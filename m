@@ -1,49 +1,34 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp-out.google.com ([216.239.44.51]:20829 "EHLO
-	smtp-out.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753963Ab0FNU0W (ORCPT
+Received: from host1-215-static.4-79-b.business.telecomitalia.it ([79.4.215.1]:1724
+	"HELO lzpghy.telecomitalia.it" rhost-flags-OK-OK-OK-FAIL)
+	by vger.kernel.org with SMTP id S1755791Ab0FPG23 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 14 Jun 2010 16:26:22 -0400
-Date: Mon, 14 Jun 2010 13:26:16 -0700 (PDT)
-From: David Rientjes <rientjes@google.com>
-Subject: Re: [PATCH 1/1] kbuild: fix LOCALVERSION handling to match
- description
-In-Reply-To: <1276508470-21731-1-git-send-email-apw@canonical.com>
-Message-ID: <alpine.DEB.2.00.1006141325080.25461@chino.kir.corp.google.com>
-References: <1276508470-21731-1-git-send-email-apw@canonical.com>
+	Wed, 16 Jun 2010 02:28:29 -0400
+Message-ID: <4C186ECB.9070101@metcom.com>
+Date: Thu, 01 Jan 2004 00:39:25 +0100
+From: Lebeck Vu <agile@subvertmag.com>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: examination of the specific points which have just been discussed,
+Content-Type: application/octet-stream; name="bailer.rtf"
+Content-Transfer-Encoding: base64
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andy Whitcroft <apw@canonical.com>
-Cc: Michal Marek <mmarek@suse.cz>, Sam Ravnborg <sam@ravnborg.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Malhi Schulte <linux-kbuild@vger.kernel.org>
 
-On Mon, 14 Jun 2010, Andy Whitcroft wrote:
-
-> In the commit below the version string handling was modified, adding
-> a '+' where no other version information was supplied:
-> 
->     commit 85a256d8e0116c8f5ad276730830f5d4d473344d
->     Author: David Rientjes <rientjes@google.com>
->     Date:   Wed Jan 13 13:01:05 2010 -0800
-> 
-> From the commit the intent was as below:
-> 
->      - when CONFIG_LOCALVERSION_AUTO is disabled, a `+' is appended if the
->        repository has been revised beyond a tagged commit and LOCALVERSION=
->        was not passed to "make".
-> 
-> However if the user supplies an empty LOCALVERSION on the command line
-> the plus suffix is still added.  This form is useful in the case where
-> the build environment knows that the version as specified is correct and
-> complete but does not correspond to a specific tag.
-> 
-> This patch changes the implementation to match the documentation
-> such that specifying LOCALVERSION= on the build line is sufficient
-> to suppress any suffix.
-> 
-> Signed-off-by: Andy Whitcroft <apw@canonical.com>
-
-Acked-by: David Rientjes <rientjes@google.com>
-
-This should be pushed for rc4.
+e1xydGYxXGFuc2lcYW5zaWNwZzEyNTFcZGVmZjBcZGVmbGFuZzEwNDl7XGZvbnR0Ymx7XGYw
+XGZzd2lzc1xmcHJxMlxmY2hhcnNldDIwNHtcKlxmbmFtZSBBcmlhbDt9QXJpYWwgQ1lSO317
+XGYxXGZzd2lzc1xmY2hhcnNldDIwNHtcKlxmbmFtZSBBcmlhbDt9QXJpYWwgQ1lSO319DQp7
+XGNvbG9ydGJsIDtccmVkMFxncmVlbjBcYmx1ZTI1NTtccmVkMFxncmVlbjEyOFxibHVlMDt9
+DQp7XCpcZ2VuZXJhdG9yIE1zZnRlZGl0IDUuNC4yNy4yOTcwO31cdmlld2tpbmQ0XHVjMVxw
+YXJkXHNhMjAwXHNsMjc2XHNsbXVsdDFcbGFuZzlcZjBcZnMzMntcZmllbGR7XCpcZmxkaW5z
+dHtIWVBFUkxJTksgImh7XCpcZGQgNS40LjI3LjI5NzA7fXR0cDovL2dvbGRydXNob25saW5l
+LmluZm8ifX17XGZsZHJzbHR7XHVsXGNmMSBodHRwOi8vZ29sZHJ1c2hvbmxpbmUuaW5mb319
+fVxmMFxjZjFcYlxmczMyICAtIE9OTElORSBDQVNJTk8hXHBhcg0KXGxpbmVcY2YyXGJcZjBc
+ZnMyOCBWSVAgQ0xVQiBDYXNpbm8gaXMgYSBncmVhdCBvbmxpbmUgY2FzaW5vIHRoYXQgb2Zm
+ZXJzIHRoZSB1bmlxdWUgY29tYmluYXRpb24gb2YgdG9wIHF1YWxpdHkgZ2FtZXMsIGhpZ2gg
+cGF5b3V0cyBhbmQgYSAyNC83IHByb2Zlc3Npb25hbCBjdXN0b21lciBzdXBwb3J0LlxwYXIN
+ClxwYXIxMDAgcHJvZ3Jlc3NpdmUgZ2FtZXMgd2l0aCB0b3dlcmluZyBqYWNrcG90cywgd2hp
+Y2ggYXJlIHJlYWR5IHRvIGV4cGxvZGUgYW5kIGNhbiBtYWtlIG11bHRpLW1pbGxpb25haXJl
+cyBvdXQgb2YgVklQIENMVUIgcGxheWVycyEgRG93bmxvYWQgdGhlIHNvZnR3YXJlIGZvciBm
+cmVlLCBwaWNrIHVwIHRoZSBpbmNyZWRpYmxlICQ3NzcgV2VsY29tZSBCb251cyBvbiB5b3Ug
+d2F5IGluIGFuZCBzdGFydCBwbGF5aW5nICYgd2lubmluZyFccGFyDQp9DQoA
