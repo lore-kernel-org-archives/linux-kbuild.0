@@ -1,42 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from po-out-1718.google.com ([72.14.252.152]:51150 "EHLO
-	po-out-1718.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754545AbYACEh0 (ORCPT
+Received: from miranda.se.axis.com ([193.13.178.8]:60274 "EHLO
+	miranda.se.axis.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752120AbYACREL (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 2 Jan 2008 23:37:26 -0500
-Received: by po-out-1718.google.com with SMTP id c31so4459906poi.1
-        for <linux-kbuild@vger.kernel.org>; Wed, 02 Jan 2008 20:37:26 -0800 (PST)
-Date: Thu, 3 Jan 2008 12:37:32 +0800
-From: WANG Cong <xiyou.wangcong@gmail.com>
-Subject: Re: [Patch 0/8] Remove 'TOPDIR' from Makefiles
-Message-ID: <20080103043732.GA2505@hacking>
-Reply-To: WANG Cong <xiyou.wangcong@gmail.com>
-References: <20080101071311.GA2496@hacking> <20080102095159.GB7815@uranus.ravnborg.org>
+	Thu, 3 Jan 2008 12:04:11 -0500
+Date: Thu, 3 Jan 2008 18:03:22 +0100
+From: Jesper Nilsson <jesper.nilsson@axis.com>
+Subject: Re: (Try #3) [Patch 4/8] CRIS: Remove 'TOPDIR' from Makefiles
+Message-ID: <20080103170322.GC9512@axis.com>
+References: <20080101071311.GA2496@hacking> <20080101072922.GE2496@hacking> <20080101102010.GD28913@uranus.ravnborg.org> <20080101133421.GD2499@hacking> <20080102062759.GF2493@hacking> <20080102192535.GC11217@uranus.ravnborg.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20080102095159.GB7815@uranus.ravnborg.org>
+In-Reply-To: <20080102192535.GC11217@uranus.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Sam Ravnborg <sam@ravnborg.org>
-Cc: WANG Cong <xiyou.wangcong@gmail.com>, LKML <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org, Andrew Morton <akpm@osdl.org>
+Cc: WANG Cong <xiyou.wangcong@gmail.com>, Mikael Starvik <mikael.starvik@axis.com>, LKML <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org, Andrew Morton <akpm@osdl.org>, dev-etrax@axis.com, Andreas Schwab <schwab@suse.de>
 
+On Wed, Jan 02, 2008 at 08:25:35PM +0100, Sam Ravnborg wrote:
+> On Wed, Jan 02, 2008 at 02:27:59PM +0800, WANG Cong wrote:
+> > 
+> > Refine it as suggested by Andreas.
+> > 
+> > -------->
+> > 
+> > This patch removes TOPDIR from Cris Makefiles.
 
->Hi Wang.
->
->You a heads up. I will most likely apply
->the remaining of the patches tonight, except the UM stuff
->which I hope Jeff to take and the final removal of TOPDIR
->may wait a bit.
->I want the s390, xfs and um changes to hit -mm at least
->and we have several external modules that uses TOPDIR.
->
->And some of these external modules I care about - not
->all of them but some of them.
->
->	Sam
+We had the TOPDIR replaced with $(srcdir) already, but this looks better.
 
-Thanks, Sam!
+Compiles OK for both EtraxFS and ARTPEC-3 cpus in our tree.
 
- Cong
+> > Cc: Mikael Starvik <starvik@axis.com>
+> > Cc: Sam Ravnborg <sam@ravnborg.org>
+> > Cc: Andreas Schwab <schwab@suse.de>
+> > Signed-off-by: WANG Cong <xiyou.wangcong@gmail.com>
+> 
+> Added Jesper to Cc and applied.
 
+Thanks!
+
+> 	Sam
+
+/^JN - Jesper Nilsson
+--
+               Jesper Nilsson -- jesper.nilsson@axis.com
