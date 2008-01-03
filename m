@@ -1,47 +1,44 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from miranda.se.axis.com ([193.13.178.8]:60274 "EHLO
-	miranda.se.axis.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752120AbYACREL (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 3 Jan 2008 12:04:11 -0500
-Date: Thu, 3 Jan 2008 18:03:22 +0100
-From: Jesper Nilsson <jesper.nilsson@axis.com>
-Subject: Re: (Try #3) [Patch 4/8] CRIS: Remove 'TOPDIR' from Makefiles
-Message-ID: <20080103170322.GC9512@axis.com>
-References: <20080101071311.GA2496@hacking> <20080101072922.GE2496@hacking> <20080101102010.GD28913@uranus.ravnborg.org> <20080101133421.GD2499@hacking> <20080102062759.GF2493@hacking> <20080102192535.GC11217@uranus.ravnborg.org>
-MIME-Version: 1.0
+Received: from pasmtpa.tele.dk ([80.160.77.114]:49137 "EHLO pasmtpA.tele.dk"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752040AbYACUHZ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 3 Jan 2008 15:07:25 -0500
+Date: Thu, 3 Jan 2008 21:07:09 +0100
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: [RFC] Make kconfig MinGW friendly
+Message-ID: <20080103200709.GE21227@uranus.ravnborg.org>
+References: <20071217180741.GA17759@michl.2n.cz>
+Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20080102192535.GC11217@uranus.ravnborg.org>
+In-Reply-To: <20071217180741.GA17759@michl.2n.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: WANG Cong <xiyou.wangcong@gmail.com>, Mikael Starvik <mikael.starvik@axis.com>, LKML <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org, Andrew Morton <akpm@osdl.org>, dev-etrax@axis.com, Andreas Schwab <schwab@suse.de>
+To: Ladislav Michl <ladis@linux-mips.org>
+Cc: linux-kbuild@vger.kernel.org
 
-On Wed, Jan 02, 2008 at 08:25:35PM +0100, Sam Ravnborg wrote:
-> On Wed, Jan 02, 2008 at 02:27:59PM +0800, WANG Cong wrote:
-> > 
-> > Refine it as suggested by Andreas.
-> > 
-> > -------->
-> > 
-> > This patch removes TOPDIR from Cris Makefiles.
-
-We had the TOPDIR replaced with $(srcdir) already, but this looks better.
-
-Compiles OK for both EtraxFS and ARTPEC-3 cpus in our tree.
-
-> > Cc: Mikael Starvik <starvik@axis.com>
-> > Cc: Sam Ravnborg <sam@ravnborg.org>
-> > Cc: Andreas Schwab <schwab@suse.de>
-> > Signed-off-by: WANG Cong <xiyou.wangcong@gmail.com>
+On Mon, Dec 17, 2007 at 07:07:41PM +0100, Ladislav Michl wrote:
+> Why the hell would you want do to such stupid thing?
 > 
-> Added Jesper to Cc and applied.
+> Kconfig is powerfull tool. So powerfull that more and more software
+> projects are using it for configuration. So instead of fixing some of
+> them one by one, lets fix it in kernel and wait for sync.
+> 
+> This work was originaly done for PTXdist - GPL licensed build system for
+> userlands and cross-compilers, but it will not hurt kernel kconfig
+> either. PTXdist menuconfig now works on Windows linked with PDCurses and
+> compiled using MinGW - there is no termios and signals.
+> 
+> Signed-off-by: Ladislav Michl <ladis@linux-mips.org>
+> 
+> * Do not include <sys/wait.h> and <signal.h> (comes from times when
+>   lxdialog was separate process)
+> * Do not mess with termios directly and let curses tell screen size.
+>   Comment to commit c8dc68ad0fbd934e78e913b8a8d7b45945db4930 says
+>   check for screen size could be removed later, but because it didn't
+>   happen for more than year I left it here as well.
 
-Thanks!
+Looks good to me and works for me - so applied.
 
-> 	Sam
-
-/^JN - Jesper Nilsson
---
-               Jesper Nilsson -- jesper.nilsson@axis.com
+Thanks,
+	Sam
