@@ -1,101 +1,81 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from sovereign.computergmbh.de ([85.214.69.204]:41758 "EHLO
-	sovereign.computergmbh.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754246AbYACWdp (ORCPT
+Received: from ro-out-1112.google.com ([72.14.202.180]:38784 "EHLO
+	ro-out-1112.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751750AbYADNXd (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 3 Jan 2008 17:33:45 -0500
-Date: Thu, 3 Jan 2008 23:33:44 +0100 (CET)
-From: Jan Engelhardt <jengelh@computergmbh.de>
+	Fri, 4 Jan 2008 08:23:33 -0500
+Received: by ro-out-1112.google.com with SMTP id p4so1410100roc.5
+        for <linux-kbuild@vger.kernel.org>; Fri, 04 Jan 2008 05:23:32 -0800 (PST)
+Date: Fri, 4 Jan 2008 21:23:16 +0800
+From: WANG Cong <xiyou.wangcong@gmail.com>
 Subject: Re: Kbuild update
-In-Reply-To: <20080103213255.GA21811@uranus.ravnborg.org>
-Message-ID: <Pine.LNX.4.64.0801032308400.26693@fbirervta.pbzchgretzou.qr>
+Message-ID: <20080104132316.GA2485@hacking>
+Reply-To: WANG Cong <xiyou.wangcong@gmail.com>
 References: <20080103213255.GA21811@uranus.ravnborg.org>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20080103213255.GA21811@uranus.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Sam Ravnborg <sam@ravnborg.org>
 Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
 
 
-On Jan 3 2008 22:32, Sam Ravnborg wrote:
->
->On top of this I have my personal todo items such as:
->- modern ncurses interface for menuconfig (ala tig, htop and others)
-
-Sorry.. your comparison {menuconfig, htop} raises an "incompatible
-pointer passed" on my side. Please explain :)
-
+{snip}
 
 >TODO items (from my mailbox - I have plenty more)
 >=================================================
+>- asm-offset useable from modules (Oleg had a half backed solution)
+>- modpost should use err(), warn() etc (suggestyed by Rusty)
+>- less kernel hardcoding in kconfig (Rob Landley)
+>- emit dependencies from "depends" (Bernhard Fischer)
+>- fix select (whatever that means)
 >- allow kconfig to accept overrides (Jan Engelhart)
 >  maybe there is a patch, needs followup
+>- document kernel build better (Andreas Hermann)
+>  just a start, more is needed
+>- save ARCH and CROSSCOMPILE
+>  requires major surgery to do correct - we use CC too early
+>- i18n patch for mconf and friends (from Kernel Translator project)
+>  is old but several bits of it needs to be applied to better support i18n
 
-Indeed there is/was a patch. Well, the one I sent last time.
-http://lkml.org/lkml/2007/10/18/206
+Hmm, I glanced at that project. It's old and seems freezed now.
+I don't know if people still have interests in the i18n of kconfig.
+If so, I think I can help with the Chinese part. ;)
 
-I have updated it to Linus's current treetop.
-git://computergmbh.de/linux 'kconfig' branch;
 
-===
+>- i18n support in kernel
+>  some like it, others don't. But now we have japanese versions of some docs...
 
-commit da9389c3e640f9ee261865beb6b9861fe5b30b78
-Author: Jan Engelhardt <jengelh@computergmbh.de>
-Date:   Thu Jan 3 23:23:38 2008 +0100
+Well, in fact, we've already had some Chinese docs too. ;)
+Just have a look at Documentation/zh_CN/.
 
-    kconfig: allow overriding symbols
-    
-    Allow config variables in .config to override earlier ones in the same
-    file. In other words,
-    
-    	# CONFIG_SECURITY is not defined
-    	CONFIG_SECURITY=y
-    
-    will activate it. This makes it a bit easier to do
-    
-    	cat original-config myconfig myconfig2 ... >.config;
-    
-    and run *config as expected.
-    
-    Signed-off-by: Jan Engelhardt <jengelh@computergmbh.de>
 
-diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
-index e0f402f..2853ca7 100644
---- a/scripts/kconfig/confdata.c
-+++ b/scripts/kconfig/confdata.c
-@@ -232,8 +232,7 @@ load:
- 					sym->type = S_BOOLEAN;
- 			}
- 			if (sym->flags & def_flags) {
--				conf_warning("trying to reassign symbol %s", sym->name);
--				break;
-+				conf_warning("override: reassigning to symbol %s", sym->name);
- 			}
- 			switch (sym->type) {
- 			case S_BOOLEAN:
-@@ -272,8 +271,7 @@ load:
- 					sym->type = S_OTHER;
- 			}
- 			if (sym->flags & def_flags) {
--				conf_warning("trying to reassign symbol %s", sym->name);
--				break;
-+				conf_warning("override: reassigning to symbol %s", sym->name);
- 			}
- 			if (conf_set_sym_val(sym, def, def_flags, p))
- 				continue;
-@@ -297,11 +295,9 @@ load:
- 				}
- 				break;
- 			case yes:
--				if (cs->def[def].tri != no) {
--					conf_warning("%s creates inconsistent choice state", sym->name);
--					cs->flags &= ~def_flags;
--				} else
--					cs->def[def].val = sym;
-+				if(cs->def[def].tri != no)
-+					conf_warning("override: %s changes choice state", sym->name);
-+				cs->def[def].val = sym;
- 				break;
- 			}
- 			cs->def[def].tri = E_OR(cs->def[def].tri, sym->def[def].tri);
+>- use GCC --combine (David Woodhouse)
+>- more color themes (Jan Engelhart)
+>  and I would like them selectable from inside menuconfig
+>- walk throug the ~15 qconf related patched - are they relevant?
+>- document use of __init and related sections
+>- Use seperate sections for all init sections to improve checking
+>- improve headers_check (10x speed up is possible by doing a dir-by-dir check)
+>
+>bugzilla.kernel.org
+>===================
+>7103 	sam@ravnborg.org 	NEW 		2.6.17.* 	initramfs problem
+>3174 	sam@ravnborg.org 	ASSI 		2.6.7 	        make rpm creates erroneous version number
+>3486 	sam@ravnborg.org 	ASSI 		2.6.4-52 	"make clean" on external driver will clean the kernel sou...
+>6860 	sam@ravnborg.org 	ASSI 		2.6.18-rc1 	'make deb-pkg' create incorrect package name
+>7042 	sam@ravnborg.org 	ASSI 		2.6.17.7 	Recursing into /lib/modules/`uname -r`/build infects my b...
+>8275 	sam@ravnborg.org 	ASSI 		2.6.21-rc5-g28d... 	make rpm-pkg broken for git cloned sources
+>
+
+I will take a look at the problems and see if I can help you.
+
+{snip}
+
+>Note: The kbuild stuff is done only in my spare time and
+>      with 3 kids, a wife and a full-time job I am often lacking behind.
+
+Thanks for your work, Sam!
+
