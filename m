@@ -1,53 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pasmtpb.tele.dk ([80.160.77.98]:34552 "EHLO pasmtpB.tele.dk"
+Received: from pasmtpb.tele.dk ([80.160.77.98]:55832 "EHLO pasmtpB.tele.dk"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751842AbYADOjx (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 4 Jan 2008 09:39:53 -0500
-Date: Fri, 4 Jan 2008 15:39:53 +0100
+	id S1753128AbYADTn0 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 4 Jan 2008 14:43:26 -0500
+Date: Fri, 4 Jan 2008 20:43:28 +0100
 From: Sam Ravnborg <sam@ravnborg.org>
 Subject: Re: Kbuild update
-Message-ID: <20080104143953.GA30536@uranus.ravnborg.org>
-References: <20080103213255.GA21811@uranus.ravnborg.org> <20080104132316.GA2485@hacking>
+Message-ID: <20080104194328.GA32091@uranus.ravnborg.org>
+References: <20080103213255.GA21811@uranus.ravnborg.org> <Pine.LNX.4.64.0801032308400.26693@fbirervta.pbzchgretzou.qr>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20080104132316.GA2485@hacking>
+In-Reply-To: <Pine.LNX.4.64.0801032308400.26693@fbirervta.pbzchgretzou.qr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: WANG Cong <xiyou.wangcong@gmail.com>
+To: Jan Engelhardt <jengelh@computergmbh.de>
 Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
 
-On Fri, Jan 04, 2008 at 09:23:16PM +0800, WANG Cong wrote:
+On Thu, Jan 03, 2008 at 11:33:44PM +0100, Jan Engelhardt wrote:
 > 
-> {snip}
+> On Jan 3 2008 22:32, Sam Ravnborg wrote:
+> >
+> >On top of this I have my personal todo items such as:
+> >- modern ncurses interface for menuconfig (ala tig, htop and others)
+> 
+> Sorry.. your comparison {menuconfig, htop} raises an "incompatible
+> pointer passed" on my side. Please explain :)
+
+htop is a nice ncurses based interface to top.
+
+Try "F2" and see a nice layout for a menu structure remotely
+similar to menuconfig.
+I could mention a few more - this was more to say that there
+exist much beter looking ncurses based tools than menuconfig.
+
 > 
 > >TODO items (from my mailbox - I have plenty more)
 > >=================================================
-> >- asm-offset useable from modules (Oleg had a half backed solution)
-> >- modpost should use err(), warn() etc (suggestyed by Rusty)
-> >- less kernel hardcoding in kconfig (Rob Landley)
-> >- emit dependencies from "depends" (Bernhard Fischer)
-> >- fix select (whatever that means)
 > >- allow kconfig to accept overrides (Jan Engelhart)
 > >  maybe there is a patch, needs followup
-> >- document kernel build better (Andreas Hermann)
-> >  just a start, more is needed
-> >- save ARCH and CROSSCOMPILE
-> >  requires major surgery to do correct - we use CC too early
-> >- i18n patch for mconf and friends (from Kernel Translator project)
-> >  is old but several bits of it needs to be applied to better support i18n
 > 
-> Hmm, I glanced at that project. It's old and seems freezed now.
-> I don't know if people still have interests in the i18n of kconfig.
-> If so, I think I can help with the Chinese part. ;)
+> Indeed there is/was a patch. Well, the one I sent last time.
+> http://lkml.org/lkml/2007/10/18/206
+> 
+> I have updated it to Linus's current treetop.
+> git://computergmbh.de/linux 'kconfig' branch;
 
-From the off-list communication I have had there is indeed an interest.
-It sort of stopped at one point due to missing integration in mainline.
-What I refer to is mostly the mconf.c bits, but I would also like to
-see what lkml says to a sample of .po files included in the kernel
-for a number of languages.
-
-One criteria to get a .po file integrated could be at least 10% of the
-strings translated or similar.
+Applied after fixing one checkpatch error.
+I did not care about the lines longer than 80 in this case.
+I also restored the original Cc: list.
 
 	Sam
