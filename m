@@ -1,13 +1,15 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail29.messagelabs.com ([216.82.249.147]:40111 "HELO
+Received: from mail29.messagelabs.com ([216.82.249.147]:31656 "HELO
 	mail29.messagelabs.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with SMTP id S1750951AbYAHOKs (ORCPT
+	with SMTP id S1751084AbYAHOQ3 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 8 Jan 2008 09:10:48 -0500
+	Tue, 8 Jan 2008 09:16:29 -0500
 From: =?utf-8?q?Uwe=20Kleine-K=C3=B6nig?= <Uwe.Kleine-Koenig@digi.com>
-Subject: [PATCH] ignore cache modifiers for generating the tag files
-Date: Tue,  8 Jan 2008 15:10:29 +0100
-Message-Id: <1199801429-19325-1-git-send-email-Uwe.Kleine-Koenig@digi.com>
+Subject: [PATCH v2] ignore cache modifiers for generating the tag files
+Date: Tue,  8 Jan 2008 15:16:24 +0100
+Message-Id: <1199801784-19490-1-git-send-email-Uwe.Kleine-Koenig@digi.com>
+In-Reply-To: <1199801429-19325-1-git-send-email-Uwe.Kleine-Koenig@digi.com>
+References: <1199801429-19325-1-git-send-email-Uwe.Kleine-Koenig@digi.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
@@ -34,21 +36,21 @@ Cc: Sam Ravnborg <sam@ravnborg.org>
 
 Hello,
 
-I'm not sure if this is the right place to send this patch to, but your
-MAINTAINER entry is the most promising ...
+I sent out an old version of this patch by mistake, please ignore the first
+post and use this one instead.
 
-Best regards
+Sorry,
 Uwe
 
 diff --git a/Makefile b/Makefile
-index c1825aa..3de3b4e 100644
+index c1825aa..d8c1029 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -1371,6 +1371,7 @@ define xtags
  	if $1 --version 2>&1 | grep -iq exuberant; then \
  	    $(all-sources) | xargs $1 -a \
  		-I __initdata,__exitdata,__acquires,__releases \
-+		-I ____cacheline_aligned_in_smp \
++		-I __read_mostly,____cacheline_aligned,____cacheline_aligned_in_smp,____cacheline_internodealigned_in_smp \
  		-I EXPORT_SYMBOL,EXPORT_SYMBOL_GPL \
  		--extra=+f --c-kinds=+px \
  		--regex-asm='/^ENTRY\(([^)]*)\).*/\1/'; \
