@@ -1,67 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from miranda.se.axis.com ([193.13.178.8]:46189 "EHLO
-	miranda.se.axis.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752042AbYAGHJ1 convert rfc822-to-8bit (ORCPT
+Received: from mail29.messagelabs.com ([216.82.249.147]:40111 "HELO
+	mail29.messagelabs.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with SMTP id S1750951AbYAHOKs (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 7 Jan 2008 02:09:27 -0500
-From: "Mikael Starvik" <mikael.starvik@axis.com>
-Subject: RE: [Patch 4/8] CRIS: Remove 'TOPDIR' from Makefiles
-Date: Mon, 7 Jan 2008 08:08:52 +0100
-Message-ID: <BFECAF9E178F144FAEF2BF4CE739C66804C402EA@exmail1.se.axis.com>
+	Tue, 8 Jan 2008 09:10:48 -0500
+From: =?utf-8?q?Uwe=20Kleine-K=C3=B6nig?= <Uwe.Kleine-Koenig@digi.com>
+Subject: [PATCH] ignore cache modifiers for generating the tag files
+Date: Tue,  8 Jan 2008 15:10:29 +0100
+Message-Id: <1199801429-19325-1-git-send-email-Uwe.Kleine-Koenig@digi.com>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
-In-Reply-To: <BFECAF9E178F144FAEF2BF4CE739C668057FD0ED@exmail1.se.axis.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: 'Sam Ravnborg' <sam@ravnborg.org>, 'WANG Cong' <xiyou.wangcong@gmail.com>
-Cc: Mikael Starvik <mikael.starvik@axis.com>, 'LKML' <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org, 'Andrew Morton' <akpm@osdl.org>, dev-etrax <dev-etrax@axis.com>
+To: linux-kbuild@vger.kernel.org
+Cc: Sam Ravnborg <sam@ravnborg.org>
 
->PS. Mikael - should Jesper be mentioned in MAINTAINERS?
+With this patch I'm able to find the definition of _xmit_lock defined in
+include/linux/netdevice.h as follows:
 
-Yes, that is a good idea. Down the road Jesper will take over maintainership
-I guess.
+	struct net_device {
+		...
+		spinlock_t _xmit_lock ____cacheline_aligned_in_smp;
+	}
 
------Original Message-----
-From: Sam Ravnborg [mailto:sam@ravnborg.org] 
-Sent: Tuesday, January 01, 2008 11:20 AM
-To: WANG Cong
-Cc: Mikael Starvik; LKML; linux-kbuild@vger.kernel.org; Andrew Morton;
-dev-etrax
-Subject: Re: [Patch 4/8] CRIS: Remove 'TOPDIR' from Makefiles
+Otherwise this counts as definition of ____cacheline_aligned_in_smp.
 
+Signed-off-by: Uwe Kleine-König <Uwe.Kleine-Koenig@digi.com>
+Cc: Sam Ravnborg <sam@ravnborg.org>
+---
+ Makefile |    1 +
+ 1 files changed, 1 insertions(+), 0 deletions(-)
 
-On Tue, Jan 01, 2008 at 03:29:22PM +0800, WANG Cong wrote:
-> 
-> TOPDIR is obsolete, use objtree instead.
-> This patch removes TOPDIR from all Cris Makefiles.
-> 
-> Cc: Mikael Starvik <starvik@axis.com>
-> Cc: Sam Ravnborg <sam@ravnborg.org>
-> Signed-off-by: WANG Cong <xiyou.wangcong@gmail.com>
-> 
-> ---
-> 
-> diff --git a/arch/cris/arch-v32/boot/compressed/Makefile
-b/arch/cris/arch-v32/boot/compressed/Makefile
-> index 9f77eda..8586922 100644
-> --- a/arch/cris/arch-v32/boot/compressed/Makefile
-> +++ b/arch/cris/arch-v32/boot/compressed/Makefile
-> @@ -7,7 +7,7 @@
->  target = $(target_compressed_dir)
->  src    = $(src_compressed_dir)
->  
-> -CC = gcc-cris -mlinux -march=v32 -I $(TOPDIR)/include
-> +CC = gcc-cris -mlinux -march=v32 -I $(objtree)/include
+Hello,
 
-As in the mips case the right fix is to use:
-> +CC = gcc-cris -mlinux -march=v32 -Iinclude -Iinclude2
+I'm not sure if this is the right place to send this patch to, but your
+MAINTAINER entry is the most promising ...
 
-In this way we pick up the includes also in the O=..
-case.
+Best regards
+Uwe
 
-PS. Mikael - should Jesper be mentioned in MAINTAINERS?
-
-	Sam
+diff --git a/Makefile b/Makefile
+index c1825aa..3de3b4e 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1371,6 +1371,7 @@ define xtags
+ 	if $1 --version 2>&1 | grep -iq exuberant; then \
+ 	    $(all-sources) | xargs $1 -a \
+ 		-I __initdata,__exitdata,__acquires,__releases \
++		-I ____cacheline_aligned_in_smp \
+ 		-I EXPORT_SYMBOL,EXPORT_SYMBOL_GPL \
+ 		--extra=+f --c-kinds=+px \
+ 		--regex-asm='/^ENTRY\(([^)]*)\).*/\1/'; \
+-- 
+1.5.3.6
 
