@@ -1,59 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail29.messagelabs.com ([216.82.249.147]:31656 "HELO
-	mail29.messagelabs.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with SMTP id S1751084AbYAHOQ3 (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 8 Jan 2008 09:16:29 -0500
-From: =?utf-8?q?Uwe=20Kleine-K=C3=B6nig?= <Uwe.Kleine-Koenig@digi.com>
-Subject: [PATCH v2] ignore cache modifiers for generating the tag files
-Date: Tue,  8 Jan 2008 15:16:24 +0100
-Message-Id: <1199801784-19490-1-git-send-email-Uwe.Kleine-Koenig@digi.com>
-In-Reply-To: <1199801429-19325-1-git-send-email-Uwe.Kleine-Koenig@digi.com>
-References: <1199801429-19325-1-git-send-email-Uwe.Kleine-Koenig@digi.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Received: from pasmtpb.tele.dk ([80.160.77.98]:36935 "EHLO pasmtpB.tele.dk"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751754AbYAHTlt (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 8 Jan 2008 14:41:49 -0500
+Date: Tue, 8 Jan 2008 20:41:51 +0100
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: [PATCH v2] ignore cache modifiers for generating the tag files
+Message-ID: <20080108194151.GA26661@uranus.ravnborg.org>
+References: <1199801429-19325-1-git-send-email-Uwe.Kleine-Koenig@digi.com> <1199801784-19490-1-git-send-email-Uwe.Kleine-Koenig@digi.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <1199801784-19490-1-git-send-email-Uwe.Kleine-Koenig@digi.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Sam Ravnborg <sam@ravnborg.org>
+To: Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <Uwe.Kleine-Koenig@digi.com>
+Cc: linux-kbuild@vger.kernel.org
 
-With this patch I'm able to find the definition of _xmit_lock defined in
-include/linux/netdevice.h as follows:
+On Tue, Jan 08, 2008 at 03:16:24PM +0100, Uwe Kleine-König wrote:
+> With this patch I'm able to find the definition of _xmit_lock defined in
+> include/linux/netdevice.h as follows:
+> 
+> 	struct net_device {
+> 		...
+> 		spinlock_t _xmit_lock ____cacheline_aligned_in_smp;
+> 	}
+> 
+> Otherwise this counts as definition of ____cacheline_aligned_in_smp.
+> 
+> Signed-off-by: Uwe Kleine-König <Uwe.Kleine-Koenig@digi.com>
+> Cc: Sam Ravnborg <sam@ravnborg.org>
+> ---
+>  Makefile |    1 +
+>  1 files changed, 1 insertions(+), 0 deletions(-)
+> 
+> Hello,
+> 
+> I sent out an old version of this patch by mistake, please ignore the first
+> post and use this one instead.
 
-	struct net_device {
-		...
-		spinlock_t _xmit_lock ____cacheline_aligned_in_smp;
-	}
+Thanks, applied.
+And yes - I look after most of the changes to the top-level Makefile.
 
-Otherwise this counts as definition of ____cacheline_aligned_in_smp.
-
-Signed-off-by: Uwe Kleine-KÃ¶nig <Uwe.Kleine-Koenig@digi.com>
-Cc: Sam Ravnborg <sam@ravnborg.org>
----
- Makefile |    1 +
- 1 files changed, 1 insertions(+), 0 deletions(-)
-
-Hello,
-
-I sent out an old version of this patch by mistake, please ignore the first
-post and use this one instead.
-
-Sorry,
-Uwe
-
-diff --git a/Makefile b/Makefile
-index c1825aa..d8c1029 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1371,6 +1371,7 @@ define xtags
- 	if $1 --version 2>&1 | grep -iq exuberant; then \
- 	    $(all-sources) | xargs $1 -a \
- 		-I __initdata,__exitdata,__acquires,__releases \
-+		-I __read_mostly,____cacheline_aligned,____cacheline_aligned_in_smp,____cacheline_internodealigned_in_smp \
- 		-I EXPORT_SYMBOL,EXPORT_SYMBOL_GPL \
- 		--extra=+f --c-kinds=+px \
- 		--regex-asm='/^ENTRY\(([^)]*)\).*/\1/'; \
--- 
-1.5.3.6
-
+	Sam
