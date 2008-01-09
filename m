@@ -1,46 +1,70 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pasmtpb.tele.dk ([80.160.77.98]:36935 "EHLO pasmtpB.tele.dk"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751754AbYAHTlt (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 8 Jan 2008 14:41:49 -0500
-Date: Tue, 8 Jan 2008 20:41:51 +0100
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH v2] ignore cache modifiers for generating the tag files
-Message-ID: <20080108194151.GA26661@uranus.ravnborg.org>
-References: <1199801429-19325-1-git-send-email-Uwe.Kleine-Koenig@digi.com> <1199801784-19490-1-git-send-email-Uwe.Kleine-Koenig@digi.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Received: from po-out-1718.google.com ([72.14.252.153]:26140 "EHLO
+	po-out-1718.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751264AbYAICWc (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 8 Jan 2008 21:22:32 -0500
+Received: by po-out-1718.google.com with SMTP id c31so116525poi.1
+        for <linux-kbuild@vger.kernel.org>; Tue, 08 Jan 2008 18:22:31 -0800 (PST)
+Date: Wed, 9 Jan 2008 10:22:08 +0800
+From: WANG Cong <xiyou.wangcong@gmail.com>
+Subject: Re: translations (Re: Kbuild update)
+Message-ID: <20080109022208.GD2480@hacking>
+Reply-To: WANG Cong <xiyou.wangcong@gmail.com>
+References: <20080103213255.GA21811@uranus.ravnborg.org> <20080104132316.GA2485@hacking> <20080104143953.GA30536@uranus.ravnborg.org> <20080105054840.GB9976@does.not.exist> <20080106142606.GB2528@hacking> <20080106214136.GA24008@flower.upol.cz>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <1199801784-19490-1-git-send-email-Uwe.Kleine-Koenig@digi.com>
+In-Reply-To: <20080106214136.GA24008@flower.upol.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <Uwe.Kleine-Koenig@digi.com>
-Cc: linux-kbuild@vger.kernel.org
+To: Oleg Verych <olecom@flower.upol.cz>
+Cc: WANG Cong <xiyou.wangcong@gmail.com>, Adrian Bunk <bunk@kernel.org>, Sam Ravnborg <sam@ravnborg.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
 
-On Tue, Jan 08, 2008 at 03:16:24PM +0100, Uwe Kleine-König wrote:
-> With this patch I'm able to find the definition of _xmit_lock defined in
-> include/linux/netdevice.h as follows:
-> 
-> 	struct net_device {
-> 		...
-> 		spinlock_t _xmit_lock ____cacheline_aligned_in_smp;
-> 	}
-> 
-> Otherwise this counts as definition of ____cacheline_aligned_in_smp.
-> 
-> Signed-off-by: Uwe Kleine-König <Uwe.Kleine-Koenig@digi.com>
-> Cc: Sam Ravnborg <sam@ravnborg.org>
-> ---
->  Makefile |    1 +
->  1 files changed, 1 insertions(+), 0 deletions(-)
-> 
-> Hello,
-> 
-> I sent out an old version of this patch by mistake, please ignore the first
-> post and use this one instead.
 
-Thanks, applied.
-And yes - I look after most of the changes to the top-level Makefile.
+>"I will use ...
+>http://images.google.cz/images?svnum=100&um=1&hl=cs&client=firefox-a&rls=org.mozilla%3Acs%3Aofficial&q=I+will+use+Google+before&btnG=Hledat+obr%C3%A1zky
+>... for making translations..."
+>http://www.google.com/translate?u=http%3A%2F%2Flxr.linux.no%2Flinux%2FDocumentation%2FHOWTO&langpair=en%7Czh-TW&hl=en&ie=UTF8
+>?
+>
+>In case if people will help Google to have better quality of translation,
+>that will be better generally for much bigger number of *people*,
+>especially in China, isn't it?
 
-	Sam
+Perhaps yes.
+
+But at least now, that kind of translation still sucks. It can
+satisfy me.
+
+>
+>Making any official world-domination/new-world-order projects with
+>Linux will not help IMHO. Very fast code flow and almost no up to date
+>documentation is still relevant and google search + email archives
+>are not going to be obsolete in the near future.
+>
+>Also, future of the linux codebase with Chinese comments in C or in
+>ASM is kind of wired nightmare. Those, who cannot read actual source
+>code (i.e. C) will not go too far.
+>
+>So, translation guys, maybe you will stop making noise and will start
+>to make e.g. less buggy Linux? Greg KH have much more stuff to care,
+>than some translations IMHO.
+
+I never say to translate C comments. What we want to translate is the
+strings in Kconfig.
+
+I abosutely agree that we should focus on the exsiting bugs of Linux,
+but like Greg's inclusion of some kernel doc translations, this kind
+of work is really helpful to attract some kernel newbies from none
+English-speaking countries. Even we can't make offical efforts,
+the civil work, like TLKTP, is still worthy. Believe me, I am leading
+a local LUG in my college and I found that one _big_ reason that why
+the newbies are afraid of Linux kernel is English, instead of the
+C tricks or low-level programming.
+
+Regards.
+
+
+ Cong
+
