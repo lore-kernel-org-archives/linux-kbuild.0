@@ -1,34 +1,104 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pasmtpa.tele.dk ([80.160.77.114]:44893 "EHLO pasmtpA.tele.dk"
+Received: from pasmtpa.tele.dk ([80.160.77.114]:60888 "EHLO pasmtpA.tele.dk"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752138AbYAITma (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 9 Jan 2008 14:42:30 -0500
-Date: Wed, 9 Jan 2008 20:41:50 +0100
+	id S1753067AbYAIT56 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 9 Jan 2008 14:57:58 -0500
+Date: Wed, 9 Jan 2008 20:58:00 +0100
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH] use C89 random functions in conf.c
-Message-ID: <20080109194150.GC6880@uranus.ravnborg.org>
-References: <20080109153619.GA11272@michl.2n.cz>
+Subject: kbuild.git rebased
+Message-ID: <20080109195800.GA7304@uranus.ravnborg.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20080109153619.GA11272@michl.2n.cz>
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ladislav Michl <ladis@linux-mips.org>
-Cc: linux-kbuild@vger.kernel.org
+To: linux-kbuild <linux-kbuild@vger.kernel.org>
+Cc: Andrew Morton <akpm@linux-foundation.org>
 
-On Wed, Jan 09, 2008 at 04:36:19PM +0100, Ladislav Michl wrote:
-> Hi,
-> 
-> rand and srand functions conform also to C89 in addition to POSIX.1-2001,
-> which makes them a bit more portable (work also on MinGW host). Linux man
-> page also says:
-> "The versions of rand() and srand() in the Linux C Library use the same
-> random number generator as random() and srandom()".
-> Once there, sort includes and remove leading whitespace.
+I have just rebased kbuild.git.
+Content at the moment is:
 
-I have applied the relevant bis in two patches.
-One as pure cleanup and a second replacing the two remaining random functions
-with rand.
+Adrian Bunk (1):
+      Remove references to "make dep"
 
-	Sam
+Andi Kleen (3):
+      kbuild: declare the modpost error functions as printf like
+      kbuild: fix format string warnings in modpost
+      kbuild: fix a buffer overflow in modpost
+
+Andreas Mohr (1):
+      kbuild: eradicate bashisms in scripts/patch-kernel
+
+Andres Salomon (1):
+      kconfig: use getopt() in conf.c for handling command line arguments
+
+Aron Griffis (1):
+      kbuild: support mercurial in setlocalversion
+
+Geert Uytterhoeven (1):
+      kbuild: Add missing srctree prefix for includecheck and versioncheck
+
+Jan Engelhardt (1):
+      kconfig: allow overriding symbols
+
+Johannes Berg (7):
+      kernel-doc: fix xml output mode
+      kernel-doc: init kernel version
+      kernel-doc: single DOC: selection
+      kernel-doc: process functions, not DOC:
+      kernel-doc: use no-doc option
+      kernel-doc: new P directive for DOC: sections
+      convert drivers/base/power/Makefile to ccflags
+
+Josh Boyer (3):
+      kbuild: merge mkubootimg tool for building U-Boot images
+      kbuild: rework arch specific Makefiles to use mkubootimg
+      Remove mkuboot.sh script
+
+Ladislav Michl (3):
+      kconfig: make kconfig MinGW friendly
+      kconfig: fix whitespace and sort includes in conf.c
+      kconfig: use C89 random functions in conf.c
+
+Mike Frysinger (1):
+      kbuild: fixup genksyms usage/getopt
+
+Randy Dunlap (2):
+      kbuild: add 'includecheck' help text
+      kconfig: add hints/tips/tricks to Documentation/kbuild/kconfig-language.txt
+
+Robert P. J. Day (2):
+      Kbuild: Clarify the rpm-related make packaging targets
+      A few corrections to include/linux/Kbuild
+
+Sam Ravnborg (7):
+      kbuild: document versioncheck in make help
+      kconfig: if ncurses-devel is missing then say so
+      kbuild: fix buglet in gcc-version.sh
+      kbuild: ignore *.order files
+      kbuild: fix installing external modules
+      kconfig: rename E_OR & friends to avoid name clash
+      kconfig: delete unused FILE_ and SYMBOL_ flags
+
+Tejun Heo (1):
+      kbuild: implement modules.order
+
+Theodore Ts'o (3):
+      kbuild: change CONFIG_LOCALVERSION_AUTO to use a git-describe-ish format
+      kbuild: fix scripts/setlocalversion to avoid erroneous -dirty tag
+      kbuild: fix false positive -dirty tag caused by make-kpkg
+
+Uwe Kleine-König (1):
+      kbuild: ignore cache modifiers for generating the tags files
+
+Vegard Nossum (1):
+      aic7(3*x): fix firmware build
+
+WANG Cong (5):
+      MIPS: Remove 'TOPDIR' from Makefiles
+      CRIS: Remove 'TOPDIR' from Makefiles
+      INFINIBAND: Remove 'TOPDIR' from Makefiles
+      FRV: Drop 'TOPDIR' from Makefiles
+      FS: Remove dead code
+
