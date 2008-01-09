@@ -1,48 +1,89 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pasmtpb.tele.dk ([80.160.77.98]:58971 "EHLO pasmtpB.tele.dk"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750859AbYAIFSK (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 9 Jan 2008 00:18:10 -0500
-Date: Wed, 9 Jan 2008 06:18:14 +0100
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: Kbuild update
-Message-ID: <20080109051814.GB31009@uranus.ravnborg.org>
-References: <20080103213255.GA21811@uranus.ravnborg.org> <20080104132316.GA2485@hacking> <20080104143953.GA30536@uranus.ravnborg.org> <20080105054840.GB9976@does.not.exist> <20080106142606.GB2528@hacking> <20080106150744.GJ2082@does.not.exist> <20080106154521.GB3504@uranus.ravnborg.org> <20080109023239.GF2480@hacking>
-Mime-Version: 1.0
+Received: from barikada.upol.cz ([158.194.242.200]:33155 "EHLO
+	barikada.upol.cz" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751540AbYAINdM (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 9 Jan 2008 08:33:12 -0500
+Date: Wed, 9 Jan 2008 14:50:24 +0100
+Subject: Re: translations (Re: Kbuild update)
+Message-ID: <20080109135024.GD24008@flower.upol.cz>
+References: <20080103213255.GA21811@uranus.ravnborg.org> <20080104132316.GA2485@hacking> <20080104143953.GA30536@uranus.ravnborg.org> <20080105054840.GB9976@does.not.exist> <20080106142606.GB2528@hacking> <20080106214136.GA24008@flower.upol.cz> <20080109022208.GD2480@hacking>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20080109023239.GF2480@hacking>
+In-Reply-To: <20080109022208.GD2480@hacking>
+From: Oleg Verych <olecom@flower.upol.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: WANG Cong <xiyou.wangcong@gmail.com>
-Cc: Adrian Bunk <bunk@kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
+Cc: Adrian Bunk <bunk@kernel.org>, Sam Ravnborg <sam@ravnborg.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
 
-On Wed, Jan 09, 2008 at 10:32:39AM +0800, WANG Cong wrote:
+@ Wed, Jan 09, 2008 at 10:22:08AM +0800, WANG Cong wrote:
 > 
-> >> > If we can make this to be an offical project for Linux kernel, I
-> >> > think it won't be a big problem.
-> >> 
-> >> We don't even manage to maintain the English language texts properly,
-> >> and I am therefore not overly optimistic that we'll have the 
-> >> translations maintained properly for many years.
-> >Italian was 100% translated at one point in time.
-> >And the Linux Kernel Translation project has a number of
-> >spelling error fixes in queue (I dunno if they have been applied).
+> >"I will use ...
+> >http://images.google.cz/images?svnum=100&um=1&hl=cs&client=firefox-a&rls=org.mozilla%3Acs%3Aofficial&q=I+will+use+Google+before&btnG=Hledat+obr%C3%A1zky
+> >... for making translations..."
+> >http://www.google.com/translate?u=http%3A%2F%2Flxr.linux.no%2Flinux%2FDocumentation%2FHOWTO&langpair=en%7Czh-TW&hl=en&ie=UTF8
+> >?
 > >
-> >So even when run as an external project it was ok for some languages,
-> >and having it official and someone taking patches to .po files would
-> >for sure allow more users to build a kernel.
+> >In case if people will help Google to have better quality of translation,
+> >that will be better generally for much bigger number of *people*,
+> >especially in China, isn't it?
+> 
+> Perhaps yes.
+> 
+> But at least now, that kind of translation still sucks. It can
+> satisfy me.
+> 
 > >
+> >Making any official world-domination/new-world-order projects with
+> >Linux will not help IMHO. Very fast code flow and almost no up to date
+> >documentation is still relevant and google search + email archives
+> >are not going to be obsolete in the near future.
+> >
+> >Also, future of the linux codebase with Chinese comments in C or in
+> >ASM is kind of wired nightmare. Those, who cannot read actual source
+> >code (i.e. C) will not go too far.
+> >
+> >So, translation guys, maybe you will stop making noise and will start
+> >to make e.g. less buggy Linux? Greg KH have much more stuff to care,
+> >than some translations IMHO.
 > 
-> Agreed.
-> 
-> That's the goal of TLKTP. Sam, can you contact to the author of
-> TLKTP? Maybe we can talk to him to see if we can restart the
-> project. If so, I can help with the Chinese translation part.
+> I never say to translate C comments. What we want to translate is the
+> strings in Kconfig.
 
-My first try bounced, found another address for Egry Gabor -
-let's see if I have more luck.
+ftp://flower.upol.cz/upload/Configure.help
 
-The associated list is spam only so I did not try that one.
+OK, please, take a look at stuff, Korean guys did 5-6 years ago. One
+particular ARM port (S3C2410X) along with an ARM bootloader (vivi) was
+done. Yet for some reason official Linux port has another developers, and,
+it seems, it was done some time (~1-2 years) later.
 
-	Sam
+> I abosutely agree that we should focus on the exsiting bugs of Linux,
+> but like Greg's inclusion of some kernel doc translations, this kind
+> of work is really helpful to attract some kernel newbies from none
+> English-speaking countries. Even we can't make offical efforts,
+> the civil work, like TLKTP, is still worthy.
+...
+
+> Believe me, I am leading a local LUG in my college and I found that one
+> _big_ reason that why the newbies are afraid of Linux kernel is
+> English, instead of the C tricks or low-level programming.
+
+IMHO, there is so much stuff done, that any brilliant C or whatever-asm
+coder *have* to study at least something of it. And, in order to do a
+valuable contribution, one must know the work-flow, people *and* English.
+This is usually done by reading mailing list *and* archives for quite
+some time. This takes time, this takes effort, but this also have huge
+impact on intelligence and culture of the `coders'.
+
+Do you ever have a question about why History exists and is studied on
+all levels of education? Same with programming. Without
+history-via-English, one have no strong roots, thus base for grow and
+flower.
+
+OTOH, Internet has so much noise and crap all over the place, that
+information is very hard to find. It takes much time to sort and see it.
+Yet, providing noise generating, like in-tree translations, seems, is a
+very easy way around (not taking maintaining in account).
+____
