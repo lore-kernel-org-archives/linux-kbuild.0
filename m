@@ -1,60 +1,83 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pasmtpa.tele.dk ([80.160.77.114]:37567 "EHLO pasmtpA.tele.dk"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750801AbYANF6n (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 14 Jan 2008 00:58:43 -0500
-Date: Mon, 14 Jan 2008 06:58:48 +0100
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: kconfig: support option env="" [Was: kconfig: use $K64BIT to set 64BIT with all*config targets]
-Message-ID: <20080114055848.GA5187@uranus.ravnborg.org>
-References: <20071110204038.GA13140@uranus.ravnborg.org> <11947274093185-git-send-email-sam@ravnborg.org> <11947274091127-git-send-email-sam@ravnborg.org> <Pine.LNX.4.64.0711142116500.1818@scrub.home> <20071114220840.GB10920@uranus.ravnborg.org> <Pine.LNX.4.64.0711151616330.1817@scrub.home> <20080106132601.GA3139@uranus.ravnborg.org> <Pine.LNX.4.64.0801140442420.17507@scrub.home>
-Mime-Version: 1.0
+Received: from ag-out-0708.google.com ([72.14.246.246]:24135 "EHLO
+	ag-out-0708.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751356AbYANG1c (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 14 Jan 2008 01:27:32 -0500
+Received: by ag-out-0708.google.com with SMTP id 23so1377453agd.10
+        for <linux-kbuild@vger.kernel.org>; Sun, 13 Jan 2008 22:27:29 -0800 (PST)
+Date: Mon, 14 Jan 2008 14:26:34 +0800
+From: WANG Cong <xiyou.wangcong@gmail.com>
+Subject: Re: (Try #3) [Patch 2/8] MIPS: Remove 'TOPDIR' from Makefiles
+Message-ID: <20080114062634.GB2537@hacking>
+Reply-To: WANG Cong <xiyou.wangcong@gmail.com>
+References: <20080101071311.GA2496@hacking> <20080101072238.GC2496@hacking> <20080101101540.GB28913@uranus.ravnborg.org> <jefxxhlkxb.fsf@sykes.suse.de> <20080101175754.GC31575@uranus.ravnborg.org> <20080102062135.GE2493@hacking> <20080111141754.GC19900@linux-mips.org> <20080111170204.GA28299@uranus.ravnborg.org>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Pine.LNX.4.64.0801140442420.17507@scrub.home>
+In-Reply-To: <20080111170204.GA28299@uranus.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Roman Zippel <zippel@linux-m68k.org>
-Cc: LKML <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: Ralf Baechle <ralf@linux-mips.org>, WANG Cong <xiyou.wangcong@gmail.com>, Andreas Schwab <schwab@suse.de>, LKML <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org, Andrew Morton <akpm@osdl.org>, linux-mips@linux-mips.org
 
-On Mon, Jan 14, 2008 at 04:49:48AM +0100, Roman Zippel wrote:
-> Hi,
-> 
-> On Sun, 6 Jan 2008, Sam Ravnborg wrote:
-> 
-> > Please get back to me so we can finsih this patch and have it applied.
-> > I will split the patch in two btw.
-> 
-> I reworked the patch a little and split it into three.
+On Fri, Jan 11, 2008 at 06:02:04PM +0100, Sam Ravnborg wrote:
+>On Fri, Jan 11, 2008 at 02:17:54PM +0000, Ralf Baechle wrote:
+>> On Wed, Jan 02, 2008 at 02:21:36PM +0800, WANG Cong wrote:
+>> 
+>> > >> Shouldn't that use $(LINUXINCLUDE), or $(KBUILD_CPPFLAGS)?
+>> > >It would be better to use $(LINUXINCLUDE) as we then pull in all config
+>> > >symbols too and do not have to hardcode kbuild internal names (include2).
+>> > 
+>> > OK. Refine this patch.
+>> 
+>> LDSCRIPT also needed fixing to get builds in a separate object directory
+>> working again.
+>> 
+>> I've applied below fix.
+>
+>Great - I will drop it from my tree. 
+>
+>See small comment below.
+>
+>	Sam
+>
+>
+>>   Ralf
+>> 
+>> From 8babf06e1265214116fb8ffc634c04df85597c52 Mon Sep 17 00:00:00 2001
+>> From: WANG Cong <xiyou.wangcong@gmail.com>
+>> Date: Wed, 2 Jan 2008 14:21:36 +0800
+>> Subject: [PATCH] [MIPS] Lasat: Fix built in separate object directory.
+>> 
+>> Signed-off-by: WANG Cong <xiyou.wangcong@gmail.com>
+>> 
+>> [Ralf: The LDSCRIPT script needed fixing, too]
+>> 
+>> Signed-off-by: Ralf Baechle <ralf@linux-mips.org>
+>> 
+>> diff --git a/arch/mips/lasat/image/Makefile b/arch/mips/lasat/image/Makefile
+>> index 5332449..7ccd40d 100644
+>> --- a/arch/mips/lasat/image/Makefile
+>> +++ b/arch/mips/lasat/image/Makefile
+>> @@ -12,11 +12,11 @@ endif
+>>  
+>>  MKLASATIMG = mklasatimg
+>>  MKLASATIMG_ARCH = mq2,mqpro,sp100,sp200
+>> -KERNEL_IMAGE = $(TOPDIR)/vmlinux
+>> +KERNEL_IMAGE = vmlinux
+>>  KERNEL_START = $(shell $(NM) $(KERNEL_IMAGE) | grep " _text" | cut -f1 -d\ )
+>>  KERNEL_ENTRY = $(shell $(NM) $(KERNEL_IMAGE) | grep kernel_entry | cut -f1 -d\ )
+>>  
+>> -LDSCRIPT= -L$(obj) -Tromscript.normal
+>> +LDSCRIPT= -L$(srctree)/$(obj) -Tromscript.normal
+>
+>This needs to read:
+>> +LDSCRIPT= -L$(srctree)/$(src) -Tromscript.normal
+>
+>
+>(There is no difference between src and obj in normal cases but to be consistent
+>it shuld be like above).
 
-Thanks Roman.
-I will test and apply tonight.
+Agreed. Thank you!
 
-Removal of KERNELVERSION in patch #3 is wrong as the frontend
-uses KERNELVERSION to display the kernel version in their title.
-I will drop the deletion before I apply the patch.
-
-
-> 
-> > > +	if (sym->flags & SYMBOL_AUTO)
-> > > +		sym->flags &= ~SYMBOL_WRITE;
-> > > +
-> > 
-> > Why is this change needed?
-> > It is non-obvious to me so please explain and I will add a comment.
-> 
-> Automatically generated symbols are not saved, this was previously not 
-> needed as they weren't in the menu structure.
-OK
-
-> 
-> > I did it like this:
-> > 			menu_warn(current_entry,
-> > 			          "config %s: redefining environment symbol from '%s' to '%s'",
-> > 			          sym->name, env, sym2->name);
-> 
-> I omitted the prefix, it's inconsistent with other warnings.
-OK
-
-Thanks,
-	Sam
