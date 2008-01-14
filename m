@@ -1,69 +1,60 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from scrub.xs4all.nl ([194.109.195.176]:3531 "EHLO scrub.xs4all.nl"
+Received: from pasmtpa.tele.dk ([80.160.77.114]:37567 "EHLO pasmtpA.tele.dk"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754725AbYANDvS (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 13 Jan 2008 22:51:18 -0500
-Date: Mon, 14 Jan 2008 04:51:16 +0100 (CET)
-From: Roman Zippel <zippel@linux-m68k.org>
-Subject: [PATCH 3/3] use environment option
-In-Reply-To: <20080106132601.GA3139@uranus.ravnborg.org>
-Message-ID: <Pine.LNX.4.64.0801140450580.17507@scrub.home>
-References: <20071110204038.GA13140@uranus.ravnborg.org>
- <11947274093185-git-send-email-sam@ravnborg.org> <11947274091127-git-send-email-sam@ravnborg.org>
- <Pine.LNX.4.64.0711142116500.1818@scrub.home> <20071114220840.GB10920@uranus.ravnborg.org>
- <Pine.LNX.4.64.0711151616330.1817@scrub.home> <20080106132601.GA3139@uranus.ravnborg.org>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+	id S1750801AbYANF6n (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 14 Jan 2008 00:58:43 -0500
+Date: Mon, 14 Jan 2008 06:58:48 +0100
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: kconfig: support option env="" [Was: kconfig: use $K64BIT to set 64BIT with all*config targets]
+Message-ID: <20080114055848.GA5187@uranus.ravnborg.org>
+References: <20071110204038.GA13140@uranus.ravnborg.org> <11947274093185-git-send-email-sam@ravnborg.org> <11947274091127-git-send-email-sam@ravnborg.org> <Pine.LNX.4.64.0711142116500.1818@scrub.home> <20071114220840.GB10920@uranus.ravnborg.org> <Pine.LNX.4.64.0711151616330.1817@scrub.home> <20080106132601.GA3139@uranus.ravnborg.org> <Pine.LNX.4.64.0801140442420.17507@scrub.home>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Pine.LNX.4.64.0801140442420.17507@scrub.home>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
+To: Roman Zippel <zippel@linux-m68k.org>
 Cc: LKML <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
 
+On Mon, Jan 14, 2008 at 04:49:48AM +0100, Roman Zippel wrote:
+> Hi,
+> 
+> On Sun, 6 Jan 2008, Sam Ravnborg wrote:
+> 
+> > Please get back to me so we can finsih this patch and have it applied.
+> > I will split the patch in two btw.
+> 
+> I reworked the patch a little and split it into three.
 
-Use the environment option to provide the ARCH symbol.
-Remove the unused KERNELVERSION symbol.
+Thanks Roman.
+I will test and apply tonight.
 
-Signed-off-by: Roman Zippel <zippel@linux-m68k.org>
+Removal of KERNELVERSION in patch #3 is wrong as the frontend
+uses KERNELVERSION to display the kernel version in their title.
+I will drop the deletion before I apply the patch.
 
----
- init/Kconfig             |    4 ++++
- scripts/kconfig/symbol.c |   14 --------------
- 2 files changed, 4 insertions(+), 14 deletions(-)
 
-Index: linux-2.6/init/Kconfig
-===================================================================
---- linux-2.6.orig/init/Kconfig
-+++ linux-2.6/init/Kconfig
-@@ -1,3 +1,7 @@
-+config ARCH
-+	string
-+	option env="ARCH"
-+
- config DEFCONFIG_LIST
- 	string
- 	depends on !UML
-Index: linux-2.6/scripts/kconfig/symbol.c
-===================================================================
---- linux-2.6.orig/scripts/kconfig/symbol.c
-+++ linux-2.6/scripts/kconfig/symbol.c
-@@ -56,20 +56,6 @@ void sym_init(void)
- 
- 	uname(&uts);
- 
--	sym = sym_lookup("ARCH", 0);
--	sym->type = S_STRING;
--	sym->flags |= SYMBOL_AUTO;
--	p = getenv("ARCH");
--	if (p)
--		sym_add_default(sym, p);
--
--	sym = sym_lookup("KERNELVERSION", 0);
--	sym->type = S_STRING;
--	sym->flags |= SYMBOL_AUTO;
--	p = getenv("KERNELVERSION");
--	if (p)
--		sym_add_default(sym, p);
--
- 	sym = sym_lookup("UNAME_RELEASE", 0);
- 	sym->type = S_STRING;
- 	sym->flags |= SYMBOL_AUTO;
+> 
+> > > +	if (sym->flags & SYMBOL_AUTO)
+> > > +		sym->flags &= ~SYMBOL_WRITE;
+> > > +
+> > 
+> > Why is this change needed?
+> > It is non-obvious to me so please explain and I will add a comment.
+> 
+> Automatically generated symbols are not saved, this was previously not 
+> needed as they weren't in the menu structure.
+OK
+
+> 
+> > I did it like this:
+> > 			menu_warn(current_entry,
+> > 			          "config %s: redefining environment symbol from '%s' to '%s'",
+> > 			          sym->name, env, sym2->name);
+> 
+> I omitted the prefix, it's inconsistent with other warnings.
+OK
+
+Thanks,
+	Sam
