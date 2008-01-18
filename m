@@ -1,79 +1,38 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ro-out-1112.google.com ([72.14.202.181]:6483 "EHLO
-	ro-out-1112.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750956AbYAOBeo (ORCPT
+Received: from E23SMTP05.au.ibm.com ([202.81.18.174]:51055 "EHLO
+	e23smtp05.au.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750853AbYARGOk (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 14 Jan 2008 20:34:44 -0500
-Received: by ro-out-1112.google.com with SMTP id p4so2793743roc.5
-        for <linux-kbuild@vger.kernel.org>; Mon, 14 Jan 2008 17:34:43 -0800 (PST)
-Date: Tue, 15 Jan 2008 09:33:47 +0800
-From: WANG Cong <xiyou.wangcong@gmail.com>
-Subject: Re: translations (Re: Kbuild update)
-Message-ID: <20080115013347.GA3112@hacking>
-Reply-To: WANG Cong <xiyou.wangcong@gmail.com>
-References: <20080103213255.GA21811@uranus.ravnborg.org> <20080104132316.GA2485@hacking> <20080104143953.GA30536@uranus.ravnborg.org> <20080105054840.GB9976@does.not.exist> <20080106142606.GB2528@hacking> <20080106214136.GA24008@flower.upol.cz> <20080109022208.GD2480@hacking> <20080109135024.GD24008@flower.upol.cz>
+	Fri, 18 Jan 2008 01:14:40 -0500
+Message-ID: <479043CA.90002@linux.vnet.ibm.com>
+Date: Fri, 18 Jan 2008 11:44:34 +0530
+From: Kamalesh Babulal <kamalesh@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20080109135024.GD24008@flower.upol.cz>
+Subject: Re: 2.6.24-rc8-mm1 Build Failure at scripts/mkubooting/crc32.c
+References: <20080117023514.9df393cf.akpm@linux-foundation.org>
+In-Reply-To: <20080117023514.9df393cf.akpm@linux-foundation.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Oleg Verych <olecom@flower.upol.cz>
-Cc: WANG Cong <xiyou.wangcong@gmail.com>, Adrian Bunk <bunk@kernel.org>, Sam Ravnborg <sam@ravnborg.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: linux-kernel@vger.kernel.org, sam@ravnborg.org, linux-kbuild@vger.kernel.org, Andy Whitcroft <apw@shadowen.org>, Balbir Singh <balbir@linux.vnet.ibm.com>
 
+Hi Andrew,
 
->
->ftp://flower.upol.cz/upload/Configure.help
->
->OK, please, take a look at stuff, Korean guys did 5-6 years ago. One
->particular ARM port (S3C2410X) along with an ARM bootloader (vivi) was
->done. Yet for some reason official Linux port has another developers, and,
->it seems, it was done some time (~1-2 years) later.
+The kernel build fails with following error message
 
-I glanced at the page. I don't know Korean, but it seems OK.
-What do you mean by saying this? I can't catch your points.
+scripts/mkubootimg/crc32.c:15:18: error: zlib.h: No such file or directory
+scripts/mkubootimg/crc32.c:77: error: expected '=', ',', ';', 'asm' or '__attribute__' before 'crc_table'
+scripts/mkubootimg/crc32.c:153: error: expected '=', ',', ';', 'asm' or '__attribute__' before 'crc32'
+make[2]: *** [scripts/mkubootimg/crc32.o] Error 1
+make[1]: *** [scripts/mkubootimg] Error 2
+make: *** [scripts] Error 2
 
+The patch causing this build failure may be git-kbuild.patch.
 
->> I abosutely agree that we should focus on the exsiting bugs of Linux,
->> but like Greg's inclusion of some kernel doc translations, this kind
->> of work is really helpful to attract some kernel newbies from none
->> English-speaking countries. Even we can't make offical efforts,
->> the civil work, like TLKTP, is still worthy.
->...
->
->> Believe me, I am leading a local LUG in my college and I found that one
->> _big_ reason that why the newbies are afraid of Linux kernel is
->> English, instead of the C tricks or low-level programming.
->
->IMHO, there is so much stuff done, that any brilliant C or whatever-asm
->coder *have* to study at least something of it. And, in order to do a
->valuable contribution, one must know the work-flow, people *and* English.
->This is usually done by reading mailing list *and* archives for quite
->some time. This takes time, this takes effort, but this also have huge
->impact on intelligence and culture of the `coders'.
->
->Do you ever have a question about why History exists and is studied on
->all levels of education? Same with programming. Without
->history-via-English, one have no strong roots, thus base for grow and
->flower.
-
-I think you've overstated.
-
-Translation does _not_ mean avoiding learning English. I agree with
-what you said above about English. But just as you said, it needs
-_time_ and translation *is* a good way to help this. I, myself,
-began to learn computer English by reading the translations of some
-famous English textbooks, and then reading the original ones.
-
-
->OTOH, Internet has so much noise and crap all over the place, that
->information is very hard to find. It takes much time to sort and see it.
->Yet, providing noise generating, like in-tree translations, seems, is a
->very easy way around (not taking maintaining in account).
-
-Translations can be put in .po files.
-
-Thanks.
-
- Cong
-
+-- 
+Thanks & Regards,
+Kamalesh Babulal,
+Linux Technology Center,
+IBM, ISTL.
