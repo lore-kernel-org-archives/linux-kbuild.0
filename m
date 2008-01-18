@@ -1,55 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp2.linux-foundation.org ([207.189.120.14]:48683 "EHLO
-	smtp2.linux-foundation.org" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751519AbYARHja (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 18 Jan 2008 02:39:30 -0500
-Date: Thu, 17 Jan 2008 23:38:53 -0800
-From: Andrew Morton <akpm@linux-foundation.org>
-Subject: Re: 2.6.24-rc8-mm1 build failure on headers_check
-Message-Id: <20080117233853.1b782123.akpm@linux-foundation.org>
-In-Reply-To: <479050BF.1090107@linux.vnet.ibm.com>
-References: <20080117023514.9df393cf.akpm@linux-foundation.org>
-	<479050BF.1090107@linux.vnet.ibm.com>
+Received: from pasmtpb.tele.dk ([80.160.77.98]:60215 "EHLO pasmtpB.tele.dk"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750853AbYARIGV (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 18 Jan 2008 03:06:21 -0500
+Date: Fri, 18 Jan 2008 09:06:27 +0100
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: 2.6.24-rc8-mm1 Build Failure at scripts/mkubooting/crc32.c
+Message-ID: <20080118080627.GB15956@uranus.ravnborg.org>
+References: <20080117023514.9df393cf.akpm@linux-foundation.org> <479043CA.90002@linux.vnet.ibm.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <479043CA.90002@linux.vnet.ibm.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Kamalesh Babulal <kamalesh@linux.vnet.ibm.com>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, linuxppc-dev@ozlabs.org, Sam Ravnborg <sam@ravnborg.org>, Andy Whitcroft <apw@shadowen.org>, Balbir Singh <balbir@linux.vnet.ibm.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Andy Whitcroft <apw@shadowen.org>, Balbir Singh <balbir@linux.vnet.ibm.com>
 
-On Fri, 18 Jan 2008 12:39:51 +0530 Kamalesh Babulal <kamalesh@linux.vnet.ibm.com> wrote:
-
+On Fri, Jan 18, 2008 at 11:44:34AM +0530, Kamalesh Babulal wrote:
 > Hi Andrew,
 > 
-> The kernel build fails during the headers_check on power box
+> The kernel build fails with following error message
 > 
->   CHECK   include/asm/nvram.h
-> /usr/local/autobench/autotest/tmp/build/linux/usr/include/asm/nvram.h requires linux/list.h, which does not exist in exported headers
-> make[3]: *** [/usr/local/autobench/autotest/tmp/build/linux/usr/include/asm/.check.nvram.h] Error 1
+> scripts/mkubootimg/crc32.c:15:18: error: zlib.h: No such file or directory
+> scripts/mkubootimg/crc32.c:77: error: expected '=', ',', ';', 'asm' or '__attribute__' before 'crc_table'
+> scripts/mkubootimg/crc32.c:153: error: expected '=', ',', ';', 'asm' or '__attribute__' before 'crc32'
+> make[2]: *** [scripts/mkubootimg/crc32.o] Error 1
+> make[1]: *** [scripts/mkubootimg] Error 2
+> make: *** [scripts] Error 2
+> 
+> The patch causing this build failure may be git-kbuild.patch.
 
-doh.
+The mkubootimg patches in kbuild.git has been reverted - but that was
+after akpm merged kbuild.git.
+So it is fixed in next -mm.
 
---- a/include/asm-powerpc/nvram.h~include-asm-powerpc-nvramh-needs-listh-fix
-+++ a/include/asm-powerpc/nvram.h
-@@ -11,7 +11,6 @@
- #define _ASM_POWERPC_NVRAM_H
- 
- #include <linux/errno.h>
--#include <linux/list.h>
- 
- #define NVRW_CNT 0x20
- #define NVRAM_HEADER_LEN 16 /* sizeof(struct nvram_header) */
-@@ -59,6 +58,9 @@ struct nvram_header {
- };
- 
- #ifdef __KERNEL__
-+
-+#include <linux/list.h>
-+
- struct nvram_partition {
- 	struct list_head partition;
- 	struct nvram_header header;
-_
+The workaround for now is to just remove the line
+containing "mkubootimg" in scripts/Makefile.
 
+(Assuming you do not need the uImage target).
+
+	Sam
