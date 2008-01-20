@@ -1,23 +1,23 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pasmtpb.tele.dk ([80.160.77.98]:60215 "EHLO pasmtpB.tele.dk"
+Received: from gir.skynet.ie ([193.1.99.77]:42072 "EHLO gir.skynet.ie"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750853AbYARIGV (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 18 Jan 2008 03:06:21 -0500
-Date: Fri, 18 Jan 2008 09:06:27 +0100
-From: Sam Ravnborg <sam@ravnborg.org>
+	id S1753918AbYATPaj (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 20 Jan 2008 10:30:39 -0500
+Date: Sun, 20 Jan 2008 15:30:36 +0000
+From: Mel Gorman <mel@csn.ul.ie>
 Subject: Re: 2.6.24-rc8-mm1 Build Failure at scripts/mkubooting/crc32.c
-Message-ID: <20080118080627.GB15956@uranus.ravnborg.org>
+Message-ID: <20080120153035.GA29142@csn.ul.ie>
 References: <20080117023514.9df393cf.akpm@linux-foundation.org> <479043CA.90002@linux.vnet.ibm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-15
 Content-Disposition: inline
 In-Reply-To: <479043CA.90002@linux.vnet.ibm.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Kamalesh Babulal <kamalesh@linux.vnet.ibm.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Andy Whitcroft <apw@shadowen.org>, Balbir Singh <balbir@linux.vnet.ibm.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org, sam@ravnborg.org, linux-kbuild@vger.kernel.org, Andy Whitcroft <apw@shadowen.org>, Balbir Singh <balbir@linux.vnet.ibm.com>
 
-On Fri, Jan 18, 2008 at 11:44:34AM +0530, Kamalesh Babulal wrote:
+On (18/01/08 11:44), Kamalesh Babulal didst pronounce:
 > Hi Andrew,
 > 
 > The kernel build fails with following error message
@@ -30,14 +30,13 @@ On Fri, Jan 18, 2008 at 11:44:34AM +0530, Kamalesh Babulal wrote:
 > make: *** [scripts] Error 2
 > 
 > The patch causing this build failure may be git-kbuild.patch.
+> 
 
-The mkubootimg patches in kbuild.git has been reverted - but that was
-after akpm merged kbuild.git.
-So it is fixed in next -mm.
+A dependency on zlib was introduced by that patch. I installed
+zlib1g-dev but I see that this is expected to be fixed without internal
+dependencies anyway.
 
-The workaround for now is to just remove the line
-containing "mkubootimg" in scripts/Makefile.
-
-(Assuming you do not need the uImage target).
-
-	Sam
+-- 
+Mel Gorman
+Part-time Phd Student                          Linux Technology Center
+University of Limerick                         IBM Dublin Software Lab
