@@ -1,35 +1,35 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pasmtpb.tele.dk ([80.160.77.98]:47642 "EHLO pasmtpB.tele.dk"
+Received: from ozlabs.org ([203.10.76.45]:37760 "EHLO ozlabs.org"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753236AbYAUCvH (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 20 Jan 2008 21:51:07 -0500
-Date: Mon, 21 Jan 2008 03:51:11 +0100
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: kbuild: improved Section mismatch detection
-Message-ID: <20080121025111.GA26076@uranus.ravnborg.org>
-References: <20080120200527.GA23852@uranus.ravnborg.org> <20080120222754.GK8669@does.not.exist>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+	id S1755970AbYAUDD3 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 20 Jan 2008 22:03:29 -0500
+From: Rusty Russell <rusty@rustcorp.com.au>
+Subject: Re: [PATCH] kbuild: fix so modpost can now check any .o file
+Date: Mon, 21 Jan 2008 11:56:31 +1100
+References: <20080120200527.GA23852@uranus.ravnborg.org> <1200859743-24037-1-git-send-email-sam@ravnborg.org>
+In-Reply-To: <1200859743-24037-1-git-send-email-sam@ravnborg.org>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="utf-8"
+Content-Transfer-Encoding: 7bit
 Content-Disposition: inline
-In-Reply-To: <20080120222754.GK8669@does.not.exist>
+Message-Id: <200801211156.32122.rusty@rustcorp.com.au>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Adrian Bunk <bunk@kernel.org>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, linux arch <linux-arch@vger.kernel.org>
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-arch@vger.kernel.org
 
-On Mon, Jan 21, 2008 at 12:27:54AM +0200, Adrian Bunk wrote:
-> On Sun, Jan 20, 2008 at 09:05:27PM +0100, Sam Ravnborg wrote:
-> >...
-> > Adrian reminded us that KCFLAGS=-fno-inline told
-> > another story with more than 100 Section mismatch
-> > warnings on 64 bit x86 with an allyesconfig build.
-> >...
-> 
-> Not -fno-inline but -fno-inline-functions-called-once
-> (completely different option).
+On Monday 21 January 2008 07:08:56 Sam Ravnborg wrote:
+> It is very convinient to say:
+> scripts/mod/modpost mm/built-in.o
+>
+> to check if any section mismatch errors occured
+> in mm/ (as an example).
 
-Yep - looked that up after sending the mail.
-A quick test shows no diference in # of generated Section mismatch
-warnings for the two - which is good.
+Hi Sam,
 
-	Sam
+In an ideal world, wouldn't it be better to split out section analysis into a 
+different helper program?
+
+Cheers,
+Rusty.
