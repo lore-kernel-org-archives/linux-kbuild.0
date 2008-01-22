@@ -1,38 +1,52 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from py-out-1112.google.com ([64.233.166.180]:64435 "EHLO
-	py-out-1112.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755893AbYAVAWB (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 21 Jan 2008 19:22:01 -0500
-Received: by py-out-1112.google.com with SMTP id u52so3250522pyb.10
-        for <linux-kbuild@vger.kernel.org>; Mon, 21 Jan 2008 16:22:00 -0800 (PST)
-From: Daniel De Graaf <danieldegraaf@gmail.com>
-Date: Mon, 21 Jan 2008 18:21:11 -0600
-Subject: [PATCH] Support ARCH=x86 in buildtar
-Message-ID: <47953726.3ce9220a.7267.2abf@mx.google.com>
+Received: from pip9.gyao.ne.jp ([61.122.117.247]:31698 "EHLO mx.gate01.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1753129AbYAVA5p (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 21 Jan 2008 19:57:45 -0500
+Date: Tue, 22 Jan 2008 09:56:57 +0900
+From: Paul Mundt <lethal@linux-sh.org>
+Subject: Re: [PATCH] Use separate sections for __dev/__cpu/__mem code/data
+Message-ID: <20080122005657.GA26831@linux-sh.org>
+References: <1200859743-24037-6-git-send-email-sam@ravnborg.org> <1200859743-24037-7-git-send-email-sam@ravnborg.org> <1200859743-24037-8-git-send-email-sam@ravnborg.org> <20080121073341.GA20050@linux-sh.org> <20080121095722.GA29145@uranus.ravnborg.org> <jebq7fqxnj.fsf@sykes.suse.de> <20080121104506.GA29585@uranus.ravnborg.org> <20080121104745.GA29721@uranus.ravnborg.org> <20080121105257.GA21567@linux-sh.org> <20080121120641.GA30165@uranus.ravnborg.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20080121120641.GA30165@uranus.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Sam Ravnborg <sam@ravnborg.org>
-Cc: Linux Kernel Build list <linux-kbuild@vger.kernel.org>, Trivial Patches <trivial@kernel.org>
+Cc: Andreas Schwab <schwab@suse.de>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-arch@vger.kernel.org, Greg KH <greg@kroah.com>, Randy Dunlap <randy.dunlap@oracle.com>, Adrian Bunk <bunk@kernel.org>
 
-Signed-off-by: Daniel De Graaf <danieldegraaf@gmail.com>
----
- scripts/package/buildtar |    4 ++--
- 1 files changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/scripts/package/buildtar b/scripts/package/buildtar
-index aa0ccdb..28574ae 100644
---- a/scripts/package/buildtar
-+++ b/scripts/package/buildtar
-@@ -69,8 +69,8 @@ cp -v -- "${objtree}/vmlinux" "${tmpdir}/boot/vmlinux-${KERNELRELEASE}"
- # Install arch-specific kernel image(s)
- #
- case "${ARCH}" in
--	i386|x86_64)
--		[ -f "${objtree}/arch/$ARCH/boot/bzImage" ] && cp -v -- "${objtree}/arch/$ARCH/boot/bzImage" "${tmpdir}/boot/vmlinuz-${KERNELRELEASE}"
-+	x86|i386|x86_64)
-+		[ -f "${objtree}/arch/x86/boot/bzImage" ] && cp -v -- "${objtree}/arch/x86/boot/bzImage" "${tmpdir}/boot/vmlinuz-${KERNELRELEASE}"
- 		;;
- 	alpha)
- 		[ -f "${objtree}/arch/alpha/boot/vmlinux.gz" ] && cp -v -- "${objtree}/arch/alpha/boot/vmlinux.gz" "${tmpdir}/boot/vmlinuz-${KERNELRELEASE}"
-
+On Mon, Jan 21, 2008 at 01:06:41PM +0100, Sam Ravnborg wrote:
+> On Mon, Jan 21, 2008 at 07:52:57PM +0900, Paul Mundt wrote:
+> > On Mon, Jan 21, 2008 at 11:47:45AM +0100, Sam Ravnborg wrote:
+> > > On Mon, Jan 21, 2008 at 11:45:06AM +0100, Sam Ravnborg wrote:
+> > > > On Mon, Jan 21, 2008 at 11:29:52AM +0100, Andreas Schwab wrote:
+> > > > > Sam Ravnborg <sam@ravnborg.org> writes:
+> > > > > 
+> > > > > > On Mon, Jan 21, 2008 at 04:33:41PM +0900, Paul Mundt wrote:
+> > > > > >> so the ## is being taken directly rather than acting as a concatenation.
+> > > > > >
+> > > > > > Strange...
+> > > > > > I can reproduce with gcc 3.4.5 here - will fix.
+> > > > > 
+> > > > > The ## operator does not work with -traditional.
+> > > > 
+> > > > Crap - then it breaks at the following architectures:
+> > > > sh64, s390, m68k, m32r
+> > > > 
+> > > > Thanks Andreas.
+> > > 
+> > > OK - I was too quick it seem.
+> > > sh has:
+> > > arch/sh/Makefile:CPPFLAGS_vmlinux.lds := -traditional
+> > > 
+> > > So this needs to be ripped out as it is not needed.
+> > > 
+> > Yes, that can be killed. If this is aimed at 2.6.25, I'll just kill it
+> > off in my tree. Otherwise, feel free to roll this in to your patch set.
+> 
+> It is aimed for 2.6.25 and it looks reasonable to reach that goal.
+> So please take this patch in your tree.
+> 
+Done.
