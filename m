@@ -1,40 +1,105 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from caramon.arm.linux.org.uk ([78.32.30.218]:51285 "EHLO
-	caramon.arm.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752379AbYAVVZ3 (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 22 Jan 2008 16:25:29 -0500
-Date: Tue, 22 Jan 2008 21:25:01 +0000
-From: Russell King <rmk+lkml@arm.linux.org.uk>
-Subject: Re: [PATCH] Use separate sections for __dev/__cpu/__mem code/data
-Message-ID: <20080122212501.GA17434@flint.arm.linux.org.uk>
-References: <20080120200527.GA23852@uranus.ravnborg.org> <1200859743-24037-1-git-send-email-sam@ravnborg.org> <1200859743-24037-2-git-send-email-sam@ravnborg.org> <1200859743-24037-3-git-send-email-sam@ravnborg.org> <1200859743-24037-4-git-send-email-sam@ravnborg.org> <1200859743-24037-5-git-send-email-sam@ravnborg.org> <1200859743-24037-6-git-send-email-sam@ravnborg.org> <1200859743-24037-7-git-send-email-sam@ravnborg.org> <1200859743-24037-8-git-send-email-sam@ravnborg.org> <20080122211715.GA26279@kroah.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Received: from smtp4.pp.htv.fi ([213.243.153.38]:43580 "EHLO smtp4.pp.htv.fi"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751015AbYAVX4H (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 22 Jan 2008 18:56:07 -0500
+Date: Wed, 23 Jan 2008 01:54:39 +0200
+From: Adrian Bunk <bunk@kernel.org>
+Subject: [2.6 patch] kconfig: remove "enable"
+Message-ID: <20080122235439.GJ26556@does.not.exist>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20080122211715.GA26279@kroah.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Greg KH <greg@kroah.com>
-Cc: Sam Ravnborg <sam@ravnborg.org>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-arch@vger.kernel.org, Randy Dunlap <randy.dunlap@oracle.com>, Adrian Bunk <bunk@kernel.org>
+To: zippel@linux-m68k.org, Sam Ravnborg <sam@ravnborg.org>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Tue, Jan 22, 2008 at 01:17:15PM -0800, Greg KH wrote:
-> I like this a lot.  It makes things much more understandable from a
-> driver developer's point of view, and would allow us to mark some things
-> as freeable when we do not run with a CPU hotplug system :)
+Kconfig had a synonym "enable" for "select" that was neither documented 
+nor used.
 
-You mean at run time - I'm not sure if there's any advantage to that.
+Signed-off-by: Adrian Bunk <bunk@kernel.org>
 
-In order to free the hotplug cpu data and text, you'd have to make
-those sections page aligned - and then you have the question of
-how much space you are wasting in doing so.  That will be variable
-over time as the code changes.
+---
 
-Also, if you were to merge the hotplug cpu text and data to reduce
-the wastage, would that cause any architectures any issues?  (Thinking
-about execute-only being set on the kernel's text section only, etc.)
+ scripts/kconfig/zconf.gperf          |    1 -
+ scripts/kconfig/zconf.hash.c_shipped |   14 +++++++-------
+ 2 files changed, 7 insertions(+), 8 deletions(-)
 
--- 
-Russell King
- Linux kernel    2.6 ARM Linux   - http://www.arm.linux.org.uk/
- maintainer of:
+6b3161305f33144e2ae5227bbf32221e2310371d 
+diff --git a/scripts/kconfig/zconf.gperf b/scripts/kconfig/zconf.gperf
+index 93538e5..2196816 100644
+--- a/scripts/kconfig/zconf.gperf
++++ b/scripts/kconfig/zconf.gperf
+@@ -35,7 +35,6 @@ int,		T_TYPE,		TF_COMMAND, S_INT
+ hex,		T_TYPE,		TF_COMMAND, S_HEX
+ string,		T_TYPE,		TF_COMMAND, S_STRING
+ select,		T_SELECT,	TF_COMMAND
+-enable,		T_SELECT,	TF_COMMAND
+ range,		T_RANGE,	TF_COMMAND
+ option,		T_OPTION,	TF_COMMAND
+ on,		T_ON,		TF_PARAM
+diff --git a/scripts/kconfig/zconf.hash.c_shipped b/scripts/kconfig/zconf.hash.c_shipped
+index ab28b18..fb66a5d 100644
+--- a/scripts/kconfig/zconf.hash.c_shipped
++++ b/scripts/kconfig/zconf.hash.c_shipped
+@@ -1,4 +1,4 @@
+-/* ANSI-C code produced by gperf version 3.0.2 */
++/* ANSI-C code produced by gperf version 3.0.3 */
+ /* Command-line: gperf  */
+ /* Computed positions: -k'1,3' */
+ 
+@@ -53,7 +53,7 @@ kconf_id_hash (register const char *str, register unsigned int len)
+       49, 49, 49, 49, 49, 49, 49, 49, 49, 49,
+       49, 49, 49, 49, 49, 49, 49, 49, 49, 49,
+       49, 49, 49, 49, 49, 49, 49, 49, 49, 49,
+-      49, 49, 49, 49, 49, 49, 49, 18, 11,  5,
++      49, 49, 49, 49, 49, 49, 49, 49, 11,  5,
+        0,  0,  5, 49,  5, 20, 49, 49,  5, 20,
+        5,  0, 30, 49,  0, 15,  0, 10, 49, 49,
+       25, 49, 49, 49, 49, 49, 49, 49, 49, 49,
+@@ -107,7 +107,6 @@ struct kconf_id_strings_t
+     char kconf_id_strings_str21[sizeof("string")];
+     char kconf_id_strings_str22[sizeof("if")];
+     char kconf_id_strings_str23[sizeof("int")];
+-    char kconf_id_strings_str24[sizeof("enable")];
+     char kconf_id_strings_str26[sizeof("select")];
+     char kconf_id_strings_str27[sizeof("modules")];
+     char kconf_id_strings_str28[sizeof("tristate")];
+@@ -141,7 +140,6 @@ static struct kconf_id_strings_t kconf_id_strings_contents =
+     "string",
+     "if",
+     "int",
+-    "enable",
+     "select",
+     "modules",
+     "tristate",
+@@ -157,13 +155,16 @@ static struct kconf_id_strings_t kconf_id_strings_contents =
+ #define kconf_id_strings ((const char *) &kconf_id_strings_contents)
+ #ifdef __GNUC__
+ __inline
++#ifdef __GNUC_STDC_INLINE__
++__attribute__ ((__gnu_inline__))
++#endif
+ #endif
+ struct kconf_id *
+ kconf_id_lookup (register const char *str, register unsigned int len)
+ {
+   enum
+     {
+-      TOTAL_KEYWORDS = 31,
++      TOTAL_KEYWORDS = 30,
+       MIN_WORD_LENGTH = 2,
+       MAX_WORD_LENGTH = 14,
+       MIN_HASH_VALUE = 2,
+@@ -194,8 +195,7 @@ kconf_id_lookup (register const char *str, register unsigned int len)
+       {(int)(long)&((struct kconf_id_strings_t *)0)->kconf_id_strings_str21,		T_TYPE,		TF_COMMAND, S_STRING},
+       {(int)(long)&((struct kconf_id_strings_t *)0)->kconf_id_strings_str22,		T_IF,		TF_COMMAND|TF_PARAM},
+       {(int)(long)&((struct kconf_id_strings_t *)0)->kconf_id_strings_str23,		T_TYPE,		TF_COMMAND, S_INT},
+-      {(int)(long)&((struct kconf_id_strings_t *)0)->kconf_id_strings_str24,		T_SELECT,	TF_COMMAND},
+-      {-1},
++      {-1}, {-1},
+       {(int)(long)&((struct kconf_id_strings_t *)0)->kconf_id_strings_str26,		T_SELECT,	TF_COMMAND},
+       {(int)(long)&((struct kconf_id_strings_t *)0)->kconf_id_strings_str27,	T_OPT_MODULES,	TF_OPTION},
+       {(int)(long)&((struct kconf_id_strings_t *)0)->kconf_id_strings_str28,	T_TYPE,		TF_COMMAND, S_TRISTATE},
+
