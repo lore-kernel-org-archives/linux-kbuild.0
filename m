@@ -1,536 +1,330 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pasmtpb.tele.dk ([80.160.77.98]:42857 "EHLO pasmtpB.tele.dk"
+Received: from pasmtpb.tele.dk ([80.160.77.98]:42809 "EHLO pasmtpB.tele.dk"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1758981AbYAXWDy (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 24 Jan 2008 17:03:54 -0500
-Received: from ravnborg.org (0x535d98d8.vgnxx8.adsl-dhcp.tele.dk [83.93.152.216])
-	by pasmtpB.tele.dk (Postfix) with ESMTP id 2C5CEE31C6E
-	for <linux-kbuild@vger.kernel.org>; Thu, 24 Jan 2008 23:03:50 +0100 (CET)
+	id S1759068AbYAXWD4 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 24 Jan 2008 17:03:56 -0500
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: [PATCH 42/77] kbuild: clean up modpost.c
-Date: Thu, 24 Jan 2008 23:03:23 +0100
-Message-Id: <1201212238-4369-42-git-send-email-sam@ravnborg.org>
+Subject: [PATCH 50/77] kconfig: gettext support for xconfig
+Date: Thu, 24 Jan 2008 23:03:31 +0100
+Message-Id: <1201212238-4369-50-git-send-email-sam@ravnborg.org>
 In-Reply-To: <20080124215813.GA4204@uranus.ravnborg.org>
 References: <20080124215813.GA4204@uranus.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: Sam Ravnborg <sam@ravnborg.org>
+Cc: EGRY Gabor <gaboregry1@t-online.hu>, Sam Ravnborg <sam@ravnborg.org>, Roman Zippel <zippel@linux-m68k.org>
 
-akpm complained about overly long lines in modpost.c and
-when started additional style issues were fixed:
+From: EGRY Gabor <gaboregry1@t-online.hu>
 
-o Updated my copyright
-o Removed unneeded {}
-o Drop assignments in if ()
-o Spaces around operators
-o Break long lines
-o locate * near variable not type
-o Fix a format specifier for sizeof()
-o Corrected placement of '{' and '}'
-o spaces to tabs (but use tabs only for indention)
+Full gettext support for xconfig.
 
-modpost.c is not checkpatch clean. Readability were favoured
-on top of checkpatch compliance.
-But checkpatch were used to find additional stuff to clean up.
-
+Signed-off-by: Egry Gabor <gaboregry1@t-online.hu>
+Reviewed-by: Sam Ravnborg <sam@ravnborg.org>
 Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
+Cc: Roman Zippel <zippel@linux-m68k.org>
 ---
- scripts/mod/modpost.c |  197 +++++++++++++++++++++++++------------------------
- 1 files changed, 101 insertions(+), 96 deletions(-)
+ scripts/kconfig/qconf.cc |   93 ++++++++++++++++++++++++----------------------
+ 1 files changed, 49 insertions(+), 44 deletions(-)
 
-diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index 4d1c590..696d2a5 100644
---- a/scripts/mod/modpost.c
-+++ b/scripts/mod/modpost.c
-@@ -2,7 +2,7 @@
-  *
-  * Copyright 2003       Kai Germaschewski
-  * Copyright 2002-2004  Rusty Russell, IBM Corporation
-- * Copyright 2006       Sam Ravnborg
-+ * Copyright 2006-2008  Sam Ravnborg
-  * Based in part on module-init-tools/depmod.c,file2alias
-  *
-  * This software may be used and distributed according to the terms
-@@ -74,7 +74,8 @@ static int is_vmlinux(const char *modname)
- {
- 	const char *myname;
+diff --git a/scripts/kconfig/qconf.cc b/scripts/kconfig/qconf.cc
+index b9bb32d..9fe27ca 100644
+--- a/scripts/kconfig/qconf.cc
++++ b/scripts/kconfig/qconf.cc
+@@ -114,7 +114,7 @@ void ConfigItem::updateMenu(void)
  
--	if ((myname = strrchr(modname, '/')))
-+	myname = strrchr(modname, '/');
-+	if (myname)
- 		myname++;
- 	else
- 		myname = modname;
-@@ -85,14 +86,13 @@ static int is_vmlinux(const char *modname)
+ 	sym = menu->sym;
+ 	prop = menu->prompt;
+-	prompt = QString::fromLocal8Bit(menu_get_prompt(menu));
++	prompt = _(menu_get_prompt(menu));
  
- void *do_nofail(void *ptr, const char *expr)
- {
--	if (!ptr) {
-+	if (!ptr)
- 		fatal("modpost: Memory allocation failure: %s.\n", expr);
--	}
-+
- 	return ptr;
- }
- 
- /* A list of all modules we processed */
--
- static struct module *modules;
- 
- static struct module *find_module(char *modname)
-@@ -115,7 +115,8 @@ static struct module *new_module(char *modname)
- 	p = NOFAIL(strdup(modname));
- 
- 	/* strip trailing .o */
--	if ((s = strrchr(p, '.')) != NULL)
-+	s = strrchr(p, '.');
-+	if (s != NULL)
- 		if (strcmp(s, ".o") == 0)
- 			*s = '\0';
- 
-@@ -156,7 +157,7 @@ static inline unsigned int tdb_hash(const char *name)
- 	unsigned   i;	/* Used to cycle through random values. */
- 
- 	/* Set the initial value from the key size. */
--	for (value = 0x238F13AF * strlen(name), i=0; name[i]; i++)
-+	for (value = 0x238F13AF * strlen(name), i = 0; name[i]; i++)
- 		value = (value + (((unsigned char *)name)[i] << (i*5 % 24)));
- 
- 	return (1103515243 * value + 12345);
-@@ -200,7 +201,7 @@ static struct symbol *find_symbol(const char *name)
- 	if (name[0] == '.')
- 		name++;
- 
--	for (s = symbolhash[tdb_hash(name) % SYMBOL_HASH_SIZE]; s; s=s->next) {
-+	for (s = symbolhash[tdb_hash(name) % SYMBOL_HASH_SIZE]; s; s = s->next) {
- 		if (strcmp(s->name, name) == 0)
- 			return s;
- 	}
-@@ -225,9 +226,10 @@ static const char *export_str(enum export ex)
- 	return export_list[ex].str;
- }
- 
--static enum export export_no(const char * s)
-+static enum export export_no(const char *s)
- {
- 	int i;
-+
- 	if (!s)
- 		return export_unknown;
- 	for (i = 0; export_list[i].export != export_unknown; i++) {
-@@ -317,7 +319,7 @@ void *grab_file(const char *filename, unsigned long *size)
-   * spaces in the beginning of the line is trimmed away.
-   * Return a pointer to a static buffer.
-   **/
--char* get_next_line(unsigned long *pos, void *file, unsigned long size)
-+char *get_next_line(unsigned long *pos, void *file, unsigned long size)
- {
- 	static char line[4096];
- 	int skip = 1;
-@@ -325,8 +327,7 @@ char* get_next_line(unsigned long *pos, void *file, unsigned long size)
- 	signed char *p = (signed char *)file + *pos;
- 	char *s = line;
- 
--	for (; *pos < size ; (*pos)++)
--	{
-+	for (; *pos < size ; (*pos)++) {
- 		if (skip && isspace(*p)) {
- 			p++;
- 			continue;
-@@ -388,7 +389,9 @@ static int parse_elf(struct elf_info *info, const char *filename)
- 
- 	/* Check if file offset is correct */
- 	if (hdr->e_shoff > info->size) {
--		fatal("section header offset=%lu in file '%s' is bigger then filesize=%lu\n", (unsigned long)hdr->e_shoff, filename, info->size);
-+		fatal("section header offset=%lu in file '%s' is bigger than "
-+		      "filesize=%lu\n", (unsigned long)hdr->e_shoff,
-+		      filename, info->size);
- 		return 0;
- 	}
- 
-@@ -409,7 +412,10 @@ static int parse_elf(struct elf_info *info, const char *filename)
- 		const char *secname;
- 
- 		if (sechdrs[i].sh_offset > info->size) {
--			fatal("%s is truncated. sechdrs[i].sh_offset=%lu > sizeof(*hrd)=%lu\n", filename, (unsigned long)sechdrs[i].sh_offset, sizeof(*hdr));
-+			fatal("%s is truncated. sechdrs[i].sh_offset=%lu > "
-+			      "sizeof(*hrd)=%zu\n", filename,
-+			      (unsigned long)sechdrs[i].sh_offset,
-+			      sizeof(*hdr));
- 			return 0;
- 		}
- 		secname = secstrings + sechdrs[i].sh_name;
-@@ -436,9 +442,9 @@ static int parse_elf(struct elf_info *info, const char *filename)
- 		info->strtab       = (void *)hdr +
- 			             sechdrs[sechdrs[i].sh_link].sh_offset;
- 	}
--	if (!info->symtab_start) {
-+	if (!info->symtab_start)
- 		fatal("%s has no symtab?\n", filename);
--	}
-+
- 	/* Fix endianness in symbols */
- 	for (sym = info->symtab_start; sym < info->symtab_stop; sym++) {
- 		sym->st_shndx = TO_NATIVE(sym->st_shndx);
-@@ -507,11 +513,13 @@ static void handle_modversions(struct module *mod, struct elf_info *info,
- #endif
- 
- 		if (memcmp(symname, MODULE_SYMBOL_PREFIX,
--			   strlen(MODULE_SYMBOL_PREFIX)) == 0)
--			mod->unres = alloc_symbol(symname +
--						  strlen(MODULE_SYMBOL_PREFIX),
--						  ELF_ST_BIND(sym->st_info) == STB_WEAK,
--						  mod->unres);
-+			   strlen(MODULE_SYMBOL_PREFIX)) == 0) {
-+			mod->unres =
-+			  alloc_symbol(symname +
-+			               strlen(MODULE_SYMBOL_PREFIX),
-+			               ELF_ST_BIND(sym->st_info) == STB_WEAK,
-+			               mod->unres);
-+		}
+ 	if (prop) switch (prop->type) {
+ 	case P_MENU:
+@@ -208,7 +208,7 @@ void ConfigItem::updateMenu(void)
  		break;
- 	default:
- 		/* All exported symbols */
-@@ -580,21 +588,21 @@ static char *get_modinfo(void *modinfo, unsigned long modinfo_len,
-  **/
- static int strrcmp(const char *s, const char *sub)
- {
--        int slen, sublen;
-+	int slen, sublen;
- 
- 	if (!s || !sub)
- 		return 1;
- 
- 	slen = strlen(s);
--        sublen = strlen(sub);
-+	sublen = strlen(sub);
- 
- 	if ((slen == 0) || (sublen == 0))
- 		return 1;
- 
--        if (sublen > slen)
--                return 1;
-+	if (sublen > slen)
-+		return 1;
- 
--        return memcmp(s + slen - sublen, sub, sublen);
-+	return memcmp(s + slen - sublen, sub, sublen);
- }
- 
- /*
-@@ -671,7 +679,8 @@ static int data_section(const char *name)
-  *   the pattern is identified by:
-  *   tosec   = init or exit section
-  *   fromsec = data section
-- *   atsym = *driver, *_template, *_sht, *_ops, *_probe, *probe_one, *_console, *_timer
-+ *   atsym = *driver, *_template, *_sht, *_ops, *_probe,
-+ *           *probe_one, *_console, *_timer
-  *
-  * Pattern 3:
-  *   Whitelist all refereces from .text.head to .init.data
-@@ -731,15 +740,16 @@ static int secref_whitelist(const char *modname, const char *tosec,
- 		return 1;
- 
- 	/* Check for pattern 2 */
--	if ((init_section(tosec) || exit_section(tosec)) && data_section(fromsec))
-+	if ((init_section(tosec) || exit_section(tosec))
-+	    && data_section(fromsec))
- 		for (s = pat2sym; *s; s++)
- 			if (strrcmp(atsym, *s) == 0)
- 				return 1;
- 
- 	/* Check for pattern 3 */
- 	if ((strcmp(fromsec, ".text.head") == 0) &&
--		((strcmp(tosec, ".init.data") == 0) ||
--		(strcmp(tosec, ".init.text") == 0)))
-+	    ((strcmp(tosec, ".init.data") == 0) ||
-+	    (strcmp(tosec, ".init.text") == 0)))
- 	return 1;
- 
- 	/* Check for pattern 4 */
-@@ -816,7 +826,7 @@ static inline int is_valid_name(struct elf_info *elf, Elf_Sym *sym)
-  **/
- static void find_symbols_between(struct elf_info *elf, Elf_Addr addr,
- 				 const char *sec,
--			         Elf_Sym **before, Elf_Sym **after)
-+				 Elf_Sym **before, Elf_Sym **after)
- {
- 	Elf_Sym *sym;
- 	Elf_Ehdr *hdr = elf->hdr;
-@@ -842,20 +852,15 @@ static void find_symbols_between(struct elf_info *elf, Elf_Addr addr,
- 			if ((addr - sym->st_value) < beforediff) {
- 				beforediff = addr - sym->st_value;
- 				*before = sym;
--			}
--			else if ((addr - sym->st_value) == beforediff) {
-+			} else if ((addr - sym->st_value) == beforediff) {
- 				*before = sym;
- 			}
--		}
--		else
--		{
-+		} else {
- 			if ((sym->st_value - addr) < afterdiff) {
- 				afterdiff = sym->st_value - addr;
- 				*after = sym;
--			}
--			else if ((sym->st_value - addr) == afterdiff) {
-+			} else if ((sym->st_value - addr) == afterdiff)
- 				*after = sym;
--			}
- 		}
  	}
+ 	if (!sym_has_value(sym) && visible)
+-		prompt += " (NEW)";
++		prompt += _(" (NEW)");
+ set_prompt:
+ 	setText(promptColIdx, prompt);
  }
-@@ -952,12 +957,14 @@ static int addend_arm_rel(struct elf_info *elf, int rsection, Elf_Rela *r)
- 	switch (r_typ) {
- 	case R_ARM_ABS32:
- 		/* From ARM ABI: (S + A) | T */
--		r->r_addend = (int)(long)(elf->symtab_start + ELF_R_SYM(r->r_info));
-+		r->r_addend = (int)(long)
-+		              (elf->symtab_start + ELF_R_SYM(r->r_info));
- 		break;
- 	case R_ARM_PC24:
- 		/* From ARM ABI: ((S + A) | T) - P */
--		r->r_addend = (int)(long)(elf->hdr + elf->sechdrs[rsection].sh_offset +
--		                          (r->r_offset - elf->sechdrs[rsection].sh_addr));
-+		r->r_addend = (int)(long)(elf->hdr +
-+		              elf->sechdrs[rsection].sh_offset +
-+		              (r->r_offset - elf->sechdrs[rsection].sh_addr));
- 		break;
- 	default:
- 		return 1;
-@@ -1002,7 +1009,7 @@ static int addend_mips_rel(struct elf_info *elf, int rsection, Elf_Rela *r)
-  **/
- static void check_sec_ref(struct module *mod, const char *modname,
- 			  struct elf_info *elf,
--			  int section(const char*),
-+			  int section(const char *),
- 			  int section_ref_ok(const char *))
- {
- 	int i;
-@@ -1022,7 +1029,7 @@ static void check_sec_ref(struct module *mod, const char *modname,
- 		if (sechdrs[i].sh_type == SHT_RELA) {
- 			Elf_Rela *rela;
- 			Elf_Rela *start = (void *)hdr + sechdrs[i].sh_offset;
--			Elf_Rela *stop  = (void*)start + sechdrs[i].sh_size;
-+			Elf_Rela *stop  = (void *)start + sechdrs[i].sh_size;
- 			name += strlen(".rela");
- 			if (section_ref_ok(name))
- 				continue;
-@@ -1059,7 +1066,7 @@ static void check_sec_ref(struct module *mod, const char *modname,
- 		} else if (sechdrs[i].sh_type == SHT_REL) {
- 			Elf_Rel *rel;
- 			Elf_Rel *start = (void *)hdr + sechdrs[i].sh_offset;
--			Elf_Rel *stop  = (void*)start + sechdrs[i].sh_size;
-+			Elf_Rel *stop  = (void *)start + sechdrs[i].sh_size;
- 			name += strlen(".rel");
- 			if (section_ref_ok(name))
- 				continue;
-@@ -1088,7 +1095,7 @@ static void check_sec_ref(struct module *mod, const char *modname,
- 						continue;
- 					break;
- 				case EM_ARM:
--					if(addend_arm_rel(elf, i, &r))
-+					if (addend_arm_rel(elf, i, &r))
- 						continue;
- 					break;
- 				case EM_MIPS:
-@@ -1126,32 +1133,32 @@ static int initexit_section_ref_ok(const char *name)
- 	const char **s;
- 	/* Absolute section names */
- 	const char *namelist1[] = {
--		"__bug_table",		/* used by powerpc for BUG() */
-+		"__bug_table",	/* used by powerpc for BUG() */
- 		"__ex_table",
- 		".altinstructions",
--		".cranges",		/* used by sh64 */
-+		".cranges",	/* used by sh64 */
- 		".fixup",
--		".machvec",		/* ia64 + powerpc uses these */
-+		".machvec",	/* ia64 + powerpc uses these */
- 		".machine.desc",
--		".opd",			/* See comment [OPD] */
-+		".opd",		/* See comment [OPD] */
- 		"__dbe_table",
- 		".parainstructions",
- 		".pdr",
--		".plt",			/* seen on ARCH=um build on x86_64. Harmless */
-+		".plt",		/* seen on ARCH=um build on x86_64. Harmless */
- 		".smp_locks",
- 		".stab",
- 		".m68k_fixup",
--		".xt.prop",		/* xtensa informational section */
--		".xt.lit",		/* xtensa informational section */
-+		".xt.prop",	/* xtensa informational section */
-+		".xt.lit",	/* xtensa informational section */
- 		NULL
- 	};
- 	/* Start of section names */
- 	const char *namelist2[] = {
- 		".debug",
- 		".eh_frame",
--		".note",		/* ignore ELF notes - may contain anything */
--		".got",			/* powerpc - global offset table */
--		".toc",			/* powerpc - table of contents */
-+		".note",	/* ignore ELF notes - may contain anything */
-+		".got",		/* powerpc - global offset table */
-+		".toc",		/* powerpc - table of contents */
- 		NULL
- 	};
- 	/* part of section name */
-@@ -1221,7 +1228,8 @@ static int init_section_ref_ok(const char *name)
- 			return 1;
+@@ -346,7 +346,7 @@ ConfigList::ConfigList(ConfigView* p, const char *name)
  
- 	/* If section name ends with ".init" we allow references
--	 * as is the case with .initcallN.init, .early_param.init, .taglist.init etc
-+	 * as is the case with .initcallN.init, .early_param.init,
-+	 * .taglist.init etc
- 	 */
- 	if (strrcmp(name, ".init") == 0)
- 		return 1;
-@@ -1368,7 +1376,7 @@ static void check_for_gpl_usage(enum export exp, const char *m, const char *s)
+ 	for (i = 0; i < colNr; i++)
+ 		colMap[i] = colRevMap[i] = -1;
+-	addColumn(promptColIdx, "Option");
++	addColumn(promptColIdx, _("Option"));
+ 
+ 	reinit();
+ }
+@@ -360,14 +360,14 @@ void ConfigList::reinit(void)
+ 	removeColumn(nameColIdx);
+ 
+ 	if (showName)
+-		addColumn(nameColIdx, "Name");
++		addColumn(nameColIdx, _("Name"));
+ 	if (showRange) {
+ 		addColumn(noColIdx, "N");
+ 		addColumn(modColIdx, "M");
+ 		addColumn(yesColIdx, "Y");
  	}
- }
+ 	if (showData)
+-		addColumn(dataColIdx, "Value");
++		addColumn(dataColIdx, _("Value"));
  
--static void check_for_unused(enum export exp, const char* m, const char* s)
-+static void check_for_unused(enum export exp, const char *m, const char *s)
+ 	updateListAll();
+ }
+@@ -803,7 +803,7 @@ void ConfigList::contextMenuEvent(QContextMenuEvent *e)
+ 			QAction *action;
+ 
+ 			headerPopup = new QPopupMenu(this);
+-			action = new QAction(NULL, "Show Name", 0, this);
++			action = new QAction(NULL, _("Show Name"), 0, this);
+ 			  action->setToggleAction(TRUE);
+ 			  connect(action, SIGNAL(toggled(bool)),
+ 				  parent(), SLOT(setShowName(bool)));
+@@ -811,7 +811,7 @@ void ConfigList::contextMenuEvent(QContextMenuEvent *e)
+ 				  action, SLOT(setOn(bool)));
+ 			  action->setOn(showName);
+ 			  action->addTo(headerPopup);
+-			action = new QAction(NULL, "Show Range", 0, this);
++			action = new QAction(NULL, _("Show Range"), 0, this);
+ 			  action->setToggleAction(TRUE);
+ 			  connect(action, SIGNAL(toggled(bool)),
+ 				  parent(), SLOT(setShowRange(bool)));
+@@ -819,7 +819,7 @@ void ConfigList::contextMenuEvent(QContextMenuEvent *e)
+ 				  action, SLOT(setOn(bool)));
+ 			  action->setOn(showRange);
+ 			  action->addTo(headerPopup);
+-			action = new QAction(NULL, "Show Data", 0, this);
++			action = new QAction(NULL, _("Show Data"), 0, this);
+ 			  action->setToggleAction(TRUE);
+ 			  connect(action, SIGNAL(toggled(bool)),
+ 				  parent(), SLOT(setShowData(bool)));
+@@ -1041,7 +1041,12 @@ void ConfigInfoView::menuInfo(void)
+ 		if (showDebug())
+ 			debug = debug_info(sym);
+ 
+-		help = print_filter(_(menu_get_help(menu)));
++		help = menu_get_help(menu);
++		/* Gettextize if the help text not empty */
++		if (help.isEmpty())
++			help = print_filter(menu_get_help(menu));
++		else
++			help = print_filter(_(menu_get_help(menu)));
+ 	} else if (menu->prompt) {
+ 		head += "<big><b>";
+ 		head += print_filter(_(menu->prompt->text));
+@@ -1167,7 +1172,7 @@ void ConfigInfoView::expr_print_help(void *data, struct symbol *sym, const char
+ QPopupMenu* ConfigInfoView::createPopupMenu(const QPoint& pos)
  {
- 	const char *e = is_vmlinux(m) ?"":".ko";
+ 	QPopupMenu* popup = Parent::createPopupMenu(pos);
+-	QAction* action = new QAction(NULL,"Show Debug Info", 0, popup);
++	QAction* action = new QAction(NULL, _("Show Debug Info"), 0, popup);
+ 	  action->setToggleAction(TRUE);
+ 	  connect(action, SIGNAL(toggled(bool)), SLOT(setShowDebug(bool)));
+ 	  connect(this, SIGNAL(showDebugChanged(bool)), action, SLOT(setOn(bool)));
+@@ -1189,11 +1194,11 @@ ConfigSearchWindow::ConfigSearchWindow(ConfigMainWindow* parent, const char *nam
  
-@@ -1401,7 +1409,7 @@ static void check_exports(struct module *mod)
- 		if (!mod->gpl_compatible)
- 			check_for_gpl_usage(exp->export, basename, exp->name);
- 		check_for_unused(exp->export, basename, exp->name);
--        }
-+	}
- }
+ 	QVBoxLayout* layout1 = new QVBoxLayout(this, 11, 6);
+ 	QHBoxLayout* layout2 = new QHBoxLayout(0, 0, 6);
+-	layout2->addWidget(new QLabel("Find:", this));
++	layout2->addWidget(new QLabel(_("Find:"), this));
+ 	editField = new QLineEdit(this);
+ 	connect(editField, SIGNAL(returnPressed()), SLOT(search()));
+ 	layout2->addWidget(editField);
+-	searchButton = new QPushButton("Search", this);
++	searchButton = new QPushButton(_("Search"), this);
+ 	searchButton->setAutoDefault(FALSE);
+ 	connect(searchButton, SIGNAL(clicked()), SLOT(search()));
+ 	layout2->addWidget(searchButton);
+@@ -1313,58 +1318,58 @@ ConfigMainWindow::ConfigMainWindow(void)
+ 	menu = menuBar();
+ 	toolBar = new QToolBar("Tools", this);
  
- /**
-@@ -1465,9 +1473,8 @@ static int add_versions(struct buffer *b, struct module *mod)
- 	buf_printf(b, "__attribute__((section(\"__versions\"))) = {\n");
+-	backAction = new QAction("Back", QPixmap(xpm_back), "Back", 0, this);
++	backAction = new QAction("Back", QPixmap(xpm_back), _("Back"), 0, this);
+ 	  connect(backAction, SIGNAL(activated()), SLOT(goBack()));
+ 	  backAction->setEnabled(FALSE);
+-	QAction *quitAction = new QAction("Quit", "&Quit", CTRL+Key_Q, this);
++	QAction *quitAction = new QAction("Quit", _("&Quit"), CTRL+Key_Q, this);
+ 	  connect(quitAction, SIGNAL(activated()), SLOT(close()));
+-	QAction *loadAction = new QAction("Load", QPixmap(xpm_load), "&Load", CTRL+Key_L, this);
++	QAction *loadAction = new QAction("Load", QPixmap(xpm_load), _("&Load"), CTRL+Key_L, this);
+ 	  connect(loadAction, SIGNAL(activated()), SLOT(loadConfig()));
+-	saveAction = new QAction("Save", QPixmap(xpm_save), "&Save", CTRL+Key_S, this);
++	saveAction = new QAction("Save", QPixmap(xpm_save), _("&Save"), CTRL+Key_S, this);
+ 	  connect(saveAction, SIGNAL(activated()), SLOT(saveConfig()));
+ 	conf_set_changed_callback(conf_changed);
+ 	// Set saveAction's initial state
+ 	conf_changed();
+-	QAction *saveAsAction = new QAction("Save As...", "Save &As...", 0, this);
++	QAction *saveAsAction = new QAction("Save As...", _("Save &As..."), 0, this);
+ 	  connect(saveAsAction, SIGNAL(activated()), SLOT(saveConfigAs()));
+-	QAction *searchAction = new QAction("Find", "&Find", CTRL+Key_F, this);
++	QAction *searchAction = new QAction("Find", _("&Find"), CTRL+Key_F, this);
+ 	  connect(searchAction, SIGNAL(activated()), SLOT(searchConfig()));
+-	QAction *singleViewAction = new QAction("Single View", QPixmap(xpm_single_view), "Split View", 0, this);
++	QAction *singleViewAction = new QAction("Single View", QPixmap(xpm_single_view), _("Single View"), 0, this);
+ 	  connect(singleViewAction, SIGNAL(activated()), SLOT(showSingleView()));
+-	QAction *splitViewAction = new QAction("Split View", QPixmap(xpm_split_view), "Split View", 0, this);
++	QAction *splitViewAction = new QAction("Split View", QPixmap(xpm_split_view), _("Split View"), 0, this);
+ 	  connect(splitViewAction, SIGNAL(activated()), SLOT(showSplitView()));
+-	QAction *fullViewAction = new QAction("Full View", QPixmap(xpm_tree_view), "Full View", 0, this);
++	QAction *fullViewAction = new QAction("Full View", QPixmap(xpm_tree_view), _("Full View"), 0, this);
+ 	  connect(fullViewAction, SIGNAL(activated()), SLOT(showFullView()));
  
- 	for (s = mod->unres; s; s = s->next) {
--		if (!s->module) {
-+		if (!s->module)
- 			continue;
--		}
- 		if (!s->crc_valid) {
- 			warn("\"%s\" [%s.ko] has no CRC!\n",
- 				s->name, mod->name);
-@@ -1488,9 +1495,8 @@ static void add_depends(struct buffer *b, struct module *mod,
- 	struct module *m;
- 	int first = 1;
+-	QAction *showNameAction = new QAction(NULL, "Show Name", 0, this);
++	QAction *showNameAction = new QAction(NULL, _("Show Name"), 0, this);
+ 	  showNameAction->setToggleAction(TRUE);
+ 	  connect(showNameAction, SIGNAL(toggled(bool)), configView, SLOT(setShowName(bool)));
+ 	  connect(configView, SIGNAL(showNameChanged(bool)), showNameAction, SLOT(setOn(bool)));
+ 	  showNameAction->setOn(configView->showName());
+-	QAction *showRangeAction = new QAction(NULL, "Show Range", 0, this);
++	QAction *showRangeAction = new QAction(NULL, _("Show Range"), 0, this);
+ 	  showRangeAction->setToggleAction(TRUE);
+ 	  connect(showRangeAction, SIGNAL(toggled(bool)), configView, SLOT(setShowRange(bool)));
+ 	  connect(configView, SIGNAL(showRangeChanged(bool)), showRangeAction, SLOT(setOn(bool)));
+ 	  showRangeAction->setOn(configList->showRange);
+-	QAction *showDataAction = new QAction(NULL, "Show Data", 0, this);
++	QAction *showDataAction = new QAction(NULL, _("Show Data"), 0, this);
+ 	  showDataAction->setToggleAction(TRUE);
+ 	  connect(showDataAction, SIGNAL(toggled(bool)), configView, SLOT(setShowData(bool)));
+ 	  connect(configView, SIGNAL(showDataChanged(bool)), showDataAction, SLOT(setOn(bool)));
+ 	  showDataAction->setOn(configList->showData);
+-	QAction *showAllAction = new QAction(NULL, "Show All Options", 0, this);
++	QAction *showAllAction = new QAction(NULL, _("Show All Options"), 0, this);
+ 	  showAllAction->setToggleAction(TRUE);
+ 	  connect(showAllAction, SIGNAL(toggled(bool)), configView, SLOT(setShowAll(bool)));
+ 	  connect(showAllAction, SIGNAL(toggled(bool)), menuView, SLOT(setShowAll(bool)));
+ 	  showAllAction->setOn(configList->showAll);
+-	QAction *showDebugAction = new QAction(NULL, "Show Debug Info", 0, this);
++	QAction *showDebugAction = new QAction(NULL, _("Show Debug Info"), 0, this);
+ 	  showDebugAction->setToggleAction(TRUE);
+ 	  connect(showDebugAction, SIGNAL(toggled(bool)), helpText, SLOT(setShowDebug(bool)));
+ 	  connect(helpText, SIGNAL(showDebugChanged(bool)), showDebugAction, SLOT(setOn(bool)));
+ 	  showDebugAction->setOn(helpText->showDebug());
  
--	for (m = modules; m; m = m->next) {
-+	for (m = modules; m; m = m->next)
- 		m->seen = is_vmlinux(m->name);
--	}
+-	QAction *showIntroAction = new QAction(NULL, "Introduction", 0, this);
++	QAction *showIntroAction = new QAction(NULL, _("Introduction"), 0, this);
+ 	  connect(showIntroAction, SIGNAL(activated()), SLOT(showIntro()));
+-	QAction *showAboutAction = new QAction(NULL, "About", 0, this);
++	QAction *showAboutAction = new QAction(NULL, _("About"), 0, this);
+ 	  connect(showAboutAction, SIGNAL(activated()), SLOT(showAbout()));
  
- 	buf_printf(b, "\n");
- 	buf_printf(b, "static const char __module_depends[]\n");
-@@ -1506,7 +1512,8 @@ static void add_depends(struct buffer *b, struct module *mod,
- 			continue;
+ 	// init tool bar
+@@ -1379,7 +1384,7 @@ ConfigMainWindow::ConfigMainWindow(void)
  
- 		s->module->seen = 1;
--		if ((p = strrchr(s->module->name, '/')) != NULL)
-+		p = strrchr(s->module->name, '/');
-+		if (p)
- 			p++;
- 		else
- 			p = s->module->name;
-@@ -1578,7 +1585,7 @@ static void read_dump(const char *fname, unsigned int kernel)
- 	void *file = grab_file(fname, &size);
- 	char *line;
+ 	// create config menu
+ 	QPopupMenu* config = new QPopupMenu(this);
+-	menu->insertItem("&File", config);
++	menu->insertItem(_("&File"), config);
+ 	loadAction->addTo(config);
+ 	saveAction->addTo(config);
+ 	saveAsAction->addTo(config);
+@@ -1388,12 +1393,12 @@ ConfigMainWindow::ConfigMainWindow(void)
  
--        if (!file)
-+	if (!file)
- 		/* No symbol versions, silently ignore */
+ 	// create edit menu
+ 	QPopupMenu* editMenu = new QPopupMenu(this);
+-	menu->insertItem("&Edit", editMenu);
++	menu->insertItem(_("&Edit"), editMenu);
+ 	searchAction->addTo(editMenu);
+ 
+ 	// create options menu
+ 	QPopupMenu* optionMenu = new QPopupMenu(this);
+-	menu->insertItem("&Option", optionMenu);
++	menu->insertItem(_("&Option"), optionMenu);
+ 	showNameAction->addTo(optionMenu);
+ 	showRangeAction->addTo(optionMenu);
+ 	showDataAction->addTo(optionMenu);
+@@ -1404,7 +1409,7 @@ ConfigMainWindow::ConfigMainWindow(void)
+ 	// create help menu
+ 	QPopupMenu* helpMenu = new QPopupMenu(this);
+ 	menu->insertSeparator();
+-	menu->insertItem("&Help", helpMenu);
++	menu->insertItem(_("&Help"), helpMenu);
+ 	showIntroAction->addTo(helpMenu);
+ 	showAboutAction->addTo(helpMenu);
+ 
+@@ -1452,14 +1457,14 @@ void ConfigMainWindow::loadConfig(void)
+ 	if (s.isNull())
  		return;
+ 	if (conf_read(QFile::encodeName(s)))
+-		QMessageBox::information(this, "qconf", "Unable to load configuration!");
++		QMessageBox::information(this, "qconf", _("Unable to load configuration!"));
+ 	ConfigView::updateListAll();
+ }
  
-@@ -1601,11 +1608,10 @@ static void read_dump(const char *fname, unsigned int kernel)
- 		crc = strtoul(line, &d, 16);
- 		if (*symname == '\0' || *modname == '\0' || *d != '\0')
- 			goto fail;
--
--		if (!(mod = find_module(modname))) {
--			if (is_vmlinux(modname)) {
-+		mod = find_module(modname);
-+		if (!mod) {
-+			if (is_vmlinux(modname))
- 				have_vmlinux = 1;
--			}
- 			mod = new_module(NOFAIL(strdup(modname)));
- 			mod->skip = 1;
- 		}
-@@ -1662,31 +1668,31 @@ int main(int argc, char **argv)
- 	int err;
+ void ConfigMainWindow::saveConfig(void)
+ {
+ 	if (conf_write(NULL))
+-		QMessageBox::information(this, "qconf", "Unable to save configuration!");
++		QMessageBox::information(this, "qconf", _("Unable to save configuration!"));
+ }
  
- 	while ((opt = getopt(argc, argv, "i:I:mso:aw")) != -1) {
--		switch(opt) {
--			case 'i':
--				kernel_read = optarg;
--				break;
--			case 'I':
--				module_read = optarg;
--				external_module = 1;
--				break;
--			case 'm':
--				modversions = 1;
--				break;
--			case 'o':
--				dump_write = optarg;
--				break;
--			case 'a':
--				all_versions = 1;
--				break;
--			case 's':
--				vmlinux_section_warnings = 0;
--				break;
--			case 'w':
--				warn_unresolved = 1;
--				break;
--			default:
--				exit(1);
-+		switch (opt) {
-+		case 'i':
-+			kernel_read = optarg;
-+			break;
-+		case 'I':
-+			module_read = optarg;
-+			external_module = 1;
-+			break;
-+		case 'm':
-+			modversions = 1;
-+			break;
-+		case 'o':
-+			dump_write = optarg;
-+			break;
-+		case 'a':
-+			all_versions = 1;
-+			break;
-+		case 's':
-+			vmlinux_section_warnings = 0;
-+			break;
-+		case 'w':
-+			warn_unresolved = 1;
-+			break;
-+		default:
-+			exit(1);
- 		}
+ void ConfigMainWindow::saveConfigAs(void)
+@@ -1468,7 +1473,7 @@ void ConfigMainWindow::saveConfigAs(void)
+ 	if (s.isNull())
+ 		return;
+ 	if (conf_write(QFile::encodeName(s)))
+-		QMessageBox::information(this, "qconf", "Unable to save configuration!");
++		QMessageBox::information(this, "qconf", _("Unable to save configuration!"));
+ }
+ 
+ void ConfigMainWindow::searchConfig(void)
+@@ -1612,11 +1617,11 @@ void ConfigMainWindow::closeEvent(QCloseEvent* e)
+ 		e->accept();
+ 		return;
  	}
+-	QMessageBox mb("qconf", "Save configuration?", QMessageBox::Warning,
++	QMessageBox mb("qconf", _("Save configuration?"), QMessageBox::Warning,
+ 			QMessageBox::Yes | QMessageBox::Default, QMessageBox::No, QMessageBox::Cancel | QMessageBox::Escape);
+-	mb.setButtonText(QMessageBox::Yes, "&Save Changes");
+-	mb.setButtonText(QMessageBox::No, "&Discard Changes");
+-	mb.setButtonText(QMessageBox::Cancel, "Cancel Exit");
++	mb.setButtonText(QMessageBox::Yes, _("&Save Changes"));
++	mb.setButtonText(QMessageBox::No, _("&Discard Changes"));
++	mb.setButtonText(QMessageBox::Cancel, _("Cancel Exit"));
+ 	switch (mb.exec()) {
+ 	case QMessageBox::Yes:
+ 		conf_write(NULL);
+@@ -1631,7 +1636,7 @@ void ConfigMainWindow::closeEvent(QCloseEvent* e)
  
-@@ -1695,9 +1701,8 @@ int main(int argc, char **argv)
- 	if (module_read)
- 		read_dump(module_read, 0);
+ void ConfigMainWindow::showIntro(void)
+ {
+-	static char str[] = "Welcome to the qconf graphical kernel configuration tool for Linux.\n\n"
++	static const QString str = _("Welcome to the qconf graphical kernel configuration tool for Linux.\n\n"
+ 		"For each option, a blank box indicates the feature is disabled, a check\n"
+ 		"indicates it is enabled, and a dot indicates that it is to be compiled\n"
+ 		"as a module.  Clicking on the box will cycle through the three states.\n\n"
+@@ -1641,15 +1646,15 @@ void ConfigMainWindow::showIntro(void)
+ 		"options must be enabled to support the option you are interested in, you can\n"
+ 		"still view the help of a grayed-out option.\n\n"
+ 		"Toggling Show Debug Info under the Options menu will show the dependencies,\n"
+-		"which you can then match by examining other options.\n\n";
++		"which you can then match by examining other options.\n\n");
  
--	while (optind < argc) {
-+	while (optind < argc)
- 		read_symbols(argv[optind++]);
--	}
+ 	QMessageBox::information(this, "qconf", str);
+ }
  
- 	for (mod = modules; mod; mod = mod->next) {
- 		if (mod->skip)
+ void ConfigMainWindow::showAbout(void)
+ {
+-	static char str[] = "qconf is Copyright (C) 2002 Roman Zippel <zippel@linux-m68k.org>.\n\n"
+-		"Bug reports and feature request can also be entered at http://bugzilla.kernel.org/\n";
++	static const QString str = _("qconf is Copyright (C) 2002 Roman Zippel <zippel@linux-m68k.org>.\n\n"
++		"Bug reports and feature request can also be entered at http://bugzilla.kernel.org/\n");
+ 
+ 	QMessageBox::information(this, "qconf", str);
+ }
+@@ -1707,7 +1712,7 @@ static const char *progname;
+ 
+ static void usage(void)
+ {
+-	printf("%s <config>\n", progname);
++	printf(_("%s <config>\n"), progname);
+ 	exit(0);
+ }
+ 
 -- 
 1.5.4.rc3.14.g44397
 
