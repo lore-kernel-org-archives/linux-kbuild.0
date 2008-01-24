@@ -1,339 +1,79 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pasmtpb.tele.dk ([80.160.77.98]:42841 "EHLO pasmtpB.tele.dk"
+Received: from pasmtpa.tele.dk ([80.160.77.114]:37483 "EHLO pasmtpA.tele.dk"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1759128AbYAXWEA (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	id S1756389AbYAXWEA (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
 	Thu, 24 Jan 2008 17:04:00 -0500
-Received: from ravnborg.org (0x535d98d8.vgnxx8.adsl-dhcp.tele.dk [83.93.152.216])
-	by pasmtpB.tele.dk (Postfix) with ESMTP id A6E88E31C9D
-	for <linux-kbuild@vger.kernel.org>; Thu, 24 Jan 2008 23:03:51 +0100 (CET)
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: [PATCH 61/77] kbuild: code refactoring in modpost
-Date: Thu, 24 Jan 2008 23:03:42 +0100
-Message-Id: <1201212238-4369-61-git-send-email-sam@ravnborg.org>
+Subject: [PATCH 36/77] kconfig: allow overriding symbols
+Date: Thu, 24 Jan 2008 23:03:17 +0100
+Message-Id: <1201212238-4369-36-git-send-email-sam@ravnborg.org>
 In-Reply-To: <20080124215813.GA4204@uranus.ravnborg.org>
 References: <20080124215813.GA4204@uranus.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: Sam Ravnborg <sam@ravnborg.org>
+Cc: Jan Engelhardt <jengelh@computergmbh.de>, Sam Ravnborg <sam@ravnborg.org>, Roman Zippel <zippel@linux-m68k.org>, Randy Dunlap <randy.dunlap@oracle.com>
 
-Split a too long function up in smaller bits to make
-prgram logic easier to follow.
-A few related changes done due to parameter
-changes.
+From: Jan Engelhardt <jengelh@computergmbh.de>
 
-No functional changes.
+Allow config variables in .config to override earlier ones in the same
+file. In other words,
 
+	# CONFIG_SECURITY is not defined
+	CONFIG_SECURITY=y
+
+will activate it. This makes it a bit easier to do
+
+cat original-config myconfig myconfig2 ... >.config;
+and run *config as expected.
+
+Signed-off-by: Jan Engelhardt <jengelh@computergmbh.de>
 Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
+Cc: Roman Zippel <zippel@linux-m68k.org>
+Cc: Randy Dunlap <randy.dunlap@oracle.com>
 ---
- scripts/mod/modpost.c |  242 ++++++++++++++++++++++++++++---------------------
- 1 files changed, 137 insertions(+), 105 deletions(-)
+ scripts/kconfig/confdata.c |   14 +++++---------
+ 1 files changed, 5 insertions(+), 9 deletions(-)
 
-diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index 902ee55..e463013 100644
---- a/scripts/mod/modpost.c
-+++ b/scripts/mod/modpost.c
-@@ -937,19 +937,19 @@ static void warn_sec_mismatch(const char *modname, const char *fromsec,
- }
- 
- static unsigned int *reloc_location(struct elf_info *elf,
--					   int rsection, Elf_Rela *r)
-+				    Elf_Shdr *sechdr, Elf_Rela *r)
- {
- 	Elf_Shdr *sechdrs = elf->sechdrs;
--	int section = sechdrs[rsection].sh_info;
-+	int section = sechdr->sh_info;
- 
- 	return (void *)elf->hdr + sechdrs[section].sh_offset +
- 		(r->r_offset - sechdrs[section].sh_addr);
- }
- 
--static int addend_386_rel(struct elf_info *elf, int rsection, Elf_Rela *r)
-+static int addend_386_rel(struct elf_info *elf, Elf_Shdr *sechdr, Elf_Rela *r)
- {
- 	unsigned int r_typ = ELF_R_TYPE(r->r_info);
--	unsigned int *location = reloc_location(elf, rsection, r);
-+	unsigned int *location = reloc_location(elf, sechdr, r);
- 
- 	switch (r_typ) {
- 	case R_386_32:
-@@ -965,7 +965,7 @@ static int addend_386_rel(struct elf_info *elf, int rsection, Elf_Rela *r)
- 	return 0;
- }
- 
--static int addend_arm_rel(struct elf_info *elf, int rsection, Elf_Rela *r)
-+static int addend_arm_rel(struct elf_info *elf, Elf_Shdr *sechdr, Elf_Rela *r)
- {
- 	unsigned int r_typ = ELF_R_TYPE(r->r_info);
- 
-@@ -978,8 +978,8 @@ static int addend_arm_rel(struct elf_info *elf, int rsection, Elf_Rela *r)
- 	case R_ARM_PC24:
- 		/* From ARM ABI: ((S + A) | T) - P */
- 		r->r_addend = (int)(long)(elf->hdr +
--		              elf->sechdrs[rsection].sh_offset +
--		              (r->r_offset - elf->sechdrs[rsection].sh_addr));
-+		              sechdr->sh_offset +
-+		              (r->r_offset - sechdr->sh_addr));
- 		break;
- 	default:
- 		return 1;
-@@ -987,10 +987,10 @@ static int addend_arm_rel(struct elf_info *elf, int rsection, Elf_Rela *r)
- 	return 0;
- }
- 
--static int addend_mips_rel(struct elf_info *elf, int rsection, Elf_Rela *r)
-+static int addend_mips_rel(struct elf_info *elf, Elf_Shdr *sechdr, Elf_Rela *r)
- {
- 	unsigned int r_typ = ELF_R_TYPE(r->r_info);
--	unsigned int *location = reloc_location(elf, rsection, r);
-+	unsigned int *location = reloc_location(elf, sechdr, r);
- 	unsigned int inst;
- 
- 	if (r_typ == R_MIPS_HI16)
-@@ -1010,6 +1010,128 @@ static int addend_mips_rel(struct elf_info *elf, int rsection, Elf_Rela *r)
- 	return 0;
- }
- 
-+static void section_rela(const char *modname, struct elf_info *elf,
-+                         Elf_Shdr *sechdr, int section(const char *),
-+                         int section_ref_ok(const char *))
-+{
-+	Elf_Sym  *sym;
-+	Elf_Rela *rela;
-+	Elf_Rela r;
-+	unsigned int r_sym;
-+	const char *fromsec;
-+	const char * tosec;
-+
-+	Elf_Ehdr *hdr = elf->hdr;
-+	Elf_Rela *start = (void *)hdr + sechdr->sh_offset;
-+	Elf_Rela *stop  = (void *)start + sechdr->sh_size;
-+
-+	const char *secstrings = (void *)hdr +
-+				 elf->sechdrs[hdr->e_shstrndx].sh_offset;
-+
-+	fromsec = secstrings + sechdr->sh_name;
-+	fromsec += strlen(".rela");
-+	/* if from section (name) is know good then skip it */
-+	if (section_ref_ok(fromsec))
-+		return;
-+
-+	for (rela = start; rela < stop; rela++) {
-+		r.r_offset = TO_NATIVE(rela->r_offset);
-+#if KERNEL_ELFCLASS == ELFCLASS64
-+		if (hdr->e_machine == EM_MIPS) {
-+			unsigned int r_typ;
-+			r_sym = ELF64_MIPS_R_SYM(rela->r_info);
-+			r_sym = TO_NATIVE(r_sym);
-+			r_typ = ELF64_MIPS_R_TYPE(rela->r_info);
-+			r.r_info = ELF64_R_INFO(r_sym, r_typ);
-+		} else {
-+			r.r_info = TO_NATIVE(rela->r_info);
-+			r_sym = ELF_R_SYM(r.r_info);
-+		}
-+#else
-+		r.r_info = TO_NATIVE(rela->r_info);
-+		r_sym = ELF_R_SYM(r.r_info);
-+#endif
-+		r.r_addend = TO_NATIVE(rela->r_addend);
-+		sym = elf->symtab_start + r_sym;
-+		/* Skip special sections */
-+		if (sym->st_shndx >= SHN_LORESERVE)
-+			continue;
-+
-+		tosec = secstrings +
-+			elf->sechdrs[sym->st_shndx].sh_name;
-+		if (section(tosec))
-+			warn_sec_mismatch(modname, fromsec, elf, sym, r);
-+	}
-+}
-+
-+static void section_rel(const char *modname, struct elf_info *elf,
-+                        Elf_Shdr *sechdr, int section(const char *),
-+                        int section_ref_ok(const char *))
-+{
-+	Elf_Sym *sym;
-+	Elf_Rel *rel;
-+	Elf_Rela r;
-+	unsigned int r_sym;
-+	const char *fromsec;
-+	const char * tosec;
-+
-+	Elf_Ehdr *hdr = elf->hdr;
-+	Elf_Rel *start = (void *)hdr + sechdr->sh_offset;
-+	Elf_Rel *stop  = (void *)start + sechdr->sh_size;
-+
-+	const char *secstrings = (void *)hdr +
-+				 elf->sechdrs[hdr->e_shstrndx].sh_offset;
-+
-+	fromsec = secstrings + sechdr->sh_name;
-+	fromsec += strlen(".rel");
-+	/* if from section (name) is know good then skip it */
-+	if (section_ref_ok(fromsec))
-+		return;
-+
-+	for (rel = start; rel < stop; rel++) {
-+		r.r_offset = TO_NATIVE(rel->r_offset);
-+#if KERNEL_ELFCLASS == ELFCLASS64
-+		if (hdr->e_machine == EM_MIPS) {
-+			unsigned int r_typ;
-+			r_sym = ELF64_MIPS_R_SYM(rel->r_info);
-+			r_sym = TO_NATIVE(r_sym);
-+			r_typ = ELF64_MIPS_R_TYPE(rel->r_info);
-+			r.r_info = ELF64_R_INFO(r_sym, r_typ);
-+		} else {
-+			r.r_info = TO_NATIVE(rel->r_info);
-+			r_sym = ELF_R_SYM(r.r_info);
-+		}
-+#else
-+		r.r_info = TO_NATIVE(rel->r_info);
-+		r_sym = ELF_R_SYM(r.r_info);
-+#endif
-+		r.r_addend = 0;
-+		switch (hdr->e_machine) {
-+		case EM_386:
-+			if (addend_386_rel(elf, sechdr, &r))
-+				continue;
-+			break;
-+		case EM_ARM:
-+			if (addend_arm_rel(elf, sechdr, &r))
-+				continue;
-+			break;
-+		case EM_MIPS:
-+			if (addend_mips_rel(elf, sechdr, &r))
-+				continue;
-+			break;
-+		}
-+		sym = elf->symtab_start + r_sym;
-+		/* Skip special sections */
-+		if (sym->st_shndx >= SHN_LORESERVE)
-+			continue;
-+
-+		tosec = secstrings +
-+			elf->sechdrs[sym->st_shndx].sh_name;
-+		if (section(tosec))
-+			warn_sec_mismatch(modname, fromsec, elf, sym, r);
-+	}
-+}
-+
- /**
-  * A module includes a number of sections that are discarded
-  * either when loaded or when used as built-in.
-@@ -1028,108 +1150,18 @@ static void check_sec_ref(struct module *mod, const char *modname,
- 			  int section_ref_ok(const char *))
- {
- 	int i;
--	Elf_Sym  *sym;
- 	Elf_Ehdr *hdr = elf->hdr;
- 	Elf_Shdr *sechdrs = elf->sechdrs;
--	const char *secstrings = (void *)hdr +
--				 sechdrs[hdr->e_shstrndx].sh_offset;
- 
- 	/* Walk through all sections */
- 	for (i = 0; i < hdr->e_shnum; i++) {
--		const char *name = secstrings + sechdrs[i].sh_name;
--		const char *secname;
--		Elf_Rela r;
--		unsigned int r_sym;
- 		/* We want to process only relocation sections and not .init */
--		if (sechdrs[i].sh_type == SHT_RELA) {
--			Elf_Rela *rela;
--			Elf_Rela *start = (void *)hdr + sechdrs[i].sh_offset;
--			Elf_Rela *stop  = (void *)start + sechdrs[i].sh_size;
--			name += strlen(".rela");
--			if (section_ref_ok(name))
--				continue;
--
--			for (rela = start; rela < stop; rela++) {
--				r.r_offset = TO_NATIVE(rela->r_offset);
--#if KERNEL_ELFCLASS == ELFCLASS64
--				if (hdr->e_machine == EM_MIPS) {
--					unsigned int r_typ;
--					r_sym = ELF64_MIPS_R_SYM(rela->r_info);
--					r_sym = TO_NATIVE(r_sym);
--					r_typ = ELF64_MIPS_R_TYPE(rela->r_info);
--					r.r_info = ELF64_R_INFO(r_sym, r_typ);
--				} else {
--					r.r_info = TO_NATIVE(rela->r_info);
--					r_sym = ELF_R_SYM(r.r_info);
--				}
--#else
--				r.r_info = TO_NATIVE(rela->r_info);
--				r_sym = ELF_R_SYM(r.r_info);
--#endif
--				r.r_addend = TO_NATIVE(rela->r_addend);
--				sym = elf->symtab_start + r_sym;
--				/* Skip special sections */
--				if (sym->st_shndx >= SHN_LORESERVE)
--					continue;
--
--				secname = secstrings +
--					sechdrs[sym->st_shndx].sh_name;
--				if (section(secname))
--					warn_sec_mismatch(modname, name,
--							  elf, sym, r);
--			}
--		} else if (sechdrs[i].sh_type == SHT_REL) {
--			Elf_Rel *rel;
--			Elf_Rel *start = (void *)hdr + sechdrs[i].sh_offset;
--			Elf_Rel *stop  = (void *)start + sechdrs[i].sh_size;
--			name += strlen(".rel");
--			if (section_ref_ok(name))
--				continue;
--
--			for (rel = start; rel < stop; rel++) {
--				r.r_offset = TO_NATIVE(rel->r_offset);
--#if KERNEL_ELFCLASS == ELFCLASS64
--				if (hdr->e_machine == EM_MIPS) {
--					unsigned int r_typ;
--					r_sym = ELF64_MIPS_R_SYM(rel->r_info);
--					r_sym = TO_NATIVE(r_sym);
--					r_typ = ELF64_MIPS_R_TYPE(rel->r_info);
--					r.r_info = ELF64_R_INFO(r_sym, r_typ);
--				} else {
--					r.r_info = TO_NATIVE(rel->r_info);
--					r_sym = ELF_R_SYM(r.r_info);
--				}
--#else
--				r.r_info = TO_NATIVE(rel->r_info);
--				r_sym = ELF_R_SYM(r.r_info);
--#endif
--				r.r_addend = 0;
--				switch (hdr->e_machine) {
--				case EM_386:
--					if (addend_386_rel(elf, i, &r))
--						continue;
--					break;
--				case EM_ARM:
--					if (addend_arm_rel(elf, i, &r))
--						continue;
--					break;
--				case EM_MIPS:
--					if (addend_mips_rel(elf, i, &r))
--						continue;
--					break;
--				}
--				sym = elf->symtab_start + r_sym;
--				/* Skip special sections */
--				if (sym->st_shndx >= SHN_LORESERVE)
--					continue;
--
--				secname = secstrings +
--					sechdrs[sym->st_shndx].sh_name;
--				if (section(secname))
--					warn_sec_mismatch(modname, name,
--							  elf, sym, r);
--			}
--		}
-+		if (sechdrs[i].sh_type == SHT_RELA)
-+			section_rela(modname, elf, &elf->sechdrs[i],
-+			             section, section_ref_ok);
-+		else if (sechdrs[i].sh_type == SHT_REL)
-+			section_rel(modname, elf, &elf->sechdrs[i],
-+			            section, section_ref_ok);
- 	}
- }
- 
+diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
+index e0f402f..2eccefb 100644
+--- a/scripts/kconfig/confdata.c
++++ b/scripts/kconfig/confdata.c
+@@ -232,8 +232,7 @@ load:
+ 					sym->type = S_BOOLEAN;
+ 			}
+ 			if (sym->flags & def_flags) {
+-				conf_warning("trying to reassign symbol %s", sym->name);
+-				break;
++				conf_warning("override: reassigning to symbol %s", sym->name);
+ 			}
+ 			switch (sym->type) {
+ 			case S_BOOLEAN:
+@@ -272,8 +271,7 @@ load:
+ 					sym->type = S_OTHER;
+ 			}
+ 			if (sym->flags & def_flags) {
+-				conf_warning("trying to reassign symbol %s", sym->name);
+-				break;
++				conf_warning("override: reassigning to symbol %s", sym->name);
+ 			}
+ 			if (conf_set_sym_val(sym, def, def_flags, p))
+ 				continue;
+@@ -297,11 +295,9 @@ load:
+ 				}
+ 				break;
+ 			case yes:
+-				if (cs->def[def].tri != no) {
+-					conf_warning("%s creates inconsistent choice state", sym->name);
+-					cs->flags &= ~def_flags;
+-				} else
+-					cs->def[def].val = sym;
++				if (cs->def[def].tri != no)
++					conf_warning("override: %s changes choice state", sym->name);
++				cs->def[def].val = sym;
+ 				break;
+ 			}
+ 			cs->def[def].tri = E_OR(cs->def[def].tri, sym->def[def].tri);
 -- 
 1.5.4.rc3.14.g44397
 
