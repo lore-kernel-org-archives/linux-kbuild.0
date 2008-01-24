@@ -1,65 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pasmtpb.tele.dk ([80.160.77.98]:42808 "EHLO pasmtpB.tele.dk"
+Received: from pasmtpa.tele.dk ([80.160.77.114]:37450 "EHLO pasmtpA.tele.dk"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1758852AbYAXWDv (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	id S1758859AbYAXWDv (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
 	Thu, 24 Jan 2008 17:03:51 -0500
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: [PATCH 28/77] FRV: Drop 'TOPDIR' from Makefiles
-Date: Thu, 24 Jan 2008 23:03:09 +0100
-Message-Id: <1201212238-4369-28-git-send-email-sam@ravnborg.org>
+Subject: [PATCH 16/77] kbuild: fix a buffer overflow in modpost
+Date: Thu, 24 Jan 2008 23:02:57 +0100
+Message-Id: <1201212238-4369-16-git-send-email-sam@ravnborg.org>
 In-Reply-To: <20080124215813.GA4204@uranus.ravnborg.org>
 References: <20080124215813.GA4204@uranus.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: WANG Cong <xiyou.wangcong@gmail.com>, David Howells <dhowells@redhat.com>, Sam Ravnborg <sam@ravnborg.org>
+Cc: Andi Kleen <ak@suse.de>, Sam Ravnborg <sam@ravnborg.org>
 
-From: WANG Cong <xiyou.wangcong@gmail.com>
+From: Andi Kleen <ak@suse.de>
 
-This patch drops TOPDIR from frv Makefiles.
-
-Cc: David Howells <dhowells@redhat.com>
-Signed-off-by: WANG Cong <xiyou.wangcong@gmail.com>
+When passing an file name > 1k the stack could be overflowed.
+Not really a security issue, but still better plugged.
+Signed-off-by: Andi Kleen <ak@suse.de>
 Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
 ---
- arch/frv/boot/Makefile |    8 ++++----
- 1 files changed, 4 insertions(+), 4 deletions(-)
+ scripts/mod/modpost.c |    3 ++-
+ 1 files changed, 2 insertions(+), 1 deletions(-)
 
-diff --git a/arch/frv/boot/Makefile b/arch/frv/boot/Makefile
-index dc6f038..6ae3254 100644
---- a/arch/frv/boot/Makefile
-+++ b/arch/frv/boot/Makefile
-@@ -10,7 +10,7 @@
+diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
+index 404ee0d..4d1c590 100644
+--- a/scripts/mod/modpost.c
++++ b/scripts/mod/modpost.c
+@@ -1656,7 +1656,6 @@ int main(int argc, char **argv)
+ {
+ 	struct module *mod;
+ 	struct buffer buf = { };
+-	char fname[SZ];
+ 	char *kernel_read = NULL, *module_read = NULL;
+ 	char *dump_write = NULL;
+ 	int opt;
+@@ -1709,6 +1708,8 @@ int main(int argc, char **argv)
+ 	err = 0;
  
- targets := Image zImage bootpImage
+ 	for (mod = modules; mod; mod = mod->next) {
++		char fname[strlen(mod->name) + 10];
++
+ 		if (mod->skip)
+ 			continue;
  
--SYSTEM	=$(TOPDIR)/$(LINUX)
-+SYSTEM	=$(LINUX)
- 
- ZTEXTADDR	 = 0x02080000
- PARAMS_PHYS	 = 0x0207c000
-@@ -45,7 +45,7 @@ zImage:	$(CONFIGURE) compressed/$(LINUX)
- bootpImage: bootp/bootp
- 	$(OBJCOPY) -O binary -R .note -R .comment -S bootp/bootp $@
- 
--compressed/$(LINUX): $(TOPDIR)/$(LINUX) dep
-+compressed/$(LINUX): $(LINUX) dep
- 	@$(MAKE) -C compressed $(LINUX)
- 
- bootp/bootp: zImage initrd
-@@ -59,10 +59,10 @@ initrd:
- # installation
- #
- install: $(CONFIGURE) Image
--	sh ./install.sh $(KERNELRELEASE) Image $(TOPDIR)/System.map "$(INSTALL_PATH)"
-+	sh ./install.sh $(KERNELRELEASE) Image System.map "$(INSTALL_PATH)"
- 
- zinstall: $(CONFIGURE) zImage
--	sh ./install.sh $(KERNELRELEASE) zImage $(TOPDIR)/System.map "$(INSTALL_PATH)"
-+	sh ./install.sh $(KERNELRELEASE) zImage System.map "$(INSTALL_PATH)"
- 
- #
- # miscellany
 -- 
 1.5.4.rc3.14.g44397
 
