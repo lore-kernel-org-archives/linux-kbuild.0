@@ -1,45 +1,182 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pasmtpa.tele.dk ([80.160.77.114]:46592 "EHLO pasmtpA.tele.dk"
+Received: from pasmtpa.tele.dk ([80.160.77.114]:37398 "EHLO pasmtpA.tele.dk"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754404AbYAXV7z (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 24 Jan 2008 16:59:55 -0500
-Date: Thu, 24 Jan 2008 23:00:05 +0100
+	id S1758736AbYAXWDs (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 24 Jan 2008 17:03:48 -0500
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: kbuild: Preparing for merge window
-Message-ID: <20080124220005.GB4204@uranus.ravnborg.org>
-References: <20080124215813.GA4204@uranus.ravnborg.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Subject: [PATCH 03/77] kernel-doc: single DOC: selection
+Date: Thu, 24 Jan 2008 23:02:44 +0100
+Message-Id: <1201212238-4369-3-git-send-email-sam@ravnborg.org>
 In-Reply-To: <20080124215813.GA4204@uranus.ravnborg.org>
+References: <20080124215813.GA4204@uranus.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
+To: linux-kbuild@vger.kernel.org
+Cc: Johannes Berg <johannes@sipsolutions.net>, Randy Dunlap <randy.dunlap@oracle.com>, Sam Ravnborg <sam@ravnborg.org>
 
-On Thu, Jan 24, 2008 at 10:58:13PM +0100, Sam Ravnborg wrote:
-> The following is the list of patches queued up for the merge window at the moment.
-> I have during the last week done several modpost changes to make section ismatch
-> warnings more reliable and I am happy with the modified modpost code now.
-> 
-> The warnings generated will if CONFIG_DEBUG_SECTION_MISMATCH=y be verbose
-> so it better guides the developer how to fix the warning.
-> 
-> Other patches of interest:
-> 
-> - We now have separate sections for all init/exit annotations
-> - We have restarted getting kconfig globalized, pending is widechar support
-> - Support for modules.order to tell in what order to load modules
-> - lots of small fixes/enhancements
-> 
-> The diffstat say that we touch a lot of files.
-> This is due to the following changes (mainly):
-> - consolidation touching all .lds.S files
-> - removal ofstale comment about make dep
-> - removal of obsolete __attribute_used__
-> - removal of TOPDIR
-> 
-> Patches will follow for review.
+From: Johannes Berg <johannes@sipsolutions.net>
 
-Patches will be sent to linux-kbuild only.
+Currently, DOC: sections are always output even if only a single
+function is requested, fix this and also make it possible to just
+output a single DOC: section by giving its title as the function
+name to output.
 
-	Sam
+Also fixes docbook XML well-formedness for sections with examples.
+
+Signed-off-by: Johannes Berg <johannes@sipsolutions.net>
+Signed-off-by: Randy Dunlap <randy.dunlap@oracle.com>
+Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
+---
+ scripts/kernel-doc |   63 +++++++++++++++++++++++++++++++++++----------------
+ 1 files changed, 43 insertions(+), 20 deletions(-)
+
+diff --git a/scripts/kernel-doc b/scripts/kernel-doc
+index 8cf528b..8255f72 100755
+--- a/scripts/kernel-doc
++++ b/scripts/kernel-doc
+@@ -54,13 +54,13 @@ use strict;
+ #  Set output format using one of -docbook -html -text or -man.  Default is man.
+ #
+ #  -function funcname
+-#	If set, then only generate documentation for the given function(s).  All
+-#	other functions are ignored.
++#	If set, then only generate documentation for the given function(s) or
++#	DOC: section titles.  All other functions and DOC: sections are ignored.
+ #
+ #  -nofunction funcname
+-#	If set, then only generate documentation for the other function(s).
+-#	Cannot be used together with -function
+-#	(yes, that's a bug -- perl hackers can fix it 8))
++#	If set, then only generate documentation for the other function(s)/DOC:
++#	sections. Cannot be used together with -function (yes, that's a bug --
++#	perl hackers can fix it 8))
+ #
+ #  c files - list of 'c' files to process
+ #
+@@ -374,6 +374,25 @@ sub dump_section {
+ }
+ 
+ ##
++# dump DOC: section after checking that it should go out
++#
++sub dump_doc_section {
++    my $name = shift;
++    my $contents = join "\n", @_;
++
++    if (($function_only == 0) ||
++	( $function_only == 1 && defined($function_table{$name})) ||
++	( $function_only == 2 && !defined($function_table{$name})))
++    {
++	dump_section $name, $contents;
++	output_blockhead({'sectionlist' => \@sectionlist,
++			  'sections' => \%sections,
++			  'module' => $modulename,
++			  'content-only' => ($function_only != 0), });
++    }
++}
++
++##
+ # output function
+ #
+ # parameterdescs, a hash.
+@@ -564,8 +583,8 @@ sub output_function_html(%) {
+     print "<hr>\n";
+ }
+ 
+-# output intro in html
+-sub output_intro_html(%) {
++# output DOC: block header in html
++sub output_blockhead_html(%) {
+     my %args = %{$_[0]};
+     my ($parameter, $section);
+     my $count;
+@@ -871,7 +890,7 @@ sub output_typedef_xml(%) {
+ }
+ 
+ # output in XML DocBook
+-sub output_intro_xml(%) {
++sub output_blockhead_xml(%) {
+     my %args = %{$_[0]};
+     my ($parameter, $section);
+     my $count;
+@@ -882,15 +901,23 @@ sub output_intro_xml(%) {
+     # print out each section
+     $lineprefix="   ";
+     foreach $section (@{$args{'sectionlist'}}) {
+-	print "<refsect1>\n <title>$section</title>\n <para>\n";
++	if (!$args{'content-only'}) {
++		print "<refsect1>\n <title>$section</title>\n";
++	}
+ 	if ($section =~ m/EXAMPLE/i) {
+ 	    print "<example><para>\n";
++	} else {
++	    print "<para>\n";
+ 	}
+ 	output_highlight($args{'sections'}{$section});
+ 	if ($section =~ m/EXAMPLE/i) {
+ 	    print "</para></example>\n";
++	} else {
++	    print "</para>";
++	}
++	if (!$args{'content-only'}) {
++		print "\n</refsect1>\n";
+ 	}
+-	print " </para>\n</refsect1>\n";
+     }
+ 
+     print "\n\n";
+@@ -1137,7 +1164,7 @@ sub output_typedef_man(%) {
+     }
+ }
+ 
+-sub output_intro_man(%) {
++sub output_blockhead_man(%) {
+     my %args = %{$_[0]};
+     my ($parameter, $section);
+     my $count;
+@@ -1294,7 +1321,7 @@ sub output_struct_text(%) {
+     output_section_text(@_);
+ }
+ 
+-sub output_intro_text(%) {
++sub output_blockhead_text(%) {
+     my %args = %{$_[0]};
+     my ($parameter, $section);
+ 
+@@ -1325,9 +1352,9 @@ sub output_declaration {
+ 
+ ##
+ # generic output function - calls the right one based on current output mode.
+-sub output_intro {
++sub output_blockhead {
+     no strict 'refs';
+-    my $func = "output_intro_".$output_mode;
++    my $func = "output_blockhead_".$output_mode;
+     &$func(@_);
+     $section_counter++;
+ }
+@@ -1926,9 +1953,7 @@ sub process_file($) {
+ 	} elsif ($state == 4) {
+ 		# Documentation block
+ 		if (/$doc_block/) {
+-			dump_section($section, xml_escape($contents));
+-			output_intro({'sectionlist' => \@sectionlist,
+-				      'sections' => \%sections });
++			dump_doc_section($section, xml_escape($contents));
+ 			$contents = "";
+ 			$function = "";
+ 			%constants = ();
+@@ -1946,9 +1971,7 @@ sub process_file($) {
+ 		}
+ 		elsif (/$doc_end/)
+ 		{
+-			dump_section($section, xml_escape($contents));
+-			output_intro({'sectionlist' => \@sectionlist,
+-				      'sections' => \%sections });
++			dump_doc_section($section, xml_escape($contents));
+ 			$contents = "";
+ 			$function = "";
+ 			%constants = ();
+-- 
+1.5.4.rc3.14.g44397
+
