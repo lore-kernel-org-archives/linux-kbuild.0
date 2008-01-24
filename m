@@ -1,214 +1,220 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pasmtpb.tele.dk ([80.160.77.98]:42830 "EHLO pasmtpB.tele.dk"
+Received: from pasmtpa.tele.dk ([80.160.77.114]:37483 "EHLO pasmtpA.tele.dk"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755891AbYAXWEI (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 24 Jan 2008 17:04:08 -0500
-Received: from ravnborg.org (0x535d98d8.vgnxx8.adsl-dhcp.tele.dk [83.93.152.216])
-	by pasmtpB.tele.dk (Postfix) with ESMTP id D62A4E31C93
-	for <linux-kbuild@vger.kernel.org>; Thu, 24 Jan 2008 23:03:52 +0100 (CET)
+	id S1756511AbYAXWEJ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 24 Jan 2008 17:04:09 -0500
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: [PATCH 70/77] kbuild: introduce a few helpers in modpost
-Date: Thu, 24 Jan 2008 23:03:51 +0100
-Message-Id: <1201212238-4369-70-git-send-email-sam@ravnborg.org>
+Subject: [PATCH 51/77] kconfig: gettext support for menuconfig
+Date: Thu, 24 Jan 2008 23:03:32 +0100
+Message-Id: <1201212238-4369-51-git-send-email-sam@ravnborg.org>
 In-Reply-To: <20080124215813.GA4204@uranus.ravnborg.org>
 References: <20080124215813.GA4204@uranus.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: Sam Ravnborg <sam@ravnborg.org>
+Cc: EGRY Gabor <gaboregry1@t-online.hu>, Sam Ravnborg <sam@ravnborg.org>, Roman Zippel <zippel@linux-m68k.org>
 
-Introducing helpers to retreive symbol and section
-names cleaned up the code a bit.
+From: EGRY Gabor <gaboregry1@t-online.hu>
 
+Full gettext support for menuconfig.
+
+Signed-off-by: Egry Gabor <gaboregry1@t-online.hu>
+Reviewed-by: Sam Ravnborg <sam@ravnborg.org>
 Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
+Cc: Roman Zippel <zippel@linux-m68k.org>
 ---
- scripts/mod/modpost.c |   73 +++++++++++++++++++++++++-----------------------
- 1 files changed, 38 insertions(+), 35 deletions(-)
+ scripts/kconfig/mconf.c |   51 ++++++++++++++++++++++++-----------------------
+ 1 files changed, 26 insertions(+), 25 deletions(-)
 
-diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index 7dfd039..e4099cd 100644
---- a/scripts/mod/modpost.c
-+++ b/scripts/mod/modpost.c
-@@ -605,6 +605,26 @@ static int strrcmp(const char *s, const char *sub)
- 	return memcmp(s + slen - sublen, sub, sublen);
+diff --git a/scripts/kconfig/mconf.c b/scripts/kconfig/mconf.c
+index ee9ed30..50e61c4 100644
+--- a/scripts/kconfig/mconf.c
++++ b/scripts/kconfig/mconf.c
+@@ -289,11 +289,11 @@ static void get_prompt_str(struct gstr *r, struct property *prop)
+ 	int i, j;
+ 	struct menu *submenu[8], *menu;
+ 
+-	str_printf(r, "Prompt: %s\n", prop->text);
+-	str_printf(r, "  Defined at %s:%d\n", prop->menu->file->name,
++	str_printf(r, _("Prompt: %s\n"), _(prop->text));
++	str_printf(r, _("  Defined at %s:%d\n"), prop->menu->file->name,
+ 		prop->menu->lineno);
+ 	if (!expr_is_yes(prop->visible.expr)) {
+-		str_append(r, "  Depends on: ");
++		str_append(r, _("  Depends on: "));
+ 		expr_gstr_print(prop->visible.expr, r);
+ 		str_append(r, "\n");
+ 	}
+@@ -301,13 +301,13 @@ static void get_prompt_str(struct gstr *r, struct property *prop)
+ 	for (i = 0; menu != &rootmenu && i < 8; menu = menu->parent)
+ 		submenu[i++] = menu;
+ 	if (i > 0) {
+-		str_printf(r, "  Location:\n");
++		str_printf(r, _("  Location:\n"));
+ 		for (j = 4; --i >= 0; j += 2) {
+ 			menu = submenu[i];
+-			str_printf(r, "%*c-> %s", j, ' ', menu_get_prompt(menu));
++			str_printf(r, "%*c-> %s", j, ' ', _(menu_get_prompt(menu)));
+ 			if (menu->sym) {
+ 				str_printf(r, " (%s [=%s])", menu->sym->name ?
+-					menu->sym->name : "<choice>",
++					menu->sym->name : _("<choice>"),
+ 					sym_get_string_value(menu->sym));
+ 			}
+ 			str_append(r, "\n");
+@@ -337,7 +337,7 @@ static void get_symbol_str(struct gstr *r, struct symbol *sym)
+ 	if (hit)
+ 		str_append(r, "\n");
+ 	if (sym->rev_dep.expr) {
+-		str_append(r, "  Selected by: ");
++		str_append(r, _("  Selected by: "));
+ 		expr_gstr_print(sym->rev_dep.expr, r);
+ 		str_append(r, "\n");
+ 	}
+@@ -353,7 +353,7 @@ static struct gstr get_relations_str(struct symbol **sym_arr)
+ 	for (i = 0; sym_arr && (sym = sym_arr[i]); i++)
+ 		get_symbol_str(&res, sym);
+ 	if (!i)
+-		str_append(&res, "No matches found.\n");
++		str_append(&res, _("No matches found.\n"));
+ 	return res;
  }
  
-+static const char *sym_name(struct elf_info *elf, Elf_Sym *sym)
-+{
-+	return elf->strtab + sym->st_name;
-+}
-+
-+static const char *sec_name(struct elf_info *elf, int shndx)
-+{
-+	Elf_Shdr *sechdrs = elf->sechdrs;
-+	return (void *)elf->hdr +
-+	        elf->sechdrs[elf->hdr->e_shstrndx].sh_offset +
-+	        sechdrs[shndx].sh_name;
-+}
-+
-+static const char *sech_name(struct elf_info *elf, Elf_Shdr *sechdr)
-+{
-+	return (void *)elf->hdr +
-+	        elf->sechdrs[elf->hdr->e_shstrndx].sh_offset +
-+	        sechdr->sh_name;
-+}
-+
- /* if sym is empty or point to a string
-  * like ".[0-9]+" then return 1.
-  * This is the optional prefix added by ld to some sections
-@@ -943,17 +963,14 @@ static Elf_Sym *find_elf_symbol2(struct elf_info *elf, Elf_Addr addr,
- {
- 	Elf_Sym *sym;
- 	Elf_Sym *near = NULL;
--	Elf_Ehdr *hdr = elf->hdr;
- 	Elf_Addr distance = ~0;
--	const char *secstrings = (void *)hdr +
--				 elf->sechdrs[hdr->e_shstrndx].sh_offset;
+@@ -433,6 +433,7 @@ static void build_conf(struct menu *menu)
+ 			switch (prop->type) {
+ 			case P_MENU:
+ 				child_count++;
++				prompt = _(prompt);
+ 				if (single_menu_mode) {
+ 					item_make("%s%*c%s",
+ 						  menu->data ? "-->" : "++>",
+@@ -448,7 +449,7 @@ static void build_conf(struct menu *menu)
+ 			case P_COMMENT:
+ 				if (prompt) {
+ 					child_count++;
+-					item_make("   %*c*** %s ***", indent + 1, ' ', prompt);
++					item_make("   %*c*** %s ***", indent + 1, ' ', _(prompt));
+ 					item_set_tag(':');
+ 					item_set_data(menu);
+ 				}
+@@ -456,7 +457,7 @@ static void build_conf(struct menu *menu)
+ 			default:
+ 				if (prompt) {
+ 					child_count++;
+-					item_make("---%*c%s", indent + 1, ' ', prompt);
++					item_make("---%*c%s", indent + 1, ' ', _(prompt));
+ 					item_set_tag(':');
+ 					item_set_data(menu);
+ 				}
+@@ -500,10 +501,10 @@ static void build_conf(struct menu *menu)
+ 			item_set_data(menu);
+ 		}
  
- 	for (sym = elf->symtab_start; sym < elf->symtab_stop; sym++) {
- 		const char *symsec;
- 
- 		if (sym->st_shndx >= SHN_LORESERVE)
- 			continue;
--		symsec = secstrings + elf->sechdrs[sym->st_shndx].sh_name;
-+		symsec = sec_name(elf, sym->st_shndx);
- 		if (strcmp(symsec, sec) != 0)
- 			continue;
- 		if (!is_valid_name(elf, sym))
-@@ -978,24 +995,21 @@ static Elf_Sym *find_elf_symbol2(struct elf_info *elf, Elf_Addr addr,
- static void warn_sec_mismatch(const char *modname, const char *fromsec,
- 			      struct elf_info *elf, Elf_Sym *sym, Elf_Rela r)
- {
--	const char *refsymname = "";
- 	Elf_Sym *where;
- 	Elf_Sym *refsym;
--	Elf_Ehdr *hdr = elf->hdr;
--	Elf_Shdr *sechdrs = elf->sechdrs;
--	const char *secstrings = (void *)hdr +
--				 sechdrs[hdr->e_shstrndx].sh_offset;
--	const char *secname = secstrings + sechdrs[sym->st_shndx].sh_name;
-+	const char *refsymname = "";
-+	const char *secname;
- 
-+	secname = sec_name(elf, sym->st_shndx);
- 	where = find_elf_symbol2(elf, r.r_offset, fromsec);
- 
- 	refsym = find_elf_symbol(elf, r.r_addend, sym);
--	if (refsym && strlen(elf->strtab + refsym->st_name))
--		refsymname = elf->strtab + refsym->st_name;
-+	if (refsym && strlen(sym_name(elf, refsym)))
-+		refsymname = sym_name(elf, refsym);
- 
- 	/* check whitelist - we may ignore it */
- 	if (secref_whitelist(modname, secname, fromsec,
--			     where ? elf->strtab + where->st_name : "",
-+			     where ? sym_name(elf, where) : "",
- 	                     refsymname))
- 		return;
- 
-@@ -1003,7 +1017,7 @@ static void warn_sec_mismatch(const char *modname, const char *fromsec,
- 		warn("%s(%s+0x%llx): Section mismatch: reference to %s:%s "
- 		     "in '%s'\n",
- 		     modname, fromsec, (unsigned long long)r.r_offset,
--		     secname, refsymname, elf->strtab + where->st_name);
-+		     secname, refsymname, sym_name(elf, where));
+-		item_add_str("%*c%s", indent + 1, ' ', menu_get_prompt(menu));
++		item_add_str("%*c%s", indent + 1, ' ', _(menu_get_prompt(menu)));
+ 		if (val == yes) {
+ 			if (def_menu) {
+-				item_add_str(" (%s)", menu_get_prompt(def_menu));
++				item_add_str(" (%s)", _(menu_get_prompt(def_menu)));
+ 				item_add_str("  --->");
+ 				if (def_menu->list) {
+ 					indent += 2;
+@@ -515,7 +516,7 @@ static void build_conf(struct menu *menu)
+ 		}
  	} else {
- 		warn("%s(%s+0x%llx): Section mismatch: reference to %s:%s\n",
- 		     modname, fromsec, (unsigned long long)r.r_offset,
-@@ -1095,14 +1109,10 @@ static void section_rela(const char *modname, struct elf_info *elf,
- 	const char *fromsec;
- 	const char * tosec;
- 
--	Elf_Ehdr *hdr = elf->hdr;
--	Elf_Rela *start = (void *)hdr + sechdr->sh_offset;
-+	Elf_Rela *start = (void *)elf->hdr + sechdr->sh_offset;
- 	Elf_Rela *stop  = (void *)start + sechdr->sh_size;
- 
--	const char *secstrings = (void *)hdr +
--				 elf->sechdrs[hdr->e_shstrndx].sh_offset;
--
--	fromsec = secstrings + sechdr->sh_name;
-+	fromsec = sech_name(elf, sechdr);
- 	fromsec += strlen(".rela");
- 	/* if from section (name) is know good then skip it */
- 	if (match(fromsec, section_white_list))
-@@ -1111,7 +1121,7 @@ static void section_rela(const char *modname, struct elf_info *elf,
- 	for (rela = start; rela < stop; rela++) {
- 		r.r_offset = TO_NATIVE(rela->r_offset);
- #if KERNEL_ELFCLASS == ELFCLASS64
--		if (hdr->e_machine == EM_MIPS) {
-+		if (elf->hdr->e_machine == EM_MIPS) {
- 			unsigned int r_typ;
- 			r_sym = ELF64_MIPS_R_SYM(rela->r_info);
- 			r_sym = TO_NATIVE(r_sym);
-@@ -1131,8 +1141,7 @@ static void section_rela(const char *modname, struct elf_info *elf,
- 		if (sym->st_shndx >= SHN_LORESERVE)
- 			continue;
- 
--		tosec = secstrings +
--			elf->sechdrs[sym->st_shndx].sh_name;
-+		tosec = sec_name(elf, sym->st_shndx);
- 		if (section_mismatch(fromsec, tosec))
- 			warn_sec_mismatch(modname, fromsec, elf, sym, r);
+ 		if (menu == current_menu) {
+-			item_make("---%*c%s", indent + 1, ' ', menu_get_prompt(menu));
++			item_make("---%*c%s", indent + 1, ' ', _(menu_get_prompt(menu)));
+ 			item_set_tag(':');
+ 			item_set_data(menu);
+ 			goto conf_childs;
+@@ -558,17 +559,17 @@ static void build_conf(struct menu *menu)
+ 				tmp = indent - tmp + 4;
+ 				if (tmp < 0)
+ 					tmp = 0;
+-				item_add_str("%*c%s%s", tmp, ' ', menu_get_prompt(menu),
++				item_add_str("%*c%s%s", tmp, ' ', _(menu_get_prompt(menu)),
+ 					     (sym_has_value(sym) || !sym_is_changable(sym)) ?
+-					     "" : " (NEW)");
++					     "" : _(" (NEW)"));
+ 				item_set_tag('s');
+ 				item_set_data(menu);
+ 				goto conf_childs;
+ 			}
+ 		}
+-		item_add_str("%*c%s%s", indent + 1, ' ', menu_get_prompt(menu),
++		item_add_str("%*c%s%s", indent + 1, ' ', _(menu_get_prompt(menu)),
+ 			  (sym_has_value(sym) || !sym_is_changable(sym)) ?
+-			  "" : " (NEW)");
++			  "" : _(" (NEW)"));
+ 		if (menu->prompt->type == P_MENU) {
+ 			item_add_str("  --->");
+ 			return;
+@@ -606,7 +607,7 @@ static void conf(struct menu *menu)
+ 			item_set_tag('S');
+ 		}
+ 		dialog_clear();
+-		res = dialog_menu(prompt ? prompt : _("Main Menu"),
++		res = dialog_menu(prompt ? _(prompt) : _("Main Menu"),
+ 				  _(menu_instructions),
+ 				  active_menu, &s_scroll);
+ 		if (res == 1 || res == KEY_ESC || res == -ERRDISPLAYTOOSMALL)
+@@ -653,7 +654,7 @@ static void conf(struct menu *menu)
+ 			if (sym)
+ 				show_help(submenu);
+ 			else
+-				show_helptext("README", _(mconf_readme));
++				show_helptext(_("README"), _(mconf_readme));
+ 			break;
+ 		case 3:
+ 			if (item_is_tag('t')) {
+@@ -711,13 +712,13 @@ static void show_help(struct menu *menu)
+ 		str_append(&help, nohelp_text);
  	}
-@@ -1148,14 +1157,10 @@ static void section_rel(const char *modname, struct elf_info *elf,
- 	const char *fromsec;
- 	const char * tosec;
+ 	get_symbol_str(&help, sym);
+-	show_helptext(menu_get_prompt(menu), str_get(&help));
++	show_helptext(_(menu_get_prompt(menu)), str_get(&help));
+ 	str_free(&help);
+ }
  
--	Elf_Ehdr *hdr = elf->hdr;
--	Elf_Rel *start = (void *)hdr + sechdr->sh_offset;
-+	Elf_Rel *start = (void *)elf->hdr + sechdr->sh_offset;
- 	Elf_Rel *stop  = (void *)start + sechdr->sh_size;
- 
--	const char *secstrings = (void *)hdr +
--				 elf->sechdrs[hdr->e_shstrndx].sh_offset;
--
--	fromsec = secstrings + sechdr->sh_name;
-+	fromsec = sech_name(elf, sechdr);
- 	fromsec += strlen(".rel");
- 	/* if from section (name) is know good then skip it */
- 	if (match(fromsec, section_white_list))
-@@ -1164,7 +1169,7 @@ static void section_rel(const char *modname, struct elf_info *elf,
- 	for (rel = start; rel < stop; rel++) {
- 		r.r_offset = TO_NATIVE(rel->r_offset);
- #if KERNEL_ELFCLASS == ELFCLASS64
--		if (hdr->e_machine == EM_MIPS) {
-+		if (elf->hdr->e_machine == EM_MIPS) {
- 			unsigned int r_typ;
- 			r_sym = ELF64_MIPS_R_SYM(rel->r_info);
- 			r_sym = TO_NATIVE(r_sym);
-@@ -1179,7 +1184,7 @@ static void section_rel(const char *modname, struct elf_info *elf,
- 		r_sym = ELF_R_SYM(r.r_info);
- #endif
- 		r.r_addend = 0;
--		switch (hdr->e_machine) {
-+		switch (elf->hdr->e_machine) {
- 		case EM_386:
- 			if (addend_386_rel(elf, sechdr, &r))
- 				continue;
-@@ -1198,8 +1203,7 @@ static void section_rel(const char *modname, struct elf_info *elf,
- 		if (sym->st_shndx >= SHN_LORESERVE)
- 			continue;
- 
--		tosec = secstrings +
--			elf->sechdrs[sym->st_shndx].sh_name;
-+		tosec = sec_name(elf, sym->st_shndx);
- 		if (section_mismatch(fromsec, tosec))
- 			warn_sec_mismatch(modname, fromsec, elf, sym, r);
- 	}
-@@ -1221,11 +1225,10 @@ static void check_sec_ref(struct module *mod, const char *modname,
-                           struct elf_info *elf)
+ static void conf_choice(struct menu *menu)
  {
- 	int i;
--	Elf_Ehdr *hdr = elf->hdr;
- 	Elf_Shdr *sechdrs = elf->sechdrs;
+-	const char *prompt = menu_get_prompt(menu);
++	const char *prompt = _(menu_get_prompt(menu));
+ 	struct menu *child;
+ 	struct symbol *active;
  
- 	/* Walk through all sections */
--	for (i = 0; i < hdr->e_shnum; i++) {
-+	for (i = 0; i < elf->hdr->e_shnum; i++) {
- 		/* We want to process only relocation sections and not .init */
- 		if (sechdrs[i].sh_type == SHT_RELA)
- 			section_rela(modname, elf, &elf->sechdrs[i]);
+@@ -731,7 +732,7 @@ static void conf_choice(struct menu *menu)
+ 		for (child = menu->list; child; child = child->next) {
+ 			if (!menu_is_visible(child))
+ 				continue;
+-			item_make("%s", menu_get_prompt(child));
++			item_make("%s", _(menu_get_prompt(child)));
+ 			item_set_data(child);
+ 			if (child->sym == active)
+ 				item_set_selected(1);
+@@ -739,7 +740,7 @@ static void conf_choice(struct menu *menu)
+ 				item_set_tag('X');
+ 		}
+ 		dialog_clear();
+-		res = dialog_checklist(prompt ? prompt : _("Main Menu"),
++		res = dialog_checklist(prompt ? _(prompt) : _("Main Menu"),
+ 					_(radiolist_instructions),
+ 					 15, 70, 6);
+ 		selected = item_activate_selected();
+@@ -785,10 +786,10 @@ static void conf_string(struct menu *menu)
+ 			heading = _(inputbox_instructions_string);
+ 			break;
+ 		default:
+-			heading = "Internal mconf error!";
++			heading = _("Internal mconf error!");
+ 		}
+ 		dialog_clear();
+-		res = dialog_inputbox(prompt ? prompt : _("Main Menu"),
++		res = dialog_inputbox(prompt ? _(prompt) : _("Main Menu"),
+ 				      heading, 10, 75,
+ 				      sym_get_string_value(menu->sym));
+ 		switch (res) {
 -- 
 1.5.4.rc3.14.g44397
 
