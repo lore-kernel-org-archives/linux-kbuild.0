@@ -1,26 +1,25 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pasmtpa.tele.dk ([80.160.77.114]:48181 "EHLO pasmtpA.tele.dk"
+Received: from pasmtpa.tele.dk ([80.160.77.114]:40022 "EHLO pasmtpA.tele.dk"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752740AbYAXUxW (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 24 Jan 2008 15:53:22 -0500
-Date: Thu, 24 Jan 2008 21:53:26 +0100
+	id S1755494AbYAXU4u (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 24 Jan 2008 15:56:50 -0500
+Date: Thu, 24 Jan 2008 21:56:54 +0100
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [2.6 patch] kconfig: remove "enable"
-Message-ID: <20080124205326.GA3689@uranus.ravnborg.org>
-References: <20080122235439.GJ26556@does.not.exist>
+Subject: Re: [PATCH] Support ARCH=x86 in buildtar
+Message-ID: <20080124205654.GC3689@uranus.ravnborg.org>
+References: <47953726.3ce9220a.7267.2abf@mx.google.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20080122235439.GJ26556@does.not.exist>
+In-Reply-To: <47953726.3ce9220a.7267.2abf@mx.google.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Adrian Bunk <bunk@kernel.org>
-Cc: zippel@linux-m68k.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Daniel De Graaf <danieldegraaf@gmail.com>
+Cc: Linux Kernel Build list <linux-kbuild@vger.kernel.org>, Trivial Patches <trivial@kernel.org>
 
-On Wed, Jan 23, 2008 at 01:54:39AM +0200, Adrian Bunk wrote:
-> Kconfig had a synonym "enable" for "select" that was neither documented 
-> nor used.
+On Mon, Jan 21, 2008 at 06:21:11PM -0600, Daniel De Graaf wrote:
+> Signed-off-by: Daniel De Graaf <danieldegraaf@gmail.com>
 
-Fixed up to apply to latest kbuild.git and applied.
+Thanks, applied.
 
 	Sam
