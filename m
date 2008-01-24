@@ -1,231 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pasmtpb.tele.dk ([80.160.77.98]:42857 "EHLO pasmtpB.tele.dk"
+Received: from pasmtpa.tele.dk ([80.160.77.114]:37437 "EHLO pasmtpA.tele.dk"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1756517AbYAXWEE (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	id S1756640AbYAXWEE (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
 	Thu, 24 Jan 2008 17:04:04 -0500
-Received: from ravnborg.org (0x535d98d8.vgnxx8.adsl-dhcp.tele.dk [83.93.152.216])
-	by pasmtpB.tele.dk (Postfix) with ESMTP id D954BE31CA1
-	for <linux-kbuild@vger.kernel.org>; Thu, 24 Jan 2008 23:03:51 +0100 (CET)
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: [PATCH 63/77] kbuild: check section names consistently in modpost
-Date: Thu, 24 Jan 2008 23:03:44 +0100
-Message-Id: <1201212238-4369-63-git-send-email-sam@ravnborg.org>
+Subject: [PATCH 41/77] kconfig: use C89 random functions in conf.c
+Date: Thu, 24 Jan 2008 23:03:22 +0100
+Message-Id: <1201212238-4369-41-git-send-email-sam@ravnborg.org>
 In-Reply-To: <20080124215813.GA4204@uranus.ravnborg.org>
 References: <20080124215813.GA4204@uranus.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: Sam Ravnborg <sam@ravnborg.org>
+Cc: Ladislav Michl <ladis@linux-mips.org>, Sam Ravnborg <sam@ravnborg.org>, Roman Zippel <zippel@linux-m68k.org>
 
-Now that match() is introduced use it consistently so
-we can share the section name definitions.
+From: Ladislav Michl <ladis@linux-mips.org>
 
+rand and srand functions conform also to C89 in addition to POSIX.1-2001,
+which makes them a bit more portable (work also on MinGW host). Linux man
+page also says:
+"The versions of rand() and srand() in the Linux C Library use the same
+random number generator as random() and srandom()".
+
+* Use C89 conformant functions rand() and srand()
+
+Signed-off-by: Ladislav Michl <ladis@linux-mips.org>
 Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
+Cc: Roman Zippel <zippel@linux-m68k.org>
 ---
- scripts/mod/modpost.c |  146 ++++++++++++++++++++-----------------------------
- 1 files changed, 60 insertions(+), 86 deletions(-)
+ scripts/kconfig/conf.c |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index 6c206b9..986513d 100644
---- a/scripts/mod/modpost.c
-+++ b/scripts/mod/modpost.c
-@@ -625,6 +625,7 @@ static int number_prefix(const char *sym)
- 
- /* The pattern is an array of simple patterns.
-  * "foo" will match an exact string equal to "foo"
-+ * "*foo" will match a string that ends with "foo"
-  * "foo*" will match a string that begins with "foo"
-  * "foo$" will match a string equal to "foo" or "foo.1"
-  *   where the '1' can be any number including several digits.
-@@ -638,8 +639,13 @@ int match(const char *sym, const char * const pat[])
- 		p = *pat++;
- 		const char *endp = p + strlen(p) - 1;
- 
-+		/* "*foo" */
-+		if (*p == '*') {
-+			if (strrcmp(sym, p + 1) == 0)
-+				return 1;
-+		}
- 		/* "foo*" */
--		if (*endp == '*') {
-+		else if (*endp == '*') {
- 			if (strncmp(sym, p, strlen(p) - 1) == 0)
- 				return 1;
- 		}
-@@ -660,54 +666,6 @@ int match(const char *sym, const char * const pat[])
- 	return 0;
- }
- 
--/*
-- * Functions used only during module init is marked __init and is stored in
-- * a .init.text section. Likewise data is marked __initdata and stored in
-- * a .init.data section.
-- * If this section is one of these sections return 1
-- * See include/linux/init.h for the details
-- */
--static int init_section(const char *name)
--{
--	if (strcmp(name, ".init") == 0)
--		return 1;
--	if (strncmp(name, ".init.", strlen(".init.")) == 0)
--		return 1;
--	return 0;
--}
--
--/*
-- * Functions used only during module exit is marked __exit and is stored in
-- * a .exit.text section. Likewise data is marked __exitdata and stored in
-- * a .exit.data section.
-- * If this section is one of these sections return 1
-- * See include/linux/init.h for the details
-- **/
--static int exit_section(const char *name)
--{
--	if (strcmp(name, ".exit.text") == 0)
--		return 1;
--	if (strcmp(name, ".exit.data") == 0)
--		return 1;
--	return 0;
--
--}
--
--/*
-- * Data sections are named like this:
-- * .data | .data.rel | .data.rel.*
-- * Return 1 if the specified section is a data section
-- */
--static int data_section(const char *name)
--{
--	if ((strcmp(name, ".data") == 0) ||
--	    (strcmp(name, ".data.rel") == 0) ||
--	    (strncmp(name, ".data.rel.", strlen(".data.rel.")) == 0))
--		return 1;
--	else
--		return 0;
--}
--
- /* sections that we do not want to do full section mismatch check on */
- static const char *section_white_list[] =
- 	{ ".debug*", ".stab*", ".note*", ".got*", ".toc*", NULL };
-@@ -721,9 +679,50 @@ static const char *section_white_list[] =
- #define INIT_SECTIONS INIT_DATA_SECTIONS, INIT_TEXT_SECTIONS
- #define EXIT_SECTIONS EXIT_DATA_SECTIONS, EXIT_TEXT_SECTIONS
- 
--#define DATA_SECTIONS ".data$"
-+#define DATA_SECTIONS ".data$", ".data.rel$"
- #define TEXT_SECTIONS ".text$"
- 
-+/* init data sections */
-+static const char *init_data_sections[] = { INIT_DATA_SECTIONS, NULL };
-+
-+/* all init sections */
-+static const char *init_sections[] = { INIT_SECTIONS, NULL };
-+
-+/* All init and exit sections (code + data) */
-+static const char *init_exit_sections[] =
-+	{INIT_SECTIONS, EXIT_SECTIONS, NULL };
-+
-+/* data section */
-+static const char *data_sections[] = { DATA_SECTIONS, NULL };
-+
-+/* sections that may refer to an init/exit section with no warning */
-+static const char *initref_sections[] =
-+{
-+	".text.init.refok*",
-+	".exit.text.refok*",
-+	".data.init.refok*",
-+	NULL
-+};
-+
-+
-+/* symbols in .data that may refer to init/exit sections */
-+static const char *symbol_white_list[] =
-+{
-+	"*driver",
-+	"*_template", /* scsi uses *_template a lot */
-+	"*_timer",    /* arm uses ops structures named _timer a lot */
-+	"*_sht",      /* scsi also used *_sht to some extent */
-+	"*_ops",
-+	"*_probe",
-+	"*_probe_one",
-+	"*_console",
-+	NULL
-+};
-+
-+static const char *head_sections[] = { ".head.text*", NULL };
-+static const char *linker_symbols[] =
-+	{ "__init_begin", "_sinittext", "_einittext", NULL };
-+
- struct sectioncheck {
- 	const char *fromsec[20];
- 	const char *tosec[20];
-@@ -817,55 +816,30 @@ static int secref_whitelist(const char *modname, const char *tosec,
- 			    const char *fromsec, const char *atsym,
- 			    const char *refsymname)
- {
--	const char **s;
--	const char *pat2sym[] = {
--		"driver",
--		"_template", /* scsi uses *_template a lot */
--		"_timer",    /* arm uses ops structures named _timer a lot */
--		"_sht",      /* scsi also used *_sht to some extent */
--		"_ops",
--		"_probe",
--		"_probe_one",
--		"_console",
--		NULL
--	};
--
--	const char *pat3refsym[] = {
--		"__init_begin",
--		"_sinittext",
--		"_einittext",
--		NULL
--	};
--
- 	/* Check for pattern 0 */
--	if ((strncmp(fromsec, ".text.init.refok", strlen(".text.init.refok")) == 0) ||
--	    (strncmp(fromsec, ".exit.text.refok", strlen(".exit.text.refok")) == 0) ||
--	    (strncmp(fromsec, ".data.init.refok", strlen(".data.init.refok")) == 0))
-+	if (match(fromsec, initref_sections))
- 		return 1;
- 
- 	/* Check for pattern 1 */
--	if ((strcmp(tosec, ".init.data") == 0) &&
--	    (strncmp(fromsec, ".data", strlen(".data")) == 0) &&
-+	if (match(tosec, init_data_sections) &&
-+	    match(fromsec, data_sections) &&
- 	    (strncmp(atsym, "__param", strlen("__param")) == 0))
- 		return 1;
- 
- 	/* Check for pattern 2 */
--	if ((init_section(tosec) || exit_section(tosec))
--	    && data_section(fromsec))
--		for (s = pat2sym; *s; s++)
--			if (strrcmp(atsym, *s) == 0)
--				return 1;
-+	if (match(tosec, init_exit_sections) &&
-+	    match(fromsec, data_sections) &&
-+	    match(atsym, symbol_white_list))
-+		return 1;
- 
- 	/* Check for pattern 3 */
--	if ((strcmp(fromsec, ".text.head") == 0) &&
--	    ((strcmp(tosec, ".init.data") == 0) ||
--	    (strcmp(tosec, ".init.text") == 0)))
-+	if (match(fromsec, head_sections) &&
-+	    match(tosec, init_sections))
- 	return 1;
- 
- 	/* Check for pattern 4 */
--	for (s = pat3refsym; *s; s++)
--		if (strcmp(refsymname, *s) == 0)
--			return 1;
-+	if (match(refsymname, linker_symbols))
-+		return 1;
- 
- 	return 0;
- }
+diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
+index a3d2d0b..01c2f35 100644
+--- a/scripts/kconfig/conf.c
++++ b/scripts/kconfig/conf.c
+@@ -375,7 +375,7 @@ static int conf_choice(struct menu *menu)
+ 			break;
+ 		case set_random:
+ 			if (is_new)
+-				def = (random() % cnt) + 1;
++				def = (rand() % cnt) + 1;
+ 		case set_default:
+ 		case set_yes:
+ 		case set_mod:
+@@ -526,7 +526,7 @@ int main(int ac, char **av)
+ 			break;
+ 		case 'r':
+ 			input_mode = set_random;
+-			srandom(time(NULL));
++			srand(time(NULL));
+ 			break;
+ 		case 'h':
+ 			printf("See README for usage info\n");
 -- 
 1.5.4.rc3.14.g44397
 
