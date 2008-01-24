@@ -1,330 +1,154 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
 Received: from pasmtpb.tele.dk ([80.160.77.98]:42809 "EHLO pasmtpB.tele.dk"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1759068AbYAXWD4 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 24 Jan 2008 17:03:56 -0500
+	id S1758736AbYAXWDv (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 24 Jan 2008 17:03:51 -0500
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: [PATCH 50/77] kconfig: gettext support for xconfig
-Date: Thu, 24 Jan 2008 23:03:31 +0100
-Message-Id: <1201212238-4369-50-git-send-email-sam@ravnborg.org>
+Subject: [PATCH 12/77] kbuild: implement modules.order
+Date: Thu, 24 Jan 2008 23:02:53 +0100
+Message-Id: <1201212238-4369-12-git-send-email-sam@ravnborg.org>
 In-Reply-To: <20080124215813.GA4204@uranus.ravnborg.org>
 References: <20080124215813.GA4204@uranus.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: EGRY Gabor <gaboregry1@t-online.hu>, Sam Ravnborg <sam@ravnborg.org>, Roman Zippel <zippel@linux-m68k.org>
+Cc: Tejun Heo <htejun@gmail.com>, Bill Nottingham <notting@redhat.com>, Rusty Russell <rusty@rustcorp.com.au>, Greg Kroah-Hartman <gregkh@suse.de>, Kay Sievers <kay.sievers@vrfy.org>, Sam Ravnborg <sam@ravnborg.org>
 
-From: EGRY Gabor <gaboregry1@t-online.hu>
+From: Tejun Heo <htejun@gmail.com>
 
-Full gettext support for xconfig.
+When multiple built-in modules (especially drivers) provide the same
+capability, they're prioritized by link order specified by the order
+listed in Makefile.  This implicit ordering is lost for loadable
+modules.
 
-Signed-off-by: Egry Gabor <gaboregry1@t-online.hu>
-Reviewed-by: Sam Ravnborg <sam@ravnborg.org>
+When driver modules are loaded by udev, what comes first in
+modules.alias file is selected.  However, the order in this file is
+indeterministic (depends on filesystem listing order of installed
+modules).  This causes confusion.
+
+The solution is two-parted.  This patch updates kbuild such that it
+generates and installs modules.order which contains the name of
+modules ordered according to Makefile.  The second part is update to
+depmod such that it generates output files according to this file.
+
+Note that both obj-y and obj-m subdirs can contain modules and
+ordering information between those two are lost from beginning.
+Currently obj-y subdirs are put before obj-m subdirs.
+
+Sam Ravnborg cleaned up Makefile modifications and suggested using awk
+to remove duplicate lines from modules.order instead of using separate
+C program.
+
+Signed-off-by: Tejun Heo <htejun@gmail.com>
+Cc: Bill Nottingham <notting@redhat.com>
+Cc: Rusty Russell <rusty@rustcorp.com.au>
+Cc: Greg Kroah-Hartman <gregkh@suse.de>
+Cc: Kay Sievers <kay.sievers@vrfy.org>
 Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
-Cc: Roman Zippel <zippel@linux-m68k.org>
 ---
- scripts/kconfig/qconf.cc |   93 ++++++++++++++++++++++++----------------------
- 1 files changed, 49 insertions(+), 44 deletions(-)
+ Makefile               |    8 +++++++-
+ scripts/Makefile.build |   17 ++++++++++++++++-
+ scripts/Makefile.lib   |    6 ++++++
+ 3 files changed, 29 insertions(+), 2 deletions(-)
 
-diff --git a/scripts/kconfig/qconf.cc b/scripts/kconfig/qconf.cc
-index b9bb32d..9fe27ca 100644
---- a/scripts/kconfig/qconf.cc
-+++ b/scripts/kconfig/qconf.cc
-@@ -114,7 +114,7 @@ void ConfigItem::updateMenu(void)
+diff --git a/Makefile b/Makefile
+index c546e05..532981a 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1021,9 +1021,14 @@ ifdef CONFIG_MODULES
+ all: modules
  
- 	sym = menu->sym;
- 	prop = menu->prompt;
--	prompt = QString::fromLocal8Bit(menu_get_prompt(menu));
-+	prompt = _(menu_get_prompt(menu));
+ #	Build modules
++#
++#	A module can be listed more than once in obj-m resulting in
++#	duplicate lines in modules.order files.  Those are removed
++#	using awk while concatenating to the final file.
  
- 	if (prop) switch (prop->type) {
- 	case P_MENU:
-@@ -208,7 +208,7 @@ void ConfigItem::updateMenu(void)
- 		break;
- 	}
- 	if (!sym_has_value(sym) && visible)
--		prompt += " (NEW)";
-+		prompt += _(" (NEW)");
- set_prompt:
- 	setText(promptColIdx, prompt);
- }
-@@ -346,7 +346,7 @@ ConfigList::ConfigList(ConfigView* p, const char *name)
+ PHONY += modules
+ modules: $(vmlinux-dirs) $(if $(KBUILD_BUILTIN),vmlinux)
++	$(Q)$(AWK) '!x[$$0]++' $(vmlinux-dirs:%=$(objtree)/%/modules.order) > $(objtree)/modules.order
+ 	@echo '  Building modules, stage 2.';
+ 	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.modpost
  
- 	for (i = 0; i < colNr; i++)
- 		colMap[i] = colRevMap[i] = -1;
--	addColumn(promptColIdx, "Option");
-+	addColumn(promptColIdx, _("Option"));
+@@ -1051,6 +1056,7 @@ _modinst_:
+ 		rm -f $(MODLIB)/build ; \
+ 		ln -s $(objtree) $(MODLIB)/build ; \
+ 	fi
++	@cp -f $(objtree)/modules.order $(MODLIB)/
+ 	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.modinst
  
- 	reinit();
- }
-@@ -360,14 +360,14 @@ void ConfigList::reinit(void)
- 	removeColumn(nameColIdx);
+ # This depmod is only for convenience to give the initial
+@@ -1110,7 +1116,7 @@ clean: archclean $(clean-dirs)
+ 	@find . $(RCS_FIND_IGNORE) \
+ 		\( -name '*.[oas]' -o -name '*.ko' -o -name '.*.cmd' \
+ 		-o -name '.*.d' -o -name '.*.tmp' -o -name '*.mod.c' \
+-		-o -name '*.symtypes' \) \
++		-o -name '*.symtypes' -o -name 'modules.order' \) \
+ 		-type f -print | xargs rm -f
  
- 	if (showName)
--		addColumn(nameColIdx, "Name");
-+		addColumn(nameColIdx, _("Name"));
- 	if (showRange) {
- 		addColumn(noColIdx, "N");
- 		addColumn(modColIdx, "M");
- 		addColumn(yesColIdx, "Y");
- 	}
- 	if (showData)
--		addColumn(dataColIdx, "Value");
-+		addColumn(dataColIdx, _("Value"));
+ # mrproper - Delete all generated files, including .config
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index de9836e..db38ef4 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -83,10 +83,12 @@ ifneq ($(strip $(obj-y) $(obj-m) $(obj-n) $(obj-) $(lib-target)),)
+ builtin-target := $(obj)/built-in.o
+ endif
  
- 	updateListAll();
- }
-@@ -803,7 +803,7 @@ void ConfigList::contextMenuEvent(QContextMenuEvent *e)
- 			QAction *action;
++modorder-target := $(obj)/modules.order
++
+ # We keep a list of all modules in $(MODVERDIR)
  
- 			headerPopup = new QPopupMenu(this);
--			action = new QAction(NULL, "Show Name", 0, this);
-+			action = new QAction(NULL, _("Show Name"), 0, this);
- 			  action->setToggleAction(TRUE);
- 			  connect(action, SIGNAL(toggled(bool)),
- 				  parent(), SLOT(setShowName(bool)));
-@@ -811,7 +811,7 @@ void ConfigList::contextMenuEvent(QContextMenuEvent *e)
- 				  action, SLOT(setOn(bool)));
- 			  action->setOn(showName);
- 			  action->addTo(headerPopup);
--			action = new QAction(NULL, "Show Range", 0, this);
-+			action = new QAction(NULL, _("Show Range"), 0, this);
- 			  action->setToggleAction(TRUE);
- 			  connect(action, SIGNAL(toggled(bool)),
- 				  parent(), SLOT(setShowRange(bool)));
-@@ -819,7 +819,7 @@ void ConfigList::contextMenuEvent(QContextMenuEvent *e)
- 				  action, SLOT(setOn(bool)));
- 			  action->setOn(showRange);
- 			  action->addTo(headerPopup);
--			action = new QAction(NULL, "Show Data", 0, this);
-+			action = new QAction(NULL, _("Show Data"), 0, this);
- 			  action->setToggleAction(TRUE);
- 			  connect(action, SIGNAL(toggled(bool)),
- 				  parent(), SLOT(setShowData(bool)));
-@@ -1041,7 +1041,12 @@ void ConfigInfoView::menuInfo(void)
- 		if (showDebug())
- 			debug = debug_info(sym);
+ __build: $(if $(KBUILD_BUILTIN),$(builtin-target) $(lib-target) $(extra-y)) \
+-	 $(if $(KBUILD_MODULES),$(obj-m)) \
++	 $(if $(KBUILD_MODULES),$(obj-m) $(modorder-target)) \
+ 	 $(subdir-ym) $(always)
+ 	@:
  
--		help = print_filter(_(menu_get_help(menu)));
-+		help = menu_get_help(menu);
-+		/* Gettextize if the help text not empty */
-+		if (help.isEmpty())
-+			help = print_filter(menu_get_help(menu));
-+		else
-+			help = print_filter(_(menu_get_help(menu)));
- 	} else if (menu->prompt) {
- 		head += "<big><b>";
- 		head += print_filter(_(menu->prompt->text));
-@@ -1167,7 +1172,7 @@ void ConfigInfoView::expr_print_help(void *data, struct symbol *sym, const char
- QPopupMenu* ConfigInfoView::createPopupMenu(const QPoint& pos)
- {
- 	QPopupMenu* popup = Parent::createPopupMenu(pos);
--	QAction* action = new QAction(NULL,"Show Debug Info", 0, popup);
-+	QAction* action = new QAction(NULL, _("Show Debug Info"), 0, popup);
- 	  action->setToggleAction(TRUE);
- 	  connect(action, SIGNAL(toggled(bool)), SLOT(setShowDebug(bool)));
- 	  connect(this, SIGNAL(showDebugChanged(bool)), action, SLOT(setOn(bool)));
-@@ -1189,11 +1194,11 @@ ConfigSearchWindow::ConfigSearchWindow(ConfigMainWindow* parent, const char *nam
+@@ -276,6 +278,19 @@ targets += $(builtin-target)
+ endif # builtin-target
  
- 	QVBoxLayout* layout1 = new QVBoxLayout(this, 11, 6);
- 	QHBoxLayout* layout2 = new QHBoxLayout(0, 0, 6);
--	layout2->addWidget(new QLabel("Find:", this));
-+	layout2->addWidget(new QLabel(_("Find:"), this));
- 	editField = new QLineEdit(this);
- 	connect(editField, SIGNAL(returnPressed()), SLOT(search()));
- 	layout2->addWidget(editField);
--	searchButton = new QPushButton("Search", this);
-+	searchButton = new QPushButton(_("Search"), this);
- 	searchButton->setAutoDefault(FALSE);
- 	connect(searchButton, SIGNAL(clicked()), SLOT(search()));
- 	layout2->addWidget(searchButton);
-@@ -1313,58 +1318,58 @@ ConfigMainWindow::ConfigMainWindow(void)
- 	menu = menuBar();
- 	toolBar = new QToolBar("Tools", this);
+ #
++# Rule to create modules.order file
++#
++# Create commands to either record .ko file or cat modules.order from
++# a subdirectory
++modorder-cmds =						\
++	$(foreach m, $(modorder),			\
++		$(if $(filter %/modules.order, $m),	\
++			cat $m;, echo kernel/$m;))
++
++$(modorder-target): $(subdir-ym) FORCE
++	$(Q)(cat /dev/null; $(modorder-cmds)) > $@
++
++#
+ # Rule to compile a set of .o files into one .a file
+ #
+ ifdef lib-target
+diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+index 3c5e88b..8e44023 100644
+--- a/scripts/Makefile.lib
++++ b/scripts/Makefile.lib
+@@ -25,6 +25,11 @@ lib-y := $(filter-out $(obj-y), $(sort $(lib-y) $(lib-m)))
+ # o if we encounter foo/ in $(obj-m), remove it from $(obj-m) 
+ #   and add the directory to the list of dirs to descend into: $(subdir-m)
  
--	backAction = new QAction("Back", QPixmap(xpm_back), "Back", 0, this);
-+	backAction = new QAction("Back", QPixmap(xpm_back), _("Back"), 0, this);
- 	  connect(backAction, SIGNAL(activated()), SLOT(goBack()));
- 	  backAction->setEnabled(FALSE);
--	QAction *quitAction = new QAction("Quit", "&Quit", CTRL+Key_Q, this);
-+	QAction *quitAction = new QAction("Quit", _("&Quit"), CTRL+Key_Q, this);
- 	  connect(quitAction, SIGNAL(activated()), SLOT(close()));
--	QAction *loadAction = new QAction("Load", QPixmap(xpm_load), "&Load", CTRL+Key_L, this);
-+	QAction *loadAction = new QAction("Load", QPixmap(xpm_load), _("&Load"), CTRL+Key_L, this);
- 	  connect(loadAction, SIGNAL(activated()), SLOT(loadConfig()));
--	saveAction = new QAction("Save", QPixmap(xpm_save), "&Save", CTRL+Key_S, this);
-+	saveAction = new QAction("Save", QPixmap(xpm_save), _("&Save"), CTRL+Key_S, this);
- 	  connect(saveAction, SIGNAL(activated()), SLOT(saveConfig()));
- 	conf_set_changed_callback(conf_changed);
- 	// Set saveAction's initial state
- 	conf_changed();
--	QAction *saveAsAction = new QAction("Save As...", "Save &As...", 0, this);
-+	QAction *saveAsAction = new QAction("Save As...", _("Save &As..."), 0, this);
- 	  connect(saveAsAction, SIGNAL(activated()), SLOT(saveConfigAs()));
--	QAction *searchAction = new QAction("Find", "&Find", CTRL+Key_F, this);
-+	QAction *searchAction = new QAction("Find", _("&Find"), CTRL+Key_F, this);
- 	  connect(searchAction, SIGNAL(activated()), SLOT(searchConfig()));
--	QAction *singleViewAction = new QAction("Single View", QPixmap(xpm_single_view), "Split View", 0, this);
-+	QAction *singleViewAction = new QAction("Single View", QPixmap(xpm_single_view), _("Single View"), 0, this);
- 	  connect(singleViewAction, SIGNAL(activated()), SLOT(showSingleView()));
--	QAction *splitViewAction = new QAction("Split View", QPixmap(xpm_split_view), "Split View", 0, this);
-+	QAction *splitViewAction = new QAction("Split View", QPixmap(xpm_split_view), _("Split View"), 0, this);
- 	  connect(splitViewAction, SIGNAL(activated()), SLOT(showSplitView()));
--	QAction *fullViewAction = new QAction("Full View", QPixmap(xpm_tree_view), "Full View", 0, this);
-+	QAction *fullViewAction = new QAction("Full View", QPixmap(xpm_tree_view), _("Full View"), 0, this);
- 	  connect(fullViewAction, SIGNAL(activated()), SLOT(showFullView()));
- 
--	QAction *showNameAction = new QAction(NULL, "Show Name", 0, this);
-+	QAction *showNameAction = new QAction(NULL, _("Show Name"), 0, this);
- 	  showNameAction->setToggleAction(TRUE);
- 	  connect(showNameAction, SIGNAL(toggled(bool)), configView, SLOT(setShowName(bool)));
- 	  connect(configView, SIGNAL(showNameChanged(bool)), showNameAction, SLOT(setOn(bool)));
- 	  showNameAction->setOn(configView->showName());
--	QAction *showRangeAction = new QAction(NULL, "Show Range", 0, this);
-+	QAction *showRangeAction = new QAction(NULL, _("Show Range"), 0, this);
- 	  showRangeAction->setToggleAction(TRUE);
- 	  connect(showRangeAction, SIGNAL(toggled(bool)), configView, SLOT(setShowRange(bool)));
- 	  connect(configView, SIGNAL(showRangeChanged(bool)), showRangeAction, SLOT(setOn(bool)));
- 	  showRangeAction->setOn(configList->showRange);
--	QAction *showDataAction = new QAction(NULL, "Show Data", 0, this);
-+	QAction *showDataAction = new QAction(NULL, _("Show Data"), 0, this);
- 	  showDataAction->setToggleAction(TRUE);
- 	  connect(showDataAction, SIGNAL(toggled(bool)), configView, SLOT(setShowData(bool)));
- 	  connect(configView, SIGNAL(showDataChanged(bool)), showDataAction, SLOT(setOn(bool)));
- 	  showDataAction->setOn(configList->showData);
--	QAction *showAllAction = new QAction(NULL, "Show All Options", 0, this);
-+	QAction *showAllAction = new QAction(NULL, _("Show All Options"), 0, this);
- 	  showAllAction->setToggleAction(TRUE);
- 	  connect(showAllAction, SIGNAL(toggled(bool)), configView, SLOT(setShowAll(bool)));
- 	  connect(showAllAction, SIGNAL(toggled(bool)), menuView, SLOT(setShowAll(bool)));
- 	  showAllAction->setOn(configList->showAll);
--	QAction *showDebugAction = new QAction(NULL, "Show Debug Info", 0, this);
-+	QAction *showDebugAction = new QAction(NULL, _("Show Debug Info"), 0, this);
- 	  showDebugAction->setToggleAction(TRUE);
- 	  connect(showDebugAction, SIGNAL(toggled(bool)), helpText, SLOT(setShowDebug(bool)));
- 	  connect(helpText, SIGNAL(showDebugChanged(bool)), showDebugAction, SLOT(setOn(bool)));
- 	  showDebugAction->setOn(helpText->showDebug());
- 
--	QAction *showIntroAction = new QAction(NULL, "Introduction", 0, this);
-+	QAction *showIntroAction = new QAction(NULL, _("Introduction"), 0, this);
- 	  connect(showIntroAction, SIGNAL(activated()), SLOT(showIntro()));
--	QAction *showAboutAction = new QAction(NULL, "About", 0, this);
-+	QAction *showAboutAction = new QAction(NULL, _("About"), 0, this);
- 	  connect(showAboutAction, SIGNAL(activated()), SLOT(showAbout()));
- 
- 	// init tool bar
-@@ -1379,7 +1384,7 @@ ConfigMainWindow::ConfigMainWindow(void)
- 
- 	// create config menu
- 	QPopupMenu* config = new QPopupMenu(this);
--	menu->insertItem("&File", config);
-+	menu->insertItem(_("&File"), config);
- 	loadAction->addTo(config);
- 	saveAction->addTo(config);
- 	saveAsAction->addTo(config);
-@@ -1388,12 +1393,12 @@ ConfigMainWindow::ConfigMainWindow(void)
- 
- 	// create edit menu
- 	QPopupMenu* editMenu = new QPopupMenu(this);
--	menu->insertItem("&Edit", editMenu);
-+	menu->insertItem(_("&Edit"), editMenu);
- 	searchAction->addTo(editMenu);
- 
- 	// create options menu
- 	QPopupMenu* optionMenu = new QPopupMenu(this);
--	menu->insertItem("&Option", optionMenu);
-+	menu->insertItem(_("&Option"), optionMenu);
- 	showNameAction->addTo(optionMenu);
- 	showRangeAction->addTo(optionMenu);
- 	showDataAction->addTo(optionMenu);
-@@ -1404,7 +1409,7 @@ ConfigMainWindow::ConfigMainWindow(void)
- 	// create help menu
- 	QPopupMenu* helpMenu = new QPopupMenu(this);
- 	menu->insertSeparator();
--	menu->insertItem("&Help", helpMenu);
-+	menu->insertItem(_("&Help"), helpMenu);
- 	showIntroAction->addTo(helpMenu);
- 	showAboutAction->addTo(helpMenu);
- 
-@@ -1452,14 +1457,14 @@ void ConfigMainWindow::loadConfig(void)
- 	if (s.isNull())
- 		return;
- 	if (conf_read(QFile::encodeName(s)))
--		QMessageBox::information(this, "qconf", "Unable to load configuration!");
-+		QMessageBox::information(this, "qconf", _("Unable to load configuration!"));
- 	ConfigView::updateListAll();
- }
- 
- void ConfigMainWindow::saveConfig(void)
- {
- 	if (conf_write(NULL))
--		QMessageBox::information(this, "qconf", "Unable to save configuration!");
-+		QMessageBox::information(this, "qconf", _("Unable to save configuration!"));
- }
- 
- void ConfigMainWindow::saveConfigAs(void)
-@@ -1468,7 +1473,7 @@ void ConfigMainWindow::saveConfigAs(void)
- 	if (s.isNull())
- 		return;
- 	if (conf_write(QFile::encodeName(s)))
--		QMessageBox::information(this, "qconf", "Unable to save configuration!");
-+		QMessageBox::information(this, "qconf", _("Unable to save configuration!"));
- }
- 
- void ConfigMainWindow::searchConfig(void)
-@@ -1612,11 +1617,11 @@ void ConfigMainWindow::closeEvent(QCloseEvent* e)
- 		e->accept();
- 		return;
- 	}
--	QMessageBox mb("qconf", "Save configuration?", QMessageBox::Warning,
-+	QMessageBox mb("qconf", _("Save configuration?"), QMessageBox::Warning,
- 			QMessageBox::Yes | QMessageBox::Default, QMessageBox::No, QMessageBox::Cancel | QMessageBox::Escape);
--	mb.setButtonText(QMessageBox::Yes, "&Save Changes");
--	mb.setButtonText(QMessageBox::No, "&Discard Changes");
--	mb.setButtonText(QMessageBox::Cancel, "Cancel Exit");
-+	mb.setButtonText(QMessageBox::Yes, _("&Save Changes"));
-+	mb.setButtonText(QMessageBox::No, _("&Discard Changes"));
-+	mb.setButtonText(QMessageBox::Cancel, _("Cancel Exit"));
- 	switch (mb.exec()) {
- 	case QMessageBox::Yes:
- 		conf_write(NULL);
-@@ -1631,7 +1636,7 @@ void ConfigMainWindow::closeEvent(QCloseEvent* e)
- 
- void ConfigMainWindow::showIntro(void)
- {
--	static char str[] = "Welcome to the qconf graphical kernel configuration tool for Linux.\n\n"
-+	static const QString str = _("Welcome to the qconf graphical kernel configuration tool for Linux.\n\n"
- 		"For each option, a blank box indicates the feature is disabled, a check\n"
- 		"indicates it is enabled, and a dot indicates that it is to be compiled\n"
- 		"as a module.  Clicking on the box will cycle through the three states.\n\n"
-@@ -1641,15 +1646,15 @@ void ConfigMainWindow::showIntro(void)
- 		"options must be enabled to support the option you are interested in, you can\n"
- 		"still view the help of a grayed-out option.\n\n"
- 		"Toggling Show Debug Info under the Options menu will show the dependencies,\n"
--		"which you can then match by examining other options.\n\n";
-+		"which you can then match by examining other options.\n\n");
- 
- 	QMessageBox::information(this, "qconf", str);
- }
- 
- void ConfigMainWindow::showAbout(void)
- {
--	static char str[] = "qconf is Copyright (C) 2002 Roman Zippel <zippel@linux-m68k.org>.\n\n"
--		"Bug reports and feature request can also be entered at http://bugzilla.kernel.org/\n";
-+	static const QString str = _("qconf is Copyright (C) 2002 Roman Zippel <zippel@linux-m68k.org>.\n\n"
-+		"Bug reports and feature request can also be entered at http://bugzilla.kernel.org/\n");
- 
- 	QMessageBox::information(this, "qconf", str);
- }
-@@ -1707,7 +1712,7 @@ static const char *progname;
- 
- static void usage(void)
- {
--	printf("%s <config>\n", progname);
-+	printf(_("%s <config>\n"), progname);
- 	exit(0);
- }
- 
++# Determine modorder.
++# Unfortunately, we don't have information about ordering between -y
++# and -m subdirs.  Just put -y's first.
++modorder	:= $(patsubst %/,%/modules.order, $(filter %/, $(obj-y)) $(obj-m:.o=.ko))
++
+ __subdir-y	:= $(patsubst %/,%,$(filter %/, $(obj-y)))
+ subdir-y	+= $(__subdir-y)
+ __subdir-m	:= $(patsubst %/,%,$(filter %/, $(obj-m)))
+@@ -64,6 +69,7 @@ real-objs-m := $(foreach m, $(obj-m), $(if $(strip $($(m:.o=-objs)) $($(m:.o=-y)
+ extra-y		:= $(addprefix $(obj)/,$(extra-y))
+ always		:= $(addprefix $(obj)/,$(always))
+ targets		:= $(addprefix $(obj)/,$(targets))
++modorder	:= $(addprefix $(obj)/,$(modorder))
+ obj-y		:= $(addprefix $(obj)/,$(obj-y))
+ obj-m		:= $(addprefix $(obj)/,$(obj-m))
+ lib-y		:= $(addprefix $(obj)/,$(lib-y))
 -- 
 1.5.4.rc3.14.g44397
 
