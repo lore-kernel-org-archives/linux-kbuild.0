@@ -1,65 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pasmtpb.tele.dk ([80.160.77.98]:42856 "EHLO pasmtpB.tele.dk"
+Received: from pasmtpb.tele.dk ([80.160.77.98]:42828 "EHLO pasmtpB.tele.dk"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1758990AbYAXWDx (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 24 Jan 2008 17:03:53 -0500
+	id S1758893AbYAXWDw (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 24 Jan 2008 17:03:52 -0500
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: [PATCH 46/77] kconfig: whitespace removing
-Date: Thu, 24 Jan 2008 23:03:27 +0100
-Message-Id: <1201212238-4369-46-git-send-email-sam@ravnborg.org>
+Subject: [PATCH 32/77] kbuild: fix scripts/setlocalversion to avoid erroneous -dirty tag
+Date: Thu, 24 Jan 2008 23:03:13 +0100
+Message-Id: <1201212238-4369-32-git-send-email-sam@ravnborg.org>
 In-Reply-To: <20080124215813.GA4204@uranus.ravnborg.org>
 References: <20080124215813.GA4204@uranus.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: EGRY Gabor <gaboregry1@t-online.hu>, Sam Ravnborg <sam@ravnborg.org>, Roman Zippel <zippel@linux-m68k.org>
+Cc: Theodore Ts'o <tytso@mit.edu>, Sam Ravnborg <sam@ravnborg.org>
 
-From: EGRY Gabor <gaboregry1@t-online.hu>
+From: Theodore Ts'o <tytso@mit.edu>
 
-This patch removes the unnecessary whitespaces from
-end of help lines of Kconfig files.
+If git's index file is out of date, and some files have been touched
+such that their timestamp doesn't what is in the index, "git
+diff-index HEAD" may show that a particular file is dirty, when in
+fact it really isn't.  Running "git update-index" will update the
+index to avoid these false positives.
 
-Signed-off-by: Egry Gabor <gaboregry1@t-online.hu>
-Reviewed-by: Sam Ravnborg <sam@ravnborg.org>
+Signed-off-by: "Theodore Ts'o" <tytso@mit.edu>
 Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
-Cc: Roman Zippel <zippel@linux-m68k.org>
 ---
- scripts/kconfig/lex.zconf.c_shipped |    5 +++++
- scripts/kconfig/zconf.l             |    5 +++++
- 2 files changed, 10 insertions(+), 0 deletions(-)
+ scripts/setlocalversion |    1 +
+ 1 files changed, 1 insertions(+), 0 deletions(-)
 
-diff --git a/scripts/kconfig/lex.zconf.c_shipped b/scripts/kconfig/lex.zconf.c_shipped
-index a065d5a..bed0f4e 100644
---- a/scripts/kconfig/lex.zconf.c_shipped
-+++ b/scripts/kconfig/lex.zconf.c_shipped
-@@ -1275,6 +1275,11 @@ YY_RULE_SETUP
- case 32:
- YY_RULE_SETUP
- {
-+		while (zconfleng) {
-+			if ((zconftext[zconfleng-1] != ' ') && (zconftext[zconfleng-1] != '\t'))
-+				break;
-+			zconfleng--;
-+		}
- 		append_string(zconftext, zconfleng);
- 		if (!first_ts)
- 			first_ts = last_ts;
-diff --git a/scripts/kconfig/zconf.l b/scripts/kconfig/zconf.l
-index 187d38c..4cea5c8 100644
---- a/scripts/kconfig/zconf.l
-+++ b/scripts/kconfig/zconf.l
-@@ -217,6 +217,11 @@ n	[A-Za-z0-9_]
- 		append_string("\n", 1);
- 	}
- 	[^ \t\n].* {
-+		while (yyleng) {
-+			if ((yytext[yyleng-1] != ' ') && (yytext[yyleng-1] != '\t'))
-+				break;
-+			yyleng--;
-+		}
- 		append_string(yytext, yyleng);
- 		if (!first_ts)
- 			first_ts = last_ts;
+diff --git a/scripts/setlocalversion b/scripts/setlocalversion
+index 1b31da8..acce8eb 100644
+--- a/scripts/setlocalversion
++++ b/scripts/setlocalversion
+@@ -16,6 +16,7 @@ if head=`git rev-parse --verify HEAD 2>/dev/null`; then
+ 	fi
+ 
+ 	# Are there uncommitted changes?
++	git update-index --refresh --unmerged > /dev/null
+ 	if git diff-index HEAD | read dummy; then
+ 		printf '%s' -dirty
+ 	fi
 -- 
 1.5.4.rc3.14.g44397
 
