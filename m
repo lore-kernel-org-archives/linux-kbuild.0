@@ -1,65 +1,54 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pasmtpa.tele.dk ([80.160.77.114]:37448 "EHLO pasmtpA.tele.dk"
+Received: from pasmtpb.tele.dk ([80.160.77.98]:42808 "EHLO pasmtpB.tele.dk"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1757064AbYAXWEF (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	id S1757453AbYAXWEF (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
 	Thu, 24 Jan 2008 17:04:05 -0500
+Received: from ravnborg.org (0x535d98d8.vgnxx8.adsl-dhcp.tele.dk [83.93.152.216])
+	by pasmtpB.tele.dk (Postfix) with ESMTP id 799C2E31CA2
+	for <linux-kbuild@vger.kernel.org>; Thu, 24 Jan 2008 23:03:52 +0100 (CET)
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: [PATCH 43/77] kbuild: scripts/mkmakefile: dynamic determination of output directory
-Date: Thu, 24 Jan 2008 23:03:24 +0100
-Message-Id: <1201212238-4369-43-git-send-email-sam@ravnborg.org>
+Subject: [PATCH 68/77] kbuild: link vmlinux.o before kallsyms passes
+Date: Thu, 24 Jan 2008 23:03:49 +0100
+Message-Id: <1201212238-4369-68-git-send-email-sam@ravnborg.org>
 In-Reply-To: <20080124215813.GA4204@uranus.ravnborg.org>
 References: <20080124215813.GA4204@uranus.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: Jan Beulich <jbeulich@novell.com>, Sam Ravnborg <sam@ravnborg.org>
+Cc: Sam Ravnborg <sam@ravnborg.org>
 
-From: Jan Beulich <jbeulich@novell.com>
+link vmlinux.o so we may report section mismatch bugs before
+we start with the real link - that may error out.
 
-Rather than fixing the output directory in the generated Makefile,
-determine it from the placement of Makefile. This allows moving
-the build tree around or accessing it through different mount paths.
-
-(The lastword definition is a compatibility one for make prior to 3.81;
-newer make will simply ignore it and use the [faster] built-in.)
-
-Signed-off-by: Jan Beulich <jbeulich@novell.com>
 Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
 ---
- scripts/mkmakefile |   10 +++++++---
- 1 files changed, 7 insertions(+), 3 deletions(-)
+ Makefile |    6 ++++--
+ 1 files changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/scripts/mkmakefile b/scripts/mkmakefile
-index e0f54b9..e65d8b3 100644
---- a/scripts/mkmakefile
-+++ b/scripts/mkmakefile
-@@ -25,8 +25,11 @@ cat << EOF > $2/Makefile
- VERSION = $3
- PATCHLEVEL = $4
+diff --git a/Makefile b/Makefile
+index 1f22c1f..ae80713 100644
+--- a/Makefile
++++ b/Makefile
+@@ -798,7 +798,7 @@ define rule_vmlinux-modpost
+ endef
  
--KERNELSRC    := $1
--KERNELOUTPUT := $2
-+lastword = \$(word \$(words \$(1)),\$(1))
-+makedir := \$(dir \$(call lastword,\$(MAKEFILE_LIST)))
-+
-+MAKEARGS := -C $1
-+MAKEARGS += O=\$(if \$(patsubst /%,,\$(makedir)),\$(CURDIR)/)\$(patsubst %/,%,\$(makedir))
+ # vmlinux image - including updated kernel symbols
+-vmlinux: $(vmlinux-lds) $(vmlinux-init) $(vmlinux-main) $(kallsyms.o) vmlinux.o FORCE
++vmlinux: $(vmlinux-lds) $(vmlinux-init) $(vmlinux-main) vmlinux.o $(kallsyms.o) FORCE
+ ifdef CONFIG_HEADERS_CHECK
+ 	$(Q)$(MAKE) -f $(srctree)/Makefile headers_check
+ endif
+@@ -809,7 +809,9 @@ endif
+ 	$(call if_changed_rule,vmlinux__)
+ 	$(Q)rm -f .old_version
  
- MAKEFLAGS += --no-print-directory
+-vmlinux.o: $(vmlinux-lds) $(vmlinux-init) $(vmlinux-main) $(kallsyms.o) FORCE
++# build vmlinux.o first to catch section mismatch errors early
++$(kallsyms.o): vmlinux.o
++vmlinux.o: $(vmlinux-lds) $(vmlinux-init) $(vmlinux-main) FORCE
+ 	$(call if_changed_rule,vmlinux-modpost)
  
-@@ -35,10 +38,11 @@ MAKEFLAGS += --no-print-directory
- all	:= \$(filter-out all Makefile,\$(MAKECMDGOALS))
- 
- all:
--	\$(MAKE) -C \$(KERNELSRC) O=\$(KERNELOUTPUT) \$(all)
-+	\$(MAKE) \$(MAKEARGS) \$(all)
- 
- Makefile:;
- 
- \$(all) %/: all
- 	@:
-+
- EOF
+ # The actual objects are generated when descending, 
 -- 
 1.5.4.rc3.14.g44397
 
