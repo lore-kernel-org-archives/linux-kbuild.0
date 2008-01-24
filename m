@@ -1,76 +1,65 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pasmtpa.tele.dk ([80.160.77.114]:37450 "EHLO pasmtpA.tele.dk"
+Received: from pasmtpa.tele.dk ([80.160.77.114]:37448 "EHLO pasmtpA.tele.dk"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1758842AbYAXWEF (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	id S1757064AbYAXWEF (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
 	Thu, 24 Jan 2008 17:04:05 -0500
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: [PATCH 45/77] kconfig: update-po-config info
-Date: Thu, 24 Jan 2008 23:03:26 +0100
-Message-Id: <1201212238-4369-45-git-send-email-sam@ravnborg.org>
+Subject: [PATCH 43/77] kbuild: scripts/mkmakefile: dynamic determination of output directory
+Date: Thu, 24 Jan 2008 23:03:24 +0100
+Message-Id: <1201212238-4369-43-git-send-email-sam@ravnborg.org>
 In-Reply-To: <20080124215813.GA4204@uranus.ravnborg.org>
 References: <20080124215813.GA4204@uranus.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: EGRY Gabor <gaboregry1@t-online.hu>, Sam Ravnborg <sam@ravnborg.org>, Roman Zippel <zippel@linux-m68k.org>
+Cc: Jan Beulich <jbeulich@novell.com>, Sam Ravnborg <sam@ravnborg.org>
 
-From: EGRY Gabor <gaboregry1@t-online.hu>
+From: Jan Beulich <jbeulich@novell.com>
 
-This patch adds tracking messages.
+Rather than fixing the output directory in the generated Makefile,
+determine it from the placement of Makefile. This allows moving
+the build tree around or accessing it through different mount paths.
 
-Signed-off-by: Egry Gabor <gaboregry1@t-online.hu>
-Reviewed-by: Sam Ravnborg <sam@ravnborg.org>
+(The lastword definition is a compatibility one for make prior to 3.81;
+newer make will simply ignore it and use the [faster] built-in.)
+
+Signed-off-by: Jan Beulich <jbeulich@novell.com>
 Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
-Cc: Roman Zippel <zippel@linux-m68k.org>
 ---
- scripts/kconfig/Makefile |   18 +++++++++++-------
- 1 files changed, 11 insertions(+), 7 deletions(-)
+ scripts/mkmakefile |   10 +++++++---
+ 1 files changed, 7 insertions(+), 3 deletions(-)
 
-diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
-index 8091435..d28bf85 100644
---- a/scripts/kconfig/Makefile
-+++ b/scripts/kconfig/Makefile
-@@ -24,22 +24,25 @@ oldconfig: $(obj)/conf
- silentoldconfig: $(obj)/conf
- 	$< -s $(Kconfig)
+diff --git a/scripts/mkmakefile b/scripts/mkmakefile
+index e0f54b9..e65d8b3 100644
+--- a/scripts/mkmakefile
++++ b/scripts/mkmakefile
+@@ -25,8 +25,11 @@ cat << EOF > $2/Makefile
+ VERSION = $3
+ PATCHLEVEL = $4
  
--# Create new linux.po file
-+# Create new linux.pot file
- # Adjust charset to UTF-8 in .po file to accept UTF-8 in Kconfig files
- # The symlink is used to repair a deficiency in arch/um
- update-po-config: $(obj)/kxgettext
--	xgettext --default-domain=linux                  \
-+	$(Q)echo "  GEN config"
-+	$(Q)xgettext --default-domain=linux              \
- 	    --add-comments --keyword=_ --keyword=N_      \
- 	    --from-code=UTF-8                            \
- 	    --files-from=scripts/kconfig/POTFILES.in     \
- 	    --output $(obj)/config.pot
- 	$(Q)sed -i s/CHARSET/UTF-8/ $(obj)/config.pot
- 	$(Q)ln -fs Kconfig.i386 arch/um/Kconfig.arch
--	(for i in `ls arch/`;                            \
--	do                                               \
--	    $(obj)/kxgettext arch/$$i/Kconfig;           \
--	done ) >> $(obj)/config.pot
--	msguniq --sort-by-file --to-code=UTF-8 $(obj)/config.pot \
-+	$(Q)(for i in `ls arch/`;                        \
-+	    do                                           \
-+		echo "  GEN $$i";                        \
-+		$(obj)/kxgettext arch/$$i/Kconfig        \
-+		     >> $(obj)/config.pot;               \
-+	    done )
-+	$(Q)msguniq --sort-by-file --to-code=UTF-8 $(obj)/config.pot \
- 	    --output $(obj)/linux.pot
- 	$(Q)rm -f arch/um/Kconfig.arch
- 	$(Q)rm -f $(obj)/config.pot
-@@ -138,6 +141,7 @@ endif
- clean-files	:= lkc_defs.h qconf.moc .tmp_qtcheck \
- 		   .tmp_gtkcheck zconf.tab.c lex.zconf.c zconf.hash.c
- clean-files     += mconf qconf gconf
-+clean-files     += config.pot linux.pot
+-KERNELSRC    := $1
+-KERNELOUTPUT := $2
++lastword = \$(word \$(words \$(1)),\$(1))
++makedir := \$(dir \$(call lastword,\$(MAKEFILE_LIST)))
++
++MAKEARGS := -C $1
++MAKEARGS += O=\$(if \$(patsubst /%,,\$(makedir)),\$(CURDIR)/)\$(patsubst %/,%,\$(makedir))
  
- # Check that we have the required ncurses stuff installed for lxdialog (menuconfig)
- PHONY += $(obj)/dochecklxdialog
+ MAKEFLAGS += --no-print-directory
+ 
+@@ -35,10 +38,11 @@ MAKEFLAGS += --no-print-directory
+ all	:= \$(filter-out all Makefile,\$(MAKECMDGOALS))
+ 
+ all:
+-	\$(MAKE) -C \$(KERNELSRC) O=\$(KERNELOUTPUT) \$(all)
++	\$(MAKE) \$(MAKEARGS) \$(all)
+ 
+ Makefile:;
+ 
+ \$(all) %/: all
+ 	@:
++
+ EOF
 -- 
 1.5.4.rc3.14.g44397
 
