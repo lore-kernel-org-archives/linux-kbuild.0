@@ -1,460 +1,281 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pasmtpb.tele.dk ([80.160.77.98]:55198 "EHLO pasmtpB.tele.dk"
+Received: from pasmtpa.tele.dk ([80.160.77.114]:46113 "EHLO pasmtpA.tele.dk"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751981AbYAXVr3 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 24 Jan 2008 16:47:29 -0500
-Received: from ravnborg.org (0x535d98d8.vgnxx8.adsl-dhcp.tele.dk [83.93.152.216])
-	by pasmtpB.tele.dk (Postfix) with ESMTP id 705FEF180AF
-	for <linux-kbuild@vger.kernel.org>; Thu, 24 Jan 2008 22:47:26 +0100 (CET)
-Date: Thu, 24 Jan 2008 22:47:37 +0100
+	id S1753778AbYAXV6G (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 24 Jan 2008 16:58:06 -0500
+Date: Thu, 24 Jan 2008 22:58:13 +0100
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: modpost is becoming verbose
-Message-ID: <20080124214737.GA4122@uranus.ravnborg.org>
+Subject: kbuild: Preparing for merge window
+Message-ID: <20080124215813.GA4204@uranus.ravnborg.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild <linux-kbuild@vger.kernel.org>
+To: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
 
-I have commit the following patch to kbuild.git to
-make modpost more verbose.
+The following is the list of patches queued up for the merge window at the moment.
+I have during the last week done several modpost changes to make section ismatch
+warnings more reliable and I am happy with the modified modpost code now.
 
-The verbosity can be adjusted by a new config option
-introduced in an earlier patch and you need full kbuild.git
-to try it out.
+The warnings generated will if CONFIG_DEBUG_SECTION_MISMATCH=y be verbose
+so it better guides the developer how to fix the warning.
 
-All patches will soon hit kbuild + lkml for review.
+Other patches of interest:
+
+- We now have separate sections for all init/exit annotations
+- We have restarted getting kconfig globalized, pending is widechar support
+- Support for modules.order to tell in what order to load modules
+- lots of small fixes/enhancements
+
+The diffstat say that we touch a lot of files.
+This is due to the following changes (mainly):
+- consolidation touching all .lds.S files
+- removal ofstale comment about make dep
+- removal of obsolete __attribute_used__
+- removal of TOPDIR
+
+Patches will follow for review.
 
 	Sam
 
-From 678f770eb79d245d38b33c3f0fb14c7f1c93d9ec Mon Sep 17 00:00:00 2001
-From: Sam Ravnborg <sam@ravnborg.org>
-Date: Thu, 24 Jan 2008 21:12:37 +0100
-Subject: [PATCH] kbuild: add verbose option to Section mismatch reporting in modpost
+Adrian Bunk (4):
+      Remove references to "make dep"
+      kconfig: remove "enable"
+      remove __attribute_used__
+      asm-generic/vmlix.lds.h: simplify __mem{init,exit}* dependencies
 
-If the config option CONFIG_SECTION_MISMATCH is not set and
-we see a Section mismatch present the following to the user:
+Andi Kleen (3):
+      kbuild: declare the modpost error functions as printf like
+      kbuild: fix format string warnings in modpost
+      kbuild: fix a buffer overflow in modpost
 
-modpost: Found 1 section mismatch(es).
-To see additional details select "Enable full Section mismatch analysis"
-in the Kernel Hacking menu (CONFIG_SECTION_MISMATCH).
+Andreas Mohr (1):
+      kbuild: eradicate bashisms in scripts/patch-kernel
 
-If the option CONFIG_SECTION_MISMATCH is selected
-then be verbose in the Section mismatch reporting from mdopost.
-Sample outputs:
+Andres Salomon (1):
+      kconfig: use getopt() in conf.c for handling command line arguments
 
-WARNING: o-x86_64/vmlinux.o(.text+0x7396): Section mismatch in reference from the function discover_ebda() to the variable .init.data:ebda_addr
-The function  discover_ebda() references
-the variable __initdata ebda_addr.
-This is often because discover_ebda lacks a __initdata
-annotation or the annotation of ebda_addr is wrong.
+Aron Griffis (1):
+      kbuild: support mercurial in setlocalversion
 
-WARNING: o-x86_64/vmlinux.o(.data+0x74d58): Section mismatch in reference from the variable pci_serial_quirks to the function .devexit.text:pci_plx9050_exit()
-The variable pci_serial_quirks references
-the function __devexit pci_plx9050_exit()
-If the reference is valid then annotate the
-variable with __exit* (see linux/init.h) or name the variable:
-*driver, *_template, *_timer, *_sht, *_ops, *_probe, *_probe_one, *_console,
+Daniel De Graaf (1):
+      kbuild: support ARCH=x86 in buildtar
 
-WARNING: o-x86_64/vmlinux.o(__ksymtab+0x630): Section mismatch in reference from the variable __ksymtab_arch_register_cpu to the function .cpuinit.text:arch_register_cpu()
-The symbol arch_register_cpu is exported and annotated __cpuinit
-Fix this by removing the __cpuinit annotation of arch_register_cpu or drop the export.
+EGRY Gabor (10):
+      kconfig: update-po-config info
+      kconfig: whitespace removing
+      kconfig: missing macros in gconfig
+      kconfig: gettext support for gconfig
+      kconfig: macro fix in menu.c
+      kconfig: gettext support for xconfig
+      kconfig: gettext support for menuconfig
+      kconfig: gettext support for lxdialog
+      kconfig: gettext support for config
+      kconfig: gconfig: symbol fix
 
-Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
----
- lib/Kconfig.debug        |    2 +
- scripts/Makefile.modpost |    1 +
- scripts/mod/modpost.c    |  255 ++++++++++++++++++++++++++++++++++++++++-----
- 3 files changed, 229 insertions(+), 29 deletions(-)
+Geert Uytterhoeven (1):
+      kbuild: Add missing srctree prefix for includecheck and versioncheck
 
-diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
-index c1fb0c6..d930aec 100644
---- a/lib/Kconfig.debug
-+++ b/lib/Kconfig.debug
-@@ -108,6 +108,8 @@ config DEBUG_SECTION_MISMATCH
- 	    will tell where the mismatch happens much closer to the
- 	    source. The drawback is that we will report the same
- 	    mismatch at least twice.
-+	  - Enable verbose reporting from modpost to help solving
-+	    the section mismatches reported.
- 
- config DEBUG_KERNEL
- 	bool "Kernel debugging"
-diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
-index d988f5d..65e707e 100644
---- a/scripts/Makefile.modpost
-+++ b/scripts/Makefile.modpost
-@@ -62,6 +62,7 @@ modpost = scripts/mod/modpost                    \
-  $(if $(KBUILD_EXTMOD),-i,-o) $(kernelsymfile)   \
-  $(if $(KBUILD_EXTMOD),-I $(modulesymfile))      \
-  $(if $(KBUILD_EXTMOD),-o $(modulesymfile))      \
-+ $(if $(CONFIG_DEBUG_SECTION_MISMATCH),,-S)      \
-  $(if $(KBUILD_EXTMOD)$(KBUILD_MODPOST_WARN),-w)
- 
- quiet_cmd_modpost = MODPOST $(words $(filter-out vmlinux FORCE, $^)) modules
-diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index e75739e..3cf1ba8 100644
---- a/scripts/mod/modpost.c
-+++ b/scripts/mod/modpost.c
-@@ -28,6 +28,9 @@ static int vmlinux_section_warnings = 1;
- /* Only warn about unresolved symbols */
- static int warn_unresolved = 0;
- /* How a symbol is exported */
-+static int sec_mismatch_count = 0;
-+static int sec_mismatch_verbose = 1;
-+
- enum export {
- 	export_plain,      export_unused,     export_gpl,
- 	export_unused_gpl, export_gpl_future, export_unknown
-@@ -760,9 +763,23 @@ static const char *head_sections[] = { ".head.text*", NULL };
- static const char *linker_symbols[] =
- 	{ "__init_begin", "_sinittext", "_einittext", NULL };
- 
-+enum mismatch {
-+	NO_MISMATCH,
-+	TEXT_TO_INIT,
-+	DATA_TO_INIT,
-+	TEXT_TO_EXIT,
-+	DATA_TO_EXIT,
-+	XXXINIT_TO_INIT,
-+	XXXEXIT_TO_EXIT,
-+	INIT_TO_EXIT,
-+	EXIT_TO_INIT,
-+	EXPORT_TO_INIT_EXIT,
-+};
-+
- struct sectioncheck {
- 	const char *fromsec[20];
- 	const char *tosec[20];
-+	enum mismatch mismatch;
- };
- 
- const struct sectioncheck sectioncheck[] = {
-@@ -770,33 +787,54 @@ const struct sectioncheck sectioncheck[] = {
-  * normal code and data
-  */
- {
--	.fromsec = { TEXT_SECTIONS, DATA_SECTIONS, NULL },
--	.tosec   = { ALL_INIT_SECTIONS, ALL_EXIT_SECTIONS, NULL }
-+	.fromsec = { TEXT_SECTIONS, NULL },
-+	.tosec   = { ALL_INIT_SECTIONS, NULL },
-+	.mismatch = TEXT_TO_INIT,
-+},
-+{
-+	.fromsec = { DATA_SECTIONS, NULL },
-+	.tosec   = { ALL_INIT_SECTIONS, NULL },
-+	.mismatch = DATA_TO_INIT,
-+},
-+{
-+	.fromsec = { TEXT_SECTIONS, NULL },
-+	.tosec   = { ALL_EXIT_SECTIONS, NULL },
-+	.mismatch = TEXT_TO_EXIT,
-+},
-+{
-+	.fromsec = { DATA_SECTIONS, NULL },
-+	.tosec   = { ALL_EXIT_SECTIONS, NULL },
-+	.mismatch = DATA_TO_EXIT,
- },
- /* Do not reference init code/data from devinit/cpuinit/meminit code/data */
- {
- 	.fromsec = { DEV_INIT_SECTIONS, CPU_INIT_SECTIONS, MEM_INIT_SECTIONS, NULL },
--	.tosec   = { INIT_SECTIONS, NULL }
-+	.tosec   = { INIT_SECTIONS, NULL },
-+	.mismatch = XXXINIT_TO_INIT,
- },
- /* Do not reference exit code/data from devexit/cpuexit/memexit code/data */
- {
- 	.fromsec = { DEV_EXIT_SECTIONS, CPU_EXIT_SECTIONS, MEM_EXIT_SECTIONS, NULL },
--	.tosec   = { EXIT_SECTIONS, NULL }
-+	.tosec   = { EXIT_SECTIONS, NULL },
-+	.mismatch = XXXEXIT_TO_EXIT,
- },
- /* Do not use exit code/data from init code */
- {
- 	.fromsec = { ALL_INIT_SECTIONS, NULL },
- 	.tosec   = { ALL_EXIT_SECTIONS, NULL },
-+	.mismatch = INIT_TO_EXIT,
- },
- /* Do not use init code/data from exit code */
- {
- 	.fromsec = { ALL_EXIT_SECTIONS, NULL },
--	.tosec   = { ALL_INIT_SECTIONS, NULL }
-+	.tosec   = { ALL_INIT_SECTIONS, NULL },
-+	.mismatch = EXIT_TO_INIT,
- },
- /* Do not export init/exit functions or data */
- {
- 	.fromsec = { "__ksymtab*", NULL },
--	.tosec   = { ALL_INIT_SECTIONS, ALL_EXIT_SECTIONS, NULL }
-+	.tosec   = { ALL_INIT_SECTIONS, ALL_EXIT_SECTIONS, NULL },
-+	.mismatch = EXPORT_TO_INIT_EXIT
- }
- };
- 
-@@ -809,10 +847,10 @@ static int section_mismatch(const char *fromsec, const char *tosec)
- 	for (i = 0; i < elems; i++) {
- 		if (match(fromsec, check->fromsec) &&
- 		    match(tosec, check->tosec))
--			return 1;
-+			return check->mismatch;
- 		check++;
- 	}
--	return 0;
-+	return NO_MISMATCH;
- }
- 
- /**
-@@ -989,47 +1027,197 @@ static Elf_Sym *find_elf_symbol2(struct elf_info *elf, Elf_Addr addr,
- }
- 
- /*
-+ * Convert a section name to the function/data attribute
-+ * .init.text => __init
-+ * .cpuinit.data => __cpudata
-+ * .memexitconst => __memconst
-+ * etc.
-+*/
-+static char *sec2annotation(const char *s)
-+{
-+	if (match(s, init_exit_sections)) {
-+		char *p = malloc(20);
-+		char *r = p;
-+
-+		*p++ = '_';
-+		*p++ = '_';
-+		if (*s == '.')
-+			s++;
-+		while (*s && *s != '.')
-+			*p++ = *s++;
-+		*p = '\0';
-+		if (*s == '.')
-+			s++;
-+		if (strstr(s, "rodata") != NULL)
-+			strcat(p, "const ");
-+		else if (strstr(s, "data") != NULL)
-+			strcat(p, "data ");
-+		else
-+			strcat(p, " ");
-+		return r; /* we leak her but we do not care */
-+	} else {
-+		return "";
-+	}
-+}
-+
-+static int is_function(Elf_Sym *sym)
-+{
-+	if (sym)
-+		return ELF_ST_TYPE(sym->st_info) == STT_FUNC;
-+	else
-+		return 0;
-+}
-+
-+/*
-  * Print a warning about a section mismatch.
-  * Try to find symbols near it so user can find it.
-  * Check whitelist before warning - it may be a false positive.
-  */
--static void report_sec_mismatch(const char *modname,
-+static void report_sec_mismatch(const char *modname, enum mismatch mismatch,
-                                 const char *fromsec,
-                                 unsigned long long fromaddr,
-                                 const char *fromsym,
--                                const char *tosec, const char *tosym)
--{
--	if (strlen(tosym)) {
--		warn("%s(%s+0x%llx): Section mismatch: reference to %s:%s "
--		     "in '%s'\n",
--		     modname, fromsec, fromaddr,
--		     tosec, tosym, fromsym);
--	} else {
--		warn("%s(%s+0x%llx): Section mismatch: reference to %s:%s\n",
--		     modname, fromsec, fromaddr,
--		     tosec, tosym);
-+                                int from_is_func,
-+                                const char *tosec, const char *tosym,
-+                                int to_is_func)
-+{
-+	const char *from, *from_p;
-+	const char *to, *to_p;
-+	from = from_is_func ? "function" : "variable";
-+	from_p = from_is_func ? "()" : "";
-+	to = to_is_func ? "function" : "variable";
-+	to_p = to_is_func ? "()" : "";
-+
-+	fprintf(stderr, "WARNING: %s(%s+0x%llx): Section mismatch in"
-+	                " reference from the %s %s%s to the %s %s:%s%s\n",
-+                        modname, fromsec, fromaddr, from, fromsym, from_p,
-+	                to, tosec, tosym, to_p);
-+
-+	sec_mismatch_count++;
-+	if (!sec_mismatch_verbose)
-+		return;
-+
-+	switch (mismatch) {
-+	case TEXT_TO_INIT:
-+		fprintf(stderr,
-+		"The function %s %s() references\n"
-+		"the %s %s%s%s.\n"
-+		"This is often because %s lacks a %s\n"
-+		"annotation or the annotation of %s is wrong.\n",
-+		sec2annotation(fromsec), fromsym,
-+		to, sec2annotation(tosec), tosym, to_p,
-+		fromsym, sec2annotation(tosec), tosym);
-+		break;
-+	case DATA_TO_INIT: {
-+		const char **s = symbol_white_list;
-+		fprintf(stderr,
-+		"The variable %s references\n"
-+		"the %s %s%s%s\n"
-+		"If the reference is valid then annotate the\n"
-+		"variable with __init* (see linux/init.h) "
-+		"or name the variable:\n",
-+		fromsym, to, sec2annotation(tosec), tosym, to_p);
-+		while (*s)
-+			fprintf(stderr, "%s, ", *s++);
-+		fprintf(stderr, "\n");
-+		break;
- 	}
-+	case TEXT_TO_EXIT:
-+		fprintf(stderr,
-+		"The function %s() references a %s in an exit section.\n"
-+		"Often the %s %s%s has valid usage outside the exit section\n"
-+		"and the fix is to remove the %sannotation of %s.\n",
-+		fromsym, to, to, tosym, to_p, sec2annotation(tosec), tosym);
-+		break;
-+	case DATA_TO_EXIT: {
-+		const char **s = symbol_white_list;
-+		fprintf(stderr,
-+		"The variable %s references\n"
-+		"the %s %s%s%s\n"
-+		"If the reference is valid then annotate the\n"
-+		"variable with __exit* (see linux/init.h) or "
-+		"name the variable:\n",
-+		fromsym, to, sec2annotation(tosec), tosym, to_p);
-+		while (*s)
-+			fprintf(stderr, "%s, ", *s++);
-+		fprintf(stderr, "\n");
-+		break;
-+	}
-+	case XXXINIT_TO_INIT:
-+	case XXXEXIT_TO_EXIT:
-+		fprintf(stderr,
-+		"The %s %s%s%s references\n"
-+		"a %s %s%s%s.\n"
-+		"If %s is only used by %s then\n"
-+		"annotate %s with a matching annotation.\n",
-+		from, sec2annotation(fromsec), fromsym, from_p,
-+		to, sec2annotation(tosec), tosym, to_p,
-+		fromsym, tosym, fromsym);
-+		break;
-+	case INIT_TO_EXIT:
-+		fprintf(stderr,
-+		"The %s %s%s%s references\n"
-+		"a %s %s%s%s.\n"
-+		"This is often seen when error handling "
-+		"in the init function\n"
-+		"uses functionality in the exit path.\n"
-+		"The fix is often to remove the %sannotation of\n"
-+		"%s%s so it may be used outside an exit section.\n",
-+		from, sec2annotation(fromsec), fromsym, from_p,
-+		to, sec2annotation(tosec), tosym, to_p,
-+		sec2annotation(tosec), tosym, to_p);
-+		break;
-+	case EXIT_TO_INIT:
-+		fprintf(stderr,
-+		"The %s %s%s%s references\n"
-+		"a %s %s%s%s.\n"
-+		"This is often seen when error handling "
-+		"in the exit function\n"
-+		"uses functionality in the init path.\n"
-+		"The fix is often to remove the %sannotation of\n"
-+		"%s%s so it may be used outside an init section.\n",
-+		from, sec2annotation(fromsec), fromsym, from_p,
-+		to, sec2annotation(tosec), tosym, to_p,
-+		sec2annotation(tosec), tosym, to_p);
-+		break;
-+	case EXPORT_TO_INIT_EXIT:
-+		fprintf(stderr,
-+		"The symbol %s is exported and annotated %s\n"
-+		"Fix this by removing the %sannotation of %s "
-+		"or drop the export.\n",
-+		tosym, sec2annotation(tosec), sec2annotation(tosec), tosym);
-+	case NO_MISMATCH:
-+		/* To get warnings on missing members */
-+		break;
-+	}
-+	fprintf(stderr, "\n");
- }
- 
- static void check_section_mismatch(const char *modname, struct elf_info *elf,
-                                    Elf_Rela *r, Elf_Sym *sym, const char *fromsec)
- {
- 	const char *tosec;
-+	enum mismatch mismatch;
- 
- 	tosec = sec_name(elf, sym->st_shndx);
--	if (section_mismatch(fromsec, tosec)) {
--		const char *fromsym;
-+	mismatch = section_mismatch(fromsec, tosec);
-+	if (mismatch != NO_MISMATCH) {
-+		Elf_Sym *to;
-+		Elf_Sym *from;
- 		const char *tosym;
-+		const char *fromsym;
- 
--		fromsym = sym_name(elf,
--		          find_elf_symbol2(elf, r->r_offset, fromsec));
--		tosym = sym_name(elf,
--		        find_elf_symbol(elf, r->r_addend, sym));
-+		from = find_elf_symbol2(elf, r->r_offset, fromsec);
-+		fromsym = sym_name(elf, from);
-+		to = find_elf_symbol(elf, r->r_addend, sym);
-+		tosym = sym_name(elf, to);
- 
- 		/* check whitelist - we may ignore it */
- 		if (secref_whitelist(fromsec, fromsym, tosec, tosym)) {
--			report_sec_mismatch(modname, fromsec, r->r_offset,
--			                    fromsym, tosec, tosym);
-+			report_sec_mismatch(modname, mismatch,
-+			   fromsec, r->r_offset, fromsym,
-+			   is_function(from), tosec, tosym,
-+			   is_function(to));
- 		}
- 	}
- }
-@@ -1643,7 +1831,7 @@ int main(int argc, char **argv)
- 	int opt;
- 	int err;
- 
--	while ((opt = getopt(argc, argv, "i:I:mso:aw")) != -1) {
-+	while ((opt = getopt(argc, argv, "i:I:msSo:aw")) != -1) {
- 		switch (opt) {
- 		case 'i':
- 			kernel_read = optarg;
-@@ -1664,6 +1852,9 @@ int main(int argc, char **argv)
- 		case 's':
- 			vmlinux_section_warnings = 0;
- 			break;
-+		case 'S':
-+			sec_mismatch_verbose = 0;
-+			break;
- 		case 'w':
- 			warn_unresolved = 1;
- 			break;
-@@ -1708,6 +1899,12 @@ int main(int argc, char **argv)
- 
- 	if (dump_write)
- 		write_dump(dump_write);
-+	if (sec_mismatch_count && !sec_mismatch_verbose)
-+		fprintf(stderr, "modpost: Found %d section mismatch(es).\n"
-+		        "To see additional details select \"Enable full "
-+		        "Section mismatch analysis\"\n"
-+		        "in the Kernel Hacking menu "
-+		        "(CONFIG_SECTION_MISMATCH).\n", sec_mismatch_count);
- 
- 	return err;
- }
--- 
-1.5.4.rc3.14.g44397
+Jan Beulich (2):
+      kbuild: scripts/mkmakefile: dynamic determination of output directory
+      kconfig: tristate choices with mixed tristate and boolean values
 
+Jan Engelhardt (1):
+      kconfig: allow overriding symbols
+
+Johannes Berg (7):
+      kernel-doc: fix xml output mode
+      kernel-doc: init kernel version
+      kernel-doc: single DOC: selection
+      kernel-doc: process functions, not DOC:
+      kernel-doc: use no-doc option
+      kernel-doc: new P directive for DOC: sections
+      convert drivers/base/power/Makefile to ccflags
+
+Ladislav Michl (3):
+      kconfig: make kconfig MinGW friendly
+      kconfig: fix whitespace and sort includes in conf.c
+      kconfig: use C89 random functions in conf.c
+
+Mike Frysinger (1):
+      kbuild: fixup genksyms usage/getopt
+
+Randy Dunlap (3):
+      kbuild: add 'includecheck' help text
+      kconfig: add hints/tips/tricks to Documentation/kbuild/kconfig-language.txt
+      kbuild: minor scripts/decodecode update
+
+Robert P. J. Day (2):
+      Kbuild: Clarify the rpm-related make packaging targets
+      A few corrections to include/linux/Kbuild
+
+Roman Zippel (3):
+      kconfig: explicitly introduce expression list
+      kconfig: environment symbol support
+      kconfig: use environment option
+
+Sam Ravnborg (22):
+      kbuild: document versioncheck in make help
+      kconfig: if ncurses-devel is missing then say so
+      kbuild: fix buglet in gcc-version.sh
+      kbuild: ignore *.order files
+      kbuild: fix installing external modules
+      kconfig: rename E_OR & friends to avoid name clash
+      kconfig: delete unused FILE_ and SYMBOL_ flags
+      kbuild: clean up modpost.c
+      kbuild: fix so modpost can now check any .o file
+      kbuild: try harder to find symbol names in modpost
+      kbuild: code refactoring in modpost
+      kbuild: introduce blacklisting in modpost
+      kbuild: check section names consistently in modpost
+      all archs: consolidate init and exit sections in vmlinux.lds.h
+      compiler.h: introduce __section()
+      Use separate sections for __dev/__cpu/__mem code/data
+      kbuild: introduce new option to enhance section mismatch analysis
+      kbuild: link vmlinux.o before kallsyms passes
+      kbuild: use simpler section mismatch warnings in modpost
+      kbuild: introduce a few helpers in modpost
+      kbuild: simplified warning report in modpost
+      kbuild: add verbose option to Section mismatch reporting in modpost
+
+Tejun Heo (1):
+      kbuild: implement modules.order
+
+Theodore Ts'o (3):
+      kbuild: change CONFIG_LOCALVERSION_AUTO to use a git-describe-ish format
+      kbuild: fix scripts/setlocalversion to avoid erroneous -dirty tag
+      kbuild: fix false positive -dirty tag caused by make-kpkg
+
+Uwe Kleine-König (1):
+      kbuild: ignore cache modifiers for generating the tags files
+
+Valdis Kletnieks (1):
+      kbuild: document 'make prepare' in 'make help'
+
+Vegard Nossum (1):
+      aic7(3*x): fix firmware build
+
+WANG Cong (4):
+      CRIS: Remove 'TOPDIR' from Makefiles
+      INFINIBAND: Remove 'TOPDIR' from Makefiles
+      FRV: Drop 'TOPDIR' from Makefiles
+      FS: Remove dead code
+
+ .gitignore                                  |    1 +
+ Documentation/kbuild/kconfig-language.txt   |   75 ++-
+ Makefile                                    |   28 +-
+ arch/alpha/kernel/vmlinux.lds.S             |    8 +-
+ arch/alpha/lib/dec_and_lock.c               |    3 +-
+ arch/arm/kernel/vmlinux.lds.S               |   10 +-
+ arch/arm/mach-imx/Makefile                  |    3 -
+ arch/arm/mach-netx/Makefile                 |    3 -
+ arch/avr32/kernel/vmlinux.lds.S             |    8 +-
+ arch/blackfin/kernel/vmlinux.lds.S          |    8 +-
+ arch/cris/arch-v10/vmlinux.lds.S            |    8 +-
+ arch/cris/arch-v32/boot/compressed/Makefile |    2 +-
+ arch/cris/arch-v32/vmlinux.lds.S            |    8 +-
+ arch/frv/boot/Makefile                      |    8 +-
+ arch/frv/kernel/gdb-stub.c                  |    2 +-
+ arch/frv/kernel/vmlinux.lds.S               |   14 +-
+ arch/h8300/kernel/vmlinux.lds.S             |    8 +-
+ arch/ia64/kernel/vmlinux.lds.S              |    8 +-
+ arch/m32r/kernel/vmlinux.lds.S              |   12 +-
+ arch/m68k/kernel/vmlinux-std.lds            |    8 +-
+ arch/m68k/kernel/vmlinux-sun3.lds           |    8 +-
+ arch/m68knommu/kernel/vmlinux.lds.S         |    8 +-
+ arch/mips/kernel/vmlinux.lds.S              |    8 +-
+ arch/mips/tx4927/common/Makefile            |    4 -
+ arch/mips/tx4938/common/Makefile            |    4 -
+ arch/mips/tx4938/toshiba_rbtx4938/Makefile  |    4 -
+ arch/parisc/kernel/vmlinux.lds.S            |    8 +-
+ arch/powerpc/boot/Makefile                  |    2 +-
+ arch/powerpc/kernel/sysfs.c                 |    2 +-
+ arch/powerpc/kernel/vmlinux.lds.S           |   10 +-
+ arch/powerpc/oprofile/op_model_power4.c     |    6 +-
+ arch/ppc/kernel/vmlinux.lds.S               |    8 +-
+ arch/s390/kernel/vmlinux.lds.S              |    8 +-
+ arch/sh/kernel/vmlinux.lds.S                |    8 +-
+ arch/sh64/kernel/Makefile                   |    4 -
+ arch/sh64/kernel/vmlinux.lds.S              |    8 +-
+ arch/sh64/lib/Makefile                      |    4 -
+ arch/sh64/mach-cayman/Makefile              |    4 -
+ arch/sh64/mm/Makefile                       |    4 -
+ arch/sparc/kernel/vmlinux.lds.S             |    8 +-
+ arch/sparc64/kernel/unaligned.c             |    2 +-
+ arch/sparc64/kernel/vmlinux.lds.S           |    8 +-
+ arch/um/include/init.h                      |   26 +-
+ arch/um/kernel/dyn.lds.S                    |    4 +-
+ arch/um/kernel/uml.lds.S                    |    4 +-
+ arch/v850/kernel/vmlinux.lds.S              |   10 +-
+ arch/x86/kernel/vmlinux_32.lds.S            |   14 +-
+ arch/x86/kernel/vmlinux_64.lds.S            |   19 +-
+ arch/xtensa/kernel/vmlinux.lds.S            |    9 +-
+ arch/xtensa/mm/Makefile                     |    4 -
+ arch/xtensa/platform-iss/Makefile           |    5 -
+ drivers/base/power/Makefile                 |    8 +-
+ drivers/infiniband/hw/cxgb3/Makefile        |    3 +-
+ drivers/rapidio/rio.h                       |    4 +-
+ drivers/scsi/aic7xxx/Makefile               |   45 +-
+ fs/compat_ioctl.c                           |    2 +-
+ fs/smbfs/Makefile                           |   20 -
+ include/asm-avr32/setup.h                   |    2 +-
+ include/asm-generic/vmlinux.lds.h           |   86 ++-
+ include/asm-ia64/gcc_intrin.h               |    2 +-
+ include/asm-sh/machvec.h                    |    2 +-
+ include/asm-sh/thread_info.h                |    2 +-
+ include/asm-x86/thread_info_32.h            |    2 +-
+ include/linux/Kbuild                        |    8 +-
+ include/linux/compiler-gcc3.h               |    2 -
+ include/linux/compiler-gcc4.h               |    1 -
+ include/linux/compiler.h                    |    9 +-
+ include/linux/elfnote.h                     |    2 +-
+ include/linux/init.h                        |  102 ++--
+ include/linux/module.h                      |    4 +-
+ include/linux/moduleparam.h                 |    4 +-
+ include/linux/pci.h                         |    2 +-
+ init/Kconfig                                |    8 +
+ lib/Kconfig.debug                           |   32 +
+ scripts/Makefile.build                      |   26 +-
+ scripts/Makefile.lib                        |    6 +
+ scripts/Makefile.modinst                    |    2 +-
+ scripts/Makefile.modpost                    |    1 +
+ scripts/basic/docproc.c                     |   44 +-
+ scripts/decodecode                          |   17 +-
+ scripts/gcc-version.sh                      |    5 +-
+ scripts/genksyms/genksyms.c                 |   10 +-
+ scripts/kconfig/Makefile                    |   39 +-
+ scripts/kconfig/POTFILES.in                 |    7 +
+ scripts/kconfig/conf.c                      |   69 +-
+ scripts/kconfig/confdata.c                  |   24 +-
+ scripts/kconfig/expr.c                      |   32 +-
+ scripts/kconfig/expr.h                      |   16 +-
+ scripts/kconfig/gconf.c                     |   16 +-
+ scripts/kconfig/lex.zconf.c_shipped         |    5 +
+ scripts/kconfig/lkc.h                       |    5 +
+ scripts/kconfig/lxdialog/check-lxdialog.sh  |   16 +-
+ scripts/kconfig/lxdialog/checklist.c        |    4 +-
+ scripts/kconfig/lxdialog/dialog.h           |   11 +-
+ scripts/kconfig/lxdialog/inputbox.c         |    4 +-
+ scripts/kconfig/lxdialog/menubox.c          |    6 +-
+ scripts/kconfig/lxdialog/textbox.c          |    2 +-
+ scripts/kconfig/lxdialog/util.c             |   32 +-
+ scripts/kconfig/lxdialog/yesno.c            |    4 +-
+ scripts/kconfig/mconf.c                     |  112 +--
+ scripts/kconfig/menu.c                      |   49 +-
+ scripts/kconfig/qconf.cc                    |  109 ++--
+ scripts/kconfig/symbol.c                    |   79 ++-
+ scripts/kconfig/util.c                      |   23 +-
+ scripts/kconfig/zconf.gperf                 |    2 +-
+ scripts/kconfig/zconf.hash.c_shipped        |   19 +-
+ scripts/kconfig/zconf.l                     |    5 +
+ scripts/kernel-doc                          |   85 ++-
+ scripts/mkmakefile                          |   10 +-
+ scripts/mod/modpost.c                       | 1178 +++++++++++++++-----------
+ scripts/mod/modpost.h                       |    2 +
+ scripts/package/Makefile                    |    5 +-
+ scripts/package/buildtar                    |    4 +-
+ scripts/patch-kernel                        |   22 +-
+ scripts/setlocalversion                     |   29 +-
+ 115 files changed, 1753 insertions(+), 1185 deletions(-)
