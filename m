@@ -1,52 +1,74 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pasmtpa.tele.dk ([80.160.77.114]:37448 "EHLO pasmtpA.tele.dk"
+Received: from pasmtpb.tele.dk ([80.160.77.98]:42808 "EHLO pasmtpB.tele.dk"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1759059AbYAXWDy (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 24 Jan 2008 17:03:54 -0500
+	id S1759094AbYAXWDz (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 24 Jan 2008 17:03:55 -0500
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: [PATCH 25/77] kbuild: fix installing external modules
-Date: Thu, 24 Jan 2008 23:03:06 +0100
-Message-Id: <1201212238-4369-25-git-send-email-sam@ravnborg.org>
+Subject: [PATCH 48/77] kconfig: gettext support for gconfig
+Date: Thu, 24 Jan 2008 23:03:29 +0100
+Message-Id: <1201212238-4369-48-git-send-email-sam@ravnborg.org>
 In-Reply-To: <20080124215813.GA4204@uranus.ravnborg.org>
 References: <20080124215813.GA4204@uranus.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: Sam Ravnborg <sam@ravnborg.org>, Eric Sandeen <sandeen@redhat.com>
+Cc: EGRY Gabor <gaboregry1@t-online.hu>, Sam Ravnborg <sam@ravnborg.org>, Roman Zippel <zippel@linux-m68k.org>
 
-Eric Sandeen <sandeen@redhat.com> reported:
-  Installing external modules is supposed to put them in some path
-  under /lib/modules/<version>/extra/subdir/, but this change:
-  http://linux.bkbits.net:8080/linux-2.6/?PAGE=cset&REV=1.1982.9.23
-  makes them go under /lib/modules/<version>/extrasubdir
+From: EGRY Gabor <gaboregry1@t-online.hu>
 
- (for example, make M=fs/ext3 modules_install puts ext3.ko in
- /lib/modules/<version>/extrafs/ext3.ko)
+Gettext support for menu and toolbar.
 
-This was the case only when specifying a trailing slash to M=..
-
-Fixed by removing trailing slash if present so
-we correctly match dir part of target.
-
+Signed-off-by: Egry Gabor <gaboregry1@t-online.hu>
+Reviewed-by: Sam Ravnborg <sam@ravnborg.org>
 Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
-Cc: Eric Sandeen <sandeen@redhat.com>
+Cc: Roman Zippel <zippel@linux-m68k.org>
 ---
- scripts/Makefile.modinst |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+ scripts/kconfig/Makefile    |    7 +++++--
+ scripts/kconfig/POTFILES.in |    1 +
+ 2 files changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/scripts/Makefile.modinst b/scripts/Makefile.modinst
-index f0ff248..efa5d94 100644
---- a/scripts/Makefile.modinst
-+++ b/scripts/Makefile.modinst
-@@ -21,7 +21,7 @@ quiet_cmd_modules_install = INSTALL $@
+diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
+index d28bf85..32e8c5a 100644
+--- a/scripts/kconfig/Makefile
++++ b/scripts/kconfig/Makefile
+@@ -27,7 +27,7 @@ silentoldconfig: $(obj)/conf
+ # Create new linux.pot file
+ # Adjust charset to UTF-8 in .po file to accept UTF-8 in Kconfig files
+ # The symlink is used to repair a deficiency in arch/um
+-update-po-config: $(obj)/kxgettext
++update-po-config: $(obj)/kxgettext $(obj)/gconf.glade.h
+ 	$(Q)echo "  GEN config"
+ 	$(Q)xgettext --default-domain=linux              \
+ 	    --add-comments --keyword=_ --keyword=N_      \
+@@ -139,7 +139,7 @@ gconf-objs	:= gconf.o kconfig_load.o zconf.tab.o
+ endif
  
- # Modules built outside the kernel source tree go into extra by default
- INSTALL_MOD_DIR ?= extra
--ext-mod-dir = $(INSTALL_MOD_DIR)$(subst $(KBUILD_EXTMOD),,$(@D))
-+ext-mod-dir = $(INSTALL_MOD_DIR)$(subst $(patsubst %/,%,$(KBUILD_EXTMOD)),,$(@D))
+ clean-files	:= lkc_defs.h qconf.moc .tmp_qtcheck \
+-		   .tmp_gtkcheck zconf.tab.c lex.zconf.c zconf.hash.c
++		   .tmp_gtkcheck zconf.tab.c lex.zconf.c zconf.hash.c gconf.glade.h
+ clean-files     += mconf qconf gconf
+ clean-files     += config.pot linux.pot
  
- modinst_dir = $(if $(KBUILD_EXTMOD),$(ext-mod-dir),kernel/$(@D))
+@@ -254,6 +254,9 @@ $(obj)/%.moc: $(src)/%.h
+ $(obj)/lkc_defs.h: $(src)/lkc_proto.h
+ 	sed < $< > $@ 's/P(\([^,]*\),.*/#define \1 (\*\1_p)/'
  
++# Extract gconf menu items for I18N support
++$(obj)/gconf.glade.h: $(obj)/gconf.glade
++	intltool-extract --type=gettext/glade $(obj)/gconf.glade
+ 
+ ###
+ # The following requires flex/bison/gperf
+diff --git a/scripts/kconfig/POTFILES.in b/scripts/kconfig/POTFILES.in
+index cc94e46..19d0e63 100644
+--- a/scripts/kconfig/POTFILES.in
++++ b/scripts/kconfig/POTFILES.in
+@@ -2,4 +2,5 @@ scripts/kconfig/mconf.c
+ scripts/kconfig/conf.c
+ scripts/kconfig/confdata.c
+ scripts/kconfig/gconf.c
++scripts/kconfig/gconf.glade.h
+ scripts/kconfig/qconf.cc
 -- 
 1.5.4.rc3.14.g44397
 
