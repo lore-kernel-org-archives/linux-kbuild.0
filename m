@@ -1,119 +1,78 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from anchor-post-37.mail.demon.net ([194.217.242.87]:51563 "EHLO
-	anchor-post-37.mail.demon.net" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1752039AbYA0RiX (ORCPT
+Received: from wa-out-1112.google.com ([209.85.146.183]:46328 "EHLO
+	wa-out-1112.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752449AbYA1Bpa (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 27 Jan 2008 12:38:23 -0500
-Subject: Re: [PATCH][RFC] Kconfig: show git branch name in LOCALVERSION_AUTO
-From: Richard Kennedy <richard@rsk.demon.co.uk>
-In-Reply-To: <20080124212345.GA3944@uranus.ravnborg.org>
-References: <1200916933.2906.17.camel@castor.localdomain>
-	 <20080124212345.GA3944@uranus.ravnborg.org>
-Content-Type: text/plain
-Date: Sun, 27 Jan 2008 17:38:20 +0000
-Message-Id: <1201455500.9303.6.camel@castor.localdomain>
-Mime-Version: 1.0
+	Sun, 27 Jan 2008 20:45:30 -0500
+Received: by wa-out-1112.google.com with SMTP id v27so2669930wah.23
+        for <linux-kbuild@vger.kernel.org>; Sun, 27 Jan 2008 17:45:30 -0800 (PST)
+Message-ID: <479D33B3.6010707@gmail.com>
+Date: Mon, 28 Jan 2008 10:45:23 +0900
+From: Tejun Heo <htejun@gmail.com>
+MIME-Version: 1.0
+Subject: Re: [PATCH 12/77] kbuild: implement modules.order
+References: <20080124215813.GA4204@uranus.ravnborg.org> <200801261501.56198.rusty@rustcorp.com.au> <479AB57D.3080805@gmail.com> <200801262025.59593.rusty@rustcorp.com.au>
+In-Reply-To: <200801262025.59593.rusty@rustcorp.com.au>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: linux-kbuild@vger.kernel.org, lkml <linux-kernel@vger.kernel.org>
+To: Rusty Russell <rusty@rustcorp.com.au>
+Cc: Sam Ravnborg <sam@ravnborg.org>, linux-kbuild@vger.kernel.org, Bill Nottingham <notting@redhat.com>, Greg Kroah-Hartman <gregkh@suse.de>, Kay Sievers <kay.sievers@vrfy.org>, Jon Masters <jonathan@jonmasters.org>
 
-On Thu, 2008-01-24 at 22:23 +0100, Sam Ravnborg wrote:
-> On Mon, Jan 21, 2008 at 12:02:13PM +0000, Richard Kennedy wrote:
-> > config option to add the git branch name to the automatically generated
-> > version string.
-> > 
-> > If the current git branch name is not "master" then add the name to the
-> > LOCALVERSION_AUTO version string.
-> > The format will then be -<name>-gxxxxxxxx
+Hello,
+
+Rusty Russell wrote:
+>> There was a non-deterministic behavior involving ata_piix and ahci
+>> drivers on ich6.  Both drivers support the chipset but ata_piix is less
+>> capable while ahci might misbehave (chip bug).  Generally, ahci should
+>> be preferred as it seems the problem cases seem to be rare.  When
+>> drivers are linked in, this is forced by link order.
 > 
-> PAtch does no longer apply to kbuild.git.
-> Please update either on top of kbuild.git or
-> when kbuild.git is merged and then resubmit.
+> Right.  Nasty.  This is currently dealt with by blacklisting the lesser 
+> driver; if that's wrong, blacklist the other one (blacklisting means that 
+> aliases can't pull it in, it needs to be modprobed by name).  That kind of 
+> sucks because it's not under kernel control and the distros have to do it, 
+> but that's how it's always been.
+
+In SUSE, it's dealt with by having a rudimentary module priority in
+initrd.  User can select which driver to use for which controller with
+the configuration tool, which mostly works but the configuration can't
+be enforced if there are multiple controllers which can be driven by
+more than one drivers (the first one grabs them all).
+
+I think the base system (kernel + udev) needs to provide deterministic,
+sensible default behavior.
+
+> After all, they chose to build two drivers for one device, perhaps they are 
+> the best people to decide?
+
+The thing is that kernel drivers forced them to do that.  They can't
+choose between ata_piix and ahci.  One is not proper subset of the other.
+
+>>>> So, are you saying that modprobe chooses modules in the reverse order of
+>>>> modules.alias file?
+>>> That is precisely what I'm saying, and more.
+>> Oops, then modprobe needs to be updated too.  Jon, can you please put
+>> this onto your to-do list too?
 > 
-> Thanks,
-> 	Sam
-config option to add the git branch name to the automatically generated
-version string.
+> The modprobe beheavour of loading them all is IMHO correct.  The order was 
+> never defined however, and reverse was how it was implemented.
 
-If the current git branch name is not "master" then add the name to the
-LOCALVERSION_AUTO version string.
-The format will then be -<name>-gxxxxxxxx
+Yeah, modprobe should load all modules matching the alias as it can't
+tell whether the previously loaded module actually attached to everything.
 
-Signed-off-by: Richard Kennedy <richard@rsk.demon.co.uk>
----
-Sam,
-here's a patch against the latest kbuild.git.
-[ if I got the git remote thing right ;) ]
+> There is, of course, no reason to change modprobe; just define the current 
+> behaviour that the *last* alias is preferred, and generate modules.alias 
+> accordingly.
 
-Richard
+Yeah, the alias file can be generated in reverse but I think it's better
+to do things straight.  It may cause some surprises (after upgrading
+modprobe, the other driver is being loaded!) but IMHO we'll be better
+off with forward-ordered aliases in the long run.  After all, module
+loading order was undefined anyway.
 
+Thanks.
 
-diff --git a/Makefile b/Makefile
-index ae80713..84eddba 100644
---- a/Makefile
-+++ b/Makefile
-@@ -874,7 +874,8 @@ localver = $(subst $(space),, $(string) \
- # checks as needed.
- ifdef CONFIG_LOCALVERSION_AUTO
- 	_localver-auto = $(shell $(CONFIG_SHELL) \
--	                  $(srctree)/scripts/setlocalversion $(srctree))
-+	                  $(srctree)/scripts/setlocalversion $(srctree) \
-+				$(CONFIG_LOCALVERSION_BRANCH))
- 	localver-auto  = $(LOCALVERSION)$(_localver-auto)
- endif
- 
-diff --git a/init/Kconfig b/init/Kconfig
-index e7f2f41..bfaadc7 100644
---- a/init/Kconfig
-+++ b/init/Kconfig
-@@ -100,6 +100,16 @@ config LOCALVERSION_AUTO
- 
- 	  which is done within the script "scripts/setlocalversion".)
- 
-+config LOCALVERSION_BRANCH
-+	bool "Automatically add branch name to the version string"
-+	default n
-+	depends on LOCALVERSION_AUTO
-+	help
-+	  If the current git branch name is not "master" then add the name to
-+	  the LOCALVERSION_AUTO version string.
-+	  The format will then be -<name>-gxxxxxxxx
-+	  see the help for LOCALVERSION_AUTO for more details
-+
- config SWAP
- 	bool "Support for paging of anonymous memory (swap)"
- 	depends on MMU && BLOCK
-diff --git a/scripts/setlocalversion b/scripts/setlocalversion
-index 52f032e..f38e3c4 100644
---- a/scripts/setlocalversion
-+++ b/scripts/setlocalversion
-@@ -2,7 +2,7 @@
- # Print additional version information for non-release trees.
- 
- usage() {
--	echo "Usage: $0 [srctree]" >&2
-+	echo "Usage: $0 [srctree] [show-branch]" >&2
- 	exit 1
- }
- 
-@@ -10,6 +10,13 @@ cd "${1:-.}" || usage
- 
- # Check for git and a git repo.
- if head=`git rev-parse --verify HEAD 2>/dev/null`; then
-+	# show the branch name?
-+    	if [[ $2 == "y" ]]; then
-+		name=`git branch | grep -E "^[*]" | cut -d " " -sf 2`
-+		if [[ $name != "master" ]]; then
-+			printf '%s' "-$name"
-+		fi
-+	fi
- 	# Do we have an untagged version?
- 	if git name-rev --tags HEAD | grep -E '^HEAD[[:space:]]+(.*~[0-9]*|undefined)$' > /dev/null; then
- 	        git describe | awk -F- '{printf("-%05d-%s", $(NF-1),$(NF))}'
 -- 
-1.5.3.7
-
-
-
+tejun
