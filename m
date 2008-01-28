@@ -1,39 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp2.linux-foundation.org ([207.189.120.14]:33069 "EHLO
-	smtp2.linux-foundation.org" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1752552AbYA1WEx (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 28 Jan 2008 17:04:53 -0500
-Date: Tue, 29 Jan 2008 09:04:38 +1100 (EST)
-From: Linus Torvalds <torvalds@linux-foundation.org>
+Received: from pasmtpb.tele.dk ([80.160.77.98]:46485 "EHLO pasmtpB.tele.dk"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753285AbYA1WYz (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 28 Jan 2008 17:24:55 -0500
+Date: Mon, 28 Jan 2008 23:24:55 +0100
+From: Sam Ravnborg <sam@ravnborg.org>
 Subject: Re: [GIT PATCH] kbuild updates
-In-Reply-To: <20080128212624.GA3842@uranus.ravnborg.org>
-Message-ID: <alpine.LFD.1.00.0801290901340.3505@www.l.google.com>
-References: <20080128212624.GA3842@uranus.ravnborg.org>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+Message-ID: <20080128222455.GB4222@uranus.ravnborg.org>
+References: <20080128212624.GA3842@uranus.ravnborg.org> <alpine.LFD.1.00.0801290901340.3505@www.l.google.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <alpine.LFD.1.00.0801290901340.3505@www.l.google.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
+To: Linus Torvalds <torvalds@linux-foundation.org>
 Cc: Andrew Morton <akpm@linux-foundation.org>, LKML <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Paul Mundt <lethal@linux-sh.org>
 
-
-
-On Mon, 28 Jan 2008, Sam Ravnborg wrote:
+On Tue, Jan 29, 2008 at 09:04:38AM +1100, Linus Torvalds wrote:
 > 
-> Please pull following patches for kbuild/kconfig and a few other areas.
 > 
-> Pull from:
-> 	ssh://master.kernel.org/pub/scm/linux/kernel/git/sam/kbuild.git
+> On Mon, 28 Jan 2008, Sam Ravnborg wrote:
+> > 
+> > Please pull following patches for kbuild/kconfig and a few other areas.
+> > 
+> > Pull from:
+> > 	ssh://master.kernel.org/pub/scm/linux/kernel/git/sam/kbuild.git
+> 
+> This conflicts with the SH updates (sh is also integrating 32/64-bit into 
+> one tree now).
+> 
+> Since I don't know the SH tree or your changes, the probably fairly 
+> trivial manual merge isn't an option (especially as I'm not at home and 
+> doing this on a laptop with a less than ideal keyboard and smaller screen 
+> than I'm used to).
+> 
+> So I hope you and Paul can resolve the conflicts and re-send.
 
-This conflicts with the SH updates (sh is also integrating 32/64-bit into 
-one tree now).
+As expected the conflicts were trivial and I fixed it up.
+It was:
+- The edit of the vmlinux.lds files
+- The removal of make dep
 
-Since I don't know the SH tree or your changes, the probably fairly 
-trivial manual merge isn't an option (especially as I'm not at home and 
-doing this on a laptop with a less than ideal keyboard and smaller screen 
-than I'm used to).
+Please pull the updated tree.
 
-So I hope you and Paul can resolve the conflicts and re-send.
-
-		Linus
+	Sam
