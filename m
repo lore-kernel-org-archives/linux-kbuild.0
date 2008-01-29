@@ -1,43 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ozlabs.org ([203.10.76.45]:53463 "EHLO ozlabs.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753650AbYA2Ft6 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 29 Jan 2008 00:49:58 -0500
-From: Rusty Russell <rusty@rustcorp.com.au>
-Subject: Re: [PATCH 12/77] kbuild: implement modules.order
-Date: Tue, 29 Jan 2008 14:29:05 +1100
-References: <20080124215813.GA4204@uranus.ravnborg.org> <479D33B3.6010707@gmail.com> <1201490410.32422.206.camel@perihelion>
-In-Reply-To: <1201490410.32422.206.camel@perihelion>
+Received: from astoria.ccjclearline.com ([64.235.106.9]:53917 "EHLO
+	astoria.ccjclearline.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751642AbYA2L7S (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 29 Jan 2008 06:59:18 -0500
+Received: from [99.236.100.208] (helo=crashcourse.ca)
+	by astoria.ccjclearline.com with esmtpsa (TLSv1:AES256-SHA:256)
+	(Exim 4.68)
+	(envelope-from <rpjday@crashcourse.ca>)
+	id 1JJp5s-0000xg-RD
+	for linux-kbuild@vger.kernel.org; Tue, 29 Jan 2008 06:57:54 -0500
+Date: Tue, 29 Jan 2008 06:58:42 -0500 (EST)
+From: "Robert P. J. Day" <rpjday@crashcourse.ca>
+Subject: support for just "depends" is now gone?
+Message-ID: <alpine.LFD.1.00.0801290656450.28120@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-Message-Id: <200801291429.06426.rusty@rustcorp.com.au>
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jon Masters <jonathan@jonmasters.org>
-Cc: Tejun Heo <htejun@gmail.com>, Sam Ravnborg <sam@ravnborg.org>, linux-kbuild@vger.kernel.org, Bill Nottingham <notting@redhat.com>, Greg Kroah-Hartman <gregkh@suse.de>, Kay Sievers <kay.sievers@vrfy.org>
+To: kbuild devel list <linux-kbuild@vger.kernel.org>
 
-On Monday 28 January 2008 14:20:10 Jon Masters wrote:
-> On Mon, 2008-01-28 at 10:45 +0900, Tejun Heo wrote:
-> > Yeah, the alias file can be generated in reverse but I think it's better
-> > to do things straight.  It may cause some surprises (after upgrading
-> > modprobe, the other driver is being loaded!) but IMHO we'll be better
-> > off with forward-ordered aliases in the long run.  After all, module
-> > loading order was undefined anyway.
->
-> I actually agree, in that the first entry is probably what people expect
-> to get loaded, and that works well with things like Modules.order. I
-> guess I'll just throw that together, since this wasn't defined anyway,
-> and perhaps add a config option so you can reverse order if you want.
 
-Please bear in mind that modules.alias is a (cimpletely undocumented) internal 
-module utilities detail: in theory modprobe is reading all the aliases out of 
-modules themselves (that's too slow, since nowdays probe-by-alias is the 
-common case).
+  i'm just verifying that the current Kconfig parser no longer has
+support for simple "depends" directives, but only "depends on", right?
+and the alternative of "requires" is long since gone.
 
-So since this is a temporary hack anyway, I think backwards is fine.
+  as long as this is true, i can remove the search for "depends"
+directives from my cleanup script.  thanks.
 
-Cheers,
-Rusty.
+rday
+--
+
+========================================================================
+Robert P. J. Day
+Linux Consulting, Training and Annoying Kernel Pedantry
+Waterloo, Ontario, CANADA
+
+Home page:                                         http://crashcourse.ca
+Fedora Cookbook:    http://crashcourse.ca/wiki/index.php/Fedora_Cookbook
+========================================================================
