@@ -1,31 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pasmtpb.tele.dk ([80.160.77.98]:46798 "EHLO pasmtpB.tele.dk"
+Received: from ozlabs.org ([203.10.76.45]:53463 "EHLO ozlabs.org"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750794AbYA2FOl (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 29 Jan 2008 00:14:41 -0500
-Date: Tue, 29 Jan 2008 06:14:44 +0100
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH 28/77] FRV: Drop 'TOPDIR' from Makefiles
-Message-ID: <20080129051443.GB4448@uranus.ravnborg.org>
-References: <1201212238-4369-28-git-send-email-sam@ravnborg.org> <20080124215813.GA4204@uranus.ravnborg.org> <15193.1201566177@redhat.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+	id S1753650AbYA2Ft6 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 29 Jan 2008 00:49:58 -0500
+From: Rusty Russell <rusty@rustcorp.com.au>
+Subject: Re: [PATCH 12/77] kbuild: implement modules.order
+Date: Tue, 29 Jan 2008 14:29:05 +1100
+References: <20080124215813.GA4204@uranus.ravnborg.org> <479D33B3.6010707@gmail.com> <1201490410.32422.206.camel@perihelion>
+In-Reply-To: <1201490410.32422.206.camel@perihelion>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="utf-8"
+Content-Transfer-Encoding: 7bit
 Content-Disposition: inline
-In-Reply-To: <15193.1201566177@redhat.com>
+Message-Id: <200801291429.06426.rusty@rustcorp.com.au>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: David Howells <dhowells@redhat.com>
-Cc: linux-kbuild@vger.kernel.org, WANG Cong <xiyou.wangcong@gmail.com>
+To: Jon Masters <jonathan@jonmasters.org>
+Cc: Tejun Heo <htejun@gmail.com>, Sam Ravnborg <sam@ravnborg.org>, linux-kbuild@vger.kernel.org, Bill Nottingham <notting@redhat.com>, Greg Kroah-Hartman <gregkh@suse.de>, Kay Sievers <kay.sievers@vrfy.org>
 
-On Tue, Jan 29, 2008 at 12:22:57AM +0000, David Howells wrote:
-> Sam Ravnborg <sam@ravnborg.org> wrote:
-> 
-> > This patch drops TOPDIR from frv Makefiles.
-> 
-> I thought you already had a patch to do this.  Anyway, it looks reasonable,
-> but I can't test it until I get back from LCA.
+On Monday 28 January 2008 14:20:10 Jon Masters wrote:
+> On Mon, 2008-01-28 at 10:45 +0900, Tejun Heo wrote:
+> > Yeah, the alias file can be generated in reverse but I think it's better
+> > to do things straight.  It may cause some surprises (after upgrading
+> > modprobe, the other driver is being loaded!) but IMHO we'll be better
+> > off with forward-ordered aliases in the long run.  After all, module
+> > loading order was undefined anyway.
+>
+> I actually agree, in that the first entry is probably what people expect
+> to get loaded, and that works well with things like Modules.order. I
+> guess I'll just throw that together, since this wasn't defined anyway,
+> and perhaps add a config option so you can reverse order if you want.
 
-It is the same patch you have seen before - I just
-sent my full queue for review before the merge.
+Please bear in mind that modules.alias is a (cimpletely undocumented) internal 
+module utilities detail: in theory modprobe is reading all the aliases out of 
+modules themselves (that's too slow, since nowdays probe-by-alias is the 
+common case).
 
-	Sam
+So since this is a temporary hack anyway, I think backwards is fine.
+
+Cheers,
+Rusty.
