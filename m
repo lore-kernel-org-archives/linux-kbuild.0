@@ -1,47 +1,24 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pasmtpb.tele.dk ([80.160.77.98]:46485 "EHLO pasmtpB.tele.dk"
+Received: from mx1.redhat.com ([66.187.233.31]:60909 "EHLO mx1.redhat.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753285AbYA1WYz (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 28 Jan 2008 17:24:55 -0500
-Date: Mon, 28 Jan 2008 23:24:55 +0100
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [GIT PATCH] kbuild updates
-Message-ID: <20080128222455.GB4222@uranus.ravnborg.org>
-References: <20080128212624.GA3842@uranus.ravnborg.org> <alpine.LFD.1.00.0801290901340.3505@www.l.google.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <alpine.LFD.1.00.0801290901340.3505@www.l.google.com>
+	id S1753324AbYA2AXB (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 28 Jan 2008 19:23:01 -0500
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <1201212238-4369-28-git-send-email-sam@ravnborg.org>
+References: <1201212238-4369-28-git-send-email-sam@ravnborg.org> <20080124215813.GA4204@uranus.ravnborg.org>
+Subject: Re: [PATCH 28/77] FRV: Drop 'TOPDIR' from Makefiles
+Date: Tue, 29 Jan 2008 00:22:57 +0000
+Message-ID: <15193.1201566177@redhat.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Andrew Morton <akpm@linux-foundation.org>, LKML <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Paul Mundt <lethal@linux-sh.org>
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: dhowells@redhat.com, linux-kbuild@vger.kernel.org, WANG Cong <xiyou.wangcong@gmail.com>
 
-On Tue, Jan 29, 2008 at 09:04:38AM +1100, Linus Torvalds wrote:
-> 
-> 
-> On Mon, 28 Jan 2008, Sam Ravnborg wrote:
-> > 
-> > Please pull following patches for kbuild/kconfig and a few other areas.
-> > 
-> > Pull from:
-> > 	ssh://master.kernel.org/pub/scm/linux/kernel/git/sam/kbuild.git
-> 
-> This conflicts with the SH updates (sh is also integrating 32/64-bit into 
-> one tree now).
-> 
-> Since I don't know the SH tree or your changes, the probably fairly 
-> trivial manual merge isn't an option (especially as I'm not at home and 
-> doing this on a laptop with a less than ideal keyboard and smaller screen 
-> than I'm used to).
-> 
-> So I hope you and Paul can resolve the conflicts and re-send.
+Sam Ravnborg <sam@ravnborg.org> wrote:
 
-As expected the conflicts were trivial and I fixed it up.
-It was:
-- The edit of the vmlinux.lds files
-- The removal of make dep
+> This patch drops TOPDIR from frv Makefiles.
 
-Please pull the updated tree.
+I thought you already had a patch to do this.  Anyway, it looks reasonable,
+but I can't test it until I get back from LCA.
 
-	Sam
+David
