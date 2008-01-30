@@ -1,90 +1,77 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pasmtpa.tele.dk ([80.160.77.114]:37135 "EHLO pasmtpA.tele.dk"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755751AbYA2UMo (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 29 Jan 2008 15:12:44 -0500
-Date: Tue, 29 Jan 2008 21:12:45 +0100
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [RFC] __ref annotation of function/data referencing __init/__exit
-Message-ID: <20080129201245.GA14857@uranus.ravnborg.org>
-References: <20080126184454.GA25591@uranus.ravnborg.org> <20080128213811.GE3842@uranus.ravnborg.org> <Pine.LNX.4.64.0801292053531.14907@fbirervta.pbzchgretzou.qr>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Pine.LNX.4.64.0801292053531.14907@fbirervta.pbzchgretzou.qr>
+Received: from vervifontaine.sonytel.be ([80.88.33.193]:42377 "EHLO
+	vervifontaine.sonycom.com" rhost-flags-OK-OK-OK-FAIL)
+	by vger.kernel.org with ESMTP id S1754579AbYA3KNb (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 30 Jan 2008 05:13:31 -0500
+Date: Wed, 30 Jan 2008 11:13:23 +0100 (CET)
+From: Geert Uytterhoeven <Geert.Uytterhoeven@sonycom.com>
+Subject: kbuild: Spelling/grammar fixes for config DEBUG_SECTION_MISMATCH
+Message-ID: <Pine.LNX.4.64.0801301112550.26678@vixen.sonytel.be>
+MIME-Version: 1.0
+Content-Type: MULTIPART/MIXED; BOUNDARY="-584349381-1508965004-1201688003=:26678"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jan Engelhardt <jengelh@computergmbh.de>
-Cc: LKML <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: linux-kbuild@vger.kernel.org, Linux Kernel Development <linux-kernel@vger.kernel.org>
 
-On Tue, Jan 29, 2008 at 08:55:32PM +0100, Jan Engelhardt wrote:
-> 
-> On Jan 28 2008 22:38, Sam Ravnborg wrote:
-> >On Sat, Jan 26, 2008 at 07:44:54PM +0100, Sam Ravnborg wrote:
-> >> Today we have the following annotations for functions/data
-> >> referencing __init/__exit functions / data:
-> >> 
-> >> __init_refok for functions
-> >> __initdata_refok for data
-> >> 
-> >> and
-> >> _exit_refok for functions
-> >> 
-> >> To simplify it and to introduce a shorter annotation I
-> >> will suggest the following annotation:
-> >> 
-> >> __ref      <= for functions (code) that
-> >>               references __*init / __*exit
-> >> __refdata  <= for variables
-> >> __refconst <= for const variables
-> >>
-> >
-> >This patch was includedin todays kbuild.git submission
-> >as I heard no negative feedback.
-> 
-> I would like to see some real-world example of __ref*.
-> When would you want to "reference" (function pointer?) an __init
-> function from outside another __init function?
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
 
-It replaces the old __init_Refok - so you can just grep for that one.
-One obvious example:
+---584349381-1508965004-1201688003=:26678
+Content-Type: TEXT/PLAIN; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 
-init/main.c:static void noinline __init_refok rest_init(void)
+kbuild: Spelling/grammar fixes for config DEBUG_SECTION_MISMATCH
 
-Here we jump from the the __init part to the normal operation.
+Signed-off-by: Geert Uytterhoeven <Geert.Uytterhoeven@sonycom.com>
+---
+ lib/Kconfig.debug |    8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-And
-static noinline __init_refok
-int zone_wait_table_init(struct zone *zone, unsigned long zone_size_pages)
-{
-       ...
-      if (system_state == SYSTEM_BOOTING) {
-                zone->wait_table = (wait_queue_head_t *)
-                        alloc_bootmem_node(pgdat, alloc_size);
+--- a/lib/Kconfig.debug
++++ b/lib/Kconfig.debug
+@@ -90,19 +90,19 @@ config DEBUG_SECTION_MISMATCH
+ 	  most likely result in an oops.
+ 	  In the code functions and variables are annotated with
+ 	  __init, __devinit etc. (see full list in include/linux/init.h)
+-	  which result in the code/data being placed in specific sections.
+-	  The section mismatch anaylsis are always done after a full
++	  which results in the code/data being placed in specific sections.
++	  The section mismatch analysis is always done after a full
+ 	  kernel build but enabling this options will in addition
+ 	  do the following:
+ 	  - Add the option -fno-inline-functions-called-once to gcc
+ 	    When inlining a function annotated __init in a non-init
+ 	    function we would loose the section information and thus
+ 	    the analysis would not catch the illegal reference.
+-	    This options tell gcc to inline less but will also
++	    This option tells gcc to inline less but will also
+ 	    result in a larger kernel.
+ 	  - Run the section mismatch analysis for each module/built-in.o
+ 	    When we run the section mismatch analysis on vmlinux.o we
+-	    looses valueable information about where the mismatch was
++	    loose valueable information about where the mismatch was
+ 	    introduced.
+ 	    Running the analysis for each module/built-in.o file
+ 	    will tell where the mismatch happens much closer to the
 
-The program logic guarantee that we only call
-alloc_bootmem_node when we are in the init phase.
-So to silence the warning we added __init_refok that is
-now named __ref.
+With kind regards,
 
-We have plenty of data structures containing pointers to
-functions annotated __*init or __*exit.
+Geert Uytterhoeven
+Software Architect
 
-One that casues a lot of warnings is pci_serial_quirks.
+Sony Network and Software Technology Center Europe
+The Corporate Village · Da Vincilaan 7-D1 · B-1935 Zaventem · Belgium
 
-Here we can use the annotation to tell modpost that
-the references are OK like this (see __refdata):
+Phone:    +32 (0)2 700 8453
+Fax:      +32 (0)2 700 8622
+E-mail:   Geert.Uytterhoeven@sonycom.com
+Internet: http://www.sony-europe.com/
 
-static struct pci_serial_quirk pci_serial_quirks[] __refdata = {
-	...
-                .exit           = __devexit_p(sbs_exit),
-        },
-
-
-thout the annotation modpost would complain about the
-reference to sbs_exit because sbs_exit is annotated __devexit.
-
-If you have proposals to improve the commeonts in init.h please let
-me know. This seems to confuse a lot of people.
-
-	Sam
+Sony Network and Software Technology Center Europe
+A division of Sony Service Centre (Europe) N.V.
+Registered office: Technologielaan 7 · B-1840 Londerzeel · Belgium
+VAT BE 0413.825.160 · RPR Brussels
+Fortis Bank Zaventem · Swift GEBABEBB08A · IBAN BE39001382358619
+---584349381-1508965004-1201688003=:26678--
