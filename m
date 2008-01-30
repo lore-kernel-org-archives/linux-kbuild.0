@@ -1,77 +1,51 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from vervifontaine.sonytel.be ([80.88.33.193]:42377 "EHLO
-	vervifontaine.sonycom.com" rhost-flags-OK-OK-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1754579AbYA3KNb (ORCPT
+Received: from smtp-out1.tiscali.nl ([195.241.79.176]:35416 "EHLO
+	smtp-out1.tiscali.nl" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751281AbYA3PM0 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 30 Jan 2008 05:13:31 -0500
-Date: Wed, 30 Jan 2008 11:13:23 +0100 (CET)
-From: Geert Uytterhoeven <Geert.Uytterhoeven@sonycom.com>
-Subject: kbuild: Spelling/grammar fixes for config DEBUG_SECTION_MISMATCH
-Message-ID: <Pine.LNX.4.64.0801301112550.26678@vixen.sonytel.be>
+	Wed, 30 Jan 2008 10:12:26 -0500
+Message-ID: <47A093D6.3000105@tiscali.nl>
+Date: Wed, 30 Jan 2008 16:12:22 +0100
+From: Roel Kluin <12o3l@tiscali.nl>
 MIME-Version: 1.0
-Content-Type: MULTIPART/MIXED; BOUNDARY="-584349381-1508965004-1201688003=:26678"
+Subject: [PATCH][scripts/{genksyms/parse.c,kconfig/zconf.tab)_shipped] duplicate
+ YYSTYPE_IS_TRIVIAL =>1st *_DECLARED
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: linux-kbuild@vger.kernel.org, Linux Kernel Development <linux-kernel@vger.kernel.org>
+To: sam@ravnborg.org
+Cc: linux-kbuild@vger.kernel.org, lkml <linux-kernel@vger.kernel.org>
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
+Untested patch, please confirm it's the right fix.
+--
+duplicate YYSTYPE_IS_TRIVIAL, 2nd should be YYSTYPE_IS_DECLARED
 
----584349381-1508965004-1201688003=:26678
-Content-Type: TEXT/PLAIN; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
-
-kbuild: Spelling/grammar fixes for config DEBUG_SECTION_MISMATCH
-
-Signed-off-by: Geert Uytterhoeven <Geert.Uytterhoeven@sonycom.com>
+Signed-off-by: Roel Kluin <12o3l@tiscali.nl>
 ---
- lib/Kconfig.debug |    8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
-
---- a/lib/Kconfig.debug
-+++ b/lib/Kconfig.debug
-@@ -90,19 +90,19 @@ config DEBUG_SECTION_MISMATCH
- 	  most likely result in an oops.
- 	  In the code functions and variables are annotated with
- 	  __init, __devinit etc. (see full list in include/linux/init.h)
--	  which result in the code/data being placed in specific sections.
--	  The section mismatch anaylsis are always done after a full
-+	  which results in the code/data being placed in specific sections.
-+	  The section mismatch analysis is always done after a full
- 	  kernel build but enabling this options will in addition
- 	  do the following:
- 	  - Add the option -fno-inline-functions-called-once to gcc
- 	    When inlining a function annotated __init in a non-init
- 	    function we would loose the section information and thus
- 	    the analysis would not catch the illegal reference.
--	    This options tell gcc to inline less but will also
-+	    This option tells gcc to inline less but will also
- 	    result in a larger kernel.
- 	  - Run the section mismatch analysis for each module/built-in.o
- 	    When we run the section mismatch analysis on vmlinux.o we
--	    looses valueable information about where the mismatch was
-+	    loose valueable information about where the mismatch was
- 	    introduced.
- 	    Running the analysis for each module/built-in.o file
- 	    will tell where the mismatch happens much closer to the
-
-With kind regards,
-
-Geert Uytterhoeven
-Software Architect
-
-Sony Network and Software Technology Center Europe
-The Corporate Village · Da Vincilaan 7-D1 · B-1935 Zaventem · Belgium
-
-Phone:    +32 (0)2 700 8453
-Fax:      +32 (0)2 700 8622
-E-mail:   Geert.Uytterhoeven@sonycom.com
-Internet: http://www.sony-europe.com/
-
-Sony Network and Software Technology Center Europe
-A division of Sony Service Centre (Europe) N.V.
-Registered office: Technologielaan 7 · B-1840 Londerzeel · Belgium
-VAT BE 0413.825.160 · RPR Brussels
-Fortis Bank Zaventem · Swift GEBABEBB08A · IBAN BE39001382358619
----584349381-1508965004-1201688003=:26678--
+diff --git a/scripts/genksyms/parse.c_shipped b/scripts/genksyms/parse.c_shipped
+index 3e6079f..61f7539 100644
+--- a/scripts/genksyms/parse.c_shipped
++++ b/scripts/genksyms/parse.c_shipped
+@@ -377,7 +377,7 @@ void free (void *); /* INFRINGES ON USER NAME SPACE */
+ 
+ #if (! defined yyoverflow \
+      && (! defined __cplusplus \
+-	 || (defined YYSTYPE_IS_TRIVIAL && YYSTYPE_IS_TRIVIAL)))
++	 || (defined YYSTYPE_IS_DECLARED && YYSTYPE_IS_TRIVIAL)))
+ 
+ /* A type that is properly aligned for any stack member.  */
+ union yyalloc
+diff --git a/scripts/kconfig/zconf.tab.c_shipped b/scripts/kconfig/zconf.tab.c_shipped
+index d22d924..9a7bcc7 100644
+--- a/scripts/kconfig/zconf.tab.c_shipped
++++ b/scripts/kconfig/zconf.tab.c_shipped
+@@ -389,7 +389,7 @@ void free (void *); /* INFRINGES ON USER NAME SPACE */
+ 
+ #if (! defined yyoverflow \
+      && (! defined __cplusplus \
+-	 || (defined YYSTYPE_IS_TRIVIAL && YYSTYPE_IS_TRIVIAL)))
++	 || (defined YYSTYPE_IS_DECLARED && YYSTYPE_IS_TRIVIAL)))
+ 
+ /* A type that is properly aligned for any stack member.  */
+ union yyalloc
