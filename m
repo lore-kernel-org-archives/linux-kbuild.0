@@ -1,50 +1,54 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pasmtpb.tele.dk ([80.160.77.98]:52592 "EHLO pasmtpB.tele.dk"
+Received: from pasmtpb.tele.dk ([80.160.77.98]:52595 "EHLO pasmtpB.tele.dk"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754697AbYBBUqk (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	id S1763805AbYBBUqk (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
 	Sat, 2 Feb 2008 15:46:40 -0500
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: [PATCH] Remove __INIT_REFOK and __INITDATA_REFOK
-Date: Sat,  2 Feb 2008 21:46:35 +0100
-Message-Id: <1201985204-26589-1-git-send-email-sam@ravnborg.org>
+Subject: [PATCH] kbuild: add svn revision information to setlocalversion
+Date: Sat,  2 Feb 2008 21:46:37 +0100
+Message-Id: <1201985204-26589-3-git-send-email-sam@ravnborg.org>
 In-Reply-To: <20080202203503.GA26415@uranus.ravnborg.org>
 References: <20080202203503.GA26415@uranus.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: kbuild <linux-kbuild@vger.kernel.org>
-Cc: Ralf Baechle <ralf@linux-mips.org>
+Cc: Bryan Wu <bryan.wu@analog.com>
 
-From: Ralf Baechle <ralf@linux-mips.org>
+From: Bryan Wu <bryan.wu@analog.com>
 
-Commit 312b1485fb509c9bc32eda28ad29537896658cb8 made __INIT_REFOK expand
-into .section .section ".ref.text", "ax".  Since the assembler doesn't
-tolerate stuttering in the source that broke all MIPS builds.
+follow git and mercurial style, include uncommitted changes detect
 
-Since with this change Sam downgraded __INIT_REFOK to just a backward
-compat thing and there being only a single use in the MIPS arch code the
-best solution is to delete both of __INIT_REFOK and __INITDATA_REFOK (which
-was equally broken) being unused anyway these can be deleted.
-
-Signed-off-by: Ralf Baechle <ralf@linux-mips.org>
-Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
+Signed-off-by: Bryan Wu <bryan.wu@analog.com>
 ---
- include/linux/init.h |    3 ---
- 1 files changed, 0 insertions(+), 3 deletions(-)
+ scripts/setlocalversion |   15 +++++++++++++++
+ 1 files changed, 15 insertions(+), 0 deletions(-)
+ mode change 100644 => 100755 scripts/setlocalversion
 
-diff --git a/include/linux/init.h b/include/linux/init.h
-index 2efbda0..90cdbbb 100644
---- a/include/linux/init.h
-+++ b/include/linux/init.h
-@@ -124,9 +124,6 @@
- #define __REF            .section       ".ref.text", "ax"
- #define __REFDATA        .section       ".ref.data", "aw"
- #define __REFCONST       .section       ".ref.rodata", "aw"
--/* backward compatibility */
--#define __INIT_REFOK     .section	__REF
--#define __INITDATA_REFOK .section	__REFDATA
- 
- #ifndef __ASSEMBLY__
- /*
+diff --git a/scripts/setlocalversion b/scripts/setlocalversion
+old mode 100644
+new mode 100755
+index 52f032e..17b0028
+--- a/scripts/setlocalversion
++++ b/scripts/setlocalversion
+@@ -45,3 +45,18 @@ if hgid=`hg id 2>/dev/null`; then
+ 	# All done with mercurial
+ 	exit
+ fi
++
++# Check for svn and a svn repo.
++if rev=`svn info 2>/dev/null | grep '^Revision' | awk '{print $NF}'` ; then
++	changes=`svn status 2>/dev/null | grep '^[AMD]' | wc -l`
++
++	# Are there uncommitted changes?
++	if [ $changes != 0 ]; then
++		printf -- '-svn%s%s%s' "$rev" -dirty "$changes"
++	else
++		printf -- '-svn%s' "$rev"
++	fi
++
++	# All done with svn
++	exit
++fi
 -- 
 1.5.4.rc3.14.g44397
 
