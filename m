@@ -1,58 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pasmtpb.tele.dk ([80.160.77.98]:52597 "EHLO pasmtpB.tele.dk"
+Received: from pasmtpb.tele.dk ([80.160.77.98]:52592 "EHLO pasmtpB.tele.dk"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1764119AbYBBUqk (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	id S1754697AbYBBUqk (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
 	Sat, 2 Feb 2008 15:46:40 -0500
-Received: from ravnborg.org (0x535d98d8.vgnxx8.adsl-dhcp.tele.dk [83.93.152.216])
-	by pasmtpB.tele.dk (Postfix) with ESMTP id 9CA18E30A7A
-	for <linux-kbuild@vger.kernel.org>; Sat,  2 Feb 2008 21:46:39 +0100 (CET)
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: [PATCH] kconfig: ignore select of unknown symbol
-Date: Sat,  2 Feb 2008 21:46:39 +0100
-Message-Id: <1201985204-26589-5-git-send-email-sam@ravnborg.org>
+Subject: [PATCH] Remove __INIT_REFOK and __INITDATA_REFOK
+Date: Sat,  2 Feb 2008 21:46:35 +0100
+Message-Id: <1201985204-26589-1-git-send-email-sam@ravnborg.org>
 In-Reply-To: <20080202203503.GA26415@uranus.ravnborg.org>
 References: <20080202203503.GA26415@uranus.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: kbuild <linux-kbuild@vger.kernel.org>
-Cc: Sam Ravnborg <sam@ravnborg.org>
+Cc: Ralf Baechle <ralf@linux-mips.org>
 
-We have had warnings for a long time about select of unknow symbol
-but the warnings does not really makes sense since we may
-select a symbol that is relevant and defined in one
-arch but not in another arch.
-And as long as we do not use a common set of Kconfig files
-for all archs lets just ignore this case.
+From: Ralf Baechle <ralf@linux-mips.org>
 
-Previously we have used this to find bad uses of
-select but we need a more relaible method to do so.
+Commit 312b1485fb509c9bc32eda28ad29537896658cb8 made __INIT_REFOK expand
+into .section .section ".ref.text", "ax".  Since the assembler doesn't
+tolerate stuttering in the source that broke all MIPS builds.
 
+Since with this change Sam downgraded __INIT_REFOK to just a backward
+compat thing and there being only a single use in the MIPS arch code the
+best solution is to delete both of __INIT_REFOK and __INITDATA_REFOK (which
+was equally broken) being unused anyway these can be deleted.
+
+Signed-off-by: Ralf Baechle <ralf@linux-mips.org>
 Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
-Cc: Roman Zippel <zippel@linux-m68k.org>
 ---
- scripts/kconfig/menu.c |    9 +++------
- 1 files changed, 3 insertions(+), 6 deletions(-)
+ include/linux/init.h |    3 ---
+ 1 files changed, 0 insertions(+), 3 deletions(-)
 
-diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
-index fdad173..606ceb9 100644
---- a/scripts/kconfig/menu.c
-+++ b/scripts/kconfig/menu.c
-@@ -203,12 +203,9 @@ void sym_check_prop(struct symbol *sym)
- 				prop_warn(prop,
- 				    "config symbol '%s' uses select, but is "
- 				    "not boolean or tristate", sym->name);
--			else if (sym2->type == S_UNKNOWN)
--				prop_warn(prop,
--				    "'select' used by config symbol '%s' "
--				    "refers to undefined symbol '%s'",
--				    sym->name, sym2->name);
--			else if (sym2->type != S_BOOLEAN && sym2->type != S_TRISTATE)
-+			else if (sym2->type != S_UNKNOWN &&
-+			         sym2->type != S_BOOLEAN &&
-+			         sym2->type != S_TRISTATE)
- 				prop_warn(prop,
- 				    "'%s' has wrong type. 'select' only "
- 				    "accept arguments of boolean and "
+diff --git a/include/linux/init.h b/include/linux/init.h
+index 2efbda0..90cdbbb 100644
+--- a/include/linux/init.h
++++ b/include/linux/init.h
+@@ -124,9 +124,6 @@
+ #define __REF            .section       ".ref.text", "ax"
+ #define __REFDATA        .section       ".ref.data", "aw"
+ #define __REFCONST       .section       ".ref.rodata", "aw"
+-/* backward compatibility */
+-#define __INIT_REFOK     .section	__REF
+-#define __INITDATA_REFOK .section	__REFDATA
+ 
+ #ifndef __ASSEMBLY__
+ /*
 -- 
 1.5.4.rc3.14.g44397
 
