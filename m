@@ -1,48 +1,119 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from fmmailgate05.web.de ([217.72.192.243]:62584 "EHLO
-	fmmailgate05.web.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1758244AbYBCM3D (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 3 Feb 2008 07:29:03 -0500
-Received: from web.de
-	by fmmailgate05.web.de (Postfix) with SMTP id DF2EC3E93661
-	for <linux-kbuild@vger.kernel.org>; Sun,  3 Feb 2008 13:29:00 +0100 (CET)
-Date: Sun, 03 Feb 2008 13:29:00 +0100
-Message-Id: <142056111@web.de>
-MIME-Version: 1.0
-From: devzero@web.de
-Subject: defconfigs size reduction?
-Content-Type: text/plain; charset=iso-8859-15
-Content-Transfer-Encoding: 7bit
+Received: from pasmtpa.tele.dk ([80.160.77.114]:47439 "EHLO pasmtpA.tele.dk"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751372AbYBCVKi (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 3 Feb 2008 16:10:38 -0500
+Date: Sun, 3 Feb 2008 22:10:42 +0100
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: [GIT PATCH] Second round of kbuild updates
+Message-ID: <20080203211042.GF2648@uranus.ravnborg.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>
 
-hi there, 
+Hi Linus.
 
-i found that there are a lot of deconfigs bundled with every kernel-release. (about 335 on my suse box)
+Please pull the following changes from kbuild.git:
 
-summed up, that`s  6,3M and 311 KLOC (Kilo Lines of Configuration :) 
+	ssh://master.kernel.org/pub/scm/linux/kernel/git/sam/kbuild.git
 
-i think, that`s quite a lot.
+The diffstat say that a relative high number of files are touched.
+This is due to the set of patches from Mathieu that introduce
+an arch common Kconfig file and start utilizing it.
+The rest are much simpler.
 
-if i strip the comments ( real comments and "# CONFIGOPT is not set") and the blank lines from that, the size reduces to 1.9M and 86 KLOC.
+The most visible change is that I have made all the section mismatch
+warning prints go away and in the end of the build modpost simply
+report the number of section mismatch warnings and how to see detail.
 
-i have tested such stripping with arch/x86/configs/i386_defconfig and if i do a "make defconfig" afterwards, the .config in /usr/src/linux
-has those comments and the blank lines again.
+The typical output is now:
 
-so it appears, that these defconfigs have lot`s of redundant information which could probably be wiped with a bigger cleanup patch.
-i`m not sure, if this is a good approach, because others may use the configs in a different way or it may work differently for other arches. 
+modpost: Found 35 section mismatch(es).
+To see full details build your kernel with:
+'make CONFIG_DEBUG_SECTION_MISMATCH=y'
 
-maybe you experts can give a comment here ?
-would such cleanup for shrinking kernelsize be reasonable ?
+And CONFIG_DEBUG_SECTION_MISMATCH cannot be set
+from the config anymore so we are not noisy in typical
+allyesconfig builds.
 
-regards
-roland
+When we are down to an acceptable number of warnings modpost
+will start to be vocal again.
 
+The section mismatch logic were changed so we no longer complain
+about exported symbols annotated __devinit, __cpuinit, __meminit
+as they all seemed to be dealt with properly and the hack needed
+to avoid the warnings was not worth the effort.
 
+And I killed the irritating "select of unknown symbol warning".
 
-_________________________________________________________________________
-In 5 Schritten zur eigenen Homepage. Jetzt Domain sichern und gestalten! 
-Nur 3,99 EUR/Monat! http://www.maildomain.web.de/?mc=021114
+The scsi change is acked by James and he said OK to get it in via kbuild.git.
 
+Patches has been sent out for review one day ago and comments has been
+addressed.
+As Andrew has picked up the updated kbuild.git tree I think it is
+easiest to get this in before Andrew starts merging his pile of patches.
+
+	Sam
+
+Bryan Wu (1):
+      kbuild: add svn revision information to setlocalversion
+
+Geert Uytterhoeven (1):
+      kbuild: Spelling/grammar fixes for config DEBUG_SECTION_MISMATCH
+
+Mathieu Desnoyers (5):
+      Fix ARM to play nicely with generic Instrumentation menu
+      Create arch/Kconfig
+      Add HAVE_OPROFILE
+      Add HAVE_KPROBES
+      Move Kconfig.instrumentation to arch/Kconfig and init/Kconfig
+
+Ralf Baechle (1):
+      Remove __INIT_REFOK and __INITDATA_REFOK
+
+Sam Ravnborg (5):
+      kbuild: print only total number of section mismatces found
+      kconfig: mark config as changed when loading an alternate config
+      kconfig: ignore select of unknown symbol
+      kbuild: do not warn about __*init/__*exit symbols being exported
+      scsi: fix dependency bug in aic7 Makefile
+
+ arch/Kconfig                     |   31 +++++++++++++++++++
+ arch/alpha/Kconfig               |    3 +-
+ arch/arm/Kconfig                 |   21 +++++++++++-
+ arch/arm/Kconfig.instrumentation |   62 --------------------------------------
+ arch/avr32/Kconfig               |    5 +--
+ arch/blackfin/Kconfig            |    3 +-
+ arch/cris/Kconfig                |    2 -
+ arch/frv/Kconfig                 |    2 -
+ arch/h8300/Kconfig               |    2 -
+ arch/ia64/Kconfig                |    4 +-
+ arch/m32r/Kconfig                |    3 +-
+ arch/m68k/Kconfig                |    2 -
+ arch/m68knommu/Kconfig           |    2 -
+ arch/mips/Kconfig                |    3 +-
+ arch/parisc/Kconfig              |    3 +-
+ arch/powerpc/Kconfig             |    4 +-
+ arch/ppc/Kconfig                 |    4 +-
+ arch/s390/Kconfig                |    4 +-
+ arch/sh/Kconfig                  |    3 +-
+ arch/sparc/Kconfig               |    3 +-
+ arch/sparc64/Kconfig             |    4 +-
+ arch/um/Kconfig                  |    2 -
+ arch/v850/Kconfig                |    2 -
+ arch/x86/Kconfig                 |    8 +----
+ arch/xtensa/Kconfig              |    2 -
+ drivers/scsi/aic7xxx/Makefile    |    9 +----
+ include/linux/init.h             |    3 --
+ init/Kconfig                     |   14 ++++++++
+ kernel/Kconfig.instrumentation   |   49 ------------------------------
+ lib/Kconfig.debug                |   14 ++++----
+ scripts/kconfig/mconf.c          |    1 +
+ scripts/kconfig/menu.c           |    9 ++----
+ scripts/mod/modpost.c            |   17 +++++-----
+ scripts/setlocalversion          |   16 ++++++++++
+ 34 files changed, 122 insertions(+), 194 deletions(-)
