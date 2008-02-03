@@ -1,34 +1,48 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pasmtpb.tele.dk ([80.160.77.98]:48682 "EHLO pasmtpB.tele.dk"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1757694AbYBCKD7 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 3 Feb 2008 05:03:59 -0500
-Date: Sun, 3 Feb 2008 11:04:03 +0100
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH try#2 ] kbuild: add svn revision information to setlocalversion
-Message-ID: <20080203100403.GA20810@uranus.ravnborg.org>
-References: <20080202203503.GA26415@uranus.ravnborg.org> <E1JLPrz-00059X-Sc@faramir.fjphome.nl> <20080202213015.GA27015@uranus.ravnborg.org> <1202019206.6671.18.camel@roc-laptop>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1202019206.6671.18.camel@roc-laptop>
+Received: from fmmailgate05.web.de ([217.72.192.243]:62584 "EHLO
+	fmmailgate05.web.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1758244AbYBCM3D (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 3 Feb 2008 07:29:03 -0500
+Received: from web.de
+	by fmmailgate05.web.de (Postfix) with SMTP id DF2EC3E93661
+	for <linux-kbuild@vger.kernel.org>; Sun,  3 Feb 2008 13:29:00 +0100 (CET)
+Date: Sun, 03 Feb 2008 13:29:00 +0100
+Message-Id: <142056111@web.de>
+MIME-Version: 1.0
+From: devzero@web.de
+Subject: defconfigs size reduction?
+Content-Type: text/plain; charset=iso-8859-15
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Bryan Wu <bryan.wu@analog.com>
-Cc: Frans Pop <elendil@planet.nl>, akpm@linux-foundation.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
 
-On Sun, Feb 03, 2008 at 02:13:26PM +0800, Bryan Wu wrote:
-> >From 0a7a2c6f19d32a85ca1a7887382325170ef19a66 Mon Sep 17 00:00:00 2001
-> From: Bryan Wu <bryan.wu@analog.com>
-> Date: Sun, 3 Feb 2008 14:05:00 +0800
-> Subject: [PATCH] [Scripts] add svn revision information to setlocalversion
-> 
-> follow git and mercurial style, include uncommitted changes detect
-> 
-> Cc: Frans Pop <elendil@planet.nl>
-> Signed-off-by: Bryan Wu <bryan.wu@analog.com>
+hi there, 
 
-Applied and pushed out.
-Thanks for the review Frans and thanks for the quick fix Bryan.
+i found that there are a lot of deconfigs bundled with every kernel-release. (about 335 on my suse box)
 
-	Sam
+summed up, that`s  6,3M and 311 KLOC (Kilo Lines of Configuration :) 
+
+i think, that`s quite a lot.
+
+if i strip the comments ( real comments and "# CONFIGOPT is not set") and the blank lines from that, the size reduces to 1.9M and 86 KLOC.
+
+i have tested such stripping with arch/x86/configs/i386_defconfig and if i do a "make defconfig" afterwards, the .config in /usr/src/linux
+has those comments and the blank lines again.
+
+so it appears, that these defconfigs have lot`s of redundant information which could probably be wiped with a bigger cleanup patch.
+i`m not sure, if this is a good approach, because others may use the configs in a different way or it may work differently for other arches. 
+
+maybe you experts can give a comment here ?
+would such cleanup for shrinking kernelsize be reasonable ?
+
+regards
+roland
+
+
+
+_________________________________________________________________________
+In 5 Schritten zur eigenen Homepage. Jetzt Domain sichern und gestalten! 
+Nur 3,99 EUR/Monat! http://www.maildomain.web.de/?mc=021114
+
