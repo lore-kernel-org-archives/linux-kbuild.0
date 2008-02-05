@@ -1,109 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from vervifontaine.sonytel.be ([80.88.33.193]:45264 "EHLO
-	vervifontaine.sonycom.com" rhost-flags-OK-OK-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1754426AbYBEKiy (ORCPT
+Received: from mail29.messagelabs.com ([216.82.249.147]:23112 "HELO
+	mail29.messagelabs.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with SMTP id S1754544AbYBEKo4 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 5 Feb 2008 05:38:54 -0500
-Date: Tue, 5 Feb 2008 11:38:49 +0100 (CET)
-From: Geert Uytterhoeven <Geert.Uytterhoeven@sonycom.com>
-Subject: Re: [REVIEW for merge] kbuild updates including silence of section
- mismatch check
-In-Reply-To: <20080202203503.GA26415@uranus.ravnborg.org>
-Message-ID: <Pine.LNX.4.64.0802051116410.1588@vixen.sonytel.be>
-References: <20080202203503.GA26415@uranus.ravnborg.org>
+	Tue, 5 Feb 2008 05:44:56 -0500
+Date: Tue, 5 Feb 2008 11:44:52 +0100
+From: Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <Uwe.Kleine-Koenig@digi.com>
+Subject: [PATCH] Add binoffset to gitignore
+Message-ID: <20080205104452.GA26460@digi.com>
 MIME-Version: 1.0
-Content-Type: MULTIPART/MIXED; BOUNDARY="-584349381-421666238-1202207929=:1588"
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Sam Ravnborg <sam@ravnborg.org>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>
+Cc: linux-kbuild@vger.kernel.org
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
-
----584349381-421666238-1202207929=:1588
-Content-Type: TEXT/PLAIN; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
-
-On Sat, 2 Feb 2008, Sam Ravnborg wrote:
-> The most visible change is that I have made all the section mismatch
-> go away and in the end of the build modpost report the number
-> of section mismatch warnings and how to see detail.
-> 
-> The typical output is now:
-> 
-> modpost: Found 35 section mismatch(es).
-> To see full details build your kernel with:
-> 'make CONFIG_DEBUG_SECTION_MISMATCH=y'
-
-Can we get a `warning' string literal in that message, so I notice it when
-grepping for compiler warnings?
-
-... Ah, there already exists a warn() routine, so let's use it.
-
-Subject: modpost: Use warn() for announcing section mismatches
-
-From: Geert Uytterhoeven <Geert.Uytterhoeven@sonycom.com>
-
-modpost: Use warn() for announcing section mismatches, for easy grepping for
-warnings in build logs.
-
-Also change an existing call from fprintf() to warn() while we're at it.
-
-Signed-off-by: Geert Uytterhoeven <Geert.Uytterhoeven@sonycom.com>
+Signed-off-by: Uwe Kleine-K鰊ig <Uwe.Kleine-Koenig@digi.com>
 ---
- scripts/mod/modpost.c |   16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+ scripts/.gitignore |    1 +
+ 1 files changed, 1 insertions(+), 0 deletions(-)
 
---- a/scripts/mod/modpost.c
-+++ b/scripts/mod/modpost.c
-@@ -1129,10 +1129,10 @@ static void report_sec_mismatch(const ch
- 	if (!sec_mismatch_verbose)
- 		return;
- 
--	fprintf(stderr, "WARNING: %s(%s+0x%llx): Section mismatch in"
--	                " reference from the %s %s%s to the %s %s:%s%s\n",
--                        modname, fromsec, fromaddr, from, fromsym, from_p,
--	                to, tosec, tosym, to_p);
-+	warn("%s(%s+0x%llx): Section mismatch in reference from the %s %s%s "
-+	     "to the %s %s:%s%s\n",
-+	     modname, fromsec, fromaddr, from, fromsym, from_p, to, tosec,
-+	     tosym, to_p);
- 
- 	switch (mismatch) {
- 	case TEXT_TO_INIT:
-@@ -1938,10 +1938,10 @@ int main(int argc, char **argv)
- 	if (dump_write)
- 		write_dump(dump_write);
- 	if (sec_mismatch_count && !sec_mismatch_verbose)
--		fprintf(stderr, "modpost: Found %d section mismatch(es).\n"
--		        "To see full details build your kernel with:\n"
--		        "'make CONFIG_DEBUG_SECTION_MISMATCH=y'\n",
--		        sec_mismatch_count);
-+		warn("modpost: Found %d section mismatch(es).\n"
-+		     "To see full details build your kernel with:\n"
-+		     "'make CONFIG_DEBUG_SECTION_MISMATCH=y'\n",
-+		     sec_mismatch_count);
- 
- 	return err;
- }
+diff --git a/scripts/.gitignore b/scripts/.gitignore
+index a1f52cb..b939fbd 100644
+--- a/scripts/.gitignore
++++ b/scripts/.gitignore
+@@ -6,3 +6,4 @@ kallsyms
+ pnmtologo
+ bin2c
+ unifdef
++binoffset
+-- 
+1.5.3.8
 
-With kind regards,
 
-Geert Uytterhoeven
-Software Architect
-
-Sony Network and Software Technology Center Europe
-The Corporate Village 路 Da Vincilaan 7-D1 路 B-1935 Zaventem 路 Belgium
-
-Phone:    +32 (0)2 700 8453
-Fax:      +32 (0)2 700 8622
-E-mail:   Geert.Uytterhoeven@sonycom.com
-Internet: http://www.sony-europe.com/
-
-Sony Network and Software Technology Center Europe
-A division of Sony Service Centre (Europe) N.V.
-Registered office: Technologielaan 7 路 B-1840 Londerzeel 路 Belgium
-VAT BE 0413.825.160 路 RPR Brussels
-Fortis Bank Zaventem 路 Swift GEBABEBB08A 路 IBAN BE39001382358619
----584349381-421666238-1202207929=:1588--
+-- 
+Uwe Kleine-K鰊ig, Software Engineer
+Digi International GmbH Branch Breisach, K黤erstrasse 8, 79206 Breisach, Germany
+Tax: 315/5781/0242 / VAT: DE153662976 / Reg. Amtsgericht Dortmund HRB 13962
