@@ -1,26 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pasmtpa.tele.dk ([80.160.77.114]:53512 "EHLO pasmtpA.tele.dk"
+Received: from pasmtpa.tele.dk ([80.160.77.114]:60585 "EHLO pasmtpA.tele.dk"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1758711AbYBFUz0 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 6 Feb 2008 15:55:26 -0500
-Date: Wed, 6 Feb 2008 21:55:32 +0100
+	id S1755300AbYBFU6S (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 6 Feb 2008 15:58:18 -0500
+Date: Wed, 6 Feb 2008 21:58:23 +0100
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH] Add binoffset to gitignore
-Message-ID: <20080206205532.GA12043@uranus.ravnborg.org>
-References: <20080205104452.GA26460@digi.com>
+Subject: Re: [REVIEW for merge] kbuild updates including silence of section mismatch check
+Message-ID: <20080206205823.GB12043@uranus.ravnborg.org>
+References: <20080202203503.GA26415@uranus.ravnborg.org> <Pine.LNX.4.64.0802051116410.1588@vixen.sonytel.be>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20080205104452.GA26460@digi.com>
+In-Reply-To: <Pine.LNX.4.64.0802051116410.1588@vixen.sonytel.be>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <Uwe.Kleine-Koenig@digi.com>
-Cc: linux-kbuild@vger.kernel.org
+To: Geert Uytterhoeven <Geert.Uytterhoeven@sonycom.com>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>
 
-On Tue, Feb 05, 2008 at 11:44:52AM +0100, Uwe Kleine-König wrote:
-> Signed-off-by: Uwe Kleine-König <Uwe.Kleine-Koenig@digi.com>
+On Tue, Feb 05, 2008 at 11:38:49AM +0100, Geert Uytterhoeven wrote:
+> On Sat, 2 Feb 2008, Sam Ravnborg wrote:
+> > The most visible change is that I have made all the section mismatch
+> > go away and in the end of the build modpost report the number
+> > of section mismatch warnings and how to see detail.
+> > 
+> > The typical output is now:
+> > 
+> > modpost: Found 35 section mismatch(es).
+> > To see full details build your kernel with:
+> > 'make CONFIG_DEBUG_SECTION_MISMATCH=y'
+> 
+> Can we get a `warning' string literal in that message, so I notice it when
+> grepping for compiler warnings?
+> 
+> ... Ah, there already exists a warn() routine, so let's use it.
+> 
+> Subject: modpost: Use warn() for announcing section mismatches
 
-Applied - thanks.
+Fair enough. Applied.
 
 	Sam
