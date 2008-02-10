@@ -1,54 +1,31 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp5.pp.htv.fi ([213.243.153.39]:39778 "EHLO smtp5.pp.htv.fi"
+Received: from pasmtpa.tele.dk ([80.160.77.114]:54318 "EHLO pasmtpA.tele.dk"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752200AbYBJTew (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 10 Feb 2008 14:34:52 -0500
-Date: Sun, 10 Feb 2008 21:34:47 +0200
-From: Adrian Bunk <bunk@kernel.org>
-Subject: Re: kconfig creates strange (invalid?) configuration
-Message-ID: <20080210193447.GG2436@cs181133002.pp.htv.fi>
-References: <20080210143333.GC2436@cs181133002.pp.htv.fi> <20080210192457.GA13733@uranus.ravnborg.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+	id S1756118AbYBJW7d (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 10 Feb 2008 17:59:33 -0500
+Received: from ravnborg.org (0x535d98d8.vgnxx8.adsl-dhcp.tele.dk [83.93.152.216])
+	by pasmtpA.tele.dk (Postfix) with ESMTP id C4166801540
+	for <linux-kbuild@vger.kernel.org>; Sun, 10 Feb 2008 23:59:31 +0100 (CET)
+Date: Sun, 10 Feb 2008 23:59:40 +0100
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: make V=1 broken
+Message-ID: <20080210225939.GB15317@uranus.ravnborg.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20080210192457.GA13733@uranus.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: zippel@linux-m68k.org, linux-kbuild@vger.kernel.org
+To: linux-kbuild <linux-kbuild@vger.kernel.org>
 
-On Sun, Feb 10, 2008 at 08:24:57PM +0100, Sam Ravnborg wrote:
-> On Sun, Feb 10, 2008 at 04:33:33PM +0200, Adrian Bunk wrote:
-> > The attached .config (with current -git) results in a compile 
-> > error since it contains:
-> > 
-> > CONFIG_X86=y
-> > # CONFIG_EMBEDDED is not set
-> > CONFIG_SERIO=m
-> > CONFIG_SERIO_I8042=y
-> > 
-> > Looking at drivers/input/serio/Kconfig I simply don't get how this 
-> > can happen.
-> select is causing troubles again.
-> Try:
-> git grep SERIO | grep select
-> 
-> I did not analyze exactly where it happens but this is a typical
-> select issue.
+make V=1 is broken at the moment.
 
-No, I think the problem is related to the fact that CONFIG_SERIO is
-only m and not y, which is a problem in the direction opposite to what 
-select does.
+I do not have possibility to look at it until
+in ~20 hours.
+So if anyone can help until then...
 
-> 	Sam
+To reproduce:
 
-cu
-Adrian
+make defconfig
+make V=1
 
--- 
-
-       "Is there not promise of rain?" Ling Tan asked suddenly out
-        of the darkness. There had been need of rain for many days.
-       "Only a promise," Lao Er said.
-                                       Pearl S. Buck - Dragon Seed
-
+	Sam
