@@ -1,38 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from rgminet01.oracle.com ([148.87.113.118]:56370 "EHLO
-	rgminet01.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751966AbYBJScw (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 10 Feb 2008 13:32:52 -0500
-Date: Sun, 10 Feb 2008 10:30:26 -0800
-From: Randy Dunlap <randy.dunlap@oracle.com>
+Received: from smtp6.pp.htv.fi ([213.243.153.40]:38737 "EHLO smtp6.pp.htv.fi"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751983AbYBJSie (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 10 Feb 2008 13:38:34 -0500
+Date: Sun, 10 Feb 2008 20:38:29 +0200
+From: Adrian Bunk <bunk@kernel.org>
 Subject: Re: kconfig creates strange (invalid?) configuration
-Message-Id: <20080210103026.27e639d3.randy.dunlap@oracle.com>
-In-Reply-To: <20080210143333.GC2436@cs181133002.pp.htv.fi>
-References: <20080210143333.GC2436@cs181133002.pp.htv.fi>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Message-ID: <20080210183829.GF2436@cs181133002.pp.htv.fi>
+References: <20080210143333.GC2436@cs181133002.pp.htv.fi> <20080210103026.27e639d3.randy.dunlap@oracle.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20080210103026.27e639d3.randy.dunlap@oracle.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Adrian Bunk <bunk@kernel.org>
-Cc: zippel@linux-m68k.org, sam@ravnborg.org, linux-kbuild@vger.kernel.org
+To: Randy Dunlap <randy.dunlap@oracle.com>
+Cc: zippel@linux-m68k.org, sam@ravnborg.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Sun, 10 Feb 2008 16:33:33 +0200 Adrian Bunk wrote:
-
-> The attached .config (with current -git) results in a compile 
-> error since it contains:
+On Sun, Feb 10, 2008 at 10:30:26AM -0800, Randy Dunlap wrote:
+> On Sun, 10 Feb 2008 16:33:33 +0200 Adrian Bunk wrote:
 > 
-> CONFIG_X86=y
-> # CONFIG_EMBEDDED is not set
-> CONFIG_SERIO=m
-> CONFIG_SERIO_I8042=y
+> > The attached .config (with current -git) results in a compile 
+> > error since it contains:
+> > 
+> > CONFIG_X86=y
+> > # CONFIG_EMBEDDED is not set
+> > CONFIG_SERIO=m
+> > CONFIG_SERIO_I8042=y
+> > 
+> > Looking at drivers/input/serio/Kconfig I simply don't get how this 
+> > can happen.
 > 
-> Looking at drivers/input/serio/Kconfig I simply don't get how this 
-> can happen.
+> Is this from a 'make randconfig' or from one of the *config tools
+> or done via a text editor (+ make oldconfig)?
 
-Is this from a 'make randconfig' or from one of the *config tools
-or done via a text editor (+ make oldconfig)?
+This is my standard "everything modular" .config.
 
----
-~Randy
+But I don't get the source of your question since it shouldn't matter 
+where the .config comes from, and it stays this way after an oldconfig.
+
+> ~Randy
+
+cu
+Adrian
+
+-- 
+
+       "Is there not promise of rain?" Ling Tan asked suddenly out
+        of the darkness. There had been need of rain for many days.
+       "Only a promise," Lao Er said.
+                                       Pearl S. Buck - Dragon Seed
+
