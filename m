@@ -1,104 +1,105 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from web95105.mail.in2.yahoo.com ([203.104.18.157]:40575 "HELO
-	web95105.mail.in2.yahoo.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with SMTP id S1752149AbYBKNfx (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 11 Feb 2008 08:35:53 -0500
-Date: Mon, 11 Feb 2008 13:35:50 +0000 (GMT)
-From: murtuja bharmal <murtuja_bharmal@yahoo.com>
-Subject: Re: Help Require for makeing 2.6 kernel makefile
-In-Reply-To: <20080208192620.GA31391@uranus.ravnborg.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
-Message-ID: <432435.26752.qm@web95105.mail.in2.yahoo.com>
+Received: from pasmtpb.tele.dk ([80.160.77.98]:60380 "EHLO pasmtpB.tele.dk"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751046AbYBKOKo (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 11 Feb 2008 09:10:44 -0500
+Date: Mon, 11 Feb 2008 15:10:51 +0100
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: help required for KBUILD
+Message-ID: <20080211141051.GD20959@uranus.ravnborg.org>
+References: <193302.60802.qm@web95116.mail.in2.yahoo.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <193302.60802.qm@web95116.mail.in2.yahoo.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>, linux-kbuild@vger.kernel.org
+To: murtuja bharmal <murtuja_bharmal@yahoo.com>
+Cc: linux-kbuild@vger.kernel.org
 
+Hi Murtuja.
 
---- Sam Ravnborg <sam@ravnborg.org> wrote:
+On Mon, Feb 11, 2008 at 07:25:06AM +0000, murtuja bharmal wrote:
+> Sudo Code for kernel module compilation using KBUILD
+> SYSTEM. 
+> 
+> If module versioing is enabled. 
 
-> On Fri, Feb 08, 2008 at 02:10:34PM +0000, murtuja
-> bharmal wrote:
-> > Hello Sam,
-> > 
-> >  Can we write a kernel makefile using KBUILD to
-> make
-> > kernel module, for which source file are in
-> different
-> > directory.
-> > 
-> > For example.
-> > In Directory  “test1/” I have a two file Hello1.c
-> and
-> > Hello2.c
-> > First I want to make Hello1.o and Hello2.o and
-> after
-> > linking it will be Hello3.o. 
-> > For Hello3.o output directory will be “test2/”
-> > 
-> > In Directory “test4/” I have a file Hello4.c,
-> after
-> > compiling, it will be Hell4.o. 
-> > For Hello4.o Output directory will be “test2/”.
-> > Now after linking Hell1.o and Hello4.o.  I want to
-> > make Hello.ko in directory “test5/”.
-> > 
-> > Can we have separate makefile for “test1” and
-> “test4”
-> > directory.
+I assume you are aware that all these steps are taken care
+of by kbuild and that you do not need to do them manually
+neither to understand them to use them?
+
+This is also true for external modules.
+
 > 
-> You cannot achieve exactly what you want - sorry.
-> test1/Makefile would look like this:
-> obj-m := Hello3.o
-> Hello3-y := Hello1.o Hello2.o
+> step1. 
 > 
-> test4/Makefile would look like this:
-> obj-m := Hello4.o
+> create a .tmp_<moudule name>.o file from <module
+> name>.c using gcc. 
 > 
-> You could create a Makefile in the directory
-> above test1/ and test4/ that looks like this:
+> step2. 
 > 
-> obj-m := test1/ test4/
+> if objdump -h .tmp_<module name>.o | grep -q
+> __ksymtab; then 
 > 
-> So you could build both modules in one go.
-> And then you could use make modules_install to
-> install them.
+> gcc -D GENKSYMS
+> ..............|scripts/genksyms/genksyms >
+> .tmp_<module name>.ver 
 > 
-> Hope this helps.
+> ld -m elf_i386 -r -o <module name>.o .tmp_<module
+> name>.o .tmp_<module name>.ver 
 > 
-> PS. Please post such questions to
-> linux-kbuild@vger.kernel.org.
-> We are a community so use it.
+> else 
 > 
-> 	Sam
+> mv -f .tmp_<module name>.o <module name>.o 
 > 
 
-Hi,
-
-  Actually problem is I have 2000 source file for
-single kernel module with 2.4 kbuild architecture.
-All this source file are in different directory
-sturcture.
-I can not split this in to multiple modules.
-And In 2.4 makefile it is not tightly binded with
-kbuild.
-It is like complining some file and linking it,
-putting it in some directory and so on and finally
-making module from all linked files.
-It has near about 100 makefiles for 2.4 architecture.
-
-Now I m not able to findout the way how I will achive
-this with 2.6 kbuild system because in all directory
-there is one makefile, which is making intermidiate
-object file, say form 10 source file, then again at
-last we are linking all this intermidate object file
-and making a single module.
-
-Murtuja
+Correct -this is also explained in Makefile.build like this:
+# When module versioning is enabled the following steps are executed:
+# o compile a .tmp_<file>.o from <file>.c
+# o if .tmp_<file>.o doesn't contain a __ksymtab version, i.e. does
+#   not export symbols, we just rename .tmp_<file>.o to <file>.o and
+#   are done.
+# o otherwise, we calculate symbol versions using the good old
+#   genksyms on the preprocessed source and postprocess them in a way
+#   that they are usable as a linker script
+# o generate <file>.o from .tmp_<file>.o using the linker to
+#   replace the unresolved symbols __crc_exported_symbol with
+#   the actual value of the checksum generated by genksyms
 
 
+> Step 3. 
+> 
+> LINUXDIR/scripts/mod/modpost .............. vmlinux
+> <module name>.o 
+> 
+> #the above command create file <module name>.mod.c 
+> 
+> Step 4. 
+> 
+> gcc ....................... - o <module name>.mod.o
+> <module name>.mod.c 
+> 
+> Step 5. 
+> 
+> ld -m elf_i386 -r -o <module name>.ko <module name>.o
+> <module name>.mod.o 
+> 
+> 
+> 
+> In step 2 it is checking for 
+> __ksymtab on .tmp_<module name>.o header.
+> 
+> Can anybody tell me when __ksymtab in included in
+> module object header.
+> Is it only added when we have EXPORT_SYMBOL Macro in
+> kernel module code or any other reason.
+Correct - it is only included if there is an exported symbol,
+as an exported symbol place some info in a section named ksymtab_*.
 
+> And what is .tmp_<module name>.ver file.
+If you look at it you will see it caontains the CRC values for the
+exported symbols - the values are then checked later when the module
+is loaded by the module for consitency.
 
-      Meet people who discuss and share your passions. Go to http://in.promos.yahoo.com/groups
+	Sam
