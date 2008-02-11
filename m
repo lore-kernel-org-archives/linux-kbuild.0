@@ -1,68 +1,109 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from barikada.upol.cz ([158.194.242.200]:45482 "EHLO
-	barikada.upol.cz" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752772AbYBKOOa (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 11 Feb 2008 09:14:30 -0500
-Received: from flower (flower.upol.cz [158.194.64.22])
-	by barikada.upol.cz (Spam Firewall) with ESMTP id 5191B1DC194
-	for <linux-kbuild@vger.kernel.org>; Mon, 11 Feb 2008 15:14:29 +0100 (CET)
-Received: from flower (flower.upol.cz [158.194.64.22]) by barikada.upol.cz with ESMTP id MZaLfxcDeEirbm7b for <linux-kbuild@vger.kernel.org>; Mon, 11 Feb 2008 15:14:29 +0100 (CET)
-Received: from olecom by flower with local (Exim 4.63)
-	(envelope-from <olecom@flower.upol.cz>)
-	id 1JOZiC-0007mO-09
-	for linux-kbuild@vger.kernel.org; Mon, 11 Feb 2008 15:32:48 +0100
-Date: Mon, 11 Feb 2008 15:32:47 +0100
-Subject: Re: shell command is empty, when "silent" (Re: make V=1 broken)
-Message-ID: <20080211143247.GH24008@flower.upol.cz>
-References: <20080210225939.GB15317@uranus.ravnborg.org> <20080211024640.GF24008@flower.upol.cz> <20080211133453.GC20959@uranus.ravnborg.org>
+Received: from scrub.xs4all.nl ([194.109.195.176]:3419 "EHLO scrub.xs4all.nl"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753148AbYBKUOF (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 11 Feb 2008 15:14:05 -0500
+Date: Mon, 11 Feb 2008 21:13:47 +0100 (CET)
+From: Roman Zippel <zippel@linux-m68k.org>
+Subject: Re: kconfig creates strange (invalid?) configuration
+In-Reply-To: <20080210143333.GC2436@cs181133002.pp.htv.fi>
+Message-ID: <Pine.LNX.4.64.0802112048070.3378@scrub.home>
+References: <20080210143333.GC2436@cs181133002.pp.htv.fi>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20080211133453.GC20959@uranus.ravnborg.org>
-From: Oleg Verych <olecom@flower.upol.cz>
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <linux-kbuild@vger.kernel.org>
+To: Adrian Bunk <bunk@kernel.org>
+Cc: sam@ravnborg.org, linux-kbuild@vger.kernel.org
 
-On Mon, Feb 11, 2008 at 02:34:53PM +0100, Sam Ravnborg wrote:
-> On Mon, Feb 11, 2008 at 03:46:40AM +0100, Oleg Verych wrote:
-[]
-> > ,--`make V=1`--
-> > |  GEN     /dev/shm/blinux/Makefile
-> > |set -e; ; mkdir -p include/linux/; 
-> > []
-> > |/bin/sh: Syntax error: ";" unexpected
-> > `--
-> > 
-> > That "silent" juggling with `echo` is overhead, thus remove it.
+Hi,
+
+On Sun, 10 Feb 2008, Adrian Bunk wrote:
+
+> The attached .config (with current -git) results in a compile 
+> error since it contains:
 > 
-> Hi Oleg.
-> People has requested to make the build even more silent with
-> make -s. So when Mike provided a patch is was applied (but unfortunately faulty).
+> CONFIG_X86=y
+> # CONFIG_EMBEDDED is not set
+> CONFIG_SERIO=m
+> CONFIG_SERIO_I8042=y
 > 
-> So I fixed it by appended patch.
-> The right fix would have been to resue echo-cmd but that
-> required a bit more rework.
-[]
+> Looking at drivers/input/serio/Kconfig I simply don't get how this 
+> can happen.
 
-Memory is cheap, efficiency is uselsess.
+You've hit the rather subtle rules of select vs default. What happened is 
+that SERIO is selected to m, but SERIO_I8042 isn't selected so the default 
+of y is used instead.
+We already had the problem in the past that select and default don't work 
+well together, so this patch cleans this up and makes the rule hopefully 
+more straightforward. Basically now the value is calculated like this:
 
-Funny, that *debug* output didn't give a clue for quite some people.
+	(value && dependency) || select
 
-Aah, why do i care?
+where the value is the user choice (if available and the symbol is 
+visible) or default.
 
->  #   to specify a valid file as first prerequisite (often the kbuild file)
-> +       chk_filechk = :
->   quiet_chk_filechk = echo '  CHK     $@'
->  silent_chk_filechk = :
-> +       upd_filechk = :
->   quiet_upd_filechk = echo '  UPD     $@'
->  silent_upd_filechk = :
-> +
->  define filechk
->  	$(Q)set -e;				\
->  	$($(quiet)chk_filechk);			\
-> -- 
-> 1.5.4.rc3.14.g44397
-> 
+In this case it means SERIO and SERIO_I8042 are both set to y due to their 
+default and if SERIO didn't had the default, then the SERIO_I8042 value 
+would be limited to m due to the dependency.
+
+I tested this patch with more 10000 random configs and above case is the 
+only the difference that showed up, so I hope there is nothing that 
+depended on the old more complex and subtle rules.
+
+bye, Roman
+
+Signed-off-by: Roman Zippel <zippel@linux-m68k.org>
+
+---
+ scripts/kconfig/symbol.c |   34 +++++++++++++++++++++-------------
+ 1 file changed, 21 insertions(+), 13 deletions(-)
+
+Index: linux-2.6.k.git/scripts/kconfig/symbol.c
+===================================================================
+--- linux-2.6.k.git.orig/scripts/kconfig/symbol.c	2008-02-11 15:29:38.000000000 +0100
++++ linux-2.6.k.git/scripts/kconfig/symbol.c	2008-02-11 20:45:44.000000000 +0100
+@@ -298,22 +298,30 @@ void sym_calc_value(struct symbol *sym)
+ 		if (sym_is_choice_value(sym) && sym->visible == yes) {
+ 			prop = sym_get_choice_prop(sym);
+ 			newval.tri = (prop_get_symbol(prop)->curr.val == sym) ? yes : no;
+-		} else if (EXPR_OR(sym->visible, sym->rev_dep.tri) != no) {
+-			sym->flags |= SYMBOL_WRITE;
+-			if (sym_has_value(sym))
+-				newval.tri = sym->def[S_DEF_USER].tri;
+-			else if (!sym_is_choice(sym)) {
+-				prop = sym_get_default_prop(sym);
+-				if (prop)
+-					newval.tri = expr_calc_value(prop->expr);
++		} else {
++			if (sym->visible != no) {
++				/* if the symbol is visible use the user value
++				 * if available, otherwise try the default value
++				 */
++				sym->flags |= SYMBOL_WRITE;
++				if (sym_has_value(sym)) {
++					newval.tri = EXPR_AND(sym->def[S_DEF_USER].tri,
++							      sym->visible);
++					goto calc_newval;
++				}
+ 			}
+-			newval.tri = EXPR_OR(EXPR_AND(newval.tri, sym->visible), sym->rev_dep.tri);
+-		} else if (!sym_is_choice(sym)) {
+-			prop = sym_get_default_prop(sym);
+-			if (prop) {
++			if (sym->rev_dep.tri != no)
+ 				sym->flags |= SYMBOL_WRITE;
+-				newval.tri = expr_calc_value(prop->expr);
++			if (!sym_is_choice(sym)) {
++				prop = sym_get_default_prop(sym);
++				if (prop) {
++					sym->flags |= SYMBOL_WRITE;
++					newval.tri = EXPR_AND(expr_calc_value(prop->expr),
++							      prop->visible.tri);
++				}
+ 			}
++		calc_newval:
++			newval.tri = EXPR_OR(newval.tri, sym->rev_dep.tri);
+ 		}
+ 		if (newval.tri == mod && sym_get_type(sym) == S_BOOLEAN)
+ 			newval.tri = yes;
