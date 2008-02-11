@@ -1,119 +1,268 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from agminet01.oracle.com ([141.146.126.228]:64652 "EHLO
-	agminet01.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752207AbYBKUXu (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 11 Feb 2008 15:23:50 -0500
-Date: Mon, 11 Feb 2008 12:23:17 -0800
-From: Randy Dunlap <randy.dunlap@oracle.com>
-Subject: Re: kconfig creates strange (invalid?) configuration
-Message-Id: <20080211122317.60ac7dbe.randy.dunlap@oracle.com>
-In-Reply-To: <Pine.LNX.4.64.0802112048070.3378@scrub.home>
-References: <20080210143333.GC2436@cs181133002.pp.htv.fi>
-	<Pine.LNX.4.64.0802112048070.3378@scrub.home>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Received: from smtp.gentoo.org ([140.211.166.183]:46387 "EHLO smtp.gentoo.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1761182AbYBKXiS (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 11 Feb 2008 18:38:18 -0500
+Received: from localhost (localhost [127.0.0.1])
+	by smtp.gentoo.org (Postfix) with ESMTP id 94F1666252
+	for <linux-kbuild@vger.kernel.org>; Mon, 11 Feb 2008 23:38:16 +0000 (UTC)
+From: Mike Frysinger <vapier@gentoo.org>
+Subject: [patch/rfc] relocate kconfig "package name" to Kconfig/environment
+Date: Mon, 11 Feb 2008 18:38:15 -0500
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+Message-Id: <200802111838.15973.vapier@gentoo.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Roman Zippel <zippel@linux-m68k.org>
-Cc: Adrian Bunk <bunk@kernel.org>, sam@ravnborg.org, linux-kbuild@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
 
-On Mon, 11 Feb 2008 21:13:47 +0100 (CET) Roman Zippel wrote:
+This was discussed some time ago, but I don't really follow kconfig closely
+and the current source still doesn't do what I need, so I just banged it out.
+This moves the string "Linux kernel" out of hardcoded kconfig sources and into
+a Kconfig option.  This allows the projects that utilize kconfig as their
+build system to better integrate the menusystem into their project.  Rather
+than having to edit the sources all over the place, they only need to update
+the new "KERNELPACKAGE" setting to whatever represents their project.
+Feedback welcome! :)
 
-> Hi,
-> 
-> On Sun, 10 Feb 2008, Adrian Bunk wrote:
-> 
-> > The attached .config (with current -git) results in a compile 
-> > error since it contains:
-> > 
-> > CONFIG_X86=y
-> > # CONFIG_EMBEDDED is not set
-> > CONFIG_SERIO=m
-> > CONFIG_SERIO_I8042=y
-> > 
-> > Looking at drivers/input/serio/Kconfig I simply don't get how this 
-> > can happen.
-> 
-> You've hit the rather subtle rules of select vs default. What happened is 
-> that SERIO is selected to m, but SERIO_I8042 isn't selected so the default 
-> of y is used instead.
-> We already had the problem in the past that select and default don't work 
-> well together, so this patch cleans this up and makes the rule hopefully 
-> more straightforward. Basically now the value is calculated like this:
-> 
-> 	(value && dependency) || select
-> 
-> where the value is the user choice (if available and the symbol is 
-> visible) or default.
-> 
-> In this case it means SERIO and SERIO_I8042 are both set to y due to their 
-> default and if SERIO didn't had the default, then the SERIO_I8042 value 
-> would be limited to m due to the dependency.
-> 
-> I tested this patch with more 10000 random configs and above case is the 
-> only the difference that showed up, so I hope there is nothing that 
-> depended on the old more complex and subtle rules.
-
-Thanks for the explanation.  I was just going to patch/RFC a trivial
-patch that fixes the build, but is probably not optimal, even if we
-didn't have your patch.  (see below)
-
+Signed-off-by: Mike Frysinger <vapier@gentoo.org>
 ---
-From: Randy Dunlap <randy.dunlap@oracle.com>
+ Makefile                   |    3 ++-
+ init/Kconfig               |    4 ++++
+ scripts/kconfig/conf.c     |   10 +++++-----
+ scripts/kconfig/confdata.c |   17 ++++++++++++-----
+ scripts/kconfig/gconf.c    |    4 ++--
+ scripts/kconfig/mconf.c    |   21 ++++++++++++---------
+ scripts/kconfig/qconf.cc   |    4 ++--
+ 7 files changed, 39 insertions(+), 24 deletions(-)
 
-Adrian Bunk pointed out a kernel config file that contained:
-CONFIG_X86=y
-# CONFIG_EMBEDDED is not set
-CONFIG_SERIO=m
-CONFIG_SERIO_I8042=y
-
-which happens to cause:
-
-serio.out:ERROR: "i8042_command" [drivers/misc/acer-wmi.ko] undefined!
-serio.out:ERROR: "i8042_command" [drivers/leds/leds-clevo-mail.ko] undefined!
-
-
-The full config file also contains:
-# CONFIG_X86_PC is not set
-# CONFIG_X86_ELAN is not set
-# CONFIG_X86_VOYAGER is not set
-# CONFIG_X86_NUMAQ is not set
-# CONFIG_X86_SUMMIT is not set
-# CONFIG_X86_BIGSMP is not set
-# CONFIG_X86_VISWS is not set
-CONFIG_X86_GENERICARCH=y
-# CONFIG_X86_ES7000 is not set
-# CONFIG_X86_RDC321X is not set
-# CONFIG_X86_VSMP is not set
-
-and drivers/input/keyboard/Kconfig says:
-config KEYBOARD_ATKBD
-	tristate "AT keyboard" if EMBEDDED || !X86_PC
-	default y
-	select SERIO
-	select SERIO_LIBPS2
-	select SERIO_I8042 if X86_PC
-	select SERIO_GSCPS2 if GSC
-
-Changing the !X86_PC to !X86 fixes the build issue.  However, some of the
-CONFIG_X86_* variants may not care for it.
-
-Signed-off-by: Randy Dunlap <randy.dunlap@oracle.com>
----
- drivers/input/keyboard/Kconfig |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
---- linux-2.6.25-rc1.orig/drivers/input/keyboard/Kconfig
-+++ linux-2.6.25-rc1/drivers/input/keyboard/Kconfig
-@@ -13,7 +13,7 @@ menuconfig INPUT_KEYBOARD
- if INPUT_KEYBOARD
+diff --git a/Makefile b/Makefile
+index c162370..5dac0d2 100644
+--- a/Makefile
++++ b/Makefile
+@@ -338,8 +338,9 @@ KBUILD_AFLAGS   := -D__ASSEMBLY__
+ # Read KERNELRELEASE from include/config/kernel.release (if it exists)
+ KERNELRELEASE = $(shell cat include/config/kernel.release 2> /dev/null)
+ KERNELVERSION = $(VERSION).$(PATCHLEVEL).$(SUBLEVEL)$(EXTRAVERSION)
++KERNELPACKAGE = Linux Kernel
  
- config KEYBOARD_ATKBD
--	tristate "AT keyboard" if EMBEDDED || !X86_PC
-+	tristate "AT keyboard" if EMBEDDED || !X86
- 	default y
- 	select SERIO
- 	select SERIO_LIBPS2
-
+-export VERSION PATCHLEVEL SUBLEVEL KERNELRELEASE KERNELVERSION
++export VERSION PATCHLEVEL SUBLEVEL KERNELRELEASE KERNELVERSION KERNELPACKAGE
+ export ARCH SRCARCH CONFIG_SHELL HOSTCC HOSTCFLAGS CROSS_COMPILE AS LD CC
+ export CPP AR NM STRIP OBJCOPY OBJDUMP MAKE AWK GENKSYMS PERL UTS_MACHINE
+ export HOSTCXX HOSTCXXFLAGS LDFLAGS_MODULE CHECK CHECKFLAGS
+diff --git a/init/Kconfig b/init/Kconfig
+index 824d48c..418f972 100644
+--- a/init/Kconfig
++++ b/init/Kconfig
+@@ -6,6 +6,10 @@ config KERNELVERSION
+ 	string
+ 	option env="KERNELVERSION"
+ 
++config KERNELPACKAGE
++	string
++	option env="KERNELPACKAGE"
++
+ config DEFCONFIG_LIST
+ 	string
+ 	depends on !UML
+diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
+index fda6313..aea2d3f 100644
+--- a/scripts/kconfig/conf.c
++++ b/scripts/kconfig/conf.c
+@@ -563,8 +563,8 @@ int main(int ac, char **av)
+ 	case ask_silent:
+ 		if (stat(".config", &tmpstat)) {
+ 			printf(_("***\n"
+-				"*** You have not yet configured your kernel!\n"
+-				"*** (missing kernel .config file)\n"
++				"*** You have not yet configured things!\n"
++				"*** (missing .config file)\n"
+ 				"***\n"
+ 				"*** Please run some configurator (e.g. \"make oldconfig\" or\n"
+ 				"*** \"make menuconfig\" or \"make xconfig\").\n"
+@@ -610,7 +610,7 @@ int main(int ac, char **av)
+ 	} else if (conf_get_changed()) {
+ 		name = getenv("KCONFIG_NOSILENTUPDATE");
+ 		if (name && *name) {
+-			fprintf(stderr, _("\n*** Kernel configuration requires explicit update.\n\n"));
++			fprintf(stderr, _("\n*** Configuration requires explicit update.\n\n"));
+ 			return 1;
+ 		}
+ 	} else
+@@ -621,12 +621,12 @@ int main(int ac, char **av)
+ 		check_conf(&rootmenu);
+ 	} while (conf_cnt);
+ 	if (conf_write(NULL)) {
+-		fprintf(stderr, _("\n*** Error during writing of the kernel configuration.\n\n"));
++		fprintf(stderr, _("\n*** Error during writing of the configuration.\n\n"));
+ 		return 1;
+ 	}
+ skip_check:
+ 	if (input_mode == ask_silent && conf_write_autoconf()) {
+-		fprintf(stderr, _("\n*** Error during writing of the kernel configuration.\n\n"));
++		fprintf(stderr, _("\n*** Error during writing of the configuration.\n\n"));
+ 		return 1;
+ 	}
+ 
+diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
+index ee5fe94..01796b8 100644
+--- a/scripts/kconfig/confdata.c
++++ b/scripts/kconfig/confdata.c
+@@ -392,7 +392,7 @@ int conf_read(const char *name)
+ int conf_write(const char *name)
+ {
+ 	FILE *out;
+-	struct symbol *sym;
++	struct symbol *sym, *pkg_sym;
+ 	struct menu *menu;
+ 	const char *basename;
+ 	char dirname[128], tmpname[128], newname[128];
+@@ -438,6 +438,8 @@ int conf_write(const char *name)
+ 
+ 	sym = sym_lookup("KERNELVERSION", 0);
+ 	sym_calc_value(sym);
++	pkg_sym = sym_lookup("KERNELPACKAGE", 0);
++	sym_calc_value(pkg_sym);
+ 	time(&now);
+ 	env = getenv("KCONFIG_NOTIMESTAMP");
+ 	if (env && *env)
+@@ -445,9 +447,10 @@ int conf_write(const char *name)
+ 
+ 	fprintf(out, _("#\n"
+ 		       "# Automatically generated make config: don't edit\n"
+-		       "# Linux kernel version: %s\n"
++		       "# %s version: %s\n"
+ 		       "%s%s"
+ 		       "#\n"),
++		     sym_get_string_value(pkg_sym),
+ 		     sym_get_string_value(sym),
+ 		     use_timestamp ? "# " : "",
+ 		     use_timestamp ? ctime(&now) : "");
+@@ -668,7 +671,7 @@ out:
+ 
+ int conf_write_autoconf(void)
+ {
+-	struct symbol *sym;
++	struct symbol *sym, *pkg_sym;
+ 	const char *str;
+ 	char *name;
+ 	FILE *out, *out_h;
+@@ -694,19 +697,23 @@ int conf_write_autoconf(void)
+ 
+ 	sym = sym_lookup("KERNELVERSION", 0);
+ 	sym_calc_value(sym);
++	pkg_sym = sym_lookup("KERNELPACKAGE", 0);
++	sym_calc_value(pkg_sym);
+ 	time(&now);
+ 	fprintf(out, "#\n"
+ 		     "# Automatically generated make config: don't edit\n"
+-		     "# Linux kernel version: %s\n"
++		     "# %s version: %s\n"
+ 		     "# %s"
+ 		     "#\n",
++		     sym_get_string_value(pkg_sym),
+ 		     sym_get_string_value(sym), ctime(&now));
+ 	fprintf(out_h, "/*\n"
+ 		       " * Automatically generated C config: don't edit\n"
+-		       " * Linux kernel version: %s\n"
++		       " * %s version: %s\n"
+ 		       " * %s"
+ 		       " */\n"
+ 		       "#define AUTOCONF_INCLUDED\n",
++		       sym_get_string_value(pkg_sym),
+ 		       sym_get_string_value(sym), ctime(&now));
+ 
+ 	for_all_symbols(i, sym) {
+diff --git a/scripts/kconfig/gconf.c b/scripts/kconfig/gconf.c
+index 199b22b..fcf80b5 100644
+--- a/scripts/kconfig/gconf.c
++++ b/scripts/kconfig/gconf.c
+@@ -266,8 +266,8 @@ void init_main_window(const gchar * glade_file)
+ 					  /*"style", PANGO_STYLE_OBLIQUE, */
+ 					  NULL);
+ 
+-	sprintf(title, _("Linux Kernel v%s Configuration"),
+-		getenv("KERNELVERSION"));
++	sprintf(title, _("%s v%s Configuration"),
++		getenv("KERNELPACKAGE"), getenv("KERNELVERSION"));
+ 	gtk_window_set_title(GTK_WINDOW(main_wnd), title);
+ 
+ 	gtk_widget_show(main_wnd);
+diff --git a/scripts/kconfig/mconf.c b/scripts/kconfig/mconf.c
+index 734cf4f..cb5f1ee 100644
+--- a/scripts/kconfig/mconf.c
++++ b/scripts/kconfig/mconf.c
+@@ -362,13 +362,16 @@ static void set_config_filename(const char *config_filename)
+ {
+ 	static char menu_backtitle[PATH_MAX+128];
+ 	int size;
+-	struct symbol *sym;
++	struct symbol *sym, *pkg_sym;
+ 
+ 	sym = sym_lookup("KERNELVERSION", 0);
+ 	sym_calc_value(sym);
++	pkg_sym = sym_lookup("KERNELPACKAGE", 0);
++	sym_calc_value(pkg_sym);
+ 	size = snprintf(menu_backtitle, sizeof(menu_backtitle),
+-	                _("%s - Linux Kernel v%s Configuration"),
+-		        config_filename, sym_get_string_value(sym));
++	                _("%s - %s v%s Configuration"),
++	                config_filename, sym_get_string_value(pkg_sym),
++	                sym_get_string_value(sym));
+ 	if (size >= sizeof(menu_backtitle))
+ 		menu_backtitle[sizeof(menu_backtitle)-1] = '\0';
+ 	set_dialog_backtitle(menu_backtitle);
+@@ -894,7 +897,7 @@ int main(int ac, char **av)
+ 		if (conf_get_changed())
+ 			res = dialog_yesno(NULL,
+ 					   _("Do you wish to save your "
+-					     "new kernel configuration?\n"
++					     "new configuration?\n"
+ 					     "<ESC><ESC> to continue."),
+ 					   6, 60);
+ 		else
+@@ -906,20 +909,20 @@ int main(int ac, char **av)
+ 	case 0:
+ 		if (conf_write(filename)) {
+ 			fprintf(stderr, _("\n\n"
+-				"Error during writing of the kernel configuration.\n"
+-				"Your kernel configuration changes were NOT saved."
++				"Error during writing of the configuration.\n"
++				"Your configuration changes were NOT saved."
+ 				"\n\n"));
+ 			return 1;
+ 		}
+ 	case -1:
+ 		printf(_("\n\n"
+-			"*** End of Linux kernel configuration.\n"
+-			"*** Execute 'make' to build the kernel or try 'make help'."
++			"*** End of source configuration.\n"
++			"*** Execute 'make' to build the source or try 'make help'."
+ 			"\n\n"));
+ 		break;
+ 	default:
+ 		fprintf(stderr, _("\n\n"
+-			"Your kernel configuration changes were NOT saved."
++			"Your configuration changes were NOT saved."
+ 			"\n\n"));
+ 	}
+ 
+diff --git a/scripts/kconfig/qconf.cc b/scripts/kconfig/qconf.cc
+index 5d0fd38..babf34a 100644
+--- a/scripts/kconfig/qconf.cc
++++ b/scripts/kconfig/qconf.cc
+@@ -1276,8 +1276,8 @@ ConfigMainWindow::ConfigMainWindow(void)
+ 	char title[256];
+ 
+ 	QWidget *d = configApp->desktop();
+-	snprintf(title, sizeof(title), _("Linux Kernel v%s Configuration"),
+-		getenv("KERNELVERSION"));
++	snprintf(title, sizeof(title), _("%s v%s Configuration"),
++		getenv("KERNELPACKAGE"), getenv("KERNELVERSION"));
+ 	setCaption(title);
+ 
+ 	width = configSettings->readNumEntry("/window width", d->width() - 64);
