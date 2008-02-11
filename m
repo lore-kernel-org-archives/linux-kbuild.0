@@ -1,23 +1,26 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp6.pp.htv.fi ([213.243.153.40]:39568 "EHLO smtp6.pp.htv.fi"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753645AbYBKUTe (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 11 Feb 2008 15:19:34 -0500
-Date: Mon, 11 Feb 2008 22:19:25 +0200
-From: Adrian Bunk <bunk@kernel.org>
+Received: from agminet01.oracle.com ([141.146.126.228]:64652 "EHLO
+	agminet01.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752207AbYBKUXu (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 11 Feb 2008 15:23:50 -0500
+Date: Mon, 11 Feb 2008 12:23:17 -0800
+From: Randy Dunlap <randy.dunlap@oracle.com>
 Subject: Re: kconfig creates strange (invalid?) configuration
-Message-ID: <20080211201925.GC2959@cs181133002.pp.htv.fi>
-References: <20080210143333.GC2436@cs181133002.pp.htv.fi> <Pine.LNX.4.64.0802112048070.3378@scrub.home>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+Message-Id: <20080211122317.60ac7dbe.randy.dunlap@oracle.com>
 In-Reply-To: <Pine.LNX.4.64.0802112048070.3378@scrub.home>
+References: <20080210143333.GC2436@cs181133002.pp.htv.fi>
+	<Pine.LNX.4.64.0802112048070.3378@scrub.home>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Roman Zippel <zippel@linux-m68k.org>
-Cc: sam@ravnborg.org, linux-kbuild@vger.kernel.org
+Cc: Adrian Bunk <bunk@kernel.org>, sam@ravnborg.org, linux-kbuild@vger.kernel.org
 
-On Mon, Feb 11, 2008 at 09:13:47PM +0100, Roman Zippel wrote:
+On Mon, 11 Feb 2008 21:13:47 +0100 (CET) Roman Zippel wrote:
+
 > Hi,
 > 
 > On Sun, 10 Feb 2008, Adrian Bunk wrote:
@@ -53,18 +56,64 @@ On Mon, Feb 11, 2008 at 09:13:47PM +0100, Roman Zippel wrote:
 > only the difference that showed up, so I hope there is nothing that 
 > depended on the old more complex and subtle rules.
 
-Thanks, I confirm that your patch fixes my problem.
+Thanks for the explanation.  I was just going to patch/RFC a trivial
+patch that fixes the build, but is probably not optimal, even if we
+didn't have your patch.  (see below)
 
-> bye, Roman
->...
+---
+From: Randy Dunlap <randy.dunlap@oracle.com>
 
-cu
-Adrian
+Adrian Bunk pointed out a kernel config file that contained:
+CONFIG_X86=y
+# CONFIG_EMBEDDED is not set
+CONFIG_SERIO=m
+CONFIG_SERIO_I8042=y
 
--- 
+which happens to cause:
 
-       "Is there not promise of rain?" Ling Tan asked suddenly out
-        of the darkness. There had been need of rain for many days.
-       "Only a promise," Lao Er said.
-                                       Pearl S. Buck - Dragon Seed
+serio.out:ERROR: "i8042_command" [drivers/misc/acer-wmi.ko] undefined!
+serio.out:ERROR: "i8042_command" [drivers/leds/leds-clevo-mail.ko] undefined!
+
+
+The full config file also contains:
+# CONFIG_X86_PC is not set
+# CONFIG_X86_ELAN is not set
+# CONFIG_X86_VOYAGER is not set
+# CONFIG_X86_NUMAQ is not set
+# CONFIG_X86_SUMMIT is not set
+# CONFIG_X86_BIGSMP is not set
+# CONFIG_X86_VISWS is not set
+CONFIG_X86_GENERICARCH=y
+# CONFIG_X86_ES7000 is not set
+# CONFIG_X86_RDC321X is not set
+# CONFIG_X86_VSMP is not set
+
+and drivers/input/keyboard/Kconfig says:
+config KEYBOARD_ATKBD
+	tristate "AT keyboard" if EMBEDDED || !X86_PC
+	default y
+	select SERIO
+	select SERIO_LIBPS2
+	select SERIO_I8042 if X86_PC
+	select SERIO_GSCPS2 if GSC
+
+Changing the !X86_PC to !X86 fixes the build issue.  However, some of the
+CONFIG_X86_* variants may not care for it.
+
+Signed-off-by: Randy Dunlap <randy.dunlap@oracle.com>
+---
+ drivers/input/keyboard/Kconfig |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+--- linux-2.6.25-rc1.orig/drivers/input/keyboard/Kconfig
++++ linux-2.6.25-rc1/drivers/input/keyboard/Kconfig
+@@ -13,7 +13,7 @@ menuconfig INPUT_KEYBOARD
+ if INPUT_KEYBOARD
+ 
+ config KEYBOARD_ATKBD
+-	tristate "AT keyboard" if EMBEDDED || !X86_PC
++	tristate "AT keyboard" if EMBEDDED || !X86
+ 	default y
+ 	select SERIO
+ 	select SERIO_LIBPS2
 
