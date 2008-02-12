@@ -1,136 +1,81 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from xenotime.net ([66.160.160.81]:38229 "HELO xenotime.net"
+Received: from mail.gmx.net ([213.165.64.20]:55922 "HELO mail.gmx.net"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with SMTP
-	id S1751054AbYBLAkC (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 11 Feb 2008 19:40:02 -0500
-Received: from midway.site ([71.245.99.126]) by xenotime.net for <linux-kbuild@vger.kernel.org>; Mon, 11 Feb 2008 16:39:58 -0800
-Date: Mon, 11 Feb 2008 16:39:57 -0800
-From: Randy Dunlap <rdunlap@xenotime.net>
-Subject: Re: [patch/rfc] relocate kconfig "package name" to
- Kconfig/environment
-Message-Id: <20080211163957.69b68251.rdunlap@xenotime.net>
-In-Reply-To: <200802111929.27753.vapier@gentoo.org>
-References: <200802111838.15973.vapier@gentoo.org>
-	<20080211160204.c0e747e8.rdunlap@xenotime.net>
-	<200802111929.27753.vapier@gentoo.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+	id S1752325AbYBLK5T convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 12 Feb 2008 05:57:19 -0500
+From: Toralf =?iso-8859-15?q?F=F6rster?= <toralf.foerster@gmx.de>
+Subject: Fwd: Re: build #350 issue for v2.6.25-rc1 in drivers/i2c/busses/i2c-i801.c
+Date: Tue, 12 Feb 2008 11:57:14 +0100
+MIME-Version: 1.0
+Content-Disposition: inline
+Message-Id: <200802121157.14502.toralf.foerster@gmx.de>
+Content-Type: Text/Plain;
+  charset="iso-8859-15"
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Mike Frysinger <vapier@gentoo.org>
-Cc: linux-kbuild@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
 
-On Mon, 11 Feb 2008 19:29:27 -0500 Mike Frysinger wrote:
+Hello,
 
-> On Monday 11 February 2008, Randy Dunlap wrote:
-> > On Mon, 11 Feb 2008 18:38:15 -0500 Mike Frysinger wrote:
-> > > --- a/Makefile
-> > > +++ b/Makefile
-> > > @@ -338,8 +338,9 @@ KBUILD_AFLAGS   := -D__ASSEMBLY__
-> > >  # Read KERNELRELEASE from include/config/kernel.release (if it exists)
-> > >  KERNELRELEASE = $(shell cat include/config/kernel.release 2> /dev/null)
-> > >  KERNELVERSION = $(VERSION).$(PATCHLEVEL).$(SUBLEVEL)$(EXTRAVERSION)
-> > > +KERNELPACKAGE = Linux Kernel
-> >
-> > Doesn't need quotes?
-> 
-> shouldnt ... or at least, it worked fine for me in testing menuconfig
-> 
-> > > --- a/init/Kconfig
-> > > +++ b/init/Kconfig
-> > > @@ -6,6 +6,10 @@ config KERNELVERSION
-> > >  	string
-> > >  	option env="KERNELVERSION"
-> > >
-> > > +config KERNELPACKAGE
-> > > +	string
-> > > +	option env="KERNELPACKAGE"
-> > > +
-> >
-> > Each arch/$ARCH/Kconfig can have (and most do) a "mainmenu" entry
-> > that could be useful here, either alone or combined with 'KERNELPACKAGE'.
-> 
-> i dont think that main menu option actually gets displayed anywhere ?  either 
+does the mentioned  issue (pls see below) belong to kbuild ?
 
-No, it's not currently used.  Unfortunately.
 
-> way, that string tends to be much longer than what we want here ...
-> 
-> > > --- a/scripts/kconfig/conf.c
-> > > +++ b/scripts/kconfig/conf.c
-> > > @@ -563,8 +563,8 @@ int main(int ac, char **av)
-> > >  	case ask_silent:
-> > >  		if (stat(".config", &tmpstat)) {
-> > >  			printf(_("***\n"
-> > > -				"*** You have not yet configured your kernel!\n"
-> > > -				"*** (missing kernel .config file)\n"
-> > > +				"*** You have not yet configured things!\n"
-> >
-> > s/things/$KERNELPACKAGE/ ?
-> 
-> i thought just making it generic in the generic sections kept things simple 
-> and wasnt really a loss of information.  doesnt matter to me one way or the 
-> other though.
-> 
-> > > --- a/scripts/kconfig/confdata.c
-> > > +++ b/scripts/kconfig/confdata.c
-> > > @@ -392,7 +392,7 @@ int conf_read(const char *name)
-> > >  int conf_write(const char *name)
-> > >  {
-> > >  	FILE *out;
-> > > -	struct symbol *sym;
-> > > +	struct symbol *sym, *pkg_sym;
-> > >  	struct menu *menu;
-> > >  	const char *basename;
-> > >  	char dirname[128], tmpname[128], newname[128];
-> > > @@ -438,6 +438,8 @@ int conf_write(const char *name)
-> > >
-> > >  	sym = sym_lookup("KERNELVERSION", 0);
-> > >  	sym_calc_value(sym);
-> > > +	pkg_sym = sym_lookup("KERNELPACKAGE", 0);
-> > > +	sym_calc_value(pkg_sym);
-> > >  	time(&now);
-> > >  	env = getenv("KCONFIG_NOTIMESTAMP");
-> > >  	if (env && *env)
-> > > @@ -445,9 +447,10 @@ int conf_write(const char *name)
-> > >
-> > >  	fprintf(out, _("#\n"
-> > >  		       "# Automatically generated make config: don't edit\n"
-> > > -		       "# Linux kernel version: %s\n"
-> > > +		       "# %s version: %s\n"
-> > >  		       "%s%s"
-> > >  		       "#\n"),
-> > > +		     sym_get_string_value(pkg_sym),
-> > >  		     sym_get_string_value(sym),
-> >
-> > Why drop the "version: "?  I.e., must KERNELVERSION contain that
-> > word if it is desired?
-> 
-> i really dont know what you're talking about ... nothing was dropped here
+----------  Weitergeleitete Nachricht  ----------
+Subject: Re: build #350 issue for v2.6.25-rc1 in drivers/i2c/busses/i2c-i801.c
+Date: Dienstag, 12. Februar 2008
+From: Jean Delvare <khali@linux-fr.org>
+To: Toralf Förster <toralf.foerster@gmx.de>
 
-Ack, I misread the +- & context lines.
+Hi Toralf,
 
-> > > --- a/scripts/kconfig/gconf.c
-> > > +++ b/scripts/kconfig/gconf.c
-> > > @@ -266,8 +266,8 @@ void init_main_window(const gchar * glade_file)
-> > >  					  /*"style", PANGO_STYLE_OBLIQUE, */
-> > >  					  NULL);
-> > >
-> > > -	sprintf(title, _("Linux Kernel v%s Configuration"),
-> > > -		getenv("KERNELVERSION"));
-> > > +	sprintf(title, _("%s v%s Configuration"),
-> > > +		getenv("KERNELPACKAGE"), getenv("KERNELVERSION"));
-> >
-> > But here at least a 'v' is added... (inconsistent)
+On Tue, 12 Feb 2008 09:38:35 +0100, Toralf Förster wrote:
+> the build with the attached .config failed, make ends with:
+> ...
+>   LD      drivers/i2c/busses/built-in.o
+>   CC [M]  drivers/i2c/busses/i2c-i801.o
+> drivers/i2c/busses/i2c-i801.c: In function 'i801_probe':
+> drivers/i2c/busses/i2c-i801.c:636: error: implicit declaration of function 'pci_request_region'
+> drivers/i2c/busses/i2c-i801.c:676: error: implicit declaration of function 'pci_release_region'
+> make[3]: *** [drivers/i2c/busses/i2c-i801.o] Error 1
+> make[2]: *** [drivers/i2c/busses] Error 2
+> make[1]: *** [drivers/i2c] Error 2
+> make: *** [drivers] Error 2
 > 
-> the 'v' wasn't added by me, it's always been there.  the title bar is 
-> consistent across all the configuration interfaces:
-> <package name> v<version> Configuration
-> which becomes:
-> Linux Kernel v2.6.25-rc1 Configuration
+> The build was made with :
+> $> make mrproper && make rndconfig && <tweak config file> && make oldconfig && make
+> 
+> Here's the config:
+> 
+> #
+> # Automatically generated make config: don't edit
 
-Yes, I misread some lines.  Sorry about that.
+Note, it says: don't edit.
 
----
-~Randy
+> # Linux kernel version: 2.6.25-rc1
+> # Mon Feb 11 17:42:48 2008
+> #
+> (...)
+> # CONFIG_PCI is not set
+> (...)
+> # CONFIG_I2C is not set
+> CONFIG_I2C_I801=m
+
+You set CONFIG_I2C_I801=m while PCI and I2C are both disabled. You
+asked for a built breakage, you got it.
+
+You might argue that "make oldconfig" should fix the configuration file
+in such a way that the dependencies are correct again. But then this is
+a kconfig issue, to be reported to the kconfig maintainer, not me.
+
+-- 
+Jean Delvare
+
+-------------------------------------------------------
+
+-- 
+MfG/Sincerely
+
+Toralf Förster
+pgp finger print: 7B1A 07F4 EC82 0F90 D4C2 8936 872A E508 7DB6 9DA3
