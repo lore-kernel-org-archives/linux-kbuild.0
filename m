@@ -1,69 +1,70 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from orion2.pixelized.ch ([195.190.190.13]:53855 "EHLO
-	mail.pixelized.ch" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752299AbYBMKP0 (ORCPT
+Received: from astoria.ccjclearline.com ([64.235.106.9]:48007 "EHLO
+	astoria.ccjclearline.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756949AbYBMQqG (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 13 Feb 2008 05:15:26 -0500
-Message-ID: <47B2C1F4.5010403@cateee.net>
-Date: Wed, 13 Feb 2008 11:09:56 +0100
-From: "Giacomo A. Catenazzi" <cate@cateee.net>
+	Wed, 13 Feb 2008 11:46:06 -0500
+Received: from cpe001d60ad7267-cm001225dbafb6.cpe.net.cable.rogers.com ([99.236.100.208] helo=crashcourse.ca)
+	by astoria.ccjclearline.com with esmtpsa (TLSv1:AES256-SHA:256)
+	(Exim 4.68)
+	(envelope-from <rpjday@crashcourse.ca>)
+	id 1JPKkG-0000zQ-BI
+	for linux-kbuild@vger.kernel.org; Wed, 13 Feb 2008 11:46:04 -0500
+Date: Wed, 13 Feb 2008 11:46:00 -0500 (EST)
+From: "Robert P. J. Day" <rpjday@crashcourse.ca>
+Subject: unnecessary "tristate"ness in Kconfig files
+Message-ID: <alpine.LFD.1.00.0802131142210.9575@localhost.localdomain>
 MIME-Version: 1.0
-Subject: Re: distributed module configuration
-References: <20080212191552.GA20883@kroah.com> <20080212.164149.209357519.davem@davemloft.net> <20080213084541.GA8091@uranus.ravnborg.org> <20080213.005433.23276743.davem@davemloft.net> <20080213090451.GA8319@uranus.ravnborg.org>
-In-Reply-To: <20080213090451.GA8319@uranus.ravnborg.org>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: David Miller <davem@davemloft.net>, greg@kroah.com, torvalds@linux-foundation.org, jeff@garzik.org, arjan@infradead.org, sfr@canb.auug.org.au, linux-kernel@vger.kernel.org, linux-next@vger.kernel.org, linux-arch@vger.kernel.org, akpm@linux-foundation.org, linux-kbuild@vger.kernel.org
+To: kbuild devel list <linux-kbuild@vger.kernel.org>
 
-Sam Ravnborg wrote:
-> On Wed, Feb 13, 2008 at 12:54:33AM -0800, David Miller wrote:
->> From: Sam Ravnborg <sam@ravnborg.org>
->> Date: Wed, 13 Feb 2008 09:45:41 +0100
->>
->>> So we could do:
->>>
->>> config foo
->>> 	tristate "do you want foo?"
->>> 	depends on USB && BAR
->>> 	module
->>> 	  obj-$(CONFIG_FOO) += foo.o
->>> 	  foo-y := file1.o file2.o
->>> 	help
->>> 	  foo will allow you to explode your PC
->>  ...
->>> Does this fit what you had in mind?
->> Yes it does.
->>
->> Now I'll ask if you think embedding this information in one of the C
->> files for a module would be even nicer?
-> I have no good idea for the syntax and I and not sure what is gained
-> by reducing a driver with one file.
-> Agreed - simple drivers would then be a single file - and thats a good argument.
 
-I like the Sam proposal, but maybe we can simplify the rules on
-"module" segment: some informations are often redundant, dependencies
-are sometime calculated by config part and sometime by Makefile
-(and sometime in the Makefile there are some wrong hacks).
-I would really like a good section like:
+  can someone correct me if my thinking is out of whack here?
+consider init/Kconfig:
 
-module
-    foo : file1.o file2.o
+...
+config IKCONFIG
+        tristate "Kernel .config support"
+        ---help---
+          This option enables the complete Linux kernel ".config" file
+          contents to be saved in the kernel. It provides documentation
+          of which kernel options are used in a running kernel or in an
+          on-disk kernel.  This information can be extracted from the kernel
+          image file with the script scripts/extract-ikconfig and used as
+          input to rebuild the current kernel or to build another kernel.
+          It can also be extracted from a running kernel by reading
+          /proc/config.gz if enabled (below).
 
-and let the complex rules in the normal Makefile
-(which is also good because the complex rules are often not
-specific to a single driver).
+config IKCONFIG_PROC
+        bool "Enable access to .config through /proc/config.gz"
+        depends on IKCONFIG && PROC_FS
+        ---help---
+          This option enables access to the kernel configuration file
+          through /proc/config.gz.
+...
 
-But I don't like merging all info in a single file:
-- not so clean in case of multiple source-file driver
-- it would be more complex the "copy and paste"
-   from other drivers: most developers are not
-   comfortable with Kconfig and Makefile, so easy to grep
-   others Kconfig/Makefile could help developers not do
-   do strange/wrong hacks.
+  now why is IKCONFIG tristate instead of simple bool?  it's used
+solely as a dependency for IKCONFIG_PROC, and that's used in
+kernel/configs.c thusly:
 
-ciao
-	cate
+...
+#ifdef CONFIG_IKCONFIG_PROC
+...
+#endif
+...
 
+  so it's easy to see that it should be selectable, but it's *not*
+clear to see why it should be *tristate*.  what is the value of its
+tristate-ness?  thanks.
+
+rday
+--
+========================================================================
+Robert P. J. Day
+Linux Consulting, Training and Annoying Kernel Pedantry:
+    Have classroom, will lecture.
+
+http://crashcourse.ca                          Waterloo, Ontario, CANADA
+========================================================================
