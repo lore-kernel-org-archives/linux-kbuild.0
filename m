@@ -1,57 +1,69 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from scrub.xs4all.nl ([194.109.195.176]:52469 "EHLO scrub.xs4all.nl"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1761575AbYBNA5s (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 13 Feb 2008 19:57:48 -0500
-From: Roman Zippel <zippel@linux-m68k.org>
-Subject: Re: distributed module configuration [Was: Announce: Linux-next (Or Andrew's dream :-))]
-Date: Thu, 14 Feb 2008 01:56:13 +0100
-References: <20080212174824.GA1919@kroah.com> <20080212.164149.209357519.davem@davemloft.net> <20080213084541.GA8091@uranus.ravnborg.org>
-In-Reply-To: <20080213084541.GA8091@uranus.ravnborg.org>
+Received: from yergi.telenet-ops.be ([195.130.132.36]:54713 "EHLO
+	yergi.telenet-ops.be" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932473AbYBNIt3 (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 14 Feb 2008 03:49:29 -0500
+Received: from wilson.telenet-ops.be (unknown [195.130.132.42])
+	by yergi.telenet-ops.be (Postfix) with ESMTP id 3B69B5C999A
+	for <linux-kbuild@vger.kernel.org>; Thu, 14 Feb 2008 09:49:29 +0100 (CET)
+Date: Thu, 14 Feb 2008 09:48:42 +0100 (CET)
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Subject: Re: distributed module configuration [Was: Announce: Linux-next (Or
+ Andrew's dream :-))]
+In-Reply-To: <200802140156.15325.zippel@linux-m68k.org>
+Message-ID: <Pine.LNX.4.64.0802140944100.15629@anakin>
+References: <20080212174824.GA1919@kroah.com> <20080212.164149.209357519.davem@davemloft.net>
+ <20080213084541.GA8091@uranus.ravnborg.org> <200802140156.15325.zippel@linux-m68k.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-Message-Id: <200802140156.15325.zippel@linux-m68k.org>
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: David Miller <davem@davemloft.net>, greg@kroah.com, torvalds@linux-foundation.org, jeff@garzik.org, arjan@infradead.org, sfr@canb.auug.org.au, linux-kernel@vger.kernel.org, linux-next@vger.kernel.org, linux-arch@vger.kernel.org, akpm@linux-foundation.org, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: Roman Zippel <zippel@linux-m68k.org>
+Cc: Sam Ravnborg <sam@ravnborg.org>, David Miller <davem@davemloft.net>, greg@kroah.com, torvalds@linux-foundation.org, jeff@garzik.org, arjan@infradead.org, sfr@canb.auug.org.au, linux-kernel@vger.kernel.org, linux-next@vger.kernel.org, linux-arch@vger.kernel.org, akpm@linux-foundation.org, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-Hi,
-
-On Wednesday 13. February 2008, Sam Ravnborg wrote:
-
-> config foo
+On Thu, 14 Feb 2008, Roman Zippel wrote:
+> On Wednesday 13. February 2008, Sam Ravnborg wrote:
+> > config foo
+> > 	tristate "do you want foo?"
+> > 	depends on USB && BAR
+> > 	module
+> > 	  obj-$(CONFIG_FOO) += foo.o
+> > 	  foo-y := file1.o file2.o
+> > 	help
+> > 	  foo will allow you to explode your PC
+> 
+> I'm more thinking about something like this:
+> 
+> module foo [FOO]
 > 	tristate "do you want foo?"
 > 	depends on USB && BAR
-> 	module
-> 	  obj-$(CONFIG_FOO) += foo.o
-> 	  foo-y := file1.o file2.o
-> 	help
-> 	  foo will allow you to explode your PC
+> 	source file1.c
+> 	source file2.c if BAZ
 
-I'm more thinking about something like this:
+And we can finally distinguish between
 
-module foo [FOO]
-	tristate "do you want foo?"
-	depends on USB && BAR
-	source file1.c
-	source file2.c if BAZ
+    config bar
+    bool "do you want bar?"
+    
+for boolean options and
 
-Avoiding direct Makefile fragments would give us far more flexibility in the 
-final Makefile output.
+    module baz
+    bool "do you want baz?"
 
-> And we could introduce support for
->
-> source "drivers/net/Kconfig.*"
->
-> But then we would have to make the kconfig step mandatory
-> for each build as we would otherwise not know if there
-> were added any Kconfig files.
+for modules that cannot be modular?
 
-That's a real problem and it would be a step back of what we have right now, 
-so I'm not exactly comfortable with it.
+And we can make `depends on' do the right thing for dependencies on modules
+that are modular (cfr. e.g. commit e11a6c236b3070ed05b079f91a9b3defa48b54d3,
+[VIDEO]: XVR500 and XVR2500 require FB=y)?
 
-bye, Roman
+Gr{oetje,eeting}s,
+
+						Geert
+
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+							    -- Linus Torvalds
