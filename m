@@ -1,29 +1,27 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from yergi.telenet-ops.be ([195.130.132.36]:54713 "EHLO
-	yergi.telenet-ops.be" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932473AbYBNIt3 (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 14 Feb 2008 03:49:29 -0500
-Received: from wilson.telenet-ops.be (unknown [195.130.132.42])
-	by yergi.telenet-ops.be (Postfix) with ESMTP id 3B69B5C999A
-	for <linux-kbuild@vger.kernel.org>; Thu, 14 Feb 2008 09:49:29 +0100 (CET)
-Date: Thu, 14 Feb 2008 09:48:42 +0100 (CET)
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Subject: Re: distributed module configuration [Was: Announce: Linux-next (Or
- Andrew's dream :-))]
+Received: from pasmtpa.tele.dk ([80.160.77.114]:42364 "EHLO pasmtpA.tele.dk"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754259AbYBNWi0 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 14 Feb 2008 17:38:26 -0500
+Date: Thu, 14 Feb 2008 23:38:32 +0100
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: distributed module configuration [Was: Announce: Linux-next (Or Andrew's dream :-))]
+Message-ID: <20080214223832.GA23149@uranus.ravnborg.org>
+References: <20080212174824.GA1919@kroah.com> <20080212.164149.209357519.davem@davemloft.net> <20080213084541.GA8091@uranus.ravnborg.org> <200802140156.15325.zippel@linux-m68k.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 In-Reply-To: <200802140156.15325.zippel@linux-m68k.org>
-Message-ID: <Pine.LNX.4.64.0802140944100.15629@anakin>
-References: <20080212174824.GA1919@kroah.com> <20080212.164149.209357519.davem@davemloft.net>
- <20080213084541.GA8091@uranus.ravnborg.org> <200802140156.15325.zippel@linux-m68k.org>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Roman Zippel <zippel@linux-m68k.org>
-Cc: Sam Ravnborg <sam@ravnborg.org>, David Miller <davem@davemloft.net>, greg@kroah.com, torvalds@linux-foundation.org, jeff@garzik.org, arjan@infradead.org, sfr@canb.auug.org.au, linux-kernel@vger.kernel.org, linux-next@vger.kernel.org, linux-arch@vger.kernel.org, akpm@linux-foundation.org, linux-kbuild <linux-kbuild@vger.kernel.org>
+Cc: David Miller <davem@davemloft.net>, greg@kroah.com, torvalds@linux-foundation.org, jeff@garzik.org, arjan@infradead.org, sfr@canb.auug.org.au, linux-kernel@vger.kernel.org, linux-next@vger.kernel.org, linux-arch@vger.kernel.org, akpm@linux-foundation.org, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-On Thu, 14 Feb 2008, Roman Zippel wrote:
+On Thu, Feb 14, 2008 at 01:56:13AM +0100, Roman Zippel wrote:
+> Hi,
+> 
 > On Wednesday 13. February 2008, Sam Ravnborg wrote:
+> 
 > > config foo
 > > 	tristate "do you want foo?"
 > > 	depends on USB && BAR
@@ -40,30 +38,17 @@ On Thu, 14 Feb 2008, Roman Zippel wrote:
 > 	depends on USB && BAR
 > 	source file1.c
 > 	source file2.c if BAZ
+> 
+> Avoiding direct Makefile fragments would give us far more flexibility in the 
+> final Makefile output.
 
-And we can finally distinguish between
+Much better and now I see it I recall you posted something
+along these lines before.
+Is this something that you plan to look into implementing?
 
-    config bar
-    bool "do you want bar?"
-    
-for boolean options and
+I can do the kbuild bits but I need you to do the kconfig
+stuff (which is by far the biggest effort too).
 
-    module baz
-    bool "do you want baz?"
+It would be much appreciated to get this.
 
-for modules that cannot be modular?
-
-And we can make `depends on' do the right thing for dependencies on modules
-that are modular (cfr. e.g. commit e11a6c236b3070ed05b079f91a9b3defa48b54d3,
-[VIDEO]: XVR500 and XVR2500 require FB=y)?
-
-Gr{oetje,eeting}s,
-
-						Geert
-
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-							    -- Linus Torvalds
+	Sam
