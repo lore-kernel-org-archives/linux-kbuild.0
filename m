@@ -1,70 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from astoria.ccjclearline.com ([64.235.106.9]:48007 "EHLO
-	astoria.ccjclearline.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756949AbYBMQqG (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 13 Feb 2008 11:46:06 -0500
-Received: from cpe001d60ad7267-cm001225dbafb6.cpe.net.cable.rogers.com ([99.236.100.208] helo=crashcourse.ca)
-	by astoria.ccjclearline.com with esmtpsa (TLSv1:AES256-SHA:256)
-	(Exim 4.68)
-	(envelope-from <rpjday@crashcourse.ca>)
-	id 1JPKkG-0000zQ-BI
-	for linux-kbuild@vger.kernel.org; Wed, 13 Feb 2008 11:46:04 -0500
-Date: Wed, 13 Feb 2008 11:46:00 -0500 (EST)
-From: "Robert P. J. Day" <rpjday@crashcourse.ca>
-Subject: unnecessary "tristate"ness in Kconfig files
-Message-ID: <alpine.LFD.1.00.0802131142210.9575@localhost.localdomain>
+Received: from scrub.xs4all.nl ([194.109.195.176]:52469 "EHLO scrub.xs4all.nl"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1761575AbYBNA5s (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 13 Feb 2008 19:57:48 -0500
+From: Roman Zippel <zippel@linux-m68k.org>
+Subject: Re: distributed module configuration [Was: Announce: Linux-next (Or Andrew's dream :-))]
+Date: Thu, 14 Feb 2008 01:56:13 +0100
+References: <20080212174824.GA1919@kroah.com> <20080212.164149.209357519.davem@davemloft.net> <20080213084541.GA8091@uranus.ravnborg.org>
+In-Reply-To: <20080213084541.GA8091@uranus.ravnborg.org>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+Message-Id: <200802140156.15325.zippel@linux-m68k.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: kbuild devel list <linux-kbuild@vger.kernel.org>
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: David Miller <davem@davemloft.net>, greg@kroah.com, torvalds@linux-foundation.org, jeff@garzik.org, arjan@infradead.org, sfr@canb.auug.org.au, linux-kernel@vger.kernel.org, linux-next@vger.kernel.org, linux-arch@vger.kernel.org, akpm@linux-foundation.org, linux-kbuild <linux-kbuild@vger.kernel.org>
 
+Hi,
 
-  can someone correct me if my thinking is out of whack here?
-consider init/Kconfig:
+On Wednesday 13. February 2008, Sam Ravnborg wrote:
 
-...
-config IKCONFIG
-        tristate "Kernel .config support"
-        ---help---
-          This option enables the complete Linux kernel ".config" file
-          contents to be saved in the kernel. It provides documentation
-          of which kernel options are used in a running kernel or in an
-          on-disk kernel.  This information can be extracted from the kernel
-          image file with the script scripts/extract-ikconfig and used as
-          input to rebuild the current kernel or to build another kernel.
-          It can also be extracted from a running kernel by reading
-          /proc/config.gz if enabled (below).
+> config foo
+> 	tristate "do you want foo?"
+> 	depends on USB && BAR
+> 	module
+> 	  obj-$(CONFIG_FOO) += foo.o
+> 	  foo-y := file1.o file2.o
+> 	help
+> 	  foo will allow you to explode your PC
 
-config IKCONFIG_PROC
-        bool "Enable access to .config through /proc/config.gz"
-        depends on IKCONFIG && PROC_FS
-        ---help---
-          This option enables access to the kernel configuration file
-          through /proc/config.gz.
-...
+I'm more thinking about something like this:
 
-  now why is IKCONFIG tristate instead of simple bool?  it's used
-solely as a dependency for IKCONFIG_PROC, and that's used in
-kernel/configs.c thusly:
+module foo [FOO]
+	tristate "do you want foo?"
+	depends on USB && BAR
+	source file1.c
+	source file2.c if BAZ
 
-...
-#ifdef CONFIG_IKCONFIG_PROC
-...
-#endif
-...
+Avoiding direct Makefile fragments would give us far more flexibility in the 
+final Makefile output.
 
-  so it's easy to see that it should be selectable, but it's *not*
-clear to see why it should be *tristate*.  what is the value of its
-tristate-ness?  thanks.
+> And we could introduce support for
+>
+> source "drivers/net/Kconfig.*"
+>
+> But then we would have to make the kconfig step mandatory
+> for each build as we would otherwise not know if there
+> were added any Kconfig files.
 
-rday
---
-========================================================================
-Robert P. J. Day
-Linux Consulting, Training and Annoying Kernel Pedantry:
-    Have classroom, will lecture.
+That's a real problem and it would be a step back of what we have right now, 
+so I'm not exactly comfortable with it.
 
-http://crashcourse.ca                          Waterloo, Ontario, CANADA
-========================================================================
+bye, Roman
