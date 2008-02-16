@@ -1,45 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from astoria.ccjclearline.com ([64.235.106.9]:40318 "EHLO
-	astoria.ccjclearline.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750769AbYBPVz7 (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 16 Feb 2008 16:55:59 -0500
-Received: from cpe00142a336e11-cm001ac318e826.cpe.net.cable.rogers.com ([72.140.150.221] helo=crashcourse.ca)
-	by astoria.ccjclearline.com with esmtpsa (TLSv1:AES256-SHA:256)
-	(Exim 4.68)
-	(envelope-from <rpjday@crashcourse.ca>)
-	id 1JQV0p-0007gd-5Y
-	for linux-kbuild@vger.kernel.org; Sat, 16 Feb 2008 16:55:59 -0500
-Date: Sat, 16 Feb 2008 16:55:52 -0500 (EST)
-From: "Robert P. J. Day" <rpjday@crashcourse.ca>
-Subject: "aflags-y" versus "asflags-y"??
-Message-ID: <alpine.LFD.1.00.0802161653320.4271@localhost.localdomain>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+Received: from pasmtpa.tele.dk ([80.160.77.114]:53585 "EHLO pasmtpA.tele.dk"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751740AbYBPWYW (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 16 Feb 2008 17:24:22 -0500
+Date: Sat, 16 Feb 2008 23:24:32 +0100
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: ccflags-y versus EXTRA_CFLAGS??
+Message-ID: <20080216222432.GB16599@uranus.ravnborg.org>
+References: <alpine.LFD.1.00.0802161615400.3910@localhost.localdomain> <20080216212618.GA16599@uranus.ravnborg.org> <alpine.LFD.1.00.0802161632260.4111@localhost.localdomain>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <alpine.LFD.1.00.0802161632260.4111@localhost.localdomain>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: kbuild devel list <linux-kbuild@vger.kernel.org>
+To: "Robert P. J. Day" <rpjday@crashcourse.ca>
+Cc: kbuild devel list <linux-kbuild@vger.kernel.org>
 
+On Sat, Feb 16, 2008 at 04:44:44PM -0500, Robert P. J. Day wrote:
+> On Sat, 16 Feb 2008, Sam Ravnborg wrote:
+> 
+> > On Sat, Feb 16, 2008 at 04:21:18PM -0500, Robert P. J. Day wrote:
+> > >
+> > >   IIRC, there are a number of deprecated variables and preferred
+> > > forms, along the lines of:
+> > >
+> > >   ccflags-y -> EXTRA_CFLAGS
+> > >   asflags-y -> EXTRA_AFLAGS
+> >
+> > ccflags-y, asflags are preferred.
+> 
+> ah, it goes the other way.  (i'm assuming you really meant asflags-y
+> above, and this would also include EXTRA_LDFLAGS -> ldflags-y, yes?)
 
-  i'm confused ... try both of the following:
+Yes - all three of them. And yes they have the -y postfix all of them.
 
-  $ grep -r aflags- *
-  $ grep -r asflags- *
+A simple git log Documentation/kbuild/makefiles.txt would have told you
+the story and what is preferred.
 
-so which one is the standard?  and for added entertainment,
-
-  $ grep -r extra-aflags-x *
-
-that seems just wrong.
-
-rday
---
-
-
-========================================================================
-Robert P. J. Day
-Linux Consulting, Training and Annoying Kernel Pedantry:
-    Have classroom, will lecture.
-
-http://crashcourse.ca                          Waterloo, Ontario, CANADA
-========================================================================
+	Sam
