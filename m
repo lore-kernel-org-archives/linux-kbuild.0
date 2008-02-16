@@ -1,45 +1,68 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtpq1.groni1.gr.home.nl ([213.51.130.200]:33495 "EHLO
-	smtpq1.groni1.gr.home.nl" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753556AbYBPDvT (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 15 Feb 2008 22:51:19 -0500
-Message-ID: <47B65E35.8020905@keyaccess.nl>
-Date: Sat, 16 Feb 2008 04:53:25 +0100
-From: Rene Herman <rene.herman@keyaccess.nl>
-MIME-Version: 1.0
+Received: from pasmtpb.tele.dk ([80.160.77.98]:41033 "EHLO pasmtpB.tele.dk"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753254AbYBPLgB (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 16 Feb 2008 06:36:01 -0500
+Date: Sat, 16 Feb 2008 12:36:10 +0100
+From: Sam Ravnborg <sam@ravnborg.org>
 Subject: Re: 2.6.25-rc2 vdso_install breaks user "make install"
+Message-ID: <20080216113610.GB11362@uranus.ravnborg.org>
 References: <47B6592A.6030200@keyaccess.nl> <20080216034211.8DD03270193@magilla.localdomain>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 In-Reply-To: <20080216034211.8DD03270193@magilla.localdomain>
-Content-Type: text/plain; charset=ISO-8859-15; format=flowed
-Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Roland McGrath <roland@redhat.com>
-Cc: Linux Kernel <linux-kernel@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, linux-kbuild@vger.kernel.org
+Cc: Rene Herman <rene.herman@keyaccess.nl>, Linux Kernel <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org
 
-On 16-02-08 04:42, Roland McGrath wrote:
-
-> Perhaps it makes more sense to have vdso_install be a dependency of 
-> modules_install rather than install, since they both put things in
-> /lib/modules.
-
-Would work for me -- modules_install ofcourse runs as root.
-
-> The installed vdso images are potentially useful for a kernel when you 
-> aren't bothering to build or install any modules, but those images are
-> only ever useful for sophisticated debugging uses anyway.
+On Fri, Feb 15, 2008 at 07:42:11PM -0800, Roland McGrath wrote:
+> Perhaps it makes more sense to have vdso_install be a dependency of
+> modules_install rather than install, since they both put things in /lib/modules.
+> The installed vdso images are potentially useful for a kernel when you
+> aren't bothering to build or install any modules, but those images are only
+> ever useful for sophisticated debugging uses anyway.
 > 
 > Sam, any thoughts?  (See arch/x86/Makefile and arch/powerpc/Makefile.)
 
-Or maybe update the installkernel "protocol" to add these in?
+Installing the vdso files as aprt of modules_install would be
+unintuitive as this has nothing to do with modules.
 
-> The only kind of install runs I actually care about are for packaging 
-> system builds.  There the packaged build does 'make vdso_install' 
-> explicitly anyway (at least Fedora rpms' .spec does).  So if the
-> consensus is just to drop the dependency on vdso_install completely, I
-> don't object.
+And since you wrote:
+> useful for sophisticated debugging uses anyway
+I suggest to make the vdso_install step independent as
+in following patch.
+[Note: help docs needs to mention the new target].
 
-Did that for now...
+This solves the issue at ahnd and still gives us the posibility
+to install the files should they be needed.
 
-Rene.
+	Sam
+
+diff --git a/arch/powerpc/Makefile b/arch/powerpc/Makefile
+index 6845482..1c6ce35 100644
+--- a/arch/powerpc/Makefile
++++ b/arch/powerpc/Makefile
+@@ -176,7 +176,7 @@ define archhelp
+   @echo '  *_defconfig     - Select default config from arch/$(ARCH)/configs'
+ endef
+ 
+-install: vdso_install
++install:
+ 	$(Q)$(MAKE) $(build)=$(boot) install
+ 
+ vdso_install:
+diff --git a/arch/x86/Makefile b/arch/x86/Makefile
+index 204af43..f1e739a 100644
+--- a/arch/x86/Makefile
++++ b/arch/x86/Makefile
+@@ -229,7 +229,7 @@ zdisk bzdisk: vmlinux
+ fdimage fdimage144 fdimage288 isoimage: vmlinux
+ 	$(Q)$(MAKE) $(build)=$(boot) BOOTIMAGE=$(KBUILD_IMAGE) $@
+ 
+-install: vdso_install
++install:
+ 	$(Q)$(MAKE) $(build)=$(boot) BOOTIMAGE=$(KBUILD_IMAGE) install
+ 
+ PHONY += vdso_install
