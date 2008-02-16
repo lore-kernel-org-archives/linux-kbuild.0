@@ -1,68 +1,114 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pasmtpb.tele.dk ([80.160.77.98]:41033 "EHLO pasmtpB.tele.dk"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753254AbYBPLgB (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 16 Feb 2008 06:36:01 -0500
-Date: Sat, 16 Feb 2008 12:36:10 +0100
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: 2.6.25-rc2 vdso_install breaks user "make install"
-Message-ID: <20080216113610.GB11362@uranus.ravnborg.org>
-References: <47B6592A.6030200@keyaccess.nl> <20080216034211.8DD03270193@magilla.localdomain>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20080216034211.8DD03270193@magilla.localdomain>
+Received: from astoria.ccjclearline.com ([64.235.106.9]:56949 "EHLO
+	astoria.ccjclearline.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752816AbYBPNOh (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 16 Feb 2008 08:14:37 -0500
+Date: Sat, 16 Feb 2008 08:14:31 -0500 (EST)
+From: "Robert P. J. Day" <rpjday@crashcourse.ca>
+Subject: [PATCH] kbuild:  Some cheap typo and grammar fixes.
+Message-ID: <alpine.LFD.1.00.0802160812400.22496@localhost.localdomain>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Roland McGrath <roland@redhat.com>
-Cc: Rene Herman <rene.herman@keyaccess.nl>, Linux Kernel <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org
+To: kbuild devel list <linux-kbuild@vger.kernel.org>
+Cc: Sam Ravnborg <sam@ravnborg.org>
 
-On Fri, Feb 15, 2008 at 07:42:11PM -0800, Roland McGrath wrote:
-> Perhaps it makes more sense to have vdso_install be a dependency of
-> modules_install rather than install, since they both put things in /lib/modules.
-> The installed vdso images are potentially useful for a kernel when you
-> aren't bothering to build or install any modules, but those images are only
-> ever useful for sophisticated debugging uses anyway.
-> 
-> Sam, any thoughts?  (See arch/x86/Makefile and arch/powerpc/Makefile.)
 
-Installing the vdso files as aprt of modules_install would be
-unintuitive as this has nothing to do with modules.
+Signed-off-by: Robert P. J. Day <rpjday@crashcourse.ca>
 
-And since you wrote:
-> useful for sophisticated debugging uses anyway
-I suggest to make the vdso_install step independent as
-in following patch.
-[Note: help docs needs to mention the new target].
+---
 
-This solves the issue at ahnd and still gives us the posibility
-to install the files should they be needed.
+ Documentation/kbuild/makefiles.txt |    4 ++--
+ scripts/Kbuild.include             |   14 +++++++-------
+ 2 files changed, 9 insertions(+), 9 deletions(-)
 
-	Sam
+diff --git a/Documentation/kbuild/makefiles.txt b/Documentation/kbuild/makefiles.txt
+index 7a77533..3042f09 100644
+--- a/Documentation/kbuild/makefiles.txt
++++ b/Documentation/kbuild/makefiles.txt
+@@ -277,9 +277,9 @@ more details, with real examples.
+ --- 3.7 Compilation flags
 
-diff --git a/arch/powerpc/Makefile b/arch/powerpc/Makefile
-index 6845482..1c6ce35 100644
---- a/arch/powerpc/Makefile
-+++ b/arch/powerpc/Makefile
-@@ -176,7 +176,7 @@ define archhelp
-   @echo '  *_defconfig     - Select default config from arch/$(ARCH)/configs'
- endef
- 
--install: vdso_install
-+install:
- 	$(Q)$(MAKE) $(build)=$(boot) install
- 
- vdso_install:
-diff --git a/arch/x86/Makefile b/arch/x86/Makefile
-index 204af43..f1e739a 100644
---- a/arch/x86/Makefile
-+++ b/arch/x86/Makefile
-@@ -229,7 +229,7 @@ zdisk bzdisk: vmlinux
- fdimage fdimage144 fdimage288 isoimage: vmlinux
- 	$(Q)$(MAKE) $(build)=$(boot) BOOTIMAGE=$(KBUILD_IMAGE) $@
- 
--install: vdso_install
-+install:
- 	$(Q)$(MAKE) $(build)=$(boot) BOOTIMAGE=$(KBUILD_IMAGE) install
- 
- PHONY += vdso_install
+     ccflags-y, asflags-y and ldflags-y
+-	The three flags listed above applies only to the kbuild makefile
++	The three flags listed above apply only to the kbuild makefile
+ 	where they are assigned. They are used for all the normal
+-	cc, as and ld invocation happenign during a recursive build.
++	cc, as and ld invocation happening during a recursive build.
+ 	Note: Flags with the same behaviour were previously named:
+ 	EXTRA_CFLAGS, EXTRA_AFLAGS and EXTRA_LDFLAGS.
+ 	They are yet supported but their use are deprecated.
+diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
+index d64e6ba..944651e 100644
+--- a/scripts/Kbuild.include
++++ b/scripts/Kbuild.include
+@@ -79,7 +79,7 @@ TMPOUT := $(if $(KBUILD_EXTMOD),$(firstword $(KBUILD_EXTMOD))/)
+
+ # try-run
+ # Usage: option = $(call try-run, $(CC)...-o "$$TMP",option-ok,otherwise)
+-# Exit code chooses option. "$$TMP" is can be used as temporary file and
++# Exit code chooses option. "$$TMP" can be used as temporary file and
+ # is automatically cleaned up.
+ try-run = $(shell set -e;		\
+ 	TMP="$(TMPOUT).$$$$.tmp";	\
+@@ -157,7 +157,7 @@ echo-cmd = $(if $($(quiet)cmd_$(1)),\
+ # printing commands
+ cmd = @$(echo-cmd) $(cmd_$(1))
+
+-# Add $(obj)/ for paths that are not absolute
++# Add $(obj)/ prefix for paths that are not absolute
+ objectify = $(foreach o,$(1),$(if $(filter /%,$(o)),$(o),$(obj)/$(o)))
+
+ ###
+@@ -169,7 +169,7 @@ objectify = $(foreach o,$(1),$(if $(filter /%,$(o)),$(o),$(obj)/$(o)))
+ # See Documentation/kbuild/makefiles.txt for more info
+
+ ifneq ($(KBUILD_NOCMDDEP),1)
+-# Check if both arguments has same arguments. Result is empty string if equal.
++# Check if argument lists are equivalent. Result is empty string if equal.
+ # User may override this check using make KBUILD_NOCMDDEP=1
+ arg-check = $(strip $(filter-out $(cmd_$(1)), $(cmd_$@)) \
+                     $(filter-out $(cmd_$@),   $(cmd_$(1))) )
+@@ -181,7 +181,7 @@ endif
+ # in $(cmd_xxx) double $$ your perl vars
+ make-cmd = $(subst \#,\\\#,$(subst $$,$$$$,$(call escsq,$(cmd_$(1)))))
+
+-# Find any prerequisites that is newer than target or that does not exist.
++# Find any prerequisites that are newer than target or that do not exist.
+ # PHONY targets skipped in both cases.
+ any-prereq = $(filter-out $(PHONY),$?) $(filter-out $(PHONY) $(wildcard $^),$^)
+
+@@ -208,7 +208,7 @@ if_changed_rule = $(if $(strip $(any-prereq) $(arg-check) ),                 \
+ 	$(rule_$(1)))
+
+ ###
+-# why - tell why a a target got build
++# why - explain why a target got built
+ #       enabled by make V=2
+ #       Output (listed in the order they are checked):
+ #          (1) - due to target is PHONY
+@@ -217,12 +217,12 @@ if_changed_rule = $(if $(strip $(any-prereq) $(arg-check) ),                 \
+ #          (4) - due to command line change
+ #          (5) - due to missing .cmd file
+ #          (6) - due to target not in $(targets)
+-# (1) PHONY targets are always build
++# (1) PHONY targets are always built
+ # (2) No target, so we better build it
+ # (3) Prerequisite is newer than target
+ # (4) The command line stored in the file named dir/.target.cmd
+ #     differed from actual command line. This happens when compiler
+-#     options changes
++#     options change
+ # (5) No dir/.target.cmd file (used to store command line)
+ # (6) No dir/.target.cmd file and target not listed in $(targets)
+ #     This is a good hint that there is a bug in the kbuild file
+
+========================================================================
+Robert P. J. Day
+Linux Consulting, Training and Annoying Kernel Pedantry:
+    Have classroom, will lecture.
+
+http://crashcourse.ca                          Waterloo, Ontario, CANADA
+========================================================================
