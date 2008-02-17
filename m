@@ -1,31 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.mail.elte.hu ([157.181.151.9]:38587 "EHLO mx2.mail.elte.hu"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752073AbYBQTyA (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 17 Feb 2008 14:54:00 -0500
-Date: Sun, 17 Feb 2008 20:53:44 +0100
-From: Ingo Molnar <mingo@elte.hu>
-Subject: Re: 2.6.25-rc2 vdso_install breaks user "make install"
-Message-ID: <20080217195344.GC20850@elte.hu>
-References: <47B6592A.6030200@keyaccess.nl> <20080216034211.8DD03270193@magilla.localdomain> <20080216113610.GB11362@uranus.ravnborg.org> <20080217193514.GJ14588@uranus.ravnborg.org>
+Received: from astoria.ccjclearline.com ([64.235.106.9]:38227 "EHLO
+	astoria.ccjclearline.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755727AbYBQUXF (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 17 Feb 2008 15:23:05 -0500
+Received: from cpe001d60ad7267-cm001225dbafb6.cpe.net.cable.rogers.com ([99.236.100.208] helo=crashcourse.ca)
+	by astoria.ccjclearline.com with esmtpsa (TLSv1:AES256-SHA:256)
+	(Exim 4.68)
+	(envelope-from <rpjday@crashcourse.ca>)
+	id 1JQq2S-0007XM-Ah
+	for linux-kbuild@vger.kernel.org; Sun, 17 Feb 2008 15:23:04 -0500
+Date: Sun, 17 Feb 2008 15:22:59 -0500 (EST)
+From: "Robert P. J. Day" <rpjday@crashcourse.ca>
+Subject: [PATCH] KBUILD: Clarify which tags targets are for which editors.
+Message-ID: <alpine.LFD.1.00.0802171522001.592@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20080217193514.GJ14588@uranus.ravnborg.org>
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: Roland McGrath <roland@redhat.com>, Rene Herman <rene.herman@keyaccess.nl>, Linux Kernel <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org
+To: kbuild devel list <linux-kbuild@vger.kernel.org>
 
 
-* Sam Ravnborg <sam@ravnborg.org> wrote:
+Signed-off-by: Robert P. J. Day <rpjday@crashcourse.ca>
 
-> Roland - if you agree will you please submit the patch
-> to the x86 people.
-> You can tag it:
-> Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
-> or Acked-by: Sam Ravnborg <sam@ravnborg.org>
+---
 
-i've picked it up, thanks.
+diff --git a/Makefile b/Makefile
+index 67cc457..95d6a63 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1189,7 +1189,7 @@ help:
+ 	@echo  '  dir/file.[ois]  - Build specified target only'
+ 	@echo  '  dir/file.ko     - Build module including final link'
+ 	@echo  '  prepare         - Set up for building external modules'
+-	@echo  '  tags/TAGS	  - Generate tags file for editors'
++	@echo  '  {tags,TAGS}     - Generate tags file for {vi,emacs} editors'
+ 	@echo  '  cscope	  - Generate cscope index'
+ 	@echo  '  kernelrelease	  - Output the release version string'
+ 	@echo  '  kernelversion	  - Output the version stored in Makefile'
+========================================================================
+Robert P. J. Day
+Linux Consulting, Training and Annoying Kernel Pedantry:
+    Have classroom, will lecture.
 
-	Ingo
+http://crashcourse.ca                          Waterloo, Ontario, CANADA
+========================================================================
