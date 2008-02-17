@@ -1,67 +1,56 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from astoria.ccjclearline.com ([64.235.106.9]:53759 "EHLO
-	astoria.ccjclearline.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752722AbYBQKk0 (ORCPT
+Received: from yergi.telenet-ops.be ([195.130.132.36]:37703 "EHLO
+	yergi.telenet-ops.be" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751728AbYBQNMx (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 17 Feb 2008 05:40:26 -0500
-Date: Sun, 17 Feb 2008 05:40:18 -0500 (EST)
-From: "Robert P. J. Day" <rpjday@crashcourse.ca>
-Subject: Re: ccflags-y versus EXTRA_CFLAGS??
-In-Reply-To: <20080216222432.GB16599@uranus.ravnborg.org>
-Message-ID: <alpine.LFD.1.00.0802170533570.9596@localhost.localdomain>
-References: <alpine.LFD.1.00.0802161615400.3910@localhost.localdomain> <20080216212618.GA16599@uranus.ravnborg.org> <alpine.LFD.1.00.0802161632260.4111@localhost.localdomain> <20080216222432.GB16599@uranus.ravnborg.org>
+	Sun, 17 Feb 2008 08:12:53 -0500
+Received: from wilson.telenet-ops.be (unknown [195.130.132.42])
+	by yergi.telenet-ops.be (Postfix) with ESMTP id E6A635C8D0F
+	for <linux-kbuild@vger.kernel.org>; Sun, 17 Feb 2008 14:12:53 +0100 (CET)
+Date: Sun, 17 Feb 2008 14:12:10 +0100 (CET)
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Subject: [PATCH] modpost: Fix reversed symbol name order
+Message-ID: <Pine.LNX.4.64.0802171411400.19269@anakin>
 MIME-Version: 1.0
 Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Sam Ravnborg <sam@ravnborg.org>
-Cc: kbuild devel list <linux-kbuild@vger.kernel.org>
+Cc: linux-kbuild@vger.kernel.org, Linux Kernel Development <linux-kernel@vger.kernel.org>
 
-On Sat, 16 Feb 2008, Sam Ravnborg wrote:
+XXXINIT_TO_INIT and XXXEXIT_TO_EXIT warnings use the reversed symbol name order
+in the suggestion, e.g.:
 
-> On Sat, Feb 16, 2008 at 04:44:44PM -0500, Robert P. J. Day wrote:
-> > On Sat, 16 Feb 2008, Sam Ravnborg wrote:
-> >
-> > > On Sat, Feb 16, 2008 at 04:21:18PM -0500, Robert P. J. Day wrote:
-> > > >
-> > > >   IIRC, there are a number of deprecated variables and preferred
-> > > > forms, along the lines of:
-> > > >
-> > > >   ccflags-y -> EXTRA_CFLAGS
-> > > >   asflags-y -> EXTRA_AFLAGS
-> > >
-> > > ccflags-y, asflags are preferred.
-> >
-> > ah, it goes the other way.  (i'm assuming you really meant asflags-y
-> > above, and this would also include EXTRA_LDFLAGS -> ldflags-y, yes?)
->
-> Yes - all three of them. And yes they have the -y postfix all of them.
->
-> A simple git log Documentation/kbuild/makefiles.txt would have told
-> you the story and what is preferred.
+    WARNING: vmlinux.o(.meminit.text+0x36c): Section mismatch in reference from the function free_area_init_core() to the function .init.text:setup_usemap()
+    The function __meminit free_area_init_core() references
+    a function __init setup_usemap().
+    If free_area_init_core is only used by setup_usemap then
+    annotate free_area_init_core with a matching annotation.
 
-i *have* read that file and, after grepping through the source tree,
-i'm still confused.  as a simple example, consider the possible
-variables for assembler flags.  so far, i've found occurrences of:
+Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
+---
+ scripts/mod/modpost.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-  * AFLAGS
-  * EXTRA_AFLAGS
-  * ASFLAGS
-  * AFLAGS-y
-  * KBUILD_AFLAGS
-  * aflags-y
-  * asflags-y
-  * extra-aflags-y
+--- a/scripts/mod/modpost.c
++++ b/scripts/mod/modpost.c
+@@ -1200,7 +1200,7 @@ static void report_sec_mismatch(const ch
+ 		"annotate %s with a matching annotation.\n",
+ 		from, sec2annotation(fromsec), fromsym, from_p,
+ 		to, sec2annotation(tosec), tosym, to_p,
+-		fromsym, tosym, fromsym);
++		tosym, fromsym, tosym);
+ 		break;
+ 	case INIT_TO_EXIT:
+ 		fprintf(stderr,
 
-should i continue?  and you're suggesting that reading that docs file
-is going to clarify all of this?  really?  good luck.
+Gr{oetje,eeting}s,
 
-rday
+						Geert
+
 --
-========================================================================
-Robert P. J. Day
-Linux Consulting, Training and Annoying Kernel Pedantry:
-    Have classroom, will lecture.
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
 
-http://crashcourse.ca                          Waterloo, Ontario, CANADA
-========================================================================
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+							    -- Linus Torvalds
