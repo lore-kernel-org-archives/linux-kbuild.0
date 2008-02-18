@@ -1,54 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from astoria.ccjclearline.com ([64.235.106.9]:38112 "EHLO
+Received: from astoria.ccjclearline.com ([64.235.106.9]:39947 "EHLO
 	astoria.ccjclearline.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751141AbYBRSUI (ORCPT
+	with ESMTP id S1757898AbYBRTbu (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 18 Feb 2008 13:20:08 -0500
-Date: Mon, 18 Feb 2008 13:20:00 -0500 (EST)
+	Mon, 18 Feb 2008 14:31:50 -0500
+Received: from cpe001d60ad7267-cm001225dbafb6.cpe.net.cable.rogers.com ([99.236.100.208] helo=crashcourse.ca)
+	by astoria.ccjclearline.com with esmtpsa (TLSv1:AES256-SHA:256)
+	(Exim 4.68)
+	(envelope-from <rpjday@crashcourse.ca>)
+	id 1JRBiO-0002Yy-7H
+	for linux-kbuild@vger.kernel.org; Mon, 18 Feb 2008 14:31:48 -0500
+Date: Mon, 18 Feb 2008 14:31:44 -0500 (EST)
 From: "Robert P. J. Day" <rpjday@crashcourse.ca>
-Subject: Re: packaging issues:  some serious, some not so serious
-In-Reply-To: <20080218181747.GA23691@uranus.ravnborg.org>
-Message-ID: <alpine.LFD.1.00.0802181319160.4194@localhost.localdomain>
-References: <alpine.LFD.1.00.0802181054100.9323@localhost.localdomain> <20080218181747.GA23691@uranus.ravnborg.org>
+Subject: "remote" packaging is definitely broken
+Message-ID: <alpine.LFD.1.00.0802181428390.4487@localhost.localdomain>
 MIME-Version: 1.0
 Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: kbuild devel list <linux-kbuild@vger.kernel.org>
+To: kbuild devel list <linux-kbuild@vger.kernel.org>
 
-On Mon, 18 Feb 2008, Sam Ravnborg wrote:
 
-> I would much rather you persuaded your earlier idea list all the
-> directories to visit. This list is known and easy to maintain
-> whereas a blacklist like we have now only will grow bigger over
-> time.
->
-> We could add something like:
-> diff --git a/Makefile b/Makefile
-> index 0d585c0..fb5bbc3 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -358,6 +358,11 @@ export MODVERDIR := $(if $(KBUILD_EXTMOD),$(firstword $(KBU
->  RCS_FIND_IGNORE := \( -name SCCS -o -name BitKeeper -o -name .svn -o -name CVS
->  export RCS_TAR_IGNORE := --exclude SCCS --exclude BitKeeper --exclude .svn --ex
->
-> +# all dirs
-> +KBUILD_ALL_DIRS := arch block crypto Documentation drivers fs include init
-> +KBUILD_ALL_DIRS += ipc net samples scripts security sound usr virt
-> +export KBUILD_ALL_DIRS
-> +
->  # ===========================================================================
->  # Rules shared between *config targets and build targets
->
->
-> And then use this definition in all find / tar operations.
-> We do not need to change everything in one go as the old RCS_TAR_IGNORE
-> and RCS_FIND_IGNORE can continue as is for a while.
->
-> Can you please try out this approach?
+  i'm sure you're excited to hear from me again, but i've found a few
+more bugs in the packaging targets.  one appears to be fairly obvious
+-- from scripts/package/Makefile:
 
-sure, i prefer that strategy anyway.  let me work on it.
+...
+rpm-pkg rpm: $(objtree)/kernel.spec FORCE
+        $(MAKE) clean
+        $(PREV) ln -sf $(srctree) $(KERNELPATH)
+        $(PREV) tar -cz $(RCS_TAR_IGNORE) -f $(KERNELPATH).tar.gz $(KERNELPATH)/.
+        $(PREV) rm $(KERNELPATH)
+...
+
+  if you're packaging remotely (that is, using "make O=..."), you can
+see how the kernel.spec file is created in the obj dir, but it's the
+src dir that's bundled up with tar.  pretty sure that's not going to
+work, but i haven't looked closely enough to know if a simple textual
+change there is going to fix it -- i'm currently fighting off a wicked
+cold and am only marginally coherent.
+
+  there's one more flaw in packaging, but i'll flesh it out more
+completely before i post it.
 
 rday
 --
