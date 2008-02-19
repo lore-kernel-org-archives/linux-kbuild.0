@@ -1,53 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from astoria.ccjclearline.com ([64.235.106.9]:40031 "EHLO
+Received: from astoria.ccjclearline.com ([64.235.106.9]:57989 "EHLO
 	astoria.ccjclearline.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752795AbYBRTev (ORCPT
+	with ESMTP id S1752471AbYBSJoX (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 18 Feb 2008 14:34:51 -0500
-Received: from cpe001d60ad7267-cm001225dbafb6.cpe.net.cable.rogers.com ([99.236.100.208] helo=crashcourse.ca)
-	by astoria.ccjclearline.com with esmtpsa (TLSv1:AES256-SHA:256)
-	(Exim 4.68)
-	(envelope-from <rpjday@crashcourse.ca>)
-	id 1JRBlL-0002ed-T0
-	for linux-kbuild@vger.kernel.org; Mon, 18 Feb 2008 14:34:51 -0500
-Date: Mon, 18 Feb 2008 14:34:46 -0500 (EST)
+	Tue, 19 Feb 2008 04:44:23 -0500
+Date: Tue, 19 Feb 2008 04:43:56 -0500 (EST)
 From: "Robert P. J. Day" <rpjday@crashcourse.ca>
-Subject: [PATCH] KBUILD:  Remove meaningless comment from Makefile.
-Message-ID: <alpine.LFD.1.00.0802181432570.4650@localhost.localdomain>
+Subject: Re: packaging issues:  some serious, some not so serious
+In-Reply-To: <20080218181747.GA23691@uranus.ravnborg.org>
+Message-ID: <alpine.LFD.1.00.0802190442500.25509@localhost.localdomain>
+References: <alpine.LFD.1.00.0802181054100.9323@localhost.localdomain> <20080218181747.GA23691@uranus.ravnborg.org>
 MIME-Version: 1.0
 Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: kbuild devel list <linux-kbuild@vger.kernel.org>
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: kbuild devel list <linux-kbuild@vger.kernel.org>
 
+On Mon, 18 Feb 2008, Sam Ravnborg wrote:
 
-Given that there is no usage of a TAR_IGNORE variable, that initial
-comment can be tossed.
+> We could add something like:
+> diff --git a/Makefile b/Makefile
+> index 0d585c0..fb5bbc3 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -358,6 +358,11 @@ export MODVERDIR := $(if $(KBUILD_EXTMOD),$(firstword $(KBU
+>  RCS_FIND_IGNORE := \( -name SCCS -o -name BitKeeper -o -name .svn -o -name CVS
+>  export RCS_TAR_IGNORE := --exclude SCCS --exclude BitKeeper --exclude .svn --ex
+>
+> +# all dirs
+> +KBUILD_ALL_DIRS := arch block crypto Documentation drivers fs include init
+> +KBUILD_ALL_DIRS += ipc net samples scripts security sound usr virt
+> +export KBUILD_ALL_DIRS
+> +
 
-Signed-off-by: Robert P. J. Day <rpjday@crashcourse.ca>
+would you not also need to include the regular files at the top of the
+source tree as well?  for some of the packaging targets, those files
+should be included as well.
 
----
+rday
+--
 
-sam,
-
-  might as well just add this to the accumulating typoes patch if
-you want, unless you've already fixed this.
-
-diff --git a/scripts/package/Makefile b/scripts/package/Makefile
-index 5e32607..eb23656 100644
---- a/scripts/package/Makefile
-+++ b/scripts/package/Makefile
-@@ -1,10 +1,6 @@
- # Makefile for the different targets used to generate full packages of a kernel
- # It uses the generic clean infrastructure of kbuild
-
--# Ignore the following files/directories during tar operation
--TAR_IGNORE := --exclude SCCS --exclude BitKeeper --exclude .svn --exclude CVS
--
--
- # RPM target
- # ---------------------------------------------------------------------------
- # The rpm target generates two rpm files:
 ========================================================================
 Robert P. J. Day
 Linux Consulting, Training and Annoying Kernel Pedantry:
