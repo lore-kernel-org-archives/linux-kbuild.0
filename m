@@ -1,88 +1,87 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from astoria.ccjclearline.com ([64.235.106.9]:43114 "EHLO
-	astoria.ccjclearline.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752196AbYBSRiA (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 19 Feb 2008 12:38:00 -0500
-Received: from cpe001d60ad7267-cm001225dbafb6.cpe.net.cable.rogers.com ([99.236.100.208] helo=crashcourse.ca)
-	by astoria.ccjclearline.com with esmtpsa (TLSv1:AES256-SHA:256)
-	(Exim 4.68)
-	(envelope-from <rpjday@crashcourse.ca>)
-	id 1JRWPp-0006UV-5g
-	for linux-kbuild@vger.kernel.org; Tue, 19 Feb 2008 12:38:01 -0500
-Date: Tue, 19 Feb 2008 12:37:53 -0500 (EST)
-From: "Robert P. J. Day" <rpjday@crashcourse.ca>
-Subject: one more packaging bug
-Message-ID: <alpine.LFD.1.00.0802191224020.14991@localhost.localdomain>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+Received: from pasmtpb.tele.dk ([80.160.77.98]:33040 "EHLO pasmtpB.tele.dk"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751679AbYBSULF (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 19 Feb 2008 15:11:05 -0500
+Date: Tue, 19 Feb 2008 21:11:14 +0100
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: [GIT PULL] 2 x kbuild fixes
+Message-ID: <20080219201114.GA12272@uranus.ravnborg.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: kbuild devel list <linux-kbuild@vger.kernel.org>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: LKML <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
+
+Hi Linus.
+
+Please pull two kbuild fixes from:
+  ssh://master.kernel.org/pub/scm/linux/kernel/git/sam/kbuild-linus.git
+
+Note - new git tree to avoid clash with new stuff.
+Full diff below the details.
+
+	Sam
 
 
-  from a drug-induced fog of semi-coherence, here's what seems to be
-an obvious bug in "make rpm-pkg".  the tail end of the output:
+Geert Uytterhoeven (1):
+      kbuild: fix reversed symbol name order in modpost
 
-Processing files: kernel-2.6.25rc200114g9a4c854dirty-1
-error: File not found: /var/tmp/kernel-2.6.25rc200114g9a4c854dirty-root/lib/modules/2.6.25-rc2-00114-g9a4c854-dirty
-Checking for unpackaged file(s): /usr/lib/rpm/check-files /var/tmp/kernel-2.6.25rc200114g9a4c854dirty-root
-error: Installed (but unpackaged) file(s) found:
-   /lib/modules/2.6.25-rc2/build
-   /lib/modules/2.6.25-rc2/kernel/drivers/scsi/scsi_wait_scan.ko
-   /lib/modules/2.6.25-rc2/modules.alias
-   /lib/modules/2.6.25-rc2/modules.ccwmap
-   /lib/modules/2.6.25-rc2/modules.dep
-   /lib/modules/2.6.25-rc2/modules.ieee1394map
-   /lib/modules/2.6.25-rc2/modules.inputmap
-   /lib/modules/2.6.25-rc2/modules.isapnpmap
-   /lib/modules/2.6.25-rc2/modules.ofmap
-   /lib/modules/2.6.25-rc2/modules.order
-   /lib/modules/2.6.25-rc2/modules.pcimap
-   /lib/modules/2.6.25-rc2/modules.seriomap
-   /lib/modules/2.6.25-rc2/modules.symbols
-   /lib/modules/2.6.25-rc2/modules.usbmap
-   /lib/modules/2.6.25-rc2/source
+Sam Ravnborg (1):
+      Add missing init section definitions
 
+ include/asm-generic/vmlinux.lds.h |    3 +++
+ include/linux/init.h              |    2 ++
+ scripts/mod/modpost.c             |    2 +-
+ 3 files changed, 6 insertions(+), 1 deletions(-)
 
-RPM build errors:
-    File not found: /var/tmp/kernel-2.6.25rc200114g9a4c854dirty-root/lib/modules/2.6.25-rc2-00114-g9a4c854-dirty
-    Installed (but unpackaged) file(s) found:
-   /lib/modules/2.6.25-rc2/build
-   /lib/modules/2.6.25-rc2/kernel/drivers/scsi/scsi_wait_scan.ko
-   /lib/modules/2.6.25-rc2/modules.alias
-   /lib/modules/2.6.25-rc2/modules.ccwmap
-   /lib/modules/2.6.25-rc2/modules.dep
-   /lib/modules/2.6.25-rc2/modules.ieee1394map
-   /lib/modules/2.6.25-rc2/modules.inputmap
-   /lib/modules/2.6.25-rc2/modules.isapnpmap
-   /lib/modules/2.6.25-rc2/modules.ofmap
-   /lib/modules/2.6.25-rc2/modules.order
-   /lib/modules/2.6.25-rc2/modules.pcimap
-   /lib/modules/2.6.25-rc2/modules.seriomap
-   /lib/modules/2.6.25-rc2/modules.symbols
-   /lib/modules/2.6.25-rc2/modules.usbmap
-   /lib/modules/2.6.25-rc2/source
-make[1]: *** [rpm-pkg] Error 1
-make: *** [rpm-pkg] Error 2
+diff --git a/include/asm-generic/vmlinux.lds.h b/include/asm-generic/vmlinux.lds.h
+index f784d2f..f054778 100644
+--- a/include/asm-generic/vmlinux.lds.h
++++ b/include/asm-generic/vmlinux.lds.h
+@@ -238,6 +238,9 @@
+ 		*(.kprobes.text)					\
+ 		VMLINUX_SYMBOL(__kprobes_text_end) = .;
+ 
++/* Section used for early init (in .S files) */
++#define HEAD_TEXT  *(.head.text)
++
+ /* init and exit section handling */
+ #define INIT_DATA							\
+ 	*(.init.data)							\
+diff --git a/include/linux/init.h b/include/linux/init.h
+index a404a00..fb58c04 100644
+--- a/include/linux/init.h
++++ b/include/linux/init.h
+@@ -42,6 +42,7 @@
+    discard it in modules) */
+ #define __init		__section(.init.text) __cold
+ #define __initdata	__section(.init.data)
++#define __initconst	__section(.init.rodata)
+ #define __exitdata	__section(.exit.data)
+ #define __exit_call	__used __section(.exitcall.exit)
+ 
+@@ -106,6 +107,7 @@
+ #define __memexitconst   __section(.memexit.rodata)
+ 
+ /* For assembly routines */
++#define __HEAD		.section	".head.text","ax"
+ #define __INIT		.section	".init.text","ax"
+ #define __FINIT		.previous
+ 
+diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
+index 6174277..695b5d6 100644
+--- a/scripts/mod/modpost.c
++++ b/scripts/mod/modpost.c
+@@ -1200,7 +1200,7 @@ static void report_sec_mismatch(const char *modname, enum mismatch mismatch,
+ 		"annotate %s with a matching annotation.\n",
+ 		from, sec2annotation(fromsec), fromsym, from_p,
+ 		to, sec2annotation(tosec), tosym, to_p,
+-		fromsym, tosym, fromsym);
++		tosym, fromsym, tosym);
+ 		break;
+ 	case INIT_TO_EXIT:
+ 		fprintf(stderr,
 
-  the problem seems obvious -- the "name" of the eventual package is
-designed to be some variation of the output of "git describe", which
-could very well look like, well, "2.6.25rc200114g9a4c854dirty-root"
-
-  but when rpmbuild is trying to create the package, i'm guessing it
-whacks off everything after the second "-" since those symbols mean
-something special to rpmbuild.  thus, you get the truncated directory
-name of "2.6.25-rc2", which doesn't match what the packaging script is
-expecting, and it chokes.  just need to make all those names
-consistent, i'm guessing.
-
-rday
---
-========================================================================
-Robert P. J. Day
-Linux Consulting, Training and Annoying Kernel Pedantry:
-    Have classroom, will lecture.
-
-http://crashcourse.ca                          Waterloo, Ontario, CANADA
-========================================================================
