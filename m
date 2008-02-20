@@ -1,87 +1,31 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pasmtpb.tele.dk ([80.160.77.98]:33040 "EHLO pasmtpB.tele.dk"
+Received: from mail.suse.de ([195.135.220.2]:50621 "EHLO mx1.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751679AbYBSULF (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 19 Feb 2008 15:11:05 -0500
-Date: Tue, 19 Feb 2008 21:11:14 +0100
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: [GIT PULL] 2 x kbuild fixes
-Message-ID: <20080219201114.GA12272@uranus.ravnborg.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+	id S1753079AbYBTSME (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 20 Feb 2008 13:12:04 -0500
+From: Andi Kleen <ak@suse.de>
+Subject: rebuilding object files from asm files
+Date: Wed, 20 Feb 2008 19:12:00 +0100
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Content-Disposition: inline
+Message-Id: <200802201912.00091.ak@suse.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: LKML <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
-
-Hi Linus.
-
-Please pull two kbuild fixes from:
-  ssh://master.kernel.org/pub/scm/linux/kernel/git/sam/kbuild-linus.git
-
-Note - new git tree to avoid clash with new stuff.
-Full diff below the details.
-
-	Sam
+To: sam@ravnborg.org
+Cc: linux-kbuild@vger.kernel.org
 
 
-Geert Uytterhoeven (1):
-      kbuild: fix reversed symbol name order in modpost
+Here's a small kbuild quirk I noticed on 2.6.25rc2. I tried to rebuild
+the obj file of a assembler file (.S) with make path/to/file.o.
 
-Sam Ravnborg (1):
-      Add missing init section definitions
+Normally when I do this for .o file only its dependencies and 
+and the object file are built as I expect.
 
- include/asm-generic/vmlinux.lds.h |    3 +++
- include/linux/init.h              |    2 ++
- scripts/mod/modpost.c             |    2 +-
- 3 files changed, 6 insertions(+), 1 deletions(-)
+But with an assembler file (like arch/x86/kernel/head_64.o) kbuild
+starts to rebuild everything. 
 
-diff --git a/include/asm-generic/vmlinux.lds.h b/include/asm-generic/vmlinux.lds.h
-index f784d2f..f054778 100644
---- a/include/asm-generic/vmlinux.lds.h
-+++ b/include/asm-generic/vmlinux.lds.h
-@@ -238,6 +238,9 @@
- 		*(.kprobes.text)					\
- 		VMLINUX_SYMBOL(__kprobes_text_end) = .;
- 
-+/* Section used for early init (in .S files) */
-+#define HEAD_TEXT  *(.head.text)
-+
- /* init and exit section handling */
- #define INIT_DATA							\
- 	*(.init.data)							\
-diff --git a/include/linux/init.h b/include/linux/init.h
-index a404a00..fb58c04 100644
---- a/include/linux/init.h
-+++ b/include/linux/init.h
-@@ -42,6 +42,7 @@
-    discard it in modules) */
- #define __init		__section(.init.text) __cold
- #define __initdata	__section(.init.data)
-+#define __initconst	__section(.init.rodata)
- #define __exitdata	__section(.exit.data)
- #define __exit_call	__used __section(.exitcall.exit)
- 
-@@ -106,6 +107,7 @@
- #define __memexitconst   __section(.memexit.rodata)
- 
- /* For assembly routines */
-+#define __HEAD		.section	".head.text","ax"
- #define __INIT		.section	".init.text","ax"
- #define __FINIT		.previous
- 
-diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index 6174277..695b5d6 100644
---- a/scripts/mod/modpost.c
-+++ b/scripts/mod/modpost.c
-@@ -1200,7 +1200,7 @@ static void report_sec_mismatch(const char *modname, enum mismatch mismatch,
- 		"annotate %s with a matching annotation.\n",
- 		from, sec2annotation(fromsec), fromsym, from_p,
- 		to, sec2annotation(tosec), tosym, to_p,
--		fromsym, tosym, fromsym);
-+		tosym, fromsym, tosym);
- 		break;
- 	case INIT_TO_EXIT:
- 		fprintf(stderr,
+-Andi
 
