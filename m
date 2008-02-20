@@ -1,58 +1,29 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pasmtpa.tele.dk ([80.160.77.114]:52635 "EHLO pasmtpA.tele.dk"
+Received: from ns.suse.de ([195.135.220.2]:36118 "EHLO mx1.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755569AbYBTTPw (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 20 Feb 2008 14:15:52 -0500
-Date: Wed, 20 Feb 2008 20:16:02 +0100
-From: Sam Ravnborg <sam@ravnborg.org>
+	id S1760815AbYBTTto (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 20 Feb 2008 14:49:44 -0500
+Message-ID: <47BC84BC.6010303@suse.de>
+Date: Wed, 20 Feb 2008 20:51:24 +0100
+From: Andi Kleen <ak@suse.de>
+MIME-Version: 1.0
 Subject: Re: rebuilding object files from asm files
-Message-ID: <20080220191602.GA21139@uranus.ravnborg.org>
-References: <200802201912.00091.ak@suse.de>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <200802201912.00091.ak@suse.de>
+References: <200802201912.00091.ak@suse.de> <20080220191602.GA21139@uranus.ravnborg.org>
+In-Reply-To: <20080220191602.GA21139@uranus.ravnborg.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andi Kleen <ak@suse.de>
+To: Sam Ravnborg <sam@ravnborg.org>
 Cc: linux-kbuild@vger.kernel.org
 
-Hi Andi.
 
-On Wed, Feb 20, 2008 at 07:12:00PM +0100, Andi Kleen wrote:
+> So building head_64.o requires a visit of all directories listed
+> in vmlinux-dirs before it can build head_64.o.
 > 
-> Here's a small kbuild quirk I noticed on 2.6.25rc2. I tried to rebuild
-> the obj file of a assembler file (.S) with make path/to/file.o.
-> 
-> Normally when I do this for .o file only its dependencies and 
-> and the object file are built as I expect.
-> 
-> But with an assembler file (like arch/x86/kernel/head_64.o) kbuild
-> starts to rebuild everything. 
+> I do not see any clean way to fix this :-(
 
-Took a look at this.
-You will notice that there is a difference in the behaviour
-betweet arch/x86/kernel/entry_64.o and head_64.o from same dir.
-For entry_64.o it works as expected.
+I see. Thanks for the investigation. If it only affects head_64.S
+I guess it is not so bad.
 
-The 'problem' is that kbuild when deciding to use the rule:
-%.o: %.S prepare scripts FORCE
-        $(Q)$(MAKE) $(build)=$(build-dir) $(target-dir)$(notdir $@)
-
-Already have done most of the work and mainly is has defined
-the dependencies for vmlinux.
-As head_64.o is listed in $(head-y) kbuild do as
-told in following rule:
-
-Note: vmlinux-init is equal to $(head-y) + $(init-y)
-
-# The actual objects are generated when descending,
-# make sure no implicit rule kicks in
-$(sort $(vmlinux-init) $(vmlinux-main)) $(vmlinux-lds): $(vmlinux-dirs) ;
-
-So building head_64.o requires a visit of all directories listed
-in vmlinux-dirs before it can build head_64.o.
-
-I do not see any clean way to fix this :-(
-
-	Sam
+-Andi
