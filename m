@@ -1,37 +1,29 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pasmtpa.tele.dk ([80.160.77.114]:48511 "EHLO pasmtpA.tele.dk"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751142AbYBTUBP (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 20 Feb 2008 15:01:15 -0500
-Date: Wed, 20 Feb 2008 21:01:25 +0100
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: rebuilding object files from asm files
-Message-ID: <20080220200125.GF21139@uranus.ravnborg.org>
-References: <200802201912.00091.ak@suse.de> <20080220191602.GA21139@uranus.ravnborg.org> <47BC84BC.6010303@suse.de>
-Mime-Version: 1.0
+Received: from gprs189-60.eurotel.cz ([160.218.189.60]:43082 "EHLO amd.ucw.cz"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1754979AbYBUNGE (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 21 Feb 2008 08:06:04 -0500
+Date: Thu, 21 Feb 2008 14:05:28 +0100
+From: Pavel Machek <pavel@ucw.cz>
+Subject: make clean does not remove vmlinux.bin.all
+Message-ID: <20080221130528.GA20053@elf.ucw.cz>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <47BC84BC.6010303@suse.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andi Kleen <ak@suse.de>
-Cc: linux-kbuild@vger.kernel.org
+To: kernel list <linux-kernel@vger.kernel.org>, sam@ravnborg.org, linux-kbuild@vger.kernel.org, Ingo Molnar <mingo@elte.hu>
 
-On Wed, Feb 20, 2008 at 08:51:24PM +0100, Andi Kleen wrote:
-> 
-> > So building head_64.o requires a visit of all directories listed
-> > in vmlinux-dirs before it can build head_64.o.
-> > 
-> > I do not see any clean way to fix this :-(
-> 
-> I see. Thanks for the investigation. If it only affects head_64.S
-> I guess it is not so bad.
 
-All of:
-head-y                := arch/x86/kernel/head_$(BITS).o
-head-$(CONFIG_X86_64) += arch/x86/kernel/head64.o
-head-y                += arch/x86/kernel/init_task.o
+...which is pretty big...
 
-But thats limited anyway.
+arch/x86/boot/compressed$ du -sh *
+16K     relocs
+8.4M    vmlinux.bin.all
 
-	Sam
+(note that I'm using separate object/source directories, but it should
+not matter here).
+								Pavel
+-- 
+(english) http://www.livejournal.com/~pavelmachek
+(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blog.html
