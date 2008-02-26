@@ -1,76 +1,99 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from 1wt.eu ([62.212.114.60]:2130 "EHLO 1wt.eu"
+Received: from smtp4.pp.htv.fi ([213.243.153.38]:42814 "EHLO smtp4.pp.htv.fi"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754209AbYBYXVi (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 25 Feb 2008 18:21:38 -0500
-Date: Tue, 26 Feb 2008 00:21:33 +0100
-From: Willy Tarreau <w@1wt.eu>
+	id S1754059AbYBZJP7 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 26 Feb 2008 04:15:59 -0500
+Date: Tue, 26 Feb 2008 11:14:55 +0200
+From: Adrian Bunk <bunk@kernel.org>
 Subject: Re: [PATCH] Compress kernel modules on installation.
-Message-ID: <20080225232133.GZ8953@1wt.eu>
-References: <20080225214209.a3f79327.sbrokenshire@xestia.co.uk> <8499950a0802251417l7a2fff25q7fa57fce57369b1b@mail.gmail.com> <20080225221953.GX8953@1wt.eu> <8499950a0802251432q1e59e542nfa06f66becef63aa@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Message-ID: <20080226091455.GA3498@cs181133002.pp.htv.fi>
+References: <20080225214209.a3f79327.sbrokenshire@xestia.co.uk> <20080225222137.GY8953@1wt.eu>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <8499950a0802251432q1e59e542nfa06f66becef63aa@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20080225222137.GY8953@1wt.eu>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Oleg Verych <olecom@gmail.com>
+To: Willy Tarreau <w@1wt.eu>
 Cc: Steve Brokenshire <sbrokenshire@xestia.co.uk>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-On Mon, Feb 25, 2008 at 11:32:44PM +0100, Oleg Verych wrote:
-> On Mon, Feb 25, 2008 at 11:19 PM, Willy Tarreau:
-> >
-> > On Mon, Feb 25, 2008 at 11:17:23PM +0100, Oleg Verych wrote:
-> >  > On Mon, Feb 25, 2008 at 10:42 PM, Steve Brokenshire:
-> >  > > Hi,
-> >  > >
-> >  > >  (I've sent this to the linux-kbuild and linux-kernel lists as this
-> >  > >  patch modifies the Makefile.modinst file. I also don't subscribe to the
-> >  > >  linux-kbuild and linux-kernel mailing lists so can I have any replies
-> >  > >  CC'ed to me please)
-> >  >
-> >  > And what if i like bzip2 (yea sometimes better) or 7zip (better if !EMBEDDED)
-> >  > or whatever?
-> >  >
-> >  > It's pure user/distro question.
-> >
-> >  not exactly, as only gzip is supported by module-init-tools. However,
-> >  if you come up with a patch to implement lzma or equivalent for
-> >  module-init-tools, it may be useful.
+On Mon, Feb 25, 2008 at 11:21:38PM +0100, Willy Tarreau wrote:
+> On Mon, Feb 25, 2008 at 09:42:09PM +0000, Steve Brokenshire wrote:
+> > Hi,
+> > 
+> > (I've sent this to the linux-kbuild and linux-kernel lists as this
+> > patch modifies the Makefile.modinst file. I also don't subscribe to the 
+> > linux-kbuild and linux-kernel mailing lists so can I have any replies
+> > CC'ed to me please)
+> > 
+> > This patch allows kernel modules to be compressed when 'make
+> > modules_install' is run after being copied to
+> > the /lib/module/<version>/<...> directory which is useful if you have
+> > module-init-tools installed with --enable-zlib. This patch adds an
+> > option (MODULE_COMPRESS) to the kernel configuration file (specifically
+> > init/Kconfig) so that the kernel modules will compressed if
+> > MODULE_COMPRESS is set.
+> > 
+> > When MODULE_COMPRESS is set the output of 'make modules_install' will
+> > go as the following:
+> > 
+> > INSTALL  drivers/fs/xfs/xfs.ko
+> > COMPRESS drivers/fs/xfs/xfs.ko
+> > INSTALL  drivers/fs/fat/fat.ko
+> > COMPRESS drivers/fs/fat/fat.ko
+> > ...
+> > 
+> > I've tested my patch on kernel versions 2.6.24.2, 2.6.24-git12, 2.6.23.14 and
+> > 2.6.19 and they compile, install and compress into the respective
+> > module directories without any errors.
+> > 
+> > I've also tested this with the uvcvideo (linux-uvc) kernel module (from
+> > the SVN branch and with kernel versions 2.6.24.2, 2.6.24-git12, 2.6.23.14 and
+> > 2.6.19) as that uses Kbuild properly when installing the module and
+> > after installing the uvcvideo the module is then compressed.
+> > Unfortunately, I couldn't find any other kernel modules which used the
+> > Kbuild system for installing their kernel modules. :(
+> > 
+> > I've included include/config/auto.conf in Makefile.modinst so that it
+> > can check if MODULE_COMPRESS is set when installing the kernel modules.
+> > 
+> > Unfortunately when I ran mkinitrd (CentOS version) to create the initrd
+> > image to go with the kernel, I get errors saying that certain kernel
+> > modules don't exist despite the fact they do actually exist. When I
+> > pass --allow-missing to mkinitrd, it seems to go fine but when booting
+> > up with the system with the new initrd image I get error messages
+> > saying that the modules don't exist.
+> > 
+> > A workaround is to compile the modules, don't have MODULE_COMPRESS set 
+> > in .config, install the modules, run mkinitrd and copy it to /boot, set 
+> > MODULE_COMPRESS in .config and then install the modules again but
+> > compressed.
+> > 
+> > That's about it really. The only showstopper I feel is mkinitrd not
+> > working properly with the compressed kernel modules.
 > 
-> Oh, come on! It's userspace,
+> Have you tried keeping the module names intact (.ko, not .ko.gz) ?
+> It's what I was doing with modutils in 2.4 and what I'm still doing
+> with module-init-tools in 2.6. While I don't particularly use mkinitrd,
+> I think that keeping the name intact is preferable and should help.
 
-and your point is ... ?
+How would you see if, and if yes with what program, a module was 
+compressed if the name is kept intact?
 
-> i have scripts managing existence/compression
-> on per-file basis on my comp.
+I'd assume stuff like mkinitrd simply also needs to gain knowledge about 
+compressed modules.
 
-I'm definitely happy for you.
+> Regards,
+> Willy
 
-> If most distros just drop thousands of useless
-> (sometimes compressed) stuff to your harddisk, it's not kernel's or
-> modules-init-tools' problem.
+cu
+Adrian
 
-who said there was a problem ?
+-- 
 
-> Also having compressed over compressed stuff, like on initramfs booting image
-> with such modules (if by defaults) may cause bigger file, more CPU overhead.
-
-Already known and obvious, thanks. But that's unrelated to the initial post.
-
-> It is userspace and all that policy stuff, etc., etc.
-
-A makefile is userspace too. I still fail to see your point.
- 
-> Want to make a minidistro on lkml? Well, i see klibc working fine already.
-
-Huh? drinking before posting does no good it seems... :-)
-
-Steve proposed a simple patch to ease modules compression during the
-build process. Obviously it's userspace (as all the build process,
-mind you). And there's nothing dirty nor funny there. Maybe you just
-don't understand what it's useful for, but in this case it simply means
-you don't need this feature :-)
-
-Willy
+       "Is there not promise of rain?" Ling Tan asked suddenly out
+        of the darkness. There had been need of rain for many days.
+       "Only a promise," Lao Er said.
+                                       Pearl S. Buck - Dragon Seed
 
