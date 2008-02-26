@@ -1,75 +1,98 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp5.pp.htv.fi ([213.243.153.39]:58922 "EHLO smtp5.pp.htv.fi"
+Received: from pasmtpb.tele.dk ([80.160.77.98]:51108 "EHLO pasmtpB.tele.dk"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751529AbYBZS0v (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 26 Feb 2008 13:26:51 -0500
-Date: Tue, 26 Feb 2008 20:25:45 +0200
-From: Adrian Bunk <bunk@kernel.org>
-Subject: Re: [BUILD_FAILURE] Linux 2.6.25-rc3 - various unexported
-	functions () on powerpc
-Message-ID: <20080226182545.GE8287@cs181133002.pp.htv.fi>
-References: <alpine.LFD.1.00.0802241354200.14934@woody.linux-foundation.org> <47C42234.6060906@linux.vnet.ibm.com> <20080226151512.GA10717@cs181133002.pp.htv.fi> <47C457F5.4080902@linux.vnet.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+	id S1761092AbYBZTl0 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 26 Feb 2008 14:41:26 -0500
+Date: Tue, 26 Feb 2008 20:40:58 +0100
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Kconfig configuration restore bug [Was: x86: vSMP selection in config]
+Message-ID: <20080226194058.GA31438@uranus.ravnborg.org>
+References: <200802210258.45011.yinghai.lu@sun.com> <200802241832.37850.yinghai.lu@sun.com> <200802242136.28744.yinghai.lu@sun.com> <200802242243.49576.yinghai.lu@sun.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <47C457F5.4080902@linux.vnet.ibm.com>
+In-Reply-To: <200802242243.49576.yinghai.lu@sun.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Kamalesh Babulal <kamalesh@linux.vnet.ibm.com>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linuxppc-dev@ozlabs.org, sam@ravnborg.org, linux-kbuild@vger.kernel.org, Andy Whitcroft <apw@shadowen.org>
+To: Roman Zippel <zippel@linux-m68k.org>
+Cc: Ingo Molnar <mingo@elte.hu>, Andrew Morton <akpm@linux-foundation.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, kiran@scalemp.com, shai@scalemp.com, Glauber Costa <gcosta@redhat.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, Yinghai Lu <Yinghai.Lu@Sun.COM>
 
-On Tue, Feb 26, 2008 at 11:48:29PM +0530, Kamalesh Babulal wrote:
-> Adrian Bunk wrote:
-> > On Tue, Feb 26, 2008 at 07:59:08PM +0530, Kamalesh Babulal wrote:
-> >> Hi,
-> >>
-> >> The 2.6.25-rc3 kernel build fails on powerpc with allyesconfig config option,
-> >> the .config has been attached.
-> >> ...
-> > 
-> > Builds fine here.
-> > 
-> > Local problem (e.g. disk full) on your machine?
-> > 
-> > cu
-> > Adrian
-> > 
-> Hi Adrain,
+Hi Roman.
 
-Hi Kamalseh,  ;)
+We discovered a situation where we could set a
+choice value in menuconfig but later when we either was
+running menuconfig or oldconfig the value were changed.
 
-> It Builds fine on another powerpc box with the same .config file, the problem seems to be with the gcc
-> on that box, the reported build failure might have been the side effect of the same. 
-> 
-> 
-> drivers/md/raid6int8.c: In function `raid6_int8_gen_syndrome':
-> drivers/md/raid6int8.c:185: error: unable to find a register to spill in class `FLOAT_REGS'
-> drivers/md/raid6int8.c:185: error: this is the insn:
-> (insn:HI 619 799 638 4 drivers/md/raid6int8.c:168 (set (mem:DI (plus:DI (reg/v/f:DI 122 [ p ])
->                 (reg/v:DI 66 ctr [orig:124 d ] [124])) [0 S8 A64])
->         (reg/v:DI 129 [ wp0 ])) 320 {*movdi_internal64} (nil)
->     (expr_list:REG_DEAD (reg/v:DI 129 [ wp0 ])
->         (nil)))
-> drivers/md/raid6int8.c:185: confused by earlier errors, bailing out
-> make[2]: *** [drivers/md/raid6int8.o] Error 1
-> make[1]: *** [drivers/md] Error 2
-> make: *** [drivers] Error 2
-> 
-> # gcc --version
-> gcc (GCC) 3.4.6 20060404 (Red Hat 3.4.6-3)
+I have created a minimal config that exhibit the error.
+It was created in a pure mechanical trial-and-error fashion.
 
-this means your quite old vendor gcc has a bug.
+First the minimal Kconfig file:
+# x86 configuration
 
-> Thanks & Regards,
-> Kamalesh Babulal,
+choice
+	prompt "Subarchitecture Type"
 
-cu
-Adrian
+config X86_PC
+	bool "PC-compatible"
 
--- 
+config X86_VOYAGER
+	bool "Voyager (NCR)"
 
-       "Is there not promise of rain?" Ling Tan asked suddenly out
-        of the darkness. There had been need of rain for many days.
-       "Only a promise," Lao Er said.
-                                       Pearl S. Buck - Dragon Seed
+config X86_VSMP
+	bool "Support for ScaleMP vSMP"
+	depends on PCI
 
+endchoice
+
+config PCI
+	bool "PCI support" if !X86_VISWS
+	depends on !X86_VOYAGER
+	default y
+	
+
+config USB_ARCH_HAS_HCD
+	bool
+	default PCI
+
+config USB
+	bool "Support for Host-side USB"
+	depends on USB_ARCH_HAS_HCD
+
+config USB_PHIDGET
+	bool "USB Phidgets drivers"
+	depends on USB
+
+config USB_PHIDGETMOTORCONTROL
+	bool "USB PhidgetMotorControl support"
+	depends on USB_PHIDGET
+
+
+
+Next the saved .config that is used:
+#
+# Automatically generated make config: don't edit
+# Linux kernel version: KERNELVERSION
+# Tue Feb 26 20:27:09 2008
+#
+# CONFIG_X86_PC is not set
+# CONFIG_X86_VOYAGER is not set
+CONFIG_X86_VSMP=y
+CONFIG_PCI=y
+CONFIG_USB_ARCH_HAS_HCD=y
+CONFIG_USB=y
+# CONFIG_USB_PHIDGET is not set
+
+When we enter menuconfig or are running oldconfig then we can see
+that CONFIG_X86_PC is set to 'y' and CONFIG_X86_VSMP is set to 'n'.
+
+If I in menuconfig select VSMP this setting is saved but then
+oldconfig kicks in and we loose the setting again.
+
+If I delete any of the config variables in the sample above then
+we no longer change the values and we keep the VSMP equals 'y'.
+
+
+Can you please take a look at this.
+
+Thanks,
+	Sam
