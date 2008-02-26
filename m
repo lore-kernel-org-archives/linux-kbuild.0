@@ -1,67 +1,62 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pasmtpa.tele.dk ([80.160.77.114]:59499 "EHLO pasmtpA.tele.dk"
+Received: from smtp6.pp.htv.fi ([213.243.153.40]:51105 "EHLO smtp6.pp.htv.fi"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753463AbYBZL22 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 26 Feb 2008 06:28:28 -0500
-Date: Tue, 26 Feb 2008 12:28:40 +0100
-From: Sam Ravnborg <sam@ravnborg.org>
+	id S1751631AbYBZMbU (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 26 Feb 2008 07:31:20 -0500
+Date: Tue, 26 Feb 2008 14:30:16 +0200
+From: Adrian Bunk <bunk@kernel.org>
 Subject: Re: [PATCH] Compress kernel modules on installation.
-Message-ID: <20080226112840.GA29465@uranus.ravnborg.org>
-References: <20080225214209.a3f79327.sbrokenshire@xestia.co.uk>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Message-ID: <20080226123016.GA27813@cs181133002.pp.htv.fi>
+References: <20080225214209.a3f79327.sbrokenshire@xestia.co.uk> <20080225222137.GY8953@1wt.eu> <20080226091455.GA3498@cs181133002.pp.htv.fi> <20080226102203.GA21257@1wt.eu>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20080225214209.a3f79327.sbrokenshire@xestia.co.uk>
+In-Reply-To: <20080226102203.GA21257@1wt.eu>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Steve Brokenshire <sbrokenshire@xestia.co.uk>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: Willy Tarreau <w@1wt.eu>
+Cc: Steve Brokenshire <sbrokenshire@xestia.co.uk>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-On Mon, Feb 25, 2008 at 09:42:09PM +0000, Steve Brokenshire wrote:
-> Hi,
+On Tue, Feb 26, 2008 at 11:22:03AM +0100, Willy Tarreau wrote:
+> On Tue, Feb 26, 2008 at 11:14:55AM +0200, Adrian Bunk wrote:
+> > On Mon, Feb 25, 2008 at 11:21:38PM +0100, Willy Tarreau wrote:
+>...
+> > > Have you tried keeping the module names intact (.ko, not .ko.gz) ?
+> > > It's what I was doing with modutils in 2.4 and what I'm still doing
+> > > with module-init-tools in 2.6. While I don't particularly use mkinitrd,
+> > > I think that keeping the name intact is preferable and should help.
+> > 
+> > How would you see if, and if yes with what program, a module was 
+> > compressed if the name is kept intact?
 > 
-> (I've sent this to the linux-kbuild and linux-kernel lists as this
-> patch modifies the Makefile.modinst file. I also don't subscribe to the 
-> linux-kbuild and linux-kernel mailing lists so can I have any replies
-> CC'ed to me please)
-> 
-> This patch allows kernel modules to be compressed when 'make
-> modules_install' is run after being copied to
-> the /lib/module/<version>/<...> directory which is useful if you have
-> module-init-tools installed with --enable-zlib. This patch adds an
-> option (MODULE_COMPRESS) to the kernel configuration file (specifically
-> init/Kconfig) so that the kernel modules will compressed if
-> MODULE_COMPRESS is set.
-> 
-> When MODULE_COMPRESS is set the output of 'make modules_install' will
-> go as the following:
-> 
-> INSTALL  drivers/fs/xfs/xfs.ko
-> COMPRESS drivers/fs/xfs/xfs.ko
-> INSTALL  drivers/fs/fat/fat.ko
-> COMPRESS drivers/fs/fat/fat.ko
-> ...
-> 
-> I've tested my patch on kernel versions 2.6.24.2, 2.6.24-git12, 2.6.23.14 and
-> 2.6.19 and they compile, install and compress into the respective
-> module directories without any errors.
-> 
-> I've also tested this with the uvcvideo (linux-uvc) kernel module (from
-> the SVN branch and with kernel versions 2.6.24.2, 2.6.24-git12, 2.6.23.14 and
-> 2.6.19) as that uses Kbuild properly when installing the module and
-> after installing the uvcvideo the module is then compressed.
-> Unfortunately, I couldn't find any other kernel modules which used the
-> Kbuild system for installing their kernel modules. :(
-> 
-> I've included include/config/auto.conf in Makefile.modinst so that it
-> can check if MODULE_COMPRESS is set when installing the kernel modules.
+> depmod/modinfo/insmod/modprobe already know it. And quite honnestly,
+> I don't know about any other program which really needs to process
+> those files once installed. Well, maybe ksymoops, but I'd have to
+> check, as I don't recall having ever been annoyed with this.
+>...
 
-Should we mention this possibility in Documentation/kbuild/modules.txt also?
+depmod/modinfo/insmod/modprobe know only if you compile 
+module-init-tools with zlib support.
 
-Otherwise from a quick scan it looks OK.
-As module-init-tols are our userspae counterpart we should align the
-functionality with that tool.
-I assume this gives us a simple choice of compression method and naming.
+And what about the busybox versions?
 
-	Sam
+A different name would e.g.:
+- easily allow proper error handling if the userspace modules program 
+  doesn't support the compression used
+- better scale to support additional compressions
+- give the user a hint what is happening and what might be the problem
+  when anythig goes wrong
+
+> Regards,
+> Willy
+
+cu
+Adrian
+
+-- 
+
+       "Is there not promise of rain?" Ling Tan asked suddenly out
+        of the darkness. There had been need of rain for many days.
+       "Only a promise," Lao Er said.
+                                       Pearl S. Buck - Dragon Seed
+
