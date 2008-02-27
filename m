@@ -1,51 +1,39 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from scrub.xs4all.nl ([194.109.195.176]:59179 "EHLO scrub.xs4all.nl"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752632AbYB0DAl (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 26 Feb 2008 22:00:41 -0500
-Date: Wed, 27 Feb 2008 03:59:45 +0100 (CET)
-From: Roman Zippel <zippel@linux-m68k.org>
-Subject: Re: Kconfig configuration restore bug [Was: x86: vSMP selection in
- config]
-In-Reply-To: <20080226194058.GA31438@uranus.ravnborg.org>
-Message-ID: <Pine.LNX.4.64.0802270353480.2723@scrub.home>
-References: <200802210258.45011.yinghai.lu@sun.com> <200802241832.37850.yinghai.lu@sun.com>
- <200802242136.28744.yinghai.lu@sun.com> <200802242243.49576.yinghai.lu@sun.com>
- <20080226194058.GA31438@uranus.ravnborg.org>
+Received: from nf-out-0910.google.com ([64.233.182.189]:61069 "EHLO
+	nf-out-0910.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751541AbYB0DKF (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 26 Feb 2008 22:10:05 -0500
+Received: by nf-out-0910.google.com with SMTP id g13so1326253nfb.21
+        for <linux-kbuild@vger.kernel.org>; Tue, 26 Feb 2008 19:10:04 -0800 (PST)
+Message-ID: <8499950a0802261910t55b3f80r1139c9c13ab9b198@mail.gmail.com>
+Date: Wed, 27 Feb 2008 04:10:04 +0100
+From: "Oleg Verych" <olecom@gmail.com>
+Subject: why filename extensions? (Re: [PATCH] Compress kernel modules on installation.)
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: Ingo Molnar <mingo@elte.hu>, Andrew Morton <akpm@linux-foundation.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, kiran@scalemp.com, shai@scalemp.com, Glauber Costa <gcosta@redhat.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, Yinghai Lu <Yinghai.Lu@Sun.COM>
+To: Adrian Bunk <bunk@kernel.org>
+Cc: Willy Tarreau <w@1wt.eu>, Steve Brokenshire <sbrokenshire@xestia.co.uk>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-Hi,
+On Tue, Feb 26, 2008 at 1:30 PM, Adrian Bunk <bunk@kernel.org> wrote:
 
-On Tue, 26 Feb 2008, Sam Ravnborg wrote:
+>  depmod/modinfo/insmod/modprobe know only if you compile
+>  module-init-tools with zlib support.
+>
+>  And what about the busybox versions?
+>
+>  A different name would e.g.:
+>  - easily allow proper error handling if the userspace modules program
+>   doesn't support the compression used
+>  - better scale to support additional compressions
+>  - give the user a hint what is happening and what might be the problem
+>   when anythig goes wrong
 
-> choice
-> 	prompt "Subarchitecture Type"
-> 
-> config X86_PC
-> 	bool "PC-compatible"
-> 
-> config X86_VOYAGER
-> 	bool "Voyager (NCR)"
-> 
-> config X86_VSMP
-> 	bool "Support for ScaleMP vSMP"
-> 	depends on PCI
-> 
-> endchoice
-> 
-> config PCI
-> 	bool "PCI support" if !X86_VISWS
-> 	depends on !X86_VOYAGER
-> 	default y
+Right...
 
-The basic problem is that this is a recursive dependency - PCI depends on 
-the choice and the choice depends on PCI. IMO X86_VSMP cannot depend on 
-PCI.
-I'm looking into why this hasn't been picked up by the dependency check...
-
-bye, Roman
+http://article.gmane.org/gmane.linux.debian.devel.dpkg.general/8495
+_______
