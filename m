@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from scrub.xs4all.nl ([194.109.195.176]:37614 "EHLO scrub.xs4all.nl"
+Received: from scrub.xs4all.nl ([194.109.195.176]:37623 "EHLO scrub.xs4all.nl"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752620AbYB2EJc (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 28 Feb 2008 23:09:32 -0500
-Date: Fri, 29 Feb 2008 05:09:02 +0100 (CET)
+	id S1752620AbYB2EKj (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 28 Feb 2008 23:10:39 -0500
+Date: Fri, 29 Feb 2008 05:10:24 +0100 (CET)
 From: Roman Zippel <zippel@linux-m68k.org>
-Subject: [PATCH 1/3] fix recursive dependencies
+Subject: [PATCH 2/3] fix choice dependency check
 In-Reply-To: <20080226194058.GA31438@uranus.ravnborg.org>
-Message-ID: <Pine.LNX.4.64.0802290443440.2723@scrub.home>
+Message-ID: <Pine.LNX.4.64.0802290509100.2723@scrub.home>
 References: <200802210258.45011.yinghai.lu@sun.com> <200802241832.37850.yinghai.lu@sun.com>
  <200802242136.28744.yinghai.lu@sun.com> <200802242243.49576.yinghai.lu@sun.com>
  <20080226194058.GA31438@uranus.ravnborg.org>
@@ -18,69 +18,144 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: Sam Ravnborg <sam@ravnborg.org>
 Cc: Ingo Molnar <mingo@elte.hu>, Andrew Morton <akpm@linux-foundation.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, kiran@scalemp.com, shai@scalemp.com, Glauber Costa <gcosta@redhat.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, Yinghai Lu <Yinghai.Lu@Sun.COM>
 
-Hi,
 
-On Tue, 26 Feb 2008, Sam Ravnborg wrote:
-
-> We discovered a situation where we could set a
-> choice value in menuconfig but later when we either was
-> running menuconfig or oldconfig the value were changed.
-
-The patch fixes these dependency problems.
-
-bye, Roman
-
-
-The proper dependency check uncovered a few dependency problems,
-the subarchitecture used a mixture of selects and depends on SMP
-and PCI dependency was messed up.
+Properly check the dependency of choices as a group.
+Also fix that sym_check_deps() correctly terminates the dependency loop 
+error check (otherwise it would continue printing the dependency chain).
 
 Signed-off-by: Roman Zippel <zippel@linux-m68k.org>
 
 ---
- arch/x86/Kconfig |   10 ++++------
- 1 file changed, 4 insertions(+), 6 deletions(-)
+ scripts/kconfig/symbol.c |   94 ++++++++++++++++++++++++++++++++++++++---------
+ 1 file changed, 76 insertions(+), 18 deletions(-)
 
-Index: linux-2.6/arch/x86/Kconfig
+Index: linux-2.6/scripts/kconfig/symbol.c
 ===================================================================
---- linux-2.6.orig/arch/x86/Kconfig
-+++ linux-2.6/arch/x86/Kconfig
-@@ -243,8 +243,7 @@ config X86_ELAN
+--- linux-2.6.orig/scripts/kconfig/symbol.c
++++ linux-2.6/scripts/kconfig/symbol.c
+@@ -762,8 +762,6 @@ struct symbol **sym_re_search(const char
+ }
  
- config X86_VOYAGER
- 	bool "Voyager (NCR)"
--	depends on X86_32
--	select SMP if !BROKEN
-+	depends on X86_32 && (SMP || BROKEN)
- 	help
- 	  Voyager is an MCA-based 32-way capable SMP architecture proprietary
- 	  to NCR Corp.  Machine classes 345x/35xx/4100/51xx are Voyager-based.
-@@ -256,9 +255,8 @@ config X86_VOYAGER
  
- config X86_NUMAQ
- 	bool "NUMAQ (IBM/Sequent)"
--	select SMP
-+	depends on SMP && X86_32
- 	select NUMA
--	depends on X86_32
- 	help
- 	  This option is used for getting Linux to run on a (IBM/Sequent) NUMA
- 	  multiquad box. This changes the way that processors are bootstrapped,
-@@ -329,7 +327,7 @@ config X86_RDC321X
+-struct symbol *sym_check_deps(struct symbol *sym);
+-
+ static struct symbol *sym_check_expr_deps(struct expr *e)
+ {
+ 	struct symbol *sym;
+@@ -795,40 +793,100 @@ static struct symbol *sym_check_expr_dep
+ }
  
- config X86_VSMP
- 	bool "Support for ScaleMP vSMP"
--	depends on X86_64 && PCI
-+	depends on X86_64
- 	 help
- 	  Support for ScaleMP vSMP systems.  Say 'Y' here if this kernel is
- 	  supposed to run on these EM64T-based machines.  Only choose this option
-@@ -1381,7 +1379,7 @@ endmenu
- menu "Bus options (PCI etc.)"
+ /* return NULL when dependencies are OK */
+-struct symbol *sym_check_deps(struct symbol *sym)
++static struct symbol *sym_check_sym_deps(struct symbol *sym)
+ {
+ 	struct symbol *sym2;
+ 	struct property *prop;
  
- config PCI
--	bool "PCI support" if !X86_VISWS
-+	bool "PCI support" if !X86_VISWS && !X86_VSMP
- 	depends on !X86_VOYAGER
- 	default y
- 	select ARCH_SUPPORTS_MSI if (X86_LOCAL_APIC && X86_IO_APIC)
+-	if (sym->flags & SYMBOL_CHECK) {
+-		fprintf(stderr, "%s:%d:error: found recursive dependency: %s",
+-		        sym->prop->file->name, sym->prop->lineno, sym->name);
+-		return sym;
+-	}
+-	if (sym->flags & SYMBOL_CHECKED)
+-		return NULL;
+-
+-	sym->flags |= (SYMBOL_CHECK | SYMBOL_CHECKED);
+ 	sym2 = sym_check_expr_deps(sym->rev_dep.expr);
+ 	if (sym2)
+-		goto out;
++		return sym2;
+ 
+ 	for (prop = sym->prop; prop; prop = prop->next) {
+ 		if (prop->type == P_CHOICE || prop->type == P_SELECT)
+ 			continue;
+ 		sym2 = sym_check_expr_deps(prop->visible.expr);
+ 		if (sym2)
+-			goto out;
++			break;
+ 		if (prop->type != P_DEFAULT || sym_is_choice(sym))
+ 			continue;
+ 		sym2 = sym_check_expr_deps(prop->expr);
+ 		if (sym2)
+-			goto out;
++			break;
+ 	}
+-out:
++
++	return sym2;
++}
++
++static struct symbol *sym_check_choice_deps(struct symbol *choice)
++{
++	struct symbol *sym, *sym2;
++	struct property *prop;
++	struct expr *e;
++
++	prop = sym_get_choice_prop(choice);
++	expr_list_for_each_sym(prop->expr, e, sym)
++		sym->flags |= (SYMBOL_CHECK | SYMBOL_CHECKED);
++
++	choice->flags |= (SYMBOL_CHECK | SYMBOL_CHECKED);
++	sym2 = sym_check_sym_deps(choice);
++	choice->flags &= ~SYMBOL_CHECK;
+ 	if (sym2)
+-		fprintf(stderr, " -> %s%s", sym->name, sym2 == sym? "\n": "");
+-	sym->flags &= ~SYMBOL_CHECK;
++		goto out;
++
++	expr_list_for_each_sym(prop->expr, e, sym) {
++		sym2 = sym_check_sym_deps(sym);
++		if (sym2) {
++			fprintf(stderr, " -> %s", sym->name);
++			break;
++		}
++	}
++out:
++	expr_list_for_each_sym(prop->expr, e, sym)
++		sym->flags &= ~SYMBOL_CHECK;
++
++	if (sym2 && sym_is_choice_value(sym2) &&
++	    prop_get_symbol(sym_get_choice_prop(sym2)) == choice)
++		sym2 = choice;
++
++	return sym2;
++}
++
++struct symbol *sym_check_deps(struct symbol *sym)
++{
++	struct symbol *sym2;
++	struct property *prop;
++
++	if (sym->flags & SYMBOL_CHECK) {
++		fprintf(stderr, "%s:%d:error: found recursive dependency: %s",
++		        sym->prop->file->name, sym->prop->lineno,
++			sym->name ? sym->name : "<choice>");
++		return sym;
++	}
++	if (sym->flags & SYMBOL_CHECKED)
++		return NULL;
++
++	if (sym_is_choice_value(sym)) {
++		/* for choice groups start the check with main choice symbol */
++		prop = sym_get_choice_prop(sym);
++		sym2 = sym_check_deps(prop_get_symbol(prop));
++	} else if (sym_is_choice(sym)) {
++		sym2 = sym_check_choice_deps(sym);
++	} else {
++		sym->flags |= (SYMBOL_CHECK | SYMBOL_CHECKED);
++		sym2 = sym_check_sym_deps(sym);
++		sym->flags &= ~SYMBOL_CHECK;
++	}
++
++	if (sym2) {
++		fprintf(stderr, " -> %s", sym->name ? sym->name : "<choice>");
++		if (sym2 == sym) {
++			fprintf(stderr, "\n");
++			zconfnerrs++;
++			sym2 = NULL;
++		}
++	}
++
+ 	return sym2;
+ }
+ 
