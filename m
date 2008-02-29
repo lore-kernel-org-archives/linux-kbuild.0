@@ -1,43 +1,86 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.gmx.net ([213.165.64.20]:46744 "HELO mail.gmx.net"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with SMTP
-	id S1754754AbYB1Kl5 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 28 Feb 2008 05:41:57 -0500
-From: Richard Hacker <lerichi@gmx.net>
-Subject: Re: [PATCH 001/002] scripts/mod/modpost.c: New option -E to load extra symbols
-Date: Thu, 28 Feb 2008 11:42:27 +0100
-References: <200802280940.53020.lerichi@gmx.net> <20080228091839.GA18519@uranus.ravnborg.org>
-In-Reply-To: <20080228091839.GA18519@uranus.ravnborg.org>
+Received: from scrub.xs4all.nl ([194.109.195.176]:37614 "EHLO scrub.xs4all.nl"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752620AbYB2EJc (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 28 Feb 2008 23:09:32 -0500
+Date: Fri, 29 Feb 2008 05:09:02 +0100 (CET)
+From: Roman Zippel <zippel@linux-m68k.org>
+Subject: [PATCH 1/3] fix recursive dependencies
+In-Reply-To: <20080226194058.GA31438@uranus.ravnborg.org>
+Message-ID: <Pine.LNX.4.64.0802290443440.2723@scrub.home>
+References: <200802210258.45011.yinghai.lu@sun.com> <200802241832.37850.yinghai.lu@sun.com>
+ <200802242136.28744.yinghai.lu@sun.com> <200802242243.49576.yinghai.lu@sun.com>
+ <20080226194058.GA31438@uranus.ravnborg.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-Message-Id: <200802281142.27755.lerichi@gmx.net>
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Sam Ravnborg <sam@ravnborg.org>
-Cc: kai@germaschewski.name, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+Cc: Ingo Molnar <mingo@elte.hu>, Andrew Morton <akpm@linux-foundation.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, kiran@scalemp.com, shai@scalemp.com, Glauber Costa <gcosta@redhat.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, Yinghai Lu <Yinghai.Lu@Sun.COM>
 
-Hello Sam,
+Hi,
 
-> At first quick look it looked good and I have only two comments:
-> 1) The variable should be named KBUILD_* to fit the general namespace used
-I wanted to use the namespace EXTRA_* to continue the line of EXTRA_CFLAGS, 
-etc. that were used when building modules. Is that OK? The other names sound 
-odd to me: KBUILD_SYMBOLS or KBUILD_EXTRA_SYMBOLS. If you really do not like 
-EXTRA_SYMBOLS, which one do you propose?
+On Tue, 26 Feb 2008, Sam Ravnborg wrote:
 
-> 2) The new possibility should be documented in
-> Documentation/kbuild/modules.txt
-[PATCH 002/002] in this revised series updated scripts/Makefile.modpost to use 
-this new feature of modpost, and documented the change as well. Please take a 
-look at it: http://lkml.org/lkml/2008/2/28/72
+> We discovered a situation where we could set a
+> choice value in menuconfig but later when we either was
+> running menuconfig or oldconfig the value were changed.
 
-> PS. Please also cc: linux-kbuild@vger.kernel.org if you submit again.
-Did it. (For new readers in linux-kbuild: The original patchset can be found 
-at:
-http://lkml.org/lkml/2008/2/28/71 for [PATCH 001/002]
-http://lkml.org/lkml/2008/2/28/72 for [PATCH 002/002] )
+The patch fixes these dependency problems.
 
-- Richard
+bye, Roman
+
+
+The proper dependency check uncovered a few dependency problems,
+the subarchitecture used a mixture of selects and depends on SMP
+and PCI dependency was messed up.
+
+Signed-off-by: Roman Zippel <zippel@linux-m68k.org>
+
+---
+ arch/x86/Kconfig |   10 ++++------
+ 1 file changed, 4 insertions(+), 6 deletions(-)
+
+Index: linux-2.6/arch/x86/Kconfig
+===================================================================
+--- linux-2.6.orig/arch/x86/Kconfig
++++ linux-2.6/arch/x86/Kconfig
+@@ -243,8 +243,7 @@ config X86_ELAN
+ 
+ config X86_VOYAGER
+ 	bool "Voyager (NCR)"
+-	depends on X86_32
+-	select SMP if !BROKEN
++	depends on X86_32 && (SMP || BROKEN)
+ 	help
+ 	  Voyager is an MCA-based 32-way capable SMP architecture proprietary
+ 	  to NCR Corp.  Machine classes 345x/35xx/4100/51xx are Voyager-based.
+@@ -256,9 +255,8 @@ config X86_VOYAGER
+ 
+ config X86_NUMAQ
+ 	bool "NUMAQ (IBM/Sequent)"
+-	select SMP
++	depends on SMP && X86_32
+ 	select NUMA
+-	depends on X86_32
+ 	help
+ 	  This option is used for getting Linux to run on a (IBM/Sequent) NUMA
+ 	  multiquad box. This changes the way that processors are bootstrapped,
+@@ -329,7 +327,7 @@ config X86_RDC321X
+ 
+ config X86_VSMP
+ 	bool "Support for ScaleMP vSMP"
+-	depends on X86_64 && PCI
++	depends on X86_64
+ 	 help
+ 	  Support for ScaleMP vSMP systems.  Say 'Y' here if this kernel is
+ 	  supposed to run on these EM64T-based machines.  Only choose this option
+@@ -1381,7 +1379,7 @@ endmenu
+ menu "Bus options (PCI etc.)"
+ 
+ config PCI
+-	bool "PCI support" if !X86_VISWS
++	bool "PCI support" if !X86_VISWS && !X86_VSMP
+ 	depends on !X86_VOYAGER
+ 	default y
+ 	select ARCH_SUPPORTS_MSI if (X86_LOCAL_APIC && X86_IO_APIC)
