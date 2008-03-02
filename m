@@ -1,416 +1,1769 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from xenotime.net ([66.160.160.81]:56742 "HELO xenotime.net"
+Received: from mail.gmx.net ([213.165.64.20]:46794 "HELO mail.gmx.net"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with SMTP
-	id S1752574AbYB2WV5 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 29 Feb 2008 17:21:57 -0500
-Received: from midway.site ([71.245.99.126]) by xenotime.net for <linux-kbuild@vger.kernel.org>; Fri, 29 Feb 2008 14:21:54 -0800
-Date: Fri, 29 Feb 2008 14:21:53 -0800
-From: Randy Dunlap <rdunlap@xenotime.net>
-Subject: [PATCH v2] kbuild: make *config usage docs
-Message-Id: <20080229142153.9c6a656e.rdunlap@xenotime.net>
-In-Reply-To: <20080215132223.GE1178@uranus.ravnborg.org>
-References: <20080212155228.0c913874.rdunlap@xenotime.net>
-	<20080215132223.GE1178@uranus.ravnborg.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+	id S1755383AbYCBRvi (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 2 Mar 2008 12:51:38 -0500
+From: Toralf =?iso-8859-1?q?F=F6rster?= <toralf.foerster@gmx.de>
+Subject: why is CONFIG_PCI unset ? [was: build #350 issue for v2.6.25-rc1 in drivers/i2c/busses/i2c-i801.c]
+Date: Sun, 2 Mar 2008 18:51:31 +0100
+References: <200802222143.38643.toralf.foerster@gmx.de> <20080222205855.GA7711@uranus.ravnborg.org>
+In-Reply-To: <20080222205855.GA7711@uranus.ravnborg.org>
+MIME-Version: 1.0
+Content-Type: multipart/signed;
+  boundary="nextPart2641734.MAfAfhVuYo";
+  protocol="application/pgp-signature";
+  micalg=pgp-sha1
 Content-Transfer-Encoding: 7bit
+Message-Id: <200803021851.34398.toralf.foerster@gmx.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: linux-kbuild@vger.kernel.org
+To: linux-kernel@vger.kernel.org
+Cc: Sam Ravnborg <sam@ravnborg.org>, linux-kbuild@vger.kernel.org
 
-On Fri, 15 Feb 2008 14:22:23 +0100 Sam Ravnborg wrote:
+--nextPart2641734.MAfAfhVuYo
+Content-Type: multipart/mixed;
+  boundary="Boundary-01=_jkuyH09aW80s5De"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-> Hi Randy.
-> 
-> On Tue, Feb 12, 2008 at 03:52:28PM -0800, Randy Dunlap wrote:
-> > Hi,
-> > 
-> > I'm trying to catch up on some old/dropped patches.
-> > Here's from from Oct./2006:
-> >   http://marc.info/?l=linux-kernel&m=116114965011388&w=2
-> > 
-> > Any interest in this or should I just nuke it?
-> Please - do not nuke it...
-> We need documentation for both kconfig and kbuild.
-> 
-> General comments...
-> I would have preferred an asciidoc compatible format but no big deal.
-> 
-> Should we combine kconfig and kbuild stuff in a single file?
-> People often confuse the two things - and they are also closely
-> interrelated so documenting then in the same file makes sense.
+--Boundary-01=_jkuyH09aW80s5De
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-Specifically which files would you consider combining?
 
-> > Mostly contains user interface and search topics, along with
-> > mini.config/custom.config usage.
-> > 
-> > Signed-off-by: Randy Dunlap <randy.dunlap@oracle.com>
-> > ---
-> >  Documentation/kbuild/00-INDEX         |    2 
-> >  Documentation/kbuild/make-configs.txt |  167 ++++++++++++++++++++++++++++++++++
-> >  README                                |   17 +--
-> >  3 files changed, 175 insertions(+), 11 deletions(-)
-> > 
-> > --- /dev/null
-> > +++ linux-2619-rc2-ppc/Documentation/kbuild/make-configs.txt
-> > @@ -0,0 +1,167 @@
+At Friday 22 February 2008 Sam Ravnborg wrote :
+> On Fri, Feb 22, 2008 at 09:43:36PM +0100, Toralf F=F6rster wrote:
+> > Hello,
+> >=20
+> > pls see below for an issue of KConfig which happens for isntance if ran=
+dconfig selects
+> > CONFIG_INPUT_APANEL.
+>=20
+> Which select a symbol with dependencies =3D> boom!
+>=20
+> Select is evil. We need 'requires' that could be used by the user to say =
+"I want this".
+>=20
+> [Comment from Randy]=20
+> > Yes, I see this one often.  I wish someone were willing to try
+> > to fix it.  I've looked at the source code, but I'm not willing to
+> > dive deeply into it.
+>=20
+> I hope Roman suddenly fixes it.
+>=20
+> 	Sam
+>=20
 
-> > +======================================================================
-> > +menuconfig
-> > +--------------------------------------------------
-> > +
-> > +SEARCHING for CONFIG symbols
-> > +
-> > +Searching in menuconfig:
-> > +
-> > +	The Search function searches for kernel configuration symbol
-> > +	names, so you have to know something close to what you are
-> > +	looking for.
-> > +
-> > +	Example:
-> > +		/hotplug
-> > +		This lists all config symbols that contain "hotplug",
-> > +		e.g., HOTPLUG, HOTPLUG_CPU, MEMORY_HOTPLUG.
-> > +
-> > +	For search help, enter / followed TAB-TAB-TAB (to highlight
-> > +	<Help>) and Enter.  This will tell you that you can also use
-> > +	regular expressions (regexes) in the search string, so if you
-> > +	are not interested in MEMORY_HOTPLUG, you could try
-> > +
-> > +		/^hotplug
-> > +
-> > +
-> It is not entirely obvious that '/' brings up a dialog.
+Hello,
 
-It's listed in menuconfig's main help text.
-Do you have any suggestions?
+a _lot_ of build tests of my (compile) test script failed with:
 
-> > +______________________________________________________________________
-> > +Environment variables in 'menuconfig'
-> > +
-> > +KCONFIG_ALLCONFIG
-> > +--------------------------------------------------
-...
-> > +
-> Can I ask you to document the others:
-> conf.c:         name = getenv("KCONFIG_ALLCONFIG");
-> conf.c:         name = getenv("KCONFIG_NOSILENTUPDATE");
+=2E..
+  LD      drivers/i2c/algos/built-in.o
+  CC      drivers/i2c/busses/i2c-i801.o
+drivers/i2c/busses/i2c-i801.c: In function 'i801_probe':
+drivers/i2c/busses/i2c-i801.c:642: error: implicit declaration of function =
+'pci_request_region'
+drivers/i2c/busses/i2c-i801.c:682: error: implicit declaration of function =
+'pci_release_region'
+make[3]: *** [drivers/i2c/busses/i2c-i801.o] Error 1
+make[2]: *** [drivers/i2c/busses] Error 2
+make[1]: *** [drivers/i2c] Error 2
+make: *** [drivers] Error 2
 
-Those are already done.
+I hard coded my script to prepend these 2 lines
+CONFIG_PCI=3Dy
+CONFIG_I2C=3Dy
+at top of the each .config file before I run "make oldconfig" however the
+resulting config CONFIG_PCI is very often unset.
 
-> confdata.c:     char *name = getenv("KCONFIG_CONFIG");
-> confdata.c:     env = getenv("KCONFIG_OVERWRITECONFIG");
-> confdata.c:     env = getenv("KCONFIG_NOTIMESTAMP");
-> confdata.c:     name = getenv("KCONFIG_AUTOCONFIG");
-> confdata.c:     name = getenv("KCONFIG_AUTOHEADER");
+I'm wondering which kernel config I've to set in addition to the 2 lines to
+circumvent the current situation until kbuild handles such case correctly. =
+Most
+of the reported build failures results from the issue seen above which makes
+the current test runs nearly useless :-(
+=20
 
-Added.
+I attached a config file as an example.
 
-> Their usage should be more or less self explanatory,
-> otherwise look at the commit when they were added.
-> 
-> > +______________________________________________________________________
-> > +menuconfig User Interface Options
-> > +----------------------------------------------------------------------
-> > +LINES and COLUMNS
-> > +--------------------------------------------------
-> > +See the menuconfig embedded help text.
-> 
-> We do not check these anymore. I do not see the need to reference these here.
 
-Dropped.
+=2D-=20
+MfG/Sincerely
 
-> > --- linux-2619-rc2-ppc.orig/README
-> > +++ linux-2619-rc2-ppc/README
-> > @@ -50,9 +50,9 @@ DOCUMENTATION:
-> >  
-> >   - The Documentation/DocBook/ subdirectory contains several guides for
-> >     kernel developers and users.  These guides can be rendered in a
-> > -   number of formats:  PostScript (.ps), PDF, and HTML, among others.
-> > -   After installation, "make psdocs", "make pdfdocs", or "make htmldocs"
-> > -   will render the documentation in the requested format.
-> > +   number of formats:  PostScript (.ps), PDF, HTML, & man-pages, among others.
-> > +   After installation, "make psdocs", "make pdfdocs", "make htmldocs",
-> > +   or "make mandocs" will render the documentation in the requested format.
-> 
-> Unrelated change...
+Toralf F=F6rster
+pgp finger print: 7B1A 07F4 EC82 0F90 D4C2 8936 872A E508 7DB6 9DA3
 
-It's related to "I was trying to fix some kbuild usage text."
+--Boundary-01=_jkuyH09aW80s5De
+Content-Type: text/plain;
+  charset="iso-8859-1";
+  name="config.rnd.402"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+	filename="config.rnd.402"
 
-Updated patch below.
+#
+# Automatically generated make config: don't edit
+# Linux kernel version: 2.6.25-rc3
+# Sun Mar  2 18:01:19 2008
+#
+# CONFIG_64BIT is not set
+CONFIG_X86_32=y
+# CONFIG_X86_64 is not set
+CONFIG_X86=y
+# CONFIG_GENERIC_LOCKBREAK is not set
+CONFIG_GENERIC_TIME=y
+CONFIG_GENERIC_CMOS_UPDATE=y
+CONFIG_CLOCKSOURCE_WATCHDOG=y
+CONFIG_GENERIC_CLOCKEVENTS=y
+CONFIG_GENERIC_CLOCKEVENTS_BROADCAST=y
+CONFIG_LOCKDEP_SUPPORT=y
+CONFIG_STACKTRACE_SUPPORT=y
+CONFIG_HAVE_LATENCYTOP_SUPPORT=y
+CONFIG_SEMAPHORE_SLEEPERS=y
+CONFIG_FAST_CMPXCHG_LOCAL=y
+CONFIG_MMU=y
+CONFIG_ZONE_DMA=y
+CONFIG_QUICKLIST=y
+CONFIG_GENERIC_ISA_DMA=y
+CONFIG_GENERIC_IOMAP=y
+CONFIG_GENERIC_BUG=y
+CONFIG_GENERIC_HWEIGHT=y
+# CONFIG_GENERIC_GPIO is not set
+CONFIG_ARCH_MAY_HAVE_PC_FDC=y
+CONFIG_DMI=y
+# CONFIG_RWSEM_GENERIC_SPINLOCK is not set
+CONFIG_RWSEM_XCHGADD_ALGORITHM=y
+# CONFIG_ARCH_HAS_ILOG2_U32 is not set
+# CONFIG_ARCH_HAS_ILOG2_U64 is not set
+CONFIG_ARCH_HAS_CPU_IDLE_WAIT=y
+CONFIG_GENERIC_CALIBRATE_DELAY=y
+# CONFIG_GENERIC_TIME_VSYSCALL is not set
+CONFIG_ARCH_HAS_CPU_RELAX=y
+# CONFIG_HAVE_SETUP_PER_CPU_AREA is not set
+CONFIG_ARCH_HIBERNATION_POSSIBLE=y
+CONFIG_ARCH_SUSPEND_POSSIBLE=y
+# CONFIG_ZONE_DMA32 is not set
+CONFIG_ARCH_POPULATES_NODE_MAP=y
+# CONFIG_AUDIT_ARCH is not set
+CONFIG_ARCH_SUPPORTS_AOUT=y
+CONFIG_GENERIC_HARDIRQS=y
+CONFIG_GENERIC_IRQ_PROBE=y
+CONFIG_GENERIC_PENDING_IRQ=y
+CONFIG_X86_SMP=y
+CONFIG_X86_32_SMP=y
+CONFIG_X86_HT=y
+CONFIG_X86_BIOS_REBOOT=y
+CONFIG_X86_TRAMPOLINE=y
+CONFIG_KTIME_SCALAR=y
+CONFIG_DEFCONFIG_LIST="/lib/modules/$UNAME_RELEASE/.config"
 
----
-From: Randy Dunlap <randy.dunlap@oracle.com>
+#
+# General setup
+#
+CONFIG_EXPERIMENTAL=y
+CONFIG_LOCK_KERNEL=y
+CONFIG_INIT_ENV_ARG_LIMIT=32
+CONFIG_LOCALVERSION=""
+# CONFIG_LOCALVERSION_AUTO is not set
+# CONFIG_SWAP is not set
+# CONFIG_SYSVIPC is not set
+# CONFIG_POSIX_MQUEUE is not set
+CONFIG_BSD_PROCESS_ACCT=y
+# CONFIG_BSD_PROCESS_ACCT_V3 is not set
+CONFIG_TASKSTATS=y
+CONFIG_TASK_DELAY_ACCT=y
+CONFIG_TASK_XACCT=y
+# CONFIG_TASK_IO_ACCOUNTING is not set
+CONFIG_AUDIT=y
+# CONFIG_AUDITSYSCALL is not set
+# CONFIG_IKCONFIG is not set
+CONFIG_LOG_BUF_SHIFT=14
+# CONFIG_CGROUPS is not set
+CONFIG_GROUP_SCHED=y
+# CONFIG_FAIR_GROUP_SCHED is not set
+# CONFIG_RT_GROUP_SCHED is not set
+CONFIG_USER_SCHED=y
+# CONFIG_CGROUP_SCHED is not set
+CONFIG_SYSFS_DEPRECATED=y
+# CONFIG_RELAY is not set
+CONFIG_NAMESPACES=y
+# CONFIG_UTS_NS is not set
+# CONFIG_USER_NS is not set
+CONFIG_PID_NS=y
+CONFIG_BLK_DEV_INITRD=y
+CONFIG_INITRAMFS_SOURCE=""
+CONFIG_CC_OPTIMIZE_FOR_SIZE=y
+CONFIG_SYSCTL=y
+# CONFIG_EMBEDDED is not set
+CONFIG_UID16=y
+CONFIG_SYSCTL_SYSCALL=y
+CONFIG_KALLSYMS=y
+# CONFIG_KALLSYMS_EXTRA_PASS is not set
+CONFIG_HOTPLUG=y
+CONFIG_PRINTK=y
+CONFIG_BUG=y
+CONFIG_ELF_CORE=y
+CONFIG_COMPAT_BRK=y
+CONFIG_BASE_FULL=y
+CONFIG_FUTEX=y
+CONFIG_ANON_INODES=y
+CONFIG_EPOLL=y
+CONFIG_SIGNALFD=y
+CONFIG_TIMERFD=y
+CONFIG_EVENTFD=y
+CONFIG_SHMEM=y
+CONFIG_VM_EVENT_COUNTERS=y
+CONFIG_SLUB_DEBUG=y
+# CONFIG_SLAB is not set
+CONFIG_SLUB=y
+# CONFIG_SLOB is not set
+# CONFIG_PROFILING is not set
+# CONFIG_MARKERS is not set
+CONFIG_HAVE_OPROFILE=y
+CONFIG_HAVE_KPROBES=y
+CONFIG_PROC_PAGE_MONITOR=y
+CONFIG_SLABINFO=y
+CONFIG_RT_MUTEXES=y
+# CONFIG_TINY_SHMEM is not set
+CONFIG_BASE_SMALL=0
+# CONFIG_MODULES is not set
+CONFIG_BLOCK=y
+CONFIG_LBD=y
+# CONFIG_BLK_DEV_IO_TRACE is not set
+# CONFIG_LSF is not set
+CONFIG_BLK_DEV_BSG=y
 
-Create a kconfig user assistance guide, with a few tips and hints
-about using menuconfig, xconfig, and gconfig.
+#
+# IO Schedulers
+#
+CONFIG_IOSCHED_NOOP=y
+# CONFIG_IOSCHED_AS is not set
+CONFIG_IOSCHED_DEADLINE=y
+# CONFIG_IOSCHED_CFQ is not set
+# CONFIG_DEFAULT_AS is not set
+# CONFIG_DEFAULT_DEADLINE is not set
+# CONFIG_DEFAULT_CFQ is not set
+CONFIG_DEFAULT_NOOP=y
+CONFIG_DEFAULT_IOSCHED="noop"
+CONFIG_CLASSIC_RCU=y
+# CONFIG_PREEMPT_RCU is not set
 
-Mostly contains user interface, environment variables, and search topics,
-along with mini.config/custom.config usage.
+#
+# Processor type and features
+#
+CONFIG_TICK_ONESHOT=y
+CONFIG_NO_HZ=y
+# CONFIG_HIGH_RES_TIMERS is not set
+CONFIG_GENERIC_CLOCKEVENTS_BUILD=y
+CONFIG_SMP=y
+# CONFIG_X86_PC is not set
+# CONFIG_X86_ELAN is not set
+# CONFIG_X86_VOYAGER is not set
+# CONFIG_X86_NUMAQ is not set
+# CONFIG_X86_SUMMIT is not set
+# CONFIG_X86_BIGSMP is not set
+# CONFIG_X86_VISWS is not set
+CONFIG_X86_GENERICARCH=y
+# CONFIG_X86_ES7000 is not set
+# CONFIG_X86_RDC321X is not set
+# CONFIG_X86_VSMP is not set
+# CONFIG_SCHED_NO_NO_OMIT_FRAME_POINTER is not set
+CONFIG_PARAVIRT_GUEST=y
+# CONFIG_XEN is not set
+# CONFIG_VMI is not set
+CONFIG_PARAVIRT=y
+CONFIG_X86_CYCLONE_TIMER=y
+# CONFIG_M386 is not set
+# CONFIG_M486 is not set
+# CONFIG_M586 is not set
+# CONFIG_M586TSC is not set
+CONFIG_M586MMX=y
+# CONFIG_M686 is not set
+# CONFIG_MPENTIUMII is not set
+# CONFIG_MPENTIUMIII is not set
+# CONFIG_MPENTIUMM is not set
+# CONFIG_MPENTIUM4 is not set
+# CONFIG_MK6 is not set
+# CONFIG_MK7 is not set
+# CONFIG_MK8 is not set
+# CONFIG_MCRUSOE is not set
+# CONFIG_MEFFICEON is not set
+# CONFIG_MWINCHIPC6 is not set
+# CONFIG_MWINCHIP2 is not set
+# CONFIG_MWINCHIP3D is not set
+# CONFIG_MGEODEGX1 is not set
+# CONFIG_MGEODE_LX is not set
+# CONFIG_MCYRIXIII is not set
+# CONFIG_MVIAC3_2 is not set
+# CONFIG_MVIAC7 is not set
+# CONFIG_MPSC is not set
+# CONFIG_MCORE2 is not set
+# CONFIG_GENERIC_CPU is not set
+# CONFIG_X86_GENERIC is not set
+CONFIG_X86_CMPXCHG=y
+CONFIG_X86_L1_CACHE_SHIFT=5
+CONFIG_X86_XADD=y
+CONFIG_X86_PPRO_FENCE=y
+CONFIG_X86_F00F_BUG=y
+CONFIG_X86_WP_WORKS_OK=y
+CONFIG_X86_INVLPG=y
+CONFIG_X86_BSWAP=y
+CONFIG_X86_POPAD_OK=y
+CONFIG_X86_ALIGNMENT_16=y
+CONFIG_X86_GOOD_APIC=y
+CONFIG_X86_INTEL_USERCOPY=y
+CONFIG_X86_TSC=y
+CONFIG_X86_MINIMUM_CPU_FAMILY=4
+CONFIG_HPET_TIMER=y
+CONFIG_HPET_EMULATE_RTC=y
+# CONFIG_IOMMU_HELPER is not set
+CONFIG_NR_CPUS=8
+CONFIG_SCHED_SMT=y
+# CONFIG_SCHED_MC is not set
+# CONFIG_PREEMPT_NONE is not set
+# CONFIG_PREEMPT_VOLUNTARY is not set
+CONFIG_PREEMPT=y
+CONFIG_RCU_TRACE=y
+CONFIG_X86_LOCAL_APIC=y
+CONFIG_X86_IO_APIC=y
+# CONFIG_X86_MCE is not set
+CONFIG_VM86=y
+CONFIG_TOSHIBA=y
+# CONFIG_I8K is not set
+CONFIG_X86_REBOOTFIXUPS=y
+# CONFIG_MICROCODE is not set
+# CONFIG_X86_MSR is not set
+# CONFIG_X86_CPUID is not set
+# CONFIG_NOHIGHMEM is not set
+# CONFIG_HIGHMEM4G is not set
+CONFIG_HIGHMEM64G=y
+CONFIG_PAGE_OFFSET=0xC0000000
+CONFIG_HIGHMEM=y
+CONFIG_X86_PAE=y
+CONFIG_SELECT_MEMORY_MODEL=y
+CONFIG_FLATMEM_MANUAL=y
+# CONFIG_DISCONTIGMEM_MANUAL is not set
+# CONFIG_SPARSEMEM_MANUAL is not set
+CONFIG_FLATMEM=y
+CONFIG_FLAT_NODE_MEM_MAP=y
+# CONFIG_SPARSEMEM_STATIC is not set
+# CONFIG_SPARSEMEM_VMEMMAP_ENABLE is not set
+CONFIG_SPLIT_PTLOCK_CPUS=4
+CONFIG_RESOURCES_64BIT=y
+CONFIG_ZONE_DMA_FLAG=1
+CONFIG_BOUNCE=y
+CONFIG_NR_QUICK=1
+CONFIG_VIRT_TO_BUS=y
+CONFIG_HIGHPTE=y
+CONFIG_MATH_EMULATION=y
+CONFIG_MTRR=y
+# CONFIG_IRQBALANCE is not set
+CONFIG_SECCOMP=y
+# CONFIG_HZ_100 is not set
+CONFIG_HZ_250=y
+# CONFIG_HZ_300 is not set
+# CONFIG_HZ_1000 is not set
+CONFIG_HZ=250
+# CONFIG_SCHED_HRTICK is not set
+# CONFIG_KEXEC is not set
+# CONFIG_CRASH_DUMP is not set
+CONFIG_PHYSICAL_START=0x100000
+CONFIG_RELOCATABLE=y
+CONFIG_PHYSICAL_ALIGN=0x100000
+# CONFIG_HOTPLUG_CPU is not set
+CONFIG_COMPAT_VDSO=y
+CONFIG_ARCH_ENABLE_MEMORY_HOTPLUG=y
 
-Signed-off-by: Randy Dunlap <randy.dunlap@oracle.com>
----
- Documentation/kbuild/00-INDEX         |    2 
- Documentation/kbuild/make-configs.txt |  188 ++++++++++++++++++++++++
- README                                |   32 ++--
- 3 files changed, 210 insertions(+), 12 deletions(-)
+#
+# Power management options
+#
+# CONFIG_PM is not set
 
---- linux-2625-rc3-kdoc.orig/Documentation/kbuild/00-INDEX
-+++ linux-2625-rc3-kdoc/Documentation/kbuild/00-INDEX
-@@ -4,5 +4,7 @@ kconfig-language.txt
- 	- specification of Config Language, the language in Kconfig files
- makefiles.txt
- 	- developer information for linux kernel makefiles
-+make-configs.txt
-+	- usage help for make *config
- modules.txt
- 	- how to build modules and to install them
---- /dev/null
-+++ linux-2625-rc3-kdoc/Documentation/kbuild/make-configs.txt
-@@ -0,0 +1,188 @@
-+This file contains some assistance for using "make *config".
-+
-+Use "make help" to list all of the possible configuration targets.
-+
-+The xconfig ('qconf') and menuconfig ('mconf') programs also
-+have embedded help text.  Be sure to check it for navigation,
-+search, and other general help text.
-+
-+======================================================================
-+General
-+--------------------------------------------------
-+
-+New kernel releases often introduce new config symbols.  Often more
-+important, new kernel releases may rename config symbols.  When
-+this happens, using a previously working .config file and running
-+"make oldconfig" won't necessarily produce a working new kernel
-+for you, so you may find that you need to see what NEW kernel
-+symbols have been introduced.
-+
-+To see a list of new config symbols when using "make oldconfig", use
-+
-+	cp user/some/old.config .config
-+	yes "" | make oldconfig >conf.new
-+
-+and the config program will list as (NEW) any new symbols that have
-+unknown values.  Of course, the .config file is also updated with
-+new (default) values, so you can use:
-+
-+	grep "(NEW)" conf.new
-+
-+to see the new config symbols or you can 'diff' the previous and
-+new .config files to see the differences:
-+
-+	diff .config.old .config | less
-+
-+(Yes, we need something better here.)
-+
-+
-+======================================================================
-+menuconfig
-+--------------------------------------------------
-+
-+SEARCHING for CONFIG symbols
-+
-+Searching in menuconfig:
-+
-+	The Search function searches for kernel configuration symbol
-+	names, so you have to know something close to what you are
-+	looking for.
-+
-+	Example:
-+		/hotplug
-+		This lists all config symbols that contain "hotplug",
-+		e.g., HOTPLUG, HOTPLUG_CPU, MEMORY_HOTPLUG.
-+
-+	For search help, enter / followed TAB-TAB-TAB (to highlight
-+	<Help>) and Enter.  This will tell you that you can also use
-+	regular expressions (regexes) in the search string, so if you
-+	are not interested in MEMORY_HOTPLUG, you could try
-+
-+		/^hotplug
-+
-+
-+______________________________________________________________________
-+Color Themes for 'menuconfig'
-+
-+It is possible to select different color themes using the variable
-+MENUCONFIG_COLOR.  To select a theme use:
-+
-+	make MENUCONFIG_COLOR=<theme> menuconfig
-+
-+Available themes are:
-+  mono       => selects colors suitable for monochrome displays
-+  blackbg    => selects a color scheme with black background
-+  classic    => theme with blue background. The classic look
-+  bluetitle  => a LCD friendly version of classic. (default)
-+
-+______________________________________________________________________
-+Environment variables in 'menuconfig'
-+
-+KCONFIG_ALLCONFIG
-+--------------------------------------------------
-+(partially based on lkml email from/by Rob Landley, re: miniconfig)
-+--------------------------------------------------
-+The allyesconfig/allmodconfig/allnoconfig/randconfig variants can
-+also use the environment variable KCONFIG_ALLCONFIG as a flag or a
-+filename that contains config symbols that the user requires to be
-+set to a specific value.  If KCONFIG_ALLCONFIG is used without a
-+filename, "make *config" checks for a file named
-+"all{yes/mod/no/random}.config" (corresponding to the *config command
-+that was used) for symbol values that are to be forced.  If this file
-+is not found, it checks for a file named "all.config" to contain forced
-+values.
-+
-+This enables you to create "miniature" config (miniconfig) or custom
-+config files containing just the config symbols that you are interested
-+in.  Then the kernel config system generates the full .config file,
-+including dependencies of your miniconfig file, based on the miniconfig
-+file.
-+
-+This 'KCONFIG_ALLCONFIG' file is a config file which contains
-+(usually a subset of all) preset config symbols.  These variable
-+settings are still subject to normal dependency checks.
-+
-+Examples:
-+	KCONFIG_ALLCONFIG=custom-notebook.config make allnoconfig
-+or
-+	KCONFIG_ALLCONFIG=mini.config make allnoconfig
-+or
-+	make KCONFIG_ALLCONFIG=mini.config allnoconfig
-+
-+These examples will disable most options (allnoconfig) but enable or
-+disable the options that are explicitly listed in the specified
-+mini-config files.
-+
-+KCONFIG_NOSILENTUPDATE
-+--------------------------------------------------
-+If this variable has a non-blank value, it prevents silent kernel
-+config udpates (requires explicit updates).
-+
-+KCONFIG_CONFIG
-+--------------------------------------------------
-+This environment variable can be used to specify a default kernel config
-+file name to override the default name of ".config".
-+
-+KCONFIG_OVERWRITECONFIG
-+--------------------------------------------------
-+If you set KCONFIG_OVERWRITECONFIG in the environment, Kconfig will not
-+break symlinks when .config is a symlink to somewhere else.
-+
-+KCONFIG_NOTIMESTAMP
-+--------------------------------------------------
-+If this environment variable exists and is non-null, the timestamp line
-+in generated .config files is omitted.
-+
-+KCONFIG_AUTOCONFIG
-+--------------------------------------------------
-+This environment variable can be set to specify the path & name of the
-+"auto.conf" file.  Its default value is "include/config/auto.conf".
-+
-+KCONFIG_AUTOHEADER
-+--------------------------------------------------
-+This environment variable can be set to specify the path & name of the
-+"autoconf.h" (header) file.  Its default value is "include/linux/autoconf.h".
-+
-+______________________________________________________________________
-+menuconfig User Interface Options
-+----------------------------------------------------------------------
-+MENUCONFIG_MODE
-+--------------------------------------------------
-+This mode shows all sub-menus in one large tree.
-+
-+Example:
-+	MENUCONFIG_MODE=single_menu make menuconfig
-+
-+======================================================================
-+xconfig
-+--------------------------------------------------
-+
-+Searching in xconfig:
-+
-+	The Search function searches for kernel configuration symbol
-+	names, so you have to know something close to what you are
-+	looking for.
-+
-+	Example:
-+		Ctrl-F hotplug
-+	or
-+		Menu: File, Search, hotplug
-+
-+	lists all config symbol entries that contain "hotplug" in
-+	the symbol name.  In this Search dialog, you may change the
-+	config setting for any of the entries that are not grayed out.
-+	You can also enter a different search string without having
-+	to return to the main menu.
-+
-+
-+======================================================================
-+gconfig
-+--------------------------------------------------
-+
-+Searching in gconfig:
-+
-+	None (gconfig isn't maintained as well as xconfig or menuconfig);
-+	however, gconfig does have a few more viewing choices than
-+	xconfig does.
-+
-+###
---- linux-2625-rc3-kdoc.orig/README
-+++ linux-2625-rc3-kdoc/README
-@@ -52,11 +52,11 @@ DOCUMENTATION:
- 
-  - The Documentation/DocBook/ subdirectory contains several guides for
-    kernel developers and users.  These guides can be rendered in a
--   number of formats:  PostScript (.ps), PDF, and HTML, among others.
--   After installation, "make psdocs", "make pdfdocs", or "make htmldocs"
--   will render the documentation in the requested format.
-+   number of formats:  PostScript (.ps), PDF, HTML, & man-pages, among others.
-+   After installation, "make psdocs", "make pdfdocs", "make htmldocs",
-+   or "make mandocs" will render the documentation in the requested format.
- 
--INSTALLING the kernel:
-+INSTALLING the kernel source:
- 
-  - If you install the full sources, put the kernel tarball in a
-    directory where you have permissions (eg. your home directory) and
-@@ -187,14 +187,9 @@ CONFIGURING the kernel:
- 	"make randconfig"  Create a ./.config file by setting symbol
- 			   values to random values.
- 
--   The allyesconfig/allmodconfig/allnoconfig/randconfig variants can
--   also use the environment variable KCONFIG_ALLCONFIG to specify a
--   filename that contains config options that the user requires to be
--   set to a specific value.  If KCONFIG_ALLCONFIG=filename is not used,
--   "make *config" checks for a file named "all{yes/mod/no/random}.config"
--   for symbol values that are to be forced.  If this file is not found,
--   it checks for a file named "all.config" to contain forced values.
--   
-+   You can find more information on using the Linux kernel config tools
-+   in Documentation/kbuild/make-configs.txt.
-+
- 	NOTES on "make config":
- 	- having unnecessary drivers will make the kernel bigger, and can
- 	  under some circumstances lead to problems: probing for a
-@@ -231,6 +226,19 @@ COMPILING the kernel:
-  - If you configured any of the parts of the kernel as `modules', you
-    will also have to do "make modules_install".
- 
-+ - Verbose kernel compile/build output:
-+
-+   Normally the kernel build system runs in a fairly quiet mode (but not
-+   totally silent).  However, sometimes you or other kernel developers need
-+   to see compile, link, or other commands exactly as they are executed.
-+   For this, use "verbose" build mode.  This is done by inserting
-+   "V=1" in the "make" command.  E.g.:
-+
-+	make V=1 all
-+
-+   To have the build system also tell the reason for the rebuild of each
-+   target, use "V=2".  The default is "V=0".
-+
-  - Keep a backup kernel handy in case something goes wrong.  This is 
-    especially true for the development releases, since each new release
-    contains new code which has not been debugged.  Make sure you keep a
+#
+# CPU Frequency scaling
+#
+# CONFIG_CPU_FREQ is not set
+CONFIG_CPU_IDLE=y
+CONFIG_CPU_IDLE_GOV_LADDER=y
+CONFIG_CPU_IDLE_GOV_MENU=y
+
+#
+# Bus options (PCI etc.)
+#
+# CONFIG_PCI is not set
+# CONFIG_ARCH_SUPPORTS_MSI is not set
+CONFIG_ISA_DMA_API=y
+# CONFIG_ISA is not set
+CONFIG_MCA=y
+# CONFIG_MCA_LEGACY is not set
+CONFIG_SCx200=y
+# CONFIG_SCx200HR_TIMER is not set
+CONFIG_PCCARD=y
+# CONFIG_PCMCIA_DEBUG is not set
+CONFIG_PCMCIA=y
+CONFIG_PCMCIA_LOAD_CIS=y
+# CONFIG_PCMCIA_IOCTL is not set
+
+#
+# PC-card bridges
+#
+
+#
+# Executable file formats / Emulations
+#
+# CONFIG_BINFMT_ELF is not set
+CONFIG_BINFMT_AOUT=y
+# CONFIG_BINFMT_MISC is not set
+
+#
+# Networking
+#
+CONFIG_NET=y
+
+#
+# Networking options
+#
+CONFIG_PACKET=y
+CONFIG_PACKET_MMAP=y
+CONFIG_UNIX=y
+CONFIG_XFRM=y
+# CONFIG_XFRM_USER is not set
+# CONFIG_XFRM_SUB_POLICY is not set
+# CONFIG_XFRM_MIGRATE is not set
+CONFIG_XFRM_STATISTICS=y
+# CONFIG_NET_KEY is not set
+CONFIG_INET=y
+CONFIG_IP_MULTICAST=y
+CONFIG_IP_ADVANCED_ROUTER=y
+CONFIG_ASK_IP_FIB_HASH=y
+# CONFIG_IP_FIB_TRIE is not set
+CONFIG_IP_FIB_HASH=y
+# CONFIG_IP_MULTIPLE_TABLES is not set
+CONFIG_IP_ROUTE_MULTIPATH=y
+CONFIG_IP_ROUTE_VERBOSE=y
+CONFIG_IP_PNP=y
+# CONFIG_IP_PNP_DHCP is not set
+CONFIG_IP_PNP_BOOTP=y
+# CONFIG_IP_PNP_RARP is not set
+# CONFIG_NET_IPIP is not set
+CONFIG_NET_IPGRE=y
+# CONFIG_NET_IPGRE_BROADCAST is not set
+# CONFIG_IP_MROUTE is not set
+# CONFIG_ARPD is not set
+# CONFIG_SYN_COOKIES is not set
+# CONFIG_INET_AH is not set
+CONFIG_INET_ESP=y
+CONFIG_INET_IPCOMP=y
+CONFIG_INET_XFRM_TUNNEL=y
+CONFIG_INET_TUNNEL=y
+CONFIG_INET_XFRM_MODE_TRANSPORT=y
+# CONFIG_INET_XFRM_MODE_TUNNEL is not set
+# CONFIG_INET_XFRM_MODE_BEET is not set
+# CONFIG_INET_LRO is not set
+# CONFIG_INET_DIAG is not set
+CONFIG_TCP_CONG_ADVANCED=y
+# CONFIG_TCP_CONG_BIC is not set
+# CONFIG_TCP_CONG_CUBIC is not set
+CONFIG_TCP_CONG_WESTWOOD=y
+# CONFIG_TCP_CONG_HTCP is not set
+# CONFIG_TCP_CONG_HSTCP is not set
+CONFIG_TCP_CONG_HYBLA=y
+CONFIG_TCP_CONG_VEGAS=y
+CONFIG_TCP_CONG_SCALABLE=y
+# CONFIG_TCP_CONG_LP is not set
+CONFIG_TCP_CONG_VENO=y
+CONFIG_TCP_CONG_YEAH=y
+CONFIG_TCP_CONG_ILLINOIS=y
+# CONFIG_DEFAULT_BIC is not set
+# CONFIG_DEFAULT_CUBIC is not set
+# CONFIG_DEFAULT_HTCP is not set
+CONFIG_DEFAULT_VEGAS=y
+# CONFIG_DEFAULT_WESTWOOD is not set
+# CONFIG_DEFAULT_RENO is not set
+CONFIG_DEFAULT_TCP_CONG="vegas"
+# CONFIG_TCP_MD5SIG is not set
+# CONFIG_IPV6 is not set
+# CONFIG_INET6_XFRM_TUNNEL is not set
+# CONFIG_INET6_TUNNEL is not set
+# CONFIG_NETLABEL is not set
+# CONFIG_NETWORK_SECMARK is not set
+# CONFIG_NETFILTER is not set
+CONFIG_IP_DCCP=y
+CONFIG_IP_DCCP_ACKVEC=y
+
+#
+# DCCP CCIDs Configuration (EXPERIMENTAL)
+#
+CONFIG_IP_DCCP_CCID2=y
+# CONFIG_IP_DCCP_CCID2_DEBUG is not set
+CONFIG_IP_DCCP_CCID3=y
+# CONFIG_IP_DCCP_CCID3_DEBUG is not set
+CONFIG_IP_DCCP_CCID3_RTO=100
+CONFIG_IP_DCCP_TFRC_LIB=y
+CONFIG_IP_SCTP=y
+CONFIG_SCTP_DBG_MSG=y
+CONFIG_SCTP_DBG_OBJCNT=y
+# CONFIG_SCTP_HMAC_NONE is not set
+CONFIG_SCTP_HMAC_SHA1=y
+# CONFIG_SCTP_HMAC_MD5 is not set
+# CONFIG_TIPC is not set
+# CONFIG_ATM is not set
+CONFIG_BRIDGE=y
+CONFIG_VLAN_8021Q=y
+CONFIG_DECNET=y
+CONFIG_DECNET_ROUTER=y
+CONFIG_LLC=y
+CONFIG_LLC2=y
+# CONFIG_IPX is not set
+# CONFIG_ATALK is not set
+CONFIG_X25=y
+# CONFIG_LAPB is not set
+# CONFIG_ECONET is not set
+CONFIG_WAN_ROUTER=y
+CONFIG_NET_SCHED=y
+
+#
+# Queueing/Scheduling
+#
+CONFIG_NET_SCH_CBQ=y
+CONFIG_NET_SCH_HTB=y
+# CONFIG_NET_SCH_HFSC is not set
+# CONFIG_NET_SCH_PRIO is not set
+# CONFIG_NET_SCH_RR is not set
+# CONFIG_NET_SCH_RED is not set
+CONFIG_NET_SCH_SFQ=y
+CONFIG_NET_SCH_TEQL=y
+# CONFIG_NET_SCH_TBF is not set
+CONFIG_NET_SCH_GRED=y
+CONFIG_NET_SCH_DSMARK=y
+CONFIG_NET_SCH_NETEM=y
+
+#
+# Classification
+#
+CONFIG_NET_CLS=y
+# CONFIG_NET_CLS_BASIC is not set
+CONFIG_NET_CLS_TCINDEX=y
+# CONFIG_NET_CLS_ROUTE4 is not set
+CONFIG_NET_CLS_FW=y
+# CONFIG_NET_CLS_U32 is not set
+# CONFIG_NET_CLS_RSVP is not set
+# CONFIG_NET_CLS_RSVP6 is not set
+CONFIG_NET_CLS_FLOW=y
+# CONFIG_NET_EMATCH is not set
+# CONFIG_NET_CLS_ACT is not set
+CONFIG_NET_CLS_IND=y
+CONFIG_NET_SCH_FIFO=y
+
+#
+# Network testing
+#
+CONFIG_NET_PKTGEN=y
+# CONFIG_HAMRADIO is not set
+# CONFIG_CAN is not set
+# CONFIG_IRDA is not set
+# CONFIG_BT is not set
+CONFIG_AF_RXRPC=y
+# CONFIG_AF_RXRPC_DEBUG is not set
+CONFIG_RXKAD=y
+CONFIG_FIB_RULES=y
+
+#
+# Wireless
+#
+CONFIG_CFG80211=y
+# CONFIG_NL80211 is not set
+CONFIG_WIRELESS_EXT=y
+CONFIG_MAC80211=y
+
+#
+# Rate control algorithm selection
+#
+CONFIG_MAC80211_RC_DEFAULT_PID=y
+# CONFIG_MAC80211_RC_DEFAULT_SIMPLE is not set
+# CONFIG_MAC80211_RC_DEFAULT_NONE is not set
+
+#
+# Selecting 'y' for an algorithm will
+#
+
+#
+# build the algorithm into mac80211.
+#
+CONFIG_MAC80211_RC_DEFAULT="pid"
+CONFIG_MAC80211_RC_PID=y
+CONFIG_MAC80211_RC_SIMPLE=y
+# CONFIG_MAC80211_LEDS is not set
+# CONFIG_MAC80211_DEBUGFS is not set
+# CONFIG_MAC80211_DEBUG_PACKET_ALIGNMENT is not set
+# CONFIG_MAC80211_DEBUG is not set
+# CONFIG_IEEE80211 is not set
+# CONFIG_RFKILL is not set
+CONFIG_NET_9P=y
+# CONFIG_NET_9P_FD is not set
+# CONFIG_NET_9P_VIRTIO is not set
+# CONFIG_NET_9P_DEBUG is not set
+
+#
+# Device Drivers
+#
+
+#
+# Generic Driver Options
+#
+CONFIG_UEVENT_HELPER_PATH="/sbin/hotplug"
+# CONFIG_STANDALONE is not set
+CONFIG_PREVENT_FIRMWARE_BUILD=y
+CONFIG_FW_LOADER=y
+# CONFIG_SYS_HYPERVISOR is not set
+CONFIG_CONNECTOR=y
+# CONFIG_PROC_EVENTS is not set
+CONFIG_MTD=y
+# CONFIG_MTD_DEBUG is not set
+# CONFIG_MTD_CONCAT is not set
+CONFIG_MTD_PARTITIONS=y
+# CONFIG_MTD_REDBOOT_PARTS is not set
+# CONFIG_MTD_CMDLINE_PARTS is not set
+
+#
+# User Modules And Translation Layers
+#
+CONFIG_MTD_CHAR=y
+CONFIG_MTD_BLKDEVS=y
+# CONFIG_MTD_BLOCK is not set
+# CONFIG_MTD_BLOCK_RO is not set
+# CONFIG_FTL is not set
+CONFIG_NFTL=y
+# CONFIG_NFTL_RW is not set
+CONFIG_INFTL=y
+# CONFIG_RFD_FTL is not set
+# CONFIG_SSFDC is not set
+# CONFIG_MTD_OOPS is not set
+
+#
+# RAM/ROM/Flash chip drivers
+#
+# CONFIG_MTD_CFI is not set
+CONFIG_MTD_JEDECPROBE=y
+CONFIG_MTD_GEN_PROBE=y
+# CONFIG_MTD_CFI_ADV_OPTIONS is not set
+CONFIG_MTD_MAP_BANK_WIDTH_1=y
+CONFIG_MTD_MAP_BANK_WIDTH_2=y
+CONFIG_MTD_MAP_BANK_WIDTH_4=y
+# CONFIG_MTD_MAP_BANK_WIDTH_8 is not set
+# CONFIG_MTD_MAP_BANK_WIDTH_16 is not set
+# CONFIG_MTD_MAP_BANK_WIDTH_32 is not set
+CONFIG_MTD_CFI_I1=y
+CONFIG_MTD_CFI_I2=y
+# CONFIG_MTD_CFI_I4 is not set
+# CONFIG_MTD_CFI_I8 is not set
+# CONFIG_MTD_CFI_INTELEXT is not set
+CONFIG_MTD_CFI_AMDSTD=y
+CONFIG_MTD_CFI_STAA=y
+CONFIG_MTD_CFI_UTIL=y
+CONFIG_MTD_RAM=y
+CONFIG_MTD_ROM=y
+# CONFIG_MTD_ABSENT is not set
+
+#
+# Mapping drivers for chip access
+#
+CONFIG_MTD_COMPLEX_MAPPINGS=y
+# CONFIG_MTD_PHYSMAP is not set
+CONFIG_MTD_TS5500=y
+# CONFIG_MTD_AMD76XROM is not set
+# CONFIG_MTD_ICHXROM is not set
+# CONFIG_MTD_SCB2_FLASH is not set
+CONFIG_MTD_NETtel=y
+# CONFIG_MTD_L440GX is not set
+# CONFIG_MTD_PLATRAM is not set
+
+#
+# Self-contained MTD device drivers
+#
+# CONFIG_MTD_DATAFLASH is not set
+CONFIG_MTD_M25P80=y
+CONFIG_MTD_SLRAM=y
+# CONFIG_MTD_PHRAM is not set
+CONFIG_MTD_MTDRAM=y
+CONFIG_MTDRAM_TOTAL_SIZE=4096
+CONFIG_MTDRAM_ERASE_SIZE=128
+CONFIG_MTDRAM_ABS_POS=0x0
+CONFIG_MTD_BLOCK2MTD=y
+
+#
+# Disk-On-Chip Device Drivers
+#
+CONFIG_MTD_DOC2000=y
+# CONFIG_MTD_DOC2001 is not set
+# CONFIG_MTD_DOC2001PLUS is not set
+CONFIG_MTD_DOCPROBE=y
+CONFIG_MTD_DOCECC=y
+CONFIG_MTD_DOCPROBE_ADVANCED=y
+CONFIG_MTD_DOCPROBE_ADDRESS=0x0000
+# CONFIG_MTD_DOCPROBE_HIGH is not set
+# CONFIG_MTD_DOCPROBE_55AA is not set
+# CONFIG_MTD_NAND is not set
+CONFIG_MTD_NAND_IDS=y
+CONFIG_MTD_ONENAND=y
+# CONFIG_MTD_ONENAND_VERIFY_WRITE is not set
+CONFIG_MTD_ONENAND_OTP=y
+CONFIG_MTD_ONENAND_2X_PROGRAM=y
+CONFIG_MTD_ONENAND_SIM=y
+
+#
+# UBI - Unsorted block images
+#
+CONFIG_MTD_UBI=y
+CONFIG_MTD_UBI_WL_THRESHOLD=4096
+CONFIG_MTD_UBI_BEB_RESERVE=1
+# CONFIG_MTD_UBI_GLUEBI is not set
+
+#
+# UBI debugging options
+#
+# CONFIG_MTD_UBI_DEBUG is not set
+CONFIG_PARPORT=y
+CONFIG_PARPORT_PC=y
+CONFIG_PARPORT_PC_FIFO=y
+# CONFIG_PARPORT_PC_SUPERIO is not set
+# CONFIG_PARPORT_PC_PCMCIA is not set
+# CONFIG_PARPORT_GSC is not set
+# CONFIG_PARPORT_AX88796 is not set
+# CONFIG_PARPORT_1284 is not set
+CONFIG_BLK_DEV=y
+# CONFIG_BLK_DEV_FD is not set
+CONFIG_PARIDE=y
+
+#
+# Parallel IDE high-level drivers
+#
+CONFIG_PARIDE_PD=y
+CONFIG_PARIDE_PCD=y
+# CONFIG_PARIDE_PF is not set
+CONFIG_PARIDE_PT=y
+# CONFIG_PARIDE_PG is not set
+
+#
+# Parallel IDE protocol modules
+#
+# CONFIG_PARIDE_ATEN is not set
+CONFIG_PARIDE_BPCK=y
+# CONFIG_PARIDE_BPCK6 is not set
+CONFIG_PARIDE_COMM=y
+# CONFIG_PARIDE_DSTR is not set
+CONFIG_PARIDE_FIT2=y
+# CONFIG_PARIDE_FIT3 is not set
+# CONFIG_PARIDE_EPAT is not set
+CONFIG_PARIDE_EPIA=y
+CONFIG_PARIDE_FRIQ=y
+# CONFIG_PARIDE_FRPW is not set
+CONFIG_PARIDE_KBIC=y
+CONFIG_PARIDE_KTTI=y
+CONFIG_PARIDE_ON20=y
+CONFIG_PARIDE_ON26=y
+# CONFIG_BLK_DEV_COW_COMMON is not set
+# CONFIG_BLK_DEV_LOOP is not set
+CONFIG_BLK_DEV_NBD=y
+CONFIG_BLK_DEV_RAM=y
+CONFIG_BLK_DEV_RAM_COUNT=16
+CONFIG_BLK_DEV_RAM_SIZE=4096
+CONFIG_BLK_DEV_XIP=y
+# CONFIG_CDROM_PKTCDVD is not set
+# CONFIG_ATA_OVER_ETH is not set
+CONFIG_VIRTIO_BLK=y
+CONFIG_MISC_DEVICES=y
+# CONFIG_EEPROM_93CX6 is not set
+CONFIG_ENCLOSURE_SERVICES=y
+CONFIG_HAVE_IDE=y
+# CONFIG_IDE is not set
+
+#
+# SCSI device support
+#
+CONFIG_RAID_ATTRS=y
+CONFIG_SCSI=y
+CONFIG_SCSI_DMA=y
+CONFIG_SCSI_TGT=y
+CONFIG_SCSI_NETLINK=y
+CONFIG_SCSI_PROC_FS=y
+
+#
+# SCSI support type (disk, tape, CD-ROM)
+#
+CONFIG_BLK_DEV_SD=y
+CONFIG_CHR_DEV_ST=y
+# CONFIG_CHR_DEV_OSST is not set
+CONFIG_BLK_DEV_SR=y
+# CONFIG_BLK_DEV_SR_VENDOR is not set
+# CONFIG_CHR_DEV_SG is not set
+# CONFIG_CHR_DEV_SCH is not set
+CONFIG_SCSI_ENCLOSURE=y
+
+#
+# Some SCSI devices (e.g. CD jukebox) support multiple LUNs
+#
+CONFIG_SCSI_MULTI_LUN=y
+# CONFIG_SCSI_CONSTANTS is not set
+# CONFIG_SCSI_LOGGING is not set
+CONFIG_SCSI_SCAN_ASYNC=y
+
+#
+# SCSI Transports
+#
+CONFIG_SCSI_SPI_ATTRS=y
+CONFIG_SCSI_FC_ATTRS=y
+# CONFIG_SCSI_FC_TGT_ATTRS is not set
+# CONFIG_SCSI_ISCSI_ATTRS is not set
+# CONFIG_SCSI_SAS_ATTRS is not set
+# CONFIG_SCSI_SAS_LIBSAS is not set
+# CONFIG_SCSI_SRP_ATTRS is not set
+CONFIG_SCSI_LOWLEVEL=y
+# CONFIG_ISCSI_TCP is not set
+CONFIG_SCSI_BUSLOGIC=y
+CONFIG_SCSI_OMIT_FLASHPOINT=y
+CONFIG_SCSI_IBMMCA=y
+CONFIG_IBMMCA_SCSI_ORDER_STANDARD=y
+# CONFIG_IBMMCA_SCSI_DEV_RESET is not set
+# CONFIG_SCSI_PPA is not set
+# CONFIG_SCSI_IMM is not set
+CONFIG_SCSI_NCR_D700=y
+# CONFIG_SCSI_NCR_Q720 is not set
+# CONFIG_SCSI_SIM710 is not set
+# CONFIG_SCSI_DEBUG is not set
+# CONFIG_SCSI_LOWLEVEL_PCMCIA is not set
+# CONFIG_ATA is not set
+# CONFIG_MD is not set
+# CONFIG_MACINTOSH_DRIVERS is not set
+CONFIG_NETDEVICES=y
+CONFIG_NETDEVICES_MULTIQUEUE=y
+CONFIG_DUMMY=y
+# CONFIG_BONDING is not set
+CONFIG_MACVLAN=y
+CONFIG_EQUALIZER=y
+# CONFIG_TUN is not set
+# CONFIG_VETH is not set
+CONFIG_PHYLIB=y
+
+#
+# MII PHY device drivers
+#
+CONFIG_MARVELL_PHY=y
+CONFIG_DAVICOM_PHY=y
+# CONFIG_QSEMI_PHY is not set
+CONFIG_LXT_PHY=y
+CONFIG_CICADA_PHY=y
+CONFIG_VITESSE_PHY=y
+CONFIG_SMSC_PHY=y
+CONFIG_BROADCOM_PHY=y
+# CONFIG_ICPLUS_PHY is not set
+# CONFIG_REALTEK_PHY is not set
+CONFIG_FIXED_PHY=y
+# CONFIG_MDIO_BITBANG is not set
+CONFIG_NET_ETHERNET=y
+CONFIG_MII=y
+CONFIG_NET_VENDOR_3COM=y
+# CONFIG_EL3 is not set
+CONFIG_NET_VENDOR_SMC=y
+# CONFIG_ULTRAMCA is not set
+# CONFIG_ENC28J60 is not set
+# CONFIG_DEPCA is not set
+CONFIG_IBMLANA=y
+# CONFIG_IBM_NEW_EMAC_ZMII is not set
+# CONFIG_IBM_NEW_EMAC_RGMII is not set
+# CONFIG_IBM_NEW_EMAC_TAH is not set
+# CONFIG_IBM_NEW_EMAC_EMAC4 is not set
+CONFIG_B44=y
+CONFIG_NET_POCKET=y
+CONFIG_ATP=y
+# CONFIG_DE600 is not set
+# CONFIG_DE620 is not set
+# CONFIG_NETDEV_1000 is not set
+CONFIG_NETDEV_10000=y
+CONFIG_TR=y
+CONFIG_IBMTR=y
+CONFIG_TMS380TR=y
+CONFIG_MADGEMC=y
+
+#
+# Wireless LAN
+#
+CONFIG_WLAN_PRE80211=y
+# CONFIG_STRIP is not set
+# CONFIG_PCMCIA_WAVELAN is not set
+# CONFIG_PCMCIA_NETWAVE is not set
+# CONFIG_WLAN_80211 is not set
+# CONFIG_NET_PCMCIA is not set
+# CONFIG_WAN is not set
+CONFIG_PLIP=y
+# CONFIG_PPP is not set
+CONFIG_SLIP=y
+# CONFIG_SLIP_COMPRESSED is not set
+# CONFIG_SLIP_SMART is not set
+# CONFIG_SLIP_MODE_SLIP6 is not set
+CONFIG_NETCONSOLE=y
+CONFIG_NETCONSOLE_DYNAMIC=y
+CONFIG_NETPOLL=y
+# CONFIG_NETPOLL_TRAP is not set
+CONFIG_NET_POLL_CONTROLLER=y
+CONFIG_VIRTIO_NET=y
+CONFIG_ISDN=y
+CONFIG_ISDN_I4L=y
+# CONFIG_ISDN_PPP is not set
+CONFIG_ISDN_AUDIO=y
+CONFIG_ISDN_TTY_FAX=y
+# CONFIG_ISDN_X25 is not set
+
+#
+# ISDN feature submodules
+#
+# CONFIG_ISDN_DIVERSION is not set
+
+#
+# ISDN4Linux hardware drivers
+#
+
+#
+# Passive cards
+#
+# CONFIG_ISDN_DRV_HISAX is not set
+
+#
+# Active cards
+#
+CONFIG_ISDN_DRV_GIGASET=y
+# CONFIG_GIGASET_M101 is not set
+# CONFIG_GIGASET_DEBUG is not set
+# CONFIG_GIGASET_UNDOCREQ is not set
+CONFIG_ISDN_CAPI=y
+# CONFIG_ISDN_DRV_AVMB1_VERBOSE_REASON is not set
+CONFIG_CAPI_TRACE=y
+# CONFIG_ISDN_CAPI_MIDDLEWARE is not set
+# CONFIG_ISDN_CAPI_CAPI20 is not set
+CONFIG_ISDN_CAPI_CAPIDRV=y
+
+#
+# CAPI hardware drivers
+#
+CONFIG_CAPI_AVM=y
+CONFIG_ISDN_DRV_AVMB1_B1PCMCIA=y
+# CONFIG_ISDN_DRV_AVMB1_AVM_CS is not set
+CONFIG_CAPI_EICON=y
+CONFIG_PHONE=y
+
+#
+# Input device support
+#
+CONFIG_INPUT=y
+# CONFIG_INPUT_FF_MEMLESS is not set
+CONFIG_INPUT_POLLDEV=y
+
+#
+# Userland interfaces
+#
+CONFIG_INPUT_MOUSEDEV=y
+# CONFIG_INPUT_MOUSEDEV_PSAUX is not set
+CONFIG_INPUT_MOUSEDEV_SCREEN_X=1024
+CONFIG_INPUT_MOUSEDEV_SCREEN_Y=768
+# CONFIG_INPUT_JOYDEV is not set
+CONFIG_INPUT_EVDEV=y
+# CONFIG_INPUT_EVBUG is not set
+
+#
+# Input Device Drivers
+#
+CONFIG_INPUT_KEYBOARD=y
+CONFIG_KEYBOARD_ATKBD=y
+# CONFIG_KEYBOARD_SUNKBD is not set
+# CONFIG_KEYBOARD_LKKBD is not set
+# CONFIG_KEYBOARD_XTKBD is not set
+CONFIG_KEYBOARD_NEWTON=y
+# CONFIG_KEYBOARD_STOWAWAY is not set
+CONFIG_INPUT_MOUSE=y
+CONFIG_MOUSE_PS2=y
+CONFIG_MOUSE_PS2_ALPS=y
+CONFIG_MOUSE_PS2_LOGIPS2PP=y
+CONFIG_MOUSE_PS2_SYNAPTICS=y
+CONFIG_MOUSE_PS2_LIFEBOOK=y
+CONFIG_MOUSE_PS2_TRACKPOINT=y
+# CONFIG_MOUSE_PS2_TOUCHKIT is not set
+# CONFIG_MOUSE_SERIAL is not set
+# CONFIG_MOUSE_VSXXXAA is not set
+CONFIG_INPUT_JOYSTICK=y
+# CONFIG_JOYSTICK_ANALOG is not set
+# CONFIG_JOYSTICK_A3D is not set
+# CONFIG_JOYSTICK_ADI is not set
+CONFIG_JOYSTICK_COBRA=y
+CONFIG_JOYSTICK_GF2K=y
+CONFIG_JOYSTICK_GRIP=y
+# CONFIG_JOYSTICK_GRIP_MP is not set
+CONFIG_JOYSTICK_GUILLEMOT=y
+# CONFIG_JOYSTICK_INTERACT is not set
+CONFIG_JOYSTICK_SIDEWINDER=y
+CONFIG_JOYSTICK_TMDC=y
+CONFIG_JOYSTICK_IFORCE=y
+# CONFIG_JOYSTICK_IFORCE_232 is not set
+# CONFIG_JOYSTICK_WARRIOR is not set
+CONFIG_JOYSTICK_MAGELLAN=y
+# CONFIG_JOYSTICK_SPACEORB is not set
+# CONFIG_JOYSTICK_SPACEBALL is not set
+CONFIG_JOYSTICK_STINGER=y
+CONFIG_JOYSTICK_TWIDJOY=y
+# CONFIG_JOYSTICK_DB9 is not set
+CONFIG_JOYSTICK_GAMECON=y
+# CONFIG_JOYSTICK_TURBOGRAFX is not set
+# CONFIG_JOYSTICK_JOYDUMP is not set
+CONFIG_INPUT_TABLET=y
+# CONFIG_INPUT_TOUCHSCREEN is not set
+CONFIG_INPUT_MISC=y
+CONFIG_INPUT_PCSPKR=y
+CONFIG_INPUT_APANEL=y
+CONFIG_INPUT_WISTRON_BTNS=y
+# CONFIG_INPUT_UINPUT is not set
+
+#
+# Hardware I/O ports
+#
+CONFIG_SERIO=y
+CONFIG_SERIO_I8042=y
+CONFIG_SERIO_SERPORT=y
+# CONFIG_SERIO_CT82C710 is not set
+CONFIG_SERIO_PARKBD=y
+CONFIG_SERIO_LIBPS2=y
+CONFIG_SERIO_RAW=y
+CONFIG_GAMEPORT=y
+# CONFIG_GAMEPORT_NS558 is not set
+# CONFIG_GAMEPORT_L4 is not set
+
+#
+# Character devices
+#
+CONFIG_VT=y
+CONFIG_VT_CONSOLE=y
+CONFIG_HW_CONSOLE=y
+CONFIG_VT_HW_CONSOLE_BINDING=y
+# CONFIG_SERIAL_NONSTANDARD is not set
+
+#
+# Serial drivers
+#
+CONFIG_SERIAL_8250=y
+# CONFIG_SERIAL_8250_CONSOLE is not set
+CONFIG_FIX_EARLYCON_MEM=y
+CONFIG_SERIAL_8250_CS=y
+CONFIG_SERIAL_8250_NR_UARTS=4
+CONFIG_SERIAL_8250_RUNTIME_UARTS=4
+# CONFIG_SERIAL_8250_EXTENDED is not set
+# CONFIG_SERIAL_8250_MCA is not set
+
+#
+# Non-8250 serial port support
+#
+CONFIG_SERIAL_CORE=y
+CONFIG_UNIX98_PTYS=y
+# CONFIG_LEGACY_PTYS is not set
+# CONFIG_PRINTER is not set
+CONFIG_PPDEV=y
+# CONFIG_IPMI_HANDLER is not set
+CONFIG_HW_RANDOM=y
+# CONFIG_HW_RANDOM_VIA is not set
+# CONFIG_NVRAM is not set
+# CONFIG_RTC is not set
+CONFIG_GEN_RTC=y
+# CONFIG_GEN_RTC_X is not set
+# CONFIG_R3964 is not set
+
+#
+# PCMCIA character devices
+#
+# CONFIG_SYNCLINK_CS is not set
+# CONFIG_CARDMAN_4000 is not set
+CONFIG_CARDMAN_4040=y
+# CONFIG_IPWIRELESS is not set
+# CONFIG_MWAVE is not set
+CONFIG_SCx200_GPIO=y
+# CONFIG_PC8736x_GPIO is not set
+CONFIG_NSC_GPIO=y
+CONFIG_CS5535_GPIO=y
+CONFIG_RAW_DRIVER=y
+CONFIG_MAX_RAW_DEVS=256
+# CONFIG_HANGCHECK_TIMER is not set
+# CONFIG_TCG_TPM is not set
+# CONFIG_TELCLOCK is not set
+CONFIG_I2C=y
+CONFIG_I2C_BOARDINFO=y
+CONFIG_I2C_CHARDEV=y
+
+#
+# I2C Algorithms
+#
+CONFIG_I2C_ALGOBIT=y
+# CONFIG_I2C_ALGOPCF is not set
+CONFIG_I2C_ALGOPCA=y
+
+#
+# I2C Hardware Bus support
+#
+CONFIG_I2C_I801=y
+CONFIG_I2C_OCORES=y
+# CONFIG_I2C_PARPORT is not set
+CONFIG_I2C_PARPORT_LIGHT=y
+CONFIG_I2C_SIMTEC=y
+CONFIG_SCx200_I2C=y
+CONFIG_SCx200_I2C_SCL=12
+CONFIG_SCx200_I2C_SDA=13
+# CONFIG_I2C_TAOS_EVM is not set
+
+#
+# Miscellaneous I2C Chip support
+#
+# CONFIG_DS1682 is not set
+CONFIG_SENSORS_EEPROM=y
+CONFIG_SENSORS_PCF8574=y
+# CONFIG_PCF8575 is not set
+CONFIG_SENSORS_PCF8591=y
+CONFIG_TPS65010=y
+# CONFIG_SENSORS_MAX6875 is not set
+# CONFIG_SENSORS_TSL2550 is not set
+# CONFIG_I2C_DEBUG_CORE is not set
+# CONFIG_I2C_DEBUG_ALGO is not set
+# CONFIG_I2C_DEBUG_BUS is not set
+# CONFIG_I2C_DEBUG_CHIP is not set
+
+#
+# SPI support
+#
+CONFIG_SPI=y
+CONFIG_SPI_MASTER=y
+
+#
+# SPI Master Controller Drivers
+#
+CONFIG_SPI_BITBANG=y
+# CONFIG_SPI_BUTTERFLY is not set
+CONFIG_SPI_LM70_LLP=y
+
+#
+# SPI Protocol Masters
+#
+# CONFIG_SPI_AT25 is not set
+CONFIG_SPI_SPIDEV=y
+CONFIG_SPI_TLE62X0=y
+# CONFIG_W1 is not set
+# CONFIG_POWER_SUPPLY is not set
+# CONFIG_HWMON is not set
+# CONFIG_THERMAL is not set
+# CONFIG_WATCHDOG is not set
+
+#
+# Sonics Silicon Backplane
+#
+CONFIG_SSB_POSSIBLE=y
+CONFIG_SSB=y
+CONFIG_SSB_PCMCIAHOST_POSSIBLE=y
+CONFIG_SSB_PCMCIAHOST=y
+# CONFIG_SSB_DEBUG is not set
+
+#
+# Multifunction device drivers
+#
+# CONFIG_MFD_SM501 is not set
+
+#
+# Multimedia devices
+#
+# CONFIG_VIDEO_DEV is not set
+CONFIG_DVB_CORE=y
+CONFIG_DVB_CAPTURE_DRIVERS=y
+# CONFIG_TTPCI_EEPROM is not set
+CONFIG_DVB_B2C2_FLEXCOP=y
+# CONFIG_DVB_B2C2_FLEXCOP_DEBUG is not set
+
+#
+# Supported DVB Frontends
+#
+
+#
+# Customise DVB Frontends
+#
+CONFIG_DVB_FE_CUSTOMISE=y
+
+#
+# DVB-S (satellite) frontends
+#
+CONFIG_DVB_STV0299=y
+# CONFIG_DVB_CX24110 is not set
+# CONFIG_DVB_CX24123 is not set
+CONFIG_DVB_TDA8083=y
+# CONFIG_DVB_MT312 is not set
+# CONFIG_DVB_VES1X93 is not set
+CONFIG_DVB_S5H1420=y
+# CONFIG_DVB_TDA10086 is not set
+
+#
+# DVB-T (terrestrial) frontends
+#
+# CONFIG_DVB_SP8870 is not set
+CONFIG_DVB_SP887X=y
+# CONFIG_DVB_CX22700 is not set
+CONFIG_DVB_CX22702=y
+CONFIG_DVB_L64781=y
+# CONFIG_DVB_TDA1004X is not set
+CONFIG_DVB_NXT6000=y
+CONFIG_DVB_MT352=y
+CONFIG_DVB_ZL10353=y
+# CONFIG_DVB_DIB3000MB is not set
+CONFIG_DVB_DIB3000MC=y
+CONFIG_DVB_DIB7000M=y
+CONFIG_DVB_DIB7000P=y
+
+#
+# DVB-C (cable) frontends
+#
+CONFIG_DVB_VES1820=y
+# CONFIG_DVB_TDA10021 is not set
+# CONFIG_DVB_TDA10023 is not set
+# CONFIG_DVB_STV0297 is not set
+
+#
+# ATSC (North American/Korean Terrestrial/Cable DTV) frontends
+#
+# CONFIG_DVB_NXT200X is not set
+CONFIG_DVB_OR51211=y
+# CONFIG_DVB_OR51132 is not set
+# CONFIG_DVB_BCM3510 is not set
+# CONFIG_DVB_LGDT330X is not set
+# CONFIG_DVB_S5H1409 is not set
+
+#
+# Tuners/PLL support
+#
+CONFIG_DVB_PLL=y
+CONFIG_DVB_TDA826X=y
+CONFIG_DVB_TDA827X=y
+CONFIG_DVB_TDA18271=y
+CONFIG_DVB_TUNER_QT1010=y
+CONFIG_DVB_TUNER_MT2060=y
+# CONFIG_DVB_TUNER_MT2266 is not set
+# CONFIG_DVB_TUNER_MT2131 is not set
+CONFIG_DVB_TUNER_DIB0070=y
+CONFIG_DVB_TUNER_XC5000=y
+
+#
+# Miscellaneous devices
+#
+# CONFIG_DVB_LNBP21 is not set
+CONFIG_DVB_ISL6421=y
+CONFIG_DVB_TUA6100=y
+# CONFIG_DAB is not set
+
+#
+# Graphics support
+#
+# CONFIG_VGASTATE is not set
+CONFIG_VIDEO_OUTPUT_CONTROL=y
+# CONFIG_FB is not set
+CONFIG_BACKLIGHT_LCD_SUPPORT=y
+# CONFIG_LCD_CLASS_DEVICE is not set
+CONFIG_BACKLIGHT_CLASS_DEVICE=y
+# CONFIG_BACKLIGHT_CORGI is not set
+
+#
+# Display device support
+#
+# CONFIG_DISPLAY_SUPPORT is not set
+
+#
+# Console display driver support
+#
+CONFIG_VGA_CONSOLE=y
+CONFIG_VGACON_SOFT_SCROLLBACK=y
+CONFIG_VGACON_SOFT_SCROLLBACK_SIZE=64
+CONFIG_VIDEO_SELECT=y
+CONFIG_DUMMY_CONSOLE=y
+
+#
+# Sound
+#
+CONFIG_SOUND=y
+
+#
+# Advanced Linux Sound Architecture
+#
+# CONFIG_SND is not set
+
+#
+# Open Sound System
+#
+CONFIG_SOUND_PRIME=y
+# CONFIG_SOUND_MSNDCLAS is not set
+CONFIG_SOUND_MSNDPIN=y
+
+#
+# Compiled-in MSND Pinnacle support requires firmware during compilation.
+#
+CONFIG_MSNDPIN_HAVE_BOOT=y
+CONFIG_MSNDPIN_INIT_FILE="/etc/sound/pndspini.bin"
+CONFIG_MSNDPIN_PERM_FILE="/etc/sound/pndsperm.bin"
+CONFIG_MSNDPIN_IRQ=5
+CONFIG_MSNDPIN_MEM=0xD0000
+CONFIG_MSNDPIN_IO=0x290
+CONFIG_MSNDPIN_DIGITAL=y
+CONFIG_MSNDPIN_NONPNP=y
+
+#
+# MSND Pinnacle DSP section will be configured to above parameters.
+#
+CONFIG_MSNDPIN_CFG=0x250
+
+#
+# Pinnacle-specific Device Configuration (0 disables)
+#
+CONFIG_MSNDPIN_MPU_IO=0x0
+CONFIG_MSNDPIN_MPU_IRQ=0
+CONFIG_MSNDPIN_IDE_IO0=0x0
+CONFIG_MSNDPIN_IDE_IO1=0x0
+CONFIG_MSNDPIN_IDE_IRQ=0
+CONFIG_MSNDPIN_JOYSTICK_IO=0x0
+CONFIG_MSND_FIFOSIZE=128
+CONFIG_SOUND_OSS=y
+CONFIG_SOUND_TRACEINIT=y
+# CONFIG_SOUND_DMAP is not set
+# CONFIG_SOUND_SSCAPE is not set
+# CONFIG_SOUND_VMIDI is not set
+# CONFIG_SOUND_TRIX is not set
+# CONFIG_SOUND_MSS is not set
+CONFIG_SOUND_MPU401=y
+# CONFIG_SOUND_PAS is not set
+# CONFIG_SOUND_PSS is not set
+# CONFIG_SOUND_SB is not set
+CONFIG_SOUND_YM3812=y
+# CONFIG_SOUND_UART6850 is not set
+# CONFIG_SOUND_AEDSP16 is not set
+CONFIG_HID_SUPPORT=y
+CONFIG_HID=y
+CONFIG_HID_DEBUG=y
+# CONFIG_HIDRAW is not set
+# CONFIG_USB_SUPPORT is not set
+CONFIG_MMC=y
+# CONFIG_MMC_DEBUG is not set
+CONFIG_MMC_UNSAFE_RESUME=y
+
+#
+# MMC/SD Card Drivers
+#
+CONFIG_MMC_BLOCK=y
+CONFIG_MMC_BLOCK_BOUNCE=y
+# CONFIG_SDIO_UART is not set
+
+#
+# MMC/SD Host Controller Drivers
+#
+CONFIG_MMC_WBSD=y
+# CONFIG_MEMSTICK is not set
+CONFIG_NEW_LEDS=y
+CONFIG_LEDS_CLASS=y
+
+#
+# LED drivers
+#
+CONFIG_LEDS_NET48XX=y
+# CONFIG_LEDS_WRAP is not set
+# CONFIG_LEDS_CLEVO_MAIL is not set
+
+#
+# LED Triggers
+#
+CONFIG_LEDS_TRIGGERS=y
+# CONFIG_LEDS_TRIGGER_TIMER is not set
+# CONFIG_LEDS_TRIGGER_HEARTBEAT is not set
+CONFIG_EDAC=y
+
+#
+# Reporting subsystems
+#
+# CONFIG_EDAC_DEBUG is not set
+# CONFIG_EDAC_MM_EDAC is not set
+CONFIG_RTC_LIB=y
+CONFIG_RTC_CLASS=y
+
+#
+# Conflicting RTC option has been selected, check GEN_RTC and RTC
+#
+# CONFIG_RTC_HCTOSYS is not set
+# CONFIG_RTC_DEBUG is not set
+
+#
+# RTC interfaces
+#
+CONFIG_RTC_INTF_SYSFS=y
+# CONFIG_RTC_INTF_PROC is not set
+# CONFIG_RTC_INTF_DEV is not set
+# CONFIG_RTC_DRV_TEST is not set
+
+#
+# I2C RTC drivers
+#
+# CONFIG_RTC_DRV_DS1307 is not set
+CONFIG_RTC_DRV_DS1374=y
+CONFIG_RTC_DRV_DS1672=y
+CONFIG_RTC_DRV_MAX6900=y
+# CONFIG_RTC_DRV_RS5C372 is not set
+CONFIG_RTC_DRV_ISL1208=y
+CONFIG_RTC_DRV_X1205=y
+# CONFIG_RTC_DRV_PCF8563 is not set
+# CONFIG_RTC_DRV_PCF8583 is not set
+CONFIG_RTC_DRV_M41T80=y
+# CONFIG_RTC_DRV_M41T80_WDT is not set
+
+#
+# SPI RTC drivers
+#
+# CONFIG_RTC_DRV_MAX6902 is not set
+# CONFIG_RTC_DRV_R9701 is not set
+# CONFIG_RTC_DRV_RS5C348 is not set
+
+#
+# Platform RTC drivers
+#
+CONFIG_RTC_DRV_CMOS=y
+CONFIG_RTC_DRV_DS1511=y
+# CONFIG_RTC_DRV_DS1553 is not set
+# CONFIG_RTC_DRV_DS1742 is not set
+# CONFIG_RTC_DRV_STK17TA8 is not set
+CONFIG_RTC_DRV_M48T86=y
+CONFIG_RTC_DRV_M48T59=y
+CONFIG_RTC_DRV_V3020=y
+
+#
+# on-CPU RTC drivers
+#
+# CONFIG_AUXDISPLAY is not set
+
+#
+# Userspace I/O
+#
+CONFIG_UIO=y
+
+#
+# Firmware Drivers
+#
+# CONFIG_EDD is not set
+CONFIG_DELL_RBU=y
+CONFIG_DCDBAS=y
+# CONFIG_DMIID is not set
+
+#
+# File systems
+#
+# CONFIG_EXT2_FS is not set
+CONFIG_EXT3_FS=y
+CONFIG_EXT3_FS_XATTR=y
+CONFIG_EXT3_FS_POSIX_ACL=y
+# CONFIG_EXT3_FS_SECURITY is not set
+# CONFIG_EXT4DEV_FS is not set
+CONFIG_JBD=y
+# CONFIG_JBD_DEBUG is not set
+CONFIG_FS_MBCACHE=y
+# CONFIG_REISERFS_FS is not set
+CONFIG_JFS_FS=y
+# CONFIG_JFS_POSIX_ACL is not set
+# CONFIG_JFS_SECURITY is not set
+# CONFIG_JFS_DEBUG is not set
+CONFIG_JFS_STATISTICS=y
+CONFIG_FS_POSIX_ACL=y
+# CONFIG_XFS_FS is not set
+CONFIG_GFS2_FS=y
+# CONFIG_GFS2_FS_LOCKING_NOLOCK is not set
+CONFIG_GFS2_FS_LOCKING_DLM=y
+CONFIG_OCFS2_FS=y
+CONFIG_OCFS2_DEBUG_MASKLOG=y
+# CONFIG_OCFS2_DEBUG_FS is not set
+CONFIG_DNOTIFY=y
+CONFIG_INOTIFY=y
+CONFIG_INOTIFY_USER=y
+# CONFIG_QUOTA is not set
+CONFIG_AUTOFS_FS=y
+# CONFIG_AUTOFS4_FS is not set
+CONFIG_FUSE_FS=y
+CONFIG_GENERIC_ACL=y
+
+#
+# CD-ROM/DVD Filesystems
+#
+# CONFIG_ISO9660_FS is not set
+# CONFIG_UDF_FS is not set
+
+#
+# DOS/FAT/NT Filesystems
+#
+# CONFIG_MSDOS_FS is not set
+# CONFIG_VFAT_FS is not set
+# CONFIG_NTFS_FS is not set
+
+#
+# Pseudo filesystems
+#
+CONFIG_PROC_FS=y
+CONFIG_PROC_KCORE=y
+CONFIG_PROC_SYSCTL=y
+CONFIG_SYSFS=y
+CONFIG_TMPFS=y
+CONFIG_TMPFS_POSIX_ACL=y
+# CONFIG_HUGETLBFS is not set
+# CONFIG_HUGETLB_PAGE is not set
+CONFIG_CONFIGFS_FS=y
+
+#
+# Miscellaneous filesystems
+#
+# CONFIG_ADFS_FS is not set
+# CONFIG_AFFS_FS is not set
+# CONFIG_ECRYPT_FS is not set
+CONFIG_HFS_FS=y
+CONFIG_HFSPLUS_FS=y
+# CONFIG_BEFS_FS is not set
+# CONFIG_BFS_FS is not set
+# CONFIG_EFS_FS is not set
+CONFIG_JFFS2_FS=y
+CONFIG_JFFS2_FS_DEBUG=0
+# CONFIG_JFFS2_FS_WRITEBUFFER is not set
+# CONFIG_JFFS2_SUMMARY is not set
+CONFIG_JFFS2_FS_XATTR=y
+# CONFIG_JFFS2_FS_POSIX_ACL is not set
+# CONFIG_JFFS2_FS_SECURITY is not set
+CONFIG_JFFS2_COMPRESSION_OPTIONS=y
+CONFIG_JFFS2_ZLIB=y
+# CONFIG_JFFS2_LZO is not set
+CONFIG_JFFS2_RTIME=y
+# CONFIG_JFFS2_RUBIN is not set
+CONFIG_JFFS2_CMODE_NONE=y
+# CONFIG_JFFS2_CMODE_PRIORITY is not set
+# CONFIG_JFFS2_CMODE_SIZE is not set
+# CONFIG_JFFS2_CMODE_FAVOURLZO is not set
+CONFIG_CRAMFS=y
+CONFIG_VXFS_FS=y
+# CONFIG_MINIX_FS is not set
+CONFIG_HPFS_FS=y
+CONFIG_QNX4FS_FS=y
+CONFIG_ROMFS_FS=y
+# CONFIG_SYSV_FS is not set
+CONFIG_UFS_FS=y
+CONFIG_UFS_FS_WRITE=y
+# CONFIG_UFS_DEBUG is not set
+# CONFIG_NETWORK_FILESYSTEMS is not set
+
+#
+# Partition Types
+#
+CONFIG_PARTITION_ADVANCED=y
+CONFIG_ACORN_PARTITION=y
+CONFIG_ACORN_PARTITION_CUMANA=y
+CONFIG_ACORN_PARTITION_EESOX=y
+CONFIG_ACORN_PARTITION_ICS=y
+CONFIG_ACORN_PARTITION_ADFS=y
+# CONFIG_ACORN_PARTITION_POWERTEC is not set
+# CONFIG_ACORN_PARTITION_RISCIX is not set
+# CONFIG_OSF_PARTITION is not set
+# CONFIG_AMIGA_PARTITION is not set
+# CONFIG_ATARI_PARTITION is not set
+# CONFIG_MAC_PARTITION is not set
+CONFIG_MSDOS_PARTITION=y
+# CONFIG_BSD_DISKLABEL is not set
+# CONFIG_MINIX_SUBPARTITION is not set
+CONFIG_SOLARIS_X86_PARTITION=y
+CONFIG_UNIXWARE_DISKLABEL=y
+CONFIG_LDM_PARTITION=y
+# CONFIG_LDM_DEBUG is not set
+# CONFIG_SGI_PARTITION is not set
+# CONFIG_ULTRIX_PARTITION is not set
+# CONFIG_SUN_PARTITION is not set
+CONFIG_KARMA_PARTITION=y
+# CONFIG_EFI_PARTITION is not set
+CONFIG_SYSV68_PARTITION=y
+CONFIG_NLS=y
+CONFIG_NLS_DEFAULT="iso8859-1"
+# CONFIG_NLS_CODEPAGE_437 is not set
+CONFIG_NLS_CODEPAGE_737=y
+# CONFIG_NLS_CODEPAGE_775 is not set
+# CONFIG_NLS_CODEPAGE_850 is not set
+# CONFIG_NLS_CODEPAGE_852 is not set
+CONFIG_NLS_CODEPAGE_855=y
+CONFIG_NLS_CODEPAGE_857=y
+CONFIG_NLS_CODEPAGE_860=y
+CONFIG_NLS_CODEPAGE_861=y
+CONFIG_NLS_CODEPAGE_862=y
+CONFIG_NLS_CODEPAGE_863=y
+# CONFIG_NLS_CODEPAGE_864 is not set
+# CONFIG_NLS_CODEPAGE_865 is not set
+# CONFIG_NLS_CODEPAGE_866 is not set
+# CONFIG_NLS_CODEPAGE_869 is not set
+# CONFIG_NLS_CODEPAGE_936 is not set
+# CONFIG_NLS_CODEPAGE_950 is not set
+CONFIG_NLS_CODEPAGE_932=y
+CONFIG_NLS_CODEPAGE_949=y
+# CONFIG_NLS_CODEPAGE_874 is not set
+CONFIG_NLS_ISO8859_8=y
+CONFIG_NLS_CODEPAGE_1250=y
+# CONFIG_NLS_CODEPAGE_1251 is not set
+CONFIG_NLS_ASCII=y
+CONFIG_NLS_ISO8859_1=y
+CONFIG_NLS_ISO8859_2=y
+CONFIG_NLS_ISO8859_3=y
+# CONFIG_NLS_ISO8859_4 is not set
+CONFIG_NLS_ISO8859_5=y
+CONFIG_NLS_ISO8859_6=y
+# CONFIG_NLS_ISO8859_7 is not set
+CONFIG_NLS_ISO8859_9=y
+CONFIG_NLS_ISO8859_13=y
+# CONFIG_NLS_ISO8859_14 is not set
+# CONFIG_NLS_ISO8859_15 is not set
+CONFIG_NLS_KOI8_R=y
+CONFIG_NLS_KOI8_U=y
+CONFIG_NLS_UTF8=y
+CONFIG_DLM=y
+# CONFIG_DLM_DEBUG is not set
+
+#
+# Kernel hacking
+#
+CONFIG_TRACE_IRQFLAGS_SUPPORT=y
+# CONFIG_PRINTK_TIME is not set
+# CONFIG_ENABLE_WARN_DEPRECATED is not set
+# CONFIG_ENABLE_MUST_CHECK is not set
+# CONFIG_MAGIC_SYSRQ is not set
+CONFIG_UNUSED_SYMBOLS=y
+CONFIG_DEBUG_FS=y
+# CONFIG_HEADERS_CHECK is not set
+# CONFIG_DEBUG_KERNEL is not set
+# CONFIG_SLUB_DEBUG_ON is not set
+# CONFIG_SLUB_STATS is not set
+CONFIG_DEBUG_BUGVERBOSE=y
+# CONFIG_LATENCYTOP is not set
+# CONFIG_SAMPLES is not set
+CONFIG_EARLY_PRINTK=y
+CONFIG_X86_FIND_SMP_CONFIG=y
+CONFIG_X86_MPPARSE=y
+CONFIG_DOUBLEFAULT=y
+CONFIG_IO_DELAY_TYPE_0X80=0
+CONFIG_IO_DELAY_TYPE_0XED=1
+CONFIG_IO_DELAY_TYPE_UDELAY=2
+CONFIG_IO_DELAY_TYPE_NONE=3
+# CONFIG_IO_DELAY_0X80 is not set
+# CONFIG_IO_DELAY_0XED is not set
+CONFIG_IO_DELAY_UDELAY=y
+# CONFIG_IO_DELAY_NONE is not set
+CONFIG_DEFAULT_IO_DELAY_TYPE=2
+
+#
+# Security options
+#
+CONFIG_KEYS=y
+# CONFIG_KEYS_DEBUG_PROC_KEYS is not set
+CONFIG_SECURITY=y
+CONFIG_SECURITY_NETWORK=y
+CONFIG_SECURITY_NETWORK_XFRM=y
+CONFIG_SECURITY_CAPABILITIES=y
+CONFIG_SECURITY_FILE_CAPABILITIES=y
+CONFIG_SECURITY_DEFAULT_MMAP_MIN_ADDR=0
+# CONFIG_SECURITY_SELINUX is not set
+CONFIG_CRYPTO=y
+CONFIG_CRYPTO_ALGAPI=y
+CONFIG_CRYPTO_AEAD=y
+CONFIG_CRYPTO_BLKCIPHER=y
+CONFIG_CRYPTO_SEQIV=y
+CONFIG_CRYPTO_HASH=y
+CONFIG_CRYPTO_MANAGER=y
+CONFIG_CRYPTO_HMAC=y
+CONFIG_CRYPTO_XCBC=y
+# CONFIG_CRYPTO_NULL is not set
+# CONFIG_CRYPTO_MD4 is not set
+CONFIG_CRYPTO_MD5=y
+CONFIG_CRYPTO_SHA1=y
+CONFIG_CRYPTO_SHA256=y
+# CONFIG_CRYPTO_SHA512 is not set
+# CONFIG_CRYPTO_WP512 is not set
+# CONFIG_CRYPTO_TGR192 is not set
+CONFIG_CRYPTO_GF128MUL=y
+CONFIG_CRYPTO_ECB=y
+CONFIG_CRYPTO_CBC=y
+CONFIG_CRYPTO_PCBC=y
+CONFIG_CRYPTO_LRW=y
+CONFIG_CRYPTO_XTS=y
+CONFIG_CRYPTO_CTR=y
+CONFIG_CRYPTO_GCM=y
+CONFIG_CRYPTO_CCM=y
+# CONFIG_CRYPTO_CRYPTD is not set
+CONFIG_CRYPTO_DES=y
+CONFIG_CRYPTO_FCRYPT=y
+# CONFIG_CRYPTO_BLOWFISH is not set
+# CONFIG_CRYPTO_TWOFISH is not set
+CONFIG_CRYPTO_TWOFISH_COMMON=y
+CONFIG_CRYPTO_TWOFISH_586=y
+# CONFIG_CRYPTO_SERPENT is not set
+CONFIG_CRYPTO_AES=y
+# CONFIG_CRYPTO_AES_586 is not set
+# CONFIG_CRYPTO_CAST5 is not set
+CONFIG_CRYPTO_CAST6=y
+CONFIG_CRYPTO_TEA=y
+CONFIG_CRYPTO_ARC4=y
+CONFIG_CRYPTO_KHAZAD=y
+# CONFIG_CRYPTO_ANUBIS is not set
+# CONFIG_CRYPTO_SEED is not set
+# CONFIG_CRYPTO_SALSA20 is not set
+CONFIG_CRYPTO_SALSA20_586=y
+CONFIG_CRYPTO_DEFLATE=y
+CONFIG_CRYPTO_MICHAEL_MIC=y
+# CONFIG_CRYPTO_CRC32C is not set
+# CONFIG_CRYPTO_CAMELLIA is not set
+# CONFIG_CRYPTO_AUTHENC is not set
+CONFIG_CRYPTO_LZO=y
+CONFIG_CRYPTO_HW=y
+CONFIG_CRYPTO_DEV_PADLOCK=y
+CONFIG_CRYPTO_DEV_PADLOCK_AES=y
+CONFIG_CRYPTO_DEV_PADLOCK_SHA=y
+CONFIG_HAVE_KVM=y
+CONFIG_VIRTUALIZATION=y
+# CONFIG_KVM is not set
+CONFIG_VIRTIO=y
+CONFIG_VIRTIO_RING=y
+CONFIG_VIRTIO_BALLOON=y
+
+#
+# Library routines
+#
+CONFIG_BITREVERSE=y
+CONFIG_CRC_CCITT=y
+CONFIG_CRC16=y
+CONFIG_CRC_ITU_T=y
+CONFIG_CRC32=y
+CONFIG_CRC7=y
+CONFIG_LIBCRC32C=y
+CONFIG_AUDIT_GENERIC=y
+CONFIG_ZLIB_INFLATE=y
+CONFIG_ZLIB_DEFLATE=y
+CONFIG_LZO_COMPRESS=y
+CONFIG_LZO_DECOMPRESS=y
+CONFIG_PLIST=y
+CONFIG_HAS_IOMEM=y
+CONFIG_HAS_IOPORT=y
+CONFIG_HAS_DMA=y
+CONFIG_CHECK_SIGNATURE=y
+
+--Boundary-01=_jkuyH09aW80s5De--
+
+--nextPart2641734.MAfAfhVuYo
+Content-Type: application/pgp-signature; name=signature.asc 
+Content-Description: This is a digitally signed message part.
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.7 (GNU/Linux)
+
+iD8DBQBHyukmhyrlCH22naMRAg0OAJoC6O07UQ0vzixW5qOyg05FeVVKIACgjJXu
+PIkcw30Rs9Y7bS5Ro20osE0=
+=Tt0c
+-----END PGP SIGNATURE-----
+
+--nextPart2641734.MAfAfhVuYo--
