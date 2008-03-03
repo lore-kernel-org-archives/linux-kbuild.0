@@ -1,20 +1,22 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from agminet01.oracle.com ([141.146.126.228]:49985 "EHLO
+Received: from agminet01.oracle.com ([141.146.126.228]:12933 "EHLO
 	agminet01.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754287AbYCCXBQ (ORCPT
+	with ESMTP id S1755883AbYCCXcQ (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 3 Mar 2008 18:01:16 -0500
-Date: Mon, 3 Mar 2008 15:01:05 -0800
+	Mon, 3 Mar 2008 18:32:16 -0500
+Date: Mon, 3 Mar 2008 15:32:03 -0800
 From: Randy Dunlap <randy.dunlap@oracle.com>
-Subject: [PATCH] kbuild doc: move smart-config.txt to Doc/kbuild/
-Message-Id: <20080303150105.d8f68bc1.randy.dunlap@oracle.com>
+Subject: [PATCH v2] kbuild doc: move smart-config.txt to Doc/kbuild/
+Message-Id: <20080303153203.22c52d98.randy.dunlap@oracle.com>
+In-Reply-To: <20080303150105.d8f68bc1.randy.dunlap@oracle.com>
+References: <20080303150105.d8f68bc1.randy.dunlap@oracle.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: samr <sam@ravnborg.org>
+To: samr <sam@ravnborg.org>
+Cc: linux-kbuild@vger.kernel.org
 
 From: Randy Dunlap <randy.dunlap@oracle.com>
 
@@ -24,11 +26,16 @@ What do you think about this one?
 Move smart-config.txt to Documentation/kbuild/ since it is
 build/config-related.
 
+Update 00-INDEX files.
+Fix up trailing whitespace in smart-config.txt.
+
 Signed-off-by: Randy Dunlap <randy.dunlap@oracle.com>
 ---
+ Documentation/00-INDEX                |    2 
+ Documentation/kbuild/00-INDEX         |    2 
  Documentation/kbuild/smart-config.txt |   98 ++++++++++++++++++++++++
  Documentation/smart-config.txt        |   98 ------------------------
- 2 files changed, 98 insertions(+), 98 deletions(-)
+ 4 files changed, 100 insertions(+), 100 deletions(-)
 
 --- /dev/null
 +++ linux-2.6.25-rc3-git4/Documentation/kbuild/smart-config.txt
@@ -122,7 +129,7 @@ Signed-off-by: Randy Dunlap <randy.dunlap@oracle.com>
 +
 +    Werner Almesberger had the original idea and wrote the first
 +    version of this patch.
-+    
++
 +    Michael Chastain picked it up and continued development.  He is
 +    now the principal author and maintainer.  Please report any bugs
 +    to him.
@@ -232,3 +239,22 @@ Signed-off-by: Randy Dunlap <randy.dunlap@oracle.com>
 -    by Michael Chastain.
 -
 -    Thanks to all of the beta testers.
+--- linux-2.6.25-rc3-git4.orig/Documentation/00-INDEX
++++ linux-2.6.25-rc3-git4/Documentation/00-INDEX
+@@ -353,8 +353,6 @@ sgi-visws.txt
+ 	- short blurb on the SGI Visual Workstations.
+ sh/
+ 	- directory with info on porting Linux to a new architecture.
+-smart-config.txt
+-	- description of the Smart Config makefile feature.
+ sound/
+ 	- directory with info on sound card support.
+ sparc/
+--- linux-2.6.25-rc3-git4.orig/Documentation/kbuild/00-INDEX
++++ linux-2.6.25-rc3-git4/Documentation/kbuild/00-INDEX
+@@ -6,3 +6,5 @@ makefiles.txt
+ 	- developer information for linux kernel makefiles
+ modules.txt
+ 	- how to build modules and to install them
++smart-config.txt
++	- description of the Smart Config makefile feature.
