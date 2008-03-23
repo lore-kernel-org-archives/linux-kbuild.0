@@ -1,143 +1,157 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from astoria.ccjclearline.com ([64.235.106.9]:41618 "EHLO
-	astoria.ccjclearline.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752511AbYCVSpL (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 22 Mar 2008 14:45:11 -0400
-Date: Sat, 22 Mar 2008 14:45:08 -0400 (EDT)
-From: "Robert P. J. Day" <rpjday@crashcourse.ca>
-Subject: [PATCH] KBUILD: Move files that don't check __KERNEL__.
-Message-ID: <alpine.LFD.1.00.0803221442550.22665@localhost.localdomain>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+Received: from pasmtpa.tele.dk ([80.160.77.114]:34298 "EHLO pasmtpA.tele.dk"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753978AbYCWUt7 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 23 Mar 2008 16:49:59 -0400
+Date: Sun, 23 Mar 2008 21:50:21 +0100
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: [GIT PULL] one kbuild fix
+Message-ID: <20080323205021.GA5087@uranus.ravnborg.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: kbuild devel list <linux-kbuild@vger.kernel.org>
-Cc: Andrew Morton <akpm@osdl.org>
+To: Linus Torvalds <torvalds@linux-foundation.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
+Cc: Gordon Farquharson <gordonfarquharson@gmail.com>, Michael Buesch <mb@bu3sch.de>, stable@kernel.org
 
+Hi Linus.
 
+Please pull following fix for kbuild.
 
-Move files that don't check __KERNEL__ from unifdef-y to header-y.
+It can be pulled from:
 
-Signed-off-by: Robert P. J. Day <rpjday@crashcourse.ca>
+   ssh://master.kernel.org/pub/scm/linux/kernel/git/sam/kbuild-linus.git
 
+Full patch below.
+
+	Sam
+
+From 4ce6efed48d736e3384c39ff87bda723e1f8e041 Mon Sep 17 00:00:00 2001
+From: Sam Ravnborg <sam@uranus.ravnborg.org>
+Date: Sun, 23 Mar 2008 21:38:54 +0100
+Subject: [PATCH] kbuild: soften modpost checks when doing cross builds
+
+The module alias support in the kernel have a consistency
+check where it is checked that the size of a structure
+in the kernel and on the build host are the same.
+For cross builds this check does not make sense so detect
+when we do cross builds and silently skip the check in these
+situations.
+This fixes a build bug for a wireless driver when cross building
+for arm.
+
+Acked-by: Michael Buesch <mb@bu3sch.de>
+Tested-by: Gordon Farquharson <gordonfarquharson@gmail.com>
+Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
+Cc: stable@kernel.org
 ---
+ Makefile                 |    2 +-
+ scripts/Makefile.modpost |    6 +++++-
+ scripts/mod/file2alias.c |    4 ++++
+ scripts/mod/modpost.c    |    5 ++++-
+ scripts/mod/modpost.h    |    1 +
+ 5 files changed, 15 insertions(+), 3 deletions(-)
 
-diff --git a/include/linux/Kbuild b/include/linux/Kbuild
-index 4108b38..e57f006 100644
---- a/include/linux/Kbuild
-+++ b/include/linux/Kbuild
-@@ -20,6 +20,7 @@ header-y += affs_hardblocks.h
- header-y += aio_abi.h
- header-y += arcfb.h
- header-y += atmapi.h
-+header-y += atmarp.h
- header-y += atmbr2684.h
- header-y += atmclip.h
- header-y += atm_eni.h
-@@ -48,6 +49,7 @@ header-y += coff.h
- header-y += comstats.h
- header-y += const.h
- header-y += cgroupstats.h
-+header-y += cramfs_fs.h
- header-y += cycx_cfm.h
- header-y += dlmconstants.h
- header-y += dlm_device.h
-@@ -70,10 +72,12 @@ header-y += firewire-constants.h
- header-y += fuse.h
- header-y += genetlink.h
- header-y += gen_stats.h
-+header-y += gfs2_ondisk.h
- header-y += gigaset_dev.h
- header-y += hysdn_if.h
- header-y += i2o-dev.h
- header-y += i8k.h
-+header-y += if_addrlabel.h
- header-y += if_arcnet.h
- header-y += if_bonding.h
- header-y += if_cablemodem.h
-@@ -90,6 +94,7 @@ header-y += if_tunnel.h
- header-y += in6.h
- header-y += in_route.h
- header-y += ioctl.h
-+header-y += ip6_tunnel.h
- header-y += ipmi_msgdefs.h
- header-y += ipsec.h
- header-y += ipx.h
-@@ -151,11 +156,14 @@ header-y += tipc_config.h
- header-y += toshiba.h
- header-y += ultrasound.h
- header-y += un.h
-+header-y += unistd.h
- header-y += utime.h
- header-y += veth.h
- header-y += video_decoder.h
- header-y += video_encoder.h
- header-y += videotext.h
-+header-y += virtio_blk.h
-+header-y += virtio_net.h
- header-y += x25.h
+diff --git a/Makefile b/Makefile
+index 7a4d34b..1c4c8f8 100644
+--- a/Makefile
++++ b/Makefile
+@@ -189,7 +189,7 @@ SUBARCH := $(shell uname -m | sed -e s/i.86/i386/ -e s/sun4u/sparc64/ \
+ # Alternatively CROSS_COMPILE can be set in the environment.
+ # Default value for CROSS_COMPILE is not to prefix executables
+ # Note: Some architectures assign CROSS_COMPILE in their arch/*/Makefile
+-
++export KBUILD_BUILDHOST := $(SUBARCH)
+ ARCH		?= $(SUBARCH)
+ CROSS_COMPILE	?=
+ 
+diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
+index cfc004e..2d20640 100644
+--- a/scripts/Makefile.modpost
++++ b/scripts/Makefile.modpost
+@@ -58,6 +58,9 @@ modules   := $(patsubst %.o,%.ko, $(wildcard $(__modules:.ko=.o)))
+ # Stop after building .o files if NOFINAL is set. Makes compile tests quicker
+ _modpost: $(if $(KBUILD_MODPOST_NOFINAL), $(modules:.ko:.o),$(modules))
+ 
++ifneq ($(KBUILD_BUILDHOST),$(ARCH))
++        cross_build := 1
++endif
+ 
+ # Step 2), invoke modpost
+ #  Includes step 3,4
+@@ -70,7 +73,8 @@ modpost = scripts/mod/modpost                    \
+  $(if $(CONFIG_DEBUG_SECTION_MISMATCH),,-S)      \
+  $(if $(CONFIG_MARKERS),-K $(kernelmarkersfile)) \
+  $(if $(CONFIG_MARKERS),-M $(markersfile))	 \
+- $(if $(KBUILD_EXTMOD)$(KBUILD_MODPOST_WARN),-w)
++ $(if $(KBUILD_EXTMOD)$(KBUILD_MODPOST_WARN),-w) \
++ $(if $(cross_build),-c)
+ 
+ quiet_cmd_modpost = MODPOST $(words $(filter-out vmlinux FORCE, $^)) modules
+       cmd_modpost = $(modpost) -s
+diff --git a/scripts/mod/file2alias.c b/scripts/mod/file2alias.c
+index 9ddf944..348d868 100644
+--- a/scripts/mod/file2alias.c
++++ b/scripts/mod/file2alias.c
+@@ -51,11 +51,13 @@ do {                                                            \
+                 sprintf(str + strlen(str), "*");                \
+ } while(0)
+ 
++unsigned int cross_build = 0;
+ /**
+  * Check that sizeof(device_id type) are consistent with size of section
+  * in .o file. If in-consistent then userspace and kernel does not agree
+  * on actual size which is a bug.
+  * Also verify that the final entry in the table is all zeros.
++ * Ignore both checks if build host differ from target host and size differs.
+  **/
+ static void device_id_check(const char *modname, const char *device_id,
+ 			    unsigned long size, unsigned long id_size,
+@@ -64,6 +66,8 @@ static void device_id_check(const char *modname, const char *device_id,
+ 	int i;
+ 
+ 	if (size % id_size || size < id_size) {
++		if (cross_build != 0)
++			return;
+ 		fatal("%s: sizeof(struct %s_device_id)=%lu is not a modulo "
+ 		      "of the size of section __mod_%s_device_table=%lu.\n"
+ 		      "Fix definition of struct %s_device_id "
+diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
+index 695b5d6..110cf24 100644
+--- a/scripts/mod/modpost.c
++++ b/scripts/mod/modpost.c
+@@ -2026,7 +2026,7 @@ int main(int argc, char **argv)
+ 	int opt;
+ 	int err;
+ 
+-	while ((opt = getopt(argc, argv, "i:I:msSo:awM:K:")) != -1) {
++	while ((opt = getopt(argc, argv, "i:I:cmsSo:awM:K:")) != -1) {
+ 		switch (opt) {
+ 		case 'i':
+ 			kernel_read = optarg;
+@@ -2035,6 +2035,9 @@ int main(int argc, char **argv)
+ 			module_read = optarg;
+ 			external_module = 1;
+ 			break;
++		case 'c':
++			cross_build = 1;
++			break;
+ 		case 'm':
+ 			modversions = 1;
+ 			break;
+diff --git a/scripts/mod/modpost.h b/scripts/mod/modpost.h
+index 565c587..09f58e3 100644
+--- a/scripts/mod/modpost.h
++++ b/scripts/mod/modpost.h
+@@ -135,6 +135,7 @@ struct elf_info {
+ };
+ 
+ /* file2alias.c */
++extern unsigned int cross_build;
+ void handle_moddevtable(struct module *mod, struct elf_info *info,
+ 			Elf_Sym *sym, const char *symname);
+ void add_moddevtable(struct buffer *buf, struct module *mod);
+-- 
+1.5.4.1.143.ge7e51
 
- unifdef-y += acct.h
-@@ -164,7 +172,6 @@ unifdef-y += adfs_fs.h
- unifdef-y += agpgart.h
- unifdef-y += apm_bios.h
- unifdef-y += atalk.h
--unifdef-y += atmarp.h
- unifdef-y += atmdev.h
- unifdef-y += atm.h
- unifdef-y += atm_tcp.h
-@@ -180,7 +187,6 @@ unifdef-y += cm4000_cs.h
- unifdef-y += cn_proc.h
- unifdef-y += coda.h
- unifdef-y += connector.h
--unifdef-y += cramfs_fs.h
- unifdef-y += cuda.h
- unifdef-y += cyclades.h
- unifdef-y += dccp.h
-@@ -204,7 +210,6 @@ unifdef-y += futex.h
- unifdef-y += fs.h
- unifdef-y += gameport.h
- unifdef-y += generic_serial.h
--unifdef-y += gfs2_ondisk.h
- unifdef-y += hayesesp.h
- unifdef-y += hdlcdrv.h
- unifdef-y += hdlc.h
-@@ -217,7 +222,6 @@ unifdef-y += i2c-dev.h
- unifdef-y += icmp.h
- unifdef-y += icmpv6.h
- unifdef-y += if_addr.h
--unifdef-y += if_addrlabel.h
- unifdef-y += if_arp.h
- unifdef-y += if_bridge.h
- unifdef-y += if_ec.h
-@@ -243,7 +247,6 @@ unifdef-y += ipc.h
- unifdef-y += ipmi.h
- unifdef-y += ipv6.h
- unifdef-y += ipv6_route.h
--unifdef-y += ip6_tunnel.h
- unifdef-y += isdn.h
- unifdef-y += isdnif.h
- unifdef-y += isdn_divertif.h
-@@ -339,14 +342,11 @@ unifdef-y += udf_fs_i.h
- unifdef-y += udp.h
- unifdef-y += uinput.h
- unifdef-y += uio.h
--unifdef-y += unistd.h
- unifdef-y += usbdevice_fs.h
- unifdef-y += utsname.h
- unifdef-y += videodev2.h
- unifdef-y += videodev.h
- unifdef-y += virtio_config.h
--unifdef-y += virtio_blk.h
--unifdef-y += virtio_net.h
- unifdef-y += vt.h
- unifdef-y += wait.h
- unifdef-y += wanrouter.h
-========================================================================
-Robert P. J. Day
-Linux Consulting, Training and Annoying Kernel Pedantry:
-    Have classroom, will lecture.
-
-http://crashcourse.ca                          Waterloo, Ontario, CANADA
-========================================================================
