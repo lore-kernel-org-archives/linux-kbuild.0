@@ -1,32 +1,35 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from relayhost.vub.ac.be ([134.184.129.111]:53591 "EHLO
-	mxout.vub.ac.be" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752775AbYCZWhx (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 26 Mar 2008 18:37:53 -0400
-Message-Id: <6094685B-CB1A-4092-85E7-4311307BE4D5@ugent.be>
-From: Bram Adams <Bram.Adams@ugent.be>
-In-Reply-To: <20080320080129.0accea46.rdunlap@xenotime.net>
-Content-Type: text/plain; charset=US-ASCII; format=flowed
-Content-Transfer-Encoding: 7bit
-Mime-Version: 1.0 (Apple Message framework v919.2)
-Subject: Re: The evolution of the Linux kernel build system
-Date: Wed, 26 Mar 2008 23:37:29 +0100
-References: <9048849A-9578-40E7-BD0E-FF2CD34F9372@ugent.be> <20080320080129.0accea46.rdunlap@xenotime.net>
+Received: from smtp6.pp.htv.fi ([213.243.153.40]:45269 "EHLO smtp6.pp.htv.fi"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751554AbYC3SBb (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 30 Mar 2008 14:01:31 -0400
+Date: Sun, 30 Mar 2008 21:01:19 +0300
+From: Adrian Bunk <bunk@kernel.org>
+Subject: wish: build time warning for missing MODULE_LICENSE
+Message-ID: <20080330180119.GC1575@cs181133002.pp.htv.fi>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Randy Dunlap <rdunlap@xenotime.net>
-Cc: linux-kbuild@vger.kernel.org
+To: rusty@rustcorp.com.au, sam@ravnborg.org
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Hi,
+I just fixed a bug where I had accidentally removed a MODULE_LICENSE() 
+from a file.
 
-Op 20-mrt-08, om 16:01 heeft Randy Dunlap het volgende geschreven:
+The problem is that such bugs are currently not discovered until someone 
+actually runs a kernel with this module loaded.
 
-> Please let us know when the detailed report is available.
+Could we get a build time warning/error for a missing MODULE_LICENSE?
 
-OK, thanks!
+TIA
+Adrian
 
-Kind regards,
+-- 
 
-Bram Adams
-GH-SEL, INTEC, Ghent University (Belgium)
+       "Is there not promise of rain?" Ling Tan asked suddenly out
+        of the darkness. There had been need of rain for many days.
+       "Only a promise," Lao Er said.
+                                       Pearl S. Buck - Dragon Seed
+
