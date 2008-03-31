@@ -1,66 +1,49 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp4.pp.htv.fi ([213.243.153.38]:48647 "EHLO smtp4.pp.htv.fi"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754674AbYC3Ue3 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 30 Mar 2008 16:34:29 -0400
-Date: Sun, 30 Mar 2008 23:34:17 +0300
-From: Adrian Bunk <bunk@kernel.org>
-Subject: Re: wish: build time warning for missing MODULE_LICENSE
-Message-ID: <20080330203417.GA7607@cs181133002.pp.htv.fi>
-References: <20080330180119.GC1575@cs181133002.pp.htv.fi> <20080330190430.GD19733@uranus.ravnborg.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20080330190430.GD19733@uranus.ravnborg.org>
+Received: from metis.extern.pengutronix.de ([83.236.181.26]:42432 "EHLO
+	metis.extern.pengutronix.de" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1750918AbYCaNdM (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 31 Mar 2008 09:33:12 -0400
+From: Wolfram Sang <w.sang@pengutronix.de>
+Subject: [PATCH] Documentation/kbuild: fix typos (s/bin_shipped/bin.o_shipped/)
+Date: Mon, 31 Mar 2008 15:08:04 +0200
+Message-Id: <1206968884-16410-1-git-send-email-w.sang@pengutronix.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: rusty@rustcorp.com.au, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
+Cc: Wolfram Sang <w.sang@pengutronix.de>
 
-On Sun, Mar 30, 2008 at 09:04:30PM +0200, Sam Ravnborg wrote:
-> On Sun, Mar 30, 2008 at 09:01:19PM +0300, Adrian Bunk wrote:
-> > I just fixed a bug where I had accidentally removed a MODULE_LICENSE() 
-> > from a file.
-> > 
-> > The problem is that such bugs are currently not discovered until someone 
-> > actually runs a kernel with this module loaded.
-> > 
-> > Could we get a build time warning/error for a missing MODULE_LICENSE?
-> 
-> Is it something as simple as this you are after?
-> [My dev box is dead atm so I have not done a kernel build
-> with this, only a single module].
+The text always mentions ...bin.o_shipped, just the example makefiles
+actually use ...bin_shipped. It was corrected in one place some time
+ago, these ones seem to have been forgotten.
 
-Thanks, it seems to work - and I'm currently working on fixing the bugs 
-it catches.
+Signed-off-by: Wolfram Sang <w.sang@pengutronix.de>
+---
+ Documentation/kbuild/modules.txt |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
 
-Considering that these are trivial to fix I'd even suggest a fatal() 
-instead of the warn() for making them obvious for everyone doing build 
-testing.
-
-> 	Sam
-> 
-> diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-> index 695b5d6..e8560a0 100644
-> --- a/scripts/mod/modpost.c
-> +++ b/scripts/mod/modpost.c
-> @@ -1552,6 +1552,8 @@ static void read_symbols(char *modname)
->  	}
->  
->  	license = get_modinfo(info.modinfo, info.modinfo_len, "license");
-> +	if (!license && !is_vmlinux(modname))
-> +		warn("modpost: missing MODULE_LICENSE() in %s\n", modname);
->  	while (license) {
->  		if (license_is_gpl_compatible(license))
->  			mod->gpl_compatible = 1;
-
-cu
-Adrian
-
+diff --git a/Documentation/kbuild/modules.txt b/Documentation/kbuild/modules.txt
+index 1d247d5..ce3f2ff 100644
+--- a/Documentation/kbuild/modules.txt
++++ b/Documentation/kbuild/modules.txt
+@@ -253,7 +253,7 @@ following files:
+ 
+ 		# Module specific targets
+ 		genbin:
+-			echo "X" > 8123_bin_shipped
++			echo "X" > 8123_bin.o_shipped
+ 
+ 
+ 	In example 2, we are down to two fairly simple files and for simple
+@@ -279,7 +279,7 @@ following files:
+ 
+ 		# Module specific targets
+ 		genbin:
+-			echo "X" > 8123_bin_shipped
++			echo "X" > 8123_bin.o_shipped
+ 
+ 		endif
+ 
 -- 
-
-       "Is there not promise of rain?" Ling Tan asked suddenly out
-        of the darkness. There had been need of rain for many days.
-       "Only a promise," Lao Er said.
-                                       Pearl S. Buck - Dragon Seed
+1.5.4.4
 
