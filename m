@@ -1,49 +1,65 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from metis.extern.pengutronix.de ([83.236.181.26]:42432 "EHLO
-	metis.extern.pengutronix.de" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1750918AbYCaNdM (ORCPT
+Received: from testure.choralone.org ([194.9.77.134]:45436 "EHLO
+	testure.choralone.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751755AbYDACpe (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 31 Mar 2008 09:33:12 -0400
-From: Wolfram Sang <w.sang@pengutronix.de>
-Subject: [PATCH] Documentation/kbuild: fix typos (s/bin_shipped/bin.o_shipped/)
-Date: Mon, 31 Mar 2008 15:08:04 +0200
-Message-Id: <1206968884-16410-1-git-send-email-w.sang@pengutronix.de>
+	Mon, 31 Mar 2008 22:45:34 -0400
+Date: Mon, 31 Mar 2008 22:22:48 -0400
+From: Dave Jones <davej@codemonkey.org.uk>
+Subject: Re: wish: build time warning for missing MODULE_LICENSE
+Message-ID: <20080401022247.GA8383@codemonkey.org.uk>
+References: <20080330180119.GC1575@cs181133002.pp.htv.fi> <20080330190430.GD19733@uranus.ravnborg.org> <20080330203417.GA7607@cs181133002.pp.htv.fi>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20080330203417.GA7607@cs181133002.pp.htv.fi>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Wolfram Sang <w.sang@pengutronix.de>
+To: Adrian Bunk <bunk@kernel.org>
+Cc: Sam Ravnborg <sam@ravnborg.org>, rusty@rustcorp.com.au, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-The text always mentions ...bin.o_shipped, just the example makefiles
-actually use ...bin_shipped. It was corrected in one place some time
-ago, these ones seem to have been forgotten.
+On Sun, Mar 30, 2008 at 11:34:17PM +0300, Adrian Bunk wrote:
+ > On Sun, Mar 30, 2008 at 09:04:30PM +0200, Sam Ravnborg wrote:
+ > > On Sun, Mar 30, 2008 at 09:01:19PM +0300, Adrian Bunk wrote:
+ > > > I just fixed a bug where I had accidentally removed a MODULE_LICENSE() 
+ > > > from a file.
+ > > > 
+ > > > The problem is that such bugs are currently not discovered until someone 
+ > > > actually runs a kernel with this module loaded.
+ > > > 
+ > > > Could we get a build time warning/error for a missing MODULE_LICENSE?
+ > > 
+ > > Is it something as simple as this you are after?
+ > > [My dev box is dead atm so I have not done a kernel build
+ > > with this, only a single module].
+ > 
+ > Thanks, it seems to work - and I'm currently working on fixing the bugs 
+ > it catches.
+ > 
+ > Considering that these are trivial to fix I'd even suggest a fatal() 
+ > instead of the warn() for making them obvious for everyone doing build 
+ > testing.
+ 
+In the Fedora kernel specfile, we have something to catch this at build time.
+Relevant pieces are (munged a bit for clarity) ..
 
-Signed-off-by: Wolfram Sang <w.sang@pengutronix.de>
----
- Documentation/kbuild/modules.txt |    4 ++--
- 1 files changed, 2 insertions(+), 2 deletions(-)
+    find . -name "*.ko" -type f >modnames
 
-diff --git a/Documentation/kbuild/modules.txt b/Documentation/kbuild/modules.txt
-index 1d247d5..ce3f2ff 100644
---- a/Documentation/kbuild/modules.txt
-+++ b/Documentation/kbuild/modules.txt
-@@ -253,7 +253,7 @@ following files:
- 
- 		# Module specific targets
- 		genbin:
--			echo "X" > 8123_bin_shipped
-+			echo "X" > 8123_bin.o_shipped
- 
- 
- 	In example 2, we are down to two fairly simple files and for simple
-@@ -279,7 +279,7 @@ following files:
- 
- 		# Module specific targets
- 		genbin:
--			echo "X" > 8123_bin_shipped
-+			echo "X" > 8123_bin.o_shipped
- 
- 		endif
- 
+    while read i
+    do
+      echo -n "$i " >> modinfo
+      /sbin/modinfo -l $i >> modinfo
+    done < modnames
+
+    egrep -v \
+          'GPL( v2)?$|Dual BSD/GPL$|Dual MPL/GPL$|GPL and additional rights$' \
+          modinfo && exit 1
+
+This hasn't been triggering though, so either it stopped working at some point,
+or we don't build the module you mention.  Which was it out of curiosity ?
+Or was your slip-up an -mm only thing?
+
+	Dave
+
 -- 
-1.5.4.4
-
+http://www.codemonkey.org.uk
