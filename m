@@ -1,96 +1,88 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp6.pp.htv.fi ([213.243.153.40]:43425 "EHLO smtp6.pp.htv.fi"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1756411AbYDAHnO (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 1 Apr 2008 03:43:14 -0400
-Date: Tue, 1 Apr 2008 10:43:11 +0300
-From: Adrian Bunk <bunk@kernel.org>
-Subject: Re: wish: build time warning for missing MODULE_LICENSE
-Message-ID: <20080401074311.GE23259@cs181133002.pp.htv.fi>
-References: <20080330180119.GC1575@cs181133002.pp.htv.fi> <20080330190430.GD19733@uranus.ravnborg.org> <20080330203417.GA7607@cs181133002.pp.htv.fi> <20080401022247.GA8383@codemonkey.org.uk>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20080401022247.GA8383@codemonkey.org.uk>
+Received: from milhouse.binasys.co.uk ([216.12.200.91]:42231 "EHLO
+	milhouse.binasys.co.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1759970AbYDAUJg convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 1 Apr 2008 16:09:36 -0400
+Date: Tue, 1 Apr 2008 20:42:47 +0100
+From: Steve Brokenshire <sbrokenshire@xestia.co.uk>
+Subject: Re: [PATCH] Compress kernel modules on installation.
+Message-Id: <20080401204247.068aaa22.sbrokenshire@xestia.co.uk>
+In-Reply-To: <20080226112840.GA29465@uranus.ravnborg.org>
+References: <20080225214209.a3f79327.sbrokenshire@xestia.co.uk>
+	<20080226112840.GA29465@uranus.ravnborg.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Dave Jones <davej@codemonkey.org.uk>, Sam Ravnborg <sam@ravnborg.org>, rusty@rustcorp.com.au, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-On Mon, Mar 31, 2008 at 10:22:48PM -0400, Dave Jones wrote:
-> On Sun, Mar 30, 2008 at 11:34:17PM +0300, Adrian Bunk wrote:
->  > On Sun, Mar 30, 2008 at 09:04:30PM +0200, Sam Ravnborg wrote:
->  > > On Sun, Mar 30, 2008 at 09:01:19PM +0300, Adrian Bunk wrote:
->  > > > I just fixed a bug where I had accidentally removed a MODULE_LICENSE() 
->  > > > from a file.
->  > > > 
->  > > > The problem is that such bugs are currently not discovered until someone 
->  > > > actually runs a kernel with this module loaded.
->  > > > 
->  > > > Could we get a build time warning/error for a missing MODULE_LICENSE?
->  > > 
->  > > Is it something as simple as this you are after?
->  > > [My dev box is dead atm so I have not done a kernel build
->  > > with this, only a single module].
->  > 
->  > Thanks, it seems to work - and I'm currently working on fixing the bugs 
->  > it catches.
->  > 
->  > Considering that these are trivial to fix I'd even suggest a fatal() 
->  > instead of the warn() for making them obvious for everyone doing build 
->  > testing.
->  
-> In the Fedora kernel specfile, we have something to catch this at build time.
-> Relevant pieces are (munged a bit for clarity) ..
+On Tue, 26 Feb 2008 12:28:40 +0100
+Sam Ravnborg <sam@ravnborg.org> wrote:
+
+> On Mon, Feb 25, 2008 at 09:42:09PM +0000, Steve Brokenshire wrote:
+> > Hi,
+> > 
+> > (I've sent this to the linux-kbuild and linux-kernel lists as this
+> > patch modifies the Makefile.modinst file. I also don't subscribe to the 
+> > linux-kbuild and linux-kernel mailing lists so can I have any replies
+> > CC'ed to me please)
+> > 
+> > This patch allows kernel modules to be compressed when 'make
+> > modules_install' is run after being copied to
+> > the /lib/module/<version>/<...> directory which is useful if you have
+> > module-init-tools installed with --enable-zlib. This patch adds an
+> > option (MODULE_COMPRESS) to the kernel configuration file (specifically
+> > init/Kconfig) so that the kernel modules will compressed if
+> > MODULE_COMPRESS is set.
+> > 
+> > When MODULE_COMPRESS is set the output of 'make modules_install' will
+> > go as the following:
+> > 
+> > INSTALL  drivers/fs/xfs/xfs.ko
+> > COMPRESS drivers/fs/xfs/xfs.ko
+> > INSTALL  drivers/fs/fat/fat.ko
+> > COMPRESS drivers/fs/fat/fat.ko
+> > ...
+> > 
+> > I've tested my patch on kernel versions 2.6.24.2, 2.6.24-git12, 2.6.23.14 and
+> > 2.6.19 and they compile, install and compress into the respective
+> > module directories without any errors.
+> > 
+> > I've also tested this with the uvcvideo (linux-uvc) kernel module (from
+> > the SVN branch and with kernel versions 2.6.24.2, 2.6.24-git12, 2.6.23.14 and
+> > 2.6.19) as that uses Kbuild properly when installing the module and
+> > after installing the uvcvideo the module is then compressed.
+> > Unfortunately, I couldn't find any other kernel modules which used the
+> > Kbuild system for installing their kernel modules. :(
+> > 
+> > I've included include/config/auto.conf in Makefile.modinst so that it
+> > can check if MODULE_COMPRESS is set when installing the kernel modules.
 > 
->     find . -name "*.ko" -type f >modnames
+> Should we mention this possibility in Documentation/kbuild/modules.txt also?
 > 
->     while read i
->     do
->       echo -n "$i " >> modinfo
->       /sbin/modinfo -l $i >> modinfo
->     done < modnames
+> Otherwise from a quick scan it looks OK.
+> As module-init-tols are our userspae counterpart we should align the
+> functionality with that tool.
+> I assume this gives us a simple choice of compression method and naming.
 > 
->     egrep -v \
->           'GPL( v2)?$|Dual BSD/GPL$|Dual MPL/GPL$|GPL and additional rights$' \
->           modinfo && exit 1
+> 	Sam
 
-I'd say the price for the most elegant solution goes to Sam.  ;)
+(Sorry for my lazy replying...)
 
-> This hasn't been triggering though, so either it stopped working at some point,
-> or we don't build the module you mention.  Which was it out of curiosity ?
-> Or was your slip-up an -mm only thing?
+I think it should be mentioned in Documentation/kbuild/modules.txt at
+Chapter 2.2. The following should be added to the modules_install
+target part:
 
-My slip-up was the OSS ac97_codec in 2.6.25-rc.
+If MODULES_COMPRESS is set when the modules_install target is run then
+the module is compressed after it has been copied to 
+/lib/modules/<kernel-version>. Compressed modules require 
+module-init-tools installed with --zlib-enabled.
 
-The other ones I found until now are:
-arch/x86/video/fbdev.c
-drivers/ide/ide-pnp.c (bug introduced in 2.6.25-rc)
-drivers/ide/pci/cmd640.c (bug introduced in 2.6.25-rc)
-drivers/ide/ppc/mpc8xx.c (bug introduced in 2.6.25-rc)
-drivers/ide/ppc/pmac.c (bug introduced in 2.6.25-rc)
-drivers/ide/arm/ide_arm.c (bug introduced in 2.6.25-rc)
-drivers/ide/cris/ide-cris.c (bug introduced in 2.6.25-rc)
-drivers/ide/h8300/ide-h8300.c (bug introduced in 2.6.25-rc)
-drivers/ide/legacy/gayle.c (bug introduced in 2.6.25-rc)
-drivers/ide/legacy/buddha.c (bug introduced in 2.6.25-rc)
-drivers/ide/legacy/falconide.c (bug introduced in 2.6.25-rc)
-drivers/ide/legacy/macide.c (bug introduced in 2.6.25-rc)
-drivers/ide/legacy/q40ide.c (bug introduced in 2.6.25-rc)
-drivers/media/video/v4l2-int-device.c (bug introduced in 2.6.25-rc)
-arch/arm/kernel/arthur.c
+Does that sound right?
 
-Most likely none of them is modular in the Fedora kernel and/or 
-available on the architectures Fedora supports.
+Anyway, as it currently is with the patch, MODULE_COMPRESS isn't as scalable as it perhaps could be and I've been thinking I should try and make a better version of the patch which is scalable (So depending on how module-init-tools is updated in the future each option would also give which version of module-init-tools is required to use that compression method in the init/KConfig file)
 
-> 	Dave
-
-cu
-Adrian
-
--- 
-
-       "Is there not promise of rain?" Ling Tan asked suddenly out
-        of the darkness. There had been need of rain for many days.
-       "Only a promise," Lao Er said.
-                                       Pearl S. Buck - Dragon Seed
-
+Steve
