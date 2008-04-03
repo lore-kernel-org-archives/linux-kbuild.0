@@ -1,88 +1,243 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from milhouse.binasys.co.uk ([216.12.200.91]:42231 "EHLO
-	milhouse.binasys.co.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1759970AbYDAUJg convert rfc822-to-8bit (ORCPT
+Received: from agminet01.oracle.com ([141.146.126.228]:35036 "EHLO
+	agminet01.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756497AbYDCTrm (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 1 Apr 2008 16:09:36 -0400
-Date: Tue, 1 Apr 2008 20:42:47 +0100
-From: Steve Brokenshire <sbrokenshire@xestia.co.uk>
-Subject: Re: [PATCH] Compress kernel modules on installation.
-Message-Id: <20080401204247.068aaa22.sbrokenshire@xestia.co.uk>
-In-Reply-To: <20080226112840.GA29465@uranus.ravnborg.org>
-References: <20080225214209.a3f79327.sbrokenshire@xestia.co.uk>
-	<20080226112840.GA29465@uranus.ravnborg.org>
+	Thu, 3 Apr 2008 15:47:42 -0400
+Date: Thu, 3 Apr 2008 12:45:29 -0700
+From: Randy Dunlap <randy.dunlap@oracle.com>
+Subject: [PATCH] documentation: build source files in Documentation sub-dir
+Message-Id: <20080403124529.3f2efb79.randy.dunlap@oracle.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: lkml <linux-kernel@vger.kernel.org>
+Cc: linux-kbuild@vger.kernel.org, samr <sam@ravnborg.org>, akpm <akpm@linux-foundation.org>
 
-On Tue, 26 Feb 2008 12:28:40 +0100
-Sam Ravnborg <sam@ravnborg.org> wrote:
+From: Randy Dunlap <randy.dunlap@oracle.com>
 
-> On Mon, Feb 25, 2008 at 09:42:09PM +0000, Steve Brokenshire wrote:
-> > Hi,
-> > 
-> > (I've sent this to the linux-kbuild and linux-kernel lists as this
-> > patch modifies the Makefile.modinst file. I also don't subscribe to the 
-> > linux-kbuild and linux-kernel mailing lists so can I have any replies
-> > CC'ed to me please)
-> > 
-> > This patch allows kernel modules to be compressed when 'make
-> > modules_install' is run after being copied to
-> > the /lib/module/<version>/<...> directory which is useful if you have
-> > module-init-tools installed with --enable-zlib. This patch adds an
-> > option (MODULE_COMPRESS) to the kernel configuration file (specifically
-> > init/Kconfig) so that the kernel modules will compressed if
-> > MODULE_COMPRESS is set.
-> > 
-> > When MODULE_COMPRESS is set the output of 'make modules_install' will
-> > go as the following:
-> > 
-> > INSTALL  drivers/fs/xfs/xfs.ko
-> > COMPRESS drivers/fs/xfs/xfs.ko
-> > INSTALL  drivers/fs/fat/fat.ko
-> > COMPRESS drivers/fs/fat/fat.ko
-> > ...
-> > 
-> > I've tested my patch on kernel versions 2.6.24.2, 2.6.24-git12, 2.6.23.14 and
-> > 2.6.19 and they compile, install and compress into the respective
-> > module directories without any errors.
-> > 
-> > I've also tested this with the uvcvideo (linux-uvc) kernel module (from
-> > the SVN branch and with kernel versions 2.6.24.2, 2.6.24-git12, 2.6.23.14 and
-> > 2.6.19) as that uses Kbuild properly when installing the module and
-> > after installing the uvcvideo the module is then compressed.
-> > Unfortunately, I couldn't find any other kernel modules which used the
-> > Kbuild system for installing their kernel modules. :(
-> > 
-> > I've included include/config/auto.conf in Makefile.modinst so that it
-> > can check if MODULE_COMPRESS is set when installing the kernel modules.
-> 
-> Should we mention this possibility in Documentation/kbuild/modules.txt also?
-> 
-> Otherwise from a quick scan it looks OK.
-> As module-init-tols are our userspae counterpart we should align the
-> functionality with that tool.
-> I assume this gives us a simple choice of compression method and naming.
-> 
-> 	Sam
+Currently source files in the Documentation/ sub-dir can easily bit-rot
+since they are not generally buildable, either because they are hidden
+in text files or because there are no Makefile rules for them.
+This needs to be fixed so that the source files remain usable and good
+examples of code instead of bad examples.
 
-(Sorry for my lazy replying...)
+Add the ability to build source files that are in the Documentation/ dir.
+Add to Kconfig as "BUILD_DOCSRC" config symbol.
 
-I think it should be mentioned in Documentation/kbuild/modules.txt at
-Chapter 2.2. The following should be added to the modules_install
-target part:
+Use "CONFIG_BUILD_DOCSRC=1 make ..." to build objects from the
+Documentation/ sources.  Or enable BUILD_DOCSRC in the *config system.
 
-If MODULES_COMPRESS is set when the modules_install target is run then
-the module is compressed after it has been copied to 
-/lib/modules/<kernel-version>. Compressed modules require 
-module-init-tools installed with --zlib-enabled.
+The Makefiles use $objdir/usr/include for header files, so doing
+"make headers_install" is required.  This is done for you if you enable
+CONFIG_HEADERS_CHECK=y.
 
-Does that sound right?
+Note: needs documentation-move-spidev_fdx-example-to-its-own-source-file.patch
+from -mm patchset.
 
-Anyway, as it currently is with the patch, MODULE_COMPRESS isn't as scalable as it perhaps could be and I've been thinking I should try and make a better version of the patch which is scalable (So depending on how module-init-tools is updated in the future each option would also give which version of module-init-tools is required to use that compression method in the init/KConfig file)
+Signed-off-by: Randy Dunlap <randy.dunlap@oracle.com>
+Reviewed-by: Sam Ravnborg <sam@ravnborg.org>
+---
+ Documentation/DocBook/Makefile              |    7 +++++++
+ Documentation/Makefile                      |    3 +++
+ Documentation/accounting/Makefile           |   10 ++++++++++
+ Documentation/auxdisplay/Makefile           |   10 ++++++++++
+ Documentation/connector/Makefile            |    9 +++++++++
+ Documentation/filesystems/configfs/Makefile |    1 +
+ Documentation/ia64/Makefile                 |    8 ++++++++
+ Documentation/networking/Makefile           |    8 ++++++++
+ Documentation/pcmcia/Makefile               |   10 ++++++++++
+ Documentation/spi/Makefile                  |   11 +++++++++++
+ Documentation/video4linux/Makefile          |    8 ++++++++
+ Documentation/vm/Makefile                   |    8 ++++++++
+ Documentation/watchdog/src/Makefile         |    8 ++++++++
+ Makefile                                    |    5 ++++-
+ lib/Kconfig.debug                           |    8 ++++++++
+ 15 files changed, 113 insertions(+), 1 deletion(-)
+ create mode 100644 Documentation/Makefile
+ create mode 100644 Documentation/accounting/Makefile
 
-Steve
+--- /dev/null
++++ lin2625-rc8-docsrc/Documentation/Makefile
+@@ -0,0 +1,3 @@
++obj-m := DocBook/ accounting/ auxdisplay/ connector/ \
++	filesystems/configfs/ ia64/ networking/ \
++	pcmcia/ spi/ video4linux/ vm/ watchdog/src/
+--- /dev/null
++++ lin2625-rc8-docsrc/Documentation/accounting/Makefile
+@@ -0,0 +1,10 @@
++# kbuild trick to avoid linker error. Can be omitted if a module is built.
++obj- := dummy.o
++
++# List of programs to build
++hostprogs-y := getdelays
++
++# Tell kbuild to always build the programs
++always := $(hostprogs-y)
++
++HOSTCFLAGS_getdelays.o += -I$(srctree)/usr/include
+--- lin2625-rc8-docsrc.orig/Makefile
++++ lin2625-rc8-docsrc/Makefile
+@@ -806,6 +806,9 @@ endif
+ ifdef CONFIG_SAMPLES
+ 	$(Q)$(MAKE) $(build)=samples
+ endif
++ifdef CONFIG_BUILD_DOCSRC
++	$(Q)$(MAKE) $(build)=Documentation
++endif
+ 	$(call vmlinux-modpost)
+ 	$(call if_changed_rule,vmlinux__)
+ 	$(Q)rm -f .old_version
+@@ -1114,7 +1117,7 @@ MRPROPER_FILES += .config .config.old in
+ #
+ clean: rm-dirs  := $(CLEAN_DIRS)
+ clean: rm-files := $(CLEAN_FILES)
+-clean-dirs      := $(addprefix _clean_,$(srctree) $(vmlinux-alldirs))
++clean-dirs      := $(addprefix _clean_,$(srctree) $(vmlinux-alldirs) Documentation)
+ 
+ PHONY += $(clean-dirs) clean archclean
+ $(clean-dirs):
+--- lin2625-rc8-docsrc.orig/Documentation/DocBook/Makefile
++++ lin2625-rc8-docsrc/Documentation/DocBook/Makefile
+@@ -101,6 +101,13 @@ C-procfs-example = procfs_example.xml
+ C-procfs-example2 = $(addprefix $(obj)/,$(C-procfs-example))
+ $(obj)/procfs-guide.xml: $(C-procfs-example2)
+ 
++# List of programs to build
++##oops, this is a kernel module::hostprogs-y := procfs_example
++obj-m += procfs_example.o
++
++# Tell kbuild to always build the programs
++always := $(hostprogs-y)
++
+ notfoundtemplate = echo "*** You have to install docbook-utils or xmlto ***"; \
+ 		   exit 1
+ db2xtemplate = db2TYPE -o $(dir $@) $<
+--- /dev/null
++++ lin2625-rc8-docsrc/Documentation/auxdisplay/Makefile
+@@ -0,0 +1,10 @@
++# kbuild trick to avoid linker error. Can be omitted if a module is built.
++obj- := dummy.o
++
++# List of programs to build
++hostprogs-y := cfag12864b-example
++
++# Tell kbuild to always build the programs
++always := $(hostprogs-y)
++
++HOSTCFLAGS_cfag12864b-example.o += -I$(srctree)/usr/include
+--- /dev/null
++++ lin2625-rc8-docsrc/Documentation/connector/Makefile
+@@ -0,0 +1,9 @@
++obj-m += cn_test.o
++
++# List of programs to build
++hostprogs-y := ucon
++
++# Tell kbuild to always build the programs
++always := $(hostprogs-y)
++
++HOSTCFLAGS_ucon.o += -I$(srctree)/usr/include
+--- /dev/null
++++ lin2625-rc8-docsrc/Documentation/ia64/Makefile
+@@ -0,0 +1,8 @@
++# kbuild trick to avoid linker error. Can be omitted if a module is built.
++obj- := dummy.o
++
++# List of programs to build
++hostprogs-y := aliasing-test
++
++# Tell kbuild to always build the programs
++always := $(hostprogs-y)
+--- /dev/null
++++ lin2625-rc8-docsrc/Documentation/networking/Makefile
+@@ -0,0 +1,8 @@
++# kbuild trick to avoid linker error. Can be omitted if a module is built.
++obj- := dummy.o
++
++# List of programs to build
++hostprogs-y := ifenslave
++
++# Tell kbuild to always build the programs
++always := $(hostprogs-y)
+--- /dev/null
++++ lin2625-rc8-docsrc/Documentation/pcmcia/Makefile
+@@ -0,0 +1,10 @@
++# kbuild trick to avoid linker error. Can be omitted if a module is built.
++obj- := dummy.o
++
++# List of programs to build
++hostprogs-y := crc32hash
++
++# Tell kbuild to always build the programs
++always := $(hostprogs-y)
++
++HOSTCFLAGS_crc32hash.o += -I$(srctree)/usr/include
+--- /dev/null
++++ lin2625-rc8-docsrc/Documentation/spi/Makefile
+@@ -0,0 +1,11 @@
++# kbuild trick to avoid linker error. Can be omitted if a module is built.
++obj- := dummy.o
++
++# List of programs to build
++hostprogs-y := spidev_test spidev_fdx
++
++# Tell kbuild to always build the programs
++always := $(hostprogs-y)
++
++HOSTCFLAGS_spidev_test.o += -I$(srctree)/usr/include
++HOSTCFLAGS_spidev_fdx.o += -I$(srctree)/usr/include
+--- /dev/null
++++ lin2625-rc8-docsrc/Documentation/video4linux/Makefile
+@@ -0,0 +1,8 @@
++# kbuild trick to avoid linker error. Can be omitted if a module is built.
++obj- := dummy.o
++
++# List of programs to build
++hostprogs-y := v4lgrab
++
++# Tell kbuild to always build the programs
++always := $(hostprogs-y)
+--- /dev/null
++++ lin2625-rc8-docsrc/Documentation/vm/Makefile
+@@ -0,0 +1,8 @@
++# kbuild trick to avoid linker error. Can be omitted if a module is built.
++obj- := dummy.o
++
++# List of programs to build
++hostprogs-y := slabinfo
++
++# Tell kbuild to always build the programs
++always := $(hostprogs-y)
+--- /dev/null
++++ lin2625-rc8-docsrc/Documentation/watchdog/src/Makefile
+@@ -0,0 +1,8 @@
++# kbuild trick to avoid linker error. Can be omitted if a module is built.
++obj- := dummy.o
++
++# List of programs to build
++hostprogs-y := watchdog-simple watchdog-test
++
++# Tell kbuild to always build the programs
++always := $(hostprogs-y)
+--- /dev/null
++++ lin2625-rc8-docsrc/Documentation/filesystems/configfs/Makefile
+@@ -0,0 +1 @@
++obj-m += configfs_example.o
+--- lin2625-rc8-docsrc.orig/lib/Kconfig.debug
++++ lin2625-rc8-docsrc/lib/Kconfig.debug
+@@ -621,4 +621,12 @@ config PROVIDE_OHCI1394_DMA_INIT
+ 
+ 	  See Documentation/debugging-via-ohci1394.txt for more information.
+ 
++menuconfig BUILD_DOCSRC
++	bool "Build targets in Documentation/ tree"
++	help
++	  This option attempts to build objects from the source files in the
++	  kernel Documentation/ tree.
++
++	  Say N if you are unsure.
++
+ source "samples/Kconfig"
