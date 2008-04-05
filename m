@@ -1,52 +1,38 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mtaout03-winn.ispmail.ntl.com ([81.103.221.49]:24445 "EHLO
-	mtaout03-winn.ispmail.ntl.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1755299AbYDCUt5 (ORCPT
+Received: from fructidor.freesurf.fr ([212.43.206.30]:53955 "EHLO
+	smtp-out.freesurf.fr" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1753491AbYDEVAj (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 3 Apr 2008 16:49:57 -0400
-Message-ID: <47F542BE.3000106@gentoo.org>
-Date: Thu, 03 Apr 2008 21:49:02 +0100
-From: Daniel Drake <dsd@gentoo.org>
+	Sat, 5 Apr 2008 17:00:39 -0400
+Message-ID: <20080405223515.26673ya8h0yff5wk@webmail-html.freesurf.fr>
+Date: Sat, 05 Apr 2008 22:35:15 +0200
+From: su17171@freesurf.fr
+Subject: Dear Friend
 MIME-Version: 1.0
-Subject: x86: defconfig not being applied automatically in 2.6.24+
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Type: text/plain;
+	charset=ISO-8859-1;
+	DelSp="Yes";
+	format="flowed"
+Content-Disposition: inline
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: linux kernel <linux-kernel@vger.kernel.org>, kerframil@gmail.com, mpagano@gentoo.org, linux-kbuild@vger.kernel.org
 
-In 2.6.23, if you unpacked a kernel source tarball and then ran "make 
-menuconfig" you'd be presented with this message:
-	# using defaults found in arch/i386/defconfig
+Dear Friend
 
-and the default options would be set.
+I could not get connected to you on phone so I decided to send this  
+email to you.Presently, I am out of the country.Since, I could not  
+reach you before I travelled I lodged your money including the  
+interest with the correspondent Bank Cotonou-Benin, in respect of the  
+little assistance you rendered to me during the cost of transfering my  
+sum.
 
-The same thing in 2.6.24 does not give you any "using defaults" message, 
-and the default config options within menuconfig are rather blank (e.g. 
-no PCI support). You can work around this by explicitly running "make 
-defconfig" before menuconfig, but it would be nice to have the behaviour 
-the way it was for 2.6.23 (and the way it still is for other archs).
+The Account Officer Name,Dr. Ken Ibru is informed on this contact him  
+to receive your fund. His email is:
+( ken55@sify.com )
 
+Please I may not have time to respond your email, just contact Dr Ken  
+Ibru to release your payment.
+Best Regards,
+Dr.Andrew And Partners
 
-I've looked into the problem. It works on 2.6.23 because of init/Kconfig 
-which is still unchanged:
-
-config DEFCONFIG_LIST
-	[...]
-	default "arch/$ARCH/defconfig"
-
-arch/i386/defconfig and arch/x86_64/defconfig existed in 2.6.23, but not 
-in 2.6.24 due to the arch merge.
-
-I've identified why it worked in 2.6.23 but I'm not really sure of the 
-right way to fix it for the newer kernels. I tried adding another 
-default in DEFCONFIG_LIST:
-	default "arch/$SRCARCH/configs/$KBUILD_DEFCONFIG"
-but it seems that $SRCARCH and $KBUILD_DEFCONFIG are not being exported 
-to kconfig and I couldn't immediately see how to change that.
-
-Any thoughts?
-
-Thanks,
-Daniel
