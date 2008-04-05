@@ -1,38 +1,54 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from fructidor.freesurf.fr ([212.43.206.30]:39821 "EHLO
-	smtp-out.freesurf.fr" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1753536AbYDEVC5 (ORCPT
+Received: from astoria.ccjclearline.com ([64.235.106.9]:57531 "EHLO
+	astoria.ccjclearline.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753929AbYDEX7k (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 5 Apr 2008 17:02:57 -0400
-Message-ID: <20080405223510.65231h8jjfpzpvgg@webmail-html.freesurf.fr>
-Date: Sat, 05 Apr 2008 22:35:10 +0200
-From: su17171@freesurf.fr
-Subject: Dear Friend
+	Sat, 5 Apr 2008 19:59:40 -0400
+Received: from cpe00142a336e11-cm001ac318e826.cpe.net.cable.rogers.com ([72.140.150.221] helo=crashcourse.ca)
+	by astoria.ccjclearline.com with esmtpsa (TLSv1:AES256-SHA:256)
+	(Exim 4.68)
+	(envelope-from <rpjday@crashcourse.ca>)
+	id 1JiIIK-0002QV-LJ
+	for linux-kbuild@vger.kernel.org; Sat, 05 Apr 2008 19:59:36 -0400
+Date: Sat, 5 Apr 2008 19:59:31 -0400 (EDT)
+From: "Robert P. J. Day" <rpjday@crashcourse.ca>
+Subject: "if CONFIG" versus "depends on CONFIG"
+Message-ID: <alpine.LFD.1.00.0804051956270.17908@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset=ISO-8859-1;
-	DelSp="Yes";
-	format="flowed"
-Content-Disposition: inline
-Content-Transfer-Encoding: 7bit
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
+To: kbuild devel list <linux-kbuild@vger.kernel.org>
 
-Dear Friend
 
-I could not get connected to you on phone so I decided to send this  
-email to you.Presently, I am out of the country.Since, I could not  
-reach you before I travelled I lodged your money including the  
-interest with the correspondent Bank Cotonou-Benin, in respect of the  
-little assistance you rendered to me during the cost of transfering my  
-sum.
+  is there any inherent difference between having a config entry
+contain
 
-The Account Officer Name,Dr. Ken Ibru is informed on this contact him  
-to receive your fund. His email is:
-( ken55@sify.com )
+  depends on FUBAR
 
-Please I may not have time to respond your email, just contact Dr Ken  
-Ibru to release your payment.
-Best Regards,
-Dr.Andrew And Partners
+as opposed to having that config option wrapped inside
 
+  if FUBAR
+  ...
+  endif
+
+i ask since the Kconfig file drivers/usb/serial/Kconfig wraps almost
+the entire file in
+
+  if USB_SERIAL
+  ...
+  endif
+
+and yet still defines the majority of config entries as depending on
+USB_SERIAL, which seems redundant.
+
+rday
+--
+
+========================================================================
+Robert P. J. Day
+Linux Consulting, Training and Annoying Kernel Pedantry:
+    Have classroom, will lecture.
+
+http://crashcourse.ca                          Waterloo, Ontario, CANADA
+========================================================================
