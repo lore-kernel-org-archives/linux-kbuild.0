@@ -1,11 +1,11 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from fructidor.freesurf.fr ([212.43.206.30]:53955 "EHLO
+Received: from fructidor.freesurf.fr ([212.43.206.30]:39821 "EHLO
 	smtp-out.freesurf.fr" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1753491AbYDEVAj (ORCPT
+	with ESMTP id S1753536AbYDEVC5 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 5 Apr 2008 17:00:39 -0400
-Message-ID: <20080405223515.26673ya8h0yff5wk@webmail-html.freesurf.fr>
-Date: Sat, 05 Apr 2008 22:35:15 +0200
+	Sat, 5 Apr 2008 17:02:57 -0400
+Message-ID: <20080405223510.65231h8jjfpzpvgg@webmail-html.freesurf.fr>
+Date: Sat, 05 Apr 2008 22:35:10 +0200
 From: su17171@freesurf.fr
 Subject: Dear Friend
 MIME-Version: 1.0
