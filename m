@@ -1,50 +1,44 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from xenotime.net ([66.160.160.81]:36247 "HELO xenotime.net"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with SMTP
-	id S1751396AbYDFBFK (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 5 Apr 2008 21:05:10 -0400
-Received: from midway.site ([71.117.215.127]) by xenotime.net for <linux-kbuild@vger.kernel.org>; Sat, 5 Apr 2008 18:05:05 -0700
-Date: Sat, 5 Apr 2008 18:05:05 -0700
-From: Randy Dunlap <rdunlap@xenotime.net>
-Subject: Re: "if CONFIG" versus "depends on CONFIG"
-Message-Id: <20080405180505.6acb221e.rdunlap@xenotime.net>
-In-Reply-To: <alpine.LFD.1.00.0804051956270.17908@localhost.localdomain>
-References: <alpine.LFD.1.00.0804051956270.17908@localhost.localdomain>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Received: from astoria.ccjclearline.com ([64.235.106.9]:36004 "EHLO
+	astoria.ccjclearline.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752292AbYDFTli (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 6 Apr 2008 15:41:38 -0400
+Received: from cpe001d60ad7267-cm001225dbafb6.cpe.net.cable.rogers.com ([99.236.100.208] helo=crashcourse.ca)
+	by astoria.ccjclearline.com with esmtpsa (TLSv1:AES256-SHA:256)
+	(Exim 4.68)
+	(envelope-from <rpjday@crashcourse.ca>)
+	id 1Jiakg-0000ts-6Q
+	for linux-kbuild@vger.kernel.org; Sun, 06 Apr 2008 15:42:06 -0400
+Date: Sun, 6 Apr 2008 15:41:34 -0400 (EDT)
+From: "Robert P. J. Day" <rpjday@crashcourse.ca>
+Subject: why "depends on FUBAR!=n"?
+Message-ID: <alpine.LFD.1.00.0804061540050.19835@localhost.localdomain>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Robert P. J. Day" <rpjday@crashcourse.ca>
-Cc: kbuild devel list <linux-kbuild@vger.kernel.org>
+To: kbuild devel list <linux-kbuild@vger.kernel.org>
 
-On Sat, 5 Apr 2008 19:59:31 -0400 (EDT) Robert P. J. Day wrote:
 
-> 
->   is there any inherent difference between having a config entry
-> contain
-> 
->   depends on FUBAR
-> 
-> as opposed to having that config option wrapped inside
-> 
->   if FUBAR
->   ...
->   endif
+  i'm sure i'll regret asking this, but why are there a number of
+Kconfig dependency directives of the form:
 
-No difference AFAICT.
+  depends on FUBAR!=n
 
-> i ask since the Kconfig file drivers/usb/serial/Kconfig wraps almost
-> the entire file in
-> 
->   if USB_SERIAL
->   ...
->   endif
-> 
-> and yet still defines the majority of config entries as depending on
-> USB_SERIAL, which seems redundant.
+how exactly does that differ from just
 
-Yes, that's redundant.
+  depends on FUBAR
 
----
-~Randy
+thanks.
+
+rday
+--
+
+========================================================================
+Robert P. J. Day
+Linux Consulting, Training and Annoying Kernel Pedantry:
+    Have classroom, will lecture.
+
+http://crashcourse.ca                          Waterloo, Ontario, CANADA
+========================================================================
