@@ -1,44 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from astoria.ccjclearline.com ([64.235.106.9]:36004 "EHLO
-	astoria.ccjclearline.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752292AbYDFTli (ORCPT
+Received: from smtp1.linux-foundation.org ([140.211.169.13]:33667 "EHLO
+	smtp1.linux-foundation.org" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1752388AbYDHUrv (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 6 Apr 2008 15:41:38 -0400
-Received: from cpe001d60ad7267-cm001225dbafb6.cpe.net.cable.rogers.com ([99.236.100.208] helo=crashcourse.ca)
-	by astoria.ccjclearline.com with esmtpsa (TLSv1:AES256-SHA:256)
-	(Exim 4.68)
-	(envelope-from <rpjday@crashcourse.ca>)
-	id 1Jiakg-0000ts-6Q
-	for linux-kbuild@vger.kernel.org; Sun, 06 Apr 2008 15:42:06 -0400
-Date: Sun, 6 Apr 2008 15:41:34 -0400 (EDT)
-From: "Robert P. J. Day" <rpjday@crashcourse.ca>
-Subject: why "depends on FUBAR!=n"?
-Message-ID: <alpine.LFD.1.00.0804061540050.19835@localhost.localdomain>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+	Tue, 8 Apr 2008 16:47:51 -0400
+Date: Tue, 8 Apr 2008 13:46:13 -0700
+From: Andrew Morton <akpm@linux-foundation.org>
+Subject: Re: [PATCH] documentation: build source files in Documentation
+ sub-dir
+Message-Id: <20080408134613.a047a7b6.akpm@linux-foundation.org>
+In-Reply-To: <20080403124529.3f2efb79.randy.dunlap@oracle.com>
+References: <20080403124529.3f2efb79.randy.dunlap@oracle.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: kbuild devel list <linux-kbuild@vger.kernel.org>
+To: Randy Dunlap <randy.dunlap@oracle.com>
+Cc: lkml <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org, samr <sam@ravnborg.org>
 
+On Thu, 3 Apr 2008 12:45:29 -0700 Randy Dunlap <randy.dunlap@oracle.com> wrote:
 
-  i'm sure i'll regret asking this, but why are there a number of
-Kconfig dependency directives of the form:
+> Currently source files in the Documentation/ sub-dir can easily bit-rot
+> since they are not generally buildable, either because they are hidden
+> in text files or because there are no Makefile rules for them.
+> This needs to be fixed so that the source files remain usable and good
+> examples of code instead of bad examples.
+> 
+> Add the ability to build source files that are in the Documentation/ dir.
+> Add to Kconfig as "BUILD_DOCSRC" config symbol.
+> 
+> Use "CONFIG_BUILD_DOCSRC=1 make ..." to build objects from the
+> Documentation/ sources.  Or enable BUILD_DOCSRC in the *config system.
+> 
+> The Makefiles use $objdir/usr/include for header files, so doing
+> "make headers_install" is required.  This is done for you if you enable
+> CONFIG_HEADERS_CHECK=y.
+> 
+> Note: needs documentation-move-spidev_fdx-example-to-its-own-source-file.patch
+> from -mm patchset.
 
-  depends on FUBAR!=n
+argh, I'm getting several warnings and at least two build errors from this.
+One is:
 
-how exactly does that differ from just
+In file included from /usr/src/devel/usr/include/linux/netlink.h:5,
+                 from /usr/src/devel/usr/include/linux/genetlink.h:4,
+                 from Documentation/accounting/getdelays.c:26:
+/usr/src/devel/usr/include/linux/types.h:166: error: expected specifier-qualifier-list before '__kernel_daddr_t'
 
-  depends on FUBAR
+(i386 allmodconfig).
 
-thanks.
-
-rday
---
-
-========================================================================
-Robert P. J. Day
-Linux Consulting, Training and Annoying Kernel Pedantry:
-    Have classroom, will lecture.
-
-http://crashcourse.ca                          Waterloo, Ontario, CANADA
-========================================================================
+I think I'll disable this patch for now..
