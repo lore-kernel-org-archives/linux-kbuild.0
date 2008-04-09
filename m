@@ -1,53 +1,75 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp1.linux-foundation.org ([140.211.169.13]:33667 "EHLO
-	smtp1.linux-foundation.org" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1752388AbYDHUrv (ORCPT
+Received: from michael.checkpoint.com ([194.29.32.68]:51993 "EHLO
+	michael.checkpoint.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751928AbYDIOt4 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 8 Apr 2008 16:47:51 -0400
-Date: Tue, 8 Apr 2008 13:46:13 -0700
-From: Andrew Morton <akpm@linux-foundation.org>
-Subject: Re: [PATCH] documentation: build source files in Documentation
- sub-dir
-Message-Id: <20080408134613.a047a7b6.akpm@linux-foundation.org>
-In-Reply-To: <20080403124529.3f2efb79.randy.dunlap@oracle.com>
-References: <20080403124529.3f2efb79.randy.dunlap@oracle.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+	Wed, 9 Apr 2008 10:49:56 -0400
+Received: from [91.90.139.95] (localhost [127.0.0.1])
+	by michael.checkpoint.com (8.12.10+Sun/8.12.10) with ESMTP id m39EIvfU004874
+	for <linux-kbuild@vger.kernel.org>; Wed, 9 Apr 2008 17:18:57 +0300 (IDT)
+Message-ID: <47FCD046.4060706@checkpoint.com>
+Date: Wed, 09 Apr 2008 17:18:46 +0300
+From: Anatoli Tubman <anatolit@checkpoint.com>
+MIME-Version: 1.0
+Subject: Combining several subdirectories into a single loadable module
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Randy Dunlap <randy.dunlap@oracle.com>
-Cc: lkml <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org, samr <sam@ravnborg.org>
+To: linux-kbuild@vger.kernel.org
 
-On Thu, 3 Apr 2008 12:45:29 -0700 Randy Dunlap <randy.dunlap@oracle.com> wrote:
+Hi all!
 
-> Currently source files in the Documentation/ sub-dir can easily bit-rot
-> since they are not generally buildable, either because they are hidden
-> in text files or because there are no Makefile rules for them.
-> This needs to be fixed so that the source files remain usable and good
-> examples of code instead of bad examples.
-> 
-> Add the ability to build source files that are in the Documentation/ dir.
-> Add to Kconfig as "BUILD_DOCSRC" config symbol.
-> 
-> Use "CONFIG_BUILD_DOCSRC=1 make ..." to build objects from the
-> Documentation/ sources.  Or enable BUILD_DOCSRC in the *config system.
-> 
-> The Makefiles use $objdir/usr/include for header files, so doing
-> "make headers_install" is required.  This is done for you if you enable
-> CONFIG_HEADERS_CHECK=y.
-> 
-> Note: needs documentation-move-spidev_fdx-example-to-its-own-source-file.patch
-> from -mm patchset.
+Sorry if this question is stupid, I'm new to this whole kbuild thing.
 
-argh, I'm getting several warnings and at least two build errors from this.
-One is:
+I have a kernel module with source scattered over several directories,
+with a separate set of specific compilation flags for each directory.
+How do I write Makefiles for it, assuming in-tree compilation?
 
-In file included from /usr/src/devel/usr/include/linux/netlink.h:5,
-                 from /usr/src/devel/usr/include/linux/genetlink.h:4,
-                 from Documentation/accounting/getdelays.c:26:
-/usr/src/devel/usr/include/linux/types.h:166: error: expected specifier-qualifier-list before '__kernel_daddr_t'
+Here's the situation in detail. Suppose I have this directory structure:
 
-(i386 allmodconfig).
+mymodule
+mymodule/subdir1
+mymodule/subdir1/source11.c
+mymodule/subdir1/source12.c
+...
+mymodule/subdir1/source1N.c
+mymodule/subdir2
+mymodule/subdir2/source21.c
+mymodule/subdir2/source22.c
+...
+mymodule/subdir2/source2M.c
+...
+mymodule/subdirK/sourceKL.c
 
-I think I'll disable this patch for now..
+Each subdirI needs to have its own Makefile with its own EXTRA_CFLAGS,
+and all .o files created in subdirectories need be combined into single
+mymodule.ko. How do I do that? There are no examples in the
+documentation, nor in the kernel source.
+
+The question could be subdivided in two.
+
+1. How do I tell the build system to compile sourceIJ.c and then leave
+   sourceIJ.o alone (do not include in the kernel, do not build a .ko)?
+
+2. Given a set of already built sourceIJ.o files, how do I tell the
+   build system to combine them into a single .ko without trying to
+   compile the corresponding sources first? If I say something like
+
+      mymodule-objs := subdir1/source11.o (etc)
+
+   in mymodule/Makefile, the build system will try to compile
+   subdir1/source11.c *with mymodule/Makefile*, which is wrong (I need
+   it to be done with mymodule/subdir1/Makefile).
+
+I also tried to build libraries (.a archives) instead of using
+sourceIJ.o directly, but without success.
+
+I tried to understand scripts/Makefile.build but it only gave me a
+headache...
+
+Regards
+-- 
+Anatoli Tubman
+Connectra performance and infrastructure
+Check Point Software Technologies
