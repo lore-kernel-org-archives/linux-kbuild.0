@@ -1,75 +1,110 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from michael.checkpoint.com ([194.29.32.68]:51993 "EHLO
-	michael.checkpoint.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751928AbYDIOt4 (ORCPT
+Received: from barikada.upol.cz ([158.194.242.200]:44063 "EHLO
+	barikada.upol.cz" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752616AbYDIO6v (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 9 Apr 2008 10:49:56 -0400
-Received: from [91.90.139.95] (localhost [127.0.0.1])
-	by michael.checkpoint.com (8.12.10+Sun/8.12.10) with ESMTP id m39EIvfU004874
-	for <linux-kbuild@vger.kernel.org>; Wed, 9 Apr 2008 17:18:57 +0300 (IDT)
-Message-ID: <47FCD046.4060706@checkpoint.com>
-Date: Wed, 09 Apr 2008 17:18:46 +0300
-From: Anatoli Tubman <anatolit@checkpoint.com>
-MIME-Version: 1.0
-Subject: Combining several subdirectories into a single loadable module
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+	Wed, 9 Apr 2008 10:58:51 -0400
+Subject: coloring stdout && stderr, small kbuild example
+Date: Wed, 9 Apr 2008 17:02:31 +0200
+Message-Id: <E1Jjbol-0002zS-4P@flower>
+From: Oleg Verych <olecom@flower.upol.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, kbuild devel list <linux-kbuild@vger.kernel.org>
 
-Hi all!
+Those boring never-ending builds...
 
-Sorry if this question is stupid, I'm new to this whole kbuild thing.
+Can some dualCPU power be spent, if building is interactive (i.e. sent to
+terminal), to have them a bit colored?
 
-I have a kernel module with source scattered over several directories,
-with a separate set of specific compilation flags for each directory.
-How do I write Makefiles for it, assuming in-tree compilation?
+My last rant about "colored printk()" led away from kernel developers
+and their solutions. But now, let me share something.
 
-Here's the situation in detail. Suppose I have this directory structure:
+(maybe some terminal emulators have more colors, finally?) usage:
 
-mymodule
-mymodule/subdir1
-mymodule/subdir1/source11.c
-mymodule/subdir1/source12.c
-...
-mymodule/subdir1/source1N.c
-mymodule/subdir2
-mymodule/subdir2/source21.c
-mymodule/subdir2/source22.c
-...
-mymodule/subdir2/source2M.c
-...
-mymodule/subdirK/sourceKL.c
+olecom@flower:/tmp/blinux$ stty -tostop ; mkfifo stdout.pipe stderr.pipe
+olecom@flower:/tmp/blinux$ sh ./colorize-linux-build.sh <stdout.pipe &
+[1] 22070
+olecom@flower:/tmp/blinux$ COLORIZERR=y sh colorize-linux-build.sh <stderr.pipe &
+[2] 22145
+olecom@flower:/tmp/blinux$
+olecom@flower:/tmp/blinux$ LANG=C make >stdout.pipe 2>stderr.pipe
+make -C /mnt/zdev0/linux-2.6 O=/dev/shm/blinux/.
+  Using /mnt/zdev0/linux-2.6 as source for kernel
+  GEN     /dev/shm/blinux/Makefile
+  CHK     include/linux/version.h
+  CHK     include/linux/utsrelease.h
+  CALL    /mnt/zdev0/linux-2.6/scripts/checksyscalls.sh
+  CHK     include/linux/compile.h
+  VDSOSYM arch/x86/vdso/vdso-syms.lds
+  VDSOSYM arch/x86/vdso/vdso32-syscall-syms.lds
+  VDSOSYM arch/x86/vdso/vdso32-sysenter-syms.lds
+  VDSOSYM arch/x86/vdso/vdso32-syms.lds
+  LD      arch/x86/vdso/built-in.o
+  CC      mm/memory.o
 
-Each subdirI needs to have its own Makefile with its own EXTRA_CFLAGS,
-and all .o files created in subdirectories need be combined into single
-mymodule.ko. How do I do that? There are no examples in the
-documentation, nor in the kernel source.
+olecom@flower:/tmp/blinux$
 
-The question could be subdivided in two.
+make[3]: *** [mm/memory.o] Interrupt
+make[2]: *** [mm] Interrupt
+make[1]: *** [sub-make] Interrupt
+make: *** [all] Interrupt
 
-1. How do I tell the build system to compile sourceIJ.c and then leave
-   sourceIJ.o alone (do not include in the kernel, do not build a .ko)?
+[1]-  Done                    sh ./colorize-linux-build.sh <stdout.pipe
+[2]+  Done                    COLORIZERR=yes sh colorize-linux-build.sh <stderr.pipe
+olecom@flower:/tmp/blinux$
 
-2. Given a set of already built sourceIJ.o files, how do I tell the
-   build system to combine them into a single .ko without trying to
-   compile the corresponding sources first? If I say something like
+________________________________________________________________________
+#!/bin/sh
+# colorize linux build
 
-      mymodule-objs := subdir1/source11.o (etc)
+# Time-stamp: Wed Apr  9 13:78:13 CEST 2008 olecom@flower.upol.cRAzY
 
-   in mymodule/Makefile, the build system will try to compile
-   subdir1/source11.c *with mymodule/Makefile*, which is wrong (I need
-   it to be done with mymodule/subdir1/Makefile).
+color() {
+    # $1 -- regex
+    # $2 -- color code
+    # $3 -- next color code (default is $D)
+    # $4 -- regex match number (s///flags)
+    printf %s "`eval echo $TERMINAL_OUTPUT`"
+}
 
-I also tried to build libraries (.a archives) instead of using
-sourceIJ.o directly, but without success.
+# for tty
+[ -t 1 ] && {
+    # escape symbol
+    E=`printf '\033'`
+    # default fg && bg rendering ; reset attributes
+    D="7" ; RESET="$E[0m"
+    # basic attributes (reset bg color and bold, set fg color)
+    V="$E[40;22;3"
+    # wrap regex with color ; goto exit
+    TERMINAL_OUTPUT='{s-"$1"-"$V$2m&$V${3-'$D'}m"-$4 ";" b}'
+}
 
-I tried to understand scripts/Makefile.build but it only gave me a
-headache...
+# process stdout
 
-Regards
--- 
-Anatoli Tubman
-Connectra performance and infrastructure
-Check Point Software Technologies
+[ -z "$COLORIZERR" ] && {
+    sed "
+/CC/` color CC '6;1'`
+/LD/` color LD '2;1'`
+/AS/` color AS '5;1'`
+/GEN/`color GEN '2;1'`
+/UPD/`color UPD '2;1'`
+/CHK/`color CHK '3;1'`
+/CA/` color CALL '6'`
+s-^-${V}2m-
+"
+    printf "$RESET
+"
+}
+
+# process stderr (once)
+
+while read ERROR
+do OUT=$OUT'
+'$ERROR
+done
+
+printf "\033[1;37;41m$OUT$RESET
+"
+exit
