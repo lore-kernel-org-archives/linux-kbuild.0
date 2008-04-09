@@ -1,55 +1,291 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from barikada.upol.cz ([158.194.242.200]:45909 "EHLO
-	barikada.upol.cz" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753648AbYDIRTL (ORCPT
+Received: from agminet01.oracle.com ([141.146.126.228]:43075 "EHLO
+	agminet01.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753942AbYDITgf (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 9 Apr 2008 13:19:11 -0400
-Date: Wed, 9 Apr 2008 19:39:11 +0200
-Subject: Re: coloring stdout && stderr, small kbuild example
-Message-ID: <20080409173911.GH24008@flower.upol.cz>
-References: <E1Jjbol-0002zS-4P@flower> <1207754040.6860.7.camel@tara.firmix.at>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1207754040.6860.7.camel@tara.firmix.at>
-From: Oleg Verych <olecom@flower.upol.cz>
+	Wed, 9 Apr 2008 15:36:35 -0400
+Date: Wed, 9 Apr 2008 12:35:51 -0700
+From: Randy Dunlap <randy.dunlap@oracle.com>
+Subject: [PATCH v2] documentation: build source files in Documentation
+ sub-dir
+Message-Id: <20080409123551.42c5da0d.randy.dunlap@oracle.com>
+In-Reply-To: <20080408134613.a047a7b6.akpm@linux-foundation.org>
+References: <20080403124529.3f2efb79.randy.dunlap@oracle.com>
+	<20080408134613.a047a7b6.akpm@linux-foundation.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Bernd Petrovitsch <bernd@firmix.at>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, kbuild devel list <linux-kbuild@vger.kernel.org>
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: lkml <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org, samr <sam@ravnborg.org>
 
-Time flies...
+On Tue, 8 Apr 2008 13:46:13 -0700 Andrew Morton wrote:
 
-> > My last rant about "colored printk()" led away from kernel developers
-> > and their solutions. But now, let me share something.
+> On Thu, 3 Apr 2008 12:45:29 -0700 Randy Dunlap <randy.dunlap@oracle.com> wrote:
+> 
+> > Currently source files in the Documentation/ sub-dir can easily bit-rot
+> > since they are not generally buildable, either because they are hidden
+> > in text files or because there are no Makefile rules for them.
+> > This needs to be fixed so that the source files remain usable and good
+> > examples of code instead of bad examples.
+> > 
+> > Add the ability to build source files that are in the Documentation/ dir.
+> > Add to Kconfig as "BUILD_DOCSRC" config symbol.
+> > 
+> > Use "CONFIG_BUILD_DOCSRC=1 make ..." to build objects from the
+> > Documentation/ sources.  Or enable BUILD_DOCSRC in the *config system.
+> > 
+> > The Makefiles use $objdir/usr/include for header files, so doing
+> > "make headers_install" is required.  This is done for you if you enable
+> > CONFIG_HEADERS_CHECK=y.
+> > 
+> > Note: needs documentation-move-spidev_fdx-example-to-its-own-source-file.patch
+> > from -mm patchset.
+> 
+> argh, I'm getting several warnings and at least two build errors from this.
+> One is:
+> 
+> In file included from /usr/src/devel/usr/include/linux/netlink.h:5,
+>                  from /usr/src/devel/usr/include/linux/genetlink.h:4,
+>                  from Documentation/accounting/getdelays.c:26:
+> /usr/src/devel/usr/include/linux/types.h:166: error: expected specifier-qualifier-list before '__kernel_daddr_t'
+> 
+> (i386 allmodconfig).
+> 
+> I think I'll disable this patch for now..
 
-That was about "The True Kernel Developer's Way to Coloring"
-by Jonathan Corbet October 9, 2007 http://lwn.net/Articles/253726/
+Oh drat and curses.
 
-Bernd Petrovitsch @ Wed, Apr 09, 2008 at 05:14:00PM +0200:
+Change all -I$(srctree) in Makefiles to -I$(objtree).
+New (full) patch file with only that change is below.
+I can send a patch with only those changes if you prefer that.
 
-> I don't know if it's of any use for you but there is already
-> *) color-make - http://bre.klaki.net/programs/colormake/ - and
-> *) color-gcc - http://schlueters.de/colorgcc.html -
-> out there.
+Cross-build using O= works now.
+---
 
-Please, show those to http://udrepper.livejournal.com/17109.html
-`perl` is more welcome in Debian, btw.
+From: Randy Dunlap <randy.dunlap@oracle.com>
 
-Free versions of color_proc_cpuinfo && color_meminfo:
+Currently source files in the Documentation/ sub-dir can easily bit-rot
+since they are not generally buildable, either because they are hidden
+in text files or because there are no Makefile rules for them.
+This needs to be fixed so that the source files remain usable and good
+examples of code instead of bad examples.
 
-TERMINAL_OUTPUT='s-"$1"-"$V$2m&$V${3-'$D'}m"-$4'
+Add the ability to build source files that are in the Documentation/ dir.
+Add to Kconfig as "BUILD_DOCSRC" config symbol.
 
-`color '[^:]*' 4 3`
-`color :       3 2`
-`color AMD     6 2`
-`color Intel   6 2`
-`color Athlon  '6;44' 2`
-`color Pentium '6;44' 2`
+Use "CONFIG_BUILD_DOCSRC=1 make ..." to build objects from the
+Documentation/ sources.  Or enable BUILD_DOCSRC in the *config system.
 
-Invent Your Own Easily(R)
---
-sed 'sed && sh + olecom = love' << ''
--o--=O`C
- #oo'L O
-<___=E M
+The Makefiles use $objdir/usr/include for header files, so doing
+"make headers_install" is required.  This is done for you if you enable
+CONFIG_HEADERS_CHECK=y.
+
+Note: needs documentation-move-spidev_fdx-example-to-its-own-source-file.patch
+from -mm patchset.
+
+Signed-off-by: Randy Dunlap <randy.dunlap@oracle.com>
+Reviewed-by: Sam Ravnborg <sam@ravnborg.org>
+---
+ Documentation/DocBook/Makefile              |    7 +++++++
+ Documentation/Makefile                      |    3 +++
+ Documentation/accounting/Makefile           |   10 ++++++++++
+ Documentation/auxdisplay/Makefile           |   10 ++++++++++
+ Documentation/connector/Makefile            |    9 +++++++++
+ Documentation/filesystems/configfs/Makefile |    1 +
+ Documentation/ia64/Makefile                 |    8 ++++++++
+ Documentation/networking/Makefile           |    8 ++++++++
+ Documentation/pcmcia/Makefile               |   10 ++++++++++
+ Documentation/spi/Makefile                  |   11 +++++++++++
+ Documentation/video4linux/Makefile          |    8 ++++++++
+ Documentation/vm/Makefile                   |    8 ++++++++
+ Documentation/watchdog/src/Makefile         |    8 ++++++++
+ Makefile                                    |    5 ++++-
+ lib/Kconfig.debug                           |    8 ++++++++
+ 15 files changed, 113 insertions(+), 1 deletion(-)
+ create mode 100644 Documentation/Makefile
+ create mode 100644 Documentation/accounting/Makefile
+
+--- /dev/null
++++ lin2625-rc8-docsrc/Documentation/Makefile
+@@ -0,0 +1,3 @@
++obj-m := DocBook/ accounting/ auxdisplay/ connector/ \
++	filesystems/configfs/ ia64/ networking/ \
++	pcmcia/ spi/ video4linux/ vm/ watchdog/src/
+--- /dev/null
++++ lin2625-rc8-docsrc/Documentation/accounting/Makefile
+@@ -0,0 +1,10 @@
++# kbuild trick to avoid linker error. Can be omitted if a module is built.
++obj- := dummy.o
++
++# List of programs to build
++hostprogs-y := getdelays
++
++# Tell kbuild to always build the programs
++always := $(hostprogs-y)
++
++HOSTCFLAGS_getdelays.o += -I$(objtree)/usr/include
+--- lin2625-rc8-docsrc.orig/Makefile
++++ lin2625-rc8-docsrc/Makefile
+@@ -806,6 +806,9 @@ endif
+ ifdef CONFIG_SAMPLES
+ 	$(Q)$(MAKE) $(build)=samples
+ endif
++ifdef CONFIG_BUILD_DOCSRC
++	$(Q)$(MAKE) $(build)=Documentation
++endif
+ 	$(call vmlinux-modpost)
+ 	$(call if_changed_rule,vmlinux__)
+ 	$(Q)rm -f .old_version
+@@ -1114,7 +1117,7 @@ MRPROPER_FILES += .config .config.old in
+ #
+ clean: rm-dirs  := $(CLEAN_DIRS)
+ clean: rm-files := $(CLEAN_FILES)
+-clean-dirs      := $(addprefix _clean_,$(srctree) $(vmlinux-alldirs))
++clean-dirs      := $(addprefix _clean_,$(srctree) $(vmlinux-alldirs) Documentation)
+ 
+ PHONY += $(clean-dirs) clean archclean
+ $(clean-dirs):
+--- lin2625-rc8-docsrc.orig/Documentation/DocBook/Makefile
++++ lin2625-rc8-docsrc/Documentation/DocBook/Makefile
+@@ -101,6 +101,13 @@ C-procfs-example = procfs_example.xml
+ C-procfs-example2 = $(addprefix $(obj)/,$(C-procfs-example))
+ $(obj)/procfs-guide.xml: $(C-procfs-example2)
+ 
++# List of programs to build
++##oops, this is a kernel module::hostprogs-y := procfs_example
++obj-m += procfs_example.o
++
++# Tell kbuild to always build the programs
++always := $(hostprogs-y)
++
+ notfoundtemplate = echo "*** You have to install docbook-utils or xmlto ***"; \
+ 		   exit 1
+ db2xtemplate = db2TYPE -o $(dir $@) $<
+--- /dev/null
++++ lin2625-rc8-docsrc/Documentation/auxdisplay/Makefile
+@@ -0,0 +1,10 @@
++# kbuild trick to avoid linker error. Can be omitted if a module is built.
++obj- := dummy.o
++
++# List of programs to build
++hostprogs-y := cfag12864b-example
++
++# Tell kbuild to always build the programs
++always := $(hostprogs-y)
++
++HOSTCFLAGS_cfag12864b-example.o += -I$(objtree)/usr/include
+--- /dev/null
++++ lin2625-rc8-docsrc/Documentation/connector/Makefile
+@@ -0,0 +1,9 @@
++obj-m += cn_test.o
++
++# List of programs to build
++hostprogs-y := ucon
++
++# Tell kbuild to always build the programs
++always := $(hostprogs-y)
++
++HOSTCFLAGS_ucon.o += -I$(objtree)/usr/include
+--- /dev/null
++++ lin2625-rc8-docsrc/Documentation/ia64/Makefile
+@@ -0,0 +1,8 @@
++# kbuild trick to avoid linker error. Can be omitted if a module is built.
++obj- := dummy.o
++
++# List of programs to build
++hostprogs-y := aliasing-test
++
++# Tell kbuild to always build the programs
++always := $(hostprogs-y)
+--- /dev/null
++++ lin2625-rc8-docsrc/Documentation/networking/Makefile
+@@ -0,0 +1,8 @@
++# kbuild trick to avoid linker error. Can be omitted if a module is built.
++obj- := dummy.o
++
++# List of programs to build
++hostprogs-y := ifenslave
++
++# Tell kbuild to always build the programs
++always := $(hostprogs-y)
+--- /dev/null
++++ lin2625-rc8-docsrc/Documentation/pcmcia/Makefile
+@@ -0,0 +1,10 @@
++# kbuild trick to avoid linker error. Can be omitted if a module is built.
++obj- := dummy.o
++
++# List of programs to build
++hostprogs-y := crc32hash
++
++# Tell kbuild to always build the programs
++always := $(hostprogs-y)
++
++HOSTCFLAGS_crc32hash.o += -I$(objtree)/usr/include
+--- /dev/null
++++ lin2625-rc8-docsrc/Documentation/spi/Makefile
+@@ -0,0 +1,11 @@
++# kbuild trick to avoid linker error. Can be omitted if a module is built.
++obj- := dummy.o
++
++# List of programs to build
++hostprogs-y := spidev_test spidev_fdx
++
++# Tell kbuild to always build the programs
++always := $(hostprogs-y)
++
++HOSTCFLAGS_spidev_test.o += -I$(objtree)/usr/include
++HOSTCFLAGS_spidev_fdx.o += -I$(objtree)/usr/include
+--- /dev/null
++++ lin2625-rc8-docsrc/Documentation/video4linux/Makefile
+@@ -0,0 +1,8 @@
++# kbuild trick to avoid linker error. Can be omitted if a module is built.
++obj- := dummy.o
++
++# List of programs to build
++hostprogs-y := v4lgrab
++
++# Tell kbuild to always build the programs
++always := $(hostprogs-y)
+--- /dev/null
++++ lin2625-rc8-docsrc/Documentation/vm/Makefile
+@@ -0,0 +1,8 @@
++# kbuild trick to avoid linker error. Can be omitted if a module is built.
++obj- := dummy.o
++
++# List of programs to build
++hostprogs-y := slabinfo
++
++# Tell kbuild to always build the programs
++always := $(hostprogs-y)
+--- /dev/null
++++ lin2625-rc8-docsrc/Documentation/watchdog/src/Makefile
+@@ -0,0 +1,8 @@
++# kbuild trick to avoid linker error. Can be omitted if a module is built.
++obj- := dummy.o
++
++# List of programs to build
++hostprogs-y := watchdog-simple watchdog-test
++
++# Tell kbuild to always build the programs
++always := $(hostprogs-y)
+--- /dev/null
++++ lin2625-rc8-docsrc/Documentation/filesystems/configfs/Makefile
+@@ -0,0 +1 @@
++obj-m += configfs_example.o
+--- lin2625-rc8-docsrc.orig/lib/Kconfig.debug
++++ lin2625-rc8-docsrc/lib/Kconfig.debug
+@@ -621,4 +621,12 @@ config PROVIDE_OHCI1394_DMA_INIT
+ 
+ 	  See Documentation/debugging-via-ohci1394.txt for more information.
+ 
++menuconfig BUILD_DOCSRC
++	bool "Build targets in Documentation/ tree"
++	help
++	  This option attempts to build objects from the source files in the
++	  kernel Documentation/ tree.
++
++	  Say N if you are unsure.
++
+ source "samples/Kconfig"
