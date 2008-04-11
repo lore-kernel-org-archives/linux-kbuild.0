@@ -1,74 +1,111 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from xenotime.net ([66.160.160.81]:34551 "HELO xenotime.net"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with SMTP
-	id S1751736AbYDJTvM (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 10 Apr 2008 15:51:12 -0400
-Received: from midway.site ([71.117.215.127]) by xenotime.net for <linux-kbuild@vger.kernel.org>; Thu, 10 Apr 2008 12:51:09 -0700
-Date: Thu, 10 Apr 2008 12:51:09 -0700
-From: Randy Dunlap <rdunlap@xenotime.net>
-Subject: Re: unnecessary "tristate"ness in Kconfig files
-Message-Id: <20080410125109.0b575f62.rdunlap@xenotime.net>
-In-Reply-To: <alpine.LFD.1.00.0802131142210.9575@localhost.localdomain>
-References: <alpine.LFD.1.00.0802131142210.9575@localhost.localdomain>
+Received: from rgminet01.oracle.com ([148.87.113.118]:11605 "EHLO
+	rgminet01.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1758418AbYDKA5Y (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 10 Apr 2008 20:57:24 -0400
+Date: Thu, 10 Apr 2008 17:56:30 -0700
+From: Randy Dunlap <randy.dunlap@oracle.com>
+Subject: Re: [PATCH v2] documentation: build source files in Documentation
+ sub-dir
+Message-Id: <20080410175630.d862af9e.randy.dunlap@oracle.com>
+In-Reply-To: <20080409145409.615cd236.akpm@linux-foundation.org>
+References: <20080403124529.3f2efb79.randy.dunlap@oracle.com>
+	<20080408134613.a047a7b6.akpm@linux-foundation.org>
+	<20080409123551.42c5da0d.randy.dunlap@oracle.com>
+	<20080409145409.615cd236.akpm@linux-foundation.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Robert P. J. Day" <rpjday@crashcourse.ca>
-Cc: kbuild devel list <linux-kbuild@vger.kernel.org>
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, sam@ravnborg.org, Ingo Molnar <mingo@elte.hu>, Thomas Gleixner <tglx@linutronix.de>
 
-On Wed, 13 Feb 2008 11:46:00 -0500 (EST) Robert P. J. Day wrote:
+On Wed, 9 Apr 2008 14:54:09 -0700 Andrew Morton wrote:
 
+> On Wed, 9 Apr 2008 12:35:51 -0700
+> Randy Dunlap <randy.dunlap@oracle.com> wrote:
 > 
->   can someone correct me if my thinking is out of whack here?
-> consider init/Kconfig:
+> > On Tue, 8 Apr 2008 13:46:13 -0700 Andrew Morton wrote:
+> > 
+> > > On Thu, 3 Apr 2008 12:45:29 -0700 Randy Dunlap <randy.dunlap@oracle.com> wrote:
+> > > 
+> > > > Currently source files in the Documentation/ sub-dir can easily bit-rot
+> > > > since they are not generally buildable, either because they are hidden
+> > > > in text files or because there are no Makefile rules for them.
+> > > > This needs to be fixed so that the source files remain usable and good
+> > > > examples of code instead of bad examples.
+> > > > 
+> > > > Add the ability to build source files that are in the Documentation/ dir.
+> > > > Add to Kconfig as "BUILD_DOCSRC" config symbol.
+> > > > 
+> > > > Use "CONFIG_BUILD_DOCSRC=1 make ..." to build objects from the
+> > > > Documentation/ sources.  Or enable BUILD_DOCSRC in the *config system.
+> > > > 
+> > > > The Makefiles use $objdir/usr/include for header files, so doing
+> > > > "make headers_install" is required.  This is done for you if you enable
+> > > > CONFIG_HEADERS_CHECK=y.
+> > > > 
+> > > > Note: needs documentation-move-spidev_fdx-example-to-its-own-source-file.patch
+> > > > from -mm patchset.
+> > > 
+> > > argh, I'm getting several warnings and at least two build errors from this.
+> > > One is:
+> > > 
+> > > In file included from /usr/src/devel/usr/include/linux/netlink.h:5,
+> > >                  from /usr/src/devel/usr/include/linux/genetlink.h:4,
+> > >                  from Documentation/accounting/getdelays.c:26:
+> > > /usr/src/devel/usr/include/linux/types.h:166: error: expected specifier-qualifier-list before '__kernel_daddr_t'
+> > > 
+> > > (i386 allmodconfig).
+> > > 
+> > > I think I'll disable this patch for now..
+> > 
+> > Oh drat and curses.
+> > 
+> > Change all -I$(srctree) in Makefiles to -I$(objtree).
+> > New (full) patch file with only that change is below.
+> > I can send a patch with only those changes if you prefer that.
+> > 
+> > Cross-build using O= works now.
 > 
-> ...
-> config IKCONFIG
->         tristate "Kernel .config support"
->         ---help---
->           This option enables the complete Linux kernel ".config" file
->           contents to be saved in the kernel. It provides documentation
->           of which kernel options are used in a running kernel or in an
->           on-disk kernel.  This information can be extracted from the kernel
->           image file with the script scripts/extract-ikconfig and used as
->           input to rebuild the current kernel or to build another kernel.
->           It can also be extracted from a running kernel by reading
->           /proc/config.gz if enabled (below).
+> I wasn't using O=.
 > 
-> config IKCONFIG_PROC
->         bool "Enable access to .config through /proc/config.gz"
->         depends on IKCONFIG && PROC_FS
->         ---help---
->           This option enables access to the kernel configuration file
->           through /proc/config.gz.
-> ...
+> It turns out that this is breakage introduced by git-x86.patch. 
+> Reproducible via:
 > 
->   now why is IKCONFIG tristate instead of simple bool?  it's used
-> solely as a dependency for IKCONFIG_PROC, and that's used in
-> kernel/configs.c thusly:
+> setenv ARCH i386
+> make mrproper
+> make allmodconfig
+> gcc -I$(/bin/pwd)/include Documentation/accounting/getdelays.c -o getdelays
 > 
-> ...
-> #ifdef CONFIG_IKCONFIG_PROC
-> ...
-> #endif
-> ...
+> In file included from /usr/src/devel/include/linux/netlink.h:5,
+>                  from /usr/src/devel/include/linux/genetlink.h:4,
+>                  from Documentation/accounting/getdelays.c:26:
+> /usr/src/devel/include/linux/types.h:203: error: expected specifier-qualifier-list before '__kernel_daddr_t'
 
-and it's used in kernel/Makefile:
 
-obj-$(CONFIG_IKCONFIG) += configs.o
+Those __kernel_* types shouldn't be used outside of the #ifdef __KERNEL__
+block, should they?
 
->   so it's easy to see that it should be selectable, but it's *not*
-> clear to see why it should be *tristate*.  what is the value of its
-> tristate-ness?  thanks.
-
-Did you test building with CONFIG_IKCONFIG=m ?
-How did you evaluate that it (tristate) is unnecessary?
+Patch below fixes kernel side for me.  Don't have any idea what it
+may do to userspace users of the header file.
 
 ---
-~Randy
-PS:  IKCONFIG was originally a bool.  Someone from Google
-thought it would be interesting to make it a loadable module.
-I disagreed, but the patch was merged anyway.
-PPS:  Sorry about the delayed reply.
+ include/linux/types.h |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+--- mmotm-2008-0410-0157.orig/include/linux/types.h
++++ mmotm-2008-0410-0157/include/linux/types.h
+@@ -200,8 +200,8 @@ typedef u32 resource_size_t;
+ #endif	/* __KERNEL__ */
+ 
+ struct ustat {
+-	__kernel_daddr_t	f_tfree;
+-	__kernel_ino_t		f_tinode;
++	daddr_t			f_tfree;
++	ino_t			f_tinode;
+ 	char			f_fname[6];
+ 	char			f_fpack[6];
+ };
