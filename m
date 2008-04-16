@@ -1,63 +1,42 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pasmtpb.tele.dk ([80.160.77.98]:37796 "EHLO pasmtpB.tele.dk"
+Received: from smtp5.pp.htv.fi ([213.243.153.39]:57684 "EHLO smtp5.pp.htv.fi"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751625AbYDPHzQ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 16 Apr 2008 03:55:16 -0400
-Date: Wed, 16 Apr 2008 09:55:46 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH]kbuild: add arm, mips and i386 macros
-Message-ID: <20080416075546.GA31296@uranus.ravnborg.org>
-References: <af3ea28a0804092038q59a5b907ndb3d9fa33a6be834@mail.gmail.com> <af3ea28a0804152010g5a234640o94f39bbecf0d4637@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+	id S1750756AbYDPRvl (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 16 Apr 2008 13:51:41 -0400
+Date: Wed, 16 Apr 2008 20:51:35 +0300
+From: Adrian Bunk <bunk@kernel.org>
+Subject: 2.6.25 and DEBUG_SECTION_MISMATCH
+Message-ID: <20080416175135.GN1677@cs181133002.pp.htv.fi>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <af3ea28a0804152010g5a234640o94f39bbecf0d4637@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: ye janboe <janboe.ye@gmail.com>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel <linux-kernel@vger.kernel.org>
+To: sam@ravnborg.org
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Wed, Apr 16, 2008 at 11:10:31AM +0800, ye janboe wrote:
-> No one think this patch is needed?
+Hi Sam,
 
-I have not had time to neither look through it nor to apply it.
+although DEBUG_SECTION_MISMATCH allows to also find exotig things like 
+finding bugs only present when using gcc < 3.4 and CONFIG_HOTPLUG=n at 
+the same time, the problem is that we print
+    WARNING: modpost: Found 13 section mismatch(es).
+    To see full details build your kernel with:
+    'make CONFIG_DEBUG_SECTION_MISMATCH=y'
+but CONFIG_DEBUG_SECTION_MISMATCH is not offered in 2.6.25.
 
-Later,
+The options seem to be:
+- going back to the worse but for most practical purposes usable
+  warnings in 2.6.24
+- don't show these warnings during modpost for 2.6.25
 
-	Sam
-> 
-> 2008/4/10, ye janboe <janboe.ye@gmail.com>:
-> > commit a80cc2fe14ce7e7a6de70b5927b9c0a6ee530805
-> >  Author: janboe <janboe.ye@gmail.com>
-> >  Date:   Thu Apr 10 11:18:03 2008 +0800
-> >
-> >     the commits 56a974fa2d595fe6ebe433c525b8232ead539b76 and
-> >  ae4ac12323c0ff80528cac3269151d580e23f923
-> >     involved additional macros but not available on cygwin.
-> >  Signed-off-by: Janboe Ye <janboe.ye@gmail.com>
-> >  diff --git a/scripts/mod/modpost.h b/scripts/mod/modpost.h
-> >  index 09f58e3..f864ab8 100644
-> >  --- a/scripts/mod/modpost.h
-> >  +++ b/scripts/mod/modpost.h
-> >  @@ -42,6 +42,16 @@
-> >   #define ELF_R_SYM   ELF64_R_SYM
-> >   #define ELF_R_TYPE  ELF64_R_TYPE
-> >   #endif
-> >  +#define R_386_32           1            /* Direct 32 bit  */
-> >  +#define R_386_PC32         2            /* PC relative 32 bit */
-> >  +
-> >  +#define R_ARM_PC24              1       /* PC relative 26 bit branch */
-> >  +#define R_ARM_ABS32             2       /* Direct 32 bit  */
-> >  +
-> >  +#define R_MIPS_32               2       /* Direct 32 bit */
-> >  +#define R_MIPS_26               4       /* Direct 26 bit shifted */
-> >  +#define R_MIPS_HI16             5       /* High 16 bit */
-> >  +#define R_MIPS_LO16             6       /* Low 16 bit */
-> >
-> >   /* The 64-bit MIPS ELF ABI uses an unusual reloc format. */
-> >   typedef struct
-> >
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+cu
+Adrian
+
+-- 
+
+       "Is there not promise of rain?" Ling Tan asked suddenly out
+        of the darkness. There had been need of rain for many days.
+       "Only a promise," Lao Er said.
+                                       Pearl S. Buck - Dragon Seed
+
