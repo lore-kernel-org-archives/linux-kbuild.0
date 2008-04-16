@@ -1,49 +1,131 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from fk-out-0910.google.com ([209.85.128.184]:53744 "EHLO
-	fk-out-0910.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750822AbYDPT0B (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 16 Apr 2008 15:26:01 -0400
-Received: by fk-out-0910.google.com with SMTP id 19so2933281fkr.5
-        for <linux-kbuild@vger.kernel.org>; Wed, 16 Apr 2008 12:25:59 -0700 (PDT)
-Message-ID: <480651E2.4060907@gmail.com>
-Date: Wed, 16 Apr 2008 21:22:10 +0200
-From: Jacek Luczak <difrost.kernel@gmail.com>
-MIME-Version: 1.0
+Received: from mx2.mail.elte.hu ([157.181.151.9]:57570 "EHLO mx2.mail.elte.hu"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1757434AbYDPTza (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 16 Apr 2008 15:55:30 -0400
+Date: Wed, 16 Apr 2008 21:55:04 +0200
+From: Ingo Molnar <mingo@elte.hu>
 Subject: Re: 2.6.25 and DEBUG_SECTION_MISMATCH
-References: <20080416175135.GN1677@cs181133002.pp.htv.fi>
-In-Reply-To: <20080416175135.GN1677@cs181133002.pp.htv.fi>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Message-ID: <20080416195504.GA2408@elte.hu>
+References: <20080416175135.GN1677@cs181133002.pp.htv.fi> <20080416192306.GA3090@uranus.ravnborg.org> <20080416193102.GA16981@elte.hu>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20080416193102.GA16981@elte.hu>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Adrian Bunk <bunk@kernel.org>
-Cc: sam@ravnborg.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: Adrian Bunk <bunk@kernel.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Hi Adrian,
 
-> Hi Sam,
+* Ingo Molnar <mingo@elte.hu> wrote:
+
+> * Sam Ravnborg <sam@ravnborg.org> wrote:
 > 
-> although DEBUG_SECTION_MISMATCH allows to also find exotig things like 
-> finding bugs only present when using gcc < 3.4 and CONFIG_HOTPLUG=n at 
-> the same time, the problem is that we print
->     WARNING: modpost: Found 13 section mismatch(es).
->     To see full details build your kernel with:
->     'make CONFIG_DEBUG_SECTION_MISMATCH=y'
-> but CONFIG_DEBUG_SECTION_MISMATCH is not offered in 2.6.25.
+> > I would prefer we were down to less than 5 warnings so we could 
+> > enable it in kconfig but maybe after next merge window.
+> 
+> they get regenerated. More than 1 out of every 100 new patches. Quite 
+> expensive feature (in terms of maintenance overhead) for a rather 
+> theoretical memory saving benefit.
 
-Most of those ,,old mismatches'' where already fixed, so ...
+in v2.6.24 we had at least 200 section fixes:
 
-> The options seem to be:
-> - going back to the worse but for most practical purposes usable
->   warnings in 2.6.24
-> - don't show these warnings during modpost for 2.6.25
+  $ git-log v2.6.24.. | egrep -c 'WARNING:.*Section mismatch'
+  198
 
-... IMO it would be better to not show modpost warnings. It will result in great
-number of reports from users. Sam is here a boss.
+for 12671 commits - that's 1 section type fix for every 60 commits. Even 
+considering that in v2.6.24 you did a titanic effort of fixing tons of 
+section matches - chances are that we'll still see about 1 section fix 
+for every 100 commits in the future too. That's more than 100 section 
+mismatch fixes for v2.6.26. That's _much_ more maintenance overhead than 
+a lot of _big_ features - and there's no end in sight. x86.git has more 
+than 10 section mismatch fixes for about 1000 new patches - that matches 
+the 1% cost approximately.
 
-There's also second part of the story around inline functions which may be
-reported while running with CONFIG_DEBUG_SECTION_MISMATCH.
+and 90% of the problems could be reduced via the very simple patch below 
+...
 
-Greats,
-	Jacek
+so ... why shouldnt we say that if someone wants to have this feature, 
+it should be done all automatically, in the link space. There's no 
+reason why the dependencies couldnt be figured out all automatically.
+
+	Ingo
+
+------------------->
+Subject: x86: force __cpuinit on for CONFIG_PM without HOTPLUG_CPU
+From: Andi Kleen <ak@suse.de>
+
+This avoids the requirement to mark a lot of initialization functions not
+__cpuinit just for resume from RAM.
+
+More functions could be converted now, didn't do all.
+
+Cc: rjw@sisk.pl
+Cc: pavel@suse.cz
+
+Signed-off-by: Andi Kleen <ak@suse.de>
+Signed-off-by: Ingo Molnar <mingo@elte.hu>
+Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+---
+ arch/x86/Kconfig                |    5 +++++
+ arch/x86/kernel/cpu/mtrr/main.c |    2 +-
+ arch/x86/kernel/trampoline_64.S |    2 +-
+ include/linux/init.h            |    2 +-
+ 4 files changed, 8 insertions(+), 3 deletions(-)
+
+Index: linux/arch/x86/Kconfig
+===================================================================
+--- linux.orig/arch/x86/Kconfig
++++ linux/arch/x86/Kconfig
+@@ -130,6 +130,11 @@ config GENERIC_PENDING_IRQ
+ 	depends on GENERIC_HARDIRQS && SMP
+ 	default y
+ 
++config PM_CPUINIT
++	bool
++	depends on PM
++	default y
++
+ config X86_SMP
+ 	bool
+ 	depends on SMP && ((X86_32 && !X86_VOYAGER) || X86_64)
+Index: linux/arch/x86/kernel/cpu/mtrr/main.c
+===================================================================
+--- linux.orig/arch/x86/kernel/cpu/mtrr/main.c
++++ linux/arch/x86/kernel/cpu/mtrr/main.c
+@@ -712,7 +712,7 @@ void __init mtrr_bp_init(void)
+ 	}
+ }
+ 
+-void mtrr_ap_init(void)
++void __cpuinit mtrr_ap_init(void)
+ {
+ 	unsigned long flags;
+ 
+Index: linux/arch/x86/kernel/trampoline_64.S
+===================================================================
+--- linux.orig/arch/x86/kernel/trampoline_64.S
++++ linux/arch/x86/kernel/trampoline_64.S
+@@ -34,7 +34,7 @@
+ #include <asm/segment.h>
+ 
+ /* We can free up trampoline after bootup if cpu hotplug is not supported. */
+-#ifndef CONFIG_HOTPLUG_CPU
++#if !defined(CONFIG_HOTPLUG_CPU) && !defined(CONFIG_PM_CPUINIT)
+ .section .init.data, "aw", @progbits
+ #else
+ .section .rodata, "a", @progbits
+Index: linux/include/linux/init.h
+===================================================================
+--- linux.orig/include/linux/init.h
++++ linux/include/linux/init.h
+@@ -266,7 +266,7 @@ void __init parse_early_param(void);
+ #define __devexitdata __exitdata
+ #endif
+ 
+-#ifdef CONFIG_HOTPLUG_CPU
++#if defined(CONFIG_HOTPLUG_CPU) || defined(CONFIG_PM_CPUINIT)
+ #define __cpuinit
+ #define __cpuinitdata
+ #define __cpuexit
