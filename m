@@ -1,36 +1,32 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp4.pp.htv.fi ([213.243.153.38]:46780 "EHLO smtp4.pp.htv.fi"
+Received: from pasmtpb.tele.dk ([80.160.77.98]:56696 "EHLO pasmtpB.tele.dk"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1759929AbYDYUlJ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 25 Apr 2008 16:41:09 -0400
-Date: Fri, 25 Apr 2008 23:40:16 +0300
-From: Adrian Bunk <bunk@kernel.org>
-Subject: [2.6 patch] scripts/Makefile.modpost typo fix
-Message-ID: <20080425204016.GB20630@cs181133002.pp.htv.fi>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+	id S1762529AbYDYVgr (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 25 Apr 2008 17:36:47 -0400
+Date: Fri, 25 Apr 2008 23:37:20 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: [2.6 patch] scripts/Makefile.modpost typo fix
+Message-ID: <20080425213720.GA12787@uranus.ravnborg.org>
+References: <20080425204016.GB20630@cs181133002.pp.htv.fi>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <20080425204016.GB20630@cs181133002.pp.htv.fi>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Richard Hacker <lerichi@gmx.net>, Sam Ravnborg <sam@ravnborg.org>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: Adrian Bunk <bunk@kernel.org>
+Cc: Richard Hacker <lerichi@gmx.net>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
--EVIUSER  ;-)
+On Fri, Apr 25, 2008 at 11:40:16PM +0300, Adrian Bunk wrote:
+> -EVIUSER  ;-)
+> 
+> Signed-off-by: Adrian Bunk <bunk@kernel.org>
 
-Signed-off-by: Adrian Bunk <bunk@kernel.org>
+Thanks Adrian.
 
----
-c047b74be2c64a0a1458a407cc77f54e5ae136c2 diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
-index 24b3c8f..a098a04 100644
---- a/scripts/Makefile.modpost
-+++ b/scripts/Makefile.modpost
-@@ -76,7 +76,7 @@ modpost = scripts/mod/modpost                    \
-  $(if $(CONFIG_MODULE_SRCVERSION_ALL),-a,)       \
-  $(if $(KBUILD_EXTMOD),-i,-o) $(kernelsymfile)   \
-  $(if $(KBUILD_EXTMOD),-I $(modulesymfile))      \
-- $(if $(iKBUILD_EXTRA_SYMBOLS), $(patsubst %, -e %,$(EXTRA_SYMBOLS))) \
-+ $(if $(KBUILD_EXTRA_SYMBOLS), $(patsubst %, -e %,$(EXTRA_SYMBOLS))) \
-  $(if $(KBUILD_EXTMOD),-o $(modulesymfile))      \
-  $(if $(CONFIG_DEBUG_SECTION_MISMATCH),,-S)      \
-  $(if $(CONFIG_MARKERS),-K $(kernelmarkersfile)) \
+I will wait a few days pushing this obvious fix
+because I hope to find at least a few hours to walk
+through my inbox aka patchqueue and include a few more
+patches.
 
+	Sam
