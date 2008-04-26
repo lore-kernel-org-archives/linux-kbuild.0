@@ -1,59 +1,104 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.queued.net ([207.210.101.209]:4704 "EHLO mail.queued.net"
+Received: from mail.queued.net ([207.210.101.209]:4702 "EHLO mail.queued.net"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755585AbYDZCkJ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	id S1755587AbYDZCkJ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
 	Fri, 25 Apr 2008 22:40:09 -0400
-Date: Fri, 25 Apr 2008 22:34:58 -0400
+Date: Fri, 25 Apr 2008 22:35:30 -0400
 From: Andres Salomon <dilinger@queued.net>
-Subject: [PATCH 1/4] build: fix missing x86-specific help output
-Message-ID: <20080425223458.4eb88ba6@ephemeral>
+Subject: [PATCH 4/4] kconfig: add *_silentdefconfig feature for config
+ targets
+Message-ID: <20080425223530.10b9d50d@ephemeral>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: sam@ravnborg.org
-Cc: Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com
+Cc: Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
 
-Normally 'make help' spits out architecture-specific targets (including
-things like foo_defconfig).  However, it looks like ARCH was never changed
-to SRCARCH during the x86 transition; the makefile still looks in
-arch/i386/configs for arch-specific config files (if ARCH is i386, that is).
+Being able to run 'silentoldconfig' with an existing .config has been
+immensely useful, especially for automated builds.  If the kernel code
+changes in an incompatible manner without the associated .config being
+updated, the build will fail and call attention to the need for an update.
 
-This changes it to use SRCARCH, which makes it properly display things
-like i386_defconfig and x86_64_defconfig.
+AFAICT, there is nothing similar when using *_defconfig; one must copy
+a .config manually, and then run silentoldconfig.  Simply running the
+associated _defconfig will quietly update the config (which may silently
+drop config options).  This patch adds a *_silentdefconfig target, with
+semantics similar to silentoldconfig.  It will take the defconfig from
+arch/$(SRCARCH)/configs/$x_defconfig, check for changes, and if there are
+none, write out a .config.  If there have been changes and stdin is
+valid, it will prompt for updates.  If there have been changes and
+stdin is not valid, it will bail out with an error.
 
 Signed-off-by: Andres Salomon <dilinger@debian.org>
 ---
- Makefile |    6 +++---
- 1 files changed, 3 insertions(+), 3 deletions(-)
+ Makefile                 |    4 ++++
+ scripts/kconfig/Makefile |    3 +++
+ scripts/kconfig/conf.c   |   13 +++++++++++--
+ 3 files changed, 18 insertions(+), 2 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index 3dbc826..e77149e 100644
+index e77149e..c264f7f 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -1170,7 +1170,7 @@ rpm: include/config/kernel.release FORCE
- # Brief documentation of the typical targets used
- # ---------------------------------------------------------------------------
- 
--boards := $(wildcard $(srctree)/arch/$(ARCH)/configs/*_defconfig)
-+boards := $(wildcard $(srctree)/arch/$(SRCARCH)/configs/*_defconfig)
- boards := $(notdir $(boards))
- 
- help:
-@@ -1217,9 +1217,9 @@ help:
- 	@echo  'Documentation targets:'
- 	@$(MAKE) -f $(srctree)/Documentation/DocBook/Makefile dochelp
- 	@echo  ''
--	@echo  'Architecture specific targets ($(ARCH)):'
-+	@echo  'Architecture specific targets ($(SRCARCH)):'
- 	@$(if $(archhelp),$(archhelp),\
--		echo '  No architecture specific help defined for $(ARCH)')
-+		echo '  No architecture specific help defined for $(SRCARCH)')
- 	@echo  ''
- 	@$(if $(boards), \
+@@ -1225,6 +1225,10 @@ help:
  		$(foreach b, $(boards), \
+ 		printf "  %-24s - Build for %s\\n" $(b) $(subst _defconfig,,$(b));) \
+ 		echo '')
++	@$(if $(boards), \
++		$(foreach b, $(boards), \
++		printf "  %-24s - Quiet Build for %s\\n" $(subst _defconfig,_silentdefconfig,$(b)) $(subst _defconfig,,$(b));) \
++		echo '')
+ 
+ 	@echo  '  make V=0|1 [targets] 0 => quiet build (default), 1 => verbose build'
+ 	@echo  '  make V=2   [targets] 2 => give reason for rebuild of target'
+diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
+index ce7d754..19ba562 100644
+--- a/scripts/kconfig/Makefile
++++ b/scripts/kconfig/Makefile
+@@ -72,6 +72,9 @@ endif
+ %_defconfig: $(obj)/conf
+ 	$(Q)$< -d -D arch/$(SRCARCH)/configs/$@ $(Kconfig)
+ 
++%_silentdefconfig: $(obj)/conf
++	$(Q)$< -s -o -D arch/$(SRCARCH)/configs/$(subst _silentdefconfig,_defconfig,$@) $(Kconfig)
++
+ # Help text used by make help
+ help:
+ 	@echo  '  config	  - Update current config utilising a line-oriented program'
+diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
+index 9a27638..264eee9 100644
+--- a/scripts/kconfig/conf.c
++++ b/scripts/kconfig/conf.c
+@@ -558,7 +558,8 @@ int main(int ac, char **av)
+ 		}
+ 		break;
+ 	case ask_new:
+-		if (silent_mode && stat(".config", &tmpstat)) {
++		if (!defconfig_file && silent_mode &&
++				stat(".config", &tmpstat)) {
+ 			printf(_("***\n"
+ 				"*** You have not yet configured your kernel!\n"
+ 				"*** (missing kernel .config file)\n"
+@@ -570,7 +571,15 @@ int main(int ac, char **av)
+ 		}
+ 		/* fall through */
+ 	case ask_all:
+-		conf_read(NULL);
++		if (defconfig_file) {
++			if (conf_read(defconfig_file)) {
++				printf(_("***\n*** Can't find default "
++					 "configuration \"%s\"!\n***\n"),
++					 defconfig_file);
++				exit(1);
++			}
++		} else
++			conf_read(NULL);
+ 		break;
+ 	case set_no:
+ 	case set_mod:
 -- 
 1.5.5
 
