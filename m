@@ -1,42 +1,166 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from sovereign.computergmbh.de ([85.214.69.204]:41641 "EHLO
+Received: from sovereign.computergmbh.de ([85.214.69.204]:45334 "EHLO
 	sovereign.computergmbh.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755824AbYDZSDP (ORCPT
+	with ESMTP id S1752536AbYDZSLZ (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 26 Apr 2008 14:03:15 -0400
-Date: Sat, 26 Apr 2008 20:03:14 +0200 (CEST)
+	Sat, 26 Apr 2008 14:11:25 -0400
+Date: Sat, 26 Apr 2008 20:11:24 +0200 (CEST)
 From: Jan Engelhardt <jengelh@computergmbh.de>
 Subject: Re: [PATCH] headerdep: a tool for detecting inclusion cycles in
  header file
-In-Reply-To: <20080426142235.GB7051@tull.net>
-Message-ID: <alpine.LNX.1.10.0804262001400.20150@fbirervta.pbzchgretzou.qr>
-References: <20080426134554.GA20727@damson.getinternet.no> <48133537.7040800@cs.helsinki.fi> <19f34abd0804260717le1773aapec49cdb6f68e296f@mail.gmail.com> <20080426142235.GB7051@tull.net>
+In-Reply-To: <20080426134554.GA20727@damson.getinternet.no>
+Message-ID: <alpine.LNX.1.10.0804262004060.20150@fbirervta.pbzchgretzou.qr>
+References: <20080426134554.GA20727@damson.getinternet.no>
 MIME-Version: 1.0
 Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nick Andrew <nick@nick-andrew.net>
-Cc: Vegard Nossum <vegard.nossum@gmail.com>, Pekka Enberg <penberg@cs.helsinki.fi>, Sam Ravnborg <sam@ravnborg.org>, Adrian Bunk <bunk@kernel.org>, linux-kbuild@vger.kernel.org, kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Vegard Nossum <vegard.nossum@gmail.com>
+Cc: Sam Ravnborg <sam@ravnborg.org>, Pekka Enberg <penberg@cs.helsinki.fi>, Adrian Bunk <bunk@kernel.org>, linux-kbuild@vger.kernel.org, kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
 
 
-On Saturday 2008-04-26 16:22, Nick Andrew wrote:
->On Sat, Apr 26, 2008 at 04:17:15PM +0200, Vegard Nossum wrote:
->> I didn't want to get into the lands of parsing options since we would
->> need to handle gcc options and skip arguments to those, etc.
->
->?
->
->use Getopt::Std qw(getopts);
->use vars qw($opt_g);
->getopts('g');
->[...]
->if ($opt_g) {
->	graph();
->}
+On Saturday 2008-04-26 15:45, Vegard Nossum wrote:
 
-Try this, at least it is known to handle pass_through, which
-is _just what we want_ for handling unknown options:
+>+exit;
 
-	use Getopt::Long;
-	&Getopt::Long::Configure(qw(bundling pass_through));
-	&GetOptions("g" => \$opt_g, "I" => \@include_paths);
+exit is implicit.
+
+>+# Get a file name that is relative to our include paths
+>+sub strip {
+>+	my $filename = shift;
+>+
+>+	for my $i (@I) {
+>+		my $stripped = $filename;
+>+		$stripped =~ s/^$i\///;
+
+			s/^\Q$i\/\E//;
+
+>+# Search for the file name in the list of include paths
+>+sub search {
+>+	my $filename = shift;
+>+	return $filename if -f $filename;
+>+
+>+	for my $i (@I) {
+>+		my $path = sprintf "%s/%s", $i, $filename;
+
+		my $path = "$i/$filename";
+
+>+		return $path if -f $path;
+>+	}
+>+
+>+	return undef;
+>+}
+>+
+>+sub parse_all {
+>+	# Parse all the headers.
+>+	my @queue = @_;
+>+	while(@queue) {
+>+		my $header = pop @queue;
+>+		next if exists $deps{$header};
+>+
+>+		$deps{$header} = [] unless exists $deps{$header};
+>+
+>+		my $path = search($header);
+>+		next unless $path;
+>+
+>+		open(my $file, '<', $path) or die($!);
+>+		chomp(my @lines = <$file>);
+>+		close($file);
+>+
+>+		for my $line (@lines) {
+>+			if(my($dep) = ($line =~ m/^#\s*include <([^>]+)>/)) {
+
+			$line =~ m/^#\s*include\s*<(.*?)>/
+
+>+				push @queue, $dep;
+>+				push @{$deps{$header}}, $dep;
+>+			}
+>+		}
+>+	}
+>+}
+>+
+>+sub print_cycle {
+>+	my $cycle = shift;
+>+
+>+	my $first = shift @$cycle;
+>+	my $last = pop @$cycle;
+>+
+>+	my $msg = "In file included";
+>+	printf "%s from %s,\n", $msg, $last if defined $last;
+
+	print "$msg from $last,\n" if defined $last;
+>+
+>+	for my $header (reverse @$cycle) {
+>+		printf "%*.s from %s\n", length $msg, '', $header;
+
+		print " " x length($msg), "from $header\n";
+
+>+	}
+>+
+>+	printf "%s: warning: recursive header inclusion\n", $first;
+
+	print "$first: warning: recursive header inclusion\n";
+
+You seem to be addicted to printf?
+
+>+}
+>+
+>+# Find and print the smallest cycle starting in the specified node.
+>+sub detect_cycles {
+>+	my @queue = map { [$_] } @_;
+>+	while(@queue) {
+>+		my $top = pop @queue;
+>+		my $name = $top->[-1];
+>+
+>+		for my $dep (@{$deps{$name}}) {
+>+			my $chain = [@$top, $dep];
+>+
+>+			if(grep { $_ eq $dep } @$top) {
+>+				print_cycle($chain);
+>+				return;
+>+			}
+>+
+>+			push @queue, $chain;
+>+		}
+>+	}
+>+}
+>+
+>+sub mangle {
+>+	$_ = shift;
+>+	s/\//__/g;
+>+	s/\./_/g;
+>+	s/-/_/g;
+>+	$_;
+>+}
+>+
+>+sub escape {
+>+	$_ = shift;
+>+}
+
+Does escape() have... any use?
+
+>+
+>+# Output dependency graph in GraphViz language.
+>+sub graph {
+>+	printf "digraph {\n";
+>+
+>+	printf "\t/* vertices */\n";
+>+	for my $header (keys %deps) {
+>+		printf "\t%s [label=\"%s\"];\n",
+>+			mangle($header), escape($header);
+>+	}
+>+
+>+	printf "\n";
+>+
+>+	printf "\t/* edges */\n";
+>+	for my $header (keys %deps) {
+>+		for my $dep (@{$deps{$header}}) {
+>+			printf "\t%s -> %s;\n",
+>+				mangle($header), mangle($dep);
+>+		}
+>+	}
+>+
+>+	printf "}\n";
+>+}
+
+Might want to replace all those printfs too.
