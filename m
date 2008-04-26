@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.queued.net ([207.210.101.209]:4702 "EHLO mail.queued.net"
+Received: from mail.queued.net ([207.210.101.209]:4705 "EHLO mail.queued.net"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755587AbYDZCkJ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	id S1755944AbYDZCkJ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
 	Fri, 25 Apr 2008 22:40:09 -0400
-Date: Fri, 25 Apr 2008 22:35:30 -0400
+Date: Fri, 25 Apr 2008 22:35:22 -0400
 From: Andres Salomon <dilinger@queued.net>
-Subject: [PATCH 4/4] kconfig: add *_silentdefconfig feature for config
- targets
-Message-ID: <20080425223530.10b9d50d@ephemeral>
+Subject: [PATCH 2/4] kconfig: make conf -s  (silent) a modifier rather than
+ an input mode
+Message-ID: <20080425223522.4aca9f00@ephemeral>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
@@ -17,88 +17,139 @@ To: sam@ravnborg.org
 Cc: Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
 
-Being able to run 'silentoldconfig' with an existing .config has been
-immensely useful, especially for automated builds.  If the kernel code
-changes in an incompatible manner without the associated .config being
-updated, the build will fail and call attention to the need for an update.
+Rather than 'silentoldconfig' being its own input mode, just make it
+the same as 'oldconfig' but with a modifier.  This is just a 'silent_mode'
+toggle that allows us to add future silent targets.
 
-AFAICT, there is nothing similar when using *_defconfig; one must copy
-a .config manually, and then run silentoldconfig.  Simply running the
-associated _defconfig will quietly update the config (which may silently
-drop config options).  This patch adds a *_silentdefconfig target, with
-semantics similar to silentoldconfig.  It will take the defconfig from
-arch/$(SRCARCH)/configs/$x_defconfig, check for changes, and if there are
-none, write out a .config.  If there have been changes and stdin is
-valid, it will prompt for updates.  If there have been changes and
-stdin is not valid, it will bail out with an error.
+So, 'silentoldconfig' calls 'conf -s -o' rather than 'conf -s'.
 
 Signed-off-by: Andres Salomon <dilinger@debian.org>
 ---
- Makefile                 |    4 ++++
- scripts/kconfig/Makefile |    3 +++
- scripts/kconfig/conf.c   |   13 +++++++++++--
- 3 files changed, 18 insertions(+), 2 deletions(-)
+ scripts/kconfig/Makefile |    2 +-
+ scripts/kconfig/conf.c   |   23 +++++++++++------------
+ 2 files changed, 12 insertions(+), 13 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index e77149e..c264f7f 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1225,6 +1225,10 @@ help:
- 		$(foreach b, $(boards), \
- 		printf "  %-24s - Build for %s\\n" $(b) $(subst _defconfig,,$(b));) \
- 		echo '')
-+	@$(if $(boards), \
-+		$(foreach b, $(boards), \
-+		printf "  %-24s - Quiet Build for %s\\n" $(subst _defconfig,_silentdefconfig,$(b)) $(subst _defconfig,,$(b));) \
-+		echo '')
- 
- 	@echo  '  make V=0|1 [targets] 0 => quiet build (default), 1 => verbose build'
- 	@echo  '  make V=2   [targets] 2 => give reason for rebuild of target'
 diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
-index ce7d754..19ba562 100644
+index 32e8c5a..7df7ea6 100644
 --- a/scripts/kconfig/Makefile
 +++ b/scripts/kconfig/Makefile
-@@ -72,6 +72,9 @@ endif
- %_defconfig: $(obj)/conf
- 	$(Q)$< -d -D arch/$(SRCARCH)/configs/$@ $(Kconfig)
+@@ -22,7 +22,7 @@ oldconfig: $(obj)/conf
+ 	$< -o $(Kconfig)
  
-+%_silentdefconfig: $(obj)/conf
-+	$(Q)$< -s -o -D arch/$(SRCARCH)/configs/$(subst _silentdefconfig,_defconfig,$@) $(Kconfig)
-+
- # Help text used by make help
- help:
- 	@echo  '  config	  - Update current config utilising a line-oriented program'
+ silentoldconfig: $(obj)/conf
+-	$< -s $(Kconfig)
++	$< -s -o $(Kconfig)
+ 
+ # Create new linux.pot file
+ # Adjust charset to UTF-8 in .po file to accept UTF-8 in Kconfig files
 diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
-index 9a27638..264eee9 100644
+index fda6313..e17767e 100644
 --- a/scripts/kconfig/conf.c
 +++ b/scripts/kconfig/conf.c
-@@ -558,7 +558,8 @@ int main(int ac, char **av)
+@@ -21,7 +21,6 @@ static void check_conf(struct menu *menu);
+ enum {
+ 	ask_all,
+ 	ask_new,
+-	ask_silent,
+ 	set_default,
+ 	set_yes,
+ 	set_mod,
+@@ -31,6 +30,7 @@ enum {
+ char *defconfig_file;
+ 
+ static int indent = 1;
++static int silent_mode;
+ static int valid_stdin = 1;
+ static int conf_cnt;
+ static char line[128];
+@@ -65,7 +65,7 @@ static void strip(char *str)
+ 
+ static void check_stdin(void)
+ {
+-	if (!valid_stdin && input_mode == ask_silent) {
++	if (!valid_stdin && silent_mode) {
+ 		printf(_("aborted!\n\n"));
+ 		printf(_("Console input/output is redirected. "));
+ 		printf(_("Run 'make oldconfig' to update configuration.\n\n"));
+@@ -102,7 +102,6 @@ static int conf_askvalue(struct symbol *sym, const char *def)
  		}
  		break;
  	case ask_new:
--		if (silent_mode && stat(".config", &tmpstat)) {
-+		if (!defconfig_file && silent_mode &&
-+				stat(".config", &tmpstat)) {
+-	case ask_silent:
+ 		if (sym_has_value(sym)) {
+ 			printf("%s\n", def);
+ 			return 0;
+@@ -352,7 +351,6 @@ static int conf_choice(struct menu *menu)
+ 		printf("]: ");
+ 		switch (input_mode) {
+ 		case ask_new:
+-		case ask_silent:
+ 			if (!is_new) {
+ 				cnt = def;
+ 				printf("%d\n", cnt);
+@@ -425,7 +423,7 @@ static void conf(struct menu *menu)
+ 
+ 		switch (prop->type) {
+ 		case P_MENU:
+-			if (input_mode == ask_silent && rootEntry != menu) {
++			if (silent_mode && rootEntry != menu) {
+ 				check_conf(menu);
+ 				return;
+ 			}
+@@ -510,7 +508,7 @@ int main(int ac, char **av)
+ 			input_mode = ask_new;
+ 			break;
+ 		case 's':
+-			input_mode = ask_silent;
++			silent_mode = 1;
+ 			valid_stdin = isatty(0) && isatty(1) && isatty(2);
+ 			break;
+ 		case 'd':
+@@ -560,8 +558,8 @@ int main(int ac, char **av)
+ 			exit(1);
+ 		}
+ 		break;
+-	case ask_silent:
+-		if (stat(".config", &tmpstat)) {
++	case ask_new:
++		if (silent_mode && stat(".config", &tmpstat)) {
  			printf(_("***\n"
  				"*** You have not yet configured your kernel!\n"
  				"*** (missing kernel .config file)\n"
-@@ -570,7 +571,15 @@ int main(int ac, char **av)
+@@ -571,8 +569,8 @@ int main(int ac, char **av)
+ 				"***\n"));
+ 			exit(1);
  		}
- 		/* fall through */
++		/* fall through */
  	case ask_all:
--		conf_read(NULL);
-+		if (defconfig_file) {
-+			if (conf_read(defconfig_file)) {
-+				printf(_("***\n*** Can't find default "
-+					 "configuration \"%s\"!\n***\n"),
-+					 defconfig_file);
-+				exit(1);
-+			}
-+		} else
-+			conf_read(NULL);
+-	case ask_new:
+ 		conf_read(NULL);
  		break;
  	case set_no:
- 	case set_mod:
+@@ -600,11 +598,12 @@ int main(int ac, char **av)
+ 		break;
+ 	}
+ 
+-	if (input_mode != ask_silent) {
++	if (!silent_mode) {
+ 		rootEntry = &rootmenu;
+ 		conf(&rootmenu);
+ 		if (input_mode == ask_all) {
+-			input_mode = ask_silent;
++			input_mode = ask_new;
++			silent_mode = 1;
+ 			valid_stdin = 1;
+ 		}
+ 	} else if (conf_get_changed()) {
+@@ -625,7 +624,7 @@ int main(int ac, char **av)
+ 		return 1;
+ 	}
+ skip_check:
+-	if (input_mode == ask_silent && conf_write_autoconf()) {
++	if (silent_mode && conf_write_autoconf()) {
+ 		fprintf(stderr, _("\n*** Error during writing of the kernel configuration.\n\n"));
+ 		return 1;
+ 	}
 -- 
 1.5.5
 
