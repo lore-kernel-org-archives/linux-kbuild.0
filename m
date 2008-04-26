@@ -1,41 +1,48 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from yoi5.greathalifaxhome.com ([66.180.172.116]:36218 "HELO
-	vps1.tull.net" rhost-flags-OK-FAIL-OK-OK) by vger.kernel.org with SMTP
-	id S1751623AbYDZOWu (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 26 Apr 2008 10:22:50 -0400
-Date: Sun, 27 Apr 2008 00:22:35 +1000
-From: Nick Andrew <nick@nick-andrew.net>
-Subject: Re: [PATCH] headerdep: a tool for detecting inclusion cycles in	header file
-Message-ID: <20080426142235.GB7051@tull.net>
-References: <20080426134554.GA20727@damson.getinternet.no> <48133537.7040800@cs.helsinki.fi> <19f34abd0804260717le1773aapec49cdb6f68e296f@mail.gmail.com>
+Received: from smtp5.pp.htv.fi ([213.243.153.39]:59213 "EHLO smtp5.pp.htv.fi"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752536AbYDZPAx (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 26 Apr 2008 11:00:53 -0400
+Date: Sat, 26 Apr 2008 18:00:30 +0300
+From: Adrian Bunk <bunk@kernel.org>
+Subject: Re: [PATCH] headerdep: a tool for detecting inclusion cycles in
+	header file
+Message-ID: <20080426150030.GH2252@cs181133002.pp.htv.fi>
+References: <20080426134554.GA20727@damson.getinternet.no>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <19f34abd0804260717le1773aapec49cdb6f68e296f@mail.gmail.com>
+In-Reply-To: <20080426134554.GA20727@damson.getinternet.no>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Vegard Nossum <vegard.nossum@gmail.com>
-Cc: Pekka Enberg <penberg@cs.helsinki.fi>, Sam Ravnborg <sam@ravnborg.org>, Adrian Bunk <bunk@kernel.org>, linux-kbuild@vger.kernel.org, kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: Sam Ravnborg <sam@ravnborg.org>, Pekka Enberg <penberg@cs.helsinki.fi>, linux-kbuild@vger.kernel.org, kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Sat, Apr 26, 2008 at 04:17:15PM +0200, Vegard Nossum wrote:
-> I didn't want to get into the lands of parsing options since we would
-> need to handle gcc options and skip arguments to those, etc.
+On Sat, Apr 26, 2008 at 03:45:54PM +0200, Vegard Nossum wrote:
+> Hi Sam,
+> 
+> Maybe something like this could be useful for cleaning up headers (and
+> maintaining that cleanliness once it has been achieved). What do you think?
+> 
+> (One thing which might or might not be good is that 'make headerdep' will
+>  also compile using CC if they're not already compiled. If this should be
+>  fixed, I think you'd know how to do it.)
 
-?
+This way you only catch problems in the current kernel configuration.
 
-use Getopt::Std qw(getopts);
+The only problems are under include/, and you should be able to do this 
+by parsing all headers and without hooking into the build system.
 
-use vars qw($opt_g);
+> Vegard
+>...
 
-getopts('g');
+cu
+Adrian
 
-[...]
-
-if ($opt_g) {
-	graph();
-}
-
-Nick.
 -- 
-PGP Key ID = 0x418487E7                      http://www.nick-andrew.net/
-PGP Key fingerprint = B3ED 6894 8E49 1770 C24A  67E3 6266 6EB9 4184 87E7
+
+       "Is there not promise of rain?" Ling Tan asked suddenly out
+        of the darkness. There had been need of rain for many days.
+       "Only a promise," Lao Er said.
+                                       Pearl S. Buck - Dragon Seed
+
