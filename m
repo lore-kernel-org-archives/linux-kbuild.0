@@ -1,73 +1,149 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp5.pp.htv.fi ([213.243.153.39]:42313 "EHLO smtp5.pp.htv.fi"
+Received: from pasmtpb.tele.dk ([80.160.77.98]:46738 "EHLO pasmtpB.tele.dk"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1757810AbYDZUF0 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 26 Apr 2008 16:05:26 -0400
-Date: Sat, 26 Apr 2008 23:05:02 +0300
-From: Adrian Bunk <bunk@kernel.org>
-Subject: Re: [GIT PULL] kbuild fixes
-Message-ID: <20080426200502.GU2252@cs181133002.pp.htv.fi>
-References: <20080426191256.GA784@uranus.ravnborg.org> <20080426192037.GR2252@cs181133002.pp.htv.fi> <20080426193701.GA9131@uranus.ravnborg.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+	id S1750885AbYD0UrM (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 27 Apr 2008 16:47:12 -0400
+Date: Sun, 27 Apr 2008 22:47:44 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: [PATCH 4/4] kconfig: add *_silentdefconfig feature for config targets
+Message-ID: <20080427204744.GA444@uranus.ravnborg.org>
+References: <20080425223530.10b9d50d@ephemeral>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20080426193701.GA9131@uranus.ravnborg.org>
+In-Reply-To: <20080425223530.10b9d50d@ephemeral>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, LKML <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: Andres Salomon <dilinger@queued.net>
+Cc: Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-On Sat, Apr 26, 2008 at 09:37:01PM +0200, Sam Ravnborg wrote:
-> On Sat, Apr 26, 2008 at 10:20:37PM +0300, Adrian Bunk wrote:
-> > On Sat, Apr 26, 2008 at 09:12:56PM +0200, Sam Ravnborg wrote:
-> > > Hi Linus.
-> > > 
-> > > Please apply the following two fixes by pulling from:
-> > > 
-> > >    master.kernel.org/pub/scm/linux/kernel/git/sam/kbuild.git
-> > > 
-> > > 
-> > > The MODULE_LICENSE fix is neded to get an allmodconfig
-> > > build fixed.
-> > 
-> > Which one is this?
-> > 
-> > http://lkml.org/lkml/2008/3/31/50 ?
-> > (my allmod build is not yet finished)
+On Fri, Apr 25, 2008 at 10:35:30PM -0400, Andres Salomon wrote:
 > 
-> The changelog was actually bad for this one.
-
-It was not a build error when I sent it one month ago, and that was the 
-changelog in all such patches I sent.
-
-> I saw two classes of problems:
+> Being able to run 'silentoldconfig' with an existing .config has been
+> immensely useful, especially for automated builds.  If the kernel code
+> changes in an incompatible manner without the associated .config being
+> updated, the build will fail and call attention to the need for an update.
 > 
-> 1) I got report about broken builds - fbdev was the culprint.
-> 2) a "make CONFIG_DEBUG_SECTION_MISMATCH=y" build broke
->    immediately.
+> AFAICT, there is nothing similar when using *_defconfig; one must copy
+> a .config manually, and then run silentoldconfig.  Simply running the
+> associated _defconfig will quietly update the config (which may silently
+> drop config options).  This patch adds a *_silentdefconfig target, with
+> semantics similar to silentoldconfig.  It will take the defconfig from
+> arch/$(SRCARCH)/configs/$x_defconfig, check for changes, and if there are
+> none, write out a .config.  If there have been changes and stdin is
+> valid, it will prompt for updates.  If there have been changes and
+> stdin is not valid, it will bail out with an error.
 
-OK, I never tried 2).
+I like what you achieve by this patchset.
+But I do not agree on the naming you chose.
 
-As long as this problem exists even a warning shouldn't be issued.
+We have today:
+oldconfig	=> very chatty
+silentoldconfig	=> Asks only relevant questions
+defconfig	=> silent
 
-> I made it non-fatal because we had at least one module that
-> was not yet fixed.
+[I plan one day to make oldconfig behave like
+silentoldconfig and drop the chatty mode]
 
-I had this patch in my test compiles for some time.
+And I see why you went for the name *_silentdefconfig
+But in reality what we want to say is that we want to
+interactively apply the _defconfig.
 
-Considering that I had a new such bug to fix during this merge window
-"at least one unfixed module" is a bad prerequisite for making it an 
-error since new bugs always get added.  ;-)
+So if we could come up with something where we told
+that we want to interactively use i386_defconfig
+then the users would hopefully be less confused.
 
-> 	Sam
+I have considered a few way to do so:
 
-cu
-Adrian
+a) make I=1 i386_defconfig
+b) make i_i386_defconfig
+c) make ii386_defconfig
+d) make i386_config
 
--- 
+And none of these are actually good.
+Any better ideas here?
 
-       "Is there not promise of rain?" Ling Tan asked suddenly out
-        of the darkness. There had been need of rain for many days.
-       "Only a promise," Lao Er said.
-                                       Pearl S. Buck - Dragon Seed
+See a few comments below.
 
+	Sam
+
+
+> 
+> Signed-off-by: Andres Salomon <dilinger@debian.org>
+> ---
+>  Makefile                 |    4 ++++
+>  scripts/kconfig/Makefile |    3 +++
+>  scripts/kconfig/conf.c   |   13 +++++++++++--
+>  3 files changed, 18 insertions(+), 2 deletions(-)
+> 
+> diff --git a/Makefile b/Makefile
+> index e77149e..c264f7f 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -1225,6 +1225,10 @@ help:
+>  		$(foreach b, $(boards), \
+>  		printf "  %-24s - Build for %s\\n" $(b) $(subst _defconfig,,$(b));) \
+>  		echo '')
+> +	@$(if $(boards), \
+> +		$(foreach b, $(boards), \
+> +		printf "  %-24s - Quiet Build for %s\\n" $(subst _defconfig,_silentdefconfig,$(b)) $(subst _defconfig,,$(b));) \
+> +		echo '')
+This is the first time we use printf in the top-level Makefile.
+Most likely because I never use printf in my shell scripts
+so I guess this is not a problem.
+
+>  
+>  	@echo  '  make V=0|1 [targets] 0 => quiet build (default), 1 => verbose build'
+>  	@echo  '  make V=2   [targets] 2 => give reason for rebuild of target'
+> diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
+> index ce7d754..19ba562 100644
+> --- a/scripts/kconfig/Makefile
+> +++ b/scripts/kconfig/Makefile
+> @@ -72,6 +72,9 @@ endif
+>  %_defconfig: $(obj)/conf
+>  	$(Q)$< -d -D arch/$(SRCARCH)/configs/$@ $(Kconfig)
+>  
+> +%_silentdefconfig: $(obj)/conf
+> +	$(Q)$< -s -o -D arch/$(SRCARCH)/configs/$(subst _silentdefconfig,_defconfig,$@) $(Kconfig)
+> +
+>  # Help text used by make help
+>  help:
+>  	@echo  '  config	  - Update current config utilising a line-oriented program'
+> diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
+> index 9a27638..264eee9 100644
+> --- a/scripts/kconfig/conf.c
+> +++ b/scripts/kconfig/conf.c
+> @@ -558,7 +558,8 @@ int main(int ac, char **av)
+>  		}
+>  		break;
+>  	case ask_new:
+> -		if (silent_mode && stat(".config", &tmpstat)) {
+> +		if (!defconfig_file && silent_mode &&
+> +				stat(".config", &tmpstat)) {
+
+This belong in a preparation patch. We should handle this
+also if we do not do so from the Makefile.
+
+>  			printf(_("***\n"
+>  				"*** You have not yet configured your kernel!\n"
+>  				"*** (missing kernel .config file)\n"
+> @@ -570,7 +571,15 @@ int main(int ac, char **av)
+>  		}
+>  		/* fall through */
+>  	case ask_all:
+> -		conf_read(NULL);
+> +		if (defconfig_file) {
+> +			if (conf_read(defconfig_file)) {
+> +				printf(_("***\n*** Can't find default "
+> +					 "configuration \"%s\"!\n***\n"),
+> +					 defconfig_file);
+> +				exit(1);
+> +			}
+> +		} else
+> +			conf_read(NULL);
+
+Does conf_read() fail if we use the NULL argument?
+I assume not so the above code can be simplified and
+should also be in the same preparational patch as the change above.
+
+	Sam
