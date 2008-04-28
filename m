@@ -1,69 +1,33 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pasmtpa.tele.dk ([80.160.77.114]:44715 "EHLO pasmtpA.tele.dk"
+Received: from pasmtpa.tele.dk ([80.160.77.114]:39463 "EHLO pasmtpA.tele.dk"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S934270AbYD1UqT (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 28 Apr 2008 16:46:19 -0400
-Date: Mon, 28 Apr 2008 22:46:51 +0200
+	id S934619AbYD1VHd (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 28 Apr 2008 17:07:33 -0400
+Date: Mon, 28 Apr 2008 23:08:06 +0200
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH 1/4] build: fix missing x86-specific help output
-Message-ID: <20080428204651.GC18248@uranus.ravnborg.org>
-References: <20080425223458.4eb88ba6@ephemeral> <20080428111839.5f8d5669@ephemeral>
+Subject: Re: [PATCH 2/3] fix choice dependency check
+Message-ID: <20080428210806.GF18248@uranus.ravnborg.org>
+References: <200802210258.45011.yinghai.lu@sun.com> <200802241832.37850.yinghai.lu@sun.com> <200802242136.28744.yinghai.lu@sun.com> <200802242243.49576.yinghai.lu@sun.com> <20080226194058.GA31438@uranus.ravnborg.org> <Pine.LNX.4.64.0802290509100.2723@scrub.home>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20080428111839.5f8d5669@ephemeral>
+In-Reply-To: <Pine.LNX.4.64.0802290509100.2723@scrub.home>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andres Salomon <dilinger@queued.net>
-Cc: Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com
+To: Roman Zippel <zippel@linux-m68k.org>
+Cc: Ingo Molnar <mingo@elte.hu>, Andrew Morton <akpm@linux-foundation.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, kiran@scalemp.com, shai@scalemp.com, Glauber Costa <gcosta@redhat.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, Yinghai Lu <Yinghai.Lu@Sun.COM>
 
-On Mon, Apr 28, 2008 at 11:18:39AM -0400, Andres Salomon wrote:
-> Note that this one is a general x86 fix, I probably should've separated it
-> out from the other three.
+On Fri, Feb 29, 2008 at 05:10:24AM +0100, Roman Zippel wrote:
 > 
-> On Fri, 25 Apr 2008 22:34:58 -0400
-> Andres Salomon <dilinger@queued.net> wrote:
+> Properly check the dependency of choices as a group.
+> Also fix that sym_check_deps() correctly terminates the dependency loop 
+> error check (otherwise it would continue printing the dependency chain).
 > 
-> > 
-> > Normally 'make help' spits out architecture-specific targets (including
-> > things like foo_defconfig).  However, it looks like ARCH was never changed
-> > to SRCARCH during the x86 transition; the makefile still looks in
-> > arch/i386/configs for arch-specific config files (if ARCH is i386, that is).
-> > 
-> > This changes it to use SRCARCH, which makes it properly display things
-> > like i386_defconfig and x86_64_defconfig.
-> > 
-> > Signed-off-by: Andres Salomon <dilinger@debian.org>
-> > ---
-> >  Makefile |    6 +++---
-> >  1 files changed, 3 insertions(+), 3 deletions(-)
-> > 
-> > diff --git a/Makefile b/Makefile
-> > index 3dbc826..e77149e 100644
-> > --- a/Makefile
-> > +++ b/Makefile
-> > @@ -1170,7 +1170,7 @@ rpm: include/config/kernel.release FORCE
-> >  # Brief documentation of the typical targets used
-> >  # ---------------------------------------------------------------------------
-> >  
-> > -boards := $(wildcard $(srctree)/arch/$(ARCH)/configs/*_defconfig)
-> > +boards := $(wildcard $(srctree)/arch/$(SRCARCH)/configs/*_defconfig)
-> >  boards := $(notdir $(boards))
+> Signed-off-by: Roman Zippel <zippel@linux-m68k.org>
 
-I already had this fix in a previous patch.
+Hi Roman.
 
-> >  
-> >  help:
-> > @@ -1217,9 +1217,9 @@ help:
-> >  	@echo  'Documentation targets:'
-> >  	@$(MAKE) -f $(srctree)/Documentation/DocBook/Makefile dochelp
-> >  	@echo  ''
-> > -	@echo  'Architecture specific targets ($(ARCH)):'
-> > +	@echo  'Architecture specific targets ($(SRCARCH)):'
-> >  	@$(if $(archhelp),$(archhelp),\
-> > -		echo '  No architecture specific help defined for $(ARCH)')
-> > +		echo '  No architecture specific help defined for $(SRCARCH)')
-
-So I used only this part.
+I realised this was never applied - so I did so now.
+Same with the one with named choice groups.
 
 	Sam
