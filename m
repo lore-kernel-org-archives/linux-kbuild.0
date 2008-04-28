@@ -1,213 +1,64 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.queued.net ([207.210.101.209]:3955 "EHLO mail.queued.net"
+Received: from mail.queued.net ([207.210.101.209]:1233 "EHLO mail.queued.net"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752038AbYD1Bkg (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 27 Apr 2008 21:40:36 -0400
-Date: Sun, 27 Apr 2008 21:43:39 -0400
+	id S935712AbYD1PPb (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 28 Apr 2008 11:15:31 -0400
+Date: Mon, 28 Apr 2008 11:18:39 -0400
 From: Andres Salomon <dilinger@queued.net>
-Subject: Re: [PATCH 4/4] kconfig: add *_silentdefconfig feature for config
- targets
-Message-ID: <20080427214339.48bc2ed8@ephemeral>
-In-Reply-To: <20080427204744.GA444@uranus.ravnborg.org>
-References: <20080425223530.10b9d50d@ephemeral>
-	<20080427204744.GA444@uranus.ravnborg.org>
+Subject: Re: [PATCH 1/4] build: fix missing x86-specific help output
+Message-ID: <20080428111839.5f8d5669@ephemeral>
+In-Reply-To: <20080425223458.4eb88ba6@ephemeral>
+References: <20080425223458.4eb88ba6@ephemeral>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: Andres Salomon <dilinger@queued.net>
+Cc: sam@ravnborg.org, Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com
 
-On Sun, 27 Apr 2008 22:47:44 +0200
-Sam Ravnborg <sam@ravnborg.org> wrote:
+Note that this one is a general x86 fix, I probably should've separated it
+out from the other three.
 
-> On Fri, Apr 25, 2008 at 10:35:30PM -0400, Andres Salomon wrote:
-> > 
-> > Being able to run 'silentoldconfig' with an existing .config has been
-> > immensely useful, especially for automated builds.  If the kernel code
-> > changes in an incompatible manner without the associated .config being
-> > updated, the build will fail and call attention to the need for an update.
-> > 
-> > AFAICT, there is nothing similar when using *_defconfig; one must copy
-> > a .config manually, and then run silentoldconfig.  Simply running the
-> > associated _defconfig will quietly update the config (which may silently
-> > drop config options).  This patch adds a *_silentdefconfig target, with
-> > semantics similar to silentoldconfig.  It will take the defconfig from
-> > arch/$(SRCARCH)/configs/$x_defconfig, check for changes, and if there are
-> > none, write out a .config.  If there have been changes and stdin is
-> > valid, it will prompt for updates.  If there have been changes and
-> > stdin is not valid, it will bail out with an error.
-> 
-> I like what you achieve by this patchset.
-> But I do not agree on the naming you chose.
-
-
-Yeah, I don't really like the name either, but I wasn't sure what to call
-it.  I want behavior that is similar to silentoldconfig, but not because
-I want it to not be chatty, but because I want it to fail if there have
-been changes and there's no tty (ie, !valid_stdin).  So basically,
-silentdefoldconfig or something ridiculously long like that. :)
+On Fri, 25 Apr 2008 22:34:58 -0400
+Andres Salomon <dilinger@queued.net> wrote:
 
 > 
-> We have today:
-> oldconfig	=> very chatty
-> silentoldconfig	=> Asks only relevant questions
-> defconfig	=> silent
+> Normally 'make help' spits out architecture-specific targets (including
+> things like foo_defconfig).  However, it looks like ARCH was never changed
+> to SRCARCH during the x86 transition; the makefile still looks in
+> arch/i386/configs for arch-specific config files (if ARCH is i386, that is).
 > 
-> [I plan one day to make oldconfig behave like
-> silentoldconfig and drop the chatty mode]
+> This changes it to use SRCARCH, which makes it properly display things
+> like i386_defconfig and x86_64_defconfig.
 > 
-> And I see why you went for the name *_silentdefconfig
-> But in reality what we want to say is that we want to
-> interactively apply the _defconfig.
-
-Do I?  I'm not sure what you mean by "interactively apply".  I want
-to non-interactively apply the defconfig, and fail if prompting is
-required (rather than just choosing default values).
-
-Perhaps _silentoldconfig would've been a better name.  Actually, I'm
-pretty sure that it is. 
-
+> Signed-off-by: Andres Salomon <dilinger@debian.org>
+> ---
+>  Makefile |    6 +++---
+>  1 files changed, 3 insertions(+), 3 deletions(-)
 > 
-> So if we could come up with something where we told
-> that we want to interactively use i386_defconfig
-> then the users would hopefully be less confused.
-> 
-> I have considered a few way to do so:
-> 
-> a) make I=1 i386_defconfig
-> b) make i_i386_defconfig
-> c) make ii386_defconfig
-> d) make i386_config
-> 
-> And none of these are actually good.
-> Any better ideas here?
-
-Sounds like you're saying that you want:
-
-make oldconfig V=1   (chatty, prompt if possible or fail)
-make oldconfig V=0   (silentoldconfig, prompt if possible or fail)
-
-make defconfig V=1   (chatty, use defaults)
-make defconfig V=0   (silent, use defaults)
-
-make i386_oldconfig V=1 (chatty, prompt if possible or fail)
-make i386_oldconfig V=0 (silent, prompt if possible or fail)
-
-make i386_defconfig V=1 (chatty, use defaults)
-make i386_defconfig V=0 (silent, use defaults)
-
-Does that sound right?  Would using the build system's verbose variable
-work?  If so, what should the default be?
-
-
-
-
-> 
-> See a few comments below.
-> 
-> 	Sam
-> 
-> 
-> > 
-> > Signed-off-by: Andres Salomon <dilinger@debian.org>
-> > ---
-> >  Makefile                 |    4 ++++
-> >  scripts/kconfig/Makefile |    3 +++
-> >  scripts/kconfig/conf.c   |   13 +++++++++++--
-> >  3 files changed, 18 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/Makefile b/Makefile
-> > index e77149e..c264f7f 100644
-> > --- a/Makefile
-> > +++ b/Makefile
-> > @@ -1225,6 +1225,10 @@ help:
-> >  		$(foreach b, $(boards), \
-> >  		printf "  %-24s - Build for %s\\n" $(b) $(subst _defconfig,,$(b));) \
-> >  		echo '')
-> > +	@$(if $(boards), \
-> > +		$(foreach b, $(boards), \
-> > +		printf "  %-24s - Quiet Build for %s\\n" $(subst _defconfig,_silentdefconfig,$(b)) $(subst _defconfig,,$(b));) \
-> > +		echo '')
-> This is the first time we use printf in the top-level Makefile.
-> Most likely because I never use printf in my shell scripts
-> so I guess this is not a problem.
-
-
-Eh?  There's already a printf, this just adds an additional printf.
-
-
-> 
-> >  
-> >  	@echo  '  make V=0|1 [targets] 0 => quiet build (default), 1 => verbose build'
-> >  	@echo  '  make V=2   [targets] 2 => give reason for rebuild of target'
-> > diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
-> > index ce7d754..19ba562 100644
-> > --- a/scripts/kconfig/Makefile
-> > +++ b/scripts/kconfig/Makefile
-> > @@ -72,6 +72,9 @@ endif
-> >  %_defconfig: $(obj)/conf
-> >  	$(Q)$< -d -D arch/$(SRCARCH)/configs/$@ $(Kconfig)
-> >  
-> > +%_silentdefconfig: $(obj)/conf
-> > +	$(Q)$< -s -o -D arch/$(SRCARCH)/configs/$(subst _silentdefconfig,_defconfig,$@) $(Kconfig)
-> > +
-> >  # Help text used by make help
-> >  help:
-> >  	@echo  '  config	  - Update current config utilising a line-oriented program'
-> > diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
-> > index 9a27638..264eee9 100644
-> > --- a/scripts/kconfig/conf.c
-> > +++ b/scripts/kconfig/conf.c
-> > @@ -558,7 +558,8 @@ int main(int ac, char **av)
-> >  		}
-> >  		break;
-> >  	case ask_new:
-> > -		if (silent_mode && stat(".config", &tmpstat)) {
-> > +		if (!defconfig_file && silent_mode &&
-> > +				stat(".config", &tmpstat)) {
-> 
-> This belong in a preparation patch. We should handle this
-> also if we do not do so from the Makefile.
-
-I'm not sure what you mean.  This isn't really preparation for this patch;
-it's just ensuring that we can use '-o' and '-D' together without
-running a check for .config.  Basically, if '-o' is specified but '-D'
-is not, check for .config (and fail if it doesn't exist.  If '-o' and '-D'
-are both specified, we don't care about .config.
-
-> 
-> >  			printf(_("***\n"
-> >  				"*** You have not yet configured your kernel!\n"
-> >  				"*** (missing kernel .config file)\n"
-> > @@ -570,7 +571,15 @@ int main(int ac, char **av)
-> >  		}
-> >  		/* fall through */
-> >  	case ask_all:
-> > -		conf_read(NULL);
-> > +		if (defconfig_file) {
-> > +			if (conf_read(defconfig_file)) {
-> > +				printf(_("***\n*** Can't find default "
-> > +					 "configuration \"%s\"!\n***\n"),
-> > +					 defconfig_file);
-> > +				exit(1);
-> > +			}
-> > +		} else
-> > +			conf_read(NULL);
-> 
-> Does conf_read() fail if we use the NULL argument?
-> I assume not so the above code can be simplified and
-> should also be in the same preparational patch as the change above.
-
-I don't believe it fails, it uses a default config name.  I'm not sure
-if it fails if _that_ file isn't found, though.  I can't make much
-sense of the symbol stuff..
-
-We definitely _do_ want to fail if conf_read(defconfig_file) can't find
-the file, and we definitely don't want to fail if conf_read(NULL) can't
-open the file.
-
-
-> 
-> 	Sam
+> diff --git a/Makefile b/Makefile
+> index 3dbc826..e77149e 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -1170,7 +1170,7 @@ rpm: include/config/kernel.release FORCE
+>  # Brief documentation of the typical targets used
+>  # ---------------------------------------------------------------------------
+>  
+> -boards := $(wildcard $(srctree)/arch/$(ARCH)/configs/*_defconfig)
+> +boards := $(wildcard $(srctree)/arch/$(SRCARCH)/configs/*_defconfig)
+>  boards := $(notdir $(boards))
+>  
+>  help:
+> @@ -1217,9 +1217,9 @@ help:
+>  	@echo  'Documentation targets:'
+>  	@$(MAKE) -f $(srctree)/Documentation/DocBook/Makefile dochelp
+>  	@echo  ''
+> -	@echo  'Architecture specific targets ($(ARCH)):'
+> +	@echo  'Architecture specific targets ($(SRCARCH)):'
+>  	@$(if $(archhelp),$(archhelp),\
+> -		echo '  No architecture specific help defined for $(ARCH)')
+> +		echo '  No architecture specific help defined for $(SRCARCH)')
+>  	@echo  ''
+>  	@$(if $(boards), \
+>  		$(foreach b, $(boards), \
