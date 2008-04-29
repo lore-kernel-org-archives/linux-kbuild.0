@@ -1,148 +1,106 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.queued.net ([207.210.101.209]:1269 "EHLO mail.queued.net"
+Received: from pasmtpb.tele.dk ([80.160.77.98]:57501 "EHLO pasmtpB.tele.dk"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S933360AbYD1Voy (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 28 Apr 2008 17:44:54 -0400
-Date: Mon, 28 Apr 2008 17:48:06 -0400
-From: Andres Salomon <dilinger@queued.net>
-Subject: Re: [PATCH 4/4] kconfig: add *_silentdefconfig feature for config
- targets
-Message-ID: <20080428174806.37f03c44@ephemeral>
-In-Reply-To: <20080428213437.GA24202@uranus.ravnborg.org>
-References: <20080425223530.10b9d50d@ephemeral>
-	<20080427204744.GA444@uranus.ravnborg.org>
-	<20080427214339.48bc2ed8@ephemeral>
-	<20080428213437.GA24202@uranus.ravnborg.org>
+	id S1754361AbYD2Se5 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 29 Apr 2008 14:34:57 -0400
+Date: Tue, 29 Apr 2008 20:35:31 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Additional kconfig targets (cloneconfig, nonint_oldconfig etc)
+Message-ID: <20080429183531.GB19652@uranus.ravnborg.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
+Cc: Dave Jones <davej@codemonkey.org.uk>, Roland McGrath <roland@redhat.com>, Andres Salomon <dilinger@queued.net>
 
-On Mon, 28 Apr 2008 23:34:37 +0200
-Sam Ravnborg <sam@ravnborg.org> wrote:
+Recently there has been request for a number of new
+kconfig related targets.
 
-> > > 
-> > > And I see why you went for the name *_silentdefconfig
-> > > But in reality what we want to say is that we want to
-> > > interactively apply the _defconfig.
-> > 
-> > Do I?  I'm not sure what you mean by "interactively apply".  I want
-> > to non-interactively apply the defconfig, and fail if prompting is
-> > required (rather than just choosing default values).
-> I mean exactly the behaviour you ask for.
-> 
-> > Sounds like you're saying that you want:
-> > 
-> > make oldconfig V=1   (chatty, prompt if possible or fail)
-> > make oldconfig V=0   (silentoldconfig, prompt if possible or fail)
-> > 
-> > make defconfig V=1   (chatty, use defaults)
-> > make defconfig V=0   (silent, use defaults)
-> > 
-> > make i386_oldconfig V=1 (chatty, prompt if possible or fail)
-> > make i386_oldconfig V=0 (silent, prompt if possible or fail)
-> > 
-> > make i386_defconfig V=1 (chatty, use defaults)
-> > make i386_defconfig V=0 (silent, use defaults)
-> > 
-> > Does that sound right?  Would using the build system's verbose variable
-> > work?  If so, what should the default be?
-> 
-> V= shall not be used for this. I will try to cook up something.
+In general it boils down to the following:
 
-Ok.
+We need to be flexible in what configuration
+we start out from and how we apply it.
 
-> 
-> > > > 
-> > > > diff --git a/Makefile b/Makefile
-> > > > index e77149e..c264f7f 100644
-> > > > --- a/Makefile
-> > > > +++ b/Makefile
-> > > > @@ -1225,6 +1225,10 @@ help:
-> > > >  		$(foreach b, $(boards), \
-> > > >  		printf "  %-24s - Build for %s\\n" $(b) $(subst _defconfig,,$(b));) \
-> > > >  		echo '')
-> > > > +	@$(if $(boards), \
-> > > > +		$(foreach b, $(boards), \
-> > > > +		printf "  %-24s - Quiet Build for %s\\n" $(subst _defconfig,_silentdefconfig,$(b)) $(subst _defconfig,,$(b));) \
-> > > > +		echo '')
-> > > This is the first time we use printf in the top-level Makefile.
-> > > Most likely because I never use printf in my shell scripts
-> > > so I guess this is not a problem.
-> > 
-> > 
-> > Eh?  There's already a printf, this just adds an additional printf.
-> I'm blind and you are right.
-> 
-> > > > --- a/scripts/kconfig/conf.c
-> > > > +++ b/scripts/kconfig/conf.c
-> > > > @@ -558,7 +558,8 @@ int main(int ac, char **av)
-> > > >  		}
-> > > >  		break;
-> > > >  	case ask_new:
-> > > > -		if (silent_mode && stat(".config", &tmpstat)) {
-> > > > +		if (!defconfig_file && silent_mode &&
-> > > > +				stat(".config", &tmpstat)) {
-> > > 
-> > > This belong in a preparation patch. We should handle this
-> > > also if we do not do so from the Makefile.
-> > 
-> > I'm not sure what you mean.  This isn't really preparation for this patch;
-> > it's just ensuring that we can use '-o' and '-D' together without
-> > running a check for .config.  Basically, if '-o' is specified but '-D'
-> > is not, check for .config (and fail if it doesn't exist.  If '-o' and '-D'
-> > are both specified, we don't care about .config.
-> 
-> OK - but then it really does not belong in this patch.
+We need to be able to apply it in following ways:
+1) automated - select defaults for all new symbols
+   => It is used for "make defconfig, make *_defconfig" today
 
-I can break it into a separate patch, then.  Should I do so now, or wait?
+2) interactive - asking user for all new symbols
+   and error out if stdin is redirected
 
+3) list unknown - list all new symbols and do not
+   create a new config
 
-> 
-> > 
-> > > 
-> > > >  			printf(_("***\n"
-> > > >  				"*** You have not yet configured your kernel!\n"
-> > > >  				"*** (missing kernel .config file)\n"
-> > > > @@ -570,7 +571,15 @@ int main(int ac, char **av)
-> > > >  		}
-> > > >  		/* fall through */
-> > > >  	case ask_all:
-> > > > -		conf_read(NULL);
-> > > > +		if (defconfig_file) {
-> > > > +			if (conf_read(defconfig_file)) {
-> > > > +				printf(_("***\n*** Can't find default "
-> > > > +					 "configuration \"%s\"!\n***\n"),
-> > > > +					 defconfig_file);
-> > > > +				exit(1);
-> > > > +			}
-> > > > +		} else
-> > > > +			conf_read(NULL);
-> > > 
-> > > Does conf_read() fail if we use the NULL argument?
-> > > I assume not so the above code can be simplified and
-> > > should also be in the same preparational patch as the change above.
-> > 
-> > I don't believe it fails, it uses a default config name.  I'm not sure
-> > if it fails if _that_ file isn't found, though.  I can't make much
-> > sense of the symbol stuff..
-> Thought we could simplify the code if defconfig_file is by default NULL.
-> Then we can drop the else.
+With oldconfig today we have two modes:
+-> One mode where we are very chatty and show
+   all output.
+-> And the 'silent' mode where we only start being
+   chatty when we see a new symbol.
 
-Ok.
+I plan to drop the 'very chatty' mode as I
+do not see it usefull.
+So in essense 'make oldconfig' and 'make silentoldconfig'
+become equal.
 
-> 
-> I will try to get back to you on this later. The patches are anyway
-> too late for this merge window.
+The commands we have today for kconfig is:
 
+# Command line variants
+make oldconfig
+make silentoldconfig
+make defconfig
+make XXX_defconfig
 
-Ok, sure.  I guess just let me know when you come up w/ an idea for
-what it should be named, and I can update patches accordingly..
+(The other frontends are left out on purpose).
+The challenge here is to come up with a syntax that
+allows us to select between the three behaviours,
+while keeping backward compatibility.
 
+The best suggestion I have so far is to say that:
+a) if defconfig is specified then we use method 1)
+b) if oldconfig is specified then we use method 2)
+c) if newconfig is specified then we use method 3)
 
+And we add support for a new 'commandline' parameter
+'K' so I can say:
 
-> 
-> 	Sam
+make K=/proc/config.gz defconfig
+make K=i386_defconfig  defconfig
+make K=i386_defconfig  oldconfig
+make K=/proc/config.gz newconfig
+
+So K is used to specify what config file we use
+to start out from.
+
+Care should be taken to keep the known good
+targets working as before.
+
+Andres Salomon already did some preparational work
+for this but I need to find a good way to handle the K=
+parameter.
+Dave J also posted patches that is useful for 'newconfig'.
+
+But I wanted to ask for opinions before diving into
+implmenting this.
+
+	Sam
+
+[Random notes..]
+
+# Enviroment variables affecting kconfig
+KCONFIG_ALLCONFIG
+KCONFIG_NOSILENTUPDATE
+KCONFIG_CONFIG
+KCONFIG_OVERWRITECONFIG
+KCONFIG_NOTIMESTAMP
+KCONFIG_AUTOCONFIG
+KCONFIG_AUTOHEADER
+
+#input files (aparts from the mandatory ones)
+all.config
+allno.config
+allmod.config
+allyes.config
+allrandom.config
+
