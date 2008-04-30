@@ -1,57 +1,44 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from wa-out-1112.google.com ([209.85.146.178]:63139 "EHLO
-	wa-out-1112.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756700AbYD3Kp6 (ORCPT
+Received: from sovereign.computergmbh.de ([85.214.69.204]:46437 "EHLO
+	sovereign.computergmbh.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756073AbYD3OnN (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 30 Apr 2008 06:45:58 -0400
-Received: by wa-out-1112.google.com with SMTP id j37so253395waf.23
-        for <linux-kbuild@vger.kernel.org>; Wed, 30 Apr 2008 03:45:57 -0700 (PDT)
-Message-ID: <ed10ee420804300345r5d4566d2uff5c3f49f1c15107@mail.gmail.com>
-Date: Wed, 30 Apr 2008 03:45:57 -0700
-From: "SL Baur" <steve@xemacs.org>
+	Wed, 30 Apr 2008 10:43:13 -0400
+Date: Wed, 30 Apr 2008 16:43:12 +0200 (CEST)
+From: Jan Engelhardt <jengelh@medozas.de>
 Subject: Re: Additional kconfig targets (cloneconfig, nonint_oldconfig etc)
-In-Reply-To: <20080429172402.14d7d40b@ephemeral>
+In-Reply-To: <20080430063552.GA30509@uranus.ravnborg.org>
+Message-ID: <alpine.LNX.1.10.0804301641580.5623@fbirervta.pbzchgretzou.qr>
+References: <20080429183531.GB19652@uranus.ravnborg.org> <20080429172402.14d7d40b@ephemeral> <20080430063552.GA30509@uranus.ravnborg.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-References: <20080429183531.GB19652@uranus.ravnborg.org>
-	 <20080429172402.14d7d40b@ephemeral>
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andres Salomon <dilinger@queued.net>
-Cc: Sam Ravnborg <sam@ravnborg.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Dave Jones <davej@codemonkey.org.uk>, Roland McGrath <roland@redhat.com>
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: Andres Salomon <dilinger@queued.net>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Dave Jones <davej@codemonkey.org.uk>, Roland McGrath <roland@redhat.com>
 
-On 4/29/08, Andres Salomon <dilinger@queued.net> wrote:
-> On Tue, 29 Apr 2008 20:35:31 +0200
->  Sam Ravnborg <sam@ravnborg.org> wrote:
 
->  > And we add support for a new 'commandline' parameter
->  > 'K' so I can say:
->  >
->  > make K=/proc/config.gz defconfig
->  > make K=i386_defconfig  defconfig
->  > make K=i386_defconfig  oldconfig
->  > make K=/proc/config.gz newconfig
->  >
->  > So K is used to specify what config file we use
->  > to start out from.
+On Wednesday 2008-04-30 08:35, Sam Ravnborg wrote:
+>> 
+>> 'newconfig' sounds to me like you're creating a new config; the exact
+>> opposite of what it does.  I'd suggest 'listnewconfig' or some such thing.
+>
+>listnewconfig is better - will use that.
 
-I like this idea a lot.  I didn't like the hardcoded `.config' 13
-years ago and I still
-don't like it now.
+Mh, newconfig sounds like  make K=/dev/null oldconfig/defconfig
 
->  Sounds good, I highly prefer specifying the config via env variable
->  rather than embedded in the target (ie, 'make olpc_defconfig').
+>> Sounds good, I highly prefer specifying the config via env variable
+>> rather than embedded in the target (ie, 'make olpc_defconfig').
+>I will try to come up with some simple algorithm to locate the file.
+>I guess something like:
+>
+>a) Try in local dir with name supplied
+>b) If filname does not start with '/' try in arch/$ARCH/configs/*
+>c) If filname does not start with '/' try in arch/$ARCH/configs/*_defconfig
 
-Is there any reasonable way to embed the configuration file name in the kernel
-image like BSD does it?  /proc/config.gz is a good way to retrieve way to
-retrieve configuration information on a running system, not so good for pushing
-kernels out to a network and keeping track of the config files on the build
-machine.
+Scan ./ before arch/$ARCH/configs/
 
-I don't have any way of checking this now, but can /proc files like
-/proc/config.gz
-be exported via NFS or the equivalent?
+>If filename is prefixed .gz unpack it
 
--sb
+ /proc/.gzconfig? :-D (scnr)
+
