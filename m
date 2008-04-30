@@ -1,34 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([66.187.233.31]:52082 "EHLO mx1.redhat.com"
+Received: from pasmtpb.tele.dk ([80.160.77.98]:55689 "EHLO pasmtpB.tele.dk"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1765463AbYD3UfN (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 30 Apr 2008 16:35:13 -0400
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-From: Roland McGrath <roland@redhat.com>
+	id S1759224AbYD3UhA (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 30 Apr 2008 16:37:00 -0400
+Date: Wed, 30 Apr 2008 22:37:34 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
 Subject: Re: Additional kconfig targets (cloneconfig, nonint_oldconfig etc)
-In-Reply-To: SL Baur's message of  Wednesday, 30 April 2008 13:32:52 -0700 <ed10ee420804301332n5fb72f3jb9bdea03aa313fad@mail.gmail.com>
-References: <20080429183531.GB19652@uranus.ravnborg.org>
-	<20080429172402.14d7d40b@ephemeral>
-	<ed10ee420804300345r5d4566d2uff5c3f49f1c15107@mail.gmail.com>
-	<20080430080134.60346a12.randy.dunlap@oracle.com>
-	<ed10ee420804301332n5fb72f3jb9bdea03aa313fad@mail.gmail.com>
-Message-Id: <20080430203510.AEE7426FA04@magilla.localdomain>
-Date: Wed, 30 Apr 2008 13:35:10 -0700 (PDT)
+Message-ID: <20080430203734.GA9837@uranus.ravnborg.org>
+References: <20080429183531.GB19652@uranus.ravnborg.org> <20080429172402.14d7d40b@ephemeral> <ed10ee420804300345r5d4566d2uff5c3f49f1c15107@mail.gmail.com> <20080430080134.60346a12.randy.dunlap@oracle.com> <ed10ee420804301332n5fb72f3jb9bdea03aa313fad@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ed10ee420804301332n5fb72f3jb9bdea03aa313fad@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: SL Baur <steve@xemacs.org>
-Cc: Randy Dunlap <randy.dunlap@oracle.com>, Andres Salomon <dilinger@queued.net>, Sam Ravnborg <sam@ravnborg.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Dave Jones <davej@codemonkey.org.uk>
+Cc: Randy Dunlap <randy.dunlap@oracle.com>, Andres Salomon <dilinger@queued.net>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Dave Jones <davej@codemonkey.org.uk>, Roland McGrath <roland@redhat.com>
 
+On Wed, Apr 30, 2008 at 01:32:52PM -0700, SL Baur wrote:
+> On 4/30/08, Randy Dunlap <randy.dunlap@oracle.com> wrote:
+> > On Wed, 30 Apr 2008 03:45:57 -0700 SL Baur wrote:
+> 
+> >  > Is there any reasonable way to embed the configuration file name in the kernel
+> >  > image like BSD does it?  /proc/config.gz is a good way to retrieve way to
+> >  > retrieve configuration information on a running system, not so good for pushing
+> >  > kernels out to a network and keeping track of the config files on the build
+> >  > machine.
+> >
+> >
+> > I don't know how BSD does it, but CONFIG_IKCONFIG does embed the
+> >  config image in the kernel.  It can be extracted with
+> >  scripts/extract-ikconfig.
+> 
+> No, that's not what I meant.  Now that we have a means of specifying
+> a configuration file by name, it would be nice if the file name could,
+> for example, be appended to EXTRAVERSION.  That's all it would
+> take to duplicate the behavior I misdescribed.
+> 
+> 
 > Eg. `make K=HPxw4300.config ...' would have "-HPxw4300" appended
 > to EXTRAVERSION.  Maybe this doesn't make sense any more, but it
 > was once something I wanted very much.
+You can just do:
+echo "-HPxw4300" > localversion
 
-We have "echo .foo > localversion" or CONFIG_LOCALVERSION=.foo for that.
-Maybe what you would like is a variable on that make command line to
-magically set CONFIG_LOCALVERSION with less typing.
+Then it gets appended to the kernel version. While not automatic is
+solves your need.
 
-
-Thanks,
-Roland
+	Sam
