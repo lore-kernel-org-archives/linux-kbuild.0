@@ -1,125 +1,69 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.queued.net ([207.210.101.209]:2979 "EHLO mail.queued.net"
+Received: from pasmtpb.tele.dk ([80.160.77.98]:51337 "EHLO pasmtpB.tele.dk"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752857AbYD2VUv (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 29 Apr 2008 17:20:51 -0400
-Date: Tue, 29 Apr 2008 17:24:02 -0400
-From: Andres Salomon <dilinger@queued.net>
+	id S1755907AbYD3GfT (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 30 Apr 2008 02:35:19 -0400
+Date: Wed, 30 Apr 2008 08:35:52 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
 Subject: Re: Additional kconfig targets (cloneconfig, nonint_oldconfig etc)
-Message-ID: <20080429172402.14d7d40b@ephemeral>
-In-Reply-To: <20080429183531.GB19652@uranus.ravnborg.org>
-References: <20080429183531.GB19652@uranus.ravnborg.org>
+Message-ID: <20080430063552.GA30509@uranus.ravnborg.org>
+References: <20080429183531.GB19652@uranus.ravnborg.org> <20080429172402.14d7d40b@ephemeral>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20080429172402.14d7d40b@ephemeral>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
+To: Andres Salomon <dilinger@queued.net>
 Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Dave Jones <davej@codemonkey.org.uk>, Roland McGrath <roland@redhat.com>
 
-On Tue, 29 Apr 2008 20:35:31 +0200
-Sam Ravnborg <sam@ravnborg.org> wrote:
+> > The commands we have today for kconfig is:
+> > 
+> > # Command line variants
+> > make oldconfig
+> > make silentoldconfig
+> > make defconfig
+> > make XXX_defconfig
+> > 
+> > (The other frontends are left out on purpose).
+> > The challenge here is to come up with a syntax that
+> > allows us to select between the three behaviours,
+> > while keeping backward compatibility.
+> > 
+> > The best suggestion I have so far is to say that:
+> > a) if defconfig is specified then we use method 1)
+> > b) if oldconfig is specified then we use method 2)
+> > c) if newconfig is specified then we use method 3)
+> > 
+> 
+> 'newconfig' sounds to me like you're creating a new config; the exact
+> opposite of what it does.  I'd suggest 'listnewconfig' or some such thing.
+listnewconfig is better - will use that.
 
-> Recently there has been request for a number of new
-> kconfig related targets.
+> Then again, 'defconfig' and 'oldconfig' are primarily what I care about,
+> as I haven't been in a situation where I would have found method 3) to
+> be useful.
 > 
-> In general it boils down to the following:
+> > And we add support for a new 'commandline' parameter
+> > 'K' so I can say:
+> > 
+> > make K=/proc/config.gz defconfig
+> > make K=i386_defconfig  defconfig
+> > make K=i386_defconfig  oldconfig
+> > make K=/proc/config.gz newconfig
+> > 
+> > So K is used to specify what config file we use
+> > to start out from.
 > 
-> We need to be flexible in what configuration
-> we start out from and how we apply it.
-> 
-> We need to be able to apply it in following ways:
-> 1) automated - select defaults for all new symbols
->    => It is used for "make defconfig, make *_defconfig" today
-> 
-> 2) interactive - asking user for all new symbols
->    and error out if stdin is redirected
-> 
-> 3) list unknown - list all new symbols and do not
->    create a new config
-> 
-> With oldconfig today we have two modes:
-> -> One mode where we are very chatty and show
->    all output.
-> -> And the 'silent' mode where we only start being
->    chatty when we see a new symbol.
-> 
-> I plan to drop the 'very chatty' mode as I
-> do not see it usefull.
+> Sounds good, I highly prefer specifying the config via env variable
+> rather than embedded in the target (ie, 'make olpc_defconfig').
+I will try to come up with some simple algorithm to locate the file.
+I guess something like:
 
-I'd certainly agree with that.
+a) Try in local dir with name supplied
+b) If filname does not start with '/' try in arch/$ARCH/configs/*
+c) If filname does not start with '/' try in arch/$ARCH/configs/*_defconfig
 
-> So in essense 'make oldconfig' and 'make silentoldconfig'
-> become equal.
-> 
-> The commands we have today for kconfig is:
-> 
-> # Command line variants
-> make oldconfig
-> make silentoldconfig
-> make defconfig
-> make XXX_defconfig
-> 
-> (The other frontends are left out on purpose).
-> The challenge here is to come up with a syntax that
-> allows us to select between the three behaviours,
-> while keeping backward compatibility.
-> 
-> The best suggestion I have so far is to say that:
-> a) if defconfig is specified then we use method 1)
-> b) if oldconfig is specified then we use method 2)
-> c) if newconfig is specified then we use method 3)
-> 
+If filename is prefixed .gz unpack it
 
-'newconfig' sounds to me like you're creating a new config; the exact
-opposite of what it does.  I'd suggest 'listnewconfig' or some such thing.
-Then again, 'defconfig' and 'oldconfig' are primarily what I care about,
-as I haven't been in a situation where I would have found method 3) to
-be useful.
-
-> And we add support for a new 'commandline' parameter
-> 'K' so I can say:
-> 
-> make K=/proc/config.gz defconfig
-> make K=i386_defconfig  defconfig
-> make K=i386_defconfig  oldconfig
-> make K=/proc/config.gz newconfig
-> 
-> So K is used to specify what config file we use
-> to start out from.
-
-Sounds good, I highly prefer specifying the config via env variable
-rather than embedded in the target (ie, 'make olpc_defconfig').
-
-> 
-> Care should be taken to keep the known good
-> targets working as before.
-> 
-> Andres Salomon already did some preparational work
-> for this but I need to find a good way to handle the K=
-> parameter.
-> Dave J also posted patches that is useful for 'newconfig'.
-> 
-> But I wanted to ask for opinions before diving into
-> implmenting this.
-> 
-> 	Sam
-> 
-> [Random notes..]
-> 
-> # Enviroment variables affecting kconfig
-> KCONFIG_ALLCONFIG
-> KCONFIG_NOSILENTUPDATE
-> KCONFIG_CONFIG
-> KCONFIG_OVERWRITECONFIG
-> KCONFIG_NOTIMESTAMP
-> KCONFIG_AUTOCONFIG
-> KCONFIG_AUTOHEADER
-> 
-> #input files (aparts from the mandatory ones)
-> all.config
-> allno.config
-> allmod.config
-> allyes.config
-> allrandom.config
-> 
+	Sam
