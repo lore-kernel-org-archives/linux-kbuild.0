@@ -1,76 +1,398 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from galactus.symlabs.net ([91.121.6.203]:45641 "EHLO symlabs.com"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1751009AbYEAFR0 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 1 May 2008 01:17:26 -0400
-Message-ID: <16355.213.30.72.21.1209618475.squirrel@galactus.symlabs.net>
-Date: Thu, 1 May 2008 07:07:55 +0200 (CEST)
-Subject: gcc 3.4.6 fails to build 2.6.25 due to offsetof() not digestible
-     by gas
-From: sampo@symlabs.com
-Reply-To: sampo@symlabs.com
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7BIT
+Received: from pasmtpa.tele.dk ([80.160.77.114]:46805 "EHLO pasmtpA.tele.dk"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751009AbYEAGMJ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 1 May 2008 02:12:09 -0400
+Date: Thu, 1 May 2008 08:12:40 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: Additional kconfig targets (cloneconfig, nonint_oldconfig etc)
+Message-ID: <20080501061240.GA13544@uranus.ravnborg.org>
+References: <20080429183531.GB19652@uranus.ravnborg.org> <200805010640.33973.zippel@linux-m68k.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <200805010640.33973.zippel@linux-m68k.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: sampo@symlabs.com
+To: Roman Zippel <zippel@linux-m68k.org>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Dave Jones <davej@codemonkey.org.uk>, Roland McGrath <roland@redhat.com>, Andres Salomon <dilinger@queued.net>
 
-Platform: x86
-Compiler: gcc-3.4.6
-Binutils: 2.17.50.0.8
-Kernel under build: 2.6.25 (from kernel.org)
+On Thu, May 01, 2008 at 06:40:29AM +0200, Roman Zippel wrote:
+> Hi,
+> 
+> On Tuesday 29. April 2008, Sam Ravnborg wrote:
+> 
+> > Recently there has been request for a number of new
+> > kconfig related targets.
+> >
+> > In general it boils down to the following:
+> >
+> > We need to be flexible in what configuration
+> > we start out from and how we apply it.
+> >
+> > We need to be able to apply it in following ways:
+> > 1) automated - select defaults for all new symbols
+> >    => It is used for "make defconfig, make *_defconfig" today
+> >
+> > 2) interactive - asking user for all new symbols
+> >    and error out if stdin is redirected
+> >
+> > 3) list unknown - list all new symbols and do not
+> >    create a new config
+> 
+> A general comment about the intendend design:
+> conf.c is primarily meant as interactive tool. defconfig isn't exactly 
+> interactive, but is included for historical reasons as it produces the same 
+> output.
+> The patch I've seen for the last point put it into conf.c, which is the wrong 
+> place for it. For this sort of thing we should create a small query tool, 
+> which then can export all sorts of information.
 
-Problem: Build fails due to incompatibility of asm-offsets.h with
-assembler. See below:
+Hi Roman.
+This is work in progress...
+I have created a new frontend: aconf.c that is a trimmed down version
+of conf.c. aconf.c are intended to take care of all the automated configurations
+such as: all*config, randconfig and the automated defconfig
 
-gcc -Wp,-MD,arch/x86/kernel/.entry_32.o.d  -nostdinc -isystem
-/apps/gcc/3.4.6/lib/gcc/i686-pc-linux-gnu/3.4.6/include -D__KERNEL__
--Iinclude  -include include/linux/autoconf.h -D__ASSEMBLY__ -m32
--DCONFIG_AS_CFI=1 -DCONFIG_AS_CFI_SIGNAL_FRAME=1
--Iinclude/asm-x86/mach-default     -c -o arch/x86/kernel/entry_32.o
-arch/x86/kernel/entry_32.S
-include/asm/asm-offsets.h: Assembler messages:
-include/asm/asm-offsets.h:10: Error: invalid character '_' in mnemonic
-include/asm/asm-offsets.h:11: Error: invalid character '_' in mnemonic
-include/asm/asm-offsets.h:12: Error: invalid character '_' in mnemonic
-include/asm/asm-offsets.h:13: Error: invalid character '_' in mnemonic
-include/asm/asm-offsets.h:14: Error: invalid character '_' in mnemonic
-include/asm/asm-offsets.h:15: Error: invalid character '_' in mnemonic
-(snip - much more of the same)
+In this way we have conf.c for all the interactive targets and aconf for
+all the automated targets.
 
-Analysis:
+This is not exactly what you suggest but I thik a step in the right direction.
 
-1. All errors are related to use of offsetof() macro. The asm-offsets.h
-   contains lines like
+Comments?
 
-     IA32_SIGCONTEXT_ax $44 offsetof(struct sigcontext, ax)	#
+	Sam
 
-2. offsetof() macro is defined in include/linux/stddef.h. It appears
-   to rely on __compiler_offsetof() which maps to __builtin_offsetof()
-   on gcc-4.x, but on gcc-3.4.6 the definition is as follows
+/*
+ * Copyright (C) 2002 Roman Zippel <zippel@linux-m68k.org>
+ * Copyright (C) 2008 Sam Ravnborg <sam@ravnborg.org>
+ * Released under the terms of the GNU GPL v2.0.
+ */
 
-     #define offsetof(TYPE, MEMBER) ((size_t) &((TYPE *)0)->MEMBER)
+/*
+ * Generate the automated configs
+ */
 
-   I believe this C syntax is what is causing indigestion to gas.
+#include <locale.h>
+#include <ctype.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+#include <unistd.h>
+#include <sys/stat.h>
 
-3. The compilation can be forced to proceed bit further by
-   adding to beginning of .S files #define __ASM_OFFSETS_H__
-   which prevents the problematic include from being included.
-   However, some .S files actually need the definitions.
+#define LKC_DIRECT_LINK
+#include "lkc.h"
 
-4. In Documentation/Changes file the compiler requirement is
-   documented as gcc-3.2. Therefore it seems reasonable to expect
-   gcc-3.4.6 to work.
+static void check_conf(struct menu *menu);
+static void conf(struct menu *menu);
 
-5. Last time I compiled kernel was 2.6.23.9. Back then this
-   problem did not exist. The toolchain is the same as used back then.
+enum {
+	set_default,
+	set_yes,
+	set_mod,
+	set_no,
+	set_random
+} input_mode;
 
-6. googling did not return any enlightening entries, thus I presume
-   this problem has not been reported yet.
+static char *defconfig_file;
 
-Cheers,
---Sampo
+static int conf_cnt;
+static struct menu *rootEntry;
+
+/* Set strig value - it this a nop as it looks like? */
+static void conf_string(struct menu *menu)
+{
+	struct symbol *sym = menu->sym;
+	const char *def;
 
 
+	if (!sym_is_changable(sym))
+		return;
+
+	if (sym_has_value(sym) && (input_mode != set_default))
+		return;
+
+	def = sym_get_string_value(sym);
+	if (def)
+		sym_set_string_value(sym, def);
+}
+
+static void conf_sym(struct menu *menu)
+{
+	struct symbol *sym = menu->sym;
+	int type;
+	tristate val;
+
+	if (!sym_is_changable(sym))
+		return;
+
+	if (sym_has_value(sym) && (input_mode != set_default))
+		return;
+
+	type = sym_get_type(sym);
+	switch (input_mode) {
+	case set_yes:
+		if (sym_tristate_within_range(sym, yes)) {
+			sym_set_tristate_value(sym, yes);
+			break;
+		}
+	/* fallthrough */
+	case set_mod:
+		if (type == S_TRISTATE) {
+			if (sym_tristate_within_range(sym, mod)) {
+				sym_set_tristate_value(sym, mod);
+				break;
+			}
+		} else if (sym_tristate_within_range(sym, yes)) {
+			sym_set_tristate_value(sym, yes);
+			break;
+		}
+	/* fallthrough */
+	case set_no:
+		if (sym_tristate_within_range(sym, no)) {
+			sym_set_tristate_value(sym, no);
+			break;
+		}
+	/* fallthrough */
+	case set_random:
+		 do {
+			val = (tristate)(rand() % 3);
+		} while (!sym_tristate_within_range(sym, val));
+		switch (val) {
+		case no:  sym_set_tristate_value(sym, no); break;
+		case mod: sym_set_tristate_value(sym, mod); break;
+		case yes: sym_set_tristate_value(sym, yes); break;
+		}
+		break;
+	/* silence gcc warning */
+	case set_default:
+		sym_set_tristate_value(sym, sym_get_tristate_value(sym));
+		break;
+	}
+}
+
+static void conf_choice(struct menu *menu)
+{
+	struct symbol *sym, *def_sym;
+	struct menu *child;
+	int type;
+	bool is_new;
+	int cnt, def;
+
+	sym = menu->sym;
+	type = sym_get_type(sym);
+	is_new = !sym_has_value(sym);
+	if (sym_is_changable(sym)) {
+		conf_sym(menu);
+		sym_calc_value(sym);
+	}
+	if (sym_get_tristate_value(sym) != yes)
+		return;
+	def_sym = sym_get_choice_value(sym);
+	cnt = def = 0;
+	for (child = menu->list; child; child = child->next) {
+		if (!child->sym || !menu_is_visible(child))
+			continue;
+		cnt++;
+		if (child->sym == def_sym)
+			def = cnt;
+	}
+	if (cnt == 1)
+		goto conf_childs;
+
+	switch (input_mode) {
+	case set_random:
+		if (is_new)
+			def = (rand() % cnt) + 1;
+	/* fallthrough */
+	case set_default:
+	case set_yes:
+	case set_mod:
+	case set_no:
+		cnt = def;
+		break;
+	}
+
+conf_childs:
+	for (child = menu->list; child; child = child->next) {
+		if (!child->sym || !menu_is_visible(child))
+			continue;
+		if (!--cnt)
+			break;
+	}
+	sym_set_choice_value(sym, child->sym);
+	for (child = child->list; child; child = child->next)
+		conf(child);
+}
+
+
+static void conf(struct menu *menu)
+{
+	struct symbol *sym;
+	struct property *prop;
+	struct menu *child;
+
+	if (!menu_is_visible(menu))
+		return;
+
+	sym = menu->sym;
+	//if (sym)
+	//	printf("sym:%s\n", sym->name);
+	prop = menu->prompt;
+	if (prop && prop->type == P_MENU) {
+		if (menu != rootEntry) {
+			check_conf(menu);
+			return;
+		}
+	}
+
+	if (!sym)
+		goto conf_childs;
+
+	if (sym_is_choice(sym)) {
+		conf_choice(menu);
+		if (sym->curr.tri != mod)
+			return;
+		goto conf_childs;
+	}
+
+	switch (sym->type) {
+	case S_INT:
+	case S_HEX:
+	case S_STRING:
+		conf_string(menu);
+		break;
+	default:
+		conf_sym(menu);
+		break;
+	}
+
+conf_childs:
+	for (child = menu->list; child; child = child->next)
+		conf(child);
+}
+
+static void check_conf(struct menu *menu)
+{
+	struct symbol *sym;
+	struct menu *child;
+
+	if (!menu_is_visible(menu))
+		return;
+
+	sym = menu->sym;
+	if (sym && !sym_has_value(sym)) {
+		if (sym_is_changable(sym) ||
+		    (sym_is_choice(sym) && sym_get_tristate_value(sym) == yes)) {
+			conf_cnt++;
+			rootEntry = menu_get_parent_menu(menu);
+			conf(rootEntry);
+		}
+	}
+
+	for (child = menu->list; child; child = child->next)
+		check_conf(child);
+}
+
+int main(int ac, char **av)
+{
+	int opt;
+	const char *name;
+	struct stat tmpstat;
+
+	setlocale(LC_ALL, "");
+	bindtextdomain(PACKAGE, LOCALEDIR);
+	textdomain(PACKAGE);
+
+	while ((opt = getopt(ac, av, "dD:nmyrh")) != -1) {
+		switch (opt) {
+		case 'd':
+			input_mode = set_default;
+			break;
+		case 'D':
+			input_mode = set_default;
+			defconfig_file = optarg;
+			break;
+		case 'n':
+			input_mode = set_no;
+			break;
+		case 'm':
+			input_mode = set_mod;
+			break;
+		case 'y':
+			input_mode = set_yes;
+			break;
+		case 'r':
+			input_mode = set_random;
+			srand(time(NULL));
+			break;
+		case 'h':
+			printf(_("See README for usage info\n"));
+			exit(0);
+			break;
+		default:
+			fprintf(stderr, _("See README for usage info\n"));
+			exit(1);
+		}
+	}
+	if (ac == optind) {
+		printf(_("%s: Kconfig file missing\n"), av[0]);
+		exit(1);
+	}
+	name = av[optind];
+	conf_parse(name);
+	//zconfdump(stdout);
+	switch (input_mode) {
+	case set_default:
+		if (!defconfig_file)
+			defconfig_file = conf_get_default_confname();
+		if (conf_read(defconfig_file)) {
+			printf(_("***\n"
+				"*** Can't find default configuration \"%s\"!\n"
+				"***\n"), defconfig_file);
+			exit(1);
+		}
+		break;
+	case set_no:
+	case set_mod:
+	case set_yes:
+	case set_random:
+		name = getenv("KCONFIG_ALLCONFIG");
+		if (name && !stat(name, &tmpstat)) {
+			conf_read_simple(name, S_DEF_USER);
+			break;
+		}
+		switch (input_mode) {
+		case set_no:	 name = "allno.config"; break;
+		case set_mod:	 name = "allmod.config"; break;
+		case set_yes:	 name = "allyes.config"; break;
+		case set_random: name = "allrandom.config"; break;
+		default: break;
+		}
+		if (!stat(name, &tmpstat))
+			conf_read_simple(name, S_DEF_USER);
+		else if (!stat("all.config", &tmpstat))
+			conf_read_simple("all.config", S_DEF_USER);
+		break;
+	default:
+		break;
+	}
+
+	do {
+		conf_cnt = 0;
+		check_conf(&rootmenu);
+	} while (conf_cnt);
+	if (conf_write(NULL)) {
+		fprintf(stderr, _("\n*** Error during writing of the kernel configuration.\n\n"));
+		return 1;
+	}
+
+	if (conf_write_autoconf()) {
+		fprintf(stderr, _("\n*** Error during writing of the kernel configuration.\n\n"));
+		return 1;
+	}
+
+	return 0;
+}
