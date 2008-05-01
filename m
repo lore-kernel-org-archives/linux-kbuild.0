@@ -1,67 +1,76 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp-vbr8.xs4all.nl ([194.109.24.28]:3624 "EHLO
-	smtp-vbr8.xs4all.nl" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752401AbYEAEuc (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 1 May 2008 00:50:32 -0400
-From: Roman Zippel <zippel@linux-m68k.org>
-Subject: Re: Additional kconfig targets (cloneconfig, nonint_oldconfig etc)
-Date: Thu, 1 May 2008 06:40:29 +0200
-References: <20080429183531.GB19652@uranus.ravnborg.org>
-In-Reply-To: <20080429183531.GB19652@uranus.ravnborg.org>
+Received: from galactus.symlabs.net ([91.121.6.203]:45641 "EHLO symlabs.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1751009AbYEAFR0 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 1 May 2008 01:17:26 -0400
+Message-ID: <16355.213.30.72.21.1209618475.squirrel@galactus.symlabs.net>
+Date: Thu, 1 May 2008 07:07:55 +0200 (CEST)
+Subject: gcc 3.4.6 fails to build 2.6.25 due to offsetof() not digestible
+     by gas
+From: sampo@symlabs.com
+Reply-To: sampo@symlabs.com
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-Message-Id: <200805010640.33973.zippel@linux-m68k.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Dave Jones <davej@codemonkey.org.uk>, Roland McGrath <roland@redhat.com>, Andres Salomon <dilinger@queued.net>
+To: linux-kbuild@vger.kernel.org
+Cc: sampo@symlabs.com
 
-Hi,
+Platform: x86
+Compiler: gcc-3.4.6
+Binutils: 2.17.50.0.8
+Kernel under build: 2.6.25 (from kernel.org)
 
-On Tuesday 29. April 2008, Sam Ravnborg wrote:
+Problem: Build fails due to incompatibility of asm-offsets.h with
+assembler. See below:
 
-> Recently there has been request for a number of new
-> kconfig related targets.
->
-> In general it boils down to the following:
->
-> We need to be flexible in what configuration
-> we start out from and how we apply it.
->
-> We need to be able to apply it in following ways:
-> 1) automated - select defaults for all new symbols
->    => It is used for "make defconfig, make *_defconfig" today
->
-> 2) interactive - asking user for all new symbols
->    and error out if stdin is redirected
->
-> 3) list unknown - list all new symbols and do not
->    create a new config
+gcc -Wp,-MD,arch/x86/kernel/.entry_32.o.d  -nostdinc -isystem
+/apps/gcc/3.4.6/lib/gcc/i686-pc-linux-gnu/3.4.6/include -D__KERNEL__
+-Iinclude  -include include/linux/autoconf.h -D__ASSEMBLY__ -m32
+-DCONFIG_AS_CFI=1 -DCONFIG_AS_CFI_SIGNAL_FRAME=1
+-Iinclude/asm-x86/mach-default     -c -o arch/x86/kernel/entry_32.o
+arch/x86/kernel/entry_32.S
+include/asm/asm-offsets.h: Assembler messages:
+include/asm/asm-offsets.h:10: Error: invalid character '_' in mnemonic
+include/asm/asm-offsets.h:11: Error: invalid character '_' in mnemonic
+include/asm/asm-offsets.h:12: Error: invalid character '_' in mnemonic
+include/asm/asm-offsets.h:13: Error: invalid character '_' in mnemonic
+include/asm/asm-offsets.h:14: Error: invalid character '_' in mnemonic
+include/asm/asm-offsets.h:15: Error: invalid character '_' in mnemonic
+(snip - much more of the same)
 
-A general comment about the intendend design:
-conf.c is primarily meant as interactive tool. defconfig isn't exactly 
-interactive, but is included for historical reasons as it produces the same 
-output.
-The patch I've seen for the last point put it into conf.c, which is the wrong 
-place for it. For this sort of thing we should create a small query tool, 
-which then can export all sorts of information.
+Analysis:
 
-If we silence the defconfig output (which IMO is a good thing, as I don't 
-think anyone looked at the output seriously for a long time and the current 
-behaviour has purely historical reasons), it would also open up the 
-possibility to separate it from conf.c.
-This also fits into an idea I'm playing with to extend the .config format like 
-this:
+1. All errors are related to use of offsetof() macro. The asm-offsets.h
+   contains lines like
 
-%defaultmode: mod
-CONFIG_FOO=n
+     IA32_SIGCONTEXT_ax $44 offsetof(struct sigcontext, ax)	#
 
-Basically this could replace "make allmodconfig KCONFIG_ALLCONFIG=..." and the 
-current way to produce an allmodconfig would be replaced by a dedicated 
-function.
+2. offsetof() macro is defined in include/linux/stddef.h. It appears
+   to rely on __compiler_offsetof() which maps to __builtin_offsetof()
+   on gcc-4.x, but on gcc-3.4.6 the definition is as follows
 
-bye, Roman
+     #define offsetof(TYPE, MEMBER) ((size_t) &((TYPE *)0)->MEMBER)
+
+   I believe this C syntax is what is causing indigestion to gas.
+
+3. The compilation can be forced to proceed bit further by
+   adding to beginning of .S files #define __ASM_OFFSETS_H__
+   which prevents the problematic include from being included.
+   However, some .S files actually need the definitions.
+
+4. In Documentation/Changes file the compiler requirement is
+   documented as gcc-3.2. Therefore it seems reasonable to expect
+   gcc-3.4.6 to work.
+
+5. Last time I compiled kernel was 2.6.23.9. Back then this
+   problem did not exist. The toolchain is the same as used back then.
+
+6. googling did not return any enlightening entries, thus I presume
+   this problem has not been reported yet.
+
+Cheers,
+--Sampo
+
+
