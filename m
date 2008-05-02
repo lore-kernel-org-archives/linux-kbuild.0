@@ -1,42 +1,74 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pasmtpa.tele.dk ([80.160.77.114]:41530 "EHLO pasmtpA.tele.dk"
+Received: from pasmtpa.tele.dk ([80.160.77.114]:35334 "EHLO pasmtpA.tele.dk"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1761478AbYEBKlg (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 2 May 2008 06:41:36 -0400
-Date: Fri, 2 May 2008 12:42:11 +0200
+	id S1755137AbYEBKz4 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 2 May 2008 06:55:56 -0400
+Date: Fri, 2 May 2008 12:56:30 +0200
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: gcc 3.4.6 fails to build 2.6.25 due to offsetof() not digestible by gas
-Message-ID: <20080502104211.GB20741@uranus.ravnborg.org>
-References: <34486.81.193.128.196.1209659903.squirrel@galactus.symlabs.net> <20080501165333.GG29330@cs181133002.pp.htv.fi> <33623.81.193.128.196.1209661842.squirrel@galactus.symlabs.net> <20080501191714.GM29330@cs181133002.pp.htv.fi> <20080501213952.GA8281@uranus.ravnborg.org> <20080501220747.GV29330@cs181133002.pp.htv.fi> <52649.81.193.128.196.1209689622.squirrel@galactus.symlabs.net> <8499950a0805011848h713606e3mda5dd2aed31dfa91@mail.gmail.com> <20080502060813.GB19090@uranus.ravnborg.org> <20080502105620.GW24008@flower.upol.cz>
+Subject: Re: Additional kconfig targets (cloneconfig, nonint_oldconfig etc)
+Message-ID: <20080502105630.GA20955@uranus.ravnborg.org>
+References: <20080429183531.GB19652@uranus.ravnborg.org> <alpine.LNX.1.10.0804301643140.5623@fbirervta.pbzchgretzou.qr>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20080502105620.GW24008@flower.upol.cz>
+In-Reply-To: <alpine.LNX.1.10.0804301643140.5623@fbirervta.pbzchgretzou.qr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Oleg Verych <olecom@flower.upol.cz>
-Cc: "Sam Ravnborg (kbuild list)" <linux-kbuild@vger.kernel.org>
+To: Jan Engelhardt <jengelh@medozas.de>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Dave Jones <davej@codemonkey.org.uk>, Roland McGrath <roland@redhat.com>, Andres Salomon <dilinger@queued.net>
 
-On Fri, May 02, 2008 at 12:56:20PM +0200, Oleg Verych wrote:
-> Sam Ravnborg @ Fri, May 02, 2008 at 08:08:13AM +0200:
-> > On Fri, May 02, 2008 at 02:48:58AM +0100, Oleg Verych wrote:
-> > > Sam, please, tell to those guys, that shell must be `bash`, as Roman wanted.
-> > 
-> > No - we want to be portable across as many setups as possible.
-> > So forcing us to use bash is in the long run not a good solutions.
-> > 
-> > We should go for the least common denominator - busy-box could be the one.
+> >(The other frontends are left out on purpose).
+> >The challenge here is to come up with a syntax that
+> >allows us to select between the three behaviours,
+> >while keeping backward compatibility.
+> >
+> >The best suggestion I have so far is to say that:
+> >a) if defconfig is specified then we use method 1)
+> >b) if oldconfig is specified then we use method 2)
+> >c) if newconfig is specified then we use method 3)
 > 
-> ,-- Message-ID: <Pine.LNX.4.64.0702082335150.14457@scrub.home> --
-> |It would make casual kbuild hacking only even more difficult, as one has
-> |to check it works with the various shells.
-> `--
-This is still true. But we start to see a few more people reporting issues
-with non-standard Linux systems (busy-box, cygwin, sun) so there is a 
-need and there is a tester base.
-And any strightforward looking patches will be applied - when eventual
-feedback has been incorporated.
+> [Where is 1) defined?]
 
-I will not promise to check for non-linux compliance but testers are welcome.
+1) automated - select defaults for all new symbols
+   => It is used for "make defconfig, make *_defconfig" today
+
+> Ok and these are doing .. what?
+
+> ># Enviroment variables affecting kconfig
+> >KCONFIG_ALLCONFIG
+
+Specify input file in .config format to adjust a all*config run
+
+> >KCONFIG_NOSILENTUPDATE
+If set then error out if .config is modified
+
+> >KCONFIG_CONFIG
+Provide alternative name for .config
+
+> >KCONFIG_OVERWRITECONFIG
+If you set KCONFIG_OVERWRITECONFIG in environment, Kconfig will not break
+ symlinks when .config is a symlink to somewhere else
+
+> >KCONFIG_NOTIMESTAMP
+Do not put timestamp in .config
+
+> >KCONFIG_AUTOCONFIG
+Provide alternative name for: include/config/auto.conf
+
+> >KCONFIG_AUTOHEADER
+Provide alternative name for include/linux/autoconf.h 
+
+
+
+
+> Used for..?
+All used to hardcode specific values in all*config builds.
+
+> >#input files (aparts from the mandatory ones)
+> >all.config
+> >allno.config
+> >allmod.config
+> >allyes.config
+> >allrandom.config
 
 	Sam
