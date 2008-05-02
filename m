@@ -1,68 +1,485 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from barikada.upol.cz ([158.194.242.200]:41333 "EHLO
-	barikada.upol.cz" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1758438AbYEBLFA (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 2 May 2008 07:05:00 -0400
-Received: from flower (flower.upol.cz [158.194.64.22])
-	by barikada.upol.cz (Spam Firewall) with ESMTP id 72EB01242D0
-	for <linux-kbuild@vger.kernel.org>; Fri,  2 May 2008 13:04:46 +0200 (CEST)
-Received: from flower (flower.upol.cz [158.194.64.22]) by barikada.upol.cz with ESMTP id 9IvM6fyzYyxydYPe for <linux-kbuild@vger.kernel.org>; Fri, 02 May 2008 13:04:46 +0200 (CEST)
-Received: from olecom by flower with local (Exim 4.63)
-	(envelope-from <olecom@flower.upol.cz>)
-	id 1JrtOk-0002ML-28
-	for linux-kbuild@vger.kernel.org; Fri, 02 May 2008 13:25:54 +0200
-Date: Fri, 2 May 2008 13:25:54 +0200
-Subject: source processing-friendly scripting
-Message-ID: <20080502112554.GX24008@flower.upol.cz>
-References: <20080501165333.GG29330@cs181133002.pp.htv.fi> <33623.81.193.128.196.1209661842.squirrel@galactus.symlabs.net> <20080501191714.GM29330@cs181133002.pp.htv.fi> <20080501213952.GA8281@uranus.ravnborg.org> <20080501220747.GV29330@cs181133002.pp.htv.fi> <52649.81.193.128.196.1209689622.squirrel@galactus.symlabs.net> <8499950a0805011848h713606e3mda5dd2aed31dfa91@mail.gmail.com> <20080502060813.GB19090@uranus.ravnborg.org> <20080502105620.GW24008@flower.upol.cz> <20080502104211.GB20741@uranus.ravnborg.org>
-MIME-Version: 1.0
+Received: from pasmtpb.tele.dk ([80.160.77.98]:38764 "EHLO pasmtpB.tele.dk"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1764309AbYEBTJP (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 2 May 2008 15:09:15 -0400
+Date: Fri, 2 May 2008 21:09:49 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: Additional kconfig targets (cloneconfig, nonint_oldconfig etc)
+Message-ID: <20080502190949.GA30270@uranus.ravnborg.org>
+References: <20080429183531.GB19652@uranus.ravnborg.org>
+Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20080502104211.GB20741@uranus.ravnborg.org>
-From: Oleg Verych <olecom@flower.upol.cz>
+In-Reply-To: <20080429183531.GB19652@uranus.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Sam Ravnborg (kbuild list)" <linux-kbuild@vger.kernel.org>
+To: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
+Cc: Dave Jones <davej@codemonkey.org.uk>, Roland McGrath <roland@redhat.com>, Andres Salomon <dilinger@queued.net>, Roman Zippel <zippel@linux-m68k.org>
 
-Sam Ravnborg @ Fri, May 02, 2008 at 12:42:11PM +0200:
-[]
-> > ,-- Message-ID: <Pine.LNX.4.64.0702082335150.14457@scrub.home> --
-> > |It would make casual kbuild hacking only even more difficult, as one has
-> > |to check it works with the various shells.
-> > `--
-> This is still true. But we start to see a few more people reporting issues
-> with non-standard Linux systems (busy-box, cygwin, sun) so there is a 
-> need and there is a tester base.
+With the attached patch you can do:
 
-Even if i will have my extended `sh` (as you may saw in dash list),
-it's quite easy to make portability modules for any tools used.
+make K=my_favourite_config defconfig
 
-But this is the case only if source/script is not a concrete -- i.e. is
-written is the way friendly for text-processing tools, thus clear
-plain-text transformations of source can be possible. This is not the
-case of `make` and requires experience as in scripting as in design.
+kconfig will read all config values form 'my_favourite_config'
+and set all other symbols to their default value.
+The output is now dense like this:
+# configuration is based on 'my_favourite_config'
+#
+# configuration written to .config
+#
 
-> And any strightforward looking patches will be applied - when eventual
-> feedback has been incorporated.
 
-I've shown readable `sed` for cases other than MIPS. MIPS requires
-more cleanup of all that manual "#define" stuff.
+The K= notations works for the usual suspects:
+allnoconfig, allyesconfig, allmodconfig, randconfig and defconfig
 
-,-- arch/mips/kernel/asm-offsets.c --
-|        text("/* MIPS pt_regs offsets. */");
-|        offset("#define PT_R0     ", struct pt_regs, regs[0]);
-`--
+alldefconfig with no parameters create a kernel konfiguration
+with all parameters set to default.
 
-Anyone, who wants to have some understanding of basic things:
+The difference between alldefconfig and defconfig is that if
+no K= parameter is specified the defconfig will try to load
+one of the files specified in the defconfig list from
+init/Kconfig (see DEFCONFIG_LIST)
 
-* processing of plain text
-* gcc/assembler generation
-* kbuild
+I decided to create a new .c file to support this.
+It was not strictly necessary but this allows us to
+simplify conf.c a lot. I did not do so yet.
 
-may take it and have ``fun''.
+What is missing:
+1) No support for .gz input file
+   But aconf.sh should be easy to adjust to this
 
-> I will not promise to check for non-linux compliance but testers are welcome.
-> 
-> 	Sam
-____
+2) We hardcode that files name *_defconfig are found
+   in arch/$ARCH/configs/*
+
+3) Implement newsymbolsconfig (any better name?)
+   Shall list all new symbols and shall not write
+   any config
+
+	Sam
+
+diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
+index fa1a7d5..3e560a4 100644
+--- a/scripts/kconfig/Makefile
++++ b/scripts/kconfig/Makefile
+@@ -47,30 +47,25 @@ update-po-config: $(obj)/kxgettext $(obj)/gconf.glade.h
+ 	$(Q)rm -f arch/um/Kconfig.arch
+ 	$(Q)rm -f $(obj)/config.pot
+ 
+-PHONY += randconfig allyesconfig allnoconfig allmodconfig defconfig
++aconf-targets := allnoconfig allyesconfig allmodconfig alldefconfig randconfig
++PHONY += $(aconf-targets) defconfig
+ 
+-randconfig: $(obj)/conf
+-	$< -r $(Kconfig)
++$(aconf-targets): $(src)/aconf.sh $(obj)/aconf
++	$(Q)$(CONFIG_SHELL) $< $@ $(Kconfig)
+ 
+-allyesconfig: $(obj)/conf
+-	$< -y $(Kconfig)
++%_defconfig: $(src)/aconf.sh $(obj)/aconf
++	$(Q)K=arch/$(SRCARCH)/configs/$@ \
++	$(CONFIG_SHELL) $< alldefconfig $(Kconfig)
+ 
+-allnoconfig: $(obj)/conf
+-	$< -n $(Kconfig)
+-
+-allmodconfig: $(obj)/conf
+-	$< -m $(Kconfig)
+-
+-defconfig: $(obj)/conf
+ ifeq ($(KBUILD_DEFCONFIG),)
++defconfig: $(obj)/conf
+ 	$< -d $(Kconfig)
+ else
+-	@echo "*** Default configuration is based on '$(KBUILD_DEFCONFIG)'"
+-	$(Q)$< -D arch/$(SRCARCH)/configs/$(KBUILD_DEFCONFIG) $(Kconfig)
++defconfig: $(src)/aconf.sh $(obj)/aconf
++	$(Q)K=arch/$(SRCARCH)/configs/$(KBUILD_DEFCONFIG) \
++	$(CONFIG_SHELL) $< alldefconfig $(Kconfig)
+ endif
+ 
+-%_defconfig: $(obj)/conf
+-	$(Q)$< -D arch/$(SRCARCH)/configs/$@ $(Kconfig)
+ 
+ # Help text used by make help
+ help:
+@@ -100,6 +95,7 @@ HOST_EXTRACFLAGS += -DLOCALE
+ # ===========================================================================
+ # Shared Makefile for the various kconfig executables:
+ # conf:	  Used for defconfig, oldconfig and related targets
++# aconf:  Generate simple configurations (all*config, etc)
+ # mconf:  Used for the mconfig target.
+ #         Utilizes the lxdialog package
+ # qconf:  Used for the xconfig target
+@@ -112,10 +108,11 @@ lxdialog := lxdialog/checklist.o lxdialog/util.o lxdialog/inputbox.o
+ lxdialog += lxdialog/textbox.o lxdialog/yesno.o lxdialog/menubox.o
+ 
+ conf-objs	:= conf.o  zconf.tab.o
++aconf-objs	:= aconf.o zconf.tab.o
+ mconf-objs	:= mconf.o zconf.tab.o $(lxdialog)
+ kxgettext-objs	:= kxgettext.o zconf.tab.o
+ 
+-hostprogs-y := conf qconf gconf kxgettext
++hostprogs-y := conf aconf qconf gconf kxgettext
+ 
+ ifeq ($(MAKECMDGOALS),menuconfig)
+ 	hostprogs-y += mconf
+diff --git a/scripts/kconfig/aconf.c b/scripts/kconfig/aconf.c
+new file mode 100644
+index 0000000..db3df0f
+--- /dev/null
++++ b/scripts/kconfig/aconf.c
+@@ -0,0 +1,316 @@
++/*
++ * Copyright (C) 2002 Roman Zippel <zippel@linux-m68k.org>
++ * Copyright (C) 2008 Sam Ravnborg <sam@ravnborg.org>
++ * Released under the terms of the GNU GPL v2.0.
++ */
++
++/*
++ * Generate the automated configs
++ */
++
++#include <locale.h>
++#include <ctype.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <time.h>
++#include <unistd.h>
++#include <sys/stat.h>
++
++#define LKC_DIRECT_LINK
++#include "lkc.h"
++
++static void check_conf(struct menu *menu);
++static void conf(struct menu *menu);
++
++enum {
++	set_unknown,
++	set_default,
++	set_yes,
++	set_mod,
++	set_no,
++	set_random
++} default_value = set_unknown;
++
++
++static int conf_cnt;
++static struct menu *rootEntry;
++
++/* Set strig value - it this a nop as it looks like? */
++static void conf_string(struct menu *menu)
++{
++	struct symbol *sym = menu->sym;
++	const char *def;
++
++
++	if (!sym_is_changable(sym))
++		return;
++
++	if (sym_has_value(sym) && (default_value != set_default))
++		return;
++
++	def = sym_get_string_value(sym);
++	if (def)
++		sym_set_string_value(sym, def);
++}
++
++static void conf_sym(struct menu *menu)
++{
++	struct symbol *sym = menu->sym;
++	int type;
++	tristate val;
++
++	if (!sym_is_changable(sym))
++		return;
++
++	if (sym_has_value(sym) && (default_value != set_default))
++		return;
++
++	type = sym_get_type(sym);
++	switch (default_value) {
++	case set_yes:
++		if (sym_tristate_within_range(sym, yes)) {
++			sym_set_tristate_value(sym, yes);
++			break;
++		}
++	/* fallthrough */
++	case set_mod:
++		if (type == S_TRISTATE) {
++			if (sym_tristate_within_range(sym, mod)) {
++				sym_set_tristate_value(sym, mod);
++				break;
++			}
++		} else if (sym_tristate_within_range(sym, yes)) {
++			sym_set_tristate_value(sym, yes);
++			break;
++		}
++	/* fallthrough */
++	case set_no:
++		if (sym_tristate_within_range(sym, no)) {
++			sym_set_tristate_value(sym, no);
++			break;
++		}
++	/* fallthrough */
++	case set_random:
++		 do {
++			val = (tristate)(rand() % 3);
++		} while (!sym_tristate_within_range(sym, val));
++		switch (val) {
++		case no:  sym_set_tristate_value(sym, no); break;
++		case mod: sym_set_tristate_value(sym, mod); break;
++		case yes: sym_set_tristate_value(sym, yes); break;
++		}
++		break;
++	case set_default:
++		sym_set_tristate_value(sym, sym_get_tristate_value(sym));
++		break;
++	/* silence gcc warning */
++	case set_unknown:
++		break;
++	}
++}
++
++static void conf_choice(struct menu *menu)
++{
++	struct symbol *sym, *def_sym;
++	struct menu *child;
++	int type;
++	bool is_new;
++	int cnt, def;
++
++	sym = menu->sym;
++	type = sym_get_type(sym);
++	is_new = !sym_has_value(sym);
++	if (sym_is_changable(sym)) {
++		conf_sym(menu);
++		sym_calc_value(sym);
++	}
++	if (sym_get_tristate_value(sym) != yes)
++		return;
++	def_sym = sym_get_choice_value(sym);
++	cnt = def = 0;
++	for (child = menu->list; child; child = child->next) {
++		if (!child->sym || !menu_is_visible(child))
++			continue;
++		cnt++;
++		if (child->sym == def_sym)
++			def = cnt;
++	}
++	if (cnt == 1)
++		goto conf_childs;
++
++	switch (default_value) {
++	case set_random:
++		if (is_new)
++			def = (rand() % cnt) + 1;
++	/* fallthrough */
++	case set_default:
++	case set_yes:
++	case set_mod:
++	case set_no:
++		cnt = def;
++		break;
++	/* silence gcc warning */
++	case set_unknown:
++		break;
++	}
++
++conf_childs:
++	for (child = menu->list; child; child = child->next) {
++		if (!child->sym || !menu_is_visible(child))
++			continue;
++		if (!--cnt)
++			break;
++	}
++	sym_set_choice_value(sym, child->sym);
++	for (child = child->list; child; child = child->next)
++		conf(child);
++}
++
++
++static void conf(struct menu *menu)
++{
++	struct symbol *sym;
++	struct property *prop;
++	struct menu *child;
++
++	if (!menu_is_visible(menu))
++		return;
++
++	sym = menu->sym;
++	prop = menu->prompt;
++	if (prop && prop->type == P_MENU) {
++		if (menu != rootEntry) {
++			check_conf(menu);
++			return;
++		}
++	}
++
++	if (!sym)
++		goto conf_childs;
++
++	if (sym_is_choice(sym)) {
++		conf_choice(menu);
++		if (sym->curr.tri != mod)
++			return;
++		goto conf_childs;
++	}
++
++	switch (sym->type) {
++	case S_INT:
++	case S_HEX:
++	case S_STRING:
++		conf_string(menu);
++		break;
++	default:
++		conf_sym(menu);
++		break;
++	}
++
++conf_childs:
++	for (child = menu->list; child; child = child->next)
++		conf(child);
++}
++
++static void check_conf(struct menu *menu)
++{
++	struct symbol *sym;
++	struct menu *child;
++
++	if (!menu_is_visible(menu))
++		return;
++
++	sym = menu->sym;
++	if (sym && !sym_has_value(sym)) {
++		if (sym_is_changable(sym) ||
++		    (sym_is_choice(sym) &&
++		     sym_get_tristate_value(sym) == yes)) {
++			conf_cnt++;
++			rootEntry = menu_get_parent_menu(menu);
++			conf(rootEntry);
++		}
++	}
++
++	for (child = menu->list; child; child = child->next)
++		check_conf(child);
++}
++
++int main(int ac, char **av)
++{
++	int opt;
++	char *config_file = NULL;
++	struct stat tmpstat;
++
++	setlocale(LC_ALL, "");
++	bindtextdomain(PACKAGE, LOCALEDIR);
++	textdomain(PACKAGE);
++
++	while ((opt = getopt(ac, av, "dnmyrhi:")) != -1) {
++		switch (opt) {
++		case 'd':
++			default_value = set_default;
++			break;
++		case 'n':
++			default_value = set_no;
++			break;
++		case 'm':
++			default_value = set_mod;
++			break;
++		case 'y':
++			default_value = set_yes;
++			break;
++		case 'r':
++			default_value = set_random;
++			srand(time(NULL));
++			break;
++		case 'i':
++			config_file = optarg;
++			break;
++		case 'h':
++			printf(_("See README for usage info\n"));
++			exit(0);
++			break;
++		default:
++			fprintf(stderr, _("See README for usage info\n"));
++			exit(1);
++		}
++	}
++	if (ac == optind) {
++		fprintf(stderr, _("%s: Kconfig file missing\n"), av[0]);
++		exit(1);
++	}
++	if (default_value == set_unknown) {
++		fprintf(stderr,
++		        _("%s: default value missing. "
++		        "You must use one of: -{d,n,m,y,r}\n"), av[0]);
++		exit(1);
++	}
++	conf_parse(av[optind]);
++	/* debug: zconfdump(stdout); */
++	if (config_file && stat(config_file, &tmpstat)) {
++		fprintf(stderr, _("%s: failed to open %s\n"),
++		        av[0], config_file);
++		exit(1);
++	}
++	if (config_file && conf_read_simple(config_file, S_DEF_USER)) {
++		fprintf(stderr, _("%s: failed to read %s\n"),
++		        av[0], config_file);
++		exit(1);
++	}
++	if (config_file) {
++		printf(_("# configuration is based on '%s'\n"), config_file);
++	}
++	/* generate the config */
++	do {
++		conf_cnt = 0;
++		check_conf(&rootmenu);
++	} while (conf_cnt);
++	/* write out the config */
++	if (conf_write(NULL) || conf_write_autoconf()) {
++		fprintf(stderr,
++		        _("%s: error during write of the configuration.\n"),
++		        av[0]);
++		exit(1);
++	}
++	return 0;
++}
+diff --git a/scripts/kconfig/aconf.sh b/scripts/kconfig/aconf.sh
+new file mode 100755
+index 0000000..c46a868
+--- /dev/null
++++ b/scripts/kconfig/aconf.sh
+@@ -0,0 +1,30 @@
++#!/bin/sh
++set -e
++aconf=scripts/kconfig/aconf
++# Find input file
++if [ ! -z $K ]; then
++	config_file="-i $K";
++fi
++
++case "$1" in
++	"allnoconfig")
++		$aconf -n $config_file $2
++		;;
++	"allyesconfig")
++		$aconf -y $config_file $2
++		;;
++	"allmodconfig")
++		$aconf -m $config_file $2
++		;;
++	"alldefconfig")
++		$aconf -d $config_file $2
++		;;
++	"randconfig")
++		$aconf -r $config_file $2
++		;;
++	*)
++		echo "$0: unknow command $1"
++		exit 1
++	;;
++esac
++
