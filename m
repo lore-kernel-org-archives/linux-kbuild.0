@@ -1,60 +1,99 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from py-out-1112.google.com ([64.233.166.176]:60321 "EHLO
-	py-out-1112.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1758507AbYEAWyy (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 1 May 2008 18:54:54 -0400
-Received: by py-out-1112.google.com with SMTP id u52so1853623pyb.10
-        for <linux-kbuild@vger.kernel.org>; Thu, 01 May 2008 15:54:53 -0700 (PDT)
-Message-ID: <8499950a0805011554p25bc8230l9f3556bf3a1ff15a@mail.gmail.com>
-Date: Thu, 1 May 2008 23:54:53 +0100
-From: "Oleg Verych" <olecom@gmail.com>
-Subject: Re: `sed`ing asm-offsets (Re: gcc 3.4.6 fails to build 2.6.25 due to offsetof() not digestible by gas)
-In-Reply-To: <20080501214219.GA8386@uranus.ravnborg.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+Received: from galactus.symlabs.net ([91.121.6.203]:58614 "EHLO symlabs.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1753634AbYEBA4i (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 1 May 2008 20:56:38 -0400
+Message-ID: <52649.81.193.128.196.1209689622.squirrel@galactus.symlabs.net>
+In-Reply-To: <20080501220747.GV29330@cs181133002.pp.htv.fi>
 References: <16355.213.30.72.21.1209618475.squirrel@galactus.symlabs.net>
-	 <20080501120616.GY29330@cs181133002.pp.htv.fi>
-	 <38941.81.193.128.196.1209654347.squirrel@galactus.symlabs.net>
-	 <20080501163453.GF29330@cs181133002.pp.htv.fi>
-	 <34486.81.193.128.196.1209659903.squirrel@galactus.symlabs.net>
-	 <20080501165333.GG29330@cs181133002.pp.htv.fi>
-	 <33623.81.193.128.196.1209661842.squirrel@galactus.symlabs.net>
-	 <20080501185352.GU24008@flower.upol.cz>
-	 <20080501214219.GA8386@uranus.ravnborg.org>
+    <20080501120616.GY29330@cs181133002.pp.htv.fi>
+    <38941.81.193.128.196.1209654347.squirrel@galactus.symlabs.net>
+    <20080501163453.GF29330@cs181133002.pp.htv.fi>
+    <34486.81.193.128.196.1209659903.squirrel@galactus.symlabs.net>
+    <20080501165333.GG29330@cs181133002.pp.htv.fi>
+    <33623.81.193.128.196.1209661842.squirrel@galactus.symlabs.net>
+    <20080501191714.GM29330@cs181133002.pp.htv.fi>
+    <20080501213952.GA8281@uranus.ravnborg.org>
+    <20080501220747.GV29330@cs181133002.pp.htv.fi>
+Date: Fri, 2 May 2008 02:53:42 +0200 (CEST)
+Subject: Re: gcc 3.4.6 fails to build 2.6.25 due to offsetof() not
+     digestible by gas
+From: sampo@symlabs.com
+Reply-To: sampo@symlabs.com
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Sam Ravnborg (kbuild list)" <linux-kbuild@vger.kernel.org>
+To: Adrian Bunk <bunk@kernel.org>
+Cc: Sam Ravnborg <sam@ravnborg.org>, sampo@symlabs.com, linux-kbuild@vger.kernel.org
 
-> >   sed -ne "/^->/{s:^->\([^ ]*\) [\$$#]*\([^ ]*\) \(.*\):#define \1 \2 /*
-> > \3 */:; s:->::; p;}" < asm-offsets.s
-[]
->  >  Can you come up with a _minimal_ fix that makes it compatible with
->  >  busy-box AND GNU sed?
+Adrian Bunk wrote:
+> On Thu, May 01, 2008 at 11:39:52PM +0200, Sam Ravnborg wrote:
+>>
+>> Do we know why it picked up the busy box version?
+
+I think it has to do with my /bin/sh being the busybox ash. It seems
+the ash prefers its built-in version over the one in path. This is
+probably due to me having compiled busybox with some option. Sorry
+for the confusion.
+
+If I edit linux/Kbuild to reference explicitly /usr/bin/sed (which
+is the gnu sed), the compile proceeds ok up to a point where
+following happens
+
+(snip)
+make -f scripts/Makefile.build obj=arch/x86/vdso
+  gcc -Wp,-MD,arch/x86/vdso/vdso32/.int80.o.d  -nostdinc -isystem
+/apps/gcc/3.4.6/lib/gcc/i686-pc-linux-gnu/3.4.6/include -D__KERNEL__
+-Iinclude  -include include/linux/autoconf.h -D__ASSEMBLY__ -m32
+-DCONFIG_AS_CFI=1 -DCONFIG_AS_CFI_SIGNAL_FRAME=1
+-Iinclude/asm-x86/mach-default     -c -o arch/x86/vdso/vdso32/int80.o
+arch/x86/vdso/vdso32/int80.S
+arch/x86/vdso/vdso32/int80.S: Assembler messages:
+arch/x86/vdso/vdso32/int80.S:68: Fatal error: cannot write to output file
+make[1]: *** [arch/x86/vdso/vdso32/int80.o] Error 1
+make: *** [arch/x86/vdso] Error 2
+
+Here the problem appears to be that -c is supplied but there is no
+source file to compile. The error message certainly is not
+helpful. I'll investigate further.
+
+>> Because from the commandline it was the correct sed - and I do not
+>> know that make should do different.
+
+Busybox ash compiled with certain options is the culprit for
+this one.
+
+> Good point.
 >
->  Script works in GNU and busybox sed, except that "$#" thing.
->  Let's wait for `set -x` feedback.
+> No, and we might actually have two issues:
+> - what happened with the PATH (Sampo, is it really PATH or do you use an
+>                                alias?)
+> - we must somehow handle non-GNU sed's (either change the code or error)
 
-Unreadable for humans `sed` can be as short as this:
+I would wish at least busybox sed be accommodated. Looking at the
+sed expression, it seems unnecessarily complicated. I'll try to formulate
+a simpler expression that accomplishes the same net result, namely
+transforming
 
-[busybox] sed '/#def/s-.[$#]- -gp;d'
+  ->IA32_SIGCONTEXT_ax $44 offsetof(struct sigcontext, ax)
 
-or without "-fverbose-asm" (i.e. #comments after instruction) even like this
+to
 
-olecom@flower:/tmp/blinux$ busybox sed '/#def/s [$]  p;d'
-arch/x86/kernel/asm-offsets.s
-+ busybox sed '/#def/s [$]  p;d' arch/x86/kernel/asm-offsets.s
-#define tsk_state 0 /*offsetof(struct task_struct, state)*/
-#define tsk_flags 20 /*offsetof(struct task_struct, flags)*/
-#define tsk_pid 328 /*offsetof(struct task_struct, pid)*/
-olecom@flower:/tmp/blinux$
+  #define IA32_SIGCONTEXT_ax 44 /* offsetof(struct sigcontext, ax) # */
 
-The only thing to change is (unreadable) #define in asm-offsets.c:
+It can't be as difficult as
 
-#define DEFINE(sym, val) \
-        asm volatile("\n#define " #sym " %0 /*" #val "*/": : "i" (val))
+  "/^->/{s:^->\([^ ]*\) [\$$#]*\([^ ]*\) \(.*\):#define \1 \2 /* \3 */:;
+s:->::; p;}"
 
-(BLANK also, but it's a phony load)
-_____
+Cheers,
+--Sampo
+
+>> 	Sam
+>
+> cu
+> Adrian
+
+
