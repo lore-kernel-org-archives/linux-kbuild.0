@@ -1,29 +1,40 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pasmtpa.tele.dk ([80.160.77.114]:36050 "EHLO pasmtpA.tele.dk"
+Received: from pasmtpa.tele.dk ([80.160.77.114]:36572 "EHLO pasmtpA.tele.dk"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S934183AbYEBUq4 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 2 May 2008 16:46:56 -0400
-Date: Fri, 2 May 2008 22:47:29 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: kconfig frontend updates
-Message-ID: <20080502204729.GA6534@uranus.ravnborg.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+	id S936026AbYEBUso (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 2 May 2008 16:48:44 -0400
+From: sam@ravnborg.org
+Subject: [PATCH] kconfig: .gitignore aconf
+Date: Fri,  2 May 2008 22:49:17 +0200
+Message-Id: <1209761358-6579-4-git-send-email-sam@ravnborg.org>
+In-Reply-To: <1209761358-6579-3-git-send-email-sam@ravnborg.org>
+References: <20080502204729.GA6534@uranus.ravnborg.org>
+ <1209761358-6579-1-git-send-email-sam@ravnborg.org>
+ <1209761358-6579-2-git-send-email-sam@ravnborg.org>
+ <1209761358-6579-3-git-send-email-sam@ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Roman Zippel <zippel@linux-m68k.org>
+To: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+Cc: Sam Ravnborg <sam@uranus.ravnborg.org>
 
-The following patchset implments the following:
+From: Sam Ravnborg <sam@uranus.ravnborg.org>
 
-o Inputfiles to all*config can be specified with K=
-o less chatty oldconfig mode
-o Drop useless warnings
+---
+ scripts/kconfig/.gitignore |    1 +
+ 1 files changed, 1 insertions(+), 0 deletions(-)
 
-This is work-in-progress aimed for next mergewindow.
-Posted here mainly to get some feedback and a
-bit of review.
+diff --git a/scripts/kconfig/.gitignore b/scripts/kconfig/.gitignore
+index b49584c..ae664f9 100644
+--- a/scripts/kconfig/.gitignore
++++ b/scripts/kconfig/.gitignore
+@@ -13,6 +13,7 @@ lkc_defs.h
+ # configuration programs
+ #
+ conf
++aconf
+ mconf
+ qconf
+ gconf
+-- 
+1.5.4.1.143.ge7e51
 
-Patches follows to lkml + kbuild lists
-
-	Sam
