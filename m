@@ -1,83 +1,74 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp6.pp.htv.fi ([213.243.153.40]:48700 "EHLO smtp6.pp.htv.fi"
+Received: from smtp4.pp.htv.fi ([213.243.153.38]:57427 "EHLO smtp4.pp.htv.fi"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752012AbYEDICh (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 4 May 2008 04:02:37 -0400
-Date: Sun, 4 May 2008 11:01:37 +0300
+	id S1751231AbYEDIMp (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 4 May 2008 04:12:45 -0400
+Date: Sun, 4 May 2008 11:11:45 +0300
 From: Adrian Bunk <bunk@kernel.org>
-Subject: Re: [2.6 patch] kconfig-language.txt: remove bogus hint
-Message-ID: <20080504080137.GF5838@cs181133002.pp.htv.fi>
-References: <20080503231535.GY5838@cs181133002.pp.htv.fi> <20080504061741.GA14784@uranus.ravnborg.org>
+Subject: Re: kconfig - a suggestion how to fix the select issue
+Message-ID: <20080504081145.GG5838@cs181133002.pp.htv.fi>
+References: <20080504071041.GA15315@uranus.ravnborg.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20080504061741.GA14784@uranus.ravnborg.org>
+In-Reply-To: <20080504071041.GA15315@uranus.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Sam Ravnborg <sam@ravnborg.org>
-Cc: Randy Dunlap <randy.dunlap@oracle.com>, linux-kbuild@vger.kernel.org
+Cc: Roman Zippel <zippel@linux-m68k.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
 
-On Sun, May 04, 2008 at 08:17:41AM +0200, Sam Ravnborg wrote:
-> On Sun, May 04, 2008 at 02:15:35AM +0300, Adrian Bunk wrote:
-> > This kconfig construct described here is required in a different and 
-> > much more complicated situation.
-> Please elaborate...
+On Sun, May 04, 2008 at 09:10:41AM +0200, Sam Ravnborg wrote:
+>...
+> 
+> config A
+>         bool "a"
+> 
+> config B
+>         bool "b"
+>         depends on A
+> 
+> config C
+>         bool "c"
+>         require B
+> 
+> The require dependency will have impact on visibility.
+> C shall only be visible if all symbols it require are
+> visible. Note that visible does not imply 'chosen'.
+> In this case C would be visible when A is chosen.
+> 
+> When the user then choose C and B is not chosen 
+> then the user is prompted to choose B.
+> 
+> So user has to chose B in order to have C chosen.
+>...
+> Comments?
 
-In the hint C is described as a tristate.
 
-But you need this idiom only when A is a tristate and C is a bool.
+Given:
 
-Understanding when to apply this idiom requiers an understanding that we 
-use bool for two quite different cases:
-- non-modular driver and
-- enable feature in driver,
-and the semantics bool's have in kconfig (e.g. select has the 
-semantics for the former case and dependencies have the semantics
-for the latter case, which does not sound logical but seems to actually 
-cover most use cases).
+config A
+	tristate "a"
+
+config B
+	tristate "b"
+	depends on A
+
+config C
+	bool "c"
+	require B
+
+CONFIG_A=m
+
+
+Will C be visible?
+
+
+The underlying problem is that we use bool for two different cases:
+- non-modular driver (answer would be "no")
+- enable feature in driver (answer would be "depends on the value of D")
+
 
 > 	Sam
-> 
-> > 
-> > For the use case the hint claimed it would be a simple dependency is 
-> > enough.
-> > 
-> > Signed-off-by: Adrian Bunk <bunk@kernel.org>
-> > 
-> > ---
-> > 8e3fd4a5e77c9cd1b52989cd72e984b47ad426b4 diff --git a/Documentation/kbuild/kconfig-language.txt b/Documentation/kbuild/kconfig-language.txt
-> > index 00b950d..c412c24 100644
-> > --- a/Documentation/kbuild/kconfig-language.txt
-> > +++ b/Documentation/kbuild/kconfig-language.txt
-> > @@ -377,27 +377,3 @@ config FOO
-> >  
-> >  limits FOO to module (=m) or disabled (=n).
-> >  
-> > -
-> > -Build limited by a third config symbol which may be =y or =m
-> > -~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> > -A common idiom that we see (and sometimes have problems with) is this:
-> > -
-> > -When option C in B (module or subsystem) uses interfaces from A (module
-> > -or subsystem), and both A and B are tristate (could be =y or =m if they
-> > -were independent of each other, but they aren't), then we need to limit
-> > -C such that it cannot be built statically if A is built as a loadable
-> > -module.  (C already depends on B, so there is no dependency issue to
-> > -take care of here.)
-> > -
-> > -If A is linked statically into the kernel image, C can be built
-> > -statically or as loadable module(s).  However, if A is built as loadable
-> > -module(s), then C must be restricted to loadable module(s) also.  This
-> > -can be expressed in kconfig language as:
-> > -
-> > -config C
-> > -	depends on A = y || A = B
-> > -
-> > -or for real examples, use this command in a kernel tree:
-> > -
-> > -$ find . -name Kconfig\* | xargs grep -ns "depends on.*=.*||.*=" | grep -v orig
-> > -
-> > 
 
 cu
 Adrian
