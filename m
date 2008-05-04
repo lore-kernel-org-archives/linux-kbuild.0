@@ -1,76 +1,144 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from brmea-mail-3.Sun.COM ([192.18.98.34]:39889 "EHLO
-	brmea-mail-3.sun.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751077AbYEDNFj (ORCPT
+Received: from barikada.upol.cz ([158.194.242.200]:60885 "EHLO
+	barikada.upol.cz" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751049AbYEDOkc (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 4 May 2008 09:05:39 -0400
-Date: Sun, 04 May 2008 08:55:12 -0400
-From: David Collier-Brown <davecb@sun.com>
+	Sun, 4 May 2008 10:40:32 -0400
+Date: Sun, 4 May 2008 17:01:30 +0200
 Subject: Re: kconfig - a suggestion how to fix the select issue
-In-reply-to: <20080504071041.GA15315@uranus.ravnborg.org>
-Reply-to: davecb@sun.com
-Message-id: <481DB230.30907@sun.com>
-MIME-version: 1.0
-Content-type: text/plain; format=flowed; charset=us-ascii
-Content-transfer-encoding: 7BIT
-References: <20080504071041.GA15315@uranus.ravnborg.org>
+Message-ID: <20080504150130.GB24008@flower.upol.cz>
+References: <20080504071041.GA15315@uranus.ravnborg.org> <481DB230.30907@sun.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <481DB230.30907@sun.com>
+From: Oleg Verych <olecom@flower.upol.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: Roman Zippel <zippel@linux-m68k.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
+To: David Collier-Brown <davecb@sun.com>
+Cc: Sam Ravnborg <sam@ravnborg.org>, Roman Zippel <zippel@linux-m68k.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
 
-Sam Ravnborg wrote:
-[Snipped]
-> The suggestion is to introduce a "require" term used
-> like this:
-> 
-> config A
->         bool "a"
-> 
-> config B
->         bool "b"
->         depends on A
-> 
-> config C
->         bool "c"
->         require B
-> 
-> The require dependency will have impact on visibility.
-> C shall only be visible if all symbols it require are
-> visible. Note that visible does not imply 'chosen'.
-> In this case C would be visible when A is chosen.
-> 
-> When the user then choose C and B is not chosen 
-> then the user is prompted to choose B.
-> 
-> So user has to chose B in order to have C chosen.
-> 
-> This would make it visible for the user that choosing
-> a camera had the side-effect that USB had to be enabled too.
-> But if we have some general option that prevents the
-> visibility of USB we would not be offered the camara
-> in the first place
+David Collier-Brown @ Sun, May 04, 2008 at 08:55:12AM -0400:
+[]
+> I speculate that having two ways to express a dependency,
+> and the addtition of visibility control makes the
+> dependency tree-walk into a problem which is no longer
+> solvable in trivial logic. That in turn makes my head
+> explode (;-))
 
-In the example you suggest, the user would not see the
-option of choosing the camera at C unless they selected
-USB at A, and would wonder where the camera disappeared
-to...
+In short:
+mixing all together and applying resolving and UI heuristics on top.
 
-I speculate that having two ways to express a dependency,
-and the addtition of visibility control makes the
-dependency tree-walk into a problem which is no longer
-solvable in trivial logic. That in turn makes my head 
-explode (;-))
+> I wonder if one could simplify back into a flat set of
+> selections without visibility rules and a backwards-
+> chaining "you need to select these too" message emitter,
+> and if that would be worthwhile.
 
-I wonder if one could simplify back into a flat set of
-selections without visibility rules and a backwards-
-chaining "you need to select these too" message emitter,
-and if that would be worthwhile.
+No need to hide anything and invent complexity. Flexible and
+human-friendly interface. (Batch things like def_condig are done by
+humans, randconfig -- useless if there's no heuristics, allyes - simple.)
 
---dave (who used to do formal logics) c-b
--- 
-David Collier-Brown            | Always do right. This will gratify
-Sun Microsystems, Toronto      | some people and astonish the rest
-davecb@sun.com                 |                      -- Mark Twain
-(905) 943-1983, cell: (647) 833-9377, (800) 555-9786 x56583
-bridge: (877) 385-4099 code: 506 9191#
+Just UI part for now. Automation of selection can be applied only, after
+one can see whole picture. Say, you have [ UCcamers ] which depends on
+USB, Video, etc.
+
++-- Navigation ---------------------------------------------------+
+|  ...            [ arch     ]      [ atm ]     [ w-less speaker] |
+|  [ kernel ] --> [ drivers  ]  --> [ fun ] --> [ camerass      ] |
+|  [ klibc  ]     [ file sys ]      [ mtd ]     [ manual DMA    ] |
+|  ...            ...               ...         ...               |
++-----------------------------------------------------------------+
++--     needs     ------+  +-- configure -----+  +--  options  ---+
+| ++Universal S bus++++ |  |  ...             |  | build: y [m] n |
+| --Video capture---    |<-+-[* UCcamera    ]-+->| RGB support y  |
+| --sysfs kernel for u- |  |  * LPTcamera     |  | YUV support y  |
+|                       |  |  * RS232camera   |  | HSB support y  |
++-----------------------+  +------------------+  +----------------+
++-- command line/text editor -- olecom@kit[configure] ------------+
+$ build = m \n
+$ go <
+
++--  walk tags  ---------+ +------------- Description ------------+
+| intro, kernel, drivers,| | USB camera with foo bar features     |
+| fun, [camerass]        | | with dual-core toaster and coffee    |
+|                        | | machine inside                       |
+|                        | |                                      |
+|                        | | Options:                             |
+|                        | | * RGB enables RGB                    |
+|                        | | ....                                 |
++------------------------+ +--------------------------------------+
+
+So, after 'go <' command (visually or command-lineually) we will be in
+[--Video capture--] which isn't configured/enabled yet (due to --)
+
+Now,
+
++-- Navigation ---------------------------------------------------+
+|  ...            [ arch     ]      [ atm ]     [ w-less speaker] |
+|  [ kernel ] --> [ drivers  ]  --> [*fun*] --> [ camerass      ] |
+|  [ klibc  ]     [ file sys ]      [ mtd ]     [ manual DMA    ] |
+|  ...            ...               ...         ...               |
++-----------------------------------------------------------------+
++--     needs     ------+  +-- configure -----+  +--  options  ---+
+| ++Universal S bus++++ |  |  ...             |  | build: y [m] n |
+| [-Video capture--]    |<-+-[* UCcamera    ]-+->| RGB support y  |
+| --sysfs kernel for u- |  |  * LPTcamera     |  | YUV support y  |
+|                       |  |  * RS232camera   |  | HSB support y  |
++-----------------------+  +------------------+  +----------------+
++-- command line/text editor -- olecom@kit[ needs   ] ------------+
+$ build = m \n
+$ go < \n
+$ we are here, hitting enter on needs/video
++--  walk tags  ---------+ +------------- Description ------------+
+| intro, kernel, drivers,| | Video processing for everyone        |
+| fun, cameras, [videoP] | | all is supported all works with no   |
+|                        | | OOP and shaman drums                 |
+|                        | |                                      |
+|                        | | Inside MMA:                          |
+|                        | | * conf: DEBUG                        |
+|                        | | * build: chip1...                    |
++------------------------+ +--------------------------------------+
+
+we will have:
+
++-- Navigation ---------------------------------------------------+
+|  [ arch     ]    [ mtd   ]    [ radio ]    [ bt8xx    ]         |
+|  [ drivers  ] -> [ media ] -> [*video*] -> [ cpia2    ]         |
+|  [ file sys ]    [ ps3   ]    [ common]    [ usbvideo ]         |
+|  ...            ...               ...         ...               |
++-----------------------------------------------------------------+
++--     needs     ------+  +-- configure -----+  +--  options  ---+
+| --V4L1--              |  |  ...             |  | menu:          |
+| --V4L2--              |<-+-[*Video capture]-+->| * DEBUG_FOO    |
+| --V4W7--              |  |  * Video decode  |  | * bt8xx        |
+|                       |  |  * Video improve |  | ...            |
++-----------------------+  +------------------+  +----------------+
++-- command line/text editor -- olecom@kit[configure] ------------+
+$ go < \n
+$ we are here, hitting enter on needs/video
+$
++--  walk tags  ---------+ +------------- Description ------------+
+| intro, kernel, drivers,| | Video processing for everyone        |
+| fun, cameras, [video]  | | all is supported all works with no   |
+|                        | | OOP and shaman drums                 |
+|                        | |                                      |
+|                        | | Inside MMA:                          |
+|                        | | * this is menu                       |
+|                        | |                                      |
++------------------------+ +--------------------------------------+
+
+== [ rant ] ==
+
+Can some of those PS3 or KDE teams design proper "Konfigure Linux"
+game for kernel hackers? I try to do this with TERM=linux, `sh`, and
+`sed`. Patching paper work isn't for such tasks.
+
+On collecting CONFIG_ info by gcc in sources, thus generating symbol
+dependency automatically, was told to shut up. Let's see what will
+happen next. Don't forget to use cultural skills, imagination and
+creativity.
+--
+sed 'sed && sh + olecom = love' << ''
+-o--=O`C
+ #oo'L O
+<___=E M
