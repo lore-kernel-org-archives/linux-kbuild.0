@@ -1,62 +1,40 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from enyo.dsw2k3.info ([195.71.86.239]:46474 "EHLO enyo.dsw2k3.info"
+Received: from pasmtpa.tele.dk ([80.160.77.114]:35780 "EHLO pasmtpA.tele.dk"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750950AbYEDS0a (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 4 May 2008 14:26:30 -0400
-Date: Sun, 4 May 2008 19:59:13 +0200
-From: Matthias Schniedermeyer <ms@citd.de>
-Subject: Re: kconfig - a suggestion how to fix the select issue
-Message-ID: <20080504175913.GA28072@citd.de>
-References: <20080504071041.GA15315@uranus.ravnborg.org> <1209895922.4114.21.camel@gimli.at.home>
-MIME-Version: 1.0
+	id S1753913AbYEDS5F (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 4 May 2008 14:57:05 -0400
+Date: Sun, 4 May 2008 20:57:37 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: kconfig frontend updates
+Message-ID: <20080504185737.GA23063@uranus.ravnborg.org>
+References: <20080502204729.GA6534@uranus.ravnborg.org>
+Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1209895922.4114.21.camel@gimli.at.home>
+In-Reply-To: <20080502204729.GA6534@uranus.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Bernd Petrovitsch <bernd@firmix.at>
-Cc: Sam Ravnborg <sam@ravnborg.org>, Roman Zippel <zippel@linux-m68k.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
+To: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Roman Zippel <zippel@linux-m68k.org>
 
-On 04.05.2008 12:12, Bernd Petrovitsch wrote:
-> On Sun, 2008-05-04 at 09:10 +0200, Sam Ravnborg wrote:
-> > Today we have two ways to express/solve dependencies.
-> > 
-> > Top-down we have "depends on"
-> > and bottom up we have "select".
-> > 
-> > The "depends on" dependencies at the same
-> > time impact the visibility of a symbol.
-> > A symbol with "depends on" not satisfied are not
-> > visible and thus not shown in menuconfig.
+On Fri, May 02, 2008 at 10:47:29PM +0200, Sam Ravnborg wrote:
+> The following patchset implments the following:
 > 
-> Perhaps this is problem: The menu item shouldn't be selectable for sure
-> but it may well be visible (and I'm purposely ignoring details of "how
-> to grey out" for the different user interfaces).
-> If it's visible (but not selectable) the user interface can provide the
-> auto-generated requirements (derived from the "depends on" chains) as
-> part of the "help" or where ever it seems useful. And the user at least
-> knows where to look further.
+> o Inputfiles to all*config can be specified with K=
+> o less chatty oldconfig mode
+> o Drop useless warnings
+> 
+> This is work-in-progress aimed for next mergewindow.
+> Posted here mainly to get some feedback and a
+> bit of review.
 
-I always wondered why there is no "grey out", at least optionaly.
+New set of patches (2) will follow.
+The warning "trying to assign nonexistent symbol" remains for now.
+I do not want to mix the two things.
 
-My "favourite"(tm) example of a sub-marine is: Wireless drivers (mac80211).
+The patches are also pushed to kbuild.git so they
+will appear in -next and -mm.
+Let's see how many scripts will break due to this ;-)
 
-The config-option to switch on the visibility of the mac80211 drivers 
-("CONFIG_MAC80211") is conveniently located on the other side of the 
-milky way.
-(3 menus down, a sitestep and 2 up again. At least in menuconfig)
+Comments /testing welcome.
 
-
-
-
-
-
-
-Bis denn
-
--- 
-Real Programmers consider "what you see is what you get" to be just as 
-bad a concept in Text Editors as it is in women. No, the Real Programmer
-wants a "you asked for it, you got it" text editor -- complicated, 
-cryptic, powerful, unforgiving, dangerous.
-
+	Sam
