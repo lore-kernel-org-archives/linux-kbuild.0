@@ -1,120 +1,91 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pasmtpb.tele.dk ([80.160.77.98]:51284 "EHLO pasmtpB.tele.dk"
+Received: from smtp6.pp.htv.fi ([213.243.153.40]:48700 "EHLO smtp6.pp.htv.fi"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754333AbYEDHKG (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 4 May 2008 03:10:06 -0400
-Date: Sun, 4 May 2008 09:10:41 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: kconfig - a suggestion how to fix the select issue
-Message-ID: <20080504071041.GA15315@uranus.ravnborg.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+	id S1752012AbYEDICh (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 4 May 2008 04:02:37 -0400
+Date: Sun, 4 May 2008 11:01:37 +0300
+From: Adrian Bunk <bunk@kernel.org>
+Subject: Re: [2.6 patch] kconfig-language.txt: remove bogus hint
+Message-ID: <20080504080137.GF5838@cs181133002.pp.htv.fi>
+References: <20080503231535.GY5838@cs181133002.pp.htv.fi> <20080504061741.GA14784@uranus.ravnborg.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
+In-Reply-To: <20080504061741.GA14784@uranus.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Roman Zippel <zippel@linux-m68k.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: Randy Dunlap <randy.dunlap@oracle.com>, linux-kbuild@vger.kernel.org
 
-Today we have two ways to express/solve dependencies.
+On Sun, May 04, 2008 at 08:17:41AM +0200, Sam Ravnborg wrote:
+> On Sun, May 04, 2008 at 02:15:35AM +0300, Adrian Bunk wrote:
+> > This kconfig construct described here is required in a different and 
+> > much more complicated situation.
+> Please elaborate...
 
-Top-down we have "depends on"
-and bottom up we have "select".
+In the hint C is described as a tristate.
 
-The "depends on" dependencies at the same
-time impact the visibility of a symbol.
-A symbol with "depends on" not satisfied are not
-visible and thus not shown in menuconfig.
+But you need this idiom only when A is a tristate and C is a bool.
 
-The "select" method is a way to forcefully
-set the selected symbol to the same value
-as the one where the select are stated.
+Understanding when to apply this idiom requiers an understanding that we 
+use bool for two quite different cases:
+- non-modular driver and
+- enable feature in driver,
+and the semantics bool's have in kconfig (e.g. select has the 
+semantics for the former case and dependencies have the semantics
+for the latter case, which does not sound logical but seems to actually 
+cover most use cases).
 
-But this has shortcoming in relation to the
-interface we like to present to the user.
+> 	Sam
+> 
+> > 
+> > For the use case the hint claimed it would be a simple dependency is 
+> > enough.
+> > 
+> > Signed-off-by: Adrian Bunk <bunk@kernel.org>
+> > 
+> > ---
+> > 8e3fd4a5e77c9cd1b52989cd72e984b47ad426b4 diff --git a/Documentation/kbuild/kconfig-language.txt b/Documentation/kbuild/kconfig-language.txt
+> > index 00b950d..c412c24 100644
+> > --- a/Documentation/kbuild/kconfig-language.txt
+> > +++ b/Documentation/kbuild/kconfig-language.txt
+> > @@ -377,27 +377,3 @@ config FOO
+> >  
+> >  limits FOO to module (=m) or disabled (=n).
+> >  
+> > -
+> > -Build limited by a third config symbol which may be =y or =m
+> > -~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> > -A common idiom that we see (and sometimes have problems with) is this:
+> > -
+> > -When option C in B (module or subsystem) uses interfaces from A (module
+> > -or subsystem), and both A and B are tristate (could be =y or =m if they
+> > -were independent of each other, but they aren't), then we need to limit
+> > -C such that it cannot be built statically if A is built as a loadable
+> > -module.  (C already depends on B, so there is no dependency issue to
+> > -take care of here.)
+> > -
+> > -If A is linked statically into the kernel image, C can be built
+> > -statically or as loadable module(s).  However, if A is built as loadable
+> > -module(s), then C must be restricted to loadable module(s) also.  This
+> > -can be expressed in kconfig language as:
+> > -
+> > -config C
+> > -	depends on A = y || A = B
+> > -
+> > -or for real examples, use this command in a kernel tree:
+> > -
+> > -$ find . -name Kconfig\* | xargs grep -ns "depends on.*=.*||.*=" | grep -v orig
+> > -
+> > 
 
-Consider following example:
+cu
+Adrian
 
-config A
-	bool "a"
+-- 
 
-config B
-	bool "b"
-	depends on A
-
-config C
-	bool "c"
-	depends on B
-
-To be able to chose 'C' I have to chose
-A and then B before I am even offered 
-the possibility to chose 'C'.
-And this is often less than obvious. C could
-be a device that uses either USB or firewire
-and I could not care less.
-
-The usual way to solve this is to introduce
-use of select like this:
-
-config A
-	bool "a"
-
-config B
-	bool "b"
-	depends on A
-
-config C
-	bool "c"
-	select B     <= use of select
-
-With this change we have increased visibility
-of C so it is shown in menuconfig.
-But if we chose 'C' then we implicitly set
-B='y' too but ignore the dependency of 'A' so
-we end up with a configuration where:
-A='n'
-B='y'
-C='y'
-which is not what we wanted. As B depends on A we should
-never see B equals 'y' when A equals 'n'.
-
-The solution is not to let "select follow dependencies"
-as the dependency on B could be complex (A || FOO).
-Because we would not know if we should enable A or FOO.
-
-So we need some other way to say the C require B.
-
-The suggestion is to introduce a "require" term used
-like this:
-
-config A
-        bool "a"
-
-config B
-        bool "b"
-        depends on A
-
-config C
-        bool "c"
-        require B
-
-The require dependency will have impact on visibility.
-C shall only be visible if all symbols it require are
-visible. Note that visible does not imply 'chosen'.
-In this case C would be visible when A is chosen.
-
-When the user then choose C and B is not chosen 
-then the user is prompted to choose B.
-
-So user has to chose B in order to have C chosen.
-
-This would make it visible for the user that choosing
-a camera had the side-effect that USB had to be enabled too.
-But if we have some general option that prevents the
-visibility of USB we would not be offered the camara
-in the first place
-
-Comments?
-
-	Sam
-
-
+       "Is there not promise of rain?" Ling Tan asked suddenly out
+        of the darkness. There had been need of rain for many days.
+       "Only a promise," Lao Er said.
+                                       Pearl S. Buck - Dragon Seed
 
