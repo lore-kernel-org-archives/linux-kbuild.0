@@ -1,62 +1,129 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ns.firmix.at ([62.141.48.66]:4613 "EHLO ns.firmix.at"
+Received: from pasmtpa.tele.dk ([80.160.77.114]:45824 "EHLO pasmtpA.tele.dk"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754760AbYEDKMc (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 4 May 2008 06:12:32 -0400
-Received: from ns.firmix.at (localhost [127.0.0.1])
-	by ns.firmix.at (8.14.1/8.14.1) with ESMTP id m44ACDUZ011156
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-SHA bits=256 verify=NO)
-	for <linux-kbuild@vger.kernel.org>; Sun, 4 May 2008 12:12:22 +0200
-Received: (from defang@localhost)
-	by ns.firmix.at (8.14.1/8.14.1/Submit) id m44AC9K9011145
-	for <linux-kbuild@vger.kernel.org>; Sun, 4 May 2008 12:12:09 +0200
+	id S1754551AbYEDKiO (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 4 May 2008 06:38:14 -0400
+Date: Sun, 4 May 2008 12:38:48 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
 Subject: Re: kconfig - a suggestion how to fix the select issue
-From: Bernd Petrovitsch <bernd@firmix.at>
-In-Reply-To: <20080504071041.GA15315@uranus.ravnborg.org>
-References: <20080504071041.GA15315@uranus.ravnborg.org>
-Content-Type: text/plain
-Date: Sun, 04 May 2008 12:12:02 +0200
-Message-Id: <1209895922.4114.21.camel@gimli.at.home>
+Message-ID: <20080504103848.GC17276@uranus.ravnborg.org>
+References: <20080504071041.GA15315@uranus.ravnborg.org> <20080504081145.GG5838@cs181133002.pp.htv.fi> <20080504082732.GB17276@uranus.ravnborg.org> <20080504090429.GH5838@cs181133002.pp.htv.fi>
 Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <20080504090429.GH5838@cs181133002.pp.htv.fi>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
+To: Adrian Bunk <bunk@kernel.org>
 Cc: Roman Zippel <zippel@linux-m68k.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
 
-On Sun, 2008-05-04 at 09:10 +0200, Sam Ravnborg wrote:
-> Today we have two ways to express/solve dependencies.
+On Sun, May 04, 2008 at 12:04:29PM +0300, Adrian Bunk wrote:
+> On Sun, May 04, 2008 at 10:27:32AM +0200, Sam Ravnborg wrote:
+> > On Sun, May 04, 2008 at 11:11:45AM +0300, Adrian Bunk wrote:
+> > > On Sun, May 04, 2008 at 09:10:41AM +0200, Sam Ravnborg wrote:
+> > > >...
+> > > > 
+> > > > config A
+> > > >         bool "a"
+> > > > 
+> > > > config B
+> > > >         bool "b"
+> > > >         depends on A
+> > > > 
+> > > > config C
+> > > >         bool "c"
+> > > >         require B
+> > > > 
+> > > > The require dependency will have impact on visibility.
+> > > > C shall only be visible if all symbols it require are
+> > > > visible. Note that visible does not imply 'chosen'.
+> > > > In this case C would be visible when A is chosen.
+> > > > 
+> > > > When the user then choose C and B is not chosen 
+> > > > then the user is prompted to choose B.
+> > > > 
+> > > > So user has to chose B in order to have C chosen.
+> > > >...
+> > > > Comments?
+> > > 
+> > > 
+> > > Given:
+> > > 
+> > > config A
+> > > 	tristate "a"
+> > > 
+> > > config B
+> > > 	tristate "b"
+> > > 	depends on A
+> > > 
+> > > config C
+> > > 	bool "c"
+> > > 	require B
+> > > 
+> > > CONFIG_A=m
+> > > 
+> > > 
+> > > Will C be visible?
+> > If you followed my description then you would see
+> > that the visibility of C are determineded by the dependencies
+> > of C (none in this case) and the dependencies of the symbol
+> > it requires. In this case B. B dpens on A and A equals m so B is
+> > visible thus C is visible.
 > 
-> Top-down we have "depends on"
-> and bottom up we have "select".
+> *shudder*
+So let me explain it with some other words:
+B is visible because A=m
+C is visible because B is visible.
+Simple.
+
 > 
-> The "depends on" dependencies at the same
-> time impact the visibility of a symbol.
-> A symbol with "depends on" not satisfied are not
-> visible and thus not shown in menuconfig.
+> > > The underlying problem is that we use bool for two different cases:
+> > > - non-modular driver (answer would be "no")
+> > > - enable feature in driver (answer would be "depends on the value of D")
+> > Lets try to agree on the semantics with bools first please.
+> > When we have that in place lets extend it to modular - OK?
+> 
+> I doubt the "extension" works this way since most of the interesting 
+> cases are with tristates.
+> 
+> But OK, here's some fun with bools:
+> 
+> config X86
+> 	def_bool y
+> 
+> config A
+> 	bool "a"
+> 
+> config B
+> 	bool "b"
+> 	depends on A
+> 
+> config D
+> 	bool "d"
+> 	depends on !B if X86
+> 
+> config E
+> 	bool "e"
+> 
+> config C
+> 	bool "c"
+> 	depends on D || E
+> 	requires B
+> 
+> Given:
+> - CONFIG_A=y
+> - CONFIG_B=n
+> - CONFIG_D=y
+> - CONFIG_E=n
+> 
+> Will C be visible?
+The above has a syntax error. A 'depends on' cannot have an
+if caluse.
+And I did not get your point either.
 
-Perhaps this is problem: The menu item shouldn't be selectable for sure
-but it may well be visible (and I'm purposely ignoring details of "how
-to grey out" for the different user interfaces).
-If it's visible (but not selectable) the user interface can provide the
-auto-generated requirements (derived from the "depends on" chains) as
-part of the "help" or where ever it seems useful. And the user at least
-knows where to look further.
+Are you trying to say that we cannot improve kconfig to better
+express the dependencies or what is your point?
 
-> The "select" method is a way to forcefully
-> set the selected symbol to the same value
-> as the one where the select are stated.
+Puzzeled...
 
-Which makes sense from the usability point of view for typical library
-functions (e.g. zlib, CRC, ...).
-But that ("which CONFIG_ variables actually selected this CONFIG_
-variable" and/or "which CONFIG_ variables will selected this CONFIG_
-variable") could also be automatically generated and displayed.
-
-	Bernd
--- 
-Firmix Software GmbH                   http://www.firmix.at/
-mobil: +43 664 4416156                 fax: +43 1 7890849-55
-          Embedded Linux Development and Services
-
+	Sam
