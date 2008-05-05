@@ -1,44 +1,162 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pasmtpa.tele.dk ([80.160.77.114]:47211 "EHLO pasmtpA.tele.dk"
+Received: from pasmtpa.tele.dk ([80.160.77.114]:38774 "EHLO pasmtpA.tele.dk"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754602AbYEDTb7 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 4 May 2008 15:31:59 -0400
-Date: Sun, 4 May 2008 21:32:34 +0200
+	id S1752388AbYEETsz (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 5 May 2008 15:48:55 -0400
+Date: Mon, 5 May 2008 21:49:29 +0200
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: kconfig - a suggestion how to fix the select issue
-Message-ID: <20080504193234.GB23846@uranus.ravnborg.org>
-References: <20080504071041.GA15315@uranus.ravnborg.org> <481E0E76.3060900@gmail.com>
+Subject: [PATCH] kconfig: add support for stdin (make K=- ...)
+Message-ID: <20080505194929.GA8868@uranus.ravnborg.org>
+References: <82e4877d0805031742o464dd581wd93173d79705ce0d@mail.gmail.com> <20080504092417.GA3425@elte.hu> <82e4877d0805050814j721ae522k84384df48c9f4336@mail.gmail.com> <20080505171501.GA22332@elte.hu> <20080505182427.GA2025@uranus.ravnborg.org> <ce0170d90805051136w2f016c15p575623d33c220ddf@mail.gmail.com> <20080505184538.GE22332@elte.hu>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <481E0E76.3060900@gmail.com>
+In-Reply-To: <20080505184538.GE22332@elte.hu>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Rene Herman <rene.herman@gmail.com>
-Cc: Roman Zippel <zippel@linux-m68k.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
+To: Ingo Molnar <mingo@elte.hu>
+Cc: Sergio Luis <sergio@uece.br>, Parag Warudkar <parag.warudkar@gmail.com>, LKML <linux-kernel@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, "akpm@osdl.org" <akpm@osdl.org>, Peter Zijlstra <peterz@infradead.org>, Arjan van de Ven <arjan@infradead.org>, Dave Jones <davej@redhat.com>, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-On Sun, May 04, 2008 at 09:28:54PM +0200, Rene Herman wrote:
-> On 04-05-08 09:10, Sam Ravnborg wrote:
+On Mon, May 05, 2008 at 08:45:38PM +0200, Ingo Molnar wrote:
 > 
-> >Today we have two ways to express/solve dependencies.
-> >
-> >Top-down we have "depends on"
-> >and bottom up we have "select".
-> >
-> >The "depends on" dependencies at the same
-> >time impact the visibility of a symbol.
-> >A symbol with "depends on" not satisfied are not
-> >visible and thus not shown in menuconfig.
+> * Sergio Luis <sergio@uece.br> wrote:
 > 
-> I've always really disliked the visibility thing. I believe it's not really 
-> the core issue here but regardless of anything else, could we not "grey 
-> out" non-selectable options with its helpt text still available? That's 
-> much more the standard UI paradigm.
+> > >  In latest kbuild.git I've added a new feature.
+> > >
+> > >         make K=.config alldefconfig
+> > >
+> > >  would give you eaxtly what you request here.
+> > >  K= is used to say where to locate the base-configuration.
+> 
+> > Can I specify /proc/config.gz (gzipped) in the K parameter?
+> > -sergio
+> 
+> i think the 'natural' script behavior would be for this to do the right 
+> thing:
+> 
+>    zcat /proc/config.gz | make K=- alldefconfig
+> 
+> or something like that - so that it can be scripted in a pipe.
 
-Works in xconfig - but last I tried I failed to enable it in menuconfig.
-It should be doable I just failed to see how.
-
-And as my linux time-share for this month is already almost consumed
-I will not find time to look at it :-(
+I like this ;-)
+So I implemented support for stdin - see attached.
+It is also in kbuild.git.
 
 	Sam
+
+commit 95ee7b97051dcc4b61d1dbf626e9b32266cb402d
+Author: Sam Ravnborg <sam@ravnborg.org>
+Date:   Mon May 5 21:44:21 2008 +0200
+
+    kconfig: add support for stdin (make K=- ...)
+    
+    With support for stdin we can now say:
+    
+       zcat /proc/config.gz | make K=- alldefconfig
+    
+    Which will give us a configuration based on the
+    running kernel with all new values set to default.
+    
+    Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
+
+diff --git a/scripts/kconfig/aconf.c b/scripts/kconfig/aconf.c
+index cf05861..54ffd72 100644
+--- a/scripts/kconfig/aconf.c
++++ b/scripts/kconfig/aconf.c
+@@ -248,6 +248,7 @@ static void usage(void)
+ 
+ int main(int ac, char **av)
+ {
++	char *config_filename;
+ 	char *config_file = NULL;
+ 	char *kconfig_file = NULL;
+ 	struct stat tmpstat;
+@@ -287,19 +288,26 @@ int main(int ac, char **av)
+ 	}
+ 	conf_parse(kconfig_file);
+ 	/* debug: zconfdump(stdout); */
+-	if (config_file && stat(config_file, &tmpstat)) {
+-		fprintf(stderr, _("%s: failed to open %s\n"),
+-		        av[0], config_file);
+-		exit(1);
++	if (strcmp(config_file, "-")) {
++		if (config_file && stat(config_file, &tmpstat)) {
++			fprintf(stderr, _("%s: failed to open %s\n"),
++			        av[0], config_file);
++			exit(1);
++		}
++		config_filename = config_file;
++	} else {
++		config_filename = "stdin";
+ 	}
++
+ 	if (config_file && conf_read_simple(config_file, S_DEF_USER)) {
+ 		fprintf(stderr, _("%s: failed to read %s\n"),
+-		        av[0], config_file);
++		        av[0], config_filename);
+ 		exit(1);
+ 	}
+ 	if (config_file) {
+ 		printf("#\n");
+-		printf(_("# configuration is based on '%s'\n"), config_file);
++		printf(_("# configuration is based on '%s'\n"),
++		       config_filename);
+ 	}
+ 	/* generate the config */
+ 	do {
+diff --git a/scripts/kconfig/lex.zconf.c_shipped b/scripts/kconfig/lex.zconf.c_shipped
+index 6a61cee..7bd00d3 100644
+--- a/scripts/kconfig/lex.zconf.c_shipped
++++ b/scripts/kconfig/lex.zconf.c_shipped
+@@ -2268,13 +2268,17 @@ FILE *zconf_fopen(const char *name)
+ 	char *env, fullname[PATH_MAX+1];
+ 	FILE *f;
+ 
+-	f = fopen(name, "r");
+-	if (!f && name != NULL && name[0] != '/') {
+-		env = getenv(SRCTREE);
+-		if (env) {
+-			sprintf(fullname, "%s/%s", env, name);
+-			f = fopen(fullname, "r");
++	if (strcmp(name, "-")) {
++		f = fopen(name, "r");
++		if (!f && name != NULL && name[0] != '/') {
++			env = getenv(SRCTREE);
++			if (env) {
++				sprintf(fullname, "%s/%s", env, name);
++				f = fopen(fullname, "r");
++			}
+ 		}
++	} else {
++		f = stdin;
+ 	}
+ 	return f;
+ }
+diff --git a/scripts/kconfig/zconf.l b/scripts/kconfig/zconf.l
+index 4cea5c8..a268d88 100644
+--- a/scripts/kconfig/zconf.l
++++ b/scripts/kconfig/zconf.l
+@@ -269,13 +269,17 @@ FILE *zconf_fopen(const char *name)
+ 	char *env, fullname[PATH_MAX+1];
+ 	FILE *f;
+ 
+-	f = fopen(name, "r");
+-	if (!f && name != NULL && name[0] != '/') {
+-		env = getenv(SRCTREE);
+-		if (env) {
+-			sprintf(fullname, "%s/%s", env, name);
+-			f = fopen(fullname, "r");
++	if (strcmp(name, "-")) {
++		f = fopen(name, "r");
++		if (!f && name != NULL && name[0] != '/') {
++			env = getenv(SRCTREE);
++			if (env) {
++				sprintf(fullname, "%s/%s", env, name);
++				f = fopen(fullname, "r");
++			}
+ 		}
++	} else {
++		f = stdin;
+ 	}
+ 	return f;
+ }
