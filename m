@@ -1,162 +1,54 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pasmtpa.tele.dk ([80.160.77.114]:38774 "EHLO pasmtpA.tele.dk"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752388AbYEETsz (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 5 May 2008 15:48:55 -0400
-Date: Mon, 5 May 2008 21:49:29 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: [PATCH] kconfig: add support for stdin (make K=- ...)
-Message-ID: <20080505194929.GA8868@uranus.ravnborg.org>
-References: <82e4877d0805031742o464dd581wd93173d79705ce0d@mail.gmail.com> <20080504092417.GA3425@elte.hu> <82e4877d0805050814j721ae522k84384df48c9f4336@mail.gmail.com> <20080505171501.GA22332@elte.hu> <20080505182427.GA2025@uranus.ravnborg.org> <ce0170d90805051136w2f016c15p575623d33c220ddf@mail.gmail.com> <20080505184538.GE22332@elte.hu>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20080505184538.GE22332@elte.hu>
+Received: from linux-m68k.xs4all.nl ([82.95.193.92]:59432 "EHLO
+	scrub.xs4all.nl" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1758166AbYEFDIn (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 5 May 2008 23:08:43 -0400
+Date: Tue, 6 May 2008 05:08:40 +0200 (CEST)
+From: Roman Zippel <zippel@linux-m68k.org>
+Subject: Re: [PATCH 2/2] kconfig: make oldconfig less chatty and clean up
+ conf.c
+In-Reply-To: <20080504185950.GC23063@uranus.ravnborg.org>
+Message-ID: <Pine.LNX.4.64.0805060455590.30555@scrub.home>
+References: <20080502204729.GA6534@uranus.ravnborg.org>
+ <20080504185737.GA23063@uranus.ravnborg.org> <20080504185950.GC23063@uranus.ravnborg.org>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ingo Molnar <mingo@elte.hu>
-Cc: Sergio Luis <sergio@uece.br>, Parag Warudkar <parag.warudkar@gmail.com>, LKML <linux-kernel@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, "akpm@osdl.org" <akpm@osdl.org>, Peter Zijlstra <peterz@infradead.org>, Arjan van de Ven <arjan@infradead.org>, Dave Jones <davej@redhat.com>, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
 
-On Mon, May 05, 2008 at 08:45:38PM +0200, Ingo Molnar wrote:
-> 
-> * Sergio Luis <sergio@uece.br> wrote:
-> 
-> > >  In latest kbuild.git I've added a new feature.
-> > >
-> > >         make K=.config alldefconfig
-> > >
-> > >  would give you eaxtly what you request here.
-> > >  K= is used to say where to locate the base-configuration.
-> 
-> > Can I specify /proc/config.gz (gzipped) in the K parameter?
-> > -sergio
-> 
-> i think the 'natural' script behavior would be for this to do the right 
-> thing:
-> 
->    zcat /proc/config.gz | make K=- alldefconfig
-> 
-> or something like that - so that it can be scripted in a pipe.
+Hi,
 
-I like this ;-)
-So I implemented support for stdin - see attached.
-It is also in kbuild.git.
+On Sun, 4 May 2008, Sam Ravnborg wrote:
 
-	Sam
+> We now check for valid stadin in both cases and this
+> may break a script here and there.
 
-commit 95ee7b97051dcc4b61d1dbf626e9b32266cb402d
-Author: Sam Ravnborg <sam@ravnborg.org>
-Date:   Mon May 5 21:44:21 2008 +0200
+I strongly disagree with this, please preserve the old behaviour. It took 
+a while to work out the current behaviour.
+Only silentoldconfig checks for stdin because it's used as hook during 
+kbuild to verify the config. For all other interactive targets the user 
+has to know what he's doing, e.g. it's valid to do "yes '' | make 
+oldconfig".
 
-    kconfig: add support for stdin (make K=- ...)
-    
-    With support for stdin we can now say:
-    
-       zcat /proc/config.gz | make K=- alldefconfig
-    
-    Which will give us a configuration based on the
-    running kernel with all new values set to default.
-    
-    Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
+> -		switch (input_mode) {
+> -		case set_no:	 name = "allno.config"; break;
+> -		case set_mod:	 name = "allmod.config"; break;
+> -		case set_yes:	 name = "allyes.config"; break;
+> -		case set_random: name = "allrandom.config"; break;
+> -		default: break;
+> -		}
+> -		if (!stat(name, &tmpstat))
+> -			conf_read_simple(name, S_DEF_USER);
+> -		else if (!stat("all.config", &tmpstat))
+> -			conf_read_simple("all.config", S_DEF_USER);
+> -		break;
+> -	default:
+> -		break;
+>  	}
 
-diff --git a/scripts/kconfig/aconf.c b/scripts/kconfig/aconf.c
-index cf05861..54ffd72 100644
---- a/scripts/kconfig/aconf.c
-+++ b/scripts/kconfig/aconf.c
-@@ -248,6 +248,7 @@ static void usage(void)
- 
- int main(int ac, char **av)
- {
-+	char *config_filename;
- 	char *config_file = NULL;
- 	char *kconfig_file = NULL;
- 	struct stat tmpstat;
-@@ -287,19 +288,26 @@ int main(int ac, char **av)
- 	}
- 	conf_parse(kconfig_file);
- 	/* debug: zconfdump(stdout); */
--	if (config_file && stat(config_file, &tmpstat)) {
--		fprintf(stderr, _("%s: failed to open %s\n"),
--		        av[0], config_file);
--		exit(1);
-+	if (strcmp(config_file, "-")) {
-+		if (config_file && stat(config_file, &tmpstat)) {
-+			fprintf(stderr, _("%s: failed to open %s\n"),
-+			        av[0], config_file);
-+			exit(1);
-+		}
-+		config_filename = config_file;
-+	} else {
-+		config_filename = "stdin";
- 	}
-+
- 	if (config_file && conf_read_simple(config_file, S_DEF_USER)) {
- 		fprintf(stderr, _("%s: failed to read %s\n"),
--		        av[0], config_file);
-+		        av[0], config_filename);
- 		exit(1);
- 	}
- 	if (config_file) {
- 		printf("#\n");
--		printf(_("# configuration is based on '%s'\n"), config_file);
-+		printf(_("# configuration is based on '%s'\n"),
-+		       config_filename);
- 	}
- 	/* generate the config */
- 	do {
-diff --git a/scripts/kconfig/lex.zconf.c_shipped b/scripts/kconfig/lex.zconf.c_shipped
-index 6a61cee..7bd00d3 100644
---- a/scripts/kconfig/lex.zconf.c_shipped
-+++ b/scripts/kconfig/lex.zconf.c_shipped
-@@ -2268,13 +2268,17 @@ FILE *zconf_fopen(const char *name)
- 	char *env, fullname[PATH_MAX+1];
- 	FILE *f;
- 
--	f = fopen(name, "r");
--	if (!f && name != NULL && name[0] != '/') {
--		env = getenv(SRCTREE);
--		if (env) {
--			sprintf(fullname, "%s/%s", env, name);
--			f = fopen(fullname, "r");
-+	if (strcmp(name, "-")) {
-+		f = fopen(name, "r");
-+		if (!f && name != NULL && name[0] != '/') {
-+			env = getenv(SRCTREE);
-+			if (env) {
-+				sprintf(fullname, "%s/%s", env, name);
-+				f = fopen(fullname, "r");
-+			}
- 		}
-+	} else {
-+		f = stdin;
- 	}
- 	return f;
- }
-diff --git a/scripts/kconfig/zconf.l b/scripts/kconfig/zconf.l
-index 4cea5c8..a268d88 100644
---- a/scripts/kconfig/zconf.l
-+++ b/scripts/kconfig/zconf.l
-@@ -269,13 +269,17 @@ FILE *zconf_fopen(const char *name)
- 	char *env, fullname[PATH_MAX+1];
- 	FILE *f;
- 
--	f = fopen(name, "r");
--	if (!f && name != NULL && name[0] != '/') {
--		env = getenv(SRCTREE);
--		if (env) {
--			sprintf(fullname, "%s/%s", env, name);
--			f = fopen(fullname, "r");
-+	if (strcmp(name, "-")) {
-+		f = fopen(name, "r");
-+		if (!f && name != NULL && name[0] != '/') {
-+			env = getenv(SRCTREE);
-+			if (env) {
-+				sprintf(fullname, "%s/%s", env, name);
-+				f = fopen(fullname, "r");
-+			}
- 		}
-+	} else {
-+		f = stdin;
- 	}
- 	return f;
- }
+This isn't yet in aconf.c.
+
+bye, Roman
