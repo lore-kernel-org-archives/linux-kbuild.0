@@ -1,121 +1,91 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from barikada.upol.cz ([158.194.242.200]:37783 "EHLO
-	barikada.upol.cz" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751223AbYEFDaI (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 5 May 2008 23:30:08 -0400
-Date: Tue, 6 May 2008 05:51:08 +0200
-Subject: Re: [PATCH] kconfig: add support for stdin (make K=- ...)
-Message-ID: <20080506035108.GD24008@flower.upol.cz>
-References: <82e4877d0805031742o464dd581wd93173d79705ce0d@mail.gmail.com> <20080504092417.GA3425@elte.hu> <82e4877d0805050814j721ae522k84384df48c9f4336@mail.gmail.com> <20080505171501.GA22332@elte.hu> <20080505182427.GA2025@uranus.ravnborg.org> <ce0170d90805051136w2f016c15p575623d33c220ddf@mail.gmail.com> <20080505184538.GE22332@elte.hu> <20080505194929.GA8868@uranus.ravnborg.org>
-MIME-Version: 1.0
+Received: from pasmtpa.tele.dk ([80.160.77.114]:44135 "EHLO pasmtpA.tele.dk"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750835AbYEFEeG (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 6 May 2008 00:34:06 -0400
+Date: Tue, 6 May 2008 06:34:39 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: [PATCH 1/2] kconfig: introduce K= support
+Message-ID: <20080506043439.GA13366@uranus.ravnborg.org>
+References: <20080502204729.GA6534@uranus.ravnborg.org> <20080504185737.GA23063@uranus.ravnborg.org> <20080504185918.GB23063@uranus.ravnborg.org> <Pine.LNX.4.64.0805060438220.30555@scrub.home>
+Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20080505194929.GA8868@uranus.ravnborg.org>
-From: Oleg Verych <olecom@flower.upol.cz>
+In-Reply-To: <Pine.LNX.4.64.0805060438220.30555@scrub.home>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: Ingo Molnar <mingo@elte.hu>, Sergio Luis <sergio@uece.br>, Parag Warudkar <parag.warudkar@gmail.com>, LKML <linux-kernel@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, "akpm@osdl.org" <akpm@osdl.org>, Peter Zijlstra <peterz@infradead.org>, Arjan van de Ven <arjan@infradead.org>, Dave Jones <davej@redhat.com>, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: Roman Zippel <zippel@linux-m68k.org>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
 
-Sam Ravnborg @ Mon, May 05, 2008 at 09:49:29PM +0200:
-[]
-> > i think the 'natural' script behavior would be for this to do the right 
-> > thing:
-> > 
-> >    zcat /proc/config.gz | make K=- alldefconfig
-> > 
-> > or something like that - so that it can be scripted in a pipe.
+On Tue, May 06, 2008 at 04:55:55AM +0200, Roman Zippel wrote:
+> Hi,
 > 
-> I like this ;-)
-> So I implemented support for stdin - see attached.
-> It is also in kbuild.git.
+> On Sun, 4 May 2008, Sam Ravnborg wrote:
+> 
+> Below is patch which adds a library function to set the default values in 
+> a much simpler way.
+> The behaviour is slightly different, now it's closer to generating a 
+> .config with all possible symbols set to some value and using that to 
+> generate the final config. It has the advantage of not being as dependend 
+> on the order of the symbols, e.g. with allmodconfig this sets a few more 
+> symbols to 'm'.
 
-Isn't /dev/stdin (or link to /proc) supported everywhere already?
+Thanks. I will rework the patch to use this function.
 
-> +	if (strcmp(config_file, "-")) {
+> 
+> > +# An arch may use KBUILD_DEFCONFIG to specify defconfig file
+> > +# fallback to arch/$ARCH/defconfig
+> > +defconfig-file := $(if $(KBUILD_DEFCONFIG),            \
+> > +        arch/$(SRCARCH)/configs/$(KBUILD_DEFCONFIG),   \
+> > +        arch/$(SRCARCH)/defconfig)
+> > +defconfig-file := $(strip $(defconfig-file))
+> 
+> init/Kconfig has a DEFCONFIG_LIST which is intended to be used for this.
 
-full strcmp() for just one symbol?
+The plan is to drop arch/$(SRCARCH)/defconfig and solely rely
+on KBUILD_DEFCONFIG.
+And I see KBUILD_DEFCONFIG thus for a "make defconfig" the
+DEFCONFIG_LIST becomes unused.
 
-> +		if (config_file && stat(config_file, &tmpstat)) {
-> +			fprintf(stderr, _("%s: failed to open %s\n"),
-> +			        av[0], config_file);
-> +			exit(1);
-> +		}
-> +		config_filename = config_file;
-> +	} else {
-> +		config_filename = "stdin";
->  	}
-> +
->  	if (config_file && conf_read_simple(config_file, S_DEF_USER)) {
->  		fprintf(stderr, _("%s: failed to read %s\n"),
-> -		        av[0], config_file);
-> +		        av[0], config_filename);
->  		exit(1);
->  	}
->  	if (config_file) {
->  		printf("#\n");
-> -		printf(_("# configuration is based on '%s'\n"), config_file);
-> +		printf(_("# configuration is based on '%s'\n"),
-> +		       config_filename);
->  	}
->  	/* generate the config */
->  	do {
-> diff --git a/scripts/kconfig/lex.zconf.c_shipped b/scripts/kconfig/lex.zconf.c_shipped
-> index 6a61cee..7bd00d3 100644
-> --- a/scripts/kconfig/lex.zconf.c_shipped
-> +++ b/scripts/kconfig/lex.zconf.c_shipped
-> @@ -2268,13 +2268,17 @@ FILE *zconf_fopen(const char *name)
->  	char *env, fullname[PATH_MAX+1];
->  	FILE *f;
->  
-> -	f = fopen(name, "r");
-> -	if (!f && name != NULL && name[0] != '/') {
-> -		env = getenv(SRCTREE);
-> -		if (env) {
-> -			sprintf(fullname, "%s/%s", env, name);
-> -			f = fopen(fullname, "r");
-> +	if (strcmp(name, "-")) {
-> +		f = fopen(name, "r");
-> +		if (!f && name != NULL && name[0] != '/') {
-> +			env = getenv(SRCTREE);
-> +			if (env) {
-> +				sprintf(fullname, "%s/%s", env, name);
-> +				f = fopen(fullname, "r");
-> +			}
->  		}
-> +	} else {
-> +		f = stdin;
->  	}
->  	return f;
->  }
-> diff --git a/scripts/kconfig/zconf.l b/scripts/kconfig/zconf.l
-> index 4cea5c8..a268d88 100644
-> --- a/scripts/kconfig/zconf.l
-> +++ b/scripts/kconfig/zconf.l
-> @@ -269,13 +269,17 @@ FILE *zconf_fopen(const char *name)
->  	char *env, fullname[PATH_MAX+1];
->  	FILE *f;
->  
-> -	f = fopen(name, "r");
-> -	if (!f && name != NULL && name[0] != '/') {
-> -		env = getenv(SRCTREE);
-> -		if (env) {
-> -			sprintf(fullname, "%s/%s", env, name);
-> -			f = fopen(fullname, "r");
-> +	if (strcmp(name, "-")) {
-> +		f = fopen(name, "r");
-> +		if (!f && name != NULL && name[0] != '/') {
-> +			env = getenv(SRCTREE);
-> +			if (env) {
-> +				sprintf(fullname, "%s/%s", env, name);
-> +				f = fopen(fullname, "r");
-> +			}
->  		}
-> +	} else {
-> +		f = stdin;
->  	}
->  	return f;
+But I guess your point is that we should dropt KBUILD_DEFCONFIG
+entirely and rely on DEFCONFIG_LIST instead.
 
-rather big diffstat for almost nothing. Userspacy?
-____
+I will try it out.
+
+> 
+> > +	if (ac < 2) {
+> > +		usage();
+> > +		exit(1);
+> > +	}
+> > +	if (strcmp(av[1], "allnoconfig") == 0)
+> > +		default_value = set_no;
+> > +	else if (strcmp(av[1], "allyesconfig") == 0)
+> > +		default_value = set_yes;
+> > +	else if (strcmp(av[1], "allmodconfig") == 0)
+> > +		default_value = set_mod;
+> > +	else if (strcmp(av[1], "alldefconfig") == 0)
+> > +		default_value = set_default;
+> > +	else if (strcmp(av[1], "randconfig") == 0) {
+> > +		default_value = set_random;
+> > +		srand(time(NULL));
+> > +	} else {
+> > +		usage();
+> > +		exit(1);
+> > +	}
+> > +	if (strcmp(av[2], "-b") == 0) {
+> > +		config_file = av[3];
+> > +		kconfig_file = av[4];
+> > +	} else {
+> > +		kconfig_file = av[2];
+> > +	}
+> 
+> Even if it has only a single option, please keep using getopt().
+
+OK.
+
+Thanks for your feedback.
+PS. I will post the updated patches in the weekend. Not that they
+are difficult but I'm on the way out of the door for a few days
+travelling.
+
+	Sam
