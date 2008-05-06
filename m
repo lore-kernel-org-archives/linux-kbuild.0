@@ -1,62 +1,84 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pasmtpa.tele.dk ([80.160.77.114]:37211 "EHLO pasmtpA.tele.dk"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750833AbYEFEhB (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 6 May 2008 00:37:01 -0400
-Date: Tue, 6 May 2008 06:37:36 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH 2/2] kconfig: make oldconfig less chatty and clean up conf.c
-Message-ID: <20080506043736.GB13366@uranus.ravnborg.org>
-References: <20080502204729.GA6534@uranus.ravnborg.org> <20080504185737.GA23063@uranus.ravnborg.org> <20080504185950.GC23063@uranus.ravnborg.org> <Pine.LNX.4.64.0805060455590.30555@scrub.home>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Pine.LNX.4.64.0805060455590.30555@scrub.home>
+Received: from sovereign.computergmbh.de ([85.214.69.204]:50375 "EHLO
+	sovereign.computergmbh.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754203AbYEFITO (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 6 May 2008 04:19:14 -0400
+Date: Tue, 6 May 2008 10:19:13 +0200 (CEST)
+From: Jan Engelhardt <jengelh@medozas.de>
+Subject: Re: kconfig - a suggestion how to fix the select issue
+In-Reply-To: <20080504071041.GA15315@uranus.ravnborg.org>
+Message-ID: <alpine.LNX.1.10.0805042004310.11757@fbirervta.pbzchgretzou.qr>
+References: <20080504071041.GA15315@uranus.ravnborg.org>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Roman Zippel <zippel@linux-m68k.org>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: Roman Zippel <zippel@linux-m68k.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
 
-On Tue, May 06, 2008 at 05:08:40AM +0200, Roman Zippel wrote:
-> Hi,
-> 
-> On Sun, 4 May 2008, Sam Ravnborg wrote:
-> 
-> > We now check for valid stadin in both cases and this
-> > may break a script here and there.
-> 
-> I strongly disagree with this, please preserve the old behaviour. It took 
-> a while to work out the current behaviour.
-> Only silentoldconfig checks for stdin because it's used as hook during 
-> kbuild to verify the config. For all other interactive targets the user 
-> has to know what he's doing, e.g. it's valid to do "yes '' | make 
-> oldconfig".
-I will test a bit more and may revert to the old behaviour.
-One good thing with the new behaviour is that
-make oldconfig > /dev/null
-does not hang if there is new symbols - and I would like to keep
-it so.
+On Sunday 2008-05-04 09:10, Sam Ravnborg wrote:
 
-> 
-> > -		switch (input_mode) {
-> > -		case set_no:	 name = "allno.config"; break;
-> > -		case set_mod:	 name = "allmod.config"; break;
-> > -		case set_yes:	 name = "allyes.config"; break;
-> > -		case set_random: name = "allrandom.config"; break;
-> > -		default: break;
-> > -		}
-> > -		if (!stat(name, &tmpstat))
-> > -			conf_read_simple(name, S_DEF_USER);
-> > -		else if (!stat("all.config", &tmpstat))
-> > -			conf_read_simple("all.config", S_DEF_USER);
-> > -		break;
-> > -	default:
-> > -		break;
-> >  	}
-> 
-> This isn't yet in aconf.c.
-On purpose. It is very very seldom used and with K=file
-it is now much easier to specify a base configuration.
-So no need for all the special filenames.
+>Today we have two ways to express/solve dependencies.
+>
+>Top-down we have "depends on"
+>and bottom up we have "select".
+>
+>The "depends on" dependencies at the same time impact the visibility of 
+>a symbol. A symbol with "depends on" not satisfied are not visible and 
+>thus not shown in menuconfig.
+>
+>The "select" method is a way to forcefully set the selected symbol to 
+>the same value as the one where the select are stated.
+>
+>But this has shortcoming in relation to the interface we like to 
+>present to the user.
+[...]
 
-	Sam
+Suggestion:
+
+Make kconfig work like an interactive package manager. All objects are 
+visible and the user can select any of them.
+
+depends and selects are resolved upon request only, i.e. when the user 
+hits Exit or manually initiates a resolve request. Kconfig then checks 
+to see if all dependencies are satisfied, and if it cannot automatically 
+solve it — because it encounters an alternation expression (a || foo) — 
+it asks the user to select one.
+
+If user input is not available, exit with error (much like `make 
+oldconfig </dev/null` already does on new options.)
+
+Drawback:
+
+Most likely a lot of work.
+
+
+Consider/Suggested syntax:
+
+	menuconfig V4L2
+		tristate "video and all that"
+	
+	if V4L2
+	
+	config MY_CAMERA
+		tristate "nice cam"
+		requires USB || FIREWIRE
+	
+	endif
+
+leading to a new screen on dependency resolution (when USB=n && 
+FIREWIRE=n), showing a modified "choice" prompt where you can 
+either
+1) change the state of CONFIG_MY_CAMERA to y/m/n.
+2) select one of the required dependencies.
+
+	CONFIG_MY_CAMERA has unsatisfied dependencies.
+
+	<M> nice cam
+	    ( ) USB
+	    ( ) FireWire
+
+Of course a bit of thinking on how to display things is needed for more 
+complex requires.
