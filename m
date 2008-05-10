@@ -1,55 +1,98 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from chilli.pcug.org.au ([203.10.76.44]:52121 "EHLO smtps.tip.net.au"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755864AbYEJNjY (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 10 May 2008 09:39:24 -0400
-Date: Sat, 10 May 2008 23:39:04 +1000
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-Subject: Re: New kbuild git trees [Was: linux-next: kbuild build failure]
-Message-Id: <20080510233904.106eaf75.sfr@canb.auug.org.au>
-In-Reply-To: <20080510115945.GA29171@uranus.ravnborg.org>
-References: <20080506221756.95f572af.sfr@canb.auug.org.au>
-	<20080510115945.GA29171@uranus.ravnborg.org>
-Mime-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pgp-signature";
- micalg="PGP-SHA1";
- boundary="Signature=_Sat__10_May_2008_23_39_04_+1000_FqV+Xm+L586VIL3J"
+Received: from barikada.upol.cz ([158.194.242.200]:57883 "EHLO
+	barikada.upol.cz" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753931AbYEJVEj (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 10 May 2008 17:04:39 -0400
+Subject: Re: [PATCH] kconfig: add support for K=file
+In-Reply-To: <1209761358-6579-1-git-send-email-sam@ravnborg.org>
+References: <20080502204729.GA6534@uranus.ravnborg.org> <1209761358-6579-1-git-send-email-sam@ravnborg.org>
+Date: Sat, 10 May 2008 23:25:49 +0200
+Message-Id: <E1JuwZh-0004Yv-CP@flower>
+From: Oleg Verych <olecom@flower.upol.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Sam Ravnborg <sam@ravnborg.org>
-Cc: Michael Ellerman <michael@ellerman.id.au>, linux-next@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
+Cc: kbuild list <linux-kbuild@vger.kernel.org>
 
---Signature=_Sat__10_May_2008_23_39_04_+1000_FqV+Xm+L586VIL3J
-Content-Type: text/plain; charset=US-ASCII
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Sam Ravnborg @ Fri,  2 May 2008 22:49:14 +0200:
 
-Hi Sam,
+> From: Sam Ravnborg <sam@uranus.ravnborg.org>
 
-On Sat, 10 May 2008 13:59:45 +0200 Sam Ravnborg <sam@ravnborg.org> wrote:
->
-> I have replaced kbuild.git with two next git repositories:
->=20
-> kbuild-fixes.git =3D> stuff designated for -linus after -rc1.
-> kbuild-next.git =3D> stuff for next merge window.
-> Everything in the master branch.
+> +defconfig: $(src)/aconf.sh $(obj)/aconf
+> +	$(Q)K=arch/$(SRCARCH)/configs/$(KBUILD_DEFCONFIG) \
+> +	$(CONFIG_SHELL) $< alldefconfig $(Kconfig)
 
-I have set these up, thanks.
+> +# aconf:  Generate simple configurations (all*config, etc)
 
---=20
-Cheers,
-Stephen Rothwell                    sfr@canb.auug.org.au
-http://www.canb.auug.org.au/~sfr/
+> +++ b/scripts/kconfig/aconf.sh
 
---Signature=_Sat__10_May_2008_23_39_04_+1000_FqV+Xm+L586VIL3J
-Content-Type: application/pgp-signature
+> +#!/bin/sh
+> +set -e
+> +aconf=scripts/kconfig/aconf
+> +# Find input file
+> +if [ ! -z $K ]; then
+> +	config_file="-i $K";
+> +fi
+> +
+> +case "$1" in
+> +	"allnoconfig")
+> +		$aconf -n $config_file $2
+> +		;;
+> +	"allyesconfig")
+> +		$aconf -y $config_file $2
+> +		;;
+> +	"allmodconfig")
+> +		$aconf -m $config_file $2
+> +		;;
+> +	"alldefconfig")
+> +		$aconf -d $config_file $2
+> +		;;
+> +	"randconfig")
+> +		$aconf -r $config_file $2
+> +		;;
+> +	*)
+> +		echo "$0: unknow command $1"
+> +		exit 1
+> +	;;
+> +esac
+> +
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.6 (GNU/Linux)
 
-iD8DBQFIJaWJTgG2atn1QN8RAnLBAJ48QoFuPk2pGz0PHJQ9UpwtPpZrTQCdF3hJ
-pTA3xjvL7uhU184VOIjB6XA=
-=8wok
------END PGP SIGNATURE-----
+#!/bin/sh
+set -e
 
---Signature=_Sat__10_May_2008_23_39_04_+1000_FqV+Xm+L586VIL3J--
+aconf="$src_tree/scripts/kconfig/aconf -"
+case $1 in
+	# and typing of "allbalblabla" is a bit easier: "allb"
+	all[mynd]*)
+		# add command char using multicores :), yes string
+                # processing in shell kind of sucks
+		aconf="${aconf}`echo $1 | sed 's ^all\(.\).* \1 '`"
+		;;
+	rand*)
+		aconf="${aconf}r"
+		;;
+	*)      # fix typo and redirect to stderr
+		echo "$0: unknown command \`$1'" >&2
+		exit 1
+	;;
+esac
+
+# Find input file
+[ "$K" ] && aconf="$aconf -i $K"
+
+# remove command from parameters
+shift 1
+
+# execute with all other parameters
+$aconf "$@"
+# end
+
+What about something like that (not tested)? There are some fixes and i'm
+not sure about if "$K" is empty what to do with "$config_file".
+-- 
+sed 'sed && sh + olecom = love' << ''
+-o--=O`C
+ #oo'L O
+<___=E M
