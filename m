@@ -1,45 +1,52 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp-out04.alice-dsl.net ([88.44.63.6]:46586 "EHLO
-	smtp-out04.alice-dsl.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750933AbYEHLlO (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 8 May 2008 07:41:14 -0400
-Date: Thu, 8 May 2008 13:41:11 +0200
-From: Andi Kleen <andi@firstfloor.org>
-Subject: [PATCH] Disable modpost warnings for linkonce sections
-Message-ID: <20080508114111.GA20671@basil.nowhere.org>
-MIME-Version: 1.0
+Received: from pasmtpa.tele.dk ([80.160.77.114]:56758 "EHLO pasmtpA.tele.dk"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752838AbYEJL7K (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 10 May 2008 07:59:10 -0400
+Date: Sat, 10 May 2008 13:59:45 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: New kbuild git trees [Was: linux-next: kbuild build failure]
+Message-ID: <20080510115945.GA29171@uranus.ravnborg.org>
+References: <20080506221756.95f572af.sfr@canb.auug.org.au>
+Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <20080506221756.95f572af.sfr@canb.auug.org.au>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: sam@ravnborg.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: Stephen Rothwell <sfr@canb.auug.org.au>
+Cc: Michael Ellerman <michael@ellerman.id.au>, linux-next@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-Disable modpost warnings for linkonce sections
+On Tue, May 06, 2008 at 10:17:56PM +1000, Stephen Rothwell wrote:
+> Hi Sam,
+> 
+> Today's linux-next build of a particular config we use in the kisskb
+> build system (see
+> http://kisskb.ellerman.id.au/kisskb/buildresult/26810/).  However the
+> failure is rather clear: we are a victim of commit
+> 7fe94b58075431f4f8be500b297b0daa372daf62 ("kconfig: make oldconfig less
+> chatty and clean up conf.c") which includes the comment "We now check for
+> valid stadin in both cases and this may break a script here and there".
+> So "here and there" may be more problematic than you imagined.
 
-My build gives lots of warnings like
+Hi Stepehen.
 
-WARNING: sound/core/snd.o (.gnu.linkonce.wi.mpspec_def.h.30779716): unexpected section name.
-The (.[number]+) following section name are ld generated and not expected.
-Did you forget to use "ax"/"aw" in a .S file?
-Note that for example <linux/init.h> contains
-section definitions for use in .S files.
 
-But for .linkonce. duplicated sections are actually ok and expected.
-So just disable the warning for this case.
+I have replaced kbuild.git with two next git repositories:
 
-Signed-off-by: Andi Kleen <ak@linux.intel.com>
+kbuild-fixes.git => stuff designated for -linus after -rc1.
+kbuild-next.git => stuff for next merge window.
+Everything in the master branch.
 
-Index: linux/scripts/mod/modpost.c
-===================================================================
---- linux.orig/scripts/mod/modpost.c
-+++ linux/scripts/mod/modpost.c
-@@ -721,7 +721,7 @@ static int check_section(const char *mod
- 		/* consume all digits */
- 		while (*e && e != sec && isdigit(*e))
- 			e--;
--		if (*e == '.') {
-+		if (*e == '.' && !strstr(sec, ".linkonce")) {
- 			warn("%s (%s): unexpected section name.\n"
- 			     "The (.[number]+) following section name are "
- 			     "ld generated and not expected.\n"
+They are both empty at the moment but I have a few patches that
+will hit -fixes soon (including MAINTAINERS update reflecting this).
+
+The problematic kconfig patches will hit -next when they are
+redone and have survived a somehow more extensive testing than
+last round.
+
+I would expect you to take both kbuild-fixes and kbuild-next in -next.
+I do not plan to have a -mm specific tree as I do not work
+with stuff that far in the future (time does not permit so).
+
+	Sam
