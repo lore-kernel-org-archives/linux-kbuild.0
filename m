@@ -1,48 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from one.firstfloor.org ([213.235.205.2]:53177 "EHLO
-	one.firstfloor.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751060AbYEKKJI (ORCPT
+Received: from rv-out-0506.google.com ([209.85.198.234]:25204 "EHLO
+	rv-out-0506.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755342AbYEMXU1 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 11 May 2008 06:09:08 -0400
-Message-ID: <4826C5BC.6060203@firstfloor.org>
-Date: Sun, 11 May 2008 12:09:00 +0200
-From: Andi Kleen <andi@firstfloor.org>
+	Tue, 13 May 2008 19:20:27 -0400
+Received: by rv-out-0506.google.com with SMTP id l9so3504466rvb.1
+        for <linux-kbuild@vger.kernel.org>; Tue, 13 May 2008 16:20:25 -0700 (PDT)
+Message-ID: <a27c0c970805131620o42d9ff0cm14aaaf2b99582bab@mail.gmail.com>
+Date: Tue, 13 May 2008 16:20:25 -0700
+From: "Greg Steuck" <greg@nest.cx>
+Subject: Switched from hardcoded ".config" to conf_get_configname()
 MIME-Version: 1.0
-Subject: Re: [PATCH] Disable modpost warnings for linkonce sections
-References: <20080508114111.GA20671@basil.nowhere.org> <20080511081156.GA25696@uranus.ravnborg.org>
-In-Reply-To: <20080511081156.GA25696@uranus.ravnborg.org>
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: zippel@linux-m68k.org
+Cc: linux-kbuild@vger.kernel.org
 
-Sam Ravnborg wrote:
-> On Thu, May 08, 2008 at 01:41:11PM +0200, Andi Kleen wrote:
->> Disable modpost warnings for linkonce sections
->>
->> My build gives lots of warnings like
->>
->> WARNING: sound/core/snd.o (.gnu.linkonce.wi.mpspec_def.h.30779716): unexpected section name.
->> The (.[number]+) following section name are ld generated and not expected.
->> Did you forget to use "ax"/"aw" in a .S file?
->> Note that for example <linux/init.h> contains
->> section definitions for use in .S files.
->>
->> But for .linkonce. duplicated sections are actually ok and expected.
->> So just disable the warning for this case.
-> 
-> Agreed.
-> Applied and pushed out.
+Hey Roman,
 
-There's still the "crap in /proc/kallsyms" problem like
+I needed the following one line patch to make KCONFIG_CONFIG usable
+with conf -s:
 
-0000000000000b0c N DW.aio.h.903a6d92.0
-0000000000000b19 N DW.aio.h.903a6d92.1
-0000000000000b24 N DW.aio.h.903a6d92.2
-0000000000000bce N DW.task_io_accounting.h.8d8de327.0
+--- scripts/kconfig/conf.c#1    2008-05-13 14:43:41.000000000 -0700
++++ scripts/kconfig/conf.c#2    2008-05-13 16:16:40.000000000 -0700
+@@ -561,7 +561,7 @@
+                }
+                break;
+        case ask_silent:
+-               if (stat(".config", &tmpstat)) {
++               if (stat(conf_get_configname(), &tmpstat)) {
+                        printf(_("***\n"
+                                "*** You have not yet configured your kernel!\n"
+                                "*** (missing kernel .config file)\n"
 
-Haven't not looked at that yet, but that needs to be fixed too.
 
--Andi
+Thanks
+Greg
+-- 
+nest.cx is Gmail hosted, use PGP for anything private. Key:
+http://tinyurl.com/ho8qg
+Fingerprint: 5E2B 2D0E 1E03 2046 BEC3 4D50 0B15 42BD 8DF5 A1B0
