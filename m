@@ -1,60 +1,33 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from hrndva-omtalb.mail.rr.com ([71.74.56.122]:58483 "EHLO
-	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751867AbYEOBhH (ORCPT
+Received: from smtp-out01.alice-dsl.net ([88.44.60.11]:22449 "EHLO
+	smtp-out01.alice-dsl.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751835AbYEOJDb (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 14 May 2008 21:37:07 -0400
-Message-Id: <20080515013705.027387767@goodmis.org>
+	Thu, 15 May 2008 05:03:31 -0400
+Subject: Re: [PATCH 0/4] Create a CFLAGS_REMOVE for ftrace
+From: Andi Kleen <andi@firstfloor.org>
 References: <20080515013028.056366414@goodmis.org>
-Date: Wed, 14 May 2008 21:30:29 -0400
-From: Steven Rostedt <rostedt@goodmis.org>
-Subject: [PATCH 1/4] kbuild: Create new CFLAGS_REMOVE_(basename).o option
-Content-Disposition: inline; filename=kbuild-add-cflags-remove.patch
+Date: Thu, 15 May 2008 11:02:46 +0200
+In-Reply-To: <20080515013028.056366414@goodmis.org> (Steven Rostedt's message of "Wed, 14 May 2008 21:30:28 -0400")
+Message-ID: <87tzh0ym6h.fsf@basil.nowhere.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ingo Molnar <mingo@elte.hu>
-Cc: David Miller <davem@davemloft.net>, linux-kernel@vger.kernel.org, pq@iki.fi, proski@gnu.org, sandmann@redhat.com, a.p.zijlstra@chello.nl, linux-kbuild@vger.kernel.org, zippel@linux-m68k.org, Steven Rostedt <srostedt@redhat.com>
+To: Steven Rostedt <rostedt@goodmis.org>
+Cc: Ingo Molnar <mingo@elte.hu>, David Miller <davem@davemloft.net>, linux-kernel@vger.kernel.org, pq@iki.fi, proski@gnu.org, sandmann@redhat.com, a.p.zijlstra@chello.nl, linux-kbuild@vger.kernel.org, zippel@linux-m68k.org
 
-We currently have a way to add special CFLAGS to code, but we do not have a 
-way to remove them if needed.
+Steven Rostedt <rostedt@goodmis.org> writes:
 
-With the case of ftrace, some files should simply not be profiled. Adding
-the -pg flag to these files is simply a waste, and adding "notrace" to each
-and every function is ugly.
+> Recently David Miller ported ftrace over to the sparc64. When I mentioned
+> to him a way to remove the "notrace" from all the functions in some
+> files done by using a dirty little hack, David (correctly) called it
+> "Makefile turd" and told us to stop doing that.
+>
+> I then asked if a CFLAGS_REMOVE_foo.o = -pg would be more pleasing, and he
+> agreed.
 
-Currently we put in "Makefile turd" [1] to stop the compiler from adding -pg
-to certain files. This was clumsy and awkward.
+Very nice. You should use that for the scheduler case to get rid of
+"-fno-omit-frame-pointer"
 
-This patch now adds the revese of CFLAGS_(basename).o with
-CFLAGS_REMOVE_(basename).o.  This allows developers to prevent certain
-CFLAGS from being used to compile files. For example, we can now do
-
-CFLAGS_REMOVE_string.o = -pg
-
-to remove the -pg option from the string.o file in the lib directory.
-
-Note: a space delimited list of options may be added to the REMOVE macro.
-
-[1] - what David Miller called the workaronud to remove -pg
-
-Signed-off-by: Steven Rostedt <srostedt@redhat.com>
----
- scripts/Makefile.lib |    3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-Index: linux-sched-devel.git/scripts/Makefile.lib
-===================================================================
---- linux-sched-devel.git.orig/scripts/Makefile.lib	2008-05-14 18:12:22.000000000 -0700
-+++ linux-sched-devel.git/scripts/Makefile.lib	2008-05-14 18:12:26.000000000 -0700
-@@ -96,7 +96,8 @@ basename_flags = -D"KBUILD_BASENAME=KBUI
- modname_flags  = $(if $(filter 1,$(words $(modname))),\
-                  -D"KBUILD_MODNAME=KBUILD_STR($(call name-fix,$(modname)))")
- 
--_c_flags       = $(KBUILD_CFLAGS) $(ccflags-y) $(CFLAGS_$(basetarget).o)
-+orig_c_flags   = $(KBUILD_CFLAGS) $(ccflags-y) $(CFLAGS_$(basetarget).o)
-+_c_flags       = $(filter-out $(CFLAGS_REMOVE_$(basetarget).o), $(orig_c_flags))
- _a_flags       = $(KBUILD_AFLAGS) $(asflags-y) $(AFLAGS_$(basetarget).o)
- _cpp_flags     = $(KBUILD_CPPFLAGS) $(cppflags-y) $(CPPFLAGS_$(@F))
- 
-
--- 
+-Andi
