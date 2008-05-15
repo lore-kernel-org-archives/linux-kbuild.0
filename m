@@ -1,45 +1,34 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from rv-out-0506.google.com ([209.85.198.234]:25204 "EHLO
-	rv-out-0506.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755342AbYEMXU1 (ORCPT
+Received: from hrndva-omtalb.mail.rr.com ([71.74.56.123]:46442 "EHLO
+	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751546AbYEOBhG (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 13 May 2008 19:20:27 -0400
-Received: by rv-out-0506.google.com with SMTP id l9so3504466rvb.1
-        for <linux-kbuild@vger.kernel.org>; Tue, 13 May 2008 16:20:25 -0700 (PDT)
-Message-ID: <a27c0c970805131620o42d9ff0cm14aaaf2b99582bab@mail.gmail.com>
-Date: Tue, 13 May 2008 16:20:25 -0700
-From: "Greg Steuck" <greg@nest.cx>
-Subject: Switched from hardcoded ".config" to conf_get_configname()
-MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+	Wed, 14 May 2008 21:37:06 -0400
+Message-Id: <20080515013028.056366414@goodmis.org>
+Date: Wed, 14 May 2008 21:30:28 -0400
+From: Steven Rostedt <rostedt@goodmis.org>
+Subject: [PATCH 0/4] Create a CFLAGS_REMOVE for ftrace
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: zippel@linux-m68k.org
-Cc: linux-kbuild@vger.kernel.org
+To: Ingo Molnar <mingo@elte.hu>
+Cc: David Miller <davem@davemloft.net>, linux-kernel@vger.kernel.org, pq@iki.fi, proski@gnu.org, sandmann@redhat.com, a.p.zijlstra@chello.nl, linux-kbuild@vger.kernel.org, zippel@linux-m68k.org
 
-Hey Roman,
+Recently David Miller ported ftrace over to the sparc64. When I mentioned
+to him a way to remove the "notrace" from all the functions in some
+files done by using a dirty little hack, David (correctly) called it
+"Makefile turd" and told us to stop doing that.
 
-I needed the following one line patch to make KCONFIG_CONFIG usable
-with conf -s:
+I then asked if a CFLAGS_REMOVE_foo.o = -pg would be more pleasing, and he
+agreed.
 
---- scripts/kconfig/conf.c#1    2008-05-13 14:43:41.000000000 -0700
-+++ scripts/kconfig/conf.c#2    2008-05-13 16:16:40.000000000 -0700
-@@ -561,7 +561,7 @@
-                }
-                break;
-        case ask_silent:
--               if (stat(".config", &tmpstat)) {
-+               if (stat(conf_get_configname(), &tmpstat)) {
-                        printf(_("***\n"
-                                "*** You have not yet configured your kernel!\n"
-                                "*** (missing kernel .config file)\n"
+This patch series starts out by creating a CFLAGS_REMOVE_(basetarget).o
+that removes options from CFLAGS to compile a target file.
 
+The rest of the patches clean up the Makefile turd with this variant.
 
-Thanks
-Greg
--- 
-nest.cx is Gmail hosted, use PGP for anything private. Key:
-http://tinyurl.com/ho8qg
-Fingerprint: 5E2B 2D0E 1E03 2046 BEC3 4D50 0B15 42BD 8DF5 A1B0
+Note, I left the turd in the trace directory itself, just because (almost)
+all the files there should not be traced. But that's a special directory,
+and this patch series keeps the sewage in one place.
+
+-- Steve
+
