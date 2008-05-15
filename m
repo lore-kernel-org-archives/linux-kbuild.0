@@ -1,22 +1,63 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from web95109.mail.in2.yahoo.com ([203.104.18.161]:37525 "HELO
-	web95109.mail.in2.yahoo.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with SMTP id S1751756AbYEOSbe (ORCPT
+Received: from web95116.mail.in2.yahoo.com ([203.104.18.168]:28386 "HELO
+	web95116.mail.in2.yahoo.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with SMTP id S1764583AbYEOSBk (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 15 May 2008 14:31:34 -0400
-Date: Thu, 15 May 2008 19:31:31 +0100 (BST)
+	Thu, 15 May 2008 14:01:40 -0400
+Date: Thu, 15 May 2008 19:01:37 +0100 (BST)
 From: murtuja bharmal <murtuja_bharmal@yahoo.com>
 Subject: Re: Kbuild Makefile output
 In-Reply-To: <20080515174222.GB24024@uranus.ravnborg.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
 Content-Transfer-Encoding: 8bit
-Message-ID: <818830.6509.qm@web95109.mail.in2.yahoo.com>
+Message-ID: <140961.15510.qm@web95116.mail.in2.yahoo.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Sam Ravnborg <sam@ravnborg.org>
 Cc: linux-kernel@vger.kernel.org, linux-kbuild <linux-kbuild@vger.kernel.org>
 
+Hello Sam,
+
+Thanks for reply.
+Actually Problem is.
+As I told you I have near near about 1000 file that
+compiles for single module creation which spread in
+multiple directies in 2.4 with lots of makefile.
+
+Now I have created single makefile to compile all this
+file and able to create kernel module.
+
+But now the problem is lots of file included in kernel
+module, compiled twice or even more then twice for
+user space (whithou kernel flag set) and kernel space
+and this userspace binary is not a part of kbuild
+makefile.
+
+Previously in 2.4 we use to put all output object file
+in different directories for kernel module and user
+binaries based in their compilation Flags.
+
+Now after attaching kbuild makefile with this system,
+kbuild make all object file in source directory itself
+becasue of that userspace makefiles not able to
+compile those file again. Because one object file is
+already there by kbuild. So I am not able create
+userspace binary.
+
+Now either solution is generate kbuild object file in
+different directory not in source directory as per our
+previous design or make a copy of exsisting file with
+some other name. One for kernel and one for user
+space.
+
+So I thought lets check the possibility of generating
+all kernel related object file in some other directory
+not in source directory.
+
+
+Thanks 
+Murtuja
 
 --- Sam Ravnborg <sam@ravnborg.org> wrote:
 
@@ -62,50 +103,6 @@ Cc: linux-kernel@vger.kernel.org, linux-kbuild <linux-kbuild@vger.kernel.org>
 > 	Sam
 > 
 
-Hello Sam,
-
-Thanks for reply.
-Actually Problem is.
-As I told you I have near near about 1000 file that
-compiles for single module creation which spread in
-multiple directies in 2.4 with lots of makefile.
-
-Now I have created single makefile to compile all this
-file and able to create kernel module.
-
-But now the problem is lots of file included in kernel
-module, compiled twice or even more then twice for
-user space (whithou kernel flag set) and kernel space
-as well.
-
-Previously in 2.4 we use to put all output object file
-in different directories for kernel module and user
-binaries based on their compilation Flags.
-
-Now after attaching kbuild makefile with this system,
-kbuild make all object file in source directory itself
-becasue of that userspace makefiles not able to
-compile those file again. Because one object file is
-already there by kbuild. So I am not able create
-userspace binary.
-
-Now either solution is generate kbuild object file in
-different directory not in source directory as per our
-previous design or make a copy of exsisting file with
-some other name. One for kernel and one for user
-space but this is also not a good approach.
-
-So I thought lets check the possibility of generating
-all kernel related object file in some other directory
-not in source directory.
-So I just want to know whether it is possible or not
-and if possible how.
 
 
-Thanks 
-Murtuja
-
-
-
-
-      Forgot the famous last words? Access your message archive online at http://in.messenger.yahoo.com/webmessengerpromo.php
+      Connect with friends all over the world. Get Yahoo! India Messenger at http://in.messenger.yahoo.com/?wm=n/
