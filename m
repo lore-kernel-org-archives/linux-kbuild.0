@@ -1,87 +1,55 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from agminet01.oracle.com ([141.146.126.228]:22415 "EHLO
-	agminet01.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751867AbYEOVCT (ORCPT
+Received: from web95110.mail.in2.yahoo.com ([203.104.18.162]:27448 "HELO
+	web95110.mail.in2.yahoo.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with SMTP id S1750759AbYEPGD6 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 15 May 2008 17:02:19 -0400
-Date: Thu, 15 May 2008 13:58:40 -0700
-From: Joel Becker <Joel.Becker@oracle.com>
+	Fri, 16 May 2008 02:03:58 -0400
+Date: Fri, 16 May 2008 07:03:55 +0100 (BST)
+From: murtuja bharmal <murtuja_bharmal@yahoo.com>
 Subject: Re: Kbuild Makefile output
-Message-ID: <20080515205840.GA814@mail.oracle.com>
-References: <20080515174222.GB24024@uranus.ravnborg.org> <818830.6509.qm@web95109.mail.in2.yahoo.com>
+In-Reply-To: <20080515205840.GA814@mail.oracle.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <818830.6509.qm@web95109.mail.in2.yahoo.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7BIT
+Message-ID: <225576.17638.qm@web95110.mail.in2.yahoo.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: murtuja bharmal <murtuja_bharmal@yahoo.com>
-Cc: Sam Ravnborg <sam@ravnborg.org>, linux-kernel@vger.kernel.org, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: Joel Becker <Joel.Becker@oracle.com>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>
 
-On Thu, May 15, 2008 at 07:31:31PM +0100, murtuja bharmal wrote:
-> But now the problem is lots of file included in kernel
-> module, compiled twice or even more then twice for
-> user space (whithou kernel flag set) and kernel space
-> as well.
+
+--- Joel Becker <Joel.Becker@oracle.com> wrote:
+
+> 1) Have the build name the output files
+> appropritately.  That is,
+> compile foo.c to foo-kernel.o and foo-userspace.o. 
+> Then link as needed.
+> The makefile dependencies Just Work.
 > 
-> Previously in 2.4 we use to put all output object file
-> in different directories for kernel module and user
-> binaries based on their compilation Flags.
-> 
-> Now after attaching kbuild makefile with this system,
-> kbuild make all object file in source directory itself
-> becasue of that userspace makefiles not able to
-> compile those file again. Because one object file is
-> already there by kbuild. So I am not able create
-> userspace binary.
 
-Two solutions.
+Thanks Joel,
+In case of Solution 1.
+what changes required in Makefile.
+I mean how to build foo-kernel.c from foo.c using
+kbuild makefile.
 
-1) Have the build name the output files appropritately.  That is,
-compile foo.c to foo-kernel.o and foo-userspace.o.  Then link as needed.
-The makefile dependencies Just Work.
+Suppose this is my makefile
 
-2) Better - create a kbuild symlink farm.  That is, lay out your sources
-however you want, but in a single directory that is not the parent put
-your kbuild makefile.  Have it symlink all .c files for kernel building
-into this directory.
+obj-m := mymodule.o
 
-toplevel
-	dir1
-		Makefile
-		foo.c
-	dir2
-		Makefile
-		bar.c
-	dir3
-		Makefile
-		baz.c
-	kbuild
-		Makefile
+mymodule-objs += \
+         dir1/foo.o   \
+         dir2/bar.o   
 
-The kbuild/Makefile does something like:
+all:
+         make -C /usr/src/linux M=`pwd` modules.
 
-obj-$(CONFIG_MYMODULE) += mymodule.o
-mymodule-objs := foo.o bar.o baz.o
-mymodule-sources = $(patsubst %.o,%.c,$(mymodule-objs))
+I only want to change name for foo.c to foo-kernel.o,
+not for bar.c.
 
-obj-sources = $(foreach obj,$(mymodule-sources),$(wildcard ../*/$(obj)))
+Thanks
+Murtuja
+ 
 
-$(mymodule-sources): $(obj-sources)
-	for f in $(obj-sources); do	\
-	  -ln -s $$f .;			\
-	done
 
-Joel
-
--- 
-
-Life's Little Instruction Book #232
-
-	"Keep your promises."
-
-Joel Becker
-Principal Software Developer
-Oracle
-E-mail: joel.becker@oracle.com
-Phone: (650) 506-8127
+      Best Jokes, Best Friends, Best Food and more. Go to http://in.promos.yahoo.com/groups/bestofyahoo/
