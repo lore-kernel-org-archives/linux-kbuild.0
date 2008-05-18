@@ -1,51 +1,97 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from rgminet01.oracle.com ([148.87.113.118]:52508 "EHLO
-	rgminet01.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751131AbYEPQC7 (ORCPT
+Received: from astoria.ccjclearline.com ([64.235.106.9]:44508 "EHLO
+	astoria.ccjclearline.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755453AbYERASL (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 16 May 2008 12:02:59 -0400
-Date: Fri, 16 May 2008 09:02:49 -0700
-From: Joel Becker <Joel.Becker@oracle.com>
-Subject: Re: Kbuild Makefile output
-Message-ID: <20080516160249.GB499@mail.oracle.com>
-References: <20080516093243.GA499@mail.oracle.com> <114572.24054.qm@web95110.mail.in2.yahoo.com>
+	Sat, 17 May 2008 20:18:11 -0400
+Date: Sat, 17 May 2008 20:18:07 -0400 (EDT)
+From: "Robert P. J. Day" <rpjday@crashcourse.ca>
+Subject: [PATCH] KBUILD: Move non-__KERNEL__-checking headers to header-y.
+Message-ID: <alpine.LFD.1.10.0805172016210.8908@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <114572.24054.qm@web95110.mail.in2.yahoo.com>
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: murtuja bharmal <murtuja_bharmal@yahoo.com>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>
+To: kbuild devel list <linux-kbuild@vger.kernel.org>
+Cc: Andrew Morton <akpm@osdl.org>
 
-On Fri, May 16, 2008 at 12:36:30PM +0100, murtuja bharmal wrote:
-> Actaually foo.c is common file for kernel space and
-> user space and bar.c is only a part of kernel space.
-> Anyway if we can change object file name for all
-> source file without changing source file name, then
-> also no issue but I just want to know whether it is
-> possible or not.
 
-	In general, kbuild wants to find a source file with the same
-name as the object file.  That you can't change.  It also expects to
-build object files in the same directory as their source files.  This is
-why I suggested a special directory where you symlink all the required
-sources for a kernel build, then let kbuild do the rest.
-	To sum up - pick the names you want for the files in a kernel
-build.  Set them in mymodule-objs.  Then if those names are different
-than your actual source file, come up with a rule to change the name.
+Move exported header files under include/linux that don't check the
+__KERNEL__ preprocessor from unifdef-y to header-y.
 
-Joel
+Signed-off-by: Robert P. J. Day <rpjday@crashcourse.ca>
 
--- 
+---
 
-"It is not the function of our government to keep the citizen from
- falling into error; it is the function of the citizen to keep the
- government from falling into error."
-	- Robert H. Jackson
+diff --git a/include/linux/Kbuild b/include/linux/Kbuild
+index b7d81b2..6333a16 100644
+--- a/include/linux/Kbuild
++++ b/include/linux/Kbuild
+@@ -104,6 +104,7 @@ header-y += iso_fs.h
+ header-y += ixjuser.h
+ header-y += jffs2.h
+ header-y += keyctl.h
++header-y += kvm.h
+ header-y += limits.h
+ header-y += dlm_plock.h
+ header-y += magic.h
+@@ -157,11 +158,18 @@ header-y += toshiba.h
+ header-y += udf_fs_i.h
+ header-y += ultrasound.h
+ header-y += un.h
++header-y += unistd.h
+ header-y += utime.h
+ header-y += veth.h
+ header-y += video_decoder.h
+ header-y += video_encoder.h
+ header-y += videotext.h
++header-y += virtio_blk.h
++header-y += virtio_net.h
++header-y += virtio_9p.h
++header-y += virtio_balloon.h
++header-y += virtio_pci.h
++header-y += wireless.h
+ header-y += x25.h
 
-Joel Becker
-Principal Software Developer
-Oracle
-E-mail: joel.becker@oracle.com
-Phone: (650) 506-8127
+ unifdef-y += acct.h
+@@ -253,7 +261,6 @@ unifdef-y += kd.h
+ unifdef-y += kernelcapi.h
+ unifdef-y += kernel.h
+ unifdef-y += keyboard.h
+-unifdef-y += kvm.h
+ unifdef-y += llc.h
+ unifdef-y += loop.h
+ unifdef-y += lp.h
+@@ -338,24 +345,17 @@ unifdef-y += types.h
+ unifdef-y += udp.h
+ unifdef-y += uinput.h
+ unifdef-y += uio.h
+-unifdef-y += unistd.h
+ unifdef-y += usbdevice_fs.h
+ unifdef-y += utsname.h
+ unifdef-y += videodev2.h
+ unifdef-y += videodev.h
+ unifdef-y += virtio_config.h
+-unifdef-y += virtio_blk.h
+-unifdef-y += virtio_net.h
+-unifdef-y += virtio_9p.h
+-unifdef-y += virtio_balloon.h
+ unifdef-y += virtio_console.h
+-unifdef-y += virtio_pci.h
+ unifdef-y += virtio_ring.h
+ unifdef-y += vt.h
+ unifdef-y += wait.h
+ unifdef-y += wanrouter.h
+ unifdef-y += watchdog.h
+-unifdef-y += wireless.h
+ unifdef-y += xattr.h
+ unifdef-y += xfrm.h
+
+
+========================================================================
+Robert P. J. Day
+Linux Consulting, Training and Annoying Kernel Pedantry:
+    Have classroom, will lecture.
+
+http://crashcourse.ca                          Waterloo, Ontario, CANADA
+========================================================================
