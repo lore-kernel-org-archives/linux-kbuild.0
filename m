@@ -1,55 +1,76 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from testure.choralone.org ([194.9.77.134]:47373 "EHLO
-	testure.choralone.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S937424AbYEUVKc (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 21 May 2008 17:10:32 -0400
-Date: Wed, 21 May 2008 17:11:39 -0400
-From: Dave Jones <davej@codemonkey.org.uk>
+Received: from mail.queued.net ([207.210.101.209]:4477 "EHLO mail.queued.net"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1757222AbYEUVdj (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 21 May 2008 17:33:39 -0400
+Date: Wed, 21 May 2008 17:38:32 -0400
+From: Andres Salomon <dilinger@queued.net>
 Subject: Re: Additional kconfig targets (cloneconfig, nonint_oldconfig etc)
-Message-ID: <20080521211139.GA22591@codemonkey.org.uk>
-References: <20080429183531.GB19652@uranus.ravnborg.org> <20080502190949.GA30270@uranus.ravnborg.org> <20080521164703.61c7d715@ephemeral>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20080521164703.61c7d715@ephemeral>
+Message-ID: <20080521173832.68e9d267@ephemeral>
+In-Reply-To: <20080521211139.GA22591@codemonkey.org.uk>
+References: <20080429183531.GB19652@uranus.ravnborg.org>
+	<20080502190949.GA30270@uranus.ravnborg.org>
+	<20080521164703.61c7d715@ephemeral>
+	<20080521211139.GA22591@codemonkey.org.uk>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andres Salomon <dilinger@queued.net>
+To: Dave Jones <davej@codemonkey.org.uk>
 Cc: Sam Ravnborg <sam@ravnborg.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Roland McGrath <roland@redhat.com>, Roman Zippel <zippel@linux-m68k.org>
 
-On Wed, May 21, 2008 at 04:47:03PM -0400, Andres Salomon wrote:
+On Wed, 21 May 2008 17:11:39 -0400
+Dave Jones <davej@codemonkey.org.uk> wrote:
 
- > > 3) Implement newsymbolsconfig (any better name?)
- > >    Shall list all new symbols and shall not write
- > >    any config
- > 
- > I'm not sure I see the point of #3.
+> On Wed, May 21, 2008 at 04:47:03PM -0400, Andres Salomon wrote:
+> 
+>  > > 3) Implement newsymbolsconfig (any better name?)
+>  > >    Shall list all new symbols and shall not write
+>  > >    any config
+>  > 
+>  > I'm not sure I see the point of #3.
+> 
+> It's something we've had in Fedora kernels forever, because
+> when rebasing to a new upstream version the process becomes
+> 
+> make newsymbolsconfig
+> take list of symbols, and make decisions on them
+> make oldconfig
+> 
+>
 
-It's something we've had in Fedora kernels forever, because
-when rebasing to a new upstream version the process becomes
+Ah, I see.  My process has always been:
 
-make newsymbolsconfig
-take list of symbols, and make decisions on them
+
+cp arch/x86/configs/foo_defconfig .config
 make oldconfig
+make obvious decisions about new symbols, choose defaults if unknown
+diff -u arch/x86/configs/foo_defconfig .config
+figure out if any decisions or defaults are incorrect, change accordingly
+make oldconfig (more decisions if there are new symbols exposed)
+cp .config arch/x86/configs/foo_defconfig && commit
 
 
-without it, the process would be..
+> without it, the process would be..
+> 
+> make oldconfig
+> note new symbol, make decision
+> make oldconfig
+> note a 2nd new symbol, make decision
+> make oldconfig
+> note a 3rd new symbol..
+> make oldconfig..
+> you get the idea.
+> 
+> The way we have it isn't perfect, (adding a new symbol may unhide
+> another set of new symbols), but it reduces the number of iterations
+> needed dramatically.
+> 
+> 	Dave
+> 
 
-make oldconfig
-note new symbol, make decision
-make oldconfig
-note a 2nd new symbol, make decision
-make oldconfig
-note a 3rd new symbol..
-make oldconfig..
-you get the idea.
+My build has broken again, which is why I'm inquiring about the status
+of this; I'm not going to bother fixing it if my patches are never going
+to end up upstream..
 
-The way we have it isn't perfect, (adding a new symbol may unhide
-another set of new symbols), but it reduces the number of iterations
-needed dramatically.
-
-	Dave
-
--- 
-http://www.codemonkey.org.uk
