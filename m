@@ -1,70 +1,63 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from host36-195-149-62.serverdedicati.aruba.it ([62.149.195.36]:55101
-	"EHLO mx.cpushare.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1758518AbYEUT7s (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 21 May 2008 15:59:48 -0400
-Date: Wed, 21 May 2008 21:48:08 +0200
-From: Andrea Arcangeli <andrea@qumranet.com>
-Subject: Re: kbuild variable $(src) broken in 2.6.23-rc3?
-Message-ID: <20080521194806.GJ22488@duo.random>
-References: <20080521144211.902CD37652C@pmx1.sophos.com> <20080521190453.GA12638@uranus.ravnborg.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20080521190453.GA12638@uranus.ravnborg.org>
+Received: from mail.queued.net ([207.210.101.209]:1600 "EHLO mail.queued.net"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1761244AbYEUUmK (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 21 May 2008 16:42:10 -0400
+Date: Wed, 21 May 2008 16:47:03 -0400
+From: Andres Salomon <dilinger@queued.net>
+Subject: Re: Additional kconfig targets (cloneconfig, nonint_oldconfig etc)
+Message-ID: <20080521164703.61c7d715@ephemeral>
+In-Reply-To: <20080502190949.GA30270@uranus.ravnborg.org>
+References: <20080429183531.GB19652@uranus.ravnborg.org>
+	<20080502190949.GA30270@uranus.ravnborg.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Sam Ravnborg <sam@ravnborg.org>
-Cc: tvrtko.ursulin@sophos.com, linux-kbuild@vger.kernel.org
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Dave Jones <davej@codemonkey.org.uk>, Roland McGrath <roland@redhat.com>, Roman Zippel <zippel@linux-m68k.org>
 
-On Wed, May 21, 2008 at 09:04:53PM +0200, Sam Ravnborg wrote:
-> Andrea Arcangeli <andrea@qumranet.com> reported a similar issue.
-> I have not gotten around to look at it yet.
-> I minimal Makefile that exhibits the problem
-> would be helpfull!
+On Fri, 2 May 2008 21:09:49 +0200
+Sam Ravnborg <sam@ravnborg.org> wrote:
 
-I don't have the minimal but I can easily provide you a way to
-reproduce:
+> With the attached patch you can do:
+> 
+> make K=my_favourite_config defconfig
+> 
+> kconfig will read all config values form 'my_favourite_config'
+> and set all other symbols to their default value.
+> The output is now dense like this:
+> # configuration is based on 'my_favourite_config'
+> #
+> # configuration written to .config
+> #
+> 
 
-git clone git://git.kernel.org/pub/scm/virt/kvm/kvm-userspace.git
-cd kvm-userspace
-patch -p1 -R <../belowinlinedworkaround
-./configure --kerneldir=/usr/src/anykernel
-cd kernel
-make
 
-The below has the benefit of making more robust and higher prio the
-inclusion of external-module-compat so it may not to be backed out
-after this 2.6.26-rc regression is fixed.
+Is this slated for 2.6.27?
 
-The problem is that the $(src) in the EXTRA_CFLAGS below is expanded
-to "".
 
-Thanks.
+> 
+> The K= notations works for the usual suspects:
+> allnoconfig, allyesconfig, allmodconfig, randconfig and defconfig
 
-Signed-off-by: Andrea Arcangeli <andrea@qumranet.com>
+Since this is aconf (automated), if we run 'make K=foo defconfig' and
+'foo' doesn't contain one of the necessary values.. the build will fail,
+right?
 
-diff --git a/kernel/Kbuild b/kernel/Kbuild
-index cabfc75..d9245eb 100644
---- a/kernel/Kbuild
-+++ b/kernel/Kbuild
-@@ -1,4 +1,3 @@
--EXTRA_CFLAGS := -I$(src)/include -include $(src)/external-module-compat.h
- obj-m := kvm.o kvm-intel.o kvm-amd.o
- kvm-objs := kvm_main.o x86.o mmu.o x86_emulate.o anon_inodes.o irq.o i8259.o \
- 	 lapic.o ioapic.o preempt.o i8254.o external-module-compat.o
-diff --git a/kernel/Makefile b/kernel/Makefile
-index 78ff923..e3fccbe 100644
---- a/kernel/Makefile
-+++ b/kernel/Makefile
-@@ -27,7 +27,8 @@ all::
- #	include header priority 1) $LINUX 2) $KERNELDIR 3) include-compat
- 	$(MAKE) -C $(KERNELDIR) M=`pwd` \
- 		LINUXINCLUDE="-I`pwd`/include -Iinclude -I`pwd`/include-compat \
--		-include include/linux/autoconf.h" \
-+		-include include/linux/autoconf.h \
-+		-include `pwd`/external-module-compat.h"
- 		"$$@"
- 
- sync: header-sync source-sync
+[...]
+> 
+> What is missing:
+> 1) No support for .gz input file
+>    But aconf.sh should be easy to adjust to this
+> 
+> 2) We hardcode that files name *_defconfig are found
+>    in arch/$ARCH/configs/*
+> 
+> 3) Implement newsymbolsconfig (any better name?)
+>    Shall list all new symbols and shall not write
+>    any config
+> 
+
+I'm not sure I see the point of #3.
