@@ -1,132 +1,94 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pasmtpa.tele.dk ([80.160.77.114]:56990 "EHLO pasmtpA.tele.dk"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751543AbYEXTZB (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 24 May 2008 15:25:01 -0400
-Date: Sat, 24 May 2008 21:25:40 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: [RFC PATCH] kconfig: introduce KCONFIG_* symbols for .c files
-Message-ID: <20080524192540.GA28067@uranus.ravnborg.org>
+Received: from smtp1.linux-foundation.org ([140.211.169.13]:48276 "EHLO
+	smtp1.linux-foundation.org" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1752693AbYEXTxe (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 24 May 2008 15:53:34 -0400
+Date: Sat, 24 May 2008 12:53:16 -0700
+From: Andrew Morton <akpm@linux-foundation.org>
+Subject: Re: [RFC PATCH] kconfig: introduce KCONFIG_* symbols for .c files
+Message-Id: <20080524125316.4b969936.akpm@linux-foundation.org>
+In-Reply-To: <20080524192540.GA28067@uranus.ravnborg.org>
+References: <20080524192540.GA28067@uranus.ravnborg.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, Andrew Morton <akpm@linux-foundation.org>, Roman Zippel <zippel@linux-m68k.org>
-Cc: Jeremy Fitzhardinge <jeremy@goop.org>
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, Roman Zippel <zippel@linux-m68k.org>, Jeremy Fitzhardinge <jeremy@goop.org>
 
-We have many places in the kernel that looks like
-the following:
+On Sat, 24 May 2008 21:25:40 +0200 Sam Ravnborg <sam@ravnborg.org> wrote:
 
-#ifdef CONFIG_FOO
-	...
-#endif
+> We have many places in the kernel that looks like
+> the following:
+> 
+> #ifdef CONFIG_FOO
+> 	...
+> #endif
+> 
+> Which has the disadvantage that the code denoted '...'
+> are not even built if CONFIG_FOO is not selected in
+> the current configuration.
+> 
+> We know that gcc do simple code-elimination for
+> conditionals which is always true/false and
+> thus the above code could be turned into:
+> 
+> 	if (CONFIG_FOO)
+> 		...
+> 
+> One line smaller and we follow the normal flow in the program.
+> The code is always build but we do not waste space as gcc will
+> do proper code-elimination for us.
+> 
+> Today this is not possible because kconfig will only
+> define CONFIG_FOO if selected and FOO is not a module.
+> 
+> The following patch implement a new set of defines in
+> the KCONFIG_* namespace.
+> 
+> For a tristate symbol the following are defined:
+> 
+> FOO not selected: 
+> #define KCONFIG_FOO        0
+> #define KCONFIG_FOO_MODULE 0
+> 
+> FOO is built-in ('y')
+> #define KCONFIG_FOO        1
+> #define KCONFIG_FOO_MODULE 0
+> 
+> FOO is a module ('m'):
+> #define KCONFIG_FOO        1
+> #define KCONFIG_FOO_MODULE 1
+> 
+> In other words KCONFIG_FOO will say if the
+> symbol is selected and KCONFIG_FOO_MODULE
+> will say if it is a module.
+> 
+> With the above included we can now do:
+> 
+> 	if (KCONFIG_FOO)
+> 		...
+> 
+> This is not a replacement for the CONFIG_*
+> defines but a pleasant supplement.
+> Using KCONFIG_FOO will also give us a nice
+> error message the day that FOO is no longer part
+> of the configuration.
 
-Which has the disadvantage that the code denoted '...'
-are not even built if CONFIG_FOO is not selected in
-the current configuration.
+It could help to get us out of the occasional sticky situation, but it
+does seem a bit risky.  What happens with Kconfig variables which are
+just not known about at all with some .configs?
 
-We know that gcc do simple code-elimination for
-conditionals which is always true/false and
-thus the above code could be turned into:
+Silly example, one could add
 
-	if (CONFIG_FOO)
-		...
+	if (KCONFIG_DVB_VES1820)
 
-One line smaller and we follow the normal flow in the program.
-The code is always build but we do not waste space as gcc will
-do proper code-elimination for us.
+to kernel/sched.c and that would work happily until someone sets DVB=n,
+in which case I assume KCONFIG_DVB_VES1820 doesn't get defined
+anywhere?
 
-Today this is not possible because kconfig will only
-define CONFIG_FOO if selected and FOO is not a module.
+A more realistic example might be using an x86-only KCONFIG_* in non-x86
+code.
 
-The following patch implement a new set of defines in
-the KCONFIG_* namespace.
-
-For a tristate symbol the following are defined:
-
-FOO not selected: 
-#define KCONFIG_FOO        0
-#define KCONFIG_FOO_MODULE 0
-
-FOO is built-in ('y')
-#define KCONFIG_FOO        1
-#define KCONFIG_FOO_MODULE 0
-
-FOO is a module ('m'):
-#define KCONFIG_FOO        1
-#define KCONFIG_FOO_MODULE 1
-
-In other words KCONFIG_FOO will say if the
-symbol is selected and KCONFIG_FOO_MODULE
-will say if it is a module.
-
-With the above included we can now do:
-
-	if (KCONFIG_FOO)
-		...
-
-This is not a replacement for the CONFIG_*
-defines but a pleasant supplement.
-Using KCONFIG_FOO will also give us a nice
-error message the day that FOO is no longer part
-of the configuration.
-
-Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
----
-diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
-index ee5fe94..011a5ec 100644
---- a/scripts/kconfig/confdata.c
-+++ b/scripts/kconfig/confdata.c
-@@ -666,6 +666,31 @@ out:
- 	return res;
- }
- 
-+static void write_tristate(FILE *m, FILE *h, struct symbol *sym)
-+{
-+	switch (sym_get_tristate_value(sym)) {
-+	case mod:
-+		fprintf(m, "CONFIG_%s=m\n", sym->name);
-+		fprintf(h, "#define CONFIG_%s_MODULE 1\n", sym->name);
-+		fprintf(h, "#define KCONFIG_%s 1\n", sym->name);
-+		if (sym->type == S_TRISTATE)
-+			fprintf(h, "#define KCONFIG_%s_MODULE 1\n", sym->name);
-+		break;
-+	case yes:
-+		fprintf(m, "CONFIG_%s=y\n", sym->name);
-+		fprintf(h, "#define CONFIG_%s 1\n", sym->name);
-+		fprintf(h, "#define KCONFIG_%s 1\n", sym->name);
-+		if (sym->type == S_TRISTATE)
-+			fprintf(h, "#define KCONFIG_%s_MODULE 0\n", sym->name);
-+		break;
-+	case no:
-+		fprintf(h, "#define KCONFIG_%s 0\n", sym->name);
-+		if (sym->type == S_TRISTATE)
-+			fprintf(h, "#define KCONFIG_%s_MODULE 0\n", sym->name);
-+		break;
-+	}
-+}
-+
- int conf_write_autoconf(void)
- {
- 	struct symbol *sym;
-@@ -716,18 +741,7 @@ int conf_write_autoconf(void)
- 		switch (sym->type) {
- 		case S_BOOLEAN:
- 		case S_TRISTATE:
--			switch (sym_get_tristate_value(sym)) {
--			case no:
--				break;
--			case mod:
--				fprintf(out, "CONFIG_%s=m\n", sym->name);
--				fprintf(out_h, "#define CONFIG_%s_MODULE 1\n", sym->name);
--				break;
--			case yes:
--				fprintf(out, "CONFIG_%s=y\n", sym->name);
--				fprintf(out_h, "#define CONFIG_%s 1\n", sym->name);
--				break;
--			}
-+			write_tristate(out, out_h, sym);
- 			break;
- 		case S_STRING:
- 			str = sym_get_string_value(sym);
