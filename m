@@ -1,63 +1,132 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from nf-out-0910.google.com ([64.233.182.191]:11165 "EHLO
-	nf-out-0910.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1758080AbYEVSKe (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 22 May 2008 14:10:34 -0400
-Received: by nf-out-0910.google.com with SMTP id d3so85144nfc.21
-        for <linux-kbuild@vger.kernel.org>; Thu, 22 May 2008 11:10:32 -0700 (PDT)
-Date: Thu, 22 May 2008 23:06:24 +0400
-From: Alexey Dobriyan <adobriyan@gmail.com>
-Subject: Re: Additional kconfig targets (cloneconfig, nonint_oldconfig etc)
-Message-ID: <20080522190624.GA12322@martell.zuzino.mipt.ru>
-References: <20080429183531.GB19652@uranus.ravnborg.org> <20080502190949.GA30270@uranus.ravnborg.org> <20080521164703.61c7d715@ephemeral> <20080521211139.GA22591@codemonkey.org.uk>
-MIME-Version: 1.0
+Received: from pasmtpa.tele.dk ([80.160.77.114]:56990 "EHLO pasmtpA.tele.dk"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751543AbYEXTZB (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 24 May 2008 15:25:01 -0400
+Date: Sat, 24 May 2008 21:25:40 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: [RFC PATCH] kconfig: introduce KCONFIG_* symbols for .c files
+Message-ID: <20080524192540.GA28067@uranus.ravnborg.org>
+Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20080521211139.GA22591@codemonkey.org.uk>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Dave Jones <davej@codemonkey.org.uk>, Andres Salomon <dilinger@queued.net>, Sam Ravnborg <sam@ravnborg.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Roland McGrath <roland@redhat.com>, Roman Zippel <zippel@linux-m68k.org>
+To: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, Andrew Morton <akpm@linux-foundation.org>, Roman Zippel <zippel@linux-m68k.org>
+Cc: Jeremy Fitzhardinge <jeremy@goop.org>
 
-On Wed, May 21, 2008 at 05:11:39PM -0400, Dave Jones wrote:
-> On Wed, May 21, 2008 at 04:47:03PM -0400, Andres Salomon wrote:
-> 
->  > > 3) Implement newsymbolsconfig (any better name?)
->  > >    Shall list all new symbols and shall not write
->  > >    any config
->  > 
->  > I'm not sure I see the point of #3.
-> 
-> It's something we've had in Fedora kernels forever, because
-> when rebasing to a new upstream version the process becomes
-> 
-> make newsymbolsconfig
-> take list of symbols, and make decisions on them
-> make oldconfig
-> 
-> 
-> without it, the process would be..
-> 
-> make oldconfig
-> note new symbol, make decision
-> make oldconfig
-> note a 2nd new symbol, make decision
-> make oldconfig
-> note a 3rd new symbol..
-> make oldconfig..
-> you get the idea.
+We have many places in the kernel that looks like
+the following:
 
-It's actually
+#ifdef CONFIG_FOO
+	...
+#endif
 
-	make oldconfig
-	[note new symbol, make decision]
-	[note new symbol, make decision]
-	[note new symbol, make decision]
-	make
+Which has the disadvantage that the code denoted '...'
+are not even built if CONFIG_FOO is not selected in
+the current configuration.
 
-so the number of decisions and invocations are the same.
+We know that gcc do simple code-elimination for
+conditionals which is always true/false and
+thus the above code could be turned into:
 
-> The way we have it isn't perfect, (adding a new symbol may unhide
-> another set of new symbols), but it reduces the number of iterations
-> needed dramatically.
+	if (CONFIG_FOO)
+		...
 
+One line smaller and we follow the normal flow in the program.
+The code is always build but we do not waste space as gcc will
+do proper code-elimination for us.
+
+Today this is not possible because kconfig will only
+define CONFIG_FOO if selected and FOO is not a module.
+
+The following patch implement a new set of defines in
+the KCONFIG_* namespace.
+
+For a tristate symbol the following are defined:
+
+FOO not selected: 
+#define KCONFIG_FOO        0
+#define KCONFIG_FOO_MODULE 0
+
+FOO is built-in ('y')
+#define KCONFIG_FOO        1
+#define KCONFIG_FOO_MODULE 0
+
+FOO is a module ('m'):
+#define KCONFIG_FOO        1
+#define KCONFIG_FOO_MODULE 1
+
+In other words KCONFIG_FOO will say if the
+symbol is selected and KCONFIG_FOO_MODULE
+will say if it is a module.
+
+With the above included we can now do:
+
+	if (KCONFIG_FOO)
+		...
+
+This is not a replacement for the CONFIG_*
+defines but a pleasant supplement.
+Using KCONFIG_FOO will also give us a nice
+error message the day that FOO is no longer part
+of the configuration.
+
+Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
+---
+diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
+index ee5fe94..011a5ec 100644
+--- a/scripts/kconfig/confdata.c
++++ b/scripts/kconfig/confdata.c
+@@ -666,6 +666,31 @@ out:
+ 	return res;
+ }
+ 
++static void write_tristate(FILE *m, FILE *h, struct symbol *sym)
++{
++	switch (sym_get_tristate_value(sym)) {
++	case mod:
++		fprintf(m, "CONFIG_%s=m\n", sym->name);
++		fprintf(h, "#define CONFIG_%s_MODULE 1\n", sym->name);
++		fprintf(h, "#define KCONFIG_%s 1\n", sym->name);
++		if (sym->type == S_TRISTATE)
++			fprintf(h, "#define KCONFIG_%s_MODULE 1\n", sym->name);
++		break;
++	case yes:
++		fprintf(m, "CONFIG_%s=y\n", sym->name);
++		fprintf(h, "#define CONFIG_%s 1\n", sym->name);
++		fprintf(h, "#define KCONFIG_%s 1\n", sym->name);
++		if (sym->type == S_TRISTATE)
++			fprintf(h, "#define KCONFIG_%s_MODULE 0\n", sym->name);
++		break;
++	case no:
++		fprintf(h, "#define KCONFIG_%s 0\n", sym->name);
++		if (sym->type == S_TRISTATE)
++			fprintf(h, "#define KCONFIG_%s_MODULE 0\n", sym->name);
++		break;
++	}
++}
++
+ int conf_write_autoconf(void)
+ {
+ 	struct symbol *sym;
+@@ -716,18 +741,7 @@ int conf_write_autoconf(void)
+ 		switch (sym->type) {
+ 		case S_BOOLEAN:
+ 		case S_TRISTATE:
+-			switch (sym_get_tristate_value(sym)) {
+-			case no:
+-				break;
+-			case mod:
+-				fprintf(out, "CONFIG_%s=m\n", sym->name);
+-				fprintf(out_h, "#define CONFIG_%s_MODULE 1\n", sym->name);
+-				break;
+-			case yes:
+-				fprintf(out, "CONFIG_%s=y\n", sym->name);
+-				fprintf(out_h, "#define CONFIG_%s 1\n", sym->name);
+-				break;
+-			}
++			write_tristate(out, out_h, sym);
+ 			break;
+ 		case S_STRING:
+ 			str = sym_get_string_value(sym);
