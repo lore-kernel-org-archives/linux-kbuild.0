@@ -1,25 +1,23 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp1.linux-foundation.org ([140.211.169.13]:48276 "EHLO
-	smtp1.linux-foundation.org" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1752693AbYEXTxe (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 24 May 2008 15:53:34 -0400
-Date: Sat, 24 May 2008 12:53:16 -0700
-From: Andrew Morton <akpm@linux-foundation.org>
+Received: from smtp4.pp.htv.fi ([213.243.153.38]:40050 "EHLO smtp4.pp.htv.fi"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754146AbYEXUH4 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 24 May 2008 16:07:56 -0400
+Date: Sat, 24 May 2008 23:05:24 +0300
+From: Adrian Bunk <bunk@kernel.org>
 Subject: Re: [RFC PATCH] kconfig: introduce KCONFIG_* symbols for .c files
-Message-Id: <20080524125316.4b969936.akpm@linux-foundation.org>
-In-Reply-To: <20080524192540.GA28067@uranus.ravnborg.org>
+Message-ID: <20080524200523.GB2308@cs181133002.pp.htv.fi>
 References: <20080524192540.GA28067@uranus.ravnborg.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20080524192540.GA28067@uranus.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Sam Ravnborg <sam@ravnborg.org>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, Roman Zippel <zippel@linux-m68k.org>, Jeremy Fitzhardinge <jeremy@goop.org>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, Andrew Morton <akpm@linux-foundation.org>, Roman Zippel <zippel@linux-m68k.org>, Jeremy Fitzhardinge <jeremy@goop.org>
 
-On Sat, 24 May 2008 21:25:40 +0200 Sam Ravnborg <sam@ravnborg.org> wrote:
-
+On Sat, May 24, 2008 at 09:25:40PM +0200, Sam Ravnborg wrote:
 > We have many places in the kernel that looks like
 > the following:
 > 
@@ -65,7 +63,10 @@ On Sat, 24 May 2008 21:25:40 +0200 Sam Ravnborg <sam@ravnborg.org> wrote:
 > In other words KCONFIG_FOO will say if the
 > symbol is selected and KCONFIG_FOO_MODULE
 > will say if it is a module.
-> 
+
+If you really want to be able to transform all #if's in .c files to 
+if()'s you also have to offer a variant of our MODULE #define.
+
 > With the above included we can now do:
 > 
 > 	if (KCONFIG_FOO)
@@ -76,19 +77,20 @@ On Sat, 24 May 2008 21:25:40 +0200 Sam Ravnborg <sam@ravnborg.org> wrote:
 > Using KCONFIG_FOO will also give us a nice
 > error message the day that FOO is no longer part
 > of the configuration.
+>...
 
-It could help to get us out of the occasional sticky situation, but it
-does seem a bit risky.  What happens with Kconfig variables which are
-just not known about at all with some .configs?
+Also an error message if if the varible is not currently available on 
+this architecture (e.g. KCONFIG_ISA on ia64).
 
-Silly example, one could add
+Not an unsolvable problem, but something that has to be taken care of.
 
-	if (KCONFIG_DVB_VES1820)
+cu
+Adrian
 
-to kernel/sched.c and that would work happily until someone sets DVB=n,
-in which case I assume KCONFIG_DVB_VES1820 doesn't get defined
-anywhere?
+-- 
 
-A more realistic example might be using an x86-only KCONFIG_* in non-x86
-code.
+       "Is there not promise of rain?" Ling Tan asked suddenly out
+        of the darkness. There had been need of rain for many days.
+       "Only a promise," Lao Er said.
+                                       Pearl S. Buck - Dragon Seed
 
