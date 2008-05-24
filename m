@@ -1,56 +1,40 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from gw.goop.org ([64.81.55.164]:53747 "EHLO mail.goop.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753047AbYEXVOV (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 24 May 2008 17:14:21 -0400
-Message-ID: <4838850E.20101@goop.org>
-Date: Sat, 24 May 2008 22:13:50 +0100
-From: Jeremy Fitzhardinge <jeremy@goop.org>
-MIME-Version: 1.0
+Received: from gprs189-60.eurotel.cz ([160.218.189.60]:2176 "EHLO spitz.ucw.cz"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1757021AbYEXV1D (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 24 May 2008 17:27:03 -0400
+Date: Sat, 24 May 2008 23:26:29 +0200
+From: Pavel Machek <pavel@ucw.cz>
 Subject: Re: [RFC PATCH] kconfig: introduce KCONFIG_* symbols for .c files
-References: <20080524192540.GA28067@uranus.ravnborg.org> <48387F0B.3020506@goop.org> <48388187.2070503@goop.org> <20080524210304.GD2308@cs181133002.pp.htv.fi>
-In-Reply-To: <20080524210304.GD2308@cs181133002.pp.htv.fi>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Message-ID: <20080524212628.GA4040@ucw.cz>
+References: <20080524192540.GA28067@uranus.ravnborg.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20080524192540.GA28067@uranus.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Adrian Bunk <bunk@kernel.org>
-Cc: Sam Ravnborg <sam@ravnborg.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, Andrew Morton <akpm@linux-foundation.org>, Roman Zippel <zippel@linux-m68k.org>, Tom Spink <tspink@gmail.com>
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, Andrew Morton <akpm@linux-foundation.org>, Roman Zippel <zippel@linux-m68k.org>, Jeremy Fitzhardinge <jeremy@goop.org>
 
-Adrian Bunk wrote:
-> On Sat, May 24, 2008 at 09:58:47PM +0100, Jeremy Fitzhardinge wrote:
->   
->> Would
->>
->>    #define KCONFIG(x)   (CONFIG_##x - 0)
->>
->>    if (KCONFIG(PREEMPT)) {
->>        ...
->>    }
->>
->> work?
->>     
->
-> $ cat test.c
-> #define KCONFIG(x)   (CONFIG_##x - 0)
->
-> int main()
-> {
->   if (KCONFIG(PREEMPT))
->     ;
->
->   return 0;
-> }
-> $ gcc -O2 -Wall test.c
-> test.c: In function ‘main’:
-> test.c:5: error: ‘CONFIG_PREEMPT’ undeclared (first use in this function)
-> test.c:5: error: (Each undeclared identifier is reported only once
-> test.c:5: error: for each function it appears in.)
->   
+Hi!
 
-You and your scientific method.
+> One line smaller and we follow the normal flow in the program.
+> The code is always build but we do not waste space as gcc will
+> do proper code-elimination for us.
+> 
+> Today this is not possible because kconfig will only
+> define CONFIG_FOO if selected and FOO is not a module.
+> 
+> The following patch implement a new set of defines in
+> the KCONFIG_* namespace.
 
-Yeah, this is one of those cases where you need cpp to rescan its input 
-after pasting, and I don't think it will ever do that.
+Could we s/KCONFIG_/CFG_/g ?
 
-    J
+CONFIG_ is long enough already, and K there is very maningless.....
+
+
+							Pavel
+-- 
+(english) http://www.livejournal.com/~pavelmachek
+(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blog.html
