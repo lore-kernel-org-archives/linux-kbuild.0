@@ -1,86 +1,39 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pasmtpb.tele.dk ([80.160.77.98]:55263 "EHLO pasmtpB.tele.dk"
+Received: from pasmtpa.tele.dk ([80.160.77.114]:42804 "EHLO pasmtpA.tele.dk"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1758436AbYEXUhJ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 24 May 2008 16:37:09 -0400
-Date: Sat, 24 May 2008 22:37:48 +0200
+	id S1752608AbYEXUn6 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 24 May 2008 16:43:58 -0400
+Date: Sat, 24 May 2008 22:44:38 +0200
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: [PATCH] x86: use defconfig as last resort
-Message-ID: <20080524203748.GA2343@uranus.ravnborg.org>
-References: <20080524192540.GA28067@uranus.ravnborg.org> <alpine.LFD.1.10.0805241320200.3081@woody.linux-foundation.org>
+Subject: Re: [RFC PATCH] kconfig: introduce KCONFIG_* symbols for .c files
+Message-ID: <20080524204438.GA3136@uranus.ravnborg.org>
+References: <20080524192540.GA28067@uranus.ravnborg.org> <20080524200523.GB2308@cs181133002.pp.htv.fi>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <alpine.LFD.1.10.0805241320200.3081@woody.linux-foundation.org>
+In-Reply-To: <20080524200523.GB2308@cs181133002.pp.htv.fi>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>, Roman Zippel <zippel@linux-m68k.org>, Jeremy Fitzhardinge <jeremy@goop.org>
+To: Adrian Bunk <bunk@kernel.org>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, Andrew Morton <akpm@linux-foundation.org>, Roman Zippel <zippel@linux-m68k.org>, Jeremy Fitzhardinge <jeremy@goop.org>
 
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: [PATCH] x86: use defconfig as last resort
+> 
+> If you really want to be able to transform all #if's in .c files to 
+> if()'s you also have to offer a variant of our MODULE #define.
+1) I have no pland to replace the current CONFIG_ use.
+2) I do not follow whay you try to say about our "MODULE #define"
 
-When using "make oldconfig" with no .config
-present try the list from init/Kconfig DEFCONFIG_LIST
-before resorting to use one of the defconfigs.
+> >...
+> 
+> Also an error message if if the varible is not currently available on 
+> this architecture (e.g. KCONFIG_ISA on ia64).
+> 
+> Not an unsolvable problem, but something that has to be taken care of.
 
-Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
----
+My master plan is to have a single configuration for the kernel
+and not as today where we have one configuration for each architecture.
 
-I had the patch in my local tree but never got it posted.
-And then I forgot.
-
-I plan to redo this stuff soonish so we have a more
-clean and predictive approach.
-But the KCONFIG_ stuff was just more fun ;^)
+How far away we are from that I dunno. It is a while I visited this.
+And I will not have time to do so anytime soon I'm afraid.
 
 	Sam
-
- arch/x86/Kconfig |   24 ++++++++++++------------
- 1 files changed, 12 insertions(+), 12 deletions(-)
-
-diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
-index fe361ae..393a169 100644
---- a/arch/x86/Kconfig
-+++ b/arch/x86/Kconfig
-@@ -26,18 +26,6 @@ config X86
- 	select HAVE_KVM if ((X86_32 && !X86_VOYAGER && !X86_VISWS && !X86_NUMAQ) || X86_64)
- 	select HAVE_ARCH_KGDB if !X86_VOYAGER
- 
--config DEFCONFIG_LIST
--	string
--	depends on X86_32
--	option defconfig_list
--	default "arch/x86/configs/i386_defconfig"
--
--config DEFCONFIG_LIST
--	string
--	depends on X86_64
--	option defconfig_list
--	default "arch/x86/configs/x86_64_defconfig"
--
- 
- config GENERIC_LOCKBREAK
- 	def_bool n
-@@ -205,6 +193,18 @@ config KTIME_SCALAR
- 	def_bool X86_32
- source "init/Kconfig"
- 
-+config DEFCONFIG_LIST
-+	string
-+	depends on X86_32
-+	option defconfig_list
-+	default "arch/x86/configs/i386_defconfig"
-+
-+config DEFCONFIG_LIST
-+	string
-+	depends on X86_64
-+	option defconfig_list
-+	default "arch/x86/configs/x86_64_defconfig"
-+
- menu "Processor type and features"
- 
- source "kernel/time/Kconfig"
--- 
-1.5.4.1.143.ge7e51
-
