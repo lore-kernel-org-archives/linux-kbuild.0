@@ -1,39 +1,54 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pasmtpa.tele.dk ([80.160.77.114]:42804 "EHLO pasmtpA.tele.dk"
+Received: from pasmtpa.tele.dk ([80.160.77.114]:43273 "EHLO pasmtpA.tele.dk"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752608AbYEXUn6 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 24 May 2008 16:43:58 -0400
-Date: Sat, 24 May 2008 22:44:38 +0200
+	id S1756456AbYEXUpa (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 24 May 2008 16:45:30 -0400
+Date: Sat, 24 May 2008 22:46:10 +0200
 From: Sam Ravnborg <sam@ravnborg.org>
 Subject: Re: [RFC PATCH] kconfig: introduce KCONFIG_* symbols for .c files
-Message-ID: <20080524204438.GA3136@uranus.ravnborg.org>
-References: <20080524192540.GA28067@uranus.ravnborg.org> <20080524200523.GB2308@cs181133002.pp.htv.fi>
+Message-ID: <20080524204610.GB3136@uranus.ravnborg.org>
+References: <20080524192540.GA28067@uranus.ravnborg.org> <20080524125316.4b969936.akpm@linux-foundation.org> <48387736.9050004@goop.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20080524200523.GB2308@cs181133002.pp.htv.fi>
+In-Reply-To: <48387736.9050004@goop.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Adrian Bunk <bunk@kernel.org>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, Andrew Morton <akpm@linux-foundation.org>, Roman Zippel <zippel@linux-m68k.org>, Jeremy Fitzhardinge <jeremy@goop.org>
+To: Jeremy Fitzhardinge <jeremy@goop.org>
+Cc: Andrew Morton <akpm@linux-foundation.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, Roman Zippel <zippel@linux-m68k.org>
 
+On Sat, May 24, 2008 at 09:14:46PM +0100, Jeremy Fitzhardinge wrote:
+> Andrew Morton wrote:
+> >It could help to get us out of the occasional sticky situation, but it
+> >  
 > 
-> If you really want to be able to transform all #if's in .c files to 
-> if()'s you also have to offer a variant of our MODULE #define.
-1) I have no pland to replace the current CONFIG_ use.
-2) I do not follow whay you try to say about our "MODULE #define"
-
-> >...
+> I think if you know you can use the if(KCONFIG_) technique, then one 
+> would tend to structure things so that you do it as much as possible.  
+> Ideally you'd use CONFIG vars in Makefiles to make code go away 
+> entirely, and if (KCONFIG_) in .c files to do conditional compilation.
 > 
-> Also an error message if if the varible is not currently available on 
-> this architecture (e.g. KCONFIG_ISA on ia64).
+> >does seem a bit risky.  What happens with Kconfig variables which are
+> >just not known about at all with some .configs?
+> >
+> >Silly example, one could add
+> >
+> >	if (KCONFIG_DVB_VES1820)
+> >
+> >to kernel/sched.c and that would work happily until someone sets DVB=n,
+> >in which case I assume KCONFIG_DVB_VES1820 doesn't get defined
+> >anywhere?
+> >
+> >A more realistic example might be using an x86-only KCONFIG_* in non-x86
+> >code.
+> >  
 > 
-> Not an unsolvable problem, but something that has to be taken care of.
+> Well, logically that means that all config vars are always "known", even 
+> if they can never be defined.  I don't know what the practicalities of 
+> that are: can all Kconfig files everywhere reasonably be scanned to 
+> produce the symbol list?
 
-My master plan is to have a single configuration for the kernel
-and not as today where we have one configuration for each architecture.
-
-How far away we are from that I dunno. It is a while I visited this.
-And I will not have time to do so anytime soon I'm afraid.
+When we have one configuration for the kernel and not as today
+where we have one configuration for each architecture (with a lot
+of shared files) then it is already taken care of by my (updated) patch.
 
 	Sam
