@@ -1,54 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pasmtpa.tele.dk ([80.160.77.114]:43273 "EHLO pasmtpA.tele.dk"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1756456AbYEXUpa (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 24 May 2008 16:45:30 -0400
-Date: Sat, 24 May 2008 22:46:10 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
+Received: from smtp1.linux-foundation.org ([140.211.169.13]:52833 "EHLO
+	smtp1.linux-foundation.org" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1756689AbYEXUs3 (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 24 May 2008 16:48:29 -0400
+Date: Sat, 24 May 2008 13:48:15 -0700
+From: Andrew Morton <akpm@linux-foundation.org>
 Subject: Re: [RFC PATCH] kconfig: introduce KCONFIG_* symbols for .c files
-Message-ID: <20080524204610.GB3136@uranus.ravnborg.org>
-References: <20080524192540.GA28067@uranus.ravnborg.org> <20080524125316.4b969936.akpm@linux-foundation.org> <48387736.9050004@goop.org>
+Message-Id: <20080524134815.116feb9d.akpm@linux-foundation.org>
+In-Reply-To: <20080524202427.GA879@uranus.ravnborg.org>
+References: <20080524192540.GA28067@uranus.ravnborg.org>
+	<20080524125316.4b969936.akpm@linux-foundation.org>
+	<20080524202427.GA879@uranus.ravnborg.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <48387736.9050004@goop.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jeremy Fitzhardinge <jeremy@goop.org>
-Cc: Andrew Morton <akpm@linux-foundation.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, Roman Zippel <zippel@linux-m68k.org>
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, Roman Zippel <zippel@linux-m68k.org>, Jeremy Fitzhardinge <jeremy@goop.org>
 
-On Sat, May 24, 2008 at 09:14:46PM +0100, Jeremy Fitzhardinge wrote:
-> Andrew Morton wrote:
-> >It could help to get us out of the occasional sticky situation, but it
-> >  
-> 
-> I think if you know you can use the if(KCONFIG_) technique, then one 
-> would tend to structure things so that you do it as much as possible.  
-> Ideally you'd use CONFIG vars in Makefiles to make code go away 
-> entirely, and if (KCONFIG_) in .c files to do conditional compilation.
-> 
-> >does seem a bit risky.  What happens with Kconfig variables which are
-> >just not known about at all with some .configs?
-> >
-> >Silly example, one could add
-> >
-> >	if (KCONFIG_DVB_VES1820)
-> >
-> >to kernel/sched.c and that would work happily until someone sets DVB=n,
-> >in which case I assume KCONFIG_DVB_VES1820 doesn't get defined
-> >anywhere?
-> >
-> >A more realistic example might be using an x86-only KCONFIG_* in non-x86
-> >code.
-> >  
-> 
-> Well, logically that means that all config vars are always "known", even 
-> if they can never be defined.  I don't know what the practicalities of 
-> that are: can all Kconfig files everywhere reasonably be scanned to 
-> produce the symbol list?
+On Sat, 24 May 2008 22:24:27 +0200 Sam Ravnborg <sam@ravnborg.org> wrote:
 
-When we have one configuration for the kernel and not as today
-where we have one configuration for each architecture (with a lot
-of shared files) then it is already taken care of by my (updated) patch.
+> > It could help to get us out of the occasional sticky situation, but it
+> > does seem a bit risky.  What happens with Kconfig variables which are
+> > just not known about at all with some .configs?
+> > 
+> > Silly example, one could add
+> > 
+> > 	if (KCONFIG_DVB_VES1820)
+> > 
+> > to kernel/sched.c and that would work happily until someone sets DVB=n,
+> > in which case I assume KCONFIG_DVB_VES1820 doesn't get defined
+> > anywhere?
+> It would have helped if I had applied the correct patch...
+> All boolean and tristate symbols in the konfiguration have
+> their symbols defined as KCONFIG_* no matter their values.
+> So KCONFIG_DVB_VES1820 would get defined.
 
-	Sam
+But there are still holes - KCONFIG_ARCH_FOOTBRIDGE wouldn't be defined
+on x86, for example.  Anything which is inside an `if' or inside an
+if/source/endif will not be known about?  I assume?
+
+It's all probably not a big problem in practice - we'd need to be
+more-than-usually-silly to trip over things like this.
+
