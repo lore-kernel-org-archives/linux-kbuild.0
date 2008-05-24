@@ -1,47 +1,35 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp6.pp.htv.fi ([213.243.153.40]:45386 "EHLO smtp6.pp.htv.fi"
+Received: from pasmtpa.tele.dk ([80.160.77.114]:49574 "EHLO pasmtpA.tele.dk"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1761613AbYEXVAG (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 24 May 2008 17:00:06 -0400
-Date: Sat, 24 May 2008 23:57:33 +0300
-From: Adrian Bunk <bunk@kernel.org>
+	id S1753047AbYEXVCj (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 24 May 2008 17:02:39 -0400
+Date: Sat, 24 May 2008 23:03:18 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
 Subject: Re: [RFC PATCH] kconfig: introduce KCONFIG_* symbols for .c files
-Message-ID: <20080524205733.GC2308@cs181133002.pp.htv.fi>
-References: <20080524192540.GA28067@uranus.ravnborg.org> <20080524200523.GB2308@cs181133002.pp.htv.fi> <20080524204438.GA3136@uranus.ravnborg.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Message-ID: <20080524210318.GB3264@uranus.ravnborg.org>
+References: <20080524192540.GA28067@uranus.ravnborg.org> <20080524125316.4b969936.akpm@linux-foundation.org> <48387736.9050004@goop.org> <20080524204610.GB3136@uranus.ravnborg.org> <48388112.6030003@goop.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20080524204438.GA3136@uranus.ravnborg.org>
+In-Reply-To: <48388112.6030003@goop.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, Andrew Morton <akpm@linux-foundation.org>, Roman Zippel <zippel@linux-m68k.org>, Jeremy Fitzhardinge <jeremy@goop.org>
+To: Jeremy Fitzhardinge <jeremy@goop.org>
+Cc: Andrew Morton <akpm@linux-foundation.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, Roman Zippel <zippel@linux-m68k.org>
 
-On Sat, May 24, 2008 at 10:44:38PM +0200, Sam Ravnborg wrote:
-> > 
-> > If you really want to be able to transform all #if's in .c files to 
-> > if()'s you also have to offer a variant of our MODULE #define.
-> 1) I have no pland to replace the current CONFIG_ use.
-> 2) I do not follow whay you try to say about our "MODULE #define"
->...
+On Sat, May 24, 2008 at 09:56:50PM +0100, Jeremy Fitzhardinge wrote:
+> Sam Ravnborg wrote:
+> >When we have one configuration for the kernel and not as today
+> >where we have one configuration for each architecture (with a lot
+> >of shared files) then it is already taken care of by my (updated) patch.
+> 
+> Yep.  But is a unified config something that someone is actively working 
+> on, or a distant pipe dream?
 
-I'm talking about the one set with
-  MODFLAGS        = -DMODULE
+Midway...
+Roman implmented named choices and I have yet to try it out.
 
-But looking through the kernel I have to take my statement back since 
-there don't seem to be many usages that could (if wanted) be transformed 
-to if()'s at all (and similarily there wouldn't be many use cases in 
-the future).
+But I have a bit on my TODO list before I get there and
+limited time (My day-time job is not Linux related).
 
-> 	Sam
-
-cu
-Adrian
-
--- 
-
-       "Is there not promise of rain?" Ling Tan asked suddenly out
-        of the darkness. There had been need of rain for many days.
-       "Only a promise," Lao Er said.
-                                       Pearl S. Buck - Dragon Seed
-
+	Sam
