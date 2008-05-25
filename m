@@ -1,40 +1,56 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from gprs189-60.eurotel.cz ([160.218.189.60]:2176 "EHLO spitz.ucw.cz"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1757021AbYEXV1D (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 24 May 2008 17:27:03 -0400
-Date: Sat, 24 May 2008 23:26:29 +0200
-From: Pavel Machek <pavel@ucw.cz>
-Subject: Re: [RFC PATCH] kconfig: introduce KCONFIG_* symbols for .c files
-Message-ID: <20080524212628.GA4040@ucw.cz>
-References: <20080524192540.GA28067@uranus.ravnborg.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20080524192540.GA28067@uranus.ravnborg.org>
+Received: from smtp1.linux-foundation.org ([140.211.169.13]:42692 "EHLO
+	smtp1.linux-foundation.org" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751526AbYEYBbg (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 24 May 2008 21:31:36 -0400
+Date: Sat, 24 May 2008 18:30:40 -0700 (PDT)
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Subject: Re: [PATCH] x86: use defconfig as last resort
+In-Reply-To: <20080524203748.GA2343@uranus.ravnborg.org>
+Message-ID: <alpine.LFD.1.10.0805241825460.3081@woody.linux-foundation.org>
+References: <20080524192540.GA28067@uranus.ravnborg.org> <alpine.LFD.1.10.0805241320200.3081@woody.linux-foundation.org> <20080524203748.GA2343@uranus.ravnborg.org>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Sam Ravnborg <sam@ravnborg.org>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, Andrew Morton <akpm@linux-foundation.org>, Roman Zippel <zippel@linux-m68k.org>, Jeremy Fitzhardinge <jeremy@goop.org>
+Cc: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>, Roman Zippel <zippel@linux-m68k.org>, Jeremy Fitzhardinge <jeremy@goop.org>
 
-Hi!
 
-> One line smaller and we follow the normal flow in the program.
-> The code is always build but we do not waste space as gcc will
-> do proper code-elimination for us.
+
+On Sat, 24 May 2008, Sam Ravnborg wrote:
 > 
-> Today this is not possible because kconfig will only
-> define CONFIG_FOO if selected and FOO is not a module.
-> 
-> The following patch implement a new set of defines in
-> the KCONFIG_* namespace.
+> When using "make oldconfig" with no .config
+> present try the list from init/Kconfig DEFCONFIG_LIST
+> before resorting to use one of the defconfigs.
 
-Could we s/KCONFIG_/CFG_/g ?
+Hmm. Why does placement matter here?
 
-CONFIG_ is long enough already, and K there is very maningless.....
+Also:
 
+> +config DEFCONFIG_LIST
+> +	string
+> +	depends on X86_32
+> +	option defconfig_list
+> +	default "arch/x86/configs/i386_defconfig"
+> +
+> +config DEFCONFIG_LIST
+> +	string
+> +	depends on X86_64
+> +	option defconfig_list
+> +	default "arch/x86/configs/x86_64_defconfig"
+> +
 
-							Pavel
--- 
-(english) http://www.livejournal.com/~pavelmachek
-(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blog.html
+Wouldn't this be cleaner as just *one* entry, and then just have 
+different default statements, ie something like
+
+    config DEFCONFIG_LIST
+	string
+	option defconfig_list
+	default "arch/x86/configs/i386_defconfig" if X86_32
+	default "arch/x86/configs/x86_64_defconfig" if X86_64
+
+instead?
+
+		Linus
