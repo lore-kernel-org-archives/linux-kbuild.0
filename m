@@ -1,56 +1,68 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp1.linux-foundation.org ([140.211.169.13]:42692 "EHLO
-	smtp1.linux-foundation.org" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751526AbYEYBbg (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 24 May 2008 21:31:36 -0400
-Date: Sat, 24 May 2008 18:30:40 -0700 (PDT)
-From: Linus Torvalds <torvalds@linux-foundation.org>
+Received: from pasmtpa.tele.dk ([80.160.77.114]:50414 "EHLO pasmtpA.tele.dk"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751825AbYEYGOt (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 25 May 2008 02:14:49 -0400
+Date: Sun, 25 May 2008 08:15:25 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
 Subject: Re: [PATCH] x86: use defconfig as last resort
-In-Reply-To: <20080524203748.GA2343@uranus.ravnborg.org>
-Message-ID: <alpine.LFD.1.10.0805241825460.3081@woody.linux-foundation.org>
-References: <20080524192540.GA28067@uranus.ravnborg.org> <alpine.LFD.1.10.0805241320200.3081@woody.linux-foundation.org> <20080524203748.GA2343@uranus.ravnborg.org>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+Message-ID: <20080525061525.GA30707@uranus.ravnborg.org>
+References: <20080524192540.GA28067@uranus.ravnborg.org> <alpine.LFD.1.10.0805241320200.3081@woody.linux-foundation.org> <20080524203748.GA2343@uranus.ravnborg.org> <alpine.LFD.1.10.0805241825460.3081@woody.linux-foundation.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <alpine.LFD.1.10.0805241825460.3081@woody.linux-foundation.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
+To: Linus Torvalds <torvalds@linux-foundation.org>
 Cc: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>, Roman Zippel <zippel@linux-m68k.org>, Jeremy Fitzhardinge <jeremy@goop.org>
 
-
-
-On Sat, 24 May 2008, Sam Ravnborg wrote:
+On Sat, May 24, 2008 at 06:30:40PM -0700, Linus Torvalds wrote:
 > 
-> When using "make oldconfig" with no .config
-> present try the list from init/Kconfig DEFCONFIG_LIST
-> before resorting to use one of the defconfigs.
+> 
+> On Sat, 24 May 2008, Sam Ravnborg wrote:
+> > 
+> > When using "make oldconfig" with no .config
+> > present try the list from init/Kconfig DEFCONFIG_LIST
+> > before resorting to use one of the defconfigs.
+> 
+> Hmm. Why does placement matter here?
 
-Hmm. Why does placement matter here?
+We have the following list in init/Kconfig:
 
-Also:
+config DEFCONFIG_LIST
+        string
+        depends on !UML
+        option defconfig_list
+        default "/lib/modules/$UNAME_RELEASE/.config"
+        default "/etc/kernel-config"
+        default "/boot/config-$UNAME_RELEASE"
+        default "arch/$ARCH/defconfig"
 
-> +config DEFCONFIG_LIST
-> +	string
-> +	depends on X86_32
-> +	option defconfig_list
-> +	default "arch/x86/configs/i386_defconfig"
-> +
-> +config DEFCONFIG_LIST
-> +	string
-> +	depends on X86_64
-> +	option defconfig_list
-> +	default "arch/x86/configs/x86_64_defconfig"
-> +
+If we define an arch specific DEFCONFIG_LIST before this then
+the arch supplied values are tried first.
+The patch moves the ARCH supplied list below the definition
+in init/Kconfig so it is tried last.
 
-Wouldn't this be cleaner as just *one* entry, and then just have 
-different default statements, ie something like
+> 
+> Also:
+> 
+> > +config DEFCONFIG_LIST
+> > +	string
+> > +	depends on X86_32
+> > +	option defconfig_list
+> > +	default "arch/x86/configs/i386_defconfig"
+> > +
+> > +config DEFCONFIG_LIST
+> > +	string
+> > +	depends on X86_64
+> > +	option defconfig_list
+> > +	default "arch/x86/configs/x86_64_defconfig"
+> > +
+> 
+> Wouldn't this be cleaner as just *one* entry, and then just have 
+> different default statements, ie something like
 
-    config DEFCONFIG_LIST
-	string
-	option defconfig_list
-	default "arch/x86/configs/i386_defconfig" if X86_32
-	default "arch/x86/configs/x86_64_defconfig" if X86_64
+I will try to come up with an alternative solution in a minute.
 
-instead?
-
-		Linus
+	Sam
