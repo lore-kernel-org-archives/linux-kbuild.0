@@ -1,76 +1,61 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pmx1.sophos.com ([213.31.172.16]:40740 "EHLO pmx1.sophos.com"
+Received: from smtp4.pp.htv.fi ([213.243.153.38]:44780 "EHLO smtp4.pp.htv.fi"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750885AbYE3MwL (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 30 May 2008 08:52:11 -0400
-In-Reply-To: <20080530124111.GC15295@duo.random>
-Subject: Re: kbuild variable $(src) broken in 2.6.23-rc3?
+	id S1751917AbYEaUWu (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 31 May 2008 16:22:50 -0400
+Date: Sat, 31 May 2008 23:22:39 +0300
+From: Adrian Bunk <bunk@kernel.org>
+Subject: sh64 build error - sh, kbuild or binutils problem?
+Message-ID: <20080531202239.GB7347@cs181133002.pp.htv.fi>
 MIME-Version: 1.0
-From: tvrtko.ursulin@sophos.com
-Date: Fri, 30 May 2008 13:52:05 +0100
-Content-Type: text/plain; charset="US-ASCII"
-Message-Id: <20080530125207.0F13D33669E@pmx1.sophos.com>
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andrea Arcangeli <andrea@qumranet.com>
-Cc: linux-kbuild@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>
+To: sam@ravnborg.org, hjl.tools@gmail.com, lethal@linux-sh.org
+Cc: linux-kbuild@vger.kernel.org, linux-sh@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Andrea Arcangeli <andrea@qumranet.com> wrote on 30/05/2008 13:41:11:
+cayman_defconfig fails to build with the following error
+(using binutils 2.18.50.0.7):
 
-> On Thu, May 29, 2008 at 09:36:58PM +0200, Sam Ravnborg wrote:
-> > I tracked it down now (a simple bisect would have doen the trick too).
-> > It was the introduction of KBUILD_EXTRA_SYMBOLS that caused
-> > us troubles because we started to include the Makefile
-> > in Makefile.modpost and thus ccflags-y (EXTRA_CFLAGS) were
-> > assigned the value "-I$(src)" but $(src) was not defined so
-> > we ended up with an empty -I which then picked up the following
-> > parameter on the command line.
-> > 
-> > I cooked up the following fix:
-> > 
-> > diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
-> > index a098a04..28ef233 100644
-> > --- a/scripts/Makefile.modpost
-> > +++ b/scripts/Makefile.modpost
-> > @@ -37,6 +37,10 @@
-> >  # symbols in the final module linking stage
-> >  # KBUILD_MODPOST_NOFINAL can be set to skip the final link of 
-modules.
-> >  # This is solely usefull to speed up test compiles
-> > +
-> > +# Assign src as it may be used in ccflags-y
-> > +src = .
-> > +
-> >  PHONY := _modpost
-> >  _modpost: __modpost
-> > 
-> 
-> The module source is the src, so this fixes the build for KVM at least.
-> 
-> Signed-off-by: Andrea Arcangeli <andrea@qumranet.com>
-> 
-> diff -r d99f6640491e scripts/Makefile.modpost
-> --- a/scripts/Makefile.modpost   Tue May 20 18:19:45 2008 +0200
-> +++ b/scripts/Makefile.modpost   Fri May 30 14:40:16 2008 +0200
-> @@ -37,6 +37,10 @@
->  # symbols in the final module linking stage
->  # KBUILD_MODPOST_NOFINAL can be set to skip the final link of modules.
->  # This is solely usefull to speed up test compiles
-> +
-> +# Assign src as it may be used in ccflags-y
-> +src = $(KBUILD_EXTMOD)
-> +
->  PHONY := _modpost
->  _modpost: __modpost
+<--  snip  -->
 
-This works for me as well.
+...
+  LD      drivers/macintosh/built-in.o
+  LD      drivers/media/common/tuners/built-in.o
+  CC [M]  drivers/media/common/tuners/tuner-xc2028.o
+  CC [M]  drivers/media/common/tuners/tuner-simple.o
+  CC [M]  drivers/media/common/tuners/tuner-types.o
+  CC [M]  drivers/media/common/tuners/mt20xx.o
+  CC [M]  drivers/media/common/tuners/tda8290.o
+  CC [M]  drivers/media/common/tuners/tea5767.o
+  CC [M]  drivers/media/common/tuners/tea5761.o
+  CC [M]  drivers/media/common/tuners/tda9887.o
+  CC [M]  drivers/media/common/tuners/xc5000.o
+  LD      drivers/media/common/built-in.o
+...
+  LD      drivers/media/built-in.o
+sh64-linux-ld: sh3 architecture of input file `drivers/media/common/built-in.o' is incompatible with sh5 outputmake[3]: *** [drivers/media/built-in.o] Error 1
 
-Tvrtko
+<--  snip  -->
 
 
+Minimal example demonstrating the problem:
 
-Sophos Plc, The Pentagon, Abingdon Science Park, Abingdon,
-OX14 3YP, United Kingdom.
+$ sh64-linux-ar rcs tmp.o
+$ sh64-linux-ld -EL -r -o tmp2.o tmp.o
+$ sh64-linux-ld -EL -r -o out.o tmp2.o 
+sh64-linux-ld: sh3 architecture of input file `tmp2.o' is incompatible with sh5 output
+$ 
 
-Company Reg No 2096520. VAT Reg No GB 348 3873 20.
+
+cu
+Adrian
+
+-- 
+
+       "Is there not promise of rain?" Ling Tan asked suddenly out
+        of the darkness. There had been need of rain for many days.
+       "Only a promise," Lao Er said.
+                                       Pearl S. Buck - Dragon Seed
 
