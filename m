@@ -1,128 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pasmtpa.tele.dk ([80.160.77.114]:45687 "EHLO pasmtpA.tele.dk"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750913AbYFCVGw (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 3 Jun 2008 17:06:52 -0400
-Date: Tue, 3 Jun 2008 23:07:32 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: [RFC PATCH] drop support for KALLSYMS_EXTRA_PASS
-Message-ID: <20080603210732.GA6247@uranus.ravnborg.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Received: from bipbip.grupopie.com ([195.23.16.24]:55577 "EHLO
+	bipbip.grupopie.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754201AbYFDO3Z (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 4 Jun 2008 10:29:25 -0400
+Message-ID: <4846A04F.1030909@grupopie.com>
+Date: Wed, 04 Jun 2008 15:01:51 +0100
+From: Paulo Marques <pmarques@grupopie.com>
+MIME-Version: 1.0
+Subject: Re: [RFC PATCH] drop support for KALLSYMS_EXTRA_PASS
+References: <20080603210732.GA6247@uranus.ravnborg.org>
+In-Reply-To: <20080603210732.GA6247@uranus.ravnborg.org>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
-Cc: Paulo Marques <pmarques@grupopie.com>, Keith Owens <kaos@ocs.com.au>
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Keith Owens <kaos@ocs.com.au>
 
-We have not seen any reports on inconsistent kallsysms data recently
-as in the last one or two years. At least I do not recall these
-and google had no hits in my searching.
+Sam Ravnborg wrote:
+> We have not seen any reports on inconsistent kallsysms data recently
+> as in the last one or two years. At least I do not recall these
+> and google had no hits in my searching.
+> 
+> So I suggest removing this as to simplify the final linking.
+> When doing "make allyesconfig" build this extra linking
+> takes considerably time (and I usually forgoet to turn it off).
 
-So I suggest removing this as to simplify the final linking.
-When doing "make allyesconfig" build this extra linking
-takes considerably time (and I usually forgoet to turn it off).
+I don't remember any recent (read: in the last few years) problems 
+either, so I guess this is ok.
 
-In addition this patch removes the debug target: debug_kallsyms
+> In addition this patch removes the debug target: debug_kallsyms
 
-	Sam
+This might be useful if changes in some binutils version creates new 
+problems for kallsyms, but it doesn't seem like a lot of work to just 
+send a reporter a patch to add this back if needed. Since there haven't 
+been any reports in a few years, I have no problems with this.
 
-Suggested patch:
+Acked-by: Paulo Marques <pmarques@grupopie.com>
 
-diff --git a/Makefile b/Makefile
-index 8db70fe..911cb90 100644
---- a/Makefile
-+++ b/Makefile
-@@ -702,7 +702,6 @@ define rule_vmlinux__
- 		rm -f $@;                                                    \
- 		/bin/false;                                                  \
- 	fi;
--	$(verify_kallsyms)
- endef
- 
- 
-@@ -719,28 +718,8 @@ ifdef CONFIG_KALLSYMS
- # o The correct .tmp_kallsyms2.o is linked into the final vmlinux.
- # o Verify that the System.map from vmlinux matches the map from
- #   .tmp_vmlinux2, just in case we did not generate kallsyms correctly.
--# o If CONFIG_KALLSYMS_EXTRA_PASS is set, do an extra pass using
--#   .tmp_vmlinux3 and .tmp_kallsyms3.o.  This is only meant as a
--#   temporary bypass to allow the kernel to be built while the
--#   maintainers work out what went wrong with kallsyms.
- 
--ifdef CONFIG_KALLSYMS_EXTRA_PASS
--last_kallsyms := 3
--else
--last_kallsyms := 2
--endif
--
--kallsyms.o := .tmp_kallsyms$(last_kallsyms).o
--
--define verify_kallsyms
--	$(Q)$(if $($(quiet)cmd_sysmap),                                      \
--	  echo '  $($(quiet)cmd_sysmap)  .tmp_System.map' &&)                \
--	  $(cmd_sysmap) .tmp_vmlinux$(last_kallsyms) .tmp_System.map
--	$(Q)cmp -s System.map .tmp_System.map ||                             \
--		(echo Inconsistent kallsyms data;                            \
--		 echo Try setting CONFIG_KALLSYMS_EXTRA_PASS;                \
--		 rm .tmp_kallsyms* ; /bin/false )
--endef
-+kallsyms.o := .tmp_kallsyms2.o
- 
- # Update vmlinux version before link
- # Use + in front of this rule to silent warning about make -j1
-@@ -758,7 +737,7 @@ quiet_cmd_kallsyms = KSYM    $@
-       cmd_kallsyms = $(NM) -n $< | $(KALLSYMS) \
-                      $(if $(CONFIG_KALLSYMS_ALL),--all-symbols) > $@
- 
--.tmp_kallsyms1.o .tmp_kallsyms2.o .tmp_kallsyms3.o: %.o: %.S scripts FORCE
-+.tmp_kallsyms1.o .tmp_kallsyms2.o: %.o: %.S scripts FORCE
- 	$(call if_changed_dep,as_o_S)
- 
- .tmp_kallsyms%.S: .tmp_vmlinux% $(KALLSYMS)
-@@ -771,22 +750,9 @@ quiet_cmd_kallsyms = KSYM    $@
- .tmp_vmlinux2: $(vmlinux-lds) $(vmlinux-all) .tmp_kallsyms1.o FORCE
- 	$(call if_changed,vmlinux__)
- 
--.tmp_vmlinux3: $(vmlinux-lds) $(vmlinux-all) .tmp_kallsyms2.o FORCE
--	$(call if_changed,vmlinux__)
--
- # Needs to visit scripts/ before $(KALLSYMS) can be used.
- $(KALLSYMS): scripts ;
- 
--# Generate some data for debugging strange kallsyms problems
--debug_kallsyms: .tmp_map$(last_kallsyms)
--
--.tmp_map%: .tmp_vmlinux% FORCE
--	($(OBJDUMP) -h $< | $(AWK) '/^ +[0-9]/{print $$4 " 0 " $$2}'; $(NM) $<) | sort > $@
--
--.tmp_map3: .tmp_map2
--
--.tmp_map2: .tmp_map1
--
- endif # ifdef CONFIG_KALLSYMS
- 
- # Do modpost on a prelinked vmlinux. The finally linked vmlinux has
-diff --git a/init/Kconfig b/init/Kconfig
-index 6199d11..5fc1067 100644
---- a/init/Kconfig
-+++ b/init/Kconfig
-@@ -588,18 +588,6 @@ config KALLSYMS_ALL
- 
- 	   Say N.
- 
--config KALLSYMS_EXTRA_PASS
--	bool "Do an extra kallsyms pass"
--	depends on KALLSYMS
--	help
--	   If kallsyms is not working correctly, the build will fail with
--	   inconsistent kallsyms data.  If that occurs, log a bug report and
--	   turn on KALLSYMS_EXTRA_PASS which should result in a stable build.
--	   Always say N here unless you find a bug in kallsyms, which must be
--	   reported.  KALLSYMS_EXTRA_PASS is only a temporary workaround while
--	   you wait for kallsyms to be fixed.
--
--
- config HOTPLUG
- 	bool "Support for hot-pluggable devices" if EMBEDDED
- 	default y
+-- 
+Paulo Marques - www.grupopie.com
+
+"'thinking outside the box' works better if I know what's inside the box."
