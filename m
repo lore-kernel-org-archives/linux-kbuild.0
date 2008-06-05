@@ -1,39 +1,51 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pasmtpa.tele.dk ([80.160.77.114]:36134 "EHLO pasmtpA.tele.dk"
+Received: from mail.ocs.com.au ([202.134.241.204]:17963 "EHLO mail.ocs.com.au"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751237AbYFDVta (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 4 Jun 2008 17:49:30 -0400
-Date: Wed, 4 Jun 2008 23:50:12 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: Simplify vmlinux link
-Message-ID: <20080604215012.GD13032@uranus.ravnborg.org>
-References: <20080604214514.GA13032@uranus.ravnborg.org>
+	id S1752713AbYFEJnY (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 5 Jun 2008 05:43:24 -0400
+From: Keith Owens <kaos@ocs.com.au>
+Subject: Re: [RFC PATCH] drop support for KALLSYMS_EXTRA_PASS 
+In-reply-to: Your message of "Tue, 03 Jun 2008 23:07:32 +0200."
+             <20080603210732.GA6247@uranus.ravnborg.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20080604214514.GA13032@uranus.ravnborg.org>
+Date: Thu, 05 Jun 2008 19:19:24 +1000
+Message-ID: <17789.1212657564@ocs10w>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: LKML <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Paulo Marques <pmarques@grupopie.com>
 
-On Wed, Jun 04, 2008 at 11:45:14PM +0200, Sam Ravnborg wrote:
-> Following two patches simplifies the foo used to link
-> vmlinux to a level where it is maintainable again.
-> 
-> The patches remove the KALLSYMS_EXTRA_PASS stuff and
-> move the vmlinux link stuff to a small shell script.
-> 
-> This need some testing as I have not even been able
-> to boot test this as my dev box is down.
-> So help and feedback is really appreciated.
-> 
-> Full patch below - I will post sepearate patches as follow-up.
-> 
-> Patches will be pushed out to kbuild-next only when I get
-> some positive reponse that it boots.
+Sam Ravnborg (on Tue, 3 Jun 2008 23:07:32 +0200) wrote:
+>We have not seen any reports on inconsistent kallsysms data recently
+>as in the last one or two years. At least I do not recall these
+>and google had no hits in my searching.
+>
+>So I suggest removing this as to simplify the final linking.
+>When doing "make allyesconfig" build this extra linking
+>takes considerably time (and I usually forgoet to turn it off).
+>
+>In addition this patch removes the debug target: debug_kallsyms
+>
+>diff --git a/Makefile b/Makefile
+>-define verify_kallsyms
+>-	$(Q)$(if $($(quiet)cmd_sysmap),                                      \
+>-	  echo '  $($(quiet)cmd_sysmap)  .tmp_System.map' &&)                \
+>-	  $(cmd_sysmap) .tmp_vmlinux$(last_kallsyms) .tmp_System.map
+>-	$(Q)cmp -s System.map .tmp_System.map ||                             \
+>-		(echo Inconsistent kallsyms data;                            \
+>-		 echo Try setting CONFIG_KALLSYMS_EXTRA_PASS;                \
+>-		 rm .tmp_kallsyms* ; /bin/false )
+>-endef
 
-This breaks um build btw.
-The 2/2 patch contains an attempt to fix it but I could not
-manage to tech ld how to find -lunit - despite that it worked with gcc.
+I am not happy about removing the check for inconsistent kallsyms data.
+Changes to the tool chain could cause this problem to recur and we
+would not pick up on it.  If we do keep the check for inconsistent data
+then we still need some way for the user to continue while the problem
+is investigated.
 
-	Sam
+Since your real complaint seems to be the extra time taken in make
+allyesconfig then the solution is easy.  Change CONFIG_KALLSYMS_EXTRA_PASS
+to a Makefile option, KALLSYMS_EXTRA_PASS=y.  No extra time required in
+make allyesconfig.
+
