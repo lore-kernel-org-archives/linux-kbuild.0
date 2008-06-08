@@ -1,43 +1,36 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor.suse.de ([195.135.220.2]:60568 "EHLO mx1.suse.de"
+Received: from gate.crashing.org ([63.228.1.57]:53925 "EHLO gate.crashing.org"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753154AbYFHRef (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 8 Jun 2008 13:34:35 -0400
-From: Andreas Schwab <schwab@suse.de>
+	id S1751244AbYFHTqy (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 8 Jun 2008 15:46:54 -0400
+In-Reply-To: <jeod6b25ln.fsf@sykes.suse.de>
+References: <20080608094730.GA30098@uranus.ravnborg.org> <19f34abd0806080312j2b09179cpa384a0460af5874e@mail.gmail.com> <20080608104122.GA10545@uranus.ravnborg.org> <1212922141.32207.495.camel@pmac.infradead.org> <20080608111707.GB10545@uranus.ravnborg.org> <1212931024.32207.546.camel@pmac.infradead.org> <2ccd2be2a739abf56d86266d5041bf07@kernel.crashing.org> <jeod6b25ln.fsf@sykes.suse.de>
+Mime-Version: 1.0 (Apple Message framework v623)
+Content-Type: text/plain; charset=US-ASCII; format=flowed
+Message-Id: <443677aecf2a9bfcb7fb8bb0fa1d71b5@kernel.crashing.org>
+Content-Transfer-Encoding: 7bit
+From: Segher Boessenkool <segher@kernel.crashing.org>
 Subject: Re: [PATCH] Speed up "make headers_*"
-References: <20080608094730.GA30098@uranus.ravnborg.org>
-	<19f34abd0806080312j2b09179cpa384a0460af5874e@mail.gmail.com>
-	<20080608104122.GA10545@uranus.ravnborg.org>
-	<1212922141.32207.495.camel@pmac.infradead.org>
-	<20080608111707.GB10545@uranus.ravnborg.org>
-	<1212931024.32207.546.camel@pmac.infradead.org>
-	<2ccd2be2a739abf56d86266d5041bf07@kernel.crashing.org>
-Date: Sun, 08 Jun 2008 19:34:28 +0200
-In-Reply-To: <2ccd2be2a739abf56d86266d5041bf07@kernel.crashing.org> (Segher
-	Boessenkool's message of "Sun, 8 Jun 2008 19:06:46 +0200")
-Message-ID: <jeod6b25ln.fsf@sykes.suse.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
+Date: Sun, 8 Jun 2008 21:45:34 +0200
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Segher Boessenkool <segher@kernel.crashing.org>
-Cc: David Woodhouse <dwmw2@infradead.org>, Vegard Nossum <vegard.nossum@gmail.com>, geert@linux-m68k.org, LKML <linux-kernel@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, zippel@linux-m68k.org, Sam Ravnborg <sam@ravnborg.org>, Jan Engelhardt <jengelh@computergmbh.de>
+To: Andreas Schwab <schwab@suse.de>
+Cc: geert@linux-m68k.org, Linus Torvalds <torvalds@linux-foundation.org>, zippel@linux-m68k.org, Jan Engelhardt <jengelh@computergmbh.de>, Sam Ravnborg <sam@ravnborg.org>, David Woodhouse <dwmw2@infradead.org>, Vegard Nossum <vegard.nossum@gmail.com>, LKML <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-Segher Boessenkool <segher@kernel.crashing.org> writes:
-
->> Assuming we _don't_ want the ac_ahz member to be included on m68k, this
->> should fix it (is __mc68000__ the right thing to use?)...
+On 8 jun 2008, at 19:34, Andreas Schwab wrote:
+>>> Assuming we _don't_ want the ac_ahz member to be included on m68k, 
+>>> this
+>>> should fix it (is __mc68000__ the right thing to use?)...
+>>
+>> I think __m68k__ is preferred, it's harder to confuse for one of the
+>> tuning symbols (that is, __mc68040__ and friends).
 >
-> I think __m68k__ is preferred, it's harder to confuse for one of the
-> tuning symbols (that is, __mc68040__ and friends).
+> __m68k__ wasn't pre-defined by gcc before 3.4.
 
-__m68k__ wasn't pre-defined by gcc before 3.4.
+Darn, I knew I should have checked the history.  __mc68000__ is
+the best thing to use, then, some people still use 3.3 (don't ask
+me why).
 
-Andreas.
 
--- 
-Andreas Schwab, SuSE Labs, schwab@suse.de
-SuSE Linux Products GmbH, Maxfeldstraße 5, 90409 Nürnberg, Germany
-PGP key fingerprint = 58CA 54C7 6D53 942B 1756  01D3 44D5 214B 8276 4ED5
-"And now for something completely different."
+Segher
+
