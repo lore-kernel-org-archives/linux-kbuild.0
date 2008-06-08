@@ -1,101 +1,31 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from wf-out-1314.google.com ([209.85.200.169]:60276 "EHLO
-	wf-out-1314.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754848AbYFHUhm (ORCPT
+Received: from bombadil.infradead.org ([18.85.46.34]:32856 "EHLO
+	bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754732AbYFHU67 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 8 Jun 2008 16:37:42 -0400
-Received: by wf-out-1314.google.com with SMTP id 27so1803542wfd.4
-        for <linux-kbuild@vger.kernel.org>; Sun, 08 Jun 2008 13:37:42 -0700 (PDT)
-Message-ID: <19f34abd0806081337n2024f33fof890f63b4e136b83@mail.gmail.com>
-Date: Sun, 8 Jun 2008 22:37:41 +0200
-From: "Vegard Nossum" <vegard.nossum@gmail.com>
-Subject: Re: [PATCH 6/6] kbuild: optimize headers_* targets
-In-Reply-To: <1212955658-32168-6-git-send-email-sam@ravnborg.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+	Sun, 8 Jun 2008 16:58:59 -0400
+Subject: Re: [PATCH] Speed up "make headers_*"
+From: David Woodhouse <dwmw2@infradead.org>
+In-Reply-To: <20080608200727.GA32141@uranus.ravnborg.org>
 References: <20080608094730.GA30098@uranus.ravnborg.org>
-	 <1212955658-32168-6-git-send-email-sam@ravnborg.org>
+	 <20080608200727.GA32141@uranus.ravnborg.org>
+Content-Type: text/plain
+Date: Sun, 08 Jun 2008 21:58:54 +0100
+Message-Id: <1212958734.2534.51.camel@shinybook.infradead.org>
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, David Woodhouse <dwmw2@infradead.org>
+To: Sam Ravnborg <sam@ravnborg.org>, Mike Frysinger <vapier@gentoo.org>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>
 
-Hi Sam,
+It doesn't look like headers_check_all will work after your patches --
+but to be fair I don't think it worked _before_ them either. When you
+run headers_install_all, there's no asm/ directory -- and thus the check
+will fail for any headers in linux/ which try to include <asm/*.h>. 
 
-Just one more comment from me :-)
-
-On Sun, Jun 8, 2008 at 10:07 PM, Sam Ravnborg <sam@ravnborg.org> wrote:
-> diff --git a/scripts/headers_install.pl b/scripts/headers_install.pl
-> new file mode 100644
-> index 0000000..283c055
-> --- /dev/null
-> +++ b/scripts/headers_install.pl
-> @@ -0,0 +1,43 @@
-> +#!/usr/bin/perl
-> +#
-> +# headers_install prepare the listed header files for use in
-> +# user space and copy the files to their destination.
-> +#
-> +# Usage: headers_install.pl odir installdir [files...]
-> +# odir:    dir to open files
-> +# install: dir to install the files
-> +# files:   list of files to check
-> +#
-> +# Step in preparation for users space:
-> +# 1) Drop all use of compiler.h definitions
-> +# 2) Drop include of compiler.h
-> +# 3) Drop all sections defined out by __KERNEL__ (using unifdef)
-> +
-> +use strict;
-> +use warnings;
-> +
-> +my ($odir, $installdir, @files) = @ARGV;
-> +
-> +my $ret = 0;
-> +my $unifdef = "scripts/unifdef -U__KERNEL__";
-> +
-> +foreach my $file (@files) {
-> +       my $tmpfile = "$installdir/$file.tmp";
-> +       open(my $infile, '<', "$odir/$file") or die "$odir/$file: $!\n";
-> +       open(my $outfile, '>', "$tmpfile") or die "$tmpfile: $!\n";
-> +       while (my $line = <$infile>) {
-> +               $line =~ s/([\s(])__user\s/$1/g;
-> +               $line =~ s/([\s(])__force\s/$1/g;
-> +               $line =~ s/([\s(])__iomem\s/$1/g;
-> +               $line =~ s/\s__attribute_const__\s/ /g;
-> +               $line =~ s/\s__attribute_const__$//g;
-> +               $line =~ s/^#include <linux\/compiler.h>//;
-> +               printf $outfile "%s", $line;
-> +       }
-> +       close $outfile;
-> +       close $infile;
-> +       $ret = system $unifdef . " $tmpfile > $installdir/$file";
-
-This seems flawed as we'll always exit with the $ret of the last file.
-Do you intend to abort on the first error, or go as far as possible?
-
-Maybe you can use something like this:
-
-system ... or warn "$file: $!\n"
-$ret = $? unless $ret;
-
-(This should preserve the $ret from the first process that fails with
-a non-zero exit code.)
-
-> +       unlink $tmpfile;
-> +}
-> +
-> +exit $ret;
-
-What do you think?
-
-
-Vegard
+Did this _ever_ work?
 
 -- 
-"The animistic metaphor of the bug that maliciously sneaked in while
-the programmer was not looking is intellectually dishonest as it
-disguises that the error is the programmer's own creation."
-	-- E. W. Dijkstra, EWD1036
+dwmw2
+
