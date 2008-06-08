@@ -1,36 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from gate.crashing.org ([63.228.1.57]:53925 "EHLO gate.crashing.org"
+Received: from pasmtpb.tele.dk ([80.160.77.98]:39547 "EHLO pasmtpB.tele.dk"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751244AbYFHTqy (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 8 Jun 2008 15:46:54 -0400
-In-Reply-To: <jeod6b25ln.fsf@sykes.suse.de>
-References: <20080608094730.GA30098@uranus.ravnborg.org> <19f34abd0806080312j2b09179cpa384a0460af5874e@mail.gmail.com> <20080608104122.GA10545@uranus.ravnborg.org> <1212922141.32207.495.camel@pmac.infradead.org> <20080608111707.GB10545@uranus.ravnborg.org> <1212931024.32207.546.camel@pmac.infradead.org> <2ccd2be2a739abf56d86266d5041bf07@kernel.crashing.org> <jeod6b25ln.fsf@sykes.suse.de>
-Mime-Version: 1.0 (Apple Message framework v623)
-Content-Type: text/plain; charset=US-ASCII; format=flowed
-Message-Id: <443677aecf2a9bfcb7fb8bb0fa1d71b5@kernel.crashing.org>
-Content-Transfer-Encoding: 7bit
-From: Segher Boessenkool <segher@kernel.crashing.org>
+	id S1754481AbYFHUGp (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 8 Jun 2008 16:06:45 -0400
+Date: Sun, 8 Jun 2008 22:07:27 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
 Subject: Re: [PATCH] Speed up "make headers_*"
-Date: Sun, 8 Jun 2008 21:45:34 +0200
+Message-ID: <20080608200727.GA32141@uranus.ravnborg.org>
+References: <20080608094730.GA30098@uranus.ravnborg.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20080608094730.GA30098@uranus.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andreas Schwab <schwab@suse.de>
-Cc: geert@linux-m68k.org, Linus Torvalds <torvalds@linux-foundation.org>, zippel@linux-m68k.org, Jan Engelhardt <jengelh@computergmbh.de>, Sam Ravnborg <sam@ravnborg.org>, David Woodhouse <dwmw2@infradead.org>, Vegard Nossum <vegard.nossum@gmail.com>, LKML <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
+Cc: David Woodhouse <dwmw2@infradead.org>, Linus Torvalds <torvalds@linux-foundation.org>
 
-On 8 jun 2008, at 19:34, Andreas Schwab wrote:
->>> Assuming we _don't_ want the ac_ahz member to be included on m68k, 
->>> this
->>> should fix it (is __mc68000__ the right thing to use?)...
->>
->> I think __m68k__ is preferred, it's harder to confuse for one of the
->> tuning symbols (that is, __mc68040__ and friends).
->
-> __m68k__ wasn't pre-defined by gcc before 3.4.
+On Sun, Jun 08, 2008 at 11:47:30AM +0200, Sam Ravnborg wrote:
+> This is just a heads up patch if anyone is interested.
+> I finally took the time needed to optimize the
+> make headers_* targets.
 
-Darn, I knew I should have checked the history.  __mc68000__ is
-the best thing to use, then, some people still use 3.3 (don't ask
-me why).
+Based on inputs from various people I have now updated the patch.
+A proper serie with a few preparational patches will be posted
+and they are aiming for kbuild-next.
 
+The patchset:
 
-Segher
+      kbuild: refactor headers_* targets in Makefile
+      kbuild: always unifdef files in headers_install*
+      kbuild: drop support of ALTARCH for headers_*
+      kbuild: code refactoring in Makefile.headerinst
+      kbuild: error out early in make headers_install
+      kbuild: optimize headers_* targets
 
+The meat of the patch is in the last patch which contains all
+the real improvements.
+
+	Sam
