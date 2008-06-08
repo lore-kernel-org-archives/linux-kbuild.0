@@ -1,154 +1,90 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from rv-out-0506.google.com ([209.85.198.238]:19121 "EHLO
-	rv-out-0506.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756795AbYFHKMf (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 8 Jun 2008 06:12:35 -0400
-Received: by rv-out-0506.google.com with SMTP id l9so2132205rvb.1
-        for <linux-kbuild@vger.kernel.org>; Sun, 08 Jun 2008 03:12:35 -0700 (PDT)
-Message-ID: <19f34abd0806080312j2b09179cpa384a0460af5874e@mail.gmail.com>
-Date: Sun, 8 Jun 2008 12:12:35 +0200
-From: "Vegard Nossum" <vegard.nossum@gmail.com>
+Received: from pasmtpa.tele.dk ([80.160.77.114]:36315 "EHLO pasmtpA.tele.dk"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1757071AbYFHKkl (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 8 Jun 2008 06:40:41 -0400
+Date: Sun, 8 Jun 2008 12:41:22 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
 Subject: Re: [PATCH] Speed up "make headers_*"
-In-Reply-To: <20080608094730.GA30098@uranus.ravnborg.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Message-ID: <20080608104122.GA10545@uranus.ravnborg.org>
+References: <20080608094730.GA30098@uranus.ravnborg.org> <19f34abd0806080312j2b09179cpa384a0460af5874e@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-References: <20080608094730.GA30098@uranus.ravnborg.org>
+In-Reply-To: <19f34abd0806080312j2b09179cpa384a0460af5874e@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
+To: Vegard Nossum <vegard.nossum@gmail.com>
 Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, David Woodhouse <dwmw2@infradead.org>, Linus Torvalds <torvalds@linux-foundation.org>, Jan Engelhardt <jengelh@computergmbh.de>
 
-On Sun, Jun 8, 2008 at 11:47 AM, Sam Ravnborg <sam@ravnborg.org> wrote:
-> This is just a heads up patch if anyone is interested.
-> I finally took the time needed to optimize the
-> make headers_* targets.
->
-> On my box it now takes less than 10 seconds to run
-> the full install + check cycle.
-> And it generates roughtly one screen full of output.
->
-> Compare that to ~31 seconds and output filling up
-> my scroll back buffer.
+On Sun, Jun 08, 2008 at 12:12:35PM +0200, Vegard Nossum wrote:
+> On Sun, Jun 8, 2008 at 11:47 AM, Sam Ravnborg <sam@ravnborg.org> wrote:
+> > This is just a heads up patch if anyone is interested.
+> > I finally took the time needed to optimize the
+> > make headers_* targets.
+> >
+> > On my box it now takes less than 10 seconds to run
+> > the full install + check cycle.
+> > And it generates roughtly one screen full of output.
+> >
+> > Compare that to ~31 seconds and output filling up
+> > my scroll back buffer.
+> 
+> Nice :-)
+> 
+> > Comments (especially to the perl scripts) are welcome.
+> 
+> Will do! Some of my comments are a bit on the pedantic side, so you
+> choose yourself which ones you want to heed!
 
-Nice :-)
+Thnaks!
 
-> Comments (especially to the perl scripts) are welcome.
+headers_install.pl looks like this now.
+I am not happy about the way I call unifdef - can it be
+done better?
+No error handling and I like to avid the extra tmp file.
 
-Will do! Some of my comments are a bit on the pedantic side, so you
-choose yourself which ones you want to heed!
+	Sam
 
-> diff --git a/scripts/headers_check.pl b/scripts/headers_check.pl
-> new file mode 100644
-> index 0000000..dfb2ec7
-> --- /dev/null
-> +++ b/scripts/headers_check.pl
-> @@ -0,0 +1,48 @@
-> +#!/usr/bin/perl
-> +#
-> +# headers_check.pl execute a number of trivial consistency checks
-> +#
-> +# Usage: headers_check.pl dir [files...]
-> +# dir..:  dir to look for included files
-> +# files:  list of files to check
-> +#
-> +# The script reads the supplied files line by line and:
-> +#
-> +# 1) for each include statement it checks if the
-> +#    included file actually exists.
-> +#    Only include files located in asm* and linux* are checked.
-> +#    The rest are assumed to be system include files.
-> +#
-> +# 2) TODO
+#!/usr/bin/perl
+#
+# headers_install prepare the listed header files for use in
+# user space and copy the files to their destination.
+#
+# Usage: headers_install.pl odir installdir [files...]
+# odir:    dir to open files
+# install: dir to install the files
+# files:   list of files to check
+#
+# Step in preparation for users space:
+# 1) Drop all use of compiler.h definitions
+# 2) Drop include of compiler.h
+# 3) Drop all sections defined out by __KERNEL__
 
-'use strict' and 'use warnings' is recommended. You have "my" on the
-variables anyway (which is a good thing!).
+use strict;
+use warnings;
 
-> +
-> +my ($dir, @files) = @ARGV;
-> +
-> +my $ret = 0;
-> +my $lineno = 0;
-> +my $filename;
-> +
-> +foreach $file (@files) {
-> +       $filename = $file;
-> +       open(FILE, "< $filename") or die "$filename: $!\n";
+my ($odir, $installdir, @files) = @ARGV;
 
-I personally prefer to put '<', $filename here instead of mashing them
-together as one string. I don't know if it really matters.
+my $ret = 0;
 
-If you want to compile with strict/warnings here, you should replace
-FILE with "my $fh" here
+foreach my $file (@files) {
+	open(my $infile, '<', "$odir/$file") or die "$odir/$file: $!\n";
+	open(my $outfile, '>', "$installdir/$file.tmp") or
+		die "$installdir/$file.tmp: $!\n";
+	while (my $line = <$infile>) {
+		$line =~ s/([\s(])__user\s/$1/g;
+		$line =~ s/([\s(])__force\s/$1/g;
+		$line =~ s/([\s(])__iomem\s/$1/g;
+		$line =~ s/\s__attribute_const__\s/ /g;
+		$line =~ s/\s__attribute_const__$//g;
+		$line =~ s/^#include <linux\/compiler.h>//;
+		printf $outfile "%s", $line;
+	}
+	close($outfile);
+	close($outfile);
+	system "scripts/unifdef -U__KERNEL__ $installdir/$file.tmp > $installdir/$file"
+}
 
-> +       $lineno = 0;
-> +       while ($line = <FILE>) {
+exit $ret;
 
-...and use <$fh> here.
-
-> +               $lineno++;
-> +               &check_include();
-
-The & should be gone (see perldoc -q 'calling a function')
-
-> +       }
-> +       close(FILE);
-> +}
-> +exit($ret);
-
-The parentheses are not needed for most of the built-in functions.
-
-> +
-> +my $includere = qr/^\s*#\s*include\s+<(.*)>/;
-
-What seems to be the purpose of this, also what's up with the funny name? :-D
-
-> +sub check_include()
-
-The parentheses should be gone. This has something to do with
-prototypes and should normally not be used.
-
-> +{
-> +       if ($line =~ m/^\s*#\s*include\s+<(.*)>/) {
-> +               my $inc = $1;
-
-This could also be written as if (my($inc) = $line =~ ...), and you
-bypass the use of $1, which is often error-prone... but it's correct
-in this case and is simply a matter of taste.
-
-> +               if ($inc =~ m/^asm/ || $inc =~ m/^linux/) {
-> +                       if (!(stat($dir . "/" . $inc))) {
-
-May use unless() instead of if(!()) here. But that's just perl pedantry.
-
-> +                               printf STDERR "$filename:$lineno: included file '$inc' is not exported\n";
-> +                               $ret = 1;
-> +                       }
-> +               }
-> +       }
-> +}
-
-More or less the same comments would apply to the next script as well.
-
-> diff --git a/scripts/headers_install.pl b/scripts/headers_install.pl
-> new file mode 100644
-> index 0000000..8aa66af
-> --- /dev/null
-> +++ b/scripts/headers_install.pl
-...
-> +               $line =~ s/([\s(])__user\s/\1/g;
-...
-
-Use of $1 instead of \1 is recommended, see perldoc perlre ("Warning
-on \1 vs $1").
-
-
-Vegard
-
--- 
-"The animistic metaphor of the bug that maliciously sneaked in while
-the programmer was not looking is intellectually dishonest as it
-disguises that the error is the programmer's own creation."
-	-- E. W. Dijkstra, EWD1036
