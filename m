@@ -1,79 +1,62 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([18.85.46.34]:40937 "EHLO
-	bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754953AbYFHMO2 (ORCPT
+Received: from rv-out-0506.google.com ([209.85.198.234]:21847 "EHLO
+	rv-out-0506.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1762032AbYFHMX0 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 8 Jun 2008 08:14:28 -0400
+	Sun, 8 Jun 2008 08:23:26 -0400
+Received: by rv-out-0506.google.com with SMTP id l9so2152196rvb.1
+        for <linux-kbuild@vger.kernel.org>; Sun, 08 Jun 2008 05:23:24 -0700 (PDT)
+Message-ID: <8499950a0806080523l15e5ba01v30c4c78b59e0a4d7@mail.gmail.com>
+Date: Sun, 8 Jun 2008 13:23:24 +0100
+From: "Oleg Verych" <olecom@gmail.com>
 Subject: Re: [PATCH] Speed up "make headers_*"
-From: David Woodhouse <dwmw2@infradead.org>
-In-Reply-To: <1212925623.32207.517.camel@pmac.infradead.org>
-References: <20080608094730.GA30098@uranus.ravnborg.org>
-	 <1212924004.32207.498.camel@pmac.infradead.org>
-	 <20080608113028.GE10545@uranus.ravnborg.org>
-	 <1212925623.32207.517.camel@pmac.infradead.org>
-Content-Type: text/plain
-Date: Sun, 08 Jun 2008 13:14:25 +0100
-Message-Id: <1212927265.32207.527.camel@pmac.infradead.org>
-Mime-Version: 1.0
+In-Reply-To: <20080608111707.GB10545@uranus.ravnborg.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+References: <20080608094730.GA30098@uranus.ravnborg.org>
+	 <19f34abd0806080312j2b09179cpa384a0460af5874e@mail.gmail.com>
+	 <20080608104122.GA10545@uranus.ravnborg.org>
+	 <1212922141.32207.495.camel@pmac.infradead.org>
+	 <20080608111707.GB10545@uranus.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Sam Ravnborg <sam@ravnborg.org>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>
+Cc: David Woodhouse <dwmw2@infradead.org>, Vegard Nossum <vegard.nossum@gmail.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, Jan Engelhardt <jengelh@computergmbh.de>
 
-On Sun, 2008-06-08 at 12:47 +0100, David Woodhouse wrote:
-> On Sun, 2008-06-08 at 13:30 +0200, Sam Ravnborg wrote:
-> > I will name it ASMDIR and set it to 'y' if we shall install to asm/
-> 
-> That works if we can't just make the top-level Makefile set $(dst) for
-> itself. Which perhaps we could, if we stopped it running the whole
-> recursive installation on include/ for each arch, and instead made it
-> run only on include/asm-$(ARCH) for each arch.
-> 
-> And do a separate run for the other directories, of course -- probably
-> with $(ARCH) and $(SRCARCH) set to empty or something.
-> 
-> That also might help shave a little more time off by not repeating the
-> export 20 times for every non-asm subdirectory. (Not that we actually
-> _do_ repeat it, but even the make invocation and the dependency checks
-> take time).
+> Correct. A quick grep shows that we have these different
+> uses of __KERNEL__:
+>
+> #if defined(__ARM_EABI__) && !defined(__KERNEL__)
+> #if !defined(CONFIG_M68K) || !defined(__KERNEL__)
+> #if defined(CONFIG_VIDEO_V4L1_COMPAT) || !defined (__KERNEL__)
+> #if defined(__GNUC__) && !defined(__STRICT_ANSI__) || defined(__KERNEL__)
+> #if defined(__KERNEL__)
 
-Something like this takes the time for 'headers_install_all' from 30s to
-20s on my machine, and from 9s to 1.5s when it doesn't actually have to
-do anything. I have yet to actually remove $(BIARCH) and just override
-$(dst), though.
+> #ifndef __KERNEL__
+>
+> #else and #endif filtered away.
+>
+> A script needs to take into account other preprocessor
+> uses too due to their nested nature.
+> But doable I'm sure.
+>
+> And I rather have 100 lines perl than use the unifdef utility
+> because we then have it collected in one place and can do even
+> stricter validation.
 
-diff --git a/Makefile b/Makefile
-index eff8fee..4eae126 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1017,6 +1017,14 @@ headers_install_all: __headers
- 	         BIASMDIR=-bi-$$arch ;\
- 	 done
- 
-+PHONY += headers_install_all_faster
-+headers_install_all_faster: __headers
-+	$(Q)$(MAKE) ARCH= SRCARCH= $(hdr-inst)=include
-+	$(Q)set -e; for arch in $(hdr-archs); do \
-+	 $(MAKE) ARCH=$$arch SRCARCH=$$arch $(hdr-inst)=include/asm-$$arch \
-+	         BIASMDIR=-bi-$$arch ;\
-+	 done
-+
- PHONY += headers_install
- headers_install: __headers
- 	$(Q)if [ ! -r $(srctree)/include/asm-$(SRCARCH)/Kbuild ]; then \
-diff --git a/include/Kbuild b/include/Kbuild
-index b522887..9393f7e 100644
---- a/include/Kbuild
-+++ b/include/Kbuild
-@@ -5,4 +5,6 @@ header-y += mtd/
- header-y += rdma/
- header-y += video/
- 
-+ifneq ($(ARCH),)
- header-y += asm-$(ARCH)/
-+endif
+I've suggested some time ago to adopt a coding style for simple
+
+#if defined(__KERNEL__)
+#ifndef __KERNEL__
+
+this will be much clearner as for developers to know the scope by
+using simple /* __KERNEL__ */  /* !__KERNEL__ */, and `sed`
+script for that would be from 1 to 4 lines.
 
 -- 
-dwmw2
-
+sed 'sed && sh + olecom = love'  <<  ''
+-o--=O`C
+ #oo'L O
+<___=E M
