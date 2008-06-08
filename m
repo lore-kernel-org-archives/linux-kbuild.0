@@ -1,55 +1,32 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([18.85.46.34]:51773 "EHLO
-	bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751494AbYFHNRL (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 8 Jun 2008 09:17:11 -0400
-Subject: Re: [PATCH] Speed up "make headers_*"
-From: David Woodhouse <dwmw2@infradead.org>
-In-Reply-To: <20080608111707.GB10545@uranus.ravnborg.org>
-References: <20080608094730.GA30098@uranus.ravnborg.org>
-	 <19f34abd0806080312j2b09179cpa384a0460af5874e@mail.gmail.com>
-	 <20080608104122.GA10545@uranus.ravnborg.org>
-	 <1212922141.32207.495.camel@pmac.infradead.org>
-	 <20080608111707.GB10545@uranus.ravnborg.org>
-Content-Type: text/plain
-Date: Sun, 08 Jun 2008 14:17:04 +0100
-Message-Id: <1212931024.32207.546.camel@pmac.infradead.org>
-Mime-Version: 1.0
+Received: from gate.crashing.org ([63.228.1.57]:41670 "EHLO gate.crashing.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752227AbYFHRHc (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 8 Jun 2008 13:07:32 -0400
+In-Reply-To: <1212931024.32207.546.camel@pmac.infradead.org>
+References: <20080608094730.GA30098@uranus.ravnborg.org> <19f34abd0806080312j2b09179cpa384a0460af5874e@mail.gmail.com> <20080608104122.GA10545@uranus.ravnborg.org> <1212922141.32207.495.camel@pmac.infradead.org> <20080608111707.GB10545@uranus.ravnborg.org> <1212931024.32207.546.camel@pmac.infradead.org>
+Mime-Version: 1.0 (Apple Message framework v623)
+Content-Type: text/plain; charset=US-ASCII; format=flowed
+Message-Id: <2ccd2be2a739abf56d86266d5041bf07@kernel.crashing.org>
 Content-Transfer-Encoding: 7bit
+From: Segher Boessenkool <segher@kernel.crashing.org>
+Subject: Re: [PATCH] Speed up "make headers_*"
+Date: Sun, 8 Jun 2008 19:06:46 +0200
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: Vegard Nossum <vegard.nossum@gmail.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, Jan Engelhardt <jengelh@computergmbh.de>, geert@linux-m68k.org, zippel@linux-m68k.org
+To: David Woodhouse <dwmw2@infradead.org>
+Cc: Vegard Nossum <vegard.nossum@gmail.com>, geert@linux-m68k.org, LKML <linux-kernel@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, zippel@linux-m68k.org, Sam Ravnborg <sam@ravnborg.org>, Jan Engelhardt <jengelh@computergmbh.de>
 
-On Sun, 2008-06-08 at 13:17 +0200, Sam Ravnborg wrote:
-> #if !defined(CONFIG_M68K) || !defined(__KERNEL__)
+> Assuming we _don't_ want the ac_ahz member to be included on m68k, this
+> should fix it (is __mc68000__ the right thing to use?)...
 
-That's just scary, and broken for m68k where in userspace neither
-CONFIG_M68K nor __KERNEL__ will be defined, so the unwanted ac_ahz
-member will actually show up and break the binary compatibility.
+I think __m68k__ is preferred, it's harder to confuse for one of the
+tuning symbols (that is, __mc68040__ and friends).
 
-Assuming we _don't_ want the ac_ahz member to be included on m68k, this
-should fix it (is __mc68000__ the right thing to use?)...
-
-diff --git a/include/linux/acct.h b/include/linux/acct.h
-index e8cae54..228473b 100644
---- a/include/linux/acct.h
-+++ b/include/linux/acct.h
-@@ -58,8 +58,7 @@ struct acct
- 	comp_t		ac_minflt;		/* Minor Pagefaults */
- 	comp_t		ac_majflt;		/* Major Pagefaults */
- 	comp_t		ac_swaps;		/* Number of Swaps */
--/* m68k had no padding here. */
--#if !defined(CONFIG_M68K) || !defined(__KERNEL__)
-+#ifndef __mc68000__ /* m68k had no padding here. */
- 	__u16		ac_ahz;			/* AHZ */
- #endif
- 	__u32		ac_exitcode;		/* Exitcode */
+It should function identically though, both __m68k__ and __mc68000__
+(and __mc68000 and mc68000) are defined under exactly the same
+conditions.
 
 
-
-
--- 
-dwmw2
+Segher
 
