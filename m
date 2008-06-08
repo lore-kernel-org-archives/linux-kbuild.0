@@ -1,57 +1,88 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pasmtpa.tele.dk ([80.160.77.114]:40243 "EHLO pasmtpA.tele.dk"
+Received: from pasmtpa.tele.dk ([80.160.77.114]:53420 "EHLO pasmtpA.tele.dk"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1759253AbYFGKvF (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 7 Jun 2008 06:51:05 -0400
-Date: Sat, 7 Jun 2008 12:51:46 +0200
+	id S1753838AbYFHH3s (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 8 Jun 2008 03:29:48 -0400
+Received: from ravnborg.org (0x535d98d8.vgnxx8.adsl-dhcp.tele.dk [83.93.152.216])
+	by pasmtpA.tele.dk (Postfix) with ESMTP id 72362800049
+	for <linux-kbuild@vger.kernel.org>; Sun,  8 Jun 2008 09:29:47 +0200 (CEST)
+Date: Sun, 8 Jun 2008 09:30:30 +0200
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [RFC PATCH] drop support for KALLSYMS_EXTRA_PASS
-Message-ID: <20080607105146.GA25410@uranus.ravnborg.org>
-References: <20080603210732.GA6247@uranus.ravnborg.org> <17789.1212657564@ocs10w>
+Subject: perl help needed...
+Message-ID: <20080608073030.GA13796@uranus.ravnborg.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <17789.1212657564@ocs10w>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Keith Owens <kaos@ocs.com.au>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Paulo Marques <pmarques@grupopie.com>
+To: linux-kbuild <linux-kbuild@vger.kernel.org>
 
-On Thu, Jun 05, 2008 at 07:19:24PM +1000, Keith Owens wrote:
-> Sam Ravnborg (on Tue, 3 Jun 2008 23:07:32 +0200) wrote:
-> >We have not seen any reports on inconsistent kallsysms data recently
-> >as in the last one or two years. At least I do not recall these
-> >and google had no hits in my searching.
-> >
-> >So I suggest removing this as to simplify the final linking.
-> >When doing "make allyesconfig" build this extra linking
-> >takes considerably time (and I usually forgoet to turn it off).
-> >
-> >In addition this patch removes the debug target: debug_kallsyms
-> >
-> >diff --git a/Makefile b/Makefile
-> >-define verify_kallsyms
-> >-	$(Q)$(if $($(quiet)cmd_sysmap),                                      \
-> >-	  echo '  $($(quiet)cmd_sysmap)  .tmp_System.map' &&)                \
-> >-	  $(cmd_sysmap) .tmp_vmlinux$(last_kallsyms) .tmp_System.map
-> >-	$(Q)cmp -s System.map .tmp_System.map ||                             \
-> >-		(echo Inconsistent kallsyms data;                            \
-> >-		 echo Try setting CONFIG_KALLSYMS_EXTRA_PASS;                \
-> >-		 rm .tmp_kallsyms* ; /bin/false )
-> >-endef
-> 
-> I am not happy about removing the check for inconsistent kallsyms data.
-> Changes to the tool chain could cause this problem to recur and we
-> would not pick up on it.  If we do keep the check for inconsistent data
-> then we still need some way for the user to continue while the problem
-> is investigated.
-> 
-> Since your real complaint seems to be the extra time taken in make
-> allyesconfig then the solution is easy.  Change CONFIG_KALLSYMS_EXTRA_PASS
-> to a Makefile option, KALLSYMS_EXTRA_PASS=y.  No extra time required in
-> make allyesconfig.
-The primary complaint are the additional complexity in the Makefile.
-See http://lkml.org/lkml/2008/6/4/436 for a much simpler
-and thus more hackable method for linking vmlinux.
+I'm trying to optimize "make headers_install" and need 
+some perl help...
 
-	Sam
+What I have today:
+#!/usr/bin/perl
+#
+# headers_install prepare the listed header files for use in
+# user space and copy the files to their destination.
+#
+# Usage: headers_install.pl opendir installdir [files...]
+# opendir: dir to open files
+# install: dir to install the files
+# files..: list of files to check
+#
+# Step in preparation for users space:
+# 1) Drop all use of compiler.h definitions
+# 2) Drop include of compiler.h
+# 3) Drop all sections defined out by __KERNEL__
+
+my ($opendir, $installdir, @files) = @ARGV;
+
+my $ret = 0;
+
+foreach $file (@files) {
+        open(INFILE, "< $opendir/$file") or die "$openddir/$file: $!\n";
+        open(UNIFDEF, "| scripts/unifdef -U__KERNEL__ |");
+        open(OUTFILE, "> $installdir/$file") or die "$installdir/$file: $!\n";
+        while ($line = <INFILE>) {
+                $line =~ s/([\s(])__user\s/\1/g;
+                $line =~ s/([\s(])__force\s/\1/g;
+                $line =~ s/([\s(])__iomem\s/\1/g;
+                $line =~ s/\s__attribute_const__\s/ /g;
+                $line =~ s/\s__attribute_const__$//g;
+                $line =~ s/^#include <linux\/compiler.h>//;
+
+# this part is broken:
+                printf UNIFDEF $line;
+                $newline = <UNIFDEF>;
+                printf OUTFILE $newline;
+# until here
+
+        }
+        close(OUTFILE);
+        close(INFILE);
+}
+
+exit($ret);
+
+
+But the bidirectional IO for unifdef does not work.
+This is in several places documented to not work - so no
+suprise here.
+
+But my googling did not turn up the solution I needed.
+
+What I need to do in the above is to pass the modified
+lines through unifdef to remove the __KERNEL__ sections.
+I would much rather have this done by the perl script itself
+and this looks reasonably simple. But I have not tried that
+path yet - wanted to get the simple stuff working first.
+
+Can you improve the above script so it actually passes the
+lines through unifdef and correct any other stupid
+mistakes of mine I would appreciate it very much!
+
+Note: I have moved the HDRSED functionality from the Makefile.headersinst
+file to the perl script.
+
+   Sam
