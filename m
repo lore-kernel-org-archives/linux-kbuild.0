@@ -1,36 +1,88 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([18.85.46.34]:50893 "EHLO
-	bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1758575AbYFIKTZ (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 9 Jun 2008 06:19:25 -0400
-Subject: Re: [PATCH 5/6] kbuild: error out early in make headers_install
-From: David Woodhouse <dwmw2@infradead.org>
-In-Reply-To: <1212955658-32168-5-git-send-email-sam@ravnborg.org>
-References: <20080608094730.GA30098@uranus.ravnborg.org>
-	 <1212955658-32168-5-git-send-email-sam@ravnborg.org>
-Content-Type: text/plain
-Date: Mon, 09 Jun 2008 11:19:15 +0100
-Message-Id: <1213006756.32207.608.camel@pmac.infradead.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Received: from smtp6.pp.htv.fi ([213.243.153.40]:50200 "EHLO smtp6.pp.htv.fi"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752682AbYFJK0U (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 10 Jun 2008 06:26:20 -0400
+Date: Tue, 10 Jun 2008 13:25:23 +0300
+From: Adrian Bunk <bunk@kernel.org>
+Subject: modpost error message with -j builds
+Message-ID: <20080610102523.GB17556@cs181133002.pp.htv.fi>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: sam@ravnborg.org
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Sun, 2008-06-08 at 22:07 +0200, Sam Ravnborg wrote:
-> Fix the a.out.h case by setting SRCARCH and error
-> out early in case of an error.
-> The a.out.h case failed with the *_all targets.
+I just say the following with a -j 2 build:
 
-I wanted to do the same trick ($(if $(wildcard asm-$(SRCARCH)/a.out.h)))
-for exporting linux/a.out.h too -- that should never have been
-unexported, and really should be put back before 2.6.26 release (I think
-I sent a patch, already).
+<--  snip  -->
 
-I suppose we'll have to also export it ifeq ($(SRCARCH),).
+...
+  CHECK   include/linux/version.h
+  LD      vmlinux
+  SYSMAP  System.map
+  SYSMAP  .tmp_System.map
+  Building modules, stage 2.
+  MODPOST 222 modules
+  CC      arch/x86/boot/a20.o
+  CC      arch/x86/boot/cmdline.o
+  AS      arch/x86/boot/copy.o
+  HOSTCC  arch/x86/boot/mkcpustr
+  CC      arch/x86/boot/cpucheck.o
+  CC      arch/x86/boot/edd.o
+  AS      arch/x86/boot/compressed/head_64.o
+  CC      arch/x86/boot/compressed/misc.o
+ERROR: "____ilog2_NaN" [drivers/usb/core/usbcore.ko] undefined!
+make[1]: *** [__modpost] Error 1
+make: *** [modules] Error 2
+make: *** Waiting for unfinished jobs....
+  CC      arch/x86/boot/main.o
+  CC      arch/x86/boot/mca.o
+  CC      arch/x86/boot/memory.o
+  CC      arch/x86/boot/pm.o
+  AS      arch/x86/boot/pmjump.o
+  CC      arch/x86/boot/printf.o
+  CC      arch/x86/boot/string.o
+  OBJCOPY arch/x86/boot/compressed/vmlinux.bin
+  CC      arch/x86/boot/tty.o
+  GZIP    arch/x86/boot/compressed/vmlinux.bin.gz
+  CC      arch/x86/boot/video.o
+  CC      arch/x86/boot/video-mode.o
+  CC      arch/x86/boot/version.o
+  CC      arch/x86/boot/video-vga.o
+  CC      arch/x86/boot/video-vesa.o
+  CC      arch/x86/boot/video-bios.o
+  HOSTCC  arch/x86/boot/tools/build
+  CPUSTR  arch/x86/boot/cpustr.h
+  CC      arch/x86/boot/cpu.o
+  LD      arch/x86/boot/compressed/piggy.o
+  LD      arch/x86/boot/compressed/vmlinux
+  OFFSETS arch/x86/boot/offsets.h
+  OBJCOPY arch/x86/boot/vmlinux.bin
+  AS      arch/x86/boot/header.o
+  LD      arch/x86/boot/setup.elf
+  OBJCOPY arch/x86/boot/setup.bin
+  BUILD   arch/x86/boot/bzImage
+Root device is (8, 1)
+Setup is 12252 bytes (padded to 12288 bytes).
+System is 2498 kB
+CRC ee7ee55
+Kernel: arch/x86/boot/bzImage is ready  (#1)
+
+<--  snip  -->
+
+It would be good if there was a last line "ERROR: ..." when the build 
+finished with a non-zero return value.
+
+cu
+Adrian
 
 -- 
-dwmw2
+
+       "Is there not promise of rain?" Ling Tan asked suddenly out
+        of the darkness. There had been need of rain for many days.
+       "Only a promise," Lao Er said.
+                                       Pearl S. Buck - Dragon Seed
 
