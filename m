@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from saraswathi.solana.com ([198.99.130.12]:43664 "EHLO
-	saraswathi.solana.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1760827AbYFKPLS (ORCPT
+Received: from [198.99.130.12] ([198.99.130.12]:43749 "EHLO
+	saraswathi.solana.com" rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org
+	with ESMTP id S1752932AbYFKPX0 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 11 Jun 2008 11:11:18 -0400
-Date: Wed, 11 Jun 2008 11:11:00 -0400
+	Wed, 11 Jun 2008 11:23:26 -0400
+Date: Wed, 11 Jun 2008 11:23:18 -0400
 From: Jeff Dike <jdike@addtoit.com>
 Subject: Re: kbuild breaks um - fails to find util when linking
-Message-ID: <20080611151100.GA8066@c2.user-mode-linux.org>
+Message-ID: <20080611152318.GA8099@c2.user-mode-linux.org>
 References: <20080610190307.GA15983@uranus.ravnborg.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
@@ -19,6 +19,8 @@ To: Sam Ravnborg <sam@ravnborg.org>
 Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
 
 On Tue, Jun 10, 2008 at 09:03:07PM +0200, Sam Ravnborg wrote:
+> Hi Jeff.
+> 
 > In an attempt to make the final link of vmlinux
 > readable/hackable I have broken um build.
 > 
@@ -29,11 +31,25 @@ On Tue, Jun 10, 2008 at 09:03:07PM +0200, Sam Ravnborg wrote:
 > I hope you have a clue why. I tried various things but
 > did not find out why ld cannot locate util.
 
-Looks to me like replacing the "-rpath foo" with -Lfoo does the trick.
+This little patch fixes the -lutil problem linking vmlinux.o, but on
+the final link, I get what appears to be every libc symbol
+undefined...
 
-I'll work up an incremental patch for this.
+Index: linux-2.6-git/arch/um/Makefile
+===================================================================
+--- linux-2.6-git.orig/arch/um/Makefile	2008-06-11 10:46:03.000000000 -0400
++++ linux-2.6-git/arch/um/Makefile	2008-06-11 11:19:05.000000000 -0400
+@@ -104,7 +104,7 @@ archprepare: $(ARCH_SYMLINKS) $(ARCH_DIR
+ prepare: $(ARCH_DIR)/include/kern_constants.h
+ 
+ LINK-$(CONFIG_LD_SCRIPT_STATIC) += -static
+-LINK-$(CONFIG_LD_SCRIPT_DYN) += -rpath /lib -rpath /usr/lib
++LINK-$(CONFIG_LD_SCRIPT_DYN) += -L/lib -L/usr/lib
+ 
+ CFLAGS_NO_HARDENING := $(call cc-option, -fno-PIC,) $(call cc-option, -fno-pic,) \
+ 	$(call cc-option, -fno-stack-protector,) \
 
-      	    	 Jeff
+	       		  	Jeff
 
 -- 
 Work email - jdike at linux dot intel dot com
