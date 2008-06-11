@@ -1,62 +1,63 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from [198.99.130.12] ([198.99.130.12]:43916 "EHLO
-	saraswathi.solana.com" rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org
-	with ESMTP id S1752943AbYFKPs0 (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 11 Jun 2008 11:48:26 -0400
-Date: Wed, 11 Jun 2008 11:48:16 -0400
-From: Jeff Dike <jdike@addtoit.com>
+Received: from pasmtpb.tele.dk ([80.160.77.98]:35219 "EHLO pasmtpB.tele.dk"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754763AbYFKTsc (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 11 Jun 2008 15:48:32 -0400
+Date: Wed, 11 Jun 2008 21:49:14 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
 Subject: Re: kbuild breaks um - fails to find util when linking
-Message-ID: <20080611154816.GA8167@c2.user-mode-linux.org>
-References: <20080610190307.GA15983@uranus.ravnborg.org>
-MIME-Version: 1.0
+Message-ID: <20080611194914.GB12794@uranus.ravnborg.org>
+References: <20080610190307.GA15983@uranus.ravnborg.org> <20080611154816.GA8167@c2.user-mode-linux.org>
+Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20080610190307.GA15983@uranus.ravnborg.org>
+In-Reply-To: <20080611154816.GA8167@c2.user-mode-linux.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
+To: Jeff Dike <jdike@addtoit.com>
 Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
 
-This patch obviously isn't usable for anyone else, but UML needs a
-hook or something to add libgcc and libc to the ld commands:
+On Wed, Jun 11, 2008 at 11:48:16AM -0400, Jeff Dike wrote:
+> This patch obviously isn't usable for anyone else, but UML needs a
+> hook or something to add libgcc and libc to the ld commands:
+> 
+> Index: linux-2.6-git/scripts/link-vmlinux.sh
+> ===================================================================
+> --- linux-2.6-git.orig/scripts/link-vmlinux.sh	2008-06-11 11:26:07.000000000 -0400
+> +++ linux-2.6-git/scripts/link-vmlinux.sh	2008-06-11 11:41:04.000000000 -0400
+> @@ -122,7 +122,7 @@ fi
+>  # First stage of fully linked vmlinux
+>  tell LD ${VMLINUX}
+>  ${LD} ${LDFLAGS} ${LDFLAGS_vmlinux} -o ${VMLINUX} \
+> -      -T ${KBUILD_VMLINUX_LDS} vmlinux.o
+> +      -T ${KBUILD_VMLINUX_LDS} vmlinux.o `gcc -print-libgcc-file-name` -lc
+>  
+>  if [ "${CONFIG_KALLSYMS}" = "y" ]; then
+>  
+> @@ -133,7 +133,8 @@ if [ "${CONFIG_KALLSYMS}" = "y" ]; then
+>          # link in kalll symbols
+>  	tell LD vmlinux
+>          ${LD} ${LDFLAGS} ${LDFLAGS_vmlinux} -o vmlinux \
+> -         -T ${KBUILD_VMLINUX_LDS} vmlinux.o .tmp_kallsyms.o
+> +         -T ${KBUILD_VMLINUX_LDS} vmlinux.o .tmp_kallsyms.o \
+> +	    `gcc -print-libgcc-file-name` -lc
+>  fi
+>  
+>  tell SYSMAP System.map
+> 
+> This fixes the flood of undefined symbols, but I still get this on the
+> link:
+>     ld: warning: Cannot create .note.gnu.build-id section, --build-id ignored.
+>     ld: warning: cannot find entry symbol _start; defaulting to 08056320
+> 
+> And when I run the result, I get this, which I don't understand at
+> all:
+> 
+>     -bash: ./uml/linux: /usr/lib/libc.so.1: bad ELF interpreter: No
+> such file or directory
 
-Index: linux-2.6-git/scripts/link-vmlinux.sh
-===================================================================
---- linux-2.6-git.orig/scripts/link-vmlinux.sh	2008-06-11 11:26:07.000000000 -0400
-+++ linux-2.6-git/scripts/link-vmlinux.sh	2008-06-11 11:41:04.000000000 -0400
-@@ -122,7 +122,7 @@ fi
- # First stage of fully linked vmlinux
- tell LD ${VMLINUX}
- ${LD} ${LDFLAGS} ${LDFLAGS_vmlinux} -o ${VMLINUX} \
--      -T ${KBUILD_VMLINUX_LDS} vmlinux.o
-+      -T ${KBUILD_VMLINUX_LDS} vmlinux.o `gcc -print-libgcc-file-name` -lc
- 
- if [ "${CONFIG_KALLSYMS}" = "y" ]; then
- 
-@@ -133,7 +133,8 @@ if [ "${CONFIG_KALLSYMS}" = "y" ]; then
-         # link in kalll symbols
- 	tell LD vmlinux
-         ${LD} ${LDFLAGS} ${LDFLAGS_vmlinux} -o vmlinux \
--         -T ${KBUILD_VMLINUX_LDS} vmlinux.o .tmp_kallsyms.o
-+         -T ${KBUILD_VMLINUX_LDS} vmlinux.o .tmp_kallsyms.o \
-+	    `gcc -print-libgcc-file-name` -lc
- fi
- 
- tell SYSMAP System.map
+Thanks Jeff.
 
-This fixes the flood of undefined symbols, but I still get this on the
-link:
-    ld: warning: Cannot create .note.gnu.build-id section, --build-id ignored.
-    ld: warning: cannot find entry symbol _start; defaulting to 08056320
+I will take an additional look tomorrow.
 
-And when I run the result, I get this, which I don't understand at
-all:
-
-    -bash: ./uml/linux: /usr/lib/libc.so.1: bad ELF interpreter: No
-such file or directory
-
-			Jeff
-
--- 
-Work email - jdike at linux dot intel dot com
+	Sam
