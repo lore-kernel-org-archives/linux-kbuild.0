@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from [198.99.130.12] ([198.99.130.12]:43749 "EHLO
+Received: from [198.99.130.12] ([198.99.130.12]:43916 "EHLO
 	saraswathi.solana.com" rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org
-	with ESMTP id S1752932AbYFKPX0 (ORCPT
+	with ESMTP id S1752943AbYFKPs0 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 11 Jun 2008 11:23:26 -0400
-Date: Wed, 11 Jun 2008 11:23:18 -0400
+	Wed, 11 Jun 2008 11:48:26 -0400
+Date: Wed, 11 Jun 2008 11:48:16 -0400
 From: Jeff Dike <jdike@addtoit.com>
 Subject: Re: kbuild breaks um - fails to find util when linking
-Message-ID: <20080611152318.GA8099@c2.user-mode-linux.org>
+Message-ID: <20080611154816.GA8167@c2.user-mode-linux.org>
 References: <20080610190307.GA15983@uranus.ravnborg.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
@@ -18,38 +18,45 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: Sam Ravnborg <sam@ravnborg.org>
 Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
 
-On Tue, Jun 10, 2008 at 09:03:07PM +0200, Sam Ravnborg wrote:
-> Hi Jeff.
-> 
-> In an attempt to make the final link of vmlinux
-> readable/hackable I have broken um build.
-> 
-> um used a special rule so it could use gcc as linker.
-> With my changes we need to use ld to link vmlinux and
-> ld now fails to locate util.
-> 
-> I hope you have a clue why. I tried various things but
-> did not find out why ld cannot locate util.
+This patch obviously isn't usable for anyone else, but UML needs a
+hook or something to add libgcc and libc to the ld commands:
 
-This little patch fixes the -lutil problem linking vmlinux.o, but on
-the final link, I get what appears to be every libc symbol
-undefined...
-
-Index: linux-2.6-git/arch/um/Makefile
+Index: linux-2.6-git/scripts/link-vmlinux.sh
 ===================================================================
---- linux-2.6-git.orig/arch/um/Makefile	2008-06-11 10:46:03.000000000 -0400
-+++ linux-2.6-git/arch/um/Makefile	2008-06-11 11:19:05.000000000 -0400
-@@ -104,7 +104,7 @@ archprepare: $(ARCH_SYMLINKS) $(ARCH_DIR
- prepare: $(ARCH_DIR)/include/kern_constants.h
+--- linux-2.6-git.orig/scripts/link-vmlinux.sh	2008-06-11 11:26:07.000000000 -0400
++++ linux-2.6-git/scripts/link-vmlinux.sh	2008-06-11 11:41:04.000000000 -0400
+@@ -122,7 +122,7 @@ fi
+ # First stage of fully linked vmlinux
+ tell LD ${VMLINUX}
+ ${LD} ${LDFLAGS} ${LDFLAGS_vmlinux} -o ${VMLINUX} \
+-      -T ${KBUILD_VMLINUX_LDS} vmlinux.o
++      -T ${KBUILD_VMLINUX_LDS} vmlinux.o `gcc -print-libgcc-file-name` -lc
  
- LINK-$(CONFIG_LD_SCRIPT_STATIC) += -static
--LINK-$(CONFIG_LD_SCRIPT_DYN) += -rpath /lib -rpath /usr/lib
-+LINK-$(CONFIG_LD_SCRIPT_DYN) += -L/lib -L/usr/lib
+ if [ "${CONFIG_KALLSYMS}" = "y" ]; then
  
- CFLAGS_NO_HARDENING := $(call cc-option, -fno-PIC,) $(call cc-option, -fno-pic,) \
- 	$(call cc-option, -fno-stack-protector,) \
+@@ -133,7 +133,8 @@ if [ "${CONFIG_KALLSYMS}" = "y" ]; then
+         # link in kalll symbols
+ 	tell LD vmlinux
+         ${LD} ${LDFLAGS} ${LDFLAGS_vmlinux} -o vmlinux \
+-         -T ${KBUILD_VMLINUX_LDS} vmlinux.o .tmp_kallsyms.o
++         -T ${KBUILD_VMLINUX_LDS} vmlinux.o .tmp_kallsyms.o \
++	    `gcc -print-libgcc-file-name` -lc
+ fi
+ 
+ tell SYSMAP System.map
 
-	       		  	Jeff
+This fixes the flood of undefined symbols, but I still get this on the
+link:
+    ld: warning: Cannot create .note.gnu.build-id section, --build-id ignored.
+    ld: warning: cannot find entry symbol _start; defaulting to 08056320
+
+And when I run the result, I get this, which I don't understand at
+all:
+
+    -bash: ./uml/linux: /usr/lib/libc.so.1: bad ELF interpreter: No
+such file or directory
+
+			Jeff
 
 -- 
 Work email - jdike at linux dot intel dot com
