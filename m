@@ -1,77 +1,76 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from rv-out-0506.google.com ([209.85.198.231]:40772 "EHLO
-	rv-out-0506.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752392AbYFMVwy (ORCPT
+Received: from fg-out-1718.google.com ([72.14.220.159]:32780 "EHLO
+	fg-out-1718.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755685AbYFMXJ3 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 13 Jun 2008 17:52:54 -0400
-Received: by rv-out-0506.google.com with SMTP id k40so2745147rvb.1
-        for <linux-kbuild@vger.kernel.org>; Fri, 13 Jun 2008 14:52:52 -0700 (PDT)
-Message-ID: <8499950a0806131452j5dc9574dk336e9e06ee9e1785@mail.gmail.com>
-Date: Fri, 13 Jun 2008 22:52:52 +0100
-From: "Oleg Verych" <olecom@gmail.com>
-Subject: about size optimizations (Re: Not as much ccache win as I expected)
+	Fri, 13 Jun 2008 19:09:29 -0400
+Received: by fg-out-1718.google.com with SMTP id 19so2897291fgg.17
+        for <linux-kbuild@vger.kernel.org>; Fri, 13 Jun 2008 16:09:26 -0700 (PDT)
+Message-ID: <4852FDFC.1020403@googlemail.com>
+Date: Sat, 14 Jun 2008 01:08:44 +0200
+From: Gabriel C <nix.or.die@googlemail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: kbuild breaks um - fails to find util when linking
+References: <20080610190307.GA15983@uranus.ravnborg.org> <20080611154816.GA8167@c2.user-mode-linux.org> <20080612180859.GA2271@uranus.ravnborg.org> <20080612201315.GA10879@c2.user-mode-linux.org> <20080612210615.GA7558@uranus.ravnborg.org>
+In-Reply-To: <20080612210615.GA7558@uranus.ravnborg.org>
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-embedded <linux-embedded@vger.kernel.org>, linux-kbuild@vger.kernel.org
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: Jeff Dike <jdike@addtoit.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
 
->> And what kinds of source/kconfig changes are made for every build?
->
-> I start with a baseline config for an embedded board, then
-> alter, one at a time, individual config items related to kernel size.
-> No source changes are made.
+Sam Ravnborg wrote:
 
-Using same `gcc -E` principle, I once had a dream to create
-build with something like "whole-kernel-at-time" optimising
-compiler option:
+Hi Sam , Jeff ,
 
-for file in $all_core_files
-do gcc $opt -E $file >>core_kernel.c
-done && gcc $opt code_kernel.c -o vmlinux.c.o
+> On Thu, Jun 12, 2008 at 04:13:15PM -0400, Jeff Dike wrote:
+>> On Thu, Jun 12, 2008 at 08:08:59PM +0200, Sam Ravnborg wrote:
+>>> Following patch will result in a building ARCH=um kernel.
+>>> If it works I dunno.
+>> You can just try running it.  Given its behavior with this patch so
+>> far, it would be an excellent sign for it to figure out that it has no
+>> root filesystem and panic.
+>>
+>> Anyway, I can't get it to give me a UML binary.  I see this in the
+>> build output (and V=3 doesn't make it any more verbose):
+>>
+>>
+>> 	  CHK     include/linux/compile.h
+>> 	  LINK linux
+>>
+>> 	Compilation finished at Thu Jun 12 16:11:15
+>>
+>> but no linux or vmlinux in my output directory.
+> 
+> So appearantly kbuild thinks you have a vmlinux
+> so no need to relink.
+> And the line "LINK linux" implies this as well.
+> 
+> Please double check that you do not have a vmlinux,
+> and try V=2" to see where LINK picks up the vmlinux.
+> 
+> My build finised:
+> $ ./linux
+>  ./linux: /usr/lib/libc.so.1: bad ELF interpreter: No such file or directory
 
-# same for some special parts and asm
-do_foo
-# do final link
-do_vmlinux
 
-I've had something like that once for `dash` and had few
-percents of size reduction. It would be interesting to
-implement and check this in linux.
+I didn't tested this patch but I think LINK-$(CONFIG_LD_SCRIPT_DYN) should have -rpath / -rpath-link too since 
+libc.so.* is usually in /lib and not /usr/lib.
 
-Also i've many things to point-tune/point-remove based on
-usage patterns/source patterns, which can be easily removed by
-stream text editor from sources. These like     not needed
-* syscalls,sysctl, ioctls
-* fields in data structures/sources for handling them
-* code branches or code blocks which are known (in particular
-board / embedded case) to be useless etc. etc.
+Another thing I noticed is this hunk :
 
-But all this requires non trivial source text editor or visual tools
-for easy analysis, navigation, marking, RE generation and
-build + run testing.
++$(shell $(CC) -print-file-name=ld-linux.so.2) \
 
-With mid-70 command line and `make` (even kbuild version)
-or 20++ years old technology of text editors, it's not that trivial
-to accomplish.
+On 64bit that should not work since it is ld-linux-x86-64.so.2 and not ld-linux.so.2
 
-Some kind of IDE for kernel development is needed. Here
-one will have all whitespace and code style policy, static
-checks for stupid security holes, C mis-use, kernel API
-mis-use, all those crutches in linux/scripts/* in one place
-and applied right away.
+> 
 
-Sorry, for this rant, but i see no developemnt here at all.
-New schedulers, slab allocators, file systems are great.
-But all this has nothing to do with fundamental developent
-of the tools. Hardware is quite fast and have pretty much
-of RAM/ROM/caches now, yet software just bloats.
+> So I will take an additional look tomorrow.
+> 
+> 	Sam
 
-The streaming, pre-cc text editing is the key, fine GCC is not.
--- 
-sed 'sed && sh + olecom = love'  <<  ''
--o--=O`C
- #oo'L O
-<___=E M
+
+Regards ,
+
+Gabriel
