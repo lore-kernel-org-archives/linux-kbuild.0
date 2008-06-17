@@ -1,44 +1,69 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from lazybastard.de ([212.112.238.170]:60258 "EHLO
-	longford.logfs.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1758689AbYFOR6s (ORCPT
+Received: from eastrmmtao101.cox.net ([68.230.240.7]:54568 "EHLO
+	eastrmmtao101.cox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753175AbYFQCRI (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 15 Jun 2008 13:58:48 -0400
-Date: Sun, 15 Jun 2008 19:58:35 +0200
-From: =?utf-8?B?SsO2cm4=?= Engel <joern@logfs.org>
-Subject: Re: Not as much ccache win as I expected
-Message-ID: <20080615175835.GA15244@logfs.org>
-References: <4852C51D.30206@am.sony.com> <8499950a0806131354u7d2431b2n2df50b7b6c98f18d@mail.gmail.com> <4852E245.4020502@am.sony.com>
+	Mon, 16 Jun 2008 22:17:08 -0400
+Message-ID: <48571D0D.2030708@ou.edu>
+Date: Mon, 16 Jun 2008 21:10:21 -0500
+From: Steve Kenton <skenton@ou.edu>
+Reply-To: skenton@ou.edu
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <4852E245.4020502@am.sony.com>
+Subject: FYI - cross  building on Cygwin works for multiple arches with only
+ one hack to kbuild
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Tim Bird <tim.bird@am.sony.com>
-Cc: Oleg Verych <olecom@gmail.com>, linux-embedded <linux-embedded@vger.kernel.org>, linux-kbuild@vger.kernel.org
+To: Linux-Kbuild <linux-kbuild@vger.kernel.org>
 
-On Fri, 13 June 2008 14:10:29 -0700, Tim Bird wrote:
-> 
-> Maybe I should just be grateful for any ccache hits I get.
+I have been working with cross compilers and portable tool chains. To 
+flush out hidden assumptions I sometimes build in environments like 
+Solaris and Cygwin as well as on Linux.  I recently got 22 different gcc 
+cross compilers and associated binutils etc. to build on Cygwin so I 
+gave a try building kernel defconfigs for most of the arches.  To my 
+pleasant surprise, I was able to successfully build vmlinux in 10 cases 
+while only having to make one (1) hack on the kernel build system. Kudos 
+to the kbuild support!
 
-ccache's usefulness depends on your workload.  If you make a change to
-include/linux/fs.h, close to 100% of the kernel is rebuilt, with or
-without ccache.  But when you revert that change, the build time differs
-dramatically.  Without ccache, fs.h was simply changed again and
-everything is rebuild.  With ccache, there are hits for the old version
-and all is pulled from the cache - provided you have allotted enough
-disk for it.
+The only problem was that the Cygwin /usr/include/elf.h file used in 
+scripts/mod/modpost.h is lacking a few arch specific symbols and 
+redefines a few other symbols. But, by adding these and ignoring the 
+redefines I got variable numbers of section mismatches on different 
+arches so mod post was apparently not too unhappy with the hack.
 
-If you never revert to an old version or do some equivalent operation,
-ccache can even be a net loss.  On a fast machine, the additional disk
-accesses are easily more expensive than the minimal cpu gains.
+Is it worth trying to use the linux/elf.h or otherwise work round the 
+Cygwin elf.h?  If I remember correctly Solaris had similar problems last 
+time I tried it,  but that port is not building right now because of 
+other problems so I can't easily test it right now.  I'd be glad to hack 
+on and/or try stuff if it's worth while and someone can point me in the 
+right direction.  I'm not currently subscribed so please include in on 
+reply.
 
-Jörn
+Steve Kenton
 
--- 
-Public Domain  - Free as in Beer
-General Public - Free as in Speech
-BSD License    - Free as in Enterprise
-Shared Source  - Free as in "Work will make you..."
+
+#define R_386_32           1            /* Direct 32 bit  */
+#define R_386_PC32         2            /* PC relative 32 bit */
+#define R_386_32PLT        11
+#define R_MIPS_32               2       /* Direct 32 bit */
+#define R_MIPS_26               4       /* Direct 26 bit shifted */
+#define R_MIPS_HI16             5       /* High 16 bit */
+#define R_MIPS_LO16             6       /* Low 16 bit */
+#define R_ARM_PC24              1       /* PC relative 26 bit branch */
+#define R_ARM_ABS32             2       /* Direct 32 bit  */
+
+WARNING: modpost: Found 7 section mismatch(es).
+WARNING: modpost: Found 4 section mismatch(es).
+WARNING: modpost: Found 37 section mismatch(es).
+WARNING: modpost: Found 1 section mismatch(es).
+WARNING: modpost: Found 19 section mismatch(es).
+WARNING: modpost: Found 12 section mismatch(es).
+WARNING: modpost: Found 1 section mismatch(es).
+WARNING: modpost: Found 3 section mismatch(es).
+WARNING: modpost: Found 18 section mismatch(es).
+WARNING: modpost: Found 25 section mismatch(es).
+WARNING: modpost: Found 3 section mismatch(es).
+
+
+
