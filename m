@@ -1,36 +1,37 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from saraswathi.solana.com ([198.99.130.12]:44600 "EHLO
-	saraswathi.solana.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752441AbYFRQwE (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 18 Jun 2008 12:52:04 -0400
-Date: Wed, 18 Jun 2008 12:51:38 -0400
-From: Jeff Dike <jdike@addtoit.com>
+Received: from pasmtpb.tele.dk ([80.160.77.98]:34177 "EHLO pasmtpB.tele.dk"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751313AbYFRQ6f (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 18 Jun 2008 12:58:35 -0400
+Date: Wed, 18 Jun 2008 18:59:18 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
 Subject: Re: kbuild breaks um - fails to find util when linking
-Message-ID: <20080618165138.GD8225@c2.user-mode-linux.org>
-References: <20080610190307.GA15983@uranus.ravnborg.org> <20080611154816.GA8167@c2.user-mode-linux.org> <20080612180859.GA2271@uranus.ravnborg.org> <20080612201315.GA10879@c2.user-mode-linux.org> <20080612210615.GA7558@uranus.ravnborg.org> <4852FDFC.1020403@googlemail.com>
-MIME-Version: 1.0
+Message-ID: <20080618165918.GA24283@uranus.ravnborg.org>
+References: <20080610190307.GA15983@uranus.ravnborg.org> <20080611154816.GA8167@c2.user-mode-linux.org> <20080612180859.GA2271@uranus.ravnborg.org> <20080612201315.GA10879@c2.user-mode-linux.org> <20080612210615.GA7558@uranus.ravnborg.org> <4852FDFC.1020403@googlemail.com> <20080618165138.GD8225@c2.user-mode-linux.org>
+Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <4852FDFC.1020403@googlemail.com>
+In-Reply-To: <20080618165138.GD8225@c2.user-mode-linux.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Gabriel C <nix.or.die@googlemail.com>
-Cc: Sam Ravnborg <sam@ravnborg.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
+To: Jeff Dike <jdike@addtoit.com>
+Cc: Gabriel C <nix.or.die@googlemail.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
 
-On Sat, Jun 14, 2008 at 01:08:44AM +0200, Gabriel C wrote:
-> Another thing I noticed is this hunk :
+On Wed, Jun 18, 2008 at 12:51:38PM -0400, Jeff Dike wrote:
+> On Sat, Jun 14, 2008 at 01:08:44AM +0200, Gabriel C wrote:
+> > Another thing I noticed is this hunk :
+> > 
+> > +$(shell $(CC) -print-file-name=ld-linux.so.2) \
+> > 
+> > On 64bit that should not work since it is ld-linux-x86-64.so.2 and not ld-linux.so.2
 > 
-> +$(shell $(CC) -print-file-name=ld-linux.so.2) \
+> That's a good point too.
 > 
-> On 64bit that should not work since it is ld-linux-x86-64.so.2 and not ld-linux.so.2
+> This seems like an awful lot of fragile hair to go through in order to
+> avoid using gcc to drive the link.
 
-That's a good point too.
+I agree on that. I have pulled the patch from kbuild-next.git,
+and it will return only when I have found a simple way to handle um.
+I think it is easy to do but I have not looked at it yet.
 
-This seems like an awful lot of fragile hair to go through in order to
-avoid using gcc to drive the link.
-
-      	    	   	 Jeff
-
--- 
-Work email - jdike at linux dot intel dot com
+	Sam
