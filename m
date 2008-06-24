@@ -1,69 +1,191 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from moutng.kundenserver.de ([212.227.126.188]:57373 "EHLO
-	moutng.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756324AbYFXPdH (ORCPT
+Received: from outbound-va3.frontbridge.com ([216.32.180.16]:39639 "EHLO
+	VA3EHSOBE003.bigfish.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755050AbYFXR6f (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 24 Jun 2008 11:33:07 -0400
-From: Arnd Bergmann <arnd@arndb.de>
-Subject: Re: Support arch/$ARCH/include in kbuild
-Date: Tue, 24 Jun 2008 17:32:57 +0200
-References: <20080621220703.GA12279@uranus.ravnborg.org> <20080622220508.GA8957@uranus.ravnborg.org>
-In-Reply-To: <20080622220508.GA8957@uranus.ravnborg.org>
+	Tue, 24 Jun 2008 13:58:35 -0400
+Message-ID: <48613536.2000708@am.sony.com>
+Date: Tue, 24 Jun 2008 10:56:06 -0700
+From: Tim Bird <tim.bird@am.sony.com>
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
+Subject: [PATCH] add diffconfig utility (v2)
+References: <484ED902.9040000@am.sony.com> <20080610212158.GB23855@uranus.ravnborg.org> <484F1B8F.9000804@am.sony.com> <Pine.LNX.4.64.0806111328150.13310@vixen.sonytel.be> <48501836.10900@am.sony.com> <20080612131931.GB13702@uranus.ravnborg.org>
+In-Reply-To: <20080612131931.GB13702@uranus.ravnborg.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-Message-Id: <200806241732.58449.arnd@arndb.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Sam Ravnborg <sam@ravnborg.org>
-Cc: LKML <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>
+Cc: linux-embedded <linux-embedded@vger.kernel.org>, linux kernel <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org
 
-On Monday 23 June 2008, Sam Ravnborg wrote:
+Sam Ravnborg wrote:
+> When you consider it stabilized could you please drop me a
+> new mail including full changelog and updated patch.
+> 
+> And please cc: linux-kbuild@vger.kernel.org + linux-kernel on the
+> submission.
 
-> Any comments are welcome!
-> Patches will follow as reply to this one, but they
-> are only sent to kbuild and lkml.
+Sam,
 
-I think you need to fix up all instances of #include <asm-$ARCH/$FILE>,
+I haven't gotten any more feedback, and I believe I've addressed
+all previous feedback.
 
-grep ^#[:ws:]*include.*[\"\<]asm-[^g].*/ `git-ls-files`
+As for the ChangeLog, here's some information about history and
+recent changes.  I can put this in the patch/script if desired.
 
-Documentation/lguest/lguest.c:#include "asm-x86/bootparam.h"
-arch/ia64/ia32/audit.c:#include <asm-x86/unistd_32.h>
-arch/ia64/kernel/asm-offsets.c:#include <asm-ia64/processor.h>
-arch/ia64/kernel/asm-offsets.c:#include <asm-ia64/ptrace.h>
-arch/ia64/kernel/asm-offsets.c:#include <asm-ia64/siginfo.h>
-arch/ia64/kernel/asm-offsets.c:#include <asm-ia64/sigcontext.h>
-arch/ia64/kernel/asm-offsets.c:#include <asm-ia64/mca.h>
-arch/ia64/kernel/jprobes.S:#include <asm-ia64/break.h>
-arch/mips/mips-boards/generic/amon.c:#include <asm-mips/addrspace.h>
-arch/mips/mips-boards/generic/amon.c:#include <asm-mips/mips-boards/launch.h>
-arch/mips/mips-boards/generic/amon.c:#include <asm-mips/mipsmtregs.h>
-arch/powerpc/platforms/86xx/mpc86xx_smp.c:#include <asm-powerpc/mpic.h>
-arch/sparc64/kernel/compat_audit.c:#include <asm-sparc/unistd.h>
-arch/um/sys-x86_64/syscall_table.c:#include <asm-x86/unistd_64.h>
-arch/um/sys-x86_64/syscall_table.c:#include <asm-x86/unistd_64.h>
-drivers/char/agp/parisc-agp.c:#include <asm-parisc/parisc-device.h>
-drivers/char/agp/parisc-agp.c:#include <asm-parisc/ropes.h>
-drivers/infiniband/hw/ehca/ehca_reqs.c:#include <asm-powerpc/system.h>
-drivers/s390/net/qeth_core_main.c:#include <asm-s390/ebcdic.h>
-drivers/s390/net/qeth_core_main.c:#include <asm-s390/io.h>
-include/asm-arm/arch-omap/board.h:#include <asm-arm/arch-omap/board-nokia.h>
-include/asm-blackfin/gpio.h:#include <asm-blackfin/mach-bf548/gpio.h>
-include/asm-m68knommu: lots of #include <asm-m68k/*>
-include/asm-parisc/ropes.h:#include <asm-parisc/parisc-device.h>
-include/asm-powerpc/irqflags.h:#include <asm-powerpc/hw_irq.h>
-include/asm-sparc64: lots of #include <asm-sparc/*>
+CHANGELOG:
+2008-06-24 - Tim Bird <tim.bird@am.sony.com> - add usage function,
+   add -m feature for merge-style output, use .config and .config.old
+   by default, improve command line handling
+~2007 - Tim Bird - re-format code for internal use at Sony
+~2006 - Matt Mackall - create original diffconfig tool as part of
+   bloatwatch project
 
-most of these are obvious, the interesting ones being sparc64, m68knommu
-and arch/um as well as arch/ia64/ia32/audit.c.
 
-The best idea I have for sparc64 and m68knommu would be to use
-"gcc -Iarch/sparc64/include -Iarch/sparc/include" and then remove the
-respective files from sparc64. On m68knommu, this works as well, except
-for the pci.h and setup.h files that include the m68k one and then
-do some more.
+Diffconfig is a simple utility for comparing two kernel configuration files.
+See usage in the script for more info.
 
-	Arnd <><
+Signed-off-by: Tim Bird <tim.bird@am.sony.com>
+
+ scripts/diffconfig |  129 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 129 insertions(+)
+ create mode 100755 scripts/diffconfig
+
+diff --git a/scripts/diffconfig b/scripts/diffconfig
+new file mode 100755
+index 0000000..aa6cfe1
+--- /dev/null
++++ b/scripts/diffconfig
+@@ -0,0 +1,129 @@
++#!/usr/bin/python
++#
++# diffconfig - a tool to compare .config files.
++#
++# originally written in 2006 by Matt Mackall
++#  (at least, this was in his bloatwatch source code)
++# last worked on 2008 by Tim Bird
++#
++
++import sys, os
++
++def usage():
++    print """Usage: diffconfig [-h] [-m] [<config1> <config2>]
++
++Diffconfig is a simple utility for comparing two .config files.
++Using standard diff to compare .config files often includes extraneous and
++distracting information.  This utility produces sorted output with only the
++changes in configuration values between the two files.
++
++Added and removed items are shown with a leading plus or minus, respectively.
++Changed items show the old and new values on a single line.
++
++If -m is specified, then output will be in "merge" style, which has the
++changed and new values in kernel config option format.
++
++If no config files are specified, .config and .config.old are used.
++
++Example usage:
++ $ diffconfig .config config-with-some-changes
++-EXT2_FS_XATTR  n
++-EXT2_FS_XIP  n
++ CRAMFS  n -> y
++ EXT2_FS  y -> n
++ LOG_BUF_SHIFT  14 -> 16
++ PRINTK_TIME  n -> y
++"""
++    sys.exit(0)
++
++# returns a dictionary of name/value pairs for config items in the file
++def readconfig(config_file):
++    d = {}
++    for line in config_file:
++        line = line[:-1]
++        if line[:7] == "CONFIG_":
++            name, val = line[7:].split("=", 1)
++            d[name] = val
++        if line[-11:] == " is not set":
++            d[line[9:-11]] = "n"
++    return d
++
++def print_config(op, config, value, new_value):
++    global merge_style
++
++    if merge_style:
++        if new_value:
++            if new_value=="n":
++                print "# CONFIG_%s is not set" % config
++            else:
++                print "CONFIG_%s=%s" % (config, new_value)
++    else:
++        if op=="-":
++            print "-%s %s" % (config, value)
++        elif op=="+":
++            print "+%s %s" % (config, new_value)
++        else:
++            print " %s %s -> %s" % (config, value, new_value)
++
++def main():
++    global merge_style
++
++    # parse command line args
++    if ("-h" in sys.argv or "--help" in sys.argv):
++	usage()
++
++    merge_style = 0
++    if "-m" in sys.argv:
++        merge_style = 1
++        sys.argv.remove("-m")
++
++    argc = len(sys.argv)
++    if not (argc==1 or argc == 3):
++        print "Error: incorrect number of arguments or unrecognized option"
++        usage()
++
++    if argc == 1:
++        # if no filenames given, assume .config and .config.old
++        build_dir=""
++        if os.environ.has_key("KBUILD_OUTPUT"):
++            build_dir = os.environ["KBUILD_OUTPUT"]+"/"
++
++        configa_filename = build_dir + ".config.old"
++        configb_filename = build_dir + ".config"
++    else:
++        configa_filename = sys.argv[1]
++        configb_filename = sys.argv[2]
++
++    a = readconfig(file(configa_filename))
++    b = readconfig(file(configb_filename))
++
++    # print items in a but not b (accumulate, sort and print)
++    old = []
++    for config in a:
++        if config not in b:
++            old.append(config)
++    old.sort()
++    for config in old:
++        print_config("-", config, a[config], None)
++        del a[config]
++
++    # print items that changed (accumulate, sort, and print)
++    changed = []
++    for config in a:
++        if a[config] != b[config]:
++            changed.append(config)
++        else:
++            del b[config]
++    changed.sort()
++    for config in changed:
++        print_config("->", config, a[config], b[config])
++        del b[config]
++
++    # now print items in b but not in a
++    # (items from b that were in a were removed above)
++    new = b.keys()
++    new.sort()
++    for config in new:
++        print_config("+", config, None, b[config])
++
++main()
+
+
+
