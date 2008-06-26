@@ -1,73 +1,73 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp5.pp.htv.fi ([213.243.153.39]:35209 "EHLO smtp5.pp.htv.fi"
+Received: from pasmtpa.tele.dk ([80.160.77.114]:58168 "EHLO pasmtpA.tele.dk"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751981AbYFZHNt (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 26 Jun 2008 03:13:49 -0400
-Date: Thu, 26 Jun 2008 10:11:41 +0300
-From: Adrian Bunk <bunk@kernel.org>
-Subject: Re: [PATCH] Speed up "make headers_*"
-Message-ID: <20080626071141.GN10285@cs181140183.pp.htv.fi>
-References: <5DC8DBC2-AA22-448B-8646-06D5788C00FE@shu.ac.uk>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+	id S1750877AbYFZS4A (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 26 Jun 2008 14:56:00 -0400
+Date: Thu, 26 Jun 2008 20:56:46 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: Support arch/$ARCH/include in kbuild
+Message-ID: <20080626185645.GA13699@uranus.ravnborg.org>
+References: <20080621220703.GA12279@uranus.ravnborg.org> <20080622220508.GA8957@uranus.ravnborg.org> <200806241732.58449.arnd@arndb.de>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <5DC8DBC2-AA22-448B-8646-06D5788C00FE@shu.ac.uk>
+In-Reply-To: <200806241732.58449.arnd@arndb.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Tim Schmielau <T.Schmielau@shu.ac.uk>
-Cc: David Woodhouse <dwmw2@infradead.org>, Sam Ravnborg <sam@ravnborg.org>, Vegard Nossum <vegard.nossum@gmail.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, Jan Engelhardt <jengelh@computergmbh.de>, geert@linux-m68k.org, zippel@linux-m68k.org
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: LKML <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>
 
-On Thu, Jun 26, 2008 at 02:59:21AM +0100, Tim Schmielau wrote:
-> [apologies for the late reply, I do not follow lkml anymore]
->
-> On Sun, 2008-06-08 at 14:17 +0100, David Woodhouse wrote:
->> On Sun, 2008-06-08 at 13:17 +0200, Sam Ravnborg wrote:
->> > #if !defined(CONFIG_M68K) || !defined(__KERNEL__)
->>
->> That's just scary, and broken for m68k where in userspace neither
->> CONFIG_M68K nor __KERNEL__ will be defined, so the unwanted ac_ahz
->> member will actually show up and break the binary compatibility.
->> Assuming we _don't_ want the ac_ahz member to be included on m68k,  
->> this
->> should fix it (is __mc68000__ the right thing to use?)...
->>
->> diff --git a/include/linux/acct.h b/include/linux/acct.h
->> index e8cae54..228473b 100644
->> --- a/include/linux/acct.h
->> +++ b/include/linux/acct.h
->> @@ -58,8 +58,7 @@ struct acct
->>         comp_t          ac_minflt;              /* Minor Pagefaults */
->>         comp_t          ac_majflt;              /* Major Pagefaults */
->>         comp_t          ac_swaps;               /* Number of Swaps */
->> -/* m68k had no padding here. */
->> -#if !defined(CONFIG_M68K) || !defined(__KERNEL__)
->> +#ifndef __mc68000__ /* m68k had no padding here. */
->>         __u16           ac_ahz;                 /* AHZ */
->>  #endif
->>         __u32           ac_exitcode;            /* Exitcode */
+On Tue, Jun 24, 2008 at 05:32:57PM +0200, Arnd Bergmann wrote:
+> On Monday 23 June 2008, Sam Ravnborg wrote:
+> 
+> > Any comments are welcome!
+> > Patches will follow as reply to this one, but they
+> > are only sent to kbuild and lkml.
+> 
+> I think you need to fix up all instances of #include <asm-$ARCH/$FILE>,
+> 
+> grep ^#[:ws:]*include.*[\"\<]asm-[^g].*/ `git-ls-files`
+> 
+> Documentation/lguest/lguest.c:#include "asm-x86/bootparam.h"
+> arch/ia64/ia32/audit.c:#include <asm-x86/unistd_32.h>
+> arch/ia64/kernel/asm-offsets.c:#include <asm-ia64/processor.h>
+> arch/ia64/kernel/asm-offsets.c:#include <asm-ia64/ptrace.h>
+> arch/ia64/kernel/asm-offsets.c:#include <asm-ia64/siginfo.h>
+> arch/ia64/kernel/asm-offsets.c:#include <asm-ia64/sigcontext.h>
+> arch/ia64/kernel/asm-offsets.c:#include <asm-ia64/mca.h>
+> arch/ia64/kernel/jprobes.S:#include <asm-ia64/break.h>
+> arch/mips/mips-boards/generic/amon.c:#include <asm-mips/addrspace.h>
+> arch/mips/mips-boards/generic/amon.c:#include <asm-mips/mips-boards/launch.h>
+> arch/mips/mips-boards/generic/amon.c:#include <asm-mips/mipsmtregs.h>
+> arch/powerpc/platforms/86xx/mpc86xx_smp.c:#include <asm-powerpc/mpic.h>
+> arch/sparc64/kernel/compat_audit.c:#include <asm-sparc/unistd.h>
+> arch/um/sys-x86_64/syscall_table.c:#include <asm-x86/unistd_64.h>
+> arch/um/sys-x86_64/syscall_table.c:#include <asm-x86/unistd_64.h>
+> drivers/char/agp/parisc-agp.c:#include <asm-parisc/parisc-device.h>
+> drivers/char/agp/parisc-agp.c:#include <asm-parisc/ropes.h>
+> drivers/infiniband/hw/ehca/ehca_reqs.c:#include <asm-powerpc/system.h>
+> drivers/s390/net/qeth_core_main.c:#include <asm-s390/ebcdic.h>
+> drivers/s390/net/qeth_core_main.c:#include <asm-s390/io.h>
+> include/asm-arm/arch-omap/board.h:#include <asm-arm/arch-omap/board-nokia.h>
+> include/asm-blackfin/gpio.h:#include <asm-blackfin/mach-bf548/gpio.h>
+> include/asm-m68knommu: lots of #include <asm-m68k/*>
+> include/asm-parisc/ropes.h:#include <asm-parisc/parisc-device.h>
+> include/asm-powerpc/irqflags.h:#include <asm-powerpc/hw_irq.h>
+> include/asm-sparc64: lots of #include <asm-sparc/*>
+> 
+> most of these are obvious, the interesting ones being sparc64, m68knommu
+> and arch/um as well as arch/ia64/ia32/audit.c.
+> 
+> The best idea I have for sparc64 and m68knommu would be to use
+> "gcc -Iarch/sparc64/include -Iarch/sparc/include" and then remove the
+> respective files from sparc64. On m68knommu, this works as well, except
+> for the pci.h and setup.h files that include the m68k one and then
+> do some more.
 
-struct acct as provided by the kernel anyway differs from the one 
-shipped by glibc in /usr/include/sys/acct.h since your
-"BSD accounting format rework" patch back in 2004.
+For sparc64 I have taken a bit more drastic approach and I am
+merging the header files of sparc and sparc64.
 
-Does the pre-v3 stuff actually work?
-My first impression is that it doesn't and should therefore be removed.
+My goal is to get sparc converted to use arch/sparc/include/asm
+for 2.6.27.
 
-> This would make cross-compiled m68k kernels silently write wrong
-> accounting files.
->...
-
-Cross-compiling can't make any difference here.
-
-> Tim
-
-cu
-Adrian
-
--- 
-
-       "Is there not promise of rain?" Ling Tan asked suddenly out
-        of the darkness. There had been need of rain for many days.
-       "Only a promise," Lao Er said.
-                                       Pearl S. Buck - Dragon Seed
-
+	Sam
