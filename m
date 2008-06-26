@@ -1,191 +1,63 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from outbound-va3.frontbridge.com ([216.32.180.16]:39639 "EHLO
-	VA3EHSOBE003.bigfish.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755050AbYFXR6f (ORCPT
+Received: from smtp5.freeserve.com ([193.252.22.159]:55807 "EHLO
+	smtp5.freeserve.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751999AbYFZCO3 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 24 Jun 2008 13:58:35 -0400
-Message-ID: <48613536.2000708@am.sony.com>
-Date: Tue, 24 Jun 2008 10:56:06 -0700
-From: Tim Bird <tim.bird@am.sony.com>
-MIME-Version: 1.0
-Subject: [PATCH] add diffconfig utility (v2)
-References: <484ED902.9040000@am.sony.com> <20080610212158.GB23855@uranus.ravnborg.org> <484F1B8F.9000804@am.sony.com> <Pine.LNX.4.64.0806111328150.13310@vixen.sonytel.be> <48501836.10900@am.sony.com> <20080612131931.GB13702@uranus.ravnborg.org>
-In-Reply-To: <20080612131931.GB13702@uranus.ravnborg.org>
-Content-Type: text/plain; charset="UTF-8"
+	Wed, 25 Jun 2008 22:14:29 -0400
+Message-Id: <5DC8DBC2-AA22-448B-8646-06D5788C00FE@shu.ac.uk>
+From: Tim Schmielau <T.Schmielau@shu.ac.uk>
+Content-Type: text/plain; charset=US-ASCII; format=flowed; delsp=yes
 Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0 (Apple Message framework v924)
+Subject: Re: [PATCH] Speed up "make headers_*"
+Date: Thu, 26 Jun 2008 02:59:21 +0100
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: linux-embedded <linux-embedded@vger.kernel.org>, linux kernel <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org
+To: David Woodhouse <dwmw2@infradead.org>
+Cc: Sam Ravnborg <sam@ravnborg.org>, Vegard Nossum <vegard.nossum@gmail.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, Jan Engelhardt <jengelh@computergmbh.de>, geert@linux-m68k.org, zippel@linux-m68k.org
 
-Sam Ravnborg wrote:
-> When you consider it stabilized could you please drop me a
-> new mail including full changelog and updated patch.
-> 
-> And please cc: linux-kbuild@vger.kernel.org + linux-kernel on the
-> submission.
+[apologies for the late reply, I do not follow lkml anymore]
 
-Sam,
+On Sun, 2008-06-08 at 14:17 +0100, David Woodhouse wrote:
+> On Sun, 2008-06-08 at 13:17 +0200, Sam Ravnborg wrote:
+> > #if !defined(CONFIG_M68K) || !defined(__KERNEL__)
+>
+> That's just scary, and broken for m68k where in userspace neither
+> CONFIG_M68K nor __KERNEL__ will be defined, so the unwanted ac_ahz
+> member will actually show up and break the binary compatibility.
+> Assuming we _don't_ want the ac_ahz member to be included on m68k,  
+> this
+> should fix it (is __mc68000__ the right thing to use?)...
+>
+> diff --git a/include/linux/acct.h b/include/linux/acct.h
+> index e8cae54..228473b 100644
+> --- a/include/linux/acct.h
+> +++ b/include/linux/acct.h
+> @@ -58,8 +58,7 @@ struct acct
+>         comp_t          ac_minflt;              /* Minor Pagefaults */
+>         comp_t          ac_majflt;              /* Major Pagefaults */
+>         comp_t          ac_swaps;               /* Number of Swaps */
+> -/* m68k had no padding here. */
+> -#if !defined(CONFIG_M68K) || !defined(__KERNEL__)
+> +#ifndef __mc68000__ /* m68k had no padding here. */
+>         __u16           ac_ahz;                 /* AHZ */
+>  #endif
+>         __u32           ac_exitcode;            /* Exitcode */
+>
+This would make cross-compiled m68k kernels silently write wrong
+accounting files.
 
-I haven't gotten any more feedback, and I believe I've addressed
-all previous feedback.
+I personally believe it more likely to find an m68k user cross-compiling
+his kernels than one including kernel headers in userspace, which was
+frowned upon at the time the above code was written (and the number
+of BSD accounting users on m68k was estimated as nil, anyways).
 
-As for the ChangeLog, here's some information about history and
-recent changes.  I can put this in the patch/script if desired.
+If we want this header to work on m68k in userspace, something even
+more scary like the following approximation to a mind-reading device
+would be needed:
 
-CHANGELOG:
-2008-06-24 - Tim Bird <tim.bird@am.sony.com> - add usage function,
-   add -m feature for merge-style output, use .config and .config.old
-   by default, improve command line handling
-~2007 - Tim Bird - re-format code for internal use at Sony
-~2006 - Matt Mackall - create original diffconfig tool as part of
-   bloatwatch project
+#if !defined(CONFIG_M68K) || (!defined(__KERNEL__) && ! 
+defined(__mc68000__))
 
-
-Diffconfig is a simple utility for comparing two kernel configuration files.
-See usage in the script for more info.
-
-Signed-off-by: Tim Bird <tim.bird@am.sony.com>
-
- scripts/diffconfig |  129 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 129 insertions(+)
- create mode 100755 scripts/diffconfig
-
-diff --git a/scripts/diffconfig b/scripts/diffconfig
-new file mode 100755
-index 0000000..aa6cfe1
---- /dev/null
-+++ b/scripts/diffconfig
-@@ -0,0 +1,129 @@
-+#!/usr/bin/python
-+#
-+# diffconfig - a tool to compare .config files.
-+#
-+# originally written in 2006 by Matt Mackall
-+#  (at least, this was in his bloatwatch source code)
-+# last worked on 2008 by Tim Bird
-+#
-+
-+import sys, os
-+
-+def usage():
-+    print """Usage: diffconfig [-h] [-m] [<config1> <config2>]
-+
-+Diffconfig is a simple utility for comparing two .config files.
-+Using standard diff to compare .config files often includes extraneous and
-+distracting information.  This utility produces sorted output with only the
-+changes in configuration values between the two files.
-+
-+Added and removed items are shown with a leading plus or minus, respectively.
-+Changed items show the old and new values on a single line.
-+
-+If -m is specified, then output will be in "merge" style, which has the
-+changed and new values in kernel config option format.
-+
-+If no config files are specified, .config and .config.old are used.
-+
-+Example usage:
-+ $ diffconfig .config config-with-some-changes
-+-EXT2_FS_XATTR  n
-+-EXT2_FS_XIP  n
-+ CRAMFS  n -> y
-+ EXT2_FS  y -> n
-+ LOG_BUF_SHIFT  14 -> 16
-+ PRINTK_TIME  n -> y
-+"""
-+    sys.exit(0)
-+
-+# returns a dictionary of name/value pairs for config items in the file
-+def readconfig(config_file):
-+    d = {}
-+    for line in config_file:
-+        line = line[:-1]
-+        if line[:7] == "CONFIG_":
-+            name, val = line[7:].split("=", 1)
-+            d[name] = val
-+        if line[-11:] == " is not set":
-+            d[line[9:-11]] = "n"
-+    return d
-+
-+def print_config(op, config, value, new_value):
-+    global merge_style
-+
-+    if merge_style:
-+        if new_value:
-+            if new_value=="n":
-+                print "# CONFIG_%s is not set" % config
-+            else:
-+                print "CONFIG_%s=%s" % (config, new_value)
-+    else:
-+        if op=="-":
-+            print "-%s %s" % (config, value)
-+        elif op=="+":
-+            print "+%s %s" % (config, new_value)
-+        else:
-+            print " %s %s -> %s" % (config, value, new_value)
-+
-+def main():
-+    global merge_style
-+
-+    # parse command line args
-+    if ("-h" in sys.argv or "--help" in sys.argv):
-+	usage()
-+
-+    merge_style = 0
-+    if "-m" in sys.argv:
-+        merge_style = 1
-+        sys.argv.remove("-m")
-+
-+    argc = len(sys.argv)
-+    if not (argc==1 or argc == 3):
-+        print "Error: incorrect number of arguments or unrecognized option"
-+        usage()
-+
-+    if argc == 1:
-+        # if no filenames given, assume .config and .config.old
-+        build_dir=""
-+        if os.environ.has_key("KBUILD_OUTPUT"):
-+            build_dir = os.environ["KBUILD_OUTPUT"]+"/"
-+
-+        configa_filename = build_dir + ".config.old"
-+        configb_filename = build_dir + ".config"
-+    else:
-+        configa_filename = sys.argv[1]
-+        configb_filename = sys.argv[2]
-+
-+    a = readconfig(file(configa_filename))
-+    b = readconfig(file(configb_filename))
-+
-+    # print items in a but not b (accumulate, sort and print)
-+    old = []
-+    for config in a:
-+        if config not in b:
-+            old.append(config)
-+    old.sort()
-+    for config in old:
-+        print_config("-", config, a[config], None)
-+        del a[config]
-+
-+    # print items that changed (accumulate, sort, and print)
-+    changed = []
-+    for config in a:
-+        if a[config] != b[config]:
-+            changed.append(config)
-+        else:
-+            del b[config]
-+    changed.sort()
-+    for config in changed:
-+        print_config("->", config, a[config], b[config])
-+        del b[config]
-+
-+    # now print items in b but not in a
-+    # (items from b that were in a were removed above)
-+    new = b.keys()
-+    new.sort()
-+    for config in new:
-+        print_config("+", config, None, b[config])
-+
-+main()
-
-
+Tim
 
