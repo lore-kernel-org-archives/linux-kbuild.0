@@ -1,60 +1,34 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pasmtpa.tele.dk ([80.160.77.114]:42228 "EHLO pasmtpA.tele.dk"
+Received: from pasmtpb.tele.dk ([80.160.77.98]:42690 "EHLO pasmtpB.tele.dk"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1764049AbYF0VGl (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 27 Jun 2008 17:06:41 -0400
-Date: Fri, 27 Jun 2008 23:07:27 +0200
+	id S1755024AbYF0VJ3 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 27 Jun 2008 17:09:29 -0400
+Date: Fri, 27 Jun 2008 23:10:15 +0200
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH] kbuild: sparse needs CF not CHECKFLAGS
-Message-ID: <20080627210727.GD29245@uranus.ravnborg.org>
-References: <Pine.LNX.4.64.0806201542200.27182@vixen.sonytel.be>
+Subject: Re: [PATCH] add diffconfig utility (v2)
+Message-ID: <20080627211015.GF29245@uranus.ravnborg.org>
+References: <484ED902.9040000@am.sony.com> <20080610212158.GB23855@uranus.ravnborg.org> <484F1B8F.9000804@am.sony.com> <Pine.LNX.4.64.0806111328150.13310@vixen.sonytel.be> <48501836.10900@am.sony.com> <20080612131931.GB13702@uranus.ravnborg.org> <48613536.2000708@am.sony.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Pine.LNX.4.64.0806201542200.27182@vixen.sonytel.be>
+In-Reply-To: <48613536.2000708@am.sony.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Geert Uytterhoeven <Geert.Uytterhoeven@sonycom.com>
-Cc: "Robert P. J. Day" <rpjday@mindspring.com>, linux-kbuild@vger.kernel.org, Linux Kernel Development <linux-kernel@vger.kernel.org>
+To: Tim Bird <tim.bird@am.sony.com>
+Cc: linux-embedded <linux-embedded@vger.kernel.org>, linux kernel <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org
 
-On Fri, Jun 20, 2008 at 03:45:12PM +0200, Geert Uytterhoeven wrote:
-> Documentation/sparse.txt tells to use:
+On Tue, Jun 24, 2008 at 10:56:06AM -0700, Tim Bird wrote:
+> Sam Ravnborg wrote:
+> > When you consider it stabilized could you please drop me a
+> > new mail including full changelog and updated patch.
+> > 
+> > And please cc: linux-kbuild@vger.kernel.org + linux-kernel on the
+> > submission.
 > 
->     make C=2 CHECKFLAGS="-D__CHECK_ENDIAN__"
+> Sam,
 > 
-> However, this still doesn't enable endian checks. The correct syntax is:
-> 
->     make C=2 CF="-D__CHECK_ENDIAN__"
-> 
-> This documentation bug was introduced by the following commit:
-> 
->     commit 1c7bafe7206d928eaccbcbd08d868733e0fb7054
->     Author: Robert P. J. Day <rpjday@mindspring.com>
->     Date:   Wed Sep 13 07:57:50 2006 -0400
-> 
-> 	kbuild: clarify "make C=" build option
-> 	    
-> 	Clarify the use of "make C=" in the top-level Makefile, and fix a
-> 	typo in the Documentation file.
-> 
-> 	Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
-> 
-> This `typo' was not a typo, as `CF' had been introduced much earlier, by:
-> 
->     commit 7b49bb9aff8b14d15da58111d8908c877c0a525e
->     Author: viro@ZenIV.linux.org.uk <viro@ZenIV.linux.org.uk>
->     Date:   Fri Sep 9 21:14:35 2005 +0100
-> 
-> 	[PATCH] kbuild: CF=<arguments> passes arguments to sparse
-> 	
-> 	Allows to add to sparse arguments without mutilating makefiles - just
-> 	pass CF=<arguments> and they will be added to CHECKFLAGS.
->     
->     Signed-off-by: Al Viro <viro@zeniv.linux.org.uk>
->     Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
-> 
-> Signed-off-by: Geert Uytterhoeven <Geert.Uytterhoeven@sonycom.com>
-
-Applied
+> I haven't gotten any more feedback, and I believe I've addressed
+> all previous feedback.
+Thanks, applied
 
 	Sam
