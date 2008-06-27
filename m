@@ -1,36 +1,60 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([18.85.46.34]:45086 "EHLO
-	bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755024AbYF0VGC (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 27 Jun 2008 17:06:02 -0400
-Subject: Re: [PATCH] Fix a.out.h export to userspace with O= build.
-From: David Woodhouse <dwmw2@infradead.org>
-In-Reply-To: <20080627205712.GA29202@uranus.ravnborg.org>
-References: <20080627130236.GD18644@cs181140183.pp.htv.fi>
-	 <1214571984.10393.193.camel@pmac.infradead.org>
-	 <20080627131231.GF18644@cs181140183.pp.htv.fi>
-	 <1214573982.10393.204.camel@pmac.infradead.org>
-	 <20080627205712.GA29202@uranus.ravnborg.org>
-Content-Type: text/plain
-Date: Fri, 27 Jun 2008 22:05:56 +0100
-Message-Id: <1214600756.10393.214.camel@pmac.infradead.org>
+Received: from pasmtpa.tele.dk ([80.160.77.114]:42228 "EHLO pasmtpA.tele.dk"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1764049AbYF0VGl (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 27 Jun 2008 17:06:41 -0400
+Date: Fri, 27 Jun 2008 23:07:27 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: [PATCH] kbuild: sparse needs CF not CHECKFLAGS
+Message-ID: <20080627210727.GD29245@uranus.ravnborg.org>
+References: <Pine.LNX.4.64.0806201542200.27182@vixen.sonytel.be>
 Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Pine.LNX.4.64.0806201542200.27182@vixen.sonytel.be>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: Adrian Bunk <bunk@kernel.org>, torvalds@linux-foundation.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, dhowells@redhat.com
+To: Geert Uytterhoeven <Geert.Uytterhoeven@sonycom.com>
+Cc: "Robert P. J. Day" <rpjday@mindspring.com>, linux-kbuild@vger.kernel.org, Linux Kernel Development <linux-kernel@vger.kernel.org>
 
-On Fri, 2008-06-27 at 22:57 +0200, Sam Ravnborg wrote:
-> Hi David.
+On Fri, Jun 20, 2008 at 03:45:12PM +0200, Geert Uytterhoeven wrote:
+> Documentation/sparse.txt tells to use:
 > 
-> Will you carry this patch in your tree or do you
-> want me to add it to kbuild-next.git?
+>     make C=2 CHECKFLAGS="-D__CHECK_ENDIAN__"
+> 
+> However, this still doesn't enable endian checks. The correct syntax is:
+> 
+>     make C=2 CF="-D__CHECK_ENDIAN__"
+> 
+> This documentation bug was introduced by the following commit:
+> 
+>     commit 1c7bafe7206d928eaccbcbd08d868733e0fb7054
+>     Author: Robert P. J. Day <rpjday@mindspring.com>
+>     Date:   Wed Sep 13 07:57:50 2006 -0400
+> 
+> 	kbuild: clarify "make C=" build option
+> 	    
+> 	Clarify the use of "make C=" in the top-level Makefile, and fix a
+> 	typo in the Documentation file.
+> 
+> 	Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
+> 
+> This `typo' was not a typo, as `CF' had been introduced much earlier, by:
+> 
+>     commit 7b49bb9aff8b14d15da58111d8908c877c0a525e
+>     Author: viro@ZenIV.linux.org.uk <viro@ZenIV.linux.org.uk>
+>     Date:   Fri Sep 9 21:14:35 2005 +0100
+> 
+> 	[PATCH] kbuild: CF=<arguments> passes arguments to sparse
+> 	
+> 	Allows to add to sparse arguments without mutilating makefiles - just
+> 	pass CF=<arguments> and they will be added to CHECKFLAGS.
+>     
+>     Signed-off-by: Al Viro <viro@zeniv.linux.org.uk>
+>     Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
+> 
+> Signed-off-by: Geert Uytterhoeven <Geert.Uytterhoeven@sonycom.com>
 
-I was hoping Linus would apply it, since we could consider it a
-regression.
+Applied
 
--- 
-dwmw2
-
+	Sam
