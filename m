@@ -1,58 +1,34 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pasmtpb.tele.dk ([80.160.77.98]:51668 "EHLO pasmtpB.tele.dk"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1763098AbYF3Ved (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 30 Jun 2008 17:34:33 -0400
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: [PATCH 21/24] kconfig: prefix hex values with 0x in .config
-Date: Mon, 30 Jun 2008 23:35:15 +0200
-Message-Id: <1214861718-32626-21-git-send-email-sam@ravnborg.org>
-In-Reply-To: <20080630213155.GA32479@uranus.ravnborg.org>
-References: <20080630213155.GA32479@uranus.ravnborg.org>
+Received: from smtp-vbr17.xs4all.nl ([194.109.24.37]:3494 "EHLO
+	smtp-vbr17.xs4all.nl" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754331AbYF3V7w (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 30 Jun 2008 17:59:52 -0400
+Date: Mon, 30 Jun 2008 23:59:42 +0200 (CEST)
+From: Roman Zippel <zippel@linux-m68k.org>
+Subject: Re: kconfig - hex are considered decimal
+In-Reply-To: <20080630204032.GA29429@uranus.ravnborg.org>
+Message-ID: <Pine.LNX.4.64.0806302356340.6791@localhost.localdomain>
+References: <20080629115120.GA4654@uranus.ravnborg.org>
+ <Pine.LNX.4.64.0806301404270.6791@localhost.localdomain>
+ <20080630204032.GA29429@uranus.ravnborg.org>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: kbuild <linux-kbuild@vger.kernel.org>, lkml <linux-kernel@vger.kernel.org>
-Cc: Sam Ravnborg <sam@ravnborg.org>, Roman Zippel <zippel@linux-m68k.org>
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>
 
-We could hit a situation where hex values
-are stored internally in kconfig without 0x prefix, so if we see
-one of these add 0x prefix when we write value to .config.
-The real fix is to make sure we always prefix hex
-values with 0x in kconfig.
+Hi,
 
-Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
-Cc: Roman Zippel <zippel@linux-m68k.org>
----
- arch/x86/boot/compressed/relocs.c |    2 +-
- scripts/kconfig/confdata.c        |    2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+On Mon, 30 Jun 2008, Sam Ravnborg wrote:
 
-diff --git a/arch/x86/boot/compressed/relocs.c b/arch/x86/boot/compressed/relocs.c
-index edaadea..88d27f6 100644
---- a/arch/x86/boot/compressed/relocs.c
-+++ b/arch/x86/boot/compressed/relocs.c
-@@ -244,7 +244,7 @@ static void read_ehdr(FILE *fp)
- static void read_shdrs(FILE *fp)
- {
- 	int i;
--	if (ehdr.e_shnum > MAX_SHDRS) {
-+	if (1 || ehdr.e_shnum > MAX_SHDRS) {
- 		die("%d section headers supported: %d\n",
- 			ehdr.e_shnum, MAX_SHDRS);
- 	}
-diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
-index 0759761..6f39c80 100644
---- a/scripts/kconfig/confdata.c
-+++ b/scripts/kconfig/confdata.c
-@@ -510,7 +510,7 @@ int conf_write(const char *name)
- 			case S_HEX:
- 				str = sym_get_string_value(sym);
- 				if (str[0] != '0' || (str[1] != 'x' && str[1] != 'X')) {
--					fprintf(out, "CONFIG_%s=%s\n", sym->name, str);
-+					fprintf(out, "CONFIG_%s=0x%s\n", sym->name, str);
- 					break;
- 				}
- 			case S_INT:
--- 
-1.5.6.1.93.gef98
+> For now I added this patch (for previous mail).
+> This makes the configs equal so they can be compared.
+
+Did you try changing and saving that hex value?
+You need a similiar logic as used for saving the header file.
+Why is it a problem, that needs immediate fixing anyway?
+
+bye, Roman
 
