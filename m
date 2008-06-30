@@ -1,100 +1,97 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pasmtpa.tele.dk ([80.160.77.114]:36811 "EHLO pasmtpA.tele.dk"
+Received: from pasmtpb.tele.dk ([80.160.77.98]:51648 "EHLO pasmtpB.tele.dk"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1760034AbYF3VbJ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 30 Jun 2008 17:31:09 -0400
-Date: Mon, 30 Jun 2008 23:31:55 +0200
+	id S1760284AbYF3Vec (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 30 Jun 2008 17:34:32 -0400
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: kbuild - pending stuff, and Maintainer news
-Message-ID: <20080630213155.GA32479@uranus.ravnborg.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
+Subject: [PATCH 01/24] kbuild: refactor headers_* targets in Makefile
+Date: Mon, 30 Jun 2008 23:34:55 +0200
+Message-Id: <1214861718-32626-1-git-send-email-sam@ravnborg.org>
+In-Reply-To: <20080630213155.GA32479@uranus.ravnborg.org>
+References: <20080630213155.GA32479@uranus.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
+To: kbuild <linux-kbuild@vger.kernel.org>, lkml <linux-kernel@vger.kernel.org>
+Cc: Sam Ravnborg <sam@ravnborg.org>, David Woodhouse <dwmw2@infradead.org>
 
-Following is stuff pending in kbuild-next.git for upcoming
-merge window.
+o Use lower case for local variables
+o Add a helper target for common targets
+o Use $(hdr-inst)= ... to make Make invocations simpler
+o Add -rR to make invocations
 
-Headlines:
-- make *config targets are less chatty (and thus faster too)
-- support for arch/$ARCH/include
-- 3x faster headers_check and much less verbose
-- added a diffconfig utility that shows difference between two configs
+In total this adds more lines than it removes but the
+benefit is better readability
 
-Most of the kconfig stuff is fresh patches - the rest has been in kbuild-next.git
-for a while and thus in -next (which has caught a lot of issues - thanks Stephen!).
+Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
+Cc: David Woodhouse <dwmw2@infradead.org>
+---
+ Makefile |   39 +++++++++++++++++++++++----------------
+ 1 files changed, 23 insertions(+), 16 deletions(-)
 
+diff --git a/Makefile b/Makefile
+index 6aff5f4..c65fe4f 100644
+--- a/Makefile
++++ b/Makefile
+@@ -996,36 +996,43 @@ depend dep:
+ 
+ # ---------------------------------------------------------------------------
+ # Kernel headers
+-INSTALL_HDR_PATH=$(objtree)/usr
+-export INSTALL_HDR_PATH
+ 
+-HDRFILTER=generic i386 x86_64
+-HDRARCHES=$(filter-out $(HDRFILTER),$(patsubst $(srctree)/include/asm-%/Kbuild,%,$(wildcard $(srctree)/include/asm-*/Kbuild)))
++#Default location for installed headers
++export INSTALL_HDR_PATH = $(objtree)/usr
+ 
+-PHONY += headers_install_all
+-headers_install_all: include/linux/version.h scripts_basic FORCE
++hdr-filter := generic um ppc
++hdr-archs  := $(filter-out $(hdr-filter),                           \
++                  $(patsubst $(srctree)/include/asm-%/Kbuild,%,     \
++                      $(wildcard $(srctree)/include/asm-*/Kbuild)))
++hdr-inst := -rR -f $(srctree)/scripts/Makefile.headersinst obj
++
++PHONY += __headers
++__headers: include/linux/version.h scripts_basic FORCE
+ 	$(Q)$(MAKE) $(build)=scripts scripts/unifdef
+-	$(Q)for arch in $(HDRARCHES); do \
+-	 $(MAKE) ARCH=$$arch -f $(srctree)/scripts/Makefile.headersinst obj=include BIASMDIR=-bi-$$arch ;\
++
++PHONY += headers_install_all
++headers_install_all: __headers
++	$(Q)for arch in $(hdr-archs); do \
++	 $(MAKE) ARCH=$$arch $(hdr-inst)=include BIASMDIR=-bi-$$arch ;\
+ 	 done
+ 
+ PHONY += headers_install
+-headers_install: include/linux/version.h scripts_basic FORCE
+-	@if [ ! -r $(srctree)/include/asm-$(SRCARCH)/Kbuild ]; then \
++headers_install: __headers
++	$(Q)if [ ! -r $(srctree)/include/asm-$(SRCARCH)/Kbuild ]; then \
+ 	  echo '*** Error: Headers not exportable for this architecture ($(SRCARCH))'; \
+-	  exit 1 ; fi
+-	$(Q)$(MAKE) $(build)=scripts scripts/unifdef
+-	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.headersinst ARCH=$(SRCARCH) obj=include
++	  exit 1 ; \
++	fi
++	$(Q)$(MAKE) $(hdr-inst)=include ARCH=$(SRCARCH)
+ 
+ PHONY += headers_check_all
+ headers_check_all: headers_install_all
+-	$(Q)for arch in $(HDRARCHES); do \
+-	 $(MAKE) ARCH=$$arch -f $(srctree)/scripts/Makefile.headersinst obj=include BIASMDIR=-bi-$$arch HDRCHECK=1 ;\
++	$(Q)for arch in $(hdr-archs); do \
++	 $(MAKE) ARCH=$$arch $(hdr-inst)=include BIASMDIR=-bi-$$arch HDRCHECK=1 ;\
+ 	 done
+ 
+ PHONY += headers_check
+ headers_check: headers_install
+-	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.headersinst ARCH=$(SRCARCH) obj=include HDRCHECK=1
++	$(Q)$(MAKE) $(hdr-inst)=include ARCH=$(SRCARCH) HDRCHECK=1
+ 
+ # ---------------------------------------------------------------------------
+ # Modules
+-- 
+1.5.6.1.93.gef98
 
-Other news
-We are moving soon and this will impact both my connectivity and
-the time I can use on kbuild stuff.
-So if I fail to act on your mails then I am most likely busy
-moving, painting, gardening or other practical stuff.
-If you really need help then drop by and help me - then
-we can always fix the kbuild stuff over a beer.
-
-	Sam
-
-Shortlog (patches follows).
-
-Alexey Dobriyan (2):
-      kbuild: make clean removes *.o.* as well
-      kbuild: remove Module.markers during mrproper
-
-Geert Uytterhoeven (1):
-      kbuild: sparse needs CF not CHECKFLAGS
-
-Jan Beulich (1):
-      vmlinux.lds: move __attribute__((__cold__)) functions back into final .text section
-
-Randy Dunlap (1):
-      kernel-doc: handle/strip __init
-
-Roman Zippel (1):
-      kconfig: set all new symbols automatically
-
-S.Çağlar Onur (1):
-      init: fix URL of "The GNU Accounting Utilities"
-
-Sam Ravnborg (16):
-      kbuild: refactor headers_* targets in Makefile
-      kbuild: always unifdef files in headers_install*
-      kbuild: drop support of ALTARCH for headers_*
-      kbuild: code refactoring in Makefile.headerinst
-      kbuild: error out early in make headers_install
-      kbuild: only one call for include/ in make headers_*
-      kbuild: optimize headers_* targets
-      kbuild: install all headers when arch is changed
-      kbuild: prepare headers_* for arch/$ARCH/include
-      kbuild: support arch/$ARCH/include for tags, cscope
-      kbuild: asm symlink support for arch/$ARCH/include
-      kbuild: add arch/$ARCH/include to search path
-      kconfig: prefix hex values with 0x in .config
-      kconfig: speed up all*config + randconfig
-      kconfig: make oldconfig is now less chatty
-      kconfig: make defconfig is no longer chatty
-
-Tim Bird (1):
-      kconfig: add diffconfig utility
-
- Documentation/sparse.txt          |    8 +-
- Kbuild                            |    3 +-
- Makefile                          |  116 +++++++++------
- arch/x86/boot/compressed/relocs.c |    2 +-
- include/Kbuild                    |    4 +-
- include/asm-generic/vmlinux.lds.h |    4 +-
- init/Kconfig                      |    2 +-
- scripts/Makefile.headersinst      |  292 +++++++++++++------------------------
- scripts/diffconfig                |  129 ++++++++++++++++
- scripts/hdrcheck.sh               |   10 --
- scripts/headers.sh                |   41 +++++
- scripts/headers_check.pl          |   56 +++++++
- scripts/headers_install.pl        |   45 ++++++
- scripts/kconfig/conf.c            |  161 +++++++++------------
- scripts/kconfig/confdata.c        |   72 +++++++++-
- scripts/kconfig/lkc.h             |    9 +
- scripts/kernel-doc                |    1 +
- 17 files changed, 602 insertions(+), 353 deletions(-)
