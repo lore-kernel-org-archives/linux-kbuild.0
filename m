@@ -1,58 +1,54 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pasmtpb.tele.dk ([80.160.77.98]:56780 "EHLO pasmtpB.tele.dk"
+Received: from mx3.mail.elte.hu ([157.181.1.138]:32936 "EHLO mx3.mail.elte.hu"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753493AbYGAGMX (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 1 Jul 2008 02:12:23 -0400
-Date: Tue, 1 Jul 2008 08:12:41 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: kconfig - hex are considered decimal
-Message-ID: <20080701061241.GA4922@uranus.ravnborg.org>
-References: <20080629115120.GA4654@uranus.ravnborg.org> <Pine.LNX.4.64.0806301404270.6791@localhost.localdomain> <20080630204032.GA29429@uranus.ravnborg.org> <Pine.LNX.4.64.0806302356340.6791@localhost.localdomain>
-Mime-Version: 1.0
+	id S1751500AbYGAGlg (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 1 Jul 2008 02:41:36 -0400
+Date: Tue, 1 Jul 2008 08:41:22 +0200
+From: Ingo Molnar <mingo@elte.hu>
+Subject: Re: [PATCH 21/24] kconfig: prefix hex values with 0x in .config
+Message-ID: <20080701064122.GE16642@elte.hu>
+References: <20080630213155.GA32479@uranus.ravnborg.org> <1214861718-32626-21-git-send-email-sam@ravnborg.org>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Pine.LNX.4.64.0806302356340.6791@localhost.localdomain>
+In-Reply-To: <1214861718-32626-21-git-send-email-sam@ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Roman Zippel <zippel@linux-m68k.org>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: kbuild <linux-kbuild@vger.kernel.org>, lkml <linux-kernel@vger.kernel.org>, Roman Zippel <zippel@linux-m68k.org>
 
-On Mon, Jun 30, 2008 at 11:59:42PM +0200, Roman Zippel wrote:
-> Hi,
+
+* Sam Ravnborg <sam@ravnborg.org> wrote:
+
+> We could hit a situation where hex values
+> are stored internally in kconfig without 0x prefix, so if we see
+> one of these add 0x prefix when we write value to .config.
+> The real fix is to make sure we always prefix hex
+> values with 0x in kconfig.
 > 
-> On Mon, 30 Jun 2008, Sam Ravnborg wrote:
+> Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
+> Cc: Roman Zippel <zippel@linux-m68k.org>
+> ---
+>  arch/x86/boot/compressed/relocs.c |    2 +-
+>  scripts/kconfig/confdata.c        |    2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
 > 
-> > For now I added this patch (for previous mail).
-> > This makes the configs equal so they can be compared.
-> 
-> Did you try changing and saving that hex value?
-Yes.
-- When changing I see the 0x prefix - which I consider OK for hex values
-- When saving I see the 0x prefix in autoconf.h + .config
+> diff --git a/arch/x86/boot/compressed/relocs.c b/arch/x86/boot/compressed/relocs.c
+> index edaadea..88d27f6 100644
+> --- a/arch/x86/boot/compressed/relocs.c
+> +++ b/arch/x86/boot/compressed/relocs.c
+> @@ -244,7 +244,7 @@ static void read_ehdr(FILE *fp)
+>  static void read_shdrs(FILE *fp)
+>  {
+>  	int i;
+> -	if (ehdr.e_shnum > MAX_SHDRS) {
+> +	if (1 || ehdr.e_shnum > MAX_SHDRS) {
+>  		die("%d section headers supported: %d\n",
+>  			ehdr.e_shnum, MAX_SHDRS);
+>  	}
 
-> You need a similiar logic as used for saving the header file.
-> Why is it a problem, that needs immediate fixing anyway?
+note: stale x86 change slipped into this patch, please do not commit it 
+to the kbuild tree. (i suspect it happened when you sent me the 
+MAX_SHDRS debug patch yesterday)
 
-To keep difference minimal for .config produced by 
-old style 'all*config' and new style 'all*config'.
-
-See patches where kconfig start to use the new
-method for 'all*config' targets - they are cc:ed to you
-and available on linux-kbuild.
-I simply started to use conf_set_all_new_symbols() and
-as a result I could simplify conf.c.
-
-And things got so simple that I dropped the patches
-introducing aconf.c.
-
-Yet TODO:
-
--> Give Redhat's nonint_oldconfig a closer look and see
-   how to integrate this functionality
--> Give Andres Salomon patches a second look and see how to
-   integrate the functionality he requires
-
-It it does not turn out to be simple I will lilely postpone it
-until I have moved.
-
-	Sam
+	Ingo
