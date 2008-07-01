@@ -1,34 +1,42 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp-vbr17.xs4all.nl ([194.109.24.37]:3494 "EHLO
-	smtp-vbr17.xs4all.nl" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754331AbYF3V7w (ORCPT
+Received: from pythia.bakeyournoodle.com ([203.82.209.197]:57776 "EHLO
+	pythia.bakeyournoodle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754855AbYGABen (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 30 Jun 2008 17:59:52 -0400
-Date: Mon, 30 Jun 2008 23:59:42 +0200 (CEST)
-From: Roman Zippel <zippel@linux-m68k.org>
-Subject: Re: kconfig - hex are considered decimal
-In-Reply-To: <20080630204032.GA29429@uranus.ravnborg.org>
-Message-ID: <Pine.LNX.4.64.0806302356340.6791@localhost.localdomain>
-References: <20080629115120.GA4654@uranus.ravnborg.org>
- <Pine.LNX.4.64.0806301404270.6791@localhost.localdomain>
- <20080630204032.GA29429@uranus.ravnborg.org>
+	Mon, 30 Jun 2008 21:34:43 -0400
+Date: Tue, 1 Jul 2008 11:34:38 +1000
+From: Tony Breeds <tony@bakeyournoodle.com>
+Subject: Re: [BUILD-FAILURE] linux-next: Tree for June 30 - powerpc - build failure at arch_add_memory()
+Message-ID: <20080701013438.GT20457@bakeyournoodle.com>
+References: <20080701001656.e156585c.sfr@canb.auug.org.au> <486924FE.4090801@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <486924FE.4090801@linux.vnet.ibm.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>
+To: Kamalesh Babulal <kamalesh@linux.vnet.ibm.com>
+Cc: Stephen Rothwell <sfr@canb.auug.org.au>, linux-kbuild@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, linuxppc-dev@ozlabs.org, linux-next@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>
 
-Hi,
+On Mon, Jun 30, 2008 at 11:55:02PM +0530, Kamalesh Babulal wrote:
+> Hi Stephen,
+> 
+> next-20080630 kernel build fails on powerpc, with randconfig
+> 
+>   CC      arch/powerpc/mm/mem.o
+> arch/powerpc/mm/mem.c: In function ‘arch_add_memory’:
+> arch/powerpc/mm/mem.c:130: error: implicit declaration of function ‘create_section_mapping’
+> make[1]: *** [arch/powerpc/mm/mem.o] Error 1
+> make: *** [arch/powerpc/mm] Error 2
 
-On Mon, 30 Jun 2008, Sam Ravnborg wrote:
+This problem exists in in 2.6.26-rc8, so it's not specifially linux-next
+realted.  The patch at:
+http://patchwork.ozlabs.org/linuxppc/patch?id=19347
+should fix it but is un-ACK'd ;P
 
-> For now I added this patch (for previous mail).
-> This makes the configs equal so they can be compared.
+Yours Tony
 
-Did you try changing and saving that hex value?
-You need a similiar logic as used for saving the header file.
-Why is it a problem, that needs immediate fixing anyway?
-
-bye, Roman
+  linux.conf.au    http://www.marchsouth.org/
+  Jan 19 - 24 2009 The Australian Linux Technical Conference!
 
