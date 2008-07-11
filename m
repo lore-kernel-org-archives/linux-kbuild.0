@@ -1,34 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pasmtpa.tele.dk ([80.160.77.114]:51109 "EHLO pasmtpA.tele.dk"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753222AbYGJTnm (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 10 Jul 2008 15:43:42 -0400
-Date: Thu, 10 Jul 2008 21:44:29 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: Integrating relocatable kernel build with kernel build
-Message-ID: <20080710194429.GA17255@uranus.ravnborg.org>
-References: <4875040A.7020306@in.ibm.com> <20080709202740.GA2655@uranus.ravnborg.org> <4876184E.7040705@in.ibm.com>
+Received: from xenotime.net ([66.160.160.81]:52234 "HELO xenotime.net"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with SMTP
+	id S1753813AbYGKSgs (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 11 Jul 2008 14:36:48 -0400
+Received: from chimera.site ([96.225.228.12]) by xenotime.net for <linux-kbuild@vger.kernel.org>; Fri, 11 Jul 2008 11:36:45 -0700
+Date: Fri, 11 Jul 2008 11:36:45 -0700
+From: Randy Dunlap <rdunlap@xenotime.net>
+Subject: localversion filter *.orig ?
+Message-Id: <20080711113645.35923e25.rdunlap@xenotime.net>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4876184E.7040705@in.ibm.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Mohan Kumar M <mohan@in.ibm.com>
-Cc: linux-kbuild@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
+Cc: samr <sam@ravnborg.org>
 
-> >
-> >>Another feature I am looking is to generate the "relocatable vmlinux" 
-> >>image in the top directory of kernel source and the intermediate vmlinux 
-> >>file either in arch/powerpc/kernel or arch/powerpc/boot.
-> >We no longer build arch specific targets in the top-level directory
-> >of the kernel src. We print out where to locate the build file.
-> >
-> 
-> Still need to build the final "relocatable vmlinux" image in the top
-> level directory of kernel source (either as vmlinux or vmlinux.reloc).
+Hi,
 
-As I said above this is NOT how we do it today. So you need to fix the
-tools that assume this.
+When using linux-next from linux-mainline tarball + patch*next.bz2,
+there is always (AFAIK) a localversion-next.orig file:
 
-	Sam
+$ ls -l localver*
+-rw-r--r-- 1 rddunlap users 15 Jul 11 08:05 localversion-next
+---------- 1 rddunlap users  0 Jul 11 08:05 localversion-next.orig
+
+This causes a warning during build:
+
+cat: /local/linsrc/linux-next-20080711/localversion-next.orig: Permission denied
+
+Can localver*.orig be filtered out of the localversion files?
+
+
+PS:  where are $(shell,sort,filter,filter-out,subst,patsubst,etc.) documented?
+
+Thanks,
+---
+~Randy
+Linux Plumbers Conference, 17-19 September 2008, Portland, Oregon USA
+http://linuxplumbersconf.org/
