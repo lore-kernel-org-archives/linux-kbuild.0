@@ -1,58 +1,40 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp6.pp.htv.fi ([213.243.153.40]:52272 "EHLO smtp6.pp.htv.fi"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753757AbYGOOXq (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 15 Jul 2008 10:23:46 -0400
-Date: Tue, 15 Jul 2008 17:23:41 +0300
-From: Adrian Bunk <bunk@kernel.org>
-Subject: Re: binutils 2.18.50.0.8 frv build error
-Message-ID: <20080715142341.GF24533@cs181140183.pp.htv.fi>
-References: <20080715121327.GA24533@cs181140183.pp.htv.fi> <20080715132005.GA6517@lucon.org> <20080715134747.GD24533@cs181140183.pp.htv.fi> <20080715140040.GA8580@lucon.org>
+Received: from fk-out-0910.google.com ([209.85.128.189]:12452 "EHLO
+	fk-out-0910.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1761898AbYGOWba (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 15 Jul 2008 18:31:30 -0400
+Received: by fk-out-0910.google.com with SMTP id 18so3313908fkq.5
+        for <linux-kbuild@vger.kernel.org>; Tue, 15 Jul 2008 15:31:28 -0700 (PDT)
+From: jkacur <jkacur@gmail.com>
+Reply-To: jkacur@gmail.com
+Subject: [PATCH] Change Kbuild message to match default
+Date: Wed, 16 Jul 2008 00:31:16 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain;
+  charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 Content-Disposition: inline
-In-Reply-To: <20080715140040.GA8580@lucon.org>
+Message-Id: <200807160031.16323.jkacur@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "H.J. Lu" <hjl.tools@gmail.com>
-Cc: dhowells@redhat.com, sam@ravnborg.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: sam@ravnborg.org
+Cc: linux-kbuild@vger.kernel.org
 
-On Tue, Jul 15, 2008 at 07:00:40AM -0700, H.J. Lu wrote:
-> On Tue, Jul 15, 2008 at 04:47:47PM +0300, Adrian Bunk wrote:
->...
-> > I did an "frv-linux-objdump  -Dx" on the init/mounts.o files generated 
-> > with both binutils versions, and the diff is:
-> > 
-> > 
-> > --- working	2008-07-15 16:34:49.000000000 +0300
-> > +++ broken	2008-07-15 16:34:40.000000000 +0300
-> >  architecture: fr450, flags 0x00000011:
-> >  HAS_RELOC, HAS_SYMS
-> >  start address 0x00000000
-> > -private flags = 0x800020d: -mcpu=fr450 -mgpr-32 -msoft-float non-pic relocations
-> > +private flags = 0x800030d: -mcpu=fr450 -mgpr-32 -msoft-float -fpic non-pic relocations
-> >  
-> 
-> Are you saying "ld -r init/do_mounts.o" changed private flags? If
-> yes, please open a bug report at
+Change the Kbuild "If unsure" message to match the default.
 
-It seems so.
+Signed-off-by: John Kacur <jkacur at gmail dot com>
 
-> http://www.sourceware.org/bugzilla/
-> 
-> with the original init/do_mounts.o.
+Index: linux-2.6.26/init/Kconfig
+===================================================================
+--- linux-2.6.26.orig/init/Kconfig
++++ linux-2.6.26/init/Kconfig
+@@ -522,7 +522,7 @@ config CC_OPTIMIZE_FOR_SIZE
+          Enabling this option will pass "-Os" instead of "-O2" to gcc
+          resulting in a smaller kernel.
 
-Done, it's #6747.
+-         If unsure, say N.
++         If unsure, say Y.
 
-> H.J.
-
-Thanks for your help
-Adrian
-
--- 
-
-       "Is there not promise of rain?" Ling Tan asked suddenly out
-        of the darkness. There had been need of rain for many days.
-       "Only a promise," Lao Er said.
-                                       Pearl S. Buck - Dragon Seed
-
+ config SYSCTL
+        bool
