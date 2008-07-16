@@ -1,40 +1,44 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from fk-out-0910.google.com ([209.85.128.189]:12452 "EHLO
-	fk-out-0910.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1761898AbYGOWba (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 15 Jul 2008 18:31:30 -0400
-Received: by fk-out-0910.google.com with SMTP id 18so3313908fkq.5
-        for <linux-kbuild@vger.kernel.org>; Tue, 15 Jul 2008 15:31:28 -0700 (PDT)
-From: jkacur <jkacur@gmail.com>
-Reply-To: jkacur@gmail.com
-Subject: [PATCH] Change Kbuild message to match default
-Date: Wed, 16 Jul 2008 00:31:16 +0200
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="us-ascii"
+Received: from main.gmane.org ([80.91.229.2]:56651 "EHLO ciao.gmane.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1757318AbYGPPuH (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 16 Jul 2008 11:50:07 -0400
+Received: from root by ciao.gmane.org with local (Exim 4.43)
+	id 1KJ9GU-0007A1-6x
+	for linux-kbuild@vger.kernel.org; Wed, 16 Jul 2008 15:50:02 +0000
+Received: from 82-135-208-232.static.zebra.lt ([82.135.208.232])
+        by main.gmane.org with esmtp (Gmexim 0.1 (Debian))
+        id 1AlnuQ-0007hv-00
+        for <linux-kbuild@vger.kernel.org>; Wed, 16 Jul 2008 15:50:02 +0000
+Received: from paulius.zaleckas by 82-135-208-232.static.zebra.lt with local (Gmexim 0.1 (Debian))
+        id 1AlnuQ-0007hv-00
+        for <linux-kbuild@vger.kernel.org>; Wed, 16 Jul 2008 15:50:02 +0000
+From: Paulius Zaleckas <paulius.zaleckas@teltonika.lt>
+Subject: make fails to create correct arch include symlink
+Date: Wed, 16 Jul 2008 18:41:26 +0300
+Message-ID: <g5l4r7$bc9$1@ger.gmane.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-Message-Id: <200807160031.16323.jkacur@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: sam@ravnborg.org
-Cc: linux-kbuild@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
 
-Change the Kbuild "If unsure" message to match the default.
+Here is what happens:
+---
+[paulius@home linux-2.6]$ make all ARCH=arm CROSS_COMPILE=arm-linux-
+   CHK     include/linux/version.h
+make[1]: `include/asm-arm/mach-types.h' is up to date.
+   CHK     include/linux/utsrelease.h
+ERROR: the symlink include/asm points to asm-x86 but asm-arm was expected
+        set ARCH or save .config and run 'make mrproper' to fix it
+make: *** [include/asm] Error 1
+---
 
-Signed-off-by: John Kacur <jkacur at gmail dot com>
+I know that 'make mrproper' will work, but
+"set ARCH or save .config and run 'make mrproper' to fix it"
+ARCH is set, but it fails!
 
-Index: linux-2.6.26/init/Kconfig
-===================================================================
---- linux-2.6.26.orig/init/Kconfig
-+++ linux-2.6.26/init/Kconfig
-@@ -522,7 +522,7 @@ config CC_OPTIMIZE_FOR_SIZE
-          Enabling this option will pass "-Os" instead of "-O2" to gcc
-          resulting in a smaller kernel.
+BR,
+Paulius Zaleckas
 
--         If unsure, say N.
-+         If unsure, say Y.
-
- config SYSCTL
-        bool
