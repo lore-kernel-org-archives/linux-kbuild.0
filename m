@@ -1,58 +1,37 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from astoria.ccjclearline.com ([64.235.106.9]:54526 "EHLO
-	astoria.ccjclearline.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755204AbYGQLFd (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 17 Jul 2008 07:05:33 -0400
-Received: from cpe00195b4acfae-cm001868e2bdba.cpe.net.cable.rogers.com ([99.236.99.222] helo=crashcourse.ca)
-	by astoria.ccjclearline.com with esmtpsa (TLSv1:AES256-SHA:256)
-	(Exim 4.69)
-	(envelope-from <rpjday@crashcourse.ca>)
-	id 1KJRIh-00017O-2u
-	for linux-kbuild@vger.kernel.org; Thu, 17 Jul 2008 07:05:31 -0400
-Date: Thu, 17 Jul 2008 07:04:38 -0400 (EDT)
-From: "Robert P. J. Day" <rpjday@crashcourse.ca>
-Subject: what is the value of "help" text on a choice?
-Message-ID: <alpine.LFD.1.10.0807170701200.14326@localhost.localdomain>
+Received: from mail.gmx.net ([213.165.64.20]:43203 "HELO mail.gmx.net"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with SMTP
+	id S1754102AbYGSMXp (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 19 Jul 2008 08:23:45 -0400
+From: Marvin <marvin24@gmx.de>
+Subject: comparision of int values
+Date: Sat, 19 Jul 2008 14:23:41 +0200
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+Content-Type: text/plain;
+  charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+Message-Id: <200807191423.41571.marvin24@gmx.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: kbuild devel list <linux-kbuild@vger.kernel.org>
+To: linux-kbuild@vger.kernel.org
 
+Hi,
 
-  i just noticed this in init/Kconfig:
+is there a way to compare int values?
 
-...
-choice
-        prompt "Choose SLAB allocator"
-        default SLUB
-        help
-           This option allows to select a slab allocator.
+E.g.:
 
-config SLAB
-        bool "SLAB"
-        help
-          The regular slab allocator that is established and known to work
-          well in all environments. It organizes cache hot objects in
-          per cpu and per node queues. SLAB is the default choice for
-          a slab allocator.
-...
+config FOO
+	int
+	prompt "Foo"
+	range 1 10
 
-  but while there is some help text associated with the "choice"
-entry, i don't see how you can display it while in "make menuconfig".
+config BAR
+	def_bool (FOO || 5) = 5
 
-  you can certainly display the help info for each of the actual
-underlying choices, but not for the choice entry itself.  or am i
-missing something here?
+for bool BAR = ( FOO <= 5 )?
 
-rday
---
+Thanks
 
-========================================================================
-Robert P. J. Day
-Linux Consulting, Training and Annoying Kernel Pedantry:
-    Have classroom, will lecture.
-
-http://crashcourse.ca                          Waterloo, Ontario, CANADA
-========================================================================
+Marvin
