@@ -1,12 +1,12 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtpout3.tre.se ([80.251.192.228]:45633 "EHLO smtpout3.tre.se"
+Received: from smtpout3.tre.se ([80.251.192.228]:46125 "EHLO smtpout3.tre.se"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751317AbYGZIMB (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 26 Jul 2008 04:12:01 -0400
-Date: Fri, 25 Jul 2008 22:34:46 +0200
+	id S1751638AbYGZITz (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 26 Jul 2008 04:19:55 -0400
+Date: Sat, 26 Jul 2008 09:43:28 +0200
 From: Sam Ravnborg <sam@ravnborg.org>
 Subject: [GIT PULL] kbuild
-Message-ID: <20080725203446.GA30215@uranus.ravnborg.org>
+Message-ID: <20080726074328.GA2161@uranus.ravnborg.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
