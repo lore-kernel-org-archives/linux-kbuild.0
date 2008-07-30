@@ -1,67 +1,56 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mta23.gyao.ne.jp ([125.63.38.249]:53451 "EHLO mx.gate01.com"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1754064AbYG2IzX (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 29 Jul 2008 04:55:23 -0400
-Date: Tue, 29 Jul 2008 17:54:40 +0900
-From: Paul Mundt <lethal@linux-sh.org>
-Subject: Re: kill include symlinks for sh?
-Message-ID: <20080729085440.GD29389@linux-sh.org>
-References: <20080728115735.GA32089@uranus.ravnborg.org> <20080728231922.GB28055@linux-sh.org> <20080729064049.GA28656@uranus.ravnborg.org>
-MIME-Version: 1.0
+Received: from smtpout3.tre.se ([80.251.192.228]:17344 "EHLO smtpout3.tre.se"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751736AbYG3U0H (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 30 Jul 2008 16:26:07 -0400
+Date: Wed, 30 Jul 2008 22:26:55 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: [PATCH] Change Kbuild message to match default
+Message-ID: <20080730202655.GA12148@uranus.ravnborg.org>
+References: <200807160031.16323.jkacur@gmail.com> <520f0cf10807260234v64297490l6db807fee0864cc5@mail.gmail.com>
+Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20080729064049.GA28656@uranus.ravnborg.org>
+In-Reply-To: <520f0cf10807260234v64297490l6db807fee0864cc5@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: linux-sh@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: John Kacur <jkacur@gmail.com>
+Cc: linux-kbuild@vger.kernel.org, lkml@vger.kernel.org
 
-On Tue, Jul 29, 2008 at 08:40:49AM +0200, Sam Ravnborg wrote:
-> Hi Paul
+On Sat, Jul 26, 2008 at 11:34:14AM +0200, John Kacur wrote:
+> On Wed, Jul 16, 2008 at 12:31 AM, jkacur <jkacur@gmail.com> wrote:
+> > Change the Kbuild "If unsure" message to match the default.
+> >
+> > Signed-off-by: John Kacur <jkacur at gmail dot com>
+> >
+> > Index: linux-2.6.26/init/Kconfig
+> > ===================================================================
+> > --- linux-2.6.26.orig/init/Kconfig
+> > +++ linux-2.6.26/init/Kconfig
+> > @@ -522,7 +522,7 @@ config CC_OPTIMIZE_FOR_SIZE
+> >          Enabling this option will pass "-Os" instead of "-O2" to gcc
+> >          resulting in a smaller kernel.
+> >
+> > -         If unsure, say N.
+> > +         If unsure, say Y.
+> >
+> >  config SYSCTL
+> >        bool
+> >
 > 
-> > This didn't end up being _too_ painful, though it did take a bit of time
-> > to hunt down all of the guilty parties. I've pushed out what I have now,
-> > which you can see at:
-> > 
-> > http://git.kernel.org/?p=linux/kernel/git/lethal/sh-2.6.git;a=commitdiff;h=f15cbe6f1a4b4d9df59142fc8e4abb973302cf44
-> > 
-> > It's been holding up to all of the random builds I've thrown at it so
-> > far, so there shouldn't be any really nasty surprises left over.
-> 
-> I took a quick look at it and the header re-org looks good.
-> I like that you added the 'mach-' prefix to the directory names.
-> 
-> But I also noticed several changes like this:
-> -#include <asm/landisk/iodata_landisk.h>
-> +#include <mach/iodata_landisk.h>
-> 
-> In this case you _know_ that this is a landisk so
-> the less magic option would have been the longer
-> include form like this:
-> +#include <mach-landisk/mach/iodata_landisk.h>
-> 
-> It would be preferable that we use the gcc -I
-> directive:
-> 
->     -Iarch/sh/include/mach-$MACH
-> 
-> only to automagically select between identical named
-> files for the different platforms and not like
-> the above where we use it simply to cut off the include
-> path a little.
-> 
-Yes, I had thought about that as well. We certainly need to go this route
-if we are building multiple mach types at the same time. Fortunately the
-vast majority of mach types do not have their own include structure, so
-it's not been something that's popped up yet as a real problem.
+> This seems like a no-brainer to me that the default and the "If
+> unsure" message should match, any reason you haven't picked-it up?
 
-> Another note is that you decided to move the generated
-> file over to arch/sh/include too.
-> I really do not know if I think this is the right approach.
+Two reasons:
 
-This was before I realized that asm-offsets.h was being placed in
-include/asm-sh anyways, despite the directory not existing until Kbuild
-created it. I don't have any problems with moving it back, I just thought
-the idea of multiple include directories for the same asm/ prefix seemed
-non-intuitive.
+1) I have not started to look at new patches until now
+
+   And this is due to several reasons.
+   First off I have been without internet for a while.
+   And secondly I do try to avoid new patches during the
+   merge window which does not fix merge issues.
+
+2) I am not convinced that "default y" is really what we want.
+   What does popular distroes use (aka what gets wide testing?).
+
+	Sam
