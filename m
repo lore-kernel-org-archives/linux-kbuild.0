@@ -1,68 +1,74 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtpout3.tre.se ([80.251.192.228]:30064 "EHLO smtpout3.tre.se"
+Received: from smtpout3.tre.se ([80.251.192.228]:37433 "EHLO smtpout3.tre.se"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751177AbYGaUQO (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 31 Jul 2008 16:16:14 -0400
-Date: Thu, 31 Jul 2008 22:16:02 +0200
+	id S1754736AbYGaVdW (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 31 Jul 2008 17:33:22 -0400
+Date: Thu, 31 Jul 2008 23:34:10 +0200
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [Patch] UML build: fix missing posix_types.h
-Message-ID: <20080731201602.GC25158@uranus.ravnborg.org>
-References: <20080731121028.GA23636@hack.voiplan.pt>
+Subject: Re: [PATCH] Change Kbuild message to match default
+Message-ID: <20080731213410.GC25921@uranus.ravnborg.org>
+References: <200807160031.16323.jkacur@gmail.com> <520f0cf10807260234v64297490l6db807fee0864cc5@mail.gmail.com> <20080730202655.GA12148@uranus.ravnborg.org> <520f0cf10807301623l759baa8ub9c669176107fa85@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20080731121028.GA23636@hack.voiplan.pt>
+In-Reply-To: <520f0cf10807301623l759baa8ub9c669176107fa85@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: WANG Cong <xiyou.wangcong@gmail.com>
-Cc: LKML <linux-kernel@vger.kernel.org>, jdike@addtoit.com, linux-kbuild@vger.kernel.org, user-mode-linux-devel@lists.sourceforge.net, Andrew Morton <akpm@osdl.org>
+To: John Kacur <jkacur@gmail.com>
+Cc: linux-kbuild@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>
 
-On Thu, Jul 31, 2008 at 01:10:28PM +0100, WANG Cong wrote:
+On Thu, Jul 31, 2008 at 01:23:56AM +0200, John Kacur wrote:
+> On Wed, Jul 30, 2008 at 10:26 PM, Sam Ravnborg <sam@ravnborg.org> wrote:
+> > On Sat, Jul 26, 2008 at 11:34:14AM +0200, John Kacur wrote:
+> >> On Wed, Jul 16, 2008 at 12:31 AM, jkacur <jkacur@gmail.com> wrote:
+> >> > Change the Kbuild "If unsure" message to match the default.
+> >> >
+> >> > Signed-off-by: John Kacur <jkacur at gmail dot com>
+> >> >
+> >> > Index: linux-2.6.26/init/Kconfig
+> >> > ===================================================================
+> >> > --- linux-2.6.26.orig/init/Kconfig
+> >> > +++ linux-2.6.26/init/Kconfig
+> >> > @@ -522,7 +522,7 @@ config CC_OPTIMIZE_FOR_SIZE
+> >> >          Enabling this option will pass "-Os" instead of "-O2" to gcc
+> >> >          resulting in a smaller kernel.
+> >> >
+> >> > -         If unsure, say N.
+> >> > +         If unsure, say Y.
+> >> >
+> >> >  config SYSCTL
+> >> >        bool
+> >> >
+> >>
+> >> This seems like a no-brainer to me that the default and the "If
+> >> unsure" message should match, any reason you haven't picked-it up?
+> >
+> > Two reasons:
+> >
+> > 1) I have not started to look at new patches until now
+> >
+> >   And this is due to several reasons.
+> >   First off I have been without internet for a while.
+> >   And secondly I do try to avoid new patches during the
+> >   merge window which does not fix merge issues.
 > 
-> When building UML with 'O=foo' specified, I got:
+> Ok, no problem!
 > 
-> CC      kernel/bounds.s
->   In file included from
-> /home/wangcong/Projects/linux-2.6/include/linux/types.h:11,
->                  from
-> /home/wangcong/Projects/linux-2.6/include/linux/page-flags.h:8,
->                  from
-> /home/wangcong/Projects/linux-2.6/kernel/bounds.c:9:
-> /home/wangcong/Projects/linux-2.6/include/linux/posix_types.h:47:29:
-> error: asm/posix_types.h: No such file or directory
-> In file included from
-> /home/wangcong/Projects/linux-2.6/include/linux/page-flags.h:8,
->                  from
-> /home/wangcong/Projects/linux-2.6/kernel/bounds.c:9:
-> /home/wangcong/Projects/linux-2.6/include/linux/types.h:12:23: error:
-> asm/types.h: No such file or directory
-> In file included from
-> /home/wangcong/Projects/linux-2.6/include/linux/page-flags.h:8,
+> >
+> > 2) I am not convinced that "default y" is really what we want.
+> >   What does popular distroes use (aka what gets wide testing?).
+> >
 > 
-> Below patch fixed it, note, it is only tested for x86 and um.
+> Hmnn, good point, in any case there is an inconsistency here. I can
+> only speak for my laptop here running openSUSE 11.0 (X86-64)
 > 
-> Signed-off-by: WANG Cong <wangcong@zeuux.org>
-> Cc: sam@ravnborg.org
-> Cc: jdike@addtoit.com
-> 
-> ---
-> diff --git a/Makefile b/Makefile
-> index aa527a4..39130d1 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -930,7 +930,8 @@ ifneq ($(KBUILD_SRC),)
->  		/bin/false; \
->  	fi;
->  	$(Q)if [ ! -d include2 ]; then mkdir -p include2; fi;
-> -	$(Q)if [ -e $(srctree)/include/asm-$(SRCARCH)/system.h ]; then  \
-> +	$(Q)if [ -e $(srctree)/include/asm-$(SRCARCH)/system.h -o \
-> +		 -e $(objtree)/include/asm-$(SRCARCH)/system.h ] ; then \
->  	    ln -fsn $(srctree)/include/asm-$(SRCARCH) include2/asm;     \
->  	    fi
->  endif
+> gunzip -c /proc/config.gz | grep CC_OPTIMIZE_FOR_SIZE
+> CONFIG_CC_OPTIMIZE_FOR_SIZE=y
+> uname -a
+> Linux linux-ipxk 2.6.25.11-0.1-default #1 SMP 2008-07-13 20:48:28
+> +0200 x86_64 x86_64 x86_64 GNU/Linux
 
-I have a similar patch locally. I just check for errno.h so I 
-do not have to do the extra check in objtree.
-Will push tonight.
+Thanks - I applied your patch.
 
 	Sam
+
