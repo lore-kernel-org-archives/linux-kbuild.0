@@ -1,65 +1,87 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtpout3.tre.se ([80.251.192.228]:41245 "EHLO smtpout3.tre.se"
+Received: from smtp5.pp.htv.fi ([213.243.153.39]:52981 "EHLO smtp5.pp.htv.fi"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752489AbYHAThd (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 1 Aug 2008 15:37:33 -0400
-Date: Fri, 1 Aug 2008 21:38:07 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: annoying "trying to assign nonexistent symbol" warnings
-Message-ID: <20080801193807.GA4441@uranus.ravnborg.org>
-References: <20080801192220.GB19682@cs181140183.pp.htv.fi>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+	id S1754063AbYHBT1y (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 2 Aug 2008 15:27:54 -0400
+Date: Sat, 2 Aug 2008 22:26:47 +0300
+From: Adrian Bunk <bunk@kernel.org>
+Subject: Re: Kconfig no longer outputs a .config with freshly updated
+	defconfigs
+Message-ID: <20080802192646.GR19682@cs181140183.pp.htv.fi>
+References: <1217693013.2328.22.camel@localhost.localdomain>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20080801192220.GB19682@cs181140183.pp.htv.fi>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <1217693013.2328.22.camel@localhost.localdomain>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Adrian Bunk <bunk@kernel.org>
-Cc: zippel@linux-m68k.org, linux-kbuild@vger.kernel.org
+To: Josh Boyer <jwboyer@linux.vnet.ibm.com>, Sam Ravnborg <sam@ravnborg.org>, Roman Zippel <zippel@linux-m68k.org>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-On Fri, Aug 01, 2008 at 10:22:20PM +0300, Adrian Bunk wrote:
-> Now that defconfig became less chatty the "trying to assign nonexistent symbol"
-> warnings become annoying: They are in practice not avoidable and give a 
-> false impression that something would have gone wrong.
+On Sat, Aug 02, 2008 at 12:03:33PM -0400, Josh Boyer wrote:
+> I was going through the somewhat tedious task of updating the 4xx
+> defconfigs today, and I noticed some odd behavior from Kconfig.
+> Basically, I would do:
 > 
-> If anyone already knows where to touch the code for disabling these 
-> warnings for defconfigs that would be appreciated, otherwise I'll cook
-> up a patch.
+> 	make ppc44x_defconfig
+> 	make oldconfig
+> 	<build>
+> 	cp .config arch/powerpc/configs/ppc44x_defconfig
+> 	make distclean
+> 
+> I did this for a number of configs.  Then I went back and tried to build
+> ppc44x_defconfig again and I got this result:
+> 
+> [jwboyer@localhost linux-2.6]$ make ppc44x_defconfig
+>   HOSTCC  scripts/basic/fixdep
+>   HOSTCC  scripts/basic/docproc
+>   HOSTCC  scripts/kconfig/conf.o
+>   HOSTCC  scripts/kconfig/kxgettext.o
+>   SHIPPED scripts/kconfig/zconf.tab.c
+>   SHIPPED scripts/kconfig/lex.zconf.c
+>   SHIPPED scripts/kconfig/zconf.hash.c
+>   HOSTCC  scripts/kconfig/zconf.tab.o
+> scripts/kconfig/lex.zconf.c:1628: warning: ‘input’ defined but not used
+>   HOSTLD  scripts/kconfig/conf
+> [jwboyer@localhost linux-2.6]$ make oldconfig
+> scripts/kconfig/conf -o arch/powerpc/Kconfig
+> #
+> # using defaults found in /boot/config-2.6.25.13-104.fc9.ppc64
+> #
+> 
+> There was no .config file present after the initial 'make
+> ppc44x_defconfig', so it defaulted to using something in /boot.  I'm a
+> bit baffled here, but that seems to be common to any newly updated
+> defconfig I've done.
+> 
+> Was there a change to Kconfig recently that won't copy the defconfig
+> file to .config if there are no symbol changes or something like that?
 
-Last time I posted a patch to remove these warnings the feedback was
-that the warnings was used to say when a defconfig really needed an update.
-And the patch was buried inside another serie so I dropped it again.
+Thanks for your bug report, this should have worked.
 
-IIRC I added this warning long time ago and Roman was not happy
-with it - and he was right then.
+@Sam:
+I've bisected this and it is caused by
+commit f443d2eccf077afd8a839cc7ed66cc4d520c5f05
+(kconfig: speed up all*config + randconfig).
 
-	Sam
+Minimal example for reproducing it:
 
-diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
-index 0759761..df6a188 100644
---- a/scripts/kconfig/confdata.c
-+++ b/scripts/kconfig/confdata.c
-@@ -222,10 +222,8 @@ load:
- 				continue;
- 			if (def == S_DEF_USER) {
- 				sym = sym_find(line + 9);
--				if (!sym) {
--					conf_warning("trying to assign nonexistent symbol %s", line + 9);
-+				if (!sym)
- 					break;
--				}
- 			} else {
- 				sym = sym_lookup(line + 9, 0);
- 				if (sym->type == S_UNKNOWN)
-@@ -261,10 +259,8 @@ load:
- 			}
- 			if (def == S_DEF_USER) {
- 				sym = sym_find(line + 7);
--				if (!sym) {
--					conf_warning("trying to assign nonexistent symbol %s", line + 7);
-+				if (!sym)
- 					break;
--				}
- 			} else {
- 				sym = sym_lookup(line + 7, 0);
- 				if (sym->type == S_UNKNOWN)
+make x86_64_defconfig
+cp .config arch/x86/configs/x86_64_defconfig
+rm .config
+make x86_64_defconfig
+ls .config
+
+> josh
+
+cu
+Adrian
+
+-- 
+
+       "Is there not promise of rain?" Ling Tan asked suddenly out
+        of the darkness. There had been need of rain for many days.
+       "Only a promise," Lao Er said.
+                                       Pearl S. Buck - Dragon Seed
+
