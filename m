@@ -1,28 +1,24 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from e2.ny.us.ibm.com ([32.97.182.142]:36684 "EHLO e2.ny.us.ibm.com"
+Received: from smtpout3.tre.se ([80.251.192.228]:24689 "EHLO smtpout3.tre.se"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751341AbYHBX6a convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 2 Aug 2008 19:58:30 -0400
-Date: Sat, 2 Aug 2008 19:58:18 -0400
-From: Josh Boyer <jwboyer@linux.vnet.ibm.com>
-Subject: Re: Kconfig no longer outputs a .config with freshly updated
- defconfigs
-Message-ID: <20080802195818.7f72583f@zod.rchland.ibm.com>
-In-Reply-To: <20080802192646.GR19682@cs181140183.pp.htv.fi>
-References: <1217693013.2328.22.camel@localhost.localdomain>
-	<20080802192646.GR19682@cs181140183.pp.htv.fi>
+	id S1752650AbYHCICG (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 3 Aug 2008 04:02:06 -0400
+Date: Sun, 3 Aug 2008 10:00:19 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: Kconfig no longer outputs a .config with freshly updated defconfigs
+Message-ID: <20080803080019.GA13265@uranus.ravnborg.org>
+References: <1217693013.2328.22.camel@localhost.localdomain> <20080802192646.GR19682@cs181140183.pp.htv.fi>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20080802192646.GR19682@cs181140183.pp.htv.fi>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Adrian Bunk <bunk@kernel.org>
-Cc: Sam Ravnborg <sam@ravnborg.org>, Roman Zippel <zippel@linux-m68k.org>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+Cc: Josh Boyer <jwboyer@linux.vnet.ibm.com>, Roman Zippel <zippel@linux-m68k.org>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-On Sat, 2 Aug 2008 22:26:47 +0300
-Adrian Bunk <bunk@kernel.org> wrote:
-
+On Sat, Aug 02, 2008 at 10:26:47PM +0300, Adrian Bunk wrote:
 > On Sat, Aug 02, 2008 at 12:03:33PM -0400, Josh Boyer wrote:
 > > I was going through the somewhat tedious task of updating the 4xx
 > > defconfigs today, and I noticed some odd behavior from Kconfig.
@@ -68,8 +64,63 @@ Adrian Bunk <bunk@kernel.org> wrote:
 > I've bisected this and it is caused by
 > commit f443d2eccf077afd8a839cc7ed66cc4d520c5f05
 > (kconfig: speed up all*config + randconfig).
+> 
+> Minimal example for reproducing it:
+> 
+> make x86_64_defconfig
+> cp .config arch/x86/configs/x86_64_defconfig
+> rm .config
+> make x86_64_defconfig
+> ls .config
 
-Thanks Adrian.  I had intended to bisect it this evening, but you beat
-me to the punch.
+Thanks Adrian.
 
-josh
+The code has started to check if anything changed
+and if not - then do not write out a new config.
+So in your sample above we would not see any changes
+compared to what we read in autoconf.h so we did nto write
+out a new autoconf.h (and thus no .config).
+
+The right fix seems to check for .config and for changes
+and in both cases to write a new config.
+
+Patch below.
+
+	Sam
+
+
+diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
+index 9fba838..7c938c2 100644
+--- a/scripts/kconfig/conf.c
++++ b/scripts/kconfig/conf.c
+@@ -464,6 +464,21 @@ static int conf_update(void)
+ 	return 0;
+ }
+ 
++/* Write out config if config has changed or .config is missing */
++static int conf_do_write(void)
++{
++	struct stat tmpstat;
++
++	/* Any config changes */
++	if (conf_get_changed())
++		return 1;
++	/* .config missing */
++	if (stat(conf_get_configname(), &tmpstat))
++		return 1;
++
++	return 0;
++}
++
+ int main(int ac, char **av)
+ {
+ 	int opt;
+@@ -596,7 +611,7 @@ int main(int ac, char **av)
+ 		break;
+ 	}
+ 
+-	if (conf_get_changed() && conf_write(NULL)) {
++	if (conf_do_write() && conf_write(NULL)) {
+ 		fprintf(stderr, _("\n*** Error during writing of the kernel configuration.\n\n"));
+ 		exit(1);
+ 	}
