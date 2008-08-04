@@ -1,112 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp4.pp.htv.fi ([213.243.153.38]:47906 "EHLO smtp4.pp.htv.fi"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750933AbYHCKIo (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 3 Aug 2008 06:08:44 -0400
-Date: Sun, 3 Aug 2008 13:07:32 +0300
-From: Adrian Bunk <bunk@kernel.org>
-Subject: Re: Kconfig no longer outputs a .config with freshly updated
-	defconfigs
-Message-ID: <20080803100732.GA7442@cs181140183.pp.htv.fi>
-References: <1217693013.2328.22.camel@localhost.localdomain> <20080802192646.GR19682@cs181140183.pp.htv.fi> <20080803080019.GA13265@uranus.ravnborg.org>
+Received: from yorgi.telenet-ops.be ([195.130.133.69]:54939 "EHLO
+	yorgi.telenet-ops.be" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1761121AbYHDHDR (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 4 Aug 2008 03:03:17 -0400
+Received: from monty.telenet-ops.be (monty.telenet-ops.be [195.130.132.56])
+	by yorgi.telenet-ops.be (Postfix) with ESMTP id 2BFA3589359
+	for <linux-kbuild@vger.kernel.org>; Mon,  4 Aug 2008 09:03:16 +0200 (CEST)
+Date: Mon, 4 Aug 2008 09:02:43 +0200 (CEST)
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Subject: `make oldconfig' no longer updating `.config.old'?
+Message-ID: <Pine.LNX.4.64.0808040857340.23329@anakin>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20080803080019.GA13265@uranus.ravnborg.org>
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: Josh Boyer <jwboyer@linux.vnet.ibm.com>, Roman Zippel <zippel@linux-m68k.org>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
+Cc: Linux Kernel Development <linux-kernel@vger.kernel.org>, Tim Bird <tim.bird@am.sony.com>
 
-On Sun, Aug 03, 2008 at 10:00:19AM +0200, Sam Ravnborg wrote:
-> On Sat, Aug 02, 2008 at 10:26:47PM +0300, Adrian Bunk wrote:
-> > On Sat, Aug 02, 2008 at 12:03:33PM -0400, Josh Boyer wrote:
-> > > I was going through the somewhat tedious task of updating the 4xx
-> > > defconfigs today, and I noticed some odd behavior from Kconfig.
-> > > Basically, I would do:
-> > > 
-> > > 	make ppc44x_defconfig
-> > > 	make oldconfig
-> > > 	<build>
-> > > 	cp .config arch/powerpc/configs/ppc44x_defconfig
-> > > 	make distclean
-> > > 
-> > > I did this for a number of configs.  Then I went back and tried to build
-> > > ppc44x_defconfig again and I got this result:
-> > > 
-> > > [jwboyer@localhost linux-2.6]$ make ppc44x_defconfig
-> > >   HOSTCC  scripts/basic/fixdep
-> > >   HOSTCC  scripts/basic/docproc
-> > >   HOSTCC  scripts/kconfig/conf.o
-> > >   HOSTCC  scripts/kconfig/kxgettext.o
-> > >   SHIPPED scripts/kconfig/zconf.tab.c
-> > >   SHIPPED scripts/kconfig/lex.zconf.c
-> > >   SHIPPED scripts/kconfig/zconf.hash.c
-> > >   HOSTCC  scripts/kconfig/zconf.tab.o
-> > > scripts/kconfig/lex.zconf.c:1628: warning: ‘input’ defined but not used
-> > >   HOSTLD  scripts/kconfig/conf
-> > > [jwboyer@localhost linux-2.6]$ make oldconfig
-> > > scripts/kconfig/conf -o arch/powerpc/Kconfig
-> > > #
-> > > # using defaults found in /boot/config-2.6.25.13-104.fc9.ppc64
-> > > #
-> > > 
-> > > There was no .config file present after the initial 'make
-> > > ppc44x_defconfig', so it defaulted to using something in /boot.  I'm a
-> > > bit baffled here, but that seems to be common to any newly updated
-> > > defconfig I've done.
-> > > 
-> > > Was there a change to Kconfig recently that won't copy the defconfig
-> > > file to .config if there are no symbol changes or something like that?
-> > 
-> > Thanks for your bug report, this should have worked.
-> > 
-> > @Sam:
-> > I've bisected this and it is caused by
-> > commit f443d2eccf077afd8a839cc7ed66cc4d520c5f05
-> > (kconfig: speed up all*config + randconfig).
-> > 
-> > Minimal example for reproducing it:
-> > 
-> > make x86_64_defconfig
-> > cp .config arch/x86/configs/x86_64_defconfig
-> > rm .config
-> > make x86_64_defconfig
-> > ls .config
-> 
-> Thanks Adrian.
-> 
-> The code has started to check if anything changed
-> and if not - then do not write out a new config.
-> So in your sample above we would not see any changes
-> compared to what we read in autoconf.h so we did nto write
-> out a new autoconf.h (and thus no .config).
-> 
-> The right fix seems to check for .config and for changes
-> and in both cases to write a new config.
-> 
-> Patch below.
+	Hi,
 
-This breaks with:
+I have the habit of doing `make .config{.old,}' after each config run,
+to see what was changed. But since a few weeks, `make oldconfig' no longer
+seems to update `.config.old'.
 
-make ARCH=x86 x86_64_defconfig
-cp .config arch/x86/configs/x86_64_defconfig
-make ARCH=x86 i386_defconfig
-make ARCH=x86 x86_64_defconfig
+This also breaks the default behavior of `scripts/diffconfig' (`If no
+config files are specified, .config and .config.old are used.').
 
-Why can't we simply always write the .config?
+Was this change intentional?
 
-> 	Sam
->...
+Gr{oetje,eeting}s,
 
-cu
-Adrian
+						Geert
 
--- 
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
 
-       "Is there not promise of rain?" Ling Tan asked suddenly out
-        of the darkness. There had been need of rain for many days.
-       "Only a promise," Lao Er said.
-                                       Pearl S. Buck - Dragon Seed
-
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+							    -- Linus Torvalds
