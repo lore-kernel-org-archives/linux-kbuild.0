@@ -1,50 +1,42 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from edna.telenet-ops.be ([195.130.132.58]:41944 "EHLO
-	edna.telenet-ops.be" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751217AbYHEHbE (ORCPT
+Received: from mexforward.lss.emc.com ([128.222.32.20]:41887 "EHLO
+	mexforward.lss.emc.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753254AbYHEIrv convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 5 Aug 2008 03:31:04 -0400
-Date: Tue, 5 Aug 2008 09:31:00 +0200 (CEST)
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Subject: Re: `make oldconfig' no longer updating `.config.old'?
-In-Reply-To: <20080804201040.GA28982@uranus.ravnborg.org>
-Message-ID: <Pine.LNX.4.64.0808050930390.7331@anakin>
-References: <Pine.LNX.4.64.0808040857340.23329@anakin>
- <20080804201040.GA28982@uranus.ravnborg.org>
+	Tue, 5 Aug 2008 04:47:51 -0400
+Received: from mailhub.lss.emc.com (uraeus.lss.emc.com [10.254.144.14])
+	by mexforward.lss.emc.com (Switch-3.2.5/Switch-3.1.7) with ESMTP id m758lnBn014907
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-SHA bits=256 verify=NO)
+	for <linux-kbuild@vger.kernel.org>; Tue, 5 Aug 2008 04:47:49 -0400 (EDT)
+Received: from corpussmtp2.corp.emc.com (corpussmtp2.corp.emc.com [128.221.14.146])
+	by mailhub.lss.emc.com (Switch-3.2.5/Switch-3.1.7) with ESMTP id m758lieY028265
+	for <linux-kbuild@vger.kernel.org>; Tue, 5 Aug 2008 04:47:48 -0400 (EDT)
+From: Qian_Riny@emc.com
+Content-class: urn:content-classes:message
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+Subject: How to separate obj and src for external module build?
+Date: Tue, 5 Aug 2008 04:47:44 -0400
+Message-ID: <74FD445BA9418847A54455595122B4B43F7F4F@CORPUSMX70C.corp.emc.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: linux-kbuild@vger.kernel.org, Linux Kernel Development <linux-kernel@vger.kernel.org>, Tim Bird <tim.bird@am.sony.com>
+To: linux-kbuild@vger.kernel.org
 
-On Mon, 4 Aug 2008, Sam Ravnborg wrote:
-> On Mon, Aug 04, 2008 at 09:02:43AM +0200, Geert Uytterhoeven wrote:
-> > I have the habit of doing `make .config{.old,}' after each config run,
-> > to see what was changed. But since a few weeks, `make oldconfig' no longer
-> > seems to update `.config.old'.
-> > 
-> > This also breaks the default behavior of `scripts/diffconfig' (`If no
-> > config files are specified, .config and .config.old are used.').
-> > 
-> > Was this change intentional?
-> 
-> .config is with current kconfig updated only if a user visible
-> symbol changes (or something like that).
-> I had another similar report where .config was not created if
-> missing and confi was not changed.
-> 
-> Fix is below and I will commit it soon.
+Hi,
 
-Thanks! Problem solved.
+I want to put all obj files (*.o, *.ko etc) into a different directory
+(e.g. obj/) 
+rather than the same src (*.c, Makefile) directory while building an
+external module:
+$(MAKE) -C $(KERNELDIR) M=$(SRC) modules
+How to do it?
 
-Gr{oetje,eeting}s,
+I tried to use O (KBUILD_OUTPUT), but still no luck. It seems that
+O (KBUILD_OUTPUT) is just used for kernel build output.
 
-						Geert
+$(MAKE) -C $(KERNELDIR) M=$(SRC) O=$(OBJ) modules
+It doesn't work.
 
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-							    -- Linus Torvalds
+Thanks. 
