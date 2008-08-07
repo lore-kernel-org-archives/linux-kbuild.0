@@ -1,155 +1,55 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtpout3.tre.se ([80.251.192.228]:43825 "EHLO smtpout3.tre.se"
+Received: from arroyo.ext.ti.com ([192.94.94.40]:55244 "EHLO arroyo.ext.ti.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1761784AbYHFU2Z (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 6 Aug 2008 16:28:25 -0400
-Date: Wed, 6 Aug 2008 22:27:38 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: [GIT PULL] kbuild fixes
-Message-ID: <20080806202738.GA20066@uranus.ravnborg.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+	id S1754605AbYHGHsy convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 7 Aug 2008 03:48:54 -0400
+Received: from dbdp20.itg.ti.com ([172.24.170.38])
+	by arroyo.ext.ti.com (8.13.7/8.13.7) with ESMTP id m777mhVu028370
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-SHA bits=256 verify=NO)
+	for <linux-kbuild@vger.kernel.org>; Thu, 7 Aug 2008 02:48:52 -0500
+Received: from dbde70.ent.ti.com (localhost [127.0.0.1])
+	by dbdp20.itg.ti.com (8.13.8/8.13.8) with ESMTP id m777mhmV018635
+	for <linux-kbuild@vger.kernel.org>; Thu, 7 Aug 2008 13:18:43 +0530 (IST)
+From: "Dasgupta, Romit" <romit@ti.com>
+Date: Thu, 7 Aug 2008 13:18:32 +0530
+Subject: scripts/Kbuild.include doubts
+Message-ID: <B85A65D85D7EB246BE421B3FB0FBB593013CA23CA1@dbde02.ent.ti.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: 8BIT
+MIME-Version: 1.0
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
-Cc: Denis ChengRq <crquan@gmail.com>, "Robert P. J. Day" <rpjday@crashcourse.ca>, Randy Dunlap <randy.dunlap@oracle.com>, Andrew Morton <akpm@linux-foundation.org>, Russell King <rmk@arm.linux.org.uk>
+To: "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>
 
-Hi Linus.
+Sorry for being naïve, please see the changes below and kindly let me know if the changes look right.
 
-Please pull following kbuild related fixes.
+In the first case, cc-version passes $(CC) anyway so I think that is not necessary.
+In the second case, $($(1)) within a foreach doesnot seem to do a recursive expansion. So $(o) seems to be empty. I might be wrong but that's what I see happening!
 
-o Fix "make O=..." builds for arm
-o update to for newer cscope
-o patch-kernel fix (but I doubt it has many uses)
-o small Kconfig clean-up
+Thanks,
+-Romit
 
-	Sam
+diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
+index d64e6ba..bb73b13 100644
+--- a/scripts/Kbuild.include
++++ b/scripts/Kbuild.include
+@@ -128,7 +128,7 @@ cc-fullversion = $(shell $(CONFIG_SHELL) \
 
-The following changes since commit 0967d61ea0d8e8a7826bd8949cd93dd1e829ac55:
-  Linus Torvalds (1):
-        Linux 2.6.27-rc2
+ # cc-ifversion
+ # Usage:  EXTRA_CFLAGS += $(call cc-ifversion, -lt, 0402, -O1)
+-cc-ifversion = $(shell [ $(call cc-version, $(CC)) $(1) $(2) ] && echo $(3))
++cc-ifversion = $(shell [ $(call cc-version) $(1) $(2) ] && echo $(3))
 
-are available in the git repository at:
+ # ld-option
+ # Usage: ldflags += $(call ld-option, -Wl$(comma)--hash-style=both)
+@@ -147,7 +147,7 @@ build := -f $(if $(KBUILD_SRC),$(srctree)/)scripts/Makefile.
+ addtree = $(if $(filter-out -I/%,$(1)),$(patsubst -I%,-I$(srctree)/%,$(1))) $(1
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/sam/kbuild-fixes.git master
+ # Find all -I options and call addtree
+-flags = $(foreach o,$($(1)),$(if $(filter -I%,$(o)),$(call addtree,$(o)),$(o)))
++flags = $(foreach o,$(1),$(if $(filter -I%,$(o)),$(call addtree,$(o)),$(o)))
 
-Denis ChengRq (1):
-      kbuild: a better way to generate cscope database change
-
-Erkki Lintunen (1):
-      bugfix for scripts/patch-kernel in 2.6 sublevel stepping
-
-Robert P. J. Day (1):
-      Kconfig: Extend "menuconfig" for modules to simplify Kconfig file
-
-Sam Ravnborg (1):
-      kbuild: fix O=.. build with arm
-
- Makefile             |    8 ++++----
- init/Kconfig         |    9 ++++-----
- scripts/patch-kernel |    3 ++-
- 3 files changed, 10 insertions(+), 10 deletions(-)
-
-diff --git a/Makefile b/Makefile
-index ea413fa..f3e2065 100644
---- a/Makefile
-+++ b/Makefile
-@@ -929,10 +929,10 @@ ifneq ($(KBUILD_SRC),)
- 		echo "  in the '$(srctree)' directory.";\
- 		/bin/false; \
- 	fi;
--	$(Q)if [ ! -d include2 ]; then mkdir -p include2; fi;
--	$(Q)if [ -e $(srctree)/include/asm-$(SRCARCH)/errno.h ]; then  \
-+	$(Q)if [ ! -d include2 ]; then                                  \
-+	    mkdir -p include2;                                          \
- 	    ln -fsn $(srctree)/include/asm-$(SRCARCH) include2/asm;     \
--	    fi
-+	fi
- endif
- 
- # prepare2 creates a makefile if using a separate output directory
-@@ -1492,7 +1492,7 @@ quiet_cmd_cscope-file = FILELST cscope.files
-       cmd_cscope-file = (echo \-k; echo \-q; $(all-sources)) > cscope.files
- 
- quiet_cmd_cscope = MAKE    cscope.out
--      cmd_cscope = cscope -b
-+      cmd_cscope = cscope -b -f cscope.out
- 
- cscope: FORCE
- 	$(call cmd,cscope-file)
-diff --git a/init/Kconfig b/init/Kconfig
-index 7e6dae1..b678803 100644
---- a/init/Kconfig
-+++ b/init/Kconfig
-@@ -845,9 +845,10 @@ menuconfig MODULES
- 
- 	  If unsure, say Y.
- 
-+if MODULES
-+
- config MODULE_FORCE_LOAD
- 	bool "Forced module loading"
--	depends on MODULES
- 	default n
- 	help
- 	  Allow loading of modules without version information (ie. modprobe
-@@ -856,7 +857,6 @@ config MODULE_FORCE_LOAD
- 
- config MODULE_UNLOAD
- 	bool "Module unloading"
--	depends on MODULES
- 	help
- 	  Without this option you will not be able to unload any
- 	  modules (note that some modules may not be unloadable
-@@ -875,7 +875,6 @@ config MODULE_FORCE_UNLOAD
- 
- config MODVERSIONS
- 	bool "Module versioning support"
--	depends on MODULES
- 	help
- 	  Usually, you have to use modules compiled with your kernel.
- 	  Saying Y here makes it sometimes possible to use modules
-@@ -886,7 +885,6 @@ config MODVERSIONS
- 
- config MODULE_SRCVERSION_ALL
- 	bool "Source checksum for all modules"
--	depends on MODULES
- 	help
- 	  Modules which contain a MODULE_VERSION get an extra "srcversion"
- 	  field inserted into their modinfo section, which contains a
-@@ -898,11 +896,12 @@ config MODULE_SRCVERSION_ALL
- 
- config KMOD
- 	def_bool y
--	depends on MODULES
- 	help
- 	  This is being removed soon.  These days, CONFIG_MODULES
- 	  implies CONFIG_KMOD, so use that instead.
- 
-+endif # MODULES
-+
- config STOP_MACHINE
- 	bool
- 	default y
-diff --git a/scripts/patch-kernel b/scripts/patch-kernel
-index ece46ef..46a59ca 100755
---- a/scripts/patch-kernel
-+++ b/scripts/patch-kernel
-@@ -213,6 +213,7 @@ fi
- if [ $stopvers != "default" ]; then
- 	STOPSUBLEVEL=`echo $stopvers | cut -d. -f3`
- 	STOPEXTRA=`echo $stopvers | cut -d. -f4`
-+	STOPFULLVERSION=${stopvers%%.$STOPEXTRA}
- 	#echo "#___STOPSUBLEVEL=/$STOPSUBLEVEL/, STOPEXTRA=/$STOPEXTRA/"
- else
- 	STOPSUBLEVEL=9999
-@@ -249,7 +250,7 @@ while :				# incrementing SUBLEVEL (s in v.p.s)
- do
-     CURRENTFULLVERSION="$VERSION.$PATCHLEVEL.$SUBLEVEL"
-     EXTRAVER=
--    if [ $stopvers = $CURRENTFULLVERSION ]; then
-+    if [ $STOPFULLVERSION = $CURRENTFULLVERSION ]; then
-         echo "Stopping at $CURRENTFULLVERSION base as requested."
-         break
-     fi
+ # echo command.
+ # Short version is used, if $(quiet) equals `quiet_', otherwise full one.
