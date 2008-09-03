@@ -1,56 +1,83 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mu-out-0910.google.com ([209.85.134.190]:23691 "EHLO
-	mu-out-0910.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752133AbYICTmQ convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 3 Sep 2008 15:42:16 -0400
-Received: by mu-out-0910.google.com with SMTP id g7so2877173muf.1
-        for <linux-kbuild@vger.kernel.org>; Wed, 03 Sep 2008 12:42:14 -0700 (PDT)
-From: Bartlomiej Zolnierkiewicz <bzolnier@gmail.com>
+Received: from xenotime.net ([66.160.160.81]:49861 "HELO xenotime.net"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with SMTP
+	id S1753641AbYICUCn (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 3 Sep 2008 16:02:43 -0400
+Received: from shark.he.net ([66.160.160.2]) by xenotime.net for <linux-kbuild@vger.kernel.org>; Wed, 3 Sep 2008 13:02:42 -0700
+Date: Wed, 3 Sep 2008 13:02:42 -0700 (PDT)
+From: "Randy.Dunlap" <rdunlap@xenotime.net>
 Subject: Re: [PATCH] ncurses based config
-Date: Wed, 3 Sep 2008 21:38:14 +0200
+In-Reply-To: <200809032138.14651.bzolnier@gmail.com>
+Message-ID: <Pine.LNX.4.64.0809031259110.20541@shark.he.net>
 References: <1220469076-16487-1-git-send-email-nir@tzachar.com>
-In-Reply-To: <1220469076-16487-1-git-send-email-nir@tzachar.com>
+ <200809032138.14651.bzolnier@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="utf-8"
-Content-Transfer-Encoding: 8BIT
-Content-Disposition: inline
-Message-Id: <200809032138.14651.bzolnier@gmail.com>
+Content-Type: MULTIPART/MIXED; BOUNDARY="-1606286688-467003182-1220472162=:20541"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nir Tzachar <tzachar@grad120a.cs.bgu.ac.il>
-Cc: linux-kernel@vger.kernel.org, zippel@linux-m68k.org, linux-kbuild@vger.kernel.org, Nir Tzachar <nir@tzachar.com>
+To: Bartlomiej Zolnierkiewicz <bzolnier@gmail.com>
+Cc: Nir Tzachar <tzachar@grad120a.cs.bgu.ac.il>, linux-kernel@vger.kernel.org, zippel@linux-m68k.org, linux-kbuild@vger.kernel.org, Nir Tzachar <nir@tzachar.com>
 
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
 
-Hi,
+---1606286688-467003182-1220472162=:20541
+Content-Type: TEXT/PLAIN; charset=ISO-8859-1
+Content-Transfer-Encoding: QUOTED-PRINTABLE
 
-On Wednesday 03 September 2008, Nir Tzachar wrote:
-> This patch was inspired by the kernel projects page, where an ncurses
-> replacement for menuconfig was mentioned (by Sam Ravnborg).
-> 
-> Building on menuconfig, this patch implements a more modern look interface using
-> ncurses and ncurses' satellite libraries (menu, panel, form). The implementation
-> does not depend on lxdialog, which is currently distributed with the kernel.
-> 
-> The only change outside of nconf.c is due to a name clash: both ncurses and
-> lkc.h define a fucntion named menu_init(). I changed the internal version's
-> name. 
-> 
-> Please consider the patch for merging. Comments are appreciated.
+On Wed, 3 Sep 2008, Bartlomiej Zolnierkiewicz wrote:
 
-Could you please tell what kernel version is it against?
+>=20
+> Hi,
+>=20
+> On Wednesday 03 September 2008, Nir Tzachar wrote:
+> > This patch was inspired by the kernel projects page, where an ncurses
+> > replacement for menuconfig was mentioned (by Sam Ravnborg).
+> >=20
+> > Building on menuconfig, this patch implements a more modern look interf=
+ace using
+> > ncurses and ncurses' satellite libraries (menu, panel, form). The imple=
+mentation
+> > does not depend on lxdialog, which is currently distributed with the ke=
+rnel.
+> >=20
+> > The only change outside of nconf.c is due to a name clash: both ncurses=
+ and
+> > lkc.h define a fucntion named menu_init(). I changed the internal versi=
+on's
+> > name.=20
+> >=20
+> > Please consider the patch for merging. Comments are appreciated.
+>=20
+> Could you please tell what kernel version is it against?
 
-I'm getting the following error on make nconfig (and also on make menuconfig
-which works fine without this patch) with the current Linus' tree:
+It applies cleanly to 2.6.27-rc5-git4 FWIW.
 
-  HOSTCC  scripts/kconfig/conf.o
-  HOSTCC  scripts/kconfig/kxgettext.o
-  HOSTCC  scripts/kconfig/nconf.o
-  HOSTCC  scripts/kconfig/zconf.tab.o
-scripts/kconfig/zconf.tab.c: In function ‘conf_parse’:
-scripts/kconfig/zconf.tab.c:2258: warning: implicit declaration of function ‘menu_init’
-  HOSTLD  scripts/kconfig/nconf
-scripts/kconfig/nconf arch/x86/Kconfig
-make[1]: *** [nconfig] Segmentation fault
-make: *** [nconfig] Error 2
+> I'm getting the following error on make nconfig (and also on make menucon=
+fig
+> which works fine without this patch) with the current Linus' tree:
+>=20
+>   HOSTCC  scripts/kconfig/conf.o
+>   HOSTCC  scripts/kconfig/kxgettext.o
+>   HOSTCC  scripts/kconfig/nconf.o
+>   HOSTCC  scripts/kconfig/zconf.tab.o
+> scripts/kconfig/zconf.tab.c: In function =FF=FFconf_parse=FF=FF:
+> scripts/kconfig/zconf.tab.c:2258: warning: implicit declaration of functi=
+on =FF=FFmenu_init=FF=FF
+>   HOSTLD  scripts/kconfig/nconf
+> scripts/kconfig/nconf arch/x86/Kconfig
+> make[1]: *** [nconfig] Segmentation fault
+> make: *** [nconfig] Error 2
+
+Need to change all /menu_init/ in zconf.tab.c* to /_menu_init/.
+
+Need to strip trailing whitespace on new source code lines.
+
+I'm seeing cyan (?) foreground on black background.  Is that the colors
+that were planned?
+
+Instructions are dark blue on black -- cannot read them.
+
+--=20
+~Randy
+---1606286688-467003182-1220472162=:20541--
