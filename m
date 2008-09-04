@@ -1,56 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ey-out-2122.google.com ([74.125.78.27]:5107 "EHLO
-	ey-out-2122.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751834AbYIDKgN convert rfc822-to-8bit (ORCPT
+Received: from mail-in-14.arcor-online.net ([151.189.21.54]:58593 "EHLO
+	mail-in-14.arcor-online.net" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1752177AbYIDMOL (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 4 Sep 2008 06:36:13 -0400
-Received: by ey-out-2122.google.com with SMTP id 6so1591712eyi.37
-        for <linux-kbuild@vger.kernel.org>; Thu, 04 Sep 2008 03:36:12 -0700 (PDT)
-Date: Thu, 4 Sep 2008 12:36:09 +0200
-From: Alejandro Riveira =?UTF-8?B?RmVybsOhbmRleg==?=
-	<ariveira@gmail.com>
+	Thu, 4 Sep 2008 08:14:11 -0400
+From: Bodo Eggert <7eggert@gmx.de>
 Subject: Re: [PATCH] ncurses based config
-Message-ID: <20080904123609.1c3638d8@Varda>
-In-Reply-To: <1220469076-16487-1-git-send-email-nir@tzachar.com>
-References: <1220469076-16487-1-git-send-email-nir@tzachar.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+Reply-To: 7eggert@gmx.de
+Date: Thu, 04 Sep 2008 14:21:38 +0200
+References: <b86dt-3nV-39@gated-at.bofh.it> <b86wB-3HU-1@gated-at.bofh.it> <b86Qa-4k2-53@gated-at.bofh.it> <b879t-4DG-23@gated-at.bofh.it>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8Bit
+Message-Id: <E1KbDqF-0003oH-1B@be1.7eggert.dyndns.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nir Tzachar <tzachar@grad120a.cs.bgu.ac.il>
-Cc: linux-kernel@vger.kernel.org, zippel@linux-m68k.org, linux-kbuild@vger.kernel.org, Nir Tzachar <nir@tzachar.com>
+To: Alejandro Riveira =?ISO-8859-1?Q?Fern=E1ndez?= <ariveira@gmail.com>, "Randy.Dunlap" <rdunlap@xenotime.net>, Bartlomiej Zolnierkiewicz <bzolnier@gmail.com>, Nir Tzachar <tzachar@grad120a.cs.bgu.ac.il>, linux-kernel@vger.kernel.org, zippel@linux-m68k.org, linux-kbuild@vger.kernel.org, Nir Tzachar <nir@tzachar.com>
 
-El Wed,  3 Sep 2008 22:11:16 +0300
-"Nir Tzachar" <tzachar@nexus.cs.bgu.ac.il> escribi√≥:
+Alejandro Riveira Fern·ndez <ariveira@gmail.com> wrote:
+> El Wed, 3 Sep 2008 13:02:42 -0700 (PDT)
 
-> This patch was inspired by the kernel projects page, where an ncurses
-> replacement for menuconfig was mentioned (by Sam Ravnborg).
-> 
-> Building on menuconfig, this patch implements a more modern look interface using
-> ncurses and ncurses' satellite libraries (menu, panel, form). The implementation
-> does not depend on lxdialog, which is currently distributed with the kernel.
-> 
-> The only change outside of nconf.c is due to a name clash: both ncurses and
-> lkc.h define a fucntion named menu_init(). I changed the internal version's
-> name. 
-> 
-> Please consider the patch for merging. Comments are appreciated.
+[nconfig]
 
-  i apliedd your patches and the fixlet pointed out by Randy
-  rebased on todays git and the menu crashes when i select
-  help on Kernel Hacking>Spinlock and rw-...
-  is a Segmentation fault
+>> I'm seeing cyan (?) foreground on black background.  Is that the colors
+>> that were planned?
+>   
+>  much nicer colors here (ubuntu)
+>  http://img177.imageshack.us/my.php?image=pantallazonm7.png
 
-> 
-> ---
->  scripts/kconfig/Makefile |   16 +-
->  scripts/kconfig/lkc.h    |    2 +-
->  scripts/kconfig/mconf.c  |    2 +
->  scripts/kconfig/menu.c   |    2 +-
->  scripts/kconfig/nconf.c  | 1852 ++++++++++++++++++++++++++++++++++++++++++++++
->  5 files changed, 1871 insertions(+), 3 deletions(-)
->  create mode 100644 scripts/kconfig/nconf.c
-> 
+Desaturate the image using "luminosity" setting, and you'll spot a problem.
+
+Choosing a non-black background isn't bad per se, but it limits the number of
+colors you can use for foreground, and a dark grey isn't much better.
+
+Generally you should use no color unless you'd like to draw attention. Use
+blue for unimportant things, red if you want to alert. Never use red and blue
+close to each other, because they need different focussing in the eye, and
+trying to see both will cause a headache.
+
+The layout is possibly good for large screen sizes, but you should design it
+for 80x24 first. Having to install X11 or a framebuffer console just to
+configure a kernel is no good.
+
+In other words: You don't permanently need half a screen of instructions,
+hide them by default and offer a popup. The window below the title is the
+only working area, it can be maximized. (Looking at "make menuconfig",
+I see the same mistakes.)
 
 
