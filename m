@@ -1,38 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-in-11.arcor-online.net ([151.189.21.51]:40076 "EHLO
-	mail-in-11.arcor-online.net" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751404AbYIDO3n (ORCPT
+Received: from fk-out-0910.google.com ([209.85.128.187]:12398 "EHLO
+	fk-out-0910.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751851AbYIDPFX convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 4 Sep 2008 10:29:43 -0400
-Date: Thu, 4 Sep 2008 16:37:01 +0200 (CEST)
-From: Bodo Eggert <7eggert@gmx.de>
+	Thu, 4 Sep 2008 11:05:23 -0400
+Received: by fk-out-0910.google.com with SMTP id 18so2633932fkq.5
+        for <linux-kbuild@vger.kernel.org>; Thu, 04 Sep 2008 08:05:21 -0700 (PDT)
+From: Bartlomiej Zolnierkiewicz <bzolnier@gmail.com>
 Subject: Re: [PATCH] ncurses based config
-In-Reply-To: <9b2db90b0809040517v4478f1b9md69ea07ef9c62c86@mail.gmail.com>
-Message-ID: <alpine.LSU.0.999.0809041627170.16019@be1.lrz>
-References: <b86dt-3nV-39@gated-at.bofh.it> <b86wB-3HU-1@gated-at.bofh.it>
- <b86Qa-4k2-53@gated-at.bofh.it> <b879t-4DG-23@gated-at.bofh.it>
- <E1KbDqF-0003oH-1B@be1.7eggert.dyndns.org>
- <9b2db90b0809040517v4478f1b9md69ea07ef9c62c86@mail.gmail.com>
+Date: Thu, 4 Sep 2008 17:02:30 +0200
+References: <1220469076-16487-1-git-send-email-nir@tzachar.com> <Pine.LNX.4.64.0809031259110.20541@shark.he.net> <20080903222927.7d191458@Varda>
+In-Reply-To: <20080903222927.7d191458@Varda>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=us-ascii
+Content-Disposition: inline
+Message-Id: <200809041702.30301.bzolnier@gmail.com>
+Content-Type: text/plain;
+  charset="utf-8"
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nir Tzachar <nir@tzachar.com>
-Cc: 7eggert@gmx.de, =?iso-8859-15?Q?Alejandro_Riveira_Fern=E1ndez?= <ariveira@gmail.com>, "Randy.Dunlap" <rdunlap@xenotime.net>, Bartlomiej Zolnierkiewicz <bzolnier@gmail.com>, Nir Tzachar <tzachar@grad120a.cs.bgu.ac.il>, linux-kernel@vger.kernel.org, zippel@linux-m68k.org, linux-kbuild@vger.kernel.org
+To: Alejandro Riveira =?utf-8?q?Fern=C3=A1ndez?= <ariveira@gmail.com>
+Cc: "Randy.Dunlap" <rdunlap@xenotime.net>, Nir Tzachar <tzachar@grad120a.cs.bgu.ac.il>, linux-kernel@vger.kernel.org, zippel@linux-m68k.org, linux-kbuild@vger.kernel.org, Nir Tzachar <nir@tzachar.com>
 
-On Thu, 4 Sep 2008, Nir Tzachar wrote:
-> On Thu, Sep 4, 2008 at 3:21 PM, Bodo Eggert <7eggert@gmx.de> wrote:
+On Wednesday 03 September 2008, Alejandro Riveira Fernández wrote:
 
-> > In other words: You don't permanently need half a screen of instructions,
-> > hide them by default and offer a popup. The window below the title is the
-> > only working area, it can be maximized. (Looking at "make menuconfig",
-> > I see the same mistakes.)
-> 
-> I tried to copy the behaviour of menuconfig, hence the similarity.
+[...]
 
-Obviously. I tried to put the blame on menuconfig by mentioning it.
+> > I'm seeing cyan (?) foreground on black background.  Is that the colors
+> > that were planned?
+>   
+>  much nicer colors here (ubuntu) 
+>  http://img177.imageshack.us/my.php?image=pantallazonm7.png
 
-> Does placing a short help, e.g.,  'press I for instruction' seems
-> good?
+Update: under Fedora9 with default settings:
 
-In this case, I'd just add one more button.
+- X + xterm: colors are OK
+
+- X + konsole: colors are not OK
+
+- console (on vesafb): colors are OK except that frames are "invisible"
+
+Seems like there are some compatibility issues to be resolved...
+
+Thanks,
+Bart
