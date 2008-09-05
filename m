@@ -1,30 +1,25 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mu-out-0910.google.com ([209.85.134.186]:53994 "EHLO
-	mu-out-0910.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754167AbYIENuA convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 5 Sep 2008 09:50:00 -0400
-Received: by mu-out-0910.google.com with SMTP id g7so352872muf.1
-        for <linux-kbuild@vger.kernel.org>; Fri, 05 Sep 2008 06:49:58 -0700 (PDT)
-Date: Fri, 5 Sep 2008 15:49:53 +0200
-From: Alejandro Riveira =?UTF-8?B?RmVybsOhbmRleg==?=
-	<ariveira@gmail.com>
+Received: from 1wt.eu ([62.212.114.60]:3203 "EHLO 1wt.eu"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751047AbYIEUDF (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 5 Sep 2008 16:03:05 -0400
+Date: Fri, 5 Sep 2008 21:59:30 +0200
+From: Willy Tarreau <w@1wt.eu>
 Subject: Re: [PATCH] ncurses based config V2
-Message-ID: <20080905154953.3abefbce@Varda>
-In-Reply-To: <1220603220-17090-1-git-send-email-nir@tzachar.com>
-References: <1220469076-16487-1-git-send-email-nir@tzachar.com>
-	<1220603220-17090-1-git-send-email-nir@tzachar.com>
+Message-ID: <20080905195930.GA27913@1wt.eu>
+References: <1220469076-16487-1-git-send-email-nir@tzachar.com> <1220603220-17090-1-git-send-email-nir@tzachar.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1220603220-17090-1-git-send-email-nir@tzachar.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Nir Tzachar <tzachar@grad120a.cs.bgu.ac.il>
-Cc: linux-kernel@vger.kernel.org, bzolnier@gmail.com, zippel@linux-m68k.org, linux-kbuild@vger.kernel.org, rdunlap@xenotime.net, kosaki.motohiro@jp.fujitsu.com, 7eggert@gmx.de, Nir Tzachar <nir@tzachar.com>
+Cc: linux-kernel@vger.kernel.org, bzolnier@gmail.com, zippel@linux-m68k.org, linux-kbuild@vger.kernel.org, ariveira@gmail.com, rdunlap@xenotime.net, kosaki.motohiro@jp.fujitsu.com, 7eggert@gmx.de, Nir Tzachar <nir@tzachar.com>
 
-El Fri,  5 Sep 2008 11:27:00 +0300
-"Nir Tzachar" <tzachar@nexus.cs.bgu.ac.il> escribió:
+Hello,
 
+On Fri, Sep 05, 2008 at 11:27:00AM +0300, Nir Tzachar wrote:
 > Changes:
 > 1) Fixed segfaults in help window.
 > 2) Removed the instructions window, made the instructions appear as a button
@@ -37,18 +32,60 @@ El Fri,  5 Sep 2008 11:27:00 +0300
 > 8) Misc fixes.
 > 
 > Comments are appreciated.
-> Cheers.
-> ---
->  scripts/kconfig/Makefile            |   17 +-
->  scripts/kconfig/lkc.h               |    2 +-
->  scripts/kconfig/mconf.c             |    2 +
->  scripts/kconfig/menu.c              |    2 +-
->  scripts/kconfig/nconf.c             | 2019 +++++++++++++++++++++++++++++++++++
->  scripts/kconfig/zconf.tab.c_shipped |    2 +-
->  scripts/kconfig/zconf.y             |    2 +-
->  7 files changed, 2041 insertions(+), 5 deletions(-)
->  create mode 100644 scripts/kconfig/nconf.c
 
- Tried it and the segmentation fault disappeared 
+OK, I've just tried it. Here are the first comments I can make :
 
-> 
+  - colors are too dark. Cyan on black is barely readable, red on black is
+    almost unreadable and blue on black is not readable at all, I have to
+    switch off the light to read it. Most often you'll see light shades of
+    grey (even white) in interfaces because it's hard to see dark shades,
+    and bright flashy letters would dazzle and be seen as fuzzy. Many colors
+    are perfectly readable on while or even light grey (except yellow and
+    sometimes cyan). Blue backgrounds were often used under DOS and were
+    OK with almost all colors except red (well-known eye focus problem).
+    But there was a trick, pixels were very large in 640x200, nowaydays
+    we have small pixels and letters are not much readable anymore on blue
+    backgrounds. For your tests, you can try to load 
+    xterm -bg <color> -fg <color> and ensure that you're using a medium
+    font (tickness of 1-pixel).
+
+  - pressing arrows too fast regularly escapes (probably because of the
+    ESC prefix, I don't know). This is rather strange, because no other
+    application does this to me. Is there a specific initialization
+    sequence with ncurses to state that arrows should return special codes
+    instead of the ESC prefix ? (I have no idea)
+
+  - entering text in boxes (eg: local version) does not move the cursor,
+    it remains at the beginning of the line. If I press any arrow, the
+    box immediately closes (most likely the Esc prefix again).
+
+  - in the input boxes, spaces are missing aroung the title, which touches
+    the frame (eg: Local version again).
+
+  - in "instructions", it's not explained how to leave that box. I found
+    both Enter and Esc to work, but a last line with a small message would
+    be better.
+
+  - I noticed I was tempted a lot to press "?" to get help, but the key is
+    not bound. It would be nice to have it bound to Help since make oldconfig
+    and menuconfig to both report help that way.
+
+  - I'm not convinced that the parenthesis around hotkeys make the menu
+    that much readable, especially when there are lots of short words or
+    even acronyms. Eg :
+        [ ]   (U)TS namespace
+        [ ]   (I)PC namespace
+        [ ]   (U)ser namespace (EXPERIMENTAL)
+        [ ]   (P)ID Namespaces (EXPERIMENTAL)
+
+    I don't know if there is something such as a bold attribute in ncurses,
+    it would make sense to use it IMHO because you don't force a color on
+    people's terms, you rely on the style which works well for them.
+
+I'm sorry I don't go further for now, the arrows causing frequent exits is
+too bothersome, I've started it about 30 times just for this report, it's
+too hard to navigate. I hope that the points above are already helpful.
+
+Regards,
+Willy
+
