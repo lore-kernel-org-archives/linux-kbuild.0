@@ -1,50 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from terminus.zytor.com ([198.137.202.10]:33361 "EHLO
-	terminus.zytor.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753540AbYIHVWU (ORCPT
+Received: from mx1.nuigalway.ie ([140.203.201.100]:59312 "EHLO
+	mx1.nuigalway.ie" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750871AbYIIO6d (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 8 Sep 2008 17:22:20 -0400
-Message-ID: <48C5977C.7020109@kernel.org>
-Date: Mon, 08 Sep 2008 14:22:04 -0700
-From: "H. Peter Anvin" <hpa@kernel.org>
+	Tue, 9 Sep 2008 10:58:33 -0400
+Date: Tue, 9 Sep 2008 15:46:18 +0100
+From: Jonathan Lynch <jonathan.lynch@gmail.com>
+Subject: [PATCH] kbuild: Bugfix for variable KBUILD_EXTRA_SYMBOLS 
+Message-ID: <20080909144618.GA20020@riviera.nuigalway.ie>
 MIME-Version: 1.0
-Subject: Re: [git pull] x86 fixes
-References: <200809081932.m88JWVZG013061@askone.hos.anvin.org> <200809081634.24257.linux@sandersweb.net> <48C59711.8050502@zytor.com>
-In-Reply-To: <48C59711.8050502@zytor.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/mixed; boundary="Dxnq1zWXvFF0Q93v"
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
-Cc: linux@sandersweb.net, linux-kernel@vger.kernel.org, x86 maintainers <x86@kernel.org>
+To: sam@ravnborg.org
+Cc: linux-kbuild@vger.kernel.org
 
-H. Peter Anvin wrote:
-> David Sanders wrote:
->> On Monday 08 September 2008 15:32, H. Peter Anvin wrote:
->>> diff --git a/arch/x86/Makefile_32.cpu b/arch/x86/Makefile_32.cpu
->>> index e372b58..b72b4f7 100644
->>> --- a/arch/x86/Makefile_32.cpu
->>> +++ b/arch/x86/Makefile_32.cpu
->>> @@ -45,3 +45,8 @@ cflags-$(CONFIG_MGEODEGX1)    += -march=pentium-mmx
->>>  # cpu entries
->>>  cflags-$(CONFIG_X86_GENERIC)     += $(call tune,generic,$(call 
->>> tune,i686))
->> Peter, I'm getting this error:
->> as: unrecognized option `-mtune=generic32'
->> I have binutils 2.17.
->> David
-> 
-> Oh bloody hell...
-> 
-> cc-option = $(call try-run,\
->         $(CC) $(KBUILD_CFLAGS) $(1) -S -xc /dev/null -o "$$TMP",$(1),$(2))
-> 
-> Note the -S.  Useless for anything related to the assembler.
-> 
-> /me wimpers...
 
-Sam:
+--Dxnq1zWXvFF0Q93v
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Is there a reason cc-option and friends use -S instead of -c?
 
-	-hpa
+Feedback for the patch "kbuild: Add new Kbuild variable EXTRA_SYMBOLS", requested the variable to be renamed from EXTRA_SYMBOLS to KBUILD_EXTRA_SYMBOLS. 
+The patch was resubmitted and committed but not all the variables were renamed. This patch fixes that and applies to 2.6.27-rc5-git10 
+
+original patch that conatined the bug can be found at:
+http://git.kernel.org/?p=linux/kernel/git/torvalds/linux-2.6.git;a=commit;h=0d96fb20b7ed757fc936bb35e26c22251a75b734
+
+Please Apply.
+
+Signed-off-by: Jonathan Lynch <jonathan.lynch@gmail.com>
+
+---
+
+--Dxnq1zWXvFF0Q93v
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: attachment; filename=kbuild_patch
+
+--- linux-2.6.27-rc5/scripts/Makefile.modpost.orig	2008-09-09 14:59:20.000000000 +0100
++++ linux-2.6.27-rc5/scripts/Makefile.modpost	2008-09-09 15:00:31.000000000 +0100
+@@ -82,7 +82,7 @@ modpost = scripts/mod/modpost           
+  $(if $(CONFIG_MODULE_SRCVERSION_ALL),-a,)       \
+  $(if $(KBUILD_EXTMOD),-i,-o) $(kernelsymfile)   \
+  $(if $(KBUILD_EXTMOD),-I $(modulesymfile))      \
+- $(if $(KBUILD_EXTRA_SYMBOLS), $(patsubst %, -e %,$(EXTRA_SYMBOLS))) \
++ $(if $(KBUILD_EXTRA_SYMBOLS), $(patsubst %, -e %,$(KBUILD_EXTRA_SYMBOLS))) \
+  $(if $(KBUILD_EXTMOD),-o $(modulesymfile))      \
+  $(if $(CONFIG_DEBUG_SECTION_MISMATCH),,-S)      \
+  $(if $(CONFIG_MARKERS),-K $(kernelmarkersfile)) \
+
+--Dxnq1zWXvFF0Q93v--
