@@ -1,53 +1,49 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.nuigalway.ie ([140.203.201.100]:59312 "EHLO
-	mx1.nuigalway.ie" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750871AbYIIO6d (ORCPT
+Received: from az33egw02.freescale.net ([192.88.158.103]:37223 "EHLO
+	az33egw02.freescale.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751636AbYIKAfs (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 9 Sep 2008 10:58:33 -0400
-Date: Tue, 9 Sep 2008 15:46:18 +0100
-From: Jonathan Lynch <jonathan.lynch@gmail.com>
-Subject: [PATCH] kbuild: Bugfix for variable KBUILD_EXTRA_SYMBOLS 
-Message-ID: <20080909144618.GA20020@riviera.nuigalway.ie>
-MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="Dxnq1zWXvFF0Q93v"
-Content-Disposition: inline
+	Wed, 10 Sep 2008 20:35:48 -0400
+From: Trent Piepho <tpiepho@freescale.com>
+Subject: [PATCH] kbuild: tag with git revision when git describe is missing
+Date: Wed, 10 Sep 2008 17:34:41 -0700
+Message-Id: <1221093281-10929-1-git-send-email-tpiepho@freescale.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: sam@ravnborg.org
-Cc: linux-kbuild@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
+Cc: Trent Piepho <tpiepho@freescale.com>, Jan Engelhardt <jengelh@medozas.de>, Sam Ravnborg <sam@ravnborg.org>
 
+setlocalversion used to use an abbreviated git commit sha1 to generate the
+tag.  This was changed in commit d882421f4e08ddf0a94245cdbe516db260aa6f41
+"kbuild: change CONFIG_LOCALVERSION_AUTO to use a git-describe-ish format"
+to use git describe to come up with a tag.  Which is nice, but git describe
+sometimes can't describe the revision.  Commit
+56b2f0706d82535fd8d85503f2dcc0be40c8e55d addressed this, but there is still
+no tag generated.
 
---Dxnq1zWXvFF0Q93v
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+So, generate a plain abbreviated sha1 tag like setlocalversion used to when
+git describe comes up short.
 
-
-Feedback for the patch "kbuild: Add new Kbuild variable EXTRA_SYMBOLS", requested the variable to be renamed from EXTRA_SYMBOLS to KBUILD_EXTRA_SYMBOLS. 
-The patch was resubmitted and committed but not all the variables were renamed. This patch fixes that and applies to 2.6.27-rc5-git10 
-
-original patch that conatined the bug can be found at:
-http://git.kernel.org/?p=linux/kernel/git/torvalds/linux-2.6.git;a=commit;h=0d96fb20b7ed757fc936bb35e26c22251a75b734
-
-Please Apply.
-
-Signed-off-by: Jonathan Lynch <jonathan.lynch@gmail.com>
-
+Signed-off-by: Trent Piepho <tpiepho@freescale.com>
+CC: Jan Engelhardt <jengelh@medozas.de>
+CC: Sam Ravnborg <sam@ravnborg.org>
 ---
+ scripts/setlocalversion |    2 ++
+ 1 files changed, 2 insertions(+), 0 deletions(-)
 
---Dxnq1zWXvFF0Q93v
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: attachment; filename=kbuild_patch
+diff --git a/scripts/setlocalversion b/scripts/setlocalversion
+index 83b7512..05a572f 100755
+--- a/scripts/setlocalversion
++++ b/scripts/setlocalversion
+@@ -14,6 +14,8 @@ if head=`git rev-parse --verify HEAD 2>/dev/null`; then
+ 	if git name-rev --tags HEAD | grep -E '^HEAD[[:space:]]+(.*~[0-9]*|undefined)$' > /dev/null; then
+ 		if tag=`git describe 2>/dev/null`; then
+ 			echo $tag | awk -F- '{printf("-%05d-%s", $(NF-1),$(NF))}'
++		else
++			printf '%s%s' -g `echo "$head" | cut -c1-7`
+ 		fi
+ 	fi
+ 
+-- 
+1.5.4.1
 
---- linux-2.6.27-rc5/scripts/Makefile.modpost.orig	2008-09-09 14:59:20.000000000 +0100
-+++ linux-2.6.27-rc5/scripts/Makefile.modpost	2008-09-09 15:00:31.000000000 +0100
-@@ -82,7 +82,7 @@ modpost = scripts/mod/modpost           
-  $(if $(CONFIG_MODULE_SRCVERSION_ALL),-a,)       \
-  $(if $(KBUILD_EXTMOD),-i,-o) $(kernelsymfile)   \
-  $(if $(KBUILD_EXTMOD),-I $(modulesymfile))      \
-- $(if $(KBUILD_EXTRA_SYMBOLS), $(patsubst %, -e %,$(EXTRA_SYMBOLS))) \
-+ $(if $(KBUILD_EXTRA_SYMBOLS), $(patsubst %, -e %,$(KBUILD_EXTRA_SYMBOLS))) \
-  $(if $(KBUILD_EXTMOD),-o $(modulesymfile))      \
-  $(if $(CONFIG_DEBUG_SECTION_MISMATCH),,-S)      \
-  $(if $(CONFIG_MARKERS),-K $(kernelmarkersfile)) \
-
---Dxnq1zWXvFF0Q93v--
