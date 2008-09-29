@@ -1,68 +1,55 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.queued.net ([207.210.101.209]:3102 "EHLO mail.queued.net"
+Received: from fallback.mail.ru ([194.67.57.14]:2820 "EHLO mx4.mail.ru"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750912AbYIZVlu (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 26 Sep 2008 17:41:50 -0400
-Date: Fri, 26 Sep 2008 17:31:33 -0400
-From: Andres Salomon <dilinger@queued.net>
-Subject: Re: [PATCH] deb-pkg: Fix Provides field
-Message-ID: <20080926173133.13f75910@ephemeral>
-In-Reply-To: <1221682195-26809-2-git-send-email-max@stro.at>
-References: <1221682195-26809-1-git-send-email-max@stro.at>
-	<1221682195-26809-2-git-send-email-max@stro.at>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+	id S1752131AbYI2J2c (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 29 Sep 2008 05:28:32 -0400
+Received: from mx71.mail.ru (mx71.mail.ru [194.67.23.4])
+	by mx4.mail.ru (mPOP.Fallback_MX) with ESMTP id 3E791540C09
+	for <linux-kbuild@vger.kernel.org>; Mon, 29 Sep 2008 09:50:13 +0400 (MSD)
+From: Andrey Borzenkov <arvidjaar@mail.ru>
+Subject: Building two (external) modules from the same sources
+Date: Mon, 29 Sep 2008 09:49:34 +0400
+MIME-Version: 1.0
+Content-Type: multipart/signed;
+  boundary="nextPart2083589.Lk0uras9UW";
+  protocol="application/pgp-signature";
+  micalg=pgp-sha1
 Content-Transfer-Encoding: 7bit
+Message-Id: <200809290949.35749.arvidjaar@mail.ru>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: maximilian attems <max@stro.at>
-Cc: sam@ravnborg.org, linux-kbuild@vger.kernel.org
+To: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org
 
-On Wed, 17 Sep 2008 22:09:50 +0200
-maximilian attems <max@stro.at> wrote:
+--nextPart2083589.Lk0uras9UW
+Content-Type: text/plain;
+  charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-> kernel-image naming has been dropped for the Lenny release
-> and was only transitional for Etch.
-> 
-> as it builds modules it provides linux-modules-$version
-> 
-> Cc: Andres Salomon <dilinger@debian.org>
-> Signed-off-by: maximilian attems <max@stro.at>
-> ---
->  scripts/package/builddeb |    4 ++--
->  1 files changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-> index 9889a73..8c69b9e 100644
-> --- a/scripts/package/builddeb
-> +++ b/scripts/package/builddeb
-> @@ -99,7 +99,7 @@ Maintainer: $maintainer
->  Standards-Version: 3.6.1
->  
->  Package: $packagename
-> -Provides: kernel-image-$version, linux-image-$version
-> +Provides: linux-image, linux-image-2.6, linux-modules-$version
+I have here driver that can be built for two different types of
+hardware from basically the same sources (this is port of old Agere
+drivers for Hermes-I/Hermes-II chipsets). Build differs only in one
+define -DHERMES2 and single file with different firmware. Unfortunately
+"if HII" are spread over sources which makes splitting of sources rather
+questionable.
 
-Hm, I'd recommend making the linux-modules* stuff configurable.  Ubuntu's
-kernel provides look like the following:
+What is the best way (from kbuild POV) to build two modules - for H-I
+and H-II - from the same set of source files?
 
-Provides: fuse-module, ivtv-modules, kvm-api-4, linux-image, linux-image-2.6, redhat-cluster-modules
+TIA
 
+-andrey
 
+--nextPart2083589.Lk0uras9UW
+Content-Type: application/pgp-signature; name=signature.asc 
+Content-Description: This is a digitally signed message part.
 
->  Architecture: any
->  Description: User Mode Linux kernel, version $version
->   User-mode Linux is a port of the Linux kernel to its own system call
-> @@ -121,7 +121,7 @@ Maintainer: $maintainer
->  Standards-Version: 3.6.1
->  
->  Package: $packagename
-> -Provides: kernel-image-$version, linux-image-$version
-> +Provides: linux-image, linux-image-2.6, linux-modules-$version
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (GNU/Linux)
 
-Ditto.
+iEYEABECAAYFAkjgbG8ACgkQR6LMutpd94x9WQCZAQkQUQGFw+NqS4XTReiw57b6
+pUsAn23EvcFOUIF9Y38hQzBDipClhYgy
+=71CF
+-----END PGP SIGNATURE-----
 
->  Architecture: any
->  Description: Linux kernel, version $version
->   This package contains the Linux kernel, modules and corresponding
-> other
+--nextPart2083589.Lk0uras9UW--
