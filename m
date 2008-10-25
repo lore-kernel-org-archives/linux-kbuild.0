@@ -1,97 +1,36 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pqueuea.post.tele.dk ([193.162.153.9]:48251 "EHLO
-	pqueuea.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752526AbYJYVoG (ORCPT
+Received: from pfepa.post.tele.dk ([195.41.46.235]:44085 "EHLO
+	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754299AbYJYV7y (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 25 Oct 2008 17:44:06 -0400
-Received: from pfepa.post.tele.dk (pfepa.post.tele.dk [195.41.46.235])
-	by pqueuea.post.tele.dk (Postfix) with ESMTP id BBE6CDBCDC
-	for <linux-kbuild@vger.kernel.org>; Sat, 25 Oct 2008 23:14:22 +0200 (CEST)
-Date: Sat, 25 Oct 2008 23:11:07 +0200
+	Sat, 25 Oct 2008 17:59:54 -0400
+Date: Sat, 25 Oct 2008 23:59:59 +0200
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: [PULL] kbuild fixes for -rc1
-Message-ID: <20081025211107.GA20417@uranus.ravnborg.org>
+Subject: kbuild maintainer news [Was: kbuild fixes for -rc1]
+Message-ID: <20081025215959.GA27617@uranus.ravnborg.org>
+References: <20081025211107.GA20417@uranus.ravnborg.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <20081025211107.GA20417@uranus.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>, Andrew Morton <akpm@linux-foundation.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
-Cc: Evgeniy Manachkin <sfstudio@mail.ru>, Alan Cox <alan@redhat.com>, Stable <stable@kernel.org>
+To: LKML <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-Hi Linus.
+In case anyone was wondering...
+I have been busy moving to a new house the last couple of months.
 
-Please pull the following two fixes for kbuild.
-One fix for make rpm (which is also stable material)
-And one fix so we are more robust for wrong asm symlinks
+As we are now well installed (as in the important stuff is finished)
+I can now spend some time as kbuild maintainer again.
 
-None of these has been in -next but they are trivial and
-I would like to see them applied soon.
+But in order not to be buried alive in email I deleted
+all mails I received in my absense period.
 
-Thanks,
+So if you have any pending kbuild patches around please
+resend them to me with a cc: to at least linux-kbuild.
+
+But please do not expect promt replies there is still
+a shitload of things to do.
 
 	Sam
-
-The following changes since commit e013e13bf605b9e6b702adffbe2853cfc60e7806:
-  Jens Axboe (1):
-        libata: fix bug with non-ncq devices
-
-are available in the git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/sam/kbuild-fixes.git master
-
-Evgeniy Manachkin (1):
-      kbuild: mkspec - fix build rpm
-
-Sam Ravnborg (1):
-      kbuild: improve check-symlink
-
- Makefile               |    5 +++++
- scripts/package/mkspec |    3 +++
- 2 files changed, 8 insertions(+), 0 deletions(-)
-
-diff --git a/Makefile b/Makefile
-index 8e54051..cacb624 100644
---- a/Makefile
-+++ b/Makefile
-@@ -961,6 +961,7 @@ export CPPFLAGS_vmlinux.lds += -P -C -U$(ARCH)
  
- # The asm symlink changes when $(ARCH) changes.
- # Detect this and ask user to run make mrproper
-+# If asm is a stale symlink (point to dir that does not exist) remove it
- define check-symlink
- 	set -e;                                                            \
- 	if [ -L include/asm ]; then                                        \
-@@ -970,6 +971,10 @@ define check-symlink
- 			echo "       set ARCH or save .config and run 'make mrproper' to fix it";             \
- 			exit 1;                                            \
- 		fi;                                                        \
-+		test -e $$asmlink || rm include/asm;                       \
-+	elif [ -d include/asm ]; then                                      \
-+		echo "ERROR: $@ is a directory but a symlink was expected";\
-+		exit 1;                                                    \
- 	fi
- endef
- 
-diff --git a/scripts/package/mkspec b/scripts/package/mkspec
-index ffd61fe..113d373 100755
---- a/scripts/package/mkspec
-+++ b/scripts/package/mkspec
-@@ -64,8 +64,10 @@ fi
- echo "%install"
- echo "%ifarch ia64"
- echo 'mkdir -p $RPM_BUILD_ROOT/boot/efi $RPM_BUILD_ROOT/lib/modules'
-+echo 'mkdir -p $RPM_BUILD_ROOT/boot/efi $RPM_BUILD_ROOT/lib/firmware'
- echo "%else"
- echo 'mkdir -p $RPM_BUILD_ROOT/boot $RPM_BUILD_ROOT/lib/modules'
-+echo 'mkdir -p $RPM_BUILD_ROOT/boot $RPM_BUILD_ROOT/lib/firmware'
- echo "%endif"
- 
- echo 'INSTALL_MOD_PATH=$RPM_BUILD_ROOT make %{_smp_mflags} modules_install'
-@@ -92,5 +94,6 @@ echo "%files"
- echo '%defattr (-, root, root)'
- echo "%dir /lib/modules"
- echo "/lib/modules/$KERNELRELEASE"
-+echo "/lib/firmware"
- echo "/boot/*"
- echo ""
