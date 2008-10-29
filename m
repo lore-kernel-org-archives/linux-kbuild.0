@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp1.linux-foundation.org ([140.211.169.13]:43407 "EHLO
+Received: from smtp1.linux-foundation.org ([140.211.169.13]:37358 "EHLO
 	smtp1.linux-foundation.org" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1754144AbYJ2VUd (ORCPT
+	by vger.kernel.org with ESMTP id S1754155AbYJ2VUe (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 29 Oct 2008 17:20:33 -0400
-Message-Id: <200810292120.m9TLK8DV019358@imap1.linux-foundation.org>
-Subject: [patch 04/13] scripts/package: don't break if %{_smp_mflags} isn't set
+	Wed, 29 Oct 2008 17:20:34 -0400
+Message-Id: <200810292120.m9TLK9kn019361@imap1.linux-foundation.org>
+Subject: [patch 05/13] scripts/package: allow custom options to rpm
 From: akpm@linux-foundation.org
-Date: Wed, 29 Oct 2008 14:20:08 -0700
+Date: Wed, 29 Oct 2008 14:20:09 -0700
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: sam@ravnborg.org
@@ -15,40 +15,39 @@ Cc: linux-kbuild@vger.kernel.org, akpm@linux-foundation.org, jk@ozlabs.org
 
 From: Jeremy Kerr <jk@ozlabs.org>
 
-Currently, if we do a 'make rpm-pkg' without the _smp_mflags rpm macro
-defined, the build fails with:
+Add a RPMOPTS make variable to allow arbitrary options to be passed
+to rpm during 'make rpm-pkg'. For example:
 
-  [snip]
-  Executing(%build): /bin/bash -e /var/tmp/rpm-tmp.67959
-  + umask 022
-  + cd /home/jk/devel/kernel-snapshot/rpm/BUILD
-  + cd kernel-2.6.26
-  + make clean
-  + make '%{_smp_mflags}'
-  make[3]: *** No rule to make target `%{_smp_mflags}'.  Stop.
-  error: Bad exit status from /var/tmp/rpm-tmp.67959 (%build)
-
-This change uses the 'null if not set' reference to the _smp_mflags
-macro instead.
+ make RPMOPTS="--define '_topdir /home/jk/rpm'" rpm-pkg
 
 Signed-off-by: Jeremy Kerr <jk@ozlabs.org>
 Cc: Sam Ravnborg <sam@ravnborg.org>
 Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
 ---
 
- scripts/package/mkspec |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ scripts/package/Makefile |    5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff -puN scripts/package/mkspec~scripts-package-dont-break-if-%_smp_mflags-isnt-set scripts/package/mkspec
---- a/scripts/package/mkspec~scripts-package-dont-break-if-%_smp_mflags-isnt-set
-+++ a/scripts/package/mkspec
-@@ -57,7 +57,7 @@ fi
- echo "%build"
+diff -puN scripts/package/Makefile~scripts-package-allow-custom-options-to-rpm scripts/package/Makefile
+--- a/scripts/package/Makefile~scripts-package-allow-custom-options-to-rpm
++++ a/scripts/package/Makefile
+@@ -47,7 +47,7 @@ rpm-pkg rpm: $(objtree)/kernel.spec FORC
+ 	set -e; \
+ 	mv -f $(objtree)/.tmp_version $(objtree)/.version
  
- if ! $PREBUILT; then
--echo "make clean && make %{_smp_mflags}"
-+echo "make clean && make %{?_smp_mflags}"
- echo ""
- fi
+-	$(RPM) --target $(UTS_MACHINE) -ta ../$(KERNELPATH).tar.gz
++	$(RPM) $(RPMOPTS) --target $(UTS_MACHINE) -ta ../$(KERNELPATH).tar.gz
+ 	rm ../$(KERNELPATH).tar.gz
+ 
+ clean-files := $(objtree)/kernel.spec
+@@ -64,7 +64,8 @@ binrpm-pkg: $(objtree)/binkernel.spec FO
+ 	set -e; \
+ 	mv -f $(objtree)/.tmp_version $(objtree)/.version
+ 
+-	$(RPM) --define "_builddir $(srctree)" --target $(UTS_MACHINE) -bb $<
++	$(RPM) $(RPMOPTS) --define "_builddir $(srctree)" --target \
++		$(UTS_MACHINE) -bb $<
+ 
+ clean-files += $(objtree)/binkernel.spec
  
 _
