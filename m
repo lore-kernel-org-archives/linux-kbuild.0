@@ -1,43 +1,59 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp1.linux-foundation.org ([140.211.169.13]:58733 "EHLO
+Received: from smtp1.linux-foundation.org ([140.211.169.13]:46671 "EHLO
 	smtp1.linux-foundation.org" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1754031AbYJ2VUc (ORCPT
+	by vger.kernel.org with ESMTP id S1754046AbYJ2VUc (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
 	Wed, 29 Oct 2008 17:20:32 -0400
-Message-Id: <200810292120.m9TLK97C019364@imap1.linux-foundation.org>
-Subject: [patch 06/13] scripts/checksyscalls.sh: fix for non-gnu sed
+Message-Id: <200810292120.m9TLKAhZ019367@imap1.linux-foundation.org>
+Subject: [patch 07/13] adjust init section definitions
 From: akpm@linux-foundation.org
-Date: Wed, 29 Oct 2008 14:20:09 -0700
+Date: Wed, 29 Oct 2008 14:20:10 -0700
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: sam@ravnborg.org
-Cc: linux-kbuild@vger.kernel.org, akpm@linux-foundation.org, tvolpini@gmx.net
+Cc: linux-kbuild@vger.kernel.org, akpm@linux-foundation.org, jbeulich@novell.com
 
-From: Thomas Volpini <tvolpini@gmx.net>
+From: "Jan Beulich" <jbeulich@novell.com>
 
-Make the checksyscalls script work even on systems where sed is non-gnu.
+Add rodata equivalents for assembly use, and fix the section attributes
+used by __REFCONST.
 
-Cc: Sam Ravnborg <sam@ravnborg.org>a
+Signed-off-by: Jan Beulich <jbeulich@novell.com>
+Cc: Sam Ravnborg <sam@ravnborg.org>
 Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
 ---
 
- scripts/checksyscalls.sh |    4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ include/linux/init.h |    6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff -puN scripts/checksyscalls.sh~scripts-checksyscallssh-fix-for-non-gnu-sed scripts/checksyscalls.sh
---- a/scripts/checksyscalls.sh~scripts-checksyscallssh-fix-for-non-gnu-sed
-+++ a/scripts/checksyscalls.sh
-@@ -113,10 +113,10 @@ EOF
- }
+diff -puN include/linux/init.h~adjust-init-section-definitions include/linux/init.h
+--- a/include/linux/init.h~adjust-init-section-definitions
++++ a/include/linux/init.h
+@@ -112,21 +112,25 @@
+ #define __FINIT		.previous
  
- syscall_list() {
--sed -n -e '/^\#define/ { s/[^_]*__NR_\([^[:space:]]*\).*/\
-+sed -n -e '/^\#define/ s/[^_]*__NR_\([^[:space:]]*\).*/\
- \#if !defined \(__NR_\1\) \&\& !defined \(__IGNORE_\1\)\
- \#warning syscall \1 not implemented\
--\#endif/p }' $1
-+\#endif/p' $1
- }
+ #define __INITDATA	.section	".init.data","aw"
++#define __INITRODATA	.section	".init.rodata","a"
+ #define __FINITDATA	.previous
  
- (ignore_list && syscall_list ${srctree}/arch/x86/include/asm/unistd_32.h) | \
+ #define __DEVINIT        .section	".devinit.text", "ax"
+ #define __DEVINITDATA    .section	".devinit.data", "aw"
++#define __DEVINITRODATA  .section	".devinit.rodata", "a"
+ 
+ #define __CPUINIT        .section	".cpuinit.text", "ax"
+ #define __CPUINITDATA    .section	".cpuinit.data", "aw"
++#define __CPUINITRODATA  .section	".cpuinit.rodata", "a"
+ 
+ #define __MEMINIT        .section	".meminit.text", "ax"
+ #define __MEMINITDATA    .section	".meminit.data", "aw"
++#define __MEMINITRODATA  .section	".meminit.rodata", "a"
+ 
+ /* silence warnings when references are OK */
+ #define __REF            .section       ".ref.text", "ax"
+ #define __REFDATA        .section       ".ref.data", "aw"
+-#define __REFCONST       .section       ".ref.rodata", "aw"
++#define __REFCONST       .section       ".ref.rodata", "a"
+ 
+ #ifndef __ASSEMBLY__
+ /*
 _
