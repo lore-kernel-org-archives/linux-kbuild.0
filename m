@@ -1,131 +1,70 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp1.linux-foundation.org ([140.211.169.13]:47724 "EHLO
+Received: from smtp1.linux-foundation.org ([140.211.169.13]:50333 "EHLO
 	smtp1.linux-foundation.org" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1754119AbYJ2VUg (ORCPT
+	by vger.kernel.org with ESMTP id S1753733AbYJ2VUg (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
 	Wed, 29 Oct 2008 17:20:36 -0400
-Message-Id: <200810292120.m9TLK66T019326@imap1.linux-foundation.org>
-Subject: [patch 02/13] genksyms: allow to ignore symbol checksum changes
+Message-Id: <200810292120.m9TLK7Jp019355@imap1.linux-foundation.org>
+Subject: [patch 03/13] lkdtm: fix for CONFIG_SCSI=n
 From: akpm@linux-foundation.org
-Date: Wed, 29 Oct 2008 14:20:06 -0700
+Date: Wed, 29 Oct 2008 14:20:07 -0700
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: sam@ravnborg.org
-Cc: linux-kbuild@vger.kernel.org, akpm@linux-foundation.org, agruen@suse.de, randy.dunlap@oracle.com
+Cc: linux-kbuild@vger.kernel.org, akpm@linux-foundation.org, randy.dunlap@oracle.com, ankita@in.ibm.com
 
-From: Andreas Gruenbacher <agruen@suse.de>
+From: Randy Dunlap <randy.dunlap@oracle.com>
 
-This adds an "override" keyword for use in *.symvers / *.symref files. 
-When a symbol is overridden, the symbol's old definition will be used for
-computing checksums instead of the new one, preserving the previous
-checksum.  (Genksyms will still warn about the change.)
+Fix lkdtm test code for case of CONFIG_SCSI=n, to avoid build errors:
 
-This is meant to allow distributions to hide minor actual as well as fake
-ABI changes.  (For example, when extra type information becomes available
-because additional headers are included, this may change checksums even
-though none of the types used have actully changed.)
+In file included from linux-next-20080618/tests/lkdtm.c:55:
+linux-next-20080618/include/scsi/scsi_cmnd.h:28:25: warning: "BLK_MAX_CDB" is not defined
+linux-next-20080618/include/scsi/scsi_cmnd.h:29:3: error: #error MAX_COMMAND_SIZE can not be bigger than BLK_MAX_CDB
+In file included from linux-next-20080618/tests/lkdtm.c:55:
+linux-next-20080618/include/scsi/scsi_cmnd.h: In function 'scsi_bidi_cmnd':
+linux-next-20080618/include/scsi/scsi_cmnd.h:183: error: implicit declaration of function 'blk_bidi_rq'
+linux-next-20080618/include/scsi/scsi_cmnd.h:184: error: dereferencing pointer to incomplete type
+linux-next-20080618/include/scsi/scsi_cmnd.h: In function 'scsi_in':
+linux-next-20080618/include/scsi/scsi_cmnd.h:190: error: dereferencing pointer to incomplete type
+make[2]: *** [tests/lkdtm.o] Error 1
 
-This approach also allows to get rid of "#ifdef __GENKSYMS__" hacks in the
-code, which are currently used in some vendor kernels to work around
-checksum changes.
-
-Signed-off-by: Andreas Gruenbacher <agruen@suse.de>
-Cc: Sam Ravnborg <sam@ravnborg.org>
-Cc: Randy Dunlap <randy.dunlap@oracle.com>
+Signed-off-by: Randy Dunlap <randy.dunlap@oracle.com>
+Acked-by: Ankita Garg <ankita@in.ibm.com> 
 Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
 ---
 
- scripts/genksyms/genksyms.c |   34 ++++++++++++++++++++++++++++++----
- scripts/genksyms/genksyms.h |    1 +
- 2 files changed, 31 insertions(+), 4 deletions(-)
+ tests/lkdtm.c |    6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff -puN scripts/genksyms/genksyms.c~genksyms-allow-to-ignore-symbol-checksum-changes scripts/genksyms/genksyms.c
---- a/scripts/genksyms/genksyms.c~genksyms-allow-to-ignore-symbol-checksum-changes
-+++ a/scripts/genksyms/genksyms.c
-@@ -191,11 +191,26 @@ struct symbol *__add_symbol(const char *
- 				/* fall through */ ;
- 			else if (sym->type == type &&
- 				 equal_list(sym->defn, defn)) {
-+				if (!sym->is_declared && sym->is_override) {
-+					print_location();
-+					print_type_name(type, name);
-+					fprintf(stderr, " modversion is "
-+						"unchanged\n");
-+				}
- 				sym->is_declared = 1;
- 				return sym;
- 			} else if (!sym->is_declared) {
--				status = is_unknown_symbol(sym) ?
--					STATUS_DEFINED : STATUS_MODIFIED;
-+				if (sym->is_override && flag_preserve) {
-+					print_location();
-+					fprintf(stderr, "ignoring ");
-+					print_type_name(type, name);
-+					fprintf(stderr, " modversion change\n");
-+					sym->is_declared = 1;
-+					return sym;
-+				} else {
-+					status = is_unknown_symbol(sym) ?
-+						STATUS_DEFINED : STATUS_MODIFIED;
-+				}
- 			} else {
- 				error_with_pos("redefinition of %s", name);
- 				return sym;
-@@ -229,6 +244,7 @@ struct symbol *__add_symbol(const char *
- 
- 	sym->is_declared = !is_reference;
- 	sym->status = status;
-+	sym->is_override = 0;
- 
- 	if (flag_debug) {
- 		fprintf(debugfile, "Defn for %s %s == <",
-@@ -348,9 +364,16 @@ static void read_reference(FILE *f)
- 	while (!feof(f)) {
- 		struct string_list *defn = NULL;
- 		struct string_list *sym, *def;
--		int is_extern = 0;
-+		int is_extern = 0, is_override = 0;
-+		struct symbol *subsym;
- 
- 		sym = read_node(f);
-+		if (sym && sym->tag == SYM_NORMAL &&
-+		    !strcmp(sym->string, "override")) {
-+			is_override = 1;
-+			free_node(sym);
-+			sym = read_node(f);
-+		}
- 		if (!sym)
- 			continue;
- 		def = read_node(f);
-@@ -365,8 +388,9 @@ static void read_reference(FILE *f)
- 			defn = def;
- 			def = read_node(f);
- 		}
--		add_reference_symbol(xstrdup(sym->string), sym->tag,
-+		subsym = add_reference_symbol(xstrdup(sym->string), sym->tag,
- 					      defn, is_extern);
-+		subsym->is_override = is_override;
- 		free_node(sym);
- 	}
+diff -puN tests/lkdtm.c~lkdtm-fix-for-config_scsi=n tests/lkdtm.c
+--- a/tests/lkdtm.c~lkdtm-fix-for-config_scsi=n
++++ a/tests/lkdtm.c
+@@ -175,12 +175,14 @@ static int jp_hrtimer_start(struct hrtim
+ 	return 0;
  }
-@@ -743,6 +767,8 @@ int main(int argc, char **argv)
- 		while (visited_symbols != (struct symbol *)-1L) {
- 			struct symbol *sym = visited_symbols;
  
-+			if (sym->is_override)
-+				fputs("override ", dumpfile);
- 			if (sym->type != SYM_NORMAL) {
- 				putc(symbol_type_name[sym->type][0], dumpfile);
- 				putc('#', dumpfile);
-diff -puN scripts/genksyms/genksyms.h~genksyms-allow-to-ignore-symbol-checksum-changes scripts/genksyms/genksyms.h
---- a/scripts/genksyms/genksyms.h~genksyms-allow-to-ignore-symbol-checksum-changes
-+++ a/scripts/genksyms/genksyms.h
-@@ -49,6 +49,7 @@ struct symbol {
- 	int is_extern;
- 	int is_declared;
- 	enum symbol_status status;
-+	int is_override;
- };
++#ifdef CONFIG_SCSI
+ static int jp_scsi_dispatch_cmd(struct scsi_cmnd *cmd)
+ {
+ 	lkdtm_handler();
+ 	jprobe_return();
+ 	return 0;
+ }
++#endif
  
- typedef struct string_list **yystype;
+ #ifdef CONFIG_IDE
+ int jp_generic_ide_ioctl(ide_drive_t *drive, struct file *file,
+@@ -307,8 +309,12 @@ static int __init lkdtm_module_init(void
+ 		lkdtm.entry = (kprobe_opcode_t*) jp_hrtimer_start;
+ 		break;
+ 	case SCSI_DISPATCH_CMD:
++#ifdef CONFIG_SCSI
+ 		lkdtm.kp.symbol_name = "scsi_dispatch_cmd";
+ 		lkdtm.entry = (kprobe_opcode_t*) jp_scsi_dispatch_cmd;
++#else
++		printk(KERN_INFO "lkdtm : Crash point not available\n");
++#endif
+ 		break;
+ 	case IDE_CORE_CP:
+ #ifdef CONFIG_IDE
 _
