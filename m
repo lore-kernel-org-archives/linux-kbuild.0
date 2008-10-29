@@ -1,65 +1,70 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp1.linux-foundation.org ([140.211.169.13]:57409 "EHLO
-	smtp1.linux-foundation.org" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1754158AbYJ2VUo (ORCPT
+Received: from pfepa.post.tele.dk ([195.41.46.235]:51689 "EHLO
+	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753847AbYJ2V3e (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 29 Oct 2008 17:20:44 -0400
-Message-Id: <200810292120.m9TLKCJP019376@imap1.linux-foundation.org>
-Subject: [patch 10/13] kbuild: prevent modpost from looking for a .cmd file for a static library linked into a module
-From: akpm@linux-foundation.org
-Date: Wed, 29 Oct 2008 14:20:12 -0700
+	Wed, 29 Oct 2008 17:29:34 -0400
+Date: Wed, 29 Oct 2008 22:29:28 +0100
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: KBUILD: do not include arch/<ARCH>/include/asm in find-sources twice.
+Message-ID: <20081029212928.GA24474@uranus.ravnborg.org>
+References: <1225200985.12607.186.camel@zakaz.uk.xensource.com> <20081029190707.GD22105@uranus.ravnborg.org> <1225309873.5267.10.camel@localhost.localdomain>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1225309873.5267.10.camel@localhost.localdomain>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: sam@ravnborg.org
-Cc: linux-kbuild@vger.kernel.org, akpm@linux-foundation.org, ashutosh@chelsio.com, ashutosh.naik@gmail.com, rusty@rustcorp.com.au
+To: Ian Campbell <ijc@hellion.org.uk>
+Cc: linux-kbuild@vger.kernel.org
 
-From: "Ashutosh Naik" <ashutosh@chelsio.com>
+On Wed, Oct 29, 2008 at 07:51:13PM +0000, Ian Campbell wrote:
+> On Wed, 2008-10-29 at 20:07 +0100, Sam Ravnborg wrote:
+> > On Tue, Oct 28, 2008 at 01:36:25PM +0000, Ian Campbell wrote:
+> > > Architectures which have moved their includes to arch/<ARCH>/include
+> > > now list the headers twice in the source listing used by "make
+> > > cscope" and friends, causing those tools to list symbols twice.
+> > > 
+> > > Skipping these files in the ALLSOURCE_ARCHS pass rather than removing
+> > > the ALLINCLUDE_ARCHS pass preserves the semantics of the later.
+> > > 
+> > > Signed-off-by: Ian Campbell <ijc@hellion.org.uk>
+> > > Cc: Sam Ravnborg <sam@ravnborg.org>
+> > > Cc: linux-kbuild@vger.kernel.org
+> > > 
+> > > diff -r a613b893f5b5 Makefile
+> > > --- a/Makefile	Mon Oct 27 10:29:49 2008 +0000
+> > > +++ b/Makefile	Tue Oct 28 13:33:04 2008 +0000
+> > > @@ -1435,7 +1435,8 @@
+> > >  define find-sources
+> > >          ( for arch in $(ALLSOURCE_ARCHS) ; do \
+> > >  	       find $(__srctree)arch/$${arch} $(RCS_FIND_IGNORE) \
+> > > -	            -name $1 -print; \
+> > > +		    -wholename $(__srctree)arch/$${arch}/include/asm -type d -prune \
+> > > +	            -o -name $1 -print; \
+> > >  	  done ; \
+> > >  	  find $(__srctree)security/selinux/include $(RCS_FIND_IGNORE) \
+> > >  	       -name $1 -print; \
+> > > 
+> > 
+> > Hi Ian.
+> > 
+> > I would much rather prefer to see a patch that
+> > - support the platforms of arm and others
+> 
+> How do you mean?
+> 
+>         $ ls arch/arm/include/
+>         asm/
+> 
+> so it'll work as well for arm as it does for any other architecture.
 
-This fixes a compile time warning which occurs whenever a static library
-is linked into a kernel module.  MODPOST tries to look for a
-".<modulename>.cmd" file to look for its dependencies, but that file
-doesn't exist or get generated for static libraries.
+fyi - I have applied your patch to kbuild-fixes.
 
-This patch prevents modpost from looking for a .cmd file when a module is
-linked with a static library
+I hope this stuff can be simplified one day.
+I continue to see a steady stream of patches dealing with tags and cscope.
 
-[akpm@linux-foundation.org: coding-style fixes]
-Signed-off-by: Ashutosh Naik <ashutosh.naik@gmail.com>
-Cc: Sam Ravnborg <sam@ravnborg.org>
-Cc: Rusty Russell <rusty@rustcorp.com.au>
-Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
----
+Maybe the right thing to do is to just move it all out in a shell
+script so we do not clutter the makefile with all this.
 
- scripts/mod/sumversion.c |   12 +++++++++++-
- 1 file changed, 11 insertions(+), 1 deletion(-)
-
-diff -puN scripts/mod/sumversion.c~kbuild-prevent-modpost-from-looking-for-a-cmd-file-for-a-static-library-linked-into-a-module scripts/mod/sumversion.c
---- a/scripts/mod/sumversion.c~kbuild-prevent-modpost-from-looking-for-a-cmd-file-for-a-static-library-linked-into-a-module
-+++ a/scripts/mod/sumversion.c
-@@ -290,6 +290,15 @@ static int parse_file(const char *fname,
- 	release_file(file, len);
- 	return 1;
- }
-+/* Check whether the file is a static library or not */
-+static int is_static_library(const char *objfile)
-+{
-+	int len = strlen(objfile);
-+	if (objfile[len - 2] == '.' && objfile[len - 1] == 'a')
-+		return 1;
-+	else
-+		return 0;
-+}
- 
- /* We have dir/file.o.  Open dir/.file.o.cmd, look for deps_ line to
-  * figure out source file. */
-@@ -420,7 +429,8 @@ void get_src_version(const char *modname
- 	while ((fname = strsep(&sources, " ")) != NULL) {
- 		if (!*fname)
- 			continue;
--		if (!parse_source_files(fname, &md))
-+		if (!(is_static_library(fname)) &&
-+				!parse_source_files(fname, &md))
- 			goto release;
- 	}
- 
-_
+	Sam
