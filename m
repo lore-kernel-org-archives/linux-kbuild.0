@@ -1,78 +1,83 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mtaout02-winn.ispmail.ntl.com ([81.103.221.48]:49882 "EHLO
-	mtaout02-winn.ispmail.ntl.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1753621AbYJ3LJo (ORCPT
+Received: from orion2.pixelized.ch ([195.190.190.13]:60921 "EHLO
+	orion.pixelized.ch" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752460AbYJ3LW2 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 30 Oct 2008 07:09:44 -0400
-From: Ian Campbell <ijc@hellion.org.uk>
-In-Reply-To: <1225364543.12607.461.camel@zakaz.uk.xensource.com>
-References: <1225200985.12607.186.camel@zakaz.uk.xensource.com>
-	 <20081029190707.GD22105@uranus.ravnborg.org>
-	 <1225364543.12607.461.camel@zakaz.uk.xensource.com>
-Content-Type: text/plain
-Date: Thu, 30 Oct 2008 11:09:19 +0000
-Message-Id: <1225364959.12607.465.camel@zakaz.uk.xensource.com>
-Mime-Version: 1.0
+	Thu, 30 Oct 2008 07:22:28 -0400
+Message-ID: <49099771.8000302@cateee.net>
+Date: Thu, 30 Oct 2008 12:16:01 +0100
+From: "Giacomo A. Catenazzi" <cate@cateee.net>
+MIME-Version: 1.0
+Subject: Re: [patch 12/13] kconfig: add module_name shortcut
+References: <200810292120.m9TLKFgx019406@imap1.linux-foundation.org> <20081030110211.GA25873@cs181140183.pp.htv.fi>
+In-Reply-To: <20081030110211.GA25873@cs181140183.pp.htv.fi>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Subject: Re: KBUILD: do not include arch/<ARCH>/include/asm in find-sources
-	twice.
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: linux-kbuild@vger.kernel.org
+To: Adrian Bunk <bunk@kernel.org>
+Cc: akpm@linux-foundation.org, sam@ravnborg.org, linux-kbuild@vger.kernel.org, adobriyan@gmail.com, zippel@linux-m68k.org
 
-On Thu, 2008-10-30 at 11:02 +0000, Ian Campbell wrote:
+Adrian Bunk wrote:
+> On Wed, Oct 29, 2008 at 02:20:14PM -0700, akpm@linux-foundation.org wrote:
+>> From: Alexey Dobriyan <adobriyan@gmail.com>
+>>
+>> Add Kconfig token "module_name" to supply module's name. Example:
+>>
+>> 	config FOO
+>> 		tristate "foo"
+>> 		module_name foo
+>> 		---help---
+>> 		  foo
+>>
+>> Print module's name as following on menuconfigs help screen (press 'h'):
+>>
+>> 	Module name: foo
+>>
+>> 8139too driver converted to show real-life example.
+>>
+>> P.S.: menuconfig only, no checking wrt modular/standalone code et al.
+>> ...
 > 
-> I can see one further simplifications which is to make the final
->         find $(__srctree) $(RCS_FIND_IGNORE) \
->                        \( -name include
-> into
->         find $(__srctree) $(RCS_FIND_IGNORE) \
->                        \( -wholename $(__srctree)/include/config
-> which then allows 
->           find $(__srctree)security/selinux/include $(RCS_FIND_IGNORE)
-> \
->                -name $1 -print; \
->           find $(__srctree)include $(RCS_FIND_IGNORE) \
->                -name config -prune -o -name $1 -print; \
-> to be removed. However it also adds a bunch of new files such as
-> include/acpi include/scsi etc. Arguably they should be included
-> anyway.
-
-In patch form that looks like (on top of the patch just now). And
-include/scsi aren't new, they were included by the find
-$(__srctree)/include previously.
-
-diff -r f113cec1a44e Makefile
---- a/Makefile	Thu Oct 30 11:06:22 2008 +0000
-+++ b/Makefile	Thu Oct 30 11:07:37 2008 +0000
-@@ -1439,17 +1439,13 @@
- 	       find $(__srctree)arch/$${arch} $(RCS_FIND_IGNORE) \
- 	            -name $1 -print; \
- 	  done ; \
--	  find $(__srctree)security/selinux/include $(RCS_FIND_IGNORE) \
--	       -name $1 -print; \
--	  find $(__srctree)include $(RCS_FIND_IGNORE) \
--	       -name config -prune -o -name $1 -print; \
- 	  for arch in $(EXTRAINCLUDE_ARCHS) ; do \
- 	       test -e $(__srctree)arch/$${arch}/include/asm && \
- 	         find $(__srctree)arch/$${arch}/include/asm $(RCS_FIND_IGNORE) \
- 	            -name $1 -print; \
- 	  done ; \
- 	  find $(__srctree) $(RCS_FIND_IGNORE) \
--	       \( -name include -o -name arch -o -name '.tmp_*' \) -prune -o \
-+	       \( -wholename $(__srctree)include/config -o -name arch -o -name '.tmp_*' \) -prune -o \
- 	       -name $1 -print; \
- 	  )
- endef
-
-
+> We have 4 interfaces, and for not losing information all of them have to 
+> support it.
 > 
--- 
-Ian Campbell
-Current Noise: Venom - Witching Hour
+>> --- a/drivers/net/Kconfig~kconfig-add-module_name-shortcut
+>> +++ a/drivers/net/Kconfig
+>> @@ -1549,14 +1549,12 @@ config 8139TOO
+>>  	depends on NET_PCI && PCI
+>>  	select CRC32
+>>  	select MII
+>> +	module_name 8139too
+>>  	---help---
+>>  	  This is a driver for the Fast Ethernet PCI network cards based on
+>>  	  the RTL 8129/8130/8139 chips. If you have one of those, say Y and
+>>  	  read the Ethernet-HOWTO <http://www.tldp.org/docs.html#howto>.
+>>  
+>> -	  To compile this driver as a module, choose M here: the module
+>> -	  will be called 8139too.  This is recommended.
+>> -
+>> ...
+> 
+> Are you planning any further usage of the module_name?
+> 
+> Currently your patch seems to be in menuconfig equivalent to
+> 
+> -       To compile this driver as a module, choose M here: the module
+> -       will be called 8139too.  This is recommended.
+> +	Module name: 8139too
+> 
+> I don't have any strong opinion whether that's better or worse, but if 
+> that's the only change we don't need a new kconfig syntax for it.
 
-Hitchcock's Staple Principle:
-	The stapler runs out of staples only while you are trying to
-	staple something.
+This feature is very useful for auto configuration: from a lsmod you 
+will find easily the relevant configuration.
 
+Actually I'm doing it with some complexer scripts, but some Makefile
+are "creative".
+
+I had some plan to include more building information to Kconfig
+to automatically generating some part of Makefile's.
+
+ciao
+	cate
