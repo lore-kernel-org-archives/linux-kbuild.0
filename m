@@ -1,62 +1,52 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepa.post.tele.dk ([195.41.46.235]:51008 "EHLO
-	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757587AbYJ3VFs (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 30 Oct 2008 17:05:48 -0400
-Date: Thu, 30 Oct 2008 22:04:34 +0100
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH] Add module_name Kconfig shortcut
-Message-ID: <20081030210434.GA1519@uranus.ravnborg.org>
-References: <20081028004604.GA17144@x200.localdomain>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Received: from ex.2n.cz ([213.29.92.11]:53417 "EHLO ex.2n.cz"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750857AbYJaKSc (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 31 Oct 2008 06:18:32 -0400
+Received: from ladis by localhost with local (Exim 3.36 #1 (Debian))	id
+ 1Kvr02-0005Hx-00	for <linux-kbuild@vger.kernel.org>; Fri, 31 Oct 2008
+ 11:13:02 +0100
+Date: Fri, 31 Oct 2008 11:13:02 +0100
+Subject: Menuconfig and !isalpha() characters in comment
+Message-ID: <20081031101302.GA20296@michl.2n.cz>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <20081028004604.GA17144@x200.localdomain>
+From: Ladislav Michl <ladis@linux-mips.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Alexey Dobriyan <adobriyan@gmail.com>
-Cc: linux-kernel@vger.kernel.org, zippel@linux-m68k.org, akpm@osdl.org, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: linux-kbuild@vger.kernel.org
 
-On Tue, Oct 28, 2008 at 03:46:04AM +0300, Alexey Dobriyan wrote:
-> As correctly noticed in bug 11446 (http://bugzilla.kernel.org/show_bug.cgi?id=11446)
-> "To compile this driver as a module, blah-blah" boilerplate is being
-> copy-pasted to death with slight variations.
-> 
-> Add Kconfig token "module_name" to supply module's name. Example:
-> 
-> 	config FOO
-> 		tristate "foo"
-> 		module_name foo
-> 		---help---
-> 		  foo
-> 
-> Print module's name as following on menuconfigs help screen (press 'h'):
-> 
-> 	Module name: foo
-> 
-> 8139too driver converted to show real-life example.
-> 
-> P.S.: menuconfig only, no checking wrt modular/standalone code et al.
+Hi,
 
-Hi Alexey.
+first let me apologize to report bug which does not trigger in kernel
+tree, but I'd rather see it fixed here.
 
-This is a baby step towards moving simple module stuff to Kconfig.
-This is the way we want to go when someone cooks up proper support for that.
+As a testcase apply following patch and run 'make menuconfig ARCH=arm'
+Now pressing <space> key no longer toggles selected menuconfig entry,
+but rather selects first, second and fourth line of added comment.
 
-But we should do it in one go so when someone decide to visit the
-8139too driver then they can do a full conversion to the "keep all
-module definition in Kconfig" in one step.
+How would prefered fix look like? I wouldn't allow comment selection at
+first place, but lets wait to some conclusion with good chance to be
+accepted in mailine.
 
-Please see a few mails from Roman Zippel outlining his ideas.
-I do not recall the details but I do recall that he suggested
-to name the source files in Kconfig.
+diff --git a/arch/arm/Kconfig b/arch/arm/Kconfig
+index 9c0690b..eb89e78 100644
+--- a/arch/arm/Kconfig
++++ b/arch/arm/Kconfig
+@@ -3,6 +3,11 @@
+ # see Documentation/kbuild/kconfig-language.txt.
+ #
+ 
++comment "----------------"
++comment "................"
++comment "Some comment    "
++comment "----------------"
++
+ mainmenu "Linux Kernel Configuration"
+ 
+ config ARM
 
-And when we do it we shall at least support it in menuconfig and xconfig.
-config and gconfig can come later.
 
-config and gconfig shall at least generate a correct config but may not
-show all relavent info.
-
-	Sam
-
+Best regards,
+	ladis
