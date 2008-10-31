@@ -1,45 +1,96 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from orion2.pixelized.ch ([195.190.190.13]:37387 "EHLO
-	orion.pixelized.ch" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750779AbYJaMeW (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 31 Oct 2008 08:34:22 -0400
-Message-ID: <490AFB43.30504@cateee.net>
-Date: Fri, 31 Oct 2008 13:34:11 +0100
-From: "Giacomo A. Catenazzi" <cate@cateee.net>
-MIME-Version: 1.0
+Received: from ex.2n.cz ([213.29.92.11]:6014 "EHLO ex.2n.cz"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751236AbYJaNDn (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 31 Oct 2008 09:03:43 -0400
+Date: Fri, 31 Oct 2008 14:03:40 +0100
 Subject: Re: [PATCH] conf.c: use return to exit from main()
-References: <20081031110905.GA20416@michl.2n.cz>
-In-Reply-To: <20081031110905.GA20416@michl.2n.cz>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
+Message-ID: <20081031130340.GA20563@michl.2n.cz>
+References: <20081031110905.GA20416@michl.2n.cz> <490AFB43.30504@cateee.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <490AFB43.30504@cateee.net>
+From: Ladislav Michl <ladis@linux-mips.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ladislav Michl <ladis@linux-mips.org>
+To: "Giacomo A. Catenazzi" <cate@cateee.net>
 Cc: linux-kbuild@vger.kernel.org
 
-Ladislav Michl wrote:
-> Replace exit() with return and use standard exit values. Good for
-> code size and readability, although I have to admit both has very
-> little impact on real world... :-)
+On Fri, Oct 31, 2008 at 01:34:11PM +0100, Giacomo A. Catenazzi wrote:
+> With your change, it is more difficult to add other errors and to test
+> error values, because AFAIK the EXIT_FAILURE is not fix.
 > 
->    text    data     bss     dec     hex filename
->   60608    2084    5908   68600   10bf8 scripts/kconfig/conf_orig
->   60528    2084    5908   68520   10ba8 scripts/kconfig/conf
+> For these two reason, and because I don't think this program
+> could be ported in a generic C platform, I think you should
+> not uset EXIT_FAILURE.
 
-replacing return is ok, but it is wrong to change the return values:
+Well, every POSIX platform I know about defines EXIT_FAILURE as 1.
+However POSIX itself requires EXIT_FAILURE to evaluate to a
+non-zero value so your statement is perfectly valid.
+Here it is:
 
-We are on POSIX (UNIX, Linux, etc), not on a very generic standard C
-implementation.  The return value is important and it could be
-used by other scripts, which is not guarantee in generic standard C.
+Replace exit() with return.
 
-With your change, it is more difficult to add other errors and to test
-error values, because AFAIK the EXIT_FAILURE is not fix.
+Signed-off-by: Ladislav Michl <ladis@linux-mips.org>
 
-For these two reason, and because I don't think this program
-could be ported in a generic C platform, I think you should
-not uset EXIT_FAILURE.
-
-ciao
-	cate
-
+diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
+index 3e1057f..5bcea31 100644
+--- a/scripts/kconfig/conf.c
++++ b/scripts/kconfig/conf.c
+@@ -469,16 +469,15 @@ int main(int ac, char **av)
+ 			break;
+ 		case 'h':
+ 			printf(_("See README for usage info\n"));
+-			exit(0);
+-			break;
++			return 0;
+ 		default:
+ 			fprintf(stderr, _("See README for usage info\n"));
+-			exit(1);
++			return 1;
+ 		}
+ 	}
+ 	if (ac == optind) {
+ 		printf(_("%s: Kconfig file missing\n"), av[0]);
+-		exit(1);
++		return 1;
+ 	}
+ 	name = av[optind];
+ 	conf_parse(name);
+@@ -492,7 +491,7 @@ int main(int ac, char **av)
+ 				"*** Please run some configurator (e.g. \"make oldconfig\" or\n"
+ 				"*** \"make menuconfig\" or \"make xconfig\").\n"
+ 				"***\n"));
+-			exit(1);
++			return 1;
+ 		}
+ 	}
+ 
+@@ -504,7 +503,7 @@ int main(int ac, char **av)
+ 			printf(_("***\n"
+ 				"*** Can't find default configuration \"%s\"!\n"
+ 				"***\n"), defconfig_file);
+-			exit(1);
++			return 1;
+ 		}
+ 		break;
+ 	case ask_silent:
+@@ -586,7 +585,7 @@ int main(int ac, char **av)
+ 		 */
+ 		if (conf_get_changed() && conf_write(NULL)) {
+ 			fprintf(stderr, _("\n*** Error during writing of the kernel configuration.\n\n"));
+-			exit(1);
++			return 1;
+ 		}
+ 		if (conf_write_autoconf()) {
+ 			fprintf(stderr, _("\n*** Error during update of the kernel configuration.\n\n"));
+@@ -595,7 +594,7 @@ int main(int ac, char **av)
+ 	} else {
+ 		if (conf_write(NULL)) {
+ 			fprintf(stderr, _("\n*** Error during writing of the kernel configuration.\n\n"));
+-			exit(1);
++			return 1;
+ 		}
+ 	}
+ 	return 0;
