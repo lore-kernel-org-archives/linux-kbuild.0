@@ -1,96 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ex.2n.cz ([213.29.92.11]:6014 "EHLO ex.2n.cz"
+Received: from smtp.gentoo.org ([140.211.166.183]:38341 "EHLO smtp.gentoo.org"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751236AbYJaNDn (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 31 Oct 2008 09:03:43 -0400
-Date: Fri, 31 Oct 2008 14:03:40 +0100
-Subject: Re: [PATCH] conf.c: use return to exit from main()
-Message-ID: <20081031130340.GA20563@michl.2n.cz>
-References: <20081031110905.GA20416@michl.2n.cz> <490AFB43.30504@cateee.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <490AFB43.30504@cateee.net>
-From: Ladislav Michl <ladis@linux-mips.org>
+	id S1753265AbYKFIbY (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 6 Nov 2008 03:31:24 -0500
+From: Mike Frysinger <vapier@gentoo.org>
+Subject: [PATCH] scripts/mkcompile_h: kill output in silent mode
+Date: Thu,  6 Nov 2008 03:31:22 -0500
+Message-Id: <1225960282-30342-1-git-send-email-vapier@gentoo.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Giacomo A. Catenazzi" <cate@cateee.net>
-Cc: linux-kbuild@vger.kernel.org
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-On Fri, Oct 31, 2008 at 01:34:11PM +0100, Giacomo A. Catenazzi wrote:
-> With your change, it is more difficult to add other errors and to test
-> error values, because AFAIK the EXIT_FAILURE is not fix.
-> 
-> For these two reason, and because I don't think this program
-> could be ported in a generic C platform, I think you should
-> not uset EXIT_FAILURE.
+The mkcompile_h script does `echo` regardless of silent mode the make is
+running at, so have it respect $quiet from kbuild and only echo when not in
+silent mode.
 
-Well, every POSIX platform I know about defines EXIT_FAILURE as 1.
-However POSIX itself requires EXIT_FAILURE to evaluate to a
-non-zero value so your statement is perfectly valid.
-Here it is:
+Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+---
+ scripts/mkcompile_h |    6 ++++--
+ 1 files changed, 4 insertions(+), 2 deletions(-)
 
-Replace exit() with return.
-
-Signed-off-by: Ladislav Michl <ladis@linux-mips.org>
-
-diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
-index 3e1057f..5bcea31 100644
---- a/scripts/kconfig/conf.c
-+++ b/scripts/kconfig/conf.c
-@@ -469,16 +469,15 @@ int main(int ac, char **av)
- 			break;
- 		case 'h':
- 			printf(_("See README for usage info\n"));
--			exit(0);
--			break;
-+			return 0;
- 		default:
- 			fprintf(stderr, _("See README for usage info\n"));
--			exit(1);
-+			return 1;
- 		}
- 	}
- 	if (ac == optind) {
- 		printf(_("%s: Kconfig file missing\n"), av[0]);
--		exit(1);
-+		return 1;
- 	}
- 	name = av[optind];
- 	conf_parse(name);
-@@ -492,7 +491,7 @@ int main(int ac, char **av)
- 				"*** Please run some configurator (e.g. \"make oldconfig\" or\n"
- 				"*** \"make menuconfig\" or \"make xconfig\").\n"
- 				"***\n"));
--			exit(1);
-+			return 1;
- 		}
- 	}
+diff --git a/scripts/mkcompile_h b/scripts/mkcompile_h
+index a8740df..6a12dd9 100755
+--- a/scripts/mkcompile_h
++++ b/scripts/mkcompile_h
+@@ -4,6 +4,8 @@ SMP=$3
+ PREEMPT=$4
+ CC=$5
  
-@@ -504,7 +503,7 @@ int main(int ac, char **av)
- 			printf(_("***\n"
- 				"*** Can't find default configuration \"%s\"!\n"
- 				"***\n"), defconfig_file);
--			exit(1);
-+			return 1;
- 		}
- 		break;
- 	case ask_silent:
-@@ -586,7 +585,7 @@ int main(int ac, char **av)
- 		 */
- 		if (conf_get_changed() && conf_write(NULL)) {
- 			fprintf(stderr, _("\n*** Error during writing of the kernel configuration.\n\n"));
--			exit(1);
-+			return 1;
- 		}
- 		if (conf_write_autoconf()) {
- 			fprintf(stderr, _("\n*** Error during update of the kernel configuration.\n\n"));
-@@ -595,7 +594,7 @@ int main(int ac, char **av)
- 	} else {
- 		if (conf_write(NULL)) {
- 			fprintf(stderr, _("\n*** Error during writing of the kernel configuration.\n\n"));
--			exit(1);
-+			return 1;
- 		}
- 	}
- 	return 0;
++vecho() { [ "${quiet}" = "silent_" ] || echo "$@" ; }
++
+ # If compile.h exists already and we don't own autoconf.h
+ # (i.e. we're not the same user who did make *config), don't
+ # modify compile.h
+@@ -11,7 +13,7 @@ CC=$5
+ # do "compiled by root"
+ 
+ if [ -r $TARGET -a ! -O include/linux/autoconf.h ]; then
+-  echo "  SKIPPED $TARGET"
++  vecho "  SKIPPED $TARGET"
+   exit 0
+ fi
+ 
+@@ -89,7 +91,7 @@ if [ -r $TARGET ] && \
+       cmp -s .tmpver.1 .tmpver.2; then
+    rm -f .tmpcompile
+ else
+-   echo "  UPD     $TARGET"
++   vecho "  UPD     $TARGET"
+    mv -f .tmpcompile $TARGET
+ fi
+ rm -f .tmpver.1 .tmpver.2
+-- 
+1.6.0.3
+
