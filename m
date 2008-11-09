@@ -1,40 +1,93 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from rv-out-0506.google.com ([209.85.198.234]:28247 "EHLO
-	rv-out-0506.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750964AbYKFVRv (ORCPT
+Received: from pfepa.post.tele.dk ([195.41.46.235]:37424 "EHLO
+	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755932AbYKIWLa (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 6 Nov 2008 16:17:51 -0500
-Message-ID: <8bd0f97a0811061317v53fa6faau9832d1869cf888f6@mail.gmail.com>
-Date: Thu, 6 Nov 2008 16:17:50 -0500
-From: "Mike Frysinger" <vapier.adi@gmail.com>
-Subject: Re: [PATCH] kbuild: introduce KECHO convenience echo
-In-Reply-To: <20081106205048.GA2972@uranus.ravnborg.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+	Sun, 9 Nov 2008 17:11:30 -0500
+Date: Sun, 9 Nov 2008 23:08:54 +0100
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: [GIT] one kbuild fix
+Message-ID: <20081109220854.GA23710@uranus.ravnborg.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-References: <1225960295-30366-1-git-send-email-vapier@gentoo.org>
-	 <20081106205048.GA2972@uranus.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: Mike Frysinger <vapier@gentoo.org>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Jonathan McDowell <noodles@earth.li>, Frans Pop <elendil@planet.nl>
 
-On Thu, Nov 6, 2008 at 15:50, Sam Ravnborg wrote:
-> On Thu, Nov 06, 2008 at 03:31:34AM -0500, Mike Frysinger wrote:
->> There is a bunch of places in the build system where we do 'echo' to show
->> some nice status lines.  This means we still get output when running in
->> silent mode.  So declare a new KECHO variable that only does 'echo' when we
->> are in a suitable verbose build mode.
->
-> Nice idea.
-> I will add it as soon as I start working on kbuild-next
-> Same for your other two patches.
->
-> A lot of the kbuild stuff today is using lowercase to
-> avoid all the typical SCREAMING in Makefiles so I
-> may end up using $(kecho).
+Hi Linus.
 
-yeah i wasnt sure whether to use $(KECHO) or $(kecho) or just $(echo).
- i'm really not partial to any :).
--mike
+Please pull following fix the debian packager to properly support firmware
+
+	Sam
+
+Pull from:
+
+   git://git.kernel.org/pub/scm/linux/kernel/git/sam/kbuild-fixes.git master
+
+Jonathan McDowell (1):
+      kbuild: Fixup deb-pkg target to generate separate firmware deb
+
+ scripts/package/builddeb |   24 ++++++++++++++++++++++--
+ 1 files changed, 22 insertions(+), 2 deletions(-)
+
+
+diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+index ba6bf5d..1264b8e 100644
+--- a/scripts/package/builddeb
++++ b/scripts/package/builddeb
+@@ -15,15 +15,18 @@ set -e
+ version=$KERNELRELEASE
+ revision=`cat .version`
+ tmpdir="$objtree/debian/tmp"
++fwdir="$objtree/debian/fwtmp"
+ packagename=linux-$version
++fwpackagename=linux-firmware-image
+ 
+ if [ "$ARCH" == "um" ] ; then
+ 	packagename=user-mode-linux-$version
+ fi
+ 
+ # Setup the directory structure
+-rm -rf "$tmpdir"
++rm -rf "$tmpdir" "$fwdir"
+ mkdir -p "$tmpdir/DEBIAN" "$tmpdir/lib" "$tmpdir/boot"
++mkdir -p "$fwdir/DEBIAN" "$fwdir/lib"
+ if [ "$ARCH" == "um" ] ; then
+ 	mkdir -p "$tmpdir/usr/lib/uml/modules/$version" "$tmpdir/usr/share/doc/$packagename" "$tmpdir/usr/bin"
+ fi
+@@ -107,6 +110,7 @@ Standards-Version: 3.6.1
+ 
+ Package: $packagename
+ Provides: kernel-image-$version, linux-image-$version
++Suggests: $fwpackagename
+ Architecture: any
+ Description: Linux kernel, version $version
+  This package contains the Linux kernel, modules and corresponding other
+@@ -118,8 +122,24 @@ fi
+ chown -R root:root "$tmpdir"
+ chmod -R go-w "$tmpdir"
+ 
++# Do we have firmware? Move it out of the way and build it into a package.
++if [ -e "$tmpdir/lib/firmware" ]; then
++	mv "$tmpdir/lib/firmware" "$fwdir/lib/"
++
++	cat <<EOF >> debian/control
++
++Package: $fwpackagename
++Architecture: all
++Description: Linux kernel firmware, version $version
++ This package contains firmware from the Linux kernel, version $version
++EOF
++
++	dpkg-gencontrol -isp -p$fwpackagename -P"$fwdir"
++	dpkg --build "$fwdir" ..
++fi
++
+ # Perform the final magic
+-dpkg-gencontrol -isp
++dpkg-gencontrol -isp -p$packagename
+ dpkg --build "$tmpdir" ..
+ 
+ exit 0
