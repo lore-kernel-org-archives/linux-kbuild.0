@@ -1,93 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepa.post.tele.dk ([195.41.46.235]:37424 "EHLO
-	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755932AbYKIWLa (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 9 Nov 2008 17:11:30 -0500
-Date: Sun, 9 Nov 2008 23:08:54 +0100
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: [GIT] one kbuild fix
-Message-ID: <20081109220854.GA23710@uranus.ravnborg.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Received: from ltw.loris.tv ([85.14.220.160]:60028 "EHLO ltw.loris.tv"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753268AbYKJOYk (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 10 Nov 2008 09:24:40 -0500
+Date: Mon, 10 Nov 2008 14:58:25 +0100
+Subject: [PATCH 1/1] Kconfig: Correct sched-rt-group.txt pathname in init/Kconfig
+Message-ID: <20081110135825.GC2784@ltw.loris.tv>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+From: adi@drcomp.erfurt.thur.de (Adrian Knoth)
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Jonathan McDowell <noodles@earth.li>, Frans Pop <elendil@planet.nl>
+To: zippel@linux-m68.org
+Cc: linux-kernel@vger.kernel.org, trivial@kernel.org, linux-kbuild@vger.kernel.org
 
-Hi Linus.
+From: Adrian Knoth <adi@drcomp.erfurt.thur.de>
 
-Please pull following fix the debian packager to properly support firmware
+init/Kconfig directs the user to Documentation/sched-rt-group.txt, but
+the file is actually in Documentation/scheduler/sched-rt-group.txt.
 
-	Sam
+This patch corrects the pathname mentioned in init/Kconfig.
 
-Pull from:
+Signed-off-by: Adrian Knoth <adi@drcomp.erfurt.thur.de>
+---
+Present in 2.6.28-rc4, though discovered in 2.6.27.5.
 
-   git://git.kernel.org/pub/scm/linux/kernel/git/sam/kbuild-fixes.git master
-
-Jonathan McDowell (1):
-      kbuild: Fixup deb-pkg target to generate separate firmware deb
-
- scripts/package/builddeb |   24 ++++++++++++++++++++++--
- 1 files changed, 22 insertions(+), 2 deletions(-)
-
-
-diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-index ba6bf5d..1264b8e 100644
---- a/scripts/package/builddeb
-+++ b/scripts/package/builddeb
-@@ -15,15 +15,18 @@ set -e
- version=$KERNELRELEASE
- revision=`cat .version`
- tmpdir="$objtree/debian/tmp"
-+fwdir="$objtree/debian/fwtmp"
- packagename=linux-$version
-+fwpackagename=linux-firmware-image
+--- init/Kconfig        2008-11-10 14:35:45.000000000 +0100
++++ init/Kconfig.new    2008-11-10 14:37:11.000000000 +0100
+@@ -354,7 +354,7 @@
+          setting below. If enabled, it will also make it impossible to
+          schedule realtime tasks for non-root users until you allocate
+          realtime bandwidth for them.
+-         See Documentation/sched-rt-group.txt for more information.
++         See Documentation/scheduler/sched-rt-group.txt for more information.
  
- if [ "$ARCH" == "um" ] ; then
- 	packagename=user-mode-linux-$version
- fi
- 
- # Setup the directory structure
--rm -rf "$tmpdir"
-+rm -rf "$tmpdir" "$fwdir"
- mkdir -p "$tmpdir/DEBIAN" "$tmpdir/lib" "$tmpdir/boot"
-+mkdir -p "$fwdir/DEBIAN" "$fwdir/lib"
- if [ "$ARCH" == "um" ] ; then
- 	mkdir -p "$tmpdir/usr/lib/uml/modules/$version" "$tmpdir/usr/share/doc/$packagename" "$tmpdir/usr/bin"
- fi
-@@ -107,6 +110,7 @@ Standards-Version: 3.6.1
- 
- Package: $packagename
- Provides: kernel-image-$version, linux-image-$version
-+Suggests: $fwpackagename
- Architecture: any
- Description: Linux kernel, version $version
-  This package contains the Linux kernel, modules and corresponding other
-@@ -118,8 +122,24 @@ fi
- chown -R root:root "$tmpdir"
- chmod -R go-w "$tmpdir"
- 
-+# Do we have firmware? Move it out of the way and build it into a package.
-+if [ -e "$tmpdir/lib/firmware" ]; then
-+	mv "$tmpdir/lib/firmware" "$fwdir/lib/"
-+
-+	cat <<EOF >> debian/control
-+
-+Package: $fwpackagename
-+Architecture: all
-+Description: Linux kernel firmware, version $version
-+ This package contains firmware from the Linux kernel, version $version
-+EOF
-+
-+	dpkg-gencontrol -isp -p$fwpackagename -P"$fwdir"
-+	dpkg --build "$fwdir" ..
-+fi
-+
- # Perform the final magic
--dpkg-gencontrol -isp
-+dpkg-gencontrol -isp -p$packagename
- dpkg --build "$tmpdir" ..
- 
- exit 0
+ choice
+        depends on GROUP_SCHED
+
+
+-- 
+mail: adi@thur.de  	http://adi.thur.de	PGP/GPG: key via keyserver
+
+Ich kann Bedenken nicht mehr hören. Ich will nur noch machen.
+					(Lutz Donnerhacke via email)
