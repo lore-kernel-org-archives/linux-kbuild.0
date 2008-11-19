@@ -1,104 +1,67 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from rcsinet14.oracle.com ([148.87.113.126]:48258 "EHLO
-	rgminet14.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751749AbYKRCPF (ORCPT
+Received: from mercury.realtime.net ([205.238.132.86]:55505 "EHLO
+	mercury.realtime.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751383AbYKSHbR (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 17 Nov 2008 21:15:05 -0500
-Received: from rgminet11.oracle.com (rcsinet11.oracle.com [148.87.113.123])
-	by rgminet14.oracle.com (Switch-3.3.1/Switch-3.3.1) with ESMTP id mAI2FrE4010074
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-SHA bits=256 verify=OK)
-	for <linux-kbuild@vger.kernel.org>; Tue, 18 Nov 2008 02:15:54 GMT
-Received: from rgminet15.oracle.com (rcsinet15.oracle.com [148.87.113.117])
-	by rgminet11.oracle.com (Switch-3.3.1/Switch-3.3.1) with ESMTP id mAI2E6kk023848
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-SHA bits=256 verify=OK)
-	for <linux-kbuild@vger.kernel.org>; Tue, 18 Nov 2008 02:14:07 GMT
-Received: from acsmt704.oracle.com (acsmt704.oracle.com [141.146.40.82])
-	by rgminet15.oracle.com (Switch-3.3.1/Switch-3.3.1) with ESMTP id mAI2DVC7009763
-	for <linux-kbuild@vger.kernel.org>; Tue, 18 Nov 2008 02:13:33 GMT
-Message-ID: <4922238C.40807@oracle.com>
-Date: Tue, 18 Nov 2008 10:08:12 +0800
-From: Wenji Huang <wenji.huang@oracle.com>
-Reply-To: wenji.huang@oracle.com
+	Wed, 19 Nov 2008 02:31:17 -0500
+From: "Milton Miller" <miltonm@bga.com>
+Reply-to: miltonm@bga.com
+Subject: [BUG] ppc64 relocatable vmlinux builds even with undefined symbols
+Date: Wed, 19 Nov 2008 01:14:49 -0600
+Message-id: <4923bce9.bc.3e34.1353742792@bga.com>
 MIME-Version: 1.0
-Subject: [PATCH] Kbuild: generate debug info in building
-Content-Type: text/plain; charset=windows-1251; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
+To: linuxppc-dev@ozlabs.org, linux-kbuild@vger.kernel.org
+Cc: Paul Mackerras <paulus@samba.org>
 
-This patch will generate kernel debuginfo in Kbuild when invoking "make
-debug_info". The separate debug files are in .debug under building tree.
-They can help the cases of requiring debug info for tracing/debug tools,
-especially cross-compilation. Moreover, it can simplify or standardize
-the packaging process for the distributions those will provide
-kernel-debuginfo.
+With the additon of -pie to build CONFIG_RELOCATABLE
+CONFIG_PPC64 kernels, even
+if a function is undefined we still get a vmlinux,
+System.map, and other files
+with no error message.
+ 
+This is with binutils 2.17 as built by debian
+ 
+with 2.6.28-rc5, CONFIG_EMBEDDED=y CONFIG_HOTPLUG=n
+CONFIG_PCI=y, CONFIG_RELOCATABLE=n
+ 
+arch/powerpc/kernel/built-in.o: In function
+`.pcibios_remove_root_bus':
+(.text+0x12dc4): undefined reference to
+`.pcibios_unmap_io_space'
+make[1]: *** [.tmp_vmlinux1] Error 1
+make: *** [sub-make] Error 2
+ 
+ 
+with CONFIG_RELOCATABLE=y
+  LD      init/built-in.o
+  LD      .tmp_vmlinux1
+  KSYM    .tmp_kallsyms1.S
+  AS      .tmp_kallsyms1.o
+  LD      .tmp_vmlinux2
+  KSYM    .tmp_kallsyms2.S
+  AS      .tmp_kallsyms2.o
+  LD      vmlinux
+  SYSMAP  System.map
+  SYSMAP  .tmp_System.map
 
-Signed-off-by: Wenji Huang <wenji.huang@oracle.com>
----
-  Makefile                 |   14 ++++++++++++++
-  scripts/Makefile.modpost |   14 ++++++++++++++
-  2 files changed, 28 insertions(+), 0 deletions(-)
+Note that we set -pie for this combination.  I tried adding
+seperately both
+--no-undefined and --no-allow-shlib-undefined to
+LDFLAGS_vmilnux,
+but the link still did not error out.
 
-diff --git a/Makefile b/Makefile
-index 7f9ff9b..eed7510 100644
---- a/Makefile
-+++ b/Makefile
-@@ -814,6 +814,20 @@ define rule_vmlinux-modpost
-  	$(Q)echo 'cmd_$@ := $(cmd_vmlinux-modpost)' > $(dot-target).cmd
-  endef
+I note that nm -u will detect the U symbol:
 
-+ifdef CONFIG_DEBUG_INFO
-+quiet_cmd_vmlinux_debug = GEN     $<.debug
-+      cmd_vmlinux_debug = mkdir -p .debug;                          \
-+                          $(OBJCOPY) --only-keep-debug              \
-+                                     $< .debug/$<.debug
-+targets += vmlinux.debug
-+endif
-+
-+debug_info: vmlinux FORCE
-+ifdef CONFIG_DEBUG_INFO
-+	$(call if_changed,vmlinux_debug)
-+	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.modpost $@
-+endif
-+
-  # vmlinux image - including updated kernel symbols
-  vmlinux: $(vmlinux-lds) $(vmlinux-init) $(vmlinux-main) vmlinux.o
-$(kallsyms.o) FORCE
-  ifdef CONFIG_HEADERS_CHECK
-diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
-index f4053dc..0df73b2 100644
---- a/scripts/Makefile.modpost
-+++ b/scripts/Makefile.modpost
-@@ -137,6 +137,20 @@ $(modules): %.ko :%.o %.mod.o FORCE
+$ nm -u /tmp/p-test/vmlinux                  w mach_cell
+                 w mach_iseries
+                 w mach_powermac
+                 U pcibios_unmap_io_space
 
-  targets += $(modules)
+but that would either require duplicating cmd_vmlinux and
+adding an additonal
+check or modifing rule_vmlinux. 
 
-+modules-debug := $(modules:.ko=.ko.debug)
-+ifdef CONFIG_DEBUG_INFO
-+quiet_cmd_debug_ko = GEN     $@
-+      cmd_debug_ko = mkdir -p .debug/`dirname $@`;			\
-+		     $(OBJCOPY) --only-keep-debug $< .debug/$@
-+targets += $(modules-debug)
-+endif
-+
-+debug_info: $(modules-debug) FORCE
-+
-+$(modules-debug): $(modules) FORCE
-+ifdef CONFIG_DEBUG_INFO
-+	$(call if_changed,debug_ko)
-+endif
-
-  # Add FORCE to the prequisites of a target to force it to be always
-rebuilt.
-  #
----------------------------------------------------------------------------
--- 
-1.5.6
-
---
-To unsubscribe from this list: send the line "unsubscribe linux-kernel" in
-the body of a message to majordomo@vger.kernel.org
-More majordomo info at  http://vger.kernel.org/majordomo-info.html
-Please read the FAQ at  http://www.tux.org/lkml/
-
+milton 
