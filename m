@@ -1,78 +1,104 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepb.post.tele.dk ([195.41.46.236]:36262 "EHLO
+Received: from pfepb.post.tele.dk ([195.41.46.236]:36285 "EHLO
 	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752975AbYKXUxd (ORCPT
+	with ESMTP id S1752776AbYKXUxe (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 24 Nov 2008 15:53:33 -0500
+	Mon, 24 Nov 2008 15:53:34 -0500
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: [PATCH 3/8] kbuild: introduce $(kecho) convenience echo
-Date: Mon, 24 Nov 2008 21:54:50 +0100
-Message-Id: <1227560095-32597-3-git-send-email-sam@ravnborg.org>
+Subject: [PATCH 7/8] kbuild: gen_init_cpio expands shell variables in file names
+Date: Mon, 24 Nov 2008 21:54:54 +0100
+Message-Id: <1227560095-32597-7-git-send-email-sam@ravnborg.org>
 In-Reply-To: <20081124205150.GA32497@uranus.ravnborg.org>
 References: <20081124205150.GA32497@uranus.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: lkml <linux-kernel@vger.kernel.org>, kbuild <linux-kbuild@vger.kernel.org>
-Cc: Mike Frysinger <vapier@gentoo.org>, Sam Ravnborg <sam@ravnborg.org>
+Cc: "Sally, Gene" <Gene.Sally@timesys.com>, gene.sally@timesys.com, Sam Ravnborg <sam@ravnborg.org>
 
-From: Mike Frysinger <vapier@gentoo.org>
+From: Sally, Gene <Gene.Sally@timesys.com>
 
-There is a bunch of places in the build system where we do 'echo' to show
-some nice status lines.  This means we still get output when running in
-silent mode.  So declare a new KECHO variable that only does 'echo' when we
-are in a suitable verbose build mode.
+Modify gen_init_cpio so that lines that specify files can contain
+what looks like a shell variable that's expanded during processing.
 
-Signed-off-by: Mike Frysinger <vapier@gentoo.org>
-[sam: added Documentation]
+For example:
+
+   file /sbin/kinit ${RFS_BASE}/usr/src/klibc/kinit/kinit 0755 0 0
+
+given RFS_BASE is "/some/directory" in the environment
+
+would be expanded to
+
+   file /sbin/kinit /some/directory/usr/src/klibc/kinit/kinit 0755 0 0
+
+If several environment variables appear in a line, they are all expanded
+with processing happening from left to right.
+Undefined variables expand to a null string.
+Syntax errors stop processing, letting the existing error handling
+show the user offending line.
+
+This patch helps embedded folks who frequently create several
+RFS directories and then switch between them as they're tuning
+an initramfs.
+
+Signed-off-by: gene.sally@timesys.com
 Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
 ---
- Documentation/kbuild/makefiles.txt |   14 ++++++++++++++
- scripts/Kbuild.include             |    7 +++++++
- 2 files changed, 21 insertions(+), 0 deletions(-)
+ usr/gen_init_cpio.c |   28 +++++++++++++++++++++++++++-
+ 1 files changed, 27 insertions(+), 1 deletions(-)
 
-diff --git a/Documentation/kbuild/makefiles.txt b/Documentation/kbuild/makefiles.txt
-index 7a77533..51104f9 100644
---- a/Documentation/kbuild/makefiles.txt
-+++ b/Documentation/kbuild/makefiles.txt
-@@ -383,6 +383,20 @@ more details, with real examples.
- 	to prerequisites are referenced with $(src) (because they are not
- 	generated files).
+diff --git a/usr/gen_init_cpio.c b/usr/gen_init_cpio.c
+index 7abc07f..f1d3fe3 100644
+--- a/usr/gen_init_cpio.c
++++ b/usr/gen_init_cpio.c
+@@ -370,6 +370,30 @@ error:
+ 	return rc;
+ }
  
-+    $(kecho)
-+	echoing information to user in a rule is often a good practice
-+	but when execution "make -s" one does not expect to see any output
-+	except for warnings/errors.
-+	To support this kbuild define $(kecho) which will echo out the
-+	text following $(kecho) to stdout except if "make -s" is used.
++static char *cpio_replace_env(char *new_location)
++{
++       char expanded[PATH_MAX + 1];
++       char env_var[PATH_MAX + 1];
++       char *start;
++       char *end;
 +
-+	Example:
-+		#arch/blackfin/boot/Makefile
-+		$(obj)/vmImage: $(obj)/vmlinux.gz
-+			$(call if_changed,uimage)
-+			@$(kecho) 'Kernel: $@ is ready'
++       for (start = NULL; (start = strstr(new_location, "${")); ) {
++               end = strchr(start, '}');
++               if (start < end) {
++                       *env_var = *expanded = '\0';
++                       strncat(env_var, start + 2, end - start - 2);
++                       strncat(expanded, new_location, start - new_location);
++                       strncat(expanded, getenv(env_var), PATH_MAX);
++                       strncat(expanded, end + 1, PATH_MAX);
++                       strncpy(new_location, expanded, PATH_MAX);
++               } else
++                       break;
++       }
++
++       return new_location;
++}
 +
 +
- --- 3.11 $(CC) support functions
- 
- 	The kernel may be built with several different versions of
-diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
-index 982dcae..e637e28 100644
---- a/scripts/Kbuild.include
-+++ b/scripts/Kbuild.include
-@@ -25,6 +25,13 @@ basetarget = $(basename $(notdir $@))
- escsq = $(subst $(squote),'\$(squote)',$1)
- 
- ###
-+# Easy method for doing a status message
-+       kecho := :
-+ quiet_kecho := echo
-+silent_kecho := :
-+kecho := $($(quiet)kecho)
-+
-+###
- # filechk is used to check if the content of a generated file is updated.
- # Sample usage:
- # define filechk_sample
+ static int cpio_mkfile_line(const char *line)
+ {
+ 	char name[PATH_MAX + 1];
+@@ -415,7 +439,8 @@ static int cpio_mkfile_line(const char *line)
+ 	} else {
+ 		dname = name;
+ 	}
+-	rc = cpio_mkfile(dname, location, mode, uid, gid, nlinks);
++	rc = cpio_mkfile(dname, cpio_replace_env(location),
++	                 mode, uid, gid, nlinks);
+  fail:
+ 	if (dname_len) free(dname);
+ 	return rc;
+@@ -439,6 +464,7 @@ void usage(const char *prog)
+ 		"\n"
+ 		"<name>       name of the file/dir/nod/etc in the archive\n"
+ 		"<location>   location of the file in the current filesystem\n"
++		"             expands shell variables quoted with ${}\n"
+ 		"<target>     link target\n"
+ 		"<mode>       mode/permissions of the file\n"
+ 		"<uid>        user id (0=root)\n"
 -- 
 1.5.6.GIT
 
