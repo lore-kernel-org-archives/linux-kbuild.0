@@ -1,104 +1,116 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepb.post.tele.dk ([195.41.46.236]:36285 "EHLO
+Received: from pfepb.post.tele.dk ([195.41.46.236]:36269 "EHLO
 	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752776AbYKXUxe (ORCPT
+	with ESMTP id S1752918AbYKXUxb (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 24 Nov 2008 15:53:34 -0500
+	Mon, 24 Nov 2008 15:53:31 -0500
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: [PATCH 7/8] kbuild: gen_init_cpio expands shell variables in file names
-Date: Mon, 24 Nov 2008 21:54:54 +0100
-Message-Id: <1227560095-32597-7-git-send-email-sam@ravnborg.org>
+Subject: [PATCH 4/8] kbuild: use KECHO convenience echo
+Date: Mon, 24 Nov 2008 21:54:51 +0100
+Message-Id: <1227560095-32597-4-git-send-email-sam@ravnborg.org>
 In-Reply-To: <20081124205150.GA32497@uranus.ravnborg.org>
 References: <20081124205150.GA32497@uranus.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: lkml <linux-kernel@vger.kernel.org>, kbuild <linux-kbuild@vger.kernel.org>
-Cc: "Sally, Gene" <Gene.Sally@timesys.com>, gene.sally@timesys.com, Sam Ravnborg <sam@ravnborg.org>
+Cc: Mike Frysinger <vapier@gentoo.org>, Sam Ravnborg <sam@ravnborg.org>
 
-From: Sally, Gene <Gene.Sally@timesys.com>
+From: Mike Frysinger <vapier@gentoo.org>
 
-Modify gen_init_cpio so that lines that specify files can contain
-what looks like a shell variable that's expanded during processing.
+Convert a few echos in the build system to new $(kecho) so we get correct
+output according to build verbosity.
 
-For example:
-
-   file /sbin/kinit ${RFS_BASE}/usr/src/klibc/kinit/kinit 0755 0 0
-
-given RFS_BASE is "/some/directory" in the environment
-
-would be expanded to
-
-   file /sbin/kinit /some/directory/usr/src/klibc/kinit/kinit 0755 0 0
-
-If several environment variables appear in a line, they are all expanded
-with processing happening from left to right.
-Undefined variables expand to a null string.
-Syntax errors stop processing, letting the existing error handling
-show the user offending line.
-
-This patch helps embedded folks who frequently create several
-RFS directories and then switch between them as they're tuning
-an initramfs.
-
-Signed-off-by: gene.sally@timesys.com
+Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+[sam: added kecho in a few more places for O=... builds]
 Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
 ---
- usr/gen_init_cpio.c |   28 +++++++++++++++++++++++++++-
- 1 files changed, 27 insertions(+), 1 deletions(-)
+ Makefile                    |    8 ++++----
+ arch/blackfin/boot/Makefile |    2 +-
+ scripts/Kbuild.include      |   11 ++---------
+ 3 files changed, 7 insertions(+), 14 deletions(-)
 
-diff --git a/usr/gen_init_cpio.c b/usr/gen_init_cpio.c
-index 7abc07f..f1d3fe3 100644
---- a/usr/gen_init_cpio.c
-+++ b/usr/gen_init_cpio.c
-@@ -370,6 +370,30 @@ error:
- 	return rc;
- }
+diff --git a/Makefile b/Makefile
+index 54720a5..391b2da 100644
+--- a/Makefile
++++ b/Makefile
+@@ -926,7 +926,7 @@ PHONY += prepare archprepare prepare0 prepare1 prepare2 prepare3
+ # 2) Create the include2 directory, used for the second asm symlink
+ prepare3: include/config/kernel.release
+ ifneq ($(KBUILD_SRC),)
+-	@echo '  Using $(srctree) as source for kernel'
++	@$(kecho) '  Using $(srctree) as source for kernel'
+ 	$(Q)if [ -f $(srctree)/.config -o -d $(srctree)/include/config ]; then \
+ 		echo "  $(srctree) is not clean, please run 'make mrproper'";\
+ 		echo "  in the '$(srctree)' directory.";\
+@@ -983,7 +983,7 @@ endef
+ # directory for generated filesas used by some architectures.
+ define create-symlink
+ 	if [ ! -L include/asm ]; then                                      \
+-			echo '  SYMLINK $@ -> include/asm-$(SRCARCH)';     \
++			$(kecho) '  SYMLINK $@ -> include/asm-$(SRCARCH)'; \
+ 			if [ ! -d include/asm-$(SRCARCH) ]; then           \
+ 				mkdir -p include/asm-$(SRCARCH);           \
+ 			fi;                                                \
+@@ -1096,7 +1096,7 @@ all: modules
+ PHONY += modules
+ modules: $(vmlinux-dirs) $(if $(KBUILD_BUILTIN),vmlinux)
+ 	$(Q)$(AWK) '!x[$$0]++' $(vmlinux-dirs:%=$(objtree)/%/modules.order) > $(objtree)/modules.order
+-	@echo '  Building modules, stage 2.';
++	@$(kecho) '  Building modules, stage 2.';
+ 	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.modpost
+ 	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.fwinst obj=firmware __fw_modbuild
  
-+static char *cpio_replace_env(char *new_location)
-+{
-+       char expanded[PATH_MAX + 1];
-+       char env_var[PATH_MAX + 1];
-+       char *start;
-+       char *end;
-+
-+       for (start = NULL; (start = strstr(new_location, "${")); ) {
-+               end = strchr(start, '}');
-+               if (start < end) {
-+                       *env_var = *expanded = '\0';
-+                       strncat(env_var, start + 2, end - start - 2);
-+                       strncat(expanded, new_location, start - new_location);
-+                       strncat(expanded, getenv(env_var), PATH_MAX);
-+                       strncat(expanded, end + 1, PATH_MAX);
-+                       strncpy(new_location, expanded, PATH_MAX);
-+               } else
-+                       break;
-+       }
-+
-+       return new_location;
-+}
-+
-+
- static int cpio_mkfile_line(const char *line)
- {
- 	char name[PATH_MAX + 1];
-@@ -415,7 +439,8 @@ static int cpio_mkfile_line(const char *line)
- 	} else {
- 		dname = name;
- 	}
--	rc = cpio_mkfile(dname, location, mode, uid, gid, nlinks);
-+	rc = cpio_mkfile(dname, cpio_replace_env(location),
-+	                 mode, uid, gid, nlinks);
-  fail:
- 	if (dname_len) free(dname);
- 	return rc;
-@@ -439,6 +464,7 @@ void usage(const char *prog)
- 		"\n"
- 		"<name>       name of the file/dir/nod/etc in the archive\n"
- 		"<location>   location of the file in the current filesystem\n"
-+		"             expands shell variables quoted with ${}\n"
- 		"<target>     link target\n"
- 		"<mode>       mode/permissions of the file\n"
- 		"<uid>        user id (0=root)\n"
+@@ -1360,7 +1360,7 @@ $(module-dirs): crmodverdir $(objtree)/Module.symvers
+ 	$(Q)$(MAKE) $(build)=$(patsubst _module_%,%,$@)
+ 
+ modules: $(module-dirs)
+-	@echo '  Building modules, stage 2.';
++	@$(kecho) '  Building modules, stage 2.';
+ 	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.modpost
+ 
+ PHONY += modules_install
+diff --git a/arch/blackfin/boot/Makefile b/arch/blackfin/boot/Makefile
+index 522f3c1..e028d13 100644
+--- a/arch/blackfin/boot/Makefile
++++ b/arch/blackfin/boot/Makefile
+@@ -25,7 +25,7 @@ $(obj)/vmlinux.gz: $(obj)/vmlinux.bin FORCE
+ 
+ $(obj)/vmImage: $(obj)/vmlinux.gz
+ 	$(call if_changed,uimage)
+-	@echo 'Kernel: $@ is ready'
++	@$(kecho) 'Kernel: $@ is ready'
+ 
+ install:
+ 	sh $(srctree)/$(src)/install.sh $(KERNELRELEASE) $(BOOTIMAGE) System.map "$(INSTALL_PATH)"
+diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
+index e637e28..2cf1516 100644
+--- a/scripts/Kbuild.include
++++ b/scripts/Kbuild.include
+@@ -46,22 +46,15 @@ kecho := $($(quiet)kecho)
+ # - If they are equal no change, and no timestamp update
+ # - stdin is piped in from the first prerequisite ($<) so one has
+ #   to specify a valid file as first prerequisite (often the kbuild file)
+-       chk_filechk = :
+- quiet_chk_filechk = echo '  CHK     $@'
+-silent_chk_filechk = :
+-       upd_filechk = :
+- quiet_upd_filechk = echo '  UPD     $@'
+-silent_upd_filechk = :
+-
+ define filechk
+ 	$(Q)set -e;				\
+-	$($(quiet)chk_filechk);			\
++	$(kecho) '  CHK     $@';		\
+ 	mkdir -p $(dir $@);			\
+ 	$(filechk_$(1)) < $< > $@.tmp;		\
+ 	if [ -r $@ ] && cmp -s $@ $@.tmp; then	\
+ 		rm -f $@.tmp;			\
+ 	else					\
+-		$($(quiet)upd_filechk);		\
++		$(kecho) '  UPD     $@';	\
+ 		mv -f $@.tmp $@;		\
+ 	fi
+ endef
 -- 
 1.5.6.GIT
 
