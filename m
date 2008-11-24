@@ -1,40 +1,62 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mtaout03-winn.ispmail.ntl.com ([81.103.221.49]:32656 "EHLO
-	mtaout03-winn.ispmail.ntl.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751751AbYKXLee (ORCPT
+Received: from pfepa.post.tele.dk ([195.41.46.235]:53220 "EHLO
+	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753173AbYKXSu6 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 24 Nov 2008 06:34:34 -0500
-From: Ian Campbell <ijc@hellion.org.uk>
-In-Reply-To: <20081124112410.GA13820@uranus.ravnborg.org>
-References: <20081122231631.GA6456@uranus.ravnborg.org>
-	 <1227522668.9425.21.camel@zakaz.uk.xensource.com>
-	 <20081124112410.GA13820@uranus.ravnborg.org>
-Content-Type: text/plain
-Date: Mon, 24 Nov 2008 11:33:50 +0000
-Message-Id: <1227526430.9425.34.camel@zakaz.uk.xensource.com>
+	Mon, 24 Nov 2008 13:50:58 -0500
+Date: Mon, 24 Nov 2008 19:44:28 +0100
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: [PATCH] ncurses based config V2
+Message-ID: <20081124184428.GA17085@uranus.ravnborg.org>
+References: <1220469076-16487-1-git-send-email-nir@tzachar.com> <1220603220-17090-1-git-send-email-nir@tzachar.com> <20080905195930.GA27913@1wt.eu>
 Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Subject: Re: [RFC PATCH] kbuild: move tags support to a shell script
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20080905195930.GA27913@1wt.eu>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Guennadi Liakhovetski <g.liakhovetski@gmx.de>, Jim Radford <radford@galvanix.net>
+To: Willy Tarreau <w@1wt.eu>
+Cc: Nir Tzachar <tzachar@grad120a.cs.bgu.ac.il>, linux-kernel@vger.kernel.org, bzolnier@gmail.com, zippel@linux-m68k.org, linux-kbuild@vger.kernel.org, ariveira@gmail.com, rdunlap@xenotime.net, kosaki.motohiro@jp.fujitsu.com, 7eggert@gmx.de, Nir Tzachar <nir@tzachar.com>
 
-On Mon, 2008-11-24 at 12:24 +0100, Sam Ravnborg wrote:
-> Is it OK that I add a:
+Hi Nir.
+
+Some comments as followup to Willy.
+
+> OK, I've just tried it. Here are the first comments I can make :
 > 
-> Tested-by: Ian Campbell <ijc@hellion.org.uk>
-> 
-> to the patch?
+>   - colors are too dark.
+Seconded. Please try to find a lighter set of default colors.
+You may be inspired by one of the menuconfig color-sets.
 
-Yes, sure.
+I agree that we could use a lift here - so please do not go for the
+default color set of menuconfig.
 
-Ian.
+>   - entering text in boxes (eg: local version) does not move the cursor,
+>     it remains at the beginning of the line. If I press any arrow, the
+>     box immediately closes (most likely the Esc prefix again).
 
--- 
-Ian Campbell
-Current Noise: Enslaved - Isa
+I do not see any cursor which is annoying. menuconfig has the same issue.
 
-Keep the number of passes in a compiler to a minimum.
-		-- D. Gries
+>   - I noticed I was tempted a lot to press "?" to get help, but the key is
+>     not bound. It would be nice to have it bound to Help since make oldconfig
+>     and menuconfig to both report help that way.
+
+Please bound this.
+
+>   - I'm not convinced that the parenthesis around hotkeys make the menu
+>     that much readable, especially when there are lots of short words or
+>     even acronyms. Eg :
+>         [ ]   (U)TS namespace
+>         [ ]   (I)PC namespace
+>         [ ]   (U)ser namespace (EXPERIMENTAL)
+>         [ ]   (P)ID Namespaces (EXPERIMENTAL)
+
+This looks like some ancient stuff and it must be a better way to
+show the short-cuts.
+
+I would really appreciate if you could look into the above issues.
+If you do a repost with this fixed I will try to do a proper review,
+including code-review next time.
+
+	Sam
 
