@@ -1,64 +1,40 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepb.post.tele.dk ([195.41.46.236]:35992 "EHLO
-	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751643AbYKXLWr (ORCPT
+Received: from mtaout03-winn.ispmail.ntl.com ([81.103.221.49]:32656 "EHLO
+	mtaout03-winn.ispmail.ntl.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751751AbYKXLee (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 24 Nov 2008 06:22:47 -0500
-Date: Mon, 24 Nov 2008 12:24:10 +0100
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [RFC PATCH] kbuild: move tags support to a shell script
-Message-ID: <20081124112410.GA13820@uranus.ravnborg.org>
-References: <20081122231631.GA6456@uranus.ravnborg.org> <1227522668.9425.21.camel@zakaz.uk.xensource.com>
+	Mon, 24 Nov 2008 06:34:34 -0500
+From: Ian Campbell <ijc@hellion.org.uk>
+In-Reply-To: <20081124112410.GA13820@uranus.ravnborg.org>
+References: <20081122231631.GA6456@uranus.ravnborg.org>
+	 <1227522668.9425.21.camel@zakaz.uk.xensource.com>
+	 <20081124112410.GA13820@uranus.ravnborg.org>
+Content-Type: text/plain
+Date: Mon, 24 Nov 2008 11:33:50 +0000
+Message-Id: <1227526430.9425.34.camel@zakaz.uk.xensource.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1227522668.9425.21.camel@zakaz.uk.xensource.com>
+Content-Transfer-Encoding: 7bit
+Subject: Re: [RFC PATCH] kbuild: move tags support to a shell script
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ian Campbell <ijc@hellion.org.uk>
+To: Sam Ravnborg <sam@ravnborg.org>
 Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Guennadi Liakhovetski <g.liakhovetski@gmx.de>, Jim Radford <radford@galvanix.net>
 
-On Mon, Nov 24, 2008 at 10:31:08AM +0000, Ian Campbell wrote:
-> On Sun, 2008-11-23 at 00:16 +0100, Sam Ravnborg wrote:
-> > As no-one else wanted to do so - I now moved the tags support
-> > to a shell script of its own.
-> > The usage is the same: make {tags,TAGS,cscope}
-> > 
-> > The ALLSOURCE_ARCHS suppport was lost in the transition - is it actually used by anyone?
+On Mon, 2008-11-24 at 12:24 +0100, Sam Ravnborg wrote:
+> Is it OK that I add a:
 > 
-> I'm the one who actually added it way back in
-> a0674e88d9c150e016a69e78e735f48772314c53 and to be honest I don't use it
-> anymore since I've changed jobs and only really do x86 now...
+> Tested-by: Ian Campbell <ijc@hellion.org.uk>
 > 
-> I can't say if anyone else is using it though.
-> 
-> > I have given the patch only some light testing.
-> > 
-> > Could those of you that actually sues tags/cscope plese give it a try.
-> 
-> I tested your second patch from the subsequent email and functionally it
-> seems fine, it currently includes include/asm-* for all architectures
-> but I suppose they will all go away shortly.
-> 
-> The output was a bit odd though:
->         $ make cscope
->         /bin/sh /local/scratch/ianc/devel/linux-2.6.git/scripts/tags.sh cscope
->           GEN     cscope.out (from 13251 files)
-> I guess I would have expected "  GEN     cscope.files" instead of the
-> first line or just "  TAGS"?
+> to the patch?
 
-Thanks for testing Ian.
+Yes, sure.
 
-I will fix up the invocation line to something like
-  GEN    {tags,TAGS,cscope}
+Ian.
 
-And then I will drop the extra output from the shell script
-in the cscope case.
+-- 
+Ian Campbell
+Current Noise: Enslaved - Isa
 
-Is it OK that I add a:
+Keep the number of passes in a compiler to a minimum.
+		-- D. Gries
 
-Tested-by: Ian Campbell <ijc@hellion.org.uk>
-
-to the patch?
-
-	Sam
