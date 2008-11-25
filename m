@@ -1,50 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepb.post.tele.dk ([195.41.46.236]:57603 "EHLO
+Received: from pfepb.post.tele.dk ([195.41.46.236]:39596 "EHLO
 	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751128AbYKYIKa (ORCPT
+	with ESMTP id S1751414AbYKYJpX (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 25 Nov 2008 03:10:30 -0500
-Date: Tue, 25 Nov 2008 09:11:53 +0100
+	Tue, 25 Nov 2008 04:45:23 -0500
+Date: Tue, 25 Nov 2008 10:46:47 +0100
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH] ncurses based config V2
-Message-ID: <20081125081153.GA12275@uranus.ravnborg.org>
-References: <1220469076-16487-1-git-send-email-nir@tzachar.com> <1220603220-17090-1-git-send-email-nir@tzachar.com> <20080905195930.GA27913@1wt.eu> <20081124184428.GA17085@uranus.ravnborg.org> <9b2db90b0811250001k6e0c609frca073f3221a3e8ed@mail.gmail.com>
+Subject: Re: [PATCH 8/8] kbuild: move tags support to a shell script
+Message-ID: <20081125094647.GA32030@uranus.ravnborg.org>
+References: <20081124205150.GA32497@uranus.ravnborg.org> <1227560095-32597-8-git-send-email-sam@ravnborg.org> <1227564434.16868.14.camel@localhost.localdomain>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <9b2db90b0811250001k6e0c609frca073f3221a3e8ed@mail.gmail.com>
+In-Reply-To: <1227564434.16868.14.camel@localhost.localdomain>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nir Tzachar <nir.tzachar@gmail.com>
-Cc: Willy Tarreau <w@1wt.eu>, Nir Tzachar <tzachar@grad120a.cs.bgu.ac.il>, linux-kernel@vger.kernel.org, bzolnier@gmail.com, zippel@linux-m68k.org, linux-kbuild@vger.kernel.org, ariveira@gmail.com, rdunlap@xenotime.net, kosaki.motohiro@jp.fujitsu.com, 7eggert@gmx.de
+To: Ian Campbell <ijc@hellion.org.uk>
+Cc: lkml <linux-kernel@vger.kernel.org>, kbuild <linux-kbuild@vger.kernel.org>, Alexey Dobriyan <adobriyan@gmail.com>
 
-Hi Nir.
-
-> >>         [ ]   (U)TS namespace
-> >>         [ ]   (I)PC namespace
-> >>         [ ]   (U)ser namespace (EXPERIMENTAL)
-> >>         [ ]   (P)ID Namespaces (EXPERIMENTAL)
-> >
-> > This looks like some ancient stuff and it must be a better way to
-> > show the short-cuts.
+On Mon, Nov 24, 2008 at 10:07:14PM +0000, Ian Campbell wrote:
+> On Mon, 2008-11-24 at 21:54 +0100, Sam Ravnborg wrote:
+> > 
+> > +# Support um (which has SUBARCH)
+> > +# FIXME: add support for ALLSOURCE_ARCHS if really used
+> > +if [ "${ARCH}" == "${SUBARCH}" ]; then
+> > +       archs="${ARCH} ${SUBARCH}"
+> > +else
+> > +       archs="${SRCARCH}"
+> > +fi
 > 
-> This was the best I could come up with, as ncurses does not let you
-> use color attributed for menu items. I'll try a different scheme,
-> where the first capitalized letter is the shortcut. What do u say?
+> I've never used um but is this conditional backwards? If ${ARCH} ==
+> ${SUBARCH} then archs="${ARCH} ${SUBARCH}" is equivalent to archs="
+> ${ARCH} ${ARCH}", isn't it?
+It is buggy.
 
-Better than the above - let me see it in action and I will judge.
-I had preferred something with a colored highlight - but if ncurses
-do not support that then I think first catital letter i ok.
-
-Alternative is to use first letter in the prompt and accept the
-ambiguity.
-
-> > I would really appreciate if you could look into the above issues.
-> > If you do a repost with this fixed I will try to do a proper review,
-> > including code-review next time.
 > 
-> Sure. I'll have a patch ready in a few days.
+> I'm not quite sure I understand the distinction between ARCH, SRCARCH
+> and SUBARCH either but is it expected that for ARCH=um, SUBARCH will be
+> i386/x86_64 or x86? I think it's the former in which case I'd expect
+> these days nothing will be found in arch/i386 or arch/x86_64? is a
+> SRCSUBARCH required?
 
-Great - loks forward to see it.
+Something like that. But we only need to include headers for the
+relavant SUBARCH. I will give it a closer look.
 
 	Sam
