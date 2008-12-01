@@ -1,53 +1,40 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp1.linux-foundation.org ([140.211.169.13]:58967 "EHLO
+Received: from smtp1.linux-foundation.org ([140.211.169.13]:35949 "EHLO
 	smtp1.linux-foundation.org" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1752146AbYLAWWC (ORCPT
+	by vger.kernel.org with ESMTP id S1752665AbYLAWWD (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 1 Dec 2008 17:22:02 -0500
-Message-Id: <200812012221.mB1ML43Q013094@imap1.linux-foundation.org>
-Subject: [patch 3/8] scripts/package: allow custom options to rpm
+	Mon, 1 Dec 2008 17:22:03 -0500
+Message-Id: <200812012221.mB1ML4NF013097@imap1.linux-foundation.org>
+Subject: [patch 4/8] tags: skip ./ in filenames
 From: akpm@linux-foundation.org
-Date: Mon, 01 Dec 2008 14:21:03 -0800
+Date: Mon, 01 Dec 2008 14:21:04 -0800
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: sam@ravnborg.org
-Cc: linux-kbuild@vger.kernel.org, akpm@linux-foundation.org, jk@ozlabs.org
+Cc: linux-kbuild@vger.kernel.org, akpm@linux-foundation.org, adobriyan@gmail.com
 
-From: Jeremy Kerr <jk@ozlabs.org>
+From: Alexey Dobriyan <adobriyan@gmail.com>
 
-Add a RPMOPTS make variable to allow arbitrary options to be passed
-to rpm during 'make rpm-pkg'. For example:
+This drives size of tags file from 68.9 MB down to 67.7 MB.
 
- make RPMOPTS="--define '_topdir /home/jk/rpm'" rpm-pkg
-
-Signed-off-by: Jeremy Kerr <jk@ozlabs.org>
+Signed-off-by: Alexey Dobriyan <adobriyan@gmail.com>
 Cc: Sam Ravnborg <sam@ravnborg.org>
 Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
 ---
 
- scripts/package/Makefile |    5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ Makefile |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff -puN scripts/package/Makefile~scripts-package-allow-custom-options-to-rpm scripts/package/Makefile
---- a/scripts/package/Makefile~scripts-package-allow-custom-options-to-rpm
-+++ a/scripts/package/Makefile
-@@ -47,7 +47,7 @@ rpm-pkg rpm: $(objtree)/kernel.spec FORC
- 	set -e; \
- 	mv -f $(objtree)/.tmp_version $(objtree)/.version
- 
--	$(RPM) --target $(UTS_MACHINE) -ta ../$(KERNELPATH).tar.gz
-+	$(RPM) $(RPMOPTS) --target $(UTS_MACHINE) -ta ../$(KERNELPATH).tar.gz
- 	rm ../$(KERNELPATH).tar.gz
- 
- clean-files := $(objtree)/kernel.spec
-@@ -64,7 +64,8 @@ binrpm-pkg: $(objtree)/binkernel.spec FO
- 	set -e; \
- 	mv -f $(objtree)/.tmp_version $(objtree)/.version
- 
--	$(RPM) --define "_builddir $(srctree)" --target $(UTS_MACHINE) -bb $<
-+	$(RPM) $(RPMOPTS) --define "_builddir $(srctree)" --target \
-+		$(UTS_MACHINE) -bb $<
- 
- clean-files += $(objtree)/binkernel.spec
+diff -puN Makefile~tags-skip-in-filenames Makefile
+--- a/Makefile~tags-skip-in-filenames
++++ a/Makefile
+@@ -1456,7 +1456,7 @@ define find-sources
+ 	       -name $1 -print; \
+ 	  find $(__srctree) $(RCS_FIND_IGNORE) \
+ 	       \( -name include -o -name arch -o -name '.tmp_*' \) -prune -o \
+-	       -name $1 -print; \
++	       -name $1 -print | sed -e 's#^./##'; \
+ 	  )
+ endef
  
 _
