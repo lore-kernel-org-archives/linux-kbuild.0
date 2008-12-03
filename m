@@ -1,42 +1,39 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepb.post.tele.dk ([195.41.46.236]:35517 "EHLO
+Received: from pfepb.post.tele.dk ([195.41.46.236]:35602 "EHLO
 	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750770AbYLCVcH (ORCPT
+	with ESMTP id S1751568AbYLCVc1 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 3 Dec 2008 16:32:07 -0500
-Date: Wed, 3 Dec 2008 22:33:31 +0100
+	Wed, 3 Dec 2008 16:32:27 -0500
+Date: Wed, 3 Dec 2008 22:33:48 +0100
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [patch 1/8] genksyms: track symbol checksum changes
-Message-ID: <20081203213331.GD7599@uranus.ravnborg.org>
-References: <200812012221.mB1ML2lO013046@imap1.linux-foundation.org>
+Subject: Re: [patch 2/8] genksyms: allow to ignore symbol checksum changes
+Message-ID: <20081203213348.GE7599@uranus.ravnborg.org>
+References: <200812012221.mB1ML37d013060@imap1.linux-foundation.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <200812012221.mB1ML2lO013046@imap1.linux-foundation.org>
+In-Reply-To: <200812012221.mB1ML37d013060@imap1.linux-foundation.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: akpm@linux-foundation.org
 Cc: linux-kbuild@vger.kernel.org, agruen@suse.de, randy.dunlap@oracle.com
 
-On Mon, Dec 01, 2008 at 02:21:01PM -0800, akpm@linux-foundation.org wrote:
+On Mon, Dec 01, 2008 at 02:21:03PM -0800, akpm@linux-foundation.org wrote:
 > From: Andreas Gruenbacher <agruen@suse.de>
 > 
-> Sometimes it is preferable to avoid changes of exported symbol checksums
-> (to avoid breaking externally provided modules).  When a checksum change
-> occurs, it can be hard to figure out what caused this change: underlying
-> types may have changed, or additional type information may simply have
-> become available at the point where a symbol is exported.
+> This adds an "override" keyword for use in *.symvers / *.symref files. 
+> When a symbol is overridden, the symbol's old definition will be used for
+> computing checksums instead of the new one, preserving the previous
+> checksum.  (Genksyms will still warn about the change.)
 > 
-> Add a new --reference option to genksyms which allows it to report why
-> checksums change, based on the type information dumps it creates with the
-> --dump-types flag.  Genksyms will read in such a dump from a previous run,
-> and report which symbols have changed (and why).
+> This is meant to allow distributions to hide minor actual as well as fake
+> ABI changes.  (For example, when extra type information becomes available
+> because additional headers are included, this may change checksums even
+> though none of the types used have actully changed.)
 > 
-> The behavior can be controlled for an entire build as follows: If
-> KBUILD_SYMTYPES is set, genksyms uses --dump-types to produce *.symtypes
-> dump files.  If any *.symref files exist, those will be used as the
-> reference to check against.  If KBUILD_PRESERVE is set, checksum changes
-> will fail the build.
+> This approach also allows to get rid of "#ifdef __GENKSYMS__" hacks in the
+> code, which are currently used in some vendor kernels to work around
+> checksum changes.
 > 
 > Signed-off-by: Andreas Gruenbacher <agruen@suse.de>
 > Cc: Sam Ravnborg <sam@ravnborg.org>
