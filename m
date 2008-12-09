@@ -1,66 +1,83 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from moutng.kundenserver.de ([212.227.126.186]:57868 "EHLO
-	moutng.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753243AbYLHX0a (ORCPT
+Received: from pfepb.post.tele.dk ([195.41.46.236]:50475 "EHLO
+	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751073AbYLIFoE (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 8 Dec 2008 18:26:30 -0500
-From: Arnd Bergmann <arnd@arndb.de>
+	Tue, 9 Dec 2008 00:44:04 -0500
+Date: Tue, 9 Dec 2008 06:45:28 +0100
+From: Sam Ravnborg <sam@ravnborg.org>
 Subject: Re: Merge headerfiles for m68k and m68knommu to arch/m68k/include/asm
-Date: Tue, 9 Dec 2008 00:26:05 +0100
-References: <20081208205814.GA22697@uranus.ravnborg.org> <Pine.LNX.4.64.0812082359190.29640@anakin>
-In-Reply-To: <Pine.LNX.4.64.0812082359190.29640@anakin>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Content-Transfer-Encoding: 7bit
+Message-ID: <20081209054528.GA1407@uranus.ravnborg.org>
+References: <20081208205814.GA22697@uranus.ravnborg.org> <Pine.LNX.4.64.0812082359190.29640@anakin> <200812090026.06689.arnd@arndb.de>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Message-Id: <200812090026.06689.arnd@arndb.de>
+In-Reply-To: <200812090026.06689.arnd@arndb.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Geert Uytterhoeven <geert@linux-m68k.org>
-Cc: Sam Ravnborg <sam@ravnborg.org>, Roman Zippel <zippel@linux-m68k.org>, linux-m68k <linux-m68k@vger.kernel.org>, Greg Ungerer <gerg@uclinux.org>, uclinux-dev <uclinux-dev@uclinux.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: Geert Uytterhoeven <geert@linux-m68k.org>, Roman Zippel <zippel@linux-m68k.org>, linux-m68k <linux-m68k@vger.kernel.org>, Greg Ungerer <gerg@uclinux.org>, uclinux-dev <uclinux-dev@uclinux.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-On Tuesday 09 December 2008, Geert Uytterhoeven wrote:
-> > I have used the following include guard:
+On Tue, Dec 09, 2008 at 12:26:05AM +0100, Arnd Bergmann wrote:
+> On Tuesday 09 December 2008, Geert Uytterhoeven wrote:
+> > > I have used the following include guard:
+> > > 
+> > > #ifdef __uClinux__
+> > > #include "atomic_no.h"
+> > > #else
+> > > #include "atomic_mm.h"
+> > > #endif
+> > > 
+> > > gcc -E -dM for the two compilers revealed that this was the
+> > > only symbol that differed.
 > > 
-> > #ifdef __uClinux__
-> > #include "atomic_no.h"
-> > #else
-> > #include "atomic_mm.h"
-> > #endif
+> > I think you can share a toolchain for m68k and m68knommu, at least for the
+> > kernel (I used my plain m68k toolchain when experimenting with m68knommu for
+> > Amiga).
 > > 
-> > gcc -E -dM for the two compilers revealed that this was the
-> > only symbol that differed.
+> > > With the above construct we do the "right thing" also for
+> > > headers exported to userspace.
+> > > But actually none of the headers using the above are
+> > > subject for export at the moment so we could use a
+> > > CONFIG_ symbol for the same.
+> > 
+> > So I prefer to just check CONFIG_MMU.
 > 
-> I think you can share a toolchain for m68k and m68knommu, at least for the
-> kernel (I used my plain m68k toolchain when experimenting with m68knommu for
-> Amiga).
+> Some of them are, by means of include/asm-generic/Kbuild.asm, e.g.
+> unistd.h!
+I was fooled by make headers_check showing no errros.
+But it turns out that headers_check does not recognize
+includes made with "".
+
+So I will update the patch to include revevant *_{no,mm}.h files
+in Kbuild.
+
 > 
-> > With the above construct we do the "right thing" also for
-> > headers exported to userspace.
-> > But actually none of the headers using the above are
-> > subject for export at the moment so we could use a
-> > CONFIG_ symbol for the same.
+> I'm not sure if it's entirely correct, but I think you can use
 > 
-> So I prefer to just check CONFIG_MMU.
+> #ifdef __KERNEL__
+> # ifdef CONFIG_MMU
+> #  include "atomic_mm.h
+> # else
+> #  include "atomic_no.h
+> # endif
+> #else
+> # ifndef __uClinux__
+> #  include "atomic_mm.h
+> # else
+> #  include "atomic_no.h
+> # endif
+> #endif
 
-Some of them are, by means of include/asm-generic/Kbuild.asm, e.g.
-unistd.h!
+Can someone with a shared (m68k/m68knommu) please check if
+__uClinux__ is only set in the m68knommu case.
 
-I'm not sure if it's entirely correct, but I think you can use
+Use:
 
-#ifdef __KERNEL__
-# ifdef CONFIG_MMU
-#  include "atomic_mm.h
-# else
-#  include "atomic_no.h
-# endif
-#else
-# ifndef __uClinux__
-#  include "atomic_mm.h
-# else
-#  include "atomic_no.h
-# endif
-#endif
+    touch foo.h; gcc -E -dM
 
-	Arnd <><
+to see what is defined by the compiler.
+You will also need to specify if this is for m68k or m68knommu.
+
+Thanks,
+	Sam
