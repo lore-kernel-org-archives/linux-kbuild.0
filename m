@@ -1,61 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.wellnetcz.com ([212.24.148.102]:34884 "EHLO
-	smtp.wellnetcz.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751945AbYLJMsm (ORCPT
+Received: from pfepa.post.tele.dk ([195.41.46.235]:54798 "EHLO
+	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751657AbYLJM6v (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 10 Dec 2008 07:48:42 -0500
-From: Jiri Slaby <jirislaby@gmail.com>
-Subject: [PATCH 1/1] tags.sh: fix string equality testing
-Date: Wed, 10 Dec 2008 13:48:38 +0100
-Message-Id: <1228913318-6003-1-git-send-email-jirislaby@gmail.com>
+	Wed, 10 Dec 2008 07:58:51 -0500
+Date: Wed, 10 Dec 2008 14:00:17 +0100
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: [PATCH 1/1] makesystem: revive cscope target
+Message-ID: <20081210130017.GA12939@uranus.ravnborg.org>
+References: <1228911013-25641-1-git-send-email-jirislaby@gmail.com> <20081210124120.GA12784@uranus.ravnborg.org> <493FBA3B.5010801@gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <493FBA3B.5010801@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: sam@ravnborg.org
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Jiri Slaby <jirislaby@gmail.com>
+To: Jiri Slaby <jirislaby@gmail.com>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Test of string equality in shells is =, not C-like ==.
+On Wed, Dec 10, 2008 at 01:46:51PM +0100, Jiri Slaby wrote:
+> On 12/10/2008 01:41 PM, Sam Ravnborg wrote:
+> > On Wed, Dec 10, 2008 at 01:10:13PM +0100, Jiri Slaby wrote:
+> >> - export src and obj, so that we can check them in tags.sh
+> >> - don't allow * expansion during sh function calls
+> > 
+> > What benefit does this patch give us?
+> > We do not use $obj neither $src in tags.sh.
+> 
+> I'm confused...
+> 
+> git kernel.org:/pub/scm/linux/kernel/git/sam/kbuild-next.git
+> says:
+> # Do not use full path is we do not use O=.. builds
+> if [ ${src} == ${obj} ]; then
+>         tree=
+> else
+>         tree=${srctree}
+> fi
+> in scripts/tags.sh.
 
-Signed-off-by: Jiri Slaby <jirislaby@gmail.com>
----
- scripts/tags.sh |   10 +++++-----
- 1 files changed, 5 insertions(+), 5 deletions(-)
+OK - forgot about that one.
+Will apply your patches when I get at my Linux box.
 
-diff --git a/scripts/tags.sh b/scripts/tags.sh
-index 3b7225c..6f49398 100644
---- a/scripts/tags.sh
-+++ b/scripts/tags.sh
-@@ -7,7 +7,7 @@
- # Uses the following environment variables:
- # ARCH, SUBARCH, srctree, src, obj
- 
--if [ $KBUILD_VERBOSE == 1 ]; then
-+if [ $KBUILD_VERBOSE = 1 ]; then
- 	set -x
- fi
- 
-@@ -18,7 +18,7 @@ ignore="( -name SCCS -o -name BitKeeper -o -name .svn -o \
-           -prune -o"
- 
- # Do not use full path is we do not use O=.. builds
--if [ ${src} == ${obj} ]; then
-+if [ ${src} = ${obj} ]; then
- 	tree=
- else
- 	tree=${srctree}/
-@@ -135,10 +135,10 @@ xtags()
- 
- 
- # Support um (which uses SUBARCH)
--if [ ${ARCH} == um ]; then
--	if [ $SUBARCH == i386 ]; then
-+if [ ${ARCH} = um ]; then
-+	if [ $SUBARCH = i386 ]; then
- 		archinclude=x86
--	elif [ $SUBARCH == x86_64 ]; then
-+	elif [ $SUBARCH = x86_64 ]; then
- 		archinclude=x86
- 	else
- 		archinclude=${SUBARCH}
--- 
-1.6.0.5
-
+	Sam
