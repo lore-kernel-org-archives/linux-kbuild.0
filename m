@@ -1,110 +1,30 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.wellnetcz.com ([212.24.148.102]:60486 "EHLO
-	smtp.wellnetcz.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754278AbYLJMKX (ORCPT
+Received: from pfepa.post.tele.dk ([195.41.46.235]:45264 "EHLO
+	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750967AbYLJMjy (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 10 Dec 2008 07:10:23 -0500
-From: Jiri Slaby <jirislaby@gmail.com>
-Subject: [PATCH 1/1] makesystem: revive cscope target
-Date: Wed, 10 Dec 2008 13:10:13 +0100
-Message-Id: <1228911013-25641-1-git-send-email-jirislaby@gmail.com>
+	Wed, 10 Dec 2008 07:39:54 -0500
+Date: Wed, 10 Dec 2008 13:41:20 +0100
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: [PATCH 1/1] makesystem: revive cscope target
+Message-ID: <20081210124120.GA12784@uranus.ravnborg.org>
+References: <1228911013-25641-1-git-send-email-jirislaby@gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1228911013-25641-1-git-send-email-jirislaby@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: sam@ravnborg.org
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Jiri Slaby <jirislaby@gmail.com>
+To: Jiri Slaby <jirislaby@gmail.com>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-- export src and obj, so that we can check them in tags.sh
-- don't allow * expansion during sh function calls
+On Wed, Dec 10, 2008 at 01:10:13PM +0100, Jiri Slaby wrote:
+> - export src and obj, so that we can check them in tags.sh
+> - don't allow * expansion during sh function calls
 
-Signed-off-by: Jiri Slaby <jirislaby@gmail.com>
-Cc: Sam Ravnborg <sam@ravnborg.org>
----
- Makefile        |    2 +-
- scripts/tags.sh |   22 +++++++++++-----------
- 2 files changed, 12 insertions(+), 12 deletions(-)
+What benefit does this patch give us?
+We do not use $obj neither $src in tags.sh.
 
-diff --git a/Makefile b/Makefile
-index 8f4f626..a094d74 100644
---- a/Makefile
-+++ b/Makefile
-@@ -156,7 +156,7 @@ obj		:= $(objtree)
- 
- VPATH		:= $(srctree)$(if $(KBUILD_EXTMOD),:$(KBUILD_EXTMOD))
- 
--export srctree objtree VPATH TOPDIR
-+export src obj srctree objtree VPATH TOPDIR
- 
- 
- # SUBARCH tells the usermode build what the underlying arch is.  That is set
-diff --git a/scripts/tags.sh b/scripts/tags.sh
-index 47274dc..3b7225c 100644
---- a/scripts/tags.sh
-+++ b/scripts/tags.sh
-@@ -21,25 +21,25 @@ ignore="( -name SCCS -o -name BitKeeper -o -name .svn -o \
- if [ ${src} == ${obj} ]; then
- 	tree=
- else
--	tree=${srctree}
-+	tree=${srctree}/
- fi
- 
- # find sources in arch/$ARCH
- find_arch_sources()
- {
--	find ${tree}arch/$1 $ignore -name $2 -print;
-+	find ${tree}arch/$1 $ignore -name "$2" -print;
- }
- 
- # find sources in arch/$1/include
- find_arch_include_sources()
- {
--	find ${tree}arch/$1/include $ignore -name $2 -print;
-+	find ${tree}arch/$1/include $ignore -name "$2" -print;
- }
- 
- # find sources in include/
- find_include_sources()
- {
--	find ${tree}include $ignore -name config -prune -o -name $1 -print;
-+	find ${tree}include $ignore -name config -prune -o -name "$1" -print;
- }
- 
- # find sources in rest of tree
-@@ -48,27 +48,27 @@ find_other_sources()
- {
- 	find ${tree}* $ignore \
- 	     \( -name include -o -name arch -o -name '.tmp_*' \) -prune -o \
--	       -name $1 -print;
-+	       -name "$1" -print;
- }
- 
- find_sources()
- {
--	find_arch_sources $1 $2
--	find_include_sources $2
--	find_other_sources $2
-+	find_arch_sources $1 "$2"
-+	find_include_sources "$2"
-+	find_other_sources "$2"
- }
- 
- all_sources()
- {
--	find_sources $SRCARCH *.[chS]
-+	find_sources $SRCARCH '*.[chS]'
- 	if [ ! -z "$archinclude" ]; then
--		find_arch_include_sources $archinclude *.[chS]
-+		find_arch_include_sources $archinclude '*.[chS]'
- 	fi
- }
- 
- all_kconfigs()
- {
--	find_sources $SRCARCH "Kconfig*"
-+	find_sources $SRCARCH 'Kconfig*'
- }
- 
- all_defconfigs()
--- 
-1.6.0.5
+Likewise we do not pass it non-expanded parameters.
 
+	Sam
