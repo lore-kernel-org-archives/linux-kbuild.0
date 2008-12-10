@@ -1,50 +1,38 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepb.post.tele.dk ([195.41.46.236]:48808 "EHLO
-	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754297AbYLJUiS (ORCPT
+Received: from hrndva-omtalb.mail.rr.com ([71.74.56.124]:43068 "EHLO
+	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751820AbYLJUoe (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 10 Dec 2008 15:38:18 -0500
-Date: Wed, 10 Dec 2008 21:39:45 +0100
-From: Sam Ravnborg <sam@ravnborg.org>
+	Wed, 10 Dec 2008 15:44:34 -0500
+Date: Wed, 10 Dec 2008 15:44:32 -0500 (EST)
+From: Steven Rostedt <rostedt@goodmis.org>
 Subject: Re: Better way to force a rebuild
-Message-ID: <20081210203945.GB16674@uranus.ravnborg.org>
-References: <alpine.DEB.1.10.0812101443550.11805@gandalf.stny.rr.com> <20081210200242.GA15692@uranus.ravnborg.org> <alpine.DEB.1.10.0812101524230.11805@gandalf.stny.rr.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <alpine.DEB.1.10.0812101524230.11805@gandalf.stny.rr.com>
+In-Reply-To: <20081210203740.GA16674@uranus.ravnborg.org>
+Message-ID: <alpine.DEB.1.10.0812101541220.11805@gandalf.stny.rr.com>
+References: <alpine.DEB.1.10.0812101443550.11805@gandalf.stny.rr.com> <20081210200242.GA15692@uranus.ravnborg.org> <20081210121048.6186eaf9.akpm@linux-foundation.org> <20081210203740.GA16674@uranus.ravnborg.org>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Steven Rostedt <rostedt@goodmis.org>
-Cc: linux-kbuild@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, zippel@linux-m68k.org, Ingo Molnar <mingo@elte.hu>, Andrew Morton <akpm@linux-foundation.org>
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: Andrew Morton <akpm@linux-foundation.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, zippel@linux-m68k.org, mingo@elte.hu
 
-On Wed, Dec 10, 2008 at 03:26:14PM -0500, Steven Rostedt wrote:
-> > 
-> > 	Sam
-> > 
+
+On Wed, 10 Dec 2008, Sam Ravnborg wrote:
 > 
-> BTW, Sam, are you the new (or current) maintainer of kbuild/kconfig? If 
-> so, then we need to update MAINTAINERS.  I just notice that you reply to 
-> my kbuild questions more than anybody else (except for Andrew, but he 
-> doesn't count ;-)
+> I will fix the record_mcount stuff somehow.
+> But not tonight. Busy with work-work.
 
-From MAINTAINERS:
-KERNEL BUILD (kbuild: Makefile, scripts/Makefile.*)
-P:      Sam Ravnborg
-M:      sam@ravnborg.org
-T:      git kernel.org:/pub/scm/linux/kernel/git/sam/kbuild-next.git
-T:      git kernel.org:/pub/scm/linux/kernel/git/sam/kbuild-fixes.git
-L:      linux-kbuild@vger.kernel.org
-S:      Maintained
+Sam, Thanks!
 
+No hurry, I was doing some clean ups when I came across that code, and 
+said to myself "what an ugly hack!", and I wanted it fixed. The current 
+hack works just fine, but it is an eye sore in the kernel.
 
-Roman Zippel is the maintainer of kconfig and we pass the
-patches via me.
-Again from MAINTAINERS:
-KCONFIG
-P:      Roman Zippel
-M:      zippel@linux-m68k.org
-L:      linux-kbuild@vger.kernel.org
-S:      Maintained
+I just wanted others to know that it needed to be cleaned up, and figured 
+a post would help get it done.
 
-	Sam
+Thanks,
+
+-- Steve
+
