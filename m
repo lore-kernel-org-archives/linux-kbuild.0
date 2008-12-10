@@ -1,58 +1,26 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp1.linux-foundation.org ([140.211.169.13]:48327 "EHLO
-	smtp1.linux-foundation.org" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1752501AbYLJULS (ORCPT
+Received: from hrndva-omtalb.mail.rr.com ([71.74.56.125]:45258 "EHLO
+	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753766AbYLJUT6 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 10 Dec 2008 15:11:18 -0500
-Date: Wed, 10 Dec 2008 12:10:48 -0800
-From: Andrew Morton <akpm@linux-foundation.org>
+	Wed, 10 Dec 2008 15:19:58 -0500
+Date: Wed, 10 Dec 2008 15:19:56 -0500 (EST)
+From: Steven Rostedt <rostedt@goodmis.org>
 Subject: Re: Better way to force a rebuild
-Message-Id: <20081210121048.6186eaf9.akpm@linux-foundation.org>
 In-Reply-To: <20081210200242.GA15692@uranus.ravnborg.org>
-References: <alpine.DEB.1.10.0812101443550.11805@gandalf.stny.rr.com>
-	<20081210200242.GA15692@uranus.ravnborg.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Message-ID: <alpine.DEB.1.10.0812101515400.11805@gandalf.stny.rr.com>
+References: <alpine.DEB.1.10.0812101443550.11805@gandalf.stny.rr.com> <20081210200242.GA15692@uranus.ravnborg.org>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Sam Ravnborg <sam@ravnborg.org>
-Cc: rostedt@goodmis.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, zippel@linux-m68k.org, mingo@elte.hu
+Cc: linux-kbuild@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, zippel@linux-m68k.org, Ingo Molnar <mingo@elte.hu>, Andrew Morton <akpm@linux-foundation.org>
 
-On Wed, 10 Dec 2008 21:02:42 +0100
-Sam Ravnborg <sam@ravnborg.org> wrote:
+
+On Wed, 10 Dec 2008, Sam Ravnborg wrote:
 
 > On Wed, Dec 10, 2008 at 02:48:35PM -0500, Steven Rostedt wrote:
-> > 
-> > Hi,
-> > 
-> > In include/linux/kernel.h I currently have the following lines at the 
-> > bottom of the file:
-> > 
-> > /* Rebuild everything on CONFIG_FTRACE_MCOUNT_RECORD */
-> > #ifdef CONFIG_FTRACE_MCOUNT_RECORD
-> > # define REBUILD_DUE_TO_FTRACE_MCOUNT_RECORD
-> > #endif
-> > 
-> > 
-> > This is only there to force a rebuild of all files when 
-> > CONFIG_FTRACE_MCOUNT_RECORD is modified. Since the modification of that 
-> > config causes the build to act different, we need to rebuild all C 
-> > objects. I added the #ifdef in kernel.h as a hack to force the rebuild by 
-> > the config dependencies used in kbuild.
-> > 
-> > My question is, is there a better way to force a full rebuild on a 
-> > modification of a config?
-> 
-> Why is that hack required in the first place?
-> We rebuild if:
-> - target file is missing (not the case here)
-> - any prerequisite files are newer than target (not the case here)
-> - any CONFIG_* options used by any prerequisite has changed (not the case here)
->   [It is due to your hack]
-> - gcc changed (not the case here)
-> - options are added/deleted to gcc (this should be the case for relevant files)
-> 
 > 
 > Looking a bit deeper into this.
 > I see that we have in Makefile.build:
@@ -67,7 +35,10 @@ Sam Ravnborg <sam@ravnborg.org> wrote:
 > That should be doable - and it is indeed a bug that we do not do so.
 > The integration of record_mcount needs to be improved.
 
-Yes, changing the state of CONFIG_CC_OPTIMIZE_FOR_SIZE does exactly
-what Steven wants.
+Yes, that is exactly what I want. Now the next step is to implement this. 
+I'm not that strong on the kbuild system to know how.
 
-But damn me it's hard to work out where and how this is implemented :(
+Thanks,
+
+-- Steve
+
