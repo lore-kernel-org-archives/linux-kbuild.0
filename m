@@ -1,36 +1,110 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepb.post.tele.dk ([195.41.46.236]:48805 "EHLO
-	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752976AbYLISCh (ORCPT
+Received: from smtp.wellnetcz.com ([212.24.148.102]:60486 "EHLO
+	smtp.wellnetcz.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754278AbYLJMKX (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 9 Dec 2008 13:02:37 -0500
-Date: Tue, 9 Dec 2008 19:04:05 +0100
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: Merge headerfiles for m68k and m68knommu to arch/m68k/include/asm
-Message-ID: <20081209180405.GA5890@uranus.ravnborg.org>
-References: <20081208205814.GA22697@uranus.ravnborg.org> <20081209054528.GA1407@uranus.ravnborg.org> <Pine.LNX.4.64.0812090921310.29640@anakin> <200812091202.47150.arnd@arndb.de>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <200812091202.47150.arnd@arndb.de>
+	Wed, 10 Dec 2008 07:10:23 -0500
+From: Jiri Slaby <jirislaby@gmail.com>
+Subject: [PATCH 1/1] makesystem: revive cscope target
+Date: Wed, 10 Dec 2008 13:10:13 +0100
+Message-Id: <1228911013-25641-1-git-send-email-jirislaby@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: Geert Uytterhoeven <geert@linux-m68k.org>, Roman Zippel <zippel@linux-m68k.org>, linux-m68k <linux-m68k@vger.kernel.org>, Greg Ungerer <gerg@uclinux.org>, uclinux-dev <uclinux-dev@uclinux.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: sam@ravnborg.org
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Jiri Slaby <jirislaby@gmail.com>
 
-On Tue, Dec 09, 2008 at 12:02:46PM +0100, Arnd Bergmann wrote:
-> On Tuesday 09 December 2008, Geert Uytterhoeven wrote:
-> > What are the other exported headers that differ?
-> 
-> byteorder.h, param.h, ptrace.h, setup.h, sigcontext.h, siginfo.h, signal.h
-> and unistd.h.
+- export src and obj, so that we can check them in tags.sh
+- don't allow * expansion during sh function calls
 
-And diffing these files for the most part it looked like
-a simple job for someone with some basic m68k/m68knommu knowledge
-to unify these.
+Signed-off-by: Jiri Slaby <jirislaby@gmail.com>
+Cc: Sam Ravnborg <sam@ravnborg.org>
+---
+ Makefile        |    2 +-
+ scripts/tags.sh |   22 +++++++++++-----------
+ 2 files changed, 12 insertions(+), 12 deletions(-)
 
-That would be a natural next step when the headers
-are unified. I do not see it as a prerequisite for the
-merge of the header files.
+diff --git a/Makefile b/Makefile
+index 8f4f626..a094d74 100644
+--- a/Makefile
++++ b/Makefile
+@@ -156,7 +156,7 @@ obj		:= $(objtree)
+ 
+ VPATH		:= $(srctree)$(if $(KBUILD_EXTMOD),:$(KBUILD_EXTMOD))
+ 
+-export srctree objtree VPATH TOPDIR
++export src obj srctree objtree VPATH TOPDIR
+ 
+ 
+ # SUBARCH tells the usermode build what the underlying arch is.  That is set
+diff --git a/scripts/tags.sh b/scripts/tags.sh
+index 47274dc..3b7225c 100644
+--- a/scripts/tags.sh
++++ b/scripts/tags.sh
+@@ -21,25 +21,25 @@ ignore="( -name SCCS -o -name BitKeeper -o -name .svn -o \
+ if [ ${src} == ${obj} ]; then
+ 	tree=
+ else
+-	tree=${srctree}
++	tree=${srctree}/
+ fi
+ 
+ # find sources in arch/$ARCH
+ find_arch_sources()
+ {
+-	find ${tree}arch/$1 $ignore -name $2 -print;
++	find ${tree}arch/$1 $ignore -name "$2" -print;
+ }
+ 
+ # find sources in arch/$1/include
+ find_arch_include_sources()
+ {
+-	find ${tree}arch/$1/include $ignore -name $2 -print;
++	find ${tree}arch/$1/include $ignore -name "$2" -print;
+ }
+ 
+ # find sources in include/
+ find_include_sources()
+ {
+-	find ${tree}include $ignore -name config -prune -o -name $1 -print;
++	find ${tree}include $ignore -name config -prune -o -name "$1" -print;
+ }
+ 
+ # find sources in rest of tree
+@@ -48,27 +48,27 @@ find_other_sources()
+ {
+ 	find ${tree}* $ignore \
+ 	     \( -name include -o -name arch -o -name '.tmp_*' \) -prune -o \
+-	       -name $1 -print;
++	       -name "$1" -print;
+ }
+ 
+ find_sources()
+ {
+-	find_arch_sources $1 $2
+-	find_include_sources $2
+-	find_other_sources $2
++	find_arch_sources $1 "$2"
++	find_include_sources "$2"
++	find_other_sources "$2"
+ }
+ 
+ all_sources()
+ {
+-	find_sources $SRCARCH *.[chS]
++	find_sources $SRCARCH '*.[chS]'
+ 	if [ ! -z "$archinclude" ]; then
+-		find_arch_include_sources $archinclude *.[chS]
++		find_arch_include_sources $archinclude '*.[chS]'
+ 	fi
+ }
+ 
+ all_kconfigs()
+ {
+-	find_sources $SRCARCH "Kconfig*"
++	find_sources $SRCARCH 'Kconfig*'
+ }
+ 
+ all_defconfigs()
+-- 
+1.6.0.5
 
-	Sam
