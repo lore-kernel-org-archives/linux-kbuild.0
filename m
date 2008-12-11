@@ -1,56 +1,99 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from moutng.kundenserver.de ([212.227.17.9]:52210 "EHLO
-	moutng.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1758263AbYLKQxr (ORCPT
+Received: from nelson.telenet-ops.be ([195.130.133.66]:41142 "EHLO
+	nelson.telenet-ops.be" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755654AbYLKUQu (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 11 Dec 2008 11:53:47 -0500
-From: Arnd Bergmann <arnd@arndb.de>
+	Thu, 11 Dec 2008 15:16:50 -0500
+Date: Thu, 11 Dec 2008 21:16:47 +0100 (CET)
+From: Geert Uytterhoeven <geert@linux-m68k.org>
 Subject: Re: Merge headerfiles for m68k and m68knommu to arch/m68k/include/asm
-Date: Thu, 11 Dec 2008 17:48:18 +0100
-References: <20081208205814.GA22697@uranus.ravnborg.org> <Pine.LNX.4.64.0812110932510.7310@anakin> <je1vwfuk47.fsf@sykes.suse.de>
-In-Reply-To: <je1vwfuk47.fsf@sykes.suse.de>
+In-Reply-To: <Pine.LNX.4.64.0812110932510.7310@anakin>
+Message-ID: <Pine.LNX.4.64.0812112116060.333@anakin>
+References: <20081208205814.GA22697@uranus.ravnborg.org>
+ <Pine.LNX.4.64.0812082359190.29640@anakin> <200812090026.06689.arnd@arndb.de>
+ <20081209054528.GA1407@uranus.ravnborg.org> <Pine.LNX.4.64.0812110932510.7310@anakin>
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-Message-Id: <200812111748.20012.arnd@arndb.de>
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andreas Schwab <schwab@suse.de>
-Cc: Geert Uytterhoeven <geert@linux-m68k.org>, Sam Ravnborg <sam@ravnborg.org>, Roman Zippel <zippel@linux-m68k.org>, linux-m68k <linux-m68k@vger.kernel.org>, Greg Ungerer <gerg@uclinux.org>, uclinux-dev <uclinux-dev@uclinux.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: Arnd Bergmann <arnd@arndb.de>, Roman Zippel <zippel@linux-m68k.org>, linux-m68k <linux-m68k@vger.kernel.org>, Greg Ungerer <gerg@uclinux.org>, uclinux-dev <uclinux-dev@uclinux.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-On Thursday 11 December 2008, Andreas Schwab wrote:
-> Geert Uytterhoeven <geert@linux-m68k.org> writes:
+On Thu, 11 Dec 2008, Geert Uytterhoeven wrote:
+> On Tue, 9 Dec 2008, Sam Ravnborg wrote:
+> > On Tue, Dec 09, 2008 at 12:26:05AM +0100, Arnd Bergmann wrote:
+> > > On Tuesday 09 December 2008, Geert Uytterhoeven wrote:
+> > > > > I have used the following include guard:
+> > > > > 
+> > > > > #ifdef __uClinux__
+> > > > > #include "atomic_no.h"
+> > > > > #else
+> > > > > #include "atomic_mm.h"
+> > > > > #endif
+> > > > > 
+> > > > > gcc -E -dM for the two compilers revealed that this was the
+> > > > > only symbol that differed.
+> > > > 
+> > > > I think you can share a toolchain for m68k and m68knommu, at least for the
+> > > > kernel (I used my plain m68k toolchain when experimenting with m68knommu for
+> > > > Amiga).
+> > > > 
+> > > > > With the above construct we do the "right thing" also for
+> > > > > headers exported to userspace.
+> > > > > But actually none of the headers using the above are
+> > > > > subject for export at the moment so we could use a
+> > > > > CONFIG_ symbol for the same.
+> > > > 
+> > > > So I prefer to just check CONFIG_MMU.
+> > > 
+> > > Some of them are, by means of include/asm-generic/Kbuild.asm, e.g.
+> > > unistd.h!
+> > I was fooled by make headers_check showing no errros.
+> > But it turns out that headers_check does not recognize
+> > includes made with "".
+> > 
+> > So I will update the patch to include revevant *_{no,mm}.h files
+> > in Kbuild.
+> > 
+> > > I'm not sure if it's entirely correct, but I think you can use
+> > > 
+> > > #ifdef __KERNEL__
+> > > # ifdef CONFIG_MMU
+> > > #  include "atomic_mm.h
+> > > # else
+> > > #  include "atomic_no.h
+> > > # endif
+> > > #else
+> > > # ifndef __uClinux__
+> > > #  include "atomic_mm.h
+> > > # else
+> > > #  include "atomic_no.h
+> > > # endif
+> > > #endif
+> > 
+> > Can someone with a shared (m68k/m68knommu) please check if
+> > __uClinux__ is only set in the m68knommu case.
+> > 
+> > Use:
+> > 
+> >     touch foo.h; gcc -E -dM
+> > 
+> > to see what is defined by the compiler.
+> > You will also need to specify if this is for m68k or m68knommu.
 > 
-> > None of my m68k-linux compilers set __uClinux__, as expected.
+> Any comments from the m68knommu toolchain people?
 > 
-> IIUC, userspace ABI is supposed to be completely identical.
+> None of my m68k-linux compilers set __uClinux__, as expected.
 
-The header files are currently different for the definitions of
-__arch__swab32, EXEC_PAGESIZE, struct sigcontext, struct siginfo,
-struct pt_regs (coldfire only) and COMMAND_LINE_SIZE.
+Can't we unifdef out in scripts/headers_install.pl based on CONFIG_MMU?
 
-I don't expect the last two to cause any trouble, but the others
-are likely to.
+Gr{oetje,eeting}s,
 
-__arch_swab32 should be protected with __mcfisaaplus__ (as it
-already is on m68knommu). 
+						Geert
 
-pt_regs on m68knommu is already screwed by itself, because it
-depends on the CONFIG_COLDFIRE symbol. I don't think that it's
-possible to build a gdb for coldfire with the current headers,
-because CONFIG_* symbols are not visible in user space.
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
 
-The signal handling ABI is currently broken on m68knommu:
-
-commit 19dbaf6f6 "m68knommu: save reg a5 on context change",
-changes the layout of struct sigcontext in an incompatible
-way from older m68knommu and all m68k versions.
-
-Prior to that, Linux-2.5.64 changed m68knommu to use the generic
-siginfo instead of the m68k compatible one, thereby removing
-uid32 support from it. This breaks when you build a libc with
-uid32 against the m68k headers.
-
-	Arnd <><
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+							    -- Linus Torvalds
