@@ -1,37 +1,30 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ns1.suse.de ([195.135.220.2]:48397 "EHLO mx1.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753924AbYLKJiu (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 11 Dec 2008 04:38:50 -0500
-From: Andreas Schwab <schwab@suse.de>
-Subject: Re: Merge headerfiles for m68k and m68knommu to arch/m68k/include/asm
-References: <20081208205814.GA22697@uranus.ravnborg.org>
-	<Pine.LNX.4.64.0812082359190.29640@anakin>
-	<200812090026.06689.arnd@arndb.de>
-	<20081209054528.GA1407@uranus.ravnborg.org>
-	<Pine.LNX.4.64.0812110932510.7310@anakin>
-Date: Thu, 11 Dec 2008 10:38:48 +0100
-In-Reply-To: <Pine.LNX.4.64.0812110932510.7310@anakin> (Geert Uytterhoeven's
-	message of "Thu, 11 Dec 2008 09:33:55 +0100 (CET)")
-Message-ID: <je1vwfuk47.fsf@sykes.suse.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
+Received: from smtp1.argonst.com ([67.220.151.134]:3366 "EHLO
+	smtp1.argonst.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756104AbYLKPpI (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 11 Dec 2008 10:45:08 -0500
+In-Reply-To: <Pine.LNX.4.64.0812091838500.27084@anakin>
+References: <20081208205814.GA22697@uranus.ravnborg.org> <Pine.LNX.4.64.0812082359190.29640@anakin> <2929E10F-8611-41C9-8B15-C734AA7D7820@argonst.com> <Pine.LNX.4.64.0812091838500.27084@anakin>
+Mime-Version: 1.0 (Apple Message framework v753.1)
+Content-Type: text/plain; charset=US-ASCII; delsp=yes; format=flowed
+Message-Id: <EB7A6806-7754-4EB5-8CCB-BCDE7380194D@argonst.com>
+Content-Transfer-Encoding: 7bit
+From: Allon Stern <Allon.Stern@argonst.com>
+Subject: Re: [uClinux-dev] Re: Merge headerfiles for m68k and m68knommu to arch/m68k/include/asm
+Date: Thu, 11 Dec 2008 10:44:49 -0500
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Geert Uytterhoeven <geert@linux-m68k.org>
-Cc: Sam Ravnborg <sam@ravnborg.org>, Arnd Bergmann <arnd@arndb.de>, Roman Zippel <zippel@linux-m68k.org>, linux-m68k <linux-m68k@vger.kernel.org>, Greg Ungerer <gerg@uclinux.org>, uclinux-dev <uclinux-dev@uclinux.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
+Cc: uClinux development list <uclinux-dev@uclinux.org>, Sam Ravnborg <sam@ravnborg.org>, linux-m68k <linux-m68k@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>, linux-kbuild <linux-kbuild@vger.kernel.org>, Roman Zippel <zippel@linux-m68k.org>, Greg Ungerer <gerg@uclinux.org>
 
-Geert Uytterhoeven <geert@linux-m68k.org> writes:
 
-> None of my m68k-linux compilers set __uClinux__, as expected.
+On Dec 9, 2008, at 12:39 PM, Geert Uytterhoeven wrote:
+> Sure, but that one is nicely protected by "#if defined  
+> (__mcfisaaplus__) ||
+> defined (__mcfisac__)", right?
 
-IIUC, userspace ABI is supposed to be completely identical.
-
-Andreas.
-
--- 
-Andreas Schwab, SuSE Labs, schwab@suse.de
-SuSE Linux Products GmbH, Maxfeldstraße 5, 90409 Nürnberg, Germany
-PGP key fingerprint = 58CA 54C7 6D53 942B 1756  01D3 44D5 214B 8276 4ED5
-"And now for something completely different."
+Well, that was the patch we had to apply.
+It wasn't in the baseline kernel.org kernel.
+-
+allon
