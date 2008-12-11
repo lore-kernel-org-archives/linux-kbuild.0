@@ -1,85 +1,100 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepa.post.tele.dk ([195.41.46.235]:58429 "EHLO
-	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755166AbYLJV0w (ORCPT
+Received: from yergi.telenet-ops.be ([195.130.132.36]:42373 "EHLO
+	yergi.telenet-ops.be" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754648AbYLKIen (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 10 Dec 2008 16:26:52 -0500
-Date: Wed, 10 Dec 2008 22:28:21 +0100
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: Better way to force a rebuild
-Message-ID: <20081210212821.GA18348@uranus.ravnborg.org>
-References: <alpine.DEB.1.10.0812101443550.11805@gandalf.stny.rr.com> <20081210200242.GA15692@uranus.ravnborg.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20081210200242.GA15692@uranus.ravnborg.org>
+	Thu, 11 Dec 2008 03:34:43 -0500
+Received: from harold.telenet-ops.be (unknown [195.130.133.65])
+	by yergi.telenet-ops.be (Postfix) with ESMTP id 7698F5C8374
+	for <linux-kbuild@vger.kernel.org>; Thu, 11 Dec 2008 09:34:41 +0100 (CET)
+Date: Thu, 11 Dec 2008 09:33:55 +0100 (CET)
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Subject: Re: Merge headerfiles for m68k and m68knommu to arch/m68k/include/asm
+In-Reply-To: <20081209054528.GA1407@uranus.ravnborg.org>
+Message-ID: <Pine.LNX.4.64.0812110932510.7310@anakin>
+References: <20081208205814.GA22697@uranus.ravnborg.org>
+ <Pine.LNX.4.64.0812082359190.29640@anakin> <200812090026.06689.arnd@arndb.de>
+ <20081209054528.GA1407@uranus.ravnborg.org>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Steven Rostedt <rostedt@goodmis.org>
-Cc: linux-kbuild@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, zippel@linux-m68k.org, Ingo Molnar <mingo@elte.hu>, Andrew Morton <akpm@linux-foundation.org>
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: Arnd Bergmann <arnd@arndb.de>, Roman Zippel <zippel@linux-m68k.org>, linux-m68k <linux-m68k@vger.kernel.org>, Greg Ungerer <gerg@uclinux.org>, uclinux-dev <uclinux-dev@uclinux.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-On Wed, Dec 10, 2008 at 09:02:42PM +0100, Sam Ravnborg wrote:
-> On Wed, Dec 10, 2008 at 02:48:35PM -0500, Steven Rostedt wrote:
+On Tue, 9 Dec 2008, Sam Ravnborg wrote:
+> On Tue, Dec 09, 2008 at 12:26:05AM +0100, Arnd Bergmann wrote:
+> > On Tuesday 09 December 2008, Geert Uytterhoeven wrote:
+> > > > I have used the following include guard:
+> > > > 
+> > > > #ifdef __uClinux__
+> > > > #include "atomic_no.h"
+> > > > #else
+> > > > #include "atomic_mm.h"
+> > > > #endif
+> > > > 
+> > > > gcc -E -dM for the two compilers revealed that this was the
+> > > > only symbol that differed.
+> > > 
+> > > I think you can share a toolchain for m68k and m68knommu, at least for the
+> > > kernel (I used my plain m68k toolchain when experimenting with m68knommu for
+> > > Amiga).
+> > > 
+> > > > With the above construct we do the "right thing" also for
+> > > > headers exported to userspace.
+> > > > But actually none of the headers using the above are
+> > > > subject for export at the moment so we could use a
+> > > > CONFIG_ symbol for the same.
+> > > 
+> > > So I prefer to just check CONFIG_MMU.
 > > 
-> > Hi,
+> > Some of them are, by means of include/asm-generic/Kbuild.asm, e.g.
+> > unistd.h!
+> I was fooled by make headers_check showing no errros.
+> But it turns out that headers_check does not recognize
+> includes made with "".
+> 
+> So I will update the patch to include revevant *_{no,mm}.h files
+> in Kbuild.
+> 
 > > 
-> > In include/linux/kernel.h I currently have the following lines at the 
-> > bottom of the file:
+> > I'm not sure if it's entirely correct, but I think you can use
 > > 
-> > /* Rebuild everything on CONFIG_FTRACE_MCOUNT_RECORD */
-> > #ifdef CONFIG_FTRACE_MCOUNT_RECORD
-> > # define REBUILD_DUE_TO_FTRACE_MCOUNT_RECORD
+> > #ifdef __KERNEL__
+> > # ifdef CONFIG_MMU
+> > #  include "atomic_mm.h
+> > # else
+> > #  include "atomic_no.h
+> > # endif
+> > #else
+> > # ifndef __uClinux__
+> > #  include "atomic_mm.h
+> > # else
+> > #  include "atomic_no.h
+> > # endif
 > > #endif
-> > 
-> > 
-> > This is only there to force a rebuild of all files when 
-> > CONFIG_FTRACE_MCOUNT_RECORD is modified. Since the modification of that 
-> > config causes the build to act different, we need to rebuild all C 
-> > objects. I added the #ifdef in kernel.h as a hack to force the rebuild by 
-> > the config dependencies used in kbuild.
-> > 
-> > My question is, is there a better way to force a full rebuild on a 
-> > modification of a config?
 > 
-> Why is that hack required in the first place?
-> We rebuild if:
-> - target file is missing (not the case here)
-> - any prerequisite files are newer than target (not the case here)
-> - any CONFIG_* options used by any prerequisite has changed (not the case here)
->   [It is due to your hack]
-> - gcc changed (not the case here)
-> - options are added/deleted to gcc (this should be the case for relevant files)
+> Can someone with a shared (m68k/m68knommu) please check if
+> __uClinux__ is only set in the m68knommu case.
 > 
+> Use:
 > 
-> Looking a bit deeper into this.
-> I see that we have in Makefile.build:
+>     touch foo.h; gcc -E -dM
 > 
-> define rule_cc_o_c
->         $(call echo-cmd,checksrc) $(cmd_checksrc)                         \
->         $(call echo-cmd,cc_o_c) $(cmd_cc_o_c);                            \
->         $(cmd_modversions)                                                \
->         $(cmd_record_mcount)   
-> 
-> So you want everyting to be rebuild if the command above changes.
-> That should be doable - and it is indeed a bug that we do not do so.
-> The integration of record_mcount needs to be improved.
+> to see what is defined by the compiler.
+> You will also need to specify if this is for m68k or m68knommu.
 
-I made the following quick hack.
-I think it should do the trick.
+Any comments from the m68knommu toolchain people?
 
-	Sam
+None of my m68k-linux compilers set __uClinux__, as expected.
 
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index 468fbc9..8b5bf43 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -215,7 +215,8 @@ define rule_cc_o_c
- 	$(call echo-cmd,cc_o_c) $(cmd_cc_o_c);				  \
- 	$(cmd_modversions)						  \
- 	$(cmd_record_mcount)						  \
--	scripts/basic/fixdep $(depfile) $@ '$(call make-cmd,cc_o_c)' >    \
-+	scripts/basic/fixdep $(depfile) $@                                \
-+	'$(call make-cmd,cc_o_c) $(call make-cmd,record_mcount)' >        \
- 	                                              $(dot-target).tmp;  \
- 	rm -f $(depfile);						  \
- 	mv -f $(dot-target).tmp $(dot-target).cmd
+Gr{oetje,eeting}s,
+
+						Geert
+
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+							    -- Linus Torvalds
