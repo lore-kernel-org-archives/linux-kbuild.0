@@ -1,35 +1,92 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from moutng.kundenserver.de ([212.227.126.187]:52789 "EHLO
-	moutng.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750745AbYLMQQx (ORCPT
+Received: from pfepa.post.tele.dk ([195.41.46.235]:60371 "EHLO
+	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751277AbYLMTdi (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 13 Dec 2008 11:16:53 -0500
-From: Arnd Bergmann <arnd@arndb.de>
-Subject: Re: Merge headerfiles for m68k and m68knommu to arch/m68k/include/asm
-Date: Sat, 13 Dec 2008 17:16:30 +0100
-References: <20081208205814.GA22697@uranus.ravnborg.org> <Pine.LNX.4.64.0812110932510.7310@anakin> <Pine.LNX.4.64.0812112116060.333@anakin>
-In-Reply-To: <Pine.LNX.4.64.0812112116060.333@anakin>
-MIME-Version: 1.0
+	Sat, 13 Dec 2008 14:33:38 -0500
+Date: Sat, 13 Dec 2008 20:35:06 +0100
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: BUG: via_drmclient.h is referenced but does not exist
+Message-ID: <20081213193506.GA22969@uranus.ravnborg.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Content-Transfer-Encoding: 7bit
-Message-Id: <200812131716.31874.arnd@arndb.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Geert Uytterhoeven <geert@linux-m68k.org>
-Cc: Sam Ravnborg <sam@ravnborg.org>, Roman Zippel <zippel@linux-m68k.org>, linux-m68k <linux-m68k@vger.kernel.org>, Greg Ungerer <gerg@uclinux.org>, uclinux-dev <uclinux-dev@uclinux.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: David Airlie <airlied@linux.ie>, dri-devel <dri-devel@lists.sourceforge.net>
+Cc: LKML <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-On Thursday 11 December 2008, Geert Uytterhoeven wrote:
-> 
-> > None of my m68k-linux compilers set __uClinux__, as expected.
-> 
-> Can't we unifdef out in scripts/headers_install.pl based on CONFIG_MMU?
+Hi David et al.
 
-That should work, but I'm not convinced that it is what you want.
-If you want binaries to be used interchangably between the two,
-you really need to fix the signal handling and pt_regs on m68knommu,
-and someone should try to work out what EXEC_PAGESIZE and COMMAND_LINE_SIZE
-should really be defined to.
+After improving the headers_check.pl script to do a
+check for files included with:
 
-	Arnd <><
+	#include "foo.h"
+
+it reported the following error:
+
+/home/sam/kernel/knext.git/usr/include/drm/via_drm.h:34: included file '/home/sam/kernel/knext.git/usr/include/drm/via_drmclient.h' is not exported
+
+And indeed the file via_drmclient.h does not exist in the kernel source.
+We do not see any issue in the kernel as the include is guarded by:
+
+#ifndef __KERNEL__
+#include "via_drmclient.h"
+#endif
+
+But referring to a non-existing file is not the right thing to to.
+
+We need this check as we have several places where we do:
+
+	#include "foo.h"
+
+in our exported headers.
+
+So we need to fix drm somehow.
+
+The headers_check.pl patch is included for reference.
+
+	Sam
+
+diff --git a/scripts/headers_check.pl b/scripts/headers_check.pl
+index 488a3b1..b97341e 100644
+--- a/scripts/headers_check.pl
++++ b/scripts/headers_check.pl
+@@ -32,7 +32,7 @@ foreach my $file (@files) {
+ 	$lineno = 0;
+ 	while ($line = <FH>) {
+ 		$lineno++;
+-		check_include();
++		check_include($filename);
+ 	}
+ 	close FH;
+ }
+@@ -40,7 +40,8 @@ exit $ret;
+ 
+ sub check_include
+ {
+-	if ($line =~ m/^\s*#\s*include\s+<((asm|linux).*)>/) {
++	my ($filename) = @_;
++	if ($line =~ m/^\s*#\s*include\s+<((asm|linux)[_a-zA-Z0-9\/.]+)>/) {
+ 		my $inc = $1;
+ 		my $found;
+ 		$found = stat($dir . "/" . $inc);
+@@ -52,5 +53,18 @@ sub check_include
+ 			printf STDERR "$filename:$lineno: included file '$inc' is not exported\n";
+ 			$ret = 1;
+ 		}
++	} elsif ($line =~ m/^\s*#\s*include\s+"([_a-zA-Z0-9.]+)"/) {
++		my $inc = $1;
++		my $filedir = $filename;
++		my $found;
++
++		# drop filename part so we have only the dir part
++		$filedir =~ s/\/[_a-zA-Z0-9.]+$//;
++
++		$found = stat($filedir . "/" . $inc);
++		if (!$found) {
++			printf STDERR "$filename:$lineno: included file '$filedir/$inc' is not exported\n";
++			$ret = 1;
++		}
+ 	}
+ }
