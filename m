@@ -1,92 +1,69 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepa.post.tele.dk ([195.41.46.235]:60371 "EHLO
-	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751277AbYLMTdi (ORCPT
+Received: from pfepb.post.tele.dk ([195.41.46.236]:35376 "EHLO
+	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751328AbYLMUmK (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 13 Dec 2008 14:33:38 -0500
-Date: Sat, 13 Dec 2008 20:35:06 +0100
+	Sat, 13 Dec 2008 15:42:10 -0500
+Date: Sat, 13 Dec 2008 21:43:37 +0100
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: BUG: via_drmclient.h is referenced but does not exist
-Message-ID: <20081213193506.GA22969@uranus.ravnborg.org>
+Subject: Re: Merge headerfiles for m68k and m68knommu to arch/m68k/include/asm
+Message-ID: <20081213204337.GA27748@uranus.ravnborg.org>
+References: <20081208205814.GA22697@uranus.ravnborg.org> <Pine.LNX.4.64.0812082359190.29640@anakin> <200812090026.06689.arnd@arndb.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <200812090026.06689.arnd@arndb.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: David Airlie <airlied@linux.ie>, dri-devel <dri-devel@lists.sourceforge.net>
-Cc: LKML <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: Geert Uytterhoeven <geert@linux-m68k.org>, Roman Zippel <zippel@linux-m68k.org>, linux-m68k <linux-m68k@vger.kernel.org>, Greg Ungerer <gerg@uclinux.org>, uclinux-dev <uclinux-dev@uclinux.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-Hi David et al.
+On Tue, Dec 09, 2008 at 12:26:05AM +0100, Arnd Bergmann wrote:
+> On Tuesday 09 December 2008, Geert Uytterhoeven wrote:
+> > > I have used the following include guard:
+> > > 
+> > > #ifdef __uClinux__
+> > > #include "atomic_no.h"
+> > > #else
+> > > #include "atomic_mm.h"
+> > > #endif
+> > > 
+> > > gcc -E -dM for the two compilers revealed that this was the
+> > > only symbol that differed.
+> > 
+> > I think you can share a toolchain for m68k and m68knommu, at least for the
+> > kernel (I used my plain m68k toolchain when experimenting with m68knommu for
+> > Amiga).
+> > 
+> > > With the above construct we do the "right thing" also for
+> > > headers exported to userspace.
+> > > But actually none of the headers using the above are
+> > > subject for export at the moment so we could use a
+> > > CONFIG_ symbol for the same.
+> > 
+> > So I prefer to just check CONFIG_MMU.
+> 
+> Some of them are, by means of include/asm-generic/Kbuild.asm, e.g.
+> unistd.h!
+> 
+> I'm not sure if it's entirely correct, but I think you can use
+> 
+> #ifdef __KERNEL__
+> # ifdef CONFIG_MMU
+> #  include "atomic_mm.h
+> # else
+> #  include "atomic_no.h
+> # endif
+> #else
+> # ifndef __uClinux__
+> #  include "atomic_mm.h
+> # else
+> #  include "atomic_no.h
+> # endif
+> #endif
 
-After improving the headers_check.pl script to do a
-check for files included with:
-
-	#include "foo.h"
-
-it reported the following error:
-
-/home/sam/kernel/knext.git/usr/include/drm/via_drm.h:34: included file '/home/sam/kernel/knext.git/usr/include/drm/via_drmclient.h' is not exported
-
-And indeed the file via_drmclient.h does not exist in the kernel source.
-We do not see any issue in the kernel as the include is guarded by:
-
-#ifndef __KERNEL__
-#include "via_drmclient.h"
-#endif
-
-But referring to a non-existing file is not the right thing to to.
-
-We need this check as we have several places where we do:
-
-	#include "foo.h"
-
-in our exported headers.
-
-So we need to fix drm somehow.
-
-The headers_check.pl patch is included for reference.
+I kept the original way of doing it since all reports said that
+__uClinux__ is set by the m68knommu toolchain.
+Using only this symbol makes it simpler what happens.
 
 	Sam
-
-diff --git a/scripts/headers_check.pl b/scripts/headers_check.pl
-index 488a3b1..b97341e 100644
---- a/scripts/headers_check.pl
-+++ b/scripts/headers_check.pl
-@@ -32,7 +32,7 @@ foreach my $file (@files) {
- 	$lineno = 0;
- 	while ($line = <FH>) {
- 		$lineno++;
--		check_include();
-+		check_include($filename);
- 	}
- 	close FH;
- }
-@@ -40,7 +40,8 @@ exit $ret;
- 
- sub check_include
- {
--	if ($line =~ m/^\s*#\s*include\s+<((asm|linux).*)>/) {
-+	my ($filename) = @_;
-+	if ($line =~ m/^\s*#\s*include\s+<((asm|linux)[_a-zA-Z0-9\/.]+)>/) {
- 		my $inc = $1;
- 		my $found;
- 		$found = stat($dir . "/" . $inc);
-@@ -52,5 +53,18 @@ sub check_include
- 			printf STDERR "$filename:$lineno: included file '$inc' is not exported\n";
- 			$ret = 1;
- 		}
-+	} elsif ($line =~ m/^\s*#\s*include\s+"([_a-zA-Z0-9.]+)"/) {
-+		my $inc = $1;
-+		my $filedir = $filename;
-+		my $found;
-+
-+		# drop filename part so we have only the dir part
-+		$filedir =~ s/\/[_a-zA-Z0-9.]+$//;
-+
-+		$found = stat($filedir . "/" . $inc);
-+		if (!$found) {
-+			printf STDERR "$filename:$lineno: included file '$filedir/$inc' is not exported\n";
-+			$ret = 1;
-+		}
- 	}
- }
