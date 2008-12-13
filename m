@@ -1,82 +1,48 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepb.post.tele.dk ([195.41.46.236]:55907 "EHLO
+Received: from pfepb.post.tele.dk ([195.41.46.236]:58812 "EHLO
 	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753619AbYLMXNF (ORCPT
+	with ESMTP id S1751884AbYLMXPc (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 13 Dec 2008 18:13:05 -0500
-Date: Sun, 14 Dec 2008 00:14:34 +0100
+	Sat, 13 Dec 2008 18:15:32 -0500
+Date: Sun, 14 Dec 2008 00:16:54 +0100
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH 1/1] tags.sh: fix string equality testing
-Message-ID: <20081213231434.GB32331@uranus.ravnborg.org>
-References: <1228913318-6003-1-git-send-email-jirislaby@gmail.com>
+Subject: Re: Better way to force a rebuild
+Message-ID: <20081213231654.GA32446@uranus.ravnborg.org>
+References: <alpine.DEB.1.10.0812101443550.11805@gandalf.stny.rr.com> <20081210200242.GA15692@uranus.ravnborg.org> <20081210212821.GA18348@uranus.ravnborg.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1228913318-6003-1-git-send-email-jirislaby@gmail.com>
+In-Reply-To: <20081210212821.GA18348@uranus.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jiri Slaby <jirislaby@gmail.com>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Steven Rostedt <rostedt@goodmis.org>
+Cc: linux-kbuild@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, zippel@linux-m68k.org, Ingo Molnar <mingo@elte.hu>, Andrew Morton <akpm@linux-foundation.org>
 
-On Wed, Dec 10, 2008 at 01:48:38PM +0100, Jiri Slaby wrote:
-> Test of string equality in shells is =, not C-like ==.
+On Wed, Dec 10, 2008 at 10:28:21PM +0100, Sam Ravnborg wrote:
 > 
-> Signed-off-by: Jiri Slaby <jirislaby@gmail.com>
+> I made the following quick hack.
+> I think it should do the trick.
+> 
+> 	Sam
+> 
+> diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+> index 468fbc9..8b5bf43 100644
+> --- a/scripts/Makefile.build
+> +++ b/scripts/Makefile.build
+> @@ -215,7 +215,8 @@ define rule_cc_o_c
+>  	$(call echo-cmd,cc_o_c) $(cmd_cc_o_c);				  \
+>  	$(cmd_modversions)						  \
+>  	$(cmd_record_mcount)						  \
+> -	scripts/basic/fixdep $(depfile) $@ '$(call make-cmd,cc_o_c)' >    \
+> +	scripts/basic/fixdep $(depfile) $@                                \
+> +	'$(call make-cmd,cc_o_c) $(call make-cmd,record_mcount)' >        \
+>  	                                              $(dot-target).tmp;  \
+>  	rm -f $(depfile);						  \
+>  	mv -f $(dot-target).tmp $(dot-target).cmd
 
-Here I also did some local modifcations.
-See below.
+Hi Steven.
+
+Did you try the above?
+If it works I will add it to kbuild-next.git
 
 	Sam
-
-From 91a70f60c285587826702a93ae924e7b9d761f94 Mon Sep 17 00:00:00 2001
-From: Jiri Slaby <jirislaby@gmail.com>
-Date: Wed, 10 Dec 2008 13:48:38 +0100
-Subject: [PATCH] kbuild: fix string equality testing in tags.sh
-
-Test of string equality in shells is =, not C-like ==.
-
-Signed-off-by: Jiri Slaby <jirislaby@gmail.com>
-Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
----
- scripts/tags.sh |   10 +++++-----
- 1 files changed, 5 insertions(+), 5 deletions(-)
-
-diff --git a/scripts/tags.sh b/scripts/tags.sh
-index 3c814ba..4e75472 100755
---- a/scripts/tags.sh
-+++ b/scripts/tags.sh
-@@ -7,7 +7,7 @@
- # Uses the following environment variables:
- # ARCH, SUBARCH, srctree, src, obj
- 
--if [ $KBUILD_VERBOSE == 1 ]; then
-+if [ "$KBUILD_VERBOSE" = "1" ]; then
- 	set -x
- fi
- 
-@@ -18,7 +18,7 @@ ignore="( -name SCCS -o -name BitKeeper -o -name .svn -o \
-           -prune -o"
- 
- # Do not use full path is we do not use O=.. builds
--if [ "${KBUILD_SRC}" == "" ]; then
-+if [ "${KBUILD_SRC}" = "" ]; then
- 	tree=
- else
- 	tree=${srctree}/
-@@ -135,10 +135,10 @@ xtags()
- 
- 
- # Support um (which uses SUBARCH)
--if [ ${ARCH} == um ]; then
--	if [ $SUBARCH == i386 ]; then
-+if [ "${ARCH}" = "um" ]; then
-+	if [ "$SUBARCH" = "i386" ]; then
- 		archinclude=x86
--	elif [ $SUBARCH == x86_64 ]; then
-+	elif [ "$SUBARCH" = "x86_64" ]; then
- 		archinclude=x86
- 	else
- 		archinclude=${SUBARCH}
--- 
-1.5.6.GIT
-
