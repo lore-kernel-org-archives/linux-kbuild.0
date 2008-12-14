@@ -1,48 +1,153 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepb.post.tele.dk ([195.41.46.236]:58812 "EHLO
-	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751884AbYLMXPc (ORCPT
+Received: from harold.telenet-ops.be ([195.130.133.65]:55279 "EHLO
+	harold.telenet-ops.be" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753290AbYLNQNy (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 13 Dec 2008 18:15:32 -0500
-Date: Sun, 14 Dec 2008 00:16:54 +0100
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: Better way to force a rebuild
-Message-ID: <20081213231654.GA32446@uranus.ravnborg.org>
-References: <alpine.DEB.1.10.0812101443550.11805@gandalf.stny.rr.com> <20081210200242.GA15692@uranus.ravnborg.org> <20081210212821.GA18348@uranus.ravnborg.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20081210212821.GA18348@uranus.ravnborg.org>
+	Sun, 14 Dec 2008 11:13:54 -0500
+Date: Sun, 14 Dec 2008 17:13:51 +0100 (CET)
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Subject: Re: [PATCH] m68k,m68knommu: merge header files
+In-Reply-To: <20081213205828.GD27748@uranus.ravnborg.org>
+Message-ID: <Pine.LNX.4.64.0812141710530.5936@anakin>
+References: <20081208205814.GA22697@uranus.ravnborg.org>
+ <20081213205251.GC27748@uranus.ravnborg.org> <20081213205828.GD27748@uranus.ravnborg.org>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Steven Rostedt <rostedt@goodmis.org>
-Cc: linux-kbuild@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, zippel@linux-m68k.org, Ingo Molnar <mingo@elte.hu>, Andrew Morton <akpm@linux-foundation.org>
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: Roman Zippel <zippel@linux-m68k.org>, linux-m68k <linux-m68k@vger.kernel.org>, Greg Ungerer <gerg@uclinux.org>, uclinux-dev <uclinux-dev@uclinux.org>, Arnd Bergmann <arnd@arndb.de>, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-On Wed, Dec 10, 2008 at 10:28:21PM +0100, Sam Ravnborg wrote:
+On Sat, 13 Dec 2008, Sam Ravnborg wrote:
+> >From 5a8b9717a399679c4753e596ea864b02a1197025 Mon Sep 17 00:00:00 2001
+> From: Sam Ravnborg <sam@ravnborg.org>
+> Date: Sat, 13 Dec 2008 21:23:08 +0100
+> Subject: [PATCH] m68k,m68knommu: merge header files
 > 
-> I made the following quick hack.
-> I think it should do the trick.
+> Merge header files for m68k and m68knommu to the single location:
 > 
-> 	Sam
+>     arch/m68k/include/asm
 > 
-> diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-> index 468fbc9..8b5bf43 100644
-> --- a/scripts/Makefile.build
-> +++ b/scripts/Makefile.build
-> @@ -215,7 +215,8 @@ define rule_cc_o_c
->  	$(call echo-cmd,cc_o_c) $(cmd_cc_o_c);				  \
->  	$(cmd_modversions)						  \
->  	$(cmd_record_mcount)						  \
-> -	scripts/basic/fixdep $(depfile) $@ '$(call make-cmd,cc_o_c)' >    \
-> +	scripts/basic/fixdep $(depfile) $@                                \
-> +	'$(call make-cmd,cc_o_c) $(call make-cmd,record_mcount)' >        \
->  	                                              $(dot-target).tmp;  \
->  	rm -f $(depfile);						  \
->  	mv -f $(dot-target).tmp $(dot-target).cmd
+> The majority of this patch was the result of the
+> script that is included in the changelog below.
+> 
+> The script was originally written by Arnd Bergman and
+                                            ^^^^^^^
+					    Bergmann
+> exten by me to cover a few more files.
+  ^^^^^
+  extended
 
-Hi Steven.
+> When the header files differed the script uses the following:
+> 
+> The original m68k file is named <file>_mm.h  [mm for memory manager]
+> The m68knommu file is named <file>_no.h [no for no memory manager]
+> 
+> The files uses the following include guard:
+> 
+> This include gaurd works as the m68knommu toolchain set
+               ^^^^^
+	       guard
+> the __uClinux__ symbol - so this should work in userspace too.
+> 
+> Merging the header files for m68k and m68knommu exposes the
+> (unexpected?) ABI differences thus it is easier to actually
+> identify these and thus to fix them.
+> 
+> The commit has been build tested with both a m68k and
+> a m68knommu toolchain - with success.
+> 
+> The commit has also been tested with "make headers_check"
+> and this patch fixes make headers_check for m68knommu.
+> 
+> The script used:
+> TARGET=arch/m68k/include/asm
+> SOURCE=arch/m68knommu/include/asm
+> 
+> INCLUDE="cachectl.h errno.h fcntl.h hwtest.h ioctls.h ipcbuf.h \
+> linkage.h math-emu.h md.h mman.h movs.h msgbuf.h openprom.h \
+> oplib.h poll.h posix_types.h resource.h rtc.h sembuf.h shmbuf.h \
+> shm.h shmparam.h socket.h sockios.h spinlock.h statfs.h stat.h \
+> termbits.h termios.h tlb.h types.h user.h"
+> 
+> EQUAL="auxvec.h cputime.h device.h emergency-restart.h futex.h \
+> ioctl.h irq_regs.h kdebug.h local.h mutex.h percpu.h \
+> sections.h topology.h"
+> 
+> NOMUUFILES="anchor.h bootstd.h coldfire.h commproc.h dbg.h \
+  ^^^^^^^^^^
+  NOMMUFILES (as the same typo is present in the other parts of the script
+              it still worked ;-)
 
-Did you try the above?
-If it works I will add it to kbuild-next.git
+> elia.h flat.h m5206sim.h m520xsim.h m523xsim.h m5249sim.h \
+> m5272sim.h m527xsim.h m528xsim.h m5307sim.h m532xsim.h \
+> m5407sim.h m68360_enet.h m68360.h m68360_pram.h m68360_quicc.h \
+> m68360_regs.h MC68328.h MC68332.h MC68EZ328.h MC68VZ328.h \
+> mcfcache.h mcfdma.h mcfmbus.h mcfne.h mcfpci.h mcfpit.h \
+> mcfsim.h mcfsmc.h mcftimer.h mcfuart.h mcfwdebug.h \
+> nettel.h quicc_simple.h smp.h"
+> 
+> FILES="atomic.h bitops.h bootinfo.h bug.h bugs.h byteorder.h cache.h \
+> cacheflush.h checksum.h current.h delay.h div64.h \
+> dma-mapping.h dma.h elf.h entry.h fb.h fpu.h hardirq.h hw_irq.h io.h \
+> irq.h kmap_types.h machdep.h mc146818rtc.h mmu.h mmu_context.h \
+> module.h page.h page_offset.h param.h pci.h pgalloc.h \
+> pgtable.h processor.h ptrace.h scatterlist.h segment.h \
+> setup.h sigcontext.h siginfo.h signal.h string.h system.h \
+> thread_info.h timex.h tlbflush.h traps.h uaccess.h ucontext.h \
+> unaligned.h unistd.h"
+> 
+> mergefile() {
+> 	BASE=${1%.h}
+> 	git mv ${SOURCE}/$1 ${TARGET}/${BASE}_no.h
+> 	git mv ${TARGET}/$1 ${TARGET}/${BASE}_mm.h
+> 
+> cat << EOF > ${TARGET}/$1
+> EOF
+> 
+> 	git add ${TARGET}/$1
+> }
+> 
+> set -e
+> 
+> mkdir -p ${TARGET}
+> 
+> git mv include/asm-m68k/* ${TARGET}
+> rmdir include/asm-m68k
+> 
+> git rm ${SOURCE}/Kbuild
+> for F in $INCLUDE $EQUAL; do
+> 	git rm ${SOURCE}/$F
+> done
+> 
+> for F in $NOMUUFILES; do
+> 	git mv ${SOURCE}/$F ${TARGET}/$F
+> done
+> 
+> for F in $FILES ; do
+> 	mergefile $F
+> done
+> 
+> rmdir arch/m68knommu/include/asm
+> rmdir arch/m68knommu/include
+> 
+> Cc: Arnd Bergmann <arnd@arndb.de>
+> Cc: Geert Uytterhoeven <geert@linux-m68k.org>
+> Cc: Greg Ungerer <gerg@uclinux.org>
+> Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
 
-	Sam
+m68k-bits are
+Acked-by: Geert Uytterhoeven <geert@linux-m68k.org>
+
+Thanks a lot, Arnd, Sam!
+
+Gr{oetje,eeting}s,
+
+						Geert
+
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+							    -- Linus Torvalds
