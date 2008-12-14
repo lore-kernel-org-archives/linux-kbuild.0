@@ -1,72 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ns2.gothnet.se ([82.193.160.251]:14513 "EHLO
-	GOTHNET-SMTP2.gothnet.se" rhost-flags-OK-OK-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1753363AbYLNQOS (ORCPT
+Received: from yorgi.telenet-ops.be ([195.130.133.69]:59921 "EHLO
+	yorgi.telenet-ops.be" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752939AbYLNQbm (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 14 Dec 2008 11:14:18 -0500
-Message-ID: <49452CEE.1090909@shipmail.org>
-Date: Sun, 14 Dec 2008 16:57:34 +0100
-From: =?ISO-8859-1?Q?Thomas_Hellstr=F6m?= <thomas@shipmail.org>
+	Sun, 14 Dec 2008 11:31:42 -0500
+Received: from edna.telenet-ops.be (edna.telenet-ops.be [195.130.132.58])
+	by yorgi.telenet-ops.be (Postfix) with ESMTP id 419AA680B64
+	for <linux-kbuild@vger.kernel.org>; Sun, 14 Dec 2008 17:31:41 +0100 (CET)
+Date: Sun, 14 Dec 2008 17:31:08 +0100 (CET)
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Subject: make headers_install: .install and ..install.cmd
+Message-ID: <Pine.LNX.4.64.0812141728370.5714@anakin>
 MIME-Version: 1.0
-Subject: Re: BUG: via_drmclient.h is referenced but does not exist
-References: <20081213193506.GA22969@uranus.ravnborg.org>
-In-Reply-To: <20081213193506.GA22969@uranus.ravnborg.org>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Sam Ravnborg <sam@ravnborg.org>
-Cc: David Airlie <airlied@linux.ie>, dri-devel <dri-devel@lists.sourceforge.net>, LKML <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
+Cc: linux-kbuild@vger.kernel.org, Linux Kernel Development <linux-kernel@vger.kernel.org>
 
-Hi!
+	Hi Sam,
 
-The intention is for via_drm.h to be self-containing when included both 
-for a kernel build and for a user-space build. In this particular case, 
-via_drmclient.h lives in the user-space clients and includes stdint.h to 
-get access to uint32_t and friends.
+When I use `make ARCH=m68k INSTALL_HDR_PATH=/tmp/headers headers_install',
+I get lots of `.install' and `..install.cmd' files in /tmp/headers and its
+subdirectories.
 
-Of course, the user-space clients could
-#include "uint32.h"
-#include "via_drm.h"
+I'm building the kernel in a separate output directory and run my make command
+from there.
 
-but shouldn't really the tools be mimicing what the compiler does in 
-this case?
+Is this intentional?
 
-/Thomas
+Gr{oetje,eeting}s,
 
+						Geert
 
-Sam Ravnborg wrote:
-> Hi David et al.
->
-> After improving the headers_check.pl script to do a
-> check for files included with:
->
-> 	#include "foo.h"
->
-> it reported the following error:
->
-> /home/sam/kernel/knext.git/usr/include/drm/via_drm.h:34: included file '/home/sam/kernel/knext.git/usr/include/drm/via_drmclient.h' is not exported
->
-> And indeed the file via_drmclient.h does not exist in the kernel source.
-> We do not see any issue in the kernel as the include is guarded by:
->
-> #ifndef __KERNEL__
-> #include "via_drmclient.h"
-> #endif
->
-> But referring to a non-existing file is not the right thing to to.
->
-> We need this check as we have several places where we do:
->
-> 	#include "foo.h"
->
-> in our exported headers.
->
-> So we need to fix drm somehow.
->
-> The headers_check.pl patch is included for reference.
->
->   
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
 
-
-
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+							    -- Linus Torvalds
