@@ -1,50 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepb.post.tele.dk ([195.41.46.236]:37038 "EHLO
-	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750947AbYLOLaV (ORCPT
+Received: from pfepa.post.tele.dk ([195.41.46.235]:47778 "EHLO
+	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752946AbYLOVBE (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 15 Dec 2008 06:30:21 -0500
-Date: Mon, 15 Dec 2008 12:31:50 +0100
+	Mon, 15 Dec 2008 16:01:04 -0500
+Date: Mon, 15 Dec 2008 22:02:27 +0100
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: make headers_install: .install and ..install.cmd
-Message-ID: <20081215113150.GA10911@uranus.ravnborg.org>
-References: <Pine.LNX.4.64.0812141728370.5714@anakin>
+Subject: Re: BUG: via_drmclient.h is referenced but does not exist
+Message-ID: <20081215210227.GA14396@uranus.ravnborg.org>
+References: <20081213193506.GA22969@uranus.ravnborg.org> <49452CEE.1090909@shipmail.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <Pine.LNX.4.64.0812141728370.5714@anakin>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <49452CEE.1090909@shipmail.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Geert Uytterhoeven <geert@linux-m68k.org>
-Cc: linux-kbuild@vger.kernel.org, Linux Kernel Development <linux-kernel@vger.kernel.org>
+To: Thomas =?iso-8859-1?Q?Hellstr=F6m?= <thomas@shipmail.org>
+Cc: David Airlie <airlied@linux.ie>, dri-devel <dri-devel@lists.sourceforge.net>, LKML <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-On Sun, Dec 14, 2008 at 05:31:08PM +0100, Geert Uytterhoeven wrote:
-> 	Hi Sam,
+On Sun, Dec 14, 2008 at 04:57:34PM +0100, Thomas Hellström wrote:
+> Hi!
 > 
-> When I use `make ARCH=m68k INSTALL_HDR_PATH=/tmp/headers headers_install',
-> I get lots of `.install' and `..install.cmd' files in /tmp/headers and its
-> subdirectories.
+> The intention is for via_drm.h to be self-containing when included both 
+> for a kernel build and for a user-space build. In this particular case, 
+> via_drmclient.h lives in the user-space clients and includes stdint.h to 
+> get access to uint32_t and friends.
 > 
-> I'm building the kernel in a separate output directory and run my make command
-> from there.
+> Of course, the user-space clients could
+> #include "uint32.h"
+> #include "via_drm.h"
 > 
-> Is this intentional?
+> but shouldn't really the tools be mimicing what the compiler does in 
+> this case?
 
-Hi Geert.
+The kernel headers and thus the kernel ABI is separate and ideally
+they should not depend on any other header files to provide anything.
 
-We use the files .install and ..install.cmd to check if we need to install
-the headers again or need to check them again.
-And there is no other place to put them than next to the relevant files.
-Otherwse we would not do the right thing when exporting to
-two different directories from the same repository.
+This is why __u32, __u64 etc are preferred in the kernel ABI
+and not uint32_t as used by the drm headers.
 
-The real fix would be to speed up the install step.
-Today we rely on the unifdef tool and a perl scrip for the installation.
-Combining the functionality in one C file would most likely
-speed up the install process to such a degree that we can do it
-unconditionally and then we can get rid of the .install 
-and ..install.cmd files.
+We do not adhere to this as a strict rule (yet).
+But if you do:
 
-But noone has written a C program to do that (yet).
+grep -l uint32_t usr/include/linux
+
+then you will only see 7 hits. Out of 368 files.
+So we are not bad in this respect.
+
+For drm the fix seems simple - just replace all of uint32_t with __u32.
+likewise for the other 32 bit and the 64 bit variants.
+
+For the specific case where drm includes a non-existing file I suggest
+that we get this fixed in some way soon.
 
 	Sam
