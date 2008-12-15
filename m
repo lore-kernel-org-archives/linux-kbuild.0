@@ -1,53 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from hrndva-omtalb.mail.rr.com ([71.74.56.123]:53922 "EHLO
-	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753505AbYLNRFK (ORCPT
+Received: from pfepb.post.tele.dk ([195.41.46.236]:37038 "EHLO
+	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750947AbYLOLaV (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 14 Dec 2008 12:05:10 -0500
-Date: Sun, 14 Dec 2008 12:05:09 -0500 (EST)
-From: Steven Rostedt <rostedt@goodmis.org>
-Subject: Re: Better way to force a rebuild
-In-Reply-To: <20081213231654.GA32446@uranus.ravnborg.org>
-Message-ID: <alpine.DEB.1.10.0812141204480.20467@gandalf.stny.rr.com>
-References: <alpine.DEB.1.10.0812101443550.11805@gandalf.stny.rr.com> <20081210200242.GA15692@uranus.ravnborg.org> <20081210212821.GA18348@uranus.ravnborg.org> <20081213231654.GA32446@uranus.ravnborg.org>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+	Mon, 15 Dec 2008 06:30:21 -0500
+Date: Mon, 15 Dec 2008 12:31:50 +0100
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: make headers_install: .install and ..install.cmd
+Message-ID: <20081215113150.GA10911@uranus.ravnborg.org>
+References: <Pine.LNX.4.64.0812141728370.5714@anakin>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Pine.LNX.4.64.0812141728370.5714@anakin>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: linux-kbuild@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, zippel@linux-m68k.org, Ingo Molnar <mingo@elte.hu>, Andrew Morton <akpm@linux-foundation.org>
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: linux-kbuild@vger.kernel.org, Linux Kernel Development <linux-kernel@vger.kernel.org>
 
-
-On Sun, 14 Dec 2008, Sam Ravnborg wrote:
-
-> On Wed, Dec 10, 2008 at 10:28:21PM +0100, Sam Ravnborg wrote:
-> > 
-> > I made the following quick hack.
-> > I think it should do the trick.
-> > 
-> > 	Sam
-> > 
-> > diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-> > index 468fbc9..8b5bf43 100644
-> > --- a/scripts/Makefile.build
-> > +++ b/scripts/Makefile.build
-> > @@ -215,7 +215,8 @@ define rule_cc_o_c
-> >  	$(call echo-cmd,cc_o_c) $(cmd_cc_o_c);				  \
-> >  	$(cmd_modversions)						  \
-> >  	$(cmd_record_mcount)						  \
-> > -	scripts/basic/fixdep $(depfile) $@ '$(call make-cmd,cc_o_c)' >    \
-> > +	scripts/basic/fixdep $(depfile) $@                                \
-> > +	'$(call make-cmd,cc_o_c) $(call make-cmd,record_mcount)' >        \
-> >  	                                              $(dot-target).tmp;  \
-> >  	rm -f $(depfile);						  \
-> >  	mv -f $(dot-target).tmp $(dot-target).cmd
+On Sun, Dec 14, 2008 at 05:31:08PM +0100, Geert Uytterhoeven wrote:
+> 	Hi Sam,
 > 
-> Hi Steven.
+> When I use `make ARCH=m68k INSTALL_HDR_PATH=/tmp/headers headers_install',
+> I get lots of `.install' and `..install.cmd' files in /tmp/headers and its
+> subdirectories.
 > 
-> Did you try the above?
-> If it works I will add it to kbuild-next.git
+> I'm building the kernel in a separate output directory and run my make command
+> from there.
+> 
+> Is this intentional?
 
-I started to but got distracted :-/   I'll retry it on Monday.
+Hi Geert.
 
--- Steve
+We use the files .install and ..install.cmd to check if we need to install
+the headers again or need to check them again.
+And there is no other place to put them than next to the relevant files.
+Otherwse we would not do the right thing when exporting to
+two different directories from the same repository.
 
+The real fix would be to speed up the install step.
+Today we rely on the unifdef tool and a perl scrip for the installation.
+Combining the functionality in one C file would most likely
+speed up the install process to such a degree that we can do it
+unconditionally and then we can get rid of the .install 
+and ..install.cmd files.
+
+But noone has written a C program to do that (yet).
+
+	Sam
