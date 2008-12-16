@@ -1,71 +1,88 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepb.post.tele.dk ([195.41.46.236]:37267 "EHLO
-	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756378AbYLOVuQ (ORCPT
+Received: from hrndva-omtalb.mail.rr.com ([71.74.56.125]:45407 "EHLO
+	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753398AbYLPUGr (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 15 Dec 2008 16:50:16 -0500
-Date: Mon, 15 Dec 2008 22:51:43 +0100
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: BUG: via_drmclient.h is referenced but does not exist
-Message-ID: <20081215215143.GA16475@uranus.ravnborg.org>
-References: <20081213193506.GA22969@uranus.ravnborg.org> <49452CEE.1090909@shipmail.org> <20081215210227.GA14396@uranus.ravnborg.org> <4946CB83.2000507@tungstengraphics.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <4946CB83.2000507@tungstengraphics.com>
+	Tue, 16 Dec 2008 15:06:47 -0500
+Date: Tue, 16 Dec 2008 15:06:45 -0500 (EST)
+From: Steven Rostedt <rostedt@goodmis.org>
+Subject: Re: Better way to force a rebuild
+In-Reply-To: <alpine.DEB.1.10.0812141204480.20467@gandalf.stny.rr.com>
+Message-ID: <alpine.DEB.1.10.0812161502530.25356@gandalf.stny.rr.com>
+References: <alpine.DEB.1.10.0812101443550.11805@gandalf.stny.rr.com> <20081210200242.GA15692@uranus.ravnborg.org> <20081210212821.GA18348@uranus.ravnborg.org> <20081213231654.GA32446@uranus.ravnborg.org>
+ <alpine.DEB.1.10.0812141204480.20467@gandalf.stny.rr.com>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Thomas =?iso-8859-1?Q?Hellstr=F6m?= <thomas@tungstengraphics.com>
-Cc: Thomas =?iso-8859-1?Q?Hellstr=F6m?= <thomas@shipmail.org>, David Airlie <airlied@linux.ie>, dri-devel <dri-devel@lists.sourceforge.net>, LKML <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: linux-kbuild@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, zippel@linux-m68k.org, Ingo Molnar <mingo@elte.hu>, Andrew Morton <akpm@linux-foundation.org>
 
-On Mon, Dec 15, 2008 at 10:26:27PM +0100, Thomas Hellström wrote:
-> Hi!
+
+On Sun, 14 Dec 2008, Steven Rostedt wrote:
 > 
-> Sam Ravnborg wrote:
-> >On Sun, Dec 14, 2008 at 04:57:34PM +0100, Thomas Hellström wrote:
-> >  
-> >>Hi!
-> >>
-> >>The intention is for via_drm.h to be self-containing when included both 
-> >>for a kernel build and for a user-space build. In this particular case, 
-> >>via_drmclient.h lives in the user-space clients and includes stdint.h to 
-> >>get access to uint32_t and friends.
-> >>
-> >>Of course, the user-space clients could
-> >>#include "uint32.h"
-> >>#include "via_drm.h"
-> >>
-> >>but shouldn't really the tools be mimicing what the compiler does in 
-> >>this case?
-> >>    
-> >
-> >The kernel headers and thus the kernel ABI is separate and ideally
-> >they should not depend on any other header files to provide anything.
-> >
-> >This is why __u32, __u64 etc are preferred in the kernel ABI
-> >and not uint32_t as used by the drm headers.
-> >
-> >We do not adhere to this as a strict rule (yet).
-> >But if you do:
-> >
-> >grep -l uint32_t usr/include/linux
-> >
-> >then you will only see 7 hits. Out of 368 files.
-> >So we are not bad in this respect.
-> >
-> >For drm the fix seems simple - just replace all of uint32_t with __u32.
-> >likewise for the other 32 bit and the 64 bit variants.
-> >  
-> I'm not sure that's possible, as these header files are shared with *BSD 
-> (and possibly Solaris).
-I dunno about *BSD and solaris.
+> On Sun, 14 Dec 2008, Sam Ravnborg wrote:
+> 
+> > On Wed, Dec 10, 2008 at 10:28:21PM +0100, Sam Ravnborg wrote:
+> > > 
+> > > I made the following quick hack.
+> > > I think it should do the trick.
+> > > 
+> > > 	Sam
+> > > 
+> > > diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+> > > index 468fbc9..8b5bf43 100644
+> > > --- a/scripts/Makefile.build
+> > > +++ b/scripts/Makefile.build
+> > > @@ -215,7 +215,8 @@ define rule_cc_o_c
+> > >  	$(call echo-cmd,cc_o_c) $(cmd_cc_o_c);				  \
+> > >  	$(cmd_modversions)						  \
+> > >  	$(cmd_record_mcount)						  \
+> > > -	scripts/basic/fixdep $(depfile) $@ '$(call make-cmd,cc_o_c)' >    \
+> > > +	scripts/basic/fixdep $(depfile) $@                                \
+> > > +	'$(call make-cmd,cc_o_c) $(call make-cmd,record_mcount)' >        \
+> > >  	                                              $(dot-target).tmp;  \
+> > >  	rm -f $(depfile);						  \
+> > >  	mv -f $(dot-target).tmp $(dot-target).cmd
+> > 
+> > Hi Steven.
+> > 
+> > Did you try the above?
+> > If it works I will add it to kbuild-next.git
+> 
+> I started to but got distracted :-/   I'll retry it on Monday.
 
-But other linux ABI header files do:
+Hi Sam,
 
-#include <linux/types.h>
+Sorry for taking so long to get back to you, but my hard drive for my 
+laptop is on the fritz, and I'm busy making sure everything is backed up.
 
-To get access to these basic types.
-And we could do the same for drm if the other systems does not prevent it.
+I tried this patch and it does not seem to do what I want :-(
 
-	Sam
+You can test it too, just compile the kernel with CONFIG_FUNCTION_TRACER
+and CONFIG_DYNAMIC_FTRACE enabled, and then compile again with just 
+disabling CONFIG_DYNAMIC_FTRACE (keep CONFIG_FUNCTION_TRACER enabled). If 
+the entire kernel does not compile again, then it did not work.
+
+-- Steve
+
+Oh, you need to add this patch first:
+
+---
+ include/linux/kernel.h |    5 -----
+ 1 file changed, 5 deletions(-)
+
+Index: linux-trace.git/include/linux/kernel.h
+===================================================================
+--- linux-trace.git.orig/include/linux/kernel.h	2008-11-20 14:36:55.000000000 -0500
++++ linux-trace.git/include/linux/kernel.h	2008-12-10 16:54:16.000000000 -0500
+@@ -535,9 +535,4 @@ struct sysinfo {
+ #define NUMA_BUILD 0
+ #endif
+ 
+-/* Rebuild everything on CONFIG_FTRACE_MCOUNT_RECORD */
+-#ifdef CONFIG_FTRACE_MCOUNT_RECORD
+-# define REBUILD_DUE_TO_FTRACE_MCOUNT_RECORD
+-#endif
+-
+ #endif
