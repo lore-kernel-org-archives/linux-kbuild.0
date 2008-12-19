@@ -1,42 +1,49 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepb.post.tele.dk ([195.41.46.236]:44638 "EHLO
+Received: from pfepb.post.tele.dk ([195.41.46.236]:40468 "EHLO
 	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755946AbYLSWAi (ORCPT
+	with ESMTP id S1756998AbYLSWHa (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 19 Dec 2008 17:00:38 -0500
-Date: Fri, 19 Dec 2008 23:02:10 +0100
+	Fri, 19 Dec 2008 17:07:30 -0500
+Date: Fri, 19 Dec 2008 23:08:59 +0100
 From: Sam Ravnborg <sam@ravnborg.org>
 Subject: Re: GIT head doesn't seem to want to build on 32bit..
-Message-ID: <20081219220210.GB3090@uranus.ravnborg.org>
-References: <20081216172859.5bc030b6@lxorguk.ukuu.org.uk> <alpine.LFD.2.00.0812160946410.14014@localhost.localdomain> <20081216181133.2342b49e@lxorguk.ukuu.org.uk> <20081216183817.GA25108@uranus.ravnborg.org> <20081217100727.5cf6248c@lxorguk.ukuu.org.uk>
+Message-ID: <20081219220859.GA3784@uranus.ravnborg.org>
+References: <20081216172859.5bc030b6@lxorguk.ukuu.org.uk> <alpine.LFD.2.00.0812160946410.14014@localhost.localdomain> <20081216181133.2342b49e@lxorguk.ukuu.org.uk> <20081216183817.GA25108@uranus.ravnborg.org> <20081217100727.5cf6248c@lxorguk.ukuu.org.uk> <20081219220210.GB3090@uranus.ravnborg.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20081217100727.5cf6248c@lxorguk.ukuu.org.uk>
+In-Reply-To: <20081219220210.GB3090@uranus.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Alan Cox <alan@lxorguk.ukuu.org.uk>
 Cc: Linus Torvalds <torvalds@linux-foundation.org>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-On Wed, Dec 17, 2008 at 10:07:27AM +0000, Alan Cox wrote:
-> 
-> > Smells like a kbuild issue.
-> > Please copy me and linux-kbuild@vger.kernel.org on any findings.
+On Fri, Dec 19, 2008 at 11:02:10PM +0100, Sam Ravnborg wrote:
+> On Wed, Dec 17, 2008 at 10:07:27AM +0000, Alan Cox wrote:
 > > 
-> > [My 64 bit toolchain is br0ken atm so I could not try to reproduce]
+> > > Smells like a kbuild issue.
+> > > Please copy me and linux-kbuild@vger.kernel.org on any findings.
+> > > 
+> > > [My 64 bit toolchain is br0ken atm so I could not try to reproduce]
+> > 
+> > Yes I do indeed need to build x86_64 first, then make distclean or
+> > mrproper and then 32bit build fails
 > 
-> Yes I do indeed need to build x86_64 first, then make distclean or
-> mrproper and then 32bit build fails
+> Hi Alan.
+> 
+> Can I ask you to persuade this a bit more?
+> 
+> 1) when it fails try using "make V=1" and post the command executed.
+> 1a) Do the same when it works and compare the two
+> 2) try to do: make path/file.i and check if the generated .i file
+>    differ when it fails and when it is ok.
+> 
+> Other than that I have no ideas for the moment.
 
-Hi Alan.
+One additional request.
+Can you check if your .config differ when it fails and when it succeeds.
 
-Can I ask you to persuade this a bit more?
+[The code fails due to DECLARE_PER_CPU() does not do it's job I think].
 
-1) when it fails try using "make V=1" and post the command executed.
-1a) Do the same when it works and compare the two
-2) try to do: make path/file.i and check if the generated .i file
-   differ when it fails and when it is ok.
-
-Other than that I have no ideas for the moment.
-
+Thanks,
 	Sam
