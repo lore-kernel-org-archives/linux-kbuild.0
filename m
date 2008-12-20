@@ -1,105 +1,99 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepa.post.tele.dk ([195.41.46.235]:41319 "EHLO
-	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751771AbYLTOaH (ORCPT
+Received: from mail-bw0-f21.google.com ([209.85.218.21]:50655 "EHLO
+	mail-bw0-f21.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751379AbYLTPNi (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 20 Dec 2008 09:30:07 -0500
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: [PATCH 19/26] kbuild: fix make tags/cscope
-Date: Sat, 20 Dec 2008 15:31:30 +0100
-Message-Id: <1229783497-19550-19-git-send-email-sam@ravnborg.org>
-In-Reply-To: <20081220142518.GA19390@uranus.ravnborg.org>
+	Sat, 20 Dec 2008 10:13:38 -0500
+Message-ID: <19f34abd0812200713i76261f99t2bae7c0e4a5460de@mail.gmail.com>
+Date: Sat, 20 Dec 2008 16:13:36 +0100
+From: "Vegard Nossum" <vegard.nossum@gmail.com>
+Subject: Re: [PATCH 04/26] kbuild: introduce $(kecho) convenience echo
+In-Reply-To: <1229783497-19550-4-git-send-email-sam@ravnborg.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 References: <20081220142518.GA19390@uranus.ravnborg.org>
+	 <1229783497-19550-4-git-send-email-sam@ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: kbuild <linux-kbuild@vger.kernel.org>, lkml <linux-kernel@vger.kernel.org>
-Cc: Jiri Slaby <jirislaby@gmail.com>, Sam Ravnborg <sam@ravnborg.org>
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: kbuild <linux-kbuild@vger.kernel.org>, lkml <linux-kernel@vger.kernel.org>, Mike Frysinger <vapier@gentoo.org>
 
-From: Jiri Slaby <jirislaby@gmail.com>
+Hi,
 
-- fix combining O=... and tags
-- don't allow * expansion during sh function calls
+On Sat, Dec 20, 2008 at 3:31 PM, Sam Ravnborg <sam@ravnborg.org> wrote:
+> From: Mike Frysinger <vapier@gentoo.org>
+>
+> There is a bunch of places in the build system where we do 'echo' to show
+> some nice status lines.  This means we still get output when running in
+> silent mode.  So declare a new KECHO variable that only does 'echo' when we
+> are in a suitable verbose build mode.
+>
+> Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+> [sam: added Documentation]
+> Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
+> ---
+>  Documentation/kbuild/makefiles.txt |   14 ++++++++++++++
+>  scripts/Kbuild.include             |    7 +++++++
+>  2 files changed, 21 insertions(+), 0 deletions(-)
+>
+> diff --git a/Documentation/kbuild/makefiles.txt b/Documentation/kbuild/makefiles.txt
+> index 7a77533..51104f9 100644
+> --- a/Documentation/kbuild/makefiles.txt
+> +++ b/Documentation/kbuild/makefiles.txt
+> @@ -383,6 +383,20 @@ more details, with real examples.
+>        to prerequisites are referenced with $(src) (because they are not
+>        generated files).
+>
+> +    $(kecho)
+> +       echoing information to user in a rule is often a good practice
+> +       but when execution "make -s" one does not expect to see any output
+> +       except for warnings/errors.
+> +       To support this kbuild define $(kecho) which will echo out the
+> +       text following $(kecho) to stdout except if "make -s" is used.
+> +
+> +       Example:
+> +               #arch/blackfin/boot/Makefile
+> +               $(obj)/vmImage: $(obj)/vmlinux.gz
+> +                       $(call if_changed,uimage)
+> +                       @$(kecho) 'Kernel: $@ is ready'
+> +
+> +
+>  --- 3.11 $(CC) support functions
+>
+>        The kernel may be built with several different versions of
+> diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
+> index 936940b..8cf87e8 100644
+> --- a/scripts/Kbuild.include
+> +++ b/scripts/Kbuild.include
+> @@ -25,6 +25,13 @@ basetarget = $(basename $(notdir $@))
+>  escsq = $(subst $(squote),'\$(squote)',$1)
+>
+>  ###
+> +# Easy method for doing a status message
+> +       kecho := :
+> + quiet_kecho := echo
+> +silent_kecho := :
+> +kecho := $($(quiet)kecho)
 
-Signed-off-by: Jiri Slaby <jirislaby@gmail.com>
-[sam: use KBUILD_SRC to check if we use O=...]
-Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
----
- scripts/tags.sh |   24 ++++++++++++------------
- 1 files changed, 12 insertions(+), 12 deletions(-)
+Hm, why don't we put
 
-diff --git a/scripts/tags.sh b/scripts/tags.sh
-index 47274dc..3c814ba 100755
---- a/scripts/tags.sh
-+++ b/scripts/tags.sh
-@@ -18,28 +18,28 @@ ignore="( -name SCCS -o -name BitKeeper -o -name .svn -o \
-           -prune -o"
- 
- # Do not use full path is we do not use O=.. builds
--if [ ${src} == ${obj} ]; then
-+if [ "${KBUILD_SRC}" == "" ]; then
- 	tree=
- else
--	tree=${srctree}
-+	tree=${srctree}/
- fi
- 
- # find sources in arch/$ARCH
- find_arch_sources()
- {
--	find ${tree}arch/$1 $ignore -name $2 -print;
-+	find ${tree}arch/$1 $ignore -name "$2" -print;
- }
- 
- # find sources in arch/$1/include
- find_arch_include_sources()
- {
--	find ${tree}arch/$1/include $ignore -name $2 -print;
-+	find ${tree}arch/$1/include $ignore -name "$2" -print;
- }
- 
- # find sources in include/
- find_include_sources()
- {
--	find ${tree}include $ignore -name config -prune -o -name $1 -print;
-+	find ${tree}include $ignore -name config -prune -o -name "$1" -print;
- }
- 
- # find sources in rest of tree
-@@ -48,27 +48,27 @@ find_other_sources()
- {
- 	find ${tree}* $ignore \
- 	     \( -name include -o -name arch -o -name '.tmp_*' \) -prune -o \
--	       -name $1 -print;
-+	       -name "$1" -print;
- }
- 
- find_sources()
- {
--	find_arch_sources $1 $2
--	find_include_sources $2
--	find_other_sources $2
-+	find_arch_sources $1 "$2"
-+	find_include_sources "$2"
-+	find_other_sources "$2"
- }
- 
- all_sources()
- {
--	find_sources $SRCARCH *.[chS]
-+	find_sources $SRCARCH '*.[chS]'
- 	if [ ! -z "$archinclude" ]; then
--		find_arch_include_sources $archinclude *.[chS]
-+		find_arch_include_sources $archinclude '*.[chS]'
- 	fi
- }
- 
- all_kconfigs()
- {
--	find_sources $SRCARCH "Kconfig*"
-+	find_sources $SRCARCH 'Kconfig*'
- }
- 
- all_defconfigs()
+  +kecho := @$($(quiet)kecho)
+
+instead, so each caller can omit the @? And the example would then be:
+
+> +               $(obj)/vmImage: $(obj)/vmlinux.gz
+> +                       $(call if_changed,uimage)
+> +                       $(kecho) 'Kernel: $@ is ready'
+
+It seems to work correctly over here.
+
+
+Vegard
+
 -- 
-1.6.0.2.GIT
-
+"The animistic metaphor of the bug that maliciously sneaked in while
+the programmer was not looking is intellectually dishonest as it
+disguises that the error is the programmer's own creation."
+	-- E. W. Dijkstra, EWD1036
