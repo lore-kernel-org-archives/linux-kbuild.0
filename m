@@ -1,78 +1,526 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepa.post.tele.dk ([195.41.46.235]:41288 "EHLO
-	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751703AbYLTOaF (ORCPT
+Received: from pfepb.post.tele.dk ([195.41.46.236]:56421 "EHLO
+	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752161AbYLTOaN (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 20 Dec 2008 09:30:05 -0500
+	Sat, 20 Dec 2008 09:30:13 -0500
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: [PATCH 04/26] kbuild: introduce $(kecho) convenience echo
-Date: Sat, 20 Dec 2008 15:31:15 +0100
-Message-Id: <1229783497-19550-4-git-send-email-sam@ravnborg.org>
+Subject: [PATCH 25/26] allow stripping of generated symbols under CONFIG_KALLSYMS_ALL
+Date: Sat, 20 Dec 2008 15:31:36 +0100
+Message-Id: <1229783497-19550-25-git-send-email-sam@ravnborg.org>
 In-Reply-To: <20081220142518.GA19390@uranus.ravnborg.org>
 References: <20081220142518.GA19390@uranus.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: kbuild <linux-kbuild@vger.kernel.org>, lkml <linux-kernel@vger.kernel.org>
-Cc: Mike Frysinger <vapier@gentoo.org>, Sam Ravnborg <sam@ravnborg.org>
+Cc: Jan Beulich <jbeulich@novell.com>, Sam Ravnborg <sam@ravnborg.org>
 
-From: Mike Frysinger <vapier@gentoo.org>
+From: Jan Beulich <jbeulich@novell.com>
 
-There is a bunch of places in the build system where we do 'echo' to show
-some nice status lines.  This means we still get output when running in
-silent mode.  So declare a new KECHO variable that only does 'echo' when we
-are in a suitable verbose build mode.
+Building upon parts of the module stripping patch, this patch
+introduces similar stripping for vmlinux when CONFIG_KALLSYMS_ALL=y.
+Using CONFIG_KALLSYMS_STRIP_GENERATED reduces the overhead of
+CONFIG_KALLSYMS_ALL from 245k/310k to 65k/80k for the (i386/x86-64)
+kernels I tested with.
 
-Signed-off-by: Mike Frysinger <vapier@gentoo.org>
-[sam: added Documentation]
+The patch also does away with the need to special case the kallsyms-
+internal symbols by making them available even in the first linking
+stage.
+
+While it is a generated file, the patch includes the changes to
+scripts/genksyms/keywords.c_shipped, as I'm unsure what the procedure
+here is.
+
+Signed-off-by: Jan Beulich <jbeulich@novell.com>
 Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
 ---
- Documentation/kbuild/makefiles.txt |   14 ++++++++++++++
- scripts/Kbuild.include             |    7 +++++++
- 2 files changed, 21 insertions(+), 0 deletions(-)
+ Makefile                            |   47 +++++++--
+ arch/x86/scripts/strip-symbols      |    1 +
+ init/Kconfig                        |    7 ++
+ kernel/kallsyms.c                   |   16 +--
+ scripts/genksyms/keywords.c_shipped |  189 ++++++++++++++++++-----------------
+ scripts/genksyms/keywords.gperf     |    2 +
+ scripts/kallsyms.c                  |   21 ++---
+ 7 files changed, 155 insertions(+), 128 deletions(-)
+ create mode 100644 arch/x86/scripts/strip-symbols
 
-diff --git a/Documentation/kbuild/makefiles.txt b/Documentation/kbuild/makefiles.txt
-index 7a77533..51104f9 100644
---- a/Documentation/kbuild/makefiles.txt
-+++ b/Documentation/kbuild/makefiles.txt
-@@ -383,6 +383,20 @@ more details, with real examples.
- 	to prerequisites are referenced with $(src) (because they are not
- 	generated files).
+diff --git a/Makefile b/Makefile
+index 5dd0ed3..b3d1c8f 100644
+--- a/Makefile
++++ b/Makefile
+@@ -604,6 +604,9 @@ export	INSTALL_PATH ?= /boot
+ MODLIB	= $(INSTALL_MOD_PATH)/lib/modules/$(KERNELRELEASE)
+ export MODLIB
  
-+    $(kecho)
-+	echoing information to user in a rule is often a good practice
-+	but when execution "make -s" one does not expect to see any output
-+	except for warnings/errors.
-+	To support this kbuild define $(kecho) which will echo out the
-+	text following $(kecho) to stdout except if "make -s" is used.
++strip-symbols := $(srctree)/scripts/strip-symbols \
++		 $(wildcard $(srctree)/arch/$(ARCH)/scripts/strip-symbols)
 +
-+	Example:
-+		#arch/blackfin/boot/Makefile
-+		$(obj)/vmImage: $(obj)/vmlinux.gz
-+			$(call if_changed,uimage)
-+			@$(kecho) 'Kernel: $@ is ready'
-+
-+
- --- 3.11 $(CC) support functions
+ #
+ # INSTALL_MOD_STRIP, if defined, will cause modules to be stripped while
+ # they get installed.  If INSTALL_MOD_STRIP is '1', then the default
+@@ -611,8 +614,10 @@ export MODLIB
+ # be used as the option(s) to the objcopy command.
+ ifdef INSTALL_MOD_STRIP
+ ifeq ($(INSTALL_MOD_STRIP),1)
+-mod_strip_cmd = $(OBJCOPY) --strip-debug --strip-symbols \
+-		$(srctree)/scripts/strip-symbols --wildcard
++mod_strip_cmd = $(OBJCOPY) --strip-debug
++ifeq ($(CONFIG_KALLSYMS_ALL),$(CONFIG_KALLSYMS_STRIP_GENERATED))
++mod_strip_cmd += --wildcard $(addprefix --strip-symbols ,$(strip-symbols))
++endif
+ else
+ mod_strip_cmd = $(OBJCOPY) $(INSTALL_MOD_STRIP)
+ endif # INSTALL_MOD_STRIP=1
+@@ -747,6 +752,7 @@ last_kallsyms := 2
+ endif
  
- 	The kernel may be built with several different versions of
-diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
-index 936940b..8cf87e8 100644
---- a/scripts/Kbuild.include
-+++ b/scripts/Kbuild.include
-@@ -25,6 +25,13 @@ basetarget = $(basename $(notdir $@))
- escsq = $(subst $(squote),'\$(squote)',$1)
+ kallsyms.o := .tmp_kallsyms$(last_kallsyms).o
++kallsyms.h := $(wildcard include/config/kallsyms/*.h) $(wildcard include/config/kallsyms/*/*.h)
  
- ###
-+# Easy method for doing a status message
-+       kecho := :
-+ quiet_kecho := echo
-+silent_kecho := :
-+kecho := $($(quiet)kecho)
+ define verify_kallsyms
+ 	$(Q)$(if $($(quiet)cmd_sysmap),                                      \
+@@ -771,24 +777,41 @@ endef
+ 
+ # Generate .S file with all kernel symbols
+ quiet_cmd_kallsyms = KSYM    $@
+-      cmd_kallsyms = $(NM) -n $< | $(KALLSYMS) \
+-                     $(if $(CONFIG_KALLSYMS_ALL),--all-symbols) > $@
++      cmd_kallsyms = { test $* -eq 0 || $(NM) -n $<; } \
++		     | $(KALLSYMS) $(if $(CONFIG_KALLSYMS_ALL),--all-symbols) >$@
+ 
+-.tmp_kallsyms1.o .tmp_kallsyms2.o .tmp_kallsyms3.o: %.o: %.S scripts FORCE
++quiet_cmd_kstrip = STRIP   $@
++      cmd_kstrip = $(OBJCOPY) --wildcard $(addprefix --strip$(if $(CONFIG_RELOCATABLE),-unneeded)-symbols ,$(filter %/scripts/strip-symbols,$^)) $< $@
 +
-+###
- # filechk is used to check if the content of a generated file is updated.
- # Sample usage:
- # define filechk_sample
++$(foreach n,0 1 2 3,.tmp_kallsyms$(n).o): KBUILD_AFLAGS += -Wa,--strip-local-absolute
++$(foreach n,0 1 2 3,.tmp_kallsyms$(n).o): %.o: %.S scripts FORCE
+ 	$(call if_changed_dep,as_o_S)
+ 
+-.tmp_kallsyms%.S: .tmp_vmlinux% $(KALLSYMS)
++ifeq ($(CONFIG_KALLSYMS_STRIP_GENERATED),y)
++strip-ext := .stripped
++endif
++
++.tmp_kallsyms%.S: .tmp_vmlinux%$(strip-ext) $(KALLSYMS) $(kallsyms.h)
+ 	$(call cmd,kallsyms)
+ 
++# make -jN seems to have problems with intermediate files, see bug #3330.
++.SECONDARY: $(foreach n,1 2 3,.tmp_vmlinux$(n).stripped)
++.tmp_vmlinux%.stripped: .tmp_vmlinux% $(strip-symbols) $(kallsyms.h)
++	$(call cmd,kstrip)
++
++ifneq ($(CONFIG_DEBUG_INFO),y)
++.tmp_vmlinux%: LDFLAGS_vmlinux += -S
++endif
+ # .tmp_vmlinux1 must be complete except kallsyms, so update vmlinux version
+-.tmp_vmlinux1: $(vmlinux-lds) $(vmlinux-all) FORCE
+-	$(call if_changed_rule,ksym_ld)
++.tmp_vmlinux%: $(vmlinux-lds) $(vmlinux-all) FORCE
++	$(if $(filter 1,$*),$(call if_changed_rule,ksym_ld),$(call if_changed,vmlinux__))
+ 
+-.tmp_vmlinux2: $(vmlinux-lds) $(vmlinux-all) .tmp_kallsyms1.o FORCE
+-	$(call if_changed,vmlinux__)
++.tmp_vmlinux0$(strip-ext):
++	$(Q)echo "placeholder" >$@
+ 
+-.tmp_vmlinux3: $(vmlinux-lds) $(vmlinux-all) .tmp_kallsyms2.o FORCE
+-	$(call if_changed,vmlinux__)
++.tmp_vmlinux1: .tmp_kallsyms0.o
++.tmp_vmlinux2: .tmp_kallsyms1.o
++.tmp_vmlinux3: .tmp_kallsyms2.o
+ 
+ # Needs to visit scripts/ before $(KALLSYMS) can be used.
+ $(KALLSYMS): scripts ;
+diff --git a/arch/x86/scripts/strip-symbols b/arch/x86/scripts/strip-symbols
+new file mode 100644
+index 0000000..a2f1ccb
+--- /dev/null
++++ b/arch/x86/scripts/strip-symbols
+@@ -0,0 +1 @@
++__cpu_vendor_dev_X86_VENDOR_*
+diff --git a/init/Kconfig b/init/Kconfig
+index f763762..0f5af40 100644
+--- a/init/Kconfig
++++ b/init/Kconfig
+@@ -588,6 +588,13 @@ config KALLSYMS_ALL
+ 
+ 	   Say N.
+ 
++config KALLSYMS_STRIP_GENERATED
++	bool "Strip machine generated symbols from kallsyms"
++	depends on KALLSYMS_ALL
++	default y
++	help
++	  Say N if you want kallsyms to retain even machine generated symbols.
++
+ config KALLSYMS_EXTRA_PASS
+ 	bool "Do an extra kallsyms pass"
+ 	depends on KALLSYMS
+diff --git a/kernel/kallsyms.c b/kernel/kallsyms.c
+index 7b8b0f2..e694afa 100644
+--- a/kernel/kallsyms.c
++++ b/kernel/kallsyms.c
+@@ -30,20 +30,19 @@
+ #define all_var 0
+ #endif
+ 
+-/* These will be re-linked against their real values during the second link stage */
+-extern const unsigned long kallsyms_addresses[] __attribute__((weak));
+-extern const u8 kallsyms_names[] __attribute__((weak));
++extern const unsigned long kallsyms_addresses[];
++extern const u8 kallsyms_names[];
+ 
+ /* tell the compiler that the count isn't in the small data section if the arch
+  * has one (eg: FRV)
+  */
+ extern const unsigned long kallsyms_num_syms
+-__attribute__((weak, section(".rodata")));
++	__attribute__((__section__(".rodata")));
+ 
+-extern const u8 kallsyms_token_table[] __attribute__((weak));
+-extern const u16 kallsyms_token_index[] __attribute__((weak));
++extern const u8 kallsyms_token_table[];
++extern const u16 kallsyms_token_index[];
+ 
+-extern const unsigned long kallsyms_markers[] __attribute__((weak));
++extern const unsigned long kallsyms_markers[];
+ 
+ static inline int is_kernel_inittext(unsigned long addr)
+ {
+@@ -168,9 +167,6 @@ static unsigned long get_symbol_pos(unsigned long addr,
+ 	unsigned long symbol_start = 0, symbol_end = 0;
+ 	unsigned long i, low, high, mid;
+ 
+-	/* This kernel should never had been booted. */
+-	BUG_ON(!kallsyms_addresses);
+-
+ 	/* do a binary search on the sorted kallsyms_addresses array */
+ 	low = 0;
+ 	high = kallsyms_num_syms;
+diff --git a/scripts/genksyms/keywords.c_shipped b/scripts/genksyms/keywords.c_shipped
+index 971e011..83484fe 100644
+--- a/scripts/genksyms/keywords.c_shipped
++++ b/scripts/genksyms/keywords.c_shipped
+@@ -1,4 +1,4 @@
+-/* ANSI-C code produced by gperf version 3.0.2 */
++/* ANSI-C code produced by gperf version 3.0.1 */
+ /* Command-line: gperf -L ANSI-C -a -C -E -g -H is_reserved_hash -k '1,3,$' -N is_reserved_word -p -t scripts/genksyms/keywords.gperf  */
+ 
+ #if !((' ' == 32) && ('!' == 33) && ('"' == 34) && ('#' == 35) \
+@@ -32,7 +32,7 @@
+ 
+ #line 3 "scripts/genksyms/keywords.gperf"
+ struct resword { const char *name; int token; };
+-/* maximum key range = 62, duplicates = 0 */
++/* maximum key range = 64, duplicates = 0 */
+ 
+ #ifdef __GNUC__
+ __inline
+@@ -46,32 +46,32 @@ is_reserved_hash (register const char *str, register unsigned int len)
+ {
+   static const unsigned char asso_values[] =
+     {
+-      65, 65, 65, 65, 65, 65, 65, 65, 65, 65,
+-      65, 65, 65, 65, 65, 65, 65, 65, 65, 65,
+-      65, 65, 65, 65, 65, 65, 65, 65, 65, 65,
+-      65, 65, 65, 65, 65, 65, 65, 65, 65, 65,
+-      65, 65, 65, 65, 65, 65, 65, 65, 65, 65,
+-      65, 65, 65, 65, 65, 65, 65, 65, 65, 65,
+-      65, 65, 65, 65, 65, 65, 65, 65, 65,  5,
+-      65, 65, 65, 65, 65, 65, 35, 65, 65, 65,
+-       0, 65, 65, 65, 65, 65, 65, 65, 65, 65,
+-      65, 65, 65, 65, 65,  0, 65,  0, 65,  5,
+-      20, 15, 10, 30, 65, 15, 65, 65, 20,  0,
+-      10, 35, 20, 65, 10,  5,  0, 10,  5, 65,
+-      65, 65, 65, 65, 65, 65, 65, 65, 65, 65,
+-      65, 65, 65, 65, 65, 65, 65, 65, 65, 65,
+-      65, 65, 65, 65, 65, 65, 65, 65, 65, 65,
+-      65, 65, 65, 65, 65, 65, 65, 65, 65, 65,
+-      65, 65, 65, 65, 65, 65, 65, 65, 65, 65,
+-      65, 65, 65, 65, 65, 65, 65, 65, 65, 65,
+-      65, 65, 65, 65, 65, 65, 65, 65, 65, 65,
+-      65, 65, 65, 65, 65, 65, 65, 65, 65, 65,
+-      65, 65, 65, 65, 65, 65, 65, 65, 65, 65,
+-      65, 65, 65, 65, 65, 65, 65, 65, 65, 65,
+-      65, 65, 65, 65, 65, 65, 65, 65, 65, 65,
+-      65, 65, 65, 65, 65, 65, 65, 65, 65, 65,
+-      65, 65, 65, 65, 65, 65, 65, 65, 65, 65,
+-      65, 65, 65, 65, 65, 65
++      67, 67, 67, 67, 67, 67, 67, 67, 67, 67,
++      67, 67, 67, 67, 67, 67, 67, 67, 67, 67,
++      67, 67, 67, 67, 67, 67, 67, 67, 67, 67,
++      67, 67, 67, 67, 67, 67, 67, 67, 67, 67,
++      67, 67, 67, 67, 67, 67, 67, 67, 67, 67,
++      67, 67, 67, 67, 67, 67, 67, 67, 67, 67,
++      67, 67, 67, 67, 67, 67, 67, 67, 67,  0,
++      67, 67, 67, 67, 67, 67, 15, 67, 67, 67,
++       0, 67, 67, 67, 67, 67, 67, 67, 67, 67,
++      67, 67, 67, 67, 67,  0, 67,  0, 67,  5,
++      25, 20, 15, 30, 67, 15, 67, 67, 10,  0,
++      10, 40, 20, 67, 10,  5,  0, 10, 15, 67,
++      67, 67, 67, 67, 67, 67, 67, 67, 67, 67,
++      67, 67, 67, 67, 67, 67, 67, 67, 67, 67,
++      67, 67, 67, 67, 67, 67, 67, 67, 67, 67,
++      67, 67, 67, 67, 67, 67, 67, 67, 67, 67,
++      67, 67, 67, 67, 67, 67, 67, 67, 67, 67,
++      67, 67, 67, 67, 67, 67, 67, 67, 67, 67,
++      67, 67, 67, 67, 67, 67, 67, 67, 67, 67,
++      67, 67, 67, 67, 67, 67, 67, 67, 67, 67,
++      67, 67, 67, 67, 67, 67, 67, 67, 67, 67,
++      67, 67, 67, 67, 67, 67, 67, 67, 67, 67,
++      67, 67, 67, 67, 67, 67, 67, 67, 67, 67,
++      67, 67, 67, 67, 67, 67, 67, 67, 67, 67,
++      67, 67, 67, 67, 67, 67, 67, 67, 67, 67,
++      67, 67, 67, 67, 67, 67
+     };
+   return len + asso_values[(unsigned char)str[2]] + asso_values[(unsigned char)str[0]] + asso_values[(unsigned char)str[len - 1]];
+ }
+@@ -84,116 +84,119 @@ is_reserved_word (register const char *str, register unsigned int len)
+ {
+   enum
+     {
+-      TOTAL_KEYWORDS = 43,
++      TOTAL_KEYWORDS = 45,
+       MIN_WORD_LENGTH = 3,
+       MAX_WORD_LENGTH = 24,
+       MIN_HASH_VALUE = 3,
+-      MAX_HASH_VALUE = 64
++      MAX_HASH_VALUE = 66
+     };
+ 
+   static const struct resword wordlist[] =
+     {
+       {""}, {""}, {""},
+-#line 26 "scripts/genksyms/keywords.gperf"
++#line 28 "scripts/genksyms/keywords.gperf"
+       {"asm", ASM_KEYW},
+       {""},
+-#line 8 "scripts/genksyms/keywords.gperf"
++#line 10 "scripts/genksyms/keywords.gperf"
+       {"__asm", ASM_KEYW},
+       {""},
+-#line 9 "scripts/genksyms/keywords.gperf"
++#line 11 "scripts/genksyms/keywords.gperf"
+       {"__asm__", ASM_KEYW},
+       {""}, {""},
+-#line 52 "scripts/genksyms/keywords.gperf"
++#line 54 "scripts/genksyms/keywords.gperf"
+       {"__typeof__", TYPEOF_KEYW},
+       {""},
+-#line 12 "scripts/genksyms/keywords.gperf"
++#line 14 "scripts/genksyms/keywords.gperf"
+       {"__const", CONST_KEYW},
+-#line 11 "scripts/genksyms/keywords.gperf"
+-      {"__attribute__", ATTRIBUTE_KEYW},
+ #line 13 "scripts/genksyms/keywords.gperf"
++      {"__attribute__", ATTRIBUTE_KEYW},
++#line 15 "scripts/genksyms/keywords.gperf"
+       {"__const__", CONST_KEYW},
+-#line 18 "scripts/genksyms/keywords.gperf"
++#line 20 "scripts/genksyms/keywords.gperf"
+       {"__signed__", SIGNED_KEYW},
+-#line 44 "scripts/genksyms/keywords.gperf"
++#line 46 "scripts/genksyms/keywords.gperf"
+       {"static", STATIC_KEYW},
+-#line 20 "scripts/genksyms/keywords.gperf"
+-      {"__volatile__", VOLATILE_KEYW},
+-#line 39 "scripts/genksyms/keywords.gperf"
++      {""},
++#line 41 "scripts/genksyms/keywords.gperf"
+       {"int", INT_KEYW},
+-#line 32 "scripts/genksyms/keywords.gperf"
++#line 34 "scripts/genksyms/keywords.gperf"
+       {"char", CHAR_KEYW},
+-#line 33 "scripts/genksyms/keywords.gperf"
++#line 35 "scripts/genksyms/keywords.gperf"
+       {"const", CONST_KEYW},
+-#line 45 "scripts/genksyms/keywords.gperf"
++#line 47 "scripts/genksyms/keywords.gperf"
+       {"struct", STRUCT_KEYW},
+-#line 24 "scripts/genksyms/keywords.gperf"
++#line 26 "scripts/genksyms/keywords.gperf"
+       {"__restrict__", RESTRICT_KEYW},
+-#line 25 "scripts/genksyms/keywords.gperf"
++#line 27 "scripts/genksyms/keywords.gperf"
+       {"restrict", RESTRICT_KEYW},
+-#line 23 "scripts/genksyms/keywords.gperf"
+-      {"_restrict", RESTRICT_KEYW},
+-#line 16 "scripts/genksyms/keywords.gperf"
++#line 7 "scripts/genksyms/keywords.gperf"
++      {"EXPORT_SYMBOL_GPL_FUTURE", EXPORT_SYMBOL_KEYW},
++#line 18 "scripts/genksyms/keywords.gperf"
+       {"__inline__", INLINE_KEYW},
+-#line 10 "scripts/genksyms/keywords.gperf"
+-      {"__attribute", ATTRIBUTE_KEYW},
+       {""},
+-#line 14 "scripts/genksyms/keywords.gperf"
++#line 22 "scripts/genksyms/keywords.gperf"
++      {"__volatile__", VOLATILE_KEYW},
++#line 5 "scripts/genksyms/keywords.gperf"
++      {"EXPORT_SYMBOL", EXPORT_SYMBOL_KEYW},
++#line 25 "scripts/genksyms/keywords.gperf"
++      {"_restrict", RESTRICT_KEYW},
++      {""},
++#line 12 "scripts/genksyms/keywords.gperf"
++      {"__attribute", ATTRIBUTE_KEYW},
++#line 6 "scripts/genksyms/keywords.gperf"
++      {"EXPORT_SYMBOL_GPL", EXPORT_SYMBOL_KEYW},
++#line 16 "scripts/genksyms/keywords.gperf"
+       {"__extension__", EXTENSION_KEYW},
+-#line 35 "scripts/genksyms/keywords.gperf"
++#line 37 "scripts/genksyms/keywords.gperf"
+       {"enum", ENUM_KEYW},
+-#line 19 "scripts/genksyms/keywords.gperf"
+-      {"__volatile", VOLATILE_KEYW},
+-#line 36 "scripts/genksyms/keywords.gperf"
++#line 8 "scripts/genksyms/keywords.gperf"
++      {"EXPORT_UNUSED_SYMBOL", EXPORT_SYMBOL_KEYW},
++#line 38 "scripts/genksyms/keywords.gperf"
+       {"extern", EXTERN_KEYW},
+       {""},
+-#line 17 "scripts/genksyms/keywords.gperf"
++#line 19 "scripts/genksyms/keywords.gperf"
+       {"__signed", SIGNED_KEYW},
+-#line 7 "scripts/genksyms/keywords.gperf"
+-      {"EXPORT_SYMBOL_GPL_FUTURE", EXPORT_SYMBOL_KEYW},
+-      {""},
+-#line 51 "scripts/genksyms/keywords.gperf"
++#line 9 "scripts/genksyms/keywords.gperf"
++      {"EXPORT_UNUSED_SYMBOL_GPL", EXPORT_SYMBOL_KEYW},
++#line 49 "scripts/genksyms/keywords.gperf"
++      {"union", UNION_KEYW},
++#line 53 "scripts/genksyms/keywords.gperf"
+       {"typeof", TYPEOF_KEYW},
+-#line 46 "scripts/genksyms/keywords.gperf"
++#line 48 "scripts/genksyms/keywords.gperf"
+       {"typedef", TYPEDEF_KEYW},
+-#line 15 "scripts/genksyms/keywords.gperf"
++#line 17 "scripts/genksyms/keywords.gperf"
+       {"__inline", INLINE_KEYW},
+-#line 31 "scripts/genksyms/keywords.gperf"
++#line 33 "scripts/genksyms/keywords.gperf"
+       {"auto", AUTO_KEYW},
+-#line 47 "scripts/genksyms/keywords.gperf"
+-      {"union", UNION_KEYW},
+-      {""}, {""},
+-#line 48 "scripts/genksyms/keywords.gperf"
+-      {"unsigned", UNSIGNED_KEYW},
+-#line 49 "scripts/genksyms/keywords.gperf"
+-      {"void", VOID_KEYW},
+-#line 42 "scripts/genksyms/keywords.gperf"
+-      {"short", SHORT_KEYW},
++#line 21 "scripts/genksyms/keywords.gperf"
++      {"__volatile", VOLATILE_KEYW},
+       {""}, {""},
+ #line 50 "scripts/genksyms/keywords.gperf"
+-      {"volatile", VOLATILE_KEYW},
+-      {""},
+-#line 37 "scripts/genksyms/keywords.gperf"
+-      {"float", FLOAT_KEYW},
+-#line 34 "scripts/genksyms/keywords.gperf"
+-      {"double", DOUBLE_KEYW},
++      {"unsigned", UNSIGNED_KEYW},
+       {""},
+-#line 5 "scripts/genksyms/keywords.gperf"
+-      {"EXPORT_SYMBOL", EXPORT_SYMBOL_KEYW},
+-      {""}, {""},
+-#line 38 "scripts/genksyms/keywords.gperf"
++#line 44 "scripts/genksyms/keywords.gperf"
++      {"short", SHORT_KEYW},
++#line 40 "scripts/genksyms/keywords.gperf"
+       {"inline", INLINE_KEYW},
+-#line 6 "scripts/genksyms/keywords.gperf"
+-      {"EXPORT_SYMBOL_GPL", EXPORT_SYMBOL_KEYW},
+-#line 41 "scripts/genksyms/keywords.gperf"
+-      {"register", REGISTER_KEYW},
+       {""},
+-#line 22 "scripts/genksyms/keywords.gperf"
++#line 52 "scripts/genksyms/keywords.gperf"
++      {"volatile", VOLATILE_KEYW},
++#line 42 "scripts/genksyms/keywords.gperf"
++      {"long", LONG_KEYW},
++#line 24 "scripts/genksyms/keywords.gperf"
+       {"_Bool", BOOL_KEYW},
+-#line 43 "scripts/genksyms/keywords.gperf"
+-      {"signed", SIGNED_KEYW},
+       {""}, {""},
+-#line 40 "scripts/genksyms/keywords.gperf"
+-      {"long", LONG_KEYW}
++#line 43 "scripts/genksyms/keywords.gperf"
++      {"register", REGISTER_KEYW},
++#line 51 "scripts/genksyms/keywords.gperf"
++      {"void", VOID_KEYW},
++#line 39 "scripts/genksyms/keywords.gperf"
++      {"float", FLOAT_KEYW},
++#line 36 "scripts/genksyms/keywords.gperf"
++      {"double", DOUBLE_KEYW},
++      {""}, {""}, {""}, {""},
++#line 45 "scripts/genksyms/keywords.gperf"
++      {"signed", SIGNED_KEYW}
+     };
+ 
+   if (len <= MAX_WORD_LENGTH && len >= MIN_WORD_LENGTH)
+diff --git a/scripts/genksyms/keywords.gperf b/scripts/genksyms/keywords.gperf
+index 5ef3733..8abe7ab 100644
+--- a/scripts/genksyms/keywords.gperf
++++ b/scripts/genksyms/keywords.gperf
+@@ -5,6 +5,8 @@ struct resword { const char *name; int token; }
+ EXPORT_SYMBOL, EXPORT_SYMBOL_KEYW
+ EXPORT_SYMBOL_GPL, EXPORT_SYMBOL_KEYW
+ EXPORT_SYMBOL_GPL_FUTURE, EXPORT_SYMBOL_KEYW
++EXPORT_UNUSED_SYMBOL, EXPORT_SYMBOL_KEYW
++EXPORT_UNUSED_SYMBOL_GPL, EXPORT_SYMBOL_KEYW
+ __asm, ASM_KEYW
+ __asm__, ASM_KEYW
+ __attribute, ATTRIBUTE_KEYW
+diff --git a/scripts/kallsyms.c b/scripts/kallsyms.c
+index ad2434b..9275812 100644
+--- a/scripts/kallsyms.c
++++ b/scripts/kallsyms.c
+@@ -130,18 +130,9 @@ static int read_symbol(FILE *in, struct sym_entry *s)
+ static int symbol_valid(struct sym_entry *s)
+ {
+ 	/* Symbols which vary between passes.  Passes 1 and 2 must have
+-	 * identical symbol lists.  The kallsyms_* symbols below are only added
+-	 * after pass 1, they would be included in pass 2 when --all-symbols is
+-	 * specified so exclude them to get a stable symbol list.
++	 * identical symbol lists.
+ 	 */
+ 	static char *special_symbols[] = {
+-		"kallsyms_addresses",
+-		"kallsyms_num_syms",
+-		"kallsyms_names",
+-		"kallsyms_markers",
+-		"kallsyms_token_table",
+-		"kallsyms_token_index",
+-
+ 	/* Exclude linker generated symbols which vary between passes */
+ 		"_SDA_BASE_",		/* ppc */
+ 		"_SDA2_BASE_",		/* ppc */
+@@ -173,7 +164,9 @@ static int symbol_valid(struct sym_entry *s)
+ 	}
+ 
+ 	/* Exclude symbols which vary between passes. */
+-	if (strstr((char *)s->sym + offset, "_compiled."))
++	if (strstr((char *)s->sym + offset, "_compiled.") ||
++	    strncmp((char*)s->sym + offset, "__compound_literal.", 19) == 0 ||
++	    strncmp((char*)s->sym + offset, "__compound_literal$", 19) == 0)
+ 		return 0;
+ 
+ 	for (i = 0; special_symbols[i]; i++)
+@@ -550,8 +543,10 @@ int main(int argc, char **argv)
+ 		usage();
+ 
+ 	read_map(stdin);
+-	sort_symbols();
+-	optimize_token_table();
++	if (table_cnt) {
++		sort_symbols();
++		optimize_token_table();
++	}
+ 	write_src();
+ 
+ 	return 0;
 -- 
 1.6.0.2.GIT
 
