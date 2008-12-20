@@ -1,44 +1,55 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepa.post.tele.dk ([195.41.46.235]:41315 "EHLO
-	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751920AbYLTOaH (ORCPT
+Received: from pfepb.post.tele.dk ([195.41.46.236]:56387 "EHLO
+	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751814AbYLTOaH (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
 	Sat, 20 Dec 2008 09:30:07 -0500
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: [PATCH 15/26] setlocalversion: print correct subversion revision
-Date: Sat, 20 Dec 2008 15:31:26 +0100
-Message-Id: <1229783497-19550-15-git-send-email-sam@ravnborg.org>
+Subject: [PATCH 01/26] kbuild: fix -I option expansion with O=... builds
+Date: Sat, 20 Dec 2008 15:31:12 +0100
+Message-Id: <1229783497-19550-1-git-send-email-sam@ravnborg.org>
 In-Reply-To: <20081220142518.GA19390@uranus.ravnborg.org>
 References: <20081220142518.GA19390@uranus.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: kbuild <linux-kbuild@vger.kernel.org>, lkml <linux-kernel@vger.kernel.org>
-Cc: Peter Korsgaard <jacmet@sunsite.dk>, Sam Ravnborg <sam@ravnborg.org>
+Cc: Sam Ravnborg <sam@ravnborg.org>
 
-From: Peter Korsgaard <jacmet@sunsite.dk>
+When adding extra -I options with O=... we could
+end up in a situation where there were no parameters to -I.
+So we had a commandline that looked like this:
 
-Output svn revision of latest change, instead of repo revision as thats
-what we're interested in (especially when working on a branch/tag).
+    ... -I -Wall ...
 
-Signed-off-by: Peter Korsgaard <jacmet@sunsite.dk>
+This had the undesired side effect that gcc assumed "-Wall"
+was a path to look for include files so this options was
+effectively ignored.
+
+This happens only when we build the generated module.mod.c files
+as part of the final modules builds and is as such harmless
+with current kbuild.
+This bug was exposed when we rearranged the options to gcc.
+
 Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
 ---
- scripts/setlocalversion |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+ scripts/Kbuild.include |    4 +++-
+ 1 files changed, 3 insertions(+), 1 deletions(-)
 
-diff --git a/scripts/setlocalversion b/scripts/setlocalversion
-index 72d2335..81d984b 100755
---- a/scripts/setlocalversion
-+++ b/scripts/setlocalversion
-@@ -51,7 +51,7 @@ if hgid=`hg id 2>/dev/null`; then
- fi
+diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
+index 982dcae..936940b 100644
+--- a/scripts/Kbuild.include
++++ b/scripts/Kbuild.include
+@@ -144,7 +144,9 @@ ld-option = $(call try-run,\
+ build := -f $(if $(KBUILD_SRC),$(srctree)/)scripts/Makefile.build obj
  
- # Check for svn and a svn repo.
--if rev=`svn info 2>/dev/null | grep '^Revision'`; then
-+if rev=`svn info 2>/dev/null | grep '^Last Changed Rev'`; then
- 	rev=`echo $rev | awk '{print $NF}'`
- 	changes=`svn status 2>/dev/null | grep '^[AMD]' | wc -l`
+ # Prefix -I with $(srctree) if it is not an absolute path.
+-addtree = $(if $(filter-out -I/%,$(1)),$(patsubst -I%,-I$(srctree)/%,$(1))) $(1)
++# skip if -I has no parameter
++addtree = $(if $(patsubst -I%,%,$(1)), \
++$(if $(filter-out -I/%,$(1)),$(patsubst -I%,-I$(srctree)/%,$(1))) $(1))
  
+ # Find all -I options and call addtree
+ flags = $(foreach o,$($(1)),$(if $(filter -I%,$(o)),$(call addtree,$(o)),$(o)))
 -- 
 1.6.0.2.GIT
 
