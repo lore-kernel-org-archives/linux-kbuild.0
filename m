@@ -1,57 +1,104 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepa.post.tele.dk ([195.41.46.235]:41318 "EHLO
+Received: from pfepa.post.tele.dk ([195.41.46.235]:41316 "EHLO
 	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751921AbYLTOaH (ORCPT
+	with ESMTP id S1751906AbYLTOaH (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
 	Sat, 20 Dec 2008 09:30:07 -0500
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: [PATCH 13/26] scripts/package: allow custom options to rpm
-Date: Sat, 20 Dec 2008 15:31:24 +0100
-Message-Id: <1229783497-19550-13-git-send-email-sam@ravnborg.org>
+Subject: [PATCH 08/26] kbuild: gen_init_cpio expands shell variables in file names
+Date: Sat, 20 Dec 2008 15:31:19 +0100
+Message-Id: <1229783497-19550-8-git-send-email-sam@ravnborg.org>
 In-Reply-To: <20081220142518.GA19390@uranus.ravnborg.org>
 References: <20081220142518.GA19390@uranus.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: kbuild <linux-kbuild@vger.kernel.org>, lkml <linux-kernel@vger.kernel.org>
-Cc: Jeremy Kerr <jk@ozlabs.org>, Andrew Morton <akpm@linux-foundation.org>, Sam Ravnborg <sam@ravnborg.org>
+Cc: "Sally, Gene" <Gene.Sally@timesys.com>, gene.sally@timesys.com, Sam Ravnborg <sam@ravnborg.org>
 
-From: Jeremy Kerr <jk@ozlabs.org>
+From: Sally, Gene <Gene.Sally@timesys.com>
 
-Add a RPMOPTS make variable to allow arbitrary options to be passed
-to rpm during 'make rpm-pkg'. For example:
+Modify gen_init_cpio so that lines that specify files can contain
+what looks like a shell variable that's expanded during processing.
 
- make RPMOPTS="--define '_topdir /home/jk/rpm'" rpm-pkg
+For example:
 
-Signed-off-by: Jeremy Kerr <jk@ozlabs.org>
-Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+   file /sbin/kinit ${RFS_BASE}/usr/src/klibc/kinit/kinit 0755 0 0
+
+given RFS_BASE is "/some/directory" in the environment
+
+would be expanded to
+
+   file /sbin/kinit /some/directory/usr/src/klibc/kinit/kinit 0755 0 0
+
+If several environment variables appear in a line, they are all expanded
+with processing happening from left to right.
+Undefined variables expand to a null string.
+Syntax errors stop processing, letting the existing error handling
+show the user offending line.
+
+This patch helps embedded folks who frequently create several
+RFS directories and then switch between them as they're tuning
+an initramfs.
+
+Signed-off-by: gene.sally@timesys.com
 Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
 ---
- scripts/package/Makefile |    5 +++--
- 1 files changed, 3 insertions(+), 2 deletions(-)
+ usr/gen_init_cpio.c |   28 +++++++++++++++++++++++++++-
+ 1 files changed, 27 insertions(+), 1 deletions(-)
 
-diff --git a/scripts/package/Makefile b/scripts/package/Makefile
-index 5e32607..c162409 100644
---- a/scripts/package/Makefile
-+++ b/scripts/package/Makefile
-@@ -47,7 +47,7 @@ rpm-pkg rpm: $(objtree)/kernel.spec FORCE
- 	set -e; \
- 	mv -f $(objtree)/.tmp_version $(objtree)/.version
+diff --git a/usr/gen_init_cpio.c b/usr/gen_init_cpio.c
+index 7abc07f..f1d3fe3 100644
+--- a/usr/gen_init_cpio.c
++++ b/usr/gen_init_cpio.c
+@@ -370,6 +370,30 @@ error:
+ 	return rc;
+ }
  
--	$(RPM) --target $(UTS_MACHINE) -ta ../$(KERNELPATH).tar.gz
-+	$(RPM) $(RPMOPTS) --target $(UTS_MACHINE) -ta ../$(KERNELPATH).tar.gz
- 	rm ../$(KERNELPATH).tar.gz
- 
- clean-files := $(objtree)/kernel.spec
-@@ -64,7 +64,8 @@ binrpm-pkg: $(objtree)/binkernel.spec FORCE
- 	set -e; \
- 	mv -f $(objtree)/.tmp_version $(objtree)/.version
- 
--	$(RPM) --define "_builddir $(srctree)" --target $(UTS_MACHINE) -bb $<
-+	$(RPM) $(RPMOPTS) --define "_builddir $(srctree)" --target \
-+		$(UTS_MACHINE) -bb $<
- 
- clean-files += $(objtree)/binkernel.spec
- 
++static char *cpio_replace_env(char *new_location)
++{
++       char expanded[PATH_MAX + 1];
++       char env_var[PATH_MAX + 1];
++       char *start;
++       char *end;
++
++       for (start = NULL; (start = strstr(new_location, "${")); ) {
++               end = strchr(start, '}');
++               if (start < end) {
++                       *env_var = *expanded = '\0';
++                       strncat(env_var, start + 2, end - start - 2);
++                       strncat(expanded, new_location, start - new_location);
++                       strncat(expanded, getenv(env_var), PATH_MAX);
++                       strncat(expanded, end + 1, PATH_MAX);
++                       strncpy(new_location, expanded, PATH_MAX);
++               } else
++                       break;
++       }
++
++       return new_location;
++}
++
++
+ static int cpio_mkfile_line(const char *line)
+ {
+ 	char name[PATH_MAX + 1];
+@@ -415,7 +439,8 @@ static int cpio_mkfile_line(const char *line)
+ 	} else {
+ 		dname = name;
+ 	}
+-	rc = cpio_mkfile(dname, location, mode, uid, gid, nlinks);
++	rc = cpio_mkfile(dname, cpio_replace_env(location),
++	                 mode, uid, gid, nlinks);
+  fail:
+ 	if (dname_len) free(dname);
+ 	return rc;
+@@ -439,6 +464,7 @@ void usage(const char *prog)
+ 		"\n"
+ 		"<name>       name of the file/dir/nod/etc in the archive\n"
+ 		"<location>   location of the file in the current filesystem\n"
++		"             expands shell variables quoted with ${}\n"
+ 		"<target>     link target\n"
+ 		"<mode>       mode/permissions of the file\n"
+ 		"<uid>        user id (0=root)\n"
 -- 
 1.6.0.2.GIT
 
