@@ -1,24 +1,31 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepb.post.tele.dk ([195.41.46.236]:40468 "EHLO
-	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756998AbYLSWHa (ORCPT
+Received: from earthlight.etchedpixels.co.uk ([81.2.110.250]:41846 "EHLO
+	lxorguk.ukuu.org.uk" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1751014AbYLTA2e (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 19 Dec 2008 17:07:30 -0500
-Date: Fri, 19 Dec 2008 23:08:59 +0100
-From: Sam Ravnborg <sam@ravnborg.org>
+	Fri, 19 Dec 2008 19:28:34 -0500
+Date: Sat, 20 Dec 2008 00:27:56 +0000
+From: Alan Cox <alan@lxorguk.ukuu.org.uk>
 Subject: Re: GIT head doesn't seem to want to build on 32bit..
-Message-ID: <20081219220859.GA3784@uranus.ravnborg.org>
-References: <20081216172859.5bc030b6@lxorguk.ukuu.org.uk> <alpine.LFD.2.00.0812160946410.14014@localhost.localdomain> <20081216181133.2342b49e@lxorguk.ukuu.org.uk> <20081216183817.GA25108@uranus.ravnborg.org> <20081217100727.5cf6248c@lxorguk.ukuu.org.uk> <20081219220210.GB3090@uranus.ravnborg.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Message-ID: <20081220002756.6505de5f@lxorguk.ukuu.org.uk>
 In-Reply-To: <20081219220210.GB3090@uranus.ravnborg.org>
+References: <20081216172859.5bc030b6@lxorguk.ukuu.org.uk>
+	<alpine.LFD.2.00.0812160946410.14014@localhost.localdomain>
+	<20081216181133.2342b49e@lxorguk.ukuu.org.uk>
+	<20081216183817.GA25108@uranus.ravnborg.org>
+	<20081217100727.5cf6248c@lxorguk.ukuu.org.uk>
+	<20081219220210.GB3090@uranus.ravnborg.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Alan Cox <alan@lxorguk.ukuu.org.uk>
+To: Sam Ravnborg <sam@ravnborg.org>
 Cc: Linus Torvalds <torvalds@linux-foundation.org>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-On Fri, Dec 19, 2008 at 11:02:10PM +0100, Sam Ravnborg wrote:
+On Fri, 19 Dec 2008 23:02:10 +0100
+Sam Ravnborg <sam@ravnborg.org> wrote:
+
 > On Wed, Dec 17, 2008 at 10:07:27AM +0000, Alan Cox wrote:
 > > 
 > > > Smells like a kbuild issue.
@@ -32,18 +39,9 @@ On Fri, Dec 19, 2008 at 11:02:10PM +0100, Sam Ravnborg wrote:
 > Hi Alan.
 > 
 > Can I ask you to persuade this a bit more?
-> 
-> 1) when it fails try using "make V=1" and post the command executed.
-> 1a) Do the same when it works and compare the two
-> 2) try to do: make path/file.i and check if the generated .i file
->    differ when it fails and when it is ok.
-> 
-> Other than that I have no ideas for the moment.
 
-One additional request.
-Can you check if your .config differ when it fails and when it succeeds.
+I will take a serious look at it when I get time. I hit it while fighting
+a pair of ATA controller problems and really I have to sort those out
+before I got back and beat up the other stuff.
 
-[The code fails due to DECLARE_PER_CPU() does not do it's job I think].
-
-Thanks,
-	Sam
+Alan
