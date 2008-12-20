@@ -1,44 +1,121 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-bw0-f21.google.com ([209.85.218.21]:33398 "EHLO
-	mail-bw0-f21.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752250AbYLTCCh (ORCPT
+Received: from pfepa.post.tele.dk ([195.41.46.235]:40028 "EHLO
+	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751379AbYLTOXr (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 19 Dec 2008 21:02:37 -0500
-Message-ID: <f19298770812191802g5dfbdbe3hf2ff63f66979fe7c@mail.gmail.com>
-Date: Sat, 20 Dec 2008 05:02:34 +0300
-From: "Alexey Zaytsev" <alexey.zaytsev@gmail.com>
-Subject: Re: GIT head doesn't seem to want to build on 32bit..
-In-Reply-To: <20081217113029.GB5027@uranus.ravnborg.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+	Sat, 20 Dec 2008 09:23:47 -0500
+Date: Sat, 20 Dec 2008 15:25:18 +0100
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: kbuild-next content
+Message-ID: <20081220142518.GA19390@uranus.ravnborg.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-References: <20081216172859.5bc030b6@lxorguk.ukuu.org.uk>
-	 <alpine.LFD.2.00.0812160946410.14014@localhost.localdomain>
-	 <20081216181133.2342b49e@lxorguk.ukuu.org.uk>
-	 <20081216183817.GA25108@uranus.ravnborg.org>
-	 <20081217100727.5cf6248c@lxorguk.ukuu.org.uk>
-	 <20081217113029.GB5027@uranus.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: Alan Cox <alan@lxorguk.ukuu.org.uk>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
 
-On Wed, Dec 17, 2008 at 14:30, Sam Ravnborg <sam@ravnborg.org> wrote:
-> On Wed, Dec 17, 2008 at 10:07:27AM +0000, Alan Cox wrote:
->>
->> > Smells like a kbuild issue.
->> > Please copy me and linux-kbuild@vger.kernel.org on any findings.
->> >
->> > [My 64 bit toolchain is br0ken atm so I could not try to reproduce]
->>
->> Yes I do indeed need to build x86_64 first, then make distclean or
->> mrproper and then 32bit build fails
->
-> I will fix my 64 bit build soonish.
-> In the meantime could someone do:
->
+Following is the collected patched in kbuild-next for
+the upcoming merge window.
 
-I can't reproduce this on a 64-bit host no matter what I do.
-Alan, could you please provide your 64-bit .config?
-Also, I could give Sam ssh to this machine.
+Highlights:
+
+o Better track of symbol checksum changes (Andreas Gruenbacher)
+o Improved strinning of modules (Jan Beulich)
+o silent is now really silent (Mike Frysinger)
+o improved svn support (Peter Korsgaard)
+o detect include looks (new target: headerdep) (Vegard Nossum)
+
+And a lot of smaller things. Shortlog + diffstat below.
+
+I have still stuff pending but the queue is getting smaller.
+
+Bugzilla say that I have 5 bugs assigned. But I guess
+in reality there is a few more.
+
+It will all be part of -next and some of the patches is there already.
+Patches will follow.
+
+	Sam
+
+Andreas Gruenbacher (2):
+      genksyms: track symbol checksum changes
+      genksyms: allow to ignore symbol checksum changes
+
+Arjan van de Ven (1):
+      scripts: improve the decodecode script
+
+Jan Beulich (2):
+      kbuild: strip generated symbols from *.ko
+      allow stripping of generated symbols under CONFIG_KALLSYMS_ALL
+
+Jeremy Kerr (1):
+      scripts/package: allow custom options to rpm
+
+Jiri Slaby (2):
+      kbuild: fix make tags/cscope
+      kbuild: fix string equality testing in tags.sh
+
+Mike Frysinger (3):
+      kbuild: kill output in silent mode of mkcompile_h
+      kbuild: introduce $(kecho) convenience echo
+      kbuild: use KECHO convenience echo
+
+Peter Korsgaard (2):
+      setlocalversion: print correct subversion revision
+      setlocalversion: add git-svn support
+
+Randy Dunlap (1):
+      kernel-doc: check for extra kernel-doc notations
+
+Robert P. J. Day (1):
+      kbuild: remove TAR_IGNORE
+
+Sally, Gene (1):
+      kbuild: gen_init_cpio expands shell variables in file names
+
+Sam Ravnborg (8):
+      kbuild: fix -I option expansion with O=... builds
+      kbuild: expand -I in KBUILD_CPPFLAGS
+      kbuild: teach mkmakfile to be silent
+      kconfig: fix options to check-lxdialog.sh
+      tags and cscope support really belongs in a shell script
+      kbuild: fix make incompatibility
+      kbuild: simplify use of genksyms
+      kbuild: support switching source directories with O=.. builds
+
+Vegard Nossum (1):
+      kbuild: add headerdep used to detect inclusion cycles in header files
+
+Werner Almesberger (1):
+      remove bashisms from scripts/extract-ikconfig
+
+ Documentation/kbuild/makefiles.txt         |   14 ++
+ Makefile                                   |  209 +++++++--------------
+ arch/blackfin/boot/Makefile                |    2 +-
+ arch/x86/scripts/strip-symbols             |    1 +
+ init/Kconfig                               |    7 +
+ kernel/kallsyms.c                          |   16 +-
+ scripts/Kbuild.include                     |   22 ++-
+ scripts/Makefile.build                     |   67 +++++---
+ scripts/Makefile.lib                       |   15 +-
+ scripts/Makefile.modinst                   |    3 +-
+ scripts/decodecode                         |   32 +++-
+ scripts/extract-ikconfig                   |    8 +-
+ scripts/genksyms/genksyms.c                |  277 ++++++++++++++++++++++++++--
+ scripts/genksyms/genksyms.h                |    7 +
+ scripts/genksyms/keywords.c_shipped        |  189 ++++++++++----------
+ scripts/genksyms/keywords.gperf            |    2 +
+ scripts/headerdep.pl                       |  193 +++++++++++++++++++
+ scripts/kallsyms.c                         |   21 +--
+ scripts/kconfig/lxdialog/check-lxdialog.sh |    2 +-
+ scripts/kernel-doc                         |   67 +++++++-
+ scripts/mkcompile_h                        |    6 +-
+ scripts/mkmakefile                         |    4 +-
+ scripts/mksysmap                           |    7 +-
+ scripts/package/Makefile                   |    9 +-
+ scripts/setlocalversion                    |    7 +-
+ scripts/strip-symbols                      |   22 +++
+ scripts/tags.sh                            |  160 ++++++++++++++++
+ usr/gen_init_cpio.c                        |   28 +++-
+ 28 files changed, 1046 insertions(+), 351 deletions(-)
