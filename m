@@ -1,76 +1,103 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepb.post.tele.dk ([195.41.46.236]:56422 "EHLO
+Received: from pfepb.post.tele.dk ([195.41.46.236]:56413 "EHLO
 	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752165AbYLTOaM (ORCPT
+	with ESMTP id S1752136AbYLTOaL (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 20 Dec 2008 09:30:12 -0500
+	Sat, 20 Dec 2008 09:30:11 -0500
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: [PATCH 23/26] kbuild: simplify use of genksyms
-Date: Sat, 20 Dec 2008 15:31:34 +0100
-Message-Id: <1229783497-19550-23-git-send-email-sam@ravnborg.org>
+Subject: [PATCH 14/26] scripts: improve the decodecode script
+Date: Sat, 20 Dec 2008 15:31:25 +0100
+Message-Id: <1229783497-19550-14-git-send-email-sam@ravnborg.org>
 In-Reply-To: <20081220142518.GA19390@uranus.ravnborg.org>
 References: <20081220142518.GA19390@uranus.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: kbuild <linux-kbuild@vger.kernel.org>, lkml <linux-kernel@vger.kernel.org>
-Cc: Sam Ravnborg <sam@ravnborg.org>
+Cc: Arjan van de Ven <arjan@linux.intel.com>, Andrew Morton <akpm@linux-foundation.org>, Sam Ravnborg <sam@ravnborg.org>
 
-Avoid duplicating long list of options in two places
+From: Arjan van de Ven <arjan@linux.intel.com>
 
+kerneloops.org has been using an improved "decodecode" script,
+specifically it has a special marker that shows which line in the assembly
+the oops happened at, like this:
+
+  20:	83 e0 03             	and    $0x3,%eax
+  23:	09 d8                	or     %ebx,%eax
+  25:	85 db                	test   %ebx,%ebx
+  27:	89 02                	mov    %eax,(%edx)
+  29:	74 0f                	je     0x3a
+  2b:*	3b 73 04             	cmp    0x4(%ebx),%esi     <-- trapping instruction
+  2e:	75 05                	jne    0x35
+  30:	89 53 04             	mov    %edx,0x4(%ebx)
+  33:	eb 07                	jmp    0x3c
+  35:	89 53 08             	mov    %edx,0x8(%ebx)
+
+this patch updates the kernel copy to also have this functionality.
+
+Signed-off-by: Arjan van de Ven <arjan@linux.intel.com>
+Reviewed-by: WANG Cong <wangcong@zeuux.org>
+Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
 Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
 ---
- scripts/Makefile.build |   30 ++++++++++++------------------
- 1 files changed, 12 insertions(+), 18 deletions(-)
+ scripts/decodecode |   32 ++++++++++++++++++++++----------
+ 1 files changed, 22 insertions(+), 10 deletions(-)
 
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index d21f0ea..c1da14b 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -151,17 +151,17 @@ cmd_cc_i_c       = $(CPP) $(c_flags)   -o $@ $<
- $(obj)/%.i: $(src)/%.c FORCE
- 	$(call if_changed_dep,cc_i_c)
+diff --git a/scripts/decodecode b/scripts/decodecode
+index 235d393..4b00647 100755
+--- a/scripts/decodecode
++++ b/scripts/decodecode
+@@ -7,7 +7,7 @@
+ # AFLAGS=--32 decodecode < 386.oops
  
-+cmd_gensymtypes =                                                           \
-+    $(CPP) -D__GENKSYMS__ $(c_flags) $< |                                   \
-+    $(GENKSYMS) -T $@ -a $(ARCH)                                            \
-+     $(if $(KBUILD_PRESERVE),-p)                                            \
-+     $(if $(1),-r $(firstword $(wildcard $(@:.symtypes=.symref) /dev/null)))
+ cleanup() {
+-	rm -f $T $T.s $T.o
++	rm -f $T $T.s $T.o $T.oo $T.aa  $T.aaa
+ 	exit 1
+ }
+ 
+@@ -44,21 +44,33 @@ if [ $marker -eq 0 ]; then
+ 	marker=`expr index "$code" "\("`
+ fi
+ 
++touch $T.oo
+ if [ $marker -ne 0 ]; then
+-	beforemark=`echo "$code" | cut -c-$((${marker} - 1))`
++	echo All code >> $T.oo
++	echo ======== >> $T.oo
++	beforemark=`echo "$code"`
+ 	echo -n "	.byte 0x" > $T.s
+-	echo $beforemark | sed -e 's/ /,0x/g' >> $T.s
+-	as $AFLAGS -o $T.o $T.s
+-	objdump -S $T.o
+-	rm $T.o $T.s
++	echo $beforemark | sed -e 's/ /,0x/g' | sed -e 's/<//g' | sed -e 's/>//g' >> $T.s
++	as $AFLAGS -o $T.o $T.s &> /dev/null
++	objdump -S $T.o | grep -v "/tmp" | grep -v "Disassembly" | grep -v "\.text" | grep -v "^$" &> $T.ooo
++	cat $T.ooo >> $T.oo
++	rm -f $T.o $T.s  $T.ooo
+ 
+ # and fix code at-and-after marker
+ 	code=`echo "$code" | cut -c$((${marker} + 1))-`
+ fi
+-
++echo Code starting with the faulting instruction  > $T.aa
++echo =========================================== >> $T.aa
+ code=`echo $code | sed -e 's/ [<(]/ /;s/[>)] / /;s/ /,0x/g'`
+ echo -n "	.byte 0x" > $T.s
+ echo $code >> $T.s
+-as $AFLAGS -o $T.o $T.s
+-objdump -S $T.o
+-rm $T $T.s $T.o
++as $AFLAGS -o $T.o $T.s &> /dev/null
++objdump -S $T.o | grep -v "Disassembly" | grep -v "/tmp" | grep -v "\.text" | grep -v "^$" &> $T.aaa
++cat $T.aaa >> $T.aa
 +
- quiet_cmd_cc_symtypes_c = SYM $(quiet_modtag) $@
--cmd_cc_symtypes_c	   = \
--		set -e;							\
--		$(CPP) -D__GENKSYMS__ $(c_flags) $<			\
--		| $(GENKSYMS) -T $@					\
--			      -r $(firstword $(wildcard			\
--				     $(@:.symtypes=.symref) /dev/null))	\
--			      $(if $(KBUILD_PRESERVE),-p)		\
--			      -a $(ARCH)				\
--		  >/dev/null;						\
--		test -s $@ || rm -f $@
-+cmd_cc_symtypes_c =                                                         \
-+    set -e;                                                                 \
-+    $(call cmd_gensymtypes, true) >/dev/null;                               \
-+    test -s $@ || rm -f $@
- 
- $(obj)/%.symtypes : $(src)/%.c FORCE
- 	$(call cmd,cc_symtypes_c)
-@@ -191,14 +191,8 @@ else
- cmd_cc_o_c = $(CC) $(c_flags) -c -o $(@D)/.tmp_$(@F) $<
- cmd_modversions =							\
- 	if $(OBJDUMP) -h $(@D)/.tmp_$(@F) | grep -q __ksymtab; then	\
--		$(CPP) -D__GENKSYMS__ $(c_flags) $<			\
--		| $(GENKSYMS) $(if $(KBUILD_SYMTYPES),			\
--			           -T $(@:.o=.symtypes))		\
--			      -r $(firstword $(wildcard			\
--				     $(@:.o=.symref) /dev/null))	\
--			      $(if $(KBUILD_PRESERVE),-p)		\
--			      -a $(ARCH)				\
--		> $(@D)/.tmp_$(@F:.o=.ver);				\
-+		$(call cmd_gensymtypes, $(KBUILD_SYMTYPES))		\
-+		    > $(@D)/.tmp_$(@F:.o=.ver);				\
- 									\
- 		$(LD) $(LDFLAGS) -r -o $@ $(@D)/.tmp_$(@F) 		\
- 			-T $(@D)/.tmp_$(@F:.o=.ver);			\
++faultline=`cat $T.aaa | head -1 | cut -d":" -f2`
++
++cat $T.oo | sed -e "s/\($faultline\)/\*\1     <-- trapping instruction/g"
++echo
++cat $T.aa
++cleanup
 -- 
 1.6.0.2.GIT
 
