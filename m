@@ -1,46 +1,116 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepb.post.tele.dk ([195.41.46.236]:56396 "EHLO
+Received: from pfepb.post.tele.dk ([195.41.46.236]:56392 "EHLO
 	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751941AbYLTOaJ (ORCPT
+	with ESMTP id S1751946AbYLTOaJ (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
 	Sat, 20 Dec 2008 09:30:09 -0500
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: [PATCH 16/26] setlocalversion: add git-svn support
-Date: Sat, 20 Dec 2008 15:31:27 +0100
-Message-Id: <1229783497-19550-16-git-send-email-sam@ravnborg.org>
+Subject: [PATCH 05/26] kbuild: use KECHO convenience echo
+Date: Sat, 20 Dec 2008 15:31:16 +0100
+Message-Id: <1229783497-19550-5-git-send-email-sam@ravnborg.org>
 In-Reply-To: <20081220142518.GA19390@uranus.ravnborg.org>
 References: <20081220142518.GA19390@uranus.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: kbuild <linux-kbuild@vger.kernel.org>, lkml <linux-kernel@vger.kernel.org>
-Cc: Peter Korsgaard <jacmet@sunsite.dk>, Sam Ravnborg <sam@ravnborg.org>
+Cc: Mike Frysinger <vapier@gentoo.org>, Sam Ravnborg <sam@ravnborg.org>
 
-From: Peter Korsgaard <jacmet@sunsite.dk>
+From: Mike Frysinger <vapier@gentoo.org>
 
-Print svn revision in addition to git info on git-svn repos.
+Convert a few echos in the build system to new $(kecho) so we get correct
+output according to build verbosity.
 
-Signed-off-by: Peter Korsgaard <jacmet@sunsite.dk>
+Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+[sam: added kecho in a few more places for O=... builds]
 Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
 ---
- scripts/setlocalversion |    5 +++++
- 1 files changed, 5 insertions(+), 0 deletions(-)
+ Makefile                    |    8 ++++----
+ arch/blackfin/boot/Makefile |    2 +-
+ scripts/Kbuild.include      |   11 ++---------
+ 3 files changed, 7 insertions(+), 14 deletions(-)
 
-diff --git a/scripts/setlocalversion b/scripts/setlocalversion
-index 81d984b..f6946cf 100755
---- a/scripts/setlocalversion
-+++ b/scripts/setlocalversion
-@@ -19,6 +19,11 @@ if head=`git rev-parse --verify --short HEAD 2>/dev/null`; then
- 		fi
- 	fi
+diff --git a/Makefile b/Makefile
+index 3075586..3a6ac68 100644
+--- a/Makefile
++++ b/Makefile
+@@ -926,7 +926,7 @@ PHONY += prepare archprepare prepare0 prepare1 prepare2 prepare3
+ # 2) Create the include2 directory, used for the second asm symlink
+ prepare3: include/config/kernel.release
+ ifneq ($(KBUILD_SRC),)
+-	@echo '  Using $(srctree) as source for kernel'
++	@$(kecho) '  Using $(srctree) as source for kernel'
+ 	$(Q)if [ -f $(srctree)/.config -o -d $(srctree)/include/config ]; then \
+ 		echo "  $(srctree) is not clean, please run 'make mrproper'";\
+ 		echo "  in the '$(srctree)' directory.";\
+@@ -983,7 +983,7 @@ endef
+ # directory for generated filesas used by some architectures.
+ define create-symlink
+ 	if [ ! -L include/asm ]; then                                      \
+-			echo '  SYMLINK $@ -> include/asm-$(SRCARCH)';     \
++			$(kecho) '  SYMLINK $@ -> include/asm-$(SRCARCH)'; \
+ 			if [ ! -d include/asm-$(SRCARCH) ]; then           \
+ 				mkdir -p include/asm-$(SRCARCH);           \
+ 			fi;                                                \
+@@ -1096,7 +1096,7 @@ all: modules
+ PHONY += modules
+ modules: $(vmlinux-dirs) $(if $(KBUILD_BUILTIN),vmlinux)
+ 	$(Q)$(AWK) '!x[$$0]++' $(vmlinux-dirs:%=$(objtree)/%/modules.order) > $(objtree)/modules.order
+-	@echo '  Building modules, stage 2.';
++	@$(kecho) '  Building modules, stage 2.';
+ 	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.modpost
+ 	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.fwinst obj=firmware __fw_modbuild
  
-+	# Is this git on svn?
-+	if git config --get svn-remote.svn.url >/dev/null; then
-+	        printf -- '-svn%s' "`git-svn find-rev $head`"
-+	fi
-+
- 	# Are there uncommitted changes?
- 	git update-index --refresh --unmerged > /dev/null
- 	if git diff-index --name-only HEAD | grep -v "^scripts/package" \
+@@ -1360,7 +1360,7 @@ $(module-dirs): crmodverdir $(objtree)/Module.symvers
+ 	$(Q)$(MAKE) $(build)=$(patsubst _module_%,%,$@)
+ 
+ modules: $(module-dirs)
+-	@echo '  Building modules, stage 2.';
++	@$(kecho) '  Building modules, stage 2.';
+ 	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.modpost
+ 
+ PHONY += modules_install
+diff --git a/arch/blackfin/boot/Makefile b/arch/blackfin/boot/Makefile
+index 522f3c1..e028d13 100644
+--- a/arch/blackfin/boot/Makefile
++++ b/arch/blackfin/boot/Makefile
+@@ -25,7 +25,7 @@ $(obj)/vmlinux.gz: $(obj)/vmlinux.bin FORCE
+ 
+ $(obj)/vmImage: $(obj)/vmlinux.gz
+ 	$(call if_changed,uimage)
+-	@echo 'Kernel: $@ is ready'
++	@$(kecho) 'Kernel: $@ is ready'
+ 
+ install:
+ 	sh $(srctree)/$(src)/install.sh $(KERNELRELEASE) $(BOOTIMAGE) System.map "$(INSTALL_PATH)"
+diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
+index 8cf87e8..c29be8f 100644
+--- a/scripts/Kbuild.include
++++ b/scripts/Kbuild.include
+@@ -46,22 +46,15 @@ kecho := $($(quiet)kecho)
+ # - If they are equal no change, and no timestamp update
+ # - stdin is piped in from the first prerequisite ($<) so one has
+ #   to specify a valid file as first prerequisite (often the kbuild file)
+-       chk_filechk = :
+- quiet_chk_filechk = echo '  CHK     $@'
+-silent_chk_filechk = :
+-       upd_filechk = :
+- quiet_upd_filechk = echo '  UPD     $@'
+-silent_upd_filechk = :
+-
+ define filechk
+ 	$(Q)set -e;				\
+-	$($(quiet)chk_filechk);			\
++	$(kecho) '  CHK     $@';		\
+ 	mkdir -p $(dir $@);			\
+ 	$(filechk_$(1)) < $< > $@.tmp;		\
+ 	if [ -r $@ ] && cmp -s $@ $@.tmp; then	\
+ 		rm -f $@.tmp;			\
+ 	else					\
+-		$($(quiet)upd_filechk);		\
++		$(kecho) '  UPD     $@';	\
+ 		mv -f $@.tmp $@;		\
+ 	fi
+ endef
 -- 
 1.6.0.2.GIT
 
