@@ -1,84 +1,123 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from acsinet12.oracle.com ([141.146.126.234]:24888 "EHLO
-	acsinet12.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752130AbYLVStr (ORCPT
+Received: from pfepa.post.tele.dk ([195.41.46.235]:51428 "EHLO
+	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751898AbYLYNON (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 22 Dec 2008 13:49:47 -0500
-Date: Mon, 22 Dec 2008 10:49:12 -0800
-From: Randy Dunlap <randy.dunlap@oracle.com>
-Subject: Re: [PATCH 04/26] kbuild: introduce $(kecho) convenience echo
-Message-Id: <20081222104912.fca1d371.randy.dunlap@oracle.com>
-In-Reply-To: <1229783497-19550-4-git-send-email-sam@ravnborg.org>
-References: <20081220142518.GA19390@uranus.ravnborg.org>
-	<1229783497-19550-4-git-send-email-sam@ravnborg.org>
+	Thu, 25 Dec 2008 08:14:13 -0500
+Date: Thu, 25 Dec 2008 14:15:45 +0100
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: [GIT PULL] kbuild updates for v2.6.29
+Message-ID: <20081225131545.GA30628@uranus.ravnborg.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: kbuild <linux-kbuild@vger.kernel.org>, lkml <linux-kernel@vger.kernel.org>, Mike Frysinger <vapier@gentoo.org>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
 
-On Sat, 20 Dec 2008 15:31:15 +0100 Sam Ravnborg wrote:
+Hi Linus.
 
-> From: Mike Frysinger <vapier@gentoo.org>
-> 
-> There is a bunch of places in the build system where we do 'echo' to show
-> some nice status lines.  This means we still get output when running in
-> silent mode.  So declare a new KECHO variable that only does 'echo' when we
-> are in a suitable verbose build mode.
-> 
-> Signed-off-by: Mike Frysinger <vapier@gentoo.org>
-> [sam: added Documentation]
-> Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
+A few (26) patches has accumulated the last months on the kbuild side.
 
-Hi,
-Just nits/clarifications (below).
+Highlights:
 
+o Better track of symbol checksum changes (Andreas Gruenbacher)
+o Improved stripping of modules (Jan Beulich)
+o silent is now really silent (Mike Frysinger)
+o improved svn support (Peter Korsgaard)
+o detect include looks (new target: headerdep) (Vegard Nossum)
 
-> ---
->  Documentation/kbuild/makefiles.txt |   14 ++++++++++++++
->  scripts/Kbuild.include             |    7 +++++++
->  2 files changed, 21 insertions(+), 0 deletions(-)
-> 
-> diff --git a/Documentation/kbuild/makefiles.txt b/Documentation/kbuild/makefiles.txt
-> index 7a77533..51104f9 100644
-> --- a/Documentation/kbuild/makefiles.txt
-> +++ b/Documentation/kbuild/makefiles.txt
-> @@ -383,6 +383,20 @@ more details, with real examples.
->  	to prerequisites are referenced with $(src) (because they are not
->  	generated files).
->  
-> +    $(kecho)
-> +	echoing information to user in a rule is often a good practice
+This pull contains a lot of crunch in the top-level Makefile.
+This is mostly due to:
+- move all tags generation support to a shell script (deletes stuff)
+- improved strip support for modules/vmlinux (adds atuff)
 
-	                    to users
+Please pull from:
 
-> +	but when execution "make -s" one does not expect to see any output
+   git://git.kernel.org/pub/scm/linux/kernel/git/sam/kbuild-next.git master
 
-	         executing
-
-> +	except for warnings/errors.
-> +	To support this kbuild define $(kecho) which will echo out the
-
-	                       defines
-
-> +	text following $(kecho) to stdout except if "make -s" is used.
-
-s/except if/unless/
-
-> +
-> +	Example:
-> +		#arch/blackfin/boot/Makefile
-> +		$(obj)/vmImage: $(obj)/vmlinux.gz
-> +			$(call if_changed,uimage)
-> +			@$(kecho) 'Kernel: $@ is ready'
-> +
-> +
->  --- 3.11 $(CC) support functions
->  
->  	The kernel may be built with several different versions of
+	Sam
 
 
----
-~Randy
+Andreas Gruenbacher (2):
+      genksyms: track symbol checksum changes
+      genksyms: allow to ignore symbol checksum changes
+
+Arjan van de Ven (1):
+      scripts: improve the decodecode script
+
+Jan Beulich (2):
+      kbuild: strip generated symbols from *.ko
+      allow stripping of generated symbols under CONFIG_KALLSYMS_ALL
+
+Jeremy Kerr (1):
+      scripts/package: allow custom options to rpm
+
+Jiri Slaby (2):
+      kbuild: fix make tags/cscope
+      kbuild: fix string equality testing in tags.sh
+
+Mike Frysinger (3):
+      kbuild: kill output in silent mode of mkcompile_h
+      kbuild: introduce $(kecho) convenience echo
+      kbuild: use KECHO convenience echo
+
+Peter Korsgaard (2):
+      setlocalversion: print correct subversion revision
+      setlocalversion: add git-svn support
+
+Randy Dunlap (1):
+      kernel-doc: check for extra kernel-doc notations
+
+Robert P. J. Day (1):
+      kbuild: remove TAR_IGNORE
+
+Sally, Gene (1):
+      kbuild: gen_init_cpio expands shell variables in file names
+
+Sam Ravnborg (8):
+      kbuild: fix -I option expansion with O=... builds
+      kbuild: expand -I in KBUILD_CPPFLAGS
+      kbuild: teach mkmakfile to be silent
+      kconfig: fix options to check-lxdialog.sh
+      tags and cscope support really belongs in a shell script
+      kbuild: fix make incompatibility
+      kbuild: simplify use of genksyms
+      kbuild: support switching source directories with O=.. builds
+
+Vegard Nossum (1):
+      kbuild: add headerdep used to detect inclusion cycles in header files
+
+Werner Almesberger (1):
+      remove bashisms from scripts/extract-ikconfig
+
+ Documentation/kbuild/makefiles.txt         |   14 ++
+ Makefile                                   |  209 +++++++--------------
+ arch/blackfin/boot/Makefile                |    2 +-
+ arch/x86/scripts/strip-symbols             |    1 +
+ init/Kconfig                               |    7 +
+ kernel/kallsyms.c                          |   16 +-
+ scripts/Kbuild.include                     |   22 ++-
+ scripts/Makefile.build                     |   67 +++++---
+ scripts/Makefile.lib                       |   15 +-
+ scripts/Makefile.modinst                   |    3 +-
+ scripts/decodecode                         |   32 +++-
+ scripts/extract-ikconfig                   |    8 +-
+ scripts/genksyms/genksyms.c                |  277 ++++++++++++++++++++++++++--
+ scripts/genksyms/genksyms.h                |    7 +
+ scripts/genksyms/keywords.c_shipped        |  189 ++++++++++----------
+ scripts/genksyms/keywords.gperf            |    2 +
+ scripts/headerdep.pl                       |  193 +++++++++++++++++++
+ scripts/kallsyms.c                         |   21 +--
+ scripts/kconfig/lxdialog/check-lxdialog.sh |    2 +-
+ scripts/kernel-doc                         |   67 +++++++-
+ scripts/mkcompile_h                        |    6 +-
+ scripts/mkmakefile                         |    4 +-
+ scripts/mksysmap                           |    7 +-
+ scripts/package/Makefile                   |    9 +-
+ scripts/setlocalversion                    |    7 +-
+ scripts/strip-symbols                      |   22 +++
+ scripts/tags.sh                            |  160 ++++++++++++++++
+ usr/gen_init_cpio.c                        |   28 +++-
+ 28 files changed, 1046 insertions(+), 351 deletions(-)
