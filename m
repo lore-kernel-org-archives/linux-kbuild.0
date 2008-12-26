@@ -1,27 +1,44 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:45634 "EHLO mga02.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751870AbYLZHtB (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 26 Dec 2008 02:49:01 -0500
-Subject: add a piece of code to each module
-From: Shaohua Li <shaohua.li@intel.com>
-Content-Type: text/plain
-Date: Fri, 26 Dec 2008 15:48:59 +0800
-Message-Id: <1230277739.4780.9.camel@sli10-desk.sh.intel.com>
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Received: from sovereign.computergmbh.de ([85.214.69.204]:58303 "EHLO
+	sovereign.computergmbh.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751333AbYLZTaY (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 26 Dec 2008 14:30:24 -0500
+Date: Fri, 26 Dec 2008 20:30:19 +0100 (CET)
+From: Jan Engelhardt <jengelh@medozas.de>
+Subject: Re: [PATCH] Compress kernel modules on installation.
+In-Reply-To: <20080226112840.GA29465@uranus.ravnborg.org>
+Message-ID: <alpine.LSU.2.00.0812262026320.11203@fbirervta.pbzchgretzou.qr>
+References: <20080225214209.a3f79327.sbrokenshire@xestia.co.uk> <20080226112840.GA29465@uranus.ravnborg.org>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: sam@ravnborg.org
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: Steve Brokenshire <sbrokenshire@xestia.co.uk>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-Hi,
-I'm now porting dyn ftrace to IA64. To make modules work, I must add a
-piece of code (trampoline code) to each module. I can't add the
-trampoline code in module load, because at that time, only PLT
-trampoline code can be added, and that code isn't ok for ftrace. I
-wonder if this can be done in kbuild. If yes, how can I do it?
 
-Thanks,
-Shaohua
+On Tuesday 2008-02-26 12:28, Sam Ravnborg wrote:
+>> 
+>> (I've sent this to the linux-kbuild and linux-kernel lists as this
+>> patch modifies the Makefile.modinst file. I also don't subscribe to the 
+>> linux-kbuild and linux-kernel mailing lists so can I have any replies
+>> CC'ed to me please)
+>> 
+>> This patch allows kernel modules to be compressed when 'make
+>> modules_install' is run after being copied to
+>> the /lib/module/<version>/<...> directory which is useful if you have
+>> module-init-tools installed with --enable-zlib. This patch adds an
+>> option (MODULE_COMPRESS) to the kernel configuration file (specifically
+>> init/Kconfig) so that the kernel modules will compressed if
+>> MODULE_COMPRESS is set.
 
+I recently started compressing my kernel modules and that saved me
+at least 70 MB of disk space on mostlyallmodconfig.
+(And no, the argument of disks being cheap is not so true with
+CF or SSD.)
+Distro is lazy and wants to wait for upstream to have it,
+so is there any chance of getting this proposal in?
+
+
+Jan
