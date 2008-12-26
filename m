@@ -1,48 +1,66 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepb.post.tele.dk ([195.41.46.236]:36177 "EHLO
-	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750929AbYLZTrA (ORCPT
+Received: from sovereign.computergmbh.de ([85.214.69.204]:38818 "EHLO
+	sovereign.computergmbh.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750929AbYLZTuh (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 26 Dec 2008 14:47:00 -0500
-Date: Fri, 26 Dec 2008 20:48:33 +0100
-From: Sam Ravnborg <sam@ravnborg.org>
+	Fri, 26 Dec 2008 14:50:37 -0500
+Date: Fri, 26 Dec 2008 20:50:34 +0100 (CET)
+From: Jan Engelhardt <jengelh@medozas.de>
 Subject: Re: [PATCH] Compress kernel modules on installation.
-Message-ID: <20081226194833.GA8306@uranus.ravnborg.org>
-References: <20080225214209.a3f79327.sbrokenshire@xestia.co.uk> <20080226112840.GA29465@uranus.ravnborg.org> <alpine.LSU.2.00.0812262026320.11203@fbirervta.pbzchgretzou.qr>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <alpine.LSU.2.00.0812262026320.11203@fbirervta.pbzchgretzou.qr>
+In-Reply-To: <20081226194833.GA8306@uranus.ravnborg.org>
+Message-ID: <alpine.LSU.2.00.0812262049040.12031@fbirervta.pbzchgretzou.qr>
+References: <20080225214209.a3f79327.sbrokenshire@xestia.co.uk> <20080226112840.GA29465@uranus.ravnborg.org> <alpine.LSU.2.00.0812262026320.11203@fbirervta.pbzchgretzou.qr> <20081226194833.GA8306@uranus.ravnborg.org>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jan Engelhardt <jengelh@medozas.de>
+To: Sam Ravnborg <sam@ravnborg.org>
 Cc: Steve Brokenshire <sbrokenshire@xestia.co.uk>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-On Fri, Dec 26, 2008 at 08:30:19PM +0100, Jan Engelhardt wrote:
-> 
-> On Tuesday 2008-02-26 12:28, Sam Ravnborg wrote:
-> >> 
-> >> (I've sent this to the linux-kbuild and linux-kernel lists as this
-> >> patch modifies the Makefile.modinst file. I also don't subscribe to the 
-> >> linux-kbuild and linux-kernel mailing lists so can I have any replies
-> >> CC'ed to me please)
-> >> 
-> >> This patch allows kernel modules to be compressed when 'make
-> >> modules_install' is run after being copied to
-> >> the /lib/module/<version>/<...> directory which is useful if you have
-> >> module-init-tools installed with --enable-zlib. This patch adds an
-> >> option (MODULE_COMPRESS) to the kernel configuration file (specifically
-> >> init/Kconfig) so that the kernel modules will compressed if
-> >> MODULE_COMPRESS is set.
-> 
-> I recently started compressing my kernel modules and that saved me
-> at least 70 MB of disk space on mostlyallmodconfig.
-> (And no, the argument of disks being cheap is not so true with
-> CF or SSD.)
-> Distro is lazy and wants to wait for upstream to have it,
-> so is there any chance of getting this proposal in?
 
-Steve said he wanted to try to make the solution more
-scalable so I am awaiting a new patch.
+On Friday 2008-12-26 20:48, Sam Ravnborg wrote:
+>> >> 
+>> >> This patch allows kernel modules to be compressed when 'make
+>> >> modules_install' is run after being copied to
+>> >> the /lib/module/<version>/<...> directory which is useful if you have
+>> >> module-init-tools installed with --enable-zlib. This patch adds an
+>> >> option (MODULE_COMPRESS) to the kernel configuration file (specifically
+>> >> init/Kconfig) so that the kernel modules will compressed if
+>> >> MODULE_COMPRESS is set.
+>> 
+>> I recently started compressing my kernel modules and that saved me
+>> at least 70 MB of disk space on mostlyallmodconfig.
+>> (And no, the argument of disks being cheap is not so true with
+>> CF or SSD.)
+>> Distro is lazy and wants to wait for upstream to have it,
+>> so is there any chance of getting this proposal in?
+>
+>Steve said he wanted to try to make the solution more
+>scalable so I am awaiting a new patch.
 
-	Sam
+Hm, all I needed was this patch. It might fire up some people,
+but it's got all the scalability I could think of..
+
+
+commit b4a3e1c610c99d4e8b543b97fd722076c6f7c5dd
+Author: Jan Engelhardt <jengelh@medozas.de>
+Date:   Wed Dec 10 20:39:21 2008 +0100
+
+build: install modules compressed
+---
+ scripts/Makefile.modinst |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/scripts/Makefile.modinst b/scripts/Makefile.modinst
+index efa5d94..c3421a1 100644
+--- a/scripts/Makefile.modinst
++++ b/scripts/Makefile.modinst
+@@ -17,7 +17,7 @@ __modinst: $(modules)
+ 	@:
+ 
+ quiet_cmd_modules_install = INSTALL $@
+-      cmd_modules_install = mkdir -p $(2); cp $@ $(2) ; $(mod_strip_cmd) $(2)/$(notdir $@)
++      cmd_modules_install = mkdir -p $(2); cp $@ $(2) ; $(mod_strip_cmd) $(2)/$(notdir $@); gzip -9f $(2)/$(notdir $@)
+ 
+ # Modules built outside the kernel source tree go into extra by default
+ INSTALL_MOD_DIR ?= extra
