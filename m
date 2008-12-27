@@ -1,58 +1,67 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from sovereign.computergmbh.de ([85.214.69.204]:56458 "EHLO
-	sovereign.computergmbh.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752293AbYLZXMl (ORCPT
+Received: from pfepb.post.tele.dk ([195.41.46.236]:44346 "EHLO
+	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751419AbYL0JCF (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 26 Dec 2008 18:12:41 -0500
-Date: Sat, 27 Dec 2008 00:12:36 +0100 (CET)
-From: Jan Engelhardt <jengelh@medozas.de>
-Subject: Re: [PATCH] Compress kernel modules on installation.
-In-Reply-To: <20081226225748.GA25143@uranus.ravnborg.org>
-Message-ID: <alpine.LSU.2.00.0812270005200.12031@fbirervta.pbzchgretzou.qr>
-References: <20080225214209.a3f79327.sbrokenshire@xestia.co.uk> <20080226112840.GA29465@uranus.ravnborg.org> <alpine.LSU.2.00.0812262026320.11203@fbirervta.pbzchgretzou.qr> <20081226194833.GA8306@uranus.ravnborg.org> <alpine.LSU.2.00.0812262049040.12031@fbirervta.pbzchgretzou.qr>
- <20081226225748.GA25143@uranus.ravnborg.org>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+	Sat, 27 Dec 2008 04:02:05 -0500
+Date: Sat, 27 Dec 2008 10:03:39 +0100
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Improve dependency checks in kconfig
+Message-ID: <20081227090339.GA6279@uranus.ravnborg.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: Steve Brokenshire <sbrokenshire@xestia.co.uk>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Roman Zippel <zippel@linux-m68k.org>
 
+While working on some unification of Kconfig stuff across
+all architectures I hit a Kconfig bug where it segfaulted
+due to a recursive dependency.
+It's a bug I have introduced myself long time ago :-(
 
-On Friday 2008-12-26 23:57, Sam Ravnborg wrote:
->>>
->>>Steve said [in Feb 2008] he wanted to try to make the solution
->>>more scalable so I am awaiting a new patch.
->> 
->>Hm, all I needed was this patch. It might fire up some people,
->>but it's got all the scalability I could think of..
->
->Jan - there is obviously no way I could apply this patch
->so late in the cycle. 
+I decided to do the reporting more verbose while fixing
+this bug.
 
-2.6.29 just started, did not it. Even if not, just queue it for
-the next.
+When looking into this I added a few comments to expr.h
+so I do not have to fnd out how it works next time.
 
->The original patch that made this a CONFIG option is
->then much better as we avoid forcing new and untested
->behaviour on the users.
->
->We all know that compressing the modules are simple.
->And unless someone comes up with *very* good arguments
->then we should just use gzip with default parameters.
+The problem was that kconfig do not save where it finds
+a config symbol but only the related properties.
 
-Besides the -9 flag, where would there be nondefault
-parameters?
+But a symbol defined like this:
 
->If we go for the "keep the .ko extension but compress"
->then someone needs to answer the obvious questions:
->
->- will this break on a typical distribution
+    config FOO
+            bool
 
-No; module-init-tools already uses gzopen even on
-uncompressed files.
+does not have any properties so we do not save any
+filename/line numbers.
 
->- will this break busybox users
+The solution I came up with was to add a new property:
+P_SYMBOL used solely to record filename/line number for
+defined symbols.
+I could not add it to struct symbol because a symbol can
+be defined at several places.
 
-I did not see any gzip support in there, so the
-answer is likely "yes, as usual".
+With this change kconfig at least report one of the
+places where said symbol is defined. It is not perfect as
+we should report all places where a symbol is reported but
+for the cases I hit what we have here was good enough.
+
+With this I hit a recursive dependency issue in m68k - a patch
+is already sent to the m68k guys.
+
+Patches follows.
+
+Sam Ravnborg (4):
+      kconfig: explain symbol value defaults
+      kconfig: add comments to symbol flags
+      kconfig: struct property commented
+      kconfig: improve readout when we hit recursive dependencies
+
+ scripts/kconfig/expr.h   |   83 ++++++++++++++++++++++++++++++---------------
+ scripts/kconfig/menu.c   |    2 +
+ scripts/kconfig/symbol.c |   11 ++++--
+ 3 files changed, 65 insertions(+), 31 deletions(-)
+
+	Sam
