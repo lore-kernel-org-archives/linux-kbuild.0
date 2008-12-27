@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepa.post.tele.dk ([195.41.46.235]:48668 "EHLO
+Received: from pfepa.post.tele.dk ([195.41.46.235]:48736 "EHLO
 	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754573AbYL0U4g (ORCPT
+	with ESMTP id S1755033AbYL0U5I (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 27 Dec 2008 15:56:36 -0500
-Date: Sat, 27 Dec 2008 21:58:07 +0100
+	Sat, 27 Dec 2008 15:57:08 -0500
+Date: Sat, 27 Dec 2008 21:58:40 +0100
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: [PATCH 1/2] kconfig: print all locations when we see a recursive dependency
-Message-ID: <20081227205807.GB16609@uranus.ravnborg.org>
+Subject: [PATCH 2/2] kconfig: improve error messages for bad source statements
+Message-ID: <20081227205840.GC16609@uranus.ravnborg.org>
 References: <20081227090339.GA6279@uranus.ravnborg.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
@@ -17,86 +17,64 @@ Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Roman Zippel <zippel@linux-m68k.org>
 
-From 7e9617872fe81a9515e8ce22c9ece8bd1e905b4c Mon Sep 17 00:00:00 2001
+From 31606ff6946f5fc841b9d990c6c5479f54f16835 Mon Sep 17 00:00:00 2001
 From: Sam Ravnborg <sam@ravnborg.org>
-Date: Sat, 27 Dec 2008 21:25:29 +0100
-Subject: [PATCH 1/2] kconfig: print all locations when we see a recursive dependency
+Date: Sat, 27 Dec 2008 21:51:59 +0100
+Subject: [PATCH 2/2] kconfig: improve error messages for bad source statements
 
-It is nessesary to know all locations when trying to track
-a recursive dependency. So print out all locations for each symbol.
-
-Sample output:
-Kconfig:1: found recursive dependency:
-            TEST1
-         -> TEST2 (Kconfig:4),(Kconfig:12)
-         -> TEST1 (Kconfig:1),(Kconfig:7)
-
-In a more complex example the symbols can be defined in different
-files thus making it harder to track.
+We now say where we detect the second source of a file,
+and where we detect a recursively source of the same file.
+This makes it easier to fix such errors.
 
 Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
 Cc: Roman Zippel <zippel@linux-m68k.org>
 ---
- scripts/kconfig/symbol.c |   24 ++++++++++++++++++------
- 1 files changed, 18 insertions(+), 6 deletions(-)
+ scripts/kconfig/lex.zconf.c_shipped |    7 +++++--
+ scripts/kconfig/zconf.l             |    7 +++++--
+ 2 files changed, 10 insertions(+), 4 deletions(-)
 
-diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
-index 474dae2..fc62f34 100644
---- a/scripts/kconfig/symbol.c
-+++ b/scripts/kconfig/symbol.c
-@@ -790,6 +790,21 @@ static struct symbol *sym_check_expr_deps(struct expr *e)
- 	return NULL;
- }
+diff --git a/scripts/kconfig/lex.zconf.c_shipped b/scripts/kconfig/lex.zconf.c_shipped
+index 7342ce0..dc3e818 100644
+--- a/scripts/kconfig/lex.zconf.c_shipped
++++ b/scripts/kconfig/lex.zconf.c_shipped
+@@ -2370,11 +2370,14 @@ void zconf_nextfile(const char *name)
+ 	current_buf = buf;
  
-+static void print_symbol_location(struct symbol *sym)
-+{
-+	struct property *prop;
-+	int comma = 0;
-+
-+	fprintf(stderr, "\t -> %s ", sym->name ? sym->name : "<choice>");
-+	for (prop = sym->prop; prop; prop = prop->next) {
-+		if (prop->type == P_SYMBOL) {
-+			fprintf(stderr, "%s(%s:%d)",
-+			comma ? "," : "", prop->file->name, prop->lineno);
-+			comma = 1;
-+		}
-+	}
-+	fprintf(stderr, "\n");
-+}
- /* return NULL when dependencies are OK */
- static struct symbol *sym_check_sym_deps(struct symbol *sym)
- {
-@@ -835,7 +850,7 @@ static struct symbol *sym_check_choice_deps(struct symbol *choice)
- 	expr_list_for_each_sym(prop->expr, e, sym) {
- 		sym2 = sym_check_sym_deps(sym);
- 		if (sym2) {
--			fprintf(stderr, " -> %s", sym->name);
-+			print_symbol_location(sym);
- 			break;
- 		}
+ 	if (file->flags & FILE_BUSY) {
+-		printf("recursive scan (%s)?\n", name);
++		printf("%s:%d: do not source '%s' from itself\n",
++		       zconf_curname(), zconf_lineno(), name);
+ 		exit(1);
  	}
-@@ -856,7 +871,7 @@ struct symbol *sym_check_deps(struct symbol *sym)
- 	struct property *prop;
- 
- 	if (sym->flags & SYMBOL_CHECK) {
--		fprintf(stderr, "%s:%d:error: found recursive dependency:\n",
-+		fprintf(stderr, "%s:%d: found recursive dependency:\n",
- 		        sym->prop->file->name, sym->prop->lineno);
- 		fprintf(stderr, "\t    %s\n",
- 			sym->name ? sym->name : "<choice>");
-@@ -878,11 +893,8 @@ struct symbol *sym_check_deps(struct symbol *sym)
+ 	if (file->flags & FILE_SCANNED) {
+-		printf("file %s already scanned?\n", name);
++		printf("%s:%d: file '%s' is already sourced from '%s'\n",
++		       zconf_curname(), zconf_lineno(), name,
++		       file->parent->name);
+ 		exit(1);
  	}
+ 	file->flags |= FILE_BUSY;
+diff --git a/scripts/kconfig/zconf.l b/scripts/kconfig/zconf.l
+index 5164ef7..21ff69c 100644
+--- a/scripts/kconfig/zconf.l
++++ b/scripts/kconfig/zconf.l
+@@ -314,11 +314,14 @@ void zconf_nextfile(const char *name)
+ 	current_buf = buf;
  
- 	if (sym2) {
--		fprintf(stderr, "\t -> %s (%s:%d)\n",
--		        sym->name ? sym->name : "<choice>",
--			sym->prop->file->name, sym->prop->lineno);
-+		print_symbol_location(sym);
- 		if (sym2 == sym) {
--			fprintf(stderr, "\n");
- 			zconfnerrs++;
- 			sym2 = NULL;
- 		}
+ 	if (file->flags & FILE_BUSY) {
+-		printf("recursive scan (%s)?\n", name);
++		printf("%s:%d: do not source '%s' from itself\n",
++		       zconf_curname(), zconf_lineno(), name);
+ 		exit(1);
+ 	}
+ 	if (file->flags & FILE_SCANNED) {
+-		printf("file %s already scanned?\n", name);
++		printf("%s:%d: file '%s' is already sourced from '%s'\n",
++		       zconf_curname(), zconf_lineno(), name,
++		       file->parent->name);
+ 		exit(1);
+ 	}
+ 	file->flags |= FILE_BUSY;
 -- 
 1.6.0.2.GIT
 
