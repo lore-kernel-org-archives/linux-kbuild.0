@@ -1,67 +1,72 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepb.post.tele.dk ([195.41.46.236]:44346 "EHLO
-	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751419AbYL0JCF (ORCPT
+Received: from pfepa.post.tele.dk ([195.41.46.235]:50728 "EHLO
+	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751867AbYL0JXU (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 27 Dec 2008 04:02:05 -0500
-Date: Sat, 27 Dec 2008 10:03:39 +0100
+	Sat, 27 Dec 2008 04:23:20 -0500
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Improve dependency checks in kconfig
-Message-ID: <20081227090339.GA6279@uranus.ravnborg.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Subject: [PATCH 2/4] kconfig: add comments to symbol flags
+Date: Sat, 27 Dec 2008 10:24:52 +0100
+Message-Id: <1230369894-10510-2-git-send-email-sam@ravnborg.org>
+In-Reply-To: <20081227090339.GA6279@uranus.ravnborg.org>
+References: <20081227090339.GA6279@uranus.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Roman Zippel <zippel@linux-m68k.org>
+To: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
+Cc: Sam Ravnborg <sam@ravnborg.org>
 
-While working on some unification of Kconfig stuff across
-all architectures I hit a Kconfig bug where it segfaulted
-due to a recursive dependency.
-It's a bug I have introduced myself long time ago :-(
+No functional changes - only comments.
 
-I decided to do the reporting more verbose while fixing
-this bug.
+Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
+---
+ scripts/kconfig/expr.h |   34 ++++++++++++++++++----------------
+ 1 files changed, 18 insertions(+), 16 deletions(-)
 
-When looking into this I added a few comments to expr.h
-so I do not have to fnd out how it works next time.
+diff --git a/scripts/kconfig/expr.h b/scripts/kconfig/expr.h
+index 455f2c8..0bdb58e 100644
+--- a/scripts/kconfig/expr.h
++++ b/scripts/kconfig/expr.h
+@@ -88,22 +88,24 @@ struct symbol {
+ 
+ #define for_all_symbols(i, sym) for (i = 0; i < 257; i++) for (sym = symbol_hash[i]; sym; sym = sym->next) if (sym->type != S_OTHER)
+ 
+-#define SYMBOL_CONST		0x0001
+-#define SYMBOL_CHECK		0x0008
+-#define SYMBOL_CHOICE		0x0010
+-#define SYMBOL_CHOICEVAL	0x0020
+-#define SYMBOL_VALID		0x0080
+-#define SYMBOL_OPTIONAL		0x0100
+-#define SYMBOL_WRITE		0x0200
+-#define SYMBOL_CHANGED		0x0400
+-#define SYMBOL_AUTO		0x1000
+-#define SYMBOL_CHECKED		0x2000
+-#define SYMBOL_WARNED		0x8000
+-#define SYMBOL_DEF		0x10000
+-#define SYMBOL_DEF_USER		0x10000
+-#define SYMBOL_DEF_AUTO		0x20000
+-#define SYMBOL_DEF3		0x40000
+-#define SYMBOL_DEF4		0x80000
++#define SYMBOL_CONST      0x0001  /* symbol is const */
++#define SYMBOL_CHECK      0x0008  /* used during dependency checking */
++#define SYMBOL_CHOICE     0x0010  /* start of a choice block (null name) */
++#define SYMBOL_CHOICEVAL  0x0020  /* used as a value in a choice block */
++#define SYMBOL_VALID      0x0080  /* set when symbol.curr is calculated */
++#define SYMBOL_OPTIONAL   0x0100  /* choice is optional - values can be 'n' */
++#define SYMBOL_WRITE      0x0200  /* ? */
++#define SYMBOL_CHANGED    0x0400  /* ? */
++#define SYMBOL_AUTO       0x1000  /* value from environment variable */
++#define SYMBOL_CHECKED    0x2000  /* used during dependency checking */
++#define SYMBOL_WARNED     0x8000  /* warning has been issued */
++
++/* Set when symbol.def[] is used */
++#define SYMBOL_DEF        0x10000  /* First bit of SYMBOL_DEF */
++#define SYMBOL_DEF_USER   0x10000  /* symbol.def[S_DEF_USER] is valid */
++#define SYMBOL_DEF_AUTO   0x20000  /* symbol.def[S_DEF_AUTO] is valid */
++#define SYMBOL_DEF3       0x40000  /* symbol.def[S_DEF_3] is valid */
++#define SYMBOL_DEF4       0x80000  /* symbol.def[S_DEF_4] is valid */
+ 
+ #define SYMBOL_MAXLENGTH	256
+ #define SYMBOL_HASHSIZE		257
+-- 
+1.6.0.2.GIT
 
-The problem was that kconfig do not save where it finds
-a config symbol but only the related properties.
-
-But a symbol defined like this:
-
-    config FOO
-            bool
-
-does not have any properties so we do not save any
-filename/line numbers.
-
-The solution I came up with was to add a new property:
-P_SYMBOL used solely to record filename/line number for
-defined symbols.
-I could not add it to struct symbol because a symbol can
-be defined at several places.
-
-With this change kconfig at least report one of the
-places where said symbol is defined. It is not perfect as
-we should report all places where a symbol is reported but
-for the cases I hit what we have here was good enough.
-
-With this I hit a recursive dependency issue in m68k - a patch
-is already sent to the m68k guys.
-
-Patches follows.
-
-Sam Ravnborg (4):
-      kconfig: explain symbol value defaults
-      kconfig: add comments to symbol flags
-      kconfig: struct property commented
-      kconfig: improve readout when we hit recursive dependencies
-
- scripts/kconfig/expr.h   |   83 ++++++++++++++++++++++++++++++---------------
- scripts/kconfig/menu.c   |    2 +
- scripts/kconfig/symbol.c |   11 ++++--
- 3 files changed, 65 insertions(+), 31 deletions(-)
-
-	Sam
