@@ -1,34 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ns2.suse.de ([195.135.220.15]:54047 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751692AbYL3KnZ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 30 Dec 2008 05:43:25 -0500
-From: Andreas Schwab <schwab@suse.de>
+Received: from pfepb.post.tele.dk ([195.41.46.236]:49636 "EHLO
+	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751394AbYL3MFx (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 30 Dec 2008 07:05:53 -0500
+Date: Tue, 30 Dec 2008 13:07:25 +0100
+From: Sam Ravnborg <sam@ravnborg.org>
 Subject: Re: Many warnings from our userspace headers
-References: <20081230103348.GA363@uranus.ravnborg.org>
-Date: Tue, 30 Dec 2008 11:43:22 +0100
-In-Reply-To: <20081230103348.GA363@uranus.ravnborg.org> (Sam Ravnborg's
-	message of "Tue, 30 Dec 2008 11:33:48 +0100")
-Message-ID: <jeiqp2j645.fsf@sykes.suse.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
+Message-ID: <20081230120725.GA4622@uranus.ravnborg.org>
+References: <20081230103348.GA363@uranus.ravnborg.org> <jeiqp2j645.fsf@sykes.suse.de>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <jeiqp2j645.fsf@sykes.suse.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
+To: Andreas Schwab <schwab@suse.de>
 Cc: LKML <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, janitors <kernel-janitors@vger.kernel.org>, David Woodhouse <dwmw2@infradead.org>
 
-Sam Ravnborg <sam@ravnborg.org> writes:
+On Tue, Dec 30, 2008 at 11:43:22AM +0100, Andreas Schwab wrote:
+> Sam Ravnborg <sam@ravnborg.org> writes:
+> 
+> > /home/sam/kernel/knext.git/usr/include/linux/acct.h:62: leaks CONFIG_M68K to userspace where it is not valid
+> 
+> IMHO this is a false positive, since it is protected by __KERNEL__ in
+> the same expression.
 
-> /home/sam/kernel/knext.git/usr/include/linux/acct.h:62: leaks CONFIG_M68K to userspace where it is not valid
+Correct - but we can rewrite it like this:
 
-IMHO this is a false positive, since it is protected by __KERNEL__ in
-the same expression.
+diff --git a/include/linux/acct.h b/include/linux/acct.h
+index 882dc72..bcc6d2f 100644
+--- a/include/linux/acct.h
++++ b/include/linux/acct.h
+@@ -59,8 +59,12 @@ struct acct
+ 	comp_t		ac_majflt;		/* Major Pagefaults */
+ 	comp_t		ac_swaps;		/* Number of Swaps */
+ /* m68k had no padding here. */
+-#if !defined(CONFIG_M68K) || !defined(__KERNEL__)
++#ifndef __KERNEL__
+ 	__u16		ac_ahz;			/* AHZ */
++#else
++  #ifndef CONFIG_M68K
++	__u16		ac_ahz;			/* AHZ */
++  #endif
+ #endif
+ 	__u32		ac_exitcode;		/* Exitcode */
+ 	char		ac_comm[ACCT_COMM + 1];	/* Command Name */
 
-Andreas.
+This is at least for me also easier to parse.
+So we remove a (bogus) warning and make the code easier to read.
 
--- 
-Andreas Schwab, SuSE Labs, schwab@suse.de
-SuSE Linux Products GmbH, Maxfeldstraße 5, 90409 Nürnberg, Germany
-PGP key fingerprint = 58CA 54C7 6D53 942B 1756  01D3 44D5 214B 8276 4ED5
-"And now for something completely different."
+	Sam
