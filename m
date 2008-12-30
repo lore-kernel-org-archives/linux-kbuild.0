@@ -1,55 +1,42 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepa.post.tele.dk ([195.41.46.235]:36127 "EHLO
-	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753484AbYL2Nvv (ORCPT
+Received: from ti-out-0910.google.com ([209.85.142.189]:48009 "EHLO
+	ti-out-0910.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751179AbYL3GR2 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 29 Dec 2008 08:51:51 -0500
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: [PATCH 02/13] kconfig: explain symbol value defaults
-Date: Mon, 29 Dec 2008 14:53:12 +0100
-Message-Id: <1230558803-7168-2-git-send-email-sam@ravnborg.org>
-In-Reply-To: <20081229134402.GA7069@uranus.ravnborg.org>
-References: <20081229134402.GA7069@uranus.ravnborg.org>
+	Tue, 30 Dec 2008 01:17:28 -0500
+Received: by ti-out-0910.google.com with SMTP id b6so7953480tic.23
+        for <linux-kbuild@vger.kernel.org>; Mon, 29 Dec 2008 22:17:26 -0800 (PST)
+Message-ID: <df9815e70812292217p65b6285eo7a7909c0f6899e6e@mail.gmail.com>
+Date: Tue, 30 Dec 2008 14:17:26 +0800
+From: "Jike Song" <albcamus@gmail.com>
+Subject: Do we really need file `all'?
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
-Cc: Sam Ravnborg <sam@ravnborg.org>
+To: sam@ravnborg.org
+Cc: linux-kbuild@vger.kernel.org
 
-Added a few comments - no functional change.
+Hi Sam,
 
-Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
----
- scripts/kconfig/expr.h |    8 ++++++--
- 1 files changed, 6 insertions(+), 2 deletions(-)
+ In commit a680eedc6c621c75695c68198533fc3c98f4053b you introduced the
+following code:
 
-diff --git a/scripts/kconfig/expr.h b/scripts/kconfig/expr.h
-index 9d4cba1..455f2c8 100644
---- a/scripts/kconfig/expr.h
-+++ b/scripts/kconfig/expr.h
-@@ -65,9 +65,13 @@ enum symbol_type {
- 	S_UNKNOWN, S_BOOLEAN, S_TRISTATE, S_INT, S_HEX, S_STRING, S_OTHER
- };
- 
-+/* enum values are used as index to symbol.def[] */
- enum {
- 	S_DEF_USER,		/* main user value */
--	S_DEF_AUTO,
-+	S_DEF_AUTO,		/* values read from auto.conf */
-+	S_DEF_DEF3,		/* Reserved for UI usage */
-+	S_DEF_DEF4,		/* Reserved for UI usage */
-+	S_DEF_COUNT
- };
- 
- struct symbol {
-@@ -75,7 +79,7 @@ struct symbol {
- 	char *name;
- 	enum symbol_type type;
- 	struct symbol_value curr;
--	struct symbol_value def[4];
-+	struct symbol_value def[S_DEF_COUNT];
- 	tristate visible;
- 	int flags;
- 	struct property *prop;
+        exuberant()
+        {
+                all_sources > all
+                all_sources | xargs ....{snip}...
+
+This will generate a regular file named `all' in the repository, which
+is not included in .gitignore.
+Do we really need this file? I think the second run of all_source is
+enough.  Or otherwise should
+we add it into .gitignore?
+
+I'm not subscribing linux-kbuild list so please CC me in replies, thanks.
+
 -- 
-1.6.0.2.GIT
-
+Thanks,
+Jike
