@@ -1,77 +1,38 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepa.post.tele.dk ([195.41.46.235]:57054 "EHLO
+Received: from pfepa.post.tele.dk ([195.41.46.235]:54583 "EHLO
 	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751031AbZABTtB (ORCPT
+	with ESMTP id S1751239AbZABWae (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 2 Jan 2009 14:49:01 -0500
-Date: Fri, 2 Jan 2009 20:50:39 +0100
+	Fri, 2 Jan 2009 17:30:34 -0500
+Date: Fri, 2 Jan 2009 23:32:13 +0100
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: [GIT] final batch of kbuild updates 
-Message-ID: <20090102195039.GA7343@uranus.ravnborg.org>
+Subject: Re: [PATCH] Kbuild: reintroduce ALLSOURCE_ARCHS support for tags/cscope.
+Message-ID: <20090102223213.GA8843@uranus.ravnborg.org>
+References: <1230730656-2987-1-git-send-email-albcamus@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <1230730656-2987-1-git-send-email-albcamus@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
+To: Jike Song <albcamus@gmail.com>
+Cc: linux-kbuild@vger.kernel.org
 
-Hi Linus.
+On Wed, Dec 31, 2008 at 09:37:36PM +0800, Jike Song wrote:
+> This patch reintroduce the ALLSOURCE_ARCHS support for tags/TAGS/
+> cscope targets. The Kbuild previously has this feature, but after
+> moving the targets into scripts/tags.sh, ALLSOURCE_ARCHS disappears.
+> 
+> It's something like this:
+> 
+> 	$ make ALLSOURCE_ARCHS="x86 mips arm" tags cscope
 
-Here follows the final batch of kbuild updates for the merge window.
+Hi Jike.
 
-Highlights:
+Did you implment this feature because you really use it
+or did you do so because it was 'missing'?
 
-o We no longer let sparse warm about void-valued expressions
-o We have implmented additional checks on out user space headers
-  We do not fail on these yet - there are to much to be fixed.
-o Added some long needed documentation for kconfig and kbuild
-  Always room for more - especially on the kbuild parts.
-
-This set includes a fix in the m68k specific Kconfig file - this 
-is acked by Gert.
-
-The kconfig changes is mostly adding comments. The actual changes will
-wait until next merge window.
-
-Please pull from:
-
-    git://git.kernel.org/pub/scm/linux/kernel/git/sam/kbuild-next.git master
+I explicitly avoided the feature as I expected it to be used
+very seldom.
 
 	Sam
-
-
-Hannes Eder (1):
-      kbuild: disable sparse warning "returning void-valued expression"
-
-Mike Frysinger (2):
-      headers_check.pl: disallow extern's
-      kbuild: in headers_install autoconvert asm/inline/volatile to __xxx__
-
-Randy Dunlap (1):
-      kbuild: make *config usage docs
-
-Sam Ravnborg (10):
-      m68k: fix recursive dependency in Kconfig
-      kconfig: explain symbol value defaults
-      kconfig: add comments to symbol flags
-      kconfig: struct property commented
-      kconfig: improve error messages for bad source statements
-      kbuild: check for leaked CONFIG_ symbols to userspace
-      kbuild: document environment variables
-      kbuild: drop debugging leftover in tags.sh
-      kbuild: add checks for include of linux/types in userspace headers
-      kbuild: ignore a few files in headers_check
-
- Documentation/kbuild/00-INDEX       |    6 +-
- Documentation/kbuild/kbuild.txt     |  126 +++++++++++++++++++++++
- Documentation/kbuild/kconfig.txt    |  188 +++++++++++++++++++++++++++++++++++
- Makefile                            |    3 +-
- README                              |   32 ++++---
- arch/m68k/Kconfig                   |    1 -
- scripts/headers_check.pl            |   70 +++++++++++++-
- scripts/headers_install.pl          |    3 +
- scripts/kconfig/expr.h              |   82 ++++++++++-----
- scripts/kconfig/lex.zconf.c_shipped |    7 +-
- scripts/kconfig/zconf.l             |    7 +-
- scripts/tags.sh                     |    1 -
- 12 files changed, 476 insertions(+), 50 deletions(-)
