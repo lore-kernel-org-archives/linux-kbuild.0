@@ -1,40 +1,42 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepb.post.tele.dk ([195.41.46.236]:52858 "EHLO
-	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757491AbZABWci (ORCPT
+Received: from one.firstfloor.org ([213.235.205.2]:33542 "EHLO
+	one.firstfloor.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1758559AbZACCUP (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 2 Jan 2009 17:32:38 -0500
-Date: Fri, 2 Jan 2009 23:34:14 +0100
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH] Kbuild: reintroduce ALLSOURCE_ARCHS support for tags/cscope.
-Message-ID: <20090102223414.GB8843@uranus.ravnborg.org>
-References: <1230730656-2987-1-git-send-email-albcamus@gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1230730656-2987-1-git-send-email-albcamus@gmail.com>
+	Fri, 2 Jan 2009 21:20:15 -0500
+From: Andi Kleen <andi@firstfloor.org>
+References: <20090103321.351399938@firstfloor.org>
+In-Reply-To: <20090103321.351399938@firstfloor.org>
+Subject: [PATCH] [2/3] KBUILD: Add a symlink to the source for separate objdirs
+Message-Id: <20090103022142.684153E6651@basil.firstfloor.org>
+Date: Sat,  3 Jan 2009 03:21:42 +0100 (CET)
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jike Song <albcamus@gmail.com>
-Cc: linux-kbuild@vger.kernel.org
-
-On Wed, Dec 31, 2008 at 09:37:36PM +0800, Jike Song wrote:
-> This patch reintroduce the ALLSOURCE_ARCHS support for tags/TAGS/
-> cscope targets. The Kbuild previously has this feature, but after
-> moving the targets into scripts/tags.sh, ALLSOURCE_ARCHS disappears.
-> 
-> It's something like this:
-> 
-> 	$ make ALLSOURCE_ARCHS="x86 mips arm" tags cscope
+To: linux-kbuild@vger.kernel.org, sam@ravnborg.org, linux-kernel@vger.kernel.org
 
 
-A second point...
-If you are serious about this then we need this documented
-somewhere. This is not "make help" material so I suggest you
-to add a new chapter in Documentation/kbuild/kbuild.txt
-where you could include this.
+I have some scripts which need to map back to the source directory
+from an objdir. This was so far done by parsing the Makefile,
+but the Makefile format changes occasionally and breaks my scripts
+then.
 
-[The file is soon-to-be-present in mainline kernel, it is
-part of my second push for this merge window.
+To make this more reliable add a "source" symlink back. 
 
-	Sam
+Signed-off-by: Andi Kleen <ak@linux.intel.com>
+
+---
+ Makefile |    1 +
+ 1 file changed, 1 insertion(+)
+
+Index: linux-2.6.28-kbuild/Makefile
+===================================================================
+--- linux-2.6.28-kbuild.orig/Makefile	2008-12-27 16:45:43.000000000 +0100
++++ linux-2.6.28-kbuild/Makefile	2008-12-31 20:26:27.000000000 +0100
+@@ -936,6 +936,7 @@
+ 	    mkdir -p include2;                                          \
+ 	    ln -fsn $(srctree)/include/asm-$(SRCARCH) include2/asm;     \
+ 	fi
++	ln -fsn $(srctree) source
+ endif
+ 
+ # prepare2 creates a makefile if using a separate output directory
