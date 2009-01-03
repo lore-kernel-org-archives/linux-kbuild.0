@@ -1,61 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from one.firstfloor.org ([213.235.205.2]:52513 "EHLO
-	one.firstfloor.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751591AbZACQ7Q (ORCPT
+Received: from pfepa.post.tele.dk ([195.41.46.235]:35066 "EHLO
+	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1759424AbZACUTS (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 3 Jan 2009 11:59:16 -0500
-Date: Sat, 3 Jan 2009 18:12:55 +0100
-From: Andi Kleen <andi@firstfloor.org>
-Subject: Re: [PATCH] [1/3] KBUILD: Add script to manipulate .config files on the command line
-Message-ID: <20090103171255.GO496@one.firstfloor.org>
-References: <20090103321.351399938@firstfloor.org> <200901031154.44868.arnd@arndb.de>
+	Sat, 3 Jan 2009 15:19:18 -0500
+Date: Sat, 3 Jan 2009 21:20:53 +0100
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: [PATCH] Kbuild: reintroduce ALLSOURCE_ARCHS support for tags/cscope.
+Message-ID: <20090103202053.GA5066@uranus.ravnborg.org>
+References: <1230730656-2987-1-git-send-email-albcamus@gmail.com> <20090102223414.GB8843@uranus.ravnborg.org> <df9815e70901030610w1c61d95bt8259e73c9609a8c3@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <200901031154.44868.arnd@arndb.de>
+In-Reply-To: <df9815e70901030610w1c61d95bt8259e73c9609a8c3@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: Andi Kleen <andi@firstfloor.org>, linux-kbuild@vger.kernel.org, sam@ravnborg.org, linux-kernel@vger.kernel.org
+To: Jike Song <albcamus@gmail.com>
+Cc: linux-kbuild@vger.kernel.org
 
-On Sat, Jan 03, 2009 at 11:54:44AM +0100, Arnd Bergmann wrote:
-> > I extracted most of the CONFIG manipulation code from one of my
-> > build scripts into a new shell script scripts/config
+On Sat, Jan 03, 2009 at 10:10:15PM +0800, Jike Song wrote:
+> On Sat, Jan 3, 2009 at 6:34 AM, Sam Ravnborg <sam@ravnborg.org> wrote:
+> > On Wed, Dec 31, 2008 at 09:37:36PM +0800, Jike Song wrote:
+> >> This patch reintroduce the ALLSOURCE_ARCHS support for tags/TAGS/
+> >> cscope targets. The Kbuild previously has this feature, but after
+> >> moving the targets into scripts/tags.sh, ALLSOURCE_ARCHS disappears.
+> >>
+> >> It's something like this:
+> >>
+> >>       $ make ALLSOURCE_ARCHS="x86 mips arm" tags cscope
+> >
+> >
+> > A second point...
+> > If you are serious about this then we need this documented
+> > somewhere. This is not "make help" material so I suggest you
+> > to add a new chapter in Documentation/kbuild/kbuild.txt
+> > where you could include this.
 > 
-> This looks very useful, thanks for sharing.
-> 
-> > The script is not integrated with the normal Kconfig machinery
-> > and doesn't do any checking against Kconfig files, but just manipulates
-> > that text format. This is always done at make time anyways.
-> 
-> Why? I would imagine it to be useful to get immediate feedback
-> whether changing the option was successful. It should be easy to
-> run scripts/kconfig/conf -o on the config file afterwards.
+> Excuse me, do you mean Documentation/kbuild/makefiles.txt instead?
 
-Mostly so that the script doesn't need to know about the source
-directory. That would be another argument, making it harder to use. 
-At least my build scripts often run in a different environment. And
-make always checks it anyways.
+Nope - I mean Documentation/kbuild/kbuild.txt
 
-Also I wasn't sure how to change the filename of the config file
-without using Kconfig internals.  That would be less of a concern
-now if it was merged, but it was one out of tree.
+It is included in kbuild-next.git and will appear in mainline
+shortly.
 
-> 
-> My normal workflow when changing single options is to remove the
-> line from .config and call make oldconfig again. What I would
-> like to see most here is something like
-> 
-> ./scripts/config --reconfigure smp
-> Remove SMP from .config, and do oldconfig to ask again.
-
-You don't need the make oldconfig, make always does that automatically.
-
-BTW there's an undocumented option to do this, but I intentionally
-didn't document it because it doesn't work with --file due to the
-reasons stated above.
-
--Andi
-
--- 
-ak@linux.intel.com
+	Sam
