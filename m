@@ -1,58 +1,37 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepb.post.tele.dk ([195.41.46.236]:39434 "EHLO
-	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753105AbZAGURJ (ORCPT
+Received: from pfepa.post.tele.dk ([195.41.46.235]:45982 "EHLO
+	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754067AbZAGUZd (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 7 Jan 2009 15:17:09 -0500
-Date: Wed, 7 Jan 2009 21:18:49 +0100
+	Wed, 7 Jan 2009 15:25:33 -0500
+Date: Wed, 7 Jan 2009 21:27:12 +0100
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH] [1/3] KBUILD: Add script to manipulate .config files on the command line
-Message-ID: <20090107201849.GH4647@uranus.ravnborg.org>
-References: <20090103321.351399938@firstfloor.org>
+Subject: Re: [PATCH] [3/3] KBUILD: Add a "bin" symlink for the scripts directory too
+Message-ID: <20090107202712.GI4647@uranus.ravnborg.org>
+References: <20090103321.351399938@firstfloor.org> <20090103022143.6D0803E6650@basil.firstfloor.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20090103321.351399938@firstfloor.org>
+In-Reply-To: <20090103022143.6D0803E6650@basil.firstfloor.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Andi Kleen <andi@firstfloor.org>
 Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Sat, Jan 03, 2009 at 03:21:41AM +0100, Andi Kleen wrote:
+On Sat, Jan 03, 2009 at 03:21:43AM +0100, Andi Kleen wrote:
 > 
-> I often change single options in .config files. Instead of using
-> an editor or one of the frontends it's convenient to do this from
-> the command line. It's also useful to do from automated build scripts
-> when building different variants from a base config file.
+> Several of the scripts in "scripts" are useful to operate on
+> files in a separate objdir. Instead of always manually typing
+> the path to the source dir create a convenient symlink to
+> the source dir's script directory in the objdir too.
 > 
-> I extracted most of the CONFIG manipulation code from one of my
-> build scripts into a new shell script scripts/config
-> 
-> The script is not integrated with the normal Kconfig machinery
-> and doesn't do any checking against Kconfig files, but just manipulates
-> that text format. This is always done at make time anyways.
-> 
-> I believe this script would be a useful standard addition for scripts/*
-> 
-> Sample usage:
-> 
-> ./scripts/config --disable smp 
-> Disable SMP in .config file
-> 
-> ./scripts/config --file otherdir/.config --module e1000e
-> Enable E1000E as module in otherdir/.config
-> 
-> ./scripts/config --state smp
-> y 
-> Check state of config option CONFIG_SMP
-> 
-> After merging into git please make scripts/config executable
-> 
-> Signed-off-by: Andi Kleen <ak@linux.intel.com>
+> I named it bin because scripts was already used for the object
+> files of scripts.
 
-When I try to run the script with no arguments nothing happens!?!
+So you suggest we in the O=... case should have
+a bin symlink to save you typing "source/sc<tab>
 
-I will merge as is but please followup with a patch so it prints out usage
-in this situation.
+That does not justify another symlink in the output
+directory.
 
 	Sam
