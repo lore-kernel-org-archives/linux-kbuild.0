@@ -1,53 +1,42 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepb.post.tele.dk ([195.41.46.236]:58158 "EHLO
-	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751762AbZAGVe5 (ORCPT
+Received: from pfepa.post.tele.dk ([195.41.46.235]:52379 "EHLO
+	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750713AbZAGWFr (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 7 Jan 2009 16:34:57 -0500
-Date: Wed, 7 Jan 2009 22:36:36 +0100
+	Wed, 7 Jan 2009 17:05:47 -0500
+Date: Wed, 7 Jan 2009 23:07:28 +0100
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH] [3/3] KBUILD: Add a "bin" symlink for the scripts directory too
-Message-ID: <20090107213636.GA9273@uranus.ravnborg.org>
-References: <20090103321.351399938@firstfloor.org> <20090103022143.6D0803E6650@basil.firstfloor.org> <20090107202712.GI4647@uranus.ravnborg.org> <20090107213032.GM496@one.firstfloor.org>
+Subject: Re: [PATCH] [1/3] KBUILD: Add script to manipulate .config files on the command line
+Message-ID: <20090107220728.GA9707@uranus.ravnborg.org>
+References: <20090103321.351399938@firstfloor.org> <20090107201849.GH4647@uranus.ravnborg.org> <20090107213315.GN496@one.firstfloor.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20090107213032.GM496@one.firstfloor.org>
+In-Reply-To: <20090107213315.GN496@one.firstfloor.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Andi Kleen <andi@firstfloor.org>
 Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Wed, Jan 07, 2009 at 10:30:32PM +0100, Andi Kleen wrote:
-> On Wed, Jan 07, 2009 at 09:27:12PM +0100, Sam Ravnborg wrote:
-> > On Sat, Jan 03, 2009 at 03:21:43AM +0100, Andi Kleen wrote:
-> > > 
-> > > Several of the scripts in "scripts" are useful to operate on
-> > > files in a separate objdir. Instead of always manually typing
-> > > the path to the source dir create a convenient symlink to
-> > > the source dir's script directory in the objdir too.
-> > > 
-> > > I named it bin because scripts was already used for the object
-> > > files of scripts.
+On Wed, Jan 07, 2009 at 10:33:15PM +0100, Andi Kleen wrote:
+> > When I try to run the script with no arguments nothing happens!?!
 > > 
-> > So you suggest we in the O=... case should have
-> > a bin symlink to save you typing "source/sc<tab>
+> > I will merge as is but please followup with a patch so it prints out usage
+> > in this situation.
 > 
-> Yes.
+> Here's a patch 
 > 
-> > 
-> > That does not justify another symlink in the output
-> > directory.
+> -Andi
 > 
-> Why not? They don't cost anything, do they? And
-> convenience matters.
+> ---
+> 
+> Kbuild: print usage with no arguments in scripts/config
+> 
+> Requested by Sam.
+> 
+> Signed-off-by: Andi Kleen <ak@linux.intel.com>
 
-Different people have different needs.
-The next guys needs Arch to point at source/arch/$ARCH
-and so on.
-If it is convinient for your workflow I suggest you to
-create it yourself.
-
-Doing stuff like this as part of the build is simply the wrong place to do it.
+Thanks,
+added and pushes out to kbuild-fixes.git
 
 	Sam
