@@ -1,89 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepb.post.tele.dk ([195.41.46.236]:54770 "EHLO
-	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757576AbZAGVAe (ORCPT
+Received: from one.firstfloor.org ([213.235.205.2]:39369 "EHLO
+	one.firstfloor.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753189AbZAGVQ2 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 7 Jan 2009 16:00:34 -0500
-Date: Wed, 7 Jan 2009 22:02:12 +0100
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: [GIT] kbuild stuff
-Message-ID: <20090107210212.GA8735@uranus.ravnborg.org>
+	Wed, 7 Jan 2009 16:16:28 -0500
+Date: Wed, 7 Jan 2009 22:30:32 +0100
+From: Andi Kleen <andi@firstfloor.org>
+Subject: Re: [PATCH] [3/3] KBUILD: Add a "bin" symlink for the scripts directory too
+Message-ID: <20090107213032.GM496@one.firstfloor.org>
+References: <20090103321.351399938@firstfloor.org> <20090103022143.6D0803E6650@basil.firstfloor.org> <20090107202712.GI4647@uranus.ravnborg.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <20090107202712.GI4647@uranus.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: Andi Kleen <andi@firstfloor.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Hi Linus.
+On Wed, Jan 07, 2009 at 09:27:12PM +0100, Sam Ravnborg wrote:
+> On Sat, Jan 03, 2009 at 03:21:43AM +0100, Andi Kleen wrote:
+> > 
+> > Several of the scripts in "scripts" are useful to operate on
+> > files in a separate objdir. Instead of always manually typing
+> > the path to the source dir create a convenient symlink to
+> > the source dir's script directory in the objdir too.
+> > 
+> > I named it bin because scripts was already used for the object
+> > files of scripts.
+> 
+> So you suggest we in the O=... case should have
+> a bin symlink to save you typing "source/sc<tab>
 
-First set of kbuild related fixes and other stuff.
+Yes.
 
-o Anders fixed up qnx and I took this patch via my tree
-  as it is a general include header issue.
+> 
+> That does not justify another symlink in the output
+> directory.
 
-o Andi added a new script 'config' to manipulate the configuration
-  It needs some polishing but is usefull as is
+Why not? They don't cost anything, do they? And
+convenience matters.
 
-o Arjan improved bootchart - and I took his word for that it is an improvement
+-Andi
 
-o Jike added back ALLSOURCE_ARCHS to tags as it is actually used
-
-o Wolfram fixed some documentation typos
-
-o And I fixed a modules_install regression
-
-All in all only small details.
-
-Outstanding things at the moments:
-
-- The patches to strip modules and vmlinux causes troubles:
-  o With MODVERSIONS enabled ccache and distcc does no longer improve things
-  o sparc build is br0ken
-
-- Alan's reported issue with broken 32 bit build is not solved - awaiting feedback from Alan
-
-I dunno what to do to make people start looking at all the warnings our
-exported headers generates. Maybe I should let headers_check error ou if
-there is more than 10 warnings in a directory..
-
-Please pull from:
-
-   git://git.kernel.org/pub/scm/linux/kernel/git/sam/kbuild-fixes.git master
-
-	Sam
-
-
-Anders Larsen (1):
-      qnx: include <linux/types.h> for definitions of __[us]{8,16,32,64} types
-
-Andi Kleen (2):
-      kconfig: add script to manipulate .config files on the command line
-      kbuild: add a symlink to the source for separate objdirs
-
-Arjan van de Ven (1):
-      bootchart: improve output based on Dave Jones' feedback
-
-Jike Song (1):
-      kbuild: reintroduce ALLSOURCE_ARCHS support for tags/cscope
-
-Sam Ravnborg (1):
-      fix modules_install via NFS
-
-Wolfram Sang (1):
-      kbuild: fix typos (s/bin_shipped/bin.o_shipped/) in Documentation
-
- Documentation/kbuild/kbuild.txt  |    7 ++
- Documentation/kbuild/modules.txt |    4 +-
- Makefile                         |    1 +
- firmware/.gitignore              |    1 -
- firmware/Makefile                |   10 +--
- include/linux/qnx4_fs.h          |    4 +-
- include/linux/qnxtypes.h         |    5 +-
- scripts/.gitignore               |    1 +
- scripts/Makefile                 |    3 +-
- scripts/bootgraph.pl             |   16 +++-
- scripts/config                   |  150 ++++++++++++++++++++++++++++++++++++++
- {firmware => scripts}/ihex2fw.c  |    0
- scripts/tags.sh                  |   18 +++-
- 13 files changed, 194 insertions(+), 26 deletions(-)
+-- 
+ak@linux.intel.com
