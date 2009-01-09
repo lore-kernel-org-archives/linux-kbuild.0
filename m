@@ -1,122 +1,103 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from rcsinet12.oracle.com ([148.87.113.124]:16947 "EHLO
-	rgminet12.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753250AbZAHTAW (ORCPT
+Received: from hrndva-omtalb.mail.rr.com ([71.74.56.124]:46234 "EHLO
+	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750889AbZAICpS (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 8 Jan 2009 14:00:22 -0500
-Date: Thu, 8 Jan 2009 10:59:34 -0800
-From: Randy Dunlap <randy.dunlap@oracle.com>
-Subject: [PATCH] kbuild: fix kbuild.txt typos
-Message-Id: <20090108105934.e02d4404.randy.dunlap@oracle.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+	Thu, 8 Jan 2009 21:45:18 -0500
+Date: Thu, 8 Jan 2009 21:45:14 -0500 (EST)
+From: Steven Rostedt <rostedt@goodmis.org>
+Subject: Re: [PATCH 1/6]Make recordmcount destinct module compile
+In-Reply-To: <1231468368.10683.100.camel@sli10-desk.sh.intel.com>
+Message-ID: <alpine.DEB.1.10.0901082142510.18713@gandalf.stny.rr.com>
+References: <1231468368.10683.100.camel@sli10-desk.sh.intel.com>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: samr <sam@ravnborg.org>, akpm <akpm@linux-foundation.org>
+To: Shaohua Li <shaohua.li@intel.com>
+Cc: ia64 <linux-ia64@vger.kernel.org>, "Luck, Tony" <tony.luck@intel.com>, Ingo Molnar <mingo@elte.hu>, Sam Ravnborg <sam@ravnborg.org>, linux-kbuild@vger.kernel.org
 
-From: Randy Dunlap <randy.dunlap@oracle.com>
 
-Fix typos in the new kbuild.txt file.
+[ Added Sam and linux-kbuild to the CC list ]
 
-Signed-off-by: Randy Dunlap <randy.dunlap@oracle.com>
----
- Documentation/kbuild/kbuild.txt |   29 +++++++++++++++--------------
- 1 file changed, 15 insertions(+), 14 deletions(-)
+Since this patch touches not just recordmcount.pl but also the kbuild 
+system, I want the maintainers to be aware.
 
---- linux-next-20090108.orig/Documentation/kbuild/kbuild.txt
-+++ linux-next-20090108/Documentation/kbuild/kbuild.txt
-@@ -3,7 +3,7 @@ Environment variables
- KCPPFLAGS
- --------------------------------------------------
- Additional options to pass when preprocessing. The preprocessing options
--will be used in all cases where kbuild do preprocessing including
-+will be used in all cases where kbuild does preprocessing including
- building C files and assembler files.
- 
- KAFLAGS
-@@ -16,7 +16,7 @@ Additional options to the C compiler.
- 
- KBUILD_VERBOSE
- --------------------------------------------------
--Set the kbuild verbosity. Can be assinged same values as "V=...".
-+Set the kbuild verbosity. Can be assigned same values as "V=...".
- See make help for the full list.
- Setting "V=..." takes precedence over KBUILD_VERBOSE.
- 
-@@ -35,14 +35,14 @@ KBUILD_OUTPUT
- --------------------------------------------------
- Specify the output directory when building the kernel.
- The output directory can also be specificed using "O=...".
--Setting "O=..." takes precedence over KBUILD_OUTPUT
-+Setting "O=..." takes precedence over KBUILD_OUTPUT.
- 
- ARCH
- --------------------------------------------------
- Set ARCH to the architecture to be built.
- In most cases the name of the architecture is the same as the
- directory name found in the arch/ directory.
--But some architectures suach as x86 and sparc has aliases.
-+But some architectures such as x86 and sparc have aliases.
- x86: i386 for 32 bit, x86_64 for 64 bit
- sparc: sparc for 32 bit, sparc64 for 64 bit
- 
-@@ -63,7 +63,7 @@ CF is often used on the command-line lik
- INSTALL_PATH
- --------------------------------------------------
- INSTALL_PATH specifies where to place the updated kernel and system map
--images. Default is /boot, but you can set it to other values
-+images. Default is /boot, but you can set it to other values.
- 
- 
- MODLIB
-@@ -90,7 +90,7 @@ INSTALL_MOD_STRIP will used as the optio
- 
- INSTALL_FW_PATH
- --------------------------------------------------
--INSTALL_FW_PATH specify where to install the firmware blobs.
-+INSTALL_FW_PATH specifies where to install the firmware blobs.
- The default value is:
- 
-     $(INSTALL_MOD_PATH)/lib/firmware
-@@ -99,7 +99,7 @@ The value can be overridden in which cas
- 
- INSTALL_HDR_PATH
- --------------------------------------------------
--INSTALL_HDR_PATH specify where to install user space headers when
-+INSTALL_HDR_PATH specifies where to install user space headers when
- executing "make headers_*".
- The default value is:
- 
-@@ -112,22 +112,23 @@ The value can be overridden in which cas
- 
- KBUILD_MODPOST_WARN
- --------------------------------------------------
--KBUILD_MODPOST_WARN can be set to avoid error out in case of undefined
--symbols in the final module linking stage.
-+KBUILD_MODPOST_WARN can be set to avoid errors in case of undefined
-+symbols in the final module linking stage. It changes such errors
-+into warnings.
- 
--KBUILD_MODPOST_FINAL
-+KBUILD_MODPOST_NOFINAL
- --------------------------------------------------
- KBUILD_MODPOST_NOFINAL can be set to skip the final link of modules.
--This is solely usefull to speed up test compiles.
-+This is solely useful to speed up test compiles.
- 
- KBUILD_EXTRA_SYMBOLS
- --------------------------------------------------
--For modules use symbols from another modules.
-+For modules that use symbols from other modules.
- See more details in modules.txt.
- 
- ALLSOURCE_ARCHS
- --------------------------------------------------
--For tags/TAGS/cscope targets, you can specify more than one archs
--to be included in the databases, separated by blankspace. e.g.
-+For tags/TAGS/cscope targets, you can specify more than one arch
-+to be included in the databases, separated by blank space. E.g.:
- 
-     $ make ALLSOURCE_ARCHS="x86 mips arm" tags
+Sam, this patch look OK with you, and if it does, can you ack it.
+
+Thanks,
+
+-- Steve
+
+
+On Fri, 9 Jan 2009, Shaohua Li wrote:
+
+> In IA64, module build and kernel build use different option.
+> Make recordmcount.pl differentiate the two cases.
+> 
+> Signed-off-by: Shaohua Li <shaohua.li@intel.com>
+> ---
+>  scripts/Makefile.build  |    9 ++++++++-
+>  scripts/recordmcount.pl |    6 +++---
+>  2 files changed, 11 insertions(+), 4 deletions(-)
+> 
+> Index: linux/scripts/Makefile.build
+> ===================================================================
+> --- linux.orig/scripts/Makefile.build	2009-01-09 09:52:01.000000000 +0800
+> +++ linux/scripts/Makefile.build	2009-01-09 09:52:36.000000000 +0800
+> @@ -114,6 +114,7 @@ endif
+>  # Default is built-in, unless we know otherwise
+>  modkern_cflags := $(CFLAGS_KERNEL)
+>  quiet_modtag := $(empty)   $(empty)
+> +is_module := 0
+>  
+>  $(real-objs-m)        : modkern_cflags := $(CFLAGS_MODULE)
+>  $(real-objs-m:.o=.i)  : modkern_cflags := $(CFLAGS_MODULE)
+> @@ -125,6 +126,11 @@ $(real-objs-m:.o=.i)  : quiet_modtag := 
+>  $(real-objs-m:.o=.s)  : quiet_modtag := [M]
+>  $(real-objs-m:.o=.lst): quiet_modtag := [M]
+>  
+> +$(real-objs-m)        : is_module := 1
+> +$(real-objs-m:.o=.i)  : is_module := 1
+> +$(real-objs-m:.o=.s)  : is_module := 1
+> +$(real-objs-m:.o=.lst): is_module := 1
+> +
+>  $(obj-m)              : quiet_modtag := [M]
+>  
+>  # Default for not multi-part modules
+> @@ -201,7 +207,8 @@ endif
+>  ifdef CONFIG_FTRACE_MCOUNT_RECORD
+>  cmd_record_mcount = perl $(srctree)/scripts/recordmcount.pl "$(ARCH)" \
+>  	"$(if $(CONFIG_64BIT),64,32)" \
+> -	"$(OBJDUMP)" "$(OBJCOPY)" "$(CC)" "$(LD)" "$(NM)" "$(RM)" "$(MV)" "$(@)";
+> +	"$(OBJDUMP)" "$(OBJCOPY)" "$(CC)" "$(LD)" "$(NM)" "$(RM)" "$(MV)" \
+> +	"$(is_module)" "$(@)";
+>  endif
+>  
+>  define rule_cc_o_c
+> Index: linux/scripts/recordmcount.pl
+> ===================================================================
+> --- linux.orig/scripts/recordmcount.pl	2009-01-08 16:09:59.000000000 +0800
+> +++ linux/scripts/recordmcount.pl	2009-01-09 09:52:36.000000000 +0800
+> @@ -100,14 +100,14 @@ $P =~ s@.*/@@g;
+>  
+>  my $V = '0.1';
+>  
+> -if ($#ARGV < 6) {
+> -	print "usage: $P arch objdump objcopy cc ld nm rm mv inputfile\n";
+> +if ($#ARGV < 7) {
+> +	print "usage: $P arch objdump objcopy cc ld nm rm mv is_module inputfile\n";
+>  	print "version: $V\n";
+>  	exit(1);
+>  }
+>  
+>  my ($arch, $bits, $objdump, $objcopy, $cc,
+> -    $ld, $nm, $rm, $mv, $inputfile) = @ARGV;
+> +    $ld, $nm, $rm, $mv, $is_module, $inputfile) = @ARGV;
+>  
+>  # Acceptable sections to record.
+>  my %text_sections = (
+> 
+> 
+> 
+> 
