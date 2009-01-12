@@ -1,51 +1,120 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from one.firstfloor.org ([213.235.205.2]:36492 "EHLO
-	one.firstfloor.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751433AbZAJD4h (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 9 Jan 2009 22:56:37 -0500
-Date: Sat, 10 Jan 2009 04:56:13 +0100
-From: Andi Kleen <andi@firstfloor.org>
-Subject: [PATCH] KBUILD: Create the source symlink earlier in the objdir
-Message-ID: <20090110035613.GA7225@basil.nowhere.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Received: from mga11.intel.com ([192.55.52.93]:59285 "EHLO mga11.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751174AbZALCAx (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 11 Jan 2009 21:00:53 -0500
+Subject: Re: [PATCH 1/6]Make recordmcount destinct module compile
+From: Shaohua Li <shaohua.li@intel.com>
+In-Reply-To: <20090109200514.GA24634@uranus.ravnborg.org>
+References: <1231468368.10683.100.camel@sli10-desk.sh.intel.com>
+	 <alpine.DEB.1.10.0901082142510.18713@gandalf.stny.rr.com>
+	 <20090109192841.GA19482@uranus.ravnborg.org>
+	 <alpine.DEB.1.10.0901091456390.17378@gandalf.stny.rr.com>
+	 <20090109200514.GA24634@uranus.ravnborg.org>
+Content-Type: text/plain
+Date: Mon, 12 Jan 2009 10:00:51 +0800
+Message-Id: <1231725651.5130.2.camel@sli10-desk.sh.intel.com>
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: sam@ravnborg.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: Steven Rostedt <rostedt@goodmis.org>, ia64 <linux-ia64@vger.kernel.org>, "Luck, Tony" <tony.luck@intel.com>, Ingo Molnar <mingo@elte.hu>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>
 
-KBUILD: Create the source symlink earlier in the objdir
+On Sat, 2009-01-10 at 04:05 +0800, Sam Ravnborg wrote:
+> On Fri, Jan 09, 2009 at 02:57:38PM -0500, Steven Rostedt wrote:
+> > 
+> > On Fri, 9 Jan 2009, Sam Ravnborg wrote:
+> > > So we duplicate the cases where we identify "this .o file
+> > > is used in a module".
+> > > This is not good.
+> > > 
+> > > Also there is no reason to do this for the .i, .s and .lst
+> > > targets as they do not invode recordmcount.pl anyway.
+> > > 
+> > > If your build your patch on top of the following we avoid
+> > > the duplicated list.
+> > > 
+> > > 	Sam
+> > 
+> > Thanks Sam,
+> > 
+> > Can I add this on top of Shaohua's and put your Signed-off-by, as well
+> > as an Acked-by on Shaohua's?
+> 
+> My patch was made on top of -linus so you
+> need to use the flag in the call to recordmount.pl.
+> 
+> Please feel free to put my Acked-by: on the patch,
+> but as this does not originate from me it would be the
+> wrong documentation trail to add my Sigend-off-by
+> as I just gave an improvement proposal.
+Ok, refreshed. Other patches don't need changes.
 
-It's useful to already have the source symlink in a 
-objdir when one just runs make *config. Then one
-can do 
+In IA64, module build and kernel build use different option.
+Make recordmcount.pl differentiate the two cases.
 
-mkdir obj-allyes
-cd obj-allyes
-make -C ../sourcedir O=$(pwd) allyesconfig
-./source/scripts/config --disable debug_info
-make CC=icecc -j18
-
-without having to interrupt the make first just to
-get the source symlink.
-
-Signed-off-by: Andi Kleen <ak@linux.intel.com>
-
+Signed-off-by: Shaohua Li <shaohua.li@intel.com>
+Acked-by: Sam Ravnborg <sam@ravnborg.org>
 ---
- Makefile |    1 +
- 1 file changed, 1 insertion(+)
+ scripts/Makefile.build  |   13 +++++++------
+ scripts/recordmcount.pl |    6 +++---
+ 2 files changed, 10 insertions(+), 9 deletions(-)
 
-
-Index: linux-2.6.28-kbuild/Makefile
+Index: linux/scripts/Makefile.build
 ===================================================================
---- linux-2.6.28-kbuild.orig/Makefile	2009-01-07 22:16:49.000000000 +0100
-+++ linux-2.6.28-kbuild/Makefile	2009-01-10 04:50:53.000000000 +0100
-@@ -383,6 +383,7 @@
- # output directory.
- outputmakefile:
- ifneq ($(KBUILD_SRC),)
-+	@ln -fsn $(srctree) $(objtree)/source
- 	$(Q)$(CONFIG_SHELL) $(srctree)/scripts/mkmakefile \
- 	    $(srctree) $(objtree) $(VERSION) $(PATCHLEVEL)
+--- linux.orig/scripts/Makefile.build	2009-01-09 10:51:05.000000000 +0800
++++ linux/scripts/Makefile.build	2009-01-12 09:39:25.000000000 +0800
+@@ -112,13 +112,13 @@ endif
+ # ---------------------------------------------------------------------------
+ 
+ # Default is built-in, unless we know otherwise
+-modkern_cflags := $(CFLAGS_KERNEL)
++modkern_cflags = $(if $(part-of-module), $(CFLAGS_MODULE), $(CFLAGS_KERNEL))
+ quiet_modtag := $(empty)   $(empty)
+ 
+-$(real-objs-m)        : modkern_cflags := $(CFLAGS_MODULE)
+-$(real-objs-m:.o=.i)  : modkern_cflags := $(CFLAGS_MODULE)
+-$(real-objs-m:.o=.s)  : modkern_cflags := $(CFLAGS_MODULE)
+-$(real-objs-m:.o=.lst): modkern_cflags := $(CFLAGS_MODULE)
++$(real-objs-m)        : part-of-module := y
++$(real-objs-m:.o=.i)  : part-of-module := y
++$(real-objs-m:.o=.s)  : part-of-module := y
++$(real-objs-m:.o=.lst): part-of-module := y
+ 
+ $(real-objs-m)        : quiet_modtag := [M]
+ $(real-objs-m:.o=.i)  : quiet_modtag := [M]
+@@ -215,7 +215,8 @@ endif
+ ifdef CONFIG_FTRACE_MCOUNT_RECORD
+ cmd_record_mcount = perl $(srctree)/scripts/recordmcount.pl "$(ARCH)" \
+ 	"$(if $(CONFIG_64BIT),64,32)" \
+-	"$(OBJDUMP)" "$(OBJCOPY)" "$(CC)" "$(LD)" "$(NM)" "$(RM)" "$(MV)" "$(@)";
++	"$(OBJDUMP)" "$(OBJCOPY)" "$(CC)" "$(LD)" "$(NM)" "$(RM)" "$(MV)" \
++	"$(if $(part-of-module),1,0)" "$(@)";
  endif
+ 
+ define rule_cc_o_c
+Index: linux/scripts/recordmcount.pl
+===================================================================
+--- linux.orig/scripts/recordmcount.pl	2009-01-09 10:45:05.000000000 +0800
++++ linux/scripts/recordmcount.pl	2009-01-12 09:48:46.000000000 +0800
+@@ -100,14 +100,14 @@ $P =~ s@.*/@@g;
+ 
+ my $V = '0.1';
+ 
+-if ($#ARGV < 6) {
+-	print "usage: $P arch objdump objcopy cc ld nm rm mv inputfile\n";
++if ($#ARGV < 7) {
++	print "usage: $P arch objdump objcopy cc ld nm rm mv is_module inputfile\n";
+ 	print "version: $V\n";
+ 	exit(1);
+ }
+ 
+ my ($arch, $bits, $objdump, $objcopy, $cc,
+-    $ld, $nm, $rm, $mv, $inputfile) = @ARGV;
++    $ld, $nm, $rm, $mv, $is_module, $inputfile) = @ARGV;
+ 
+ # Acceptable sections to record.
+ my %text_sections = (
+
+
