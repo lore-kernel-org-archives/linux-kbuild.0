@@ -1,17 +1,17 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from rcsinet14.oracle.com ([148.87.113.126]:61985 "EHLO
-	rgminet14.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752476AbZAMDR1 (ORCPT
+Received: from rcsinet11.oracle.com ([148.87.113.123]:46246 "EHLO
+	rgminet11.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751471AbZAMD03 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 12 Jan 2009 22:17:27 -0500
-Message-ID: <496C06D0.3060903@oracle.com>
-Date: Tue, 13 Jan 2009 11:13:20 +0800
+	Mon, 12 Jan 2009 22:26:29 -0500
+Message-ID: <496C091E.1000003@oracle.com>
+Date: Tue, 13 Jan 2009 11:23:10 +0800
 From: Wenji Huang <wenji.huang@oracle.com>
 Reply-To: wenji.huang@oracle.com
 MIME-Version: 1.0
-Subject: Re: [PATCH] Kbuild: generate debug info in building
-References: <4922238C.40807@oracle.com> <20081122114329.GB24848@uranus.ravnborg.org>
-In-Reply-To: <20081122114329.GB24848@uranus.ravnborg.org>
+Subject: Building error of 2.6.29-rc1 using old binutils
+References: <4922238C.40807@oracle.com> <20081122114329.GB24848@uranus.ravnborg.org> <496C06D0.3060903@oracle.com>
+In-Reply-To: <496C06D0.3060903@oracle.com>
 Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -20,8 +20,10 @@ To: Sam Ravnborg <sam@ravnborg.org>
 Cc: linux-kbuild@vger.kernel.org, lkml <linux-kernel@vger.kernel.org>
 
 Hi,
-I got the following building error for 2.6.29-rc1.
 
+Sorry, resend it in terms of correct subject.
+
+I got the following building error for 2.6.29-rc1.
 # make
    CHK     include/linux/version.h
    CHK     include/linux/utsrelease.h
@@ -65,3 +67,5 @@ quiet_cmd_kstrip = STRIP   $@
 
 Regards,
 Wenji
+
+
