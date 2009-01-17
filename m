@@ -1,58 +1,67 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from rex.securecomputing.com ([203.24.151.4]:38483 "EHLO
-	cyberguard.com.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1761552AbZAPWTd (ORCPT
+Received: from flock1.newmail.ru ([82.204.219.207]:59508 "HELO
+	flock1.newmail.ru" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with SMTP id S1762047AbZAQS1B (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 16 Jan 2009 17:19:33 -0500
-Message-ID: <497107F1.6000208@snapgear.com>
-Date: Sat, 17 Jan 2009 08:19:29 +1000
-From: Greg Ungerer <gerg@snapgear.com>
+	Sat, 17 Jan 2009 13:27:01 -0500
+From: Andrey Borzenkov <arvidjaar@mail.ru>
+Subject: Should EXTRA_FIRMWARE include full path to output directory?
+Date: Sat, 17 Jan 2009 21:26:15 +0300
 MIME-Version: 1.0
-Subject: Re: [PATCH] m68k,m68knommu: merge header files
-References: <20081208205814.GA22697@uranus.ravnborg.org> <20081213205251.GC27748@uranus.ravnborg.org> <20081213205828.GD27748@uranus.ravnborg.org> <49707AE0.1040803@opengear.com> <Pine.LNX.4.64.0901161354410.18756@anakin> <49709800.70009@snapgear.com> <20090116143429.GB22152@uranus.ravnborg.org> <Pine.LNX.4.64.0901162242010.25319@anakin>
-In-Reply-To: <Pine.LNX.4.64.0901162242010.25319@anakin>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Type: multipart/signed;
+  boundary="nextPart1325630.A9ChXFn69Y";
+  protocol="application/pgp-signature";
+  micalg=pgp-sha1
 Content-Transfer-Encoding: 7bit
+Message-Id: <200901172126.29358.arvidjaar@mail.ru>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Geert Uytterhoeven <geert@linux-m68k.org>
-Cc: Sam Ravnborg <sam@ravnborg.org>, Roman Zippel <zippel@linux-m68k.org>, linux-m68k <linux-m68k@vger.kernel.org>, Greg Ungerer <gerg@uclinux.org>, uclinux-dev <uclinux-dev@uclinux.org>, Arnd Bergmann <arnd@arndb.de>, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+
+--nextPart1325630.A9ChXFn69Y
+Content-Type: text/plain;
+  charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+
+{pts/1}% LC_ALL=3DC make -C ~/src/linux-git O=3D$HOME/build/linux-2.6.29
+make: Entering directory `/home/bor/src/linux-git'
+  Using /home/bor/src/linux-git as source for kernel
+ln -fsn /home/bor/src/linux-git source
+  GEN     /home/bor/build/linux-2.6.29/Makefile
+  CHK     include/linux/version.h
+  CHK     include/linux/utsrelease.h
+  SYMLINK include/asm -> include/asm-x86
+  CALL    /home/bor/src/linux-git/scripts/checksyscalls.sh
+  CHK     include/linux/compile.h
+/home/bor/src/linux-git/firmware/Makefile:156: warning: overriding commands=
+=20
+for target `firmware/e100/d101m_ucode.bin.gen.S'
+/home/bor/src/linux-git/firmware/Makefile:153: warning: ignoring old=20
+commands for target `firmware/e100/d101m_ucode.bin.gen.S'
+  AS      firmware/e100/d101m_ucode.bin.gen.o
+firmware/e100/d101m_ucode.bin.gen.S: Assembler messages:
+firmware/e100/d101m_ucode.bin.gen.S:5: Error: file not found:=20
+/home/bor/src/linux-git/firmware/e100/d101m_ucode.bin
+make[2]: *** [firmware/e100/d101m_ucode.bin.gen.o] Error 1
+make[1]: *** [firmware] Error 2
+make: *** [sub-make] Error 2
+make: Leaving directory `/home/bor/src/linux-git'
+{pts/1}% grep e100 ~/build/linux-2.6.29/.config
+CONFIG_EXTRA_FIRMWARE=3D"e100/d101m_ucode.bin"
 
 
-Hi Geert,
+--nextPart1325630.A9ChXFn69Y
+Content-Type: application/pgp-signature; name=signature.asc 
+Content-Description: This is a digitally signed message part.
 
-Geert Uytterhoeven wrote:
-> On Fri, 16 Jan 2009, Sam Ravnborg wrote:
->>>>> More review, testing, comments welcome...
->>>>> Where to from here?
->>>> I'll pull from it and give it some m68k test builds.
->>>> After that, you can move it to for-next. If everything's well, it can go to
->>>> Linus.
->>> Sounds like a plan.
->>>
->>>
->>>> Or should I amend and add my SoB and put it in m68k for-next?
->>> I am happy to go either way.
->> For my part I like this to reach mainline ASAP. So whatever suits the
->> two of you is fine with me.
-> 
-> I pulled from Greg's tree, and built atari_defconfig, multi_defconfig,
-> sun3_defconfig. Atari_defconfig runs fine under ARAnyM.
-> 
-> As I'll be on a business trip to Japan next week, I probably won't be able to
-> do a proper follow-up. So Greg, can you put it on your for-next branch and
-> send it to Linus if everything goes well?
-> 
-> Acked-by: Geert Uytterhoeven <geert@linux-m68k.org>
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (GNU/Linux)
 
-Yep, I can take care of that.
+iEYEABECAAYFAklyIsoACgkQR6LMutpd94xMZwCbBPA1h8HQjWKNFBflqJRrwN4t
+wPAAnia0u0B7AHpaSb3RcxjQUAf+43GZ
+=Cz6u
+-----END PGP SIGNATURE-----
 
-Regards
-Greg
-
-
-------------------------------------------------------------------------
-Greg Ungerer  --  Principal Engineer        EMAIL:     gerg@snapgear.com
-SnapGear, a McAfee Company                  PHONE:       +61 7 3435 2888
-825 Stanley St,                             FAX:         +61 7 3891 3630
-Woolloongabba, QLD, 4102, Australia         WEB: http://www.SnapGear.com
+--nextPart1325630.A9ChXFn69Y--
