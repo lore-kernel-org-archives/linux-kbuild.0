@@ -1,67 +1,40 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from flock1.newmail.ru ([82.204.219.207]:59508 "HELO
-	flock1.newmail.ru" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with SMTP id S1762047AbZAQS1B (ORCPT
+Received: from pfepb.post.tele.dk ([195.41.46.236]:49599 "EHLO
+	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754733AbZARUwc (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 17 Jan 2009 13:27:01 -0500
-From: Andrey Borzenkov <arvidjaar@mail.ru>
-Subject: Should EXTRA_FIRMWARE include full path to output directory?
-Date: Sat, 17 Jan 2009 21:26:15 +0300
-MIME-Version: 1.0
-Content-Type: multipart/signed;
-  boundary="nextPart1325630.A9ChXFn69Y";
-  protocol="application/pgp-signature";
-  micalg=pgp-sha1
-Content-Transfer-Encoding: 7bit
-Message-Id: <200901172126.29358.arvidjaar@mail.ru>
+	Sun, 18 Jan 2009 15:52:32 -0500
+Date: Sun, 18 Jan 2009 21:54:16 +0100
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: [PATCH 06/13] kconfig: print all locations when we see a recursive dependency
+Message-ID: <20090118205416.GD2978@uranus.ravnborg.org>
+References: <20081229134402.GA7069@uranus.ravnborg.org> <1230558803-7168-6-git-send-email-sam@ravnborg.org> <Pine.LNX.4.64.0812310346430.17013@localhost.localdomain>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Pine.LNX.4.64.0812310346430.17013@localhost.localdomain>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
+To: Roman Zippel <zippel@linux-m68k.org>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
 
---nextPart1325630.A9ChXFn69Y
-Content-Type: text/plain;
-  charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+On Wed, Dec 31, 2008 at 03:55:00AM +0100, Roman Zippel wrote:
+> Hi,
+> 
+> On Mon, 29 Dec 2008, Sam Ravnborg wrote:
+> 
+> > It is nessesary to know all locations when trying to track
+> > a recursive dependency. So print out all locations for each symbol.
+> 
+> The problem is that this is little more than a better grep, although 
+> kconfig knows exactly what went wrong, but this info is scattered all over 
+> the stack.
+> We could either return more info to print more than just the symbol or 
+> maintain more info while traversing the tree. The patch below does the 
+> latter. The patch could use some small cleanups, so it's not final yet.
 
-{pts/1}% LC_ALL=3DC make -C ~/src/linux-git O=3D$HOME/build/linux-2.6.29
-make: Entering directory `/home/bor/src/linux-git'
-  Using /home/bor/src/linux-git as source for kernel
-ln -fsn /home/bor/src/linux-git source
-  GEN     /home/bor/build/linux-2.6.29/Makefile
-  CHK     include/linux/version.h
-  CHK     include/linux/utsrelease.h
-  SYMLINK include/asm -> include/asm-x86
-  CALL    /home/bor/src/linux-git/scripts/checksyscalls.sh
-  CHK     include/linux/compile.h
-/home/bor/src/linux-git/firmware/Makefile:156: warning: overriding commands=
-=20
-for target `firmware/e100/d101m_ucode.bin.gen.S'
-/home/bor/src/linux-git/firmware/Makefile:153: warning: ignoring old=20
-commands for target `firmware/e100/d101m_ucode.bin.gen.S'
-  AS      firmware/e100/d101m_ucode.bin.gen.o
-firmware/e100/d101m_ucode.bin.gen.S: Assembler messages:
-firmware/e100/d101m_ucode.bin.gen.S:5: Error: file not found:=20
-/home/bor/src/linux-git/firmware/e100/d101m_ucode.bin
-make[2]: *** [firmware/e100/d101m_ucode.bin.gen.o] Error 1
-make[1]: *** [firmware] Error 2
-make: *** [sub-make] Error 2
-make: Leaving directory `/home/bor/src/linux-git'
-{pts/1}% grep e100 ~/build/linux-2.6.29/.config
-CONFIG_EXTRA_FIRMWARE=3D"e100/d101m_ucode.bin"
+Hi Roman.
 
+Have you had time to look more into this?
 
---nextPart1325630.A9ChXFn69Y
-Content-Type: application/pgp-signature; name=signature.asc 
-Content-Description: This is a digitally signed message part.
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.9 (GNU/Linux)
-
-iEYEABECAAYFAklyIsoACgkQR6LMutpd94xMZwCbBPA1h8HQjWKNFBflqJRrwN4t
-wPAAnia0u0B7AHpaSb3RcxjQUAf+43GZ
-=Cz6u
------END PGP SIGNATURE-----
-
---nextPart1325630.A9ChXFn69Y--
+	Sam
