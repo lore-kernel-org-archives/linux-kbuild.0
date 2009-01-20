@@ -1,99 +1,209 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from sovereign.computergmbh.de ([85.214.69.204]:45077 "EHLO
-	sovereign.computergmbh.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752680AbZASUVi (ORCPT
+Received: from milhouse.binasys.co.uk ([216.12.200.91]:34933 "EHLO
+	milhouse.binasys.co.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754247AbZATDjB (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 19 Jan 2009 15:21:38 -0500
-Date: Mon, 19 Jan 2009 21:21:37 +0100 (CET)
-From: Jan Engelhardt <jengelh@medozas.de>
+	Mon, 19 Jan 2009 22:39:01 -0500
+Date: Tue, 20 Jan 2009 03:30:47 +0000
+From: Steve Brokenshire <sbrokenshire@xestia.co.uk>
 Subject: Re: [PATCH] Compress kernel modules on installation.
-In-Reply-To: <20090118210416.GE2978@uranus.ravnborg.org>
-Message-ID: <alpine.LSU.2.00.0901192120400.12940@fbirervta.pbzchgretzou.qr>
-References: <20080225214209.a3f79327.sbrokenshire@xestia.co.uk> <20080226112840.GA29465@uranus.ravnborg.org> <alpine.LSU.2.00.0812262026320.11203@fbirervta.pbzchgretzou.qr> <20081226194833.GA8306@uranus.ravnborg.org> <alpine.LSU.2.00.0812262049040.12031@fbirervta.pbzchgretzou.qr>
- <20090118210416.GE2978@uranus.ravnborg.org>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+Message-Id: <20090120033047.7412d93e.sbrokenshire@xestia.co.uk>
+In-Reply-To: <20081226194833.GA8306@uranus.ravnborg.org>
+References: <20080225214209.a3f79327.sbrokenshire@xestia.co.uk>
+	<20080226112840.GA29465@uranus.ravnborg.org>
+	<alpine.LSU.2.00.0812262026320.11203@fbirervta.pbzchgretzou.qr>
+	<20081226194833.GA8306@uranus.ravnborg.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Sam Ravnborg <sam@ravnborg.org>
-Cc: Steve Brokenshire <sbrokenshire@xestia.co.uk>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+Cc: Jan Engelhardt <jengelh@medozas.de>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
+On Fri, 26 Dec 2008 20:48:33 +0100
+Sam Ravnborg <sam@ravnborg.org> wrote:
 
-On Sunday 2009-01-18 22:04, Sam Ravnborg wrote:
->
->Can I ask you to redo this patch.
->I want a way to swith off compression, but it should default be enable.
->So if KBUILD_MODULE_NOCOMPRESS is undefined we will compress the modules
->when we install them.
->
->And add documentation to Documentation/kbuild/kbuild.txt too...
+> On Fri, Dec 26, 2008 at 08:30:19PM +0100, Jan Engelhardt wrote:
+> > 
+> > On Tuesday 2008-02-26 12:28, Sam Ravnborg wrote:
+> > >> 
+> > >> (I've sent this to the linux-kbuild and linux-kernel lists as this
+> > >> patch modifies the Makefile.modinst file. I also don't subscribe to the 
+> > >> linux-kbuild and linux-kernel mailing lists so can I have any replies
+> > >> CC'ed to me please)
+> > >> 
+> > >> This patch allows kernel modules to be compressed when 'make
+> > >> modules_install' is run after being copied to
+> > >> the /lib/module/<version>/<...> directory which is useful if you have
+> > >> module-init-tools installed with --enable-zlib. This patch adds an
+> > >> option (MODULE_COMPRESS) to the kernel configuration file (specifically
+> > >> init/Kconfig) so that the kernel modules will compressed if
+> > >> MODULE_COMPRESS is set.
+> > 
+> > I recently started compressing my kernel modules and that saved me
+> > at least 70 MB of disk space on mostlyallmodconfig.
+> > (And no, the argument of disks being cheap is not so true with
+> > CF or SSD.)
+> > Distro is lazy and wants to wait for upstream to have it,
+> > so is there any chance of getting this proposal in?
+> 
+> Steve said he wanted to try to make the solution more
+> scalable so I am awaiting a new patch.
+> 
+> 	Sam
+> 
 
-changes to previous:
-- added choice for compress (none, -1, -2, ..., -9)
-- documentation
+Yikes! I do apologise. I have been a little bit busy lately and that my
+old PC decided to fail on the 24th December so I've been using that as
+an excuse for panic buying, building and installing a 64-bit system but
+I do have an updated patch available that is scalable (in that... if
+new compression formats are used in the future they can be easily added
+by adding text to init/Kconfig and code to Makefile.modinst).
 
-parent ad2507ab58aa5a3e50b0482889882ff3adf6ef33 (v2.6.29-rc2-24-gad2507a)
-commit 3fc20a79496c3c5c8d4b906ea7e2496de448002d
-Author: Jan Engelhardt <jengelh@medozas.de>
-Date:   Mon Jan 19 21:18:39 2009 +0100
+I have noticed the patch from Jan for specifying settings for gzip. I
+don't see why something like this can't be added to init/Kconfig...
 
-kbuild: install modules gzipped
+config MODULE_COMPRESS_OPTIONS
+	string "Compression method command line options"
+	depends on MODULES
+	help
+	  This option specifies the command line options to be used for
+	  the selected compression method.
 
-This saves lots of disk space. Yes we had discussions about gzip -6
-having a better compression-per-time ratio, but the point is that
-people doing the compression in the first place often do not care
-about the amount of compression time as long as the final filesize
-will be smaller (that's what LZMA does over bzip2, and what bzip2
-does over gzip). The KBUILD_MODULES_COMPRESS make variable can be set
-over the command line to tune the compression level to your need,
-including disabling it entirely.
+	  Please refer to the selected compression method's documentation 
+	  on which options should be used.
 
-Signed-off-by: Jan Engelhardt <jengelh@medozas.de>
----
- Documentation/kbuild/kbuild.txt |   11 +++++++++++
- scripts/Makefile.modinst        |    6 +++++-
- 2 files changed, 16 insertions(+), 1 deletions(-)
+	  If unsure, leave this option blank.
 
-diff --git a/Documentation/kbuild/kbuild.txt b/Documentation/kbuild/kbuild.txt
-index 923f9dd..453ba6c 100644
---- a/Documentation/kbuild/kbuild.txt
-+++ b/Documentation/kbuild/kbuild.txt
-@@ -125,6 +125,17 @@ KBUILD_EXTRA_SYMBOLS
- For modules use symbols from another modules.
- See more details in modules.txt.
+And perhaps alter for Makefile.modinst (after applying the patch below)...
+
+quiet_cmd_modules_compress_gzip = COMPRESS $@
+      cmd_modules_compress_gzip = gzip $(CONFIG_MODULE_COMPRESS_OPTIONS) \
+				 -c $(2)/`basename $@` \ 
+				 > $(2)/`basename $@`.gz; \
+				rm $(2)/`basename $@`
+
+I'll supply the patch for what's been done so far (that and it's gone
+3am here...) so the above makes a bit more sense. I should point out
+that in the patch there should be an additional blank line after
+endchoice for init/Kconfig but adding that blank line with the plus
+sign seems to cause the patching process to fail so I had to take it
+out and that this patch works with 2.6.27.4 (which is the kernel I am
+currently using) with a slight fuzz and I haven't chance to test it
+with the latest kernel.
+
+I'll have a go at incorporating what I've said regarding
+MODULE_COMPRESS_OPTIONS into another patch using the latest kernel (and
+add the standard 'If unsure' message to MODULE_COMPRESS as well).
+
+Steve
+
+Patch Follows...
+
+================================
+
+Signed-off-by: Steve Brokenshire <sbrokenshire@xestia.co.uk>
+
+--- a/scripts/Makefile.modinst	2008-02-11 05:51:11.000000000 +0000
++++ b/scripts/Makefile.modinst	2008-05-29 19:30:51.000000000 +0100
+@@ -5,6 +5,7 @@
+ PHONY := __modinst
+ __modinst:
  
-+KBUILD_MODULES_COMPRESS
-+--------------------------------------------------
-+By default, kbuild will compress modules with gzip -9 compression to
-+reduce disk space. The KBUILD_MODULES_COMPRESS make parameter can be
-+used to set an alternate compression level or disable compression
-+entirely.
-+Example for using the standard gzip compression level:
-+	make KBUILD_MODULES_COMPRESS="-6"
-+Disabling compression:
-+	make KBUILD_MODULES_COMPRESS=""
-+
- ALLSOURCE_ARCHS
- --------------------------------------------------
- For tags/TAGS/cscope targets, you can specify more than one archs
-diff --git a/scripts/Makefile.modinst b/scripts/Makefile.modinst
-index 18b4bf8..e0708b1 100644
---- a/scripts/Makefile.modinst
-+++ b/scripts/Makefile.modinst
-@@ -16,9 +16,13 @@ PHONY += $(modules)
++include include/config/auto.conf
+ include scripts/Kbuild.include
+ 
+ #
+@@ -16,8 +17,15 @@
  __modinst: $(modules)
  	@:
  
-+KBUILD_MODULES_COMPRESS  ?= -9
- quiet_cmd_modules_install = INSTALL $@
-       cmd_modules_install = mkdir -p $(2); \
--			    $(mod_strip_cmd) $@ $(2)/$(notdir $@) || cp $@ $(2)
-+			    $(mod_strip_cmd) $@ $(2)/$(notdir $@) || cp $@ $(2); \
-+			    $(if ${KBUILD_MODULES_COMPRESS}, \
-+			    	gzip -f ${KBUILD_MODULES_COMPRESS} \
-+			    	$(2)/$(notdir $@), )
+-quiet_cmd_modules_install = INSTALL $@
+-      cmd_modules_install = mkdir -p $(2); cp $@ $(2) ; $(mod_strip_cmd) $(2)/$(notdir $@)
++quiet_cmd_modules_install = INSTALL  $@
++      cmd_modules_install = mkdir -p $(2); \
++				cp $@ $(2) ; \
++				$(mod_strip_cmd) $(2)/$(notdir $@)
++
++quiet_cmd_modules_compress_gzip = COMPRESS $@
++      cmd_modules_compress_gzip = gzip --best -c $(2)/`basename $@` \
++				 > $(2)/`basename $@`.gz; \
++				rm $(2)/`basename $@`
  
  # Modules built outside the kernel source tree go into extra by default
  INSTALL_MOD_DIR ?= extra
--- 
-# Created with git-export-patch
+@@ -26,8 +34,11 @@
+ modinst_dir = $(if $(KBUILD_EXTMOD),$(ext-mod-dir),kernel/$(@D))
+ 
+ $(modules):
++
+ 	$(call cmd,modules_install,$(MODLIB)/$(modinst_dir))
+ 
++	$(if $(CONFIG_MODULE_COMPRESS_GZIP), \
++		$(call cmd,modules_compress_gzip,$(MODLIB)/$(modinst_dir)))
+ 
+ # Declare the contents of the .PHONY variable as phony.  We keep that
+ # information in a variable se we can use it in if_changed and friends.
+--- a/init/Kconfig	2008-02-11 05:51:11.000000000 +0000
++++ b/init/Kconfig	2008-05-29 19:05:34.000000000 +0100
+@@ -716,6 +716,45 @@
+ 	  rmmod).  This is mainly for kernel developers and desperate users.
+ 	  If unsure, say N.
+ 
++config MODULE_COMPRESS
++	bool "Compress kernel modules on installation"
++	depends on MODULES
++	help
++	  This option compresses the kernel modules when 'make
++	  modules_install' is run.
++
++	  The modules will be compressed into the selected compression 
++	  format with Gzip being the default compression format.
++
++	  When a kernel module is installed from outside of the main kernel
++	  source and uses the Kbuild system for installing modules then that
++	  kernel module will also be compressed when it is installed.
++
++	  When running mkinitrd you will find that an error message
++	  appears saying that it cannot find a certain kernel module.
++	  As a workaround, unset CONFIG_MODULE_COMPRESS, build the modules
++	  and install them, run mkinitrd and create the initrd image, place
++	  the initrd image in the correct place for booting, set
++	  CONFIG_MODULE_COMPRESS and then install the modules again.
++
++	  This options requires the module-init-tools package to be 
++	  configured with --enable-zlib (if using gzip which is the
++	  default compression method).
++
++choice
++	depends on MODULE_COMPRESS
++	prompt "Kernel module compression method"
++	default MODULE_COMPRESS_GZIP
++
++config MODULE_COMPRESS_GZIP
++	bool "Gzip compression"
++	help
++	  Compresses the kernel modules using the Gzip (GNU zip) 
++	  compression format.
++
++	  This option requires gzip to be installed.
++	  
++endchoice
+ config MODVERSIONS
+ 	bool "Module versioning support"
+ 	depends on MODULES
+--- a/Documentation/kbuild/modules.txt	2008-02-11 05:51:11.000000000 +0000
++++ b/Documentation/kbuild/modules.txt	2008-05-29 19:35:30.000000000 +0100
+@@ -96,6 +96,11 @@
+ 		Installation default is in /lib/modules/<kernel-version>/extra,
+ 		but may be prefixed with INSTALL_MOD_PATH - see separate
+ 		chapter.
++		If MODULES_COMPRESS is set when the modules_install target is 
++		run then the module is compressed after it has been 
++		copied to /lib/modules/<kernel-version>. Compressed modules 
++		using the default Gzip compression format will require 
++		module-init-tools installed with --zlib-enabled.
+ 
+ 	make -C $KDIR M=`pwd` clean
+ 		Remove all generated files for the module - the kernel
