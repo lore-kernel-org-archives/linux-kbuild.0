@@ -1,53 +1,56 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ew0-f20.google.com ([209.85.219.20]:38210 "EHLO
-	mail-ew0-f20.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1760291AbZATKPc (ORCPT
+Received: from pfepa.post.tele.dk ([195.41.46.235]:42676 "EHLO
+	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756344AbZATNpf (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 20 Jan 2009 05:15:32 -0500
-Received: by ewy13 with SMTP id 13so831112ewy.13
-        for <linux-kbuild@vger.kernel.org>; Tue, 20 Jan 2009 02:15:29 -0800 (PST)
-MIME-Version: 1.0
-Date: Tue, 20 Jan 2009 18:15:29 +0800
-Message-ID: <91b13c310901200215t1b40ac1eid0a704d6c55522bc@mail.gmail.com>
-Subject: Is this a kbuild system's BUG?
-From: Cheng Renquan <crquan@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+	Tue, 20 Jan 2009 08:45:35 -0500
+Date: Tue, 20 Jan 2009 14:47:19 +0100
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: Is this a kbuild system's BUG?
+Message-ID: <20090120134719.GA18924@uranus.ravnborg.org>
+References: <91b13c310901200215t1b40ac1eid0a704d6c55522bc@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <91b13c310901200215t1b40ac1eid0a704d6c55522bc@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
+To: Cheng Renquan <crquan@gmail.com>
 Cc: linux-kbuild@vger.kernel.org
 
-Hello,
+On Tue, Jan 20, 2009 at 06:15:29PM +0800, Cheng Renquan wrote:
+> Hello,
+> 
+> as the prepare target said,
+> 
+>   prepare         - Set up for building external modules
+> 
+> it should setup a environment for external modules building, right?
+> 
+> I unpacked linux-2.6.28.tar.bz2 to /usr/src/linux-2.6.28/, copied a
+> good .config,
+> "make prepare" under it,
+> 
+> but if I use it to build an external module under $PWD/kernel, it complains,
+> 
+> $ env -i make -C /usr/src/linux-2.6.28/ M=$PWD/kernel
+> make: Entering directory `/usr/src/linux-2.6.28'
+> 
+>   WARNING: Symbol version dump /usr/src/linux-2.6.28/Module.symvers
+>            is missing; modules will have no dependencies and modversions.
+> 
+>   Building modules, stage 2.
+>   MODPOST 1 modules
+> /bin/sh: scripts/mod/modpost: No such file or directory
+> make[1]: *** [__modpost] Error 127
+> make: *** [modules] Error 2
+> make: Leaving directory `/usr/src/linux-2.6.28'
+> 
+> it seems OK if I do a "make scritps/" in advance, so should we add scripts
+> depend to prepare?
+Yes.
+I wonder why this is not done today??
 
-as the prepare target said,
+Can I ask you to try it out and see if anythings breaks.
 
-  prepare         - Set up for building external modules
-
-it should setup a environment for external modules building, right?
-
-I unpacked linux-2.6.28.tar.bz2 to /usr/src/linux-2.6.28/, copied a
-good .config,
-"make prepare" under it,
-
-but if I use it to build an external module under $PWD/kernel, it complains,
-
-$ env -i make -C /usr/src/linux-2.6.28/ M=$PWD/kernel
-make: Entering directory `/usr/src/linux-2.6.28'
-
-  WARNING: Symbol version dump /usr/src/linux-2.6.28/Module.symvers
-           is missing; modules will have no dependencies and modversions.
-
-  Building modules, stage 2.
-  MODPOST 1 modules
-/bin/sh: scripts/mod/modpost: No such file or directory
-make[1]: *** [__modpost] Error 127
-make: *** [modules] Error 2
-make: Leaving directory `/usr/src/linux-2.6.28'
-
-it seems OK if I do a "make scritps/" in advance, so should we add scripts
-depend to prepare?
-
--- 
-Cheng Renquan, Shenzhen, China
-Katharine Hepburn  - "Death will be a great relief. No more interviews."
+	Sam
