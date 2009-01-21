@@ -1,16 +1,17 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from wf-out-1314.google.com ([209.85.200.172]:50000 "EHLO
+Received: from wf-out-1314.google.com ([209.85.200.175]:48909 "EHLO
 	wf-out-1314.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752273AbZAUBoi (ORCPT
+	with ESMTP id S1752788AbZAUBuy (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 20 Jan 2009 20:44:38 -0500
-Subject: Re: [git pull] m68k and m68knommu merge of includes
+	Tue, 20 Jan 2009 20:50:54 -0500
+Subject: [PATCH] m68k{nommu}: fixups after the header move
 From: Harvey Harrison <harvey.harrison@gmail.com>
-In-Reply-To: <200901210058.n0L0wjdf005545@localhost.localdomain>
+In-Reply-To: <1232502275.5653.2.camel@brick>
 References: <200901210058.n0L0wjdf005545@localhost.localdomain>
+	 <1232502275.5653.2.camel@brick>
 Content-Type: text/plain
-Date: Tue, 20 Jan 2009 17:44:35 -0800
-Message-Id: <1232502275.5653.2.camel@brick>
+Date: Tue, 20 Jan 2009 17:50:51 -0800
+Message-Id: <1232502651.9701.0.camel@brick>
 Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -18,27 +19,70 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: Greg Ungerer <gerg@snapgear.com>
 Cc: torvalds@linux-foundation.org, arnd@arndb.de, gerg@uclinux.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-m68k@vger.kernel.org, sam@ravnborg.org, uclinux-dev@uclinux.org, zippel@linux-m68k.org
 
-On Wed, 2009-01-21 at 10:58 +1000, Greg Ungerer wrote:
-> Hi Linus,
-> 
-> Please consider pulling this merge of the m68k and m68knommu include files.
-> It comepletely moves include/asm-m68k to arch/m68k/include as part of the
-> process, and ultimately results in both m68k and m68knommu arch code using
-> the same set of includes. More cleanup can follow, but this is the
-> necessary first step.
-> 
-> Thanks
-> Greg
+swab.h seems to have been missed during the header merge.
+Add conditionals similar to byteorder.h and remove the
+now unnecessary byteorder_no/mm.h
 
-I think you need to check your arch/m68k/include/asm/swab.h as I get an
-empty file when I pull this.  It looks like it needs a conditional 
-include of swab_mm/swab_no similar to the other files.
+Signed-off-by: Harvey Harrison <harvey.harrison@gmail.com>
+---
+ arch/m68k/include/asm/byteorder.h    |   11 ++++++-----
+ arch/m68k/include/asm/byteorder_mm.h |    6 ------
+ arch/m68k/include/asm/byteorder_no.h |    6 ------
+ arch/m68k/include/asm/swab.h         |    5 +++++
+ 4 files changed, 11 insertions(+), 17 deletions(-)
 
-Also, because of the byteorder changes, it looks like you don't need
-a separate byteorder_mm/no as they both just include the generic
-include/linux/byteorder/big_endian.h
+diff --git a/arch/m68k/include/asm/byteorder.h b/arch/m68k/include/asm/byteorder.h
+index f20502a..31b260a 100644
+--- a/arch/m68k/include/asm/byteorder.h
++++ b/arch/m68k/include/asm/byteorder.h
+@@ -1,5 +1,6 @@
+-#ifdef __uClinux__
+-#include "byteorder_no.h"
+-#else
+-#include "byteorder_mm.h"
+-#endif
++#ifndef _M68K_BYTEORDER_H
++#define _M68K_BYTEORDER_H
++
++#include <linux/byteorder/big_endian.h>
++
++#endif /* _M68K_BYTEORDER_H */
+diff --git a/arch/m68k/include/asm/byteorder_mm.h b/arch/m68k/include/asm/byteorder_mm.h
+deleted file mode 100644
+index 31b260a..0000000
+--- a/arch/m68k/include/asm/byteorder_mm.h
++++ /dev/null
+@@ -1,6 +0,0 @@
+-#ifndef _M68K_BYTEORDER_H
+-#define _M68K_BYTEORDER_H
+-
+-#include <linux/byteorder/big_endian.h>
+-
+-#endif /* _M68K_BYTEORDER_H */
+diff --git a/arch/m68k/include/asm/byteorder_no.h b/arch/m68k/include/asm/byteorder_no.h
+deleted file mode 100644
+index 9c6c76a..0000000
+--- a/arch/m68k/include/asm/byteorder_no.h
++++ /dev/null
+@@ -1,6 +0,0 @@
+-#ifndef _M68KNOMMU_BYTEORDER_H
+-#define _M68KNOMMU_BYTEORDER_H
+-
+-#include <linux/byteorder/big_endian.h>
+-
+-#endif /* _M68KNOMMU_BYTEORDER_H */
+diff --git a/arch/m68k/include/asm/swab.h b/arch/m68k/include/asm/swab.h
+index e69de29..7d7dde1 100644
+--- a/arch/m68k/include/asm/swab.h
++++ b/arch/m68k/include/asm/swab.h
+@@ -0,0 +1,5 @@
++#ifdef __uClinux__
++#include "swab_no.h"
++#else
++#include "swab_mm.h"
++#endif
+-- 
+1.6.1.249.g455e5
 
-Cheers,
 
-Harvey
 
