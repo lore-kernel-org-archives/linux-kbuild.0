@@ -1,42 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from rv-out-0506.google.com ([209.85.198.225]:40514 "EHLO
-	rv-out-0506.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757056AbZAUDtR (ORCPT
+Received: from byss.tchmachines.com ([208.76.80.75]:57920 "EHLO
+	byss.tchmachines.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754990AbZAWBGy (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 20 Jan 2009 22:49:17 -0500
-Subject: Re: [git pull] m68k and m68knommu merge of includes
-From: Harvey Harrison <harvey.harrison@gmail.com>
-In-Reply-To: <497698D2.1050804@snapgear.com>
-References: <200901210058.n0L0wjdf005545@localhost.localdomain>
-	 <1232502275.5653.2.camel@brick>  <497698D2.1050804@snapgear.com>
-Content-Type: text/plain
-Date: Tue, 20 Jan 2009 19:49:14 -0800
-Message-Id: <1232509755.9701.2.camel@brick>
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+	Thu, 22 Jan 2009 20:06:54 -0500
+Date: Thu, 22 Jan 2009 16:16:47 -0800
+From: Josh Hunt <josh@scalex86.org>
+Subject: [PATCH] Add vmlinux to kernel rpm
+Message-ID: <20090123001647.GB31925@localhost.localdomain>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Greg Ungerer <gerg@snapgear.com>
-Cc: torvalds@linux-foundation.org, arnd@arndb.de, gerg@uclinux.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-m68k@vger.kernel.org, sam@ravnborg.org, uclinux-dev@uclinux.org, zippel@linux-m68k.org
+To: sam@ravnborg.org
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, kiran@scalex86.org
 
-On Wed, 2009-01-21 at 13:38 +1000, Greg Ungerer wrote:
-> > 
-> > I think you need to check your arch/m68k/include/asm/swab.h as I get an
-> > empty file when I pull this.  It looks like it needs a conditional 
-> > include of swab_mm/swab_no similar to the other files.
-> 
-> Yes, something went wrong there...
-> 
-> 
-> > Also, because of the byteorder changes, it looks like you don't need
-> > a separate byteorder_mm/no as they both just include the generic
-> > include/linux/byteorder/big_endian.h
-> 
-> Are you happy to just apply your follow up patch to fix these issues,
-> after this has been pulled?
+Adds compressed vmlinux to rpm when doing "make {rpm-pkg,binrpm-pkg}".
+Installs vmlinux.bz2 to /boot.
 
-Sounds fine to me, hopefully Linus will just apply it right after he
-pulls.
+Signed-off-by: Josh Hunt <josh@scalex86.org>
 
-Harvey
+Index: linux-2.6.28/scripts/package/mkspec
+===================================================================
+--- linux-2.6.28.orig/scripts/package/mkspec    2008-12-24
+15:26:37.000000000 -0800
++++ linux-2.6.28/scripts/package/mkspec    2009-01-21
+16:53:03.000000000 -0800
+@@ -86,6 +86,14 @@ echo "%endif"
+ echo 'cp System.map $RPM_BUILD_ROOT'"/boot/System.map-$KERNELRELEASE"
 
+ echo 'cp .config $RPM_BUILD_ROOT'"/boot/config-$KERNELRELEASE"
++
++echo "%ifnarch ppc64"
++echo 'cp vmlinux vmlinux.orig'
++echo 'bzip2 -9 vmlinux'
++echo 'mv vmlinux.bz2
+$RPM_BUILD_ROOT'"/boot/vmlinux-$KERNELRELEASE.bz2"
++echo 'mv vmlinux.orig vmlinux'
++echo "%endif"
++
+ echo ""
+ echo "%clean"
+ echo '#echo -rf $RPM_BUILD_ROOT' 
