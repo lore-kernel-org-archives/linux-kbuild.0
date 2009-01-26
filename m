@@ -1,36 +1,70 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from sovereign.computergmbh.de ([85.214.69.204]:35198 "EHLO
-	sovereign.computergmbh.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751697AbZAYSCX (ORCPT
+Received: from pfepb.post.tele.dk ([195.41.46.236]:47748 "EHLO
+	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753445AbZAZUKc (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 25 Jan 2009 13:02:23 -0500
-Date: Sun, 25 Jan 2009 19:02:21 +0100 (CET)
-From: Jan Engelhardt <jengelh@medozas.de>
-Subject: Re: [PATCH] Compress kernel modules on installation.
-In-Reply-To: <20090125165118.dfdd3978.sbrokenshire@xestia.co.uk>
-Message-ID: <alpine.LSU.2.00.0901251900490.7363@fbirervta.pbzchgretzou.qr>
-References: <20080225214209.a3f79327.sbrokenshire@xestia.co.uk> <20080226112840.GA29465@uranus.ravnborg.org> <alpine.LSU.2.00.0812262026320.11203@fbirervta.pbzchgretzou.qr> <20081226194833.GA8306@uranus.ravnborg.org> <20090120033047.7412d93e.sbrokenshire@xestia.co.uk>
- <20090125165118.dfdd3978.sbrokenshire@xestia.co.uk>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+	Mon, 26 Jan 2009 15:10:32 -0500
+Date: Mon, 26 Jan 2009 21:12:17 +0100
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: [GIT] kbuild updates
+Message-ID: <20090126201217.GA9704@uranus.ravnborg.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Steve Brokenshire <sbrokenshire@xestia.co.uk>
-Cc: Sam Ravnborg <sam@ravnborg.org>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: Linus Torvalds <torvalds@linux-foundation.org>, LKML <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
+Cc: Randy Dunlap <randy.dunlap@oracle.com>, Andi Kleen <ak@linux.intel.com>, Wenji Huang <wenji.huang@oracle.com>, Theodore Ts'o <tytso@mit.edu>, Dave Jones <davej@redhat.com>, Roland McGrath <roland@redhat.com>, Jan Beulich <jbeulich@novell.com>
+
+Hi Linus.
+
+Please pull the following fixes.
+
+1) It reverts the two patches that introduce improved stripping
+   of modules and vmlinux. Expect them to come back later when we have
+   sorted out all issues.
+   Jan has posted a patch to disable the ill effects but we should
+   fix the root couse somehow.
+
+2) Two other trivialities
 
 
-On Sunday 2009-01-25 17:51, Steve Brokenshire wrote:
->+
->+quiet_cmd_modules_install = INSTALL  $@
->+      cmd_modules_install = mkdir -p $(2); \
->+				cp $@ $(2) ; \
->+				$(mod_strip_cmd) $(2)/$(notdir $@)
->+
->+quiet_cmd_modules_compress_gzip = COMPRESS $@
->+      cmd_modules_compress_gzip = gzip $(MODCOMPOPT) -c \
->+				 $(2)/`basename $@` \
->+				 > $(2)/`basename $@`.gz; \
->+				 rm $(2)/`basename $@`
+Note: I am rather unresponsive until week 11 due to day-time work and vacation.
 
-That is *three* extra shell invocations you got there
-for something make can compute itself using $(@F) iirc.
+	Sam
+
+
+The following changes since commit a6525042bfdfcab128bd91fad264de10fd24a55e:
+  Linus Torvalds (1):
+        Merge branch 'x86-pat-for-linus' of git://git.kernel.org/.../tip/linux-2.6-tip
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/sam/kbuild-fixes.git master
+
+Andi Kleen (1):
+      kbuild: print usage with no arguments in scripts/config
+
+Randy Dunlap (1):
+      kbuild: fix kbuild.txt typos
+
+Sam Ravnborg (1):
+      Revert "kbuild: strip generated symbols from *.ko"
+
+ Documentation/kbuild/kbuild.txt     |   29 +++---
+ Makefile                            |   59 ++++--------
+ arch/x86/scripts/strip-symbols      |    1 -
+ init/Kconfig                        |    7 --
+ kernel/kallsyms.c                   |   16 ++-
+ scripts/Makefile.build              |   55 ++++-------
+ scripts/Makefile.modinst            |    3 +-
+ scripts/config                      |    4 +
+ scripts/genksyms/genksyms.c         |   21 +---
+ scripts/genksyms/keywords.c_shipped |  189 +++++++++++++++++------------------
+ scripts/genksyms/keywords.gperf     |    2 -
+ scripts/kallsyms.c                  |   21 +++--
+ scripts/mksysmap                    |    7 +-
+ scripts/strip-symbols               |   22 ----
+ 14 files changed, 185 insertions(+), 251 deletions(-)
+ delete mode 100644 arch/x86/scripts/strip-symbols
+ delete mode 100644 scripts/strip-symbols
