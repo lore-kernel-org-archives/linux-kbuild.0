@@ -1,81 +1,55 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx5.mail.ru ([194.67.23.25]:6960 "EHLO mx5.mail.ru"
+Received: from smtp1-g21.free.fr ([212.27.42.1]:40776 "EHLO smtp1-g21.free.fr"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752326AbZBDQpq (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 4 Feb 2009 11:45:46 -0500
-From: Andrey Borzenkov <arvidjaar@mail.ru>
-Subject: Re: 2.6.29-rc: unable to compile e100 firmware into kernel
-Date: Wed, 4 Feb 2009 19:45:29 +0300
-References: <200901311900.00851.arvidjaar@mail.ru> <4807377b0902011105l29e846c3r140212ac654efb93@mail.gmail.com> <1233754384.19223.183.camel@macbook.infradead.org>
-In-Reply-To: <1233754384.19223.183.camel@macbook.infradead.org>
-MIME-Version: 1.0
-Content-Type: multipart/signed;
-  boundary="nextPart7914482.lB7CaGVr5o";
-  protocol="application/pgp-signature";
-  micalg=pgp-sha1
+	id S1754629AbZBIRuC (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 9 Feb 2009 12:50:02 -0500
+Subject: [PATCH] fix spurious initramfs rebuild
+From: Maxime Bizon <mbizon@freebox.fr>
+Reply-To: mbizon@freebox.fr
+Content-Type: text/plain
+Date: Mon, 09 Feb 2009 18:49:52 +0100
+Message-Id: <1234201792.1951.26.camel@sakura.staff.proxad.net>
+Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
-Message-Id: <200902041945.36632.arvidjaar@mail.ru>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: David Woodhouse <dwmw2@infradead.org>
-Cc: Jesse Brandeburg <jesse.brandeburg@gmail.com>, linux-kbuild@vger.kernel.org, netdev@vger.kernel.org, Linux Kernel Development <linux-kernel@vger.kernel.org>
+To: sam@ravnborg.org
+Cc: linux-kbuild@vger.kernel.org
 
---nextPart7914482.lB7CaGVr5o
-Content-Type: text/plain;
-  charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
 
-On 4 of February 2009 16:33:04 David Woodhouse wrote:
-> On Sun, 2009-02-01 at 11:05 -0800, Jesse Brandeburg wrote:
-> > On Sat, Jan 31, 2009 at 7:59 AM, Andrey Borzenkov=20
-<arvidjaar@mail.ru> wrote:
-> > > {pts/2}% LC_ALL=3DC make -C ~/src/linux-git
-> > > O=3D$HOME/build/linux-2.6.29 make: Entering directory
-> > > `/home/bor/src/linux-git'
-> > >  Using /home/bor/src/linux-git as source for kernel
-> > > ln -fsn /home/bor/src/linux-git source
-> >
-> > I think (seem to recall something on the list) there have been
-> > multiple people reporting the make O=3D option doesn't work with
-> > CONFIG_FIRMWARE_IN_KERNEL,
->
-> That shouldn't be the case -- it works fine here.
->
-> Andrey, what version of make are you using?
+Hello,
 
-OK, build error was likely result of something I did before (I suspect=20
-what, but after I cleaned up build firmware/e100 it rebuilds OK now).=20
-But even after I verified that firmware *was* built in kernel loading=20
-still failed. This is genuine bug caused by config option mismatch.
 
-I had CONFIG_FW_LOADER=3Dm. I do not remember ever setting it explicitly,=20
-so I suspect it was selected by some other driver in the past (I do make=20
-oldconfig for at least ten past releases if not more). This cannot work=20
-with CONFIG_FIRMWARE_IN_KERNEL=3Dy because of this code in=20
-drivers/base/firmware_class.c:
 
-#ifdef CONFIG_FW_LOADER
-extern struct builtin_fw __start_builtin_fw[];
-extern struct builtin_fw __end_builtin_fw[];
-#else /* Module case. Avoid ifdefs later; it'll all optimise out */
-static struct builtin_fw *__start_builtin_fw;
-static struct builtin_fw *__end_builtin_fw;
-#endif
+When gen_initramfs_list is used to generate make dependencies, it
+includes symbolic links, for which make tracks the link target. Any
+change to that target will cause an initramfs rebuild, even if the
+symlink points to something outside of the initramfs directory.
 
-IOW CONFIG_FIRMWARE_IN_KERNEL must force CONFIG_FW_LOADER=3Dy. I do not=20
-understand Kconfig enough to offer a patch.
+If the target happens to be /tmp, the rebuild occurs for each kernel
+build, since gen_initramfs_list uses mktemp...
 
---nextPart7914482.lB7CaGVr5o
-Content-Type: application/pgp-signature; name=signature.asc 
-Content-Description: This is a digitally signed message part.
+Proposed way to fix it is to omit symbolic links from generated
+dependencies, but this has a small drawback: changing perm/owner on a
+symlink will go unnoticed.
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.9 (GNU/Linux)
 
-iEYEABECAAYFAkmJxiwACgkQR6LMutpd94zT8ACguCB4BNMcm2EpgbfqthRcxBjU
-B2QAn2XTi2/yJieX5xJS87CoUGtUO7b/
-=4wIb
------END PGP SIGNATURE-----
+Signed-off-by: Maxime Bizon <mbizon@freebox.fr>
 
---nextPart7914482.lB7CaGVr5o--
+--- linux-2.6.28.4/scripts/gen_initramfs_list.sh.old	2009-02-09 18:22:26.000000000 +0100
++++ linux-2.6.28.4/scripts/gen_initramfs_list.sh	2009-02-09 18:21:54.000000000 +0100
+@@ -97,7 +97,7 @@
+ }
+ 
+ list_parse() {
+-	echo "$1 \\"
++	[ ! -L "$1" ] && echo "$1 \\" || :
+ }
+ 
+ # for each file print a line in following format
+
+
+-- 
+Maxime
+
+
