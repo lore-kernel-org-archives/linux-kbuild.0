@@ -1,34 +1,55 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from one.firstfloor.org ([213.235.205.2]:38820 "EHLO
-	one.firstfloor.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750730AbZBKIvV (ORCPT
+Received: from smtp1.linux-foundation.org ([140.211.169.13]:38715 "EHLO
+	smtp1.linux-foundation.org" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1756695AbZBKVLk (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 11 Feb 2009 03:51:21 -0500
-Date: Wed, 11 Feb 2009 09:50:20 +0100
-From: Andi Kleen <andi@firstfloor.org>
-Subject: one more oldconfig quirk in 2.6.29-rc4
-Message-ID: <20090211085020.GA15967@basil.nowhere.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+	Wed, 11 Feb 2009 16:11:40 -0500
+Message-Id: <200902112111.n1BLAxVl008391@imap1.linux-foundation.org>
+Subject: [patch for 2.6.29? 1/1] bootgraph: fix for use with dot symbols
+From: akpm@linux-foundation.org
+Date: Wed, 11 Feb 2009 13:10:59 -0800
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: sam@ravnborg.org, linux-kbuild@vger.kernel.org
+To: sam@ravnborg.org
+Cc: linux-kbuild@vger.kernel.org, akpm@linux-foundation.org, mikey@neuling.org, arjan@linux.intel.com
 
+From: Michael Neuling <mikey@neuling.org>
 
-I changed one option manually in a .config file in a separate
-objdir requiring make oldconfig. Then I ran make (without
-oldconfig) and got
+powerpc has dot symbols, so the dmesg output looks like:
 
-make[4]: *** [silentoldconfig] Error 1
-make[3]: *** [silentoldconfig] Error 2
-make[2]: *** No rule to make target `include/config/auto.conf', needed by `include/config/kernel.release'.  Stop.
-make[1]: *** [sub-make] Error 2
-make: *** [all] Error 2
+<4>[    0.327310] calling  .migration_init+0x0/0x9c @ 1
+<4>[    0.327595] initcall .migration_init+0x0/0x9c returned 1 after 0 usecs
 
-In the past make would always run oldconfig automatically.
+The below fixes bootgraph.pl so it handles this correctly.
 
--Andi
+Signed-off-by: Michael Neuling <mikey@neuling.org>
+Signed-off-by: Arjan van de Ven <arjan@linux.intel.com>
+Cc: Sam Ravnborg <sam@ravnborg.org>
+Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+---
 
--- 
-ak@linux.intel.com -- Speaking for myself only.
+ scripts/bootgraph.pl |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff -puN scripts/bootgraph.pl~bootgraph-fix-for-use-with-dot-symbols scripts/bootgraph.pl
+--- a/scripts/bootgraph.pl~bootgraph-fix-for-use-with-dot-symbols
++++ a/scripts/bootgraph.pl
+@@ -51,7 +51,7 @@ my %pidctr;
+ 
+ while (<>) {
+ 	my $line = $_;
+-	if ($line =~ /([0-9\.]+)\] calling  ([a-zA-Z0-9\_]+)\+/) {
++	if ($line =~ /([0-9\.]+)\] calling  ([a-zA-Z0-9\_\.]+)\+/) {
+ 		my $func = $2;
+ 		if ($done == 0) {
+ 			$start{$func} = $1;
+@@ -87,7 +87,7 @@ while (<>) {
+ 		$count = $count + 1;
+ 	}
+ 
+-	if ($line =~ /([0-9\.]+)\] initcall ([a-zA-Z0-9\_]+)\+.*returned/) {
++	if ($line =~ /([0-9\.]+)\] initcall ([a-zA-Z0-9\_\.]+)\+.*returned/) {
+ 		if ($done == 0) {
+ 			$end{$2} = $1;
+ 			$maxtime = $1;
+_
