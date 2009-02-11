@@ -1,55 +1,34 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp1-g21.free.fr ([212.27.42.1]:40776 "EHLO smtp1-g21.free.fr"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754629AbZBIRuC (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 9 Feb 2009 12:50:02 -0500
-Subject: [PATCH] fix spurious initramfs rebuild
-From: Maxime Bizon <mbizon@freebox.fr>
-Reply-To: mbizon@freebox.fr
-Content-Type: text/plain
-Date: Mon, 09 Feb 2009 18:49:52 +0100
-Message-Id: <1234201792.1951.26.camel@sakura.staff.proxad.net>
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Received: from one.firstfloor.org ([213.235.205.2]:38820 "EHLO
+	one.firstfloor.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750730AbZBKIvV (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 11 Feb 2009 03:51:21 -0500
+Date: Wed, 11 Feb 2009 09:50:20 +0100
+From: Andi Kleen <andi@firstfloor.org>
+Subject: one more oldconfig quirk in 2.6.29-rc4
+Message-ID: <20090211085020.GA15967@basil.nowhere.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: sam@ravnborg.org
-Cc: linux-kbuild@vger.kernel.org
+To: sam@ravnborg.org, linux-kbuild@vger.kernel.org
 
 
-Hello,
+I changed one option manually in a .config file in a separate
+objdir requiring make oldconfig. Then I ran make (without
+oldconfig) and got
 
+make[4]: *** [silentoldconfig] Error 1
+make[3]: *** [silentoldconfig] Error 2
+make[2]: *** No rule to make target `include/config/auto.conf', needed by `include/config/kernel.release'.  Stop.
+make[1]: *** [sub-make] Error 2
+make: *** [all] Error 2
 
+In the past make would always run oldconfig automatically.
 
-When gen_initramfs_list is used to generate make dependencies, it
-includes symbolic links, for which make tracks the link target. Any
-change to that target will cause an initramfs rebuild, even if the
-symlink points to something outside of the initramfs directory.
-
-If the target happens to be /tmp, the rebuild occurs for each kernel
-build, since gen_initramfs_list uses mktemp...
-
-Proposed way to fix it is to omit symbolic links from generated
-dependencies, but this has a small drawback: changing perm/owner on a
-symlink will go unnoticed.
-
-
-Signed-off-by: Maxime Bizon <mbizon@freebox.fr>
-
---- linux-2.6.28.4/scripts/gen_initramfs_list.sh.old	2009-02-09 18:22:26.000000000 +0100
-+++ linux-2.6.28.4/scripts/gen_initramfs_list.sh	2009-02-09 18:21:54.000000000 +0100
-@@ -97,7 +97,7 @@
- }
- 
- list_parse() {
--	echo "$1 \\"
-+	[ ! -L "$1" ] && echo "$1 \\" || :
- }
- 
- # for each file print a line in following format
-
+-Andi
 
 -- 
-Maxime
-
-
+ak@linux.intel.com -- Speaking for myself only.
