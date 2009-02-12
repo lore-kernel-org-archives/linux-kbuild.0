@@ -1,52 +1,52 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp1.linux-foundation.org ([140.211.169.13]:42252 "EHLO
-	smtp1.linux-foundation.org" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1757134AbZBKVYO (ORCPT
+Received: from byss.tchmachines.com ([208.76.80.75]:36872 "EHLO
+	byss.tchmachines.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750721AbZBLFLA (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 11 Feb 2009 16:24:14 -0500
-Message-Id: <200902112124.n1BLO9qK027146@imap1.linux-foundation.org>
-Subject: [patch 1/1] tags: fix config symbols generation
-From: akpm@linux-foundation.org
-Date: Wed, 11 Feb 2009 13:24:09 -0800
+	Thu, 12 Feb 2009 00:11:00 -0500
+Date: Wed, 11 Feb 2009 21:10:57 -0800
+From: Josh Hunt <josh@scalex86.org>
+Subject: [PATCH] Add vmlinux to kernel rpm - updated description
+Message-ID: <20090212051057.GC12732@localhost.localdomain>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: sam@ravnborg.org
-Cc: linux-kbuild@vger.kernel.org, akpm@linux-foundation.org, adobriyan@gmail.com
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, kiran@scalex86.org, mingo@elte.hu
 
-From: Alexey Dobriyan <adobriyan@gmail.com>
+Resending with updated description:
 
-commit 4f628248a578585472e19e4cba2c604643af8c6c aka "kbuild: reintroduce
-ALLSOURCE_ARCHS support for tags/cscope" breaks tags generation for
-Kconfig symbols.
+We are building an automated system to test kernels weekly and need to
+provide an rpm to our QA dept.  We would like to use the ability to create
+kernel rpms already in the kernel's Makefile, but need the vmlinux file
+included in the rpm for later debugging.  This patch adds a compressed vmlinux to
+the kernel rpm when doing a make rpm-pkg or binrpm-pkg and upon install
+places the vmlinux file in /boot.
 
-Steps to reproduce:
+Signed-off-by: Josh Hunt <josh@scalex86.org>
 
-	make tags
-	vi -t PROC_FS
+Index: linux-2.6.28/scripts/package/mkspec
+===================================================================
+--- linux-2.6.28.orig/scripts/package/mkspec    2008-12-24
+15:26:37.000000000 -0800
++++ linux-2.6.28/scripts/package/mkspec    2009-01-21
+16:53:03.000000000 -0800
+@@ -86,6 +86,14 @@ echo "%endif"
+ echo 'cp System.map $RPM_BUILD_ROOT'"/boot/System.map-$KERNELRELEASE"
 
-It should jump to 'config PROC_FS' line.
+ echo 'cp .config $RPM_BUILD_ROOT'"/boot/config-$KERNELRELEASE"
++
++echo "%ifnarch ppc64"
++echo 'cp vmlinux vmlinux.orig'
++echo 'bzip2 -9 vmlinux'
++echo 'mv vmlinux.bz2
+$RPM_BUILD_ROOT'"/boot/vmlinux-$KERNELRELEASE.bz2"
++echo 'mv vmlinux.orig vmlinux'
++echo "%endif"
++
+ echo ""
+ echo "%clean"
+ echo '#echo -rf $RPM_BUILD_ROOT'
 
-Signed-off-by: Alexey Dobriyan <adobriyan@gmail.com>
-Cc: Sam Ravnborg <sam@ravnborg.org>
-Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
----
-
- scripts/tags.sh |    5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
-
-diff -puN scripts/tags.sh~tags-fix-config-symbols-generation scripts/tags.sh
---- a/scripts/tags.sh~tags-fix-config-symbols-generation
-+++ a/scripts/tags.sh
-@@ -76,7 +76,10 @@ all_sources()
- 
- all_kconfigs()
- {
--	find_sources $ALLSOURCE_ARCHS 'Kconfig*'
-+	for arch in $ALLSOURCE_ARCHS; do
-+		find_sources $arch 'Kconfig*'
-+	done
-+	find_other_sources 'Kconfig*'
- }
- 
- all_defconfigs()
-_
