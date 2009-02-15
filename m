@@ -1,81 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepb.post.tele.dk ([195.41.46.236]:47767 "EHLO
-	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751318AbZBOJBJ (ORCPT
+Received: from pfepa.post.tele.dk ([195.41.46.235]:38074 "EHLO
+	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751443AbZBOJWL (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 15 Feb 2009 04:01:09 -0500
-Date: Sun, 15 Feb 2009 10:03:01 +0100
+	Sun, 15 Feb 2009 04:22:11 -0500
+Date: Sun, 15 Feb 2009 10:24:02 +0100
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH] Fix 'make rpm' when CONFIG_LOCALVERSION_AUTO=y and using SCM tree
-Message-ID: <20090215090301.GA29048@uranus.ravnborg.org>
-References: <20090212181605.GA7696@localhost.localdomain>
+Subject: Re: [patch 1/1] tags: fix config symbols generation
+Message-ID: <20090215092402.GB29094@uranus.ravnborg.org>
+References: <200902112124.n1BLO9qK027146@imap1.linux-foundation.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20090212181605.GA7696@localhost.localdomain>
+In-Reply-To: <200902112124.n1BLO9qK027146@imap1.linux-foundation.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Josh Hunt <josh@scalex86.org>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, kiran@scalex86.org, mingo@elte.hu
+To: akpm@linux-foundation.org
+Cc: linux-kbuild@vger.kernel.org, adobriyan@gmail.com
 
-On Thu, Feb 12, 2009 at 10:16:05AM -0800, Josh Hunt wrote:
-> Running 'make rpm' fails when CONFIG_LOCALVERSION_AUTO=y and using a kernel source
-> tree under SCM.  This is due to KERNELRELEASE being different when the initial make
-> is run and when make is run from rpmbuild.
-...
+On Wed, Feb 11, 2009 at 01:24:09PM -0800, akpm@linux-foundation.org wrote:
+> From: Alexey Dobriyan <adobriyan@gmail.com>
+> 
+> commit 4f628248a578585472e19e4cba2c604643af8c6c aka "kbuild: reintroduce
+> ALLSOURCE_ARCHS support for tags/cscope" breaks tags generation for
+> Kconfig symbols.
+> 
+> Steps to reproduce:
+> 
+> 	make tags
+> 	vi -t PROC_FS
+> 
+> It should jump to 'config PROC_FS' line.
+> 
+> Signed-off-by: Alexey Dobriyan <adobriyan@gmail.com>
+> Cc: Sam Ravnborg <sam@ravnborg.org>
+> Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
 
-I had to hand apply your patch and ended up with the following.
-
-Changes:
-- renamed from autoversion to scmversion
-- simpler logic in top-level Makefile
-- removed "set -e;" in scripts/package/Makefile - they are not needed
-
-Please test.
+Applied to kbuild-fixes.git
 
 	Sam
-
-diff --git a/Makefile b/Makefile
-index 22d7584..3824446 100644
---- a/Makefile
-+++ b/Makefile
-@@ -903,12 +903,18 @@ localver = $(subst $(space),, $(string) \
- # and if the SCM is know a tag from the SCM is appended.
- # The appended tag is determined by the SCM used.
- #
--# Currently, only git is supported.
--# Other SCMs can edit scripts/setlocalversion and add the appropriate
--# checks as needed.
-+# .scmversion is used when generating rpm packages so we do not loose
-+# the version information from the SCM when we do the build of the kernel
-+# from the copied source
- ifdef CONFIG_LOCALVERSION_AUTO
--	_localver-auto = $(shell $(CONFIG_SHELL) \
--	                  $(srctree)/scripts/setlocalversion $(srctree))
-+
-+ifeq ($(wildcard .scmversion),)
-+        _localver-auto = $(shell $(CONFIG_SHELL) \
-+                         $(srctree)/scripts/setlocalversion $(srctree))
-+else
-+        _localver-auto = $(shell cat .scmversion 2> /dev/null)
-+endif
-+
- 	localver-auto  = $(LOCALVERSION)$(_localver-auto)
- endif
- 
-diff --git a/scripts/package/Makefile b/scripts/package/Makefile
-index 8c6b7b0..fa4a0a1 100644
---- a/scripts/package/Makefile
-+++ b/scripts/package/Makefile
-@@ -35,9 +35,10 @@ $(objtree)/kernel.spec: $(MKSPEC) $(srctree)/Makefile
- rpm-pkg rpm: $(objtree)/kernel.spec FORCE
- 	$(MAKE) clean
- 	$(PREV) ln -sf $(srctree) $(KERNELPATH)
-+	$(CONFIG_SHELL) $(srctree)/scripts/setlocalversion > $(objtree)/.scmversion
- 	$(PREV) tar -cz $(RCS_TAR_IGNORE) -f $(KERNELPATH).tar.gz $(KERNELPATH)/.
- 	$(PREV) rm $(KERNELPATH)
--
-+	rm -f $(objtree)/.scmversion
- 	set -e; \
- 	$(CONFIG_SHELL) $(srctree)/scripts/mkversion > $(objtree)/.tmp_version
- 	set -e; \
