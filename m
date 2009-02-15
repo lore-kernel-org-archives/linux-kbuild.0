@@ -1,38 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepb.post.tele.dk ([195.41.46.236]:33366 "EHLO
+Received: from pfepb.post.tele.dk ([195.41.46.236]:47965 "EHLO
 	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752746AbZBOLj7 (ORCPT
+	with ESMTP id S1751229AbZBOPKp (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 15 Feb 2009 06:39:59 -0500
-Date: Sun, 15 Feb 2009 12:41:49 +0100
+	Sun, 15 Feb 2009 10:10:45 -0500
+Date: Sun, 15 Feb 2009 16:12:36 +0100
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH] KBUILD: Create the source symlink earlier in the objdir
-Message-ID: <20090215114149.GB31771@uranus.ravnborg.org>
-References: <20090110035613.GA7225@basil.nowhere.org> <20090215103659.GC31088@uranus.ravnborg.org> <20090215111608.GE26292@one.firstfloor.org>
+Subject: Re: one more oldconfig quirk in 2.6.29-rc4
+Message-ID: <20090215151236.GB673@uranus.ravnborg.org>
+References: <20090211085020.GA15967@basil.nowhere.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20090215111608.GE26292@one.firstfloor.org>
+In-Reply-To: <20090211085020.GA15967@basil.nowhere.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Andi Kleen <andi@firstfloor.org>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: linux-kbuild@vger.kernel.org
 
-On Sun, Feb 15, 2009 at 12:16:08PM +0100, Andi Kleen wrote:
-> > diff --git a/Makefile b/Makefile
-> > index 22d7584..76ee131 100644
-> > --- a/Makefile
-> > +++ b/Makefile
-> > @@ -388,6 +388,7 @@ PHONY += outputmakefile
-> >  # separate output directory. This allows convenient use of make in the
-> >  # output directory.
-> >  outputmakefile:
-> > +	$(Q)ln -fsn $(srctree) source
-> >  ifneq ($(KBUILD_SRC),)
+On Wed, Feb 11, 2009 at 09:50:20AM +0100, Andi Kleen wrote:
 > 
-> Haven't tried it, but
-> doesn't that create the symlink in the non separate objdir case too
-> because it's outside the ifneq?
-Yep - thanks for spotting it!
+> I changed one option manually in a .config file in a separate
+> objdir requiring make oldconfig. Then I ran make (without
+> oldconfig) and got
+> 
+> make[4]: *** [silentoldconfig] Error 1
+> make[3]: *** [silentoldconfig] Error 2
+> make[2]: *** No rule to make target `include/config/auto.conf', needed by `include/config/kernel.release'.  Stop.
+> make[1]: *** [sub-make] Error 2
+> make: *** [all] Error 2
+> 
+> In the past make would always run oldconfig automatically.
+
+I tried to reproduce it with no luck :-(
+
+my steps:
+mkdir ../andi
+cp <a .config from somewhere> ../andi
+cd ../andi
+vi .config
+  < removed all security options to fore a config run >
+make -C ../kfixes.git O=$PWD 
+
+# worked as expected
+
+rm -rf include/config/*
+vi .config
+  < removed all security options to fore a config run >
+make -C ../kfixes.git O=$PWD
+
+# worked as expected
+
+If this is reproducealbe then please try to post the output of
+a run with V=1.
 
 	Sam
