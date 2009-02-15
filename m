@@ -1,52 +1,81 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepb.post.tele.dk ([195.41.46.236]:51479 "EHLO
+Received: from pfepb.post.tele.dk ([195.41.46.236]:47767 "EHLO
 	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751260AbZBOH7p (ORCPT
+	with ESMTP id S1751318AbZBOJBJ (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 15 Feb 2009 02:59:45 -0500
-Date: Sun, 15 Feb 2009 09:01:36 +0100
+	Sun, 15 Feb 2009 04:01:09 -0500
+Date: Sun, 15 Feb 2009 10:03:01 +0100
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH] Add vmlinux to kernel rpm - updated description
-Message-ID: <20090215080136.GA26481@uranus.ravnborg.org>
-References: <20090212051057.GC12732@localhost.localdomain>
+Subject: Re: [PATCH] Fix 'make rpm' when CONFIG_LOCALVERSION_AUTO=y and using SCM tree
+Message-ID: <20090215090301.GA29048@uranus.ravnborg.org>
+References: <20090212181605.GA7696@localhost.localdomain>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20090212051057.GC12732@localhost.localdomain>
+In-Reply-To: <20090212181605.GA7696@localhost.localdomain>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Josh Hunt <josh@scalex86.org>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, kiran@scalex86.org, mingo@elte.hu
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, kiran@scalex86.org, mingo@elte.hu
 
-On Wed, Feb 11, 2009 at 09:10:57PM -0800, Josh Hunt wrote:
-> Resending with updated description:
-> 
-> We are building an automated system to test kernels weekly and need to
-> provide an rpm to our QA dept.  We would like to use the ability to create
-> kernel rpms already in the kernel's Makefile, but need the vmlinux file
-> included in the rpm for later debugging.  This patch adds a compressed vmlinux to
-> the kernel rpm when doing a make rpm-pkg or binrpm-pkg and upon install
-> places the vmlinux file in /boot.
-> 
-> Signed-off-by: Josh Hunt <josh@scalex86.org>
+On Thu, Feb 12, 2009 at 10:16:05AM -0800, Josh Hunt wrote:
+> Running 'make rpm' fails when CONFIG_LOCALVERSION_AUTO=y and using a kernel source
+> tree under SCM.  This is due to KERNELRELEASE being different when the initial make
+> is run and when make is run from rpmbuild.
+...
 
-Applied, but...
+I had to hand apply your patch and ended up with the following.
 
-> 
-> Index: linux-2.6.28/scripts/package/mkspec
-> ===================================================================
-> --- linux-2.6.28.orig/scripts/package/mkspec    2008-12-24
-> 15:26:37.000000000 -0800
-> +++ linux-2.6.28/scripts/package/mkspec    2009-01-21
-> 16:53:03.000000000 -0800
-> @@ -86,6 +86,14 @@ echo "%endif"
->  echo 'cp System.map $RPM_BUILD_ROOT'"/boot/System.map-$KERNELRELEASE"
-> 
->  echo 'cp .config $RPM_BUILD_ROOT'"/boot/config-$KERNELRELEASE"
-> +
-> +echo "%ifnarch ppc64"
-> +echo 'cp vmlinux vmlinux.orig'
-why is this relevant for all architectures except ppc64?
-This is not addressed neither in a comment nor in the changelog.
+Changes:
+- renamed from autoversion to scmversion
+- simpler logic in top-level Makefile
+- removed "set -e;" in scripts/package/Makefile - they are not needed
+
+Please test.
 
 	Sam
+
+diff --git a/Makefile b/Makefile
+index 22d7584..3824446 100644
+--- a/Makefile
++++ b/Makefile
+@@ -903,12 +903,18 @@ localver = $(subst $(space),, $(string) \
+ # and if the SCM is know a tag from the SCM is appended.
+ # The appended tag is determined by the SCM used.
+ #
+-# Currently, only git is supported.
+-# Other SCMs can edit scripts/setlocalversion and add the appropriate
+-# checks as needed.
++# .scmversion is used when generating rpm packages so we do not loose
++# the version information from the SCM when we do the build of the kernel
++# from the copied source
+ ifdef CONFIG_LOCALVERSION_AUTO
+-	_localver-auto = $(shell $(CONFIG_SHELL) \
+-	                  $(srctree)/scripts/setlocalversion $(srctree))
++
++ifeq ($(wildcard .scmversion),)
++        _localver-auto = $(shell $(CONFIG_SHELL) \
++                         $(srctree)/scripts/setlocalversion $(srctree))
++else
++        _localver-auto = $(shell cat .scmversion 2> /dev/null)
++endif
++
+ 	localver-auto  = $(LOCALVERSION)$(_localver-auto)
+ endif
+ 
+diff --git a/scripts/package/Makefile b/scripts/package/Makefile
+index 8c6b7b0..fa4a0a1 100644
+--- a/scripts/package/Makefile
++++ b/scripts/package/Makefile
+@@ -35,9 +35,10 @@ $(objtree)/kernel.spec: $(MKSPEC) $(srctree)/Makefile
+ rpm-pkg rpm: $(objtree)/kernel.spec FORCE
+ 	$(MAKE) clean
+ 	$(PREV) ln -sf $(srctree) $(KERNELPATH)
++	$(CONFIG_SHELL) $(srctree)/scripts/setlocalversion > $(objtree)/.scmversion
+ 	$(PREV) tar -cz $(RCS_TAR_IGNORE) -f $(KERNELPATH).tar.gz $(KERNELPATH)/.
+ 	$(PREV) rm $(KERNELPATH)
+-
++	rm -f $(objtree)/.scmversion
+ 	set -e; \
+ 	$(CONFIG_SHELL) $(srctree)/scripts/mkversion > $(objtree)/.tmp_version
+ 	set -e; \
