@@ -1,119 +1,52 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx28.mail.ru ([94.100.176.42]:1480 "EHLO mx28.mail.ru"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750717AbZBNI0I (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 14 Feb 2009 03:26:08 -0500
-Received: from mx40.mail.ru (mx40.mail.ru [94.100.176.54])
-	by mx28.mail.ru (mPOP.Fallback_MX) with ESMTP id 50134797A63
-	for <linux-kbuild@vger.kernel.org>; Sat, 14 Feb 2009 11:04:09 +0300 (MSK)
-From: Andrey Borzenkov <arvidjaar@mail.ru>
-Subject: Unable to make xconfig with Qt 4.5
-Date: Sat, 14 Feb 2009 11:03:23 +0300
-MIME-Version: 1.0
-Content-Type: multipart/signed;
-  boundary="nextPart3752896.iQ7sLfzbjd";
-  protocol="application/pgp-signature";
-  micalg=pgp-sha1
-Content-Transfer-Encoding: 7bit
-Message-Id: <200902141103.32358.arvidjaar@mail.ru>
+Received: from pfepb.post.tele.dk ([195.41.46.236]:51479 "EHLO
+	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751260AbZBOH7p (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 15 Feb 2009 02:59:45 -0500
+Date: Sun, 15 Feb 2009 09:01:36 +0100
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: [PATCH] Add vmlinux to kernel rpm - updated description
+Message-ID: <20090215080136.GA26481@uranus.ravnborg.org>
+References: <20090212051057.GC12732@localhost.localdomain>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20090212051057.GC12732@localhost.localdomain>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Linux Kernel Development <linux-kernel@vger.kernel.org>, cooker@mandrivalinux.org
+To: Josh Hunt <josh@scalex86.org>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, kiran@scalex86.org, mingo@elte.hu
 
---nextPart3752896.iQ7sLfzbjd
-Content-Type: text/plain;
-  charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+On Wed, Feb 11, 2009 at 09:10:57PM -0800, Josh Hunt wrote:
+> Resending with updated description:
+> 
+> We are building an automated system to test kernels weekly and need to
+> provide an rpm to our QA dept.  We would like to use the ability to create
+> kernel rpms already in the kernel's Makefile, but need the vmlinux file
+> included in the rpm for later debugging.  This patch adds a compressed vmlinux to
+> the kernel rpm when doing a make rpm-pkg or binrpm-pkg and upon install
+> places the vmlinux file in /boot.
+> 
+> Signed-off-by: Josh Hunt <josh@scalex86.org>
 
-It seems that distribution started to ship Qt 4.5 with KDE4. I am lucky=20
-one running Mandriva cooker:
+Applied, but...
 
-{pts/2}% LC_ALL=3DC make -C ~/src/linux-git O=3D$HOME/build/linux-2.6.29=20
-xconfig
-make: Entering directory `/home/bor/src/linux-git'                         =
-=20
-  GEN     /home/bor/build/linux-2.6.29/Makefile                            =
-=20
-Package qt-mt was not found in the pkg-config search path.                 =
-=20
-Perhaps you should add the directory containing `qt-mt.pc'                 =
-=20
-to the PKG_CONFIG_PATH environment variable                                =
-=20
-No package 'qt-mt' found                                                   =
-=20
-Package qt-mt was not found in the pkg-config search path.                 =
-=20
-Perhaps you should add the directory containing `qt-mt.pc'                 =
-=20
-to the PKG_CONFIG_PATH environment variable                                =
-=20
-No package 'qt-mt' found                                                   =
-=20
-Package qt-mt was not found in the pkg-config search path.                 =
-=20
-Perhaps you should add the directory containing `qt-mt.pc'                 =
-=20
-to the PKG_CONFIG_PATH environment variable                                =
-=20
-No package 'qt-mt' found                                                   =
-=20
-Package qt-mt was not found in the pkg-config search path.                 =
-=20
-Perhaps you should add the directory containing `qt-mt.pc'                 =
-=20
-to the PKG_CONFIG_PATH environment variable                                =
-=20
-No package 'qt-mt' found                                                   =
-=20
-  HOSTCXX scripts/kconfig/qconf.o                                          =
-=20
-/home/bor/src/linux-git/scripts/kconfig/qconf.cc:6:26: error:=20
-qapplication.h: No such file or directory                                  =
-                      =20
-/home/bor/src/linux-git/scripts/kconfig/qconf.cc:7:25: error:=20
-qmainwindow.h: No such file or directory                                   =
-                      =20
+> 
+> Index: linux-2.6.28/scripts/package/mkspec
+> ===================================================================
+> --- linux-2.6.28.orig/scripts/package/mkspec    2008-12-24
+> 15:26:37.000000000 -0800
+> +++ linux-2.6.28/scripts/package/mkspec    2009-01-21
+> 16:53:03.000000000 -0800
+> @@ -86,6 +86,14 @@ echo "%endif"
+>  echo 'cp System.map $RPM_BUILD_ROOT'"/boot/System.map-$KERNELRELEASE"
+> 
+>  echo 'cp .config $RPM_BUILD_ROOT'"/boot/config-$KERNELRELEASE"
+> +
+> +echo "%ifnarch ppc64"
+> +echo 'cp vmlinux vmlinux.orig'
+why is this relevant for all architectures except ppc64?
+This is not addressed neither in a comment nor in the changelog.
 
-List of packages available in qt4 devel:
-
-{pts/3}% rpm -ql libqt4-devel-4.5.0-0.rc1.4mdv2009.1 | grep pkgc
-/usr/lib/pkgconfig/Qt3Support.pc
-/usr/lib/pkgconfig/QtAssistantClient.pc
-/usr/lib/pkgconfig/QtCLucene.pc
-/usr/lib/pkgconfig/QtCore.pc
-/usr/lib/pkgconfig/QtDBus.pc
-/usr/lib/pkgconfig/QtDesigner.pc
-/usr/lib/pkgconfig/QtDesignerComponents.pc
-/usr/lib/pkgconfig/QtGui.pc
-/usr/lib/pkgconfig/QtHelp.pc
-/usr/lib/pkgconfig/QtNetwork.pc
-/usr/lib/pkgconfig/QtOpenGL.pc
-/usr/lib/pkgconfig/QtScript.pc
-/usr/lib/pkgconfig/QtScriptTools.pc
-/usr/lib/pkgconfig/QtSql.pc
-/usr/lib/pkgconfig/QtSvg.pc
-/usr/lib/pkgconfig/QtTest.pc
-/usr/lib/pkgconfig/QtUiTools.pc
-/usr/lib/pkgconfig/QtWebKit.pc
-/usr/lib/pkgconfig/QtXml.pc
-/usr/lib/pkgconfig/QtXmlPatterns.pc
-
-this was straight update so either this is local packaging issue or Qt=20
-4.5 change package structure.
-
---nextPart3752896.iQ7sLfzbjd
-Content-Type: application/pgp-signature; name=signature.asc 
-Content-Description: This is a digitally signed message part.
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.9 (GNU/Linux)
-
-iEYEABECAAYFAkmWes0ACgkQR6LMutpd94wvcQCgioCk4rrs8MWj8JcS91FL7OfB
-0UIAoIk+CrZ6ozU7thJf7eFQ/ZEJoPE/
-=/2dd
------END PGP SIGNATURE-----
-
---nextPart3752896.iQ7sLfzbjd--
+	Sam
