@@ -1,59 +1,63 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from byss.tchmachines.com ([208.76.80.75]:49950 "EHLO
-	byss.tchmachines.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753232AbZBRIFu (ORCPT
+Received: from ti-out-0910.google.com ([209.85.142.185]:13750 "EHLO
+	ti-out-0910.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750828AbZBRINr (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 18 Feb 2009 03:05:50 -0500
-Date: Wed, 18 Feb 2009 00:05:46 -0800
-From: Josh Hunt <josh@scalex86.org>
-Subject: Re: [PATCH] Add vmlinux to kernel rpm - updated description
-Message-ID: <20090218080546.GA8115@localhost.localdomain>
-References: <20090212051057.GC12732@localhost.localdomain> <20090215080136.GA26481@uranus.ravnborg.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20090215080136.GA26481@uranus.ravnborg.org>
+	Wed, 18 Feb 2009 03:13:47 -0500
+From: Cheng Renquan <crquan@gmail.com>
+Subject: [PATCH] [KBUILD] add symbol value to help find the real depend
+Date: Wed, 18 Feb 2009 16:13:45 +0800
+Message-Id: <1234944825-10299-1-git-send-email-crquan@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, kiran@scalex86.org, mingo@elte.hu
+To: Sam Ravnborg <sam@ravnborg.org>, Roman Zippel <zippel@linux-m68k.org>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Cheng Renquan <chengrq@uit.com.cn>
 
-On Sun, Feb 15, 2009 at 09:01:36AM +0100, Sam Ravnborg wrote:
-> On Wed, Feb 11, 2009 at 09:10:57PM -0800, Josh Hunt wrote:
-> > Resending with updated description:
-> > 
-> > We are building an automated system to test kernels weekly and need to
-> > provide an rpm to our QA dept.  We would like to use the ability to create
-> > kernel rpms already in the kernel's Makefile, but need the vmlinux file
-> > included in the rpm for later debugging.  This patch adds a compressed vmlinux to
-> > the kernel rpm when doing a make rpm-pkg or binrpm-pkg and upon install
-> > places the vmlinux file in /boot.
-> > 
-> > Signed-off-by: Josh Hunt <josh@scalex86.org>
-> 
-> Applied, but...
-> 
-> > 
-> > Index: linux-2.6.28/scripts/package/mkspec
-> > ===================================================================
-> > --- linux-2.6.28.orig/scripts/package/mkspec    2008-12-24
-> > 15:26:37.000000000 -0800
-> > +++ linux-2.6.28/scripts/package/mkspec    2009-01-21
-> > 16:53:03.000000000 -0800
-> > @@ -86,6 +86,14 @@ echo "%endif"
-> >  echo 'cp System.map $RPM_BUILD_ROOT'"/boot/System.map-$KERNELRELEASE"
-> > 
-> >  echo 'cp .config $RPM_BUILD_ROOT'"/boot/config-$KERNELRELEASE"
-> > +
-> > +echo "%ifnarch ppc64"
-> > +echo 'cp vmlinux vmlinux.orig'
-> why is this relevant for all architectures except ppc64?
-> This is not addressed neither in a comment nor in the changelog.
+From: Cheng Renquan <chengrq@uit.com.cn>
 
-I was under the impression that the ppc64 vmlinuz file could be
-unzipped and used for debugging and so adding it to /boot would be
-redundant.  Please let me know if this is not the case and I will
-submit an updated patch.
+kbuild-menuconfig-display-depend-value.patch
 
-Thanks
-Josh 
+Sometimes when configuring need to disable some unused item, but the item is
+selected by many other items, it's hard to find the real dependency which
+selected it, This patch add every symbol's value accompanied to make it
+possible to find the real dependency easily.
+
+An example is CONFIG_RFKILL,
+
+  ---------------------- RF switch subsystem support ----------------------
+  | CONFIG_RFKILL:                                                        |
+  |                                                                       |
+  | Say Y here if you want to have control over RF switches               |
+  | found on many WiFi and Bluetooth cards.                               |
+  |                                                                       |
+  | To compile this driver as a module, choose M here: the                |
+  | module will be called rfkill.                                         |
+  |                                                                       |
+  | Symbol: RFKILL [=m]                                                   |
+  | Prompt: RF switch subsystem support                                   |
+  |   Defined at net/rfkill/Kconfig:4                                     |
+  |   Depends on: NET [=y]                                                |
+  |   Location:                                                           |
+  |     -> Networking support (NET [=y])                                  |
+  |   Selected by: IWLCORE [=n] && NETDEVICES [=y] && !S390 [=S390] && PC |
+  |                                                                       |
+  ----------------------------------------------------------------( 99%)---
+
+Signed-off-by: Cheng Renquan <chengrq@uit.com.cn>
+
+---
+
+Index: linux-2.6.29-rc5-lio/scripts/kconfig/expr.c
+===================================================================
+--- linux-2.6.29-rc5-lio.orig/scripts/kconfig/expr.c
++++ linux-2.6.29-rc5-lio/scripts/kconfig/expr.c
+@@ -1098,6 +1098,9 @@ void expr_fprint(struct expr *e, FILE *o
+ static void expr_print_gstr_helper(void *data, struct symbol *sym, const char *str)
+ {
+ 	str_append((struct gstr*)data, str);
++	if (sym)
++		str_printf((struct gstr *)data, " [=%s]",
++				sym_get_string_value(sym));
+ }
+ 
+ void expr_gstr_print(struct expr *e, struct gstr *gs)
