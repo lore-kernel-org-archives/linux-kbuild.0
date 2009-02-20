@@ -1,63 +1,163 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ti-out-0910.google.com ([209.85.142.185]:13750 "EHLO
-	ti-out-0910.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750828AbZBRINr (ORCPT
+Received: from byss.tchmachines.com ([208.76.80.75]:33213 "EHLO
+	byss.tchmachines.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753107AbZBTHpe (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 18 Feb 2009 03:13:47 -0500
-From: Cheng Renquan <crquan@gmail.com>
-Subject: [PATCH] [KBUILD] add symbol value to help find the real depend
-Date: Wed, 18 Feb 2009 16:13:45 +0800
-Message-Id: <1234944825-10299-1-git-send-email-crquan@gmail.com>
+	Fri, 20 Feb 2009 02:45:34 -0500
+Date: Thu, 19 Feb 2009 23:45:31 -0800
+From: Josh Hunt <josh@scalex86.org>
+Subject: [PATCHv2] Fix 'make rpm' when CONFIG_LOCALVERSION_AUTO=y and using
+	SCM tree
+Message-ID: <20090220074531.GF8151@localhost.localdomain>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>, Roman Zippel <zippel@linux-m68k.org>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Cheng Renquan <chengrq@uit.com.cn>
+To: sam@ravnborg.org
+Cc: linux-kernel@vger.kernel.org, kiran@scalex86.org, mingo@elte.hu, linux-kbuild@vger.kernel.org
 
-From: Cheng Renquan <chengrq@uit.com.cn>
+Updated patch with Sam's fixes as per this discussion:
+http://lkml.org/lkml/2009/2/15/18
 
-kbuild-menuconfig-display-depend-value.patch
+Running 'make rpm' fails when CONFIG_LOCALVERSION_AUTO=y and using a kernel
+source tree under SCM.  This is due to KERNELRELEASE being different when the
+initial make is run and when make is run from rpmbuild.
 
-Sometimes when configuring need to disable some unused item, but the item is
-selected by many other items, it's hard to find the real dependency which
-selected it, This patch add every symbol's value accompanied to make it
-possible to find the real dependency easily.
+mkspec creates kernel.spec using KERNELRELEASE:
 
-An example is CONFIG_RFKILL,
+<mkspec>
+echo "%files"
+echo '%defattr (-, root, root)'
+echo "%dir /lib/modules"
+echo "/lib/modules/$KERNELRELEASE"
+echo "/lib/firmware"
+echo "/boot/*"
+echo ""
+</mkspec>
 
-  ---------------------- RF switch subsystem support ----------------------
-  | CONFIG_RFKILL:                                                        |
-  |                                                                       |
-  | Say Y here if you want to have control over RF switches               |
-  | found on many WiFi and Bluetooth cards.                               |
-  |                                                                       |
-  | To compile this driver as a module, choose M here: the                |
-  | module will be called rfkill.                                         |
-  |                                                                       |
-  | Symbol: RFKILL [=m]                                                   |
-  | Prompt: RF switch subsystem support                                   |
-  |   Defined at net/rfkill/Kconfig:4                                     |
-  |   Depends on: NET [=y]                                                |
-  |   Location:                                                           |
-  |     -> Networking support (NET [=y])                                  |
-  |   Selected by: IWLCORE [=n] && NETDEVICES [=y] && !S390 [=S390] && PC |
-  |                                                                       |
-  ----------------------------------------------------------------( 99%)---
+When CONFIG_LOCALVERSION_AUTO=y scripts/setlocalversion is called and grabs any
+additional version info from SCM.  Next, the srctree is tarred up and SCM
+information is excluded.
 
-Signed-off-by: Cheng Renquan <chengrq@uit.com.cn>
+rpmbuild reruns make and in the process generates a new
+include/config/kernel.release and thus a new KERNELRELEASE.  However this time
+the SCM information is gone so KERNELRELEASE no longer has the additional
+version information.  When "make modules_install" runs, it uses the new
+KERNELRELEASE value to determine where to install the modules.  This conflicts
+with where the spec file assumes they are going because of the mis-matching
+KERNELRELEASE versions.
+
+<snippet>
++ INSTALL_MOD_PATH=/var/tmp/kernel-2.6.29rc4tip01479g5d85422-root
++ make -j16 modules_install
+  INSTALL crypto/aead.ko
+  INSTALL crypto/cbc.ko
+  INSTALL crypto/chainiv.ko
+  INSTALL crypto/crc32c.ko
+  INSTALL crypto/crypto_algapi.ko
+  INSTALL crypto/crypto_blkcipher.ko
+  INSTALL crypto/crypto_hash.ko
+  INSTALL crypto/cryptomgr.ko
+  INSTALL crypto/ecb.ko
+  INSTALL crypto/eseqiv.ko
+  INSTALL crypto/krng.ko
+  INSTALL crypto/md5.ko
+  INSTALL crypto/pcbc.ko
+  INSTALL crypto/rng.ko
+  INSTALL drivers/block/cciss.ko
+  INSTALL drivers/hid/hid-dummy.ko
+  INSTALL drivers/scsi/iscsi_tcp.ko
+  INSTALL drivers/scsi/libiscsi.ko
+  INSTALL drivers/scsi/libiscsi_tcp.ko
+  INSTALL drivers/scsi/scsi_transport_iscsi.ko
+  INSTALL drivers/scsi/scsi_wait_scan.ko
+  INSTALL fs/lockd/lockd.ko
+  INSTALL fs/nfs/nfs.ko
+  INSTALL fs/nfsd/nfsd.ko
+  INSTALL lib/libcrc32c.ko
+  INSTALL net/sunrpc/sunrpc.ko
+  DEPMOD  2.6.29-rc4-tip
++ cp arch/x86/boot/bzImage
+/var/tmp/kernel-2.6.29rc4tip01479g5d85422-root/boot/vmlinuz-2.6.29-rc4-tip-01479-g5d85422
++ cp System.map
+/var/tmp/kernel-2.6.29rc4tip01479g5d85422-root/boot/System.map-2.6.29-rc4-tip-01479-g5d85422
++ cp .config
+/var/tmp/kernel-2.6.29rc4tip01479g5d85422-root/boot/config-2.6.29-rc4-tip-01479-g5d85422
++ cp vmlinux vmlinux.orig
++ bzip2 -9 vmlinux
++ mv vmlinux.bz2
+/var/tmp/kernel-2.6.29rc4tip01479g5d85422-root/boot/vmlinux-2.6.29-rc4-tip-01479-g5d85422.bz2
++ mv vmlinux.orig vmlinux
++ /usr/lib/rpm/brp-compress
+Processing files: kernel-2.6.29rc4tip01479g5d85422-2
+error: File not found:
+/var/tmp/kernel-2.6.29rc4tip01479g5d85422-root/lib/modules/2.6.29-rc4-tip-01479-g5d85422
+
+
+RPM build errors:
+    File not found:
+/var/tmp/kernel-2.6.29rc4tip01479g5d85422-root/lib/modules/2.6.29-rc4-tip-01479-g5d85422
+make[1]: *** [rpm] Error 1
+make: *** [rpm] Error 2
+</snippet>
+
+I have tested this patch on git -tip, Linus' git tree, and the kernel.org tar
+files, both with and without CONFIG_LOCALVERSION_AUTO=y.
+
+Signed-off-by: Josh Hunt <josh@scalex86.org>
 
 ---
 
-Index: linux-2.6.29-rc5-lio/scripts/kconfig/expr.c
+Index: linux-2.6/Makefile
 ===================================================================
---- linux-2.6.29-rc5-lio.orig/scripts/kconfig/expr.c
-+++ linux-2.6.29-rc5-lio/scripts/kconfig/expr.c
-@@ -1098,6 +1098,9 @@ void expr_fprint(struct expr *e, FILE *o
- static void expr_print_gstr_helper(void *data, struct symbol *sym, const char *str)
- {
- 	str_append((struct gstr*)data, str);
-+	if (sym)
-+		str_printf((struct gstr *)data, " [=%s]",
-+				sym_get_string_value(sym));
- }
- 
- void expr_gstr_print(struct expr *e, struct gstr *gs)
+--- linux-2.6.orig/Makefile     2009-02-16 17:07:10.000000000 -0800
++++ linux-2.6/Makefile  2009-02-19 23:13:31.000000000 -0800
+@@ -903,12 +903,18 @@ localver = $(subst $(space),, $(string)
+ # and if the SCM is know a tag from the SCM is appended.
+ # The appended tag is determined by the SCM used.
+ #
+-# Currently, only git is supported.
+-# Other SCMs can edit scripts/setlocalversion and add the appropriate
+-# checks as needed.
++# .scmversion is used when generating rpm packages so we do not loose
++# the version information from the SCM when we do the build of the
+kernel
++# from the copied source
+ ifdef CONFIG_LOCALVERSION_AUTO
+-       _localver-auto = $(shell $(CONFIG_SHELL) \
+-                         $(srctree)/scripts/setlocalversion
+$(srctree))
++
++ifeq ($(wildcard .scmversion),)
++        _localver-auto = $(shell $(CONFIG_SHELL) \
++                         $(srctree)/scripts/setlocalversion
+$(srctree))
++else
++        _localver-auto = $(shell cat .scmversion 2> /dev/null)
++endif
++
+        localver-auto  = $(LOCALVERSION)$(_localver-auto)
+ endif
+
+Index: linux-2.6/scripts/package/Makefile
+===================================================================
+--- linux-2.6.orig/scripts/package/Makefile     2009-02-16
+17:07:10.000000000 -0800
++++ linux-2.6/scripts/package/Makefile  2009-02-19 23:13:31.000000000
+-0800
+@@ -35,9 +35,10 @@ $(objtree)/kernel.spec: $(MKSPEC) $(srct
+ rpm-pkg rpm: $(objtree)/kernel.spec FORCE
+        $(MAKE) clean
+        $(PREV) ln -sf $(srctree) $(KERNELPATH)
++       $(CONFIG_SHELL) $(srctree)/scripts/setlocalversion >
+$(objtree)/.scmversion
+        $(PREV) tar -cz $(RCS_TAR_IGNORE) -f $(KERNELPATH).tar.gz
+$(KERNELPATH)/.
+        $(PREV) rm $(KERNELPATH)
+-
++       rm -f $(objtree)/.scmversion
+        set -e; \
+        $(CONFIG_SHELL) $(srctree)/scripts/mkversion >
+$(objtree)/.tmp_version
+        set -e; \
