@@ -1,13 +1,12 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from fg-out-1718.google.com ([72.14.220.159]:61104 "EHLO
-	fg-out-1718.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753556AbZBTRUd (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 20 Feb 2009 12:20:33 -0500
-Date: Fri, 20 Feb 2009 18:20:27 +0100
-From: Frederic Weisbecker <fweisbec@gmail.com>
+Received: from mx3.mail.elte.hu ([157.181.1.138]:44844 "EHLO mx3.mail.elte.hu"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752453AbZBTRWw (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 20 Feb 2009 12:22:52 -0500
+Date: Fri, 20 Feb 2009 18:22:41 +0100
+From: Ingo Molnar <mingo@elte.hu>
 Subject: Re: [PATCH] tracing/markers: make markers select tracepoints
-Message-ID: <20090220172026.GG5732@nowhere>
+Message-ID: <20090220172241.GF24538@elte.hu>
 References: <499edf47.1818d00a.060b.2b8d@mx.google.com> <499EE162.4050008@oracle.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
@@ -16,46 +15,11 @@ In-Reply-To: <499EE162.4050008@oracle.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Randy Dunlap <randy.dunlap@oracle.com>
-Cc: Ingo Molnar <mingo@elte.hu>, Steven Rostedt <rostedt@goodmis.org>, linux-kernel@vger.kernel.org, zippel@linux-m68k.org, linux-kbuild@vger.kernel.org
-
-On Fri, Feb 20, 2009 at 08:59:14AM -0800, Randy Dunlap wrote:
-> Frederic Weisbecker wrote:
-> > Sometimes it happens that KConfig dependencies are not handled
-> > like in the following scenario:
-> > 
-> > - config A
-> >    bool
-> > 
-> > - config B
-> >    bool
-> >    depends on A
-> > 
-> > -config C
-> >    bool
-> >    select B
-> > 
-> > If one selects C, then it will select B without checking its dependency to A, if A
-> > hasn't been selected elsewhere, it will result in a build crash.
-> 
-> as documented in Documentation/kbuild/kconfig-language.txt (and yes, it is
-> considered to be a shortcoming/problem by most people AFAIK):
-> 
->   Note:
-> 	select should be used with care. select will force
-> 	a symbol to a value without visiting the dependencies.
-> 	By abusing select you are able to select a symbol FOO even
-> 	if FOO depends on BAR that is not set.
-> 	In general use select only for non-visible symbols
-> 	(no prompts anywhere) and for symbols with no dependencies.
-> 	That will limit the usefulness but on the other hand avoid
-> 	the illegal configurations all over.
-> 	kconfig should one day warn about such things.
+Cc: Frederic Weisbecker <fweisbec@gmail.com>, Steven Rostedt <rostedt@goodmis.org>, linux-kernel@vger.kernel.org, zippel@linux-m68k.org, linux-kbuild@vger.kernel.org
 
 
-Ah thanks!
+* Randy Dunlap <randy.dunlap@oracle.com> wrote:
 
-
- 
 > > This is what happens on the following build error:
 > > 
 > > kernel/built-in.o: In function `marker_update_probe_range':
@@ -67,11 +31,12 @@ Ah thanks!
 > > kernel/built-in.o: In function `marker_update_probes':
 > > marker.c:(.text+0x530ba): undefined reference to `tracepoint_probe_update_all'
 > > 
-> > CONFIG_KVM_TRACE will select CONFIG_MARKER, but the latter depends on CONFIG_TRACEPOINTS
-> > which will not be selected.
+> > CONFIG_KVM_TRACE will select CONFIG_MARKER, but the latter 
+> > depends on CONFIG_TRACEPOINTS which will not be selected.
 > > 
-> > A temporary fix is to make CONFIG_MARKER select CONFIG_TRACEPOINTS, though it doesn't
-> > fix the source KConfig dependency handling problem.
+> > A temporary fix is to make CONFIG_MARKER select 
+> > CONFIG_TRACEPOINTS, though it doesn't fix the source KConfig 
+> > dependency handling problem.
 > > 
 > > Reported-by: Ingo Molnar <mingo@elte.hu>
 > > Cc: Roman Zippel <zippel@linux-m68k.org>
@@ -94,25 +59,16 @@ Ah thanks!
 > >  	  Place an empty function call at each marker site. Can be
 > >  	  dynamically changed for a probe function.
 > 
-> but using "select" instead of "depends on" just causes the kind of problem
-> that you described, whereas using "depends on" does follow dependency
-> chains.
+> but using "select" instead of "depends on" just causes the 
+> kind of problem that you described, whereas using "depends on" 
+> does follow dependency chains.
 
+Well, as long as the secondary selects are 'expanded' along the 
+line of dependencies, it should still be fine. With an 
+increasing number of dependencies it quickly becomes ugly 
+though. This might be one of the cases where it works.
 
-Ok, but here we are in the case described in the above KConfig documentation
-which tells that select is mostly useful for config that are not prompted.
+Eventually we should eliminate markers, their uses can either be 
+converted to new-style tracepoints, or to ftrace_printk().
 
-This is the case for TRACEPOINTS. So I think this fix is right.
-
-MARKERS/TRACEPOINTS could be likely described as library which can be used
-by debugging facilities anywhere in the kernel.
-
-Using only a chain of dependency would hide a lot of those debugging options.
-So IMHO, I think such "library" things should be selected directly from other
-options and not be enabled by hand, hence only show the debugging options anywhere
-in the kernel if those two are selected.
-
- 
-> -- 
-> ~Randy
-
+	Ingo
