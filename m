@@ -1,80 +1,104 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from rcsinet12.oracle.com ([148.87.113.124]:42473 "EHLO
-	rgminet12.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751882AbZBUGMP (ORCPT
+Received: from acsinet11.oracle.com ([141.146.126.233]:61628 "EHLO
+	acsinet11.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751969AbZBUGT7 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 21 Feb 2009 01:12:15 -0500
-Date: Fri, 20 Feb 2009 22:12:49 -0800
+	Sat, 21 Feb 2009 01:19:59 -0500
+Message-ID: <499F9D25.8010300@oracle.com>
+Date: Fri, 20 Feb 2009 22:20:21 -0800
 From: Randy Dunlap <randy.dunlap@oracle.com>
-Subject: Re: [PATCH] [KBUILD] add symbol value to help find the real depend
-Message-Id: <20090220221249.9350c317.randy.dunlap@oracle.com>
-In-Reply-To: <1234944825-10299-1-git-send-email-crquan@gmail.com>
-References: <1234944825-10299-1-git-send-email-crquan@gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+MIME-Version: 1.0
+Subject: Re: [PATCH][RFC] check for select dependency errors on config load
+References: <499edf47.1818d00a.060b.2b8d@mx.google.com>	<499EE162.4050008@oracle.com>	<alpine.DEB.2.00.0902210008580.30069@gandalf.stny.rr.com> <20090220220810.6f4360f0.akpm@linux-foundation.org>
+In-Reply-To: <20090220220810.6f4360f0.akpm@linux-foundation.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Cheng Renquan <crquan@gmail.com>
-Cc: Sam Ravnborg <sam@ravnborg.org>, Roman Zippel <zippel@linux-m68k.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Cheng Renquan <chengrq@uit.com.cn>
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: Steven Rostedt <rostedt@goodmis.org>, LKML <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org, Randy Dunlap <randy.dunlap@oracle.com>, Frederic Weisbecker <fweisbec@gmail.com>, Ingo Molnar <mingo@elte.hu>, zippel@linux-m68k.org
 
-On Wed, 18 Feb 2009 16:13:45 +0800 Cheng Renquan wrote:
+Andrew Morton wrote:
+> On Sat, 21 Feb 2009 00:24:05 -0500 (EST) Steven Rostedt <rostedt@goodmis.org> wrote:
+> 
+>> There's been a few problems with SELECT and dependencies lately.
+>> I've been burnt by it a few times myself. So I look at the kconfig
+>> code and added this patch. It can use a bit more work but it does what
+>> I want.
+>>
+>> When the config is loaded, it checks all the symbols that are
+>> selected by an active config and makes sure the visible dependencies are 
+>> also activated. This should probably be moved to the writing of the 
+>> config instead, but since I just wanted to see if my current config was 
+>> OK, I did it on load. This is an RFC patch anyway, so fixes/comments are 
+>> definitely welcome.
+>>
+>> Here's what I get with the attached config running on 2.6.29-rc5.
+>>
+>> $ make menuconfig
+>> scripts/kconfig/mconf arch/x86/Kconfig
+>> .config:2561:warning: MICROCODE selects FW_LOADER which fails its dependencies!
+>> .config:2561:warning: MICROCODE_INTEL selects FW_LOADER which fails its dependencies!
+>> .config:2561:warning: PCMCIA_LOAD_CIS selects FW_LOADER which fails its dependencies!
+>> .config:2561:warning: SCSI_SAS_LIBSAS selects SCSI_SAS_ATTRS which fails its dependencies!
+>> .config:2561:warning: SCSI_AIC94XX selects FW_LOADER which fails its dependencies!
+>> .config:2561:warning: KEYBOARD_ATKBD selects SERIO which fails its dependencies!
+>> .config:2561:warning: KEYBOARD_ATKBD selects SERIO_LIBPS2 which fails its dependencies!
+>> .config:2561:warning: KEYBOARD_ATKBD selects SERIO_I8042 which fails its dependencies!
+>> .config:2561:warning: MOUSE_PS2 selects SERIO which fails its dependencies!
+>> .config:2561:warning: MOUSE_PS2 selects SERIO_LIBPS2 which fails its dependencies!
+>> .config:2561:warning: MOUSE_PS2 selects SERIO_I8042 which fails its dependencies!
+>> .config:2561:warning: VT selects INPUT which fails its dependencies!
+>> .config:2561:warning: DRM selects I2C_ALGOBIT which fails its dependencies!
+>> .config:2561:warning: SND_EMU10K1 selects FW_LOADER which fails its dependencies!
+>>
+>> <exit out>
+>>
+> 
+> OK, this is fairly easy to use.
+> 
+> You get
+> 
+> .config:1181:warning: PCMCIA_LOAD_CIS selects FW_LOADER which fails its dependencies!
+> 
+> So you then go into `make menuconfig' and type /^fw_loader$ to display
+> FW_LOADER's dependencies.
+> 
+> 	Depends on: HOTPLUG && EMBEDDED
+> 
+> then do `egrep "HOTPLUG|EMBEDDED" .config'
+> 
+> And we discover weird things.  Why does FW_LOADER depend on EMBEDDED?
+> 
+> And why the heck does INPUT depend on EMBEDDED?!??!
+> 
+> And what's up with CONFIG_SERIO?
+> 
+> 	Depends on: !S390 && (EMBEDDED || !X86)
+> 
+> hm.
 
-> From: Cheng Renquan <chengrq@uit.com.cn>
-> 
-> kbuild-menuconfig-display-depend-value.patch
-> 
-> Sometimes when configuring need to disable some unused item, but the item is
-> selected by many other items, it's hard to find the real dependency which
-> selected it, This patch add every symbol's value accompanied to make it
-> possible to find the real dependency easily.
-> 
-> An example is CONFIG_RFKILL,
-> 
->   ---------------------- RF switch subsystem support ----------------------
->   | CONFIG_RFKILL:                                                        |
->   |                                                                       |
->   | Say Y here if you want to have control over RF switches               |
->   | found on many WiFi and Bluetooth cards.                               |
->   |                                                                       |
->   | To compile this driver as a module, choose M here: the                |
->   | module will be called rfkill.                                         |
->   |                                                                       |
->   | Symbol: RFKILL [=m]                                                   |
->   | Prompt: RF switch subsystem support                                   |
->   |   Defined at net/rfkill/Kconfig:4                                     |
->   |   Depends on: NET [=y]                                                |
->   |   Location:                                                           |
->   |     -> Networking support (NET [=y])                                  |
->   |   Selected by: IWLCORE [=n] && NETDEVICES [=y] && !S390 [=S390] && PC |
->   |                                                                       |
->   ----------------------------------------------------------------( 99%)---
-> 
-> Signed-off-by: Cheng Renquan <chengrq@uit.com.cn>
-> 
-> ---
-> 
-> Index: linux-2.6.29-rc5-lio/scripts/kconfig/expr.c
-> ===================================================================
-> --- linux-2.6.29-rc5-lio.orig/scripts/kconfig/expr.c
-> +++ linux-2.6.29-rc5-lio/scripts/kconfig/expr.c
-> @@ -1098,6 +1098,9 @@ void expr_fprint(struct expr *e, FILE *o
->  static void expr_print_gstr_helper(void *data, struct symbol *sym, const char *str)
->  {
->  	str_append((struct gstr*)data, str);
-> +	if (sym)
-> +		str_printf((struct gstr *)data, " [=%s]",
-> +				sym_get_string_value(sym));
->  }
->  
->  void expr_gstr_print(struct expr *e, struct gstr *gs)
-> --
+EMBEDDED is misnamed.  It means "those who think that they know enough
+to use all of the power of kconfig."
+Some people spell that EXPERT etc.
+Or it means "let me shoot myself in the foot."
 
-Hi,
+So HOTPLUG, INPUT, FW_LOADER, etc. should not be modified by Aunt Tillie,
+but you and I can play with them.
 
-This looks good/helpful.  Can it be made to work with
-gconfig & xconfig as well as menuconfig?
 
-Thanks,
----
+for SERIO:
+
+config SERIO
+	tristate "Serial I/O support" if EMBEDDED || !X86
+	default y
+
+Experts can modify it.  !X86 can modify it.
+It's usually needed on X86 for keyboard controllers etc.,
+but if one sets EMBEDDED, you can muck up your config and not be
+able to use the keyboard.
+
+I don't know where the !S390 comes from, but it's not surprising.
+
+-- 
 ~Randy
