@@ -1,12 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.redhat.com ([66.187.237.31]:33375 "EHLO mx2.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751846AbZBTS5b (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 20 Feb 2009 13:57:31 -0500
-Date: Fri, 20 Feb 2009 13:56:25 -0500
-From: Jason Baron <jbaron@redhat.com>
+Received: from fg-out-1718.google.com ([72.14.220.154]:14511 "EHLO
+	fg-out-1718.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751927AbZBUDPa (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 20 Feb 2009 22:15:30 -0500
+Date: Sat, 21 Feb 2009 04:15:25 +0100
+From: Frederic Weisbecker <fweisbec@gmail.com>
 Subject: Re: [PATCH] tracing/markers: make markers select tracepoints
-Message-ID: <20090220185625.GA3104@redhat.com>
+Message-ID: <20090221031523.GA5771@nowhere>
 References: <499edf47.1818d00a.060b.2b8d@mx.google.com> <499EE162.4050008@oracle.com> <20090220172241.GF24538@elte.hu> <20090220173107.GH5732@nowhere> <20090220174811.GL24538@elte.hu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
@@ -15,9 +16,10 @@ In-Reply-To: <20090220174811.GL24538@elte.hu>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Ingo Molnar <mingo@elte.hu>
-Cc: Frederic Weisbecker <fweisbec@gmail.com>, Avi Kivity <avi@redhat.com>, Randy Dunlap <randy.dunlap@oracle.com>, Steven Rostedt <rostedt@goodmis.org>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+Cc: Avi Kivity <avi@redhat.com>, Randy Dunlap <randy.dunlap@oracle.com>, Steven Rostedt <rostedt@goodmis.org>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
 On Fri, Feb 20, 2009 at 06:48:11PM +0100, Ingo Molnar wrote:
+> 
 > * Frederic Weisbecker <fweisbec@gmail.com> wrote:
 > 
 > > > > >  config MARKERS
@@ -84,7 +86,26 @@ On Fri, Feb 20, 2009 at 06:48:11PM +0100, Ingo Molnar wrote:
 >  echo kvmtrace > /debug/tracing/current_tracer
 > 
 > that's all.
-> 
+
+
+Note that I haven't looked at kvm tracing in detail, so I could be wrong.
+But when I look of the kind of events above which are traced through KVM,
+I guess the frequency rate of traces can be high.
+
+The use of ftrace_printk seems to me an overhead here for ring buffer space consuming
+and tracing overhead itself.
+
+ftrace_printk inserts the events on the ring buffer as already formatted, so
+it consumes more space that traditional binary insertion. But I skip that since we have
+16384 entries by default (large enough), though the notion of entry size is dynamic
+with the ring buffer.
+
+But doing the vsnprintf on tracing context seems to me inappropriate since
+tracing should be as much transparent as possible from the traced site point
+of view. I think it should be better on output time, unless the traces rate is not
+as high as I imagine.
+
+ 
 > Basically the conversion would look like this:
 > 
 > before:
@@ -99,7 +120,13 @@ On Fri, Feb 20, 2009 at 06:48:11PM +0100, Ingo Molnar wrote:
 > As a result all these traces would become a lot more readable 
 > (and a lot more flexible) both in the source code, and in the 
 > trace output stage.
-> 
+
+
+Right.
+Anyway, it needs to be integrated into the common tracing part
+of the kernel. virt/kvm_trace.c is a whole tracer.
+
+
 > And any ad-hoc tracepoint can be added, without worrying about 
 > the name of the macro or the number of type of arguments. Note 
 > that in this specific example we didnt need to split up the u64 
@@ -113,41 +140,5 @@ On Fri, Feb 20, 2009 at 06:48:11PM +0100, Ingo Molnar wrote:
 > Avi, what do you think, any objections against an RFC patchset 
 > that shows this off?
 > 
-
-hi,
-
-this is the kind of case that i've designed 'dynamic debug' for. It
-implicitly allows fined grained control via - source file and line
-number, function name, module name, and/or fomat string. If we are going
-to have a bunch of these type of interfaces sprinkled throughout the
-kernel, I think this fine grained control becomes important. this is all
-controlled and visible via: <debugfs>/dynamic_debug/control file. In the
-above case i believe matching 'kvm' module would turn all these
-statements on/off. We can always add 'tags' to tie specific debug
-statements together as well.
-
-In terms of usage, currently, if you set 'CONFIG_DYNAMIC_DEBUG' all
-'pr_debug' and 'dev_dbg' statements are picked up. Thus, simply
-converting the above statements to use 'pr_debug()' will make them
-run-time tunable if CONFIG_DYNAMIC_DEBUG is set. That's all that needs
-to be done...we don't need to write an ftracer debug statements.
-
-We could also make subsystem specific macros as you mentioned
-conditional on subsystem specific CONFIG parameters. For example, if 
-'CONFIG_KVM_DEBUG' is set we tie it into this infrastructure otherwise its a
-no-op.
-
-In terms of the 'backend', currently we're using 'printk'. However, i've
-posted patches in to tie into ftrace_printk(). This could easily be made
-toggle switch.
-
-That said, markers do allow for callbacks, so that different parts of
-the kernel can register and get called when the marker is hit. This
-behavior might be more appropriate if its not simple 'printk' style
-debugging.
-
-thanks,
-
--Jason
-
+> 	Ingo
 
