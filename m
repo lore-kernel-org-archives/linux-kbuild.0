@@ -1,31 +1,31 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from casper.infradead.org ([85.118.1.10]:47421 "EHLO
-	casper.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753224AbZBVLiF (ORCPT
+Received: from bombadil.infradead.org ([18.85.46.34]:51181 "EHLO
+	bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753551AbZBVLnO (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 22 Feb 2009 06:38:05 -0500
+	Sun, 22 Feb 2009 06:43:14 -0500
 Subject: Re: [PATCH] tracing/markers: make markers select tracepoints
 From: Peter Zijlstra <peterz@infradead.org>
-In-Reply-To: <20090222121821.3599.A69D9226@jp.fujitsu.com>
-References: <499EE162.4050008@oracle.com> <20090220172241.GF24538@elte.hu>
-	 <20090222121821.3599.A69D9226@jp.fujitsu.com>
+In-Reply-To: <20090220172241.GF24538@elte.hu>
+References: <499edf47.1818d00a.060b.2b8d@mx.google.com>
+	 <499EE162.4050008@oracle.com>  <20090220172241.GF24538@elte.hu>
 Content-Type: text/plain
-Date: Sun, 22 Feb 2009 12:37:40 +0100
-Message-Id: <1235302660.4632.4.camel@laptop>
+Date: Sun, 22 Feb 2009 12:43:00 +0100
+Message-Id: <1235302980.4632.8.camel@laptop>
 Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: KOSAKI Motohiro <kosaki.motohiro@jp.fujitsu.com>
-Cc: Ingo Molnar <mingo@elte.hu>, Randy Dunlap <randy.dunlap@oracle.com>, Frederic Weisbecker <fweisbec@gmail.com>, Steven Rostedt <rostedt@goodmis.org>, linux-kernel@vger.kernel.org, zippel@linux-m68k.org, linux-kbuild@vger.kernel.org, "Frank Ch. Eigler" <fche@redhat.com>, Mathieu Desnoyers <mathieu.desnoyers@polymtl.ca>
+To: Ingo Molnar <mingo@elte.hu>
+Cc: Randy Dunlap <randy.dunlap@oracle.com>, Frederic Weisbecker <fweisbec@gmail.com>, Steven Rostedt <rostedt@goodmis.org>, linux-kernel@vger.kernel.org, zippel@linux-m68k.org, linux-kbuild@vger.kernel.org
 
-On Sun, 2009-02-22 at 12:23 +0900, KOSAKI Motohiro wrote:
+On Fri, 2009-02-20 at 18:22 +0100, Ingo Molnar wrote:
+> Eventually we should eliminate markers, their uses can either be 
+> converted to new-style tracepoints, or to ftrace_printk().
 
-> IIRC, this suggestion still don't get agreement of all tracing feature stakeholder.
-> We need to definitely discuss more lot and deep.
-> so I wonder why don't we create linux-tracing new mailing list.
+I would like to never merge an ftrace_printk() user... just as I'd like
+to get rid of every marker.
 
-Yes, lets hide it from general view, sounds like a brilliant plan.
-
-
+Then again, some people appear happy to commit their printk debug spree
+too :/
 
