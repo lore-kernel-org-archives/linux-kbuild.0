@@ -1,70 +1,56 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.redhat.com ([66.187.237.31]:60717 "EHLO mx2.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754089AbZBUWFN (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 21 Feb 2009 17:05:13 -0500
+Received: from fgwmail5.fujitsu.co.jp ([192.51.44.35]:47087 "EHLO
+	fgwmail5.fujitsu.co.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751483AbZBVDZC (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 21 Feb 2009 22:25:02 -0500
+Date: Sun, 22 Feb 2009 12:23:55 +0900 (JST)
+From: KOSAKI Motohiro <kosaki.motohiro@jp.fujitsu.com>
 Subject: Re: [PATCH] tracing/markers: make markers select tracepoints
-References: <499edf47.1818d00a.060b.2b8d@mx.google.com>
-	<499EE162.4050008@oracle.com> <20090220172241.GF24538@elte.hu>
-	<20090220173107.GH5732@nowhere> <20090220174811.GL24538@elte.hu>
-From: fche@redhat.com (Frank Ch. Eigler)
-Date: Sat, 21 Feb 2009 17:04:46 -0500
-In-Reply-To: <20090220174811.GL24538@elte.hu> (Ingo Molnar's message of "Fri, 20 Feb 2009 18:48:11 +0100")
-Message-ID: <y0mtz6nqwe9.fsf@ton.toronto.redhat.com>
+In-Reply-To: <20090220172241.GF24538@elte.hu>
+References: <499EE162.4050008@oracle.com> <20090220172241.GF24538@elte.hu>
+Message-Id: <20090222121821.3599.A69D9226@jp.fujitsu.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Ingo Molnar <mingo@elte.hu>
-Cc: Frederic Weisbecker <fweisbec@gmail.com>, Avi Kivity <avi@redhat.com>, Randy Dunlap <randy.dunlap@oracle.com>, Steven Rostedt <rostedt@goodmis.org>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+Cc: kosaki.motohiro@jp.fujitsu.com, Randy Dunlap <randy.dunlap@oracle.com>, Frederic Weisbecker <fweisbec@gmail.com>, Steven Rostedt <rostedt@goodmis.org>, linux-kernel@vger.kernel.org, zippel@linux-m68k.org, linux-kbuild@vger.kernel.org, "Frank Ch. Eigler" <fche@redhat.com>, Mathieu Desnoyers <mathieu.desnoyers@polymtl.ca>
 
-Ingo Molnar <mingo@elte.hu> writes:
+Hi
 
-> [...]
-> there's i think the KVM usecase where markers are used 
-> essentially a printk()-alike flexible tracing facility.
->
-> [...]
-> ./vmx.c:	KVMTRACE_3D(MSR_READ, vcpu, ecx, (u32)data, (u32)(data >> 32),
-> ./vmx.c:	KVMTRACE_3D(MSR_WRITE, vcpu, ecx, (u32)data, (u32)(data >> 32),
-> ./vmx.c:	KVMTRACE_0D(PEND_INTR, vcpu, handler);
->
-> I think this could easily be converted to a wrapper around 
-> ftrace_printk() plus a "kvmtrace" ftrace plugin [...]
+(cc to Frank and Mathieu)
 
-It would be even easier converted to the markers API directly,
-without the KVMTRACE* macro intermediary:
+> > >  config MARKERS
+> > >  	bool "Activate markers"
+> > > -	depends on TRACEPOINTS
+> > > +	select TRACEPOINTS
+> > >  	help
+> > >  	  Place an empty function call at each marker site. Can be
+> > >  	  dynamically changed for a probe function.
+> > 
+> > but using "select" instead of "depends on" just causes the 
+> > kind of problem that you described, whereas using "depends on" 
+> > does follow dependency chains.
+> 
+> Well, as long as the secondary selects are 'expanded' along the 
+> line of dependencies, it should still be fine. With an 
+> increasing number of dependencies it quickly becomes ugly 
+> though. This might be one of the cases where it works.
+> 
+> Eventually we should eliminate markers, their uses can either be 
+> converted to new-style tracepoints, or to ftrace_printk().
 
-before:
-        KVMTRACE_3D(MSR_READ, &svm->vcpu, ecx, (u32)data,
-                    (u32)(data >> 32), handler);
-after:
-	trace_mark(kvmtrace, "MSR_READ: %p, %08lx, %016Lx\n",
-                             &svm->vcpu, ecx, data);
+IIRC, this suggestion still don't get agreement of all tracing feature stakeholder.
+We need to definitely discuss more lot and deep.
+so I wonder why don't we create linux-tracing new mailing list.
 
-All this already "just works".
-
-The only part that's missing, from ftrace's point of view, is an
-interface from markers to the ftrace printing.  And Lai Jiangshan
-kindly posted exactly such generic code back in December:
-
-http://lkml.org/lkml/2008/12/30/297
-
-Please let's get this merged.
-
-> This means KVM tracing is activated via:
->  echo kvmtrace > /debug/tracing/current_tracer
-> that's all.
-
-Lai's interface is almost identical, and automatically works for
-any/all markers.
+tracer feature perfectly have new ML creation condition
+  - very active development
+  - many stakeholder and developer
+  - use many common parts (eg, marker, kprobe, unified buffer)
 
 
-> And any ad-hoc tracepoint can be added, without worrying about 
-> the name of the macro or the number of type of arguments. [...]
-
-(This KVMTRACE stuff was always unnecessary with respect to markers,
-and must have been explained by some historical baggage.)
 
 
-- FChE
