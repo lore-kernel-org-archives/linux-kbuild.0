@@ -1,47 +1,51 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from toq6.bellnexxia.net ([209.226.175.62]:45961 "EHLO
-	toq6-srv.bellnexxia.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752419AbZBVQZv (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 22 Feb 2009 11:25:51 -0500
-Date: Sun, 22 Feb 2009 11:04:06 -0500
-From: Mathieu Desnoyers <mathieu.desnoyers@polymtl.ca>
+Received: from mx2.mail.elte.hu ([157.181.151.9]:40425 "EHLO mx2.mail.elte.hu"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752407AbZBVROD (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 22 Feb 2009 12:14:03 -0500
+Date: Sun, 22 Feb 2009 18:13:44 +0100
+From: Ingo Molnar <mingo@elte.hu>
 Subject: Re: [PATCH] tracing/markers: make markers select tracepoints
-Message-ID: <20090222160405.GA17875@Krystal>
-References: <499EE162.4050008@oracle.com> <20090220172241.GF24538@elte.hu> <20090222121821.3599.A69D9226@jp.fujitsu.com> <1235302660.4632.4.camel@laptop>
-Mime-Version: 1.0
+Message-ID: <20090222171344.GC6570@elte.hu>
+References: <499edf47.1818d00a.060b.2b8d@mx.google.com> <499EE162.4050008@oracle.com> <20090220172241.GF24538@elte.hu> <20090220173107.GH5732@nowhere> <20090220174811.GL24538@elte.hu> <y0mtz6nqwe9.fsf@ton.toronto.redhat.com>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
 Content-Disposition: inline
-In-Reply-To: <1235302660.4632.4.camel@laptop>
+In-Reply-To: <y0mtz6nqwe9.fsf@ton.toronto.redhat.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Peter Zijlstra <peterz@infradead.org>
-Cc: KOSAKI Motohiro <kosaki.motohiro@jp.fujitsu.com>, Ingo Molnar <mingo@elte.hu>, Randy Dunlap <randy.dunlap@oracle.com>, Frederic Weisbecker <fweisbec@gmail.com>, Steven Rostedt <rostedt@goodmis.org>, linux-kernel@vger.kernel.org, zippel@linux-m68k.org, linux-kbuild@vger.kernel.org, "Frank Ch. Eigler" <fche@redhat.com>
-
-* Peter Zijlstra (peterz@infradead.org) wrote:
-> On Sun, 2009-02-22 at 12:23 +0900, KOSAKI Motohiro wrote:
-> 
-> > IIRC, this suggestion still don't get agreement of all tracing feature stakeholder.
-> > We need to definitely discuss more lot and deep.
-> > so I wonder why don't we create linux-tracing new mailing list.
-> 
-> Yes, lets hide it from general view, sounds like a brilliant plan.
-> 
-> 
-> 
-
-I guess Kosaki's point is that there may be a disconnect between the
-work that is done on the LTTng side and the ftrace side. LTTng uses the
-markers as a core infrastructure part (and tracepoints for
-instrumentation). I guess his idea is to improve communication, not to
-stop it. So by your reaction, I guess his proposal might not be ideal,
-but I hear his concerns. I'll try to post the core lttng patchset
-shortly.
-
-Mathieu
+To: "Frank Ch. Eigler" <fche@redhat.com>
+Cc: Frederic Weisbecker <fweisbec@gmail.com>, Avi Kivity <avi@redhat.com>, Randy Dunlap <randy.dunlap@oracle.com>, Steven Rostedt <rostedt@goodmis.org>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
 
--- 
-Mathieu Desnoyers
-OpenPGP key fingerprint: 8CD5 52C3 8E3C 4140 715F  BA06 3F25 A8FE 3BAE 9A68
+* Frank Ch. Eigler <fche@redhat.com> wrote:
+
+> Ingo Molnar <mingo@elte.hu> writes:
+> 
+> > [...]
+> > there's i think the KVM usecase where markers are used 
+> > essentially a printk()-alike flexible tracing facility.
+> >
+> > [...]
+> > ./vmx.c:	KVMTRACE_3D(MSR_READ, vcpu, ecx, (u32)data, (u32)(data >> 32),
+> > ./vmx.c:	KVMTRACE_3D(MSR_WRITE, vcpu, ecx, (u32)data, (u32)(data >> 32),
+> > ./vmx.c:	KVMTRACE_0D(PEND_INTR, vcpu, handler);
+> >
+> > I think this could easily be converted to a wrapper around 
+> > ftrace_printk() plus a "kvmtrace" ftrace plugin [...]
+> 
+> It would be even easier converted to the markers API directly,
+> without the KVMTRACE* macro intermediary:
+> 
+> before:
+>         KVMTRACE_3D(MSR_READ, &svm->vcpu, ecx, (u32)data,
+>                     (u32)(data >> 32), handler);
+> after:
+> 	trace_mark(kvmtrace, "MSR_READ: %p, %08lx, %016Lx\n",
+>                              &svm->vcpu, ecx, data);
+> 
+> All this already "just works".
+
+except that we are removing markers.
+
+	Ingo
