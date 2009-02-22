@@ -1,40 +1,42 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.redhat.com ([66.187.237.31]:50270 "EHLO mx2.redhat.com"
+Received: from mx3.mail.elte.hu ([157.181.1.138]:39112 "EHLO mx3.mail.elte.hu"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751752AbZBVMYy (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 22 Feb 2009 07:24:54 -0500
-Date: Sun, 22 Feb 2009 07:24:25 -0500
-From: "Frank Ch. Eigler" <fche@redhat.com>
-Subject: Re: [PATCH] tracing/markers: make markers select tracepoints
-Message-ID: <20090222122424.GA9951@redhat.com>
-References: <499edf47.1818d00a.060b.2b8d@mx.google.com> <499EE162.4050008@oracle.com> <20090220172241.GF24538@elte.hu> <1235302980.4632.8.camel@laptop> <y0mocwuptbc.fsf@ton.toronto.redhat.com> <1235304876.4632.10.camel@laptop>
-Mime-Version: 1.0
+	id S1752462AbZBVQXb (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 22 Feb 2009 11:23:31 -0500
+Date: Sun, 22 Feb 2009 17:23:11 +0100
+From: Ingo Molnar <mingo@elte.hu>
+Subject: Re: [PATCH][RFC] check for select dependency errors on config load
+Message-ID: <20090222162311.GA25417@elte.hu>
+References: <499edf47.1818d00a.060b.2b8d@mx.google.com> <499EE162.4050008@oracle.com> <alpine.DEB.2.00.0902210008580.30069@gandalf.stny.rr.com>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1235304876.4632.10.camel@laptop>
+In-Reply-To: <alpine.DEB.2.00.0902210008580.30069@gandalf.stny.rr.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Peter Zijlstra <peterz@infradead.org>
-Cc: Ingo Molnar <mingo@elte.hu>, Randy Dunlap <randy.dunlap@oracle.com>, Frederic Weisbecker <fweisbec@gmail.com>, Steven Rostedt <rostedt@goodmis.org>, linux-kernel@vger.kernel.org, zippel@linux-m68k.org, linux-kbuild@vger.kernel.org
+To: Steven Rostedt <rostedt@goodmis.org>
+Cc: LKML <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org, Randy Dunlap <randy.dunlap@oracle.com>, Frederic Weisbecker <fweisbec@gmail.com>, zippel@linux-m68k.org, Andrew Morton <akpm@linux-foundation.org>
 
-Hi -
 
-On Sun, Feb 22, 2009 at 01:14:36PM +0100, Peter Zijlstra wrote:
-> > > I would like to never merge an ftrace_printk() user... just as I'd like
-> > > to get rid of every marker.
-> > 
-> > But why?  They solve a problem well enough that Ingo had in effect
-> > reinvented them on Friday.
+* Steven Rostedt <rostedt@goodmis.org> wrote:
+
+> There's been a few problems with SELECT and dependencies 
+> lately. I've been burnt by it a few times myself. So I look at 
+> the kconfig code and added this patch. It can use a bit more 
+> work but it does what I want.
 > 
-> Because after a printk() debug spree, I don't commit them, I toss them
-> out and keep the fix.
+> When the config is loaded, it checks all the symbols that are 
+> selected by an active config and makes sure the visible 
+> dependencies are also activated. This should probably be moved 
+> to the writing of the config instead, but since I just wanted 
+> to see if my current config was OK, I did it on load. This is 
+> an RFC patch anyway, so fixes/comments are definitely welcome.
+> 
+> Here's what I get with the attached config running on 
+> 2.6.29-rc5.
 
-Markers solve a problem closer to tracepoints than to debugging
-printk's.
+Yah! Very nice Steve.
 
-In this context, the main difference between tracepoints is that
-markers need almost no hand-written glue code of the sort that make up
-ftrace engines that just trace simple values.  Simpler & smaller code
-for the same output seems like a win.
+/me nominates Steve as the Kconfig maintainer :-)
 
-- FChE
+	Ingo
