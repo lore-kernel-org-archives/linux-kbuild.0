@@ -1,41 +1,37 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from byss.tchmachines.com ([208.76.80.75]:34597 "EHLO
-	byss.tchmachines.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751885AbZBVSy7 (ORCPT
+Received: from hrndva-omtalb.mail.rr.com ([71.74.56.123]:56247 "EHLO
+	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753577AbZBWAXU (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 22 Feb 2009 13:54:59 -0500
-Date: Sun, 22 Feb 2009 10:54:55 -0800
-From: Josh Hunt <josh@scalex86.org>
-Subject: [PATCH] Fix mkspec to cleanup RPM_BUILD_ROOT
-Message-ID: <20090222185455.GB17685@localhost.localdomain>
+	Sun, 22 Feb 2009 19:23:20 -0500
+Date: Sun, 22 Feb 2009 19:23:17 -0500 (EST)
+From: Steven Rostedt <rostedt@goodmis.org>
+Subject: Re: [PATCH] tracing/markers: make markers select tracepoints
+In-Reply-To: <1235302980.4632.8.camel@laptop>
+Message-ID: <alpine.DEB.2.00.0902221922360.18221@gandalf.stny.rr.com>
+References: <499edf47.1818d00a.060b.2b8d@mx.google.com>  <499EE162.4050008@oracle.com>  <20090220172241.GF24538@elte.hu> <1235302980.4632.8.camel@laptop>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: sam@ravnborg.org
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, kiran@scalex86.org, mingo@elte.hu
+To: Peter Zijlstra <peterz@infradead.org>
+Cc: Ingo Molnar <mingo@elte.hu>, Randy Dunlap <randy.dunlap@oracle.com>, Frederic Weisbecker <fweisbec@gmail.com>, linux-kernel@vger.kernel.org, zippel@linux-m68k.org, linux-kbuild@vger.kernel.org
 
-The contents of the %clean section in mkspec is currently commented
-out leaving RPM_BUILD_ROOT and its contents on the build machine.
-This patch removes it once the rpm build process is complete.
 
-Signed-off-by: Josh Hunt <josh@scalex86.org>
----
+On Sun, 22 Feb 2009, Peter Zijlstra wrote:
 
-Index: linux-2.6/scripts/package/mkspec
-===================================================================
---- linux-2.6.orig/scripts/package/mkspec       2009-02-20
-15:51:22.000000000 -0800
-+++ linux-2.6/scripts/package/mkspec    2009-02-20 16:06:32.000000000
--0800
-@@ -96,7 +96,7 @@ echo "%endif"
- 
- echo ""
- echo "%clean"
--echo '#echo -rf $RPM_BUILD_ROOT'
-+echo 'rm -rf $RPM_BUILD_ROOT'
- echo ""
- echo "%files"
- echo '%defattr (-, root, root)'
+> On Fri, 2009-02-20 at 18:22 +0100, Ingo Molnar wrote:
+> > Eventually we should eliminate markers, their uses can either be 
+> > converted to new-style tracepoints, or to ftrace_printk().
+> 
+> I would like to never merge an ftrace_printk() user... just as I'd like
+> to get rid of every marker.
+> 
+> Then again, some people appear happy to commit their printk debug spree
+> too :/
+
+/me looks at arch/powerpc/kernel/ftrace.c and realizes that he's guilty as 
+charged :-p
+
+-- Steve
 
