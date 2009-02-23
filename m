@@ -1,53 +1,34 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.redhat.com ([66.187.237.31]:44211 "EHLO mx2.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751756AbZBWKOK (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 23 Feb 2009 05:14:10 -0500
-Message-ID: <49A276E0.9010603@redhat.com>
-Date: Mon, 23 Feb 2009 12:13:52 +0200
-From: Avi Kivity <avi@redhat.com>
+Received: from nf-out-0910.google.com ([64.233.182.185]:32894 "EHLO
+	nf-out-0910.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752000AbZBWK2L (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 23 Feb 2009 05:28:11 -0500
 MIME-Version: 1.0
-Subject: Re: [PATCH] tracing/markers: make markers select tracepoints
-References: <499edf47.1818d00a.060b.2b8d@mx.google.com> <499EE162.4050008@oracle.com> <20090220172241.GF24538@elte.hu> <20090220173107.GH5732@nowhere> <20090220174811.GL24538@elte.hu>
-In-Reply-To: <20090220174811.GL24538@elte.hu>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+In-Reply-To: <435196707.27641@eyou.net>
+References: <1234944825-10299-1-git-send-email-crquan@gmail.com>
+	 <435196707.27641@eyou.net>
+Date: Mon, 23 Feb 2009 18:28:07 +0800
+Message-ID: <91b13c310902230228g116836b0of85494934e39313f@mail.gmail.com>
+Subject: Re: [PATCH] [KBUILD] add symbol value to help find the real depend
+From: Cheng Renquan <crquan@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ingo Molnar <mingo@elte.hu>
-Cc: Frederic Weisbecker <fweisbec@gmail.com>, Randy Dunlap <randy.dunlap@oracle.com>, Steven Rostedt <rostedt@goodmis.org>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: Randy Dunlap <randy.dunlap@oracle.com>
+Cc: Sam Ravnborg <sam@ravnborg.org>, Roman Zippel <zippel@linux-m68k.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Ingo Molnar wrote:
->         KVMTRACE_3D(MSR_READ, &svm->vcpu, ecx, (u32)data,
->                     (u32)(data >> 32), handler);
+On Sat, Feb 21, 2009 at 2:12 PM, Randy Dunlap <randy.dunlap@oracle.com> wrote:
+> Hi,
 >
-> after:
->
-> 	kvm_trace("MSR_READ: %p, %08lx, %016Lx\n", &svm->vcpu, ecx, data);
->
-> As a result all these traces would become a lot more readable 
-> (and a lot more flexible) both in the source code, and in the 
-> trace output stage.
->
-> And any ad-hoc tracepoint can be added, without worrying about 
-> the name of the macro or the number of type of arguments. Note 
-> that in this specific example we didnt need to split up the u64 
-> 'data' into two 32-bit values, nor do we have to pass in the 
-> 'handler' name, nor do we have to provide a MSR_READ 
-> enumeration.
->
-> The tracing-disabled case would still be as fast - a single 
-> branch check.
->
-> Avi, what do you think, any objections against an RFC patchset 
-> that shows this off?
->
->   
+> This looks good/helpful.  Can it be made to work with
+> gconfig & xconfig as well as menuconfig?
 
-Definitely, as long as formatting is performed after the data is 
-gathered (say, in userspace).  kvmtrace can generate around 1M 
-events/sec/cpu, so we need truly low overhead.
+Patches for gconfig & xconfig are already in progress, please be
+patient, I will post later. Thanks,
 
 -- 
-error compiling committee.c: too many arguments to function
-
+Cheng Renquan, Shenzhen, China
+Henny Youngman  - "When I told my doctor I couldn't afford an
+operation, he offered to touch-up my X-rays."
