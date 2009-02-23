@@ -1,54 +1,37 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([18.85.46.34]:35340 "EHLO
-	bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752370AbZBWLLm (ORCPT
+Received: from ti-out-0910.google.com ([209.85.142.188]:24359 "EHLO
+	ti-out-0910.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753478AbZBWPKR (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 23 Feb 2009 06:11:42 -0500
-Subject: Re: [PATCH] tracing/markers: make markers select tracepoints
-From: Peter Zijlstra <peterz@infradead.org>
-In-Reply-To: <20090222122424.GA9951@redhat.com>
-References: <499edf47.1818d00a.060b.2b8d@mx.google.com>
-	 <499EE162.4050008@oracle.com> <20090220172241.GF24538@elte.hu>
-	 <1235302980.4632.8.camel@laptop> <y0mocwuptbc.fsf@ton.toronto.redhat.com>
-	 <1235304876.4632.10.camel@laptop>  <20090222122424.GA9951@redhat.com>
-Content-Type: text/plain
-Date: Mon, 23 Feb 2009 12:11:27 +0100
-Message-Id: <1235387487.4645.28.camel@laptop>
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+	Mon, 23 Feb 2009 10:10:17 -0500
+From: Cheng Renquan <crquan@gmail.com>
+Subject: [PATCH 0/6] [KBUILD] configuration system improvements
+Date: Mon, 23 Feb 2009 23:09:58 +0800
+Message-Id: <1235401804-8136-1-git-send-email-crquan@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Frank Ch. Eigler" <fche@redhat.com>
-Cc: Ingo Molnar <mingo@elte.hu>, Randy Dunlap <randy.dunlap@oracle.com>, Frederic Weisbecker <fweisbec@gmail.com>, Steven Rostedt <rostedt@goodmis.org>, linux-kernel@vger.kernel.org, zippel@linux-m68k.org, linux-kbuild@vger.kernel.org
+To: Randy Dunlap <randy.dunlap@oracle.com>, Sam Ravnborg <sam@ravnborg.org>, Roman Zippel <zippel@linux-m68k.org>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, cr_quan@163.com
 
-On Sun, 2009-02-22 at 07:24 -0500, Frank Ch. Eigler wrote:
-> Hi -
-> 
-> On Sun, Feb 22, 2009 at 01:14:36PM +0100, Peter Zijlstra wrote:
-> > > > I would like to never merge an ftrace_printk() user... just as I'd like
-> > > > to get rid of every marker.
-> > > 
-> > > But why?  They solve a problem well enough that Ingo had in effect
-> > > reinvented them on Friday.
-> > 
-> > Because after a printk() debug spree, I don't commit them, I toss them
-> > out and keep the fix.
-> 
-> Markers solve a problem closer to tracepoints than to debugging
-> printk's.
+This group of patches improve the usability of kernel configuration system,
+mainly,
 
-Not so. In both cases the regular stuff (NMI trace, OOPS,
-function/graph/sched trace, etc) is not enough and you wish to augment
-its output.
+1. add symbol's value shown accompanied in config item's help message;
+2. move the real plumbing functions code from mconf.c to menu.c, make them
+   be able to be shared with other configuration methods;
+3. add "symbol's value shown" support for gconfig/xconfig/config;
 
-> In this context, the main difference between tracepoints is that
-> markers need almost no hand-written glue code of the sort that make up
-> ftrace engines that just trace simple values.  Simpler & smaller code
-> for the same output seems like a win.
+  0001--KBUILD-add-symbol-value-to-help-find-the-real-depe.patch
+  0002--KBUILD-add-menu_get_ext_help-function-to-display-m.patch
+  0003--KBUILD-menuconfig-improvements.patch
+  0004--KBUILD-make-use-of-menu_get_ext_help-in-gconfig.patch
+  0005--KBUILD-make-use-of-menu_get_ext_help-in-qconfig.patch
+  0006--KBUILD-make-use-of-menu_get_ext_help-in-make-conf.patch
 
-Right, for dumb tracers that's true I suppose, however any
-high-bandwidth tracer will try to avoid putting silly ASCII strings in
-and will therefore need to write more glue code.
+I found gconfig still lack of "search by symbol" support, and that would be
+in another patch.
 
-Which reduces these default thingies to printk() level debugging.
+Request for comments, thanks.
 
+--
+Cheng Renquan, Shenzhen, China
