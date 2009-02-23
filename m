@@ -1,87 +1,37 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([18.85.46.34]:47283 "EHLO
-	bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753413AbZBWWRe (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 23 Feb 2009 17:17:34 -0500
+Received: from THUNK.ORG ([69.25.196.29]:43845 "EHLO thunker.thunk.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753618AbZBWWmF (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 23 Feb 2009 17:42:05 -0500
+Date: Mon, 23 Feb 2009 17:41:41 -0500
+From: Theodore Tso <tytso@mit.edu>
 Subject: Re: [PATCH] tracing/markers: make markers select tracepoints
-From: Peter Zijlstra <peterz@infradead.org>
-In-Reply-To: <20090223183220.GE19739@mit.edu>
-References: <20090220172241.GF24538@elte.hu>
-	 <1235302980.4632.8.camel@laptop> <y0mocwuptbc.fsf@ton.toronto.redhat.com>
-	 <1235304876.4632.10.camel@laptop> <20090222122424.GA9951@redhat.com>
-	 <1235387487.4645.28.camel@laptop> <20090223154404.GA30147@redhat.com>
-	 <1235406159.4645.366.camel@laptop> <20090223171032.GA2566@redhat.com>
-	 <alpine.DEB.2.00.0902231228420.18221@gandalf.stny.rr.com>
-	 <20090223183220.GE19739@mit.edu>
-Content-Type: text/plain
-Date: Mon, 23 Feb 2009 23:16:59 +0100
-Message-Id: <1235427419.4645.959.camel@laptop>
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Message-ID: <20090223224141.GI19739@mit.edu>
+References: <y0mocwuptbc.fsf@ton.toronto.redhat.com> <1235304876.4632.10.camel@laptop> <20090222122424.GA9951@redhat.com> <1235387487.4645.28.camel@laptop> <20090223154404.GA30147@redhat.com> <1235406159.4645.366.camel@laptop> <20090223171032.GA2566@redhat.com> <alpine.DEB.2.00.0902231228420.18221@gandalf.stny.rr.com> <20090223183220.GE19739@mit.edu> <1235427419.4645.959.camel@laptop>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1235427419.4645.959.camel@laptop>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Theodore Tso <tytso@mit.edu>
+To: Peter Zijlstra <peterz@infradead.org>
 Cc: Steven Rostedt <rostedt@goodmis.org>, "Frank Ch. Eigler" <fche@redhat.com>, Ingo Molnar <mingo@elte.hu>, Randy Dunlap <randy.dunlap@oracle.com>, Frederic Weisbecker <fweisbec@gmail.com>, linux-kernel@vger.kernel.org, zippel@linux-m68k.org, linux-kbuild@vger.kernel.org
 
-On Mon, 2009-02-23 at 13:32 -0500, Theodore Tso wrote:
-> On Mon, Feb 23, 2009 at 12:31:31PM -0500, Steven Rostedt wrote:
-> > > The impression that this is somehow different with tracepoints is
-> > > mistaken.  Tracepoints are *exactly* as "ABI-like" as markers.
-> > 
-> > I disagree with this point. markers are text strings that will eventually 
-> > appear to userspace. trace points need translation. A trace point can be 
-> > modified at any time and should never mess up user apps.
-> > 
-> > You may have a hook to a trace point that provides user apps a text based 
-> > output. If the trace point changes, this hook may break. But the tracer 
-> > maintainer of that hook will be responsible for that change, not the 
-> > maintainer of the code the tracepoint existed in.
+On Mon, Feb 23, 2009 at 11:16:59PM +0100, Peter Zijlstra wrote:
 > 
-> So stupid question time --- exactly who is supposed to write and
-> maintain trnaslation code; the "hook"?  What trace points have done is
-> added an extra layer of indirection, but in order for someone to
-> actually make *use* of the have the trace point, someone has to
-> maintain the "hook".
+> We're working on adding arguments to the function/graph tracer, it would
+> fit all your above requirements and doesn't need any source modification
+> to boot.
 
-That just means we have to make it easier to write/generate this glue,
-no? If we had function argument debug data (see below) we could generate
-a generic tracepoint hook.
+*Excellent*.  I would love to have that funtionality.  How do you plan
+to make available complex data structures (i.e., suppose I want
+inode->i_ino printed out)?  I assume this will require writing some
+"easy to generate" glue code that would presumably be some kind of
+kernel module?  That doesn't bother me (after all that's what
+SystemTap does), as long as generation of the glue code can be largely
+automated ---- so that you can take something approximately like a
+DTrace or SystemTap script, and with some perl or python helper,
+translate it into glue code that gets compiled into a kernel module.
+Is something like that what you have in mind?
 
-> I'm sorry I've offended Peter with the ext4 trace_mark() hooks, but
-> it's what I could forsee needing if someone wants reports a wierd sh*t
-> bug in ext4 and I wanted to be able to be able to extract debugging
-> information without forcing them to patch and recompile the kernel,
-> and in the ideal world, without even needing to reboot the kernel.
-> (If we had usable and reliable debuginfo information, in most cases
-> I'd be able simply use access to function parameters as replacements
-> for trace_mark().)
-
-We're working on adding arguments to the function/graph tracer, it would
-fit all your above requirements and doesn't need any source modification
-to boot.
-
-Furthermore, most of it is upstream.
-
-> I've had to debug problems in the field on customer machines where
-> installing a new kernel was a big deal (as in, you get a window to
-> reboot the machine every 24 hours, and the problem is so complex you
-> can't replicate it anywhere *but* the production environment).  It's
-> also been the case that more than once I've seen wierd behaviour on my
-> laptop, and being able to peer inside it to see what is going on
-> easily and conveniently is a major win.
-
-Yeah, I know, the function graph tracer is brilliant that way. It even
-provides information on the rest of the system and requires no
-additional patches or big lumps of userspace.
-
-> Finally, whether or not the text string is an ABI really depends on
-> the tools.  Given that the string is self describing, it's only an ABI
-> if the tools are stupid.  
-
->  This really isn't rocket science....
-
-It isn't, yet how many scripts/programs have you seen that failed at the
-above?
-
-
+   	        	     	       	    	     	- Ted
