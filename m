@@ -1,34 +1,54 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from nf-out-0910.google.com ([64.233.182.185]:32894 "EHLO
-	nf-out-0910.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752000AbZBWK2L (ORCPT
+Received: from bombadil.infradead.org ([18.85.46.34]:35340 "EHLO
+	bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752370AbZBWLLm (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 23 Feb 2009 05:28:11 -0500
-MIME-Version: 1.0
-In-Reply-To: <435196707.27641@eyou.net>
-References: <1234944825-10299-1-git-send-email-crquan@gmail.com>
-	 <435196707.27641@eyou.net>
-Date: Mon, 23 Feb 2009 18:28:07 +0800
-Message-ID: <91b13c310902230228g116836b0of85494934e39313f@mail.gmail.com>
-Subject: Re: [PATCH] [KBUILD] add symbol value to help find the real depend
-From: Cheng Renquan <crquan@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+	Mon, 23 Feb 2009 06:11:42 -0500
+Subject: Re: [PATCH] tracing/markers: make markers select tracepoints
+From: Peter Zijlstra <peterz@infradead.org>
+In-Reply-To: <20090222122424.GA9951@redhat.com>
+References: <499edf47.1818d00a.060b.2b8d@mx.google.com>
+	 <499EE162.4050008@oracle.com> <20090220172241.GF24538@elte.hu>
+	 <1235302980.4632.8.camel@laptop> <y0mocwuptbc.fsf@ton.toronto.redhat.com>
+	 <1235304876.4632.10.camel@laptop>  <20090222122424.GA9951@redhat.com>
+Content-Type: text/plain
+Date: Mon, 23 Feb 2009 12:11:27 +0100
+Message-Id: <1235387487.4645.28.camel@laptop>
+Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Randy Dunlap <randy.dunlap@oracle.com>
-Cc: Sam Ravnborg <sam@ravnborg.org>, Roman Zippel <zippel@linux-m68k.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: "Frank Ch. Eigler" <fche@redhat.com>
+Cc: Ingo Molnar <mingo@elte.hu>, Randy Dunlap <randy.dunlap@oracle.com>, Frederic Weisbecker <fweisbec@gmail.com>, Steven Rostedt <rostedt@goodmis.org>, linux-kernel@vger.kernel.org, zippel@linux-m68k.org, linux-kbuild@vger.kernel.org
 
-On Sat, Feb 21, 2009 at 2:12 PM, Randy Dunlap <randy.dunlap@oracle.com> wrote:
-> Hi,
->
-> This looks good/helpful.  Can it be made to work with
-> gconfig & xconfig as well as menuconfig?
+On Sun, 2009-02-22 at 07:24 -0500, Frank Ch. Eigler wrote:
+> Hi -
+> 
+> On Sun, Feb 22, 2009 at 01:14:36PM +0100, Peter Zijlstra wrote:
+> > > > I would like to never merge an ftrace_printk() user... just as I'd like
+> > > > to get rid of every marker.
+> > > 
+> > > But why?  They solve a problem well enough that Ingo had in effect
+> > > reinvented them on Friday.
+> > 
+> > Because after a printk() debug spree, I don't commit them, I toss them
+> > out and keep the fix.
+> 
+> Markers solve a problem closer to tracepoints than to debugging
+> printk's.
 
-Patches for gconfig & xconfig are already in progress, please be
-patient, I will post later. Thanks,
+Not so. In both cases the regular stuff (NMI trace, OOPS,
+function/graph/sched trace, etc) is not enough and you wish to augment
+its output.
 
--- 
-Cheng Renquan, Shenzhen, China
-Henny Youngman  - "When I told my doctor I couldn't afford an
-operation, he offered to touch-up my X-rays."
+> In this context, the main difference between tracepoints is that
+> markers need almost no hand-written glue code of the sort that make up
+> ftrace engines that just trace simple values.  Simpler & smaller code
+> for the same output seems like a win.
+
+Right, for dumb tracers that's true I suppose, however any
+high-bandwidth tracer will try to avoid putting silly ASCII strings in
+and will therefore need to write more glue code.
+
+Which reduces these default thingies to printk() level debugging.
+
