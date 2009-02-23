@@ -1,37 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from hrndva-omtalb.mail.rr.com ([71.74.56.123]:56247 "EHLO
-	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753577AbZBWAXU (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 22 Feb 2009 19:23:20 -0500
-Date: Sun, 22 Feb 2009 19:23:17 -0500 (EST)
-From: Steven Rostedt <rostedt@goodmis.org>
-Subject: Re: [PATCH] tracing/markers: make markers select tracepoints
-In-Reply-To: <1235302980.4632.8.camel@laptop>
-Message-ID: <alpine.DEB.2.00.0902221922360.18221@gandalf.stny.rr.com>
-References: <499edf47.1818d00a.060b.2b8d@mx.google.com>  <499EE162.4050008@oracle.com>  <20090220172241.GF24538@elte.hu> <1235302980.4632.8.camel@laptop>
+Received: from mx2.redhat.com ([66.187.237.31]:44211 "EHLO mx2.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751756AbZBWKOK (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 23 Feb 2009 05:14:10 -0500
+Message-ID: <49A276E0.9010603@redhat.com>
+Date: Mon, 23 Feb 2009 12:13:52 +0200
+From: Avi Kivity <avi@redhat.com>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: Re: [PATCH] tracing/markers: make markers select tracepoints
+References: <499edf47.1818d00a.060b.2b8d@mx.google.com> <499EE162.4050008@oracle.com> <20090220172241.GF24538@elte.hu> <20090220173107.GH5732@nowhere> <20090220174811.GL24538@elte.hu>
+In-Reply-To: <20090220174811.GL24538@elte.hu>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Peter Zijlstra <peterz@infradead.org>
-Cc: Ingo Molnar <mingo@elte.hu>, Randy Dunlap <randy.dunlap@oracle.com>, Frederic Weisbecker <fweisbec@gmail.com>, linux-kernel@vger.kernel.org, zippel@linux-m68k.org, linux-kbuild@vger.kernel.org
+To: Ingo Molnar <mingo@elte.hu>
+Cc: Frederic Weisbecker <fweisbec@gmail.com>, Randy Dunlap <randy.dunlap@oracle.com>, Steven Rostedt <rostedt@goodmis.org>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
+Ingo Molnar wrote:
+>         KVMTRACE_3D(MSR_READ, &svm->vcpu, ecx, (u32)data,
+>                     (u32)(data >> 32), handler);
+>
+> after:
+>
+> 	kvm_trace("MSR_READ: %p, %08lx, %016Lx\n", &svm->vcpu, ecx, data);
+>
+> As a result all these traces would become a lot more readable 
+> (and a lot more flexible) both in the source code, and in the 
+> trace output stage.
+>
+> And any ad-hoc tracepoint can be added, without worrying about 
+> the name of the macro or the number of type of arguments. Note 
+> that in this specific example we didnt need to split up the u64 
+> 'data' into two 32-bit values, nor do we have to pass in the 
+> 'handler' name, nor do we have to provide a MSR_READ 
+> enumeration.
+>
+> The tracing-disabled case would still be as fast - a single 
+> branch check.
+>
+> Avi, what do you think, any objections against an RFC patchset 
+> that shows this off?
+>
+>   
 
-On Sun, 22 Feb 2009, Peter Zijlstra wrote:
+Definitely, as long as formatting is performed after the data is 
+gathered (say, in userspace).  kvmtrace can generate around 1M 
+events/sec/cpu, so we need truly low overhead.
 
-> On Fri, 2009-02-20 at 18:22 +0100, Ingo Molnar wrote:
-> > Eventually we should eliminate markers, their uses can either be 
-> > converted to new-style tracepoints, or to ftrace_printk().
-> 
-> I would like to never merge an ftrace_printk() user... just as I'd like
-> to get rid of every marker.
-> 
-> Then again, some people appear happy to commit their printk debug spree
-> too :/
-
-/me looks at arch/powerpc/kernel/ftrace.c and realizes that he's guilty as 
-charged :-p
-
--- Steve
+-- 
+error compiling committee.c: too many arguments to function
 
