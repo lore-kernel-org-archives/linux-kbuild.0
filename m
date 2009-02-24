@@ -1,54 +1,84 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.redhat.com ([66.187.237.31]:59775 "EHLO mx2.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755005AbZBXNBu (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 24 Feb 2009 08:01:50 -0500
-Date: Tue, 24 Feb 2009 08:01:13 -0500
-From: "Frank Ch. Eigler" <fche@redhat.com>
-Subject: Re: [PATCH] tracing/markers: make markers select tracepoints
-Message-ID: <20090224130113.GA6749@redhat.com>
-References: <20090220172241.GF24538@elte.hu> <1235302980.4632.8.camel@laptop> <y0mocwuptbc.fsf@ton.toronto.redhat.com> <1235304876.4632.10.camel@laptop> <20090222122424.GA9951@redhat.com> <1235387487.4645.28.camel@laptop> <20090223154404.GA30147@redhat.com> <1235406159.4645.366.camel@laptop> <20090223171032.GA2566@redhat.com> <20090223172302.GB29344@elte.hu>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20090223172302.GB29344@elte.hu>
+Received: from qb-out-0506.google.com ([72.14.204.226]:25265 "EHLO
+	qb-out-0506.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752041AbZBXTF2 (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 24 Feb 2009 14:05:28 -0500
+Received: by qb-out-0506.google.com with SMTP id q18so1622896qba.17
+        for <linux-kbuild@vger.kernel.org>; Tue, 24 Feb 2009 11:05:25 -0800 (PST)
+MIME-Version: 1.0
+Date: Tue, 24 Feb 2009 14:05:25 -0500
+Message-ID: <b493f8670902241105l48bd7cdbmb99608e802d2454a@mail.gmail.com>
+Subject: potential linking bug in recursive directory descent
+From: Fred Isaman <iisaman@citi.umich.edu>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ingo Molnar <mingo@elte.hu>
-Cc: Peter Zijlstra <peterz@infradead.org>, Randy Dunlap <randy.dunlap@oracle.com>, Frederic Weisbecker <fweisbec@gmail.com>, Steven Rostedt <rostedt@goodmis.org>, linux-kernel@vger.kernel.org, zippel@linux-m68k.org, linux-kbuild@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
 
-Hi -
+The pnfs tree base of of 2.6.29-rc5 uses the new find_last_bit
+function (defined in
+lib/find_last_bit.c) in a file in the fs/nfs directory.  Myself and
+another developer (though no one else so far) get the following error
+during compile:
 
-> > The impression that this is somehow different with tracepoints 
-> > is mistaken.  Tracepoints are *exactly* as "ABI-like" as 
-> > markers.
-> 
-> they arent. To the kernel they look like function calls, with no 
-> ABI properties at all. They can and will change without notice.
-
-Markers also "look like" function calls because they are - the
-callbacks just happen to take a format string and varargs.  What did
-you think they were?
+   Kernel: arch/x86/boot/bzImage is ready  (#5)
+     Building modules, stage 2.
+     MODPOST 515 modules
+   ERROR: "find_last_bit" [fs/nfs/nfs.ko] undefined!
+   make[2]: *** [__modpost] Error 1
+   make[1]: *** [modules] Error 2
+   make: *** [sub-make] Error 2
 
 
-srostedt argues that separating the tracepoint from its rendering is
-necessary to free the instrumentation site from backward-compatibility
-stagnation.  
+Note that find_last_bit() is not used in any file in the fs directory.
+If I add it to any function that is EXPORT_SYMBOL'ed
+from the fs directory, suddenly the compile errors go away.  (See the
+below patch for a more concrete example.)
 
-But consider - it has been manifold stated that tracepoints are not
-welcome in the tree without a "tracer" (hand-written glue), so the
-same person ends up writing both.  Since they are tightly coupled.  a
-change on one will affect the other.  A moved tracepoint will produce
-events at different times; a lost tracepoint parameter will lose data
-at trace rendering time.  The tracing engine can only pretend to
-produce the same data by guessing.
+I am not sure what is going on, and why it only affects some
+developers, but it looks a lot like the kbuild system
+is deciding that the library does not need to be included at the fs
+directory level, so isn't including it in fs/nfs where
+it is needed.
 
-Similarly, if a marker site were to change, and if someone deemed the
-old trace data important to preserve, a hand-written marker callback
-function could replace a generic one, The new one could make the same
-heuristic adaptation.
+Thanks for any help.
+Fred
 
-Try working out some examples.  You'll probably see how similar they
-really turn out, with respect to the hypothetical "preserve ABI" idea.
+From 4bd89543983640ab01c9b704d427f83dad3aa455 Mon Sep 17 00:00:00 2001
+From: Fred Isaman <iisaman@citi.umich.edu>
+Date: Fri, 20 Feb 2009 11:58:52 -0500
+Subject: [PATCH 1/1] DEBUG: Need this to compile - what the heck?
 
-- FChE
+This looks suspiciously like a bug in the kbuild system, where
+the library include is not passed down to fs/nfs unless it is
+used by fs.  Without this, I get the following error during linking:
+
+Kernel: arch/x86/boot/bzImage is ready  (#5)
+ Building modules, stage 2.
+ MODPOST 515 modules
+ERROR: "find_last_bit" [fs/nfs/nfs.ko] undefined!
+make[2]: *** [__modpost] Error 1
+make[1]: *** [modules] Error 2
+make: *** [sub-make] Error 2
+
+Signed-off-by: Fred Isaman <iisaman@citi.umich.edu>
+---
+ fs/inode.c |    1 +
+ 1 files changed, 1 insertions(+), 0 deletions(-)
+
+diff --git a/fs/inode.c b/fs/inode.c
+index 306faef..a4e29b3 100644
+--- a/fs/inode.c
++++ b/fs/inode.c
+@@ -226,6 +226,7 @@ EXPORT_SYMBOL(destroy_inode);
+ */
+ void inode_init_once(struct inode *inode)
+ {
++       find_last_bit((unsigned long *) inode, 5);
+       memset(inode, 0, sizeof(*inode));
+       INIT_HLIST_NODE(&inode->i_hash);
+       INIT_LIST_HEAD(&inode->i_dentry);
+--
+1.6.0.6
