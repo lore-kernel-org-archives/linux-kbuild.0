@@ -1,47 +1,54 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([18.85.46.34]:39333 "EHLO
-	bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751184AbZBXI4H (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 24 Feb 2009 03:56:07 -0500
+Received: from mx2.redhat.com ([66.187.237.31]:59775 "EHLO mx2.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1755005AbZBXNBu (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 24 Feb 2009 08:01:50 -0500
+Date: Tue, 24 Feb 2009 08:01:13 -0500
+From: "Frank Ch. Eigler" <fche@redhat.com>
 Subject: Re: [PATCH] tracing/markers: make markers select tracepoints
-From: Peter Zijlstra <peterz@infradead.org>
-In-Reply-To: <20090223224141.GI19739@mit.edu>
-References: <y0mocwuptbc.fsf@ton.toronto.redhat.com>
-	 <1235304876.4632.10.camel@laptop> <20090222122424.GA9951@redhat.com>
-	 <1235387487.4645.28.camel@laptop> <20090223154404.GA30147@redhat.com>
-	 <1235406159.4645.366.camel@laptop> <20090223171032.GA2566@redhat.com>
-	 <alpine.DEB.2.00.0902231228420.18221@gandalf.stny.rr.com>
-	 <20090223183220.GE19739@mit.edu> <1235427419.4645.959.camel@laptop>
-	 <20090223224141.GI19739@mit.edu>
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
-Date: Tue, 24 Feb 2009 09:55:37 +0100
-Message-Id: <1235465737.15790.7.camel@twins>
+Message-ID: <20090224130113.GA6749@redhat.com>
+References: <20090220172241.GF24538@elte.hu> <1235302980.4632.8.camel@laptop> <y0mocwuptbc.fsf@ton.toronto.redhat.com> <1235304876.4632.10.camel@laptop> <20090222122424.GA9951@redhat.com> <1235387487.4645.28.camel@laptop> <20090223154404.GA30147@redhat.com> <1235406159.4645.366.camel@laptop> <20090223171032.GA2566@redhat.com> <20090223172302.GB29344@elte.hu>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20090223172302.GB29344@elte.hu>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Theodore Tso <tytso@mit.edu>
-Cc: Steven Rostedt <rostedt@goodmis.org>, "Frank Ch. Eigler" <fche@redhat.com>, Ingo Molnar <mingo@elte.hu>, Randy Dunlap <randy.dunlap@oracle.com>, Frederic Weisbecker <fweisbec@gmail.com>, linux-kernel@vger.kernel.org, zippel@linux-m68k.org, linux-kbuild@vger.kernel.org
+To: Ingo Molnar <mingo@elte.hu>
+Cc: Peter Zijlstra <peterz@infradead.org>, Randy Dunlap <randy.dunlap@oracle.com>, Frederic Weisbecker <fweisbec@gmail.com>, Steven Rostedt <rostedt@goodmis.org>, linux-kernel@vger.kernel.org, zippel@linux-m68k.org, linux-kbuild@vger.kernel.org
 
-On Mon, 2009-02-23 at 17:41 -0500, Theodore Tso wrote:
-> On Mon, Feb 23, 2009 at 11:16:59PM +0100, Peter Zijlstra wrote:
-> > 
-> > We're working on adding arguments to the function/graph tracer, it would
-> > fit all your above requirements and doesn't need any source modification
-> > to boot.
+Hi -
+
+> > The impression that this is somehow different with tracepoints 
+> > is mistaken.  Tracepoints are *exactly* as "ABI-like" as 
+> > markers.
 > 
-> *Excellent*.  I would love to have that funtionality.  How do you plan
-> to make available complex data structures (i.e., suppose I want
-> inode->i_ino printed out)?  I assume this will require writing some
-> "easy to generate" glue code that would presumably be some kind of
-> kernel module?  That doesn't bother me (after all that's what
-> SystemTap does), as long as generation of the glue code can be largely
-> automated ---- so that you can take something approximately like a
-> DTrace or SystemTap script, and with some perl or python helper,
-> translate it into glue code that gets compiled into a kernel module.
-> Is something like that what you have in mind?
+> they arent. To the kernel they look like function calls, with no 
+> ABI properties at all. They can and will change without notice.
 
-Yeah, we were also looking at using sparse and term rewrite systems on
-top of the regular C parse tree to generate stuff.
+Markers also "look like" function calls because they are - the
+callbacks just happen to take a format string and varargs.  What did
+you think they were?
 
+
+srostedt argues that separating the tracepoint from its rendering is
+necessary to free the instrumentation site from backward-compatibility
+stagnation.  
+
+But consider - it has been manifold stated that tracepoints are not
+welcome in the tree without a "tracer" (hand-written glue), so the
+same person ends up writing both.  Since they are tightly coupled.  a
+change on one will affect the other.  A moved tracepoint will produce
+events at different times; a lost tracepoint parameter will lose data
+at trace rendering time.  The tracing engine can only pretend to
+produce the same data by guessing.
+
+Similarly, if a marker site were to change, and if someone deemed the
+old trace data important to preserve, a hand-written marker callback
+function could replace a generic one, The new one could make the same
+heuristic adaptation.
+
+Try working out some examples.  You'll probably see how similar they
+really turn out, with respect to the hypothetical "preserve ABI" idea.
+
+- FChE
