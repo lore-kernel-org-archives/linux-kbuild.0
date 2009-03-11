@@ -1,40 +1,42 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepa.post.tele.dk ([195.41.46.235]:43147 "EHLO
-	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751928AbZCKSfj (ORCPT
+Received: from bombadil.infradead.org ([18.85.46.34]:46538 "EHLO
+	bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752619AbZCKS7q (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 11 Mar 2009 14:35:39 -0400
-Date: Wed, 11 Mar 2009 19:37:35 +0100
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH] scripts/unifdef.c: rename getline symbol to something else
-Message-ID: <20090311183735.GA2832@uranus.ravnborg.org>
-References: <20090311161733.GE5448@bombadil.infradead.org>
-Mime-Version: 1.0
+	Wed, 11 Mar 2009 14:59:46 -0400
+Date: Wed, 11 Mar 2009 14:59:42 -0400
+From: Kyle McMartin <kyle@infradead.org>
+Subject: Re: [PATCH] scripts/unifdef.c: rename getline symbol to something
+	else
+Message-ID: <20090311185942.GA11433@bombadil.infradead.org>
+References: <20090311161733.GE5448@bombadil.infradead.org> <20090311183735.GA2832@uranus.ravnborg.org>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20090311161733.GE5448@bombadil.infradead.org>
+In-Reply-To: <20090311183735.GA2832@uranus.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Kyle McMartin <kyle@infradead.org>
-Cc: linux-kernel@vger.kernel.org, jakub@redhat.com, linux-kbuild@vger.kernel.org
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: Kyle McMartin <kyle@infradead.org>, linux-kernel@vger.kernel.org, jakub@redhat.com, linux-kbuild@vger.kernel.org
 
-On Wed, Mar 11, 2009 at 12:17:33PM -0400, Kyle McMartin wrote:
-> From: Kyle McMartin <kyle@redhat.com>
+On Wed, Mar 11, 2009 at 07:37:35PM +0100, Sam Ravnborg wrote:
+> > Rawhide builds are currently failing to build unifdef.c, as the next
+> > version of glibc changes the default _POSIX_C_SOURCE level, which
+> > exposes getline() from <stdio.h>
+> > 
+> > scripts/unifdef.c:209: error: conflicting types for 'getline'
+> > /usr/include/stdio.h:653: note: previous declaration of 'getline' was
+> > here
+> > make[2]: *** [scripts/unifdef] Error 1
+> > make[1]: *** [__headers] Error 2
+> > make: *** [vmlinux] Error 2
+> > 
+> > Rename the symbol in unifdef.c to parseline to avoid this conflicting
+> > declaration.
 > 
-> Rawhide builds are currently failing to build unifdef.c, as the next
-> version of glibc changes the default _POSIX_C_SOURCE level, which
-> exposes getline() from <stdio.h>
+> I have a similar patch queued in kbuild-fixes.git.
 > 
-> scripts/unifdef.c:209: error: conflicting types for 'getline'
-> /usr/include/stdio.h:653: note: previous declaration of 'getline' was
-> here
-> make[2]: *** [scripts/unifdef] Error 1
-> make[1]: *** [__headers] Error 2
-> make: *** [vmlinux] Error 2
-> 
-> Rename the symbol in unifdef.c to parseline to avoid this conflicting
-> declaration.
 
-I have a similar patch queued in kbuild-fixes.git.
+Great, thanks. Is this going to go into the next -rc?
 
-	Sam
+regards, Kyle
