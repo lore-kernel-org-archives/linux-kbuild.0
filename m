@@ -1,159 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepb.post.tele.dk ([195.41.46.236]:57133 "EHLO
-	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751995AbZCKTWH (ORCPT
+Received: from smtp1.linux-foundation.org ([140.211.169.13]:42908 "EHLO
+	smtp1.linux-foundation.org" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1750949AbZCLHAD (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 11 Mar 2009 15:22:07 -0400
-Date: Wed, 11 Mar 2009 20:24:02 +0100
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: [GIT] kbuild
-Message-ID: <20090311192402.GA3148@uranus.ravnborg.org>
+	Thu, 12 Mar 2009 03:00:03 -0400
+Date: Wed, 11 Mar 2009 23:56:51 -0700
+From: Andrew Morton <akpm@linux-foundation.org>
+Subject: Re: [PATCH] scripts/unifdef.c: rename getline symbol to something
+ else
+Message-Id: <20090311235651.3c3fba2a.akpm@linux-foundation.org>
+In-Reply-To: <20090311185942.GA11433@bombadil.infradead.org>
+References: <20090311161733.GE5448@bombadil.infradead.org>
+	<20090311183735.GA2832@uranus.ravnborg.org>
+	<20090311185942.GA11433@bombadil.infradead.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Kyle McMartin <kyle@infradead.org>, Gilles Espinasse <g.esp@free.fr>, Josh Hunt <josh@scalex86.org>, "Justin P. Mattock" <justinmattock@gmail.com>
+To: Kyle McMartin <kyle@infradead.org>
+Cc: Sam Ravnborg <sam@ravnborg.org>, linux-kernel@vger.kernel.org, jakub@redhat.com, linux-kbuild@vger.kernel.org
 
-Hi Linus.
+On Wed, 11 Mar 2009 14:59:42 -0400 Kyle McMartin <kyle@infradead.org> wrote:
 
-A few late kbuild related fixes.
+> On Wed, Mar 11, 2009 at 07:37:35PM +0100, Sam Ravnborg wrote:
+> > > Rawhide builds are currently failing to build unifdef.c, as the next
+> > > version of glibc changes the default _POSIX_C_SOURCE level, which
+> > > exposes getline() from <stdio.h>
+> > > 
+> > > scripts/unifdef.c:209: error: conflicting types for 'getline'
+> > > /usr/include/stdio.h:653: note: previous declaration of 'getline' was
+> > > here
+> > > make[2]: *** [scripts/unifdef] Error 1
+> > > make[1]: *** [__headers] Error 2
+> > > make: *** [vmlinux] Error 2
+> > > 
+> > > Rename the symbol in unifdef.c to parseline to avoid this conflicting
+> > > declaration.
+> > 
+> > I have a similar patch queued in kbuild-fixes.git.
+> > 
+> 
+> Great, thanks. Is this going to go into the next -rc?
+> 
 
-1) Fix unidef to build on latest RAWHIDE. They have doen some changes that
-   casued unifdef to fail.
-
-2) Remove unused option to depmod. This is not fixing a real bug but
-   gives us better busybox compatibility.
-
-3) Two fixes for make rpm - it should be working again after long time
-   suffering.
-
-Please pull,
-
-	Thanks - Sam
-
-
-The following changes since commit 559595a985e106d2fa9f0c79b7f5805453fed593:
-  Linus Torvalds (1):
-        Merge branch 'merge' of git://git.kernel.org/.../benh/powerpc
-
-are available in the git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/sam/kbuild-fixes.git master
-
-Gilles Espinasse (1):
-      kbuild: remove unused -r option for module-init-tool depmod
-
-Josh Hunt (2):
-      kbuild: fix mkspec to cleanup RPM_BUILD_ROOT
-      kbuild: fix 'make rpm' when CONFIG_LOCALVERSION_AUTO=y and using SCM tree
-
-Justin P. Mattock (1):
-      kbuild: fix C libary confusion in unifdef.c due to getline()
-
- Makefile                 |   18 ++++++++++++------
- scripts/package/Makefile |    3 ++-
- scripts/package/mkspec   |    2 +-
- scripts/unifdef.c        |    6 +++---
- 4 files changed, 18 insertions(+), 11 deletions(-)
-
-Full diff for reference.
-
-diff --git a/Makefile b/Makefile
-index d04ee0a..5a5b82e 100644
---- a/Makefile
-+++ b/Makefile
-@@ -904,12 +904,18 @@ localver = $(subst $(space),, $(string) \
- # and if the SCM is know a tag from the SCM is appended.
- # The appended tag is determined by the SCM used.
- #
--# Currently, only git is supported.
--# Other SCMs can edit scripts/setlocalversion and add the appropriate
--# checks as needed.
-+# .scmversion is used when generating rpm packages so we do not loose
-+# the version information from the SCM when we do the build of the kernel
-+# from the copied source
- ifdef CONFIG_LOCALVERSION_AUTO
--	_localver-auto = $(shell $(CONFIG_SHELL) \
--	                  $(srctree)/scripts/setlocalversion $(srctree))
-+
-+ifeq ($(wildcard .scmversion),)
-+        _localver-auto = $(shell $(CONFIG_SHELL) \
-+                         $(srctree)/scripts/setlocalversion $(srctree))
-+else
-+        _localver-auto = $(shell cat .scmversion 2> /dev/null)
-+endif
-+
- 	localver-auto  = $(LOCALVERSION)$(_localver-auto)
- endif
- 
-@@ -1537,7 +1543,7 @@ quiet_cmd_depmod = DEPMOD  $(KERNELRELEASE)
-       cmd_depmod = \
- 	if [ -r System.map -a -x $(DEPMOD) ]; then                              \
- 		$(DEPMOD) -ae -F System.map                                     \
--		$(if $(strip $(INSTALL_MOD_PATH)), -b $(INSTALL_MOD_PATH) -r)   \
-+		$(if $(strip $(INSTALL_MOD_PATH)), -b $(INSTALL_MOD_PATH) )     \
- 		$(KERNELRELEASE);                                               \
- 	fi
- 
-diff --git a/scripts/package/Makefile b/scripts/package/Makefile
-index 8c6b7b0..fa4a0a1 100644
---- a/scripts/package/Makefile
-+++ b/scripts/package/Makefile
-@@ -35,9 +35,10 @@ $(objtree)/kernel.spec: $(MKSPEC) $(srctree)/Makefile
- rpm-pkg rpm: $(objtree)/kernel.spec FORCE
- 	$(MAKE) clean
- 	$(PREV) ln -sf $(srctree) $(KERNELPATH)
-+	$(CONFIG_SHELL) $(srctree)/scripts/setlocalversion > $(objtree)/.scmversion
- 	$(PREV) tar -cz $(RCS_TAR_IGNORE) -f $(KERNELPATH).tar.gz $(KERNELPATH)/.
- 	$(PREV) rm $(KERNELPATH)
--
-+	rm -f $(objtree)/.scmversion
- 	set -e; \
- 	$(CONFIG_SHELL) $(srctree)/scripts/mkversion > $(objtree)/.tmp_version
- 	set -e; \
-diff --git a/scripts/package/mkspec b/scripts/package/mkspec
-index ee448cd..3d93f8c 100755
---- a/scripts/package/mkspec
-+++ b/scripts/package/mkspec
-@@ -96,7 +96,7 @@ echo "%endif"
- 
- echo ""
- echo "%clean"
--echo '#echo -rf $RPM_BUILD_ROOT'
-+echo 'rm -rf $RPM_BUILD_ROOT'
- echo ""
- echo "%files"
- echo '%defattr (-, root, root)'
-diff --git a/scripts/unifdef.c b/scripts/unifdef.c
-index 552025e..05a31a6 100644
---- a/scripts/unifdef.c
-+++ b/scripts/unifdef.c
-@@ -206,7 +206,7 @@ static void             done(void);
- static void             error(const char *);
- static int              findsym(const char *);
- static void             flushline(bool);
--static Linetype         getline(void);
-+static Linetype         get_line(void);
- static Linetype         ifeval(const char **);
- static void             ignoreoff(void);
- static void             ignoreon(void);
-@@ -512,7 +512,7 @@ process(void)
- 
- 	for (;;) {
- 		linenum++;
--		lineval = getline();
-+		lineval = get_line();
- 		trans_table[ifstate[depth]][lineval]();
- 		debug("process %s -> %s depth %d",
- 		    linetype_name[lineval],
-@@ -526,7 +526,7 @@ process(void)
-  * help from skipcomment().
-  */
- static Linetype
--getline(void)
-+get_line(void)
- {
- 	const char *cp;
- 	int cursym;
+I was going to put it into 2.6.29 but Sam stole it :)
