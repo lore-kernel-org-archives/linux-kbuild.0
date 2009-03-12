@@ -1,18 +1,19 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ew0-f164.google.com ([209.85.219.164]:39279 "EHLO
+Received: from mail-ew0-f164.google.com ([209.85.219.164]:49829 "EHLO
 	mail-ew0-f164.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755178AbZCLNnS (ORCPT
+	with ESMTP id S1755202AbZCLNnU (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 12 Mar 2009 09:43:18 -0400
-Received: by mail-ew0-f164.google.com with SMTP id 8so337400ewy.13
-        for <linux-kbuild@vger.kernel.org>; Thu, 12 Mar 2009 06:43:16 -0700 (PDT)
+	Thu, 12 Mar 2009 09:43:20 -0400
+Received: by mail-ew0-f164.google.com with SMTP id 8so337415ewy.13
+        for <linux-kbuild@vger.kernel.org>; Thu, 12 Mar 2009 06:43:19 -0700 (PDT)
 From: Remis Lima Baima <remis.developer@googlemail.com>
-Subject: [PATCH 2/3] Apply generic headers for x86
-Date: Thu, 12 Mar 2009 14:43:07 +0100
-Message-Id: <1236865388-31590-3-git-send-email-remis.developer@googlemail.com>
-In-Reply-To: <1236865388-31590-2-git-send-email-remis.developer@googlemail.com>
+Subject: [PATCH 3/3] Apply generic headers for PPC
+Date: Thu, 12 Mar 2009 14:43:08 +0100
+Message-Id: <1236865388-31590-4-git-send-email-remis.developer@googlemail.com>
+In-Reply-To: <1236865388-31590-3-git-send-email-remis.developer@googlemail.com>
 References: <1236865388-31590-1-git-send-email-remis.developer@googlemail.com>
  <1236865388-31590-2-git-send-email-remis.developer@googlemail.com>
+ <1236865388-31590-3-git-send-email-remis.developer@googlemail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
@@ -21,108 +22,104 @@ Cc: Remis Lima Baima <remis.developer@googlemail.com>
 This patch depends on patch d8b392b37469f570bd180f37be783367259f1d4b
 ("Create the infrastructure for generic headers").
 
-Remove the dummy arch/x86/include/asm/XXX.h files.
+Remove the dummy arch/powerpc/include/asm/XXX.h files.
 
-Add in the arch/x86/include/asm/Kbuild file the variable generic-y
-with the names of the removed arch/x86/include/asm/XXX.h files.
+Add in the arch/powerpc/include/asm/Kbuild file the variable generic-y
+with the names of the removed arch/powerpc/include/asm/XXX.h files.
 
 The removed files will be automatically generated during the build
 process by the script scripts/Makefile.genericheaders.
 
 Signed-off-by: Remis Lima Baima <remis.developer@googlemail.com>
 ---
- arch/x86/include/asm/Kbuild     |    9 +++++++++
- arch/x86/include/asm/cputime.h  |    1 -
- arch/x86/include/asm/errno.h    |    1 -
- arch/x86/include/asm/fcntl.h    |    1 -
- arch/x86/include/asm/ioctl.h    |    1 -
- arch/x86/include/asm/poll.h     |    1 -
- arch/x86/include/asm/resource.h |    1 -
- arch/x86/include/asm/rtc.h      |    1 -
- arch/x86/include/asm/sections.h |    1 -
- 9 files changed, 9 insertions(+), 8 deletions(-)
- delete mode 100644 arch/x86/include/asm/cputime.h
- delete mode 100644 arch/x86/include/asm/errno.h
- delete mode 100644 arch/x86/include/asm/fcntl.h
- delete mode 100644 arch/x86/include/asm/ioctl.h
- delete mode 100644 arch/x86/include/asm/poll.h
- delete mode 100644 arch/x86/include/asm/resource.h
- delete mode 100644 arch/x86/include/asm/rtc.h
- delete mode 100644 arch/x86/include/asm/sections.h
+ arch/powerpc/include/asm/Kbuild              |    8 ++++++++
+ arch/powerpc/include/asm/div64.h             |    1 -
+ arch/powerpc/include/asm/emergency-restart.h |    1 -
+ arch/powerpc/include/asm/irq_regs.h          |    2 --
+ arch/powerpc/include/asm/poll.h              |    1 -
+ arch/powerpc/include/asm/resource.h          |    1 -
+ arch/powerpc/include/asm/statfs.h            |    6 ------
+ arch/powerpc/include/asm/xor.h               |    1 -
+ 8 files changed, 8 insertions(+), 13 deletions(-)
+ delete mode 100644 arch/powerpc/include/asm/div64.h
+ delete mode 100644 arch/powerpc/include/asm/emergency-restart.h
+ delete mode 100644 arch/powerpc/include/asm/irq_regs.h
+ delete mode 100644 arch/powerpc/include/asm/poll.h
+ delete mode 100644 arch/powerpc/include/asm/resource.h
+ delete mode 100644 arch/powerpc/include/asm/statfs.h
+ delete mode 100644 arch/powerpc/include/asm/xor.h
 
-diff --git a/arch/x86/include/asm/Kbuild b/arch/x86/include/asm/Kbuild
-index 4a8e80c..ae936b1 100644
---- a/arch/x86/include/asm/Kbuild
-+++ b/arch/x86/include/asm/Kbuild
-@@ -22,3 +22,12 @@ unifdef-y += unistd_32.h
- unifdef-y += unistd_64.h
- unifdef-y += vm86.h
- unifdef-y += vsyscall.h
+diff --git a/arch/powerpc/include/asm/Kbuild b/arch/powerpc/include/asm/Kbuild
+index 5ab7d7f..8eea68e 100644
+--- a/arch/powerpc/include/asm/Kbuild
++++ b/arch/powerpc/include/asm/Kbuild
+@@ -35,3 +35,11 @@ unifdef-y += spu_info.h
+ unifdef-y += termios.h
+ unifdef-y += types.h
+ unifdef-y += unistd.h
 +
-+generic-y += cputime.h
-+generic-y += errno.h
-+generic-y += fcntl.h
-+generic-y += ioctl.h
++generic-y += div64.h
++generic-y += emergency-restart.h
++generic-y += irq_regs.h
 +generic-y += poll.h
 +generic-y += resource.h
-+generic-y += rtc.h
-+generic-y += sections.h
-diff --git a/arch/x86/include/asm/cputime.h b/arch/x86/include/asm/cputime.h
++generic-y += statfs.h
++generic-y += xor.h
+diff --git a/arch/powerpc/include/asm/div64.h b/arch/powerpc/include/asm/div64.h
 deleted file mode 100644
-index 6d68ad7..0000000
---- a/arch/x86/include/asm/cputime.h
+index 6cd978c..0000000
+--- a/arch/powerpc/include/asm/div64.h
 +++ /dev/null
 @@ -1 +0,0 @@
--#include <asm-generic/cputime.h>
-diff --git a/arch/x86/include/asm/errno.h b/arch/x86/include/asm/errno.h
+-#include <asm-generic/div64.h>
+diff --git a/arch/powerpc/include/asm/emergency-restart.h b/arch/powerpc/include/asm/emergency-restart.h
 deleted file mode 100644
-index 4c82b50..0000000
---- a/arch/x86/include/asm/errno.h
+index 3711bd9..0000000
+--- a/arch/powerpc/include/asm/emergency-restart.h
 +++ /dev/null
 @@ -1 +0,0 @@
--#include <asm-generic/errno.h>
-diff --git a/arch/x86/include/asm/fcntl.h b/arch/x86/include/asm/fcntl.h
+-#include <asm-generic/emergency-restart.h>
+diff --git a/arch/powerpc/include/asm/irq_regs.h b/arch/powerpc/include/asm/irq_regs.h
 deleted file mode 100644
-index 46ab12d..0000000
---- a/arch/x86/include/asm/fcntl.h
+index ba94b51..0000000
+--- a/arch/powerpc/include/asm/irq_regs.h
 +++ /dev/null
-@@ -1 +0,0 @@
--#include <asm-generic/fcntl.h>
-diff --git a/arch/x86/include/asm/ioctl.h b/arch/x86/include/asm/ioctl.h
-deleted file mode 100644
-index b279fe0..0000000
---- a/arch/x86/include/asm/ioctl.h
-+++ /dev/null
-@@ -1 +0,0 @@
--#include <asm-generic/ioctl.h>
-diff --git a/arch/x86/include/asm/poll.h b/arch/x86/include/asm/poll.h
+@@ -1,2 +0,0 @@
+-#include <asm-generic/irq_regs.h>
+-
+diff --git a/arch/powerpc/include/asm/poll.h b/arch/powerpc/include/asm/poll.h
 deleted file mode 100644
 index c98509d..0000000
---- a/arch/x86/include/asm/poll.h
+--- a/arch/powerpc/include/asm/poll.h
 +++ /dev/null
 @@ -1 +0,0 @@
 -#include <asm-generic/poll.h>
-diff --git a/arch/x86/include/asm/resource.h b/arch/x86/include/asm/resource.h
+diff --git a/arch/powerpc/include/asm/resource.h b/arch/powerpc/include/asm/resource.h
 deleted file mode 100644
 index 04bc4db..0000000
---- a/arch/x86/include/asm/resource.h
+--- a/arch/powerpc/include/asm/resource.h
 +++ /dev/null
 @@ -1 +0,0 @@
 -#include <asm-generic/resource.h>
-diff --git a/arch/x86/include/asm/rtc.h b/arch/x86/include/asm/rtc.h
+diff --git a/arch/powerpc/include/asm/statfs.h b/arch/powerpc/include/asm/statfs.h
 deleted file mode 100644
-index f71c3b0..0000000
---- a/arch/x86/include/asm/rtc.h
+index 5244834..0000000
+--- a/arch/powerpc/include/asm/statfs.h
++++ /dev/null
+@@ -1,6 +0,0 @@
+-#ifndef _ASM_POWERPC_STATFS_H
+-#define _ASM_POWERPC_STATFS_H
+-
+-#include <asm-generic/statfs.h>
+-
+-#endif
+diff --git a/arch/powerpc/include/asm/xor.h b/arch/powerpc/include/asm/xor.h
+deleted file mode 100644
+index c82eb12..0000000
+--- a/arch/powerpc/include/asm/xor.h
 +++ /dev/null
 @@ -1 +0,0 @@
--#include <asm-generic/rtc.h>
-diff --git a/arch/x86/include/asm/sections.h b/arch/x86/include/asm/sections.h
-deleted file mode 100644
-index 2b8c516..0000000
---- a/arch/x86/include/asm/sections.h
-+++ /dev/null
-@@ -1 +0,0 @@
--#include <asm-generic/sections.h>
+-#include <asm-generic/xor.h>
 -- 
 1.5.6.3
 
