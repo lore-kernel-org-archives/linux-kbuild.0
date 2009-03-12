@@ -1,47 +1,34 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp1.linux-foundation.org ([140.211.169.13]:42908 "EHLO
-	smtp1.linux-foundation.org" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1750949AbZCLHAD (ORCPT
+Received: from pfepa.post.tele.dk ([195.41.46.235]:40903 "EHLO
+	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755687AbZCLMT5 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 12 Mar 2009 03:00:03 -0400
-Date: Wed, 11 Mar 2009 23:56:51 -0700
-From: Andrew Morton <akpm@linux-foundation.org>
-Subject: Re: [PATCH] scripts/unifdef.c: rename getline symbol to something
- else
-Message-Id: <20090311235651.3c3fba2a.akpm@linux-foundation.org>
-In-Reply-To: <20090311185942.GA11433@bombadil.infradead.org>
-References: <20090311161733.GE5448@bombadil.infradead.org>
-	<20090311183735.GA2832@uranus.ravnborg.org>
-	<20090311185942.GA11433@bombadil.infradead.org>
+	Thu, 12 Mar 2009 08:19:57 -0400
+Received: from ravnborg.org (x1-6-00-1e-2a-84-ae-3e.k225.webspeed.dk [80.163.61.94])
+	by pfepa.post.tele.dk (Postfix) with ESMTP id 1BAD9A50056
+	for <linux-kbuild@vger.kernel.org>; Thu, 12 Mar 2009 13:19:54 +0100 (CET)
+Date: Thu, 12 Mar 2009 13:21:54 +0100
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: No kbuild stuff planned for next merge window
+Message-ID: <20090312122154.GA10574@uranus.ravnborg.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Kyle McMartin <kyle@infradead.org>
-Cc: Sam Ravnborg <sam@ravnborg.org>, linux-kernel@vger.kernel.org, jakub@redhat.com, linux-kbuild@vger.kernel.org
+To: linux-kbuild <linux-kbuild@vger.kernel.org>
 
-On Wed, 11 Mar 2009 14:59:42 -0400 Kyle McMartin <kyle@infradead.org> wrote:
+Hi all.
 
-> On Wed, Mar 11, 2009 at 07:37:35PM +0100, Sam Ravnborg wrote:
-> > > Rawhide builds are currently failing to build unifdef.c, as the next
-> > > version of glibc changes the default _POSIX_C_SOURCE level, which
-> > > exposes getline() from <stdio.h>
-> > > 
-> > > scripts/unifdef.c:209: error: conflicting types for 'getline'
-> > > /usr/include/stdio.h:653: note: previous declaration of 'getline' was
-> > > here
-> > > make[2]: *** [scripts/unifdef] Error 1
-> > > make[1]: *** [__headers] Error 2
-> > > make: *** [vmlinux] Error 2
-> > > 
-> > > Rename the symbol in unifdef.c to parseline to avoid this conflicting
-> > > declaration.
-> > 
-> > I have a similar patch queued in kbuild-fixes.git.
-> > 
-> 
-> Great, thanks. Is this going to go into the next -rc?
-> 
+I have a few patches saved away but due to lack of time
+and on top of this some HW troubles I have not had time
+to review and accumulate stuff for the upcoming merge
+window.
 
-I was going to put it into 2.6.29 but Sam stole it :)
+So kbuild-next.git is empty for the moment.
+
+If you have submitted a patch that you really think should
+be in 2.6.30 then please let me know and I will try
+to find time to look at it.
+
+	Sam
