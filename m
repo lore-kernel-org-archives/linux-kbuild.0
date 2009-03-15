@@ -1,85 +1,105 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from out1.smtp.messagingengine.com ([66.111.4.25]:41785 "EHLO
-	out1.smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1752373AbZCOVre convert rfc822-to-8bit
-	(ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 15 Mar 2009 17:47:34 -0400
-Message-Id: <1237153649.32747.1305532855@webmail.messagingengine.com>
-From: "Alexander van Heukelum" <heukelum@fastmail.fm>
-Content-Disposition: inline
-Content-Transfer-Encoding: 8BIT
-Content-Type: text/plain; charset="UTF-8"
-MIME-Version: 1.0
-References: <20090315102341.GA6051@uranus.ravnborg.org>
- <20090315102856.GB6292@uranus.ravnborg.org>
- <10f740e80903150353i233d0da5rabde6e97607e3435@mail.gmail.com>
- <20090315130930.GA7146@uranus.ravnborg.org>
- <20090315185406.GA19737@elte.hu>
+Received: from pfepb.post.tele.dk ([195.41.46.236]:59013 "EHLO
+	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753811AbZCOWBc (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 15 Mar 2009 18:01:32 -0400
+Date: Sun, 15 Mar 2009 23:03:28 +0100
+From: Sam Ravnborg <sam@ravnborg.org>
 Subject: Re: [PATCH 2/2] kconfig: improve seed in randconfig
-In-Reply-To: <20090315185406.GA19737@elte.hu>
-Date: Sun, 15 Mar 2009 22:47:29 +0100
+Message-ID: <20090315220328.GA10923@uranus.ravnborg.org>
+References: <20090315102341.GA6051@uranus.ravnborg.org> <20090315102856.GB6292@uranus.ravnborg.org> <10f740e80903150353i233d0da5rabde6e97607e3435@mail.gmail.com> <20090315130930.GA7146@uranus.ravnborg.org> <20090315185406.GA19737@elte.hu> <1237153649.32747.1305532855@webmail.messagingengine.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <1237153649.32747.1305532855@webmail.messagingengine.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ingo Molnar <mingo@elte.hu>, Sam Ravnborg <sam@ravnborg.org>
-Cc: Geert Uytterhoeven <geert@linux-m68k.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Roman Zippel <zippel@linux-m68k.org>
+To: Alexander van Heukelum <heukelum@fastmail.fm>
+Cc: Ingo Molnar <mingo@elte.hu>, Geert Uytterhoeven <geert@linux-m68k.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Roman Zippel <zippel@linux-m68k.org>
 
-
-On Sun, 15 Mar 2009 19:54:07 +0100, "Ingo Molnar" <mingo@elte.hu> said:
+> > 
+> >  � � � � seed = (unsigned int)((now.tv_sec+1)*(now.tv_usec+1));
+> > 
+> > ought to settle any practical doubts.
 > 
-> * Sam Ravnborg <sam@ravnborg.org> wrote:
+> Or maybe (and I think better...)
 > 
-> > On Sun, Mar 15, 2009 at 11:53:03AM +0100, Geert Uytterhoeven wrote:
-> > > On Sun, Mar 15, 2009 at 11:28, Sam Ravnborg <sam@ravnborg.org> wrote:
-> > > > 'make randconfig' uses glibc's rand function, and the seed of
-> > > > that PRNG is set via:
-> > > >
-> > > >                        srand(time(NULL));
-> > > >
-> > > > But 'time()' only increases once every second - freezing the
-> > > > randconfig result within a single second.
-> > > >
-> > > > My Nehalem testbox does randconfig much faster than 1 second
-> > > >  and i have a few scripts that do 'randconfig until condition X'
-> > > > loops.
-> > > >
-> > > > Those scripts currently waste a lot of CPU time due to randconfig
-> > > > changing its seed only once per second currently.
-> > > >
-> > > > Change the seed to be micrseconds based. (I checked the statistical
-> > > > spread of the seed - the now.tv_sec*now.tv_usec multiplication
-> > > > there further improves it.)
-> > > 
-> > > > +                       gettimeofday(&now, NULL);
-> > > > +
-> > > > +                       seed = (unsigned int)(now.tv_sec*now.tv_usec);
-> > > 
-> > > Just wondering: may there be some platforms that don't offer microsecond
-> > > resolution, and tv_usec is always zero?
-> > That would indeed be bad for the seed.
-> > Googling did not turn up anything.
-> 
-> doing:
-> 
->          seed = (unsigned int)((now.tv_sec+1)*(now.tv_usec+1));
-> 
-> ought to settle any practical doubts.
+>     seed = (unsigned int)(now.tv_sec ^ now.tv_usec);
 
-Or maybe (and I think better...)
+Maybe better - but the one suggested by Ingo is more intuitive,
+and is what I implmented already.
 
-    seed = (unsigned int)(now.tv_sec ^ now.tv_usec);
+I have pushed out the following patch.
 
-Greetings,
-    Alexander
+[And I know it breaks the 80 char limit].
 
-> 	Ing
+	Sam
 
-o :)
+commit b0fe551000179c868d46266278a890eab878baca
+Author: Ingo Molnar <mingo@elte.hu>
+Date:   Thu Mar 12 15:15:31 2009 +0100
 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kernel"
-> in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> Please read the FAQ at  http://www.tux.org/lkml/
-> 
-> 
+    kconfig: improve seed in randconfig
+    
+    'make randconfig' uses glibc's rand function, and the seed of
+    that PRNG is set via:
+    
+    			srand(time(NULL));
+    
+    But 'time()' only increases once every second - freezing the
+    randconfig result within a single second.
+    
+    My Nehalem testbox does randconfig much faster than 1 second
+     and i have a few scripts that do 'randconfig until condition X'
+    loops.
+    
+    Those scripts currently waste a lot of CPU time due to randconfig
+    changing its seed only once per second currently.
+    
+    Change the seed to be micrseconds based. (I checked the statistical
+    spread of the seed - the now.tv_sec*now.tv_usec multiplication
+    there further improves it.)
+    
+    Signed-off-by: Ingo Molnar <mingo@elte.hu>
+    Cc: Roman Zippel <zippel@linux-m68k.org>
+    [sam: fix for systems where usec is zero - noticed by Geert Uytterhoeven]
+    Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
+
+diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
+index 3e1057f..d190092 100644
+--- a/scripts/kconfig/conf.c
++++ b/scripts/kconfig/conf.c
+@@ -11,6 +11,7 @@
+ #include <time.h>
+ #include <unistd.h>
+ #include <sys/stat.h>
++#include <sys/time.h>
+ 
+ #define LKC_DIRECT_LINK
+ #include "lkc.h"
+@@ -464,9 +465,22 @@ int main(int ac, char **av)
+ 			input_mode = set_yes;
+ 			break;
+ 		case 'r':
++		{
++			struct timeval now;
++			unsigned int seed;
++
++			/*
++			 * Use microseconds derived seed,
++			 * compensate for systems where it may be zero
++			 */
++			gettimeofday(&now, NULL);
++
++			seed = (unsigned int)((now.tv_sec + 1) * (now.tv_usec + 1));
++			srand(seed);
++
+ 			input_mode = set_random;
+-			srand(time(NULL));
+ 			break;
++		}
+ 		case 'h':
+ 			printf(_("See README for usage info\n"));
+ 			exit(0);
