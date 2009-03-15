@@ -1,56 +1,122 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepb.post.tele.dk ([195.41.46.236]:35298 "EHLO
-	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753652AbZCOKVp (ORCPT
+Received: from pfepa.post.tele.dk ([195.41.46.235]:43822 "EHLO
+	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753652AbZCOK0N (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 15 Mar 2009 06:21:45 -0400
-Date: Sun, 15 Mar 2009 11:23:41 +0100
+	Sun, 15 Mar 2009 06:26:13 -0400
+Date: Sun, 15 Mar 2009 11:28:12 +0100
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: kconfig - fix randconfig
-Message-ID: <20090315102341.GA6051@uranus.ravnborg.org>
+Subject: [PATCH 1/2] kconfig: fix randconfig for choice blocks
+Message-ID: <20090315102812.GA6292@uranus.ravnborg.org>
+References: <20090315102341.GA6051@uranus.ravnborg.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <20090315102341.GA6051@uranus.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
 Cc: Roman Zippel <zippel@linux-m68k.org>, Ingo Molnar <mingo@elte.hu>
 
-kconfig failed to generate random values for choice values in
-a choice block thus limiting the effect of builds based on randconfig
-generated configs.
+Ingo Molnar reported that 'make randconfig' was not covering
+choice blocks properly, resulting in certain config options
+being left out of randconfig testing altogether.
 
-To test this I used this small config:
+With the following patch we:
+- properly randomize choice value for normal choice blocks
+- properly randomize for multi choice blocks
+- added several comments to explain what is going on
 
-config MOD
-	def_bool n
-	option modules
+The root cause of the bug was that SYMBOL_VALID was set on the
+symbol representing the choice block so clearing this did
+the trick initially.
+But testign revealed a few more issues that is now fixed.
 
-choice CHOICE
-        prompt "ABCD Choice"
-        default A
+Reported-by: Ingo Molnar <mingo@elte.hu>
+Cc: Ingo Molnar <mingo@elte.hu>
+Cc: Roman Zippel <zippel@linux-m68k.org>
+Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
+---
+ scripts/kconfig/confdata.c |   51 +++++++++++++++++++++++++++++++-------------
+ 1 files changed, 36 insertions(+), 15 deletions(-)
 
-config A
-        tristate "A"
+diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
+index 830d9ea..273d738 100644
+--- a/scripts/kconfig/confdata.c
++++ b/scripts/kconfig/confdata.c
+@@ -843,7 +843,7 @@ void conf_set_all_new_symbols(enum conf_def_mode mode)
+ 			default:
+ 				continue;
+ 			}
+-			if (!sym_is_choice(sym) || mode != def_random)
++			if (!(sym_is_choice(sym) && mode == def_random))
+ 				sym->flags |= SYMBOL_DEF_USER;
+ 			break;
+ 		default:
+@@ -856,28 +856,49 @@ void conf_set_all_new_symbols(enum conf_def_mode mode)
+ 
+ 	if (mode != def_random)
+ 		return;
+-
++	/*
++	 * We have different type of choice blocks.
++	 * If curr.tri equal to mod then we can select several
++	 * choice symbols in one block.
++	 * In this case we do nothing.
++	 * If curr.tri equal yes then only one symbol can be
++	 * selected in a choice block and we set it to yes,
++	 * and the rest to no.
++	 */
+ 	for_all_symbols(i, csym) {
+ 		if (sym_has_value(csym) || !sym_is_choice(csym))
+ 			continue;
+ 
+ 		sym_calc_value(csym);
++
++		if (csym->curr.tri != yes)
++			continue;
++
+ 		prop = sym_get_choice_prop(csym);
+-		def = -1;
+-		while (1) {
+-			cnt = 0;
+-			expr_list_for_each_sym(prop->expr, e, sym) {
+-				if (sym->visible == no)
+-					continue;
+-				if (def == cnt++) {
+-					csym->def[S_DEF_USER].val = sym;
+-					break;
+-				}
++
++		/* count entries in choice block */
++		cnt = 0;
++		expr_list_for_each_sym(prop->expr, e, sym)
++			cnt++;
++
++		/*
++		 * find a random value and set it to yes,
++		 * set the rest to no so we have only one set
++		 */
++		def = (rand() % cnt);
++
++		cnt = 0;
++		expr_list_for_each_sym(prop->expr, e, sym) {
++			if (def == cnt++) {
++				sym->def[S_DEF_USER].tri = yes;
++				csym->def[S_DEF_USER].val = sym;
++			}
++			else {
++				sym->def[S_DEF_USER].tri = no;
+ 			}
+-			if (def >= 0 || cnt < 2)
+-				break;
+-			def = (rand() % cnt) + 1;
+ 		}
+ 		csym->flags |= SYMBOL_DEF_USER;
++		/* clear VALID to get value calculated */
++		csym->flags &= ~(SYMBOL_VALID);
+ 	}
+ }
+-- 
+1.6.0.2.GIT
 
-config B
-        tristate "B"
-
-config C
-        tristate "C"
-
-config D
-        tristate "D"
-
-endchoice
-
-With the fix applied we now distribute the values more or
-less even among the choice symbols.
-And if MOD is enabled then we have several entries enabled.
-
-Furhtermore calling randconfig several times in row made it
-generate the same config as it used a second based seed.
-
-Two patches follows - they are also at kfixes.git
-
-	Sam
