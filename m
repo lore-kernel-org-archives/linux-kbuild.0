@@ -1,105 +1,19 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepb.post.tele.dk ([195.41.46.236]:59013 "EHLO
-	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753811AbZCOWBc (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 15 Mar 2009 18:01:32 -0400
-Date: Sun, 15 Mar 2009 23:03:28 +0100
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH 2/2] kconfig: improve seed in randconfig
-Message-ID: <20090315220328.GA10923@uranus.ravnborg.org>
-References: <20090315102341.GA6051@uranus.ravnborg.org> <20090315102856.GB6292@uranus.ravnborg.org> <10f740e80903150353i233d0da5rabde6e97607e3435@mail.gmail.com> <20090315130930.GA7146@uranus.ravnborg.org> <20090315185406.GA19737@elte.hu> <1237153649.32747.1305532855@webmail.messagingengine.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <1237153649.32747.1305532855@webmail.messagingengine.com>
+Received: from host152-247-static.28-79-b.business.telecomitalia.it ([79.28.247.152]:3362
+	"HELO host152-247-static.28-79-b.business.telecomitalia.it"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with SMTP
+	id S1751729AbZCPJmC (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 16 Mar 2009 05:42:02 -0400
+Message-ID: <20090316103825.6050905@gigared.com>
+Date: Mon, 16 Mar 2009 10:38:25 +0100
+From: "Minna" <tlpeturs@gigared.com>
+MIME-Version: 1.0
+Subject: Is it everything okay?
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Alexander van Heukelum <heukelum@fastmail.fm>
-Cc: Ingo Molnar <mingo@elte.hu>, Geert Uytterhoeven <geert@linux-m68k.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Roman Zippel <zippel@linux-m68k.org>
+To: linux-kbuild@vger.kernel.org
 
-> > 
-> >          seed = (unsigned int)((now.tv_sec+1)*(now.tv_usec+1));
-> > 
-> > ought to settle any practical doubts.
-> 
-> Or maybe (and I think better...)
-> 
->     seed = (unsigned int)(now.tv_sec ^ now.tv_usec);
+Is it truth? http://sxli.bestbreakingfree.com
 
-Maybe better - but the one suggested by Ingo is more intuitive,
-and is what I implmented already.
-
-I have pushed out the following patch.
-
-[And I know it breaks the 80 char limit].
-
-	Sam
-
-commit b0fe551000179c868d46266278a890eab878baca
-Author: Ingo Molnar <mingo@elte.hu>
-Date:   Thu Mar 12 15:15:31 2009 +0100
-
-    kconfig: improve seed in randconfig
-    
-    'make randconfig' uses glibc's rand function, and the seed of
-    that PRNG is set via:
-    
-    			srand(time(NULL));
-    
-    But 'time()' only increases once every second - freezing the
-    randconfig result within a single second.
-    
-    My Nehalem testbox does randconfig much faster than 1 second
-     and i have a few scripts that do 'randconfig until condition X'
-    loops.
-    
-    Those scripts currently waste a lot of CPU time due to randconfig
-    changing its seed only once per second currently.
-    
-    Change the seed to be micrseconds based. (I checked the statistical
-    spread of the seed - the now.tv_sec*now.tv_usec multiplication
-    there further improves it.)
-    
-    Signed-off-by: Ingo Molnar <mingo@elte.hu>
-    Cc: Roman Zippel <zippel@linux-m68k.org>
-    [sam: fix for systems where usec is zero - noticed by Geert Uytterhoeven]
-    Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
-
-diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
-index 3e1057f..d190092 100644
---- a/scripts/kconfig/conf.c
-+++ b/scripts/kconfig/conf.c
-@@ -11,6 +11,7 @@
- #include <time.h>
- #include <unistd.h>
- #include <sys/stat.h>
-+#include <sys/time.h>
- 
- #define LKC_DIRECT_LINK
- #include "lkc.h"
-@@ -464,9 +465,22 @@ int main(int ac, char **av)
- 			input_mode = set_yes;
- 			break;
- 		case 'r':
-+		{
-+			struct timeval now;
-+			unsigned int seed;
-+
-+			/*
-+			 * Use microseconds derived seed,
-+			 * compensate for systems where it may be zero
-+			 */
-+			gettimeofday(&now, NULL);
-+
-+			seed = (unsigned int)((now.tv_sec + 1) * (now.tv_usec + 1));
-+			srand(seed);
-+
- 			input_mode = set_random;
--			srand(time(NULL));
- 			break;
-+		}
- 		case 'h':
- 			printf(_("See README for usage info\n"));
- 			exit(0);
