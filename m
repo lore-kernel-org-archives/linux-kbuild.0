@@ -1,105 +1,168 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ew0-f165.google.com ([209.85.219.165]:60623 "EHLO
-	mail-ew0-f165.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751685AbZCRRPG (ORCPT
+Received: from pfepb.post.tele.dk ([195.41.46.236]:45625 "EHLO
+	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751184AbZCRTdO (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 18 Mar 2009 13:15:06 -0400
-Received: by ewy9 with SMTP id 9so122750ewy.37
-        for <linux-kbuild@vger.kernel.org>; Wed, 18 Mar 2009 10:15:03 -0700 (PDT)
-From: Remis Lima Baima <remis.developer@googlemail.com>
-Subject: [PATCH 2/2] Apply generic headers for x86
-Date: Wed, 18 Mar 2009 18:08:35 +0100
-Message-Id: <1237396115-28674-3-git-send-email-remis.developer@googlemail.com>
-In-Reply-To: <1237396115-28674-2-git-send-email-remis.developer@googlemail.com>
-References: <20090312153150.GA11875@uranus.ravnborg.org>
- <1237396115-28674-1-git-send-email-remis.developer@googlemail.com>
- <1237396115-28674-2-git-send-email-remis.developer@googlemail.com>
+	Wed, 18 Mar 2009 15:33:14 -0400
+Date: Wed, 18 Mar 2009 20:35:11 +0100
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: [GIT] kbuild
+Message-ID: <20090318193511.GA14621@uranus.ravnborg.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: sam@ravnborg.org
-Cc: linux-kbuild@vger.kernel.org, Remis Lima Baima <remis.developer@googlemail.com>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Roman Zippel <zippel@linux-m68k.org>, Ingo Molnar <mingo@elte.hu>
 
-This patch depends on patch 7354857901f03bd27db16bf8c34958dd1673a95a
-("Create the infrastructure for generic headers").
+Fix the following issues:
 
-Remove the dummy arch/x86/include/asm/XXX.h files.
+o 'make randconfig' failed to generate random values for choices
+  thus letting several build-time bugs slip through the randconfig
+  based testing in tip - and likely for others doing builds based
+  on randconfig too
 
-Signed-off-by: Remis Lima Baima <remis.developer@googlemail.com>
----
- arch/x86/include/asm/cputime.h  |    1 -
- arch/x86/include/asm/errno.h    |    1 -
- arch/x86/include/asm/fcntl.h    |    1 -
- arch/x86/include/asm/ioctl.h    |    1 -
- arch/x86/include/asm/poll.h     |    1 -
- arch/x86/include/asm/resource.h |    1 -
- arch/x86/include/asm/rtc.h      |    1 -
- arch/x86/include/asm/sections.h |    1 -
- 8 files changed, 0 insertions(+), 8 deletions(-)
- delete mode 100644 arch/x86/include/asm/cputime.h
- delete mode 100644 arch/x86/include/asm/errno.h
- delete mode 100644 arch/x86/include/asm/fcntl.h
- delete mode 100644 arch/x86/include/asm/ioctl.h
- delete mode 100644 arch/x86/include/asm/poll.h
- delete mode 100644 arch/x86/include/asm/resource.h
- delete mode 100644 arch/x86/include/asm/rtc.h
- delete mode 100644 arch/x86/include/asm/sections.h
+  This fix is not a minimal fix - some effort were put into making
+  the code more strightforward and a few comments was added in the
+  process.
 
-diff --git a/arch/x86/include/asm/cputime.h b/arch/x86/include/asm/cputime.h
-deleted file mode 100644
-index 6d68ad7..0000000
---- a/arch/x86/include/asm/cputime.h
-+++ /dev/null
-@@ -1 +0,0 @@
--#include <asm-generic/cputime.h>
-diff --git a/arch/x86/include/asm/errno.h b/arch/x86/include/asm/errno.h
-deleted file mode 100644
-index 4c82b50..0000000
---- a/arch/x86/include/asm/errno.h
-+++ /dev/null
-@@ -1 +0,0 @@
--#include <asm-generic/errno.h>
-diff --git a/arch/x86/include/asm/fcntl.h b/arch/x86/include/asm/fcntl.h
-deleted file mode 100644
-index 46ab12d..0000000
---- a/arch/x86/include/asm/fcntl.h
-+++ /dev/null
-@@ -1 +0,0 @@
--#include <asm-generic/fcntl.h>
-diff --git a/arch/x86/include/asm/ioctl.h b/arch/x86/include/asm/ioctl.h
-deleted file mode 100644
-index b279fe0..0000000
---- a/arch/x86/include/asm/ioctl.h
-+++ /dev/null
-@@ -1 +0,0 @@
--#include <asm-generic/ioctl.h>
-diff --git a/arch/x86/include/asm/poll.h b/arch/x86/include/asm/poll.h
-deleted file mode 100644
-index c98509d..0000000
---- a/arch/x86/include/asm/poll.h
-+++ /dev/null
-@@ -1 +0,0 @@
--#include <asm-generic/poll.h>
-diff --git a/arch/x86/include/asm/resource.h b/arch/x86/include/asm/resource.h
-deleted file mode 100644
-index 04bc4db..0000000
---- a/arch/x86/include/asm/resource.h
-+++ /dev/null
-@@ -1 +0,0 @@
--#include <asm-generic/resource.h>
-diff --git a/arch/x86/include/asm/rtc.h b/arch/x86/include/asm/rtc.h
-deleted file mode 100644
-index f71c3b0..0000000
---- a/arch/x86/include/asm/rtc.h
-+++ /dev/null
-@@ -1 +0,0 @@
--#include <asm-generic/rtc.h>
-diff --git a/arch/x86/include/asm/sections.h b/arch/x86/include/asm/sections.h
-deleted file mode 100644
-index 2b8c516..0000000
---- a/arch/x86/include/asm/sections.h
-+++ /dev/null
-@@ -1 +0,0 @@
--#include <asm-generic/sections.h>
--- 
-1.5.6.3
+o Use seed for random with a resolution higher than 1 second.
+  Now that 'make randconfig' is much faster we can generate more
+  than one randconfig on a decent box within one second.
 
+Please pull,
+	Sam
+
+The following changes since commit 5bee17f18b595937e6beafeee5197868a3f74a06:
+  Kyle McMartin (1):
+        parisc: sba_iommu: fix build bug when CONFIG_PARISC_AGP=y
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/sam/kbuild-fixes.git master
+
+Ingo Molnar (1):
+      kconfig: improve seed in randconfig
+
+Sam Ravnborg (1):
+      kconfig: fix randconfig for choice blocks
+
+Full diff of the two changes:
+
+ scripts/kconfig/conf.c     |   16 +++++++++++++-
+ scripts/kconfig/confdata.c |   51 +++++++++++++++++++++++++++++++-------------
+ 2 files changed, 51 insertions(+), 16 deletions(-)
+diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
+index 3e1057f..d190092 100644
+--- a/scripts/kconfig/conf.c
++++ b/scripts/kconfig/conf.c
+@@ -11,6 +11,7 @@
+ #include <time.h>
+ #include <unistd.h>
+ #include <sys/stat.h>
++#include <sys/time.h>
+ 
+ #define LKC_DIRECT_LINK
+ #include "lkc.h"
+@@ -464,9 +465,22 @@ int main(int ac, char **av)
+ 			input_mode = set_yes;
+ 			break;
+ 		case 'r':
++		{
++			struct timeval now;
++			unsigned int seed;
++
++			/*
++			 * Use microseconds derived seed,
++			 * compensate for systems where it may be zero
++			 */
++			gettimeofday(&now, NULL);
++
++			seed = (unsigned int)((now.tv_sec + 1) * (now.tv_usec + 1));
++			srand(seed);
++
+ 			input_mode = set_random;
+-			srand(time(NULL));
+ 			break;
++		}
+ 		case 'h':
+ 			printf(_("See README for usage info\n"));
+ 			exit(0);
+diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
+index 830d9ea..273d738 100644
+--- a/scripts/kconfig/confdata.c
++++ b/scripts/kconfig/confdata.c
+@@ -843,7 +843,7 @@ void conf_set_all_new_symbols(enum conf_def_mode mode)
+ 			default:
+ 				continue;
+ 			}
+-			if (!sym_is_choice(sym) || mode != def_random)
++			if (!(sym_is_choice(sym) && mode == def_random))
+ 				sym->flags |= SYMBOL_DEF_USER;
+ 			break;
+ 		default:
+@@ -856,28 +856,49 @@ void conf_set_all_new_symbols(enum conf_def_mode mode)
+ 
+ 	if (mode != def_random)
+ 		return;
+-
++	/*
++	 * We have different type of choice blocks.
++	 * If curr.tri equal to mod then we can select several
++	 * choice symbols in one block.
++	 * In this case we do nothing.
++	 * If curr.tri equal yes then only one symbol can be
++	 * selected in a choice block and we set it to yes,
++	 * and the rest to no.
++	 */
+ 	for_all_symbols(i, csym) {
+ 		if (sym_has_value(csym) || !sym_is_choice(csym))
+ 			continue;
+ 
+ 		sym_calc_value(csym);
++
++		if (csym->curr.tri != yes)
++			continue;
++
+ 		prop = sym_get_choice_prop(csym);
+-		def = -1;
+-		while (1) {
+-			cnt = 0;
+-			expr_list_for_each_sym(prop->expr, e, sym) {
+-				if (sym->visible == no)
+-					continue;
+-				if (def == cnt++) {
+-					csym->def[S_DEF_USER].val = sym;
+-					break;
+-				}
++
++		/* count entries in choice block */
++		cnt = 0;
++		expr_list_for_each_sym(prop->expr, e, sym)
++			cnt++;
++
++		/*
++		 * find a random value and set it to yes,
++		 * set the rest to no so we have only one set
++		 */
++		def = (rand() % cnt);
++
++		cnt = 0;
++		expr_list_for_each_sym(prop->expr, e, sym) {
++			if (def == cnt++) {
++				sym->def[S_DEF_USER].tri = yes;
++				csym->def[S_DEF_USER].val = sym;
++			}
++			else {
++				sym->def[S_DEF_USER].tri = no;
+ 			}
+-			if (def >= 0 || cnt < 2)
+-				break;
+-			def = (rand() % cnt) + 1;
+ 		}
+ 		csym->flags |= SYMBOL_DEF_USER;
++		/* clear VALID to get value calculated */
++		csym->flags &= ~(SYMBOL_VALID);
+ 	}
+ }
