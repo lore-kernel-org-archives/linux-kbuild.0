@@ -1,19 +1,27 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from host152-247-static.28-79-b.business.telecomitalia.it ([79.28.247.152]:3362
-	"HELO host152-247-static.28-79-b.business.telecomitalia.it"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with SMTP
-	id S1751729AbZCPJmC (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 16 Mar 2009 05:42:02 -0400
-Message-ID: <20090316103825.6050905@gigared.com>
-Date: Mon, 16 Mar 2009 10:38:25 +0100
-From: "Minna" <tlpeturs@gigared.com>
+Received: from hrndva-commlb.mail.rr.com ([71.74.57.8]:46977 "EHLO
+	hrndva-commlb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756241AbZCROOK (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 18 Mar 2009 10:14:10 -0400
+Message-Id: <7h9gbp$cgbsej@rrcs-agw-01b.hrndva.rr.com>
+From: Siemens Winners Alert <wccpr@winch.twcbc.com>
+Reply-To: siemens12@btinternet.com
+Subject: Final Notification
+Date: Wed, 18 Mar 2009 9:14:07 -0500
 MIME-Version: 1.0
-Subject: Is it everything okay?
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
+To: info@lotto.com
 
-Is it truth? http://sxli.bestbreakingfree.com
+The sum of £750,000,00 GBP has been Awarded to your E-MAIL ID,Get back to us with your info via (siemens12@rocketmail.com)
+Names :
+Address:
+Conntry :
+Occupation :
+Age :
 
+Mrs Mercy Bill
+(Information Officer)
