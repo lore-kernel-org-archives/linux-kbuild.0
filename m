@@ -1,62 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([18.85.46.34]:56833 "EHLO
-	bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1758352AbZCWT0O (ORCPT
+Received: from mail-fx0-f158.google.com ([209.85.220.158]:60382 "EHLO
+	mail-fx0-f158.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752976AbZCWUJs (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 23 Mar 2009 15:26:14 -0400
-Date: Mon, 23 Mar 2009 15:25:49 -0400
-From: Kyle McMartin <kyle@mcmartin.ca>
-Subject: [PATCH] Build with -fno-dwarf2-cfi-asm
-Message-ID: <20090323192549.GA19208@bombadil.infradead.org>
+	Mon, 23 Mar 2009 16:09:48 -0400
+From: Bartlomiej Zolnierkiewicz <bzolnier@gmail.com>
+Subject: Re: [PATCH] Be able to build pmac driver without IDE built-in
+Date: Mon, 23 Mar 2009 21:12:21 +0100
+References: <0a0401c9a8b9$fa181c30$f9b5a8c0@pii350>
+In-Reply-To: <0a0401c9a8b9$fa181c30$f9b5a8c0@pii350>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+Message-Id: <200903232112.21291.bzolnier@gmail.com>
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: torvalds@linux-foundation.org
-Cc: roland@redhat.com, aoliva@redhat.com, sam@ravnborg.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: Gilles Espinasse <g.esp@free.fr>
+Cc: sam@ravnborg.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, benh@kernel.crashing.org
 
-From: Kyle McMartin <kyle@redhat.com>
+On Thursday 19 March 2009, Gilles Espinasse wrote:
+> No reason to need IDE built-in to be able to compile pmac driver
+> Tested to work on 2.6.29-rc8 and 2.6.28.8 with ide and pmac as modules
+> inside an initramfs
+> 
+>  Signed-off-by: Gilles Espinasse <g.esp@free.fr>
 
-With a sufficiently new compiler and binutils, code which wasn't
-previously generating .eh_frame sections has begun to. Certain architectures
-(powerpc, in this case) may generate unexpected relocation formats in
-response to this, preventing modules from loading.
+applied by hand (please check your mailer settings
+as it seems to corrupt whitespaces)
 
-While the new relocation types should probably be handled, revert to
-the previous behaviour with regards to generation of .eh_frame sections.
+> --- linux-2.6.28/drivers/ide/Kconfig.old 2009-03-19 16:36:34.000000000 +0100
+> +++ linux-2.6.28/drivers/ide/Kconfig 2009-03-19 16:35:49.000000000 +0100
+> @@ -676,7 +676,7 @@
+>  # TODO: BLK_DEV_IDEDMA_PCI -> BLK_DEV_IDEDMA_SFF
+>  config BLK_DEV_IDE_PMAC
+>   tristate "PowerMac on-board IDE support"
+> - depends on PPC_PMAC && IDE=y
+> + depends on PPC_PMAC && IDE
 
-(This was reported against Fedora, which appears to be the only distro
-doing any building against gcc-4.4 at present: RH bz#486545.)
-
-Signed-off-by: Kyle McMartin <kyle@redhat.com>
-Cc: roland@redhat.com
-Cc: aoliva@redhat.com
-Cc: sam@ravnborg.org
----
-
-As near as I can tell, the only case previously was for the vdso images,
-which are explicitly built with -fasynchronous-unwind-tables, and
-annotated with cfi directives.
-
-Everyone else either unwinds their stack manually, or has a custom
-unwind format like parisc or ia64.
-
-Hopefully this is a somewhat better description than the last time.
-
-cheers, Kyle
-
-diff --git a/Makefile b/Makefile
-index a2c2efe..057230a 100644
---- a/Makefile
-+++ b/Makefile
-@@ -569,6 +569,9 @@ KBUILD_CFLAGS += $(call cc-option,-Wno-pointer-sign,)
- # disable invalid "can't wrap" optimzations for signed / pointers
- KBUILD_CFLAGS	+= $(call cc-option,-fwrapv)
- 
-+# revert to pre-gcc-4.4 behaviour of .eh_frame
-+KBUILD_CFLAGS	+= $(call cc-option,-fno-dwarf2-cfi-asm)
-+
- # Add user supplied CPPFLAGS, AFLAGS and CFLAGS as the last assignments
- # But warn user when we do so
- warn-assign = \
+IDE config options are covered by if IDE ... endif so no need to check
+for IDE explicitly now (I cleaned this while applying the patch)
