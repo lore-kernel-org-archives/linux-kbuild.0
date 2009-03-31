@@ -1,57 +1,62 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from metis.ext.pengutronix.de ([92.198.50.35]:56499 "EHLO
-	metis.ext.pengutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751119AbZC2S0U (ORCPT
+Received: from baikonur.stro.at ([213.239.196.228]:55720 "EHLO
+	baikonur.stro.at" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757343AbZCaPTE (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 29 Mar 2009 14:26:20 -0400
-Date: Sun, 29 Mar 2009 20:26:17 +0200
-From: Uwe =?iso-8859-1?Q?Kleine-K=F6nig?=
-	<u.kleine-koenig@pengutronix.de>
-Subject: Re: [PATCH] headerdep: fix option processing for -I
-Message-ID: <20090329182617.GA25154@pengutronix.de>
-References: <1238331707-23129-1-git-send-email-u.kleine-koenig@pengutronix.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <1238331707-23129-1-git-send-email-u.kleine-koenig@pengutronix.de>
+	Tue, 31 Mar 2009 11:19:04 -0400
+From: maximilian attems <max@stro.at>
+Subject: [PATCH 5/7] deb-pkg: Generate a debian/copyright
+Date: Tue, 31 Mar 2009 17:19:30 +0200
+Message-Id: <1238512772-21180-5-git-send-email-max@stro.at>
+In-Reply-To: <1238512772-21180-4-git-send-email-max@stro.at>
+References: <1238512772-21180-1-git-send-email-max@stro.at>
+ <1238512772-21180-2-git-send-email-max@stro.at>
+ <1238512772-21180-3-git-send-email-max@stro.at>
+ <1238512772-21180-4-git-send-email-max@stro.at>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: Vegard Nossum <vegard.nossum@gmail.com>, Sam Ravnborg <sam@ravnborg.org>
+Cc: sam@ravnborg.org, akpm@linux-foundation.org, maximilian attems <max@stro.at>, Andres Salomon <dilinger@debian.org>
 
-Hello,
+add a basic debian/copyright to the binary package.
 
-sorry for replying to my own mail, but I found a further enhancement.
+Cc: Andres Salomon <dilinger@debian.org>
+Signed-off-by: maximilian attems <max@stro.at>
+---
+ scripts/package/builddeb |   20 ++++++++++++++++++++
+ 1 files changed, 20 insertions(+), 0 deletions(-)
 
-On Sun, Mar 29, 2009 at 03:01:47PM +0200, Uwe Kleine-König wrote:
-> -I takes an argument.  Without this change only a 1 is added to
-> @opt_include which is not helpful.
-> 
-> Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
-> Cc: Vegard Nossum <vegard.nossum@gmail.com>
-> Cc: Sam Ravnborg <sam@ravnborg.org>
-> 
-> ---
->  scripts/headerdep.pl |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
-> 
-> diff --git a/scripts/headerdep.pl b/scripts/headerdep.pl
-> index 97399da..536408e 100755
-> --- a/scripts/headerdep.pl
-> +++ b/scripts/headerdep.pl
-> @@ -19,7 +19,7 @@ my $opt_graph;
->  	version	=> \&version,
->  
->  	all	=> \$opt_all,
-> -	I	=> \@opt_include,
-> +	"I:s"	=> \@opt_include,
-This should better be "I=s".  The difference is that with : the argument
-is optional, with = it is not.
-
-Best regards
-Uwe
-
+diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+index 9d21ec5..c9ff47e 100644
+--- a/scripts/package/builddeb
++++ b/scripts/package/builddeb
+@@ -91,6 +91,26 @@ linux-2.6 ($version-$revision) unstable; urgency=low
+  -- ${maintainer}  $(date -R)
+ EOF
+ 
++# Generate copyright file
++cat <<EOF > debian/copyright
++This is a packacked upstream version of the Linux kernel.
++
++The sources may be found at most Linux ftp sites, including
++ftp://ftp.kernel.org/pub/linux/kernel
++
++Copyright: 1991 - 2008 Linus Torvalds and others.
++
++see git history
++git://git.eu.kernel.org/pub/scm/linux/kernel/git/torvalds/linux-2.6.git
++
++    This program is free software; you can redistribute it and/or modify
++    it under the terms of the GNU General Public License as published by
++    the Free Software Foundation; version 2 dated June, 1991.
++
++On Debian GNU/Linux systems, the complete text of the GNU General Public
++License version 2 can be found in \`/usr/share/common-licenses/GPL-2'.
++EOF
++
+ # Generate a control file
+ if [ "$ARCH" == "um" ]; then
+ 
 -- 
-Pengutronix e.K.                              | Uwe Kleine-König            |
-Industrial Linux Solutions                    | http://www.pengutronix.de/  |
+1.6.2.1
+
