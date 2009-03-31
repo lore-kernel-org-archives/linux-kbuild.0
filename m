@@ -1,66 +1,88 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from baikonur.stro.at ([213.239.196.228]:55750 "EHLO
+Received: from baikonur.stro.at ([213.239.196.228]:55753 "EHLO
 	baikonur.stro.at" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1759477AbZCaPTJ (ORCPT
+	with ESMTP id S1759550AbZCaPTJ (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
 	Tue, 31 Mar 2009 11:19:09 -0400
 From: maximilian attems <max@stro.at>
-Subject: [PATCH 4/7] deb-pkg: Fix Section and Source field
-Date: Tue, 31 Mar 2009 17:19:29 +0200
-Message-Id: <1238512772-21180-4-git-send-email-max@stro.at>
-In-Reply-To: <1238512772-21180-3-git-send-email-max@stro.at>
-References: <1238512772-21180-1-git-send-email-max@stro.at>
- <1238512772-21180-2-git-send-email-max@stro.at>
- <1238512772-21180-3-git-send-email-max@stro.at>
+Subject: [PATCH 1/7] deb-pkg: Beautify changelog
+Date: Tue, 31 Mar 2009 17:19:26 +0200
+Message-Id: <1238512772-21180-1-git-send-email-max@stro.at>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: sam@ravnborg.org, akpm@linux-foundation.org, maximilian attems <max@stro.at>, Andres Salomon <dilinger@debian.org>
 
-Base section has been removed, the base is defined by Priority field.
-Source is linux-2.6.
+Try harder to find email and maintainer name.
+Debian's own devscripts all use DEBEMAIL or DEBFULLNAME
+prior to an eventual EMAIL or NAME environment variable.
+Match their logic.
+
+"Anonymous Maintainer" sounds nicer then Kernel compiler
+if no name is found. As bonus add more descriptive changelog
+entry.
 
 Cc: Andres Salomon <dilinger@debian.org>
 Signed-off-by: maximilian attems <max@stro.at>
 ---
- scripts/package/builddeb |   10 +++++-----
- 1 files changed, 5 insertions(+), 5 deletions(-)
+ scripts/package/builddeb |   25 ++++++++++++++++++++-----
+ 1 files changed, 20 insertions(+), 5 deletions(-)
 
 diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-index 35f972b..9d21ec5 100644
+index 1264b8e..dd61591 100644
 --- a/scripts/package/builddeb
 +++ b/scripts/package/builddeb
-@@ -84,7 +84,7 @@ fi
- maintainer="${name} <${email}>"
+@@ -66,14 +66,29 @@ EOF
+ 	chmod 755 "$tmpdir/DEBIAN/$script"
+ done
+ 
+-name="Kernel Compiler <$(id -nu)@$(hostname -f)>"
++# Try to determine maintainer and email values
++if [ -n "${DEBEMAIL}" ]; then
++	email=${DEBEMAIL}
++elif [ -n "${EMAIL}" ]; then
++	email=${EMAIL}
++else
++	email=$(id -nu)@$(hostname -f)
++fi
++if [ -n "${DEBFULLNAME}" ]; then
++	name=${DEBFULLNAME}
++elif [ -n "${NAME}" ]; then
++	name=${NAME}
++else
++	name="Anonymous Maintainer"
++fi
++maintainer="${name} <${email}>"
  # Generate a simple changelog template
  cat <<EOF > debian/changelog
--linux ($version-$revision) unstable; urgency=low
-+linux-2.6 ($version-$revision) unstable; urgency=low
+ linux ($version-$revision) unstable; urgency=low
  
-   * New upstream release
+-  * A standard release
++  * New upstream release
  
-@@ -95,8 +95,8 @@ EOF
- if [ "$ARCH" == "um" ]; then
+- -- $name  $(date -R)
++ -- ${maintainer}  $(date -R)
+ EOF
  
- cat <<EOF > debian/control
--Source: linux
--Section: base
-+Source: linux-2.6
-+Section: admin
+ # Generate a control file
+@@ -83,7 +98,7 @@ cat <<EOF > debian/control
+ Source: linux
+ Section: base
  Priority: optional
- Maintainer: $maintainer
- Standards-Version: 3.8.1
-@@ -117,8 +117,8 @@ EOF
+-Maintainer: $name
++Maintainer: $maintainer
+ Standards-Version: 3.6.1
  
- else
- cat <<EOF > debian/control
--Source: linux
--Section: base
-+Source: linux-2.6
-+Section: admin
+ Package: $packagename
+@@ -105,7 +120,7 @@ cat <<EOF > debian/control
+ Source: linux
+ Section: base
  Priority: optional
- Maintainer: $maintainer
- Standards-Version: 3.8.1
+-Maintainer: $name
++Maintainer: $maintainer
+ Standards-Version: 3.6.1
+ 
+ Package: $packagename
 -- 
 1.6.2.1
 
