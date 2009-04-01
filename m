@@ -1,19 +1,19 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from baikonur.stro.at ([213.239.196.228]:36259 "EHLO
+Received: from baikonur.stro.at ([213.239.196.228]:36278 "EHLO
 	baikonur.stro.at" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752015AbZDAVl6 (ORCPT
+	with ESMTP id S1756838AbZDAVmp (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 1 Apr 2009 17:41:58 -0400
-Date: Wed, 1 Apr 2009 23:42:34 +0200
+	Wed, 1 Apr 2009 17:42:45 -0400
+Date: Wed, 1 Apr 2009 23:43:19 +0200
 From: maximilian attems <max@stro.at>
-Subject: Re: [PATCH 5a/5] deb-pkg: allow alternative hook scripts directory
+Subject: Re: [PATCH 5b/5] deb-pkg: allow alternative hook scripts directory
 	in .deb packages
-Message-ID: <20090401214234.GC17518@stro.at>
-References: <200904012133.37387.elendil@planet.nl> <200904012143.52853.elendil@planet.nl>
+Message-ID: <20090401214319.GD17518@stro.at>
+References: <200904012133.37387.elendil@planet.nl> <200904012144.13077.elendil@planet.nl>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <200904012143.52853.elendil@planet.nl>
+In-Reply-To: <200904012144.13077.elendil@planet.nl>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Frans Pop <elendil@planet.nl>
@@ -23,7 +23,7 @@ On Wed, 01 Apr 2009, Frans Pop wrote:
 
 > Hook scripts in the default directory /etc/kernel are also executed by
 > official Debian kernel packages as well as kernel packages created using
-> make-kpkg. Allow to specify an alternative hook scripts directory by
-> exporting the environment variable KDEB_HOOKDIR.
+> make-kpkg. Allow to specify the base hook scripts directory in the kernel
+> configuration (DEB_HOOKDIRS_PATH).
 
-under discusisson, no ack yet.
+this seems overkill defer to discussions.
