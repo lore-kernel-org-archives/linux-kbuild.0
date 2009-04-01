@@ -1,19 +1,19 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from baikonur.stro.at ([213.239.196.228]:36278 "EHLO
+Received: from baikonur.stro.at ([213.239.196.228]:38174 "EHLO
 	baikonur.stro.at" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756838AbZDAVmp (ORCPT
+	with ESMTP id S1750863AbZDAV7r (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 1 Apr 2009 17:42:45 -0400
-Date: Wed, 1 Apr 2009 23:43:19 +0200
+	Wed, 1 Apr 2009 17:59:47 -0400
+Date: Wed, 1 Apr 2009 23:41:41 +0200
 From: maximilian attems <max@stro.at>
-Subject: Re: [PATCH 5b/5] deb-pkg: allow alternative hook scripts directory
-	in .deb packages
-Message-ID: <20090401214319.GD17518@stro.at>
-References: <200904012133.37387.elendil@planet.nl> <200904012144.13077.elendil@planet.nl>
+Subject: Re: [PATCH 3/5] deb-pkg: pass Debian maintainer script parameters
+	to packaging hook scripts
+Message-ID: <20090401214141.GB17518@stro.at>
+References: <200904012133.37387.elendil@planet.nl> <200904012143.18562.elendil@planet.nl>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <200904012144.13077.elendil@planet.nl>
+In-Reply-To: <200904012143.18562.elendil@planet.nl>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Frans Pop <elendil@planet.nl>
@@ -21,9 +21,53 @@ Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Sam Ravnborg <sa
 
 On Wed, 01 Apr 2009, Frans Pop wrote:
 
-> Hook scripts in the default directory /etc/kernel are also executed by
-> official Debian kernel packages as well as kernel packages created using
-> make-kpkg. Allow to specify the base hook scripts directory in the kernel
-> configuration (DEB_HOOKDIRS_PATH).
+> The Debian packaging scripts created by the deb-pkg target do not pass
+> on the standard Debian maintainer script parameters to hook scripts,
+> which means that those scripts cannot tell whether they are being called
+> during e.g. install vs. upgrade, or removal vs. purge of the package.
+> 
+> As there are several variantions in how hook scripts are called from
+> kernel packages, we pass the parameters in the environment variable
+> DEB_MAINT_PARAMS rather than as extra arguments.
+> 
+> Bump version of builddep script to 1.3.
+> 
+> Signed-off-by: Frans Pop <elendil@planet.nl>
 
-this seems overkill defer to discussions.
+ack for the env variable.
+ 
+> diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+> index 5b1517d..c9a4dcd 100644
+> --- a/scripts/package/builddeb
+> +++ b/scripts/package/builddeb
+> @@ -1,6 +1,6 @@
+>  #!/bin/sh
+>  #
+> -# builddeb 1.2
+> +# builddeb 1.3
+>  # Copyright 2003 Wichert Akkerman <wichert@wiggy.net>
+>  #
+>  # Simple script to generate a deb package for a Linux kernel. All the
+> @@ -63,7 +63,11 @@ for script in postinst postrm preinst prerm ; do
+>  
+>  set -e
+>  
+> -test -d /etc/kernel/$script.d && run-parts --arg="$version" /etc/kernel/$script.d
+> +# Pass maintainer script parameters to hook scripts
+> +export DEB_MAINT_PARAMS="\$@"
+> +
+> +test -d $debhookdir/$script.d && \\
+> +	run-parts --arg="$version" /etc/kernel/$script.d
+
+gratious formating change, please if this needs to be broken in 2 lines,
+break before && so that logic is more evident.
+>  exit 0
+>  EOF
+>  	chmod 755 "$tmpdir/DEBIAN/$script"
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> 
+-- 
+maks
