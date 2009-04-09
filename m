@@ -1,90 +1,42 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from acsinet12.oracle.com ([141.146.126.234]:45151 "EHLO
-	acsinet12.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756219AbZDIGrw (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 9 Apr 2009 02:47:52 -0400
-From: Wenji Huang <wenji.huang@oracle.com>
-Subject: [PATCH 1/1] Separate the debuginfo out from kbuild
-Date: Wed,  8 Apr 2009 22:06:21 -0400
-Message-Id: <1239242781-7983-1-git-send-email-wenji.huang@oracle.com>
+Received: from mail.mnsspb.ru ([84.204.75.2]:48847 "EHLO mail.mnsspb.ru"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S932681AbZDIMPi (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 9 Apr 2009 08:15:38 -0400
+From: Kirill Smelkov <kirr@mns.spb.ru>
+Subject: [PATCH] Makefile: fix few typos
+Date: Thu,  9 Apr 2009 15:34:34 +0400
+Message-Id: <1239276874-2141-1-git-send-email-kirr@mns.spb.ru>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, tytso@MIT.EDU, elena.zannoni@oracle.com, Wenji Huang <wenji.huang@oracle.com>
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, navy-patches@mns.spb.ru, Kirill Smelkov <kirr@mns.spb.ru>
 
-This patch will add "make debug_info" to split debuginfo files. The
-separate debug files are under debug directory of building tree.
-
-It is based on two considerations:
-   * The debuginfo extracting machinery could be integrated into the
-     kbuild system. This way it's not just done via RPM macros. So
-     generating debuginfo RPMS or something alike can be simplified
-     and standardized, also distribution independent.
-   * Reduce the size of current file which mixes executable and
-     debug sections. For example, 7% off for vmlinux.
-
-Signed-off-by: Wenji Huang <wenji.huang@oracle.com>
+Signed-off-by: Kirill Smelkov <kirr@mns.spb.ru>
 ---
- Makefile                 |   14 ++++++++++++++
- scripts/Makefile.modpost |   12 ++++++++++++
- 2 files changed, 26 insertions(+), 0 deletions(-)
+ Makefile |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index e5ad5fd..0df7581 100644
+index e5ad5fd..3e95d45 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -832,6 +832,19 @@ define rule_vmlinux-modpost
- 	$(Q)echo 'cmd_$@ := $(cmd_vmlinux-modpost)' > $(dot-target).cmd
- endef
+@@ -567,7 +567,7 @@ KBUILD_CFLAGS += $(call cc-option,-Wdeclaration-after-statement,)
+ # disable pointer signed / unsigned warnings in gcc 4.0
+ KBUILD_CFLAGS += $(call cc-option,-Wno-pointer-sign,)
  
-+quiet_cmd_vmlinux_debug = GEN     $<.debug
-+      cmd_vmlinux_debug = mkdir -p debug;         \
-+                          $(OBJCOPY) --only-keep-debug         \
-+                                     $< debug/$<.debug
-+targets += vmlinux.debug
-+
-+PHONY += debug_info
-+debug_info: vmlinux FORCE
-+ifdef CONFIG_DEBUG_INFO
-+	$(call if_changed,vmlinux_debug)
-+	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.modpost $@
-+endif
-+
- # vmlinux image - including updated kernel symbols
- vmlinux: $(vmlinux-lds) $(vmlinux-init) $(vmlinux-main) vmlinux.o $(kallsyms.o) FORCE
- ifdef CONFIG_HEADERS_CHECK
-@@ -1278,6 +1291,7 @@ help:
- 	@echo  '  all		  - Build all targets marked with [*]'
- 	@echo  '* vmlinux	  - Build the bare kernel'
- 	@echo  '* modules	  - Build all modules'
-+	@echo  '  debug_info      - Extract debug info to debug directory'
- 	@echo  '  modules_install - Install all modules to INSTALL_MOD_PATH (default: /)'
- 	@echo  '  firmware_install- Install all firmware to INSTALL_FW_PATH'
- 	@echo  '                    (default: $$(INSTALL_MOD_PATH)/lib/firmware)'
-diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
-index f4053dc..c120261 100644
---- a/scripts/Makefile.modpost
-+++ b/scripts/Makefile.modpost
-@@ -137,6 +137,18 @@ $(modules): %.ko :%.o %.mod.o FORCE
+-# disable invalid "can't wrap" optimzations for signed / pointers
++# disable invalid "can't wrap" optimizations for signed / pointers
+ KBUILD_CFLAGS	+= $(call cc-option,-fwrapv)
  
- targets += $(modules)
+ # revert to pre-gcc-4.4 behaviour of .eh_frame
+@@ -1587,5 +1587,5 @@ PHONY += FORCE
+ FORCE:
  
-+modules-debug := $(modules:.ko=.ko.debug)
-+quiet_cmd_debug_ko = GEN     $@
-+      cmd_debug_ko = mkdir -p debug/$(dir $@);                         \
-+                    $(OBJCOPY) --only-keep-debug $< debug/$@
-+targets += $(modules-debug)
-+
-+debug_info: $(modules-debug) FORCE
-+
-+ifdef CONFIG_DEBUG_INFO
-+$(modules-debug): $(modules) FORCE
-+	$(call if_changed,debug_ko)
-+endif
- 
- # Add FORCE to the prequisites of a target to force it to be always rebuilt.
- # ---------------------------------------------------------------------------
+ # Declare the contents of the .PHONY variable as phony.  We keep that
+-# information in a variable se we can use it in if_changed and friends.
++# information in a variable so we can use it in if_changed and friends.
+ .PHONY: $(PHONY)
 -- 
-1.5.6
+1.6.2.2.471.g6da14
 
