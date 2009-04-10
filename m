@@ -1,105 +1,84 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.mail.elte.hu ([157.181.151.9]:38210 "EHLO mx2.mail.elte.hu"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751560AbZDJMIa (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 10 Apr 2009 08:08:30 -0400
-Date: Fri, 10 Apr 2009 14:08:16 +0200
-From: Ingo Molnar <mingo@elte.hu>
-Subject: Re: [ANNOUNCE] headercheck - check dependencies on header files
-Message-ID: <20090410120816.GM21506@elte.hu>
-References: <20090409204219.GA31511@uranus.ravnborg.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20090409204219.GA31511@uranus.ravnborg.org>
+Received: from acsinet12.oracle.com ([141.146.126.234]:16460 "EHLO
+	acsinet12.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754030AbZDJUfZ (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 10 Apr 2009 16:35:25 -0400
+Date: Fri, 10 Apr 2009 13:35:38 -0700
+From: Randy Dunlap <randy.dunlap@oracle.com>
+Subject: [PATCH?] docbook: make cleandocs
+Message-Id: <20090410133538.fa2b9798.randy.dunlap@oracle.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
+To: linux-kbuild@vger.kernel.org
+Cc: linux-doc@vger.kernel.org, samr <sam@ravnborg.org>
+
+Hi Sam,
+
+"make clean" cleans DocBook generated files, but I would like a way to
+clean _only_ those generated files.  Something like the patch below,
+except that it doesn't work.  :(
+
+Can you give me ideas of how to fix it, please?
+
+Thanks,
+---
+~Randy
 
 
-* Sam Ravnborg <sam@ravnborg.org> wrote:
 
-> We have at several occasions discussed if our header files
-> should include their dependencies or not.
-> 
-> But we were lacking a tool to tell us if our header files
-> included the headerfiles they needed or not.
-> 
-> headercheck can be used to do so.
-> 
-> headercheck use the existing Kbuild files in
-> include/ to determine which directories to visit.
-> 
-> And for each directory it create one .c file for each
-> .h file and build it.
-> 
-> A .c file looks like this:
-> 
-> 	$cat module.h.c
-> 		#include <linux/module.h>
-> 
-> 
-> Building this file will tell us if module.h is
-> missing any dependencies (but NOT if it has too many) with
-> the current configuration.
-> 
-> We know that some header files are simply NOT supposed to be included
-> direct and thus is not eligble to such a check.
-> 
-> To avoid checking these we can say in Kbuild:
-> 
-> 	ignore-y += compiler-gcc.h
-> 
-> This tells headercheck to ignore compiler-gcc.h when performing
-> the headercheck.
-> 
-> The current implementation leaves a lot of .c files.
-> I will address this if the concept is considered acceptable.
-> 
-> To visit all relevant directories we need to adjust the Kbuild
-> files but that can wait until we have the current pile fixed.
-> Likewise it does not support arch specific include files.
-> That can wait too.
-> 
-> I have tried running headercheck on an i386 defconfig and
-> the result shows that a lot af headers does not include there
-> dependencies.
-> 
-> The numbers (including sub-directories): 
-> 
->      25 include/asm-generic
->      12 include/drm
->     282 include/linux
->       2 include/mtd
->      24 include/sound
->      12 include/video
-> 
-> Remember we do not visit all directories - only those listed in include/Kbuild.
-> 
-> To try it yourself apply following patch and on a configured kernel use:
-> 
->     make -k headercheck
-> 
-> Looking at the errors I would assume that at least 75% of the errors
-> can be fixed in one day but the rest may be a bit more troublesome.
-> 
-> The open question is if this is worthwhile? 
 
-Definitely a good idea IMHO. The current practice of 'include enough 
-.h files in the .c file to make it build' has resulted in perversely 
-long #include line sections in .c files.
+From: Randy Dunlap <randy.dunlap@oracle.com>
 
-For example arch/x86/kernel/setup.c has 76 headers (!) at the 
-moment, and you have to go down 4 pages in the file before you see 
-the first line of substantial code.
+Add a 'make cleandocs' target to clean up all generated
+DocBook files.
 
-Or arch/x86/mm/fault.c had 32 headers - i recently cut that down to 
-11 only.
+Signed-off-by: Randy Dunlap <randy.dunlap@oracle.com>
+---
+ Documentation/DocBook/Makefile |   15 ++++++++++++---
+ 1 file changed, 12 insertions(+), 3 deletions(-)
 
-Nice would be to have a tool that lists the minimum set of required 
-headers for any given .c file, for a current .config. If we run that 
-in allyesconfig we get a pretty good approximation of the headers 
-needed.
-
-	Ingo
+--- linux-2.6.30-rc1-git3.orig/Documentation/DocBook/Makefile
++++ linux-2.6.30-rc1-git3/Documentation/DocBook/Makefile
+@@ -31,7 +31,7 @@ PS_METHOD	= $(prefer-db2x)
+ 
+ ###
+ # The targets that may be used.
+-PHONY += xmldocs sgmldocs psdocs pdfdocs htmldocs mandocs installmandocs
++PHONY += xmldocs sgmldocs psdocs pdfdocs htmldocs mandocs installmandocs cleandocs
+ 
+ BOOKS := $(addprefix $(obj)/,$(DOCBOOKS))
+ xmldocs: $(BOOKS)
+@@ -213,11 +213,12 @@ silent_gen_xml = :
+ dochelp:
+ 	@echo  ' Linux kernel internal documentation in different formats:'
+ 	@echo  '  htmldocs        - HTML'
+-	@echo  '  installmandocs  - install man pages generated by mandocs'
+-	@echo  '  mandocs         - man pages'
+ 	@echo  '  pdfdocs         - PDF'
+ 	@echo  '  psdocs          - Postscript'
+ 	@echo  '  xmldocs         - XML DocBook'
++	@echo  '  mandocs         - man pages'
++	@echo  '  installmandocs  - install man pages generated by mandocs'
++	@echo  '  cleandocs       - clean all generated DocBook files'
+ 
+ ###
+ # Temporary files left by various tools
+@@ -235,6 +236,14 @@ clean-files := $(DOCBOOKS) \
+ 
+ clean-dirs := $(patsubst %.xml,%,$(DOCBOOKS)) man
+ 
++cleandocs:
++	echo "clean-files: $(clean-files)"
++	echo "clean-dirs: $(clean-dirs)"
++	cd Documentation/DocBook
++	rm -f $(clean-files)
++	rm -rf $(clean-dirs)
++	cd ../..
++
+ # Declare the contents of the .PHONY variable as phony.  We keep that
+ # information in a variable se we can use it in if_changed and friends.
+ 
