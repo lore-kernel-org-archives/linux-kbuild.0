@@ -1,108 +1,28 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from rcsinet12.oracle.com ([148.87.113.124]:18048 "EHLO
-	rgminet12.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752234AbZDNBno (ORCPT
+Received: from solcza.etanetas.lt ([82.135.221.82]:32783 "EHLO
+	solcza.etanetas.lt" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752853AbZDOJJZ (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 13 Apr 2009 21:43:44 -0400
-Message-ID: <49E3E944.2040505@oracle.com>
-Date: Tue, 14 Apr 2009 09:39:16 +0800
-From: Wenji Huang <wenji.huang@oracle.com>
-Reply-To: wenji.huang@oracle.com
+	Wed, 15 Apr 2009 05:09:25 -0400
+Message-ID: <000701c9bd29$497bd1d0$52dd8752@namai-1y7vmhgjn>
+From: Jackie Whaley <whaley@force9.net>
+Subject: =?iso-8859-1?b?T3ByYWggY2VydGlmaWVkIHdpZWdodCBsb3NzIHNvbHV0aW9uIEFjYWk=?=
+ =?iso-8859-1?b?IEJlcnJp?=
+Date: Tue, 14 Apr 2009 20:48:58 +0200
 MIME-Version: 1.0
-Subject: [Fwd: [PATCH 1/1] Separate the debuginfo out from kbuild]
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Type: text/plain;
+	format=flowed;
+	charset="iso-8859-1";
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: tytso@MIT.EDU, Elena Zannoni <elena.zannoni@oracle.com>, Roland McGrath <roland@redhat.com>, LKML <linux-kernel@vger.kernel.org>
+To: netdev@vger.kernel.orgnetdev@vger.kernel.org, linux-parisc@vger.kernel.orgnetdev@vger.kernel.org, linux-kbuild@vger.kernel.org
+Cc: kvm@vger.kernel.org, kvm-ppc@vger.kernel.org, kvm-ia64@vger.kernel.org
 
-Add Roland to cc
+hi
 
--------- Original Message --------
-Subject: [PATCH 1/1] Separate the debuginfo out from kbuild
-Date: Wed,  8 Apr 2009 22:06:21 -0400
-From: Wenji Huang <wenji.huang@oracle.com>
-To: linux-kbuild@vger.kernel.org
-CC: linux-kernel@vger.kernel.org, tytso@MIT.EDU, 
-elena.zannoni@oracle.com, Wenji Huang <wenji.huang@oracle.com>
+Help yourself lose weight now , this is nothing like any diet plan you have ever tried before. Acai diet will deliver results and rid you of your unwated weight.
+visit site http://t7sk4isth.blogspot.com
 
-This patch will add "make debug_info" to split debuginfo files. The
-separate debug files are under debug directory of building tree.
-
-It is based on two considerations:
-    * The debuginfo extracting machinery could be integrated into the
-      kbuild system. This way it's not just done via RPM macros. So
-      generating debuginfo RPMS or something alike can be simplified
-      and standardized, also distribution independent.
-    * Reduce the size of current file which mixes executable and
-      debug sections. For example, 7% off for vmlinux.
-
-Signed-off-by: Wenji Huang <wenji.huang@oracle.com>
----
-  Makefile                 |   14 ++++++++++++++
-  scripts/Makefile.modpost |   12 ++++++++++++
-  2 files changed, 26 insertions(+), 0 deletions(-)
-
-diff --git a/Makefile b/Makefile
-index e5ad5fd..0df7581 100644
---- a/Makefile
-+++ b/Makefile
-@@ -832,6 +832,19 @@ define rule_vmlinux-modpost
-  	$(Q)echo 'cmd_$@ := $(cmd_vmlinux-modpost)' > $(dot-target).cmd
-  endef
-
-+quiet_cmd_vmlinux_debug = GEN     $<.debug
-+      cmd_vmlinux_debug = mkdir -p debug;         \
-+                          $(OBJCOPY) --only-keep-debug         \
-+                                     $< debug/$<.debug
-+targets += vmlinux.debug
-+
-+PHONY += debug_info
-+debug_info: vmlinux FORCE
-+ifdef CONFIG_DEBUG_INFO
-+	$(call if_changed,vmlinux_debug)
-+	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.modpost $@
-+endif
-+
-  # vmlinux image - including updated kernel symbols
-  vmlinux: $(vmlinux-lds) $(vmlinux-init) $(vmlinux-main) vmlinux.o 
-$(kallsyms.o) FORCE
-  ifdef CONFIG_HEADERS_CHECK
-@@ -1278,6 +1291,7 @@ help:
-  	@echo  '  all		  - Build all targets marked with [*]'
-  	@echo  '* vmlinux	  - Build the bare kernel'
-  	@echo  '* modules	  - Build all modules'
-+	@echo  '  debug_info      - Extract debug info to debug directory'
-  	@echo  '  modules_install - Install all modules to INSTALL_MOD_PATH 
-(default: /)'
-  	@echo  '  firmware_install- Install all firmware to INSTALL_FW_PATH'
-  	@echo  '                    (default: $$(INSTALL_MOD_PATH)/lib/firmware)'
-diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
-index f4053dc..c120261 100644
---- a/scripts/Makefile.modpost
-+++ b/scripts/Makefile.modpost
-@@ -137,6 +137,18 @@ $(modules): %.ko :%.o %.mod.o FORCE
-
-  targets += $(modules)
-
-+modules-debug := $(modules:.ko=.ko.debug)
-+quiet_cmd_debug_ko = GEN     $@
-+      cmd_debug_ko = mkdir -p debug/$(dir $@);                         \
-+                    $(OBJCOPY) --only-keep-debug $< debug/$@
-+targets += $(modules-debug)
-+
-+debug_info: $(modules-debug) FORCE
-+
-+ifdef CONFIG_DEBUG_INFO
-+$(modules-debug): $(modules) FORCE
-+	$(call if_changed,debug_ko)
-+endif
-
-  # Add FORCE to the prequisites of a target to force it to be always 
-rebuilt.
-  # 
----------------------------------------------------------------------------
--- 
-1.5.6
-
+code msg guiuhpo9iop
+id 6
