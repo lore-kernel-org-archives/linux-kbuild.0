@@ -1,106 +1,144 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx3.mail.elte.hu ([157.181.1.138]:49527 "EHLO mx3.mail.elte.hu"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752484AbZDSJBD (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 19 Apr 2009 05:01:03 -0400
-Date: Sun, 19 Apr 2009 10:59:14 +0200
-From: Ingo Molnar <mingo@elte.hu>
-Subject: Re: kbuild - introduce support for subdir-ccflags-y
-Message-ID: <20090419085914.GA25898@elte.hu>
-References: <20090418125159.GA23008@uranus.ravnborg.org> <20090418125839.GA3668@flint.arm.linux.org.uk> <20090418150750.GA24059@elte.hu> <20090418180953.GE7148@flint.arm.linux.org.uk> <f73f7ab80904182017n7f27f49ck48ba200deb99388a@mail.gmail.com> <20090419062841.GA17801@uranus.ravnborg.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Received: from pfepb.post.tele.dk ([195.41.46.236]:56123 "EHLO
+	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752734AbZDSJXt (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 19 Apr 2009 05:23:49 -0400
+Date: Sun, 19 Apr 2009 11:25:55 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: [GIT] kbuild
+Message-ID: <20090419092555.GA19213@uranus.ravnborg.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20090419062841.GA17801@uranus.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>, "H. Peter Anvin" <hpa@zytor.com>, Thomas Gleixner <tglx@linutronix.de>, Andrew Morton <akpm@linux-foundation.org>
-Cc: Kyle Moffett <kyle@moffetthome.net>, linux-kbuild <linux-kbuild@vger.kernel.org>, linux arch <linux-arch@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Ingo Molnar <mingo@redhat.com>, "David S. Miller" <davem@davemloft.net>, Russell King <rmk+lkml@arm.linux.org.uk>
+To: Linus Torvalds <torvalds@linux-foundation.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>
+Cc: Russell King <rmk+lkml@arm.linux.org.uk>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, Thomas Gleixner <tglx@linutronix.de>, Al Viro <viro@ZenIV.linux.org.uk>
+
+Hi Linus.
+
+We have on the lists recently discussed two features:
+1) Move generated files to include/generated
+2) Introduce support for subdir-ccflags-y
+
+Both features has low risk of introducing regressions
+and including them now allow us to use the features for next
+merge window.
+
+This will for example allow arm to support mach-types.h in
+include/generated without touching files outside arch/arm.
+
+Please pull.
+
+	Sam
+
+The following changes since commit ff54250a0ebab7f90a5f848a0ba63f999830c872:
+  Linus Torvalds (1):
+        Remove 'recurse into child resources' logic from 'reserve_region_with_split()'
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/sam/kbuild-fixes.git master
+
+Sam Ravnborg (2):
+      kbuild: support include/generated
+      kbuild: introduce subdir-ccflags-y
+
+ .gitignore                         |    1 +
+ Documentation/kbuild/makefiles.txt |   10 ++++++++++
+ Makefile                           |    2 +-
+ scripts/Makefile.build             |    3 +++
+ scripts/Makefile.lib               |    9 +++++++--
+ 5 files changed, 22 insertions(+), 3 deletions(-)
 
 
-* Sam Ravnborg <sam@ravnborg.org> wrote:
-
-> On Sat, Apr 18, 2009 at 11:17:44PM -0400, Kyle Moffett wrote:
-> > On Sat, Apr 18, 2009 at 2:09 PM, Russell King <rmk+lkml@arm.linux.org.uk> wrote:
-> > > On Sat, Apr 18, 2009 at 05:07:50PM +0200, Ingo Molnar wrote:
-> > >> * Russell King <rmk+lkml@arm.linux.org.uk> wrote:
-> > >> > On Sat, Apr 18, 2009 at 02:51:59PM +0200, Sam Ravnborg wrote:
-> > >> > > The typical use cases are an architecture or a subsystem that
-> > >> > > decide to cover all files with -Werror.
-> > >> > > Today alpha, mips and sparc uses -Werror in almost all their
-> > >> > > Makefile - with subdir-ccflag-y it is now simpler to do so
-> > >> > > as only the top-level directories needs to be covered.
-> > >> >
-> > >> > Hmm, this won't make sense for ARM.  We have things like #warning
-> > >> > and deprecated functions in machine specific headers, and adding
-> > >> > -Werror to the whole of arch/arm/ will result in these causing
-> > >> > builds to fail.
-> > >>
-> > >> This is optional - if you dont want it, you dont set it.
-> > >
-> > > Please read _all_ of my mail, particularly the bit where it talks about
-> > > it being useful for a certain subset.
-> > 
-> > It's my impression that on x86 it's a config option whether or not to
-> > build with -Werror.  You could do the exact same thing with an
-> > internal inverted-logic CONFIG_ARM_ALLOW_WARNINGS option and make all
-> > the boards triggering warnings "select ARM_ALLOW_WARNINGS".  Then have
-> > a user-visible config option "ARM_USER_ALLOW_WARNINGS" which also
-> > selects the internal option.  That adds some additional kconfig-level
-> > documentation on which subarch combos need some love.
-> 
-> Correct - but Russell's original comment was that the subdir-* 
-> feature was of no use for arm. And this is correct with the 
-> current way the individual directories are specified.
-> 
-> If you compare arch/x86/kernel/ and arch/arm/kernel/ you will see 
-> that x86 has 3 subdirectories where arm has none.
-> 
-> Another measure: Arm has 12 Makefiles outside mach* and plat* 
-> where x86 has 24 Makefiles.
-> 
-> Ao unless Russell decide to take the patch that refactor all the 
-> core-* stuff out in a Kbuild file arm has no use of 
-> subdir-ccflags-y and can use the already existing ccflags-y if 
-> they decide to cover most of arm with -Werror.
-
-Yes. This is an optional facility entirely - if some arch does
-not need or does not want it, it does not have to care.
-
-Sparc is the example to follow here: it has had unconditional 
--Werror builds (for its architecture files) for years. It has
-done so without any explicit kbuild help beyond a single-line
-ccflags-y := -Werror rule. Sparc has 7 makefiles and it has a 
-well-tested compiler environment.
-
-We cannot do the same on x86 straight away: it's being built
-on a very wide variety of compiler versions, by a very wide
-range of people: more than 95% of our Linux kernel testers are
-on x86.
-
-Some of those compiler versions emit bogus warnings that cannot
-be worked around in the kernel in any sane way - and a forced
--Werror build would thus become a (needless) show-stopper there.
-It will also take some time to flush out any remaining warnings.
-
-All in one, we want arch/x86 to become a -Werror-clean architecture 
-and we want all the advantages of that, but we didnt want to do any 
-artificial 'break the world' flag day.
-
-So we are doing a hybrid approach instead, we are adding a 
-default-off .config option, and we are doing it all smoothly and 
-gradually.
-
-The reason we asked Sam whether he can think of any kbuild help 
-(again, which is strictly optional) was that we didnt want to 
-propagate a 5-6 lines hybrid Makefile rule into 24 makefiles.
-
-We could have done this all via a special makefile rule entirely
-in arch/x86/ that is included in every secondary makefile - but
-we also wanted to give other architectures an optional, librarized
-kbuild facility to do the same, if they so choose.
-
-Thanks,
-
-	Ingo
+diff --git a/.gitignore b/.gitignore
+index 869e1a3..51bd99d 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -49,6 +49,7 @@ include/linux/compile.h
+ include/linux/version.h
+ include/linux/utsrelease.h
+ include/linux/bounds.h
++include/generated
+ 
+ # stgit generated dirs
+ patches-*
+diff --git a/Documentation/kbuild/makefiles.txt b/Documentation/kbuild/makefiles.txt
+index d4b0567..d76cfd8 100644
+--- a/Documentation/kbuild/makefiles.txt
++++ b/Documentation/kbuild/makefiles.txt
+@@ -316,6 +316,16 @@ more details, with real examples.
+ 		#arch/m68k/fpsp040/Makefile
+ 		ldflags-y := -x
+ 
++    subdir-ccflags-y, subdir-asflags-y
++	The two flags listed above are similar to ccflags-y and as-falgs-y.
++	The difference is that the subdir- variants has effect for the kbuild
++	file where tey are present and all subdirectories.
++	Options specified using subdir-* are added to the commandline before
++	the options specified using the non-subdir variants.
++
++	Example:
++		subdir-ccflags-y := -Werror
++
+     CFLAGS_$@, AFLAGS_$@
+ 
+ 	CFLAGS_$@ and AFLAGS_$@ only apply to commands in current
+diff --git a/Makefile b/Makefile
+index bfdef56..6f4208f 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1200,7 +1200,7 @@ CLEAN_FILES +=	vmlinux System.map \
+                 .tmp_kallsyms* .tmp_version .tmp_vmlinux* .tmp_System.map
+ 
+ # Directories & files removed with 'make mrproper'
+-MRPROPER_DIRS  += include/config include2 usr/include
++MRPROPER_DIRS  += include/config include2 usr/include include/generated
+ MRPROPER_FILES += .config .config.old include/asm .version .old_version \
+                   include/linux/autoconf.h include/linux/version.h      \
+                   include/linux/utsrelease.h                            \
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index 39a9642..5c4b7a4 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -27,6 +27,9 @@ ccflags-y  :=
+ cppflags-y :=
+ ldflags-y  :=
+ 
++subdir-asflags-y :=
++subdir-ccflags-y :=
++
+ # Read auto.conf if it exists, otherwise ignore
+ -include include/config/auto.conf
+ 
+diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+index 9796195..cba61ca 100644
+--- a/scripts/Makefile.lib
++++ b/scripts/Makefile.lib
+@@ -4,6 +4,11 @@ ccflags-y  += $(EXTRA_CFLAGS)
+ cppflags-y += $(EXTRA_CPPFLAGS)
+ ldflags-y  += $(EXTRA_LDFLAGS)
+ 
++#
++# flags that take effect in sub directories
++export KBUILD_SUBDIR_ASFLAGS := $(KBUILD_SUBDIR_ASFLAGS) $(subdir-asflags-y)
++export KBUILD_SUBDIR_CCFLAGS := $(KBUILD_SUBDIR_CCFLAGS) $(subdir-ccflags-y)
++
+ # Figure out what we need to build from the various variables
+ # ===========================================================================
+ 
+@@ -104,10 +109,10 @@ else
+ debug_flags =
+ endif
+ 
+-orig_c_flags   = $(KBUILD_CPPFLAGS) $(KBUILD_CFLAGS)                     \
++orig_c_flags   = $(KBUILD_CPPFLAGS) $(KBUILD_CFLAGS) $(KBUILD_SUBDIR_CCFLAGS) \
+                  $(ccflags-y) $(CFLAGS_$(basetarget).o)
+ _c_flags       = $(filter-out $(CFLAGS_REMOVE_$(basetarget).o), $(orig_c_flags))
+-_a_flags       = $(KBUILD_CPPFLAGS) $(KBUILD_AFLAGS)                     \
++_a_flags       = $(KBUILD_CPPFLAGS) $(KBUILD_AFLAGS) $(KBUILD_SUBDIR_ASFLAGS) \
+                  $(asflags-y) $(AFLAGS_$(basetarget).o)
+ _cpp_flags     = $(KBUILD_CPPFLAGS) $(cppflags-y) $(CPPFLAGS_$(@F))
+ 
