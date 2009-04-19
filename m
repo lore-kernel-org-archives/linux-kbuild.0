@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from fmmailgate01.web.de ([217.72.192.221]:53339 "EHLO
+Received: from fmmailgate01.web.de ([217.72.192.221]:53342 "EHLO
 	fmmailgate01.web.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1758231AbZDSNlV (ORCPT
+	with ESMTP id S1758312AbZDSNlV (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
 	Sun, 19 Apr 2009 09:41:21 -0400
 From: Markus Heidelberg <markus.heidelberg@web.de>
-Subject: [PATCH 02/10] kconfig: add a note about the deps to the 'silentoldconfig' help
-Date: Sun, 19 Apr 2009 15:41:19 +0200
-Message-Id: <1240148487-27584-3-git-send-email-markus.heidelberg@web.de>
+Subject: [PATCH 04/10] gitignore: ignore Kconfig i18n files
+Date: Sun, 19 Apr 2009 15:41:21 +0200
+Message-Id: <1240148487-27584-5-git-send-email-markus.heidelberg@web.de>
 In-Reply-To: <1240148487-27584-1-git-send-email-markus.heidelberg@web.de>
 References: <1240148487-27584-1-git-send-email-markus.heidelberg@web.de>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -18,35 +18,22 @@ Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Markus Heidelber
 
 Signed-off-by: Markus Heidelberg <markus.heidelberg@web.de>
 ---
- README                   |    1 +
- scripts/kconfig/Makefile |    2 +-
- 2 files changed, 2 insertions(+), 1 deletions(-)
+ scripts/kconfig/.gitignore |    2 ++
+ 1 files changed, 2 insertions(+), 0 deletions(-)
 
-diff --git a/README b/README
-index d6c6c74..7a078ff 100644
---- a/README
-+++ b/README
-@@ -174,6 +174,7 @@ CONFIGURING the kernel:
- 	"make silentoldconfig"
- 			   Like above, but avoids cluttering the screen
- 			   with questions already answered.
-+			   Additionally updates the dependencies.
- 	"make defconfig"   Create a ./.config file by using the default
- 			   symbol values from arch/$ARCH/defconfig.
- 	"make allyesconfig"
-diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
-index 47e3f2e..5ddf8be 100644
---- a/scripts/kconfig/Makefile
-+++ b/scripts/kconfig/Makefile
-@@ -83,7 +83,7 @@ help:
- 	@echo  '  xconfig	  - Update current config utilising a QT based front-end'
- 	@echo  '  gconfig	  - Update current config utilising a GTK based front-end'
- 	@echo  '  oldconfig	  - Update current config utilising a provided .config as base'
--	@echo  '  silentoldconfig - Same as oldconfig, but quietly'
-+	@echo  '  silentoldconfig - Same as oldconfig, but quietly, additionally update deps'
- 	@echo  '  randconfig	  - New config with random answer to all options'
- 	@echo  '  defconfig	  - New config with default answer to all options'
- 	@echo  '  allmodconfig	  - New config selecting modules when possible'
+diff --git a/scripts/kconfig/.gitignore b/scripts/kconfig/.gitignore
+index b49584c..01e185f 100644
+--- a/scripts/kconfig/.gitignore
++++ b/scripts/kconfig/.gitignore
+@@ -8,6 +8,8 @@ lex.*.c
+ zconf.hash.c
+ *.moc
+ lkc_defs.h
++gconf.glade.h
++*.pot
+ 
+ #
+ # configuration programs
 -- 
 1.6.3.rc1.24.g467d50
 
