@@ -1,38 +1,34 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepb.post.tele.dk ([195.41.46.236]:41477 "EHLO
-	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750896AbZDSXmz (ORCPT
+Received: from smtp1.linux-foundation.org ([140.211.169.13]:51539 "EHLO
+	smtp1.linux-foundation.org" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751211AbZDTBAs (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 19 Apr 2009 19:42:55 -0400
-Date: Mon, 20 Apr 2009 01:45:01 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
+	Sun, 19 Apr 2009 21:00:48 -0400
+Date: Sun, 19 Apr 2009 17:52:32 -0700 (PDT)
+From: Linus Torvalds <torvalds@linux-foundation.org>
 Subject: Re: [GIT] kbuild
-Message-ID: <20090419234501.GA6475@uranus.ravnborg.org>
-References: <20090419092555.GA19213@uranus.ravnborg.org> <20090419223959.GB12054@linux-sh.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20090419223959.GB12054@linux-sh.org>
+In-Reply-To: <20090419234501.GA6475@uranus.ravnborg.org>
+Message-ID: <alpine.LFD.2.00.0904191745390.2199@localhost.localdomain>
+References: <20090419092555.GA19213@uranus.ravnborg.org> <20090419223959.GB12054@linux-sh.org> <20090419234501.GA6475@uranus.ravnborg.org>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Paul Mundt <lethal@linux-sh.org>, Linus Torvalds <torvalds@linux-foundation.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>, Russell King <rmk+lkml@arm.linux.org.uk>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, Thomas Gleixner <tglx@linutronix.de>, Al Viro <viro@ZenIV.linux.org.uk>
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: Paul Mundt <lethal@linux-sh.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>, Russell King <rmk+lkml@arm.linux.org.uk>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, Thomas Gleixner <tglx@linutronix.de>, Al Viro <viro@ZenIV.linux.org.uk>
 
-On Mon, Apr 20, 2009 at 07:39:59AM +0900, Paul Mundt wrote:
-> On Sun, Apr 19, 2009 at 11:25:55AM +0200, Sam Ravnborg wrote:
-> > We have on the lists recently discussed two features:
-> > 1) Move generated files to include/generated
-> > 2) Introduce support for subdir-ccflags-y
-> > 
-> > Both features has low risk of introducing regressions
-> > and including them now allow us to use the features for next
-> > merge window.
-> > 
-> > This will for example allow arm to support mach-types.h in
-> > include/generated without touching files outside arch/arm.
-> > 
-> This applies to sh also, although apparently I've missed the discussion
-> about how mach-types.h generation should be using this.
 
-You will soon see a path from me where I fix sh too.
 
-	Sam
+On Mon, 20 Apr 2009, Sam Ravnborg wrote:
+> 
+> You will soon see a path from me where I fix sh too.
+
+Can we do a global 'sed s:asm/asm-offsets.h:generated/asm-offsets.h:g' 
+thing too? And then get rid of the include/asm symlink?
+
+That asm-offsets.h mess is scary. I don't quite know why kvm on ia64 seems 
+to do it's own asm-offsets.h file, for example. And arch/blackfin/Makefile 
+mentions arch/$(ARCH)/include/asm/asm-offsets.h (but does it actually do 
+one?).
+
+		Linus
