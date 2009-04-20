@@ -1,72 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from zeniv.linux.org.uk ([195.92.253.2]:54433 "EHLO
-	ZenIV.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750852AbZDTCt5 (ORCPT
+Received: from pfepa.post.tele.dk ([195.41.46.235]:42795 "EHLO
+	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750951AbZDTEki (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 19 Apr 2009 22:49:57 -0400
-Date: Mon, 20 Apr 2009 03:49:54 +0100
-From: Al Viro <viro@ZenIV.linux.org.uk>
+	Mon, 20 Apr 2009 00:40:38 -0400
+Date: Mon, 20 Apr 2009 06:42:42 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
 Subject: Re: [GIT] kbuild
-Message-ID: <20090420024954.GW26366@ZenIV.linux.org.uk>
-References: <20090419092555.GA19213@uranus.ravnborg.org> <20090419223959.GB12054@linux-sh.org> <20090419234501.GA6475@uranus.ravnborg.org> <alpine.LFD.2.00.0904191745390.2199@localhost.localdomain> <20090420014158.GV26366@ZenIV.linux.org.uk>
-MIME-Version: 1.0
+Message-ID: <20090420044242.GA8494@uranus.ravnborg.org>
+References: <20090419092555.GA19213@uranus.ravnborg.org> <20090419223959.GB12054@linux-sh.org> <20090419234501.GA6475@uranus.ravnborg.org> <alpine.LFD.2.00.0904191745390.2199@localhost.localdomain>
+Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20090420014158.GV26366@ZenIV.linux.org.uk>
+In-Reply-To: <alpine.LFD.2.00.0904191745390.2199@localhost.localdomain>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Sam Ravnborg <sam@ravnborg.org>, Paul Mundt <lethal@linux-sh.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>, Russell King <rmk+lkml@arm.linux.org.uk>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, Thomas Gleixner <tglx@linutronix.de>
+Cc: Paul Mundt <lethal@linux-sh.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>, Russell King <rmk+lkml@arm.linux.org.uk>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, Thomas Gleixner <tglx@linutronix.de>, Al Viro <viro@ZenIV.linux.org.uk>
 
-On Mon, Apr 20, 2009 at 02:41:58AM +0100, Al Viro wrote:
-> On Sun, Apr 19, 2009 at 05:52:32PM -0700, Linus Torvalds wrote:
-> > 
-> > 
-> > On Mon, 20 Apr 2009, Sam Ravnborg wrote:
-> > > 
-> > > You will soon see a path from me where I fix sh too.
-> > 
-> > Can we do a global 'sed s:asm/asm-offsets.h:generated/asm-offsets.h:g' 
-> > thing too? And then get rid of the include/asm symlink?
-> > 
-> > That asm-offsets.h mess is scary. I don't quite know why kvm on ia64 seems 
-> > to do it's own asm-offsets.h file, for example. And arch/blackfin/Makefile 
-> > mentions arch/$(ARCH)/include/asm/asm-offsets.h (but does it actually do 
-> > one?).
+On Sun, Apr 19, 2009 at 05:52:32PM -0700, Linus Torvalds wrote:
 > 
-> We'll need to update uml as well (contents of shared/kern_constants.h)
+> 
+> On Mon, 20 Apr 2009, Sam Ravnborg wrote:
+> > 
+> > You will soon see a path from me where I fix sh too.
+> 
+> Can we do a global 'sed s:asm/asm-offsets.h:generated/asm-offsets.h:g' 
+> thing too? And then get rid of the include/asm symlink?
 
-BTW, while we are at it...  There's a way to deal with arch/um without
-that kind of contortions, provided that we are willing to use -idirafter.
+As Al also suggest I did a one-asm-offsets.h file per arch so we
+can cnvert them one by one.
 
-For the current tree the minimal patch would be just this, and after that
-we can simply replace all kern_constants.h includes with asm/asm-offsets.h
-or generated/asm-offsets.h.  And remove kern_constants.h completely once
-that is done.
+> That asm-offsets.h mess is scary. I don't quite know why kvm on ia64 seems 
+> to do it's own asm-offsets.h file, for example.
+Will take a look.
 
-Moreover, once include/generated gets in, we can move user_constants.h
-over there and lose the "add -I$(SHARED_HEADERS) to ARCH_INCLUDE for
-O=... builds bit" in arch/um/Makefile as well.
+> And arch/blackfin/Makefile 
+> mentions arch/$(ARCH)/include/asm/asm-offsets.h (but does it actually do 
+> one?).
+Thats just a left over from older days when the arch's had to clean up after
+themself.
 
+I will try to finish something within a few days and send it out for review.
 
-diff --git a/arch/um/Makefile b/arch/um/Makefile
-index 0728def..dce2d7f 100644
---- a/arch/um/Makefile
-+++ b/arch/um/Makefile
-@@ -47,7 +47,7 @@ KBUILD_AFLAGS += $(ARCH_INCLUDE)
- 
- USER_CFLAGS = $(patsubst $(KERNEL_DEFINES),,$(patsubst -D__KERNEL__,,\
- 	$(patsubst -I%,,$(KBUILD_CFLAGS)))) $(ARCH_INCLUDE) $(MODE_INCLUDE) \
--	$(filter -I%,$(CFLAGS)) -D_FILE_OFFSET_BITS=64
-+	$(filter -I%,$(CFLAGS)) -D_FILE_OFFSET_BITS=64 -idirafter include
- 
- include $(srctree)/$(ARCH_DIR)/Makefile-$(SUBARCH)
- 
-@@ -150,6 +150,6 @@ $(SHARED_HEADERS)/user_constants.h: $(ARCH_DIR)/sys-$(SUBARCH)/user-offsets.s
- 
- $(SHARED_HEADERS)/kern_constants.h:
- 	$(Q)mkdir -p $(dir $@)
--	$(Q)echo '#include "../../../../include/asm/asm-offsets.h"' >$@
-+	$(Q)echo '#include <asm/asm-offsets.h>' >$@
- 
- export SUBARCH USER_CFLAGS CFLAGS_NO_HARDENING OS HEADER_ARCH DEV_NULL_PATH
+	Sam
