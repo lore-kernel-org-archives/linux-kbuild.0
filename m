@@ -1,49 +1,44 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepb.post.tele.dk ([195.41.46.236]:46196 "EHLO
-	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751698AbZDTEno (ORCPT
+Received: from zeniv.linux.org.uk ([195.92.253.2]:44538 "EHLO
+	ZenIV.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753307AbZDTFPn (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 20 Apr 2009 00:43:44 -0400
-Date: Mon, 20 Apr 2009 06:45:51 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
+	Mon, 20 Apr 2009 01:15:43 -0400
+Date: Mon, 20 Apr 2009 06:15:38 +0100
+From: Al Viro <viro@ZenIV.linux.org.uk>
 Subject: Re: [GIT] kbuild
-Message-ID: <20090420044551.GB8494@uranus.ravnborg.org>
-References: <20090419092555.GA19213@uranus.ravnborg.org> <20090419223959.GB12054@linux-sh.org> <20090419234501.GA6475@uranus.ravnborg.org> <alpine.LFD.2.00.0904191745390.2199@localhost.localdomain> <20090420014158.GV26366@ZenIV.linux.org.uk> <20090420024954.GW26366@ZenIV.linux.org.uk>
-Mime-Version: 1.0
+Message-ID: <20090420051538.GX26366@ZenIV.linux.org.uk>
+References: <20090419092555.GA19213@uranus.ravnborg.org> <20090419223959.GB12054@linux-sh.org> <20090419234501.GA6475@uranus.ravnborg.org> <alpine.LFD.2.00.0904191745390.2199@localhost.localdomain> <20090420014158.GV26366@ZenIV.linux.org.uk> <20090420024954.GW26366@ZenIV.linux.org.uk> <20090420044551.GB8494@uranus.ravnborg.org>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20090420024954.GW26366@ZenIV.linux.org.uk>
+In-Reply-To: <20090420044551.GB8494@uranus.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Al Viro <viro@ZenIV.linux.org.uk>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, Paul Mundt <lethal@linux-sh.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>, Russell King <rmk+lkml@arm.linux.org.uk>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, Thomas Gleixner <tglx@linutronix.de>
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, Paul Mundt <lethal@linux-sh.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>, Russell King <rmk+lkml@arm.linux.org.uk>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, Thomas Gleixner <tglx@linutronix.de>, jdike@addtoit.com
 
-On Mon, Apr 20, 2009 at 03:49:54AM +0100, Al Viro wrote:
-> On Mon, Apr 20, 2009 at 02:41:58AM +0100, Al Viro wrote:
-> > On Sun, Apr 19, 2009 at 05:52:32PM -0700, Linus Torvalds wrote:
-> > > 
-> > > 
-> > > On Mon, 20 Apr 2009, Sam Ravnborg wrote:
-> > > > 
-> > > > You will soon see a path from me where I fix sh too.
-> > > 
-> > > Can we do a global 'sed s:asm/asm-offsets.h:generated/asm-offsets.h:g' 
-> > > thing too? And then get rid of the include/asm symlink?
-> > > 
-> > > That asm-offsets.h mess is scary. I don't quite know why kvm on ia64 seems 
-> > > to do it's own asm-offsets.h file, for example. And arch/blackfin/Makefile 
-> > > mentions arch/$(ARCH)/include/asm/asm-offsets.h (but does it actually do 
-> > > one?).
-> > 
-> > We'll need to update uml as well (contents of shared/kern_constants.h)
-> 
-> BTW, while we are at it...  There's a way to deal with arch/um without
-> that kind of contortions, provided that we are willing to use -idirafter.
-For kernel proper the use of -idirafter would be confusing.
-But for um alone we should be safe provided it is properly commented.
+On Mon, Apr 20, 2009 at 06:45:51AM +0200, Sam Ravnborg wrote:
 
-I have already fixed um the obvious way for asm-offsets in my local tree.
-But if you prefer I can add a -dirafter based patch before the "move
-asm-offsets.h to incldue/generated" patch.
+> For kernel proper the use of -idirafter would be confusing.
+> But for um alone we should be safe provided it is properly commented.
 
-	Sam
+Less than for all um - it's only for USER_OBJ there.  It is special,
+simply because for uml the counterpart of really low-level glue has
+to talk to libc.  So there we have separation into "normal kernel source"
+and "userland code that uses userland headers, calls libc functions, etc."
+ 
+> I have already fixed um the obvious way for asm-offsets in my local tree.
+> But if you prefer I can add a -dirafter based patch before the "move
+> asm-offsets.h to incldue/generated" patch.
+
+I've dumped several header cleanup patches for uml into
+git://git.kernel.org/pub/scm/linux/kernel/git/viro/um-header.git/ 
+including the -idirafter, move of user_constants.h, etc.
+Another fun thing: user.h used to be included directly by just about
+every userland-side file.  Switched it to -include user.h (for USER_CFLAGS,
+of course - not for normal stuff), killed includes, got rid of shitloads
+of kern_constants.h includes at the same time.  At which point getting
+rid of kern_constants.h became trivial.
+
+Up to Jeff's approval, obviously - *including* -idirafter patch.
