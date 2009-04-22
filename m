@@ -1,12 +1,12 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from Cpsmtpm-eml108.kpnxchange.com ([195.121.3.12]:56014 "EHLO
-	CPSMTPM-EML108.kpnxchange.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751794AbZDVXLX (ORCPT
+Received: from Cpsmtpm-eml110.kpnxchange.com ([195.121.3.14]:51422 "EHLO
+	CPSMTPM-EML110.kpnxchange.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751043AbZDVXLq (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 22 Apr 2009 19:11:23 -0400
+	Wed, 22 Apr 2009 19:11:46 -0400
 From: Frans Pop <elendil@planet.nl>
-Subject: [PATCH 9/14] deb-pkg: improve maintainer identification
-Date: Thu, 23 Apr 2009 01:11:20 +0200
+Subject: [PATCH 10/14] deb-pkg: improve Source field
+Date: Thu, 23 Apr 2009 01:11:43 +0200
 References: <200904230034.59627.elendil@planet.nl>
 In-Reply-To: <200904230034.59627.elendil@planet.nl>
 MIME-Version: 1.0
@@ -14,72 +14,45 @@ Content-Type: text/plain;
   charset="utf-8"
 Content-Transfer-Encoding: 7bit
 Content-Disposition: inline
-Message-Id: <200904230111.21558.elendil@planet.nl>
+Message-Id: <200904230111.44655.elendil@planet.nl>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Sam Ravnborg <sam@ravnborg.org>, maximilian attems <max@stro.at>, Andres Salomon <dilinger@debian.org>
 
-From: maximilian attems <max@stro.at>
-Subject: deb-pkg: improve maintainer identification
+The Source: field is defined as the source package in the package
+archive from which a binary packages are built. As deb-pkg does not
+generate a source package, we should avoid to use any existing source
+packages here.
 
-Try harder to find email and maintainer name.
-Debian's own devscripts all use DEBEMAIL or DEBFULLNAME prior to an
-eventual EMAIL or NAME environment variable. Match their logic.
-
-"Anonymous" sounds nicer then "Kernel Compiler" if no name is found.
-
-Signed-off-by: maximilian attems <max@stro.at>
 Signed-off-by: Frans Pop <elendil@planet.nl>
+Cc: maximilian attems <max@stro.at>
 Cc: Andres Salomon <dilinger@debian.org>
 ---
 
-I've removed some unnecessary braces. Also, "Anonymous Maintainer" seemed
-somewhat redundant to me; just "Anonymous" should do.
+I still have strong objections to "linux-2.6".
+IMO "linux-upstream" is a good compromise: it's clear and avoids both
+Debian's "linux-2.6" and Ubuntu's "linux".
 
 diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-index 2bd12c1..60f8de2 100644
+index 60f8de2..ebb112d 100644
 --- a/scripts/package/builddeb
 +++ b/scripts/package/builddeb
-@@ -95,14 +95,30 @@ EOF
- 	chmod 755 "$tmpdir/DEBIAN/$script"
- done
+@@ -114,7 +114,7 @@ maintainer="$name <$email>"
  
--name="Kernel Compiler <$(id -nu)@$(hostname -f)>"
-+# Try to determine maintainer and email values
-+if [ -n "$DEBEMAIL" ]; then
-+       email=$DEBEMAIL
-+elif [ -n "$EMAIL" ]; then
-+       email=$EMAIL
-+else
-+       email=$(id -nu)@$(hostname -f)
-+fi
-+if [ -n "$DEBFULLNAME" ]; then
-+       name=$DEBFULLNAME
-+elif [ -n "$NAME" ]; then
-+       name=$NAME
-+else
-+       name="Anonymous"
-+fi
-+maintainer="$name <$email>"
-+
  # Generate a simple changelog template
  cat <<EOF > debian/changelog
- linux ($packageversion) unstable; urgency=low
+-linux ($packageversion) unstable; urgency=low
++linux-upstream ($packageversion) unstable; urgency=low
  
    * Custom built Linux kernel.
  
-- -- $name  $(date -R)
-+ -- $maintainer  $(date -R)
- EOF
+@@ -143,7 +143,7 @@ EOF
  
- # Generate copyright file
-@@ -130,7 +146,7 @@ cat <<EOF > debian/control
- Source: linux
+ # Generate a control file
+ cat <<EOF > debian/control
+-Source: linux
++Source: linux-upstream
  Section: base
  Priority: optional
--Maintainer: $name
-+Maintainer: $maintainer
- Standards-Version: 3.6.1
- EOF
- 
+ Maintainer: $maintainer
