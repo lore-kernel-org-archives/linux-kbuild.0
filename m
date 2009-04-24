@@ -1,94 +1,88 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from fornax.pixelized.ch ([88.198.8.169]:34561 "EHLO
-	fornax.pixelized.ch" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753082AbZDWMjI (ORCPT
+Received: from Cpsmtpm-eml106.kpnxchange.com ([195.121.3.10]:59693 "EHLO
+	CPSMTPM-EML106.kpnxchange.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1760908AbZDXRI2 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 23 Apr 2009 08:39:08 -0400
-Message-ID: <49F0602C.1060605@cateee.net>
-Date: Thu, 23 Apr 2009 14:33:48 +0200
-From: "Giacomo A. Catenazzi" <cate@cateee.net>
+	Fri, 24 Apr 2009 13:08:28 -0400
+From: Frans Pop <elendil@planet.nl>
+Subject: Re: [PATCH 8/14 v2] deb-pkg: generate debian/copyright file
+Date: Fri, 24 Apr 2009 19:08:24 +0200
+References: <200904230034.59627.elendil@planet.nl> <200904230111.02672.elendil@planet.nl>
+In-Reply-To: <200904230111.02672.elendil@planet.nl>
 MIME-Version: 1.0
-Subject: Re: Tool support for Kconfig
-References: <DC736A60-0CD8-44BA-92B6-653CF56F6DB1@gsd.uwaterloo.ca>
-In-Reply-To: <DC736A60-0CD8-44BA-92B6-653CF56F6DB1@gsd.uwaterloo.ca>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Type: text/plain;
+  charset="utf-8"
 Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+Message-Id: <200904241908.25581.elendil@planet.nl>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Rafael Lotufo <rlotufo@swen.uwaterloo.ca>
-Cc: linux-kernel@vger.kernel.org, Kbuild <linux-kbuild@vger.kernel.org>
+To: linux-kbuild@vger.kernel.org
+Cc: Sam Ravnborg <sam@ravnborg.org>, maximilian attems <max@stro.at>, Andres Salomon <dilinger@debian.org>
 
-[CC also to kbuild list]
+On Thursday 23 April 2009, Frans Pop wrote:
+Add a basic debian/copyright to the binary packages.
 
-Rafael Lotufo wrote:
-> We currently see the Linux kernel configuration options as a very rich 
-> real-world feature model,
+Based on an earlier patch from Maximilian Attems.
 
-But also broken and it lack a lot of useful features.
+Signed-off-by: Frans Pop <elendil@planet.nl>
+Cc: maximilian attems <max@stro.at>
+Cc: Andres Salomon <dilinger@debian.org>
+---
 
-> and it has been our subject
-> of investigation since last January. Our current efforts have been to 
-> create a reasoning tool for the Kconfig options, something that
-> could help in finding recursive dependencies, configuration options that 
-> cannot be selected, and even tools that would facilitate
-> configuring the Linux kernel, like resolving dependencies for a wanted 
-> configuration option that cannot be currently selected
-> due to its dependencies. Furthermore, the reasoning tool can compute 
-> semantic diffs, intersections, unions, and slices of Kconfig
-> specifications.
-> 
-> We would be interested to receive input from interested Linux kernel 
-> developers regarding their experience
-> with modifying Kconfig files. Would a tool for analyzing and comparing 
-> Kconfig files be useful?
-> What questions one typically has to answer when evolving Kconfig files? 
-> Are there any frequent problems
-> or mistakes?
+Resending as previous version had a trailing space in one line.
 
-the Kconfig has a big real problem: linear order of dependencies,
-i.e. dependencies should be defined before use point.  This is not
-a requirement of language, but with current interfaces would be very
-impractical to find new options in past branches. But on the other hand,
-in some cases is very annoying. (Lately I configured a new machine, starting
-from distribution config. In this case I needed to go from bottom to
-top of tree, in order to remove almost every (unneded) feature.
-
-So a check that warn about such cases would be nice. This would resolve
-also the recursion problem.
-But also a better way to handle dependencies (in user interface)
-would be nice, like our package managers:
-- removing a CONFIG (showing all dependencies before confirmation)
-   [which is not yet possible]
-- adding a know CONFIG, which could be hidden.
-   Actually we can ask for dependencies with search '/' command, but
-   also allowing to select the dependencies (like in our package manager)
-   would be nice.
-
-Note: such features could make "SELECT" obsolete.
-
-Know problems?
-I don't know. Usually new driver use copy paste, so without
-big problems. The syntax is pretty simple.
-
-There was some confusion about dependency handling (logical
-operators with ternary values n/m/y)
-
-SELECT is sometime used incorrectly (style/design, not in
-semantic layer)
-
-config menu can be defined several time. This is a nice feature,
-but also a source of possible problems. I think normally it is
-OK on same file and on incompatible area (e.g. on different
-architectures). I think all other cases should be errors.
-
-Hidden (always invalid dependencies) CONFIG item are interesting.
-
-ciao
-	cate
-
-> 
-> We would very much appreciate any input on this subject.
-> 
-> Thank you very much for you attention,
-> 
-
+diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+index 0449147..2bd12c1 100644
+--- a/scripts/package/builddeb
++++ b/scripts/package/builddeb
+@@ -15,6 +15,8 @@ set -e
+ create_package() {
+ 	local pname="$1" pdir="$2"
+ 
++	cp debian/copyright "$pdir/usr/share/doc/$pname/"
++
+ 	# Fix ownership and permissions
+ 	chown -R root:root "$pdir"
+ 	chmod -R go-w "$pdir"
+@@ -43,10 +45,10 @@ fi
+ 
+ # Setup the directory structure
+ rm -rf "$tmpdir" "$fwdir"
+-mkdir -p "$tmpdir/DEBIAN" "$tmpdir/lib" "$tmpdir/boot"
+-mkdir -p "$fwdir/DEBIAN" "$fwdir/lib"
++mkdir -p "$tmpdir/DEBIAN" "$tmpdir/lib" "$tmpdir/boot" "$tmpdir/usr/share/doc/$packagename"
++mkdir -p "$fwdir/DEBIAN" "$fwdir/lib" "$fwdir/usr/share/doc/$fwpackagename"
+ if [ "$ARCH" = "um" ] ; then
+-	mkdir -p "$tmpdir/usr/lib/uml/modules/$version" "$tmpdir/usr/share/doc/$packagename" "$tmpdir/usr/bin"
++	mkdir -p "$tmpdir/usr/lib/uml/modules/$version" "$tmpdir/usr/bin"
+ fi
+ 
+ # Build and install the kernel
+@@ -103,6 +105,26 @@ linux ($packageversion) unstable; urgency=low
+  -- $name  $(date -R)
+ EOF
+ 
++# Generate copyright file
++cat <<EOF > debian/copyright
++This is a packacked upstream version of the Linux kernel.
++
++The sources may be found at most Linux ftp sites, including:
++ftp://ftp.kernel.org/pub/linux/kernel
++
++Copyright: 1991 - 2009 Linus Torvalds and others.
++
++The git repository for mainline kernel development is at:
++git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux-2.6.git
++
++    This program is free software; you can redistribute it and/or modify
++    it under the terms of the GNU General Public License as published by
++    the Free Software Foundation; version 2 dated June, 1991.
++
++On Debian GNU/Linux systems, the complete text of the GNU General Public
++License version 2 can be found in \`/usr/share/common-licenses/GPL-2'.
++EOF
++
+ # Generate a control file
+ cat <<EOF > debian/control
+ Source: linux
