@@ -1,40 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.mail.elte.hu ([157.181.151.9]:35516 "EHLO mx2.mail.elte.hu"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1762916AbZD3OoP (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 30 Apr 2009 10:44:15 -0400
-Date: Thu, 30 Apr 2009 16:43:09 +0200
-From: Ingo Molnar <mingo@elte.hu>
-Subject: Re: [PATCH 0/3] removing unwanted module configs
-Message-ID: <20090430144309.GC14897@elte.hu>
-References: <20090430030821.523327994@goodmis.org> <20090430071830.GC16737@elte.hu> <alpine.DEB.2.00.0904300908110.20374@gandalf.stny.rr.com> <20090430132605.GA5289@elte.hu> <alpine.DEB.2.00.0904300932380.20374@gandalf.stny.rr.com> <alpine.DEB.2.00.0904300945440.20374@gandalf.stny.rr.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <alpine.DEB.2.00.0904300945440.20374@gandalf.stny.rr.com>
+Received: from hrndva-omtalb.mail.rr.com ([71.74.56.123]:56229 "EHLO
+	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1762683AbZD3SwT (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 30 Apr 2009 14:52:19 -0400
+Message-Id: <20090430185022.122124349@goodmis.org>
+Date: Thu, 30 Apr 2009 14:50:22 -0400
+From: Steven Rostedt <rostedt@goodmis.org>
+Subject: [PATCH 0/7] kconfig: more featured minimum module configs
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Steven Rostedt <rostedt@goodmis.org>
-Cc: linux-kernel@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>, Linus Torvalds <torvalds@linux-foundation.org>, Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@linutronix.de>, Theodore Tso <tytso@mit.edu>, Arnaldo Carvalho de Melo <acme@redhat.com>, zippel@linux-m68k.org, linux-kbuild@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>, Jonathan Corbet <corbet@lwn.net>
+To: linux-kernel@vger.kernel.org
+Cc: Ingo Molnar <mingo@elte.hu>, Andrew Morton <akpm@linux-foundation.org>, Linus Torvalds <torvalds@linux-foundation.org>, Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@linutronix.de>, Theodore Tso <tytso@mit.edu>, Arnaldo Carvalho de Melo <acme@redhat.com>, zippel@linux-m68k.org, linux-kbuild@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>
+
+This set of patches adds on top of my previous post.
+
+It fixes CONFIG_IKCONFIG when CONFIG_IKCONFIG_PROC is not set.
+ (gcc optimizes the config out!)
+
+As a request from Ingo, it now enables IKCONFIG and will also
+use various locations to find a config to base against.
+
+Have fun,
+
+-- Steve
 
 
-* Steven Rostedt <rostedt@goodmis.org> wrote:
+The following patches are in:
 
-> On Thu, 30 Apr 2009, Steven Rostedt wrote:
-> > 
-> > Since this option can also be used for helping embedded 
-> > developers (I used it for that) I would not want to bloat the 
-> > kernel with running a script that is suppose to minimize it. But 
-> > if IKCONFIG && !IKCONFIG_PROC does not add more data to the 
-> > kernel, then I would be happy to turn it on by default.
-> 
-> Actually, I can let the user decide. If it sees that IKCONFIG is 
-> not set, it can remove it from the .config output. When the 
-> silentoldconfig runs afterwards, it will ask the user if they want 
-> to enable it.
+  git://git.kernel.org/pub/scm/linux/kernel/git/rostedt/linux-2.6-trace.git
 
-No, please offer reasonable non-interactive default behavior. It's 
-pretty well-defined, and it can be engineered to be self-sufficient 
-as well. Why not do that?
+    branch: kconfig
 
-	Ingo
+
+Steven Rostedt (7):
+      kconfig: streamline_config.pl do not stop with no depends
+      kconfig: do not warn about modules built in
+      kconfig: enable CONFIG_IKCONFIG from streamline_config.pl
+      kconfig: add check if end exists in extract-ikconfig
+      kconfig: have extract-ikconfig read ELF files
+      kconfig: keep config.gz around even if CONFIG_IKCONFIG_PROC is not set
+      kconfig: search for a config to base the local(mod|yes)config on
+
+----
+ kernel/Makefile                      |    2 +-
+ scripts/extract-ikconfig             |   14 +++++
+ scripts/kconfig/streamline_config.pl |  102 +++++++++++++++++++++++++++++-----
+ 3 files changed, 103 insertions(+), 15 deletions(-)
+-- 
