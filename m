@@ -1,46 +1,71 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from xenotime.net ([72.52.64.118]:41571 "HELO xenotime.net"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with SMTP
-	id S1751465AbZD2Xyf (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 29 Apr 2009 19:54:35 -0400
-Received: from ::ffff:71.182.83.218 ([71.182.83.218]) by xenotime.net for <linux-kbuild@vger.kernel.org>; Wed, 29 Apr 2009 16:54:24 -0700
-Message-ID: <49F8E904.3080601@xenotime.net>
-Date: Wed, 29 Apr 2009 16:55:48 -0700
-From: Randy Dunlap <rdunlap@xenotime.net>
-MIME-Version: 1.0
-Subject: Re: error when using KCONFIG_ALLCONFIG?
-References: <49F8D6EC.1090800@xenotime.net> <20090429234911.GA1922@uranus.ravnborg.org>
-In-Reply-To: <20090429234911.GA1922@uranus.ravnborg.org>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+Received: from hrndva-omtalb.mail.rr.com ([71.74.56.123]:41628 "EHLO
+	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752138AbZD3DTq (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 29 Apr 2009 23:19:46 -0400
+Message-Id: <20090430030821.523327994@goodmis.org>
+Date: Wed, 29 Apr 2009 23:08:21 -0400
+From: Steven Rostedt <rostedt@goodmis.org>
+Subject: [PATCH 0/3] removing unwanted module configs
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: linux-kbuild@vger.kernel.org
+To: linux-kernel@vger.kernel.org
+Cc: Ingo Molnar <mingo@elte.hu>, Andrew Morton <akpm@linux-foundation.org>, Linus Torvalds <torvalds@linux-foundation.org>, Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@linutronix.de>, Theodore Tso <tytso@mit.edu>, Arnaldo Carvalho de Melo <acme@redhat.com>, zippel@linux-m68k.org, linux-kbuild@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>, Jonathan Corbet <corbet@lwn.net>
 
-Sam Ravnborg wrote:
-> On Wed, Apr 29, 2009 at 03:38:36PM -0700, Randy Dunlap wrote:
->> Hi,
->>
->> I often use
->> make KCONFIG_ALLCONFIG=filename allnoconfig
->>
->> and it works fine.  However, when I use O= with that:
->>
->> make O=xx64 KCONFIG_ALLCONFIG=filename allnoconfig
->>
->> I get an xx64/.config file that is the same as
->>
->> make O=xx64 allnoconfig
->>
->> I.e., the KCONFIG_ALLCONFIG=filename part was ignored.
->>
->> Is this new?  expected?  known?
-> I dunno if it is new but it is not expected.
-> Can you try if it help to move 'filename' to output directory.
+As it has been brought up last Kernel Summit, we want to make it easier
+for those that report bugs to build their own kernels, and maybe even
+bisect with git.  Some of these people are not programmers and do not
+understand the complexity of the configuration options. But to compile
+a distribution configured kernel on their boxes can take hours.
 
-make O=xx64 KCONFIG_ALLCONFIG=xx64/filename allnoconfig
+This patch series comes to the rescue. I wrote the first instance of
+streamline config when I bought a new box in 2005 and got frustrated
+with finding all the necessary configurations to boot it. It is a
+small (yet powerful) perl script.
 
-gives the same result as 'make allnoconfig'.
+Here's what it does:
 
----
+ * Reads the modules that are load by using lsmod.
+ * Reads all Makefiles to map modules to CONFIG_* options
+ * Reads the Kconfig files to find dependencies and selects
+ * Figures out what CONFIGS are needed to compile the loaded modules
+ * Reads the .config and prints out a version with all module configurations
+    that not needed, disabled.
+
+The next two patches add options to make.
+
+ localmodconfig - this will run streamline_config.pl on the .config file
+	and replace it at the end.
+
+ localyesconfig - this will do the same as localmodconfig but will also
+	sed -i s/=m/=y/  to turn all modules to core. It will also run
+	the 'make oldcondfig' to fix it up and let the user handle
+	andything that was changed by converting a module to core.
+
+Anyway, this is now in git and as a series of patches here. My git tree
+is based off of the latest Linus git tree.
+
+Have fun!
+
+-- Steve
+
+
+
+The following patches are in:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/rostedt/linux-2.6-trace.git
+
+    branch: kconfig
+
+
+Steven Rostedt (3):
+      kconfig: add streamline_config.pl to scripts
+      kconfig: make localmodconfig to run streamline_config.pl
+      kconfig: add make localyesconfig option
+
+----
+ scripts/kconfig/Makefile             |   24 +++-
+ scripts/kconfig/streamline_config.pl |  291 ++++++++++++++++++++++++++++++++++
+ 2 files changed, 314 insertions(+), 1 deletions(-)
+-- 
