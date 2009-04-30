@@ -1,15 +1,15 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from hrndva-omtalb.mail.rr.com ([71.74.56.125]:56264 "EHLO
+Received: from hrndva-omtalb.mail.rr.com ([71.74.56.124]:35145 "EHLO
 	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1763217AbZD3SwT (ORCPT
+	with ESMTP id S1763234AbZD3SwU (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 30 Apr 2009 14:52:19 -0400
-Message-Id: <20090430185217.661759804@goodmis.org>
+	Thu, 30 Apr 2009 14:52:20 -0400
+Message-Id: <20090430185218.681261851@goodmis.org>
 References: <20090430185022.122124349@goodmis.org>
-Date: Thu, 30 Apr 2009 14:50:23 -0400
+Date: Thu, 30 Apr 2009 14:50:24 -0400
 From: Steven Rostedt <rostedt@goodmis.org>
-Subject: [PATCH 1/7] kconfig: streamline_config.pl do not stop with no depends
-Content-Disposition: inline; filename=0001-kconfig-streamline_config.pl-do-not-stop-with-no-de.patch
+Subject: [PATCH 2/7] kconfig: do not warn about modules built in
+Content-Disposition: inline; filename=0002-kconfig-do-not-warn-about-modules-built-in.patch
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org
@@ -17,47 +17,45 @@ Cc: Ingo Molnar <mingo@elte.hu>, Andrew Morton <akpm@linux-foundation.org>, Linu
 
 From: Steven Rostedt <srostedt@redhat.com>
 
-If a config is does not have a prompt, it must be selected.
-streamline_config.pl keeps track of all configs that select other configs.
-If a config that does not have a prompt needs to be set to enable a
-current module, it will add include all configs that select it.
-Note, streamline_config.pl does not enable modules that are not already
-enabled. It only keeps enabled those that were enabled and might be
-needed to compile the current modules.
+The streamline_config.pl finds all the configs that are needed to
+compile the currently loaded modules. After it creates the .config
+file, it tests to make sure all the configs that are needed were
+set.
 
-The code to find the selects of a config is after the code that
-adds the depends. But if a config needed selects but had no dependencies,
-it would not be set. Because the code would stop before getting to
-the select.
+It only looks at the configs that are modules, it does not look
+at the builtin configs. This causes unnecessary warnings about modules
+not being covered.
 
-[ Impact: fix to enable configs that need to be selected ]
+[ Impact: stops false warnings about modules not configured ]
 
+Reported-by: Ingo Molnar <mingo@elte.hu>
 Signed-off-by: Steven Rostedt <rostedt@goodmis.org>
 ---
- scripts/kconfig/streamline_config.pl |    8 +++-----
- 1 files changed, 3 insertions(+), 5 deletions(-)
+ scripts/kconfig/streamline_config.pl |    8 +++++---
+ 1 files changed, 5 insertions(+), 3 deletions(-)
 
 diff --git a/scripts/kconfig/streamline_config.pl b/scripts/kconfig/streamline_config.pl
-index 79d8557..1774905 100644
+index 1774905..caac952 100644
 --- a/scripts/kconfig/streamline_config.pl
 +++ b/scripts/kconfig/streamline_config.pl
-@@ -237,13 +237,11 @@ while ($repeat) {
-     foreach my $config (keys %configs) {
- 	$config =~ s/^CONFIG_//;
- 
--	if (!defined($depends{$config})) {
--	    next;
-+	if (defined($depends{$config})) {
-+	    # This config has dependencies. Make sure they are also included
-+	    parse_config_dep_select $depends{$config};
- 	}
- 
--	# This config has dependencies. Make sure they are also included
--	parse_config_dep_select $depends{$config};
--
- 	if (defined($prompt{$config}) || !defined($selects{$config})) {
- 	    next;
- 	}
+@@ -256,12 +256,14 @@ my %setconfigs;
+ # Finally, read the .config file and turn off any module enabled that
+ # we could not find a reason to keep enabled.
+ while(<CIN>) {
+-	if (/^(CONFIG.*)=m/) {
++	if (/^(CONFIG.*)=(m|y)/) {
+ 		if (defined($configs{$1})) {
+-		    $setconfigs{$1} = 1;
++		    $setconfigs{$1} = $2;
+ 		    print;
+-		} else {
++		} elsif ($2 eq "m") {
+ 		    print "# $1 is not set\n";
++		} else {
++		    print;
+ 		}
+ 	} else {
+ 		print;
 -- 
 1.6.2.1
 
