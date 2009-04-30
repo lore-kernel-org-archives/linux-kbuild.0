@@ -1,17 +1,17 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-bw0-f163.google.com ([209.85.218.163]:54299 "EHLO
-	mail-bw0-f163.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750909AbZD3Vve (ORCPT
+Received: from fk-out-0910.google.com ([209.85.128.190]:30012 "EHLO
+	fk-out-0910.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753457AbZD3WEW (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 30 Apr 2009 17:51:34 -0400
+	Thu, 30 Apr 2009 18:04:22 -0400
 MIME-Version: 1.0
-In-Reply-To: <20090430185219.656122641@goodmis.org>
+In-Reply-To: <20090430185223.792841532@goodmis.org>
 References: <20090430185022.122124349@goodmis.org>
-	 <20090430185219.656122641@goodmis.org>
-Date: Thu, 30 Apr 2009 22:51:32 +0100
-Message-ID: <9b2b86520904301451v1d77589l7ee48217fb64e567@mail.gmail.com>
-Subject: Re: [PATCH 3/7] kconfig: enable CONFIG_IKCONFIG from
-	streamline_config.pl
+	 <20090430185223.792841532@goodmis.org>
+Date: Thu, 30 Apr 2009 23:04:21 +0100
+Message-ID: <9b2b86520904301504m2906e466ndd8b9e7851bcd59@mail.gmail.com>
+Subject: Re: [PATCH 7/7] kconfig: search for a config to base the
+	local(mod|yes)config on
 From: Alan Jenkins <sourcejedi.lkml@googlemail.com>
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
@@ -23,82 +23,27 @@ Cc: linux-kernel@vger.kernel.org, Ingo Molnar <mingo@elte.hu>, Andrew Morton <ak
 On 4/30/09, Steven Rostedt <rostedt@goodmis.org> wrote:
 > From: Steven Rostedt <srostedt@redhat.com>
 >
-> Ingo Molnar suggested that the streamline_config.pl should enable
-> CONFIG_IKCONFIG to keep the current config in the kernel.
-> Then we can use scripts/extract-ikconfig to find the current
-> modules.
+> Instead of using the .config in the local directory. This patch
+> changes streamline_config.pl to search various locations for a config.
 >
-> This patch changes streamline_config.pl to check if CONFIG_IKCONFIG
-> is not set, and if it is not, it enables it to be a module.
+> Here's the list and order of search:
 >
-> [ Impact: make current config options easier to find ]
+>   /proc/config.gz
+>   /boot/vmlinuz-`uname -r`
+>   vmlinux  # local to the directory
+>   /lib/modules/`uname -r`/kernel/kernel/configs.ko
+>   kernel/configs.ko
+>   kernel/configs.o
+>   .config
 >
-> Reported-by: Ingo Molnar <mingo@elte.hu>
-> Signed-off-by: Steven Rostedt <rostedt@goodmis.org>
-> ---
->  scripts/kconfig/streamline_config.pl |   33
-> +++++++++++++++++++++++----------
->  1 files changed, 23 insertions(+), 10 deletions(-)
->
-> diff --git a/scripts/kconfig/streamline_config.pl
-> b/scripts/kconfig/streamline_config.pl
-> index caac952..2334641 100644
-> --- a/scripts/kconfig/streamline_config.pl
-> +++ b/scripts/kconfig/streamline_config.pl
-> @@ -256,18 +256,31 @@ my %setconfigs;
->  # Finally, read the .config file and turn off any module enabled that
->  # we could not find a reason to keep enabled.
->  while(<CIN>) {
-> -	if (/^(CONFIG.*)=(m|y)/) {
-> -		if (defined($configs{$1})) {
-> -		    $setconfigs{$1} = $2;
-> -		    print;
-> -		} elsif ($2 eq "m") {
-> -		    print "# $1 is not set\n";
-> -		} else {
-> -		    print;
-> -		}
-> +
-> +    if (/CONFIG_IKCONFIG/) {
-> +	if (/# CONFIG_IKCONFIG is not set/) {
-> +	    # enable IKCONFIG at least as a module
-> +	    print "CONFIG_IKCONFIG=m\n";
-> +	    # don't ask about PROC
-> +	    print "# CONFIG_IKCONFIG is not set\n";
+> Once it finds a file that contains a config (it checks if the binary
+> objects have configs first) it then uses it to create the .config
+> with minimum modules needed.
 
-I assume the second one should be CONFIG_IKCONFIG_PROC :-).
+Maybe this has already been discussed, but is there some reason for
+omitting /boot/config-`uname -r`?  My understanding as a user of a
+specific distribution was that kernel packages provide these files,
+and therefore do not feel the need to enable CONFIG_IKCONFIG.
 
-> +	} else {
-> +	    print;
-> +	}
-> +	next;
-> +    }
-> +
-> +    if (/^(CONFIG.*)=(m|y)/) {
-> +	if (defined($configs{$1})) {
-> +	    $setconfigs{$1} = $2;
-> +	    print;
-> +	} elsif ($2 eq "m") {
-> +	    print "# $1 is not set\n";
->  	} else {
-> -		print;
-> +	    print;
->  	}
-
-> +    } else {
-> +	print;
-> +    }
-
-
-Maybe it would be cleaner make the two "if" blocks the same; i.e. do
-this instead:
-
-+	next;
-+    }
-+
-+	print;
-
-
->  }
->  close(CIN);
->
+Regards
+Alan
