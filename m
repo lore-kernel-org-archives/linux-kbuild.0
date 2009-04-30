@@ -1,50 +1,64 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from hrndva-omtalb.mail.rr.com ([71.74.56.123]:56229 "EHLO
+Received: from hrndva-omtalb.mail.rr.com ([71.74.56.125]:56264 "EHLO
 	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1762683AbZD3SwT (ORCPT
+	with ESMTP id S1763217AbZD3SwT (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
 	Thu, 30 Apr 2009 14:52:19 -0400
-Message-Id: <20090430185022.122124349@goodmis.org>
-Date: Thu, 30 Apr 2009 14:50:22 -0400
+Message-Id: <20090430185217.661759804@goodmis.org>
+References: <20090430185022.122124349@goodmis.org>
+Date: Thu, 30 Apr 2009 14:50:23 -0400
 From: Steven Rostedt <rostedt@goodmis.org>
-Subject: [PATCH 0/7] kconfig: more featured minimum module configs
+Subject: [PATCH 1/7] kconfig: streamline_config.pl do not stop with no depends
+Content-Disposition: inline; filename=0001-kconfig-streamline_config.pl-do-not-stop-with-no-de.patch
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org
 Cc: Ingo Molnar <mingo@elte.hu>, Andrew Morton <akpm@linux-foundation.org>, Linus Torvalds <torvalds@linux-foundation.org>, Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@linutronix.de>, Theodore Tso <tytso@mit.edu>, Arnaldo Carvalho de Melo <acme@redhat.com>, zippel@linux-m68k.org, linux-kbuild@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>
 
-This set of patches adds on top of my previous post.
+From: Steven Rostedt <srostedt@redhat.com>
 
-It fixes CONFIG_IKCONFIG when CONFIG_IKCONFIG_PROC is not set.
- (gcc optimizes the config out!)
+If a config is does not have a prompt, it must be selected.
+streamline_config.pl keeps track of all configs that select other configs.
+If a config that does not have a prompt needs to be set to enable a
+current module, it will add include all configs that select it.
+Note, streamline_config.pl does not enable modules that are not already
+enabled. It only keeps enabled those that were enabled and might be
+needed to compile the current modules.
 
-As a request from Ingo, it now enables IKCONFIG and will also
-use various locations to find a config to base against.
+The code to find the selects of a config is after the code that
+adds the depends. But if a config needed selects but had no dependencies,
+it would not be set. Because the code would stop before getting to
+the select.
 
-Have fun,
+[ Impact: fix to enable configs that need to be selected ]
 
--- Steve
+Signed-off-by: Steven Rostedt <rostedt@goodmis.org>
+---
+ scripts/kconfig/streamline_config.pl |    8 +++-----
+ 1 files changed, 3 insertions(+), 5 deletions(-)
 
+diff --git a/scripts/kconfig/streamline_config.pl b/scripts/kconfig/streamline_config.pl
+index 79d8557..1774905 100644
+--- a/scripts/kconfig/streamline_config.pl
++++ b/scripts/kconfig/streamline_config.pl
+@@ -237,13 +237,11 @@ while ($repeat) {
+     foreach my $config (keys %configs) {
+ 	$config =~ s/^CONFIG_//;
+ 
+-	if (!defined($depends{$config})) {
+-	    next;
++	if (defined($depends{$config})) {
++	    # This config has dependencies. Make sure they are also included
++	    parse_config_dep_select $depends{$config};
+ 	}
+ 
+-	# This config has dependencies. Make sure they are also included
+-	parse_config_dep_select $depends{$config};
+-
+ 	if (defined($prompt{$config}) || !defined($selects{$config})) {
+ 	    next;
+ 	}
+-- 
+1.6.2.1
 
-The following patches are in:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/rostedt/linux-2.6-trace.git
-
-    branch: kconfig
-
-
-Steven Rostedt (7):
-      kconfig: streamline_config.pl do not stop with no depends
-      kconfig: do not warn about modules built in
-      kconfig: enable CONFIG_IKCONFIG from streamline_config.pl
-      kconfig: add check if end exists in extract-ikconfig
-      kconfig: have extract-ikconfig read ELF files
-      kconfig: keep config.gz around even if CONFIG_IKCONFIG_PROC is not set
-      kconfig: search for a config to base the local(mod|yes)config on
-
-----
- kernel/Makefile                      |    2 +-
- scripts/extract-ikconfig             |   14 +++++
- scripts/kconfig/streamline_config.pl |  102 +++++++++++++++++++++++++++++-----
- 3 files changed, 103 insertions(+), 15 deletions(-)
 -- 
