@@ -1,15 +1,15 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from hrndva-omtalb.mail.rr.com ([71.74.56.125]:54142 "EHLO
+Received: from hrndva-omtalb.mail.rr.com ([71.74.56.125]:37545 "EHLO
 	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1764525AbZD3SwZ (ORCPT
+	with ESMTP id S1764560AbZD3SwZ (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
 	Thu, 30 Apr 2009 14:52:25 -0400
-Message-Id: <20090430185223.792841532@goodmis.org>
+Message-Id: <20090430185222.696995168@goodmis.org>
 References: <20090430185022.122124349@goodmis.org>
-Date: Thu, 30 Apr 2009 14:50:29 -0400
+Date: Thu, 30 Apr 2009 14:50:28 -0400
 From: Steven Rostedt <rostedt@goodmis.org>
-Subject: [PATCH 7/7] kconfig: search for a config to base the local(mod|yes)config on
-Content-Disposition: inline; filename=0007-kconfig-search-for-a-config-to-base-the-local-mod-y.patch
+Subject: [PATCH 6/7] kconfig: keep config.gz around even if CONFIG_IKCONFIG_PROC is not set
+Content-Disposition: inline; filename=0006-kconfig-keep-config.gz-around-even-if-CONFIG_IKCONF.patch
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org
@@ -17,104 +17,32 @@ Cc: Ingo Molnar <mingo@elte.hu>, Andrew Morton <akpm@linux-foundation.org>, Linu
 
 From: Steven Rostedt <srostedt@redhat.com>
 
-Instead of using the .config in the local directory. This patch
-changes streamline_config.pl to search various locations for a config.
+If CONFIG_IKCONFIG is set but CONFIG_IKCONFIG_PROC is not, then
+gcc will optibize the config.gz out, because nobody uses it.
 
-Here's the list and order of search:
+This patch adds "__used" to the config.gz data to keep it around so that
+code like extract-ikconfig can still find it.
 
-  /proc/config.gz
-  /boot/vmlinuz-`uname -r`
-  vmlinux  # local to the directory
-  /lib/modules/`uname -r`/kernel/kernel/configs.ko
-  kernel/configs.ko
-  kernel/configs.o
-  .config
-
-Once it finds a file that contains a config (it checks if the binary
-objects have configs first) it then uses it to create the .config
-with minimum modules needed.
-
-[ Impact: use mostly the current config ]
+[ Impact: allow extract-ikconfig to find config.gz ]
 
 Signed-off-by: Steven Rostedt <rostedt@goodmis.org>
 ---
- scripts/kconfig/streamline_config.pl |   63 +++++++++++++++++++++++++++++++++-
- 1 files changed, 62 insertions(+), 1 deletions(-)
+ kernel/Makefile |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-diff --git a/scripts/kconfig/streamline_config.pl b/scripts/kconfig/streamline_config.pl
-index 2334641..9fa3f81 100644
---- a/scripts/kconfig/streamline_config.pl
-+++ b/scripts/kconfig/streamline_config.pl
-@@ -45,7 +45,68 @@
- my $config = ".config";
- my $linuxpath = ".";
+diff --git a/kernel/Makefile b/kernel/Makefile
+index 4242366..f10c7c7 100644
+--- a/kernel/Makefile
++++ b/kernel/Makefile
+@@ -114,7 +114,7 @@ $(obj)/config_data.gz: .config FORCE
+ 	$(call if_changed,gzip)
  
--open(CIN,$config) || die "Can't open current config file: $config";
-+my $uname = `uname -r`;
-+chomp $uname;
-+
-+my @searchconfigs = (
-+	{
-+	    "file" => "/proc/config.gz",
-+	    "exec" => "zcat",
-+	},
-+	{
-+	    "file" => "/boot/vmlinuz-$uname",
-+	    "exec" => "scripts/extract-ikconfig",
-+	    "test" => "scripts/extract-ikconfig",
-+	},
-+	{
-+	    "file" => "vmlinux",
-+	    "exec" => "scripts/extract-ikconfig",
-+	    "test" => "scripts/extract-ikconfig",
-+	},
-+	{
-+	    "file" => "/lib/modules/$uname/kernel/kernel/configs.ko",
-+	    "exec" => "scripts/extract-ikconfig",
-+	    "test" => "scripts/extract-ikconfig",
-+	},
-+	{
-+	    "file" => "kernel/configs.ko",
-+	    "exec" => "scripts/extract-ikconfig",
-+	    "test" => "scripts/extract-ikconfig",
-+	},
-+	{
-+	    "file" => "kernel/configs.o",
-+	    "exec" => "scripts/extract-ikconfig",
-+	    "test" => "scripts/extract-ikconfig",
-+	},
-+	{
-+	    "file" => ".config",
-+	    "exec" => "cat",
-+	},
-+);
-+
-+sub find_config {
-+    foreach my $conf (@searchconfigs) {
-+	my $file = $conf->{"file"};
-+
-+	next if ( ! -f "$file");
-+
-+	if (defined($conf->{"test"})) {
-+	    `$conf->{"test"} $conf->{"file"} 2>/dev/null`;
-+	    next if ($?);
-+	}
-+
-+	my $exec = $conf->{"exec"};
-+
-+	print STDERR "using config: '$file'\n";
-+
-+	open(CIN, "$exec $file |") || die "Failed to run $exec $file";
-+	return;
-+    }
-+    die "No config file found";
-+}
-+
-+find_config;
-+
- my @makefiles = `find $linuxpath -name Makefile`;
- my %depends;
- my %selects;
+ quiet_cmd_ikconfiggz = IKCFG   $@
+-      cmd_ikconfiggz = (echo "static const char kernel_config_data[] = MAGIC_START"; cat $< | scripts/bin2c; echo "MAGIC_END;") > $@
++      cmd_ikconfiggz = (echo "static const char kernel_config_data[] __used = MAGIC_START"; cat $< | scripts/bin2c; echo "MAGIC_END;") > $@
+ targets += config_data.h
+ $(obj)/config_data.h: $(obj)/config_data.gz FORCE
+ 	$(call if_changed,ikconfiggz)
 -- 
 1.6.2.1
 
