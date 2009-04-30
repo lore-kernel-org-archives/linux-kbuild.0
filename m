@@ -1,15 +1,15 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from hrndva-omtalb.mail.rr.com ([71.74.56.123]:56335 "EHLO
+Received: from hrndva-omtalb.mail.rr.com ([71.74.56.125]:54142 "EHLO
 	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1764351AbZD3SwX (ORCPT
+	with ESMTP id S1764525AbZD3SwZ (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 30 Apr 2009 14:52:23 -0400
-Message-Id: <20090430185221.582053988@goodmis.org>
+	Thu, 30 Apr 2009 14:52:25 -0400
+Message-Id: <20090430185223.792841532@goodmis.org>
 References: <20090430185022.122124349@goodmis.org>
-Date: Thu, 30 Apr 2009 14:50:27 -0400
+Date: Thu, 30 Apr 2009 14:50:29 -0400
 From: Steven Rostedt <rostedt@goodmis.org>
-Subject: [PATCH 5/7] kconfig: have extract-ikconfig read ELF files
-Content-Disposition: inline; filename=0005-kconfig-have-extract-ikconfig-read-ELF-files.patch
+Subject: [PATCH 7/7] kconfig: search for a config to base the local(mod|yes)config on
+Content-Disposition: inline; filename=0007-kconfig-search-for-a-config-to-base-the-local-mod-y.patch
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org
@@ -17,46 +17,104 @@ Cc: Ingo Molnar <mingo@elte.hu>, Andrew Morton <akpm@linux-foundation.org>, Linu
 
 From: Steven Rostedt <srostedt@redhat.com>
 
-It would be nice to use extract-ikconfig to find the congfig.gz
-in either vmlinux (not vmlinuz) or configs.ko.
+Instead of using the .config in the local directory. This patch
+changes streamline_config.pl to search various locations for a config.
 
-This patch changes the script to also be able to read ELF files directly.
+Here's the list and order of search:
 
-[ Impact: find config.gz in vmlinux and configs.ko ]
+  /proc/config.gz
+  /boot/vmlinuz-`uname -r`
+  vmlinux  # local to the directory
+  /lib/modules/`uname -r`/kernel/kernel/configs.ko
+  kernel/configs.ko
+  kernel/configs.o
+  .config
+
+Once it finds a file that contains a config (it checks if the binary
+objects have configs first) it then uses it to create the .config
+with minimum modules needed.
+
+[ Impact: use mostly the current config ]
 
 Signed-off-by: Steven Rostedt <rostedt@goodmis.org>
 ---
- scripts/extract-ikconfig |   10 ++++++++++
- 1 files changed, 10 insertions(+), 0 deletions(-)
+ scripts/kconfig/streamline_config.pl |   63 +++++++++++++++++++++++++++++++++-
+ 1 files changed, 62 insertions(+), 1 deletions(-)
 
-diff --git a/scripts/extract-ikconfig b/scripts/extract-ikconfig
-index 42d6bce..de233ff 100755
---- a/scripts/extract-ikconfig
-+++ b/scripts/extract-ikconfig
-@@ -59,6 +59,8 @@ dump_config "$image"
- GZHDR1="0x1f 0x8b 0x08 0x00"
- GZHDR2="0x1f 0x8b 0x08 0x08"
+diff --git a/scripts/kconfig/streamline_config.pl b/scripts/kconfig/streamline_config.pl
+index 2334641..9fa3f81 100644
+--- a/scripts/kconfig/streamline_config.pl
++++ b/scripts/kconfig/streamline_config.pl
+@@ -45,7 +45,68 @@
+ my $config = ".config";
+ my $linuxpath = ".";
  
-+ELFHDR="0x7f 0x45 0x4c 0x46"
+-open(CIN,$config) || die "Can't open current config file: $config";
++my $uname = `uname -r`;
++chomp $uname;
 +
- # vmlinux.gz: Check for a compressed images
- off=`$binoffset "$image" $GZHDR1 2>/dev/null`
- [ "$?" != "0" ] && off="-1"
-@@ -73,6 +75,14 @@ elif [ "$off" -ne "-1" ]; then
- 	(dd ibs="$off" skip=1 count=0 && dd bs=512k) <"$image" 2>/dev/null | \
- 		zcat >"$TMPFILE"
- 	dump_config "$TMPFILE"
++my @searchconfigs = (
++	{
++	    "file" => "/proc/config.gz",
++	    "exec" => "zcat",
++	},
++	{
++	    "file" => "/boot/vmlinuz-$uname",
++	    "exec" => "scripts/extract-ikconfig",
++	    "test" => "scripts/extract-ikconfig",
++	},
++	{
++	    "file" => "vmlinux",
++	    "exec" => "scripts/extract-ikconfig",
++	    "test" => "scripts/extract-ikconfig",
++	},
++	{
++	    "file" => "/lib/modules/$uname/kernel/kernel/configs.ko",
++	    "exec" => "scripts/extract-ikconfig",
++	    "test" => "scripts/extract-ikconfig",
++	},
++	{
++	    "file" => "kernel/configs.ko",
++	    "exec" => "scripts/extract-ikconfig",
++	    "test" => "scripts/extract-ikconfig",
++	},
++	{
++	    "file" => "kernel/configs.o",
++	    "exec" => "scripts/extract-ikconfig",
++	    "test" => "scripts/extract-ikconfig",
++	},
++	{
++	    "file" => ".config",
++	    "exec" => "cat",
++	},
++);
 +
-+# check if this is simply an ELF file
-+else
-+	off=`$binoffset "$image" $ELFHDR 2>/dev/null`
-+	[ "$?" != "0" ] && off="-1"
-+	if [ "$off" -eq "0" ]; then
-+		dump_config "$image"
-+	fi
- fi
- 
- echo "ERROR: Unable to extract kernel configuration information."
++sub find_config {
++    foreach my $conf (@searchconfigs) {
++	my $file = $conf->{"file"};
++
++	next if ( ! -f "$file");
++
++	if (defined($conf->{"test"})) {
++	    `$conf->{"test"} $conf->{"file"} 2>/dev/null`;
++	    next if ($?);
++	}
++
++	my $exec = $conf->{"exec"};
++
++	print STDERR "using config: '$file'\n";
++
++	open(CIN, "$exec $file |") || die "Failed to run $exec $file";
++	return;
++    }
++    die "No config file found";
++}
++
++find_config;
++
+ my @makefiles = `find $linuxpath -name Makefile`;
+ my %depends;
+ my %selects;
 -- 
 1.6.2.1
 
