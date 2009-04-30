@@ -1,76 +1,132 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from hrndva-omtalb.mail.rr.com ([71.74.56.124]:41671 "EHLO
-	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753955AbZD3DTs (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 29 Apr 2009 23:19:48 -0400
-Message-Id: <20090430031946.963964381@goodmis.org>
+Received: from mx2.mail.elte.hu ([157.181.151.9]:52765 "EHLO mx2.mail.elte.hu"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751112AbZD3HTu (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 30 Apr 2009 03:19:50 -0400
+Date: Thu, 30 Apr 2009 09:18:30 +0200
+From: Ingo Molnar <mingo@elte.hu>
+Subject: Re: [PATCH 0/3] removing unwanted module configs
+Message-ID: <20090430071830.GC16737@elte.hu>
 References: <20090430030821.523327994@goodmis.org>
-Date: Wed, 29 Apr 2009 23:08:24 -0400
-From: Steven Rostedt <rostedt@goodmis.org>
-Subject: [PATCH 3/3] kconfig: add make localyesconfig option
-Content-Disposition: inline; filename=0003-kconfig-add-make-localyesconfig-option.patch
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20090430030821.523327994@goodmis.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: Ingo Molnar <mingo@elte.hu>, Andrew Morton <akpm@linux-foundation.org>, Linus Torvalds <torvalds@linux-foundation.org>, Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@linutronix.de>, Theodore Tso <tytso@mit.edu>, Arnaldo Carvalho de Melo <acme@redhat.com>, zippel@linux-m68k.org, linux-kbuild@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>, Jonathan Corbet <corbet@lwn.net>
+To: Steven Rostedt <rostedt@goodmis.org>
+Cc: linux-kernel@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>, Linus Torvalds <torvalds@linux-foundation.org>, Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@linutronix.de>, Theodore Tso <tytso@mit.edu>, Arnaldo Carvalho de Melo <acme@redhat.com>, zippel@linux-m68k.org, linux-kbuild@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>, Jonathan Corbet <corbet@lwn.net>
 
-From: Steven Rostedt <srostedt@redhat.com>
 
-This adds the option localyesconfig to make. This is similar to
-localmodconfig, but after it removes unnecessary modules it runs
+* Steven Rostedt <rostedt@goodmis.org> wrote:
 
-  sed -i s/=m/=y/
+> As it has been brought up last Kernel Summit, we want to make it easier
+> for those that report bugs to build their own kernels, and maybe even
+> bisect with git.  Some of these people are not programmers and do not
+> understand the complexity of the configuration options. But to compile
+> a distribution configured kernel on their boxes can take hours.
+> 
+> This patch series comes to the rescue. I wrote the first instance of
+> streamline config when I bought a new box in 2005 and got frustrated
+> with finding all the necessary configurations to boot it. It is a
+> small (yet powerful) perl script.
+> 
+> Here's what it does:
+> 
+>  * Reads the modules that are load by using lsmod.
+>  * Reads all Makefiles to map modules to CONFIG_* options
+>  * Reads the Kconfig files to find dependencies and selects
+>  * Figures out what CONFIGS are needed to compile the loaded modules
+>  * Reads the .config and prints out a version with all module configurations
+>     that not needed, disabled.
+> 
+> The next two patches add options to make.
+> 
+>  localmodconfig - this will run streamline_config.pl on the .config file
+> 	and replace it at the end.
+> 
+>  localyesconfig - this will do the same as localmodconfig but will also
+> 	sed -i s/=m/=y/  to turn all modules to core. It will also run
+> 	the 'make oldcondfig' to fix it up and let the user handle
+> 	andything that was changed by converting a module to core.
+> 
+> Anyway, this is now in git and as a series of patches here. My git 
+> tree is based off of the latest Linus git tree.
+> 
+> Have fun!
 
-on the .config file. It then runs "make silentoldconfig" to fix any
-wholes that were created by the conversion of modules to core.
+Very nice and useful!
 
-[ Impact: facilitate making a moduleless config ]
+I have given it a try - it works to a certain degree, but does not 
+seem to work fully. If i boot a Fedora distro kernel with this 
+module setup:
 
-Signed-off-by: Steven Rostedt <rostedt@goodmis.org>
----
- scripts/kconfig/Makefile |   13 ++++++++++++-
- 1 files changed, 12 insertions(+), 1 deletions(-)
+aldebaran:~/linux/linux> lsmod
+Module                  Size  Used by
+sunrpc                253904  1 
+ipv6                  349568  50 
+cpufreq_ondemand       73248  0 
+acpi_cpufreq           75408  0 
+freq_table             70400  2 cpufreq_ondemand,acpi_cpufreq
+dm_multipath           82256  0 
+i2c_i801               75932  0 
+i2c_core               87192  1 i2c_i801
+serio_raw              71556  0 
+pcspkr                 68352  0 
+pata_jmicron           69504  0 
+iTCO_wdt               78208  0 
+shpchp                 99160  0 
+iTCO_vendor_support    68868  1 iTCO_wdt
+igb                   144412  0 
+dca                    71976  1 igb
+pata_acpi              70528  0 
+ata_generic            71428  0 
 
-diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
-index 4b289ad..c080424 100644
---- a/scripts/kconfig/Makefile
-+++ b/scripts/kconfig/Makefile
-@@ -3,7 +3,7 @@
- # These targets are used from top-level makefile
- 
- PHONY += oldconfig xconfig gconfig menuconfig config silentoldconfig update-po-config \
--	localmodconfig
-+	localmodconfig localyesconfig
- 
- ifdef KBUILD_KCONFIG
- Kconfig := $(KBUILD_KCONFIG)
-@@ -38,6 +38,16 @@ localmodconfig: $(obj)/streamline_config.pl $(obj)/conf
- 		 mv -f .config.old.1 .config.old)
- 	$(Q)rm -f .tmp.config
- 
-+localyesconfig: $(obj)/streamline_config.pl
-+	$(Q)perl $< $(Kconfig) > .tmp.config
-+	$(Q)sed -i s/=m/=y/ .tmp.config
-+	$(Q)cmp -s .tmp.config .config ||		\
-+		(mv -f .config .config.old.1;		\
-+		 mv -f .tmp.config .config;		\
-+		 $(obj)/conf -s $(Kconfig);		\
-+		 mv -f .config.old.1 .config.old)
-+	$(Q)rm -f .tmp.config
-+
- # Create new linux.pot file
- # Adjust charset to UTF-8 in .po file to accept UTF-8 in Kconfig files
- # The symlink is used to repair a deficiency in arch/um
-@@ -94,6 +104,7 @@ help:
- 	@echo  '  gconfig	  - Update current config utilising a GTK based front-end'
- 	@echo  '  oldconfig	  - Update current config utilising a provided .config as base'
- 	@echo  '  localmodconfig  - Update current config disabling modules not loaded'
-+	@echo  '  localyesconfig  - Update current config converting local mods to core'
- 	@echo  '  silentoldconfig - Same as oldconfig, but quietly'
- 	@echo  '  randconfig	  - New config with random answer to all options'
- 	@echo  '  defconfig	  - New config with default answer to all options'
--- 
-1.6.2.1
+note the 'igb' driver that is essential to be picked up. 'make 
+localyesconfig' complains:
 
--- 
+  module igb did not have configs CONFIG_IGB
+
+But:
+
+  # CONFIG_IGB is not set
+
+It did pick up other essential drivers - such as ext3. Why did it 
+miss IGB? Here are all the missed drivers:
+
+aldebaran:~/linux/linux> make localyesconfig
+module ata_generic did not have configs CONFIG_ATA_GENERIC
+module iTCO_vendor_support did not have configs CONFIG_ITCO_WDT
+module shpchp did not have configs CONFIG_HOTPLUG_PCI_SHPC
+module acpi_cpufreq did not have configs CONFIG_IA64_ACPI_CPUFREQ CONFIG_X86_ACPI_CPUFREQ
+module pata_jmicron did not have configs CONFIG_PATA_JMICRON
+module i2c_i801 did not have configs CONFIG_I2C_I801
+module serio_raw did not have configs CONFIG_SERIO_RAW
+module iTCO_wdt did not have configs CONFIG_ITCO_WDT
+module freq_table did not have configs CONFIG_CPU_FREQ_TABLE
+module igb did not have configs CONFIG_IGB
+module ipv6 did not have configs CONFIG_IPV6
+module dca did not have configs CONFIG_DCA
+module sunrpc did not have configs CONFIG_SUNRPC
+module pata_acpi did not have configs CONFIG_PATA_ACPI
+module dm_multipath did not have configs CONFIG_DM_MULTIPATH
+module cpufreq_ondemand did not have configs 
+CONFIG_CPU_FREQ_GOV_ONDEMAND
+module i2c_core did not have configs CONFIG_I2C
+module pcspkr did not have configs CONFIG_INPUT_PCSPKR
+
+Of those drivers, igb is the only truly boot-critical one - the box 
+wont be very useful if it has no network support.
+
+Another comment: 'make localyesconfig' does not seem to be 
+self-invariant. I.e. it does not handle the case well when we 
+already have booted a localyesconfig kernel and do 'make 
+localyesconfig' again. It will find no modules and will merrily 
+create an almost empty .config.
+
+This could be addressed the following way: i think the script should 
+implicitly turn on CONFIG_IKCONFIG=y, and should also check for the 
+presence of /proc/config.gz and use it as a starting point. This 
+makes the whole concept nicely self-invariant.
+
+	Ingo
