@@ -1,167 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx3.mail.elte.hu ([157.181.1.138]:59433 "EHLO mx3.mail.elte.hu"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1761188AbZD3N1L (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 30 Apr 2009 09:27:11 -0400
-Date: Thu, 30 Apr 2009 15:26:05 +0200
-From: Ingo Molnar <mingo@elte.hu>
+Received: from hrndva-omtalb.mail.rr.com ([71.74.56.124]:37054 "EHLO
+	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751868AbZD3NmN (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 30 Apr 2009 09:42:13 -0400
+Date: Thu, 30 Apr 2009 09:42:12 -0400 (EDT)
+From: Steven Rostedt <rostedt@goodmis.org>
 Subject: Re: [PATCH 0/3] removing unwanted module configs
-Message-ID: <20090430132605.GA5289@elte.hu>
-References: <20090430030821.523327994@goodmis.org> <20090430071830.GC16737@elte.hu> <alpine.DEB.2.00.0904300908110.20374@gandalf.stny.rr.com>
+In-Reply-To: <20090430132605.GA5289@elte.hu>
+Message-ID: <alpine.DEB.2.00.0904300932380.20374@gandalf.stny.rr.com>
+References: <20090430030821.523327994@goodmis.org> <20090430071830.GC16737@elte.hu> <alpine.DEB.2.00.0904300908110.20374@gandalf.stny.rr.com> <20090430132605.GA5289@elte.hu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <alpine.DEB.2.00.0904300908110.20374@gandalf.stny.rr.com>
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Steven Rostedt <rostedt@goodmis.org>
+To: Ingo Molnar <mingo@elte.hu>
 Cc: linux-kernel@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>, Linus Torvalds <torvalds@linux-foundation.org>, Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@linutronix.de>, Theodore Tso <tytso@mit.edu>, Arnaldo Carvalho de Melo <acme@redhat.com>, zippel@linux-m68k.org, linux-kbuild@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>, Jonathan Corbet <corbet@lwn.net>
 
 
-* Steven Rostedt <rostedt@goodmis.org> wrote:
+On Thu, 30 Apr 2009, Ingo Molnar wrote:
+> 
+> CONFIG_IKCONFIG=y would be a one-off thing, only to make the whole 
+> concept self-hosting. If i boot a localyesconfig kernel, how does 
+> the script figure out what is built in? It cannot, unless i provide 
+> it the precise .config - but often that wont be provided. The script 
+> should clone the environment it is running in really.
 
-> 
-> On Thu, 30 Apr 2009, Ingo Molnar wrote:
-> 
-> > 
-> > * Steven Rostedt <rostedt@goodmis.org> wrote:
-> > 
-> > > As it has been brought up last Kernel Summit, we want to make it easier
-> > > for those that report bugs to build their own kernels, and maybe even
-> > > bisect with git.  Some of these people are not programmers and do not
-> > > understand the complexity of the configuration options. But to compile
-> > > a distribution configured kernel on their boxes can take hours.
-> > > 
-> > > This patch series comes to the rescue. I wrote the first instance of
-> > > streamline config when I bought a new box in 2005 and got frustrated
-> > > with finding all the necessary configurations to boot it. It is a
-> > > small (yet powerful) perl script.
-> > > 
-> > > Here's what it does:
-> > > 
-> > >  * Reads the modules that are load by using lsmod.
-> > >  * Reads all Makefiles to map modules to CONFIG_* options
-> > >  * Reads the Kconfig files to find dependencies and selects
-> > >  * Figures out what CONFIGS are needed to compile the loaded modules
-> > >  * Reads the .config and prints out a version with all module configurations
-> > >     that not needed, disabled.
-> > > 
-> > > The next two patches add options to make.
-> > > 
-> > >  localmodconfig - this will run streamline_config.pl on the .config file
-> > > 	and replace it at the end.
-> > > 
-> > >  localyesconfig - this will do the same as localmodconfig but will also
-> > > 	sed -i s/=m/=y/  to turn all modules to core. It will also run
-> > > 	the 'make oldcondfig' to fix it up and let the user handle
-> > > 	andything that was changed by converting a module to core.
-> > > 
-> > > Anyway, this is now in git and as a series of patches here. My git 
-> > > tree is based off of the latest Linus git tree.
-> > > 
-> > > Have fun!
-> > 
-> > Very nice and useful!
-> > 
-> > I have given it a try - it works to a certain degree, but does not 
-> > seem to work fully. If i boot a Fedora distro kernel with this 
-> > module setup:
-> > 
-> > aldebaran:~/linux/linux> lsmod
-> > Module                  Size  Used by
-> > sunrpc                253904  1 
-> > ipv6                  349568  50 
-> > cpufreq_ondemand       73248  0 
-> > acpi_cpufreq           75408  0 
-> > freq_table             70400  2 cpufreq_ondemand,acpi_cpufreq
-> > dm_multipath           82256  0 
-> > i2c_i801               75932  0 
-> > i2c_core               87192  1 i2c_i801
-> > serio_raw              71556  0 
-> > pcspkr                 68352  0 
-> > pata_jmicron           69504  0 
-> > iTCO_wdt               78208  0 
-> > shpchp                 99160  0 
-> > iTCO_vendor_support    68868  1 iTCO_wdt
-> > igb                   144412  0 
-> > dca                    71976  1 igb
-> > pata_acpi              70528  0 
-> > ata_generic            71428  0 
-> > 
-> > note the 'igb' driver that is essential to be picked up. 'make 
-> > localyesconfig' complains:
-> > 
-> >   module igb did not have configs CONFIG_IGB
-> 
-> Did the original .config have it set. It will not enable any 
-> modules that are not already set.
+Does IKCONFIG get loaded in the running kernel if IKCONFIG_PROC is not 
+set, or does it just sit in the vmlinux file.
 
-no, it wasnt enabled. 
+Since this option can also be used for helping embedded developers (I used 
+it for that) I would not want to bloat the kernel with running a script 
+that is suppose to minimize it. But if IKCONFIG && !IKCONFIG_PROC does not 
+add more data to the kernel, then I would be happy to turn it on by 
+default.
 
-> > But:
-> > 
-> >   # CONFIG_IGB is not set
-> > 
-> > It did pick up other essential drivers - such as ext3. Why did it 
-> > miss IGB? Here are all the missed drivers:
-> > 
-> > aldebaran:~/linux/linux> make localyesconfig
-> > module ata_generic did not have configs CONFIG_ATA_GENERIC
-> > module iTCO_vendor_support did not have configs CONFIG_ITCO_WDT
-> > module shpchp did not have configs CONFIG_HOTPLUG_PCI_SHPC
-> > module acpi_cpufreq did not have configs CONFIG_IA64_ACPI_CPUFREQ CONFIG_X86_ACPI_CPUFREQ
-> > module pata_jmicron did not have configs CONFIG_PATA_JMICRON
-> > module i2c_i801 did not have configs CONFIG_I2C_I801
-> > module serio_raw did not have configs CONFIG_SERIO_RAW
-> > module iTCO_wdt did not have configs CONFIG_ITCO_WDT
-> > module freq_table did not have configs CONFIG_CPU_FREQ_TABLE
-> > module igb did not have configs CONFIG_IGB
-> > module ipv6 did not have configs CONFIG_IPV6
-> > module dca did not have configs CONFIG_DCA
-> > module sunrpc did not have configs CONFIG_SUNRPC
-> > module pata_acpi did not have configs CONFIG_PATA_ACPI
-> > module dm_multipath did not have configs CONFIG_DM_MULTIPATH
-> > module cpufreq_ondemand did not have configs 
-> > CONFIG_CPU_FREQ_GOV_ONDEMAND
-> > module i2c_core did not have configs CONFIG_I2C
-> > module pcspkr did not have configs CONFIG_INPUT_PCSPKR
-> 
-> Hmm, I just added the "localyesconfig" and have not played with it 
-> much. I need to change the integrity check of the script to test 
-> for modules that are already compiled in (CONFIG_FOO=y). Right now 
-> it expects the modules to be modules :-/
-> 
-> > Of those drivers, igb is the only truly boot-critical one - the 
-> > box wont be very useful if it has no network support.
-> > 
-> > Another comment: 'make localyesconfig' does not seem to be 
-> > self-invariant. I.e. it does not handle the case well when we 
-> > already have booted a localyesconfig kernel and do 'make 
-> > localyesconfig' again. It will find no modules and will merrily 
-> > create an almost empty .config.
-> 
-> It should not touch CONFIG_FOO=y. It should only disable the modules that 
-> are already set but not needed.
-> 
-> I will update the script to not warn about modules that are compiled in.
-> 
-> > This could be addressed the following way: i think the script 
-> > should implicitly turn on CONFIG_IKCONFIG=y, and should also 
-> > check for the presence of /proc/config.gz and use it as a 
-> > starting point. This makes the whole concept nicely 
-> > self-invariant.
-> 
-> I really want to stay away from enabling anything in the .config 
-> scripts. I can probably do it for the trivial cases. But there are 
-> cases where more than one config will enable a module, or it takes 
-> several types of dependencies to enable it. The script can not 
-> know which is the best set of dependencies to enable, and I would 
-> not want to enable all of them.
+I see I can use scripts/extract-ikconfig to get the config from the 
+current image. Now which image should it try?
 
-CONFIG_IKCONFIG=y would be a one-off thing, only to make the whole 
-concept self-hosting. If i boot a localyesconfig kernel, how does 
-the script figure out what is built in? It cannot, unless i provide 
-it the precise .config - but often that wont be provided. The script 
-should clone the environment it is running in really.
+/boot/vmlinuz-`uname -r`
+./vmlinux
 
-	Ingo
+I could have it first try /proc/config.gz and if it does not find it then
+try the /boot kernel, if it does not find it or does not find a config 
+file in it, it would then try ./vmlinux file. If it does not find the file 
+or the config then it would just use the local .config.
+
+-- Steve
+
