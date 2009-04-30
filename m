@@ -1,15 +1,15 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from hrndva-omtalb.mail.rr.com ([71.74.56.123]:37471 "EHLO
+Received: from hrndva-omtalb.mail.rr.com ([71.74.56.124]:56315 "EHLO
 	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1764236AbZD3SwV (ORCPT
+	with ESMTP id S1763901AbZD3SwW (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 30 Apr 2009 14:52:21 -0400
-Message-Id: <20090430185219.656122641@goodmis.org>
+	Thu, 30 Apr 2009 14:52:22 -0400
+Message-Id: <20090430185220.625711175@goodmis.org>
 References: <20090430185022.122124349@goodmis.org>
-Date: Thu, 30 Apr 2009 14:50:25 -0400
+Date: Thu, 30 Apr 2009 14:50:26 -0400
 From: Steven Rostedt <rostedt@goodmis.org>
-Subject: [PATCH 3/7] kconfig: enable CONFIG_IKCONFIG from streamline_config.pl
-Content-Disposition: inline; filename=0003-kconfig-enable-CONFIG_IKCONFIG-from-streamline_conf.patch
+Subject: [PATCH 4/7] kconfig: add check if end exists in extract-ikconfig
+Content-Disposition: inline; filename=0004-kconfig-add-check-if-end-exists-in-extract-ikconfig.patch
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org
@@ -17,68 +17,31 @@ Cc: Ingo Molnar <mingo@elte.hu>, Andrew Morton <akpm@linux-foundation.org>, Linu
 
 From: Steven Rostedt <srostedt@redhat.com>
 
-Ingo Molnar suggested that the streamline_config.pl should enable
-CONFIG_IKCONFIG to keep the current config in the kernel.
-Then we can use scripts/extract-ikconfig to find the current
-modules.
+Both start and end should be tested for existence before continuing
+to parse the config.gz file.
 
-This patch changes streamline_config.pl to check if CONFIG_IKCONFIG
-is not set, and if it is not, it enables it to be a module.
+[ Impact: better integrity checks in finding config.gz
 
-[ Impact: make current config options easier to find ]
-
-Reported-by: Ingo Molnar <mingo@elte.hu>
 Signed-off-by: Steven Rostedt <rostedt@goodmis.org>
 ---
- scripts/kconfig/streamline_config.pl |   33 +++++++++++++++++++++++----------
- 1 files changed, 23 insertions(+), 10 deletions(-)
+ scripts/extract-ikconfig |    4 ++++
+ 1 files changed, 4 insertions(+), 0 deletions(-)
 
-diff --git a/scripts/kconfig/streamline_config.pl b/scripts/kconfig/streamline_config.pl
-index caac952..2334641 100644
---- a/scripts/kconfig/streamline_config.pl
-+++ b/scripts/kconfig/streamline_config.pl
-@@ -256,18 +256,31 @@ my %setconfigs;
- # Finally, read the .config file and turn off any module enabled that
- # we could not find a reason to keep enabled.
- while(<CIN>) {
--	if (/^(CONFIG.*)=(m|y)/) {
--		if (defined($configs{$1})) {
--		    $setconfigs{$1} = $2;
--		    print;
--		} elsif ($2 eq "m") {
--		    print "# $1 is not set\n";
--		} else {
--		    print;
--		}
-+
-+    if (/CONFIG_IKCONFIG/) {
-+	if (/# CONFIG_IKCONFIG is not set/) {
-+	    # enable IKCONFIG at least as a module
-+	    print "CONFIG_IKCONFIG=m\n";
-+	    # don't ask about PROC
-+	    print "# CONFIG_IKCONFIG is not set\n";
-+	} else {
-+	    print;
-+	}
-+	next;
-+    }
-+
-+    if (/^(CONFIG.*)=(m|y)/) {
-+	if (defined($configs{$1})) {
-+	    $setconfigs{$1} = $2;
-+	    print;
-+	} elsif ($2 eq "m") {
-+	    print "# $1 is not set\n";
- 	} else {
--		print;
-+	    print;
- 	}
-+    } else {
-+	print;
-+    }
- }
- close(CIN);
+diff --git a/scripts/extract-ikconfig b/scripts/extract-ikconfig
+index 72997c3..42d6bce 100755
+--- a/scripts/extract-ikconfig
++++ b/scripts/extract-ikconfig
+@@ -17,6 +17,10 @@ dump_config() {
+ 	return
+     fi
+     end=`$binoffset $file $IKCFG_ED 2>/dev/null`
++    [ "$?" != "0" ] && end="-1"
++    if [ "$end" -eq "-1" ]; then
++	return
++    fi
  
+     start=`expr $start + 8`
+     size=`expr $end - $start`
 -- 
 1.6.2.1
 
