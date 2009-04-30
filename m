@@ -1,65 +1,104 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from xenotime.net ([72.52.64.118]:34340 "HELO xenotime.net"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with SMTP
-	id S1750736AbZD3UYQ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 30 Apr 2009 16:24:16 -0400
-Received: from ::ffff:71.182.83.218 ([71.182.83.218]) by xenotime.net for <linux-kbuild@vger.kernel.org>; Thu, 30 Apr 2009 13:24:13 -0700
-Message-ID: <49FA0944.7060602@xenotime.net>
-Date: Thu, 30 Apr 2009 13:25:40 -0700
-From: Randy Dunlap <rdunlap@xenotime.net>
+Received: from mail-bw0-f163.google.com ([209.85.218.163]:54299 "EHLO
+	mail-bw0-f163.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750909AbZD3Vve (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 30 Apr 2009 17:51:34 -0400
 MIME-Version: 1.0
-Subject: Re: error when using KCONFIG_ALLCONFIG?
-References: <49F8D6EC.1090800@xenotime.net> <20090429234911.GA1922@uranus.ravnborg.org> <49F8E904.3080601@xenotime.net>
-In-Reply-To: <49F8E904.3080601@xenotime.net>
+In-Reply-To: <20090430185219.656122641@goodmis.org>
+References: <20090430185022.122124349@goodmis.org>
+	 <20090430185219.656122641@goodmis.org>
+Date: Thu, 30 Apr 2009 22:51:32 +0100
+Message-ID: <9b2b86520904301451v1d77589l7ee48217fb64e567@mail.gmail.com>
+Subject: Re: [PATCH 3/7] kconfig: enable CONFIG_IKCONFIG from
+	streamline_config.pl
+From: Alan Jenkins <sourcejedi.lkml@googlemail.com>
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: linux-kbuild@vger.kernel.org
+To: Steven Rostedt <rostedt@goodmis.org>
+Cc: linux-kernel@vger.kernel.org, Ingo Molnar <mingo@elte.hu>, Andrew Morton <akpm@linux-foundation.org>, Linus Torvalds <torvalds@linux-foundation.org>, Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@linutronix.de>, Theodore Tso <tytso@mit.edu>, Arnaldo Carvalho de Melo <acme@redhat.com>, zippel@linux-m68k.org, linux-kbuild@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>
 
-Randy Dunlap wrote:
-> Sam Ravnborg wrote:
->> On Wed, Apr 29, 2009 at 03:38:36PM -0700, Randy Dunlap wrote:
->>> Hi,
->>>
->>> I often use
->>> make KCONFIG_ALLCONFIG=filename allnoconfig
->>>
->>> and it works fine.  However, when I use O= with that:
->>>
->>> make O=xx64 KCONFIG_ALLCONFIG=filename allnoconfig
->>>
->>> I get an xx64/.config file that is the same as
->>>
->>> make O=xx64 allnoconfig
->>>
->>> I.e., the KCONFIG_ALLCONFIG=filename part was ignored.
->>>
->>> Is this new?  expected?  known?
->> I dunno if it is new but it is not expected.
->> Can you try if it help to move 'filename' to output directory.
-> 
-> make O=xx64 KCONFIG_ALLCONFIG=xx64/filename allnoconfig
-> 
-> gives the same result as 'make allnoconfig'.
+On 4/30/09, Steven Rostedt <rostedt@goodmis.org> wrote:
+> From: Steven Rostedt <srostedt@redhat.com>
+>
+> Ingo Molnar suggested that the streamline_config.pl should enable
+> CONFIG_IKCONFIG to keep the current config in the kernel.
+> Then we can use scripts/extract-ikconfig to find the current
+> modules.
+>
+> This patch changes streamline_config.pl to check if CONFIG_IKCONFIG
+> is not set, and if it is not, it enables it to be a module.
+>
+> [ Impact: make current config options easier to find ]
+>
+> Reported-by: Ingo Molnar <mingo@elte.hu>
+> Signed-off-by: Steven Rostedt <rostedt@goodmis.org>
+> ---
+>  scripts/kconfig/streamline_config.pl |   33
+> +++++++++++++++++++++++----------
+>  1 files changed, 23 insertions(+), 10 deletions(-)
+>
+> diff --git a/scripts/kconfig/streamline_config.pl
+> b/scripts/kconfig/streamline_config.pl
+> index caac952..2334641 100644
+> --- a/scripts/kconfig/streamline_config.pl
+> +++ b/scripts/kconfig/streamline_config.pl
+> @@ -256,18 +256,31 @@ my %setconfigs;
+>  # Finally, read the .config file and turn off any module enabled that
+>  # we could not find a reason to keep enabled.
+>  while(<CIN>) {
+> -	if (/^(CONFIG.*)=(m|y)/) {
+> -		if (defined($configs{$1})) {
+> -		    $setconfigs{$1} = $2;
+> -		    print;
+> -		} elsif ($2 eq "m") {
+> -		    print "# $1 is not set\n";
+> -		} else {
+> -		    print;
+> -		}
+> +
+> +    if (/CONFIG_IKCONFIG/) {
+> +	if (/# CONFIG_IKCONFIG is not set/) {
+> +	    # enable IKCONFIG at least as a module
+> +	    print "CONFIG_IKCONFIG=m\n";
+> +	    # don't ask about PROC
+> +	    print "# CONFIG_IKCONFIG is not set\n";
 
-It appears that using O= with KCONFIG_ALLCONFIG causes the
-KCONFIG_ALLCONFIG option/feature to be ignored completely.
+I assume the second one should be CONFIG_IKCONFIG_PROC :-).
 
-All of these commands act as though KCONFIG_ALLCONFIG=filename
-was not used at all:
+> +	} else {
+> +	    print;
+> +	}
+> +	next;
+> +    }
+> +
+> +    if (/^(CONFIG.*)=(m|y)/) {
+> +	if (defined($configs{$1})) {
+> +	    $setconfigs{$1} = $2;
+> +	    print;
+> +	} elsif ($2 eq "m") {
+> +	    print "# $1 is not set\n";
+>  	} else {
+> -		print;
+> +	    print;
+>  	}
 
-make O=zz64 KCONFIG_ALLCONFIG=filename allyesconfig
-make O=zz64 KCONFIG_ALLCONFIG=filename allmodconfig
-make O=zz64 KCONFIG_ALLCONFIG=filename allnoconfig
-
-These all produce the same output .config files that are
-produced by entering:
-
-make O=zz64 allyesconfig
-make O=zz64 allmodconfig
-make O=zz64 allnoconfig
+> +    } else {
+> +	print;
+> +    }
 
 
-~Randy
+Maybe it would be cleaner make the two "if" blocks the same; i.e. do
+this instead:
+
++	next;
++    }
++
++	print;
+
+
+>  }
+>  close(CIN);
+>
