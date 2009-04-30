@@ -1,15 +1,15 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from hrndva-omtalb.mail.rr.com ([71.74.56.124]:56315 "EHLO
+Received: from hrndva-omtalb.mail.rr.com ([71.74.56.123]:56335 "EHLO
 	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1763901AbZD3SwW (ORCPT
+	with ESMTP id S1764351AbZD3SwX (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 30 Apr 2009 14:52:22 -0400
-Message-Id: <20090430185220.625711175@goodmis.org>
+	Thu, 30 Apr 2009 14:52:23 -0400
+Message-Id: <20090430185221.582053988@goodmis.org>
 References: <20090430185022.122124349@goodmis.org>
-Date: Thu, 30 Apr 2009 14:50:26 -0400
+Date: Thu, 30 Apr 2009 14:50:27 -0400
 From: Steven Rostedt <rostedt@goodmis.org>
-Subject: [PATCH 4/7] kconfig: add check if end exists in extract-ikconfig
-Content-Disposition: inline; filename=0004-kconfig-add-check-if-end-exists-in-extract-ikconfig.patch
+Subject: [PATCH 5/7] kconfig: have extract-ikconfig read ELF files
+Content-Disposition: inline; filename=0005-kconfig-have-extract-ikconfig-read-ELF-files.patch
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org
@@ -17,31 +17,46 @@ Cc: Ingo Molnar <mingo@elte.hu>, Andrew Morton <akpm@linux-foundation.org>, Linu
 
 From: Steven Rostedt <srostedt@redhat.com>
 
-Both start and end should be tested for existence before continuing
-to parse the config.gz file.
+It would be nice to use extract-ikconfig to find the congfig.gz
+in either vmlinux (not vmlinuz) or configs.ko.
 
-[ Impact: better integrity checks in finding config.gz
+This patch changes the script to also be able to read ELF files directly.
+
+[ Impact: find config.gz in vmlinux and configs.ko ]
 
 Signed-off-by: Steven Rostedt <rostedt@goodmis.org>
 ---
- scripts/extract-ikconfig |    4 ++++
- 1 files changed, 4 insertions(+), 0 deletions(-)
+ scripts/extract-ikconfig |   10 ++++++++++
+ 1 files changed, 10 insertions(+), 0 deletions(-)
 
 diff --git a/scripts/extract-ikconfig b/scripts/extract-ikconfig
-index 72997c3..42d6bce 100755
+index 42d6bce..de233ff 100755
 --- a/scripts/extract-ikconfig
 +++ b/scripts/extract-ikconfig
-@@ -17,6 +17,10 @@ dump_config() {
- 	return
-     fi
-     end=`$binoffset $file $IKCFG_ED 2>/dev/null`
-+    [ "$?" != "0" ] && end="-1"
-+    if [ "$end" -eq "-1" ]; then
-+	return
-+    fi
+@@ -59,6 +59,8 @@ dump_config "$image"
+ GZHDR1="0x1f 0x8b 0x08 0x00"
+ GZHDR2="0x1f 0x8b 0x08 0x08"
  
-     start=`expr $start + 8`
-     size=`expr $end - $start`
++ELFHDR="0x7f 0x45 0x4c 0x46"
++
+ # vmlinux.gz: Check for a compressed images
+ off=`$binoffset "$image" $GZHDR1 2>/dev/null`
+ [ "$?" != "0" ] && off="-1"
+@@ -73,6 +75,14 @@ elif [ "$off" -ne "-1" ]; then
+ 	(dd ibs="$off" skip=1 count=0 && dd bs=512k) <"$image" 2>/dev/null | \
+ 		zcat >"$TMPFILE"
+ 	dump_config "$TMPFILE"
++
++# check if this is simply an ELF file
++else
++	off=`$binoffset "$image" $ELFHDR 2>/dev/null`
++	[ "$?" != "0" ] && off="-1"
++	if [ "$off" -eq "0" ]; then
++		dump_config "$image"
++	fi
+ fi
+ 
+ echo "ERROR: Unable to extract kernel configuration information."
 -- 
 1.6.2.1
 
