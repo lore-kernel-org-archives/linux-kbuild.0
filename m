@@ -1,40 +1,65 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.mail.elte.hu ([157.181.151.9]:59194 "EHLO mx2.mail.elte.hu"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750716AbZD3TLl (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 30 Apr 2009 15:11:41 -0400
-Date: Thu, 30 Apr 2009 21:10:01 +0200
-From: Ingo Molnar <mingo@elte.hu>
-Subject: Re: [PATCH 0/7] kconfig: more featured minimum module configs
-Message-ID: <20090430191001.GA14108@elte.hu>
-References: <20090430185022.122124349@goodmis.org>
+Received: from xenotime.net ([72.52.64.118]:34340 "HELO xenotime.net"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with SMTP
+	id S1750736AbZD3UYQ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 30 Apr 2009 16:24:16 -0400
+Received: from ::ffff:71.182.83.218 ([71.182.83.218]) by xenotime.net for <linux-kbuild@vger.kernel.org>; Thu, 30 Apr 2009 13:24:13 -0700
+Message-ID: <49FA0944.7060602@xenotime.net>
+Date: Thu, 30 Apr 2009 13:25:40 -0700
+From: Randy Dunlap <rdunlap@xenotime.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20090430185022.122124349@goodmis.org>
+Subject: Re: error when using KCONFIG_ALLCONFIG?
+References: <49F8D6EC.1090800@xenotime.net> <20090429234911.GA1922@uranus.ravnborg.org> <49F8E904.3080601@xenotime.net>
+In-Reply-To: <49F8E904.3080601@xenotime.net>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Steven Rostedt <rostedt@goodmis.org>
-Cc: linux-kernel@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>, Linus Torvalds <torvalds@linux-foundation.org>, Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@linutronix.de>, Theodore Tso <tytso@mit.edu>, Arnaldo Carvalho de Melo <acme@redhat.com>, zippel@linux-m68k.org, linux-kbuild@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: linux-kbuild@vger.kernel.org
 
-
-* Steven Rostedt <rostedt@goodmis.org> wrote:
-
-> This set of patches adds on top of my previous post.
+Randy Dunlap wrote:
+> Sam Ravnborg wrote:
+>> On Wed, Apr 29, 2009 at 03:38:36PM -0700, Randy Dunlap wrote:
+>>> Hi,
+>>>
+>>> I often use
+>>> make KCONFIG_ALLCONFIG=filename allnoconfig
+>>>
+>>> and it works fine.  However, when I use O= with that:
+>>>
+>>> make O=xx64 KCONFIG_ALLCONFIG=filename allnoconfig
+>>>
+>>> I get an xx64/.config file that is the same as
+>>>
+>>> make O=xx64 allnoconfig
+>>>
+>>> I.e., the KCONFIG_ALLCONFIG=filename part was ignored.
+>>>
+>>> Is this new?  expected?  known?
+>> I dunno if it is new but it is not expected.
+>> Can you try if it help to move 'filename' to output directory.
 > 
-> It fixes CONFIG_IKCONFIG when CONFIG_IKCONFIG_PROC is not set.
->  (gcc optimizes the config out!)
+> make O=xx64 KCONFIG_ALLCONFIG=xx64/filename allnoconfig
 > 
-> As a request from Ingo, it now enables IKCONFIG and will also use 
-> various locations to find a config to base against.
+> gives the same result as 'make allnoconfig'.
 
-hm, now 'make localyesconfig' done on a Fedora distro kernel 
-produces something very close to an allyesconfig:
+It appears that using O= with KCONFIG_ALLCONFIG causes the
+KCONFIG_ALLCONFIG option/feature to be ignored completely.
 
- -rw-rw-r-- 1 mingo mingo 91930 2009-04-30 20:03 .config
- aldebaran:~/linux/linux> grep =y .config | wc -l
- 3398
+All of these commands act as though KCONFIG_ALLCONFIG=filename
+was not used at all:
 
-is that expected?
+make O=zz64 KCONFIG_ALLCONFIG=filename allyesconfig
+make O=zz64 KCONFIG_ALLCONFIG=filename allmodconfig
+make O=zz64 KCONFIG_ALLCONFIG=filename allnoconfig
 
-	Ingo
+These all produce the same output .config files that are
+produced by entering:
+
+make O=zz64 allyesconfig
+make O=zz64 allmodconfig
+make O=zz64 allnoconfig
+
+
+~Randy
