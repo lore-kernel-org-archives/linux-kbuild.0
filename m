@@ -1,46 +1,76 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from casper.infradead.org ([85.118.1.10]:59418 "EHLO
-	casper.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752985AbZEAJDE (ORCPT
+Received: from pfepb.post.tele.dk ([195.41.46.236]:53267 "EHLO
+	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751309AbZEAKMz (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 1 May 2009 05:03:04 -0400
-Subject: Re: [PATCH 0/2] kconfig: updates to streamline_config.pl
-From: Peter Zijlstra <peterz@infradead.org>
-In-Reply-To: <9b2b86520905010147l702e5129i1aa24c1eeefced27@mail.gmail.com>
-References: <20090430233642.333097165@goodmis.org>
-	 <9b2b86520905010147l702e5129i1aa24c1eeefced27@mail.gmail.com>
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
-Date: Fri, 01 May 2009 11:01:14 +0200
-Message-Id: <1241168474.7620.222.camel@twins>
+	Fri, 1 May 2009 06:12:55 -0400
+Date: Fri, 1 May 2009 12:15:03 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: [GIT] kbuild
+Message-ID: <20090501101503.GA21406@uranus.ravnborg.org>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Alan Jenkins <sourcejedi.lkml@googlemail.com>
-Cc: Steven Rostedt <rostedt@goodmis.org>, linux-kernel@vger.kernel.org, Ingo Molnar <mingo@elte.hu>, Andrew Morton <akpm@linux-foundation.org>, Linus Torvalds <torvalds@linux-foundation.org>, Thomas Gleixner <tglx@linutronix.de>, Theodore Tso <tytso@mit.edu>, Arnaldo Carvalho de Melo <acme@redhat.com>, zippel@linux-m68k.org, linux-kbuild@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Anders Kaseorg <andersk@mit.edu>, Ralf Baechle <ralf@linux-mips.org>, Nico Schottelius <nico@ikn.schottelius.org>, Cedric Hombourger <chombourger@gmail.com>, Andrew Morton <akpm@linux-foundation.org>, Randy Dunlap <randy.dunlap@oracle.com>, Matt Kraai <kraai@ftbfs.org>, =?iso-8859-1?B?RnLpZOlyaWMgQnJp6HJl?= <fbriere@fbriere.net>, Jesper Nilsson <jesper.nilsson@axis.com>, Haavard Skinnemoen <hskinnemoen@atmel.com>
 
-On Fri, 2009-05-01 at 09:47 +0100, Alan Jenkins wrote:
-> On 5/1/09, Steven Rostedt <rostedt@goodmis.org> wrote:
-> > Thanks to Alan Jenkins for suggesting these cleanups/fixes/enhancements.
-> 
-> And thanks to you for pushing this script!  It should be handy for
-> speeding up bisection builds, without accidentally disabling a config
-> that caused the regression.
-> 
-> Though I'm wary of it for _general_ usage, because of hotplug.  I
-> think it would be even more useful if there was some way to preserve
-> all the currently selected USB drivers.
+Hi Linus.
 
-While we're on feature requests...
+kbuild fixes:
 
- - the same for things like netfilter etc..
+o fixed check for section flags. Replace a heuristics with correct check of the flags
 
- - the ability to generate permutation configs, I've had the need to
-   build test code that had like way to many CONFIG options:
+o a cygwin build fix (people do build kernels with cygwin these days)
 
-GROUP_SCHED * {USER_SCHED, CGROUP_SCHED} * FAIR_GROUP_SCHED * RT_GROUP_SCHED
+o remove more files when cleaning
 
-   comes to mind. With a streamlined .config changing the configuration
-   takes more time than actually building a bzImage.
+o fix tags so we do not append to the tags database
+
+o improve support for git tags in setlocalversion
 
 
+	Sam
+
+The following changes since commit 091438dd5668396328a3419abcbc6591159eb8d1:
+  Linus Torvalds (1):
+        Linux 2.6.30-rc4
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/sam/kbuild-fixes.git master
+
+Anders Kaseorg (1):
+      kbuild, modpost: Check the section flags, to catch missing "ax"/"aw"
+
+Cedric Hombourger (1):
+      kbuild: fix Module.markers permission error under cygwin
+
+Frédéric Brière (1):
+      kbuild: clean Module.markers and modules.order for out-of-tree modules
+
+Matt Kraai (1):
+      kbuild: remove a tag file before it is regenerated
+
+Nico Schottelius (1):
+      kbuild: fix scripts/setlocalversion with git
+
+Randy Dunlap (1):
+      docs: also clean index.html
+
+Robert P. J. Day (1):
+      kbuild: "make prepare" should be "make modules_prepare"
+
+Sam Ravnborg (2):
+      avr32: drop unused CLEAN_FILES
+      kbuild: fix comment in modpost.c
+
+ Documentation/DocBook/Makefile |    5 ++-
+ Makefile                       |    6 +++-
+ arch/avr32/Makefile            |    2 -
+ scripts/mod/modpost.c          |   55 +++++++++++++++------------------------
+ scripts/setlocalversion        |   13 ++++-----
+ scripts/tags.sh                |    2 +
+ 6 files changed, 36 insertions(+), 47 deletions(-)
