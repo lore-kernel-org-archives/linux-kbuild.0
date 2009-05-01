@@ -1,49 +1,32 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from hrndva-omtalb.mail.rr.com ([71.74.56.123]:53889 "EHLO
-	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754465AbZD3XiA (ORCPT
+Received: from mail-bw0-f163.google.com ([209.85.218.163]:44740 "EHLO
+	mail-bw0-f163.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752775AbZEAIrs (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 30 Apr 2009 19:38:00 -0400
-Message-Id: <20090430233758.444232604@goodmis.org>
+	Fri, 1 May 2009 04:47:48 -0400
+MIME-Version: 1.0
+In-Reply-To: <20090430233642.333097165@goodmis.org>
 References: <20090430233642.333097165@goodmis.org>
-Date: Thu, 30 Apr 2009 19:36:44 -0400
-From: Steven Rostedt <rostedt@goodmis.org>
-Subject: [PATCH 2/2] kconfig: test for /boot/config-uname after /proc/config.gz in localconfig
-Content-Disposition: inline; filename=0002-kconfig-test-for-boot-config-uname-after-proc-con.patch
+Date: Fri, 1 May 2009 09:47:45 +0100
+Message-ID: <9b2b86520905010147l702e5129i1aa24c1eeefced27@mail.gmail.com>
+Subject: Re: [PATCH 0/2] kconfig: updates to streamline_config.pl
+From: Alan Jenkins <sourcejedi.lkml@googlemail.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: Ingo Molnar <mingo@elte.hu>, Andrew Morton <akpm@linux-foundation.org>, Linus Torvalds <torvalds@linux-foundation.org>, Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@linutronix.de>, Theodore Tso <tytso@mit.edu>, Arnaldo Carvalho de Melo <acme@redhat.com>, zippel@linux-m68k.org, linux-kbuild@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>, Alan Jenkins <sourcejedi.lkml@googlemail.com>
+To: Steven Rostedt <rostedt@goodmis.org>
+Cc: linux-kernel@vger.kernel.org, Ingo Molnar <mingo@elte.hu>, Andrew Morton <akpm@linux-foundation.org>, Linus Torvalds <torvalds@linux-foundation.org>, Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@linutronix.de>, Theodore Tso <tytso@mit.edu>, Arnaldo Carvalho de Melo <acme@redhat.com>, zippel@linux-m68k.org, linux-kbuild@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>
 
-From: Steven Rostedt <srostedt@redhat.com>
+On 5/1/09, Steven Rostedt <rostedt@goodmis.org> wrote:
+> Thanks to Alan Jenkins for suggesting these cleanups/fixes/enhancements.
 
-Many distros put their config in /boot/config-`uname -r`, add a check
-for that right after /proc/config.gz
+And thanks to you for pushing this script!  It should be handy for
+speeding up bisection builds, without accidentally disabling a config
+that caused the regression.
 
-[ Impact: use distro config as default to streamline_config.pl ]
+Though I'm wary of it for _general_ usage, because of hotplug.  I
+think it would be even more useful if there was some way to preserve
+all the currently selected USB drivers.
 
-Reported-by: Alan Jenkins <sourcejedi.lkml@googlemail.com>
-Signed-off-by: Steven Rostedt <rostedt@goodmis.org>
----
- scripts/kconfig/streamline_config.pl |    4 ++++
- 1 files changed, 4 insertions(+), 0 deletions(-)
-
-diff --git a/scripts/kconfig/streamline_config.pl b/scripts/kconfig/streamline_config.pl
-index 69b7c3f..46ca62d 100644
---- a/scripts/kconfig/streamline_config.pl
-+++ b/scripts/kconfig/streamline_config.pl
-@@ -54,6 +54,10 @@ my @searchconfigs = (
- 	    "exec" => "zcat",
- 	},
- 	{
-+	    "file" => "/boot/config-$uname",
-+	    "exec" => "cat",
-+	},
-+	{
- 	    "file" => "/boot/vmlinuz-$uname",
- 	    "exec" => "scripts/extract-ikconfig",
- 	    "test" => "scripts/extract-ikconfig",
--- 
-1.6.2.1
-
--- 
+Alan
