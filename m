@@ -1,76 +1,42 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepb.post.tele.dk ([195.41.46.236]:53267 "EHLO
-	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751309AbZEAKMz (ORCPT
+Received: from pfepa.post.tele.dk ([195.41.46.235]:56827 "EHLO
+	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756091AbZEALgZ (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 1 May 2009 06:12:55 -0400
-Date: Fri, 1 May 2009 12:15:03 +0200
+	Fri, 1 May 2009 07:36:25 -0400
+Date: Fri, 1 May 2009 13:38:34 +0200
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: [GIT] kbuild
-Message-ID: <20090501101503.GA21406@uranus.ravnborg.org>
+Subject: Re: [PATCH 0/14] deb-pkg target improvements
+Message-ID: <20090501113834.GA22023@uranus.ravnborg.org>
+References: <200904230034.59627.elendil@planet.nl> <20090423091406.GA5702@stro.at>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20090423091406.GA5702@stro.at>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Anders Kaseorg <andersk@mit.edu>, Ralf Baechle <ralf@linux-mips.org>, Nico Schottelius <nico@ikn.schottelius.org>, Cedric Hombourger <chombourger@gmail.com>, Andrew Morton <akpm@linux-foundation.org>, Randy Dunlap <randy.dunlap@oracle.com>, Matt Kraai <kraai@ftbfs.org>, =?iso-8859-1?B?RnLpZOlyaWMgQnJp6HJl?= <fbriere@fbriere.net>, Jesper Nilsson <jesper.nilsson@axis.com>, Haavard Skinnemoen <hskinnemoen@atmel.com>
+To: maximilian attems <max@stro.at>
+Cc: Frans Pop <elendil@planet.nl>, linux-kbuild@vger.kernel.org, Andres Salomon <dilinger@debian.org>
 
-Hi Linus.
+On Thu, Apr 23, 2009 at 11:14:06AM +0200, maximilian attems wrote:
+> On Thu, 23 Apr 2009, Frans Pop wrote:
+> 
+> > Here's a new patch series with improvements for the deb-pkg target. It's a
+> > compromise that includes both the patches from Maximilian Attems and myself,
+> > with some changes because of comments, a few fixes, and further improvements.
+> > 
+> > The (new) second patch simplifies some of the later patches quite a bit.
+> 
+> great!
+> been currently overworked in coorganising this physics workshop [1].
+> so had no time to respin all of this.
+> 
+> reviewed and the hole patch serie has an
+> Acked-by: maximilian attems <max@stro.at>
 
-kbuild fixes:
+Applied the full serie with maximilliam's ack.
+Thanks for fixing this!
 
-o fixed check for section flags. Replace a heuristics with correct check of the flags
-
-o a cygwin build fix (people do build kernels with cygwin these days)
-
-o remove more files when cleaning
-
-o fix tags so we do not append to the tags database
-
-o improve support for git tags in setlocalversion
-
+It is applied to kbuild-next so it will show up in .32.
 
 	Sam
-
-The following changes since commit 091438dd5668396328a3419abcbc6591159eb8d1:
-  Linus Torvalds (1):
-        Linux 2.6.30-rc4
-
-are available in the git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/sam/kbuild-fixes.git master
-
-Anders Kaseorg (1):
-      kbuild, modpost: Check the section flags, to catch missing "ax"/"aw"
-
-Cedric Hombourger (1):
-      kbuild: fix Module.markers permission error under cygwin
-
-Frédéric Brière (1):
-      kbuild: clean Module.markers and modules.order for out-of-tree modules
-
-Matt Kraai (1):
-      kbuild: remove a tag file before it is regenerated
-
-Nico Schottelius (1):
-      kbuild: fix scripts/setlocalversion with git
-
-Randy Dunlap (1):
-      docs: also clean index.html
-
-Robert P. J. Day (1):
-      kbuild: "make prepare" should be "make modules_prepare"
-
-Sam Ravnborg (2):
-      avr32: drop unused CLEAN_FILES
-      kbuild: fix comment in modpost.c
-
- Documentation/DocBook/Makefile |    5 ++-
- Makefile                       |    6 +++-
- arch/avr32/Makefile            |    2 -
- scripts/mod/modpost.c          |   55 +++++++++++++++------------------------
- scripts/setlocalversion        |   13 ++++-----
- scripts/tags.sh                |    2 +
- 6 files changed, 36 insertions(+), 47 deletions(-)
