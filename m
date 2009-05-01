@@ -1,42 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepa.post.tele.dk ([195.41.46.235]:56827 "EHLO
-	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756091AbZEALgZ (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 1 May 2009 07:36:25 -0400
-Date: Fri, 1 May 2009 13:38:34 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH 0/14] deb-pkg target improvements
-Message-ID: <20090501113834.GA22023@uranus.ravnborg.org>
-References: <200904230034.59627.elendil@planet.nl> <20090423091406.GA5702@stro.at>
-Mime-Version: 1.0
+Received: from mx3.mail.elte.hu ([157.181.1.138]:47371 "EHLO mx3.mail.elte.hu"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754002AbZEAMCO (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 1 May 2009 08:02:14 -0400
+Date: Fri, 1 May 2009 14:01:00 +0200
+From: Ingo Molnar <mingo@elte.hu>
+Subject: Re: [PATCH 0/7] kconfig: more featured minimum module configs
+Message-ID: <20090501120100.GC24706@elte.hu>
+References: <20090430185022.122124349@goodmis.org> <20090430191001.GA14108@elte.hu> <alpine.DEB.2.00.0904301854230.20374@gandalf.stny.rr.com>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20090423091406.GA5702@stro.at>
+In-Reply-To: <alpine.DEB.2.00.0904301854230.20374@gandalf.stny.rr.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: maximilian attems <max@stro.at>
-Cc: Frans Pop <elendil@planet.nl>, linux-kbuild@vger.kernel.org, Andres Salomon <dilinger@debian.org>
+To: Steven Rostedt <rostedt@goodmis.org>
+Cc: linux-kernel@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>, Linus Torvalds <torvalds@linux-foundation.org>, Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@linutronix.de>, Theodore Tso <tytso@mit.edu>, Arnaldo Carvalho de Melo <acme@redhat.com>, zippel@linux-m68k.org, linux-kbuild@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>
 
-On Thu, Apr 23, 2009 at 11:14:06AM +0200, maximilian attems wrote:
-> On Thu, 23 Apr 2009, Frans Pop wrote:
+
+* Steven Rostedt <rostedt@goodmis.org> wrote:
+
+> On Thu, 30 Apr 2009, Ingo Molnar wrote:
 > 
-> > Here's a new patch series with improvements for the deb-pkg target. It's a
-> > compromise that includes both the patches from Maximilian Attems and myself,
-> > with some changes because of comments, a few fixes, and further improvements.
+> > * Steven Rostedt <rostedt@goodmis.org> wrote:
 > > 
-> > The (new) second patch simplifies some of the later patches quite a bit.
+> > > This set of patches adds on top of my previous post.
+> > > 
+> > > It fixes CONFIG_IKCONFIG when CONFIG_IKCONFIG_PROC is not set.
+> > >  (gcc optimizes the config out!)
+> > > 
+> > > As a request from Ingo, it now enables IKCONFIG and will also use 
+> > > various locations to find a config to base against.
+> > 
+> > hm, now 'make localyesconfig' done on a Fedora distro kernel 
+> > produces something very close to an allyesconfig:
+> > 
+> >  -rw-rw-r-- 1 mingo mingo 91930 2009-04-30 20:03 .config
+> >  aldebaran:~/linux/linux> grep =y .config | wc -l
+> >  3398
+> > 
+> > is that expected?
 > 
-> great!
-> been currently overworked in coorganising this physics workshop [1].
-> so had no time to respin all of this.
-> 
-> reviewed and the hole patch serie has an
-> Acked-by: maximilian attems <max@stro.at>
+> What config did it use? If it uses an allyesconfig that was 
+> already made then it will not disable anything.
 
-Applied the full serie with maximilliam's ack.
-Thanks for fixing this!
+i used a regular config - then i also tried an allnoconfig - but no 
+change in the result, bloated .config.
 
-It is applied to kbuild-next so it will show up in .32.
-
-	Sam
+	Ingo
