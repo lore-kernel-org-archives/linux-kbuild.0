@@ -1,66 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepa.post.tele.dk ([195.41.46.235]:46899 "EHLO
-	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752153AbZEDL7f (ORCPT
+Received: from one.firstfloor.org ([213.235.205.2]:55357 "EHLO
+	one.firstfloor.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754051AbZEDMPr (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 4 May 2009 07:59:35 -0400
-Date: Mon, 4 May 2009 14:01:06 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: [PATCH 3/3] kbuild, modpost: fix unexpected non-allocatable warning with mips
-Message-ID: <20090504120106.GC7239@uranus.ravnborg.org>
-References: <20090504115704.GA7134@uranus.ravnborg.org>
-Mime-Version: 1.0
+	Mon, 4 May 2009 08:15:47 -0400
+Subject: Re: [PATCH 7/7] kconfig: search for a config to base the local(mod|yes)config on
+From: Andi Kleen <andi@firstfloor.org>
+References: <20090430185022.122124349@goodmis.org>
+	<20090430185223.792841532@goodmis.org>
+Date: Mon, 04 May 2009 14:15:41 +0200
+In-Reply-To: <20090430185223.792841532@goodmis.org> (Steven Rostedt's message of "Thu, 30 Apr 2009 14:50:29 -0400")
+Message-ID: <87fxflgj2q.fsf@basil.nowhere.org>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20090504115704.GA7134@uranus.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: LKML <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
-Cc: Sean MacLennan <smaclennan@pikatech.com>, Anders Kaseorg <andersk@mit.edu>, Jean Delvare <khali@linux-fr.org>, Manuel Lauss <mano@roarinelk.homelinux.net>, Stephen Rothwell <sfr@canb.auug.org.au>, linuxppc-dev <linuxppc-dev@ozlabs.org>, Wolfgang Denk <wd@denx.de>
+To: Steven Rostedt <rostedt@goodmis.org>
+Cc: linux-kernel@vger.kernel.org, Ingo Molnar <mingo@elte.hu>, Andrew Morton <akpm@linux-foundation.org>, Linus Torvalds <torvalds@linux-foundation.org>, Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@linutronix.de>, Theodore Tso <tytso@mit.edu>, Arnaldo Carvalho de Melo <acme@redhat.com>, zippel@linux-m68k.org, linux-kbuild@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>
 
-From 4391ed6aa9a38cdfb48addd7a9b24a2ff099b1a7 Mon Sep 17 00:00:00 2001
-From: Sam Ravnborg <sam@ravnborg.org>
-Date: Mon, 4 May 2009 13:05:26 +0200
-Subject: [PATCH 3/3] kbuild, modpost: fix unexpected non-allocatable warning with mips
+Steven Rostedt <rostedt@goodmis.org> writes:
 
-mips emit the following debug sections:
-.mdebug* and .pdr
+> Here's the list and order of search:
+>
+>   /proc/config.gz
+>   /boot/vmlinuz-`uname -r`
+>   vmlinux  # local to the directory
+>   /lib/modules/`uname -r`/kernel/kernel/configs.ko
+>   kernel/configs.ko
+>   kernel/configs.o
+>   .config
 
-They were included in the check for non-allocatable section
-and caused modpost to warn.
 
-Manuel Lauss suggested to fix this by adding the relevant
-sections to the list of sections we do not check.
+That seems like the wrong order. ./.config should always be first for
+compatibility. 
 
-Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
-Reported-by: Manuel Lauss <mano@roarinelk.homelinux.net>
----
- scripts/mod/modpost.c |   12 +++++++++++-
- 1 files changed, 11 insertions(+), 1 deletions(-)
+That order would completely wreck all my build scripts, and I suspect
+others too.
 
-diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index 268d457..161b784 100644
---- a/scripts/mod/modpost.c
-+++ b/scripts/mod/modpost.c
-@@ -727,7 +727,17 @@ int match(const char *sym, const char * const pat[])
- 
- /* sections that we do not want to do full section mismatch check on */
- static const char *section_white_list[] =
--	{ ".comment*", ".debug*", ".stab*", ".note*", ".got*", ".toc*", NULL };
-+{
-+	".comment*",
-+	".debug*",
-+	".mdebug*",        /* alpha, score, mips etc. */
-+	".pdr",            /* alpha, score, mips etc. */
-+	".stab*",
-+	".note*",
-+	".got*",
-+	".toc*",
-+	NULL
-+};
- 
- /*
-  * This is used to find sections missing the SHF_ALLOC flag.
+-Andi
+
 -- 
-1.6.3.rc3.40.g75b44
-
+ak@linux.intel.com -- Speaking for myself only.
