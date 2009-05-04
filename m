@@ -1,60 +1,44 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from hrndva-omtalb.mail.rr.com ([71.74.56.122]:49834 "EHLO
-	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751212AbZEAX1Y (ORCPT
+Received: from pfepb.post.tele.dk ([195.41.46.236]:56916 "EHLO
+	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753525AbZEDLzc (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 1 May 2009 19:27:24 -0400
-Date: Fri, 1 May 2009 19:27:23 -0400 (EDT)
-From: Steven Rostedt <rostedt@goodmis.org>
-Subject: Re: [PATCH 0/7] kconfig: more featured minimum module configs
-In-Reply-To: <20090501120100.GC24706@elte.hu>
-Message-ID: <alpine.DEB.2.00.0905011926330.20374@gandalf.stny.rr.com>
-References: <20090430185022.122124349@goodmis.org> <20090430191001.GA14108@elte.hu> <alpine.DEB.2.00.0904301854230.20374@gandalf.stny.rr.com> <20090501120100.GC24706@elte.hu>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+	Mon, 4 May 2009 07:55:32 -0400
+Date: Mon, 4 May 2009 13:57:04 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: kbuild, modpost: fix "non-allocatable section" warnings
+Message-ID: <20090504115704.GA7134@uranus.ravnborg.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ingo Molnar <mingo@elte.hu>
-Cc: linux-kernel@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>, Linus Torvalds <torvalds@linux-foundation.org>, Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@linutronix.de>, Theodore Tso <tytso@mit.edu>, Arnaldo Carvalho de Melo <acme@redhat.com>, zippel@linux-m68k.org, linux-kbuild@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>
+To: LKML <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
+Cc: Sean MacLennan <smaclennan@pikatech.com>, Anders Kaseorg <andersk@mit.edu>, Jean Delvare <khali@linux-fr.org>, Manuel Lauss <mano@roarinelk.homelinux.net>, Stephen Rothwell <sfr@canb.auug.org.au>, linuxppc-dev <linuxppc-dev@ozlabs.org>, Wolfgang Denk <wd@denx.de>
 
+It turned out there were at least three sources of
+the "non-allocatable section" warning.
 
+1) SUSE specific .comment section
+2) endianness issues in elf header
+3) additional debug sections
 
-On Fri, 1 May 2009, Ingo Molnar wrote:
+I have updated kbuild-fixes.git with
+patches for all of the above.
 
-> 
-> * Steven Rostedt <rostedt@goodmis.org> wrote:
-> 
-> > On Thu, 30 Apr 2009, Ingo Molnar wrote:
-> > 
-> > > * Steven Rostedt <rostedt@goodmis.org> wrote:
-> > > 
-> > > > This set of patches adds on top of my previous post.
-> > > > 
-> > > > It fixes CONFIG_IKCONFIG when CONFIG_IKCONFIG_PROC is not set.
-> > > >  (gcc optimizes the config out!)
-> > > > 
-> > > > As a request from Ingo, it now enables IKCONFIG and will also use 
-> > > > various locations to find a config to base against.
-> > > 
-> > > hm, now 'make localyesconfig' done on a Fedora distro kernel 
-> > > produces something very close to an allyesconfig:
-> > > 
-> > >  -rw-rw-r-- 1 mingo mingo 91930 2009-04-30 20:03 .config
-> > >  aldebaran:~/linux/linux> grep =y .config | wc -l
-> > >  3398
-> > > 
-> > > is that expected?
-> > 
-> > What config did it use? If it uses an allyesconfig that was 
-> > already made then it will not disable anything.
-> 
-> i used a regular config - then i also tried an allnoconfig - but no 
-> change in the result, bloated .config.
+But as we have seen three independent sources of this
+warning within short time I expect there may be
+yet-to-be-discovered issues.
 
-Could you send me the config it used (it should print out which one it 
-used) and the output of lsmod. Then I can test it locally.
+The patches accumulated so far all looks trivially correct
+and Jean and Sean has been quick to test them.
+So unless something unexpected shows up I plan to push them
+within a day or two.
 
-Thanks,
+I would like to see them in -next for a day or two first
+in the hope that if other architectures has troubles
+they will report this before it hits upstream.
 
--- Steve
+Patches will follow for reference / testing.
 
+	Sam
