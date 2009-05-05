@@ -1,31 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from baikonur.stro.at ([213.239.196.228]:35758 "EHLO
-	baikonur.stro.at" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752159AbZEEJR1 (ORCPT
+Received: from pfepb.post.tele.dk ([195.41.46.236]:51291 "EHLO
+	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752600AbZEETCI (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 5 May 2009 05:17:27 -0400
-Date: Tue, 5 May 2009 11:17:25 +0200
-From: maximilian attems <max@stro.at>
-Subject: Re: [PATCH 0/14] deb-pkg target improvements
-Message-ID: <20090505091725.GI30902@stro.at>
-References: <200904230034.59627.elendil@planet.nl> <20090423091406.GA5702@stro.at> <20090501113834.GA22023@uranus.ravnborg.org> <20090504151703.GB30902@stro.at> <20090504152550.GA8726@uranus.ravnborg.org>
-MIME-Version: 1.0
+	Tue, 5 May 2009 15:02:08 -0400
+Date: Tue, 5 May 2009 21:04:16 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: [GIT] kbuild fixes
+Message-ID: <20090505190416.GA19475@uranus.ravnborg.org>
+Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20090504152550.GA8726@uranus.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: Frans Pop <elendil@planet.nl>, linux-kbuild@vger.kernel.org, Andres Salomon <dilinger@debian.org>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Manuel Lauss <mano@roarinelk.homelinux.net>, Jean Delvare <khali@linux-fr.org>, Anders Kaseorg <andersk@mit.edu>, Sean MacLennan <smaclennan@pikatech.com>
 
-On Mon, 04 May 2009, Sam Ravnborg wrote:
+Hi Linus.
 
-> I meant .31 - and you are right that I had not pushed out.
-> Done now so soon in -next.
-> 
-> 	Sam
+This fixes an annoying warning "unexpected non-allocatable section",
+that shows up in certain combinations of targets/gccs.
 
-cool, landed. thanks :)
+The tree commit fixes three different sources of the warnings.
+This has now been in -next for a day or two with no additional comlains.
 
--- 
-maks
+Please pull.
+
+	Sam
+
+The following changes since commit b4348f32dae3cb6eb4bc21c7ed8f76c0b11e9d6a:
+  Linus Torvalds (1):
+        Merge branch 'for-linus' of git://oss.sgi.com/xfs/xfs
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/sam/kbuild-fixes.git master
+
+Anders Kaseorg (1):
+      kbuild, modpost: fix unexpected non-allocatable section when cross compiling
+
+Sam Ravnborg (2):
+      kbuild, modpost: fix "unexpected non-allocatable" warning with SUSE gcc
+      kbuild, modpost: fix unexpected non-allocatable warning with mips
+
+ scripts/mod/modpost.c |   47 ++++++++++++++++++++++++++++++++++-------------
+ 1 files changed, 34 insertions(+), 13 deletions(-)
