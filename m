@@ -1,61 +1,44 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.gmx.net ([213.165.64.20]:34587 "HELO mail.gmx.net"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with SMTP
-	id S1755389AbZEJSco (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 10 May 2009 14:32:44 -0400
-Date: Sun, 10 May 2009 20:33:03 +0200 (CEST)
-From: Guennadi Liakhovetski <g.liakhovetski@gmx.de>
-Subject: Re: dubious section mismatch test (was Re: [PULL] soc-camera: one
- commit as v4l2-dev preparation)
-In-Reply-To: <20090509165416.GA25534@uranus.ravnborg.org>
-Message-ID: <Pine.LNX.4.64.0905092113280.10748@axis700.grange>
-References: <Pine.LNX.4.64.0905071841331.9460@axis700.grange>
- <20090509062726.22d18182@pedra.chehab.org> <Pine.LNX.4.64.0905091430100.3515@axis700.grange>
- <20090509165416.GA25534@uranus.ravnborg.org>
+Received: from mail-ew0-f176.google.com ([209.85.219.176]:49158 "EHLO
+	mail-ew0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751161AbZEKGC2 convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 11 May 2009 02:02:28 -0400
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+In-Reply-To: <20090511015831.GB15777@luminet.net>
+References: <20090511015831.GB15777@luminet.net>
+Date: Mon, 11 May 2009 08:02:16 +0200
+Message-ID: <10f740e80905102302gbed0737y61c31900564ca704@mail.gmail.com>
+Subject: Re: eliminate -pipe from kernel compile
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: Mauro Carvalho Chehab <mchehab@infradead.org>, Linux Media Mailing List <linux-media@vger.kernel.org>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: lancetag@luminet.net, linux-m68k@vger.kernel.org
+Cc: linux-kbuild@vger.kernel.org
 
-On Sat, 9 May 2009, Sam Ravnborg wrote:
+Added linux-kbuild
 
-> On Sat, May 09, 2009 at 06:13:13PM +0200, Guennadi Liakhovetski wrote:
-> > On Sat, 9 May 2009, Mauro Carvalho Chehab wrote:
-> > 
-> > > WARNING: /home/v4l/master/v4l/soc_camera.o(.data+0x0): Section mismatch in reference from the variable soc_camera_pdrv to the function .devinit.text:soc_camera_pdrv_probe()
-> > > The variable soc_camera_pdrv references
-> > > the function __devinit soc_camera_pdrv_probe()
-> > > If the reference is valid then annotate the
-> > > variable with __init* (see linux/init.h) or name the variable:
-> > > *driver, *_template, *_timer, *_sht, *_ops, *_probe, *_probe_one, *_console, 
-> > > 
-> > > WARNING: /home/v4l/master/v4l/soc_camera.o(.data+0x8): Section mismatch in reference from the variable soc_camera_pdrv to the function .devexit.text:soc_camera_pdrv_remove()
-> > > The variable soc_camera_pdrv references
-> > > the function __devexit soc_camera_pdrv_remove()
-> > > If the reference is valid then annotate the
-> > > variable with __exit* (see linux/init.h) or name the variable:
-> > > *driver, *_template, *_timer, *_sht, *_ops, *_probe, *_probe_one, *_console, 
-> > 
-> > FWIW, I find this test dubious. Matching on symbol names doesn't seem like 
-> > a good idea to me. Can we introduce a new marker instead something like
-> > 
-> > static struct whatever_driver __driver driver = {
-> > 	.probe	= my_probe,
-> > 	.remove	= __exit_p(my_remove),
-> > };
-> > 
-> > to put them in a new special section? Or is there a better solution?
-> 
-> We already have that:
-> __refdata would be your choice in this case.
+On Mon, May 11, 2009 at 03:58, Lance Tagliapietra <lancetag@luminet.net> wrote:
+> I was noticing that kernel compiling is set up to have gcc pipe data from one pass to another, instead of using
+> temporary files.  On a memory constrained environment, this may not be the best idea (or at least I'd like to
+> explore that idea).  Instead of loading the assember, and having immediately being swapped out while the cc1 pass
+> runs, it may make more sense to have the temp files being written, instead of the swap in and out, when compiling
+> the various objects of the kernel.
+>
+> So, simply pulling out the -pipe from the compiler flag list didn't see to have the desired effect.  I'm afraid I'm
+> still missing something.  I'm still observing the assembler being loaded.
+>
+> Thoughts?
 
-Aha, great! Then also the warning text should be changed, shouldn't it?
+Gr{oetje,eeting}s,
 
-Thanks
-Guennadi
----
-Guennadi Liakhovetski, Ph.D.
-Freelance Open-Source Software Developer
-http://www.open-technology.de/
+						Geert
+
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+							    -- Linus Torvalds
