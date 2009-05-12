@@ -1,44 +1,66 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ew0-f176.google.com ([209.85.219.176]:49158 "EHLO
-	mail-ew0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751161AbZEKGC2 convert rfc822-to-8bit (ORCPT
+Received: from smtp1.linux-foundation.org ([140.211.169.13]:43307 "EHLO
+	smtp1.linux-foundation.org" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1752224AbZELVEy (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 11 May 2009 02:02:28 -0400
-MIME-Version: 1.0
-In-Reply-To: <20090511015831.GB15777@luminet.net>
-References: <20090511015831.GB15777@luminet.net>
-Date: Mon, 11 May 2009 08:02:16 +0200
-Message-ID: <10f740e80905102302gbed0737y61c31900564ca704@mail.gmail.com>
-Subject: Re: eliminate -pipe from kernel compile
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+	Tue, 12 May 2009 17:04:54 -0400
+Message-Id: <200905122102.n4CL2pl2007220@imap1.linux-foundation.org>
+Subject: [patch 2/3] menu: fix embedded menu presentation
+From: akpm@linux-foundation.org
+Date: Tue, 12 May 2009 13:43:35 -0700
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: lancetag@luminet.net, linux-m68k@vger.kernel.org
-Cc: linux-kbuild@vger.kernel.org
+To: sam@ravnborg.org
+Cc: linux-kbuild@vger.kernel.org, akpm@linux-foundation.org, randy.dunlap@oracle.com
 
-Added linux-kbuild
+From: Randy Dunlap <randy.dunlap@oracle.com>
 
-On Mon, May 11, 2009 at 03:58, Lance Tagliapietra <lancetag@luminet.net> wrote:
-> I was noticing that kernel compiling is set up to have gcc pipe data from one pass to another, instead of using
-> temporary files.  On a memory constrained environment, this may not be the best idea (or at least I'd like to
-> explore that idea).  Instead of loading the assember, and having immediately being swapped out while the cc1 pass
-> runs, it may make more sense to have the temp files being written, instead of the swap in and out, when compiling
-> the various objects of the kernel.
->
-> So, simply pulling out the -pipe from the compiler flag list didn't see to have the desired effect.  I'm afraid I'm
-> still missing something.  I'm still observing the assembler being loaded.
->
-> Thoughts?
+The STRIP_ASM_SYMS kconfig symbol mucks up the embedded menu because
+STRIP_ASM_SYMS is in the middle of the embedded menu items but it does not
+depend on EMBEDDED.  Move it to beyond the end of the embedded menu so
+that the menu is presented correctly.
 
-Gr{oetje,eeting}s,
+Or if STRIP_ASM_SYMS should depend on EMBEDDED, that can also be fixed.
 
-						Geert
+Signed-off-by: Randy Dunlap <randy.dunlap@oracle.com>
+Cc: Sam Ravnborg <sam@ravnborg.org>
+Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+---
 
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+ init/Kconfig |   16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-							    -- Linus Torvalds
+diff -puN init/Kconfig~menu-fix-embedded-menu-presentation init/Kconfig
+--- a/init/Kconfig~menu-fix-embedded-menu-presentation
++++ a/init/Kconfig
+@@ -808,14 +808,6 @@ config KALLSYMS_EXTRA_PASS
+ 	   you wait for kallsyms to be fixed.
+ 
+ 
+-config STRIP_ASM_SYMS
+-	bool "Strip assembler-generated symbols during link"
+-	default n
+-	help
+-	  Strip internal assembler-generated symbols during a link (symbols
+-	  that look like '.Lxxx') so they don't pollute the output of
+-	  get_wchan() and suchlike.
+-
+ config HOTPLUG
+ 	bool "Support for hot-pluggable devices" if EMBEDDED
+ 	default y
+@@ -961,6 +953,14 @@ config SLUB_DEBUG
+ 	  SLUB sysfs support. /sys/slab will not exist and there will be
+ 	  no support for cache validation etc.
+ 
++config STRIP_ASM_SYMS
++	bool "Strip assembler-generated symbols during link"
++	default n
++	help
++	  Strip internal assembler-generated symbols during a link (symbols
++	  that look like '.Lxxx') so they don't pollute the output of
++	  get_wchan() and suchlike.
++
+ config COMPAT_BRK
+ 	bool "Disable heap randomization"
+ 	default y
+_
