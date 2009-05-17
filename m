@@ -1,77 +1,49 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.wp.pl ([212.77.101.5]:31440 "EHLO mx1.wp.pl"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751903AbZEQPuK (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 17 May 2009 11:50:10 -0400
-Received: from 93-181-133-4.as.kn.pl (HELO krzysio.net) (krzysztof.h1@[93.181.133.4])
-          (envelope-sender <krzysztof.h1@wp.pl>)
-          by smtp.wp.pl (WP-SMTPD) with SMTP
-          for <linux-kbuild@vger.kernel.org>; 17 May 2009 17:50:09 +0200
-Date: Sun, 17 May 2009 17:56:17 +0200
-From: Krzysztof Helt <krzysztof.h1@wp.pl>
-Subject: Kconfig: fix problem in HID menu
-Message-Id: <20090517175617.81323cc1.krzysztof.h1@wp.pl>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Received: from fmmailgate01.web.de ([217.72.192.221]:43778 "EHLO
+	fmmailgate01.web.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754351AbZEQXgr (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 17 May 2009 19:36:47 -0400
+From: Markus Heidelberg <markus.heidelberg@web.de>
+Subject: [PATCH resend 00/10] kconfig: various fixes and documentation updates
+Date: Mon, 18 May 2009 01:36:44 +0200
+Message-Id: <1242603414-9267-1-git-send-email-markus.heidelberg@web.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: LKLM <linux-kernel@vger.kernel.org>
+To: Sam Ravnborg <sam@ravnborg.org>, Roman Zippel <zippel@linux-m68k.org>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Markus Heidelberg <markus.heidelberg@web.de>
 
-From: Krzysztof Helt <krzysztof.h1@wp.pl>
+Hi,
 
-Following syntax does not work properly if there is an options FOO2 depending on the FOO:
+I sent this series about 4 weeks ago on 2009-04-19, but didn't receive any
+comments. Is Roman inactive currently?
 
-config FOO
-	tristate "Foo" if EMBEDDED
-	depends on FUD
-	default !EMBEDDED
 
-config FOO2
-	bool "Foo2"
-	depends on FOO
+Patches  1-3: documentation updates, typo fixes
+Patch      4: .gitignore
+Patches  5-8: qconf fixes (compiler warnings/errors)
+Patches 9-10: environment variable fixes (KCONFIG_CONFIG + KCONFIG_AUTOCONFIG)
 
-If the EMBEDDED is not selected the FOO option is selected
-and it cannot be unselected.
+Markus Heidelberg (10):
+  kconfig: fix typo "mconfig" to "menuconfig" in a comment
+  kconfig: add a note about the deps to the 'silentoldconfig' help
+  kconfig: resort the documentation of the environment variables
+  gitignore: ignore Kconfig i18n files
+  kconfig qconf: fix -Wall compiler warnings
+  kconfig qconf: fix namespace for Horizontal and Vertical enum values
+  kconfig qconf: add namespace for use of Key_ enum values
+  kconfig qconf: fix the type of the desktop widget
+  kconfig: do not hardcode ".config" filename
+  kconfig: do not hardcode "include/config/auto.conf" filename
 
-The change of the FOO definition:
+ Documentation/kbuild/kconfig.txt |  116 +++++++++++++++++++------------------
+ README                           |    1 +
+ scripts/kconfig/.gitignore       |    2 +
+ scripts/kconfig/Makefile         |    4 +-
+ scripts/kconfig/conf.c           |    7 +-
+ scripts/kconfig/confdata.c       |   20 ++++---
+ scripts/kconfig/lkc.h            |    1 +
+ scripts/kconfig/qconf.cc         |   48 +++++++++-------
+ scripts/kconfig/util.c           |    6 +-
+ 9 files changed, 112 insertions(+), 93 deletions(-)
 
-config FOO
-	tristate "Foo" 
-	depends on EMBEDDED && FUD
-	default !EMBEDDED
-
-fixes the issue.
-
-This is likely a bug in Kconfig tool.
-
-Signed-off-by: Krzysztof Helt <krzysztof.h1@wp.pl>
----
-
-diff --git a/drivers/hid/Kconfig b/drivers/hid/Kconfig
-index 7e67dcb..c52204d 100644
---- a/drivers/hid/Kconfig
-+++ b/drivers/hid/Kconfig
-@@ -153,8 +153,8 @@ config HID_KENSINGTON
- 	Support for Kensington Slimblade Trackball.
- 
- config HID_LOGITECH
--	tristate "Logitech" if EMBEDDED
--	depends on USB_HID
-+	tristate "Logitech"
-+	depends on EMBEDDED && USB_HID
- 	default !EMBEDDED
- 	---help---
- 	Support for Logitech devices that are not fully compliant with HID standard.
-@@ -205,8 +205,8 @@ config HID_NTRIG
- 	Support for N-Trig touch screen.
- 
- config HID_PANTHERLORD
--	tristate "Pantherlord devices support" if EMBEDDED
--	depends on USB_HID
-+	tristate "Pantherlord devices support"
-+	depends on EMBEDDED && USB_HID
- 	default !EMBEDDED
- 	---help---
- 	Support for PantherLord/GreenAsia based device support.
