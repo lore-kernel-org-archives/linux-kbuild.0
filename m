@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from fmmailgate01.web.de ([217.72.192.221]:43809 "EHLO
-	fmmailgate01.web.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754920AbZEQXgt (ORCPT
+Received: from fmmailgate02.web.de ([217.72.192.227]:46388 "EHLO
+	fmmailgate02.web.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755140AbZEQXgt (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
 	Sun, 17 May 2009 19:36:49 -0400
 From: Markus Heidelberg <markus.heidelberg@web.de>
-Subject: [PATCH resend 09/10] kconfig: do not hardcode ".config" filename
-Date: Mon, 18 May 2009 01:36:53 +0200
-Message-Id: <1242603414-9267-10-git-send-email-markus.heidelberg@web.de>
+Subject: [PATCH resend 07/10] kconfig qconf: add namespace for use of Key_ enum values
+Date: Mon, 18 May 2009 01:36:51 +0200
+Message-Id: <1242603414-9267-8-git-send-email-markus.heidelberg@web.de>
 In-Reply-To: <1242603414-9267-1-git-send-email-markus.heidelberg@web.de>
 References: <1242603414-9267-1-git-send-email-markus.heidelberg@web.de>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,63 +15,119 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: Sam Ravnborg <sam@ravnborg.org>, Roman Zippel <zippel@linux-m68k.org>
 Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Markus Heidelberg <markus.heidelberg@web.de>
 
-Rather than hardcoding ".config" use conf_get_configname(), which also
-respects the environment variable KCONFIG_CONFIG.
+They are defined in the 'Qt' namespace.
 
-This fixes "make silentoldconfig" when KCONFIG_CONFIG is used and also
-suggests the given filename for "Load" and "Save as" in qconf.
+Fixes the following compiler errors after a quick conversion with 'qt3to4',
+which occured with g++ 3.4.6 and 4.1.2, but not anymore with 4.3.2.
+
+scripts/kconfig/qconf.cc: In member function 'virtual void ConfigLineEdit::keyPressEvent(QKeyEvent*)':
+scripts/kconfig/qconf.cc:311: error: 'Key_Escape' was not declared in this scope
+scripts/kconfig/qconf.cc:313: error: 'Key_Return' was not declared in this scope
+scripts/kconfig/qconf.cc:314: error: 'Key_Enter' was not declared in this scope
+
+scripts/kconfig/qconf.cc: In member function 'virtual void ConfigList::keyPressEvent(QKeyEvent*)':
+scripts/kconfig/qconf.cc:653: error: 'Key_Escape' was not declared in this scope
+scripts/kconfig/qconf.cc:666: error: 'Key_Return' was not declared in this scope
+scripts/kconfig/qconf.cc:667: error: 'Key_Enter' was not declared in this scope
+scripts/kconfig/qconf.cc:681: error: 'Key_Space' was not declared in this scope
+scripts/kconfig/qconf.cc:684: error: 'Key_N' was not declared in this scope
+scripts/kconfig/qconf.cc:687: error: 'Key_M' was not declared in this scope
+scripts/kconfig/qconf.cc:690: error: 'Key_Y' was not declared in this scope
+
+scripts/kconfig/qconf.cc: In constructor 'ConfigMainWindow::ConfigMainWindow()':
+scripts/kconfig/qconf.cc:1329: error: 'CTRL' was not declared in this scope
+scripts/kconfig/qconf.cc:1329: error: 'Key_Q' was not declared in this scope
+scripts/kconfig/qconf.cc:1331: error: 'Key_L' was not declared in this scope
+scripts/kconfig/qconf.cc:1333: error: 'Key_S' was not declared in this scope
+scripts/kconfig/qconf.cc:1340: error: 'Key_F' was not declared in this scope
 
 Signed-off-by: Markus Heidelberg <markus.heidelberg@web.de>
 ---
- scripts/kconfig/conf.c   |    7 ++++---
- scripts/kconfig/qconf.cc |    4 ++--
- 2 files changed, 6 insertions(+), 5 deletions(-)
+ scripts/kconfig/qconf.cc |   28 ++++++++++++++--------------
+ 1 files changed, 14 insertions(+), 14 deletions(-)
 
-diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
-index d190092..3baaaec 100644
---- a/scripts/kconfig/conf.c
-+++ b/scripts/kconfig/conf.c
-@@ -498,14 +498,15 @@ int main(int ac, char **av)
- 	conf_parse(name);
- 	//zconfdump(stdout);
- 	if (sync_kconfig) {
--		if (stat(".config", &tmpstat)) {
-+		name = conf_get_configname();
-+		if (stat(name, &tmpstat)) {
- 			fprintf(stderr, _("***\n"
- 				"*** You have not yet configured your kernel!\n"
--				"*** (missing kernel .config file)\n"
-+				"*** (missing kernel config file \"%s\")\n"
- 				"***\n"
- 				"*** Please run some configurator (e.g. \"make oldconfig\" or\n"
- 				"*** \"make menuconfig\" or \"make xconfig\").\n"
--				"***\n"));
-+				"***\n"), name);
- 			exit(1);
- 		}
- 	}
 diff --git a/scripts/kconfig/qconf.cc b/scripts/kconfig/qconf.cc
-index 19811fc..ce7d508 100644
+index 7433dac..afae613 100644
 --- a/scripts/kconfig/qconf.cc
 +++ b/scripts/kconfig/qconf.cc
-@@ -1448,7 +1448,7 @@ ConfigMainWindow::ConfigMainWindow(void)
- 
- void ConfigMainWindow::loadConfig(void)
+@@ -297,10 +297,10 @@ void ConfigLineEdit::show(ConfigItem* i)
+ void ConfigLineEdit::keyPressEvent(QKeyEvent* e)
  {
--	QString s = QFileDialog::getOpenFileName(".config", NULL, this);
-+	QString s = QFileDialog::getOpenFileName(conf_get_configname(), NULL, this);
- 	if (s.isNull())
- 		return;
- 	if (conf_read(QFile::encodeName(s)))
-@@ -1464,7 +1464,7 @@ void ConfigMainWindow::saveConfig(void)
+ 	switch (e->key()) {
+-	case Key_Escape:
++	case Qt::Key_Escape:
+ 		break;
+-	case Key_Return:
+-	case Key_Enter:
++	case Qt::Key_Return:
++	case Qt::Key_Enter:
+ 		sym_set_string_value(item->menu->sym, text().latin1());
+ 		parent()->updateList(item);
+ 		break;
+@@ -639,7 +639,7 @@ void ConfigList::keyPressEvent(QKeyEvent* ev)
+ 	struct menu *menu;
+ 	enum prop_type type;
  
- void ConfigMainWindow::saveConfigAs(void)
- {
--	QString s = QFileDialog::getSaveFileName(".config", NULL, this);
-+	QString s = QFileDialog::getSaveFileName(conf_get_configname(), NULL, this);
- 	if (s.isNull())
+-	if (ev->key() == Key_Escape && mode != fullMode && mode != listMode) {
++	if (ev->key() == Qt::Key_Escape && mode != fullMode && mode != listMode) {
+ 		emit parentSelected();
+ 		ev->accept();
  		return;
- 	if (conf_write(QFile::encodeName(s)))
+@@ -652,8 +652,8 @@ void ConfigList::keyPressEvent(QKeyEvent* ev)
+ 	item = (ConfigItem*)i;
+ 
+ 	switch (ev->key()) {
+-	case Key_Return:
+-	case Key_Enter:
++	case Qt::Key_Return:
++	case Qt::Key_Enter:
+ 		if (item->goParent) {
+ 			emit parentSelected();
+ 			break;
+@@ -667,16 +667,16 @@ void ConfigList::keyPressEvent(QKeyEvent* ev)
+ 			emit menuSelected(menu);
+ 			break;
+ 		}
+-	case Key_Space:
++	case Qt::Key_Space:
+ 		changeValue(item);
+ 		break;
+-	case Key_N:
++	case Qt::Key_N:
+ 		setValue(item, no);
+ 		break;
+-	case Key_M:
++	case Qt::Key_M:
+ 		setValue(item, mod);
+ 		break;
+-	case Key_Y:
++	case Qt::Key_Y:
+ 		setValue(item, yes);
+ 		break;
+ 	default:
+@@ -1315,18 +1315,18 @@ ConfigMainWindow::ConfigMainWindow(void)
+ 	backAction = new QAction("Back", QPixmap(xpm_back), _("Back"), 0, this);
+ 	  connect(backAction, SIGNAL(activated()), SLOT(goBack()));
+ 	  backAction->setEnabled(FALSE);
+-	QAction *quitAction = new QAction("Quit", _("&Quit"), CTRL+Key_Q, this);
++	QAction *quitAction = new QAction("Quit", _("&Quit"), Qt::CTRL + Qt::Key_Q, this);
+ 	  connect(quitAction, SIGNAL(activated()), SLOT(close()));
+-	QAction *loadAction = new QAction("Load", QPixmap(xpm_load), _("&Load"), CTRL+Key_L, this);
++	QAction *loadAction = new QAction("Load", QPixmap(xpm_load), _("&Load"), Qt::CTRL + Qt::Key_L, this);
+ 	  connect(loadAction, SIGNAL(activated()), SLOT(loadConfig()));
+-	saveAction = new QAction("Save", QPixmap(xpm_save), _("&Save"), CTRL+Key_S, this);
++	saveAction = new QAction("Save", QPixmap(xpm_save), _("&Save"), Qt::CTRL + Qt::Key_S, this);
+ 	  connect(saveAction, SIGNAL(activated()), SLOT(saveConfig()));
+ 	conf_set_changed_callback(conf_changed);
+ 	// Set saveAction's initial state
+ 	conf_changed();
+ 	QAction *saveAsAction = new QAction("Save As...", _("Save &As..."), 0, this);
+ 	  connect(saveAsAction, SIGNAL(activated()), SLOT(saveConfigAs()));
+-	QAction *searchAction = new QAction("Find", _("&Find"), CTRL+Key_F, this);
++	QAction *searchAction = new QAction("Find", _("&Find"), Qt::CTRL + Qt::Key_F, this);
+ 	  connect(searchAction, SIGNAL(activated()), SLOT(searchConfig()));
+ 	QAction *singleViewAction = new QAction("Single View", QPixmap(xpm_single_view), _("Single View"), 0, this);
+ 	  connect(singleViewAction, SIGNAL(activated()), SLOT(showSingleView()));
 -- 
 1.6.3.1.20.ga30f
 
