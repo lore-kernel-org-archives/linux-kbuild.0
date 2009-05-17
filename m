@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from fmmailgate02.web.de ([217.72.192.227]:46379 "EHLO
+Received: from fmmailgate02.web.de ([217.72.192.227]:46378 "EHLO
 	fmmailgate02.web.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754491AbZEQXgr (ORCPT
+	with ESMTP id S1754554AbZEQXgr (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
 	Sun, 17 May 2009 19:36:47 -0400
 From: Markus Heidelberg <markus.heidelberg@web.de>
-Subject: [PATCH resend 02/10] kconfig: add a note about the deps to the 'silentoldconfig' help
-Date: Mon, 18 May 2009 01:36:46 +0200
-Message-Id: <1242603414-9267-3-git-send-email-markus.heidelberg@web.de>
+Subject: [PATCH resend 01/10] kconfig: fix typo "mconfig" to "menuconfig" in a comment
+Date: Mon, 18 May 2009 01:36:45 +0200
+Message-Id: <1242603414-9267-2-git-send-email-markus.heidelberg@web.de>
 In-Reply-To: <1242603414-9267-1-git-send-email-markus.heidelberg@web.de>
 References: <1242603414-9267-1-git-send-email-markus.heidelberg@web.de>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -18,35 +18,22 @@ Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Markus Heidelber
 
 Signed-off-by: Markus Heidelberg <markus.heidelberg@web.de>
 ---
- README                   |    1 +
  scripts/kconfig/Makefile |    2 +-
- 2 files changed, 2 insertions(+), 1 deletions(-)
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-diff --git a/README b/README
-index d6c6c74..7a078ff 100644
---- a/README
-+++ b/README
-@@ -174,6 +174,7 @@ CONFIGURING the kernel:
- 	"make silentoldconfig"
- 			   Like above, but avoids cluttering the screen
- 			   with questions already answered.
-+			   Additionally updates the dependencies.
- 	"make defconfig"   Create a ./.config file by using the default
- 			   symbol values from arch/$ARCH/defconfig.
- 	"make allyesconfig"
 diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
-index 47e3f2e..5ddf8be 100644
+index fa8c2dd..47e3f2e 100644
 --- a/scripts/kconfig/Makefile
 +++ b/scripts/kconfig/Makefile
-@@ -83,7 +83,7 @@ help:
- 	@echo  '  xconfig	  - Update current config utilising a QT based front-end'
- 	@echo  '  gconfig	  - Update current config utilising a GTK based front-end'
- 	@echo  '  oldconfig	  - Update current config utilising a provided .config as base'
--	@echo  '  silentoldconfig - Same as oldconfig, but quietly'
-+	@echo  '  silentoldconfig - Same as oldconfig, but quietly, additionally update deps'
- 	@echo  '  randconfig	  - New config with random answer to all options'
- 	@echo  '  defconfig	  - New config with default answer to all options'
- 	@echo  '  allmodconfig	  - New config selecting modules when possible'
+@@ -104,7 +104,7 @@ HOST_EXTRACFLAGS += -DLOCALE
+ # ===========================================================================
+ # Shared Makefile for the various kconfig executables:
+ # conf:	  Used for defconfig, oldconfig and related targets
+-# mconf:  Used for the mconfig target.
++# mconf:  Used for the menuconfig target
+ #         Utilizes the lxdialog package
+ # qconf:  Used for the xconfig target
+ #         Based on QT which needs to be installed to compile it
 -- 
 1.6.3.1.20.ga30f
 
