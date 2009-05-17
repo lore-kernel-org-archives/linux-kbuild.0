@@ -1,69 +1,77 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from spamtitan.hbci.com ([206.230.105.6]:62489 "EHLO
-	spamtitan.hbci.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1761716AbZENDw1 (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 13 May 2009 23:52:27 -0400
-Date: Wed, 13 May 2009 22:12:37 -0500
-From: Lance Tagliapietra <lancetag@Luminet.net>
-Subject: Re: eliminate -pipe from kernel compile
-Message-ID: <20090514031235.GA4178@luminet.net>
-Reply-To: lancetag@Luminet.net
-References: <20090511015831.GB15777@luminet.net> <10f740e80905102302gbed0737y61c31900564ca704@mail.gmail.com> <20090513003829.GA13155@uranus.ravnborg.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20090513003829.GA13155@uranus.ravnborg.org>
+Received: from mx1.wp.pl ([212.77.101.5]:31440 "EHLO mx1.wp.pl"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751903AbZEQPuK (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 17 May 2009 11:50:10 -0400
+Received: from 93-181-133-4.as.kn.pl (HELO krzysio.net) (krzysztof.h1@[93.181.133.4])
+          (envelope-sender <krzysztof.h1@wp.pl>)
+          by smtp.wp.pl (WP-SMTPD) with SMTP
+          for <linux-kbuild@vger.kernel.org>; 17 May 2009 17:50:09 +0200
+Date: Sun, 17 May 2009 17:56:17 +0200
+From: Krzysztof Helt <krzysztof.h1@wp.pl>
+Subject: Kconfig: fix problem in HID menu
+Message-Id: <20090517175617.81323cc1.krzysztof.h1@wp.pl>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: Geert Uytterhoeven <geert@linux-m68k.org>, linux-m68k@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
+Cc: LKLM <linux-kernel@vger.kernel.org>
 
-Hello,
+From: Krzysztof Helt <krzysztof.h1@wp.pl>
 
-I just completed a test build with my patch to arch/m68k/Makefile to remove the -pipe flag (see patch below).  
-Watching the build confirmed that a) -pipe was no longer showing up in the gcc command lines and b) temporary 
-files were being created as expected without pipe; and c) the as command was not loaded waiting for cc1 to 
-complete.  Yea!  The /arch/m68k/Makefile is the only place where the -pipe flag is located, and that seems
-to be the place for all arch's.
+Following syntax does not work properly if there is an options FOO2 depending on the FOO:
 
---- arch/m68k/Makefile.old	2009-05-13 21:58:28.000000000 -0500
-+++ arch/m68k/Makefile	2009-05-09 11:16:39.000000000 -0500
-@@ -33,7 +33,9 @@
- CHECKFLAGS += -D__mc68000__
+config FOO
+	tristate "Foo" if EMBEDDED
+	depends on FUD
+	default !EMBEDDED
+
+config FOO2
+	bool "Foo2"
+	depends on FOO
+
+If the EMBEDDED is not selected the FOO option is selected
+and it cannot be unselected.
+
+The change of the FOO definition:
+
+config FOO
+	tristate "Foo" 
+	depends on EMBEDDED && FUD
+	default !EMBEDDED
+
+fixes the issue.
+
+This is likely a bug in Kconfig tool.
+
+Signed-off-by: Krzysztof Helt <krzysztof.h1@wp.pl>
+---
+
+diff --git a/drivers/hid/Kconfig b/drivers/hid/Kconfig
+index 7e67dcb..c52204d 100644
+--- a/drivers/hid/Kconfig
++++ b/drivers/hid/Kconfig
+@@ -153,8 +153,8 @@ config HID_KENSINGTON
+ 	Support for Kensington Slimblade Trackball.
  
- # without -fno-strength-reduce the 53c7xx.c driver fails ;-(
--KBUILD_CFLAGS += -pipe -fno-strength-reduce -ffixed-a2
-+# delete -pipe to save RAM / minimize swap during compile
-+# original: KBUILD_CFLAGS += -pipe -fno-strength-reduce -ffixed-a2
-+KBUILD_CFLAGS += -fno-strength-reduce -ffixed-a2
+ config HID_LOGITECH
+-	tristate "Logitech" if EMBEDDED
+-	depends on USB_HID
++	tristate "Logitech"
++	depends on EMBEDDED && USB_HID
+ 	default !EMBEDDED
+ 	---help---
+ 	Support for Logitech devices that are not fully compliant with HID standard.
+@@ -205,8 +205,8 @@ config HID_NTRIG
+ 	Support for N-Trig touch screen.
  
- # enable processor switch if compiled only for a single cpu
- ifndef CONFIG_M68020
-
-Pulling out the -pipe does seem to cut compile time.  I am working on hard numbers.
-
---Lance
-
-On Wed, May 13, 2009 at 02:38:29AM +0200, Sam Ravnborg wrote:
-> On Mon, May 11, 2009 at 08:02:16AM +0200, Geert Uytterhoeven wrote:
-> > Added linux-kbuild
-> > 
-> > On Mon, May 11, 2009 at 03:58, Lance Tagliapietra <lancetag@luminet.net> wrote:
-> > > I was noticing that kernel compiling is set up to have gcc pipe data from one pass to another, instead of using
-> > > temporary files. ?On a memory constrained environment, this may not be the best idea (or at least I'd like to
-> > > explore that idea). ?Instead of loading the assember, and having immediately being swapped out while the cc1 pass
-> > > runs, it may make more sense to have the temp files being written, instead of the swap in and out, when compiling
-> > > the various objects of the kernel.
-> > >
-> > > So, simply pulling out the -pipe from the compiler flag list didn't see to have the desired effect. ?I'm afraid I'm
-> > > still missing something. ?I'm still observing the assembler being loaded.
-> 
-> 1) How did you "pulling out the -pipe from the compiler flag list"?
-> Please show this as a patch.
-> 
-> 2) Did you verify that -pipe was used before and no more after your
->    changes?
->    Hint - use "make V=1" to see all command line options to gcc
-> 
-> 	Sam
+ config HID_PANTHERLORD
+-	tristate "Pantherlord devices support" if EMBEDDED
+-	depends on USB_HID
++	tristate "Pantherlord devices support"
++	depends on EMBEDDED && USB_HID
+ 	default !EMBEDDED
+ 	---help---
+ 	Support for PantherLord/GreenAsia based device support.
