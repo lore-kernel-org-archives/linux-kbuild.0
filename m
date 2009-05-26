@@ -1,58 +1,91 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from astoria.ccjclearline.com ([64.235.106.9]:58031 "EHLO
-	astoria.ccjclearline.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751908AbZEWOMo (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 23 May 2009 10:12:44 -0400
-Date: Sat, 23 May 2009 10:11:17 -0400 (EDT)
-From: "Robert P. J. Day" <rpjday@crashcourse.ca>
-Subject: Re: "make config" to another architecture doesn't relink
- include/asm
-In-Reply-To: <200905231322.16154.arnd@arndb.de>
-Message-ID: <alpine.LFD.2.00.0905231010570.7113@localhost.localdomain>
-References: <alpine.LFD.2.00.0905221219500.13933@localhost.localdomain> <200905231322.16154.arnd@arndb.de>
-MIME-Version: 1.0
-Content-Type: MULTIPART/MIXED; BOUNDARY="8323328-478106526-1243087881=:7113"
+Received: from hera.kernel.org ([140.211.167.34]:35392 "EHLO hera.kernel.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752857AbZEZID2 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 26 May 2009 04:03:28 -0400
+From: Cheng Renquan <crq@hera.kernel.org>
+Subject: [PATCH] Kbuild: remove extra ifdef/endif of top Makefile
+Date: Tue, 26 May 2009 16:03:07 +0800
+Message-Id: <1243324987-17840-1-git-send-email-crq@hera.kernel.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org, sam@ravnborg.org
+To: linux-kbuild@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>
+Cc: Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org, crquan@gmail.com
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
+From: Cheng Renquan <crq@kernel.org>
 
---8323328-478106526-1243087881=:7113
-Content-Type: TEXT/PLAIN; charset=iso-8859-1
-Content-Transfer-Encoding: QUOTED-PRINTABLE
+The GNU make's origin function know undefined variable well,
+so the outer ifdef/endif is unneeded.
 
-On Sat, 23 May 2009, Arnd Bergmann wrote:
+I've checked the minimal requirements from Documentation/Changes
+is GNU make 3.79.1, and that version of GNU make has support of
+origin function already, so now it's safe to kill the outer
+conditional checking, without upgrading the minimal requirements.
 
-> On Friday 22 May 2009, Robert P. J. Day wrote:
-> > =A0 shouldn't it be sufficient that, if i do another "make
-> > ??_defconfig" to another architecture, all traces of the previous
-> > configure are erased and include/asm should be relinked
-> > automatically?
+Signed-off-by: Cheng Renquan <crq@kernel.org>
+---
+ Makefile |   26 +++++++++-----------------
+ 1 files changed, 9 insertions(+), 17 deletions(-)
 
-> In 2.6.30, the symlink is finally no longer needed, so maybe we
-> should simply drop it to solve this problem as well.
+diff --git a/Makefile b/Makefile
+index 9b2b58c..3798f26 100644
+--- a/Makefile
++++ b/Makefile
+@@ -35,10 +35,8 @@ MAKEFLAGS += -rR --no-print-directory
+ # To put more focus on warnings, be less verbose as default
+ # Use 'make V=1' to see the full commands
+ 
+-ifdef V
+-  ifeq ("$(origin V)", "command line")
+-    KBUILD_VERBOSE = $(V)
+-  endif
++ifeq ("$(origin V)", "command line")
++  KBUILD_VERBOSE = $(V)
+ endif
+ ifndef KBUILD_VERBOSE
+   KBUILD_VERBOSE = 0
+@@ -54,10 +52,8 @@ endif
+ # See the file "Documentation/sparse.txt" for more details, including
+ # where to get the "sparse" utility.
+ 
+-ifdef C
+-  ifeq ("$(origin C)", "command line")
+-    KBUILD_CHECKSRC = $(C)
+-  endif
++ifeq ("$(origin C)", "command line")
++  KBUILD_CHECKSRC = $(C)
+ endif
+ ifndef KBUILD_CHECKSRC
+   KBUILD_CHECKSRC = 0
+@@ -69,12 +65,10 @@ endif
+ ifdef SUBDIRS
+   KBUILD_EXTMOD ?= $(SUBDIRS)
+ endif
+-ifdef M
+-  ifeq ("$(origin M)", "command line")
+-    KBUILD_EXTMOD := $(M)
+-  endif
+-endif
+ 
++ifeq ("$(origin M)", "command line")
++  KBUILD_EXTMOD := $(M)
++endif
+ 
+ # kbuild supports saving output files in a separate directory.
+ # To locate output files in a separate directory two syntaxes are supported.
+@@ -98,10 +92,8 @@ ifeq ($(KBUILD_SRC),)
+ 
+ # OK, Make called in directory where kernel src resides
+ # Do we want to locate output files in a separate directory?
+-ifdef O
+-  ifeq ("$(origin O)", "command line")
+-    KBUILD_OUTPUT := $(O)
+-  endif
++ifeq ("$(origin O)", "command line")
++  KBUILD_OUTPUT := $(O)
+ endif
+ 
+ # That's our default target when none is given on the command line
 
-  or that could work, too.  :-)
-
-rday
---
-
-
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-Robert P. J. Day                               Waterloo, Ontario, CANADA
-
-        Linux Consulting, Training and Annoying Kernel Pedantry.
-
-Web page:                                          http://crashcourse.ca
-Linked In:                             http://www.linkedin.com/in/rpjday
-Twitter:                                       http://twitter.com/rpjday
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
---8323328-478106526-1243087881=:7113--
+-- 
+Cheng Renquan, Shenzhen, China
