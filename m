@@ -1,39 +1,23 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from sj-iport-5.cisco.com ([171.68.10.87]:28727 "EHLO
-	sj-iport-5.cisco.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752383AbZEaBNb (ORCPT
+Received: from farizej.centrum.cz ([90.183.38.130]:59848 "EHLO
+	farizej.centrum.cz" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753366AbZFBOyx (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 30 May 2009 21:13:31 -0400
-Date: Sat, 30 May 2009 18:13:32 -0700
-From: David VomLehn <dvomlehn@cisco.com>
-Subject: [PATCH] documentation:kbuild Incorrect makefile syntix in examnple
-Message-ID: <20090531011332.GA13205@cuplxvomd02.corp.sa.net>
+	Tue, 2 Jun 2009 10:54:53 -0400
+Date: Tue, 02 Jun 2009 16:54:48 +0200
+From: <isa_youssouf@centrum.sk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Message-ID: <200906021654.13217@centrum.cz>
+Subject: Good Day
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-doc@vger.kernel.org
-Cc: rdunlap@xenotime.net, linux-kbuild@vger.kernel.org, sam@ravnborg.org
 
-There is an error in the make syntax for one of the kbuild examples. This
-fixes it.
+Good Day 
 
-Signed-off-by: David VomLehn <dvomlehn@cisco.com>
----
- Documentation/kbuild/modules.txt |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+I want to transfer the sum of Twelve Million Dollars (US$12.000,000) to your country and will need your little cooperation. I will reward you with  reasonable amount. Please inform me as soon as possible if you are interested. 
 
-diff --git a/Documentation/kbuild/modules.txt b/Documentation/kbuild/modules.txt
-index b1096da..0767cf6 100644
---- a/Documentation/kbuild/modules.txt
-+++ b/Documentation/kbuild/modules.txt
-@@ -275,7 +275,7 @@ following files:
- 
- 		KERNELDIR := /lib/modules/`uname -r`/build
- 		all::
--			$(MAKE) -C $KERNELDIR M=`pwd` $@
-+			$(MAKE) -C $(KERNELDIR) M=`pwd` $@
- 
- 		# Module specific targets
- 		genbin:
+Regards  
+Isa Youssouf
+
