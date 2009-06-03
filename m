@@ -1,23 +1,18 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from farizej.centrum.cz ([90.183.38.130]:59848 "EHLO
-	farizej.centrum.cz" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753366AbZFBOyx (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 2 Jun 2009 10:54:53 -0400
-Date: Tue, 02 Jun 2009 16:54:48 +0200
-From: <isa_youssouf@centrum.sk>
+Received: from [38.110.66.41] ([38.110.66.41]:29426 "HELO wergvan"
+	rhost-flags-FAIL-FAIL-OK-FAIL) by vger.kernel.org with SMTP
+	id S1752597AbZFCI55 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 3 Jun 2009 04:57:57 -0400
+Message-ID: <20090603044959.7070602@collier.org>
+Date: Wed, 3 Jun 2009 04:49:59 -0500
+From: "Gertrude Donovan" <dwendaniqiq@collier.org>
 MIME-Version: 1.0
-Message-ID: <200906021654.13217@centrum.cz>
-Subject: Good Day
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
+Subject: Get an access to real pleasure.
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
+To: linux-kbuild@vger.kernel.org
 
-Good Day 
-
-I want to transfer the sum of Twelve Million Dollars (US$12.000,000) to your country and will need your little cooperation. I will reward you with  reasonable amount. Please inform me as soon as possible if you are interested. 
-
-Regards  
-Isa Youssouf
+Will you be ready at the right moment? http://gponrj.doqwakev.com/
 
