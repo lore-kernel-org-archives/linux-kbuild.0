@@ -1,76 +1,72 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-px0-f182.google.com ([209.85.216.182]:43089 "EHLO
-	mail-px0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751181AbZFDKBj (ORCPT
+Received: from pfepa.post.tele.dk ([195.41.46.235]:56391 "EHLO
+	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750885AbZFDKgx (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 4 Jun 2009 06:01:39 -0400
-Date: Thu, 4 Jun 2009 17:56:23 +0800
-From: Amerigo Wang <xiyou.wangcong@gmail.com>
+	Thu, 4 Jun 2009 06:36:53 -0400
+Date: Thu, 4 Jun 2009 12:39:09 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
 Subject: Re: [Patch 1/2] kbuild: two trivial fixes for check headers
-Message-ID: <20090604095623.GC7030@cr0.nay.redhat.com>
-References: <20090604080406.7005.27662.sendpatchset@localhost.localdomain> <20090604091519.GA9571@uranus.ravnborg.org>
-MIME-Version: 1.0
+Message-ID: <20090604103909.GA10102@uranus.ravnborg.org>
+References: <20090604080406.7005.27662.sendpatchset@localhost.localdomain> <20090604091519.GA9571@uranus.ravnborg.org> <4A27927E.9090800@redhat.com>
+Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20090604091519.GA9571@uranus.ravnborg.org>
+In-Reply-To: <4A27927E.9090800@redhat.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: Amerigo Wang <amwang@redhat.com>, linux-kernel@vger.kernel.org, akpm@linux-foundation.org, linux-kbuild@vger.kernel.org
+To: Amerigo Wang <amwang@redhat.com>
+Cc: linux-kernel@vger.kernel.org, akpm@linux-foundation.org, linux-kbuild@vger.kernel.org
 
-On Thu, Jun 04, 2009 at 11:15:19AM +0200, Sam Ravnborg wrote:
->On Thu, Jun 04, 2009 at 04:01:52AM -0400, Amerigo Wang wrote:
->> 
->> Remove a useless 'extern' in an exported header.
->> Fix a comment headers_check.pl.
->
->These two patches has nothing in commom.
->
->> 
->> Signed-off-by: WANG Cong <amwang@redhat.com>
->> Cc: Sam Ravnborg <sam@ravnborg.org>
->> 
->> ------
->> diff --git a/include/mtd/jffs2-user.h b/include/mtd/jffs2-user.h
->> index fa94b0e..10dc7ef 100644
->> --- a/include/mtd/jffs2-user.h
->> +++ b/include/mtd/jffs2-user.h
->> @@ -18,7 +18,7 @@
->>  #undef je32_to_cpu
->>  #undef jemode_to_cpu
->>  
->> -extern int target_endian;
->> +int target_endian;
->
->You now declare a global variable named target_endian each time you include this file - which is wrong.
+On Thu, Jun 04, 2009 at 05:23:10PM +0800, Amerigo Wang wrote:
+> Sam Ravnborg wrote:
+> >On Thu, Jun 04, 2009 at 04:01:52AM -0400, Amerigo Wang wrote:
+> >  
+> >>Remove a useless 'extern' in an exported header.
+> >>Fix a comment headers_check.pl.
+> >>    
+> >
+> >These two patches has nothing in commom.
+> >  
+> 
+> They are both about kernel headers stuff.
+> 
+> >  
+> >>Signed-off-by: WANG Cong <amwang@redhat.com>
+> >>Cc: Sam Ravnborg <sam@ravnborg.org>
+> >>
+> >>------
+> >>diff --git a/include/mtd/jffs2-user.h b/include/mtd/jffs2-user.h
+> >>index fa94b0e..10dc7ef 100644
+> >>--- a/include/mtd/jffs2-user.h
+> >>+++ b/include/mtd/jffs2-user.h
+> >>@@ -18,7 +18,7 @@
+> >> #undef je32_to_cpu
+> >> #undef jemode_to_cpu
+> >> 
+> >>-extern int target_endian;
+> >>+int target_endian;
+> >>    
+> >
+> >You now declare a global variable named target_endian each time you 
+> >include this file - which is wrong.
+> >  
+> Why? 'make headers_check' complains about it.
 
-Hmmm, the script seems wrong, not the C code. :)
-And the word 'prototype' is only for functions.
+Rightfully is does...
+But is think it is a prototype of a function.
 
-How about patch below?
+But think about it - it does not makes sense to have an
+extern declarationof a variable in an exported header.
+There is no way that userspace can access this variable
+from user-space and therefore the declaration of the variable
+needs to be moved to a kernel-only header file.
 
-Signed-off-by: WANG Cong <amwang@redhat.com>
+So if you touch this I would ask you not to consider a single line
+in jffs-user.h - but rather take a critiacal look at the whole
+file and fix any issues there is.
+And then to send it to the mtd people (dwmw2).
+I did not look at the file but just looking at yout patch
+the "undef jemode_to_cpu" looks fishy in an exported header.
 
----
-diff --git a/scripts/headers_check.pl b/scripts/headers_check.pl
-index 56f90a4..11dc869 100644
---- a/scripts/headers_check.pl
-+++ b/scripts/headers_check.pl
-@@ -2,7 +2,7 @@
- #
- # headers_check.pl execute a number of trivial consistency checks
- #
--# Usage: headers_check.pl dir [files...]
-+# Usage: headers_check.pl dir arch [files...]
- # dir:   dir to look for included files
- # arch:  architecture
- # files: list of files to check
-@@ -63,7 +63,7 @@ sub check_include
- 
- sub check_prototypes
- {
--	if ($line =~ m/^\s*extern\b/) {
-+	if ($line =~ m/^\s*extern\b.*\(.*\)/) {
- 		printf STDERR "$filename:$lineno: extern's make no sense in userspace\n";
- 	}
- }
+	Sam
