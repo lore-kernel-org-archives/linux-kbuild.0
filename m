@@ -1,58 +1,40 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepb.post.tele.dk ([195.41.46.236]:36409 "EHLO
+Received: from pfepb.post.tele.dk ([195.41.46.236]:36439 "EHLO
 	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755559AbZFEXlN (ORCPT
+	with ESMTP id S1755647AbZFEXlO (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 5 Jun 2009 19:41:13 -0400
+	Fri, 5 Jun 2009 19:41:14 -0400
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: [PATCH 30/39] kconfig qconf: fix the type of the desktop widget
-Date: Sat,  6 Jun 2009 01:42:48 +0200
-Message-Id: <1244245377-17441-30-git-send-email-sam@ravnborg.org>
+Subject: [PATCH 38/39] ignore *.patch files
+Date: Sat,  6 Jun 2009 01:42:56 +0200
+Message-Id: <1244245377-17441-38-git-send-email-sam@ravnborg.org>
 In-Reply-To: <20090605233720.GA13588@uranus.ravnborg.org>
 References: <20090605233720.GA13588@uranus.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
-Cc: Markus Heidelberg <markus.heidelberg@web.de>, Sam Ravnborg <sam@ravnborg.org>
+Cc: Mike Frysinger <vapier@gentoo.org>, Sam Ravnborg <sam@ravnborg.org>
 
-From: Markus Heidelberg <markus.heidelberg@web.de>
+From: Mike Frysinger <vapier@gentoo.org>
 
-QApplication::desktop() returns a pointer to QDesktopWidget, not to
-QWidget.
-
-Fixes the following compiler error after a quick conversion with 'qt3to4',
-which occured with g++ 3.4.6 and 4.1.2, but not anymore with 4.3.2.
-
-scripts/kconfig/qconf.cc: In constructor 'ConfigMainWindow::ConfigMainWindow()':
-scripts/kconfig/qconf.cc:1289: error: cannot convert 'QDesktopWidget*' to 'QWidget*' in initialization
-
-Signed-off-by: Markus Heidelberg <markus.heidelberg@web.de>
+Signed-off-by: Mike Frysinger <vapier@gentoo.org>
 Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
 ---
- scripts/kconfig/qconf.cc |    3 ++-
- 1 files changed, 2 insertions(+), 1 deletions(-)
+ .gitignore |    1 +
+ 1 files changed, 1 insertions(+), 0 deletions(-)
 
-diff --git a/scripts/kconfig/qconf.cc b/scripts/kconfig/qconf.cc
-index afae613..19811fc 100644
---- a/scripts/kconfig/qconf.cc
-+++ b/scripts/kconfig/qconf.cc
-@@ -5,6 +5,7 @@
+diff --git a/.gitignore b/.gitignore
+index 51bd99d..3433d7c 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -25,6 +25,7 @@
+ *.elf
+ *.bin
+ *.gz
++*.patch
  
- #include <qapplication.h>
- #include <qmainwindow.h>
-+#include <qdesktopwidget.h>
- #include <qtoolbar.h>
- #include <qlayout.h>
- #include <qvbox.h>
-@@ -1275,7 +1276,7 @@ ConfigMainWindow::ConfigMainWindow(void)
- 	int x, y, width, height;
- 	char title[256];
- 
--	QWidget *d = configApp->desktop();
-+	QDesktopWidget *d = configApp->desktop();
- 	snprintf(title, sizeof(title), _("Linux Kernel v%s Configuration"),
- 		getenv("KERNELVERSION"));
- 	setCaption(title);
+ #
+ # Top-level generic files
 -- 
 1.6.3.rc3.40.g75b44
 
