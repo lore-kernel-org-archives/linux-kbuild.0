@@ -1,43 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepb.post.tele.dk ([195.41.46.236]:36419 "EHLO
+Received: from pfepb.post.tele.dk ([195.41.46.236]:36414 "EHLO
 	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754943AbZFEXlM (ORCPT
+	with ESMTP id S1755465AbZFEXlL (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 5 Jun 2009 19:41:12 -0400
+	Fri, 5 Jun 2009 19:41:11 -0400
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: [PATCH 21/39] kbuild/Documentation: Incorrect makefile syntax in example
-Date: Sat,  6 Jun 2009 01:42:39 +0200
-Message-Id: <1244245377-17441-21-git-send-email-sam@ravnborg.org>
+Subject: [PATCH 19/39] kbuild: clean up scripts/headers.sh
+Date: Sat,  6 Jun 2009 01:42:37 +0200
+Message-Id: <1244245377-17441-19-git-send-email-sam@ravnborg.org>
 In-Reply-To: <20090605233720.GA13588@uranus.ravnborg.org>
 References: <20090605233720.GA13588@uranus.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
-Cc: David VomLehn <dvomlehn@cisco.com>, Sam Ravnborg <sam@ravnborg.org>
+Cc: Amerigo Wang <amwang@redhat.com>, Sam Ravnborg <sam@ravnborg.org>
 
-From: David VomLehn <dvomlehn@cisco.com>
+From: Amerigo Wang <amwang@redhat.com>
 
-There is an error in the make syntax for one of the kbuild examples
+'drop' variable is unused.
 
-Signed-off-by: David VomLehn <dvomlehn@cisco.com>
+'ppc' and 'sparc64' directories don't exist in arch/,
+and I think their headers can be well exported now, so
+just remove them.
+
+Signed-off-by: WANG Cong <amwang@redhat.com>
 Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
 ---
- Documentation/kbuild/modules.txt |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+ scripts/headers.sh |    7 -------
+ 1 files changed, 0 insertions(+), 7 deletions(-)
 
-diff --git a/Documentation/kbuild/modules.txt b/Documentation/kbuild/modules.txt
-index b1096da..0767cf6 100644
---- a/Documentation/kbuild/modules.txt
-+++ b/Documentation/kbuild/modules.txt
-@@ -275,7 +275,7 @@ following files:
+diff --git a/scripts/headers.sh b/scripts/headers.sh
+index d33426f..0308ecc 100755
+--- a/scripts/headers.sh
++++ b/scripts/headers.sh
+@@ -15,19 +15,12 @@ do_command()
+ 	fi
+ }
  
- 		KERNELDIR := /lib/modules/`uname -r`/build
- 		all::
--			$(MAKE) -C $KERNELDIR M=`pwd` $@
-+			$(MAKE) -C $(KERNELDIR) M=`pwd` $@
+-# Do not try this architecture
+-drop="generic um ppc sparc64 cris"
+-
+ archs=$(ls ${srctree}/arch)
  
- 		# Module specific targets
- 		genbin:
+ for arch in ${archs}; do
+ 	case ${arch} in
+ 	um)        # no userspace export
+ 		;;
+-	ppc)       # headers exported by powerpc
+-		;;
+-	sparc64)   # headers exported by sparc
+-		;;
+ 	cris)      # headers export are known broken
+ 		;;
+ 	*)
 -- 
 1.6.3.rc3.40.g75b44
 
