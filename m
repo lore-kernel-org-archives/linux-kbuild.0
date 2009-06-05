@@ -1,107 +1,52 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepa.post.tele.dk ([195.41.46.235]:45067 "EHLO
-	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755423AbZFEXlL (ORCPT
+Received: from pfepb.post.tele.dk ([195.41.46.236]:36412 "EHLO
+	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754817AbZFEXlL (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
 	Fri, 5 Jun 2009 19:41:11 -0400
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: [PATCH 22/39] kbuild: remove extra ifdef/endif of top Makefile
-Date: Sat,  6 Jun 2009 01:42:40 +0200
-Message-Id: <1244245377-17441-22-git-send-email-sam@ravnborg.org>
+Subject: [PATCH 17/39] kbuild: fix header export when __ASSEMBLY__ is used
+Date: Sat,  6 Jun 2009 01:42:35 +0200
+Message-Id: <1244245377-17441-17-git-send-email-sam@ravnborg.org>
 In-Reply-To: <20090605233720.GA13588@uranus.ravnborg.org>
 References: <20090605233720.GA13588@uranus.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
-Cc: Cheng Renquan <crq@kernel.org>, Sam Ravnborg <sam@ravnborg.org>
+Cc: Sam Ravnborg <sam@ravnborg.org>, Russell King <rmk+lkml@arm.linux.org.uk>, Jaswinder Singh Rajput <jaswinder@kernel.org>
 
-From: Cheng Renquan <crq@kernel.org>
+unifdef got confused by:
 
-The GNU make's origin function know undefined variable well,
-so the outer ifdef/endif conditional checking is unneeded.
+Because it does not know __ASSEMBLY__ it does not
+detect that htis is not for userspace.
+This caused too much code to be exported, and headers_check barfed
+over this code.
 
-From `info make` documentation, origin will return
+For arm this fixes following "make headers_check" warning:
+/usr/include/asm/hwcap.h:29: extern's make no sense in userspace
 
-  `undefined'
-     if VARIABLE was never defined.
-  `command line'
-     if VARIABLE was defined on the command line.
-   ...
+Russell King suggested to undefine __ASSEMBLY__ to fix this warning.
 
-Therefore, $(origin V) will get a value anyway, killing ifdef/endif is
-viable and safe.
-
-Furthermore, I've checked the minimal requirements from
-Documentation/Changes is GNU make 3.79.1, and that version of GNU make
-has support of origin function well already, so now it's safe to kill
-the outer conditional checking, without upgrading the minimal
-requirements.
-
-Signed-off-by: Cheng Renquan <crq@kernel.org>
+Cc: Russell King <rmk+lkml@arm.linux.org.uk>
+Cc: Jaswinder Singh Rajput <jaswinder@kernel.org>
 Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
 ---
- Makefile |   26 +++++++++-----------------
- 1 files changed, 9 insertions(+), 17 deletions(-)
+ scripts/headers_install.pl |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index 610d1c3..e270254 100644
---- a/Makefile
-+++ b/Makefile
-@@ -35,10 +35,8 @@ MAKEFLAGS += -rR --no-print-directory
- # To put more focus on warnings, be less verbose as default
- # Use 'make V=1' to see the full commands
+diff --git a/scripts/headers_install.pl b/scripts/headers_install.pl
+index c6ae405..bc70ea6 100644
+--- a/scripts/headers_install.pl
++++ b/scripts/headers_install.pl
+@@ -20,7 +20,7 @@ use strict;
  
--ifdef V
--  ifeq ("$(origin V)", "command line")
--    KBUILD_VERBOSE = $(V)
--  endif
-+ifeq ("$(origin V)", "command line")
-+  KBUILD_VERBOSE = $(V)
- endif
- ifndef KBUILD_VERBOSE
-   KBUILD_VERBOSE = 0
-@@ -54,10 +52,8 @@ endif
- # See the file "Documentation/sparse.txt" for more details, including
- # where to get the "sparse" utility.
+ my ($readdir, $installdir, $arch, @files) = @ARGV;
  
--ifdef C
--  ifeq ("$(origin C)", "command line")
--    KBUILD_CHECKSRC = $(C)
--  endif
-+ifeq ("$(origin C)", "command line")
-+  KBUILD_CHECKSRC = $(C)
- endif
- ifndef KBUILD_CHECKSRC
-   KBUILD_CHECKSRC = 0
-@@ -69,12 +65,10 @@ endif
- ifdef SUBDIRS
-   KBUILD_EXTMOD ?= $(SUBDIRS)
- endif
--ifdef M
--  ifeq ("$(origin M)", "command line")
--    KBUILD_EXTMOD := $(M)
--  endif
--endif
+-my $unifdef = "scripts/unifdef -U__KERNEL__";
++my $unifdef = "scripts/unifdef -U__KERNEL__ -U__ASSEMBLY__";
  
-+ifeq ("$(origin M)", "command line")
-+  KBUILD_EXTMOD := $(M)
-+endif
- 
- # kbuild supports saving output files in a separate directory.
- # To locate output files in a separate directory two syntaxes are supported.
-@@ -98,10 +92,8 @@ ifeq ($(KBUILD_SRC),)
- 
- # OK, Make called in directory where kernel src resides
- # Do we want to locate output files in a separate directory?
--ifdef O
--  ifeq ("$(origin O)", "command line")
--    KBUILD_OUTPUT := $(O)
--  endif
-+ifeq ("$(origin O)", "command line")
-+  KBUILD_OUTPUT := $(O)
- endif
- 
- # That's our default target when none is given on the command line
+ foreach my $file (@files) {
+ 	local *INFILE;
 -- 
 1.6.3.rc3.40.g75b44
 
