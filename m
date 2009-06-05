@@ -1,38 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from hera.kernel.org ([140.211.167.34]:33046 "EHLO hera.kernel.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751202AbZFECWl (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 4 Jun 2009 22:22:41 -0400
-Subject: Re: [Patch 1/2] kbuild: two trivial fixes for check headers
-From: Jaswinder Singh Rajput <jaswinder@kernel.org>
-In-Reply-To: <20090604103909.GA10102@uranus.ravnborg.org>
-References: <20090604080406.7005.27662.sendpatchset@localhost.localdomain>
-	 <20090604091519.GA9571@uranus.ravnborg.org> <4A27927E.9090800@redhat.com>
-	 <20090604103909.GA10102@uranus.ravnborg.org>
-Content-Type: text/plain
-Date: Fri, 05 Jun 2009 07:53:44 +0530
-Message-Id: <1244168624.2522.11.camel@ht.satnam>
-Mime-Version: 1.0
+Received: from moutng.kundenserver.de ([212.227.126.171]:57978 "EHLO
+	moutng.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751146AbZFEJWT (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 5 Jun 2009 05:22:19 -0400
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: Re: [Patch] kbuild: fix headers_check.pl
+Date: Fri, 5 Jun 2009 10:21:50 +0100
+References: <20090605021419.7905.89870.sendpatchset@localhost.localdomain>
+In-Reply-To: <20090605021419.7905.89870.sendpatchset@localhost.localdomain>
+MIME-Version: 1.0
+Content-Type: Text/Plain;
+  charset="iso-8859-15"
 Content-Transfer-Encoding: 7bit
+Message-Id: <200906051021.51726.arnd@arndb.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: Amerigo Wang <amwang@redhat.com>, linux-kernel@vger.kernel.org, akpm@linux-foundation.org, linux-kbuild@vger.kernel.org, David Woodhouse <dwmw2@infradead.org>
+To: Amerigo Wang <amwang@redhat.com>
+Cc: linux-kernel@vger.kernel.org, akpm@linux-foundation.org, sam@ravnborg.org, linux-kbuild@vger.kernel.org
 
-On Thu, 2009-06-04 at 12:39 +0200, Sam Ravnborg wrote:
+On Friday 05 June 2009, Amerigo Wang wrote:
+> -sub check_prototypes
+> +sub check_declarations
+>  {
+> -       if ($line =~ m/^\s*extern\b/) {
+> -               printf STDERR "$filename:$lineno: extern's make no sense in userspace\n";
+> +       if ($line =~m/^\s*extern\b/) {
+> +               if ($line =~ m/^\s*extern\b.*\(.*\)/) {
+> +                       printf STDERR "$filename:$lineno: extern's make no sense in userspace\n";
+> +               } else {
+> +                       printf STDERR "$filename:$lineno: exporting global variable to userspace is suspicious\n";
+> +               }
+>         }
+>  }
 
-> So if you touch this I would ask you not to consider a single line
-> in jffs-user.h - but rather take a critiacal look at the whole
-> file and fix any issues there is.
-> And then to send it to the mtd people (dwmw2).
-> I did not look at the file but just looking at yout patch
-> the "undef jemode_to_cpu" looks fishy in an exported header.
-> 
+I don't think we really need that distinction here, the old
+text applies to both. But please find a way to get rid of
+the "extern's".
 
-David already have patches to remove whole jffs-user.h file and AFAIK he
-already queued it. So no point of touching this file.
+http://angryflower.com/bobsqu.gif
 
-Thanks,
---
-JSR
-
+	Arnd <><
