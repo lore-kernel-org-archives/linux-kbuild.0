@@ -1,43 +1,38 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.nokia.com ([192.100.105.134]:38043 "EHLO
-	mgw-mx09.nokia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750943AbZFEL3E (ORCPT
+Received: from moutng.kundenserver.de ([212.227.126.177]:57689 "EHLO
+	moutng.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751226AbZFEMbw (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 5 Jun 2009 07:29:04 -0400
-Message-ID: <4A2900E9.1050005@gmail.com>
-Date: Fri, 05 Jun 2009 14:26:33 +0300
-From: Artem Bityutskiy <dedekind1@gmail.com>
-MIME-Version: 1.0
+	Fri, 5 Jun 2009 08:31:52 -0400
+From: Arnd Bergmann <arnd@arndb.de>
 Subject: Re: [Patch] kbuild: fix headers_check.pl
-References: <20090605021419.7905.89870.sendpatchset@localhost.localdomain> <200906051021.51726.arnd@arndb.de>
-In-Reply-To: <200906051021.51726.arnd@arndb.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Date: Fri, 5 Jun 2009 13:31:14 +0100
+References: <20090605021419.7905.89870.sendpatchset@localhost.localdomain> <200906051021.51726.arnd@arndb.de> <4A28F1CD.6040804@redhat.com>
+In-Reply-To: <4A28F1CD.6040804@redhat.com>
+MIME-Version: 1.0
+Content-Type: Text/Plain;
+  charset="iso-8859-15"
 Content-Transfer-Encoding: 7bit
+Message-Id: <200906051331.14978.arnd@arndb.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: Amerigo Wang <amwang@redhat.com>, linux-kernel@vger.kernel.org, akpm@linux-foundation.org, sam@ravnborg.org, linux-kbuild@vger.kernel.org
+To: Amerigo Wang <amwang@redhat.com>
+Cc: linux-kernel@vger.kernel.org, akpm@linux-foundation.org, sam@ravnborg.org, linux-kbuild@vger.kernel.org
 
-Arnd Bergmann wrote:
-> On Friday 05 June 2009, Amerigo Wang wrote:
->> -sub check_prototypes
->> +sub check_declarations
->>  {
->> -       if ($line =~ m/^\s*extern\b/) {
->> -               printf STDERR "$filename:$lineno: extern's make no sense in userspace\n";
->> +       if ($line =~m/^\s*extern\b/) {
->> +               if ($line =~ m/^\s*extern\b.*\(.*\)/) {
->> +                       printf STDERR "$filename:$lineno: extern's make no sense in userspace\n";
->> +               } else {
->> +                       printf STDERR "$filename:$lineno: exporting global variable to userspace is suspicious\n";
->> +               }
->>         }
->>  }
+On Friday 05 June 2009, Amerigo Wang wrote:
 > 
-> I don't think we really need that distinction here, the old
-> text applies to both. But please find a way to get rid of
-> the "extern's".
-> 
-> http://angryflower.com/bobsqu.gif
+> >
+> > I don't think we really need that distinction here, the old
+> > text applies to both.
+>
+> Even for function declarations?
 
-Hehe, made me smile :-)
+Yes. Any use of 'extern' in a kernel header file by definition
+refers to a symbol that is defined in the kernel and therefore
+not accessibly in user space. It is the same problem for
+variables and functions, with the complication that leaving
+out the 'extern' statement on a function declaration will
+hide it from this check, while leaving it out on a variable
+declaration turns it into a definition.
+
+	Arnd <><
