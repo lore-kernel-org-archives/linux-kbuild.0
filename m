@@ -1,89 +1,54 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepb.post.tele.dk ([195.41.46.236]:36415 "EHLO
-	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755463AbZFEXlL (ORCPT
+Received: from pfepa.post.tele.dk ([195.41.46.235]:45070 "EHLO
+	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755452AbZFEXlL (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
 	Fri, 5 Jun 2009 19:41:11 -0400
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: [PATCH 20/39] kbuild: allow docproc invocation from external
-Date: Sat,  6 Jun 2009 01:42:38 +0200
-Message-Id: <1244245377-17441-20-git-send-email-sam@ravnborg.org>
+Subject: [PATCH 24/39] kconfig: add a note about the deps to the 'silentoldconfig' help
+Date: Sat,  6 Jun 2009 01:42:42 +0200
+Message-Id: <1244245377-17441-24-git-send-email-sam@ravnborg.org>
 In-Reply-To: <20090605233720.GA13588@uranus.ravnborg.org>
 References: <20090605233720.GA13588@uranus.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
-Cc: Jiri Slaby <jirislaby@gmail.com>, Sam Ravnborg <sam@ravnborg.org>
+Cc: Markus Heidelberg <markus.heidelberg@web.de>, Sam Ravnborg <sam@ravnborg.org>
 
-From: Jiri Slaby <jirislaby@gmail.com>
+From: Markus Heidelberg <markus.heidelberg@web.de>
 
-- getcwd returns path without a slash at the end, add the slash
-- add KBUILD_SRC env support, so that we can specify path for
-  kernel (to know where scripts/kernel-doc resides) and SRCTREE
-  (for searching files referenced in .tmpl) separately
-
-[v2]
-- use KBUILD_SRC instead of a newly introduced environment variable
-
-Signed-off-by: Jiri Slaby <jirislaby@gmail.com>
-Acked-by: Randy Dunlap <randy.dunlap@oracle.com>
+Signed-off-by: Markus Heidelberg <markus.heidelberg@web.de>
 Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
 ---
- scripts/basic/docproc.c |   13 +++++++++----
- 1 files changed, 9 insertions(+), 4 deletions(-)
+ README                   |    1 +
+ scripts/kconfig/Makefile |    2 +-
+ 2 files changed, 2 insertions(+), 1 deletions(-)
 
-diff --git a/scripts/basic/docproc.c b/scripts/basic/docproc.c
-index 35bdc68..4c9523e 100644
---- a/scripts/basic/docproc.c
-+++ b/scripts/basic/docproc.c
-@@ -69,7 +69,7 @@ FILELINE * docsection;
- #define NOFUNCTION    "-nofunction"
- #define NODOCSECTIONS "-no-doc-sections"
- 
--char *srctree;
-+static char *srctree, *kernsrctree;
- 
- void usage (void)
- {
-@@ -77,7 +77,8 @@ void usage (void)
- 	fprintf(stderr, "Input is read from file.tmpl. Output is sent to stdout\n");
- 	fprintf(stderr, "doc: frontend when generating kernel documentation\n");
- 	fprintf(stderr, "depend: generate list of files referenced within file\n");
--	fprintf(stderr, "Environment variable SRCTREE: absolute path to kernel source tree.\n");
-+	fprintf(stderr, "Environment variable SRCTREE: absolute path to sources.\n");
-+	fprintf(stderr, "                     KBUILD_SRC: absolute path to kernel source tree.\n");
- }
- 
- /*
-@@ -96,8 +97,8 @@ void exec_kernel_doc(char **svec)
- 			exit(1);
- 		case  0:
- 			memset(real_filename, 0, sizeof(real_filename));
--			strncat(real_filename, srctree, PATH_MAX);
--			strncat(real_filename, KERNELDOCPATH KERNELDOC,
-+			strncat(real_filename, kernsrctree, PATH_MAX);
-+			strncat(real_filename, "/" KERNELDOCPATH KERNELDOC,
- 					PATH_MAX - strlen(real_filename));
- 			execvp(real_filename, svec);
- 			fprintf(stderr, "exec ");
-@@ -178,6 +179,7 @@ void find_export_symbols(char * filename)
- 		char real_filename[PATH_MAX + 1];
- 		memset(real_filename, 0, sizeof(real_filename));
- 		strncat(real_filename, srctree, PATH_MAX);
-+		strncat(real_filename, "/", PATH_MAX - strlen(real_filename));
- 		strncat(real_filename, filename,
- 				PATH_MAX - strlen(real_filename));
- 		sym = add_new_file(filename);
-@@ -382,6 +384,9 @@ int main(int argc, char *argv[])
- 	srctree = getenv("SRCTREE");
- 	if (!srctree)
- 		srctree = getcwd(NULL, 0);
-+	kernsrctree = getenv("KBUILD_SRC");
-+	if (!kernsrctree)
-+		kernsrctree = srctree;
- 	if (argc != 3) {
- 		usage();
- 		exit(1);
+diff --git a/README b/README
+index d6c6c74..7a078ff 100644
+--- a/README
++++ b/README
+@@ -174,6 +174,7 @@ CONFIGURING the kernel:
+ 	"make silentoldconfig"
+ 			   Like above, but avoids cluttering the screen
+ 			   with questions already answered.
++			   Additionally updates the dependencies.
+ 	"make defconfig"   Create a ./.config file by using the default
+ 			   symbol values from arch/$ARCH/defconfig.
+ 	"make allyesconfig"
+diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
+index 47e3f2e..5ddf8be 100644
+--- a/scripts/kconfig/Makefile
++++ b/scripts/kconfig/Makefile
+@@ -83,7 +83,7 @@ help:
+ 	@echo  '  xconfig	  - Update current config utilising a QT based front-end'
+ 	@echo  '  gconfig	  - Update current config utilising a GTK based front-end'
+ 	@echo  '  oldconfig	  - Update current config utilising a provided .config as base'
+-	@echo  '  silentoldconfig - Same as oldconfig, but quietly'
++	@echo  '  silentoldconfig - Same as oldconfig, but quietly, additionally update deps'
+ 	@echo  '  randconfig	  - New config with random answer to all options'
+ 	@echo  '  defconfig	  - New config with default answer to all options'
+ 	@echo  '  allmodconfig	  - New config selecting modules when possible'
 -- 
 1.6.3.rc3.40.g75b44
 
