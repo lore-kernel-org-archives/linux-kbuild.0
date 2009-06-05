@@ -1,51 +1,38 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.redhat.com ([66.187.237.31]:60755 "EHLO mx2.redhat.com"
+Received: from hera.kernel.org ([140.211.167.34]:33046 "EHLO hera.kernel.org"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754360AbZFECMP (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 4 Jun 2009 22:12:15 -0400
-Date: Thu, 4 Jun 2009 22:12:09 -0400
-From: Amerigo Wang <amwang@redhat.com>
-Message-Id: <20090605021427.7905.16640.sendpatchset@localhost.localdomain>
-In-Reply-To: <20090605021419.7905.89870.sendpatchset@localhost.localdomain>
-References: <20090605021419.7905.89870.sendpatchset@localhost.localdomain>
-Subject: [Patch] kbuild: clean up scripts/headers.sh
+	id S1751202AbZFECWl (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 4 Jun 2009 22:22:41 -0400
+Subject: Re: [Patch 1/2] kbuild: two trivial fixes for check headers
+From: Jaswinder Singh Rajput <jaswinder@kernel.org>
+In-Reply-To: <20090604103909.GA10102@uranus.ravnborg.org>
+References: <20090604080406.7005.27662.sendpatchset@localhost.localdomain>
+	 <20090604091519.GA9571@uranus.ravnborg.org> <4A27927E.9090800@redhat.com>
+	 <20090604103909.GA10102@uranus.ravnborg.org>
+Content-Type: text/plain
+Date: Fri, 05 Jun 2009 07:53:44 +0530
+Message-Id: <1244168624.2522.11.camel@ht.satnam>
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: akpm@linux-foundation.org, sam@ravnborg.org, Amerigo Wang <amwang@redhat.com>, linux-kbuild@vger.kernel.org
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: Amerigo Wang <amwang@redhat.com>, linux-kernel@vger.kernel.org, akpm@linux-foundation.org, linux-kbuild@vger.kernel.org, David Woodhouse <dwmw2@infradead.org>
 
+On Thu, 2009-06-04 at 12:39 +0200, Sam Ravnborg wrote:
 
-'drop' variable is unused.
+> So if you touch this I would ask you not to consider a single line
+> in jffs-user.h - but rather take a critiacal look at the whole
+> file and fix any issues there is.
+> And then to send it to the mtd people (dwmw2).
+> I did not look at the file but just looking at yout patch
+> the "undef jemode_to_cpu" looks fishy in an exported header.
+> 
 
-'ppc' and 'sparc64' directories don't exist in arch/,
-and I think their headers can be well exported now, so
-just remove them.
+David already have patches to remove whole jffs-user.h file and AFAIK he
+already queued it. So no point of touching this file.
 
-Signed-off-by: WANG Cong <amwang@redhat.com>
-Cc: Sam Ravnborg <sam@ravnborg.org>
+Thanks,
+--
+JSR
 
-------
-diff --git a/scripts/headers.sh b/scripts/headers.sh
-index d33426f..0308ecc 100755
---- a/scripts/headers.sh
-+++ b/scripts/headers.sh
-@@ -15,19 +15,12 @@ do_command()
- 	fi
- }
- 
--# Do not try this architecture
--drop="generic um ppc sparc64 cris"
--
- archs=$(ls ${srctree}/arch)
- 
- for arch in ${archs}; do
- 	case ${arch} in
- 	um)        # no userspace export
- 		;;
--	ppc)       # headers exported by powerpc
--		;;
--	sparc64)   # headers exported by sparc
--		;;
- 	cris)      # headers export are known broken
- 		;;
- 	*)
