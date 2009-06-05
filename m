@@ -1,43 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepb.post.tele.dk ([195.41.46.236]:37909 "EHLO
+Received: from pfepb.post.tele.dk ([195.41.46.236]:38299 "EHLO
 	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752399AbZFEWNV (ORCPT
+	with ESMTP id S1752639AbZFEWRD (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 5 Jun 2009 18:13:21 -0400
-Date: Sat, 6 Jun 2009 00:14:54 +0200
+	Fri, 5 Jun 2009 18:17:03 -0400
+Date: Sat, 6 Jun 2009 00:19:20 +0200
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [patch 3/3] scripts/headers_check.pl: correct RE in header CONFIG leak check
-Message-ID: <20090605221454.GK29008@uranus.ravnborg.org>
-References: <200905122102.n4CL2q6F007223@imap1.linux-foundation.org>
+Subject: Re: dubious section mismatch test (was Re: [PULL] soc-camera: one commit as v4l2-dev preparation)
+Message-ID: <20090605221920.GL29008@uranus.ravnborg.org>
+References: <Pine.LNX.4.64.0905071841331.9460@axis700.grange> <20090509062726.22d18182@pedra.chehab.org> <Pine.LNX.4.64.0905091430100.3515@axis700.grange> <20090509165416.GA25534@uranus.ravnborg.org> <Pine.LNX.4.64.0905092113280.10748@axis700.grange>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <200905122102.n4CL2q6F007223@imap1.linux-foundation.org>
+In-Reply-To: <Pine.LNX.4.64.0905092113280.10748@axis700.grange>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: akpm@linux-foundation.org
-Cc: linux-kbuild@vger.kernel.org, rpjday@crashcourse.ca, dwmw2@infradead.org
+To: Guennadi Liakhovetski <g.liakhovetski@gmx.de>
+Cc: Mauro Carvalho Chehab <mchehab@infradead.org>, Linux Media Mailing List <linux-media@vger.kernel.org>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-On Tue, May 12, 2009 at 01:43:36PM -0700, akpm@linux-foundation.org wrote:
-> From: "Robert P. J. Day" <rpjday@crashcourse.ca>
+On Sun, May 10, 2009 at 08:33:03PM +0200, Guennadi Liakhovetski wrote:
+> On Sat, 9 May 2009, Sam Ravnborg wrote:
 > 
-> Correct the regular expression in scripts/headers_check.pl to include '_'
-> as a valid character in the class; otherwise, the check will report a
-> "leaked" symbol of CONFIG_A_B_C as merely CONFIG_A.
+> > On Sat, May 09, 2009 at 06:13:13PM +0200, Guennadi Liakhovetski wrote:
+> > > On Sat, 9 May 2009, Mauro Carvalho Chehab wrote:
+> > > 
+> > > > WARNING: /home/v4l/master/v4l/soc_camera.o(.data+0x0): Section mismatch in reference from the variable soc_camera_pdrv to the function .devinit.text:soc_camera_pdrv_probe()
+> > > > The variable soc_camera_pdrv references
+> > > > the function __devinit soc_camera_pdrv_probe()
+> > > > If the reference is valid then annotate the
+> > > > variable with __init* (see linux/init.h) or name the variable:
+> > > > *driver, *_template, *_timer, *_sht, *_ops, *_probe, *_probe_one, *_console, 
+> > > > 
+> > > > WARNING: /home/v4l/master/v4l/soc_camera.o(.data+0x8): Section mismatch in reference from the variable soc_camera_pdrv to the function .devexit.text:soc_camera_pdrv_remove()
+> > > > The variable soc_camera_pdrv references
+> > > > the function __devexit soc_camera_pdrv_remove()
+> > > > If the reference is valid then annotate the
+> > > > variable with __exit* (see linux/init.h) or name the variable:
+> > > > *driver, *_template, *_timer, *_sht, *_ops, *_probe, *_probe_one, *_console, 
+> > > 
+> > > FWIW, I find this test dubious. Matching on symbol names doesn't seem like 
+> > > a good idea to me. Can we introduce a new marker instead something like
+> > > 
+> > > static struct whatever_driver __driver driver = {
+> > > 	.probe	= my_probe,
+> > > 	.remove	= __exit_p(my_remove),
+> > > };
+> > > 
+> > > to put them in a new special section? Or is there a better solution?
+> > 
+> > We already have that:
+> > __refdata would be your choice in this case.
 > 
-> This patch will make no difference whatsoever in the current kernel tree
-> as the call to the perl routine that does that check is currently
-> commented out:
-> 
->                 &check_include();
->                 &check_asm_types();
->                 &check_sizetypes();
->                 &check_prototypes();
->                 # Dropped for now. Too much noise &check_config();
-> 
-> However, I noticed that problem when I was building the yum downloadable
-> kernel source rpm for fedora 11 (beta), which *does* run that check, and
-> that's where the problem became obvious.
+> Aha, great! Then also the warning text should be changed, shouldn't it?
 
-Applied,
+Yep - included __refdata in the warning now.
+
 	Sam
