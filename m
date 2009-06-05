@@ -1,71 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepb.post.tele.dk ([195.41.46.236]:36411 "EHLO
+Received: from pfepb.post.tele.dk ([195.41.46.236]:36410 "EHLO
 	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754295AbZFEXlL (ORCPT
+	with ESMTP id S1755329AbZFEXlL (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
 	Fri, 5 Jun 2009 19:41:11 -0400
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: [PATCH 18/39] kbuild/headers_check: refine extern check
-Date: Sat,  6 Jun 2009 01:42:36 +0200
-Message-Id: <1244245377-17441-18-git-send-email-sam@ravnborg.org>
+Subject: [PATCH 15/39] kbuild, deb-pkg: bump standards version
+Date: Sat,  6 Jun 2009 01:42:33 +0200
+Message-Id: <1244245377-17441-15-git-send-email-sam@ravnborg.org>
 In-Reply-To: <20090605233720.GA13588@uranus.ravnborg.org>
 References: <20090605233720.GA13588@uranus.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
-Cc: Amerigo Wang <amwang@redhat.com>, Sam Ravnborg <sam@ravnborg.org>
+Cc: maximilian attems <max@stro.at>, Frans Pop <elendil@planet.nl>, Sam Ravnborg <sam@ravnborg.org>
 
-From: Amerigo Wang <amwang@redhat.com>
+From: maximilian attems <max@stro.at>
 
-'extern' checking information is not clear, refine it.
-Plus, fix a comment.
+Latest Debian policy is 3.8.1.
+Even if we are not yet compliant to it strive for the latest.
 
-Signed-off-by: WANG Cong <amwang@redhat.com>
+Signed-off-by: maximilian attems <max@stro.at>
+Signed-off-by: Frans Pop <elendil@planet.nl>
+Acked-by: Andres Salomon <dilinger@debian.org>
 Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
 ---
- scripts/headers_check.pl |   14 +++++++++-----
- 1 files changed, 9 insertions(+), 5 deletions(-)
+ scripts/package/builddeb |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-diff --git a/scripts/headers_check.pl b/scripts/headers_check.pl
-index 56f90a4..3923888 100644
---- a/scripts/headers_check.pl
-+++ b/scripts/headers_check.pl
-@@ -2,7 +2,7 @@
- #
- # headers_check.pl execute a number of trivial consistency checks
- #
--# Usage: headers_check.pl dir [files...]
-+# Usage: headers_check.pl dir arch [files...]
- # dir:   dir to look for included files
- # arch:  architecture
- # files: list of files to check
-@@ -37,7 +37,7 @@ foreach my $file (@files) {
- 		&check_include();
- 		&check_asm_types();
- 		&check_sizetypes();
--		&check_prototypes();
-+		&check_declarations();
- 		# Dropped for now. Too much noise &check_config();
- 	}
- 	close FH;
-@@ -61,10 +61,14 @@ sub check_include
- 	}
- }
+diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+index 9708d26..01c2d13 100644
+--- a/scripts/package/builddeb
++++ b/scripts/package/builddeb
+@@ -147,7 +147,7 @@ Source: linux-upstream
+ Section: admin
+ Priority: optional
+ Maintainer: $maintainer
+-Standards-Version: 3.6.1
++Standards-Version: 3.8.1
+ EOF
  
--sub check_prototypes
-+sub check_declarations
- {
--	if ($line =~ m/^\s*extern\b/) {
--		printf STDERR "$filename:$lineno: extern's make no sense in userspace\n";
-+	if ($line =~m/^\s*extern\b/) {
-+		if ($line =~ m/^\s*extern\b.*\(.*\)/) {
-+			printf STDERR "$filename:$lineno: extern's make no sense in userspace\n";
-+		} else {
-+			printf STDERR "$filename:$lineno: exporting global variable to userspace is suspicious\n";
-+		}
- 	}
- }
- 
+ if [ "$ARCH" = "um" ]; then
 -- 
 1.6.3.rc3.40.g75b44
 
