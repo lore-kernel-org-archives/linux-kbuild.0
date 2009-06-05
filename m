@@ -1,70 +1,61 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepb.post.tele.dk ([195.41.46.236]:36410 "EHLO
-	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754656AbZFEXlN (ORCPT
+Received: from pfepa.post.tele.dk ([195.41.46.235]:45067 "EHLO
+	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755253AbZFEXlN (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
 	Fri, 5 Jun 2009 19:41:13 -0400
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: [PATCH 36/39] menu: fix embedded menu presentation
-Date: Sat,  6 Jun 2009 01:42:54 +0200
-Message-Id: <1244245377-17441-36-git-send-email-sam@ravnborg.org>
+Subject: [PATCH 34/39] scripts/headers_check.pl: correct RE in header CONFIG leak check
+Date: Sat,  6 Jun 2009 01:42:52 +0200
+Message-Id: <1244245377-17441-34-git-send-email-sam@ravnborg.org>
 In-Reply-To: <20090605233720.GA13588@uranus.ravnborg.org>
 References: <20090605233720.GA13588@uranus.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
-Cc: Randy Dunlap <randy.dunlap@oracle.com>, Andrew Morton <akpm@linux-foundation.org>, Sam Ravnborg <sam@ravnborg.org>
+Cc: "Robert P. J. Day" <rpjday@crashcourse.ca>, David Woodhouse <dwmw2@infradead.org>, Andrew Morton <akpm@linux-foundation.org>, Sam Ravnborg <sam@ravnborg.org>
 
-From: Randy Dunlap <randy.dunlap@oracle.com>
+From: Robert P. J. Day <rpjday@crashcourse.ca>
 
-The STRIP_ASM_SYMS kconfig symbol mucks up the embedded menu because
-STRIP_ASM_SYMS is in the middle of the embedded menu items but it does not
-depend on EMBEDDED.  Move it to beyond the end of the embedded menu so
-that the menu is presented correctly.
+Correct the regular expression in scripts/headers_check.pl to include '_'
+as a valid character in the class; otherwise, the check will report a
+"leaked" symbol of CONFIG_A_B_C as merely CONFIG_A.
 
-Or if STRIP_ASM_SYMS should depend on EMBEDDED, that can also be fixed.
+This patch will make no difference whatsoever in the current kernel tree
+as the call to the perl routine that does that check is currently
+commented out:
 
-Signed-off-by: Randy Dunlap <randy.dunlap@oracle.com>
+                &check_include();
+                &check_asm_types();
+                &check_sizetypes();
+                &check_prototypes();
+                # Dropped for now. Too much noise &check_config();
+
+However, I noticed that problem when I was building the yum downloadable
+kernel source rpm for fedora 11 (beta), which *does* run that check, and
+that's where the problem became obvious.
+
+Signed-off-by: Robert P. J. Day <rpjday@crashcourse.ca>
+Cc: David Woodhouse <dwmw2@infradead.org>
 Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
 Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
 ---
- init/Kconfig |   16 ++++++++--------
- 1 files changed, 8 insertions(+), 8 deletions(-)
+ scripts/headers_check.pl |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-diff --git a/init/Kconfig b/init/Kconfig
-index 7be4d38..4389cee 100644
---- a/init/Kconfig
-+++ b/init/Kconfig
-@@ -808,14 +808,6 @@ config KALLSYMS_EXTRA_PASS
- 	   you wait for kallsyms to be fixed.
+diff --git a/scripts/headers_check.pl b/scripts/headers_check.pl
+index 3923888..e3fb949 100644
+--- a/scripts/headers_check.pl
++++ b/scripts/headers_check.pl
+@@ -74,7 +74,7 @@ sub check_declarations
  
- 
--config STRIP_ASM_SYMS
--	bool "Strip assembler-generated symbols during link"
--	default n
--	help
--	  Strip internal assembler-generated symbols during a link (symbols
--	  that look like '.Lxxx') so they don't pollute the output of
--	  get_wchan() and suchlike.
--
- config HOTPLUG
- 	bool "Support for hot-pluggable devices" if EMBEDDED
- 	default y
-@@ -961,6 +953,14 @@ config SLUB_DEBUG
- 	  SLUB sysfs support. /sys/slab will not exist and there will be
- 	  no support for cache validation etc.
- 
-+config STRIP_ASM_SYMS
-+	bool "Strip assembler-generated symbols during link"
-+	default n
-+	help
-+	  Strip internal assembler-generated symbols during a link (symbols
-+	  that look like '.Lxxx') so they don't pollute the output of
-+	  get_wchan() and suchlike.
-+
- config COMPAT_BRK
- 	bool "Disable heap randomization"
- 	default y
+ sub check_config
+ {
+-	if ($line =~ m/[^a-zA-Z0-9_]+CONFIG_([a-zA-Z0-9]+)[^a-zA-Z0-9]/) {
++	if ($line =~ m/[^a-zA-Z0-9_]+CONFIG_([a-zA-Z0-9_]+)[^a-zA-Z0-9_]/) {
+ 		printf STDERR "$filename:$lineno: leaks CONFIG_$1 to userspace where it is not valid\n";
+ 	}
+ }
 -- 
 1.6.3.rc3.40.g75b44
 
