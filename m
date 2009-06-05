@@ -1,61 +1,129 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepa.post.tele.dk ([195.41.46.235]:45067 "EHLO
+Received: from pfepa.post.tele.dk ([195.41.46.235]:45075 "EHLO
 	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755253AbZFEXlN (ORCPT
+	with ESMTP id S1754420AbZFEXlN (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
 	Fri, 5 Jun 2009 19:41:13 -0400
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: [PATCH 34/39] scripts/headers_check.pl: correct RE in header CONFIG leak check
-Date: Sat,  6 Jun 2009 01:42:52 +0200
-Message-Id: <1244245377-17441-34-git-send-email-sam@ravnborg.org>
+Subject: [PATCH 32/39] kconfig: do not hardcode "include/config/auto.conf" filename
+Date: Sat,  6 Jun 2009 01:42:50 +0200
+Message-Id: <1244245377-17441-32-git-send-email-sam@ravnborg.org>
 In-Reply-To: <20090605233720.GA13588@uranus.ravnborg.org>
 References: <20090605233720.GA13588@uranus.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
-Cc: "Robert P. J. Day" <rpjday@crashcourse.ca>, David Woodhouse <dwmw2@infradead.org>, Andrew Morton <akpm@linux-foundation.org>, Sam Ravnborg <sam@ravnborg.org>
+Cc: Markus Heidelberg <markus.heidelberg@web.de>, Sam Ravnborg <sam@ravnborg.org>
 
-From: Robert P. J. Day <rpjday@crashcourse.ca>
+From: Markus Heidelberg <markus.heidelberg@web.de>
 
-Correct the regular expression in scripts/headers_check.pl to include '_'
-as a valid character in the class; otherwise, the check will report a
-"leaked" symbol of CONFIG_A_B_C as merely CONFIG_A.
+Regardless of KCONFIG_AUTOCONFIG, the filename written as a Make target
+into "include/config/auto.conf.cmd" was always the default one.
 
-This patch will make no difference whatsoever in the current kernel tree
-as the call to the perl routine that does that check is currently
-commented out:
+Of course this doesn't make it work for the Kernel kbuild system, since
+there the filename is hardcoded at several places in the Makefiles.
 
-                &check_include();
-                &check_asm_types();
-                &check_sizetypes();
-                &check_prototypes();
-                # Dropped for now. Too much noise &check_config();
-
-However, I noticed that problem when I was building the yum downloadable
-kernel source rpm for fedora 11 (beta), which *does* run that check, and
-that's where the problem became obvious.
-
-Signed-off-by: Robert P. J. Day <rpjday@crashcourse.ca>
-Cc: David Woodhouse <dwmw2@infradead.org>
-Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+Signed-off-by: Markus Heidelberg <markus.heidelberg@web.de>
 Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
 ---
- scripts/headers_check.pl |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+ scripts/kconfig/confdata.c |   20 ++++++++++++--------
+ scripts/kconfig/lkc.h      |    1 +
+ scripts/kconfig/util.c     |    6 +++---
+ 3 files changed, 16 insertions(+), 11 deletions(-)
 
-diff --git a/scripts/headers_check.pl b/scripts/headers_check.pl
-index 3923888..e3fb949 100644
---- a/scripts/headers_check.pl
-+++ b/scripts/headers_check.pl
-@@ -74,7 +74,7 @@ sub check_declarations
- 
- sub check_config
- {
--	if ($line =~ m/[^a-zA-Z0-9_]+CONFIG_([a-zA-Z0-9]+)[^a-zA-Z0-9]/) {
-+	if ($line =~ m/[^a-zA-Z0-9_]+CONFIG_([a-zA-Z0-9_]+)[^a-zA-Z0-9_]/) {
- 		printf STDERR "$filename:$lineno: leaks CONFIG_$1 to userspace where it is not valid\n";
- 	}
+diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
+index 273d738..a04da34 100644
+--- a/scripts/kconfig/confdata.c
++++ b/scripts/kconfig/confdata.c
+@@ -41,6 +41,13 @@ const char *conf_get_configname(void)
+ 	return name ? name : ".config";
  }
+ 
++const char *conf_get_autoconfig_name(void)
++{
++	char *name = getenv("KCONFIG_AUTOCONFIG");
++
++	return name ? name : "include/config/auto.conf";
++}
++
+ static char *conf_expand_value(const char *in)
+ {
+ 	struct symbol *sym;
+@@ -555,15 +562,14 @@ int conf_write(const char *name)
+ 
+ int conf_split_config(void)
+ {
+-	char *name, path[128];
++	const char *name;
++	char path[128];
+ 	char *s, *d, c;
+ 	struct symbol *sym;
+ 	struct stat sb;
+ 	int res, i, fd;
+ 
+-	name = getenv("KCONFIG_AUTOCONFIG");
+-	if (!name)
+-		name = "include/config/auto.conf";
++	name = conf_get_autoconfig_name();
+ 	conf_read_simple(name, S_DEF_AUTO);
+ 
+ 	if (chdir("include/config"))
+@@ -670,7 +676,7 @@ int conf_write_autoconf(void)
+ {
+ 	struct symbol *sym;
+ 	const char *str;
+-	char *name;
++	const char *name;
+ 	FILE *out, *out_h;
+ 	time_t now;
+ 	int i, l;
+@@ -773,9 +779,7 @@ int conf_write_autoconf(void)
+ 		name = "include/linux/autoconf.h";
+ 	if (rename(".tmpconfig.h", name))
+ 		return 1;
+-	name = getenv("KCONFIG_AUTOCONFIG");
+-	if (!name)
+-		name = "include/config/auto.conf";
++	name = conf_get_autoconfig_name();
+ 	/*
+ 	 * This must be the last step, kbuild has a dependency on auto.conf
+ 	 * and this marks the successful completion of the previous steps.
+diff --git a/scripts/kconfig/lkc.h b/scripts/kconfig/lkc.h
+index 4a9af6f..f379b0b 100644
+--- a/scripts/kconfig/lkc.h
++++ b/scripts/kconfig/lkc.h
+@@ -74,6 +74,7 @@ char *zconf_curname(void);
+ 
+ /* confdata.c */
+ const char *conf_get_configname(void);
++const char *conf_get_autoconfig_name(void);
+ char *conf_get_default_confname(void);
+ void sym_set_change_count(int count);
+ void sym_add_change_count(int count);
+diff --git a/scripts/kconfig/util.c b/scripts/kconfig/util.c
+index 3cc9f93..b6b2a46 100644
+--- a/scripts/kconfig/util.c
++++ b/scripts/kconfig/util.c
+@@ -46,8 +46,8 @@ int file_write_dep(const char *name)
+ 		else
+ 			fprintf(out, "\t%s\n", file->name);
+ 	}
+-	fprintf(out, "\ninclude/config/auto.conf: \\\n"
+-		     "\t$(deps_config)\n\n");
++	fprintf(out, "\n%s: \\\n"
++		     "\t$(deps_config)\n\n", conf_get_autoconfig_name());
+ 
+ 	expr_list_for_each_sym(sym_env_list, e, sym) {
+ 		struct property *prop;
+@@ -61,7 +61,7 @@ int file_write_dep(const char *name)
+ 		if (!value)
+ 			value = "";
+ 		fprintf(out, "ifneq \"$(%s)\" \"%s\"\n", env_sym->name, value);
+-		fprintf(out, "include/config/auto.conf: FORCE\n");
++		fprintf(out, "%s: FORCE\n", conf_get_autoconfig_name());
+ 		fprintf(out, "endif\n");
+ 	}
+ 
 -- 
 1.6.3.rc3.40.g75b44
 
