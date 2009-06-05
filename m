@@ -1,41 +1,205 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepa.post.tele.dk ([195.41.46.235]:45066 "EHLO
-	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753657AbZFEXlM (ORCPT
+Received: from pfepb.post.tele.dk ([195.41.46.236]:36405 "EHLO
+	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755498AbZFEXlM (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
 	Fri, 5 Jun 2009 19:41:12 -0400
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: [PATCH 35/39] kbuild: add hint about __refdata to modpost
-Date: Sat,  6 Jun 2009 01:42:53 +0200
-Message-Id: <1244245377-17441-35-git-send-email-sam@ravnborg.org>
+Subject: [PATCH 25/39] kconfig: resort the documentation of the environment variables
+Date: Sat,  6 Jun 2009 01:42:43 +0200
+Message-Id: <1244245377-17441-25-git-send-email-sam@ravnborg.org>
 In-Reply-To: <20090605233720.GA13588@uranus.ravnborg.org>
 References: <20090605233720.GA13588@uranus.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
-Cc: Sam Ravnborg <sam@ravnborg.org>, Guennadi Liakhovetski <g.liakhovetski@gmx.de>
+Cc: Markus Heidelberg <markus.heidelberg@web.de>, Sam Ravnborg <sam@ravnborg.org>
 
-As requested by Guennadi Liakhovetski
+From: Markus Heidelberg <markus.heidelberg@web.de>
 
-Cc: Guennadi Liakhovetski <g.liakhovetski@gmx.de>
+All the KCONFIG_ environment variables were previously located in a
+section "Environment variables in 'menuconfig'", but neither are they
+restricted to 'menuconfig' nor are they all used by 'menuconfig'.
+
+Introduce the following three sections for these variables:
+  * Environment variables for '*config'
+  * Environment variables for '{allyes/allmod/allno/rand}config'
+  * Environment variables for 'silentoldconfig'
+
+Furthermore this puts MENUCONFIG_MODE next to MENUCONFIG_COLOR into a
+common section "User interface options for 'menuconfig'".
+
+Signed-off-by: Markus Heidelberg <markus.heidelberg@web.de>
 Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
 ---
- scripts/mod/modpost.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+ Documentation/kbuild/kconfig.txt |  116 +++++++++++++++++++------------------
+ 1 files changed, 60 insertions(+), 56 deletions(-)
 
-diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index 94e71ef..4522948 100644
---- a/scripts/mod/modpost.c
-+++ b/scripts/mod/modpost.c
-@@ -1196,7 +1196,7 @@ static void report_sec_mismatch(const char *modname, enum mismatch mismatch,
- 		"The variable %s references\n"
- 		"the %s %s%s%s\n"
- 		"If the reference is valid then annotate the\n"
--		"variable with __init* (see linux/init.h) "
-+		"variable with __init* or __refdata (see linux/init.h) "
- 		"or name the variable:\n",
- 		fromsym, to, sec2annotation(tosec), tosym, to_p);
- 		while (*s)
+diff --git a/Documentation/kbuild/kconfig.txt b/Documentation/kbuild/kconfig.txt
+index 26a7c0a..849b5e5 100644
+--- a/Documentation/kbuild/kconfig.txt
++++ b/Documentation/kbuild/kconfig.txt
+@@ -35,48 +35,26 @@ new .config files to see the differences:
+ 
+ (Yes, we need something better here.)
+ 
+-
+-======================================================================
+-menuconfig
+---------------------------------------------------
+-
+-SEARCHING for CONFIG symbols
+-
+-Searching in menuconfig:
+-
+-	The Search function searches for kernel configuration symbol
+-	names, so you have to know something close to what you are
+-	looking for.
+-
+-	Example:
+-		/hotplug
+-		This lists all config symbols that contain "hotplug",
+-		e.g., HOTPLUG, HOTPLUG_CPU, MEMORY_HOTPLUG.
+-
+-	For search help, enter / followed TAB-TAB-TAB (to highlight
+-	<Help>) and Enter.  This will tell you that you can also use
+-	regular expressions (regexes) in the search string, so if you
+-	are not interested in MEMORY_HOTPLUG, you could try
+-
+-		/^hotplug
+-
+-
+ ______________________________________________________________________
+-Color Themes for 'menuconfig'
++Environment variables for '*config'
+ 
+-It is possible to select different color themes using the variable
+-MENUCONFIG_COLOR.  To select a theme use:
++KCONFIG_CONFIG
++--------------------------------------------------
++This environment variable can be used to specify a default kernel config
++file name to override the default name of ".config".
+ 
+-	make MENUCONFIG_COLOR=<theme> menuconfig
++KCONFIG_OVERWRITECONFIG
++--------------------------------------------------
++If you set KCONFIG_OVERWRITECONFIG in the environment, Kconfig will not
++break symlinks when .config is a symlink to somewhere else.
+ 
+-Available themes are:
+-  mono       => selects colors suitable for monochrome displays
+-  blackbg    => selects a color scheme with black background
+-  classic    => theme with blue background. The classic look
+-  bluetitle  => a LCD friendly version of classic. (default)
++KCONFIG_NOTIMESTAMP
++--------------------------------------------------
++If this environment variable exists and is non-null, the timestamp line
++in generated .config files is omitted.
+ 
+ ______________________________________________________________________
+-Environment variables in 'menuconfig'
++Environment variables for '{allyes/allmod/allno/rand}config'
+ 
+ KCONFIG_ALLCONFIG
+ --------------------------------------------------
+@@ -95,8 +73,7 @@ values.
+ This enables you to create "miniature" config (miniconfig) or custom
+ config files containing just the config symbols that you are interested
+ in.  Then the kernel config system generates the full .config file,
+-including dependencies of your miniconfig file, based on the miniconfig
+-file.
++including symbols of your miniconfig file.
+ 
+ This 'KCONFIG_ALLCONFIG' file is a config file which contains
+ (usually a subset of all) preset config symbols.  These variable
+@@ -113,26 +90,14 @@ These examples will disable most options (allnoconfig) but enable or
+ disable the options that are explicitly listed in the specified
+ mini-config files.
+ 
++______________________________________________________________________
++Environment variables for 'silentoldconfig'
++
+ KCONFIG_NOSILENTUPDATE
+ --------------------------------------------------
+ If this variable has a non-blank value, it prevents silent kernel
+ config udpates (requires explicit updates).
+ 
+-KCONFIG_CONFIG
+---------------------------------------------------
+-This environment variable can be used to specify a default kernel config
+-file name to override the default name of ".config".
+-
+-KCONFIG_OVERWRITECONFIG
+---------------------------------------------------
+-If you set KCONFIG_OVERWRITECONFIG in the environment, Kconfig will not
+-break symlinks when .config is a symlink to somewhere else.
+-
+-KCONFIG_NOTIMESTAMP
+---------------------------------------------------
+-If this environment variable exists and is non-null, the timestamp line
+-in generated .config files is omitted.
+-
+ KCONFIG_AUTOCONFIG
+ --------------------------------------------------
+ This environment variable can be set to specify the path & name of the
+@@ -143,15 +108,54 @@ KCONFIG_AUTOHEADER
+ This environment variable can be set to specify the path & name of the
+ "autoconf.h" (header) file.  Its default value is "include/linux/autoconf.h".
+ 
++
++======================================================================
++menuconfig
++--------------------------------------------------
++
++SEARCHING for CONFIG symbols
++
++Searching in menuconfig:
++
++	The Search function searches for kernel configuration symbol
++	names, so you have to know something close to what you are
++	looking for.
++
++	Example:
++		/hotplug
++		This lists all config symbols that contain "hotplug",
++		e.g., HOTPLUG, HOTPLUG_CPU, MEMORY_HOTPLUG.
++
++	For search help, enter / followed TAB-TAB-TAB (to highlight
++	<Help>) and Enter.  This will tell you that you can also use
++	regular expressions (regexes) in the search string, so if you
++	are not interested in MEMORY_HOTPLUG, you could try
++
++		/^hotplug
++
+ ______________________________________________________________________
+-menuconfig User Interface Options
+-----------------------------------------------------------------------
++User interface options for 'menuconfig'
++
++MENUCONFIG_COLOR
++--------------------------------------------------
++It is possible to select different color themes using the variable
++MENUCONFIG_COLOR.  To select a theme use:
++
++	make MENUCONFIG_COLOR=<theme> menuconfig
++
++Available themes are:
++  mono       => selects colors suitable for monochrome displays
++  blackbg    => selects a color scheme with black background
++  classic    => theme with blue background. The classic look
++  bluetitle  => a LCD friendly version of classic. (default)
++
+ MENUCONFIG_MODE
+ --------------------------------------------------
+ This mode shows all sub-menus in one large tree.
+ 
+ Example:
+-	MENUCONFIG_MODE=single_menu make menuconfig
++	make MENUCONFIG_MODE=single_menu menuconfig
++
+ 
+ ======================================================================
+ xconfig
 -- 
 1.6.3.rc3.40.g75b44
 
