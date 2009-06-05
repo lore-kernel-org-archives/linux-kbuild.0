@@ -1,54 +1,71 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepa.post.tele.dk ([195.41.46.235]:45070 "EHLO
-	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755452AbZFEXlL (ORCPT
+Received: from pfepb.post.tele.dk ([195.41.46.236]:36411 "EHLO
+	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754295AbZFEXlL (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
 	Fri, 5 Jun 2009 19:41:11 -0400
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: [PATCH 24/39] kconfig: add a note about the deps to the 'silentoldconfig' help
-Date: Sat,  6 Jun 2009 01:42:42 +0200
-Message-Id: <1244245377-17441-24-git-send-email-sam@ravnborg.org>
+Subject: [PATCH 18/39] kbuild/headers_check: refine extern check
+Date: Sat,  6 Jun 2009 01:42:36 +0200
+Message-Id: <1244245377-17441-18-git-send-email-sam@ravnborg.org>
 In-Reply-To: <20090605233720.GA13588@uranus.ravnborg.org>
 References: <20090605233720.GA13588@uranus.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
-Cc: Markus Heidelberg <markus.heidelberg@web.de>, Sam Ravnborg <sam@ravnborg.org>
+Cc: Amerigo Wang <amwang@redhat.com>, Sam Ravnborg <sam@ravnborg.org>
 
-From: Markus Heidelberg <markus.heidelberg@web.de>
+From: Amerigo Wang <amwang@redhat.com>
 
-Signed-off-by: Markus Heidelberg <markus.heidelberg@web.de>
+'extern' checking information is not clear, refine it.
+Plus, fix a comment.
+
+Signed-off-by: WANG Cong <amwang@redhat.com>
 Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
 ---
- README                   |    1 +
- scripts/kconfig/Makefile |    2 +-
- 2 files changed, 2 insertions(+), 1 deletions(-)
+ scripts/headers_check.pl |   14 +++++++++-----
+ 1 files changed, 9 insertions(+), 5 deletions(-)
 
-diff --git a/README b/README
-index d6c6c74..7a078ff 100644
---- a/README
-+++ b/README
-@@ -174,6 +174,7 @@ CONFIGURING the kernel:
- 	"make silentoldconfig"
- 			   Like above, but avoids cluttering the screen
- 			   with questions already answered.
-+			   Additionally updates the dependencies.
- 	"make defconfig"   Create a ./.config file by using the default
- 			   symbol values from arch/$ARCH/defconfig.
- 	"make allyesconfig"
-diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
-index 47e3f2e..5ddf8be 100644
---- a/scripts/kconfig/Makefile
-+++ b/scripts/kconfig/Makefile
-@@ -83,7 +83,7 @@ help:
- 	@echo  '  xconfig	  - Update current config utilising a QT based front-end'
- 	@echo  '  gconfig	  - Update current config utilising a GTK based front-end'
- 	@echo  '  oldconfig	  - Update current config utilising a provided .config as base'
--	@echo  '  silentoldconfig - Same as oldconfig, but quietly'
-+	@echo  '  silentoldconfig - Same as oldconfig, but quietly, additionally update deps'
- 	@echo  '  randconfig	  - New config with random answer to all options'
- 	@echo  '  defconfig	  - New config with default answer to all options'
- 	@echo  '  allmodconfig	  - New config selecting modules when possible'
+diff --git a/scripts/headers_check.pl b/scripts/headers_check.pl
+index 56f90a4..3923888 100644
+--- a/scripts/headers_check.pl
++++ b/scripts/headers_check.pl
+@@ -2,7 +2,7 @@
+ #
+ # headers_check.pl execute a number of trivial consistency checks
+ #
+-# Usage: headers_check.pl dir [files...]
++# Usage: headers_check.pl dir arch [files...]
+ # dir:   dir to look for included files
+ # arch:  architecture
+ # files: list of files to check
+@@ -37,7 +37,7 @@ foreach my $file (@files) {
+ 		&check_include();
+ 		&check_asm_types();
+ 		&check_sizetypes();
+-		&check_prototypes();
++		&check_declarations();
+ 		# Dropped for now. Too much noise &check_config();
+ 	}
+ 	close FH;
+@@ -61,10 +61,14 @@ sub check_include
+ 	}
+ }
+ 
+-sub check_prototypes
++sub check_declarations
+ {
+-	if ($line =~ m/^\s*extern\b/) {
+-		printf STDERR "$filename:$lineno: extern's make no sense in userspace\n";
++	if ($line =~m/^\s*extern\b/) {
++		if ($line =~ m/^\s*extern\b.*\(.*\)/) {
++			printf STDERR "$filename:$lineno: extern's make no sense in userspace\n";
++		} else {
++			printf STDERR "$filename:$lineno: exporting global variable to userspace is suspicious\n";
++		}
+ 	}
+ }
+ 
 -- 
 1.6.3.rc3.40.g75b44
 
