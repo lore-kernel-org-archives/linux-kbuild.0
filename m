@@ -1,34 +1,34 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepb.post.tele.dk ([195.41.46.236]:59064 "EHLO
-	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751742AbZFEVxy (ORCPT
+Received: from pfepa.post.tele.dk ([195.41.46.235]:35177 "EHLO
+	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752958AbZFEWBe (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 5 Jun 2009 17:53:54 -0400
-Date: Fri, 5 Jun 2009 23:56:11 +0200
+	Fri, 5 Jun 2009 18:01:34 -0400
+Date: Sat, 6 Jun 2009 00:03:50 +0200
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH] Kbuild: remove extra ifdef/endif of top Makefile
-Message-ID: <20090605215611.GG29008@uranus.ravnborg.org>
-References: <1243324987-17840-1-git-send-email-crq@hera.kernel.org>
+Subject: Re: [PATCH resend 00/10] kconfig: various fixes and documentation updates
+Message-ID: <20090605220350.GH29008@uranus.ravnborg.org>
+References: <1242603414-9267-1-git-send-email-markus.heidelberg@web.de> <20090527234340.0884578a.akpm@linux-foundation.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1243324987-17840-1-git-send-email-crq@hera.kernel.org>
+In-Reply-To: <20090527234340.0884578a.akpm@linux-foundation.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Cheng Renquan <crq@hera.kernel.org>
-Cc: linux-kbuild@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org, crquan@gmail.com
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: Markus Heidelberg <markus.heidelberg@web.de>, Roman Zippel <zippel@linux-m68k.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Tue, May 26, 2009 at 04:03:07PM +0800, Cheng Renquan wrote:
-> From: Cheng Renquan <crq@kernel.org>
+On Wed, May 27, 2009 at 11:43:40PM -0700, Andrew Morton wrote:
+> On Mon, 18 May 2009 01:36:44 +0200 Markus Heidelberg <markus.heidelberg@web.de> wrote:
 > 
-> The GNU make's origin function know undefined variable well,
-> so the outer ifdef/endif is unneeded.
+> > I sent this series about 4 weeks ago on 2009-04-19, but didn't receive any
+> > comments. Is Roman inactive currently?
 > 
-> I've checked the minimal requirements from Documentation/Changes
-> is GNU make 3.79.1, and that version of GNU make has support of
-> origin function already, so now it's safe to kill the outer
-> conditional checking, without upgrading the minimal requirements.
+> Roman and Sam are part-time unpaid kernel slaves.  Things take a bit
+> longer.
 
-Applied with V2 of your description,
+Your humble slave has now applied the patches.
+
+Markus, thanks for your patience.
 
 	Sam
