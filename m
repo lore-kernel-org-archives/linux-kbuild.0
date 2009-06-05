@@ -1,80 +1,70 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepb.post.tele.dk ([195.41.46.236]:36428 "EHLO
+Received: from pfepb.post.tele.dk ([195.41.46.236]:36410 "EHLO
 	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755586AbZFEXlN (ORCPT
+	with ESMTP id S1754656AbZFEXlN (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
 	Fri, 5 Jun 2009 19:41:13 -0400
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: [PATCH 31/39] kconfig: do not hardcode ".config" filename
-Date: Sat,  6 Jun 2009 01:42:49 +0200
-Message-Id: <1244245377-17441-31-git-send-email-sam@ravnborg.org>
+Subject: [PATCH 36/39] menu: fix embedded menu presentation
+Date: Sat,  6 Jun 2009 01:42:54 +0200
+Message-Id: <1244245377-17441-36-git-send-email-sam@ravnborg.org>
 In-Reply-To: <20090605233720.GA13588@uranus.ravnborg.org>
 References: <20090605233720.GA13588@uranus.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
-Cc: Markus Heidelberg <markus.heidelberg@web.de>, Sam Ravnborg <sam@ravnborg.org>
+Cc: Randy Dunlap <randy.dunlap@oracle.com>, Andrew Morton <akpm@linux-foundation.org>, Sam Ravnborg <sam@ravnborg.org>
 
-From: Markus Heidelberg <markus.heidelberg@web.de>
+From: Randy Dunlap <randy.dunlap@oracle.com>
 
-Rather than hardcoding ".config" use conf_get_configname(), which also
-respects the environment variable KCONFIG_CONFIG.
+The STRIP_ASM_SYMS kconfig symbol mucks up the embedded menu because
+STRIP_ASM_SYMS is in the middle of the embedded menu items but it does not
+depend on EMBEDDED.  Move it to beyond the end of the embedded menu so
+that the menu is presented correctly.
 
-This fixes "make silentoldconfig" when KCONFIG_CONFIG is used and also
-suggests the given filename for "Load" and "Save as" in qconf.
+Or if STRIP_ASM_SYMS should depend on EMBEDDED, that can also be fixed.
 
-Signed-off-by: Markus Heidelberg <markus.heidelberg@web.de>
+Signed-off-by: Randy Dunlap <randy.dunlap@oracle.com>
+Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
 Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
 ---
- scripts/kconfig/conf.c   |    7 ++++---
- scripts/kconfig/qconf.cc |    4 ++--
- 2 files changed, 6 insertions(+), 5 deletions(-)
+ init/Kconfig |   16 ++++++++--------
+ 1 files changed, 8 insertions(+), 8 deletions(-)
 
-diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
-index d190092..3baaaec 100644
---- a/scripts/kconfig/conf.c
-+++ b/scripts/kconfig/conf.c
-@@ -498,14 +498,15 @@ int main(int ac, char **av)
- 	conf_parse(name);
- 	//zconfdump(stdout);
- 	if (sync_kconfig) {
--		if (stat(".config", &tmpstat)) {
-+		name = conf_get_configname();
-+		if (stat(name, &tmpstat)) {
- 			fprintf(stderr, _("***\n"
- 				"*** You have not yet configured your kernel!\n"
--				"*** (missing kernel .config file)\n"
-+				"*** (missing kernel config file \"%s\")\n"
- 				"***\n"
- 				"*** Please run some configurator (e.g. \"make oldconfig\" or\n"
- 				"*** \"make menuconfig\" or \"make xconfig\").\n"
--				"***\n"));
-+				"***\n"), name);
- 			exit(1);
- 		}
- 	}
-diff --git a/scripts/kconfig/qconf.cc b/scripts/kconfig/qconf.cc
-index 19811fc..ce7d508 100644
---- a/scripts/kconfig/qconf.cc
-+++ b/scripts/kconfig/qconf.cc
-@@ -1448,7 +1448,7 @@ ConfigMainWindow::ConfigMainWindow(void)
+diff --git a/init/Kconfig b/init/Kconfig
+index 7be4d38..4389cee 100644
+--- a/init/Kconfig
++++ b/init/Kconfig
+@@ -808,14 +808,6 @@ config KALLSYMS_EXTRA_PASS
+ 	   you wait for kallsyms to be fixed.
  
- void ConfigMainWindow::loadConfig(void)
- {
--	QString s = QFileDialog::getOpenFileName(".config", NULL, this);
-+	QString s = QFileDialog::getOpenFileName(conf_get_configname(), NULL, this);
- 	if (s.isNull())
- 		return;
- 	if (conf_read(QFile::encodeName(s)))
-@@ -1464,7 +1464,7 @@ void ConfigMainWindow::saveConfig(void)
  
- void ConfigMainWindow::saveConfigAs(void)
- {
--	QString s = QFileDialog::getSaveFileName(".config", NULL, this);
-+	QString s = QFileDialog::getSaveFileName(conf_get_configname(), NULL, this);
- 	if (s.isNull())
- 		return;
- 	if (conf_write(QFile::encodeName(s)))
+-config STRIP_ASM_SYMS
+-	bool "Strip assembler-generated symbols during link"
+-	default n
+-	help
+-	  Strip internal assembler-generated symbols during a link (symbols
+-	  that look like '.Lxxx') so they don't pollute the output of
+-	  get_wchan() and suchlike.
+-
+ config HOTPLUG
+ 	bool "Support for hot-pluggable devices" if EMBEDDED
+ 	default y
+@@ -961,6 +953,14 @@ config SLUB_DEBUG
+ 	  SLUB sysfs support. /sys/slab will not exist and there will be
+ 	  no support for cache validation etc.
+ 
++config STRIP_ASM_SYMS
++	bool "Strip assembler-generated symbols during link"
++	default n
++	help
++	  Strip internal assembler-generated symbols during a link (symbols
++	  that look like '.Lxxx') so they don't pollute the output of
++	  get_wchan() and suchlike.
++
+ config COMPAT_BRK
+ 	bool "Disable heap randomization"
+ 	default y
 -- 
 1.6.3.rc3.40.g75b44
 
