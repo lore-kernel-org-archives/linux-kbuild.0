@@ -1,134 +1,76 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepa.post.tele.dk ([195.41.46.235]:44611 "EHLO
-	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752512AbZFEXfF (ORCPT
+Received: from pfepb.post.tele.dk ([195.41.46.236]:36367 "EHLO
+	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752285AbZFEXlA (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 5 Jun 2009 19:35:05 -0400
-Date: Sat, 6 Jun 2009 01:37:21 +0200
+	Fri, 5 Jun 2009 19:41:00 -0400
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: kbuild-next content
-Message-ID: <20090605233720.GA13588@uranus.ravnborg.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Subject: [PATCH 01/39] kconfig: handle comment entries within choice/endchoice
+Date: Sat,  6 Jun 2009 01:42:19 +0200
+Message-Id: <1244245377-17441-1-git-send-email-sam@ravnborg.org>
+In-Reply-To: <20090605233720.GA13588@uranus.ravnborg.org>
+References: <20090605233720.GA13588@uranus.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
+Cc: Peter Korsgaard <jacmet@sunsite.dk>, Roman Zippel <zippel@linux-m68k.org>, Sam Ravnborg <sam@ravnborg.org>
 
-I have been offline for a while - but found some time this weekend
-to do some kbuild work.
-This is the patches that has accumulated in kbuild-next so far.
+From: Peter Korsgaard <jacmet@sunsite.dk>
 
-I have almost everything applied that I had queued up.
-So if there is something missing assume I deleted it by mistake
-and resend it to me.
+Implement support for comment entries within choice groups. Comment entries
+are displayed visually distinct from normal configs, and selecting them is
+a no-op.
 
-I have a number of patches sitting in my local trees but
-I need to look over them once more before they are ready
-for public review.
-This is mostly related to generated headers and simplfied
-vmlinux.lds scripts (Tim is eagerly await this...).
+Signed-off-by: Peter Korsgaard <jacmet@sunsite.dk>
+Cc: Roman Zippel <zippel@linux-m68k.org>
+Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
+---
+ scripts/kconfig/lxdialog/checklist.c |    3 ++-
+ scripts/kconfig/mconf.c              |   10 +++++++++-
+ 2 files changed, 11 insertions(+), 2 deletions(-)
 
-Patches will follow.
+diff --git a/scripts/kconfig/lxdialog/checklist.c b/scripts/kconfig/lxdialog/checklist.c
+index b2a878c..bcc6f19 100644
+--- a/scripts/kconfig/lxdialog/checklist.c
++++ b/scripts/kconfig/lxdialog/checklist.c
+@@ -41,7 +41,8 @@ static void print_item(WINDOW * win, int choice, int selected)
+ 	wmove(win, choice, check_x);
+ 	wattrset(win, selected ? dlg.check_selected.atr
+ 		 : dlg.check.atr);
+-	wprintw(win, "(%c)", item_is_tag('X') ? 'X' : ' ');
++	if (!item_is_tag(':'))
++		wprintw(win, "(%c)", item_is_tag('X') ? 'X' : ' ');
+ 
+ 	wattrset(win, selected ? dlg.tag_selected.atr : dlg.tag.atr);
+ 	mvwaddch(win, choice, item_x, item_str()[0]);
+diff --git a/scripts/kconfig/mconf.c b/scripts/kconfig/mconf.c
+index 6841e95..3bcacb4 100644
+--- a/scripts/kconfig/mconf.c
++++ b/scripts/kconfig/mconf.c
+@@ -732,7 +732,12 @@ static void conf_choice(struct menu *menu)
+ 		for (child = menu->list; child; child = child->next) {
+ 			if (!menu_is_visible(child))
+ 				continue;
+-			item_make("%s", _(menu_get_prompt(child)));
++			if (child->sym)
++				item_make("%s", _(menu_get_prompt(child)));
++			else {
++				item_make("*** %s ***", _(menu_get_prompt(child)));
++				item_set_tag(':');
++			}
+ 			item_set_data(child);
+ 			if (child->sym == active)
+ 				item_set_selected(1);
+@@ -748,6 +753,9 @@ static void conf_choice(struct menu *menu)
+ 		case 0:
+ 			if (selected) {
+ 				child = item_data();
++				if (!child->sym)
++					break;
++
+ 				sym_set_tristate_value(child->sym, yes);
+ 			}
+ 			return;
+-- 
+1.6.3.rc3.40.g75b44
 
-	Sam
-
-Amerigo Wang (2):
-      kbuild/headers_check: refine extern check
-      kbuild: clean up scripts/headers.sh
-
-Cheng Renquan (1):
-      kbuild: remove extra ifdef/endif of top Makefile
-
-David VomLehn (1):
-      kbuild/Documentation: Incorrect makefile syntax in example
-
-Frans Pop (9):
-      kbuild, deb-pkg: minor general improvements in builddeb script
-      kbuild, deb-pkg: refactor code to reduce duplication
-      kbuild, deb-pkg: fix 'file not found' error when building .deb package for arm
-      kbuild, deb-pkg: pass Debian maintainer script parameters to packaging hook scripts
-      kbuild, deb-pkg: allow to specify a custom revision for .deb packages
-      kbuild, deb-pkg: allow alternative hook scripts directory in .deb packages
-      kbuild, deb-pkg: improve changelog entry and package descriptions
-      kbuild, deb-pkg: generate debian/copyright file
-      kbuild, deb-pkg: improve Source field
-
-Jan Beulich (1):
-      initconst adjustments
-
-Jiri Slaby (1):
-      kbuild: allow docproc invocation from external
-
-Manish Katiyar (1):
-      kernel/kallsyms.c: replace deprecated __initcall with device_initcall and fix whitespace
-
-Markus Heidelberg (10):
-      kconfig: fix typo "mconfig" to "menuconfig" in a comment
-      kconfig: add a note about the deps to the 'silentoldconfig' help
-      kconfig: resort the documentation of the environment variables
-      gitignore: ignore Kconfig i18n files
-      kconfig qconf: fix -Wall compiler warnings
-      kconfig qconf: fix namespace for Horizontal and Vertical enum values
-      kconfig qconf: add namespace for use of Key_ enum values
-      kconfig qconf: fix the type of the desktop widget
-      kconfig: do not hardcode ".config" filename
-      kconfig: do not hardcode "include/config/auto.conf" filename
-
-Mike Frysinger (1):
-      ignore *.patch files
-
-Peter Korsgaard (1):
-      kconfig: handle comment entries within choice/endchoice
-
-Randy Dunlap (1):
-      menu: fix embedded menu presentation
-
-Robert P. J. Day (1):
-      scripts/headers_check.pl: correct RE in header CONFIG leak check
-
-Sam Ravnborg (2):
-      kbuild: fix header export when __ASSEMBLY__ is used
-      kbuild: add hint about __refdata to modpost
-
-Sergei Poselenov (1):
-      kbuild: fix "Argument list too long" error for "make headers_check",
-
-dann frazier (1):
-      Remove bashisms from scripts
-
-maximilian attems (5):
-      kbuild, deb-pkg: improve maintainer identification
-      kbuild, deb-pkg: fix generated package name
-      kbuild, deb-pkg: fix Provides field
-      kbuild, deb-pkg: fix Section field
-      kbuild, deb-pkg: bump standards version
-
- .gitignore                           |    1 +
- Documentation/kbuild/kconfig.txt     |  116 ++++++++++++++-------------
- Documentation/kbuild/modules.txt     |    2 +-
- Makefile                             |   26 ++----
- README                               |    1 +
- include/asm-generic/vmlinux.lds.h    |    5 +-
- include/linux/init.h                 |    3 +-
- init/Kconfig                         |   16 ++--
- kernel/kallsyms.c                    |  134 ++++++++++++++++++-------------
- scripts/Makefile.headersinst         |    8 ++-
- scripts/basic/docproc.c              |   13 ++-
- scripts/gcc-version.sh               |    2 +-
- scripts/headers.sh                   |    7 --
- scripts/headers_check.pl             |   16 +++--
- scripts/headers_install.pl           |    2 +-
- scripts/kconfig/.gitignore           |    3 +
- scripts/kconfig/Makefile             |    4 +-
- scripts/kconfig/conf.c               |    7 +-
- scripts/kconfig/confdata.c           |   20 +++--
- scripts/kconfig/lkc.h                |    1 +
- scripts/kconfig/lxdialog/checklist.c |    3 +-
- scripts/kconfig/mconf.c              |   10 ++-
- scripts/kconfig/qconf.cc             |   48 ++++++-----
- scripts/kconfig/util.c               |    6 +-
- scripts/mod/modpost.c                |   50 +++++++++---
- scripts/package/builddeb             |  149 +++++++++++++++++++++++-----------
- scripts/ver_linux                    |    2 +-
- 27 files changed, 395 insertions(+), 260 deletions(-)
