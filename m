@@ -1,38 +1,39 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from moutng.kundenserver.de ([212.227.126.177]:57689 "EHLO
-	moutng.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751226AbZFEMbw (ORCPT
+Received: from wf-out-1314.google.com ([209.85.200.174]:58401 "EHLO
+	wf-out-1314.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751272AbZFENbs (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 5 Jun 2009 08:31:52 -0400
-From: Arnd Bergmann <arnd@arndb.de>
-Subject: Re: [Patch] kbuild: fix headers_check.pl
-Date: Fri, 5 Jun 2009 13:31:14 +0100
-References: <20090605021419.7905.89870.sendpatchset@localhost.localdomain> <200906051021.51726.arnd@arndb.de> <4A28F1CD.6040804@redhat.com>
-In-Reply-To: <4A28F1CD.6040804@redhat.com>
+	Fri, 5 Jun 2009 09:31:48 -0400
+Received: by wf-out-1314.google.com with SMTP id 26so667849wfd.4
+        for <linux-kbuild@vger.kernel.org>; Fri, 05 Jun 2009 06:31:50 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-15"
+Date: Fri, 5 Jun 2009 16:31:50 +0300
+Message-ID: <55c333c0906050631y6ca1b676q94dd8ec324c9ba7@mail.gmail.com>
+Subject: Building a 32 bit on a 64 bit machine.
+From: Kevin Wilson <wkevils@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
-Message-Id: <200906051331.14978.arnd@arndb.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Amerigo Wang <amwang@redhat.com>
-Cc: linux-kernel@vger.kernel.org, akpm@linux-foundation.org, sam@ravnborg.org, linux-kbuild@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
 
-On Friday 05 June 2009, Amerigo Wang wrote:
-> 
-> >
-> > I don't think we really need that distinction here, the old
-> > text applies to both.
->
-> Even for function declarations?
+Hello,
+I want to build a module I developed for 32 bit on a 64 bit machine.
+It is on a machine running Fedora.
 
-Yes. Any use of 'extern' in a kernel header file by definition
-refers to a symbol that is defined in the kernel and therefore
-not accessibly in user space. It is the same problem for
-variables and functions, with the complication that leaving
-out the 'extern' statement on a function declaration will
-hide it from this check, while leaving it out on a variable
-declaration turns it into a definition.
+I tried to install the kernel-devel of the 32 bit, and to build my module
+agains that tree, with Make ARCH=i686. But I get error saying:
+`-mcpu=' is deprecated. Use `-mtune=' or '-march=' instead.
 
-	Arnd <><
+error: CPU you selected does not support x86-64 instruction set
+
+Any ideas? is it possible ?
+
+I had success with building this module against other 64 bit kernels
+using this method
+(installing kernel-devel and building against it).
+
+I appreciate if anybody can some link for some howto.
+
+Rgs,
+Kevin
