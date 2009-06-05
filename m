@@ -1,15 +1,18 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepb.post.tele.dk ([195.41.46.236]:36405 "EHLO
+Received: from pfepb.post.tele.dk ([195.41.46.236]:36404 "EHLO
 	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755498AbZFEXlM (ORCPT
+	with ESMTP id S1755501AbZFEXlM (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
 	Fri, 5 Jun 2009 19:41:12 -0400
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: [PATCH 25/39] kconfig: resort the documentation of the environment variables
-Date: Sat,  6 Jun 2009 01:42:43 +0200
-Message-Id: <1244245377-17441-25-git-send-email-sam@ravnborg.org>
+Subject: [PATCH 27/39] kconfig qconf: fix -Wall compiler warnings
+Date: Sat,  6 Jun 2009 01:42:45 +0200
+Message-Id: <1244245377-17441-27-git-send-email-sam@ravnborg.org>
 In-Reply-To: <20090605233720.GA13588@uranus.ravnborg.org>
 References: <20090605233720.GA13588@uranus.ravnborg.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
@@ -17,189 +20,60 @@ Cc: Markus Heidelberg <markus.heidelberg@web.de>, Sam Ravnborg <sam@ravnborg.org
 
 From: Markus Heidelberg <markus.heidelberg@web.de>
 
-All the KCONFIG_ environment variables were previously located in a
-section "Environment variables in 'menuconfig'", but neither are they
-restricted to 'menuconfig' nor are they all used by 'menuconfig'.
+These compiler warnings occure when adding -Wall to HOSTCXXFLAGS in
+/Makefile
 
-Introduce the following three sections for these variables:
-  * Environment variables for '*config'
-  * Environment variables for '{allyes/allmod/allno/rand}config'
-  * Environment variables for 'silentoldconfig'
+scripts/kconfig/qconf.h: In constructor ‘ConfigInfoView::ConfigInfoView(QWidget*, const char*)’:
+scripts/kconfig/qconf.h:274: warning: ‘ConfigInfoView::menu’ will be initialized after
+scripts/kconfig/qconf.h:273: warning:   ‘symbol* ConfigInfoView::sym’
+scripts/kconfig/qconf.cc:922: warning:   when initialized here
 
-Furthermore this puts MENUCONFIG_MODE next to MENUCONFIG_COLOR into a
-common section "User interface options for 'menuconfig'".
+scripts/kconfig/qconf.cc: In member function ‘void ConfigMainWindow::setMenuLink(menu*)’:
+scripts/kconfig/qconf.cc:1498: warning: enumeration value ‘menuMode’ not handled in switch
+scripts/kconfig/qconf.cc:1498: warning: enumeration value ‘listMode’ not handled in switch
+
+scripts/kconfig/qconf.cc: In member function ‘void ConfigMainWindow::saveSettings()’:
+scripts/kconfig/qconf.cc:1664: warning: enumeration value ‘menuMode’ not handled in switch
+scripts/kconfig/qconf.cc:1664: warning: enumeration value ‘listMode’ not handled in switch
 
 Signed-off-by: Markus Heidelberg <markus.heidelberg@web.de>
 Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
 ---
- Documentation/kbuild/kconfig.txt |  116 +++++++++++++++++++------------------
- 1 files changed, 60 insertions(+), 56 deletions(-)
+ scripts/kconfig/qconf.cc |    7 ++++++-
+ 1 files changed, 6 insertions(+), 1 deletions(-)
 
-diff --git a/Documentation/kbuild/kconfig.txt b/Documentation/kbuild/kconfig.txt
-index 26a7c0a..849b5e5 100644
---- a/Documentation/kbuild/kconfig.txt
-+++ b/Documentation/kbuild/kconfig.txt
-@@ -35,48 +35,26 @@ new .config files to see the differences:
+diff --git a/scripts/kconfig/qconf.cc b/scripts/kconfig/qconf.cc
+index 5d0fd38..2bd6ed0 100644
+--- a/scripts/kconfig/qconf.cc
++++ b/scripts/kconfig/qconf.cc
+@@ -920,7 +920,7 @@ void ConfigView::updateListAll(void)
+ }
  
- (Yes, we need something better here.)
+ ConfigInfoView::ConfigInfoView(QWidget* parent, const char *name)
+-	: Parent(parent, name), menu(0), sym(0)
++	: Parent(parent, name), sym(0), menu(0)
+ {
+ 	if (name) {
+ 		configSettings->beginGroup(name);
+@@ -1524,6 +1524,8 @@ void ConfigMainWindow::setMenuLink(struct menu *menu)
+ 	case fullMode:
+ 		list = configList;
+ 		break;
++	default:
++		break;
+ 	}
  
--
--======================================================================
--menuconfig
----------------------------------------------------
--
--SEARCHING for CONFIG symbols
--
--Searching in menuconfig:
--
--	The Search function searches for kernel configuration symbol
--	names, so you have to know something close to what you are
--	looking for.
--
--	Example:
--		/hotplug
--		This lists all config symbols that contain "hotplug",
--		e.g., HOTPLUG, HOTPLUG_CPU, MEMORY_HOTPLUG.
--
--	For search help, enter / followed TAB-TAB-TAB (to highlight
--	<Help>) and Enter.  This will tell you that you can also use
--	regular expressions (regexes) in the search string, so if you
--	are not interested in MEMORY_HOTPLUG, you could try
--
--		/^hotplug
--
--
- ______________________________________________________________________
--Color Themes for 'menuconfig'
-+Environment variables for '*config'
+ 	if (list) {
+@@ -1673,6 +1675,9 @@ void ConfigMainWindow::saveSettings(void)
+ 	case fullMode :
+ 		entry = "full";
+ 		break;
++
++	default:
++		break;
+ 	}
+ 	configSettings->writeEntry("/listMode", entry);
  
--It is possible to select different color themes using the variable
--MENUCONFIG_COLOR.  To select a theme use:
-+KCONFIG_CONFIG
-+--------------------------------------------------
-+This environment variable can be used to specify a default kernel config
-+file name to override the default name of ".config".
- 
--	make MENUCONFIG_COLOR=<theme> menuconfig
-+KCONFIG_OVERWRITECONFIG
-+--------------------------------------------------
-+If you set KCONFIG_OVERWRITECONFIG in the environment, Kconfig will not
-+break symlinks when .config is a symlink to somewhere else.
- 
--Available themes are:
--  mono       => selects colors suitable for monochrome displays
--  blackbg    => selects a color scheme with black background
--  classic    => theme with blue background. The classic look
--  bluetitle  => a LCD friendly version of classic. (default)
-+KCONFIG_NOTIMESTAMP
-+--------------------------------------------------
-+If this environment variable exists and is non-null, the timestamp line
-+in generated .config files is omitted.
- 
- ______________________________________________________________________
--Environment variables in 'menuconfig'
-+Environment variables for '{allyes/allmod/allno/rand}config'
- 
- KCONFIG_ALLCONFIG
- --------------------------------------------------
-@@ -95,8 +73,7 @@ values.
- This enables you to create "miniature" config (miniconfig) or custom
- config files containing just the config symbols that you are interested
- in.  Then the kernel config system generates the full .config file,
--including dependencies of your miniconfig file, based on the miniconfig
--file.
-+including symbols of your miniconfig file.
- 
- This 'KCONFIG_ALLCONFIG' file is a config file which contains
- (usually a subset of all) preset config symbols.  These variable
-@@ -113,26 +90,14 @@ These examples will disable most options (allnoconfig) but enable or
- disable the options that are explicitly listed in the specified
- mini-config files.
- 
-+______________________________________________________________________
-+Environment variables for 'silentoldconfig'
-+
- KCONFIG_NOSILENTUPDATE
- --------------------------------------------------
- If this variable has a non-blank value, it prevents silent kernel
- config udpates (requires explicit updates).
- 
--KCONFIG_CONFIG
----------------------------------------------------
--This environment variable can be used to specify a default kernel config
--file name to override the default name of ".config".
--
--KCONFIG_OVERWRITECONFIG
----------------------------------------------------
--If you set KCONFIG_OVERWRITECONFIG in the environment, Kconfig will not
--break symlinks when .config is a symlink to somewhere else.
--
--KCONFIG_NOTIMESTAMP
----------------------------------------------------
--If this environment variable exists and is non-null, the timestamp line
--in generated .config files is omitted.
--
- KCONFIG_AUTOCONFIG
- --------------------------------------------------
- This environment variable can be set to specify the path & name of the
-@@ -143,15 +108,54 @@ KCONFIG_AUTOHEADER
- This environment variable can be set to specify the path & name of the
- "autoconf.h" (header) file.  Its default value is "include/linux/autoconf.h".
- 
-+
-+======================================================================
-+menuconfig
-+--------------------------------------------------
-+
-+SEARCHING for CONFIG symbols
-+
-+Searching in menuconfig:
-+
-+	The Search function searches for kernel configuration symbol
-+	names, so you have to know something close to what you are
-+	looking for.
-+
-+	Example:
-+		/hotplug
-+		This lists all config symbols that contain "hotplug",
-+		e.g., HOTPLUG, HOTPLUG_CPU, MEMORY_HOTPLUG.
-+
-+	For search help, enter / followed TAB-TAB-TAB (to highlight
-+	<Help>) and Enter.  This will tell you that you can also use
-+	regular expressions (regexes) in the search string, so if you
-+	are not interested in MEMORY_HOTPLUG, you could try
-+
-+		/^hotplug
-+
- ______________________________________________________________________
--menuconfig User Interface Options
------------------------------------------------------------------------
-+User interface options for 'menuconfig'
-+
-+MENUCONFIG_COLOR
-+--------------------------------------------------
-+It is possible to select different color themes using the variable
-+MENUCONFIG_COLOR.  To select a theme use:
-+
-+	make MENUCONFIG_COLOR=<theme> menuconfig
-+
-+Available themes are:
-+  mono       => selects colors suitable for monochrome displays
-+  blackbg    => selects a color scheme with black background
-+  classic    => theme with blue background. The classic look
-+  bluetitle  => a LCD friendly version of classic. (default)
-+
- MENUCONFIG_MODE
- --------------------------------------------------
- This mode shows all sub-menus in one large tree.
- 
- Example:
--	MENUCONFIG_MODE=single_menu make menuconfig
-+	make MENUCONFIG_MODE=single_menu menuconfig
-+
- 
- ======================================================================
- xconfig
 -- 
 1.6.3.rc3.40.g75b44
 
