@@ -1,79 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepb.post.tele.dk ([195.41.46.236]:36404 "EHLO
+Received: from pfepb.post.tele.dk ([195.41.46.236]:36419 "EHLO
 	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755501AbZFEXlM (ORCPT
+	with ESMTP id S1754943AbZFEXlM (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
 	Fri, 5 Jun 2009 19:41:12 -0400
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: [PATCH 27/39] kconfig qconf: fix -Wall compiler warnings
-Date: Sat,  6 Jun 2009 01:42:45 +0200
-Message-Id: <1244245377-17441-27-git-send-email-sam@ravnborg.org>
+Subject: [PATCH 21/39] kbuild/Documentation: Incorrect makefile syntax in example
+Date: Sat,  6 Jun 2009 01:42:39 +0200
+Message-Id: <1244245377-17441-21-git-send-email-sam@ravnborg.org>
 In-Reply-To: <20090605233720.GA13588@uranus.ravnborg.org>
 References: <20090605233720.GA13588@uranus.ravnborg.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
-Cc: Markus Heidelberg <markus.heidelberg@web.de>, Sam Ravnborg <sam@ravnborg.org>
+Cc: David VomLehn <dvomlehn@cisco.com>, Sam Ravnborg <sam@ravnborg.org>
 
-From: Markus Heidelberg <markus.heidelberg@web.de>
+From: David VomLehn <dvomlehn@cisco.com>
 
-These compiler warnings occure when adding -Wall to HOSTCXXFLAGS in
-/Makefile
+There is an error in the make syntax for one of the kbuild examples
 
-scripts/kconfig/qconf.h: In constructor ‘ConfigInfoView::ConfigInfoView(QWidget*, const char*)’:
-scripts/kconfig/qconf.h:274: warning: ‘ConfigInfoView::menu’ will be initialized after
-scripts/kconfig/qconf.h:273: warning:   ‘symbol* ConfigInfoView::sym’
-scripts/kconfig/qconf.cc:922: warning:   when initialized here
-
-scripts/kconfig/qconf.cc: In member function ‘void ConfigMainWindow::setMenuLink(menu*)’:
-scripts/kconfig/qconf.cc:1498: warning: enumeration value ‘menuMode’ not handled in switch
-scripts/kconfig/qconf.cc:1498: warning: enumeration value ‘listMode’ not handled in switch
-
-scripts/kconfig/qconf.cc: In member function ‘void ConfigMainWindow::saveSettings()’:
-scripts/kconfig/qconf.cc:1664: warning: enumeration value ‘menuMode’ not handled in switch
-scripts/kconfig/qconf.cc:1664: warning: enumeration value ‘listMode’ not handled in switch
-
-Signed-off-by: Markus Heidelberg <markus.heidelberg@web.de>
+Signed-off-by: David VomLehn <dvomlehn@cisco.com>
 Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
 ---
- scripts/kconfig/qconf.cc |    7 ++++++-
- 1 files changed, 6 insertions(+), 1 deletions(-)
+ Documentation/kbuild/modules.txt |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-diff --git a/scripts/kconfig/qconf.cc b/scripts/kconfig/qconf.cc
-index 5d0fd38..2bd6ed0 100644
---- a/scripts/kconfig/qconf.cc
-+++ b/scripts/kconfig/qconf.cc
-@@ -920,7 +920,7 @@ void ConfigView::updateListAll(void)
- }
+diff --git a/Documentation/kbuild/modules.txt b/Documentation/kbuild/modules.txt
+index b1096da..0767cf6 100644
+--- a/Documentation/kbuild/modules.txt
++++ b/Documentation/kbuild/modules.txt
+@@ -275,7 +275,7 @@ following files:
  
- ConfigInfoView::ConfigInfoView(QWidget* parent, const char *name)
--	: Parent(parent, name), menu(0), sym(0)
-+	: Parent(parent, name), sym(0), menu(0)
- {
- 	if (name) {
- 		configSettings->beginGroup(name);
-@@ -1524,6 +1524,8 @@ void ConfigMainWindow::setMenuLink(struct menu *menu)
- 	case fullMode:
- 		list = configList;
- 		break;
-+	default:
-+		break;
- 	}
+ 		KERNELDIR := /lib/modules/`uname -r`/build
+ 		all::
+-			$(MAKE) -C $KERNELDIR M=`pwd` $@
++			$(MAKE) -C $(KERNELDIR) M=`pwd` $@
  
- 	if (list) {
-@@ -1673,6 +1675,9 @@ void ConfigMainWindow::saveSettings(void)
- 	case fullMode :
- 		entry = "full";
- 		break;
-+
-+	default:
-+		break;
- 	}
- 	configSettings->writeEntry("/listMode", entry);
- 
+ 		# Module specific targets
+ 		genbin:
 -- 
 1.6.3.rc3.40.g75b44
 
