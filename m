@@ -1,57 +1,39 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepb.post.tele.dk ([195.41.46.236]:36405 "EHLO
-	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755394AbZFEXlK (ORCPT
+Received: from moutng.kundenserver.de ([212.227.126.186]:53292 "EHLO
+	moutng.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752813AbZFFAlP (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 5 Jun 2009 19:41:10 -0400
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: [PATCH 11/39] kbuild, deb-pkg: improve Source field
-Date: Sat,  6 Jun 2009 01:42:29 +0200
-Message-Id: <1244245377-17441-11-git-send-email-sam@ravnborg.org>
-In-Reply-To: <20090605233720.GA13588@uranus.ravnborg.org>
-References: <20090605233720.GA13588@uranus.ravnborg.org>
+	Fri, 5 Jun 2009 20:41:15 -0400
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: Re: [PATCH 17/39] kbuild: fix header export when __ASSEMBLY__ is used
+Date: Sat, 6 Jun 2009 00:41:07 +0000
+References: <20090605233720.GA13588@uranus.ravnborg.org> <1244245377-17441-17-git-send-email-sam@ravnborg.org>
+In-Reply-To: <1244245377-17441-17-git-send-email-sam@ravnborg.org>
+MIME-Version: 1.0
+Content-Type: Text/Plain;
+  charset="iso-8859-15"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+Message-Id: <200906060041.07600.arnd@arndb.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
-Cc: Frans Pop <elendil@planet.nl>, Andres Salomon <dilinger@debian.org>, Sam Ravnborg <sam@ravnborg.org>
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Russell King <rmk+lkml@arm.linux.org.uk>, Jaswinder Singh Rajput <jaswinder@kernel.org>
 
-From: Frans Pop <elendil@planet.nl>
+On Friday 05 June 2009 11:42:35 pm Sam Ravnborg wrote:
+> Because it does not know __ASSEMBLY__ it does not
+> detect that htis is not for userspace.
+> This caused too much code to be exported, and headers_check barfed
+> over this code.
+> 
+> For arm this fixes following "make headers_check" warning:
+> /usr/include/asm/hwcap.h:29: extern's make no sense in userspace
 
-The Source: field is defined as the source package in the package
-archive from which a binary packages are built. As deb-pkg does not
-generate a source package, we should avoid to use any existing source
-packages here.
+Are you sure that this is safe for all user space? If a user application
+for instance includes asm/signal.h or asm/types.h from assembly (for
+whatever reason), it now breaks.
 
-Signed-off-by: Frans Pop <elendil@planet.nl>
-Acked-by: maximilian attems <max@stro.at>
-Cc: Andres Salomon <dilinger@debian.org>
-Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
----
- scripts/package/builddeb |    4 ++--
- 1 files changed, 2 insertions(+), 2 deletions(-)
+I can't think of a good reason why anyone would do such a thing,
+but it used to be possible.
 
-diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-index 9d464fd..6d3b7e5 100644
---- a/scripts/package/builddeb
-+++ b/scripts/package/builddeb
-@@ -114,7 +114,7 @@ maintainer="$name <$email>"
- 
- # Generate a simple changelog template
- cat <<EOF > debian/changelog
--linux ($packageversion) unstable; urgency=low
-+linux-upstream ($packageversion) unstable; urgency=low
- 
-   * Custom built Linux kernel.
- 
-@@ -143,7 +143,7 @@ EOF
- 
- # Generate a control file
- cat <<EOF > debian/control
--Source: linux
-+Source: linux-upstream
- Section: base
- Priority: optional
- Maintainer: $maintainer
--- 
-1.6.3.rc3.40.g75b44
-
+	Arnd <><
