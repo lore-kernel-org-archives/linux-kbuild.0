@@ -1,60 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from wf-out-1314.google.com ([209.85.200.170]:43522 "EHLO
-	wf-out-1314.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751096AbZFFFkj (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 6 Jun 2009 01:40:39 -0400
-Received: by wf-out-1314.google.com with SMTP id 26so860534wfd.4
-        for <linux-kbuild@vger.kernel.org>; Fri, 05 Jun 2009 22:40:41 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20090606051823.GA16127@synapse.neuralscape.com>
-References: <55c333c0906050631y6ca1b676q94dd8ec324c9ba7@mail.gmail.com>
-	 <20090606051823.GA16127@synapse.neuralscape.com>
-Date: Sat, 6 Jun 2009 08:40:39 +0300
-Message-ID: <55c333c0906052240p71168d37q7c1a0b71fbe1f59f@mail.gmail.com>
-Subject: Re: Building a 32 bit on a 64 bit machine.
-From: Kevin Wilson <wkevils@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
+Received: from hera.kernel.org ([140.211.167.34]:53384 "EHLO hera.kernel.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751234AbZFFFoa (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 6 Jun 2009 01:44:30 -0400
+Subject: Re: [PATCH 17/39] kbuild: fix header export when __ASSEMBLY__ is
+ used
+From: Jaswinder Singh Rajput <jaswinder@kernel.org>
+In-Reply-To: <200906060041.07600.arnd@arndb.de>
+References: <20090605233720.GA13588@uranus.ravnborg.org>
+	 <1244245377-17441-17-git-send-email-sam@ravnborg.org>
+	 <200906060041.07600.arnd@arndb.de>
+Content-Type: text/plain
+Date: Sat, 06 Jun 2009 11:15:44 +0530
+Message-Id: <1244267144.2449.29.camel@ht.satnam>
+Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Karen Shaeffer <shaeffer@neuralscape.com>
-Cc: linux-kbuild@vger.kernel.org
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: Sam Ravnborg <sam@ravnborg.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Russell King <rmk+lkml@arm.linux.org.uk>
 
-Hello,
-   I know that using cross compiler is needed when you want to compile
-for different platforms (for example, to build a module for ARM or PPC on intel
-machine).
-I did not mention it, but the machine I am building on is an Intel
-x86_64 machine, and I want to build on it a 32 bit module - also for
-Intel machine.
-So I believe there should be a way to do it with some gcc flag.
+Hello Sam, Russell,
 
-Any ideas ?
+On Sat, 2009-06-06 at 00:41 +0000, Arnd Bergmann wrote:
+> On Friday 05 June 2009 11:42:35 pm Sam Ravnborg wrote:
+> > Because it does not know __ASSEMBLY__ it does not
+> > detect that htis is not for userspace.
+> > This caused too much code to be exported, and headers_check barfed
+> > over this code.
+> > 
+> > For arm this fixes following "make headers_check" warning:
+> > /usr/include/asm/hwcap.h:29: extern's make no sense in userspace
+> 
+> Are you sure that this is safe for all user space? If a user application
+> for instance includes asm/signal.h or asm/types.h from assembly (for
+> whatever reason), it now breaks.
+> 
+> I can't think of a good reason why anyone would do such a thing,
+> but it used to be possible.
+> 
 
-Rgs,
-Kevin
+I also want to add :
 
-On Sat, Jun 6, 2009 at 8:18 AM, Karen Shaeffer<shaeffer@neuralscape.com> wrote:
-> On Fri, Jun 05, 2009 at 04:31:50PM +0300, Kevin Wilson wrote:
->> Hello,
->> I want to build a module I developed for 32 bit on a 64 bit machine.
->> It is on a machine running Fedora.
->>
->> Rgs,
->> Kevin
->
-> Hi Kevin,
-> You need a cross compile tool chain. You can learn about that
-> here:
-> http://cross-lfs.org/view/1.1.0/x86_64/introduction/chapter.html
->
-> You'll also need to port your module to 64 bits.
->
-> Good luck with it,
-> Karen
-> --
->  Karen Shaeffer
->  Neuralscape, Palo Alto, Ca. 94306
->  shaeffer@neuralscape.com  http://www.neuralscape.com
->
+__KERNEL__ and __ASSEMBLY__ is used for specific purpose, please do not
+mix them otherwise it leads to confusion and people will start using
+interchangeably. It seems to me that you are introducing Pink traffic
+light for stoppage so my request is to respect the protocols.
+
+I do not think it is safe and this will screw some user-space apps and
+then later on kernel.
+
+Thanks,
+--
+JSR
+
+
