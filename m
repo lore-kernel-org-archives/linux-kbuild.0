@@ -1,48 +1,83 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from caramon.arm.linux.org.uk ([78.32.30.218]:56826 "EHLO
-	caramon.arm.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751848AbZFFIPH (ORCPT
+Received: from pfepb.post.tele.dk ([195.41.46.236]:45614 "EHLO
+	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752555AbZFFIg2 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 6 Jun 2009 04:15:07 -0400
-Date: Sat, 6 Jun 2009 09:14:53 +0100
-From: Russell King <rmk+lkml@arm.linux.org.uk>
-Subject: Re: [PATCH 17/39] kbuild: fix header export when __ASSEMBLY__ is
-	used
-Message-ID: <20090606081453.GA30463@flint.arm.linux.org.uk>
-References: <20090605233720.GA13588@uranus.ravnborg.org> <1244245377-17441-17-git-send-email-sam@ravnborg.org> <200906060041.07600.arnd@arndb.de> <20090606060552.GA22347@uranus.ravnborg.org>
-MIME-Version: 1.0
+	Sat, 6 Jun 2009 04:36:28 -0400
+Date: Sat, 6 Jun 2009 10:38:44 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: [PATCH 18/39] kbuild/headers_check: refine extern check
+Message-ID: <20090606083844.GA14555@uranus.ravnborg.org>
+References: <20090605233720.GA13588@uranus.ravnborg.org> <1244245377-17441-18-git-send-email-sam@ravnborg.org> <200906060046.07421.arnd@arndb.de>
+Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20090606060552.GA22347@uranus.ravnborg.org>
+In-Reply-To: <200906060046.07421.arnd@arndb.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: Arnd Bergmann <arnd@arndb.de>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Jaswinder Singh Rajput <jaswinder@kernel.org>
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Amerigo Wang <amwang@redhat.com>
 
-On Sat, Jun 06, 2009 at 08:05:52AM +0200, Sam Ravnborg wrote:
-> On Sat, Jun 06, 2009 at 12:41:07AM +0000, Arnd Bergmann wrote:
-> > On Friday 05 June 2009 11:42:35 pm Sam Ravnborg wrote:
-> > > Because it does not know __ASSEMBLY__ it does not
-> > > detect that htis is not for userspace.
-> > > This caused too much code to be exported, and headers_check barfed
-> > > over this code.
-> > > 
-> > > For arm this fixes following "make headers_check" warning:
-> > > /usr/include/asm/hwcap.h:29: extern's make no sense in userspace
+On Sat, Jun 06, 2009 at 12:46:07AM +0000, Arnd Bergmann wrote:
+> On Friday 05 June 2009 11:42:36 pm Sam Ravnborg wrote:
+> > From: Amerigo Wang <amwang@redhat.com>
 > > 
-> > Are you sure that this is safe for all user space? If a user application
-> > for instance includes asm/signal.h or asm/types.h from assembly (for
-> > whatever reason), it now breaks.
+> > 'extern' checking information is not clear, refine it.
+> > Plus, fix a comment.
+> > 
+> > Signed-off-by: WANG Cong <amwang@redhat.com>
+> > Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
 > 
-> I had not thought about this implication.
-> I will drop the patch as this most likely
-> will break some userspace.
+> I still think this is pointless and should just be removed
+> (or replaced with a patch to kill the apostrophe in there).
 
-So now go back and re-read my original email.  I was not suggesting to
-undefine __ASSEMBLY__ - I was more detailed in my _question_ which I
-was making, and there were _two_ possibilities.
+So you wanted me to visit that link...
+I redid it like this:
 
--- 
-Russell King
- Linux kernel    2.6 ARM Linux   - http://www.arm.linux.org.uk/
- maintainer of:
+Subject: kbuild/headers_check: refine extern check
+
+'extern' checking information is not clear, refine it.
+Plus, fix a comment.
+
+Signed-off-by: WANG Cong <amwang@redhat.com>
+[sam: redid the extern error message]
+Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
+---
+diff --git a/scripts/headers_check.pl b/scripts/headers_check.pl
+index 4414c43..db1dd7a 100644
+--- a/scripts/headers_check.pl
++++ b/scripts/headers_check.pl
+@@ -2,7 +2,7 @@
+ #
+ # headers_check.pl execute a number of trivial consistency checks
+ #
+-# Usage: headers_check.pl dir [files...]
++# Usage: headers_check.pl dir arch [files...]
+ # dir:   dir to look for included files
+ # arch:  architecture
+ # files: list of files to check
+@@ -37,7 +37,7 @@ foreach my $file (@files) {
+ 		&check_include();
+ 		&check_asm_types();
+ 		&check_sizetypes();
+-		&check_prototypes();
++		&check_declarations();
+ 		# Dropped for now. Too much noise &check_config();
+ 	}
+ 	close FH;
+@@ -61,10 +61,12 @@ sub check_include
+ 	}
+ }
+ 
+-sub check_prototypes
++sub check_declarations
+ {
+-	if ($line =~ m/^\s*extern\b/) {
+-		printf STDERR "$filename:$lineno: extern's make no sense in userspace\n";
++	if ($line =~m/^\s*extern\b/) {
++		printf STDERR "$filename:$lineno: " .
++		              "userspace cannot call function or variable " .
++		              "defined in the kernel\n";
+ 	}
+ }
+ 
