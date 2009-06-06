@@ -1,39 +1,36 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepb.post.tele.dk ([195.41.46.236]:34116 "EHLO
-	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750721AbZFFGDg (ORCPT
+Received: from pfepa.post.tele.dk ([195.41.46.235]:41301 "EHLO
+	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750721AbZFFGEn (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 6 Jun 2009 02:03:36 -0400
-Date: Sat, 6 Jun 2009 08:05:52 +0200
+	Sat, 6 Jun 2009 02:04:43 -0400
+Date: Sat, 6 Jun 2009 08:06:59 +0200
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH 17/39] kbuild: fix header export when __ASSEMBLY__ is used
-Message-ID: <20090606060552.GA22347@uranus.ravnborg.org>
-References: <20090605233720.GA13588@uranus.ravnborg.org> <1244245377-17441-17-git-send-email-sam@ravnborg.org> <200906060041.07600.arnd@arndb.de>
+Subject: Re: Building a 32 bit on a 64 bit machine.
+Message-ID: <20090606060659.GB22347@uranus.ravnborg.org>
+References: <55c333c0906050631y6ca1b676q94dd8ec324c9ba7@mail.gmail.com> <20090606051823.GA16127@synapse.neuralscape.com> <55c333c0906052240p71168d37q7c1a0b71fbe1f59f@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <200906060041.07600.arnd@arndb.de>
+In-Reply-To: <55c333c0906052240p71168d37q7c1a0b71fbe1f59f@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Russell King <rmk+lkml@arm.linux.org.uk>, Jaswinder Singh Rajput <jaswinder@kernel.org>
+To: Kevin Wilson <wkevils@gmail.com>
+Cc: Karen Shaeffer <shaeffer@neuralscape.com>, linux-kbuild@vger.kernel.org
 
-On Sat, Jun 06, 2009 at 12:41:07AM +0000, Arnd Bergmann wrote:
-> On Friday 05 June 2009 11:42:35 pm Sam Ravnborg wrote:
-> > Because it does not know __ASSEMBLY__ it does not
-> > detect that htis is not for userspace.
-> > This caused too much code to be exported, and headers_check barfed
-> > over this code.
-> > 
-> > For arm this fixes following "make headers_check" warning:
-> > /usr/include/asm/hwcap.h:29: extern's make no sense in userspace
+On Sat, Jun 06, 2009 at 08:40:39AM +0300, Kevin Wilson wrote:
+> Hello,
+>    I know that using cross compiler is needed when you want to compile
+> for different platforms (for example, to build a module for ARM or PPC on intel
+> machine).
+> I did not mention it, but the machine I am building on is an Intel
+> x86_64 machine, and I want to build on it a 32 bit module - also for
+> Intel machine.
+> So I believe there should be a way to do it with some gcc flag.
 > 
-> Are you sure that this is safe for all user space? If a user application
-> for instance includes asm/signal.h or asm/types.h from assembly (for
-> whatever reason), it now breaks.
+> Any ideas ?
 
-I had not thought about this implication.
-I will drop the patch as this most likely
-will break some userspace.
+Your gcc only support 64-bit.
+So you need a cross compiler to build 32 bit x86.
 
 	Sam
