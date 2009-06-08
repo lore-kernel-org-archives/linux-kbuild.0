@@ -1,94 +1,28 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.redhat.com ([66.187.237.31]:33547 "EHLO mx2.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753046AbZFHB3Z (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 7 Jun 2009 21:29:25 -0400
-Message-ID: <4A2C69FD.2030800@redhat.com>
-Date: Mon, 08 Jun 2009 09:31:41 +0800
-From: Amerigo Wang <amwang@redhat.com>
-MIME-Version: 1.0
-Subject: Re: [PATCH 18/39] kbuild/headers_check: refine extern check
-References: <20090605233720.GA13588@uranus.ravnborg.org> <1244245377-17441-18-git-send-email-sam@ravnborg.org> <200906060046.07421.arnd@arndb.de> <20090606083844.GA14555@uranus.ravnborg.org>
-In-Reply-To: <20090606083844.GA14555@uranus.ravnborg.org>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
+Received: from pfepa.post.tele.dk ([195.41.46.235]:38764 "EHLO
+	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751579AbZFHFup (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 8 Jun 2009 01:50:45 -0400
+Date: Mon, 8 Jun 2009 07:53:02 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: [PATCH] kbuild: fix spacing for bzip2 commands
+Message-ID: <20090608055302.GA22656@uranus.ravnborg.org>
+References: <1244360677-26434-1-git-send-email-vapier@gentoo.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1244360677-26434-1-git-send-email-vapier@gentoo.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: Arnd Bergmann <arnd@arndb.de>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
+To: Mike Frysinger <vapier@gentoo.org>
+Cc: linux-kbuild@vger.kernel.org, akpm@linux-foundation.org
 
-Sam Ravnborg wrote:
-> On Sat, Jun 06, 2009 at 12:46:07AM +0000, Arnd Bergmann wrote:
->   
->> On Friday 05 June 2009 11:42:36 pm Sam Ravnborg wrote:
->>     
->>> From: Amerigo Wang <amwang@redhat.com>
->>>
->>> 'extern' checking information is not clear, refine it.
->>> Plus, fix a comment.
->>>
->>> Signed-off-by: WANG Cong <amwang@redhat.com>
->>> Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
->>>       
->> I still think this is pointless and should just be removed
->> (or replaced with a patch to kill the apostrophe in there).
->>     
->
-> So you wanted me to visit that link...
-> I redid it like this:
->
-> Subject: kbuild/headers_check: refine extern check
->
-> 'extern' checking information is not clear, refine it.
-> Plus, fix a comment.
->
-> Signed-off-by: WANG Cong <amwang@redhat.com>
-> [sam: redid the extern error message]
-> Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
->   
+On Sun, Jun 07, 2009 at 03:44:37AM -0400, Mike Frysinger wrote:
+> The current bzip2 command has an extra space before the target:
+>   MODPOST 4 modules
+>   BZIP2    arch/blackfin/boot/vmlinux.bin.bz2
+>   UIMAGE  arch/blackfin/boot/vmImage.bz2
 
-Yeah, after reading Arnd's comments, I agree on this patch.
-
-Thanks, Sam!
-
-> ---
-> diff --git a/scripts/headers_check.pl b/scripts/headers_check.pl
-> index 4414c43..db1dd7a 100644
-> --- a/scripts/headers_check.pl
-> +++ b/scripts/headers_check.pl
-> @@ -2,7 +2,7 @@
->  #
->  # headers_check.pl execute a number of trivial consistency checks
->  #
-> -# Usage: headers_check.pl dir [files...]
-> +# Usage: headers_check.pl dir arch [files...]
->  # dir:   dir to look for included files
->  # arch:  architecture
->  # files: list of files to check
-> @@ -37,7 +37,7 @@ foreach my $file (@files) {
->  		&check_include();
->  		&check_asm_types();
->  		&check_sizetypes();
-> -		&check_prototypes();
-> +		&check_declarations();
->  		# Dropped for now. Too much noise &check_config();
->  	}
->  	close FH;
-> @@ -61,10 +61,12 @@ sub check_include
->  	}
->  }
->  
-> -sub check_prototypes
-> +sub check_declarations
->  {
-> -	if ($line =~ m/^\s*extern\b/) {
-> -		printf STDERR "$filename:$lineno: extern's make no sense in userspace\n";
-> +	if ($line =~m/^\s*extern\b/) {
-> +		printf STDERR "$filename:$lineno: " .
-> +		              "userspace cannot call function or variable " .
-> +		              "defined in the kernel\n";
->  	}
->  }
->  
->   
-
+Applied,
+	Sam
