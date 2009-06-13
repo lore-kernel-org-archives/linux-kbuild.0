@@ -1,57 +1,44 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from BISCAYNE-ONE-STATION.MIT.EDU ([18.7.7.80]:45387 "EHLO
-	biscayne-one-station.mit.edu" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1756533AbZFLOw1 (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 12 Jun 2009 10:52:27 -0400
-Date: Fri, 12 Jun 2009 10:52:06 -0400 (EDT)
-From: Tim Abbott <tabbott@ksplice.com>
-Subject: Re: [PATCH] Improve vmlinux.lds.h support for arch specific linker
- scripts
-In-Reply-To: <20090607185430.GA15299@uranus.ravnborg.org>
-Message-ID: <alpine.DEB.1.10.0906112032560.9154@vinegar-pot.mit.edu>
-References: <20090607185430.GA15299@uranus.ravnborg.org>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+Received: from smtp.gentoo.org ([140.211.166.183]:39719 "EHLO smtp.gentoo.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751375AbZFMLL5 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 13 Jun 2009 07:11:57 -0400
+From: Mike Frysinger <vapier@gentoo.org>
+Subject: [PATCH] scripts/checksyscalls.sh: only whine perf_counter_open when supported
+Date: Sat, 13 Jun 2009 07:11:42 -0400
+Message-Id: <1244891502-12393-1-git-send-email-vapier@gentoo.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Sam Ravnborg <sam@ravnborg.org>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, linux arch <linux-arch@vger.kernel.org>, Anders Kaseorg <andersk@ksplice.com>
+Cc: linux-kbuild@vger.kernel.org
 
-On Sun, 7 Jun 2009, Sam Ravnborg wrote:
+If the port does not support HAVE_PERF_COUNTERS, then they can't support
+the perf_counter_open syscall either.  Rather than forcing everyone to add
+an ignore (or suffer the warning until they get around to implementing
+support), only whine about the syscall when applicable.
 
-> Please review and comment..
-> It will be part of kbuild-next.git
+Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+Acked-by: Ingo Molnar <mingo@elte.hu>
+---
+ scripts/checksyscalls.sh |    5 +++++
+ 1 files changed, 5 insertions(+), 0 deletions(-)
 
-This patch looks great.  I have a few very minor comments.
+diff --git a/scripts/checksyscalls.sh b/scripts/checksyscalls.sh
+index 60d00d1..90fb953 100755
+--- a/scripts/checksyscalls.sh
++++ b/scripts/checksyscalls.sh
+@@ -104,6 +104,11 @@ cat << EOF
+ #define __IGNORE_sync_file_range
+ #endif
+ 
++/* if the port doesn't have support for it yet */
++#ifndef CONFIG_HAVE_PERF_COUNTERS
++#define __IGNORE_perf_counter_open
++#endif
++
+ /* Unmerged syscalls for AFS, STREAMS, etc. */
+ #define __IGNORE_afs_syscall
+ #define __IGNORE_getpmsg
+-- 
+1.6.3.1
 
-> + *	/DISCARD/ : {
-> + *		EXIT_TEXT
-> + *		EXIT_DATA
-> + *		*(.exitcall.exit)
-> + *	}
-
-I recommend adding
-
-#define EXIT_CALL *(.exitcall.exit)
-
-and using it in the DISCARD section of the sample linker script so that 
-the sample linker script doesn't use any raw section names.
-
-> +#define BSS_SECTION(sbss_align, bss_align)				\
-> +	SBSS								\
-> +	BSS(bss_align)							\
-> +	. = ALIGN(4);							\
-
-This macro should end with the 'ALIGN(4);' -- there's an extra backslash 
-at the end of the line.
-
-I recommend changing HEAD_SECTION to HEAD_TEXT_SECTION to better fit the 
-naming scheme.  This would involve deleting the recently added 
-include/linux/section-names.h and going back to hardcoding .head.text in 
-include/linux/init.h (given the way these macros have turned out, 
-include/linux/section-names.h doesn't really make sense).
-
-Also, the commit message misspells 'alignment', 'linker', and 'Abbott'.
-
-	-Tim Abbott
