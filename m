@@ -1,33 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from BISCAYNE-ONE-STATION.MIT.EDU ([18.7.7.80]:34570 "EHLO
-	biscayne-one-station.mit.edu" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1758022AbZFNWPp (ORCPT
+Received: from astoria.ccjclearline.com ([64.235.106.9]:45894 "EHLO
+	astoria.ccjclearline.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753236AbZGENs1 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 14 Jun 2009 18:15:45 -0400
-Date: Sun, 14 Jun 2009 18:15:36 -0400 (EDT)
-From: Tim Abbott <tabbott@ksplice.com>
-Subject: Re: [PATCH] Improve vmlinux.lds.h support for arch specific linker
- scripts
-In-Reply-To: <20090614202244.GA2951@uranus.ravnborg.org>
-Message-ID: <alpine.DEB.1.10.0906141621550.24859@vinegar-pot.mit.edu>
-References: <20090607185430.GA15299@uranus.ravnborg.org> <alpine.DEB.1.10.0906112032560.9154@vinegar-pot.mit.edu> <20090614202244.GA2951@uranus.ravnborg.org>
+	Sun, 5 Jul 2009 09:48:27 -0400
+Received: from cpe002129687b04-cm001225dbafb6.cpe.net.cable.rogers.com ([99.235.241.187] helo=crashcourse.ca)
+	by astoria.ccjclearline.com with esmtpsa (TLSv1:AES256-SHA:256)
+	(Exim 4.69)
+	(envelope-from <rpjday@crashcourse.ca>)
+	id 1MNSWI-0002yO-UA
+	for linux-kbuild@vger.kernel.org; Sun, 05 Jul 2009 10:16:43 -0400
+Date: Sun, 5 Jul 2009 09:46:19 -0400 (EDT)
+From: "Robert P. J. Day" <rpjday@crashcourse.ca>
+Subject: [PATCH] KBUILD:  Correct initramfs compression comment.
+Message-ID: <alpine.LFD.2.00.0907050943170.27170@localhost>
 MIME-Version: 1.0
 Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, linux arch <linux-arch@vger.kernel.org>, Anders Kaseorg <andersk@ksplice.com>
+To: kbuild devel list <linux-kbuild@vger.kernel.org>
 
-On Sun, 14 Jun 2009, Sam Ravnborg wrote:
 
-> On Fri, Jun 12, 2009 at 10:52:06AM -0400, Tim Abbott wrote:
-> > This patch looks great.  I have a few very minor comments.
-> I fixed the above in a separate commit, so
+Fix the Makefile comment since bzip2 is now supported.
 
-I've looked at the new commit in kbuild-next.git, and it looks good.  You 
-should feel free to add my ack to both patches (or a combined patch if 
-they end up being squashed together).
+Signed-off-by: Robert P. J. Day <rpjday@crashcourse.ca>
 
-Acked-by: Tim Abbott <tabbott@ksplice.com>
+---
 
-	-Tim Abbott
+diff --git a/usr/Makefile b/usr/Makefile
+index 245145a..1e6a9e4 100644
+--- a/usr/Makefile
++++ b/usr/Makefile
+@@ -6,7 +6,7 @@ klibcdirs:;
+ PHONY += klibcdirs
+
+
+-# Gzip, but no bzip2
++# Gzip
+ suffix_$(CONFIG_INITRAMFS_COMPRESSION_GZIP)   = .gz
+
+ # Bzip2
+
+
+========================================================================
+Robert P. J. Day                               Waterloo, Ontario, CANADA
+
+        Linux Consulting, Training and Annoying Kernel Pedantry.
+
+Web page:                                          http://crashcourse.ca
+Linked In:                             http://www.linkedin.com/in/rpjday
+Twitter:                                       http://twitter.com/rpjday
+========================================================================
