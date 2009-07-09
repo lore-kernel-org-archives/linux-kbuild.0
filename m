@@ -1,57 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pz0-f175.google.com ([209.85.222.175]:57844 "EHLO
-	mail-pz0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1758638AbZGICgv (ORCPT
+Received: from smtpq3.gn.mail.iss.as9143.net ([212.54.34.166]:49237 "EHLO
+	smtpq3.gn.mail.iss.as9143.net" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1753532AbZGII07 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 8 Jul 2009 22:36:51 -0400
-Date: Thu, 9 Jul 2009 10:38:55 +0800
-From: Amerigo Wang <xiyou.wangcong@gmail.com>
+	Thu, 9 Jul 2009 04:26:59 -0400
+Date: Thu, 9 Jul 2009 10:26:51 +0200
+From: Dick Streefland <dick@streefland.net>
 Subject: Re: [PATCH] kconfig: simplification of scripts/extract-ikconfig
-Message-ID: <20090709023855.GA5648@cr0.nay.redhat.com>
-References: <20090623225245.GA10443@streefland.net> <20090624021506.GA5871@cr0.nay.redhat.com> <20090624114607.GA10817@streefland.net> <20090624133148.GA12878@streefland.net> <20090629025146.GA5998@cr0.nay.redhat.com> <20090629113613.GA6853@streefland.net>
+Message-ID: <20090709082651.GA6165@streefland.net>
+References: <20090623225245.GA10443@streefland.net> <20090624021506.GA5871@cr0.nay.redhat.com> <20090624114607.GA10817@streefland.net> <20090624133148.GA12878@streefland.net> <20090629025146.GA5998@cr0.nay.redhat.com> <20090629113613.GA6853@streefland.net> <20090709023855.GA5648@cr0.nay.redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20090629113613.GA6853@streefland.net>
+In-Reply-To: <20090709023855.GA5648@cr0.nay.redhat.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Dick Streefland <dick@streefland.net>
-Cc: Amerigo Wang <xiyou.wangcong@gmail.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Amerigo Wang <xiyou.wangcong@gmail.com>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Mon, Jun 29, 2009 at 01:36:13PM +0200, Dick Streefland wrote:
->On Monday 2009-06-29 10:51, Amerigo Wang wrote:
->| Does this work?
->| My quick test shows no...
->| 
->| I still can't get the right offset number with this trick.
->| 
->| P.S. My grep is 2.5.1.
->
->I've tested the script with grep 2.5.1, and it works for me. Can you be
->more specific about what you think is wrong with the offsets? You need
->to be aware of the fact that because "tr" replaces the first character
->of the pattern by a newline, an offset will be 1 higher than the start
->of the original pattern. The resulting offsets are therefore 1-based
->instead of 0-based, which is exactly what "tail" expects for the "-c"
->option.
+On Thursday 2009-07-09 10:38, Amerigo Wang wrote:
+| I appologize for my delay, I totally missed this thread, sorry.
+| 
+| I just tested it, it works! So,
+| 
+| Tested-by: WANG Cong <xiyou.wangcong@gmail.com>
 
-Hi,
+Great, thanks.
 
-I appologize for my delay, I totally missed this thread, sorry.
+| But, I still don't understand the behavior of 'grep -abo',
+| please try the following commands:
+| 
+| echo -e '\x01\x02\x03\x04' > test.bin
+| od -x test.bin
+| tr $'\x01\x02\x03\x04' '1234' < test.bin | grep -abo '4'
+| 
+| Am I missing something here??
 
-I just tested it, it works! So,
+The output with grep-2.5.3 is 3:4, which means that the string "4" was
+found at offset 3 (0-based). With grep-2.5.1, you get 0:4, which means
+that the line containing the string "4" has offset 0. The "tr" commands
+in the script ensure that the patterns we are looking for are always at
+the start of a line, so that it doesn't matter which version of grep is
+installed.
 
-Tested-by: WANG Cong <xiyou.wangcong@gmail.com>
-
-
-But, I still don't understand the behavior of 'grep -abo',
-please try the following commands:
-
-echo -e '\x01\x02\x03\x04' > test.bin
-od -x test.bin
-tr $'\x01\x02\x03\x04' '1234' < test.bin | grep -abo '4'
-
-
-Am I missing something here??
-
-Thanks.
+-- 
+Dick
