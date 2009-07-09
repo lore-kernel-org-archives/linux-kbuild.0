@@ -1,47 +1,64 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtpq3.gn.mail.iss.as9143.net ([212.54.34.166]:49237 "EHLO
-	smtpq3.gn.mail.iss.as9143.net" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1753532AbZGII07 (ORCPT
+Received: from bhuna.collabora.co.uk ([93.93.131.97]:55925 "EHLO
+	bhuna.collabora.co.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753715AbZGIV4L (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 9 Jul 2009 04:26:59 -0400
-Date: Thu, 9 Jul 2009 10:26:51 +0200
-From: Dick Streefland <dick@streefland.net>
-Subject: Re: [PATCH] kconfig: simplification of scripts/extract-ikconfig
-Message-ID: <20090709082651.GA6165@streefland.net>
-References: <20090623225245.GA10443@streefland.net> <20090624021506.GA5871@cr0.nay.redhat.com> <20090624114607.GA10817@streefland.net> <20090624133148.GA12878@streefland.net> <20090629025146.GA5998@cr0.nay.redhat.com> <20090629113613.GA6853@streefland.net> <20090709023855.GA5648@cr0.nay.redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20090709023855.GA5648@cr0.nay.redhat.com>
+	Thu, 9 Jul 2009 17:56:11 -0400
+Date: Thu, 9 Jul 2009 17:49:08 -0400
+From: Andres Salomon <dilinger@collabora.co.uk>
+Subject: Re: [PATCH] kbuild: deb-pkg fix install scripts for posix sh
+Message-ID: <20090709174908.40e8031c@mycelium.queued.net>
+In-Reply-To: <1246817854-27396-1-git-send-email-max@stro.at>
+References: <1246817854-27396-1-git-send-email-max@stro.at>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Amerigo Wang <xiyou.wangcong@gmail.com>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: maximilian attems <max@stro.at>
+Cc: linux-kbuild@vger.kernel.org, sam@ravnborg.org, Frans Pop <elendil@planet.nl>, linux-kernel@vger.kernel.org
 
-On Thursday 2009-07-09 10:38, Amerigo Wang wrote:
-| I appologize for my delay, I totally missed this thread, sorry.
-| 
-| I just tested it, it works! So,
-| 
-| Tested-by: WANG Cong <xiyou.wangcong@gmail.com>
+On Sun,  5 Jul 2009 20:17:34 +0200
+maximilian attems <max@stro.at> wrote:
 
-Great, thanks.
+> bash versus dash and posh disagree on expanding $@ within double
+> quotes: export x="$@"
+> see http://bugs.debian.org/381091 for details
+> just use the arglist with $*.
+> 
+> dpkg: error processing linux-image-2.6.31-rc1_2.6.31-rc1-18_i386.deb
+> (--install): subprocess pre-installation script returned error exit
+> status 2 export: 6: 2.6.31-rc1-18: bad variable name
+> fixes http://bugzilla.kernel.org/show_bug.cgi?id=13567
+> 
+> seen on Ubuntu as there dash is the default sh,
+> versus bash on Debian.
+> 
 
-| But, I still don't understand the behavior of 'grep -abo',
-| please try the following commands:
-| 
-| echo -e '\x01\x02\x03\x04' > test.bin
-| od -x test.bin
-| tr $'\x01\x02\x03\x04' '1234' < test.bin | grep -abo '4'
-| 
-| Am I missing something here??
+Acked-By: Andres Salomon <dilinger@collabora.co.uk>
 
-The output with grep-2.5.3 is 3:4, which means that the string "4" was
-found at offset 3 (0-based). With grep-2.5.1, you get 0:4, which means
-that the line containing the string "4" has offset 0. The "tr" commands
-in the script ensure that the patterns we are looking for are always at
-the start of a line, so that it doesn't matter which version of grep is
-installed.
+This should be applied ASAP, as it breaks things for every
+ubuntu user who attempts to use 'make deb-pkg'.
 
--- 
-Dick
+
+> Reported-by: Pauli <suokkos@gmail.com>
+> Cc: Frans Pop <elendil@planet.nl>
+> Cc: Andres Salomon <dilinger@debian.org>
+> Signed-off-by: maximilian attems <max@stro.at>
+> ---
+>  scripts/package/builddeb |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
+> 
+> diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+> index b19f1f4..8b357b0 100644
+> --- a/scripts/package/builddeb
+> +++ b/scripts/package/builddeb
+> @@ -89,7 +89,7 @@ for script in postinst postrm preinst prerm ; do
+>  set -e
+>  
+>  # Pass maintainer script parameters to hook scripts
+> -export DEB_MAINT_PARAMS="\$@"
+> +export DEB_MAINT_PARAMS="\$*"
+>  
+>  test -d $debhookdir/$script.d && run-parts --arg="$version"
+> $debhookdir/$script.d exit 0
