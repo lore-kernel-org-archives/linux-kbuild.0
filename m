@@ -1,53 +1,31 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-px0-f193.google.com ([209.85.216.193]:52038 "EHLO
-	mail-px0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750765AbZGJHxW (ORCPT
+Received: from smtpq3.gn.mail.iss.as9143.net ([212.54.34.166]:48649 "EHLO
+	smtpq3.gn.mail.iss.as9143.net" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1750941AbZGJJyh (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 10 Jul 2009 03:53:22 -0400
-Date: Fri, 10 Jul 2009 15:55:30 +0800
-From: Amerigo Wang <xiyou.wangcong@gmail.com>
+	Fri, 10 Jul 2009 05:54:37 -0400
+Date: Fri, 10 Jul 2009 11:54:32 +0200
+From: Dick Streefland <dick@streefland.net>
 Subject: Re: [PATCH] kconfig: simplification of scripts/extract-ikconfig
-Message-ID: <20090710075530.GB6263@cr0.nay.redhat.com>
-References: <20090623225245.GA10443@streefland.net> <20090624021506.GA5871@cr0.nay.redhat.com> <20090624114607.GA10817@streefland.net> <20090624133148.GA12878@streefland.net> <20090629025146.GA5998@cr0.nay.redhat.com> <20090629113613.GA6853@streefland.net> <20090709023855.GA5648@cr0.nay.redhat.com> <20090709082651.GA6165@streefland.net>
+Message-ID: <20090710095432.GA9721@streefland.net>
+References: <20090623225245.GA10443@streefland.net> <20090624021506.GA5871@cr0.nay.redhat.com> <20090624114607.GA10817@streefland.net> <20090624133148.GA12878@streefland.net> <20090629025146.GA5998@cr0.nay.redhat.com> <20090629113613.GA6853@streefland.net> <20090709023855.GA5648@cr0.nay.redhat.com> <20090709082651.GA6165@streefland.net> <20090710075530.GB6263@cr0.nay.redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20090709082651.GA6165@streefland.net>
+In-Reply-To: <20090710075530.GB6263@cr0.nay.redhat.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Dick Streefland <dick@streefland.net>
-Cc: Amerigo Wang <xiyou.wangcong@gmail.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Amerigo Wang <xiyou.wangcong@gmail.com>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Thu, Jul 09, 2009 at 10:26:51AM +0200, Dick Streefland wrote:
->On Thursday 2009-07-09 10:38, Amerigo Wang wrote:
->| I appologize for my delay, I totally missed this thread, sorry.
->| 
->| I just tested it, it works! So,
->| 
->| Tested-by: WANG Cong <xiyou.wangcong@gmail.com>
->
->Great, thanks.
->
->| But, I still don't understand the behavior of 'grep -abo',
->| please try the following commands:
->| 
->| echo -e '\x01\x02\x03\x04' > test.bin
->| od -x test.bin
->| tr $'\x01\x02\x03\x04' '1234' < test.bin | grep -abo '4'
->| 
->| Am I missing something here??
->
->The output with grep-2.5.3 is 3:4, which means that the string "4" was
->found at offset 3 (0-based). With grep-2.5.1, you get 0:4, which means
->that the line containing the string "4" has offset 0. The "tr" commands
->in the script ensure that the patterns we are looking for are always at
->the start of a line, so that it doesn't matter which version of grep is
->installed.
+On Friday 2009-07-10 15:55, Amerigo Wang wrote:
+| Have you checked other version of grep? I mean lower version, of course,
+| does your script work with them too?
 
-Hmm, I see, it is really a _big_ change. :)
+The script works with all grep versions since 2.5, released 2002-03-13,
+where the -o option was added. The config extraction feature was
+introduced in Linux 2.6.8, released 2004-08-14, so I don't think this
+dependency will be a problem.
 
-Have you checked other version of grep? I mean lower version, of course,
-does your script work with them too?
-
-Thank you!
-
+-- 
+Dick
