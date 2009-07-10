@@ -1,64 +1,99 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bhuna.collabora.co.uk ([93.93.131.97]:55925 "EHLO
-	bhuna.collabora.co.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753715AbZGIV4L (ORCPT
+Received: from cpsmtpm-eml110.kpnxchange.com ([195.121.3.14]:56808 "EHLO
+	CPSMTPM-EML110.kpnxchange.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1750765AbZGJH2K (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 9 Jul 2009 17:56:11 -0400
-Date: Thu, 9 Jul 2009 17:49:08 -0400
-From: Andres Salomon <dilinger@collabora.co.uk>
-Subject: Re: [PATCH] kbuild: deb-pkg fix install scripts for posix sh
-Message-ID: <20090709174908.40e8031c@mycelium.queued.net>
-In-Reply-To: <1246817854-27396-1-git-send-email-max@stro.at>
-References: <1246817854-27396-1-git-send-email-max@stro.at>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+	Fri, 10 Jul 2009 03:28:10 -0400
+From: Frans Pop <elendil@planet.nl>
+Subject: Re: [Bug 13012] 2.6.28.9 causes init to segfault on Debian etch; 2.6.28.8 OK
+Date: Fri, 10 Jul 2009 09:28:05 +0200
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="utf-8"
 Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+Message-Id: <200907100928.07369.elendil@planet.nl>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: maximilian attems <max@stro.at>
-Cc: linux-kbuild@vger.kernel.org, sam@ravnborg.org, Frans Pop <elendil@planet.nl>, linux-kernel@vger.kernel.org
+To: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Cc: akpm@linux-foundation.org, torvalds@linux-foundation.org, linux-kbuild@vger.kernel.org, barryn@pobox.com, bugme-daemon@bugzilla.kernel.org
 
-On Sun,  5 Jul 2009 20:17:34 +0200
-maximilian attems <max@stro.at> wrote:
+On Thu, 9 Apr 2009, Linus Torvalds wrote:
+> On Thu, 9 Apr 2009, Andrew Morton wrote:
+> > -fwrapv killed Barry's gcc-4.1.2-compiled kernel in 2.6.27.x,
+> > 2.6.28.x and presumably 2.6.29, 2.6.30.
+>
+> Auughh. I hate compiler bugs. They're horrible to debug.
+>
+> I _think_ 'fwrapv' only really matters with gcc-4.3, so maybe we could
+> just enable it for new versions.
+>
+> HOWEVER, I also wonder if we could instead of "-fwrapv" use
+> "-fno-strict-overflow". They are apparently subtly different, and maybe
+> the bug literally only happens with -fwrapv.
+>
+> Barry, can you see if that simple "replace -fwrapv with
+> -fno-strict-overflow" works for you?
+>
+> Or just go with Barry's helpful debugging:
+> > > I also noticed that the problem only happens with some gcc's:
+> > >
+> > > Problem occurs:
+> > > gcc (GCC) 4.1.2 20061115 (prerelease) (Debian 4.1.1-21)
+> > > gcc-4.1 (GCC) 4.1.3 20080704 (prerelease) (Debian 4.1.2-25)
+> > >
+> > > Problem does not occur (i.e. 2.6.28.9 works and I don't have to
+> > > revert anything):
+> > > gcc-4.2 (GCC) 4.2.4 (Debian 4.2.4-6)
+> > > gcc (Debian 4.3.2-1.1) 4.3.2
+>
+> and consider 4.2 to be the point where it's ok.
+>
+> Do we have some gcc developer who
+>  (a) knows what the rules are
+> and
+>  (b) might even help us figure out where the bug occurs?
 
-> bash versus dash and posh disagree on expanding $@ within double
-> quotes: export x="$@"
-> see http://bugs.debian.org/381091 for details
-> just use the arglist with $*.
-> 
-> dpkg: error processing linux-image-2.6.31-rc1_2.6.31-rc1-18_i386.deb
-> (--install): subprocess pre-installation script returned error exit
-> status 2 export: 6: 2.6.31-rc1-18: bad variable name
-> fixes http://bugzilla.kernel.org/show_bug.cgi?id=13567
-> 
-> seen on Ubuntu as there dash is the default sh,
-> versus bash on Debian.
-> 
+The discussion on issue looks to have died, but it has bitten Debian 
+stable ("Lenny") [1] as it causes init to die on s390 after a kernel 
+update.
 
-Acked-By: Andres Salomon <dilinger@collabora.co.uk>
+Here's a possible patch. The exact gcc version to check for is still a bit 
+open I guess. For the s390 issue I've confirmed that 4.2.4 is OK, but for 
+safety and because of Andrew's comment above I've set the test for 4.3 in 
+the patch.
 
-This should be applied ASAP, as it breaks things for every
-ubuntu user who attempts to use 'make deb-pkg'.
+Cheers,
+FJP
 
+[1] http://bugs.debian.org/536354
 
-> Reported-by: Pauli <suokkos@gmail.com>
-> Cc: Frans Pop <elendil@planet.nl>
-> Cc: Andres Salomon <dilinger@debian.org>
-> Signed-off-by: maximilian attems <max@stro.at>
-> ---
->  scripts/package/builddeb |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
-> 
-> diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-> index b19f1f4..8b357b0 100644
-> --- a/scripts/package/builddeb
-> +++ b/scripts/package/builddeb
-> @@ -89,7 +89,7 @@ for script in postinst postrm preinst prerm ; do
->  set -e
->  
->  # Pass maintainer script parameters to hook scripts
-> -export DEB_MAINT_PARAMS="\$@"
-> +export DEB_MAINT_PARAMS="\$*"
->  
->  test -d $debhookdir/$script.d && run-parts --arg="$version"
-> $debhookdir/$script.d exit 0
+---
+From: Frans Pop <elendil@planet.nl>
+Subject: Only add '-fwrapv' to gcc CFLAGS for gcc 4.3 and later
+
+This flag has been shown to cause init to segfault for kernels
+compiled with gcc-4.1. gcc version 4.2.4 has been shown to be OK,
+but as there is some uncertainty the flag is only added for 4.3
+and later.
+
+This fixes http://bugzilla.kernel.org/show_bug.cgi?id=13012.
+
+Reported-by: Barry K. Nathan <barryn@pobox.com>
+Signed-off-by: Frans Pop <elendil@planet.nl>
+
+diff --git a/Makefile b/Makefile
+index 0aeec59..2f8756e 100644
+--- a/Makefile
++++ b/Makefile
+@@ -565,7 +565,8 @@ KBUILD_CFLAGS += $(call 
+cc-option,-Wdeclaration-after-statement,)
+ KBUILD_CFLAGS += $(call cc-option,-Wno-pointer-sign,)
+ 
+ # disable invalid "can't wrap" optimizations for signed / pointers
+-KBUILD_CFLAGS	+= $(call cc-option,-fwrapv)
++KBUILD_CFLAGS  += $(shell if [ $(call cc-version) -ge 0430 ]; then \
++		    echo $(call cc-option,-fwrapv); fi ;)
+ 
+ # revert to pre-gcc-4.4 behaviour of .eh_frame
+ KBUILD_CFLAGS	+= $(call cc-option,-fno-dwarf2-cfi-asm)
