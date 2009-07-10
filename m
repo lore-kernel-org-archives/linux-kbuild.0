@@ -1,99 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cpsmtpm-eml110.kpnxchange.com ([195.121.3.14]:56808 "EHLO
-	CPSMTPM-EML110.kpnxchange.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1750765AbZGJH2K (ORCPT
+Received: from mail-px0-f193.google.com ([209.85.216.193]:52038 "EHLO
+	mail-px0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750765AbZGJHxW (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 10 Jul 2009 03:28:10 -0400
-From: Frans Pop <elendil@planet.nl>
-Subject: Re: [Bug 13012] 2.6.28.9 causes init to segfault on Debian etch; 2.6.28.8 OK
-Date: Fri, 10 Jul 2009 09:28:05 +0200
+	Fri, 10 Jul 2009 03:53:22 -0400
+Date: Fri, 10 Jul 2009 15:55:30 +0800
+From: Amerigo Wang <xiyou.wangcong@gmail.com>
+Subject: Re: [PATCH] kconfig: simplification of scripts/extract-ikconfig
+Message-ID: <20090710075530.GB6263@cr0.nay.redhat.com>
+References: <20090623225245.GA10443@streefland.net> <20090624021506.GA5871@cr0.nay.redhat.com> <20090624114607.GA10817@streefland.net> <20090624133148.GA12878@streefland.net> <20090629025146.GA5998@cr0.nay.redhat.com> <20090629113613.GA6853@streefland.net> <20090709023855.GA5648@cr0.nay.redhat.com> <20090709082651.GA6165@streefland.net>
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="utf-8"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Message-Id: <200907100928.07369.elendil@planet.nl>
+In-Reply-To: <20090709082651.GA6165@streefland.net>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Cc: akpm@linux-foundation.org, torvalds@linux-foundation.org, linux-kbuild@vger.kernel.org, barryn@pobox.com, bugme-daemon@bugzilla.kernel.org
+To: Dick Streefland <dick@streefland.net>
+Cc: Amerigo Wang <xiyou.wangcong@gmail.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Thu, 9 Apr 2009, Linus Torvalds wrote:
-> On Thu, 9 Apr 2009, Andrew Morton wrote:
-> > -fwrapv killed Barry's gcc-4.1.2-compiled kernel in 2.6.27.x,
-> > 2.6.28.x and presumably 2.6.29, 2.6.30.
+On Thu, Jul 09, 2009 at 10:26:51AM +0200, Dick Streefland wrote:
+>On Thursday 2009-07-09 10:38, Amerigo Wang wrote:
+>| I appologize for my delay, I totally missed this thread, sorry.
+>| 
+>| I just tested it, it works! So,
+>| 
+>| Tested-by: WANG Cong <xiyou.wangcong@gmail.com>
 >
-> Auughh. I hate compiler bugs. They're horrible to debug.
+>Great, thanks.
 >
-> I _think_ 'fwrapv' only really matters with gcc-4.3, so maybe we could
-> just enable it for new versions.
+>| But, I still don't understand the behavior of 'grep -abo',
+>| please try the following commands:
+>| 
+>| echo -e '\x01\x02\x03\x04' > test.bin
+>| od -x test.bin
+>| tr $'\x01\x02\x03\x04' '1234' < test.bin | grep -abo '4'
+>| 
+>| Am I missing something here??
 >
-> HOWEVER, I also wonder if we could instead of "-fwrapv" use
-> "-fno-strict-overflow". They are apparently subtly different, and maybe
-> the bug literally only happens with -fwrapv.
->
-> Barry, can you see if that simple "replace -fwrapv with
-> -fno-strict-overflow" works for you?
->
-> Or just go with Barry's helpful debugging:
-> > > I also noticed that the problem only happens with some gcc's:
-> > >
-> > > Problem occurs:
-> > > gcc (GCC) 4.1.2 20061115 (prerelease) (Debian 4.1.1-21)
-> > > gcc-4.1 (GCC) 4.1.3 20080704 (prerelease) (Debian 4.1.2-25)
-> > >
-> > > Problem does not occur (i.e. 2.6.28.9 works and I don't have to
-> > > revert anything):
-> > > gcc-4.2 (GCC) 4.2.4 (Debian 4.2.4-6)
-> > > gcc (Debian 4.3.2-1.1) 4.3.2
->
-> and consider 4.2 to be the point where it's ok.
->
-> Do we have some gcc developer who
->  (a) knows what the rules are
-> and
->  (b) might even help us figure out where the bug occurs?
+>The output with grep-2.5.3 is 3:4, which means that the string "4" was
+>found at offset 3 (0-based). With grep-2.5.1, you get 0:4, which means
+>that the line containing the string "4" has offset 0. The "tr" commands
+>in the script ensure that the patterns we are looking for are always at
+>the start of a line, so that it doesn't matter which version of grep is
+>installed.
 
-The discussion on issue looks to have died, but it has bitten Debian 
-stable ("Lenny") [1] as it causes init to die on s390 after a kernel 
-update.
+Hmm, I see, it is really a _big_ change. :)
 
-Here's a possible patch. The exact gcc version to check for is still a bit 
-open I guess. For the s390 issue I've confirmed that 4.2.4 is OK, but for 
-safety and because of Andrew's comment above I've set the test for 4.3 in 
-the patch.
+Have you checked other version of grep? I mean lower version, of course,
+does your script work with them too?
 
-Cheers,
-FJP
+Thank you!
 
-[1] http://bugs.debian.org/536354
-
----
-From: Frans Pop <elendil@planet.nl>
-Subject: Only add '-fwrapv' to gcc CFLAGS for gcc 4.3 and later
-
-This flag has been shown to cause init to segfault for kernels
-compiled with gcc-4.1. gcc version 4.2.4 has been shown to be OK,
-but as there is some uncertainty the flag is only added for 4.3
-and later.
-
-This fixes http://bugzilla.kernel.org/show_bug.cgi?id=13012.
-
-Reported-by: Barry K. Nathan <barryn@pobox.com>
-Signed-off-by: Frans Pop <elendil@planet.nl>
-
-diff --git a/Makefile b/Makefile
-index 0aeec59..2f8756e 100644
---- a/Makefile
-+++ b/Makefile
-@@ -565,7 +565,8 @@ KBUILD_CFLAGS += $(call 
-cc-option,-Wdeclaration-after-statement,)
- KBUILD_CFLAGS += $(call cc-option,-Wno-pointer-sign,)
- 
- # disable invalid "can't wrap" optimizations for signed / pointers
--KBUILD_CFLAGS	+= $(call cc-option,-fwrapv)
-+KBUILD_CFLAGS  += $(shell if [ $(call cc-version) -ge 0430 ]; then \
-+		    echo $(call cc-option,-fwrapv); fi ;)
- 
- # revert to pre-gcc-4.4 behaviour of .eh_frame
- KBUILD_CFLAGS	+= $(call cc-option,-fno-dwarf2-cfi-asm)
