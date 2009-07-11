@@ -1,18 +1,38 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from host128-69-dynamic.50-79-r.retail.telecomitalia.it ([79.50.69.128]:3593
-	"HELO oyhvjm.telecomitalia.it" rhost-flags-OK-OK-OK-FAIL)
-	by vger.kernel.org with SMTP id S1757282AbZGJWAO (ORCPT
+Received: from hati.oit.pdx.edu ([131.252.120.59]:41401 "EHLO hati.oit.pdx.edu"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751930AbZGLBuI convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 10 Jul 2009 18:00:14 -0400
-Date: Thu, 09 Jul 2009 21:59:21 +0100
-Message-ID: <1dc4212330eb1eab53c98920090710215145@combidem.com>
-From: Laker Muna <reproductive@combidem.com>
-Content-Type: text/plain;
- charset="windows-1254"
+	Sat, 11 Jul 2009 21:50:08 -0400
+Message-ID: <20090711124927.6ccdiapb40sookkg@webmail.pdx.edu>
+Date: Sat, 11 Jul 2009 12:49:27 -0700
+From: MITSUBISHI COMPANY UK <info@mitsubihi.co.uk>
+Reply-to: infomitscombonanza@googlemail.com
+Subject: Your E-mail Attach To 2009 Anniversary Bonanza
 MIME-Version: 1.0
-Subject: sporophyte
+Content-Type: text/plain;
+	charset=ISO-8859-1;
+	DelSp="Yes";
+	format="flowed"
+Content-Disposition: inline
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
 
-The Missing Piece to Extraordinary Orgasms - Cunniillngus www.ma29. net. Worl'ds smallest country up ofr sale
+
+
+MITSUBISHI COMPANY UK.
+28 TANFIELD ROAD,LONDON, UK.
+
+You have just been awarded,the sum of  £870.000.00 in the  MITSUBISHI COMPANY
+Award 2009, Anniversary Bonanza. held in July.
+
+Names:............. Address:..............
+Country:................ Age:..........
+Phone Number............ Occupation.......Sex
+
+Regards.Felke Courtney.
+Online Co-ordinator.
+
+
+
