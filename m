@@ -1,38 +1,32 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from hati.oit.pdx.edu ([131.252.120.59]:41401 "EHLO hati.oit.pdx.edu"
+Received: from hera.kernel.org ([140.211.167.34]:53895 "EHLO hera.kernel.org"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751930AbZGLBuI convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 11 Jul 2009 21:50:08 -0400
-Message-ID: <20090711124927.6ccdiapb40sookkg@webmail.pdx.edu>
-Date: Sat, 11 Jul 2009 12:49:27 -0700
-From: MITSUBISHI COMPANY UK <info@mitsubihi.co.uk>
-Reply-to: infomitscombonanza@googlemail.com
-Subject: Your E-mail Attach To 2009 Anniversary Bonanza
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset=ISO-8859-1;
-	DelSp="Yes";
-	format="flowed"
-Content-Disposition: inline
-Content-Transfer-Encoding: 8BIT
+	id S1751058AbZGLILz (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 12 Jul 2009 04:11:55 -0400
+From: Cheng Renquan <crq@kernel.org>
+Subject: [PATCH 0/6] kbuild configuration system improvements
+Date: Sun, 12 Jul 2009 16:11:42 +0800
+Message-Id: <1247386308-19628-1-git-send-email-crq@kernel.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
+To: linux-kbuild@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>
+Cc: Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org, crquan@gmail.com
 
+From: Cheng Renquan <crquan@gmail.com>
 
+These patches improve usability of kernel configuration system,
 
-MITSUBISHI COMPANY UK.
-28 TANFIELD ROAD,LONDON, UK.
+1. add symbol's value shown accompanied in config item's help message;
+2. move the real plumbing functions code from mconf.c to menu.c, make them
+   be able to be shared with other configuration methods;
+3. add "symbol's value shown" support for gconfig/xconfig/config;
 
-You have just been awarded,the sum of  £870.000.00 in the  MITSUBISHI COMPANY
-Award 2009, Anniversary Bonanza. held in July.
+    0001-add-symbol-value-to-help-find-the-real-depend.patch
+    0002-add-menu_get_ext_help-function-to-display-more-infor.patch
+    0003-menuconfig-improvements.patch
+    0004-make-use-of-menu_get_ext_help-in-gconfig.patch
+    0005-make-use-of-menu_get_ext_help-in-qconfig.patch
+    0006-make-use-of-menu_get_ext_help-in-make-config.patch
 
-Names:............. Address:..............
-Country:................ Age:..........
-Phone Number............ Occupation.......Sex
-
-Regards.Felke Courtney.
-Online Co-ordinator.
-
-
-
+--
+Cheng Renquan
