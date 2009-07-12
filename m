@@ -1,142 +1,79 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from hera.kernel.org ([140.211.167.34]:53913 "EHLO hera.kernel.org"
+Received: from aun.it.uu.se ([130.238.12.36]:42461 "EHLO aun.it.uu.se"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753060AbZGLIM3 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 12 Jul 2009 04:12:29 -0400
-From: Cheng Renquan <crq@kernel.org>
-Subject: [PATCH 2/6] add menu_get_ext_help function to display more information
-Date: Sun, 12 Jul 2009 16:11:44 +0800
-Message-Id: <1247386308-19628-3-git-send-email-crq@kernel.org>
+	id S1752108AbZGLKZ2 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 12 Jul 2009 06:25:28 -0400
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+Message-ID: <19033.46146.685018.240686@pilspetsen.it.uu.se>
+Date: Sun, 12 Jul 2009 12:00:34 +0200
+From: Mikael Pettersson <mikpe@it.uu.se>
+Subject: Re: [PATCH 1/6] add symbol value to help find the real depend
 In-Reply-To: <1247386308-19628-2-git-send-email-crq@kernel.org>
 References: <1247386308-19628-1-git-send-email-crq@kernel.org>
- <1247386308-19628-2-git-send-email-crq@kernel.org>
+	<1247386308-19628-2-git-send-email-crq@kernel.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>
-Cc: Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org, crquan@gmail.com
+To: Cheng Renquan <crq@kernel.org>
+Cc: linux-kbuild@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>, Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org, crquan@gmail.com
 
-From: Cheng Renquan <crquan@gmail.com>
+Cheng Renquan writes:
+ > From: Cheng Renquan <crquan@gmail.com>
+ > 
+ > kbuild-menuconfig-display-depend-value.patch
+ > 
+ > Sometimes when configuring need to disable some unused item, but the item is
+ > selected by many other items, it's hard to find the real dependency which
+ > selected it, This patch add every symbol's value accompanied to make it
+ > possible to find the real dependency easily.
+ > 
+ > An example is CONFIG_RFKILL,
+ > 
+ >   ---------------------- RF switch subsystem support ----------------------
+ >   | CONFIG_RFKILL:                                                        |
+ >   |                                                                       |
+ >   | Say Y here if you want to have control over RF switches               |
+ >   | found on many WiFi and Bluetooth cards.                               |
+ >   |                                                                       |
+ >   | To compile this driver as a module, choose M here: the                |
+ >   | module will be called rfkill.                                         |
+ >   |                                                                       |
+ >   | Symbol: RFKILL [=m]                                                   |
+ >   | Prompt: RF switch subsystem support                                   |
+ >   |   Defined at net/rfkill/Kconfig:4                                     |
+ >   |   Depends on: NET [=y]                                                |
+ >   |   Location:                                                           |
+ >   |     -> Networking support (NET [=y])                                  |
+ >   |   Selected by: IWLCORE [=n] && NETDEVICES [=y] && !S390 [=S390] && PC |
+ >   |                                                                       |
+ >   ----------------------------------------------------------------( 99%)---
 
-The three functions are moved from mconf.c, then they can be shared in
-all menuconfig & gconfig & xconfig & config.
+I like this concept, but I'd like to see it supported with make oldconfig.
+Let's say I copy a .config from kernel X into kernel Y (Y>X) and make oldconfig.
+Sometimes the new kernel will enable some previously disabled option, and
+it would be very useful to see WHY.
 
-  +void menu_get_ext_help(struct menu *menu, struct gstr *help)
-  +static void get_prompt_str(struct gstr *r, struct property *prop)
-  +void get_symbol_str(struct gstr *r, struct symbol *sym)
+To take a concrete example, in my 2.6.30 .config I had:
 
-Signed-off-by: Cheng Renquan <crquan@gmail.com>
----
- scripts/kconfig/lkc_proto.h |    2 +
- scripts/kconfig/menu.c      |   79 +++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 81 insertions(+), 0 deletions(-)
+CONFIG_DRM=m
+CONFIG_DRM_RADEON=m
+# CONFIG_FB is not set
 
-diff --git a/scripts/kconfig/lkc_proto.h b/scripts/kconfig/lkc_proto.h
-index 8e69461..ffeb532 100644
---- a/scripts/kconfig/lkc_proto.h
-+++ b/scripts/kconfig/lkc_proto.h
-@@ -17,6 +17,8 @@ P(menu_get_root_menu,struct menu *,(struct menu *menu));
- P(menu_get_parent_menu,struct menu *,(struct menu *menu));
- P(menu_has_help,bool,(struct menu *menu));
- P(menu_get_help,const char *,(struct menu *menu));
-+P(get_symbol_str,void,(struct gstr *r, struct symbol *sym));
-+P(menu_get_ext_help,void,(struct menu *menu, struct gstr *help));
- 
- /* symbol.c */
- P(symbol_hash,struct symbol *,[SYMBOL_HASHSIZE]);
-diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
-index 07ff8d1..931d782 100644
---- a/scripts/kconfig/menu.c
-+++ b/scripts/kconfig/menu.c
-@@ -9,6 +9,9 @@
- #define LKC_DIRECT_LINK
- #include "lkc.h"
- 
-+static const char nohelp_text[] = N_(
-+	"There is no help available for this kernel option.\n");
-+
- struct menu rootmenu;
- static struct menu **last_entry_ptr;
- 
-@@ -451,3 +454,79 @@ const char *menu_get_help(struct menu *menu)
- 	else
- 		return "";
- }
-+
-+static void get_prompt_str(struct gstr *r, struct property *prop)
-+{
-+	int i, j;
-+	struct menu *submenu[8], *menu;
-+
-+	str_printf(r, _("Prompt: %s\n"), _(prop->text));
-+	str_printf(r, _("  Defined at %s:%d\n"), prop->menu->file->name,
-+		prop->menu->lineno);
-+	if (!expr_is_yes(prop->visible.expr)) {
-+		str_append(r, _("  Depends on: "));
-+		expr_gstr_print(prop->visible.expr, r);
-+		str_append(r, "\n");
-+	}
-+	menu = prop->menu->parent;
-+	for (i = 0; menu != &rootmenu && i < 8; menu = menu->parent)
-+		submenu[i++] = menu;
-+	if (i > 0) {
-+		str_printf(r, _("  Location:\n"));
-+		for (j = 4; --i >= 0; j += 2) {
-+			menu = submenu[i];
-+			str_printf(r, "%*c-> %s", j, ' ', _(menu_get_prompt(menu)));
-+			if (menu->sym) {
-+				str_printf(r, " (%s [=%s])", menu->sym->name ?
-+					menu->sym->name : _("<choice>"),
-+					sym_get_string_value(menu->sym));
-+			}
-+			str_append(r, "\n");
-+		}
-+	}
-+}
-+
-+void get_symbol_str(struct gstr *r, struct symbol *sym)
-+{
-+	bool hit;
-+	struct property *prop;
-+
-+	if (sym && sym->name)
-+		str_printf(r, "Symbol: %s [=%s]\n", sym->name,
-+			   sym_get_string_value(sym));
-+	for_all_prompts(sym, prop)
-+		get_prompt_str(r, prop);
-+	hit = false;
-+	for_all_properties(sym, prop, P_SELECT) {
-+		if (!hit) {
-+			str_append(r, "  Selects: ");
-+			hit = true;
-+		} else
-+			str_printf(r, " && ");
-+		expr_gstr_print(prop->expr, r);
-+	}
-+	if (hit)
-+		str_append(r, "\n");
-+	if (sym->rev_dep.expr) {
-+		str_append(r, _("  Selected by: "));
-+		expr_gstr_print(sym->rev_dep.expr, r);
-+		str_append(r, "\n");
-+	}
-+	str_append(r, "\n\n");
-+}
-+
-+void menu_get_ext_help(struct menu *menu, struct gstr *help)
-+{
-+	struct symbol *sym = menu->sym;
-+
-+	if (menu_has_help(menu)) {
-+		if (sym->name) {
-+			str_printf(help, "CONFIG_%s:\n\n", sym->name);
-+			str_append(help, _(menu_get_help(menu)));
-+			str_append(help, "\n");
-+		}
-+	} else {
-+		str_append(help, nohelp_text);
-+	}
-+	get_symbol_str(help, sym);
-+}
--- 
-1.6.3.3
+which when oldconfig'd in 2.6.31-rc changed to
 
+CONFIG_DRM=m
+CONFIG_DRM_RADEON=m
+CONFIG_FB=m
+(+ some more FB stuff)
+
+In this case it would have been nice to get an explanation that DRM_RADEON
+was responsible for (wrongly, IMO) selecting FB. Something like
+
+# CONFIG_FB was selected by CONFIG_DRM_RADEON
+CONFIG_FB=m
+
+These comments should only be emitted for options added by select that
+previously were absent or 'is not set'.
+
+/Mikael
