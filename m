@@ -1,71 +1,82 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-vw0-f199.google.com ([209.85.212.199]:34900 "EHLO
-	mail-vw0-f199.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753912AbZGLROZ convert rfc822-to-8bit (ORCPT
+Received: from smtp1.linux-foundation.org ([140.211.169.13]:42299 "EHLO
+	smtp1.linux-foundation.org" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1754155AbZGLR6c (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 12 Jul 2009 13:14:25 -0400
+	Sun, 12 Jul 2009 13:58:32 -0400
+Date: Sun, 12 Jul 2009 10:58:21 -0700 (PDT)
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Subject: Re: [Bug 13012] 2.6.28.9 causes init to segfault on Debian etch;
+ 2.6.28.8 OK
+In-Reply-To: <200907101659.31813.elendil@planet.nl>
+Message-ID: <alpine.LFD.2.01.0907121058040.3552@localhost.localdomain>
+References: <200907100928.07369.elendil@planet.nl> <200907101659.31813.elendil@planet.nl>
 MIME-Version: 1.0
-Reply-To: crquan@gmail.com
-In-Reply-To: <19033.46146.685018.240686@pilspetsen.it.uu.se>
-References: <1247386308-19628-1-git-send-email-crq@kernel.org>
-	 <1247386308-19628-2-git-send-email-crq@kernel.org>
-	 <19033.46146.685018.240686@pilspetsen.it.uu.se>
-Date: Sun, 12 Jul 2009 17:14:23 +0000
-Message-ID: <91b13c310907121014r4ab3d37p9477030bb0e3b7d2@mail.gmail.com>
-Subject: Re: [PATCH 1/6] add symbol value to help find the real depend
-From: Cheng Renquan <crq@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Mikael Pettersson <mikpe@it.uu.se>
-Cc: linux-kbuild@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>, Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org
+To: Frans Pop <elendil@planet.nl>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>, linux-kbuild@vger.kernel.org, barryn@pobox.com, bugme-daemon@bugzilla.kernel.org, Ian Lance Taylor <iant@google.com>
 
-On Sun, Jul 12, 2009 at 10:00 AM, Mikael Pettersson<mikpe@it.uu.se> wrote:
-[...]
-> I like this concept, but I'd like to see it supported with make oldconfig.
 
-'make oldconfig' uses the same 'scripts/kconfig/conf' program as the
-'make config' does, which is supported already in this series of
-patches,
 
-> Let's say I copy a .config from kernel X into kernel Y (Y>X) and make oldconfig.
-> Sometimes the new kernel will enable some previously disabled option, and
-> it would be very useful to see WHY.
+On Fri, 10 Jul 2009, Frans Pop wrote:
+> 
+> Prompted by the same suggestion from Ben Hutchings I checked this too, 
+> but -fno-strict-overflow was only introduced in gcc 4.2.
+> So using it instead of -fwrapv *would* fix the problem for gcc 4.1, but 
+> *only* because it would effectively do the same as the patch I proposed: 
+> not add an option at all for gcc 4.1.
+> 
+> So that change seems illogical unless there are other reasons to 
+> prefer -fno-strict-overflow over -fwrapv (well, it would avoid the
+> gcc version check).
 >
-> To take a concrete example, in my 2.6.30 .config I had:
->
-> CONFIG_DRM=m
-> CONFIG_DRM_RADEON=m
-> # CONFIG_FB is not set
->
-> which when oldconfig'd in 2.6.31-rc changed to
->
-> CONFIG_DRM=m
-> CONFIG_DRM_RADEON=m
-> CONFIG_FB=m
-> (+ some more FB stuff)
->
-> In this case it would have been nice to get an explanation that DRM_RADEON
-> was responsible for (wrongly, IMO) selecting FB. Something like
->
-> # CONFIG_FB was selected by CONFIG_DRM_RADEON
-> CONFIG_FB=m
->
-> These comments should only be emitted for options added by select that
-> previously were absent or 'is not set'.
+> It does however make it somewhat more logical to change the test in my 
+> proposed patch to also allow -fwrapv for gcc 4.2.
 
-The conf system is not so smart to find the recent changes (you may
-try scripts/diffconfig to diff two .config),
+Hmm. It all really makes me suspect that we should really be using
+-fno-strict-overflow instead.
 
-Anyway, if you don't like CONFIG_FB and have no idea why it is
-selected, you can navigate to CONFIG_FB in
-menuconfig/gconfig/xconfig/config, and find out the real dependency
-reason from its help message,
+That not only apparently avoids the unnecessary gcc version check (by 
+virtue of the option only existing in compilers that don't have the 
+problem), but qutie frankly, one of the core people involved with the 
+whole thing (Ian Lance Taylor) seems to think it's the better option.
 
->
-> /Mikael
->
+See for example
 
---
-Cheng Renquan (程任全), from Shenzhen, China
+	http://www.airs.com/blog/archives/120
+
+on how gcc actually generates better code with -fno-strict-overflow.
+
+I added Ian to the cc.
+
+Ian: we generally do try to be careful and use explicit unsigned types for 
+code that cares about overflow, but we use -fwrapv because there have been 
+some cases where we didn't (and used pointer comparisons or signed 
+integers).
+
+The problem is that apparently gcc-4.1.x was literally generating buggy 
+code with -fwrapv. So now the choice for us is between switching to an 
+explicit version test:
+
+	-KBUILD_CFLAGS  += $(call cc-option,-fwrapv)
+	+KBUILD_CFLAGS  += $(shell if [ $(call cc-version) -ge 0402 ]; then \
+	+                   echo $(call cc-option,-fwrapv); fi ;)
+
+or just switching to -fno-strict-overflow instead:
+
+	-KBUILD_CFLAGS  += $(call cc-option,-fwrapv)
+	+KBUILD_CFLAGS  += $(call cc-option,-fno-strict-overflow)
+
+which avoids the buggy gcc versions because it's simply not even supported 
+by gcc-4.1.x (and even if that wasn't the case, possibly because only 
+'wrapv' is the problematic case - apparently the difference _does_ 
+matter to gcc).
+
+From everything I have been able to find, I really prefer the second 
+version. Not only is the patch cleaner, but it looks like code generation 
+is better too (for some inexplicable reason, but I suspect it's because 
+-fno-strict-overflow is just saner).
+
+		Linus
