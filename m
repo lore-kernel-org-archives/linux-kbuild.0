@@ -1,61 +1,64 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from astoria.ccjclearline.com ([64.235.106.9]:41170 "EHLO
-	astoria.ccjclearline.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752577AbZGPJXA (ORCPT
+Received: from Cpsmtpm-eml106.kpnxchange.com ([195.121.3.10]:56420 "EHLO
+	CPSMTPM-EML106.kpnxchange.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S932901AbZGPSlz (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 16 Jul 2009 05:23:00 -0400
-Received: from cpe002129687b04-cm001225dbafb6.cpe.net.cable.rogers.com ([99.235.241.187] helo=crashcourse.ca)
-	by astoria.ccjclearline.com with esmtpsa (TLSv1:AES256-SHA:256)
-	(Exim 4.69)
-	(envelope-from <rpjday@crashcourse.ca>)
-	id 1MRNB5-0002PT-8k
-	for linux-kbuild@vger.kernel.org; Thu, 16 Jul 2009 05:22:59 -0400
-Date: Thu, 16 Jul 2009 05:20:37 -0400 (EDT)
-From: "Robert P. J. Day" <rpjday@crashcourse.ca>
-Subject: [PATCH] KBUILD:  Combine config and %config targets.
-Message-ID: <alpine.LFD.2.00.0907160519001.11423@localhost>
+	Thu, 16 Jul 2009 14:41:55 -0400
+Subject: [PATCH,resend] sparc64: build compressed image (zImage) by default
+Content-Disposition: inline
+From: Frans Pop <elendil@planet.nl>
+Date: Thu, 16 Jul 2009 20:41:52 +0200
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+Content-Type: text/plain;
+  charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <200907162041.53181.elendil@planet.nl>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: kbuild devel list <linux-kbuild@vger.kernel.org>
+To: sparclinux@vger.kernel.org
+Cc: linux-kbuild@vger.kernel.org, Jurij Smakov <jurij@wooyd.org>, David Miller <davem@davemloft.net>
 
+From: Jurij Smakov <jurij@wooyd.org>
+Subject: sparc64: build compressed image (zImage) by default
 
-Since the rules appear to be identical, might as well combine the
-targets of config and %config in the same rule.
+Besides creating the uncompressed vmlinux image for sparc64, also
+create a compressed zImage. This is more consistent with other
+architectures and required to make the 'deb-pkg' target work.
 
-Signed-off-by: Robert P. J. Day <rpjday@crashcourse.ca>
+Signed-off-by: Jurij Smakov <jurij@wooyd.org>
+Signed-off-by: Frans Pop <elendil@planet.nl>
 
 ---
+The patch was taken from the Debian kernel package. It was written by
+Jurij. I added his Signed-off-by with his permission.
 
-  AFAICT, there seems to be no reason to keep these as separate rules
-since they are identical.
+The patch was tested to work during my recent tests for the cmd64x issue.
 
-
-diff --git a/Makefile b/Makefile
-index be0abac..cea9a7d 100644
---- a/Makefile
-+++ b/Makefile
-@@ -443,11 +443,7 @@ ifeq ($(config-targets),1)
- include $(srctree)/arch/$(SRCARCH)/Makefile
- export KBUILD_DEFCONFIG KBUILD_KCONFIG
-
--config: scripts_basic outputmakefile FORCE
--	$(Q)mkdir -p include/linux include/config
--	$(Q)$(MAKE) $(build)=scripts/kconfig $@
--
--%config: scripts_basic outputmakefile FORCE
-+config %config: scripts_basic outputmakefile FORCE
- 	$(Q)mkdir -p include/linux include/config
- 	$(Q)$(MAKE) $(build)=scripts/kconfig $@
-
-
-========================================================================
-Robert P. J. Day                               Waterloo, Ontario, CANADA
-
-        Linux Consulting, Training and Annoying Kernel Pedantry.
-
-Web page:                                          http://crashcourse.ca
-Twitter:                                       http://twitter.com/rpjday
-"Kernel Newbie Corner" column @ linux.com:          http://cli.gs/WG6WYX
-========================================================================
+diff --git a/arch/sparc/Makefile b/arch/sparc/Makefile
+index 2003ded..2adc5ea 100644
+--- a/arch/sparc/Makefile
++++ b/arch/sparc/Makefile
+@@ -91,6 +91,9 @@ endif
+ 
+ boot := arch/sparc/boot
+ 
++# Default target
++all: zImage
++
+ image zImage tftpboot.img vmlinux.aout: vmlinux
+ 	$(Q)$(MAKE) $(build)=$(boot) $(boot)/$@
+ 
+diff --git a/arch/sparc/boot/Makefile b/arch/sparc/boot/Makefile
+index 1ff0fd9..97e3feb 100644
+--- a/arch/sparc/boot/Makefile
++++ b/arch/sparc/boot/Makefile
+@@ -79,6 +79,9 @@ $(obj)/image: vmlinux FORCE
+ 	$(call if_changed,strip)
+ 	@echo '  kernel: $@ is ready'
+ 
++$(obj)/zImage: $(obj)/image
++	$(call if_changed,gzip)
++
+ $(obj)/tftpboot.img: $(obj)/image $(obj)/piggyback_64 System.map $(ROOT_IMG) FORCE
+ 	$(call if_changed,elftoaout)
+ 	$(call if_changed,piggy)
