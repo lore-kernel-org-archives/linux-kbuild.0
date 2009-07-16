@@ -1,36 +1,61 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor.suse.de ([195.135.220.2]:41669 "EHLO mx1.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S932142AbZGOUQO (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 15 Jul 2009 16:16:14 -0400
-Message-ID: <4A5E390E.2040004@suse.cz>
-Date: Wed, 15 Jul 2009 22:16:14 +0200
-From: Michal Marek <mmarek@suse.cz>
+Received: from astoria.ccjclearline.com ([64.235.106.9]:41170 "EHLO
+	astoria.ccjclearline.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752577AbZGPJXA (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 16 Jul 2009 05:23:00 -0400
+Received: from cpe002129687b04-cm001225dbafb6.cpe.net.cable.rogers.com ([99.235.241.187] helo=crashcourse.ca)
+	by astoria.ccjclearline.com with esmtpsa (TLSv1:AES256-SHA:256)
+	(Exim 4.69)
+	(envelope-from <rpjday@crashcourse.ca>)
+	id 1MRNB5-0002PT-8k
+	for linux-kbuild@vger.kernel.org; Thu, 16 Jul 2009 05:22:59 -0400
+Date: Thu, 16 Jul 2009 05:20:37 -0400 (EDT)
+From: "Robert P. J. Day" <rpjday@crashcourse.ca>
+Subject: [PATCH] KBUILD:  Combine config and %config targets.
+Message-ID: <alpine.LFD.2.00.0907160519001.11423@localhost>
 MIME-Version: 1.0
-Subject: Re: [PATCH] kbuild: generate modules.builtin
-References: <20090526152540.GA28341@sepie.suse.cz>	 <20090703144547.GA20980@sepie.suse.cz>	 <1247675954.3968.140.camel@quest>	 <ac3eb2510907150946y461fee0dj6e8f5265b4f91215@mail.gmail.com>	 <cc43514a0907151104r6208a3dbm89dba496c1411fc0@mail.gmail.com>	 <4A5E2944.2070904@suse.cz> <cc43514a0907151312l34bc6c92m7986fd1f99cfca2c@mail.gmail.com>
-In-Reply-To: <cc43514a0907151312l34bc6c92m7986fd1f99cfca2c@mail.gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andreas Robinson <andr345@gmail.com>
-Cc: Kay Sievers <kay.sievers@vrfy.org>, Scott James Remnant <scott@ubuntu.com>, linux-modules@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: kbuild devel list <linux-kbuild@vger.kernel.org>
 
-Andreas Robinson napsal(a):
-> On Wed, Jul 15, 2009 at 9:08 PM, Michal Marek<mmarek@suse.cz> wrote:
->> The idea is that modprobe should just do nothing and exit successfully,
->> so that scripts don't break nor start printing warnings if the kernel
->> config changes. I meant to send it to linux-modules once there is
->> agreement about the modules.builtin file format.
-> 
-> Ok, that makes sense.
-> 
-> I think there's a small chance of confusion though, when a user tries
-> to insert a module and it doesn't show up with lsmod. Perhaps you can
-> add an info() message? Then the user can figure out what is happening
-> with the --verbose option.
 
-Good idea, will do that.
+Since the rules appear to be identical, might as well combine the
+targets of config and %config in the same rule.
 
-Michal
+Signed-off-by: Robert P. J. Day <rpjday@crashcourse.ca>
+
+---
+
+  AFAICT, there seems to be no reason to keep these as separate rules
+since they are identical.
+
+
+diff --git a/Makefile b/Makefile
+index be0abac..cea9a7d 100644
+--- a/Makefile
++++ b/Makefile
+@@ -443,11 +443,7 @@ ifeq ($(config-targets),1)
+ include $(srctree)/arch/$(SRCARCH)/Makefile
+ export KBUILD_DEFCONFIG KBUILD_KCONFIG
+
+-config: scripts_basic outputmakefile FORCE
+-	$(Q)mkdir -p include/linux include/config
+-	$(Q)$(MAKE) $(build)=scripts/kconfig $@
+-
+-%config: scripts_basic outputmakefile FORCE
++config %config: scripts_basic outputmakefile FORCE
+ 	$(Q)mkdir -p include/linux include/config
+ 	$(Q)$(MAKE) $(build)=scripts/kconfig $@
+
+
+========================================================================
+Robert P. J. Day                               Waterloo, Ontario, CANADA
+
+        Linux Consulting, Training and Annoying Kernel Pedantry.
+
+Web page:                                          http://crashcourse.ca
+Twitter:                                       http://twitter.com/rpjday
+"Kernel Newbie Corner" column @ linux.com:          http://cli.gs/WG6WYX
+========================================================================
