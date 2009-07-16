@@ -1,56 +1,29 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepb.post.tele.dk ([195.41.46.236]:45391 "EHLO
-	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S933259AbZGPUQE (ORCPT
+Received: from cpsmtpm-eml101.kpnxchange.com ([195.121.3.5]:62859 "EHLO
+	CPSMTPM-EML101.kpnxchange.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S932933AbZGPVq2 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 16 Jul 2009 16:16:04 -0400
-Date: Thu, 16 Jul 2009 22:16:01 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH,resend] sparc64: build compressed image (zImage) by
-	default
-Message-ID: <20090716201601.GA6038@merkur.ravnborg.org>
-References: <200907162041.53181.elendil@planet.nl>
+	Thu, 16 Jul 2009 17:46:28 -0400
+From: Frans Pop <elendil@planet.nl>
+Subject: Re: [PATCH,resend] sparc64: build compressed image (zImage) by default
+Date: Thu, 16 Jul 2009 23:46:25 +0200
+References: <200907162041.53181.elendil@planet.nl> <20090716.131607.233631333.davem@davemloft.net>
+In-Reply-To: <20090716.131607.233631333.davem@davemloft.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Content-Transfer-Encoding: 7bit
 Content-Disposition: inline
-In-Reply-To: <200907162041.53181.elendil@planet.nl>
+Message-Id: <200907162346.26629.elendil@planet.nl>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Frans Pop <elendil@planet.nl>
-Cc: sparclinux@vger.kernel.org, linux-kbuild@vger.kernel.org, Jurij Smakov <jurij@wooyd.org>, David Miller <davem@davemloft.net>
+To: David Miller <davem@davemloft.net>
+Cc: sparclinux@vger.kernel.org, linux-kbuild@vger.kernel.org, jurij@wooyd.org
 
-On Thu, Jul 16, 2009 at 08:41:52PM +0200, Frans Pop wrote:
-> From: Jurij Smakov <jurij@wooyd.org>
-> Subject: sparc64: build compressed image (zImage) by default
-> 
-> Besides creating the uncompressed vmlinux image for sparc64, also
-> create a compressed zImage. This is more consistent with other
-> architectures and required to make the 'deb-pkg' target work.
-> 
-> Signed-off-by: Jurij Smakov <jurij@wooyd.org>
-> Signed-off-by: Frans Pop <elendil@planet.nl>
-> 
-> ---
-> The patch was taken from the Debian kernel package. It was written by
-> Jurij. I added his Signed-off-by with his permission.
-> 
-> The patch was tested to work during my recent tests for the cmd64x issue.
+On Thursday 16 July 2009, David Miller wrote:
+> It's in my queue you don't need to resend this:
+>
+> http://patchwork.ozlabs.org/patch/29268/
 
-Hmmm..
-This path does the following:
-1) zImage becomes default for sparc and sparc64
-2) fixes zImage on sparc64 (it dod not work before)
-3) On sparc zImage is a stripped version of vmlinux, on sparc64 it is a gzipped not-stripped
-   version of vmlinux - so it introduces a significantly different zImage.
-
-Could we agree on the _same_ format for zImage on sparc and sparc64 and then apply that patch?
-
-I know Julian is working on unifying piggyback_{32,64}.c so maybe that is
-covered by his work?
-
-If we fix it so zImage is the same thing on sparc and sparc64 this could go in before
-we see the unification of piggyback.
-For deb-pkg to work we could just let the sparc64 version be a stripped version - no?
-Then you would have covered my main complaint about this patch.
-
-	Sam
+OK, thanks. I did not see any ack on my mail so I was not aware you'd 
+already picked it up.
