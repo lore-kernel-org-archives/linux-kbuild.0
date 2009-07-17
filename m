@@ -1,37 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepa.post.tele.dk ([195.41.46.235]:59348 "EHLO
-	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757463AbZGQVRE (ORCPT
+Received: from mail-fx0-f218.google.com ([209.85.220.218]:50578 "EHLO
+	mail-fx0-f218.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757862AbZGQVYt convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 17 Jul 2009 17:17:04 -0400
-Date: Fri, 17 Jul 2009 23:17:03 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH] kconfig: simplification of scripts/extract-ikconfig
-Message-ID: <20090717211703.GF7080@merkur.ravnborg.org>
-References: <20090623225245.GA10443@streefland.net> <20090624021506.GA5871@cr0.nay.redhat.com> <20090624114607.GA10817@streefland.net> <20090624133148.GA12878@streefland.net> <20090629025146.GA5998@cr0.nay.redhat.com> <20090629113613.GA6853@streefland.net> <20090709023855.GA5648@cr0.nay.redhat.com> <20090709082651.GA6165@streefland.net> <20090710075530.GB6263@cr0.nay.redhat.com> <20090710095432.GA9721@streefland.net>
+	Fri, 17 Jul 2009 17:24:49 -0400
+Received: by fxm18 with SMTP id 18so978808fxm.37
+        for <linux-kbuild@vger.kernel.org>; Fri, 17 Jul 2009 14:24:48 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20090710095432.GA9721@streefland.net>
+In-Reply-To: <20090717210756.GC7080@merkur.ravnborg.org>
+References: <1a69a9d80907052107w5a2b39b5m2eb4cba3d24318c3@mail.gmail.com>
+	 <20090717210756.GC7080@merkur.ravnborg.org>
+Date: Fri, 17 Jul 2009 17:24:48 -0400
+Message-ID: <1a69a9d80907171424h1b2ef908i9f3bda24ced84a46@mail.gmail.com>
+Subject: Re: [PATCH 1/2] Kconfig: variable argument lists needs `stdarg.h'
+From: Arnaud Lacombe <lacombar@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Dick Streefland <dick@streefland.net>
-Cc: Amerigo Wang <xiyou.wangcong@gmail.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Arnaud Lacombe <lacombar@gmail.com>, linux-kbuild@vger.kernel.org, Roman Zippel <zippel@linux-m68k.org>
 
-On Fri, Jul 10, 2009 at 11:54:32AM +0200, Dick Streefland wrote:
-> On Friday 2009-07-10 15:55, Amerigo Wang wrote:
-> | Have you checked other version of grep? I mean lower version, of course,
-> | does your script work with them too?
-> 
-> The script works with all grep versions since 2.5, released 2002-03-13,
-> where the -o option was added. The config extraction feature was
-> introduced in Linux 2.6.8, released 2004-08-14, so I don't think this
-> dependency will be a problem.
+Hi Sam,
 
-Dick - I lost the original patch.
-Can you please resend.
+Thanks a lot. Sorry for the missing signed-of-by issue, it was my
+first public patch submit through git :-)
 
-In the changelog please include the information that
-you tested this with relevant grep versions.
+ - Arnaud
 
-	Sam
+On Fri, Jul 17, 2009 at 5:07 PM, Sam Ravnborg<sam@ravnborg.org> wrote:
+> On Mon, Jul 06, 2009 at 12:07:14AM -0400, Arnaud Lacombe wrote:
+>> Fix build on non GNU based platforms.
+>
+> Applied this and your next patch to kbuild-fixes.git - thanks.
+>
+> I you contribute additional patches please sign them off according to
+> SubmittingPatches in Documentation/
+>
+> I applied both as they are very simple - but usual I would
+> reject not-signed-off patches.
+>
+>        Sam
+>
