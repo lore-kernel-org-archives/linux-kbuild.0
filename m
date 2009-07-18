@@ -1,59 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepb.post.tele.dk ([195.41.46.236]:56041 "EHLO
-	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751259AbZGRG7F (ORCPT
+Received: from pfepa.post.tele.dk ([195.41.46.235]:46158 "EHLO
+	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932317AbZGRHGo (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 18 Jul 2009 02:59:05 -0400
-Date: Sat, 18 Jul 2009 08:59:03 +0200
+	Sat, 18 Jul 2009 03:06:44 -0400
+Date: Sat, 18 Jul 2009 09:06:43 +0200
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH,v2] Only add '-fwrapv' to gcc CFLAGS for gcc 4.2 and
-	later
-Message-ID: <20090718065903.GA7579@merkur.ravnborg.org>
-References: <200907100928.07369.elendil@planet.nl> <200907102205.49642.elendil@planet.nl> <20090717221846.GA7347@merkur.ravnborg.org> <200907180043.53257.elendil@planet.nl>
+Subject: Re: [PATCH] kconfig: simplification of scripts/extract-ikconfig
+Message-ID: <20090718070643.GA7703@merkur.ravnborg.org>
+References: <20090624114607.GA10817@streefland.net> <20090624133148.GA12878@streefland.net> <20090629025146.GA5998@cr0.nay.redhat.com> <20090629113613.GA6853@streefland.net> <20090709023855.GA5648@cr0.nay.redhat.com> <20090709082651.GA6165@streefland.net> <20090710075530.GB6263@cr0.nay.redhat.com> <20090710095432.GA9721@streefland.net> <20090717211703.GF7080@merkur.ravnborg.org> <20090717230859.GB10171@streefland.net>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <200907180043.53257.elendil@planet.nl>
+In-Reply-To: <20090717230859.GB10171@streefland.net>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Frans Pop <elendil@planet.nl>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, akpm@linux-foundation.org, torvalds@linux-foundation.org, linux-kbuild@vger.kernel.org, barryn@pobox.com
+To: Dick Streefland <dick@streefland.net>, Randy Dunlap <rdunlap@xenotime.net>
+Cc: Amerigo Wang <xiyou.wangcong@gmail.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Sat, Jul 18, 2009 at 12:43:51AM +0200, Frans Pop wrote:
-> On Saturday 18 July 2009, Sam Ravnborg wrote:
-> > >  # disable invalid "can't wrap" optimizations for signed / pointers
-> > > -KBUILD_CFLAGS	+= $(call cc-option,-fwrapv)
-> > > +KBUILD_CFLAGS  += $(shell if [ $(call cc-version) -ge 0402 ]; then \
-> > > +		    echo $(call cc-option,-fwrapv); fi ;)
-> >
-> > This would be simpler if you use:
+On Sat, Jul 18, 2009 at 01:08:59AM +0200, Dick Streefland wrote:
+> On Friday 2009-07-17 23:17, Sam Ravnborg wrote:
+> | Dick - I lost the original patch.
+> | Can you please resend.
+> | 
+> | In the changelog please include the information that
+> | you tested this with relevant grep versions.
 > 
-> That's now academic as Linus decided on a different fix.
-OK
+> Sure, here it is:
+> 
+> ======================================================================
+> 
+> I've rewritten the extract-ikconfig script to extract the kernel
+> configuration from a kernel compiled with CONFIG_IKCONFIG. The main
+> motivation for the rewrite was to remove the dependency on the
+> external C program binoffset.c, which is compiled on the initial run.
+> 
+> The binoffset executable is invoked with a relative path, which means
+> that the old script can only be run from the top of the kernel tree,
+> and only when you have write permission in the scripts directory.
+> The new script uses tr/grep/tail/zcat only, and can be invoked from
+> anywhere. The binoffset.c program has been removed. This script
+> requires GNU grep 2.5 (released 2002-03-13) or higher, because the -o
+> option was introduced in that version.
+> 
+> Signed-off-by: Dick Streefland <dick@streefland.net>
 
-> 
-> > # cc-ifversion
-> > # Usage:  EXTRA_CFLAGS += $(call cc-ifversion, -lt, 0402, -O1)
-> > cc-ifversion = $(shell [ $(call cc-version, $(CC)) $(1) $(2) ] && echo $(3))
-> >
-> > We have only one user at the moment so I understand why you missed it.
-> 
-> :-)
-> 
-> I based my patch on arch/x86/Makefile:
-> 35:        KBUILD_CFLAGS += $(shell if [ $(call cc-version) -lt 0400 ] ; then \
-> 36:                echo $(call cc-option,-fno-unit-at-a-time); fi ;)
-> 
-> Guess that could be improved to use cc-ifversion then.
-Yes, please...
-
-> 
-> And a quick git grep gives a few other potential candidates:
-> arch/ia64/Makefile:44:ifeq ($(call cc-version),0304)
-> arch/parisc/Makefile:129:       @if test "$(call cc-version)" -lt "0303"; then \
-> arch/powerpc/Makefile:80:GCC_BROKEN_VEC := $(shell if [ $(call cc-version) -lt 0400 ] ; then echo "y"; fi)
-> arch/powerpc/Makefile:219:      @if test "$(call cc-version)" = "0304" ; then \
-> arch/um/Makefile-i386:38:KBUILD_CFLAGS += $(shell if [ $(call cc-version) -lt 0400 ] ; then \
-Same goes for these.
+Applied to kbuild-next.git.
 
 	Sam
