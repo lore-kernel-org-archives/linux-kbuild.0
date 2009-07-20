@@ -1,64 +1,167 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([18.85.46.34]:41470 "EHLO
-	bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753143AbZGTUNT (ORCPT
+Received: from pfepb.post.tele.dk ([195.41.46.236]:35287 "EHLO
+	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751555AbZGTUfX (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 20 Jul 2009 16:13:19 -0400
-Subject: Re: [PATCH] kbuild: save ARCH & CROSS_COMPILE when building a
- kernel
-From: Peter Zijlstra <peterz@infradead.org>
-In-Reply-To: <20090720200522.GA6854@merkur.ravnborg.org>
-References: <20090720100157.GA6467@merkur.ravnborg.org>
-	 <1248086059.15751.8405.camel@twins>
-	 <20090720115134.GA6517@merkur.ravnborg.org>
-	 <1248091243.15751.8550.camel@twins>
-	 <20090720171200.GA6730@merkur.ravnborg.org>
-	 <20090720200522.GA6854@merkur.ravnborg.org>
-Content-Type: text/plain
-Date: Mon, 20 Jul 2009 22:13:17 +0200
-Message-Id: <1248120797.23509.42.camel@laptop>
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+	Mon, 20 Jul 2009 16:35:23 -0400
+Date: Mon, 20 Jul 2009 22:35:21 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: [GIT] kbuild fixes
+Message-ID: <20090720203521.GA6904@merkur.ravnborg.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, lkml <linux-kernel@vger.kernel.org>, Tim Abbott <tabbott@ksplice.com>, Arnaud Lacombe <lacombar@gmail.com>, maximilian attems <max@stro.at>
 
-On Mon, 2009-07-20 at 22:05 +0200, Sam Ravnborg wrote:
+Hi Linus.
 
-> From 27d34661aed0cd3fbf469b8efb24accaf83c1987 Mon Sep 17 00:00:00 2001
-> From: Sam Ravnborg <sam@ravnborg.org>
-> Date: Mon, 20 Jul 2009 21:37:11 +0200
-> Subject: [PATCH] kbuild: Use INSTALLKERNEL to select customized installkernel script
-> 
-> Replace the use of CROSS_COMPILE to select a customized
-> installkernel script with the possibility to set INSTALLKERNEL
-> to select a custom installkernel script when running make:
-> 
->     make INSTALLKERNEL=arm-installkernel install
-> 
-> With this patch we are now more consistent across
-> different architectures - they did not all support use
-> of CROSS_COMPILE.
-> 
-> The use of CROSS_COMPILE was a hack as this really belongs
-> to gcc/binutils and the installkernel script does not change
-> just because we change toolchain.
-> 
-> The use of CROSS_COMPILE caused troubles with an upcoming patch
-> that saves CROSS_COMPILE when a kernel is built -
-> it would no longer be installable.
-> [Thanks to Peter for this hint]
-> 
-> This patch undos what Ian did in commit:
-> 
->   0f8e2d62fa04441cd12c08ce521e84e5bd3f8a46
->   ("use ${CROSS_COMPILE}installkernel in arch/*/boot/install.sh")
-> 
-> The patch has been lightly tested on x86 - but all changes
-> looks obvious.
+Four kbuild fixlets:
 
-Acked-by: Peter Zijlstra <peterz@infradead.org>
+1) Fix to newly introduced vmlinux macros.
+   There is one in-tree user which is fixed up.
 
-Looks good to me, thanks sam!
+2) Two fixlets to make menuconfig more cygwin friendly
 
+3) install scrip fix for deb-pkg
+
+This has been in -next at least for one iteration with no comments.
+Combined diff below.
+
+Please pull - thanks!
+
+	Sam
+
+The following changes since commit 4b0a84043e0c14088958fddb62f416d050368011:
+  Linus Torvalds (1):
+        Merge branch 'sched-fixes-for-linus' of git://git.kernel.org/.../peterz/linux-2.6-sched
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/sam/kbuild-fixes.git master
+
+Arnaud Lacombe (2):
+      kconfig: variable argument lists needs `stdarg.h'
+      kconfig: initialize the screen before using curses(3) functions
+
+Tim Abbott (1):
+      vmlinux.lds.h: restructure BSS linker script macros
+
+maximilian attems (1):
+      kbuild, deb-pkg: fix install scripts for posix sh
+
+ arch/mn10300/kernel/vmlinux.lds.S |    2 +-
+ include/asm-generic/vmlinux.lds.h |   19 +++++++++----------
+ scripts/kconfig/lxdialog/util.c   |    2 ++
+ scripts/kconfig/mconf.c           |    2 ++
+ scripts/package/builddeb          |    2 +-
+ 5 files changed, 15 insertions(+), 12 deletions(-)
+
+
+diff --git a/arch/mn10300/kernel/vmlinux.lds.S b/arch/mn10300/kernel/vmlinux.lds.S
+index c96ba3d..f4aa079 100644
+--- a/arch/mn10300/kernel/vmlinux.lds.S
++++ b/arch/mn10300/kernel/vmlinux.lds.S
+@@ -107,7 +107,7 @@ SECTIONS
+   __init_end = .;
+   /* freed after init ends here */
+ 
+-  BSS(4)
++  BSS_SECTION(0, PAGE_SIZE, 4)
+ 
+   _end = . ;
+ 
+diff --git a/include/asm-generic/vmlinux.lds.h b/include/asm-generic/vmlinux.lds.h
+index a553f10..6ad76bf 100644
+--- a/include/asm-generic/vmlinux.lds.h
++++ b/include/asm-generic/vmlinux.lds.h
+@@ -30,9 +30,7 @@
+  *	EXCEPTION_TABLE(...)
+  *	NOTES
+  *
+- *	__bss_start = .;
+- *	BSS_SECTION(0, 0)
+- *	__bss_stop = .;
++ *	BSS_SECTION(0, 0, 0)
+  *	_end = .;
+  *
+  *	/DISCARD/ : {
+@@ -489,7 +487,8 @@
+  * bss (Block Started by Symbol) - uninitialized data
+  * zeroed during startup
+  */
+-#define SBSS								\
++#define SBSS(sbss_align)						\
++	. = ALIGN(sbss_align);						\
+ 	.sbss : AT(ADDR(.sbss) - LOAD_OFFSET) {				\
+ 		*(.sbss)						\
+ 		*(.scommon)						\
+@@ -498,12 +497,10 @@
+ #define BSS(bss_align)							\
+ 	. = ALIGN(bss_align);						\
+ 	.bss : AT(ADDR(.bss) - LOAD_OFFSET) {				\
+-		VMLINUX_SYMBOL(__bss_start) = .;			\
+ 		*(.bss.page_aligned)					\
+ 		*(.dynbss)						\
+ 		*(.bss)							\
+ 		*(COMMON)						\
+-		VMLINUX_SYMBOL(__bss_stop) = .;				\
+ 	}
+ 
+ /*
+@@ -735,8 +732,10 @@
+ 		INIT_RAM_FS						\
+ 	}
+ 
+-#define BSS_SECTION(sbss_align, bss_align)				\
+-	SBSS								\
++#define BSS_SECTION(sbss_align, bss_align, stop_align)			\
++	. = ALIGN(sbss_align);						\
++	VMLINUX_SYMBOL(__bss_start) = .;				\
++	SBSS(sbss_align)						\
+ 	BSS(bss_align)							\
+-	. = ALIGN(4);
+-
++	. = ALIGN(stop_align);						\
++	VMLINUX_SYMBOL(__bss_stop) = .;
+diff --git a/scripts/kconfig/lxdialog/util.c b/scripts/kconfig/lxdialog/util.c
+index 86d95cc..f2375ad 100644
+--- a/scripts/kconfig/lxdialog/util.c
++++ b/scripts/kconfig/lxdialog/util.c
+@@ -19,6 +19,8 @@
+  *  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+  */
+ 
++#include <stdarg.h>
++
+ #include "dialog.h"
+ 
+ struct dialog_info dlg;
+diff --git a/scripts/kconfig/mconf.c b/scripts/kconfig/mconf.c
+index 3bcacb4..25b60bc 100644
+--- a/scripts/kconfig/mconf.c
++++ b/scripts/kconfig/mconf.c
+@@ -888,6 +888,8 @@ int main(int ac, char **av)
+ 			single_menu_mode = 1;
+ 	}
+ 
++	initscr();
++
+ 	getyx(stdscr, saved_y, saved_x);
+ 	if (init_dialog(NULL)) {
+ 		fprintf(stderr, N_("Your display is too small to run Menuconfig!\n"));
+diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+index b19f1f4..8b357b0 100644
+--- a/scripts/package/builddeb
++++ b/scripts/package/builddeb
+@@ -89,7 +89,7 @@ for script in postinst postrm preinst prerm ; do
+ set -e
+ 
+ # Pass maintainer script parameters to hook scripts
+-export DEB_MAINT_PARAMS="\$@"
++export DEB_MAINT_PARAMS="\$*"
+ 
+ test -d $debhookdir/$script.d && run-parts --arg="$version" $debhookdir/$script.d
+ exit 0
