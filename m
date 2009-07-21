@@ -1,94 +1,83 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepb.post.tele.dk ([195.41.46.236]:54742 "EHLO
-	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754950AbZGUVP5 (ORCPT
+Received: from mga02.intel.com ([134.134.136.20]:23558 "EHLO mga02.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1756181AbZGUVsY convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 21 Jul 2009 17:15:57 -0400
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: [PATCH 07/10] kbuild: move compile.h to include/generated
-Date: Tue, 21 Jul 2009 23:19:38 +0200
-Message-Id: <1248211181-6757-7-git-send-email-sam@ravnborg.org>
-In-Reply-To: <20090721211040.GA7688@merkur.ravnborg.org>
+	Tue, 21 Jul 2009 17:48:24 -0400
+From: "Yu, Fenghua" <fenghua.yu@intel.com>
+Date: Tue, 21 Jul 2009 14:48:22 -0700
+Subject: RE: [PATCH 03/10] ia64: move nr-irqs.h to include/generated
+Message-ID: <A6AD88C3F2289247BE726C37303E1EB8B09F47F2@orsmsx505.amr.corp.intel.com>
 References: <20090721211040.GA7688@merkur.ravnborg.org>
+ <1248211181-6757-3-git-send-email-sam@ravnborg.org>
+In-Reply-To: <1248211181-6757-3-git-send-email-sam@ravnborg.org>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+MIME-Version: 1.0
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-arch@vger.kernel.org
-Cc: Sam Ravnborg <sam@ravnborg.org>, Al Viro <viro@zeniv.linux.org.uk>
+To: 'Sam Ravnborg' <sam@ravnborg.org>, "'linux-kernel@vger.kernel.org'" <linux-kernel@vger.kernel.org>, "'linux-kbuild@vger.kernel.org'" <linux-kbuild@vger.kernel.org>, "'linux-arch@vger.kernel.org'" <linux-arch@vger.kernel.org>
+Cc: 'Al Viro' <viro@zeniv.linux.org.uk>, "Luck, Tony" <tony.luck@intel.com>
 
-Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
-Cc: Al Viro <viro@zeniv.linux.org.uk>
----
- .gitignore              |    1 -
- arch/x86/boot/version.c |    2 +-
- init/Makefile           |    6 +++---
- init/version.c          |    2 +-
- 4 files changed, 5 insertions(+), 6 deletions(-)
+>---
+> arch/ia64/Makefile          |    2 +-
+> arch/ia64/include/asm/irq.h |    2 +-
+> arch/ia64/kernel/Makefile   |    7 ++-----
+> 3 files changed, 4 insertions(+), 7 deletions(-)
+>
+>diff --git a/arch/ia64/Makefile b/arch/ia64/Makefile
+>index 58a7e46..e9fcac6 100644
+>--- a/arch/ia64/Makefile
+>+++ b/arch/ia64/Makefile
+>@@ -108,4 +108,4 @@ archprepare: make_nr_irqs_h FORCE
+> PHONY += make_nr_irqs_h FORCE
+>
+> make_nr_irqs_h: FORCE
+>-	$(Q)$(MAKE) $(build)=arch/ia64/kernel include/asm-ia64/nr-irqs.h
+>+	$(Q)$(MAKE) $(build)=arch/ia64/kernel include/generated/nr-irqs.h
+>diff --git a/arch/ia64/include/asm/irq.h b/arch/ia64/include/asm/irq.h
+>index 5282546..91b920f 100644
+>--- a/arch/ia64/include/asm/irq.h
+>+++ b/arch/ia64/include/asm/irq.h
+>@@ -13,7 +13,7 @@
+>
+> #include <linux/types.h>
+> #include <linux/cpumask.h>
+>-#include <asm-ia64/nr-irqs.h>
+>+#include <generated/nr-irqs.h>
+>
+> static __inline__ int
+> irq_canonicalize (int irq)
+>diff --git a/arch/ia64/kernel/Makefile b/arch/ia64/kernel/Makefile
+>index 6b7edca..cedd773 100644
+>--- a/arch/ia64/kernel/Makefile
+>+++ b/arch/ia64/kernel/Makefile
+>@@ -81,17 +81,14 @@ define cmd_nr_irqs
+> endef
+>
+> # We use internal kbuild rules to avoid the "is up to date" message from
+>make
+>-arch/$(SRCARCH)/kernel/nr-irqs.s: $(srctree)/arch/$(SRCARCH)/kernel/nr-
+>irqs.c \
+>-				$(wildcard $(srctree)/include/asm-ia64/*/irq.h)
+>+arch/ia64/kernel/nr-irqs.s: arch/ia64/kernel/nr-irqs.c
+> 	$(Q)mkdir -p $(dir $@)
+> 	$(call if_changed_dep,cc_s_c)
+>
 
-diff --git a/.gitignore b/.gitignore
-index 624e3ab..0f594d9 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -46,7 +46,6 @@ Module.symvers
- #
- include/config
- include/linux/autoconf.h
--include/linux/compile.h
- include/linux/version.h
- include/linux/utsrelease.h
- include/generated
-diff --git a/arch/x86/boot/version.c b/arch/x86/boot/version.c
-index 2723d9b..4d88763 100644
---- a/arch/x86/boot/version.c
-+++ b/arch/x86/boot/version.c
-@@ -14,7 +14,7 @@
- 
- #include "boot.h"
- #include <linux/utsrelease.h>
--#include <linux/compile.h>
-+#include <generated/compile.h>
- 
- const char kernel_version[] =
- 	UTS_RELEASE " (" LINUX_COMPILE_BY "@" LINUX_COMPILE_HOST ") "
-diff --git a/init/Makefile b/init/Makefile
-index 4a243df..2bcd810 100644
---- a/init/Makefile
-+++ b/init/Makefile
-@@ -16,11 +16,11 @@ mounts-$(CONFIG_BLK_DEV_INITRD)	+= do_mounts_initrd.o
- mounts-$(CONFIG_BLK_DEV_MD)	+= do_mounts_md.o
- 
- # files to be removed upon make clean
--clean-files := ../include/linux/compile.h
-+clean-files := ../include/generated/compile.h
- 
- # dependencies on generated files need to be listed explicitly
- 
--$(obj)/version.o: include/linux/compile.h
-+$(obj)/version.o: include/generated/compile.h
- 
- # compile.h changes depending on hostname, generation number, etc,
- # so we regenerate it always.
-@@ -30,7 +30,7 @@ $(obj)/version.o: include/linux/compile.h
-        chk_compile.h = :
-  quiet_chk_compile.h = echo '  CHK     $@'
- silent_chk_compile.h = :
--include/linux/compile.h: FORCE
-+include/generated/compile.h: FORCE
- 	@$($(quiet)chk_compile.h)
- 	$(Q)$(CONFIG_SHELL) $(srctree)/scripts/mkcompile_h $@ \
- 	"$(UTS_MACHINE)" "$(CONFIG_SMP)" "$(CONFIG_PREEMPT)" "$(CC) $(KBUILD_CFLAGS)"
-diff --git a/init/version.c b/init/version.c
-index 52a8b98..82328aa 100644
---- a/init/version.c
-+++ b/init/version.c
-@@ -6,7 +6,7 @@
-  *  May be freely distributed as part of Linux.
-  */
- 
--#include <linux/compile.h>
-+#include <generated/compile.h>
- #include <linux/module.h>
- #include <linux/uts.h>
- #include <linux/utsname.h>
--- 
-1.6.2.5
+Could you keep the SRCARCH and srctree variables? There is no need to hard code them.
+
+>-include/asm-ia64/nr-irqs.h: arch/$(SRCARCH)/kernel/nr-irqs.s
+>+include/generated/nr-irqs.h: arch/ia64/kernel/nr-irqs.s
+> 	$(Q)mkdir -p $(dir $@)
+> 	$(call cmd,nr_irqs)
+>
+>-clean-files += $(objtree)/include/asm-ia64/nr-irqs.h
+>-
+> #
+> # native ivt.S, entry.S and fsys.S
+> #
+
+Ditto.
 
