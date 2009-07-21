@@ -1,98 +1,265 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepb.post.tele.dk ([195.41.46.236]:54735 "EHLO
+Received: from pfepb.post.tele.dk ([195.41.46.236]:54717 "EHLO
 	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755105AbZGUVP5 (ORCPT
+	with ESMTP id S1754943AbZGUVP4 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 21 Jul 2009 17:15:57 -0400
+	Tue, 21 Jul 2009 17:15:56 -0400
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: [PATCH 05/10] arm: move mach-types to include/generated
-Date: Tue, 21 Jul 2009 23:19:36 +0200
-Message-Id: <1248211181-6757-5-git-send-email-sam@ravnborg.org>
+Subject: [PATCH 02/10] kbuild: move asm-offsets.h to include/generated
+Date: Tue, 21 Jul 2009 23:19:33 +0200
+Message-Id: <1248211181-6757-2-git-send-email-sam@ravnborg.org>
 In-Reply-To: <20090721211040.GA7688@merkur.ravnborg.org>
 References: <20090721211040.GA7688@merkur.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-arch@vger.kernel.org
-Cc: Sam Ravnborg <sam@ravnborg.org>, Al Viro <viro@zeniv.linux.org.uk>, Russell King <linux@arm.linux.org.uk>
+Cc: Sam Ravnborg <sam@ravnborg.org>, Al Viro <viro@zeniv.linux.org.uk>
 
-Simplified arch/arm/Makefile by dropping the maketools target
-It was undocumented and not needed
+The simplest method was to add an extra asm-offsets.h
+file in arch/$ARCH/include/asm that references the generated file.
+
+We can now migrate the architectures one-by-one to reference
+the generated file direct - and when done we can delete the
+temporary arch/$ARCH/include/asm/asm-offsets.h file.
 
 Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
 Cc: Al Viro <viro@zeniv.linux.org.uk>
-Cc: Russell King <linux@arm.linux.org.uk>
 ---
- arch/arm/Makefile                 |   14 ++------------
- arch/arm/include/asm/mach-types.h |    1 +
- arch/arm/tools/Makefile           |    2 +-
- arch/arm/tools/gen-mach-types     |    2 +-
- 4 files changed, 5 insertions(+), 14 deletions(-)
- create mode 100644 arch/arm/include/asm/mach-types.h
+ .gitignore                                |    1 -
+ Kbuild                                    |    2 +-
+ Makefile                                  |    1 -
+ arch/alpha/include/asm/asm-offsets.h      |    1 +
+ arch/arm/include/asm/asm-offsets.h        |    1 +
+ arch/avr32/include/asm/asm-offsets.h      |    1 +
+ arch/blackfin/include/asm/asm-offsets.h   |    1 +
+ arch/cris/include/asm/asm-offsets.h       |    1 +
+ arch/frv/include/asm/asm-offsets.h        |    1 +
+ arch/h8300/include/asm/asm-offsets.h      |    1 +
+ arch/ia64/include/asm/asm-offsets.h       |    1 +
+ arch/m68k/include/asm/asm-offsets.h       |    1 +
+ arch/microblaze/include/asm/asm-offsets.h |    1 +
+ arch/mips/include/asm/asm-offsets.h       |    1 +
+ arch/mn10300/include/asm/asm-offsets.h    |    1 +
+ arch/parisc/include/asm/asm-offsets.h     |    1 +
+ arch/powerpc/include/asm/asm-offsets.h    |    1 +
+ arch/s390/include/asm/asm-offsets.h       |    1 +
+ arch/sh/include/asm/asm-offsets.h         |    1 +
+ arch/sparc/include/asm/asm-offsets.h      |    1 +
+ arch/um/Makefile                          |    2 +-
+ arch/um/include/asm/asm-offsets.h         |    1 +
+ arch/x86/include/asm/asm-offsets.h        |    1 +
+ arch/xtensa/include/asm/asm-offsets.h     |    1 +
+ 24 files changed, 22 insertions(+), 4 deletions(-)
+ create mode 100644 arch/alpha/include/asm/asm-offsets.h
+ create mode 100644 arch/arm/include/asm/asm-offsets.h
+ create mode 100644 arch/avr32/include/asm/asm-offsets.h
+ create mode 100644 arch/blackfin/include/asm/asm-offsets.h
+ create mode 100644 arch/cris/include/asm/asm-offsets.h
+ create mode 100644 arch/frv/include/asm/asm-offsets.h
+ create mode 100644 arch/h8300/include/asm/asm-offsets.h
+ create mode 100644 arch/ia64/include/asm/asm-offsets.h
+ create mode 100644 arch/m68k/include/asm/asm-offsets.h
+ create mode 100644 arch/microblaze/include/asm/asm-offsets.h
+ create mode 100644 arch/mips/include/asm/asm-offsets.h
+ create mode 100644 arch/mn10300/include/asm/asm-offsets.h
+ create mode 100644 arch/parisc/include/asm/asm-offsets.h
+ create mode 100644 arch/powerpc/include/asm/asm-offsets.h
+ create mode 100644 arch/s390/include/asm/asm-offsets.h
+ create mode 100644 arch/sh/include/asm/asm-offsets.h
+ create mode 100644 arch/sparc/include/asm/asm-offsets.h
+ create mode 100644 arch/um/include/asm/asm-offsets.h
+ create mode 100644 arch/x86/include/asm/asm-offsets.h
+ create mode 100644 arch/xtensa/include/asm/asm-offsets.h
 
-diff --git a/arch/arm/Makefile b/arch/arm/Makefile
-index c877d6d..8b335bf 100644
---- a/arch/arm/Makefile
-+++ b/arch/arm/Makefile
-@@ -226,15 +226,8 @@ all:	$(KBUILD_IMAGE)
+diff --git a/.gitignore b/.gitignore
+index 32855c6..5a5024a 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -45,7 +45,6 @@ Module.symvers
+ # Generated include files
+ #
+ include/asm
+-include/asm-*/asm-offsets.h
+ include/config
+ include/linux/autoconf.h
+ include/linux/compile.h
+diff --git a/Kbuild b/Kbuild
+index 1165d7a..e3737ad 100644
+--- a/Kbuild
++++ b/Kbuild
+@@ -43,7 +43,7 @@ $(obj)/$(bounds-file): kernel/bounds.s Kbuild
+ # 2) Generate asm-offsets.h
+ #
  
- boot := arch/arm/boot
+-offsets-file := include/asm/asm-offsets.h
++offsets-file := include/generated/asm-offsets.h
  
--#	Update machine arch and proc symlinks if something which affects
--#	them changed.  We use .arch to indicate when they were updated
--#	last, otherwise make uses the target directory mtime.
--
--archprepare: maketools
--
--PHONY += maketools FORCE
--maketools: include/linux/version.h FORCE
--	$(Q)$(MAKE) $(build)=arch/arm/tools include/asm-arm/mach-types.h
-+archprepare:
-+	$(Q)$(MAKE) $(build)=arch/arm/tools include/generated/mach-types.h
+ always  += $(offsets-file)
+ targets += $(offsets-file)
+diff --git a/Makefile b/Makefile
+index 9bd427e..1f6a34c 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1197,7 +1197,6 @@ MRPROPER_DIRS  += include/config include2 usr/include include/generated
+ MRPROPER_FILES += .config .config.old include/asm .version .old_version \
+                   include/linux/autoconf.h include/linux/version.h      \
+                   include/linux/utsrelease.h                            \
+-                  include/asm*/asm-offsets.h                            \
+ 		  Module.symvers Module.markers tags TAGS cscope*
  
- # Convert bzImage to zImage
- bzImage: zImage
-@@ -245,9 +238,6 @@ zImage Image xipImage bootpImage uImage: vmlinux
- zinstall install: vmlinux
- 	$(Q)$(MAKE) $(build)=$(boot) MACHINE=$(MACHINE) $@
- 
--CLEAN_FILES += include/asm-arm/mach-types.h \
--	       include/asm-arm/arch include/asm-arm/.arch
--
- # We use MRPROPER_FILES and CLEAN_FILES now
- archclean:
- 	$(Q)$(MAKE) $(clean)=$(boot)
-diff --git a/arch/arm/include/asm/mach-types.h b/arch/arm/include/asm/mach-types.h
+ # clean - Delete most, but leave enough to build external modules
+diff --git a/arch/alpha/include/asm/asm-offsets.h b/arch/alpha/include/asm/asm-offsets.h
 new file mode 100644
-index 0000000..948178c
+index 0000000..d370ee3
 --- /dev/null
-+++ b/arch/arm/include/asm/mach-types.h
++++ b/arch/alpha/include/asm/asm-offsets.h
 @@ -0,0 +1 @@
-+#include <generated/mach-types.h>
-diff --git a/arch/arm/tools/Makefile b/arch/arm/tools/Makefile
-index 1dbaa29..635cb18 100644
---- a/arch/arm/tools/Makefile
-+++ b/arch/arm/tools/Makefile
-@@ -4,7 +4,7 @@
- # Copyright (C) 2001 Russell King
- #
++#include <generated/asm-offsets.h>
+diff --git a/arch/arm/include/asm/asm-offsets.h b/arch/arm/include/asm/asm-offsets.h
+new file mode 100644
+index 0000000..d370ee3
+--- /dev/null
++++ b/arch/arm/include/asm/asm-offsets.h
+@@ -0,0 +1 @@
++#include <generated/asm-offsets.h>
+diff --git a/arch/avr32/include/asm/asm-offsets.h b/arch/avr32/include/asm/asm-offsets.h
+new file mode 100644
+index 0000000..d370ee3
+--- /dev/null
++++ b/arch/avr32/include/asm/asm-offsets.h
+@@ -0,0 +1 @@
++#include <generated/asm-offsets.h>
+diff --git a/arch/blackfin/include/asm/asm-offsets.h b/arch/blackfin/include/asm/asm-offsets.h
+new file mode 100644
+index 0000000..d370ee3
+--- /dev/null
++++ b/arch/blackfin/include/asm/asm-offsets.h
+@@ -0,0 +1 @@
++#include <generated/asm-offsets.h>
+diff --git a/arch/cris/include/asm/asm-offsets.h b/arch/cris/include/asm/asm-offsets.h
+new file mode 100644
+index 0000000..d370ee3
+--- /dev/null
++++ b/arch/cris/include/asm/asm-offsets.h
+@@ -0,0 +1 @@
++#include <generated/asm-offsets.h>
+diff --git a/arch/frv/include/asm/asm-offsets.h b/arch/frv/include/asm/asm-offsets.h
+new file mode 100644
+index 0000000..d370ee3
+--- /dev/null
++++ b/arch/frv/include/asm/asm-offsets.h
+@@ -0,0 +1 @@
++#include <generated/asm-offsets.h>
+diff --git a/arch/h8300/include/asm/asm-offsets.h b/arch/h8300/include/asm/asm-offsets.h
+new file mode 100644
+index 0000000..d370ee3
+--- /dev/null
++++ b/arch/h8300/include/asm/asm-offsets.h
+@@ -0,0 +1 @@
++#include <generated/asm-offsets.h>
+diff --git a/arch/ia64/include/asm/asm-offsets.h b/arch/ia64/include/asm/asm-offsets.h
+new file mode 100644
+index 0000000..d370ee3
+--- /dev/null
++++ b/arch/ia64/include/asm/asm-offsets.h
+@@ -0,0 +1 @@
++#include <generated/asm-offsets.h>
+diff --git a/arch/m68k/include/asm/asm-offsets.h b/arch/m68k/include/asm/asm-offsets.h
+new file mode 100644
+index 0000000..d370ee3
+--- /dev/null
++++ b/arch/m68k/include/asm/asm-offsets.h
+@@ -0,0 +1 @@
++#include <generated/asm-offsets.h>
+diff --git a/arch/microblaze/include/asm/asm-offsets.h b/arch/microblaze/include/asm/asm-offsets.h
+new file mode 100644
+index 0000000..d370ee3
+--- /dev/null
++++ b/arch/microblaze/include/asm/asm-offsets.h
+@@ -0,0 +1 @@
++#include <generated/asm-offsets.h>
+diff --git a/arch/mips/include/asm/asm-offsets.h b/arch/mips/include/asm/asm-offsets.h
+new file mode 100644
+index 0000000..d370ee3
+--- /dev/null
++++ b/arch/mips/include/asm/asm-offsets.h
+@@ -0,0 +1 @@
++#include <generated/asm-offsets.h>
+diff --git a/arch/mn10300/include/asm/asm-offsets.h b/arch/mn10300/include/asm/asm-offsets.h
+new file mode 100644
+index 0000000..d370ee3
+--- /dev/null
++++ b/arch/mn10300/include/asm/asm-offsets.h
+@@ -0,0 +1 @@
++#include <generated/asm-offsets.h>
+diff --git a/arch/parisc/include/asm/asm-offsets.h b/arch/parisc/include/asm/asm-offsets.h
+new file mode 100644
+index 0000000..d370ee3
+--- /dev/null
++++ b/arch/parisc/include/asm/asm-offsets.h
+@@ -0,0 +1 @@
++#include <generated/asm-offsets.h>
+diff --git a/arch/powerpc/include/asm/asm-offsets.h b/arch/powerpc/include/asm/asm-offsets.h
+new file mode 100644
+index 0000000..d370ee3
+--- /dev/null
++++ b/arch/powerpc/include/asm/asm-offsets.h
+@@ -0,0 +1 @@
++#include <generated/asm-offsets.h>
+diff --git a/arch/s390/include/asm/asm-offsets.h b/arch/s390/include/asm/asm-offsets.h
+new file mode 100644
+index 0000000..d370ee3
+--- /dev/null
++++ b/arch/s390/include/asm/asm-offsets.h
+@@ -0,0 +1 @@
++#include <generated/asm-offsets.h>
+diff --git a/arch/sh/include/asm/asm-offsets.h b/arch/sh/include/asm/asm-offsets.h
+new file mode 100644
+index 0000000..d370ee3
+--- /dev/null
++++ b/arch/sh/include/asm/asm-offsets.h
+@@ -0,0 +1 @@
++#include <generated/asm-offsets.h>
+diff --git a/arch/sparc/include/asm/asm-offsets.h b/arch/sparc/include/asm/asm-offsets.h
+new file mode 100644
+index 0000000..d370ee3
+--- /dev/null
++++ b/arch/sparc/include/asm/asm-offsets.h
+@@ -0,0 +1 @@
++#include <generated/asm-offsets.h>
+diff --git a/arch/um/Makefile b/arch/um/Makefile
+index 0728def..8936057 100644
+--- a/arch/um/Makefile
++++ b/arch/um/Makefile
+@@ -150,6 +150,6 @@ $(SHARED_HEADERS)/user_constants.h: $(ARCH_DIR)/sys-$(SUBARCH)/user-offsets.s
  
--include/asm-arm/mach-types.h: $(src)/gen-mach-types $(src)/mach-types
-+include/generated/mach-types.h: $(src)/gen-mach-types $(src)/mach-types
- 	@echo '  Generating $@'
- 	@mkdir -p $(dir $@)
- 	$(Q)$(AWK) -f $^ > $@ || { rm -f $@; /bin/false; }
-diff --git a/arch/arm/tools/gen-mach-types b/arch/arm/tools/gen-mach-types
-index ce319ef..04fef71 100644
---- a/arch/arm/tools/gen-mach-types
-+++ b/arch/arm/tools/gen-mach-types
-@@ -1,6 +1,6 @@
- #!/bin/awk
- #
--# Awk script to generate include/asm-arm/mach-types.h
-+# Awk script to generate include/generated/mach-types.h
- #
- BEGIN	{ nr = 0 }
- /^#/	{ next }
+ $(SHARED_HEADERS)/kern_constants.h:
+ 	$(Q)mkdir -p $(dir $@)
+-	$(Q)echo '#include "../../../../include/asm/asm-offsets.h"' >$@
++	$(Q)echo '#include "../../../../include/generated/asm-offsets.h"' >$@
+ 
+ export SUBARCH USER_CFLAGS CFLAGS_NO_HARDENING OS HEADER_ARCH DEV_NULL_PATH
+diff --git a/arch/um/include/asm/asm-offsets.h b/arch/um/include/asm/asm-offsets.h
+new file mode 100644
+index 0000000..d370ee3
+--- /dev/null
++++ b/arch/um/include/asm/asm-offsets.h
+@@ -0,0 +1 @@
++#include <generated/asm-offsets.h>
+diff --git a/arch/x86/include/asm/asm-offsets.h b/arch/x86/include/asm/asm-offsets.h
+new file mode 100644
+index 0000000..d370ee3
+--- /dev/null
++++ b/arch/x86/include/asm/asm-offsets.h
+@@ -0,0 +1 @@
++#include <generated/asm-offsets.h>
+diff --git a/arch/xtensa/include/asm/asm-offsets.h b/arch/xtensa/include/asm/asm-offsets.h
+new file mode 100644
+index 0000000..d370ee3
+--- /dev/null
++++ b/arch/xtensa/include/asm/asm-offsets.h
+@@ -0,0 +1 @@
++#include <generated/asm-offsets.h>
 -- 
 1.6.2.5
 
