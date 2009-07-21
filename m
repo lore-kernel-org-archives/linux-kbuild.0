@@ -1,87 +1,109 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepa.post.tele.dk ([195.41.46.235]:39896 "EHLO
-	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752721AbZGUVKm (ORCPT
+Received: from pfepb.post.tele.dk ([195.41.46.236]:54729 "EHLO
+	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755079AbZGUVP4 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 21 Jul 2009 17:10:42 -0400
-Date: Tue, 21 Jul 2009 23:10:40 +0200
+	Tue, 21 Jul 2009 17:15:56 -0400
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: [PATCH/RFC] Move generated files to include/generated
-Message-ID: <20090721211040.GA7688@merkur.ravnborg.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Subject: [PATCH 04/10] sh: move machtypes.h to include/generated
+Date: Tue, 21 Jul 2009 23:19:35 +0200
+Message-Id: <1248211181-6757-4-git-send-email-sam@ravnborg.org>
+In-Reply-To: <20090721211040.GA7688@merkur.ravnborg.org>
+References: <20090721211040.GA7688@merkur.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild <linux-kbuild@vger.kernel.org>, lkml <linux-kernel@vger.kernel.org>, linux arch <linux-arch@vger.kernel.org>, Al Viro <viro@zeniv.linux.org.uk>
+To: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-arch@vger.kernel.org
+Cc: Sam Ravnborg <sam@ravnborg.org>, Al Viro <viro@zeniv.linux.org.uk>, Paul Mundt <lethal@linux-sh.org>
 
-In 2.6.30 we introduced support for adding generated
-files to a dedicated directory named "include/generated".
+Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
+Cc: Al Viro <viro@zeniv.linux.org.uk>
+Cc: Paul Mundt <lethal@linux-sh.org>
+---
+ arch/sh/Makefile               |    9 ++-------
+ arch/sh/include/asm/.gitignore |    1 -
+ arch/sh/include/asm/machvec.h  |    2 +-
+ arch/sh/tools/Makefile         |    4 ++--
+ arch/sh/tools/gen-mach-types   |    2 +-
+ 5 files changed, 6 insertions(+), 12 deletions(-)
+ delete mode 100644 arch/sh/include/asm/.gitignore
 
-This had a number of benefits:
-
-  - avoid mixing generated and normal files
-  - allow us to finally kill the asm symlink
-  - simpler .gitignore rules
-  - simpler list of mrproper files
-
-The following patchset introduces use of include/generated
-in several places as documented by the shortlog:
-
-Sam Ravnborg (10):
-      kbuild: move bounds.h to include/generated
-      kbuild: move asm-offsets.h to include/generated
-      ia64: move nr-irqs.h to include/generated
-      sh: move machtypes.h to include/generated
-      arm: move mach-types to include/generated
-      kbuild: drop asm symlink
-      kbuild: move compile.h to include/generated
-      drop unneeded include of autoconf.h
-      kbuild: move autoconf.h to include/generated
-      kbuild: move utsrelease.h to include/generated
-
-We are left with version.h that is still generated in
-include/linux.
-
-And there may be a few architecture specific files I have missed.
-
-This patch serie has a few shortcomings...
-
-1)
-After applying one _must_ do a "make clean" to get
-a buildable kernel.
-This is because we change the path of autoconf.h but
-the patch does not include anything to force a new
-autoconf.h to be created.
-Another workaround is to use a simple "make oldconfig".
-
-2)
-All files will be rebuild.
-We change an option to gcc due to path change of autoconf.h
-so all files will be rebuild.
-
-3)
-If some files are left in include/asm/ we may still
-pick them up.
-This is relevant for asm-offsets.h where we have
-a lot of "#include <asm/asm-offsets.h>".
-And include/asm comes before arch/$ARCH/include/asm
-in the search order.
-
-4)
-We loose the check if this is the correct ARCH we are
-building for as we can no longer check the asm symlink.
-This shortcoming is addressed by another patch that saves
-ARCH and CROSS_COMPILE. But it is not part of this serie.
-
-Individual patches will follow.
-Patches are based on todays mainline.
-
-It is also available at:
-
-    git://git.kernel.org/pub/scm/linux/kernel/git/sam/generated.git
-
-Comments welcome!
-
-	Sam
+diff --git a/arch/sh/Makefile b/arch/sh/Makefile
+index 75d049b..1b63cfd 100644
+--- a/arch/sh/Makefile
++++ b/arch/sh/Makefile
+@@ -189,10 +189,6 @@ KBUILD_AFLAGS		+= $(cflags-y)
+ libs-$(CONFIG_SUPERH32)		:= arch/sh/lib/	$(libs-y)
+ libs-$(CONFIG_SUPERH64)		:= arch/sh/lib64/ $(libs-y)
+ 
+-PHONY += maketools FORCE
+-
+-maketools:  include/linux/version.h FORCE
+-	$(Q)$(MAKE) $(build)=arch/sh/tools include/asm-sh/machtypes.h
+ 
+ all: $(KBUILD_IMAGE)
+ 
+@@ -201,7 +197,8 @@ zImage uImage uImage.srec vmlinux.srec: vmlinux
+ 
+ compressed: zImage
+ 
+-archprepare: maketools
++archprepare:
++	$(Q)$(MAKE) $(build)=arch/sh/tools include/asm-sh/machtypes.h
+ 
+ archclean:
+ 	$(Q)$(MAKE) $(clean)=$(boot)
+@@ -213,5 +210,3 @@ define archhelp
+ 	@echo '  uImage  	           - Create a bootable image for U-Boot'
+ 	@echo '  uImage.srec  	           - Create an S-record for U-Boot'
+ endef
+-
+-CLEAN_FILES += include/asm-sh/machtypes.h
+diff --git a/arch/sh/include/asm/.gitignore b/arch/sh/include/asm/.gitignore
+deleted file mode 100644
+index 378db77..0000000
+--- a/arch/sh/include/asm/.gitignore
++++ /dev/null
+@@ -1 +0,0 @@
+-machtypes.h
+diff --git a/arch/sh/include/asm/machvec.h b/arch/sh/include/asm/machvec.h
+index 84dd377..9c30955 100644
+--- a/arch/sh/include/asm/machvec.h
++++ b/arch/sh/include/asm/machvec.h
+@@ -12,7 +12,7 @@
+ 
+ #include <linux/types.h>
+ #include <linux/time.h>
+-#include <asm/machtypes.h>
++#include <generated/machtypes.h>
+ 
+ struct sh_machine_vector {
+ 	void (*mv_setup)(char **cmdline_p);
+diff --git a/arch/sh/tools/Makefile b/arch/sh/tools/Makefile
+index 567516b..558a56b 100644
+--- a/arch/sh/tools/Makefile
++++ b/arch/sh/tools/Makefile
+@@ -10,7 +10,7 @@
+ # Shamelessly cloned from ARM.
+ #
+ 
+-include/asm-sh/machtypes.h: $(src)/gen-mach-types $(src)/mach-types
++include/generated/machtypes.h: $(src)/gen-mach-types $(src)/mach-types
+ 	@echo '  Generating $@'
+-	$(Q)if [ ! -d include/asm-sh ]; then mkdir -p include/asm-sh; fi
++	$(Q)mkdir -p $(dir $@)
+ 	$(Q)$(AWK) -f $^ > $@ || { rm -f $@; /bin/false; }
+diff --git a/arch/sh/tools/gen-mach-types b/arch/sh/tools/gen-mach-types
+index 65161e3..f5ff7c5 100644
+--- a/arch/sh/tools/gen-mach-types
++++ b/arch/sh/tools/gen-mach-types
+@@ -1,6 +1,6 @@
+ #!/bin/awk
+ #
+-# Awk script to generate include/asm-sh/machtypes.h
++# Awk script to generate include/generated/machtypes.h
+ # Heavily based on arch/arm/tools/gen-mach-types
+ #
+ BEGIN	{ nr = 0 }
+-- 
+1.6.2.5
 
