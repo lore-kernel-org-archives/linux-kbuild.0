@@ -1,55 +1,31 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from Cpsmtpm-eml109.kpnxchange.com ([195.121.3.13]:55438 "EHLO
-	CPSMTPM-EML109.kpnxchange.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1752971AbZGVRHm (ORCPT
+Received: from 74-93-104-97-Washington.hfc.comcastbusiness.net ([74.93.104.97]:39881
+	"EHLO sunset.davemloft.net" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1753708AbZGVSZs (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 22 Jul 2009 13:07:42 -0400
-From: Frans Pop <elendil@planet.nl>
-Subject: Re: [PATCH,resend] sparc64: build compressed image (zImage) by default
-Date: Wed, 22 Jul 2009 19:07:39 +0200
-References: <200907162041.53181.elendil@planet.nl> <20090716201601.GA6038@merkur.ravnborg.org>
-In-Reply-To: <20090716201601.GA6038@merkur.ravnborg.org>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
+	Wed, 22 Jul 2009 14:25:48 -0400
+Date: Wed, 22 Jul 2009 11:25:54 -0700 (PDT)
+Message-Id: <20090722.112554.221617981.davem@davemloft.net>
+Subject: Re: [PATCH,resend] sparc64: build compressed image (zImage) by
+ default
+From: David Miller <davem@davemloft.net>
+In-Reply-To: <200907221907.40698.elendil@planet.nl>
+References: <200907162041.53181.elendil@planet.nl>
+	<20090716201601.GA6038@merkur.ravnborg.org>
+	<200907221907.40698.elendil@planet.nl>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-Message-Id: <200907221907.40698.elendil@planet.nl>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: sparclinux@vger.kernel.org, linux-kbuild@vger.kernel.org
-Cc: Jurij Smakov <jurij@wooyd.org>, David Miller <davem@davemloft.net>
+To: elendil@planet.nl
+Cc: sparclinux@vger.kernel.org, linux-kbuild@vger.kernel.org, jurij@wooyd.org
 
-On Thursday 16 July 2009, Sam Ravnborg wrote:
-> On Thu, Jul 16, 2009 at 08:41:52PM +0200, Frans Pop wrote:
-> > From: Jurij Smakov <jurij@wooyd.org>
-> > Subject: sparc64: build compressed image (zImage) by default
-> >
-> > Besides creating the uncompressed vmlinux image for sparc64, also
-> > create a compressed zImage. This is more consistent with other
-> > architectures and required to make the 'deb-pkg' target work.
-> >
-> > Signed-off-by: Jurij Smakov <jurij@wooyd.org>
-> > Signed-off-by: Frans Pop <elendil@planet.nl>
->
-> Hmmm..
-> This path does the following:
-> 1) zImage becomes default for sparc and sparc64
-> 2) fixes zImage on sparc64 (it dod not work before)
-> 3) On sparc zImage is a stripped version of vmlinux, on sparc64 it is a
-> gzipped not-stripped version of vmlinux - so it introduces a
-> significantly different zImage.
+From: Frans Pop <elendil@planet.nl>
+Date: Wed, 22 Jul 2009 19:07:39 +0200
 
-If I read arch/sparc/boot/Makefile correctly then the sparc64 image _is_ 
-stripped as the zImage target calls $(obj)/image which does the strip.
-So the difference is less than you suggest.
+> I vaguely recall from Debian work that loading compressed kernels caused 
+> problems on sparc32 hardware (due to insufficient memory?), which could 
+> justify the difference. But I may be wrong.
 
-> Could we agree on the _same_ format for zImage on sparc and sparc64 and
-> then apply that patch?
-
-I vaguely recall from Debian work that loading compressed kernels caused 
-problems on sparc32 hardware (due to insufficient memory?), which could 
-justify the difference. But I may be wrong.
-
-Cheers,
-FJP
+This is, unfortunately, very likely true.
