@@ -1,40 +1,55 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from moutng.kundenserver.de ([212.227.17.9]:51497 "EHLO
-	moutng.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755551AbZGVNuR (ORCPT
+Received: from Cpsmtpm-eml109.kpnxchange.com ([195.121.3.13]:55438 "EHLO
+	CPSMTPM-EML109.kpnxchange.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1752971AbZGVRHm (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 22 Jul 2009 09:50:17 -0400
-From: Arnd Bergmann <arnd@arndb.de>
-Subject: Re: [PATCH/RFC] Move generated files to include/generated
-Date: Wed, 22 Jul 2009 15:50:15 +0200
-References: <20090721211040.GA7688@merkur.ravnborg.org> <20090722095818.GH6281@cr0.nay.redhat.com>
-In-Reply-To: <20090722095818.GH6281@cr0.nay.redhat.com>
+	Wed, 22 Jul 2009 13:07:42 -0400
+From: Frans Pop <elendil@planet.nl>
+Subject: Re: [PATCH,resend] sparc64: build compressed image (zImage) by default
+Date: Wed, 22 Jul 2009 19:07:39 +0200
+References: <200907162041.53181.elendil@planet.nl> <20090716201601.GA6038@merkur.ravnborg.org>
+In-Reply-To: <20090716201601.GA6038@merkur.ravnborg.org>
 MIME-Version: 1.0
-Content-Type: Text/Plain;
+Content-Type: text/plain;
   charset="iso-8859-1"
 Content-Transfer-Encoding: 7bit
-Message-Id: <200907221550.15280.arnd@arndb.de>
+Content-Disposition: inline
+Message-Id: <200907221907.40698.elendil@planet.nl>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Amerigo Wang <xiyou.wangcong@gmail.com>
-Cc: Sam Ravnborg <sam@ravnborg.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, lkml <linux-kernel@vger.kernel.org>, linux arch <linux-arch@vger.kernel.org>, Al Viro <viro@zeniv.linux.org.uk>
+To: sparclinux@vger.kernel.org, linux-kbuild@vger.kernel.org
+Cc: Jurij Smakov <jurij@wooyd.org>, David Miller <davem@davemloft.net>
 
-On Wednesday 22 July 2009, Amerigo Wang wrote:
-> On Tue, Jul 21, 2009 at 11:10:40PM +0200, Sam Ravnborg wrote:
-> >In 2.6.30 we introduced support for adding generated
-> >files to a dedicated directory named "include/generated".
+On Thursday 16 July 2009, Sam Ravnborg wrote:
+> On Thu, Jul 16, 2009 at 08:41:52PM +0200, Frans Pop wrote:
+> > From: Jurij Smakov <jurij@wooyd.org>
+> > Subject: sparc64: build compressed image (zImage) by default
+> >
+> > Besides creating the uncompressed vmlinux image for sparc64, also
+> > create a compressed zImage. This is more consistent with other
+> > architectures and required to make the 'deb-pkg' target work.
+> >
+> > Signed-off-by: Jurij Smakov <jurij@wooyd.org>
+> > Signed-off-by: Frans Pop <elendil@planet.nl>
 >
-> Personally, I don't like this, I hate to see
-> #include <generated/foo.h>
+> Hmmm..
+> This path does the following:
+> 1) zImage becomes default for sparc and sparc64
+> 2) fixes zImage on sparc64 (it dod not work before)
+> 3) On sparc zImage is a stripped version of vmlinux, on sparc64 it is a
+> gzipped not-stripped version of vmlinux - so it introduces a
+> significantly different zImage.
 
-I think that moving the generated files to a common location
-makes a lot of sense, but it seems easier to move them
-to include/generated/linux/ or even to (generated/linux/) and
-then add -Iinclude/generated/ to the gcc command line so
-you don't need to actually change all the users.
+If I read arch/sparc/boot/Makefile correctly then the sparc64 image _is_ 
+stripped as the zImage target calls $(obj)/image which does the strip.
+So the difference is less than you suggest.
 
-For the files in asm/, you could either add a generated/asm
-directory or move them to generated/linux/ and change the
-users.
+> Could we agree on the _same_ format for zImage on sparc and sparc64 and
+> then apply that patch?
 
-	Arnd <><
+I vaguely recall from Debian work that loading compressed kernels caused 
+problems on sparc32 hardware (due to insufficient memory?), which could 
+justify the difference. But I may be wrong.
+
+Cheers,
+FJP
