@@ -1,40 +1,40 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from astoria.ccjclearline.com ([64.235.106.9]:38825 "EHLO
-	astoria.ccjclearline.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754145AbZGVM1b (ORCPT
+Received: from moutng.kundenserver.de ([212.227.17.9]:51497 "EHLO
+	moutng.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755551AbZGVNuR (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 22 Jul 2009 08:27:31 -0400
-Received: from cpe002129687b04-cm001225dbafb6.cpe.net.cable.rogers.com ([99.235.241.187] helo=crashcourse.ca)
-	by astoria.ccjclearline.com with esmtpsa (TLSv1:AES256-SHA:256)
-	(Exim 4.69)
-	(envelope-from <rpjday@crashcourse.ca>)
-	id 1MTaux-0007Zh-DR
-	for linux-kbuild@vger.kernel.org; Wed, 22 Jul 2009 08:27:31 -0400
-Date: Wed, 22 Jul 2009 08:25:03 -0400 (EDT)
-From: "Robert P. J. Day" <rpjday@crashcourse.ca>
-Subject: "header-y" versus "unifdef-y"?
-Message-ID: <alpine.LFD.2.00.0907220823370.19368@localhost>
+	Wed, 22 Jul 2009 09:50:17 -0400
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: Re: [PATCH/RFC] Move generated files to include/generated
+Date: Wed, 22 Jul 2009 15:50:15 +0200
+References: <20090721211040.GA7688@merkur.ravnborg.org> <20090722095818.GH6281@cr0.nay.redhat.com>
+In-Reply-To: <20090722095818.GH6281@cr0.nay.redhat.com>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+Content-Type: Text/Plain;
+  charset="iso-8859-1"
+Content-Transfer-Encoding: 7bit
+Message-Id: <200907221550.15280.arnd@arndb.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: kbuild devel list <linux-kbuild@vger.kernel.org>
+To: Amerigo Wang <xiyou.wangcong@gmail.com>
+Cc: Sam Ravnborg <sam@ravnborg.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, lkml <linux-kernel@vger.kernel.org>, linux arch <linux-arch@vger.kernel.org>, Al Viro <viro@zeniv.linux.org.uk>
 
+On Wednesday 22 July 2009, Amerigo Wang wrote:
+> On Tue, Jul 21, 2009 at 11:10:40PM +0200, Sam Ravnborg wrote:
+> >In 2.6.30 we introduced support for adding generated
+> >files to a dedicated directory named "include/generated".
+>
+> Personally, I don't like this, I hate to see
+> #include <generated/foo.h>
 
-  is it my imagination, or did someone recently propose that there
-will soon be no distinction between those two Kbuild directives since
-it's just as easy to "unifdef" all of them, no matter what?  has that
-patch already been submitted for the next major release?
+I think that moving the generated files to a common location
+makes a lot of sense, but it seems easier to move them
+to include/generated/linux/ or even to (generated/linux/) and
+then add -Iinclude/generated/ to the gcc command line so
+you don't need to actually change all the users.
 
-rday
---
+For the files in asm/, you could either add a generated/asm
+directory or move them to generated/linux/ and change the
+users.
 
-========================================================================
-Robert P. J. Day                               Waterloo, Ontario, CANADA
-
-        Linux Consulting, Training and Annoying Kernel Pedantry.
-
-Web page:                                          http://crashcourse.ca
-Twitter:                                       http://twitter.com/rpjday
-"Kernel Newbie Corner" column @ linux.com:          http://cli.gs/WG6WYX
-========================================================================
+	Arnd <><
