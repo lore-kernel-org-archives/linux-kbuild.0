@@ -1,97 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from rcsinet12.oracle.com ([148.87.113.124]:22934 "EHLO
-	rgminet12.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751300AbZGWAPz (ORCPT
+Received: from cpsmtpm-eml105.kpnxchange.com ([195.121.3.9]:56487 "EHLO
+	CPSMTPM-EML105.kpnxchange.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1753823AbZGWMqq (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 22 Jul 2009 20:15:55 -0400
-Date: Wed, 22 Jul 2009 17:12:24 -0700
-From: Randy Dunlap <randy.dunlap@oracle.com>
-Subject: Re: [PATCH 0/6] kbuild configuration system improvements
-Message-Id: <20090722171224.d5ceaf39.randy.dunlap@oracle.com>
-In-Reply-To: <20090722214842.GA8695@merkur.ravnborg.org>
-References: <1247386308-19628-1-git-send-email-crq@kernel.org>
-	<20090718072138.GA7711@merkur.ravnborg.org>
-	<20090722134321.34f1ebf7.randy.dunlap@oracle.com>
-	<20090722214842.GA8695@merkur.ravnborg.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+	Thu, 23 Jul 2009 08:46:46 -0400
+From: Frans Pop <elendil@planet.nl>
+Subject: Re: [PATCH,v2] Only add '-fwrapv' to gcc CFLAGS for gcc 4.2 and later
+Date: Thu, 23 Jul 2009 14:46:44 +0200
+References: <200907100928.07369.elendil@planet.nl> <200907180043.53257.elendil@planet.nl> <20090718065903.GA7579@merkur.ravnborg.org>
+In-Reply-To: <20090718065903.GA7579@merkur.ravnborg.org>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="iso-8859-1"
 Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+Message-Id: <200907231446.44929.elendil@planet.nl>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Sam Ravnborg <sam@ravnborg.org>
-Cc: Cheng Renquan <crq@kernel.org>, linux-kbuild@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org, crquan@gmail.com, Roman Zippel <zippel@linux-m68k.org>
+Cc: linux-kbuild@vger.kernel.org
 
-On Wed, 22 Jul 2009 23:48:42 +0200 Sam Ravnborg wrote:
+On Saturday 18 July 2009, Sam Ravnborg wrote:
+> > I based my patch on arch/x86/Makefile:
+> > 35:        KBUILD_CFLAGS += $(shell if [ $(call cc-version) -lt 0400 ] ; then \
+> > 36:                echo $(call cc-option,-fno-unit-at-a-time); fi ;)
+> >
+> > Guess that could be improved to use cc-ifversion then.
+>
+> Yes, please...
 
-> On Wed, Jul 22, 2009 at 01:43:21PM -0700, Randy Dunlap wrote:
-> > On Sat, 18 Jul 2009 09:21:38 +0200 Sam Ravnborg wrote:
-> > 
-> > > On Sun, Jul 12, 2009 at 04:11:42PM +0800, Cheng Renquan wrote:
-> > > > From: Cheng Renquan <crquan@gmail.com>
-> > > > 
-> > > > These patches improve usability of kernel configuration system,
-> > > > 
-> > > > 1. add symbol's value shown accompanied in config item's help message;
-> > > > 2. move the real plumbing functions code from mconf.c to menu.c, make them
-> > > >    be able to be shared with other configuration methods;
-> > > > 3. add "symbol's value shown" support for gconfig/xconfig/config;
-> > > > 
-> > > >     0001-add-symbol-value-to-help-find-the-real-depend.patch
-> > > >     0002-add-menu_get_ext_help-function-to-display-more-infor.patch
-> > > >     0003-menuconfig-improvements.patch
-> > > >     0004-make-use-of-menu_get_ext_help-in-gconfig.patch
-> > > >     0005-make-use-of-menu_get_ext_help-in-qconfig.patch
-> > > >     0006-make-use-of-menu_get_ext_help-in-make-config.patch
-> > > 
-> > > I fixed them all up to:
-> > > 1) include "kconfig:" prefix in subject
-> > > 2) cc: of Roman Zippel which is kconfig maintainer
-> > > 
-> > > There were a few checkpatch issues that I decided to ignore for now.
-> > > 
-> > > Please always cc: Roman on kconfig patches as he is the mintainer.
-> > > 
-> > > Applied to kbuild-next.git.
-> > 
-> > 
-> > FWIW, I still get a segfault in gconfig (as I reported several months ago).
-> > I suppose that if it's a real issue, someone else will also see this.
-> 
-> I assumed it was fixed - the changelog patches did
-> not mention any outstanding issues.
-> 
-> Following fix is needed.
+I've got patches for x86, ia64, powerpc and um, but have a couple of
+questions before I submit them.
 
-Ack, that works.  Thanks.
+Can the patches go through your kbuild tree or should they go through the
+arch trees (they will be CCed of course)?
 
+In my patches I've left the cc-option check where it existed, so for x86
+you get (tested to work):
+-        KBUILD_CFLAGS += $(shell if [ $(call cc-version) -lt 0400 ] ; then \
+-                echo $(call cc-option,-fno-unit-at-a-time); fi ;)
++        KBUILD_CFLAGS += $(call cc-ifversion, -lt, 0400, \
++                               $(call cc-option,-fno-unit-at-a-time))
 
-> 	Sam
-> 
-> diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
-> index 931d782..b74f746 100644
-> --- a/scripts/kconfig/menu.c
-> +++ b/scripts/kconfig/menu.c
-> @@ -528,5 +528,6 @@ void menu_get_ext_help(struct menu *menu, struct gstr *help)
->  	} else {
->  		str_append(help, nohelp_text);
->  	}
-> -	get_symbol_str(help, sym);
-> +	if (sym)
-> +		get_symbol_str(help, sym);
->  }
-> 
-> 
-> 
-> 
-> > 
-> > ---
-> > ~Randy
-> > LPC 2009, Sept. 23-25, Portland, Oregon
-> > http://linuxplumbersconf.org/2009/
-> > 
+Or is it safe to simplify that to just:
++        KBUILD_CFLAGS += $(call cc-ifversion, -lt, 0400, -fno-unit-at-a-time)
+?
 
+> > And a quick git grep gives a few other potential candidates:
+> > arch/parisc/Makefile:129:       @if test "$(call cc-version)" -lt "0303"; then \
 
----
-~Randy
-LPC 2009, Sept. 23-25, Portland, Oregon
-http://linuxplumbersconf.org/2009/
+I left this one unchanged as it does not add a compiler option; instead it
+displays an "unsupported' message.
