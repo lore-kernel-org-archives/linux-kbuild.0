@@ -1,47 +1,75 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cpsmtpm-eml103.kpnxchange.com ([195.121.3.7]:55255 "EHLO
-	CPSMTPM-EML103.kpnxchange.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751256AbZGXXZH (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 24 Jul 2009 19:25:07 -0400
-From: Frans Pop <elendil@planet.nl>
-Subject: Re: [PATCH] ia64: minor Makefile simplification through use of cc-ifversion
-Date: Sat, 25 Jul 2009 01:25:04 +0200
-References: <200907232056.51064.elendil@planet.nl> <200907242023.12478.elendil@planet.nl> <20090724231511.GA20607@linux-os.sc.intel.com>
-In-Reply-To: <20090724231511.GA20607@linux-os.sc.intel.com>
+Received: from mx2.redhat.com ([66.187.237.31]:56736 "EHLO mx2.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751996AbZGYDYA (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 24 Jul 2009 23:24:00 -0400
+Date: Fri, 24 Jul 2009 23:23:44 -0400
+From: Dave Jones <davej@redhat.com>
+Subject: Re: [Bug 13012] 2.6.28.9 causes init to segfault on Debian etch;
+	2.6.28.8 OK
+Message-ID: <20090725032343.GA20841@redhat.com>
+References: <200907100928.07369.elendil@planet.nl> <200907101659.31813.elendil@planet.nl> <alpine.LFD.2.01.0907121058040.3552@localhost.localdomain> <m3k52d1775.fsf@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Message-Id: <200907250125.06102.elendil@planet.nl>
+In-Reply-To: <m3k52d1775.fsf@google.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Fenghua Yu <fenghua.yu@intel.com>
-Cc: Peter Chubb <peterc@gelato.unsw.edu.au>, Sam Ravnborg <sam@ravnborg.org>, "linux-ia64@vger.kernel.org" <linux-ia64@vger.kernel.org>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+To: Ian Lance Taylor <iant@google.com>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, Frans Pop <elendil@planet.nl>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>, linux-kbuild@vger.kernel.org, barryn@pobox.com, bugme-daemon@bugzilla.kernel.org
 
-On Saturday 25 July 2009, Fenghua Yu wrote:
-> Between GCC version 3.4.0 and 4.3.3 (including 3.4.0 and 4.3.3),
-> -mtune=merced is implemented in GCC. Starting from 4.4.0, -mtune=merced
-> is deprecated.
->
-> Even implemented in versions between 3.4.0 and 4.3.3, the -mtune=merced
-> feature has been broken in some of the versions. For example, GCC 4.1.2
-> reports interanl tuning function errors during kernel building with
-> -mtune=merced. Or GCC Bugzilla 16130 reports another -mtune=merced
-> issue on GCC 3.4.1.
->
-> So I would remove the -mtune=merced from IA64 kernel build. Without
-> this option, kernel on Merced will remain the same except losing an
-> unstable and out-of-date performance tunning feature.
->
-> Since GCC version 3.4.0, -mtune=mckinley has been implemented. The
-> -mtune=mckinley option functions the same as mtune=itanium2. And
-> mtune=itanium2 is the default option. So we don't need to add
-> mtune=mckinley either since its been the default option in any GCC
-> version which implements this option.
->
-> Signed-off-by: Fenghua Yu <fenghua.yu@intel.com>
+On Sun, Jul 12, 2009 at 10:29:50PM -0700, Ian Lance Taylor wrote:
 
-Fine by me, but you'll probably want to give the commit a different 
-subject :-)
+ > (The gcc 4.2 and later option -Wstrict-overflow=N can help find the
+ > cases where a program relies on defined signed overflow, but only if
+ > somebody is patient enough to wade through all the false positives.)
+ 
+I got curious and wondered just how many warnings this would trigger,
+so I did a build with -Wstrict-overflow=5.  I was pleasantly surprised
+to see that it isn't that many from an allmodconfig build..
+
+crypto/algboss.c:173: warning: assuming signed overflow does not occur when simplifying conditional to constant
+net/ipv4/igmp.c:773: warning: assuming signed overflow does not occur when simplifying conditional to constant
+drivers/ata/libata-eh.c:3076: warning: assuming signed overflow does not occur when simplifying conditional to constant
+sound/core/seq/seq_queue.c:195: warning: assuming signed overflow does not occur when simplifying conditional to constant
+drivers/block/ub.c:2293: warning: assuming signed overflow does not occur when simplifying conditional to constant
+sound/pci/es1968.c:1545: warning: assuming signed overflow does not occur when simplifying conditional to constant
+sound/pci/es1968.c:1582: warning: assuming signed overflow does not occur when simplifying conditional to constant
+fs/ext3/inode.c:658: warning: assuming signed overflow does not occur when simplifying conditional to constant
+fs/ext4/inode.c:797: warning: assuming signed overflow does not occur when simplifying conditional to constant
+drivers/edac/amd64_edac.c:726: warning: assuming signed overflow does not occur when simplifying conditional to constant
+sound/soc/codecs/wm8988.c:665: warning: assuming signed overflow does not occur when simplifying conditional to constant
+net/bluetooth/cmtp/core.c:234: warning: assuming signed overflow does not occur when simplifying conditional to constant
+net/mac80211/rc80211_minstrel.c:193: warning: assuming signed overflow does not occur when simplifying conditional to constant
+drivers/isdn/hardware/eicon/debug.c:419: warning: assuming signed overflow does not occur when simplifying conditional to constant
+drivers/uio/uio.c:707: warning: assuming signed overflow does not occur when simplifying conditional to constant
+drivers/uio/uio.c:671: warning: assuming signed overflow does not occur when simplifying conditional to constant
+drivers/uio/uio.c:642: warning: assuming signed overflow does not occur when simplifying conditional to constant
+drivers/net/usb/hso.c:2308: warning: assuming signed overflow does not occur when simplifying conditional to constant
+drivers/video/matrox/matroxfb_g450.c:214: warning: assuming signed overflow does not occur when simplifying conditional to constant
+drivers/video/matrox/matroxfb_g450.c:160: warning: assuming signed overflow does not occur when simplifying conditional to constant
+drivers/video/matrox/matroxfb_maven.c:1125: warning: assuming signed overflow does not occur when simplifying conditional to constant
+drivers/video/matrox/matroxfb_maven.c:1044: warning: assuming signed overflow does not occur when simplifying conditional to constant
+drivers/net/wireless/zd1211rw/zd_rf_uw2453.c:417: warning: assuming signed overflow does not occur when simplifying conditional to constant
+
+Some of these appear to be obvious cases where we don't care about
+the sign (loop counters for eg)
+
+Is it worth fixing these up, with diffs like the below ?
+
+	Dave
+
+diff --git a/fs/ext3/inode.c b/fs/ext3/inode.c
+index 5f51fed..3bb95de 100644
+--- a/fs/ext3/inode.c
++++ b/fs/ext3/inode.c
+@@ -595,7 +595,7 @@ static int ext3_alloc_branch(handle_t *handle, struct inode *inode,
+ 			int *offsets, Indirect *branch)
+ {
+ 	int blocksize = inode->i_sb->s_blocksize;
+-	int i, n = 0;
++	unsigned int i, n = 0;
+ 	int err = 0;
+ 	struct buffer_head *bh;
+ 	int num;
+
