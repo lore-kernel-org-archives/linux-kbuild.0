@@ -1,51 +1,105 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp1.linux-foundation.org ([140.211.169.13]:57197 "EHLO
-	smtp1.linux-foundation.org" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751966AbZGYQuJ (ORCPT
+Received: from cpsmtpm-eml101.kpnxchange.com ([195.121.3.5]:56842 "EHLO
+	CPSMTPM-EML101.kpnxchange.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751632AbZGZAKW (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 25 Jul 2009 12:50:09 -0400
-Date: Sat, 25 Jul 2009 09:49:41 -0700 (PDT)
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Subject: Re: [Bug 13012] 2.6.28.9 causes init to segfault on Debian etch;
- 2.6.28.8 OK
-In-Reply-To: <20090725032343.GA20841@redhat.com>
-Message-ID: <alpine.LFD.2.01.0907250944570.3960@localhost.localdomain>
-References: <200907100928.07369.elendil@planet.nl> <200907101659.31813.elendil@planet.nl> <alpine.LFD.2.01.0907121058040.3552@localhost.localdomain> <m3k52d1775.fsf@google.com> <20090725032343.GA20841@redhat.com>
+	Sat, 25 Jul 2009 20:10:22 -0400
+From: Frans Pop <elendil@planet.nl>
+Subject: kbuild: fix the binrpm-pkg target to work with KBUILD_OUTPUT set
+Date: Sun, 26 Jul 2009 02:10:19 +0200
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+Content-Type: text/plain;
+  charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+Message-Id: <200907260210.19784.elendil@planet.nl>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Dave Jones <davej@redhat.com>
-Cc: Ian Lance Taylor <iant@google.com>, Frans Pop <elendil@planet.nl>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>, linux-kbuild@vger.kernel.org, barryn@pobox.com, bugme-daemon@bugzilla.kernel.org
+To: linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
 
+The binrpm-pkg target (binary RPM only) fails when called with
+KBUILD_OUTPUT set. This patch makes it work.
 
+For the rpm-pkg target (source + binary RPM), building with
+KBUILD_OUTPUT set is not possible and also not needed as the
+actual build is done in a temporary directory anyway, so check
+that KBUILD_OUTPUT is not set in that case to avoid later errors.
 
-On Fri, 24 Jul 2009, Dave Jones wrote:
-> 
-> Is it worth fixing these up, with diffs like the below ?
+Signed-off-by: Frans Pop <elendil@planet.nl>
+---
 
-Historically, when we fix up bugs like this, it causes more bugs than it 
-fixes.
+I ran into this while trying if I could build an RPM kernel package on
+my Debian notebook :-)
 
-It needs _really_ careful people, and people who really understand how C 
-type rules work. Stuff that looks obvious often is not, and basing a large 
-part of the patch on a compiler warning is a _very_ weak reason for 
-something that is more than just syntactic.
+The patch has been tested by doing three builds:
+- make -j4 rpm-pkg
+- make -j4 binrpm-pkg
+- KBUILD_OUTPUT=../builds/amd64 make -j4 binrpm-pkg
 
-And the problem is, nobody can judge the patch from the diff. So it gets 
-absolutely zero review, until the day when somebody notices that the 
-unsigned version is a bug.
+For all three the contents of the resulting binary RPM package was identical
+(and looked correct); the source RPM package from the first build looked sane.
 
-I'd suggest that the rule should be:
+A 'KBUILD_OUTPUT=../builds/amd64 make -j4 rpm-pkg' fails as intended.
 
- - if you can use -U30 and show all uses, so that people can actually look 
-   at the patch and see what it _causes_ (ie not just the "we change 'i' 
-   to 'unsigned'", but also the "this is where 'i' gets used, and 
-   'unsigned' is right"), then we can apply it.
+One open issue is that the following commands should IIUC be identical,
+but the second one does not work:
+- KBUILD_OUTPUT=../builds/amd64 make -j4 binrpm-pkg
+- make -j4 O=../builds/amd64 binrpm-pkg
 
- - none of the patches go through a 'trivial' tree, or come from newbies 
-   that think this is a good way to get involved.
+AFAICT the root Makefile is supposed to set KBUILD_OUTPUT based on O=, but
+that is not visible when the lines within the binrpm-pkg target are executed.
+My make foo was not strong enough to debug this. Sam, do you know?
 
-Is it worth it at that point? I dunno.
+Cheers,
+FJP
 
-		Linus
+diff --git a/scripts/package/Makefile b/scripts/package/Makefile
+index fa4a0a1..b305c57 100644
+--- a/scripts/package/Makefile
++++ b/scripts/package/Makefile
+@@ -18,6 +18,9 @@
+ # e) generate the rpm files, based on kernel.spec
+ # - Use /. to avoid tar packing just the symlink
+ 
++# Note that the rpm-pkg target cannot be used with KBUILD_OUTPUT,
++# but the binrpm-pkg target can; for some reason O= gets ignored.
++
+ # Do we have rpmbuild, otherwise fall back to the older rpm
+ RPM := $(shell if [ -x "/usr/bin/rpmbuild" ]; then echo rpmbuild; \
+ 	           else echo rpm; fi)
+@@ -33,6 +36,12 @@ $(objtree)/kernel.spec: $(MKSPEC) $(srctree)/Makefile
+ 	$(CONFIG_SHELL) $(MKSPEC) > $@
+ 
+ rpm-pkg rpm: $(objtree)/kernel.spec FORCE
++	@if test -n "$(KBUILD_OUTPUT)"; then \
++		echo "Building source + binary RPM is not possible outside the"; \
++		echo "kernel source tree. Don't set KBUILD_OUTPUT, or use the"; \
++		echo "binrpm-pkg target instead."; \
++		false; \
++	fi
+ 	$(MAKE) clean
+ 	$(PREV) ln -sf $(srctree) $(KERNELPATH)
+ 	$(CONFIG_SHELL) $(srctree)/scripts/setlocalversion > $(objtree)/.scmversion
+@@ -61,7 +70,7 @@ binrpm-pkg: $(objtree)/binkernel.spec FORCE
+ 	set -e; \
+ 	mv -f $(objtree)/.tmp_version $(objtree)/.version
+ 
+-	$(RPM) $(RPMOPTS) --define "_builddir $(srctree)" --target \
++	$(RPM) $(RPMOPTS) --define "_builddir $(objtree)" --target \
+ 		$(UTS_MACHINE) -bb $<
+ 
+ clean-files += $(objtree)/binkernel.spec
+diff --git a/scripts/package/mkspec b/scripts/package/mkspec
+index 3d93f8c..ce9c60e 100755
+--- a/scripts/package/mkspec
++++ b/scripts/package/mkspec
+@@ -70,7 +70,7 @@ echo 'mkdir -p $RPM_BUILD_ROOT/boot $RPM_BUILD_ROOT/lib/modules'
+ echo 'mkdir -p $RPM_BUILD_ROOT/lib/firmware'
+ echo "%endif"
+ 
+-echo 'INSTALL_MOD_PATH=$RPM_BUILD_ROOT make %{_smp_mflags} modules_install'
++echo 'INSTALL_MOD_PATH=$RPM_BUILD_ROOT make %{_smp_mflags} KBUILD_SRC= modules_install'
+ echo "%ifarch ia64"
+ echo 'cp $KBUILD_IMAGE $RPM_BUILD_ROOT'"/boot/efi/vmlinuz-$KERNELRELEASE"
+ echo 'ln -s '"efi/vmlinuz-$KERNELRELEASE" '$RPM_BUILD_ROOT'"/boot/"
