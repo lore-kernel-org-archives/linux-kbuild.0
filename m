@@ -1,24 +1,36 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.redhat.com ([66.187.237.31]:58574 "EHLO mx2.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751403AbZGaMEG (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 31 Jul 2009 08:04:06 -0400
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <200907311227.20132.elendil@planet.nl>
-References: <200907311227.20132.elendil@planet.nl>
+Received: from cpsmtpm-eml105.kpnxchange.com ([195.121.3.9]:49527 "EHLO
+	CPSMTPM-EML105.kpnxchange.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751953AbZGaM26 (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 31 Jul 2009 08:28:58 -0400
+From: Frans Pop <elendil@planet.nl>
 Subject: Re: RomFS: enless loop during make oldconfig from 2.6.24 -> 2.6.31-rc4 (parisc)
-Date: Fri, 31 Jul 2009 13:04:00 +0100
-Message-ID: <4977.1249041840@redhat.com>
+Date: Fri, 31 Jul 2009 14:28:55 +0200
+References: <200907311227.20132.elendil@planet.nl> <4977.1249041840@redhat.com>
+In-Reply-To: <4977.1249041840@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+Message-Id: <200907311428.56932.elendil@planet.nl>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Frans Pop <elendil@planet.nl>
-Cc: dhowells@redhat.com, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, David Woodhouse <David.Woodhouse@intel.com>
+To: David Howells <dhowells@redhat.com>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, David Woodhouse <David.Woodhouse@intel.com>
 
-Frans Pop <elendil@planet.nl> wrote:
+On Friday 31 July 2009, David Howells wrote:
+> Frans Pop <elendil@planet.nl> wrote:
+> > # Linux kernel version: 2.6.24-rc3test
+>
+> I presume this is not the version of the kernel you're using.  This
+> RomFS feature was not upstream back then.  What version are you using?
 
-> # Linux kernel version: 2.6.24-rc3test
+As the Subject says, the make oldconfig was for 2.6.31-rc4 :-)
 
-I presume this is not the version of the kernel you're using.  This RomFS
-feature was not upstream back then.  What version are you using?
+$ git describe master
+v2.6.31-rc4-294-gf5886c7
 
-David
+Cheers,
+FJP
