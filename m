@@ -1,90 +1,40 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from Cpsmtpm-eml106.kpnxchange.com ([195.121.3.10]:63029 "EHLO
-	CPSMTPM-EML106.kpnxchange.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751089AbZGaRQi (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 31 Jul 2009 13:16:38 -0400
-From: Frans Pop <elendil@planet.nl>
-Subject: Re: RomFS: enless loop during make oldconfig from 2.6.24 -> 2.6.31-rc4 (parisc)
-Date: Fri, 31 Jul 2009 19:16:36 +0200
-References: <200907311730.08804.elendil@planet.nl> <17615.1249045054@redhat.com> <18884.1249058776@redhat.com>
-In-Reply-To: <18884.1249058776@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="utf-8"
+Received: from poutre.nerim.net ([62.4.16.124]:50192 "EHLO poutre.nerim.net"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754293AbZHCMFB (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 3 Aug 2009 08:05:01 -0400
+Date: Mon, 3 Aug 2009 14:04:59 +0200
+From: Jean Delvare <khali@linux-fr.org>
+Subject: ld:arch/x86/kernel/vmlinux.lds:678: parse error
+Message-ID: <20090803140459.02cea700@hyperion.delvare>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-Message-Id: <200907311916.37389.elendil@planet.nl>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: David Howells <dhowells@redhat.com>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, David Woodhouse <David.Woodhouse@intel.com>
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: linux-kbuild@vger.kernel.org
 
-On Friday 31 July 2009, David Howells wrote:
-> Frans Pop <elendil@planet.nl> wrote:
-> > I've tried again too. With all defaults I cannot reproduce it either.
-> > But if I answer the questions below as follows, I do get the loop
-> > again:
-> >
-> > Advanced netfilter configuration: N
-> > Wireless: N
-> > * sound drivers: N (* = "PCI","USB" and one or two others)
-> > Default ext3 to "data=ordered": Y
->
-> I still don't see it.  I have:
->
-> 	# CONFIG_NETFILTER_ADVANCED is not set
-> 	# CONFIG_WIRELESS is not set
-> 	# CONFIG_SND_PCI is not set
-> 	# CONFIG_SND_SPI is not set
-> 	# CONFIG_SND_USB is not set
-> 	# CONFIG_SND_GSC is not set
-> 	# CONFIG_SND_SOC is not set
-> 	CONFIG_EXT3_DEFAULTS_TO_ORDERED=y
->
-> Can you accept all the defaults, then delete the above symbols from
-> .config and run make oldconfig again, see if the problem crops up?
+Hi Sam,
 
-No, I can not reproduce it that way. But I have just reproduced it for a
-third time giving those answers starting from the original .config. So
-the "good" news is that at least it's reproducible for me.
+I am not able to build Linus' latest kernel on my oldest test system. I
+get the following linking error at the end:
 
-My guess is it's not a RomFS issue, but rather some kbuild weirdness
-(and maybe even architecture or userland related).
-Note how in the loop the help text for ROMFS_BACKED_BY_BLOCK gets
-displayed somehow, while in the normal case you don't get that.
+  LD      .tmp_vmlinux1
+ld:arch/x86/kernel/vmlinux.lds:678: parse error
 
-With all default answers, I get:
-<snip>
-  ROM file system support (ROMFS_FS) [M/n/y/?] m
-    RomFS backing stores
-    > 1. Block device-backed ROM file system support (ROMFS_BACKED_BY_BLOCK) (NEW)
-    choice[1]: 1
-  System V/Xenix/V7/Coherent file system support (SYSV_FS) [N/m/y/?] n
-  UFS file system support (read only) (UFS_FS) [N/m/y/?] n
-  NILFS2 file system support (EXPERIMENTAL) (NILFS2_FS) [N/m/y/?] (NEW)
-</snip>
+Which is:
 
-Compared to what I get in the loop:
-<snip>
-    RomFS backing stores
-    > 1. Block device-backed ROM file system support (ROMFS_BACKED_BY_BLOCK) (NEW)
-    choice[1]: 1
+ASSERT((_end - 0xC0000000 <= (512 * 1024 * 1024)),
+        "kernel image bigger than KERNEL_IMAGE_SIZE")
 
-This permits ROMFS to use block devices buffered through the page
-cache as the medium from which to retrieve data.  It does not allow
-direct mapping of the medium.
+Apparently this assertion is relatively new, as I was able to build
+kernel 2.6.29 on the same system. The system has binutils 2.14.90.0.6,
+which is more recent than what is listed in Documentation/Changes
+(2.12).
 
-If unsure, answer Y.
-</snip>
+Any idea?
 
-Is there some debugging mode for 'make oldconfig'? Or maybe we should
-just wait until Sam can comment.
-
-
-One minor issue for RomFS is that the "If unsure, answer Y." text for
-ROMFS_BACKED_BY_BLOCK and ROMFS_BACKED_BY_MTD does not really make
-much sense given that they are now alternative choices...
-
-Cheers,
-FJP
+Thanks,
+-- 
+Jean Delvare
