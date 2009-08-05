@@ -1,24 +1,52 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from one.firstfloor.org ([213.235.205.2]:42932 "EHLO
+Received: from one.firstfloor.org ([213.235.205.2]:42935 "EHLO
 	one.firstfloor.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750855AbZHEVv2 (ORCPT
+	with ESMTP id S1752735AbZHEVv3 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 5 Aug 2009 17:51:28 -0400
+	Wed, 5 Aug 2009 17:51:29 -0400
 From: Andi Kleen <andi@firstfloor.org>
-Message-Id: <200908051151.557035535@firstfloor.org>
-Subject: [PATCH] [0/5] kbuild: A couple of Kbuild fixes/improvements
-Date: Wed,  5 Aug 2009 23:51:26 +0200 (CEST)
+References: <200908051151.557035535@firstfloor.org>
+In-Reply-To: <200908051151.557035535@firstfloor.org>
+Subject: [PATCH] [1/5] kbuild: Fix ld-option Makefile macro to really work
+Message-Id: <20090805215127.B3FF8B15D8@basil.firstfloor.org>
+Date: Wed,  5 Aug 2009 23:51:27 +0200 (CEST)
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: sam@ravnborg.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
 
-Some build system patches that accumulated in my tree:
+Needed for the next patch
 
-- Fix mcount handling
-- Fix gold linker support
-- Add some gcc 4.5 support
+Signed-off-by: Andi Kleen <ak@linux.intel.com>
 
-One will address the problem Dave A. reported earlier today.
+---
+ scripts/Kbuild.include |    5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
--Andi
+Index: linux-2.6.31-rc1-ak/scripts/Kbuild.include
+===================================================================
+--- linux-2.6.31-rc1-ak.orig/scripts/Kbuild.include
++++ linux-2.6.31-rc1-ak/scripts/Kbuild.include
+@@ -83,11 +83,12 @@ TMPOUT := $(if $(KBUILD_EXTMOD),$(firstw
+ # is automatically cleaned up.
+ try-run = $(shell set -e;		\
+ 	TMP="$(TMPOUT).$$$$.tmp";	\
++	TMPO="$(TMPOUT).$$$$.o";	\
+ 	if ($(1)) >/dev/null 2>&1;	\
+ 	then echo "$(2)";		\
+ 	else echo "$(3)";		\
+ 	fi;				\
+-	rm -f "$$TMP")
++	rm -f "$$TMP" "$$TMPO")
+ 
+ # as-option
+ # Usage: cflags-y += $(call as-option,-Wa$(comma)-isa=foo,)
+@@ -133,7 +134,7 @@ cc-ifversion = $(shell [ $(call cc-versi
+ # ld-option
+ # Usage: ldflags += $(call ld-option, -Wl$(comma)--hash-style=both)
+ ld-option = $(call try-run,\
+-	$(CC) $(1) -nostdlib -xc /dev/null -o "$$TMP",$(1),$(2))
++	$(CC) /dev/null -c -o "$$TMPO" ; $(LD) $(1) "$$TMPO" -o "$$TMP",$(1),$(2))
+ 
+ ######
+ 
