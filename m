@@ -1,48 +1,66 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout.perfora.net ([74.208.4.195]:61452 "EHLO mout.perfora.net"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1756805AbZHFVdb (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 6 Aug 2009 17:33:31 -0400
-Date: Thu, 6 Aug 2009 17:33:29 -0400
-From: Andrew <nospam@flight.us>
-Subject: problems compiling 2.6.30
-Message-ID: <20090806213329.GA31124@infong470.schlund.de>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Received: from smtp1.linux-foundation.org ([140.211.169.13]:39463 "EHLO
+	smtp1.linux-foundation.org" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1756495AbZHFXEg (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 6 Aug 2009 19:04:36 -0400
+Message-Id: <200908062304.n76N4UDJ003109@imap1.linux-foundation.org>
+Subject: [patch 2/8] kernel hacking: move STRIP_ASM_SYMS from General
+From: akpm@linux-foundation.org
+Date: Thu, 06 Aug 2009 16:04:29 -0700
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
+To: sam@ravnborg.org
+Cc: linux-kbuild@vger.kernel.org, akpm@linux-foundation.org, randy.dunlap@oracle.com
 
+From: Randy Dunlap <randy.dunlap@oracle.com>
 
-I am completely unsure if I am in the right mailing list at all
+Sam suggested moving STRIP_ASM_SYMS into the Kernel hacking menu
+from the General Setup menu.  It makes more sense there.
 
-I was looking for help with kernel compile; googling gives me nothing on this
+Signed-off-by: Randy Dunlap <randy.dunlap@oracle.com>
+Cc: Sam Ravnborg <sam@ravnborg.org>
+Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+---
 
-I suspect because my circumstance is rare:  I can not do a clean install with an ancient RedHat 7.2 (Enigma) (currently running kernel 2.4.7-10 )
+ init/Kconfig      |    8 --------
+ lib/Kconfig.debug |    8 ++++++++
+ 2 files changed, 8 insertions(+), 8 deletions(-)
 
-I have incrementally upgraded the gcc to 3.4.6 (but fell short of compiling the latest 4.4.1 gcc)
-
-I sucessfully did "make bzImage" and (perhaps) "make modules" (I can see all the newly built *.o objects in the subdirectories)
-
-However!
-
-When I issue "make modules_install" I get this:
-
-]# make modules_install
-Warning: you may need to install module-init-tools
-See http://www.codemonkey.org.uk/docs/post-halloween-2.6.txt
-  INSTALL arch/x86/kernel/test_nx.ko
-  INSTALL drivers/scsi/scsi_wait_scan.ko
-  INSTALL kernel/configs.ko
-  DEPMOD  2.6.30ags1
-depmod: /lib/modules/2.6.30ags1/modules.order is not an ELF file
-make: *** [_modinst_post] Error 1
-
-I did build and (seemingly) install "module-init-tools", but I still get the above comment about "module-init-tools", and the weird "modules.order is not an ELF file" error  (googling for the latter yields nothing!)
-
-Again, apologies if I have misdirected my questions to the wrong mailing list.
-
-Thanks in advance
-
-Andrew
+diff -puN init/Kconfig~kernel-hacking-move-strip_asm_syms-from-general init/Kconfig
+--- a/init/Kconfig~kernel-hacking-move-strip_asm_syms-from-general
++++ a/init/Kconfig
+@@ -991,14 +991,6 @@ config SLUB_DEBUG
+ 	  SLUB sysfs support. /sys/slab will not exist and there will be
+ 	  no support for cache validation etc.
+ 
+-config STRIP_ASM_SYMS
+-	bool "Strip assembler-generated symbols during link"
+-	default n
+-	help
+-	  Strip internal assembler-generated symbols during a link (symbols
+-	  that look like '.Lxxx') so they don't pollute the output of
+-	  get_wchan() and suchlike.
+-
+ config COMPAT_BRK
+ 	bool "Disable heap randomization"
+ 	default y
+diff -puN lib/Kconfig.debug~kernel-hacking-move-strip_asm_syms-from-general lib/Kconfig.debug
+--- a/lib/Kconfig.debug~kernel-hacking-move-strip_asm_syms-from-general
++++ a/lib/Kconfig.debug
+@@ -50,6 +50,14 @@ config MAGIC_SYSRQ
+ 	  keys are documented in <file:Documentation/sysrq.txt>. Don't say Y
+ 	  unless you really know what this hack does.
+ 
++config STRIP_ASM_SYMS
++	bool "Strip assembler-generated symbols during link"
++	default n
++	help
++	  Strip internal assembler-generated symbols during a link (symbols
++	  that look like '.Lxxx') so they don't pollute the output of
++	  get_wchan() and suchlike.
++
+ config UNUSED_SYMBOLS
+ 	bool "Enable unused/obsolete exported symbols"
+ 	default y if X86
+_
