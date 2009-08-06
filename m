@@ -1,43 +1,48 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from one.firstfloor.org ([213.235.205.2]:42937 "EHLO
-	one.firstfloor.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752737AbZHEVv3 (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 5 Aug 2009 17:51:29 -0400
-From: Andi Kleen <andi@firstfloor.org>
-References: <200908051151.557035535@firstfloor.org>
-In-Reply-To: <200908051151.557035535@firstfloor.org>
-Subject: [PATCH] [2/5] kbuild: Check if linker supports the -X option
-Message-Id: <20090805215128.B5C08B15D8@basil.firstfloor.org>
-Date: Wed,  5 Aug 2009 23:51:28 +0200 (CEST)
+Received: from mout.perfora.net ([74.208.4.195]:61452 "EHLO mout.perfora.net"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1756805AbZHFVdb (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 6 Aug 2009 17:33:31 -0400
+Date: Thu, 6 Aug 2009 17:33:29 -0400
+From: Andrew <nospam@flight.us>
+Subject: problems compiling 2.6.30
+Message-ID: <20090806213329.GA31124@infong470.schlund.de>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: sam@ravnborg.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
 
 
-The new alternative `gold' linker in recent binutils doesn't support
-the -X option. This breaks allyesconfig builds that have 
-CONFIG_STRIP_ASM_SYMS enabled. Check if the linker really supports
-the option using ld-option.
+I am completely unsure if I am in the right mailing list at all
 
-This requires fixes in earlier patches.
+I was looking for help with kernel compile; googling gives me nothing on this
 
-Signed-off-by: Andi Kleen <ak@linux.intel.com>
+I suspect because my circumstance is rare:  I can not do a clean install with an ancient RedHat 7.2 (Enigma) (currently running kernel 2.4.7-10 )
 
----
- Makefile |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+I have incrementally upgraded the gcc to 3.4.6 (but fell short of compiling the latest 4.4.1 gcc)
 
-Index: linux-2.6.31-rc1-ak/Makefile
-===================================================================
---- linux-2.6.31-rc1-ak.orig/Makefile
-+++ linux-2.6.31-rc1-ak/Makefile
-@@ -599,7 +599,7 @@ LDFLAGS_MODULE += $(LDFLAGS_BUILD_ID)
- LDFLAGS_vmlinux += $(LDFLAGS_BUILD_ID)
- 
- ifeq ($(CONFIG_STRIP_ASM_SYMS),y)
--LDFLAGS_vmlinux	+= -X
-+LDFLAGS_vmlinux	+= $(call ld-option, -X,)
- endif
- 
- # Default kernel image to build when no specific target is given.
+I sucessfully did "make bzImage" and (perhaps) "make modules" (I can see all the newly built *.o objects in the subdirectories)
+
+However!
+
+When I issue "make modules_install" I get this:
+
+]# make modules_install
+Warning: you may need to install module-init-tools
+See http://www.codemonkey.org.uk/docs/post-halloween-2.6.txt
+  INSTALL arch/x86/kernel/test_nx.ko
+  INSTALL drivers/scsi/scsi_wait_scan.ko
+  INSTALL kernel/configs.ko
+  DEPMOD  2.6.30ags1
+depmod: /lib/modules/2.6.30ags1/modules.order is not an ELF file
+make: *** [_modinst_post] Error 1
+
+I did build and (seemingly) install "module-init-tools", but I still get the above comment about "module-init-tools", and the weird "modules.order is not an ELF file" error  (googling for the latter yields nothing!)
+
+Again, apologies if I have misdirected my questions to the wrong mailing list.
+
+Thanks in advance
+
+Andrew
