@@ -1,70 +1,71 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from moutng.kundenserver.de ([212.227.126.177]:60651 "EHLO
-	moutng.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751978AbZHLMhb (ORCPT
+Received: from cam-admin0.cambridge.arm.com ([193.131.176.58]:52707 "EHLO
+	cam-admin0.cambridge.arm.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1752074AbZHLOAo (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 12 Aug 2009 08:37:31 -0400
-From: Arnd Bergmann <arnd@arndb.de>
-Subject: Re: [RFC PATCH] kbuild: Do not select symbols with unmet dependencies
-Date: Wed, 12 Aug 2009 14:36:58 +0200
+	Wed, 12 Aug 2009 10:00:44 -0400
+Subject: Re: [RFC PATCH] kbuild: Do not select symbols with unmet
+	dependencies
+From: Catalin Marinas <catalin.marinas@arm.com>
+In-Reply-To: <200908121436.58490.arnd@arndb.de>
 References: <20090812112308.30683.24700.stgit@pc1117.cambridge.arm.com>
-In-Reply-To: <20090812112308.30683.24700.stgit@pc1117.cambridge.arm.com>
-MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="utf-8"
+	 <200908121436.58490.arnd@arndb.de>
+Content-Type: text/plain
+Date: Wed, 12 Aug 2009 15:00:24 +0100
+Message-Id: <1250085624.20332.48.camel@pc1117.cambridge.arm.com>
+Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
-Message-Id: <200908121436.58490.arnd@arndb.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Catalin Marinas <catalin.marinas@arm.com>
+To: Arnd Bergmann <arnd@arndb.de>
 Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>
 
-On Wednesday 12 August 2009, Catalin Marinas wrote:
-> The "select" statement in Kconfig files allows the enabling of options
-> even if they have unmet direct dependencies (i.e. "depends on" expands
-> to "no"). Currently, the "depends on" clauses are used in calculating
-> the visibility but they do not affect the reverse dependencies in any
-> way.
+On Wed, 2009-08-12 at 14:36 +0200, Arnd Bergmann wrote:
+> On Wednesday 12 August 2009, Catalin Marinas wrote:
+> > The "select" statement in Kconfig files allows the enabling of options
+> > even if they have unmet direct dependencies (i.e. "depends on" expands
+> > to "no"). Currently, the "depends on" clauses are used in calculating
+> > the visibility but they do not affect the reverse dependencies in any
+> > way.
+> > 
+> > The patch introduces additional tracking of the "depends on" statements
+> > and does not allow selecting an option if its direct dependencies are
+> > not met, also printing a warning.
+> > 
+> > Signed-off-by: Catalin Marinas <catalin.marinas@arm.com>
+> > Cc: Sam Ravnborg <sam@ravnborg.org>
 > 
-> The patch introduces additional tracking of the "depends on" statements
-> and does not allow selecting an option if its direct dependencies are
-> not met, also printing a warning.
-> 
-> Signed-off-by: Catalin Marinas <catalin.marinas@arm.com>
-> Cc: Sam Ravnborg <sam@ravnborg.org>
+> I guess this will change the behaviour of a number of subsystems,
+> likely causing unexpected regressions. I think your change
+> makes sense, but we need to be much more careful.
 
-I guess this will change the behaviour of a number of subsystems,
-likely causing unexpected regressions. I think your change
-makes sense, but we need to be much more careful.
+It would indeed cause regressions, that's why I'm only asking for
+comments currently.
 
-Can you extract a list of configuration symbols that are
-impacted by your patch? A possibly way out could be to annotate
-all of them first by changing
+> Can you extract a list of configuration symbols that are
+> impacted by your patch?
 
----
-config FOO
-	bool
+I can generate a list with allyesconfig but it looks like it breaks some
+common usage in Linux. For example, the VIDEO_* entries in
+drivers/media/video/Kconfig under the "Encoders/decoders and other
+helper chips" menu automatically inherit a dependency on
+!VIDEO_HELPER_CHIPS_AUTO. This option is enabled to allow other config
+options to select whatever they need. But it would fail with my patch
+because of the direct dependency of the VIDEO_* options on
+!VIDEO_HELPER_CHIPS_AUTO.
 
-config BAR
-	depends on FOO
+It needs a bit more thinking here and maybe writing something like:
 
-config BAZ
-	select BAR
----
+menu "..." if !VIDEO_HELPER_CHIPS_AUTO
 
-so that we either get
+rather than
 
-config BAZ
-	select FOO
-	select BAR
+menu "..."
+	depends on !VIDEO_HELPER_CHIPS_AUTO
 
-or alternatively, on a case-by-case basis
+though the parser (after modifying the zconf.y to handle this) seems to
+consider both dependencies at the same level
 
-config BAZ
-	depends on FOO
-	select BAR
+-- 
+Catalin
 
-Once that is in place, all the symbols have a well-defined behaviour
-and we can safely apply your patch.
-
-	Arnd <><
