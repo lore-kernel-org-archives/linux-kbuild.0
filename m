@@ -1,26 +1,37 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ratchet.progressivemarketingnetwork.com ([204.11.33.178]:59474
-	"EHLO ratchet.progressivemarketingnetwork.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751789AbZHOTDJ (ORCPT
+Received: from 74-93-104-97-Washington.hfc.comcastbusiness.net ([74.93.104.97]:40967
+	"EHLO sunset.davemloft.net" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751714AbZHQBVz (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 15 Aug 2009 15:03:09 -0400
-Received: from [68.225.53.26] (helo=junkiefans)
-	by ratchet.progressivemarketingnetwork.com with esmtp (Exim 4.69)
-	(envelope-from <timhtml@progressivemarketingnetwork.com>)
-	id 1McO03-0001rI-9w
-	for linux-kbuild@vger.kernel.org; Sat, 15 Aug 2009 11:29:08 -0700
-From: "Timothy" <timhtml@progressivemarketingnetwork.com>
-Subject: 
-Date: Sat, 15 Aug 2009 11:29:02 -0700
-Message-ID: <0ae901ca1dd6$44c0e6e0$ce42b4a0$@com>
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="US-ASCII"
+	Sun, 16 Aug 2009 21:21:55 -0400
+Date: Sun, 16 Aug 2009 18:22:06 -0700 (PDT)
+Message-Id: <20090816.182206.12029168.davem@davemloft.net>
+Subject: Re: [PATCH] sparc64: list zImage build target in 'make help' output
+From: David Miller <davem@davemloft.net>
+In-Reply-To: <200907232055.19176.elendil@planet.nl>
+References: <200907162041.53181.elendil@planet.nl>
+	<200907232055.19176.elendil@planet.nl>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
-Content-Language: en-us
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
+To: elendil@planet.nl
+Cc: sparclinux@vger.kernel.org, linux-kbuild@vger.kernel.org, jurij@wooyd.org
 
-subscribe
+From: Frans Pop <elendil@planet.nl>
+Date: Thu, 23 Jul 2009 20:55:18 +0200
 
+> The zImage target was added and gets built by default.
+> 
+> Signed-off-by: Frans Pop <elendil@planet.nl>
+> Cc: Jurij Smakov <jurij@wooyd.org>
+> ---
+> 
+> While looking at Sam Ravnborg's comments I noticed that the following
+> should be added on top of Jurij's patch.
+> 
+> David: if you prefer to merge this into the previous patch, that'd be
+> fine by me.
+
+I merged it into the sparc64 zImage patch, thanks!
