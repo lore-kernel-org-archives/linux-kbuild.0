@@ -1,53 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from 74-93-104-97-Washington.hfc.comcastbusiness.net ([74.93.104.97]:57049
-	"EHLO sunset.davemloft.net" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1756652AbZHQDXJ (ORCPT
+Received: from faui40.informatik.uni-erlangen.de ([131.188.34.40]:34188 "EHLO
+	faui40.informatik.uni-erlangen.de" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1757147AbZHQIgg (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 16 Aug 2009 23:23:09 -0400
-Date: Sun, 16 Aug 2009 20:23:20 -0700 (PDT)
-Message-Id: <20090816.202320.158035570.davem@davemloft.net>
-Subject: Re: [PATCH] sparc64: build compressed image (zImage) by default
-From: David Miller <davem@davemloft.net>
-In-Reply-To: <200906291245.59887.elendil@planet.nl>
-References: <200906291245.59887.elendil@planet.nl>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+	Mon, 17 Aug 2009 04:36:36 -0400
+From: Reinhard Tartler <siretart@tauware.de>
+Subject: [PATCH] cpumask: fix typo s/CONFIG_CPU_HOTPLUG/CONFIG_HOTPLUG_CPU/
+Date: Mon, 17 Aug 2009 10:19:33 +0200
+Message-ID: <rwuzl9y975c.fsf@faui48a.informatik.uni-erlangen.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: elendil@planet.nl
-Cc: sparclinux@vger.kernel.org, linux-kbuild@vger.kernel.org, jurij@wooyd.org
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: linux-kernel@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>, Jiri Kosina <jkosina@suse.cz>, linux-kbuild@vger.kernel.org
 
-From: Frans Pop <elendil@planet.nl>
-Date: Mon, 29 Jun 2009 12:45:59 +0200
+In ./arch/*/Kconfig, this Kconfig symbol is defined as HOTPLUG_CPU, and
+never as CPU_HOTPLUG
 
-> From: Jurij Smakov <jurij@wooyd.org>
-> Subject: sparc64: build compressed image (zImage) by default
-> 
-> Besides creating the uncompressed vmlinux image for sparc64, also
-> create a compressed zImage. This is more consistent with other
-> architectures and required to make the 'deb-pkg' target work.
-> 
-> Signed-off-by: Jurij Smakov <jurij@wooyd.org>
-> Signed-off-by: Frans Pop <elendil@planet.nl>
+Signed-off-by: Reinhard Tartler <siretart@tauware.de>
+---
+ kernel/smp.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-This is fine, however:
+diff --git a/kernel/smp.c b/kernel/smp.c
+index ad63d85..94188b8 100644
+--- a/kernel/smp.c
++++ b/kernel/smp.c
+@@ -57,7 +57,7 @@ hotplug_cfd(struct notifier_block *nfb, unsigned long action, void *hcpu)
+ 			return NOTIFY_BAD;
+ 		break;
+ 
+-#ifdef CONFIG_CPU_HOTPLUG
++#ifdef CONFIG_HOTPLUG_CPU
+ 	case CPU_UP_CANCELED:
+ 	case CPU_UP_CANCELED_FROZEN:
+ 
+-- 
+1.5.6.5
 
-> @@ -91,6 +91,9 @@ endif
->  
->  boot := arch/sparc/boot
->  
-> +# Default target
-> +all: zImage
-> +
->  image zImage tftpboot.img vmlinux.aout: vmlinux
->  	$(Q)$(MAKE) $(build)=$(boot) $(boot)/$@
->  
 
-If we are going to add this target to the 32/64 agnostic part of the
-Makefile, we should remove the identical chunk earlier in the 32-bit
-specific section.
-
-I took the liberty of making that cleanup when applying this,
-thanks!
-
+-- 
+Reinhard Tartler                     Department of Computer Science IV
+Martensstr 1, 91058 Erlangen Germany, University of Erlangen-Nuremberg
+            http://www4.informatik.uni-erlangen.de/~tartler
