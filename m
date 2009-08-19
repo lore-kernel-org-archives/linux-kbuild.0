@@ -1,15 +1,15 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from hrndva-omtalb.mail.rr.com ([71.74.56.124]:60989 "EHLO
+Received: from hrndva-omtalb.mail.rr.com ([71.74.56.123]:45448 "EHLO
 	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751882AbZHSDAh (ORCPT
+	with ESMTP id S1751857AbZHSDAj (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 18 Aug 2009 23:00:37 -0400
-Message-Id: <20090819030037.495409646@goodmis.org>
+	Tue, 18 Aug 2009 23:00:39 -0400
+Message-Id: <20090819030040.013591483@goodmis.org>
 References: <20090819025634.987354707@goodmis.org>
-Date: Tue, 18 Aug 2009 22:56:40 -0400
+Date: Tue, 18 Aug 2009 22:56:48 -0400
 From: Steven Rostedt <rostedt@goodmis.org>
-Subject: [PATCH 06/14] kconfig: enable CONFIG_IKCONFIG from streamline_config.pl
-Content-Disposition: inline; filename=0006-kconfig-enable-CONFIG_IKCONFIG-from-streamline_confi.patch
+Subject: [PATCH 14/14] kconfig: test if a .config already exists
+Content-Disposition: inline; filename=0014-kconfig-test-if-a-.config-already-exists.patch
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org
@@ -17,68 +17,66 @@ Cc: Ingo Molnar <mingo@elte.hu>, Andrew Morton <akpm@linux-foundation.org>, Thom
 
 From: Steven Rostedt <srostedt@redhat.com>
 
-Ingo Molnar suggested that the streamline_config.pl should enable
-CONFIG_IKCONFIG to keep the current config in the kernel.
-Then we can use scripts/extract-ikconfig to find the current
-modules.
+If one were to run localmodconfig or localyesconfig without having
+a .config already in the file, then the end of the process would give
+a warning when it tries to move the old .config to .config.old.
 
-This patch changes streamline_config.pl to check if CONFIG_IKCONFIG
-is not set, and if it is not, it enables it to be a module.
+This patch adds a test to check if .config exists and avoid the moves
+if it does not.
 
-[ Impact: make current config options easier to find ]
+[ Impact: remove warning after make localmodconfig ]
 
-Reported-by: Ingo Molnar <mingo@elte.hu>
 Signed-off-by: Steven Rostedt <rostedt@goodmis.org>
 ---
- scripts/kconfig/streamline_config.pl |   33 +++++++++++++++++++++++----------
- 1 files changed, 23 insertions(+), 10 deletions(-)
+ scripts/kconfig/Makefile |   30 ++++++++++++++++++++----------
+ 1 files changed, 20 insertions(+), 10 deletions(-)
 
-diff --git a/scripts/kconfig/streamline_config.pl b/scripts/kconfig/streamline_config.pl
-index caac952..2334641 100644
---- a/scripts/kconfig/streamline_config.pl
-+++ b/scripts/kconfig/streamline_config.pl
-@@ -256,18 +256,31 @@ my %setconfigs;
- # Finally, read the .config file and turn off any module enabled that
- # we could not find a reason to keep enabled.
- while(<CIN>) {
--	if (/^(CONFIG.*)=(m|y)/) {
--		if (defined($configs{$1})) {
--		    $setconfigs{$1} = $2;
--		    print;
--		} elsif ($2 eq "m") {
--		    print "# $1 is not set\n";
--		} else {
--		    print;
--		}
-+
-+    if (/CONFIG_IKCONFIG/) {
-+	if (/# CONFIG_IKCONFIG is not set/) {
-+	    # enable IKCONFIG at least as a module
-+	    print "CONFIG_IKCONFIG=m\n";
-+	    # don't ask about PROC
-+	    print "# CONFIG_IKCONFIG is not set\n";
-+	} else {
-+	    print;
-+	}
-+	next;
-+    }
-+
-+    if (/^(CONFIG.*)=(m|y)/) {
-+	if (defined($configs{$1})) {
-+	    $setconfigs{$1} = $2;
-+	    print;
-+	} elsif ($2 eq "m") {
-+	    print "# $1 is not set\n";
- 	} else {
--		print;
-+	    print;
- 	}
-+    } else {
-+	print;
-+    }
- }
- close(CIN);
+diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
+index 12a4d9e..915a39a 100644
+--- a/scripts/kconfig/Makefile
++++ b/scripts/kconfig/Makefile
+@@ -31,21 +31,31 @@ silentoldconfig: $(obj)/conf
  
+ localmodconfig: $(obj)/streamline_config.pl $(obj)/conf
+ 	$(Q)perl $< $(Kconfig) > .tmp.config
+-	$(Q)cmp -s .tmp.config .config ||		\
+-		(mv -f .config .config.old.1;		\
+-		 mv -f .tmp.config .config;		\
+-		 $(obj)/conf -s $(Kconfig);		\
+-		 mv -f .config.old.1 .config.old)
++	$(Q)if [ -f .config ]; then 				\
++			cmp -s .tmp.config .config ||		\
++			(mv -f .config .config.old.1;		\
++			 mv -f .tmp.config .config;		\
++			 $(obj)/conf -s $(Kconfig);		\
++			 mv -f .config.old.1 .config.old)	\
++	else							\
++			mv -f .tmp.config .config;		\
++			$(obj)/conf -s $(Kconfig);		\
++	fi
+ 	$(Q)rm -f .tmp.config
+ 
+ localyesconfig: $(obj)/streamline_config.pl
+ 	$(Q)perl $< $(Kconfig) > .tmp.config
+ 	$(Q)sed -i s/=m/=y/ .tmp.config
+-	$(Q)cmp -s .tmp.config .config ||		\
+-		(mv -f .config .config.old.1;		\
+-		 mv -f .tmp.config .config;		\
+-		 $(obj)/conf -s $(Kconfig);		\
+-		 mv -f .config.old.1 .config.old)
++	$(Q)if [ -f .config ]; then 				\
++			cmp -s .tmp.config .config ||		\
++			(mv -f .config .config.old.1;		\
++			 mv -f .tmp.config .config;		\
++			 $(obj)/conf -s $(Kconfig);		\
++			 mv -f .config.old.1 .config.old)	\
++	else							\
++			mv -f .tmp.config .config;		\
++			$(obj)/conf -s $(Kconfig);		\
++	fi
+ 	$(Q)rm -f .tmp.config
+ 
+ # Create new linux.pot file
 -- 
 1.6.3.3
 
