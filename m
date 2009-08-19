@@ -1,49 +1,77 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.mail.elte.hu ([157.181.151.9]:42186 "EHLO mx2.mail.elte.hu"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1757389AbZHQImW (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 17 Aug 2009 04:42:22 -0400
-Date: Mon, 17 Aug 2009 10:42:01 +0200
-From: Ingo Molnar <mingo@elte.hu>
-Subject: Re: [PATCH] cpumask: fix typo
-	s/CONFIG_CPU_HOTPLUG/CONFIG_HOTPLUG_CPU/
-Message-ID: <20090817084201.GA5877@elte.hu>
-References: <rwuzl9y975c.fsf@faui48a.informatik.uni-erlangen.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <rwuzl9y975c.fsf@faui48a.informatik.uni-erlangen.de>
+Received: from hrndva-omtalb.mail.rr.com ([71.74.56.125]:45345 "EHLO
+	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751836AbZHSDAg (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 18 Aug 2009 23:00:36 -0400
+Message-Id: <20090819030036.298981923@goodmis.org>
+References: <20090819025634.987354707@goodmis.org>
+Date: Tue, 18 Aug 2009 22:56:36 -0400
+From: Steven Rostedt <rostedt@goodmis.org>
+Subject: [PATCH 02/14] kconfig: make localmodconfig to run streamline_config.pl
+Content-Disposition: inline; filename=0002-kconfig-make-localmodconfig-to-run-streamline_config.patch
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Reinhard Tartler <siretart@tauware.de>
-Cc: Sam Ravnborg <sam@ravnborg.org>, linux-kernel@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>, Jiri Kosina <jkosina@suse.cz>, linux-kbuild@vger.kernel.org
+To: linux-kernel@vger.kernel.org
+Cc: Ingo Molnar <mingo@elte.hu>, Andrew Morton <akpm@linux-foundation.org>, Thomas Gleixner <tglx@linutronix.de>, Peter Zijlstra <peterz@infradead.org>, Linus Torvalds <torvalds@linux-foundation.org>, Theodore Tso <tytso@mit.edu>, Arjan van de Ven <arjan@infradead.org>, Greg KH <greg@kroah.com>, "Luis R. Rodriguez" <mcgrof@gmail.com>, zippel@linux-m68k.org, linux-kbuild@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>, Jonathan Corbet <corbet@lwn.net>, Alan Jenkins <sourcejedi.lkml@googlemail.com>, Andi Kleen <andi@firstfloor.org>
 
+From: Steven Rostedt <srostedt@redhat.com>
 
-* Reinhard Tartler <siretart@tauware.de> wrote:
+Running the streamline_config.pl script manually can still be confusing
+for some users. This patch adds the localmodconfig option. This will
+automatically run streamline_config.pl on the current .config and
+then run "make silentoldconfig" to fix any wholes that might have been
+created.
 
-> In ./arch/*/Kconfig, this Kconfig symbol is defined as 
-> HOTPLUG_CPU, and never as CPU_HOTPLUG
-> 
-> Signed-off-by: Reinhard Tartler <siretart@tauware.de>
-> ---
->  kernel/smp.c |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
-> 
-> diff --git a/kernel/smp.c b/kernel/smp.c
-> index ad63d85..94188b8 100644
-> --- a/kernel/smp.c
-> +++ b/kernel/smp.c
-> @@ -57,7 +57,7 @@ hotplug_cfd(struct notifier_block *nfb, unsigned long action, void *hcpu)
->  			return NOTIFY_BAD;
->  		break;
->  
-> -#ifdef CONFIG_CPU_HOTPLUG
-> +#ifdef CONFIG_HOTPLUG_CPU
->  	case CPU_UP_CANCELED:
->  	case CPU_UP_CANCELED_FROZEN:
+ $ make localmodconfig
 
-Already fixed upstream by:
+This will remove any module configurations in .config that are not needed
+to compile the modules that are loaded.
 
-69dd647: generic-ipi: fix hotplug_cfd()
+Signed-off-by: Steven Rostedt <rostedt@goodmis.org>
+---
+ scripts/kconfig/Makefile |   13 ++++++++++++-
+ 1 files changed, 12 insertions(+), 1 deletions(-)
 
-	Ingo
+diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
+index 5ddf8be..e4d8394 100644
+--- a/scripts/kconfig/Makefile
++++ b/scripts/kconfig/Makefile
+@@ -2,7 +2,8 @@
+ # Kernel configuration targets
+ # These targets are used from top-level makefile
+ 
+-PHONY += oldconfig xconfig gconfig menuconfig config silentoldconfig update-po-config
++PHONY += oldconfig xconfig gconfig menuconfig config silentoldconfig update-po-config \
++	localmodconfig
+ 
+ ifdef KBUILD_KCONFIG
+ Kconfig := $(KBUILD_KCONFIG)
+@@ -28,6 +29,15 @@ oldconfig: $(obj)/conf
+ silentoldconfig: $(obj)/conf
+ 	$< -s $(Kconfig)
+ 
++localmodconfig: $(obj)/streamline_config.pl $(obj)/conf
++	$(Q)perl $< $(Kconfig) > .tmp.config
++	$(Q)cmp -s .tmp.config .config ||		\
++		(mv -f .config .config.old.1;		\
++		 mv -f .tmp.config .config;		\
++		 $(obj)/conf -s $(Kconfig);		\
++		 mv -f .config.old.1 .config.old)
++	$(Q)rm -f .tmp.config
++
+ # Create new linux.pot file
+ # Adjust charset to UTF-8 in .po file to accept UTF-8 in Kconfig files
+ # The symlink is used to repair a deficiency in arch/um
+@@ -83,6 +93,7 @@ help:
+ 	@echo  '  xconfig	  - Update current config utilising a QT based front-end'
+ 	@echo  '  gconfig	  - Update current config utilising a GTK based front-end'
+ 	@echo  '  oldconfig	  - Update current config utilising a provided .config as base'
++	@echo  '  localmodconfig  - Update current config disabling modules not loaded'
+ 	@echo  '  silentoldconfig - Same as oldconfig, but quietly, additionally update deps'
+ 	@echo  '  randconfig	  - New config with random answer to all options'
+ 	@echo  '  defconfig	  - New config with default answer to all options'
+-- 
+1.6.3.3
+
+-- 
