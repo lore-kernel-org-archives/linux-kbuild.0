@@ -1,63 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from hrndva-omtalb.mail.rr.com ([71.74.56.125]:61016 "EHLO
-	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751925AbZHSDAh (ORCPT
+Received: from mga09.intel.com ([134.134.136.24]:54910 "EHLO mga09.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751275AbZHSJjX convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 18 Aug 2009 23:00:37 -0400
-Message-Id: <20090819030038.113273609@goodmis.org>
-References: <20090819025634.987354707@goodmis.org>
-Date: Tue, 18 Aug 2009 22:56:42 -0400
-From: Steven Rostedt <rostedt@goodmis.org>
-Subject: [PATCH 08/14] kconfig: have extract-ikconfig read ELF files
-Content-Disposition: inline; filename=0008-kconfig-have-extract-ikconfig-read-ELF-files.patch
+	Wed, 19 Aug 2009 05:39:23 -0400
+Date: Wed, 19 Aug 2009 17:38:54 +0800
+From: Alek Du <alek.du@intel.com>
+Subject: [PATCH] Makefile: Fix size_append issue for bzip2/lzma kernel
+Message-ID: <20090819173854.2250758f@dxy.sh.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: Ingo Molnar <mingo@elte.hu>, Andrew Morton <akpm@linux-foundation.org>, Thomas Gleixner <tglx@linutronix.de>, Peter Zijlstra <peterz@infradead.org>, Linus Torvalds <torvalds@linux-foundation.org>, Theodore Tso <tytso@mit.edu>, Arjan van de Ven <arjan@infradead.org>, Greg KH <greg@kroah.com>, "Luis R. Rodriguez" <mcgrof@gmail.com>, zippel@linux-m68k.org, linux-kbuild@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>, Jonathan Corbet <corbet@lwn.net>, Alan Jenkins <sourcejedi.lkml@googlemail.com>, Andi Kleen <andi@firstfloor.org>
+To: Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>
 
-From: Steven Rostedt <srostedt@redhat.com>
+From 6d755cbd7a136a4314f6976275aaa6c9d10bf3e4 Mon Sep 17 00:00:00 2001
+From: Alek Du <alek.du@intel.com>
+Date: Wed, 19 Aug 2009 17:18:39 +0800
+Subject: [PATCH] Makefile: Fix size_append issue for bzip2/lzma kernel
 
-It would be nice to use extract-ikconfig to find the congfig.gz
-in either vmlinux (not vmlinuz) or configs.ko.
+The Makefile.lib will call "echo -ne" to append uncompressed kernel size to
+bzip2/lzma kernel image. The "echo" here depends on the shell that /bin/sh pointing
+to. On Ubuntu system, the /bin/sh is pointing to dash, which does not support
+"echo -e" at all. Use /bin/echo instead of shell echo should always be safe.
 
-This patch changes the script to also be able to read ELF files directly.
-
-[ Impact: find config.gz in vmlinux and configs.ko ]
-
-Signed-off-by: Steven Rostedt <rostedt@goodmis.org>
+Signed-off-by: Alek Du <alek.du@intel.com>
 ---
- scripts/extract-ikconfig |   10 ++++++++++
- 1 files changed, 10 insertions(+), 0 deletions(-)
+ scripts/Makefile.lib |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-diff --git a/scripts/extract-ikconfig b/scripts/extract-ikconfig
-index 42d6bce..de233ff 100755
---- a/scripts/extract-ikconfig
-+++ b/scripts/extract-ikconfig
-@@ -59,6 +59,8 @@ dump_config "$image"
- GZHDR1="0x1f 0x8b 0x08 0x00"
- GZHDR2="0x1f 0x8b 0x08 0x08"
+diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+index 7a77787..c63c941 100644
+--- a/scripts/Makefile.lib
++++ b/scripts/Makefile.lib
+@@ -208,7 +208,7 @@ cmd_gzip = (cat $(filter-out FORCE,$^) | gzip -f -9 > $@) || \
  
-+ELFHDR="0x7f 0x45 0x4c 0x46"
-+
- # vmlinux.gz: Check for a compressed images
- off=`$binoffset "$image" $GZHDR1 2>/dev/null`
- [ "$?" != "0" ] && off="-1"
-@@ -73,6 +75,14 @@ elif [ "$off" -ne "-1" ]; then
- 	(dd ibs="$off" skip=1 count=0 && dd bs=512k) <"$image" 2>/dev/null | \
- 		zcat >"$TMPFILE"
- 	dump_config "$TMPFILE"
-+
-+# check if this is simply an ELF file
-+else
-+	off=`$binoffset "$image" $ELFHDR 2>/dev/null`
-+	[ "$?" != "0" ] && off="-1"
-+	if [ "$off" -eq "0" ]; then
-+		dump_config "$image"
-+	fi
- fi
- 
- echo "ERROR: Unable to extract kernel configuration information."
+ # Bzip2 and LZMA do not include size in file... so we have to fake that;
+ # append the size as a 32-bit littleendian number as gzip does.
+-size_append = echo -ne $(shell						\
++size_append = /bin/echo -ne $(shell						\
+ dec_size=0;								\
+ for F in $1; do								\
+ 	fsize=$$(stat -c "%s" $$F);					\
 -- 
-1.6.3.3
-
--- 
+1.6.0.4
