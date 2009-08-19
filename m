@@ -1,15 +1,15 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from hrndva-omtalb.mail.rr.com ([71.74.56.122]:61051 "EHLO
+Received: from hrndva-omtalb.mail.rr.com ([71.74.56.124]:56670 "EHLO
 	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751964AbZHSDAj (ORCPT
+	with ESMTP id S1752045AbZHSDAp (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 18 Aug 2009 23:00:39 -0400
-Message-Id: <20090819030039.659167675@goodmis.org>
+	Tue, 18 Aug 2009 23:00:45 -0400
+Message-Id: <20090819030038.462300834@goodmis.org>
 References: <20090819025634.987354707@goodmis.org>
-Date: Tue, 18 Aug 2009 22:56:47 -0400
+Date: Tue, 18 Aug 2009 22:56:43 -0400
 From: Steven Rostedt <rostedt@goodmis.org>
-Subject: [PATCH 13/14] kconfig: make local .config default for streamline_config
-Content-Disposition: inline; filename=0013-kconfig-make-local-.config-default-for-streamline_co.patch
+Subject: [PATCH 09/14] kconfig: keep config.gz around even if CONFIG_IKCONFIG_PROC is not set
+Content-Disposition: inline; filename=0009-kconfig-keep-config.gz-around-even-if-CONFIG_IKCONFI.patch
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org
@@ -17,43 +17,32 @@ Cc: Ingo Molnar <mingo@elte.hu>, Andrew Morton <akpm@linux-foundation.org>, Thom
 
 From: Steven Rostedt <srostedt@redhat.com>
 
-As Andi Kleen pointed out, most people would expect that the local .config
-file to be based for a streamline config. This patch changes the order
-of searching for a config file to consider the .config in the local
-directory first.
+If CONFIG_IKCONFIG is set but CONFIG_IKCONFIG_PROC is not, then
+gcc will optimize the config.gz out, because nobody uses it.
 
-Reported-by: Andi Kleen <andi@firstfloor.org>
+This patch adds "__used" to the config.gz data to keep it around so that
+code like extract-ikconfig can still find it.
+
+[ Impact: allow extract-ikconfig to find config.gz ]
+
 Signed-off-by: Steven Rostedt <rostedt@goodmis.org>
 ---
- scripts/kconfig/streamline_config.pl |    8 ++++----
- 1 files changed, 4 insertions(+), 4 deletions(-)
+ kernel/Makefile |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-diff --git a/scripts/kconfig/streamline_config.pl b/scripts/kconfig/streamline_config.pl
-index 46ca62d..95984db 100644
---- a/scripts/kconfig/streamline_config.pl
-+++ b/scripts/kconfig/streamline_config.pl
-@@ -50,6 +50,10 @@ chomp $uname;
+diff --git a/kernel/Makefile b/kernel/Makefile
+index 2093a69..d0c84e6 100644
+--- a/kernel/Makefile
++++ b/kernel/Makefile
+@@ -119,7 +119,7 @@ $(obj)/config_data.gz: .config FORCE
+ 	$(call if_changed,gzip)
  
- my @searchconfigs = (
- 	{
-+	    "file" => ".config",
-+	    "exec" => "cat",
-+	},
-+	{
- 	    "file" => "/proc/config.gz",
- 	    "exec" => "zcat",
- 	},
-@@ -82,10 +86,6 @@ my @searchconfigs = (
- 	    "exec" => "scripts/extract-ikconfig",
- 	    "test" => "scripts/extract-ikconfig",
- 	},
--	{
--	    "file" => ".config",
--	    "exec" => "cat",
--	},
- );
- 
- sub find_config {
+ quiet_cmd_ikconfiggz = IKCFG   $@
+-      cmd_ikconfiggz = (echo "static const char kernel_config_data[] = MAGIC_START"; cat $< | scripts/bin2c; echo "MAGIC_END;") > $@
++      cmd_ikconfiggz = (echo "static const char kernel_config_data[] __used = MAGIC_START"; cat $< | scripts/bin2c; echo "MAGIC_END;") > $@
+ targets += config_data.h
+ $(obj)/config_data.h: $(obj)/config_data.gz FORCE
+ 	$(call if_changed,ikconfiggz)
 -- 
 1.6.3.3
 
