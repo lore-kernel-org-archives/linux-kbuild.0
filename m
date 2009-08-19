@@ -1,15 +1,15 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from hrndva-omtalb.mail.rr.com ([71.74.56.124]:56670 "EHLO
+Received: from hrndva-omtalb.mail.rr.com ([71.74.56.125]:45391 "EHLO
 	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752045AbZHSDAp (ORCPT
+	with ESMTP id S1751942AbZHSDAi (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 18 Aug 2009 23:00:45 -0400
-Message-Id: <20090819030038.462300834@goodmis.org>
+	Tue, 18 Aug 2009 23:00:38 -0400
+Message-Id: <20090819030039.080007250@goodmis.org>
 References: <20090819025634.987354707@goodmis.org>
-Date: Tue, 18 Aug 2009 22:56:43 -0400
+Date: Tue, 18 Aug 2009 22:56:45 -0400
 From: Steven Rostedt <rostedt@goodmis.org>
-Subject: [PATCH 09/14] kconfig: keep config.gz around even if CONFIG_IKCONFIG_PROC is not set
-Content-Disposition: inline; filename=0009-kconfig-keep-config.gz-around-even-if-CONFIG_IKCONFI.patch
+Subject: [PATCH 11/14] kconfig: unset IKCONFIG_PROC and clean up nesting
+Content-Disposition: inline; filename=0011-kconfig-unset-IKCONFIG_PROC-and-clean-up-nesting.patch
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org
@@ -17,32 +17,48 @@ Cc: Ingo Molnar <mingo@elte.hu>, Andrew Morton <akpm@linux-foundation.org>, Thom
 
 From: Steven Rostedt <srostedt@redhat.com>
 
-If CONFIG_IKCONFIG is set but CONFIG_IKCONFIG_PROC is not, then
-gcc will optimize the config.gz out, because nobody uses it.
+Due to cut and paste error IKCONFIG was both set and cleared.
+It was suppose to be IKCONFIG_PROC to be cleared.
 
-This patch adds "__used" to the config.gz data to keep it around so that
-code like extract-ikconfig can still find it.
+Also cleaned up if nesting.
 
-[ Impact: allow extract-ikconfig to find config.gz ]
-
+Reported-by: Alan Jenkins <sourcejedi.lkml@googlemail.com>
 Signed-off-by: Steven Rostedt <rostedt@goodmis.org>
 ---
- kernel/Makefile |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+ scripts/kconfig/streamline_config.pl |    9 +++------
+ 1 files changed, 3 insertions(+), 6 deletions(-)
 
-diff --git a/kernel/Makefile b/kernel/Makefile
-index 2093a69..d0c84e6 100644
---- a/kernel/Makefile
-+++ b/kernel/Makefile
-@@ -119,7 +119,7 @@ $(obj)/config_data.gz: .config FORCE
- 	$(call if_changed,gzip)
+diff --git a/scripts/kconfig/streamline_config.pl b/scripts/kconfig/streamline_config.pl
+index 9fa3f81..69b7c3f 100644
+--- a/scripts/kconfig/streamline_config.pl
++++ b/scripts/kconfig/streamline_config.pl
+@@ -323,7 +323,7 @@ while(<CIN>) {
+ 	    # enable IKCONFIG at least as a module
+ 	    print "CONFIG_IKCONFIG=m\n";
+ 	    # don't ask about PROC
+-	    print "# CONFIG_IKCONFIG is not set\n";
++	    print "# CONFIG_IKCONFIG_PROC is not set\n";
+ 	} else {
+ 	    print;
+ 	}
+@@ -333,15 +333,12 @@ while(<CIN>) {
+     if (/^(CONFIG.*)=(m|y)/) {
+ 	if (defined($configs{$1})) {
+ 	    $setconfigs{$1} = $2;
+-	    print;
+ 	} elsif ($2 eq "m") {
+ 	    print "# $1 is not set\n";
+-	} else {
+-	    print;
++	    next;
+ 	}
+-    } else {
+-	print;
+     }
++    print;
+ }
+ close(CIN);
  
- quiet_cmd_ikconfiggz = IKCFG   $@
--      cmd_ikconfiggz = (echo "static const char kernel_config_data[] = MAGIC_START"; cat $< | scripts/bin2c; echo "MAGIC_END;") > $@
-+      cmd_ikconfiggz = (echo "static const char kernel_config_data[] __used = MAGIC_START"; cat $< | scripts/bin2c; echo "MAGIC_END;") > $@
- targets += config_data.h
- $(obj)/config_data.h: $(obj)/config_data.gz FORCE
- 	$(call if_changed,ikconfiggz)
 -- 
 1.6.3.3
 
