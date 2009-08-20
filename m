@@ -1,25 +1,35 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from kroah.org ([198.145.64.141]:49056 "EHLO coco.kroah.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752530AbZHSOfv (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 19 Aug 2009 10:35:51 -0400
-Date: Wed, 19 Aug 2009 07:29:32 -0700
-From: Greg KH <greg@kroah.com>
+Received: from smtp1.linux-foundation.org ([140.211.169.13]:40015 "EHLO
+	smtp1.linux-foundation.org" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1755402AbZHTVbh (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 20 Aug 2009 17:31:37 -0400
+Date: Thu, 20 Aug 2009 14:30:25 -0700
+From: Andrew Morton <akpm@linux-foundation.org>
 Subject: Re: [PATCH 00/14] kconfig: streamline distro configs for testers
-Message-ID: <20090819142932.GA31393@kroah.com>
-References: <20090819025634.987354707@goodmis.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Message-Id: <20090820143025.7134930f.akpm@linux-foundation.org>
 In-Reply-To: <20090819025634.987354707@goodmis.org>
+References: <20090819025634.987354707@goodmis.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Steven Rostedt <rostedt@goodmis.org>
-Cc: linux-kernel@vger.kernel.org, Ingo Molnar <mingo@elte.hu>, Andrew Morton <akpm@linux-foundation.org>, Thomas Gleixner <tglx@linutronix.de>, Peter Zijlstra <peterz@infradead.org>, Linus Torvalds <torvalds@linux-foundation.org>, Theodore Tso <tytso@mit.edu>, Arjan van de Ven <arjan@infradead.org>, "Luis R. Rodriguez" <mcgrof@gmail.com>, zippel@linux-m68k.org, linux-kbuild@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>, Jonathan Corbet <corbet@lwn.net>, Alan Jenkins <sourcejedi.lkml@googlemail.com>, Andi Kleen <andi@firstfloor.org>
+Cc: linux-kernel@vger.kernel.org, mingo@elte.hu, tglx@linutronix.de, peterz@infradead.org, torvalds@linux-foundation.org, tytso@mit.edu, arjan@infradead.org, greg@kroah.com, mcgrof@gmail.com, zippel@linux-m68k.org, linux-kbuild@vger.kernel.org, sam@ravnborg.org, corbet@lwn.net, sourcejedi.lkml@googlemail.com, andi@firstfloor.org
 
-On Tue, Aug 18, 2009 at 10:56:34PM -0400, Steven Rostedt wrote:
+On Tue, 18 Aug 2009 22:56:34 -0400
+Steven Rostedt <rostedt@goodmis.org> wrote:
+
 > Here's my rebase of the prior push of streamline-config.pl.
 
-Very nice, thanks for pushing this forward, it's much needed.
+ow, you made me look at perl code.
 
-greg k-h
+> The following patches are in:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/rostedt/linux-2.6-trace.git
+> 
+>     branch: kconfig
+
+Sam's been quiet lately.  I suggest that you add this to linux-next
+now so people get a chance to poke at it.
