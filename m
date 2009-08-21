@@ -1,54 +1,72 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx3.mail.elte.hu ([157.181.1.138]:50689 "EHLO mx3.mail.elte.hu"
+Received: from mx3.mail.elte.hu ([157.181.1.138]:35276 "EHLO mx3.mail.elte.hu"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S932265AbZHUQ2w (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 21 Aug 2009 12:28:52 -0400
-Date: Fri, 21 Aug 2009 18:28:22 +0200
+	id S932220AbZHUQcx (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 21 Aug 2009 12:32:53 -0400
+Date: Fri, 21 Aug 2009 18:32:20 +0200
 From: Ingo Molnar <mingo@elte.hu>
 Subject: Re: [PATCH 00/14] kconfig: streamline distro configs for testers
-Message-ID: <20090821162822.GA20898@elte.hu>
-References: <20090819025634.987354707@goodmis.org> <20090821143525.GH11098@elte.hu> <alpine.DEB.2.00.0908211047160.16405@gandalf.stny.rr.com> <20090821145406.GA3659@elte.hu> <alpine.DEB.2.00.0908211200160.30182@gandalf.stny.rr.com> <alpine.DEB.2.00.0908211204490.30182@gandalf.stny.rr.com>
+Message-ID: <20090821163220.GB20898@elte.hu>
+References: <20090819025634.987354707@goodmis.org> <20090820143025.7134930f.akpm@linux-foundation.org> <alpine.DEB.2.00.0908201741370.16405@gandalf.stny.rr.com> <20090820151326.b43038ce.akpm@linux-foundation.org> <20090821135249.GB30346@elte.hu> <alpine.DEB.2.00.0908211106560.16405@gandalf.stny.rr.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <alpine.DEB.2.00.0908211204490.30182@gandalf.stny.rr.com>
+In-Reply-To: <alpine.DEB.2.00.0908211106560.16405@gandalf.stny.rr.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Steven Rostedt <rostedt@goodmis.org>
-Cc: linux-kernel@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>, Thomas Gleixner <tglx@linutronix.de>, Peter Zijlstra <peterz@infradead.org>, Linus Torvalds <torvalds@linux-foundation.org>, Theodore Tso <tytso@mit.edu>, Arjan van de Ven <arjan@infradead.org>, Greg KH <greg@kroah.com>, "Luis R. Rodriguez" <mcgrof@gmail.com>, zippel@linux-m68k.org, linux-kbuild@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>, Jonathan Corbet <corbet@lwn.net>, Alan Jenkins <sourcejedi.lkml@googlemail.com>, Andi Kleen <andi@firstfloor.org>
+Cc: Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org, tglx@linutronix.de, peterz@infradead.org, torvalds@linux-foundation.org, tytso@mit.edu, arjan@infradead.org, greg@kroah.com, mcgrof@gmail.com, zippel@linux-m68k.org, linux-kbuild@vger.kernel.org, sam@ravnborg.org, corbet@lwn.net, sourcejedi.lkml@googlemail.com, andi@firstfloor.org, Stephen Rothwell <sfr@canb.auug.org.au>, linux-next@vger.kernel.org
 
 
 * Steven Rostedt <rostedt@goodmis.org> wrote:
 
 > 
-> On Fri, 21 Aug 2009, Steven Rostedt wrote:
-> > 
-> > OK, I found the bug. There's a dependency missing.
-> > 
-> > $ make localyesconfig
-> >   HOSTCC  scripts/basic/fixdep
-> >   HOSTCC  scripts/basic/docproc
-> >   HOSTCC  scripts/basic/hash
-> > using config: '/boot/config-2.6.27.25-78.2.56.fc9.x86_64'
-> > /bin/sh: line 8: scripts/kconfig/conf: No such file or directory
-> > make[1]: *** [localyesconfig] Error 127
-> > make: *** [localyesconfig] Error 2
-> > 
-> > Thus the script failed to run. But the sed command that converts the '=m' 
-> > to '=y' still ran. This gives us a distro config with all modules 
-> > converted to built in!
+> On Fri, 21 Aug 2009, Ingo Molnar wrote:
 > 
-> Funny that localmodconfig does not have this bug.
+> > 
+> > * Andrew Morton <akpm@linux-foundation.org> wrote:
+> > 
+> > > On Thu, 20 Aug 2009 17:43:38 -0400 (EDT)
+> > > Steven Rostedt <rostedt@goodmis.org> wrote:
+> > > 
+> > > > > 
+> > > > > > The following patches are in:
+> > > > > > 
+> > > > > >   git://git.kernel.org/pub/scm/linux/kernel/git/rostedt/linux-2.6-trace.git
+> > > > > > 
+> > > > > >     branch: kconfig
+> > > > > 
+> > > > > Sam's been quiet lately.  I suggest that you add this to linux-next
+> > > > > now so people get a chance to poke at it.
+> > > > 
+> > > > I have no means of pushing into next. Would someone like to do a pull for 
+> > > > me?
+> > > 
+> > > If suitably bribed, Stephen will add you tree directly to the 
+> > > linux-nxt lineup.
+> > 
+> > Yep, we always needed another kconfig maintainer (Sam's being mostly 
+> > busy with kbuild), and it's nice to see that Steve volunteered for 
+> > that job now! ;-)
+> 
+> Sure why not?
+> 
+> I've created a new repo:
+> 
+> git://git.kernel.org/pub/scm/linux/kernel/git/rostedt/linux-2.6-kconfig.git
+> 
+> and the same changes are in the branch: for-next
 
-... add to that i dont use modules much so i probably hit that 
-localyesconfig bug ;-)
+Cool!
 
-btw: mind adding localrandconfig too? It would be a perfect tool to 
-randomize all configs except a 'must have' core set of options.
+I'm wondering, what do you think about Vegard's 'warn about complex 
+selects' feature for kconfig which he submitted some time ago:
 
-( Or is this already possible via some existing kconfig feature? I
-  remember having seen something related, did that ever get
-  upstream? A quick grep in scripts/ shows nothing but i might have
-  missed it.)
+  http://lkml.org/lkml/2008/5/4/13
+
+That's a really sore kconfig spot we have. It's not a bug, but it 
+sure bites people again and again, and it would be nice to have some 
+built-in mechanism that gently nudges us away from complex selects. 
+(many of which are inadvertent or become complex after the fact)
 
 	Ingo
