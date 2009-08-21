@@ -1,41 +1,51 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepb.post.tele.dk ([195.41.46.236]:42871 "EHLO
-	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932800AbZHUVjs (ORCPT
+Received: from pfepa.post.tele.dk ([195.41.46.235]:54202 "EHLO
+	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932243AbZHUVvP (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 21 Aug 2009 17:39:48 -0400
-Date: Fri, 21 Aug 2009 23:39:48 +0200
+	Fri, 21 Aug 2009 17:51:15 -0400
+Date: Fri, 21 Aug 2009 23:51:06 +0200
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH 00/14] kconfig: streamline distro configs for testers
-Message-ID: <20090821213948.GB16210@merkur.ravnborg.org>
-References: <20090819025634.987354707@goodmis.org> <20090820143025.7134930f.akpm@linux-foundation.org>
+Subject: Re: [kbuild-devel] Problem with KBUILD_MODNAME
+Message-ID: <20090821215106.GD16210@merkur.ravnborg.org>
+References: <4cb7f2290908211345t2569f213s87284b9fce6e6c17@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20090820143025.7134930f.akpm@linux-foundation.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <4cb7f2290908211345t2569f213s87284b9fce6e6c17@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andrew Morton <akpm@linux-foundation.org>
-Cc: Steven Rostedt <rostedt@goodmis.org>, linux-kernel@vger.kernel.org, mingo@elte.hu, tglx@linutronix.de, peterz@infradead.org, torvalds@linux-foundation.org, tytso@mit.edu, arjan@infradead.org, greg@kroah.com, mcgrof@gmail.com, zippel@linux-m68k.org, linux-kbuild@vger.kernel.org, corbet@lwn.net, sourcejedi.lkml@googlemail.com, andi@firstfloor.org
+To: Nipun sehrawat <nipunsehrawatns@gmail.com>
+Cc: kbuild-devel@lists.sourceforge.net, Dan Mihai Dumitriu <dan.mihai.dumitriu@gmail.com>, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-On Thu, Aug 20, 2009 at 02:30:25PM -0700, Andrew Morton wrote:
-> On Tue, 18 Aug 2009 22:56:34 -0400
-> Steven Rostedt <rostedt@goodmis.org> wrote:
-> 
-> > Here's my rebase of the prior push of streamline-config.pl.
-> 
-> ow, you made me look at perl code.
-> 
-> > The following patches are in:
-> > 
-> >   git://git.kernel.org/pub/scm/linux/kernel/git/rostedt/linux-2.6-trace.git
-> > 
-> >     branch: kconfig
-> 
-> Sam's been quiet lately.  I suggest that you add this to linux-next
-> now so people get a chance to poke at it.
+kbuild list on sourceforge is long defunct.
+Please use linux-kbuild@vger.kernel.org.
 
-Busy at day time job so no spare time left for Linux stuff recently.
-Will get back in a few weeks if we get the release out in time.
+
+On Fri, Aug 21, 2009 at 10:45:14PM +0200, Nipun sehrawat wrote:
+> Hi List,
+> 
+> I am porting KTCPVS (last released for 2.6.18) to the latest kernel. I
+> was able to compile most of the files on 2.6.30, until I got struck at
+> a strange "KBUILD_MODNAME undefined warning" The Makefile of KTCPVS is
+> :
+> 
+> ---------------------------------Makefile
+> Starts-------------------------------------
+> # ktcpvs migrate to 2.6
+> 
+> ifneq ($(KERNELRELEASE),)
+>     ifdef CONFIG_MODVERSIONS
+>     EXTRA_CFLAGS := -DCONFIG_TCP_VS_DEBUG
+>     endif
+>     obj-m := ktcpvs.o tvs_hhttp.o tvs_phttp.o tvs_chttp.o tvs_http.o tvs_wlc.o
+>     LIBS := tcp_vs_sched.o tcp_vs_ctl.o misc.o redirect.o
+> tcp_vs_srvconn.o tcp_vs_timer.o tcp_vs.o fault.o regex/regcomp.o
+>     LIBS += regex/kernel.o regex/regfree.o
+>     ktcpvs-y := $(LIBS)
+
+If you are building a module use "-m" not "-y".
+Try that and see if it hepls you.
 
 	Sam
