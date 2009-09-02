@@ -1,112 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cpsmtpm-eml102.kpnxchange.com ([195.121.3.6]:57064 "EHLO
-	CPSMTPM-EML102.kpnxchange.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751667AbZHYUPn (ORCPT
+Received: from e1.ny.us.ibm.com ([32.97.182.141]:51308 "EHLO e1.ny.us.ibm.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750808AbZIBT3z convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 25 Aug 2009 16:15:43 -0400
-Subject: [PATCH,resend] kbuild: fix the binrpm-pkg target to work with KBUILD_OUTPUT set
-Content-Disposition: inline
-From: Frans Pop <elendil@planet.nl>
-Date: Tue, 25 Aug 2009 22:15:39 +0200
+	Wed, 2 Sep 2009 15:29:55 -0400
+Received: from d01relay02.pok.ibm.com (d01relay02.pok.ibm.com [9.56.227.234])
+	by e1.ny.us.ibm.com (8.14.3/8.13.1) with ESMTP id n82JTSsU025568
+	for <linux-kbuild@vger.kernel.org>; Wed, 2 Sep 2009 15:29:28 -0400
+Received: from d01av03.pok.ibm.com (d01av03.pok.ibm.com [9.56.224.217])
+	by d01relay02.pok.ibm.com (8.13.8/8.13.8/NCO v10.0) with ESMTP id n82JTvfM248220
+	for <linux-kbuild@vger.kernel.org>; Wed, 2 Sep 2009 15:29:57 -0400
+Received: from d01av03.pok.ibm.com (loopback [127.0.0.1])
+	by d01av03.pok.ibm.com (8.12.11.20060308/8.13.3) with ESMTP id n82JTv5Q013588
+	for <linux-kbuild@vger.kernel.org>; Wed, 2 Sep 2009 15:29:57 -0400
+Received: from linux.ibm.com (imap.raleigh.ibm.com [9.37.253.145])
+	by d01av03.pok.ibm.com (8.12.11.20060308/8.12.11) with ESMTP id n82JTujI013574
+	for <linux-kbuild@vger.kernel.org>; Wed, 2 Sep 2009 15:29:56 -0400
+Message-ID: <20090902152956.huh9lx2hcco44coc@imap.linux.ibm.com>
+Date: Wed,  2 Sep 2009 15:29:56 -0400
+From: cndougla@linux.vnet.ibm.com
+Subject: [PATCH] Makefile: make clean keep bounds.h and asm-offsets.h
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Content-Transfer-Encoding: 7bit
-Message-Id: <200908252215.40950.elendil@planet.nl>
+Content-Type: text/plain; charset=US-ASCII;
+	DelSp=Yes	format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: 7BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>
 
-The binrpm-pkg target (binary RPM only) fails when called with
-KBUILD_OUTPUT set. This patch makes it work.
+make clean is supposed to leave the kernel in a state such that  
+modules may be built against it. However, currently make clean deletes  
+include/linux/bounds.h and include/asm/asm-offsets.h, which are needed  
+to build kernel modules. The following patch filters these two files  
+from the targets to be cleaned.
 
-For the rpm-pkg target (source + binary RPM), building with
-KBUILD_OUTPUT set is not possible and also not needed as the
-actual build is done in a temporary directory anyway, so check
-that KBUILD_OUTPUT is not set in that case to avoid later errors.
+Signed-off-by: Chase Douglas <cndougla@linux.vnet.ibm.com>
 
-Signed-off-by: Frans Pop <elendil@planet.nl>
----
+diff --git a/scripts/Makefile.clean b/scripts/Makefile.clean
+index 6f89fbb..1ad01f8 100644
+--- a/scripts/Makefile.clean
++++ b/scripts/Makefile.clean
+@@ -40,10 +40,11 @@ subdir-ymn  := $(addprefix $(obj)/,$(subdir-ymn))
+  # build a list of files to remove, usually relative to the current
+  # directory
 
-I ran into this while trying if I could build an RPM kernel package on
-my Debian notebook :-)
+-__clean-files  := $(extra-y) $(always)                  \
++__clean-files  := $(filter-out $(bounds-file) $(offsets-file), \
++                  $(extra-y) $(always)                  \
+                    $(targets) $(clean-files)             \
+                    $(host-progs)                         \
+-                  $(hostprogs-y) $(hostprogs-m) $(hostprogs-)
++                  $(hostprogs-y) $(hostprogs-m) $(hostprogs-))
 
-The patch has been tested by doing three builds:
-- make -j4 rpm-pkg
-- make -j4 binrpm-pkg
-- KBUILD_OUTPUT=../builds/amd64 make -j4 binrpm-pkg
+  # as clean-files is given relative to the current directory, this adds
+  # a $(obj) prefix, except for absolute paths
 
-For all three the contents of the resulting binary RPM package was 
-identical
-(and looked correct); the source RPM package from the first build looked 
-sane.
-
-A 'KBUILD_OUTPUT=../builds/amd64 make -j4 rpm-pkg' fails as intended.
-
-One open issue is that the following commands should IIUC be identical,
-but the second one does not work:
-- KBUILD_OUTPUT=../builds/amd64 make -j4 binrpm-pkg
-- make -j4 O=../builds/amd64 binrpm-pkg
-
-AFAICT the root Makefile is supposed to set KBUILD_OUTPUT based on O=, but
-that is not visible when the lines within the binrpm-pkg target are 
-executed.
-My make foo was not strong enough to debug this. Sam, do you know?
-
-Cheers,
-FJP
-
-diff --git a/scripts/package/Makefile b/scripts/package/Makefile
-index fa4a0a1..b305c57 100644
---- a/scripts/package/Makefile
-+++ b/scripts/package/Makefile
-@@ -18,6 +18,9 @@
- # e) generate the rpm files, based on kernel.spec
- # - Use /. to avoid tar packing just the symlink
- 
-+# Note that the rpm-pkg target cannot be used with KBUILD_OUTPUT,
-+# but the binrpm-pkg target can; for some reason O= gets ignored.
-+
- # Do we have rpmbuild, otherwise fall back to the older rpm
- RPM := $(shell if [ -x "/usr/bin/rpmbuild" ]; then echo rpmbuild; \
- 	           else echo rpm; fi)
-@@ -33,6 +36,12 @@ $(objtree)/kernel.spec: $(MKSPEC) $(srctree)/Makefile
- 	$(CONFIG_SHELL) $(MKSPEC) > $@
- 
- rpm-pkg rpm: $(objtree)/kernel.spec FORCE
-+	@if test -n "$(KBUILD_OUTPUT)"; then \
-+		echo "Building source + binary RPM is not possible outside the"; \
-+		echo "kernel source tree. Don't set KBUILD_OUTPUT, or use the"; \
-+		echo "binrpm-pkg target instead."; \
-+		false; \
-+	fi
- 	$(MAKE) clean
- 	$(PREV) ln -sf $(srctree) $(KERNELPATH)
- 	$(CONFIG_SHELL) $(srctree)/scripts/setlocalversion > 
-$(objtree)/.scmversion
-@@ -61,7 +70,7 @@ binrpm-pkg: $(objtree)/binkernel.spec FORCE
- 	set -e; \
- 	mv -f $(objtree)/.tmp_version $(objtree)/.version
- 
--	$(RPM) $(RPMOPTS) --define "_builddir $(srctree)" --target \
-+	$(RPM) $(RPMOPTS) --define "_builddir $(objtree)" --target \
- 		$(UTS_MACHINE) -bb $<
- 
- clean-files += $(objtree)/binkernel.spec
-diff --git a/scripts/package/mkspec b/scripts/package/mkspec
-index 3d93f8c..ce9c60e 100755
---- a/scripts/package/mkspec
-+++ b/scripts/package/mkspec
-@@ -70,7 +70,7 @@ echo 'mkdir -p $RPM_BUILD_ROOT/boot 
-$RPM_BUILD_ROOT/lib/modules'
- echo 'mkdir -p $RPM_BUILD_ROOT/lib/firmware'
- echo "%endif"
- 
--echo 'INSTALL_MOD_PATH=$RPM_BUILD_ROOT make %{_smp_mflags} 
-modules_install'
-+echo 'INSTALL_MOD_PATH=$RPM_BUILD_ROOT make %{_smp_mflags} KBUILD_SRC= 
-modules_install'
- echo "%ifarch ia64"
- echo 'cp $KBUILD_IMAGE $RPM_BUILD_ROOT'"/boot/efi/vmlinuz-$KERNELRELEASE"
- echo 'ln -s '"efi/vmlinuz-$KERNELRELEASE" '$RPM_BUILD_ROOT'"/boot/"
