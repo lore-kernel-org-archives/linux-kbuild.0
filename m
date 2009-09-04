@@ -1,40 +1,36 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:4921 "EHLO mx1.redhat.com"
+Received: from cantor2.suse.de ([195.135.220.15]:38002 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755630AbZIDFxr (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 4 Sep 2009 01:53:47 -0400
-Message-ID: <4AA0ABF4.5070502@redhat.com>
-Date: Fri, 04 Sep 2009 13:56:04 +0800
-From: Amerigo Wang <amwang@redhat.com>
-MIME-Version: 1.0
-Subject: Re: [RFC Patch] kbuild: implement "make foo.s_c"
-References: <20090904053233.4396.85814.sendpatchset@localhost.localdomain> <20090903223809.7e303e6c.akpm@linux-foundation.org>
-In-Reply-To: <20090903223809.7e303e6c.akpm@linux-foundation.org>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
+	id S933637AbZIDOvk (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 4 Sep 2009 10:51:40 -0400
+From: Michal Marek <mmarek@suse.cz>
+Subject: [PATCH 0/2] kbuild: generate modules.builtin
+Date: Fri,  4 Sep 2009 16:51:31 +0200
+Message-Id: <cover.1252075736.git.mmarek@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andrew Morton <akpm@linux-foundation.org>
-Cc: linux-kernel@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>, linux-kbuild@vger.kernel.org
+To: sam@ravnborg.org
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, akpm@linux-foundation.org
 
-Andrew Morton wrote:
-> On Fri, 4 Sep 2009 01:30:06 -0400 Amerigo Wang <amwang@redhat.com> wrote:
-> 
->> This patch implements "make path/to/file.s_c", where
->> "file.s_c" is a file contains both asm and C code, this
->> is helpful for people to do debugging at asm level.
-> 
-> Try
-> 
-> 	make path/to/file.lst
-> 
-> :)
+Resending, with a small fix from Jan. As Sam has been busy with other things
+lately, would it be possible to add this to -mm so that we can start adding
+support for this to module-init-tools?
 
-Wow, I never know it before. Thanks!
+Thanks,
+Michal
 
-But the name 'file.lst' is a little bit confusing for me. :-/
+Jan Beulich (1):
+  kbuild: rebuild fix for Makefile.modbuiltin
 
-How about renaming it to other more meaningful name, e.g.
-'file.s_c'? :)
+Michal Marek (1):
+  kbuild: generate modules.builtin
 
-Thanks.
+ .gitignore                  |    1 +
+ Makefile                    |   14 ++++++++---
+ scripts/Kbuild.include      |    6 +++++
+ scripts/Makefile.lib        |    5 +++-
+ scripts/Makefile.modbuiltin |   52 +++++++++++++++++++++++++++++++++++++++++++
+ scripts/kconfig/confdata.c  |   48 +++++++++++++++++++++++++++++++++-----
+ 6 files changed, 114 insertions(+), 12 deletions(-)
+ create mode 100644 scripts/Makefile.modbuiltin
+
