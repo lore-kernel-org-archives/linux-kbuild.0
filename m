@@ -1,52 +1,51 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor.suse.de ([195.135.220.2]:46736 "EHLO mx1.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S933694AbZIDOv6 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 4 Sep 2009 10:51:58 -0400
-From: Michal Marek <mmarek@suse.cz>
-Subject: [PATCH 2/2] kbuild: rebuild fix for Makefile.modbuiltin
-Date: Fri,  4 Sep 2009 16:51:33 +0200
-Message-Id: <3263f1a5a7e97b7db424ddd429698a23f8ec665b.1252075736.git.mmarek@suse.cz>
-In-Reply-To: <7a5991a43c301eb402f67dc140c03aa1360e756e.1252075736.git.mmarek@suse.cz>
-References: <cover.1252075736.git.mmarek@suse.cz>
- <7a5991a43c301eb402f67dc140c03aa1360e756e.1252075736.git.mmarek@suse.cz>
-In-Reply-To: <cover.1252075736.git.mmarek@suse.cz>
-References: <cover.1252075736.git.mmarek@suse.cz>
+Received: from cpsmtpm-eml105.kpnxchange.com ([195.121.3.9]:52591 "EHLO
+	CPSMTPM-EML105.kpnxchange.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S933788AbZIDSzj (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 4 Sep 2009 14:55:39 -0400
+From: Frans Pop <elendil@planet.nl>
+Subject: Re: [PATCH] builddeb: Fix packaged file permissions
+Date: Fri, 4 Sep 2009 20:55:39 +0200
+References: <1252015231.3475.9.camel@localhost>
+In-Reply-To: <1252015231.3475.9.camel@localhost>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+Message-Id: <200909042055.40187.elendil@planet.nl>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: sam@ravnborg.org
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, akpm@linux-foundation.org, Jan Beulich <JBeulich@novell.com>
+To: Ben Hutchings <ben@decadent.org.uk>
+Cc: linux-kernel@vger.kernel.org, maximilian attems <max@stro.at>, linux-kbuild@vger.kernel.org
 
-From: Jan Beulich <JBeulich@novell.com>
+Added linux-kbuild to CC.
 
-This patch addresses an issue with rebuilds failing to re-generate
-modules.builtin files after altering config options.
+On Friday 04 September 2009, Ben Hutchings wrote:
+> The packaged files' permissions are implicitly dependent on the
+> current umask.  Not only can this result in surprisingly restrictive
+> permissions, but dpkg-deb will fail if the DEBIAN directory does not
+> have permissions 755 or 775.  Therefore, set the umask to 022 before
+> building a package.
+>
+> Signed-off-by: Ben Hutchings <ben@decadent.org.uk>
+Acked-by: Frans Pop <elendil@planet.nl>
 
-Signed-off-by: Jan Beulich <JBeulich@novell.com>
-Signed-off-by: Michal Marek <mmarek@suse.cz>
----
- scripts/Makefile.modbuiltin |    6 +++++-
- 1 files changed, 5 insertions(+), 1 deletions(-)
-
-diff --git a/scripts/Makefile.modbuiltin b/scripts/Makefile.modbuiltin
-index 55e1885..cc39366 100644
---- a/scripts/Makefile.modbuiltin
-+++ b/scripts/Makefile.modbuiltin
-@@ -31,9 +31,13 @@ modbuiltin-cmds =						\
- 	for m in $(modbuiltin-mods); do echo kernel/$$m; done;	\
- 	cat /dev/null $(modbuiltin-subdirs);
- 
--$(modbuiltin-target): $(subdir-ym)
-+$(modbuiltin-target): $(subdir-ym) FORCE
- 	$(Q)($(modbuiltin-cmds)) > $@
- 
-+PHONY += FORCE
-+
-+FORCE:
-+
- # Descending
- # ---------------------------------------------------------------------------
- 
--- 
-1.6.3.3
-
+> ---
+>  scripts/package/builddeb |    2 ++
+>  1 files changed, 2 insertions(+), 0 deletions(-)
+>
+> diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+> index 8b357b0..24cfd80 100644
+> --- a/scripts/package/builddeb
+> +++ b/scripts/package/builddeb
+> @@ -12,6 +12,8 @@
+>
+>  set -e
+>
+> +umask 022
+> +
+>  create_package() {
+>  	local pname="$1" pdir="$2"
+> 
