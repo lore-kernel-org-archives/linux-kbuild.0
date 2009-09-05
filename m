@@ -1,51 +1,55 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cpsmtpm-eml105.kpnxchange.com ([195.121.3.9]:52591 "EHLO
-	CPSMTPM-EML105.kpnxchange.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S933788AbZIDSzj (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 4 Sep 2009 14:55:39 -0400
-From: Frans Pop <elendil@planet.nl>
-Subject: Re: [PATCH] builddeb: Fix packaged file permissions
-Date: Fri, 4 Sep 2009 20:55:39 +0200
-References: <1252015231.3475.9.camel@localhost>
-In-Reply-To: <1252015231.3475.9.camel@localhost>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="utf-8"
+Received: from turing-police.cc.vt.edu ([128.173.14.107]:47960 "EHLO
+	turing-police.cc.vt.edu" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752575AbZIERIB (ORCPT
+	<RFC822;linux-kbuild@vger.kernel.org>);
+	Sat, 5 Sep 2009 13:08:01 -0400
+Subject: Odd Kconfig output..
+From: Valdis.Kletnieks@vt.edu
+Mime-Version: 1.0
+Content-Type: multipart/signed; boundary="==_Exmh_1252155974_2420P";
+	 micalg=pgp-sha1; protocol="application/pgp-signature"
 Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-Message-Id: <200909042055.40187.elendil@planet.nl>
+Date: Sat, 05 Sep 2009 09:06:14 -0400
+Message-ID: <12284.1252155974@turing-police.cc.vt.edu>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ben Hutchings <ben@decadent.org.uk>
-Cc: linux-kernel@vger.kernel.org, maximilian attems <max@stro.at>, linux-kbuild@vger.kernel.org
+To: Roman Zippel <zippel@linux-m68k.org>, Andrew Morton <akpm@linux-foundation.org>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-Added linux-kbuild to CC.
+--==_Exmh_1252155974_2420P
+Content-Type: text/plain; charset=us-ascii
 
-On Friday 04 September 2009, Ben Hutchings wrote:
-> The packaged files' permissions are implicitly dependent on the
-> current umask.  Not only can this result in surprisingly restrictive
-> permissions, but dpkg-deb will fail if the DEBIAN directory does not
-> have permissions 755 or 775.  Therefore, set the umask to 022 before
-> building a package.
->
-> Signed-off-by: Ben Hutchings <ben@decadent.org.uk>
-Acked-by: Frans Pop <elendil@planet.nl>
+Saw this while doing  a 'make oldconfig' moving from -mmotm0827 to -mmotm0903:
 
-> ---
->  scripts/package/builddeb |    2 ++
->  1 files changed, 2 insertions(+), 0 deletions(-)
->
-> diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-> index 8b357b0..24cfd80 100644
-> --- a/scripts/package/builddeb
-> +++ b/scripts/package/builddeb
-> @@ -12,6 +12,8 @@
->
->  set -e
->
-> +umask 022
-> +
->  create_package() {
->  	local pname="$1" pdir="$2"
-> 
+RCU Implementation
+> 1. Tree-based hierarchical RCU (TREE_RCU)
+  2. Preemptable tree-based hierarchical RCU (TREE_PREEMPT_RCU) (NEW)
+choice[1-2]: ?
+
+There is no help available for this kernel option.
+Prompt: RCU Implementation
+  Defined at init/Kconfig:329
+  Location:
+    -> General setup
+      -> RCU Subsystem
+  Selected by: m [=m]
+
+Where did that 'Selected by:' come from? Or is that just an artifact of
+the way Kconfig implements 'choice'?
+
+
+
+--==_Exmh_1252155974_2420P
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (GNU/Linux)
+Comment: Exmh version 2.5 07/13/2001
+
+iD8DBQFKomJGcC3lWbTT17ARAoazAKCLMS2hhz9lXO3eistRqMEPQnWxKACgvICa
+557ZFY691/0DRczp2tjkOXA=
+=B2Qd
+-----END PGP SIGNATURE-----
+
+--==_Exmh_1252155974_2420P--
