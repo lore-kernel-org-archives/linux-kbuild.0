@@ -1,55 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from turing-police.cc.vt.edu ([128.173.14.107]:47960 "EHLO
-	turing-police.cc.vt.edu" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752575AbZIERIB (ORCPT
-	<RFC822;linux-kbuild@vger.kernel.org>);
-	Sat, 5 Sep 2009 13:08:01 -0400
-Subject: Odd Kconfig output..
-From: Valdis.Kletnieks@vt.edu
+Received: from srvh07.vc-server.de ([83.125.112.170]:39556 "EHLO
+	srvh07.vc-server.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1758264AbZIGADM (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 6 Sep 2009 20:03:12 -0400
+Received: from p4fde92fe.dip0.t-ipconnect.de ([79.222.146.254] helo=foo.net)
+	by srvh07.vc-server.de with esmtpa (Exim 4.69)
+	(envelope-from <dh@triple-media.com>)
+	id 1MkRJq-0007b3-Dp
+	for linux-kbuild@vger.kernel.org; Mon, 07 Sep 2009 01:38:50 +0200
+Date: Mon, 7 Sep 2009 01:38:53 +0200
+From: Dennis Heuer <dh@triple-media.com>
+Subject: arch/i386/boot/bzImage once a link and once a binary
+Message-Id: <20090907013853.4f7800fc.dh@triple-media.com>
 Mime-Version: 1.0
-Content-Type: multipart/signed; boundary="==_Exmh_1252155974_2420P";
-	 micalg=pgp-sha1; protocol="application/pgp-signature"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Date: Sat, 05 Sep 2009 09:06:14 -0400
-Message-ID: <12284.1252155974@turing-police.cc.vt.edu>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Roman Zippel <zippel@linux-m68k.org>, Andrew Morton <akpm@linux-foundation.org>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
 
---==_Exmh_1252155974_2420P
-Content-Type: text/plain; charset=us-ascii
+hello
 
-Saw this while doing  a 'make oldconfig' moving from -mmotm0827 to -mmotm0903:
+am not shure if this is a failure.
 
-RCU Implementation
-> 1. Tree-based hierarchical RCU (TREE_RCU)
-  2. Preemptable tree-based hierarchical RCU (TREE_PREEMPT_RCU) (NEW)
-choice[1-2]: ?
+the first time i compiled 2.6.31-rc9 i naively copied
+arch/i386/boot/bzImage to /boot and, after the obligatory restart, got
+a grub boot-time error 16: filesystem inconsistent. this was a shock!
+however, the fallback-kernel did boot fine. i checked the
+config but couldn't find anything problematic. so i tried to
+just re-compile linux and to copy the new bzImage over the previous
+one but, luckily, cp refused to copy through a link(!). this is why i
+recognized that the first bzImage was created as a link to 
+ ../../x86/boot/bzImage. however, the second time there was a
+regular binary at same place. am now not shure if x86 is the right
+folder for grabbing bzImage for intel architectures or if there is some
+real error in the compilation scripts.
 
-There is no help available for this kernel option.
-Prompt: RCU Implementation
-  Defined at init/Kconfig:329
-  Location:
-    -> General setup
-      -> RCU Subsystem
-  Selected by: m [=m]
-
-Where did that 'Selected by:' come from? Or is that just an artifact of
-the way Kconfig implements 'choice'?
-
-
-
---==_Exmh_1252155974_2420P
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.9 (GNU/Linux)
-Comment: Exmh version 2.5 07/13/2001
-
-iD8DBQFKomJGcC3lWbTT17ARAoazAKCLMS2hhz9lXO3eistRqMEPQnWxKACgvICa
-557ZFY691/0DRczp2tjkOXA=
-=B2Qd
------END PGP SIGNATURE-----
-
---==_Exmh_1252155974_2420P--
+regards,
+dennis heuer
