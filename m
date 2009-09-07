@@ -1,41 +1,48 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from srvh07.vc-server.de ([83.125.112.170]:39556 "EHLO
-	srvh07.vc-server.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1758264AbZIGADM (ORCPT
+Received: from mtagate6.uk.ibm.com ([195.212.29.139]:39366 "EHLO
+	mtagate6.uk.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752138AbZIGIZp (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 6 Sep 2009 20:03:12 -0400
-Received: from p4fde92fe.dip0.t-ipconnect.de ([79.222.146.254] helo=foo.net)
-	by srvh07.vc-server.de with esmtpa (Exim 4.69)
-	(envelope-from <dh@triple-media.com>)
-	id 1MkRJq-0007b3-Dp
-	for linux-kbuild@vger.kernel.org; Mon, 07 Sep 2009 01:38:50 +0200
-Date: Mon, 7 Sep 2009 01:38:53 +0200
-From: Dennis Heuer <dh@triple-media.com>
-Subject: arch/i386/boot/bzImage once a link and once a binary
-Message-Id: <20090907013853.4f7800fc.dh@triple-media.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+	Mon, 7 Sep 2009 04:25:45 -0400
+Message-ID: <4AA4C354.4040002@linux.vnet.ibm.com>
+Date: Mon, 07 Sep 2009 10:24:52 +0200
+From: Peter Oberparleiter <oberpar@linux.vnet.ibm.com>
+MIME-Version: 1.0
+Subject: Re: [RFC Patch 0/5] gcov: integrate gcov into kbuild
+References: <20090904012755.3749.69645.sendpatchset@localhost.localdomain>
+In-Reply-To: <20090904012755.3749.69645.sendpatchset@localhost.localdomain>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
+To: Amerigo Wang <amwang@redhat.com>
+Cc: linux-kernel@vger.kernel.org, akpm@linux-foundation.org, linux-kbuild@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>
 
-hello
+Amerigo Wang wrote:
+> This patchset is mainly to integrate gcov into kbuild system, so that
+> we can use "make foo/bar.c.gcov" to get the gcov files.
+> Also moves the useful scripts in gcov.txt into tools/gcov/ direcotry.
 
-am not shure if this is a failure.
+Interesting approach - this should definitely make it more easy for 
+developers to get coverage data for their code. A couple of 
+thoughts/observations:
 
-the first time i compiled 2.6.31-rc9 i naively copied
-arch/i386/boot/bzImage to /boot and, after the obligatory restart, got
-a grub boot-time error 16: filesystem inconsistent. this was a shock!
-however, the fallback-kernel did boot fine. i checked the
-config but couldn't find anything problematic. so i tried to
-just re-compile linux and to copy the new bzImage over the previous
-one but, luckily, cp refused to copy through a link(!). this is why i
-recognized that the first bzImage was created as a link to 
- ../../x86/boot/bzImage. however, the second time there was a
-regular binary at same place. am now not shure if x86 is the right
-folder for grabbing bzImage for intel architectures or if there is some
-real error in the compilation scripts.
+- does not work when compiling with a separate build directory (make O=)
 
-regards,
-dennis heuer
+/sys/kernel/debug/gcov//mnt/out//mnt/linux-2.6.gcno:cannot open graph file
+make[2]: *** [init/main.c.gcov] Error 1
+make[1]: *** [init/main.c.gcov] Error 2
+make: *** [sub-make] Error 2
+
+This is most likely due to target_base_name being an absolute path 
+(relative to srctree) in case build and source directories are different.
+
+- gcov call should use option -p, otherwise gcov may overwrite .gcov 
+files if a .c file includes two .h files from different directories.
+- an option to generate .gcov files for all .c files in a subdirectory 
+would be nice
+
+
+Regards,
+   Peter Oberparleiter
+
