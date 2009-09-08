@@ -1,60 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:5570 "EHLO mx1.redhat.com"
+Received: from e9.ny.us.ibm.com ([32.97.182.139]:41744 "EHLO e9.ny.us.ibm.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752516AbZIGJ5T (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 7 Sep 2009 05:57:19 -0400
-Message-ID: <4AA4D95E.40105@redhat.com>
-Date: Mon, 07 Sep 2009 17:58:54 +0800
-From: Amerigo Wang <amwang@redhat.com>
+	id S1751168AbZIHWJk (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 8 Sep 2009 18:09:40 -0400
+Date: Tue, 8 Sep 2009 15:09:43 -0700
+From: "Paul E. McKenney" <paulmck@linux.vnet.ibm.com>
+Subject: Re: Odd Kconfig output..
+Message-ID: <20090908220943.GJ6753@linux.vnet.ibm.com>
+Reply-To: paulmck@linux.vnet.ibm.com
+References: <12284.1252155974@turing-police.cc.vt.edu>
 MIME-Version: 1.0
-Subject: Re: [RFC Patch 0/5] gcov: integrate gcov into kbuild
-References: <20090904012755.3749.69645.sendpatchset@localhost.localdomain> <4AA4C354.4040002@linux.vnet.ibm.com>
-In-Reply-To: <4AA4C354.4040002@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <12284.1252155974@turing-police.cc.vt.edu>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Peter Oberparleiter <oberpar@linux.vnet.ibm.com>
-Cc: linux-kernel@vger.kernel.org, akpm@linux-foundation.org, linux-kbuild@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>
+To: Valdis.Kletnieks@vt.edu
+Cc: Roman Zippel <zippel@linux-m68k.org>, Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-Peter Oberparleiter wrote:
-> Amerigo Wang wrote:
->> This patchset is mainly to integrate gcov into kbuild system, so that
->> we can use "make foo/bar.c.gcov" to get the gcov files.
->> Also moves the useful scripts in gcov.txt into tools/gcov/ direcotry.
+On Sat, Sep 05, 2009 at 09:06:14AM -0400, Valdis.Kletnieks@vt.edu wrote:
+> Saw this while doing  a 'make oldconfig' moving from -mmotm0827 to -mmotm0903:
 > 
-> Interesting approach - this should definitely make it more easy for 
-> developers to get coverage data for their code. A couple of 
-> thoughts/observations:
-
-
-Thanks!
-
+> RCU Implementation
+> > 1. Tree-based hierarchical RCU (TREE_RCU)
+>   2. Preemptable tree-based hierarchical RCU (TREE_PREEMPT_RCU) (NEW)
+> choice[1-2]: ?
 > 
-> - does not work when compiling with a separate build directory (make O=)
+> There is no help available for this kernel option.
+> Prompt: RCU Implementation
+>   Defined at init/Kconfig:329
+>   Location:
+>     -> General setup
+>       -> RCU Subsystem
+>   Selected by: m [=m]
 > 
-> /sys/kernel/debug/gcov//mnt/out//mnt/linux-2.6.gcno:cannot open graph file
-> make[2]: *** [init/main.c.gcov] Error 1
-> make[1]: *** [init/main.c.gcov] Error 2
-> make: *** [sub-make] Error 2
-> 
-> This is most likely due to target_base_name being an absolute path 
-> (relative to srctree) in case build and source directories are different.
-> 
+> Where did that 'Selected by:' come from? Or is that just an artifact of
+> the way Kconfig implements 'choice'?
 
+Many of the architectures use a "select" clause for RCU, usually
+selecting CLASSIC_RCU.  Could that be the issue?
 
-Hmm, yeah, I will fix it.
-
-> - gcov call should use option -p, otherwise gcov may overwrite .gcov 
-> files if a .c file includes two .h files from different directories.
-
-
-Ok.
-
-> - an option to generate .gcov files for all .c files in a subdirectory 
-> would be nice
-
-Nice idea! I will add this.
-
-
-Thank you, I will update and resend them!
+							Thanx, Paul
