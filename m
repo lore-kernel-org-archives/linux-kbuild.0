@@ -1,38 +1,92 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from fed1rmmtao107.cox.net ([68.230.241.39]:62246 "EHLO
-	fed1rmmtao107.cox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751662AbZIHX6F (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 8 Sep 2009 19:58:05 -0400
-Received: from fed1rmimpo01.cox.net ([70.169.32.71])
-          by fed1rmmtao107.cox.net
-          (InterMail vM.8.00.01.00 201-2244-105-20090324) with ESMTP
-          id <20090908235806.HNBW21470.fed1rmmtao107.cox.net@fed1rmimpo01.cox.net>
-          for <linux-kbuild@vger.kernel.org>;
-          Tue, 8 Sep 2009 19:58:06 -0400
-Date: Tue, 8 Sep 2009 19:58:07 -0400 (EDT)
-From: daniel.car@cox.net
-Message-ID: <6174716.43962.1252454287329.JavaMail.daniel.car@127.0.0.1>
-Subject: How to put output from external module in subdirectory of source
- tree
+Received: from relay1.sgi.com ([192.48.179.29]:42335 "EHLO relay.sgi.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1752046AbZIISZQ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 9 Sep 2009 14:25:16 -0400
+Received: from estes.americas.sgi.com (estes.americas.sgi.com [128.162.236.10])
+	by relay1.corp.sgi.com (Postfix) with ESMTP id 0C9D08F80BC
+	for <linux-kbuild@vger.kernel.org>; Wed,  9 Sep 2009 11:25:19 -0700 (PDT)
+Date: Wed, 9 Sep 2009 13:25:18 -0500
+From: Robin Holt <holt@sgi.com>
+Subject: [Patch] menuconfig: Display current values with symbols.
+Message-ID: <20090909182518.GB9913@sgi.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8; format=flowed; delsp=no
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
+Cc: holt@sgi.com
 
-Does kbuild support putting the build output for an out of kernel source 
-tree module in a separate directory?  For example source is src then 
-object and ko files should go to src/i686.
-The O=/path option is for building the kernel out of source tree, but my 
-question is about building an external module and putting the build 
-output elsewhere.
 
-The modules.txt file doesn't say how to do this.  If this is not 
-supported, would a patch for this functionality be welcomed?
-Please cc me on replies since I'm not subscribed.
+While investigating why a CONFIG_ symbol was not displayed, I was
+frustrated with finding each of the dependent symbol's values.  This patch
+adds a display of the symbol's value along side the symbol's name.
 
-Thanks,
-Daniel
+Signed-off-by: Robin Holt <holt@sgi.com>
+
+---
+
+One additional suggestion would be an easy way to navigate from the
+search screen to the spot in the menus where that CONFIG_ value is set.
+I could not figure out a clear and convenient method for that.  Some of
+the menus are fairly long and since they are not sorted, can result in
+some frustration while searching for the individual setting.
+
+
+Index: xpmem_numatools_kernel/scripts/kconfig/expr.c
+===================================================================
+--- xpmem_numatools_kernel.orig/scripts/kconfig/expr.c	2009-09-08 13:30:57.000000000 -0500
++++ xpmem_numatools_kernel/scripts/kconfig/expr.c	2009-09-09 11:53:07.000000000 -0500
+@@ -1013,6 +1013,19 @@ int expr_compare_type(enum expr_type t1,
+ #endif
+ }
+ 
++void expr_print_symbol(void (*fn)(void *, struct symbol *, const char *), void *data, struct symbol *sym)
++{
++	char sym_value_str[5];
++
++	if (sym->name) {
++		fn(data, sym, sym->name);
++		if (snprintf(sym_value_str, 5, "[=%s]", sym_get_string_value(sym)) < 5)
++			fn(data, sym, sym_value_str);
++	} else {
++		fn(data, NULL, "<choice>");
++	}
++}
++
+ void expr_print(struct expr *e, void (*fn)(void *, struct symbol *, const char *), void *data, int prevtoken)
+ {
+ 	if (!e) {
+@@ -1024,28 +1037,19 @@ void expr_print(struct expr *e, void (*f
+ 		fn(data, NULL, "(");
+ 	switch (e->type) {
+ 	case E_SYMBOL:
+-		if (e->left.sym->name)
+-			fn(data, e->left.sym, e->left.sym->name);
+-		else
+-			fn(data, NULL, "<choice>");
++		expr_print_symbol(fn, data, e->left.sym);
+ 		break;
+ 	case E_NOT:
+ 		fn(data, NULL, "!");
+ 		expr_print(e->left.expr, fn, data, E_NOT);
+ 		break;
+ 	case E_EQUAL:
+-		if (e->left.sym->name)
+-			fn(data, e->left.sym, e->left.sym->name);
+-		else
+-			fn(data, NULL, "<choice>");
++		expr_print_symbol(fn, data, e->left.sym);
+ 		fn(data, NULL, "=");
+ 		fn(data, e->right.sym, e->right.sym->name);
+ 		break;
+ 	case E_UNEQUAL:
+-		if (e->left.sym->name)
+-			fn(data, e->left.sym, e->left.sym->name);
+-		else
+-			fn(data, NULL, "<choice>");
++		expr_print_symbol(fn, data, e->left.sym);
+ 		fn(data, NULL, "!=");
+ 		fn(data, e->right.sym, e->right.sym->name);
+ 		break;
