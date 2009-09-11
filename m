@@ -1,15 +1,15 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from hrndva-omtalb.mail.rr.com ([71.74.56.122]:65129 "EHLO
+Received: from hrndva-omtalb.mail.rr.com ([71.74.56.123]:65175 "EHLO
 	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755905AbZIKUAb (ORCPT
+	with ESMTP id S1756235AbZIKUAd (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 11 Sep 2009 16:00:31 -0400
-Message-Id: <20090911200033.537674063@goodmis.org>
+	Fri, 11 Sep 2009 16:00:33 -0400
+Message-Id: <20090911200035.536991976@goodmis.org>
 References: <20090911195849.451244684@goodmis.org>
-Date: Fri, 11 Sep 2009 15:58:53 -0400
+Date: Fri, 11 Sep 2009 15:59:00 -0400
 From: Steven Rostedt <rostedt@goodmis.org>
-Subject: [PATCH 04/15] kconfig: streamline_config.pl do not stop with no depends
-Content-Disposition: inline; filename=0004-kconfig-streamline_config.pl-do-not-stop-with-no-dep.patch
+Subject: [PATCH 11/15] kconfig: unset IKCONFIG_PROC and clean up nesting
+Content-Disposition: inline; filename=0011-kconfig-unset-IKCONFIG_PROC-and-clean-up-nesting.patch
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org
@@ -17,45 +17,48 @@ Cc: Linus Torvalds <torvalds@linux-foundation.org>, Andrew Morton <akpm@linux-fo
 
 From: Steven Rostedt <srostedt@redhat.com>
 
-If a config does not have a prompt, it must be selected.
-streamline_config.pl keeps track of all configs that select other configs.
-If a config that does not have a prompt needs to be set to enable a
-current module, it will include all configs that select it.
-Note, streamline_config.pl does not enable modules that are not already
-enabled. It only keeps enabled those that were enabled and might be
-needed to compile the current modules.
+Due to cut and paste error IKCONFIG was both set and cleared.
+It was suppose to be IKCONFIG_PROC to be cleared.
 
-The code to find the selects of a config is after the code that
-adds the depends. But if a config needed selects but had no dependencies,
-it would not be set. Because the code would stop before getting to
-the select.
+Also cleaned up if nesting.
 
+Reported-by: Alan Jenkins <sourcejedi.lkml@googlemail.com>
 Signed-off-by: Steven Rostedt <rostedt@goodmis.org>
 ---
- scripts/kconfig/streamline_config.pl |    8 +++-----
- 1 files changed, 3 insertions(+), 5 deletions(-)
+ scripts/kconfig/streamline_config.pl |    9 +++------
+ 1 files changed, 3 insertions(+), 6 deletions(-)
 
 diff --git a/scripts/kconfig/streamline_config.pl b/scripts/kconfig/streamline_config.pl
-index 79d8557..1774905 100644
+index 9fa3f81..69b7c3f 100644
 --- a/scripts/kconfig/streamline_config.pl
 +++ b/scripts/kconfig/streamline_config.pl
-@@ -237,13 +237,11 @@ while ($repeat) {
-     foreach my $config (keys %configs) {
- 	$config =~ s/^CONFIG_//;
- 
--	if (!defined($depends{$config})) {
--	    next;
-+	if (defined($depends{$config})) {
-+	    # This config has dependencies. Make sure they are also included
-+	    parse_config_dep_select $depends{$config};
+@@ -323,7 +323,7 @@ while(<CIN>) {
+ 	    # enable IKCONFIG at least as a module
+ 	    print "CONFIG_IKCONFIG=m\n";
+ 	    # don't ask about PROC
+-	    print "# CONFIG_IKCONFIG is not set\n";
++	    print "# CONFIG_IKCONFIG_PROC is not set\n";
+ 	} else {
+ 	    print;
  	}
- 
--	# This config has dependencies. Make sure they are also included
--	parse_config_dep_select $depends{$config};
--
- 	if (defined($prompt{$config}) || !defined($selects{$config})) {
- 	    next;
+@@ -333,15 +333,12 @@ while(<CIN>) {
+     if (/^(CONFIG.*)=(m|y)/) {
+ 	if (defined($configs{$1})) {
+ 	    $setconfigs{$1} = $2;
+-	    print;
+ 	} elsif ($2 eq "m") {
+ 	    print "# $1 is not set\n";
+-	} else {
+-	    print;
++	    next;
  	}
+-    } else {
+-	print;
+     }
++    print;
+ }
+ close(CIN);
+ 
 -- 
 1.6.3.3
 
