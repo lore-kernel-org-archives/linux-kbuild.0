@@ -1,15 +1,15 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from hrndva-omtalb.mail.rr.com ([71.74.56.124]:53732 "EHLO
+Received: from hrndva-omtalb.mail.rr.com ([71.74.56.125]:47699 "EHLO
 	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756019AbZIKUAb (ORCPT
+	with ESMTP id S1756105AbZIKUAd (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 11 Sep 2009 16:00:31 -0400
-Message-Id: <20090911200033.834879243@goodmis.org>
+	Fri, 11 Sep 2009 16:00:33 -0400
+Message-Id: <20090911200036.117261078@goodmis.org>
 References: <20090911195849.451244684@goodmis.org>
-Date: Fri, 11 Sep 2009 15:58:54 -0400
+Date: Fri, 11 Sep 2009 15:59:02 -0400
 From: Steven Rostedt <rostedt@goodmis.org>
-Subject: [PATCH 05/15] kconfig: do not warn about modules built in
-Content-Disposition: inline; filename=0005-kconfig-do-not-warn-about-modules-built-in.patch
+Subject: [PATCH 13/15] kconfig: make local .config default for streamline_config
+Content-Disposition: inline; filename=0013-kconfig-make-local-.config-default-for-streamline_co.patch
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org
@@ -17,43 +17,43 @@ Cc: Linus Torvalds <torvalds@linux-foundation.org>, Andrew Morton <akpm@linux-fo
 
 From: Steven Rostedt <srostedt@redhat.com>
 
-The streamline_config.pl finds all the configs that are needed to
-compile the currently loaded modules. After it creates the .config
-file, it tests to make sure all the configs that are needed were
-set.
+As Andi Kleen pointed out, most people would expect that the local .config
+file to be based for a streamline config. This patch changes the order
+of searching for a config file to consider the .config in the local
+directory first.
 
-It only looks at the configs that are modules, it does not look
-at the builtin configs. This causes unnecessary warnings about modules
-not being covered.
-
-Reported-by: Ingo Molnar <mingo@elte.hu>
+Reported-by: Andi Kleen <andi@firstfloor.org>
 Signed-off-by: Steven Rostedt <rostedt@goodmis.org>
 ---
- scripts/kconfig/streamline_config.pl |    8 +++++---
- 1 files changed, 5 insertions(+), 3 deletions(-)
+ scripts/kconfig/streamline_config.pl |    8 ++++----
+ 1 files changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/scripts/kconfig/streamline_config.pl b/scripts/kconfig/streamline_config.pl
-index 1774905..caac952 100644
+index 46ca62d..95984db 100644
 --- a/scripts/kconfig/streamline_config.pl
 +++ b/scripts/kconfig/streamline_config.pl
-@@ -256,12 +256,14 @@ my %setconfigs;
- # Finally, read the .config file and turn off any module enabled that
- # we could not find a reason to keep enabled.
- while(<CIN>) {
--	if (/^(CONFIG.*)=m/) {
-+	if (/^(CONFIG.*)=(m|y)/) {
- 		if (defined($configs{$1})) {
--		    $setconfigs{$1} = 1;
-+		    $setconfigs{$1} = $2;
- 		    print;
--		} else {
-+		} elsif ($2 eq "m") {
- 		    print "# $1 is not set\n";
-+		} else {
-+		    print;
- 		}
- 	} else {
- 		print;
+@@ -50,6 +50,10 @@ chomp $uname;
+ 
+ my @searchconfigs = (
+ 	{
++	    "file" => ".config",
++	    "exec" => "cat",
++	},
++	{
+ 	    "file" => "/proc/config.gz",
+ 	    "exec" => "zcat",
+ 	},
+@@ -82,10 +86,6 @@ my @searchconfigs = (
+ 	    "exec" => "scripts/extract-ikconfig",
+ 	    "test" => "scripts/extract-ikconfig",
+ 	},
+-	{
+-	    "file" => ".config",
+-	    "exec" => "cat",
+-	},
+ );
+ 
+ sub find_config {
 -- 
 1.6.3.3
 
