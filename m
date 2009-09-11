@@ -1,15 +1,15 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from hrndva-omtalb.mail.rr.com ([71.74.56.122]:65103 "EHLO
+Received: from hrndva-omtalb.mail.rr.com ([71.74.56.124]:53732 "EHLO
 	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755797AbZIKUAa (ORCPT
+	with ESMTP id S1756019AbZIKUAb (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 11 Sep 2009 16:00:30 -0400
-Message-Id: <20090911200032.864010772@goodmis.org>
+	Fri, 11 Sep 2009 16:00:31 -0400
+Message-Id: <20090911200033.834879243@goodmis.org>
 References: <20090911195849.451244684@goodmis.org>
-Date: Fri, 11 Sep 2009 15:58:51 -0400
+Date: Fri, 11 Sep 2009 15:58:54 -0400
 From: Steven Rostedt <rostedt@goodmis.org>
-Subject: [PATCH 02/15] kconfig: make localmodconfig to run streamline_config.pl
-Content-Disposition: inline; filename=0002-kconfig-make-localmodconfig-to-run-streamline_config.patch
+Subject: [PATCH 05/15] kconfig: do not warn about modules built in
+Content-Disposition: inline; filename=0005-kconfig-do-not-warn-about-modules-built-in.patch
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org
@@ -17,60 +17,43 @@ Cc: Linus Torvalds <torvalds@linux-foundation.org>, Andrew Morton <akpm@linux-fo
 
 From: Steven Rostedt <srostedt@redhat.com>
 
-Running the streamline_config.pl script manually can still be confusing
-for some users. This patch adds the localmodconfig option. This will
-automatically run streamline_config.pl on the current .config and
-then run "make silentoldconfig" to fix any wholes that might have been
-created.
+The streamline_config.pl finds all the configs that are needed to
+compile the currently loaded modules. After it creates the .config
+file, it tests to make sure all the configs that are needed were
+set.
 
- $ make localmodconfig
+It only looks at the configs that are modules, it does not look
+at the builtin configs. This causes unnecessary warnings about modules
+not being covered.
 
-This will remove any module configurations in .config that are not needed
-to compile the modules that are loaded.
-
+Reported-by: Ingo Molnar <mingo@elte.hu>
 Signed-off-by: Steven Rostedt <rostedt@goodmis.org>
 ---
- scripts/kconfig/Makefile |   13 ++++++++++++-
- 1 files changed, 12 insertions(+), 1 deletions(-)
+ scripts/kconfig/streamline_config.pl |    8 +++++---
+ 1 files changed, 5 insertions(+), 3 deletions(-)
 
-diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
-index 5ddf8be..e4d8394 100644
---- a/scripts/kconfig/Makefile
-+++ b/scripts/kconfig/Makefile
-@@ -2,7 +2,8 @@
- # Kernel configuration targets
- # These targets are used from top-level makefile
- 
--PHONY += oldconfig xconfig gconfig menuconfig config silentoldconfig update-po-config
-+PHONY += oldconfig xconfig gconfig menuconfig config silentoldconfig update-po-config \
-+	localmodconfig
- 
- ifdef KBUILD_KCONFIG
- Kconfig := $(KBUILD_KCONFIG)
-@@ -28,6 +29,15 @@ oldconfig: $(obj)/conf
- silentoldconfig: $(obj)/conf
- 	$< -s $(Kconfig)
- 
-+localmodconfig: $(obj)/streamline_config.pl $(obj)/conf
-+	$(Q)perl $< $(Kconfig) > .tmp.config
-+	$(Q)cmp -s .tmp.config .config ||		\
-+		(mv -f .config .config.old.1;		\
-+		 mv -f .tmp.config .config;		\
-+		 $(obj)/conf -s $(Kconfig);		\
-+		 mv -f .config.old.1 .config.old)
-+	$(Q)rm -f .tmp.config
-+
- # Create new linux.pot file
- # Adjust charset to UTF-8 in .po file to accept UTF-8 in Kconfig files
- # The symlink is used to repair a deficiency in arch/um
-@@ -83,6 +93,7 @@ help:
- 	@echo  '  xconfig	  - Update current config utilising a QT based front-end'
- 	@echo  '  gconfig	  - Update current config utilising a GTK based front-end'
- 	@echo  '  oldconfig	  - Update current config utilising a provided .config as base'
-+	@echo  '  localmodconfig  - Update current config disabling modules not loaded'
- 	@echo  '  silentoldconfig - Same as oldconfig, but quietly, additionally update deps'
- 	@echo  '  randconfig	  - New config with random answer to all options'
- 	@echo  '  defconfig	  - New config with default answer to all options'
+diff --git a/scripts/kconfig/streamline_config.pl b/scripts/kconfig/streamline_config.pl
+index 1774905..caac952 100644
+--- a/scripts/kconfig/streamline_config.pl
++++ b/scripts/kconfig/streamline_config.pl
+@@ -256,12 +256,14 @@ my %setconfigs;
+ # Finally, read the .config file and turn off any module enabled that
+ # we could not find a reason to keep enabled.
+ while(<CIN>) {
+-	if (/^(CONFIG.*)=m/) {
++	if (/^(CONFIG.*)=(m|y)/) {
+ 		if (defined($configs{$1})) {
+-		    $setconfigs{$1} = 1;
++		    $setconfigs{$1} = $2;
+ 		    print;
+-		} else {
++		} elsif ($2 eq "m") {
+ 		    print "# $1 is not set\n";
++		} else {
++		    print;
+ 		}
+ 	} else {
+ 		print;
 -- 
 1.6.3.3
 
