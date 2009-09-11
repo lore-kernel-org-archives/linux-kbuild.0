@@ -1,15 +1,15 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from hrndva-omtalb.mail.rr.com ([71.74.56.124]:41119 "EHLO
+Received: from hrndva-omtalb.mail.rr.com ([71.74.56.124]:65164 "EHLO
 	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755850AbZIKUAa (ORCPT
+	with ESMTP id S1756214AbZIKUAc (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 11 Sep 2009 16:00:30 -0400
-Message-Id: <20090911200033.244007539@goodmis.org>
+	Fri, 11 Sep 2009 16:00:32 -0400
+Message-Id: <20090911200034.904723927@goodmis.org>
 References: <20090911195849.451244684@goodmis.org>
-Date: Fri, 11 Sep 2009 15:58:52 -0400
+Date: Fri, 11 Sep 2009 15:58:58 -0400
 From: Steven Rostedt <rostedt@goodmis.org>
-Subject: [PATCH 03/15] kconfig: add make localyesconfig option
-Content-Disposition: inline; filename=0003-kconfig-add-make-localyesconfig-option.patch
+Subject: [PATCH 09/15] kconfig: keep config.gz around even if CONFIG_IKCONFIG_PROC is not set
+Content-Disposition: inline; filename=0009-kconfig-keep-config.gz-around-even-if-CONFIG_IKCONFI.patch
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org
@@ -17,57 +17,32 @@ Cc: Linus Torvalds <torvalds@linux-foundation.org>, Andrew Morton <akpm@linux-fo
 
 From: Steven Rostedt <srostedt@redhat.com>
 
-This adds the option localyesconfig to make. This is similar to
-localmodconfig, but after it removes unnecessary modules it runs
+If CONFIG_IKCONFIG is set but CONFIG_IKCONFIG_PROC is not, then
+gcc will optimize the config.gz out, because nobody uses it.
 
-  sed -i s/=m/=y/
+This patch adds "__used" to the config.gz data to keep it around so that
+code like extract-ikconfig can still find it.
 
-on the .config file. It then runs "make silentoldconfig" to fix any
-wholes that were created by the conversion of modules to core.
+[ Impact: allow extract-ikconfig to find config.gz ]
 
 Signed-off-by: Steven Rostedt <rostedt@goodmis.org>
 ---
- scripts/kconfig/Makefile |   13 ++++++++++++-
- 1 files changed, 12 insertions(+), 1 deletions(-)
+ kernel/Makefile |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
-index e4d8394..12a4d9e 100644
---- a/scripts/kconfig/Makefile
-+++ b/scripts/kconfig/Makefile
-@@ -3,7 +3,7 @@
- # These targets are used from top-level makefile
+diff --git a/kernel/Makefile b/kernel/Makefile
+index 2093a69..d0c84e6 100644
+--- a/kernel/Makefile
++++ b/kernel/Makefile
+@@ -119,7 +119,7 @@ $(obj)/config_data.gz: .config FORCE
+ 	$(call if_changed,gzip)
  
- PHONY += oldconfig xconfig gconfig menuconfig config silentoldconfig update-po-config \
--	localmodconfig
-+	localmodconfig localyesconfig
- 
- ifdef KBUILD_KCONFIG
- Kconfig := $(KBUILD_KCONFIG)
-@@ -38,6 +38,16 @@ localmodconfig: $(obj)/streamline_config.pl $(obj)/conf
- 		 mv -f .config.old.1 .config.old)
- 	$(Q)rm -f .tmp.config
- 
-+localyesconfig: $(obj)/streamline_config.pl
-+	$(Q)perl $< $(Kconfig) > .tmp.config
-+	$(Q)sed -i s/=m/=y/ .tmp.config
-+	$(Q)cmp -s .tmp.config .config ||		\
-+		(mv -f .config .config.old.1;		\
-+		 mv -f .tmp.config .config;		\
-+		 $(obj)/conf -s $(Kconfig);		\
-+		 mv -f .config.old.1 .config.old)
-+	$(Q)rm -f .tmp.config
-+
- # Create new linux.pot file
- # Adjust charset to UTF-8 in .po file to accept UTF-8 in Kconfig files
- # The symlink is used to repair a deficiency in arch/um
-@@ -94,6 +104,7 @@ help:
- 	@echo  '  gconfig	  - Update current config utilising a GTK based front-end'
- 	@echo  '  oldconfig	  - Update current config utilising a provided .config as base'
- 	@echo  '  localmodconfig  - Update current config disabling modules not loaded'
-+	@echo  '  localyesconfig  - Update current config converting local mods to core'
- 	@echo  '  silentoldconfig - Same as oldconfig, but quietly, additionally update deps'
- 	@echo  '  randconfig	  - New config with random answer to all options'
- 	@echo  '  defconfig	  - New config with default answer to all options'
+ quiet_cmd_ikconfiggz = IKCFG   $@
+-      cmd_ikconfiggz = (echo "static const char kernel_config_data[] = MAGIC_START"; cat $< | scripts/bin2c; echo "MAGIC_END;") > $@
++      cmd_ikconfiggz = (echo "static const char kernel_config_data[] __used = MAGIC_START"; cat $< | scripts/bin2c; echo "MAGIC_END;") > $@
+ targets += config_data.h
+ $(obj)/config_data.h: $(obj)/config_data.gz FORCE
+ 	$(call if_changed,ikconfiggz)
 -- 
 1.6.3.3
 
