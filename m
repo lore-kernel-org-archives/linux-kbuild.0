@@ -1,15 +1,15 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from hrndva-omtalb.mail.rr.com ([71.74.56.125]:47699 "EHLO
+Received: from hrndva-omtalb.mail.rr.com ([71.74.56.124]:47689 "EHLO
 	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756105AbZIKUAd (ORCPT
+	with ESMTP id S1756249AbZIKUAd (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
 	Fri, 11 Sep 2009 16:00:33 -0400
-Message-Id: <20090911200036.117261078@goodmis.org>
+Message-Id: <20090911200035.830978613@goodmis.org>
 References: <20090911195849.451244684@goodmis.org>
-Date: Fri, 11 Sep 2009 15:59:02 -0400
+Date: Fri, 11 Sep 2009 15:59:01 -0400
 From: Steven Rostedt <rostedt@goodmis.org>
-Subject: [PATCH 13/15] kconfig: make local .config default for streamline_config
-Content-Disposition: inline; filename=0013-kconfig-make-local-.config-default-for-streamline_co.patch
+Subject: [PATCH 12/15] kconfig: test for /boot/config-uname after /proc/config.gz in localconfig
+Content-Disposition: inline; filename=0012-kconfig-test-for-boot-config-uname-after-proc-config.patch
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org
@@ -17,43 +17,30 @@ Cc: Linus Torvalds <torvalds@linux-foundation.org>, Andrew Morton <akpm@linux-fo
 
 From: Steven Rostedt <srostedt@redhat.com>
 
-As Andi Kleen pointed out, most people would expect that the local .config
-file to be based for a streamline config. This patch changes the order
-of searching for a config file to consider the .config in the local
-directory first.
+Many distros put their config in /boot/config-`uname -r`, add a check
+for that right after /proc/config.gz
 
-Reported-by: Andi Kleen <andi@firstfloor.org>
+Reported-by: Alan Jenkins <sourcejedi.lkml@googlemail.com>
 Signed-off-by: Steven Rostedt <rostedt@goodmis.org>
 ---
- scripts/kconfig/streamline_config.pl |    8 ++++----
- 1 files changed, 4 insertions(+), 4 deletions(-)
+ scripts/kconfig/streamline_config.pl |    4 ++++
+ 1 files changed, 4 insertions(+), 0 deletions(-)
 
 diff --git a/scripts/kconfig/streamline_config.pl b/scripts/kconfig/streamline_config.pl
-index 46ca62d..95984db 100644
+index 69b7c3f..46ca62d 100644
 --- a/scripts/kconfig/streamline_config.pl
 +++ b/scripts/kconfig/streamline_config.pl
-@@ -50,6 +50,10 @@ chomp $uname;
- 
- my @searchconfigs = (
+@@ -54,6 +54,10 @@ my @searchconfigs = (
+ 	    "exec" => "zcat",
+ 	},
  	{
-+	    "file" => ".config",
++	    "file" => "/boot/config-$uname",
 +	    "exec" => "cat",
 +	},
 +	{
- 	    "file" => "/proc/config.gz",
- 	    "exec" => "zcat",
- 	},
-@@ -82,10 +86,6 @@ my @searchconfigs = (
+ 	    "file" => "/boot/vmlinuz-$uname",
  	    "exec" => "scripts/extract-ikconfig",
  	    "test" => "scripts/extract-ikconfig",
- 	},
--	{
--	    "file" => ".config",
--	    "exec" => "cat",
--	},
- );
- 
- sub find_config {
 -- 
 1.6.3.3
 
