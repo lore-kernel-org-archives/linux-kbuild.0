@@ -1,15 +1,15 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from hrndva-omtalb.mail.rr.com ([71.74.56.122]:47668 "EHLO
+Received: from hrndva-omtalb.mail.rr.com ([71.74.56.122]:41145 "EHLO
 	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756220AbZIKUAc (ORCPT
+	with ESMTP id S1756191AbZIKUAb (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 11 Sep 2009 16:00:32 -0400
-Message-Id: <20090911200035.235119870@goodmis.org>
+	Fri, 11 Sep 2009 16:00:31 -0400
+Message-Id: <20090911200034.376726399@goodmis.org>
 References: <20090911195849.451244684@goodmis.org>
-Date: Fri, 11 Sep 2009 15:58:59 -0400
+Date: Fri, 11 Sep 2009 15:58:56 -0400
 From: Steven Rostedt <rostedt@goodmis.org>
-Subject: [PATCH 10/15] kconfig: search for a config to base the local(mod|yes)config on
-Content-Disposition: inline; filename=0010-kconfig-search-for-a-config-to-base-the-local-mod-ye.patch
+Subject: [PATCH 07/15] kconfig: add check if end exists in extract-ikconfig
+Content-Disposition: inline; filename=0007-kconfig-add-check-if-end-exists-in-extract-ikconfig.patch
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org
@@ -17,102 +17,29 @@ Cc: Linus Torvalds <torvalds@linux-foundation.org>, Andrew Morton <akpm@linux-fo
 
 From: Steven Rostedt <srostedt@redhat.com>
 
-Instead of using the .config in the local directory. This patch
-changes streamline_config.pl to search various locations for a config.
-
-Here's the list and order of search:
-
-  /proc/config.gz
-  /boot/vmlinuz-`uname -r`
-  vmlinux  # local to the directory
-  /lib/modules/`uname -r`/kernel/kernel/configs.ko
-  kernel/configs.ko
-  kernel/configs.o
-  .config
-
-Once it finds a file that contains a config (it checks if the binary
-objects have configs first) it then uses it to create the .config
-with minimum modules needed.
+Both start and end should be tested for existence before continuing
+to parse the config.gz file.
 
 Signed-off-by: Steven Rostedt <rostedt@goodmis.org>
 ---
- scripts/kconfig/streamline_config.pl |   63 +++++++++++++++++++++++++++++++++-
- 1 files changed, 62 insertions(+), 1 deletions(-)
+ scripts/extract-ikconfig |    4 ++++
+ 1 files changed, 4 insertions(+), 0 deletions(-)
 
-diff --git a/scripts/kconfig/streamline_config.pl b/scripts/kconfig/streamline_config.pl
-index 2334641..9fa3f81 100644
---- a/scripts/kconfig/streamline_config.pl
-+++ b/scripts/kconfig/streamline_config.pl
-@@ -45,7 +45,68 @@
- my $config = ".config";
- my $linuxpath = ".";
+diff --git a/scripts/extract-ikconfig b/scripts/extract-ikconfig
+index 72997c3..42d6bce 100755
+--- a/scripts/extract-ikconfig
++++ b/scripts/extract-ikconfig
+@@ -17,6 +17,10 @@ dump_config() {
+ 	return
+     fi
+     end=`$binoffset $file $IKCFG_ED 2>/dev/null`
++    [ "$?" != "0" ] && end="-1"
++    if [ "$end" -eq "-1" ]; then
++	return
++    fi
  
--open(CIN,$config) || die "Can't open current config file: $config";
-+my $uname = `uname -r`;
-+chomp $uname;
-+
-+my @searchconfigs = (
-+	{
-+	    "file" => "/proc/config.gz",
-+	    "exec" => "zcat",
-+	},
-+	{
-+	    "file" => "/boot/vmlinuz-$uname",
-+	    "exec" => "scripts/extract-ikconfig",
-+	    "test" => "scripts/extract-ikconfig",
-+	},
-+	{
-+	    "file" => "vmlinux",
-+	    "exec" => "scripts/extract-ikconfig",
-+	    "test" => "scripts/extract-ikconfig",
-+	},
-+	{
-+	    "file" => "/lib/modules/$uname/kernel/kernel/configs.ko",
-+	    "exec" => "scripts/extract-ikconfig",
-+	    "test" => "scripts/extract-ikconfig",
-+	},
-+	{
-+	    "file" => "kernel/configs.ko",
-+	    "exec" => "scripts/extract-ikconfig",
-+	    "test" => "scripts/extract-ikconfig",
-+	},
-+	{
-+	    "file" => "kernel/configs.o",
-+	    "exec" => "scripts/extract-ikconfig",
-+	    "test" => "scripts/extract-ikconfig",
-+	},
-+	{
-+	    "file" => ".config",
-+	    "exec" => "cat",
-+	},
-+);
-+
-+sub find_config {
-+    foreach my $conf (@searchconfigs) {
-+	my $file = $conf->{"file"};
-+
-+	next if ( ! -f "$file");
-+
-+	if (defined($conf->{"test"})) {
-+	    `$conf->{"test"} $conf->{"file"} 2>/dev/null`;
-+	    next if ($?);
-+	}
-+
-+	my $exec = $conf->{"exec"};
-+
-+	print STDERR "using config: '$file'\n";
-+
-+	open(CIN, "$exec $file |") || die "Failed to run $exec $file";
-+	return;
-+    }
-+    die "No config file found";
-+}
-+
-+find_config;
-+
- my @makefiles = `find $linuxpath -name Makefile`;
- my %depends;
- my %selects;
+     start=`expr $start + 8`
+     size=`expr $end - $start`
 -- 
 1.6.3.3
 
