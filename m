@@ -1,85 +1,59 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from hrndva-omtalb.mail.rr.com ([71.74.56.123]:47646 "EHLO
-	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755926AbZIKUAb (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 11 Sep 2009 16:00:31 -0400
-Message-Id: <20090911200034.125899575@goodmis.org>
-References: <20090911195849.451244684@goodmis.org>
-Date: Fri, 11 Sep 2009 15:58:55 -0400
-From: Steven Rostedt <rostedt@goodmis.org>
-Subject: [PATCH 06/15] kconfig: enable CONFIG_IKCONFIG from streamline_config.pl
-Content-Disposition: inline; filename=0006-kconfig-enable-CONFIG_IKCONFIG-from-streamline_confi.patch
+Received: from cantor.suse.de ([195.135.220.2]:44896 "EHLO mx1.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754569AbZIMP7P (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 13 Sep 2009 11:59:15 -0400
+Date: Sun, 13 Sep 2009 17:59:14 +0200 (CEST)
+From: Jiri Kosina <jkosina@suse.cz>
+Subject: Re: special HID & Kconfig: odd behavior in gconfig
+In-Reply-To: <1252681027.2282.23.camel@castor>
+Message-ID: <alpine.LNX.2.00.0909131758280.17028@wotan.suse.de>
+References: <1252681027.2282.23.camel@castor>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, Andrew Morton <akpm@linux-foundation.org>, Ingo Molnar <mingo@elte.hu>, Thomas Gleixner <tglx@linutronix.de>, Theodore Tso <tytso@mit.edu>, Arnaldo Carvalho de Melo <acme@redhat.com>, zippel@linux-m68k.org, linux-kbuild@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>, Dick Streefland <dick@streefland.net>, Stephen Rothwell <sfr@canb.auug.org.au>
+To: Richard Kennedy <richard@rsk.demon.co.uk>
+Cc: lkml <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, linux-input@vger.kernel.org
 
-From: Steven Rostedt <srostedt@redhat.com>
+On Fri, 11 Sep 2009, Richard Kennedy wrote:
 
-Ingo Molnar suggested that the streamline_config.pl should enable
-CONFIG_IKCONFIG to keep the current config in the kernel.
-Then we can use scripts/extract-ikconfig to find the current
-modules.
+> I use gconfig & and cannot turn off any of the special HID devices.
+> 
+> the Kconfig for them all have the same pattern e.g.
+> 
+> config HID_DRAGONRISE
+> 	tristate "DragonRise Inc. support" if EMBEDDED
+> 	depends on USB_HID
+> 	default !EMBEDDED
+> 
+> The 'if EMBEDDED' on the tristate line seems to confuse gconfig and it
+> sets them all to m & does not let me set them to N. I'm building this on
+> a standard desktop machine.
+> 
+> Any idea what the intention of this was? or can we just remove the if
+> embedded part?
 
-This patch changes streamline_config.pl to check if CONFIG_IKCONFIG
-is not set, and if it is not, it enables it to be a module.
+Hi Richard,
 
-[ Impact: make current config options easier to find ]
+actually this question has been raised by several people in the past
+already. Copy/pasting the latest reply I have sent on this topic
 
-Reported-by: Ingo Molnar <mingo@elte.hu>
-Signed-off-by: Steven Rostedt <rostedt@goodmis.org>
----
- scripts/kconfig/streamline_config.pl |   33 +++++++++++++++++++++++----------
- 1 files changed, 23 insertions(+), 10 deletions(-)
+===
 
-diff --git a/scripts/kconfig/streamline_config.pl b/scripts/kconfig/streamline_config.pl
-index caac952..2334641 100644
---- a/scripts/kconfig/streamline_config.pl
-+++ b/scripts/kconfig/streamline_config.pl
-@@ -256,18 +256,31 @@ my %setconfigs;
- # Finally, read the .config file and turn off any module enabled that
- # we could not find a reason to keep enabled.
- while(<CIN>) {
--	if (/^(CONFIG.*)=(m|y)/) {
--		if (defined($configs{$1})) {
--		    $setconfigs{$1} = $2;
--		    print;
--		} elsif ($2 eq "m") {
--		    print "# $1 is not set\n";
--		} else {
--		    print;
--		}
-+
-+    if (/CONFIG_IKCONFIG/) {
-+	if (/# CONFIG_IKCONFIG is not set/) {
-+	    # enable IKCONFIG at least as a module
-+	    print "CONFIG_IKCONFIG=m\n";
-+	    # don't ask about PROC
-+	    print "# CONFIG_IKCONFIG is not set\n";
-+	} else {
-+	    print;
-+	}
-+	next;
-+    }
-+
-+    if (/^(CONFIG.*)=(m|y)/) {
-+	if (defined($configs{$1})) {
-+	    $setconfigs{$1} = $2;
-+	    print;
-+	} elsif ($2 eq "m") {
-+	    print "# $1 is not set\n";
- 	} else {
--		print;
-+	    print;
- 	}
-+    } else {
-+	print;
-+    }
- }
- close(CIN);
- 
--- 
-1.6.3.3
+mostly this is because we don't want to bother users with asking for every 
+single quirky device/vendor, as there are unfortunately a lot of them. 
+Usually compiling everything in doesn't waste runtime footprint (the 
+modules don't get loaded unless needed), and they don't cost too much disk 
+space either. And if you really want to disable them, CONFIG_EMBEDDED 
+allows you to do that.
+
+Please see last paragraph on
+
+        http://lkml.org/lkml/2008/10/14/284
+
+===
 
 -- 
+Jiri Kosina
+SUSE Labs, Novell Inc.
