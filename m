@@ -1,63 +1,69 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cluster-d.mailcontrol.com ([85.115.60.190]:53725 "EHLO
-	cluster-d.mailcontrol.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751050AbZINKfo (ORCPT
+Received: from smtp1.linux-foundation.org ([140.211.169.13]:38611 "EHLO
+	smtp1.linux-foundation.org" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1755447AbZINVtG (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 14 Sep 2009 06:35:44 -0400
-Message-ID: <4AAE1C48.6030802@csr.com>
-Date: Mon, 14 Sep 2009 11:34:48 +0100
-From: David Vrabel <david.vrabel@csr.com>
+	Mon, 14 Sep 2009 17:49:06 -0400
+Message-Id: <200909142149.n8ELn3dV018408@imap1.linux-foundation.org>
+Subject: [patch 02/18] kernel hacking: move STRIP_ASM_SYMS from General
+From: akpm@linux-foundation.org
+Date: Mon, 14 Sep 2009 14:49:03 -0700
 MIME-Version: 1.0
-Subject: Re: UWB Kconfig: cannot set UWB to N in gconfig
-References: <1252577154.2340.12.camel@castor>
-In-Reply-To: <1252577154.2340.12.camel@castor>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=ANSI_X3.4-1968
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Richard Kennedy <richard@rsk.demon.co.uk>
-Cc: Roman Zippel <zippel@linux-m68k.org>, linux-usb <linux-usb@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, lkml <linux-kernel@vger.kernel.org>
+To: sam@ravnborg.org
+Cc: linux-kbuild@vger.kernel.org, akpm@linux-foundation.org, randy.dunlap@oracle.com
 
-Richard Kennedy wrote:
-> I sometimes use 'make gconfig' and I noticed that I cannot disable the
-> UWB option -- it just won't let me set it to N.
-> 
-> AFAICT this is because the CONFIG USB_WUSB selects UWB which forces it
-> on.
-> applying this patch fixes the issue but I'm not sure if this is the
-> right way to go about it.
-> 
-> any thoughts?
-> 
-> regards
-> Richard
-> 
-> This is against 2.6.31
-> 
-> 
-> diff --git a/drivers/usb/wusbcore/Kconfig b/drivers/usb/wusbcore/Kconfig
-> index eb09a0a..cc97041 100644
-> --- a/drivers/usb/wusbcore/Kconfig
-> +++ b/drivers/usb/wusbcore/Kconfig
-> @@ -5,7 +5,7 @@ config USB_WUSB
->  	tristate "Enable Wireless USB extensions (EXPERIMENTAL)"
->  	depends on EXPERIMENTAL
->  	depends on USB
-> -        select UWB
-> +        depends on UWB
+From: Randy Dunlap <randy.dunlap@oracle.com>
 
-NAK.  It's not sufficiently obvious to a user that Wireless USB support
-requires UWB.
+Sam suggested moving STRIP_ASM_SYMS into the Kernel hacking menu
+from the General Setup menu.  It makes more sense there.
 
-This is really an issue with the configuration application.  Consider
-improving them to allow switching off select'ed options and popping up a
-dialog that says "switching off UWB will also switch off WUSB" etc.
+Signed-off-by: Randy Dunlap <randy.dunlap@oracle.com>
+Cc: Sam Ravnborg <sam@ravnborg.org>
+Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+---
 
-David
--- 
-David Vrabel, Senior Software Engineer, Drivers
-CSR, Churchill House, Cambridge Business Park,  Tel: +44 (0)1223 692562
-Cowley Road, Cambridge, CB4 0WZ                 http://www.csr.com/
+ init/Kconfig      |    8 --------
+ lib/Kconfig.debug |    8 ++++++++
+ 2 files changed, 8 insertions(+), 8 deletions(-)
 
-
-Member of the CSR plc group of companies. CSR plc registered in England and Wales, registered number 4187346, registered office Churchill House, Cambridge Business Park, Cowley Road, Cambridge, CB4 0WZ, United Kingdom
+diff -puN init/Kconfig~kernel-hacking-move-strip_asm_syms-from-general init/Kconfig
+--- a/init/Kconfig~kernel-hacking-move-strip_asm_syms-from-general
++++ a/init/Kconfig
+@@ -992,14 +992,6 @@ config SLUB_DEBUG
+ 	  SLUB sysfs support. /sys/slab will not exist and there will be
+ 	  no support for cache validation etc.
+ 
+-config STRIP_ASM_SYMS
+-	bool "Strip assembler-generated symbols during link"
+-	default n
+-	help
+-	  Strip internal assembler-generated symbols during a link (symbols
+-	  that look like '.Lxxx') so they don't pollute the output of
+-	  get_wchan() and suchlike.
+-
+ config COMPAT_BRK
+ 	bool "Disable heap randomization"
+ 	default y
+diff -puN lib/Kconfig.debug~kernel-hacking-move-strip_asm_syms-from-general lib/Kconfig.debug
+--- a/lib/Kconfig.debug~kernel-hacking-move-strip_asm_syms-from-general
++++ a/lib/Kconfig.debug
+@@ -50,6 +50,14 @@ config MAGIC_SYSRQ
+ 	  keys are documented in <file:Documentation/sysrq.txt>. Don't say Y
+ 	  unless you really know what this hack does.
+ 
++config STRIP_ASM_SYMS
++	bool "Strip assembler-generated symbols during link"
++	default n
++	help
++	  Strip internal assembler-generated symbols during a link (symbols
++	  that look like '.Lxxx') so they don't pollute the output of
++	  get_wchan() and suchlike.
++
+ config UNUSED_SYMBOLS
+ 	bool "Enable unused/obsolete exported symbols"
+ 	default y if X86
+_
