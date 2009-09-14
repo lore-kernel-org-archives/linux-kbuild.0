@@ -1,418 +1,336 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp1.linux-foundation.org ([140.211.169.13]:33620 "EHLO
+Received: from smtp1.linux-foundation.org ([140.211.169.13]:55834 "EHLO
 	smtp1.linux-foundation.org" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1755566AbZINVtH (ORCPT
+	by vger.kernel.org with ESMTP id S1751831AbZINVtP (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 14 Sep 2009 17:49:07 -0400
-Message-Id: <200909142149.n8ELn41t018459@imap1.linux-foundation.org>
-Subject: [patch 03/18] kbuild: add static to prototypes
+	Mon, 14 Sep 2009 17:49:15 -0400
+Message-Id: <200909142149.n8ELnAaH018704@imap1.linux-foundation.org>
+Subject: [patch 09/18] kbuild: generate modules.builtin
 From: akpm@linux-foundation.org
-Date: Mon, 14 Sep 2009 14:49:03 -0700
+Date: Mon, 14 Sep 2009 14:49:10 -0700
 MIME-Version: 1.0
 Content-Type: text/plain; charset=ANSI_X3.4-1968
 Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: sam@ravnborg.org
-Cc: linux-kbuild@vger.kernel.org, akpm@linux-foundation.org, tsrk@tsrk.net, xiyou.wangcong@gmail.com
+Cc: linux-kbuild@vger.kernel.org, akpm@linux-foundation.org, mmarek@suse.cz, JBeulich@novell.com
 
-From: Trevor Keith <tsrk@tsrk.net>
+From: Michal Marek <mmarek@suse.cz>
 
-Warnings found via gcc -Wmissing-prototypes.
+To make it easier for tools like mkinitrd to detect whether a needed
+module is missing or whether it is compiled into the kernel, install a
+modules.builtin file listing all modules built into the kernel.  This is
+done by generating an alternate config file with all tristate =y options
+set to =Y and reading the makefiles with this config included.  The built
+in modules then appear in obj-Y.
 
-Signed-off-by: Trevor Keith <tsrk@tsrk.net>
+Signed-off-by: Michal Marek <mmarek@suse.cz>
+Cc: Jan Beulich <JBeulich@novell.com>
 Cc: Sam Ravnborg <sam@ravnborg.org>
-Acked-by: WANG Cong <xiyou.wangcong@gmail.com>
 Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
 ---
 
- scripts/basic/docproc.c     |   34 +++++++++++++++++-----------------
- scripts/basic/fixdep.c      |   26 +++++++++++++-------------
- scripts/basic/hash.c        |    4 ++--
- scripts/kconfig/conf.c      |    2 +-
- scripts/kconfig/confdata.c  |    2 +-
- scripts/kconfig/expr.c      |    4 ++--
- scripts/kconfig/kxgettext.c |    4 ++--
- scripts/kconfig/menu.c      |    4 ++--
- scripts/kconfig/symbol.c    |    6 +++---
- 9 files changed, 43 insertions(+), 43 deletions(-)
+ .gitignore                  |    1 
+ Makefile                    |   14 +++++++--
+ scripts/Kbuild.include      |    6 ++++
+ scripts/Makefile.lib        |    5 ++-
+ scripts/Makefile.modbuiltin |   48 ++++++++++++++++++++++++++++++++++
+ scripts/kconfig/confdata.c  |   48 +++++++++++++++++++++++++++++-----
+ 6 files changed, 110 insertions(+), 12 deletions(-)
 
-diff -puN scripts/basic/docproc.c~kbuild-add-static-to-prototypes scripts/basic/docproc.c
---- a/scripts/basic/docproc.c~kbuild-add-static-to-prototypes
-+++ a/scripts/basic/docproc.c
-@@ -71,7 +71,7 @@ FILELINE * docsection;
+diff -puN .gitignore~kbuild-generate-modulesbuiltin .gitignore
+--- a/.gitignore~kbuild-generate-modulesbuiltin
++++ a/.gitignore
+@@ -22,6 +22,7 @@
+ *.lst
+ *.symtypes
+ *.order
++modules.builtin
+ *.elf
+ *.bin
+ *.gz
+diff -puN Makefile~kbuild-generate-modulesbuiltin Makefile
+--- a/Makefile~kbuild-generate-modulesbuiltin
++++ a/Makefile
+@@ -871,6 +871,9 @@ $(sort $(vmlinux-init) $(vmlinux-main)) 
+ PHONY += $(vmlinux-dirs)
+ $(vmlinux-dirs): prepare scripts
+ 	$(Q)$(MAKE) $(build)=$@
++ifdef CONFIG_MODULES
++	$(Q)$(MAKE) $(modbuiltin)=$@
++endif
  
- static char *srctree, *kernsrctree;
+ # Build the kernel release string
+ #
+@@ -1126,6 +1129,7 @@ all: modules
+ PHONY += modules
+ modules: $(vmlinux-dirs) $(if $(KBUILD_BUILTIN),vmlinux)
+ 	$(Q)$(AWK) '!x[$$0]++' $(vmlinux-dirs:%=$(objtree)/%/modules.order) > $(objtree)/modules.order
++	$(Q)$(AWK) '!x[$$0]++' $(vmlinux-dirs:%=$(objtree)/%/modules.builtin) > $(objtree)/modules.builtin
+ 	@$(kecho) '  Building modules, stage 2.';
+ 	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.modpost
+ 	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.fwinst obj=firmware __fw_modbuild
+@@ -1154,7 +1158,7 @@ _modinst_:
+ 		rm -f $(MODLIB)/build ; \
+ 		ln -s $(objtree) $(MODLIB)/build ; \
+ 	fi
+-	@cp -f $(objtree)/modules.order $(MODLIB)/
++	@cp -f $(objtree)/modules.{order,builtin} $(MODLIB)/
+ 	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.modinst
  
--void usage (void)
-+static void usage (void)
- {
- 	fprintf(stderr, "Usage: docproc {doc|depend} file\n");
- 	fprintf(stderr, "Input is read from file.tmpl. Output is sent to stdout\n");
-@@ -84,7 +84,7 @@ void usage (void)
- /*
-  * Execute kernel-doc with parameters given in svec
-  */
--void exec_kernel_doc(char **svec)
-+static void exec_kernel_doc(char **svec)
- {
- 	pid_t pid;
- 	int ret;
-@@ -129,7 +129,7 @@ struct symfile
- struct symfile symfilelist[MAXFILES];
- int symfilecnt = 0;
+ # This depmod is only for convenience to give the initial
+@@ -1217,8 +1221,9 @@ clean: archclean $(clean-dirs)
+ 		\( -name '*.[oas]' -o -name '*.ko' -o -name '.*.cmd' \
+ 		-o -name '.*.d' -o -name '.*.tmp' -o -name '*.mod.c' \
+ 		-o -name '*.symtypes' -o -name 'modules.order' \
+-		-o -name 'Module.markers' -o -name '.tmp_*.o.*' \
+-		-o -name '*.gcno' \) -type f -print | xargs rm -f
++		-o -name 'modules.builtin' -o -name 'Module.markers' \
++		-o -name '.tmp_*.o.*' -o -name '*.gcno' \) \
++		-type f -print | xargs rm -f
  
--void add_new_symbol(struct symfile *sym, char * symname)
-+static void add_new_symbol(struct symfile *sym, char * symname)
- {
- 	sym->symbollist =
-           realloc(sym->symbollist, (sym->symbolcnt + 1) * sizeof(char *));
-@@ -137,14 +137,14 @@ void add_new_symbol(struct symfile *sym,
- }
+ # mrproper - Delete all generated files, including .config
+ #
+@@ -1416,7 +1421,8 @@ $(clean-dirs):
+ clean:	rm-dirs := $(MODVERDIR)
+ clean: rm-files := $(KBUILD_EXTMOD)/Module.symvers \
+                    $(KBUILD_EXTMOD)/Module.markers \
+-                   $(KBUILD_EXTMOD)/modules.order
++                   $(KBUILD_EXTMOD)/modules.order \
++                   $(KBUILD_EXTMOD)/modules.builtin
+ clean: $(clean-dirs)
+ 	$(call cmd,rmdirs)
+ 	$(call cmd,rmfiles)
+diff -puN scripts/Kbuild.include~kbuild-generate-modulesbuiltin scripts/Kbuild.include
+--- a/scripts/Kbuild.include~kbuild-generate-modulesbuiltin
++++ a/scripts/Kbuild.include
+@@ -143,6 +143,12 @@ ld-option = $(call try-run,\
+ # $(Q)$(MAKE) $(build)=dir
+ build := -f $(if $(KBUILD_SRC),$(srctree)/)scripts/Makefile.build obj
  
- /* Add a filename to the list */
--struct symfile * add_new_file(char * filename)
-+static struct symfile * add_new_file(char * filename)
- {
- 	symfilelist[symfilecnt++].filename = strdup(filename);
- 	return &symfilelist[symfilecnt - 1];
- }
++###
++# Shorthand for $(Q)$(MAKE) -f scripts/Makefile.modbuiltin obj=
++# Usage:
++# $(Q)$(MAKE) $(modbuiltin)=dir
++modbuiltin := -f $(if $(KBUILD_SRC),$(srctree)/)scripts/Makefile.modbuiltin obj
++
+ # Prefix -I with $(srctree) if it is not an absolute path.
+ # skip if -I has no parameter
+ addtree = $(if $(patsubst -I%,%,$(1)), \
+diff -puN scripts/Makefile.lib~kbuild-generate-modulesbuiltin scripts/Makefile.lib
+--- a/scripts/Makefile.lib~kbuild-generate-modulesbuiltin
++++ a/scripts/Makefile.lib
+@@ -37,6 +37,8 @@ modorder	:= $(patsubst %/,%/modules.orde
  
- /* Check if file already are present in the list */
--struct symfile * filename_exist(char * filename)
-+static struct symfile * filename_exist(char * filename)
- {
- 	int i;
- 	for (i=0; i < symfilecnt; i++)
-@@ -157,20 +157,20 @@ struct symfile * filename_exist(char * f
-  * List all files referenced within the template file.
-  * Files are separated by tabs.
-  */
--void adddep(char * file)		   { printf("\t%s", file); }
--void adddep2(char * file, char * line)     { line = line; adddep(file); }
--void noaction(char * line)		   { line = line; }
--void noaction2(char * file, char * line)   { file = file; line = line; }
-+static void adddep(char * file)		   { printf("\t%s", file); }
-+static void adddep2(char * file, char * line)     { line = line; adddep(file); }
-+static void noaction(char * line)		   { line = line; }
-+static void noaction2(char * file, char * line)   { file = file; line = line; }
+ __subdir-y	:= $(patsubst %/,%,$(filter %/, $(obj-y)))
+ subdir-y	+= $(__subdir-y)
++__subdir-Y	:= $(patsubst %/,%,$(filter %/, $(obj-Y)))
++subdir-Y	+= $(__subdir-Y)
+ __subdir-m	:= $(patsubst %/,%,$(filter %/, $(obj-m)))
+ subdir-m	+= $(__subdir-m)
+ obj-y		:= $(patsubst %/, %/built-in.o, $(obj-y))
+@@ -44,7 +46,7 @@ obj-m		:= $(filter-out %/, $(obj-m))
  
- /* Echo the line without further action */
--void printline(char * line)               { printf("%s", line); }
-+static void printline(char * line)               { printf("%s", line); }
+ # Subdirectories we need to descend into
  
- /*
-  * Find all symbols in filename that are exported with EXPORT_SYMBOL &
-  * EXPORT_SYMBOL_GPL (& EXPORT_SYMBOL_GPL_FUTURE implicitly).
-  * All symbols located are stored in symfilelist.
-  */
--void find_export_symbols(char * filename)
-+static void find_export_symbols(char * filename)
- {
- 	FILE * fp;
- 	struct symfile *sym;
-@@ -227,7 +227,7 @@ void find_export_symbols(char * filename
-  * intfunc uses -nofunction
-  * extfunc uses -function
-  */
--void docfunctions(char * filename, char * type)
-+static void docfunctions(char * filename, char * type)
- {
- 	int i,j;
- 	int symcnt = 0;
-@@ -258,15 +258,15 @@ void docfunctions(char * filename, char 
- 	fflush(stdout);
- 	free(vec);
- }
--void intfunc(char * filename) {	docfunctions(filename, NOFUNCTION); }
--void extfunc(char * filename) { docfunctions(filename, FUNCTION);   }
-+static void intfunc(char * filename) {	docfunctions(filename, NOFUNCTION); }
-+static void extfunc(char * filename) { docfunctions(filename, FUNCTION);   }
+-subdir-ym	:= $(sort $(subdir-y) $(subdir-m))
++subdir-ym	:= $(sort $(subdir-y) $(subdir-Y) $(subdir-m))
  
- /*
-  * Document specific function(s) in a file.
-  * Call kernel-doc with the following parameters:
-  * kernel-doc -docbook -function function1 [-function function2]
-  */
--void singfunc(char * filename, char * line)
-+static void singfunc(char * filename, char * line)
- {
- 	char *vec[200]; /* Enough for specific functions */
-         int i, idx = 0;
-@@ -297,7 +297,7 @@ void singfunc(char * filename, char * li
-  * Call kernel-doc with the following parameters:
-  * kernel-doc -docbook -function "doc section" filename
-  */
--void docsect(char *filename, char *line)
-+static void docsect(char *filename, char *line)
- {
- 	char *vec[6]; /* kerneldoc -docbook -function "section" file NULL */
- 	char *s;
-@@ -324,7 +324,7 @@ void docsect(char *filename, char *line)
-  * 5) Lines containing !P
-  * 6) Default lines - lines not matching the above
-  */
--void parse_file(FILE *infile)
-+static void parse_file(FILE *infile)
- {
- 	char line[MAXLINESZ];
- 	char * s;
-diff -puN scripts/basic/fixdep.c~kbuild-add-static-to-prototypes scripts/basic/fixdep.c
---- a/scripts/basic/fixdep.c~kbuild-add-static-to-prototypes
-+++ a/scripts/basic/fixdep.c
-@@ -124,7 +124,7 @@ char *target;
- char *depfile;
- char *cmdline;
- 
--void usage(void)
-+static void usage(void)
- {
- 	fprintf(stderr, "Usage: fixdep <depfile> <target> <cmdline>\n");
- 	exit(1);
-@@ -133,7 +133,7 @@ void usage(void)
- /*
-  * Print out the commandline prefixed with cmd_<target filename> :=
-  */
--void print_cmdline(void)
-+static void print_cmdline(void)
- {
- 	printf("cmd_%s := %s\n\n", target, cmdline);
- }
-@@ -146,7 +146,7 @@ int    len_config  = 0;
-  * Grow the configuration string to a desired length.
-  * Usually the first growth is plenty.
-  */
--void grow_config(int len)
-+static void grow_config(int len)
- {
- 	while (len_config + len > size_config) {
- 		if (size_config == 0)
-@@ -162,7 +162,7 @@ void grow_config(int len)
- /*
-  * Lookup a value in the configuration string.
-  */
--int is_defined_config(const char * name, int len)
-+static int is_defined_config(const char * name, int len)
- {
- 	const char * pconfig;
- 	const char * plast = str_config + len_config - len;
-@@ -178,7 +178,7 @@ int is_defined_config(const char * name,
- /*
-  * Add a new value to the configuration string.
-  */
--void define_config(const char * name, int len)
-+static void define_config(const char * name, int len)
- {
- 	grow_config(len + 1);
- 
-@@ -190,7 +190,7 @@ void define_config(const char * name, in
- /*
-  * Clear the set of configuration strings.
-  */
--void clear_config(void)
-+static void clear_config(void)
- {
- 	len_config = 0;
- 	define_config("", 0);
-@@ -199,7 +199,7 @@ void clear_config(void)
- /*
-  * Record the use of a CONFIG_* word.
-  */
--void use_config(char *m, int slen)
-+static void use_config(char *m, int slen)
- {
- 	char s[PATH_MAX];
- 	char *p;
-@@ -220,7 +220,7 @@ void use_config(char *m, int slen)
- 	printf("    $(wildcard include/config/%s.h) \\\n", s);
- }
- 
--void parse_config_file(char *map, size_t len)
-+static void parse_config_file(char *map, size_t len)
- {
- 	int *end = (int *) (map + len);
- 	/* start at +1, so that p can never be < map */
-@@ -254,7 +254,7 @@ void parse_config_file(char *map, size_t
- }
- 
- /* test is s ends in sub */
--int strrcmp(char *s, char *sub)
-+static int strrcmp(char *s, char *sub)
- {
- 	int slen = strlen(s);
- 	int sublen = strlen(sub);
-@@ -265,7 +265,7 @@ int strrcmp(char *s, char *sub)
- 	return memcmp(s + slen - sublen, sub, sublen);
- }
- 
--void do_config_file(char *filename)
-+static void do_config_file(char *filename)
- {
- 	struct stat st;
- 	int fd;
-@@ -296,7 +296,7 @@ void do_config_file(char *filename)
- 	close(fd);
- }
- 
--void parse_dep_file(void *map, size_t len)
-+static void parse_dep_file(void *map, size_t len)
- {
- 	char *m = map;
- 	char *end = m + len;
-@@ -336,7 +336,7 @@ void parse_dep_file(void *map, size_t le
- 	printf("$(deps_%s):\n", target);
- }
- 
--void print_deps(void)
-+static void print_deps(void)
- {
- 	struct stat st;
- 	int fd;
-@@ -368,7 +368,7 @@ void print_deps(void)
- 	close(fd);
- }
- 
--void traps(void)
-+static void traps(void)
- {
- 	static char test[] __attribute__((aligned(sizeof(int)))) = "CONF";
- 	int *p = (int *)test;
-diff -puN scripts/basic/hash.c~kbuild-add-static-to-prototypes scripts/basic/hash.c
---- a/scripts/basic/hash.c~kbuild-add-static-to-prototypes
-+++ a/scripts/basic/hash.c
-@@ -21,7 +21,7 @@ static void usage(void)
-  * http://www.cse.yorku.ca/~oz/hash.html
-  */
- 
--unsigned int djb2_hash(char *str)
-+static unsigned int djb2_hash(char *str)
- {
- 	unsigned long hash = 5381;
- 	int c;
-@@ -34,7 +34,7 @@ unsigned int djb2_hash(char *str)
- 	return (unsigned int)(hash & ((1 << DYNAMIC_DEBUG_HASH_BITS) - 1));
- }
- 
--unsigned int r5_hash(char *str)
-+static unsigned int r5_hash(char *str)
- {
- 	unsigned long hash = 0;
- 	int c;
-diff -puN scripts/kconfig/conf.c~kbuild-add-static-to-prototypes scripts/kconfig/conf.c
---- a/scripts/kconfig/conf.c~kbuild-add-static-to-prototypes
-+++ a/scripts/kconfig/conf.c
-@@ -121,7 +121,7 @@ static int conf_askvalue(struct symbol *
- 	return 1;
- }
- 
--int conf_string(struct menu *menu)
-+static int conf_string(struct menu *menu)
- {
- 	struct symbol *sym = menu->sym;
- 	const char *def;
-diff -puN scripts/kconfig/confdata.c~kbuild-add-static-to-prototypes scripts/kconfig/confdata.c
---- a/scripts/kconfig/confdata.c~kbuild-add-static-to-prototypes
+ # if $(foo-objs) exists, foo.o is a composite object 
+ multi-used-y := $(sort $(foreach m,$(obj-y), $(if $(strip $($(m:.o=-objs)) $($(m:.o=-y))), $(m))))
+@@ -76,6 +78,7 @@ always		:= $(addprefix $(obj)/,$(always)
+ targets		:= $(addprefix $(obj)/,$(targets))
+ modorder	:= $(addprefix $(obj)/,$(modorder))
+ obj-y		:= $(addprefix $(obj)/,$(obj-y))
++obj-Y		:= $(addprefix $(obj)/,$(obj-Y))
+ obj-m		:= $(addprefix $(obj)/,$(obj-m))
+ lib-y		:= $(addprefix $(obj)/,$(lib-y))
+ subdir-obj-y	:= $(addprefix $(obj)/,$(subdir-obj-y))
+diff -puN /dev/null scripts/Makefile.modbuiltin
+--- /dev/null
++++ a/scripts/Makefile.modbuiltin
+@@ -0,0 +1,48 @@
++# ==========================================================================
++# Generating modules.builtin
++# ==========================================================================
++
++src := $(obj)
++
++PHONY := __modbuiltin
++__modbuiltin:
++
++# Read auto2.conf which sets tristate variables to 'Y' instead of 'y'
++# That way, we get the list of built-in modules in obj-Y
++-include include/config/auto2.conf
++
++include scripts/Kbuild.include
++
++# The filename Kbuild has precedence over Makefile
++kbuild-dir := $(if $(filter /%,$(src)),$(src),$(srctree)/$(src))
++kbuild-file := $(if $(wildcard $(kbuild-dir)/Kbuild),$(kbuild-dir)/Kbuild,$(kbuild-dir)/Makefile)
++include $(kbuild-file)
++
++include scripts/Makefile.lib
++
++modbuiltin-subdirs := $(patsubst %,%/modules.builtin, $(subdir-ym))
++modbuiltin-mods    := $(filter %.ko, $(obj-Y:.o=.ko))
++modbuiltin-target  := $(obj)/modules.builtin
++
++__modbuiltin: $(modbuiltin-target) $(subdir-ym)
++	@:
++
++modbuiltin-cmds =						\
++	for m in $(modbuiltin-mods); do echo kernel/$$m; done;	\
++	cat /dev/null $(modbuiltin-subdirs);
++
++$(modbuiltin-target): $(subdir-ym)
++	$(Q)($(modbuiltin-cmds)) > $@
++
++# Descending
++# ---------------------------------------------------------------------------
++
++PHONY += $(subdir-ym)
++$(subdir-ym):
++	$(Q)$(MAKE) $(modbuiltin)=$@
++
++
++# Declare the contents of the .PHONY variable as phony.  We keep that
++# information in a variable se we can use it in if_changed and friends.
++
++.PHONY: $(PHONY)
+diff -puN scripts/kconfig/confdata.c~kbuild-generate-modulesbuiltin scripts/kconfig/confdata.c
+--- a/scripts/kconfig/confdata.c~kbuild-generate-modulesbuiltin
 +++ a/scripts/kconfig/confdata.c
-@@ -560,7 +560,7 @@ int conf_write(const char *name)
- 	return 0;
+@@ -672,12 +672,27 @@ out:
+ 	return res;
  }
  
--int conf_split_config(void)
-+static int conf_split_config(void)
++int fprintf2(FILE *f1, FILE *f2, const char *fmt, ...)
++{
++	va_list ap;
++	int res;
++
++	va_start(ap, fmt);
++	vfprintf(f1, fmt, ap);
++	va_end(ap);
++	va_start(ap, fmt);
++	res = vfprintf(f2, fmt, ap);
++	va_end(ap);
++
++	return res;
++}
++
+ int conf_write_autoconf(void)
  {
+ 	struct symbol *sym;
+ 	const char *str;
  	const char *name;
- 	char path[128];
-diff -puN scripts/kconfig/expr.c~kbuild-add-static-to-prototypes scripts/kconfig/expr.c
---- a/scripts/kconfig/expr.c~kbuild-add-static-to-prototypes
-+++ a/scripts/kconfig/expr.c
-@@ -348,7 +348,7 @@ struct expr *expr_trans_bool(struct expr
- /*
-  * e1 || e2 -> ?
-  */
--struct expr *expr_join_or(struct expr *e1, struct expr *e2)
-+static struct expr *expr_join_or(struct expr *e1, struct expr *e2)
- {
- 	struct expr *tmp;
- 	struct symbol *sym1, *sym2;
-@@ -412,7 +412,7 @@ struct expr *expr_join_or(struct expr *e
- 	return NULL;
- }
+-	FILE *out, *out_h;
++	FILE *out, *out2, *out_h;
+ 	time_t now;
+ 	int i, l;
  
--struct expr *expr_join_and(struct expr *e1, struct expr *e2)
-+static struct expr *expr_join_and(struct expr *e1, struct expr *e2)
- {
- 	struct expr *tmp;
- 	struct symbol *sym1, *sym2;
-diff -puN scripts/kconfig/kxgettext.c~kbuild-add-static-to-prototypes scripts/kconfig/kxgettext.c
---- a/scripts/kconfig/kxgettext.c~kbuild-add-static-to-prototypes
-+++ a/scripts/kconfig/kxgettext.c
-@@ -166,7 +166,7 @@ static int message__add(const char *msg,
- 	return rc;
- }
+@@ -692,16 +707,23 @@ int conf_write_autoconf(void)
+ 	if (!out)
+ 		return 1;
  
--void menu_build_message_list(struct menu *menu)
-+static void menu_build_message_list(struct menu *menu)
- {
- 	struct menu *child;
++	out2 = fopen(".tmpconfig2", "w");
++	if (!out2) {
++		fclose(out);
++		return 1;
++	}
++
+ 	out_h = fopen(".tmpconfig.h", "w");
+ 	if (!out_h) {
+ 		fclose(out);
++		fclose(out2);
+ 		return 1;
+ 	}
  
-@@ -211,7 +211,7 @@ static void message__print_gettext_msgid
- 	       "msgstr \"\"\n", self->msg);
- }
+ 	sym = sym_lookup("KERNELVERSION", 0);
+ 	sym_calc_value(sym);
+ 	time(&now);
+-	fprintf(out, "#\n"
++	fprintf2(out, out2, "#\n"
+ 		     "# Automatically generated make config: don't edit\n"
+ 		     "# Linux kernel version: %s\n"
+ 		     "# %s"
+@@ -726,45 +748,51 @@ int conf_write_autoconf(void)
+ 			case no:
+ 				break;
+ 			case mod:
+-				fprintf(out, "CONFIG_%s=m\n", sym->name);
++				fprintf2(out, out2, "CONFIG_%s=m\n",
++						sym->name);
+ 				fprintf(out_h, "#define CONFIG_%s_MODULE 1\n", sym->name);
+ 				break;
+ 			case yes:
+ 				fprintf(out, "CONFIG_%s=y\n", sym->name);
++				fprintf(out2, "CONFIG_%s=%c\n", sym->name,
++					sym->type == S_BOOLEAN ? 'y' : 'Y');
+ 				fprintf(out_h, "#define CONFIG_%s 1\n", sym->name);
+ 				break;
+ 			}
+ 			break;
+ 		case S_STRING:
+ 			str = sym_get_string_value(sym);
+-			fprintf(out, "CONFIG_%s=\"", sym->name);
++			fprintf2(out, out2, "CONFIG_%s=\"", sym->name);
+ 			fprintf(out_h, "#define CONFIG_%s \"", sym->name);
+ 			while (1) {
+ 				l = strcspn(str, "\"\\");
+ 				if (l) {
+ 					fwrite(str, l, 1, out);
++					fwrite(str, l, 1, out2);
+ 					fwrite(str, l, 1, out_h);
+ 					str += l;
+ 				}
+ 				if (!*str)
+ 					break;
+-				fprintf(out, "\\%c", *str);
++				fprintf2(out, out2, "\\%c", *str);
+ 				fprintf(out_h, "\\%c", *str);
+ 				str++;
+ 			}
+ 			fputs("\"\n", out);
++			fputs("\"\n", out2);
+ 			fputs("\"\n", out_h);
+ 			break;
+ 		case S_HEX:
+ 			str = sym_get_string_value(sym);
+ 			if (str[0] != '0' || (str[1] != 'x' && str[1] != 'X')) {
+-				fprintf(out, "CONFIG_%s=%s\n", sym->name, str);
++				fprintf2(out, out2, "CONFIG_%s=%s\n",
++						sym->name, str);
+ 				fprintf(out_h, "#define CONFIG_%s 0x%s\n", sym->name, str);
+ 				break;
+ 			}
+ 		case S_INT:
+ 			str = sym_get_string_value(sym);
+-			fprintf(out, "CONFIG_%s=%s\n", sym->name, str);
++			fprintf2(out, out2, "CONFIG_%s=%s\n", sym->name, str);
+ 			fprintf(out_h, "#define CONFIG_%s %s\n", sym->name, str);
+ 			break;
+ 		default:
+@@ -772,6 +800,7 @@ int conf_write_autoconf(void)
+ 		}
+ 	}
+ 	fclose(out);
++	fclose(out2);
+ 	fclose(out_h);
  
--void menu__xgettext(void)
-+static void menu__xgettext(void)
- {
- 	struct message *m = message__list;
- 
-diff -puN scripts/kconfig/menu.c~kbuild-add-static-to-prototypes scripts/kconfig/menu.c
---- a/scripts/kconfig/menu.c~kbuild-add-static-to-prototypes
-+++ a/scripts/kconfig/menu.c
-@@ -77,7 +77,7 @@ void menu_end_menu(void)
- 	current_menu = current_menu->parent;
- }
- 
--struct expr *menu_check_dep(struct expr *e)
-+static struct expr *menu_check_dep(struct expr *e)
- {
- 	if (!e)
- 		return e;
-@@ -187,7 +187,7 @@ static int menu_range_valid_sym(struct s
- 	       (sym2->type == S_UNKNOWN && sym_string_valid(sym, sym2->name));
- }
- 
--void sym_check_prop(struct symbol *sym)
-+static void sym_check_prop(struct symbol *sym)
- {
- 	struct property *prop;
- 	struct symbol *sym2;
-diff -puN scripts/kconfig/symbol.c~kbuild-add-static-to-prototypes scripts/kconfig/symbol.c
---- a/scripts/kconfig/symbol.c~kbuild-add-static-to-prototypes
-+++ a/scripts/kconfig/symbol.c
-@@ -36,7 +36,7 @@ tristate modules_val;
- 
- struct expr *sym_env_list;
- 
--void sym_add_default(struct symbol *sym, const char *def)
-+static void sym_add_default(struct symbol *sym, const char *def)
- {
- 	struct property *prop = prop_alloc(P_DEFAULT, sym);
- 
-@@ -125,7 +125,7 @@ struct property *sym_get_default_prop(st
- 	return NULL;
- }
- 
--struct property *sym_get_range_prop(struct symbol *sym)
-+static struct property *sym_get_range_prop(struct symbol *sym)
- {
- 	struct property *prop;
- 
-@@ -943,7 +943,7 @@ const char *prop_get_type_name(enum prop
- 	return "unknown";
- }
- 
--void prop_add_env(const char *env)
-+static void prop_add_env(const char *env)
- {
- 	struct symbol *sym, *sym2;
- 	struct property *prop;
+ 	name = getenv("KCONFIG_AUTOHEADER");
+@@ -779,6 +808,11 @@ int conf_write_autoconf(void)
+ 		name = "include/linux/autoconf.h";
+ 	if (rename(".tmpconfig.h", name))
+ 		return 1;
++	name = getenv("KCONFIG_AUTOCONFIG2");
++	if (!name)
++		name = "include/config/auto2.conf";
++	if (rename(".tmpconfig2", name))
++		return 1;
+ 	name = conf_get_autoconfig_name();
+ 	/*
+ 	 * This must be the last step, kbuild has a dependency on auto.conf
 _
