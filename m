@@ -1,59 +1,85 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp1.linux-foundation.org ([140.211.169.13]:59084 "EHLO
+Received: from smtp1.linux-foundation.org ([140.211.169.13]:39641 "EHLO
 	smtp1.linux-foundation.org" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1756517AbZINVth (ORCPT
+	by vger.kernel.org with ESMTP id S1756973AbZINVti (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 14 Sep 2009 17:49:37 -0400
-Message-Id: <200909142149.n8ELnD6D018753@imap1.linux-foundation.org>
-Subject: [patch 12/18] kbuild: fix cc1 options check to ensure we do not use -fPIC when compiling
+	Mon, 14 Sep 2009 17:49:38 -0400
+Message-Id: <200909142149.n8ELnClV018750@imap1.linux-foundation.org>
+Subject: [patch 11/18] kconfig CROSS_COMPILE option
 From: akpm@linux-foundation.org
-Date: Mon, 14 Sep 2009 14:49:13 -0700
+Date: Mon, 14 Sep 2009 14:49:11 -0700
 MIME-Version: 1.0
 Content-Type: text/plain; charset=ANSI_X3.4-1968
 Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: sam@ravnborg.org
-Cc: linux-kbuild@vger.kernel.org, akpm@linux-foundation.org, anarchy@gentoo.org, hpa@zytor.com, johansson_fredric@hotmail.com, zorry@ume.nu
+Cc: linux-kbuild@vger.kernel.org, akpm@linux-foundation.org, roland@redhat.com
 
-From: "Jory A. Pratt" <anarchy@gentoo.org>
+From: Roland McGrath <roland@redhat.com>
 
-The arch/*/boot/Makefile use cc-options to check for GCC command options
-and cc-options use the hardened specs when checking for GCC command
-options.  When -fPIE is pass to cc1 it can't use -ffreestanding or
--fno-toplevel-reorder.  Then it fail to build stuff with -ffreestanding
-and -fno-toplevel-reorder.
+This adds CROSS_COMPILE as a kconfig string so you can store it in
+.config.  Then you can use plain "make" in the configured kernel build
+directory to do the right cross compilation without setting the
+command-line or environment variable every time.
 
-Thanks to Fredric Johansson for finding the main problem behind a failed
-build using a hardened toolchain.
+With this, you can set up different build directories for different kernel
+configurations, whether native or cross-builds, and then use the simple:
 
-Signed-off-by: Magnus Granberg <zorry@ume.nu>
-Signed-off-by: Jory A. Pratt <anarchy@gentoo.org>
-Cc: Fredric Johansson <johansson_fredric@hotmail.com> 
-Cc: "H. Peter Anvin" <hpa@zytor.com>
+	make -C /build/dir M=module-source-dir
+
+idiom to build modules for any given target kernel, indicating which one
+by nothing but the build directory chosen.
+
+I tried a version that defaults the string with env="CROSS_COMPILE" so
+that in a "make oldconfig" with CROSS_COMPILE in the environment you can
+just hit return to store the way you're building it.  But the kconfig
+prompt for strings doesn't give you any way to say you want an empty
+string instead of the default, so I punted that.
+
+Signed-off-by: Roland McGrath <roland@redhat.com>
 Cc: Sam Ravnborg <sam@ravnborg.org>
 Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
 ---
 
- scripts/Kbuild.include |    4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ Makefile     |    4 +++-
+ init/Kconfig |    8 ++++++++
+ 2 files changed, 11 insertions(+), 1 deletion(-)
 
-diff -puN scripts/Kbuild.include~kbuild-fix-cc1-options-check-to-ensure-we-do-not-use-fpic-when-compiling scripts/Kbuild.include
---- a/scripts/Kbuild.include~kbuild-fix-cc1-options-check-to-ensure-we-do-not-use-fpic-when-compiling
-+++ a/scripts/Kbuild.include
-@@ -105,12 +105,12 @@ as-instr = $(call try-run,\
- # Usage: cflags-y += $(call cc-option,-march=winchip-c6,-march=i586)
+diff -puN Makefile~kconfig-cross_compile-option Makefile
+--- a/Makefile~kconfig-cross_compile-option
++++ a/Makefile
+@@ -177,11 +177,13 @@ SUBARCH := $(shell uname -m | sed -e s/i
+ # CROSS_COMPILE can be set on the command line
+ # make CROSS_COMPILE=ia64-linux-
+ # Alternatively CROSS_COMPILE can be set in the environment.
++# A third alternative is to store a setting in .config so that plain
++# "make" in the configured kernel build directory always uses that.
+ # Default value for CROSS_COMPILE is not to prefix executables
+ # Note: Some architectures assign CROSS_COMPILE in their arch/*/Makefile
+ export KBUILD_BUILDHOST := $(SUBARCH)
+ ARCH		?= $(SUBARCH)
+-CROSS_COMPILE	?=
++CROSS_COMPILE	?= $(CONFIG_CROSS_COMPILE:"%"=%)
  
- cc-option = $(call try-run,\
--	$(CC) $(KBUILD_CFLAGS) $(1) -c -xc /dev/null -o "$$TMP",$(1),$(2))
-+	$(CC) $(KBUILD_CPPFLAGS) $(KBUILD_CFLAGS) $(1) -c -xc /dev/null -o "$$TMP",$(1),$(2))
+ # Architecture as present in compile.h
+ UTS_MACHINE 	:= $(ARCH)
+diff -puN init/Kconfig~kconfig-cross_compile-option init/Kconfig
+--- a/init/Kconfig~kconfig-cross_compile-option
++++ a/init/Kconfig
+@@ -76,6 +76,14 @@ config INIT_ENV_ARG_LIMIT
+ 	  variables passed to init from the kernel command line.
  
- # cc-option-yn
- # Usage: flag := $(call cc-option-yn,-march=winchip-c6)
- cc-option-yn = $(call try-run,\
--	$(CC) $(KBUILD_CFLAGS) $(1) -c -xc /dev/null -o "$$TMP",y,n)
-+	$(CC) $(KBUILD_CPPFLAGS) $(KBUILD_CFLAGS) $(1) -c -xc /dev/null -o "$$TMP",y,n)
  
- # cc-option-align
- # Prefix align with either -falign or -malign
++config CROSS_COMPILE
++	string "Cross-compiler tool prefix"
++	help
++	  Same as running 'make CROSS_COMPILE=prefix-' but stored for
++	  default make runs in this kernel build directory.  You don't
++	  need to set this unless you want the configured kernel build
++	  directory to select the cross-compiler automatically.
++
+ config LOCALVERSION
+ 	string "Local version - append to kernel release"
+ 	help
 _
