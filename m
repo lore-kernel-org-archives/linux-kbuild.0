@@ -1,59 +1,28 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor.suse.de ([195.135.220.2]:44896 "EHLO mx1.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754569AbZIMP7P (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 13 Sep 2009 11:59:15 -0400
-Date: Sun, 13 Sep 2009 17:59:14 +0200 (CEST)
-From: Jiri Kosina <jkosina@suse.cz>
-Subject: Re: special HID & Kconfig: odd behavior in gconfig
-In-Reply-To: <1252681027.2282.23.camel@castor>
-Message-ID: <alpine.LNX.2.00.0909131758280.17028@wotan.suse.de>
-References: <1252681027.2282.23.camel@castor>
+Received: from mail-yx0-f191.google.com ([209.85.210.191]:34996 "EHLO
+	mail-yx0-f191.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753849AbZINDmK convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 13 Sep 2009 23:42:10 -0400
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+In-Reply-To: <1243381049-10359-1-git-send-email-vapier@gentoo.org>
+References: <1243381049-10359-1-git-send-email-vapier@gentoo.org>
+From: Mike Frysinger <vapier.adi@gmail.com>
+Date: Sun, 13 Sep 2009 23:41:52 -0400
+Message-ID: <8bd0f97a0909132041y3705ff59ja51c7065503ba519@mail.gmail.com>
+Subject: Re: [PATCH] checkpatch: add some common Blackfin checks
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Richard Kennedy <richard@rsk.demon.co.uk>
-Cc: lkml <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, linux-input@vger.kernel.org
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, uclinux-dist-devel@blackfin.uclinux.org, Bryan Wu <cooloney@kernel.org>, Andy Whitcroft <apw@shadowen.org>
 
-On Fri, 11 Sep 2009, Richard Kennedy wrote:
+On Tue, May 26, 2009 at 19:37, Mike Frysinger wrote:
+> Add checks for Blackfin-specific issues that seem to crop up from time to
+> time.  In particular, we have helper macros to break a 32bit address into
+> the hi/lo parts, and we want to make sure people use the csync/ssync
+> variant that includes fun anomaly workarounds.
 
-> I use gconfig & and cannot turn off any of the special HID devices.
-> 
-> the Kconfig for them all have the same pattern e.g.
-> 
-> config HID_DRAGONRISE
-> 	tristate "DragonRise Inc. support" if EMBEDDED
-> 	depends on USB_HID
-> 	default !EMBEDDED
-> 
-> The 'if EMBEDDED' on the tristate line seems to confuse gconfig and it
-> sets them all to m & does not let me set them to N. I'm building this on
-> a standard desktop machine.
-> 
-> Any idea what the intention of this was? or can we just remove the if
-> embedded part?
-
-Hi Richard,
-
-actually this question has been raised by several people in the past
-already. Copy/pasting the latest reply I have sent on this topic
-
-===
-
-mostly this is because we don't want to bother users with asking for every 
-single quirky device/vendor, as there are unfortunately a lot of them. 
-Usually compiling everything in doesn't waste runtime footprint (the 
-modules don't get loaded unless needed), and they don't cost too much disk 
-space either. And if you really want to disable them, CONFIG_EMBEDDED 
-allows you to do that.
-
-Please see last paragraph on
-
-        http://lkml.org/lkml/2008/10/14/284
-
-===
-
--- 
-Jiri Kosina
-SUSE Labs, Novell Inc.
+Andrew: could you pick this up ?
+-mike
