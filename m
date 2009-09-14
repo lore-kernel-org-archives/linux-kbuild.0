@@ -1,28 +1,63 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-yx0-f191.google.com ([209.85.210.191]:34996 "EHLO
-	mail-yx0-f191.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753849AbZINDmK convert rfc822-to-8bit (ORCPT
+Received: from cluster-d.mailcontrol.com ([85.115.60.190]:53725 "EHLO
+	cluster-d.mailcontrol.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751050AbZINKfo (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 13 Sep 2009 23:42:10 -0400
+	Mon, 14 Sep 2009 06:35:44 -0400
+Message-ID: <4AAE1C48.6030802@csr.com>
+Date: Mon, 14 Sep 2009 11:34:48 +0100
+From: David Vrabel <david.vrabel@csr.com>
 MIME-Version: 1.0
-In-Reply-To: <1243381049-10359-1-git-send-email-vapier@gentoo.org>
-References: <1243381049-10359-1-git-send-email-vapier@gentoo.org>
-From: Mike Frysinger <vapier.adi@gmail.com>
-Date: Sun, 13 Sep 2009 23:41:52 -0400
-Message-ID: <8bd0f97a0909132041y3705ff59ja51c7065503ba519@mail.gmail.com>
-Subject: Re: [PATCH] checkpatch: add some common Blackfin checks
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+Subject: Re: UWB Kconfig: cannot set UWB to N in gconfig
+References: <1252577154.2340.12.camel@castor>
+In-Reply-To: <1252577154.2340.12.camel@castor>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andrew Morton <akpm@linux-foundation.org>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, uclinux-dist-devel@blackfin.uclinux.org, Bryan Wu <cooloney@kernel.org>, Andy Whitcroft <apw@shadowen.org>
+To: Richard Kennedy <richard@rsk.demon.co.uk>
+Cc: Roman Zippel <zippel@linux-m68k.org>, linux-usb <linux-usb@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, lkml <linux-kernel@vger.kernel.org>
 
-On Tue, May 26, 2009 at 19:37, Mike Frysinger wrote:
-> Add checks for Blackfin-specific issues that seem to crop up from time to
-> time.  In particular, we have helper macros to break a 32bit address into
-> the hi/lo parts, and we want to make sure people use the csync/ssync
-> variant that includes fun anomaly workarounds.
+Richard Kennedy wrote:
+> I sometimes use 'make gconfig' and I noticed that I cannot disable the
+> UWB option -- it just won't let me set it to N.
+> 
+> AFAICT this is because the CONFIG USB_WUSB selects UWB which forces it
+> on.
+> applying this patch fixes the issue but I'm not sure if this is the
+> right way to go about it.
+> 
+> any thoughts?
+> 
+> regards
+> Richard
+> 
+> This is against 2.6.31
+> 
+> 
+> diff --git a/drivers/usb/wusbcore/Kconfig b/drivers/usb/wusbcore/Kconfig
+> index eb09a0a..cc97041 100644
+> --- a/drivers/usb/wusbcore/Kconfig
+> +++ b/drivers/usb/wusbcore/Kconfig
+> @@ -5,7 +5,7 @@ config USB_WUSB
+>  	tristate "Enable Wireless USB extensions (EXPERIMENTAL)"
+>  	depends on EXPERIMENTAL
+>  	depends on USB
+> -        select UWB
+> +        depends on UWB
 
-Andrew: could you pick this up ?
--mike
+NAK.  It's not sufficiently obvious to a user that Wireless USB support
+requires UWB.
+
+This is really an issue with the configuration application.  Consider
+improving them to allow switching off select'ed options and popping up a
+dialog that says "switching off UWB will also switch off WUSB" etc.
+
+David
+-- 
+David Vrabel, Senior Software Engineer, Drivers
+CSR, Churchill House, Cambridge Business Park,  Tel: +44 (0)1223 692562
+Cowley Road, Cambridge, CB4 0WZ                 http://www.csr.com/
+
+
+Member of the CSR plc group of companies. CSR plc registered in England and Wales, registered number 4187346, registered office Churchill House, Cambridge Business Park, Cowley Road, Cambridge, CB4 0WZ, United Kingdom
