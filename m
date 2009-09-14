@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp1.linux-foundation.org ([140.211.169.13]:51896 "EHLO
+Received: from smtp1.linux-foundation.org ([140.211.169.13]:36502 "EHLO
 	smtp1.linux-foundation.org" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1755581AbZINVtW (ORCPT
+	by vger.kernel.org with ESMTP id S1755731AbZINVtW (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
 	Mon, 14 Sep 2009 17:49:22 -0400
-Message-Id: <200909142149.n8ELn6W2018518@imap1.linux-foundation.org>
-Subject: [patch 05/18] checkincludes.pl: close file as soon as we're done with it
+Message-Id: <200909142149.n8ELn7Qb018535@imap1.linux-foundation.org>
+Subject: [patch 06/18] checkincludes.pl: provide usage helper
 From: akpm@linux-foundation.org
-Date: Mon, 14 Sep 2009 14:49:06 -0700
+Date: Mon, 14 Sep 2009 14:49:07 -0700
 MIME-Version: 1.0
 Content-Type: text/plain; charset=ANSI_X3.4-1968
 Content-Transfer-Encoding: 8bit
@@ -23,25 +23,26 @@ Cc: Sam Ravnborg <sam@ravnborg.org>
 Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
 ---
 
- scripts/checkincludes.pl |    4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ scripts/checkincludes.pl |    9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff -puN scripts/checkincludes.pl~checkincludespl-close-file-as-soon-as-were-done-with-it scripts/checkincludes.pl
---- a/scripts/checkincludes.pl~checkincludespl-close-file-as-soon-as-were-done-with-it
+diff -puN scripts/checkincludes.pl~checkincludespl-provide-usage-helper scripts/checkincludes.pl
+--- a/scripts/checkincludes.pl~checkincludespl-provide-usage-helper
 +++ a/scripts/checkincludes.pl
-@@ -13,12 +13,12 @@ foreach $file (@ARGV) {
- 			++$includedfiles{$1};
- 		}
- 	}
+@@ -3,6 +3,15 @@
+ # checkincludes: Find files included more than once in (other) files.
+ # Copyright abandoned, 2000, Niels Kristian Bech Jensen <nkbj@image.dk>.
+ 
++sub usage {
++	print "Usage: checkincludes.pl <file list>\n";
++	exit 1;
++}
 +
-+	close(FILE);
- 	
- 	foreach $filename (keys %includedfiles) {
- 		if ($includedfiles{$filename} > 1) {
- 			print "$file: $filename is included more than once.\n";
- 		}
- 	}
--
--	close(FILE);
- }
++if ($#ARGV < 0) {
++        usage();
++}
++
+ foreach $file (@ARGV) {
+ 	open(FILE, $file) or die "Cannot open $file: $!.\n";
+ 
 _
