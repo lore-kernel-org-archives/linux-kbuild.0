@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp1.linux-foundation.org ([140.211.169.13]:40984 "EHLO
+Received: from smtp1.linux-foundation.org ([140.211.169.13]:50583 "EHLO
 	smtp1.linux-foundation.org" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1756251AbZINVtf (ORCPT
+	by vger.kernel.org with ESMTP id S1756517AbZINVtf (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
 	Mon, 14 Sep 2009 17:49:35 -0400
-Message-Id: <200909142149.n8ELnHUx018940@imap1.linux-foundation.org>
-Subject: [patch 16/18] kbuild: echo the record_mcount command
+Message-Id: <200909142149.n8ELnJbp019009@imap1.linux-foundation.org>
+Subject: [patch 18/18] kbuild: set -fconserve-stack option for gcc 4.5
 From: akpm@linux-foundation.org
-Date: Mon, 14 Sep 2009 14:49:17 -0700
+Date: Mon, 14 Sep 2009 14:49:18 -0700
 MIME-Version: 1.0
 Content-Type: text/plain; charset=ANSI_X3.4-1968
 Content-Transfer-Encoding: 8bit
@@ -18,26 +18,29 @@ Cc: linux-kbuild@vger.kernel.org, akpm@linux-foundation.org, andi@firstfloor.org
 
 From: Andi Kleen <andi@firstfloor.org>
 
-I had some problems with record_mcount in the Makefile and it was hard
-to track down. Echo it by default to make it easier to diagnose.
+The upcomming gcc 4.5 has a new -fconserve-stack option that tells the
+inliner to take stack frame size in account.  Set it if the compiler
+supports it.
 
 Signed-off-by: Andi Kleen <ak@linux.intel.com>
 Cc: Sam Ravnborg <sam@ravnborg.org>
 Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
 ---
 
- scripts/Makefile.build |    1 +
- 1 file changed, 1 insertion(+)
+ Makefile |    3 +++
+ 1 file changed, 3 insertions(+)
 
-diff -puN scripts/Makefile.build~kbuild-echo-the-record_mcount-command scripts/Makefile.build
---- a/scripts/Makefile.build~kbuild-echo-the-record_mcount-command
-+++ a/scripts/Makefile.build
-@@ -216,6 +216,7 @@ define rule_cc_o_c
- 	$(call echo-cmd,checksrc) $(cmd_checksrc)			  \
- 	$(call echo-cmd,cc_o_c) $(cmd_cc_o_c);				  \
- 	$(cmd_modversions)						  \
-+	$(call echo-cmd,record_mcount)					  \
- 	$(cmd_record_mcount)						  \
- 	scripts/basic/fixdep $(depfile) $@ '$(call make-cmd,cc_o_c)' >    \
- 	                                              $(dot-target).tmp;  \
+diff -puN Makefile~kbuild-set-fconserve-stack-option-for-gcc-45 Makefile
+--- a/Makefile~kbuild-set-fconserve-stack-option-for-gcc-45
++++ a/Makefile
+@@ -573,6 +573,9 @@ KBUILD_CFLAGS	+= $(call cc-option,-fno-s
+ # revert to pre-gcc-4.4 behaviour of .eh_frame
+ KBUILD_CFLAGS	+= $(call cc-option,-fno-dwarf2-cfi-asm)
+ 
++# conserve stack if available
++KBUILD_CFLAGS   += $(call cc-option,-fconserve-stack)
++
+ # Add user supplied CPPFLAGS, AFLAGS and CFLAGS as the last assignments
+ # But warn user when we do so
+ warn-assign = \
 _
