@@ -1,74 +1,108 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cn.fujitsu.com ([222.73.24.84]:52578 "EHLO song.cn.fujitsu.com"
-	rhost-flags-OK-FAIL-OK-OK) by vger.kernel.org with ESMTP
-	id S1751068AbZIPGaI (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 16 Sep 2009 02:30:08 -0400
-Message-ID: <4AB085A6.8000605@cn.fujitsu.com>
-Date: Wed, 16 Sep 2009 14:28:54 +0800
-From: Li Zefan <lizf@cn.fujitsu.com>
-MIME-Version: 1.0
+Received: from 124x34x33x190.ap124.ftth.ucom.ne.jp ([124.34.33.190]:45851 "EHLO
+	master.linux-sh.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753024AbZIPGsz (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 16 Sep 2009 02:48:55 -0400
+Date: Wed, 16 Sep 2009 15:48:40 +0900
+From: Paul Mundt <lethal@linux-sh.org>
 Subject: Re: [PATCH] kallsyms: Fix segfault in prefix_underscores_count().
-References: <20090916050845.GA5805@linux-sh.org>
-In-Reply-To: <20090916050845.GA5805@linux-sh.org>
+Message-ID: <20090916064840.GC5805@linux-sh.org>
+References: <20090916050845.GA5805@linux-sh.org> <4AB085A6.8000605@cn.fujitsu.com>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+In-Reply-To: <4AB085A6.8000605@cn.fujitsu.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Paul Mundt <lethal@linux-sh.org>
+To: Li Zefan <lizf@cn.fujitsu.com>
 Cc: Lai Jiangshan <laijs@cn.fujitsu.com>, Sam Ravnborg <sam@ravnborg.org>, Andrew Morton <akpm@linux-foundation.org>, Ingo Molnar <mingo@elte.hu>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Paulo Marques <pmarques@grupopie.com>
 
-CC: Paulo Marques <pmarques@grupopie.com> (who reviewed that patch)
-
-Paul Mundt wrote:
-> [ I'm not sure who exactly this should go to, so I've attempted to get all of
->   the interested parties in the Cc. ]
+On Wed, Sep 16, 2009 at 02:28:54PM +0800, Li Zefan wrote:
+> Paul Mundt wrote:
+> > Commit b478b782e110fdb4135caa3062b6d687e989d994 "kallsyms, tracing:
+> > output more proper symbol name" introduces a "bugfix" that introduces
+> > a segfault in kallsyms in my configurations.
+> > 
+> > The cause is the introduction of prefix_underscores_count() which
+> > attempts to count underscores, even in symbols that do not have them.
+> > As a result, it just uselessly runs past the end of the buffer until it
+> > crashes:
+> > 
 > 
-> This is a re-send of a problem that I reported on August 7th, both Sam and Lai
-> have been unresponsive, so hopefully someone else can take a look at this.
->
-
-Lai is off office and won't be back in 2 weeks, so I'm afraid
-he won't be responsive..
-
-> Commit b478b782e110fdb4135caa3062b6d687e989d994 "kallsyms, tracing:
-> output more proper symbol name" introduces a "bugfix" that introduces
-> a segfault in kallsyms in my configurations.
+> But the fix looks obviously correct, as long as @str is guaranteed
+> to be NULL-terminated.
 > 
-> The cause is the introduction of prefix_underscores_count() which
-> attempts to count underscores, even in symbols that do not have them.
-> As a result, it just uselessly runs past the end of the buffer until it
-> crashes:
+> ...
+> > @@ -584,9 +538,14 @@ static int may_be_linker_script_provide_symbol(const struct sym_entry *se)
+> >  static int prefix_underscores_count(const char *str)
+> >  {
+> >  	const char *tail = str;
+> > +	size_t len = strlen(str);
+> > +
+> > +	while (*tail != '_') {
+> > +		if (!len--)
+> > +			return 0;
+> >  
+> > -	while (*tail != '_')
+> >  		tail++;
+> > +	}
 > 
+> Can be simplified as:
+> 
+> 	while (*tail != '\0' && *tail != '_')
+> 		tail++;
+> 
+> But..as the name "prefix_underscores_count" suggests, shouldn't
+> it be:
+> 	while (*tail == '_')
+> 		tail++;
+> ??
+> 
+Yes, that was what I did initially as well, but the behaviour is not
+exactly the same, and I wanted an explanation from Lai if there were some
+other intentions for the code. In any event, simplifying it still manages
+to do the right thing, so I'm fine with that.
 
-But the fix looks obviously correct, as long as @str is guaranteed
-to be NULL-terminated.
+------------------------
+Subject: [PATCH] kallsyms: Fix segfault in prefix_underscores_count().
 
-...
-> @@ -584,9 +538,14 @@ static int may_be_linker_script_provide_symbol(const struct sym_entry *se)
->  static int prefix_underscores_count(const char *str)
->  {
->  	const char *tail = str;
-> +	size_t len = strlen(str);
-> +
-> +	while (*tail != '_') {
-> +		if (!len--)
-> +			return 0;
->  
-> -	while (*tail != '_')
->  		tail++;
-> +	}
+Commit b478b782e110fdb4135caa3062b6d687e989d994 "kallsyms, tracing:
+output more proper symbol name" introduces a "bugfix" that introduces
+a segfault in kallsyms in my configurations.
 
-Can be simplified as:
+The cause is the introduction of prefix_underscores_count() which
+attempts to count underscores, even in symbols that do not have them.
+As a result, it just uselessly runs past the end of the buffer until it
+crashes:
 
-	while (*tail != '\0' && *tail != '_')
-		tail++;
+  CC      init/version.o
+  LD      init/built-in.o
+  LD      .tmp_vmlinux1
+  KSYM    .tmp_kallsyms1.S
+/bin/sh: line 1: 16934 Done                    sh-linux-gnu-nm -n .tmp_vmlinux1
+     16935 Segmentation fault      | scripts/kallsyms > .tmp_kallsyms1.S
+make: *** [.tmp_kallsyms1.S] Error 139
 
-But..as the name "prefix_underscores_count" suggests, shouldn't
-it be:
-	while (*tail == '_')
-		tail++;
-??
+This simplifies the logic and just does a straightforward count.
 
->  
->  	return tail - str;
->  }
+Signed-off-by: Paul Mundt <lethal@linux-sh.org>
+
+---
+
+ scripts/kallsyms.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/scripts/kallsyms.c b/scripts/kallsyms.c
+index 64343cc..86c3896 100644
+--- a/scripts/kallsyms.c
++++ b/scripts/kallsyms.c
+@@ -585,7 +585,7 @@ static int prefix_underscores_count(const char *str)
+ {
+ 	const char *tail = str;
+ 
+-	while (*tail != '_')
++	while (*tail == '_')
+ 		tail++;
+ 
+ 	return tail - str;
