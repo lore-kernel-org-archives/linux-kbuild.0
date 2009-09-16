@@ -1,43 +1,79 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp1.linux-foundation.org ([140.211.169.13]:43160 "EHLO
-	smtp1.linux-foundation.org" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1756271AbZINVuE (ORCPT
+Received: from 124x34x33x190.ap124.ftth.ucom.ne.jp ([124.34.33.190]:33335 "EHLO
+	master.linux-sh.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750761AbZIPFI7 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 14 Sep 2009 17:50:04 -0400
-Message-Id: <200909142149.n8ELn2DN018397@imap1.linux-foundation.org>
-Subject: [patch 01/18] gitignore usr/initramfs_data.cpio.bz2 and usr/initramfs_data.cpio.lzma
-From: akpm@linux-foundation.org
-Date: Mon, 14 Sep 2009 14:49:02 -0700
+	Wed, 16 Sep 2009 01:08:59 -0400
+Date: Wed, 16 Sep 2009 14:08:45 +0900
+From: Paul Mundt <lethal@linux-sh.org>
+Subject: [PATCH] kallsyms: Fix segfault in prefix_underscores_count().
+Message-ID: <20090916050845.GA5805@linux-sh.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=ANSI_X3.4-1968
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: sam@ravnborg.org
-Cc: linux-kbuild@vger.kernel.org, akpm@linux-foundation.org, jaswinder@kernel.org, jaswinderrajput@gmail.com
+To: Lai Jiangshan <laijs@cn.fujitsu.com>, Sam Ravnborg <sam@ravnborg.org>, Andrew Morton <akpm@linux-foundation.org>, Ingo Molnar <mingo@elte.hu>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-From: Jaswinder Singh Rajput <jaswinder@kernel.org>
+[ I'm not sure who exactly this should go to, so I've attempted to get all of
+  the interested parties in the Cc. ]
 
-usr/initramfs_data.cpio.bz2 and usr/initramfs_data.cpio.lzma are binary
-files should be ignored
+This is a re-send of a problem that I reported on August 7th, both Sam and Lai
+have been unresponsive, so hopefully someone else can take a look at this.
 
-Signed-off-by: Jaswinder Singh Rajput <jaswinderrajput@gmail.com>
-Cc: Sam Ravnborg <sam@ravnborg.org>
-Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+Commit b478b782e110fdb4135caa3062b6d687e989d994 "kallsyms, tracing:
+output more proper symbol name" introduces a "bugfix" that introduces
+a segfault in kallsyms in my configurations.
+
+The cause is the introduction of prefix_underscores_count() which
+attempts to count underscores, even in symbols that do not have them.
+As a result, it just uselessly runs past the end of the buffer until it
+crashes:
+
+  CC      init/version.o
+  LD      init/built-in.o
+  LD      .tmp_vmlinux1
+  KSYM    .tmp_kallsyms1.S
+/bin/sh: line 1: 16934 Done                    sh-linux-gnu-nm -n .tmp_vmlinux1
+     16935 Segmentation fault      | scripts/kallsyms > .tmp_kallsyms1.S
+make: *** [.tmp_kallsyms1.S] Error 139
+
+This adds a strlen iterator that bails out if nothing is found in the
+string, which fixes up the observed segfaults.
+
+Signed-off-by: Paul Mundt <lethal@linux-sh.org>
+
 ---
 
- usr/.gitignore |    2 ++
- 1 file changed, 2 insertions(+)
+I've uploaded a sample problematic symbol list to:
 
-diff -puN usr/.gitignore~gitignore-usr-initramfs_datacpiobz2-and-usr-initramfs_datacpiolzma usr/.gitignore
---- a/usr/.gitignore~gitignore-usr-initramfs_datacpiobz2-and-usr-initramfs_datacpiolzma
-+++ a/usr/.gitignore
-@@ -4,5 +4,7 @@
- gen_init_cpio
- initramfs_data.cpio
- initramfs_data.cpio.gz
-+initramfs_data.cpio.bz2
-+initramfs_data.cpio.lzma
- initramfs_list
- include
-_
+	http://userweb.kernel.org/~lethal/symbol-list.gz
+
+that one can pipe in to scripts/kallsyms to reproduce the fault, incase someone
+wants to make a better fix. I'm at a loss as to why no one else has reported
+this yet.
+
+ scripts/kallsyms.c |    7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/scripts/kallsyms.c b/scripts/kallsyms.c
+index 64343cc..f1d44b2 100644
+--- a/scripts/kallsyms.c
++++ b/scripts/kallsyms.c
+@@ -584,9 +538,14 @@ static int may_be_linker_script_provide_symbol(const struct sym_entry *se)
+ static int prefix_underscores_count(const char *str)
+ {
+ 	const char *tail = str;
++	size_t len = strlen(str);
++
++	while (*tail != '_') {
++		if (!len--)
++			return 0;
+ 
+-	while (*tail != '_')
+ 		tail++;
++	}
+ 
+ 	return tail - str;
+ }
