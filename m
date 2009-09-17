@@ -1,27 +1,32 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qy0-f200.google.com ([209.85.221.200]:63613 "EHLO
-	mail-qy0-f200.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752628AbZIQDWG (ORCPT
+Received: from mail-pz0-f190.google.com ([209.85.222.190]:44760 "EHLO
+	mail-pz0-f190.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753363AbZIQFM5 convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 16 Sep 2009 23:22:06 -0400
-Received: by qyk38 with SMTP id 38so4758261qyk.27
-        for <linux-kbuild@vger.kernel.org>; Wed, 16 Sep 2009 20:22:08 -0700 (PDT)
+	Thu, 17 Sep 2009 01:12:57 -0400
 MIME-Version: 1.0
 In-Reply-To: <830a8fa70909161930r518a9644ja954ced2ae5814b4@mail.gmail.com>
 References: <830a8fa70909161930r518a9644ja954ced2ae5814b4@mail.gmail.com>
-Date: Thu, 17 Sep 2009 11:15:53 +0800
-Message-ID: <2375c9f90909162015h39aeee14s99d3173d0a9baf7c@mail.gmail.com>
+Date: Wed, 16 Sep 2009 21:40:57 -0700
+Message-ID: <830a8fa70909162140h4088de90l16e806629fa943b@mail.gmail.com>
 Subject: Re: [patch] Makefile: can't build modules outside the kernel tree if
 	it was built using O=
-From: =?UTF-8?Q?Am=C3=A9rico_Wang?= <xiyou.wangcong@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+From: Caveh Jalali <ecaveh@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-Content-Transfer-Encoding: 8bit
-To: Caveh Jalali <ecaveh@gmail.com>
-Cc: sam@ravnborg.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: sam@ravnborg.org
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Thu, Sep 17, 2009 at 10:30 AM, Caveh Jalali <ecaveh@gmail.com> wrote:
+it's known good in 2.6.25, borked in 2.6.31.  i didn't track down
+the kernel version number where the offending commit showed up.
+
+anyway, here's my SOB:
+
+Signed-off-by: Caveh Jalali <ecaveh@gmail.com>
+
+On Wed, Sep 16, 2009 at 7:30 PM, Caveh Jalali <ecaveh@gmail.com> wrote:
 > in 2.6.31, it is no longer possible to build kernel modules for some platforms
 > (the ones that need include2) outside the kernel src tree if the
 > src tree was built using O= to specify an alternate directory for the
@@ -31,43 +36,37 @@ On Thu, Sep 17, 2009 at 10:30 AM, Caveh Jalali <ecaveh@gmail.com> wrote:
 >
 > commit b8b572e1015f81b4e748417be2629dfe51ab99f9
 > Author: Stephen Rothwell <sfr@canb.auug.org.au>
-> Date:Â Â  Fri Aug 1 15:20:30 2008 +1000
-
-
-Only after 2.6.31? This commit was on 2008 Aug 1...
-
+> Date:   Fri Aug 1 15:20:30 2008 +1000
 >
-> Â Â  powerpc: Move include files to arch/powerpc/include/asm
+>    powerpc: Move include files to arch/powerpc/include/asm
 >
 >
 > when the platform specific include directories were shuffled around
 > without updating the
-> top level Makefile. Â however, i think this FAIL is generic, and not
+> top level Makefile.  however, i think this FAIL is generic, and not
 > limited to powerpc.
 > here's a patch to the top level Makefile to teach it about the shuffled files:
 >
-
-
-You forgot your SOB line.
-
-Anyway, it looks fine.
-
-Acked-by: WANG Cong <xiyou.wangcong@gmail.com>
-
 >
-> --- /local/caveh/linux/linux-2.6.31/MakefileÂ Â Â  2009-09-09
+> --- /local/caveh/linux/linux-2.6.31/Makefile    2009-09-09
 > 15:13:59.000000000 -0700
-> +++ MakefileÂ Â Â  2009-09-16 12:23:05.000000000 -0700
+> +++ Makefile    2009-09-16 12:23:05.000000000 -0700
 > @@ -958,9 +958,9 @@ ifneq ($(KBUILD_SRC),)
-> Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â  echo "Â  in the '$(srctree)' directory.";\
-> Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â  /bin/false; \
-> Â Â Â Â Â Â Â  fi;
-> -Â Â Â Â Â Â  $(Q)if [ ! -d include2 ]; thenÂ Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â  \
-> -Â Â Â Â Â Â Â Â Â Â  mkdir -p include2;Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â  \
-> -Â Â Â Â Â Â Â Â Â Â  ln -fsn $(srctree)/include/asm-$(SRCARCH) include2/asm;Â Â Â Â  \
-> +Â Â Â Â Â Â  $(Q)if [ ! -d include2 ]; thenÂ Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â  \
-> +Â Â Â Â Â Â Â Â Â Â  mkdir -p include2;Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â  \
-> +Â Â Â Â Â Â Â Â Â Â  ln -fsn $(srctree)/arch/$(SRCARCH)/include/asm include2/asm; \
-> Â Â Â Â Â Â Â  fi
-> Â endif
-ÿôèº{.nÇ+‰·Ÿ®‰­†+%ŠËÿ±éÝ¶¥Šwÿº{.nÇ+‰·¥Š{±þFîŠWÿŠ{ayºÊ‡Ú™ë,j­¢f£¢·hšïêÿ‘êçz_è®(­éšŽŠÝ¢j"ú¶m§ÿÿ¾«þG«éÿ¢¸?™¨è­Ú&£ø§~á
+>                 echo "  in the '$(srctree)' directory.";\
+>                 /bin/false; \
+>         fi;
+> -       $(Q)if [ ! -d include2 ]; then                                  \
+> -           mkdir -p include2;                                          \
+> -           ln -fsn $(srctree)/include/asm-$(SRCARCH) include2/asm;     \
+> +       $(Q)if [ ! -d include2 ]; then                                   \
+> +           mkdir -p include2;                                           \
+> +           ln -fsn $(srctree)/arch/$(SRCARCH)/include/asm include2/asm; \
+>         fi
+>  endif
+>
+
+
+
+-- 
+00c
+http://www.boincstats.com/signature/user_870433_project5.gif
