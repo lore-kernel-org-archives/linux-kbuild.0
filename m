@@ -1,50 +1,48 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp1.linux-foundation.org ([140.211.169.13]:38641 "EHLO
+Received: from smtp1.linux-foundation.org ([140.211.169.13]:51967 "EHLO
 	smtp1.linux-foundation.org" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1752377AbZIRTuK (ORCPT
+	by vger.kernel.org with ESMTP id S1752738AbZIRTuL (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 18 Sep 2009 15:50:10 -0400
-Message-Id: <200909181949.n8IJnSbl019077@imap1.linux-foundation.org>
-Subject: [patch 08/18] markup_oops: use modinfo to avoid confusion with underscored module names
+	Fri, 18 Sep 2009 15:50:11 -0400
+Message-Id: <200909181949.n8IJnQ40018998@imap1.linux-foundation.org>
+Subject: [patch 06/18] checkincludes.pl: provide usage helper
 From: akpm@linux-foundation.org
-Date: Fri, 18 Sep 2009 12:49:27 -0700
+Date: Fri, 18 Sep 2009 12:49:26 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=ANSI_X3.4-1968
 Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: sam@ravnborg.org
-Cc: linux-kbuild@vger.kernel.org, akpm@linux-foundation.org, ozan@pardus.org.tr, arjan@infradead.org, xiyou.wangcong@gmail.com
+Cc: linux-kbuild@vger.kernel.org, akpm@linux-foundation.org, lrodriguez@Atheros.comlrodriguez@Atheros.com
 
-From: Ozan Çaglayan <ozan@pardus.org.tr>
+From: "Luis R. Rodriguez" <lrodriguez@Atheros.com>
 
-When EIP is at a module having an underscore in its name, the current code
-fails to find it because the module filenames has '-' instead of '_'.  Use
-modinfo for a better path finding.
-
-Signed-off-by: Ozan Çaglayan <ozan@pardus.org.tr>
-Acked-by: WANG Cong <xiyou.wangcong@gmail.com>
-Cc: Arjan van de Ven <arjan@infradead.org>
+Signed-off-by: Luis R. Rodriguez <lrodriguez@atheros.com>
 Cc: Sam Ravnborg <sam@ravnborg.org>
 Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
 ---
 
- scripts/markup_oops.pl |    5 +----
- 1 file changed, 1 insertion(+), 4 deletions(-)
+ scripts/checkincludes.pl |    9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff -puN scripts/markup_oops.pl~markup_oops-use-modinfo-to-avoid-confusion-with-underscored-module-names scripts/markup_oops.pl
---- a/scripts/markup_oops.pl~markup_oops-use-modinfo-to-avoid-confusion-with-underscored-module-names
-+++ a/scripts/markup_oops.pl
-@@ -184,10 +184,7 @@ if ($target eq "0") {
+diff -puN scripts/checkincludes.pl~checkincludespl-provide-usage-helper scripts/checkincludes.pl
+--- a/scripts/checkincludes.pl~checkincludespl-provide-usage-helper
++++ a/scripts/checkincludes.pl
+@@ -3,6 +3,15 @@
+ # checkincludes: Find files included more than once in (other) files.
+ # Copyright abandoned, 2000, Niels Kristian Bech Jensen <nkbj@image.dk>.
  
- # if it's a module, we need to find the .ko file and calculate a load offset
- if ($module ne "") {
--	my $dir = dirname($filename);
--	$dir = $dir . "/";
--	my $mod = $module . ".ko";
--	my $modulefile = `find $dir -name $mod | head -1`;
-+	my $modulefile = `modinfo $module | grep '^filename:' | awk '{ print \$2 }'`;
- 	chomp($modulefile);
- 	$filename = $modulefile;
- 	if ($filename eq "") {
++sub usage {
++	print "Usage: checkincludes.pl <file list>\n";
++	exit 1;
++}
++
++if ($#ARGV < 0) {
++        usage();
++}
++
+ foreach $file (@ARGV) {
+ 	open(FILE, $file) or die "Cannot open $file: $!.\n";
+ 
 _
