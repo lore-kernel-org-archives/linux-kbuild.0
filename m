@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp1.linux-foundation.org ([140.211.169.13]:39435 "EHLO
+Received: from smtp1.linux-foundation.org ([140.211.169.13]:52931 "EHLO
 	smtp1.linux-foundation.org" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1754161AbZIRT4X (ORCPT
+	by vger.kernel.org with ESMTP id S1754898AbZIRT4l (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 18 Sep 2009 15:56:23 -0400
-Message-Id: <200909181949.n8IJnaVh019341@imap1.linux-foundation.org>
-Subject: [patch 16/18] kbuild: echo the record_mcount command
+	Fri, 18 Sep 2009 15:56:41 -0400
+Message-Id: <200909181949.n8IJnbP7019390@imap1.linux-foundation.org>
+Subject: [patch 17/18] kbuild: fail build if recordmcount.pl fails
 From: akpm@linux-foundation.org
-Date: Fri, 18 Sep 2009 12:49:36 -0700
+Date: Fri, 18 Sep 2009 12:49:37 -0700
 MIME-Version: 1.0
 Content-Type: text/plain; charset=ANSI_X3.4-1968
 Content-Transfer-Encoding: 8bit
@@ -18,26 +18,27 @@ Cc: linux-kbuild@vger.kernel.org, akpm@linux-foundation.org, andi@firstfloor.org
 
 From: Andi Kleen <andi@firstfloor.org>
 
-I had some problems with record_mcount in the Makefile and it was hard
-to track down. Echo it by default to make it easier to diagnose.
+When this script fails the build should fail too. Otherwise there
+are mysterious build failures later.
 
 Signed-off-by: Andi Kleen <ak@linux.intel.com>
 Cc: Sam Ravnborg <sam@ravnborg.org>
 Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
 ---
 
- scripts/Makefile.build |    1 +
- 1 file changed, 1 insertion(+)
+ scripts/Makefile.build |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff -puN scripts/Makefile.build~kbuild-echo-the-record_mcount-command scripts/Makefile.build
---- a/scripts/Makefile.build~kbuild-echo-the-record_mcount-command
+diff -puN scripts/Makefile.build~kbuild-fail-build-if-recordmcountpl-fails scripts/Makefile.build
+--- a/scripts/Makefile.build~kbuild-fail-build-if-recordmcountpl-fails
 +++ a/scripts/Makefile.build
-@@ -216,6 +216,7 @@ define rule_cc_o_c
- 	$(call echo-cmd,checksrc) $(cmd_checksrc)			  \
- 	$(call echo-cmd,cc_o_c) $(cmd_cc_o_c);				  \
- 	$(cmd_modversions)						  \
-+	$(call echo-cmd,record_mcount)					  \
- 	$(cmd_record_mcount)						  \
- 	scripts/basic/fixdep $(depfile) $@ '$(call make-cmd,cc_o_c)' >    \
- 	                                              $(dot-target).tmp;  \
+@@ -206,7 +206,7 @@ cmd_modversions =							\
+ endif
+ 
+ ifdef CONFIG_FTRACE_MCOUNT_RECORD
+-cmd_record_mcount = perl $(srctree)/scripts/recordmcount.pl "$(ARCH)" \
++cmd_record_mcount = set -e ; perl $(srctree)/scripts/recordmcount.pl "$(ARCH)" \
+ 	"$(if $(CONFIG_64BIT),64,32)" \
+ 	"$(OBJDUMP)" "$(OBJCOPY)" "$(CC)" "$(LD)" "$(NM)" "$(RM)" "$(MV)" \
+ 	"$(if $(part-of-module),1,0)" "$(@)";
 _
