@@ -1,44 +1,51 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp1.linux-foundation.org ([140.211.169.13]:52931 "EHLO
+Received: from smtp1.linux-foundation.org ([140.211.169.13]:54448 "EHLO
 	smtp1.linux-foundation.org" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1754898AbZIRT4l (ORCPT
+	by vger.kernel.org with ESMTP id S1753439AbZIRT5B (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 18 Sep 2009 15:56:41 -0400
-Message-Id: <200909181949.n8IJnbP7019390@imap1.linux-foundation.org>
-Subject: [patch 17/18] kbuild: fail build if recordmcount.pl fails
+	Fri, 18 Sep 2009 15:57:01 -0400
+Message-Id: <200909181949.n8IJnT0D019100@imap1.linux-foundation.org>
+Subject: [patch 10/18] kbuild: rebuild fix for Makefile.modbuiltin
 From: akpm@linux-foundation.org
-Date: Fri, 18 Sep 2009 12:49:37 -0700
+Date: Fri, 18 Sep 2009 12:49:29 -0700
 MIME-Version: 1.0
 Content-Type: text/plain; charset=ANSI_X3.4-1968
 Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: sam@ravnborg.org
-Cc: linux-kbuild@vger.kernel.org, akpm@linux-foundation.org, andi@firstfloor.org, ak@linux.intel.com
+Cc: linux-kbuild@vger.kernel.org, akpm@linux-foundation.org, JBeulich@novell.com, mmarek@suse.cz
 
-From: Andi Kleen <andi@firstfloor.org>
+From: Jan Beulich <JBeulich@novell.com>
 
-When this script fails the build should fail too. Otherwise there
-are mysterious build failures later.
+This patch addresses an issue with rebuilds failing to re-generate
+modules.builtin files after altering config options.
 
-Signed-off-by: Andi Kleen <ak@linux.intel.com>
+Signed-off-by: Jan Beulich <JBeulich@novell.com>
+Signed-off-by: Michal Marek <mmarek@suse.cz>
 Cc: Sam Ravnborg <sam@ravnborg.org>
 Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
 ---
 
- scripts/Makefile.build |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ scripts/Makefile.modbuiltin |    6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff -puN scripts/Makefile.build~kbuild-fail-build-if-recordmcountpl-fails scripts/Makefile.build
---- a/scripts/Makefile.build~kbuild-fail-build-if-recordmcountpl-fails
-+++ a/scripts/Makefile.build
-@@ -206,7 +206,7 @@ cmd_modversions =							\
- endif
+diff -puN scripts/Makefile.modbuiltin~kbuild-rebuild-fix-for-makefilemodbuiltin scripts/Makefile.modbuiltin
+--- a/scripts/Makefile.modbuiltin~kbuild-rebuild-fix-for-makefilemodbuiltin
++++ a/scripts/Makefile.modbuiltin
+@@ -31,9 +31,13 @@ modbuiltin-cmds =						\
+ 	for m in $(modbuiltin-mods); do echo kernel/$$m; done;	\
+ 	cat /dev/null $(modbuiltin-subdirs);
  
- ifdef CONFIG_FTRACE_MCOUNT_RECORD
--cmd_record_mcount = perl $(srctree)/scripts/recordmcount.pl "$(ARCH)" \
-+cmd_record_mcount = set -e ; perl $(srctree)/scripts/recordmcount.pl "$(ARCH)" \
- 	"$(if $(CONFIG_64BIT),64,32)" \
- 	"$(OBJDUMP)" "$(OBJCOPY)" "$(CC)" "$(LD)" "$(NM)" "$(RM)" "$(MV)" \
- 	"$(if $(part-of-module),1,0)" "$(@)";
+-$(modbuiltin-target): $(subdir-ym)
++$(modbuiltin-target): $(subdir-ym) FORCE
+ 	$(Q)($(modbuiltin-cmds)) > $@
+ 
++PHONY += FORCE
++
++FORCE:
++
+ # Descending
+ # ---------------------------------------------------------------------------
+ 
 _
