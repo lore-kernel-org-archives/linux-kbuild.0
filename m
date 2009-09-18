@@ -1,60 +1,59 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp1.linux-foundation.org ([140.211.169.13]:50027 "EHLO
+Received: from smtp1.linux-foundation.org ([140.211.169.13]:60076 "EHLO
 	smtp1.linux-foundation.org" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1754898AbZIRT6E (ORCPT
+	by vger.kernel.org with ESMTP id S1756302AbZIRT6h (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 18 Sep 2009 15:58:04 -0400
-Message-Id: <200909181949.n8IJnXcc019227@imap1.linux-foundation.org>
-Subject: [patch 13/18] gconfig: disable "typeahead find" search in treeviews
+	Fri, 18 Sep 2009 15:58:37 -0400
+Message-Id: <200909181949.n8IJnWDC019172@imap1.linux-foundation.org>
+Subject: [patch 12/18] kbuild: fix cc1 options check to ensure we do not use -fPIC when compiling
 From: akpm@linux-foundation.org
-Date: Fri, 18 Sep 2009 12:49:33 -0700
+Date: Fri, 18 Sep 2009 12:49:31 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=ANSI_X3.4-1968
 Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: sam@ravnborg.org
-Cc: linux-kbuild@vger.kernel.org, akpm@linux-foundation.org, flameeyes@gmail.com, zippel@linux-m68k.org
+Cc: linux-kbuild@vger.kernel.org, akpm@linux-foundation.org, anarchy@gentoo.org, hpa@zytor.com, johansson_fredric@hotmail.com, zorry@ume.nu
 
-From: Diego Elio 'Flameeyes' Pettenò  <flameeyes@gmail.com>
+From: "Jory A. Pratt" <anarchy@gentoo.org>
 
-When typeahead find is enabled, using 'y', 'n' and 'm' to change the status
-of the configuration items will also start up the search system, making you
-jump around the configuration.
+The arch/*/boot/Makefile use cc-options to check for GCC command options
+and cc-options use the hardened specs when checking for GCC command
+options.  When -fPIE is pass to cc1 it can't use -ffreestanding or
+-fno-toplevel-reorder.  Then it fail to build stuff with -ffreestanding
+and -fno-toplevel-reorder.
 
-Disabling the enable_search property does not mean that search is not
-possible, it only disables the typeahead; to execute a search in the
-treeview, you can just call it up explicitly (i.e.: on most systems that
-will be Ctrl-f).
+Thanks to Fredric Johansson for finding the main problem behind a failed
+build using a hardened toolchain.
 
-Signed-off-by: Diego Elio 'Flameeyes' Pettenò  <flameeyes@gmail.com>
-Cc: Roman Zippel <zippel@linux-m68k.org>
+Signed-off-by: Magnus Granberg <zorry@ume.nu>
+Signed-off-by: Jory A. Pratt <anarchy@gentoo.org>
+Cc: Fredric Johansson <johansson_fredric@hotmail.com> 
+Cc: "H. Peter Anvin" <hpa@zytor.com>
 Cc: Sam Ravnborg <sam@ravnborg.org>
 Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
 ---
 
- scripts/kconfig/gconf.glade |    4 ++--
+ scripts/Kbuild.include |    4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff -puN scripts/kconfig/gconf.glade~gconfig-disable-typeahead-find-search-in-treeviews scripts/kconfig/gconf.glade
---- a/scripts/kconfig/gconf.glade~gconfig-disable-typeahead-find-search-in-treeviews
-+++ a/scripts/kconfig/gconf.glade
-@@ -547,7 +547,7 @@
- 		  <property name="headers_visible">True</property>
- 		  <property name="rules_hint">False</property>
- 		  <property name="reorderable">False</property>
--		  <property name="enable_search">True</property>
-+		  <property name="enable_search">False</property>
- 		  <signal name="cursor_changed" handler="on_treeview2_cursor_changed" last_modification_time="Sun, 12 Jan 2003 15:58:22 GMT"/>
- 		  <signal name="button_press_event" handler="on_treeview1_button_press_event" last_modification_time="Sun, 12 Jan 2003 16:03:52 GMT"/>
- 		  <signal name="key_press_event" handler="on_treeview2_key_press_event" last_modification_time="Sun, 12 Jan 2003 16:11:44 GMT"/>
-@@ -582,7 +582,7 @@
- 		      <property name="headers_visible">True</property>
- 		      <property name="rules_hint">False</property>
- 		      <property name="reorderable">False</property>
--		      <property name="enable_search">True</property>
-+		      <property name="enable_search">False</property>
- 		      <signal name="cursor_changed" handler="on_treeview2_cursor_changed" last_modification_time="Sun, 12 Jan 2003 15:57:55 GMT"/>
- 		      <signal name="button_press_event" handler="on_treeview2_button_press_event" last_modification_time="Sun, 12 Jan 2003 15:57:58 GMT"/>
- 		      <signal name="key_press_event" handler="on_treeview2_key_press_event" last_modification_time="Sun, 12 Jan 2003 15:58:01 GMT"/>
+diff -puN scripts/Kbuild.include~kbuild-fix-cc1-options-check-to-ensure-we-do-not-use-fpic-when-compiling scripts/Kbuild.include
+--- a/scripts/Kbuild.include~kbuild-fix-cc1-options-check-to-ensure-we-do-not-use-fpic-when-compiling
++++ a/scripts/Kbuild.include
+@@ -105,12 +105,12 @@ as-instr = $(call try-run,\
+ # Usage: cflags-y += $(call cc-option,-march=winchip-c6,-march=i586)
+ 
+ cc-option = $(call try-run,\
+-	$(CC) $(KBUILD_CFLAGS) $(1) -c -xc /dev/null -o "$$TMP",$(1),$(2))
++	$(CC) $(KBUILD_CPPFLAGS) $(KBUILD_CFLAGS) $(1) -c -xc /dev/null -o "$$TMP",$(1),$(2))
+ 
+ # cc-option-yn
+ # Usage: flag := $(call cc-option-yn,-march=winchip-c6)
+ cc-option-yn = $(call try-run,\
+-	$(CC) $(KBUILD_CFLAGS) $(1) -c -xc /dev/null -o "$$TMP",y,n)
++	$(CC) $(KBUILD_CPPFLAGS) $(KBUILD_CFLAGS) $(1) -c -xc /dev/null -o "$$TMP",y,n)
+ 
+ # cc-option-align
+ # Prefix align with either -falign or -malign
 _
