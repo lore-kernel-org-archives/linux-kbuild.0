@@ -1,19 +1,19 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from moutng.kundenserver.de ([212.227.126.171]:50821 "EHLO
+Received: from moutng.kundenserver.de ([212.227.126.171]:60444 "EHLO
 	moutng.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756055AbZIRLPh (ORCPT
+	with ESMTP id S1756446AbZIRLPh (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
 	Fri, 18 Sep 2009 07:15:37 -0400
 From: Arnd Bergmann <arnd@arndb.de>
 Subject: Re: [patch] Makefile: can't build modules outside the kernel tree if it was built using O=
-Date: Fri, 18 Sep 2009 13:15:32 +0200
+Date: Fri, 18 Sep 2009 11:28:55 +0200
 References: <830a8fa70909161930r518a9644ja954ced2ae5814b4@mail.gmail.com> <200909171345.30988.arnd@arndb.de> <830a8fa70909171449s597931a2t51f37be6378ddef7@mail.gmail.com>
 In-Reply-To: <830a8fa70909171449s597931a2t51f37be6378ddef7@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: Text/Plain;
   charset="iso-8859-1"
 Content-Transfer-Encoding: 7bit
-Message-Id: <200909181315.32976.arnd@arndb.de>
+Message-Id: <200909181128.56303.arnd@arndb.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Caveh Jalali <ecaveh@gmail.com>
@@ -44,3 +44,4 @@ break? It should probably give a warning that includes a http URL
 holding a description of what to do.
 
 	Arnd <><
+
