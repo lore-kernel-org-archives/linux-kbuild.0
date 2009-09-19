@@ -1,48 +1,37 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from [195.41.46.236] ([195.41.46.236]:37143 "EHLO pfepb.post.tele.dk"
-	rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with ESMTP
-	id S1755211AbZISJGQ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 19 Sep 2009 05:06:16 -0400
-Date: Sat, 19 Sep 2009 11:06:14 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [patch] Makefile: can't build modules outside the kernel tree
-	if it was built using O=
-Message-ID: <20090919090614.GC25877@merkur.ravnborg.org>
-References: <830a8fa70909161930r518a9644ja954ced2ae5814b4@mail.gmail.com>
+Received: from mx1.redhat.com ([209.132.183.28]:59257 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754305AbZISMUI (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 19 Sep 2009 08:20:08 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <830a8fa70909161930r518a9644ja954ced2ae5814b4@mail.gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+From: Roland McGrath <roland@redhat.com>
+Subject: Re: [patch 11/18] kconfig CROSS_COMPILE option
+In-Reply-To: Sam Ravnborg's message of  Saturday, 19 September 2009 11:02:41 +0200 <20090919090241.GA25877@merkur.ravnborg.org>
+References: <200909181949.n8IJnVSB019127@imap1.linux-foundation.org>
+	<20090919090241.GA25877@merkur.ravnborg.org>
+Message-Id: <20090919121950.A599F2728@magilla.sf.frob.com>
+Date: Sat, 19 Sep 2009 05:19:50 -0700 (PDT)
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Caveh Jalali <ecaveh@gmail.com>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: Pavel Machek <pavel@ucw.cz>, akpm@linux-foundation.org, linux-kbuild@vger.kernel.org
 
-On Wed, Sep 16, 2009 at 07:30:43PM -0700, Caveh Jalali wrote:
-> in 2.6.31, it is no longer possible to build kernel modules for some platforms
-> (the ones that need include2) outside the kernel src tree if the
-> src tree was built using O= to specify an alternate directory for the
-> build output.
-> 
-> i think this broke with the following commit:
-> 
-> commit b8b572e1015f81b4e748417be2629dfe51ab99f9
-> Author: Stephen Rothwell <sfr@canb.auug.org.au>
-> Date:   Fri Aug 1 15:20:30 2008 +1000
-> 
->    powerpc: Move include files to arch/powerpc/include/asm
-> 
-> 
-> when the platform specific include directories were shuffled around
-> without updating the
-> top level Makefile.  however, i think this FAIL is generic, and not
-> limited to powerpc.
-> here's a patch to the top level Makefile to teach it about the shuffled files:
+Cool.  I had done a hack locally to save ARCH in a different way, but
+had not gotten around to finishing it up to submit.  My tack was to
+write an include/config/kernel.arch file analogous to kernel.release,
+and then use that.  It was about the same as yours I guess, but without
+all the fancy sanity checks.  
 
-This is no good. Nothing outside the kernel should in any way rely
-on include2. And it will soon be gone anyway.
+One thing I'd thought to do in "finishing it up" was to write just the
+$ARCH string alone to kernel.arch (then needing a kernel.subarch too)
+rather than a makefile fragment.  My thinking is that any scripty things
+that would like to look at a given build dir (as in the installed
+/lib/modules/foo/build in kernel-devel packages) would like to extract
+the arch name as well as the kernel release string, and not necessarily
+do it by running make or parsing makeish assignment lines.
 
-So we will not try to workaround something that is broken.
 
-	Sam
+Thanks,
+Roland
