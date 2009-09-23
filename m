@@ -1,61 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from fifo99.com ([67.223.236.141]:43890 "EHLO fifo99.com"
+Received: from ozlabs.org ([203.10.76.45]:58336 "EHLO ozlabs.org"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751402AbZIVPzV (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 22 Sep 2009 11:55:21 -0400
-Subject: Re: [PATCH 1/4] module: extract __ExPORT_SYMBOL from module.h into
- mod_export.h
-From: Daniel Walker <dwalker@fifo99.com>
-In-Reply-To: <4AB8F238.3040105@tuffmail.co.uk>
-References: <1253626718-18887-1-git-send-email-alan-jenkins@tuffmail.co.uk>
-	 <1253626718-18887-2-git-send-email-alan-jenkins@tuffmail.co.uk>
-	 <1253634337.22454.3.camel@desktop>  <4AB8F238.3040105@tuffmail.co.uk>
-Content-Type: text/plain
-Date: Tue, 22 Sep 2009 08:55:26 -0700
-Message-Id: <1253634926.22454.4.camel@desktop>
-Mime-Version: 1.0
+	id S1752984AbZIWAcS (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 22 Sep 2009 20:32:18 -0400
+From: Rusty Russell <rusty@rustcorp.com.au>
+Subject: Re: module: Speed up symbol resolution during module loading
+Date: Wed, 23 Sep 2009 10:02:15 +0930
+References: <1253626112-18429-1-git-send-email-alan-jenkins@tuffmail.co.uk>
+In-Reply-To: <1253626112-18429-1-git-send-email-alan-jenkins@tuffmail.co.uk>
+MIME-Version: 1.0
+Content-Type: Text/Plain;
+  charset="iso-8859-15"
 Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+Message-Id: <200909231002.16759.rusty@rustcorp.com.au>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Alan Jenkins <alan-jenkins@tuffmail.co.uk>
-Cc: rusty@rustcorp.com.au, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-modules@vger.org
+Cc: lkml@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-modules@vger.org
 
-On Tue, 2009-09-22 at 16:50 +0100, Alan Jenkins wrote:
-> Daniel Walker wrote:
-> > On Tue, 2009-09-22 at 14:38 +0100, Alan Jenkins wrote:
-> >   
-> >> +
-> >> +struct kernel_symbol
-> >> +{
-> >> +       unsigned long value;
-> >> +       const char *name;
-> >> +};
-> >>     
-> >
-> > One relevant checkpatch error above,
-> >
-> > ERROR: open brace '{' following struct go on the same line
-> > #71: FILE: include/linux/mod_export.h:13:
-> > +struct kernel_symbol
-> > +{
-> >
-> > You have another similar one in patch 4 ,
-> >
-> > ERROR: else should follow close brace '}'
-> > #99: FILE: kernel/module.c:221:
-> > +               }
-> > +               else if (cmp < 0)
-> >
-> >
-> > Could you correct those?
-> >
-> > Daniel
-> >   
+On Tue, 22 Sep 2009 10:58:28 pm Alan Jenkins wrote:
+> The following series applies against v2.6.31. It sorts the tables of builtin
+> symbols, so the module loader can resolve them using a binary search.
 > 
-> Sure, thanks.  I'll hold off on resending though, in case there are any
-> more radical changes needed.
+> The kbuild changes to achieve this are less scary than I expected.  I'm
+> optimistic that they can be accepted without radical alteration :-).
+> 
+> Quoting from the last patch in this series:
+> 
+> "On my EeePC 701, coldplug is mainly cpu bound and takes 1.5 seconds
+> during boot. perf showed this change eliminated 20% of cpu cycles during
+> coldplug, saving 0.3 seconds of real time.
 
-Ok thanks..
+Hi Alan,
 
-Daniel
+   This seems useful, but wouldn't it be simpler to just sort at boot time?
+The same could be done for modules, possibly reducing code.
 
+Alternately, there's a standard way of hashing ELF symbols, but I'm not sure
+we can convince the linker to generate it for vmlinux (I haven't looked
+though).
+
+Thanks!
+Rusty.
