@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from BISCAYNE-ONE-STATION.MIT.EDU ([18.7.7.80]:47552 "EHLO
+Received: from BISCAYNE-ONE-STATION.MIT.EDU ([18.7.7.80]:47602 "EHLO
 	biscayne-one-station.mit.edu" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1752147AbZIWRee (ORCPT
+	by vger.kernel.org with ESMTP id S1752709AbZIWRej (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 23 Sep 2009 13:34:34 -0400
+	Wed, 23 Sep 2009 13:34:39 -0400
 From: Tim Abbott <tabbott@ksplice.com>
-Subject: [PATCH 2/2] module: use bsearch in find_symbol_in_kernel_section.
-Date: Wed, 23 Sep 2009 13:28:46 -0400
-Message-Id: <1253726926-5504-3-git-send-email-tabbott@ksplice.com>
+Subject: [PATCH 0/2] Use generic binary search function
+Date: Wed, 23 Sep 2009 13:28:44 -0400
+Message-Id: <1253726926-5504-1-git-send-email-tabbott@ksplice.com>
 In-Reply-To: <1253626718-18887-5-git-send-email-alan-jenkins@tuffmail.co.uk>
 References: <1253626718-18887-5-git-send-email-alan-jenkins@tuffmail.co.uk>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,69 +15,42 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: Alan Jenkins <alan-jenkins@tuffmail.co.uk>
 Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, rusty@rustcorp.com.au, linux-kbuild@vger.kernel.org, linux-modules@vger.kernel.org, Tim Abbott <tabbott@ksplice.com>
 
-Signed-off-by: Tim Abbott <tabbott@ksplice.com>
----
- kernel/module.c |   34 +++++++++++++++-------------------
- 1 files changed, 15 insertions(+), 19 deletions(-)
+> The builtin symbol tables are now sorted, so we can use a binary
+> search.
 
-diff --git a/kernel/module.c b/kernel/module.c
-index 9b19f23..25ff16b 100644
---- a/kernel/module.c
-+++ b/kernel/module.c
-@@ -55,6 +55,7 @@
- #include <linux/async.h>
- #include <linux/percpu.h>
- #include <linux/kmemleak.h>
-+#include <linux/bsearch.h>
- 
- #define CREATE_TRACE_POINTS
- #include <trace/events/module.h>
-@@ -209,31 +210,26 @@ struct symsearch {
- #define symversion(base, idx) ((base != NULL) ? ((base) + (idx)) : NULL)
- #endif
- 
--/* binary search on sorted symbols */
-+static int symbol_compare(const void *key, const void *elt)
-+{
-+	const char *str = key;
-+	const struct kernel_symbol *sym = elt;
-+	return strcmp(sym->name, str);
-+}
-+
- static bool find_symbol_in_kernel_section(const struct symsearch *syms,
- 					  const char *name,
- 					  unsigned int *symnum)
- {
--	int lo = 0, hi = syms->stop - syms->start - 1;
--	int mid, cmp;
--
--	while (lo <= hi) {
--		mid = (lo + hi) / 2;
--		cmp = strcmp(syms->start[mid].name, name);
--		if (cmp == 0) {
--			*symnum = mid;
--			return true;
--		}
--		else if (cmp < 0)
--			hi = mid - 1;
--		else
--			lo = mid + 1;
--	}
--
--	return false;
-+	const struct kernel_symbol *sym =
-+	    bsearch(name, syms->start, syms->stop - syms->start,
-+		    sizeof(*syms->start), symbol_compare);
-+	if (sym == NULL)
-+		return false;
-+	*symnum = sym - syms->start;
-+	return true;
- }
- 
--
- static bool find_symbol_in_kernel(const char *name,
- 				  struct symsearch *sym,
- 				  unsigned int *symnum)
--- 
-1.6.3.3
+Hi Alan,
+
+There a large number hand-coded binary searches in the kernel (run
+"git grep search | grep binary" to find many of them).  Since getting
+binary searches right is difficult, I've been meaning to submit a
+patch adding a lib/bsearch.c for some time now, so that we only have
+to get binary search right in one place.
+
+This patch series contains a generic binary search implementation as
+well as something converting your module.c patch to use it.  I haven't
+had a chance to boot-test yet, but this should give you a sense of
+what this is going to look like.  To me, you take some somewhat
+complex code and replace it with some very straightforward code.
+
+This generic binary search implementation comes from Ksplice.  It has
+the same basic API as the C library bsearch() function.  Ksplice uses
+it in half a dozen places with 4 different comparison functions, and I
+think our code is substantially cleaner because of this.
+
+I don't claim that this is a perfect implementation of binary search,
+though it is reasonably well tested.  My theory is that it is about as
+good as all the hand-coded copies all over the kernel, and we can
+optimize it to perfection later.
+
+Tim Abbott (2):
+  lib: Add generic binary search function to the kernel.
+  module: use bsearch in find_symbol_in_kernel_section.
+
+ include/linux/bsearch.h |    9 ++++++++
+ kernel/module.c         |   34 +++++++++++++----------------
+ lib/Makefile            |    2 +-
+ lib/bsearch.c           |   53 +++++++++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 78 insertions(+), 20 deletions(-)
+ create mode 100644 include/linux/bsearch.h
+ create mode 100644 lib/bsearch.c
 
