@@ -1,52 +1,70 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from atrey.karlin.mff.cuni.cz ([195.113.26.193]:39383 "EHLO
-	atrey.karlin.mff.cuni.cz" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754192AbZIWHRH (ORCPT
+Received: from mail-ew0-f211.google.com ([209.85.219.211]:50503 "EHLO
+	mail-ew0-f211.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751828AbZIWQwP (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 23 Sep 2009 03:17:07 -0400
-Date: Wed, 23 Sep 2009 09:16:41 +0200
-From: Pavel Machek <pavel@ucw.cz>
-Subject: Re: [patch 11/18] kconfig CROSS_COMPILE option
-Message-ID: <20090923071641.GA8565@elf.ucw.cz>
-References: <200909181949.n8IJnVSB019127@imap1.linux-foundation.org> <20090919090241.GA25877@merkur.ravnborg.org> <20090919121950.A599F2728@magilla.sf.frob.com> <20090919131316.GA26044@merkur.ravnborg.org> <20090919234823.12E5E13BA3@magilla.sf.frob.com> <20090920103108.GA26667@merkur.ravnborg.org>
+	Wed, 23 Sep 2009 12:52:15 -0400
+Message-ID: <4ABA523F.7000601@tuffmail.co.uk>
+Date: Wed, 23 Sep 2009 17:52:15 +0100
+From: Alan Jenkins <alan-jenkins@tuffmail.co.uk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20090920103108.GA26667@merkur.ravnborg.org>
+Subject: Re: module: Speed up symbol resolution during module loading
+References: <1253626112-18429-1-git-send-email-alan-jenkins@tuffmail.co.uk> <200909231002.16759.rusty@rustcorp.com.au>
+In-Reply-To: <200909231002.16759.rusty@rustcorp.com.au>
+Content-Type: text/plain; charset=ISO-8859-15
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: Roland McGrath <roland@redhat.com>, akpm@linux-foundation.org, linux-kbuild@vger.kernel.org
+To: Rusty Russell <rusty@rustcorp.com.au>
+Cc: linux-kernel <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org, linux-modules@vger.org
 
-Hi!
+[CC to lkml fixed :-/]
 
-> > > Another approach would be to ask kbuild for
-> > > this information so we do not expose various filenames to the
-> > > outer world.
-> > 
-> > For shell scripts and makefiles, running a command like make and retrieving
-> > its output via pipe is de rigueur.  But for some other programs it might be
-> > substantially less hassle to just read plain files.  That's what I was
-> > thinking, anyway.  (I only really think that $ARCH is something that anyone
-> > would want to fetch before they'd run make anyway, and I guess $SUBARCH in
-> > the case of ARCH=um, but not $CROSS_COMPILE.)
-> > 
-> > > This is analogous to the way we ask for
-> > > kernelrelease and kernelversion these days.
-> > 
-> > Except that include/config/kernel.release is there for all to see (when
-> > referring to /lib/modules/.../build directory, e.g.), so perhaps some
-> > people are in fact using that.
-> 
-> So when I move that file to include/generated I will break users script silently - sigh.
-> 
-> Revised patch following your guidelines below.
-> Does this look better to you?
+Rusty Russell wrote:
+> On Tue, 22 Sep 2009 10:58:28 pm Alan Jenkins wrote:
+>   
+>> The following series applies against v2.6.31. It sorts the tables of builtin
+>> symbols, so the module loader can resolve them using a binary search.
+>>
+>> The kbuild changes to achieve this are less scary than I expected.  I'm
+>> optimistic that they can be accepted without radical alteration :-).
+>>
+>> Quoting from the last patch in this series:
+>>
+>> "On my EeePC 701, coldplug is mainly cpu bound and takes 1.5 seconds
+>> during boot. perf showed this change eliminated 20% of cpu cycles during
+>> coldplug, saving 0.3 seconds of real time.
+>>     
+>
+> Hi Alan,
+>
+>    This seems useful, but wouldn't it be simpler to just sort at boot time?
+> The same could be done for modules, possibly reducing code.
+>
+> Alternately, there's a standard way of hashing ELF symbols, but I'm not sure
+> we can convince the linker to generate it for vmlinux (I haven't looked
+> though).
+>
+> Thanks!
+> Rusty.
+>   
 
-Well.. having that option in .config, so it can be easily transported
-between trees (as proposed originally) would be even nicer, but I
-guess this is better than nothing.
-									Pavel
--- 
-(english) http://www.livejournal.com/~pavelmachek
-(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blog.html
+I'm concerned that people would object to the extra overhead at boot
+time.  I've hacked up a prototype to sort at boot time and it takes 7ms
+on the same hardware.  That's just under than the average time saved
+loading one of my modules.  But the comparison is dodgy because it
+doesn't include side-effects (on cache) for the sort.  The break-even
+point will depend on the specific modules used.
+
+That 7ms will be pure overhead in some cases - i.e. if your config is
+"localyesconfig" (build in all currently used modules), but you keep
+modules enabled to allow some flexibility.  I'm not happy about that myself.
+
+Hash tables have a similar disadvantage.  They would add more
+unswappable pages, in order to optimise a function which is only
+significant at boot time.  Binary search already brings symbol
+resolution down from ~60% of modprobe's time to ~7%.  The nice thing
+about using sorted tables that they stay the same size.
+
+Regards
+Alan
