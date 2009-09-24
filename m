@@ -1,27 +1,62 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([18.85.46.34]:52252 "EHLO
-	bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752318AbZIWWAV (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 23 Sep 2009 18:00:21 -0400
-Date: Wed, 23 Sep 2009 18:00:22 -0400
-From: Christoph Hellwig <hch@infradead.org>
-Subject: Re: [PATCH 3/4] module: unexport each_symbol()
-Message-ID: <20090923220022.GB30818@infradead.org>
-References: <1253626718-18887-1-git-send-email-alan-jenkins@tuffmail.co.uk> <1253626718-18887-4-git-send-email-alan-jenkins@tuffmail.co.uk> <alpine.DEB.1.10.0909231112490.15822@dr-wily.mit.edu>
+Received: from ozlabs.org ([203.10.76.45]:58664 "EHLO ozlabs.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751125AbZIXAIv (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 23 Sep 2009 20:08:51 -0400
+From: Rusty Russell <rusty@rustcorp.com.au>
+Subject: Re: module: Speed up symbol resolution during module loading
+Date: Thu, 24 Sep 2009 09:38:53 +0930
+References: <1253626112-18429-1-git-send-email-alan-jenkins@tuffmail.co.uk> <200909231002.16759.rusty@rustcorp.com.au> <4ABA523F.7000601@tuffmail.co.uk>
+In-Reply-To: <4ABA523F.7000601@tuffmail.co.uk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: Text/Plain;
+  charset="iso-8859-15"
+Content-Transfer-Encoding: 7bit
 Content-Disposition: inline
-In-Reply-To: <alpine.DEB.1.10.0909231112490.15822@dr-wily.mit.edu>
+Message-Id: <200909240938.54063.rusty@rustcorp.com.au>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Tim Abbott <tabbott@ksplice.com>
-Cc: Alan Jenkins <alan-jenkins@tuffmail.co.uk>, rusty@rustcorp.com.au, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-modules@vger.org
+To: Alan Jenkins <alan-jenkins@tuffmail.co.uk>
+Cc: linux-kernel <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org, linux-modules@vger.org, Sam Ravnborg <sam@ravnborg.org>
 
-On Wed, Sep 23, 2009 at 01:29:43PM -0400, Tim Abbott wrote:
-> While Ksplice is not in-tree yet, Ksplice is a user of each_symbol (and in 
-> fact was the reason why each_symbol was originally exported).  Is it easy 
-> to modify your patch series so that you don't have to remove each_symbol?
+On Thu, 24 Sep 2009 02:22:15 am Alan Jenkins wrote:
+> [CC to lkml fixed :-/]
+> 
+> Rusty Russell wrote:
+> > On Tue, 22 Sep 2009 10:58:28 pm Alan Jenkins wrote:
+> >   
+> >> The following series applies against v2.6.31. It sorts the tables of builtin
+> >> symbols, so the module loader can resolve them using a binary search.
+> >>
+> >> The kbuild changes to achieve this are less scary than I expected.  I'm
+> >> optimistic that they can be accepted without radical alteration :-).
+> >>
+> >> Quoting from the last patch in this series:
+> >>
+> >> "On my EeePC 701, coldplug is mainly cpu bound and takes 1.5 seconds
+> >> during boot. perf showed this change eliminated 20% of cpu cycles during
+> >> coldplug, saving 0.3 seconds of real time.
+> >>     
+> >
+> > Hi Alan,
+> >
+> >    This seems useful, but wouldn't it be simpler to just sort at boot time?
+> > The same could be done for modules, possibly reducing code.
+> >
+> > Alternately, there's a standard way of hashing ELF symbols, but I'm not sure
+> > we can convince the linker to generate it for vmlinux (I haven't looked
+> > though).
+> >
+> > Thanks!
+> > Rusty.
+> >   
+> 
+> I'm concerned that people would object to the extra overhead at boot
+> time.  I've hacked up a prototype to sort at boot time and it takes 7ms
+> on the same hardware.
 
-We don't keep symbols for out of tree junk around.
+OK, that seems a lot to me.  Fair enough; if Sam acks the build parts, I'll
+put it in my tree.  A bit late for this merge window though.
 
+Thanks!
+Rusty.
