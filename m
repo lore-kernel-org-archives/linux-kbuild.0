@@ -1,308 +1,152 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor.suse.de ([195.135.220.2]:59073 "EHLO mx1.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752892AbZIYPOd (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 25 Sep 2009 11:14:33 -0400
-From: Michal Marek <mmarek@suse.cz>
-Subject: [PATCH] kbuild: generate modules.builtin
-Date: Fri, 25 Sep 2009 17:13:44 +0200
-Message-Id: <1253891624-5816-1-git-send-email-mmarek@suse.cz>
+Received: from [195.41.46.235] ([195.41.46.235]:57985 "EHLO pfepa.post.tele.dk"
+	rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with ESMTP
+	id S1750942AbZIYTHF (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 25 Sep 2009 15:07:05 -0400
+Date: Fri, 25 Sep 2009 21:07:02 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: [GIT] kbuild - 2nd batch
+Message-ID: <20090925190702.GA3275@merkur.ravnborg.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: Steven Rostedt <rostedt@goodmis.org>, akpm@linux-foundation.org, linux-kbuild@vger.kernel.org
+To: Linus Torvalds <torvalds@linux-foundation.org>, lkml <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-To make it easier for module-init-tools and scripts like mkinitrd to
-distinguish builtin and missing modules, install a modules.builtin file
-listing all builtin modules. This is done by generating an additional
-config file (tristate.conf) with tristate options set to uppercase 'Y'
-or 'M'. If we source that config file, the builtin modules appear in
-obj-Y.
+Hi Linus.
 
-Signed-off-by: Michal Marek <mmarek@suse.cz>
----
- .gitignore                       |    1 +
- Documentation/kbuild/kbuild.txt  |   14 +++++++++
- Documentation/kbuild/kconfig.txt |    5 +++
- Makefile                         |   17 ++++++++---
- scripts/Kbuild.include           |    6 ++++
- scripts/Makefile.modbuiltin      |   55 ++++++++++++++++++++++++++++++++++++++
- scripts/kconfig/confdata.c       |   21 ++++++++++++++-
- 7 files changed, 113 insertions(+), 6 deletions(-)
- create mode 100644 scripts/Makefile.modbuiltin
+Here comes the 2nd batch of kbuild updates.
+This pull request includes 10 commits that allows
+us to finally remove the include/asm symlink.
 
-diff --git a/.gitignore b/.gitignore
-index b93fb7e..5835867 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -22,6 +22,7 @@
- *.lst
- *.symtypes
- *.order
-+modules.builtin
- *.elf
- *.bin
- *.gz
-diff --git a/Documentation/kbuild/kbuild.txt b/Documentation/kbuild/kbuild.txt
-index bb3bf38..6f8c1ca 100644
---- a/Documentation/kbuild/kbuild.txt
-+++ b/Documentation/kbuild/kbuild.txt
-@@ -1,3 +1,17 @@
-+Output files
-+
-+modules.order
-+--------------------------------------------------
-+This file records the order in which modules appear in Makefiles. This
-+is used by modprobe to deterministically resolve aliases that match
-+multiple modules.
-+
-+modules.builtin
-+--------------------------------------------------
-+This file lists all modules that are built into the kernel. This is used
-+by modprobe to not fail when trying to load something builtin.
-+
-+
- Environment variables
- 
- KCPPFLAGS
-diff --git a/Documentation/kbuild/kconfig.txt b/Documentation/kbuild/kconfig.txt
-index 849b5e5..40f0797 100644
---- a/Documentation/kbuild/kconfig.txt
-+++ b/Documentation/kbuild/kconfig.txt
-@@ -103,6 +103,11 @@ KCONFIG_AUTOCONFIG
- This environment variable can be set to specify the path & name of the
- "auto.conf" file.  Its default value is "include/config/auto.conf".
- 
-+KCONFIG_TRISTATE
-+--------------------------------------------------
-+This environment variable can be set to specify the path & name of the
-+"tristate.conf" file.  Its default value is "include/config/tristate.conf".
-+
- KCONFIG_AUTOHEADER
- --------------------------------------------------
- This environment variable can be set to specify the path & name of the
-diff --git a/Makefile b/Makefile
-index f908acc..2e7d1cc 100644
---- a/Makefile
-+++ b/Makefile
-@@ -506,7 +506,7 @@ ifeq ($(KBUILD_EXTMOD),)
- # Carefully list dependencies so we do not try to build scripts twice
- # in parallel
- PHONY += scripts
--scripts: scripts_basic include/config/auto.conf
-+scripts: scripts_basic include/config/auto.conf include/config/tristate.conf
- 	$(Q)$(MAKE) $(build)=$(@)
- 
- # Objects we will link into vmlinux / subdirs we need to visit
-@@ -533,7 +533,7 @@ $(KCONFIG_CONFIG) include/config/auto.conf.cmd: ;
- # with it and forgot to run make oldconfig.
- # if auto.conf.cmd is missing then we are probably in a cleaned tree so
- # we execute the config step to be sure to catch updated Kconfig files
--include/config/auto.conf: $(KCONFIG_CONFIG) include/config/auto.conf.cmd
-+include/config/%.conf: $(KCONFIG_CONFIG) include/config/auto.conf.cmd
- 	$(Q)$(MAKE) -f $(srctree)/Makefile silentoldconfig
- else
- # external modules needs include/linux/autoconf.h and include/config/auto.conf
-@@ -918,6 +918,9 @@ $(sort $(vmlinux-init) $(vmlinux-main)) $(vmlinux-lds): $(vmlinux-dirs) ;
- PHONY += $(vmlinux-dirs)
- $(vmlinux-dirs): prepare scripts
- 	$(Q)$(MAKE) $(build)=$@
-+ifdef CONFIG_MODULES
-+	$(Q)$(MAKE) $(modbuiltin)=$@
-+endif
- 
- # Build the kernel release string
- #
-@@ -1168,6 +1171,7 @@ all: modules
- PHONY += modules
- modules: $(vmlinux-dirs) $(if $(KBUILD_BUILTIN),vmlinux)
- 	$(Q)$(AWK) '!x[$$0]++' $(vmlinux-dirs:%=$(objtree)/%/modules.order) > $(objtree)/modules.order
-+	$(Q)$(AWK) '!x[$$0]++' $(vmlinux-dirs:%=$(objtree)/%/modules.builtin) > $(objtree)/modules.builtin
- 	@$(kecho) '  Building modules, stage 2.';
- 	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.modpost
- 	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.fwinst obj=firmware __fw_modbuild
-@@ -1197,6 +1201,7 @@ _modinst_:
- 		ln -s $(objtree) $(MODLIB)/build ; \
- 	fi
- 	@cp -f $(objtree)/modules.order $(MODLIB)/
-+	@cp -f $(objtree)/modules.builtin $(MODLIB)/
- 	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.modinst
- 
- # This depmod is only for convenience to give the initial
-@@ -1259,8 +1264,9 @@ clean: archclean $(clean-dirs)
- 		\( -name '*.[oas]' -o -name '*.ko' -o -name '.*.cmd' \
- 		-o -name '.*.d' -o -name '.*.tmp' -o -name '*.mod.c' \
- 		-o -name '*.symtypes' -o -name 'modules.order' \
--		-o -name 'Module.markers' -o -name '.tmp_*.o.*' \
--		-o -name '*.gcno' \) -type f -print | xargs rm -f
-+		-o -name 'modules.builtin' -o -name 'Module.markers' \
-+		-o -name '.tmp_*.o.*' -o -name '*.gcno' \) \
-+		-type f -print | xargs rm -f
- 
- # mrproper - Delete all generated files, including .config
- #
-@@ -1458,7 +1464,8 @@ $(clean-dirs):
- clean:	rm-dirs := $(MODVERDIR)
- clean: rm-files := $(KBUILD_EXTMOD)/Module.symvers \
-                    $(KBUILD_EXTMOD)/Module.markers \
--                   $(KBUILD_EXTMOD)/modules.order
-+                   $(KBUILD_EXTMOD)/modules.order \
-+                   $(KBUILD_EXTMOD)/modules.builtin
- clean: $(clean-dirs)
- 	$(call cmd,rmdirs)
- 	$(call cmd,rmfiles)
-diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
-index 4f9c190..dd641e1 100644
---- a/scripts/Kbuild.include
-+++ b/scripts/Kbuild.include
-@@ -149,6 +149,12 @@ ld-option = $(call try-run,\
- # $(Q)$(MAKE) $(build)=dir
- build := -f $(if $(KBUILD_SRC),$(srctree)/)scripts/Makefile.build obj
- 
-+###
-+# Shorthand for $(Q)$(MAKE) -f scripts/Makefile.modbuiltin obj=
-+# Usage:
-+# $(Q)$(MAKE) $(modbuiltin)=dir
-+modbuiltin := -f $(if $(KBUILD_SRC),$(srctree)/)scripts/Makefile.modbuiltin obj
-+
- # Prefix -I with $(srctree) if it is not an absolute path.
- # skip if -I has no parameter
- addtree = $(if $(patsubst -I%,%,$(1)), \
-diff --git a/scripts/Makefile.modbuiltin b/scripts/Makefile.modbuiltin
-new file mode 100644
-index 0000000..102a276
---- /dev/null
-+++ b/scripts/Makefile.modbuiltin
-@@ -0,0 +1,55 @@
-+# ==========================================================================
-+# Generating modules.builtin
-+# ==========================================================================
-+
-+src := $(obj)
-+
-+PHONY := __modbuiltin
-+__modbuiltin:
-+
-+-include include/config/auto.conf
-+# tristate.conf sets tristate variables to uppercase 'Y' or 'M'
-+# That way, we get the list of built-in modules in obj-Y
-+-include include/config/tristate.conf
-+
-+include scripts/Kbuild.include
-+
-+# The filename Kbuild has precedence over Makefile
-+kbuild-dir := $(if $(filter /%,$(src)),$(src),$(srctree)/$(src))
-+kbuild-file := $(if $(wildcard $(kbuild-dir)/Kbuild),$(kbuild-dir)/Kbuild,$(kbuild-dir)/Makefile)
-+include $(kbuild-file)
-+
-+include scripts/Makefile.lib
-+__subdir-Y     := $(patsubst %/,%,$(filter %/, $(obj-Y)))
-+subdir-Y       += $(__subdir-Y)
-+subdir-ym      := $(sort $(subdir-y) $(subdir-Y) $(subdir-m))
-+subdir-ym      := $(addprefix $(obj)/,$(subdir-ym))
-+obj-Y          := $(addprefix $(obj)/,$(obj-Y))
-+
-+modbuiltin-subdirs := $(patsubst %,%/modules.builtin, $(subdir-ym))
-+modbuiltin-mods    := $(filter %.ko, $(obj-Y:.o=.ko))
-+modbuiltin-target  := $(obj)/modules.builtin
-+
-+__modbuiltin: $(modbuiltin-target) $(subdir-ym)
-+	@:
-+
-+$(modbuiltin-target): $(subdir-ym) FORCE
-+	$(Q)(for m in $(modbuiltin-mods); do echo kernel/$$m; done;	\
-+	cat /dev/null $(modbuiltin-subdirs)) > $@
-+
-+PHONY += FORCE
-+
-+FORCE:
-+
-+# Descending
-+# ---------------------------------------------------------------------------
-+
-+PHONY += $(subdir-ym)
-+$(subdir-ym):
-+	$(Q)$(MAKE) $(modbuiltin)=$@
-+
-+
-+# Declare the contents of the .PHONY variable as phony.  We keep that
-+# information in a variable se we can use it in if_changed and friends.
-+
-+.PHONY: $(PHONY)
-diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
-index b55e72f..94721f2 100644
---- a/scripts/kconfig/confdata.c
-+++ b/scripts/kconfig/confdata.c
-@@ -677,7 +677,7 @@ int conf_write_autoconf(void)
- 	struct symbol *sym;
- 	const char *str;
- 	const char *name;
--	FILE *out, *out_h;
-+	FILE *out, *tristate, *out_h;
- 	time_t now;
- 	int i, l;
- 
-@@ -692,9 +692,16 @@ int conf_write_autoconf(void)
- 	if (!out)
- 		return 1;
- 
-+	tristate = fopen(".tmpconfig_tristate", "w");
-+	if (!tristate) {
-+		fclose(out);
-+		return 1;
-+	}
-+
- 	out_h = fopen(".tmpconfig.h", "w");
- 	if (!out_h) {
- 		fclose(out);
-+		fclose(tristate);
- 		return 1;
- 	}
- 
-@@ -707,6 +714,9 @@ int conf_write_autoconf(void)
- 		     "# %s"
- 		     "#\n",
- 		     sym_get_string_value(sym), ctime(&now));
-+	fprintf(tristate, "#\n"
-+	                  "# Automatically generated - do not edit\n"
-+	                  "\n");
- 	fprintf(out_h, "/*\n"
- 		       " * Automatically generated C config: don't edit\n"
- 		       " * Linux kernel version: %s\n"
-@@ -727,10 +737,13 @@ int conf_write_autoconf(void)
- 				break;
- 			case mod:
- 				fprintf(out, "CONFIG_%s=m\n", sym->name);
-+				fprintf(tristate, "CONFIG_%s=M\n", sym->name);
- 				fprintf(out_h, "#define CONFIG_%s_MODULE 1\n", sym->name);
- 				break;
- 			case yes:
- 				fprintf(out, "CONFIG_%s=y\n", sym->name);
-+				fprintf(tristate, "CONFIG_%s=%c\n", sym->name,
-+					sym->type == S_BOOLEAN ? 'y' : 'Y');
- 				fprintf(out_h, "#define CONFIG_%s 1\n", sym->name);
- 				break;
- 			}
-@@ -772,6 +785,7 @@ int conf_write_autoconf(void)
- 		}
- 	}
- 	fclose(out);
-+	fclose(tristate);
- 	fclose(out_h);
- 
- 	name = getenv("KCONFIG_AUTOHEADER");
-@@ -779,6 +793,11 @@ int conf_write_autoconf(void)
- 		name = "include/linux/autoconf.h";
- 	if (rename(".tmpconfig.h", name))
- 		return 1;
-+	name = getenv("KCONFIG_TRISTATE");
-+	if (!name)
-+		name = "include/config/tristate.conf";
-+	if (rename(".tmpconfig_tristate", name))
-+		return 1;
- 	name = conf_get_autoconfig_name();
- 	/*
- 	 * This must be the last step, kbuild has a dependency on auto.conf
--- 
-1.6.3.3
+This is achieved by saving generated files in include/generated.
 
+For the simple cases the reference was fixed up so we do:
+
+   #include <generated/foo.h>
+
+Gut asm-offsets.h is too widely used so here we have a small
+wrapper for all archs that include a single line:
+
+   #include <generated/asm-offsets.h>
+
+Build tested on the archs where I have working cross compilers.
+[alpha, arm, sparc]
+
+The patches has been on lkml for review but they have not
+been in -next.
+
+	Sam
+
+The following changes since commit 53cddfcc0e760d2b364878b6dadbd0c6d087cfae:
+  Linus Torvalds (1):
+        Merge git://git.kernel.org/.../lethal/sh-2.6
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/sam/kbuild-next.git master
+
+Sam Ravnborg (10):
+      kbuild: move bounds.h to include/generated
+      kbuild: move asm-offsets.h to include/generated
+      ia64: move nr-irqs.h to include/generated
+      sh: move machtypes.h to include/generated
+      arm: move mach-types to include/generated
+      kbuild: drop asm symlink
+      kbuild: move compile.h to include/generated
+      drop unneeded include of autoconf.h
+      kbuild: move autoconf.h to include/generated
+      kbuild: move utsrelease.h to include/generated
+
+ .gitignore                                      |    6 --
+ Documentation/kbuild/kconfig.txt                |    3 +-
+ Kbuild                                          |    4 +-
+ Makefile                                        |   68 ++++------------------
+ arch/alpha/boot/bootp.c                         |    2 +-
+ arch/alpha/boot/bootpz.c                        |    2 +-
+ arch/alpha/boot/main.c                          |    2 +-
+ arch/alpha/include/asm/asm-offsets.h            |    1 +
+ arch/arm/Makefile                               |   14 +----
+ arch/arm/include/asm/asm-offsets.h              |    1 +
+ arch/arm/include/asm/mach-types.h               |    1 +
+ arch/arm/tools/Makefile                         |    2 +-
+ arch/arm/tools/gen-mach-types                   |    2 +-
+ arch/avr32/include/asm/asm-offsets.h            |    1 +
+ arch/blackfin/include/asm/asm-offsets.h         |    1 +
+ arch/cris/arch-v32/kernel/head.S                |    1 -
+ arch/cris/include/asm/asm-offsets.h             |    1 +
+ arch/cris/kernel/asm-offsets.c                  |    1 -
+ arch/cris/kernel/vmlinux.lds.S                  |    1 -
+ arch/frv/include/asm/asm-offsets.h              |    1 +
+ arch/frv/kernel/setup.c                         |    2 +-
+ arch/h8300/include/asm/asm-offsets.h            |    1 +
+ arch/ia64/Makefile                              |    2 +-
+ arch/ia64/include/asm/asm-offsets.h             |    1 +
+ arch/ia64/include/asm/irq.h                     |    2 +-
+ arch/ia64/kernel/Makefile                       |    7 +--
+ arch/ia64/kvm/asm-offsets.c                     |    1 -
+ arch/m68k/include/asm/asm-offsets.h             |    1 +
+ arch/m68k/kernel/head.S                         |    2 +-
+ arch/microblaze/include/asm/asm-offsets.h       |    1 +
+ arch/mips/include/asm/asm-offsets.h             |    1 +
+ arch/mn10300/include/asm/asm-offsets.h          |    1 +
+ arch/parisc/include/asm/asm-offsets.h           |    1 +
+ arch/powerpc/include/asm/asm-offsets.h          |    1 +
+ arch/powerpc/platforms/52xx/efika.c             |    2 +-
+ arch/powerpc/platforms/amigaone/setup.c         |    2 +-
+ arch/powerpc/platforms/chrp/setup.c             |    2 +-
+ arch/powerpc/platforms/powermac/bootx_init.c    |    2 +-
+ arch/s390/include/asm/asm-offsets.h             |    1 +
+ arch/sh/Makefile                                |   10 +--
+ arch/sh/include/asm/.gitignore                  |    1 -
+ arch/sh/include/asm/asm-offsets.h               |    1 +
+ arch/sh/include/asm/machvec.h                   |    2 +-
+ arch/sh/tools/Makefile                          |    4 +-
+ arch/sh/tools/gen-mach-types                    |    2 +-
+ arch/sparc/include/asm/asm-offsets.h            |    1 +
+ arch/um/Makefile                                |    2 +-
+ arch/um/include/asm/asm-offsets.h               |    1 +
+ arch/x86/boot/header.S                          |    2 +-
+ arch/x86/boot/version.c                         |    4 +-
+ arch/x86/include/asm/asm-offsets.h              |    1 +
+ arch/xtensa/include/asm/asm-offsets.h           |    1 +
+ drivers/accessibility/braille/braille_console.c |    1 -
+ drivers/hid/hid-lg.h                            |    2 -
+ drivers/platform/x86/compal-laptop.c            |    1 -
+ drivers/staging/panel/panel.c                   |    2 +-
+ include/linux/mmdebug.h                         |    2 -
+ include/linux/mmzone.h                          |    2 +-
+ include/linux/page-flags.h                      |    2 +-
+ include/linux/vermagic.h                        |    2 +-
+ init/Makefile                                   |    6 +-
+ init/version.c                                  |    4 +-
+ kernel/bounds.c                                 |    2 +-
+ kernel/kexec.c                                  |    2 +-
+ kernel/trace/trace.c                            |    2 +-
+ scripts/basic/fixdep.c                          |   10 ++--
+ scripts/kconfig/confdata.c                      |    2 +-
+ scripts/mkcompile_h                             |    2 +-
+ 68 files changed, 85 insertions(+), 139 deletions(-)
+ create mode 100644 arch/alpha/include/asm/asm-offsets.h
+ create mode 100644 arch/arm/include/asm/asm-offsets.h
+ create mode 100644 arch/arm/include/asm/mach-types.h
+ create mode 100644 arch/avr32/include/asm/asm-offsets.h
+ create mode 100644 arch/blackfin/include/asm/asm-offsets.h
+ create mode 100644 arch/cris/include/asm/asm-offsets.h
+ create mode 100644 arch/frv/include/asm/asm-offsets.h
+ create mode 100644 arch/h8300/include/asm/asm-offsets.h
+ create mode 100644 arch/ia64/include/asm/asm-offsets.h
+ create mode 100644 arch/m68k/include/asm/asm-offsets.h
+ create mode 100644 arch/microblaze/include/asm/asm-offsets.h
+ create mode 100644 arch/mips/include/asm/asm-offsets.h
+ create mode 100644 arch/mn10300/include/asm/asm-offsets.h
+ create mode 100644 arch/parisc/include/asm/asm-offsets.h
+ create mode 100644 arch/powerpc/include/asm/asm-offsets.h
+ create mode 100644 arch/s390/include/asm/asm-offsets.h
+ delete mode 100644 arch/sh/include/asm/.gitignore
+ create mode 100644 arch/sh/include/asm/asm-offsets.h
+ create mode 100644 arch/sparc/include/asm/asm-offsets.h
+ create mode 100644 arch/um/include/asm/asm-offsets.h
+ create mode 100644 arch/x86/include/asm/asm-offsets.h
+ create mode 100644 arch/xtensa/include/asm/asm-offsets.h
