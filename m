@@ -1,44 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cpsmtpm-eml102.kpnxchange.com ([195.121.3.6]:54524 "EHLO
-	CPSMTPM-EML102.kpnxchange.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1750936AbZIYT51 (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 25 Sep 2009 15:57:27 -0400
-From: Frans Pop <elendil@planet.nl>
-Subject: Re: [GIT] kbuild - 2nd batch
-Date: Fri, 25 Sep 2009 21:57:27 +0200
-References: <20090925190702.GA3275@merkur.ravnborg.org>
-In-reply-To: <20090925190702.GA3275@merkur.ravnborg.org>
-MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="us-ascii"
+Received: from gate.crashing.org ([63.228.1.57]:49924 "EHLO gate.crashing.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752257AbZIYV5v (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 25 Sep 2009 17:57:51 -0400
+Subject: Re: [patch] powerpc: build modules outside the kernel tree fails,
+ if it was built using O=
+From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+In-Reply-To: <20090925194557.GA3323@merkur.ravnborg.org>
+References: <4ABB57CB.3000409@ru.mvista.com>
+	 <20090925194557.GA3323@merkur.ravnborg.org>
+Content-Type: text/plain
+Date: Sat, 26 Sep 2009 07:57:32 +1000
+Message-Id: <1253915852.7103.531.camel@pasglop>
+Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-Message-Id: <200909252157.29628.elendil@planet.nl>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Sam Ravnborg <sam@ravnborg.org>
-Cc: torvalds@linux-foundation.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+Cc: Yuri Frolov <yfrolov@ru.mvista.com>, rep.dot.nop@gmail.com, linuxppc-dev@lists.ozlabs.org, linux-kbuild@vger.kernel.org
 
-On Monday 21 September Sam Ravnborg wrote:
-> First (delayed) batch of kbuild stuff.
-[...]
-> And I guess a bit more if I find time to crawl through my mailbox.
+On Fri, 2009-09-25 at 21:45 +0200, Sam Ravnborg wrote:
+> On Thu, Sep 24, 2009 at 03:28:11PM +0400, Yuri Frolov wrote:
+> > Hello,
+> > 
+> > here is a corresponding bug: http://bugzilla.kernel.org/show_bug.cgi?id=11143
+> > This patch should correctly export crtsavres.o in order to make O= option working.
+> > Please, consider to apply.
+> 
+> Hi Yuri.
+> 
+> I like the way you do the extra link in Makefile.modpost.
+> But you need to redo some parts as per comments below.
 
-On Friday 25 September Sam Ravnborg wrote:
-> Here comes the 2nd batch of kbuild updates.
+> > 
+> > Fix linking modules against crtsavres.o
+> 
+> Please elaborate more on what this commit does.
 
-Hello Sam,
+It's a support file that needs to be linked against every module
+(aka libgcc like) and thus needs to be built before any module.
 
-It would be really great if you could take the time to go through your 
-inbox (assuming mails to l-kbuild also end up there).
+Cheers,
+Ben.
 
-You should find one patch from me in it (sent twice) that was intended 
-for .32, titled:
-   kbuild: fix the binrpm-pkg target to work with KBUILD_OUTPUT set
 
-No doubt there are also patches from others that were missed by Andrew and 
-were thus not included in your first pull via that circuitous route.
-
-TIA,
-FJP
