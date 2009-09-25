@@ -1,68 +1,308 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor.suse.de ([195.135.220.2]:50399 "EHLO mx1.suse.de"
+Received: from cantor.suse.de ([195.135.220.2]:59073 "EHLO mx1.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750926AbZIYLE3 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 25 Sep 2009 07:04:29 -0400
-Message-ID: <4ABCA3BF.8060107@suse.cz>
-Date: Fri, 25 Sep 2009 13:04:31 +0200
+	id S1752892AbZIYPOd (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 25 Sep 2009 11:14:33 -0400
 From: Michal Marek <mmarek@suse.cz>
-MIME-Version: 1.0
-Subject: Re: Feedback on "kbuild: generate modules.builtin"
-References: <200909181949.n8IJnT4R019097@imap1.linux-foundation.org> <20090920132856.GA26845@merkur.ravnborg.org>
-In-Reply-To: <20090920132856.GA26845@merkur.ravnborg.org>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+Subject: [PATCH] kbuild: generate modules.builtin
+Date: Fri, 25 Sep 2009 17:13:44 +0200
+Message-Id: <1253891624-5816-1-git-send-email-mmarek@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Sam Ravnborg <sam@ravnborg.org>
-Cc: akpm@linux-foundation.org, linux-kbuild@vger.kernel.org, JBeulich@novell.com, Steven Rostedt <rostedt@goodmis.org>, lkml <linux-kernel@vger.kernel.org>
+Cc: Steven Rostedt <rostedt@goodmis.org>, akpm@linux-foundation.org, linux-kbuild@vger.kernel.org
 
-Sam Ravnborg napsal(a):
-> On Fri, Sep 18, 2009 at 12:49:29PM -0700, akpm@linux-foundation.org wrote:
->> From: Michal Marek <mmarek@suse.cz>
->>
->> To make it easier for tools like mkinitrd to detect whether a needed
->> module is missing or whether it is compiled into the kernel, install a
->> modules.builtin file listing all modules built into the kernel.  This is
->> done by generating an alternate config file with all tristate =y options
->> set to =Y and reading the makefiles with this config included.  The built
->> in modules then appear in obj-Y.
-> 
-> Hi Michael.
-> 
-> [Added Steven on cc: as he had done some kconfig
->  hacking lately].
-> 
-> Got some time (finally) to look at this.
-> I understand the functionality and I have myself had the need
-> to see builtin modules.
+To make it easier for module-init-tools and scripts like mkinitrd to
+distinguish builtin and missing modules, install a modules.builtin file
+listing all builtin modules. This is done by generating an additional
+config file (tristate.conf) with tristate options set to uppercase 'Y'
+or 'M'. If we source that config file, the builtin modules appear in
+obj-Y.
 
-Hi Sam,
+Signed-off-by: Michal Marek <mmarek@suse.cz>
+---
+ .gitignore                       |    1 +
+ Documentation/kbuild/kbuild.txt  |   14 +++++++++
+ Documentation/kbuild/kconfig.txt |    5 +++
+ Makefile                         |   17 ++++++++---
+ scripts/Kbuild.include           |    6 ++++
+ scripts/Makefile.modbuiltin      |   55 ++++++++++++++++++++++++++++++++++++++
+ scripts/kconfig/confdata.c       |   21 ++++++++++++++-
+ 7 files changed, 113 insertions(+), 6 deletions(-)
+ create mode 100644 scripts/Makefile.modbuiltin
 
-many thanks for the review and for the patch, I basically agree with all
-what you said, except this one:
+diff --git a/.gitignore b/.gitignore
+index b93fb7e..5835867 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -22,6 +22,7 @@
+ *.lst
+ *.symtypes
+ *.order
++modules.builtin
+ *.elf
+ *.bin
+ *.gz
+diff --git a/Documentation/kbuild/kbuild.txt b/Documentation/kbuild/kbuild.txt
+index bb3bf38..6f8c1ca 100644
+--- a/Documentation/kbuild/kbuild.txt
++++ b/Documentation/kbuild/kbuild.txt
+@@ -1,3 +1,17 @@
++Output files
++
++modules.order
++--------------------------------------------------
++This file records the order in which modules appear in Makefiles. This
++is used by modprobe to deterministically resolve aliases that match
++multiple modules.
++
++modules.builtin
++--------------------------------------------------
++This file lists all modules that are built into the kernel. This is used
++by modprobe to not fail when trying to load something builtin.
++
++
+ Environment variables
+ 
+ KCPPFLAGS
+diff --git a/Documentation/kbuild/kconfig.txt b/Documentation/kbuild/kconfig.txt
+index 849b5e5..40f0797 100644
+--- a/Documentation/kbuild/kconfig.txt
++++ b/Documentation/kbuild/kconfig.txt
+@@ -103,6 +103,11 @@ KCONFIG_AUTOCONFIG
+ This environment variable can be set to specify the path & name of the
+ "auto.conf" file.  Its default value is "include/config/auto.conf".
+ 
++KCONFIG_TRISTATE
++--------------------------------------------------
++This environment variable can be set to specify the path & name of the
++"tristate.conf" file.  Its default value is "include/config/tristate.conf".
++
+ KCONFIG_AUTOHEADER
+ --------------------------------------------------
+ This environment variable can be set to specify the path & name of the
+diff --git a/Makefile b/Makefile
+index f908acc..2e7d1cc 100644
+--- a/Makefile
++++ b/Makefile
+@@ -506,7 +506,7 @@ ifeq ($(KBUILD_EXTMOD),)
+ # Carefully list dependencies so we do not try to build scripts twice
+ # in parallel
+ PHONY += scripts
+-scripts: scripts_basic include/config/auto.conf
++scripts: scripts_basic include/config/auto.conf include/config/tristate.conf
+ 	$(Q)$(MAKE) $(build)=$(@)
+ 
+ # Objects we will link into vmlinux / subdirs we need to visit
+@@ -533,7 +533,7 @@ $(KCONFIG_CONFIG) include/config/auto.conf.cmd: ;
+ # with it and forgot to run make oldconfig.
+ # if auto.conf.cmd is missing then we are probably in a cleaned tree so
+ # we execute the config step to be sure to catch updated Kconfig files
+-include/config/auto.conf: $(KCONFIG_CONFIG) include/config/auto.conf.cmd
++include/config/%.conf: $(KCONFIG_CONFIG) include/config/auto.conf.cmd
+ 	$(Q)$(MAKE) -f $(srctree)/Makefile silentoldconfig
+ else
+ # external modules needs include/linux/autoconf.h and include/config/auto.conf
+@@ -918,6 +918,9 @@ $(sort $(vmlinux-init) $(vmlinux-main)) $(vmlinux-lds): $(vmlinux-dirs) ;
+ PHONY += $(vmlinux-dirs)
+ $(vmlinux-dirs): prepare scripts
+ 	$(Q)$(MAKE) $(build)=$@
++ifdef CONFIG_MODULES
++	$(Q)$(MAKE) $(modbuiltin)=$@
++endif
+ 
+ # Build the kernel release string
+ #
+@@ -1168,6 +1171,7 @@ all: modules
+ PHONY += modules
+ modules: $(vmlinux-dirs) $(if $(KBUILD_BUILTIN),vmlinux)
+ 	$(Q)$(AWK) '!x[$$0]++' $(vmlinux-dirs:%=$(objtree)/%/modules.order) > $(objtree)/modules.order
++	$(Q)$(AWK) '!x[$$0]++' $(vmlinux-dirs:%=$(objtree)/%/modules.builtin) > $(objtree)/modules.builtin
+ 	@$(kecho) '  Building modules, stage 2.';
+ 	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.modpost
+ 	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.fwinst obj=firmware __fw_modbuild
+@@ -1197,6 +1201,7 @@ _modinst_:
+ 		ln -s $(objtree) $(MODLIB)/build ; \
+ 	fi
+ 	@cp -f $(objtree)/modules.order $(MODLIB)/
++	@cp -f $(objtree)/modules.builtin $(MODLIB)/
+ 	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.modinst
+ 
+ # This depmod is only for convenience to give the initial
+@@ -1259,8 +1264,9 @@ clean: archclean $(clean-dirs)
+ 		\( -name '*.[oas]' -o -name '*.ko' -o -name '.*.cmd' \
+ 		-o -name '.*.d' -o -name '.*.tmp' -o -name '*.mod.c' \
+ 		-o -name '*.symtypes' -o -name 'modules.order' \
+-		-o -name 'Module.markers' -o -name '.tmp_*.o.*' \
+-		-o -name '*.gcno' \) -type f -print | xargs rm -f
++		-o -name 'modules.builtin' -o -name 'Module.markers' \
++		-o -name '.tmp_*.o.*' -o -name '*.gcno' \) \
++		-type f -print | xargs rm -f
+ 
+ # mrproper - Delete all generated files, including .config
+ #
+@@ -1458,7 +1464,8 @@ $(clean-dirs):
+ clean:	rm-dirs := $(MODVERDIR)
+ clean: rm-files := $(KBUILD_EXTMOD)/Module.symvers \
+                    $(KBUILD_EXTMOD)/Module.markers \
+-                   $(KBUILD_EXTMOD)/modules.order
++                   $(KBUILD_EXTMOD)/modules.order \
++                   $(KBUILD_EXTMOD)/modules.builtin
+ clean: $(clean-dirs)
+ 	$(call cmd,rmdirs)
+ 	$(call cmd,rmfiles)
+diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
+index 4f9c190..dd641e1 100644
+--- a/scripts/Kbuild.include
++++ b/scripts/Kbuild.include
+@@ -149,6 +149,12 @@ ld-option = $(call try-run,\
+ # $(Q)$(MAKE) $(build)=dir
+ build := -f $(if $(KBUILD_SRC),$(srctree)/)scripts/Makefile.build obj
+ 
++###
++# Shorthand for $(Q)$(MAKE) -f scripts/Makefile.modbuiltin obj=
++# Usage:
++# $(Q)$(MAKE) $(modbuiltin)=dir
++modbuiltin := -f $(if $(KBUILD_SRC),$(srctree)/)scripts/Makefile.modbuiltin obj
++
+ # Prefix -I with $(srctree) if it is not an absolute path.
+ # skip if -I has no parameter
+ addtree = $(if $(patsubst -I%,%,$(1)), \
+diff --git a/scripts/Makefile.modbuiltin b/scripts/Makefile.modbuiltin
+new file mode 100644
+index 0000000..102a276
+--- /dev/null
++++ b/scripts/Makefile.modbuiltin
+@@ -0,0 +1,55 @@
++# ==========================================================================
++# Generating modules.builtin
++# ==========================================================================
++
++src := $(obj)
++
++PHONY := __modbuiltin
++__modbuiltin:
++
++-include include/config/auto.conf
++# tristate.conf sets tristate variables to uppercase 'Y' or 'M'
++# That way, we get the list of built-in modules in obj-Y
++-include include/config/tristate.conf
++
++include scripts/Kbuild.include
++
++# The filename Kbuild has precedence over Makefile
++kbuild-dir := $(if $(filter /%,$(src)),$(src),$(srctree)/$(src))
++kbuild-file := $(if $(wildcard $(kbuild-dir)/Kbuild),$(kbuild-dir)/Kbuild,$(kbuild-dir)/Makefile)
++include $(kbuild-file)
++
++include scripts/Makefile.lib
++__subdir-Y     := $(patsubst %/,%,$(filter %/, $(obj-Y)))
++subdir-Y       += $(__subdir-Y)
++subdir-ym      := $(sort $(subdir-y) $(subdir-Y) $(subdir-m))
++subdir-ym      := $(addprefix $(obj)/,$(subdir-ym))
++obj-Y          := $(addprefix $(obj)/,$(obj-Y))
++
++modbuiltin-subdirs := $(patsubst %,%/modules.builtin, $(subdir-ym))
++modbuiltin-mods    := $(filter %.ko, $(obj-Y:.o=.ko))
++modbuiltin-target  := $(obj)/modules.builtin
++
++__modbuiltin: $(modbuiltin-target) $(subdir-ym)
++	@:
++
++$(modbuiltin-target): $(subdir-ym) FORCE
++	$(Q)(for m in $(modbuiltin-mods); do echo kernel/$$m; done;	\
++	cat /dev/null $(modbuiltin-subdirs)) > $@
++
++PHONY += FORCE
++
++FORCE:
++
++# Descending
++# ---------------------------------------------------------------------------
++
++PHONY += $(subdir-ym)
++$(subdir-ym):
++	$(Q)$(MAKE) $(modbuiltin)=$@
++
++
++# Declare the contents of the .PHONY variable as phony.  We keep that
++# information in a variable se we can use it in if_changed and friends.
++
++.PHONY: $(PHONY)
+diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
+index b55e72f..94721f2 100644
+--- a/scripts/kconfig/confdata.c
++++ b/scripts/kconfig/confdata.c
+@@ -677,7 +677,7 @@ int conf_write_autoconf(void)
+ 	struct symbol *sym;
+ 	const char *str;
+ 	const char *name;
+-	FILE *out, *out_h;
++	FILE *out, *tristate, *out_h;
+ 	time_t now;
+ 	int i, l;
+ 
+@@ -692,9 +692,16 @@ int conf_write_autoconf(void)
+ 	if (!out)
+ 		return 1;
+ 
++	tristate = fopen(".tmpconfig_tristate", "w");
++	if (!tristate) {
++		fclose(out);
++		return 1;
++	}
++
+ 	out_h = fopen(".tmpconfig.h", "w");
+ 	if (!out_h) {
+ 		fclose(out);
++		fclose(tristate);
+ 		return 1;
+ 	}
+ 
+@@ -707,6 +714,9 @@ int conf_write_autoconf(void)
+ 		     "# %s"
+ 		     "#\n",
+ 		     sym_get_string_value(sym), ctime(&now));
++	fprintf(tristate, "#\n"
++	                  "# Automatically generated - do not edit\n"
++	                  "\n");
+ 	fprintf(out_h, "/*\n"
+ 		       " * Automatically generated C config: don't edit\n"
+ 		       " * Linux kernel version: %s\n"
+@@ -727,10 +737,13 @@ int conf_write_autoconf(void)
+ 				break;
+ 			case mod:
+ 				fprintf(out, "CONFIG_%s=m\n", sym->name);
++				fprintf(tristate, "CONFIG_%s=M\n", sym->name);
+ 				fprintf(out_h, "#define CONFIG_%s_MODULE 1\n", sym->name);
+ 				break;
+ 			case yes:
+ 				fprintf(out, "CONFIG_%s=y\n", sym->name);
++				fprintf(tristate, "CONFIG_%s=%c\n", sym->name,
++					sym->type == S_BOOLEAN ? 'y' : 'Y');
+ 				fprintf(out_h, "#define CONFIG_%s 1\n", sym->name);
+ 				break;
+ 			}
+@@ -772,6 +785,7 @@ int conf_write_autoconf(void)
+ 		}
+ 	}
+ 	fclose(out);
++	fclose(tristate);
+ 	fclose(out_h);
+ 
+ 	name = getenv("KCONFIG_AUTOHEADER");
+@@ -779,6 +793,11 @@ int conf_write_autoconf(void)
+ 		name = "include/linux/autoconf.h";
+ 	if (rename(".tmpconfig.h", name))
+ 		return 1;
++	name = getenv("KCONFIG_TRISTATE");
++	if (!name)
++		name = "include/config/tristate.conf";
++	if (rename(".tmpconfig_tristate", name))
++		return 1;
+ 	name = conf_get_autoconfig_name();
+ 	/*
+ 	 * This must be the last step, kbuild has a dependency on auto.conf
+-- 
+1.6.3.3
 
->> diff -puN Makefile~kbuild-generate-modulesbuiltin Makefile
->> --- a/Makefile~kbuild-generate-modulesbuiltin
->> +++ a/Makefile
->> @@ -871,6 +871,9 @@ $(sort $(vmlinux-init) $(vmlinux-main)) 
->>  PHONY += $(vmlinux-dirs)
->>  $(vmlinux-dirs): prepare scripts
->>  	$(Q)$(MAKE) $(build)=$@
->> +ifdef CONFIG_MODULES
->> +	$(Q)$(MAKE) $(modbuiltin)=$@
->> +endif
-> 
-> The other stuff we run after a completed build is the
-> target vmlinux: just above.
-> If there is no good reason not to do so please move
-> it so we keep all these post processing steps in one place.
-
-The reason is that I need to iterate over $(vmlinux-dirs) to descend
-into subdirectories like Makefile.build does. Putting the command here
-allows to just write $(MAKE) $(modbuiltin)=$@ and be done, in the
-vmlinux target I would have to do the iteration manually.
-
-I'll provide an updated patch soon.
-
-Michal
