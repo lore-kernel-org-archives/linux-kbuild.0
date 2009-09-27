@@ -1,63 +1,33 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from [195.41.46.236] ([195.41.46.236]:35695 "EHLO pfepb.post.tele.dk"
+Received: from [195.41.46.235] ([195.41.46.235]:47407 "EHLO pfepa.post.tele.dk"
 	rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with ESMTP
-	id S1753480AbZI0I3t (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 27 Sep 2009 04:29:49 -0400
-Date: Sun, 27 Sep 2009 10:29:29 +0200
+	id S1753336AbZI0IiT (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 27 Sep 2009 04:38:19 -0400
+Date: Sun, 27 Sep 2009 10:38:17 +0200
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH,resend] kbuild: fix the binrpm-pkg target to work with
-	KBUILD_OUTPUT set
-Message-ID: <20090927082929.GA10156@merkur.ravnborg.org>
-References: <200908252215.40950.elendil@planet.nl>
+Subject: Re: [PATCH] Makefile: Fix size_append issue for bzip2/lzma kernel
+Message-ID: <20090927083817.GA10177@merkur.ravnborg.org>
+References: <20090819173854.2250758f@dxy.sh.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <200908252215.40950.elendil@planet.nl>
+In-Reply-To: <20090819173854.2250758f@dxy.sh.intel.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Frans Pop <elendil@planet.nl>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Alek Du <alek.du@intel.com>
+Cc: Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org
 
-On Tue, Aug 25, 2009 at 10:15:39PM +0200, Frans Pop wrote:
-> The binrpm-pkg target (binary RPM only) fails when called with
-> KBUILD_OUTPUT set. This patch makes it work.
+On Wed, Aug 19, 2009 at 05:38:54PM +0800, Alek Du wrote:
+> From 6d755cbd7a136a4314f6976275aaa6c9d10bf3e4 Mon Sep 17 00:00:00 2001
+> From: Alek Du <alek.du@intel.com>
+> Date: Wed, 19 Aug 2009 17:18:39 +0800
+> Subject: [PATCH] Makefile: Fix size_append issue for bzip2/lzma kernel
 > 
-> For the rpm-pkg target (source + binary RPM), building with
-> KBUILD_OUTPUT set is not possible and also not needed as the
-> actual build is done in a temporary directory anyway, so check
-> that KBUILD_OUTPUT is not set in that case to avoid later errors.
+> The Makefile.lib will call "echo -ne" to append uncompressed kernel size to
+> bzip2/lzma kernel image. The "echo" here depends on the shell that /bin/sh pointing
+> to. On Ubuntu system, the /bin/sh is pointing to dash, which does not support
+> "echo -e" at all. Use /bin/echo instead of shell echo should always be safe.
 > 
-> Signed-off-by: Frans Pop <elendil@planet.nl>
+> Signed-off-by: Alek Du <alek.du@intel.com>
 
 Applied.
-
-> ---
-> 
-> I ran into this while trying if I could build an RPM kernel package on
-> my Debian notebook :-)
-> 
-> The patch has been tested by doing three builds:
-> - make -j4 rpm-pkg
-> - make -j4 binrpm-pkg
-> - KBUILD_OUTPUT=../builds/amd64 make -j4 binrpm-pkg
-> 
-> For all three the contents of the resulting binary RPM package was 
-> identical
-> (and looked correct); the source RPM package from the first build looked 
-> sane.
-> 
-> A 'KBUILD_OUTPUT=../builds/amd64 make -j4 rpm-pkg' fails as intended.
-> 
-> One open issue is that the following commands should IIUC be identical,
-> but the second one does not work:
-> - KBUILD_OUTPUT=../builds/amd64 make -j4 binrpm-pkg
-> - make -j4 O=../builds/amd64 binrpm-pkg
-> 
-> AFAICT the root Makefile is supposed to set KBUILD_OUTPUT based on O=, but
-> that is not visible when the lines within the binrpm-pkg target are 
-> executed.
-> My make foo was not strong enough to debug this. Sam, do you know?
-
-I did not look into this - there is too much other stuff pending.
-
-	Sam
