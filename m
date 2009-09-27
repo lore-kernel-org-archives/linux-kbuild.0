@@ -1,189 +1,63 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from e28smtp06.in.ibm.com ([59.145.155.6]:43988 "EHLO
-	e28smtp06.in.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751707AbZI0FoD (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 27 Sep 2009 01:44:03 -0400
-Date: Sun, 27 Sep 2009 11:13:36 +0530
-From: Kamalesh Babulal <kamalesh@linux.vnet.ibm.com>
-Subject: Re: [PATCH] linux-next: 20090926 - drop autoconf.h from DRBD driver
-Message-ID: <20090927054336.GB4300@linux.vnet.ibm.com>
-Reply-To: Kamalesh Babulal <kamalesh@linux.vnet.ibm.com>
-References: <20090926152800.a6568e53.sfr@canb.auug.org.au> <20090926173143.GA5041@linux.vnet.ibm.com> <20090926200839.GA5220@merkur.ravnborg.org>
+Received: from [195.41.46.236] ([195.41.46.236]:35695 "EHLO pfepb.post.tele.dk"
+	rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with ESMTP
+	id S1753480AbZI0I3t (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 27 Sep 2009 04:29:49 -0400
+Date: Sun, 27 Sep 2009 10:29:29 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: [PATCH,resend] kbuild: fix the binrpm-pkg target to work with
+	KBUILD_OUTPUT set
+Message-ID: <20090927082929.GA10156@merkur.ravnborg.org>
+References: <200908252215.40950.elendil@planet.nl>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20090926200839.GA5220@merkur.ravnborg.org>
+In-Reply-To: <200908252215.40950.elendil@planet.nl>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: linux-next@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org, sfr@canb.auug.org.au
+To: Frans Pop <elendil@planet.nl>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-* Sam Ravnborg <sam@ravnborg.org> [2009-09-26 22:08:39]:
+On Tue, Aug 25, 2009 at 10:15:39PM +0200, Frans Pop wrote:
+> The binrpm-pkg target (binary RPM only) fails when called with
+> KBUILD_OUTPUT set. This patch makes it work.
+> 
+> For the rpm-pkg target (source + binary RPM), building with
+> KBUILD_OUTPUT set is not possible and also not needed as the
+> actual build is done in a temporary directory anyway, so check
+> that KBUILD_OUTPUT is not set in that case to avoid later errors.
+> 
+> Signed-off-by: Frans Pop <elendil@planet.nl>
 
-> On Sat, Sep 26, 2009 at 11:01:43PM +0530, Kamalesh Babulal wrote:
-> > Hi Sam,
-> > 
-> > 	next-20090926 allyesconfig build breaks on powerpc,
-> > 
-> > drivers/block/drbd/drbd_proc.c:26:28: error: linux/autoconf.h: No such file or directory
-> > make[3]: *** [drivers/block/drbd/drbd_proc.o] Error 1
-> > 
-> > dropping autoconf.h from drbd_proc.c helps. The cleanup patch drops the
-> > unneeded include autoconf.h.
-> > 
-> > Signed-off-by: Kamalesh Babulal <kamalesh@linux.vnet.ibm.com>
-> 
-> I only checked upstream - so this is no big suprise.
-> As there is no need to explicitly include autoconf.h this
-> change should be included by the drdb folks even if the
-> stuff I have does not hit upstream.
-> 
-> Can I ask you to audit the rest of -next for similar issues.
-> A 'git grep "autoconf\.h"' should be a qucik way to find other
-> spots to fix up.
+Applied.
 
-Sorry for being lazy here. The cleanup patch already drops 
-unneeded autoconf.h from next-20090926. Thanks to stephen
-for greping through the files.
+> ---
+> 
+> I ran into this while trying if I could build an RPM kernel package on
+> my Debian notebook :-)
+> 
+> The patch has been tested by doing three builds:
+> - make -j4 rpm-pkg
+> - make -j4 binrpm-pkg
+> - KBUILD_OUTPUT=../builds/amd64 make -j4 binrpm-pkg
+> 
+> For all three the contents of the resulting binary RPM package was 
+> identical
+> (and looked correct); the source RPM package from the first build looked 
+> sane.
+> 
+> A 'KBUILD_OUTPUT=../builds/amd64 make -j4 rpm-pkg' fails as intended.
+> 
+> One open issue is that the following commands should IIUC be identical,
+> but the second one does not work:
+> - KBUILD_OUTPUT=../builds/amd64 make -j4 binrpm-pkg
+> - make -j4 O=../builds/amd64 binrpm-pkg
+> 
+> AFAICT the root Makefile is supposed to set KBUILD_OUTPUT based on O=, but
+> that is not visible when the lines within the binrpm-pkg target are 
+> executed.
+> My make foo was not strong enough to debug this. Sam, do you know?
 
-> 
-> Patch is:
-> 
-> Acked-by: Sam Ravnborg <sam@ravnborg.org>
-> 
-> 	Sam
-> 
-> > --
-> >  drivers/block/drbd/drbd_main.c     |    1 -
-> >  drivers/block/drbd/drbd_nl.c       |    1 -
-> >  drivers/block/drbd/drbd_proc.c     |    1 -
-> >  drivers/block/drbd/drbd_receiver.c |    1 -
-> >  drivers/block/drbd/drbd_req.c      |    1 -
-> >  drivers/block/drbd/drbd_req.h      |    1 -
-> >  drivers/block/drbd/drbd_worker.c   |    1 -
-> >  drivers/staging/cowloop/cowloop.c  |    4 ----
-> >  drivers/staging/iio/ring_sw.h      |    1 -
-> >  9 files changed, 0 insertions(+), 12 deletions(-)
-> > 
-> > diff --git a/drivers/block/drbd/drbd_main.c b/drivers/block/drbd/drbd_main.c
-> > index edf0b80..80273f2 100644
-> > --- a/drivers/block/drbd/drbd_main.c
-> > +++ b/drivers/block/drbd/drbd_main.c
-> > @@ -26,7 +26,6 @@
-> >  
-> >   */
-> >  
-> > -#include <linux/autoconf.h>
-> >  #include <linux/module.h>
-> >  #include <linux/version.h>
-> >  #include <linux/drbd.h>
-> > diff --git a/drivers/block/drbd/drbd_nl.c b/drivers/block/drbd/drbd_nl.c
-> > index 1927ace..cfde310 100644
-> > --- a/drivers/block/drbd/drbd_nl.c
-> > +++ b/drivers/block/drbd/drbd_nl.c
-> > @@ -23,7 +23,6 @@
-> >  
-> >   */
-> >  
-> > -#include <linux/autoconf.h>
-> >  #include <linux/module.h>
-> >  #include <linux/drbd.h>
-> >  #include <linux/in.h>
-> > diff --git a/drivers/block/drbd/drbd_proc.c b/drivers/block/drbd/drbd_proc.c
-> > index 98fcb74..bdd0b49 100644
-> > --- a/drivers/block/drbd/drbd_proc.c
-> > +++ b/drivers/block/drbd/drbd_proc.c
-> > @@ -23,7 +23,6 @@
-> >  
-> >   */
-> >  
-> > -#include <linux/autoconf.h>
-> >  #include <linux/module.h>
-> >  
-> >  #include <asm/uaccess.h>
-> > diff --git a/drivers/block/drbd/drbd_receiver.c b/drivers/block/drbd/drbd_receiver.c
-> > index 63686c4..2f81821 100644
-> > --- a/drivers/block/drbd/drbd_receiver.c
-> > +++ b/drivers/block/drbd/drbd_receiver.c
-> > @@ -23,7 +23,6 @@
-> >   */
-> >  
-> >  
-> > -#include <linux/autoconf.h>
-> >  #include <linux/module.h>
-> >  
-> >  #include <asm/uaccess.h>
-> > diff --git a/drivers/block/drbd/drbd_req.c b/drivers/block/drbd/drbd_req.c
-> > index 0656cf1..1aaa397 100644
-> > --- a/drivers/block/drbd/drbd_req.c
-> > +++ b/drivers/block/drbd/drbd_req.c
-> > @@ -23,7 +23,6 @@
-> >  
-> >   */
-> >  
-> > -#include <linux/autoconf.h>
-> >  #include <linux/module.h>
-> >  
-> >  #include <linux/slab.h>
-> > diff --git a/drivers/block/drbd/drbd_req.h b/drivers/block/drbd/drbd_req.h
-> > index d37ab57..f22c1bc 100644
-> > --- a/drivers/block/drbd/drbd_req.h
-> > +++ b/drivers/block/drbd/drbd_req.h
-> > @@ -25,7 +25,6 @@
-> >  #ifndef _DRBD_REQ_H
-> >  #define _DRBD_REQ_H
-> >  
-> > -#include <linux/autoconf.h>
-> >  #include <linux/module.h>
-> >  
-> >  #include <linux/slab.h>
-> > diff --git a/drivers/block/drbd/drbd_worker.c b/drivers/block/drbd/drbd_worker.c
-> > index 212e954..34a4b3e 100644
-> > --- a/drivers/block/drbd/drbd_worker.c
-> > +++ b/drivers/block/drbd/drbd_worker.c
-> > @@ -23,7 +23,6 @@
-> >  
-> >   */
-> >  
-> > -#include <linux/autoconf.h>
-> >  #include <linux/module.h>
-> >  #include <linux/version.h>
-> >  #include <linux/drbd.h>
-> > diff --git a/drivers/staging/cowloop/cowloop.c b/drivers/staging/cowloop/cowloop.c
-> > index a71c743..a21b9b4 100644
-> > --- a/drivers/staging/cowloop/cowloop.c
-> > +++ b/drivers/staging/cowloop/cowloop.c
-> > @@ -237,10 +237,6 @@ char revision[] = "$Revision: 3.1 $"; /* cowlo_init_module() has
-> >  #endif
-> >  
-> >  #include <linux/types.h>
-> > -#include <linux/autoconf.h>
-> > -#ifndef AUTOCONF_INCLUDED
-> > -#include <linux/config.h>
-> > -#endif
-> >  #include <linux/module.h>
-> >  #include <linux/version.h>
-> >  #include <linux/moduleparam.h>
-> > diff --git a/drivers/staging/iio/ring_sw.h b/drivers/staging/iio/ring_sw.h
-> > index ae70ee0..4b0de7c 100644
-> > --- a/drivers/staging/iio/ring_sw.h
-> > +++ b/drivers/staging/iio/ring_sw.h
-> > @@ -29,7 +29,6 @@
-> >   * driver requests - some may support multiple options */
-> >  
-> >  
-> > -#include <linux/autoconf.h>
-> >  #include "iio.h"
-> >  #include "ring_generic.h"
-> >  
-> > 			
-> > 			Kamalesh
-> > 
-> > 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-next" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-			
-			Kamalesh
+I did not look into this - there is too much other stuff pending.
+
+	Sam
