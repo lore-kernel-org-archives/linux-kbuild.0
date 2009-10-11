@@ -1,50 +1,52 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepa.post.tele.dk ([195.41.46.235]:52116 "EHLO
+Received: from pfepa.post.tele.dk ([195.41.46.235]:60491 "EHLO
 	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755229AbZJKK3V (ORCPT
+	with ESMTP id S1752038AbZJKV2e (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 11 Oct 2009 06:29:21 -0400
-Date: Sun, 11 Oct 2009 12:28:44 +0200
+	Sun, 11 Oct 2009 17:28:34 -0400
+Date: Sun, 11 Oct 2009 23:27:57 +0200
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: kbuild generating prefix-foo.o from foo.c
-Message-ID: <20091011102844.GA969@merkur.ravnborg.org>
-References: <f750ee70910082014h3e4b2be1lc98cf0df1b3583af@mail.gmail.com> <f750ee70910082015x46f0f351t2d4651e01ba74ac9@mail.gmail.com> <20091009042829.GA32078@merkur.ravnborg.org> <f750ee70910082237t81eea57y74d992e2da5af792@mail.gmail.com>
+Subject: Re: 32-rc1: "CROSS_COMPILE changed" message breaks compilation
+Message-ID: <20091011212757.GA2768@merkur.ravnborg.org>
+References: <20090928175605.GB28514@elf.ucw.cz> <20090928190841.GA12004@merkur.ravnborg.org> <20090928192536.GE28514@elf.ucw.cz>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <f750ee70910082237t81eea57y74d992e2da5af792@mail.gmail.com>
+In-Reply-To: <20090928192536.GE28514@elf.ucw.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: kartikeyan sadasivuni <s.kartikeyan@gmail.com>
-Cc: linux-kbuild@vger.kernel.org
+To: Pavel Machek <pavel@ucw.cz>
+Cc: kernel list <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org
 
-On Fri, Oct 09, 2009 at 11:07:59AM +0530, kartikeyan sadasivuni wrote:
-> hi,
+On Mon, Sep 28, 2009 at 09:25:36PM +0200, Pavel Machek wrote:
+> Hi!
 > 
-> >
-> > Is it an option for you to create a copy of said file?
+> > > After update to 2.6.32-rc1, I'm getting
+> > > 
+> > > "Makefile:197: *** CROSS_COMPILE changed from "ccache" to to "ccache ". Use "make mrproper" to fix it up. Stop.
+> > > 
+> > > Note that the message has typo in it ("to to")... What is worse, the
+> > > message triggers even when I try to run make mrproper. Ouch.
+> > 
+> > The massage is changed in kbuild-fixes.git - but it addresses only ARCH=
+> > 
+> > As a followup to your other mails:
+> > The reason to use "make mrproper" is that when ARCH or CROSS_COMPILE changes
+> > you have generally either decided to build for a new architecture or
+> > you have changed the way you build the kernel (new toolchain or whatever).
+> > So to clean up using "make mrproper" is perfectly justified.
+> > 
+> > The target group that uses CROSS_COMPILE to enable ccache are using
+> > CROSS_COMPILE is a way it is not designed for so they should expect that it
+> > is not a perfect match.
 > 
-> I could do this but just looking for a cleaner approach.
-> I have a working solution but looking for better ways.
-> I wanted to avoid using the line (as kbuild can change in future and
-> so c_flags var)
->  $(CC) $(c_flags) -c -o $@ $<
-> and call something Kbuild already has
-> but  with changed prerequisite/dependency.
+> What is the recommended way to run ccache, then?
+ccache is a frontend to gcc - so I would have expected
+you would use: 
 
-Did you read what I suggested at all?
-From your answer I think not.
+    make CC="ccache gcc"
 
-Please go re-read my answer and realize that it is _kbuild_
-that reates the copy of the file and thus things *just works*.
-
-kbuild (make) will see that foo.c is missing
-and create is using the rule I suggested:
-
-$(obj)/foo: $(src)/foo-prefix.c
-	cat $< > $@ || (rm $@ && false)
-
-So you do _not_ have to specify c_flags or anything like that
-to make it work.
+Or does ccache also benefit ld and as and the other that receive
+the $(CROSS_COMPILE) prefix?
 
 	Sam
