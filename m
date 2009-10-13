@@ -1,52 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from qw-out-2122.google.com ([74.125.92.24]:37979 "EHLO
-	qw-out-2122.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1760141AbZJMPL3 convert rfc822-to-8bit (ORCPT
+Received: from pfepb.post.tele.dk ([195.41.46.236]:34874 "EHLO
+	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754124AbZJMS7T (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 13 Oct 2009 11:11:29 -0400
-MIME-Version: 1.0
-In-Reply-To: <4AD2EBC6.1000505@msgid.tls.msk.ru>
-References: <20091011221818.GA2833@merkur.ravnborg.org>
-	 <4AD2EBC6.1000505@msgid.tls.msk.ru>
-Date: Tue, 13 Oct 2009 23:10:19 +0800
-Message-ID: <2375c9f90910130810w2d887dd2uea0f4bc88ac2d894@mail.gmail.com>
+	Tue, 13 Oct 2009 14:59:19 -0400
+Date: Tue, 13 Oct 2009 20:58:41 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
 Subject: Re: [GIT PULL] kbuild fixes
-From: =?UTF-8?Q?Am=C3=A9rico_Wang?= <xiyou.wangcong@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+Message-ID: <20091013185841.GC5249@merkur.ravnborg.org>
+References: <20091011221818.GA2833@merkur.ravnborg.org> <4AD2EBC6.1000505@msgid.tls.msk.ru>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4AD2EBC6.1000505@msgid.tls.msk.ru>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Michael Tokarev <mjt@tls.msk.ru>
-Cc: Sam Ravnborg <sam@ravnborg.org>, Linus Torvalds <torvalds@linux-foundation.org>, lkml <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, lkml <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-On Mon, Oct 12, 2009 at 4:41 PM, Michael Tokarev <mjt@tls.msk.ru> wrote:
+On Mon, Oct 12, 2009 at 12:41:42PM +0400, Michael Tokarev wrote:
 > Sam Ravnborg wrote:
->>
 >> Hi Linus.
 >>
 >> A few kbuild related fixes.
->
 > []
->>
 >> - Fix use of echo -ne. Is caused issues for ubuntu (IIRC) users
 >
 > As has been discussed previously (and Sam has been CC'ed), the fix
-> is still incorrect.  It replaces "echo -ne" with "/bin/echo -ne",
-> but neither of the two are guaranteed to support the necessary
-> arguments and necessary (hexadecimal) escape sequences.  What should
-> be used here is printf(1).  The trivial patch below (on top of these
-> kbuild changes) fixes this issue.
->
-> Thanks.
->
-> /mjt
->
-> Signed-Off-By: Michael Tokarev <mjt@tls.msk.ru>
->
+> is still incorrect.
 
-Sorry, I just saw this email.
+In the thread hpa asked for a patch at least twice.
+Only after I submitted -fixes to Linus it shows up.
 
-Hmm, printf(1) should be more portable than echo(1), I checked your patch,
-how about using 'printf "%b" ' instead?
+Bad timing.
 
-Thanks!
+And please - do not even think of asking me to do it.
+You guys are the one that see the issue, who know how to fix it,
+and knows how to check that the fix really works.
+
+In other words - provide a patch next time you are asked to do so.
+
+I'm off for much needed vacation rest of the week and
+may rememeber to handle the patch when I get back...
+
+	Sam
