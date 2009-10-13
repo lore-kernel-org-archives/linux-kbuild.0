@@ -1,50 +1,52 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-bw0-f210.google.com ([209.85.218.210]:33686 "EHLO
-	mail-bw0-f210.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757917AbZJLTQT (ORCPT
+Received: from qw-out-2122.google.com ([74.125.92.24]:37979 "EHLO
+	qw-out-2122.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1760141AbZJMPL3 convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 12 Oct 2009 15:16:19 -0400
+	Tue, 13 Oct 2009 11:11:29 -0400
 MIME-Version: 1.0
-In-Reply-To: <87pr8sfp7k.fsf@basil.nowhere.org>
-References: <1255357820-7122-1-git-send-email-nir.tzachar@gmail.com>
-	 <87pr8sfp7k.fsf@basil.nowhere.org>
-Date: Mon, 12 Oct 2009 21:15:42 +0200
-Message-ID: <9b2db90b0910121215s3f875e9ax8342bc35613f7f59@mail.gmail.com>
-Subject: Re: [PATCH] nconfig v4
-From: Nir Tzachar <nir.tzachar@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
+In-Reply-To: <4AD2EBC6.1000505@msgid.tls.msk.ru>
+References: <20091011221818.GA2833@merkur.ravnborg.org>
+	 <4AD2EBC6.1000505@msgid.tls.msk.ru>
+Date: Tue, 13 Oct 2009 23:10:19 +0800
+Message-ID: <2375c9f90910130810w2d887dd2uea0f4bc88ac2d894@mail.gmail.com>
+Subject: Re: [GIT PULL] kbuild fixes
+From: =?UTF-8?Q?Am=C3=A9rico_Wang?= <xiyou.wangcong@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andi Kleen <andi@firstfloor.org>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, sam@ravnborg.org, zippel@linux-m68k.org
+To: Michael Tokarev <mjt@tls.msk.ru>
+Cc: Sam Ravnborg <sam@ravnborg.org>, Linus Torvalds <torvalds@linux-foundation.org>, lkml <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-Hello.
-
-On Mon, Oct 12, 2009 at 8:21 PM, Andi Kleen <andi@firstfloor.org> wrote:
-> Nir Tzachar <nir.tzachar@gmail.com> writes:
->
->> Hello.
+On Mon, Oct 12, 2009 at 4:41 PM, Michael Tokarev <mjt@tls.msk.ru> wrote:
+> Sam Ravnborg wrote:
 >>
->> This is a reworked version of nconfig, an ncurses based replacement for
->> menuconfig. The first submission was approximately a year ago. The current patch
->> is applicable to the current git tree.
+>> Hi Linus.
+>>
+>> A few kbuild related fixes.
 >
-> What are the advantages over the old menuconfig?
+> []
+>>
+>> - Fix use of echo -ne. Is caused issues for ubuntu (IIRC) users
 >
-> That information should be in the patch description.
-
-Sorry. Following is an excerpt from the original patch:
-
-This patch was inspired by the kernel projects page, where an ncurses
-replacement for menuconfig was mentioned (by Sam Ravnborg).
-
-Building on menuconfig, this patch implements a more modern look interface using
-ncurses and ncurses' satellite libraries (menu, panel, form). The implementation
-does not depend on lxdialog, which is currently distributed with the kernel.
-
-
-> -Andi
+> As has been discussed previously (and Sam has been CC'ed), the fix
+> is still incorrect.  It replaces "echo -ne" with "/bin/echo -ne",
+> but neither of the two are guaranteed to support the necessary
+> arguments and necessary (hexadecimal) escape sequences.  What should
+> be used here is printf(1).  The trivial patch below (on top of these
+> kbuild changes) fixes this issue.
 >
-> --
-> ak@linux.intel.com -- Speaking for myself only.
+> Thanks.
 >
+> /mjt
+>
+> Signed-Off-By: Michael Tokarev <mjt@tls.msk.ru>
+>
+
+Sorry, I just saw this email.
+
+Hmm, printf(1) should be more portable than echo(1), I checked your patch,
+how about using 'printf "%b" ' instead?
+
+Thanks!
