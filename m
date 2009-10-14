@@ -1,15 +1,15 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-yx0-f188.google.com ([209.85.210.188]:39341 "EHLO
-	mail-yx0-f188.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753200AbZJNGq2 (ORCPT
+Received: from mail-gx0-f212.google.com ([209.85.217.212]:65359 "EHLO
+	mail-gx0-f212.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754816AbZJNGrt (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 14 Oct 2009 02:46:28 -0400
-Received: by yxe26 with SMTP id 26so5099407yxe.4
-        for <linux-kbuild@vger.kernel.org>; Tue, 13 Oct 2009 23:45:52 -0700 (PDT)
-Date: Wed, 14 Oct 2009 01:54:25 -0500
+	Wed, 14 Oct 2009 02:47:49 -0400
+Received: by gxk4 with SMTP id 4so11676240gxk.8
+        for <linux-kbuild@vger.kernel.org>; Tue, 13 Oct 2009 23:47:11 -0700 (PDT)
+Date: Wed, 14 Oct 2009 01:55:47 -0500
 From: Jonathan Nieder <jrnieder@gmail.com>
-Subject: [PATCH resend 1/2] scripts/package: add ROOTCMD variable
-Message-ID: <20091014065425.GA8771@progeny.tock>
+Subject: [PATCH resend 2/2] scripts/package: use fakeroot if available
+Message-ID: <20091014065547.GB8771@progeny.tock>
 References: <20091014064622.GA8711@progeny.tock>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
@@ -20,92 +20,51 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Sam Ravnborg <sam@ravnborg.org>, maximilian attems <max@stro.at>, Frans Pop <elendil@planet.nl>
 
-Allow "make foo-pkg" to acquire root or fake root privileges before
-running commands that need it.  This is especially important for
-tar-pkg, since otherwise if a user forgets to run make as root, the
-installed kernel will have that user as owner and can easily be
-overwritten by a broken program running as that user later.
+Unless already running as root, use fakeroot to ensure the files
+in the generated binary packages are owned by root.  Without this
+change, you have to set ROOTCMD or become root yourself to run
+"make foo-pkg".
 
-The new ROOTCMD variable, if defined, is used as a command to run
-other commands with possibly fake elevated privileges.  If it is not
-defined, the behavior is as before, and hopefully make is running as
-root already.
+With this patch applied, you can run "make oldconfig rpm-pkg" as
+an ordinary user to build a binary package for an updated kernel
+tree and it should just work.
 
-In other words, as a shortcut, instead of running
-
-$ make oldconfig &&
-> make &&
-> fakeroot -u make rpm-pkg
-
-now one can use a single command:
-
-$ make oldconfig rpm-pkg ROOTCMD="fakeroot -u"
-
-Idea from Ryan Anderson
-<http://thread.gmane.org/gmane.comp.version-control.git/14770/focus=14802>.
+fakeroot is a bit too zealous by default in pretending files are
+owned by root.  Unless directed otherwise, its wrapped stat() and
+lstat() set st_uid and st_gid to 0 for all files.  This slows
+down the Linux build with CONFIG_LOCALVERSION_AUTO a lot, since
+git notices that the owners have changed and has to reread the
+entire kernel tree to learn that the content has not changed.
+Since "make modules_install" and "scripts/package/foo" run within
+the same fakeroot session, we are free to avoid this by telling
+fakeroot to use the actual owner and group for preexisting files,
+by passing it the -u option.
 
 Signed-off-by: Jonathan Nieder <jrnieder@gmail.com>
 ---
-Changes from v1: rebased on top of current torvalds/master.
-
- scripts/package/Makefile |   13 +++++++------
- 1 files changed, 7 insertions(+), 6 deletions(-)
+ scripts/package/Makefile |    9 +++++++++
+ 1 files changed, 9 insertions(+), 0 deletions(-)
 
 diff --git a/scripts/package/Makefile b/scripts/package/Makefile
-index f67cc88..14b65a8 100644
+index 14b65a8..14fdeda 100644
 --- a/scripts/package/Makefile
 +++ b/scripts/package/Makefile
-@@ -53,7 +53,8 @@ rpm-pkg rpm: $(objtree)/kernel.spec FORCE
- 	set -e; \
- 	mv -f $(objtree)/.tmp_version $(objtree)/.version
+@@ -1,6 +1,15 @@
+ # Makefile for the different targets used to generate full packages of a kernel
+ # It uses the generic clean infrastructure of kbuild
  
--	$(RPM) $(RPMOPTS) --target $(UTS_MACHINE) -ta ../$(KERNELPATH).tar.gz
-+	$(ROOTCMD) $(RPM) $(RPMOPTS) --target $(UTS_MACHINE) \
-+		-ta ../$(KERNELPATH).tar.gz
- 	rm ../$(KERNELPATH).tar.gz
- 
- clean-files := $(objtree)/kernel.spec
-@@ -70,8 +71,8 @@ binrpm-pkg: $(objtree)/binkernel.spec FORCE
- 	set -e; \
- 	mv -f $(objtree)/.tmp_version $(objtree)/.version
- 
--	$(RPM) $(RPMOPTS) --define "_builddir $(objtree)" --target \
--		$(UTS_MACHINE) -bb $<
-+	$(ROOTCMD) $(RPM) $(RPMOPTS) --define "_builddir $(objtree)" \
-+		--target $(UTS_MACHINE) -bb $<
- 
- clean-files += $(objtree)/binkernel.spec
- 
-@@ -79,7 +80,7 @@ clean-files += $(objtree)/binkernel.spec
++# How to acquire (fake) root privileges
++ifndef ROOTCMD
++ifneq ($(shell id -u),0)
++ifeq ($(shell which fakeroot >/dev/null 2>&1 && echo found),found)
++ROOTCMD := fakeroot -u
++endif
++endif
++endif
++
+ # RPM target
  # ---------------------------------------------------------------------------
- deb-pkg: FORCE
- 	$(MAKE) KBUILD_SRC=
--	$(CONFIG_SHELL) $(srctree)/scripts/package/builddeb
-+	$(ROOTCMD) $(CONFIG_SHELL) $(srctree)/scripts/package/builddeb
- 
- clean-dirs += $(objtree)/debian/
- 
-@@ -88,7 +89,7 @@ clean-dirs += $(objtree)/debian/
- # ---------------------------------------------------------------------------
- tar%pkg: FORCE
- 	$(MAKE) KBUILD_SRC=
--	$(CONFIG_SHELL) $(srctree)/scripts/package/buildtar $@
-+	$(ROOTCMD) $(CONFIG_SHELL) $(srctree)/scripts/package/buildtar $@
- 
- clean-dirs += $(objtree)/tar-install/
- 
-@@ -96,10 +97,10 @@ clean-dirs += $(objtree)/tar-install/
- # Help text displayed when executing 'make help'
- # ---------------------------------------------------------------------------
- help: FORCE
-+	@echo ' Set ROOTCMD={sudo|fakeroot -u|super|...} and make as non-root:'
- 	@echo '  rpm-pkg         - Build both source and binary RPM kernel packages'
- 	@echo '  binrpm-pkg      - Build only the binary kernel package'
- 	@echo '  deb-pkg         - Build the kernel as an deb package'
- 	@echo '  tar-pkg         - Build the kernel as an uncompressed tarball'
- 	@echo '  targz-pkg       - Build the kernel as a gzip compressed tarball'
- 	@echo '  tarbz2-pkg      - Build the kernel as a bzip2 compressed tarball'
--
+ # The rpm target generates two rpm files:
 -- 
 1.6.5.rc1.199.g596ec
 
