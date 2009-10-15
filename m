@@ -1,15 +1,15 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from fg-out-1718.google.com ([72.14.220.152]:57074 "EHLO
-	fg-out-1718.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1758080AbZJON2l (ORCPT
+Received: from gv-out-0910.google.com ([216.239.58.189]:18588 "EHLO
+	gv-out-0910.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1758372AbZJONcW (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 15 Oct 2009 09:28:41 -0400
-Received: by fg-out-1718.google.com with SMTP id 16so485863fgg.1
-        for <linux-kbuild@vger.kernel.org>; Thu, 15 Oct 2009 06:26:53 -0700 (PDT)
-Date: Thu, 15 Oct 2009 08:35:32 -0500
+	Thu, 15 Oct 2009 09:32:22 -0400
+Received: by gv-out-0910.google.com with SMTP id r4so88608gve.37
+        for <linux-kbuild@vger.kernel.org>; Thu, 15 Oct 2009 06:30:35 -0700 (PDT)
+Date: Thu, 15 Oct 2009 08:39:13 -0500
 From: Jonathan Nieder <jrnieder@gmail.com>
-Subject: [PATCH v2 1/2] scripts/package: add KBUILD_PKG_ROOTCMD variable
-Message-ID: <20091015133532.GB6718@progeny.tock>
+Subject: [PATCH v2 2/2] scripts/package: use fakeroot if available
+Message-ID: <20091015133913.GC6718@progeny.tock>
 References: <20091014064622.GA8711@progeny.tock>
  <20091014071627.GA6256@merkur.ravnborg.org>
  <200910141159.03799.elendil@planet.nl>
@@ -24,98 +24,53 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: maximilian attems <max@stro.at>, Sam Ravnborg <sam@ravnborg.org>, Frans Pop <elendil@planet.nl>
 
-Allow "make foo-pkg" to acquire root or fake root privileges before
-running commands that need them.  This is especially important for
-tar-pkg, since if buildtar is run as an unprivileged user, the
-installed kernel will have that user as owner and can easily be
-overwritten by a broken program running as that user later.
+Unless already running as root, use fakeroot to ensure the files in
+the generated binary packages are owned by root.  Without this change,
+you have to set KBUILD_PKG_ROOTCMD or become root yourself to run
+"make foo-pkg".
 
-The new KBUILD_PKG_ROOTCMD variable, if defined, is used as a command
-to run other commands with possibly fake elevated privileges.  Its use
-is restricted to *pkg targets, hence the name.  If it is not defined,
-the behavior is as before, and hopefully make is running as root
-already.
+With this patch applied, you can run "make oldconfig rpm-pkg" as an
+ordinary user to build a binary package for an updated kernel tree and
+it should just work.
 
-In other words, as a shortcut, instead of running
-
-	make oldconfig &&
-	make &&
-	fakeroot -u make rpm-pkg
-
-now one can use a single command:
-
-	make oldconfig rpm-pkg KBUILD_PKG_ROOTCMD="fakeroot -u"
-
-Idea from Ryan Anderson
-<http://thread.gmane.org/gmane.comp.version-control.git/14770/focus=14802>.
+fakeroot is a bit too zealous by default in pretending files are owned
+by root.  Unless directed otherwise, its wrapped stat() and lstat()
+set st_uid and st_gid to 0 for all files.  This slows down the Linux
+build with CONFIG_LOCALVERSION_AUTO a lot, since git notices that the
+owners have changed and has to reread the entire kernel tree to learn
+that the content has not changed.  Since "make modules_install" and
+"scripts/package/foo" run within the same fakeroot session, we are
+free to avoid this by telling fakeroot to use the actual owner and
+group for preexisting files, by passing it the -u option.
 
 Signed-off-by: Jonathan Nieder <jrnieder@gmail.com>
 ---
 Changes from v1:
- - use KBUILD_PKG_ROOTCMD instead of ROOTCMD
- - shorten advice in "make help" so it still fits on one terminal line
+ - rename ROOTCMD variable to KBUILD_PKG_ROOTCMD
 
- scripts/package/Makefile |   16 ++++++++++------
- 1 files changed, 10 insertions(+), 6 deletions(-)
+ scripts/package/Makefile |    9 +++++++++
+ 1 files changed, 9 insertions(+), 0 deletions(-)
 
 diff --git a/scripts/package/Makefile b/scripts/package/Makefile
-index f67cc88..6997f38 100644
+index 6997f38..2aa7e8c 100644
 --- a/scripts/package/Makefile
 +++ b/scripts/package/Makefile
-@@ -53,7 +53,8 @@ rpm-pkg rpm: $(objtree)/kernel.spec FORCE
- 	set -e; \
- 	mv -f $(objtree)/.tmp_version $(objtree)/.version
+@@ -1,6 +1,15 @@
+ # Makefile for the different targets used to generate full packages of a kernel
+ # It uses the generic clean infrastructure of kbuild
  
--	$(RPM) $(RPMOPTS) --target $(UTS_MACHINE) -ta ../$(KERNELPATH).tar.gz
-+	$(KBUILD_PKG_ROOTCMD) $(RPM) $(RPMOPTS) --target $(UTS_MACHINE) \
-+		-ta ../$(KERNELPATH).tar.gz
- 	rm ../$(KERNELPATH).tar.gz
- 
- clean-files := $(objtree)/kernel.spec
-@@ -70,8 +71,9 @@ binrpm-pkg: $(objtree)/binkernel.spec FORCE
- 	set -e; \
- 	mv -f $(objtree)/.tmp_version $(objtree)/.version
- 
--	$(RPM) $(RPMOPTS) --define "_builddir $(objtree)" --target \
--		$(UTS_MACHINE) -bb $<
-+	$(KBUILD_PKG_ROOTCMD) $(RPM) $(RPMOPTS) \
-+		--define "_builddir $(objtree)" \
-+		--target $(UTS_MACHINE) -bb $<
- 
- clean-files += $(objtree)/binkernel.spec
- 
-@@ -79,7 +81,8 @@ clean-files += $(objtree)/binkernel.spec
++# How to acquire (fake) root privileges
++ifndef KBUILD_PKG_ROOTCMD
++ifneq ($(shell id -u),0)
++ifeq ($(shell which fakeroot >/dev/null 2>&1 && echo found),found)
++KBUILD_PKG_ROOTCMD := fakeroot -u
++endif
++endif
++endif
++
+ # RPM target
  # ---------------------------------------------------------------------------
- deb-pkg: FORCE
- 	$(MAKE) KBUILD_SRC=
--	$(CONFIG_SHELL) $(srctree)/scripts/package/builddeb
-+	$(KBUILD_PKG_ROOTCMD) $(CONFIG_SHELL) \
-+		$(srctree)/scripts/package/builddeb
- 
- clean-dirs += $(objtree)/debian/
- 
-@@ -88,7 +91,8 @@ clean-dirs += $(objtree)/debian/
- # ---------------------------------------------------------------------------
- tar%pkg: FORCE
- 	$(MAKE) KBUILD_SRC=
--	$(CONFIG_SHELL) $(srctree)/scripts/package/buildtar $@
-+	$(KBUILD_PKG_ROOTCMD) $(CONFIG_SHELL) \
-+		$(srctree)/scripts/package/buildtar $@
- 
- clean-dirs += $(objtree)/tar-install/
- 
-@@ -96,10 +100,10 @@ clean-dirs += $(objtree)/tar-install/
- # Help text displayed when executing 'make help'
- # ---------------------------------------------------------------------------
- help: FORCE
-+	@echo ' Set KBUILD_PKG_ROOTCMD={sudo|fakeroot -u|...} and make as non-root:'
- 	@echo '  rpm-pkg         - Build both source and binary RPM kernel packages'
- 	@echo '  binrpm-pkg      - Build only the binary kernel package'
- 	@echo '  deb-pkg         - Build the kernel as an deb package'
- 	@echo '  tar-pkg         - Build the kernel as an uncompressed tarball'
- 	@echo '  targz-pkg       - Build the kernel as a gzip compressed tarball'
- 	@echo '  tarbz2-pkg      - Build the kernel as a bzip2 compressed tarball'
--
+ # The rpm target generates two rpm files:
 -- 
 1.6.5.rc1.199.g596ec
 
