@@ -1,124 +1,80 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepb.post.tele.dk ([195.41.46.236]:50920 "EHLO
+Received: from pfepb.post.tele.dk ([195.41.46.236]:50924 "EHLO
 	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753424AbZJRILT (ORCPT
+	with ESMTP id S1753437AbZJRILT (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
 	Sun, 18 Oct 2009 04:11:19 -0400
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: [PATCH 07/14] sh: move machtypes.h to include/generated
-Date: Sun, 18 Oct 2009 10:15:16 +0200
-Message-Id: <1255853723-477-7-git-send-email-sam@ravnborg.org>
+Subject: [PATCH 09/14] kbuild: do not check for include/asm-$ARCH
+Date: Sun, 18 Oct 2009 10:15:18 +0200
+Message-Id: <1255853723-477-9-git-send-email-sam@ravnborg.org>
 In-Reply-To: <20091018080635.GA13767@merkur.ravnborg.org>
 References: <20091018080635.GA13767@merkur.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: kbuild <linux-kbuild@vger.kernel.org>, lkml <linux-kernel@vger.kernel.org>
-Cc: Sam Ravnborg <sam@ravnborg.org>, Paul Mundt <lethal@linux-sh.org>, Al Viro <viro@zeniv.linux.org.uk>
+Cc: Sam Ravnborg <sam@ravnborg.org>
+
+No architectures uses include/asm-$ARCH now.
+So drop check for location of include files
 
 Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
-Cc: Paul Mundt <lethal@linux-sh.org>
-Cc: Al Viro <viro@zeniv.linux.org.uk>
 ---
- arch/sh/Makefile                        |   10 +++-------
- arch/sh/drivers/pci/fixups-rts7751r2d.c |    2 +-
- arch/sh/include/asm/.gitignore          |    1 -
- arch/sh/include/asm/machvec.h           |    2 +-
- arch/sh/tools/Makefile                  |    4 ++--
- arch/sh/tools/gen-mach-types            |    2 +-
- 6 files changed, 8 insertions(+), 13 deletions(-)
- delete mode 100644 arch/sh/include/asm/.gitignore
+ Makefile           |   11 +++--------
+ scripts/headers.sh |    2 --
+ 2 files changed, 3 insertions(+), 10 deletions(-)
 
-diff --git a/arch/sh/Makefile b/arch/sh/Makefile
-index fc51a91..d1dc2f4 100644
---- a/arch/sh/Makefile
-+++ b/arch/sh/Makefile
-@@ -201,10 +201,7 @@ libs-$(CONFIG_SUPERH64)		:= arch/sh/lib64/ $(libs-y)
+diff --git a/Makefile b/Makefile
+index 63dc381..5e71b69 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1069,11 +1069,6 @@ firmware_install: FORCE
+ export INSTALL_HDR_PATH = $(objtree)/usr
  
- BOOT_TARGETS = uImage uImage.bz2 uImage.gz uImage.lzma uImage.srec \
- 	       zImage vmlinux.srec romImage
--PHONY += maketools $(BOOT_TARGETS) FORCE
--
--maketools:  include/linux/version.h FORCE
--	$(Q)$(MAKE) $(build)=arch/sh/tools include/asm-sh/machtypes.h
-+PHONY += $(BOOT_TARGETS)
+ hdr-inst := -rR -f $(srctree)/scripts/Makefile.headersinst obj
+-# Find out where the Kbuild file is located to support
+-# arch/$(ARCH)/include/asm
+-hdr-dir = $(strip                                                         \
+-          $(if $(wildcard $(srctree)/arch/$(hdr-arch)/include/asm/Kbuild), \
+-               arch/$(hdr-arch)/include/asm, include/asm-$(hdr-arch)))
  
- all: $(KBUILD_IMAGE)
+ # If we do an all arch process set dst to asm-$(hdr-arch)
+ hdr-dst = $(if $(KBUILD_HEADERS), dst=include/asm-$(hdr-arch), dst=include/asm)
+@@ -1088,10 +1083,10 @@ headers_install_all:
  
-@@ -213,7 +210,8 @@ $(BOOT_TARGETS): vmlinux
+ PHONY += headers_install
+ headers_install: __headers
+-	$(if $(wildcard $(srctree)/$(hdr-dir)/Kbuild),, \
++	$(if $(wildcard $(srctree)/arch/$(hdr-arch)/include/asm/Kbuild),, \
+ 	$(error Headers not exportable for the $(SRCARCH) architecture))
+ 	$(Q)$(MAKE) $(hdr-inst)=include
+-	$(Q)$(MAKE) $(hdr-inst)=$(hdr-dir) $(hdr-dst)
++	$(Q)$(MAKE) $(hdr-inst)=arch/$(hdr-arch)/include/asm $(hdr-dst)
  
- compressed: zImage
+ PHONY += headers_check_all
+ headers_check_all: headers_install_all
+@@ -1100,7 +1095,7 @@ headers_check_all: headers_install_all
+ PHONY += headers_check
+ headers_check: headers_install
+ 	$(Q)$(MAKE) $(hdr-inst)=include HDRCHECK=1
+-	$(Q)$(MAKE) $(hdr-inst)=$(hdr-dir) $(hdr-dst) HDRCHECK=1
++	$(Q)$(MAKE) $(hdr-inst)=arch/$(hdr-arch)/include/asm $(hdr-dst) HDRCHECK=1
  
--archprepare: maketools
-+archprepare:
-+	$(Q)$(MAKE) $(build)=arch/sh/tools include/generated/machtypes.h
- 
- archclean:
- 	$(Q)$(MAKE) $(clean)=$(boot)
-@@ -229,5 +227,3 @@ define archhelp
- 	@echo '  uImage.bz2	           - Kernel-only image for U-Boot (bzip2)'
- 	@echo '  uImage.lzma	           - Kernel-only image for U-Boot (lzma)'
- endef
--
--CLEAN_FILES += include/asm-sh/machtypes.h
-diff --git a/arch/sh/drivers/pci/fixups-rts7751r2d.c b/arch/sh/drivers/pci/fixups-rts7751r2d.c
-index 052b354..7898f14 100644
---- a/arch/sh/drivers/pci/fixups-rts7751r2d.c
-+++ b/arch/sh/drivers/pci/fixups-rts7751r2d.c
-@@ -15,7 +15,7 @@
- #include <mach/lboxre2.h>
- #include <mach/r2d.h>
- #include "pci-sh4.h"
--#include <asm/machtypes.h>
-+#include <generated/machtypes.h>
- 
- #define PCIMCR_MRSET_OFF	0xBFFFFFFF
- #define PCIMCR_RFSH_OFF		0xFFFFFFFB
-diff --git a/arch/sh/include/asm/.gitignore b/arch/sh/include/asm/.gitignore
-deleted file mode 100644
-index 378db77..0000000
---- a/arch/sh/include/asm/.gitignore
-+++ /dev/null
-@@ -1 +0,0 @@
--machtypes.h
-diff --git a/arch/sh/include/asm/machvec.h b/arch/sh/include/asm/machvec.h
-index 84dd377..9c30955 100644
---- a/arch/sh/include/asm/machvec.h
-+++ b/arch/sh/include/asm/machvec.h
-@@ -12,7 +12,7 @@
- 
- #include <linux/types.h>
- #include <linux/time.h>
--#include <asm/machtypes.h>
-+#include <generated/machtypes.h>
- 
- struct sh_machine_vector {
- 	void (*mv_setup)(char **cmdline_p);
-diff --git a/arch/sh/tools/Makefile b/arch/sh/tools/Makefile
-index 567516b..558a56b 100644
---- a/arch/sh/tools/Makefile
-+++ b/arch/sh/tools/Makefile
-@@ -10,7 +10,7 @@
- # Shamelessly cloned from ARM.
- #
- 
--include/asm-sh/machtypes.h: $(src)/gen-mach-types $(src)/mach-types
-+include/generated/machtypes.h: $(src)/gen-mach-types $(src)/mach-types
- 	@echo '  Generating $@'
--	$(Q)if [ ! -d include/asm-sh ]; then mkdir -p include/asm-sh; fi
-+	$(Q)mkdir -p $(dir $@)
- 	$(Q)$(AWK) -f $^ > $@ || { rm -f $@; /bin/false; }
-diff --git a/arch/sh/tools/gen-mach-types b/arch/sh/tools/gen-mach-types
-index 65161e3..f5ff7c5 100644
---- a/arch/sh/tools/gen-mach-types
-+++ b/arch/sh/tools/gen-mach-types
-@@ -1,6 +1,6 @@
- #!/bin/awk
- #
--# Awk script to generate include/asm-sh/machtypes.h
-+# Awk script to generate include/generated/machtypes.h
- # Heavily based on arch/arm/tools/gen-mach-types
- #
- BEGIN	{ nr = 0 }
+ # ---------------------------------------------------------------------------
+ # Modules
+diff --git a/scripts/headers.sh b/scripts/headers.sh
+index 0308ecc..1ddcdd3 100755
+--- a/scripts/headers.sh
++++ b/scripts/headers.sh
+@@ -8,8 +8,6 @@ do_command()
+ {
+ 	if [ -f ${srctree}/arch/$2/include/asm/Kbuild ]; then
+ 		make ARCH=$2 KBUILD_HEADERS=$1 headers_$1
+-	elif [ -f ${srctree}/include/asm-$2/Kbuild ]; then
+-		make ARCH=$2 KBUILD_HEADERS=$1 headers_$1
+ 	else
+ 		printf "Ignoring arch: %s\n" ${arch}
+ 	fi
 -- 
 1.6.2.5
 
