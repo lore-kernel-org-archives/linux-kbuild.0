@@ -1,40 +1,80 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepb.post.tele.dk ([195.41.46.236]:50900 "EHLO
+Received: from pfepb.post.tele.dk ([195.41.46.236]:50911 "EHLO
 	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751180AbZJRILS (ORCPT
+	with ESMTP id S1752773AbZJRILS (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
 	Sun, 18 Oct 2009 04:11:18 -0400
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: [PATCH 02/14] dontdiff: add generated
-Date: Sun, 18 Oct 2009 10:15:11 +0200
-Message-Id: <1255853723-477-2-git-send-email-sam@ravnborg.org>
+Subject: [PATCH 05/14] ia64: move nr-irqs.h to include/generated
+Date: Sun, 18 Oct 2009 10:15:14 +0200
+Message-Id: <1255853723-477-5-git-send-email-sam@ravnborg.org>
 In-Reply-To: <20091018080635.GA13767@merkur.ravnborg.org>
 References: <20091018080635.GA13767@merkur.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: kbuild <linux-kbuild@vger.kernel.org>, lkml <linux-kernel@vger.kernel.org>
-Cc: Sam Ravnborg <sam@ravnborg.org>
+Cc: Sam Ravnborg <sam@ravnborg.org>, Al Viro <viro@zeniv.linux.org.uk>, Tony Luck <tony.luck@intel.com>, Fenghua Yu <fenghua.yu@intel.com>
 
-We move more and more stuff to include/generated - so lets ignore the content
-for users of plain diff
+Avoid generating files in the now deprecated asm-ia64 dir
+Simplified the logic in the Makefile when editing stuff in the area
 
 Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
+Cc: Al Viro <viro@zeniv.linux.org.uk>
+Cc: Tony Luck <tony.luck@intel.com>
+Cc: Fenghua Yu <fenghua.yu@intel.com>
 ---
- Documentation/dontdiff |    1 +
- 1 files changed, 1 insertions(+), 0 deletions(-)
+ arch/ia64/Makefile          |    2 +-
+ arch/ia64/include/asm/irq.h |    2 +-
+ arch/ia64/kernel/Makefile   |    7 ++-----
+ 3 files changed, 4 insertions(+), 7 deletions(-)
 
-diff --git a/Documentation/dontdiff b/Documentation/dontdiff
-index e1efc40..5e576a7 100644
---- a/Documentation/dontdiff
-+++ b/Documentation/dontdiff
-@@ -101,6 +101,7 @@ gconf
- gen-devlist
- gen_crc32table
- gen_init_cpio
-+generated
- genksyms
- *_gray256.c
- ihex2fw
+diff --git a/arch/ia64/Makefile b/arch/ia64/Makefile
+index e7cbaa0..475e272 100644
+--- a/arch/ia64/Makefile
++++ b/arch/ia64/Makefile
+@@ -103,4 +103,4 @@ archprepare: make_nr_irqs_h FORCE
+ PHONY += make_nr_irqs_h FORCE
+ 
+ make_nr_irqs_h: FORCE
+-	$(Q)$(MAKE) $(build)=arch/ia64/kernel include/asm-ia64/nr-irqs.h
++	$(Q)$(MAKE) $(build)=arch/ia64/kernel include/generated/nr-irqs.h
+diff --git a/arch/ia64/include/asm/irq.h b/arch/ia64/include/asm/irq.h
+index 5282546..91b920f 100644
+--- a/arch/ia64/include/asm/irq.h
++++ b/arch/ia64/include/asm/irq.h
+@@ -13,7 +13,7 @@
+ 
+ #include <linux/types.h>
+ #include <linux/cpumask.h>
+-#include <asm-ia64/nr-irqs.h>
++#include <generated/nr-irqs.h>
+ 
+ static __inline__ int
+ irq_canonicalize (int irq)
+diff --git a/arch/ia64/kernel/Makefile b/arch/ia64/kernel/Makefile
+index 6b7edca..2a75e93 100644
+--- a/arch/ia64/kernel/Makefile
++++ b/arch/ia64/kernel/Makefile
+@@ -81,17 +81,14 @@ define cmd_nr_irqs
+ endef
+ 
+ # We use internal kbuild rules to avoid the "is up to date" message from make
+-arch/$(SRCARCH)/kernel/nr-irqs.s: $(srctree)/arch/$(SRCARCH)/kernel/nr-irqs.c \
+-				$(wildcard $(srctree)/include/asm-ia64/*/irq.h)
++arch/$(SRCARCH)/kernel/nr-irqs.s: arch/$(SRCARCH)/kernel/nr-irqs.c
+ 	$(Q)mkdir -p $(dir $@)
+ 	$(call if_changed_dep,cc_s_c)
+ 
+-include/asm-ia64/nr-irqs.h: arch/$(SRCARCH)/kernel/nr-irqs.s
++include/generated/nr-irqs.h: arch/$(SRCARCH)/kernel/nr-irqs.s
+ 	$(Q)mkdir -p $(dir $@)
+ 	$(call cmd,nr_irqs)
+ 
+-clean-files += $(objtree)/include/asm-ia64/nr-irqs.h
+-
+ #
+ # native ivt.S, entry.S and fsys.S
+ #
 -- 
 1.6.2.5
 
