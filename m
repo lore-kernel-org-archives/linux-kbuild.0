@@ -1,80 +1,89 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepb.post.tele.dk ([195.41.46.236]:50911 "EHLO
+Received: from pfepb.post.tele.dk ([195.41.46.236]:50922 "EHLO
 	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752773AbZJRILS (ORCPT
+	with ESMTP id S1750977AbZJRILT (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 18 Oct 2009 04:11:18 -0400
+	Sun, 18 Oct 2009 04:11:19 -0400
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: [PATCH 05/14] ia64: move nr-irqs.h to include/generated
-Date: Sun, 18 Oct 2009 10:15:14 +0200
-Message-Id: <1255853723-477-5-git-send-email-sam@ravnborg.org>
+Subject: [PATCH 08/14] kbuild: drop include2/ used for O=... builds
+Date: Sun, 18 Oct 2009 10:15:17 +0200
+Message-Id: <1255853723-477-8-git-send-email-sam@ravnborg.org>
 In-Reply-To: <20091018080635.GA13767@merkur.ravnborg.org>
 References: <20091018080635.GA13767@merkur.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: kbuild <linux-kbuild@vger.kernel.org>, lkml <linux-kernel@vger.kernel.org>
-Cc: Sam Ravnborg <sam@ravnborg.org>, Al Viro <viro@zeniv.linux.org.uk>, Tony Luck <tony.luck@intel.com>, Fenghua Yu <fenghua.yu@intel.com>
+Cc: Sam Ravnborg <sam@ravnborg.org>
 
-Avoid generating files in the now deprecated asm-ia64 dir
-Simplified the logic in the Makefile when editing stuff in the area
+There is no longer any use of the include2/ directory.
+The generated files has moved to include/generated.
+
+Drop all references to said directory.
 
 Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
-Cc: Al Viro <viro@zeniv.linux.org.uk>
-Cc: Tony Luck <tony.luck@intel.com>
-Cc: Fenghua Yu <fenghua.yu@intel.com>
 ---
- arch/ia64/Makefile          |    2 +-
- arch/ia64/include/asm/irq.h |    2 +-
- arch/ia64/kernel/Makefile   |    7 ++-----
- 3 files changed, 4 insertions(+), 7 deletions(-)
+ Makefile                                   |    9 ++-------
+ arch/powerpc/platforms/cell/spufs/Makefile |    6 ++----
+ 2 files changed, 4 insertions(+), 11 deletions(-)
 
-diff --git a/arch/ia64/Makefile b/arch/ia64/Makefile
-index e7cbaa0..475e272 100644
---- a/arch/ia64/Makefile
-+++ b/arch/ia64/Makefile
-@@ -103,4 +103,4 @@ archprepare: make_nr_irqs_h FORCE
- PHONY += make_nr_irqs_h FORCE
+diff --git a/Makefile b/Makefile
+index 6c60a84..63dc381 100644
+--- a/Makefile
++++ b/Makefile
+@@ -335,7 +335,7 @@ CFLAGS_GCOV	= -fprofile-arcs -ftest-coverage
+ # Use LINUXINCLUDE when you must reference the include/ directory.
+ # Needed to be compatible with the O= option
+ LINUXINCLUDE    := -I$(srctree)/arch/$(hdr-arch)/include -Iinclude \
+-                   $(if $(KBUILD_SRC),-Iinclude2 -I$(srctree)/include) \
++                   $(if $(KBUILD_SRC), -I$(srctree)/include) \
+                    -include include/linux/autoconf.h
  
- make_nr_irqs_h: FORCE
--	$(Q)$(MAKE) $(build)=arch/ia64/kernel include/asm-ia64/nr-irqs.h
-+	$(Q)$(MAKE) $(build)=arch/ia64/kernel include/generated/nr-irqs.h
-diff --git a/arch/ia64/include/asm/irq.h b/arch/ia64/include/asm/irq.h
-index 5282546..91b920f 100644
---- a/arch/ia64/include/asm/irq.h
-+++ b/arch/ia64/include/asm/irq.h
-@@ -13,7 +13,7 @@
+ KBUILD_CPPFLAGS := -D__KERNEL__
+@@ -953,7 +953,6 @@ PHONY += prepare archprepare prepare0 prepare1 prepare2 prepare3
+ # prepare3 is used to check if we are building in a separate output directory,
+ # and if so do:
+ # 1) Check that make has not been executed in the kernel src $(srctree)
+-# 2) Create the include2 directory, used for the second asm symlink
+ prepare3: include/config/kernel.release
+ ifneq ($(KBUILD_SRC),)
+ 	@$(kecho) '  Using $(srctree) as source for kernel'
+@@ -962,10 +961,6 @@ ifneq ($(KBUILD_SRC),)
+ 		echo "  in the '$(srctree)' directory.";\
+ 		/bin/false; \
+ 	fi;
+-	$(Q)if [ ! -d include2 ]; then                                  \
+-	    mkdir -p include2;                                          \
+-	    ln -fsn $(srctree)/include/asm-$(SRCARCH) include2/asm;     \
+-	fi
+ endif
  
- #include <linux/types.h>
- #include <linux/cpumask.h>
--#include <asm-ia64/nr-irqs.h>
-+#include <generated/nr-irqs.h>
+ # prepare2 creates a makefile if using a separate output directory
+@@ -1192,7 +1187,7 @@ CLEAN_FILES +=	vmlinux System.map \
+                 .tmp_kallsyms* .tmp_version .tmp_vmlinux* .tmp_System.map
  
- static __inline__ int
- irq_canonicalize (int irq)
-diff --git a/arch/ia64/kernel/Makefile b/arch/ia64/kernel/Makefile
-index 6b7edca..2a75e93 100644
---- a/arch/ia64/kernel/Makefile
-+++ b/arch/ia64/kernel/Makefile
-@@ -81,17 +81,14 @@ define cmd_nr_irqs
- endef
+ # Directories & files removed with 'make mrproper'
+-MRPROPER_DIRS  += include/config include2 usr/include include/generated
++MRPROPER_DIRS  += include/config usr/include include/generated
+ MRPROPER_FILES += .config .config.old include/asm .version .old_version \
+                   include/linux/autoconf.h include/linux/version.h      \
+                   include/linux/utsrelease.h                            \
+diff --git a/arch/powerpc/platforms/cell/spufs/Makefile b/arch/powerpc/platforms/cell/spufs/Makefile
+index b93f877..b9d5d67 100644
+--- a/arch/powerpc/platforms/cell/spufs/Makefile
++++ b/arch/powerpc/platforms/cell/spufs/Makefile
+@@ -13,10 +13,8 @@ SPU_CC		:= $(SPU_CROSS)gcc
+ SPU_AS		:= $(SPU_CROSS)gcc
+ SPU_LD		:= $(SPU_CROSS)ld
+ SPU_OBJCOPY	:= $(SPU_CROSS)objcopy
+-SPU_CFLAGS	:= -O2 -Wall -I$(srctree)/include \
+-		   -I$(objtree)/include2 -D__KERNEL__
+-SPU_AFLAGS	:= -c -D__ASSEMBLY__ -I$(srctree)/include \
+-		   -I$(objtree)/include2 -D__KERNEL__
++SPU_CFLAGS	:= -O2 -Wall -I$(srctree)/include -D__KERNEL__
++SPU_AFLAGS	:= -c -D__ASSEMBLY__ -I$(srctree)/include -D__KERNEL__
+ SPU_LDFLAGS	:= -N -Ttext=0x0
  
- # We use internal kbuild rules to avoid the "is up to date" message from make
--arch/$(SRCARCH)/kernel/nr-irqs.s: $(srctree)/arch/$(SRCARCH)/kernel/nr-irqs.c \
--				$(wildcard $(srctree)/include/asm-ia64/*/irq.h)
-+arch/$(SRCARCH)/kernel/nr-irqs.s: arch/$(SRCARCH)/kernel/nr-irqs.c
- 	$(Q)mkdir -p $(dir $@)
- 	$(call if_changed_dep,cc_s_c)
- 
--include/asm-ia64/nr-irqs.h: arch/$(SRCARCH)/kernel/nr-irqs.s
-+include/generated/nr-irqs.h: arch/$(SRCARCH)/kernel/nr-irqs.s
- 	$(Q)mkdir -p $(dir $@)
- 	$(call cmd,nr_irqs)
- 
--clean-files += $(objtree)/include/asm-ia64/nr-irqs.h
--
- #
- # native ivt.S, entry.S and fsys.S
- #
+ $(obj)/switch.o: $(obj)/spu_save_dump.h $(obj)/spu_restore_dump.h
 -- 
 1.6.2.5
 
