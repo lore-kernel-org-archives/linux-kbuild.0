@@ -1,89 +1,98 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepb.post.tele.dk ([195.41.46.236]:50922 "EHLO
+Received: from pfepb.post.tele.dk ([195.41.46.236]:50916 "EHLO
 	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750977AbZJRILT (ORCPT
+	with ESMTP id S1753088AbZJRILT (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
 	Sun, 18 Oct 2009 04:11:19 -0400
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: [PATCH 08/14] kbuild: drop include2/ used for O=... builds
-Date: Sun, 18 Oct 2009 10:15:17 +0200
-Message-Id: <1255853723-477-8-git-send-email-sam@ravnborg.org>
+Subject: [PATCH 06/14] arm: move mach-types to include/generated
+Date: Sun, 18 Oct 2009 10:15:15 +0200
+Message-Id: <1255853723-477-6-git-send-email-sam@ravnborg.org>
 In-Reply-To: <20091018080635.GA13767@merkur.ravnborg.org>
 References: <20091018080635.GA13767@merkur.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: kbuild <linux-kbuild@vger.kernel.org>, lkml <linux-kernel@vger.kernel.org>
-Cc: Sam Ravnborg <sam@ravnborg.org>
+Cc: Sam Ravnborg <sam@ravnborg.org>, Al Viro <viro@zeniv.linux.org.uk>, Russell King <linux@arm.linux.org.uk>
 
-There is no longer any use of the include2/ directory.
-The generated files has moved to include/generated.
-
-Drop all references to said directory.
+Simplified arch/arm/Makefile by dropping the maketools target
+It was undocumented and not needed
 
 Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
+Cc: Al Viro <viro@zeniv.linux.org.uk>
+Cc: Russell King <linux@arm.linux.org.uk>
 ---
- Makefile                                   |    9 ++-------
- arch/powerpc/platforms/cell/spufs/Makefile |    6 ++----
- 2 files changed, 4 insertions(+), 11 deletions(-)
+ arch/arm/Makefile                 |   14 ++------------
+ arch/arm/include/asm/mach-types.h |    1 +
+ arch/arm/tools/Makefile           |    2 +-
+ arch/arm/tools/gen-mach-types     |    2 +-
+ 4 files changed, 5 insertions(+), 14 deletions(-)
+ create mode 100644 arch/arm/include/asm/mach-types.h
 
-diff --git a/Makefile b/Makefile
-index 6c60a84..63dc381 100644
---- a/Makefile
-+++ b/Makefile
-@@ -335,7 +335,7 @@ CFLAGS_GCOV	= -fprofile-arcs -ftest-coverage
- # Use LINUXINCLUDE when you must reference the include/ directory.
- # Needed to be compatible with the O= option
- LINUXINCLUDE    := -I$(srctree)/arch/$(hdr-arch)/include -Iinclude \
--                   $(if $(KBUILD_SRC),-Iinclude2 -I$(srctree)/include) \
-+                   $(if $(KBUILD_SRC), -I$(srctree)/include) \
-                    -include include/linux/autoconf.h
+diff --git a/arch/arm/Makefile b/arch/arm/Makefile
+index a73caaf..90b9704 100644
+--- a/arch/arm/Makefile
++++ b/arch/arm/Makefile
+@@ -239,15 +239,8 @@ all:	$(KBUILD_IMAGE)
  
- KBUILD_CPPFLAGS := -D__KERNEL__
-@@ -953,7 +953,6 @@ PHONY += prepare archprepare prepare0 prepare1 prepare2 prepare3
- # prepare3 is used to check if we are building in a separate output directory,
- # and if so do:
- # 1) Check that make has not been executed in the kernel src $(srctree)
--# 2) Create the include2 directory, used for the second asm symlink
- prepare3: include/config/kernel.release
- ifneq ($(KBUILD_SRC),)
- 	@$(kecho) '  Using $(srctree) as source for kernel'
-@@ -962,10 +961,6 @@ ifneq ($(KBUILD_SRC),)
- 		echo "  in the '$(srctree)' directory.";\
- 		/bin/false; \
- 	fi;
--	$(Q)if [ ! -d include2 ]; then                                  \
--	    mkdir -p include2;                                          \
--	    ln -fsn $(srctree)/include/asm-$(SRCARCH) include2/asm;     \
--	fi
- endif
+ boot := arch/arm/boot
  
- # prepare2 creates a makefile if using a separate output directory
-@@ -1192,7 +1187,7 @@ CLEAN_FILES +=	vmlinux System.map \
-                 .tmp_kallsyms* .tmp_version .tmp_vmlinux* .tmp_System.map
+-#	Update machine arch and proc symlinks if something which affects
+-#	them changed.  We use .arch to indicate when they were updated
+-#	last, otherwise make uses the target directory mtime.
+-
+-archprepare: maketools
+-
+-PHONY += maketools FORCE
+-maketools: include/linux/version.h FORCE
+-	$(Q)$(MAKE) $(build)=arch/arm/tools include/asm-arm/mach-types.h
++archprepare:
++	$(Q)$(MAKE) $(build)=arch/arm/tools include/generated/mach-types.h
  
- # Directories & files removed with 'make mrproper'
--MRPROPER_DIRS  += include/config include2 usr/include include/generated
-+MRPROPER_DIRS  += include/config usr/include include/generated
- MRPROPER_FILES += .config .config.old include/asm .version .old_version \
-                   include/linux/autoconf.h include/linux/version.h      \
-                   include/linux/utsrelease.h                            \
-diff --git a/arch/powerpc/platforms/cell/spufs/Makefile b/arch/powerpc/platforms/cell/spufs/Makefile
-index b93f877..b9d5d67 100644
---- a/arch/powerpc/platforms/cell/spufs/Makefile
-+++ b/arch/powerpc/platforms/cell/spufs/Makefile
-@@ -13,10 +13,8 @@ SPU_CC		:= $(SPU_CROSS)gcc
- SPU_AS		:= $(SPU_CROSS)gcc
- SPU_LD		:= $(SPU_CROSS)ld
- SPU_OBJCOPY	:= $(SPU_CROSS)objcopy
--SPU_CFLAGS	:= -O2 -Wall -I$(srctree)/include \
--		   -I$(objtree)/include2 -D__KERNEL__
--SPU_AFLAGS	:= -c -D__ASSEMBLY__ -I$(srctree)/include \
--		   -I$(objtree)/include2 -D__KERNEL__
-+SPU_CFLAGS	:= -O2 -Wall -I$(srctree)/include -D__KERNEL__
-+SPU_AFLAGS	:= -c -D__ASSEMBLY__ -I$(srctree)/include -D__KERNEL__
- SPU_LDFLAGS	:= -N -Ttext=0x0
+ # Convert bzImage to zImage
+ bzImage: zImage
+@@ -258,9 +251,6 @@ zImage Image xipImage bootpImage uImage: vmlinux
+ zinstall install: vmlinux
+ 	$(Q)$(MAKE) $(build)=$(boot) MACHINE=$(MACHINE) $@
  
- $(obj)/switch.o: $(obj)/spu_save_dump.h $(obj)/spu_restore_dump.h
+-CLEAN_FILES += include/asm-arm/mach-types.h \
+-	       include/asm-arm/arch include/asm-arm/.arch
+-
+ # We use MRPROPER_FILES and CLEAN_FILES now
+ archclean:
+ 	$(Q)$(MAKE) $(clean)=$(boot)
+diff --git a/arch/arm/include/asm/mach-types.h b/arch/arm/include/asm/mach-types.h
+new file mode 100644
+index 0000000..948178c
+--- /dev/null
++++ b/arch/arm/include/asm/mach-types.h
+@@ -0,0 +1 @@
++#include <generated/mach-types.h>
+diff --git a/arch/arm/tools/Makefile b/arch/arm/tools/Makefile
+index 1dbaa29..635cb18 100644
+--- a/arch/arm/tools/Makefile
++++ b/arch/arm/tools/Makefile
+@@ -4,7 +4,7 @@
+ # Copyright (C) 2001 Russell King
+ #
+ 
+-include/asm-arm/mach-types.h: $(src)/gen-mach-types $(src)/mach-types
++include/generated/mach-types.h: $(src)/gen-mach-types $(src)/mach-types
+ 	@echo '  Generating $@'
+ 	@mkdir -p $(dir $@)
+ 	$(Q)$(AWK) -f $^ > $@ || { rm -f $@; /bin/false; }
+diff --git a/arch/arm/tools/gen-mach-types b/arch/arm/tools/gen-mach-types
+index ce319ef..04fef71 100644
+--- a/arch/arm/tools/gen-mach-types
++++ b/arch/arm/tools/gen-mach-types
+@@ -1,6 +1,6 @@
+ #!/bin/awk
+ #
+-# Awk script to generate include/asm-arm/mach-types.h
++# Awk script to generate include/generated/mach-types.h
+ #
+ BEGIN	{ nr = 0 }
+ /^#/	{ next }
 -- 
 1.6.2.5
 
