@@ -1,61 +1,146 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepb.post.tele.dk ([195.41.46.236]:50898 "EHLO
+Received: from pfepb.post.tele.dk ([195.41.46.236]:50937 "EHLO
 	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750977AbZJRILS (ORCPT
+	with ESMTP id S1753537AbZJRILU (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 18 Oct 2009 04:11:18 -0400
+	Sun, 18 Oct 2009 04:11:20 -0400
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: [PATCH 01/14] kbuild: search arch/$ARCH/include before include/
-Date: Sun, 18 Oct 2009 10:15:10 +0200
-Message-Id: <1255853723-477-1-git-send-email-sam@ravnborg.org>
+Subject: [PATCH 12/14] drop explicit include of autoconf.h
+Date: Sun, 18 Oct 2009 10:15:21 +0200
+Message-Id: <1255853723-477-12-git-send-email-sam@ravnborg.org>
 In-Reply-To: <20091018080635.GA13767@merkur.ravnborg.org>
 References: <20091018080635.GA13767@merkur.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: kbuild <linux-kbuild@vger.kernel.org>, lkml <linux-kernel@vger.kernel.org>
-Cc: Sam Ravnborg <sam@ravnborg.org>, Stephen Rothwell <sfr@canb.auug.org.au>
+Cc: Sam Ravnborg <sam@ravnborg.org>
 
-The namespace used in arch/$ARCH/include is different from
-what is used in include/ except for the include/asm directory.
-
-This patch gives the arch/$ARCH/include/asm directory priority
-over include/asm.
-
-When we add asm-offsets.h to arch/$ARCH/include/asm/ this
-patch makes sure we pick up the arch specific version
-and not the one we have in include/asm.
-
-The situation with an asm-offsets.h file located in
-both include/asm _and_ arch/$ARCH/include/asm will happen
-when we move more files over to include/generated.
-
-This happens because in some cases it is not practical
-to rename all users so we simply add a file
-in arch/$ARCH/include/asm that includes the generated version.
-
-This is the solution we use for asm-offsets.h as an example.
+kbuild.h forces include of autoconf.h on the
+commandline using -include - so we do not need to
+include the file explicit.
 
 Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
-Cc: Stephen Rothwell <sfr@canb.auug.org.au>
 ---
- Makefile |    3 +--
- 1 files changed, 1 insertions(+), 2 deletions(-)
+ arch/cris/arch-v32/kernel/head.S                |    1 -
+ arch/cris/kernel/asm-offsets.c                  |    1 -
+ arch/cris/kernel/vmlinux.lds.S                  |    1 -
+ arch/ia64/kvm/asm-offsets.c                     |    1 -
+ drivers/accessibility/braille/braille_console.c |    1 -
+ drivers/hid/hid-lg.h                            |    2 --
+ drivers/platform/x86/compal-laptop.c            |    1 -
+ drivers/staging/iio/ring_sw.h                   |    1 -
+ include/linux/mmdebug.h                         |    2 --
+ 9 files changed, 0 insertions(+), 11 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index 9425d1d..a805f5c 100644
---- a/Makefile
-+++ b/Makefile
-@@ -334,9 +334,8 @@ CFLAGS_GCOV	= -fprofile-arcs -ftest-coverage
+diff --git a/arch/cris/arch-v32/kernel/head.S b/arch/cris/arch-v32/kernel/head.S
+index 3db478e..76266f8 100644
+--- a/arch/cris/arch-v32/kernel/head.S
++++ b/arch/cris/arch-v32/kernel/head.S
+@@ -10,7 +10,6 @@
+  * The macros found in mmu_defs_asm.h uses the ## concatenation operator, so
+  * -traditional must not be used when assembling this file.
+  */
+-#include <linux/autoconf.h>
+ #include <arch/memmap.h>
+ #include <hwregs/reg_rdwr.h>
+ #include <hwregs/intr_vect.h>
+diff --git a/arch/cris/kernel/asm-offsets.c b/arch/cris/kernel/asm-offsets.c
+index ddd6fbb..dd7b8e9 100644
+--- a/arch/cris/kernel/asm-offsets.c
++++ b/arch/cris/kernel/asm-offsets.c
+@@ -1,6 +1,5 @@
+ #include <linux/sched.h>
+ #include <asm/thread_info.h>
+-#include <linux/autoconf.h>
  
- # Use LINUXINCLUDE when you must reference the include/ directory.
- # Needed to be compatible with the O= option
--LINUXINCLUDE    := -Iinclude \
-+LINUXINCLUDE    := -I$(srctree)/arch/$(hdr-arch)/include -Iinclude \
-                    $(if $(KBUILD_SRC),-Iinclude2 -I$(srctree)/include) \
--                   -I$(srctree)/arch/$(hdr-arch)/include               \
-                    -include include/linux/autoconf.h
+ /*
+  * Generate definitions needed by assembly language modules.
+diff --git a/arch/cris/kernel/vmlinux.lds.S b/arch/cris/kernel/vmlinux.lds.S
+index bbfda67..d49d17d 100644
+--- a/arch/cris/kernel/vmlinux.lds.S
++++ b/arch/cris/kernel/vmlinux.lds.S
+@@ -8,7 +8,6 @@
+  * the kernel has booted.
+  */
  
- KBUILD_CPPFLAGS := -D__KERNEL__
+-#include <linux/autoconf.h>
+ #include <asm-generic/vmlinux.lds.h>
+ #include <asm/page.h>
+ 
+diff --git a/arch/ia64/kvm/asm-offsets.c b/arch/ia64/kvm/asm-offsets.c
+index 0c3564a..9324c87 100644
+--- a/arch/ia64/kvm/asm-offsets.c
++++ b/arch/ia64/kvm/asm-offsets.c
+@@ -22,7 +22,6 @@
+  *
+  */
+ 
+-#include <linux/autoconf.h>
+ #include <linux/kvm_host.h>
+ #include <linux/kbuild.h>
+ 
+diff --git a/drivers/accessibility/braille/braille_console.c b/drivers/accessibility/braille/braille_console.c
+index d672cfe..cb423f5 100644
+--- a/drivers/accessibility/braille/braille_console.c
++++ b/drivers/accessibility/braille/braille_console.c
+@@ -21,7 +21,6 @@
+  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+  */
+ 
+-#include <linux/autoconf.h>
+ #include <linux/kernel.h>
+ #include <linux/module.h>
+ #include <linux/moduleparam.h>
+diff --git a/drivers/hid/hid-lg.h b/drivers/hid/hid-lg.h
+index 27ae750..bf31592 100644
+--- a/drivers/hid/hid-lg.h
++++ b/drivers/hid/hid-lg.h
+@@ -1,8 +1,6 @@
+ #ifndef __HID_LG_H
+ #define __HID_LG_H
+ 
+-#include <linux/autoconf.h>
+-
+ #ifdef CONFIG_LOGITECH_FF
+ int lgff_init(struct hid_device *hdev);
+ #else
+diff --git a/drivers/platform/x86/compal-laptop.c b/drivers/platform/x86/compal-laptop.c
+index 11003bb..1a387e7 100644
+--- a/drivers/platform/x86/compal-laptop.c
++++ b/drivers/platform/x86/compal-laptop.c
+@@ -51,7 +51,6 @@
+ #include <linux/dmi.h>
+ #include <linux/backlight.h>
+ #include <linux/platform_device.h>
+-#include <linux/autoconf.h>
+ 
+ #define COMPAL_DRIVER_VERSION "0.2.6"
+ 
+diff --git a/drivers/staging/iio/ring_sw.h b/drivers/staging/iio/ring_sw.h
+index ae70ee0..4b0de7c 100644
+--- a/drivers/staging/iio/ring_sw.h
++++ b/drivers/staging/iio/ring_sw.h
+@@ -29,7 +29,6 @@
+  * driver requests - some may support multiple options */
+ 
+ 
+-#include <linux/autoconf.h>
+ #include "iio.h"
+ #include "ring_generic.h"
+ 
+diff --git a/include/linux/mmdebug.h b/include/linux/mmdebug.h
+index 8a55098..ee24ef8 100644
+--- a/include/linux/mmdebug.h
++++ b/include/linux/mmdebug.h
+@@ -1,8 +1,6 @@
+ #ifndef LINUX_MM_DEBUG_H
+ #define LINUX_MM_DEBUG_H 1
+ 
+-#include <linux/autoconf.h>
+-
+ #ifdef CONFIG_DEBUG_VM
+ #define VM_BUG_ON(cond) BUG_ON(cond)
+ #else
 -- 
 1.6.2.5
 
