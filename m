@@ -1,62 +1,155 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepb.post.tele.dk ([195.41.46.236]:59984 "EHLO
+Received: from pfepb.post.tele.dk ([195.41.46.236]:60745 "EHLO
 	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753152AbZJQSlc (ORCPT
+	with ESMTP id S1752076AbZJRIGc (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 17 Oct 2009 14:41:32 -0400
-Date: Sat, 17 Oct 2009 20:41:36 +0200
+	Sun, 18 Oct 2009 04:06:32 -0400
+Date: Sun, 18 Oct 2009 10:06:35 +0200
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: 32-rc1: "CROSS_COMPILE changed" message breaks compilation
-Message-ID: <20091017184136.GA13279@merkur.ravnborg.org>
-References: <20090928175605.GB28514@elf.ucw.cz> <20090928190841.GA12004@merkur.ravnborg.org> <20090928192536.GE28514@elf.ucw.cz> <20091011212757.GA2768@merkur.ravnborg.org> <20091017182511.GC16532@elf.ucw.cz>
+Subject: [PATCH 0/14 v2] kbuild: Move files to include/generated
+Message-ID: <20091018080635.GA13767@merkur.ravnborg.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20091017182511.GC16532@elf.ucw.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Pavel Machek <pavel@ucw.cz>
-Cc: kernel list <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org
+To: linux-kbuild <linux-kbuild@vger.kernel.org>, lkml <linux-kernel@vger.kernel.org>
+Cc: Stephen Rothwell <sfr@canb.auug.org.au>, Al Viro <viro@zeniv.linux.org.uk>
 
-On Sat, Oct 17, 2009 at 08:25:12PM +0200, Pavel Machek wrote:
-> On Sun 2009-10-11 23:27:57, Sam Ravnborg wrote:
-> > On Mon, Sep 28, 2009 at 09:25:36PM +0200, Pavel Machek wrote:
-> > > Hi!
-> > > 
-> > > > > After update to 2.6.32-rc1, I'm getting
-> > > > > 
-> > > > > "Makefile:197: *** CROSS_COMPILE changed from "ccache" to to "ccache ". Use "make mrproper" to fix it up. Stop.
-> > > > > 
-> > > > > Note that the message has typo in it ("to to")... What is worse, the
-> > > > > message triggers even when I try to run make mrproper. Ouch.
-> > > > 
-> > > > The massage is changed in kbuild-fixes.git - but it addresses only ARCH=
-> > > > 
-> > > > As a followup to your other mails:
-> > > > The reason to use "make mrproper" is that when ARCH or CROSS_COMPILE changes
-> > > > you have generally either decided to build for a new architecture or
-> > > > you have changed the way you build the kernel (new toolchain or whatever).
-> > > > So to clean up using "make mrproper" is perfectly justified.
-> > > > 
-> > > > The target group that uses CROSS_COMPILE to enable ccache are using
-> > > > CROSS_COMPILE is a way it is not designed for so they should expect that it
-> > > > is not a perfect match.
-> > > 
-> > > What is the recommended way to run ccache, then?
-> > ccache is a frontend to gcc - so I would have expected
-> > you would use: 
-> > 
-> >     make CC="ccache gcc"
-> > 
-> > Or does ccache also benefit ld and as and the other that receive
-> > the $(CROSS_COMPILE) prefix?
-> 
-> You are right that I don't strictly need ccache for anything but cc.
-> 
-> But anyway, check was buggy; I had CROSS_COMPILE="ccache ", and the
-> space at the end broke it.
+This is the second version of a patchset to move generated files
+to include/generated/
 
-I assume you did not read the other mail relevant to this topic.
-The patch in question has been reverted.
+include/generated/ was established as _the_ location for generated
+files used as part of the build process a few releases back.
+This patchset is a follow-up on that.
+
+Changes since v1:
+- We will now pick up .h files in arch/$ARCH/include
+  befoe include/
+  This will fix the issue reported by Stephen Rothwell
+  were we picked up an old asm-offsets.h that was left
+  in include/asm/*
+
+- generated is now included in dontdiff for the user
+  of plain old diff
+
+- fix to sh so we pick up the correct machtypes.h
+
+- Removal of include2 directory includes removal in
+  a powerpc specific file
+
+- rebased on top of -linus
+
+
+This patchset does not address request from Stephen to
+make transition of utsrelease.h smoother.
+We use utsrelease.h is so few places and any new users
+should rather use utsname.
+
+We still have a few generated files that are not moved.
+But this patchset touched enough files already so
+I stopped here for now.
+
+The patchset is pushed out at:
+
+    git://git.kernel.org/pub/scm/linux/kernel/git/sam/kbuild.next.git master
+
+Patches will follow.
 
 	Sam
+
+
+Sam Ravnborg (14):
+      kbuild: search arch/$ARCH/include before include/
+      dontdiff: add generated
+      kbuild: move bounds.h to include/generated
+      kbuild: move asm-offsets.h to include/generated
+      ia64: move nr-irqs.h to include/generated
+      arm: move mach-types to include/generated
+      sh: move machtypes.h to include/generated
+      kbuild: drop include2/ used for O=... builds
+      kbuild: do not check for include/asm-$ARCH
+      kbuild: drop include/asm
+      kbuild: move compile.h to include/generated
+      drop explicit include of autoconf.h
+      kbuild: move autoconf.h to include/generated
+      kbuild: move utsrelease.h to include/generated
+
+
+
+
+ .gitignore                                      |    6 --
+ Documentation/dontdiff                          |    1 +
+ Documentation/kbuild/kconfig.txt                |    3 +-
+ Kbuild                                          |    4 +-
+ Makefile                                        |   80 +++++------------------
+ arch/alpha/boot/bootp.c                         |    2 +-
+ arch/alpha/boot/bootpz.c                        |    2 +-
+ arch/alpha/boot/main.c                          |    2 +-
+ arch/alpha/include/asm/asm-offsets.h            |    1 +
+ arch/arm/Makefile                               |   14 +----
+ arch/arm/include/asm/asm-offsets.h              |    1 +
+ arch/arm/include/asm/mach-types.h               |    1 +
+ arch/arm/tools/Makefile                         |    2 +-
+ arch/arm/tools/gen-mach-types                   |    2 +-
+ arch/avr32/include/asm/asm-offsets.h            |    1 +
+ arch/blackfin/include/asm/asm-offsets.h         |    1 +
+ arch/cris/arch-v32/kernel/head.S                |    1 -
+ arch/cris/include/asm/asm-offsets.h             |    1 +
+ arch/cris/kernel/asm-offsets.c                  |    1 -
+ arch/cris/kernel/vmlinux.lds.S                  |    1 -
+ arch/frv/include/asm/asm-offsets.h              |    1 +
+ arch/frv/kernel/setup.c                         |    2 +-
+ arch/h8300/include/asm/asm-offsets.h            |    1 +
+ arch/ia64/Makefile                              |    2 +-
+ arch/ia64/include/asm/asm-offsets.h             |    1 +
+ arch/ia64/include/asm/irq.h                     |    2 +-
+ arch/ia64/kernel/Makefile                       |    7 +--
+ arch/ia64/kvm/asm-offsets.c                     |    1 -
+ arch/m68k/include/asm/asm-offsets.h             |    1 +
+ arch/m68k/kernel/head.S                         |    2 +-
+ arch/microblaze/include/asm/asm-offsets.h       |    1 +
+ arch/mips/include/asm/asm-offsets.h             |    1 +
+ arch/mn10300/include/asm/asm-offsets.h          |    1 +
+ arch/parisc/include/asm/asm-offsets.h           |    1 +
+ arch/powerpc/include/asm/asm-offsets.h          |    1 +
+ arch/powerpc/platforms/52xx/efika.c             |    2 +-
+ arch/powerpc/platforms/amigaone/setup.c         |    2 +-
+ arch/powerpc/platforms/cell/spufs/Makefile      |    6 +-
+ arch/powerpc/platforms/chrp/setup.c             |    2 +-
+ arch/powerpc/platforms/powermac/bootx_init.c    |    2 +-
+ arch/s390/include/asm/asm-offsets.h             |    1 +
+ arch/sh/Makefile                                |   10 +--
+ arch/sh/drivers/pci/fixups-rts7751r2d.c         |    2 +-
+ arch/sh/include/asm/.gitignore                  |    1 -
+ arch/sh/include/asm/asm-offsets.h               |    1 +
+ arch/sh/include/asm/machvec.h                   |    2 +-
+ arch/sh/tools/Makefile                          |    4 +-
+ arch/sh/tools/gen-mach-types                    |    2 +-
+ arch/sparc/include/asm/asm-offsets.h            |    1 +
+ arch/um/Makefile                                |    2 +-
+ arch/um/include/asm/asm-offsets.h               |    1 +
+ arch/x86/boot/header.S                          |    2 +-
+ arch/x86/boot/version.c                         |    4 +-
+ arch/x86/include/asm/asm-offsets.h              |    1 +
+ arch/xtensa/include/asm/asm-offsets.h           |    1 +
+ drivers/accessibility/braille/braille_console.c |    1 -
+ drivers/hid/hid-lg.h                            |    2 -
+ drivers/platform/x86/compal-laptop.c            |    1 -
+ drivers/staging/iio/ring_sw.h                   |    1 -
+ drivers/staging/panel/panel.c                   |    2 +-
+ include/linux/mmdebug.h                         |    2 -
+ include/linux/mmzone.h                          |    2 +-
+ include/linux/page-flags.h                      |    2 +-
+ include/linux/vermagic.h                        |    2 +-
+ init/Makefile                                   |    8 +--
+ init/version.c                                  |    4 +-
+ kernel/bounds.c                                 |    2 +-
+ kernel/kexec.c                                  |    2 +-
+ kernel/trace/trace.c                            |    2 +-
+ scripts/basic/fixdep.c                          |   10 ++--
+ scripts/headers.sh                              |    2 -
+ scripts/kconfig/confdata.c                      |    2 +-
+ scripts/mkcompile_h                             |    2 +-
+ 73 files changed, 91 insertions(+), 159 deletions(-)
+
