@@ -1,53 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepb.post.tele.dk ([195.41.46.236]:50088 "EHLO
-	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755277AbZJVU3f (ORCPT
+Received: from mail-bw0-f227.google.com ([209.85.218.227]:43861 "EHLO
+	mail-bw0-f227.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752646AbZJYDiL (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 22 Oct 2009 16:29:35 -0400
-Date: Thu, 22 Oct 2009 22:29:38 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: unifdef problem (xen)
-Message-ID: <20091022202938.GA1795@merkur.ravnborg.org>
-References: <20091022125223.66610093.rdunlap@xenotime.net>
+	Sat, 24 Oct 2009 23:38:11 -0400
+Received: by bwz27 with SMTP id 27so1525056bwz.21
+        for <linux-kbuild@vger.kernel.org>; Sat, 24 Oct 2009 20:38:15 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20091022125223.66610093.rdunlap@xenotime.net>
+Date: Sat, 24 Oct 2009 23:38:14 -0400
+Message-ID: <55e03a0a0910242038x5656e9c0ve28bb28023dc1432@mail.gmail.com>
+Subject: Compiling 2.6.31/31.5
+From: MySQL Student <mysqlstudent@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Randy Dunlap <rdunlap@xenotime.net>
-Cc: linux-kbuild@vger.kernel.org, jeremy@goop.org
+To: linux-kbuild@vger.kernel.org
 
-On Thu, Oct 22, 2009 at 12:52:23PM -0700, Randy Dunlap wrote:
-> Hi,
-> 
-> I'm using xen.git
-> <git://git.kernel.org/pub/scm/linux/kernel/git/jeremy/xen.git>.
-> 
-> When I build allmodconfig on x86_64 (with O=xx64), I see this warning:
-> 
-> 
-> unifdef: /xen/xx64/usr/include/xen/privcmd.h.tmp: 79: Premature EOF (#if line 33 depth 1)
-> unifdef: output may be truncated
-> 
-> 
-> The original file contains:
-> #ifndef __user
-> #define __user
-> #endif
+Hi,
 
-The problem is scripts/headers_install.pl
-Here we do:
+I'm having difficulty compiling 2.6.31 and 2.6.31.5 on x86 with
+gcc-3.4.4 and binutils-2.20.51.0.2:
 
-    $line =~ s/([\s(])__user\s/$1/g;
+  AS      arch/x86/lib/thunk_32.o
+  CC      arch/x86/lib/usercopy_32.o
+  AR      arch/x86/lib/lib.a
+  LD      vmlinux.o
+  MODPOST vmlinux.o
+  GEN     .version
+  CHK     include/linux/compile.h
+  UPD     include/linux/compile.h
+  CC      init/version.o
+  LD      init/built-in.o
+  LD      .tmp_vmlinux1
+drivers/built-in.o: In function `con_init':
+vt.c:(.init.text+0x3c5b): undefined reference to `.L1446'
+make: *** [.tmp_vmlinux1] Error 1
 
-And this zaps the newline when we see __user.
+This is built from "make defconfig".
 
-It is not obvious why this zaps the newline - must be
-some perl foo I have forgotten.
+I've seen a few references to this searching, but all the solutions
+didn't apply or didn't work. What could I be doing wrong? Could this
+be a problem with my development tools?
 
-I checked this by removing the unlink in said perl script
-and looking at the .tmp file.
-
-
-	Sam
+Thanks,
+Alex
