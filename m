@@ -1,61 +1,174 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-bw0-f227.google.com ([209.85.218.227]:40896 "EHLO
+Received: from mail-bw0-f227.google.com ([209.85.218.227]:62885 "EHLO
 	mail-bw0-f227.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754883AbZJ1WyD (ORCPT
+	with ESMTP id S1751375AbZJ1XDJ (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 28 Oct 2009 18:54:03 -0400
-Received: by bwz27 with SMTP id 27so1619861bwz.21
-        for <linux-kbuild@vger.kernel.org>; Wed, 28 Oct 2009 15:54:06 -0700 (PDT)
+	Wed, 28 Oct 2009 19:03:09 -0400
+Received: by bwz27 with SMTP id 27so1628312bwz.21
+        for <linux-kbuild@vger.kernel.org>; Wed, 28 Oct 2009 16:03:13 -0700 (PDT)
 From: Bernhard Kaindl <bernhard.kaindl@gmx.net>
-Subject: [remarks 0/4] user remarks for config symbols
-Date: Wed, 28 Oct 2009 23:53:46 +0100
-Message-Id: <4ae8cb8c.0d1abc0a.0bd6.3d0e@mx.google.com>
+Subject: [remarks 1/4] Support loading and saving custom remarks for config symbols
+Date: Wed, 28 Oct 2009 23:53:47 +0100
+Message-Id: <4ae8cdb0.0d1abc0a.0bd6.3d1e@mx.google.com>
+In-Reply-To: <cover.1256767265.git.aragorn@Anduril.(none)>
+References: <cover.1256767265.git.aragorn@Anduril.(none)>
+In-Reply-To: <cover.1256767265.git.aragorn@Anduril.(none)>
+References: <cover.1256767265.git.aragorn@Anduril.(none)>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Sam Ravnborg <sam@ravnborg.org>
 Cc: linux-kbuild@vger.kernel.org, Bernhard Kaindl <bernhard.kaindl@gmx.net>
 
-When dealing with creating or maintaining a kernel configuration, one
-may want to remember why a certain symbol was set in a certain way.
+Add the infrastructure to load and save remarks for config symbols
+to the kconfig library functions conf_read() and conf_write()
 
-I've been working on enhancing the config tools keep and edit remarks
-entered by the user to make keeping remarks as simple as possible.
+This
+ - adds sym->remark
+ - extends conf_read() to call conf_read_remarks()
+ - adds conf_read_remarks() which
+   - reads remarks from a file and
+   - stores them in sym->remark
+ - extends conf_write() to save each sym->remark so that
+   conf_read_remarks() will be able to reread them
 
-The following patches show a simple approach to that which I used
-to quite some extent, tracking hundreds of comments, using the patched
-make xconfig, which makes editing them quite comfortable.
+To not keep any additional file when no remarks exist, and to stay completely
+out of the way when this feature is not used, conf_write() does not keep
+empty remarks files, so anyone not using this code will see no changes.
 
-This simple, and rather minimum approach leaves out some changes which
-I added to make xconfig to show the remark for the newly selected
-config symbol in the panel which shows additional info for that symbol.
+The filename of the remarks file is derived from the used config file
+name and path by appending "-remarks" to the config file name. So the
+default remarks file would be ".config-remarks".
 
-If the general idea finds support, I will, of course, also bring these
-additional changes to make xconfig forward, and I have a "config2html"
-which exports the configuration decisions taken, along with any remarks
-for them, to a html file using a simple table.
+This code supports one-line remarks without newlines. The changes to
+the tools (menuconfig, xconfig, config) also only support one-line
+remarks as they use the existing UI functions for editing strings.
 
-Such export may be useful for community-oriented Linux distributions which
-like to do their kernel package management in an open environment, and
-may want do document the decisions taken in an efficient manner. I saw
-some efforts on be half of the Ubuntu kernel packagers group in that
-direction, but I am not affiliated in this regard with any distribution.
+Signed-off-by: Bernhard Kaindl <bernhard.kaindl@gmx.net>
+---
+ scripts/kconfig/confdata.c |   45 +++++++++++++++++++++++++++++++++++++++++--
+ scripts/kconfig/expr.h     |    1 +
+ 2 files changed, 43 insertions(+), 3 deletions(-)
 
-Thanks,
-Bernhard Kaindl
-
-
-Bernhard Kaindl (4):
-  Support loading and saving custom remarks for config symbols
-  menuconfig: allow editing of remarks for config symbols
-  xconfig: allow editing of remarks for config symbols
-  make config / oldconfig: allow editing of remarks for config symbols
-
- scripts/kconfig/conf.c             |   19 +++++++++++++
- scripts/kconfig/confdata.c         |   45 ++++++++++++++++++++++++++++--
- scripts/kconfig/expr.h             |    1 +
- scripts/kconfig/lxdialog/menubox.c |    3 ++
- scripts/kconfig/mconf.c            |   51 ++++++++++++++++++++++++++++++++++
- scripts/kconfig/qconf.cc           |   53 ++++++++++++++++++++++++++++++++++++
- scripts/kconfig/qconf.h            |   19 +++++++++++++
- 7 files changed, 188 insertions(+), 3 deletions(-)
+diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
+index 797a741..eee2b60 100644
+--- a/scripts/kconfig/confdata.c
++++ b/scripts/kconfig/confdata.c
+@@ -152,6 +152,30 @@ static int conf_set_sym_val(struct symbol *sym, int def, int def_flags, char *p)
+ 	return 0;
+ }
+ 
++/**
++ * Read remarks from -remarks file:
++ */
++void conf_read_remarks(const char *remfile)
++{
++	FILE *in;
++	char line[1024], *p, *p2;
++	struct symbol *sym;
++
++	sprintf(line, "%s-remarks", remfile ? remfile : conf_get_configname());
++	if (!(in = zconf_fopen(line)))
++		return;
++	while (fgets(line, sizeof(line), in)) {
++		if (!(p = strchr(line, ' '))) /* ' ' is our delimiter        */
++			continue;	      /* skip lines without one      */
++		*p++ = '\0';		      /* put a \0 there, advance     */
++		if ((p2 = strchr(p, '\n')))   /* look for \n after remark    */
++			*p2 = '\0';	      /* remove it, no \n in remarks */
++		if ((sym = sym_find(line)))   /* find the matching sym       */
++			sym->remark = strdup(p); /* and register the remark  */
++	}
++	fclose(in);
++}
++
+ int conf_read_simple(const char *name, int def)
+ {
+ 	FILE *in = NULL;
+@@ -393,16 +417,18 @@ int conf_read(const char *name)
+ 
+ 	sym_add_change_count(conf_warnings || conf_unsaved);
+ 
++	conf_read_remarks(name);
+ 	return 0;
+ }
+ 
+ int conf_write(const char *name)
+ {
+-	FILE *out;
++	FILE *out, *rem;
++	struct stat sb;
+ 	struct symbol *sym;
+ 	struct menu *menu;
+ 	const char *basename;
+-	char dirname[128], tmpname[128], newname[128];
++	char dirname[128], tmpname[128], newname[128], tmprem[128], newrem[128];
+ 	int type, l;
+ 	const char *str;
+ 	time_t now;
+@@ -432,15 +458,19 @@ int conf_write(const char *name)
+ 		basename = conf_get_configname();
+ 
+ 	sprintf(newname, "%s%s", dirname, basename);
++	sprintf(newrem, "%s%s-remarks", dirname, basename);
+ 	env = getenv("KCONFIG_OVERWRITECONFIG");
+ 	if (!env || !*env) {
+ 		sprintf(tmpname, "%s.tmpconfig.%d", dirname, (int)getpid());
+ 		out = fopen(tmpname, "w");
++		sprintf(tmprem, "%s.tmpconfig-remarks.%d", dirname, (int)getpid());
++		rem = fopen(tmprem, "w");
+ 	} else {
+ 		*tmpname = 0;
+ 		out = fopen(newname, "w");
++		rem = fopen(newrem, "w");
+ 	}
+-	if (!out)
++	if (!out || !rem)
+ 		return 1;
+ 
+ 	sym = sym_lookup("KERNELVERSION", 0);
+@@ -528,6 +558,8 @@ int conf_write(const char *name)
+ 		}
+ 
+ 	next:
++		if (sym && sym->remark)
++			fprintf(rem, "%s %s\n", sym->name, sym->remark);
+ 		if (menu->list) {
+ 			menu = menu->list;
+ 			continue;
+@@ -542,6 +574,7 @@ int conf_write(const char *name)
+ 		}
+ 	}
+ 	fclose(out);
++	fclose(rem);
+ 
+ 	if (*tmpname) {
+ 		strcat(dirname, basename);
+@@ -549,7 +582,13 @@ int conf_write(const char *name)
+ 		rename(newname, dirname);
+ 		if (rename(tmpname, newname))
+ 			return 1;
++		sprintf(dirname, "%s.old", newrem);
++		rename(newrem, dirname);
++		if (rename(tmprem, newrem)) 
++			conf_warning("moving %s to %s failed!", tmprem, newrem);
+ 	}
++	if (!stat(newrem, &sb) && !sb.st_size)
++		unlink(newrem);
+ 
+ 	printf(_("#\n"
+ 		 "# configuration written to %s\n"
+diff --git a/scripts/kconfig/expr.h b/scripts/kconfig/expr.h
+index 6408fef..217e8cb 100644
+--- a/scripts/kconfig/expr.h
++++ b/scripts/kconfig/expr.h
+@@ -77,6 +77,7 @@ enum {
+ struct symbol {
+ 	struct symbol *next;
+ 	char *name;
++	char *remark;
+ 	enum symbol_type type;
+ 	struct symbol_value curr;
+ 	struct symbol_value def[S_DEF_COUNT];
+-- 
+1.6.0.4
 
