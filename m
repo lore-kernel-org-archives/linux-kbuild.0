@@ -1,132 +1,82 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
 Received: from fallback-out1.mxes.net ([216.86.168.180]:64328 "EHLO
 	fallback-in1.mxes.net" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1752958AbZKCKLd (ORCPT
+	with ESMTP id S1755788AbZKCKLe (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 3 Nov 2009 05:11:33 -0500
+	Tue, 3 Nov 2009 05:11:34 -0500
 Received: from mxout-08.mxes.net (mxout-08.mxes.net [216.86.168.183])
-	by fallback-in1.mxes.net (Postfix) with ESMTP id B78AF86517
-	for <linux-kbuild@vger.kernel.org>; Tue,  3 Nov 2009 05:10:05 -0500 (EST)
+	by fallback-in1.mxes.net (Postfix) with ESMTP id 3449E864EE
+	for <linux-kbuild@vger.kernel.org>; Tue,  3 Nov 2009 05:10:07 -0500 (EST)
 From: Alan Jenkins <alan-jenkins@tuffmail.co.uk>
-Subject: [PATCH 07/10] lib: Add generic binary search function to the kernel.
-Date: Tue,  3 Nov 2009 10:06:19 +0000
-Message-Id: <1257242782-10496-8-git-send-email-alan-jenkins@tuffmail.co.uk>
+Subject: [PATCH 10/10] module: fix is_exported() to return true for all types of exports
+Date: Tue,  3 Nov 2009 10:06:22 +0000
+Message-Id: <1257242782-10496-11-git-send-email-alan-jenkins@tuffmail.co.uk>
 In-Reply-To: <9b2b86520911020852q49c55695rb05d87090fa9ad33@mail.gmail.com>
 References: <9b2b86520911020852q49c55695rb05d87090fa9ad33@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: greg@kroah.com
-Cc: linux-kbuild@vger.kernel.org, carmelo73@gmail.com, linux-kernel@vger.kernel.org, rusty@rustcorp.com.au, Tim Abbott <tabbott@ksplice.com>, Alan Jenkins <alan-jenkins@tuffmail.co.uk>
+Cc: linux-kbuild@vger.kernel.org, carmelo73@gmail.com, linux-kernel@vger.kernel.org, rusty@rustcorp.com.au, Alan Jenkins <alan-jenkins@tuffmail.co.uk>
 
-From: Tim Abbott <tabbott@ksplice.com>
+/proc/kallsyms annotates module symbols as global (e.g. 'D' for a data
+symbol) or local (e.g. 'd'), depending on whether is_exported() returns
+true or false.
 
-There a large number hand-coded binary searches in the kernel (run
-"git grep search | grep binary" to find many of them).  Since in my
-experience, hand-coding binary searches can be error-prone, it seems
-worth cleaning this up by providing a generic binary search function.
+Historically, is_exported() only returns true if the symbol was exported
+using EXPORT_SYMBOL(). EXPORT_SYMBOL_UNUSED(), for example, is not taken
+into account. This looks like an oversight, so let's fix it.
 
-This generic binary search implementation comes from Ksplice.  It has
-the same basic API as the C library bsearch() function.  Ksplice uses
-it in half a dozen places with 4 different comparison functions, and I
-think our code is substantially cleaner because of this.
-
-Signed-off-by: Tim Abbott <tabbott@ksplice.com>
 Signed-off-by: Alan Jenkins <alan-jenkins@tuffmail.co.uk>
 ---
- include/linux/bsearch.h |    9 ++++++++
- lib/Makefile            |    2 +-
- lib/bsearch.c           |   53 +++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 63 insertions(+), 1 deletions(-)
- create mode 100644 include/linux/bsearch.h
- create mode 100644 lib/bsearch.c
+ kernel/module.c |   30 ++++++++----------------------
+ 1 files changed, 8 insertions(+), 22 deletions(-)
 
-diff --git a/include/linux/bsearch.h b/include/linux/bsearch.h
-new file mode 100644
-index 0000000..90b1aa8
---- /dev/null
-+++ b/include/linux/bsearch.h
-@@ -0,0 +1,9 @@
-+#ifndef _LINUX_BSEARCH_H
-+#define _LINUX_BSEARCH_H
-+
-+#include <linux/types.h>
-+
-+void *bsearch(const void *key, const void *base, size_t num, size_t size,
-+	      int (*cmp)(const void *key, const void *elt));
-+
-+#endif /* _LINUX_BSEARCH_H */
-diff --git a/lib/Makefile b/lib/Makefile
-index 2e78277..fb60af1 100644
---- a/lib/Makefile
-+++ b/lib/Makefile
-@@ -21,7 +21,7 @@ lib-y	+= kobject.o kref.o klist.o
+diff --git a/kernel/module.c b/kernel/module.c
+index 122c10d..617e1f2 100644
+--- a/kernel/module.c
++++ b/kernel/module.c
+@@ -1838,33 +1838,19 @@ static void free_modinfo(struct module *mod)
  
- obj-y += bcd.o div64.o sort.o parser.o halfmd4.o debug_locks.o random32.o \
- 	 bust_spinlocks.o hexdump.o kasprintf.o bitmap.o scatterlist.o \
--	 string_helpers.o gcd.o
-+	 string_helpers.o gcd.o bsearch.o
+ #ifdef CONFIG_KALLSYMS
  
- ifeq ($(CONFIG_DEBUG_KOBJECT),y)
- CFLAGS_kobject.o += -DDEBUG
-diff --git a/lib/bsearch.c b/lib/bsearch.c
-new file mode 100644
-index 0000000..4297c98
---- /dev/null
-+++ b/lib/bsearch.c
-@@ -0,0 +1,53 @@
-+/*
-+ * A generic implementation of binary search for the Linux kernel
-+ *
-+ * Copyright (C) 2008-2009 Ksplice, Inc.
-+ * Author: Tim Abbott <tabbott@ksplice.com>
-+ *
-+ * This program is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU General Public License as
-+ * published by the Free Software Foundation; version 2.
-+ */
-+
-+#include <linux/module.h>
-+#include <linux/bsearch.h>
-+
-+/*
-+ * bsearch - binary search an array of elements
-+ * @key: pointer to item being searched for
-+ * @base: pointer to data to sort
-+ * @num: number of elements
-+ * @size: size of each element
-+ * @cmp: pointer to comparison function
-+ *
-+ * This function does a binary search on the given array.  The
-+ * contents of the array should already be in ascending sorted order
-+ * under the provided comparison function.
-+ *
-+ * Note that the key need not have the same type as the elements in
-+ * the array, e.g. key could be a string and the comparison function
-+ * could compare the string with the struct's name field.  However, if
-+ * the key and elements in the array are of the same type, you can use
-+ * the same comparison function for both sort() and bsearch().
-+ */
-+void *bsearch(const void *key, const void *base, size_t num, size_t size,
-+	      int (*cmp)(const void *key, const void *elt))
-+{
-+	int start = 0, end = num - 1, mid, result;
-+	if (num == 0)
-+		return NULL;
-+
-+	while (start <= end) {
-+		mid = (start + end) / 2;
-+		result = cmp(key, base + mid * size);
-+		if (result < 0)
-+			end = mid - 1;
-+		else if (result > 0)
-+			start = mid + 1;
-+		else
-+			return (void *)base + mid * size;
-+	}
-+
-+	return NULL;
-+}
-+EXPORT_SYMBOL(bsearch);
+-/* lookup symbol in given range of kernel_symbols */
+-static const struct kernel_symbol *lookup_symbol(const char *name,
+-	const struct kernel_symbol *syms,
+-	unsigned int count)
+-{
+-	unsigned int i;
+-
+-	for (i = 0; i < count; i++)
+-		if (strcmp(syms[i].name, name) == 0)
+-			return &syms[i];
+-	return NULL;
+-}
+-
+ static int is_exported(const char *name, unsigned long value,
+-		       const struct module *mod)
++		       struct module *mod)
+ {
+-	const struct ksymtab *symtab;
+-	const struct kernel_symbol *ks;
++	const struct kernel_symbol *sym;
++	enum export_type type;
++	const unsigned long *crc;
+ 
+-	if (!mod)
+-		symtab = &ksymtab[EXPORT_TYPE_PLAIN];
++	if (mod)
++		sym = find_symbol_in_module(mod, name, &type, &crc);
+ 	else
+-		symtab = &mod->syms[EXPORT_TYPE_PLAIN];
+-
+-	ks = lookup_symbol(name, symtab->syms, symtab->num_syms);
++		sym = find_symbol_in_kernel(name, &type, &crc);
+ 
+-	return ks != NULL && ks->value == value;
++	return (sym && sym->value == value);
+ }
+ 
+ /* As per nm */
 -- 
 1.6.3.2
 
