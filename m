@@ -1,16 +1,16 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from fallback-out1.mxes.net ([216.86.168.180]:64328 "EHLO
+Received: from fallback-out1.mxes.net ([216.86.168.180]:55018 "EHLO
 	fallback-in1.mxes.net" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1755945AbZKCKLf (ORCPT
+	with ESMTP id S1750862AbZKCKRG (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 3 Nov 2009 05:11:35 -0500
+	Tue, 3 Nov 2009 05:17:06 -0500
 Received: from mxout-08.mxes.net (mxout-08.mxes.net [216.86.168.183])
-	by fallback-in1.mxes.net (Postfix) with ESMTP id 71A1A86520
-	for <linux-kbuild@vger.kernel.org>; Tue,  3 Nov 2009 05:10:32 -0500 (EST)
+	by fallback-in1.mxes.net (Postfix) with ESMTP id 0B4C5864F9
+	for <linux-kbuild@vger.kernel.org>; Tue,  3 Nov 2009 05:07:40 -0500 (EST)
 From: Alan Jenkins <alan-jenkins@tuffmail.co.uk>
-Subject: [PATCH 09/10] module: speed up find_symbol() using binary search on the builtin symbol tables
-Date: Tue,  3 Nov 2009 10:06:21 +0000
-Message-Id: <1257242782-10496-10-git-send-email-alan-jenkins@tuffmail.co.uk>
+Subject: [PATCH 01/10] ARM: use unified discard definition in linker script
+Date: Tue,  3 Nov 2009 10:06:13 +0000
+Message-Id: <1257242782-10496-2-git-send-email-alan-jenkins@tuffmail.co.uk>
 In-Reply-To: <9b2b86520911020852q49c55695rb05d87090fa9ad33@mail.gmail.com>
 References: <9b2b86520911020852q49c55695rb05d87090fa9ad33@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -18,213 +18,67 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: greg@kroah.com
 Cc: linux-kbuild@vger.kernel.org, carmelo73@gmail.com, linux-kernel@vger.kernel.org, rusty@rustcorp.com.au, Alan Jenkins <alan-jenkins@tuffmail.co.uk>
 
-The builtin symbol tables are now sorted, so we can use a binary
-search.
+Commit 023bf6f "linker script: unify usage of discard definition"
+changed the linker scripts for all architectures except for ARM.
+I can find no discussion about this ommision, so here are the changes
+for ARM.
 
-The symbol tables in modules are still unsorted and require linear
-searching as before. But since the generic each_symbol() is removed,
-the code size only goes up 8 bytes overall on i386.
+These changes are exactly parallel to the ia64 case.
 
-On my EeePC 701, coldplug is mainly cpu bound and takes 1.5 seconds
-during boot. perf showed this change eliminated 20% of cpu cycles during
-coldplug, saving 0.3 seconds of real time.
+"ia64 is notable because it first throws away some ia64 specific
+ subsections and then include the rest of the sections into the final
+ image, so those sections must be discarded before the inclusion."
 
-These savings may not be representative since my config is not very well
-tuned.  The numbers above represent the loading of 35 modules,
-referencing a total of 441 symbols.  Nevertheless, it shows why I think
-this is worth doing.
+Not boot-tested.  In build testing, the modified linker script generated
+an identical vmlinux file.
+
+[I would like to be able to rely on this unified discard definition.
+ I want to sort the kernel symbol tables to allow faster symbol
+ resolution during module loading. The simplest way appears to be
+ to generate sorted versions from vmlinux.o, link them in to vmlinux,
+ _and discard the original unsorted tables_.
+
+ This work is driven by my x86 netbook, but it is implemented at a
+ generic level. It is possible it will benefit some ARM systems also.]
 
 Signed-off-by: Alan Jenkins <alan-jenkins@tuffmail.co.uk>
+Acked-by: Russell King <rmk+kernel@arm.linux.org.uk>
+Acked-by-without-testing: Tejun Heo <tj@kernel.org>
 ---
- kernel/module.c |  144 ++++++++++++++++++++++++++++++++++--------------------
- 1 files changed, 91 insertions(+), 53 deletions(-)
+ arch/arm/kernel/vmlinux.lds.S |   13 ++++++++-----
+ 1 files changed, 8 insertions(+), 5 deletions(-)
 
-diff --git a/kernel/module.c b/kernel/module.c
-index 38a2859..122c10d 100644
---- a/kernel/module.c
-+++ b/kernel/module.c
-@@ -55,6 +55,7 @@
- #include <linux/async.h>
- #include <linux/percpu.h>
- #include <linux/kmemleak.h>
-+#include <linux/bsearch.h>
- 
- #define CREATE_TRACE_POINTS
- #include <trace/events/module.h>
-@@ -272,36 +273,98 @@ bool each_symbol(each_symbol_fn_t *fn, void *data)
- }
- EXPORT_SYMBOL_GPL(each_symbol);
- 
--struct find_symbol_arg {
--	/* Input */
--	const char *name;
--	bool gplok;
--	bool warn;
-+static int symbol_compare(const void *key, const void *elt)
-+{
-+	const char *str = key;
-+	const struct kernel_symbol *sym = elt;
-+	return strcmp(str, sym->name);
-+}
- 
--	/* Output */
-+/* binary search on sorted symbols */
-+static const struct kernel_symbol *find_symbol_in_kernel(
-+	const char *name,
-+	enum export_type *t,
-+	const unsigned long **crc)
-+{
-+	struct kernel_symbol *sym;
-+	enum export_type type;
-+	unsigned int i;
-+
-+	for (type = 0; type < EXPORT_TYPE_MAX; type++) {
-+		sym = bsearch(name, ksymtab[type].syms, ksymtab[type].num_syms,
-+			      sizeof(struct kernel_symbol), symbol_compare);
-+		if (sym) {
-+			i = sym - ksymtab[type].syms;
-+			*crc = symversion(ksymtab[type].crcs, i);
-+			*t = type;
-+			return sym;
-+		}
-+	}
-+
-+	return NULL;
-+}
-+
-+/* linear search on unsorted symbols */
-+static const struct kernel_symbol *find_symbol_in_module(
-+	struct module *mod,
-+	const char *name,
-+	enum export_type *t,
-+	const unsigned long **crc)
-+{
-+	struct ksymtab *symtab = mod->syms;
- 	const struct kernel_symbol *sym;
--	const unsigned long *crc;
--	struct module *owner;
--};
-+	enum export_type type;
-+	unsigned int i;
- 
--static bool find_symbol_in_section(enum export_type type,
--				   const struct kernel_symbol *sym,
--				   const unsigned long *crc,
--				   struct module *owner,
--				   void *data)
-+	for (type = 0; type < EXPORT_TYPE_MAX; type++) {
-+		for (i = 0; i < symtab[type].num_syms; i++) {
-+			sym = &symtab[type].syms[i];
-+
-+			if (strcmp(sym->name, name) == 0) {
-+				*crc = symversion(symtab[type].crcs, i);
-+				*t = type;
-+				return sym;
-+			}
-+		}
-+	}
-+
-+	return NULL;
-+}
-+
-+/* Find a symbol and return it, along with, (optional) crc and
-+ * (optional) module which owns it */
-+const struct kernel_symbol *find_symbol(const char *name,
-+					struct module **owner,
-+					const unsigned long **crc,
-+					bool gplok,
-+					bool warn)
- {
--	struct find_symbol_arg *fsa = data;
-+	struct module *mod = NULL;
-+	const struct kernel_symbol *sym;
-+	enum export_type type;
-+	const unsigned long *crc_value;
- 
--	if (strcmp(sym->name, fsa->name) != 0)
--		return false;
-+	sym = find_symbol_in_kernel(name, &type, &crc_value);
-+	if (sym)
-+		goto found;
-+
-+	list_for_each_entry_rcu(mod, &modules, list) {
-+		sym = find_symbol_in_module(mod, name, &type, &crc_value);
-+		if (sym)
-+			goto found;
-+	}
-+
-+	DEBUGP("Failed to find symbol %s\n", name);
-+	return NULL;
- 
--	if (!fsa->gplok) {
-+found:
-+	if (!gplok) {
- 		if (export_is_gpl_only(type))
--			return false;
--		if (export_is_gpl_future(type) && fsa->warn) {
-+			return NULL;
-+		if (export_is_gpl_future(type) && warn) {
- 			printk(KERN_WARNING "Symbol %s is being used "
- 			       "by a non-GPL module, which will not "
--			       "be allowed in the future\n", fsa->name);
-+			       "be allowed in the future\n", name);
- 			printk(KERN_WARNING "Please see the file "
- 			       "Documentation/feature-removal-schedule.txt "
- 			       "in the kernel source tree for more details.\n");
-@@ -309,9 +372,9 @@ static bool find_symbol_in_section(enum export_type type,
- 	}
- 
- #ifdef CONFIG_UNUSED_SYMBOLS
--	if (export_is_unused(type) && fsa->warn) {
-+	if (export_is_unused(type) && warn) {
- 		printk(KERN_WARNING "Symbol %s is marked as UNUSED, "
--		       "however this module is using it.\n", fsa->name);
-+		       "however this module is using it.\n", name);
- 		printk(KERN_WARNING
- 		       "This symbol will go away in the future.\n");
- 		printk(KERN_WARNING
-@@ -322,36 +385,11 @@ static bool find_symbol_in_section(enum export_type type,
- 	}
+diff --git a/arch/arm/kernel/vmlinux.lds.S b/arch/arm/kernel/vmlinux.lds.S
+index aecf87d..ec511d4 100644
+--- a/arch/arm/kernel/vmlinux.lds.S
++++ b/arch/arm/kernel/vmlinux.lds.S
+@@ -79,11 +79,11 @@ SECTIONS
  #endif
+ 	}
  
--	fsa->sym = sym;
--	fsa->crc = crc;
--	fsa->owner = owner;
--	return true;
--}
--
--/* Find a symbol and return it, along with, (optional) crc and
-- * (optional) module which owns it */
--const struct kernel_symbol *find_symbol(const char *name,
--					struct module **owner,
--					const unsigned long **crc,
--					bool gplok,
--					bool warn)
--{
--	struct find_symbol_arg fsa;
--
--	fsa.name = name;
--	fsa.gplok = gplok;
--	fsa.warn = warn;
--
--	if (each_symbol(find_symbol_in_section, &fsa)) {
--		if (owner)
--			*owner = fsa.owner;
--		if (crc)
--			*crc = fsa.crc;
--		return fsa.sym;
--	}
--
--	DEBUGP("Failed to find symbol %s\n", name);
--	return NULL;
-+	if (owner)
-+		*owner = mod;
-+	if (crc)
-+		*crc = crc_value;
-+	return sym;
+-	/DISCARD/ : {			/* Exit code and data		*/
+-		EXIT_TEXT
+-		EXIT_DATA
+-		*(.exitcall.exit)
+-		*(.discard)
++	/*
++	 * unwind exit sections must be discarded before the rest of the
++	 * unwind sections get included.
++	 */
++	/DISCARD/ : {
+ 		*(.ARM.exidx.exit.text)
+ 		*(.ARM.extab.exit.text)
+ #ifndef CONFIG_HOTPLUG_CPU
+@@ -271,6 +271,9 @@ SECTIONS
+ 	.stab.index 0 : { *(.stab.index) }
+ 	.stab.indexstr 0 : { *(.stab.indexstr) }
+ 	.comment 0 : { *(.comment) }
++
++	/* Default discards */
++	DISCARDS
  }
- EXPORT_SYMBOL_GPL(find_symbol);
  
+ /*
 -- 
 1.6.3.2
 
