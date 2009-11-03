@@ -1,211 +1,67 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from fallback-out1.mxes.net ([216.86.168.180]:55030 "EHLO
-	fallback-in1.mxes.net" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1750998AbZKCKRH (ORCPT
+Received: from mail-yw0-f202.google.com ([209.85.211.202]:60063 "EHLO
+	mail-yw0-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751105AbZKCKTe convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 3 Nov 2009 05:17:07 -0500
-Received: from mxout-08.mxes.net (mxout-08.mxes.net [216.86.168.183])
-	by fallback-in1.mxes.net (Postfix) with ESMTP id 04C33864FB
-	for <linux-kbuild@vger.kernel.org>; Tue,  3 Nov 2009 05:09:00 -0500 (EST)
-From: Alan Jenkins <alan-jenkins@tuffmail.co.uk>
-Subject: [PATCH 03/10] module: extract __EXPORT_SYMBOL from module.h into mod_export.h
-Date: Tue,  3 Nov 2009 10:06:15 +0000
-Message-Id: <1257242782-10496-4-git-send-email-alan-jenkins@tuffmail.co.uk>
-In-Reply-To: <9b2b86520911020852q49c55695rb05d87090fa9ad33@mail.gmail.com>
+	Tue, 3 Nov 2009 05:19:34 -0500
+MIME-Version: 1.0
+In-Reply-To: <1257242782-10496-5-git-send-email-alan-jenkins@tuffmail.co.uk>
 References: <9b2b86520911020852q49c55695rb05d87090fa9ad33@mail.gmail.com>
+	<1257242782-10496-5-git-send-email-alan-jenkins@tuffmail.co.uk>
+From: Mike Frysinger <vapier.adi@gmail.com>
+Date: Tue, 3 Nov 2009 05:19:19 -0500
+Message-ID: <8bd0f97a0911030219y685a1dafy2a8e066d7132ac45@mail.gmail.com>
+Subject: Re: [PATCH 04/10] module: make MODULE_SYMBOL_PREFIX into a CONFIG
+	option
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: greg@kroah.com
-Cc: linux-kbuild@vger.kernel.org, carmelo73@gmail.com, linux-kernel@vger.kernel.org, rusty@rustcorp.com.au, Alan Jenkins <alan-jenkins@tuffmail.co.uk>
+To: Alan Jenkins <alan-jenkins@tuffmail.co.uk>
+Cc: greg@kroah.com, linux-kbuild@vger.kernel.org, carmelo73@gmail.com, linux-kernel@vger.kernel.org, rusty@rustcorp.com.au
 
-The new header mod_export.h allows __EXPORT_SYMBOL to be used without
-pulling in any function or variable declarations.  It will be used by
-the build system to help sort the list of symbols exported by the
-kernel.
+On Tue, Nov 3, 2009 at 05:06, Alan Jenkins wrote:
+> The next commit will require the use of MODULE_SYMBOL_PREFIX in
+> .tmp_exports-asm.S.  Currently it is mixed in with C structure
+> definitions in "asm/module.h".  Move the definition of this arch option
+> into Kconfig, so it can be easily accessed by any code.
+>
+> This also lets modpost.c use the same definition.  Previously modpost
+> relied on a hardcoded list of architectures in mk_elfconfig.c.
 
-Signed-off-by: Alan Jenkins <alan-jenkins@tuffmail.co.uk>
----
- include/linux/mod_export.h |   73 ++++++++++++++++++++++++++++++++++++++++++++
- include/linux/module.h     |   63 +-------------------------------------
- 2 files changed, 74 insertions(+), 62 deletions(-)
- create mode 100644 include/linux/mod_export.h
+this should also let us push VMLINUX_SYMBOL() out of
+arch/*/kernel/vmlinux.lds.S and into asm-generic/vmlinux.lds.h ...
 
-diff --git a/include/linux/mod_export.h b/include/linux/mod_export.h
-new file mode 100644
-index 0000000..3d80057
---- /dev/null
-+++ b/include/linux/mod_export.h
-@@ -0,0 +1,73 @@
-+#ifndef LINUX_MOD_EXPORT_H
-+#define LINUX_MOD_EXPORT_H
-+
-+#include <linux/compiler.h>
-+#include <asm/module.h>
-+
-+/* some toolchains uses a `_' prefix for all user symbols */
-+#ifndef MODULE_SYMBOL_PREFIX
-+#define MODULE_SYMBOL_PREFIX ""
-+#endif
-+
-+struct kernel_symbol {
-+	unsigned long value;
-+	const char *name;
-+};
-+
-+#ifdef CONFIG_MODULES
-+#ifndef __GENKSYMS__
-+#ifdef CONFIG_MODVERSIONS
-+/* Mark the CRC weak since genksyms apparently decides not to
-+ * generate a checksums for some symbols */
-+#define __CRC_SYMBOL(sym, sec)					\
-+	extern void *__crc_##sym __attribute__((weak));		\
-+	static const unsigned long __kcrctab_##sym		\
-+	__used							\
-+	__attribute__((section("__kcrctab" sec), unused))	\
-+	= (unsigned long) &__crc_##sym;
-+#else
-+#define __CRC_SYMBOL(sym, sec)
-+#endif
-+
-+/* For every exported symbol, place a struct in the __ksymtab section */
-+#define __EXPORT_SYMBOL(sym, sec)				\
-+	extern typeof(sym) sym;					\
-+	__CRC_SYMBOL(sym, sec)					\
-+	static const char __kstrtab_##sym[]			\
-+	__attribute__((section("__ksymtab_strings"), aligned(1))) \
-+	= MODULE_SYMBOL_PREFIX #sym;                    	\
-+	static const struct kernel_symbol __ksymtab_##sym	\
-+	__used							\
-+	__attribute__((section("__ksymtab" sec), unused))	\
-+	= { (unsigned long)&sym, __kstrtab_##sym }
-+
-+#define EXPORT_SYMBOL(sym)					\
-+	__EXPORT_SYMBOL(sym, "")
-+
-+#define EXPORT_SYMBOL_GPL(sym)					\
-+	__EXPORT_SYMBOL(sym, "_gpl")
-+
-+#define EXPORT_SYMBOL_GPL_FUTURE(sym)				\
-+	__EXPORT_SYMBOL(sym, "_gpl_future")
-+
-+#ifdef CONFIG_UNUSED_SYMBOLS
-+#define EXPORT_UNUSED_SYMBOL(sym) __EXPORT_SYMBOL(sym, "_unused")
-+#define EXPORT_UNUSED_SYMBOL_GPL(sym) __EXPORT_SYMBOL(sym, "_unused_gpl")
-+#else
-+#define EXPORT_UNUSED_SYMBOL(sym)
-+#define EXPORT_UNUSED_SYMBOL_GPL(sym)
-+#endif
-+
-+#endif /* __GENKSYMS__ */
-+
-+#else /* !CONFIG_MODULES */
-+
-+#define EXPORT_SYMBOL(sym)
-+#define EXPORT_SYMBOL_GPL(sym)
-+#define EXPORT_SYMBOL_GPL_FUTURE(sym)
-+#define EXPORT_UNUSED_SYMBOL(sym)
-+#define EXPORT_UNUSED_SYMBOL_GPL(sym)
-+
-+#endif /* CONFIG_MODULES */
-+
-+#endif /* LINUX_MOD_EXPORT_H */
-diff --git a/include/linux/module.h b/include/linux/module.h
-index 482efc8..b9e860a 100644
---- a/include/linux/module.h
-+++ b/include/linux/module.h
-@@ -15,6 +15,7 @@
- #include <linux/stringify.h>
- #include <linux/kobject.h>
- #include <linux/moduleparam.h>
-+#include <linux/mod_export.h>
- #include <linux/tracepoint.h>
- 
- #include <asm/local.h>
-@@ -25,19 +26,8 @@
- /* Not Yet Implemented */
- #define MODULE_SUPPORTED_DEVICE(name)
- 
--/* some toolchains uses a `_' prefix for all user symbols */
--#ifndef MODULE_SYMBOL_PREFIX
--#define MODULE_SYMBOL_PREFIX ""
--#endif
--
- #define MODULE_NAME_LEN MAX_PARAM_PREFIX_LEN
- 
--struct kernel_symbol
--{
--	unsigned long value;
--	const char *name;
--};
--
- struct modversion_info
- {
- 	unsigned long crc;
-@@ -178,52 +168,6 @@ void *__symbol_get(const char *symbol);
- void *__symbol_get_gpl(const char *symbol);
- #define symbol_get(x) ((typeof(&x))(__symbol_get(MODULE_SYMBOL_PREFIX #x)))
- 
--#ifndef __GENKSYMS__
--#ifdef CONFIG_MODVERSIONS
--/* Mark the CRC weak since genksyms apparently decides not to
-- * generate a checksums for some symbols */
--#define __CRC_SYMBOL(sym, sec)					\
--	extern void *__crc_##sym __attribute__((weak));		\
--	static const unsigned long __kcrctab_##sym		\
--	__used							\
--	__attribute__((section("__kcrctab" sec), unused))	\
--	= (unsigned long) &__crc_##sym;
--#else
--#define __CRC_SYMBOL(sym, sec)
--#endif
--
--/* For every exported symbol, place a struct in the __ksymtab section */
--#define __EXPORT_SYMBOL(sym, sec)				\
--	extern typeof(sym) sym;					\
--	__CRC_SYMBOL(sym, sec)					\
--	static const char __kstrtab_##sym[]			\
--	__attribute__((section("__ksymtab_strings"), aligned(1))) \
--	= MODULE_SYMBOL_PREFIX #sym;                    	\
--	static const struct kernel_symbol __ksymtab_##sym	\
--	__used							\
--	__attribute__((section("__ksymtab" sec), unused))	\
--	= { (unsigned long)&sym, __kstrtab_##sym }
--
--#define EXPORT_SYMBOL(sym)					\
--	__EXPORT_SYMBOL(sym, "")
--
--#define EXPORT_SYMBOL_GPL(sym)					\
--	__EXPORT_SYMBOL(sym, "_gpl")
--
--#define EXPORT_SYMBOL_GPL_FUTURE(sym)				\
--	__EXPORT_SYMBOL(sym, "_gpl_future")
--
--
--#ifdef CONFIG_UNUSED_SYMBOLS
--#define EXPORT_UNUSED_SYMBOL(sym) __EXPORT_SYMBOL(sym, "_unused")
--#define EXPORT_UNUSED_SYMBOL_GPL(sym) __EXPORT_SYMBOL(sym, "_unused_gpl")
--#else
--#define EXPORT_UNUSED_SYMBOL(sym)
--#define EXPORT_UNUSED_SYMBOL_GPL(sym)
--#endif
--
--#endif
--
- enum module_state
- {
- 	MODULE_STATE_LIVE,
-@@ -541,11 +485,6 @@ extern void module_update_tracepoints(void);
- extern int module_get_iter_tracepoints(struct tracepoint_iter *iter);
- 
- #else /* !CONFIG_MODULES... */
--#define EXPORT_SYMBOL(sym)
--#define EXPORT_SYMBOL_GPL(sym)
--#define EXPORT_SYMBOL_GPL_FUTURE(sym)
--#define EXPORT_UNUSED_SYMBOL(sym)
--#define EXPORT_UNUSED_SYMBOL_GPL(sym)
- 
- /* Given an address, look for it in the exception tables. */
- static inline const struct exception_table_entry *
--- 
-1.6.3.2
+> A build test for blackfin, one of the two MODULE_SYMBOL_PREFIX archs,
+> showed the generated code was unchanged.  vmlinux was identical save
+> for build ids, and an apparently randomized suffix on a single "__key"
+> symbol in the kallsyms data).
 
+when you get localized (static) namespace collisions, the linker
+automatically does that
+
+> --- a/init/Kconfig
+> +++ b/init/Kconfig
+> @@ -1171,6 +1171,17 @@ config MODULE_SRCVERSION_ALL
+>
+>  endif # MODULES
+>
+> +config HAVE_SYMBOL_PREFIX
+> +       bool
+> +       help
+> +         Some arch toolchains use a `_' prefix for all user symbols.
+> +         This option will be taken into account when loading modules.
+> +
+> +config SYMBOL_PREFIX
+> +       string
+> +       default "_" if HAVE_SYMBOL_PREFIX
+> +       default ""
+
+in practice, the symbol prefix is an underscore.  but there is no
+technical limitation here -- the toolchain could use whatever prefix
+they wanted
+
+so if the Kconfig option was pushed to arch/*/Kconfig, we could drop
+HAVE_SYMBOL_PREFIX and let the arch declare the exact SYMBOL_PREFIX
+value itself
+-mike
