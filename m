@@ -1,36 +1,56 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from kroah.org ([198.145.64.141]:36400 "EHLO coco.kroah.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752772AbZKCQKL (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 3 Nov 2009 11:10:11 -0500
-Date: Tue, 3 Nov 2009 07:58:24 -0800
-From: Greg KH <greg@kroah.com>
-Subject: Re: [PATCH 0/10] module: Speed up symbol resolution during module
-	loading (using binary search)
-Message-ID: <20091103155824.GA23857@kroah.com>
-References: <9b2b86520911020852q49c55695rb05d87090fa9ad33@mail.gmail.com> <1257242782-10496-1-git-send-email-alan-jenkins@tuffmail.co.uk>
+Received: from cpsmtpm-eml110.kpnxchange.com ([195.121.3.14]:64829 "EHLO
+	CPSMTPM-EML110.kpnxchange.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1750845AbZKCTzc (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 3 Nov 2009 14:55:32 -0500
+From: Frans Pop <elendil@planet.nl>
+Subject: Re: [PATCH] um: minor Makefile simplification through use of cc-ifversion
+Date: Tue, 3 Nov 2009 20:55:34 +0100
+References: <200907232057.51827.elendil@planet.nl>
+In-Reply-To: <200907232057.51827.elendil@planet.nl>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Content-Transfer-Encoding: 7bit
 Content-Disposition: inline
-In-Reply-To: <1257242782-10496-1-git-send-email-alan-jenkins@tuffmail.co.uk>
+Message-Id: <200911032055.36504.elendil@planet.nl>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Alan Jenkins <alan-jenkins@tuffmail.co.uk>
-Cc: linux-kbuild@vger.kernel.org, carmelo73@gmail.com, linux-kernel@vger.kernel.org, rusty@rustcorp.com.au
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: user-mode-linux-devel@lists.sourceforge.net, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Tue, Nov 03, 2009 at 10:06:12AM +0000, Alan Jenkins wrote:
-> GKH: Care to post actual patches?
-> 
-> Sure.
-> 
-> Changelog as per original post
-> <http://article.gmane.org/gmane.linux.kbuild.devel/3983>
+Hi Sam,
 
-Nice stuff.  Becides the embedded people arguing among themselves, I see
-no reason why you shouldn't submit this for inclusion in -next now.
-Can you send this to Ingo for inclusion in the -tip tree?  Or should it
-go through someone else's tree instead?
+You planned to take any of these patches not picked up by arch maintainers 
+in kbuild.git. This looks to be the only one not yet included in mainline.
 
-thanks,
+Cheers,
+FJP
 
-greg k-h
+On Thursday 23 July 2009, Frans Pop wrote:
+> Signed-off-by: Frans Pop <elendil@planet.nl>
+> ---
+>
+> Change was suggested by Sam Ravnborg; see
+> http://lkml.org/lkml/2009/7/18/15. Untested, but a similar patch for x86
+> was tested to work.
+>
+> diff --git a/arch/um/Makefile-i386 b/arch/um/Makefile-i386
+> index 302cbe5..2c3e658 100644
+> --- a/arch/um/Makefile-i386
+> +++ b/arch/um/Makefile-i386
+> @@ -35,8 +35,9 @@ cflags-y += -ffreestanding
+>  # Disable unit-at-a-time mode on pre-gcc-4.0 compilers, it makes gcc
+> use # a lot more stack due to the lack of sharing of stacklots.  Also,
+> gcc # 4.3.0 needs -funit-at-a-time for extern inline functions.
+> -KBUILD_CFLAGS += $(shell if [ $(call cc-version) -lt 0400 ] ; then \
+> -			echo $(call cc-option,-fno-unit-at-a-time); \
+> -			else echo $(call cc-option,-funit-at-a-time); fi ;)
+> +KBUILD_CFLAGS += $(call cc-ifversion, -lt, 0400, \
+> +			$(call cc-option,-fno-unit-at-a-time))
+> +KBUILD_CFLAGS += $(call cc-ifversion, -ge, 0400, \
+> +			$(call cc-option,-funit-at-a-time))
+>
+>  KBUILD_CFLAGS += $(cflags-y)
+
