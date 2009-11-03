@@ -1,33 +1,36 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ew0-f207.google.com ([209.85.219.207]:44532 "EHLO
-	mail-ew0-f207.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753002AbZKCPez (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 3 Nov 2009 10:34:55 -0500
-Message-ID: <4AF04D9C.1050600@tuffmail.co.uk>
-Date: Tue, 03 Nov 2009 15:34:52 +0000
-From: Alan Jenkins <alan-jenkins@tuffmail.co.uk>
+Received: from kroah.org ([198.145.64.141]:36400 "EHLO coco.kroah.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752772AbZKCQKL (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 3 Nov 2009 11:10:11 -0500
+Date: Tue, 3 Nov 2009 07:58:24 -0800
+From: Greg KH <greg@kroah.com>
+Subject: Re: [PATCH 0/10] module: Speed up symbol resolution during module
+	loading (using binary search)
+Message-ID: <20091103155824.GA23857@kroah.com>
+References: <9b2b86520911020852q49c55695rb05d87090fa9ad33@mail.gmail.com> <1257242782-10496-1-git-send-email-alan-jenkins@tuffmail.co.uk>
 MIME-Version: 1.0
-Subject: Re: [PATCH 1/2] lib: Add generic binary search function to the kernel.
-References: <1253626718-18887-5-git-send-email-alan-jenkins@tuffmail.co.uk>	 <1253726926-5504-2-git-send-email-tabbott@ksplice.com>	 <200909240941.41479.rusty@rustcorp.com.au>	 <alpine.DEB.1.10.0909271303580.14151@dr-wily.mit.edu> <a4c8a6d00911030714w2e885066g9af086818a968b7b@mail.gmail.com>
-In-Reply-To: <a4c8a6d00911030714w2e885066g9af086818a968b7b@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1257242782-10496-1-git-send-email-alan-jenkins@tuffmail.co.uk>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Thiago Farina <tfransosi@gmail.com>
-Cc: Tim Abbott <tabbott@ksplice.com>, Rusty Russell <rusty@rustcorp.com.au>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org, linux-modules@vger.kernel.org
+To: Alan Jenkins <alan-jenkins@tuffmail.co.uk>
+Cc: linux-kbuild@vger.kernel.org, carmelo73@gmail.com, linux-kernel@vger.kernel.org, rusty@rustcorp.com.au
 
-Thiago Farina wrote:
-> Hi, this patch was landed? It seems not to be in the tree
-> (git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux-2.6).
->   
+On Tue, Nov 03, 2009 at 10:06:12AM +0000, Alan Jenkins wrote:
+> GKH: Care to post actual patches?
+> 
+> Sure.
+> 
+> Changelog as per original post
+> <http://article.gmane.org/gmane.linux.kbuild.devel/3983>
 
-I guess I'm sitting on it at the moment, having folded it into a patch 
-series which I have yet to submit.
+Nice stuff.  Becides the embedded people arguing among themselves, I see
+no reason why you shouldn't submit this for inclusion in -next now.
+Can you send this to Ingo for inclusion in the -tip tree?  Or should it
+go through someone else's tree instead?
 
-There are apparently already a number of implementations scattered 
-around the kernel tree.  Perhaps you can add another copy of this 
-implementation, wherever it is you need it :-).
+thanks,
 
-Alan
+greg k-h
