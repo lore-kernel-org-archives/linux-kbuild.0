@@ -1,336 +1,85 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp1.linux-foundation.org ([140.211.169.13]:45817 "EHLO
+Received: from smtp1.linux-foundation.org ([140.211.169.13]:53386 "EHLO
 	smtp1.linux-foundation.org" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1755803AbZKDPUU (ORCPT
+	by vger.kernel.org with ESMTP id S1755897AbZKDPU2 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 4 Nov 2009 10:20:20 -0500
-Message-Id: <200911041519.nA4FJaBF030330@imap1.linux-foundation.org>
-Subject: [patch 2/4] kbuild: generate modules.builtin
+	Wed, 4 Nov 2009 10:20:28 -0500
+Message-Id: <200911041519.nA4FJjwc030665@imap1.linux-foundation.org>
+Subject: [patch 4/4] kconfig CROSS_COMPILE option
 From: akpm@linux-foundation.org
-Date: Wed, 04 Nov 2009 07:19:36 -0800
+Date: Wed, 04 Nov 2009 07:19:45 -0800
 MIME-Version: 1.0
 Content-Type: text/plain; charset=ANSI_X3.4-1968
 Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: akpm@linux-foundation.org, mmarek@suse.cz, JBeulich@novell.com, sam@ravnborg.org
+Cc: akpm@linux-foundation.org, roland@redhat.com, sam@ravnborg.org
 
-From: Michal Marek <mmarek@suse.cz>
+From: Roland McGrath <roland@redhat.com>
 
-To make it easier for tools like mkinitrd to detect whether a needed
-module is missing or whether it is compiled into the kernel, install a
-modules.builtin file listing all modules built into the kernel.  This is
-done by generating an alternate config file with all tristate =y options
-set to =Y and reading the makefiles with this config included.  The built
-in modules then appear in obj-Y.
+This adds CROSS_COMPILE as a kconfig string so you can store it in
+.config.  Then you can use plain "make" in the configured kernel build
+directory to do the right cross compilation without setting the
+command-line or environment variable every time.
 
-Signed-off-by: Michal Marek <mmarek@suse.cz>
-Cc: Jan Beulich <JBeulich@novell.com>
+With this, you can set up different build directories for different kernel
+configurations, whether native or cross-builds, and then use the simple:
+
+	make -C /build/dir M=module-source-dir
+
+idiom to build modules for any given target kernel, indicating which one
+by nothing but the build directory chosen.
+
+I tried a version that defaults the string with env="CROSS_COMPILE" so
+that in a "make oldconfig" with CROSS_COMPILE in the environment you can
+just hit return to store the way you're building it.  But the kconfig
+prompt for strings doesn't give you any way to say you want an empty
+string instead of the default, so I punted that.
+
+Signed-off-by: Roland McGrath <roland@redhat.com>
 Cc: Sam Ravnborg <sam@ravnborg.org>
 Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
 ---
 
- .gitignore                  |    1 
- Makefile                    |   14 +++++++--
- scripts/Kbuild.include      |    6 ++++
- scripts/Makefile.lib        |    5 ++-
- scripts/Makefile.modbuiltin |   48 ++++++++++++++++++++++++++++++++++
- scripts/kconfig/confdata.c  |   48 +++++++++++++++++++++++++++++-----
- 6 files changed, 110 insertions(+), 12 deletions(-)
+ Makefile     |    3 +++
+ init/Kconfig |    8 ++++++++
+ 2 files changed, 11 insertions(+)
 
-diff -puN .gitignore~kbuild-generate-modulesbuiltin .gitignore
---- a/.gitignore~kbuild-generate-modulesbuiltin
-+++ a/.gitignore
-@@ -22,6 +22,7 @@
- *.lst
- *.symtypes
- *.order
-+modules.builtin
- *.elf
- *.bin
- *.gz
-diff -puN Makefile~kbuild-generate-modulesbuiltin Makefile
---- a/Makefile~kbuild-generate-modulesbuiltin
+diff -puN Makefile~kconfig-cross_compile-option Makefile
+--- a/Makefile~kconfig-cross_compile-option
 +++ a/Makefile
-@@ -876,6 +876,9 @@ $(sort $(vmlinux-init) $(vmlinux-main)) 
- PHONY += $(vmlinux-dirs)
- $(vmlinux-dirs): prepare scripts
- 	$(Q)$(MAKE) $(build)=$@
-+ifdef CONFIG_MODULES
-+	$(Q)$(MAKE) $(modbuiltin)=$@
-+endif
+@@ -177,11 +177,14 @@ SUBARCH := $(shell uname -m | sed -e s/i
+ # CROSS_COMPILE can be set on the command line
+ # make CROSS_COMPILE=ia64-linux-
+ # Alternatively CROSS_COMPILE can be set in the environment.
++# A third alternative is to store a setting in .config so that plain
++# "make" in the configured kernel build directory always uses that.
+ # Default value for CROSS_COMPILE is not to prefix executables
+ # Note: Some architectures assign CROSS_COMPILE in their arch/*/Makefile
+ export KBUILD_BUILDHOST := $(SUBARCH)
+ ARCH		?= $(SUBARCH)
+ CROSS_COMPILE	?=
++CROSS_COMPILE	?= $(CONFIG_CROSS_COMPILE:"%"=%)
  
- # Build the kernel release string
- #
-@@ -1080,6 +1083,7 @@ all: modules
- PHONY += modules
- modules: $(vmlinux-dirs) $(if $(KBUILD_BUILTIN),vmlinux)
- 	$(Q)$(AWK) '!x[$$0]++' $(vmlinux-dirs:%=$(objtree)/%/modules.order) > $(objtree)/modules.order
-+	$(Q)$(AWK) '!x[$$0]++' $(vmlinux-dirs:%=$(objtree)/%/modules.builtin) > $(objtree)/modules.builtin
- 	@$(kecho) '  Building modules, stage 2.';
- 	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.modpost
- 	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.fwinst obj=firmware __fw_modbuild
-@@ -1108,7 +1112,7 @@ _modinst_:
- 		rm -f $(MODLIB)/build ; \
- 		ln -s $(objtree) $(MODLIB)/build ; \
- 	fi
--	@cp -f $(objtree)/modules.order $(MODLIB)/
-+	@cp -f $(objtree)/modules.{order,builtin} $(MODLIB)/
- 	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.modinst
+ # Architecture as present in compile.h
+ UTS_MACHINE 	:= $(ARCH)
+diff -puN init/Kconfig~kconfig-cross_compile-option init/Kconfig
+--- a/init/Kconfig~kconfig-cross_compile-option
++++ a/init/Kconfig
+@@ -76,6 +76,14 @@ config INIT_ENV_ARG_LIMIT
+ 	  variables passed to init from the kernel command line.
  
- # This depmod is only for convenience to give the initial
-@@ -1169,8 +1173,9 @@ clean: archclean $(clean-dirs)
- 		\( -name '*.[oas]' -o -name '*.ko' -o -name '.*.cmd' \
- 		-o -name '.*.d' -o -name '.*.tmp' -o -name '*.mod.c' \
- 		-o -name '*.symtypes' -o -name 'modules.order' \
--		-o -name 'Module.markers' -o -name '.tmp_*.o.*' \
--		-o -name '*.gcno' \) -type f -print | xargs rm -f
-+		-o -name 'modules.builtin' -o -name 'Module.markers' \
-+		-o -name '.tmp_*.o.*' -o -name '*.gcno' \) \
-+		-type f -print | xargs rm -f
  
- # mrproper - Delete all generated files, including .config
- #
-@@ -1368,7 +1373,8 @@ $(clean-dirs):
- clean:	rm-dirs := $(MODVERDIR)
- clean: rm-files := $(KBUILD_EXTMOD)/Module.symvers \
-                    $(KBUILD_EXTMOD)/Module.markers \
--                   $(KBUILD_EXTMOD)/modules.order
-+                   $(KBUILD_EXTMOD)/modules.order \
-+                   $(KBUILD_EXTMOD)/modules.builtin
- clean: $(clean-dirs)
- 	$(call cmd,rmdirs)
- 	$(call cmd,rmfiles)
-diff -puN scripts/Kbuild.include~kbuild-generate-modulesbuiltin scripts/Kbuild.include
---- a/scripts/Kbuild.include~kbuild-generate-modulesbuiltin
-+++ a/scripts/Kbuild.include
-@@ -149,6 +149,12 @@ ld-option = $(call try-run,\
- # $(Q)$(MAKE) $(build)=dir
- build := -f $(if $(KBUILD_SRC),$(srctree)/)scripts/Makefile.build obj
- 
-+###
-+# Shorthand for $(Q)$(MAKE) -f scripts/Makefile.modbuiltin obj=
-+# Usage:
-+# $(Q)$(MAKE) $(modbuiltin)=dir
-+modbuiltin := -f $(if $(KBUILD_SRC),$(srctree)/)scripts/Makefile.modbuiltin obj
++config CROSS_COMPILE
++	string "Cross-compiler tool prefix"
++	help
++	  Same as running 'make CROSS_COMPILE=prefix-' but stored for
++	  default make runs in this kernel build directory.  You don't
++	  need to set this unless you want the configured kernel build
++	  directory to select the cross-compiler automatically.
 +
- # Prefix -I with $(srctree) if it is not an absolute path.
- # skip if -I has no parameter
- addtree = $(if $(patsubst -I%,%,$(1)), \
-diff -puN scripts/Makefile.lib~kbuild-generate-modulesbuiltin scripts/Makefile.lib
---- a/scripts/Makefile.lib~kbuild-generate-modulesbuiltin
-+++ a/scripts/Makefile.lib
-@@ -37,6 +37,8 @@ modorder	:= $(patsubst %/,%/modules.orde
- 
- __subdir-y	:= $(patsubst %/,%,$(filter %/, $(obj-y)))
- subdir-y	+= $(__subdir-y)
-+__subdir-Y	:= $(patsubst %/,%,$(filter %/, $(obj-Y)))
-+subdir-Y	+= $(__subdir-Y)
- __subdir-m	:= $(patsubst %/,%,$(filter %/, $(obj-m)))
- subdir-m	+= $(__subdir-m)
- obj-y		:= $(patsubst %/, %/built-in.o, $(obj-y))
-@@ -44,7 +46,7 @@ obj-m		:= $(filter-out %/, $(obj-m))
- 
- # Subdirectories we need to descend into
- 
--subdir-ym	:= $(sort $(subdir-y) $(subdir-m))
-+subdir-ym	:= $(sort $(subdir-y) $(subdir-Y) $(subdir-m))
- 
- # if $(foo-objs) exists, foo.o is a composite object 
- multi-used-y := $(sort $(foreach m,$(obj-y), $(if $(strip $($(m:.o=-objs)) $($(m:.o=-y))), $(m))))
-@@ -76,6 +78,7 @@ always		:= $(addprefix $(obj)/,$(always)
- targets		:= $(addprefix $(obj)/,$(targets))
- modorder	:= $(addprefix $(obj)/,$(modorder))
- obj-y		:= $(addprefix $(obj)/,$(obj-y))
-+obj-Y		:= $(addprefix $(obj)/,$(obj-Y))
- obj-m		:= $(addprefix $(obj)/,$(obj-m))
- lib-y		:= $(addprefix $(obj)/,$(lib-y))
- subdir-obj-y	:= $(addprefix $(obj)/,$(subdir-obj-y))
-diff -puN /dev/null scripts/Makefile.modbuiltin
---- /dev/null
-+++ a/scripts/Makefile.modbuiltin
-@@ -0,0 +1,48 @@
-+# ==========================================================================
-+# Generating modules.builtin
-+# ==========================================================================
-+
-+src := $(obj)
-+
-+PHONY := __modbuiltin
-+__modbuiltin:
-+
-+# Read auto2.conf which sets tristate variables to 'Y' instead of 'y'
-+# That way, we get the list of built-in modules in obj-Y
-+-include include/config/auto2.conf
-+
-+include scripts/Kbuild.include
-+
-+# The filename Kbuild has precedence over Makefile
-+kbuild-dir := $(if $(filter /%,$(src)),$(src),$(srctree)/$(src))
-+kbuild-file := $(if $(wildcard $(kbuild-dir)/Kbuild),$(kbuild-dir)/Kbuild,$(kbuild-dir)/Makefile)
-+include $(kbuild-file)
-+
-+include scripts/Makefile.lib
-+
-+modbuiltin-subdirs := $(patsubst %,%/modules.builtin, $(subdir-ym))
-+modbuiltin-mods    := $(filter %.ko, $(obj-Y:.o=.ko))
-+modbuiltin-target  := $(obj)/modules.builtin
-+
-+__modbuiltin: $(modbuiltin-target) $(subdir-ym)
-+	@:
-+
-+modbuiltin-cmds =						\
-+	for m in $(modbuiltin-mods); do echo kernel/$$m; done;	\
-+	cat /dev/null $(modbuiltin-subdirs);
-+
-+$(modbuiltin-target): $(subdir-ym)
-+	$(Q)($(modbuiltin-cmds)) > $@
-+
-+# Descending
-+# ---------------------------------------------------------------------------
-+
-+PHONY += $(subdir-ym)
-+$(subdir-ym):
-+	$(Q)$(MAKE) $(modbuiltin)=$@
-+
-+
-+# Declare the contents of the .PHONY variable as phony.  We keep that
-+# information in a variable se we can use it in if_changed and friends.
-+
-+.PHONY: $(PHONY)
-diff -puN scripts/kconfig/confdata.c~kbuild-generate-modulesbuiltin scripts/kconfig/confdata.c
---- a/scripts/kconfig/confdata.c~kbuild-generate-modulesbuiltin
-+++ a/scripts/kconfig/confdata.c
-@@ -672,12 +672,27 @@ out:
- 	return res;
- }
- 
-+int fprintf2(FILE *f1, FILE *f2, const char *fmt, ...)
-+{
-+	va_list ap;
-+	int res;
-+
-+	va_start(ap, fmt);
-+	vfprintf(f1, fmt, ap);
-+	va_end(ap);
-+	va_start(ap, fmt);
-+	res = vfprintf(f2, fmt, ap);
-+	va_end(ap);
-+
-+	return res;
-+}
-+
- int conf_write_autoconf(void)
- {
- 	struct symbol *sym;
- 	const char *str;
- 	const char *name;
--	FILE *out, *out_h;
-+	FILE *out, *out2, *out_h;
- 	time_t now;
- 	int i, l;
- 
-@@ -692,16 +707,23 @@ int conf_write_autoconf(void)
- 	if (!out)
- 		return 1;
- 
-+	out2 = fopen(".tmpconfig2", "w");
-+	if (!out2) {
-+		fclose(out);
-+		return 1;
-+	}
-+
- 	out_h = fopen(".tmpconfig.h", "w");
- 	if (!out_h) {
- 		fclose(out);
-+		fclose(out2);
- 		return 1;
- 	}
- 
- 	sym = sym_lookup("KERNELVERSION", 0);
- 	sym_calc_value(sym);
- 	time(&now);
--	fprintf(out, "#\n"
-+	fprintf2(out, out2, "#\n"
- 		     "# Automatically generated make config: don't edit\n"
- 		     "# Linux kernel version: %s\n"
- 		     "# %s"
-@@ -726,45 +748,51 @@ int conf_write_autoconf(void)
- 			case no:
- 				break;
- 			case mod:
--				fprintf(out, "CONFIG_%s=m\n", sym->name);
-+				fprintf2(out, out2, "CONFIG_%s=m\n",
-+						sym->name);
- 				fprintf(out_h, "#define CONFIG_%s_MODULE 1\n", sym->name);
- 				break;
- 			case yes:
- 				fprintf(out, "CONFIG_%s=y\n", sym->name);
-+				fprintf(out2, "CONFIG_%s=%c\n", sym->name,
-+					sym->type == S_BOOLEAN ? 'y' : 'Y');
- 				fprintf(out_h, "#define CONFIG_%s 1\n", sym->name);
- 				break;
- 			}
- 			break;
- 		case S_STRING:
- 			str = sym_get_string_value(sym);
--			fprintf(out, "CONFIG_%s=\"", sym->name);
-+			fprintf2(out, out2, "CONFIG_%s=\"", sym->name);
- 			fprintf(out_h, "#define CONFIG_%s \"", sym->name);
- 			while (1) {
- 				l = strcspn(str, "\"\\");
- 				if (l) {
- 					fwrite(str, l, 1, out);
-+					fwrite(str, l, 1, out2);
- 					fwrite(str, l, 1, out_h);
- 					str += l;
- 				}
- 				if (!*str)
- 					break;
--				fprintf(out, "\\%c", *str);
-+				fprintf2(out, out2, "\\%c", *str);
- 				fprintf(out_h, "\\%c", *str);
- 				str++;
- 			}
- 			fputs("\"\n", out);
-+			fputs("\"\n", out2);
- 			fputs("\"\n", out_h);
- 			break;
- 		case S_HEX:
- 			str = sym_get_string_value(sym);
- 			if (str[0] != '0' || (str[1] != 'x' && str[1] != 'X')) {
--				fprintf(out, "CONFIG_%s=%s\n", sym->name, str);
-+				fprintf2(out, out2, "CONFIG_%s=%s\n",
-+						sym->name, str);
- 				fprintf(out_h, "#define CONFIG_%s 0x%s\n", sym->name, str);
- 				break;
- 			}
- 		case S_INT:
- 			str = sym_get_string_value(sym);
--			fprintf(out, "CONFIG_%s=%s\n", sym->name, str);
-+			fprintf2(out, out2, "CONFIG_%s=%s\n", sym->name, str);
- 			fprintf(out_h, "#define CONFIG_%s %s\n", sym->name, str);
- 			break;
- 		default:
-@@ -772,6 +800,7 @@ int conf_write_autoconf(void)
- 		}
- 	}
- 	fclose(out);
-+	fclose(out2);
- 	fclose(out_h);
- 
- 	name = getenv("KCONFIG_AUTOHEADER");
-@@ -779,6 +808,11 @@ int conf_write_autoconf(void)
- 		name = "include/generated/autoconf.h";
- 	if (rename(".tmpconfig.h", name))
- 		return 1;
-+	name = getenv("KCONFIG_AUTOCONFIG2");
-+	if (!name)
-+		name = "include/config/auto2.conf";
-+	if (rename(".tmpconfig2", name))
-+		return 1;
- 	name = conf_get_autoconfig_name();
- 	/*
- 	 * This must be the last step, kbuild has a dependency on auto.conf
+ config LOCALVERSION
+ 	string "Local version - append to kernel release"
+ 	help
 _
