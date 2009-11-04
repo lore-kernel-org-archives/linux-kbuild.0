@@ -1,54 +1,69 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp1.linux-foundation.org ([140.211.169.13]:52804 "EHLO
-	smtp1.linux-foundation.org" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1755917AbZKDPVJ (ORCPT
+Received: from pfepa.post.tele.dk ([195.41.46.235]:39162 "EHLO
+	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757290AbZKDRTN (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 4 Nov 2009 10:21:09 -0500
-Message-Id: <200911041519.nA4FJWEW030164@imap1.linux-foundation.org>
-Subject: [patch 1/4] x86: _end symbol missing from Symbol.map
-From: akpm@linux-foundation.org
-Date: Wed, 04 Nov 2009 07:19:32 -0800
+	Wed, 4 Nov 2009 12:19:13 -0500
+Date: Wed, 4 Nov 2009 18:19:16 +0100
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: [PATCH 05/10] kbuild: sort the list of symbols exported by the
+	kernel (__ksymtab)
+Message-ID: <20091104171916.GA6323@merkur.ravnborg.org>
+References: <9b2b86520911020852q49c55695rb05d87090fa9ad33@mail.gmail.com> <1257242782-10496-6-git-send-email-alan-jenkins@tuffmail.co.uk> <200911041849.43311.rusty@rustcorp.com.au> <4AF150D2.6000207@tuffmail.co.uk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=ANSI_X3.4-1968
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4AF150D2.6000207@tuffmail.co.uk>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: akpm@linux-foundation.org, hare@suse.de, mingo@elte.hu, sam@ravnborg.org, stable@kernel.org
+To: Alan Jenkins <alan-jenkins@tuffmail.co.uk>
+Cc: Rusty Russell <rusty@rustcorp.com.au>, greg@kroah.com, linux-kbuild@vger.kernel.org, carmelo73@gmail.com, linux-kernel@vger.kernel.org, Mike Frysinger <vapier.adi@gmail.com>
 
-From: Hannes Reinecke <hare@suse.de>
+On Wed, Nov 04, 2009 at 10:00:50AM +0000, Alan Jenkins wrote:
+> Rusty Russell wrote:
+>> On Tue, 3 Nov 2009 08:36:17 pm Alan Jenkins wrote:
+>>   
+>>> +/*
+>>> + * We use CPP macros since they are more familiar than assembly macros.
+>>> + * Note that CPP macros eat newlines, so each statement must be terminated
+>>> + * by a semicolon.
+>>> + */
+>>> +
+>>> +#ifdef CONFIG_HAVE_SYMBOL_PREFIX
+>>> +#define __SYM(sym) _##sym
+>>> +#else
+>>> +#define __SYM(sym) sym
+>>> +#endif
+>>>     
+>>
+>> Ideally, you would used MODULE_SYMBOL_PREFIX here, but of course it's a
+>> string.  I don't think Kconfig can do arbitrary identifiers, so we can't
+>> make CONFIG_SYMBOL_PREFIX empty or _.
+>>
+>> Perhaps clarify it to a bool CONFIG_HAVE_MODULE_UNDERSCORE_PREFIX then,
+>> since that's what you're assuming here?
+>>
+>> Thanks,
+>> Rusty.
+>
+> I made the same assumption in patch 4.  The arch defines  
+> CONFIG_HAVE_SYMBOL_PREFIX, which then causes init/Kconfig to define  
+> CONFIG_SYMBOL_PREFIX="_".
+>
+> Mike suggested that I hack kbuild instead, to do something like
+>
+> unquote = ...
+> AFLAGS_.tmp_export-asm.o += -DSYMBOL_PREFIX=$(unquote CONFIG_SYMBOL_PREFIX)
+>
+> I'm experimenting with the idea, but I haven't managed to get it working  
 
-With 2.6.31 'crash' on x86_64 falls flat on its face as the '_end' symbol
-is missing from the System.map file.
+Something like this:
+unquote = $(patsubst "%",%,$($1))
 
-The culprit is commit 091e52c3551d3031343df24b573b770b4c6c72b6, which
-moved the '_end' symbol into it's own section.  Apparently this causes
-kallsyms to not reference it properly.
+AFLAGS_.tmp_export-asm.o += -DSYMBOL_PREFIX=$(call unquote,CONFIG_SYMBOL_PREFIX)
 
-So either we'd need to revert part of the patch to not include _end in
-it's own section.
+But the readability is low so we could be better off doing it direct:
 
-Cc: Sam Ravnborg <sam@ravnborg.org>
-Cc: Ingo Molnar <mingo@elte.hu>
-Cc: <stable@kernel.org>
-Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
----
+AFLAGS_.tmp_export-asm.o += -DSYMBOL_PREFIX=$(patsubst "%",",$(CONFIG_SYMBOL_PREFIX))
 
- arch/x86/kernel/vmlinux.lds.S |    4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
-
-diff -puN arch/x86/kernel/vmlinux.lds.S~x86-_end-symbol-missing-from-symbolmap arch/x86/kernel/vmlinux.lds.S
---- a/arch/x86/kernel/vmlinux.lds.S~x86-_end-symbol-missing-from-symbolmap
-+++ a/arch/x86/kernel/vmlinux.lds.S
-@@ -319,9 +319,7 @@ SECTIONS
- 		__brk_limit = .;
- 	}
- 
--	.end : AT(ADDR(.end) - LOAD_OFFSET) {
--		_end = .;
--	}
-+	_end = .;
- 
-         STABS_DEBUG
-         DWARF_DEBUG
-_
+	Sam
