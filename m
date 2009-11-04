@@ -1,48 +1,83 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from baikonur.stro.at ([213.239.196.228]:47192 "EHLO
+Received: from baikonur.stro.at ([213.239.196.228]:43475 "EHLO
 	baikonur.stro.at" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932649AbZKDVWU (ORCPT
+	with ESMTP id S1755931AbZKDWbh (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 4 Nov 2009 16:22:20 -0500
-Date: Wed, 4 Nov 2009 22:22:25 +0100
+	Wed, 4 Nov 2009 17:31:37 -0500
 From: maximilian attems <max@stro.at>
-Subject: Re: [PATCH v2 0/2] fakeroot dwimery for scripts/package/*
-Message-ID: <20091104212225.GB24870@stro.at>
-References: <20091014064622.GA8711@progeny.tock>
- <20091014071627.GA6256@merkur.ravnborg.org>
- <200910141159.03799.elendil@planet.nl>
- <20091014110331.GZ28231@baikonur.stro.at>
- <20091015133139.GA6718@progeny.tock>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20091015133139.GA6718@progeny.tock>
+Subject: [PATCH] deb-pkg: Make deb-pkg generate a seperate linux-libc-dev deb
+Date: Wed,  4 Nov 2009 23:30:49 +0100
+Message-Id: <1257373849-25557-1-git-send-email-max@stro.at>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: linux-kbuild@vger.kernel.org, Frans Pop <elendil@planet.nl>, Jonathan Nieder <jrnieder@gmail.com>
+To: linux-kbuild@vger.kernel.org
+Cc: Sam Ravnborg <sam@ravnborg.org>, maximilian attems <max@stro.at>
 
-On Thu, 15 Oct 2009, Jonathan Nieder wrote:
+userland dev likes latest incarnation of that userland API.
+make it easy to also build it on make deb-pkg invocation:
 
-> maximilian attems wrote:
-> > Frans Pop wrote:
-> >> Sam Ravnborg wrote:
-> 
-> >>> That could be the longer:
-> >>>
-> >>>    KBUILD_PKG_ROOTCMD
-> >>>
-> >>> Which with the KBUILD_ prefix could be a globel environment
-> >>> variable for some.
-> >>
-> >> I have not tested it, but the patches look good otherwise, so with Sam's 
-> >> suggested change:
-> >> Acked-by: Frans Pop <elendil@planet.nl>
-> >
-> > Acked-by: maximilian attems <max@stro.at>
-> >
+dpkg-deb: building package `linux-libc-dev' in `../linux-libc-dev_2.6.32-rc6-4_amd64.deb'.
 
-Sam could you please push out those two patches with aboves 2 acks added,
-seems author forgot to write them directly in to the -next branch?
+Signed-off-by: maximilian attems <max@stro.at>
+---
+ scripts/package/builddeb |   20 +++++++++++++++++++-
+ 1 files changed, 19 insertions(+), 1 deletions(-)
 
-thanks
+diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+index 8b357b0..fbd1994 100644
+--- a/scripts/package/builddeb
++++ b/scripts/package/builddeb
+@@ -38,17 +38,20 @@ else
+ fi
+ tmpdir="$objtree/debian/tmp"
+ fwdir="$objtree/debian/fwtmp"
++headerdir="$objtree/debian/headertmp"
+ packagename=linux-image-$version
+ fwpackagename=linux-firmware-image
++headerpackagename=linux-libc-dev
+ 
+ if [ "$ARCH" = "um" ] ; then
+ 	packagename=user-mode-linux-$version
+ fi
+ 
+ # Setup the directory structure
+-rm -rf "$tmpdir" "$fwdir"
++rm -rf "$tmpdir" "$fwdir" "$headerdir"
+ mkdir -p "$tmpdir/DEBIAN" "$tmpdir/lib" "$tmpdir/boot" "$tmpdir/usr/share/doc/$packagename"
+ mkdir -p "$fwdir/DEBIAN" "$fwdir/lib" "$fwdir/usr/share/doc/$fwpackagename"
++mkdir -p "$headerdir/DEBIAN" "$headerdir/usr" "$headerdir/usr/share/doc/$headerpackagename"
+ if [ "$ARCH" = "um" ] ; then
+ 	mkdir -p "$tmpdir/usr/lib/uml/modules/$version" "$tmpdir/usr/bin"
+ fi
+@@ -77,6 +80,9 @@ if grep -q '^CONFIG_MODULES=y' .config ; then
+ 	fi
+ fi
+ 
++make headers_check
++make headers_install INSTALL_HDR_PATH="$headerdir/usr" 
++
+ # Install the maintainer scripts
+ # Note: hook scripts under /etc/kernel are also executed by official Debian
+ # kernel packages, as well as kernel packages built using make-kpkg
+@@ -198,6 +204,18 @@ EOF
+ 	create_package "$fwpackagename" "$fwdir"
+ fi
+ 
++cat <<EOF >> debian/control
++
++Package: $headerpackagename
++Section: devel
++Provides: linux-kernel-headers
++Architecture: any
++Description: Linux support headers for userspace development
++ This package provides userspaces headers from the Linux kernel.  These headers
++ are used by the installed headers for GNU glibc and other system libraries.
++EOF
++
++create_package "$headerpackagename" "$headerdir"
+ create_package "$packagename" "$tmpdir"
+ 
+ exit 0
+-- 
+1.5.6.5
+
