@@ -1,56 +1,42 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cpsmtpm-eml110.kpnxchange.com ([195.121.3.14]:64829 "EHLO
-	CPSMTPM-EML110.kpnxchange.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1750845AbZKCTzc (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 3 Nov 2009 14:55:32 -0500
-From: Frans Pop <elendil@planet.nl>
-Subject: Re: [PATCH] um: minor Makefile simplification through use of cc-ifversion
-Date: Tue, 3 Nov 2009 20:55:34 +0100
-References: <200907232057.51827.elendil@planet.nl>
-In-Reply-To: <200907232057.51827.elendil@planet.nl>
+Received: from ozlabs.org ([203.10.76.45]:40820 "EHLO ozlabs.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751818AbZKDITv (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 4 Nov 2009 03:19:51 -0500
+From: Rusty Russell <rusty@rustcorp.com.au>
+Subject: Re: [PATCH 05/10] kbuild: sort the list of symbols exported by the kernel (__ksymtab)
+Date: Wed, 4 Nov 2009 18:49:42 +1030
+References: <9b2b86520911020852q49c55695rb05d87090fa9ad33@mail.gmail.com> <1257242782-10496-6-git-send-email-alan-jenkins@tuffmail.co.uk>
+In-Reply-To: <1257242782-10496-6-git-send-email-alan-jenkins@tuffmail.co.uk>
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
+Content-Type: Text/Plain;
+  charset="iso-8859-15"
 Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-Message-Id: <200911032055.36504.elendil@planet.nl>
+Message-Id: <200911041849.43311.rusty@rustcorp.com.au>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: user-mode-linux-devel@lists.sourceforge.net, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Alan Jenkins <alan-jenkins@tuffmail.co.uk>
+Cc: greg@kroah.com, linux-kbuild@vger.kernel.org, carmelo73@gmail.com, linux-kernel@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>
 
-Hi Sam,
+On Tue, 3 Nov 2009 08:36:17 pm Alan Jenkins wrote:
+> +/*
+> + * We use CPP macros since they are more familiar than assembly macros.
+> + * Note that CPP macros eat newlines, so each statement must be terminated
+> + * by a semicolon.
+> + */
+> +
+> +#ifdef CONFIG_HAVE_SYMBOL_PREFIX
+> +#define __SYM(sym) _##sym
+> +#else
+> +#define __SYM(sym) sym
+> +#endif
 
-You planned to take any of these patches not picked up by arch maintainers 
-in kbuild.git. This looks to be the only one not yet included in mainline.
+Ideally, you would used MODULE_SYMBOL_PREFIX here, but of course it's a
+string.  I don't think Kconfig can do arbitrary identifiers, so we can't
+make CONFIG_SYMBOL_PREFIX empty or _.
 
-Cheers,
-FJP
+Perhaps clarify it to a bool CONFIG_HAVE_MODULE_UNDERSCORE_PREFIX then,
+since that's what you're assuming here?
 
-On Thursday 23 July 2009, Frans Pop wrote:
-> Signed-off-by: Frans Pop <elendil@planet.nl>
-> ---
->
-> Change was suggested by Sam Ravnborg; see
-> http://lkml.org/lkml/2009/7/18/15. Untested, but a similar patch for x86
-> was tested to work.
->
-> diff --git a/arch/um/Makefile-i386 b/arch/um/Makefile-i386
-> index 302cbe5..2c3e658 100644
-> --- a/arch/um/Makefile-i386
-> +++ b/arch/um/Makefile-i386
-> @@ -35,8 +35,9 @@ cflags-y += -ffreestanding
->  # Disable unit-at-a-time mode on pre-gcc-4.0 compilers, it makes gcc
-> use # a lot more stack due to the lack of sharing of stacklots.  Also,
-> gcc # 4.3.0 needs -funit-at-a-time for extern inline functions.
-> -KBUILD_CFLAGS += $(shell if [ $(call cc-version) -lt 0400 ] ; then \
-> -			echo $(call cc-option,-fno-unit-at-a-time); \
-> -			else echo $(call cc-option,-funit-at-a-time); fi ;)
-> +KBUILD_CFLAGS += $(call cc-ifversion, -lt, 0400, \
-> +			$(call cc-option,-fno-unit-at-a-time))
-> +KBUILD_CFLAGS += $(call cc-ifversion, -ge, 0400, \
-> +			$(call cc-option,-funit-at-a-time))
->
->  KBUILD_CFLAGS += $(cflags-y)
-
+Thanks,
+Rusty.
