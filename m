@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mxout-08.mxes.net ([216.86.168.183]:39896 "EHLO
+Received: from mxout-08.mxes.net ([216.86.168.183]:39919 "EHLO
 	mxout-08.mxes.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751411AbZKGVEK (ORCPT
+	with ESMTP id S1752810AbZKGVEQ (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 7 Nov 2009 16:04:10 -0500
+	Sat, 7 Nov 2009 16:04:16 -0500
 From: Alan Jenkins <alan-jenkins@tuffmail.co.uk>
-Subject: [PATCH 01/10] ARM: use unified discard definition in linker script
-Date: Sat,  7 Nov 2009 21:03:52 +0000
-Message-Id: <1257627841-15817-1-git-send-email-alan-jenkins@tuffmail.co.uk>
+Subject: [PATCH 04/10] module: extract EXPORT_SYMBOL() from module.h into mod_export.h
+Date: Sat,  7 Nov 2009 21:03:55 +0000
+Message-Id: <1257627841-15817-4-git-send-email-alan-jenkins@tuffmail.co.uk>
 In-Reply-To: <4AF5DF9F.5020208@tuffmail.co.uk>
 References: <4AF5DF9F.5020208@tuffmail.co.uk>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,67 +15,201 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: rusty@rustcorp.com.au
 Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Alan Jenkins <alan-jenkins@tuffmail.co.uk>
 
-Commit 023bf6f "linker script: unify usage of discard definition"
-changed the linker scripts for all architectures except for ARM.
-I can find no discussion about this ommision, so here are the changes
-for ARM.
+The next commit will add a new implementation of EXPORT_SYMBOL() in
+arch-independent assembly language.  It will be used by the build system
+to help sort the list of symbols exported by the kernel.
 
-These changes are exactly parallel to the ia64 case.
-
-"ia64 is notable because it first throws away some ia64 specific
- subsections and then include the rest of the sections into the final
- image, so those sections must be discarded before the inclusion."
-
-Not boot-tested.  In build testing, the modified linker script generated
-an identical vmlinux file.
-
-[I would like to be able to rely on this unified discard definition.
- I want to sort the kernel symbol tables to allow faster symbol
- resolution during module loading. The simplest way appears to be
- to generate sorted versions from vmlinux.o, link them in to vmlinux,
- _and discard the original unsorted tables_.
-
- This work is driven by my x86 netbook, but it is implemented at a
- generic level. It is possible it will benefit some ARM systems also.]
+Both implementations will live in the same file, to make it clear that
+they should be kept in sync.  Moving them to mod_export.h will avoid
+cluttering module.h with "ifndef __ASSEMBLY__".
 
 Signed-off-by: Alan Jenkins <alan-jenkins@tuffmail.co.uk>
-Acked-by: Russell King <rmk+kernel@arm.linux.org.uk>
-Acked-by-without-testing: Tejun Heo <tj@kernel.org>
 ---
- arch/arm/kernel/vmlinux.lds.S |   13 ++++++++-----
- 1 files changed, 8 insertions(+), 5 deletions(-)
+ include/linux/mod_export.h |   75 ++++++++++++++++++++++++++++++++++++++++++++
+ include/linux/module.h     |   65 +-------------------------------------
+ 2 files changed, 76 insertions(+), 64 deletions(-)
+ create mode 100644 include/linux/mod_export.h
 
-diff --git a/arch/arm/kernel/vmlinux.lds.S b/arch/arm/kernel/vmlinux.lds.S
-index aecf87d..ec511d4 100644
---- a/arch/arm/kernel/vmlinux.lds.S
-+++ b/arch/arm/kernel/vmlinux.lds.S
-@@ -79,11 +79,11 @@ SECTIONS
- #endif
- 	}
- 
--	/DISCARD/ : {			/* Exit code and data		*/
--		EXIT_TEXT
--		EXIT_DATA
--		*(.exitcall.exit)
--		*(.discard)
-+	/*
-+	 * unwind exit sections must be discarded before the rest of the
-+	 * unwind sections get included.
-+	 */
-+	/DISCARD/ : {
- 		*(.ARM.exidx.exit.text)
- 		*(.ARM.extab.exit.text)
- #ifndef CONFIG_HOTPLUG_CPU
-@@ -271,6 +271,9 @@ SECTIONS
- 	.stab.index 0 : { *(.stab.index) }
- 	.stab.indexstr 0 : { *(.stab.indexstr) }
- 	.comment 0 : { *(.comment) }
+diff --git a/include/linux/mod_export.h b/include/linux/mod_export.h
+new file mode 100644
+index 0000000..9f38816
+--- /dev/null
++++ b/include/linux/mod_export.h
+@@ -0,0 +1,75 @@
++#ifndef LINUX_MOD_EXPORT_H
++#define LINUX_MOD_EXPORT_H
 +
-+	/* Default discards */
-+	DISCARDS
- }
++#include <linux/compiler.h>
++#include <asm/module.h>
++
++/* Some toolchains use a `_' prefix for all user symbols. */
++#ifdef CONFIG_SYMBOL_PREFIX
++#define MODULE_SYMBOL_PREFIX CONFIG_SYMBOL_PREFIX
++#else
++#define MODULE_SYMBOL_PREFIX ""
++#endif
++
++struct kernel_symbol {
++	unsigned long value;
++	const char *name;
++};
++
++#ifdef CONFIG_MODULES
++#ifndef __GENKSYMS__
++#ifdef CONFIG_MODVERSIONS
++/* Mark the CRC weak since genksyms apparently decides not to
++ * generate a checksums for some symbols */
++#define __CRC_SYMBOL(sym, sec)					\
++	extern void *__crc_##sym __attribute__((weak));		\
++	static const unsigned long __kcrctab_##sym		\
++	__used							\
++	__attribute__((section("__kcrctab" sec), unused))	\
++	= (unsigned long) &__crc_##sym;
++#else
++#define __CRC_SYMBOL(sym, sec)
++#endif
++
++/* For every exported symbol, place a struct in the __ksymtab section */
++#define __EXPORT_SYMBOL(sym, sec)				\
++	extern typeof(sym) sym;					\
++	__CRC_SYMBOL(sym, sec)					\
++	static const char __kstrtab_##sym[]			\
++	__attribute__((section("__ksymtab_strings"), aligned(1))) \
++	= MODULE_SYMBOL_PREFIX #sym;                    	\
++	static const struct kernel_symbol __ksymtab_##sym	\
++	__used							\
++	__attribute__((section("__ksymtab" sec), unused))	\
++	= { (unsigned long)&sym, __kstrtab_##sym }
++
++#define EXPORT_SYMBOL(sym)					\
++	__EXPORT_SYMBOL(sym, "")
++
++#define EXPORT_SYMBOL_GPL(sym)					\
++	__EXPORT_SYMBOL(sym, "_gpl")
++
++#define EXPORT_SYMBOL_GPL_FUTURE(sym)				\
++	__EXPORT_SYMBOL(sym, "_gpl_future")
++
++#ifdef CONFIG_UNUSED_SYMBOLS
++#define EXPORT_UNUSED_SYMBOL(sym) __EXPORT_SYMBOL(sym, "_unused")
++#define EXPORT_UNUSED_SYMBOL_GPL(sym) __EXPORT_SYMBOL(sym, "_unused_gpl")
++#else
++#define EXPORT_UNUSED_SYMBOL(sym)
++#define EXPORT_UNUSED_SYMBOL_GPL(sym)
++#endif
++
++#endif /* __GENKSYMS__ */
++
++#else /* !CONFIG_MODULES */
++
++#define EXPORT_SYMBOL(sym)
++#define EXPORT_SYMBOL_GPL(sym)
++#define EXPORT_SYMBOL_GPL_FUTURE(sym)
++#define EXPORT_UNUSED_SYMBOL(sym)
++#define EXPORT_UNUSED_SYMBOL_GPL(sym)
++
++#endif /* CONFIG_MODULES */
++
++#endif /* LINUX_MOD_EXPORT_H */
+diff --git a/include/linux/module.h b/include/linux/module.h
+index 6cb1a3c..b9e860a 100644
+--- a/include/linux/module.h
++++ b/include/linux/module.h
+@@ -15,6 +15,7 @@
+ #include <linux/stringify.h>
+ #include <linux/kobject.h>
+ #include <linux/moduleparam.h>
++#include <linux/mod_export.h>
+ #include <linux/tracepoint.h>
  
- /*
+ #include <asm/local.h>
+@@ -25,21 +26,8 @@
+ /* Not Yet Implemented */
+ #define MODULE_SUPPORTED_DEVICE(name)
+ 
+-/* Some toolchains use a `_' prefix for all user symbols. */
+-#ifdef CONFIG_SYMBOL_PREFIX
+-#define MODULE_SYMBOL_PREFIX CONFIG_SYMBOL_PREFIX
+-#else
+-#define MODULE_SYMBOL_PREFIX ""
+-#endif
+-
+ #define MODULE_NAME_LEN MAX_PARAM_PREFIX_LEN
+ 
+-struct kernel_symbol
+-{
+-	unsigned long value;
+-	const char *name;
+-};
+-
+ struct modversion_info
+ {
+ 	unsigned long crc;
+@@ -180,52 +168,6 @@ void *__symbol_get(const char *symbol);
+ void *__symbol_get_gpl(const char *symbol);
+ #define symbol_get(x) ((typeof(&x))(__symbol_get(MODULE_SYMBOL_PREFIX #x)))
+ 
+-#ifndef __GENKSYMS__
+-#ifdef CONFIG_MODVERSIONS
+-/* Mark the CRC weak since genksyms apparently decides not to
+- * generate a checksums for some symbols */
+-#define __CRC_SYMBOL(sym, sec)					\
+-	extern void *__crc_##sym __attribute__((weak));		\
+-	static const unsigned long __kcrctab_##sym		\
+-	__used							\
+-	__attribute__((section("__kcrctab" sec), unused))	\
+-	= (unsigned long) &__crc_##sym;
+-#else
+-#define __CRC_SYMBOL(sym, sec)
+-#endif
+-
+-/* For every exported symbol, place a struct in the __ksymtab section */
+-#define __EXPORT_SYMBOL(sym, sec)				\
+-	extern typeof(sym) sym;					\
+-	__CRC_SYMBOL(sym, sec)					\
+-	static const char __kstrtab_##sym[]			\
+-	__attribute__((section("__ksymtab_strings"), aligned(1))) \
+-	= MODULE_SYMBOL_PREFIX #sym;                    	\
+-	static const struct kernel_symbol __ksymtab_##sym	\
+-	__used							\
+-	__attribute__((section("__ksymtab" sec), unused))	\
+-	= { (unsigned long)&sym, __kstrtab_##sym }
+-
+-#define EXPORT_SYMBOL(sym)					\
+-	__EXPORT_SYMBOL(sym, "")
+-
+-#define EXPORT_SYMBOL_GPL(sym)					\
+-	__EXPORT_SYMBOL(sym, "_gpl")
+-
+-#define EXPORT_SYMBOL_GPL_FUTURE(sym)				\
+-	__EXPORT_SYMBOL(sym, "_gpl_future")
+-
+-
+-#ifdef CONFIG_UNUSED_SYMBOLS
+-#define EXPORT_UNUSED_SYMBOL(sym) __EXPORT_SYMBOL(sym, "_unused")
+-#define EXPORT_UNUSED_SYMBOL_GPL(sym) __EXPORT_SYMBOL(sym, "_unused_gpl")
+-#else
+-#define EXPORT_UNUSED_SYMBOL(sym)
+-#define EXPORT_UNUSED_SYMBOL_GPL(sym)
+-#endif
+-
+-#endif
+-
+ enum module_state
+ {
+ 	MODULE_STATE_LIVE,
+@@ -543,11 +485,6 @@ extern void module_update_tracepoints(void);
+ extern int module_get_iter_tracepoints(struct tracepoint_iter *iter);
+ 
+ #else /* !CONFIG_MODULES... */
+-#define EXPORT_SYMBOL(sym)
+-#define EXPORT_SYMBOL_GPL(sym)
+-#define EXPORT_SYMBOL_GPL_FUTURE(sym)
+-#define EXPORT_UNUSED_SYMBOL(sym)
+-#define EXPORT_UNUSED_SYMBOL_GPL(sym)
+ 
+ /* Given an address, look for it in the exception tables. */
+ static inline const struct exception_table_entry *
 -- 
 1.6.3.3
 
