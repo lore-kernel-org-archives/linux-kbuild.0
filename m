@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mxout-08.mxes.net ([216.86.168.183]:39919 "EHLO
+Received: from mxout-08.mxes.net ([216.86.168.183]:39954 "EHLO
 	mxout-08.mxes.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752810AbZKGVEQ (ORCPT
+	with ESMTP id S1752931AbZKGVEX (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 7 Nov 2009 16:04:16 -0500
+	Sat, 7 Nov 2009 16:04:23 -0500
 From: Alan Jenkins <alan-jenkins@tuffmail.co.uk>
-Subject: [PATCH 04/10] module: extract EXPORT_SYMBOL() from module.h into mod_export.h
-Date: Sat,  7 Nov 2009 21:03:55 +0000
-Message-Id: <1257627841-15817-4-git-send-email-alan-jenkins@tuffmail.co.uk>
+Subject: [PATCH 09/10] module: speed up find_symbol() using binary search on the builtin symbol tables
+Date: Sat,  7 Nov 2009 21:04:00 +0000
+Message-Id: <1257627841-15817-9-git-send-email-alan-jenkins@tuffmail.co.uk>
 In-Reply-To: <4AF5DF9F.5020208@tuffmail.co.uk>
 References: <4AF5DF9F.5020208@tuffmail.co.uk>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,201 +15,213 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: rusty@rustcorp.com.au
 Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Alan Jenkins <alan-jenkins@tuffmail.co.uk>
 
-The next commit will add a new implementation of EXPORT_SYMBOL() in
-arch-independent assembly language.  It will be used by the build system
-to help sort the list of symbols exported by the kernel.
+The builtin symbol tables are now sorted, so we can use a binary
+search.
 
-Both implementations will live in the same file, to make it clear that
-they should be kept in sync.  Moving them to mod_export.h will avoid
-cluttering module.h with "ifndef __ASSEMBLY__".
+The symbol tables in modules are still unsorted and require linear
+searching as before. But since the generic each_symbol() is removed,
+the code size only goes up 8 bytes overall on i386.
+
+On my EeePC 701, coldplug is mainly cpu bound and takes 1.5 seconds
+during boot. perf showed this change eliminated 20% of cpu cycles during
+coldplug, saving 0.3 seconds of real time.
+
+These savings may not be representative since my config is not very well
+tuned.  The numbers above represent the loading of 35 modules,
+referencing a total of 441 symbols.  Nevertheless, it shows why I think
+this is worth doing.
 
 Signed-off-by: Alan Jenkins <alan-jenkins@tuffmail.co.uk>
 ---
- include/linux/mod_export.h |   75 ++++++++++++++++++++++++++++++++++++++++++++
- include/linux/module.h     |   65 +-------------------------------------
- 2 files changed, 76 insertions(+), 64 deletions(-)
- create mode 100644 include/linux/mod_export.h
+ kernel/module.c |  144 ++++++++++++++++++++++++++++++++++--------------------
+ 1 files changed, 91 insertions(+), 53 deletions(-)
 
-diff --git a/include/linux/mod_export.h b/include/linux/mod_export.h
-new file mode 100644
-index 0000000..9f38816
---- /dev/null
-+++ b/include/linux/mod_export.h
-@@ -0,0 +1,75 @@
-+#ifndef LINUX_MOD_EXPORT_H
-+#define LINUX_MOD_EXPORT_H
-+
-+#include <linux/compiler.h>
-+#include <asm/module.h>
-+
-+/* Some toolchains use a `_' prefix for all user symbols. */
-+#ifdef CONFIG_SYMBOL_PREFIX
-+#define MODULE_SYMBOL_PREFIX CONFIG_SYMBOL_PREFIX
-+#else
-+#define MODULE_SYMBOL_PREFIX ""
-+#endif
-+
-+struct kernel_symbol {
-+	unsigned long value;
-+	const char *name;
-+};
-+
-+#ifdef CONFIG_MODULES
-+#ifndef __GENKSYMS__
-+#ifdef CONFIG_MODVERSIONS
-+/* Mark the CRC weak since genksyms apparently decides not to
-+ * generate a checksums for some symbols */
-+#define __CRC_SYMBOL(sym, sec)					\
-+	extern void *__crc_##sym __attribute__((weak));		\
-+	static const unsigned long __kcrctab_##sym		\
-+	__used							\
-+	__attribute__((section("__kcrctab" sec), unused))	\
-+	= (unsigned long) &__crc_##sym;
-+#else
-+#define __CRC_SYMBOL(sym, sec)
-+#endif
-+
-+/* For every exported symbol, place a struct in the __ksymtab section */
-+#define __EXPORT_SYMBOL(sym, sec)				\
-+	extern typeof(sym) sym;					\
-+	__CRC_SYMBOL(sym, sec)					\
-+	static const char __kstrtab_##sym[]			\
-+	__attribute__((section("__ksymtab_strings"), aligned(1))) \
-+	= MODULE_SYMBOL_PREFIX #sym;                    	\
-+	static const struct kernel_symbol __ksymtab_##sym	\
-+	__used							\
-+	__attribute__((section("__ksymtab" sec), unused))	\
-+	= { (unsigned long)&sym, __kstrtab_##sym }
-+
-+#define EXPORT_SYMBOL(sym)					\
-+	__EXPORT_SYMBOL(sym, "")
-+
-+#define EXPORT_SYMBOL_GPL(sym)					\
-+	__EXPORT_SYMBOL(sym, "_gpl")
-+
-+#define EXPORT_SYMBOL_GPL_FUTURE(sym)				\
-+	__EXPORT_SYMBOL(sym, "_gpl_future")
-+
-+#ifdef CONFIG_UNUSED_SYMBOLS
-+#define EXPORT_UNUSED_SYMBOL(sym) __EXPORT_SYMBOL(sym, "_unused")
-+#define EXPORT_UNUSED_SYMBOL_GPL(sym) __EXPORT_SYMBOL(sym, "_unused_gpl")
-+#else
-+#define EXPORT_UNUSED_SYMBOL(sym)
-+#define EXPORT_UNUSED_SYMBOL_GPL(sym)
-+#endif
-+
-+#endif /* __GENKSYMS__ */
-+
-+#else /* !CONFIG_MODULES */
-+
-+#define EXPORT_SYMBOL(sym)
-+#define EXPORT_SYMBOL_GPL(sym)
-+#define EXPORT_SYMBOL_GPL_FUTURE(sym)
-+#define EXPORT_UNUSED_SYMBOL(sym)
-+#define EXPORT_UNUSED_SYMBOL_GPL(sym)
-+
-+#endif /* CONFIG_MODULES */
-+
-+#endif /* LINUX_MOD_EXPORT_H */
-diff --git a/include/linux/module.h b/include/linux/module.h
-index 6cb1a3c..b9e860a 100644
---- a/include/linux/module.h
-+++ b/include/linux/module.h
-@@ -15,6 +15,7 @@
- #include <linux/stringify.h>
- #include <linux/kobject.h>
- #include <linux/moduleparam.h>
-+#include <linux/mod_export.h>
- #include <linux/tracepoint.h>
+diff --git a/kernel/module.c b/kernel/module.c
+index ca4f2ba..56a7e65 100644
+--- a/kernel/module.c
++++ b/kernel/module.c
+@@ -55,6 +55,7 @@
+ #include <linux/async.h>
+ #include <linux/percpu.h>
+ #include <linux/kmemleak.h>
++#include <linux/bsearch.h>
  
- #include <asm/local.h>
-@@ -25,21 +26,8 @@
- /* Not Yet Implemented */
- #define MODULE_SUPPORTED_DEVICE(name)
+ #define CREATE_TRACE_POINTS
+ #include <trace/events/module.h>
+@@ -264,36 +265,98 @@ bool each_symbol(each_symbol_fn_t *fn, void *data)
+ }
+ EXPORT_SYMBOL_GPL(each_symbol);
  
--/* Some toolchains use a `_' prefix for all user symbols. */
--#ifdef CONFIG_SYMBOL_PREFIX
--#define MODULE_SYMBOL_PREFIX CONFIG_SYMBOL_PREFIX
--#else
--#define MODULE_SYMBOL_PREFIX ""
--#endif
--
- #define MODULE_NAME_LEN MAX_PARAM_PREFIX_LEN
- 
--struct kernel_symbol
--{
--	unsigned long value;
+-struct find_symbol_arg {
+-	/* Input */
 -	const char *name;
+-	bool gplok;
+-	bool warn;
++static int symbol_compare(const void *key, const void *elt)
++{
++	const char *str = key;
++	const struct kernel_symbol *sym = elt;
++	return strcmp(str, sym->name);
++}
+ 
+-	/* Output */
+-	struct module *owner;
+-	const unsigned long *crc;
++/* binary search on sorted symbols */
++static const struct kernel_symbol *find_symbol_in_kernel(
++	const char *name,
++	enum export_type *t,
++	const unsigned long **crc)
++{
++	struct kernel_symbol *sym;
++	enum export_type type;
++	unsigned int i;
++
++	for (type = 0; type < ARRAY_SIZE(ksymtab); type++) {
++		sym = bsearch(name, ksymtab[type].syms, ksymtab[type].num_syms,
++			      sizeof(struct kernel_symbol), symbol_compare);
++		if (sym) {
++			i = sym - ksymtab[type].syms;
++			*crc = symversion(ksymtab[type].crcs, i);
++			*t = type;
++			return sym;
++		}
++	}
++
++	return NULL;
++}
++
++/* linear search on unsorted symbols */
++static const struct kernel_symbol *find_symbol_in_module(
++	struct module *mod,
++	const char *name,
++	enum export_type *t,
++	const unsigned long **crc)
++{
++	struct ksymtab *symtab = mod->syms;
+ 	const struct kernel_symbol *sym;
 -};
--
- struct modversion_info
++	enum export_type type;
++	unsigned int i;
+ 
+-static bool find_symbol_in_section(enum export_type type,
+-				   const struct kernel_symbol *sym,
+-				   const unsigned long *crc,
+-				   struct module *owner,
+-				   void *data)
++	for (type = 0; type < EXPORT_TYPE_MAX; type++) {
++		for (i = 0; i < symtab[type].num_syms; i++) {
++			sym = &symtab[type].syms[i];
++
++			if (strcmp(sym->name, name) == 0) {
++				*crc = symversion(symtab[type].crcs, i);
++				*t = type;
++				return sym;
++			}
++		}
++	}
++
++	return NULL;
++}
++
++/* Find a symbol and return it, along with, (optional) crc and
++ * (optional) module which owns it */
++const struct kernel_symbol *find_symbol(const char *name,
++					struct module **owner,
++					const unsigned long **crc,
++					bool gplok,
++					bool warn)
  {
- 	unsigned long crc;
-@@ -180,52 +168,6 @@ void *__symbol_get(const char *symbol);
- void *__symbol_get_gpl(const char *symbol);
- #define symbol_get(x) ((typeof(&x))(__symbol_get(MODULE_SYMBOL_PREFIX #x)))
+-	struct find_symbol_arg *fsa = data;
++	struct module *mod = NULL;
++	const struct kernel_symbol *sym;
++	enum export_type type;
++	const unsigned long *crc_value;
  
--#ifndef __GENKSYMS__
--#ifdef CONFIG_MODVERSIONS
--/* Mark the CRC weak since genksyms apparently decides not to
-- * generate a checksums for some symbols */
--#define __CRC_SYMBOL(sym, sec)					\
--	extern void *__crc_##sym __attribute__((weak));		\
--	static const unsigned long __kcrctab_##sym		\
--	__used							\
--	__attribute__((section("__kcrctab" sec), unused))	\
--	= (unsigned long) &__crc_##sym;
--#else
--#define __CRC_SYMBOL(sym, sec)
--#endif
--
--/* For every exported symbol, place a struct in the __ksymtab section */
--#define __EXPORT_SYMBOL(sym, sec)				\
--	extern typeof(sym) sym;					\
--	__CRC_SYMBOL(sym, sec)					\
--	static const char __kstrtab_##sym[]			\
--	__attribute__((section("__ksymtab_strings"), aligned(1))) \
--	= MODULE_SYMBOL_PREFIX #sym;                    	\
--	static const struct kernel_symbol __ksymtab_##sym	\
--	__used							\
--	__attribute__((section("__ksymtab" sec), unused))	\
--	= { (unsigned long)&sym, __kstrtab_##sym }
--
--#define EXPORT_SYMBOL(sym)					\
--	__EXPORT_SYMBOL(sym, "")
--
--#define EXPORT_SYMBOL_GPL(sym)					\
--	__EXPORT_SYMBOL(sym, "_gpl")
--
--#define EXPORT_SYMBOL_GPL_FUTURE(sym)				\
--	__EXPORT_SYMBOL(sym, "_gpl_future")
--
--
--#ifdef CONFIG_UNUSED_SYMBOLS
--#define EXPORT_UNUSED_SYMBOL(sym) __EXPORT_SYMBOL(sym, "_unused")
--#define EXPORT_UNUSED_SYMBOL_GPL(sym) __EXPORT_SYMBOL(sym, "_unused_gpl")
--#else
--#define EXPORT_UNUSED_SYMBOL(sym)
--#define EXPORT_UNUSED_SYMBOL_GPL(sym)
--#endif
--
--#endif
--
- enum module_state
- {
- 	MODULE_STATE_LIVE,
-@@ -543,11 +485,6 @@ extern void module_update_tracepoints(void);
- extern int module_get_iter_tracepoints(struct tracepoint_iter *iter);
+-	if (strcmp(sym->name, fsa->name) != 0)
+-		return false;
++	sym = find_symbol_in_kernel(name, &type, &crc_value);
++	if (sym)
++		goto found;
++
++	list_for_each_entry_rcu(mod, &modules, list) {
++		sym = find_symbol_in_module(mod, name, &type, &crc_value);
++		if (sym)
++			goto found;
++	}
++
++	DEBUGP("Failed to find symbol %s\n", name);
++	return NULL;
  
- #else /* !CONFIG_MODULES... */
--#define EXPORT_SYMBOL(sym)
--#define EXPORT_SYMBOL_GPL(sym)
--#define EXPORT_SYMBOL_GPL_FUTURE(sym)
--#define EXPORT_UNUSED_SYMBOL(sym)
--#define EXPORT_UNUSED_SYMBOL_GPL(sym)
+-	if (!fsa->gplok) {
++found:
++	if (!gplok) {
+ 		if (export_is_gpl_only(type))
+-			return false;
+-		if (export_is_gpl_future(type) && fsa->warn) {
++			return NULL;
++		if (export_is_gpl_future(type) && warn) {
+ 			printk(KERN_WARNING "Symbol %s is being used "
+ 			       "by a non-GPL module, which will not "
+-			       "be allowed in the future\n", fsa->name);
++			       "be allowed in the future\n", name);
+ 			printk(KERN_WARNING "Please see the file "
+ 			       "Documentation/feature-removal-schedule.txt "
+ 			       "in the kernel source tree for more details.\n");
+@@ -301,9 +364,9 @@ static bool find_symbol_in_section(enum export_type type,
+ 	}
  
- /* Given an address, look for it in the exception tables. */
- static inline const struct exception_table_entry *
+ #ifdef CONFIG_UNUSED_SYMBOLS
+-	if (export_is_unused(type) && fsa->warn) {
++	if (export_is_unused(type) && warn) {
+ 		printk(KERN_WARNING "Symbol %s is marked as UNUSED, "
+-		       "however this module is using it.\n", fsa->name);
++		       "however this module is using it.\n", name);
+ 		printk(KERN_WARNING
+ 		       "This symbol will go away in the future.\n");
+ 		printk(KERN_WARNING
+@@ -314,36 +377,11 @@ static bool find_symbol_in_section(enum export_type type,
+ 	}
+ #endif
+ 
+-	fsa->owner = owner;
+-	fsa->crc = crc;
+-	fsa->sym = sym;
+-	return true;
+-}
+-
+-/* Find a symbol and return it, along with, (optional) crc and
+- * (optional) module which owns it */
+-const struct kernel_symbol *find_symbol(const char *name,
+-					struct module **owner,
+-					const unsigned long **crc,
+-					bool gplok,
+-					bool warn)
+-{
+-	struct find_symbol_arg fsa;
+-
+-	fsa.name = name;
+-	fsa.gplok = gplok;
+-	fsa.warn = warn;
+-
+-	if (each_symbol(find_symbol_in_section, &fsa)) {
+-		if (owner)
+-			*owner = fsa.owner;
+-		if (crc)
+-			*crc = fsa.crc;
+-		return fsa.sym;
+-	}
+-
+-	DEBUGP("Failed to find symbol %s\n", name);
+-	return NULL;
++	if (owner)
++		*owner = mod;
++	if (crc)
++		*crc = crc_value;
++	return sym;
+ }
+ EXPORT_SYMBOL_GPL(find_symbol);
+ 
 -- 
 1.6.3.3
 
