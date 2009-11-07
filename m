@@ -1,84 +1,78 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from acsinet12.oracle.com ([141.146.126.234]:41452 "EHLO
-	acsinet12.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755542AbZKGBJk (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 6 Nov 2009 20:09:40 -0500
-Date: Fri, 6 Nov 2009 17:07:36 -0800
-From: Randy Dunlap <randy.dunlap@oracle.com>
-Subject: Re: [PATCH] nconfig v5
-Message-Id: <20091106170736.6ace81f6.randy.dunlap@oracle.com>
-In-Reply-To: <20091106111232.9534f9f7.randy.dunlap@oracle.com>
-References: <1257496614-12052-1-git-send-email-nir.tzachar@gmail.com>
-	<20091106111232.9534f9f7.randy.dunlap@oracle.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Received: from mail.gmx.net ([213.165.64.20]:44547 "HELO mail.gmx.net"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with SMTP
+	id S1750879AbZKGGpm (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 7 Nov 2009 01:45:42 -0500
+From: Bernhard Kaindl <bernhard.kaindl@gmx.net>
+Subject: [PATCH/RFC 0/4] user remarks for config symbols
+Date: Sat,  7 Nov 2009 07:45:36 +0100
+Message-Id: <cover.1256767265.git.aragorn@Anduril.ringwar.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: nir.tzachar@gmail.com
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, sam@ravnborg.org, zippel@linux-m68k.org, andi@firstfloor.org
+To: linux-kernel@vger.kernel.org
+Cc: Bernhard Kaindl <bernhard.kaindl@gmx.net>, linux-kbuild@vger.kernel.org
 
-On Fri, 6 Nov 2009 11:12:32 -0800 Randy Dunlap wrote:
+                              - RFC -
 
-> On Fri,  6 Nov 2009 10:36:54 +0200 nir.tzachar@gmail.com wrote:
-> 
-> > From: Nir Tzachar <nir.tzachar@gmail.com>
-> > 
-> > This patch was inspired by the kernel projects page, where an ncurses
-> > replacement for menuconfig was mentioned (by Sam Ravnborg).
-> > 
-> > Building on menuconfig, this patch implements a more modern look interface using
-> > ncurses and ncurses' satellite libraries (menu, panel, form). The implementation
-> > does not depend on lxdialog, which is currently distributed with the kernel.
-> > 
-> > Attached is a reworked version of nconfig. The old menuconfig navigation scheme
-> > was dropped, and function keys are used for special choices. Arrows are used in
-> > a more intuitive fashion for menu navigation.
-> > 
-> > 1) The old menuconfig bottom menu was dropped in favor of function keys (which
-> >    are interchangeable with regular numbers).
-> > 2) Arrows are used for navigation, such that <left> always goes back one menu
-> >    and <right> enters a sub-menu.
-> > 3) The exit sequence has been improved, such that it is possible to cancel the
-> >    exit if there are pending changes and resume editing.
-> > 4) All dialog boxes have an <OK> button, which is used to exit the dialog.
-> > 5) A 'show all symbols' option has been added, similarly to xconfig.
-> > 
-> > Please condsider this version as a proper replacement for menuconfig.
-> > Cheers, Nir.
-> > 
-> > Signed-off-by: Nir Tzachar <nir.tzachar@gmail.com>
+--- Comments, Reviews, Test reports, Notes, everything welcome ---
 
+Hi,
 
-> When I use F7 to exit, the program hangs.  I have to kill it.
-> I don't see any error messages.
-> (I'm testing this on a 2.6.32-rc6 kernel source tree).
-> 
-> ncurses-5.6-41
-> ncurses-devel-5.6-41
+I recently had the need to create a documentation for a kernel config,
+and decided to extend the kernel config tool(s) to allow me to do that
+with minium effort.
 
+Specifically, I extended make xconfig (and now also others) for editing
+a remark per config symbol and I created a config2html frontend to the
+kconfig lib which outputs the config options with their comments to a
+HTML table.
 
-More user/usability/testing comments:
+Besides that, it was sometimes been interesting to be able to add a
+note for some config choices in order to see that note again when
+revisiting that config choice again later.
 
-- sometimes nconfig repaints the kconfig menu list, moving it upward or
-  downward.  I find this undersirable.
+So I hope that the patches which I created could be useable by the
+greater Linux community, and hereby, I submit them for discussion
+and if liked, for inclusion.
 
-- after F5/Save + filename entered, the OK prompt is difficult to see
-  if the entire screen (window) contains kconfig menu items
+Thanks,
+Bernhard Kaindl
 
-- make complains with:
+Bernhard Kaindl (4):
+  Support loading and saving custom remarks for config symbols
+  menuconfig: allow editing of remarks for config symbols
+  xconfig: allow editing of remarks for config symbols
+  make config / oldconfig: allow editing of remarks for config symbols
 
- GEN     /local/linsrc/lnx-2632-rc6/zz64/Makefile
-scripts/kconfig/conf -s arch/x86/Kconfig
- Using /local/linsrc/lnx-2632-rc6 as source for kernel
- /local/linsrc/lnx-2632-rc6 is not clean, please run 'make mrproper'
- in the '/local/linsrc/lnx-2632-rc6' directory
+ scripts/kconfig/conf.c             |   19 +++++++++++++
+ scripts/kconfig/confdata.c         |   45 ++++++++++++++++++++++++++++--
+ scripts/kconfig/expr.h             |    1 +
+ scripts/kconfig/lxdialog/menubox.c |    3 ++
+ scripts/kconfig/mconf.c            |   51 ++++++++++++++++++++++++++++++++++
+ scripts/kconfig/qconf.cc           |   53 ++++++++++++++++++++++++++++++++++++
+ scripts/kconfig/qconf.h            |   19 +++++++++++++
+ 7 files changed, 188 insertions(+), 3 deletions(-)
 
-because
-$ make ARCH=x86_64 O=zz64 defconfig
-creates an empty include/config/ directory.
+PS: Here is also an update to my CREDITS entry:
 
+Signed-off-by: Bernhard Kaindl <bernhard.kaindl@gmx.net>
 
----
-~Randy
+diff --git a/CREDITS b/CREDITS
+index 72b4878..a92c901 100644
+--- a/CREDITS
++++ b/CREDITS
+@@ -1714,11 +1714,11 @@ S: Tata
+ S: Hungary
+ 
+ N: Bernhard Kaindl
+-E: bkaindl@netway.at
+-E: edv@bartelt.via.at
++E: bernhard.kaindl@gmx.net
+ D: Author of a menu based configuration tool, kmenu, which 
+ D: is the predecessor of 'make menuconfig' and 'make xconfig'.
+-D: digiboard driver update(modularisation work and 2.1.x upd)
++D: Various fixes for the kernel configuration tools
++D: Digiboard driver update (modularisation work and 2.1.x update)
+ S: Tallak 95
+ S: 8103 Rein
+ S: Austria
