@@ -1,15 +1,17 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.gmx.net ([213.165.64.20]:45232 "HELO mail.gmx.net"
+Received: from mail.gmx.net ([213.165.64.20]:45545 "HELO mail.gmx.net"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with SMTP
-	id S1751100AbZKGGpq (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 7 Nov 2009 01:45:46 -0500
+	id S1751137AbZKGGps (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 7 Nov 2009 01:45:48 -0500
 From: Bernhard Kaindl <bernhard.kaindl@gmx.net>
-Subject: [PATCH 2/4] menuconfig: allow editing of remarks for config symbols
-Date: Sat,  7 Nov 2009 07:45:38 +0100
-Message-Id: <617c40ae9e206b4f246998fe075644c752bc0bc3.1256767265.git.aragorn@Anduril.ringwar.org>
-In-Reply-To: <b106dec1237ab723ae6a2404d42601bf20704bf3.1256767265.git.aragorn@Anduril.ringwar.org>
+Subject: [PATCH 4/4] make config / oldconfig: allow editing of remarks for config symbols
+Date: Sat,  7 Nov 2009 07:45:40 +0100
+Message-Id: <1b9925ee778bcecbf7e2ae22fc9cef505b4c9e61.1256767265.git.aragorn@Anduril.ringwar.org>
+In-Reply-To: <57715d006f612817fa5bc38146560ecd84605a05.1256767265.git.aragorn@Anduril.ringwar.org>
 References: <cover.1256767265.git.aragorn@Anduril.ringwar.org>
  <b106dec1237ab723ae6a2404d42601bf20704bf3.1256767265.git.aragorn@Anduril.ringwar.org>
+ <617c40ae9e206b4f246998fe075644c752bc0bc3.1256767265.git.aragorn@Anduril.ringwar.org>
+ <57715d006f612817fa5bc38146560ecd84605a05.1256767265.git.aragorn@Anduril.ringwar.org>
 In-Reply-To: <cover.1256767265.git.aragorn@Anduril.ringwar.org>
 References: <cover.1256767265.git.aragorn@Anduril.ringwar.org>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -17,127 +19,74 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org
 Cc: Bernhard Kaindl <bernhard.kaindl@gmx.net>, linux-kbuild@vger.kernel.org
 
-Extend menuconfig to allow editing of remarks for config symbols:
+In conf_sym(), which is used for ask for all bool/tristate symbols,
+print sym->remark (if one exists) befor prompting for the option and
+analogous to help (triggered by an input beginning with '?'), when the
+user enters a line starting with '<', allow the user to enter a remark
+or update it.
 
-Add a new key to lxdialog (currently '<') which, when pressed,
-is forwarded to menuconfig, which handles it similar to the
-search key ('/') which can be used at any time, but passes the
-currently selected menu entry to conf_remark()
-
-conf_remark() is based on conf_string(), which allows to edit
-a string, but before, it checks if the passed menu entry is a
-config symbol, and if not it displays a short notice saying that
-it currently does not support editing comments for a pure menu
-entries without attached config symbol.
-
-It then allows to edit a string, which is initialized from the
-sym->remark entry and if the user changed the string, it updates
-sym->remark and sets things up so that menuconfig asks to save
-the config before exiting, so the changed remark is saved in
-that go.
+This extension does not cover the configuration of string, integer or
+choice values. I leave this open for follow-up submission in case there
+is interest in the config symbol remarks in general and in really
+supporting these also fully in make config, oldconfig and (possibly)
+silbings.
 
 Signed-off-by: Bernhard Kaindl <bernhard.kaindl@gmx.net>
----
- scripts/kconfig/lxdialog/menubox.c |    3 ++
- scripts/kconfig/mconf.c            |   51 ++++++++++++++++++++++++++++++++++++
- 2 files changed, 54 insertions(+), 0 deletions(-)
 
-diff --git a/scripts/kconfig/lxdialog/menubox.c b/scripts/kconfig/lxdialog/menubox.c
-index fa9d633..6b6bc48 100644
---- a/scripts/kconfig/lxdialog/menubox.c
-+++ b/scripts/kconfig/lxdialog/menubox.c
-@@ -383,6 +383,7 @@ do_resize:
- 		case 'n':
- 		case 'm':
- 		case '/':
-+		case '<':
- 			/* save scroll info */
- 			*s_scroll = scroll;
- 			delwin(menu);
-@@ -402,6 +403,8 @@ do_resize:
- 				return 6;
- 			case '/':
- 				return 7;
-+			case '<':
-+				return 8;
- 			}
- 			return 0;
- 		case 'h':
-diff --git a/scripts/kconfig/mconf.c b/scripts/kconfig/mconf.c
-index d829535..50a9b10 100644
---- a/scripts/kconfig/mconf.c
-+++ b/scripts/kconfig/mconf.c
-@@ -276,6 +276,7 @@ static int single_menu_mode;
- static void conf(struct menu *menu);
- static void conf_choice(struct menu *menu);
- static void conf_string(struct menu *menu);
-+static void conf_remark(struct menu *menu);
- static void conf_load(void);
- static void conf_save(void);
- static void show_textbox(const char *title, const char *text, int r, int c);
-@@ -619,6 +620,9 @@ static void conf(struct menu *menu)
- 		case 7:
- 			search_conf();
- 			break;
-+		case 8:
-+			conf_remark(submenu);
-+			break;
- 		}
- 	}
- }
-@@ -743,6 +747,53 @@ static void conf_string(struct menu *menu)
- 	}
- }
+PS:
+make gconfig could also be considered for extension, but it does
+apparently does not have a great deal of string editing UI yet,
+so adding remarks to it would require finding a way to edit string
+symbols in it first.
+---
+ scripts/kconfig/conf.c |   19 +++++++++++++++++++
+ 1 files changed, 19 insertions(+), 0 deletions(-)
+
+diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
+index 9960d1c..dc60a1d 100644
+--- a/scripts/kconfig/conf.c
++++ b/scripts/kconfig/conf.c
+@@ -158,8 +158,11 @@ static int conf_sym(struct menu *menu)
+ 	struct symbol *sym = menu->sym;
+ 	int type;
+ 	tristate oldval, newval;
++	char *p;
  
-+/**
-+ * Based on conf_string(), this edits the remark for a config symbol
-+ */
-+static void conf_remark(struct menu *menu)
-+{
-+	const char *prompt = menu_get_prompt(menu);
+ 	while (1) {
++		if (sym->remark)
++			printf("Remark: %s\n", sym->remark);
+ 		printf("%*s%s ", indent - 1, "", _(menu->prompt->text));
+ 		if (sym->name)
+ 			printf("(%s) ", sym->name);
+@@ -214,6 +217,8 @@ static int conf_sym(struct menu *menu)
+ 			break;
+ 		case '?':
+ 			goto help;
++		case '<':
++			goto remark;
+ 		default:
+ 			continue;
+ 		}
+@@ -221,6 +226,20 @@ static int conf_sym(struct menu *menu)
+ 			return 0;
+ help:
+ 		print_help(menu);
++		continue;
++remark:
++		if (sym->remark)
++			printf("Current Remark: %s\n", sym->remark);
++		printf("    New remark: ");
++		fgets(line, sizeof(line), stdin);
 +
-+	if (!prompt || !menu->sym) {
-+		show_textbox(NULL,
-+			N_("Editing comments for menus without a config symbol\n"
-+				"is currently not supported."), 6, 63);
-+		return;
-+	}
-+
-+	while (1) {
-+		int res;
-+		dialog_clear();
-+		res = dialog_inputbox(prompt ? _(prompt) : _("Main Menu"),
-+				      _("Edit the remark below"), 10, 75,
-+				      menu->sym->remark);
-+		switch (res) {
-+		case 0:
-+			if (!dialog_input_result[0] && !menu->sym->remark)
-+				return;
-+			if (menu->sym->remark) {
-+				if (!strcmp(menu->sym->remark, dialog_input_result))
-+					return;
-+				free(menu->sym->remark);
-+			}
-+			if (dialog_input_result[0]) {
-+				menu->sym->remark = strdup(dialog_input_result);
-+			} else {
-+				menu->sym->remark = NULL;
-+			}
-+			/* Write new .config{,-remarks} on exit: */
-+			sym_add_change_count(1);
-+			sym_clear_all_valid();
-+			return;
-+		case 1:
-+			show_help(menu);
-+			break;
-+		case KEY_ESC:
-+			return;
++		if ((p = strchr(line, '\n')))
++			*p = '\0';            /* no \n in remark */
++		if (line[0]) {
++			if (sym->remark)
++				free(sym->remark);
++			sym->remark = strdup(line);
 +		}
-+	}
-+}
-+
- static void conf_load(void)
- {
+ 	}
+ }
  
 -- 
 1.6.0.4
