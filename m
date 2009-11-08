@@ -1,52 +1,48 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-bw0-f227.google.com ([209.85.218.227]:34331 "EHLO
-	mail-bw0-f227.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754059AbZKHVlI (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 8 Nov 2009 16:41:08 -0500
-Message-ID: <4AF7397D.2050202@gmail.com>
-Date: Sun, 08 Nov 2009 22:34:53 +0100
-From: Carmelo Amoroso <carmelo73@gmail.com>
-Reply-To: carmelo73@gmail.com
+Received: from mail.gmx.net ([213.165.64.20]:50406 "HELO mail.gmx.net"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with SMTP
+	id S1755558AbZKHWqX (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 8 Nov 2009 17:46:23 -0500
+Date: Sun, 8 Nov 2009 23:46:24 +0100 (CET)
+From: Guennadi Liakhovetski <g.liakhovetski@gmx.de>
+Subject: [PATCH/RFC] fb: put framebuffer drivers back under the "frame buffer
+ devices" menu
+Message-ID: <Pine.LNX.4.64.0911082339090.24656@axis700.grange>
 MIME-Version: 1.0
-Subject: [PATCH] kbuild: Allow to use depmod from a non default install
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>
+To: linux-fbdev-devel@lists.sourceforge.net
+Cc: Andrew Morton <akpm@linux-foundation.org>, linux-kbuild@vger.kernel.org, Roman Zippel <zippel@linux-m68k.org>
 
-This patch allow to specify the directory where to find the
-depmod tool other than being forced to use the module-init-tools
-installed on the host. The reason for this is explained below.
-When doing cross-compilation, it not guaranteed that the
-module-init-tools installed on the host (and used during kernel build)
-are exactly the same and compatible with those used on the target at runtime.
-For example, recent changes in how depmod writes modules.dep using
-root-less path, make older modprobe unusable on the target.
-User in ths case could install in a different path the module-init-tools
-compatible with the version used on the target and specify the path on the
-command line.
+The config FB_PRE_INIT_FB entry in drivers/video/Kconfig pushes all entries
+below it out of the menuconfig selection. Fix this.
 
-Signed-off-by: Carmelo Amoroso <carmelo.amoroso@st.com>
+Signed-off-by: Guennadi Liakhovetski <g.liakhovetski@gmx.de>
 ---
- Makefile |    3 ++-
- 1 files changed, 2 insertions(+), 1 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index b4c04f7..f5286c4 100644
---- a/Makefile
-+++ b/Makefile
-@@ -316,7 +316,8 @@ OBJDUMP             = $(CROSS_COMPILE)objdump
- AWK            = awk
- GENKSYMS       = scripts/genksyms/genksyms
- INSTALLKERNEL  := installkernel
--DEPMOD         = /sbin/depmod
-+DEPMOD_PATH    ?= /sbin
-+DEPMOD         = $(DEPMOD_PATH)/depmod
- KALLSYMS       = scripts/kallsyms
- PERL           = perl
- CHECK          = sparse
+This is _most_ _probably_ not a right fix, but rather an observation, that 
+the patch below fixes the problem, whereby all entires below 
+FB_PRE_INIT_FB get displaced from the "frame buffer devices" menu. A bug 
+in kconfig? The additional dependency on FB in this patch is certainly 
+redundant.
+
+ drivers/video/Kconfig |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/drivers/video/Kconfig b/drivers/video/Kconfig
+index 9bbb285..188e1ba 100644
+--- a/drivers/video/Kconfig
++++ b/drivers/video/Kconfig
+@@ -2121,7 +2121,7 @@ config FB_EP93XX
+ 
+ config FB_PRE_INIT_FB
+ 	bool "Don't reinitialize, use bootloader's GDC/Display configuration"
+-	depends on FB_MB862XX_LIME
++	depends on FB && FB_MB862XX_LIME
+ 	---help---
+ 	  Select this option if display contents should be inherited as set by
+ 	  the bootloader.
 -- 
-1.6.3.3
+1.6.2.4
+
