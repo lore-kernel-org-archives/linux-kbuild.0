@@ -1,48 +1,110 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.gmx.net ([213.165.64.20]:50406 "HELO mail.gmx.net"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with SMTP
-	id S1755558AbZKHWqX (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 8 Nov 2009 17:46:23 -0500
-Date: Sun, 8 Nov 2009 23:46:24 +0100 (CET)
-From: Guennadi Liakhovetski <g.liakhovetski@gmx.de>
-Subject: [PATCH/RFC] fb: put framebuffer drivers back under the "frame buffer
- devices" menu
-Message-ID: <Pine.LNX.4.64.0911082339090.24656@axis700.grange>
+Received: from ozlabs.org ([203.10.76.45]:59745 "EHLO ozlabs.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751739AbZKICtS convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 8 Nov 2009 21:49:18 -0500
+From: Rusty Russell <rusty@rustcorp.com.au>
+Subject: Re: [PATCH 10/10] module: fix is_exported() to return true for all types of exports
+Date: Mon, 9 Nov 2009 13:19:19 +1030
+References: <4AF5DF9F.5020208@tuffmail.co.uk> <1257627841-15817-10-git-send-email-alan-jenkins@tuffmail.co.uk>
+In-Reply-To: <1257627841-15817-10-git-send-email-alan-jenkins@tuffmail.co.uk>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+Content-Type: Text/Plain;
+  charset="utf-8"
+Content-Transfer-Encoding: 8BIT
+Message-Id: <200911091319.20308.rusty@rustcorp.com.au>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-fbdev-devel@lists.sourceforge.net
-Cc: Andrew Morton <akpm@linux-foundation.org>, linux-kbuild@vger.kernel.org, Roman Zippel <zippel@linux-m68k.org>
+To: Alan Jenkins <alan-jenkins@tuffmail.co.uk>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-The config FB_PRE_INIT_FB entry in drivers/video/Kconfig pushes all entries
-below it out of the menuconfig selection. Fix this.
+On Sun, 8 Nov 2009 07:34:01 am Alan Jenkins wrote:
+> /proc/kallsyms annotates module symbols as global (e.g. 'D' for a data
+> symbol) or local (e.g. 'd'), depending on whether is_exported() returns
+> true or false.
 
-Signed-off-by: Guennadi Liakhovetski <g.liakhovetski@gmx.de>
----
+Thanks, I've applied the whole series.
 
-This is _most_ _probably_ not a right fix, but rather an observation, that 
-the patch below fixes the problem, whereby all entires below 
-FB_PRE_INIT_FB get displaced from the "frame buffer devices" menu. A bug 
-in kconfig? The additional dependency on FB in this patch is certainly 
-redundant.
+Cheers,
+Rusty.
+PS.  One fix so far:
 
- drivers/video/Kconfig |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+Fix for CONFIG_MODVERSIONS=n:
 
-diff --git a/drivers/video/Kconfig b/drivers/video/Kconfig
-index 9bbb285..188e1ba 100644
---- a/drivers/video/Kconfig
-+++ b/drivers/video/Kconfig
-@@ -2121,7 +2121,7 @@ config FB_EP93XX
+kernel/module.c: In function ‘init_ksymtab’:
+kernel/module.c:200: warning: initialization makes integer from pointer without a cast
+kernel/module.c:201: warning: excess elements in struct initializer
+kernel/module.c:201: warning: (near initialization for ‘(anonymous)’)
+
+Signed-off-by: Rusty Russell <rusty@rustcorp.com.au>
+
+diff --git a/kernel/module.c b/kernel/module.c
+--- a/kernel/module.c
++++ b/kernel/module.c
+@@ -194,30 +194,45 @@ extern const unsigned long __start___kcr
  
- config FB_PRE_INIT_FB
- 	bool "Don't reinitialize, use bootloader's GDC/Display configuration"
--	depends on FB_MB862XX_LIME
-+	depends on FB && FB_MB862XX_LIME
- 	---help---
- 	  Select this option if display contents should be inherited as set by
- 	  the bootloader.
--- 
-1.6.2.4
-
+ static struct ksymtab ksymtab[EXPORT_TYPE_MAX];
+ 
++#ifdef CONFIG_MODVERSIONS
++#define init_one_ksymtab(ksymt, start, stop, crc_start)	\
++	do {						\
++		struct ksymtab *ks = (ksymt);		\
++		ks->syms = (start);			\
++		ks->num_syms = (stop) - ks->syms;	\
++		ks->crcs = (crc_start);			\
++	} while (0)
++#else
++#define init_one_ksymtab(ksymt, start, stop, crc_start)	\
++	do {						\
++		struct ksymtab *ks = (ksymt);		\
++		ks->syms = (start);			\
++		ks->num_syms = (stop) - ks->syms;	\
++	} while (0)
++#endif
++
+ static int __init init_ksymtab(void)
+ {
+-	ksymtab[EXPORT_TYPE_PLAIN] = (struct ksymtab) {
+-		__start___ksymtab, __start___kcrctab,
+-		__stop___ksymtab - __start___ksymtab,
+-	};
+-	ksymtab[EXPORT_TYPE_GPL] = (struct ksymtab) {
+-		__start___ksymtab_gpl, __start___kcrctab_gpl,
+-		__stop___ksymtab_gpl - __start___ksymtab_gpl,
+-	};
++	init_one_ksymtab(&ksymtab[EXPORT_TYPE_PLAIN],
++			 __start___ksymtab, __stop___ksymtab,
++			 __start___kcrctab);
++	init_one_ksymtab(&ksymtab[EXPORT_TYPE_GPL],
++			 __start___ksymtab_gpl, __stop___ksymtab_gpl,
++			 __start___kcrctab_gpl);
+ #ifdef CONFIG_UNUSED_EXPORTS
+-	ksymtab[EXPORT_TYPE_UNUSED] = (struct ksymtab) {
+-		__start___ksymtab_unused, __start___kcrctab_unused,
+-		__stop___ksymtab_unused - __start___ksymtab_unused,
+-	};
+-	ksymtab[EXPORT_TYPE_UNUSED_GPL] = (struct ksymtab) {
+-		__start___ksymtab_unused_gpl, __start___kcrctab_unused_gpl,
+-		__stop___ksymtab_unused_gpl - __start___ksymtab_unused_gpl,
+-	};
++	init_one_ksymtab(&ksymtab[EXPORT_TYPE_UNUSED],
++			 __start___ksymtab_unused,
++			 __stop___ksymtab_unused,
++			 __start___kcrctab_unused);
++	init_one_ksymtab(&ksymtab[EXPORT_TYPE_UNUSED_GPL],
++			 __start___ksymtab_unused_gpl,
++			 __stop___ksymtab_unused_gpl,
++			 __start___kcrctab_unused_gpl);
+ #endif
+-	ksymtab[EXPORT_TYPE_GPL_FUTURE] = (struct ksymtab) {
+-		__start___ksymtab_gpl_future, __start___kcrctab_gpl_future,
+-		__stop___ksymtab_gpl_future - __start___ksymtab_gpl_future,
+-	};
++	init_one_ksymtab(&ksymtab[EXPORT_TYPE_GPL_FUTURE],
++			 __start___ksymtab_gpl_future,
++			 __stop___ksymtab_gpl_future,
++			 __start___kcrctab_gpl_future);
+ 
+ 	return 0;
+ }
