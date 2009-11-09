@@ -1,110 +1,84 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ozlabs.org ([203.10.76.45]:59745 "EHLO ozlabs.org"
+Received: from ozlabs.org ([203.10.76.45]:33720 "EHLO ozlabs.org"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751739AbZKICtS convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 8 Nov 2009 21:49:18 -0500
+	id S1751739AbZKIDRz (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 8 Nov 2009 22:17:55 -0500
 From: Rusty Russell <rusty@rustcorp.com.au>
-Subject: Re: [PATCH 10/10] module: fix is_exported() to return true for all types of exports
-Date: Mon, 9 Nov 2009 13:19:19 +1030
-References: <4AF5DF9F.5020208@tuffmail.co.uk> <1257627841-15817-10-git-send-email-alan-jenkins@tuffmail.co.uk>
-In-Reply-To: <1257627841-15817-10-git-send-email-alan-jenkins@tuffmail.co.uk>
+Subject: Re: [PATCH 05/10] kbuild: sort the list of symbols exported by the kernel (__ksymtab)
+Date: Mon, 9 Nov 2009 13:47:57 +1030
+References: <9b2b86520911020852q49c55695rb05d87090fa9ad33@mail.gmail.com> <20091104171916.GA6323@merkur.ravnborg.org> <4AF2E00A.3010107@tuffmail.co.uk>
+In-Reply-To: <4AF2E00A.3010107@tuffmail.co.uk>
 MIME-Version: 1.0
 Content-Type: Text/Plain;
-  charset="utf-8"
-Content-Transfer-Encoding: 8BIT
-Message-Id: <200911091319.20308.rusty@rustcorp.com.au>
+  charset="iso-8859-1"
+Content-Transfer-Encoding: 7bit
+Message-Id: <200911091347.57286.rusty@rustcorp.com.au>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Alan Jenkins <alan-jenkins@tuffmail.co.uk>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+Cc: Sam Ravnborg <sam@ravnborg.org>, Mike Frysinger <vapier.adi@gmail.com>, greg@kroah.com, linux-kbuild@vger.kernel.org, carmelo73@gmail.com, linux-kernel@vger.kernel.org
 
-On Sun, 8 Nov 2009 07:34:01 am Alan Jenkins wrote:
-> /proc/kallsyms annotates module symbols as global (e.g. 'D' for a data
-> symbol) or local (e.g. 'd'), depending on whether is_exported() returns
-> true or false.
+On Fri, 6 Nov 2009 12:54:10 am Alan Jenkins wrote:
+> Sam Ravnborg wrote:
+> > On Wed, Nov 04, 2009 at 10:00:50AM +0000, Alan Jenkins wrote:
+> >   
+> >> Rusty Russell wrote:
+> >>     
+> >>> On Tue, 3 Nov 2009 08:36:17 pm Alan Jenkins wrote:
+> >>>   
+> >>>       
+> >>>> +/*
+> >>>> + * We use CPP macros since they are more familiar than assembly macros.
+> >>>> + * Note that CPP macros eat newlines, so each statement must be terminated
+> >>>> + * by a semicolon.
+> >>>> + */
+> >>>> +
+> >>>> +#ifdef CONFIG_HAVE_SYMBOL_PREFIX
+> >>>> +#define __SYM(sym) _##sym
+> >>>> +#else
+> >>>> +#define __SYM(sym) sym
+> >>>> +#endif
+> >>>>     
+> >>>>         
+> >>> Ideally, you would used MODULE_SYMBOL_PREFIX here, but of course it's a
+> >>> string.  I don't think Kconfig can do arbitrary identifiers, so we can't
+> >>> make CONFIG_SYMBOL_PREFIX empty or _.
+> >>>
+> >>> Perhaps clarify it to a bool CONFIG_HAVE_MODULE_UNDERSCORE_PREFIX then,
+> >>> since that's what you're assuming here?
+> >>>
+> >>> Thanks,
+> >>> Rusty.
+> >>>       
+> >> I made the same assumption in patch 4.  The arch defines  
+> >> CONFIG_HAVE_SYMBOL_PREFIX, which then causes init/Kconfig to define  
+> >> CONFIG_SYMBOL_PREFIX="_".
+> >>
+> >> Mike suggested that I hack kbuild instead, to do something like
+> >>
+> >> unquote = ...
+> >> AFLAGS_.tmp_export-asm.o += -DSYMBOL_PREFIX=$(unquote CONFIG_SYMBOL_PREFIX)
+> >>
+> >> I'm experimenting with the idea, but I haven't managed to get it working  
+> >>     
+> >
+> > Something like this:
+> > unquote = $(patsubst "%",%,$($1))
+> >
+> > AFLAGS_.tmp_export-asm.o += -DSYMBOL_PREFIX=$(call unquote,CONFIG_SYMBOL_PREFIX)
+> >
+> > But the readability is low so we could be better off doing it direct:
+> >
+> > AFLAGS_.tmp_export-asm.o += -DSYMBOL_PREFIX=$(patsubst "%",",$(CONFIG_SYMBOL_PREFIX))
+> >
+> > 	Sam
+> >   
+> 
+> Thanks to both of you, I have something that works now. 
 
-Thanks, I've applied the whole series.
+I've taken this, but really, it's overkill.  Changing the config to a fixed
+"underscore or nothing" was simpler and demonstrably sufficient for all cases
+in the last 5 years.
 
-Cheers,
+Thanks,
 Rusty.
-PS.  One fix so far:
-
-Fix for CONFIG_MODVERSIONS=n:
-
-kernel/module.c: In function ‘init_ksymtab’:
-kernel/module.c:200: warning: initialization makes integer from pointer without a cast
-kernel/module.c:201: warning: excess elements in struct initializer
-kernel/module.c:201: warning: (near initialization for ‘(anonymous)’)
-
-Signed-off-by: Rusty Russell <rusty@rustcorp.com.au>
-
-diff --git a/kernel/module.c b/kernel/module.c
---- a/kernel/module.c
-+++ b/kernel/module.c
-@@ -194,30 +194,45 @@ extern const unsigned long __start___kcr
- 
- static struct ksymtab ksymtab[EXPORT_TYPE_MAX];
- 
-+#ifdef CONFIG_MODVERSIONS
-+#define init_one_ksymtab(ksymt, start, stop, crc_start)	\
-+	do {						\
-+		struct ksymtab *ks = (ksymt);		\
-+		ks->syms = (start);			\
-+		ks->num_syms = (stop) - ks->syms;	\
-+		ks->crcs = (crc_start);			\
-+	} while (0)
-+#else
-+#define init_one_ksymtab(ksymt, start, stop, crc_start)	\
-+	do {						\
-+		struct ksymtab *ks = (ksymt);		\
-+		ks->syms = (start);			\
-+		ks->num_syms = (stop) - ks->syms;	\
-+	} while (0)
-+#endif
-+
- static int __init init_ksymtab(void)
- {
--	ksymtab[EXPORT_TYPE_PLAIN] = (struct ksymtab) {
--		__start___ksymtab, __start___kcrctab,
--		__stop___ksymtab - __start___ksymtab,
--	};
--	ksymtab[EXPORT_TYPE_GPL] = (struct ksymtab) {
--		__start___ksymtab_gpl, __start___kcrctab_gpl,
--		__stop___ksymtab_gpl - __start___ksymtab_gpl,
--	};
-+	init_one_ksymtab(&ksymtab[EXPORT_TYPE_PLAIN],
-+			 __start___ksymtab, __stop___ksymtab,
-+			 __start___kcrctab);
-+	init_one_ksymtab(&ksymtab[EXPORT_TYPE_GPL],
-+			 __start___ksymtab_gpl, __stop___ksymtab_gpl,
-+			 __start___kcrctab_gpl);
- #ifdef CONFIG_UNUSED_EXPORTS
--	ksymtab[EXPORT_TYPE_UNUSED] = (struct ksymtab) {
--		__start___ksymtab_unused, __start___kcrctab_unused,
--		__stop___ksymtab_unused - __start___ksymtab_unused,
--	};
--	ksymtab[EXPORT_TYPE_UNUSED_GPL] = (struct ksymtab) {
--		__start___ksymtab_unused_gpl, __start___kcrctab_unused_gpl,
--		__stop___ksymtab_unused_gpl - __start___ksymtab_unused_gpl,
--	};
-+	init_one_ksymtab(&ksymtab[EXPORT_TYPE_UNUSED],
-+			 __start___ksymtab_unused,
-+			 __stop___ksymtab_unused,
-+			 __start___kcrctab_unused);
-+	init_one_ksymtab(&ksymtab[EXPORT_TYPE_UNUSED_GPL],
-+			 __start___ksymtab_unused_gpl,
-+			 __stop___ksymtab_unused_gpl,
-+			 __start___kcrctab_unused_gpl);
- #endif
--	ksymtab[EXPORT_TYPE_GPL_FUTURE] = (struct ksymtab) {
--		__start___ksymtab_gpl_future, __start___kcrctab_gpl_future,
--		__stop___ksymtab_gpl_future - __start___ksymtab_gpl_future,
--	};
-+	init_one_ksymtab(&ksymtab[EXPORT_TYPE_GPL_FUTURE],
-+			 __start___ksymtab_gpl_future,
-+			 __stop___ksymtab_gpl_future,
-+			 __start___kcrctab_gpl_future);
- 
- 	return 0;
- }
