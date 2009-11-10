@@ -1,19 +1,20 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from 117.Red-88-18-227.staticIP.rima-tde.net ([88.18.227.117]:14499
-	"HELO 117.Red-88-18-227.staticIP.rima-tde.net" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with SMTP id S1755928AbZKIOLe (ORCPT
+Received: from asmtpout026.mac.com ([17.148.16.101]:44242 "EHLO
+	asmtpout026.mac.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751914AbZKJHzN (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 9 Nov 2009 09:11:34 -0500
-Message-ID: <20091109151048.6070908@xs4all.nl>
-Date: Mon, 9 Nov 2009 15:10:48 +0100
-From: "Nathan Jimenez" <vtvieira@xs4all.nl>
-MIME-Version: 1.0
-Subject: You'll tap any woman you want
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
+	Tue, 10 Nov 2009 02:55:13 -0500
+MIME-version: 1.0
+Content-transfer-encoding: 7BIT
+Content-type: text/plain; charset=ISO-8859-1
+Date: Mon, 09 Nov 2009 22:55:05 -0800
+From: "Engr. Peter Tebogo." <pprr45@me.com>
+Message-id: <151162044469757574632173708266316019987-Webmail@me.com>
+Subject: re.
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
 
-What are you afraid of? http://riv.oyqwibzyji.com/
 
+We have gotten approval to transfer US$14.5M abroad. Your share we be 30%, we receive 60% while 10% for taxes and  miscellaneous expenses. Please get back to me as soon as possible if you are interested.
+Thank you,
+Engr. Peter Tebogo.
