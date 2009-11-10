@@ -1,20 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from asmtpout026.mac.com ([17.148.16.101]:44242 "EHLO
-	asmtpout026.mac.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751914AbZKJHzN (ORCPT
+Received: from rcsinet11.oracle.com ([148.87.113.123]:35257 "EHLO
+	rgminet11.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754373AbZKJXsA (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 10 Nov 2009 02:55:13 -0500
-MIME-version: 1.0
-Content-transfer-encoding: 7BIT
-Content-type: text/plain; charset=ISO-8859-1
-Date: Mon, 09 Nov 2009 22:55:05 -0800
-From: "Engr. Peter Tebogo." <pprr45@me.com>
-Message-id: <151162044469757574632173708266316019987-Webmail@me.com>
-Subject: re.
+	Tue, 10 Nov 2009 18:48:00 -0500
+Message-ID: <4AF9FB6C.70003@oracle.com>
+Date: Tue, 10 Nov 2009 15:46:52 -0800
+From: Randy Dunlap <randy.dunlap@oracle.com>
+MIME-Version: 1.0
+Subject: [PATCH] x86 VSDO: fix Kconfig help
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
+To: lkml <linux-kernel@vger.kernel.org>, x86@kernel.org
+Cc: linux-kbuild@vger.kernel.org
 
+From: Randy Dunlap <randy.dunlap@oracle.com>
 
-We have gotten approval to transfer US$14.5M abroad. Your share we be 30%, we receive 60% while 10% for taxes and  miscellaneous expenses. Please get back to me as soon as possible if you are interested.
-Thank you,
-Engr. Peter Tebogo.
+COMPAT_VDSO has 2 help text blocks, but kconfig only uses the
+last one found, so merge the 2 blocks.
+
+It would be real nice if kconfig would warn about this.
+
+Signed-off-by: Randy Dunlap <randy.dunlap@oracle.com>
+---
+ arch/x86/Kconfig |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+--- lnx-2632-rc6.orig/arch/x86/Kconfig
++++ lnx-2632-rc6/arch/x86/Kconfig
+@@ -1601,12 +1601,12 @@ config COMPAT_VDSO
+ 	prompt "Compat VDSO support"
+ 	depends on X86_32 || IA32_EMULATION
+ 	---help---
+-	  Map the 32-bit VDSO to the predictable old-style address too.
+-	---help---
+ 	  Say N here if you are running a sufficiently recent glibc
+ 	  version (2.3.3 or later), to remove the high-mapped
+ 	  VDSO mapping and to exclusively use the randomized VDSO.
+ 
++	  Map the 32-bit VDSO to the predictable old-style address too.
++
+ 	  If unsure, say Y.
+ 
+ config CMDLINE_BOOL
