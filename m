@@ -1,55 +1,67 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx3.mail.elte.hu ([157.181.1.138]:60087 "EHLO mx3.mail.elte.hu"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751886AbZKKG1t (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 11 Nov 2009 01:27:49 -0500
-Date: Wed, 11 Nov 2009 07:27:36 +0100
-From: Ingo Molnar <mingo@elte.hu>
-Subject: Re: [PATCH] x86 VSDO: fix Kconfig help
-Message-ID: <20091111062736.GA20546@elte.hu>
-References: <4AF9FB6C.70003@oracle.com>
+Received: from mail.gmx.net ([213.165.64.20]:51480 "HELO mail.gmx.net"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with SMTP
+	id S1753761AbZKKHf0 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 11 Nov 2009 02:35:26 -0500
+Date: Wed, 11 Nov 2009 08:35:32 +0100 (CET)
+From: Guennadi Liakhovetski <g.liakhovetski@gmx.de>
+Subject: Re: [PATCH/RFC] fb: put framebuffer drivers back under the "frame
+ buffer devices" menu
+In-Reply-To: <20091110165114.4972b8b4.akpm@linux-foundation.org>
+Message-ID: <Pine.LNX.4.64.0911110834010.4072@axis700.grange>
+References: <Pine.LNX.4.64.0911082339090.24656@axis700.grange>
+ <20091110165114.4972b8b4.akpm@linux-foundation.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4AF9FB6C.70003@oracle.com>
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Randy Dunlap <randy.dunlap@oracle.com>
-Cc: lkml <linux-kernel@vger.kernel.org>, x86@kernel.org, linux-kbuild@vger.kernel.org
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: linux-fbdev-devel@lists.sourceforge.net, linux-kbuild@vger.kernel.org, Roman Zippel <zippel@linux-m68k.org>
 
+On Tue, 10 Nov 2009, Andrew Morton wrote:
 
-* Randy Dunlap <randy.dunlap@oracle.com> wrote:
-
-> From: Randy Dunlap <randy.dunlap@oracle.com>
+> On Sun, 8 Nov 2009 23:46:24 +0100 (CET)
+> Guennadi Liakhovetski <g.liakhovetski@gmx.de> wrote:
 > 
-> COMPAT_VDSO has 2 help text blocks, but kconfig only uses the
-> last one found, so merge the 2 blocks.
+> > The config FB_PRE_INIT_FB entry in drivers/video/Kconfig pushes all entries
+> > below it out of the menuconfig selection. Fix this.
+> > 
+> > Signed-off-by: Guennadi Liakhovetski <g.liakhovetski@gmx.de>
+> > ---
+> > 
+> > This is _most_ _probably_ not a right fix, but rather an observation, that 
+> > the patch below fixes the problem, whereby all entires below 
+> > FB_PRE_INIT_FB get displaced from the "frame buffer devices" menu. A bug 
+> > in kconfig? The additional dependency on FB in this patch is certainly 
+> > redundant.
+> > 
+> >  drivers/video/Kconfig |    2 +-
+> >  1 files changed, 1 insertions(+), 1 deletions(-)
+> > 
+> > diff --git a/drivers/video/Kconfig b/drivers/video/Kconfig
+> > index 9bbb285..188e1ba 100644
+> > --- a/drivers/video/Kconfig
+> > +++ b/drivers/video/Kconfig
+> > @@ -2121,7 +2121,7 @@ config FB_EP93XX
+> >  
+> >  config FB_PRE_INIT_FB
+> >  	bool "Don't reinitialize, use bootloader's GDC/Display configuration"
+> > -	depends on FB_MB862XX_LIME
+> > +	depends on FB && FB_MB862XX_LIME
+> >  	---help---
+> >  	  Select this option if display contents should be inherited as set by
+> >  	  the bootloader.
 > 
-> It would be real nice if kconfig would warn about this.
-> 
-> Signed-off-by: Randy Dunlap <randy.dunlap@oracle.com>
-> ---
->  arch/x86/Kconfig |    4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> --- lnx-2632-rc6.orig/arch/x86/Kconfig
-> +++ lnx-2632-rc6/arch/x86/Kconfig
-> @@ -1601,12 +1601,12 @@ config COMPAT_VDSO
->  	prompt "Compat VDSO support"
->  	depends on X86_32 || IA32_EMULATION
->  	---help---
-> -	  Map the 32-bit VDSO to the predictable old-style address too.
-> -	---help---
->  	  Say N here if you are running a sufficiently recent glibc
->  	  version (2.3.3 or later), to remove the high-mapped
->  	  VDSO mapping and to exclusively use the randomized VDSO.
->  
-> +	  Map the 32-bit VDSO to the predictable old-style address too.
-> +
->  	  If unsure, say Y.
+> hmm, well, lots of surrounding records also have `depends on FB', and
+> it fixes the bug, so I see no problem with using the patch as-is.
 
-I've applied it with the original ordering of the lines - it makes more 
-sense that way. (first short summary of what the option does, then a 
-longer paragraph.)
+Well, not that much of a problem with applying this patch, but this seems 
+like a bug in kernel kconfig system, and by applying this patch we paper 
+over it without having found, understood and fixed it.
 
-	Ingo
+Thanks
+Guennadi
+---
+Guennadi Liakhovetski, Ph.D.
+Freelance Open-Source Software Developer
+http://www.open-technology.de/
