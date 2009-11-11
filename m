@@ -1,56 +1,63 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp1.linux-foundation.org ([140.211.169.13]:35565 "EHLO
-	smtp1.linux-foundation.org" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1755282AbZKKAvj (ORCPT
+Received: from mail-qy0-f194.google.com ([209.85.221.194]:46432 "EHLO
+	mail-qy0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751138AbZKKFRR convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 10 Nov 2009 19:51:39 -0500
-Date: Tue, 10 Nov 2009 16:51:14 -0800
-From: Andrew Morton <akpm@linux-foundation.org>
-Subject: Re: [PATCH/RFC] fb: put framebuffer drivers back under the
- "frame buffer devices" menu
-Message-Id: <20091110165114.4972b8b4.akpm@linux-foundation.org>
-In-Reply-To: <Pine.LNX.4.64.0911082339090.24656@axis700.grange>
-References: <Pine.LNX.4.64.0911082339090.24656@axis700.grange>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+	Wed, 11 Nov 2009 00:17:17 -0500
+MIME-Version: 1.0
+In-Reply-To: <4AF9FB6C.70003@oracle.com>
+References: <4AF9FB6C.70003@oracle.com>
+Date: Wed, 11 Nov 2009 13:17:22 +0800
+Message-ID: <2375c9f90911102117q33f7ce4raed39f960ddcf1fc@mail.gmail.com>
+Subject: Re: [PATCH] x86 VSDO: fix Kconfig help
+From: =?UTF-8?Q?Am=C3=A9rico_Wang?= <xiyou.wangcong@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Guennadi Liakhovetski <g.liakhovetski@gmx.de>
-Cc: linux-fbdev-devel@lists.sourceforge.net, linux-kbuild@vger.kernel.org, Roman Zippel <zippel@linux-m68k.org>
+To: Randy Dunlap <randy.dunlap@oracle.com>
+Cc: lkml <linux-kernel@vger.kernel.org>, x86@kernel.org, linux-kbuild@vger.kernel.org
 
-On Sun, 8 Nov 2009 23:46:24 +0100 (CET)
-Guennadi Liakhovetski <g.liakhovetski@gmx.de> wrote:
+On Wed, Nov 11, 2009 at 7:46 AM, Randy Dunlap <randy.dunlap@oracle.com> wrote:
+> From: Randy Dunlap <randy.dunlap@oracle.com>
+>
+> COMPAT_VDSO has 2 help text blocks, but kconfig only uses the
+> last one found, so merge the 2 blocks.
+>
+> It would be real nice if kconfig would warn about this.
+>
+> Signed-off-by: Randy Dunlap <randy.dunlap@oracle.com>
 
-> The config FB_PRE_INIT_FB entry in drivers/video/Kconfig pushes all entries
-> below it out of the menuconfig selection. Fix this.
-> 
-> Signed-off-by: Guennadi Liakhovetski <g.liakhovetski@gmx.de>
+Looks good.
+
+Reviewed-by: WANG Cong <xiyou.wangcong@gmail.com>
+
+Thanks!
+
 > ---
-> 
-> This is _most_ _probably_ not a right fix, but rather an observation, that 
-> the patch below fixes the problem, whereby all entires below 
-> FB_PRE_INIT_FB get displaced from the "frame buffer devices" menu. A bug 
-> in kconfig? The additional dependency on FB in this patch is certainly 
-> redundant.
-> 
->  drivers/video/Kconfig |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
-> 
-> diff --git a/drivers/video/Kconfig b/drivers/video/Kconfig
-> index 9bbb285..188e1ba 100644
-> --- a/drivers/video/Kconfig
-> +++ b/drivers/video/Kconfig
-> @@ -2121,7 +2121,7 @@ config FB_EP93XX
->  
->  config FB_PRE_INIT_FB
->  	bool "Don't reinitialize, use bootloader's GDC/Display configuration"
-> -	depends on FB_MB862XX_LIME
-> +	depends on FB && FB_MB862XX_LIME
->  	---help---
->  	  Select this option if display contents should be inherited as set by
->  	  the bootloader.
-
-hmm, well, lots of surrounding records also have `depends on FB', and
-it fixes the bug, so I see no problem with using the patch as-is.
-
+>  arch/x86/Kconfig |    4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> --- lnx-2632-rc6.orig/arch/x86/Kconfig
+> +++ lnx-2632-rc6/arch/x86/Kconfig
+> @@ -1601,12 +1601,12 @@ config COMPAT_VDSO
+>        prompt "Compat VDSO support"
+>        depends on X86_32 || IA32_EMULATION
+>        ---help---
+> -         Map the 32-bit VDSO to the predictable old-style address too.
+> -       ---help---
+>          Say N here if you are running a sufficiently recent glibc
+>          version (2.3.3 or later), to remove the high-mapped
+>          VDSO mapping and to exclusively use the randomized VDSO.
+>
+> +         Map the 32-bit VDSO to the predictable old-style address too.
+> +
+>          If unsure, say Y.
+>
+>  config CMDLINE_BOOL
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-kernel" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> Please read the FAQ at  http://www.tux.org/lkml/
+>
