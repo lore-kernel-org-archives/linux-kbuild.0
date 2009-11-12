@@ -1,42 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.gmx.net ([213.165.64.20]:41315 "HELO mail.gmx.net"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with SMTP
-	id S1753022AbZKLPQp (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 12 Nov 2009 10:16:45 -0500
-Subject: Re: [PATCH v2] add userspace API headfile for net hardware
- time-stamp to kbuild
-From: Patrick Ohly <patrick.ohly@gmx.de>
-In-Reply-To: <1258019996-8880-1-git-send-email-21cnbao@gmail.com>
-References: <1258019996-8880-1-git-send-email-21cnbao@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Date: Thu, 12 Nov 2009 16:16:46 +0100
-Message-ID: <1258039006.10137.639.camel@pohly-mobl1.ikn.intel.com>
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Received: from artax.karlin.mff.cuni.cz ([195.113.26.195]:53637 "EHLO
+	artax.karlin.mff.cuni.cz" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755385AbZKLXes (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 12 Nov 2009 18:34:48 -0500
+Date: Thu, 12 Nov 2009 13:16:48 +0100
+From: Pavel Machek <pavel@ucw.cz>
+Subject: Re: [PATCH 1/4] Support loading and saving custom remarks for
+	config symbols
+Message-ID: <20091112121648.GE1394@ucw.cz>
+References: <cover.1256767265.git.aragorn@Anduril.ringwar.org> <b106dec1237ab723ae6a2404d42601bf20704bf3.1256767265.git.aragorn@Anduril.ringwar.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b106dec1237ab723ae6a2404d42601bf20704bf3.1256767265.git.aragorn@Anduril.ringwar.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Barry Song <21cnbao@gmail.com>
-Cc: sam@ravnborg.org, linux-kbuild@vger.kernel.org, uclinux-dist-devel@blackfin.uclinux.org, Jie Zhang <jie.zhang@analog.com>, Barry Song <barry.song@analog.com>
+To: Bernhard Kaindl <bernhard.kaindl@gmx.net>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-On Thu, 2009-11-12 at 17:59 +0800, Barry Song wrote:
-> From: Jie Zhang <jie.zhang@analog.com>
+Hi!
+
+> This code supports one-line remarks without newlines. The changes to
+> the tools (menuconfig, xconfig, config) also only support one-line
+> remarks as they use the existing UI functions for editing strings.
 > 
-> include/linux/net_tstamp.h is userspace API for hardware time stamping
-> of network packets. It should be exported to userspace.
-> 
-> Signed-off-by: Jie Zhang <jie.zhang@analog.com>
-> Signed-off-by: Barry Song <barry.song@analog.com>
-> cc: Patrick Ohly <patrick.ohly@gmx.de>
+> diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
+> index 797a741..eee2b60 100644
+> --- a/scripts/kconfig/confdata.c
+> +++ b/scripts/kconfig/confdata.c
+> @@ -152,6 +152,30 @@ static int conf_set_sym_val(struct symbol *sym, int def, int def_flags, char *p)
+>  	return 0;
+>  }
+>  
+> +/**
+> + * Read remarks from -remarks file:
+> + */
 
-Looks right to me. Not exporting it was oversight. Thanks for pointing
-this out.
+/** means kerneldoc but this is not valid kerneldoc.
 
-Signed-off-by: Patrick Ohly <patrick.ohly@gmx.de>
 
+								Pavel
 -- 
-Bye, Patrick Ohly
---  
-Patrick.Ohly@gmx.de
-http://www.estamos.de/
-
-
+(english) http://www.livejournal.com/~pavelmachek
+(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blog.html
