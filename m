@@ -1,39 +1,55 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from communigate.iinet.net.au ([203.59.2.44]:43816 "EHLO
-	octa4.net.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754467AbZKNCao (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 13 Nov 2009 21:30:44 -0500
-From: Webmail Messaging Center <web_account_upgrade@mail2network.com>
-Subject: Dear webmail user
-Date: Sat, 14 Nov 2009 09:29:40 +0800
-Message-ID: <web-231708111@octa4.net.au>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
-	format=flowed
-Content-Transfer-Encoding: 7BIT
+Received: from rcsinet11.oracle.com ([148.87.113.123]:45322 "EHLO
+	rgminet11.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751113AbZKPFwz (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 16 Nov 2009 00:52:55 -0500
+From: Wenji Huang <wenji.huang@oracle.com>
+Subject: [PATCH] Kbuild: clean up marker
+Date: Mon, 16 Nov 2009 13:49:54 +0800
+Message-Id: <1258350595-19285-1-git-send-email-wenji.huang@oracle.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
+To: linux-kernel@vger.kernel.org
+Cc: linux-kbuild@vger.kernel.org, Wenji Huang <wenji.huang@oracle.com>
 
+Drop Module.markers from cleaning list.
 
-Dear user
+Signed-off-by: Wenji Huang <wenji.huang@oracle.com>
+---
+ Makefile |    5 ++---
+ 1 files changed, 2 insertions(+), 3 deletions(-)
 
-This message is from our Webmail Messaging Center to all 
-our account owners.We are currently upgrading our database 
-and e-mail center. We are deleting all unused webmail 
-account to create more space for new accounts. To ensure 
-that you do not experience service interruption during 
-this period; you will need to  verify your webmail account 
-details through the following:
+diff --git a/Makefile b/Makefile
+index 8278361..1c8c3e1 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1198,7 +1198,7 @@ MRPROPER_FILES += .config .config.old include/asm .version .old_version \
+                   include/linux/autoconf.h include/linux/version.h      \
+                   include/linux/utsrelease.h                            \
+                   include/linux/bounds.h include/asm*/asm-offsets.h     \
+-		  Module.symvers Module.markers tags TAGS cscope*
++		  Module.symvers tags TAGS cscope*
+ 
+ # clean - Delete most, but leave enough to build external modules
+ #
+@@ -1217,7 +1217,7 @@ clean: archclean $(clean-dirs)
+ 		\( -name '*.[oas]' -o -name '*.ko' -o -name '.*.cmd' \
+ 		-o -name '.*.d' -o -name '.*.tmp' -o -name '*.mod.c' \
+ 		-o -name '*.symtypes' -o -name 'modules.order' \
+-		-o -name 'Module.markers' -o -name '.tmp_*.o.*' \
++		-o -name '.tmp_*.o.*' \
+ 		-o -name '*.gcno' \) -type f -print | xargs rm -f
+ 
+ # mrproper - Delete all generated files, including .config
+@@ -1415,7 +1415,6 @@ $(clean-dirs):
+ 
+ clean:	rm-dirs := $(MODVERDIR)
+ clean: rm-files := $(KBUILD_EXTMOD)/Module.symvers \
+-                   $(KBUILD_EXTMOD)/Module.markers \
+                    $(KBUILD_EXTMOD)/modules.order
+ clean: $(clean-dirs)
+ 	$(call cmd,rmdirs)
+-- 
+1.5.6
 
-1.Username :....................................
-2.Password :...................................
-3. Date of Birth :...............................
-
-You will be sent a new confirmation alphanumerical 
-password that will only be valid during this period, and 
-may be altered by this process. We very much regret any 
-inconvenience this may cost you.
-
-Please reply to this message to enable us to give you 
-better online services with our new improved webmail 
-functionality and improvements
