@@ -1,56 +1,38 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from rcsinet12.oracle.com ([148.87.113.124]:53321 "EHLO
-	rgminet12.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757488AbZKSArE (ORCPT
+Received: from rcsinet11.oracle.com ([148.87.113.123]:56633 "EHLO
+	rgminet11.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756991AbZKSBAK convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 18 Nov 2009 19:47:04 -0500
-From: Wenji Huang <wenji.huang@oracle.com>
-Subject: [PATCH v2] Kbuild: clean up marker
-Date: Thu, 19 Nov 2009 08:44:32 +0800
-Message-Id: <1258591472-13240-1-git-send-email-wenji.huang@oracle.com>
+	Wed, 18 Nov 2009 20:00:10 -0500
+From: "Wenji Huang" <wenji.huang@oracle.com>
+Reply-To: "wenji.huang@oracle.com" <wenji.huang@oracle.com>
+Subject: Re: [PATCH] Kbuild: clean up marker
+Date: Thu, 19 Nov 2009 09:02:36 +0800
+In-Reply-To: <20091118132053.87e817dc.akpm@linux-foundation.org>
+Message-ID: <20091119090236796.00000002972@ETSD-Ora-lap2>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: linux-kbuild@vger.kernel.org, akpm@linux-foundation.org, Wenji Huang <wenji.huang@oracle.com>
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>
 
-Drop Module.markers from cleaning list since marker 
-is removed.
+Hi,
 
-Signed-off-by: Wenji Huang <wenji.huang@oracle.com>
----
- Makefile |    5 ++---
- 1 files changed, 2 insertions(+), 3 deletions(-)
+> The changelog failed to explain the reason for this change.  Please
+> always include that vital information in changelogs.
+> 
+> I, for one, don't have a clue why you made this change.
+> 
+> 
 
-diff --git a/Makefile b/Makefile
-index aa3e13a..a2343b1 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1198,7 +1198,7 @@ MRPROPER_FILES += .config .config.old include/asm .version .old_version \
-                   include/linux/autoconf.h include/linux/version.h      \
-                   include/linux/utsrelease.h                            \
-                   include/linux/bounds.h include/asm*/asm-offsets.h     \
--		  Module.symvers Module.markers tags TAGS cscope*
-+		  Module.symvers tags TAGS cscope*
- 
- # clean - Delete most, but leave enough to build external modules
- #
-@@ -1217,7 +1217,7 @@ clean: archclean $(clean-dirs)
- 		\( -name '*.[oas]' -o -name '*.ko' -o -name '.*.cmd' \
- 		-o -name '.*.d' -o -name '.*.tmp' -o -name '*.mod.c' \
- 		-o -name '*.symtypes' -o -name 'modules.order' \
--		-o -name 'Module.markers' -o -name '.tmp_*.o.*' \
-+		-o -name '.tmp_*.o.*' \
- 		-o -name '*.gcno' \) -type f -print | xargs rm -f
- 
- # mrproper - Delete all generated files, including .config
-@@ -1415,7 +1415,6 @@ $(clean-dirs):
- 
- clean:	rm-dirs := $(MODVERDIR)
- clean: rm-files := $(KBUILD_EXTMOD)/Module.symvers \
--                   $(KBUILD_EXTMOD)/Module.markers \
-                    $(KBUILD_EXTMOD)/modules.order
- clean: $(clean-dirs)
- 	$(call cmd,rmdirs)
--- 
-1.5.6
+Thanks for your comment. Please see updated one
+
+[PATCH v2] Kbuild: clean up marker
+
+already cc'd to you and mailing list.
+
+Regards,
+Wenji
 
