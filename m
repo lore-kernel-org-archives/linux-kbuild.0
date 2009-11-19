@@ -1,52 +1,56 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from xes-mad.com ([216.165.139.218]:58684 "EHLO xes-mad.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751711AbZKRVvV (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 18 Nov 2009 16:51:21 -0500
-Subject: Re: [PATCH 0/3] powerpc: Add support for FIT uImages
-From: Peter Tyser <ptyser@xes-inc.com>
-In-Reply-To: <1258577834-26006-1-git-send-email-ptyser@xes-inc.com>
-References: <1258577834-26006-1-git-send-email-ptyser@xes-inc.com>
-Content-Type: text/plain; charset="UTF-8"
-Date: Wed, 18 Nov 2009 15:51:21 -0600
-Message-ID: <1258581081.8365.5996.camel@localhost.localdomain>
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Received: from rcsinet12.oracle.com ([148.87.113.124]:53321 "EHLO
+	rgminet12.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757488AbZKSArE (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 18 Nov 2009 19:47:04 -0500
+From: Wenji Huang <wenji.huang@oracle.com>
+Subject: [PATCH v2] Kbuild: clean up marker
+Date: Thu, 19 Nov 2009 08:44:32 +0800
+Message-Id: <1258591472-13240-1-git-send-email-wenji.huang@oracle.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linuxppc-dev@ozlabs.org
-Cc: linux-kbuild@vger.kernel.org
+To: linux-kernel@vger.kernel.org
+Cc: linux-kbuild@vger.kernel.org, akpm@linux-foundation.org, Wenji Huang <wenji.huang@oracle.com>
 
-On Wed, 2009-11-18 at 14:57 -0600, Peter Tyser wrote:
-> These patches add support for creating the "new" FIT uImage type
-> that U-Boot can use.  Additional info about FIT images can be
-> found in the doc/uImage.FIT/ directory of the U-Boot source.
-> Here's a link to a howto which gives an overview of the format:
-> http://git.denx.de/cgi-bin/gitweb.cgi?p=u-boot.git;a=blob;f=doc/uImage.FIT/howto.txt;h=8065e9e1d8d4d65a9b5fe0fce08d3709183d0ee4;hb=HEAD
-> 
-> I've only added support for PowerPC, but the arm, avr32, blackfin,
-> and sh arches could use the same framework in theory.  The change
-> is especially useful on PowerPC since it creates 1 FIT uImage that
-> combines the functionality of an "old" uImage format, a device
-> tree blob, and possibly a ramdisk.
-> 
-> Peter Tyser (3):
->   powerpc: Use scripts/mkuboot.sh instead of 'mkimage'
->   powerpc: Add support for creating FIT uImages
->   powerpc: Add support for ram filesystems in FIT uImages
-> 
->  arch/powerpc/Makefile        |    4 +-
->  arch/powerpc/boot/.gitignore |    1 +
->  arch/powerpc/boot/Makefile   |    8 ++-
->  arch/powerpc/boot/wrapper    |   39 ++++++++++--
->  scripts/mkits.sh             |  144 ++++++++++++++++++++++++++++++++++++++++++
->  5 files changed, 189 insertions(+), 7 deletions(-)
->  create mode 100755 scripts/mkits.sh
+Drop Module.markers from cleaning list since marker 
+is removed.
 
-Just realized I missed /Documentation/powerpc/bootwrapper.txt in this
-series.  I'll wait for feedback and roll the documentation update and
-any other requested changes into v2.
+Signed-off-by: Wenji Huang <wenji.huang@oracle.com>
+---
+ Makefile |    5 ++---
+ 1 files changed, 2 insertions(+), 3 deletions(-)
 
-Sorry for the noise,
-Peter
+diff --git a/Makefile b/Makefile
+index aa3e13a..a2343b1 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1198,7 +1198,7 @@ MRPROPER_FILES += .config .config.old include/asm .version .old_version \
+                   include/linux/autoconf.h include/linux/version.h      \
+                   include/linux/utsrelease.h                            \
+                   include/linux/bounds.h include/asm*/asm-offsets.h     \
+-		  Module.symvers Module.markers tags TAGS cscope*
++		  Module.symvers tags TAGS cscope*
+ 
+ # clean - Delete most, but leave enough to build external modules
+ #
+@@ -1217,7 +1217,7 @@ clean: archclean $(clean-dirs)
+ 		\( -name '*.[oas]' -o -name '*.ko' -o -name '.*.cmd' \
+ 		-o -name '.*.d' -o -name '.*.tmp' -o -name '*.mod.c' \
+ 		-o -name '*.symtypes' -o -name 'modules.order' \
+-		-o -name 'Module.markers' -o -name '.tmp_*.o.*' \
++		-o -name '.tmp_*.o.*' \
+ 		-o -name '*.gcno' \) -type f -print | xargs rm -f
+ 
+ # mrproper - Delete all generated files, including .config
+@@ -1415,7 +1415,6 @@ $(clean-dirs):
+ 
+ clean:	rm-dirs := $(MODVERDIR)
+ clean: rm-files := $(KBUILD_EXTMOD)/Module.symvers \
+-                   $(KBUILD_EXTMOD)/Module.markers \
+                    $(KBUILD_EXTMOD)/modules.order
+ clean: $(clean-dirs)
+ 	$(call cmd,rmdirs)
+-- 
+1.5.6
 
