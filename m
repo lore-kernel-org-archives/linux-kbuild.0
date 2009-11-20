@@ -1,345 +1,306 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:37356 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752837AbZKSHfb (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 19 Nov 2009 02:35:31 -0500
-Date: Thu, 19 Nov 2009 08:35:32 +0100
-From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [PATCH] kconfig: Add missing prototype
-Message-ID: <20091119073532.GA19293@sepie.suse.cz>
-References: <b9df5fa10911180212h5d74e640g859e7cebe952689@mail.gmail.com>
- <4B03CA6E.8080102@suse.cz>
- <b9df5fa10911180252l577deb1bm6d8aab76b912aad5@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b9df5fa10911180252l577deb1bm6d8aab76b912aad5@mail.gmail.com>
+Received: from hrndva-omtalb.mail.rr.com ([71.74.56.122]:40561 "EHLO
+	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753487AbZKTFca (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 20 Nov 2009 00:32:30 -0500
+Subject: Re: [PATCH][GIT PULL][v2.6.32] tracing/x86: Add check to detect
+ GCC messing with mcount prologue
+From: Steven Rostedt <rostedt@goodmis.org>
+Reply-To: rostedt@goodmis.org
+In-Reply-To: <1258694593.22249.1012.camel@gandalf.stny.rr.com>
+References: <alpine.LFD.2.00.0911181933540.24119@localhost.localdomain>
+	 <tip-887a29f59b93cf54e21814869a4ab6e80b6fa623@git.kernel.org>
+	 <20091119072040.GA23579@elte.hu>
+	 <alpine.LFD.2.00.0911191053390.24119@localhost.localdomain>
+	 <alpine.LFD.2.00.0911191423190.24119@localhost.localdomain>
+	 <1258694593.22249.1012.camel@gandalf.stny.rr.com>
+Content-Type: text/plain
+Date: Fri, 20 Nov 2009 00:32:34 -0500
+Message-Id: <1258695154.22249.1014.camel@gandalf.stny.rr.com>
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Rakib Mullick <rakib.mullick@gmail.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>, linux-kbuild@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>
+To: Thomas Gleixner <tglx@linutronix.de>
+Cc: Ingo Molnar <mingo@elte.hu>, "H. Peter Anvin" <hpa@zytor.com>, LKML <linux-kernel@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>, Heiko Carstens <heiko.carstens@de.ibm.com>, feng.tang@intel.com, Peter Zijlstra <peterz@infradead.org>, Frederic Weisbecker <fweisbec@gmail.com>, David Daney <ddaney@caviumnetworks.com>, Andrew Haley <aph@redhat.com>, Richard Guenther <richard.guenther@gmail.com>, jakub@redhat.com, gcc <gcc@gcc.gnu.org>, Linus Torvalds <torvalds@linux-foundation.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>
 
-On Wed, Nov 18, 2009 at 04:52:48PM +0600, Rakib Mullick wrote:
-> On 11/18/09, Michal Marek <mmarek@suse.cz> wrote:
-> >
-> > Hi Rakib,
-> >
-> >  thanks for the fix, but I already posted a new, simplified version that
-> >  doesn't use the fprintf2() thing at all:
-> >  http://patchwork.kernel.org/patch/50131/
-> >
-> Hi Michal,
+This touches the Makefile scripts. I forgot to CC kbuild and Sam.
+
+-- Steve
+
+On Fri, 2009-11-20 at 00:23 -0500, Steven Rostedt wrote:
+> Ingo,
 > 
-> Sorry I couldn't pick that up. Maybe it's not in the current -mm tree.
-> Isn't it? Does your simplified version removes the use of fprintf2()?
-
-Hm, yes, -mm has the old version. Andrew, could you please replace
-
-  kbuild-generate-modulesbuiltin.patch
-
-and
-
-  kbuild-rebuild-fix-for-makefilemodbuiltin.patch
-
-with the patch below?
-
-Thanks!
-Michal
-
-From: Michal Marek <mmarek@suse.cz>
-Subject: [PATCH] kbuild: generate modules.builtin
-
-To make it easier for module-init-tools and scripts like mkinitrd to
-distinguish builtin and missing modules, install a modules.builtin file
-listing all builtin modules. This is done by generating an additional
-config file (tristate.conf) with tristate options set to uppercase 'Y'
-or 'M'. If we source that config file, the builtin modules appear in
-obj-Y.
-
-Signed-off-by: Michal Marek <mmarek@suse.cz>
----
- .gitignore                       |    1 +
- Documentation/kbuild/kbuild.txt  |   14 +++++++++
- Documentation/kbuild/kconfig.txt |    5 +++
- Makefile                         |   17 ++++++++---
- scripts/Kbuild.include           |    6 ++++
- scripts/Makefile.modbuiltin      |   55 ++++++++++++++++++++++++++++++++++++++
- scripts/kconfig/confdata.c       |   21 ++++++++++++++-
- 7 files changed, 113 insertions(+), 6 deletions(-)
- create mode 100644 scripts/Makefile.modbuiltin
-
-diff --git a/.gitignore b/.gitignore
-index b93fb7e..5835867 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -22,6 +22,7 @@
- *.lst
- *.symtypes
- *.order
-+modules.builtin
- *.elf
- *.bin
- *.gz
-diff --git a/Documentation/kbuild/kbuild.txt b/Documentation/kbuild/kbuild.txt
-index bb3bf38..6f8c1ca 100644
---- a/Documentation/kbuild/kbuild.txt
-+++ b/Documentation/kbuild/kbuild.txt
-@@ -1,3 +1,17 @@
-+Output files
-+
-+modules.order
-+--------------------------------------------------
-+This file records the order in which modules appear in Makefiles. This
-+is used by modprobe to deterministically resolve aliases that match
-+multiple modules.
-+
-+modules.builtin
-+--------------------------------------------------
-+This file lists all modules that are built into the kernel. This is used
-+by modprobe to not fail when trying to load something builtin.
-+
-+
- Environment variables
- 
- KCPPFLAGS
-diff --git a/Documentation/kbuild/kconfig.txt b/Documentation/kbuild/kconfig.txt
-index 849b5e5..40f0797 100644
---- a/Documentation/kbuild/kconfig.txt
-+++ b/Documentation/kbuild/kconfig.txt
-@@ -103,6 +103,11 @@ KCONFIG_AUTOCONFIG
- This environment variable can be set to specify the path & name of the
- "auto.conf" file.  Its default value is "include/config/auto.conf".
- 
-+KCONFIG_TRISTATE
-+--------------------------------------------------
-+This environment variable can be set to specify the path & name of the
-+"tristate.conf" file.  Its default value is "include/config/tristate.conf".
-+
- KCONFIG_AUTOHEADER
- --------------------------------------------------
- This environment variable can be set to specify the path & name of the
-diff --git a/Makefile b/Makefile
-index aa3e13a..5707b32 100644
---- a/Makefile
-+++ b/Makefile
-@@ -464,7 +464,7 @@ ifeq ($(KBUILD_EXTMOD),)
- # Carefully list dependencies so we do not try to build scripts twice
- # in parallel
- PHONY += scripts
--scripts: scripts_basic include/config/auto.conf
-+scripts: scripts_basic include/config/auto.conf include/config/tristate.conf
- 	$(Q)$(MAKE) $(build)=$(@)
- 
- # Objects we will link into vmlinux / subdirs we need to visit
-@@ -491,7 +491,7 @@ $(KCONFIG_CONFIG) include/config/auto.conf.cmd: ;
- # with it and forgot to run make oldconfig.
- # if auto.conf.cmd is missing then we are probably in a cleaned tree so
- # we execute the config step to be sure to catch updated Kconfig files
--include/config/auto.conf: $(KCONFIG_CONFIG) include/config/auto.conf.cmd
-+include/config/%.conf: $(KCONFIG_CONFIG) include/config/auto.conf.cmd
- 	$(Q)$(MAKE) -f $(srctree)/Makefile silentoldconfig
- else
- # external modules needs include/linux/autoconf.h and include/config/auto.conf
-@@ -876,6 +876,9 @@ $(sort $(vmlinux-init) $(vmlinux-main)) $(vmlinux-lds): $(vmlinux-dirs) ;
- PHONY += $(vmlinux-dirs)
- $(vmlinux-dirs): prepare scripts
- 	$(Q)$(MAKE) $(build)=$@
-+ifdef CONFIG_MODULES
-+	$(Q)$(MAKE) $(modbuiltin)=$@
-+endif
- 
- # Build the kernel release string
- #
-@@ -1126,6 +1129,7 @@ all: modules
- PHONY += modules
- modules: $(vmlinux-dirs) $(if $(KBUILD_BUILTIN),vmlinux)
- 	$(Q)$(AWK) '!x[$$0]++' $(vmlinux-dirs:%=$(objtree)/%/modules.order) > $(objtree)/modules.order
-+	$(Q)$(AWK) '!x[$$0]++' $(vmlinux-dirs:%=$(objtree)/%/modules.builtin) > $(objtree)/modules.builtin
- 	@$(kecho) '  Building modules, stage 2.';
- 	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.modpost
- 	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.fwinst obj=firmware __fw_modbuild
-@@ -1155,6 +1159,7 @@ _modinst_:
- 		ln -s $(objtree) $(MODLIB)/build ; \
- 	fi
- 	@cp -f $(objtree)/modules.order $(MODLIB)/
-+	@cp -f $(objtree)/modules.builtin $(MODLIB)/
- 	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.modinst
- 
- # This depmod is only for convenience to give the initial
-@@ -1217,8 +1222,9 @@ clean: archclean $(clean-dirs)
- 		\( -name '*.[oas]' -o -name '*.ko' -o -name '.*.cmd' \
- 		-o -name '.*.d' -o -name '.*.tmp' -o -name '*.mod.c' \
- 		-o -name '*.symtypes' -o -name 'modules.order' \
--		-o -name 'Module.markers' -o -name '.tmp_*.o.*' \
--		-o -name '*.gcno' \) -type f -print | xargs rm -f
-+		-o -name 'modules.builtin' -o -name 'Module.markers' \
-+		-o -name '.tmp_*.o.*' -o -name '*.gcno' \) \
-+		-type f -print | xargs rm -f
- 
- # mrproper - Delete all generated files, including .config
- #
-@@ -1416,7 +1422,8 @@ $(clean-dirs):
- clean:	rm-dirs := $(MODVERDIR)
- clean: rm-files := $(KBUILD_EXTMOD)/Module.symvers \
-                    $(KBUILD_EXTMOD)/Module.markers \
--                   $(KBUILD_EXTMOD)/modules.order
-+                   $(KBUILD_EXTMOD)/modules.order \
-+                   $(KBUILD_EXTMOD)/modules.builtin
- clean: $(clean-dirs)
- 	$(call cmd,rmdirs)
- 	$(call cmd,rmfiles)
-diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
-index c67e73e..ed2773e 100644
---- a/scripts/Kbuild.include
-+++ b/scripts/Kbuild.include
-@@ -149,6 +149,12 @@ ld-option = $(call try-run,\
- # $(Q)$(MAKE) $(build)=dir
- build := -f $(if $(KBUILD_SRC),$(srctree)/)scripts/Makefile.build obj
- 
-+###
-+# Shorthand for $(Q)$(MAKE) -f scripts/Makefile.modbuiltin obj=
-+# Usage:
-+# $(Q)$(MAKE) $(modbuiltin)=dir
-+modbuiltin := -f $(if $(KBUILD_SRC),$(srctree)/)scripts/Makefile.modbuiltin obj
-+
- # Prefix -I with $(srctree) if it is not an absolute path.
- # skip if -I has no parameter
- addtree = $(if $(patsubst -I%,%,$(1)), \
-diff --git a/scripts/Makefile.modbuiltin b/scripts/Makefile.modbuiltin
-new file mode 100644
-index 0000000..102a276
---- /dev/null
-+++ b/scripts/Makefile.modbuiltin
-@@ -0,0 +1,55 @@
-+# ==========================================================================
-+# Generating modules.builtin
-+# ==========================================================================
-+
-+src := $(obj)
-+
-+PHONY := __modbuiltin
-+__modbuiltin:
-+
-+-include include/config/auto.conf
-+# tristate.conf sets tristate variables to uppercase 'Y' or 'M'
-+# That way, we get the list of built-in modules in obj-Y
-+-include include/config/tristate.conf
-+
-+include scripts/Kbuild.include
-+
-+# The filename Kbuild has precedence over Makefile
-+kbuild-dir := $(if $(filter /%,$(src)),$(src),$(srctree)/$(src))
-+kbuild-file := $(if $(wildcard $(kbuild-dir)/Kbuild),$(kbuild-dir)/Kbuild,$(kbuild-dir)/Makefile)
-+include $(kbuild-file)
-+
-+include scripts/Makefile.lib
-+__subdir-Y     := $(patsubst %/,%,$(filter %/, $(obj-Y)))
-+subdir-Y       += $(__subdir-Y)
-+subdir-ym      := $(sort $(subdir-y) $(subdir-Y) $(subdir-m))
-+subdir-ym      := $(addprefix $(obj)/,$(subdir-ym))
-+obj-Y          := $(addprefix $(obj)/,$(obj-Y))
-+
-+modbuiltin-subdirs := $(patsubst %,%/modules.builtin, $(subdir-ym))
-+modbuiltin-mods    := $(filter %.ko, $(obj-Y:.o=.ko))
-+modbuiltin-target  := $(obj)/modules.builtin
-+
-+__modbuiltin: $(modbuiltin-target) $(subdir-ym)
-+	@:
-+
-+$(modbuiltin-target): $(subdir-ym) FORCE
-+	$(Q)(for m in $(modbuiltin-mods); do echo kernel/$$m; done;	\
-+	cat /dev/null $(modbuiltin-subdirs)) > $@
-+
-+PHONY += FORCE
-+
-+FORCE:
-+
-+# Descending
-+# ---------------------------------------------------------------------------
-+
-+PHONY += $(subdir-ym)
-+$(subdir-ym):
-+	$(Q)$(MAKE) $(modbuiltin)=$@
-+
-+
-+# Declare the contents of the .PHONY variable as phony.  We keep that
-+# information in a variable se we can use it in if_changed and friends.
-+
-+.PHONY: $(PHONY)
-diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
-index b55e72f..94721f2 100644
---- a/scripts/kconfig/confdata.c
-+++ b/scripts/kconfig/confdata.c
-@@ -677,7 +677,7 @@ int conf_write_autoconf(void)
- 	struct symbol *sym;
- 	const char *str;
- 	const char *name;
--	FILE *out, *out_h;
-+	FILE *out, *tristate, *out_h;
- 	time_t now;
- 	int i, l;
- 
-@@ -692,9 +692,16 @@ int conf_write_autoconf(void)
- 	if (!out)
- 		return 1;
- 
-+	tristate = fopen(".tmpconfig_tristate", "w");
-+	if (!tristate) {
-+		fclose(out);
-+		return 1;
-+	}
-+
- 	out_h = fopen(".tmpconfig.h", "w");
- 	if (!out_h) {
- 		fclose(out);
-+		fclose(tristate);
- 		return 1;
- 	}
- 
-@@ -707,6 +714,9 @@ int conf_write_autoconf(void)
- 		     "# %s"
- 		     "#\n",
- 		     sym_get_string_value(sym), ctime(&now));
-+	fprintf(tristate, "#\n"
-+	                  "# Automatically generated - do not edit\n"
-+	                  "\n");
- 	fprintf(out_h, "/*\n"
- 		       " * Automatically generated C config: don't edit\n"
- 		       " * Linux kernel version: %s\n"
-@@ -727,10 +737,13 @@ int conf_write_autoconf(void)
- 				break;
- 			case mod:
- 				fprintf(out, "CONFIG_%s=m\n", sym->name);
-+				fprintf(tristate, "CONFIG_%s=M\n", sym->name);
- 				fprintf(out_h, "#define CONFIG_%s_MODULE 1\n", sym->name);
- 				break;
- 			case yes:
- 				fprintf(out, "CONFIG_%s=y\n", sym->name);
-+				fprintf(tristate, "CONFIG_%s=%c\n", sym->name,
-+					sym->type == S_BOOLEAN ? 'y' : 'Y');
- 				fprintf(out_h, "#define CONFIG_%s 1\n", sym->name);
- 				break;
- 			}
-@@ -772,6 +785,7 @@ int conf_write_autoconf(void)
- 		}
- 	}
- 	fclose(out);
-+	fclose(tristate);
- 	fclose(out_h);
- 
- 	name = getenv("KCONFIG_AUTOHEADER");
-@@ -779,6 +793,11 @@ int conf_write_autoconf(void)
- 		name = "include/linux/autoconf.h";
- 	if (rename(".tmpconfig.h", name))
- 		return 1;
-+	name = getenv("KCONFIG_TRISTATE");
-+	if (!name)
-+		name = "include/config/tristate.conf";
-+	if (rename(".tmpconfig_tristate", name))
-+		return 1;
- 	name = conf_get_autoconfig_name();
- 	/*
- 	 * This must be the last step, kbuild has a dependency on auto.conf
--- 
-1.6.4.2
+> Not sure if this is too much for this late in the -rc game, but it finds
+> the gcc bug at build time, and we don't need to disable function graph
+> tracer for all i386 builds.
+> 
+> This is built on my last urgent repo pull request.
+> 
+> Please pull the latest tip/tracing/urgent-2 tree, which can be found at:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/rostedt/linux-2.6-trace.git
+> tip/tracing/urgent-2
+> 
+> 
+> Steven Rostedt (1):
+>       tracing/x86: Add check to detect GCC messing with mcount prologue
+> 
+> ----
+>  kernel/trace/Kconfig    |    1 -
+>  scripts/Makefile.build  |   25 +++++++++++++++-
+>  scripts/recordmcount.pl |   74 +++++++++++++++++++++++++++++++++++++++++++++--
+>  3 files changed, 95 insertions(+), 5 deletions(-)
+> ---------------------------
+> commit c7715fb611c69ac4b7f722a891de08b206fb7686
+> Author: Steven Rostedt <srostedt@redhat.com>
+> Date:   Thu Nov 19 23:41:02 2009 -0500
+> 
+>     tracing/x86: Add check to detect GCC messing with mcount prologue
+>     
+>     Latest versions of GCC create a funny prologue for some functions.
+>     Instead of the typical:
+>     
+>     		push   %ebp
+>     		mov    %esp,%ebp
+>     		and    $0xffffffe0,%esp
+>     		[...]
+>     		call   mcount
+>     
+>     GCC may try to align the stack before setting up the frame pointer
+>     register:
+>     
+>     		push   %edi
+>     		lea    0x8(%esp),%edi
+>     		and    $0xffffffe0,%esp
+>     		pushl  -0x4(%edi)
+>     		push   %ebp
+>     		mov    %esp,%ebp
+>     		[...]
+>     		call   mcount
+>     
+>     This crazy code places a copy of the return address into the
+>     frame pointer. The function graph tracer uses this pointer to
+>     save and replace the return address of the calling function to jump
+>     to the function graph tracer's return handler, which will put back
+>     the return address. But instead instead of the typical return:
+>     
+>     		mov    %ebp,%esp
+>     		pop    %ebp
+>     		ret
+>     
+>     The return of the function performs:
+>     
+>     		lea    -0x8(%edi),%esp
+>     		pop    %edi
+>     		ret
+>     
+>     The function graph tracer return handler will not be called at the exit
+>     of the function, but the parent function will call it. Because we missed
+>     the return of the child function, the handler will replace the parent's
+>     return address with that of the child. Obviously this will cause a crash
+>     (Note, there is code to detect this case and safely panic the kernel).
+>     
+>     The kicker is that this happens to just a handful of functions.
+>     And only with certain gcc options.
+>     
+>     Compiling with: 	-march=pentium-mmx
+>     will cause the problem to appear. But if you were to change
+>     pentium-mmx to i686 or add -mtune=generic, then the problem goes away.
+>     
+>     I first saw this problem when compiling with optimize for size.
+>     But it seems that various other options may cause this issue to arise.
+>     
+>     Instead of completely disabling the function graph tracer for i386 builds
+>     this patch adds a check to recordmcount.pl to make sure that all
+>     functions that contain a call to mcount start with "push %ebp".
+>     If not, it will fail the compile and print out the nasty warning:
+>     
+>       CC      kernel/time/timer_stats.o
+>     
+>     ********************************************************
+>       Your version of GCC breaks the function graph tracer
+>       Please disable CONFIG_FUNCTION_GRAPH_TRACER
+>       Failed function was "timer_stats_update_stats"
+>     ********************************************************
+>     
+>     The script recordmcount.pl is given a new parameter "do_check". If
+>     this is negative, the script will only perform this check without
+>     creating the mcount caller section. This will be executed for x86_32
+>     when CONFIG_FUNCTION_GRAPH_TRACER is enabled and CONFIG_DYNAMIC_FTRACE
+>     is not.
+>     
+>     If the arch is x86_32 and $do_check is greater than 1, it will perform
+>     the check while processing the mcount callers. If $do_check is 0, then
+>     no check will be performed. This is for non x86_32 archs and when
+>     compiling without CONFIG_FUNCTION_GRAPH_TRACER enabled, even on x86_32.
+>     
+>     Reported-by: Thomas Gleixner <tglx@linutronix.de>
+>     LKML-Reference: <alpine.LFD.2.00.0911191423190.24119@localhost.localdomain>
+>     Signed-off-by: Steven Rostedt <rostedt@goodmis.org>
+> 
+> diff --git a/kernel/trace/Kconfig b/kernel/trace/Kconfig
+> index b416512..cd39064 100644
+> --- a/kernel/trace/Kconfig
+> +++ b/kernel/trace/Kconfig
+> @@ -143,7 +143,6 @@ config FUNCTION_GRAPH_TRACER
+>  	bool "Kernel Function Graph Tracer"
+>  	depends on HAVE_FUNCTION_GRAPH_TRACER
+>  	depends on FUNCTION_TRACER
+> -	depends on !X86_32 || !CC_OPTIMIZE_FOR_SIZE
+>  	default y
+>  	help
+>  	  Enable the kernel to trace a function at both its return
+> diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+> index 341b589..3b897f2 100644
+> --- a/scripts/Makefile.build
+> +++ b/scripts/Makefile.build
+> @@ -206,10 +206,33 @@ cmd_modversions =							\
+>  endif
+>  
+>  ifdef CONFIG_FTRACE_MCOUNT_RECORD
+> +
+> + ifdef CONFIG_FUNCTION_GRAPH_TRACER
+> +  ifdef CONFIG_X86_32
+> +   rm_do_check = 1
+> +  else
+> +   rm_do_check = 0
+> +  endif
+> + else
+> +  rm_do_check = 0
+> + endif
+> +
+>  cmd_record_mcount = set -e ; perl $(srctree)/scripts/recordmcount.pl "$(ARCH)" \
+>  	"$(if $(CONFIG_64BIT),64,32)" \
+>  	"$(OBJDUMP)" "$(OBJCOPY)" "$(CC)" "$(LD)" "$(NM)" "$(RM)" "$(MV)" \
+> -	"$(if $(part-of-module),1,0)" "$(@)";
+> +	"$(if $(part-of-module),1,0)" "$(rm_do_check)" "$(@)";
+> +
+> +else
+> +
+> + ifdef CONFIG_X86_32
+> + ifdef CONFIG_FUNCTION_GRAPH_TRACER
+> +   cmd_record_mcount = set -e ; perl $(srctree)/scripts/recordmcount.pl "$(ARCH)" \
+> +	"$(if $(CONFIG_64BIT),64,32)" \
+> +	"$(OBJDUMP)" "$(OBJCOPY)" "$(CC)" "$(LD)" "$(NM)" "$(RM)" "$(MV)" \
+> +	"$(if $(part-of-module),1,0)" "-1" "$(@)";
+> + endif
+> + endif
+> +
+>  endif
+>  
+>  define rule_cc_o_c
+> diff --git a/scripts/recordmcount.pl b/scripts/recordmcount.pl
+> index 090d300..164a9d5 100755
+> --- a/scripts/recordmcount.pl
+> +++ b/scripts/recordmcount.pl
+> @@ -99,14 +99,14 @@ $P =~ s@.*/@@g;
+>  
+>  my $V = '0.1';
+>  
+> -if ($#ARGV < 7) {
+> -	print "usage: $P arch bits objdump objcopy cc ld nm rm mv is_module inputfile\n";
+> +if ($#ARGV < 11) {
+> +	print "usage: $P arch bits objdump objcopy cc ld nm rm mv is_module do_check inputfile\n";
+>  	print "version: $V\n";
+>  	exit(1);
+>  }
+>  
+>  my ($arch, $bits, $objdump, $objcopy, $cc,
+> -    $ld, $nm, $rm, $mv, $is_module, $inputfile) = @ARGV;
+> +    $ld, $nm, $rm, $mv, $is_module, $do_check, $inputfile) = @ARGV;
+>  
+>  # This file refers to mcount and shouldn't be ftraced, so lets' ignore it
+>  if ($inputfile eq "kernel/trace/ftrace.o") {
+> @@ -129,6 +129,60 @@ $nm = "nm" if ((length $nm) == 0);
+>  $rm = "rm" if ((length $rm) == 0);
+>  $mv = "mv" if ((length $mv) == 0);
+>  
+> +# gcc can do stupid things with the stack pointer on x86_32.
+> +# It may pass a copy of the return address to mcount, which will
+> +# break the function graph tracer. If this happens then we need
+> +# to flag it and break the build.
+> +#
+> +# For x86_32, the parameter do_check will be negative if we only
+> +# want to perform the check, and positive if we should od the check.
+> +# If function graph tracing is not enabled, do_check will be zero.
+> +#
+> +
+> +my $check_next_line = 0;
+> +my $line_failed = 0;
+> +my $last_function;
+> +
+> +sub test_x86_32_prologue
+> +{
+> +    if ($check_next_line) {
+> +	if (!/push\s*\%ebp/) {
+> +	    $line_failed = 1;
+> +	}
+> +    }
+> +
+> +    if ($line_failed && /mcount/) {
+> +	print STDERR "\n********************************************************\n";
+> +	print STDERR "  Your version of GCC breaks the function graph tracer\n";
+> +	print STDERR "  Please disable CONFIG_FUNCTION_GRAPH_TRACER\n";
+> +	print STDERR "  Failed function was \"$last_function\"\n";
+> +	print STDERR "********************************************************\n\n";
+> +	exit -1;
+> +    }
+> +    $check_next_line = 0;
+> +
+> +    # check the first line after a function starts for
+> +    #  push %ebp
+> +    if (/^[0-9a-fA-F]+\s+<([a-zA-Z_].*)>:$/) {
+> +	$last_function = $1;
+> +	$check_next_line = 1;
+> +	$line_failed = 0;
+> +    }
+> +}
+> +
+> +if ($do_check < 0) {
+> +    # Only perform the check and quit
+> +    open(IN, "$objdump -dr $inputfile|") || die "error running $objdump";
+> +
+> +    while (<IN>) {
+> +	test_x86_32_prologue;
+> +    }
+> +    close (IN);
+> +    exit 0;
+> +}
+> +
+> +my $check = 0;
+> +
+>  #print STDERR "running: $P '$arch' '$objdump' '$objcopy' '$cc' '$ld' " .
+>  #    "'$nm' '$rm' '$mv' '$inputfile'\n";
+>  
+> @@ -153,6 +207,12 @@ if ($arch eq "x86") {
+>      }
+>  }
+>  
+> +if ($arch eq "i386") {
+> +    if ($do_check) {
+> +	$check = 1;
+> +    }
+> +}
+> +
+>  #
+>  # We base the defaults off of i386, the other archs may
+>  # feel free to change them in the below if statements.
+> @@ -381,6 +441,14 @@ my $text;
+>  my $read_headers = 1;
+>  
+>  while (<IN>) {
+> +
+> +    # x86_32 may need to test the start of every function to see
+> +    # if GCC did not mess up the mcount prologue. All functions must
+> +    # start with push %ebp, otherwise it is broken.
+> +    if ($check) {
+> +	test_x86_32_prologue;
+> +    }
+> +
+>      # is it a section?
+>      if (/$section_regex/) {
+>  	$read_headers = 0;
+> 
 
