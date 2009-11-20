@@ -1,125 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from hrndva-omtalb.mail.rr.com ([71.74.56.122]:57344 "EHLO
-	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752962AbZKTPL4 (ORCPT
+Received: from pfepb.post.tele.dk ([195.41.46.236]:47675 "EHLO
+	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752033AbZKTSWq (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 20 Nov 2009 10:11:56 -0500
-Subject: [PATCH][GIT PULL] kconfig: Fix make O=<dir> local{mod,yes}config
-From: Steven Rostedt <rostedt@goodmis.org>
-Reply-To: rostedt@goodmis.org
-Content-Type: text/plain
-Date: Fri, 20 Nov 2009 10:12:00 -0500
-Message-Id: <1258729920.22249.1028.camel@gandalf.stny.rr.com>
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+	Fri, 20 Nov 2009 13:22:46 -0500
+Date: Fri, 20 Nov 2009 19:22:49 +0100
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Stepping down as kbuild maintainer
+Message-ID: <20091120182249.GA28251@merkur.ravnborg.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: LKML <linux-kernel@vger.kernel.org>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, Peter Zijlstra <peterz@infradead.org>, Sam Ravnborg <sam@ravnborg.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: Linus Torvalds <torvalds@linux-foundation.org>, Andrew Morton <akpm@linux-foundation.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, lkml <linux-kernel@vger.kernel.org>, Stephen Rothwell <sfr@canb.auug.org.au>
 
+It has been fun to be kbuild maintainer but
+as things stand right now I do not have the
+time needed to be kbuild maintainer.
 
-Linus,
+I have done this solely on a hobbyist basis
+and family (3 kids etc) + job require me
+so the kbuild maintainer job was becoming
+a duty and not that fun suddenly.
 
-I know this is late in the -rc but this fix is for those like
-Peter Zijlstra that do all their builds with O=<dir>. But I understand
-if this is too much too late. I could just send it off to the stable
-folks then. (I would then have to rebase to add the "stable" tag).
+Any linux related job required either
+a move or too much working at home so
+I drpped this idea.
 
--- Steve
+So I decided to step down as maintainer
+and I hope someone else can pick up.
 
-Please pull the latest for-linus tree, which can be found at:
+What do I left "Orphan" as MAINTAINERS say?
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/rostedt/linux-2.6-kconfig.git
-for-linus
+I do not get many complains about kbuild these
+days. All the basic stuff just works.
 
+The only major complains are:
+- no human can understand the kbuild files
+  [Makefile, scripts/Makefile.*]
+- select does not work (that kconfig btw)
+- how to do strange this when building an external module
 
-Steven Rostedt (1):
-      kconfig: Fix make O=<dir> local{mod,yes}config
+So I feel pretty confident that things does not blow
+up on you when I leave.
 
-----
- scripts/kconfig/Makefile             |    4 ++--
- scripts/kconfig/streamline_config.pl |   12 ++++++------
- 2 files changed, 8 insertions(+), 8 deletions(-)
----------------------------
-commit 463bf9000750e08a85ee0b40da3266aae8a54ba2
-Author: Steven Rostedt <srostedt@redhat.com>
-Date:   Fri Nov 20 09:21:12 2009 -0500
+I keep my mail address and will be reachable there.
 
-    kconfig: Fix make O=<dir> local{mod,yes}config
-    
-    When the output directory is something other than the kernel source,
-    the streamline_config script gets confused. This patch passes in the
-    source directory to the script so that it can find the proper files.
-    
-    Reported-by: Peter Zijlstra <peterz@infradead.org>
-    Tested-by: Peter Zijlstra <peterz@infradead.org>
-    Signed-off-by: Steven Rostedt <rostedt@goodmis.org>
+Good luck!
 
-diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
-index 6d69c7c..80599e3 100644
---- a/scripts/kconfig/Makefile
-+++ b/scripts/kconfig/Makefile
-@@ -30,7 +30,7 @@ silentoldconfig: $(obj)/conf
- 	$< -s $(Kconfig)
- 
- localmodconfig: $(obj)/streamline_config.pl $(obj)/conf
--	$(Q)perl $< $(Kconfig) > .tmp.config
-+	$(Q)perl $< $(srctree) $(Kconfig) > .tmp.config
- 	$(Q)if [ -f .config ]; then 				\
- 			cmp -s .tmp.config .config ||		\
- 			(mv -f .config .config.old.1;		\
-@@ -44,7 +44,7 @@ localmodconfig: $(obj)/streamline_config.pl $(obj)/conf
- 	$(Q)rm -f .tmp.config
- 
- localyesconfig: $(obj)/streamline_config.pl $(obj)/conf
--	$(Q)perl $< $(Kconfig) > .tmp.config
-+	$(Q)perl $< $(srctree) $(Kconfig) > .tmp.config
- 	$(Q)sed -i s/=m/=y/ .tmp.config
- 	$(Q)if [ -f .config ]; then 				\
- 			cmp -s .tmp.config .config ||		\
-diff --git a/scripts/kconfig/streamline_config.pl b/scripts/kconfig/streamline_config.pl
-index 95984db..0d80082 100644
---- a/scripts/kconfig/streamline_config.pl
-+++ b/scripts/kconfig/streamline_config.pl
-@@ -43,7 +43,6 @@
- #    make oldconfig
- #
- my $config = ".config";
--my $linuxpath = ".";
- 
- my $uname = `uname -r`;
- chomp $uname;
-@@ -111,7 +110,11 @@ sub find_config {
- 
- find_config;
- 
--my @makefiles = `find $linuxpath -name Makefile`;
-+# Get the build source and top level Kconfig file (passed in)
-+my $ksource = $ARGV[0];
-+my $kconfig = $ARGV[1];
-+
-+my @makefiles = `find $ksource -name Makefile`;
- my %depends;
- my %selects;
- my %prompts;
-@@ -119,9 +122,6 @@ my %objects;
- my $var;
- my $cont = 0;
- 
--# Get the top level Kconfig file (passed in)
--my $kconfig = $ARGV[0];
--
- # prevent recursion
- my %read_kconfigs;
- 
-@@ -132,7 +132,7 @@ sub read_kconfig {
-     my $config;
-     my @kconfigs;
- 
--    open(KIN, $kconfig) || die "Can't open $kconfig";
-+    open(KIN, "$ksource/$kconfig") || die "Can't open $kconfig";
-     while (<KIN>) {
- 	chomp;
- 
-
+	Sam
 
