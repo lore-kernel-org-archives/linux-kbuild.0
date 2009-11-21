@@ -1,68 +1,37 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from xenotime.net ([72.52.64.118]:39004 "HELO xenotime.net"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with SMTP
-	id S1755997AbZKURHg convert rfc822-to-8bit (ORCPT
+Received: from master.debian.org ([70.103.162.29]:56869 "EHLO
+	master.debian.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751619AbZKUWyG (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 21 Nov 2009 12:07:36 -0500
-Received: from chimera.site ([96.253.169.185]) by xenotime.net for <linux-kbuild@vger.kernel.org>; Sat, 21 Nov 2009 09:07:40 -0800
-Date: Sat, 21 Nov 2009 09:07:39 -0800
-From: Randy Dunlap <rdunlap@xenotime.net>
+	Sat, 21 Nov 2009 17:54:06 -0500
+Date: Sun, 22 Nov 2009 09:44:45 +1100
+From: =?iso-8859-1?Q?An=EDbal?= Monsalve Salazar <anibal@debian.org>
 Subject: Re: Stepping down as kbuild maintainer
-Message-Id: <20091121090739.f86562e2.rdunlap@xenotime.net>
-In-Reply-To: <20091121094854.GB2412@hack>
+Message-ID: <20091121224444.GA5296@master.debian.org>
 References: <20091120182249.GA28251@merkur.ravnborg.org>
-	<20091121094854.GB2412@hack>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 8BIT
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20091120182249.GA28251@merkur.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: =?ISO-8859-1?Q?Am=E9rico?= Wang <xiyou.wangcong@gmail.com>
-Cc: Sam Ravnborg <sam@ravnborg.org>, Linus Torvalds <torvalds@linux-foundation.org>, Andrew Morton <akpm@linux-foundation.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, lkml <linux-kernel@vger.kernel.org>, Stephen Rothwell <sfr@canb.auug.org.au>
+To: Linus Torvalds <torvalds@linux-foundation.org>, Andrew Morton <akpm@linux-foundation.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, lkml <linux-kernel@vger.kernel.org>, Stephen Rothwell <sfr@canb.auug.org.au>, Sam Ravnborg <sam@ravnborg.org>, =?iso-8859-1?Q?Am=E9rico?= Wang <xiyou.wangcong@gmail.com>
 
-On Sat, 21 Nov 2009 17:48:54 +0800 Américo Wang wrote:
+On Sat, Nov 21, 2009 at 08:46:14AM +0100, Sam Ravnborg wrote:
+>On Sat, Nov 21, 2009 at 12:44:47PM +1100, Aníbal Monsalve Salazar wrote:
+>>Will you be available to answer questions while I walk the learning
+>>curve? :)
+>
+>I will be around yes - as long as you do not expect too quick answers.
+>Good luck(*) if you decide to try it!
 
-> On Fri, Nov 20, 2009 at 07:22:49PM +0100, Sam Ravnborg wrote:
-> >It has been fun to be kbuild maintainer but
-> >as things stand right now I do not have the
-> >time needed to be kbuild maintainer.
-> >
-> >I have done this solely on a hobbyist basis
-> >and family (3 kids etc) + job require me
-> >so the kbuild maintainer job was becoming
-> >a duty and not that fun suddenly.
-> >
-> >Any linux related job required either
-> >a move or too much working at home so
-> >I drpped this idea.
-> 
-> 
-> Hi, Sam,
-> 
-> Huge thanks to you for what you did for Linux
-> kernel! You did quite well.
-> 
-> It's a pity that we can't continue to work
-> with you.
+On Sat, Nov 21, 2009 at 09:56:39PM +0800, Américo Wang wrote:
+>On Sat, Nov 21, 2009 at 09:51:12PM +1100, Aníbal Monsalve Salazar wrote:
+>>I assume you can also help with most of the scripts. Right? :)
+>
+>Sure, feel free to contact me if you need.
 
-Ditto, thanks much for your work here, Sam.
+I would like to maintain kbuild.
 
-
-> >So I decided to step down as maintainer
-> >and I hope someone else can pick up.
-> 
-> I don't think i am able to take this but at
-> least I can take care of most of the scripts
-> under scripts/.
-> 
-> 
-> >
-> >I keep my mail address and will be reachable there.
-> >
-> 
-> Thanks again, Sam! Best wishes!
-
-Ack that also.
-
----
-~Randy
+Ram Ravnborg and Américo Wang are willing to help me.
