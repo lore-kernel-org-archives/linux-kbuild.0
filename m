@@ -1,62 +1,68 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-yx0-f187.google.com ([209.85.210.187]:49232 "EHLO
-	mail-yx0-f187.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750745AbZKUJsD (ORCPT
+Received: from xenotime.net ([72.52.64.118]:39004 "HELO xenotime.net"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with SMTP
+	id S1755997AbZKURHg convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 21 Nov 2009 04:48:03 -0500
-Date: Sat, 21 Nov 2009 17:48:54 +0800
-From: =?utf-8?Q?Am=C3=A9rico?= Wang <xiyou.wangcong@gmail.com>
+	Sat, 21 Nov 2009 12:07:36 -0500
+Received: from chimera.site ([96.253.169.185]) by xenotime.net for <linux-kbuild@vger.kernel.org>; Sat, 21 Nov 2009 09:07:40 -0800
+Date: Sat, 21 Nov 2009 09:07:39 -0800
+From: Randy Dunlap <rdunlap@xenotime.net>
 Subject: Re: Stepping down as kbuild maintainer
-Message-ID: <20091121094854.GB2412@hack>
+Message-Id: <20091121090739.f86562e2.rdunlap@xenotime.net>
+In-Reply-To: <20091121094854.GB2412@hack>
 References: <20091120182249.GA28251@merkur.ravnborg.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20091120182249.GA28251@merkur.ravnborg.org>
+	<20091121094854.GB2412@hack>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, Andrew Morton <akpm@linux-foundation.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, lkml <linux-kernel@vger.kernel.org>, Stephen Rothwell <sfr@canb.auug.org.au>
+To: =?ISO-8859-1?Q?Am=E9rico?= Wang <xiyou.wangcong@gmail.com>
+Cc: Sam Ravnborg <sam@ravnborg.org>, Linus Torvalds <torvalds@linux-foundation.org>, Andrew Morton <akpm@linux-foundation.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, lkml <linux-kernel@vger.kernel.org>, Stephen Rothwell <sfr@canb.auug.org.au>
 
-On Fri, Nov 20, 2009 at 07:22:49PM +0100, Sam Ravnborg wrote:
->It has been fun to be kbuild maintainer but
->as things stand right now I do not have the
->time needed to be kbuild maintainer.
->
->I have done this solely on a hobbyist basis
->and family (3 kids etc) + job require me
->so the kbuild maintainer job was becoming
->a duty and not that fun suddenly.
->
->Any linux related job required either
->a move or too much working at home so
->I drpped this idea.
+On Sat, 21 Nov 2009 17:48:54 +0800 Américo Wang wrote:
 
+> On Fri, Nov 20, 2009 at 07:22:49PM +0100, Sam Ravnborg wrote:
+> >It has been fun to be kbuild maintainer but
+> >as things stand right now I do not have the
+> >time needed to be kbuild maintainer.
+> >
+> >I have done this solely on a hobbyist basis
+> >and family (3 kids etc) + job require me
+> >so the kbuild maintainer job was becoming
+> >a duty and not that fun suddenly.
+> >
+> >Any linux related job required either
+> >a move or too much working at home so
+> >I drpped this idea.
+> 
+> 
+> Hi, Sam,
+> 
+> Huge thanks to you for what you did for Linux
+> kernel! You did quite well.
+> 
+> It's a pity that we can't continue to work
+> with you.
 
-Hi, Sam,
-
-Huge thanks to you for what you did for Linux
-kernel! You did quite well.
-
-It's a pity that we can't continue to work
-with you.
-
-
->
->So I decided to step down as maintainer
->and I hope someone else can pick up.
-
-I don't think i am able to take this but at
-least I can take care of most of the scripts
-under scripts/.
+Ditto, thanks much for your work here, Sam.
 
 
->
->I keep my mail address and will be reachable there.
->
+> >So I decided to step down as maintainer
+> >and I hope someone else can pick up.
+> 
+> I don't think i am able to take this but at
+> least I can take care of most of the scripts
+> under scripts/.
+> 
+> 
+> >
+> >I keep my mail address and will be reachable there.
+> >
+> 
+> Thanks again, Sam! Best wishes!
 
-Thanks again, Sam! Best wishes!
+Ack that also.
 
--- 
-Live like a child, think like the god.
- 
+---
+~Randy
