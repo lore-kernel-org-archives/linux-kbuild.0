@@ -1,32 +1,28 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-px0-f204.google.com ([209.85.216.204]:41965 "EHLO
-	mail-px0-f204.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756587AbZKWVOQ convert rfc822-to-8bit (ORCPT
+Received: from terminus.zytor.com ([198.137.202.10]:54330 "EHLO
+	terminus.zytor.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754286AbZKWVh7 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 23 Nov 2009 16:14:16 -0500
-Received: by pxi42 with SMTP id 42so3597261pxi.5
-        for <linux-kbuild@vger.kernel.org>; Mon, 23 Nov 2009 13:14:22 -0800 (PST)
+	Mon, 23 Nov 2009 16:37:59 -0500
+Message-ID: <4B0B00AF.4050000@zytor.com>
+Date: Mon, 23 Nov 2009 13:37:51 -0800
+From: "H. Peter Anvin" <hpa@zytor.com>
 MIME-Version: 1.0
-From: Jeffrey Haemer <jeffrey.haemer@gmail.com>
-Date: Mon, 23 Nov 2009 14:14:02 -0700
-Message-ID: <5808d4420911231314p389d511do8304948bf2417f8f@mail.gmail.com>
 Subject: Re: Stepping down as kbuild maintainer
+References: <20091120182249.GA28251@merkur.ravnborg.org>
+In-Reply-To: <20091120182249.GA28251@merkur.ravnborg.org>
 Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 8BIT
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, lkml <linux-kernel@vger.kernel.org>
 
-On Sun, 22 Nov 2009 09:44:45 +1100, Aníbal Monsalve Salazar wrote:
-> I would like to maintain kbuild.
->
-> Ram Ravnborg and Américo Wang are willing to help me.
+On 11/20/2009 10:22 AM, Sam Ravnborg wrote:
+> It has been fun to be kbuild maintainer but
+> as things stand right now I do not have the
+> time needed to be kbuild maintainer.
 
-I'm also willing to pitch in and help, though I'll need some guidance.
+Sam, thank you for all your work, and it is sad to see you go.
 
--- 
-Click to Call Me Now! -- http://seejeffrun.blogspot.com/2009/09/call-me-now.html
-
-Jeffrey Haemer <jeffrey.haemer@gmail.com>
-720-837-8908 [cell],  @goyishekop [twitter]
-http://www.youtube.com/user/goyishekop [vlog]
+	-hpa
