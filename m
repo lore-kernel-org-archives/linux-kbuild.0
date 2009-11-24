@@ -1,15 +1,15 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-px0-f180.google.com ([209.85.216.180]:49579 "EHLO
-	mail-px0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S933201AbZKXO5T (ORCPT
+Received: from mail-yw0-f182.google.com ([209.85.211.182]:41929 "EHLO
+	mail-yw0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757567AbZKXO7t (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 24 Nov 2009 09:57:19 -0500
-Received: by pxi10 with SMTP id 10so4976085pxi.33
-        for <linux-kbuild@vger.kernel.org>; Tue, 24 Nov 2009 06:57:25 -0800 (PST)
-Date: Tue, 24 Nov 2009 09:09:05 -0600
+	Tue, 24 Nov 2009 09:59:49 -0500
+Received: by ywh12 with SMTP id 12so6443038ywh.21
+        for <linux-kbuild@vger.kernel.org>; Tue, 24 Nov 2009 06:59:56 -0800 (PST)
+Date: Tue, 24 Nov 2009 09:11:37 -0600
 From: Jonathan Nieder <jrnieder@gmail.com>
-Subject: [PATCH v3 0/3] fakeroot dwimery for deb-pkg target
-Message-ID: <20091124150904.GA14731@progeny.tock>
+Subject: [PATCH 1/3] scripts/package: tar-pkg: use tar --owner=root
+Message-ID: <20091124151137.GB14731@progeny.tock>
 References: <20091014064622.GA8711@progeny.tock>
  <20091014071627.GA6256@merkur.ravnborg.org>
  <200910141159.03799.elendil@planet.nl>
@@ -17,41 +17,50 @@ References: <20091014064622.GA8711@progeny.tock>
  <20091015133139.GA6718@progeny.tock>
  <20091015133532.GB6718@progeny.tock>
  <4B0BC306.9010009@suse.cz>
+ <20091124150904.GA14731@progeny.tock>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <4B0BC306.9010009@suse.cz>
+In-Reply-To: <20091124150904.GA14731@progeny.tock>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Michal Marek <mmarek@suse.cz>
 Cc: linux-kbuild@vger.kernel.org, maximilian attems <max@stro.at>, Sam Ravnborg <sam@ravnborg.org>, Frans Pop <elendil@planet.nl>
 
-Hi,
+From: Michal Marek <mmarek@suse.cz>
 
-As Michal noticed, the tar*-pkg and *rpm-pkg targets can work fine
-without being able to write files owned by root.  Only deb-pkg needs
-to learn to acquire faked root privileges.  Here is an updated series
-reflecting this.
+Use the --owner= and --group= options to make sure the entries in
+the built tar file are owned by root.  Without this change, a
+careless sysadmin using the tar-pkg target can easily end up
+installing a kernel that is writable by the unprivileged user
+account used to build the kernel.
 
-This version no longer documents the KBUILD_PKG_ROOTCMD variable in
-"make help" output.  If make already has root privileges or fakeroot
-is installed, then the target will just work without any need for the
-user to worry about this.  If not, instead of waiting from an error
-from chmod, it seemed better to give an error right away with advice
-to set KBUILD_PKG_ROOTCMD appropriately.
+Test that these options are understood before using them so that
+non-GNU versions of tar can still be used if the operator is
+appropriately cautious.
 
-Since the scope of the variable’s applicability somewhat, I have not
-carried over any acks.  But I am hoping you will still like the
-patches. :)
-
-Jonathan Nieder (2):
-  scripts/package: add KBUILD_PKG_ROOTCMD variable
-  scripts/package: deb-pkg: use fakeroot if available
-
-Michal Marek (1):
-  scripts/package: tar-pkg: use tar --owner=root
-
- scripts/package/Makefile |   20 +++++++++++++++++++-
+Signed-off-by: Jonathan Nieder <jrnieder@gmail.com>
+---
  scripts/package/buildtar |    6 +++++-
- 2 files changed, 24 insertions(+), 2 deletions(-)
+ 1 files changed, 5 insertions(+), 1 deletions(-)
+
+diff --git a/scripts/package/buildtar b/scripts/package/buildtar
+index b1fd48d..51b2aa0 100644
+--- a/scripts/package/buildtar
++++ b/scripts/package/buildtar
+@@ -101,7 +101,11 @@ esac
+ #
+ (
+ 	cd "${tmpdir}"
+-	tar cf - . | ${compress} > "${tarball}${file_ext}"
++	opts=
++	if tar --owner=root --group=root --help >/dev/null 2>&1; then
++		opts="--owner=root --group=root"
++	fi
++	tar cf - . $opts | ${compress} > "${tarball}${file_ext}"
+ )
+ 
+ echo "Tarball successfully created in ${tarball}${file_ext}"
+-- 
+1.6.5.3
+
