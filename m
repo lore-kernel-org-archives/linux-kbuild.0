@@ -1,68 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:34631 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S932541AbZKXNM5 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 24 Nov 2009 08:12:57 -0500
-Message-ID: <4B0BDBDD.7090606@suse.cz>
-Date: Tue, 24 Nov 2009 14:13:01 +0100
-From: Michal Marek <mmarek@suse.cz>
+Received: from mail-px0-f180.google.com ([209.85.216.180]:49579 "EHLO
+	mail-px0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S933201AbZKXO5T (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 24 Nov 2009 09:57:19 -0500
+Received: by pxi10 with SMTP id 10so4976085pxi.33
+        for <linux-kbuild@vger.kernel.org>; Tue, 24 Nov 2009 06:57:25 -0800 (PST)
+Date: Tue, 24 Nov 2009 09:09:05 -0600
+From: Jonathan Nieder <jrnieder@gmail.com>
+Subject: [PATCH v3 0/3] fakeroot dwimery for deb-pkg target
+Message-ID: <20091124150904.GA14731@progeny.tock>
+References: <20091014064622.GA8711@progeny.tock>
+ <20091014071627.GA6256@merkur.ravnborg.org>
+ <200910141159.03799.elendil@planet.nl>
+ <20091014110331.GZ28231@baikonur.stro.at>
+ <20091015133139.GA6718@progeny.tock>
+ <20091015133532.GB6718@progeny.tock>
+ <4B0BC306.9010009@suse.cz>
 MIME-Version: 1.0
-Subject: Re: [PATCH v2 1/2] scripts/package: add KBUILD_PKG_ROOTCMD variable
-References: <20091014064622.GA8711@progeny.tock> <20091014071627.GA6256@merkur.ravnborg.org> <200910141159.03799.elendil@planet.nl> <20091014110331.GZ28231@baikonur.stro.at> <20091015133139.GA6718@progeny.tock> <20091015133532.GB6718@progeny.tock> <4B0BC306.9010009@suse.cz> <20091124120314.GA1926@progeny.tock>
-In-Reply-To: <20091124120314.GA1926@progeny.tock>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <4B0BC306.9010009@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jonathan Nieder <jrnieder@gmail.com>
+To: Michal Marek <mmarek@suse.cz>
 Cc: linux-kbuild@vger.kernel.org, maximilian attems <max@stro.at>, Sam Ravnborg <sam@ravnborg.org>, Frans Pop <elendil@planet.nl>
 
-On 24.11.2009 13:03, Jonathan Nieder wrote:
-> Hi,
-> 
-> Michal Marek wrote:
->> GNU tar has --owner and --group options to override the owner and group
->> of the files in the archive, something like
->>
->> opts=
->> if tar --owner=root --group=root --help >/dev/null 2>&1; then
->>     opts="--owner=root --group=root"
->> fi
->> tar cf - . $opts ...
->>
->> would make tar-pkg do the right thing automatically without specifying
->> fakeroot.
-> 
-> Sounds appealing.  Probably it is safe to assume GNU tar is available
-> for running tar-pkg. I’ll look into this, though I wouldn’t mind if a
-> patch appears before I finish.
+Hi,
 
-I would still fallback to plain tar, you never know what exotic
-system users build on and GNU tar is not mentioned in
-Documentation/Changes. But you're right, this would be another patch.
+As Michal noticed, the tar*-pkg and *rpm-pkg targets can work fine
+without being able to write files owned by root.  Only deb-pkg needs
+to learn to acquire faked root privileges.  Here is an updated series
+reflecting this.
 
+This version no longer documents the KBUILD_PKG_ROOTCMD variable in
+"make help" output.  If make already has root privileges or fakeroot
+is installed, then the target will just work without any need for the
+user to worry about this.  If not, instead of waiting from an error
+from chmod, it seemed better to give an error right away with advice
+to set KBUILD_PKG_ROOTCMD appropriately.
 
->>> @@ -96,10 +100,10 @@ clean-dirs += $(objtree)/tar-install/
->>>  # Help text displayed when executing 'make help'
->>>  # ---------------------------------------------------------------------------
->>>  help: FORCE
->>> +	@echo ' Set KBUILD_PKG_ROOTCMD={sudo|fakeroot -u|...} and make as non-root:'
->>>  	@echo '  rpm-pkg         - Build both source and binary RPM kernel packages'
->>>  	@echo '  binrpm-pkg      - Build only the binary kernel package'
->>>  	@echo '  deb-pkg         - Build the kernel as an deb package'
->>>  	@echo '  tar-pkg         - Build the kernel as an uncompressed tarball'
->>>  	@echo '  targz-pkg       - Build the kernel as a gzip compressed tarball'
->>>  	@echo '  tarbz2-pkg      - Build the kernel as a bzip2 compressed tarball'
-> 
-> If this variable is to only be used for some targets, this help text
-> starts to look out of place.  Maybe make deb-pkg should error out with
-> a suggestion to set it if `id -u` is not 0, instead.
+Since the scope of the variable’s applicability somewhat, I have not
+carried over any acks.  But I am hoping you will still like the
+patches. :)
 
-Good idea.
+Jonathan Nieder (2):
+  scripts/package: add KBUILD_PKG_ROOTCMD variable
+  scripts/package: deb-pkg: use fakeroot if available
 
+Michal Marek (1):
+  scripts/package: tar-pkg: use tar --owner=root
 
-> Thanks for the thoughtful review.  Updated patch coming soon.
-
-Thanks!
-
-Michal
+ scripts/package/Makefile |   20 +++++++++++++++++++-
+ scripts/package/buildtar |    6 +++++-
+ 2 files changed, 24 insertions(+), 2 deletions(-)
