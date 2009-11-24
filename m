@@ -1,43 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bedivere.hansenpartnership.com ([66.63.167.143]:59695 "EHLO
-	bedivere.hansenpartnership.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1754501AbZKXFjk (ORCPT
+Received: from baikonur.stro.at ([213.239.196.228]:48382 "EHLO
+	baikonur.stro.at" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932222AbZKXJVr (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 24 Nov 2009 00:39:40 -0500
-Subject: Re: [PATCH 05/10] kbuild: sort the list of symbols exported by the
- kernel (__ksymtab)
-From: James Bottomley <James.Bottomley@HansenPartnership.com>
-In-Reply-To: <200911241127.18013.rusty@rustcorp.com.au>
-References: <9b2b86520911020852q49c55695rb05d87090fa9ad33@mail.gmail.com>
-	 <4B072E31.4000906@tuffmail.co.uk> <20091123195320.GD26810@ldl.fc.hp.com>
-	 <200911241127.18013.rusty@rustcorp.com.au>
-Content-Type: text/plain; charset="UTF-8"
-Date: Mon, 23 Nov 2009 23:39:42 -0600
-Message-Id: <1259041182.2433.945.camel@mulgrave.site>
+	Tue, 24 Nov 2009 04:21:47 -0500
+Date: Tue, 24 Nov 2009 10:15:47 +0100
+From: maximilian attems <max@stro.at>
+Subject: Re: [PATCH] kbuild: Steppeing down as Maintainer
+Message-ID: <20091124091547.GW25768@baikonur.stro.at>
+References: <20091120182249.GA28251@merkur.ravnborg.org> <20091120182613.GA28307@merkur.ravnborg.org> <20091123150524.5bd37f6b.akpm@linux-foundation.org>
 Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20091123150524.5bd37f6b.akpm@linux-foundation.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Rusty Russell <rusty@rustcorp.com.au>
-Cc: Alex Chiang <achiang@hp.com>, Alan Jenkins <alan-jenkins@tuffmail.co.uk>, Tony Luck <tony.luck@gmail.com>, Sam Ravnborg <sam@ravnborg.org>, Mike Frysinger <vapier.adi@gmail.com>, greg@kroah.com, linux-kbuild@vger.kernel.org, carmelo73@gmail.com, linux-kernel@vger.kernel.org, kyle@mcmartin.ca, deller@gmx.de, jejb@parisc-linux.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>, paulus@samba.org
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: Sam Ravnborg <sam@ravnborg.org>, Linus Torvalds <torvalds@linux-foundation.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, lkml <linux-kernel@vger.kernel.org>, Stephen Rothwell <sfr@canb.auug.org.au>, =?iso-8859-1?Q?An=EDbal?= Monsalve Salazar <anibal@debian.org>, Steven Rostedt <rostedt@goodmis.org>, Michal Marek <mmarek@suse.cz>
 
-On Tue, 2009-11-24 at 11:27 +1030, Rusty Russell wrote:
-> On Tue, 24 Nov 2009 06:23:20 am Alex Chiang wrote:
-> > Hi Alan, Rusty,
+On Mon, Nov 23, 2009 at 03:05:24PM -0800, Andrew Morton wrote:
 > 
-> Hi Alex,
+> The current queue is:
 > 
-> > In the meantime, while Alan is deciding the proper way to fix
-> > this, would it be possible to drop the offending patch series
-> > from linux-next?
+> kbuild-generate-modulesbuiltin.patch
+> kbuild-rebuild-fix-for-makefilemodbuiltin.patch
+> kbuild-generate-modulesbuiltin-fix-2.patch
+> kbuild-generate-modulesbuiltin-fix-2-checkpatch-fixes.patch
+> kconfig-cross_compile-option.patch
+> kbuild-clean-up-marker.patch
+> kbuild-clear-marker-out-of-modpost.patch
+> kbuild-genksyms-properly-consider-export_unused_symbol_gpl.patch
 > 
-> Done.  That takes the pressure off Alan, and makes sure he has time to get
-> it right.
+> 
 
-That probably suits us on parisc too.  I just checked out our build in
-linux-next: we don't pass __modpost ... it looks like we have all the
-module symbols undefined.  Will investigate more.
+please add the following fakeroot usage to -next for 2.6.33 as
+package target enhancement:
+http://marc.info/?l=linux-kbuild&m=125561337922614&w=2
+http://marc.info/?l=linux-kbuild&m=125561358622933&w=2
 
-James
+patch got tested inbetween and with both acks:
+Acked-by: Frans Pop <elendil@planet.nl>
+Acked-by: maximilian attems <max@stro.at>
+see http://marc.info/?l=linux-kbuild&m=125551864712151&w=2
 
-
+thanks
