@@ -1,64 +1,40 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bedivere.hansenpartnership.com ([66.63.167.143]:49762 "EHLO
-	bedivere.hansenpartnership.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S933965AbZKXWnt (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 24 Nov 2009 17:43:49 -0500
-Subject: Re: [PATCH 05/10] kbuild: sort the list of symbols exported by the
- kernel (__ksymtab)
-From: James Bottomley <James.Bottomley@HansenPartnership.com>
-In-Reply-To: <4B0BA725.2050604@tuffmail.co.uk>
-References: <9b2b86520911020852q49c55695rb05d87090fa9ad33@mail.gmail.com>
-	 <4B072E31.4000906@tuffmail.co.uk> <20091123195320.GD26810@ldl.fc.hp.com>
-	 <200911241127.18013.rusty@rustcorp.com.au>
-	 <1259041182.2433.945.camel@mulgrave.site> <4B0BA725.2050604@tuffmail.co.uk>
-Content-Type: text/plain; charset="UTF-8"
-Date: Tue, 24 Nov 2009 16:43:49 -0600
-Message-Id: <1259102629.4549.842.camel@mulgrave.site>
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Received: from smtp.gentoo.org ([140.211.166.183]:49419 "EHLO smtp.gentoo.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S934382AbZKYEsl (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 24 Nov 2009 23:48:41 -0500
+From: Mike Frysinger <vapier@gentoo.org>
+Subject: [PATCH] kconfig: display an error message when aborting
+Date: Tue, 24 Nov 2009 23:48:42 -0500
+Message-Id: <1259124522-26050-1-git-send-email-vapier@gentoo.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Alan Jenkins <alan-jenkins@tuffmail.co.uk>
-Cc: Rusty Russell <rusty@rustcorp.com.au>, Alex Chiang <achiang@hp.com>, Tony Luck <tony.luck@gmail.com>, Sam Ravnborg <sam@ravnborg.org>, Mike Frysinger <vapier.adi@gmail.com>, greg@kroah.com, linux-kbuild@vger.kernel.org, carmelo73@gmail.com, linux-kernel@vger.kernel.org, kyle@mcmartin.ca, deller@gmx.de, jejb@parisc-linux.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>, paulus@samba.org
+To: linux-kbuild@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>
+Cc: linux-kernel@vger.kernel.org
 
-On Tue, 2009-11-24 at 09:28 +0000, Alan Jenkins wrote:
-> James Bottomley wrote:
-> > On Tue, 2009-11-24 at 11:27 +1030, Rusty Russell wrote:
-> >   
-> >> On Tue, 24 Nov 2009 06:23:20 am Alex Chiang wrote:
-> >>     
-> >>> Hi Alan, Rusty,
-> >>>       
-> >> Hi Alex,
-> >>
-> >>     
-> >>> In the meantime, while Alan is deciding the proper way to fix
-> >>> this, would it be possible to drop the offending patch series
-> >>> from linux-next?
-> >>>       
-> >> Done.  That takes the pressure off Alan, and makes sure he has time to get
-> >> it right.
-> >>     
-> >
-> > That probably suits us on parisc too.  I just checked out our build in
-> > linux-next: we don't pass __modpost ... it looks like we have all the
-> > module symbols undefined.  Will investigate more.
-> >
-> > James
-> >   
-> 
-> I think parisc wants P'printk where ia64 uses @fptr(printk).
-> 
-> It may also need ".import printk,code" or similar.
+If the Kconfig option causes an open() failure (like one that starts with
+an underscore), there should be an error message shown since we're going
+to be exiting with an error code.  Otherwise, the reason for the failure
+can really only be diagnosed with strace or something similar.
 
-I think if you have to make modpost architecture specific, there's
-something a bit wrong in the patch series.
+Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+---
+ scripts/kconfig/confdata.c |    2 ++
+ 1 files changed, 2 insertions(+), 0 deletions(-)
 
-I can confirm that reverting this particular patch allows the parisc
-build to work again.  It still won't boot because module symbols aren't
-resolved.
-
-James
-
+diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
+index b55e72f..e2644b4 100644
+--- a/scripts/kconfig/confdata.c
++++ b/scripts/kconfig/confdata.c
+@@ -640,6 +640,8 @@ static int conf_split_config(void)
+ 		fd = open(path, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+ 		if (fd == -1) {
+ 			if (errno != ENOENT) {
++				conf_warning("sym '%s' with path '%s': %s",
++					     sym->name, path, strerror(errno));
+ 				res = 1;
+ 				break;
+ 			}
+-- 
+1.6.5.3
 
