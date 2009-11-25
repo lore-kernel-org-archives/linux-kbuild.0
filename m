@@ -1,97 +1,108 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:38645 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753208AbZKYO2P (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 25 Nov 2009 09:28:15 -0500
-Date: Wed, 25 Nov 2009 15:28:20 +0100
-From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [PATCH 13/14] kbuild: move autoconf.h to include/generated
-Message-ID: <20091125142820.GA10565@sepie.suse.cz>
-References: <20091018080635.GA13767@merkur.ravnborg.org>
- <1255853723-477-13-git-send-email-sam@ravnborg.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1255853723-477-13-git-send-email-sam@ravnborg.org>
+Received: from bedivere.hansenpartnership.com ([66.63.167.143]:57560 "EHLO
+	bedivere.hansenpartnership.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751780AbZKYPI5 (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 25 Nov 2009 10:08:57 -0500
+Subject: Re: [PATCH 05/10] kbuild: sort the list of symbols exported by the
+ kernel (__ksymtab)
+From: James Bottomley <James.Bottomley@HansenPartnership.com>
+In-Reply-To: <4B0CF5A6.7080908@tuffmail.co.uk>
+References: <9b2b86520911020852q49c55695rb05d87090fa9ad33@mail.gmail.com>
+	 <4B072E31.4000906@tuffmail.co.uk> <20091123195320.GD26810@ldl.fc.hp.com>
+	 <200911241127.18013.rusty@rustcorp.com.au>
+	 <1259041182.2433.945.camel@mulgrave.site> <4B0BA725.2050604@tuffmail.co.uk>
+	 <1259102629.4549.842.camel@mulgrave.site> <4B0CF5A6.7080908@tuffmail.co.uk>
+Content-Type: text/plain; charset="UTF-8"
+Date: Wed, 25 Nov 2009 09:08:57 -0600
+Message-Id: <1259161737.2535.6.camel@mulgrave.site>
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: kbuild <linux-kbuild@vger.kernel.org>, lkml <linux-kernel@vger.kernel.org>
+To: Alan Jenkins <alan-jenkins@tuffmail.co.uk>
+Cc: Rusty Russell <rusty@rustcorp.com.au>, Alex Chiang <achiang@hp.com>, Tony Luck <tony.luck@gmail.com>, Sam Ravnborg <sam@ravnborg.org>, Mike Frysinger <vapier.adi@gmail.com>, greg@kroah.com, linux-kbuild@vger.kernel.org, carmelo73@gmail.com, linux-kernel@vger.kernel.org, kyle@mcmartin.ca, deller@gmx.de, jejb@parisc-linux.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>, paulus@samba.org
 
-On Sun, Oct 18, 2009 at 10:15:22AM +0200, Sam Ravnborg wrote:
-> diff --git a/Makefile b/Makefile
-> index 6570cf1..b125cd9 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -336,7 +336,7 @@ CFLAGS_GCOV	= -fprofile-arcs -ftest-coverage
->  # Needed to be compatible with the O= option
->  LINUXINCLUDE    := -I$(srctree)/arch/$(hdr-arch)/include -Iinclude \
->                     $(if $(KBUILD_SRC), -I$(srctree)/include) \
-> -                   -include include/linux/autoconf.h
-> +                   -include include/generated/autoconf.h
->  
->  KBUILD_CPPFLAGS := -D__KERNEL__
->  
-> @@ -491,17 +491,18 @@ $(KCONFIG_CONFIG) include/config/auto.conf.cmd: ;
->  # if auto.conf.cmd is missing then we are probably in a cleaned tree so
->  # we execute the config step to be sure to catch updated Kconfig files
->  include/config/auto.conf: $(KCONFIG_CONFIG) include/config/auto.conf.cmd
-> +	$(Q)mkdir -p include/generated
->  	$(Q)$(MAKE) -f $(srctree)/Makefile silentoldconfig
+On Wed, 2009-11-25 at 09:15 +0000, Alan Jenkins wrote:
+> James Bottomley wrote:
+> > On Tue, 2009-11-24 at 09:28 +0000, Alan Jenkins wrote:
+> >   
+> >> James Bottomley wrote:
+> >>     
+> >>> On Tue, 2009-11-24 at 11:27 +1030, Rusty Russell wrote:
+> >>>   
+> >>>       
+> >>>> On Tue, 24 Nov 2009 06:23:20 am Alex Chiang wrote:
+> >>>>     
+> >>>>         
+> >>>>> Hi Alan, Rusty,
+> >>>>>       
+> >>>>>           
+> >>>> Hi Alex,
+> >>>>
+> >>>>     
+> >>>>         
+> >>>>> In the meantime, while Alan is deciding the proper way to fix
+> >>>>> this, would it be possible to drop the offending patch series
+> >>>>> from linux-next?
+> >>>>>       
+> >>>>>           
+> >>>> Done.  That takes the pressure off Alan, and makes sure he has time to get
+> >>>> it right.
+> >>>>     
+> >>>>         
+> >>> That probably suits us on parisc too.  I just checked out our build in
+> >>> linux-next: we don't pass __modpost ... it looks like we have all the
+> >>> module symbols undefined.  Will investigate more.
+> >>>
+> >>> James
+> >>>   
+> >>>       
+> >> I think parisc wants P'printk where ia64 uses @fptr(printk).
+> >>
+> >> It may also need ".import printk,code" or similar.
+> >>     
+> >
+> > I think if you have to make modpost architecture specific, there's
+> > something a bit wrong in the patch series.
+> >
+> > I can confirm that reverting this particular patch allows the parisc
+> > build to work again.  It still won't boot because module symbols aren't
+> > resolved.
+> >
+> > James
+> >   
+> 
+> Yes, the series as a whole relies on that patch.  Rusty pulled the 
+> series from linux-next (thanks rusty!).
 
-This doesn't work if one runs make silentoldconfig directly. I fixed
-this with the following patch in my tree (will be pushed out soon).
+Not according to current linux-next:
 
-Michal
+jejb@ion> git log next-20091125|grep -3 'sort the list of symbols'
+Author: Alan Jenkins <alan-jenkins@tuffmail.co.uk>
+Date:   Sat Nov 7 21:03:56 2009 +0000
 
-Subject: [PATCH] kbuild: create include/generated in silentoldconfig
+    kbuild: sort the list of symbols exported by the kernel (__ksymtab)
+    
+    modpost of vmlinux.o now extracts the ksymtab sections and outputs
+    sorted versions of them as .tmp_exports-asm.S.  These sorted sections
 
-The toplevel Makefile creates the directory if it runs silentoldconfig
-automatically, but if run manually, it fails:
+Could we please have this removed so we can resume our testing of next?
 
-  $ make mrproper
-  $ make defconfig && make silentoldconfig
-  *** Default configuration is based on 'x86_64_defconfig'
-  #
-  # configuration written to .config
-  #
-  scripts/kconfig/conf -s arch/x86/Kconfig
+> I'm working on alternatives now.  I can't promise to avoid architecture 
+> specific code, but if it's necessary then I understand I have to arrange 
+> to test it myself :-).  Sorry for the inconvenience caused by 
+> "arch-independent assembly code" that wasn't.
 
-  *** Error during update of the kernel configuration.
-  ...
+I'm not sure I understand what you're trying to do, but it seems to me
+that the way to do what you want is to introduce an arch macro for
+function pointer which we all define in our headers to be however our
+assemblers represent it ... for non fptr arches this would be an
+identity.
 
-Move the mkdir command to the silentoldconfig target to make it work.
+We don't need there to be no arch changes ... but we do need any arch
+specificity confined to arch specific files.
 
-Signed-off-by: Michal Marek <mmarek@suse.cz>
----
- Makefile                 |    1 -
- scripts/kconfig/Makefile |    1 +
- 2 files changed, 1 insertions(+), 1 deletions(-)
+James
 
-diff --git a/Makefile b/Makefile
-index 7bd2531..74ad9a9 100644
---- a/Makefile
-+++ b/Makefile
-@@ -491,7 +491,6 @@ $(KCONFIG_CONFIG) include/config/auto.conf.cmd: ;
- # if auto.conf.cmd is missing then we are probably in a cleaned tree so
- # we execute the config step to be sure to catch updated Kconfig files
- include/config/auto.conf: $(KCONFIG_CONFIG) include/config/auto.conf.cmd
--	$(Q)mkdir -p include/generated
- 	$(Q)$(MAKE) -f $(srctree)/Makefile silentoldconfig
- else
- # external modules needs include/generated/autoconf.h and include/config/auto.conf
-diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
-index 6d69c7c..ca5ce8e 100644
---- a/scripts/kconfig/Makefile
-+++ b/scripts/kconfig/Makefile
-@@ -27,6 +27,7 @@ oldconfig: $(obj)/conf
- 	$< -o $(Kconfig)
- 
- silentoldconfig: $(obj)/conf
-+	$(Q)mkdir -p include/generated
- 	$< -s $(Kconfig)
- 
- localmodconfig: $(obj)/streamline_config.pl $(obj)/conf
--- 
-1.6.4.2
 
