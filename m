@@ -1,79 +1,153 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ey-out-2122.google.com ([74.125.78.25]:24007 "EHLO
-	ey-out-2122.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752270AbZKYJPR (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 25 Nov 2009 04:15:17 -0500
-Message-ID: <4B0CF5A6.7080908@tuffmail.co.uk>
-Date: Wed, 25 Nov 2009 09:15:18 +0000
-From: Alan Jenkins <alan-jenkins@tuffmail.co.uk>
+Received: from cantor.suse.de ([195.135.220.2]:57781 "EHLO mx1.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1758487AbZKYJir (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 25 Nov 2009 04:38:47 -0500
+Date: Wed, 25 Nov 2009 10:38:51 +0100
+From: Michal Marek <mmarek@suse.cz>
+Subject: [PATCH] Support loading and saving custom remarks in .config
+Message-ID: <20091125093851.GA14314@sepie.suse.cz>
+References: <cover.1256767265.git.aragorn@Anduril.ringwar.org>
+ <b106dec1237ab723ae6a2404d42601bf20704bf3.1256767265.git.aragorn@Anduril.ringwar.org>
+ <4B0C57EA.1030400@suse.cz>
 MIME-Version: 1.0
-Subject: Re: [PATCH 05/10] kbuild: sort the list of symbols exported by the
- kernel (__ksymtab)
-References: <9b2b86520911020852q49c55695rb05d87090fa9ad33@mail.gmail.com>	 <4B072E31.4000906@tuffmail.co.uk> <20091123195320.GD26810@ldl.fc.hp.com>	 <200911241127.18013.rusty@rustcorp.com.au>	 <1259041182.2433.945.camel@mulgrave.site> <4B0BA725.2050604@tuffmail.co.uk> <1259102629.4549.842.camel@mulgrave.site>
-In-Reply-To: <1259102629.4549.842.camel@mulgrave.site>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4B0C57EA.1030400@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: James Bottomley <James.Bottomley@HansenPartnership.com>
-Cc: Rusty Russell <rusty@rustcorp.com.au>, Alex Chiang <achiang@hp.com>, Tony Luck <tony.luck@gmail.com>, Sam Ravnborg <sam@ravnborg.org>, Mike Frysinger <vapier.adi@gmail.com>, greg@kroah.com, linux-kbuild@vger.kernel.org, carmelo73@gmail.com, linux-kernel@vger.kernel.org, kyle@mcmartin.ca, deller@gmx.de, jejb@parisc-linux.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>, paulus@samba.org
+To: Bernhard Kaindl <bernhard.kaindl@gmx.net>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Roman Zippel <zippel@linux-m68k.org>
 
-James Bottomley wrote:
-> On Tue, 2009-11-24 at 09:28 +0000, Alan Jenkins wrote:
->   
->> James Bottomley wrote:
->>     
->>> On Tue, 2009-11-24 at 11:27 +1030, Rusty Russell wrote:
->>>   
->>>       
->>>> On Tue, 24 Nov 2009 06:23:20 am Alex Chiang wrote:
->>>>     
->>>>         
->>>>> Hi Alan, Rusty,
->>>>>       
->>>>>           
->>>> Hi Alex,
->>>>
->>>>     
->>>>         
->>>>> In the meantime, while Alan is deciding the proper way to fix
->>>>> this, would it be possible to drop the offending patch series
->>>>> from linux-next?
->>>>>       
->>>>>           
->>>> Done.  That takes the pressure off Alan, and makes sure he has time to get
->>>> it right.
->>>>     
->>>>         
->>> That probably suits us on parisc too.  I just checked out our build in
->>> linux-next: we don't pass __modpost ... it looks like we have all the
->>> module symbols undefined.  Will investigate more.
->>>
->>> James
->>>   
->>>       
->> I think parisc wants P'printk where ia64 uses @fptr(printk).
->>
->> It may also need ".import printk,code" or similar.
->>     
->
-> I think if you have to make modpost architecture specific, there's
-> something a bit wrong in the patch series.
->
-> I can confirm that reverting this particular patch allows the parisc
-> build to work again.  It still won't boot because module symbols aren't
-> resolved.
->
-> James
->   
+To make it easier for users to maintain their .config over time, add
+support for one-line comments (remarks) attached to config option
+assignments. The format is
 
-Yes, the series as a whole relies on that patch.  Rusty pulled the 
-series from linux-next (thanks rusty!).
+  # some remark
+  CONFIG_FOO=y
+  # another remark
+  # CONFIG_BAR is not set
 
-I'm working on alternatives now.  I can't promise to avoid architecture 
-specific code, but if it's necessary then I understand I have to arrange 
-to test it myself :-).  Sorry for the inconvenience caused by 
-"arch-independent assembly code" that wasn't.
+If a config option is removed, the respective remark is removed as well.
+This patch is based on a previous patch by Bernhard Kaindl.
 
-Alan
+Signed-off-by: Michal Marek <mmarek@suse.cz>
+---
+ scripts/kconfig/confdata.c |   52 +++++++++++++++++++++++++++++++++++++++++++-
+ scripts/kconfig/expr.h     |    1 +
+ 2 files changed, 52 insertions(+), 1 deletions(-)
+
+diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
+index b55e72f..daa7d78 100644
+--- a/scripts/kconfig/confdata.c
++++ b/scripts/kconfig/confdata.c
+@@ -152,13 +152,46 @@ static int conf_set_sym_val(struct symbol *sym, int def, int def_flags, char *p)
+ 	return 0;
+ }
+ 
++static char *extract_remark(const char *line)
++{
++	const char *p;
++	char *res, *p2;
++	static const char *alnum =
++		"ABCDEFGHIJKLMNOPQRSTUVWXYZ"
++		"abcdefghijklmnopqrstuvwxyz"
++		"0123456789_";
++
++
++	if (!line || *line != '#')
++		return NULL;
++	line++;
++	line += strspn(line, " \t");
++	if (!*line || *line == '\n')
++		return NULL;
++	if (strncmp(line, "CONFIG_", sizeof("CONFIG_") - 1) != 0)
++		goto found;
++	p = line + strspn(line, alnum);
++	if (strcmp(p, " is not set\n") == 0)
++		return NULL;
++	/* skip commented out assignments */
++	if (p[1] == '=' && !strchr(p, ' ') && !strchr(p, '\t'))
++		return NULL;
++found:
++	res = strdup(line);
++	p2 = strchr(res, '\n');
++	if (p2)
++		*p2 = '\0';
++	return res;
++}
++
+ int conf_read_simple(const char *name, int def)
+ {
+ 	FILE *in = NULL;
+ 	char line[1024];
+ 	char *p, *p2;
+ 	struct symbol *sym;
+-	int i, def_flags;
++	char *last_remark;
++	int i, def_flags, last_remark_lineno;
+ 
+ 	if (name) {
+ 		in = zconf_fopen(name);
+@@ -195,6 +228,8 @@ load:
+ 	conf_lineno = 0;
+ 	conf_warnings = 0;
+ 	conf_unsaved = 0;
++	last_remark = NULL;
++	last_remark_lineno = 0;
+ 
+ 	def_flags = SYMBOL_DEF << def;
+ 	for_all_symbols(i, sym) {
+@@ -215,8 +250,15 @@ load:
+ 	}
+ 
+ 	while (fgets(line, sizeof(line), in)) {
++		char *remark;
+ 		conf_lineno++;
+ 		sym = NULL;
++		remark = extract_remark(line);
++		if (remark) {
++			free(last_remark);
++			last_remark = remark;
++			last_remark_lineno = conf_lineno;
++		}
+ 		switch (line[0]) {
+ 		case '#':
+ 			if (memcmp(line + 2, "CONFIG_", 7))
+@@ -309,6 +351,12 @@ load:
+ 			}
+ 			cs->def[def].tri = EXPR_OR(cs->def[def].tri, sym->def[def].tri);
+ 		}
++		if (sym && last_remark &&
++				last_remark_lineno == conf_lineno - 1) {
++			sym->remark = last_remark;
++			/* don't free() the string in the next iteration */
++			last_remark = NULL;
++		}
+ 	}
+ 	fclose(in);
+ 
+@@ -484,6 +532,8 @@ int conf_write(const char *name)
+ 				if (modules_sym->curr.tri == no)
+ 					type = S_BOOLEAN;
+ 			}
++			if (sym->remark)
++				fprintf(out, "# %s\n", sym->remark);
+ 			switch (type) {
+ 			case S_BOOLEAN:
+ 			case S_TRISTATE:
+diff --git a/scripts/kconfig/expr.h b/scripts/kconfig/expr.h
+index 6408fef..217e8cb 100644
+--- a/scripts/kconfig/expr.h
++++ b/scripts/kconfig/expr.h
+@@ -77,6 +77,7 @@ enum {
+ struct symbol {
+ 	struct symbol *next;
+ 	char *name;
++	char *remark;
+ 	enum symbol_type type;
+ 	struct symbol_value curr;
+ 	struct symbol_value def[S_DEF_COUNT];
+-- 
+1.6.4.2
+
