@@ -1,56 +1,76 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-yx0-f188.google.com ([209.85.210.188]:46981 "EHLO
-	mail-yx0-f188.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750891AbZKZTDp convert rfc822-to-8bit (ORCPT
+Received: from pfepb.post.tele.dk ([195.41.46.236]:59159 "EHLO
+	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750888AbZKZThr (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 26 Nov 2009 14:03:45 -0500
+	Thu, 26 Nov 2009 14:37:47 -0500
+Date: Thu, 26 Nov 2009 20:37:50 +0100
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: linux-kbuild.git
+Message-ID: <20091126193750.GA15453@merkur.ravnborg.org>
+References: <4B0E73E1.50900@suse.cz>
 MIME-Version: 1.0
-In-Reply-To: <4B0E634B.8070506@suse.cz>
-References: <1259124522-26050-1-git-send-email-vapier@gentoo.org>
-	<4B0E634B.8070506@suse.cz>
-From: Mike Frysinger <vapier.adi@gmail.com>
-Date: Thu, 26 Nov 2009 14:03:31 -0500
-Message-ID: <8bd0f97a0911261103w499540e1p24d9cb219808c0b9@mail.gmail.com>
-Subject: Re: [PATCH] kconfig: display an error message when aborting
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4B0E73E1.50900@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>, linux-kernel@vger.kernel.org
+Cc: Stephen Rothwell <sfr@canb.auug.org.au>, An?bal Monsalve Salazar <anibal@debian.org>, Andrew Morton <akpm@linux-foundation.org>, linux-kbuild@vger.kernel.org, lkml <linux-kernel@vger.kernel.org>
 
-2009/11/26 Michal Marek
-> On 25.11.2009 05:48, Mike Frysinger wrote:
->> If the Kconfig option causes an open() failure (like one that starts with
->> an underscore), there should be an error message shown since we're going
->> to be exiting with an error code.  Otherwise, the reason for the failure
->> can really only be diagnosed with strace or something similar.
->>
->> Signed-off-by: Mike Frysinger <vapier@gentoo.org>
->> ---
->>  scripts/kconfig/confdata.c |    2 ++
->>  1 files changed, 2 insertions(+), 0 deletions(-)
->>
->> diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
->> index b55e72f..e2644b4 100644
->> --- a/scripts/kconfig/confdata.c
->> +++ b/scripts/kconfig/confdata.c
->> @@ -640,6 +640,8 @@ static int conf_split_config(void)
->>               fd = open(path, O_WRONLY | O_CREAT | O_TRUNC, 0644);
->>               if (fd == -1) {
->>                       if (errno != ENOENT) {
->> +                             conf_warning("sym '%s' with path '%s': %s",
->> +                                          sym->name, path, strerror(errno));
->>                               res = 1;
->>                               break;
->>                       }
->
-> I agree that there definitely needs to be some error reporting (and not
-> only here but in many more places, look e.g. at conf_write() or
-> conf_write_autoconf()), but why use conf_warning() for this? It will
-> prefix the error message with "include/config/auto.conf:<last lineno>",
-> which has nothing to do with the path that could not be opened.
+On Thu, Nov 26, 2009 at 01:26:09PM +0100, Michal Marek wrote:
+> Hi Stephen,
+> 
+> I went through the patches posted to linux-kbuild and picked those that
+> were easy enough to review, looked safe and worked for me. I also took
+> Sam's series from kbuild-next.git, but I didn't really review it yet, so
+> there is no signoff from me (TBD). The repo is at
+> 
+>   git://repo.or.cz/linux-kbuild.git for-next
+> 
+> Please ignore the other branches. The shortlog is
+> 
+> Jie Zhang (1):
+>       net: add net_tstamp.h to headers_install
+> 
+> Jonathan Nieder (2):
+>       scripts/package: add KBUILD_PKG_ROOTCMD variable
+>       scripts/package: deb-pkg: use fakeroot if available
+> 
+> Michael Tokarev (1):
+>       kbuild: fix bzImage build for x86
+> 
+> Michal Marek (2):
+>       scripts/package: tar-pkg: use tar --owner=root
+>       kbuild: create include/generated in silentoldconfig
+> 
+> Sam Ravnborg (14):
+>       kbuild: search arch/$ARCH/include before include/
+>       dontdiff: add generated
+>       kbuild: move bounds.h to include/generated
+>       kbuild: move asm-offsets.h to include/generated
+>       ia64: move nr-irqs.h to include/generated
+>       arm: move mach-types to include/generated
+>       sh: move machtypes.h to include/generated
+>       kbuild: drop include2/ used for O=... builds
+>       kbuild: do not check for include/asm-$ARCH
+>       kbuild: drop include/asm
+>       kbuild: move compile.h to include/generated
+>       drop explicit include of autoconf.h
+>       kbuild: move autoconf.h to include/generated
+>       kbuild: move utsrelease.h to include/generated
+> 
+> Wenji Huang (2):
+>       Kbuild: clear marker out of modpost
+>       Kbuild: clean up marker
+> 
+> There are some more patches on the mailing list and in -mm, which I'm
+> going to look at, but I think this should be a good start. What do you
+> think? Could this be added to linux-next?
 
-no it doesnt.  it prefixes the config file name which i think is relevant.
-    .config:1871:warning: sym '_BF548' with path '/bf548.h': Permission denied
--mike
+Looks good.
+Good to see you picked up some of the patches that were pending.
+
+Stephen - please replace my kbuild trees with this.
+
+	Sam
