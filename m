@@ -1,51 +1,67 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor.suse.de ([195.135.220.2]:58525 "EHLO mx1.suse.de"
+Received: from cantor.suse.de ([195.135.220.2]:33723 "EHLO mx1.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1759203AbZKZLPS (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 26 Nov 2009 06:15:18 -0500
-Message-ID: <4B0E634B.8070506@suse.cz>
-Date: Thu, 26 Nov 2009 12:15:23 +0100
+	id S1760378AbZKZM0G (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 26 Nov 2009 07:26:06 -0500
+Message-ID: <4B0E73E1.50900@suse.cz>
+Date: Thu, 26 Nov 2009 13:26:09 +0100
 From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Subject: Re: [PATCH] kconfig: display an error message when aborting
-References: <1259124522-26050-1-git-send-email-vapier@gentoo.org>
-In-Reply-To: <1259124522-26050-1-git-send-email-vapier@gentoo.org>
+Subject: linux-kbuild.git
 Content-Type: text/plain; charset=ISO-8859-2
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Mike Frysinger <vapier@gentoo.org>
-Cc: linux-kbuild@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>, linux-kernel@vger.kernel.org
+To: Stephen Rothwell <sfr@canb.auug.org.au>
+Cc: Sam Ravnborg <sam@ravnborg.org>, =?ISO-8859-2?Q?An=EDbal_Monsalve_?= =?ISO-8859-2?Q?Salazar?= <anibal@debian.org>, Andrew Morton <akpm@linux-foundation.org>, linux-kbuild@vger.kernel.org, lkml <linux-kernel@vger.kernel.org>
 
-On 25.11.2009 05:48, Mike Frysinger wrote:
-> If the Kconfig option causes an open() failure (like one that starts with
-> an underscore), there should be an error message shown since we're going
-> to be exiting with an error code.  Otherwise, the reason for the failure
-> can really only be diagnosed with strace or something similar.
-> 
-> Signed-off-by: Mike Frysinger <vapier@gentoo.org>
-> ---
->  scripts/kconfig/confdata.c |    2 ++
->  1 files changed, 2 insertions(+), 0 deletions(-)
-> 
-> diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
-> index b55e72f..e2644b4 100644
-> --- a/scripts/kconfig/confdata.c
-> +++ b/scripts/kconfig/confdata.c
-> @@ -640,6 +640,8 @@ static int conf_split_config(void)
->  		fd = open(path, O_WRONLY | O_CREAT | O_TRUNC, 0644);
->  		if (fd == -1) {
->  			if (errno != ENOENT) {
-> +				conf_warning("sym '%s' with path '%s': %s",
-> +					     sym->name, path, strerror(errno));
->  				res = 1;
->  				break;
->  			}
+Hi Stephen,
 
-I agree that there definitely needs to be some error reporting (and not
-only here but in many more places, look e.g. at conf_write() or
-conf_write_autoconf()), but why use conf_warning() for this? It will
-prefix the error message with "include/config/auto.conf:<last lineno>",
-which has nothing to do with the path that could not be opened.
+I went through the patches posted to linux-kbuild and picked those that
+were easy enough to review, looked safe and worked for me. I also took
+Sam's series from kbuild-next.git, but I didn't really review it yet, so
+there is no signoff from me (TBD). The repo is at
+
+  git://repo.or.cz/linux-kbuild.git for-next
+
+Please ignore the other branches. The shortlog is
+
+Jie Zhang (1):
+      net: add net_tstamp.h to headers_install
+
+Jonathan Nieder (2):
+      scripts/package: add KBUILD_PKG_ROOTCMD variable
+      scripts/package: deb-pkg: use fakeroot if available
+
+Michael Tokarev (1):
+      kbuild: fix bzImage build for x86
+
+Michal Marek (2):
+      scripts/package: tar-pkg: use tar --owner=root
+      kbuild: create include/generated in silentoldconfig
+
+Sam Ravnborg (14):
+      kbuild: search arch/$ARCH/include before include/
+      dontdiff: add generated
+      kbuild: move bounds.h to include/generated
+      kbuild: move asm-offsets.h to include/generated
+      ia64: move nr-irqs.h to include/generated
+      arm: move mach-types to include/generated
+      sh: move machtypes.h to include/generated
+      kbuild: drop include2/ used for O=... builds
+      kbuild: do not check for include/asm-$ARCH
+      kbuild: drop include/asm
+      kbuild: move compile.h to include/generated
+      drop explicit include of autoconf.h
+      kbuild: move autoconf.h to include/generated
+      kbuild: move utsrelease.h to include/generated
+
+Wenji Huang (2):
+      Kbuild: clear marker out of modpost
+      Kbuild: clean up marker
+
+There are some more patches on the mailing list and in -mm, which I'm
+going to look at, but I think this should be a good start. What do you
+think? Could this be added to linux-next?
 
 Michal
