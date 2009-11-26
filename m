@@ -1,67 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor.suse.de ([195.135.220.2]:33723 "EHLO mx1.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1760378AbZKZM0G (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 26 Nov 2009 07:26:06 -0500
-Message-ID: <4B0E73E1.50900@suse.cz>
-Date: Thu, 26 Nov 2009 13:26:09 +0100
-From: Michal Marek <mmarek@suse.cz>
-MIME-Version: 1.0
-Subject: linux-kbuild.git
-Content-Type: text/plain; charset=ISO-8859-2
-Content-Transfer-Encoding: 7bit
+Received: from cable-static-49-187.intergga.ch ([157.161.49.187]:42363 "EHLO
+	mail.ffwll.ch" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1759287AbZKZMkG (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 26 Nov 2009 07:40:06 -0500
+From: Daniel Vetter <daniel.vetter@ffwll.ch>
+Subject: [PATCH] kbuild: specify absolute paths for cscope
+Date: Thu, 26 Nov 2009 13:34:12 +0100
+Message-Id: <1259238852-21214-1-git-send-email-daniel.vetter@ffwll.ch>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Stephen Rothwell <sfr@canb.auug.org.au>
-Cc: Sam Ravnborg <sam@ravnborg.org>, =?ISO-8859-2?Q?An=EDbal_Monsalve_?= =?ISO-8859-2?Q?Salazar?= <anibal@debian.org>, Andrew Morton <akpm@linux-foundation.org>, linux-kbuild@vger.kernel.org, lkml <linux-kernel@vger.kernel.org>
+To: linux-kbuild@vger.kernel.org
+Cc: Daniel Vetter <daniel.vetter@ffwll.ch>
 
-Hi Stephen,
+Some tools (like my favourite editor, vim) can't handle relative
+paths from cscope as soon as cscope.out is no longer in $PWD. Use
+absolute paths when generating cscope.files, which seems to be
+the recommended way to generate cscope.out, anyway (at least according
+to cscope.sf.net).
 
-I went through the patches posted to linux-kbuild and picked those that
-were easy enough to review, looked safe and worked for me. I also took
-Sam's series from kbuild-next.git, but I didn't really review it yet, so
-there is no signoff from me (TBD). The repo is at
+Signed-off-by: Daniel Vetter <daniel.vetter@ffwll.ch>
+---
+ scripts/tags.sh |    4 +++-
+ 1 files changed, 3 insertions(+), 1 deletions(-)
 
-  git://repo.or.cz/linux-kbuild.git for-next
+diff --git a/scripts/tags.sh b/scripts/tags.sh
+index d52f7a0..49bffed 100755
+--- a/scripts/tags.sh
++++ b/scripts/tags.sh
+@@ -89,7 +89,9 @@ all_defconfigs()
+ 
+ docscope()
+ {
+-	(echo \-k; echo \-q; all_sources) > cscope.files
++	# use absolute paths - vim likes it that way
++	tree=$PWD/$tree
++	(cd /; echo \-k; echo \-q; all_sources) > cscope.files
+ 	cscope -b -f cscope.out
+ }
+ 
+-- 
+1.6.5.3
 
-Please ignore the other branches. The shortlog is
-
-Jie Zhang (1):
-      net: add net_tstamp.h to headers_install
-
-Jonathan Nieder (2):
-      scripts/package: add KBUILD_PKG_ROOTCMD variable
-      scripts/package: deb-pkg: use fakeroot if available
-
-Michael Tokarev (1):
-      kbuild: fix bzImage build for x86
-
-Michal Marek (2):
-      scripts/package: tar-pkg: use tar --owner=root
-      kbuild: create include/generated in silentoldconfig
-
-Sam Ravnborg (14):
-      kbuild: search arch/$ARCH/include before include/
-      dontdiff: add generated
-      kbuild: move bounds.h to include/generated
-      kbuild: move asm-offsets.h to include/generated
-      ia64: move nr-irqs.h to include/generated
-      arm: move mach-types to include/generated
-      sh: move machtypes.h to include/generated
-      kbuild: drop include2/ used for O=... builds
-      kbuild: do not check for include/asm-$ARCH
-      kbuild: drop include/asm
-      kbuild: move compile.h to include/generated
-      drop explicit include of autoconf.h
-      kbuild: move autoconf.h to include/generated
-      kbuild: move utsrelease.h to include/generated
-
-Wenji Huang (2):
-      Kbuild: clear marker out of modpost
-      Kbuild: clean up marker
-
-There are some more patches on the mailing list and in -mm, which I'm
-going to look at, but I think this should be a good start. What do you
-think? Could this be added to linux-next?
-
-Michal
