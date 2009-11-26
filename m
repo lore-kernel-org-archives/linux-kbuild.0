@@ -1,88 +1,56 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-bw0-f227.google.com ([209.85.218.227]:44264 "EHLO
-	mail-bw0-f227.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755733AbZKZRO4 (ORCPT
+Received: from mail-yx0-f188.google.com ([209.85.210.188]:46981 "EHLO
+	mail-yx0-f188.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750891AbZKZTDp convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 26 Nov 2009 12:14:56 -0500
-Message-ID: <4B0EB78F.8040600@tuffmail.co.uk>
-Date: Thu, 26 Nov 2009 17:14:55 +0000
-From: Alan Jenkins <alan-jenkins@tuffmail.co.uk>
+	Thu, 26 Nov 2009 14:03:45 -0500
 MIME-Version: 1.0
-Subject: Re: [PATCH 05/10] kbuild: sort the list of symbols exported by the
- kernel (__ksymtab)
-References: <9b2b86520911020852q49c55695rb05d87090fa9ad33@mail.gmail.com>	<1257242782-10496-6-git-send-email-alan-jenkins@tuffmail.co.uk> <20091125164033.655810b7.akpm@linux-foundation.org>
-In-Reply-To: <20091125164033.655810b7.akpm@linux-foundation.org>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <4B0E634B.8070506@suse.cz>
+References: <1259124522-26050-1-git-send-email-vapier@gentoo.org>
+	<4B0E634B.8070506@suse.cz>
+From: Mike Frysinger <vapier.adi@gmail.com>
+Date: Thu, 26 Nov 2009 14:03:31 -0500
+Message-ID: <8bd0f97a0911261103w499540e1p24d9cb219808c0b9@mail.gmail.com>
+Subject: Re: [PATCH] kconfig: display an error message when aborting
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andrew Morton <akpm@linux-foundation.org>
-Cc: greg@kroah.com, linux-kbuild@vger.kernel.org, carmelo73@gmail.com, linux-kernel@vger.kernel.org, rusty@rustcorp.com.au, Sam Ravnborg <sam@ravnborg.org>
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>, linux-kernel@vger.kernel.org
 
-Andrew Morton wrote:
-> On Tue,  3 Nov 2009 10:06:17 +0000
-> Alan Jenkins <alan-jenkins@tuffmail.co.uk> wrote:
->
->   
->> modpost of vmlinux.o now extracts the ksymtab sections and outputs
->> sorted versions of them as .tmp_exports-asm.S.  These sorted sections
->> are linked into vmlinux and the original unsorted sections are
->> discarded.
+2009/11/26 Michal Marek
+> On 25.11.2009 05:48, Mike Frysinger wrote:
+>> If the Kconfig option causes an open() failure (like one that starts with
+>> an underscore), there should be an error message shown since we're going
+>> to be exiting with an error code.  Otherwise, the reason for the failure
+>> can really only be diagnosed with strace or something similar.
 >>
->> This will allow modules to be loaded faster, resolving symbols using
->> binary search, without any increase in the memory needed for the
->> symbol tables.
+>> Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+>> ---
+>>  scripts/kconfig/confdata.c |    2 ++
+>>  1 files changed, 2 insertions(+), 0 deletions(-)
 >>
->> This does not affect the building of modules, so hopefully it won't
->> affect compile times too much.
->>
->> Minimally tested on ARM under QEMU emulator.
->> Build tested on blackfin; output of "size -A" unchanged.
->>     
+>> diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
+>> index b55e72f..e2644b4 100644
+>> --- a/scripts/kconfig/confdata.c
+>> +++ b/scripts/kconfig/confdata.c
+>> @@ -640,6 +640,8 @@ static int conf_split_config(void)
+>>               fd = open(path, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+>>               if (fd == -1) {
+>>                       if (errno != ENOENT) {
+>> +                             conf_warning("sym '%s' with path '%s': %s",
+>> +                                          sym->name, path, strerror(errno));
+>>                               res = 1;
+>>                               break;
+>>                       }
 >
-> I'm getting a segfault from write_exports().  
->
-> (gdb) bt
-> #0  0x0000003e5f075510 in strlen () from /lib64/libc.so.6
-> #1  0x0000003e5f045cb8 in vfprintf () from /lib64/libc.so.6
-> #2  0x0000003e5f06683a in vsnprintf () from /lib64/libc.so.6
-> #3  0x0000000000401897 in buf_printf (buf=0x7fff5514f5e0, 
->     fmt=0x7fff5514f4e0 "0x%02x ") at scripts/mod/modpost.c:1692
-> #4  0x00000000004042c8 in main (argc=1024, argv=0x7fff5514f5e0)
->     at scripts/mod/modpost.c:2063
-> (gdb) f 4
-> #4  0x00000000004042c8 in main (argc=1024, argv=0x7fff5514f5e0)
->     at scripts/mod/modpost.c:2063
-> 2063                    buf_printf(&buf, "__EXPORT_%s_SYMBOL(%s,"
-> (gdb) p sym
-> $1 = (struct symbol *) 0x65c9f0
-> (gdb) p *sym
-> $2 = {next = 0x64c3a0, module = 0x610010, crc = 4077789248, crc_valid = 1, 
->   weak = 0, vmlinux = 0, kernel = 0, preloaded = 0, function = 1, 
->   export = export_unknown, name = 0x65ca10 "simple_prepare_write"}
-> (gdb) p sym->export
-> $3 = export_unknown
-> (gdb) p/d sym->export
-> $4 = 5
->
-> but section_names[] (which could be static in write_exports() btw) has
-> only five entries.
->   
+> I agree that there definitely needs to be some error reporting (and not
+> only here but in many more places, look e.g. at conf_write() or
+> conf_write_autoconf()), but why use conf_warning() for this? It will
+> prefix the error message with "include/config/auto.conf:<last lineno>",
+> which has nothing to do with the path that could not be opened.
 
-Thanks.  I can't work out why this would happen.  Could you show the 
-options modpost is being run with (make V=1 will do)?  Also confirm 
-whether this is "MODPOST vmlinux.o" or "MODPOST 1001 modules".
-
-
- > main (argc=1024
-
-It looks like this is the step "MODPOST 1001 modules".  But that 
-shouldn't run write_exports().  We only run modpost with "-x" for the 
-step "MODPOST vmlinux.o".  Also, the vmlinux-only modpost is run first, 
-so I wonder why it didn't hit the same problem.
-
-I don't know why sym->vmlinux==0 either; simple_prepare_write() should 
-always be built into vmlinux.  Perhaps modpost is being run on libfs.o 
-for some strange reason.
-
-Alan
+no it doesnt.  it prefixes the config file name which i think is relevant.
+    .config:1871:warning: sym '_BF548' with path '/bf548.h': Permission denied
+-mike
