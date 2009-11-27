@@ -1,33 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ozlabs.org ([203.10.76.45]:38464 "EHLO ozlabs.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754427AbZK0LDM (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 27 Nov 2009 06:03:12 -0500
-From: Rusty Russell <rusty@rustcorp.com.au>
-Subject: Re: [PATCH 05/10] kbuild: sort the list of symbols exported by the kernel (__ksymtab)
-Date: Fri, 27 Nov 2009 21:33:15 +1030
-References: <9b2b86520911020852q49c55695rb05d87090fa9ad33@mail.gmail.com> <4B0CF5A6.7080908@tuffmail.co.uk> <1259161737.2535.6.camel@mulgrave.site>
-In-Reply-To: <1259161737.2535.6.camel@mulgrave.site>
+Received: from pfepb.post.tele.dk ([195.41.46.236]:52090 "EHLO
+	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751092AbZK0SRq (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 27 Nov 2009 13:17:46 -0500
+Date: Fri, 27 Nov 2009 19:17:49 +0100
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: [PATCH] unifdef: update to upstream revision 1.189
+Message-ID: <20091127181749.GA16177@merkur.ravnborg.org>
+References: <E1NE3M6-0003Za-OJ@hermes-1.csi.cam.ac.uk>
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <200911272133.15617.rusty@rustcorp.com.au>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <E1NE3M6-0003Za-OJ@hermes-1.csi.cam.ac.uk>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: James Bottomley <James.Bottomley@hansenpartnership.com>
-Cc: Alan Jenkins <alan-jenkins@tuffmail.co.uk>, Alex Chiang <achiang@hp.com>, Tony Luck <tony.luck@gmail.com>, Sam Ravnborg <sam@ravnborg.org>, Mike Frysinger <vapier.adi@gmail.com>, greg@kroah.com, linux-kbuild@vger.kernel.org, carmelo73@gmail.com, linux-kernel@vger.kernel.org, kyle@mcmartin.ca, deller@gmx.de, jejb@parisc-linux.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>, paulus@samba.org
+To: Tony Finch <dot@dotat.at>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>, Joe Perches <joe@perches.com>, Russell King <rmk+kernel@arm.linux.org.uk>, "Justin P. Mattock" <justinmattock@gmail.com>
 
-On Thu, 26 Nov 2009 01:38:57 am James Bottomley wrote:
-> On Wed, 2009-11-25 at 09:15 +0000, Alan Jenkins wrote:
-> > Yes, the series as a whole relies on that patch.  Rusty pulled the 
-> > series from linux-next (thanks rusty!).
+Hi Tony.
+
+On Fri, Nov 27, 2009 at 03:50:30PM +0000, Tony Finch wrote:
+> Fix handling of input files (e.g. with no newline at EOF) that could
+> make unifdef get into an unexpected state and call abort().
 > 
-> Not according to current linux-next:
+> The new -B option compresses blank lines around a deleted section
+> so that blank lines around "paragraphs" of code don't get doubled.
+> 
+> The evaluator can now handle macros with arguments, and unbracketed
+> arguments to the "defined" operator.
 
-Yeah, I pulled it for a day, then Alan produced the ia64 fix.
+Can you confirm that this does not regress with respect to the changes
+that Russell King implemented in the commit:
+eedc9d83eaab2d35fb9dd1ec25b765dec964e26c
+("kbuild: fix headers_exports with boolean expression")
 
-Pulling again until all acks are in...
 
-Thanks,
-Rusty.
+I long time ago started a small project to do a dedicated
+implementation of unifdef solely for use by the kernel.
+Today we do some preprocessing in perl - and then
+we pass the result to unifdef file by file.
+A dedicated program could do this much faster -
+and this would be a bigger incentive for the kernel supplied
+tools to actually use the exported headers.
+
+But I never got far with it and I think the code was
+lost when I changed computer some time ago.
+
+	Sam
