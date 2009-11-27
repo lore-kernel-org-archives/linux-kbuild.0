@@ -1,74 +1,95 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor.suse.de ([195.135.220.2]:59547 "EHLO mx1.suse.de"
+Received: from chilli.pcug.org.au ([203.10.76.44]:39758 "EHLO smtps.tip.net.au"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751170AbZKZUYo (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 26 Nov 2009 15:24:44 -0500
-Message-ID: <4B0EE411.4000907@suse.cz>
-Date: Thu, 26 Nov 2009 21:24:49 +0100
-From: Michal Marek <mmarek@suse.cz>
-MIME-Version: 1.0
-Subject: Re: [PATCH] kconfig: display an error message when aborting
-References: <1259124522-26050-1-git-send-email-vapier@gentoo.org> 	<4B0E634B.8070506@suse.cz> <8bd0f97a0911261103w499540e1p24d9cb219808c0b9@mail.gmail.com> 	<4B0EDFF4.2030909@suse.cz> <8bd0f97a0911261212q3b9cf6cm71235c6cf7fae40f@mail.gmail.com>
-In-Reply-To: <8bd0f97a0911261212q3b9cf6cm71235c6cf7fae40f@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+	id S1751971AbZK0EWM (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 26 Nov 2009 23:22:12 -0500
+Date: Fri, 27 Nov 2009 15:22:11 +1100
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+Subject: Re: linux-kbuild.git
+Message-Id: <20091127152211.55043dbb.sfr@canb.auug.org.au>
+In-Reply-To: <20091126193750.GA15453@merkur.ravnborg.org>
+References: <4B0E73E1.50900@suse.cz>
+	<20091126193750.GA15453@merkur.ravnborg.org>
+Mime-Version: 1.0
+Content-Type: multipart/signed; protocol="application/pgp-signature";
+ micalg="PGP-SHA1";
+ boundary="Signature=_Fri__27_Nov_2009_15_22_11_+1100_gxWKPyByXDZsZToy"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Mike Frysinger <vapier.adi@gmail.com>
-Cc: linux-kbuild@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>, linux-kernel@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>
+Cc: Sam Ravnborg <sam@ravnborg.org>, =?UTF-8?B?IkFuw61iYWwgTW9uc2FsdmUg?= =?UTF-8?B?U2FsYXphciI=?= <anibal@debian.org>, Andrew Morton <akpm@linux-foundation.org>, linux-kbuild@vger.kernel.org, lkml <linux-kernel@vger.kernel.org>
 
-Mike Frysinger napsal(a):
-> On Thu, Nov 26, 2009 at 15:07, Michal Marek wrote:
->> Mike Frysinger napsal(a):
->>> 2009/11/26 Michal Marek
->>>> On 25.11.2009 05:48, Mike Frysinger wrote:
->>>>> If the Kconfig option causes an open() failure (like one that starts with
->>>>> an underscore), there should be an error message shown since we're going
->>>>> to be exiting with an error code.  Otherwise, the reason for the failure
->>>>> can really only be diagnosed with strace or something similar.
->>>>>
->>>>> Signed-off-by: Mike Frysinger <vapier@gentoo.org>
->>>>> ---
->>>>>  scripts/kconfig/confdata.c |    2 ++
->>>>>  1 files changed, 2 insertions(+), 0 deletions(-)
->>>>>
->>>>> diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
->>>>> index b55e72f..e2644b4 100644
->>>>> --- a/scripts/kconfig/confdata.c
->>>>> +++ b/scripts/kconfig/confdata.c
->>>>> @@ -640,6 +640,8 @@ static int conf_split_config(void)
->>>>>               fd = open(path, O_WRONLY | O_CREAT | O_TRUNC, 0644);
->>>>>               if (fd == -1) {
->>>>>                       if (errno != ENOENT) {
->>>>> +                             conf_warning("sym '%s' with path '%s': %s",
->>>>> +                                          sym->name, path, strerror(errno));
->>>>>                               res = 1;
->>>>>                               break;
->>>>>                       }
->>>> I agree that there definitely needs to be some error reporting (and not
->>>> only here but in many more places, look e.g. at conf_write() or
->>>> conf_write_autoconf()), but why use conf_warning() for this? It will
->>>> prefix the error message with "include/config/auto.conf:<last lineno>",
->>>> which has nothing to do with the path that could not be opened.
->>> no it doesnt.  it prefixes the config file name which i think is relevant.
->>>     .config:1871:warning: sym '_BF548' with path '/bf548.h': Permission denied
->> Well, it prints either ".config" or "include/config/auto.conf",
->> depending whether there was a successful silentoldconfig pass before and
->> the latter file exists. But the number is the number of lines of the
->> respective file.
-> 
-> if you want to improve kconfig's error reporing in general, have at
-> it,
+--Signature=_Fri__27_Nov_2009_15_22_11_+1100_gxWKPyByXDZsZToy
+Content-Type: text/plain; charset=US-ASCII
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-I'll write something if time permits.
+Hi Michal,
 
-> but conf_warning() appears to be the standard in confdata.c for
-> reporting errors/warnings to stderr.  your complaint applies to just
-> about every usage of conf_warning() in confdata.c.  i'm not going to
-> create my own format and fprintf() directly to stderr.
+On Thu, 26 Nov 2009 20:37:50 +0100 Sam Ravnborg <sam@ravnborg.org> wrote:
+>
+> On Thu, Nov 26, 2009 at 01:26:09PM +0100, Michal Marek wrote:
+> >=20
+> > I went through the patches posted to linux-kbuild and picked those that
+> > were easy enough to review, looked safe and worked for me. I also took
+> > Sam's series from kbuild-next.git, but I didn't really review it yet, so
+> > there is no signoff from me (TBD). The repo is at
+> >=20
+> >   git://repo.or.cz/linux-kbuild.git for-next
+>=20
+> Looks good.
+> Good to see you picked up some of the patches that were pending.
+>=20
+> Stephen - please replace my kbuild trees with this.
 
-No. conf_warning() does the right thing when called from within
-conf_read_simple(), which maintains the conf_filename and conf_lineno
-variables. That's the point I was trying to make.
+I have replaced this from today.  Do you intend to run the equivalent of
+the kbuild-current tree (bug fixes for the current release while they are
+waiting to go to Linus)?  I have removed the kbuild-current tree for now
+since the only commit in it is in the new kbuild tree.
 
-Michal
+Thanks for adding your subsystem tree as a participant of linux-next.  As
+you may know, this is not a judgment of your code.  The purpose of
+linux-next is for integration testing and to lower the impact of
+conflicts between subsystems in the next merge window.=20
+
+You will need to ensure that the patches/commits in your tree/series have
+been:
+     * submitted under GPL v2 (or later) and include the Contributor's
+	Signed-off-by,
+     * posted to the relevant mailing list,
+     * reviewed by you (or another maintainer of your subsystem tree),
+     * successfully unit tested, and=20
+     * destined for the current or next Linux merge window.
+
+Basically, this should be just what you would send to Linus (or ask him
+to fetch).  It is allowed to be rebased if you deem it necessary.
+
+--=20
+Cheers,
+Stephen Rothwell=20
+sfr@canb.auug.org.au
+
+Legal Stuff:
+By participating in linux-next, your subsystem tree contributions are
+public and will be included in the linux-next trees.  You may be sent
+e-mail messages indicating errors or other issues when the
+patches/commits from your subsystem tree are merged and tested in
+linux-next.  These messages may also be cross-posted to the linux-next
+mailing list, the linux-kernel mailing list, etc.  The linux-next tree
+project and IBM (my employer) make no warranties regarding the linux-next
+project, the testing procedures, the results, the e-mails, etc.  If you
+don't agree to these ground rules, let me know and I'll remove your tree
+from participation in linux-next.
+
+--Signature=_Fri__27_Nov_2009_15_22_11_+1100_gxWKPyByXDZsZToy
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iEYEARECAAYFAksPU/MACgkQjjKRsyhoI8yQYQCgiDBjkauTqRCkX+vKVgJId4lo
+/kkAn0Zl8Anz+qfkn456wk+BICxMlhUD
+=8WMO
+-----END PGP SIGNATURE-----
+
+--Signature=_Fri__27_Nov_2009_15_22_11_+1100_gxWKPyByXDZsZToy--
