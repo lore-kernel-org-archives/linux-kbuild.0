@@ -1,76 +1,33 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor.suse.de ([195.135.220.2]:36153 "EHLO mx1.suse.de"
+Received: from ozlabs.org ([203.10.76.45]:38464 "EHLO ozlabs.org"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752596AbZK0Jmg (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 27 Nov 2009 04:42:36 -0500
-Message-ID: <4B0F9F0D.6010601@suse.cz>
-Date: Fri, 27 Nov 2009 10:42:37 +0100
-From: Michal Marek <mmarek@suse.cz>
+	id S1754427AbZK0LDM (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 27 Nov 2009 06:03:12 -0500
+From: Rusty Russell <rusty@rustcorp.com.au>
+Subject: Re: [PATCH 05/10] kbuild: sort the list of symbols exported by the kernel (__ksymtab)
+Date: Fri, 27 Nov 2009 21:33:15 +1030
+References: <9b2b86520911020852q49c55695rb05d87090fa9ad33@mail.gmail.com> <4B0CF5A6.7080908@tuffmail.co.uk> <1259161737.2535.6.camel@mulgrave.site>
+In-Reply-To: <1259161737.2535.6.camel@mulgrave.site>
 MIME-Version: 1.0
-Subject: Re: linux-kbuild.git
-References: <4B0E73E1.50900@suse.cz>	<20091126193750.GA15453@merkur.ravnborg.org> <20091127152211.55043dbb.sfr@canb.auug.org.au>
-In-Reply-To: <20091127152211.55043dbb.sfr@canb.auug.org.au>
-Content-Type: text/plain; charset=ISO-8859-2
+Content-Type: Text/Plain;
+  charset="utf-8"
 Content-Transfer-Encoding: 7bit
+Message-Id: <200911272133.15617.rusty@rustcorp.com.au>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Stephen Rothwell <sfr@canb.auug.org.au>
-Cc: Sam Ravnborg <sam@ravnborg.org>, =?ISO-8859-2?Q?An=EDbal_Monsalve_?= =?ISO-8859-2?Q?Salazar?= <anibal@debian.org>, Andrew Morton <akpm@linux-foundation.org>, linux-kbuild@vger.kernel.org, lkml <linux-kernel@vger.kernel.org>
+To: James Bottomley <James.Bottomley@hansenpartnership.com>
+Cc: Alan Jenkins <alan-jenkins@tuffmail.co.uk>, Alex Chiang <achiang@hp.com>, Tony Luck <tony.luck@gmail.com>, Sam Ravnborg <sam@ravnborg.org>, Mike Frysinger <vapier.adi@gmail.com>, greg@kroah.com, linux-kbuild@vger.kernel.org, carmelo73@gmail.com, linux-kernel@vger.kernel.org, kyle@mcmartin.ca, deller@gmx.de, jejb@parisc-linux.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>, paulus@samba.org
 
-On 27.11.2009 05:22, Stephen Rothwell wrote:
-> Hi Michal,
+On Thu, 26 Nov 2009 01:38:57 am James Bottomley wrote:
+> On Wed, 2009-11-25 at 09:15 +0000, Alan Jenkins wrote:
+> > Yes, the series as a whole relies on that patch.  Rusty pulled the 
+> > series from linux-next (thanks rusty!).
 > 
-> On Thu, 26 Nov 2009 20:37:50 +0100 Sam Ravnborg <sam@ravnborg.org> wrote:
->>
->> On Thu, Nov 26, 2009 at 01:26:09PM +0100, Michal Marek wrote:
->>>
->>> I went through the patches posted to linux-kbuild and picked those that
->>> were easy enough to review, looked safe and worked for me. I also took
->>> Sam's series from kbuild-next.git, but I didn't really review it yet, so
->>> there is no signoff from me (TBD). The repo is at
->>>
->>>   git://repo.or.cz/linux-kbuild.git for-next
->>
->> Looks good.
->> Good to see you picked up some of the patches that were pending.
->>
->> Stephen - please replace my kbuild trees with this.
-> 
-> I have replaced this from today.
+> Not according to current linux-next:
 
-Thanks!
+Yeah, I pulled it for a day, then Alan produced the ia64 fix.
 
+Pulling again until all acks are in...
 
->  Do you intend to run the equivalent of
-> the kbuild-current tree (bug fixes for the current release while they are
-> waiting to go to Linus)?  I have removed the kbuild-current tree for now
-> since the only commit in it is in the new kbuild tree.
-
-I plan to maintain such a branch, but I thought I would base the
-for-next branch on top of it, so that you get everything in one pack. Or
-would you still prefer to have two kbuild branches in linux-next, so
-that you can remove the for-next branch if necessary and keep the
-for-current branch? Just tell me what fits you best.
-
-
-
-> Thanks for adding your subsystem tree as a participant of linux-next.  As
-> you may know, this is not a judgment of your code.  The purpose of
-> linux-next is for integration testing and to lower the impact of
-> conflicts between subsystems in the next merge window. 
-> 
-> You will need to ensure that the patches/commits in your tree/series have
-> been:
->      * submitted under GPL v2 (or later) and include the Contributor's
-> 	Signed-off-by,
->      * posted to the relevant mailing list,
->      * reviewed by you (or another maintainer of your subsystem tree),
->      * successfully unit tested, and 
->      * destined for the current or next Linux merge window.
-> 
-> Basically, this should be just what you would send to Linus (or ask him
-> to fetch).  It is allowed to be rebased if you deem it necessary.
-
-OK, will keep that in mind.
-
-Michal
+Thanks,
+Rusty.
