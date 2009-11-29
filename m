@@ -1,77 +1,68 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from master.debian.org ([70.103.162.29]:32990 "EHLO
-	master.debian.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751017AbZK2HJJ (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 29 Nov 2009 02:09:09 -0500
-Date: Sun, 29 Nov 2009 18:09:03 +1100
-From: =?iso-8859-1?Q?An=EDbal?= Monsalve Salazar <anibal@debian.org>
-Subject: Re: Stepping down as kbuild maintainer
-Message-ID: <20091129070903.GA3843@master.debian.org>
-References: <20091120182249.GA28251@merkur.ravnborg.org>
- <20091121224444.GA5296@master.debian.org>
- <4B0AFA20.9090200@suse.cz>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <4B0AFA20.9090200@suse.cz>
+Received: from chilli.pcug.org.au ([203.10.76.44]:39996 "EHLO smtps.tip.net.au"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753265AbZK2V5M (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 29 Nov 2009 16:57:12 -0500
+Date: Mon, 30 Nov 2009 08:57:13 +1100
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+Subject: Re: linux-kbuild.git
+Message-Id: <20091130085713.75f56423.sfr@canb.auug.org.au>
+In-Reply-To: <4B0F9F0D.6010601@suse.cz>
+References: <4B0E73E1.50900@suse.cz>
+	<20091126193750.GA15453@merkur.ravnborg.org>
+	<20091127152211.55043dbb.sfr@canb.auug.org.au>
+	<4B0F9F0D.6010601@suse.cz>
+Mime-Version: 1.0
+Content-Type: multipart/signed; protocol="application/pgp-signature";
+ micalg="PGP-SHA1";
+ boundary="Signature=_Mon__30_Nov_2009_08_57_13_+1100_0OpR/904v96TQU19"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Michal Marek <mmarek@suse.cz>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, Andrew Morton <akpm@linux-foundation.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, lkml <linux-kernel@vger.kernel.org>, Stephen Rothwell <sfr@canb.auug.org.au>, Sam Ravnborg <sam@ravnborg.org>, =?iso-8859-1?Q?Am=E9rico?= Wang <xiyou.wangcong@gmail.com>
+Cc: Sam Ravnborg <sam@ravnborg.org>, =?UTF-8?B?QW7DrWJhbA==?= Monsalve Salazar <anibal@debian.org>, Andrew Morton <akpm@linux-foundation.org>, linux-kbuild@vger.kernel.org, lkml <linux-kernel@vger.kernel.org>
 
-On Mon, Nov 23, 2009 at 10:09:52PM +0100, Michal Marek wrote:
->I would also like to maintain kbuild. Maybe we could work together?
->What do you think? I already talked with Sam:
+--Signature=_Mon__30_Nov_2009_08_57_13_+1100_0OpR/904v96TQU19
+Content-Type: text/plain; charset=US-ASCII
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-(Sorry, I've been very busy with my Real Life. :)
+Hi Michal,
 
-Sure. I agree. I'll test the patches on my machines (i386, x86_64,
-sparc64, powerpc, armel, alpha, and mips) and reply to them timely.
-
->>On Mon, Nov 23, 2009 at 03:55:29PM +0100, Michal Marek wrote:
->>>I would be interested / willing to take over kbuild maintainership
->>>either alone or together with Aníbal who also expressed his interest.
->>>I do have a linux-related job, actually kbuild-related (maintaining
->>>kernel build infrastructure at a certain linux vendor) and my boss
->>>would allow me to work on kbuild. I think have good experience with
->>>the kbuild scripts, GNU make, perl, etc. Looking at the number of
->>>patches sent to linux-kbuild, I think I should be able to manage
->>>that. And I only have one kid so far ;-).
->>
->>It helps enourmously if you anyway have do to some of the time
->>consuming things at work.
->>
->>I suggest you and Anibal work out how to deal with stuff.
->>
->>I will continue to be around and can answer any questions - but the
->>learning curve is maybe a bit steep in the beginning but then things
->>gets easy.
->>
->>And you are right - it has not been the # of patches to take care of.
->>Only that to do stuff properly you should:
->>- review carefully
->>- test on 5+ architectures
->>- and be responsive
->>
->>So if you can put time aside for this a few times a week and maybe
->>even the possibility to concentrate on something for more than 1 hour
->>in row you should be fine.
-
-I agree with Sam too.
-
-On Fri, Nov 27, 2009 at 03:22:11PM +1100, Stephen Rothwell wrote:
->You will need to ensure that the patches/commits in your tree/series
->have been:
->    * submitted under GPL v2 (or later) and include the Contributor's
->      Signed-off-by,
->    * posted to the relevant mailing list,
->    * reviewed by you (or another maintainer of your subsystem tree),
->    * successfully unit tested, and
->    * destined for the current or next Linux merge window.
+On Fri, 27 Nov 2009 10:42:37 +0100 Michal Marek <mmarek@suse.cz> wrote:
 >
->Basically, this should be just what you would send to Linus (or ask him
->to fetch).  It is allowed to be rebased if you deem it necessary.
+> >  Do you intend to run the equivalent of
+> > the kbuild-current tree (bug fixes for the current release while they a=
+re
+> > waiting to go to Linus)?  I have removed the kbuild-current tree for now
+> > since the only commit in it is in the new kbuild tree.
+>=20
+> I plan to maintain such a branch, but I thought I would base the
+> for-next branch on top of it, so that you get everything in one pack. Or
+> would you still prefer to have two kbuild branches in linux-next, so
+> that you can remove the for-next branch if necessary and keep the
+> for-current branch? Just tell me what fits you best.
 
-And with Stephen as well.
+Running a for-current branch allows you to queue up urgent fixes without
+disrupting your for-next branch.  I will merge such a branch early on
+(actually before I do my first build) so that I don't have to worry about
+problems that are already have fixes pending for to be merged by Linus in
+his current tree.  Also, as you say, if I have problems with your
+for-next branch, it does not affect the more urgent patches.
+
+--=20
+Cheers,
+Stephen Rothwell                    sfr@canb.auug.org.au
+http://www.canb.auug.org.au/~sfr/
+
+--Signature=_Mon__30_Nov_2009_08_57_13_+1100_0OpR/904v96TQU19
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iEYEARECAAYFAksS7jkACgkQjjKRsyhoI8xw/wCfeloYLCe86Wuq4qwVasICM+b/
+Q/YAoKThUIaRARno72+2bicDS/C2mbyO
+=8C4M
+-----END PGP SIGNATURE-----
+
+--Signature=_Mon__30_Nov_2009_08_57_13_+1100_0OpR/904v96TQU19--
