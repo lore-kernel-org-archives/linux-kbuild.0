@@ -1,38 +1,77 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor.suse.de ([195.135.220.2]:38239 "EHLO mx1.suse.de"
+Received: from cantor.suse.de ([195.135.220.2]:48519 "EHLO mx1.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752533AbZK3KgA (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 30 Nov 2009 05:36:00 -0500
-Message-ID: <4B13A015.8010407@suse.cz>
-Date: Mon, 30 Nov 2009 11:36:05 +0100
+	id S1752230AbZK3OkO (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 30 Nov 2009 09:40:14 -0500
+Message-ID: <4B13D951.8090907@suse.cz>
+Date: Mon, 30 Nov 2009 15:40:17 +0100
 From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Subject: Re: linux-kbuild.git
-References: <4B0E73E1.50900@suse.cz>	<20091126193750.GA15453@merkur.ravnborg.org>	<20091127152211.55043dbb.sfr@canb.auug.org.au>	<4B0F9F0D.6010601@suse.cz> <20091130085713.75f56423.sfr@canb.auug.org.au>
-In-Reply-To: <20091130085713.75f56423.sfr@canb.auug.org.au>
-Content-Type: text/plain; charset=ISO-8859-2
-Content-Transfer-Encoding: 7bit
+Subject: Re: [PATCH] nconfig v7
+References: <1257602859-32339-1-git-send-email-nir.tzachar@gmail.com> <1259144923-25362-1-git-send-email-nir.tzachar@gmail.com>
+In-Reply-To: <1259144923-25362-1-git-send-email-nir.tzachar@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Stephen Rothwell <sfr@canb.auug.org.au>
-Cc: Sam Ravnborg <sam@ravnborg.org>, =?ISO-8859-2?Q?An=EDbal_Monsalve_?= =?ISO-8859-2?Q?Salazar?= <anibal@debian.org>, Andrew Morton <akpm@linux-foundation.org>, linux-kbuild@vger.kernel.org, lkml <linux-kernel@vger.kernel.org>
+To: nir.tzachar@gmail.com
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, sam@ravnborg.org, zippel@linux-m68k.org, andi@firstfloor.org, randy.dunlap@oracle.com, elendil@planet.nl, bn@niasdigital.com
 
-On 29.11.2009 22:57, Stephen Rothwell wrote:
-> On Fri, 27 Nov 2009 10:42:37 +0100 Michal Marek <mmarek@suse.cz> wrote:
->> I plan to maintain such a branch, but I thought I would base the
->> for-next branch on top of it, so that you get everything in one pack. Or
->> would you still prefer to have two kbuild branches in linux-next, so
->> that you can remove the for-next branch if necessary and keep the
->> for-current branch? Just tell me what fits you best.
+On 25.11.2009 11:28, nir.tzachar@gmail.com wrote:
+> Hello.
 > 
-> Running a for-current branch allows you to queue up urgent fixes without
-> disrupting your for-next branch.  I will merge such a branch early on
-> (actually before I do my first build) so that I don't have to worry about
-> problems that are already have fixes pending for to be merged by Linus in
-> his current tree.  Also, as you say, if I have problems with your
-> for-next branch, it does not affect the more urgent patches.
+> Attached bellow is version 7 of nconfig, an ncurses based replacement for
+> menuconfig. After a thorough overhaul, addressing all concerns raised in the
+> past by users on these lists, I would be happy if this version is favorably 
+> considered for inclusion. 
+> 
+> Major changes since version 6:
+> 
+> 1) un-selectable menu items have 'XXX' before them, to indicate the fact.
+> 2) there are three separate help menus: main help (bound to F1), symbol help
+>    (bound to F2 and 'h') and short instructions (bound to F3).
 
-OK, I created a for-linus branch in git://repo.or.cz/linux-kbuild.git.
-Currently it's empty, as there are no urgent kbuild fixes for 2.6.32.
+Hi Nir,
+
+I tried it a few times, it's nice :). I get a few warnings about missing
+prototypes when compiling it:
+  HOSTCC  scripts/kconfig/nconf.gui.o
+scripts/kconfig/nconf.gui.c:23: warning: no previous prototype for
+‘set_normal_colors’
+scripts/kconfig/nconf.gui.c:68: warning: no previous prototype for
+‘normal_color_theme’
+scripts/kconfig/nconf.gui.c:100: warning: no previous prototype for
+‘no_colors_theme’
+  HOSTCC  scripts/kconfig/nconf.o
+scripts/kconfig/nconf.c:455: warning: no previous prototype for
+‘process_special_keys’
+scripts/kconfig/nconf.c:487: warning: no previous prototype for
+‘get_next_hot’
+scripts/kconfig/nconf.c:506: warning: no previous prototype for ‘canbhot’
+scripts/kconfig/nconf.c:514: warning: no previous prototype for ‘is_hot’
+scripts/kconfig/nconf.c:522: warning: no previous prototype for ‘make_hot’
+scripts/kconfig/nconf.c:582: warning: no previous prototype for ‘item_make’
+scripts/kconfig/nconf.c:626: warning: no previous prototype for
+‘item_add_str’
+scripts/kconfig/nconf.c:656: warning: no previous prototype for ‘item_tag’
+scripts/kconfig/nconf.c:668: warning: no previous prototype for
+‘curses_item_index’
+scripts/kconfig/nconf.c:673: warning: no previous prototype for ‘item_data’
+scripts/kconfig/nconf.c:684: warning: no previous prototype for
+‘item_is_tag’
+scripts/kconfig/nconf.c:691: warning: no previous prototype for
+‘set_config_filename’
+
+These probably can be static. Oh, and when I suspend the program with
+Ctrl-Z, resume with 'fg' and hit an arrow key, the escape sequence is
+interpreted as a genuine ESC and it either jumps one menu level above or
+wants to exit the program. It happens to me both in xterm and
+gnome-terminal, ncurses version is 5.6. Can you see it as well or is
+there something broken on my side?
+
+Other than that, I found no issues so far (except for the not really
+readable shortcut nOtation, but you say it's hard to fix, so let's
+forget about it for now). I'll use it a bit more and have a look at the
+code. For now, it is in git://repo.or.cz/linux-kbuild.git#for-review as is.
 
 Michal
