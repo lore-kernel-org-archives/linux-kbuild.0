@@ -1,53 +1,37 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor.suse.de ([195.135.220.2]:60453 "EHLO mx1.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:36186 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753181AbZLANGM (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 1 Dec 2009 08:06:12 -0500
-Message-ID: <4B1514C8.3000505@suse.cz>
-Date: Tue, 01 Dec 2009 14:06:16 +0100
+	id S1754072AbZLANPo (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 1 Dec 2009 08:15:44 -0500
+Message-ID: <4B151704.7020102@suse.cz>
+Date: Tue, 01 Dec 2009 14:15:48 +0100
 From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Subject: Re: [PATCH] kbuild: specify absolute paths for cscope
-References: <1259238852-21214-1-git-send-email-daniel.vetter@ffwll.ch> <4B13FD4B.5080805@suse.cz> <20091130181109.GA19614@merkur.ravnborg.org> <20091201094222.GC9177@viiv.ffwll.ch>
-In-Reply-To: <20091201094222.GC9177@viiv.ffwll.ch>
+Subject: Re: [PATCH] unifdef: update to upstream revision 1.189
+References: <E1NE3M6-0003Za-OJ@hermes-1.csi.cam.ac.uk> <20091127181749.GA16177@merkur.ravnborg.org>
+In-Reply-To: <20091127181749.GA16177@merkur.ravnborg.org>
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Daniel Vetter <daniel.vetter@ffwll.ch>
-Cc: Sam Ravnborg <sam@ravnborg.org>, linux-kbuild@vger.kernel.org, lkml <linux-kernel@vger.kernel.org>
+To: Tony Finch <dot@dotat.at>
+Cc: Sam Ravnborg <sam@ravnborg.org>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>, Joe Perches <joe@perches.com>, Russell King <rmk+kernel@arm.linux.org.uk>, "Justin P. Mattock" <justinmattock@gmail.com>
 
-On 1.12.2009 10:42, Daniel Vetter wrote:
-> I've just tried to use cscope with a working directory not equal to the
-> directory where cscope.out resides:
-> 
-> $ cscope -d -f src/cscope.out
-> 
-> It can't handle relative paths. When I try to open a file (via a
-> reference) from within cscope, it calls up vim with the wrong path.  So I
-> think this is a fundamental cscope bug (and not a vim problem).  As I've
-> already said, every tutorial on the web I could find uses absolute paths,
-> too, so the problem seems to be common, as is the work-around.  Therefore
-> please apply this patch (perhaps changing my comment to "cscope is broken
-> with relative paths, work around it via absolute paths").
+On 27.11.2009 19:17, Sam Ravnborg wrote:
+> On Fri, Nov 27, 2009 at 03:50:30PM +0000, Tony Finch wrote:
+>> Fix handling of input files (e.g. with no newline at EOF) that could
+>> make unifdef get into an unexpected state and call abort().
+>>
+>> The new -B option compresses blank lines around a deleted section
+>> so that blank lines around "paragraphs" of code don't get doubled.
+>>
+>> The evaluator can now handle macros with arguments, and unbracketed
+>> arguments to the "defined" operator.
 
-OK, you convinced me. I applied it to for-next, with a minor edit to fix
-O= builds (the tree variable is an absolute path already):
-http://repo.or.cz/w/linux-kbuild.git/commitdiff/037aaae02ecf3925b843316868743c755d73fb22
-I hope the next guy won't come and complain the he moved linux-2.6.xy to
-linux-2.6.xy.orig and cscope stopped working :).
+Hi Tony,
 
+I don't have the patch and I can't find it in the archives either. Could
+you please resend it?
 
-On 30.11.2009 19:11, Sam Ravnborg wrote:
-> For tags I recall we fall back to absolute path only for O=... builds.
-> This made the tags file considerably smaller for a non O=.. build
-> thus speeding up the search.
-> 
-> So unconditionally using absolute paths for cscope may have drawbacks.
-
-I tried it and this part seems OK. Generating the database took more or
-less the same time, cscope.out grew by less than 1% and opening cscope
-and running a query for 'printk' slowed down by about 8%, I think that's
-bearable.
-
+Thanks!
 Michal
