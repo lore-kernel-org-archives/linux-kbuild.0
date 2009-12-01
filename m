@@ -1,45 +1,40 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor.suse.de ([195.135.220.2]:42048 "EHLO mx1.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753973AbZLAQMY (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 1 Dec 2009 11:12:24 -0500
-Message-ID: <4B15406D.6010800@suse.cz>
-Date: Tue, 01 Dec 2009 17:12:29 +0100
-From: Michal Marek <mmarek@suse.cz>
-MIME-Version: 1.0
+Received: from ppsw-7.csi.cam.ac.uk ([131.111.8.137]:56076 "EHLO
+	ppsw-7.csi.cam.ac.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753962AbZLAQVj (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 1 Dec 2009 11:21:39 -0500
+Date: Tue, 1 Dec 2009 16:21:42 +0000
+From: Tony Finch <dot@dotat.at>
 Subject: Re: [PATCHv2] unifdef: update to upstream revision 1.190
-References: <4B151704.7020102@suse.cz>    <20091127210408.GA16310@merkur.ravnborg.org>    <E1NE3M6-0003Za-OJ@hermes-1.csi.cam.ac.uk>    <20091127181749.GA16177@merkur.ravnborg.org>    <alpine.LSU.2.00.0911271901430.6581@hermes-1.csi.cam.ac.uk> <E1NFU0t-0002UG-0R@hermes-1.csi.cam.ac.uk>
-In-Reply-To: <E1NFU0t-0002UG-0R@hermes-1.csi.cam.ac.uk>
-Content-Type: text/plain; charset=ISO-8859-2
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <4B15406D.6010800@suse.cz>
+Message-ID: <alpine.LSU.2.00.0912011615210.3461@hermes-1.csi.cam.ac.uk>
+References: <4B151704.7020102@suse.cz>    <20091127210408.GA16310@merkur.ravnborg.org>    <E1NE3M6-0003Za-OJ@hermes-1.csi.cam.ac.uk>    <20091127181749.GA16177@merkur.ravnborg.org>    <alpine.LSU.2.00.0911271901430.6581@hermes-1.csi.cam.ac.uk>
+ <E1NFU0t-0002UG-0R@hermes-1.csi.cam.ac.uk> <4B15406D.6010800@suse.cz>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Tony Finch <dot@dotat.at>
+To: Michal Marek <mmarek@suse.cz>
 Cc: Sam Ravnborg <sam@ravnborg.org>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>, Joe Perches <joe@perches.com>, Russell King <rmk+kernel@arm.linux.org.uk>, "Justin P. Mattock" <justinmattock@gmail.com>
 
-On 27.11.2009 16:50, Tony Finch wrote:
-> Fix handling of input files (e.g. with no newline at EOF) that could
-> make unifdef get into an unexpected state and call abort().
-> 
-> The new -B option compresses blank lines around a deleted section
-> so that blank lines around "paragraphs" of code don't get doubled.
-> 
-> The evaluator can now handle macros with arguments, and unbracketed
-> arguments to the "defined" operator.
-> 
-> Add myself to MAINTAINERS for unifdef.
-> 
-> Obtained-from: http://dotat.at/prog/unifdef/
-> Signed-off-by: Tony Finch <dot@dotat.at>
-> Acked-by: Sam Ravnborg <sam@ravnborg.org>
+On Tue, 1 Dec 2009, Michal Marek wrote:
+>
+> Thanks, applied.
 
-Thanks, applied. I remove the Obtained-from: line because I didn't find
-prior use of it and you list your website in MAINTAINERS anyway. I
-assume Sam's ack still holds because the changes you mention are
-trivial. BTW, scripts/checkpatch.pl reports some coding style issues
-(mostly parentheses in return statements and opening braces directly
-after function declarations), but as this is not original kernel source
-but a copy of one file from another project, I think we should be
-lenient here.
+Thank you.
 
-Michal
+> BTW, scripts/checkpatch.pl reports some coding style issues (mostly
+> parentheses in return statements and opening braces directly after
+> function declarations), but as this is not original kernel source but a
+> copy of one file from another project, I think we should be lenient
+> here.
+
+Sorry, I should have explicitly noted that the existing style deviations
+were not fixed by the update to the latest version.
+
+Tony.
+-- 
+f.anthony.n.finch  <dot@dotat.at>  http://dotat.at/
+GERMAN BIGHT HUMBER: SOUTHWEST 5 TO 7. MODERATE OR ROUGH. SQUALLY SHOWERS.
+MODERATE OR GOOD.
