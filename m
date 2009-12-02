@@ -1,40 +1,56 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ppsw-7.csi.cam.ac.uk ([131.111.8.137]:56076 "EHLO
-	ppsw-7.csi.cam.ac.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753962AbZLAQVj (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 1 Dec 2009 11:21:39 -0500
-Date: Tue, 1 Dec 2009 16:21:42 +0000
-From: Tony Finch <dot@dotat.at>
-Subject: Re: [PATCHv2] unifdef: update to upstream revision 1.190
-In-Reply-To: <4B15406D.6010800@suse.cz>
-Message-ID: <alpine.LSU.2.00.0912011615210.3461@hermes-1.csi.cam.ac.uk>
-References: <4B151704.7020102@suse.cz>    <20091127210408.GA16310@merkur.ravnborg.org>    <E1NE3M6-0003Za-OJ@hermes-1.csi.cam.ac.uk>    <20091127181749.GA16177@merkur.ravnborg.org>    <alpine.LSU.2.00.0911271901430.6581@hermes-1.csi.cam.ac.uk>
- <E1NFU0t-0002UG-0R@hermes-1.csi.cam.ac.uk> <4B15406D.6010800@suse.cz>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+Received: from chilli.pcug.org.au ([203.10.76.44]:51961 "EHLO smtps.tip.net.au"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751743AbZLBGZ2 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 2 Dec 2009 01:25:28 -0500
+Date: Wed, 2 Dec 2009 17:25:28 +1100
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+Subject: Re: linux-kbuild.git
+Message-Id: <20091202172528.193757ed.sfr@canb.auug.org.au>
+In-Reply-To: <4B13A015.8010407@suse.cz>
+References: <4B0E73E1.50900@suse.cz>
+	<20091126193750.GA15453@merkur.ravnborg.org>
+	<20091127152211.55043dbb.sfr@canb.auug.org.au>
+	<4B0F9F0D.6010601@suse.cz>
+	<20091130085713.75f56423.sfr@canb.auug.org.au>
+	<4B13A015.8010407@suse.cz>
+Mime-Version: 1.0
+Content-Type: multipart/signed; protocol="application/pgp-signature";
+ micalg="PGP-SHA1";
+ boundary="Signature=_Wed__2_Dec_2009_17_25_28_+1100_73ZZg71umZ_x2Oqa"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Michal Marek <mmarek@suse.cz>
-Cc: Sam Ravnborg <sam@ravnborg.org>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>, Joe Perches <joe@perches.com>, Russell King <rmk+kernel@arm.linux.org.uk>, "Justin P. Mattock" <justinmattock@gmail.com>
+Cc: Sam Ravnborg <sam@ravnborg.org>, =?UTF-8?B?QW7DrWJhbA==?= Monsalve Salazar <anibal@debian.org>, Andrew Morton <akpm@linux-foundation.org>, linux-kbuild@vger.kernel.org, lkml <linux-kernel@vger.kernel.org>
 
-On Tue, 1 Dec 2009, Michal Marek wrote:
+--Signature=_Wed__2_Dec_2009_17_25_28_+1100_73ZZg71umZ_x2Oqa
+Content-Type: text/plain; charset=US-ASCII
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+Hi Michal,
+
+On Mon, 30 Nov 2009 11:36:05 +0100 Michal Marek <mmarek@suse.cz> wrote:
 >
-> Thanks, applied.
+> OK, I created a for-linus branch in git://repo.or.cz/linux-kbuild.git.
+> Currently it's empty, as there are no urgent kbuild fixes for 2.6.32.
 
-Thank you.
+OK, it will be included from tomorrow in case you find anything urgent.
 
-> BTW, scripts/checkpatch.pl reports some coding style issues (mostly
-> parentheses in return statements and opening braces directly after
-> function declarations), but as this is not original kernel source but a
-> copy of one file from another project, I think we should be lenient
-> here.
+--=20
+Cheers,
+Stephen Rothwell                    sfr@canb.auug.org.au
+http://www.canb.auug.org.au/~sfr/
 
-Sorry, I should have explicitly noted that the existing style deviations
-were not fixed by the update to the latest version.
+--Signature=_Wed__2_Dec_2009_17_25_28_+1100_73ZZg71umZ_x2Oqa
+Content-Type: application/pgp-signature
 
-Tony.
--- 
-f.anthony.n.finch  <dot@dotat.at>  http://dotat.at/
-GERMAN BIGHT HUMBER: SOUTHWEST 5 TO 7. MODERATE OR ROUGH. SQUALLY SHOWERS.
-MODERATE OR GOOD.
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iEYEARECAAYFAksWCFgACgkQjjKRsyhoI8xFJACfb2XILITIG39iW5GoWxYQeaB+
+fO8AniTTJDo5X3/aRQQcgq23nvhnDIGU
+=P2gJ
+-----END PGP SIGNATURE-----
+
+--Signature=_Wed__2_Dec_2009_17_25_28_+1100_73ZZg71umZ_x2Oqa--
