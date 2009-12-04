@@ -1,85 +1,70 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout2.freenet.de ([195.4.92.92]:45283 "EHLO mout2.freenet.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753071AbZLDStA (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 4 Dec 2009 13:49:00 -0500
-Message-ID: <4B1958FA.1050104@gmx.de>
-Date: Fri, 04 Dec 2009 19:46:18 +0100
-From: Patrick Ringl <patrick.ringl@gmx.de>
-MIME-Version: 1.0
-Subject: 2.6.32: scripts/kconfig/streamline_config.pl :Malfunction
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Received: from rcsinet12.oracle.com ([148.87.113.124]:61989 "EHLO
+	rgminet12.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755616AbZLDTCo (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 4 Dec 2009 14:02:44 -0500
+Date: Fri, 4 Dec 2009 11:02:28 -0800
+From: Randy Dunlap <randy.dunlap@oracle.com>
+Subject: Re: [PATCH] make gconfig: fix the "(NEW)" string
+Message-Id: <20091204110228.2ce3345c.randy.dunlap@oracle.com>
+In-Reply-To: <23753252.369201259951904278.JavaMail.defaultUser@defaultHost>
+References: <23753252.369201259951904278.JavaMail.defaultUser@defaultHost>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: stripconfig@goodmis.org, zippel@linux-m68k.org
+To: "matteo_cortese@fastwebnet.it" <matteo_cortese@fastwebnet.it>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Hi,
+On Fri, 4 Dec 2009 19:38:24 +0100 (CET) matteo_cortese@fastwebnet.it wrote:
 
-I have encountered the following malfunction of the recently added
-streamline_config script. When running the following occurs:
+> The string "(NEW)" is added to those options that are not present in the
+>  current config file, thus looking as new features. Alas, the logic seem
+> s to be inverted.
 
-ack:~/linux-2.6.32# scripts/kconfig/streamline_config.pl >config_strip
-using config: '.config'
-Use of uninitialized value $ksource in concatenation (.) or string at
-scripts/kconfig/streamline_config.pl line 117.
-dock config not found!!
-module pata_sis did not have configs CONFIG_PATA_SIS
-
-As a result: it couldnt map one currently loaded module properly and the
-other module had been properly mapped, but somehow the
-dependency/integrity check triggered it, since it wasnt enabled properly.
-
-I checked the output of the script and yea as I assumed CONFIG_ACPI_DOCK
-is not set.
-
-'dock'  refers to:
-
-ack:~/linux-2.6.32# modinfo dock
-filename:       /lib/modules/2.6.26-2-amd64/kernel/drivers/acpi/dock.ko
-
-and the belonging Kconfig file says:
-
-config ACPI_DOCK
-        bool "Dock"
-        depends on EXPERIMENTAL
-        help
-          This driver supports ACPI-controlled docking stations and
-removable
-          drive bays such as the IBM Ultrabay and the Dell Module Bay.
-
-The same with 'pata_sis' (CONFIG_PATA_SIS is also not set) ..
-
-ack:~/linux-2.6.32# modinfo pata_sis
-filename:       /lib/modules/2.6.26-2-amd64/kernel/drivers/ata/pata_sis.ko
-
-and the belonging Kconfig file:
-
-config SATA_SIS
-        tristate "SiS 964/965/966/180 SATA support"
-        depends on PCI
-        select PATA_SIS
-        help
-          This option enables support for SiS Serial ATA on
-          SiS 964/965/966/180 and Parallel ATA on SiS 180.
-          The PATA support for SiS 180 requires additionally to
-          enable the PATA_SIS driver in the config.
-          If unsure, say N.
-
-In the end (if one ignored the two missing modules) a make
-silentoldconfig didnt even work.
-
-What I did to reproduce this was using the standard kernel config of
-debian lenny's amd64 branch.
+Did you just notice that thru source code inspection or via testing of
+gconfig?
 
 
-PS: I wrote such software myself, but I am going a totally different
-approach. Your idea is not that bad actually (I am enabling kernel
-config options and I am tracking all dependencies properly, while you
-can just ignore them, since your script only disables stuff).
+> Signed-off-by: Matteo Cortese <matteo_cortese@fastwebnet.it>
+> ------
+> 
+> diff -u linux-source-2.6.26-old/scripts/kconfig/gconf.c linux-source-2.6
+> .26/scripts/kconfig/gconf.c
+> --- linux-source-2.6.26-old/scripts/kconfig/gconf.c	2008-07-13 21:51:29.
+> 000000000 +0000
+> +++ linux-source-2.6.26/scripts/kconfig/gconf.c	2009-01-03 00:52:57.0000
+> 00000 +0000
+> @@ -1174,7 +1174,7 @@
+>  
+>  	row[COL_OPTION] =
+>  	    g_strdup_printf("%s %s", _(menu_get_prompt(menu)),
+> -			    sym && sym_has_value(sym) ? "(NEW)" : "");
+> +			    sym && !sym_has_value(sym) ? "(NEW)" : "");
+>  
+>  	if (show_all && !menu_is_visible(menu))
+>  		row[COL_COLOR] = g_strdup("DarkGray");
+> 
+> --
+
+Well, for me, with just some random config file that has
+CONFIG_MODULES=y
+CONFIG_BLOCK=y
+
+gconfig with this patch says:
+
+  Enable loadable module support
+  Enable the block layer (NEW)
+
+and gconfig without this patch says:
+
+  Enable loadable module support (NEW)
+  Enable the block layer
 
 
-regards,
-Patrick
+I'm confuzed.  Go figure.
 
+---
+~Randy
