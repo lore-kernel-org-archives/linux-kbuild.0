@@ -1,44 +1,33 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from static-71-162-243-5.phlapa.fios.verizon.net ([71.162.243.5]:35399
-	"EHLO grelber.thyrsus.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753643AbZLHPQg (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 8 Dec 2009 10:16:36 -0500
-From: Rob Landley <rob@landley.net>
-Subject: Re: [PATCH 0/3] clean out Perl from build system.
-Date: Tue, 8 Dec 2009 09:08:06 -0600
-References: <200912080317.08254.rob@landley.net> <4B1E290A.8040005@suse.cz>
-In-Reply-To: <4B1E290A.8040005@suse.cz>
+Received: from cantor.suse.de ([195.135.220.2]:50136 "EHLO mx1.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1756239AbZLHT4P (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 8 Dec 2009 14:56:15 -0500
+Message-ID: <4B1EAF69.5090609@suse.cz>
+Date: Tue, 08 Dec 2009 20:56:25 +0100
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-1"
+Subject: Re: [PATCH] MAINTAINERS: new kbuild maintainer
+References: <1260276751-19501-1-git-send-email-mmarek@suse.cz> <20091208131829.GA5195@merkur.ravnborg.org> <200912081611.12625.a.miskiewicz@gmail.com>
+In-Reply-To: <200912081611.12625.a.miskiewicz@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-Message-Id: <200912080908.06875.rob@landley.net>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
+To: Arkadiusz Miskiewicz <a.miskiewicz@gmail.com>
 Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-On Tuesday 08 December 2009 04:23:06 Michal Marek wrote:
-> On 8.12.2009 10:17, Rob Landley wrote:
-> > Perl was introduced as a build dependency in 2.6.25.  My cross-compile
-> > environment does not use perl, so ever since then I've patched it back
-> > out.
-> >
-> > With these patches I've personally built kernels for x86, x86_64, arm,
-> > mips, powerpc, sparc, sh4, and m68k.
->
-> Hi Rob,
->
-> you should CC linux-kbuild@ on patches like this (added now, the whole
-> series is at http://lkml.org/lkml/2009/12/8/93).
->
-> Michal
+Arkadiusz Miskiewicz napsal(a):
+> On Tuesday 08 of December 2009, Sam Ravnborg wrote:
+>> On Tue, Dec 08, 2009 at 01:52:31PM +0100, Michal Marek wrote:
+>>> Sam was fine with handing over kbuild maintainership to me. The git
+>>> trees are already in linux-next, a merge request will follow shortly.
+>> Yep - thanks for taken over this. Glad to see this is maintained properly.
+> 
+> Maybe we can get colors back in menuconfig then? ;-)
+> http://bugzilla.kernel.org/show_bug.cgi?id=13677
 
-Thanks.  LWN said Sam Ravnborg was stepping down, and I haven't kept up with 
-who's in charge now.
+Does it also happen with Nir's nconfig
+(http://lkml.org/lkml/2009/11/25/119)?
 
-Rob
--- 
-Latency is more important than throughput. It's that simple. - Linus Torvalds
+Michal
