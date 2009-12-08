@@ -1,75 +1,44 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor.suse.de ([195.135.220.2]:38063 "EHLO mx1.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755759AbZLHPPD (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 8 Dec 2009 10:15:03 -0500
-Date: Tue, 8 Dec 2009 16:14:16 +0100
-From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [GIT PULL] kbuild updates for 2.6.33
-Message-ID: <20091208151416.GA13535@sepie.suse.cz>
-References: <20091208133004.GA22750@sepie.suse.cz>
+Received: from static-71-162-243-5.phlapa.fios.verizon.net ([71.162.243.5]:35399
+	"EHLO grelber.thyrsus.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753643AbZLHPQg (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 8 Dec 2009 10:16:36 -0500
+From: Rob Landley <rob@landley.net>
+Subject: Re: [PATCH 0/3] clean out Perl from build system.
+Date: Tue, 8 Dec 2009 09:08:06 -0600
+References: <200912080317.08254.rob@landley.net> <4B1E290A.8040005@suse.cz>
+In-Reply-To: <4B1E290A.8040005@suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: Text/Plain;
+  charset="iso-8859-1"
+Content-Transfer-Encoding: 7bit
 Content-Disposition: inline
-In-Reply-To: <20091208133004.GA22750@sepie.suse.cz>
+Message-Id: <200912080908.06875.rob@landley.net>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-On Tue, Dec 08, 2009 at 02:30:04PM +0100, Michal Marek wrote:
-> Hi Linus,
-> 
-> these are the kbuild patches I collected for 2.6.33. There might be a few
-> more later, but this is the main part.
-> 
-> Thanks,
+On Tuesday 08 December 2009 04:23:06 Michal Marek wrote:
+> On 8.12.2009 10:17, Rob Landley wrote:
+> > Perl was introduced as a build dependency in 2.6.25.  My cross-compile
+> > environment does not use perl, so ever since then I've patched it back
+> > out.
+> >
+> > With these patches I've personally built kernels for x86, x86_64, arm,
+> > mips, powerpc, sparc, sh4, and m68k.
+>
+> Hi Rob,
+>
+> you should CC linux-kbuild@ on patches like this (added now, the whole
+> series is at http://lkml.org/lkml/2009/12/8/93).
+>
 > Michal
-> 
-> The following changes since commit 6ec22f9b037fc0c2e00ddb7023fad279c365324d:
->   Linus Torvalds (1):
->         Merge branch 'x86-debug-for-linus' of git://git.kernel.org/.../tip/linux-2.6-tip
-> 
-> are available in the git repository at:
-> 
->   git://repo.or.cz/linux-kbuild.git for-next
-> 
-...
-> Michal Marek (4):
->       kbuild: generate modules.builtin
 
-This patch broke make clean unfortunatelly. The for-next branch already
-has a fix (commit e1cf87b), please, if you already fetched the branch,
-fetch again. I'm attaching the fix for reference.
+Thanks.  LWN said Sam Ravnborg was stepping down, and I haven't kept up with 
+who's in charge now.
 
-Michal
-
-
----
-
-From: Michal Marek <mmarek@suse.cz>
-Subject: [PATCH] kbuild: fix make clean after mismerge
-
-Fix typo / thinko in commit 698699f.
-
-Signed-off-by: Michal Marek <mmarek@suse.cz>
----
- Makefile |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
-
-diff --git a/Makefile b/Makefile
-index 391fcb3..8491b21 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1174,7 +1174,7 @@ clean: archclean $(clean-dirs)
- 		\( -name '*.[oas]' -o -name '*.ko' -o -name '.*.cmd' \
- 		-o -name '.*.d' -o -name '.*.tmp' -o -name '*.mod.c' \
- 		-o -name '*.symtypes' -o -name 'modules.order' \
--		-o modules.order -o -name '.tmp_*.o.*' \
-+		-o -name modules.builtin -o -name '.tmp_*.o.*' \
- 		-o -name '*.gcno' \) -type f -print | xargs rm -f
- 
- # mrproper - Delete all generated files, including .config
+Rob
 -- 
-1.6.5.3
-
+Latency is more important than throughput. It's that simple. - Linus Torvalds
