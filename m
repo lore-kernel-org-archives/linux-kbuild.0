@@ -1,71 +1,49 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor.suse.de ([195.135.220.2]:44105 "EHLO mx1.suse.de"
+Received: from smtp.gentoo.org ([140.211.166.183]:43018 "EHLO smtp.gentoo.org"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752656AbZLIJem (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 9 Dec 2009 04:34:42 -0500
-Date: Wed, 9 Dec 2009 10:33:49 +0100
-From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [GIT PULL] kbuild updates for 2.6.33
-Message-ID: <20091209093349.GA11837@sepie.suse.cz>
-References: <20091208133004.GA22750@sepie.suse.cz>
+	id S1752446AbZLILzO (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 9 Dec 2009 06:55:14 -0500
+From: Mike Frysinger <vapier@gentoo.org>
+Subject: [PATCH] gen_init_cpio: fixed fwrite warning
+Date: Wed,  9 Dec 2009 06:55:19 -0500
+Message-Id: <1260359719-15744-1-git-send-email-vapier@gentoo.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20091208133004.GA22750@sepie.suse.cz>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Stephen Rothwell <sfr@canb.auug.org.au>
+To: linux-kbuild@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>
+Cc: linux-kernel@vger.kernel.org
 
-On Tue, Dec 08, 2009 at 02:30:04PM +0100, Michal Marek wrote:
-> Hi Linus,
-> 
-> these are the kbuild patches I collected for 2.6.33. There might be a few
-> more later, but this is the main part.
-> 
-> Thanks,
-> Michal
-> 
-> The following changes since commit 6ec22f9b037fc0c2e00ddb7023fad279c365324d:
->   Linus Torvalds (1):
->         Merge branch 'x86-debug-for-linus' of git://git.kernel.org/.../tip/linux-2.6-tip
-> 
-> are available in the git repository at:
-> 
->   git://repo.or.cz/linux-kbuild.git for-next
+On compilers with security warnings enabled by default, we get:
 
-Hi Linus,
+usr/gen_init_cpio.c: In function ‘cpio_mkfile’:
+usr/gen_init_cpio.c:357: warning: ignoring return value of ‘fwrite’,
+                                  declared with attribute warn_unused_result
 
-The kbuild tree now breaks with 250cce26 ("iwlwifi: driver version
-track kernel version") which you merged yesterday. Stephen Rothwell
-kindly provided a fix, which I would normally apply to the kbuild tree,
-but I don't want to rebase it as I already sent the pull request. Could
-you please apply the following one-liner when merging the kbuild tree?
-Thanks!
+So check the return value and handle errors accordingly.
 
-Michal
-
-
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-Date: Mon, 7 Dec 2009 19:56:42 +1100
-Subject: [PATCH] net: fix for utsrelease.h moving to generated
-
-Signed-off-by: Stephen Rothwell <sfr@canb.auug.org.au>
-Signed-off-by: Michal Marek <mmarek@suse.cz>
+Signed-off-by: Mike Frysinger <vapier@gentoo.org>
 ---
- drivers/net/wireless/iwlwifi/iwl-core.h |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+ usr/gen_init_cpio.c |    5 ++++-
+ 1 files changed, 4 insertions(+), 1 deletions(-)
 
-diff --git a/drivers/net/wireless/iwlwifi/iwl-core.h b/drivers/net/wireless/iwlwifi/iwl-core.h
-index 675b7df..27ca859 100644
---- a/drivers/net/wireless/iwlwifi/iwl-core.h
-+++ b/drivers/net/wireless/iwlwifi/iwl-core.h
-@@ -63,7 +63,7 @@
- #ifndef __iwl_core_h__
- #define __iwl_core_h__
+diff --git a/usr/gen_init_cpio.c b/usr/gen_init_cpio.c
+index 83b3dde..b2b3c2d 100644
+--- a/usr/gen_init_cpio.c
++++ b/usr/gen_init_cpio.c
+@@ -354,7 +354,10 @@ static int cpio_mkfile(const char *name, const char *location,
+ 		push_pad();
  
--#include <linux/utsrelease.h>
-+#include <generated/utsrelease.h>
- 
- /************************
-  * forward declarations *
+ 		if (size) {
+-			fwrite(filebuf, size, 1, stdout);
++			if (fwrite(filebuf, size, 1, stdout) != 1) {
++				fprintf(stderr, "writing filebuf failed\n");
++				goto error;
++			}
+ 			offset += size;
+ 			push_pad();
+ 		}
+-- 
+1.6.5.5
+
