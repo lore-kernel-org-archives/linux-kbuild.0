@@ -1,301 +1,84 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:33362 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752181AbZLIPqc (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 9 Dec 2009 10:46:32 -0500
-Message-ID: <4B1FC621.8060500@suse.cz>
-Date: Wed, 09 Dec 2009 16:45:37 +0100
-From: Michal Marek <mmarek@suse.cz>
-MIME-Version: 1.0
-Subject: Re: [PATCH 1/3] Replace kernel/timeconst.pl with kernel/timeconst.sh
-References: <200912080317.08254.rob@landley.net> <200912080319.30679.rob@landley.net>
-In-Reply-To: <200912080319.30679.rob@landley.net>
-Content-Type: text/plain; charset=ISO-8859-1
+Received: from rcsinet12.oracle.com ([148.87.113.124]:23276 "EHLO
+	rcsinet12.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750804AbZLIRcL (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 9 Dec 2009 12:32:11 -0500
+Date: Wed, 9 Dec 2009 09:31:08 -0800
+From: Randy Dunlap <randy.dunlap@oracle.com>
+Subject: Re: [GIT PULL] kbuild updates for 2.6.33
+Message-Id: <20091209093108.387b2736.randy.dunlap@oracle.com>
+In-Reply-To: <20091209093349.GA11837@sepie.suse.cz>
+References: <20091208133004.GA22750@sepie.suse.cz>
+	<20091209093349.GA11837@sepie.suse.cz>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Rob Landley <rob@landley.net>
-Cc: linux-kernel@vger.kernel.org, "H. Peter Anvin" <hpa@zytor.com>, linux-kbuild@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Stephen Rothwell <sfr@canb.auug.org.au>
 
-[CC hpa who wrote the timeconst.pl script]
-On 8.12.2009 10:19, Rob Landley wrote:
-> From: Rob Landley <rob@landley.net>
+On Wed, 9 Dec 2009 10:33:49 +0100 Michal Marek wrote:
+
+> On Tue, Dec 08, 2009 at 02:30:04PM +0100, Michal Marek wrote:
+> > Hi Linus,
+> > 
+> > these are the kbuild patches I collected for 2.6.33. There might be a few
+> > more later, but this is the main part.
+> > 
+> > Thanks,
+> > Michal
+> > 
+> > The following changes since commit 6ec22f9b037fc0c2e00ddb7023fad279c365324d:
+> >   Linus Torvalds (1):
+> >         Merge branch 'x86-debug-for-linus' of git://git.kernel.org/.../tip/linux-2.6-tip
+> > 
+> > are available in the git repository at:
+> > 
+> >   git://repo.or.cz/linux-kbuild.git for-next
 > 
-> Replace kernel/timeconst.pl with kernel/timeconst.sh. The new shell script
-> is much simpler, about 1/4 the size, and runs on Red Hat 9 from 2003.
-
-I tried the shell script with the precomputed values in timeconst.pl and
-it gave me different results than the perl version for 250 and 1000:
-
-with HZ=250:
---- perl
-+++ bash
-@@ -8,14 +8,14 @@
- #error "kernel/timeconst.h has the wrong HZ value!"
- #endif
-
--#define HZ_TO_MSEC_MUL32        U64_C(0x80000000)
-+#define HZ_TO_MSEC_MUL32       U64_C(0x100000000)
- #define HZ_TO_MSEC_ADJ32        U64_C(0x0)
--#define HZ_TO_MSEC_SHR32        29
-+#define HZ_TO_MSEC_SHR32       30
- #define HZ_TO_MSEC_NUM          U64_C(4)
- #define HZ_TO_MSEC_DEN          U64_C(1)
--#define MSEC_TO_HZ_MUL32        U64_C(0x80000000)
--#define MSEC_TO_HZ_ADJ32        U64_C(0x180000000)
--#define MSEC_TO_HZ_SHR32        33
-+#define MSEC_TO_HZ_MUL32       U64_C(0x100000000)
-+#define MSEC_TO_HZ_ADJ32       U64_C(0x300000000)
-+#define MSEC_TO_HZ_SHR32       34
- #define MSEC_TO_HZ_NUM          U64_C(1)
- #define MSEC_TO_HZ_DEN          U64_C(4)
- #define HZ_TO_USEC_MUL32        U64_C(0xfa000000)
-
-and with HZ=1000:
---- perl
-+++ bash
-@@ -8,14 +8,14 @@
- #error "kernel/timeconst.h has the wrong HZ value!"
- #endif
-
--#define HZ_TO_MSEC_MUL32        U64_C(0x80000000)
-+#define HZ_TO_MSEC_MUL32       U64_C(0x100000000)
- #define HZ_TO_MSEC_ADJ32        U64_C(0x0)
--#define HZ_TO_MSEC_SHR32        31
-+#define HZ_TO_MSEC_SHR32       32
- #define HZ_TO_MSEC_NUM          U64_C(1)
- #define HZ_TO_MSEC_DEN          U64_C(1)
--#define MSEC_TO_HZ_MUL32        U64_C(0x80000000)
-+#define MSEC_TO_HZ_MUL32       U64_C(0x100000000)
- #define MSEC_TO_HZ_ADJ32        U64_C(0x0)
--#define MSEC_TO_HZ_SHR32        31
-+#define MSEC_TO_HZ_SHR32       32
- #define MSEC_TO_HZ_NUM          U64_C(1)
- #define MSEC_TO_HZ_DEN          U64_C(1)
- #define HZ_TO_USEC_MUL32        U64_C(0xfa000000)
-
-$ bash --version
-GNU bash, version 4.0.33(1)-release (x86_64-suse-linux-gnu)
-...
-
-You're trying to avoid the build dependency on Perl. What about adding a
-timeconst.h_shipped with the precomputed values from timeconst.pl:
-
-#if HZ == 24
-#define ...
-...
-#endif
-
-#if HZ == 32
-...
-#endif
-...
-#ifndef HZ_TO_MSEC_MUL32
-# error "Unknown HZ value, please update kernel/timeconst.h using
-kernel/timeconst.pl"
-#endif
-
-plus some makefile automagic to run the script iff the HZ value isn't
-precomputed. Then you would only need Perl for exotic HZ configurations.
-
+> Hi Linus,
 > 
-> Signed-off-by: Rob Landley <rob@landley.net>
-> --
+> The kbuild tree now breaks with 250cce26 ("iwlwifi: driver version
+> track kernel version") which you merged yesterday. Stephen Rothwell
+> kindly provided a fix, which I would normally apply to the kbuild tree,
+> but I don't want to rebase it as I already sent the pull request. Could
+> you please apply the following one-liner when merging the kbuild tree?
+> Thanks!
+
+Hi > Michal,
+
+Is there anything that tells us when we should/must use
+<generated/*.h> ?
+
+Thanks.
+
+> From: Stephen Rothwell <sfr@canb.auug.org.au>
+> Date: Mon, 7 Dec 2009 19:56:42 +1100
+> Subject: [PATCH] net: fix for utsrelease.h moving to generated
 > 
-> kernel/Makefile | 4
-> kernel/timeconst.pl | 378 ------------------------------------------
-> kernel/timeconst.sh | 91 ++++++++++
-> 3 files changed, 93 insertions(+), 380 deletions(-)
+> Signed-off-by: Stephen Rothwell <sfr@canb.auug.org.au>
+> Signed-off-by: Michal Marek <mmarek@suse.cz>
+> ---
+>  drivers/net/wireless/iwlwifi/iwl-core.h |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
 > 
-> diff -ruN linux-2.6.30/kernel/Makefile linux-2.6.30.new/kernel/Makefile
-> --- linux-2.6.30/kernel/Makefile	2009-06-09 22:05:27.000000000 -0500
-> +++ linux-2.6.30.new/kernel/Makefile	2009-06-22 14:29:16.000000000 -0500
-> @@ -123,7 +123,7 @@
->  $(obj)/time.o: $(obj)/timeconst.h
+> diff --git a/drivers/net/wireless/iwlwifi/iwl-core.h b/drivers/net/wireless/iwlwifi/iwl-core.h
+> index 675b7df..27ca859 100644
+> --- a/drivers/net/wireless/iwlwifi/iwl-core.h
+> +++ b/drivers/net/wireless/iwlwifi/iwl-core.h
+> @@ -63,7 +63,7 @@
+>  #ifndef __iwl_core_h__
+>  #define __iwl_core_h__
 >  
->  quiet_cmd_timeconst  = TIMEC   $@
-> -      cmd_timeconst  = $(PERL) $< $(CONFIG_HZ) > $@
-> +      cmd_timeconst  = $(CONFIG_SHELL) $< $(CONFIG_HZ) $@
->  targets += timeconst.h
-> -$(obj)/timeconst.h: $(src)/timeconst.pl FORCE
-> +$(obj)/timeconst.h: $(src)/timeconst.sh FORCE
->  	$(call if_changed,timeconst)
-> diff -ruN linux-2.6.30/kernel/timeconst.pl linux-2.6.30.new/kernel/timeconst.pl
-> --- linux-2.6.30/kernel/timeconst.pl	2009-06-09 22:05:27.000000000 -0500
-> +++ linux-2.6.30.new/kernel/timeconst.pl	1969-12-31 18:00:00.000000000 -0600
-> @@ -1,378 +0,0 @@
-> -#!/usr/bin/perl
-> -# -----------------------------------------------------------------------
-> -#
-> -#   Copyright 2007-2008 rPath, Inc. - All Rights Reserved
-> -#
-> -#   This file is part of the Linux kernel, and is made available under
-> -#   the terms of the GNU General Public License version 2 or (at your
-> -#   option) any later version; incorporated herein by reference.
-> -#
-> -# -----------------------------------------------------------------------
-> -#
-> -
-> -#
-> -# Usage: timeconst.pl HZ > timeconst.h
-[snip]
-> diff -ruN linux-2.6.30/kernel/timeconst.sh linux-2.6.30.new/kernel/timeconst.sh
-> --- linux-2.6.30/kernel/timeconst.sh	1969-12-31 18:00:00.000000000 -0600
-> +++ linux-2.6.30.new/kernel/timeconst.sh	2009-06-22 14:29:16.000000000 -0500
-> @@ -0,0 +1,148 @@
-> +#!/bin/sh
-> +
-> +if [ $# -ne 2 ]
-> +then
-> +	echo "Usage: timeconst.sh HZ FILENAME"
-> +	echo
-> +	echo "Generate a header file with constants for coverting between"
-> +	echo "decimal HZ timer ticks and milisecond or microsecond delays."
-> +	echo
-> +	exit 1
-> +fi
-> +
-> +HZ=$1
-> +shift
-> +FILENAME=$1
-> +
-> +# Sanity test: even the shell in Red Hat 9 (circa 2003) supported 64 bit math.
-> +
-> +if [ $((1 << 32)) -lt 0 ]
-> +then
-> +	echo "timeconst.sh needs a shell with 64 bit math, such as bash,"
-> +	echo "busybox ash, or dash running on a 64 bit host."
-> +	exit 1
-> +fi
-> +
-> +# If this script exits for any reason before this trap is removed,
-> +# delete the output file so a partial file won't confuse the build.
-> +
-> +trap "rm $FILENAME" EXIT
-> +
-> +# Output start of header file
-> +
-> +cat > $FILENAME << EOF || exit 1
-> +/* Automatically generated by kernel/timeconst.sh */
-> +/* Conversion constants for HZ == $HZ */
-> +
-> +#ifndef __KERNEL_TIMECONST_H
-> +#define __KERNEL_TIMECONST_H
-> +
-> +#include <linux/param.h>
-> +#include <linux/types.h>
-> +
-> +#if HZ != $HZ
-> +#error "kernel/timeconst.h has the wrong HZ value!"
-> +#endif
-> +
-> +EOF
-> +
-> +# For both Milliseconds and Microseconds
-> +
-> +cat << EOF |
-> +MSEC 1000
-> +USEC 1000000
-> +EOF
-> +while read NAME PERIOD
-> +do
-> +	# Find greatest common denominator (using Euclid's algorithm)
-> +
-> +	A=$HZ
-> +	B=$PERIOD
-> +
-> +	while [ $B -ne 0 ]
-> +	do
-> +		C=$(( $A % $B ))
-> +		A=$B
-> +		B=$C
-> +	done
-> +
-> +	GCD=$A
-> +
-> +	# Do this for each direction (HZ_TO_PERIOD and PERIOD_TO_HZ)
-> +
-> +	for DIRECTION in 0 1
-> +	do
-> +		if [ $DIRECTION -eq 0 ]
-> +		then
-> +			CONVERT="HZ_TO_${NAME}"
-> +			FROM=$HZ
-> +			TO=$PERIOD
-> +		else
-> +			CONVERT="${NAME}_TO_HZ"
-> +			FROM=$PERIOD
-> +			TO=$HZ
-> +		fi
-> +
-> +		# Calculate 32 significant bits of MUL32 data.
-> +
-> +		SHIFT=0
-> +		while true
-> +		do
-> +			# This can't overflow 64 bit math.  Pathological case
-> +			# (TO=1, FROM=1000000) uses around 32+20=52 bits.
-> +
-> +			MUL32=$(( ( ( $TO << $SHIFT ) + $FROM - 1 ) / $FROM ))
-> +
-> +			# Keep increasing $SHIFT until we've got 32 bits.
-> +
-> +			[ $MUL32 -gt $(( 1 << 31 )) ] && break
-> +			SHIFT=$(( $SHIFT + 1 ))
-> +		done
-> +		MUL32=$( printf %x $MUL32 )
-> +
-> +		# ADJ32 is just (((FROM/GCD)-1)<<SHIFT)/(FROM/GCD) but this
-> +		# can overflow 64 bit math (examples, HZ=24 or HZ=122).
-> +		# Pathological case could use 32+20+20=72 bits.  (And this is
-> +		# the pathological case because a larger $HZ results in a
-> +		# smaller $SHIFT, so even insane HZ>USEC cases should be ok.)
-> +
-> +		# To get around this, we chop the bottom 32 bits off the
-> +		# calculation and then reassemble it to avoid overflow:
-> +		# 32+64=96, which is > 72.
-> +
-> +		ADJ32=$(( $FROM / $GCD ))
-> +		if [ $SHIFT -gt 32 ]
-> +		then
-> +			UPPER=$(( ( $ADJ32 - 1 ) << ( $SHIFT - 32 ) ))
-> +			LOWER=$(( ( $UPPER % $ADJ32 ) << 32 ))
-> +			ADJ32=$(( ( ( $UPPER / $ADJ32 ) << 32 ) + ( $LOWER / $ADJ32 )))
-> +		else
-> +			ADJ32=$(( ( ( $ADJ32 - 1 ) << $SHIFT) / $ADJ32 ))
-> +		fi
-> +		ADJ32=$( printf %x $ADJ32 )
-> +
-> +		NUM=$(( $TO / $GCD ))
-> +		DEN=$(( $FROM / $GCD ))
-> +
-> +		# Output next chunk of header data to file
-> +
-> +		(
-> +			echo "#define ${CONVERT}_MUL32	U64_C(0x$MUL32)" &&
-> +			echo "#define ${CONVERT}_ADJ32	U64_C(0x$ADJ32)" &&
-> +			echo "#define ${CONVERT}_SHR32	$SHIFT" &&
-> +			echo "#define ${CONVERT}_NUM		U64_C($NUM)" &&
-> +			echo "#define ${CONVERT}_DEN		U64_C($DEN)"
-> +		) >> $FILENAME || exit 1
-> +	done
-> +done
-> +
-> +(
-> +	echo
-> +	echo "#endif /* __KERNEL_TIMECHONST_H */"
-                                      ^
-
-Should be "__KERNEL_TIMECONST_H".
+> -#include <linux/utsrelease.h>
+> +#include <generated/utsrelease.h>
+>  
+>  /************************
+>   * forward declarations *
+> --
 
 
-> +) >> $FILENAME || exit 1
-> +
-> +# Don't rm $FILENAME on exit anymore.
-> +
-> +trap "" EXIT
-> +
-> +exit 0
-> 
-
-Michal
+---
+~Randy
