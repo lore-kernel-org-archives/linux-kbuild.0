@@ -1,223 +1,71 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ew0-f209.google.com ([209.85.219.209]:39597 "EHLO
-	mail-ew0-f209.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751819AbZLIG2J convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 9 Dec 2009 01:28:09 -0500
-From: Arkadiusz Miskiewicz <a.miskiewicz@gmail.com>
-Subject: Re: [PATCH] MAINTAINERS: new kbuild maintainer
-Date: Wed, 9 Dec 2009 07:28:10 +0100
-References: <1260276751-19501-1-git-send-email-mmarek@suse.cz> <4B1EB5E9.3010506@suse.cz> <9b2db90b0912082222x5287d452pf9e55d6ff44e511c@mail.gmail.com>
-In-Reply-To: <9b2db90b0912082222x5287d452pf9e55d6ff44e511c@mail.gmail.com>
+Received: from cantor.suse.de ([195.135.220.2]:44105 "EHLO mx1.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752656AbZLIJem (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 9 Dec 2009 04:34:42 -0500
+Date: Wed, 9 Dec 2009 10:33:49 +0100
+From: Michal Marek <mmarek@suse.cz>
+Subject: Re: [GIT PULL] kbuild updates for 2.6.33
+Message-ID: <20091209093349.GA11837@sepie.suse.cz>
+References: <20091208133004.GA22750@sepie.suse.cz>
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="utf-8"
-Content-Transfer-Encoding: 8BIT
-Message-Id: <200912090728.10135.a.miskiewicz@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20091208133004.GA22750@sepie.suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nir Tzachar <nir.tzachar@gmail.com>
-Cc: Michal Marek <mmarek@suse.cz>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Stephen Rothwell <sfr@canb.auug.org.au>
 
-On Wednesday 09 of December 2009, Nir Tzachar wrote:
-> Hello.
+On Tue, Dec 08, 2009 at 02:30:04PM +0100, Michal Marek wrote:
+> Hi Linus,
 > 
-> On Tue, Dec 8, 2009 at 10:24 PM, Michal Marek <mmarek@suse.cz> wrote:
-> > Arkadiusz Miskiewicz napsal(a):
-> >> On Tuesday 08 of December 2009, Michal Marek wrote:
-> >>> Arkadiusz Miskiewicz napsal(a):
-> >>>> Maybe we can get colors back in menuconfig then? ;-)
-> >>>> http://bugzilla.kernel.org/show_bug.cgi?id=13677
-> >>>
-> >>> Does it also happen with Nir's nconfig
-> >>> (http://lkml.org/lkml/2009/11/25/119)?
-> >>
-> >> Yes, it does happen, I have non-color menus. That's because nconfig also
-> >> mixes wide ncurses library with non wide ncurses headers.
-> >>
-> >>   gcc -Wp,-MD,scripts/kconfig/.nconf.o.d -Wall -Wmissing-prototypes
-> >> -Wstrict- prototypes -O2 -fomit-frame-pointer   -I/usr/include/ncurses -
-> >> DCURSES_LOC="<ncurses.h>" -DLOCALE   -c -o scripts/kconfig/nconf.o
-> >> scripts/kconfig/nconf.c
-> >>
-> >> /usr/include/ncurses is non wide version of ncurses headers (but on
-> >> other distros it could be done differently aka /usr/include/ncures being
-> >> wide version)
-> >>
-> >>   gcc  -o scripts/kconfig/nconf scripts/kconfig/nconf.o
-> >> scripts/kconfig/zconf.tab.o scripts/kconfig/nconf.gui.o -lncursesw
-> >> -lmenu - lpanel -lncurses
-> >>
-> >> and here it's linked to non wide version of library (also to wide, too
-> >> due to scripts/kconfig/lxdialog/check-lxdialog.sh putting it here)
-> >>
-> >> Anyway way to solve this is:
-> >> - detect if ncurses header is wide or non-wide
-> >> - link with proper ncurses library based on detected header
-> >
-> > Nir, you surely know ncurses better than me :). Could you look into
-> > this?   Arkadiusz, which distribution are you using?
-> >
-> > Michal
+> these are the kbuild patches I collected for 2.6.33. There might be a few
+> more later, but this is the main part.
 > 
-> Well, I see the problem, but it does not manifest on my machines.
-> The thing is that lxdialog/check-lxdialog.sh always adds ncursesw to
-> the library path, even if the narrow version exists. I believe this is
-> set so that if there is only an installation of ncursesw everything
-> will work fine. However, it does not take into account that on most
-> systems (at least those I have seen) both of the versions are
-> installed.
+> Thanks,
+> Michal
 > 
-> As nconfig does not use any wide version function, and I believe
-> lxdialog does not also, I think we can remove ncursesw from the
-> libraries.
+> The following changes since commit 6ec22f9b037fc0c2e00ddb7023fad279c365324d:
+>   Linus Torvalds (1):
+>         Merge branch 'x86-debug-for-linus' of git://git.kernel.org/.../tip/linux-2.6-tip
 > 
-> Arkadiusz, do the patch below help?
+> are available in the git repository at:
 > 
-> diff --git a/scripts/kconfig/lxdialog/check-lxdialog.sh
-> b/scripts/kconfig/lxdialog/check-lxdialog.sh
-> index fcef0f5..5596d0c 100644
-> --- a/scripts/kconfig/lxdialog/check-lxdialog.sh
-> +++ b/scripts/kconfig/lxdialog/check-lxdialog.sh
-> @@ -5,7 +5,7 @@
->  ldflags()
->  {
->         for ext in so a dylib ; do
-> -               for lib in ncursesw ncurses curses ; do
-> +               for lib in ncurses curses ; do
->                         $cc -print-file-name=lib${lib}.${ext} | grep -q /
->                         if [ $? -eq 0 ]; then
->                                 echo "-l${lib}"
-> 
+>   git://repo.or.cz/linux-kbuild.git for-next
 
-On my disto it works but it won't on a distro where /usr/include/ncurses 
-contains wide version of headers.
+Hi Linus,
 
-> 
-> Moreover, currently nconfig does not use this check.
+The kbuild tree now breaks with 250cce26 ("iwlwifi: driver version
+track kernel version") which you merged yesterday. Stephen Rothwell
+kindly provided a fix, which I would normally apply to the kbuild tree,
+but I don't want to rebase it as I already sent the pull request. Could
+you please apply the following one-liner when merging the kbuild tree?
+Thanks!
 
-I was testing on linus git and this flags from this check were used in nconfig 
-build, too (that's why there were ncurses and ncursesw at the same time in 
-linking command).
-
-> It should be made
-> common to both mconf and nconf, and we need to make sure adding the
-> appropriate libraries only to the targets which need them (currently,
-> -lncurses is added to all targets in scripts/kbuild ...) Below is a
-> very hackish patch which does this. However, having a proper Makefile
-> for lxdialog would be much better.
-> 
-> diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
-> index 6d69c7c..e0c7714 100644
-> --- a/scripts/kconfig/Makefile
-> +++ b/scripts/kconfig/Makefile
-> @@ -23,6 +23,9 @@ menuconfig: $(obj)/mconf
->  config: $(obj)/conf
->  	$< $(Kconfig)
-> 
-> +nconfig: $(obj)/nconf
-> +	$< $(Kconfig)
-> +
->  oldconfig: $(obj)/conf
->  	$< -o $(Kconfig)
-> 
-> @@ -109,6 +112,7 @@ endif
->  # Help text used by make help
->  help:
->  	@echo  '  config	  - Update current config utilising a line-oriented
->  program' +	@echo  '  nconfig         - Update current config utilising a
-> ncurses menu based program'
->  	@echo  '  menuconfig	  - Update current config utilising a menu based
->  program' @echo  '  xconfig	  - Update current config utilising a QT based
->  front-end' @echo  '  gconfig	  - Update current config utilising a GTK
->  based front-end' @@ -127,8 +131,8 @@ check-lxdialog  :=
-> $(srctree)/$(src)/lxdialog/check-lxdialog.sh
-> 
->  # Use recursively expanded variables so we do not call gcc unless
->  # we really need to do so. (Do not call gcc as part of make mrproper)
-> -HOST_EXTRACFLAGS = $(shell $(CONFIG_SHELL) $(check-lxdialog) -ccflags)
-> -HOST_LOADLIBES   = $(shell $(CONFIG_SHELL) $(check-lxdialog) -ldflags
-> $(HOSTCC))
-> +NCURSESCFLAGS = $(shell $(CONFIG_SHELL) $(check-lxdialog) -ccflags)
-> +NCURSESLIBS   = $(shell $(CONFIG_SHELL) $(check-lxdialog) -ldflags
->  $(HOSTCC))
-> 
->  HOST_EXTRACFLAGS += -DLOCALE
-> 
-> @@ -136,6 +140,8 @@ HOST_EXTRACFLAGS += -DLOCALE
->  #
->  ==========================================================================
-> = # Shared Makefile for the various kconfig executables:
->  # conf:	  Used for defconfig, oldconfig and related targets
-> +# nconf:  Used for the nconfig target.
-> +#         Utilizes ncurses
->  # mconf:  Used for the menuconfig target
->  #         Utilizes the lxdialog package
->  # qconf:  Used for the xconfig target
-> @@ -147,12 +153,30 @@ HOST_EXTRACFLAGS += -DLOCALE
->  lxdialog := lxdialog/checklist.o lxdialog/util.o lxdialog/inputbox.o
->  lxdialog += lxdialog/textbox.o lxdialog/yesno.o lxdialog/menubox.o
-> 
-> +HOSTCFLAGS_checklist.o = $(NCURSESCFLAGS)
-> +HOSTCFLAGS_util.o = $(NCURSESCFLAGS)
-> +HOSTCFLAGS_inputbox.o = $(NCURSESCFLAGS)
-> +HOSTCFLAGS_textbox.o = $(NCURSESCFLAGS)
-> +HOSTCFLAGS_yesno.o  = $(NCURSESCFLAGS)
-> +HOSTCFLAGS_menubox.o = $(NCURSESCFLAGS)
-> +HOSTCFLAGS_mconf.o = $(NCURSESCFLAGS)
-> +
-> +HOSTCFLAGS_nconf.gui.o = $(NCURSESCFLAGS)
-> +HOSTCFLAGS_nconf.o = $(NCURSESCFLAGS)
-> +
-> +HOSTLOADLIBES_mconf = $(NCURSESLIBS)
-> +
->  conf-objs	:= conf.o  zconf.tab.o
-> -mconf-objs	:= mconf.o zconf.tab.o $(lxdialog)
-> +mconf-objs     := mconf.o zconf.tab.o $(lxdialog)
-> +nconf-objs     := nconf.o zconf.tab.o nconf.gui.o
->  kxgettext-objs	:= kxgettext.o zconf.tab.o
-> 
->  hostprogs-y := conf qconf gconf kxgettext
-> 
-> +ifeq ($(MAKECMDGOALS),nconfig)
-> +	hostprogs-y += nconf
-> +endif
-> +
->  ifeq ($(MAKECMDGOALS),menuconfig)
->  	hostprogs-y += mconf
->  endif
-> @@ -176,14 +200,14 @@ endif
-> 
->  clean-files	:= lkc_defs.h qconf.moc .tmp_qtcheck \
->  		   .tmp_gtkcheck zconf.tab.c lex.zconf.c zconf.hash.c gconf.glade.h
-> -clean-files     += mconf qconf gconf
-> +clean-files     += mconf qconf gconf nconf
->  clean-files     += config.pot linux.pot
-> 
->  # Check that we have the required ncurses stuff installed for
-> lxdialog (menuconfig)
->  PHONY += $(obj)/dochecklxdialog
->  $(addprefix $(obj)/,$(lxdialog)): $(obj)/dochecklxdialog
->  $(obj)/dochecklxdialog:
-> -	$(Q)$(CONFIG_SHELL) $(check-lxdialog) -check $(HOSTCC)
-> $(HOST_EXTRACFLAGS) $(HOST_LOADLIBES)
-> +	$(Q)$(CONFIG_SHELL) $(check-lxdialog) -check $(HOSTCC)
-> $(HOST_EXTRACFLAGS) $(HOST_LOADLIBES) $(NCURSESCFLAGS) $(NCURSESLIBS)
-> 
->  always := dochecklxdialog
-> 
-> @@ -201,6 +225,7 @@ HOSTLOADLIBES_gconf	= `pkg-config --libs gtk+-2.0
-> gmodule-2.0 libglade-2.0`
->  HOSTCFLAGS_gconf.o	= `pkg-config --cflags gtk+-2.0 gmodule-2.0
->  libglade-2.0` \ -D LKC_DIRECT_LINK
-> 
-> +HOSTLOADLIBES_nconf	= -lmenu -lpanel $(NCURSESLIBS)
->  $(obj)/qconf.o: $(obj)/.tmp_qtcheck
-> 
->  ifeq ($(qconf-target),1)
-> 
+Michal
 
 
--- 
-Arkadiusz Miśkiewicz        PLD/Linux Team
-arekm / maven.pl            http://ftp.pld-linux.org/
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+Date: Mon, 7 Dec 2009 19:56:42 +1100
+Subject: [PATCH] net: fix for utsrelease.h moving to generated
+
+Signed-off-by: Stephen Rothwell <sfr@canb.auug.org.au>
+Signed-off-by: Michal Marek <mmarek@suse.cz>
+---
+ drivers/net/wireless/iwlwifi/iwl-core.h |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/drivers/net/wireless/iwlwifi/iwl-core.h b/drivers/net/wireless/iwlwifi/iwl-core.h
+index 675b7df..27ca859 100644
+--- a/drivers/net/wireless/iwlwifi/iwl-core.h
++++ b/drivers/net/wireless/iwlwifi/iwl-core.h
+@@ -63,7 +63,7 @@
+ #ifndef __iwl_core_h__
+ #define __iwl_core_h__
+ 
+-#include <linux/utsrelease.h>
++#include <generated/utsrelease.h>
+ 
+ /************************
+  * forward declarations *
