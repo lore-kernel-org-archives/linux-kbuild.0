@@ -1,59 +1,55 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:46016 "EHLO mx2.suse.de"
+Received: from cantor.suse.de ([195.135.220.2]:43989 "EHLO mx1.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750802AbZLJNxq (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 10 Dec 2009 08:53:46 -0500
-Message-ID: <4B20FD2C.1010804@suse.cz>
-Date: Thu, 10 Dec 2009 14:52:44 +0100
+	id S1760819AbZLJONO (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 10 Dec 2009 09:13:14 -0500
+Message-ID: <4B2101BB.1010803@suse.cz>
+Date: Thu, 10 Dec 2009 15:12:11 +0100
 From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Subject: Re: [PATCH 1/3] Replace kernel/timeconst.pl with kernel/timeconst.sh
-References: <200912080317.08254.rob@landley.net> <200912080319.30679.rob@landley.net> <4B1FC621.8060500@suse.cz> <200912091740.43147.rob@landley.net>
-In-Reply-To: <200912091740.43147.rob@landley.net>
+Subject: Re: [GIT PULL] kbuild updates for 2.6.33
+References: <20091208133004.GA22750@sepie.suse.cz> <20091209093349.GA11837@sepie.suse.cz> <20091209093108.387b2736.randy.dunlap@oracle.com> <20091209192038.GA7827@merkur.ravnborg.org>
+In-Reply-To: <20091209192038.GA7827@merkur.ravnborg.org>
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Rob Landley <rob@landley.net>
-Cc: linux-kernel@vger.kernel.org, "H. Peter Anvin" <hpa@zytor.com>, linux-kbuild@vger.kernel.org
+To: Randy Dunlap <randy.dunlap@oracle.com>
+Cc: Sam Ravnborg <sam@ravnborg.org>, Linus Torvalds <torvalds@linux-foundation.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Stephen Rothwell <sfr@canb.auug.org.au>
 
-On 10.12.2009 00:40, Rob Landley wrote:
-> On Wednesday 09 December 2009 09:45:37 Michal Marek wrote:
->> You're trying to avoid the build dependency on Perl. What about adding a
->> timeconst.h_shipped with the precomputed values from timeconst.pl:
+On 9.12.2009 20:20, Sam Ravnborg wrote:
+> On Wed, Dec 09, 2009 at 09:31:08AM -0800, Randy Dunlap wrote:
+>> Hi > Michal,
+>>
+>> Is there anything that tells us when we should/must use
+>> <generated/*.h> ?
 > 
-> Been there, done that.  My first patch (way back for 2.6.25) took that 
-> approach:
+> The original idea was that include/generated/ should
+> be used for all generated header files.
 > 
-> http://landley.net/hg/hgwebdir.cgi/firmware/file/a791ca629d9c/sources/patches/linux-2.6.25-
-> rc1-noperl.patch
+> I once had a patch applied that used it for other
+> generated files - this was a bad idea. Said patch
+> was reverted as it had much bigger issues.
 > 
-> But it turns out various non-x86 targets (such as ARM OMAP) allow HZ to be 
-> specified by an entry field in the config file, into which the user can type a 
-> range of numbers.  See this post from last year for details:
+> So think of it as a place for generated header files only.
+> This also warrants the location in include/
 > 
-> http://lists.impactlinux.com/pipermail/firmware-impactlinux.com/2008-
-> December/000022.html
-> 
-> This is why reducing the perl version to just the precomputed constants 
-> wouldn't work either.  (They're there so that you only need to install a 
-> random cpan library when surprised by a build break on non-x86 machines.)
+> But only for 'global' header files. For drivers
+> and the like that needs the header file only locally the
+> header file should not be located n include/generated,
+> as it is only for the global headers.
 
-That's why I wrote
-
->> plus some makefile automagic to run the script iff the HZ value isn't
->> precomputed. Then you would only need Perl for exotic HZ configurations.
-
-E.g. make it
-...
-#elif HZ == 1200
-...
-#else
-#include "timeconst_custom.h"
-#endif
-
-and the makefile would run timeconst.pl to generate timeconst_custom.h
-iff HZ is set to something arbitrary. I don't have a patch for that, but
-I don't see a fundamental problem with such approach.
+... and if the question was rather "which #include lines need to be
+fixed to use generated/": Most of the "global" generated headers are
+used only in a handful of places mostly in arch and a bit in core kernel
+code. The only drivers that needed updating were four staging drivers
+that included <linux/autoconf.h> explicitely (dropping these includes
+was a worthwhile cleanup on it's own) and one staging driver and said
+iwlwifi which included <linux/utsrelease.h>. Also the rest of the series
+is quite non-intrusive, it affects about 25 source files in arch/,
+kernel/ and init/ + makefile cleanups. The most often included
+asm/asm-offsets.h header is solved by a wrapper in arch/*/include/asm to
+avoid unnecessary conflicts. The win is that we can get rid of the
+include/asm symlink and the include2 thing in O= builds.
 
 Michal
