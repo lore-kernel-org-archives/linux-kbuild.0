@@ -1,50 +1,59 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-fx0-f213.google.com ([209.85.220.213]:53250 "EHLO
-	mail-fx0-f213.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S934188AbZLJMET (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 10 Dec 2009 07:04:19 -0500
+Received: from cantor2.suse.de ([195.135.220.15]:46016 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750802AbZLJNxq (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 10 Dec 2009 08:53:46 -0500
+Message-ID: <4B20FD2C.1010804@suse.cz>
+Date: Thu, 10 Dec 2009 14:52:44 +0100
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-In-Reply-To: <200912090728.10135.a.miskiewicz@gmail.com>
-References: <1260276751-19501-1-git-send-email-mmarek@suse.cz>
-	 <4B1EB5E9.3010506@suse.cz>
-	 <9b2db90b0912082222x5287d452pf9e55d6ff44e511c@mail.gmail.com>
-	 <200912090728.10135.a.miskiewicz@gmail.com>
-Date: Thu, 10 Dec 2009 14:04:23 +0200
-Message-ID: <9b2db90b0912100404s5e97d9ddk181aed1990e36208@mail.gmail.com>
-Subject: Re: [PATCH] MAINTAINERS: new kbuild maintainer
-From: Nir Tzachar <nir.tzachar@gmail.com>
+Subject: Re: [PATCH 1/3] Replace kernel/timeconst.pl with kernel/timeconst.sh
+References: <200912080317.08254.rob@landley.net> <200912080319.30679.rob@landley.net> <4B1FC621.8060500@suse.cz> <200912091740.43147.rob@landley.net>
+In-Reply-To: <200912091740.43147.rob@landley.net>
 Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arkadiusz Miskiewicz <a.miskiewicz@gmail.com>
-Cc: Michal Marek <mmarek@suse.cz>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: Rob Landley <rob@landley.net>
+Cc: linux-kernel@vger.kernel.org, "H. Peter Anvin" <hpa@zytor.com>, linux-kbuild@vger.kernel.org
 
->
-> On my disto it works but it won't on a distro where /usr/include/ncurses
-> contains wide version of headers.
+On 10.12.2009 00:40, Rob Landley wrote:
+> On Wednesday 09 December 2009 09:45:37 Michal Marek wrote:
+>> You're trying to avoid the build dependency on Perl. What about adding a
+>> timeconst.h_shipped with the precomputed values from timeconst.pl:
+> 
+> Been there, done that.  My first patch (way back for 2.6.25) took that 
+> approach:
+> 
+> http://landley.net/hg/hgwebdir.cgi/firmware/file/a791ca629d9c/sources/patches/linux-2.6.25-
+> rc1-noperl.patch
+> 
+> But it turns out various non-x86 targets (such as ARM OMAP) allow HZ to be 
+> specified by an entry field in the config file, into which the user can type a 
+> range of numbers.  See this post from last year for details:
+> 
+> http://lists.impactlinux.com/pipermail/firmware-impactlinux.com/2008-
+> December/000022.html
+> 
+> This is why reducing the perl version to just the precomputed constants 
+> wouldn't work either.  (They're there so that you only need to install a 
+> random cpan library when surprised by a build break on non-x86 machines.)
 
-ncurses does not support a proper pkg-config scheme, hence the
-difficulty with finding the correct flags. Regarding the wideness of
-the library, I would presume that any distro which mismatches
-/usr/include/ncurses.h and libncurses.so is in itself broken. Taking
-this into consideration, I think that including /usr/include/ncurses.h
-and linking against -lncurses should work. We should entirely ignore
-the wide version of the library, and use the default installation
-provided.
+That's why I wrote
 
->
->>
->> Moreover, currently nconfig does not use this check.
->
-> I was testing on linus git and this flags from this check were used in nconfig
-> build, too (that's why there were ncurses and ncursesw at the same time in
-> linking command).
+>> plus some makefile automagic to run the script iff the HZ value isn't
+>> precomputed. Then you would only need Perl for exotic HZ configurations.
 
-Well, I do not know why, by the check changed the flags for _all_
-targets in the scripts/kconfig dir, such that even qconfig got copiled
-with -lncursesw. Strange. The change I made in the Makefile in the
-previous mail fixes that.
+E.g. make it
+...
+#elif HZ == 1200
+...
+#else
+#include "timeconst_custom.h"
+#endif
 
-Cheers,
-Nir.
+and the makefile would run timeconst.pl to generate timeconst_custom.h
+iff HZ is set to something arbitrary. I don't have a patch for that, but
+I don't see a fundamental problem with such approach.
+
+Michal
