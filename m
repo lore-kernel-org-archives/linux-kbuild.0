@@ -1,50 +1,75 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from terminus.zytor.com ([198.137.202.10]:58046 "EHLO
-	terminus.zytor.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1758952AbZLKTT5 (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 11 Dec 2009 14:19:57 -0500
-Message-ID: <4B2299E3.8020903@zytor.com>
-Date: Fri, 11 Dec 2009 11:13:39 -0800
-From: "H. Peter Anvin" <hpa@zytor.com>
+Received: from borg.medozas.de ([188.40.89.202]:60450 "EHLO borg.medozas.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1761752AbZLKTzt (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 11 Dec 2009 14:55:49 -0500
+Date: Fri, 11 Dec 2009 20:55:53 +0100 (CET)
+From: Jan Engelhardt <jengelh@medozas.de>
+Subject: Re: nconfig v7
+Message-ID: <alpine.LSU.2.01.0912112023170.32039@obet.zrqbmnf.qr>
 MIME-Version: 1.0
-Subject: Re: [PATCH 1/3] Replace kernel/timeconst.pl with kernel/timeconst.sh
-References: <200912080317.08254.rob@landley.net> <200912091740.43147.rob@landley.net> <4B20FD2C.1010804@suse.cz> <200912101717.00049.rob@landley.net> <4B2265D2.6000400@suse.cz>
-In-Reply-To: <4B2265D2.6000400@suse.cz>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: TEXT/PLAIN; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: Rob Landley <rob@landley.net>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: nir.tzachar@gmail.com
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org
 
-On 12/11/2009 07:31 AM, Michal Marek wrote:
-> 
-> OK, that's valid point, indeed. Peter, would you ack Rob's patch with
-> the oneline fix added (http://lkml.org/lkml/2009/12/8/94 plus
-> http://lkml.org/lkml/2009/12/9/435)?
-> 
+Hi,
 
-I strongly dislike his patch, as he open-codes specific multiprecision
-arithmetic.  This makes it hard for other people to maintain, and makes
-it prone to errors -- as evidenced by the fact that it didn't even
-replicate the known-good results.
 
-I have made my position clear on this and other patches several times
-before: I consider it a fool's errand, and a result of a completely
-pointless crusade to make a particular science fair-type project a wee
-bit easier.  We have already seen real damage caused by it, since people
-have used awk instead, and have gotten bitten by incompatibilities
-between awk implementations.
+I gave nconfig a try, and here are a few suggestive points:
 
-As such, no, I will not ack this patch, and will consider myself
-released of any obligation to maintain the code if this goes in anyway.
- I would consider acking a C program which does proper multiprecision
-arithmetic, but I'm also not going to spend my time on it.
+- provide the same color scheme as menuconfig
 
-	-hpa
+- I get a visual glitch (see Exhibit A below) in General setup (patch
+  slapped onto 2.6.32); the left frame part is missing.
 
--- 
-H. Peter Anvin, Intel Open Source Technology Center
-I work for Intel.  I don't speak on their behalf.
+- For symbol info, it would be cool if it wrapped the "Selected by"
+  line (menuconfig also "suffers" from this), because that one can
+  get exceptionally long and awkward to scroll.
 
+- I certainly like F4-Config-ShowAll :)  but it has some glitches
+  interfering near ARCH_DEFCONFIG (see Exhibit B).
+
+
+
+----(Exhibit A)
+                  .config - Linux Kernel v2.6.32 Configuration
+ ┌── General setup ───────────────────────────────────────────────────────────┐
+ │                                                                            │
+  [*] Prompt for development and/or incomplete code/drivers                   │
+  ()  Local version - append to kernel release                                │
+  [ ] Automatically append version information to the version string          │
+  [*] Support for paging of anonymous memory (swap)                           │
+  [*] System V IPC                                                            │
+  [*] POSIX Message Queues                                                    │
+  [*] BSD Process Accounting                                                  │
+  [ ]   BSD Process Accounting version 3 file format                          │
+  [*] Export task/process statistics through netlink (EXPERIMENTAL)           │
+  [*]   Enable per-task delay accounting (EXPERIMENTAL)                       │
+  [*]   Enable extended accounting over taskstats (EXPERIMENTAL)              │
+  [*]     Enable per-task storage I/O accounting (EXPERIMENTAL)               │
+  [*] Auditing support                                                        │
+  [*]   Enable system-call auditing support                                   │
+      RCU Subsystem  --->                                                     │
+  < > Kernel .config support                                                  │
+  (17) Kernel log buffer size (16 => 64KB, 17 => 128KB)                       │
+  [*] Group CPU scheduler                                                     │
+ │                                                                            │
+ │                                                                            │
+ └F1Help─F2Symbol Info─F3Instructions─F4Config─F5Back─F6Save─F7Load─F8Exit────┘
+----
+
+----(Exhibit B)
+ ┌── Linux Kernel Configuration ──────────────────────────────────────────────┐
+ │                                                                            │
+ │          XXX 64-bit kernel                                                 │
+ │          XXX SPARC                                                         │
+ │          XXX SPARC32                                                       │
+ │          XXX SPARC64                                                       │
+ │          XXXch/sparc/configs/sparc64_defconfig) ARCH_DEFCONFIG             │
+ │          XXX) BITS                                                         │
+ │          XXX GENERIC_TIME                                                  │
+...
+----
