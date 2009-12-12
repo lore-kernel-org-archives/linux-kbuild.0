@@ -1,46 +1,34 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp1.linux-foundation.org ([140.211.169.13]:36346 "HELO
-	smtp1.linux-foundation.org" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with SMTP id S932140AbZLMBO5 (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 12 Dec 2009 20:14:57 -0500
-Date: Sat, 12 Dec 2009 15:22:08 -0800 (PST)
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Subject: Re: [resend][GIT PULL] kbuild updates for 2.6.33
-In-Reply-To: <20091212144730.GA6788@sepie.suse.cz>
-Message-ID: <alpine.LFD.2.00.0912121519490.3535@localhost.localdomain>
-References: <20091212144730.GA6788@sepie.suse.cz>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+Received: from gate.crashing.org ([63.228.1.57]:52513 "HELO gate.crashing.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with SMTP
+	id S933838AbZLMBlN (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 12 Dec 2009 20:41:13 -0500
+In-Reply-To: <1260615744-23165-1-git-send-email-mmarek@suse.cz>
+References: <1260615744-23165-1-git-send-email-mmarek@suse.cz>
+Mime-Version: 1.0 (Apple Message framework v753.1)
+Content-Type: text/plain; charset=US-ASCII; delsp=yes; format=flowed
+Message-Id: <BECBC631-3E9B-48EF-AA08-5C37806C4A7D@kernel.crashing.org>
+Content-Transfer-Encoding: 7bit
+From: Segher Boessenkool <segher@kernel.crashing.org>
+Subject: Re: [PATCH] modpost: fix segfault with short symbol names
+Date: Sat, 12 Dec 2009 16:26:20 +0100
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: Rusty Russell <rusty@rustcorp.com.au>, linux-kbuild@vger.kernel.org
+
+> memcmp() is wrong here, the symbol name can be shorter than  
+> KSYMTAB_PFX
+> or CRC_PFX.
+
+> -		if (memcmp(symname, CRC_PFX, strlen(CRC_PFX)) == 0) {
+> +		if (strncmp(symname, CRC_PFX, strlen(CRC_PFX)) == 0) {
+
+This doesn't change anything.  In both cases the function will return 0
+only if all strlen(CRC_PFX) chars match, and in both cases it can access
+strlen(CRC_PFX) chars (strncmp() is allowed to access characters after
+the first \0 just fine).
 
 
+Segher
 
-On Sat, 12 Dec 2009, Michal Marek wrote:
-> 
->   git://repo.or.cz/linux-kbuild.git for-33
-> 
-> 
->  .gitignore                                      |    7 +-
->  Documentation/dontdiff                          |    1 +
->  Documentation/kbuild/kbuild.txt                 |   14 +
->  Documentation/kbuild/kconfig.txt                |    8 +-
-> ...
-
-That's not at all the diffstat I get. I just get
-
- Makefile                 |    5 +-
- include/linux/Kbuild     |    1 +
- scripts/Makefile.lib     |    2 +-
- scripts/mod/modpost.c    |  164 ----------------------------------------------
- scripts/mod/modpost.h    |    3 -
- scripts/package/Makefile |   20 +++++-
- scripts/package/buildtar |    6 ++-
- 7 files changed, 28 insertions(+), 173 deletions(-)
-
-Not pulled, since I suspect you meant me to pull something else.
-
-		Linus
