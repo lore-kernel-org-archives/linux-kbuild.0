@@ -1,47 +1,81 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:52513 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:53133 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752656AbZLLLCm (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 12 Dec 2009 06:02:42 -0500
+	id S1761529AbZLLL1q (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 12 Dec 2009 06:27:46 -0500
+Message-ID: <4B237E3C.2080603@suse.cz>
+Date: Sat, 12 Dec 2009 12:27:56 +0100
 From: Michal Marek <mmarek@suse.cz>
-Subject: [PATCH] modpost: fix segfault with short symbol names
-Date: Sat, 12 Dec 2009 12:02:24 +0100
-Message-Id: <1260615744-23165-1-git-send-email-mmarek@suse.cz>
+MIME-Version: 1.0
+Subject: Re: [PATCH] wrap long help lines
+References: <3b09bd800912110901t106bb3a6td581537e151d5ce0@mail.gmail.com>
+In-Reply-To: <3b09bd800912110901t106bb3a6td581537e151d5ce0@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Rusty Russell <rusty@rustcorp.com.au>
-Cc: linux-kbuild@vger.kernel.org, linux-kernek@vger.kernel.org
+To: =?UTF-8?B?IlZhZGltIEJlbmRlYnVyeSAo0LLQsSki?= <vbendeb@google.com>
+Cc: linux-kbuild@vger.kernel.org
 
-memcmp() is wrong here, the symbol name can be shorter than KSYMTAB_PFX
-or CRC_PFX.
+Vadim Bendebury (вб) napsal(a):
+> Hi Michal, thank you for your comments. Please see my further questions below:
+> 
+> 2009/12/11 Michal Marek <mmarek@suse.cz>:
+>> Vadim Bendebury napsal(a):
+>>> Help text for certain config options is very extensive (the text includes all
+>>> config options which the option in question depends on). Long lines are not
+>>> wrapped, making it impossible to see the list.
+>>>
+>>> This patch adds a function to wrap long lines to fit the screen width and
+>>> makes sure the function is invoked after help text is prepared.
+>> Hi Vadim,
+>>
+>> I think that wrapping long lines in menuconfig is a good idea, but I
+>> have a few problems with your patch.
+>>
+> 
+> this was just an attempt to get the discussion going  :-)
+> 
+>>> diff --git a/scripts/kconfig/expr.c b/scripts/kconfig/expr.c
+>>> index edd3f39..2aa49e8 100644
+>>> --- a/scripts/kconfig/expr.c
+>>> +++ b/scripts/kconfig/expr.c
+>>> @@ -1083,6 +1083,8 @@ void expr_print(struct expr *e, void (*fn)(void *, struct symbol *, const char *
+>>>       }
+>>>       if (expr_compare_type(prevtoken, e->type) > 0)
+>>>               fn(data, NULL, ")");
+>>> +
+>>> +     str_screen_wrap(data, "||");
+>>>  }
+>> expr_print() is not the right place to do it. data is a opaque pointer,
+>> you can't assume that it's a pointer to struct gstr. qconf passes some
+>> class pointer here, there is code to dump symbol info to a filehandle.
+>> This should be done in the actual interface program, not in this generic
+>> code.
+>>
+> 
+> well, I picked this spot because this is where just the last line of
+> the text might require wrapping, this makes the wrapping function
+> simpler.
+> 
+> What do you think of mconf:show_help() before invoking
+> show_help_text() - is it the right spot to plug this in? Do you have a
+> suggestion?
 
-Signed-off-by: Michal Marek <mmarek@suse.cz>
----
- scripts/mod/modpost.c |    4 ++--
- 1 files changed, 2 insertions(+), 2 deletions(-)
+If you look at the expr_print() prototype, it takes a pointer to a
+callback and a data argument. This callback gets repeatedly called to
+store or display parts of the text. So you could create a new callback
+that pastes the parts together and inserts a newline if needed. That
+way, you don't have to memcpy() the text around afterwards.
 
-diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index 801a16a..065ee0b 100644
---- a/scripts/mod/modpost.c
-+++ b/scripts/mod/modpost.c
-@@ -515,7 +515,7 @@ static void handle_modversions(struct module *mod, struct elf_info *info,
- 		break;
- 	case SHN_ABS:
- 		/* CRC'd symbol */
--		if (memcmp(symname, CRC_PFX, strlen(CRC_PFX)) == 0) {
-+		if (strncmp(symname, CRC_PFX, strlen(CRC_PFX)) == 0) {
- 			crc = (unsigned int) sym->st_value;
- 			sym_update_crc(symname + strlen(CRC_PFX), mod, crc,
- 					export);
-@@ -559,7 +559,7 @@ static void handle_modversions(struct module *mod, struct elf_info *info,
- 		break;
- 	default:
- 		/* All exported symbols */
--		if (memcmp(symname, KSYMTAB_PFX, strlen(KSYMTAB_PFX)) == 0) {
-+		if (strncmp(symname, KSYMTAB_PFX, strlen(KSYMTAB_PFX)) == 0) {
- 			sym_add_exported(symname + strlen(KSYMTAB_PFX), mod,
- 					export);
- 		}
--- 
-1.6.5.3
 
+> And this brings the main question: how do we tell the window width in
+> different modes? Do we care to do this wrap in other than text
+> terminal modes?
+
+Qt and Gtk use widgets that take care of proper wrapping. oldconfig just
+prints the text on the terminal which does the wrapping (not at word
+boundaries, but that's IMO not an issue). So it's really just menuconfig
+(and nconfig, but porting your change to nconfig should be trivial).
+
+Michal
