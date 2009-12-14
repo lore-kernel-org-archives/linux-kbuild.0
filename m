@@ -1,32 +1,36 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-fx0-f213.google.com ([209.85.220.213]:42546 "EHLO
-	mail-fx0-f213.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751342AbZLNFl5 convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 14 Dec 2009 00:41:57 -0500
+Received: from cantor.suse.de ([195.135.220.2]:33246 "EHLO mx1.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1755567AbZLNKGW (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 14 Dec 2009 05:06:22 -0500
+Date: Mon, 14 Dec 2009 11:06:14 +0100
+From: Michal Marek <mmarek@suse.cz>
+Subject: Re: [PATCH] modpost: fix segfault with short symbol names
+Message-ID: <20091214100613.GA21769@sepie.suse.cz>
+References: <1260615744-23165-1-git-send-email-mmarek@suse.cz>
+ <BECBC631-3E9B-48EF-AA08-5C37806C4A7D@kernel.crashing.org>
 MIME-Version: 1.0
-In-Reply-To: <alpine.LSU.2.01.0912131118280.28039@obet.zrqbmnf.qr>
-References: <alpine.LSU.2.01.0912112023170.32039@obet.zrqbmnf.qr>
-	 <9b2db90b0912122323w25d2d815o70d0bd2f1e19a228@mail.gmail.com>
-	 <alpine.LSU.2.01.0912131118280.28039@obet.zrqbmnf.qr>
-Date: Mon, 14 Dec 2009 07:41:55 +0200
-Message-ID: <9b2db90b0912132141j6b06d26dgd1e14acf3631de13@mail.gmail.com>
-Subject: Re: nconfig v7
-From: Nir Tzachar <nir.tzachar@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <BECBC631-3E9B-48EF-AA08-5C37806C4A7D@kernel.crashing.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jan Engelhardt <jengelh@medozas.de>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org
+To: Segher Boessenkool <segher@kernel.crashing.org>
+Cc: Rusty Russell <rusty@rustcorp.com.au>, linux-kbuild@vger.kernel.org
 
->>> - I get a visual glitch (see Exhibit A below) in General setup (patch
->>>  slapped onto 2.6.32); the left frame part is missing.
->>
->>I cannot reproduce this. Can you provide some more details? (e.g.,
->>which terminal, $LINES, $COLUMNS, $TERM)
->
-> xterm -bg black -fg gray -geometry 80x25
+On Sat, Dec 12, 2009 at 04:26:20PM +0100, Segher Boessenkool wrote:
+> >memcmp() is wrong here, the symbol name can be shorter than
+> >KSYMTAB_PFX
+> >or CRC_PFX.
+> 
+> >-		if (memcmp(symname, CRC_PFX, strlen(CRC_PFX)) == 0) {
+> >+		if (strncmp(symname, CRC_PFX, strlen(CRC_PFX)) == 0) {
+> 
+> This doesn't change anything.  In both cases the function will return 0
+> only if all strlen(CRC_PFX) chars match, and in both cases it can access
+> strlen(CRC_PFX) chars (strncmp() is allowed to access characters after
+> the first \0 just fine).
 
-I cannot reproduce this on any of my systems. Any idea how to
-proceed?? Can you also send a snapshot?
+str(n)cmp is not allowed to access characters past the NUL byte.
+
+Michal
