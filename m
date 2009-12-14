@@ -1,53 +1,75 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from gate.crashing.org ([63.228.1.57]:41524 "EHLO gate.crashing.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753460AbZLNNdW (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 14 Dec 2009 08:33:22 -0500
-Message-ID: <51737.84.105.60.153.1260797592.squirrel@gate.crashing.org>
-In-Reply-To: <20091214100613.GA21769@sepie.suse.cz>
-References: <1260615744-23165-1-git-send-email-mmarek@suse.cz>
-    <BECBC631-3E9B-48EF-AA08-5C37806C4A7D@kernel.crashing.org>
-    <20091214100613.GA21769@sepie.suse.cz>
-Date: Mon, 14 Dec 2009 14:33:12 +0100 (CET)
-Subject: Re: [PATCH] modpost: fix segfault with short symbol names
-From: "Segher Boessenkool" <segher@kernel.crashing.org>
+Received: from mail-fx0-f213.google.com ([209.85.220.213]:53529 "EHLO
+	mail-fx0-f213.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754733AbZLNNp6 convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 14 Dec 2009 08:45:58 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7BIT
+In-Reply-To: <alpine.LSU.2.01.0912141325220.21244@obet.zrqbmnf.qr>
+References: <alpine.LSU.2.01.0912112023170.32039@obet.zrqbmnf.qr>
+	 <9b2db90b0912122323w25d2d815o70d0bd2f1e19a228@mail.gmail.com>
+	 <alpine.LSU.2.01.0912131118280.28039@obet.zrqbmnf.qr>
+	 <9b2db90b0912132141j6b06d26dgd1e14acf3631de13@mail.gmail.com>
+	 <alpine.LSU.2.01.0912141325220.21244@obet.zrqbmnf.qr>
+Date: Mon, 14 Dec 2009 15:45:56 +0200
+Message-ID: <9b2db90b0912140545i158cc4b5o9cd72feca9e8983f@mail.gmail.com>
+Subject: Re: nconfig v7
+From: Nir Tzachar <nir.tzachar@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: Segher Boessenkool <segher@kernel.crashing.org>, Rusty Russell <rusty@rustcorp.com.au>, linux-kbuild@vger.kernel.org
+To: Jan Engelhardt <jengelh@medozas.de>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org
 
-> On Sat, Dec 12, 2009 at 04:26:20PM +0100, Segher Boessenkool wrote:
->> >memcmp() is wrong here, the symbol name can be shorter than
->> >KSYMTAB_PFX
->> >or CRC_PFX.
->>
->> >-		if (memcmp(symname, CRC_PFX, strlen(CRC_PFX)) == 0) {
->> >+		if (strncmp(symname, CRC_PFX, strlen(CRC_PFX)) == 0) {
->>
->> This doesn't change anything.  In both cases the function will return 0
->> only if all strlen(CRC_PFX) chars match, and in both cases it can access
->> strlen(CRC_PFX) chars (strncmp() is allowed to access characters after
->> the first \0 just fine).
+Please try this patch. It should solve both of the problems you reported.
+
+diff --git a/scripts/kconfig/nconf.c b/scripts/kconfig/nconf.c
+index 8c56150..cab6bb0 100644
+--- a/scripts/kconfig/nconf.c
++++ b/scripts/kconfig/nconf.c
+@@ -984,7 +984,7 @@ static void build_conf(struct menu *menu)
+                                break;
+                        default:
+                                tmp = 2 + strlen(sym_get_string_value(sym));
+-                               item_make(menu, 's', "(%s)",
++                               item_make(menu, 's', "    (%s)",
+                                                sym_get_string_value(sym));
+                                tmp = indent - tmp + 4;
+                                if (tmp < 0)
+@@ -1072,8 +1072,8 @@ static void show_menu(const char *prompt, const
+char *instructions,
+
+        /* position the menu at the middle of the screen */
+        scale_menu(curses_menu, &maxy, &maxx);
+-       maxx = min(maxx, mwin_max_cols);
+-       maxy = mwin_max_lines-1;
++       maxx = min(maxx, mwin_max_cols-2);
++       maxy = mwin_max_lines-2;
+        menu_window = derwin(main_window,
+                        maxy,
+                        maxx,
+
+
+On Mon, Dec 14, 2009 at 2:26 PM, Jan Engelhardt <jengelh@medozas.de> wrote:
+> On Monday 2009-12-14 06:41, Nir Tzachar wrote:
 >
-> str(n)cmp is not allowed to access characters past the NUL byte.
-
-Let me apologise for the confusion.
-
-strncmp() _can_ access characters past the first NUL byte; and
-many implementations do so (they do accesses per 32-bit word,
-for example).  But strncmp() behaves as-if it didn't compare
-anything past the first null character, so for example causing
-a page fault if the string ends just before the end of a memory
-page isn't allowed; OTOH, the parameters to memcmp() are required
-to point to two objects, each at least "len" bytes big.
-
-So the patch fixes a real problem.  I'm sorry for being dense.
-
-Acked-by: Segher Boessenkool <segher@kernel.crashing.org>
-
-
-Segher
-
+>>>>> - I get a visual glitch (see Exhibit A below) in General setup (patch
+>>>>>  slapped onto 2.6.32); the left frame part is missing.
+>>>>
+>>>>I cannot reproduce this. Can you provide some more details? (e.g.,
+>>>>which terminal, $LINES, $COLUMNS, $TERM)
+>>>
+>>> xterm -bg black -fg gray -geometry 80x25
+>>
+>>I cannot reproduce this on any of my systems. Any idea how to
+>>proceed?? Can you also send a snapshot?
+>>
+>
+> Add this to the top of arch/x86/Kconfig:
+>
+> config VERY_LONG_CONFIGURATION_OPTION
+>   bool "With a very long long description, you see where this is going"
+>
+> to reproduce the effect on ARCH=x86.
+>
