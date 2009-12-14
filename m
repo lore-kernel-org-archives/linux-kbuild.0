@@ -1,42 +1,39 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from gate.crashing.org ([63.228.1.57]:45646 "EHLO gate.crashing.org"
+Received: from borg.medozas.de ([188.40.89.202]:33699 "EHLO borg.medozas.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1757143AbZLNMV1 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 14 Dec 2009 07:21:27 -0500
-In-Reply-To: <20091214100613.GA21769@sepie.suse.cz>
-References: <1260615744-23165-1-git-send-email-mmarek@suse.cz> <BECBC631-3E9B-48EF-AA08-5C37806C4A7D@kernel.crashing.org> <20091214100613.GA21769@sepie.suse.cz>
-Mime-Version: 1.0 (Apple Message framework v753.1)
-Content-Type: text/plain; charset=US-ASCII; delsp=yes; format=flowed
-Message-Id: <3807088D-7DBE-4966-97A7-457D0E46136D@kernel.crashing.org>
-Content-Transfer-Encoding: 7bit
-From: Segher Boessenkool <segher@kernel.crashing.org>
-Subject: Re: [PATCH] modpost: fix segfault with short symbol names
-Date: Mon, 14 Dec 2009 13:29:57 +0100
+	id S1757188AbZLNM0z (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 14 Dec 2009 07:26:55 -0500
+Date: Mon, 14 Dec 2009 13:26:53 +0100 (CET)
+From: Jan Engelhardt <jengelh@medozas.de>
+Subject: Re: nconfig v7
+In-Reply-To: <9b2db90b0912132141j6b06d26dgd1e14acf3631de13@mail.gmail.com>
+Message-ID: <alpine.LSU.2.01.0912141325220.21244@obet.zrqbmnf.qr>
+References: <alpine.LSU.2.01.0912112023170.32039@obet.zrqbmnf.qr>  <9b2db90b0912122323w25d2d815o70d0bd2f1e19a228@mail.gmail.com>  <alpine.LSU.2.01.0912131118280.28039@obet.zrqbmnf.qr> <9b2db90b0912132141j6b06d26dgd1e14acf3631de13@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: Rusty Russell <rusty@rustcorp.com.au>, linux-kbuild@vger.kernel.org
+To: Nir Tzachar <nir.tzachar@gmail.com>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org
 
->>> memcmp() is wrong here, the symbol name can be shorter than
->>> KSYMTAB_PFX
->>> or CRC_PFX.
+On Monday 2009-12-14 06:41, Nir Tzachar wrote:
+
+>>>> - I get a visual glitch (see Exhibit A below) in General setup (patch
+>>>>  slapped onto 2.6.32); the left frame part is missing.
+>>>
+>>>I cannot reproduce this. Can you provide some more details? (e.g.,
+>>>which terminal, $LINES, $COLUMNS, $TERM)
 >>
->>> -		if (memcmp(symname, CRC_PFX, strlen(CRC_PFX)) == 0) {
->>> +		if (strncmp(symname, CRC_PFX, strlen(CRC_PFX)) == 0) {
->>
->> This doesn't change anything.  In both cases the function will  
->> return 0
->> only if all strlen(CRC_PFX) chars match, and in both cases it can  
->> access
->> strlen(CRC_PFX) chars (strncmp() is allowed to access characters  
->> after
->> the first \0 just fine).
+>> xterm -bg black -fg gray -geometry 80x25
 >
-> str(n)cmp is not allowed to access characters past the NUL byte.
+>I cannot reproduce this on any of my systems. Any idea how to
+>proceed?? Can you also send a snapshot?
+>
 
-You are wrong.  strncmp() _is_ allowed to do that.  So this patch
-doesn't change anything.
+Add this to the top of arch/x86/Kconfig:
 
+config VERY_LONG_CONFIGURATION_OPTION 
+   bool "With a very long long description, you see where this is going"
 
-Segher
-
+to reproduce the effect on ARCH=x86.
