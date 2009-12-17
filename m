@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepb.post.tele.dk ([195.41.46.236]:49102 "EHLO
+Received: from pfepb.post.tele.dk ([195.41.46.236]:50437 "EHLO
 	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750816AbZLQHzJ (ORCPT
+	with ESMTP id S1753237AbZLQIJq (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 17 Dec 2009 02:55:09 -0500
-Date: Thu, 17 Dec 2009 08:54:16 +0100
+	Thu, 17 Dec 2009 03:09:46 -0500
+Date: Thu, 17 Dec 2009 09:09:00 +0100
 From: Sam Ravnborg <sam@ravnborg.org>
 Subject: Re: CONFIG_KPROBES=y build requires gawk
-Message-ID: <20091217075416.GA4002@merkur.ravnborg.org>
+Message-ID: <20091217080900.GA4010@merkur.ravnborg.org>
 References: <20091216235617.GA12267@hexapodia.org> <adabphy750b.fsf@roland-alpha.cisco.com> <4B29A686.9070603@redhat.com> <ada3a3a6xs6.fsf@roland-alpha.cisco.com> <4B29BA13.7020502@redhat.com> <aday6l25gnm.fsf@roland-alpha.cisco.com> <20091217054524.GA3931@merkur.ravnborg.org> <4B29C81E.2000704@zytor.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
@@ -56,21 +56,11 @@ On Wed, Dec 16, 2009 at 09:56:46PM -0800, H. Peter Anvin wrote:
 >  # Make variables (CC, etc...)
 > 
 >  AS		= $(CROSS_COMPILE)as
-> 
-> 
-> OK?
 
-We tried something like this some time ago.
-I cannot recall the details anymore but I managed to dig out this link:
+Took a closer look at the patch.
+I think we should move this upwards in the Makefile so it take effect as soon as possible.
+Around the line where we do:
 
-http://git.kernel.org/?p=linux/kernel/git/torvalds/old-2.6-bkcvs.git;a=commit;h=191ba46a4aceb72f8481c58069b61f5e8cdef1f0
-
-Today IIRC we no longer export the variable CFLAGS_vmlinux.lds.o so this may be a non-issue.
-I bring up this only to say that there be some hidden side-effects of manipulating
-with LC_*.
-Back then I never understood exactly what was wrong - I just did the obvious revert.
-
-One rationale behind the whish to add LC_* back then was to speed up the build.
-I recall it had a measureable effect - but memory may trick me here.
+MAKEFLAGS += -rR --no-print-directory
 
 	Sam
