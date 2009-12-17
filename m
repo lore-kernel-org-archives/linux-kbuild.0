@@ -1,63 +1,63 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepb.post.tele.dk ([195.41.46.236]:33694 "EHLO
-	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752529AbZLQFqr (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 17 Dec 2009 00:46:47 -0500
-Date: Thu, 17 Dec 2009 06:45:24 +0100
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: CONFIG_KPROBES=y build requires gawk
-Message-ID: <20091217054524.GA3931@merkur.ravnborg.org>
-References: <20091216235617.GA12267@hexapodia.org> <adabphy750b.fsf@roland-alpha.cisco.com> <4B29A686.9070603@redhat.com> <ada3a3a6xs6.fsf@roland-alpha.cisco.com> <4B29BA13.7020502@redhat.com> <aday6l25gnm.fsf@roland-alpha.cisco.com>
+Received: from mx1.redhat.com ([209.132.183.28]:53349 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753915AbZLQFrl (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 17 Dec 2009 00:47:41 -0500
+Message-ID: <4B29C652.5080803@redhat.com>
+Date: Thu, 17 Dec 2009 00:49:06 -0500
+From: Masami Hiramatsu <mhiramat@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aday6l25gnm.fsf@roland-alpha.cisco.com>
+Subject: Re: CONFIG_KPROBES=y build requires gawk
+References: <20091216235617.GA12267@hexapodia.org>	<adabphy750b.fsf@roland-alpha.cisco.com> <4B29A686.9070603@redhat.com>	<ada3a3a6xs6.fsf@roland-alpha.cisco.com> <4B29BA13.7020502@redhat.com> <aday6l25gnm.fsf@roland-alpha.cisco.com> <4B29BFE8.1000502@zytor.com>
+In-Reply-To: <4B29BFE8.1000502@zytor.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Roland Dreier <rdreier@cisco.com>
-Cc: Masami Hiramatsu <mhiramat@redhat.com>, Andrew Isaacson <adi@vmware.com>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Rob Landley <rob@landley.net>
+To: "H. Peter Anvin" <hpa@zytor.com>
+Cc: Roland Dreier <rdreier@cisco.com>, Michal Marek <mmarek@suse.cz>, Andrew Isaacson <adi@vmware.com>, Ingo Molnar <mingo@redhat.com>, x86@kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Rob Landley <rob@landley.net>
 
-On Wed, Dec 16, 2009 at 09:11:09PM -0800, Roland Dreier wrote:
+H. Peter Anvin wrote:
+> On 12/16/2009 09:11 PM, Roland Dreier wrote:
+>>
+>>  > As Al Viro said, if we run awk with LC_ALL=C, then the characters will be
+>>  > sorted as ASCII. So, your patch is OK if you can add LC_ALL=C just before
+>>  > $(AWK). (I'm not so sure whether Makefile can accept it...)
+>>
 > 
->  > As Al Viro said, if we run awk with LC_ALL=C, then the characters will be
->  > sorted as ASCII. So, your patch is OK if you can add LC_ALL=C just before
->  > $(AWK). (I'm not so sure whether Makefile can accept it...)
-> 
-> OK, updated patch:
-> 
-> ===
-> 
-> x86: Don't use POSIX character classes in gen-insn-attr-x86.awk
-> 
-> Not all awk implementations (including the default awk in Ubuntu 9.10)
-> support POSIX character classes.  Since x86-opcode-map.txt is plain
-> ASCII, we can just use explicit ranges for lower case, alphabetic, and
-> alphanumeric characters instead.  We set LC_ALL=C when invoking awk so
-> that ASCII ranges are never misinterpreted.
-> 
-> I verified that the Debian version of mawk, which doesn't have POSIX
-> character set suport, generates the byte-for-byte the same inat-tables.c
-> after this patch as gawk did on an unpatched kernel.
-> 
-> Signed-off-by: Roland Dreier <rolandd@cisco.com>
-> ---
->  arch/x86/lib/Makefile                |    2 +-
->  arch/x86/tools/gen-insn-attr-x86.awk |   10 ++++------
->  2 files changed, 5 insertions(+), 7 deletions(-)
-> 
-> diff --git a/arch/x86/lib/Makefile b/arch/x86/lib/Makefile
-> index 45b20e4..0c46d60 100644
-> --- a/arch/x86/lib/Makefile
-> +++ b/arch/x86/lib/Makefile
-> @@ -5,7 +5,7 @@
->  inat_tables_script = $(srctree)/arch/x86/tools/gen-insn-attr-x86.awk
->  inat_tables_maps = $(srctree)/arch/x86/lib/x86-opcode-map.txt
->  quiet_cmd_inat_tables = GEN     $@
-> -      cmd_inat_tables = $(AWK) -f $(inat_tables_script) $(inat_tables_maps) > $@ || rm -f $@
-> +      cmd_inat_tables = LC_ALL=C $(AWK) -f $(inat_tables_script) $(inat_tables_maps) > $@ || rm -f $@
+> I would strongly prefer the following solution as it solves this entire
+> class of problems globally, although I'd really want Michal's ACK for it:
 
-This will result in error messages in english always from awk - no?
-Some people will care.
+Sure, agreed.
+BTW, is it possible user to overwrite this setting?
 
-	Sam
+Thank you,
+
+> 
+> diff --git a/Makefile b/Makefile
+> index 33d4732..7fefc13 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -302,6 +302,10 @@ MAKEFLAGS += --include-dir=$(srctree)
+>  $(srctree)/scripts/Kbuild.include: ;
+>  include $(srctree)/scripts/Kbuild.include
+> 
+> +# Avoid funny character set dependencies
+> +LC_ALL=C
+> +export LC_ALL
+> +
+>  # Make variables (CC, etc...)
+> 
+>  AS		= $(CROSS_COMPILE)as
+> 
+> 
+
+-- 
+Masami Hiramatsu
+
+Software Engineer
+Hitachi Computer Products (America), Inc.
+Software Solutions Division
+
+e-mail: mhiramat@redhat.com
+
