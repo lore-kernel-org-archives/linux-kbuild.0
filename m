@@ -1,36 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from zeniv.linux.org.uk ([195.92.253.2]:38313 "EHLO
-	ZenIV.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756589AbZLQDD2 (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 16 Dec 2009 22:03:28 -0500
-Date: Thu, 17 Dec 2009 03:02:22 +0000
-From: Al Viro <viro@ZenIV.linux.org.uk>
-Subject: Re: CONFIG_KPROBES=y build requires gawk
-Message-ID: <20091217030222.GU14381@ZenIV.linux.org.uk>
-References: <20091216235617.GA12267@hexapodia.org> <adabphy750b.fsf@roland-alpha.cisco.com> <4B299AB5.7020109@zytor.com>
+Received: from mx1.redhat.com ([209.132.183.28]:34632 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S932801AbZLQDbf (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 16 Dec 2009 22:31:35 -0500
+Message-ID: <4B29A686.9070603@redhat.com>
+Date: Wed, 16 Dec 2009 22:33:26 -0500
+From: Masami Hiramatsu <mhiramat@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4B299AB5.7020109@zytor.com>
+Subject: Re: CONFIG_KPROBES=y build requires gawk
+References: <20091216235617.GA12267@hexapodia.org> <adabphy750b.fsf@roland-alpha.cisco.com>
+In-Reply-To: <adabphy750b.fsf@roland-alpha.cisco.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "H. Peter Anvin" <hpa@zytor.com>
-Cc: Roland Dreier <rdreier@cisco.com>, Andrew Isaacson <adi@vmware.com>, Ingo Molnar <mingo@redhat.com>, x86@kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Masami Hiramatsu <mhiramat@redhat.com>, Rob Landley <rob@landley.net>
+To: Roland Dreier <rdreier@cisco.com>
+Cc: Andrew Isaacson <adi@vmware.com>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Rob Landley <rob@landley.net>
 
-On Wed, Dec 16, 2009 at 06:43:01PM -0800, H. Peter Anvin wrote:
-> On 12/16/2009 05:39 PM, Roland Dreier wrote:
-> > Is there any reason not to apply the patch below, to allow more awk
-> > implementations to be used?  After all, it's not like we're going to put
-> > non-ASCII characters into the map file...
-> 
-> I guess the question is if it will break under any other circumstances,
-> but I guess we can find those when we get to them.
-> 
-> There was a long discussion about the use of awk on IRC today.
-> Apparently mawk, in particular, is actively broken, because the
-> maintainer believe that POSIX is crap.  There are quite a few issues
-> with it, according to reports.
- 
-still is more compact than gawk, less loaded with GNU "extensions" and
-happens to be default on debian and debian-derived userlands.
+Roland Dreier wrote:
+> Is there any reason not to apply the patch below, to allow more awk
+> implementations to be used?  After all, it's not like we're going to put
+> non-ASCII characters into the map file...
+
+Actually, the reason why I decided to use character classes is
+[a-z] wasn't same as [[:lower:]] on some environment.
+
+       For  example,  before the POSIX standard, to match alphanumeric charac-
+       ters, you would have had to write /[A-Za-z0-9]/.  If your character set
+       had  other  alphabetic characters in it, this would not match them, and
+       if your character set collated differently from ASCII, this  might  not
+       even match the ASCII alphanumeric characters.  With the POSIX character
+       classes, you can write /[[:alnum:]]/, and this matches  the  alphabetic
+       and numeric characters in your character set, no matter what it is.
+
+It seems that "your character set" doesn't mean "what character set are used
+ in the data", it means "what character set build env. is using".
+
+So, actually, my first released script had used [a-z], but I needed to
+move onto [[:lower:]].
+
+Thank you,
+
+
+-- 
+Masami Hiramatsu
+
+Software Engineer
+Hitachi Computer Products (America), Inc.
+Software Solutions Division
+
+e-mail: mhiramat@redhat.com
+
