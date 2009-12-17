@@ -1,46 +1,38 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:34632 "EHLO mx1.redhat.com"
+Received: from mx1.redhat.com ([209.132.183.28]:54079 "EHLO mx1.redhat.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S932801AbZLQDbf (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 16 Dec 2009 22:31:35 -0500
-Message-ID: <4B29A686.9070603@redhat.com>
-Date: Wed, 16 Dec 2009 22:33:26 -0500
+	id S1756990AbZLQDlX (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 16 Dec 2009 22:41:23 -0500
+Message-ID: <4B29A8F3.3090306@redhat.com>
+Date: Wed, 16 Dec 2009 22:43:47 -0500
 From: Masami Hiramatsu <mhiramat@redhat.com>
 MIME-Version: 1.0
 Subject: Re: CONFIG_KPROBES=y build requires gawk
-References: <20091216235617.GA12267@hexapodia.org> <adabphy750b.fsf@roland-alpha.cisco.com>
-In-Reply-To: <adabphy750b.fsf@roland-alpha.cisco.com>
+References: <20091216235617.GA12267@hexapodia.org> <20091217011932.GT14381@ZenIV.linux.org.uk>
+In-Reply-To: <20091217011932.GT14381@ZenIV.linux.org.uk>
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Roland Dreier <rdreier@cisco.com>
-Cc: Andrew Isaacson <adi@vmware.com>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Rob Landley <rob@landley.net>
+To: Al Viro <viro@ZenIV.linux.org.uk>
+Cc: Andrew Isaacson <adi@vmware.com>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Rob Landley <rob@landley.net>
 
-Roland Dreier wrote:
-> Is there any reason not to apply the patch below, to allow more awk
-> implementations to be used?  After all, it's not like we're going to put
-> non-ASCII characters into the map file...
+Al Viro wrote:
+> On Wed, Dec 16, 2009 at 03:56:17PM -0800, Andrew Isaacson wrote:
+>> With CONFIG_KPROBES=y on Ubuntu 9.10 x86_64 default install, I get the
+>> following:
+>>
+>> Error: Your awk doesn't support charactor-class.
+>> Please try to use gawk.
+> 
+> Aside of the incorrect suggestion (you need not just gawk, you need that
+> thing installed as awk), the use of GNUisms in there is actually pointless
+> since encoding is bloody fixed.
 
-Actually, the reason why I decided to use character classes is
-[a-z] wasn't same as [[:lower:]] on some environment.
+Hmm, maybe "POSIX awk" will be a better suggestion, isn't it?
 
-       For  example,  before the POSIX standard, to match alphanumeric charac-
-       ters, you would have had to write /[A-Za-z0-9]/.  If your character set
-       had  other  alphabetic characters in it, this would not match them, and
-       if your character set collated differently from ASCII, this  might  not
-       even match the ASCII alphanumeric characters.  With the POSIX character
-       classes, you can write /[[:alnum:]]/, and this matches  the  alphabetic
-       and numeric characters in your character set, no matter what it is.
-
-It seems that "your character set" doesn't mean "what character set are used
- in the data", it means "what character set build env. is using".
-
-So, actually, my first released script had used [a-z], but I needed to
-move onto [[:lower:]].
 
 Thank you,
-
 
 -- 
 Masami Hiramatsu
