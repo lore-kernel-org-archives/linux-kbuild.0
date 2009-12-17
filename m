@@ -1,54 +1,100 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:53185 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1758931AbZLQEzN (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 16 Dec 2009 23:55:13 -0500
-Message-ID: <4B29BA13.7020502@redhat.com>
-Date: Wed, 16 Dec 2009 23:56:51 -0500
-From: Masami Hiramatsu <mhiramat@redhat.com>
-MIME-Version: 1.0
+Received: from sj-iport-6.cisco.com ([171.71.176.117]:7668 "EHLO
+	sj-iport-6.cisco.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751178AbZLQFLL (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 17 Dec 2009 00:11:11 -0500
+From: Roland Dreier <rdreier@cisco.com>
 Subject: Re: CONFIG_KPROBES=y build requires gawk
-References: <20091216235617.GA12267@hexapodia.org>	<adabphy750b.fsf@roland-alpha.cisco.com> <4B29A686.9070603@redhat.com> <ada3a3a6xs6.fsf@roland-alpha.cisco.com>
-In-Reply-To: <ada3a3a6xs6.fsf@roland-alpha.cisco.com>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+References: <20091216235617.GA12267@hexapodia.org>
+	<adabphy750b.fsf@roland-alpha.cisco.com> <4B29A686.9070603@redhat.com>
+	<ada3a3a6xs6.fsf@roland-alpha.cisco.com> <4B29BA13.7020502@redhat.com>
+Date: Wed, 16 Dec 2009 21:11:09 -0800
+In-Reply-To: <4B29BA13.7020502@redhat.com> (Masami Hiramatsu's message of
+	"Wed, 16 Dec 2009 23:56:51 -0500")
+Message-ID: <aday6l25gnm.fsf@roland-alpha.cisco.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Roland Dreier <rdreier@cisco.com>
+To: Masami Hiramatsu <mhiramat@redhat.com>
 Cc: Andrew Isaacson <adi@vmware.com>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Rob Landley <rob@landley.net>
 
-Roland Dreier wrote:
-> 
->  >        For  example,  before the POSIX standard, to match alphanumeric charac-
->  >        ters, you would have had to write /[A-Za-z0-9]/.  If your character set
->  >        had  other  alphabetic characters in it, this would not match them, and
->  >        if your character set collated differently from ASCII, this  might  not
->  >        even match the ASCII alphanumeric characters.  With the POSIX character
->  >        classes, you can write /[[:alnum:]]/, and this matches  the  alphabetic
->  >        and numeric characters in your character set, no matter what it is.
-> 
-> I'm not sure I understand this, although I'm not a character set expert.
-> But is there really some possible locale + awk implementation where an
-> awk script, written in pure ASCII, operating on a pure ASCII input file,
-> will have [A-Za-z0-9] match a different set of ASCII characters than
-> [[:alnum:]] will match?
 
-I assume that in utf-8 locale(nowadays default in most of distro) alphabets
-may be sorted as aAbBcC...zZ(or AaBb...), and in this case a-z means
-aAbBcC...z.
+ > As Al Viro said, if we run awk with LC_ALL=C, then the characters will be
+ > sorted as ASCII. So, your patch is OK if you can add LC_ALL=C just before
+ > $(AWK). (I'm not so sure whether Makefile can accept it...)
 
-As Al Viro said, if we run awk with LC_ALL=C, then the characters will be
-sorted as ASCII. So, your patch is OK if you can add LC_ALL=C just before
-$(AWK). (I'm not so sure whether Makefile can accept it...)
+OK, updated patch:
 
-Thank you,
+===
 
--- 
-Masami Hiramatsu
+x86: Don't use POSIX character classes in gen-insn-attr-x86.awk
 
-Software Engineer
-Hitachi Computer Products (America), Inc.
-Software Solutions Division
+Not all awk implementations (including the default awk in Ubuntu 9.10)
+support POSIX character classes.  Since x86-opcode-map.txt is plain
+ASCII, we can just use explicit ranges for lower case, alphabetic, and
+alphanumeric characters instead.  We set LC_ALL=C when invoking awk so
+that ASCII ranges are never misinterpreted.
 
-e-mail: mhiramat@redhat.com
+I verified that the Debian version of mawk, which doesn't have POSIX
+character set suport, generates the byte-for-byte the same inat-tables.c
+after this patch as gawk did on an unpatched kernel.
 
+Signed-off-by: Roland Dreier <rolandd@cisco.com>
+---
+ arch/x86/lib/Makefile                |    2 +-
+ arch/x86/tools/gen-insn-attr-x86.awk |   10 ++++------
+ 2 files changed, 5 insertions(+), 7 deletions(-)
+
+diff --git a/arch/x86/lib/Makefile b/arch/x86/lib/Makefile
+index 45b20e4..0c46d60 100644
+--- a/arch/x86/lib/Makefile
++++ b/arch/x86/lib/Makefile
+@@ -5,7 +5,7 @@
+ inat_tables_script = $(srctree)/arch/x86/tools/gen-insn-attr-x86.awk
+ inat_tables_maps = $(srctree)/arch/x86/lib/x86-opcode-map.txt
+ quiet_cmd_inat_tables = GEN     $@
+-      cmd_inat_tables = $(AWK) -f $(inat_tables_script) $(inat_tables_maps) > $@ || rm -f $@
++      cmd_inat_tables = LC_ALL=C $(AWK) -f $(inat_tables_script) $(inat_tables_maps) > $@ || rm -f $@
+ 
+ $(obj)/inat-tables.c: $(inat_tables_script) $(inat_tables_maps)
+ 	$(call cmd,inat_tables)
+diff --git a/arch/x86/tools/gen-insn-attr-x86.awk b/arch/x86/tools/gen-insn-attr-x86.awk
+index 7a68506..eaf11f5 100644
+--- a/arch/x86/tools/gen-insn-attr-x86.awk
++++ b/arch/x86/tools/gen-insn-attr-x86.awk
+@@ -6,8 +6,6 @@
+ 
+ # Awk implementation sanity check
+ function check_awk_implement() {
+-	if (!match("abc", "[[:lower:]]+"))
+-		return "Your awk doesn't support charactor-class."
+ 	if (sprintf("%x", 0) != "0")
+ 		return "Your awk has a printf-format problem."
+ 	return ""
+@@ -44,12 +42,12 @@ BEGIN {
+ 	delete gtable
+ 	delete atable
+ 
+-	opnd_expr = "^[[:alpha:]/]"
++	opnd_expr = "^[A-Za-z/]"
+ 	ext_expr = "^\\("
+ 	sep_expr = "^\\|$"
+-	group_expr = "^Grp[[:alnum:]]+"
++	group_expr = "^Grp[0-9A-Za-z]+"
+ 
+-	imm_expr = "^[IJAO][[:lower:]]"
++	imm_expr = "^[IJAO][a-z]"
+ 	imm_flag["Ib"] = "INAT_MAKE_IMM(INAT_IMM_BYTE)"
+ 	imm_flag["Jb"] = "INAT_MAKE_IMM(INAT_IMM_BYTE)"
+ 	imm_flag["Iw"] = "INAT_MAKE_IMM(INAT_IMM_WORD)"
+@@ -62,7 +60,7 @@ BEGIN {
+ 	imm_flag["Ob"] = "INAT_MOFFSET"
+ 	imm_flag["Ov"] = "INAT_MOFFSET"
+ 
+-	modrm_expr = "^([CDEGMNPQRSUVW/][[:lower:]]+|NTA|T[012])"
++	modrm_expr = "^([CDEGMNPQRSUVW/][a-z]+|NTA|T[012])"
+ 	force64_expr = "\\([df]64\\)"
+ 	rex_expr = "^REX(\\.[XRWB]+)*"
+ 	fpu_expr = "^ESC" # TODO
