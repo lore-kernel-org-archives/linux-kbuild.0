@@ -1,56 +1,39 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from terminus.zytor.com ([198.137.202.10]:56178 "EHLO
-	terminus.zytor.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753219AbZLQDwj (ORCPT
+Received: from sj-iport-4.cisco.com ([171.68.10.86]:44805 "EHLO
+	sj-iport-4.cisco.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S936221AbZLQEJJ (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 16 Dec 2009 22:52:39 -0500
-Message-ID: <4B29A93D.40207@zytor.com>
-Date: Wed, 16 Dec 2009 19:45:01 -0800
-From: "H. Peter Anvin" <hpa@zytor.com>
-MIME-Version: 1.0
+	Wed, 16 Dec 2009 23:09:09 -0500
+From: Roland Dreier <rdreier@cisco.com>
 Subject: Re: CONFIG_KPROBES=y build requires gawk
-References: <20091216235617.GA12267@hexapodia.org> <adabphy750b.fsf@roland-alpha.cisco.com> <4B29A686.9070603@redhat.com>
-In-Reply-To: <4B29A686.9070603@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20091216235617.GA12267@hexapodia.org>
+	<adabphy750b.fsf@roland-alpha.cisco.com> <4B299AB5.7020109@zytor.com>
+Date: Wed, 16 Dec 2009 20:09:07 -0800
+In-Reply-To: <4B299AB5.7020109@zytor.com> (H. Peter Anvin's message of "Wed,
+	16 Dec 2009 18:43:01 -0800")
+Message-ID: <ada7hsm6y3g.fsf@roland-alpha.cisco.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masami Hiramatsu <mhiramat@redhat.com>
-Cc: Roland Dreier <rdreier@cisco.com>, Andrew Isaacson <adi@vmware.com>, Ingo Molnar <mingo@redhat.com>, x86@kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Rob Landley <rob@landley.net>
+To: "H. Peter Anvin" <hpa@zytor.com>
+Cc: Andrew Isaacson <adi@vmware.com>, Ingo Molnar <mingo@redhat.com>, x86@kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Masami Hiramatsu <mhiramat@redhat.com>, Rob Landley <rob@landley.net>
 
-On 12/16/2009 07:33 PM, Masami Hiramatsu wrote:
-> Roland Dreier wrote:
->> Is there any reason not to apply the patch below, to allow more awk
->> implementations to be used?  After all, it's not like we're going to put
->> non-ASCII characters into the map file...
-> 
-> Actually, the reason why I decided to use character classes is
-> [a-z] wasn't same as [[:lower:]] on some environment.
-> 
->        For  example,  before the POSIX standard, to match alphanumeric charac-
->        ters, you would have had to write /[A-Za-z0-9]/.  If your character set
->        had  other  alphabetic characters in it, this would not match them, and
->        if your character set collated differently from ASCII, this  might  not
->        even match the ASCII alphanumeric characters.  With the POSIX character
->        classes, you can write /[[:alnum:]]/, and this matches  the  alphabetic
->        and numeric characters in your character set, no matter what it is.
-> 
-> It seems that "your character set" doesn't mean "what character set are used
->  in the data", it means "what character set build env. is using".
-> 
-> So, actually, my first released script had used [a-z], but I needed to
-> move onto [[:lower:]].
-> 
 
-This is correct if you are not in the C locale, but I'm not sure if we
-support building the kernel in a non-C locale in the first place.
+ > > Is there any reason not to apply the patch below, to allow more awk
+ > > implementations to be used?  After all, it's not like we're going to put
+ > > non-ASCII characters into the map file...
 
-Do you have a known failure case?  There is also the option of
-explicitly setting LC_CTYPE=C.  Sigh.
+ > I guess the question is if it will break under any other circumstances,
+ > but I guess we can find those when we get to them.
 
-	-hpa
+I should have mentioned it, but with the current Debian testing version
+(mawk 1.3.3-15) and my patch, I get a byte-for-byte identical
+inat-tables.c to what I get with the unpatched kernel and gawk
+1:3.1.6.dfsg-4.
 
--- 
-H. Peter Anvin, Intel Open Source Technology Center
-I work for Intel.  I don't speak on their behalf.
+I'm not sure how likely all this is to change in the future, but it's
+hard for me to see a sane reason why eg [:lower:] and a-z would be
+different for this use.
 
+ - R.
