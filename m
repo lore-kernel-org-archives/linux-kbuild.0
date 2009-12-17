@@ -1,40 +1,39 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepb.post.tele.dk ([195.41.46.236]:50437 "EHLO
-	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753237AbZLQIJq (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 17 Dec 2009 03:09:46 -0500
-Date: Thu, 17 Dec 2009 09:09:00 +0100
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: CONFIG_KPROBES=y build requires gawk
-Message-ID: <20091217080900.GA4010@merkur.ravnborg.org>
-References: <20091216235617.GA12267@hexapodia.org> <adabphy750b.fsf@roland-alpha.cisco.com> <4B29A686.9070603@redhat.com> <ada3a3a6xs6.fsf@roland-alpha.cisco.com> <4B29BA13.7020502@redhat.com> <aday6l25gnm.fsf@roland-alpha.cisco.com> <20091217054524.GA3931@merkur.ravnborg.org> <4B29C81E.2000704@zytor.com>
+Received: from cantor2.suse.de ([195.135.220.15]:38830 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1764332AbZLQKm7 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 17 Dec 2009 05:42:59 -0500
+Message-ID: <4B2A0B30.5040906@suse.cz>
+Date: Thu, 17 Dec 2009 11:42:56 +0100
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Subject: Re: CONFIG_KPROBES=y build requires gawk
+References: <20091216235617.GA12267@hexapodia.org> <adabphy750b.fsf@roland-alpha.cisco.com> <4B29A686.9070603@redhat.com> <ada3a3a6xs6.fsf@roland-alpha.cisco.com> <4B29BA13.7020502@redhat.com> <aday6l25gnm.fsf@roland-alpha.cisco.com> <20091217054524.GA3931@merkur.ravnborg.org> <4B29C81E.2000704@zytor.com>
 In-Reply-To: <4B29C81E.2000704@zytor.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: "H. Peter Anvin" <hpa@zytor.com>
-Cc: Michal Marek <mmarek@suse.cz>, Roland Dreier <rdreier@cisco.com>, Masami Hiramatsu <mhiramat@redhat.com>, Andrew Isaacson <adi@vmware.com>, Ingo Molnar <mingo@redhat.com>, x86@kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Rob Landley <rob@landley.net>
+Cc: Sam Ravnborg <sam@ravnborg.org>, Roland Dreier <rdreier@cisco.com>, Masami Hiramatsu <mhiramat@redhat.com>, Andrew Isaacson <adi@vmware.com>, Ingo Molnar <mingo@redhat.com>, x86@kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Rob Landley <rob@landley.net>
 
-On Wed, Dec 16, 2009 at 09:56:46PM -0800, H. Peter Anvin wrote:
+On 17.12.2009 06:56, H. Peter Anvin wrote:
 > On 12/16/2009 09:45 PM, Sam Ravnborg wrote:
-> >>
-> >> diff --git a/arch/x86/lib/Makefile b/arch/x86/lib/Makefile
-> >> index 45b20e4..0c46d60 100644
-> >> --- a/arch/x86/lib/Makefile
-> >> +++ b/arch/x86/lib/Makefile
-> >> @@ -5,7 +5,7 @@
-> >>  inat_tables_script = $(srctree)/arch/x86/tools/gen-insn-attr-x86.awk
-> >>  inat_tables_maps = $(srctree)/arch/x86/lib/x86-opcode-map.txt
-> >>  quiet_cmd_inat_tables = GEN     $@
-> >> -      cmd_inat_tables = $(AWK) -f $(inat_tables_script) $(inat_tables_maps) > $@ || rm -f $@
-> >> +      cmd_inat_tables = LC_ALL=C $(AWK) -f $(inat_tables_script) $(inat_tables_maps) > $@ || rm -f $@
-> > 
-> > This will result in error messages in english always from awk - no?
-> > Some people will care.
-> > 
+>>>
+>>> diff --git a/arch/x86/lib/Makefile b/arch/x86/lib/Makefile
+>>> index 45b20e4..0c46d60 100644
+>>> --- a/arch/x86/lib/Makefile
+>>> +++ b/arch/x86/lib/Makefile
+>>> @@ -5,7 +5,7 @@
+>>>  inat_tables_script = $(srctree)/arch/x86/tools/gen-insn-attr-x86.awk
+>>>  inat_tables_maps = $(srctree)/arch/x86/lib/x86-opcode-map.txt
+>>>  quiet_cmd_inat_tables = GEN     $@
+>>> -      cmd_inat_tables = $(AWK) -f $(inat_tables_script) $(inat_tables_maps) > $@ || rm -f $@
+>>> +      cmd_inat_tables = LC_ALL=C $(AWK) -f $(inat_tables_script) $(inat_tables_maps) > $@ || rm -f $@
+>>
+>> This will result in error messages in english always from awk - no?
+>> Some people will care.
+>>
 > 
 > True, we probably don't want to set LC_MESSAGES.  Which means:
 > 
@@ -56,11 +55,13 @@ On Wed, Dec 16, 2009 at 09:56:46PM -0800, H. Peter Anvin wrote:
 >  # Make variables (CC, etc...)
 > 
 >  AS		= $(CROSS_COMPILE)as
+> 
+> 
+> OK?
 
-Took a closer look at the patch.
-I think we should move this upwards in the Makefile so it take effect as soon as possible.
-Around the line where we do:
+Definitely, setting this globally makes sure we don't run into similar
+issues elsewhere. (I have to read the rest of the thread now).
 
-MAKEFLAGS += -rR --no-print-directory
+Acked-by: Michal Marek <mmarek@sues.cz>
 
-	Sam
+Michal
