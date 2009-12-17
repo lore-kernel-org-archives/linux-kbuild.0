@@ -1,77 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:40252 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751193AbZLQFO0 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 17 Dec 2009 00:14:26 -0500
-Message-ID: <4B29BEC4.4070801@redhat.com>
-Date: Thu, 17 Dec 2009 00:16:52 -0500
-From: Masami Hiramatsu <mhiramat@redhat.com>
+Received: from terminus.zytor.com ([198.137.202.10]:58131 "EHLO
+	terminus.zytor.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751682AbZLQFOm (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 17 Dec 2009 00:14:42 -0500
+Message-ID: <4B29BC90.9090204@zytor.com>
+Date: Wed, 16 Dec 2009 21:07:28 -0800
+From: "H. Peter Anvin" <hpa@zytor.com>
 MIME-Version: 1.0
 Subject: Re: CONFIG_KPROBES=y build requires gawk
-References: <20091216235617.GA12267@hexapodia.org> <20091217011932.GT14381@ZenIV.linux.org.uk> <4B29A8F3.3090306@redhat.com> <20091217043021.GV14381@ZenIV.linux.org.uk>
-In-Reply-To: <20091217043021.GV14381@ZenIV.linux.org.uk>
-Content-Type: text/plain; charset=ISO-8859-1
+References: <20091216235617.GA12267@hexapodia.org>	<adabphy750b.fsf@roland-alpha.cisco.com> <4B299AB5.7020109@zytor.com> <ada7hsm6y3g.fsf@roland-alpha.cisco.com>
+In-Reply-To: <ada7hsm6y3g.fsf@roland-alpha.cisco.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Al Viro <viro@ZenIV.linux.org.uk>
-Cc: Andrew Isaacson <adi@vmware.com>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Rob Landley <rob@landley.net>
+To: Roland Dreier <rdreier@cisco.com>
+Cc: Andrew Isaacson <adi@vmware.com>, Ingo Molnar <mingo@redhat.com>, x86@kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Masami Hiramatsu <mhiramat@redhat.com>, Rob Landley <rob@landley.net>
 
-
-
-Al Viro wrote:
-> On Wed, Dec 16, 2009 at 10:43:47PM -0500, Masami Hiramatsu wrote:
->> Al Viro wrote:
->>> On Wed, Dec 16, 2009 at 03:56:17PM -0800, Andrew Isaacson wrote:
->>>> With CONFIG_KPROBES=y on Ubuntu 9.10 x86_64 default install, I get the
->>>> following:
->>>>
->>>> Error: Your awk doesn't support charactor-class.
->>>> Please try to use gawk.
->>>
->>> Aside of the incorrect suggestion (you need not just gawk, you need that
->>> thing installed as awk), the use of GNUisms in there is actually pointless
->>> since encoding is bloody fixed.
->>
->> Hmm, maybe "POSIX awk" will be a better suggestion, isn't it?
+On 12/16/2009 08:09 PM, Roland Dreier wrote:
 > 
-> Not really.
+>  > > Is there any reason not to apply the patch below, to allow more awk
+>  > > implementations to be used?  After all, it's not like we're going to put
+>  > > non-ASCII characters into the map file...
 > 
-> Note that meaning of [:alpha:] depends on locale, and you are working
-> with fixed input, in fixed encoding.  So you *already* have a dependency
-> on locale and it's no better or worse way to express the set than A-Za-z
-> is.  With LANG=C both describe the set you are after; in other locales
-> neither is guaranteed to.  And having it set by caller of your script
-> is trivial.
+>  > I guess the question is if it will break under any other circumstances,
+>  > but I guess we can find those when we get to them.
 > 
-> IOW, you are actually misusing the language feature and while it's easy
-> to fix, the same fix will remove any benefits compared to universally
-> available alternative language feature.
+> I should have mentioned it, but with the current Debian testing version
+> (mawk 1.3.3-15) and my patch, I get a byte-for-byte identical
+> inat-tables.c to what I get with the unpatched kernel and gawk
+> 1:3.1.6.dfsg-4.
+> 
+> I'm not sure how likely all this is to change in the future, but it's
+> hard for me to see a sane reason why eg [:lower:] and a-z would be
+> different for this use.
+> 
 
-Ah, I see:)
+If LC_COLL != C they can be.  The solution would be to force LC_COLL=C.
 
-I think that this is not so big issue as making new language in the kernel.
-(wow, if someone wants to do that, I don't dare to stop him :) )
-If just typing less than 100 characters can fix it, I'd like to do it; e.g.
-
-Ualpha = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-Lalpha = "abcdefghijklmnopqrstuvwxyz"
-alpha = Ualpha Lalpha
-digit = "0123456789"
-alnum = alpha digit
-
-and replace character classes with it. ("[[:alpha:]]"->"[" alpha "]")
-
-That's so easy, isn't that? :-)
-
-Thank you,
+	-hpa
 
 -- 
-Masami Hiramatsu
-
-Software Engineer
-Hitachi Computer Products (America), Inc.
-Software Solutions Division
-
-e-mail: mhiramat@redhat.com
+H. Peter Anvin, Intel Open Source Technology Center
+I work for Intel.  I don't speak on their behalf.
 
