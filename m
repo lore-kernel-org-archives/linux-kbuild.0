@@ -1,70 +1,60 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from straum.hexapodia.org ([64.81.70.185]:48909 "EHLO
-	straum.hexapodia.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1762756AbZLPX4S (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 16 Dec 2009 18:56:18 -0500
-Date: Wed, 16 Dec 2009 15:56:17 -0800
-From: Andrew Isaacson <adi@vmware.com>
-Subject: CONFIG_KPROBES=y build requires gawk
-Message-ID: <20091216235617.GA12267@hexapodia.org>
+Received: from smtpoutwbe01.prod.mesa1.secureserver.net ([208.109.78.112]:53718
+	"HELO smtpoutwbe01.prod.mesa1.secureserver.net" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with SMTP id S1763427AbZLQAHz convert rfc822-to-8bit
+	(ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 16 Dec 2009 19:07:55 -0500
+Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset="utf-8"
+Message-Id: <20091216170114.0b50c25debf12a9aa545bf810459b532.5b12d5606d.wbe@email.secureserver.net>
+From: "Jiafu He" <jay@goldhive.com>
+Subject: [PATCH] Makefile.build: Fix built-in.o linking errors
+Date: Wed, 16 Dec 2009 17:01:14 -0700
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: linux-kbuild@vger.kernel.org, Masami Hiramatsu <mhiramat@redhat.com>, Rob Landley <rob@landley.net>
+To: linux-kbuild@vger.kernel.org
+Cc: Michal Marek <mmarek@suse.cz>
 
-With CONFIG_KPROBES=y on Ubuntu 9.10 x86_64 default install, I get the
-following:
+This patch fixes two linking errors regarding the empty built-in.o:
+- Error "...built-in.o: no such file or directory" happens if
+"dirx/Makefile" contains only "obj-m += diry/ dirz/" and the empty
+"dirx/built-in.o" is missing. Adding $(subdir-m) into check for
+builtin-target fixes this error.
+- Linking the child builtin.o's using arm-xscale-linux-gnueabi linker
+fails with an EABI version mismatch error "... has EABI version 0, but
+... has EABI verion 4". The cause is built-in.o created by $(AR) has
+EABI verison 0, while the non-empty built-in.o's have EABI version 4.
+The fix is to use $(CC) to create the empty built-in.o.
 
-Error: Your awk doesn't support charactor-class.
-Please try to use gawk.
-  CC      arch/x86/lib/inat.o
-arch/x86/lib/inat.c:24:25: error: inat-tables.c: No such file or directory
-arch/x86/lib/inat.c: In function "inat_get_opcode_attribute":
-arch/x86/lib/inat.c:29: error: "inat_primary_table" undeclared (first use in this function)
-arch/x86/lib/inat.c:29: error: (Each undeclared identifier is reported only once
-arch/x86/lib/inat.c:29: error: for each function it appears in.)
-arch/x86/lib/inat.c: In function "inat_get_escape_attribute":
-arch/x86/lib/inat.c:44: error: "inat_escape_tables" undeclared (first use in this function)
-arch/x86/lib/inat.c: In function "inat_get_group_attribute":
-arch/x86/lib/inat.c:67: error: "inat_group_tables" undeclared (first use in this function)
-arch/x86/lib/inat.c: In function "inat_get_avx_attribute":
-arch/x86/lib/inat.c:85: error: "inat_avx_tables" undeclared (first use in this function)
-make[1]: *** [arch/x86/lib/inat.o] Error 1
-make: *** [arch/x86/lib] Error 2
+The fixes have been tested with x86/x86_64 native platforms and the
+arm-xscale-linux-gnueabi cross-compiler.
 
-Either CONFIG_KPROBES=n or 'apt-get install gawk' does the trick, but is
-this intentional?
-
-If it is, the following documentation patch should be applied.
-
--andy
-
----
-From: Andy Isaacson <adi@hexapodia.org>
-Date: Wed, 16 Dec 2009 15:51:30 -0800
-Subject: [PATCH] Document requirement for gawk.
-
-Signed-off-by: Andy Isaacson <adi@hexapodia.org>
----
- Documentation/Changes |    1 +
- 1 files changed, 1 insertions(+), 0 deletions(-)
-
-diff --git a/Documentation/Changes b/Documentation/Changes
-index 6d0f1ef..8d55162 100644
---- a/Documentation/Changes
-+++ b/Documentation/Changes
-@@ -49,6 +49,7 @@ o  oprofile               0.9                     # oprofiled --version
- o  udev                   081                     # udevinfo -V
- o  grub                   0.93                    # grub --version
- o  mcelog		  0.6
-+o  gawk                   3.0                     # awk --version
+Signed-off-by: Jiafu He <jay@goldhive.com>
+-----
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index 341b589..c8c8c81 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -82,7 +82,7 @@ ifneq ($(strip $(lib-y) $(lib-m) $(lib-n) $(lib-)),)
+ lib-target := $(obj)/lib.a
+ endif
  
- Kernel compilation
- ==================
--- 
-1.6.5.3
+-ifneq ($(strip $(obj-y) $(obj-m) $(obj-n) $(obj-) $(lib-target)),)
++ifneq ($(strip $(obj-y) $(obj-m) $(obj-n) $(obj-) $(subdir-m)
+$(lib-target)),)
+ builtin-target := $(obj)/built-in.o
+ endif
+ 
+@@ -291,7 +291,7 @@ quiet_cmd_link_o_target = LD      $@
+ cmd_link_o_target = $(if $(strip $(obj-y)),\
+                      $(LD) $(ld_flags) -r -o $@ $(filter $(obj-y), $^)
+\
+                      $(cmd_secanalysis),\
+-                     rm -f $@; $(AR) rcs $@)
++                     rm -f $@; $(CC) -c -xassembler /dev/null -o $@)
+ 
+ $(builtin-target): $(obj-y) FORCE
+        $(call if_changed,link_o_target)
+-----
 
