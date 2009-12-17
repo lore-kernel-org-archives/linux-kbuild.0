@@ -1,47 +1,54 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from zeniv.linux.org.uk ([195.92.253.2]:55235 "EHLO
-	ZenIV.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S935572AbZLQEa0 (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 16 Dec 2009 23:30:26 -0500
-Date: Thu, 17 Dec 2009 04:30:21 +0000
-From: Al Viro <viro@ZenIV.linux.org.uk>
-Subject: Re: CONFIG_KPROBES=y build requires gawk
-Message-ID: <20091217043021.GV14381@ZenIV.linux.org.uk>
-References: <20091216235617.GA12267@hexapodia.org> <20091217011932.GT14381@ZenIV.linux.org.uk> <4B29A8F3.3090306@redhat.com>
+Received: from mx1.redhat.com ([209.132.183.28]:53185 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1758931AbZLQEzN (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 16 Dec 2009 23:55:13 -0500
+Message-ID: <4B29BA13.7020502@redhat.com>
+Date: Wed, 16 Dec 2009 23:56:51 -0500
+From: Masami Hiramatsu <mhiramat@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4B29A8F3.3090306@redhat.com>
+Subject: Re: CONFIG_KPROBES=y build requires gawk
+References: <20091216235617.GA12267@hexapodia.org>	<adabphy750b.fsf@roland-alpha.cisco.com> <4B29A686.9070603@redhat.com> <ada3a3a6xs6.fsf@roland-alpha.cisco.com>
+In-Reply-To: <ada3a3a6xs6.fsf@roland-alpha.cisco.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masami Hiramatsu <mhiramat@redhat.com>
-Cc: Andrew Isaacson <adi@vmware.com>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Rob Landley <rob@landley.net>
+To: Roland Dreier <rdreier@cisco.com>
+Cc: Andrew Isaacson <adi@vmware.com>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Rob Landley <rob@landley.net>
 
-On Wed, Dec 16, 2009 at 10:43:47PM -0500, Masami Hiramatsu wrote:
-> Al Viro wrote:
-> > On Wed, Dec 16, 2009 at 03:56:17PM -0800, Andrew Isaacson wrote:
-> >> With CONFIG_KPROBES=y on Ubuntu 9.10 x86_64 default install, I get the
-> >> following:
-> >>
-> >> Error: Your awk doesn't support charactor-class.
-> >> Please try to use gawk.
-> > 
-> > Aside of the incorrect suggestion (you need not just gawk, you need that
-> > thing installed as awk), the use of GNUisms in there is actually pointless
-> > since encoding is bloody fixed.
+Roland Dreier wrote:
 > 
-> Hmm, maybe "POSIX awk" will be a better suggestion, isn't it?
+>  >        For  example,  before the POSIX standard, to match alphanumeric charac-
+>  >        ters, you would have had to write /[A-Za-z0-9]/.  If your character set
+>  >        had  other  alphabetic characters in it, this would not match them, and
+>  >        if your character set collated differently from ASCII, this  might  not
+>  >        even match the ASCII alphanumeric characters.  With the POSIX character
+>  >        classes, you can write /[[:alnum:]]/, and this matches  the  alphabetic
+>  >        and numeric characters in your character set, no matter what it is.
+> 
+> I'm not sure I understand this, although I'm not a character set expert.
+> But is there really some possible locale + awk implementation where an
+> awk script, written in pure ASCII, operating on a pure ASCII input file,
+> will have [A-Za-z0-9] match a different set of ASCII characters than
+> [[:alnum:]] will match?
 
-Not really.
+I assume that in utf-8 locale(nowadays default in most of distro) alphabets
+may be sorted as aAbBcC...zZ(or AaBb...), and in this case a-z means
+aAbBcC...z.
 
-Note that meaning of [:alpha:] depends on locale, and you are working
-with fixed input, in fixed encoding.  So you *already* have a dependency
-on locale and it's no better or worse way to express the set than A-Za-z
-is.  With LANG=C both describe the set you are after; in other locales
-neither is guaranteed to.  And having it set by caller of your script
-is trivial.
+As Al Viro said, if we run awk with LC_ALL=C, then the characters will be
+sorted as ASCII. So, your patch is OK if you can add LC_ALL=C just before
+$(AWK). (I'm not so sure whether Makefile can accept it...)
 
-IOW, you are actually misusing the language feature and while it's easy
-to fix, the same fix will remove any benefits compared to universally
-available alternative language feature.
+Thank you,
+
+-- 
+Masami Hiramatsu
+
+Software Engineer
+Hitachi Computer Products (America), Inc.
+Software Solutions Division
+
+e-mail: mhiramat@redhat.com
+
