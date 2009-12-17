@@ -1,70 +1,63 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor.suse.de ([195.135.220.2]:40402 "EHLO mx1.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:40773 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S964995AbZLQLfA (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 17 Dec 2009 06:35:00 -0500
-Message-ID: <4B2A1761.4070904@suse.cz>
-Date: Thu, 17 Dec 2009 12:34:57 +0100
+	id S1752068AbZLQMBS (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 17 Dec 2009 07:01:18 -0500
+Message-ID: <4B2A1D8C.10306@suse.cz>
+Date: Thu, 17 Dec 2009 13:01:16 +0100
 From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Subject: Re: CONFIG_KPROBES=y build requires gawk
-References: <20091216235617.GA12267@hexapodia.org> <adabphy750b.fsf@roland-alpha.cisco.com> <4B29A686.9070603@redhat.com> <ada3a3a6xs6.fsf@roland-alpha.cisco.com> <4B29BA13.7020502@redhat.com> <aday6l25gnm.fsf@roland-alpha.cisco.com> <20091217054524.GA3931@merkur.ravnborg.org> <4B29C81E.2000704@zytor.com> <20091217080900.GA4010@merkur.ravnborg.org>
-In-Reply-To: <20091217080900.GA4010@merkur.ravnborg.org>
+Subject: Re: [resend][GIT PULL] kbuild updates for 2.6.33
+References: <20091216222816.GA8397@sepie.suse.cz> <20091217131753.c09c941e.sfr@canb.auug.org.au>
+In-Reply-To: <20091217131753.c09c941e.sfr@canb.auug.org.au>
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: "H. Peter Anvin" <hpa@zytor.com>, Roland Dreier <rdreier@cisco.com>, Masami Hiramatsu <mhiramat@redhat.com>, Andrew Isaacson <adi@vmware.com>, Ingo Molnar <mingo@redhat.com>, x86@kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Rob Landley <rob@landley.net>
+To: Stephen Rothwell <sfr@canb.auug.org.au>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Rusty Russell <rusty@rustcorp.com.au>
 
-On 17.12.2009 09:09, Sam Ravnborg wrote:
-> On Wed, Dec 16, 2009 at 09:56:46PM -0800, H. Peter Anvin wrote:
->> On 12/16/2009 09:45 PM, Sam Ravnborg wrote:
->>>>
->>>> diff --git a/arch/x86/lib/Makefile b/arch/x86/lib/Makefile
->>>> index 45b20e4..0c46d60 100644
->>>> --- a/arch/x86/lib/Makefile
->>>> +++ b/arch/x86/lib/Makefile
->>>> @@ -5,7 +5,7 @@
->>>>  inat_tables_script = $(srctree)/arch/x86/tools/gen-insn-attr-x86.awk
->>>>  inat_tables_maps = $(srctree)/arch/x86/lib/x86-opcode-map.txt
->>>>  quiet_cmd_inat_tables = GEN     $@
->>>> -      cmd_inat_tables = $(AWK) -f $(inat_tables_script) $(inat_tables_maps) > $@ || rm -f $@
->>>> +      cmd_inat_tables = LC_ALL=C $(AWK) -f $(inat_tables_script) $(inat_tables_maps) > $@ || rm -f $@
->>>
->>> This will result in error messages in english always from awk - no?
->>> Some people will care.
->>>
->>
->> True, we probably don't want to set LC_MESSAGES.  Which means:
->>
->> diff --git a/Makefile b/Makefile
->> index 33d4732..357e83b 100644
->> --- a/Makefile
->> +++ b/Makefile
->> @@ -302,6 +302,13 @@ MAKEFLAGS += --include-dir=$(srctree)
->>  $(srctree)/scripts/Kbuild.include: ;
->>  include $(srctree)/scripts/Kbuild.include
->>
->> +# Avoid funny character set dependencies
->> +LC_ALL=
->> +LC_CTYPE=C
->> +LC_COLLATE=C
->> +LC_NUMERIC=C
->> +export LC_ALL LC_CTYPE LC_COLLATE LC_NUMERIC
->> +
->>  # Make variables (CC, etc...)
->>
->>  AS		= $(CROSS_COMPILE)as
+On 17.12.2009 03:17, Stephen Rothwell wrote:
+> Hi Linus, Michal,
 > 
-> Took a closer look at the patch.
-> I think we should move this upwards in the Makefile so it take effect as soon as possible.
-> Around the line where we do:
+> On Wed, 16 Dec 2009 23:28:16 +0100 Michal Marek <mmarek@suse.cz> wrote:
+>>
+>>       kbuild: move autoconf.h to include/generated
 > 
-> MAKEFLAGS += -rR --no-print-directory
+> Since Rusty's module changes are now upstream, the above change requires
+> this fixup which I have been carrying in linux-next for some time:
 
-There are only some variable assignments and a sed call in the SUBARCH
-definition, but right, to be 100% sure that in the future there won't
-appear anything locale-dependent, we should move it upwards.
+Ah, thanks, I forgot about this one. I rebased the for-next branch now
+and added your patch. I didn't touch the for-33 branch in order to not
+invalidate the pull request.
+
+
+> From: Stephen Rothwell <sfr@canb.auug.org.au>
+> Date: Thu, 12 Nov 2009 18:33:17 +1100
+> Subject: [PATCH] modpost: autoconf.h has moved to include/generated
+> 
+> Signed-off-by: Stephen Rothwell <sfr@canb.auug.org.au>
+
+Acked-by: Michal Marek <mmarek@suse.cz>.
 
 Michal
+
+
+> ---
+>  scripts/mod/modpost.c |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
+> 
+> diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
+> index f6be2e9..769ea95 100644
+> --- a/scripts/mod/modpost.c
+> +++ b/scripts/mod/modpost.c
+> @@ -15,7 +15,7 @@
+>  #include <stdio.h>
+>  #include <ctype.h>
+>  #include "modpost.h"
+> -#include "../../include/linux/autoconf.h"
+> +#include "../../include/generated/autoconf.h"
+>  #include "../../include/linux/license.h"
+>  
+>  /* Some toolchains use a `_' prefix for all user symbols. */
+
