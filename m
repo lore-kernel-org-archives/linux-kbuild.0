@@ -1,44 +1,76 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtpoutwbe06.prod.mesa1.secureserver.net ([208.109.78.208]:47752
-	"HELO smtpoutwbe06.prod.mesa1.secureserver.net" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with SMTP id S1762974AbZLQAf7 convert rfc822-to-8bit
-	(ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 16 Dec 2009 19:35:59 -0500
-Content-Transfer-Encoding: 8BIT
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <20091216173556.0b50c25debf12a9aa545bf810459b532.9761f5fd4a.wbe@email.secureserver.net>
-From: "Jiafu He" <jay@goldhive.com>
-Subject: [PATCH] Kconfig: default m doesn't work for menuconfig/xconfig/gconfig even
- if =?UTF-8?Q?CONFIG=5FMODULES=3Dy?=
-Date: Wed, 16 Dec 2009 17:35:56 -0700
-Mime-Version: 1.0
+Received: from sj-iport-6.cisco.com ([171.71.176.117]:32542 "EHLO
+	sj-iport-6.cisco.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1763639AbZLQBjv (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 16 Dec 2009 20:39:51 -0500
+From: Roland Dreier <rdreier@cisco.com>
+Subject: Re: CONFIG_KPROBES=y build requires gawk
+References: <20091216235617.GA12267@hexapodia.org>
+Date: Wed, 16 Dec 2009 17:39:48 -0800
+In-Reply-To: <20091216235617.GA12267@hexapodia.org> (Andrew Isaacson's message
+	of "Wed, 16 Dec 2009 15:56:17 -0800")
+Message-ID: <adabphy750b.fsf@roland-alpha.cisco.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Roman Zippel <zippel@linux-m68k.org>
+To: Andrew Isaacson <adi@vmware.com>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Masami Hiramatsu <mhiramat@redhat.com>, Rob Landley <rob@landley.net>
 
-menuconfig/xconfig/gconfig all fails to set tristate CONFIG_ options to
-m even if CONFIG_MODULES=y has been set. The "config" target works,
-though.
+Is there any reason not to apply the patch below, to allow more awk
+implementations to be used?  After all, it's not like we're going to put
+non-ASCII characters into the map file...
 
-Signed-off-by: Jiafu He <jay@goldhive.com>
------
-diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
-index b55e72f..9ff712b 100644
---- a/scripts/kconfig/confdata.c
-+++ b/scripts/kconfig/confdata.c
-@@ -170,8 +170,11 @@ int conf_read_simple(const char *name, int def)
-                if (in)
-                        goto load;
-                sym_add_change_count(1);
--               if (!sym_defconfig_list)
-+               if (!sym_defconfig_list) {
-+                       if (modules_sym)
-+                               sym_calc_value(modules_sym);
-                        return 1;
-+               }
+===
+
+x86: Don't use POSIX character classes in gen-insn-attr-x86.awk
+
+Not all awk implementations (including the default awk in Ubuntu 9.10)
+support POSIX character classes.  Since x86-opcode-map.txt is plain
+ASCII, we can just use explicit ranges for lower case, alphabetic, and
+alphanumeric characters instead.
+
+Signed-off-by: Roland Dreier <rolandd@cisco.com>
+---
+ arch/x86/tools/gen-insn-attr-x86.awk |   10 ++++------
+ 1 files changed, 4 insertions(+), 6 deletions(-)
+
+diff --git a/arch/x86/tools/gen-insn-attr-x86.awk b/arch/x86/tools/gen-insn-attr-x86.awk
+index 7a68506..eaf11f5 100644
+--- a/arch/x86/tools/gen-insn-attr-x86.awk
++++ b/arch/x86/tools/gen-insn-attr-x86.awk
+@@ -6,8 +6,6 @@
  
-                for_all_defaults(sym_defconfig_list, prop) {
-                        if (expr_calc_value(prop->visible.expr) == no ||
------
-
+ # Awk implementation sanity check
+ function check_awk_implement() {
+-	if (!match("abc", "[[:lower:]]+"))
+-		return "Your awk doesn't support charactor-class."
+ 	if (sprintf("%x", 0) != "0")
+ 		return "Your awk has a printf-format problem."
+ 	return ""
+@@ -44,12 +42,12 @@ BEGIN {
+ 	delete gtable
+ 	delete atable
+ 
+-	opnd_expr = "^[[:alpha:]/]"
++	opnd_expr = "^[A-Za-z/]"
+ 	ext_expr = "^\\("
+ 	sep_expr = "^\\|$"
+-	group_expr = "^Grp[[:alnum:]]+"
++	group_expr = "^Grp[0-9A-Za-z]+"
+ 
+-	imm_expr = "^[IJAO][[:lower:]]"
++	imm_expr = "^[IJAO][a-z]"
+ 	imm_flag["Ib"] = "INAT_MAKE_IMM(INAT_IMM_BYTE)"
+ 	imm_flag["Jb"] = "INAT_MAKE_IMM(INAT_IMM_BYTE)"
+ 	imm_flag["Iw"] = "INAT_MAKE_IMM(INAT_IMM_WORD)"
+@@ -62,7 +60,7 @@ BEGIN {
+ 	imm_flag["Ob"] = "INAT_MOFFSET"
+ 	imm_flag["Ov"] = "INAT_MOFFSET"
+ 
+-	modrm_expr = "^([CDEGMNPQRSUVW/][[:lower:]]+|NTA|T[012])"
++	modrm_expr = "^([CDEGMNPQRSUVW/][a-z]+|NTA|T[012])"
+ 	force64_expr = "\\([df]64\\)"
+ 	rex_expr = "^REX(\\.[XRWB]+)*"
+ 	fpu_expr = "^ESC" # TODO
