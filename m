@@ -1,88 +1,62 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp1.linux-foundation.org ([140.211.169.13]:40889 "EHLO
-	smtp1.linux-foundation.org" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751117AbZLVAZA (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 21 Dec 2009 19:25:00 -0500
-Message-Id: <200912220024.nBM0O6AQ005096@imap1.linux-foundation.org>
-Subject: [patch 1/1] kconfig CROSS_COMPILE option
-From: akpm@linux-foundation.org
-Date: Mon, 21 Dec 2009 16:24:06 -0800
-MIME-Version: 1.0
-Content-Type: text/plain; charset=ANSI_X3.4-1968
-Content-Transfer-Encoding: 8bit
+Received: from xes-mad.com ([216.165.139.218]:46848 "EHLO xes-mad.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751109AbZLVBuw (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 21 Dec 2009 20:50:52 -0500
+From: Peter Tyser <ptyser@xes-inc.com>
+Subject: [PATCH v2 1/3] powerpc: Use scripts/mkuboot.sh instead of 'mkimage'
+Date: Mon, 21 Dec 2009 19:50:41 -0600
+Message-Id: <1261446643-21714-2-git-send-email-ptyser@xes-inc.com>
+In-Reply-To: <1261446643-21714-1-git-send-email-ptyser@xes-inc.com>
+References: <1261446643-21714-1-git-send-email-ptyser@xes-inc.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: mmarek@suse.cz
-Cc: linux-kbuild@vger.kernel.org, akpm@linux-foundation.org, roland@redhat.com, anibal@debian.org, rostedt@goodmis.org, sam@ravnborg.org
+To: linuxppc-dev@ozlabs.org
+Cc: linux-kbuild@vger.kernel.org, Peter Tyser <ptyser@xes-inc.com>
 
-From: Roland McGrath <roland@redhat.com>
+mkuboot.sh provides a basic wrapper for the 'mkimage' utility.  Using
+mkuboot.sh provides clearer error reporting and allows a toolchain to
+use its own 'mkimage' executable specified by ${CROSS_COMPILE}mkimage.
+Additionally, this brings PowerPC in line with other architectures
+which already call mkimage via mkuboot.sh.
 
-This adds CROSS_COMPILE as a kconfig string so you can store it in
-.config.  Then you can use plain "make" in the configured kernel build
-directory to do the right cross compilation without setting the
-command-line or environment variable every time.
-
-With this, you can set up different build directories for different kernel
-configurations, whether native or cross-builds, and then use the simple:
-
-	make -C /build/dir M=module-source-dir
-
-idiom to build modules for any given target kernel, indicating which one
-by nothing but the build directory chosen.
-
-I tried a version that defaults the string with env="CROSS_COMPILE" so
-that in a "make oldconfig" with CROSS_COMPILE in the environment you can
-just hit return to store the way you're building it.  But the kconfig
-prompt for strings doesn't give you any way to say you want an empty
-string instead of the default, so I punted that.
-
-Signed-off-by: Roland McGrath <roland@redhat.com>
-Cc: Sam Ravnborg <sam@ravnborg.org>
-Cc: Anibal Monsalve Salazar <anibal@debian.org>
-Cc: Steven Rostedt <rostedt@goodmis.org>
-Cc: Michal Marek <mmarek@suse.cz>
-Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+Signed-off-by: Peter Tyser <ptyser@xes-inc.com>
 ---
+ arch/powerpc/boot/wrapper |    7 +++++--
+ 1 files changed, 5 insertions(+), 2 deletions(-)
 
- Makefile     |    3 +++
- init/Kconfig |    8 ++++++++
- 2 files changed, 11 insertions(+)
-
-diff -puN Makefile~kconfig-cross_compile-option Makefile
---- a/Makefile~kconfig-cross_compile-option
-+++ a/Makefile
-@@ -184,11 +184,14 @@ SUBARCH := $(shell uname -m | sed -e s/i
- # CROSS_COMPILE can be set on the command line
- # make CROSS_COMPILE=ia64-linux-
- # Alternatively CROSS_COMPILE can be set in the environment.
-+# A third alternative is to store a setting in .config so that plain
-+# "make" in the configured kernel build directory always uses that.
- # Default value for CROSS_COMPILE is not to prefix executables
- # Note: Some architectures assign CROSS_COMPILE in their arch/*/Makefile
- export KBUILD_BUILDHOST := $(SUBARCH)
- ARCH		?= $(SUBARCH)
- CROSS_COMPILE	?=
-+CROSS_COMPILE	?= $(CONFIG_CROSS_COMPILE:"%"=%)
+diff --git a/arch/powerpc/boot/wrapper b/arch/powerpc/boot/wrapper
+index 390512a..f4594ed 100755
+--- a/arch/powerpc/boot/wrapper
++++ b/arch/powerpc/boot/wrapper
+@@ -43,6 +43,9 @@ gzip=.gz
+ # cross-compilation prefix
+ CROSS=
  
- # Architecture as present in compile.h
- UTS_MACHINE 	:= $(ARCH)
-diff -puN init/Kconfig~kconfig-cross_compile-option init/Kconfig
---- a/init/Kconfig~kconfig-cross_compile-option
-+++ a/init/Kconfig
-@@ -76,6 +76,14 @@ config INIT_ENV_ARG_LIMIT
- 	  variables passed to init from the kernel command line.
- 
- 
-+config CROSS_COMPILE
-+	string "Cross-compiler tool prefix"
-+	help
-+	  Same as running 'make CROSS_COMPILE=prefix-' but stored for
-+	  default make runs in this kernel build directory.  You don't
-+	  need to set this unless you want the configured kernel build
-+	  directory to select the cross-compiler automatically.
++# mkimage wrapper script
++MKIMAGE=$srctree/scripts/mkuboot.sh
 +
- config LOCALVERSION
- 	string "Local version - append to kernel release"
- 	help
-_
+ # directory for object and other files used by this script
+ object=arch/powerpc/boot
+ objbin=$object
+@@ -267,7 +270,7 @@ membase=`${CROSS}objdump -p "$kernel" | grep -m 1 LOAD | awk '{print $7}'`
+ case "$platform" in
+ uboot)
+     rm -f "$ofile"
+-    mkimage -A ppc -O linux -T kernel -C gzip -a $membase -e $membase \
++    ${MKIMAGE} -A ppc -O linux -T kernel -C gzip -a $membase -e $membase \
+ 	$uboot_version -d "$vmz" "$ofile"
+     if [ -z "$cacheit" ]; then
+ 	rm -f "$vmz"
+@@ -327,7 +330,7 @@ coff)
+     ;;
+ cuboot*)
+     gzip -f -9 "$ofile"
+-    mkimage -A ppc -O linux -T kernel -C gzip -a "$base" -e "$entry" \
++    ${MKIMAGE} -A ppc -O linux -T kernel -C gzip -a "$base" -e "$entry" \
+             $uboot_version -d "$ofile".gz "$ofile"
+     ;;
+ treeboot*)
+-- 
+1.6.2.1
+
