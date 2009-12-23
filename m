@@ -1,75 +1,51 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp1.linux-foundation.org ([140.211.169.13]:38553 "EHLO
-	smtp1.linux-foundation.org" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751538AbZLVXuS (ORCPT
+Received: from mail-vw0-f192.google.com ([209.85.212.192]:54140 "EHLO
+	mail-vw0-f192.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752437AbZLWCDT (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 22 Dec 2009 18:50:18 -0500
-Date: Tue, 22 Dec 2009 15:49:35 -0800
-From: Andrew Morton <akpm@linux-foundation.org>
-Subject: Re: [Bugme-new] [Bug 14848] New: Kernel fails to boot if compressed
- with bzip2 or lzma
-Message-Id: <20091222154935.5da4be37.akpm@linux-foundation.org>
-In-Reply-To: <bug-14848-10286@http.bugzilla.kernel.org/>
-References: <bug-14848-10286@http.bugzilla.kernel.org/>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+	Tue, 22 Dec 2009 21:03:19 -0500
+Received: by vws30 with SMTP id 30so2307676vws.33
+        for <linux-kbuild@vger.kernel.org>; Tue, 22 Dec 2009 18:03:18 -0800 (PST)
+MIME-Version: 1.0
+Date: Wed, 23 Dec 2009 10:03:18 +0800
+Message-ID: <f895eeee0912221803l7e25f79ck75d1c359a697c9d8@mail.gmail.com>
+Subject: how to compile the linux kernel in an other directory
+From: Everest <ykai007@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: sd@sedf.de
-Cc: bugzilla-daemon@bugzilla.kernel.org, bugme-daemon@bugzilla.kernel.org, linux-kbuild@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
+
+I want to compily the Linux kernel 2.6 kernel in an alternate place
+and do not use the Makefile in top directory of kernel. (not different
+output directory use make O=DIR)
+
+For example: I have my kernel source in /home/everest/kernel, and
+I want to compile it in /home/everest/build with the Makefile in it.
+Also I need to change some of kernel source to my own directory,
+I want to develop my own fs in /home/everest/fs and I don't want to
+modify the code in kernel/fs.
+
+So I want to modify a makefile from Linux kernel 2.6 Makefile, but it
+seens not so easy to me, becaust many rules in Makefile(in top level
+directory or oher directory like /arch/arm/Makefile) use the PATH only
+available in CURRENT DIRECTORY. I want to modify only one Makefile and
+don't affect others.
+
+I notice that there is a tag in kernel Makefile: KBUILD_SRC, is that
+useful for me? But I didn't get how to use this tag and the Makefile
+only says:
+
+   # KBUILD_SRC is set on invocation of make in OBJ directory
+   # KBUILD_SRC is not intended to be used by the regular user (for now)
+
+Who can tell me how to use it? Thanks very much!
+Or is there any other to solve my problem?
+
+Thanks again!
 
 
-(switched to email.  Please respond via emailed reply-to-all, not via the
-bugzilla web interface).
+-- 
+Best wishes
 
-On Sun, 20 Dec 2009 01:46:05 GMT
-bugzilla-daemon@bugzilla.kernel.org wrote:
-
-> http://bugzilla.kernel.org/show_bug.cgi?id=14848
-> 
->            Summary: Kernel fails to boot if compressed with bzip2 or lzma
->            Product: Other
->            Version: 2.5
->     Kernel Version: 2.6.33-rc1
->           Platform: All
->         OS/Version: Linux
->               Tree: Mainline
->             Status: NEW
->           Severity: normal
->           Priority: P1
->          Component: Other
->         AssignedTo: other_other@kernel-bugs.osdl.org
->         ReportedBy: sd@sedf.de
->         Regression: Yes
-> 
-> 
-> The kernel fails to boot if compressed with bzip2 or lzma, gzip works.
-> 
-> Commit 4a2ff67c88211026afcbdbc190c13f705dae1b59 does:
-> 
-> 
-> --- a/scripts/Makefile.lib
-> +++ b/scripts/Makefile.lib
-> @@ -208,7 +208,7 @@ cmd_gzip = (cat $(filter-out FORCE,$^) | gzip -f -9 > $@)
-> || \
-> 
->  # Bzip2 and LZMA do not include size in file... so we have to fake that;
->  # append the size as a 32-bit littleendian number as gzip does.
-> -size_append = /bin/echo -ne $(shell                                    \
-> +size_append = printf $(shell                                           \
->  dec_size=0;                                                            \
->  for F in $1; do                                                               
-> \
->         fsize=$$(stat -c "%s" $$F);                                     \
-> 
-> 
-> This is wrong, because it calls the shell's builtin printf (instead
-> /usr/bin/printf) which does not support the necessary arguments.
-> 
-> At my machine (debian) "/bin/echo -ne" works.
-> 
-
-Please send a tested, signed-off patch as per
-Documentation/SubmittingPatches, thanks.
-
+Everest
