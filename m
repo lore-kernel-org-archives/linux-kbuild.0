@@ -1,51 +1,69 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-vw0-f192.google.com ([209.85.212.192]:54140 "EHLO
-	mail-vw0-f192.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752437AbZLWCDT (ORCPT
+Received: from kirsty.vergenet.net ([202.4.237.240]:52877 "EHLO
+	kirsty.vergenet.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752831AbZLXLNH (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 22 Dec 2009 21:03:19 -0500
-Received: by vws30 with SMTP id 30so2307676vws.33
-        for <linux-kbuild@vger.kernel.org>; Tue, 22 Dec 2009 18:03:18 -0800 (PST)
+	Thu, 24 Dec 2009 06:13:07 -0500
+Date: Thu, 24 Dec 2009 22:13:04 +1100
+From: Simon Horman <horms@verge.net.au>
+Subject: [patch] Makefile: Unexport LANG
+Message-ID: <20091224111300.GA31932@verge.net.au>
 MIME-Version: 1.0
-Date: Wed, 23 Dec 2009 10:03:18 +0800
-Message-ID: <f895eeee0912221803l7e25f79ck75d1c359a697c9d8@mail.gmail.com>
-Subject: how to compile the linux kernel in an other directory
-From: Everest <ykai007@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
+To: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+Cc: "H. Peter Anvin" <hpa@zytor.com>, Michal Marek <mmarek@sues.cz>, Roland Dreier <rdreier@cisco.com>, Sam Ravnborg <sam@ravnborg.org>, Masami Hiramatsu <mhiramat@redhat.com>
 
-I want to compily the Linux kernel 2.6 kernel in an alternate place
-and do not use the Makefile in top directory of kernel. (not different
-output directory use make O=DIR)
+The recent changes to setting and unexport various LC_ variables
+produces a problem on my system (Debian sid).
 
-For example: I have my kernel source in /home/everest/kernel, and
-I want to compile it in /home/everest/build with the Makefile in it.
-Also I need to change some of kernel source to my own directory,
-I want to develop my own fs in /home/everest/fs and I don't want to
-modify the code in kernel/fs.
+$ locale
+LANG=ja_JP.utf8
+LANGUAGE=ja_JP.utf8
+LC_CTYPE="ja_JP.utf8"
+LC_NUMERIC="ja_JP.utf8"
+LC_TIME="ja_JP.utf8"
+LC_COLLATE="ja_JP.utf8"
+LC_MONETARY="ja_JP.utf8"
+LC_MESSAGES="ja_JP.utf8"
+LC_PAPER="ja_JP.utf8"
+LC_NAME="ja_JP.utf8"
+LC_ADDRESS="ja_JP.utf8"
+LC_TELEPHONE="ja_JP.utf8"
+LC_MEASUREMENT="ja_JP.utf8"
+LC_IDENTIFICATION="ja_JP.utf8"
+LC_ALL=ja_JP.utf8
 
-So I want to modify a makefile from Linux kernel 2.6 Makefile, but it
-seens not so easy to me, becaust many rules in Makefile(in top level
-directory or oher directory like /arch/arm/Makefile) use the PATH only
-available in CURRENT DIRECTORY. I want to modify only one Makefile and
-don't affect others.
+Without this patch:
+$ make
+make[2]: ??: ?? make ? -jN ?????????: jobserver ??????????.
+make[2]: ??: ?? make ? -jN ?????????: jobserver ??????????.
 
-I notice that there is a tag in kernel Makefile: KBUILD_SRC, is that
-useful for me? But I didn't get how to use this tag and the Makefile
-only says:
+With this patch:
+$ make
+...
+make[2]: warning: -jN forced in submake: disabling jobserver mode.
+make[2]: warning: -jN forced in submake: disabling jobserver mode.
+...
 
-   # KBUILD_SRC is set on invocation of make in OBJ directory
-   # KBUILD_SRC is not intended to be used by the regular user (for now)
+Cc: H. Peter Anvin <hpa@zytor.com>
+Cc: Michal Marek <mmarek@sues.cz>
+Cc: Roland Dreier <rdreier@cisco.com>
+Cc: Sam Ravnborg <sam@ravnborg.org>
+Cc: Masami Hiramatsu <mhiramat@redhat.com>
+Signed-off-by: Simon Horman <horms@verge.net.au>
 
-Who can tell me how to use it? Thanks very much!
-Or is there any other to solve my problem?
-
-Thanks again!
-
-
--- 
-Best wishes
-
-Everest
+Index: linux-2.6/Makefile
+===================================================================
+--- linux-2.6.orig/Makefile	2009-12-24 22:09:29.000000000 +1100
++++ linux-2.6/Makefile	2009-12-24 22:10:58.000000000 +1100
+@@ -17,6 +17,7 @@ NAME = Man-Eating Seals of Antiquity
+ MAKEFLAGS += -rR --no-print-directory
+ 
+ # Avoid funny character set dependencies
++unexport LANG
+ unexport LC_ALL
+ LC_CTYPE=C
+ LC_COLLATE=C
