@@ -1,69 +1,91 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from kirsty.vergenet.net ([202.4.237.240]:52877 "EHLO
-	kirsty.vergenet.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752831AbZLXLNH (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 24 Dec 2009 06:13:07 -0500
-Date: Thu, 24 Dec 2009 22:13:04 +1100
-From: Simon Horman <horms@verge.net.au>
-Subject: [patch] Makefile: Unexport LANG
-Message-ID: <20091224111300.GA31932@verge.net.au>
+Received: from mx1.redhat.com ([209.132.183.28]:63097 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751068AbZLZEbC (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 25 Dec 2009 23:31:02 -0500
+Message-ID: <4B359166.3050106@redhat.com>
+Date: Fri, 25 Dec 2009 23:30:30 -0500
+From: Masami Hiramatsu <mhiramat@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Subject: Re: [patch] Makefile: Unexport LANG
+References: <20091224111300.GA31932@verge.net.au>
+In-Reply-To: <20091224111300.GA31932@verge.net.au>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
-Cc: "H. Peter Anvin" <hpa@zytor.com>, Michal Marek <mmarek@sues.cz>, Roland Dreier <rdreier@cisco.com>, Sam Ravnborg <sam@ravnborg.org>, Masami Hiramatsu <mhiramat@redhat.com>
+To: Simon Horman <horms@verge.net.au>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, "H. Peter Anvin" <hpa@zytor.com>, Michal Marek <mmarek@sues.cz>, Roland Dreier <rdreier@cisco.com>, Sam Ravnborg <sam@ravnborg.org>
 
-The recent changes to setting and unexport various LC_ variables
-produces a problem on my system (Debian sid).
+Simon Horman wrote:
+> The recent changes to setting and unexport various LC_ variables
+> produces a problem on my system (Debian sid).
+> 
+> $ locale
+> LANG=ja_JP.utf8
+> LANGUAGE=ja_JP.utf8
+> LC_CTYPE="ja_JP.utf8"
+> LC_NUMERIC="ja_JP.utf8"
+> LC_TIME="ja_JP.utf8"
+> LC_COLLATE="ja_JP.utf8"
+> LC_MONETARY="ja_JP.utf8"
+> LC_MESSAGES="ja_JP.utf8"
+> LC_PAPER="ja_JP.utf8"
+> LC_NAME="ja_JP.utf8"
+> LC_ADDRESS="ja_JP.utf8"
+> LC_TELEPHONE="ja_JP.utf8"
+> LC_MEASUREMENT="ja_JP.utf8"
+> LC_IDENTIFICATION="ja_JP.utf8"
+> LC_ALL=ja_JP.utf8
+> 
+> Without this patch:
+> $ make
+> make[2]: ??: ?? make ? -jN ?????????: jobserver ??????????.
+> make[2]: ??: ?? make ? -jN ?????????: jobserver ??????????.
+> 
+> With this patch:
+> $ make
+> ...
+> make[2]: warning: -jN forced in submake: disabling jobserver mode.
+> make[2]: warning: -jN forced in submake: disabling jobserver mode.
+> ...
+> 
+> Cc: H. Peter Anvin <hpa@zytor.com>
+> Cc: Michal Marek <mmarek@sues.cz>
+> Cc: Roland Dreier <rdreier@cisco.com>
+> Cc: Sam Ravnborg <sam@ravnborg.org>
+> Cc: Masami Hiramatsu <mhiramat@redhat.com>
+> Signed-off-by: Simon Horman <horms@verge.net.au>
 
-$ locale
-LANG=ja_JP.utf8
-LANGUAGE=ja_JP.utf8
-LC_CTYPE="ja_JP.utf8"
-LC_NUMERIC="ja_JP.utf8"
-LC_TIME="ja_JP.utf8"
-LC_COLLATE="ja_JP.utf8"
-LC_MONETARY="ja_JP.utf8"
-LC_MESSAGES="ja_JP.utf8"
-LC_PAPER="ja_JP.utf8"
-LC_NAME="ja_JP.utf8"
-LC_ADDRESS="ja_JP.utf8"
-LC_TELEPHONE="ja_JP.utf8"
-LC_MEASUREMENT="ja_JP.utf8"
-LC_IDENTIFICATION="ja_JP.utf8"
-LC_ALL=ja_JP.utf8
+Tested on Fedora 11 too, and it works good. Thank you!
 
-Without this patch:
-$ make
-make[2]: ??: ?? make ? -jN ?????????: jobserver ??????????.
-make[2]: ??: ?? make ? -jN ?????????: jobserver ??????????.
+Tested-by: Masami Hiramatsu <mhiramat@redhat.com>
 
-With this patch:
-$ make
-...
-make[2]: warning: -jN forced in submake: disabling jobserver mode.
-make[2]: warning: -jN forced in submake: disabling jobserver mode.
-...
+> 
+> Index: linux-2.6/Makefile
+> ===================================================================
+> --- linux-2.6.orig/Makefile	2009-12-24 22:09:29.000000000 +1100
+> +++ linux-2.6/Makefile	2009-12-24 22:10:58.000000000 +1100
+> @@ -17,6 +17,7 @@ NAME = Man-Eating Seals of Antiquity
+>  MAKEFLAGS += -rR --no-print-directory
+>  
+>  # Avoid funny character set dependencies
+> +unexport LANG
+>  unexport LC_ALL
+>  LC_CTYPE=C
+>  LC_COLLATE=C
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-kernel" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> Please read the FAQ at  http://www.tux.org/lkml/
 
-Cc: H. Peter Anvin <hpa@zytor.com>
-Cc: Michal Marek <mmarek@sues.cz>
-Cc: Roland Dreier <rdreier@cisco.com>
-Cc: Sam Ravnborg <sam@ravnborg.org>
-Cc: Masami Hiramatsu <mhiramat@redhat.com>
-Signed-off-by: Simon Horman <horms@verge.net.au>
+-- 
+Masami Hiramatsu
 
-Index: linux-2.6/Makefile
-===================================================================
---- linux-2.6.orig/Makefile	2009-12-24 22:09:29.000000000 +1100
-+++ linux-2.6/Makefile	2009-12-24 22:10:58.000000000 +1100
-@@ -17,6 +17,7 @@ NAME = Man-Eating Seals of Antiquity
- MAKEFLAGS += -rR --no-print-directory
- 
- # Avoid funny character set dependencies
-+unexport LANG
- unexport LC_ALL
- LC_CTYPE=C
- LC_COLLATE=C
+Software Engineer
+Hitachi Computer Products (America), Inc.
+Software Solutions Division
+
+e-mail: mhiramat@redhat.com
+
