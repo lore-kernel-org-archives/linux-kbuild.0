@@ -1,47 +1,86 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from kirsty.vergenet.net ([202.4.237.240]:58045 "EHLO
-	kirsty.vergenet.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751769AbZLZLUK (ORCPT
+Received: from mail-gx0-f211.google.com ([209.85.217.211]:64906 "EHLO
+	mail-gx0-f211.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750892AbZL1TXN (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 26 Dec 2009 06:20:10 -0500
-Date: Sat, 26 Dec 2009 22:20:07 +1100
-From: Simon Horman <horms@verge.net.au>
-Subject: Re: [patch] Makefile: Unexport LANG
-Message-ID: <20091226112007.GB2818@verge.net.au>
-References: <20091224111300.GA31932@verge.net.au>
- <4B359166.3050106@redhat.com>
- <4B359BC0.3080808@zytor.com>
+	Mon, 28 Dec 2009 14:23:13 -0500
+Received: by gxk3 with SMTP id 3so4498937gxk.1
+        for <linux-kbuild@vger.kernel.org>; Mon, 28 Dec 2009 11:23:12 -0800 (PST)
+Date: Mon, 28 Dec 2009 19:38:27 +0000
+From: Jonathan Nieder <jrnieder@gmail.com>
+Subject: [PATCH] kbuild: really fix bzImage build with non-bash sh
+Message-ID: <20091228193827.GA2157@localhost>
+References: <bug-14848-10286@http.bugzilla.kernel.org/>
+ <20091222154935.5da4be37.akpm@linux-foundation.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <4B359BC0.3080808@zytor.com>
+In-Reply-To: <20091222154935.5da4be37.akpm@linux-foundation.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "H. Peter Anvin" <hpa@zytor.com>
-Cc: Masami Hiramatsu <mhiramat@redhat.com>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Michal Marek <mmarek@sues.cz>, Roland Dreier <rdreier@cisco.com>, Sam Ravnborg <sam@ravnborg.org>
+To: Michal Marek <mmarek@suse.cz>
+Cc: sd@sedf.de, Andrew Morton <akpm@linux-foundation.org>, Michael Tokarev <mjt@tls.msk.ru>, Alek Du <alek.du@intel.com>, linux-kbuild@vger.kernel.org
 
-On Fri, Dec 25, 2009 at 09:14:40PM -0800, H. Peter Anvin wrote:
-> On 12/25/2009 08:30 PM, Masami Hiramatsu wrote:
-> >>  
-> >>  # Avoid funny character set dependencies
-> >> +unexport LANG
-> >>  unexport LC_ALL
-> >>  LC_CTYPE=C
-> >>  LC_COLLATE=C
-> > 
-> 
-> At this point, it seems to me that we should just LC_ALL=C and be done
-> with it (see other thread.)
+In an x86 build with CONFIG_KERNEL_LZMA enabled and dash as sh,
+arch/x86/boot/compressed/vmlinux.bin.lzma ends with
+'\xf0\x7d\x39\x00' (16 bytes) instead of the 4 bytes intended and
+the resulting vmlinuz fails to boot.  This improves on the
+previous behavior, in which the file contained the characters
+'-ne ' as well, but not by much.
 
-Sure, that would also work for the case that I'm seeing.
+Previous commits replaced "echo -ne" first with "/bin/echo -ne",
+then "printf" in the hope of improving portability, but none of
+these commands is guaranteed to support hexadecimal escapes on
+POSIX systems.  So use the shell to convert from hexadecimal to
+octal.
 
-I tested the following:
+With this change, an LZMA-compressed kernel built with dash as sh
+boots correctly again.
 
-# Avoid funny character set dependencies
-LC_ALL=C
-export LC_ALL
+Reported-by: sd@sedf.de
+Signed-off-by: Jonathan Nieder <jrnieder@gmail.com>
+Cc: Michal Marek <mmarek@suse.cz>
+Cc: Michael Tokarev <mjt@tls.msk.ru>
+Cc: Alek Du <alek.du@intel.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>
+---
+Andrew Morton wrote:
 
-Though personally I would advocate tweaking the locale as needed closer
-to awk scripts and the like, rather than the high-level general change that
-was made. Fall-out from a high-level change seems inevitable to me.
+> switched to email.
+
+Thanks.
+
+sd@sedf.de reported through <http://bugzilla.kernel.org/show_bug.cgi?id=14848>:
+
+>> The kernel fails to boot if compressed with bzip2 or lzma, gzip works.
+>> 
+>> Commit 4a2ff67c88211026afcbdbc190c13f705dae1b59 does:
+
+Thanks for tracking it down.  The change below works here.
+
+ scripts/Makefile.lib |    9 +++++++--
+ 1 files changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+index cd815ac..eabedbb 100644
+--- a/scripts/Makefile.lib
++++ b/scripts/Makefile.lib
+@@ -219,8 +219,13 @@ for F in $1; do								\
+ 	fsize=$$(stat -c "%s" $$F);					\
+ 	dec_size=$$(expr $$dec_size + $$fsize);				\
+ done;									\
+-printf "%08x" $$dec_size |						\
+-	sed 's/\(..\)\(..\)\(..\)\(..\)/\\\\x\4\\\\x\3\\\\x\2\\\\x\1/g'	\
++printf "%08x\n" $$dec_size |						\
++	sed 's/\(..\)/\1 /g' | {					\
++		read ch0 ch1 ch2 ch3;					\
++		for ch in $$ch3 $$ch2 $$ch1 $$ch0; do			\
++			printf '%s%03o' '\\' $$((0x$$ch)); 		\
++		done;							\
++	}								\
+ )
+ 
+ quiet_cmd_bzip2 = BZIP2   $@
+-- 
+1.6.5.7
 
