@@ -1,86 +1,87 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-gx0-f211.google.com ([209.85.217.211]:64906 "EHLO
-	mail-gx0-f211.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750892AbZL1TXN (ORCPT
+Received: from mail-yx0-f187.google.com ([209.85.210.187]:37403 "EHLO
+	mail-yx0-f187.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752003AbZL3WZt convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 28 Dec 2009 14:23:13 -0500
-Received: by gxk3 with SMTP id 3so4498937gxk.1
-        for <linux-kbuild@vger.kernel.org>; Mon, 28 Dec 2009 11:23:12 -0800 (PST)
-Date: Mon, 28 Dec 2009 19:38:27 +0000
-From: Jonathan Nieder <jrnieder@gmail.com>
-Subject: [PATCH] kbuild: really fix bzImage build with non-bash sh
-Message-ID: <20091228193827.GA2157@localhost>
-References: <bug-14848-10286@http.bugzilla.kernel.org/>
- <20091222154935.5da4be37.akpm@linux-foundation.org>
+	Wed, 30 Dec 2009 17:25:49 -0500
+Received: by yxe17 with SMTP id 17so11165838yxe.33
+        for <linux-kbuild@vger.kernel.org>; Wed, 30 Dec 2009 14:25:48 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20091222154935.5da4be37.akpm@linux-foundation.org>
+In-Reply-To: <1261446643-21714-2-git-send-email-ptyser@xes-inc.com>
+References: <1261446643-21714-1-git-send-email-ptyser@xes-inc.com>
+	<1261446643-21714-2-git-send-email-ptyser@xes-inc.com>
+From: Grant Likely <grant.likely@secretlab.ca>
+Date: Wed, 30 Dec 2009 15:25:28 -0700
+Message-ID: <fa686aa40912301425s47b0363cq723e8bff1ab995c6@mail.gmail.com>
+Subject: Re: [PATCH v2 1/3] powerpc: Use scripts/mkuboot.sh instead of
+	'mkimage'
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: sd@sedf.de, Andrew Morton <akpm@linux-foundation.org>, Michael Tokarev <mjt@tls.msk.ru>, Alek Du <alek.du@intel.com>, linux-kbuild@vger.kernel.org
+To: Peter Tyser <ptyser@xes-inc.com>
+Cc: linuxppc-dev@ozlabs.org, linux-kbuild@vger.kernel.org
 
-In an x86 build with CONFIG_KERNEL_LZMA enabled and dash as sh,
-arch/x86/boot/compressed/vmlinux.bin.lzma ends with
-'\xf0\x7d\x39\x00' (16 bytes) instead of the 4 bytes intended and
-the resulting vmlinuz fails to boot.  This improves on the
-previous behavior, in which the file contained the characters
-'-ne ' as well, but not by much.
+On Mon, Dec 21, 2009 at 6:50 PM, Peter Tyser <ptyser@xes-inc.com> wrote:
+> mkuboot.sh provides a basic wrapper for the 'mkimage' utility.  Using
+> mkuboot.sh provides clearer error reporting and allows a toolchain to
+> use its own 'mkimage' executable specified by ${CROSS_COMPILE}mkimage.
+> Additionally, this brings PowerPC in line with other architectures
+> which already call mkimage via mkuboot.sh.
+>
+> Signed-off-by: Peter Tyser <ptyser@xes-inc.com>
 
-Previous commits replaced "echo -ne" first with "/bin/echo -ne",
-then "printf" in the hope of improving portability, but none of
-these commands is guaranteed to support hexadecimal escapes on
-POSIX systems.  So use the shell to convert from hexadecimal to
-octal.
+Okay by me.  I've picked this one up.
 
-With this change, an LZMA-compressed kernel built with dash as sh
-boots correctly again.
+g.
 
-Reported-by: sd@sedf.de
-Signed-off-by: Jonathan Nieder <jrnieder@gmail.com>
-Cc: Michal Marek <mmarek@suse.cz>
-Cc: Michael Tokarev <mjt@tls.msk.ru>
-Cc: Alek Du <alek.du@intel.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>
----
-Andrew Morton wrote:
+> ---
+>  arch/powerpc/boot/wrapper |    7 +++++--
+>  1 files changed, 5 insertions(+), 2 deletions(-)
+>
+> diff --git a/arch/powerpc/boot/wrapper b/arch/powerpc/boot/wrapper
+> index 390512a..f4594ed 100755
+> --- a/arch/powerpc/boot/wrapper
+> +++ b/arch/powerpc/boot/wrapper
+> @@ -43,6 +43,9 @@ gzip=.gz
+>  # cross-compilation prefix
+>  CROSS=
+>
+> +# mkimage wrapper script
+> +MKIMAGE=$srctree/scripts/mkuboot.sh
+> +
+>  # directory for object and other files used by this script
+>  object=arch/powerpc/boot
+>  objbin=$object
+> @@ -267,7 +270,7 @@ membase=`${CROSS}objdump -p "$kernel" | grep -m 1 LOAD | awk '{print $7}'`
+>  case "$platform" in
+>  uboot)
+>     rm -f "$ofile"
+> -    mkimage -A ppc -O linux -T kernel -C gzip -a $membase -e $membase \
+> +    ${MKIMAGE} -A ppc -O linux -T kernel -C gzip -a $membase -e $membase \
+>        $uboot_version -d "$vmz" "$ofile"
+>     if [ -z "$cacheit" ]; then
+>        rm -f "$vmz"
+> @@ -327,7 +330,7 @@ coff)
+>     ;;
+>  cuboot*)
+>     gzip -f -9 "$ofile"
+> -    mkimage -A ppc -O linux -T kernel -C gzip -a "$base" -e "$entry" \
+> +    ${MKIMAGE} -A ppc -O linux -T kernel -C gzip -a "$base" -e "$entry" \
+>             $uboot_version -d "$ofile".gz "$ofile"
+>     ;;
+>  treeboot*)
+> --
+> 1.6.2.1
+>
+> _______________________________________________
+> Linuxppc-dev mailing list
+> Linuxppc-dev@lists.ozlabs.org
+> https://lists.ozlabs.org/listinfo/linuxppc-dev
+>
 
-> switched to email.
 
-Thanks.
 
-sd@sedf.de reported through <http://bugzilla.kernel.org/show_bug.cgi?id=14848>:
-
->> The kernel fails to boot if compressed with bzip2 or lzma, gzip works.
->> 
->> Commit 4a2ff67c88211026afcbdbc190c13f705dae1b59 does:
-
-Thanks for tracking it down.  The change below works here.
-
- scripts/Makefile.lib |    9 +++++++--
- 1 files changed, 7 insertions(+), 2 deletions(-)
-
-diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-index cd815ac..eabedbb 100644
---- a/scripts/Makefile.lib
-+++ b/scripts/Makefile.lib
-@@ -219,8 +219,13 @@ for F in $1; do								\
- 	fsize=$$(stat -c "%s" $$F);					\
- 	dec_size=$$(expr $$dec_size + $$fsize);				\
- done;									\
--printf "%08x" $$dec_size |						\
--	sed 's/\(..\)\(..\)\(..\)\(..\)/\\\\x\4\\\\x\3\\\\x\2\\\\x\1/g'	\
-+printf "%08x\n" $$dec_size |						\
-+	sed 's/\(..\)/\1 /g' | {					\
-+		read ch0 ch1 ch2 ch3;					\
-+		for ch in $$ch3 $$ch2 $$ch1 $$ch0; do			\
-+			printf '%s%03o' '\\' $$((0x$$ch)); 		\
-+		done;							\
-+	}								\
- )
- 
- quiet_cmd_bzip2 = BZIP2   $@
 -- 
-1.6.5.7
-
+Grant Likely, B.Sc., P.Eng.
+Secret Lab Technologies Ltd.
