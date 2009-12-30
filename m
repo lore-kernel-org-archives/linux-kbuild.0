@@ -1,68 +1,99 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-gx0-f211.google.com ([209.85.217.211]:60548 "EHLO
-	mail-gx0-f211.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751271AbZL3XCw convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 30 Dec 2009 18:02:52 -0500
-Received: by gxk3 with SMTP id 3so227338gxk.1
-        for <linux-kbuild@vger.kernel.org>; Wed, 30 Dec 2009 15:02:52 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <1261446643-21714-4-git-send-email-ptyser@xes-inc.com>
-References: <1261446643-21714-1-git-send-email-ptyser@xes-inc.com>
-	<1261446643-21714-4-git-send-email-ptyser@xes-inc.com>
-From: Grant Likely <grant.likely@secretlab.ca>
-Date: Wed, 30 Dec 2009 16:02:32 -0700
-Message-ID: <fa686aa40912301502x48785614ya4dd5c71815a7633@mail.gmail.com>
+Received: from xes-mad.com ([216.165.139.218]:56708 "EHLO xes-mad.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750701AbZL3Xks (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 30 Dec 2009 18:40:48 -0500
 Subject: Re: [PATCH v2 3/3] powerpc: Add support for ram filesystems in FIT
-	uImages
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 8BIT
+  uImages
+From: Peter Tyser <ptyser@xes-inc.com>
+In-Reply-To: <fa686aa40912301502x48785614ya4dd5c71815a7633@mail.gmail.com>
+References: <1261446643-21714-1-git-send-email-ptyser@xes-inc.com>
+	 <1261446643-21714-4-git-send-email-ptyser@xes-inc.com>
+	 <fa686aa40912301502x48785614ya4dd5c71815a7633@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Date: Wed, 30 Dec 2009 17:39:53 -0600
+Message-ID: <1262216393.29396.41.camel@localhost.localdomain>
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Peter Tyser <ptyser@xes-inc.com>
-Cc: linuxppc-dev@ozlabs.org, linux-kbuild@vger.kernel.org
+To: Grant Likely <grant.likely@secretlab.ca>
+Cc: linuxppc-dev@ozlabs.org, linux-kbuild@vger.kernel.org, u-boot <u-boot@lists.denx.de>
 
-On Mon, Dec 21, 2009 at 6:50 PM, Peter Tyser <ptyser@xes-inc.com> wrote:
-> The PowerPC architecture has the ability to embed the ramdisk located
-> at arch/powerpc/boot/ramdisk.image.gz into a bootable kernel image.  If
-> the bootable kernel is in the Flattened Image Tree (FIT) format, the
-> ramdisk should be a node in the tree instead of being embedded directly
-> in the kernel executable.
->
-> A FIT uImage with a ram filesystem can be generated using the command:
-> "make uImage.fit.initrd.<boardname>" where <boardname> is one of
-> arch/powerpc/boot/dts/<boardname>.dts.  The command will generate a FIT
-> uImage at arch/powerpc/boot/uImage.fit.initrd.<boardname> that contains
-> a kernel image, device tree blob, and a ram filesystem.
->
-> The ramdisk at arch/powerpc/boot/ramdisk.image.gz can either be an older
-> style "ramdisk" or a newer "ramfs" gzipped cpio archive.
->
-> Signed-off-by: Peter Tyser <ptyser@xes-inc.com>
-> ---
-> Changes since v1:
-> - Don't strip leading 0x from dts ramdisk address
->
->  arch/powerpc/boot/Makefile |    3 +++
->  arch/powerpc/boot/wrapper  |   20 ++++++++++++++++----
->  scripts/mkits.sh           |   34 ++++++++++++++++++++++++++++++++--
->  3 files changed, 51 insertions(+), 6 deletions(-)
->
-> diff --git a/arch/powerpc/boot/Makefile b/arch/powerpc/boot/Makefile
-> index e56ec21..c2a6591 100644
-> --- a/arch/powerpc/boot/Makefile
-> +++ b/arch/powerpc/boot/Makefile
-> @@ -313,6 +313,9 @@ $(obj)/uImage: vmlinux $(wrapperbits)
->  $(obj)/uImage.fit.%: vmlinux $(obj)/%.dtb $(wrapperbits)
->        $(call if_changed,wrap,uboot.fit,,$(obj)/$*.dtb)
->
-> +$(obj)/uImage.fit.initrd.%: vmlinux $(obj)/%.dtb $(wrapperbits)
-> +       $(call if_changed,wrap,uboot.fit,,$(obj)/$*.dtb,$(obj)/ramdisk.image.gz)
-> +
+Hi Grant,
+I put U-Boot ML on CC.
 
-IIRC, uImage.fit.initrd.% should appear before uImage.fit.% in the
-Makefile so that make behaves more consistently.  Speaking of which,
-the number of '.' in the name is getting rather large.  Would you
-consider using 'fitImage' instead of 'uImage.fit'?
+On Wed, 2009-12-30 at 16:02 -0700, Grant Likely wrote:
+> On Mon, Dec 21, 2009 at 6:50 PM, Peter Tyser <ptyser@xes-inc.com> wrote:
+> > The PowerPC architecture has the ability to embed the ramdisk located
+> > at arch/powerpc/boot/ramdisk.image.gz into a bootable kernel image.  If
+> > the bootable kernel is in the Flattened Image Tree (FIT) format, the
+> > ramdisk should be a node in the tree instead of being embedded directly
+> > in the kernel executable.
+> >
+> > A FIT uImage with a ram filesystem can be generated using the command:
+> > "make uImage.fit.initrd.<boardname>" where <boardname> is one of
+> > arch/powerpc/boot/dts/<boardname>.dts.  The command will generate a FIT
+> > uImage at arch/powerpc/boot/uImage.fit.initrd.<boardname> that contains
+> > a kernel image, device tree blob, and a ram filesystem.
+> >
+> > The ramdisk at arch/powerpc/boot/ramdisk.image.gz can either be an older
+> > style "ramdisk" or a newer "ramfs" gzipped cpio archive.
+> >
+> > Signed-off-by: Peter Tyser <ptyser@xes-inc.com>
+> > ---
+> > Changes since v1:
+> > - Don't strip leading 0x from dts ramdisk address
+> >
+> >  arch/powerpc/boot/Makefile |    3 +++
+> >  arch/powerpc/boot/wrapper  |   20 ++++++++++++++++----
+> >  scripts/mkits.sh           |   34 ++++++++++++++++++++++++++++++++--
+> >  3 files changed, 51 insertions(+), 6 deletions(-)
+> >
+> > diff --git a/arch/powerpc/boot/Makefile b/arch/powerpc/boot/Makefile
+> > index e56ec21..c2a6591 100644
+> > --- a/arch/powerpc/boot/Makefile
+> > +++ b/arch/powerpc/boot/Makefile
+> > @@ -313,6 +313,9 @@ $(obj)/uImage: vmlinux $(wrapperbits)
+> >  $(obj)/uImage.fit.%: vmlinux $(obj)/%.dtb $(wrapperbits)
+> >        $(call if_changed,wrap,uboot.fit,,$(obj)/$*.dtb)
+> >
+> > +$(obj)/uImage.fit.initrd.%: vmlinux $(obj)/%.dtb $(wrapperbits)
+> > +       $(call if_changed,wrap,uboot.fit,,$(obj)/$*.dtb,$(obj)/ramdisk.image.gz)
+> > +
+> 
+> IIRC, uImage.fit.initrd.% should appear before uImage.fit.% in the
+> Makefile so that make behaves more consistently.
 
-g.
+Makes sense.
+
+> Speaking of which,
+> the number of '.' in the name is getting rather large.  Would you
+> consider using 'fitImage' instead of 'uImage.fit'?
+
+Sure, I don't have a strong opinion about the name.  I settled on
+uImage.fit because all the U-Boot documentation describes the FIT images
+as type of uImage.  Eg the readme is located in doc/uImage.fit, its
+referred to as the "new uImage" format, etc.  So using the
+"uimage.fit.*" name goes along with the concept that a FIT image is a
+type of uImage.  A target like fitImage loses the uImage<->FIT
+connection.
+
+But I do agree that "."s are a bit overwhelming.  I could rework these
+patches with your suggested fitImage target name and follow-up with
+U-Boot patches to clear up its documentation.  In my opinion, there's
+not much reason to keep the uImage<->FIT connection that currently
+exists in U-Boot.  Right now U-Boot documents the "Legacy uImage" and
+"FIT uImage" format when logically it would make sense to rename the
+formats to "uImage" and "FIT" as there isn't much in common between the
+2 formats.  The FIT image is just a blob generated by the device tree
+compiler, its not tied to U-Boot in any way.
+
+Does anyone in the U-Boot community have an opinion about this?  I'm
+fine with keeping the uImage.fit naming or using fitImage for this
+patch, but I think U-Boot's documentation should be on the same page
+either way.
+
+Thanks for the review,
+Peter
+
