@@ -1,56 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ey-out-2122.google.com ([74.125.78.26]:31661 "EHLO
-	ey-out-2122.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752003AbZLaIB1 (ORCPT
+Received: from mail-out.m-online.net ([212.18.0.9]:43882 "EHLO
+	mail-out.m-online.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751524AbZLaWos (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 31 Dec 2009 03:01:27 -0500
-Received: by ey-out-2122.google.com with SMTP id 25so1886002eya.19
-        for <linux-kbuild@vger.kernel.org>; Thu, 31 Dec 2009 00:01:25 -0800 (PST)
-From: Peter Korsgaard <jacmet@sunsite.dk>
-Subject: Re: [PATCH v2 3/3] powerpc: Add support for ram filesystems in FIT  uImages
-References: <1261446643-21714-1-git-send-email-ptyser@xes-inc.com>
-	<1261446643-21714-4-git-send-email-ptyser@xes-inc.com>
-	<fa686aa40912301502x48785614ya4dd5c71815a7633@mail.gmail.com>
-	<1262216393.29396.41.camel@localhost.localdomain>
-	<fa686aa40912301601s6cd0ec4y85b88976159a36af@mail.gmail.com>
-Date: Thu, 31 Dec 2009 09:01:22 +0100
-In-Reply-To: <fa686aa40912301601s6cd0ec4y85b88976159a36af@mail.gmail.com>
-	(Grant Likely's message of "Wed, 30 Dec 2009 17:01:35 -0700")
-Message-ID: <87skartvvx.fsf@macbook.be.48ers.dk>
+	Thu, 31 Dec 2009 17:44:48 -0500
+From: Wolfgang Denk <wd@denx.de>
+Subject: Re: [PATCH v2 3/3] powerpc: Add support for ram filesystems in FIT uImages
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7BIT
+In-reply-to: <fa686aa40912301502x48785614ya4dd5c71815a7633@mail.gmail.com>
+References: <1261446643-21714-1-git-send-email-ptyser@xes-inc.com> <1261446643-21714-4-git-send-email-ptyser@xes-inc.com> <fa686aa40912301502x48785614ya4dd5c71815a7633@mail.gmail.com>
+Date: Thu, 31 Dec 2009 23:44:39 +0100
+Message-Id: <20091231224439.AF5353F6D1@gemini.denx.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Grant Likely <grant.likely@secretlab.ca>
-Cc: Peter Tyser <ptyser@xes-inc.com>, u-boot <u-boot@lists.denx.de>, linuxppc-dev@ozlabs.org, linux-kbuild@vger.kernel.org
+Cc: Peter Tyser <ptyser@xes-inc.com>, linuxppc-dev@ozlabs.org, linux-kbuild@vger.kernel.org
 
->>>>> "Grant" == Grant Likely <grant.likely@secretlab.ca> writes:
+Dear Grant Likely,
 
-Hi,
+In message <fa686aa40912301502x48785614ya4dd5c71815a7633@mail.gmail.com> you wrote:
+>
+> IIRC, uImage.fit.initrd.% should appear before uImage.fit.% in the
+> Makefile so that make behaves more consistently.  Speaking of which,
+> the number of '.' in the name is getting rather large.  Would you
+> consider using 'fitImage' instead of 'uImage.fit'?
 
- Grant> Personally, I don't get any benefit out of the new image format,
- Grant> so I haven't spent any time looking at it.  However, I'm
- Grant> concerned about the drift back towards a different image per
- Grant> target when the move over the last 4 years has been towards
- Grant> multiplatform kernel images.  I certainly don't want to
- Grant> encourage embedding the device tree blob into the kernel image,
- Grant> and I'm not very interested in merging code to do that into the
- Grant> kernel tree.  If someone really needs to do that for their
- Grant> particular target, it is certainly easy enough for them to weld
- Grant> in the .dtb after the fact before transferring the image to the
- Grant> target, but I want that mode to be the exception, not the rule.
+Why chose a different name at all? We could still call it "uImage",
+meaning "U-Boot image" - U-Boot is clever enought o detect
+automatically if we pass it an old style or a fit image.
 
-I understand the advantages of being able to compile multiplatform
-kernels - But for the typical embedded device, having the device tree
-together with the kernel makes stuff a lot simpler when upgrading
-because of the version depencies of the dts.
+Best regards,
 
-That's also why I submitted the (nacked) multifile uimage support some
-time ago:
-
-http://thread.gmane.org/gmane.linux.ports.ppc64.devel/46825/
-
-The fitimage stuff is the logical continuation of that.
+Wolfgang Denk
 
 -- 
-Bye, Peter Korsgaard
+DENX Software Engineering GmbH,     MD: Wolfgang Denk & Detlev Zundel
+HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
+Phone: (+49)-8142-66989-10 Fax: (+49)-8142-66989-80 Email: wd@denx.de
+If the odds are a million to one against something occuring,  chances
+are 50-50 it will.
