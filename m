@@ -1,58 +1,83 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ew0-f219.google.com ([209.85.219.219]:38246 "EHLO
-	mail-ew0-f219.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750932Ab0ACO1G (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 3 Jan 2010 09:27:06 -0500
-Received: by ewy19 with SMTP id 19so6481938ewy.21
-        for <linux-kbuild@vger.kernel.org>; Sun, 03 Jan 2010 06:27:03 -0800 (PST)
-From: Peter Korsgaard <jacmet@sunsite.dk>
-Subject: Re: [PATCH v2 3/3] powerpc: Add support for ram filesystems in FIT uImages
-References: <1261446643-21714-1-git-send-email-ptyser@xes-inc.com>
-	<1261446643-21714-4-git-send-email-ptyser@xes-inc.com>
-	<fa686aa40912301502x48785614ya4dd5c71815a7633@mail.gmail.com>
-	<20091231224439.AF5353F6D1@gemini.denx.de>
-	<1262301038.29396.137.camel@localhost.localdomain>
-	<20100101104449.6DAC63F6FF@gemini.denx.de>
-	<87wrzzpq8c.fsf@macbook.be.48ers.dk>
-	<20100103095032.8F05AE34A26@gemini.denx.de>
-Date: Sun, 03 Jan 2010 15:27:00 +0100
-In-Reply-To: <20100103095032.8F05AE34A26@gemini.denx.de> (Wolfgang Denk's
-	message of "Sun, 03 Jan 2010 10:50:32 +0100")
-Message-ID: <87skanp8ln.fsf@macbook.be.48ers.dk>
+Received: from xes-mad.com ([216.165.139.218]:57661 "EHLO xes-mad.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752091Ab0ADAy0 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 3 Jan 2010 19:54:26 -0500
+Message-ID: <4B412DCE.4030509@xes-inc.com>
+Date: Sun, 03 Jan 2010 17:52:46 -0600
+From: Peter Tyser <ptyser@xes-inc.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Subject: Re: [PATCH v2 3/3] powerpc: Add support for ram filesystems in FIT
+ uImages
+References: <1261446643-21714-1-git-send-email-ptyser@xes-inc.com> <1261446643-21714-4-git-send-email-ptyser@xes-inc.com> <fa686aa40912301502x48785614ya4dd5c71815a7633@mail.gmail.com> <20091231224439.AF5353F6D1@gemini.denx.de> <1262301038.29396.137.camel@localhost.localdomain> <20100101104449.6DAC63F6FF@gemini.denx.de>
+In-Reply-To: <20100101104449.6DAC63F6FF@gemini.denx.de>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Wolfgang Denk <wd@denx.de>
-Cc: Peter Tyser <ptyser@xes-inc.com>, linuxppc-dev@ozlabs.org, linux-kbuild@vger.kernel.org
+Cc: Grant Likely <grant.likely@secretlab.ca>, linuxppc-dev@ozlabs.org, linux-kbuild@vger.kernel.org
 
->>>>> "Wolfgang" == Wolfgang Denk <wd@denx.de> writes:
+Hi Wolfgang,
 
-Hi,
+> The "new" FIT image type should become the default, and old "legacy"
+> images should only be generated upon special request (i. e. if some-
+> one needs these for compatibility with an old, not yet FIT-aware
+> version of the boot loader).
 
- >> No, that would break stuff for the existing users. The existing format
- >> make/file names shouldn't change.
+Agreed.
 
- Wolfgang> Well, with this argument you can block all progress and freeze all
- Wolfgang> development to some ancient state.
+>> What do you think about changing the U-Boot documentation to rename
+>> those 2 image types to:
+>> 1 uImages
+>> 2 FIT Images
+>
+> Let's make this "uImage.old" (or "uImage.legacy" similar) and
+> "uImage", then.
 
-We only break backwards compatibility when we have to. There's no
-technical reason for renaming the existing make targets.
+I'm in favor of keeping the old uImage format/naming the same, and 
+calling the new image format a FIT Image.  ie no mention of uImage for 
+FIT images.
 
- >> The FIT images could be called fitimage or uImage.new or something.
+<snip>
 
- Wolfgang> I disagree. We want to make this the new default, so let's
- Wolfgang> use the default name for this, and continue to support he
- Wolfgang> legacy image format using another name.
+>> uImages have to agree with U-Boot's header format defined in the U-Boot
+>> source code, so the uImage name does make sense with respect to the
+>> "legacy" uImages.
+>
+> Well, you can read "uImage" as "universal Image", which kind of fits
+> the FIT approach :-)
 
- Wolfgang> Also, your approach does not scale. Assume we come up with an
- Wolfgang> even more advanced image format in the future - how should we
- Wolfgang> name it then?  "uImage.newer" ? "uImage.verynew" ?
- Wolfgang> "uImage.new2" ?
+I agree that the FIT image is a type of "universal Image", but I think 
+"FIT image" is much more descriptive and accurate than "universal 
+Image".  The FIT naming convention is designed to match device tree 
+naming, which has lots of meaning.  eg:
+   Flattened Device Tree (FDT) -> Flattened Image Tree (FIT)
+   device tree source (.dts) -> image tree source (.its)
+   device tree blob (.dtb) -> image tree blob (.itb)
 
-Hence fitimage. The next thing will presumably be called something else
-again.
+>> My vote would be to make the Linux FIT target rule "fitImage" and then
+>> update the U-Boot documentation to make obvious the differences between
+>> uImages and FIT images.
+>
+> I think we should not try to support both legacy and FIT images on the
+> same level - the idea is clearly that legacy images is the old, to be
+> replaced format, while FIT images is the new, to be used as standard
+> format.
 
--- 
-Bye, Peter Korsgaard
+Agreed.
+
+In this sense I vote for using plain and simple "uImage" for
+> the (new) standard format, and marking the old format by some ".old"
+> or ".legacy" suffix.
+
+I disagree here.  I don't think calling FIT images "FIT uImages" adds 
+much value and it would add confusion as there are now multiple uImage 
+formats that a user needs to keep straight.  Keeping the legacy uImage 
+naming/format the same, and calling the new FIT images "fitImage" (or 
+possibly itbImage to line up with the dtbImage target) would make more 
+sense to me.  Is there a compelling reason to keep the uImage word 
+connected to FIT images?
+
+Best,
+Peter
