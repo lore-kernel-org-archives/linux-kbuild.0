@@ -1,65 +1,144 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-out.m-online.net ([212.18.0.10]:60840 "EHLO
-	mail-out.m-online.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751500Ab0AAOSm (ORCPT
+Received: from mail-yw0-f176.google.com ([209.85.211.176]:45914 "EHLO
+	mail-yw0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750782Ab0ACFJE convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 1 Jan 2010 09:18:42 -0500
-From: Wolfgang Denk <wd@denx.de>
-Subject: Re: [PATCH v2 2/3] powerpc: Add support for creating FIT uImages
+	Sun, 3 Jan 2010 00:09:04 -0500
+Received: by ywh6 with SMTP id 6so14464458ywh.4
+        for <linux-kbuild@vger.kernel.org>; Sat, 02 Jan 2010 21:09:03 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7BIT
-In-reply-to: <fa686aa40912301457l704c324bk511a207d07218525@mail.gmail.com>
-References: <1261446643-21714-1-git-send-email-ptyser@xes-inc.com> <1261446643-21714-3-git-send-email-ptyser@xes-inc.com> <fa686aa40912301457l704c324bk511a207d07218525@mail.gmail.com>
-Date: Fri, 01 Jan 2010 15:18:40 +0100
-Message-Id: <20100101141840.D6C273F6FF@gemini.denx.de>
+In-Reply-To: <1262221856.29396.104.camel@localhost.localdomain>
+References: <1261446643-21714-1-git-send-email-ptyser@xes-inc.com>
+	<1261446643-21714-4-git-send-email-ptyser@xes-inc.com> <fa686aa40912301502x48785614ya4dd5c71815a7633@mail.gmail.com>
+	<1262216393.29396.41.camel@localhost.localdomain> <fa686aa40912301601s6cd0ec4y85b88976159a36af@mail.gmail.com>
+	<1262221856.29396.104.camel@localhost.localdomain>
+From: Grant Likely <grant.likely@secretlab.ca>
+Date: Sat, 2 Jan 2010 22:08:43 -0700
+Message-ID: <fa686aa41001022108i92596d6qdf2da0e24c34767e@mail.gmail.com>
+Subject: Re: [U-Boot] [PATCH v2 3/3] powerpc: Add support for ram filesystems
+	in FIT uImages
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Grant Likely <grant.likely@secretlab.ca>
-Cc: Peter Tyser <ptyser@xes-inc.com>, linuxppc-dev@ozlabs.org, linux-kbuild@vger.kernel.org
+To: Peter Tyser <ptyser@xes-inc.com>
+Cc: u-boot <u-boot@lists.denx.de>, linuxppc-dev@ozlabs.org, linux-kbuild@vger.kernel.org
 
-Dear Grant,
+Hi Peter,
 
-In message <fa686aa40912301457l704c324bk511a207d07218525@mail.gmail.com> you wrote:
+On Wed, Dec 30, 2009 at 6:10 PM, Peter Tyser <ptyser@xes-inc.com> wrote:
+> On Wed, 2009-12-30 at 17:01 -0700, Grant Likely wrote:
+>> On Wed, Dec 30, 2009 at 4:39 PM, Peter Tyser <ptyser@xes-inc.com> wrote:
+>> > Hi Grant,
+>> > I put U-Boot ML on CC.
+>>
+>> Thinking further, I do actually have another concern, at least with
+>> regard to the way the current patch set implements things.  Is it
+>> expected or even "recommended" that fit images will *always* contain a
+>> .dtb image?  The current patch only handles the case of a .dtb
+>> embedded inside the fit image.
 >
-> Unfortunately, the wrapper script is also being used to do things that
-> are completely unrelated to creating wrapper binaries.  FIT images
-> (and uImages) don't use any of the wrapper bits at all.  In fact, as
-> seen in this patch, generating them involves bailing out of the
-> wrapper script early to avoid linking the wrapper bits.  I think for
-> all types of uImages, the wrapper script is being misused and I don't
-> like the extra complexity that it adds.
+> I'm not aware of any recommendations as far as what FIT images should
+> contain and there isn't a requirement that it should contain a .dtb
+> image - its just a flexible image format.
+>
+> I believe in the most common FIT usage scenario the image would contain
+> both a kernel image and .dtb file though.  For example, most people I
+> deal with just have boardX and boardY that they want to boot Linux on.
+>
+> Currently they have to make a "legacy" uImage, manually run the device
+> tree compiler with the proper flags to generate a board-specific .dtb
+> file,
 
-Agreed.
+... or put the .dts files into arch/powerpc/boot/dts and use 'make <board>.dtb'
 
-> Rather than adding new paths to arch/powerpc/boot/wrapper, I would
-> rather see a new script used for generating FIT image that isn't
-> complicated by all the current wrapper cruft.  Also, the Makefile rule
-> doesn't need to depend on $(wrapperbits) which means faster build
-> times when only building uImages.
-> 
-> Bonus points if you also convert the uImage target to use the new
-> script; but I'm not demanding that you do that yet.
+multiple <board>.dtb targets can also be added to CONFIG_EXTRA_TARGETS
+so that a plain 'make' will build all needed files.
 
-I think if this is handles in a separate script, the legacy uImage
-support must be handled in this new script, too. Otherwise it would be
-too difficult to understanmd the relation of the two image formats.
+> transfer the uImage to to boardX, transfer the .dtb file to
+> boardX, set some U-Boot variables, then boot to Linux.  For boardY they
+> would have to redo the steps with the exception of recreating the legacy
+> uImage.  (To add to the confusion, the format of device trees is a
+> somewhat moving target, so .dtb files aren't always compatible with
+> different kernel versions.)
 
-> Finally, you need to add documentation about the new target to
-> Documentation/powerpc/bootwrapper.txt.
+The are no guarantees that new dtb files will work with old kernels,
+but old dtb files should continue to work with new kernels.  There
+have been growing pains in this regard, and there are a number of
+examples where this hasn't been the case especially as we were
+learning how best to use the device tree.  It is a lot more stable now
+than it had been and new cases can be considered a kernel bug.
 
-Let's keep in mind that the uImage formats (both the old legacy and
-the new FIT format) are inherently architecture independent. We want
-to use this same mechanism for example on ARM, and on other
-architectures as well.
+>> Personally, I don't get any benefit out of the new image format, so I
+>> haven't spent any time looking at it.  However, I'm concerned about
+>> the drift back towards a different image per target when the move over
+>> the last 4 years has been towards multiplatform kernel images.  I
+>> certainly don't want to encourage embedding the device tree blob into
+>> the kernel image, and I'm not very interested in merging code to do
+>> that into the kernel tree.  If someone really needs to do that for
+>> their particular target, it is certainly easy enough for them to weld
+>> in the .dtb after the fact before transferring the image to the
+>> target, but I want that mode to be the exception, not the rule.
+>
+> I see your point.  The main goal of the patch was to introduce FIT image
+> support as its the new, more flexible, "better", standard image format
+> for U-Boot going forward.  Also, lots people aren't aware of FIT images
+> and the cool stuff they can do with them, so what better way to get the
+> word out than getting support for FIT images included in the kernel
+> proper:)
 
-Best regards,
+Define 'better'.  :-)
 
-Wolfgang Denk
+I do understand your use-case and what problem fit images solve for
+you.  However, from a "long term strategy" point of view it is a use
+case that I'm not interested in actively supporting for two reasons.
+The first is that I think it is in our best interest to encourage the
+mind set that the hardware description is separate from the operating
+system image, and so they should be stored and updated separately.  I
+look at the unexpected ecosystem of distributions that has sprung up
+around wireless routers (ie OpenWRT and the like) and Linux cell
+phones (ie. Cyanogen Mod) where there is a huge range of hardware.
+The userspace can pretty much run on any of them excepting minor
+configuration changes.  The embedded space is becoming more PCs in
+this regard, and I know that multiplatform is a big deal for some of
+the users.  I'm not interested in encouraging any behaviour that will
+scuttle deployment of multiplatform kernels.  (That being said, I'm
+not going to actively sabotage people who want to put dtb sections
+into the kernel images either.  I understand that at times it is
+necessary, and there are numerous examples of this already in the
+kernel tree; specifically to support firmware that doesn't implement
+arch/powerpc's boot interface)
+
+The second is that I no longer think it is a good idea to be building
+bootloader specific image fomats if we can help it.  U-Boot is not the
+only game bootloaders, especially when talking about ARM or MIPS, and
+some folks are even using kexec to go from one kernel to the next.
+Having the same image format for all firmware and also kexec is far
+more interesting to me than the a new u-boot format.  Some form of
+zImage seems to be a more likely format to standardize around than the
+FIT format, mostly because kexec and a lot of firmware already
+understand zImages, and it doesn't require firmware to link in libfdt.
+
+> I think it would be nice to generate a FIT image that contained the
+> kernel + .dtb as it significantly simplifies the process of booting
+> Linux for the common case for lots of U-Boot users and showcases one of
+> the benefits of the FIT format.  If you'd prefer not to have this
+> portion of the patch included, I can respin so that the FIT image
+> created only contains a kernel image, not a .dtb or initramfs.  Or I
+> could make targets of fitImage (no dtb included), fitImage.<board> (dtb
+> included), and fitImage.initrd.<board> (dtb and initramfs included).
+> Either way is fine with me, it'd just be nice to see FIT support get in
+> in some form.
+
+I'd be okay (perhaps not happy, but okay) with merging fitImage and
+fitImage.initrd targets (no dtb).  I will resist merging fitImage.%
+and fitImage.initrd.% targets because I see that very much as a
+project specific deployment target and I'm not convinced yet that it
+the pattern is right or that it is even needed in the kernel at all.
+
+Cheers,
+g.
 
 -- 
-DENX Software Engineering GmbH,     MD: Wolfgang Denk & Detlev Zundel
-HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
-Phone: (+49)-8142-66989-10 Fax: (+49)-8142-66989-80 Email: wd@denx.de
-How many Unix hacks does it take to change a light bulb?  Let's  see,
-   can you use a shell script for that or does it need a C program?
+Grant Likely, B.Sc., P.Eng.
+Secret Lab Technologies Ltd.
