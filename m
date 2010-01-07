@@ -1,60 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:36702 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:43647 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752216Ab0AGLko (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 7 Jan 2010 06:40:44 -0500
-Message-ID: <4B45C83A.9000803@suse.cz>
-Date: Thu, 07 Jan 2010 12:40:42 +0100
+	id S1751021Ab0AGOxL (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 7 Jan 2010 09:53:11 -0500
 From: Michal Marek <mmarek@suse.cz>
-MIME-Version: 1.0
-Subject: Re: [PATCH] kallsyms: skip kernel symbols when lookup in module
-References: <1262846626-27109-1-git-send-email-crquan@gmail.com>
-In-Reply-To: <1262846626-27109-1-git-send-email-crquan@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-2
-Content-Transfer-Encoding: 7bit
+Subject: [PATCH 0/2] nconfig
+Date: Thu,  7 Jan 2010 15:52:46 +0100
+Message-Id: <1262875968-1078-1-git-send-email-mmarek@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Cheng Renquan <crquan@gmail.com>
-Cc: linux-kbuild@vger.kernel.org, lkml <linux-kernel@vger.kernel.org>, Rusty Russell <rusty@rustcorp.com.au>
+To: Nir Tzachar <nir.tzachar@gmail.com>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On 7.1.2010 07:43, Cheng Renquan wrote:
-> kernel symbols lookup is expensive, when we know it's a lookup in module,
-> we can skip the heavy kernel symbols.
-> 
-> Signed-off-by: Cheng Renquan <crquan@gmail.com>
-> ---
->  kernel/kallsyms.c |   12 ++++++++----
->  1 files changed, 8 insertions(+), 4 deletions(-)
-> 
-> diff --git a/kernel/kallsyms.c b/kernel/kallsyms.c
-> index 8e5288a..bb9fdc5 100644
-> --- a/kernel/kallsyms.c
-> +++ b/kernel/kallsyms.c
-> @@ -173,12 +173,16 @@ unsigned long kallsyms_lookup_name(const char *name)
->  	unsigned long i;
->  	unsigned int off;
->  
-> -	for (i = 0, off = 0; i < kallsyms_num_syms; i++) {
-> -		off = kallsyms_expand_symbol(off, namebuf);
-> +	/* if a colon ':' found, skip the heavy kernel symbols */
-> +	if (strchr(name, ':') == NULL) {
-> +		for (i = 0, off = 0; i < kallsyms_num_syms; i++) {
-> +			off = kallsyms_expand_symbol(off, namebuf);
->  
-> -		if (strcmp(namebuf, name) == 0)
-> -			return kallsyms_addresses[i];
-> +			if (strcmp(namebuf, name) == 0)
-> +				return kallsyms_addresses[i];
-> +		}
->  	}
-> +
->  	return module_kallsyms_lookup_name(name);
->  }
->  EXPORT_SYMBOL_GPL(kallsyms_lookup_name);
+Hi Nir,
 
-It think Rusty is the right person to handle this (CC added). But if you
-want my opinion: The patch looks ok.
+Just FYI: I queued nconfig for the next merge window. I added a patch to
+mark some functions static and changed the description of your patch,
+otherwise it's the v7 version you posted.
 
-Acked-by: Michal Marek <mmarek@suse.cz>
+Michal Marek (1):
+  nconfig: mark local functions as such
 
-Michal
+nir.tzachar@gmail.com (1):
+  kconfig: new configuration interface (nconfig)
+
+ scripts/kconfig/Makefile            |   16 +-
+ scripts/kconfig/lkc.h               |    2 +-
+ scripts/kconfig/lkc_proto.h         |    3 +-
+ scripts/kconfig/mconf.c             |   13 -
+ scripts/kconfig/menu.c              |   16 +-
+ scripts/kconfig/nconf.c             | 1568 +++++++++++++++++++++++++++++++++++
+ scripts/kconfig/nconf.gui.c         |  617 ++++++++++++++
+ scripts/kconfig/nconf.h             |   95 +++
+ scripts/kconfig/zconf.tab.c_shipped |    2 +-
+ scripts/kconfig/zconf.y             |    2 +-
+ 10 files changed, 2314 insertions(+), 20 deletions(-)
+ create mode 100644 scripts/kconfig/nconf.c
+ create mode 100644 scripts/kconfig/nconf.gui.c
+ create mode 100644 scripts/kconfig/nconf.h
+
