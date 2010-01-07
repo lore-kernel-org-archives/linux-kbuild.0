@@ -1,53 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-yx0-f188.google.com ([209.85.210.188]:39818 "EHLO
-	mail-yx0-f188.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752522Ab0AGGpn (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 7 Jan 2010 01:45:43 -0500
-Received: by yxe26 with SMTP id 26so17437143yxe.4
-        for <linux-kbuild@vger.kernel.org>; Wed, 06 Jan 2010 22:45:42 -0800 (PST)
-From: Cheng Renquan <crquan@gmail.com>
-Subject: [PATCH] kallsyms: skip kernel symbols when lookup in module
-Date: Thu,  7 Jan 2010 14:43:46 +0800
-Message-Id: <1262846626-27109-1-git-send-email-crquan@gmail.com>
+Received: from cantor.suse.de ([195.135.220.2]:43903 "EHLO mx1.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752114Ab0AGLUA (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 7 Jan 2010 06:20:00 -0500
+Message-ID: <4B45C35E.4080506@suse.cz>
+Date: Thu, 07 Jan 2010 12:19:58 +0100
+From: Michal Marek <mmarek@suse.cz>
+MIME-Version: 1.0
+Subject: Re: [PATCH] Don't mkdir -p include/config in the sourcetree when
+ 	using O=outputdir option
+References: <alpine.LFD.2.00.1001061705140.3744@localhost.localdomain>	 <4B44E5C8.2050006@suse.cz>	 <520f0cf11001061210w4d33fca6y98f091c4260577c0@mail.gmail.com>	 <4B44F665.6050008@suse.cz> <520f0cf11001061430l2b363d90qce43bf94a384cf13@mail.gmail.com>
+In-Reply-To: <520f0cf11001061430l2b363d90qce43bf94a384cf13@mail.gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org
+To: John Kacur <jkacur@redhat.com>
+Cc: linux-kernel@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>, linux-kbuild@vger.kernel.org
 
-kernel symbols lookup is expensive, when we know it's a lookup in module,
-we can skip the heavy kernel symbols.
+On 6.1.2010 23:30, John Kacur wrote:
+> On Wed, Jan 6, 2010 at 9:45 PM, Michal Marek <mmarek@suse.cz> wrote:
+> Michal: The length of time that a bug exists in a piece of code is no
+> argument for
+> it's correctness!
 
-Signed-off-by: Cheng Renquan <crquan@gmail.com>
----
- kernel/kallsyms.c |   12 ++++++++----
- 1 files changed, 8 insertions(+), 4 deletions(-)
+From your original post I though it fails reliably for you. If it's a
+race, then you're right, the time it was introduced is irrelevant :-).
 
-diff --git a/kernel/kallsyms.c b/kernel/kallsyms.c
-index 8e5288a..bb9fdc5 100644
---- a/kernel/kallsyms.c
-+++ b/kernel/kallsyms.c
-@@ -173,12 +173,16 @@ unsigned long kallsyms_lookup_name(const char *name)
- 	unsigned long i;
- 	unsigned int off;
- 
--	for (i = 0, off = 0; i < kallsyms_num_syms; i++) {
--		off = kallsyms_expand_symbol(off, namebuf);
-+	/* if a colon ':' found, skip the heavy kernel symbols */
-+	if (strchr(name, ':') == NULL) {
-+		for (i = 0, off = 0; i < kallsyms_num_syms; i++) {
-+			off = kallsyms_expand_symbol(off, namebuf);
- 
--		if (strcmp(namebuf, name) == 0)
--			return kallsyms_addresses[i];
-+			if (strcmp(namebuf, name) == 0)
-+				return kallsyms_addresses[i];
-+		}
- 	}
-+
- 	return module_kallsyms_lookup_name(name);
- }
- EXPORT_SYMBOL_GPL(kallsyms_lookup_name);
--- 
-1.6.5
 
+> I tried to debug this using
+> make -d V=1 O=/bld/2.6.33-rc3
+> and discovered that the bug did not always occur, but did sometimes.
+> This leads me to think that it is timing sensitive, and indeed the
+> problem shows up
+> more easily on a machine with multiple processors.
+> 
+> Is it possible that the step with mkdir -p can sometimes occur in a
+> Makefile parallel process
+> before the cd KBUILD_OUTPUT occurs? That would explain why it doesn't
+> reliably reproduce.
+
+OK, I still don't see how it fails, but adding $(objtree) there is a
+valid change and if it fixes your problem, let's apply it.
+
+Michal
