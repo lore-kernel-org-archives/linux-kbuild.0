@@ -1,134 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:35207 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1756452Ab0AFWdg (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 6 Jan 2010 17:33:36 -0500
-Date: Wed, 6 Jan 2010 23:33:23 +0100 (CET)
-From: John Kacur <jkacur@redhat.com>
-Subject: Re: [PATCH] Don't mkdir -p include/config in the sourcetree when
- using O=outputdir option
-In-Reply-To: <520f0cf11001061430l2b363d90qce43bf94a384cf13@mail.gmail.com>
-Message-ID: <alpine.LFD.2.00.1001062332220.3744@localhost.localdomain>
-References: <alpine.LFD.2.00.1001061705140.3744@localhost.localdomain>  <4B44E5C8.2050006@suse.cz>  <520f0cf11001061210w4d33fca6y98f091c4260577c0@mail.gmail.com>  <4B44F665.6050008@suse.cz> <520f0cf11001061430l2b363d90qce43bf94a384cf13@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: MULTIPART/MIXED; BOUNDARY="8323328-1073958386-1262817211=:3744"
+Received: from mail-yx0-f188.google.com ([209.85.210.188]:39818 "EHLO
+	mail-yx0-f188.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752522Ab0AGGpn (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 7 Jan 2010 01:45:43 -0500
+Received: by yxe26 with SMTP id 26so17437143yxe.4
+        for <linux-kbuild@vger.kernel.org>; Wed, 06 Jan 2010 22:45:42 -0800 (PST)
+From: Cheng Renquan <crquan@gmail.com>
+Subject: [PATCH] kallsyms: skip kernel symbols when lookup in module
+Date: Thu,  7 Jan 2010 14:43:46 +0800
+Message-Id: <1262846626-27109-1-git-send-email-crquan@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kernel@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>, linux-kbuild@vger.kernel.org
+Cc: linux-kbuild@vger.kernel.org
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
+kernel symbols lookup is expensive, when we know it's a lookup in module,
+we can skip the heavy kernel symbols.
 
---8323328-1073958386-1262817211=:3744
-Content-Type: TEXT/PLAIN; charset=ISO-8859-1
-Content-Transfer-Encoding: 8BIT
-
-
-
-On Wed, 6 Jan 2010, John Kacur wrote:
-
-> On Wed, Jan 6, 2010 at 9:45 PM, Michal Marek <mmarek@suse.cz> wrote:
-> > John Kacur napsal(a):
-> >> Yes, I doubled checked that the problem exists, and it is quite easy for me to
-> >> reproduce. However, my proposed solution is also broken, please don't
-> >> apply, I'm still investigating.
-> >>
-> >> I am surprised that you are not able to reproduce the problem though.
-> >> Did you follow the steps I that I outlined?
-> >
-> > I did
-> >
-> > $ git checkout v2.6.33-rc3
-> > $ mkdir /bld/2.6.33-rc3
-> > $ zcat /proc/config.gz >/bld/2.6.33-rc3/.config
-> > $ make O=/bld/2.6.33-rc3/ oldconfig
-> > ...
-> > hit Enter several times
-> > ...
-> > $ ls -ld include/config /bld/2.6.33-rc3/include/config/
-> > ls: cannot access include/config: No such file or directory
-> > drwxr-xr-x 2 mmarek users 4096 2010-01-06 21:35
-> > /bld/2.6.33-rc3/include/config//
-> > $ make O=/bld/2.6.33-rc3/
-> >  GEN     /bld/2.6.33-rc3/Makefile
-> > scripts/kconfig/conf -s arch/x86/Kconfig
-> >  Using /home/mmarek/linux-2.6 as source for kernel
-> >  GEN     /bld/2.6.33-rc3/Makefile
-> >  CHK     include/linux/version.h
-> >  UPD     include/linux/version.h
-> >  CHK     include/generated/utsrelease.h
-> >  UPD     include/generated/utsrelease.h
-> >  CC      kernel/bounds.s
-> > ... continues building ...
-> >
-> >
-> > The mkdir command has been in the Makefile since 2006 (c955cca), so I
-> > think that your problem is caused by something else. Try a make V=1
-> > build with a read-only source tree to see which mkdir command fails.
-> >
-> 
-> Michal: The length of time that a bug exists in a piece of code is no
-> argument for
-> it's correctness!
-> 
-> I tried to debug this using
-> make -d V=1 O=/bld/2.6.33-rc3
-> and discovered that the bug did not always occur, but did sometimes.
-> This leads me to think that it is timing sensitive, and indeed the
-> problem shows up
-> more easily on a machine with multiple processors.
-> 
-> Is it possible that the step with mkdir -p can sometimes occur in a
-> Makefile parallel process
-> before the cd KBUILD_OUTPUT occurs? That would explain why it doesn't
-> reliably reproduce.
-> 
-> In any case, the idea behind my original patch is good, just specify
-> the full path
-> using the objtree variable and the problem goes away. The first round of my
-> implementation was simply lacking.
-> 
-> Following up this note with a patch.
-> 
-> John
-> 
-
-From b9db45e49b36e589de410f1c34fe77087fa36796 Mon Sep 17 00:00:00 2001
-From: John Kacur <jkacur@redhat.com>
-Date: Wed, 6 Jan 2010 23:16:38 +0100
-Subject: [PATCH] Kbuild: Use $(objtree) for mkdir -p include/linux include/config
-
-This fixes a problem where make sometimes creates the directories
-include/linux include/config
-in the local source tree, even though O=/outputdir was specified.
-
-The solution is to give an absolute path using $(objtree)
-
-Signed-off-by: John Kacur <jkacur@redhat.com>
+Signed-off-by: Cheng Renquan <crquan@gmail.com>
 ---
- Makefile |    4 ++--
- 1 files changed, 2 insertions(+), 2 deletions(-)
+ kernel/kallsyms.c |   12 ++++++++----
+ 1 files changed, 8 insertions(+), 4 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index 1231094..2f3ba92 100644
---- a/Makefile
-+++ b/Makefile
-@@ -454,11 +454,11 @@ include $(srctree)/arch/$(SRCARCH)/Makefile
- export KBUILD_DEFCONFIG KBUILD_KCONFIG
+diff --git a/kernel/kallsyms.c b/kernel/kallsyms.c
+index 8e5288a..bb9fdc5 100644
+--- a/kernel/kallsyms.c
++++ b/kernel/kallsyms.c
+@@ -173,12 +173,16 @@ unsigned long kallsyms_lookup_name(const char *name)
+ 	unsigned long i;
+ 	unsigned int off;
  
- config: scripts_basic outputmakefile FORCE
--	$(Q)mkdir -p include/linux include/config
-+	$(Q)mkdir -p $(objtree)/include/linux $(objtree)/include/config
- 	$(Q)$(MAKE) $(build)=scripts/kconfig $@
+-	for (i = 0, off = 0; i < kallsyms_num_syms; i++) {
+-		off = kallsyms_expand_symbol(off, namebuf);
++	/* if a colon ':' found, skip the heavy kernel symbols */
++	if (strchr(name, ':') == NULL) {
++		for (i = 0, off = 0; i < kallsyms_num_syms; i++) {
++			off = kallsyms_expand_symbol(off, namebuf);
  
- %config: scripts_basic outputmakefile FORCE
--	$(Q)mkdir -p include/linux include/config
-+	$(Q)mkdir -p $(objtree)/include/linux $(objtree)/include/config
- 	$(Q)$(MAKE) $(build)=scripts/kconfig $@
- 
- else
+-		if (strcmp(namebuf, name) == 0)
+-			return kallsyms_addresses[i];
++			if (strcmp(namebuf, name) == 0)
++				return kallsyms_addresses[i];
++		}
+ 	}
++
+ 	return module_kallsyms_lookup_name(name);
+ }
+ EXPORT_SYMBOL_GPL(kallsyms_lookup_name);
 -- 
-1.6.0.6
+1.6.5
 
---8323328-1073958386-1262817211=:3744--
