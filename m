@@ -1,41 +1,68 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor.suse.de ([195.135.220.2]:58182 "EHLO mx1.suse.de"
+Received: from cantor.suse.de ([195.135.220.2]:59074 "EHLO mx1.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751133Ab0AHL5r (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 8 Jan 2010 06:57:47 -0500
-Date: Fri, 8 Jan 2010 12:57:45 +0100
+	id S1751489Ab0AHMQt (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 8 Jan 2010 07:16:49 -0500
 From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [patch] Makefile: Unexport LANG
-Message-ID: <20100108115745.GA14758@sepie.suse.cz>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4B467FCB.2080101@zytor.com>
- <20100108025924.GE2465@verge.net.au>
+Subject: [PATCH] Makefile: do not override LC_CTYPE
+Date: Fri,  8 Jan 2010 13:16:28 +0100
+Message-Id: <1262952988-16563-1-git-send-email-mmarek@suse.cz>
+In-Reply-To: <20100108115745.GA14758@sepie.suse.cz>
+References: <20100108115745.GA14758@sepie.suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Simon Horman <horms@verge.net.au>, "H. Peter Anvin" <hpa@zytor.com>
-Cc: Masami Hiramatsu <mhiramat@redhat.com>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Roland Dreier <rdreier@cisco.com>, Sam Ravnborg <sam@ravnborg.org>
+To: "H. Peter Anvin" <hpa@zytor.com>, Simon Horman <horms@verge.net.au>
+Cc: Masami Hiramatsu <mhiramat@redhat.com>, Roland Dreier <rdreier@cisco.com>, Sam Ravnborg <sam@ravnborg.org>, Sergei Trofimovich <slyfox@inbox.ru>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-sh@vger.kernel.org
 
-On Thu, Jan 07, 2010 at 04:43:55PM -0800, H. Peter Anvin wrote:
-> On 01/07/2010 04:41 PM, Simon Horman wrote:
-> > On Sat, Dec 26, 2009 at 10:20:07PM +1100, Simon Horman wrote:
-> >> On Fri, Dec 25, 2009 at 09:14:40PM -0800, H. Peter Anvin wrote:
-> I think it's up to Michal to pick the preferred solution.
-> 
-> It has been pointed out that one option might also to be to *not*
-> override LC_CTYPE, and only override LC_COLLATE.
+Setting LC_CTYPE=C breaks localized messages in some setups. With only
+LC_COLLATE=C and LC_NUMERIC=C, we get almost all we need, except for not
+so defined character classes and tolower()/toupper(). The former is not
+a big issue, because we can assume that e.g. [:alpha:] will always
+include a-zA-Z and we only ever process ASCII input. The latter seems
+only affect arch/sh/tools/gen-mach-types, which we can handle separately.
 
-Yes, that's imo a good compromise. As I noted in another thread, the
-only drawback of not setting LC_CTYPE is that it makes the behavior of
-awk's tolower()/toupper() volatile, but that seems to be only used in a
-single script. I'll post a patch in a separate email.
+So after this patch the meaning of ranges like [a-z], the behavior of
+sort and join, etc. should be the same everywhere and at the same time
+gcc should be able to print localized waring and error messages.
+LC_NUMERIC=C might not be necessary, but setting it doesn't hurt.
 
+Reported-by: Simon Horman <horms@verge.net.au>
+Reported-by: Sergei Trofimovich <slyfox@inbox.ru>
+Signed-off-by: Michal Marek <mmarek@suse.cz>
+---
 
-On Fri, Jan 08, 2010 at 01:59:24PM +1100, Simon Horman wrote:
-> Is it just me or is Michal's email bouncing of late?
+Note: if this still breaks for someone, we will simply set LC_ALL=C.
 
-My email address was wrong, sues.cz does not exist, suse.cz does. Which
-is why I overlooked this thread.
+ Makefile               |    3 +--
+ arch/sh/tools/Makefile |    2 +-
+ 2 files changed, 2 insertions(+), 3 deletions(-)
 
-Michal
+diff --git a/Makefile b/Makefile
+index 09a320f..a7b4351 100644
+--- a/Makefile
++++ b/Makefile
+@@ -18,10 +18,9 @@ MAKEFLAGS += -rR --no-print-directory
+ 
+ # Avoid funny character set dependencies
+ unexport LC_ALL
+-LC_CTYPE=C
+ LC_COLLATE=C
+ LC_NUMERIC=C
+-export LC_CTYPE LC_COLLATE LC_NUMERIC
++export LC_COLLATE LC_NUMERIC
+ 
+ # We are using a recursive build, so we need to do a little thinking
+ # to get the ordering right.
+diff --git a/arch/sh/tools/Makefile b/arch/sh/tools/Makefile
+index 558a56b..2082af1 100644
+--- a/arch/sh/tools/Makefile
++++ b/arch/sh/tools/Makefile
+@@ -13,4 +13,4 @@
+ include/generated/machtypes.h: $(src)/gen-mach-types $(src)/mach-types
+ 	@echo '  Generating $@'
+ 	$(Q)mkdir -p $(dir $@)
+-	$(Q)$(AWK) -f $^ > $@ || { rm -f $@; /bin/false; }
++	$(Q)LC_ALL=C $(AWK) -f $^ > $@ || { rm -f $@; /bin/false; }
+-- 
+1.6.5.3
+
