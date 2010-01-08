@@ -1,73 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from lennier.cc.vt.edu ([198.82.162.213]:48299 "EHLO
-	lennier.cc.vt.edu" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750906Ab0AHGzn (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 8 Jan 2010 01:55:43 -0500
-Subject: Re: mmotm 2010-01-06-14-34 uploaded (squashfs+lib/decomp)
-In-Reply-To: Your message of "Thu, 07 Jan 2010 08:04:02 PST."
-             <20100107080402.2f41d6f9.randy.dunlap@oracle.com>
-From: Valdis.Kletnieks@vt.edu
-References: <201001062259.o06MxQrp023236@imap1.linux-foundation.org> <12343.1262836096@localhost> <12823.1262836907@localhost>
-            <20100107080402.2f41d6f9.randy.dunlap@oracle.com>
-Mime-Version: 1.0
-Content-Type: multipart/signed; boundary="==_Exmh_1262933694_3893P";
-	 micalg=pgp-sha1; protocol="application/pgp-signature"
-Content-Transfer-Encoding: 7bit
-Date: Fri, 08 Jan 2010 01:54:54 -0500
-Message-ID: <24025.1262933694@localhost>
+Received: from cantor.suse.de ([195.135.220.2]:58182 "EHLO mx1.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751133Ab0AHL5r (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 8 Jan 2010 06:57:47 -0500
+Date: Fri, 8 Jan 2010 12:57:45 +0100
+From: Michal Marek <mmarek@suse.cz>
+Subject: Re: [patch] Makefile: Unexport LANG
+Message-ID: <20100108115745.GA14758@sepie.suse.cz>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4B467FCB.2080101@zytor.com>
+ <20100108025924.GE2465@verge.net.au>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Randy Dunlap <randy.dunlap@oracle.com>, Roman Zippel <zippel@linux-m68k.org>, Michal Marek <mmarek@suse.cz>
-Cc: Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: Simon Horman <horms@verge.net.au>, "H. Peter Anvin" <hpa@zytor.com>
+Cc: Masami Hiramatsu <mhiramat@redhat.com>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Roland Dreier <rdreier@cisco.com>, Sam Ravnborg <sam@ravnborg.org>
 
---==_Exmh_1262933694_3893P
-Content-Type: text/plain; charset=us-ascii
-
-On Thu, 07 Jan 2010 08:04:02 PST, Randy Dunlap said:
-> On Wed, 06 Jan 2010 23:01:47 -0500 Valdis.Kletnieks@vt.edu wrote:
+On Thu, Jan 07, 2010 at 04:43:55PM -0800, H. Peter Anvin wrote:
+> On 01/07/2010 04:41 PM, Simon Horman wrote:
+> > On Sat, Dec 26, 2009 at 10:20:07PM +1100, Simon Horman wrote:
+> >> On Fri, Dec 25, 2009 at 09:14:40PM -0800, H. Peter Anvin wrote:
+> I think it's up to Michal to pick the preferred solution.
 > 
-> > On Wed, 06 Jan 2010 22:48:16 EST, Valdis.Kletnieks@vt.edu said:
-> > 
-> > > Building with CONFIG_SQUASHFS=m, CONFIG_SQUASHFS_LZMA=y ,
-> > > and CONFIG_DECOMPRESS_LZMA=n fails:
-> > 
-> > > Looks like a missing select/depends for DECOMPRESS_LZMA.  Somebody else can
-> > > decide which it should be...
-> > 
-> > Digging further:
-> >   
-> >   x Symbol: DECOMPRESS_LZMA [=n]                                            x  
-> >   x   Selected by: RD_LZMA [=n] && BLK_DEV_INITRD [=y] || SQUASHFS_LZMA [=y x  
-> > 
-> > How the heck did this happen?  Looks like a SELECT *is* there but it's
-> > not firing??!?
-> 
-> I saw this build error in linux-next and sent a patch for it -- it's below.
-> However, it doesn't appear to be exactly the same config as yours.
+> It has been pointed out that one option might also to be to *not*
+> override LC_CTYPE, and only override LC_COLLATE.
 
-Yeah, that patch is how you ended up cc'ed - it was already in the linux-next
-patch in Andrew's -mmotm tarball.  It looked like you addressed one corner case
-of the problem, and I tripped over another.  But now I'm trying to get my
-brain wrapped around how I was able to get SQUASHFS_LZMA=y, and it had a
-select for DECOMPRESS_LZMA, but that *still* was 'n' anyhow? How did we end
-up with both && and || in that 'Selected by:' line?  Is that saying that
-RD_LZMA needs to be on too?
+Yes, that's imo a good compromise. As I noted in another thread, the
+only drawback of not setting LC_CTYPE is that it makes the behavior of
+awk's tolower()/toupper() volatile, but that seems to be only used in a
+single script. I'll post a patch in a separate email.
 
-Adding some plausible-sounding kbuild-related entries from MAINTAINERS to
-the cc: list, maybe they can explain it...
 
---==_Exmh_1262933694_3893P
-Content-Type: application/pgp-signature
+On Fri, Jan 08, 2010 at 01:59:24PM +1100, Simon Horman wrote:
+> Is it just me or is Michal's email bouncing of late?
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.10 (GNU/Linux)
-Comment: Exmh version 2.5 07/13/2001
+My email address was wrong, sues.cz does not exist, suse.cz does. Which
+is why I overlooked this thread.
 
-iD8DBQFLRta+cC3lWbTT17ARAmaXAJ4rN/u2xva5uEKI1pYzUfENxoI0EACgh8l4
-7bhZAxgOYBEzANxioSSsiQ8=
-=Z+QY
------END PGP SIGNATURE-----
-
---==_Exmh_1262933694_3893P--
-
+Michal
