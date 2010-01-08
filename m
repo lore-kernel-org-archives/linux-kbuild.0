@@ -1,47 +1,70 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from terminus.zytor.com ([198.137.202.10]:35844 "EHLO
-	terminus.zytor.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752829Ab0AHSu5 (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 8 Jan 2010 13:50:57 -0500
-Message-ID: <4B477E69.3060702@zytor.com>
-Date: Fri, 08 Jan 2010 10:50:17 -0800
-From: "H. Peter Anvin" <hpa@zytor.com>
+Received: from cantor2.suse.de ([195.135.220.15]:37774 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752214Ab0AHTYr (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 8 Jan 2010 14:24:47 -0500
+Message-ID: <4B47867B.4080700@suse.cz>
+Date: Fri, 08 Jan 2010 20:24:43 +0100
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Subject: Re: [PATCH] Makefile: do not override LC_CTYPE
-References: <20100108115745.GA14758@sepie.suse.cz> <1262952988-16563-1-git-send-email-mmarek@suse.cz>
-In-Reply-To: <1262952988-16563-1-git-send-email-mmarek@suse.cz>
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: linux-next: Tree for January 7 (pcmcia)
+References: <20100107172134.af71c742.sfr@canb.auug.org.au> <20100107101006.e59989a8.rdunlap@xenotime.net> <20100107205728.GA19115@isilmar.linta.de> <20100107210744.GA10320@sepie.suse.cz> <20100107135557.989c9585.rdunlap@xenotime.net> <20100108175423.GA29713@comet.dominikbrodowski.net>
+In-Reply-To: <20100108175423.GA29713@comet.dominikbrodowski.net>
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: Simon Horman <horms@verge.net.au>, Masami Hiramatsu <mhiramat@redhat.com>, Roland Dreier <rdreier@cisco.com>, Sam Ravnborg <sam@ravnborg.org>, Sergei Trofimovich <slyfox@inbox.ru>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-sh@vger.kernel.org
+To: Dominik Brodowski <linux@dominikbrodowski.net>
+Cc: Randy Dunlap <rdunlap@xenotime.net>, Stephen Rothwell <sfr@canb.auug.org.au>, linux-kbuild@vger.kernel.org, linux-next@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, Valdis.Kletnieks@vt.edu
 
-On 01/08/2010 04:16 AM, Michal Marek wrote:
-> Setting LC_CTYPE=C breaks localized messages in some setups. With only
-> LC_COLLATE=C and LC_NUMERIC=C, we get almost all we need, except for not
-> so defined character classes and tolower()/toupper(). The former is not
-> a big issue, because we can assume that e.g. [:alpha:] will always
-> include a-zA-Z and we only ever process ASCII input. The latter seems
-> only affect arch/sh/tools/gen-mach-types, which we can handle separately.
+Dominik Brodowski wrote:
+> From 77f9eb4599f1d0f5a43cadece9809018b534e308 Mon Sep 17 00:00:00 2001
+> From: Michal Marek <mmarek@suse.cz>
+> Date: Thu, 7 Jan 2010 21:03:11 +0100
+> Subject: [PATCH] pcmcia: fix yenta dependency on PCCARD_NONSTATIC
 > 
-> So after this patch the meaning of ranges like [a-z], the behavior of
-> sort and join, etc. should be the same everywhere and at the same time
-> gcc should be able to print localized waring and error messages.
-> LC_NUMERIC=C might not be necessary, but setting it doesn't hurt.
+> With CONFIG_PCMCIA=m and CONFIG_YENTA=y, we get
 > 
-> Reported-by: Simon Horman <horms@verge.net.au>
-> Reported-by: Sergei Trofimovich <slyfox@inbox.ru>
+> drivers/built-in.o: In function `yenta_probe':
+> yenta_socket.c:(.devinit.text+0x1e582): undefined reference to
+> `pccard_nonstatic_ops'
+> 
+> This is because
+> 
+> select PCCARD_NONSTATIC if PCMCIA
+> 
+> sets PCCARD_NONSTATIC = min(YENTA, PCMCIA). Change it to 'if PCMCIA!=n'
+> to remove the upper limit.
+> 
+> [linux@dominikbrodowski.net: propagate change to PCMICA_M8XX]
+> Reported-by: Randy Dunlap <rdunlap@xenotime.net>
 > Signed-off-by: Michal Marek <mmarek@suse.cz>
+> Acked-by: Randy Dunlap <rdunlap@xenotime.net>
+> Signed-off-by: Dominik Brodowski <linux@dominikbrodowski.net>
+> 
+> diff --git a/drivers/pcmcia/Kconfig b/drivers/pcmcia/Kconfig
+> index efc51b9..e8f35da 100644
+> --- a/drivers/pcmcia/Kconfig
+> +++ b/drivers/pcmcia/Kconfig
+> @@ -84,7 +84,7 @@ config YENTA
+>  	tristate "CardBus yenta-compatible bridge support"
+>  	depends on PCI
+>  	select CARDBUS if !EMBEDDED
+> -	select PCCARD_NONSTATIC if PCMCIA
+> +	select PCCARD_NONSTATIC if PCMCIA != n
+>  	---help---
+>  	  This option enables support for CardBus host bridges.  Virtually
+>  	  all modern PCMCIA bridges are CardBus compatible.  A "bridge" is
+> @@ -161,8 +161,8 @@ config TCIC
+>  
+>  config PCMCIA_M8XX
+>  	tristate "MPC8xx PCMCIA support"
+> -	depends on PCMCIA && PPC && 8xx
+> -	select PCCARD_IODYN if PCMCIA
+> +	depends on PCCARD && PPC && 8xx
+> +	select PCCARD_IODYN if PCMCIA != n
 
-For what it's worth:
+PCCARD_IODYN is bool, so this change is not necessary (but doesn't do
+any harm either).
 
-Acked-by: H. Peter Anvin <hpa@zytor.com>
-
-	-hpa
-
--- 
-H. Peter Anvin, Intel Open Source Technology Center
-I work for Intel.  I don't speak on their behalf.
-
+Michal
