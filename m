@@ -1,84 +1,130 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from acsinet11.oracle.com ([141.146.126.233]:41374 "EHLO
-	acsinet11.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753550Ab0AHQiu (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 8 Jan 2010 11:38:50 -0500
-Date: Fri, 8 Jan 2010 08:37:17 -0800
-From: Randy Dunlap <randy.dunlap@oracle.com>
-Subject: Re: mmotm 2010-01-06-14-34 uploaded (squashfs+lib/decomp)
-Message-Id: <20100108083717.31ff968c.randy.dunlap@oracle.com>
-In-Reply-To: <24025.1262933694@localhost>
-References: <201001062259.o06MxQrp023236@imap1.linux-foundation.org>
-	<12343.1262836096@localhost>
-	<12823.1262836907@localhost>
-	<20100107080402.2f41d6f9.randy.dunlap@oracle.com>
-	<24025.1262933694@localhost>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Received: from isilmar.linta.de ([213.133.102.198]:36089 "EHLO linta.de"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1751690Ab0AHSWb (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 8 Jan 2010 13:22:31 -0500
+Date: Fri, 8 Jan 2010 18:54:23 +0100
+From: Dominik Brodowski <linux@dominikbrodowski.net>
+Subject: Re: linux-next: Tree for January 7 (pcmcia)
+Message-ID: <20100108175423.GA29713@comet.dominikbrodowski.net>
+References: <20100107172134.af71c742.sfr@canb.auug.org.au>
+ <20100107101006.e59989a8.rdunlap@xenotime.net>
+ <20100107205728.GA19115@isilmar.linta.de>
+ <20100107210744.GA10320@sepie.suse.cz>
+ <20100107135557.989c9585.rdunlap@xenotime.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20100107135557.989c9585.rdunlap@xenotime.net>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Valdis.Kletnieks@vt.edu
-Cc: Roman Zippel <zippel@linux-m68k.org>, Michal Marek <mmarek@suse.cz>, Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: Randy Dunlap <rdunlap@xenotime.net>
+Cc: Michal Marek <mmarek@suse.cz>, Stephen Rothwell <sfr@canb.auug.org.au>, linux-kbuild@vger.kernel.org, linux-next@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, Valdis.Kletnieks@vt.edu
 
-On Fri, 08 Jan 2010 01:54:54 -0500 Valdis.Kletnieks@vt.edu wrote:
+Hey,
 
-> On Thu, 07 Jan 2010 08:04:02 PST, Randy Dunlap said:
-> > On Wed, 06 Jan 2010 23:01:47 -0500 Valdis.Kletnieks@vt.edu wrote:
+On Thu, Jan 07, 2010 at 01:55:57PM -0800, Randy Dunlap wrote:
+> > On Thu, Jan 07, 2010 at 09:57:28PM +0100, Dominik Brodowski wrote:
+> > > Hey,
+> > > 
+> > > On Thu, Jan 07, 2010 at 10:10:06AM -0800, Randy Dunlap wrote:
+> > > > > Hi all,
+> > > > > 
+> > > > > Changes since 20100106:
+> > > > 
+> > > > 
+> > > > drivers/built-in.o: In function `yenta_probe':
+> > > > yenta_socket.c:(.devinit.text+0x1e582): undefined reference to `pccard_nonstatic_ops'
+> > > > 
+> > > > CONFIG_PCCARD=y
+> > > > CONFIG_PCMCIA=m
+> > > > CONFIG_PCCARD_NONSTATIC=m
+> > > > CONFIG_YENTA=y
+> > > > 
+> > > > so yenta code (built-in) tries to reference data that lives in a
+> > > > loadable module.
+> > > 
+> > > Uh, that was I. If kconfig can't be fixed easily, I'll revert the change
 > > 
-> > > On Wed, 06 Jan 2010 22:48:16 EST, Valdis.Kletnieks@vt.edu said:
-> > > 
-> > > > Building with CONFIG_SQUASHFS=m, CONFIG_SQUASHFS_LZMA=y ,
-> > > > and CONFIG_DECOMPRESS_LZMA=n fails:
-> > > 
-> > > > Looks like a missing select/depends for DECOMPRESS_LZMA.  Somebody else can
-> > > > decide which it should be...
-> > > 
-> > > Digging further:
-> > >   
-> > >   x Symbol: DECOMPRESS_LZMA [=n]                                            x  
-> > >   x   Selected by: RD_LZMA [=n] && BLK_DEV_INITRD [=y] || SQUASHFS_LZMA [=y x  
-> > > 
-> > > How the heck did this happen?  Looks like a SELECT *is* there but it's
-> > > not firing??!?
+> > Hi Randy, Dominik,
 > > 
-> > I saw this build error in linux-next and sent a patch for it -- it's below.
-> > However, it doesn't appear to be exactly the same config as yours.
+> > Please try this one-liner. The problem is that 'if X' and 'if X!=n' are not
+> > the same in ternary logic.
+> > 
+> > Michal
+> > 
+> > From e7b12e70272484da2161c0b6c459f2eff2a989a8 Mon Sep 17 00:00:00 2001
+> > From: Michal Marek <mmarek@suse.cz>
+> > Date: Thu, 7 Jan 2010 21:03:11 +0100
+> > Subject: [PATCH] pcmcia: fix yenta dependency on PCCARD_NONSTATIC
+> > 
+> > With CONFIG_PCMCIA=m and CONFIG_YENTA=y, we get
+> > 
+> > drivers/built-in.o: In function `yenta_probe':
+> > yenta_socket.c:(.devinit.text+0x1e582): undefined reference to
+> > `pccard_nonstatic_ops'
+> > 
+> > This is because
+> > 
+> > select PCCARD_NONSTATIC if PCMCIA
+> > 
+> > sets PCCARD_NONSTATIC = min(YENTA, PCMCIA). Change it to 'if PCMCIA!=n'
+> > to remove the upper limit.
+> > 
+> > Reported-by: Randy Dunlap <rdunlap@xenotime.net>
+> > Signed-off-by: Michal Marek <mmarek@suse.cz>
 > 
-> Yeah, that patch is how you ended up cc'ed - it was already in the linux-next
-> patch in Andrew's -mmotm tarball.  It looked like you addressed one corner case
-> of the problem, and I tripped over another.  But now I'm trying to get my
-> brain wrapped around how I was able to get SQUASHFS_LZMA=y, and it had a
-> select for DECOMPRESS_LZMA, but that *still* was 'n' anyhow? How did we end
-> up with both && and || in that 'Selected by:' line?  Is that saying that
-> RD_LZMA needs to be on too?
+> Acked-by: Randy Dunlap <rdunlap@xenotime.net>
+> 
+> Thanks.
 
-The menuconfig display is truncated (use left/right arrow keys to pan it).
-The xconfig display shows this:
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-DECOMPRESS_LZMA
+Thanks for the patch. I extended it a bit further:
 
-type: tristate
-reverse dep: RD_LZMA && BLK_DEV_INITRD || SQUASHFS_LZMA && MISC_FILESYSTEMS && SQUASHFS
+From 77f9eb4599f1d0f5a43cadece9809018b534e308 Mon Sep 17 00:00:00 2001
+From: Michal Marek <mmarek@suse.cz>
+Date: Thu, 7 Jan 2010 21:03:11 +0100
+Subject: [PATCH] pcmcia: fix yenta dependency on PCCARD_NONSTATIC
 
-defined at lib/Kconfig:117
+With CONFIG_PCMCIA=m and CONFIG_YENTA=y, we get
 
-There is no help available for this kernel option.
-Symbol: DECOMPRESS_LZMA [=n]
-Selected by: RD_LZMA [=n] && BLK_DEV_INITRD [=n] || SQUASHFS_LZMA [=n] && MISC_FILESYSTEMS [=n] && SQUASHFS [=n]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+drivers/built-in.o: In function `yenta_probe':
+yenta_socket.c:(.devinit.text+0x1e582): undefined reference to
+`pccard_nonstatic_ops'
 
-In the "reverse dep:" line, && has higher precedence that || does, so it's:
+This is because
 
-reverse dep: (RD_LZMA && BLK_DEV_INITRD) || (SQUASHFS_LZMA && MISC_FILESYSTEMS && SQUASHFS)
+select PCCARD_NONSTATIC if PCMCIA
 
-So RD_LZMA and BLK_DEV_INITRD don't matter.
+sets PCCARD_NONSTATIC = min(YENTA, PCMCIA). Change it to 'if PCMCIA!=n'
+to remove the upper limit.
 
+[linux@dominikbrodowski.net: propagate change to PCMICA_M8XX]
+Reported-by: Randy Dunlap <rdunlap@xenotime.net>
+Signed-off-by: Michal Marek <mmarek@suse.cz>
+Acked-by: Randy Dunlap <rdunlap@xenotime.net>
+Signed-off-by: Dominik Brodowski <linux@dominikbrodowski.net>
 
-> Adding some plausible-sounding kbuild-related entries from MAINTAINERS to
-> the cc: list, maybe they can explain it...
-
-
----
-~Randy
+diff --git a/drivers/pcmcia/Kconfig b/drivers/pcmcia/Kconfig
+index efc51b9..e8f35da 100644
+--- a/drivers/pcmcia/Kconfig
++++ b/drivers/pcmcia/Kconfig
+@@ -84,7 +84,7 @@ config YENTA
+ 	tristate "CardBus yenta-compatible bridge support"
+ 	depends on PCI
+ 	select CARDBUS if !EMBEDDED
+-	select PCCARD_NONSTATIC if PCMCIA
++	select PCCARD_NONSTATIC if PCMCIA != n
+ 	---help---
+ 	  This option enables support for CardBus host bridges.  Virtually
+ 	  all modern PCMCIA bridges are CardBus compatible.  A "bridge" is
+@@ -161,8 +161,8 @@ config TCIC
+ 
+ config PCMCIA_M8XX
+ 	tristate "MPC8xx PCMCIA support"
+-	depends on PCMCIA && PPC && 8xx
+-	select PCCARD_IODYN if PCMCIA
++	depends on PCCARD && PPC && 8xx
++	select PCCARD_IODYN if PCMCIA != n
+ 	help
+ 	  Say Y here to include support for PowerPC 8xx series PCMCIA
+ 	  controller.
