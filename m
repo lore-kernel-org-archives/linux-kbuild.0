@@ -1,68 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor.suse.de ([195.135.220.2]:59074 "EHLO mx1.suse.de"
+Received: from cantor.suse.de ([195.135.220.2]:32831 "EHLO mx1.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751489Ab0AHMQt (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 8 Jan 2010 07:16:49 -0500
+	id S1751753Ab0AHNS4 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 8 Jan 2010 08:18:56 -0500
+Message-ID: <4B4730C0.6000601@suse.cz>
+Date: Fri, 08 Jan 2010 14:18:56 +0100
 From: Michal Marek <mmarek@suse.cz>
-Subject: [PATCH] Makefile: do not override LC_CTYPE
-Date: Fri,  8 Jan 2010 13:16:28 +0100
-Message-Id: <1262952988-16563-1-git-send-email-mmarek@suse.cz>
-In-Reply-To: <20100108115745.GA14758@sepie.suse.cz>
-References: <20100108115745.GA14758@sepie.suse.cz>
+MIME-Version: 1.0
+Subject: Re: sections mismatch detection
+References: <1262772683.4263.147.camel@localhost> <20100106104823.GA30439@merkur.ravnborg.org> <4B44762C.1090605@suse.cz> <20100107150339.b66fadc5.rdunlap@xenotime.net> <20100108054144.GA15827@merkur.ravnborg.org>
+In-Reply-To: <20100108054144.GA15827@merkur.ravnborg.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "H. Peter Anvin" <hpa@zytor.com>, Simon Horman <horms@verge.net.au>
-Cc: Masami Hiramatsu <mhiramat@redhat.com>, Roland Dreier <rdreier@cisco.com>, Sam Ravnborg <sam@ravnborg.org>, Sergei Trofimovich <slyfox@inbox.ru>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-sh@vger.kernel.org
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: Randy Dunlap <rdunlap@xenotime.net>, linux-kbuild@vger.kernel.org, Artem Bityutskiy <dedekind1@gmail.com>, LKML <linux-kernel@vger.kernel.org>
 
-Setting LC_CTYPE=C breaks localized messages in some setups. With only
-LC_COLLATE=C and LC_NUMERIC=C, we get almost all we need, except for not
-so defined character classes and tolower()/toupper(). The former is not
-a big issue, because we can assume that e.g. [:alpha:] will always
-include a-zA-Z and we only ever process ASCII input. The latter seems
-only affect arch/sh/tools/gen-mach-types, which we can handle separately.
+Sam Ravnborg napsal(a):
+>> I would prefer to see (logically) the same section mismatch not be
+>> reported multiple times, even though they are in different binary
+>> files.  This would reduce the noise level quite a bit IMO.
+> 
+> That would be nice but is not trivially doable.
+> We need to discover when there is a section mismatch
+> resulting from for example a function in kernel/*
+> calling a function in arch/$ARCH/kernel so we
+> need to execute the check on multiple levels
+> i order to catch the bugs as early as possible.
+> 
+> The easy 'fix' would be to execute the check only
+> on vmlinux.o (default behaviour) but the added
+> checks with the option enabled allows us to
+> be much more precise in reporting where
+> the section mismatch originate from.
 
-So after this patch the meaning of ranges like [a-z], the behavior of
-sort and join, etc. should be the same everywhere and at the same time
-gcc should be able to print localized waring and error messages.
-LC_NUMERIC=C might not be necessary, but setting it doesn't hurt.
+But we could remember the (caller,callee) pairs and only emit the first
+warning. Or am I missing something?
 
-Reported-by: Simon Horman <horms@verge.net.au>
-Reported-by: Sergei Trofimovich <slyfox@inbox.ru>
-Signed-off-by: Michal Marek <mmarek@suse.cz>
----
-
-Note: if this still breaks for someone, we will simply set LC_ALL=C.
-
- Makefile               |    3 +--
- arch/sh/tools/Makefile |    2 +-
- 2 files changed, 2 insertions(+), 3 deletions(-)
-
-diff --git a/Makefile b/Makefile
-index 09a320f..a7b4351 100644
---- a/Makefile
-+++ b/Makefile
-@@ -18,10 +18,9 @@ MAKEFLAGS += -rR --no-print-directory
- 
- # Avoid funny character set dependencies
- unexport LC_ALL
--LC_CTYPE=C
- LC_COLLATE=C
- LC_NUMERIC=C
--export LC_CTYPE LC_COLLATE LC_NUMERIC
-+export LC_COLLATE LC_NUMERIC
- 
- # We are using a recursive build, so we need to do a little thinking
- # to get the ordering right.
-diff --git a/arch/sh/tools/Makefile b/arch/sh/tools/Makefile
-index 558a56b..2082af1 100644
---- a/arch/sh/tools/Makefile
-+++ b/arch/sh/tools/Makefile
-@@ -13,4 +13,4 @@
- include/generated/machtypes.h: $(src)/gen-mach-types $(src)/mach-types
- 	@echo '  Generating $@'
- 	$(Q)mkdir -p $(dir $@)
--	$(Q)$(AWK) -f $^ > $@ || { rm -f $@; /bin/false; }
-+	$(Q)LC_ALL=C $(AWK) -f $^ > $@ || { rm -f $@; /bin/false; }
--- 
-1.6.5.3
-
+Michal
