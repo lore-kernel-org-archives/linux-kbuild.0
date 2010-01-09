@@ -1,43 +1,42 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:11499 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754188Ab0AIAKb (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 8 Jan 2010 19:10:31 -0500
-Message-ID: <4B47C94E.8070302@redhat.com>
-Date: Fri, 08 Jan 2010 19:09:50 -0500
-From: Masami Hiramatsu <mhiramat@redhat.com>
+Received: from terminus.zytor.com ([198.137.202.10]:41126 "EHLO
+	terminus.zytor.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750781Ab0AIAQg (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 8 Jan 2010 19:16:36 -0500
+Message-ID: <4B47CACA.7080103@zytor.com>
+Date: Fri, 08 Jan 2010 16:16:10 -0800
+From: "H. Peter Anvin" <hpa@zytor.com>
 MIME-Version: 1.0
 Subject: Re: [PATCH] Makefile: do not override LC_CTYPE
-References: <20100108115745.GA14758@sepie.suse.cz> <1262952988-16563-1-git-send-email-mmarek@suse.cz>
-In-Reply-To: <1262952988-16563-1-git-send-email-mmarek@suse.cz>
-Content-Type: text/plain; charset=ISO-2022-JP
+References: <20100108115745.GA14758@sepie.suse.cz> <1262952988-16563-1-git-send-email-mmarek@suse.cz> <4B47C94E.8070302@redhat.com>
+In-Reply-To: <4B47C94E.8070302@redhat.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: "H. Peter Anvin" <hpa@zytor.com>, Simon Horman <horms@verge.net.au>, Roland Dreier <rdreier@cisco.com>, Sam Ravnborg <sam@ravnborg.org>, Sergei Trofimovich <slyfox@inbox.ru>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-sh@vger.kernel.org
+To: Masami Hiramatsu <mhiramat@redhat.com>
+Cc: Michal Marek <mmarek@suse.cz>, Simon Horman <horms@verge.net.au>, Roland Dreier <rdreier@cisco.com>, Sam Ravnborg <sam@ravnborg.org>, Sergei Trofimovich <slyfox@inbox.ru>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-sh@vger.kernel.org
 
-Hi Michal,
+On 01/08/2010 04:09 PM, Masami Hiramatsu wrote:
+> Hi Michal,
+> 
+> Michal Marek wrote:
+>> Setting LC_CTYPE=C breaks localized messages in some setups. With only
+>> LC_COLLATE=C and LC_NUMERIC=C, we get almost all we need, except for not
+>> so defined character classes and tolower()/toupper(). The former is not
+>> a big issue, because we can assume that e.g. [:alpha:] will always
+>> include a-zA-Z and we only ever process ASCII input. The latter seems
+>> only affect arch/sh/tools/gen-mach-types, which we can handle separately.
+> 
+> Hmm, this also affects arch/x/tools/gen-insn-attr-x86.awk.
+> Could you also wrap it?
+> 
 
-Michal Marek wrote:
-> Setting LC_CTYPE=C breaks localized messages in some setups. With only
-> LC_COLLATE=C and LC_NUMERIC=C, we get almost all we need, except for not
-> so defined character classes and tolower()/toupper(). The former is not
-> a big issue, because we can assume that e.g. [:alpha:] will always
-> include a-zA-Z and we only ever process ASCII input. The latter seems
-> only affect arch/sh/tools/gen-mach-types, which we can handle separately.
+This is tolower/toupper()?  Do there exist locales where tolower/toupper
+on ASCII input do weird things, or are we merely hypothesizing?
 
-Hmm, this also affects arch/x/tools/gen-insn-attr-x86.awk.
-Could you also wrap it?
+	-hpa
 
-Thank you,
 
--- 
-Masami Hiramatsu
-
-Software Engineer
-Hitachi Computer Products (America), Inc.
-Software Solutions Division
-
-e-mail: mhiramat@redhat.com
 
