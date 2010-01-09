@@ -1,59 +1,108 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-fx0-f225.google.com ([209.85.220.225]:48099 "EHLO
-	mail-fx0-f225.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754620Ab0AIQrZ (ORCPT
+Received: from mail-gx0-f211.google.com ([209.85.217.211]:65145 "EHLO
+	mail-gx0-f211.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750702Ab0AIWs2 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 9 Jan 2010 11:47:25 -0500
+	Sat, 9 Jan 2010 17:48:28 -0500
+Date: Sat, 9 Jan 2010 16:48:28 -0600
+From: Jonathan Nieder <jrnieder@gmail.com>
+Subject: Re: [GIT PULL] kbuild fix for 2.6.33
+Message-ID: <20100109224827.GA30610@progeny.tock>
+References: <20100105155038.GA20834@sepie.suse.cz>
 MIME-Version: 1.0
-In-Reply-To: <1262875968-1078-1-git-send-email-mmarek@suse.cz>
-References: <1262875968-1078-1-git-send-email-mmarek@suse.cz>
-Date: Sat, 9 Jan 2010 18:47:21 +0200
-Message-ID: <9b2db90b1001090847n5d294f26re43686722435742f@mail.gmail.com>
-Subject: Re: [PATCH 0/2] nconfig
-From: Nir Tzachar <nir.tzachar@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20100105155038.GA20834@sepie.suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Michal Marek <mmarek@suse.cz>, Sebastian =?iso-8859-1?Q?Dalfu=DF?= <sd@sedf.de>, Andrew Morton <akpm@linux-foundation.org>, Michael Tokarev <mjt@tls.msk.ru>, Alek Du <alek.du@intel.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Thu, Jan 7, 2010 at 4:52 PM, Michal Marek <mmarek@suse.cz> wrote:
-> Hi Nir,
->
-> Just FYI: I queued nconfig for the next merge window. I added a patch to
-> mark some functions static and changed the description of your patch,
-> otherwise it's the v7 version you posted.
+Hi Linus,
 
-Thats gr8. Thanks.
+Michal Marek wrote:
 
-I would also appreciate if you can add the patch I sent Jan (attached
-below). It fixed the problem Jan raised. If you need, I'll make it a
-proper patch on top of v7.
+> please pull this to fix build with /bin/sh -> dash (as used in Ubuntu).
 
-Cheers.
+Could you look over this patch and perhaps apply it?  In the
+grand scheme of things, it is a small issue, but it has been
+offering some Debian and Ubuntu users a lot of annoyance.
 
-diff --git a/scripts/kconfig/nconf.c b/scripts/kconfig/nconf.c
-index 8c56150..cab6bb0 100644
---- a/scripts/kconfig/nconf.c
-+++ b/scripts/kconfig/nconf.c
-@@ -984,7 +984,7 @@ static void build_conf(struct menu *menu)
-                               break;
-                       default:
-                               tmp = 2 + strlen(sym_get_string_value(sym));
--                               item_make(menu, 's', "(%s)",
-+                               item_make(menu, 's', "    (%s)",
-                                               sym_get_string_value(sym));
-                               tmp = indent - tmp + 4;
-                               if (tmp < 0)
-@@ -1072,8 +1072,8 @@ static void show_menu(const char *prompt, const
-char *instructions,
+The problem is that dash's echo and printf do not support \x...
+escapes.  The symptom is a build without errors resulting in a
+vmlinuz that cannot boot.
 
-       /* position the menu at the middle of the screen */
-       scale_menu(curses_menu, &maxy, &maxx);
--       maxx = min(maxx, mwin_max_cols);
--       maxy = mwin_max_lines-1;
-+       maxx = min(maxx, mwin_max_cols-2);
-+       maxy = mwin_max_lines-2;
-       menu_window = derwin(main_window,
-                       maxy,
-                       maxx,
+Thanks,
+Jonathan
+
+> The following changes since commit 45d28b097280a78893ce25a5d0db41e6a2717853:
+>   Linus Torvalds (1):
+>         Merge branch 'reiserfs/kill-bkl' of git://git.kernel.org/.../frederic/random-tracing
+> 
+> are available in the git repository at:
+> 
+>   git://repo.or.cz/linux-kbuild.git for-33
+
+-- %< --
+From: Jonathan Nieder <jrnieder@gmail.com>
+Date: Mon, 28 Dec 2009 19:38:27 +0000
+Subject: [PATCH] kbuild: really fix bzImage build with non-bash sh
+
+dash's echo and printf do not support \x... escapes.  The symptom
+is a build without errors resulting in a vmlinuz that cannot
+boot.
+
+Previous commits replaced "echo -ne" first with "/bin/echo -ne",
+then "printf" in the hope of improving portability, but none of
+these commands is guaranteed to support hexadecimal escapes on
+POSIX systems.  Use arithmetic expansion to convert from
+hexadecimal to octal to fix this.
+
+You can see what is happening by examining the end of
+arch/x86/boot/compressed/vmlinux.bin.lzma after an x86 build with
+CONFIG_KERNEL_LZMA enabled and /bin/sh a symlink to dash.
+Without this patch, it ends with '\xf0\x7d\x39\x00' (16 bytes)
+instead of the 4 bytes intended and the resulting vmlinuz fails
+to boot.
+
+With this change, an LZMA-compressed kernel built with dash as sh
+boots correctly again.
+
+Fixes: http://bugzilla.kernel.org/show_bug.cgi?id=14907
+Reported-by: Sebastian Dalfuﬂ <sd@sedf.de>
+Reported-by: Oliver Hartkopp <oliver@hartkopp.net>
+Reported-by: Michael Guntsche <mike@it-loops.com>
+Tested-by: Meelis Roos <mroos@linux.ee>
+Cc: Michael Tokarev <mjt@tls.msk.ru>
+Cc: Alek Du <alek.du@intel.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>
+Acked-by: Michal Marek <mmarek@suse.cz>
+Signed-off-by: Jonathan Nieder <jrnieder@gmail.com>
+---
+ scripts/Makefile.lib |    9 +++++++--
+ 1 files changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+index cd815ac..eabedbb 100644
+--- a/scripts/Makefile.lib
++++ b/scripts/Makefile.lib
+@@ -219,8 +219,13 @@ for F in $1; do								\
+ 	fsize=$$(stat -c "%s" $$F);					\
+ 	dec_size=$$(expr $$dec_size + $$fsize);				\
+ done;									\
+-printf "%08x" $$dec_size |						\
+-	sed 's/\(..\)\(..\)\(..\)\(..\)/\\\\x\4\\\\x\3\\\\x\2\\\\x\1/g'	\
++printf "%08x\n" $$dec_size |						\
++	sed 's/\(..\)/\1 /g' | {					\
++		read ch0 ch1 ch2 ch3;					\
++		for ch in $$ch3 $$ch2 $$ch1 $$ch0; do			\
++			printf '%s%03o' '\\' $$((0x$$ch)); 		\
++		done;							\
++	}								\
+ )
+ 
+ quiet_cmd_bzip2 = BZIP2   $@
+-- 
+1.6.6
+
