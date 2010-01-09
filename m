@@ -1,52 +1,62 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from terminus.zytor.com ([198.137.202.10]:40630 "EHLO
-	terminus.zytor.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752596Ab0AIAod (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 8 Jan 2010 19:44:33 -0500
-Message-ID: <fee949ac4791d5692c8359a1cbb134e0.squirrel@www.zytor.com>
-In-Reply-To: <4B47CE1A.8070708@redhat.com>
-References: <20100108115745.GA14758@sepie.suse.cz>
-    <1262952988-16563-1-git-send-email-mmarek@suse.cz>
-    <4B47C94E.8070302@redhat.com> <4B47CACA.7080103@zytor.com>
-    <4B47CE1A.8070708@redhat.com>
-Date: Fri, 8 Jan 2010 16:43:51 -0800
-Subject: Re: [PATCH] Makefile: do not override LC_CTYPE
-From: "H. Peter Anvin" <hpa@zytor.com>
+Received: from mx1.redhat.com ([209.132.183.28]:37517 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751644Ab0AIAyA (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 8 Jan 2010 19:54:00 -0500
+Message-ID: <4B47D39E.20104@redhat.com>
+Date: Fri, 08 Jan 2010 19:53:50 -0500
+From: Masami Hiramatsu <mhiramat@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain;charset=utf-8
-Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] Makefile: do not override LC_CTYPE
+References: <20100108115745.GA14758@sepie.suse.cz> <1262952988-16563-1-git-send-email-mmarek@suse.cz> <4B47C94E.8070302@redhat.com> <4B47CACA.7080103@zytor.com>
+In-Reply-To: <4B47CACA.7080103@zytor.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masami Hiramatsu <mhiramat@redhat.com>
-Cc: "H. Peter Anvin" <hpa@zytor.com>, Michal Marek <mmarek@suse.cz>, Simon Horman <horms@verge.net.au>, Roland Dreier <rdreier@cisco.com>, Sam Ravnborg <sam@ravnborg.org>, Sergei Trofimovich <slyfox@inbox.ru>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-sh@vger.kernel.org
+To: "H. Peter Anvin" <hpa@zytor.com>
+Cc: Michal Marek <mmarek@suse.cz>, Simon Horman <horms@verge.net.au>, Roland Dreier <rdreier@cisco.com>, Sam Ravnborg <sam@ravnborg.org>, Sergei Trofimovich <slyfox@inbox.ru>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-sh@vger.kernel.org
 
-> H. Peter Anvin wrote:
->> On 01/08/2010 04:09 PM, Masami Hiramatsu wrote:
->>> Hi Michal,
->>>
->>> Michal Marek wrote:
->>>> Setting LC_CTYPE=C breaks localized messages in some setups. With only
->>>> LC_COLLATE=C and LC_NUMERIC=C, we get almost all we need, except for
->>>> not
->>>> so defined character classes and tolower()/toupper(). The former is
->>>> not
->>>> a big issue, because we can assume that e.g. [:alpha:] will always
->>>> include a-zA-Z and we only ever process ASCII input. The latter seems
->>>> only affect arch/sh/tools/gen-mach-types, which we can handle
->>>> separately.
->>>
->>> Hmm, this also affects arch/x/tools/gen-insn-attr-x86.awk.
->>> Could you also wrap it?
->>>
+H. Peter Anvin wrote:
+> On 01/08/2010 04:09 PM, Masami Hiramatsu wrote:
+>> Hi Michal,
 >>
->> This is tolower/toupper()?  Do there exist locales where tolower/toupper
->> on ASCII input do weird things, or are we merely hypothesizing?
->
-> Isn't it affect [A-Z] or [a-z]? If not, the patch good to me too.
->
+>> Michal Marek wrote:
+>>> Setting LC_CTYPE=C breaks localized messages in some setups. With only
+>>> LC_COLLATE=C and LC_NUMERIC=C, we get almost all we need, except for not
+>>> so defined character classes and tolower()/toupper(). The former is not
+>>> a big issue, because we can assume that e.g. [:alpha:] will always
+>>> include a-zA-Z and we only ever process ASCII input. The latter seems
+>>> only affect arch/sh/tools/gen-mach-types, which we can handle separately.
+>>
+>> Hmm, this also affects arch/x/tools/gen-insn-attr-x86.awk.
+>> Could you also wrap it?
+>>
+> 
+> This is tolower/toupper()?  Do there exist locales where tolower/toupper
+> on ASCII input do weird things, or are we merely hypothesizing?
 
-[A-Z][a-z] is what LC_COLLATE is about.
+Ah, sorry, I was just hypothesizing.
+---
+#!/bin/sh
+# en_US locale sorts alphabets as AaBb...
+LANG=en_US
+LC_ALL=
+LC_COLLATE=C
+LC_NUMERIC=C
+export LC_COLLATE LC_NUMERIC
+awk 'BEGIN{if (match("C","[a-z]")) {print "NG"} else {print "OK"} exit;}'
+---
+this returns "OK". So, the patch is OK for me too.
 
-    -hpa
+Thanks,
+
+-- 
+Masami Hiramatsu
+
+Software Engineer
+Hitachi Computer Products (America), Inc.
+Software Solutions Division
+
+e-mail: mhiramat@redhat.com
 
