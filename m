@@ -1,38 +1,32 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor.suse.de ([195.135.220.2]:33138 "EHLO mx1.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752082Ab0AKJ4e (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 11 Jan 2010 04:56:34 -0500
-Message-ID: <4B4AF5D0.3070704@suse.cz>
-Date: Mon, 11 Jan 2010 10:56:32 +0100
-From: Michal Marek <mmarek@suse.cz>
-MIME-Version: 1.0
-Subject: Re: [PATCH 0/2] nconfig
-References: <1262875968-1078-1-git-send-email-mmarek@suse.cz> <9b2db90b1001090847n5d294f26re43686722435742f@mail.gmail.com>
-In-Reply-To: <9b2db90b1001090847n5d294f26re43686722435742f@mail.gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
+Received: from earthlight.etchedpixels.co.uk ([81.2.110.250]:58672 "EHLO
+	www.etchedpixels.co.uk" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1750712Ab0AKKtQ (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 11 Jan 2010 05:49:16 -0500
+Date: Mon, 11 Jan 2010 10:52:01 +0000
+From: Alan Cox <alan@lxorguk.ukuu.org.uk>
+Subject: Re: [PATCH] Makefile: do not override LC_CTYPE
+Message-ID: <20100111105201.2d86135b@lxorguk.ukuu.org.uk>
+In-Reply-To: <4B47CACA.7080103@zytor.com>
+References: <20100108115745.GA14758@sepie.suse.cz>
+	<1262952988-16563-1-git-send-email-mmarek@suse.cz>
+	<4B47C94E.8070302@redhat.com>
+	<4B47CACA.7080103@zytor.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nir Tzachar <nir.tzachar@gmail.com>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: "H. Peter Anvin" <hpa@zytor.com>
+Cc: Masami Hiramatsu <mhiramat@redhat.com>, Michal Marek <mmarek@suse.cz>, Simon Horman <horms@verge.net.au>, Roland Dreier <rdreier@cisco.com>, Sam Ravnborg <sam@ravnborg.org>, Sergei Trofimovich <slyfox@inbox.ru>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-sh@vger.kernel.org
 
-On 9.1.2010 17:47, Nir Tzachar wrote:
-> On Thu, Jan 7, 2010 at 4:52 PM, Michal Marek <mmarek@suse.cz> wrote:
->> Hi Nir,
->>
->> Just FYI: I queued nconfig for the next merge window. I added a patch to
->> mark some functions static and changed the description of your patch,
->> otherwise it's the v7 version you posted.
-> 
-> Thats gr8. Thanks.
-> 
-> I would also appreciate if you can add the patch I sent Jan (attached
-> below). It fixed the problem Jan raised. If you need, I'll make it a
-> proper patch on top of v7.
+> This is tolower/toupper()?  Do there exist locales where tolower/toupper
+> on ASCII input do weird things, or are we merely hypothesizing?
 
-Yes, please send a patch with a proper description and signoff, I'll
-apply it on top of v7.
+Turkish is the famous one for this and usually causes
+internationalisation chaos. So yes they exist, and there are worse more
+esoteric cases. There are good reasons sed and friends support classes as
+well as old C locale style ranges.
 
-Thanks,
-Michal
+Alan
