@@ -1,108 +1,55 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-gx0-f211.google.com ([209.85.217.211]:65145 "EHLO
-	mail-gx0-f211.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750702Ab0AIWs2 (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 9 Jan 2010 17:48:28 -0500
-Date: Sat, 9 Jan 2010 16:48:28 -0600
-From: Jonathan Nieder <jrnieder@gmail.com>
-Subject: Re: [GIT PULL] kbuild fix for 2.6.33
-Message-ID: <20100109224827.GA30610@progeny.tock>
-References: <20100105155038.GA20834@sepie.suse.cz>
+Received: from trinity.fluff.org ([89.16.178.74]:45443 "EHLO trinity.fluff.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752332Ab0AKIaD (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 11 Jan 2010 03:30:03 -0500
+Date: Mon, 11 Jan 2010 08:30:02 +0000
+From: Ben Dooks <ben-linux@fluff.org>
+Subject: Kconfig with multiple sources  of integer value
+Message-ID: <20100111083002.GA24987@trinity.fluff.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20100105155038.GA20834@sepie.suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Michal Marek <mmarek@suse.cz>, Sebastian =?iso-8859-1?Q?Dalfu=DF?= <sd@sedf.de>, Andrew Morton <akpm@linux-foundation.org>, Michael Tokarev <mjt@tls.msk.ru>, Alek Du <alek.du@intel.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-Hi Linus,
+I have a situation (and possibly some more) where having the ability
+for multiple options to affect an integer value, in this case ensuring
+a minimum value.
 
-Michal Marek wrote:
+currently we have the following:
 
-> please pull this to fix build with /bin/sh -> dash (as used in Ubuntu).
+config S3C24XX_GPIO_EXTRA
+        int
+        default 128 if S3C24XX_GPIO_EXTRA128
+        default 64 if S3C24XX_GPIO_EXTRA64
+        default 0
 
-Could you look over this patch and perhaps apply it?  In the
-grand scheme of things, it is a small issue, but it has been
-offering some Debian and Ubuntu users a lot of annoyance.
+and various machines select S3C24XX_GPIO_EXTRA64 or S3C24XX_GPIO_EXTR128
+such as:
 
-The problem is that dash's echo and printf do not support \x...
-escapes.  The symptom is a build without errors resulting in a
-vmlinuz that cannot boot.
+config MACH_OSIRIS
+       ...
+        select S3C24XX_GPIO_EXTRA128
 
-Thanks,
-Jonathan
 
-> The following changes since commit 45d28b097280a78893ce25a5d0db41e6a2717853:
->   Linus Torvalds (1):
->         Merge branch 'reiserfs/kill-bkl' of git://git.kernel.org/.../frederic/random-tracing
-> 
-> are available in the git repository at:
-> 
->   git://repo.or.cz/linux-kbuild.git for-33
+It would be nice if I could say
 
--- %< --
-From: Jonathan Nieder <jrnieder@gmail.com>
-Date: Mon, 28 Dec 2009 19:38:27 +0000
-Subject: [PATCH] kbuild: really fix bzImage build with non-bash sh
+config S3C24XX_GPIO_EXTRA
 
-dash's echo and printf do not support \x... escapes.  The symptom
-is a build without errors resulting in a vmlinuz that cannot
-boot.
+and then
 
-Previous commits replaced "echo -ne" first with "/bin/echo -ne",
-then "printf" in the hope of improving portability, but none of
-these commands is guaranteed to support hexadecimal escapes on
-POSIX systems.  Use arithmetic expansion to convert from
-hexadecimal to octal to fix this.
+config MACH_OSIRIS
+       ...
+       set_min S3C24XX_GPIO_EXTRA 128
 
-You can see what is happening by examining the end of
-arch/x86/boot/compressed/vmlinux.bin.lzma after an x86 build with
-CONFIG_KERNEL_LZMA enabled and /bin/sh a symlink to dash.
-Without this patch, it ends with '\xf0\x7d\x39\x00' (16 bytes)
-instead of the 4 bytes intended and the resulting vmlinuz fails
-to boot.
+or something similar.
 
-With this change, an LZMA-compressed kernel built with dash as sh
-boots correctly again.
 
-Fixes: http://bugzilla.kernel.org/show_bug.cgi?id=14907
-Reported-by: Sebastian Dalfuﬂ <sd@sedf.de>
-Reported-by: Oliver Hartkopp <oliver@hartkopp.net>
-Reported-by: Michael Guntsche <mike@it-loops.com>
-Tested-by: Meelis Roos <mroos@linux.ee>
-Cc: Michael Tokarev <mjt@tls.msk.ru>
-Cc: Alek Du <alek.du@intel.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>
-Acked-by: Michal Marek <mmarek@suse.cz>
-Signed-off-by: Jonathan Nieder <jrnieder@gmail.com>
----
- scripts/Makefile.lib |    9 +++++++--
- 1 files changed, 7 insertions(+), 2 deletions(-)
-
-diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-index cd815ac..eabedbb 100644
---- a/scripts/Makefile.lib
-+++ b/scripts/Makefile.lib
-@@ -219,8 +219,13 @@ for F in $1; do								\
- 	fsize=$$(stat -c "%s" $$F);					\
- 	dec_size=$$(expr $$dec_size + $$fsize);				\
- done;									\
--printf "%08x" $$dec_size |						\
--	sed 's/\(..\)\(..\)\(..\)\(..\)/\\\\x\4\\\\x\3\\\\x\2\\\\x\1/g'	\
-+printf "%08x\n" $$dec_size |						\
-+	sed 's/\(..\)/\1 /g' | {					\
-+		read ch0 ch1 ch2 ch3;					\
-+		for ch in $$ch3 $$ch2 $$ch1 $$ch0; do			\
-+			printf '%s%03o' '\\' $$((0x$$ch)); 		\
-+		done;							\
-+	}								\
- )
- 
- quiet_cmd_bzip2 = BZIP2   $@
 -- 
-1.6.6
+Ben
+
+Q:      What's a light-year?
+A:      One-third less calories than a regular year.
 
