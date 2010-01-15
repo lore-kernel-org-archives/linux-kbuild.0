@@ -1,69 +1,42 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qy0-f194.google.com ([209.85.221.194]:56560 "EHLO
-	mail-qy0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752145Ab0AND0F convert rfc822-to-8bit (ORCPT
+Received: from mail02a.mail.t-online.hu ([84.2.40.7]:54471 "EHLO
+	mail02a.mail.t-online.hu" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752150Ab0AOQ74 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 13 Jan 2010 22:26:05 -0500
+	Fri, 15 Jan 2010 11:59:56 -0500
+Message-ID: <4B509C90.10305@freemail.hu>
+Date: Fri, 15 Jan 2010 17:49:20 +0100
+From: =?UTF-8?B?TsOpbWV0aCBNw6FydG9u?= <nm127@freemail.hu>
 MIME-Version: 1.0
-In-Reply-To: <1263403904.8011.83.camel@Joe-Laptop.home>
-References: <4B49D001.4000302@gmail.com> <4B4DA4F4.6060007@gmail.com>
-	 <20100113115617.GA24818@basil.fritz.box> <4B4DE887.6030602@gmail.com>
-	 <20100113155323.GB24818@basil.fritz.box>
-	 <1263400835.8011.73.camel@Joe-Laptop.home>
-	 <20100113171411.GC24818@basil.fritz.box>
-	 <1263403904.8011.83.camel@Joe-Laptop.home>
-Date: Thu, 14 Jan 2010 11:26:01 +0800
-Message-ID: <2375c9f91001131926o15a52e1cx936932c587dccdb5@mail.gmail.com>
-Subject: Re: [PATCH] Makefile: Document ability to make file.lst and file.S
-From: =?UTF-8?Q?Am=C3=A9rico_Wang?= <xiyou.wangcong@gmail.com>
+Subject: SmPL scripts into build environment? (was: Changelog quality)
+References: <4B502C6B.7000802@s5r6.in-berlin.de> <20100115.005445.263291449.davem@davemloft.net> <tkrat.e88dd4dbf17f9bde@s5r6.in-berlin.de> <20100115.012233.202457727.davem@davemloft.net> <Pine.LNX.4.64.1001151039080.23543@ask.diku.dk> <84144f021001150149u3b784d26g1822be6c5c3ecbf@mail.gmail.com> <Pine.LNX.4.64.1001151101320.23543@ask.diku.dk> <20100115110845.GB28625@sirena.org.uk> <Pine.LNX.4.64.1001151303580.23543@ask.diku.dk> <20100115133933.GB21188@rakim.wolfsonmicro.main>
+In-Reply-To: <20100115133933.GB21188@rakim.wolfsonmicro.main>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Joe Perches <joe@perches.com>
-Cc: Andi Kleen <andi@firstfloor.org>, Michal Marek <mmarek@suse.cz>, William Allen Simpson <william.allen.simpson@gmail.com>, Linux Kernel Developers <linux-kernel@vger.kernel.org>, Linux Kernel Network Developers <netdev@vger.kernel.org>, =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@helsinki.fi>, Eric Dumazet <eric.dumazet@gmail.com>, linux-kbuild@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
+Cc: Mark Brown <broonie@opensource.wolfsonmicro.com>, Julia Lawall <julia@diku.dk>, Pekka Enberg <penberg@cs.helsinki.fi>, David Miller <davem@davemloft.net>, stefanr@s5r6.in-berlin.de, adi@hexapodia.org, david.vrabel@csr.com, linux-usb@vger.kernel.org, linux-kernel@vger.kernel.org, cocci@diku.dk, Andrew Morton <akpm@linux-foundation.org>, Nicolas Palix <npalix@diku.dk>
 
-On Thu, Jan 14, 2010 at 1:31 AM, Joe Perches <joe@perches.com> wrote:
-> On Wed, 2010-01-13 at 18:14 +0100, Andi Kleen wrote:
->> On Wed, Jan 13, 2010 at 08:40:35AM -0800, Joe Perches wrote:
->> > On Wed, 2010-01-13 at 16:53 +0100, Andi Kleen wrote:
->> > > On Wed, Jan 13, 2010 at 10:36:39AM -0500, William Allen Simpson wrote:
->> > > > What make command would you suggest to get the interleaved asm?
->> > > make path/to/file.lst
->> > > (or .S -- you might need uptodate binutils if the lst listing is messed up)
->> > I didn't know that was possible.
->> The trap is that it doesn't work well on most systems with too
->> old binutils (unless the gcc is really ancient)
->
-> Then that might as well go into the help.
->
-> Signed-off-by: Joe Perches <joe@perches.com>
+Hi Marek,
 
-Good patch,
+there was a discussion about patches which are generated using the
+tool called spatch. In the changelog the SmPL script was usually
+included, see http://git.kernel.org/?p=linux%2Fkernel%2Fgit%2Ftorvalds%2Flinux-2.6.git&a=search&h=HEAD&st=commit&s=%3Csmpl%3E .
+It is useful to store the SmPL scripts because they may find
+problems in the newcoming code also.
 
-Acked-by: WANG Cong <xiyou.wangcong@gmail.com>
+In order to run a "check" the spatch tool and the SmPL is also necessary.
+There was an idea to place the used SmPL scripts under the Linux
+kernel source tree so it can move from the changelog but still remain
+for later use. The "check" could be run similar to the tools checkpatch,
+sparse or lockdep.
 
-> ---
-> diff --git a/Makefile b/Makefile
-> index 9f64552..484cff4 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -1248,7 +1248,9 @@ help:
->        @echo  '  firmware_install- Install all firmware to INSTALL_FW_PATH'
->        @echo  '                    (default: $$(INSTALL_MOD_PATH)/lib/firmware)'
->        @echo  '  dir/            - Build all files in dir and below'
-> -       @echo  '  dir/file.[ois]  - Build specified target only'
-> +       @echo  '  dir/file.[oisS] - Build specified target only'
-> +       @echo  '  dir/file.lst    - Build specified mixed source/assembly target only'
-> +       @echo  '                    (requires a recent binutils and recent build (System.map))'
->        @echo  '  dir/file.ko     - Build module including final link'
->        @echo  '  modules_prepare - Set up for building external modules'
->        @echo  '  tags/TAGS       - Generate tags file for editors'
->
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kernel" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> Please read the FAQ at  http://www.tux.org/lkml/
->
+What do you think where the SmPL scripts can be placed?
+
+What do you think the best way would be to introduce some check like this
+in the build environment?
+
+Regards,
+
+	Márton Németh
