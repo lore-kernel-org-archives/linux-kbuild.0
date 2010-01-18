@@ -1,42 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail02a.mail.t-online.hu ([84.2.40.7]:54471 "EHLO
-	mail02a.mail.t-online.hu" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752150Ab0AOQ74 (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 15 Jan 2010 11:59:56 -0500
-Message-ID: <4B509C90.10305@freemail.hu>
-Date: Fri, 15 Jan 2010 17:49:20 +0100
-From: =?UTF-8?B?TsOpbWV0aCBNw6FydG9u?= <nm127@freemail.hu>
+Received: from cantor2.suse.de ([195.135.220.15]:39863 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750898Ab0ARK7J (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 18 Jan 2010 05:59:09 -0500
+Message-ID: <4B543EF2.50605@suse.cz>
+Date: Mon, 18 Jan 2010 11:58:58 +0100
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Subject: SmPL scripts into build environment? (was: Changelog quality)
-References: <4B502C6B.7000802@s5r6.in-berlin.de> <20100115.005445.263291449.davem@davemloft.net> <tkrat.e88dd4dbf17f9bde@s5r6.in-berlin.de> <20100115.012233.202457727.davem@davemloft.net> <Pine.LNX.4.64.1001151039080.23543@ask.diku.dk> <84144f021001150149u3b784d26g1822be6c5c3ecbf@mail.gmail.com> <Pine.LNX.4.64.1001151101320.23543@ask.diku.dk> <20100115110845.GB28625@sirena.org.uk> <Pine.LNX.4.64.1001151303580.23543@ask.diku.dk> <20100115133933.GB21188@rakim.wolfsonmicro.main>
-In-Reply-To: <20100115133933.GB21188@rakim.wolfsonmicro.main>
+Subject: Re: SmPL scripts into build environment?
+References: <4B502C6B.7000802@s5r6.in-berlin.de> <20100115.005445.263291449.davem@davemloft.net> <tkrat.e88dd4dbf17f9bde@s5r6.in-berlin.de> <20100115.012233.202457727.davem@davemloft.net> <Pine.LNX.4.64.1001151039080.23543@ask.diku.dk> <84144f021001150149u3b784d26g1822be6c5c3ecbf@mail.gmail.com> <Pine.LNX.4.64.1001151101320.23543@ask.diku.dk> <20100115110845.GB28625@sirena.org.uk> <Pine.LNX.4.64.1001151303580.23543@ask.diku.dk> <20100115133933.GB21188@rakim.wolfsonmicro.main> <4B509C90.10305@freemail.hu>
+In-Reply-To: <4B509C90.10305@freemail.hu>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
-Cc: Mark Brown <broonie@opensource.wolfsonmicro.com>, Julia Lawall <julia@diku.dk>, Pekka Enberg <penberg@cs.helsinki.fi>, David Miller <davem@davemloft.net>, stefanr@s5r6.in-berlin.de, adi@hexapodia.org, david.vrabel@csr.com, linux-usb@vger.kernel.org, linux-kernel@vger.kernel.org, cocci@diku.dk, Andrew Morton <akpm@linux-foundation.org>, Nicolas Palix <npalix@diku.dk>
+To: =?UTF-8?B?TsOpbWV0aCBNw6FydG9u?= <nm127@freemail.hu>
+Cc: linux-kbuild@vger.kernel.org, Mark Brown <broonie@opensource.wolfsonmicro.com>, Julia Lawall <julia@diku.dk>, Pekka Enberg <penberg@cs.helsinki.fi>, David Miller <davem@davemloft.net>, stefanr@s5r6.in-berlin.de, adi@hexapodia.org, david.vrabel@csr.com, linux-usb@vger.kernel.org, linux-kernel@vger.kernel.org, cocci@diku.dk, Andrew Morton <akpm@linux-foundation.org>, Nicolas Palix <npalix@diku.dk>
 
-Hi Marek,
+On 15.1.2010 17:49, Németh Márton wrote:
+> Hi Marek,
 
-there was a discussion about patches which are generated using the
-tool called spatch. In the changelog the SmPL script was usually
-included, see http://git.kernel.org/?p=linux%2Fkernel%2Fgit%2Ftorvalds%2Flinux-2.6.git&a=search&h=HEAD&st=commit&s=%3Csmpl%3E .
-It is useful to store the SmPL scripts because they may find
-problems in the newcoming code also.
+s/Marek/Michal/ :)
 
-In order to run a "check" the spatch tool and the SmPL is also necessary.
-There was an idea to place the used SmPL scripts under the Linux
-kernel source tree so it can move from the changelog but still remain
-for later use. The "check" could be run similar to the tools checkpatch,
-sparse or lockdep.
 
-What do you think where the SmPL scripts can be placed?
+> there was a discussion about patches which are generated using the
+> tool called spatch. In the changelog the SmPL script was usually
+> included, see http://git.kernel.org/?p=linux%2Fkernel%2Fgit%2Ftorvalds%2Flinux-2.6.git&a=search&h=HEAD&st=commit&s=%3Csmpl%3E .
+> It is useful to store the SmPL scripts because they may find
+> problems in the newcoming code also.
+> 
+> In order to run a "check" the spatch tool and the SmPL is also necessary.
+> There was an idea to place the used SmPL scripts under the Linux
+> kernel source tree so it can move from the changelog but still remain
+> for later use. The "check" could be run similar to the tools checkpatch,
+> sparse or lockdep.
+> 
+> What do you think where the SmPL scripts can be placed?
 
-What do you think the best way would be to introduce some check like this
-in the build environment?
+Documentation/smpl/$name_of_problem_fixed.cocci? Or maybe better
+scripts/smlp/..., if you are going to add some wrapper that runs the
+semantic patches on the source tree. Or something like that, a dedicated
+subdirectory to store the semantic patches in individual files.
 
-Regards,
 
-	Márton Németh
+> What do you think the best way would be to introduce some check like this
+> in the build environment?
+
+I've only heard about the tool, I haven't used it yet. Does it need to
+preprocess and parse source files like sparse does, or can it check C
+files without expanding macros and includes? If the former, then let's
+extend make C=... to also support spatch. If the latter, then a script
+that runs spatch on all *.c files found the tree should be enough. But
+as I said, I haven't used the tool, so I don't know what it needs and
+what it can offer.
+
+Michal
