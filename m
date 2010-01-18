@@ -1,43 +1,66 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mgw2.diku.dk ([130.225.96.92]:40284 "EHLO mgw2.diku.dk"
+Received: from cantor2.suse.de ([195.135.220.15]:42235 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751469Ab0ARLW7 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 18 Jan 2010 06:22:59 -0500
-Date: Mon, 18 Jan 2010 12:22:56 +0100 (CET)
-From: Julia Lawall <julia@diku.dk>
-Subject: Re: SmPL scripts into build environment?
-In-Reply-To: <4B543EF2.50605@suse.cz>
-Message-ID: <Pine.LNX.4.64.1001181220530.14962@ask.diku.dk>
-References: <4B502C6B.7000802@s5r6.in-berlin.de> <20100115.005445.263291449.davem@davemloft.net>
- <tkrat.e88dd4dbf17f9bde@s5r6.in-berlin.de> <20100115.012233.202457727.davem@davemloft.net>
- <Pine.LNX.4.64.1001151039080.23543@ask.diku.dk>
- <84144f021001150149u3b784d26g1822be6c5c3ecbf@mail.gmail.com>
- <Pine.LNX.4.64.1001151101320.23543@ask.diku.dk> <20100115110845.GB28625@sirena.org.uk>
- <Pine.LNX.4.64.1001151303580.23543@ask.diku.dk> <20100115133933.GB21188@rakim.wolfsonmicro.main>
- <4B509C90.10305@freemail.hu> <4B543EF2.50605@suse.cz>
+	id S1754503Ab0ARMVz (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 18 Jan 2010 07:21:55 -0500
+Message-ID: <4B545262.4020907@suse.cz>
+Date: Mon, 18 Jan 2010 13:21:54 +0100
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: Re: [PATCH] Improve kconfig symbol hashing
+References: <20100113160244.GA14012@basil.fritz.box>
+In-Reply-To: <20100113160244.GA14012@basil.fritz.box>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: =?UTF-8?B?TsOpbWV0aCBNw6FydG9u?= <nm127@freemail.hu>, linux-kbuild@vger.kernel.org, Mark Brown <broonie@opensource.wolfsonmicro.com>, Pekka Enberg <penberg@cs.helsinki.fi>, David Miller <davem@davemloft.net>, stefanr@s5r6.in-berlin.de, adi@hexapodia.org, david.vrabel@csr.com, linux-usb@vger.kernel.org, linux-kernel@vger.kernel.org, cocci@diku.dk, Andrew Morton <akpm@linux-foundation.org>, Nicolas Palix <npalix@diku.dk>
+To: Andi Kleen <andi@firstfloor.org>
+Cc: zippel@linux-m68k.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-> Documentation/smpl/$name_of_problem_fixed.cocci? Or maybe better
-> scripts/smlp/..., if you are going to add some wrapper that runs the
-> semantic patches on the source tree. Or something like that, a dedicated
-> subdirectory to store the semantic patches in individual files.
-
-The idea is to make it possible to run them, assuming the user has 
-installed Coccinelle, so scripts seems better.
-
-> > What do you think the best way would be to introduce some check like this
-> > in the build environment?
+On 13.1.2010 17:02, Andi Kleen wrote:
+[...]
+> This patch increases the hash table size to a larger prime
+> and switches to a FNV32 hash. I played around with a couple of hash
+> functions, but that one seemed to perform best with reasonable
+> hash table sizes. 
 > 
-> I've only heard about the tool, I haven't used it yet. Does it need to
-> preprocess and parse source files like sparse does, or can it check C
-> files without expanding macros and includes?
+> Increasing the hash table size even further didn't
+> seem like a good idea, because there are a couple of global
+> walks which walk the complete hash table.
+> 
+> I also moved the unnamed bucket to 0. It's still the longest
+> of all the buckets (44 entries), but hopefully it's not
+> often hit except for the global walk which doesn't care.
+> 
+> The result is a much nicer distribution:
+> (first column bucket length, second number of buckets with that length)
+> 
+> 1: 3505
+> 2: 1236
+> 3: 294
+> 4: 52
+> 5: 3
+> 47: 1		<--- this is the unnamed symbols bucket
+> 
+> There are still some 5+ buckets, but increasing the hash table
+> even more would be likely not worth it.
+> 
+> This also cleans up the code slightly by removing hard coded
+> magic numbers.
+> 
+> I didn't notice a big performance difference either way 
+> on my Nehalem system, but I presume it'll help somewhat
+> on slower systems.
+> 
+> ---
+>  scripts/kconfig/expr.h              |    5 ++---
+>  scripts/kconfig/symbol.c            |   29 +++++++++++++++++------------
+>  scripts/kconfig/zconf.tab.c_shipped |    2 +-
+>  scripts/kconfig/zconf.y             |    2 +-
+>  4 files changed, 21 insertions(+), 17 deletions(-)
 
-It doesn't need to preprocess the source files.
+Hi Andi,
 
-thanks,
-julia
+The patch looks ok, but you forgot your Signed-off-by line?
+
+Michal
