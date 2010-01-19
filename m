@@ -1,39 +1,54 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.gentoo.org ([140.211.166.183]:40121 "EHLO smtp.gentoo.org"
+Received: from mx1.redhat.com ([209.132.183.28]:43489 "EHLO mx1.redhat.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751668Ab0ASGvv (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 19 Jan 2010 01:51:51 -0500
-From: Mike Frysinger <vapier@gentoo.org>
-Subject: [PATCH] kconfig: dont hardcode path to lsmod
-Date: Tue, 19 Jan 2010 01:52:00 -0500
-Message-Id: <1263883920-17289-1-git-send-email-vapier@gentoo.org>
+	id S1752746Ab0ASOKR (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 19 Jan 2010 09:10:17 -0500
+Subject: Re: [PATCH] kconfig: dont hardcode path to lsmod
+From: Steven Rostedt <srostedt@redhat.com>
+In-Reply-To: <1263883920-17289-1-git-send-email-vapier@gentoo.org>
+References: <1263883920-17289-1-git-send-email-vapier@gentoo.org>
+Content-Type: text/plain
+Date: Tue, 19 Jan 2010 09:10:02 -0500
+Message-Id: <1263910202.2737.133.camel@localhost.localdomain>
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Steven Rostedt <srostedt@redhat.com>, linux-kbuild@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>
-Cc: linux-kernel@vger.kernel.org
+To: Mike Frysinger <vapier@gentoo.org>
+Cc: linux-kbuild@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org
 
-The lsmod utility has always been installed into /bin with the newer
-module-init-tools package, so let lsmod be found via PATH instead of
-hardcoding the old modutils /sbin path.
+On Tue, 2010-01-19 at 01:52 -0500, Mike Frysinger wrote:
+> The lsmod utility has always been installed into /bin with the newer
+> module-init-tools package, so let lsmod be found via PATH instead of
+> hardcoding the old modutils /sbin path.
+> 
+> Signed-off-by: Mike Frysinger <vapier@gentoo.org>
 
-Signed-off-by: Mike Frysinger <vapier@gentoo.org>
----
- scripts/kconfig/streamline_config.pl |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+Thanks Mike, I actually have another patch like this. I was first a bit
+nervous about using non hard code, but then perhaps it's OK. I my patch
+actually checked the main paths first before choosing the "lsmod". But
+maybe that would be the better solution, since it would allow someone to
+choose their own lsmod.
 
-diff --git a/scripts/kconfig/streamline_config.pl b/scripts/kconfig/streamline_config.pl
-index 0d80082..e1dfc8c 100644
---- a/scripts/kconfig/streamline_config.pl
-+++ b/scripts/kconfig/streamline_config.pl
-@@ -238,7 +238,7 @@ foreach my $makefile (@makefiles) {
- my %modules;
- 
- # see what modules are loaded on this system
--open(LIN,"/sbin/lsmod|") || die "Cant lsmod";
-+open(LIN,"lsmod|") || die "Cant lsmod";
- while (<LIN>) {
- 	next if (/^Module/);  # Skip the first line.
- 	if (/^(\S+)/) {
--- 
-1.6.6
+Thanks!
+
+-- Steve
+
+> ---
+>  scripts/kconfig/streamline_config.pl |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
+> 
+> diff --git a/scripts/kconfig/streamline_config.pl b/scripts/kconfig/streamline_config.pl
+> index 0d80082..e1dfc8c 100644
+> --- a/scripts/kconfig/streamline_config.pl
+> +++ b/scripts/kconfig/streamline_config.pl
+> @@ -238,7 +238,7 @@ foreach my $makefile (@makefiles) {
+>  my %modules;
+>  
+>  # see what modules are loaded on this system
+> -open(LIN,"/sbin/lsmod|") || die "Cant lsmod";
+> +open(LIN,"lsmod|") || die "Cant lsmod";
+>  while (<LIN>) {
+>  	next if (/^Module/);  # Skip the first line.
+>  	if (/^(\S+)/) {
 
