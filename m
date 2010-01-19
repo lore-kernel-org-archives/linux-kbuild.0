@@ -1,44 +1,39 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor.suse.de ([195.135.220.2]:54858 "EHLO mx1.suse.de"
+Received: from smtp.gentoo.org ([140.211.166.183]:40121 "EHLO smtp.gentoo.org"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752289Ab0ARM5m (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 18 Jan 2010 07:57:42 -0500
-Message-ID: <4B545AC5.5080306@suse.cz>
-Date: Mon, 18 Jan 2010 13:57:41 +0100
-From: Michal Marek <mmarek@suse.cz>
-MIME-Version: 1.0
-Subject: Re: Kconfig with multiple sources  of integer value
-References: <20100111083002.GA24987@trinity.fluff.org>
-In-Reply-To: <20100111083002.GA24987@trinity.fluff.org>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+	id S1751668Ab0ASGvv (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 19 Jan 2010 01:51:51 -0500
+From: Mike Frysinger <vapier@gentoo.org>
+Subject: [PATCH] kconfig: dont hardcode path to lsmod
+Date: Tue, 19 Jan 2010 01:52:00 -0500
+Message-Id: <1263883920-17289-1-git-send-email-vapier@gentoo.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ben Dooks <ben-linux@fluff.org>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: Steven Rostedt <srostedt@redhat.com>, linux-kbuild@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>
+Cc: linux-kernel@vger.kernel.org
 
-On 11.1.2010 09:30, Ben Dooks wrote:
-> It would be nice if I could say
-> 
-> config S3C24XX_GPIO_EXTRA
-> 
-> and then
-> 
-> config MACH_OSIRIS
->        ...
->        set_min S3C24XX_GPIO_EXTRA 128
-> 
-> or something similar.
+The lsmod utility has always been installed into /bin with the newer
+module-init-tools package, so let lsmod be found via PATH instead of
+hardcoding the old modutils /sbin path.
 
-Or maybe extend 'select' to accept
-select FOO=<value>
-and allow select for integer options too (in which case, the =<value>
-would be mandatory). Then it would look like
+Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+---
+ scripts/kconfig/streamline_config.pl |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-config MACH_OSIRIS
-       ...
-       select S3C24XX_GPIO_EXTRA=128
+diff --git a/scripts/kconfig/streamline_config.pl b/scripts/kconfig/streamline_config.pl
+index 0d80082..e1dfc8c 100644
+--- a/scripts/kconfig/streamline_config.pl
++++ b/scripts/kconfig/streamline_config.pl
+@@ -238,7 +238,7 @@ foreach my $makefile (@makefiles) {
+ my %modules;
+ 
+ # see what modules are loaded on this system
+-open(LIN,"/sbin/lsmod|") || die "Cant lsmod";
++open(LIN,"lsmod|") || die "Cant lsmod";
+ while (<LIN>) {
+ 	next if (/^Module/);  # Skip the first line.
+ 	if (/^(\S+)/) {
+-- 
+1.6.6
 
-What do you think?
-
-Michal
