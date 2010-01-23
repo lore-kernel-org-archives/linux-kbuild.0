@@ -1,76 +1,65 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from qw-out-2122.google.com ([74.125.92.25]:54858 "EHLO
-	qw-out-2122.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754310Ab0ATDQT convert rfc822-to-8bit (ORCPT
+Received: from smtp1.linux-foundation.org ([140.211.169.13]:53888 "EHLO
+	smtp1.linux-foundation.org" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1753502Ab0AWC06 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 19 Jan 2010 22:16:19 -0500
-MIME-Version: 1.0
-In-Reply-To: <8bd0f97a1001191118q4d8f5e02he6df84a654a66d69@mail.gmail.com>
-References: <1263883920-17289-1-git-send-email-vapier@gentoo.org>
-	 <20100119142545.GB3473@hack>
-	 <8bd0f97a1001190923p6104acb4if5ec7225d549b713@mail.gmail.com>
-	 <520f0cf11001190942n2c765618m8a66b8afe82010d0@mail.gmail.com>
-	 <8bd0f97a1001190954q62b3bc5ejbdb69684d61c087c@mail.gmail.com>
-	 <alpine.LFD.2.00.1001191900340.5999@localhost.localdomain>
-	 <8bd0f97a1001191118q4d8f5e02he6df84a654a66d69@mail.gmail.com>
-Date: Wed, 20 Jan 2010 11:16:18 +0800
-Message-ID: <2375c9f91001191916l18588245ndf6c50aa2723fb08@mail.gmail.com>
-Subject: Re: [PATCH] kconfig: dont hardcode path to lsmod
-From: =?UTF-8?Q?Am=C3=A9rico_Wang?= <xiyou.wangcong@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+	Fri, 22 Jan 2010 21:26:58 -0500
+Date: Fri, 22 Jan 2010 18:26:53 -0800
+From: Andrew Morton <akpm@linux-foundation.org>
+Subject: Re: [Bugme-new] [Bug 15111] New: rpath $ORIGIN useless when path
+ contains colon
+Message-Id: <20100122182653.7b657b3a.akpm@linux-foundation.org>
+In-Reply-To: <bug-15111-10286@http.bugzilla.kernel.org/>
+References: <bug-15111-10286@http.bugzilla.kernel.org/>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Mike Frysinger <vapier.adi@gmail.com>
-Cc: John Kacur <jkacur@redhat.com>, Steven Rostedt <srostedt@redhat.com>, linux-kbuild@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
+Cc: bugzilla-daemon@bugzilla.kernel.org, bugme-daemon@bugzilla.kernel.org, they4kman@gmail.com
 
-On Wed, Jan 20, 2010 at 3:18 AM, Mike Frysinger <vapier.adi@gmail.com> wrote:
-> On Tue, Jan 19, 2010 at 13:12, John Kacur wrote:
->> On Tue, 19 Jan 2010, Mike Frysinger wrote:
->>> On Tue, Jan 19, 2010 at 12:42, John Kacur wrote:
->>> > On Tue, Jan 19, 2010 at 6:23 PM, Mike Frysinger wrote:
->>> >> On Tue, Jan 19, 2010 at 09:25, Américo Wang wrote:
->>> >>> On Tue, Jan 19, 2010 at 01:52:00AM -0500, Mike Frysinger wrote:
->>> >>>>The lsmod utility has always been installed into /bin with the newer
->>> >>>>module-init-tools package, so let lsmod be found via PATH instead of
->>> >>>>hardcoding the old modutils /sbin path.
->>> >>>>
->>> >>>
->>> >>> Some distro doesn't set /sbin to PATH, so for me a better solution
->>> >>> would be making PATH contain /sbin, and then use "lsmod".
->>> >>
->>> >> read my changelog -- module-init-tools has always installed into /bin.
->>> >>  so what your distro does with /sbin doesnt matter.
->>> >
->>> > I prefer my patches work for the real-world instead of the "so what
->>> > your distro does doesn't matter" world.
->>>
->>> try reading my comment instead of getting huffy.  if you have a distro
->>> that does something stupid like break the correct default m-i-t
->>> install setup, you should actually point it out.  the ones i checked
->>> were sane and installed lsmod into /bin (and some symlinked lsmod for
->>> backwards compat with modutils into /sbin).
->>
->> Well, I'm currently running Fedora (10 thru 12), and lsmod is in /sbin
->> Your patch would still not break for me because /sbin is in the PATH.
->>
->> However if Américo is correct that there are distros that have lsmod in
->> /sbin and don't have /sbin in the PATH, then your patch would break them.
->> You can argue that the distro is doing something stupid, but I'll bet you
->> they will blame your patch for breaking them. It seems reasonable to
->> me that a distro might only put /sbin in the superuser path, so I can
->> imagine there are cases like Américo suggests.
->
-> i am saying they're stupid for doing this, but i'm not saying we
-> shouldnt support it.  the premise for my original patch was that
-> upstream m-i-t has always used /bin (which means all 2.6 module
-> handers should be there per upstream), and the downstream distros i
-> had access to followed upstream's direction.
->
-> sounds like Fedora should have a bug report to get their things fixed
-> ... there's no reason for `lsmod` to not be in /bin (and everyone's
-> PATH) since it only reads /proc/modules and that is word readable.
 
-This certainly makes sense, but the fact is that lsmod is still there,
-what is worse, on RHEL (Fedora too, I think) /sbin is not in PATH
-of my zsh.
+(switched to email.  Please respond via emailed reply-to-all, not via the
+bugzilla web interface).
+
+On Sat, 23 Jan 2010 02:11:37 GMT bugzilla-daemon@bugzilla.kernel.org wrote:
+
+> http://bugzilla.kernel.org/show_bug.cgi?id=15111
+> 
+>            Summary: rpath $ORIGIN useless when path contains colon
+>            Product: Process Management
+>            Version: 2.5
+>           Platform: All
+>         OS/Version: Linux
+>               Tree: Mainline
+>             Status: NEW
+>           Severity: normal
+>           Priority: P1
+>          Component: Preemption
+>         AssignedTo: rlove@rlove.org
+>         ReportedBy: they4kman@gmail.com
+>         Regression: No
+> 
+> 
+> I am trying to embed Python into the Source (Half-Life 2) game engine. Many
+> game server providers place servers in paths containing colons (e.g.,
+> /home/srcds/93.76.8.1:27015/). Because of the way my program is called in (it
+> is a shared library), the search path does not include the directory my shared
+> library is in. Thus, I must use an RPATH and the RPATH variable $ORIGIN, which
+> expands to the directory my shared library is in.
+> 
+> Unfortunately, when $ORIGIN is expanded, it contains a colon, and the runtime
+> linker treats it as two individual paths, searching in "/home/srcds/93.76.8.1"
+> and "27015/". The game server providers do not allow access to the directory
+> where the server is run, so it is inconvenient to place the python25.so there.
+> 
+> To reproduce this, write any old C program that requires an external library,
+> and compile it with the following rpath option:
+> -Wl,--rpath,\$$ORIGIN/relative/path/to/library
+> 
+> Place the executable in a path containing colons, and the external library
+> under the directory at the location you specified. When you run the program, it
+> will not be able to locate the external library.
+> 
+
