@@ -1,56 +1,144 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from hrndva-omtalb.mail.rr.com ([71.74.56.124]:34286 "EHLO
+Received: from hrndva-omtalb.mail.rr.com ([71.74.56.125]:46270 "EHLO
 	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757337Ab0BCPtJ (ORCPT
+	with ESMTP id S1757339Ab0BCPtJ (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
 	Wed, 3 Feb 2010 10:49:09 -0500
-Message-Id: <20100203154906.255551521@goodmis.org>
-Date: Wed, 03 Feb 2010 10:46:08 -0500
+Message-Id: <20100203154906.499020585@goodmis.org>
+Date: Wed, 03 Feb 2010 10:46:09 -0500
 From: Steven Rostedt <rostedt@goodmis.org>
-Subject: [PATCH 3/4] kconfig: Look in both /bin and /sbin for lsmod in streamline_config.pl
+Subject: [PATCH 4/4] kconfig: Add LSMOD=file to override the lsmod for localmodconfig
 References: <20100203154605.461025238@goodmis.org>
-Content-Disposition: inline; filename=0003-kconfig-Look-in-both-bin-and-sbin-for-lsmod-in-strea.patch
+Content-Disposition: inline; filename=0004-kconfig-Add-LSMOD-file-to-override-the-lsmod-for-loc.patch
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org
-Cc: linux-kbuild@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>, Anibal Monsalve Salazar <anibal@debian.org>, Michal Marek <mmarek@suse.cz>, Xavier Chantry <shiningxc@gmail.com>
+Cc: linux-kbuild@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>, Anibal Monsalve Salazar <anibal@debian.org>, Michal Marek <mmarek@suse.cz>
 
 From: Steven Rostedt <srostedt@redhat.com>
 
-Distributions now have lsmod in /bin instead of /sbin. But to handle
-both cases, we look for it in /sbin /bin /usr/bin and /usr/sbin.
-If lsmod is not found in any of those paths, it defaults to use
-just lsmod and hopes that it lies in the path of the user.
+Doing the following:
 
-Tested-by: Xavier Chantry <shiningxc@gmail.com>
+	make LSMOD=file localmodconfig
+
+Will make the streamline-config code use the given file instead of
+lsmod. If the file is an executable, it will execute it, otherwise
+it will read it as text.
+
+	make LSMOD=/my/local/path/lsmod localmodconfig
+
+The above will execute the lsmod in /my/local/path instead of the
+lsmods that may be located elsewhere.
+
+	make LSMOD=embedded_board_lsmod localmodconfig
+
+The above will read the "embedded_board_lsmod" as a text file. This
+is useful if you are doing a cross compile and need to run the
+config against modules that exist on an embedded device.
+
+Note, if the LSMOD= file does is not a path, it will add the
+path to the object directory. That is, the above example will look
+for "embedded_board_lsmod" in the directory that the binary will
+be built in (the O=dir directory).
+
 Signed-off-by: Steven Rostedt <rostedt@goodmis.org>
----
- scripts/kconfig/streamline_config.pl |   15 ++++++++++++++-
- 1 files changed, 14 insertions(+), 1 deletions(-)
 
+ On branch config/linus
+---
+ scripts/kconfig/Makefile             |   13 +++++++++-
+ scripts/kconfig/streamline_config.pl |   38 ++++++++++++++++++++++++---------
+ 2 files changed, 38 insertions(+), 13 deletions(-)
+
+diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
+index 006c96f..85b9065 100644
+--- a/scripts/kconfig/Makefile
++++ b/scripts/kconfig/Makefile
+@@ -30,9 +30,18 @@ silentoldconfig: $(obj)/conf
+ 	$(Q)mkdir -p include/generated
+ 	$< -s $(Kconfig)
+ 
++# if no path is given, then use src directory to find file
++ifdef LSMOD
++LSMOD_F = $(shell if [ `basename $(LSMOD)` == $(LSMOD) ]; then \
++		echo $(objtree)/$(LSMOD);			\
++	else							\
++		echo $(LSMOD);					\
++	fi)
++endif
++
+ localmodconfig: $(obj)/streamline_config.pl $(obj)/conf
+ 	$(Q)mkdir -p include/generated
+-	$(Q)perl $< $(srctree) $(Kconfig) > .tmp.config
++	$(Q)perl $< $(srctree) $(Kconfig) $(LSMOD_F) > .tmp.config
+ 	$(Q)if [ -f .config ]; then 				\
+ 			cmp -s .tmp.config .config ||		\
+ 			(mv -f .config .config.old.1;		\
+@@ -47,7 +56,7 @@ localmodconfig: $(obj)/streamline_config.pl $(obj)/conf
+ 
+ localyesconfig: $(obj)/streamline_config.pl $(obj)/conf
+ 	$(Q)mkdir -p include/generated
+-	$(Q)perl $< $(srctree) $(Kconfig) > .tmp.config
++	$(Q)perl $< $(srctree) $(Kconfig) $(LSMOD_F) > .tmp.config
+ 	$(Q)sed -i s/=m/=y/ .tmp.config
+ 	$(Q)if [ -f .config ]; then 				\
+ 			cmp -s .tmp.config .config ||		\
 diff --git a/scripts/kconfig/streamline_config.pl b/scripts/kconfig/streamline_config.pl
-index 9e66fa8..d7f7db7 100644
+index d7f7db7..afbd54a 100644
 --- a/scripts/kconfig/streamline_config.pl
 +++ b/scripts/kconfig/streamline_config.pl
-@@ -264,7 +264,20 @@ foreach my $makefile (@makefiles) {
+@@ -113,6 +113,7 @@ find_config;
+ # Get the build source and top level Kconfig file (passed in)
+ my $ksource = $ARGV[0];
+ my $kconfig = $ARGV[1];
++my $lsmod_file = $ARGV[2];
+ 
+ my @makefiles = `find $ksource -name Makefile`;
+ my %depends;
+@@ -263,21 +264,36 @@ foreach my $makefile (@makefiles) {
+ 
  my %modules;
  
- # see what modules are loaded on this system
--open(LIN,"/sbin/lsmod|") || die "Cant lsmod";
-+my $lsmod;
-+
-+foreach $dir ( ("/sbin", "/bin", "/usr/sbin", "/usr/bin") ) {
-+    if ( -x "$dir/lsmod" ) {
-+	$lsmod = "$dir/lsmod";
-+	last;
+-# see what modules are loaded on this system
+-my $lsmod;
+-
+-foreach $dir ( ("/sbin", "/bin", "/usr/sbin", "/usr/bin") ) {
+-    if ( -x "$dir/lsmod" ) {
+-	$lsmod = "$dir/lsmod";
+-	last;
++if (defined($lsmod_file)) {
++    if ( ! -f $lsmod_file) {
++	die "$lsmod_file not found";
 +    }
-+}
-+if (!defined($lsmod)) {
-+    # try just the path
-+    $lsmod = "lsmod";
-+}
++    if ( -x $lsmod_file) {
++	# the file is executable, run it
++	open(LIN, "$lsmod_file|");
++    } else {
++	# Just read the contents
++	open(LIN, "$lsmod_file");
+     }
++} else {
 +
-+open(LIN,"$lsmod|") || die "Can not call lsmod with $lsmod";
++    # see what modules are loaded on this system
++    my $lsmod;
++
++    foreach $dir ( ("/sbin", "/bin", "/usr/sbin", "/usr/bin") ) {
++	if ( -x "$dir/lsmod" ) {
++	    $lsmod = "$dir/lsmod";
++	    last;
++	}
+ }
+-if (!defined($lsmod)) {
+-    # try just the path
+-    $lsmod = "lsmod";
++    if (!defined($lsmod)) {
++	# try just the path
++	$lsmod = "lsmod";
++    }
++
++    open(LIN,"$lsmod|") || die "Can not call lsmod with $lsmod";
+ }
+ 
+-open(LIN,"$lsmod|") || die "Can not call lsmod with $lsmod";
  while (<LIN>) {
  	next if (/^Module/);  # Skip the first line.
  	if (/^(\S+)/) {
