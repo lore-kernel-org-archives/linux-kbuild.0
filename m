@@ -1,55 +1,59 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from hrndva-omtalb.mail.rr.com ([71.74.56.125]:46273 "EHLO
+Received: from hrndva-omtalb.mail.rr.com ([71.74.56.124]:34286 "EHLO
 	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756809Ab0BCPtI (ORCPT
+	with ESMTP id S1757337Ab0BCPtJ (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 3 Feb 2010 10:49:08 -0500
-Message-Id: <20100203154905.668154805@goodmis.org>
-Date: Wed, 03 Feb 2010 10:46:06 -0500
+	Wed, 3 Feb 2010 10:49:09 -0500
+Message-Id: <20100203154906.255551521@goodmis.org>
+Date: Wed, 03 Feb 2010 10:46:08 -0500
 From: Steven Rostedt <rostedt@goodmis.org>
-Subject: [PATCH 1/4] kconfig: Create include/generated for localmodconfig
+Subject: [PATCH 3/4] kconfig: Look in both /bin and /sbin for lsmod in streamline_config.pl
 References: <20100203154605.461025238@goodmis.org>
-Content-Disposition: inline; filename=0001-kconfig-Create-include-generated-for-localmodconfig.patch
+Content-Disposition: inline; filename=0003-kconfig-Look-in-both-bin-and-sbin-for-lsmod-in-strea.patch
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org
-Cc: linux-kbuild@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>, Anibal Monsalve Salazar <anibal@debian.org>, Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>, Anibal Monsalve Salazar <anibal@debian.org>, Michal Marek <mmarek@suse.cz>, Xavier Chantry <shiningxc@gmail.com>
 
 From: Steven Rostedt <srostedt@redhat.com>
 
-If someone downloads a brand new kernel and runs localmodconfig or
-localyesconfig, the ending result will report:
+Distributions now have lsmod in /bin instead of /sbin. But to handle
+both cases, we look for it in /sbin /bin /usr/bin and /usr/sbin.
+If lsmod is not found in any of those paths, it defaults to use
+just lsmod and hopes that it lies in the path of the user.
 
- *** Error during update of the kernel configuration.
-
-This is because localmodconfig and localyesconfig must create the
-include/generated directory to place the autoconf.h file.
-
+Tested-by: Xavier Chantry <shiningxc@gmail.com>
 Signed-off-by: Steven Rostedt <rostedt@goodmis.org>
 ---
- scripts/kconfig/Makefile |    2 ++
- 1 files changed, 2 insertions(+), 0 deletions(-)
+ scripts/kconfig/streamline_config.pl |   15 ++++++++++++++-
+ 1 files changed, 14 insertions(+), 1 deletions(-)
 
-diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
-index 999e8a7..006c96f 100644
---- a/scripts/kconfig/Makefile
-+++ b/scripts/kconfig/Makefile
-@@ -31,6 +31,7 @@ silentoldconfig: $(obj)/conf
- 	$< -s $(Kconfig)
+diff --git a/scripts/kconfig/streamline_config.pl b/scripts/kconfig/streamline_config.pl
+index 9e66fa8..d7f7db7 100644
+--- a/scripts/kconfig/streamline_config.pl
++++ b/scripts/kconfig/streamline_config.pl
+@@ -264,7 +264,20 @@ foreach my $makefile (@makefiles) {
+ my %modules;
  
- localmodconfig: $(obj)/streamline_config.pl $(obj)/conf
-+	$(Q)mkdir -p include/generated
- 	$(Q)perl $< $(srctree) $(Kconfig) > .tmp.config
- 	$(Q)if [ -f .config ]; then 				\
- 			cmp -s .tmp.config .config ||		\
-@@ -45,6 +46,7 @@ localmodconfig: $(obj)/streamline_config.pl $(obj)/conf
- 	$(Q)rm -f .tmp.config
- 
- localyesconfig: $(obj)/streamline_config.pl $(obj)/conf
-+	$(Q)mkdir -p include/generated
- 	$(Q)perl $< $(srctree) $(Kconfig) > .tmp.config
- 	$(Q)sed -i s/=m/=y/ .tmp.config
- 	$(Q)if [ -f .config ]; then 				\
+ # see what modules are loaded on this system
+-open(LIN,"/sbin/lsmod|") || die "Cant lsmod";
++my $lsmod;
++
++foreach $dir ( ("/sbin", "/bin", "/usr/sbin", "/usr/bin") ) {
++    if ( -x "$dir/lsmod" ) {
++	$lsmod = "$dir/lsmod";
++	last;
++    }
++}
++if (!defined($lsmod)) {
++    # try just the path
++    $lsmod = "lsmod";
++}
++
++open(LIN,"$lsmod|") || die "Can not call lsmod with $lsmod";
+ while (<LIN>) {
+ 	next if (/^Module/);  # Skip the first line.
+ 	if (/^(\S+)/) {
 -- 
 1.6.5
 
