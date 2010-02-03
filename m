@@ -1,96 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from hrndva-omtalb.mail.rr.com ([71.74.56.124]:38896 "EHLO
-	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757338Ab0BCPtJ (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 3 Feb 2010 10:49:09 -0500
-Message-Id: <20100203154905.979883839@goodmis.org>
-Date: Wed, 03 Feb 2010 10:46:07 -0500
-From: Steven Rostedt <rostedt@goodmis.org>
-Subject: [PATCH 2/4] kconfig: Check for if conditions in Kconfig for localmodconfig
+Received: from cantor.suse.de ([195.135.220.2]:38923 "EHLO mx1.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S932512Ab0BCQHK (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 3 Feb 2010 11:07:10 -0500
+Date: Wed, 3 Feb 2010 17:07:09 +0100
+From: Michal Marek <mmarek@suse.cz>
+Subject: Re: [PATCH 4/4] kconfig: Add LSMOD=file to override the lsmod for
+ localmodconfig
+Message-ID: <20100203160708.GA9035@sepie.suse.cz>
 References: <20100203154605.461025238@goodmis.org>
-Content-Disposition: inline; filename=0002-kconfig-Check-for-if-conditions-in-Kconfig-for-local.patch
+ <20100203154906.499020585@goodmis.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20100203154906.499020585@goodmis.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: linux-kbuild@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>, Anibal Monsalve Salazar <anibal@debian.org>, Michal Marek <mmarek@suse.cz>, Anton Blanchard <anton@sambo.org>
+To: Steven Rostedt <rostedt@goodmis.org>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>, Anibal Monsalve Salazar <anibal@debian.org>
 
-From: Steven Rostedt <srostedt@redhat.com>
+On Wed, Feb 03, 2010 at 10:46:09AM -0500, Steven Rostedt wrote:
+> +# if no path is given, then use src directory to find file
+> +ifdef LSMOD
+> +LSMOD_F = $(shell if [ `basename $(LSMOD)` == $(LSMOD) ]; then \
+> +		echo $(objtree)/$(LSMOD);			\
+> +	else							\
+> +		echo $(LSMOD);					\
+> +	fi)
+> +endif
 
-The streamline_config.pl misses the if conditions for checking
-dependencies. For Kconfigs with the following construct:
+You can do this within make like:
 
- if MEDIA_SUPPORT
+ifdef LSMOD
+LSMOD_F := $(LSMOD)
+ifeq ($(findstring /,$(LSMOD)),)
+  LSMOD_F := $(objtree)/$(LSMOD)
+endif
+endif
 
- config VIDEO_DEV
-
- [...]
-
-If VIDEO_DEV was enabled, the script will miss the fact that MEDIA_SUPPORT
-is also needed.
-
-This patch changes streamline_config.pl to include if conditions into
-the dependencies of configs.
-
-Reported-by: Anton Blanchard <anton@sambo.org>
-Tested-by: Anton Blanchard <anton@sambo.org>
-Signed-off-by: Steven Rostedt <rostedt@goodmis.org>
----
- scripts/kconfig/streamline_config.pl |   26 ++++++++++++++++++++++++++
- 1 files changed, 26 insertions(+), 0 deletions(-)
-
-diff --git a/scripts/kconfig/streamline_config.pl b/scripts/kconfig/streamline_config.pl
-index 0d80082..9e66fa8 100644
---- a/scripts/kconfig/streamline_config.pl
-+++ b/scripts/kconfig/streamline_config.pl
-@@ -121,6 +121,8 @@ my %prompts;
- my %objects;
- my $var;
- my $cont = 0;
-+my $iflevel = 0;
-+my @ifdeps;
- 
- # prevent recursion
- my %read_kconfigs;
-@@ -146,6 +148,15 @@ sub read_kconfig {
- 	    $state = "NEW";
- 	    $config = $1;
- 
-+	    for (my $i = 0; $i < $iflevel; $i++) {
-+		if ($i) {
-+		    $depends{$config} .= " " . $ifdeps[$i];
-+		} else {
-+		    $depends{$config} = $ifdeps[$i];
-+		}
-+		$state = "DEP";
-+	    }
-+
- 	# collect the depends for the config
- 	} elsif ($state eq "NEW" && /^\s*depends\s+on\s+(.*)$/) {
- 	    $state = "DEP";
-@@ -166,6 +177,21 @@ sub read_kconfig {
- 	    # note if the config has a prompt
- 	    $prompt{$config} = 1;
- 
-+	# Check for if statements
-+	} elsif (/^if\s+(.*\S)\s*$/) {
-+	    my $deps = $1;
-+	    # remove beginning and ending non text
-+	    $deps =~ s/^[^a-zA-Z0-9_]*//;
-+	    $deps =~ s/[^a-zA-Z0-9_]*$//;
-+
-+	    my @deps = split /[^a-zA-Z0-9_]+/, $deps;
-+
-+	    $ifdeps[$iflevel++] = join ':', @deps;
-+
-+	} elsif (/^endif/) {
-+
-+	    $iflevel-- if ($iflevel);
-+
- 	# stop on "help"
- 	} elsif (/^\s*help\s*$/) {
- 	    $state = "NONE";
--- 
-1.6.5
-
-
+Michal
