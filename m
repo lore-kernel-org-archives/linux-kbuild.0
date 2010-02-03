@@ -1,50 +1,76 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:34683 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1756762Ab0BCQUP (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 3 Feb 2010 11:20:15 -0500
-Date: Wed, 3 Feb 2010 17:20:14 +0100
-From: Michal Marek <mmarek@suse.cz>
-Subject: [PATCH] kconfig: simplify LSMOD= handling
-Message-ID: <20100203162014.GA10956@sepie.suse.cz>
-References: <20100203154605.461025238@goodmis.org>
- <20100203154906.499020585@goodmis.org>
- <20100203160708.GA9035@sepie.suse.cz>
- <1265213553.24386.0.camel@gandalf.stny.rr.com>
+Received: from mail.gmx.net ([213.165.64.20]:59367 "HELO mail.gmx.net"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with SMTP
+	id S1757352Ab0BCQZU (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 3 Feb 2010 11:25:20 -0500
+Date: Wed, 3 Feb 2010 17:25:27 +0100 (CET)
+From: Guennadi Liakhovetski <g.liakhovetski@gmx.de>
+Subject: tags: include headers before source files
+Message-ID: <Pine.LNX.4.64.1002031704550.6324@axis700.grange>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1265213553.24386.0.camel@gandalf.stny.rr.com>
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Steven Rostedt <rostedt@goodmis.org>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>, Anibal Monsalve Salazar <anibal@debian.org>
+To: linux-kernel@vger.kernel.org
+Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
 
-Signed-off-by: Michal Marek <mmarek@suse.cz>
+Currently looking up a structure definition in TAGS / tags takes one to 
+one of multiple "static struct X" definitions in arch sources, which makes 
+it for many structs practically impossible to get to the required header. 
+This patch changes the order of sources being tagged to first scan 
+architecture includes, then the top-level include/ directory, and only 
+then the rest. It also takes into account, that many architectures have 
+more than one include directory, i.e., not only arch/$ARCH/include, but 
+also arch/$ARCH/mach-X/include etc.
+
+Signed-off-by: Guennadi Liakhovetski <g.liakhovetski@gmx.de>
 ---
- scripts/kconfig/Makefile |    9 ++++-----
- 1 files changed, 4 insertions(+), 5 deletions(-)
 
-diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
-index 85b9065..186c466 100644
---- a/scripts/kconfig/Makefile
-+++ b/scripts/kconfig/Makefile
-@@ -32,11 +32,10 @@ silentoldconfig: $(obj)/conf
- 
- # if no path is given, then use src directory to find file
- ifdef LSMOD
--LSMOD_F = $(shell if [ `basename $(LSMOD)` == $(LSMOD) ]; then \
--		echo $(objtree)/$(LSMOD);			\
--	else							\
--		echo $(LSMOD);					\
--	fi)
-+LSMOD_F := $(LSMOD)
-+ifeq ($(findstring /,$(LSMOD)),)
-+  LSMOD_F := $(objtree)/$(LSMOD)
-+endif
- endif
- 
- localmodconfig: $(obj)/streamline_config.pl $(obj)/conf
--- 
-1.6.5.3
+I am no expert in Kbuild, so, please, review, comment, suggest 
+improvements, but at least, this does make TAGS usable for me.
 
+diff --git a/scripts/tags.sh b/scripts/tags.sh
+index 1a0c44d..b84ce1c 100755
+--- a/scripts/tags.sh
++++ b/scripts/tags.sh
+@@ -32,13 +32,18 @@ fi
+ # find sources in arch/$ARCH
+ find_arch_sources()
+ {
+-	find ${tree}arch/$1 $ignore -name "$2" -print;
++	for i in $archincludedir; do
++		prune+="-wholename $i -prune -o "
++	done
++	find ${tree}arch/$1 $ignore $prune -name "$2" -print;
+ }
+ 
+ # find sources in arch/$1/include
+ find_arch_include_sources()
+ {
+-	find ${tree}arch/$1/include $ignore -name "$2" -print;
++	include=$(find ${tree}arch/$1/ -name include -type d);
++	archincludedir+=$include
++	find $include $ignore -name "$2" -print;
+ }
+ 
+ # find sources in include/
+@@ -63,14 +68,15 @@ find_sources()
+ 
+ all_sources()
+ {
+-	for arch in $ALLSOURCE_ARCHS
+-	do
+-		find_sources $arch '*.[chS]'
+-	done
++	find_arch_include_sources $ARCH '*.[chS]'
+ 	if [ ! -z "$archinclude" ]; then
+ 		find_arch_include_sources $archinclude '*.[chS]'
+ 	fi
+ 	find_include_sources '*.[chS]'
++	for arch in $ALLSOURCE_ARCHS
++	do
++		find_sources $arch '*.[chS]'
++	done
+ 	find_other_sources '*.[chS]'
+ }
+ 
