@@ -1,71 +1,23 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from hrndva-omtalb.mail.rr.com ([71.74.56.125]:41028 "EHLO
-	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932569Ab0BCQtg (ORCPT
+Received: from 88-97-204-164.dsl.zen.co.uk ([88.97.204.164]:16238 "EHLO
+	phoenixdental.co.uk" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1752736Ab0BCShK (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 3 Feb 2010 11:49:36 -0500
-Subject: [PATCH][linux-next] kconfig: simplify LSMOD= handling
-From: Steven Rostedt <rostedt@goodmis.org>
-Reply-To: rostedt@goodmis.org
-In-Reply-To: <20100203162014.GA10956@sepie.suse.cz>
-References: <20100203154605.461025238@goodmis.org>
-	 <20100203154906.499020585@goodmis.org>
-	 <20100203160708.GA9035@sepie.suse.cz>
-	 <1265213553.24386.0.camel@gandalf.stny.rr.com>
-	 <20100203162014.GA10956@sepie.suse.cz>
-Content-Type: text/plain; charset="ISO-8859-15"
-Date: Wed, 03 Feb 2010 11:49:21 -0500
-Message-ID: <1265215761.24386.5.camel@gandalf.stny.rr.com>
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+	Wed, 3 Feb 2010 13:37:10 -0500
+Subject: Doctor Database in the USA
+Reply-To: bobfreeman2006@gmail.com
+From: "crewel" <judy34@gmail.com>
+Message-ID: <PDSVMSoFkHAXEy4fQbP000003de@phoenixdental.co.uk>
+Date: 3 Feb 2010 17:04:03 +0000
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>, Anibal Monsalve Salazar <anibal@debian.org>
+To: links@teethwhiteningweb.com, k.russell@edenbrown.com, juanademora@gmail.com, linda.long@uc.edu, linux-il@cs.huji.ac.il
+
+You can reach me at my other email address for details:    Olivia.Dodd@leadsparadise.com
+
+  
 
 
-This has been merged into my for-next branch:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/rostedt/linux-2.6-kconfig.git
-for-linus-2
 
 
-Michal Marek (1):
-      kconfig: Simplify LSMOD= handling
-
-----
- scripts/kconfig/Makefile |    9 ++++-----
- 1 files changed, 4 insertions(+), 5 deletions(-)
----------------------------
-commit 3cebbb81c7e75321e25cc586d07a25a3d98278fc
-Author: Michal Marek <mmarek@suse.cz>
-Date:   Wed Feb 3 17:20:14 2010 +0100
-
-    kconfig: Simplify LSMOD= handling
-    
-    Signed-off-by: Michal Marek <mmarek@suse.cz>
-    LKML-Reference: <20100203162014.GA10956@sepie.suse.cz>
-    Signed-off-by: Steven Rostedt <rostedt@goodmis.org>
-
-diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
-index 85b9065..186c466 100644
---- a/scripts/kconfig/Makefile
-+++ b/scripts/kconfig/Makefile
-@@ -32,11 +32,10 @@ silentoldconfig: $(obj)/conf
- 
- # if no path is given, then use src directory to find file
- ifdef LSMOD
--LSMOD_F = $(shell if [ `basename $(LSMOD)` == $(LSMOD) ]; then \
--		echo $(objtree)/$(LSMOD);			\
--	else							\
--		echo $(LSMOD);					\
--	fi)
-+LSMOD_F := $(LSMOD)
-+ifeq ($(findstring /,$(LSMOD)),)
-+  LSMOD_F := $(objtree)/$(LSMOD)
-+endif
- endif
- 
- localmodconfig: $(obj)/streamline_config.pl $(obj)/conf
-
-
+To invoke no further correspondence status please send an email to disappear@leadsparadise.com
