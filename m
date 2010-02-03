@@ -1,147 +1,95 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from hrndva-omtalb.mail.rr.com ([71.74.56.125]:46270 "EHLO
+Received: from hrndva-omtalb.mail.rr.com ([71.74.56.124]:38896 "EHLO
 	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757339Ab0BCPtJ (ORCPT
+	with ESMTP id S1757338Ab0BCPtJ (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
 	Wed, 3 Feb 2010 10:49:09 -0500
-Message-Id: <20100203154906.499020585@goodmis.org>
-Date: Wed, 03 Feb 2010 10:46:09 -0500
+Message-Id: <20100203154905.979883839@goodmis.org>
+Date: Wed, 03 Feb 2010 10:46:07 -0500
 From: Steven Rostedt <rostedt@goodmis.org>
-Subject: [PATCH 4/4] kconfig: Add LSMOD=file to override the lsmod for localmodconfig
+Subject: [PATCH 2/4] kconfig: Check for if conditions in Kconfig for localmodconfig
 References: <20100203154605.461025238@goodmis.org>
-Content-Disposition: inline; filename=0004-kconfig-Add-LSMOD-file-to-override-the-lsmod-for-loc.patch
+Content-Disposition: inline; filename=0002-kconfig-Check-for-if-conditions-in-Kconfig-for-local.patch
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org
-Cc: linux-kbuild@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>, Anibal Monsalve Salazar <anibal@debian.org>, Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>, Anibal Monsalve Salazar <anibal@debian.org>, Michal Marek <mmarek@suse.cz>, Anton Blanchard <anton@sambo.org>
 
 From: Steven Rostedt <srostedt@redhat.com>
 
-Doing the following:
+The streamline_config.pl misses the if conditions for checking
+dependencies. For Kconfigs with the following construct:
 
-	make LSMOD=file localmodconfig
+ if MEDIA_SUPPORT
 
-Will make the streamline-config code use the given file instead of
-lsmod. If the file is an executable, it will execute it, otherwise
-it will read it as text.
+ config VIDEO_DEV
 
-	make LSMOD=/my/local/path/lsmod localmodconfig
+ [...]
 
-The above will execute the lsmod in /my/local/path instead of the
-lsmods that may be located elsewhere.
+If VIDEO_DEV was enabled, the script will miss the fact that MEDIA_SUPPORT
+is also needed.
 
-	make LSMOD=embedded_board_lsmod localmodconfig
+This patch changes streamline_config.pl to include if conditions into
+the dependencies of configs.
 
-The above will read the "embedded_board_lsmod" as a text file. This
-is useful if you are doing a cross compile and need to run the
-config against modules that exist on an embedded device.
-
-Note, if the LSMOD= file does is not a path, it will add the
-path to the object directory. That is, the above example will look
-for "embedded_board_lsmod" in the directory that the binary will
-be built in (the O=dir directory).
-
+Reported-by: Anton Blanchard <anton@sambo.org>
+Tested-by: Anton Blanchard <anton@sambo.org>
 Signed-off-by: Steven Rostedt <rostedt@goodmis.org>
-
- On branch config/linus
 ---
- scripts/kconfig/Makefile             |   13 +++++++++-
- scripts/kconfig/streamline_config.pl |   38 ++++++++++++++++++++++++---------
- 2 files changed, 38 insertions(+), 13 deletions(-)
+ scripts/kconfig/streamline_config.pl |   26 ++++++++++++++++++++++++++
+ 1 files changed, 26 insertions(+), 0 deletions(-)
 
-diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
-index 006c96f..85b9065 100644
---- a/scripts/kconfig/Makefile
-+++ b/scripts/kconfig/Makefile
-@@ -30,9 +30,18 @@ silentoldconfig: $(obj)/conf
- 	$(Q)mkdir -p include/generated
- 	$< -s $(Kconfig)
- 
-+# if no path is given, then use src directory to find file
-+ifdef LSMOD
-+LSMOD_F = $(shell if [ `basename $(LSMOD)` == $(LSMOD) ]; then \
-+		echo $(objtree)/$(LSMOD);			\
-+	else							\
-+		echo $(LSMOD);					\
-+	fi)
-+endif
-+
- localmodconfig: $(obj)/streamline_config.pl $(obj)/conf
- 	$(Q)mkdir -p include/generated
--	$(Q)perl $< $(srctree) $(Kconfig) > .tmp.config
-+	$(Q)perl $< $(srctree) $(Kconfig) $(LSMOD_F) > .tmp.config
- 	$(Q)if [ -f .config ]; then 				\
- 			cmp -s .tmp.config .config ||		\
- 			(mv -f .config .config.old.1;		\
-@@ -47,7 +56,7 @@ localmodconfig: $(obj)/streamline_config.pl $(obj)/conf
- 
- localyesconfig: $(obj)/streamline_config.pl $(obj)/conf
- 	$(Q)mkdir -p include/generated
--	$(Q)perl $< $(srctree) $(Kconfig) > .tmp.config
-+	$(Q)perl $< $(srctree) $(Kconfig) $(LSMOD_F) > .tmp.config
- 	$(Q)sed -i s/=m/=y/ .tmp.config
- 	$(Q)if [ -f .config ]; then 				\
- 			cmp -s .tmp.config .config ||		\
 diff --git a/scripts/kconfig/streamline_config.pl b/scripts/kconfig/streamline_config.pl
-index d7f7db7..afbd54a 100644
+index 0d80082..9e66fa8 100644
 --- a/scripts/kconfig/streamline_config.pl
 +++ b/scripts/kconfig/streamline_config.pl
-@@ -113,6 +113,7 @@ find_config;
- # Get the build source and top level Kconfig file (passed in)
- my $ksource = $ARGV[0];
- my $kconfig = $ARGV[1];
-+my $lsmod_file = $ARGV[2];
+@@ -121,6 +121,8 @@ my %prompts;
+ my %objects;
+ my $var;
+ my $cont = 0;
++my $iflevel = 0;
++my @ifdeps;
  
- my @makefiles = `find $ksource -name Makefile`;
- my %depends;
-@@ -263,21 +264,36 @@ foreach my $makefile (@makefiles) {
+ # prevent recursion
+ my %read_kconfigs;
+@@ -146,6 +148,15 @@ sub read_kconfig {
+ 	    $state = "NEW";
+ 	    $config = $1;
  
- my %modules;
- 
--# see what modules are loaded on this system
--my $lsmod;
--
--foreach $dir ( ("/sbin", "/bin", "/usr/sbin", "/usr/bin") ) {
--    if ( -x "$dir/lsmod" ) {
--	$lsmod = "$dir/lsmod";
--	last;
-+if (defined($lsmod_file)) {
-+    if ( ! -f $lsmod_file) {
-+	die "$lsmod_file not found";
-+    }
-+    if ( -x $lsmod_file) {
-+	# the file is executable, run it
-+	open(LIN, "$lsmod_file|");
-+    } else {
-+	# Just read the contents
-+	open(LIN, "$lsmod_file");
-     }
-+} else {
++	    for (my $i = 0; $i < $iflevel; $i++) {
++		if ($i) {
++		    $depends{$config} .= " " . $ifdeps[$i];
++		} else {
++		    $depends{$config} = $ifdeps[$i];
++		}
++		$state = "DEP";
++	    }
 +
-+    # see what modules are loaded on this system
-+    my $lsmod;
-+
-+    foreach $dir ( ("/sbin", "/bin", "/usr/sbin", "/usr/bin") ) {
-+	if ( -x "$dir/lsmod" ) {
-+	    $lsmod = "$dir/lsmod";
-+	    last;
-+	}
- }
--if (!defined($lsmod)) {
--    # try just the path
--    $lsmod = "lsmod";
-+    if (!defined($lsmod)) {
-+	# try just the path
-+	$lsmod = "lsmod";
-+    }
-+
-+    open(LIN,"$lsmod|") || die "Can not call lsmod with $lsmod";
- }
+ 	# collect the depends for the config
+ 	} elsif ($state eq "NEW" && /^\s*depends\s+on\s+(.*)$/) {
+ 	    $state = "DEP";
+@@ -166,6 +177,21 @@ sub read_kconfig {
+ 	    # note if the config has a prompt
+ 	    $prompt{$config} = 1;
  
--open(LIN,"$lsmod|") || die "Can not call lsmod with $lsmod";
- while (<LIN>) {
- 	next if (/^Module/);  # Skip the first line.
- 	if (/^(\S+)/) {
++	# Check for if statements
++	} elsif (/^if\s+(.*\S)\s*$/) {
++	    my $deps = $1;
++	    # remove beginning and ending non text
++	    $deps =~ s/^[^a-zA-Z0-9_]*//;
++	    $deps =~ s/[^a-zA-Z0-9_]*$//;
++
++	    my @deps = split /[^a-zA-Z0-9_]+/, $deps;
++
++	    $ifdeps[$iflevel++] = join ':', @deps;
++
++	} elsif (/^endif/) {
++
++	    $iflevel-- if ($iflevel);
++
+ 	# stop on "help"
+ 	} elsif (/^\s*help\s*$/) {
+ 	    $state = "NONE";
 -- 
 1.6.5
 
