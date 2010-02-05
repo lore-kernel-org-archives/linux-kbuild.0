@@ -1,23 +1,48 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from 88-97-204-164.dsl.zen.co.uk ([88.97.204.164]:16238 "EHLO
-	phoenixdental.co.uk" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1752736Ab0BCShK (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 3 Feb 2010 13:37:10 -0500
-Subject: Doctor Database in the USA
-Reply-To: bobfreeman2006@gmail.com
-From: "crewel" <judy34@gmail.com>
-Message-ID: <PDSVMSoFkHAXEy4fQbP000003de@phoenixdental.co.uk>
-Date: 3 Feb 2010 17:04:03 +0000
+Received: from cantor.suse.de ([195.135.220.2]:40878 "EHLO mx1.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S933863Ab0BEV7K (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 5 Feb 2010 16:59:10 -0500
+Message-ID: <4B6C94AC.7000301@suse.cz>
+Date: Fri, 05 Feb 2010 22:59:08 +0100
+From: Michal Marek <mmarek@suse.cz>
+MIME-Version: 1.0
+Subject: Re: tags: include headers before source files
+References: <Pine.LNX.4.64.1002031704550.6324@axis700.grange>
+In-Reply-To: <Pine.LNX.4.64.1002031704550.6324@axis700.grange>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: links@teethwhiteningweb.com, k.russell@edenbrown.com, juanademora@gmail.com, linda.long@uc.edu, linux-il@cs.huji.ac.il
+To: Guennadi Liakhovetski <g.liakhovetski@gmx.de>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-You can reach me at my other email address for details:    Olivia.Dodd@leadsparadise.com
+On 3.2.2010 17:25, Guennadi Liakhovetski wrote:
+> Currently looking up a structure definition in TAGS / tags takes one to 
+> one of multiple "static struct X" definitions in arch sources, which makes 
+> it for many structs practically impossible to get to the required header. 
+> This patch changes the order of sources being tagged to first scan 
+> architecture includes, then the top-level include/ directory, and only 
+> then the rest. It also takes into account, that many architectures have 
+> more than one include directory, i.e., not only arch/$ARCH/include, but 
+> also arch/$ARCH/mach-X/include etc.
 
-  
+Hi Guennadi
+
+This is a cool idea, but there is one issue:
 
 
+>  # find sources in arch/$1/include
+>  find_arch_include_sources()
+>  {
+> -	find ${tree}arch/$1/include $ignore -name "$2" -print;
+> +	include=$(find ${tree}arch/$1/ -name include -type d);
+> +	archincludedir+=$include
+> +	find $include $ignore -name "$2" -print;
 
+You need to check if $include isn't empty, which it is on i386 or x86_64
+(and on other archs where $ARCH != $SRCARCH). If I do a 'make cscope'
+after your change, the second find statement crawls the whole filesystem.
 
-To invoke no further correspondence status please send an email to disappear@leadsparadise.com
+Michal
+
