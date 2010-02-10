@@ -1,82 +1,36 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.gmx.net ([213.165.64.20]:40754 "HELO mail.gmx.net"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with SMTP
-	id S1756460Ab0BGXZm (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 7 Feb 2010 18:25:42 -0500
-Date: Mon, 8 Feb 2010 00:25:59 +0100 (CET)
-From: Guennadi Liakhovetski <g.liakhovetski@gmx.de>
-Subject: [PATCH v2] tags: include headers before source files
-In-Reply-To: <4B6C94AC.7000301@suse.cz>
-Message-ID: <Pine.LNX.4.64.1002080022290.15951@axis700.grange>
-References: <Pine.LNX.4.64.1002031704550.6324@axis700.grange> <4B6C94AC.7000301@suse.cz>
+Received: from cs125.vk.com ([93.186.224.125]:42200 "EHLO vk.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1751141Ab0BJGYy (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 10 Feb 2010 01:24:54 -0500
+Received: from localhost
+	([127.0.0.1] helo=localhost.localdomain ident=www-data)
+	by vk.com with esmtp (Exim 4.63)
+	(envelope-from <noreply@vk.com>)
+	id 1Nf60L-00018F-MP
+	for linux-kbuild@vger.kernel.org; Wed, 10 Feb 2010 09:24:53 +0300
+Date: Wed, 10 Feb 2010 09:24:53 +0300
+From: VK <noreply@vk.com>
+Reply-to: VK <noreply@vk.com>
+Subject: Sergey Hnykin vi ha aggiunto tra gli amici nel sito vkontakte.ru
+Message-ID: <0409ca9fc0cec5c9759127521e9743c1@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: linux-kbuild <linux-kbuild@vger.kernel.org>
 
-Currently looking up a structure definition in TAGS / tags takes one to
-one of multiple "static struct X" definitions in arch sources, which makes
-it for many structs practically impossible to get to the required header.
-This patch changes the order of sources being tagged to first scan
-architecture includes, then the top-level include/ directory, and only
-then the rest. It also takes into account, that many architectures have
-more than one include directory, i.e., not only arch/$ARCH/include, but
-also arch/$ARCH/mach-X/include etc.
+gentile ...
 
-Signed-off-by: Guennadi Liakhovetski <g.liakhovetski@gmx.de>
-Reviewed-by: WANG Cong <xiyou.wangcong@gmail.com>
----
+Ora può entrare nel sito e guardare le pagine dei Suoi amici, utilizzando la Sua e-mail e la parola d&#39;ordine (password) generata automaticamente.
 
-v1 -> v2:
+VKONTAKTE.ru è un sito, che quotidianamente aiuta dieci milioni di persone a ritrovare vecchi amici, intrattenersi con loro in rete e condividere fotografie e avvenimenti della vita.
 
-1. check if $include variable is not empty - thanks, Michal, for testing
+Per entrare nel sito, clicchi sul link sottostante:
 
-diff --git a/scripts/tags.sh b/scripts/tags.sh
-index 1a0c44d..6f0985d 100755
---- a/scripts/tags.sh
-+++ b/scripts/tags.sh
-@@ -32,13 +32,20 @@ fi
- # find sources in arch/$ARCH
- find_arch_sources()
- {
--	find ${tree}arch/$1 $ignore -name "$2" -print;
-+	for i in $archincludedir; do
-+		prune+="-wholename $i -prune -o "
-+	done
-+	find ${tree}arch/$1 $ignore $prune -name "$2" -print;
- }
- 
- # find sources in arch/$1/include
- find_arch_include_sources()
- {
--	find ${tree}arch/$1/include $ignore -name "$2" -print;
-+	include=$(find ${tree}arch/$1/ -name include -type d);
-+	if [ -n "$include" ]; then
-+		archincludedir+="$include "
-+		find $include $ignore -name "$2" -print;
-+	fi
- }
- 
- # find sources in include/
-@@ -63,14 +70,15 @@ find_sources()
- 
- all_sources()
- {
--	for arch in $ALLSOURCE_ARCHS
--	do
--		find_sources $arch '*.[chS]'
--	done
-+	find_arch_include_sources ${ARCH} '*.[chS]'
- 	if [ ! -z "$archinclude" ]; then
- 		find_arch_include_sources $archinclude '*.[chS]'
- 	fi
- 	find_include_sources '*.[chS]'
-+	for arch in $ALLSOURCE_ARCHS
-+	do
-+		find_sources $arch '*.[chS]'
-+	done
- 	find_other_sources '*.[chS]'
- }
- 
+ATTENZIONE: la Sua registrazione non sarà attiva se ignorerà questo invito.
+
+Buon divertimento!
+
+
