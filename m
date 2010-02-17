@@ -1,49 +1,63 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.mnsspb.ru ([84.204.75.2]:47824 "EHLO mail.mnsspb.ru"
+Received: from cantor.suse.de ([195.135.220.2]:34746 "EHLO mx1.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S934176Ab0BQJE5 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 17 Feb 2010 04:04:57 -0500
-From: Kirill Smelkov <kirr@mns.spb.ru>
-Subject: [PATCH] kbuild: fix a couple of typos in Documentation
-Date: Wed, 17 Feb 2010 11:45:33 +0300
-Message-Id: <1266396333-6916-1-git-send-email-kirr@mns.spb.ru>
+	id S1751215Ab0BQNFM (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 17 Feb 2010 08:05:12 -0500
+Message-ID: <4B7BE984.60107@suse.cz>
+Date: Wed, 17 Feb 2010 14:05:08 +0100
+From: Michal Marek <mmarek@suse.cz>
+MIME-Version: 1.0
+Subject: Re: [PATCH v2] tags: include headers before source files
+References: <Pine.LNX.4.64.1002031704550.6324@axis700.grange> <4B6C94AC.7000301@suse.cz> <Pine.LNX.4.64.1002080022290.15951@axis700.grange>
+In-Reply-To: <Pine.LNX.4.64.1002080022290.15951@axis700.grange>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org, Kirill Smelkov <kirr@mns.spb.ru>
+To: Guennadi Liakhovetski <g.liakhovetski@gmx.de>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-Signed-off-by: Kirill Smelkov <kirr@mns.spb.ru>
----
- Documentation/kbuild/kbuild.txt    |    2 +-
- Documentation/kbuild/makefiles.txt |    2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+On 8.2.2010 00:25, Guennadi Liakhovetski wrote:
+> Currently looking up a structure definition in TAGS / tags takes one to
+> one of multiple "static struct X" definitions in arch sources, which makes
+> it for many structs practically impossible to get to the required header.
+> This patch changes the order of sources being tagged to first scan
+> architecture includes, then the top-level include/ directory, and only
+> then the rest. It also takes into account, that many architectures have
+> more than one include directory, i.e., not only arch/$ARCH/include, but
+> also arch/$ARCH/mach-X/include etc.
+> 
+> Signed-off-by: Guennadi Liakhovetski <g.liakhovetski@gmx.de>
+> Reviewed-by: WANG Cong <xiyou.wangcong@gmail.com>
+> ---
+> 
+> v1 -> v2:
+> 
+> 1. check if $include variable is not empty - thanks, Michal, for testing
 
-diff --git a/Documentation/kbuild/kbuild.txt b/Documentation/kbuild/kbuild.txt
-index 6f8c1ca..84725b7 100644
---- a/Documentation/kbuild/kbuild.txt
-+++ b/Documentation/kbuild/kbuild.txt
-@@ -65,7 +65,7 @@ CROSS_COMPILE
- Specify an optional fixed part of the binutils filename.
- CROSS_COMPILE can be a part of the filename or the full path.
- 
--CROSS_COMPILE is also used for ccache is some setups.
-+CROSS_COMPILE is also used for ccache in some setups.
- 
- CF
- --------------------------------------------------
-diff --git a/Documentation/kbuild/makefiles.txt b/Documentation/kbuild/makefiles.txt
-index 71c602d..0135155 100644
---- a/Documentation/kbuild/makefiles.txt
-+++ b/Documentation/kbuild/makefiles.txt
-@@ -320,7 +320,7 @@ more details, with real examples.
-     subdir-ccflags-y, subdir-asflags-y
- 	The two flags listed above are similar to ccflags-y and as-falgs-y.
- 	The difference is that the subdir- variants has effect for the kbuild
--	file where tey are present and all subdirectories.
-+	file where they are present and all subdirectories.
- 	Options specified using subdir-* are added to the commandline before
- 	the options specified using the non-subdir variants.
- 
--- 
-1.7.0.17.g7e5eb
+Thanks, applied with the following change added (+= is a bash extension):
 
+diff --git a/scripts/tags.sh b/scripts/tags.sh
+index 6f0985d..c122041 100755
+--- a/scripts/tags.sh
++++ b/scripts/tags.sh
+@@ -33,7 +33,7 @@ fi
+ find_arch_sources()
+ {
+        for i in $archincludedir; do
+-               prune+="-wholename $i -prune -o "
++               prune="$prune -wholename $i -prune -o"
+        done
+        find ${tree}arch/$1 $ignore $prune -name "$2" -print;
+ }
+@@ -43,7 +43,7 @@ find_arch_include_sources()
+ {
+        include=$(find ${tree}arch/$1/ -name include -type d);
+        if [ -n "$include" ]; then
+-               archincludedir+="$include "
++               archincludedir="$archincludedir $include"
+                find $include $ignore -name "$2" -print;
+        fi
+ }
+
+Michal
