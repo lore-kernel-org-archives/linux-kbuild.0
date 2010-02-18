@@ -1,48 +1,48 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from casper.infradead.org ([85.118.1.10]:34543 "EHLO
-	casper.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753530Ab0BRKwT (ORCPT
+Received: from s15228384.onlinehome-server.info ([87.106.30.177]:53050 "EHLO
+	mail.x86-64.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757996Ab0BRLvz (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 18 Feb 2010 05:52:19 -0500
+	Thu, 18 Feb 2010 06:51:55 -0500
+Date: Thu, 18 Feb 2010 12:51:55 +0100
+From: Borislav Petkov <bp@amd64.org>
 Subject: Re: [PATCH 2/5] bitops: compile time optimization for
  hweight_long(CONSTANT)
-From: Peter Zijlstra <peterz@infradead.org>
-In-Reply-To: <4B7BF5D6.3030701@suse.cz>
-References: <4B6C93A2.1090302@zytor.com> <20100206093659.GA28326@aftab>
-	 <4B6E1DA3.50204@zytor.com> <20100208092845.GB12618@a1.tnic>
-	 <4B6FDAED.9060204@zytor.com> <20100208095945.GA14740@a1.tnic>
-	 <20100211172424.GB19779@aftab> <4B743F7D.3090605@zytor.com>
-	 <20100212170649.GC3114@aftab> <4B758FC0.1020600@zytor.com>
-	 <20100212174751.GD3114@aftab> <4B75A66A.70005@zytor.com>
-	 <4B7BF5D6.3030701@suse.cz>
-Content-Type: text/plain; charset="UTF-8"
-Date: Thu, 18 Feb 2010 11:51:50 +0100
-Message-ID: <1266490310.26719.185.camel@laptop>
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Message-ID: <20100218115155.GA20473@aftab>
+References: <4B6FDAED.9060204@zytor.com>
+ <20100208095945.GA14740@a1.tnic>
+ <20100211172424.GB19779@aftab>
+ <4B743F7D.3090605@zytor.com>
+ <20100212170649.GC3114@aftab>
+ <4B758FC0.1020600@zytor.com>
+ <20100212174751.GD3114@aftab>
+ <4B75A66A.70005@zytor.com>
+ <4B7BF5D6.3030701@suse.cz>
+ <1266490310.26719.185.camel@laptop>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1266490310.26719.185.camel@laptop>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: "H. Peter Anvin" <hpa@zytor.com>, Borislav Petkov <bp@amd64.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Borislav Petkov <petkovbb@googlemail.com>, Andrew Morton <akpm@linux-foundation.org>, Wu Fengguang <fengguang.wu@intel.com>, LKML <linux-kernel@vger.kernel.org>, Jamie Lokier <jamie@shareable.org>, Roland Dreier <rdreier@cisco.com>, Al Viro <viro@ZenIV.linux.org.uk>, "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>, Ingo Molnar <mingo@elte.hu>, Brian Gerst <brgerst@gmail.com>
+To: Peter Zijlstra <peterz@infradead.org>
+Cc: Michal Marek <mmarek@suse.cz>, "H. Peter Anvin" <hpa@zytor.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, Borislav Petkov <petkovbb@googlemail.com>, Andrew Morton <akpm@linux-foundation.org>, Wu Fengguang <fengguang.wu@intel.com>, LKML <linux-kernel@vger.kernel.org>, Jamie Lokier <jamie@shareable.org>, Roland Dreier <rdreier@cisco.com>, Al Viro <viro@ZenIV.linux.org.uk>, "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>, Ingo Molnar <mingo@elte.hu>, Brian Gerst <brgerst@gmail.com>
 
-On Wed, 2010-02-17 at 14:57 +0100, Michal Marek wrote:
-> On 12.2.2010 20:05, H. Peter Anvin wrote:
-> > On 02/12/2010 09:47 AM, Borislav Petkov wrote:
-> >>
-> >> However, this is generic code and for the above to work we have to
-> >> enforce x86-specific CFLAGS for it. What is the preferred way to do
-> >> that?
-> >>
-> > 
-> > That's a question for Michal and the kbuild list.  Michal?
-> 
-> (I was offline last week).
-> 
-> The _preferred_ way probably is not to do it :), but otherwise you can
-> set CFLAGS_hweight.o depending on CONFIG_X86(_32|_64), just like you do
-> in arch/x86/lib/Makefile already.
+On Thu, Feb 18, 2010 at 11:51:50AM +0100, Peter Zijlstra wrote:
+> I guess one way to achieve that is to create a arch/x86/lib/hweight.c
+> that includes lib/hweight.c and give the x86 one special compile flags
+> and not build the lib on.
 
-I guess one way to achieve that is to create a arch/x86/lib/hweight.c
-that includes lib/hweight.c and give the x86 one special compile flags
-and not build the lib on.
+That's what I thought initially too but that won't fly because the
+lib/hweight.c helpers have to be inlined into arch/x86/lib/hweight.c so
+that gcc can take care of the clobbered registers. Otherwise, it just a
+"call __sw_hweightXX" that gets issued into asm.
 
+
+-- 
+Regards/Gruss,
+Boris.
+
+-
+Advanced Micro Devices, Inc.
+Operating Systems Research Center
