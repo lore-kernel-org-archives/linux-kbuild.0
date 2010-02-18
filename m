@@ -1,48 +1,63 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from s15228384.onlinehome-server.info ([87.106.30.177]:53050 "EHLO
-	mail.x86-64.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757996Ab0BRLvz (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 18 Feb 2010 06:51:55 -0500
-Date: Thu, 18 Feb 2010 12:51:55 +0100
-From: Borislav Petkov <bp@amd64.org>
-Subject: Re: [PATCH 2/5] bitops: compile time optimization for
- hweight_long(CONSTANT)
-Message-ID: <20100218115155.GA20473@aftab>
-References: <4B6FDAED.9060204@zytor.com>
- <20100208095945.GA14740@a1.tnic>
- <20100211172424.GB19779@aftab>
- <4B743F7D.3090605@zytor.com>
- <20100212170649.GC3114@aftab>
- <4B758FC0.1020600@zytor.com>
- <20100212174751.GD3114@aftab>
- <4B75A66A.70005@zytor.com>
- <4B7BF5D6.3030701@suse.cz>
- <1266490310.26719.185.camel@laptop>
+Received: from xenotime.net ([72.52.64.118]:49164 "HELO xenotime.net"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with SMTP
+	id S1757732Ab0BRQCd (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 18 Feb 2010 11:02:33 -0500
+Received: from chimera.site ([71.245.98.113]) by xenotime.net for <linux-kbuild@vger.kernel.org>; Thu, 18 Feb 2010 08:02:20 -0800
+Message-ID: <4B7D6483.9050307@xenotime.net>
+Date: Thu, 18 Feb 2010 08:02:11 -0800
+From: Randy Dunlap <rdunlap@xenotime.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1266490310.26719.185.camel@laptop>
+Subject: Re: makefiles: obj vs. objtree
+References: <4B7CA583.5020002@xenotime.net> <4B7D0E5C.1070708@suse.cz>
+In-Reply-To: <4B7D0E5C.1070708@suse.cz>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Peter Zijlstra <peterz@infradead.org>
-Cc: Michal Marek <mmarek@suse.cz>, "H. Peter Anvin" <hpa@zytor.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, Borislav Petkov <petkovbb@googlemail.com>, Andrew Morton <akpm@linux-foundation.org>, Wu Fengguang <fengguang.wu@intel.com>, LKML <linux-kernel@vger.kernel.org>, Jamie Lokier <jamie@shareable.org>, Roland Dreier <rdreier@cisco.com>, Al Viro <viro@ZenIV.linux.org.uk>, "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>, Ingo Molnar <mingo@elte.hu>, Brian Gerst <brgerst@gmail.com>
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org
 
-On Thu, Feb 18, 2010 at 11:51:50AM +0100, Peter Zijlstra wrote:
-> I guess one way to achieve that is to create a arch/x86/lib/hweight.c
-> that includes lib/hweight.c and give the x86 one special compile flags
-> and not build the lib on.
+On 02/18/10 01:54, Michal Marek wrote:
+> On 18.2.2010 03:27, Randy Dunlap wrote:
+>> Can someone clarify the difference(s) in these variables, please?
+>>
+>> Documentation/kbuild.txt says about objtree:
+>>
+>> $(objtree) is the directory where output files are saved.
+>> The output directory is often set using "O=..." on the commandline.
+>>
+>>
+>> Documentation/makefiles.txt says about obj:
+>>
+>>     $(obj)
+>> 	$(obj) is a relative path which points to the directory
+>> 	where the target is saved. Always use $(obj) when
+>> 	referring to generated files.
+>>
+>>
+>> These appear to be the same to me, but let me be more specific:
+> 
+> $(objtree) is the toplevel build directory (as the doc says the
+> directory you specify with O=).
+> $(obj) is the directory below $(objtree) where the targets of the
+> current Makefile are saved:
+> 
+> $ make O=/build/dir
+> $(objtree) == /build/dir
+> $(obj) == /build/dir/fs in fs/Makefile
+> 
+> 
+>> In some cases (or places), Documentation/DocBook/Makefile uses
+>> $(obj) and other cases/places, it uses $(objtree).
+>> Does it have these correct, or should some of them be fixed?
+> 
+> $(objtree)/Documentation/DocBook could be written as $(obj) in
+> Documentation/DocBook/Makefile.
+> 
+> hth,
 
-That's what I thought initially too but that won't fly because the
-lib/hweight.c helpers have to be inlined into arch/x86/lib/hweight.c so
-that gcc can take care of the clobbered registers. Otherwise, it just a
-"call __sw_hweightXX" that gets issued into asm.
-
+Yes, it does.  I get it.  Thanks.
 
 -- 
-Regards/Gruss,
-Boris.
-
--
-Advanced Micro Devices, Inc.
-Operating Systems Research Center
+~Randy
