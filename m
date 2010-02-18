@@ -1,57 +1,48 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:55956 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754761Ab0BRJyi (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 18 Feb 2010 04:54:38 -0500
-Message-ID: <4B7D0E5C.1070708@suse.cz>
-Date: Thu, 18 Feb 2010 10:54:36 +0100
-From: Michal Marek <mmarek@suse.cz>
-MIME-Version: 1.0
-Subject: Re: makefiles: obj vs. objtree
-References: <4B7CA583.5020002@xenotime.net>
-In-Reply-To: <4B7CA583.5020002@xenotime.net>
-Content-Type: text/plain; charset=ISO-8859-1
+Received: from casper.infradead.org ([85.118.1.10]:34543 "EHLO
+	casper.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753530Ab0BRKwT (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 18 Feb 2010 05:52:19 -0500
+Subject: Re: [PATCH 2/5] bitops: compile time optimization for
+ hweight_long(CONSTANT)
+From: Peter Zijlstra <peterz@infradead.org>
+In-Reply-To: <4B7BF5D6.3030701@suse.cz>
+References: <4B6C93A2.1090302@zytor.com> <20100206093659.GA28326@aftab>
+	 <4B6E1DA3.50204@zytor.com> <20100208092845.GB12618@a1.tnic>
+	 <4B6FDAED.9060204@zytor.com> <20100208095945.GA14740@a1.tnic>
+	 <20100211172424.GB19779@aftab> <4B743F7D.3090605@zytor.com>
+	 <20100212170649.GC3114@aftab> <4B758FC0.1020600@zytor.com>
+	 <20100212174751.GD3114@aftab> <4B75A66A.70005@zytor.com>
+	 <4B7BF5D6.3030701@suse.cz>
+Content-Type: text/plain; charset="UTF-8"
+Date: Thu, 18 Feb 2010 11:51:50 +0100
+Message-ID: <1266490310.26719.185.camel@laptop>
+Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Randy Dunlap <rdunlap@xenotime.net>
-Cc: linux-kbuild@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>
+Cc: "H. Peter Anvin" <hpa@zytor.com>, Borislav Petkov <bp@amd64.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Borislav Petkov <petkovbb@googlemail.com>, Andrew Morton <akpm@linux-foundation.org>, Wu Fengguang <fengguang.wu@intel.com>, LKML <linux-kernel@vger.kernel.org>, Jamie Lokier <jamie@shareable.org>, Roland Dreier <rdreier@cisco.com>, Al Viro <viro@ZenIV.linux.org.uk>, "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>, Ingo Molnar <mingo@elte.hu>, Brian Gerst <brgerst@gmail.com>
 
-On 18.2.2010 03:27, Randy Dunlap wrote:
-> Can someone clarify the difference(s) in these variables, please?
+On Wed, 2010-02-17 at 14:57 +0100, Michal Marek wrote:
+> On 12.2.2010 20:05, H. Peter Anvin wrote:
+> > On 02/12/2010 09:47 AM, Borislav Petkov wrote:
+> >>
+> >> However, this is generic code and for the above to work we have to
+> >> enforce x86-specific CFLAGS for it. What is the preferred way to do
+> >> that?
+> >>
+> > 
+> > That's a question for Michal and the kbuild list.  Michal?
 > 
-> Documentation/kbuild.txt says about objtree:
+> (I was offline last week).
 > 
-> $(objtree) is the directory where output files are saved.
-> The output directory is often set using "O=..." on the commandline.
-> 
-> 
-> Documentation/makefiles.txt says about obj:
-> 
->     $(obj)
-> 	$(obj) is a relative path which points to the directory
-> 	where the target is saved. Always use $(obj) when
-> 	referring to generated files.
-> 
-> 
-> These appear to be the same to me, but let me be more specific:
+> The _preferred_ way probably is not to do it :), but otherwise you can
+> set CFLAGS_hweight.o depending on CONFIG_X86(_32|_64), just like you do
+> in arch/x86/lib/Makefile already.
 
-$(objtree) is the toplevel build directory (as the doc says the
-directory you specify with O=).
-$(obj) is the directory below $(objtree) where the targets of the
-current Makefile are saved:
+I guess one way to achieve that is to create a arch/x86/lib/hweight.c
+that includes lib/hweight.c and give the x86 one special compile flags
+and not build the lib on.
 
-$ make O=/build/dir
-$(objtree) == /build/dir
-$(obj) == /build/dir/fs in fs/Makefile
-
-
-> In some cases (or places), Documentation/DocBook/Makefile uses
-> $(obj) and other cases/places, it uses $(objtree).
-> Does it have these correct, or should some of them be fixed?
-
-$(objtree)/Documentation/DocBook could be written as $(obj) in
-Documentation/DocBook/Makefile.
-
-hth,
-Michal
