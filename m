@@ -1,37 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from arroyo.ext.ti.com ([192.94.94.40]:38304 "EHLO arroyo.ext.ti.com"
+Received: from cantor2.suse.de ([195.135.220.15]:55956 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751157Ab0BRGe0 convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 18 Feb 2010 01:34:26 -0500
-From: "Gadiyar, Anand" <gadiyar@ti.com>
-Date: Thu, 18 Feb 2010 12:04:12 +0530
-Subject: RE: Compile error with gregkh-07-usb-2.6.33-rc7.patch
-Message-ID: <5A47E75E594F054BAF48C5E4FC4B92AB03215B103B@dbde02.ent.ti.com>
-References: <Pine.LNX.4.44L0.1002121026420.1499-100000@iolanthe.rowland.org>
- <4B7BFE0D.4000509@suse.cz> <20100218041629.GA11556@suse.de>
-In-Reply-To: <20100218041629.GA11556@suse.de>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+	id S1754761Ab0BRJyi (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 18 Feb 2010 04:54:38 -0500
+Message-ID: <4B7D0E5C.1070708@suse.cz>
+Date: Thu, 18 Feb 2010 10:54:36 +0100
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
+Subject: Re: makefiles: obj vs. objtree
+References: <4B7CA583.5020002@xenotime.net>
+In-Reply-To: <4B7CA583.5020002@xenotime.net>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Greg KH <gregkh@suse.de>, Michal Marek <mmarek@suse.cz>
-Cc: Alan Stern <stern@rowland.harvard.edu>, jidong xiao <jidong.xiao@gmail.com>, "linux-usb@vger.kernel.org" <linux-usb@vger.kernel.org>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, Vegard Nossum <vegard.nossum@gmail.com>
+To: Randy Dunlap <rdunlap@xenotime.net>
+Cc: linux-kbuild@vger.kernel.org
 
-<snip>
-
-> > In the meantime, you can change
-> > the logic from "select USB_SUSPEND" to "depends on USB_SUSPEND". This
-> > will force one to first set USB_SUSPEND manually, but will avoid the
-> > build error.
+On 18.2.2010 03:27, Randy Dunlap wrote:
+> Can someone clarify the difference(s) in these variables, please?
 > 
-> A patch to do this would probably be best so we don't run 
-> into it again.
+> Documentation/kbuild.txt says about objtree:
 > 
+> $(objtree) is the directory where output files are saved.
+> The output directory is often set using "O=..." on the commandline.
+> 
+> 
+> Documentation/makefiles.txt says about obj:
+> 
+>     $(obj)
+> 	$(obj) is a relative path which points to the directory
+> 	where the target is saved. Always use $(obj) when
+> 	referring to generated files.
+> 
+> 
+> These appear to be the same to me, but let me be more specific:
 
-Thanks for the explanations. Patch coming up in a bit, as soon
-as I finish testing with a few configs.
+$(objtree) is the toplevel build directory (as the doc says the
+directory you specify with O=).
+$(obj) is the directory below $(objtree) where the targets of the
+current Makefile are saved:
 
-- Anand
+$ make O=/build/dir
+$(objtree) == /build/dir
+$(obj) == /build/dir/fs in fs/Makefile
+
+
+> In some cases (or places), Documentation/DocBook/Makefile uses
+> $(obj) and other cases/places, it uses $(objtree).
+> Does it have these correct, or should some of them be fixed?
+
+$(objtree)/Documentation/DocBook could be written as $(obj) in
+Documentation/DocBook/Makefile.
+
+hth,
+Michal
