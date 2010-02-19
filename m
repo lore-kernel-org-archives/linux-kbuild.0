@@ -1,39 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from terminus.zytor.com ([198.137.202.10]:37369 "EHLO mail.zytor.com"
+Received: from cantor.suse.de ([195.135.220.2]:54881 "EHLO mx1.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752090Ab0BSQ70 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 19 Feb 2010 11:59:26 -0500
-Message-ID: <4B7EC20C.30607@zytor.com>
-Date: Fri, 19 Feb 2010 08:53:32 -0800
-From: "H. Peter Anvin" <hpa@zytor.com>
-MIME-Version: 1.0
-Subject: Re: [PATCH] x86: Add optimized popcnt variants
-References: <4B758FC0.1020600@zytor.com> <20100212174751.GD3114@aftab> <4B75A66A.70005@zytor.com> <4B7BF5D6.3030701@suse.cz> <20100217172040.GC13429@aftab> <4B7C27D8.9050408@suse.cz> <4B7C29C1.10906@suse.cz> <20100218061923.GA1594@liondog.tnic> <20100219142205.GA32533@aftab> <4B7EB6EF.9010405@zytor.com> <20100219164512.GA492@aftab>
-In-Reply-To: <20100219164512.GA492@aftab>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+	id S1751775Ab0BSUpe (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 19 Feb 2010 15:45:34 -0500
+From: Michal Marek <mmarek@suse.cz>
+Subject: [PATCH] tags: Use $SRCARCH
+Date: Fri, 19 Feb 2010 21:45:08 +0100
+Message-Id: <1266612308-2911-1-git-send-email-mmarek@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Borislav Petkov <bp@amd64.org>
-Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild <linux-kbuild@vger.kernel.org>, Peter Zijlstra <peterz@infradead.org>, Andrew Morton <akpm@linux-foundation.org>, Wu Fengguang <fengguang.wu@intel.com>, LKML <linux-kernel@vger.kernel.org>, Jamie Lokier <jamie@shareable.org>, Roland Dreier <rdreier@cisco.com>, Al Viro <viro@ZenIV.linux.org.uk>, "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>, Ingo Molnar <mingo@elte.hu>, Brian Gerst <brgerst@gmail.com>
+To: linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, Guennadi Liakhovetski <g.liakhovetski@gmx.de>, WANG Cong <xiyou.wangcong@gmail.com>
 
-On 02/19/2010 08:45 AM, Borislav Petkov wrote:
->>
->> You're still not inlining these.  They should be: there is absolutely no
->> reason for code size to not inline them anymore.
-> 
-> Isn't better to have only those 4 locations for apply_alternatives to
-> patch wrt to popcnt instead of sprinkling alternatives sections around
-> the kernel in every callsite of hweight and its users? Or is the aim to
-> optimize even that "call __arch_hweightXX" away?
-> 
+$ make mrproper
+$ make tags
+  GEN     tags
+  find: `arch/x86_64/': No such file or directory
 
-That's the idea, yes.  We use inline alternatives in quite a few other
-places.
+Caused by commit f81b1be (tags: include headers before source files)
 
-	-hpa
+Cc: Guennadi Liakhovetski <g.liakhovetski@gmx.de>
+Cc: WANG Cong <xiyou.wangcong@gmail.com>
+Signed-off-by: Michal Marek <mmarek@suse.cz>
+---
+ scripts/tags.sh |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
 
+diff --git a/scripts/tags.sh b/scripts/tags.sh
+index c122041..9f45953 100755
+--- a/scripts/tags.sh
++++ b/scripts/tags.sh
+@@ -5,7 +5,7 @@
+ # mode may be any of: tags, TAGS, cscope
+ #
+ # Uses the following environment variables:
+-# ARCH, SUBARCH, srctree, src, obj
++# ARCH, SUBARCH, SRCARCH, srctree, src, obj
+ 
+ if [ "$KBUILD_VERBOSE" = "1" ]; then
+ 	set -x
+@@ -70,7 +70,7 @@ find_sources()
+ 
+ all_sources()
+ {
+-	find_arch_include_sources ${ARCH} '*.[chS]'
++	find_arch_include_sources ${SRCARCH} '*.[chS]'
+ 	if [ ! -z "$archinclude" ]; then
+ 		find_arch_include_sources $archinclude '*.[chS]'
+ 	fi
 -- 
-H. Peter Anvin, Intel Open Source Technology Center
-I work for Intel.  I don't speak on their behalf.
+1.6.5.3
 
