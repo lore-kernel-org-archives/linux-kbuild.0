@@ -1,22 +1,38 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pd956949a.dip0.t-ipconnect.de ([217.86.148.154]:39040 "EHLO
-	rhein-main-reformwaren.de" rhost-flags-OK-OK-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1755850Ab0BRTFy (ORCPT
+Received: from moutng.kundenserver.de ([212.227.17.8]:54792 "EHLO
+	moutng.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750886Ab0BSLo1 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 18 Feb 2010 14:05:54 -0500
-Reply-To: <dh37fh37r@gmail.com>
-From: Morris Cornett <four3892ndw@gmail.com>
-Subject: ***SPAM*** [Optometrists - 63,837 records 2,015 emails]
-MIME-Version: 1.0
-Content-Type: text/plain
-Message-ID: <0d8286c0-2bf2-404f-b838-b866446caa99@AD.rheinmain.local>
-Date: Thu, 18 Feb 2010 20:05:51 +0100
+	Fri, 19 Feb 2010 06:44:27 -0500
+From: Thomas Weber <weber@corscience.de>
+Subject: [PATCH] Trivial: Scripts: kconfig: util: Fix typo in comment
+Date: Fri, 19 Feb 2010 12:43:44 +0100
+Message-Id: <1266579824-14706-1-git-send-email-weber@corscience.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: mcmorg@vax1.bemidji.msus.edu, genplast07@hotmail.com, paubla@statoil.com, info@netter.ru
+To: trivial@kernel.org
+Cc: Thomas Weber <weber@corscience.de>, Roman Zippel <zippel@linux-m68k.org>, Markus Heidelberg <markus.heidelberg@web.de>, Sam Ravnborg <sam@ravnborg.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
+sting replaced with string
 
-For details, samples and counts on our US listings please
-email me at my other email address  Isabel.Kent@rightpricedlists.Co.CC
-  
-email rembox@rightpricedlists.Co.CC for delisting
+Signed-off-by: Thomas Weber <weber@corscience.de>
+---
+ scripts/kconfig/util.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/scripts/kconfig/util.c b/scripts/kconfig/util.c
+index b6b2a46..25d1ec4 100644
+--- a/scripts/kconfig/util.c
++++ b/scripts/kconfig/util.c
+@@ -72,7 +72,7 @@ int file_write_dep(const char *name)
+ }
+ 
+ 
+-/* Allocate initial growable sting */
++/* Allocate initial growable string */
+ struct gstr str_new(void)
+ {
+ 	struct gstr gs;
+-- 
+1.6.4.4
+
