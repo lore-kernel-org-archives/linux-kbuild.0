@@ -1,64 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from iolanthe.rowland.org ([192.131.102.54]:56123 "HELO
-	iolanthe.rowland.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with SMTP id S1751893Ab0BVQdt (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 22 Feb 2010 11:33:49 -0500
-Date: Mon, 22 Feb 2010 11:33:47 -0500 (EST)
-From: Alan Stern <stern@rowland.harvard.edu>
-Subject: Re: Two problems with system sleep
-In-Reply-To: <201002212139.39746.rjw@sisk.pl>
-Message-ID: <Pine.LNX.4.44L0.1002221119590.1262-100000@iolanthe.rowland.org>
+Received: from terminus.zytor.com ([198.137.202.10]:39382 "EHLO mail.zytor.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752520Ab0BVR0E (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 22 Feb 2010 12:26:04 -0500
+Message-ID: <4B82BD01.3030008@zytor.com>
+Date: Mon, 22 Feb 2010 09:21:05 -0800
+From: "H. Peter Anvin" <hpa@zytor.com>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: Re: [PATCH] x86: Add optimized popcnt variants
+References: <4B75A66A.70005@zytor.com> <4B7BF5D6.3030701@suse.cz> <20100217172040.GC13429@aftab> <4B7C27D8.9050408@suse.cz> <4B7C29C1.10906@suse.cz> <20100218061923.GA1594@liondog.tnic> <20100219142205.GA32533@aftab> <4B7EB6EF.9010405@zytor.com> <20100219164512.GA492@aftab> <4B7EC20C.30607@zytor.com> <20100222141737.GB21233@aftab>
+In-Reply-To: <20100222141737.GB21233@aftab>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Rafael J. Wysocki" <rjw@sisk.pl>
-Cc: Greg Kroah-Hartman <gregkh@suse.de>, Linux-pm mailing list <linux-pm@lists.linux-foundation.org>, Alan <alan@lxorguk.ukuu.org.uk>, linux-kbuild@vger.kernel.org
+To: Borislav Petkov <bp@amd64.org>
+Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild <linux-kbuild@vger.kernel.org>, Peter Zijlstra <peterz@infradead.org>, Andrew Morton <akpm@linux-foundation.org>, Wu Fengguang <fengguang.wu@intel.com>, LKML <linux-kernel@vger.kernel.org>, Jamie Lokier <jamie@shareable.org>, Roland Dreier <rdreier@cisco.com>, Al Viro <viro@ZenIV.linux.org.uk>, "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>, Ingo Molnar <mingo@elte.hu>, Brian Gerst <brgerst@gmail.com>
 
-On Sun, 21 Feb 2010, Rafael J. Wysocki wrote:
+On 02/22/2010 06:17 AM, Borislav Petkov wrote:
+>  
+> +config ARCH_HWEIGHT_CFLAGS
+> +	string
+> +	default "-fcall-saved-rsi -fcall-saved-rdx -fcall-saved-rcx -fcall-saved-r8 -fcall-saved-r9 -fcall-saved-r10 -fcall-saved-r11" if X86_64
+> +
 
-> > > Anyway, we need to check if control gets back to acpi_suspend_enter().
+[...]
 
-Would PM_TRACE_RTC help?  What would I have to add in order to insert
-an appropriate tracepoint?
+> +
+> +#ifdef CONFIG_64BIT
+> +/* popcnt %rdi, %rax */
+> +#define POPCNT ".byte 0xf3\n\t.byte 0x48\n\t.byte 0x0f\n\t.byte 0xb8\n\t.byte 0xc7"
+> +#define REG_IN "D"
+> +#define REG_OUT "a"
+> +#else
 
+Just a note: this still means rdi is clobbered on x86-64, which is
+probably fine, but needs to be recorded as such.  Since gcc doesn't
+support clobbers for registers used as operands (sigh), you have to
+create a dummy output and assign it a "=D" constraint.
 
-> > > BTW, does anything change if you put acpi_sleep=sci_force_enable into the
-> > > kernel command line?
-> > 
-> > Nothing changes.  I also added "pci=use_crs", based on a suggestion in 
-> > the log, but that didn't make any difference either.
-> 
-> The failure to resume may be graphics-related, so please try to compile i915
-> statically into the kernel and set CONFIG_DRM_I915_KMS.
+I don't know if gcc would handle -fcall-saved-rdi here... and if so, how
+reliably.
 
-Odd -- when I use "make menuconfig", that part of the menu 
-doesn't show up.  Navigating through "Device Drivers -> Graphics 
-support" gives me this screen:
+	-hpa
 
-    <*> /dev/agpgart (AGP Support)  --->                             
-    <*> Direct Rendering Manager (XFree86 4.1.0 and higher DRI suppor 
-    -*- Lowlevel video output switch controls                        
-    -*- Support for frame buffer devices  --->                       
-    [ ] Backlight & LCD device support  --->                         
-        Display device support  --->                                 
-        Console display driver support  --->                         
-    [ ] Bootup logo  --->                                            
-
-None of the entries in drivers/gpu/drm/Kconfig show up beyond the first 
-one.  I had to go in and edit .config by hand to set CONFIG_DRM, 
-CONFIG_DRM_KMS_HELPER, CONFIG_DRM_I915, and CONFIG_DRM_I915_KMS all to 
-"y".  Is this a bug in menuconfig?  CC'ing the mailing list...
-
-Anyway, it didn't make any difference.  The behavior was exactly the 
-same.  Pressing the power button during suspend causes an 
-almost-instant hang, before the screen or anything else revives.
-
-By concentrating on the video drivers, you may be missing part of 
-the problem.  Have you considered why pressing a key on the keyboard 
-doesn't wake the system up?  Nothing happens -- the power LED on the 
-desktop case just keeps on blinking.
-
-Alan Stern
+-- 
+H. Peter Anvin, Intel Open Source Technology Center
+I work for Intel.  I don't speak on their behalf.
 
