@@ -1,47 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from terminus.zytor.com ([198.137.202.10]:42599 "EHLO mail.zytor.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751453Ab0BZFem (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 26 Feb 2010 00:34:42 -0500
-Message-ID: <4B875BBD.4060104@zytor.com>
-Date: Thu, 25 Feb 2010 21:27:25 -0800
-From: "H. Peter Anvin" <hpa@zytor.com>
-MIME-Version: 1.0
+Received: from s15228384.onlinehome-server.info ([87.106.30.177]:59746 "EHLO
+	mail.x86-64.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S935419Ab0BZHrS (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 26 Feb 2010 02:47:18 -0500
+Date: Fri, 26 Feb 2010 08:47:14 +0100
+From: Borislav Petkov <bp@amd64.org>
 Subject: Re: [PATCH] x86: Add optimized popcnt variants
-References: <20100219164512.GA492@aftab> <4B7EC20C.30607@zytor.com> <20100222141737.GB21233@aftab> <4B82BD01.3030008@zytor.com> <20100222184945.GD21233@aftab> <4B82E144.1050007@zytor.com> <20100223155852.GF30382@aftab> <4B84118C.90203@zytor.com> <20100223175457.GA2401@aftab> <4B841BC3.1000908@zytor.com> <20100223190614.GB2401@aftab>
-In-Reply-To: <20100223190614.GB2401@aftab>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Message-ID: <20100226074714.GA15310@aftab>
+References: <20100222141737.GB21233@aftab>
+ <4B82BD01.3030008@zytor.com>
+ <20100222184945.GD21233@aftab>
+ <4B82E144.1050007@zytor.com>
+ <20100223155852.GF30382@aftab>
+ <4B84118C.90203@zytor.com>
+ <20100223175457.GA2401@aftab>
+ <4B841BC3.1000908@zytor.com>
+ <20100223190614.GB2401@aftab>
+ <4B875BBD.4060104@zytor.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4B875BBD.4060104@zytor.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Borislav Petkov <bp@amd64.org>
-Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild <linux-kbuild@vger.kernel.org>, Peter Zijlstra <peterz@infradead.org>, Andrew Morton <akpm@linux-foundation.org>, Wu Fengguang <fengguang.wu@intel.com>, LKML <linux-kernel@vger.kernel.org>, Jamie Lokier <jamie@shareable.org>, Roland Dreier <rdreier@cisco.com>, Al Viro <viro@ZenIV.linux.org.uk>, "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>, Ingo Molnar <mingo@elte.hu>, Brian Gerst <brgerst@gmail.com>
+To: "H. Peter Anvin" <hpa@zytor.com>
+Cc: Borislav Petkov <bp@amd64.org>, Michal Marek <mmarek@suse.cz>, linux-kbuild <linux-kbuild@vger.kernel.org>, Peter Zijlstra <peterz@infradead.org>, Andrew Morton <akpm@linux-foundation.org>, Wu Fengguang <fengguang.wu@intel.com>, LKML <linux-kernel@vger.kernel.org>, Jamie Lokier <jamie@shareable.org>, Roland Dreier <rdreier@cisco.com>, Al Viro <viro@ZenIV.linux.org.uk>, "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>, Ingo Molnar <mingo@elte.hu>, Brian Gerst <brgerst@gmail.com>
 
-On 02/23/2010 11:06 AM, Borislav Petkov wrote:
-> 
-> Ok, here you go.
-> 
-> --
-> From: Borislav Petkov <borislav.petkov@amd.com>
-> Date: Thu, 11 Feb 2010 00:48:31 +0100
-> Subject: [PATCH] x86: Add optimized popcnt variants
-> 
-> Add support for the hardware version of the Hamming weight function,
-> popcnt, present in CPUs which advertize it under CPUID, Function
-> 0x0000_0001_ECX[23]. On CPUs which don't support it, we fallback to the
-> default lib/hweight.c sw versions.
-> 
-> A synthetic benchmark comparing popcnt with __sw_hweight64 showed almost
-> a 3x speedup on a F10h machine.
-> 
-> Signed-off-by: Borislav Petkov <borislav.petkov@amd.com>
+From: "H. Peter Anvin" <hpa@zytor.com>
+Date: Thu, Feb 25, 2010 at 09:27:25PM -0800
 
-OK, this patch looks pretty good now, but I'm completely lost as to what
-the baseline of this patch is supposed to be.
+> OK, this patch looks pretty good now, but I'm completely lost as to
+> what the baseline of this patch is supposed to be.
 
-	-hpa
+Yeah, this is based on PeterZ's http://lkml.org/lkml/2010/2/4/119
+
+But I'm not sure which tree has it...
 
 -- 
-H. Peter Anvin, Intel Open Source Technology Center
-I work for Intel.  I don't speak on their behalf.
+Regards/Gruss,
+Boris.
 
+-
+Advanced Micro Devices, Inc.
+Operating Systems Research Center
