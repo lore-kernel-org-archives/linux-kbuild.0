@@ -1,43 +1,39 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mtaout03-winn.ispmail.ntl.com ([81.103.221.49]:45018 "EHLO
-	mtaout03-winn.ispmail.ntl.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1754820Ab0CEKVR (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 5 Mar 2010 05:21:17 -0500
-From: Ian Campbell <ijc@hellion.org.uk>
-Content-Type: text/plain; charset="UTF-8"
-Date: Fri, 05 Mar 2010 10:21:01 +0000
-Message-ID: <1267784461.11737.37000.camel@zakaz.uk.xensource.com>
-Mime-Version: 1.0
+Received: from cantor.suse.de ([195.135.220.2]:36876 "EHLO mx1.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750821Ab0CENNO (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 5 Mar 2010 08:13:14 -0500
+Message-ID: <4B910367.5040303@suse.cz>
+Date: Fri, 05 Mar 2010 14:13:11 +0100
+From: Michal Marek <mmarek@suse.cz>
+MIME-Version: 1.0
+Subject: Re: [PATCH] deb-pkg md5sums
+References: <4B901ECD.5080707@joco.name>
+In-Reply-To: <4B901ECD.5080707@joco.name>
+Content-Type: text/plain; charset=ISO-8859-2
 Content-Transfer-Encoding: 7bit
-Subject: Patch eb8f844c "kbuild: specify absolute paths for cscope" breaks
- cscope use on NFS mounted source tree
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Daniel Vetter <daniel.vetter@ffwll.ch>, mmarek@suse.cz
+To: FEJES Jozsef <fejes@joco.name>
+Cc: linux-kbuild@vger.kernel.org
 
-I keep my kernel source tree on a more powerful build box where I run my
-builds etc (including "make cscope") but run my editor from my
-workstation with an NFS mount to the source. This worked fine for me
-using relative paths for cscope. Using absolute paths in cscope breaks
-this previously working setup because the root path is not the same on
-both systems. I guess this is similar to moving the source tree around.
+On 4.3.2010 21:57, FEJES Jozsef wrote:
+> I would like an md5sums file in the packages built by the deb-pkg 
+> script. It's a quite standard and useful thing to do.
+> 
+> Please consider my patch (or something similar) for inclusion.
+> 
+> My patch does the same thing as dh_md5sums, without any fancy options 
+> which are unnecessary in this case.
 
-Without wanting to start a flamewar it really sounds to me like we are
-working around a vim (or cscope) bug here, emacs with cscope bindings
-works fine in this configuration.
+Hi,
 
-Could we at least have an option to allow both variants to work? Would
-setting "make O=$(pwd) cscope" (where pwd is the source tree) not have
-provided a workaround for people who needed absolute paths for whatever
-reason?
+Please submit a patch according to Documentation/SubmittingPatches, i.e.
+inline it in the body of the email and include your Signed-off-by: line.
+BTW:
+sh -c "cd '$pdir'; find . -type f ! -path './DEBIAN/*' -printf '%P\0'
+can be written as
+find "$pdir" -path "$pdir/DEBIAN" -prune -o -type f -printf '%P\0'
+(saves you some quoting).
 
-Ian.
--- 
-Ian Campbell
-Current Noise: Testament - D.N.R. (Do Not Resuscitate)
-
-What do you give a man who has everything?  Penicillin.
-		-- Jerry Lester
-
+Michal
