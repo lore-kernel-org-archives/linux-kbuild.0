@@ -1,38 +1,49 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ew0-f220.google.com ([209.85.219.220]:65521 "EHLO
-	mail-ew0-f220.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753137Ab0CGN5b convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 7 Mar 2010 08:57:31 -0500
+Received: from cantor.suse.de ([195.135.220.2]:56697 "EHLO mx1.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752094Ab0CGVMG (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 7 Mar 2010 16:12:06 -0500
+Message-ID: <4B9416A7.203@suse.cz>
+Date: Sun, 07 Mar 2010 22:12:07 +0100
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-In-Reply-To: <20100303094947.GB15480@sepie.suse.cz>
-References: <1267545472-17131-1-git-send-email-jkacur@redhat.com>
-	 <20100303094947.GB15480@sepie.suse.cz>
-Date: Sun, 7 Mar 2010 14:57:29 +0100
-Message-ID: <520f0cf11003070557m1eed4545yc990d7ed29277c46@mail.gmail.com>
-Subject: Re: [PATCH] kbuild - tags
-From: John Kacur <jkacur@redhat.com>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 8BIT
+Subject: Re: Patch eb8f844c "kbuild: specify absolute paths for cscope" breaks
+ cscope use on NFS mounted source tree
+References: <1267784461.11737.37000.camel@zakaz.uk.xensource.com>
+In-Reply-To: <1267784461.11737.37000.camel@zakaz.uk.xensource.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: lkml <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>
+To: Ian Campbell <ijc@hellion.org.uk>, Daniel Vetter <daniel.vetter@ffwll.ch>
+Cc: linux-kbuild@vger.kernel.org
 
-On Wed, Mar 3, 2010 at 10:49 AM, Michal Marek <mmarek@suse.cz> wrote:
-> On Tue, Mar 02, 2010 at 04:57:52PM +0100, John Kacur wrote:
->>       - Add the ability to make tags for all archs using "all"
->>               make ALLSOURCE_ARCHS=all tags
->>       - Document this in kbuild.txt
->>
->>       Without this change you have to type each arch separately.
->>
->> Signed-off-by: John Kacur <jkacur@redhat.com>
->
-> Thanks, applied.
->
+On 5.3.2010 11:21, Ian Campbell wrote:
+> I keep my kernel source tree on a more powerful build box where I run my
+> builds etc (including "make cscope") but run my editor from my
+> workstation with an NFS mount to the source. This worked fine for me
+> using relative paths for cscope. Using absolute paths in cscope breaks
+> this previously working setup because the root path is not the same on
+> both systems. I guess this is similar to moving the source tree around.
 
-Great! Are you going to send a pull request to Linus soon for 2.6.34?
+I was aware that moving the source tree around would break the cscope
+database. I hoped that nobody would do this on a daily basis, but
+nfs-mounting the tree is essentially the same (an makes perfect sense to
+do).
 
-Thanks
-John
+
+> Without wanting to start a flamewar it really sounds to me like we are
+> working around a vim (or cscope) bug here, emacs with cscope bindings
+> works fine in this configuration.
+> 
+> Could we at least have an option to allow both variants to work? Would
+> setting "make O=$(pwd) cscope" (where pwd is the source tree) not have
+> provided a workaround for people who needed absolute paths for whatever
+> reason?
+
+Daniel, how do we proceed here? Would
+$ make O=. cscope
+plus maybe a comment suggesting this, be an acceptable workaround for
+your use case (which was running vim from within a subdirectory, IIRC).
+
+Michal
