@@ -1,61 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from chilli.pcug.org.au ([203.10.76.44]:34793 "EHLO smtps.tip.net.au"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1756747Ab0CKKdt (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 11 Mar 2010 05:33:49 -0500
-Date: Thu, 11 Mar 2010 21:33:42 +1100
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-Subject: Re: [PATCH] kbuild: Do not unnecessarily regenerate modules.builtin
-Message-Id: <20100311213342.82494e22.sfr@canb.auug.org.au>
-In-Reply-To: <20100311081246.GA13932@sepie.suse.cz>
-References: <1268047222-13218-1-git-send-email-mmarek@suse.cz>
-	<20100311160326.bad1500e.sfr@canb.auug.org.au>
-	<20100311081246.GA13932@sepie.suse.cz>
-Mime-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pgp-signature";
- micalg="PGP-SHA1";
- boundary="Signature=_Thu__11_Mar_2010_21_33_42_+1100_2EIqKYGLWU_s3C=="
+Received: from smtp1.linux-foundation.org ([140.211.169.13]:42297 "EHLO
+	smtp1.linux-foundation.org" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1758249Ab0CKWFd (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 11 Mar 2010 17:05:33 -0500
+Message-Id: <201003112205.o2BM5FpL013289@imap1.linux-foundation.org>
+Subject: [patch 2/2] headerdep: perlcritic warning
+From: akpm@linux-foundation.org
+Date: Thu, 11 Mar 2010 14:05:15 -0800
+MIME-Version: 1.0
+Content-Type: text/plain; charset=ANSI_X3.4-1968
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org, Eric Miao <eric.y.miao@gmail.com>, linux-kernel@vger.kernel.org
+To: mmarek@suse.cz
+Cc: linux-kbuild@vger.kernel.org, akpm@linux-foundation.org, shemminger@vyatta.com, amwang@redhat.com
 
---Signature=_Thu__11_Mar_2010_21_33_42_+1100_2EIqKYGLWU_s3C==
-Content-Type: text/plain; charset=US-ASCII
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+From: Stephen Hemminger <shemminger@vyatta.com>
 
-Hi Michal,
+Minor perlcritic warning:
+headerdep.pl: "return" statement with explicit "undef" at line 84, column 2.  See page 199 of PBP.  (Severity: 5)
 
-On Thu, 11 Mar 2010 09:12:46 +0100 Michal Marek <mmarek@suse.cz> wrote:
->
-> On Thu, Mar 11, 2010 at 04:03:26PM +1100, Stephen Rothwell wrote:
-> > This breaks a "make modules modules_install" type build:
-> [...]
-> > $ make O=3D../ntest.obj INSTALL_MOD_PATH=3D../ -s modules modules_insta=
-ll
-> > cp: cannot stat `/home/sfr/kernels/ntest.obj/modules.builtin': No such =
-file or directory
->=20
-> Andrew reported this yesterday, too. The followin patch should fix it
-> (added to the for-next branch):
+Signed-off-by: Stephen Hemminger <shemminger@vyatta.com>
+Acked-by: WANG Cong <amwang@redhat.com>
+Cc: Michal Marek <mmarek@suse.cz>
+Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+---
 
-Great, thanks.
+ scripts/headerdep.pl |    3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
---=20
-Cheers,
-Stephen Rothwell                    sfr@canb.auug.org.au
-http://www.canb.auug.org.au/~sfr/
-
---Signature=_Thu__11_Mar_2010_21_33_42_+1100_2EIqKYGLWU_s3C==
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.10 (GNU/Linux)
-
-iEYEARECAAYFAkuYxwYACgkQjjKRsyhoI8x2oQCfRQLrExfiibiUq9oRuyUnmIZr
-9KsAoIdUoSHIiJ2Ijflq0IyQjyQfEC1W
-=Vpka
------END PGP SIGNATURE-----
-
---Signature=_Thu__11_Mar_2010_21_33_42_+1100_2EIqKYGLWU_s3C==--
+diff -puN scripts/headerdep.pl~headerdep-perlcritic-warning scripts/headerdep.pl
+--- a/scripts/headerdep.pl~headerdep-perlcritic-warning
++++ a/scripts/headerdep.pl
+@@ -80,8 +80,7 @@ sub search {
+ 		my $path = "$i/$filename";
+ 		return $path if -f $path;
+ 	}
+-
+-	return undef;
++	# not found returns undefined
+ }
+ 
+ sub parse_all {
+_
