@@ -1,35 +1,72 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:57813 "EHLO mx2.suse.de"
+Received: from cantor.suse.de ([195.135.220.2]:54735 "EHLO mx1.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755302Ab0CKKCS (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 11 Mar 2010 05:02:18 -0500
-Message-ID: <4B98BFA8.2000001@suse.cz>
-Date: Thu, 11 Mar 2010 11:02:16 +0100
+	id S1756640Ab0CKKST (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 11 Mar 2010 05:18:19 -0500
 From: Michal Marek <mmarek@suse.cz>
-MIME-Version: 1.0
-Subject: Re: [PATCH] scripts/Makefile.lib: Align the output of LZO
-References: <a04018f332b27cc76806012bce73d688ff6903ad.1268300521.git.wuzhangjin@gmail.com>
-In-Reply-To: <a04018f332b27cc76806012bce73d688ff6903ad.1268300521.git.wuzhangjin@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-2
-Content-Transfer-Encoding: 7bit
+Subject: [PATCH] kbuild: Really don't clean bounds.h and asm-offsets.h
+Date: Thu, 11 Mar 2010 11:18:10 +0100
+Message-Id: <1268302690-28218-1-git-send-email-mmarek@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Wu Zhangjin <wuzhangjin@gmail.com>
-Cc: linux-kbuild@vger.kernel.org, Albin Tonnerre <albin.tonnerre@free-electrons.com>
+To: linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
 
-On 11.3.2010 10:42, Wu Zhangjin wrote:
-> From: Wu Zhangjin <wuzhangjin@gmail.com>
-> 
-> The output of LZO is not aligned with the other output:
->   ...
->   CC      drivers/usb/mon/usbmon.mod.o
->   LZO    arch/mips/boot/compressed/vmlinux.lzo
->   ...
-> 
-> This patch fixes it.
-> 
-> Signed-off-by: Wu Zhangjin <wuzhangjin@gmail.com>
+Commit 7d3cc8b tried to keep bounds.h and asm-offsets.h during make
+clean by filtering these out of $(clean-files), but they are listed in
+$(targets) and $(always) and thus removed automatically. Introduce a new
+$(no-clean-files) variable to really skip such files in Makefile.clean.
 
-Thanks, applied.
+Signed-off-by: Michal Marek <mmarek@suse.cz>
+---
+ Documentation/kbuild/makefiles.txt |    7 +++++++
+ Kbuild                             |    4 ++--
+ scripts/Makefile.clean             |    2 ++
+ 3 files changed, 11 insertions(+), 2 deletions(-)
 
-Michal
+diff --git a/Documentation/kbuild/makefiles.txt b/Documentation/kbuild/makefiles.txt
+index 0135155..fcd1a98 100644
+--- a/Documentation/kbuild/makefiles.txt
++++ b/Documentation/kbuild/makefiles.txt
+@@ -779,6 +779,13 @@ This will delete the directory debian, including all subdirectories.
+ Kbuild will assume the directories to be in the same relative path as the
+ Makefile if no absolute path is specified (path does not start with '/').
+ 
++To exclude certain files from make clean, use the $(no-clean-files) variable.
++This is only a special case used in the top level Kbuild file:
++
++	Example:
++		#Kbuild
++		no-clean-files := $(bounds-file) $(offsets-file)
++
+ Usually kbuild descends down in subdirectories due to "obj-* := dir/",
+ but in the architecture makefiles where the kbuild infrastructure
+ is not sufficient this sometimes needs to be explicit.
+diff --git a/Kbuild b/Kbuild
+index e3737ad..18a8bfb 100644
+--- a/Kbuild
++++ b/Kbuild
+@@ -94,5 +94,5 @@ PHONY += missing-syscalls
+ missing-syscalls: scripts/checksyscalls.sh FORCE
+ 	$(call cmd,syscalls)
+ 
+-# Delete all targets during make clean
+-clean-files := $(addprefix $(objtree)/,$(filter-out $(bounds-file) $(offsets-file),$(targets)))
++# Keep these two files during make clean
++no-clean-files := $(bounds-file) $(offsets-file)
+diff --git a/scripts/Makefile.clean b/scripts/Makefile.clean
+index 6f89fbb..686cb0d 100644
+--- a/scripts/Makefile.clean
++++ b/scripts/Makefile.clean
+@@ -45,6 +45,8 @@ __clean-files	:= $(extra-y) $(always)                  \
+ 		   $(host-progs)                         \
+ 		   $(hostprogs-y) $(hostprogs-m) $(hostprogs-)
+ 
++__clean-files   := $(filter-out $(no-clean-files), $(__clean-files))
++
+ # as clean-files is given relative to the current directory, this adds
+ # a $(obj) prefix, except for absolute paths
+ 
+-- 
+1.6.6.1
+
