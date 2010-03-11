@@ -1,72 +1,61 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor.suse.de ([195.135.220.2]:54735 "EHLO mx1.suse.de"
+Received: from chilli.pcug.org.au ([203.10.76.44]:34793 "EHLO smtps.tip.net.au"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1756640Ab0CKKST (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 11 Mar 2010 05:18:19 -0500
-From: Michal Marek <mmarek@suse.cz>
-Subject: [PATCH] kbuild: Really don't clean bounds.h and asm-offsets.h
-Date: Thu, 11 Mar 2010 11:18:10 +0100
-Message-Id: <1268302690-28218-1-git-send-email-mmarek@suse.cz>
+	id S1756747Ab0CKKdt (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 11 Mar 2010 05:33:49 -0500
+Date: Thu, 11 Mar 2010 21:33:42 +1100
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+Subject: Re: [PATCH] kbuild: Do not unnecessarily regenerate modules.builtin
+Message-Id: <20100311213342.82494e22.sfr@canb.auug.org.au>
+In-Reply-To: <20100311081246.GA13932@sepie.suse.cz>
+References: <1268047222-13218-1-git-send-email-mmarek@suse.cz>
+	<20100311160326.bad1500e.sfr@canb.auug.org.au>
+	<20100311081246.GA13932@sepie.suse.cz>
+Mime-Version: 1.0
+Content-Type: multipart/signed; protocol="application/pgp-signature";
+ micalg="PGP-SHA1";
+ boundary="Signature=_Thu__11_Mar_2010_21_33_42_+1100_2EIqKYGLWU_s3C=="
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org, Eric Miao <eric.y.miao@gmail.com>, linux-kernel@vger.kernel.org
 
-Commit 7d3cc8b tried to keep bounds.h and asm-offsets.h during make
-clean by filtering these out of $(clean-files), but they are listed in
-$(targets) and $(always) and thus removed automatically. Introduce a new
-$(no-clean-files) variable to really skip such files in Makefile.clean.
+--Signature=_Thu__11_Mar_2010_21_33_42_+1100_2EIqKYGLWU_s3C==
+Content-Type: text/plain; charset=US-ASCII
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Michal Marek <mmarek@suse.cz>
----
- Documentation/kbuild/makefiles.txt |    7 +++++++
- Kbuild                             |    4 ++--
- scripts/Makefile.clean             |    2 ++
- 3 files changed, 11 insertions(+), 2 deletions(-)
+Hi Michal,
 
-diff --git a/Documentation/kbuild/makefiles.txt b/Documentation/kbuild/makefiles.txt
-index 0135155..fcd1a98 100644
---- a/Documentation/kbuild/makefiles.txt
-+++ b/Documentation/kbuild/makefiles.txt
-@@ -779,6 +779,13 @@ This will delete the directory debian, including all subdirectories.
- Kbuild will assume the directories to be in the same relative path as the
- Makefile if no absolute path is specified (path does not start with '/').
- 
-+To exclude certain files from make clean, use the $(no-clean-files) variable.
-+This is only a special case used in the top level Kbuild file:
-+
-+	Example:
-+		#Kbuild
-+		no-clean-files := $(bounds-file) $(offsets-file)
-+
- Usually kbuild descends down in subdirectories due to "obj-* := dir/",
- but in the architecture makefiles where the kbuild infrastructure
- is not sufficient this sometimes needs to be explicit.
-diff --git a/Kbuild b/Kbuild
-index e3737ad..18a8bfb 100644
---- a/Kbuild
-+++ b/Kbuild
-@@ -94,5 +94,5 @@ PHONY += missing-syscalls
- missing-syscalls: scripts/checksyscalls.sh FORCE
- 	$(call cmd,syscalls)
- 
--# Delete all targets during make clean
--clean-files := $(addprefix $(objtree)/,$(filter-out $(bounds-file) $(offsets-file),$(targets)))
-+# Keep these two files during make clean
-+no-clean-files := $(bounds-file) $(offsets-file)
-diff --git a/scripts/Makefile.clean b/scripts/Makefile.clean
-index 6f89fbb..686cb0d 100644
---- a/scripts/Makefile.clean
-+++ b/scripts/Makefile.clean
-@@ -45,6 +45,8 @@ __clean-files	:= $(extra-y) $(always)                  \
- 		   $(host-progs)                         \
- 		   $(hostprogs-y) $(hostprogs-m) $(hostprogs-)
- 
-+__clean-files   := $(filter-out $(no-clean-files), $(__clean-files))
-+
- # as clean-files is given relative to the current directory, this adds
- # a $(obj) prefix, except for absolute paths
- 
--- 
-1.6.6.1
+On Thu, 11 Mar 2010 09:12:46 +0100 Michal Marek <mmarek@suse.cz> wrote:
+>
+> On Thu, Mar 11, 2010 at 04:03:26PM +1100, Stephen Rothwell wrote:
+> > This breaks a "make modules modules_install" type build:
+> [...]
+> > $ make O=3D../ntest.obj INSTALL_MOD_PATH=3D../ -s modules modules_insta=
+ll
+> > cp: cannot stat `/home/sfr/kernels/ntest.obj/modules.builtin': No such =
+file or directory
+>=20
+> Andrew reported this yesterday, too. The followin patch should fix it
+> (added to the for-next branch):
 
+Great, thanks.
+
+--=20
+Cheers,
+Stephen Rothwell                    sfr@canb.auug.org.au
+http://www.canb.auug.org.au/~sfr/
+
+--Signature=_Thu__11_Mar_2010_21_33_42_+1100_2EIqKYGLWU_s3C==
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iEYEARECAAYFAkuYxwYACgkQjjKRsyhoI8x2oQCfRQLrExfiibiUq9oRuyUnmIZr
+9KsAoIdUoSHIiJ2Ijflq0IyQjyQfEC1W
+=Vpka
+-----END PGP SIGNATURE-----
+
+--Signature=_Thu__11_Mar_2010_21_33_42_+1100_2EIqKYGLWU_s3C==--
