@@ -1,29 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from 31.mail-out.ovh.net ([213.186.62.10]:34532 "HELO
-	31.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with SMTP id S933104Ab0CPSQK (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 16 Mar 2010 14:16:10 -0400
-Message-ID: <4B9FC952.8080403@example.com>
-Date: Tue, 16 Mar 2010 19:09:22 +0100
-From: Piotr Hosowicz <piotr@hosowicz.com>
-Reply-To: piotr@hosowicz.com
+Received: from xenotime.net ([72.52.64.118]:54407 "HELO xenotime.net"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with SMTP
+	id S1751790Ab0CPSTl (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 16 Mar 2010 14:19:41 -0400
+Received: from chimera.site ([71.245.98.113]) by xenotime.net for <linux-kbuild@vger.kernel.org>; Tue, 16 Mar 2010 11:19:39 -0700
+Message-ID: <4B9FCBBB.2040204@xenotime.net>
+Date: Tue, 16 Mar 2010 11:19:39 -0700
+From: Randy Dunlap <rdunlap@xenotime.net>
 MIME-Version: 1.0
-Subject: How to subscribe to this list?
-Content-Type: text/plain; charset=ISO-8859-2; format=flowed
-Content-Transfer-Encoding: 8bit
+Subject: Re: How to subscribe to this list?
+References: <4B9FC952.8080403@example.com>
+In-Reply-To: <4B9FC952.8080403@example.com>
+Content-Type: text/plain; charset=ISO-8859-2
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
+To: piotr@hosowicz.com
+Cc: linux-kbuild@vger.kernel.org
 
-How?
+On 03/16/10 11:09, Piotr Hosowicz wrote:
+> How?
+> 
+> Regards,
+> 
+> Piotr Hosowicz
 
-Regards,
+Hi,
 
-Piotr Hosowicz
+From the email message footer:
+
+"To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html"
+
+That web page has info on subscribing.  It's very similar to the unsubsribe
+help above.  If you still have problems, please ask again.
+
 
 -- 
-Janusz Korwin-Mikke:
-"ZUS z pewno¶ci± jest instytucj± przestêpcz±,
-ale nie mo¿na nazwaæ jej zorganizowan±."
-NP: John Coltrane & Miles Davis - On Green Dolphin Street
+~Randy
