@@ -1,11 +1,11 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from 63.mail-out.ovh.net ([91.121.185.56]:34276 "HELO
+Received: from 63.mail-out.ovh.net ([91.121.185.56]:58554 "HELO
 	63.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with SMTP id S1751951Ab0CQQDh (ORCPT
+	with SMTP id S1752747Ab0CQRtd (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 17 Mar 2010 12:03:37 -0400
-Message-ID: <4BA0FD53.2000400@example.com>
-Date: Wed, 17 Mar 2010 17:03:31 +0100
+	Wed, 17 Mar 2010 13:49:33 -0400
+Message-ID: <4BA11627.6020308@example.com>
+Date: Wed, 17 Mar 2010 18:49:27 +0100
 From: Piotr Hosowicz <piotr@hosowicz.com>
 Reply-To: piotr@hosowicz.com
 MIME-Version: 1.0
@@ -22,38 +22,26 @@ Cc: linux-kbuild@vger.kernel.org
 
 Randy Dunlap wrote:
 
-> OK, are you using lilo or grub?
-
-I am using GRUB.
-
-> Whatever boot loader it is, please
-> show us a working boot loader config entry and the failing boot loader
-> config entry.
-
-This is the working one, one of working ones:
-
-title		Debian GNU/Linux, kernel 2.6.34-rc1-nx-20100317-next-20100317+
-root		(hd0,0)
-kernel		/vmlinuz-2.6.34-rc1-nx-20100317-next-20100317+ root=/dev/sda2 ro 
-quiet
-initrd		/initrd.img-2.6.34-rc1-nx-20100317-next-20100317+
-
-
-This is the failing one:
-
-title		Debian GNU/Linux, kernel 2.6.34-rc1-nxa-20100315-next-20100315+
-root		(hd0,0)
-kernel		/vmlinuz-2.6.34-rc1-nxa-20100315-next-20100315+ root=/dev/sda2 
-ro quiet
-initrd		/initrd.img-2.6.34-rc1-nxa-20100315-next-20100315+
-
 > The first thing that I would try is enabling CONFIG_DEVTMPFS and
 > CONFIG_DEVTMPFS_MOUNT, rebuild, reboot...
 
-Ok, thanks, I'll try.
+I've rebuilt and it boots fine. Just after booting the kernel it had to 
+think for a while and I was afraid that it won't boot at all. But it booted.
+
+BTW What is this message during building about? Should I worry?
+
+WARNING: modpost: Found 106 section mismatch(es).
+To see full details build your kernel with:
+'make CONFIG_DEBUG_SECTION_MISMATCH=y'
+
+Regards,
+
+Piotr Hosowicz
 
 -- 
-Jest jedna korzy¶æ z posiadania TV - jak dobrze
-rozregulujesz odbiornik, trafisz na promieniowanie
-mikrofalowe z pocz±tków Wszech¶wiata.
+"[Oleksy] dotkn±³ naszych domów, naszych ¿on, naszych dzieci,
+naszych psów, naszych ¦WINEK MORSKICH, on po prostu wkroczy³
+swoim g³upim gadaniem w sferê prywatn±, która musi byæ chro-
+niona dla dobra ka¿dego z nas" - powiedzia³ Kwa¶niewski.
 NP:  -
+
