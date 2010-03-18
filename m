@@ -1,44 +1,22 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtpgcba1.buenosaires.gob.ar ([200.89.135.225]:49086 "EHLO
-	smtpgcba1.buenosaires.gob.ar" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1754845Ab0CQV0S (ORCPT
+Received: from stampagate.stampadoor.com.br ([200.157.64.226]:1754 "EHLO
+	stampagate.stampadoor.com.br" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1752088Ab0CRD3G (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 17 Mar 2010 17:26:18 -0400
-Message-ID: <20100317181723.88480b88s77mrbvn@mail.buenosaires.gob.ar>
-Date: Wed, 17 Mar 2010 18:17:23 -0300
-From: "Mr.Patrick Adams" <mrpatrick.adams@gmail.com>
-Reply-to: mrpatrick.adams47@gmail.com
-Subject: Winning Notification
-MIME-Version: 1.0
-Content-Type: text/plain;
- charset=ISO-8859-1;
- DelSp="Yes";
- format="flowed"
-Content-Disposition: inline
-Content-Transfer-Encoding: 8BIT
+	Wed, 17 Mar 2010 23:29:06 -0400
+Subject: Massage Therapists - 76,701 records and 8,305 emails
+Reply-To: buckrutgers2382@gmail.com
+From: "Shelton B Brock" <ufology2010@gmail.com>
+Message-ID: <STAMPAGATEiBlaJGsdo0000043b@stampagate.stampadoor.com.br>
+Date: 18 Mar 2010 00:09:48 -0300
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
+To: dean.chrp@downstate.edu, rune.kock@gmail.com, linux-ik@postaci.linux.org.tr, rmccutchan@fos.org.au
+
+I have alot of good quality American Databases at decent prices. Contact me here:  Rebekah.Greene@lowestpricelists.Co.CC for a complete catalog of what we have.
+
+ 
+  
 
 
-
-  Dear E-mail User,
-Your  email has just won the sum of £750,000.00 GBP in cash credited  
-to a file in the just concluded Irish Lottery International Award  
-Programme held 10th of march,2010
-====================================
-Your  e-mail address attached to:
-Winner Pin No:5388/10.
-Secret No:089188/10
-Winning Date: 10th of march,2010
-=============================================
-1. Full Name 2. Address: 3.Age/Gender 4. Occupation 5.Nationality  
-6.Phone Number 7. Have you won a lotttery before?(YES/NO)8.Amount Won?
-Send details to Fiduciary Agent: Dr.Culverton Humphery
-Tel: +44(0)703 595 7792
-Email:mrpatrick.adams47@gmail.com
-
-Note:All Reponses should be sent to Agent via  
-email:mrpatrick.adams47@gmail.com
-Online Co-Ordinator
-Mr.Patrick Adams
-
+Send email to rembox@lowestpricelists.Co.CC to ensure no further communication
