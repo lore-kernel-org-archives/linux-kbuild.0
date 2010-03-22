@@ -1,77 +1,152 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from hrndva-omtalb.mail.rr.com ([71.74.56.123]:58576 "EHLO
-	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750808Ab0CTVwV (ORCPT
+Received: from 26.mail-out.ovh.net ([91.121.27.225]:54341 "HELO
+	26.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with SMTP id S1754063Ab0CVDi2 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 20 Mar 2010 17:52:21 -0400
-Subject: Re: [PATCH] kconfig: recalc symbol value before showing search
- results
-From: Steven Rostedt <rostedt@goodmis.org>
-In-Reply-To: <4BA3206B.9020405@cn.fujitsu.com>
-References: <4BA3206B.9020405@cn.fujitsu.com>
-Content-Type: text/plain; charset="UTF-8"
-Date: Sat, 20 Mar 2010 17:52:16 -0400
-Message-ID: <1269121936.5363.199.camel@localhost>
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+	Sun, 21 Mar 2010 23:38:28 -0400
+Message-ID: <4BA6E49F.3070008@example.com>
+Date: Mon, 22 Mar 2010 04:31:43 +0100
+From: Piotr Hosowicz <piotr@hosowicz.com>
+Reply-To: piotr@hosowicz.com
+MIME-Version: 1.0
+Subject: Re: Maybe my frequent kernel building could be of some help to the
+ community? And how to build?
+References: <4B9FD5D1.8040203@example.com>	<4B9FDAF3.9010804@xenotime.net> <20100318084012.0cca4b6a.rdunlap@xenotime.net>
+In-Reply-To: <20100318084012.0cca4b6a.rdunlap@xenotime.net>
+Content-Type: text/plain; charset=ISO-8859-2; format=flowed
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Li Zefan <lizf@cn.fujitsu.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>, linux-kbuild@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, Michal Marek <mmarek@suse.cz>, Thomas Gleixner <tglx@linutronix.de>, Frederic Weisbecker <fweisbec@gmail.com>, Ingo Molnar <mingo@redhat.com>
+To: Randy Dunlap <rdunlap@xenotime.net>
+Cc: linux-kbuild@vger.kernel.org
 
-On Fri, 2010-03-19 at 14:57 +0800, Li Zefan wrote:
-> A symbol's value won't be recalc-ed until we save config file or
-> enter the menu where the symbol sits.
-> 
-> So If I enable OPTIMIZE_FOR_SIZE, and search FUNCTION_GRAPH_TRACER:
-> 
->   Symbol: FUNCTION_GRAPH_TRACER [=y]
->   Prompt: Kernel Function Graph Tracer
->     Defined at kernel/trace/Kconfig:140
->     Depends on: ... [=y] && (!X86_32 [=y] || !CC_OPTIMIZE_FOR_SIZE [=y])
+Randy Dunlap wrote:
 
-[ off topic ]
+> One thing that you could do that no one focuses on is building
+> with some kconfig symbols disabled (ones that are typically enabled),
+> such as CONFIG_SMP=n, CONFIG_SYSFS=n, CONFIG_PROC_FS=n, CONFIG_PM=n,
+> CONFIG_PCI=n, CONFIG_BLOCK=n, CONFIG_NET=n, CONFIG_INET=n (but latter
+> with CONFIG_NET=y), CONFIG_HOTPLUG=n.  Not all of these at the same time,
+> just various/random combinations of them.
 
-I'm not sure we need that anymore. I think Thomas added a patch that can
-disable the cases that gcc causes the function graph to fail.
+I am glad I can help. At last I sat down to write the scripts, I was so 
+excited I couldn't fall asleep ;-). I figured it out in such a way:
 
-I pushed a patch before that also runs a check at compile time to make
-sure that gcc does not produce a bad mcount setup that would screw up
-the function graph tracer.
+- separate system user for building
+- in his crontab everyminute a build try starts with randomized options 
+you mentioned - this works, I hope
 
-http://lkml.org/lkml/2009/11/20/2
+The problem is that it requires my assistance, because it asks a few 
+questions like in make oldconfig when there are new options available. I 
+do not know how to fix this.
 
-It probably still makes sense to add it.
+Here are the scripts:
 
--- Steve
+# randomize-conf.sh
 
->     ...
-> 
-> >From the dependency it should result in FUNCTION_GRAPH_TRACER=n,
-> but it still shows FUNCTION_GRAPH_TRACER=y.
-> 
-> Signed-off-by: Li Zefan <lizf@cn.fujitsu.com>
-> ---
->  scripts/kconfig/symbol.c |    1 +
->  1 files changed, 1 insertions(+), 0 deletions(-)
-> 
-> diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
-> index 6c8fbbb..dfef8d1 100644
-> --- a/scripts/kconfig/symbol.c
-> +++ b/scripts/kconfig/symbol.c
-> @@ -750,6 +750,7 @@ struct symbol **sym_re_search(const char *pattern)
->  				return NULL;
->  			}
->  		}
-> +		sym_calc_value(sym);
->  		sym_arr[cnt++] = sym;
->  	}
->  	if (sym_arr)
-> -- 1.6.3 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kernel" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> Please read the FAQ at  http://www.tux.org/lkml/
+#!/bin/bash
+
+NETENABLED=0
+function enable_or_not(){
+   if test $RANDOM -lt 16383 ; then
+     if test $1=CONFIG_NET ; then
+       NETENABLED=1
+       echo $1=y
+       return
+     fi
+     if test $1=CONFIG_INET && test $NETENABLED -eq 1 ; then
+       if test $RANDOM -lt 16383 ; then
+         echo $1=y
+       else
+         echo '# CONFIG_'$1' is not set'
+       fi
+       return
+     fi
+   else
+     echo '# CONFIG_'$1' is not set'
+   fi
+}
+
+while read LINE ; do
+   FIRST=$(echo $LINE | cut -d '=' -f 1)
+   case $FIRST in
+     CONFIG_SMP)
+       enable_or_not CONFIG_SMP
+     ;;
+     CONFIG_SYSFS)
+       enable_or_not CONFIG_SYSFS
+     ;;
+     CONFIG_PROC_FS)
+       enable_or_not CONFIG_PROC_FS
+     ;;
+     CONFIG_PM)
+       enable_or_not CONFIG_PM
+     ;;
+     CONFIG_PCI)
+       enable_or_not CONFIG_PCI
+     ;;
+     CONFIG_BLOCK)
+       enable_or_not CONFIG_BLOCK
+     ;;
+     CONFIG_NET)
+       enable_or_not CONFIG_NET
+     ;;
+     CONFIG_INET)
+       enable_or_not CONFIG_INET
+     ;;
+     CONFIG_HOTPLUG)
+       enable_or_not CONFIG_HOTPLUG
+     ;;
+     *)
+       echo $LINE
+   esac
+done
+
+# try-build.sh
+
+#!/bin/bash
+
+RCPT=phz@localhost
+
+function tidy(){
+   rm ../results/.config 2>/dev/null
+   rm ../results/build.log 2>/dev/null
+   rm ../BUILDING-NOW 2>/dev/null
+}
+
+cd ~/kernel/linux
+if test -f ../BUILDING-NOW ; then
+   exit 0
+else
+   touch ../BUILDING-NOW
+   make mrproper
+   cat ../config.all | ../randomize-conf.sh > ./.config
+   make prepare
+   cp .config ../results/
+   make -j 10 2>&1 > ../results/build.log
+   if test $? -ne 0 ; then
+     (cat ../results/.config && cat ../results/build.log) | mail -s 
+'Build failed at kernel phase' $RCPT
+     mv ../results/.config ../results/.config.kf.$(date +%y%m%d-%H%M%S)
+     tidy
+     exit 0
+   fi
+   make -j 10 modules 2>&1 >> ../results/build.log
+   if test $? -ne 0 ; then
+     (cat ../results/.config && cat ../results/build.log) | mail -s 
+'Build failed at modules phase' $RCPT
+     mv ../results/.config ../results/.config.mf.$(date +%y%m%d-%H%M%S)
+     tidy
+     exit 0
+   fi
+   echo OK | mail -s 'ok' $RCPT
+   tidy
+fi
 
 
+
+-- 
+TV: "Rosjanki osi±gnê³y szczyt w niew³a¶ciwym miejscu, w
+niew³a¶ciwym czasie i w³a¶ciwie zupe³nie niepotrzebnie."
+NP: Mark Knopfler - Hard Shoulder
+NB: 2.6.34-rc1-git9-a
