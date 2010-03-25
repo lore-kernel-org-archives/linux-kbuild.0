@@ -1,75 +1,65 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from 27.mail-out.ovh.net ([91.121.30.210]:51389 "HELO
-	27.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with SMTP id S1754477Ab0CYLiK (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 25 Mar 2010 07:38:10 -0400
-Message-ID: <4BAB4B1E.3080703@example.com>
-Date: Thu, 25 Mar 2010 12:38:06 +0100
-From: Piotr Hosowicz <piotr@hosowicz.com>
-Reply-To: piotr@hosowicz.com
+Received: from xenotime.net ([72.52.64.118]:32911 "HELO xenotime.net"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with SMTP
+	id S1751283Ab0CYR3i (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 25 Mar 2010 13:29:38 -0400
+Received: from chimera.site ([71.245.98.113]) by xenotime.net for <linux-kbuild@vger.kernel.org>; Thu, 25 Mar 2010 10:29:35 -0700
+Message-ID: <4BAB9D7F.8020506@xenotime.net>
+Date: Thu, 25 Mar 2010 10:29:35 -0700
+From: Randy Dunlap <rdunlap@xenotime.net>
 MIME-Version: 1.0
 Subject: Re: Maybe my frequent kernel building could be of some help to the
  community? And how to build?
-References: <4B9FD5D1.8040203@example.com>	<4B9FDAF3.9010804@xenotime.net> <20100318084012.0cca4b6a.rdunlap@xenotime.net> <4BA6E49F.3070008@example.com> <4BA6E87D.2030405@xenotime.net> <4BA765B8.5010808@example.com> <4BA76852.8000506@example.com> <4BA966FF.2080903@example.com> <4BAA8769.3080907@xenotime.net>
-In-Reply-To: <4BAA8769.3080907@xenotime.net>
-Content-Type: text/plain; charset=ISO-8859-2; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <4B9FD5D1.8040203@example.com>	<4B9FDAF3.9010804@xenotime.net> <20100318084012.0cca4b6a.rdunlap@xenotime.net>
+In-Reply-To: <20100318084012.0cca4b6a.rdunlap@xenotime.net>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Randy Dunlap <rdunlap@xenotime.net>
+To: piotr@hosowicz.com
 Cc: linux-kbuild@vger.kernel.org
 
-Randy Dunlap wrote:
-> On 03/23/10 18:12, Piotr Hosowicz wrote:
->> Piotr Hosowicz wrote:
->>
->>> But it seems that it works, but I do not understand why. Needs rewrite,
->>> better config template line parsing.
->> I made it with Python, the scripts follow:
+On 03/18/10 08:40, Randy Dunlap wrote:
+> On Tue, 16 Mar 2010 12:24:35 -0700 Randy Dunlap wrote:
 > 
-> Thanks for sharing them.
-
-Sorry to say but they are crap, the python script corrupts the config 
-file, I do not know why. I'll try to solve it and post again.
-
->> --- main try-build.sh
+>> On 03/16/10 12:02, Piotr Hosowicz wrote:
+>>> Hello,
+>>>
+>>> I own quite strong PC, 4 core Pentium. I recently started to build my
+>>> kernel frequently, whenever I see a new patch on kernel.org I build
+>>> again. Bothers me that I do it only for doing it. Maybe it could be of
+>>> some help to the community? And if so, what would be more appreciated -
+>>> linux-next patched kernel or gitN patched kernel? And how should I
+>>> configure the kernel for this purpose? I am afraid of putting all the
+>>> options on, yesterday I tried to put everything on as a module plus I
+>>> tinkered with some other options that seemed innocent. The kernel was
+>>> built but could not boot, saying that there was a problem with the root
+>>> device, it could not recoginze /dev/sda2, which is my correct root
+>>> device. I did not investigate much and reverted to working kernel.
+>>>
+>>> Thanks in advance for your remarks.
 >>
->> #!/bin/bash
+>> Many linux-next builds are done daily: see
+>>   http://kisskb.ellerman.id.au/kisskb/branch/9/
 >>
->> RCPT=phz@localhost
+>> and then I do 25 x86_32 randconfigs and 25 x64_64 randconfigs
+>> daily and fix most build errors that I find in them.
+>> (I am also using a quad-core PC with a cron job that finds the
+>> next day's linux-next, downloads it, and does 50 builds.)
 >>
->> function tidy(){
->>   rm ../results/.config 2>/dev/null
->>   rm ../results/build.log 2>/dev/null
->>   rm ../BUILDING-NOW 2>/dev/null
->> }
->>
->> cd ~/kernel/linux
->> if test -f ../BUILDING-NOW ; then
->>   exit 0
->> else
->>   touch ../BUILDING-NOW
->>   make mrproper
->>   cat ../config.all | ../randomize-conf.py > ./.config
->>   make prepare
->>   cp .config ../results/
->>   make -j 10 2>&1 > ../results/build.log
+>> You are welcome to do the same or test mainline (with daily
+>> builds) and/or Andrew Morton's mmotm patchset.
 > 
-> 'make' with no target also builds modules, so the 'make modules'
-> below isn't needed (it's extra work).
+> 
+> One thing that you could do that no one focuses on is building
+> with some kconfig symbols disabled (ones that are typically enabled),
+> such as CONFIG_SMP=n, CONFIG_SYSFS=n, CONFIG_PROC_FS=n, CONFIG_PM=n,
+> CONFIG_PCI=n, CONFIG_BLOCK=n, CONFIG_NET=n, CONFIG_INET=n (but latter
+> with CONFIG_NET=y), CONFIG_HOTPLUG=n.  Not all of these at the same time,
+> just various/random combinations of them.
 
-Yes, but I wanted to have it separate to know when the build fails.
+and CONFIG_SYSRQ=n  (just found some errors due to this one)
 
-Regards,
-
-Piotr Hosowicz
 
 -- 
-Miss World 2006: Jestem szczê¶liwa, ¿e mogê wspaniale uczestniczyæ w
-prze¿yciu najpiêkniejszych kobiet tutaj w Warszawie, gdzie Jan Pawe³ II,
-papie¿, w Polsce, sk±d pochodzi. Spotka³am siê z Ko¶cio³em Mariackim
-w Krakowie, który ciep³o ludzi i wielka przyja¼ñ. Po³owa mojego serca
-zostanie w Polsce, a druga po³owa pojedzie ze mn± do mojego kraju.
-NP: Mark Knopfler - Piper To The End
-NB: 2.6.34-rc2-nx-20100324-next-20100324+
+~Randy
