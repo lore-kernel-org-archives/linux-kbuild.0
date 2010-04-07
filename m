@@ -1,95 +1,137 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from 27.mail-out.ovh.net ([91.121.30.210]:47872 "HELO
-	27.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with SMTP id S1754140Ab0DARoN (ORCPT
+Received: from qw-out-2122.google.com ([74.125.92.26]:3251 "EHLO
+	qw-out-2122.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750802Ab0DGEVF (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 1 Apr 2010 13:44:13 -0400
-Message-ID: <4BB4DB68.1030800@example.com>
-Date: Thu, 01 Apr 2010 19:44:08 +0200
-From: Piotr Hosowicz <piotr@hosowicz.com>
-Reply-To: piotr@hosowicz.com
+	Wed, 7 Apr 2010 00:21:05 -0400
+Date: Wed, 7 Apr 2010 12:24:45 +0800
+From: Amerigo Wang <xiyou.wangcong@gmail.com>
+Subject: Re: [PATCH] add random binaries to .gitignore
+Message-ID: <20100407042445.GB3830@cr0.nay.redhat.com>
+References: <4BAF4DAF.70609@gmail.com>
+ <20100328133500.GB3622@core2>
+ <4BAF5BD7.1060208@gmail.com>
+ <20100328141957.GA3689@core2>
+ <4BAF618E.2010604@gmail.com>
+ <q2s9c2470ce1004062111hba0a067dwa9705a26d31b47f@mail.gmail.com>
 MIME-Version: 1.0
-Subject: Re: Maybe my frequent kernel building could be of some help to the
- community? And how to build?
-References: <4B9FD5D1.8040203@example.com>	<4B9FDAF3.9010804@xenotime.net>	<20100318084012.0cca4b6a.rdunlap@xenotime.net>	<4BAB9D7F.8020506@xenotime.net> <20100401090239.ecf26ce2.randy.dunlap@oracle.com> <4BB4D6E3.9030100@example.com>
-In-Reply-To: <4BB4D6E3.9030100@example.com>
-Content-Type: text/plain; charset=ISO-8859-2; format=flowed
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <q2s9c2470ce1004062111hba0a067dwa9705a26d31b47f@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: piotr@hosowicz.com
-Cc: Randy Dunlap <randy.dunlap@oracle.com>, Randy Dunlap <rdunlap@xenotime.net>, linux-kbuild@vger.kernel.org
+To: Jan III Sobieski <jan3sobi3ski@gmail.com>
+Cc: LKML <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org
 
-Piotr Hosowicz wrote:
-> Randy Dunlap wrote:
->> On Thu, 25 Mar 2010 10:29:35 -0700 Randy Dunlap wrote:
->>
->>> On 03/18/10 08:40, Randy Dunlap wrote:
->>>> On Tue, 16 Mar 2010 12:24:35 -0700 Randy Dunlap wrote:
->>>>
->>>>> On 03/16/10 12:02, Piotr Hosowicz wrote:
->>>>>> Hello,
->>>>>>
->>>>>> I own quite strong PC, 4 core Pentium. I recently started to build my
->>>>>> kernel frequently, whenever I see a new patch on kernel.org I build
->>>>>> again. Bothers me that I do it only for doing it. Maybe it could 
->>>>>> be of
->>>>>> some help to the community? And if so, what would be more 
->>>>>> appreciated -
->>>>>> linux-next patched kernel or gitN patched kernel? And how should I
->>>>>> configure the kernel for this purpose? I am afraid of putting all the
->>>>>> options on, yesterday I tried to put everything on as a module plus I
->>>>>> tinkered with some other options that seemed innocent. The kernel was
->>>>>> built but could not boot, saying that there was a problem with the 
->>>>>> root
->>>>>> device, it could not recoginze /dev/sda2, which is my correct root
->>>>>> device. I did not investigate much and reverted to working kernel.
->>>>>>
->>>>>> Thanks in advance for your remarks.
->>>>> Many linux-next builds are done daily: see
->>>>>   http://kisskb.ellerman.id.au/kisskb/branch/9/
+On Wed, Apr 07, 2010 at 06:11:18AM +0200, Jan III Sobieski wrote:
+>2010/3/28 Jan III Sobieski <jan3sobi3ski@gmail.com>:
+>> W dniu 2010-03-28 16:19, Alexey Dobriyan pisze:
+>>> On Sun, Mar 28, 2010 at 03:38:31PM +0200, Jan III Sobieski wrote:
+>>>> W dniu 2010-03-28 15:35, Alexey Dobriyan pisze:
+>>>>> On Sun, Mar 28, 2010 at 02:38:07PM +0200, Jan III Sobieski wrote:
+>>>>>> +# random binary files
+>>>>>> +Documentation/filesystems/dnotify_test
+>>>>>> +Documentation/laptops/dslm
+>>>>>> +Documentation/timers/hpet_example
+>>>>>> +Documentation/vm/hugepage-mmap
+>>>>>> +Documentation/vm/hugepage-shm
+>>>>>> +Documentation/vm/map_hugetlb
+>>>>>> +arch/x86/boot/compressed/vmlinux
+>>>>>> +arch/x86/tools/test_get_len
 >>>>>
->>>>> and then I do 25 x86_32 randconfigs and 25 x64_64 randconfigs
->>>>> daily and fix most build errors that I find in them.
->>>>> (I am also using a quad-core PC with a cron job that finds the
->>>>> next day's linux-next, downloads it, and does 50 builds.)
->>>>>
->>>>> You are welcome to do the same or test mainline (with daily
->>>>> builds) and/or Andrew Morton's mmotm patchset.
+>>>>> This should go to per-directory gitiignores.
 >>>>
->>>> One thing that you could do that no one focuses on is building
->>>> with some kconfig symbols disabled (ones that are typically enabled),
->>>> such as CONFIG_SMP=n, CONFIG_SYSFS=n, CONFIG_PROC_FS=n, CONFIG_PM=n,
->>>> CONFIG_PCI=n, CONFIG_BLOCK=n, CONFIG_NET=n, CONFIG_INET=n (but latter
->>>> with CONFIG_NET=y), CONFIG_HOTPLUG=n.  Not all of these at the same 
->>>> time,
->>>> just various/random combinations of them.
->>> and CONFIG_SYSRQ=n  (just found some errors due to this one)
+>>>> I agree that it is not the best solution. But one directory one
+>>>> .gitignore also isn't the best, so I propose this
+>>>
+>>> .gitignore in leaf directory is the status quo.
+>>>
+>>>       find . -type f -name '\.gitignore'
 >>
->> and CONFIG_INPUT randomly enabled/disabled
+>> Ok
+>
+>Anyone out there care to take this patches?
+
+I think you need to Cc kbuild people. (Done.)
+
+This patch looks fine for me, we need this, especially
+the x86 piece, I met it several times.
+
+Thanks!
+
+>
 >>
->> Basically any major subsystem that can be enabled/disabled should be
->> tested.
-> 
-> Randy, but as for now (please find my messages) I do not know how to 
-> randomly generate .config, I do not understand how make oldconfig works. 
-> So I am stopped.
-
-Randy, sorry, I just now saw, that You advised to use:
-
-yes '' | make oldconfig
-
-I got it wrong, and used - to my confusion:
-
-yes | make oldconfig
-
-I'll get to it tommorrow.
-
-Godd night.
-
-Piotr Hosowicz
-
--- 
-TV: "Jeszcze trzy ruchy i Otylia b�dzie szcz�liwa."
-NP: Alice In Chains - All Secrets Known
-NB: 2.6.34-rc3-next-20100401+
+>> --
+>> Jan III Sobieski
+>>
+>> Signed-off-by: Jan III Sobieski <jan3sobi3ski@gmail.com>
+>>
+>> diff --git a/Documentation/filesystems/.gitignore
+>> b/Documentation/filesystems/.gitignore
+>> new file mode 100644
+>> index 0000000..1ddd62a
+>> --- /dev/null
+>> +++ b/Documentation/filesystems/.gitignore
+>> @@ -0,0 +1,2 @@
+>> +dnotify_test
+>> +
+>> diff --git a/Documentation/laptops/.gitignore
+>> b/Documentation/laptops/.gitignore
+>> new file mode 100644
+>> index 0000000..f6bb9d0
+>> --- /dev/null
+>> +++ b/Documentation/laptops/.gitignore
+>> @@ -0,0 +1,2 @@
+>> +dslm
+>> +
+>> diff --git a/Documentation/timers/.gitignore
+>> b/Documentation/timers/.gitignore
+>> new file mode 100644
+>> index 0000000..f710cba
+>> --- /dev/null
+>> +++ b/Documentation/timers/.gitignore
+>> @@ -0,0 +1,2 @@
+>> +hpet_example
+>> +
+>> diff --git a/Documentation/vm/.gitignore b/Documentation/vm/.gitignore
+>> index 09b164a..3c65a46 100644
+>> --- a/Documentation/vm/.gitignore
+>> +++ b/Documentation/vm/.gitignore
+>> @@ -1,2 +1,6 @@
+>>  page-types
+>>  slabinfo
+>> +hugepage-mmap
+>> +hugepage-shm
+>> +map_hugetlb
+>> +
+>> diff --git a/arch/x86/boot/compressed/.gitignore
+>> b/arch/x86/boot/compressed/.gitignore
+>> index 4a46fab..b71c8ca 100644
+>> --- a/arch/x86/boot/compressed/.gitignore
+>> +++ b/arch/x86/boot/compressed/.gitignore
+>> @@ -1,4 +1,5 @@
+>>  relocs
+>> +vmlinux
+>>  vmlinux.bin.all
+>>  vmlinux.relocs
+>>  vmlinux.lds
+>> diff --git a/arch/x86/tools/.gitignore b/arch/x86/tools/.gitignore
+>> new file mode 100644
+>> index 0000000..b1ac2dc
+>> --- /dev/null
+>> +++ b/arch/x86/tools/.gitignore
+>> @@ -0,0 +1,2 @@
+>> +test_get_len
+>> +
+>>
+>
+>
+>
+>-- 
+>Jan III Sobieski
+>--
+>To unsubscribe from this list: send the line "unsubscribe linux-kernel" in
+>the body of a message to majordomo@vger.kernel.org
+>More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>Please read the FAQ at  http://www.tux.org/lkml/
