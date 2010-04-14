@@ -1,179 +1,225 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cn.fujitsu.com ([222.73.24.84]:53876 "EHLO song.cn.fujitsu.com"
-	rhost-flags-OK-FAIL-OK-OK) by vger.kernel.org with ESMTP
-	id S1753492Ab0DNDo4 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 13 Apr 2010 23:44:56 -0400
-Message-ID: <4BC53A90.9020304@cn.fujitsu.com>
-Date: Wed, 14 Apr 2010 11:46:24 +0800
-From: Li Zefan <lizf@cn.fujitsu.com>
+Received: from cantor.suse.de ([195.135.220.2]:49197 "EHLO mx1.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750939Ab0DNNW1 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 14 Apr 2010 09:22:27 -0400
+Message-ID: <4BC5C190.3020501@suse.cz>
+Date: Wed, 14 Apr 2010 15:22:24 +0200
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Subject: [PATCH 6/6] gconfig: add support to show hidden options that have
- prompts
-References: <4BC539DD.5040003@cn.fujitsu.com>
-In-Reply-To: <4BC539DD.5040003@cn.fujitsu.com>
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: [PATCH] kconfig: introduce nonint_oldconfig and	loose_nonint_oldconfig
+ (v2)
+References: <20100413194747.GX31193@redhat.com> <20100413130031.d4dec19b.randy.dunlap@oracle.com> <20100413201759.GY31193@redhat.com> <4BC4D310.6060705@oracle.com> <20100413210352.GA31193@redhat.com>
+In-Reply-To: <20100413210352.GA31193@redhat.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: LKML <linux-kernel@vger.kernel.org>
-Cc: Andrew Morton <akpm@linux-foundation.org>, Randy Dunlap <randy.dunlap@oracle.com>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, Tim Bird <tim.bird@am.sony.com>
+To: Aristeu Rozanski <aris@redhat.com>
+Cc: Randy Dunlap <randy.dunlap@oracle.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, davej@redhat.com, kyle@redhat.com, vgoyal@redhat.com, arjan@linux.intel.com
 
-There's a button in gconfig to "Show all options", but I think
-normally we are not interested in those configs which have no
-prompt and thus can't be changed, so here I add a new button to
-show hidden options which have prompts.
+On 13.4.2010 23:03, Aristeu Rozanski wrote:
+> This patch has been around for a long time in Fedora and Red Hat Enterprise   
+> Linux kernels and it may be useful for others. The nonint_oldconfig target    
+> will fail and print the unset config options
 
-Signed-off-by: Li Zefan <lizf@cn.fujitsu.com>
----
- scripts/kconfig/gconf.c     |   47 ++++++++++++++++++++++++++++++++++--------
- scripts/kconfig/gconf.glade |   28 +++++++++++++++++++++++-
- 2 files changed, 64 insertions(+), 11 deletions(-)
+Nice.
 
-diff --git a/scripts/kconfig/gconf.c b/scripts/kconfig/gconf.c
-index c6aa5a5..bef1041 100644
---- a/scripts/kconfig/gconf.c
-+++ b/scripts/kconfig/gconf.c
-@@ -30,12 +30,16 @@ enum {
- 	SINGLE_VIEW, SPLIT_VIEW, FULL_VIEW
- };
- 
-+enum {
-+	OPT_NORMAL, OPT_ALL, OPT_PROMPT
-+};
-+
- static gint view_mode = FULL_VIEW;
- static gboolean show_name = TRUE;
- static gboolean show_range = TRUE;
- static gboolean show_value = TRUE;
--static gboolean show_all = FALSE;
- static gboolean resizeable = FALSE;
-+static int opt_mode = OPT_NORMAL;
- 
- GtkWidget *main_wnd = NULL;
- GtkWidget *tree1_w = NULL;	// left  frame
-@@ -637,12 +641,29 @@ void on_show_data1_activate(GtkMenuItem * menuitem, gpointer user_data)
- 
- 
- void
--on_show_all_options1_activate(GtkMenuItem * menuitem, gpointer user_data)
-+on_set_option_mode1_activate(GtkMenuItem *menuitem, gpointer user_data)
-+{
-+	opt_mode = OPT_NORMAL;
-+	gtk_tree_store_clear(tree2);
-+	display_tree(&rootmenu);	/* instead of update_tree to speed-up */
-+}
-+
-+
-+void
-+on_set_option_mode2_activate(GtkMenuItem *menuitem, gpointer user_data)
- {
--	show_all = GTK_CHECK_MENU_ITEM(menuitem)->active;
-+	opt_mode = OPT_ALL;
-+	gtk_tree_store_clear(tree2);
-+	display_tree(&rootmenu);	/* instead of update_tree to speed-up */
-+}
-+
- 
-+void
-+on_set_option_mode3_activate(GtkMenuItem *menuitem, gpointer user_data)
-+{
-+	opt_mode = OPT_PROMPT;
- 	gtk_tree_store_clear(tree2);
--	display_tree(&rootmenu);	// instead of update_tree to speed-up
-+	display_tree(&rootmenu);	/* instead of update_tree to speed-up */
- }
- 
- 
-@@ -1095,7 +1116,10 @@ static gchar **fill_row(struct menu *menu)
- 	    g_strdup_printf("%s %s", _(menu_get_prompt(menu)),
- 			    sym && sym_has_value(sym) ? "(NEW)" : "");
- 
--	if (show_all && !menu_is_visible(menu))
-+	if (opt_mode == OPT_ALL && !menu_is_visible(menu))
-+		row[COL_COLOR] = g_strdup("DarkGray");
-+	else if (opt_mode == OPT_PROMPT &&
-+			menu_has_prompt(menu) && !menu_is_visible(menu))
- 		row[COL_COLOR] = g_strdup("DarkGray");
- 	else
- 		row[COL_COLOR] = g_strdup("Black");
-@@ -1318,16 +1342,19 @@ static void update_tree(struct menu *src, GtkTreeIter * dst)
- 		       menu2 ? menu_get_prompt(menu2) : "nil");
- #endif
- 
--		if (!menu_is_visible(child1) && !show_all) {	// remove node
-+		if ((opt_mode == OPT_NORMAL && !menu_is_visible(child1)) ||
-+		    (opt_mode == OPT_PROMPT && !menu_has_prompt(child1))) {
-+
-+			/* remove node */
- 			if (gtktree_iter_find_node(dst, menu1) != NULL) {
- 				memcpy(&tmp, child2, sizeof(GtkTreeIter));
- 				valid = gtk_tree_model_iter_next(model2,
- 								 child2);
- 				gtk_tree_store_remove(tree2, &tmp);
- 				if (!valid)
--					return;	// next parent
-+					return;		/* next parent */
- 				else
--					goto reparse;	// next child
-+					goto reparse;	/* next child */
- 			} else
- 				continue;
- 		}
-@@ -1396,7 +1423,9 @@ static void display_tree(struct menu *menu)
- 		    && (tree == tree2))
- 			continue;
- 
--		if (menu_is_visible(child) || show_all)
-+		if ((opt_mode == OPT_NORMAL && menu_is_visible(child)) ||
-+		    (opt_mode == OPT_PROMPT && menu_has_prompt(child)) ||
-+		    (opt_mode == OPT_ALL))
- 			place_node(child, fill_row(child));
- #ifdef DEBUG
- 		printf("%*c%s: ", indent, ' ', menu_get_prompt(child));
-diff --git a/scripts/kconfig/gconf.glade b/scripts/kconfig/gconf.glade
-index 909f5a4..d52b0a7 100644
---- a/scripts/kconfig/gconf.glade
-+++ b/scripts/kconfig/gconf.glade
-@@ -190,13 +190,37 @@
- 		  </child>
- 
- 		  <child>
--		    <widget class="GtkCheckMenuItem" id="show_all_options1">
-+		    <widget class="GtkRadioMenuItem" id="set_option_mode1">
-+		      <property name="visible">True</property>
-+		      <property name="tooltip" translatable="yes">Show normal options</property>
-+		      <property name="label" translatable="yes">Show normal options</property>
-+		      <property name="use_underline">True</property>
-+		      <property name="active">True</property>
-+		      <signal name="activate" handler="on_set_option_mode1_activate"/>
-+		    </widget>
-+		  </child>
-+
-+		  <child>
-+		    <widget class="GtkRadioMenuItem" id="set_option_mode2">
- 		      <property name="visible">True</property>
- 		      <property name="tooltip" translatable="yes">Show all options</property>
- 		      <property name="label" translatable="yes">Show all _options</property>
- 		      <property name="use_underline">True</property>
- 		      <property name="active">False</property>
--		      <signal name="activate" handler="on_show_all_options1_activate"/>
-+		      <property name="group">set_option_mode1</property>
-+		      <signal name="activate" handler="on_set_option_mode2_activate"/>
-+		    </widget>
-+		  </child>
-+
-+		  <child>
-+		    <widget class="GtkRadioMenuItem" id="set_option_mode3">
-+		      <property name="visible">True</property>
-+		      <property name="tooltip" translatable="yes">Show all options with prompts</property>
-+		      <property name="label" translatable="yes">Show all prompt options</property>
-+		      <property name="use_underline">True</property>
-+		      <property name="active">False</property>
-+		      <property name="group">set_option_mode1</property>
-+		      <signal name="activate" handler="on_set_option_mode3_activate"/>
- 		    </widget>
- 		  </child>
- 
--- 
-1.6.3
 
+> while loose_nonint_oldconfig will simply let the config option unset.
+
+So loose_nonint_oldconfig is just a less chatty version of
+$ yes '' | make oldconfig
+? Also, you should update make help.
+
+
+> They're useful in distro kernel packages  
+> where the config files are built using a combination of smaller config files. 
+> 
+> Arjan van de Ven wrote the initial nonint_config and Roland McGrath added the
+> loose_nonint_oldconfig.
+> 
+> v2:
+> - when -B and -b are used, return "2" so the reason can be distinguished from
+>   other errors
+> 
+> Signed-off-by: Arjan van de Ven <arjan@redhat.com> [defunct email]
+> Acked-by: Arjan van de Ven <arjan@linux.intel.com>
+> Acked-by: Randy Dunlap <randy.dunlap@oracle.com>
+> Signed-off-by: Aristeu Rozanski <aris@redhat.com>
+> 
+> --- linus-2.6.orig/scripts/kconfig/Makefile	2010-04-13 16:30:47.000000000 -0400
+> +++ linus-2.6/scripts/kconfig/Makefile	2010-04-13 16:48:24.000000000 -0400
+> @@ -69,6 +69,11 @@ localyesconfig: $(obj)/streamline_config
+>  	fi
+>  	$(Q)rm -f .tmp.config
+>  
+> +nonint_oldconfig: $(obj)/conf
+> +	$< -b $(Kconfig)
+> +loose_nonint_oldconfig: $(obj)/conf
+> +	$< -B $(Kconfig)
+
+Add an empty line between the two rules.
+
+
+> +
+>  # Create new linux.pot file
+>  # Adjust charset to UTF-8 in .po file to accept UTF-8 in Kconfig files
+>  # The symlink is used to repair a deficiency in arch/um
+> --- linus-2.6.orig/scripts/kconfig/conf.c	2010-04-13 16:30:47.000000000 -0400
+> +++ linus-2.6/scripts/kconfig/conf.c	2010-04-13 16:53:20.000000000 -0400
+> @@ -16,6 +16,9 @@
+>  #define LKC_DIRECT_LINK
+>  #include "lkc.h"
+>  
+> +/* Return codes */
+> +#define EUNSETOPT	2	/* if -B is used and unset config options were found */
+> +
+>  static void conf(struct menu *menu);
+>  static void check_conf(struct menu *menu);
+>  
+> @@ -23,6 +26,8 @@ enum {
+>  	ask_all,
+>  	ask_new,
+>  	ask_silent,
+> +	dont_ask,
+> +	dont_ask_dont_tell,
+>  	set_default,
+>  	set_yes,
+>  	set_mod,
+> @@ -360,7 +365,10 @@ static void conf(struct menu *menu)
+>  
+>  		switch (prop->type) {
+>  		case P_MENU:
+> -			if (input_mode == ask_silent && rootEntry != menu) {
+> +			if ((input_mode == ask_silent ||
+> +			     input_mode == dont_ask ||
+> +			     input_mode == dont_ask_dont_tell) &&
+> +			    rootEntry != menu) {
+>  				check_conf(menu);
+>  				return;
+>  			}
+> @@ -406,6 +414,8 @@ conf_childs:
+>  		indent -= 2;
+>  }
+>  
+> +static int return_value;
+> +
+>  static void check_conf(struct menu *menu)
+>  {
+>  	struct symbol *sym;
+> @@ -418,10 +428,19 @@ static void check_conf(struct menu *menu
+>  	if (sym && !sym_has_value(sym)) {
+>  		if (sym_is_changable(sym) ||
+>  		    (sym_is_choice(sym) && sym_get_tristate_value(sym) == yes)) {
+> -			if (!conf_cnt++)
+> -				printf(_("*\n* Restart config...\n*\n"));
+> -			rootEntry = menu_get_parent_menu(menu);
+> -			conf(rootEntry);
+> +			if (input_mode == dont_ask ||
+> +			    input_mode == dont_ask_dont_tell) {
+> +				if (input_mode == dont_ask &&
+> +				    sym->name && !sym_is_choice_value(sym)) {
+> +					fprintf(stderr,"CONFIG_%s\n",sym->name);
+
+You should print "The following variables are not set:" or something
+like that before the first variable, otherwise it's not very clear what
+the list means.
+
+
+> +					return_value = EUNSETOPT;
+
+The name 'return_value' is a little confusing, we call exit(0) or
+exit(1) at several places, but this variable only affects a single
+statement. What about
+
+static int unset_variables;
+...
+   unset_variables++;
+...
+return unset_variables ? EUNSETOPT : 0;
+
+? Also, define the static var at the beginning of the file, where the
+remaining variables are defined.
+
+
+> +				}
+> +			} else {
+> +				if (!conf_cnt++)
+> +					printf(_("*\n* Restart config...\n*\n"));
+> +				rootEntry = menu_get_parent_menu(menu);
+> +				conf(rootEntry);
+> +			}
+>  		}
+>  	}
+>  
+> @@ -439,7 +458,7 @@ int main(int ac, char **av)
+>  	bindtextdomain(PACKAGE, LOCALEDIR);
+>  	textdomain(PACKAGE);
+>  
+> -	while ((opt = getopt(ac, av, "osdD:nmyrh")) != -1) {
+> + 	while ((opt = getopt(ac, av, "osbBdD:nmyrh")) != -1) {
+>  		switch (opt) {
+>  		case 'o':
+>  			input_mode = ask_silent;
+> @@ -448,6 +467,12 @@ int main(int ac, char **av)
+>  			input_mode = ask_silent;
+>  			sync_kconfig = 1;
+>  			break;
+> +		case 'b':
+> +			input_mode = dont_ask;
+> +			break;
+> +		case 'B':
+> +			input_mode = dont_ask_dont_tell;
+> +			break;
+>  		case 'd':
+>  			input_mode = set_default;
+>  			break;
+> @@ -525,6 +550,8 @@ int main(int ac, char **av)
+>  	case ask_silent:
+>  	case ask_all:
+>  	case ask_new:
+> +	case dont_ask:
+> +	case dont_ask_dont_tell:
+>  		conf_read(NULL);
+>  		break;
+>  	case set_no:
+> @@ -586,12 +613,16 @@ int main(int ac, char **av)
+>  		conf(&rootmenu);
+>  		input_mode = ask_silent;
+>  		/* fall through */
+> +	case dont_ask:
+> +	case dont_ask_dont_tell:
+>  	case ask_silent:
+>  		/* Update until a loop caused no more changes */
+>  		do {
+>  			conf_cnt = 0;
+>  			check_conf(&rootmenu);
+> -		} while (conf_cnt);
+> +		} while (conf_cnt &&
+> +			 (input_mode != dont_ask &&
+> +			  input_mode != dont_ask_dont_tell));
+>  		break;
+>  	}
+>  
+> @@ -613,5 +644,5 @@ int main(int ac, char **av)
+>  			exit(1);
+>  		}
+>  	}
+> -	return 0;
+> +	return return_value;
+
+IMO nonint_oldconfig should not update the .config if it's going to
+fail. At least I find this output quite confusing:
+$ make nonint_oldconfig
+scripts/kconfig/conf -b arch/x86/Kconfig
+CONFIG_FOO
+#
+# configuration written to .config
+#
+make[1]: *** [nonint_oldconfig] Error 2
+make: *** [nonint_oldconfig] Error 2
+
+and a subsequent make nonint_oldconfig call does not fail.
+
+Michal
