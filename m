@@ -1,28 +1,23 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from he.sipsolutions.net ([78.46.109.217]:56042 "EHLO
-	sipsolutions.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752248Ab0DUHJV (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 21 Apr 2010 03:09:21 -0400
-Subject: subdir-ccflags problem
-From: Johannes Berg <johannes@sipsolutions.net>
-Content-Type: text/plain; charset="UTF-8"
-Date: Wed, 21 Apr 2010 09:09:18 +0200
-Message-ID: <1271833758.3627.16.camel@jlt3.sipsolutions.net>
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Received: from vilab.hit.edu.cn ([202.118.250.15]:44259 "EHLO vilab.hit.edu.cn"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1755554Ab0DUThu (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 21 Apr 2010 15:37:50 -0400
+From: "global loan company" <info@loan.com>
+Reply-To: loandept100@w.cn
+Subject: Proposal
+Date: Wed, 14 Apr 2010 15:24:07 +0800
+Message-Id: <20100414072410.M17237@loan.com>
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset=utf-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org
 
-Hi,
-
-When I specify subdir-ccflags in a Makefile, e.g. net/Makefile, but then
-build using M=net/wireless/, kbuild doesn't seem to pick it up.
-
-To me, that seems like a bug, but to my untrained eye it would appear to
-be quite hard to fix. Thoughts?
-
-johannes
-
+Medicos Financials is offering  loans for business, education and other forms 
+of financial purposes within 72 hours at a minimized interest rate of 2%. If 
+interested, please fill the loan application requirements below and specify 
+on the amount you need in US Dollar($).
+Borrowers` Data Form,,,,Your Name: Your Country: Your Address: Your Age: Your 
+Fax Number: mobile Number: Office Number: Your Occupation: Sex: Monthly 
+Income: Amount Needed: Loan duration
