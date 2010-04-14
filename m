@@ -1,34 +1,72 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:56783 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753927Ab0DMV0J (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 13 Apr 2010 17:26:09 -0400
-Date: Tue, 13 Apr 2010 17:26:00 -0400
-From: Kyle McMartin <kmcmartin@redhat.com>
-Subject: Re: [PATCH] kconfig: introduce nonint_oldconfig and
- loose_nonint_oldconfig (v2)
-Message-ID: <20100413212600.GK23664@ihatethathostname.lab.bos.redhat.com>
-References: <20100413194747.GX31193@redhat.com>
- <20100413130031.d4dec19b.randy.dunlap@oracle.com>
- <20100413201759.GY31193@redhat.com>
- <4BC4D310.6060705@oracle.com>
- <20100413210352.GA31193@redhat.com>
+Received: from cn.fujitsu.com ([222.73.24.84]:64459 "EHLO song.cn.fujitsu.com"
+	rhost-flags-OK-FAIL-OK-OK) by vger.kernel.org with ESMTP
+	id S1751583Ab0DNDl6 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 13 Apr 2010 23:41:58 -0400
+Message-ID: <4BC539DD.5040003@cn.fujitsu.com>
+Date: Wed, 14 Apr 2010 11:43:25 +0800
+From: Li Zefan <lizf@cn.fujitsu.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20100413210352.GA31193@redhat.com>
+Subject: [PATCH 0/6] kconfig: add support to show hidden options which have
+ prompts
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Aristeu Rozanski <aris@redhat.com>
-Cc: Randy Dunlap <randy.dunlap@oracle.com>, linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>, linux-kernel@vger.kernel.org, davej@redhat.com, kyle@redhat.com, vgoyal@redhat.com, arjan@linux.intel.com
+To: LKML <linux-kernel@vger.kernel.org>
+Cc: Andrew Morton <akpm@linux-foundation.org>, Randy Dunlap <randy.dunlap@oracle.com>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, Tim Bird <tim.bird@am.sony.com>
 
-On Tue, Apr 13, 2010 at 05:03:53PM -0400, Aristeu Rozanski wrote:
-> Signed-off-by: Arjan van de Ven <arjan@redhat.com> [defunct email]
-> Acked-by: Arjan van de Ven <arjan@linux.intel.com>
-> Acked-by: Randy Dunlap <randy.dunlap@oracle.com>
-> Signed-off-by: Aristeu Rozanski <aris@redhat.com>
-> 
+Usage:
+  (in menuconfig)
+  Press <Z> to show all config symbols which have prompts.
 
-Thanks for prepping this for submission, Aris.
+Quote Tim Bird (http://lkml.org/lkml/2010/3/19/319):
 
-Whatevered-by: Kyle McMartin <kyle@redhat.com>
+| I've been bitten by this numerous times.  I most often
+| use ftrace on ARM, but when I go back to x86, I almost
+| always go through a sequence of searching for the
+| function graph tracer in the menus, then realizing it's
+| completely missing until I disable CC_OPTIMIZE_FOR_SIZE.
+|
+| Is there any way to have the menu item appear, but be
+| unsettable unless the SIZE option is disabled?  I'm
+| not a Kconfig guru...
+
+I myself found this useful too. For example, I need to test
+ftrace/tracing and want to be sure all the tracing features are
+enabled, so I  enter the "Tracers" menu, and press <Z> to
+see if there is any config hidden.
+
+I noticed gconfig and xconfig have a button "Show all options",
+but that's a bit too much, and I think normally what we are not
+interested in those configs which have no prompt thus can't be
+changed by users.
+
+Exmaple:
+
+      --- Tracers
+      -*-   Kernel Function Tracer
+      - -     Kernel Function Graph Tracer
+      [*]   Interrupts-off Latency Tracer
+      - -   Preemption-off Latency Tracer
+      [*]   Sysprof Tracer
+
+Here you can see 2 tracers are not selectable, and then can find
+out how to make them selectable.
+
+I also add this support for gconfig, but haven't done for xconfig.
+
+btw: are there many users using gconfig/xconfig today ?
+
+---
+ Documentation/kbuild/kconfig-language.txt |    2 +-
+ scripts/kconfig/gconf.c                   |  113 ++++++++++-------------------
+ scripts/kconfig/gconf.glade               |   26 +++++--
+ scripts/kconfig/lkc_proto.h               |    3 +-
+ scripts/kconfig/lxdialog/inputbox.c       |    4 +-
+ scripts/kconfig/lxdialog/menubox.c        |   22 +++---
+ scripts/kconfig/mconf.c                   |   22 +++++-
+ scripts/kconfig/menu.c                    |   12 +++-
+ scripts/kconfig/zconf.tab.c_shipped       |   21 +++++-
+ scripts/kconfig/zconf.y                   |   21 +++++-
+ 10 files changed, 136 insertions(+), 110 deletions(-)
