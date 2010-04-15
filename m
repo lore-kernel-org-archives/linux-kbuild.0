@@ -1,39 +1,36 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cn.fujitsu.com ([222.73.24.84]:61196 "EHLO song.cn.fujitsu.com"
-	rhost-flags-OK-FAIL-OK-OK) by vger.kernel.org with ESMTP
-	id S1756173Ab0DOHmG (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 15 Apr 2010 03:42:06 -0400
-Message-ID: <4BC6C3A8.3020409@cn.fujitsu.com>
-Date: Thu, 15 Apr 2010 15:43:36 +0800
-From: Li Zefan <lizf@cn.fujitsu.com>
+Received: from cantor.suse.de ([195.135.220.2]:58148 "EHLO mx1.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751687Ab0DOHye (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 15 Apr 2010 03:54:34 -0400
+Message-ID: <4BC6C635.5020107@suse.cz>
+Date: Thu, 15 Apr 2010 09:54:29 +0200
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Subject: Re: [PATCH 6/6] gconfig: add support to show hidden options that
+Subject: Re: [PATCH 5/6] menuconfig: add support to show hidden options which
  have prompts
-References: <4BC539DD.5040003@cn.fujitsu.com>	<4BC53A90.9020304@cn.fujitsu.com> <20100414164847.661fe9d6.randy.dunlap@oracle.com>
-In-Reply-To: <20100414164847.661fe9d6.randy.dunlap@oracle.com>
+References: <4BC539DD.5040003@cn.fujitsu.com>	<4BC53A7A.5080502@cn.fujitsu.com> <20100414164839.e3c9391d.randy.dunlap@oracle.com> <4BC6C0CD.3020201@cn.fujitsu.com>
+In-Reply-To: <4BC6C0CD.3020201@cn.fujitsu.com>
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Randy Dunlap <randy.dunlap@oracle.com>
-Cc: LKML <linux-kernel@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, Tim Bird <tim.bird@am.sony.com>
+To: Li Zefan <lizf@cn.fujitsu.com>
+Cc: Randy Dunlap <randy.dunlap@oracle.com>, LKML <linux-kernel@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>, linux-kbuild@vger.kernel.org, Tim Bird <tim.bird@am.sony.com>
 
-Randy Dunlap wrote:
-> On Wed, 14 Apr 2010 11:46:24 +0800 Li Zefan wrote:
+On 15.4.2010 09:31, Li Zefan wrote:
+>>> +"o  To show hidden options, press <Z>.\n"
+>>
+>> maybe:
+>>        To toggle the display of hidden options, press <Z>.
+>> or     To alternate the ...
+>> ?
+>>
 > 
->> There's a button in gconfig to "Show all options", but I think
->> normally we are not interested in those configs which have no
->> prompt and thus can't be changed, so here I add a new button to
->> show hidden options which have prompts.
-> 
-> (The new option is called "Show all prompt options".)
-> 
-> These patches are looking good so far in my limited testing.
-> 
-> However, if gconfig is going to live, it needs at least one more thing:
-> it should display the kconfig symbol type (tristate, boolean, etc.)
-> like xconfig does (explicitly) and menuconfig does (by using [x] or <x>
-> in the menu).
-> 
+> Sure, it does looks better. will include this change
+> in a next patchset.
 
-Hmm, I think I can spend some time on this.
+Please send an incremental patch if you want to change the help text, I
+already merged your first version.
+
+Michal
