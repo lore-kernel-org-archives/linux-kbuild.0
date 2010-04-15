@@ -1,63 +1,42 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from rcsinet12.oracle.com ([148.87.113.124]:21131 "EHLO
-	rcsinet12.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755720Ab0DNXtX (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 14 Apr 2010 19:49:23 -0400
-Date: Wed, 14 Apr 2010 16:48:39 -0700
-From: Randy Dunlap <randy.dunlap@oracle.com>
-Subject: Re: [PATCH 5/6] menuconfig: add support to show hidden options
- which have prompts
-Message-Id: <20100414164839.e3c9391d.randy.dunlap@oracle.com>
-In-Reply-To: <4BC53A7A.5080502@cn.fujitsu.com>
-References: <4BC539DD.5040003@cn.fujitsu.com>
-	<4BC53A7A.5080502@cn.fujitsu.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Received: from cn.fujitsu.com ([222.73.24.84]:54261 "EHLO song.cn.fujitsu.com"
+	rhost-flags-OK-FAIL-OK-OK) by vger.kernel.org with ESMTP
+	id S1752658Ab0DOH1g (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 15 Apr 2010 03:27:36 -0400
+Message-ID: <4BC6C043.5070504@cn.fujitsu.com>
+Date: Thu, 15 Apr 2010 15:29:07 +0800
+From: Li Zefan <lizf@cn.fujitsu.com>
+MIME-Version: 1.0
+Subject: Re: [PATCH 0/6] kconfig: add support to show hidden options which
+ have prompts
+References: <4BC539DD.5040003@cn.fujitsu.com> <20100414160043.7ffb1109.randy.dunlap@oracle.com>
+In-Reply-To: <20100414160043.7ffb1109.randy.dunlap@oracle.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Li Zefan <lizf@cn.fujitsu.com>
+To: Randy Dunlap <randy.dunlap@oracle.com>
 Cc: LKML <linux-kernel@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, Tim Bird <tim.bird@am.sony.com>
 
-On Wed, 14 Apr 2010 11:46:02 +0800 Li Zefan wrote:
+>> Exmaple:
+>>
+>>       --- Tracers
+>>       -*-   Kernel Function Tracer
+>>       - -     Kernel Function Graph Tracer
+>>       [*]   Interrupts-off Latency Tracer
+>>       - -   Preemption-off Latency Tracer
+>>       [*]   Sysprof Tracer
+>>
+>> Here you can see 2 tracers are not selectable, and then can find
+>> out how to make them selectable.
+>>
+>> I also add this support for gconfig, but haven't done for xconfig.
+>>
+>> btw: are there many users using gconfig/xconfig today ?
+> 
+> I use xconfig quite a bit, but only use gconfig for making sure that
+> it still works or displays a menu tree correctly.
+> 
 
-> Usage:
->   Press <Z> to show all config symbols which have prompts.
-
-to show or unshow (toggle) all config symbols which have prompts.
-
-Nice and helpful, yes, thanks.
-
-
-> diff --git a/scripts/kconfig/mconf.c b/scripts/kconfig/mconf.c
-> index 8413cf3..33f31eb 100644
-> --- a/scripts/kconfig/mconf.c
-> +++ b/scripts/kconfig/mconf.c
-> @@ -67,13 +67,15 @@ static const char mconf_readme[] = N_(
->  "             there is a delayed response which you may find annoying.\n"
->  "\n"
->  "   Also, the <TAB> and cursor keys will cycle between <Select>,\n"
-> -"   <Exit> and <Help>\n"
-> +"   <Exit> and <Help>.\n"
->  "\n"
->  "o  To get help with an item, use the cursor keys to highlight <Help>\n"
-> -"   and Press <ENTER>.\n"
-> +"   and press <ENTER>.\n"
->  "\n"
->  "   Shortcut: Press <H> or <?>.\n"
->  "\n"
-> +"o  To show hidden options, press <Z>.\n"
-
-maybe:
-       To toggle the display of hidden options, press <Z>.
-or     To alternate the ...
-?
-
-> +"\n"
->  "\n"
->  "Radiolists  (Choice lists)\n"
->  "-----------\n"
-
----
-~Randy
+Ok, I wanted to make sure it worth effort to working on gconf/xconf.
+(I always use menuconfig.)
