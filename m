@@ -1,39 +1,23 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cn.fujitsu.com ([222.73.24.84]:58176 "EHLO song.cn.fujitsu.com"
-	rhost-flags-OK-FAIL-OK-OK) by vger.kernel.org with ESMTP
-	id S1752362Ab0DOIBF (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 15 Apr 2010 04:01:05 -0400
-Message-ID: <4BC6C81C.6020208@cn.fujitsu.com>
-Date: Thu, 15 Apr 2010 16:02:36 +0800
-From: Li Zefan <lizf@cn.fujitsu.com>
+Received: from mail2.gtlbd.com ([114.130.8.15]:34959 "EHLO mail2.gtlbd.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1756271Ab0DPC5i (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 15 Apr 2010 22:57:38 -0400
+From: "United Nation Scam Compensation promo" <info@mail.com>
+Reply-To: www.upsdelivery05@windowslive.com
+Subject: Your Email Address has been awarded $800.000 usd at the United nation scam compensation programm  2010
+Date: Fri, 16 Apr 2010 08:24:30 +0700
+Message-Id: <20100416010733.M4905@mail.com>
 MIME-Version: 1.0
-Subject: Re: [PATCH 5/6] menuconfig: add support to show hidden options which
- have prompts
-References: <4BC539DD.5040003@cn.fujitsu.com>	<4BC53A7A.5080502@cn.fujitsu.com> <20100414164839.e3c9391d.randy.dunlap@oracle.com> <4BC6C0CD.3020201@cn.fujitsu.com> <4BC6C635.5020107@suse.cz>
-In-Reply-To: <4BC6C635.5020107@suse.cz>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain;
+	charset=iso-8859-1
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: Randy Dunlap <randy.dunlap@oracle.com>, LKML <linux-kernel@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>, linux-kbuild@vger.kernel.org, Tim Bird <tim.bird@am.sony.com>
 
-15:54, Michal Marek wrote:
-> On 15.4.2010 09:31, Li Zefan wrote:
->>>> +"o  To show hidden options, press <Z>.\n"
->>> maybe:
->>>        To toggle the display of hidden options, press <Z>.
->>> or     To alternate the ...
->>> ?
->>>
->> Sure, it does looks better. will include this change
->> in a next patchset.
-> 
-> Please send an incremental patch if you want to change the help text, I
-> already merged your first version.
-> 
+Submit the following :Name:Address:Tel:Occupation:Age
 
-That's what I meant. ;)
+-- 
+This message has been scanned for viruses and
+dangerous content by GTLBD-MailScanner, and is
+believed to be clean.
 
-I'll do some more fixes and improvements, which is the phrase
-"a next patchset" meant.
