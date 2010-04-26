@@ -1,51 +1,49 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.windriver.com ([147.11.1.11]:34169 "EHLO
-	mail.windriver.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751128Ab0DZU4x (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 26 Apr 2010 16:56:53 -0400
-From: Jason Wessel <jason.wessel@windriver.com>
-Subject: [PATCH] Correctly deal with make that has an argument which contains an "s"
-Date: Mon, 26 Apr 2010 15:56:14 -0500
-Message-Id: <1272315374-11951-1-git-send-email-jason.wessel@windriver.com>
+Received: from mgw2.diku.dk ([130.225.96.92]:50049 "EHLO mgw2.diku.dk"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753410Ab0DZVLx (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 26 Apr 2010 17:11:53 -0400
+From: Nicolas Palix <npalix@diku.dk>
+Subject: [PATCH 0/4] Add a Coccinelle front-end script
+Date: Mon, 26 Apr 2010 23:11:15 +0200
+Message-Id: <1272316279-12042-1-git-send-email-npalix@diku.dk>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kernel@vger.kernel.org, Jason Wessel <jason.wessel@windriver.com>, Andrew Morton <akpm@linux-foundation.org>, linux-kbuild@vger.kernel.org
+To: Andrew Morton <akpm@linux-foundation.org>, Joe Perches <joe@perches.com>, "David S. Miller" <davem@davemloft.net>, Michal Marek <mmarek@suse.cz>, Sam Ravnborg <sam@ravnborg.org>, Julia Lawall <julia@diku.dk>, Gilles Muller <Gilles.Muller@lip6.fr>, Nicolas Palix <npalix@diku.dk>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, cocci@diku.dk
 
-When using remake, which is based on gnumake, if you invoke
-an example build as shown below, the build will become silent
-due to the top level make file incorrectly guessing that
-the end user wants a silent build because an argument that
-contained an "s" was used.
+New targets are added (coccicheck-<mode>) to call the spatch front-end
+in the 'scripts' directory with the <mode> argument.
 
-remake --no-extended-errors
+Four modes are defined: report, patch, context, and org.
 
-Fix up the top level Makefile to use filter with a list of
-options that mean silent with the various revisions of gnumake,
-instead of findstring.
+'report' mode generates a list in the following format:
+  file:line:column-column: message
 
-Signed-off-by: Jason Wessel <jason.wessel@windriver.com>
-CC: Michal Marek <mmarek@suse.cz>
-CC: Andrew Morton <akpm@linux-foundation.org>
-CC: linux-kbuild@vger.kernel.org
----
- Makefile |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+'patch' mode proposes a generic fix, when possible.
 
-diff --git a/Makefile b/Makefile
-index fa1db90..91ae299 100644
---- a/Makefile
-+++ b/Makefile
-@@ -294,7 +294,7 @@ endif
- # If the user is running make -s (silent mode), suppress echoing of
- # commands
- 
--ifneq ($(findstring s,$(MAKEFLAGS)),)
-+ifneq ($(filter s% -s% --silent --quiet,$(MAKEFLAGS)),)
-   quiet=silent_
- endif
- 
--- 
-1.6.3.3
+'context' mode highlights lines of interest and their context
+in a diff-like style.
+
+'org' mode generates a report in the Org mode format of Emacs.
+
+Three semantic patches, with a low rate of false positives, are also added.
+Other semantic patches will be propose later.
+
+Nicolas Palix (4):
+  Add targets to use the Coccinelle checker
+  Add scripts/smpl/drop_kmalloc_cast.cocci
+  Add scripts/smpl/kzalloc-simple.cocci
+  Add scripts/smpl/resource_size.cocci
+
+ MAINTAINERS                          |   10 +++
+ Makefile                             |    9 +++
+ scripts/smpl/drop_kmalloc_cast.cocci |   74 +++++++++++++++++++++++++
+ scripts/smpl/kzalloc-simple.cocci    |   88 +++++++++++++++++++++++++++++
+ scripts/smpl/resource_size.cocci     |  101 ++++++++++++++++++++++++++++++++++
+ scripts/spatch.sh                    |   14 +++++
+ 6 files changed, 296 insertions(+), 0 deletions(-)
+ create mode 100644 scripts/smpl/drop_kmalloc_cast.cocci
+ create mode 100644 scripts/smpl/kzalloc-simple.cocci
+ create mode 100644 scripts/smpl/resource_size.cocci
+ create mode 100755 scripts/spatch.sh
 
