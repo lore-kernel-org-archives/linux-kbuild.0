@@ -1,134 +1,48 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mgw2.diku.dk ([130.225.96.92]:50085 "EHLO mgw2.diku.dk"
+Received: from mail.perches.com ([173.55.12.10]:1736 "EHLO mail.perches.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754808Ab0DZVMF (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 26 Apr 2010 17:12:05 -0400
-From: Nicolas Palix <npalix@diku.dk>
-Subject: [PATCH 4/4] Add scripts/smpl/resource_size.cocci
-Date: Mon, 26 Apr 2010 23:11:19 +0200
-Message-Id: <1272316279-12042-5-git-send-email-npalix@diku.dk>
-In-Reply-To: <1272316279-12042-1-git-send-email-npalix@diku.dk>
+	id S1754402Ab0DZVhF (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 26 Apr 2010 17:37:05 -0400
+Subject: Re: [PATCH 1/4] Add targets to use the Coccinelle checker
+From: Joe Perches <joe@perches.com>
+In-Reply-To: <1272316279-12042-2-git-send-email-npalix@diku.dk>
 References: <1272316279-12042-1-git-send-email-npalix@diku.dk>
+	 <1272316279-12042-2-git-send-email-npalix@diku.dk>
+Content-Type: text/plain; charset="UTF-8"
+Date: Mon, 26 Apr 2010 14:37:01 -0700
+Message-ID: <1272317821.15953.107.camel@Joe-Laptop.home>
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andrew Morton <akpm@linux-foundation.org>, Joe Perches <joe@perches.com>, "David S. Miller" <davem@davemloft.net>, Michal Marek <mmarek@suse.cz>, Sam Ravnborg <sam@ravnborg.org>, Julia Lawall <julia@diku.dk>, Gilles Muller <Gilles.Muller@lip6.fr>, Nicolas Palix <npalix@diku.dk>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, cocci@diku.dk
+To: Nicolas Palix <npalix@diku.dk>
+Cc: Andrew Morton <akpm@linux-foundation.org>, "David S. Miller" <davem@davemloft.net>, Michal Marek <mmarek@suse.cz>, Sam Ravnborg <sam@ravnborg.org>, Julia Lawall <julia@diku.dk>, Gilles Muller <Gilles.Muller@lip6.fr>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, cocci@diku.dk
 
-This semantic patch replaces explicit computations
-of resource size by a call to resource_size.
+I like the concept and believe the kernel tree is a better
+repository for these scripts than an external website.
+ 
+On Mon, 2010-04-26 at 23:11 +0200, Nicolas Palix wrote:
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 3d29fa3..2aab763 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -1533,6 +1533,16 @@ L:	platform-driver-x86@vger.kernel.org
+>  S:	Supported
+>  F:	drivers/platform/x86/classmate-laptop.c
+>  
+> +COCCINELLE
 
-Signed-off-by: Nicolas Palix <npalix@diku.dk>
----
- scripts/smpl/resource_size.cocci |  101 ++++++++++++++++++++++++++++++++++++++
- 1 files changed, 101 insertions(+), 0 deletions(-)
- create mode 100644 scripts/smpl/resource_size.cocci
+COCCINELLE/Semantic Patches (SmPL)
 
-diff --git a/scripts/smpl/resource_size.cocci b/scripts/smpl/resource_size.cocci
-new file mode 100644
-index 0000000..e5e24ac
---- /dev/null
-+++ b/scripts/smpl/resource_size.cocci
-@@ -0,0 +1,101 @@
-+///
-+/// Use resource_size function on resource object
-+/// instead of explicit computation.
-+///
-+/// The semantic patch that makes this change is available
-+/// in THISFILE.
-+///
-+/// More information about semantic patching is available at
-+/// http://coccinelle.lip6.fr/
-+///
-+//  Confidence: High
-+//  Copyright: (C) 2009, 2010 Nicolas Palix, DIKU.  GPLv2.
-+//  Copyright: (C) 2009, 2010 Julia Lawall, DIKU.  GPLv2.
-+//  Copyright: (C) 2009, 2010 Gilles Muller, EMN.  GPLv2.
-+//  URL: http://coccinelle.lip6.fr/
-+//  Options:
-+//
-+//  Keywords: resource_size
-+//  Version min: 2.6.27 resource_size
-+//  Version max: *
-+//
-+
-+virtual context
-+virtual patch
-+virtual org
-+virtual report
-+
-+//----------------------------------------------------------
-+//  For context mode
-+//----------------------------------------------------------
-+
-+@r_context depends on context && !patch && !org@
-+struct resource *res;
-+@@
-+
-+* (res->end - res->start) + 1
-+
-+//----------------------------------------------------------
-+//  For patch mode
-+//----------------------------------------------------------
-+
-+@r_patch depends on !context && patch && !org@
-+struct resource *res;
-+@@
-+
-+- (res->end - res->start) + 1
-++ resource_size(res)
-+
-+//----------------------------------------------------------
-+//  For org mode
-+//----------------------------------------------------------
-+
-+
-+@r_org depends on !context && !patch && (org || report)@
-+struct resource *res;
-+position p;
-+@@
-+
-+ (res->end@p - res->start) + 1
-+
-+@rbad_org depends on !context && !patch && (org || report)@
-+struct resource *res;
-+position p != r_org.p;
-+@@
-+
-+ res->end@p - res->start
-+
-+@script:python depends on org@
-+p << r_org.p;
-+x << r_org.res;
-+@@
-+
-+msg="ERROR with %s" % (x)
-+msg_safe=msg.replace("[","@(").replace("]",")")
-+coccilib.org.print_todo(p[0], msg_safe)
-+
-+@script:python depends on report@
-+p << r_org.p;
-+x << r_org.res;
-+@@
-+
-+msg="ERROR: Missing resource_size with %s" % (x)
-+coccilib.report.print_report(p[0], msg)
-+
-+@script:python depends on org@
-+p << rbad_org.p;
-+x << rbad_org.res;
-+@@
-+
-+msg="WARNING with %s" % (x)
-+msg_safe=msg.replace("[","@(").replace("]",")")
-+coccilib.org.print_todo(p[0], msg_safe)
-+
-+@script:python depends on report@
-+p << rbad_org.p;
-+x << rbad_org.res;
-+@@
-+
-+msg="WARNING: Suspicious code. resource_size is maybe missing with %s" % (x)
-+coccilib.report.print_report(p[0], msg)
-+
--- 
-1.6.3.3
+> +coccicheck-context coccicheck-patch coccicheck-org coccicheck-report:
+> +	@echo "\nPlease, check for false positive in the output before submitting a patch.\n\n"\
+
+Please check for false positives etc...
+
+> +		"Take particularly attention when using the \"patch\" mode\n"\
+> +		"and carefully review the patch YOU are about to submit.\n"
+
+you
+
+
 
