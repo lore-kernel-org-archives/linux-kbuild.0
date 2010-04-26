@@ -1,46 +1,51 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pqueueb.post.tele.dk ([193.162.153.10]:36883 "EHLO
-	pqueueb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753411Ab0DVRPr (ORCPT
+Received: from mail.windriver.com ([147.11.1.11]:34169 "EHLO
+	mail.windriver.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751128Ab0DZU4x (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 22 Apr 2010 13:15:47 -0400
-Received: from pfepb.post.tele.dk (pfepb.post.tele.dk [195.41.46.236])
-	by pqueueb.post.tele.dk (Postfix) with ESMTP id C1FBE83F9
-	for <linux-kbuild@vger.kernel.org>; Thu, 22 Apr 2010 18:46:02 +0200 (CEST)
-Date: Thu, 22 Apr 2010 18:45:41 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: Set INSTALL_HDR_PATH on command line
-Message-ID: <20100422164541.GB22382@merkur.ravnborg.org>
-References: <1271921008.5866.16.camel@needafix>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1271921008.5866.16.camel@needafix>
+	Mon, 26 Apr 2010 16:56:53 -0400
+From: Jason Wessel <jason.wessel@windriver.com>
+Subject: [PATCH] Correctly deal with make that has an argument which contains an "s"
+Date: Mon, 26 Apr 2010 15:56:14 -0500
+Message-Id: <1272315374-11951-1-git-send-email-jason.wessel@windriver.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jonas Bonn <jonas@southpole.se>
-Cc: linux-kbuild@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kernel@vger.kernel.org, Jason Wessel <jason.wessel@windriver.com>, Andrew Morton <akpm@linux-foundation.org>, linux-kbuild@vger.kernel.org
 
-On Thu, Apr 22, 2010 at 09:23:28AM +0200, Jonas Bonn wrote:
-> In the toplevel Linux Makefile, INSTALL_HDR_PATH is hardcoded as
-> follows:
-> 
-> # Kernel headers
-> 
-> #Default location for installed headers
-> export INSTALL_HDR_PATH = $(objtree)/usr
-> 
-> Should this not be done with ?= so that the install path can be
-> overridden on the command line?
-> 
-> export INSTALL_HDR_PATH ?= $(objtree)/usr
+When using remake, which is based on gnumake, if you invoke
+an example build as shown below, the build will become silent
+due to the top level make file incorrectly guessing that
+the end user wants a silent build because an argument that
+contained an "s" was used.
 
-What you can do today is:
+remake --no-extended-errors
 
-    make INSTALL_HDR_PATH=/my/dir
+Fix up the top level Makefile to use filter with a list of
+options that mean silent with the various revisions of gnumake,
+instead of findstring.
 
+Signed-off-by: Jason Wessel <jason.wessel@windriver.com>
+CC: Michal Marek <mmarek@suse.cz>
+CC: Andrew Morton <akpm@linux-foundation.org>
+CC: linux-kbuild@vger.kernel.org
+---
+ Makefile |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-Difference between "=" and "?=" is that the latter
-only assign a new value if the variables was not defined.
+diff --git a/Makefile b/Makefile
+index fa1db90..91ae299 100644
+--- a/Makefile
++++ b/Makefile
+@@ -294,7 +294,7 @@ endif
+ # If the user is running make -s (silent mode), suppress echoing of
+ # commands
+ 
+-ifneq ($(findstring s,$(MAKEFLAGS)),)
++ifneq ($(filter s% -s% --silent --quiet,$(MAKEFLAGS)),)
+   quiet=silent_
+ endif
+ 
+-- 
+1.6.3.3
 
-	Sam
