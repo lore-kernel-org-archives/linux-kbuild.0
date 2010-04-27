@@ -1,48 +1,72 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from xenotime.net ([72.52.64.118]:50581 "HELO xenotime.net"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with SMTP
-	id S1752182Ab0DZWXu (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 26 Apr 2010 18:23:50 -0400
-Received: from ::ffff:64.134.236.53 ([64.134.236.53]) by xenotime.net for <linux-kbuild@vger.kernel.org>; Mon, 26 Apr 2010 15:23:41 -0700
-Message-ID: <4BD61266.5020905@xenotime.net>
-Date: Mon, 26 Apr 2010 15:23:34 -0700
-From: Randy Dunlap <rdunlap@xenotime.net>
+Received: from mail-qy0-f179.google.com ([209.85.221.179]:59944 "EHLO
+	mail-qy0-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751077Ab0D0FyK convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 27 Apr 2010 01:54:10 -0400
 MIME-Version: 1.0
-Subject: Re: [PATCH 1/4] Add targets to use the Coccinelle checker
-References: <1272316279-12042-1-git-send-email-npalix@diku.dk> <1272316279-12042-2-git-send-email-npalix@diku.dk> <1272317821.15953.107.camel@Joe-Laptop.home> <201004270020.09447.npalix@diku.dk>
-In-Reply-To: <201004270020.09447.npalix@diku.dk>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <1272315374-11951-1-git-send-email-jason.wessel@windriver.com>
+References: <1272315374-11951-1-git-send-email-jason.wessel@windriver.com>
+Date: Tue, 27 Apr 2010 13:54:09 +0800
+Message-ID: <p2p2375c9f91004262254v20e361aexf508b81350e03ec1@mail.gmail.com>
+Subject: Re: [PATCH] Correctly deal with make that has an argument which
+	contains an "s"
+From: =?UTF-8?Q?Am=C3=A9rico_Wang?= <xiyou.wangcong@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nicolas Palix <npalix@diku.dk>
-Cc: Joe Perches <joe@perches.com>, Andrew Morton <akpm@linux-foundation.org>, "David S. Miller" <davem@davemloft.net>, Michal Marek <mmarek@suse.cz>, Sam Ravnborg <sam@ravnborg.org>, Julia Lawall <julia@diku.dk>, Gilles Muller <Gilles.Muller@lip6.fr>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, cocci@diku.dk
+To: Jason Wessel <jason.wessel@windriver.com>
+Cc: Michal Marek <mmarek@suse.cz>, linux-kernel@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>, linux-kbuild@vger.kernel.org
 
-Nicolas Palix wrote:
+On Tue, Apr 27, 2010 at 4:56 AM, Jason Wessel
+<jason.wessel@windriver.com> wrote:
+> When using remake, which is based on gnumake, if you invoke
+> an example build as shown below, the build will become silent
+> due to the top level make file incorrectly guessing that
+> the end user wants a silent build because an argument that
+> contained an "s" was used.
+>
+> remake --no-extended-errors
+>
+> Fix up the top level Makefile to use filter with a list of
+> options that mean silent with the various revisions of gnumake,
+> instead of findstring.
+>
+> Signed-off-by: Jason Wessel <jason.wessel@windriver.com>
+> CC: Michal Marek <mmarek@suse.cz>
+> CC: Andrew Morton <akpm@linux-foundation.org>
+> CC: linux-kbuild@vger.kernel.org
 
+
+Acked-by: WANG Cong <xiyou.wangcong@gmail.com>
+
+Thanks.
+
+
+> ---
+>  Makefile |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
+>
 > diff --git a/Makefile b/Makefile
-> index 67c1001..293c88b 100644
+> index fa1db90..91ae299 100644
 > --- a/Makefile
 > +++ b/Makefile
-> @@ -1424,6 +1425,14 @@ versioncheck:
->  		-name '*.[hcS]' -type f -print | sort \
->  		| xargs $(PERL) -w $(srctree)/scripts/checkversion.pl
->  
-> +coccicheck-context coccicheck-patch coccicheck-org coccicheck-report:
-> +	@echo "\nPlease check for false positive in the output before submitting a patch.\n\n"\
-
-	                                positives
-
-> +		"Take particularly attention when using the \"patch\" mode\n"\
-
-		      particular
-
-> +		"and carefully review the patch you are about to submit.\n"
-> +	@find $(srctree)/scripts/smpl/                        \
-> +		-name '*.cocci' -type f                       \
-> +		-exec $(srctree)/scripts/spatch.sh $(SPATCH) $(@:coccicheck-%=%) \{} $(srctree) \;
-> +
->  namespacecheck:
->  	$(PERL) $(srctree)/scripts/namespace.pl
->  
-
+> @@ -294,7 +294,7 @@ endif
+>  # If the user is running make -s (silent mode), suppress echoing of
+>  # commands
+>
+> -ifneq ($(findstring s,$(MAKEFLAGS)),)
+> +ifneq ($(filter s% -s% --silent --quiet,$(MAKEFLAGS)),)
+>   quiet=silent_
+>  endif
+>
+> --
+> 1.6.3.3
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-kernel" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> Please read the FAQ at  http://www.tux.org/lkml/
+>
