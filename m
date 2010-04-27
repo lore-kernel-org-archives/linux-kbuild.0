@@ -1,236 +1,88 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cn.fujitsu.com ([222.73.24.84]:60447 "EHLO song.cn.fujitsu.com"
-	rhost-flags-OK-FAIL-OK-OK) by vger.kernel.org with ESMTP
-	id S1753723Ab0D0Hrl (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 27 Apr 2010 03:47:41 -0400
-Message-ID: <4BD6970A.9020408@cn.fujitsu.com>
-Date: Tue, 27 Apr 2010 15:49:30 +0800
-From: Li Zefan <lizf@cn.fujitsu.com>
+Received: from cantor.suse.de ([195.135.220.2]:45765 "EHLO mx1.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752628Ab0D0Lr0 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 27 Apr 2010 07:47:26 -0400
+Message-ID: <4BD6CECC.9080507@suse.cz>
+Date: Tue, 27 Apr 2010 13:47:24 +0200
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Subject: [PATCH 6/6] xconfig: Add support to show hidden options which have
- prompts
-References: <4BD696C0.8050500@cn.fujitsu.com>
-In-Reply-To: <4BD696C0.8050500@cn.fujitsu.com>
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: [PATCH] Correctly deal with make that has an argument which contains
+ an "s"
+References: <1272315374-11951-1-git-send-email-jason.wessel@windriver.com>
+In-Reply-To: <1272315374-11951-1-git-send-email-jason.wessel@windriver.com>
+Content-Type: text/plain; charset=ISO-8859-2
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: Randy Dunlap <randy.dunlap@oracle.com>, Andrew Morton <akpm@linux-foundation.org>, LKML <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org
+To: Jason Wessel <jason.wessel@windriver.com>
+Cc: lkml <linux-kernel@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, =?ISO-8859-2?Q?Am=E9rico_?= =?ISO-8859-2?Q?Wang?= <xiyou.wangcong@gmail.com>
 
-This feature has been supported in menuconfig and gconfig, so
-here add it to xconfig.
+On 26.4.2010 22:56, Jason Wessel wrote:
+> When using remake, which is based on gnumake, if you invoke
+> an example build as shown below, the build will become silent
+> due to the top level make file incorrectly guessing that
+> the end user wants a silent build because an argument that
+> contained an "s" was used.
+> 
+> remake --no-extended-errors
 
-Signed-off-by: Li Zefan <lizf@cn.fujitsu.com>
----
- scripts/kconfig/qconf.cc |   62 ++++++++++++++++++++++++++++++++-------------
- scripts/kconfig/qconf.h  |   16 +++++++++---
- 2 files changed, 56 insertions(+), 22 deletions(-)
+BTW, make --warn-undefined-variables also triggers this (although no one
+will use this option on the kernel makefiles).
 
-diff --git a/scripts/kconfig/qconf.cc b/scripts/kconfig/qconf.cc
-index d950fff..f8c07c6 100644
---- a/scripts/kconfig/qconf.cc
-+++ b/scripts/kconfig/qconf.cc
-@@ -149,7 +149,7 @@ void ConfigItem::updateMenu(void)
- 	case S_TRISTATE:
- 		char ch;
- 
--		if (!sym_is_changable(sym) && !list->showAll) {
-+		if (!sym_is_changable(sym) && list->optMode != normalOpt) {
- 			setPixmap(promptColIdx, 0);
- 			setText(noColIdx, QString::null);
- 			setText(modColIdx, QString::null);
-@@ -320,7 +320,7 @@ ConfigList::ConfigList(ConfigView* p, const char *name)
- 	  symbolYesPix(xpm_symbol_yes), symbolModPix(xpm_symbol_mod), symbolNoPix(xpm_symbol_no),
- 	  choiceYesPix(xpm_choice_yes), choiceNoPix(xpm_choice_no),
- 	  menuPix(xpm_menu), menuInvPix(xpm_menu_inv), menuBackPix(xpm_menuback), voidPix(xpm_void),
--	  showAll(false), showName(false), showRange(false), showData(false),
-+	  showName(false), showRange(false), showData(false), optMode(normalOpt),
- 	  rootEntry(0), headerPopup(0)
- {
- 	int i;
-@@ -337,10 +337,10 @@ ConfigList::ConfigList(ConfigView* p, const char *name)
- 
- 	if (name) {
- 		configSettings->beginGroup(name);
--		showAll = configSettings->readBoolEntry("/showAll", false);
- 		showName = configSettings->readBoolEntry("/showName", false);
- 		showRange = configSettings->readBoolEntry("/showRange", false);
- 		showData = configSettings->readBoolEntry("/showData", false);
-+		optMode = (enum optionMode)configSettings->readNumEntry("/optionMode", false);
- 		configSettings->endGroup();
- 		connect(configApp, SIGNAL(aboutToQuit()), SLOT(saveSettings()));
- 	}
-@@ -352,6 +352,17 @@ ConfigList::ConfigList(ConfigView* p, const char *name)
- 	reinit();
- }
- 
-+bool ConfigList::menuSkip(struct menu *menu)
-+{
-+	if (optMode == normalOpt && menu_is_visible(menu))
-+		return false;
-+	if (optMode == promptOpt && menu_has_prompt(menu))
-+		return false;
-+	if (optMode == allOpt)
-+		return false;
-+	return true;
-+}
-+
- void ConfigList::reinit(void)
- {
- 	removeColumn(dataColIdx);
-@@ -380,7 +391,7 @@ void ConfigList::saveSettings(void)
- 		configSettings->writeEntry("/showName", showName);
- 		configSettings->writeEntry("/showRange", showRange);
- 		configSettings->writeEntry("/showData", showData);
--		configSettings->writeEntry("/showAll", showAll);
-+		configSettings->writeEntry("/optionMode", (int)optMode);
- 		configSettings->endGroup();
- 	}
- }
-@@ -606,7 +617,7 @@ void ConfigList::updateMenuList(P* parent, struct menu* menu)
- 		}
- 
- 		visible = menu_is_visible(child);
--		if (showAll || visible) {
-+		if (!menuSkip(child)) {
- 			if (!child->sym && !child->list && !child->prompt)
- 				continue;
- 			if (!item || item->menu != child)
-@@ -860,13 +871,16 @@ ConfigView::~ConfigView(void)
- 	}
- }
- 
--void ConfigView::setShowAll(bool b)
-+void ConfigView::setOptionMode(QAction *act)
- {
--	if (list->showAll != b) {
--		list->showAll = b;
--		list->updateListAll();
--		emit showAllChanged(b);
--	}
-+	if (act == showNormalAction)
-+		list->optMode = normalOpt;
-+	else if (act == showAllAction)
-+		list->optMode = allOpt;
-+	else
-+		list->optMode = promptOpt;
-+
-+	list->updateListAll();
- }
- 
- void ConfigView::setShowName(bool b)
-@@ -1321,11 +1335,22 @@ ConfigMainWindow::ConfigMainWindow(void)
- 	  connect(showDataAction, SIGNAL(toggled(bool)), configView, SLOT(setShowData(bool)));
- 	  connect(configView, SIGNAL(showDataChanged(bool)), showDataAction, SLOT(setOn(bool)));
- 	  showDataAction->setOn(configList->showData);
--	QAction *showAllAction = new QAction(NULL, _("Show All Options"), 0, this);
--	  showAllAction->setToggleAction(TRUE);
--	  connect(showAllAction, SIGNAL(toggled(bool)), configView, SLOT(setShowAll(bool)));
--	  connect(showAllAction, SIGNAL(toggled(bool)), menuView, SLOT(setShowAll(bool)));
--	  showAllAction->setOn(configList->showAll);
-+
-+	QActionGroup *optGroup = new QActionGroup(this);
-+	optGroup->setExclusive(TRUE);
-+	connect(optGroup, SIGNAL(selected(QAction *)), configView,
-+		SLOT(setOptionMode(QAction *)));
-+
-+	configView->showNormalAction = new QAction(NULL, _("Show Normal Options"), 0, optGroup);
-+	configView->showAllAction = new QAction(NULL, _("Show All Options"), 0, optGroup);
-+	configView->showPromptAction = new QAction(NULL, _("Show Prompt Options"), 0, optGroup);
-+	configView->showNormalAction->setToggleAction(TRUE);
-+	configView->showNormalAction->setOn(configList->optMode == normalOpt);
-+	configView->showAllAction->setToggleAction(TRUE);
-+	configView->showAllAction->setOn(configList->optMode == allOpt);
-+	configView->showPromptAction->setToggleAction(TRUE);
-+	configView->showPromptAction->setOn(configList->optMode == promptOpt);
-+
- 	QAction *showDebugAction = new QAction(NULL, _("Show Debug Info"), 0, this);
- 	  showDebugAction->setToggleAction(TRUE);
- 	  connect(showDebugAction, SIGNAL(toggled(bool)), helpText, SLOT(setShowDebug(bool)));
-@@ -1368,7 +1393,8 @@ ConfigMainWindow::ConfigMainWindow(void)
- 	showRangeAction->addTo(optionMenu);
- 	showDataAction->addTo(optionMenu);
- 	optionMenu->insertSeparator();
--	showAllAction->addTo(optionMenu);
-+	optGroup->addTo(optionMenu);
-+	optionMenu->insertSeparator();
- 	showDebugAction->addTo(optionMenu);
- 
- 	// create help menu
-@@ -1463,7 +1489,7 @@ void ConfigMainWindow::setMenuLink(struct menu *menu)
- 	ConfigList* list = NULL;
- 	ConfigItem* item;
- 
--	if (!menu_is_visible(menu) && !configView->showAll())
-+	if (configList->menuSkip(menu))
- 		return;
- 
- 	switch (configList->mode) {
-diff --git a/scripts/kconfig/qconf.h b/scripts/kconfig/qconf.h
-index 54775ae..37bdaec 100644
---- a/scripts/kconfig/qconf.h
-+++ b/scripts/kconfig/qconf.h
-@@ -44,6 +44,9 @@ enum colIdx {
- enum listMode {
- 	singleMode, menuMode, symbolMode, fullMode, listMode
- };
-+enum optionMode {
-+	normalOpt = 0, allOpt, promptOpt
-+};
- 
- class ConfigList : public QListView {
- 	Q_OBJECT
-@@ -115,6 +118,8 @@ public:
- 	void setAllOpen(bool open);
- 	void setParentMenu(void);
- 
-+	bool menuSkip(struct menu *);
-+
- 	template <class P>
- 	void updateMenuList(P*, struct menu*);
- 
-@@ -124,8 +129,9 @@ public:
- 	QPixmap choiceYesPix, choiceNoPix;
- 	QPixmap menuPix, menuInvPix, menuBackPix, voidPix;
- 
--	bool showAll, showName, showRange, showData;
-+	bool showName, showRange, showData;
- 	enum listMode mode;
-+	enum optionMode optMode;
- 	struct menu *rootEntry;
- 	QColorGroup disabledColorGroup;
- 	QColorGroup inactivedColorGroup;
-@@ -222,17 +228,15 @@ public:
- 	static void updateList(ConfigItem* item);
- 	static void updateListAll(void);
- 
--	bool showAll(void) const { return list->showAll; }
- 	bool showName(void) const { return list->showName; }
- 	bool showRange(void) const { return list->showRange; }
- 	bool showData(void) const { return list->showData; }
- public slots:
--	void setShowAll(bool);
- 	void setShowName(bool);
- 	void setShowRange(bool);
- 	void setShowData(bool);
-+	void setOptionMode(QAction *);
- signals:
--	void showAllChanged(bool);
- 	void showNameChanged(bool);
- 	void showRangeChanged(bool);
- 	void showDataChanged(bool);
-@@ -242,6 +246,10 @@ public:
- 
- 	static ConfigView* viewList;
- 	ConfigView* nextView;
-+
-+	QAction *showNormalAction;
-+	QAction *showAllAction;
-+	QAction *showPromptAction;
- };
- 
- class ConfigInfoView : public QTextBrowser {
--- 
-1.6.3
 
+> Fix up the top level Makefile to use filter with a list of
+> options that mean silent with the various revisions of gnumake,
+> instead of findstring.
+> 
+> Signed-off-by: Jason Wessel <jason.wessel@windriver.com>
+> CC: Michal Marek <mmarek@suse.cz>
+> CC: Andrew Morton <akpm@linux-foundation.org>
+> CC: linux-kbuild@vger.kernel.org
+> ---
+>  Makefile |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
+> 
+> diff --git a/Makefile b/Makefile
+> index fa1db90..91ae299 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -294,7 +294,7 @@ endif
+>  # If the user is running make -s (silent mode), suppress echoing of
+>  # commands
+>  
+> -ifneq ($(findstring s,$(MAKEFLAGS)),)
+> +ifneq ($(filter s% -s% --silent --quiet,$(MAKEFLAGS)),)
+
+I played a bit with GNU make 3.81. Checking for --silent and --quiet is
+not necessary, because make always stores the short option if available.
+Now I was wondering if the 's' option is always at the beginning,
+looking at make-3.81/main.c, it turns out that the order in which the
+options appear in $(MAKEFLAGS) is the reverse order of the switches
+array, where 's' is near the end of the array:
+
+    { 's', flag, (char *) &silent_flag, 1, 1, 0, 0, 0, "silent" },
+                                           ^ store in $(MAKEFLAGS)?
+    { 'S', flag_off, (char *) &keep_going_flag, 1, 1, 0, 0,
+      (char *) &default_keep_going_flag, "no-keep-going" },
+    { 't', flag, (char *) &touch_flag, 1, 1, 1, 0, 0, "touch" },
+    { 'v', flag, (char *) &print_version_flag, 1, 1, 0, 0, 0, "version" },
+    { 'w', flag, (char *) &print_directory_flag, 1, 1, 0, 0, 0,
+      "print-directory" },
+    { CHAR_MAX+3, flag, (char *) &inhibit_print_directory_flag, 1, 1, 0,
+0, 0,
+      "no-print-directory" },
+    { 'W', string, (char *) &new_files, 0, 0, 0, 0, 0, "what-if" },
+    { CHAR_MAX+4, flag, (char *) &warn_undefined_variables_flag, 1, 1,
+0, 0, 0,
+      "warn-undefined-variables" },
+    { 0, 0, 0, 0, 0, 0, 0, 0, 0 }
+
+
+The only other single-letter options that come after 's' (before 's' in
+the $(MAKEFLAGS) variable) are 't', which doesn't work with the kernel,
+and 'w', which doesn't work either (the Makefile adds
+--no-print-directory). So we can indeed get away with s% and -s% (until
+the next make version changes the sort order, that is ;)).
+
+Michal
