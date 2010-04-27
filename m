@@ -1,254 +1,63 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from rcsinet10.oracle.com ([148.87.113.121]:55511 "EHLO
-	rcsinet10.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755704Ab0D0Uov (ORCPT
+Received: from smtp1.linux-foundation.org ([140.211.169.13]:60229 "EHLO
+	smtp1.linux-foundation.org" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1753834Ab0D0VNk (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 27 Apr 2010 16:44:51 -0400
-Date: Tue, 27 Apr 2010 13:42:58 -0700
-From: Randy Dunlap <randy.dunlap@oracle.com>
-Subject: Re: [PATCH 6/6] xconfig: Add support to show hidden options which
- have prompts
-Message-Id: <20100427134258.053b58cb.randy.dunlap@oracle.com>
-In-Reply-To: <4BD6970A.9020408@cn.fujitsu.com>
-References: <4BD696C0.8050500@cn.fujitsu.com>
-	<4BD6970A.9020408@cn.fujitsu.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+	Tue, 27 Apr 2010 17:13:40 -0400
+Message-Id: <201004272112.o3RLCrlB020200@imap1.linux-foundation.org>
+Subject: [patch 1/1] markup_oops: fix perlcritic warnings
+From: akpm@linux-foundation.org
+Date: Tue, 27 Apr 2010 14:12:53 -0700
+MIME-Version: 1.0
+Content-Type: text/plain; charset=ANSI_X3.4-1968
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Li Zefan <lizf@cn.fujitsu.com>
-Cc: Michal Marek <mmarek@suse.cz>, Randy Dunlap <randy.dunlap@oracle.com>, Andrew Morton <akpm@linux-foundation.org>, LKML <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org
+To: mmarek@suse.cz
+Cc: linux-kbuild@vger.kernel.org, akpm@linux-foundation.org, shemminger@vyatta.com, amwang@redhat.com, arjan@infradead.org
 
-On Tue, 27 Apr 2010 15:49:30 +0800 Li Zefan wrote:
+From: Stephen Hemminger <shemminger@vyatta.com>
 
-> This feature has been supported in menuconfig and gconfig, so
-> here add it to xconfig.
+Turn on strict checking.
+Use local file handles and 3 argument open.
 
-Looks/sounds reasonable, but it does hide some symbols that were previously displayed
-when in "Show all options" mode.
-
-E.g., CONFIG_64BIT is not displayed at all with this patch applied
-(except by the Search function).
-Also, X86_32 is not displayed at all (when this patch is applied)
-and it cannot be found or displayed by the Search function.
-
-IOW, Show all options mode is busted.  :(
-
-
-> Signed-off-by: Li Zefan <lizf@cn.fujitsu.com>
-> ---
->  scripts/kconfig/qconf.cc |   62 ++++++++++++++++++++++++++++++++-------------
->  scripts/kconfig/qconf.h  |   16 +++++++++---
->  2 files changed, 56 insertions(+), 22 deletions(-)
-> 
-> diff --git a/scripts/kconfig/qconf.cc b/scripts/kconfig/qconf.cc
-> index d950fff..f8c07c6 100644
-> --- a/scripts/kconfig/qconf.cc
-> +++ b/scripts/kconfig/qconf.cc
-> @@ -149,7 +149,7 @@ void ConfigItem::updateMenu(void)
->  	case S_TRISTATE:
->  		char ch;
->  
-> -		if (!sym_is_changable(sym) && !list->showAll) {
-> +		if (!sym_is_changable(sym) && list->optMode != normalOpt) {
->  			setPixmap(promptColIdx, 0);
->  			setText(noColIdx, QString::null);
->  			setText(modColIdx, QString::null);
-> @@ -320,7 +320,7 @@ ConfigList::ConfigList(ConfigView* p, const char *name)
->  	  symbolYesPix(xpm_symbol_yes), symbolModPix(xpm_symbol_mod), symbolNoPix(xpm_symbol_no),
->  	  choiceYesPix(xpm_choice_yes), choiceNoPix(xpm_choice_no),
->  	  menuPix(xpm_menu), menuInvPix(xpm_menu_inv), menuBackPix(xpm_menuback), voidPix(xpm_void),
-> -	  showAll(false), showName(false), showRange(false), showData(false),
-> +	  showName(false), showRange(false), showData(false), optMode(normalOpt),
->  	  rootEntry(0), headerPopup(0)
->  {
->  	int i;
-> @@ -337,10 +337,10 @@ ConfigList::ConfigList(ConfigView* p, const char *name)
->  
->  	if (name) {
->  		configSettings->beginGroup(name);
-> -		showAll = configSettings->readBoolEntry("/showAll", false);
->  		showName = configSettings->readBoolEntry("/showName", false);
->  		showRange = configSettings->readBoolEntry("/showRange", false);
->  		showData = configSettings->readBoolEntry("/showData", false);
-> +		optMode = (enum optionMode)configSettings->readNumEntry("/optionMode", false);
->  		configSettings->endGroup();
->  		connect(configApp, SIGNAL(aboutToQuit()), SLOT(saveSettings()));
->  	}
-> @@ -352,6 +352,17 @@ ConfigList::ConfigList(ConfigView* p, const char *name)
->  	reinit();
->  }
->  
-> +bool ConfigList::menuSkip(struct menu *menu)
-> +{
-> +	if (optMode == normalOpt && menu_is_visible(menu))
-> +		return false;
-> +	if (optMode == promptOpt && menu_has_prompt(menu))
-> +		return false;
-> +	if (optMode == allOpt)
-> +		return false;
-> +	return true;
-> +}
-> +
->  void ConfigList::reinit(void)
->  {
->  	removeColumn(dataColIdx);
-> @@ -380,7 +391,7 @@ void ConfigList::saveSettings(void)
->  		configSettings->writeEntry("/showName", showName);
->  		configSettings->writeEntry("/showRange", showRange);
->  		configSettings->writeEntry("/showData", showData);
-> -		configSettings->writeEntry("/showAll", showAll);
-> +		configSettings->writeEntry("/optionMode", (int)optMode);
->  		configSettings->endGroup();
->  	}
->  }
-> @@ -606,7 +617,7 @@ void ConfigList::updateMenuList(P* parent, struct menu* menu)
->  		}
->  
->  		visible = menu_is_visible(child);
-> -		if (showAll || visible) {
-> +		if (!menuSkip(child)) {
->  			if (!child->sym && !child->list && !child->prompt)
->  				continue;
->  			if (!item || item->menu != child)
-> @@ -860,13 +871,16 @@ ConfigView::~ConfigView(void)
->  	}
->  }
->  
-> -void ConfigView::setShowAll(bool b)
-> +void ConfigView::setOptionMode(QAction *act)
->  {
-> -	if (list->showAll != b) {
-> -		list->showAll = b;
-> -		list->updateListAll();
-> -		emit showAllChanged(b);
-> -	}
-> +	if (act == showNormalAction)
-> +		list->optMode = normalOpt;
-> +	else if (act == showAllAction)
-> +		list->optMode = allOpt;
-> +	else
-> +		list->optMode = promptOpt;
-> +
-> +	list->updateListAll();
->  }
->  
->  void ConfigView::setShowName(bool b)
-> @@ -1321,11 +1335,22 @@ ConfigMainWindow::ConfigMainWindow(void)
->  	  connect(showDataAction, SIGNAL(toggled(bool)), configView, SLOT(setShowData(bool)));
->  	  connect(configView, SIGNAL(showDataChanged(bool)), showDataAction, SLOT(setOn(bool)));
->  	  showDataAction->setOn(configList->showData);
-> -	QAction *showAllAction = new QAction(NULL, _("Show All Options"), 0, this);
-> -	  showAllAction->setToggleAction(TRUE);
-> -	  connect(showAllAction, SIGNAL(toggled(bool)), configView, SLOT(setShowAll(bool)));
-> -	  connect(showAllAction, SIGNAL(toggled(bool)), menuView, SLOT(setShowAll(bool)));
-> -	  showAllAction->setOn(configList->showAll);
-> +
-> +	QActionGroup *optGroup = new QActionGroup(this);
-> +	optGroup->setExclusive(TRUE);
-> +	connect(optGroup, SIGNAL(selected(QAction *)), configView,
-> +		SLOT(setOptionMode(QAction *)));
-> +
-> +	configView->showNormalAction = new QAction(NULL, _("Show Normal Options"), 0, optGroup);
-> +	configView->showAllAction = new QAction(NULL, _("Show All Options"), 0, optGroup);
-> +	configView->showPromptAction = new QAction(NULL, _("Show Prompt Options"), 0, optGroup);
-> +	configView->showNormalAction->setToggleAction(TRUE);
-> +	configView->showNormalAction->setOn(configList->optMode == normalOpt);
-> +	configView->showAllAction->setToggleAction(TRUE);
-> +	configView->showAllAction->setOn(configList->optMode == allOpt);
-> +	configView->showPromptAction->setToggleAction(TRUE);
-> +	configView->showPromptAction->setOn(configList->optMode == promptOpt);
-> +
->  	QAction *showDebugAction = new QAction(NULL, _("Show Debug Info"), 0, this);
->  	  showDebugAction->setToggleAction(TRUE);
->  	  connect(showDebugAction, SIGNAL(toggled(bool)), helpText, SLOT(setShowDebug(bool)));
-> @@ -1368,7 +1393,8 @@ ConfigMainWindow::ConfigMainWindow(void)
->  	showRangeAction->addTo(optionMenu);
->  	showDataAction->addTo(optionMenu);
->  	optionMenu->insertSeparator();
-> -	showAllAction->addTo(optionMenu);
-> +	optGroup->addTo(optionMenu);
-> +	optionMenu->insertSeparator();
->  	showDebugAction->addTo(optionMenu);
->  
->  	// create help menu
-> @@ -1463,7 +1489,7 @@ void ConfigMainWindow::setMenuLink(struct menu *menu)
->  	ConfigList* list = NULL;
->  	ConfigItem* item;
->  
-> -	if (!menu_is_visible(menu) && !configView->showAll())
-> +	if (configList->menuSkip(menu))
->  		return;
->  
->  	switch (configList->mode) {
-> diff --git a/scripts/kconfig/qconf.h b/scripts/kconfig/qconf.h
-> index 54775ae..37bdaec 100644
-> --- a/scripts/kconfig/qconf.h
-> +++ b/scripts/kconfig/qconf.h
-> @@ -44,6 +44,9 @@ enum colIdx {
->  enum listMode {
->  	singleMode, menuMode, symbolMode, fullMode, listMode
->  };
-> +enum optionMode {
-> +	normalOpt = 0, allOpt, promptOpt
-> +};
->  
->  class ConfigList : public QListView {
->  	Q_OBJECT
-> @@ -115,6 +118,8 @@ public:
->  	void setAllOpen(bool open);
->  	void setParentMenu(void);
->  
-> +	bool menuSkip(struct menu *);
-> +
->  	template <class P>
->  	void updateMenuList(P*, struct menu*);
->  
-> @@ -124,8 +129,9 @@ public:
->  	QPixmap choiceYesPix, choiceNoPix;
->  	QPixmap menuPix, menuInvPix, menuBackPix, voidPix;
->  
-> -	bool showAll, showName, showRange, showData;
-> +	bool showName, showRange, showData;
->  	enum listMode mode;
-> +	enum optionMode optMode;
->  	struct menu *rootEntry;
->  	QColorGroup disabledColorGroup;
->  	QColorGroup inactivedColorGroup;
-> @@ -222,17 +228,15 @@ public:
->  	static void updateList(ConfigItem* item);
->  	static void updateListAll(void);
->  
-> -	bool showAll(void) const { return list->showAll; }
->  	bool showName(void) const { return list->showName; }
->  	bool showRange(void) const { return list->showRange; }
->  	bool showData(void) const { return list->showData; }
->  public slots:
-> -	void setShowAll(bool);
->  	void setShowName(bool);
->  	void setShowRange(bool);
->  	void setShowData(bool);
-> +	void setOptionMode(QAction *);
->  signals:
-> -	void showAllChanged(bool);
->  	void showNameChanged(bool);
->  	void showRangeChanged(bool);
->  	void showDataChanged(bool);
-> @@ -242,6 +246,10 @@ public:
->  
->  	static ConfigView* viewList;
->  	ConfigView* nextView;
-> +
-> +	QAction *showNormalAction;
-> +	QAction *showAllAction;
-> +	QAction *showPromptAction;
->  };
->  
->  class ConfigInfoView : public QTextBrowser {
-> -- 
-
-
+Signed-off-by: Stephen Hemminger <shemminger@vyatta.com>
+Acked-by: WANG Cong <amwang@redhat.com>
+Cc: Arjan van de Ven <arjan@infradead.org>
+Cc: Michal Marek <mmarek@suse.cz>
+Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
 ---
-~Randy
-*** Remember to use Documentation/SubmitChecklist when testing your code ***
+
+ scripts/markup_oops.pl |    6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff -puN scripts/markup_oops.pl~markup_oops-fix-perlcritic-warnings scripts/markup_oops.pl
+--- a/scripts/markup_oops.pl~markup_oops-fix-perlcritic-warnings
++++ a/scripts/markup_oops.pl
+@@ -1,5 +1,7 @@
+ #!/usr/bin/perl
+ 
++use strict;
++
+ use File::Basename;
+ use Math::BigInt;
+ use Getopt::Long;
+@@ -126,7 +128,7 @@ sub process_x86_regs
+ 		$clobber = "";
+ 	}
+ 
+-	foreach $reg (keys(%regs)) {
++	foreach my $reg (keys(%regs)) {
+ 		my $clobberprime = reg_name($clobber);
+ 		my $lastwordprime = reg_name($lastword);
+ 		my $val = $regs{$reg};
+@@ -263,7 +265,7 @@ while (<FILE>) {
+ 	}
+ }
+ 
+-close(FILE);
++close($file);
+ 
+ if ($counter == 0) {
+ 	print "No matching code found \n";
+_
