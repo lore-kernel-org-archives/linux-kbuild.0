@@ -1,64 +1,44 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from metis.ext.pengutronix.de ([92.198.50.35]:39902 "EHLO
-	metis.ext.pengutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751254Ab0D0Mu2 (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 27 Apr 2010 08:50:28 -0400
-Date: Tue, 27 Apr 2010 14:50:14 +0200
-From: Wolfram Sang <w.sang@pengutronix.de>
+Received: from mgw2.diku.dk ([130.225.96.92]:56114 "EHLO mgw2.diku.dk"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751254Ab0D0Mx3 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 27 Apr 2010 08:53:29 -0400
+Date: Tue, 27 Apr 2010 14:53:24 +0200 (CEST)
+From: Julia Lawall <julia@diku.dk>
 Subject: Re: [PATCH 0/4] Add a Coccinelle front-end script
-Message-ID: <20100427125014.GD1775@pengutronix.de>
+In-Reply-To: <20100427125014.GD1775@pengutronix.de>
+Message-ID: <Pine.LNX.4.64.1004271452250.27092@ask.diku.dk>
 References: <1272316279-12042-1-git-send-email-npalix@diku.dk>
+ <20100427125014.GD1775@pengutronix.de>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="OaZoDhBhXzo6bW1J"
-Content-Disposition: inline
-In-Reply-To: <1272316279-12042-1-git-send-email-npalix@diku.dk>
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nicolas Palix <npalix@diku.dk>
-Cc: Andrew Morton <akpm@linux-foundation.org>, Joe Perches <joe@perches.com>, "David S. Miller" <davem@davemloft.net>, Michal Marek <mmarek@suse.cz>, Sam Ravnborg <sam@ravnborg.org>, Julia Lawall <julia@diku.dk>, Gilles Muller <Gilles.Muller@lip6.fr>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, cocci@diku.dk
+To: Wolfram Sang <w.sang@pengutronix.de>
+Cc: Nicolas Palix <npalix@diku.dk>, Andrew Morton <akpm@linux-foundation.org>, Joe Perches <joe@perches.com>, "David S. Miller" <davem@davemloft.net>, Michal Marek <mmarek@suse.cz>, Sam Ravnborg <sam@ravnborg.org>, Gilles Muller <Gilles.Muller@lip6.fr>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, cocci@diku.dk
 
+On Tue, 27 Apr 2010, Wolfram Sang wrote:
 
---OaZoDhBhXzo6bW1J
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> On Mon, Apr 26, 2010 at 11:11:15PM +0200, Nicolas Palix wrote:
+> > New targets are added (coccicheck-<mode>) to call the spatch front-end
+> > in the 'scripts' directory with the <mode> argument.
+> > 
+> > Four modes are defined: report, patch, context, and org.
+> > 
+> > 'report' mode generates a list in the following format:
+> >   file:line:column-column: message
+> > 
+> > 'patch' mode proposes a generic fix, when possible.
+> > 
+> > 'context' mode highlights lines of interest and their context
+> > in a diff-like style.
+> > 
+> > 'org' mode generates a report in the Org mode format of Emacs.
+> 
+> So, as I understood all semantic patches have to support 'org'?
+> I think this makes submitting slightly more complicated...
 
-On Mon, Apr 26, 2010 at 11:11:15PM +0200, Nicolas Palix wrote:
-> New targets are added (coccicheck-<mode>) to call the spatch front-end
-> in the 'scripts' directory with the <mode> argument.
->=20
-> Four modes are defined: report, patch, context, and org.
->=20
-> 'report' mode generates a list in the following format:
->   file:line:column-column: message
->=20
-> 'patch' mode proposes a generic fix, when possible.
->=20
-> 'context' mode highlights lines of interest and their context
-> in a diff-like style.
->=20
-> 'org' mode generates a report in the Org mode format of Emacs.
+No, this should not be the case.  It just won't do anything if you request 
+org output and nothing is defined to produce org output.
 
-So, as I understood all semantic patches have to support 'org'?
-I think this makes submitting slightly more complicated...
-
---=20
-Pengutronix e.K.                           | Wolfram Sang                |
-Industrial Linux Solutions                 | http://www.pengutronix.de/  |
-
---OaZoDhBhXzo6bW1J
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Digital signature
-Content-Disposition: inline
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.9 (GNU/Linux)
-
-iEYEARECAAYFAkvW3YYACgkQD27XaX1/VRsSlgCfYD2bj8JIAuDUIiTXRJzAKjbU
-GEYAnjqaz2+6sP88PDvngiaDg4N0jAG8
-=ogT9
------END PGP SIGNATURE-----
-
---OaZoDhBhXzo6bW1J--
+julia
