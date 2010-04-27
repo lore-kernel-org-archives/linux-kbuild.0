@@ -1,72 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qy0-f179.google.com ([209.85.221.179]:59944 "EHLO
-	mail-qy0-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751077Ab0D0FyK convert rfc822-to-8bit (ORCPT
+Received: from cn.fujitsu.com ([222.73.24.84]:59425 "EHLO song.cn.fujitsu.com"
+	rhost-flags-OK-FAIL-OK-OK) by vger.kernel.org with ESMTP
+	id S1751092Ab0D0Hq3 convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 27 Apr 2010 01:54:10 -0400
+	Tue, 27 Apr 2010 03:46:29 -0400
+Message-ID: <4BD696C0.8050500@cn.fujitsu.com>
+Date: Tue, 27 Apr 2010 15:48:16 +0800
+From: Li Zefan <lizf@cn.fujitsu.com>
 MIME-Version: 1.0
-In-Reply-To: <1272315374-11951-1-git-send-email-jason.wessel@windriver.com>
-References: <1272315374-11951-1-git-send-email-jason.wessel@windriver.com>
-Date: Tue, 27 Apr 2010 13:54:09 +0800
-Message-ID: <p2p2375c9f91004262254v20e361aexf508b81350e03ec1@mail.gmail.com>
-Subject: Re: [PATCH] Correctly deal with make that has an argument which
-	contains an "s"
-From: =?UTF-8?Q?Am=C3=A9rico_Wang?= <xiyou.wangcong@gmail.com>
+Subject: [PATCH 1/6] kconfig: print symbol type in help text
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jason Wessel <jason.wessel@windriver.com>
-Cc: Michal Marek <mmarek@suse.cz>, linux-kernel@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>, linux-kbuild@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>
+Cc: Randy Dunlap <randy.dunlap@oracle.com>, Andrew Morton <akpm@linux-foundation.org>, LKML <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org
 
-On Tue, Apr 27, 2010 at 4:56 AM, Jason Wessel
-<jason.wessel@windriver.com> wrote:
-> When using remake, which is based on gnumake, if you invoke
-> an example build as shown below, the build will become silent
-> due to the top level make file incorrectly guessing that
-> the end user wants a silent build because an argument that
-> contained an "s" was used.
->
-> remake --no-extended-errors
->
-> Fix up the top level Makefile to use filter with a list of
-> options that mean silent with the various revisions of gnumake,
-> instead of findstring.
->
-> Signed-off-by: Jason Wessel <jason.wessel@windriver.com>
-> CC: Michal Marek <mmarek@suse.cz>
-> CC: Andrew Morton <akpm@linux-foundation.org>
-> CC: linux-kbuild@vger.kernel.org
+Randy suggested to print out the symbol type in gconfig.
 
+Note this change does more than Randy's suggestion, that it also
+affects the display of help text in other config tools.
 
-Acked-by: WANG Cong <xiyou.wangcong@gmail.com>
+  │ Symbol: BLOCK [=y]
+  │ Type  : boolean
+  │ Prompt: Enable the block layer
+  │   Defined at block/Kconfig:4
+  │   Depends on: EMBEDDED [=n]
 
-Thanks.
+Signed-off-by: Li Zefan <lizf@cn.fujitsu.com>
+---
+ scripts/kconfig/menu.c |    4 +++-
+ 1 files changed, 3 insertions(+), 1 deletions(-)
 
-
-> ---
->  Makefile |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
->
-> diff --git a/Makefile b/Makefile
-> index fa1db90..91ae299 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -294,7 +294,7 @@ endif
->  # If the user is running make -s (silent mode), suppress echoing of
->  # commands
->
-> -ifneq ($(findstring s,$(MAKEFLAGS)),)
-> +ifneq ($(filter s% -s% --silent --quiet,$(MAKEFLAGS)),)
->   quiet=silent_
->  endif
->
-> --
-> 1.6.3.3
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kernel" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> Please read the FAQ at  http://www.tux.org/lkml/
->
+diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
+index e150176..b5d15fa 100644
+--- a/scripts/kconfig/menu.c
++++ b/scripts/kconfig/menu.c
+@@ -501,9 +501,11 @@ void get_symbol_str(struct gstr *r, struct symbol *sym)
+ 	bool hit;
+ 	struct property *prop;
+ 
+-	if (sym && sym->name)
++	if (sym && sym->name) {
+ 		str_printf(r, "Symbol: %s [=%s]\n", sym->name,
+ 			   sym_get_string_value(sym));
++		str_printf(r, "Type  : %s\n", sym_type_name(sym->type));
++	}
+ 	for_all_prompts(sym, prop)
+ 		get_prompt_str(r, prop);
+ 	hit = false;
+-- 
+1.6.3
