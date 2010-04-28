@@ -1,63 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp1.linux-foundation.org ([140.211.169.13]:60229 "EHLO
-	smtp1.linux-foundation.org" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1753834Ab0D0VNk (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 27 Apr 2010 17:13:40 -0400
-Message-Id: <201004272112.o3RLCrlB020200@imap1.linux-foundation.org>
-Subject: [patch 1/1] markup_oops: fix perlcritic warnings
-From: akpm@linux-foundation.org
-Date: Tue, 27 Apr 2010 14:12:53 -0700
+Received: from cantor.suse.de ([195.135.220.2]:48870 "EHLO mx1.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751396Ab0D1Ilq (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 28 Apr 2010 04:41:46 -0400
+Message-ID: <4BD7F4C8.4080107@suse.cz>
+Date: Wed, 28 Apr 2010 10:41:44 +0200
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=ANSI_X3.4-1968
-Content-Transfer-Encoding: 8bit
+Subject: Re: [patch 1/1] markup_oops: fix perlcritic warnings
+References: <201004272112.o3RLCrlB020200@imap1.linux-foundation.org>
+In-Reply-To: <201004272112.o3RLCrlB020200@imap1.linux-foundation.org>
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: mmarek@suse.cz
-Cc: linux-kbuild@vger.kernel.org, akpm@linux-foundation.org, shemminger@vyatta.com, amwang@redhat.com, arjan@infradead.org
+To: akpm@linux-foundation.org
+Cc: linux-kbuild@vger.kernel.org, shemminger@vyatta.com, amwang@redhat.com, arjan@infradead.org
 
-From: Stephen Hemminger <shemminger@vyatta.com>
+On 27.4.2010 23:12, akpm@linux-foundation.org wrote:
+> From: Stephen Hemminger <shemminger@vyatta.com>
+> 
+> Turn on strict checking.
+> Use local file handles and 3 argument open.
 
-Turn on strict checking.
-Use local file handles and 3 argument open.
+Hi Andrew, Stephen,
 
-Signed-off-by: Stephen Hemminger <shemminger@vyatta.com>
-Acked-by: WANG Cong <amwang@redhat.com>
-Cc: Arjan van de Ven <arjan@infradead.org>
-Cc: Michal Marek <mmarek@suse.cz>
-Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
----
+as I wrote earlier, this patch is incomplete:
+$ perl scripts/markup_oops.pl
+Global symbol "$lastword" requires explicit package name at
+scripts/markup_oops.pl line 110.
+Global symbol "$clobber" requires explicit package name at
+scripts/markup_oops.pl line 119.
+Global symbol "$lastword" requires explicit package name at
+scripts/markup_oops.pl line 119.
+Global symbol "$clobber" requires explicit package name at
+scripts/markup_oops.pl line 121.
+Global symbol "$clobber" requires explicit package name at
+scripts/markup_oops.pl line 123.
+Global symbol "$clobber" requires explicit package name at
+scripts/markup_oops.pl line 128.
+Global symbol "$clobber" requires explicit package name at
+scripts/markup_oops.pl line 132.
+Global symbol "$lastword" requires explicit package name at
+scripts/markup_oops.pl line 133.
+Global symbol "$clobber" requires explicit package name at
+scripts/markup_oops.pl line 143.
+Global symbol "$lastword" requires explicit package name at
+scripts/markup_oops.pl line 151.
+Global symbol "$file" requires explicit package name at
+scripts/markup_oops.pl line 268.
+Execution of scripts/markup_oops.pl aborted due to compilation errors.
 
- scripts/markup_oops.pl |    6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+Please drop it from -mm.
 
-diff -puN scripts/markup_oops.pl~markup_oops-fix-perlcritic-warnings scripts/markup_oops.pl
---- a/scripts/markup_oops.pl~markup_oops-fix-perlcritic-warnings
-+++ a/scripts/markup_oops.pl
-@@ -1,5 +1,7 @@
- #!/usr/bin/perl
- 
-+use strict;
-+
- use File::Basename;
- use Math::BigInt;
- use Getopt::Long;
-@@ -126,7 +128,7 @@ sub process_x86_regs
- 		$clobber = "";
- 	}
- 
--	foreach $reg (keys(%regs)) {
-+	foreach my $reg (keys(%regs)) {
- 		my $clobberprime = reg_name($clobber);
- 		my $lastwordprime = reg_name($lastword);
- 		my $val = $regs{$reg};
-@@ -263,7 +265,7 @@ while (<FILE>) {
- 	}
- }
- 
--close(FILE);
-+close($file);
- 
- if ($counter == 0) {
- 	print "No matching code found \n";
-_
+Thanks,
+Michal
