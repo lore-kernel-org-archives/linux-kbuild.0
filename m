@@ -1,125 +1,86 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.vyatta.com ([76.74.103.46]:37617 "EHLO mail.vyatta.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752470Ab0D1XRv (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 28 Apr 2010 19:17:51 -0400
-Date: Wed, 28 Apr 2010 16:17:31 -0700
-From: Stephen Hemminger <shemminger@vyatta.com>
-Subject: Re: [patch 1/1] markup_oops: fix perlcritic warnings
-Message-ID: <20100428161731.054fbd19@nehalam>
-In-Reply-To: <4BD7F4C8.4080107@suse.cz>
-References: <201004272112.o3RLCrlB020200@imap1.linux-foundation.org>
-	<4BD7F4C8.4080107@suse.cz>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Received: from pqueueb.post.tele.dk ([193.162.153.10]:37580 "EHLO
+	pqueueb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932210Ab0D3Q4G (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 30 Apr 2010 12:56:06 -0400
+Received: from pfepa.post.tele.dk (pfepa.post.tele.dk [195.41.46.235])
+	by pqueueb.post.tele.dk (Postfix) with ESMTP id 83E55843F
+	for <linux-kbuild@vger.kernel.org>; Thu, 29 Apr 2010 20:07:02 +0200 (CEST)
+Date: Thu, 29 Apr 2010 20:06:35 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: [kbuild-devel] Dynamically add objects to be built
+Message-ID: <20100429180635.GA26336@merkur.ravnborg.org>
+References: <z2za730395e1004290938v7394bf9nc28fed6333396335@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <z2za730395e1004290938v7394bf9nc28fed6333396335@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: akpm@linux-foundation.org, linux-kbuild@vger.kernel.org, amwang@redhat.com, arjan@infradead.org
+To: Chris Horlick <chorlick@gmail.com>
+Cc: kbuild-devel@lists.sourceforge.net, linux-kbuild@vger.kernel.org
 
-More complete patch, fixes all the warnings from perlcritic as
-well as perl compiler with stictures enabled.
+First - posting to linux-kbuild will liekly get you more attention.
+The old list at sourceforge is no longer active.
 
-Compile tested, does some one have an actual oops output
-to recheck it on?
+[From the bottom of your mail]
+> If anyone can point me to the "kbuild" way of doing things, it would be
+> greatly appreciated. Thanks!
+The kbuild philosofy is that you specify all .o files.
+Considering the many many hours invested writing a single .c file,
+then the effort it is to add it to the kbuild file is minimal.
 
-Signed-off-by: Stephen Hemminger <shemminger@vyatta.com>
+On Thu, Apr 29, 2010 at 11:38:30AM -0500, Chris Horlick wrote:
+> Im having an issue getting my build system set up the way id like and im
+> hoping someone here can point me in a new direction or perhaps offer some
+> advice.
+> If i manually add each .o file i want built to the makefile the lkm will
+> build with no issues, essentially this works:
+> 
+> OBJS = main.o
+> #OBJS += wm_algo_common.o
+> #OBJS += wm_algomgr_ops.o
+> #OBJS += wm_algomgr_static.o
+> #OBJS += wm_algo_tcp1.o
+> #OBJS += wm_algo_tcp2.o
+> #OBJS += wm_algo_udp.o
+> #OBJS += wm_arp_reg_method.o
+> #OBJS += wmc_algomgr.o
+> #OBJS += wmc_core.o
+> #OBJS += wmc_core_function.o
+> #OBJS += wmc_debug.o
+> #OBJS += wmc_linked_list.o
+> #OBJS += wm_core_info.o
+> #OBJS += wm_core_ops.o
+> #OBJS += wmc_packet_common.o
+> #OBJS += wmc_regmgr.o wm_driver.o
+> #OBJS += wm_hashtable.o
+> #OBJS += wm_network_common.o
+> #OBJS += wm_regmgr_ops.o
+> #OBJS += wm_regmgr_static.o
+> 
+> Granted these are commented out but they will build a loadable lkm if i
+> un-comment the obj lines. What i would really like is just to be able to
+> drop new sources into my build directory and have the makefile pick them up
+> and build them auto-magically, something like this:
+> 
+> OBJS = $(patsubst %.c,%.o,$(wildcard $(PWD)/*.c))
 
+What you fail to realise is that current directory is the root
+of the kernel source when you build your module.
 
---- a/scripts/markup_oops.pl	2010-04-28 16:05:20.794776102 -0700
-+++ b/scripts/markup_oops.pl	2010-04-28 16:15:24.894377031 -0700
-@@ -1,5 +1,7 @@
- #!/usr/bin/perl
- 
-+use strict;
-+
- use File::Basename;
- use Math::BigInt;
- 
-@@ -79,9 +81,9 @@ sub parse_x86_regs
- sub reg_name
- {
- 	my ($reg) = @_;
--	$reg =~ s/r(.)x/e\1x/;
--	$reg =~ s/r(.)i/e\1i/;
--	$reg =~ s/r(.)p/e\1p/;
-+	$reg =~ s/r(.)x/e$1x/;
-+	$reg =~ s/r(.)i/e$1i/;
-+	$reg =~ s/r(.)p/e$1p/;
- 	return $reg;
- }
- 
-@@ -94,17 +96,15 @@ sub process_x86_regs
- 	}
- 
- 	# find the arguments to the instruction
--	if ($line =~ /([0-9a-zA-Z\,\%\(\)\-\+]+)$/) {
--		$lastword = $1;
--	} else {
--		return "";
--	}
-+	return "" unless ($line =~ /([0-9a-zA-Z\,\%\(\)\-\+]+)$/);
-+
-+	my $lastword = $1;
- 
- 	# we need to find the registers that get clobbered,
- 	# since their value is no longer relevant for previous
- 	# instructions in the stream.
- 
--	$clobber = $lastword;
-+	my $clobber = $lastword;
- 	# first, remove all memory operands, they're read only
- 	$clobber =~ s/\([a-z0-9\%\,]+\)//g;
- 	# then, remove everything before the comma, thats the read part
-@@ -116,7 +116,7 @@ sub process_x86_regs
- 		$clobber = "";
- 	}
- 
--	foreach $reg (keys(%regs)) {
-+	foreach my $reg (keys(%regs)) {
- 		my $clobberprime = reg_name($clobber);
- 		my $lastwordprime = reg_name($lastword);
- 		my $val = $regs{$reg};
-@@ -192,14 +192,15 @@ if ($module ne "") {
- 		exit;
- 	}
- 	# ok so we found the module, now we need to calculate the vma offset
--	open(FILE, "objdump -dS $filename |") || die "Cannot start objdump";
--	while (<FILE>) {
-+	open(my $obj, '-|', "objdump -dS $filename")
-+	    || die "Cannot start objdump: $!";
-+	while (<$obj>) {
- 		if ($_ =~ /^([0-9a-f]+) \<$function\>\:/) {
- 			my $fu = $1;
- 			$vmaoffset = hex($target) - hex($fu) - hex($func_offset);
- 		}
- 	}
--	close(FILE);
-+	close($obj);
- }
- 
- my $counter = 0;
-@@ -225,9 +226,11 @@ sub InRange {
- # first, parse the input into the lines array, but to keep size down,
- # we only do this for 4Kb around the sweet spot
- 
--open(FILE, "objdump -dS --adjust-vma=$vmaoffset --start-address=$decodestart --stop-address=$decodestop $filename |") || die "Cannot start objdump";
-+open(my $objdump, '-|',
-+     "objdump -dS --adjust-vma=$vmaoffset --start-address=$decodestart --stop-address=$decodestop $filename")
-+    or die "Cannot start objdump: $!";
- 
--while (<FILE>) {
-+while (<$objdump>) {
- 	my $line = $_;
- 	chomp($line);
- 	if ($state == 0) {
-@@ -252,7 +255,7 @@ while (<FILE>) {
- 	}
- }
- 
--close(FILE);
-+close($objdump);
- 
- if ($counter == 0) {
- 	print "No matching code found \n";
+Try something like this:
+
+OBJS := $(patsubst %.c, %.o,$(notdir $(wildcard $(src)/*.c)))
+
+$(wildcard $(src)/*.c) will find all .c files in the directory where you module reside
+$(notdir ...) remove the path component.
+
+Try to look at the resulting OBJS like this:
+
+$(warning OBJS=$(OBJS))
+
+Note - I used ":=" above. I always avoid using "=" unless strictly required.
+
+	Sam
