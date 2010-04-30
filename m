@@ -1,56 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from rcsinet14.oracle.com ([148.87.113.126]:42888 "EHLO
-	rcsinet14.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756072Ab0D3Upr (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 30 Apr 2010 16:45:47 -0400
-Message-ID: <4BD99A56.4070800@oracle.com>
-Date: Thu, 29 Apr 2010 07:40:22 -0700
-From: Randy Dunlap <randy.dunlap@oracle.com>
-MIME-Version: 1.0
-Subject: Re: [PATCH 6/6] xconfig: Add support to show hidden options which
- have prompts
-References: <4BD696C0.8050500@cn.fujitsu.com>	<4BD6970A.9020408@cn.fujitsu.com> <20100427134258.053b58cb.randy.dunlap@oracle.com> <4BD91FEC.6070903@cn.fujitsu.com>
-In-Reply-To: <4BD91FEC.6070903@cn.fujitsu.com>
-Content-Type: text/plain; charset=ISO-8859-1
+Received: from xenotime.net ([72.52.115.56]:59489 "HELO xenotime.net"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with SMTP
+	id S1759604Ab0D3VSS (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 30 Apr 2010 17:18:18 -0400
+Received: from chimera.site ([71.245.98.113]) by xenotime.net for <linux-kbuild@vger.kernel.org>; Fri, 30 Apr 2010 14:07:59 -0700
+Date: Fri, 30 Apr 2010 14:07:59 -0700
+From: Randy Dunlap <rdunlap@xenotime.net>
+Subject: Re: [PATCH 1/4] Add targets to use the Coccinelle checker
+Message-Id: <20100430140759.fc93fff6.rdunlap@xenotime.net>
+In-Reply-To: <adaaasmyyyl.fsf@roland-alpha.cisco.com>
+References: <1272316279-12042-1-git-send-email-npalix@diku.dk>
+	<1272316279-12042-2-git-send-email-npalix@diku.dk>
+	<1272317821.15953.107.camel@Joe-Laptop.home>
+	<201004270020.09447.npalix@diku.dk>
+	<4BD61266.5020905@xenotime.net>
+	<adaaasmyyyl.fsf@roland-alpha.cisco.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Li Zefan <lizf@cn.fujitsu.com>
-Cc: Michal Marek <mmarek@suse.cz>, Andrew Morton <akpm@linux-foundation.org>, LKML <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org
+To: Roland Dreier <rdreier@cisco.com>
+Cc: Nicolas Palix <npalix@diku.dk>, Joe Perches <joe@perches.com>, Andrew Morton <akpm@linux-foundation.org>, "David S. Miller" <davem@davemloft.net>, Michal Marek <mmarek@suse.cz>, Sam Ravnborg <sam@ravnborg.org>, Julia Lawall <julia@diku.dk>, Gilles Muller <Gilles.Muller@lip6.fr>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, cocci@diku.dk
 
-On 04/28/10 22:58, Li Zefan wrote:
-> Randy Dunlap wrote:
->> On Tue, 27 Apr 2010 15:49:30 +0800 Li Zefan wrote:
->>
->>> This feature has been supported in menuconfig and gconfig, so
->>> here add it to xconfig.
->>
->> Looks/sounds reasonable, but it does hide some symbols that were previously displayed
->> when in "Show all options" mode.
->>
->> E.g., CONFIG_64BIT is not displayed at all with this patch applied
->> (except by the Search function).
->> Also, X86_32 is not displayed at all (when this patch is applied)
->> and it cannot be found or displayed by the Search function.
->>
+On Thu, 29 Apr 2010 10:01:54 -0700 Roland Dreier wrote:
 
-I'm using a kernel source tree with your 12 patches applied.
-Should that be OK?
-
-I don't see any of the hidden (no prompt string) symbols from
-arch/x86/Kconfig displayed.  Or maybe they have just moved, but I can't
-locate them.
-
+>  > > +		"Take particularly attention when using the \"patch\" mode\n"\
+>  > 
+>  > 		      particular
 > 
-> I don't see this issue, though I found a bug in this patch...
-> Could you send me your .config (in private) ?
+> Actually, "take particular attention" is not particularly grammatical.
+> I might phrase this as
+> 
+>   Be especially careful when using the "patch" mode to review the patch
+>   you are about to submit.
 
-Done, but the issue is not config-specific.
+Yes, or:
 
->> IOW, Show all options mode is busted.  :(
+    When using "patch" mode, carefully review the patch before submitting it.
 
 
--- 
+---
 ~Randy
 *** Remember to use Documentation/SubmitChecklist when testing your code ***
