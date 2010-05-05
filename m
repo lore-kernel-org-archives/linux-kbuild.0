@@ -1,42 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from puc33-1-78-231-206-69.fbx.proxad.net ([78.231.206.69]:62098
-	"HELO pqntzp.proxad.net" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with SMTP id S1755902Ab0EEUYL (ORCPT
+Received: from bedivere.hansenpartnership.com ([66.63.167.143]:34443 "EHLO
+	bedivere.hansenpartnership.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1755275Ab0EFAGZ (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 5 May 2010 16:24:11 -0400
-Message-ID: <4BE1D28C.9060104@steinmann.se>
-Date: Wed, 05 May 2010 22:23:30 +0200
-From: Majica Rappe <sheria@sheldrake.com>
-MIME-Version: 1.0
-Subject: ake any older wom
-Content-Type: application/octet-stream; name="plectrums.rtf"
-Content-Transfer-Encoding: base64
+	Wed, 5 May 2010 20:06:25 -0400
+Subject: kbuild: fixing the select problem
+From: James Bottomley <James.Bottomley@HansenPartnership.com>
+Content-Type: text/plain; charset="UTF-8"
+Date: Wed, 05 May 2010 17:49:20 -0400
+Message-ID: <1273096160.23208.35.camel@mulgrave.site>
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Marzili Risen <linux-kbuild@vger.kernel.org>
+To: linux-arch@vger.kernel.org, linux-kernel <linux-kernel@vger.kernel.org>
+Cc: Sam Ravnborg <sam@ravnborg.org>, linux-kbuild@vger.kernel.org, Randy Dunlap <randy.dunlap@oracle.com>
 
-e1xydGYxXGFuc2lcYW5zaWNwZzEyNTJcZGVmZjBcZGVmbGFuZzEwMzN7XCpcZ2VuZXJhdG9y
-IE1zZnRlZGl0IDAuNDIuMzIuNzMzNTt9e1xmb250dGJse1xmMFxmbmlsXGZjaGFyc2V0MCBD
-YWxpYnJpO319DQp7XCpcZ2VuZXJhdG9yIE1zZnRlZGl0IDAuNDIuMzIuNzMzNTt9e1xjb2xv
-cnRibCA7XHJlZDBcZ3JlZW4wXGJsdWUyNTU7XHJlZDE5MlxncmVlbjgwXGJsdWU3NztccmVk
-MFxncmVlbjE3NlxibHVlODA7XHJlZDIwNFxncmVlbjE4MFxibHVlMDtccmVkMjU1XGdyZWVu
-MFxibHVlMDtccmVkMjIzXGdyZWVuMjA2XGJsdWU0O1xyZWQxNTVcZ3JlZW4wXGJsdWUyMTE7
-XHJlZDc5XGdyZWVuMTI5XGJsdWUxODk7XHJlZDE2NVxncmVlbjE2NVxibHVlMTY1O1xyZWQx
-MjhcZ3JlZW4xNThcYmx1ZTE5NDtccmVkMjQ3XGdyZWVuMTUwXGJsdWU3MDtccmVkMFxncmVl
-bjc3XGJsdWUxODc7XHJlZDc1XGdyZWVuMTcyXGJsdWUxOTg7XHJlZDIyMVxncmVlbjEzMlxi
-bHVlMTMyO1xyZWQ1MVxncmVlbjUxXGJsdWU1MTtccmVkMTU4XGdyZWVuMTI0XGJsdWUxMjQ7
-XHJlZDE1NVxncmVlbjE4N1xibHVlODk7fQ0Ke1wqXGdlbmVyYXRvciBNc2Z0ZWRpdCAwLjQy
-LjMyLjczMzU7fVx2aWV3a2luZDRcdWMxXHBhcmRcc2EyMDBcc2wyNzZcc2xtdWx0MVxsYW5n
-OVxmMFxmczMye1xmaWVsZHtcKlxmbGRpbnN0e0hZUEVSTElOSyAiaHtcKlxkZCAwLjQyLjMy
-LjczMzU7fXR0cDovL3d3dy5rdTEyLnJ1In19e1xmbGRyc2x0e1x1bFxjZjEgaHR0cDovL3d3
-dy5rdTEyLnJ1fX19XGYwXGNmMVxiXGZzMzIgIC0gT3JkZXIgdGhlIGNoZWFwZXN0IG1lZGlj
-YXRpb25zIG5vdyFccGFyDQpWaWFncmEgXGNmNCBDaWFsaXMgXGNmMyBWaWFncmEgUHJvZmVz
-c2lvbmFsIFxjZjUgQ2lhbGlzIFByb2Zlc3Npb25hbCBcY2Y2IFZpYWdyYSBTdXBlciBBY3Rp
-dmUrIFxjZjMgQ2lhbGlzIFN1cGVyIEFjdGl2ZSsgXGNmNyBMZXZpdHJhXGNmMCAgXGNmOCBW
-aWFncmEgU29mdCBUYWJzIFxjZjkgQ2lhbGlzIFNvZnQgVGFic1xjZjEwICBcY2YxMSBMZXZp
-dHJhIFByb2Zlc3Npb25hbCBcY2Y0IEZlbWFsZSBWaWFncmEgXGNmMTIgUHJvcGVjaWEgXGNm
-NyBBY29tcGxpYSBcY2Y2IFhlbmljYWxcY2YwICBcY2Y1IEJyYW5kIExldml0cmEgXGNmMTMg
-RmVtYWxlIENpYWxpcyBcY2YxNCBMZXZpdHJhIFN1cGVyIEFjdGl2ZSsgXGNmMTUgVGFtaWZs
-dVxjZjAgIFxjZjcgVlBYTFxjZjAgIFxjZjE2IFZpYWdyYSBTb2Z0IEZsYXZvdXJlZCBcY2Y1
-IEJyYW5kIFZpYWdyYSBcY2YxNyBCcmFuZCBDaWFsaXNcY2YwDQp7XCpcZ2VuZXJhdG9yIE1z
-ZnRlZGl0IDAuNDIuMzIuNzMzNTt9fQ==
+[Sam: I know you don't maintain kbuild anymore, but since you have the
+most experience, if you could find time to comment, I'd be grateful]
+
+The select problem is that the kbuild select directive will turn a
+symbol on without reference to its dependencies.  This, in turn, means
+that either selected symbols must select their dependencies, or that
+people using select have to be aware of the selected symbol's dependency
+and build those dependencies into their symbol (leading to duplication
+and the possibility of getting the dependencies out of sync).  We use
+select for the scsi transport classes, so we run into this problem in
+SCSI quite a lot.
+
+I think the correct fix is to make a symbol that selects another symbol
+automatically inherit all of the selected symbol's dependencies.
+
+There seems to be a fairly easy way to do this in kbuild.  Right at the
+moment, select is handled as additional symbol values as the last point
+in the symbol tree evaluation process.  Instead, what I propose doing is
+for every select symbol, we add an extra unconditional default for the
+selected symbol of the selecting symbol's current value (this breaks a
+possible dependency cycle) and add to the dependencies of the selecting
+symbol, the symbol it's currently selecting.
+
+There's one wrinkle to all of this in that the current parser for
+default values stops when it finds the first valid (i.e. whose if clause
+evaluates to true) default.  To make the above scheme work, I need to
+modify the default parser so it takes the highest tristate of all the
+valid defaults (and bumps m to y for bool).
+
+Does this look acceptable to people?  I think it should give the desired
+result and has the added benefit that we can then strip the extra select
+overlay out of the kbuild system (making the parser slightly simpler).
+
+If this looks like a good idea to people, I think I can code up a quick
+patch.
+
+James
+
+
+
