@@ -1,70 +1,42 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from rcsinet10.oracle.com ([148.87.113.121]:48944 "EHLO
-	rcsinet10.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755841Ab0ECSDC (ORCPT
+Received: from puc33-1-78-231-206-69.fbx.proxad.net ([78.231.206.69]:62098
+	"HELO pqntzp.proxad.net" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with SMTP id S1755902Ab0EEUYL (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 3 May 2010 14:03:02 -0400
-Message-ID: <4BDF0F91.6080608@oracle.com>
-Date: Mon, 03 May 2010 11:01:53 -0700
-From: Randy Dunlap <randy.dunlap@oracle.com>
+	Wed, 5 May 2010 16:24:11 -0400
+Message-ID: <4BE1D28C.9060104@steinmann.se>
+Date: Wed, 05 May 2010 22:23:30 +0200
+From: Majica Rappe <sheria@sheldrake.com>
 MIME-Version: 1.0
-Subject: Re: [PATCH 6/6] xconfig: Add support to show hidden options which
- have prompts
-References: <4BD696C0.8050500@cn.fujitsu.com>	<4BD6970A.9020408@cn.fujitsu.com> <20100427134258.053b58cb.randy.dunlap@oracle.com> <4BD91FEC.6070903@cn.fujitsu.com> <4BD99A56.4070800@oracle.com> <4BDA35AD.6000407@cn.fujitsu.com>
-In-Reply-To: <4BDA35AD.6000407@cn.fujitsu.com>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+Subject: ake any older wom
+Content-Type: application/octet-stream; name="plectrums.rtf"
+Content-Transfer-Encoding: base64
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Li Zefan <lizf@cn.fujitsu.com>
-Cc: Michal Marek <mmarek@suse.cz>, Andrew Morton <akpm@linux-foundation.org>, LKML <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org
+To: Marzili Risen <linux-kbuild@vger.kernel.org>
 
-On 04/29/10 18:43, Li Zefan wrote:
-> Randy Dunlap wrote:
->> On 04/28/10 22:58, Li Zefan wrote:
->>> Randy Dunlap wrote:
->>>> On Tue, 27 Apr 2010 15:49:30 +0800 Li Zefan wrote:
->>>>
->>>>> This feature has been supported in menuconfig and gconfig, so
->>>>> here add it to xconfig.
->>>> Looks/sounds reasonable, but it does hide some symbols that were previously displayed
->>>> when in "Show all options" mode.
->>>>
->>>> E.g., CONFIG_64BIT is not displayed at all with this patch applied
->>>> (except by the Search function).
->>>> Also, X86_32 is not displayed at all (when this patch is applied)
->>>> and it cannot be found or displayed by the Search function.
->>>>
->>
->> I'm using a kernel source tree with your 12 patches applied.
->> Should that be OK?
->>
-> 
-> Should be Ok. I'm using -tip tree with those 12 patches applied.
-> So which source tree are you using?
-
-linux-2.6.34-rc4 + your 12 patches.
-
-> If we use the same tree, the same arch (x86_32), and the same .config,
-> we shuold see the same result.
-
-I'm using ARCH=x86_64
-
->> I don't see any of the hidden (no prompt string) symbols from
->> arch/x86/Kconfig displayed.  Or maybe they have just moved, but I can't
->> locate them.
->>
-> 
-> So we can't see "64BIT" in "Show prompt options" mode either ?
-
-It shows up in the Search box but not in any regular menu AFAICT.
-
-> (btw, I'll be on vacation, and probably won't be responsive util 5/6...)
-
-OK, no problem.
-
-
-thanks.
--- 
-~Randy
-*** Remember to use Documentation/SubmitChecklist when testing your code ***
+e1xydGYxXGFuc2lcYW5zaWNwZzEyNTJcZGVmZjBcZGVmbGFuZzEwMzN7XCpcZ2VuZXJhdG9y
+IE1zZnRlZGl0IDAuNDIuMzIuNzMzNTt9e1xmb250dGJse1xmMFxmbmlsXGZjaGFyc2V0MCBD
+YWxpYnJpO319DQp7XCpcZ2VuZXJhdG9yIE1zZnRlZGl0IDAuNDIuMzIuNzMzNTt9e1xjb2xv
+cnRibCA7XHJlZDBcZ3JlZW4wXGJsdWUyNTU7XHJlZDE5MlxncmVlbjgwXGJsdWU3NztccmVk
+MFxncmVlbjE3NlxibHVlODA7XHJlZDIwNFxncmVlbjE4MFxibHVlMDtccmVkMjU1XGdyZWVu
+MFxibHVlMDtccmVkMjIzXGdyZWVuMjA2XGJsdWU0O1xyZWQxNTVcZ3JlZW4wXGJsdWUyMTE7
+XHJlZDc5XGdyZWVuMTI5XGJsdWUxODk7XHJlZDE2NVxncmVlbjE2NVxibHVlMTY1O1xyZWQx
+MjhcZ3JlZW4xNThcYmx1ZTE5NDtccmVkMjQ3XGdyZWVuMTUwXGJsdWU3MDtccmVkMFxncmVl
+bjc3XGJsdWUxODc7XHJlZDc1XGdyZWVuMTcyXGJsdWUxOTg7XHJlZDIyMVxncmVlbjEzMlxi
+bHVlMTMyO1xyZWQ1MVxncmVlbjUxXGJsdWU1MTtccmVkMTU4XGdyZWVuMTI0XGJsdWUxMjQ7
+XHJlZDE1NVxncmVlbjE4N1xibHVlODk7fQ0Ke1wqXGdlbmVyYXRvciBNc2Z0ZWRpdCAwLjQy
+LjMyLjczMzU7fVx2aWV3a2luZDRcdWMxXHBhcmRcc2EyMDBcc2wyNzZcc2xtdWx0MVxsYW5n
+OVxmMFxmczMye1xmaWVsZHtcKlxmbGRpbnN0e0hZUEVSTElOSyAiaHtcKlxkZCAwLjQyLjMy
+LjczMzU7fXR0cDovL3d3dy5rdTEyLnJ1In19e1xmbGRyc2x0e1x1bFxjZjEgaHR0cDovL3d3
+dy5rdTEyLnJ1fX19XGYwXGNmMVxiXGZzMzIgIC0gT3JkZXIgdGhlIGNoZWFwZXN0IG1lZGlj
+YXRpb25zIG5vdyFccGFyDQpWaWFncmEgXGNmNCBDaWFsaXMgXGNmMyBWaWFncmEgUHJvZmVz
+c2lvbmFsIFxjZjUgQ2lhbGlzIFByb2Zlc3Npb25hbCBcY2Y2IFZpYWdyYSBTdXBlciBBY3Rp
+dmUrIFxjZjMgQ2lhbGlzIFN1cGVyIEFjdGl2ZSsgXGNmNyBMZXZpdHJhXGNmMCAgXGNmOCBW
+aWFncmEgU29mdCBUYWJzIFxjZjkgQ2lhbGlzIFNvZnQgVGFic1xjZjEwICBcY2YxMSBMZXZp
+dHJhIFByb2Zlc3Npb25hbCBcY2Y0IEZlbWFsZSBWaWFncmEgXGNmMTIgUHJvcGVjaWEgXGNm
+NyBBY29tcGxpYSBcY2Y2IFhlbmljYWxcY2YwICBcY2Y1IEJyYW5kIExldml0cmEgXGNmMTMg
+RmVtYWxlIENpYWxpcyBcY2YxNCBMZXZpdHJhIFN1cGVyIEFjdGl2ZSsgXGNmMTUgVGFtaWZs
+dVxjZjAgIFxjZjcgVlBYTFxjZjAgIFxjZjE2IFZpYWdyYSBTb2Z0IEZsYXZvdXJlZCBcY2Y1
+IEJyYW5kIFZpYWdyYSBcY2YxNyBCcmFuZCBDaWFsaXNcY2YwDQp7XCpcZ2VuZXJhdG9yIE1z
+ZnRlZGl0IDAuNDIuMzIuNzMzNTt9fQ==
