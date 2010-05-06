@@ -1,75 +1,66 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor.suse.de ([195.135.220.2]:34847 "EHLO mx1.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:36939 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750915Ab0EFOYQ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 6 May 2010 10:24:16 -0400
-Message-ID: <4BE2D10D.4070706@suse.cz>
-Date: Thu, 06 May 2010 16:24:13 +0200
+	id S1750978Ab0EFOeg (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 6 May 2010 10:34:36 -0400
+Date: Thu, 6 May 2010 16:34:34 +0200
 From: Michal Marek <mmarek@suse.cz>
+Subject: Re: [PATCH] Fix checking of scm-identifier variable
+Message-ID: <20100506143434.GA7129@sepie.suse.cz>
+References: <alpine.DEB.2.00.1004151459420.25805@chino.kir.corp.google.com>
+ <4BC7A027.7060502@google.com>
+ <alpine.DEB.2.00.1004151627290.9919@chino.kir.corp.google.com>
+ <4BC7A757.4090205@google.com>
+ <alpine.DEB.2.00.1004201347130.870@chino.kir.corp.google.com>
+ <4BCE1883.6060307@google.com>
+ <alpine.DEB.2.00.1004202224470.19920@chino.kir.corp.google.com>
+ <xr93aasf2r93.fsf@ninji.mtv.corp.google.com>
+ <alpine.DEB.2.00.1005041618170.1851@chino.kir.corp.google.com>
+ <xr93fx261c13.fsf_-_@ninji.mtv.corp.google.com>
 MIME-Version: 1.0
-Subject: Re: kbuild: fixing the select problem
-References: <1273096160.23208.35.camel@mulgrave.site>
-In-Reply-To: <1273096160.23208.35.camel@mulgrave.site>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <xr93fx261c13.fsf_-_@ninji.mtv.corp.google.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: James Bottomley <James.Bottomley@HansenPartnership.com>
-Cc: linux-arch@vger.kernel.org, linux-kernel <linux-kernel@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, linux-kbuild@vger.kernel.org, Randy Dunlap <randy.dunlap@oracle.com>, Vegard Nossum <vegard.nossum@gmail.com>
+To: Greg Thelen <gthelen@google.com>
+Cc: David Rientjes <rientjes@google.com>, linux-kbuild@vger.kernel.org
 
-On 5.5.2010 23:49, James Bottomley wrote:
-> [Sam: I know you don't maintain kbuild anymore, but since you have the
-> most experience, if you could find time to comment, I'd be grateful]
+On Wed, May 05, 2010 at 10:41:44AM -0700, Greg Thelen wrote:
+> Michal,
 > 
-> The select problem is that the kbuild select directive will turn a
-> symbol on without reference to its dependencies.  This, in turn, means
-> that either selected symbols must select their dependencies, or that
-> people using select have to be aware of the selected symbol's dependency
-> and build those dependencies into their symbol (leading to duplication
-> and the possibility of getting the dependencies out of sync).  We use
-> select for the scsi transport classes, so we run into this problem in
-> SCSI quite a lot.
-> 
-> I think the correct fix is to make a symbol that selects another symbol
-> automatically inherit all of the selected symbol's dependencies.
-> 
-> There seems to be a fairly easy way to do this in kbuild.  Right at the
-> moment, select is handled as additional symbol values as the last point
-> in the symbol tree evaluation process.  Instead, what I propose doing is
-> for every select symbol, we add an extra unconditional default for the
-> selected symbol of the selecting symbol's current value (this breaks a
-> possible dependency cycle) and add to the dependencies of the selecting
-> symbol, the symbol it's currently selecting.
+> I'm looking Makefile in the -mm branch (dated 2010-04-28-16-53) and
+> seeing what looks like a bug in the checking of scm-identifier.  The
+> "ifneq ($scm-identifier)" seems to always execute "ifeq
+> ($(LOCALVERSION,)) ...".  This patch fixes the checking of
+> scm-identifier.
 
-Nice trick :-).
-
-
-> There's one wrinkle to all of this in that the current parser for
-> default values stops when it finds the first valid (i.e. whose if clause
-> evaluates to true) default.  To make the above scheme work, I need to
-> modify the default parser so it takes the highest tristate of all the
-> valid defaults (and bumps m to y for bool).
-
-We should check if some Kconfig file doesn't rely on this "first hit"
-behavior and fix it to explicitly list the condition for a given
-default. Another option would be to add
-default SYM1 || SYM2
-to a symbol selected by SYM1 and SYM2.
-
-
-> Does this look acceptable to people?  I think it should give the desired
-> result and has the added benefit that we can then strip the extra select
-> overlay out of the kbuild system (making the parser slightly simpler).
-> 
-> If this looks like a good idea to people, I think I can code up a quick
-> patch.
-
-Other than the above, right now I don't see any issues with such approach.
-
-On a related note, I see Vegard's GSoC project to use a sat solver for
-kconfig got accepted [1]. Vegard, how is the project progressing?
-
-[1]
-http://socghop.appspot.com/gsoc/student_project/show/google/gsoc2010/psu_home/t127230762803
+Good catch, thanks!
 
 Michal
+
+> Signed-off-by: Greg Thelen <gthelen@google.com>
+> Acked-by: David Rientjes <rientjes@google.com>
+> 
+> ---
+>  Makefile |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
+> 
+> diff --git a/Makefile b/Makefile
+> index 6e8cc20..beeb757 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -943,7 +943,7 @@ endif
+>  ifdef CONFIG_LOCALVERSION_AUTO
+>  	localver-extra = $(scm-identifier)
+>  else
+> -	ifneq ($scm-identifier,)
+> +	ifneq ($(scm-identifier),)
+>  		ifeq ($(LOCALVERSION),)
+>  			localver-extra = +
+>  		endif
+> -- 
+> 1.7.0.1
+> 
+> --
+> Greg
