@@ -1,58 +1,34 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bedivere.hansenpartnership.com ([66.63.167.143]:34443 "EHLO
-	bedivere.hansenpartnership.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1755275Ab0EFAGZ (ORCPT
+Received: from mail-px0-f174.google.com ([209.85.212.174]:53908 "EHLO
+	mail-px0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752002Ab0EFDxy (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 5 May 2010 20:06:25 -0400
-Subject: kbuild: fixing the select problem
-From: James Bottomley <James.Bottomley@HansenPartnership.com>
-Content-Type: text/plain; charset="UTF-8"
-Date: Wed, 05 May 2010 17:49:20 -0400
-Message-ID: <1273096160.23208.35.camel@mulgrave.site>
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+	Wed, 5 May 2010 23:53:54 -0400
+Received: by pxi5 with SMTP id 5so1887585pxi.19
+        for <linux-kbuild@vger.kernel.org>; Wed, 05 May 2010 20:53:53 -0700 (PDT)
+MIME-Version: 1.0
+Date: Thu, 6 May 2010 11:53:53 +0800
+Message-ID: <u2l34f262ce1005052053z1cfe6d1an6c509e847ba4b40@mail.gmail.com>
+Subject: One question about top-level Makefile.
+From: os user <gnusercn@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-arch@vger.kernel.org, linux-kernel <linux-kernel@vger.kernel.org>
-Cc: Sam Ravnborg <sam@ravnborg.org>, linux-kbuild@vger.kernel.org, Randy Dunlap <randy.dunlap@oracle.com>
+To: mmarek@suse.cz
+Cc: linux-kbuild@vger.kernel.org
 
-[Sam: I know you don't maintain kbuild anymore, but since you have the
-most experience, if you could find time to comment, I'd be grateful]
+Hi, I have a question about the top-level Makefile
 
-The select problem is that the kbuild select directive will turn a
-symbol on without reference to its dependencies.  This, in turn, means
-that either selected symbols must select their dependencies, or that
-people using select have to be aware of the selected symbol's dependency
-and build those dependencies into their symbol (leading to duplication
-and the possibility of getting the dependencies out of sync).  We use
-select for the scsi transport classes, so we run into this problem in
-SCSI quite a lot.
+# The all: target is the default when no target is given on the
+# command line.
+# This allow a user to issue only 'make' to build a kernel including modules
+# Defaults vmlinux but it is usually overridden in the arch makefile
+all: vmlinux
 
-I think the correct fix is to make a symbol that selects another symbol
-automatically inherit all of the selected symbol's dependencies.
+From the last comment, arch makefile will override vmlinux. It seems
+vmlinux will not be checked by `make'. But from my test, although
+`all:' will be re-defined in arch Makefile (ARM arch), vmlinux will
+still be checked and the commands associated will be executed. Should
+we use another word instead of "overridden"?
 
-There seems to be a fairly easy way to do this in kbuild.  Right at the
-moment, select is handled as additional symbol values as the last point
-in the symbol tree evaluation process.  Instead, what I propose doing is
-for every select symbol, we add an extra unconditional default for the
-selected symbol of the selecting symbol's current value (this breaks a
-possible dependency cycle) and add to the dependencies of the selecting
-symbol, the symbol it's currently selecting.
-
-There's one wrinkle to all of this in that the current parser for
-default values stops when it finds the first valid (i.e. whose if clause
-evaluates to true) default.  To make the above scheme work, I need to
-modify the default parser so it takes the highest tristate of all the
-valid defaults (and bumps m to y for bool).
-
-Does this look acceptable to people?  I think it should give the desired
-result and has the added benefit that we can then strip the extra select
-overlay out of the kbuild system (making the parser slightly simpler).
-
-If this looks like a good idea to people, I think I can code up a quick
-patch.
-
-James
-
-
-
+Best  Regards
