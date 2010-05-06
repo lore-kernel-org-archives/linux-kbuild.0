@@ -1,106 +1,138 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bedivere.hansenpartnership.com ([66.63.167.143]:36329 "EHLO
-	bedivere.hansenpartnership.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1753700Ab0EFOwj (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 6 May 2010 10:52:39 -0400
-Subject: Re: kbuild: fixing the select problem
-From: James Bottomley <James.Bottomley@HansenPartnership.com>
-In-Reply-To: <4BE2D10D.4070706@suse.cz>
-References: <1273096160.23208.35.camel@mulgrave.site>
-	 <4BE2D10D.4070706@suse.cz>
-Content-Type: text/plain; charset="UTF-8"
-Date: Thu, 06 May 2010 09:52:34 -0500
-Message-ID: <1273157554.23208.69.camel@mulgrave.site>
-Mime-Version: 1.0
+Received: from cantor.suse.de ([195.135.220.2]:39395 "EHLO mx1.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S932234Ab0EFQVA (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 6 May 2010 12:21:00 -0400
+Message-ID: <4BE2EC69.40009@suse.cz>
+Date: Thu, 06 May 2010 18:20:57 +0200
+From: Michal Marek <mmarek@suse.cz>
+MIME-Version: 1.0
+Subject: Re: [patch 1/1] markup_oops: fix perlcritic warnings
+References: <201004272112.o3RLCrlB020200@imap1.linux-foundation.org>	<4BD7F4C8.4080107@suse.cz> <20100428161731.054fbd19@nehalam>
+In-Reply-To: <20100428161731.054fbd19@nehalam>
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-arch@vger.kernel.org, linux-kernel <linux-kernel@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, linux-kbuild@vger.kernel.org, Randy Dunlap <randy.dunlap@oracle.com>, Vegard Nossum <vegard.nossum@gmail.com>
+To: Stephen Hemminger <shemminger@vyatta.com>
+Cc: akpm@linux-foundation.org, linux-kbuild@vger.kernel.org, amwang@redhat.com, arjan@infradead.org
 
-On Thu, 2010-05-06 at 16:24 +0200, Michal Marek wrote:
-> On 5.5.2010 23:49, James Bottomley wrote:
-> > [Sam: I know you don't maintain kbuild anymore, but since you have the
-> > most experience, if you could find time to comment, I'd be grateful]
-> > 
-> > The select problem is that the kbuild select directive will turn a
-> > symbol on without reference to its dependencies.  This, in turn, means
-> > that either selected symbols must select their dependencies, or that
-> > people using select have to be aware of the selected symbol's dependency
-> > and build those dependencies into their symbol (leading to duplication
-> > and the possibility of getting the dependencies out of sync).  We use
-> > select for the scsi transport classes, so we run into this problem in
-> > SCSI quite a lot.
-> > 
-> > I think the correct fix is to make a symbol that selects another symbol
-> > automatically inherit all of the selected symbol's dependencies.
-> > 
-> > There seems to be a fairly easy way to do this in kbuild.  Right at the
-> > moment, select is handled as additional symbol values as the last point
-> > in the symbol tree evaluation process.  Instead, what I propose doing is
-> > for every select symbol, we add an extra unconditional default for the
-> > selected symbol of the selecting symbol's current value (this breaks a
-> > possible dependency cycle) and add to the dependencies of the selecting
-> > symbol, the symbol it's currently selecting.
+On 29.4.2010 01:17, Stephen Hemminger wrote:
+> More complete patch, fixes all the warnings from perlcritic as
+> well as perl compiler with stictures enabled.
 > 
-> Nice trick :-).
+> Compile tested, does some one have an actual oops output
+> to recheck it on?
 > 
-> 
-> > There's one wrinkle to all of this in that the current parser for
-> > default values stops when it finds the first valid (i.e. whose if clause
-> > evaluates to true) default.  To make the above scheme work, I need to
-> > modify the default parser so it takes the highest tristate of all the
-> > valid defaults (and bumps m to y for bool).
-> 
-> We should check if some Kconfig file doesn't rely on this "first hit"
-> behavior and fix it to explicitly list the condition for a given
-> default.
+> Signed-off-by: Stephen Hemminger <shemminger@vyatta.com>
 
-I actually asked kconfig to generate the list of symbols (in my config)
-with multiple defaults.  It's pretty small and the default y seems to be
-the thing with multiple if clauses, so they act like or statements.
+Hi Stephen,
 
-The list is
+could you please submit a patch against
+git://repo.or.cz/linux-kbuild.git for-next (or linux-next or -mm) like
+did in the last version?
 
-USB_ARCH_HAS_HCD has 4 defaults
-DEFCONFIG_LIST has 5 defaults
-MAC80211_RC_DEFAULT has 2 defaults
-X86_L1_CACHE_SHIFT has 2 defaults
-SPLIT_PTLOCK_CPUS has 2 defaults
-X86_MINIMUM_CPU_FAMILY has 3 defaults
-DEFAULT_TCP_CONG has 2 defaults
-DEFCONFIG_LIST has 5 defaults
-USB_ARCH_HAS_HCD has 4 defaults
-X86_L1_CACHE_SHIFT has 2 defaults
-X86_MINIMUM_CPU_FAMILY has 3 defaults
-SPLIT_PTLOCK_CPUS has 2 defaults
-DEFAULT_TCP_CONG has 2 defaults
-MAC80211_RC_DEFAULT has 2 defaults
+Thanks,
+Michal
 
->  Another option would be to add
-> default SYM1 || SYM2
-> to a symbol selected by SYM1 and SYM2.
-
-Well, that's effectively what the proposal does (it or's the states).
-
-> > Does this look acceptable to people?  I think it should give the desired
-> > result and has the added benefit that we can then strip the extra select
-> > overlay out of the kbuild system (making the parser slightly simpler).
-> > 
-> > If this looks like a good idea to people, I think I can code up a quick
-> > patch.
-> 
-> Other than the above, right now I don't see any issues with such approach.
-> 
-> On a related note, I see Vegard's GSoC project to use a sat solver for
-> kconfig got accepted [1]. Vegard, how is the project progressing?
-> 
-> [1]
-> http://socghop.appspot.com/gsoc/student_project/show/google/gsoc2010/psu_home/t127230762803
-> 
-> Michal
-
-James
-
+> --- a/scripts/markup_oops.pl	2010-04-28 16:05:20.794776102 -0700
+> +++ b/scripts/markup_oops.pl	2010-04-28 16:15:24.894377031 -0700
+> @@ -1,5 +1,7 @@
+>  #!/usr/bin/perl
+>  
+> +use strict;
+> +
+>  use File::Basename;
+>  use Math::BigInt;
+>  
+> @@ -79,9 +81,9 @@ sub parse_x86_regs
+>  sub reg_name
+>  {
+>  	my ($reg) = @_;
+> -	$reg =~ s/r(.)x/e\1x/;
+> -	$reg =~ s/r(.)i/e\1i/;
+> -	$reg =~ s/r(.)p/e\1p/;
+> +	$reg =~ s/r(.)x/e$1x/;
+> +	$reg =~ s/r(.)i/e$1i/;
+> +	$reg =~ s/r(.)p/e$1p/;
+>  	return $reg;
+>  }
+>  
+> @@ -94,17 +96,15 @@ sub process_x86_regs
+>  	}
+>  
+>  	# find the arguments to the instruction
+> -	if ($line =~ /([0-9a-zA-Z\,\%\(\)\-\+]+)$/) {
+> -		$lastword = $1;
+> -	} else {
+> -		return "";
+> -	}
+> +	return "" unless ($line =~ /([0-9a-zA-Z\,\%\(\)\-\+]+)$/);
+> +
+> +	my $lastword = $1;
+>  
+>  	# we need to find the registers that get clobbered,
+>  	# since their value is no longer relevant for previous
+>  	# instructions in the stream.
+>  
+> -	$clobber = $lastword;
+> +	my $clobber = $lastword;
+>  	# first, remove all memory operands, they're read only
+>  	$clobber =~ s/\([a-z0-9\%\,]+\)//g;
+>  	# then, remove everything before the comma, thats the read part
+> @@ -116,7 +116,7 @@ sub process_x86_regs
+>  		$clobber = "";
+>  	}
+>  
+> -	foreach $reg (keys(%regs)) {
+> +	foreach my $reg (keys(%regs)) {
+>  		my $clobberprime = reg_name($clobber);
+>  		my $lastwordprime = reg_name($lastword);
+>  		my $val = $regs{$reg};
+> @@ -192,14 +192,15 @@ if ($module ne "") {
+>  		exit;
+>  	}
+>  	# ok so we found the module, now we need to calculate the vma offset
+> -	open(FILE, "objdump -dS $filename |") || die "Cannot start objdump";
+> -	while (<FILE>) {
+> +	open(my $obj, '-|', "objdump -dS $filename")
+> +	    || die "Cannot start objdump: $!";
+> +	while (<$obj>) {
+>  		if ($_ =~ /^([0-9a-f]+) \<$function\>\:/) {
+>  			my $fu = $1;
+>  			$vmaoffset = hex($target) - hex($fu) - hex($func_offset);
+>  		}
+>  	}
+> -	close(FILE);
+> +	close($obj);
+>  }
+>  
+>  my $counter = 0;
+> @@ -225,9 +226,11 @@ sub InRange {
+>  # first, parse the input into the lines array, but to keep size down,
+>  # we only do this for 4Kb around the sweet spot
+>  
+> -open(FILE, "objdump -dS --adjust-vma=$vmaoffset --start-address=$decodestart --stop-address=$decodestop $filename |") || die "Cannot start objdump";
+> +open(my $objdump, '-|',
+> +     "objdump -dS --adjust-vma=$vmaoffset --start-address=$decodestart --stop-address=$decodestop $filename")
+> +    or die "Cannot start objdump: $!";
+>  
+> -while (<FILE>) {
+> +while (<$objdump>) {
+>  	my $line = $_;
+>  	chomp($line);
+>  	if ($state == 0) {
+> @@ -252,7 +255,7 @@ while (<FILE>) {
+>  	}
+>  }
+>  
+> -close(FILE);
+> +close($objdump);
+>  
+>  if ($counter == 0) {
+>  	print "No matching code found \n";
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
