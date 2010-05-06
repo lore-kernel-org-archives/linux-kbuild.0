@@ -1,49 +1,106 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pw0-f46.google.com ([209.85.160.46]:33719 "EHLO
-	mail-pw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753204Ab0EFOqC (ORCPT
+Received: from bedivere.hansenpartnership.com ([66.63.167.143]:36329 "EHLO
+	bedivere.hansenpartnership.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1753700Ab0EFOwj (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 6 May 2010 10:46:02 -0400
-Received: by pwi5 with SMTP id 5so15053pwi.19
-        for <linux-kbuild@vger.kernel.org>; Thu, 06 May 2010 07:46:02 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <4BE2CAAE.1020802@suse.cz>
-References: <u2l34f262ce1005052053z1cfe6d1an6c509e847ba4b40@mail.gmail.com>
-	 <4BE2CAAE.1020802@suse.cz>
-Date: Thu, 6 May 2010 22:46:01 +0800
-Message-ID: <j2j34f262ce1005060746sec6537cej86f2075d79ed8c1c@mail.gmail.com>
-Subject: Re: One question about top-level Makefile.
-From: os user <gnusercn@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+	Thu, 6 May 2010 10:52:39 -0400
+Subject: Re: kbuild: fixing the select problem
+From: James Bottomley <James.Bottomley@HansenPartnership.com>
+In-Reply-To: <4BE2D10D.4070706@suse.cz>
+References: <1273096160.23208.35.camel@mulgrave.site>
+	 <4BE2D10D.4070706@suse.cz>
+Content-Type: text/plain; charset="UTF-8"
+Date: Thu, 06 May 2010 09:52:34 -0500
+Message-ID: <1273157554.23208.69.camel@mulgrave.site>
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org
+Cc: linux-arch@vger.kernel.org, linux-kernel <linux-kernel@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, linux-kbuild@vger.kernel.org, Randy Dunlap <randy.dunlap@oracle.com>, Vegard Nossum <vegard.nossum@gmail.com>
 
-Hi,
+On Thu, 2010-05-06 at 16:24 +0200, Michal Marek wrote:
+> On 5.5.2010 23:49, James Bottomley wrote:
+> > [Sam: I know you don't maintain kbuild anymore, but since you have the
+> > most experience, if you could find time to comment, I'd be grateful]
+> > 
+> > The select problem is that the kbuild select directive will turn a
+> > symbol on without reference to its dependencies.  This, in turn, means
+> > that either selected symbols must select their dependencies, or that
+> > people using select have to be aware of the selected symbol's dependency
+> > and build those dependencies into their symbol (leading to duplication
+> > and the possibility of getting the dependencies out of sync).  We use
+> > select for the scsi transport classes, so we run into this problem in
+> > SCSI quite a lot.
+> > 
+> > I think the correct fix is to make a symbol that selects another symbol
+> > automatically inherit all of the selected symbol's dependencies.
+> > 
+> > There seems to be a fairly easy way to do this in kbuild.  Right at the
+> > moment, select is handled as additional symbol values as the last point
+> > in the symbol tree evaluation process.  Instead, what I propose doing is
+> > for every select symbol, we add an extra unconditional default for the
+> > selected symbol of the selecting symbol's current value (this breaks a
+> > possible dependency cycle) and add to the dependencies of the selecting
+> > symbol, the symbol it's currently selecting.
+> 
+> Nice trick :-).
+> 
+> 
+> > There's one wrinkle to all of this in that the current parser for
+> > default values stops when it finds the first valid (i.e. whose if clause
+> > evaluates to true) default.  To make the above scheme work, I need to
+> > modify the default parser so it takes the highest tristate of all the
+> > valid defaults (and bumps m to y for bool).
+> 
+> We should check if some Kconfig file doesn't rely on this "first hit"
+> behavior and fix it to explicitly list the condition for a given
+> default.
 
-On Thu, May 6, 2010 at 9:57 PM, Michal Marek <mmarek@suse.cz> wrote:
-> On 6.5.2010 05:53, os user wrote:
->> Hi, I have a question about the top-level Makefile
->>
->> # The all: target is the default when no target is given on the
->> # command line.
->> # This allow a user to issue only 'make' to build a kernel including modules
->> # Defaults vmlinux but it is usually overridden in the arch makefile
->> all: vmlinux
->>
->> From the last comment, arch makefile will override vmlinux. It seems
->> vmlinux will not be checked by `make'. But from my test, although
->> `all:' will be re-defined in arch Makefile (ARM arch), vmlinux will
->> still be checked and the commands associated will be executed. Should
->> we use another word instead of "overridden"?
->
-> "Defaults to vmlinux, but the arch makefile usually adds further targets"?
+I actually asked kconfig to generate the list of symbols (in my config)
+with multiple defaults.  It's pretty small and the default y seems to be
+the thing with multiple if clauses, so they act like or statements.
 
-It seems this makes more sense. :-)
+The list is
 
-BR
+USB_ARCH_HAS_HCD has 4 defaults
+DEFCONFIG_LIST has 5 defaults
+MAC80211_RC_DEFAULT has 2 defaults
+X86_L1_CACHE_SHIFT has 2 defaults
+SPLIT_PTLOCK_CPUS has 2 defaults
+X86_MINIMUM_CPU_FAMILY has 3 defaults
+DEFAULT_TCP_CONG has 2 defaults
+DEFCONFIG_LIST has 5 defaults
+USB_ARCH_HAS_HCD has 4 defaults
+X86_L1_CACHE_SHIFT has 2 defaults
+X86_MINIMUM_CPU_FAMILY has 3 defaults
+SPLIT_PTLOCK_CPUS has 2 defaults
+DEFAULT_TCP_CONG has 2 defaults
+MAC80211_RC_DEFAULT has 2 defaults
 
->
+>  Another option would be to add
+> default SYM1 || SYM2
+> to a symbol selected by SYM1 and SYM2.
+
+Well, that's effectively what the proposal does (it or's the states).
+
+> > Does this look acceptable to people?  I think it should give the desired
+> > result and has the added benefit that we can then strip the extra select
+> > overlay out of the kbuild system (making the parser slightly simpler).
+> > 
+> > If this looks like a good idea to people, I think I can code up a quick
+> > patch.
+> 
+> Other than the above, right now I don't see any issues with such approach.
+> 
+> On a related note, I see Vegard's GSoC project to use a sat solver for
+> kconfig got accepted [1]. Vegard, how is the project progressing?
+> 
+> [1]
+> http://socghop.appspot.com/gsoc/student_project/show/google/gsoc2010/psu_home/t127230762803
+> 
 > Michal
->
+
+James
+
+
