@@ -1,45 +1,89 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.princesmauritius.com ([202.123.25.137]:36401 "EHLO
-	[192.168.0.115]" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1756548Ab0EFTrq (ORCPT
+Received: from bedivere.hansenpartnership.com ([66.63.167.143]:52713 "EHLO
+	bedivere.hansenpartnership.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S932583Ab0EFUsj (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 6 May 2010 15:47:46 -0400
-Received: from localhost (localhost [127.0.0.1])
-	by efw.princesmauritius.com (Postfix) with ESMTP id BD285E155F
-	for <linux-kbuild@vger.kernel.org>; Thu,  6 May 2010 23:21:54 +0400 (MUT)
-Received: from mail.princesmauritius.com (mail.princesmauritius.com [192.168.2.141])
-	by efw.princesmauritius.com (Postfix) with ESMTP id 97503E1567
-	for <linux-kbuild@vger.kernel.org>; Thu,  6 May 2010 23:21:49 +0400 (MUT)
-Subject: I have a list of 5 million New businesses in the USA
-Reply-To: kathyjones@mail.princesmauritius.com
-From: "Moises Riley" <kathyjones@mail.princesmauritius.com>
-Message-Id: <20100506192149.97503E1567@efw.princesmauritius.com>
-Date: Thu,  6 May 2010 23:21:49 +0400 (MUT)
+	Thu, 6 May 2010 16:48:39 -0400
+Subject: Re: kbuild: fixing the select problem
+From: James Bottomley <James.Bottomley@HansenPartnership.com>
+In-Reply-To: <1273157554.23208.69.camel@mulgrave.site>
+References: <1273096160.23208.35.camel@mulgrave.site>
+	 <4BE2D10D.4070706@suse.cz>  <1273157554.23208.69.camel@mulgrave.site>
+Content-Type: text/plain; charset="UTF-8"
+Date: Thu, 06 May 2010 15:48:35 -0500
+Message-ID: <1273178915.2881.20.camel@mulgrave.site>
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org, martin@typomil.com, careers@ararecruiting.com, wasebu@yi.com
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-arch@vger.kernel.org, linux-kernel <linux-kernel@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, linux-kbuild@vger.kernel.org, Randy Dunlap <randy.dunlap@oracle.com>, Vegard Nossum <vegard.nossum@gmail.com>
 
-Here's a couple of our healthcare list packages on sale this week only:
+On Thu, 2010-05-06 at 09:52 -0500, James Bottomley wrote:
+> The list is
+> 
+> USB_ARCH_HAS_HCD has 4 defaults
+> DEFCONFIG_LIST has 5 defaults
+> MAC80211_RC_DEFAULT has 2 defaults
+> X86_L1_CACHE_SHIFT has 2 defaults
+> SPLIT_PTLOCK_CPUS has 2 defaults
+> X86_MINIMUM_CPU_FAMILY has 3 defaults
+> DEFAULT_TCP_CONG has 2 defaults
+> DEFCONFIG_LIST has 5 defaults
+> USB_ARCH_HAS_HCD has 4 defaults
+> X86_L1_CACHE_SHIFT has 2 defaults
+> X86_MINIMUM_CPU_FAMILY has 3 defaults
+> SPLIT_PTLOCK_CPUS has 2 defaults
+> DEFAULT_TCP_CONG has 2 defaults
+> MAC80211_RC_DEFAULT has 2 defaults
 
-Package 1
+Here's a patch that alters the default processing to the needed form and
+checks the old vs new values.  I've been running randconfigs but I can't
+get the warning to trip ... have at it.
 
-Alternative Medicine - 1,141,602 total records with 36,320 emails and 38.935 fax numbers
-Massage Therapists - 76,701 records and 8,305 emails
-Physical Therapists - 125,460 total records with 5,483 emails and 4,405 fax numbers
+James
 
-All complete lists above: $277
+---
 
-Package 2
+diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
+index 6c8fbbb..722bc4e 100644
+--- a/scripts/kconfig/symbol.c
++++ b/scripts/kconfig/symbol.c
+@@ -115,14 +115,31 @@ struct property *sym_get_env_prop(struct symbol *sym)
+ 
+ struct property *sym_get_default_prop(struct symbol *sym)
+ {
+-	struct property *prop;
++	struct property *prop, *ret = NULL;
++	tristate old_val = no, val = no;
+ 
+ 	for_all_defaults(sym, prop) {
+ 		prop->visible.tri = expr_calc_value(prop->visible.expr);
+-		if (prop->visible.tri != no)
+-			return prop;
++		if (prop->visible.tri != no) {
++			tristate v = expr_calc_value(prop->expr);
++			if (!ret)
++				old_val = v;
++			if (v >= val) {
++				val = v;
++				ret = prop;
++			}
++		}
+ 	}
+-	return NULL;
++	/*
++	 * Previously, we took the first valid default we found (this
++	 * is now old_val).  In the new scheme, the value is the or of
++	 * all the defaults.
++	 */
++	if (old_val != val)
++		menu_warn(ret->menu, "ERROR: new parser has inconsistent "
++			  "values for %s (%d != %d)\n", sym->name,
++			  old_val, val);
++	return ret;
+ }
+ 
+ static struct property *sym_get_range_prop(struct symbol *sym)
 
-Chiropractors - 108,421 total records * 3,414 emails * 6,553 fax numbers
-Acupuncturists - 23,988 records 1,826 emails
-Massage Therapists - 76,701 records and 8,305 emails
 
-All complete lists above: $247
-
-There are more packages and not just for healthcare contact me here for more info or to get samples: Jeannette.Lamb@realresults.co.cc
-
-  
-
-
-email disappear@realresults.co.cc for delisting
