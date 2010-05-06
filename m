@@ -1,75 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wy0-f174.google.com ([74.125.82.174]:39564 "EHLO
-	mail-wy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1758234Ab0EFRZR convert rfc822-to-8bit (ORCPT
+Received: from mail.princesmauritius.com ([202.123.25.137]:36401 "EHLO
+	[192.168.0.115]" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1756548Ab0EFTrq (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 6 May 2010 13:25:17 -0400
-MIME-Version: 1.0
-In-Reply-To: <28312.1273164427@localhost>
-References: <1273096160.23208.35.camel@mulgrave.site>
-	 <p2x10f740e81005052347x9430657fua98b8982e860bd2d@mail.gmail.com>
-	 <1273151844.23208.48.camel@mulgrave.site> <28312.1273164427@localhost>
-Date: Thu, 6 May 2010 19:25:15 +0200
-Message-ID: <p2l10f740e81005061025l276d91b5mf87d2af65438539a@mail.gmail.com>
-Subject: Re: kbuild: fixing the select problem
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+	Thu, 6 May 2010 15:47:46 -0400
+Received: from localhost (localhost [127.0.0.1])
+	by efw.princesmauritius.com (Postfix) with ESMTP id BD285E155F
+	for <linux-kbuild@vger.kernel.org>; Thu,  6 May 2010 23:21:54 +0400 (MUT)
+Received: from mail.princesmauritius.com (mail.princesmauritius.com [192.168.2.141])
+	by efw.princesmauritius.com (Postfix) with ESMTP id 97503E1567
+	for <linux-kbuild@vger.kernel.org>; Thu,  6 May 2010 23:21:49 +0400 (MUT)
+Subject: I have a list of 5 million New businesses in the USA
+Reply-To: kathyjones@mail.princesmauritius.com
+From: "Moises Riley" <kathyjones@mail.princesmauritius.com>
+Message-Id: <20100506192149.97503E1567@efw.princesmauritius.com>
+Date: Thu,  6 May 2010 23:21:49 +0400 (MUT)
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Valdis.Kletnieks@vt.edu
-Cc: James Bottomley <James.Bottomley@hansenpartnership.com>, linux-arch@vger.kernel.org, linux-kernel <linux-kernel@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, linux-kbuild@vger.kernel.org, Randy Dunlap <randy.dunlap@oracle.com>
+To: linux-kbuild@vger.kernel.org, martin@typomil.com, careers@ararecruiting.com, wasebu@yi.com
 
-On Thu, May 6, 2010 at 18:47,  <Valdis.Kletnieks@vt.edu> wrote:
-> On Thu, 06 May 2010 09:17:24 EDT, James Bottomley said:
->> On Thu, 2010-05-06 at 08:47 +0200, Geert Uytterhoeven wrote:
->> > On Wed, May 5, 2010 at 23:49, James Bottomley
->> > <James.Bottomley@hansenpartnership.com> wrote:
->> > > [Sam: I know you don't maintain kbuild anymore, but since you have the
->> > > most experience, if you could find time to comment, I'd be grateful]
->> > >
->> > > The select problem is that the kbuild select directive will turn a
->> > > symbol on without reference to its dependencies.  This, in turn, means
->> > > that either selected symbols must select their dependencies, or that
->> > > people using select have to be aware of the selected symbol's dependency
->> > > and build those dependencies into their symbol (leading to duplication
->> > > and the possibility of getting the dependencies out of sync).  We use
->> > > select for the scsi transport classes, so we run into this problem in
->> > > SCSI quite a lot.
->> > >
->> > > I think the correct fix is to make a symbol that selects another symbol
->> > > automatically inherit all of the selected symbol's dependencies.
->> >
->> > What if there's a good reason the selected symbol has this dependency?
->> > E.g. it depends on a critical feature not available? Like CONFIG_HAS_IOMEM?
->>
->> I don't quite understand the question.  If a selected symbol has a
->> critical dependency which is config'd to N then the build usually
->> breaks ... that's what I'm calling the select problem.  I thought
->> CONFIG_HAS_IOMEM was usually selected by the architecture, though.  In
->> the new proposal, we wouldn't be able to generate the invalid
->> configuration in the first place.
->
-> I think Geert is asking "If the arch says CONFIG_HAS_IOMEM=n, but some driver
-> does a 'select CONFIG_FOO' which then (under your proposal) forces the
-> value CONFIG_BAR=y, which eventually ends up with CONFIG_HAS_IOMEM=y, what
-> should the behavior be?"
+Here's a couple of our healthcare list packages on sale this week only:
 
-Yep, that was my (bogus) question...
+Package 1
 
-> (I suspect the right answer here is "one of the symbols is buggy and its
-> 'select' should be a 'depends' instead", but somebody else better double-check
-> that conclusion - I'm hardly a Kconfig expert).
+Alternative Medicine - 1,141,602 total records with 36,320 emails and 38.935 fax numbers
+Massage Therapists - 76,701 records and 8,305 emails
+Physical Therapists - 125,460 total records with 5,483 emails and 4,405 fax numbers
 
-No, the CONFIG_FOO will inherit the dependency on CONFIG_HAS_IOMEM.
+All complete lists above: $277
 
-Gr{oetje,eeting}s,
+Package 2
 
-						Geert
+Chiropractors - 108,421 total records * 3,414 emails * 6,553 fax numbers
+Acupuncturists - 23,988 records 1,826 emails
+Massage Therapists - 76,701 records and 8,305 emails
 
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+All complete lists above: $247
 
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-							    -- Linus Torvalds
+There are more packages and not just for healthcare contact me here for more info or to get samples: Jeannette.Lamb@realresults.co.cc
+
+  
+
+
+email disappear@realresults.co.cc for delisting
