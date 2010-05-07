@@ -1,67 +1,54 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bedivere.hansenpartnership.com ([66.63.167.143]:35598 "EHLO
-	bedivere.hansenpartnership.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1750958Ab0EFVF7 (ORCPT
+Received: from cn.fujitsu.com ([222.73.24.84]:57483 "EHLO song.cn.fujitsu.com"
+	rhost-flags-OK-FAIL-OK-OK) by vger.kernel.org with ESMTP
+	id S1751707Ab0EGFyp convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 6 May 2010 17:05:59 -0400
-Subject: Re: kbuild: fixing the select problem
-From: James Bottomley <James.Bottomley@HansenPartnership.com>
-In-Reply-To: <20100506135952.eeb0e4c5.randy.dunlap@oracle.com>
-References: <1273096160.23208.35.camel@mulgrave.site>
-	 <4BE2D10D.4070706@suse.cz> <1273157554.23208.69.camel@mulgrave.site>
-	 <1273178915.2881.20.camel@mulgrave.site>
-	 <20100506135952.eeb0e4c5.randy.dunlap@oracle.com>
-Content-Type: text/plain; charset="UTF-8"
-Date: Thu, 06 May 2010 16:05:56 -0500
-Message-ID: <1273179956.2881.23.camel@mulgrave.site>
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+	Fri, 7 May 2010 01:54:45 -0400
+Message-ID: <4BE3AB91.80606@cn.fujitsu.com>
+Date: Fri, 07 May 2010 13:56:33 +0800
+From: Li Zefan <lizf@cn.fujitsu.com>
+MIME-Version: 1.0
+Subject: [PATCH v2 1/8] kconfig: print symbol type in help text
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Randy Dunlap <randy.dunlap@oracle.com>
-Cc: Michal Marek <mmarek@suse.cz>, linux-arch@vger.kernel.org, linux-kernel <linux-kernel@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, linux-kbuild@vger.kernel.org, Vegard Nossum <vegard.nossum@gmail.com>
+To: Michal Marek <mmarek@suse.cz>
+Cc: Randy Dunlap <randy.dunlap@oracle.com>, Andrew Morton <akpm@linux-foundation.org>, linux-kbuild@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>
 
-On Thu, 2010-05-06 at 13:59 -0700, Randy Dunlap wrote:
-> On Thu, 06 May 2010 15:48:35 -0500 James Bottomley wrote:
-> 
-> > On Thu, 2010-05-06 at 09:52 -0500, James Bottomley wrote:
-> > > The list is
-> > > 
-> > > USB_ARCH_HAS_HCD has 4 defaults
-> > > DEFCONFIG_LIST has 5 defaults
-> > > MAC80211_RC_DEFAULT has 2 defaults
-> > > X86_L1_CACHE_SHIFT has 2 defaults
-> > > SPLIT_PTLOCK_CPUS has 2 defaults
-> > > X86_MINIMUM_CPU_FAMILY has 3 defaults
-> > > DEFAULT_TCP_CONG has 2 defaults
-> > > DEFCONFIG_LIST has 5 defaults
-> > > USB_ARCH_HAS_HCD has 4 defaults
-> > > X86_L1_CACHE_SHIFT has 2 defaults
-> > > X86_MINIMUM_CPU_FAMILY has 3 defaults
-> > > SPLIT_PTLOCK_CPUS has 2 defaults
-> > > DEFAULT_TCP_CONG has 2 defaults
-> > > MAC80211_RC_DEFAULT has 2 defaults
-> > 
-> > Here's a patch that alters the default processing to the needed form and
-> > checks the old vs new values.  I've been running randconfigs but I can't
-> > get the warning to trip ... have at it.
-> > 
-> 
-> I don't see the warning, but I took a problem config from linux-next 2010-0506
-> (today) [attached].  In it, CONFIG_TCG_BIOS_LOG=y and that selects ACPI,
-> so now ACPI is enabled, but ACPI depends on PM and PCI, but they are still not
-> selected...
-> 
-> or is this only step 1 of a multi-step implementation?
+Randy suggested to print out the symbol type in gconfig.
 
-Actually, it's not any step.  It's just validation of the contention
-that I can alter the default parser from taking the first valid default
-to calculating the or of the defaults without changing the current
-kbuild behaviour.
+Note this change does more than Randy's suggestion, that it also
+affects menuconfig and "make config".
 
-The patch to fix kbuild goes on top of this change minus the warnings
-(when I actually code it up).
+  │ Symbol: BLOCK [=y]
+  │ Type  : boolean
+  │ Prompt: Enable the block layer
+  │   Defined at block/Kconfig:4
+  │   Depends on: EMBEDDED [=n]
 
-James
+Signed-off-by: Li Zefan <lizf@cn.fujitsu.com>
+Acked-by: Randy Dunlap <randy.dunlap@oracle.com>
+---
+ scripts/kconfig/menu.c |    4 +++-
+ 1 files changed, 3 insertions(+), 1 deletions(-)
 
-
+diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
+index e150176..b5d15fa 100644
+--- a/scripts/kconfig/menu.c
++++ b/scripts/kconfig/menu.c
+@@ -501,9 +501,11 @@ void get_symbol_str(struct gstr *r, struct symbol *sym)
+ 	bool hit;
+ 	struct property *prop;
+ 
+-	if (sym && sym->name)
++	if (sym && sym->name) {
+ 		str_printf(r, "Symbol: %s [=%s]\n", sym->name,
+ 			   sym_get_string_value(sym));
++		str_printf(r, "Type  : %s\n", sym_type_name(sym->type));
++	}
+ 	for_all_prompts(sym, prop)
+ 		get_prompt_str(r, prop);
+ 	hit = false;
+-- 
+1.6.3
