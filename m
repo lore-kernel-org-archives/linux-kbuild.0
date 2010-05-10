@@ -1,12 +1,12 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mgw2.diku.dk ([130.225.96.92]:43856 "EHLO mgw2.diku.dk"
+Received: from mgw1.diku.dk ([130.225.96.91]:38214 "EHLO mgw1.diku.dk"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754728Ab0EJQYu (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 10 May 2010 12:24:50 -0400
+	id S1755001Ab0EJQZE (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 10 May 2010 12:25:04 -0400
 From: Nicolas Palix <npalix@diku.dk>
-Subject: [PATCH 2/4] Add scripts/coccinelle/drop_kmalloc_cast.cocci
-Date: Mon, 10 May 2010 18:24:25 +0200
-Message-Id: <1273508667-5152-3-git-send-email-npalix@diku.dk>
+Subject: [PATCH 4/4] Add scripts/coccinelle/resource_size.cocci
+Date: Mon, 10 May 2010 18:24:27 +0200
+Message-Id: <1273508667-5152-5-git-send-email-npalix@diku.dk>
 In-Reply-To: <1273508667-5152-1-git-send-email-npalix@diku.dk>
 References: <1273508667-5152-1-git-send-email-npalix@diku.dk>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -14,37 +14,36 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: Randy Dunlap <rdunlap@xenotime.net>, Roland Dreier <rdreier@cisco.com>, Joe Perches <joe@perches.com>, Andrew Morton <akpm@linux-foundation.org>, "David S. Miller" <davem@davemloft.net>, Michal Marek <mmarek@suse.cz>, Sam Ravnborg <sam@ravnborg.org>, Julia Lawall <julia@diku.dk>, Gilles Muller <Gilles.Muller@lip6.fr>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, cocci@diku.dk, Wolfram Sang <w.sang@pengutronix.de>
 Cc: Kernel Janitors <kernel-janitors@vger.kernel.org>, Nicolas Palix <npalix@diku.dk>
 
-The purpose of this semantic patch is to remove
-useless casts, as mentioned in the Linux documentation.
-See Chapter 14 in Documentation/CodingStyle for more information.
+This semantic patch replaces explicit computations
+of resource size by a call to resource_size.
 
 Signed-off-by: Nicolas Palix <npalix@diku.dk>
 Signed-off-by: Julia Lawall <julia@diku.dk>
 ---
- scripts/coccinelle/drop_kmalloc_cast.cocci |   68 ++++++++++++++++++++++++++++
- 1 files changed, 68 insertions(+), 0 deletions(-)
- create mode 100644 scripts/coccinelle/drop_kmalloc_cast.cocci
+ scripts/coccinelle/resource_size.cocci |   94 ++++++++++++++++++++++++++++++++
+ 1 files changed, 94 insertions(+), 0 deletions(-)
+ create mode 100644 scripts/coccinelle/resource_size.cocci
 
-diff --git a/scripts/coccinelle/drop_kmalloc_cast.cocci b/scripts/coccinelle/drop_kmalloc_cast.cocci
+diff --git a/scripts/coccinelle/resource_size.cocci b/scripts/coccinelle/resource_size.cocci
 new file mode 100644
-index 0000000..cb54a4b
+index 0000000..a1a007b
 --- /dev/null
-+++ b/scripts/coccinelle/drop_kmalloc_cast.cocci
-@@ -0,0 +1,68 @@
++++ b/scripts/coccinelle/resource_size.cocci
+@@ -0,0 +1,94 @@
 +///
-+/// Casting (void *) value returned by kmalloc is useless
-+/// as mentioned in Documentation/CodingStyle, Chap 14.
++/// Use resource_size function on resource object
++/// instead of explicit computation.
 +///
-+// Confidence: High
-+// Copyright: 2009,2010 Nicolas Palix, DIKU.  GPLv2.
-+// URL: http://coccinelle.lip6.fr/
-+// Options: -no_includes -include_headers
++//  Confidence: High
++//  Copyright: (C) 2009, 2010 Nicolas Palix, DIKU.  GPLv2.
++//  Copyright: (C) 2009, 2010 Julia Lawall, DIKU.  GPLv2.
++//  Copyright: (C) 2009, 2010 Gilles Muller, INRIA/LiP6.  GPLv2.
++//  URL: http://coccinelle.lip6.fr/
++//  Options:
 +//
-+// Keywords: kmalloc, kzalloc, kcalloc
-+// Version min: < 2.6.12 kmalloc
-+// Version min: < 2.6.12 kcalloc
-+// Version min:   2.6.14 kzalloc
-+// Version max: *
++//  Keywords: resource_size
++//  Version min: 2.6.27 resource_size
++//  Version max: *
 +//
 +
 +virtual context
@@ -56,48 +55,74 @@ index 0000000..cb54a4b
 +//  For context mode
 +//----------------------------------------------------------
 +
-+@depends on context@
-+type T;
++@r_context depends on context && !patch && !org@
++struct resource *res;
 +@@
 +
-+* (T *)
-+  \(kmalloc\|kzalloc\|kcalloc\)(...)
++* (res->end - res->start) + 1
 +
 +//----------------------------------------------------------
 +//  For patch mode
 +//----------------------------------------------------------
 +
-+@depends on patch@
-+type T;
++@r_patch depends on !context && patch && !org@
++struct resource *res;
 +@@
 +
-+- (T *)
-+  \(kmalloc\|kzalloc\|kcalloc\)(...)
++- (res->end - res->start) + 1
+++ resource_size(res)
 +
 +//----------------------------------------------------------
-+//  For org and report mode
++//  For org mode
 +//----------------------------------------------------------
 +
-+@r depends on org || report@
-+type T;
++
++@r_org depends on !context && !patch && (org || report)@
++struct resource *res;
 +position p;
 +@@
 +
-+ (T@p *)\(kmalloc\|kzalloc\|kcalloc\)(...)
++ (res->end@p - res->start) + 1
++
++@rbad_org depends on !context && !patch && (org || report)@
++struct resource *res;
++position p != r_org.p;
++@@
++
++ res->end@p - res->start
 +
 +@script:python depends on org@
-+p << r.p;
-+t << r.T;
++p << r_org.p;
++x << r_org.res;
 +@@
 +
-+coccilib.org.print_safe_todo(p[0], t)
++msg="ERROR with %s" % (x)
++msg_safe=msg.replace("[","@(").replace("]",")")
++coccilib.org.print_todo(p[0], msg_safe)
 +
 +@script:python depends on report@
-+p << r.p;
-+t << r.T;
++p << r_org.p;
++x << r_org.res;
 +@@
 +
-+msg="WARNING: casting value returned by k[cmz]alloc to (%s *) is useless." % (t)
++msg="ERROR: Missing resource_size with %s" % (x)
++coccilib.report.print_report(p[0], msg)
++
++@script:python depends on org@
++p << rbad_org.p;
++x << rbad_org.res;
++@@
++
++msg="WARNING with %s" % (x)
++msg_safe=msg.replace("[","@(").replace("]",")")
++coccilib.org.print_todo(p[0], msg_safe)
++
++@script:python depends on report@
++p << rbad_org.p;
++x << rbad_org.res;
++@@
++
++msg="WARNING: Suspicious code. resource_size is maybe missing with %s" % (x)
 +coccilib.report.print_report(p[0], msg)
 -- 
 1.7.0.4
