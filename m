@@ -1,47 +1,258 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from rcsinet10.oracle.com ([148.87.113.121]:53316 "EHLO
-	rcsinet10.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753577Ab0EGO3P (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 7 May 2010 10:29:15 -0400
-Message-ID: <4BE4237A.8090701@oracle.com>
-Date: Fri, 07 May 2010 07:28:10 -0700
-From: Randy Dunlap <randy.dunlap@oracle.com>
+Received: from cn.fujitsu.com ([222.73.24.84]:55780 "EHLO song.cn.fujitsu.com"
+	rhost-flags-OK-FAIL-OK-OK) by vger.kernel.org with ESMTP
+	id S1753091Ab0EJIbx (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 10 May 2010 04:31:53 -0400
+Message-ID: <4BE7C4E5.90408@cn.fujitsu.com>
+Date: Mon, 10 May 2010 16:33:41 +0800
+From: Li Zefan <lizf@cn.fujitsu.com>
 MIME-Version: 1.0
-Subject: Re: [PATCH] kconfig: introduce nonint_oldconfig and loose_nonint_oldconfig
- (v3)
-References: <20100413194747.GX31193@redhat.com> <20100413130031.d4dec19b.randy.dunlap@oracle.com> <20100413201759.GY31193@redhat.com> <4BC4D310.6060705@oracle.com> <20100413210352.GA31193@redhat.com> <4BC5C190.3020501@suse.cz> <20100506164834.GL20778@redhat.com> <20100507070257.GD5921@cr0.nay.redhat.com>
-In-Reply-To: <20100507070257.GD5921@cr0.nay.redhat.com>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 8bit
+Subject: [PATCH v2 9/8] xconfig: add support to show hidden options which
+ have prompts
+References: <4BE3AB91.80606@cn.fujitsu.com>
+In-Reply-To: <4BE3AB91.80606@cn.fujitsu.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: =?ISO-8859-1?Q?Am=E9rico_Wang?= <xiyou.wangcong@gmail.com>
-Cc: Aristeu Rozanski <aris@redhat.com>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, davej@redhat.com, kyle@redhat.com, vgoyal@redhat.com, arjan@linux.intel.com
+To: Michal Marek <mmarek@suse.cz>, Randy Dunlap <randy.dunlap@oracle.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>, linux-kbuild@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>
 
-On 05/07/10 00:02, Américo Wang wrote:
-> On Thu, May 06, 2010 at 12:48:34PM -0400, Aristeu Rozanski wrote:
->> This patch has been around for a long time in Fedora and Red Hat Enterprise
->> Linux kernels and it may be useful for others. The nonint_oldconfig target
->> will fail and print the unset config options while loose_nonint_oldconfig will
->> simply let the config option unset. They're useful in distro kernel packages
->> where the config files are built using a combination of smaller config files.
->>
->> Arjan van de Ven wrote the initial nonint_config and Roland McGrath added the
->> loose_nonint_oldconfig.
->>
->> v2:
->> - when -B and -b are used, return "2" so the reason can be distinguished from
->>  other errors
->> v3:
->> - help updated
->> - nonint_oldconfig won't update the config file if options are missing
-> 
-> The patch looks fine, but, why the name 'nonint_oldconfig'?
-> My English is not good enough to see what 'nonint' standards for...
+This feature has been supported in menuconfig and gconfig, so
+here add it to xconfig.
 
-non-interactive
+Signed-off-by: Li Zefan <lizf@cn.fujitsu.com>
+---
 
+(This patch is based on the previous patchset I sent several days ago.)
+
+Randy, I've fixed the bug you reported. The bug was seen only
+in split view.
+
+---
+ scripts/kconfig/qconf.cc |   69 +++++++++++++++++++++++++++++++++------------
+ scripts/kconfig/qconf.h  |   16 ++++++++--
+ 2 files changed, 62 insertions(+), 23 deletions(-)
+
+diff --git a/scripts/kconfig/qconf.cc b/scripts/kconfig/qconf.cc
+index 47cdeae..d0b1958 100644
+--- a/scripts/kconfig/qconf.cc
++++ b/scripts/kconfig/qconf.cc
+@@ -148,7 +148,7 @@ void ConfigItem::updateMenu(void)
+ 	case S_TRISTATE:
+ 		char ch;
+ 
+-		if (!sym_is_changable(sym) && !list->showAll) {
++		if (!sym_is_changable(sym) && list->optMode == normalOpt) {
+ 			setPixmap(promptColIdx, 0);
+ 			setText(noColIdx, QString::null);
+ 			setText(modColIdx, QString::null);
+@@ -319,7 +319,7 @@ ConfigList::ConfigList(ConfigView* p, const char *name)
+ 	  symbolYesPix(xpm_symbol_yes), symbolModPix(xpm_symbol_mod), symbolNoPix(xpm_symbol_no),
+ 	  choiceYesPix(xpm_choice_yes), choiceNoPix(xpm_choice_no),
+ 	  menuPix(xpm_menu), menuInvPix(xpm_menu_inv), menuBackPix(xpm_menuback), voidPix(xpm_void),
+-	  showAll(false), showName(false), showRange(false), showData(false),
++	  showName(false), showRange(false), showData(false), optMode(normalOpt),
+ 	  rootEntry(0), headerPopup(0)
+ {
+ 	int i;
+@@ -336,10 +336,10 @@ ConfigList::ConfigList(ConfigView* p, const char *name)
+ 
+ 	if (name) {
+ 		configSettings->beginGroup(name);
+-		showAll = configSettings->readBoolEntry("/showAll", false);
+ 		showName = configSettings->readBoolEntry("/showName", false);
+ 		showRange = configSettings->readBoolEntry("/showRange", false);
+ 		showData = configSettings->readBoolEntry("/showData", false);
++		optMode = (enum optionMode)configSettings->readNumEntry("/optionMode", false);
+ 		configSettings->endGroup();
+ 		connect(configApp, SIGNAL(aboutToQuit()), SLOT(saveSettings()));
+ 	}
+@@ -351,6 +351,17 @@ ConfigList::ConfigList(ConfigView* p, const char *name)
+ 	reinit();
+ }
+ 
++bool ConfigList::menuSkip(struct menu *menu)
++{
++	if (optMode == normalOpt && menu_is_visible(menu))
++		return false;
++	if (optMode == promptOpt && menu_has_prompt(menu))
++		return false;
++	if (optMode == allOpt)
++		return false;
++	return true;
++}
++
+ void ConfigList::reinit(void)
+ {
+ 	removeColumn(dataColIdx);
+@@ -379,7 +390,7 @@ void ConfigList::saveSettings(void)
+ 		configSettings->writeEntry("/showName", showName);
+ 		configSettings->writeEntry("/showRange", showRange);
+ 		configSettings->writeEntry("/showData", showData);
+-		configSettings->writeEntry("/showAll", showAll);
++		configSettings->writeEntry("/optionMode", (int)optMode);
+ 		configSettings->endGroup();
+ 	}
+ }
+@@ -605,7 +616,7 @@ void ConfigList::updateMenuList(P* parent, struct menu* menu)
+ 		}
+ 
+ 		visible = menu_is_visible(child);
+-		if (showAll || visible) {
++		if (!menuSkip(child)) {
+ 			if (!child->sym && !child->list && !child->prompt)
+ 				continue;
+ 			if (!item || item->menu != child)
+@@ -834,7 +845,10 @@ void ConfigList::contextMenuEvent(QContextMenuEvent *e)
+ 		e->ignore();
+ }
+ 
+-ConfigView* ConfigView::viewList;
++ConfigView*ConfigView::viewList;
++QAction *ConfigView::showNormalAction;
++QAction *ConfigView::showAllAction;
++QAction *ConfigView::showPromptAction;
+ 
+ ConfigView::ConfigView(QWidget* parent, const char *name)
+ 	: Parent(parent, name)
+@@ -859,13 +873,16 @@ ConfigView::~ConfigView(void)
+ 	}
+ }
+ 
+-void ConfigView::setShowAll(bool b)
++void ConfigView::setOptionMode(QAction *act)
+ {
+-	if (list->showAll != b) {
+-		list->showAll = b;
+-		list->updateListAll();
+-		emit showAllChanged(b);
+-	}
++	if (act == showNormalAction)
++		list->optMode = normalOpt;
++	else if (act == showAllAction)
++		list->optMode = allOpt;
++	else
++		list->optMode = promptOpt;
++
++	list->updateListAll();
+ }
+ 
+ void ConfigView::setShowName(bool b)
+@@ -1348,11 +1365,24 @@ ConfigMainWindow::ConfigMainWindow(void)
+ 	  connect(showDataAction, SIGNAL(toggled(bool)), configView, SLOT(setShowData(bool)));
+ 	  connect(configView, SIGNAL(showDataChanged(bool)), showDataAction, SLOT(setOn(bool)));
+ 	  showDataAction->setOn(configList->showData);
+-	QAction *showAllAction = new QAction(NULL, _("Show All Options"), 0, this);
+-	  showAllAction->setToggleAction(TRUE);
+-	  connect(showAllAction, SIGNAL(toggled(bool)), configView, SLOT(setShowAll(bool)));
+-	  connect(showAllAction, SIGNAL(toggled(bool)), menuView, SLOT(setShowAll(bool)));
+-	  showAllAction->setOn(configList->showAll);
++
++	QActionGroup *optGroup = new QActionGroup(this);
++	optGroup->setExclusive(TRUE);
++	connect(optGroup, SIGNAL(selected(QAction *)), configView,
++		SLOT(setOptionMode(QAction *)));
++	connect(optGroup, SIGNAL(selected(QAction *)), menuView,
++		SLOT(setOptionMode(QAction *)));
++
++	configView->showNormalAction = new QAction(NULL, _("Show Normal Options"), 0, optGroup);
++	configView->showAllAction = new QAction(NULL, _("Show All Options"), 0, optGroup);
++	configView->showPromptAction = new QAction(NULL, _("Show Prompt Options"), 0, optGroup);
++	configView->showNormalAction->setToggleAction(TRUE);
++	configView->showNormalAction->setOn(configList->optMode == normalOpt);
++	configView->showAllAction->setToggleAction(TRUE);
++	configView->showAllAction->setOn(configList->optMode == allOpt);
++	configView->showPromptAction->setToggleAction(TRUE);
++	configView->showPromptAction->setOn(configList->optMode == promptOpt);
++
+ 	QAction *showDebugAction = new QAction(NULL, _("Show Debug Info"), 0, this);
+ 	  showDebugAction->setToggleAction(TRUE);
+ 	  connect(showDebugAction, SIGNAL(toggled(bool)), helpText, SLOT(setShowDebug(bool)));
+@@ -1395,7 +1425,8 @@ ConfigMainWindow::ConfigMainWindow(void)
+ 	showRangeAction->addTo(optionMenu);
+ 	showDataAction->addTo(optionMenu);
+ 	optionMenu->insertSeparator();
+-	showAllAction->addTo(optionMenu);
++	optGroup->addTo(optionMenu);
++	optionMenu->insertSeparator();
+ 	showDebugAction->addTo(optionMenu);
+ 
+ 	// create help menu
+@@ -1490,7 +1521,7 @@ void ConfigMainWindow::setMenuLink(struct menu *menu)
+ 	ConfigList* list = NULL;
+ 	ConfigItem* item;
+ 
+-	if (!menu_is_visible(menu) && !configView->showAll())
++	if (configList->menuSkip(menu))
+ 		return;
+ 
+ 	switch (configList->mode) {
+diff --git a/scripts/kconfig/qconf.h b/scripts/kconfig/qconf.h
+index b3b5657..a7f2686 100644
+--- a/scripts/kconfig/qconf.h
++++ b/scripts/kconfig/qconf.h
+@@ -44,6 +44,9 @@ enum colIdx {
+ enum listMode {
+ 	singleMode, menuMode, symbolMode, fullMode, listMode
+ };
++enum optionMode {
++	normalOpt = 0, allOpt, promptOpt
++};
+ 
+ class ConfigList : public QListView {
+ 	Q_OBJECT
+@@ -115,6 +118,8 @@ public:
+ 	void setAllOpen(bool open);
+ 	void setParentMenu(void);
+ 
++	bool menuSkip(struct menu *);
++
+ 	template <class P>
+ 	void updateMenuList(P*, struct menu*);
+ 
+@@ -124,8 +129,9 @@ public:
+ 	QPixmap choiceYesPix, choiceNoPix;
+ 	QPixmap menuPix, menuInvPix, menuBackPix, voidPix;
+ 
+-	bool showAll, showName, showRange, showData;
++	bool showName, showRange, showData;
+ 	enum listMode mode;
++	enum optionMode optMode;
+ 	struct menu *rootEntry;
+ 	QColorGroup disabledColorGroup;
+ 	QColorGroup inactivedColorGroup;
+@@ -222,17 +228,15 @@ public:
+ 	static void updateList(ConfigItem* item);
+ 	static void updateListAll(void);
+ 
+-	bool showAll(void) const { return list->showAll; }
+ 	bool showName(void) const { return list->showName; }
+ 	bool showRange(void) const { return list->showRange; }
+ 	bool showData(void) const { return list->showData; }
+ public slots:
+-	void setShowAll(bool);
+ 	void setShowName(bool);
+ 	void setShowRange(bool);
+ 	void setShowData(bool);
++	void setOptionMode(QAction *);
+ signals:
+-	void showAllChanged(bool);
+ 	void showNameChanged(bool);
+ 	void showRangeChanged(bool);
+ 	void showDataChanged(bool);
+@@ -242,6 +246,10 @@ public:
+ 
+ 	static ConfigView* viewList;
+ 	ConfigView* nextView;
++
++	static QAction *showNormalAction;
++	static QAction *showAllAction;
++	static QAction *showPromptAction;
+ };
+ 
+ class ConfigInfoView : public QTextBrowser {
 -- 
-~Randy
-*** Remember to use Documentation/SubmitChecklist when testing your code ***
+1.6.3
+
+
