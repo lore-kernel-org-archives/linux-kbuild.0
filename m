@@ -1,86 +1,59 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from qmta03.emeryville.ca.mail.comcast.net ([76.96.30.32]:56617 "EHLO
-	qmta03.emeryville.ca.mail.comcast.net" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1756368Ab0EKSpX (ORCPT
+Received: from qmta09.emeryville.ca.mail.comcast.net ([76.96.30.96]:58822 "EHLO
+	qmta09.emeryville.ca.mail.comcast.net" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1757027Ab0EKSpt (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 11 May 2010 14:45:23 -0400
+	Tue, 11 May 2010 14:45:49 -0400
 From: matt mooney <mfm@muteddisk.com>
-Subject: [PATCH 1/3 v2] kbuild/makefiles.txt: Fix examples and content 
-Date: Tue, 11 May 2010 11:43:05 -0700
-Message-Id: <1273603385-20587-1-git-send-email-mfm@muteddisk.com>
+Subject: [PATCH 2/3 v2] kbuild/makefiles.txt: Fix examples 
+Date: Tue, 11 May 2010 11:43:33 -0700
+Message-Id: <1273603413-20647-1-git-send-email-mfm@muteddisk.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Randy Dunlap <rdunlap@xenotime.net>, linux-kbuild@vger.kernel.org, linux-doc@vger.kernel.org
 Cc: kernel-janitors@vger.kernel.org, mec@shout.net, kai@tp1.ruhr-uni-bochum.de, sam@ravnborg.org, jengelh@gmx.de
 
 
-Update section 3.3 Loadable module goals - obj-m, from $(<module_name>-objs) to $(<module_name>-y) for easier addition of conditional objects to the module. The examples are also updated to reflect the current state of each Makefile used.
+Update section 3.2 and 3.5 example, along with text in section 3.5 to reflect change.
 
 Signed-off-by: matt mooney <mfm@muteddisk.com>
 ---
 v2: Changes are the same, added linux-kbuild@vger.kernel.org to list of recipients.
 
- Documentation/kbuild/makefiles.txt |   37 ++++++++++++++++++-----------------
- 1 files changed, 19 insertions(+), 18 deletions(-)
+ Documentation/kbuild/makefiles.txt |   12 ++++++------
+ 1 files changed, 6 insertions(+), 6 deletions(-)
 
 diff --git a/Documentation/kbuild/makefiles.txt b/Documentation/kbuild/makefiles.txt
-index 71c602d..b25507d 100644
+index b25507d..6004671 100644
 --- a/Documentation/kbuild/makefiles.txt
 +++ b/Documentation/kbuild/makefiles.txt
-@@ -187,34 +187,35 @@ more details, with real examples.
- 	Note: In this example $(CONFIG_ISDN_PPP_BSDCOMP) evaluates to 'm'
-
- 	If a kernel module is built from several source files, you specify
--	that you want to build a module in the same way as above.
--
--	Kbuild needs to know which the parts that you want to build your
--	module from, so you have to tell it by setting an
--	$(<module_name>-objs) variable.
-+	that you want to build a module in the same way as above; however,
-+	kbuild needs to know which object files you want to build your
-+	module from, so you have to tell it by setting a $(<module_name>-y)
-+	variable.
-
- 	Example:
+@@ -168,7 +168,7 @@ more details, with real examples.
  		#drivers/isdn/i4l/Makefile
--		obj-$(CONFIG_ISDN) += isdn.o
--		isdn-objs := isdn_net_lib.o isdn_v110.o isdn_common.o
-+		obj-$(CONFIG_ISDN_I4L) += isdn.o
-+		isdn-y := isdn_net_lib.o isdn_v110.o isdn_common.o
+ 		# Makefile for the kernel ISDN subsystem and device drivers.
+ 		# Each configuration option enables a list of files.
+-		obj-$(CONFIG_ISDN)             += isdn.o
++		obj-$(CONFIG_ISDN_I4L)         += isdn.o
+ 		obj-$(CONFIG_ISDN_PPP_BSDCOMP) += isdn_bsdcomp.o
 
- 	In this example, the module name will be isdn.o. Kbuild will
--	compile the objects listed in $(isdn-objs) and then run
-+	compile the objects listed in $(isdn-y) and then run
- 	"$(LD) -r" on the list of these files to generate isdn.o.
-
--	Kbuild recognises objects used for composite objects by the suffix
--	-objs, and the suffix -y. This allows the Makefiles to use
--	the value of a CONFIG_ symbol to determine if an object is part
--	of a composite object.
-+	Due to kbuild recognizing $(<module_name>-y) for composite objects,
-+	you can use the value of a CONFIG_ symbol to optionally include an
-+	object file as part of a composite object.
+ --- 3.3 Loadable module goals - obj-m
+@@ -245,12 +245,12 @@ more details, with real examples.
+ 	may contain both a built-in.o and a lib.a file.
 
  	Example:
- 		#fs/ext2/Makefile
--	        obj-$(CONFIG_EXT2_FS)        += ext2.o
--		ext2-y                       := balloc.o bitmap.o
--	        ext2-$(CONFIG_EXT2_FS_XATTR) += xattr.o
--
--	In this example, xattr.o is only part of the composite object
--	ext2.o if $(CONFIG_EXT2_FS_XATTR) evaluates to 'y'.
-+	        obj-$(CONFIG_EXT2_FS) += ext2.o
-+		ext2-y := balloc.o dir.o file.o ialloc.o inode.o ioctl.o \
-+			  namei.o super.o symlink.o
-+	        ext2-$(CONFIG_EXT2_FS_XATTR) += xattr.o xattr_user.o \
-+						xattr_trusted.o
-+
-+	In this example, xattr.o, xattr_user.o and xattr_trusted.o are only
-+	part of the composite object ext2.o if $(CONFIG_EXT2_FS_XATTR)
-+	evaluates to 'y'.
+-		#arch/i386/lib/Makefile
+-		lib-y    := checksum.o delay.o
++		#arch/x86/lib/Makefile
++		lib-y    := delay.o
 
- 	Note: Of course, when you are building objects into the kernel,
- 	the syntax above will also work. So, if you have CONFIG_EXT2_FS=y,
+-	This will create a library lib.a based on checksum.o and delay.o.
+-	For kbuild to actually recognize that there is a lib.a being built,
+-	the directory shall be listed in libs-y.
++	This will create a library lib.a based on delay.o. For kbuild to
++	actually recognize that there is a lib.a being built, the directory
++	shall be listed in libs-y.
+ 	See also "6.3 List directories to visit when descending".
+
+ 	Use of lib-y is normally restricted to lib/ and arch/*/lib.
 --
 1.6.6.1
 
