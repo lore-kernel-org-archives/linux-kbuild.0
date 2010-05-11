@@ -1,59 +1,122 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from qmta09.emeryville.ca.mail.comcast.net ([76.96.30.96]:58822 "EHLO
-	qmta09.emeryville.ca.mail.comcast.net" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1757027Ab0EKSpt (ORCPT
+Received: from qmta08.emeryville.ca.mail.comcast.net ([76.96.30.80]:47051 "EHLO
+	qmta08.emeryville.ca.mail.comcast.net" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1753209Ab0EKSqE (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 11 May 2010 14:45:49 -0400
+	Tue, 11 May 2010 14:46:04 -0400
 From: matt mooney <mfm@muteddisk.com>
-Subject: [PATCH 2/3 v2] kbuild/makefiles.txt: Fix examples 
-Date: Tue, 11 May 2010 11:43:33 -0700
-Message-Id: <1273603413-20647-1-git-send-email-mfm@muteddisk.com>
+Subject: [PATCH 3/3 v2] kbuild/makefiles.txt: Fix examples and content
+Date: Tue, 11 May 2010 11:43:48 -0700
+Message-Id: <1273603428-20698-1-git-send-email-mfm@muteddisk.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Randy Dunlap <rdunlap@xenotime.net>, linux-kbuild@vger.kernel.org, linux-doc@vger.kernel.org
 Cc: kernel-janitors@vger.kernel.org, mec@shout.net, kai@tp1.ruhr-uni-bochum.de, sam@ravnborg.org, jengelh@gmx.de
 
 
-Update section 3.2 and 3.5 example, along with text in section 3.5 to reflect change.
+Update section 3.7 examples to reflect the current state of the Makefiles used. Fix spelling and grammar errors along with flow of text.
 
 Signed-off-by: matt mooney <mfm@muteddisk.com>
 ---
 v2: Changes are the same, added linux-kbuild@vger.kernel.org to list of recipients.
 
- Documentation/kbuild/makefiles.txt |   12 ++++++------
- 1 files changed, 6 insertions(+), 6 deletions(-)
+ Documentation/kbuild/makefiles.txt |   53 +++++++++++++++++-------------------
+ 1 files changed, 25 insertions(+), 28 deletions(-)
 
 diff --git a/Documentation/kbuild/makefiles.txt b/Documentation/kbuild/makefiles.txt
-index b25507d..6004671 100644
+index 6004671..acf9716 100644
 --- a/Documentation/kbuild/makefiles.txt
 +++ b/Documentation/kbuild/makefiles.txt
-@@ -168,7 +168,7 @@ more details, with real examples.
- 		#drivers/isdn/i4l/Makefile
- 		# Makefile for the kernel ISDN subsystem and device drivers.
- 		# Each configuration option enables a list of files.
--		obj-$(CONFIG_ISDN)             += isdn.o
-+		obj-$(CONFIG_ISDN_I4L)         += isdn.o
- 		obj-$(CONFIG_ISDN_PPP_BSDCOMP) += isdn_bsdcomp.o
+@@ -285,45 +285,42 @@ more details, with real examples.
+ --- 3.7 Compilation flags
 
- --- 3.3 Loadable module goals - obj-m
-@@ -245,12 +245,12 @@ more details, with real examples.
- 	may contain both a built-in.o and a lib.a file.
+     ccflags-y, asflags-y and ldflags-y
+-	The three flags listed above applies only to the kbuild makefile
+-	where they are assigned. They are used for all the normal
+-	cc, as and ld invocation happenign during a recursive build.
++	The three flags listed above apply only to the kbuild makefile where
++	they are assigned (i.e., per-directory). They are used for all the
++	normal cc, as and ld invocation happening during a recursive build.
+ 	Note: Flags with the same behaviour were previously named:
+-	EXTRA_CFLAGS, EXTRA_AFLAGS and EXTRA_LDFLAGS.
+-	They are yet supported but their use are deprecated.
++	EXTRA_CFLAGS, EXTRA_AFLAGS and EXTRA_LDFLAGS. They are still
++	supported but their use is deprecated.
+
+-	ccflags-y specifies options for compiling C files with $(CC).
++	ccflags-y specifies options for compiling with $(CC).
 
  	Example:
--		#arch/i386/lib/Makefile
--		lib-y    := checksum.o delay.o
-+		#arch/x86/lib/Makefile
-+		lib-y    := delay.o
+-		# drivers/sound/emu10k1/Makefile
+-		ccflags-y += -I$(obj)
+-		ccflags-$(DEBUG) += -DEMU10K1_DEBUG
+-
++		# drivers/acpi/Makefile
++		ccflags-y := -Os
++		ccflags-$(CONFIG_ACPI_DEBUG) += -DACPI_DEBUG_OUTPUT
 
--	This will create a library lib.a based on checksum.o and delay.o.
--	For kbuild to actually recognize that there is a lib.a being built,
--	the directory shall be listed in libs-y.
-+	This will create a library lib.a based on delay.o. For kbuild to
-+	actually recognize that there is a lib.a being built, the directory
-+	shall be listed in libs-y.
- 	See also "6.3 List directories to visit when descending".
+ 	This variable is necessary because the top Makefile owns the
+ 	variable $(KBUILD_CFLAGS) and uses it for compilation flags for the
+ 	entire tree.
 
- 	Use of lib-y is normally restricted to lib/ and arch/*/lib.
+-	asflags-y is a similar string for per-directory options
+-	when compiling assembly language source.
++	asflags-y specifies options for assembling with $(AS).
+
+ 	Example:
+-		#arch/x86_64/kernel/Makefile
+-		asflags-y := -traditional
+-
++		#arch/sparc/kernel/Makefile
++		asflags-y := -ansi
+
+-	ldflags-y is a string for per-directory options to $(LD).
++	ldflags-y specifies options for linking with $(LD).
+
+ 	Example:
+-		#arch/m68k/fpsp040/Makefile
+-		ldflags-y := -x
++		#arch/cris/boot/compressed/Makefile
++		ldflags-y += -T $(srctree)/$(src)/decompress_$(arch-y).lds
+
+     subdir-ccflags-y, subdir-asflags-y
+-	The two flags listed above are similar to ccflags-y and as-falgs-y.
+-	The difference is that the subdir- variants has effect for the kbuild
+-	file where tey are present and all subdirectories.
+-	Options specified using subdir-* are added to the commandline before
+-	the options specified using the non-subdir variants.
++	The two flags listed above are similar to ccflags-y and asflags-y.
++	The difference is that the subdir- variants affect the kbuild
++	file where they are present and all subdirectories. Options specified
++	using subdir-* are added to the commandline before the options
++	specified using the non-subdir variants.
+
+ 	Example:
+ 		subdir-ccflags-y := -Werror
+@@ -341,18 +338,18 @@ more details, with real examples.
+ 		CFLAGS_aha152x.o =   -DAHA152X_STAT -DAUTOCONF
+ 		CFLAGS_gdth.o    = # -DDEBUG_GDTH=2 -D__SERIAL__ -D__COM2__ \
+ 				     -DGDTH_STATISTICS
+-		CFLAGS_seagate.o =   -DARBITRATE -DPARITY -DSEAGATE_USE_ASM
+
+-	These three lines specify compilation flags for aha152x.o,
+-	gdth.o, and seagate.o
++	These two lines specify compilation flags for aha152x.o and gdth.o.
+
+ 	$(AFLAGS_$@) is a similar feature for source files in assembly
+ 	languages.
+
+ 	Example:
+ 		# arch/arm/kernel/Makefile
+-		AFLAGS_head-armv.o := -DTEXTADDR=$(TEXTADDR) -traditional
+-		AFLAGS_head-armo.o := -DTEXTADDR=$(TEXTADDR) -traditional
++		AFLAGS_head.o        := -DTEXT_OFFSET=$(TEXT_OFFSET)
++		AFLAGS_crunch-bits.o := -Wa,-mcpu=ep9312
++		AFLAGS_iwmmxt.o      := -Wa,-mcpu=iwmmxt
++
+
+ --- 3.9 Dependency tracking
+
 --
 1.6.6.1
 
