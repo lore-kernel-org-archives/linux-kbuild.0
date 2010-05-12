@@ -1,122 +1,35 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from qmta08.emeryville.ca.mail.comcast.net ([76.96.30.80]:47051 "EHLO
-	qmta08.emeryville.ca.mail.comcast.net" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1753209Ab0EKSqE (ORCPT
+Received: from mail-pw0-f46.google.com ([209.85.160.46]:36145 "EHLO
+	mail-pw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750732Ab0ELE0s (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 11 May 2010 14:46:04 -0400
-From: matt mooney <mfm@muteddisk.com>
-Subject: [PATCH 3/3 v2] kbuild/makefiles.txt: Fix examples and content
-Date: Tue, 11 May 2010 11:43:48 -0700
-Message-Id: <1273603428-20698-1-git-send-email-mfm@muteddisk.com>
+	Wed, 12 May 2010 00:26:48 -0400
+Date: Wed, 12 May 2010 12:30:38 +0800
+From: =?utf-8?Q?Am=C3=A9rico?= Wang <xiyou.wangcong@gmail.com>
+Subject: Re: [PATCH 1/3 v2] kbuild/makefiles.txt: Fix examples and content
+Message-ID: <20100512043038.GB5358@cr0.nay.redhat.com>
+References: <1273603385-20587-1-git-send-email-mfm@muteddisk.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1273603385-20587-1-git-send-email-mfm@muteddisk.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Randy Dunlap <rdunlap@xenotime.net>, linux-kbuild@vger.kernel.org, linux-doc@vger.kernel.org
-Cc: kernel-janitors@vger.kernel.org, mec@shout.net, kai@tp1.ruhr-uni-bochum.de, sam@ravnborg.org, jengelh@gmx.de
+To: matt mooney <mfm@muteddisk.com>
+Cc: Randy Dunlap <rdunlap@xenotime.net>, linux-kbuild@vger.kernel.org, linux-doc@vger.kernel.org, kernel-janitors@vger.kernel.org, mec@shout.net, kai@tp1.ruhr-uni-bochum.de, sam@ravnborg.org, jengelh@gmx.de
+
+On Tue, May 11, 2010 at 11:43:05AM -0700, matt mooney wrote:
+>
+>Update section 3.3 Loadable module goals - obj-m, from $(<module_name>-objs) to $(<module_name>-y) for easier addition of conditional objects to the module. The examples are also updated to reflect the current state of each Makefile used.
+>
+>Signed-off-by: matt mooney <mfm@muteddisk.com>
 
 
-Update section 3.7 examples to reflect the current state of the Makefiles used. Fix spelling and grammar errors along with flow of text.
+The whole patchset looks good to me, so,
 
-Signed-off-by: matt mooney <mfm@muteddisk.com>
----
-v2: Changes are the same, added linux-kbuild@vger.kernel.org to list of recipients.
+Reviewed-by: WANG Cong <xiyou.wangcong@gmail.com>
 
- Documentation/kbuild/makefiles.txt |   53 +++++++++++++++++-------------------
- 1 files changed, 25 insertions(+), 28 deletions(-)
+But note that I am not a native English-speaker, let's
+see what Randy will say.
 
-diff --git a/Documentation/kbuild/makefiles.txt b/Documentation/kbuild/makefiles.txt
-index 6004671..acf9716 100644
---- a/Documentation/kbuild/makefiles.txt
-+++ b/Documentation/kbuild/makefiles.txt
-@@ -285,45 +285,42 @@ more details, with real examples.
- --- 3.7 Compilation flags
-
-     ccflags-y, asflags-y and ldflags-y
--	The three flags listed above applies only to the kbuild makefile
--	where they are assigned. They are used for all the normal
--	cc, as and ld invocation happenign during a recursive build.
-+	The three flags listed above apply only to the kbuild makefile where
-+	they are assigned (i.e., per-directory). They are used for all the
-+	normal cc, as and ld invocation happening during a recursive build.
- 	Note: Flags with the same behaviour were previously named:
--	EXTRA_CFLAGS, EXTRA_AFLAGS and EXTRA_LDFLAGS.
--	They are yet supported but their use are deprecated.
-+	EXTRA_CFLAGS, EXTRA_AFLAGS and EXTRA_LDFLAGS. They are still
-+	supported but their use is deprecated.
-
--	ccflags-y specifies options for compiling C files with $(CC).
-+	ccflags-y specifies options for compiling with $(CC).
-
- 	Example:
--		# drivers/sound/emu10k1/Makefile
--		ccflags-y += -I$(obj)
--		ccflags-$(DEBUG) += -DEMU10K1_DEBUG
--
-+		# drivers/acpi/Makefile
-+		ccflags-y := -Os
-+		ccflags-$(CONFIG_ACPI_DEBUG) += -DACPI_DEBUG_OUTPUT
-
- 	This variable is necessary because the top Makefile owns the
- 	variable $(KBUILD_CFLAGS) and uses it for compilation flags for the
- 	entire tree.
-
--	asflags-y is a similar string for per-directory options
--	when compiling assembly language source.
-+	asflags-y specifies options for assembling with $(AS).
-
- 	Example:
--		#arch/x86_64/kernel/Makefile
--		asflags-y := -traditional
--
-+		#arch/sparc/kernel/Makefile
-+		asflags-y := -ansi
-
--	ldflags-y is a string for per-directory options to $(LD).
-+	ldflags-y specifies options for linking with $(LD).
-
- 	Example:
--		#arch/m68k/fpsp040/Makefile
--		ldflags-y := -x
-+		#arch/cris/boot/compressed/Makefile
-+		ldflags-y += -T $(srctree)/$(src)/decompress_$(arch-y).lds
-
-     subdir-ccflags-y, subdir-asflags-y
--	The two flags listed above are similar to ccflags-y and as-falgs-y.
--	The difference is that the subdir- variants has effect for the kbuild
--	file where tey are present and all subdirectories.
--	Options specified using subdir-* are added to the commandline before
--	the options specified using the non-subdir variants.
-+	The two flags listed above are similar to ccflags-y and asflags-y.
-+	The difference is that the subdir- variants affect the kbuild
-+	file where they are present and all subdirectories. Options specified
-+	using subdir-* are added to the commandline before the options
-+	specified using the non-subdir variants.
-
- 	Example:
- 		subdir-ccflags-y := -Werror
-@@ -341,18 +338,18 @@ more details, with real examples.
- 		CFLAGS_aha152x.o =   -DAHA152X_STAT -DAUTOCONF
- 		CFLAGS_gdth.o    = # -DDEBUG_GDTH=2 -D__SERIAL__ -D__COM2__ \
- 				     -DGDTH_STATISTICS
--		CFLAGS_seagate.o =   -DARBITRATE -DPARITY -DSEAGATE_USE_ASM
-
--	These three lines specify compilation flags for aha152x.o,
--	gdth.o, and seagate.o
-+	These two lines specify compilation flags for aha152x.o and gdth.o.
-
- 	$(AFLAGS_$@) is a similar feature for source files in assembly
- 	languages.
-
- 	Example:
- 		# arch/arm/kernel/Makefile
--		AFLAGS_head-armv.o := -DTEXTADDR=$(TEXTADDR) -traditional
--		AFLAGS_head-armo.o := -DTEXTADDR=$(TEXTADDR) -traditional
-+		AFLAGS_head.o        := -DTEXT_OFFSET=$(TEXT_OFFSET)
-+		AFLAGS_crunch-bits.o := -Wa,-mcpu=ep9312
-+		AFLAGS_iwmmxt.o      := -Wa,-mcpu=iwmmxt
-+
-
- --- 3.9 Dependency tracking
-
---
-1.6.6.1
-
+Thanks.
