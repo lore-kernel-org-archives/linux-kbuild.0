@@ -1,35 +1,56 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pw0-f46.google.com ([209.85.160.46]:36145 "EHLO
+Received: from mail-pw0-f46.google.com ([209.85.160.46]:42187 "EHLO
 	mail-pw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750732Ab0ELE0s (ORCPT
+	with ESMTP id S1750914Ab0ELGIm (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 12 May 2010 00:26:48 -0400
-Date: Wed, 12 May 2010 12:30:38 +0800
+	Wed, 12 May 2010 02:08:42 -0400
+Date: Wed, 12 May 2010 14:12:28 +0800
 From: =?utf-8?Q?Am=C3=A9rico?= Wang <xiyou.wangcong@gmail.com>
-Subject: Re: [PATCH 1/3 v2] kbuild/makefiles.txt: Fix examples and content
-Message-ID: <20100512043038.GB5358@cr0.nay.redhat.com>
-References: <1273603385-20587-1-git-send-email-mfm@muteddisk.com>
+Subject: Re: [PATCH] kconfig: introduce nonint_oldconfig and
+ loose_nonint_oldconfig (v3)
+Message-ID: <20100512061228.GA5718@cr0.nay.redhat.com>
+References: <20100413194747.GX31193@redhat.com>
+ <20100413130031.d4dec19b.randy.dunlap@oracle.com>
+ <20100413201759.GY31193@redhat.com>
+ <4BC4D310.6060705@oracle.com>
+ <20100413210352.GA31193@redhat.com>
+ <4BC5C190.3020501@suse.cz>
+ <20100506164834.GL20778@redhat.com>
+ <20100507070257.GD5921@cr0.nay.redhat.com>
+ <4BE4237A.8090701@oracle.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <1273603385-20587-1-git-send-email-mfm@muteddisk.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <4BE4237A.8090701@oracle.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: matt mooney <mfm@muteddisk.com>
-Cc: Randy Dunlap <rdunlap@xenotime.net>, linux-kbuild@vger.kernel.org, linux-doc@vger.kernel.org, kernel-janitors@vger.kernel.org, mec@shout.net, kai@tp1.ruhr-uni-bochum.de, sam@ravnborg.org, jengelh@gmx.de
+To: Randy Dunlap <randy.dunlap@oracle.com>
+Cc: =?utf-8?Q?Am=C3=A9rico?= Wang <xiyou.wangcong@gmail.com>, Aristeu Rozanski <aris@redhat.com>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, davej@redhat.com, kyle@redhat.com, vgoyal@redhat.com, arjan@linux.intel.com
 
-On Tue, May 11, 2010 at 11:43:05AM -0700, matt mooney wrote:
+On Fri, May 07, 2010 at 07:28:10AM -0700, Randy Dunlap wrote:
+>On 05/07/10 00:02, Américo Wang wrote:
+>> On Thu, May 06, 2010 at 12:48:34PM -0400, Aristeu Rozanski wrote:
+>>> This patch has been around for a long time in Fedora and Red Hat Enterprise
+>>> Linux kernels and it may be useful for others. The nonint_oldconfig target
+>>> will fail and print the unset config options while loose_nonint_oldconfig will
+>>> simply let the config option unset. They're useful in distro kernel packages
+>>> where the config files are built using a combination of smaller config files.
+>>>
+>>> Arjan van de Ven wrote the initial nonint_config and Roland McGrath added the
+>>> loose_nonint_oldconfig.
+>>>
+>>> v2:
+>>> - when -B and -b are used, return "2" so the reason can be distinguished from
+>>>  other errors
+>>> v3:
+>>> - help updated
+>>> - nonint_oldconfig won't update the config file if options are missing
+>> 
+>> The patch looks fine, but, why the name 'nonint_oldconfig'?
+>> My English is not good enough to see what 'nonint' standards for...
 >
->Update section 3.3 Loadable module goals - obj-m, from $(<module_name>-objs) to $(<module_name>-y) for easier addition of conditional objects to the module. The examples are also updated to reflect the current state of each Makefile used.
+>non-interactive
 >
->Signed-off-by: matt mooney <mfm@muteddisk.com>
 
-
-The whole patchset looks good to me, so,
-
-Reviewed-by: WANG Cong <xiyou.wangcong@gmail.com>
-
-But note that I am not a native English-speaker, let's
-see what Randy will say.
-
-Thanks.
+Got it, thanks!
