@@ -1,44 +1,32 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor.suse.de ([195.135.220.2]:38898 "EHLO mx1.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755417Ab0ENUnX (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 14 May 2010 16:43:23 -0400
-Message-ID: <4BEDB5EA.5000305@suse.cz>
-Date: Fri, 14 May 2010 22:43:22 +0200
-From: Michal Marek <mmarek@suse.cz>
-MIME-Version: 1.0
-Subject: Re: [PATCH v2 1/8] kconfig: print symbol type in help text
-References: <4BE3AB91.80606@cn.fujitsu.com> <4BECF467.1060600@cn.fujitsu.com>
-In-Reply-To: <4BECF467.1060600@cn.fujitsu.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Received: from alapat.com ([66.216.119.54]:2965 "EHLO alapat.com"
+	rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1752402Ab0EPQTX (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 16 May 2010 12:19:23 -0400
+Subject: b2b database
+Reply-To: stevewinwiood@65.61.185.26
+From: "Romero P Elise" <stevewinwiood@65.61.185.26>
+Message-Id: <201005161032195.SM05428@irrelevant>
+Date: Sun, 16 May 2010 11:19:19 -0500
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Li Zefan <lizf@cn.fujitsu.com>
-Cc: Randy Dunlap <randy.dunlap@oracle.com>, Andrew Morton <akpm@linux-foundation.org>, linux-kbuild@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>
+To: janice@csmu.edu.tw, service5@pridetour.com.tw, rochypetalas@lacasilla.com.ar, jeff@stonebridgesearch.com, didyward@comvalue.co.uk
 
-On 14.5.2010 08:57, Li Zefan wrote:
-> Hi Michal, what do you think about those patches? Seems
-> Randy has had no further comments on them.
+Here's a list package on sale this week only:
 
-Sorry, I've been quite busy this week due to a new arrival in our
-family. The patches are ok, thank you for your work and Randy for his
-review! I'll apply them.
+Consumer List Package
 
-Michal
 
-> 
-> Li Zefan wrote:
->> Randy suggested to print out the symbol type in gconfig.
->>
->> Note this change does more than Randy's suggestion, that it also
->> affects menuconfig and "make config".
->>
->>   │ Symbol: BLOCK [=y]
->>   │ Type  : boolean
->>   │ Prompt: Enable the block layer
->>   │   Defined at block/Kconfig:4
->>   │   Depends on: EMBEDDED [=n]
->>
->> Signed-off-by: Li Zefan <lizf@cn.fujitsu.com>
->> Acked-by: Randy Dunlap <randy.dunlap@oracle.com>
+Credit Inquiries Database - 1 million Full Data Records all with emails
+American Consumer Database - 1,300,000 records all with emails
+American Homeowners - 1 million Full Data Records all with emails
+
+All complete lists above: $295
+
+
+There are more packages and not just for consumers. we also have lists for healthcare, business and more. Contact me here for more info or to get samples: successtools@gmx.com
+
+  
+
+
+Send email to remfiles@gmx.com for deleted status
