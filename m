@@ -1,16 +1,16 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from alapat.com ([66.216.119.54]:2965 "EHLO alapat.com"
-	rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1752402Ab0EPQTX (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 16 May 2010 12:19:23 -0400
-Subject: b2b database
-Reply-To: stevewinwiood@65.61.185.26
-From: "Romero P Elise" <stevewinwiood@65.61.185.26>
-Message-Id: <201005161032195.SM05428@irrelevant>
-Date: Sun, 16 May 2010 11:19:19 -0500
+Received: from mail.blockbg.com ([12.170.131.75]:1382 "EHLO blockbg.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1751763Ab0EQBqy (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 16 May 2010 21:46:54 -0400
+Subject: b2b marketing list
+Reply-To: jenifferknowles@mail.blockbg.com
+From: "Metcalf placater" <jenifferknowles@mail.blockbg.com>
+Message-Id: <201005162148468.SM05500@carbonaceous>
+Date: Sun, 16 May 2010 21:50:37 -0400
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: janice@csmu.edu.tw, service5@pridetour.com.tw, rochypetalas@lacasilla.com.ar, jeff@stonebridgesearch.com, didyward@comvalue.co.uk
+To: karen.leeper@hcahealthcare.com, tdunlop@acuraofbarrie.com, info@selectnyc.com, refugeeteam@mcctoronto.com, sunrisednetal09@c18-ss-2-lb.cnet.com, chandlgt@gwm.sc.edu, pinkpurlgurl@gmail.com, akheriat@uci.edu
 
 Here's a list package on sale this week only:
 
@@ -29,4 +29,4 @@ There are more packages and not just for consumers. we also have lists for healt
   
 
 
-Send email to remfiles@gmx.com for deleted status
+to terminate please send a blank message to remfiles@gmx.com
