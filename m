@@ -1,32 +1,31 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.blockbg.com ([12.170.131.75]:1382 "EHLO blockbg.com"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1751763Ab0EQBqy (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 16 May 2010 21:46:54 -0400
-Subject: b2b marketing list
-Reply-To: jenifferknowles@mail.blockbg.com
-From: "Metcalf placater" <jenifferknowles@mail.blockbg.com>
-Message-Id: <201005162148468.SM05500@carbonaceous>
-Date: Sun, 16 May 2010 21:50:37 -0400
+Received: from cn.fujitsu.com ([222.73.24.84]:56405 "EHLO song.cn.fujitsu.com"
+	rhost-flags-OK-FAIL-OK-OK) by vger.kernel.org with ESMTP
+	id S1752141Ab0EQCQM (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 16 May 2010 22:16:12 -0400
+Message-ID: <4BF0A770.6020806@cn.fujitsu.com>
+Date: Mon, 17 May 2010 10:18:24 +0800
+From: Li Zefan <lizf@cn.fujitsu.com>
+MIME-Version: 1.0
+Subject: Re: [PATCH v2 1/8] kconfig: print symbol type in help text
+References: <4BE3AB91.80606@cn.fujitsu.com> <4BECF467.1060600@cn.fujitsu.com> <4BEDB5EA.5000305@suse.cz>
+In-Reply-To: <4BEDB5EA.5000305@suse.cz>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: karen.leeper@hcahealthcare.com, tdunlop@acuraofbarrie.com, info@selectnyc.com, refugeeteam@mcctoronto.com, sunrisednetal09@c18-ss-2-lb.cnet.com, chandlgt@gwm.sc.edu, pinkpurlgurl@gmail.com, akheriat@uci.edu
+To: Michal Marek <mmarek@suse.cz>
+Cc: Randy Dunlap <randy.dunlap@oracle.com>, Andrew Morton <akpm@linux-foundation.org>, linux-kbuild@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>
 
-Here's a list package on sale this week only:
+>> Hi Michal, what do you think about those patches? Seems
+>> Randy has had no further comments on them.
+>
+> Sorry, I've been quite busy this week due to a new arrival in our
 
-Consumer List Package
+Congratulation!
 
+> family. The patches are ok, thank you for your work and Randy for his
+> review! I'll apply them.
 
-Credit Inquiries Database - 1 million Full Data Records all with emails
-American Consumer Database - 1,300,000 records all with emails
-American Homeowners - 1 million Full Data Records all with emails
+Thanks! And take your time. :)
 
-All complete lists above: $295
-
-
-There are more packages and not just for consumers. we also have lists for healthcare, business and more. Contact me here for more info or to get samples: successtools@gmx.com
-
-  
-
-
-to terminate please send a blank message to remfiles@gmx.com
