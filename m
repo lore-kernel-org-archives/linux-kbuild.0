@@ -1,103 +1,42 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qy0-f171.google.com ([209.85.221.171]:38546 "EHLO
-	mail-qy0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757523Ab0ERNmG convert rfc822-to-8bit (ORCPT
+Received: from 160.63.219.87.dynamic.jazztel.es ([87.219.63.160]:2959 "HELO
+	fquz.jazztel.es" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with SMTP id S1753902Ab0ERSuJ (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 18 May 2010 09:42:06 -0400
+	Tue, 18 May 2010 14:50:09 -0400
+Message-ID: <4BF2E0E4.2080709@fcbu.com>
+Date: Tue, 18 May 2010 20:50:12 +0200
+From: Seesholtz Kolodzieski <pathometer@interazioni.ro>
 MIME-Version: 1.0
-In-Reply-To: <AANLkTimmIonDEg91eR4dgw6aLAOd6GsGJWs0e2Ocunwt@mail.gmail.com>
-References: <AANLkTil73ArhX2w6b_v1bmWjP1FA5zUTfPzK2N4waOu1@mail.gmail.com>
-	 <87tyq63eux.fsf@basil.nowhere.org>
-	 <AANLkTiktV26Xu_qXFPdTRMLe5UwWnjpqvEKitjRElF6R@mail.gmail.com>
-	 <1274102511.4418.18.camel@mulgrave.site>
-	 <AANLkTil9lmdG5LY2SFk3cMsPOK-gUm2diMFL_o5bT08u@mail.gmail.com>
-	 <1274106526.4418.40.camel@mulgrave.site>
-	 <alpine.DEB.2.01.1005172258360.27232@asgard.lang.hm>
-	 <AANLkTiltKYV6_usOnIhjg699vsnXVJ3vJlt63RfIfBJY@mail.gmail.com>
-	 <AANLkTimmIonDEg91eR4dgw6aLAOd6GsGJWs0e2Ocunwt@mail.gmail.com>
-Date: Tue, 18 May 2010 08:42:02 -0500
-Message-ID: <AANLkTimBkMJN3h2iYGckUnqJhkkYNcTOoxm9z4qj-9ow@mail.gmail.com>
-Subject: Re: [ANNOUNCE] GSoC project: Improving kconfig using a SAT solver
-From: kevin granade <kevin.granade@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 8BIT
+Subject: T to enter. The Indians, after some deliberation respecting the manner in which the
+Content-Type: application/octet-stream; name="benzene.rtf"
+Content-Transfer-Encoding: base64
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Vegard Nossum <vegard.nossum@gmail.com>
-Cc: Jon Smirl <jonsmirl@gmail.com>, david@lang.hm, James Bottomley <James.Bottomley@hansenpartnership.com>, Andi Kleen <andi@firstfloor.org>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Bart Massey <bart@cs.pdx.edu>, Michal Marek <mmarek@suse.cz>, Greg Kroah-Hartman <greg@kroah.com>, Ingo Molnar <mingo@elte.hu>
+To: Snopek Lappas <linux-kbuild@vger.kernel.org>
 
-On Tue, May 18, 2010 at 7:54 AM, Vegard Nossum <vegard.nossum@gmail.com> wrote:
-> On 18 May 2010 14:26, Jon Smirl <jonsmirl@gmail.com> wrote:
->> On Tue, May 18, 2010 at 2:03 AM,  <david@lang.hm> wrote:
->>> There are two modes people can be in when configuring a kernel.
->>>
->>> 1. I want to configure a kernel to support my hardware, enable anything else
->>> needed to make it work.
->>>
->>> 2. I really care about having a small kernel, don't enable anything I have
->>> disabled (but help me figure out why something I want isn't available)
->>>
->>> I don't think that hiding hardware from the user is ever the best thing to
->>> do. for approach #1 you obviously don't want to hide anything, but even for
->>> approach #2, someone may not realize that by disabling one option they are
->>> making it impossible to support something, and as someone who spent a bunch
->>> of time hunting through config to find options that I ended up finding were
->>> not available without enabling something else, I much prefer to see the
->>> option, but see it disabled rather than not being sure if it should be
->>> there, or somewhere else in the config.
->>
->> I have to agree with this. An example is audio drivers that disappear
->> because something like SPI is turned off. Sometimes I have to read the
->> Kconfig files to figure out what subsystems I need enabled in order to
->> make the driver appear as a choice.
->>
->> Another way this could work...
->> Enable the platform
->> this causes all subsystems on the platform (usb, spi, pci, etc) to be
->> soft enabled
->> user selects device drivers or hard enables the subsystem
->> on save, if the subsystem wasn't hard enabled for some reason or
->> dependency, disable it.
->>
->> ---------------
->>
->> I'd also find it useful if Kconfig had an option that analyzed the
->> system it is running on and then generated the minimal set of drivers
->> needed to support it. Assume that the system is running something like
->> the Ubuntu kernel with every driver enabled. Then figure out the
->> minimal build footprint for a custom kernel to support the same
->> hardware.  I do this by hand, but a button for doing it would be a lot
->> easier.
->
-> Consider this a response to both of the above e-mails. Just to clear
-> any confusion, a consequence of using SAT for kconfig is that you can
-> now say for example only the following: "I want drivers A, B, and C. I
-> don't care if that means I can't use FOO and I don't care if that
-> means that I have to use BAR, just give me A, B, and C."
->
-> I suppose another way to see it is that configuring the kernel using
-> the current menuconfig is a top-down process, since you have to select
-> USB before you can select any driver that depends on USB. Using SAT
-> for kconfig puts this on its head, and the configuration process
-> becomes bottom-up; you say only what you want to have (or not have),
-> and the system figures out the rest. If you choose a driver that
-> requires USB (and you haven't said that you also don't want USB
-> support, which would be impossible), then USB _will_ be enabled
-> automatically.
->
-> For the record, I think that there are already scripts that take a
-> running system and builds a config for that.
-
-At least some of what you want is provided by 'make localmodconfig'
-
--Kevin Granade
-
->
->
-> Vegard
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kernel" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> Please read the FAQ at  http://www.tux.org/lkml/
->
+e1xydGYxXGFuc2lcYW5zaWNwZzEyNTJcZGVmZjBcZGVmbGFuZzEwMzN7XCpcZ2VuZXJhdG9y
+IE1zZnRlZGl0IDIuNDQuMTMuOTU2OTt9e1xmb250dGJse1xmMFxmbmlsXGZjaGFyc2V0MCBD
+YWxpYnJpO319DQp7XCpcZ2VuZXJhdG9yIE1zZnRlZGl0IDIuNDQuMTMuOTU2OTt9e1xjb2xv
+cnRibCA7XHJlZDBcZ3JlZW4wXGJsdWUyNTU7XHJlZDE5MlxncmVlbjgwXGJsdWU3NztccmVk
+MFxncmVlbjE3NlxibHVlODA7XHJlZDIwNFxncmVlbjE4MFxibHVlMDtccmVkMjU1XGdyZWVu
+MFxibHVlMDtccmVkMjIzXGdyZWVuMjA2XGJsdWU0O1xyZWQxNTVcZ3JlZW4wXGJsdWUyMTE7
+XHJlZDc5XGdyZWVuMTI5XGJsdWUxODk7XHJlZDE2NVxncmVlbjE2NVxibHVlMTY1O1xyZWQx
+MjhcZ3JlZW4xNThcYmx1ZTE5NDtccmVkMjQ3XGdyZWVuMTUwXGJsdWU3MDtccmVkMFxncmVl
+bjc3XGJsdWUxODc7XHJlZDc1XGdyZWVuMTcyXGJsdWUxOTg7XHJlZDIyMVxncmVlbjEzMlxi
+bHVlMTMyO1xyZWQ1MVxncmVlbjUxXGJsdWU1MTtccmVkMTU4XGdyZWVuMTI0XGJsdWUxMjQ7
+XHJlZDE1NVxncmVlbjE4N1xibHVlODk7fQ0Ke1wqXGdlbmVyYXRvciBNc2Z0ZWRpdCAyLjQ0
+LjEzLjk1Njk7fVx2aWV3a2luZDRcdWMxXHBhcmRcc2EyMDBcc2wyNzZcc2xtdWx0MVxsYW5n
+OVxmMFxmczMye1xmaWVsZHtcKlxmbGRpbnN0e0hZUEVSTElOSyAiaHtcKlxkZCAyLjQ0LjEz
+Ljk1Njk7fXR0cDovL3d3dy5mdTk5LnJ1In19e1xmbGRyc2x0e1x1bFxjZjEgaHR0cDovL3d3
+dy5mdTk5LnJ1fX19XGYwXGNmMVxiXGZzMzIgIC0gT3JkZXIgdGhlIGNoZWFwZXN0IG1lZGlj
+YXRpb25zIG5vdyFccGFyDQpWaWFncmEgXGNmNCBDaWFsaXMgXGNmMyBWaWFncmEgUHJvZmVz
+c2lvbmFsIFxjZjUgQ2lhbGlzIFByb2Zlc3Npb25hbCBcY2Y2IFZpYWdyYSBTdXBlciBBY3Rp
+dmUrIFxjZjMgQ2lhbGlzIFN1cGVyIEFjdGl2ZSsgXGNmNyBMZXZpdHJhXGNmMCAgXGNmOCBW
+aWFncmEgU29mdCBUYWJzIFxjZjkgQ2lhbGlzIFNvZnQgVGFic1xjZjEwICBcY2YxMSBMZXZp
+dHJhIFByb2Zlc3Npb25hbCBcY2Y0IEZlbWFsZSBWaWFncmEgXGNmMTIgUHJvcGVjaWEgXGNm
+NyBBY29tcGxpYSBcY2Y2IFhlbmljYWxcY2YwICBcY2Y1IEJyYW5kIExldml0cmEgXGNmMTMg
+RmVtYWxlIENpYWxpcyBcY2YxNCBMZXZpdHJhIFN1cGVyIEFjdGl2ZSsgXGNmMTUgVGFtaWZs
+dVxjZjAgIFxjZjcgVlBYTFxjZjAgIFxjZjE2IFZpYWdyYSBTb2Z0IEZsYXZvdXJlZCBcY2Y1
+IEJyYW5kIFZpYWdyYSBcY2YxNyBCcmFuZCBDaWFsaXNcY2YwDQp7XCpcZ2VuZXJhdG9yIE1z
+ZnRlZGl0IDIuNDQuMTMuOTU2OTt9fQ==
