@@ -1,42 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from 160.63.219.87.dynamic.jazztel.es ([87.219.63.160]:2959 "HELO
-	fquz.jazztel.es" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with SMTP id S1753902Ab0ERSuJ (ORCPT
+Received: from qmta05.emeryville.ca.mail.comcast.net ([76.96.30.48]:52654 "EHLO
+	qmta05.emeryville.ca.mail.comcast.net" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1753313Ab0ERXTM (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 18 May 2010 14:50:09 -0400
-Message-ID: <4BF2E0E4.2080709@fcbu.com>
-Date: Tue, 18 May 2010 20:50:12 +0200
-From: Seesholtz Kolodzieski <pathometer@interazioni.ro>
+	Tue, 18 May 2010 19:19:12 -0400
+Date: Tue, 18 May 2010 16:15:58 -0700
+From: matt mooney <mfm@muteddisk.com>
+Subject: Re: [PATCH 1/3 v2] kbuild/makefiles.txt: Fix examples and content
+Message-ID: <20100518231558.GD8700@haskell.muteddisk.com>
+References: <1273603385-20587-1-git-send-email-mfm@muteddisk.com>
+ <20100512043038.GB5358@cr0.nay.redhat.com>
 MIME-Version: 1.0
-Subject: T to enter. The Indians, after some deliberation respecting the manner in which the
-Content-Type: application/octet-stream; name="benzene.rtf"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20100512043038.GB5358@cr0.nay.redhat.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Snopek Lappas <linux-kbuild@vger.kernel.org>
+To: Randy Dunlap <rdunlap@xenotime.net>
+Cc: =?iso-8859-1?Q?Am=E9rico?= Wang <xiyou.wangcong@gmail.com>, linux-kbuild@vger.kernel.org, linux-doc@vger.kernel.org, kernel-janitors@vger.kernel.org, mec@shout.net, kai@tp1.ruhr-uni-bochum.de, sam@ravnborg.org, jengelh@gmx.de
 
-e1xydGYxXGFuc2lcYW5zaWNwZzEyNTJcZGVmZjBcZGVmbGFuZzEwMzN7XCpcZ2VuZXJhdG9y
-IE1zZnRlZGl0IDIuNDQuMTMuOTU2OTt9e1xmb250dGJse1xmMFxmbmlsXGZjaGFyc2V0MCBD
-YWxpYnJpO319DQp7XCpcZ2VuZXJhdG9yIE1zZnRlZGl0IDIuNDQuMTMuOTU2OTt9e1xjb2xv
-cnRibCA7XHJlZDBcZ3JlZW4wXGJsdWUyNTU7XHJlZDE5MlxncmVlbjgwXGJsdWU3NztccmVk
-MFxncmVlbjE3NlxibHVlODA7XHJlZDIwNFxncmVlbjE4MFxibHVlMDtccmVkMjU1XGdyZWVu
-MFxibHVlMDtccmVkMjIzXGdyZWVuMjA2XGJsdWU0O1xyZWQxNTVcZ3JlZW4wXGJsdWUyMTE7
-XHJlZDc5XGdyZWVuMTI5XGJsdWUxODk7XHJlZDE2NVxncmVlbjE2NVxibHVlMTY1O1xyZWQx
-MjhcZ3JlZW4xNThcYmx1ZTE5NDtccmVkMjQ3XGdyZWVuMTUwXGJsdWU3MDtccmVkMFxncmVl
-bjc3XGJsdWUxODc7XHJlZDc1XGdyZWVuMTcyXGJsdWUxOTg7XHJlZDIyMVxncmVlbjEzMlxi
-bHVlMTMyO1xyZWQ1MVxncmVlbjUxXGJsdWU1MTtccmVkMTU4XGdyZWVuMTI0XGJsdWUxMjQ7
-XHJlZDE1NVxncmVlbjE4N1xibHVlODk7fQ0Ke1wqXGdlbmVyYXRvciBNc2Z0ZWRpdCAyLjQ0
-LjEzLjk1Njk7fVx2aWV3a2luZDRcdWMxXHBhcmRcc2EyMDBcc2wyNzZcc2xtdWx0MVxsYW5n
-OVxmMFxmczMye1xmaWVsZHtcKlxmbGRpbnN0e0hZUEVSTElOSyAiaHtcKlxkZCAyLjQ0LjEz
-Ljk1Njk7fXR0cDovL3d3dy5mdTk5LnJ1In19e1xmbGRyc2x0e1x1bFxjZjEgaHR0cDovL3d3
-dy5mdTk5LnJ1fX19XGYwXGNmMVxiXGZzMzIgIC0gT3JkZXIgdGhlIGNoZWFwZXN0IG1lZGlj
-YXRpb25zIG5vdyFccGFyDQpWaWFncmEgXGNmNCBDaWFsaXMgXGNmMyBWaWFncmEgUHJvZmVz
-c2lvbmFsIFxjZjUgQ2lhbGlzIFByb2Zlc3Npb25hbCBcY2Y2IFZpYWdyYSBTdXBlciBBY3Rp
-dmUrIFxjZjMgQ2lhbGlzIFN1cGVyIEFjdGl2ZSsgXGNmNyBMZXZpdHJhXGNmMCAgXGNmOCBW
-aWFncmEgU29mdCBUYWJzIFxjZjkgQ2lhbGlzIFNvZnQgVGFic1xjZjEwICBcY2YxMSBMZXZp
-dHJhIFByb2Zlc3Npb25hbCBcY2Y0IEZlbWFsZSBWaWFncmEgXGNmMTIgUHJvcGVjaWEgXGNm
-NyBBY29tcGxpYSBcY2Y2IFhlbmljYWxcY2YwICBcY2Y1IEJyYW5kIExldml0cmEgXGNmMTMg
-RmVtYWxlIENpYWxpcyBcY2YxNCBMZXZpdHJhIFN1cGVyIEFjdGl2ZSsgXGNmMTUgVGFtaWZs
-dVxjZjAgIFxjZjcgVlBYTFxjZjAgIFxjZjE2IFZpYWdyYSBTb2Z0IEZsYXZvdXJlZCBcY2Y1
-IEJyYW5kIFZpYWdyYSBcY2YxNyBCcmFuZCBDaWFsaXNcY2YwDQp7XCpcZ2VuZXJhdG9yIE1z
-ZnRlZGl0IDIuNDQuMTMuOTU2OTt9fQ==
+Hi Randy, 
+
+Should I resubmit these and include the main list? Or just forget about
+them? 
+
+Thanks,
+matt
+
+On 12:30 Wed 12 May     , Américo Wang wrote:
+> On Tue, May 11, 2010 at 11:43:05AM -0700, matt mooney wrote:
+> >
+> >Update section 3.3 Loadable module goals - obj-m, from $(<module_name>-objs) to $(<module_name>-y) for easier addition of conditional objects to the module. The examples are also updated to reflect the current state of each Makefile used.
+> >
+> >Signed-off-by: matt mooney <mfm@muteddisk.com>
+> 
+> 
+> The whole patchset looks good to me, so,
+> 
+> Reviewed-by: WANG Cong <xiyou.wangcong@gmail.com>
+> 
+> But note that I am not a native English-speaker, let's
+> see what Randy will say.
+> 
+> Thanks.
+> 
