@@ -1,41 +1,63 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from [92.56.241.156] ([92.56.241.156]:2074 "HELO lltxpd.aucbgy.com"
-	rhost-flags-FAIL-FAIL-OK-FAIL) by vger.kernel.org with SMTP
-	id S1751672Ab0EQPuI (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 17 May 2010 11:50:08 -0400
-Message-ID: <4BF164AC.4090903@aquatronics.nl>
-Date: Mon, 17 May 2010 17:50:07 +0200
-From: Shultz Shearhart <examinant@aquatronics.nl>
+Received: from mail.lang.hm ([64.81.33.126]:35149 "EHLO bifrost.lang.hm"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1755309Ab0ERGEA (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 18 May 2010 02:04:00 -0400
+Date: Mon, 17 May 2010 23:03:10 -0700 (PDT)
+From: david@lang.hm
+Subject: Re: [ANNOUNCE] GSoC project: Improving kconfig using a SAT solver
+In-Reply-To: <1274106526.4418.40.camel@mulgrave.site>
+Message-ID: <alpine.DEB.2.01.1005172258360.27232@asgard.lang.hm>
+References: <AANLkTil73ArhX2w6b_v1bmWjP1FA5zUTfPzK2N4waOu1@mail.gmail.com>  <87tyq63eux.fsf@basil.nowhere.org>  <AANLkTiktV26Xu_qXFPdTRMLe5UwWnjpqvEKitjRElF6R@mail.gmail.com>  <1274102511.4418.18.camel@mulgrave.site>  <AANLkTil9lmdG5LY2SFk3cMsPOK-gUm2diMFL_o5bT08u@mail.gmail.com>
+ <1274106526.4418.40.camel@mulgrave.site>
 MIME-Version: 1.0
-Subject: is not quite what
-Content-Type: application/octet-stream; name="saddlery.rtf"
-Content-Transfer-Encoding: base64
+Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Elliot Schelle <linux-kbuild@vger.kernel.org>
+To: James Bottomley <James.Bottomley@HansenPartnership.com>
+Cc: Vegard Nossum <vegard.nossum@gmail.com>, Andi Kleen <andi@firstfloor.org>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Bart Massey <bart@cs.pdx.edu>, Michal Marek <mmarek@suse.cz>, Greg Kroah-Hartman <greg@kroah.com>, Ingo Molnar <mingo@elte.hu>
 
-e1xydGYxXGFuc2lcYW5zaWNwZzEyNTJcZGVmZjBcZGVmbGFuZzEwMzN7XCpcZ2VuZXJhdG9y
-IE1zZnRlZGl0IDUuMzAuMS41MTA4O317XGZvbnR0Ymx7XGYwXGZuaWxcZmNoYXJzZXQwIENh
-bGlicmk7fX0NCntcKlxnZW5lcmF0b3IgTXNmdGVkaXQgNS4zMC4xLjUxMDg7fXtcY29sb3J0
-YmwgO1xyZWQwXGdyZWVuMFxibHVlMjU1O1xyZWQxOTJcZ3JlZW44MFxibHVlNzc7XHJlZDBc
-Z3JlZW4xNzZcYmx1ZTgwO1xyZWQyMDRcZ3JlZW4xODBcYmx1ZTA7XHJlZDI1NVxncmVlbjBc
-Ymx1ZTA7XHJlZDIyM1xncmVlbjIwNlxibHVlNDtccmVkMTU1XGdyZWVuMFxibHVlMjExO1xy
-ZWQ3OVxncmVlbjEyOVxibHVlMTg5O1xyZWQxNjVcZ3JlZW4xNjVcYmx1ZTE2NTtccmVkMTI4
-XGdyZWVuMTU4XGJsdWUxOTQ7XHJlZDI0N1xncmVlbjE1MFxibHVlNzA7XHJlZDBcZ3JlZW43
-N1xibHVlMTg3O1xyZWQ3NVxncmVlbjE3MlxibHVlMTk4O1xyZWQyMjFcZ3JlZW4xMzJcYmx1
-ZTEzMjtccmVkNTFcZ3JlZW41MVxibHVlNTE7XHJlZDE1OFxncmVlbjEyNFxibHVlMTI0O1xy
-ZWQxNTVcZ3JlZW4xODdcYmx1ZTg5O30NCntcKlxnZW5lcmF0b3IgTXNmdGVkaXQgNS4zMC4x
-LjUxMDg7fVx2aWV3a2luZDRcdWMxXHBhcmRcc2EyMDBcc2wyNzZcc2xtdWx0MVxsYW5nOVxm
-MFxmczMye1xmaWVsZHtcKlxmbGRpbnN0e0hZUEVSTElOSyAiaHtcKlxkZCA1LjMwLjEuNTEw
-ODt9dHRwOi8vd3d3LnhhNjYucnUifX17XGZsZHJzbHR7XHVsXGNmMSBodHRwOi8vd3d3Lnhh
-NjYucnV9fX1cZjBcY2YxXGJcZnMzMiAgLSBPcmRlciB0aGUgY2hlYXBlc3QgbWVkaWNhdGlv
-bnMgbm93IVxwYXINClZpYWdyYSBcY2Y0IENpYWxpcyBcY2YzIFZpYWdyYSBQcm9mZXNzaW9u
-YWwgXGNmNSBDaWFsaXMgUHJvZmVzc2lvbmFsIFxjZjYgVmlhZ3JhIFN1cGVyIEFjdGl2ZSsg
-XGNmMyBDaWFsaXMgU3VwZXIgQWN0aXZlKyBcY2Y3IExldml0cmFcY2YwICBcY2Y4IFZpYWdy
-YSBTb2Z0IFRhYnMgXGNmOSBDaWFsaXMgU29mdCBUYWJzXGNmMTAgIFxjZjExIExldml0cmEg
-UHJvZmVzc2lvbmFsIFxjZjQgRmVtYWxlIFZpYWdyYSBcY2YxMiBQcm9wZWNpYSBcY2Y3IEFj
-b21wbGlhIFxjZjYgWGVuaWNhbFxjZjAgIFxjZjUgQnJhbmQgTGV2aXRyYSBcY2YxMyBGZW1h
-bGUgQ2lhbGlzIFxjZjE0IExldml0cmEgU3VwZXIgQWN0aXZlKyBcY2YxNSBUYW1pZmx1XGNm
-MCAgXGNmNyBWUFhMXGNmMCAgXGNmMTYgVmlhZ3JhIFNvZnQgRmxhdm91cmVkIFxjZjUgQnJh
-bmQgVmlhZ3JhIFxjZjE3IEJyYW5kIENpYWxpc1xjZjANCntcKlxnZW5lcmF0b3IgTXNmdGVk
-aXQgNS4zMC4xLjUxMDg7fX0=
+On Mon, 17 May 2010, James Bottomley wrote:
+
+> On Mon, 2010-05-17 at 16:21 +0200, Vegard Nossum wrote:
+>> On 17 May 2010 15:21, James Bottomley
+>>
+>> Even if the problem is different from zypper's, it is also here
+>> possible to get an unsatisfiable instance. You are right that, yes,
+>> the kconfig files on their own should always be satisfiable. But
+>> that's before the user has made any choices at all. An example of an
+>> unsatisfiable instance would be one where the user demands that 1.
+>> some USB driver is enabled, while 2. USB support in general is
+>> disabled.
+>
+> Actually, these are two separate problems.  The first is basic
+> consistency within the Kconfig subsytstem (something that select
+> currently damages for us).  The second is what to present to the user,
+> which is where the inception of the select problem came from.  A user
+> doesn't really want to know that USB device X depends on usb storage,
+> SCSI and a raft of other things ... they just want it to configure a
+> kernel that supports their device.  In particular, we don't want to
+> present every possible option to users and then try to work out a
+> solution, we really need guided configuration (which, in some measure,
+> is what we have today: if you don't select general USB, you won't see
+> any USB drivers.  Or more importantly, if you select an Adaptec SCSI
+> card, we just enable whichever transport library it needs).
+
+There are two modes people can be in when configuring a kernel.
+
+1. I want to configure a kernel to support my hardware, enable anything 
+else needed to make it work.
+
+2. I really care about having a small kernel, don't enable anything I have 
+disabled (but help me figure out why something I want isn't available)
+
+I don't think that hiding hardware from the user is ever the best thing to 
+do. for approach #1 you obviously don't want to hide anything, but even 
+for approach #2, someone may not realize that by disabling one option they 
+are making it impossible to support something, and as someone who spent a 
+bunch of time hunting through config to find options that I ended up 
+finding were not available without enabling something else, I much prefer 
+to see the option, but see it disabled rather than not being sure if it 
+should be there, or somewhere else in the config.
+
+David Lang
