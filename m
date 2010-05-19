@@ -1,72 +1,70 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-fx0-f46.google.com ([209.85.161.46]:46524 "EHLO
-	mail-fx0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757248Ab0ESLFJ convert rfc822-to-8bit (ORCPT
+Received: from mail-ww0-f46.google.com ([74.125.82.46]:40032 "EHLO
+	mail-ww0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751954Ab0ESSb1 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 19 May 2010 07:05:09 -0400
+	Wed, 19 May 2010 14:31:27 -0400
 MIME-Version: 1.0
-In-Reply-To: <AANLkTil73ArhX2w6b_v1bmWjP1FA5zUTfPzK2N4waOu1@mail.gmail.com>
+In-Reply-To: <AANLkTik0IjrVr-Cey0wumA5DpL5XutUwEtnp_1w2OQEY@mail.gmail.com>
 References: <AANLkTil73ArhX2w6b_v1bmWjP1FA5zUTfPzK2N4waOu1@mail.gmail.com>
-Date: Wed, 19 May 2010 14:05:07 +0300
-Message-ID: <AANLkTik0IjrVr-Cey0wumA5DpL5XutUwEtnp_1w2OQEY@mail.gmail.com>
+	 <AANLkTik0IjrVr-Cey0wumA5DpL5XutUwEtnp_1w2OQEY@mail.gmail.com>
+Date: Wed, 19 May 2010 20:31:25 +0200
+Message-ID: <AANLkTik4gyHBrCAfnVogj-DiEHkp3b1OlSYcja1pJ83R@mail.gmail.com>
 Subject: Re: [ANNOUNCE] GSoC project: Improving kconfig using a SAT solver
-From: Felipe Contreras <felipe.contreras@gmail.com>
+From: Vegard Nossum <vegard.nossum@gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Vegard Nossum <vegard.nossum@gmail.com>
+To: Felipe Contreras <felipe.contreras@gmail.com>
 Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Bart Massey <bart@cs.pdx.edu>, Michal Marek <mmarek@suse.cz>, Greg Kroah-Hartman <greg@kroah.com>, Ingo Molnar <mingo@elte.hu>, James Bottomley <James.Bottomley@hansenpartnership.com>
 
-On Mon, May 17, 2010 at 3:02 PM, Vegard Nossum <vegard.nossum@gmail.com> wrote:
-> Hi,
+On 19 May 2010 13:05, Felipe Contreras <felipe.contreras@gmail.com> wrote:
+> On Mon, May 17, 2010 at 3:02 PM, Vegard Nossum <vegard.nossum@gmail.com> wrote:
+>> Hi,
+>>
+>> I just wanted to say that I've been accepted into this year's Google
+>> Summer of Code program and will spend this summer working on improving
+>> the kconfig system in a very particular direction: I want to integrate
+>> a proper boolean constraint satisfiability solver into the
+>> configuration editors (menuconfig, etc.) in order to allow
+>> partial/incomplete configuration specifications. In short, this means
+>> that the user can choose to not specify a particular value for some
+>> config options, but let the system deduce their values. This will
+>> hopefully improve usability and also solve the select problem once and
+>> for all.
 >
-> I just wanted to say that I've been accepted into this year's Google
-> Summer of Code program and will spend this summer working on improving
-> the kconfig system in a very particular direction: I want to integrate
-> a proper boolean constraint satisfiability solver into the
-> configuration editors (menuconfig, etc.) in order to allow
-> partial/incomplete configuration specifications. In short, this means
-> that the user can choose to not specify a particular value for some
-> config options, but let the system deduce their values. This will
-> hopefully improve usability and also solve the select problem once and
-> for all.
+> Very nice! I thought on this idea too.
 >
-> A slightly shortened version of the project proposal that was accepted
-> can be found here:
+> Does this means that if you have a pristine kernel, and you do 'make
+> menuconfig' and don't change anything, the .config file will be empty?
+> And then, anything that you change will be in the .config file?
 >
-> http://userweb.kernel.org/~vegard/gsoc2010/proposal-short.html
->
-> In case anybody would like to track my progress throughout the summer,
-> I have set up my public project repositories at:
->
-> http://github.com/vegard/dpll
-> http://github.com/vegard/linux-2.6-kconfig-sat
->
-> I am also planning to post some updates to LKML as milestones are
-> completed.  (Please let me know if you would like to be added to or
-> removed from the Cc list.) The official end date is August 16, by
-> which time I hope to have submitted my work for mainline inclusion.
->
-> Feedback is appreciated -- I am also prepared to respond to
-> constructive criticism.
->
-> Lastly, I would like to thank Google for sponsoring me, and to thank
-> Portland State University and my mentor Bart Massey for believing in
-> this idea and project.
 
-Very nice! I thought on this idea too.
+Yes and no -- I think the plan is to retain the .config file as it is
+(i.e. it specifies more or less every option completely), so that it
+remains backwards compatible; bisection, for example, is very
+important. But yes, I think there will be a new file, say, .satconfig,
+which contains only the specific choices of the user. And this one
+would be empty, as you say, with a pristine kernel.
 
-Does this means that if you have a pristine kernel, and you do 'make
-menuconfig' and don't change anything, the .config file will be empty?
-And then, anything that you change will be in the .config file?
+I think, then, that the .config file will be regenerated from the
+.satconfig one each time .satconfig changes.
 
-On another case I do 'make ARCH=arm omap3_beagle_defconfig' then my
-.config file will point to that particular defconfig, and I can add
-only the changes that I want. Also, omap3_beagle_defconfig probably
-points omap3_defconfig and only makes certain changes.
+> On another case I do 'make ARCH=arm omap3_beagle_defconfig' then my
+> .config file will point to that particular defconfig, and I can add
+> only the changes that I want. Also, omap3_beagle_defconfig probably
+> points omap3_defconfig and only makes certain changes.
+>
+> If so, that would be awesome :)
 
-If so, that would be awesome :)
+Do you mean essentially a sort of cascade of configurations that
+inherit options from a different file? That shouldn't be very hard to
+do -- I'll make a note of it for when I get that far! That has the
+potential to make the defconfig files a bit shorter and more
+manageable (not sure how big a problem that is in practice today,
+though).
 
--- 
-Felipe Contreras
+Thanks,
+
+
+Vegard
