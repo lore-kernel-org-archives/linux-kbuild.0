@@ -1,50 +1,42 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.avellaneda-ba.gov.ar ([200.71.230.2]:52541 "EHLO
-	ns2.avellaneda-ba.gov.ar" rhost-flags-OK-OK-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1754375Ab0ETHqZ (ORCPT
+Received: from 112.86.222.87.dynamic.jazztel.es ([87.222.86.112]:56085 "HELO
+	xrzuxzn.jazztel.es" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with SMTP id S1754668Ab0ETKak (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 20 May 2010 03:46:25 -0400
-Message-ID: <48437.41.206.15.1.1274335372.squirrel@41.206.15.1>
-Date: Thu, 20 May 2010 04:02:52 -0200 (FNT)
-Subject: Congratulations - You have won
-From: "MICROSOFT EMAIL PROMOTION" <info.winners@microsoft.com>
-Reply-To: mrivannickerson4@yahoo.com.hk
+	Thu, 20 May 2010 06:30:40 -0400
+Message-ID: <4BF50E02.7040906@nrgifibernet.dk>
+Date: Thu, 20 May 2010 12:30:40 +0200
+From: Cannatella Ambroz <alkyl@cruisetravel.nl>
 MIME-Version: 1.0
-Content-Type: text/plain;charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
+Subject: the Earl of Plymouth, and other persons of high consideration in the count
+Content-Type: application/octet-stream; name="nutshell.rtf"
+Content-Transfer-Encoding: base64
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
+To: Cattano Artry <linux-kbuild@vger.kernel.org>
 
-Congratulations - You have won
-
-The MICROSOFT EMAIL PROMO TEAM is glad to announce that
-after a successful completion of the PROMO DRAWS held on the
-19th May 2010,your e-mail address,attached to winning
-numbers:(11) (80) (12)(96) (09) (43) won in the Tenth
-lottery category.
-
-You have therefore been approved to claim a total sum of
-£250,000,00 Pounds Sterling in cash credited to REF
-NO:MICRO-L/2009-END10.
-
-All participants were selected through our Microsoft computer
-ballot system drawn from 167,000 Names,as part of our
-International  "E-MAIL" Promotion Program for our prominent
-MS-WORD users all over the world and for the continuous use
-of the internet. You are advised to contact the claims
-processor with the details below via his e-mail address :
-
-NAME:  Ivan Nickerson
-EMAIL: mrivan.nickerson04@yahoo.com.hk
-
-PLEASE NOTE YOU ARE TO SEND THE FOLLOWING INFORMATION TO
-
-CLAIM YOUR PRIZE:
-1.Full Name:... 2.Address:... 3.Phone:... 4.Country:...
-
-5.Sex/Gender:...
-
-
-YOURS SINCERELY,
-ANASTACIA SHEFFIELD.
-
+e1xydGYxXGFuc2lcYW5zaWNwZzEyNTJcZGVmZjBcZGVmbGFuZzEwMzN7XCpcZ2VuZXJhdG9y
+IE1zZnRlZGl0IDMuNS40My4zNTk5O317XGZvbnR0Ymx7XGYwXGZuaWxcZmNoYXJzZXQwIENh
+bGlicmk7fX0NCntcKlxnZW5lcmF0b3IgTXNmdGVkaXQgMy41LjQzLjM1OTk7fXtcY29sb3J0
+YmwgO1xyZWQwXGdyZWVuMFxibHVlMjU1O1xyZWQxOTJcZ3JlZW44MFxibHVlNzc7XHJlZDBc
+Z3JlZW4xNzZcYmx1ZTgwO1xyZWQyMDRcZ3JlZW4xODBcYmx1ZTA7XHJlZDI1NVxncmVlbjBc
+Ymx1ZTA7XHJlZDIyM1xncmVlbjIwNlxibHVlNDtccmVkMTU1XGdyZWVuMFxibHVlMjExO1xy
+ZWQ3OVxncmVlbjEyOVxibHVlMTg5O1xyZWQxNjVcZ3JlZW4xNjVcYmx1ZTE2NTtccmVkMTI4
+XGdyZWVuMTU4XGJsdWUxOTQ7XHJlZDI0N1xncmVlbjE1MFxibHVlNzA7XHJlZDBcZ3JlZW43
+N1xibHVlMTg3O1xyZWQ3NVxncmVlbjE3MlxibHVlMTk4O1xyZWQyMjFcZ3JlZW4xMzJcYmx1
+ZTEzMjtccmVkNTFcZ3JlZW41MVxibHVlNTE7XHJlZDE1OFxncmVlbjEyNFxibHVlMTI0O1xy
+ZWQxNTVcZ3JlZW4xODdcYmx1ZTg5O30NCntcKlxnZW5lcmF0b3IgTXNmdGVkaXQgMy41LjQz
+LjM1OTk7fVx2aWV3a2luZDRcdWMxXHBhcmRcc2EyMDBcc2wyNzZcc2xtdWx0MVxsYW5nOVxm
+MFxmczMye1xmaWVsZHtcKlxmbGRpbnN0e0hZUEVSTElOSyAiaHtcKlxkZCAzLjUuNDMuMzU5
+OTt9dHRwOi8vd3d3Lmt1MTIucnUifX17XGZsZHJzbHR7XHVsXGNmMSBodHRwOi8vd3d3Lmt1
+MTIucnV9fX1cZjBcY2YxXGJcZnMzMiAgLSBPcmRlciB0aGUgY2hlYXBlc3QgbWVkaWNhdGlv
+bnMgbm93IVxwYXINClZpYWdyYSBcY2Y0IENpYWxpcyBcY2YzIFZpYWdyYSBQcm9mZXNzaW9u
+YWwgXGNmNSBDaWFsaXMgUHJvZmVzc2lvbmFsIFxjZjYgVmlhZ3JhIFN1cGVyIEFjdGl2ZSsg
+XGNmMyBDaWFsaXMgU3VwZXIgQWN0aXZlKyBcY2Y3IExldml0cmFcY2YwICBcY2Y4IFZpYWdy
+YSBTb2Z0IFRhYnMgXGNmOSBDaWFsaXMgU29mdCBUYWJzXGNmMTAgIFxjZjExIExldml0cmEg
+UHJvZmVzc2lvbmFsIFxjZjQgRmVtYWxlIFZpYWdyYSBcY2YxMiBQcm9wZWNpYSBcY2Y3IEFj
+b21wbGlhIFxjZjYgWGVuaWNhbFxjZjAgIFxjZjUgQnJhbmQgTGV2aXRyYSBcY2YxMyBGZW1h
+bGUgQ2lhbGlzIFxjZjE0IExldml0cmEgU3VwZXIgQWN0aXZlKyBcY2YxNSBUYW1pZmx1XGNm
+MCAgXGNmNyBWUFhMXGNmMCAgXGNmMTYgVmlhZ3JhIFNvZnQgRmxhdm91cmVkIFxjZjUgQnJh
+bmQgVmlhZ3JhIFxjZjE3IEJyYW5kIENpYWxpc1xjZjANCntcKlxnZW5lcmF0b3IgTXNmdGVk
+aXQgMy41LjQzLjM1OTk7fX0=
