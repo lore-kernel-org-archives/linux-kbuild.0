@@ -1,42 +1,125 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from 112.86.222.87.dynamic.jazztel.es ([87.222.86.112]:56085 "HELO
-	xrzuxzn.jazztel.es" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with SMTP id S1754668Ab0ETKak (ORCPT
+Received: from lennier.cc.vt.edu ([198.82.162.213]:52829 "EHLO
+	lennier.cc.vt.edu" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751219Ab0ETPWI (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 20 May 2010 06:30:40 -0400
-Message-ID: <4BF50E02.7040906@nrgifibernet.dk>
-Date: Thu, 20 May 2010 12:30:40 +0200
-From: Cannatella Ambroz <alkyl@cruisetravel.nl>
-MIME-Version: 1.0
-Subject: the Earl of Plymouth, and other persons of high consideration in the count
-Content-Type: application/octet-stream; name="nutshell.rtf"
-Content-Transfer-Encoding: base64
+	Thu, 20 May 2010 11:22:08 -0400
+Subject: mmotm 2010-05-19 - Kconfig dependency list from hell...
+In-Reply-To: Your message of "Wed, 19 May 2010 16:13:09 PDT."
+             <201005192341.o4JNf5Hv012931@imap1.linux-foundation.org>
+From: Valdis.Kletnieks@vt.edu
+References: <201005192341.o4JNf5Hv012931@imap1.linux-foundation.org>
+Mime-Version: 1.0
+Content-Type: multipart/signed; boundary="==_Exmh_1274368903_4237P";
+	 micalg=pgp-sha1; protocol="application/pgp-signature"
+Content-Transfer-Encoding: 7bit
+Date: Thu, 20 May 2010 11:21:43 -0400
+Message-ID: <38232.1274368903@localhost>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Cattano Artry <linux-kbuild@vger.kernel.org>
+To: Andrew Morton <akpm@linux-foundation.org>, Roman Zippel <zippel@linux-m68k.org>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-e1xydGYxXGFuc2lcYW5zaWNwZzEyNTJcZGVmZjBcZGVmbGFuZzEwMzN7XCpcZ2VuZXJhdG9y
-IE1zZnRlZGl0IDMuNS40My4zNTk5O317XGZvbnR0Ymx7XGYwXGZuaWxcZmNoYXJzZXQwIENh
-bGlicmk7fX0NCntcKlxnZW5lcmF0b3IgTXNmdGVkaXQgMy41LjQzLjM1OTk7fXtcY29sb3J0
-YmwgO1xyZWQwXGdyZWVuMFxibHVlMjU1O1xyZWQxOTJcZ3JlZW44MFxibHVlNzc7XHJlZDBc
-Z3JlZW4xNzZcYmx1ZTgwO1xyZWQyMDRcZ3JlZW4xODBcYmx1ZTA7XHJlZDI1NVxncmVlbjBc
-Ymx1ZTA7XHJlZDIyM1xncmVlbjIwNlxibHVlNDtccmVkMTU1XGdyZWVuMFxibHVlMjExO1xy
-ZWQ3OVxncmVlbjEyOVxibHVlMTg5O1xyZWQxNjVcZ3JlZW4xNjVcYmx1ZTE2NTtccmVkMTI4
-XGdyZWVuMTU4XGJsdWUxOTQ7XHJlZDI0N1xncmVlbjE1MFxibHVlNzA7XHJlZDBcZ3JlZW43
-N1xibHVlMTg3O1xyZWQ3NVxncmVlbjE3MlxibHVlMTk4O1xyZWQyMjFcZ3JlZW4xMzJcYmx1
-ZTEzMjtccmVkNTFcZ3JlZW41MVxibHVlNTE7XHJlZDE1OFxncmVlbjEyNFxibHVlMTI0O1xy
-ZWQxNTVcZ3JlZW4xODdcYmx1ZTg5O30NCntcKlxnZW5lcmF0b3IgTXNmdGVkaXQgMy41LjQz
-LjM1OTk7fVx2aWV3a2luZDRcdWMxXHBhcmRcc2EyMDBcc2wyNzZcc2xtdWx0MVxsYW5nOVxm
-MFxmczMye1xmaWVsZHtcKlxmbGRpbnN0e0hZUEVSTElOSyAiaHtcKlxkZCAzLjUuNDMuMzU5
-OTt9dHRwOi8vd3d3Lmt1MTIucnUifX17XGZsZHJzbHR7XHVsXGNmMSBodHRwOi8vd3d3Lmt1
-MTIucnV9fX1cZjBcY2YxXGJcZnMzMiAgLSBPcmRlciB0aGUgY2hlYXBlc3QgbWVkaWNhdGlv
-bnMgbm93IVxwYXINClZpYWdyYSBcY2Y0IENpYWxpcyBcY2YzIFZpYWdyYSBQcm9mZXNzaW9u
-YWwgXGNmNSBDaWFsaXMgUHJvZmVzc2lvbmFsIFxjZjYgVmlhZ3JhIFN1cGVyIEFjdGl2ZSsg
-XGNmMyBDaWFsaXMgU3VwZXIgQWN0aXZlKyBcY2Y3IExldml0cmFcY2YwICBcY2Y4IFZpYWdy
-YSBTb2Z0IFRhYnMgXGNmOSBDaWFsaXMgU29mdCBUYWJzXGNmMTAgIFxjZjExIExldml0cmEg
-UHJvZmVzc2lvbmFsIFxjZjQgRmVtYWxlIFZpYWdyYSBcY2YxMiBQcm9wZWNpYSBcY2Y3IEFj
-b21wbGlhIFxjZjYgWGVuaWNhbFxjZjAgIFxjZjUgQnJhbmQgTGV2aXRyYSBcY2YxMyBGZW1h
-bGUgQ2lhbGlzIFxjZjE0IExldml0cmEgU3VwZXIgQWN0aXZlKyBcY2YxNSBUYW1pZmx1XGNm
-MCAgXGNmNyBWUFhMXGNmMCAgXGNmMTYgVmlhZ3JhIFNvZnQgRmxhdm91cmVkIFxjZjUgQnJh
-bmQgVmlhZ3JhIFxjZjE3IEJyYW5kIENpYWxpc1xjZjANCntcKlxnZW5lcmF0b3IgTXNmdGVk
-aXQgMy41LjQzLjM1OTk7fX0=
+--==_Exmh_1274368903_4237P
+Content-Type: text/plain; charset=us-ascii
+
+On Wed, 19 May 2010 16:13:09 PDT, akpm@linux-foundation.org said:
+> The mm-of-the-moment snapshot 2010-05-19-16-12 has been uploaded to
+> 
+>    http://userweb.kernel.org/~akpm/mmotm/
+
+Looks like some code to sort the dependency list and eliminate duplicates is
+called for. I hit '?' on a new prompt, and saw this:
+
+CONFIG_COMEDI_FC:
+
+Enable support for shared functions for low-level drivers.
+This module is not used directly by end-users. Rather, it
+is used by many other comedi drivers.
+
+To compile this driver as a module, choose M here: the module will be
+called comedi_fc.
+
+Symbol: COMEDI_FC [=n]
+Prompt: Comedi shared functions for low-level driver support
+  Defined at drivers/staging/comedi/Kconfig:1294
+  Depends on: STAGING [=y] && !STAGING_EXCLUDE_BUILD [=n]
+  Location:
+    -> Device Drivers
+      -> Staging drivers (STAGING [=y])
+        -> Exclude Staging drivers from being built (STAGING_EXCLUDE_BUILD [=n])
+
+  Selected by: COMEDI_TEST [=n] && STAGING [=y] && !STAGING_EXCLUDE_BUILD [=n]
+&& COMEDI_MISC_DRIVERS [=n] || COMEDI_DAS16M1 [=n] && STAGING [=y] &&
+!STAGING_EXCLUDE_BUILD [=n] && COMEDI_ISA_DRIVERS [=n] && ISA [=n] ||
+COMEDI_DAS16 [=n] && STAGING [=y] && !STAGING_EXCLUDE_BUILD [=n] &&
+COMEDI_ISA_DRIVERS [=n] && ISA [=n] || COMEDI_DAS800 [=n] && STAGING [=y] &&
+!STAGING_EXCLUDE_BUILD [=n] && COMEDI_ISA_DRIVERS [=n] && ISA [=n] ||
+COMEDI_DAS1800 [=n] && STAGING [=y] && !STAGING_EXCLUDE_BUILD [=n] &&
+COMEDI_ISA_DRIVERS [=n] && ISA [=n] || COMEDI_DT282X [=n] && STAGING [=y] &&
+!STAGING_EXCLUDE_BUILD [=n] && COMEDI_ISA_DRIVERS [=n] && ISA [=n] ||
+COMEDI_ADDI_APCI_3001 [=n] && STAGING [=y] && !STAGING_EXCLUDE_BUILD [=n] &&
+COMEDI_PCI_DRIVERS [=n] && PCI [=y] || COMEDI_ADDI_APCI_3120 [=n] && STAGING
+[=y] && !STAGING_EXCLUDE_BUILD [=n] && COMEDI_PCI_DRIVERS [=n] && PCI [=y] ||
+COMEDI_ADL_PCI9111 [=n] && STAGING [=y] && !STAGING_EXCLUDE_BUILD [=n] &&
+COMEDI_PCI_DRIVERS [=n] && PCI [=y] || COMEDI_ADL_PCI9118 [=n] && STAGING [=y]
+&& !STAGING_EXCLUDE_BUILD [=n] && COMEDI_PCI_DRIVERS [=n] && PCI [=y] ||
+COMEDI_AMPLC_PCI224 [=n] && STAGING [=y] && !STAGING_EXCLUDE_BUILD [=n] &&
+COMEDI_PCI_DRIVERS [=n] && PCI [=y] || COMEDI_GSC_HPDI [=n] && STAGING [=y] &&
+!STAGING_EXCLUDE_BUILD [=n] && COMEDI_PCI_DRIVERS [=n] && PCI [=y] ||
+COMEDI_CB_PCIDAS64 [=n] && STAGING [=y] && !STAGING_EXCLUDE_BUILD [=n] &&
+COMEDI_PCI_DRIVERS [=n] && PCI [=y] || COMEDI_CB_PCIDAS [=n] && STAGING [=y] &&
+!STAGING_EXCLUDE_BUILD [=n] && COMEDI_PCI_DRIVERS [=n] && PCI [=y] ||
+COMEDI_S626 [=n] && STAGING [=y] && !STAGING_EXCLUDE_BUILD [=n] &&
+COMEDI_PCI_DRIVERS [=n] && PCI [=y] || COMEDI_NI_MIO_CS [=n] && STAGING [=y] &&
+!STAGING_EXCLUDE_BUILD [=n] && COMEDI_PCMCIA_DRIVERS [=n] && PCMCIA [=y] &&
+COMEDI_NI_TIO [=n] && COMEDI_NI_COMMON [=n] || COMEDI_USBDUXFAST [=n] &&
+STAGING [=y] && !STAGING_EXCLUDE_BUILD [=n] && COMEDI_USB_DRIVERS [=n] && USB
+[=y] || COMEDI_NI_LABPC [=n] && STAGING [=y] && !STAGING_EXCLUDE_BUILD [=n] &&
+COMEDI_NI_COMMON [=n]
+
+(Last line wrapped for readability). That includes these dups:
+
+     19  !STAGING_EXCLUDE_BUILD [=n]
+     18  STAGING [=y]
+      9  COMEDI_PCI_DRIVERS [=n]
+      5  COMEDI_ISA_DRIVERS [=n]
+
+It would probably be harder to reduce these:
+
+      1  PCI [=y] || COMEDI_S626 [=n] 
+      1  PCI [=y] || COMEDI_NI_MIO_CS [=n] 
+      1  PCI [=y] || COMEDI_GSC_HPDI [=n] 
+      1  PCI [=y] || COMEDI_CB_PCIDAS64 [=n] 
+      1  PCI [=y] || COMEDI_CB_PCIDAS [=n] 
+      1  PCI [=y] || COMEDI_AMPLC_PCI224 [=n] 
+      1  PCI [=y] || COMEDI_ADL_PCI9118 [=n] 
+      1  PCI [=y] || COMEDI_ADL_PCI9111 [=n] 
+      1  PCI [=y] || COMEDI_ADDI_APCI_3120 [=n] 
+      1  ISA [=n] || COMEDI_DT282X [=n] 
+      1  ISA [=n] || COMEDI_DAS800 [=n] 
+      1  ISA [=n] || COMEDI_DAS1800 [=n] 
+      1  ISA [=n] || COMEDI_DAS16 [=n] 
+      1  ISA [=n] || COMEDI_ADDI_APCI_3001 [=n] 
+
+(Is there a reason these don't print with () around them?  It looks like it
+needs them to enforce proper semantics...)
+
+
+
+
+
+--==_Exmh_1274368903_4237P
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+Comment: Exmh version 2.5 07/13/2001
+
+iD8DBQFL9VOHcC3lWbTT17ARAoiBAKDwrqLYAMeJVqXixRkdH4KnIAeUjACeO+qi
+vn1gxJFZjK6XgeBgtFm52S8=
+=yofM
+-----END PGP SIGNATURE-----
+
+--==_Exmh_1274368903_4237P--
+
