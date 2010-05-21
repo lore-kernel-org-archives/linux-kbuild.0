@@ -1,125 +1,67 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from lennier.cc.vt.edu ([198.82.162.213]:52829 "EHLO
-	lennier.cc.vt.edu" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751219Ab0ETPWI (ORCPT
+Received: from mail-fx0-f46.google.com ([209.85.161.46]:61678 "EHLO
+	mail-fx0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752899Ab0EULHi (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 20 May 2010 11:22:08 -0400
-Subject: mmotm 2010-05-19 - Kconfig dependency list from hell...
-In-Reply-To: Your message of "Wed, 19 May 2010 16:13:09 PDT."
-             <201005192341.o4JNf5Hv012931@imap1.linux-foundation.org>
-From: Valdis.Kletnieks@vt.edu
-References: <201005192341.o4JNf5Hv012931@imap1.linux-foundation.org>
-Mime-Version: 1.0
-Content-Type: multipart/signed; boundary="==_Exmh_1274368903_4237P";
-	 micalg=pgp-sha1; protocol="application/pgp-signature"
-Content-Transfer-Encoding: 7bit
-Date: Thu, 20 May 2010 11:21:43 -0400
-Message-ID: <38232.1274368903@localhost>
+	Fri, 21 May 2010 07:07:38 -0400
+MIME-Version: 1.0
+In-Reply-To: <AANLkTik4gyHBrCAfnVogj-DiEHkp3b1OlSYcja1pJ83R@mail.gmail.com>
+References: <AANLkTil73ArhX2w6b_v1bmWjP1FA5zUTfPzK2N4waOu1@mail.gmail.com>
+	 <AANLkTik0IjrVr-Cey0wumA5DpL5XutUwEtnp_1w2OQEY@mail.gmail.com>
+	 <AANLkTik4gyHBrCAfnVogj-DiEHkp3b1OlSYcja1pJ83R@mail.gmail.com>
+Date: Fri, 21 May 2010 14:07:06 +0300
+Message-ID: <AANLkTikBzDJwcMXYq_c3Tp1yLi4XKdWTzFd0ezW81cYI@mail.gmail.com>
+Subject: Re: [ANNOUNCE] GSoC project: Improving kconfig using a SAT solver
+From: Felipe Contreras <felipe.contreras@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andrew Morton <akpm@linux-foundation.org>, Roman Zippel <zippel@linux-m68k.org>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: Vegard Nossum <vegard.nossum@gmail.com>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Bart Massey <bart@cs.pdx.edu>, Michal Marek <mmarek@suse.cz>, Greg Kroah-Hartman <greg@kroah.com>, Ingo Molnar <mingo@elte.hu>, James Bottomley <James.Bottomley@hansenpartnership.com>
 
---==_Exmh_1274368903_4237P
-Content-Type: text/plain; charset=us-ascii
+On Wed, May 19, 2010 at 9:31 PM, Vegard Nossum <vegard.nossum@gmail.com> wrote:
+> On 19 May 2010 13:05, Felipe Contreras <felipe.contreras@gmail.com> wrote:
+>> Does this means that if you have a pristine kernel, and you do 'make
+>> menuconfig' and don't change anything, the .config file will be empty?
+>> And then, anything that you change will be in the .config file?
+>
+> Yes and no -- I think the plan is to retain the .config file as it is
+> (i.e. it specifies more or less every option completely), so that it
+> remains backwards compatible; bisection, for example, is very
+> important. But yes, I think there will be a new file, say, .satconfig,
+> which contains only the specific choices of the user. And this one
+> would be empty, as you say, with a pristine kernel.
+>
+> I think, then, that the .config file will be regenerated from the
+> .satconfig one each time .satconfig changes.
 
-On Wed, 19 May 2010 16:13:09 PDT, akpm@linux-foundation.org said:
-> The mm-of-the-moment snapshot 2010-05-19-16-12 has been uploaded to
-> 
->    http://userweb.kernel.org/~akpm/mmotm/
+I see. As long as people can use .satconfig only if they want, I think
+that's great.
 
-Looks like some code to sort the dependency list and eliminate duplicates is
-called for. I hit '?' on a new prompt, and saw this:
+>> On another case I do 'make ARCH=arm omap3_beagle_defconfig' then my
+>> .config file will point to that particular defconfig, and I can add
+>> only the changes that I want. Also, omap3_beagle_defconfig probably
+>> points omap3_defconfig and only makes certain changes.
+>>
+>> If so, that would be awesome :)
+>
+> Do you mean essentially a sort of cascade of configurations that
+> inherit options from a different file? That shouldn't be very hard to
+> do -- I'll make a note of it for when I get that far! That has the
+> potential to make the defconfig files a bit shorter and more
+> manageable (not sure how big a problem that is in practice today,
+> though).
 
-CONFIG_COMEDI_FC:
+Exactly. Well, I don't know if anybody considers that a problem, but
+just check arch/arm/configs/*. All of them are much bigger than
+needed, and some have not been updated in a long time (even as old as
+2.6.11). So if you do make ARCH=arm assabet_defconfig and do a 'diff
+.config assabet_defconfig' they would be completely different. This
+way it's hard to keep track of the general config changes, and ARM
+related changes, and OMAP3 changes, and compare with board-specific
+ones.
 
-Enable support for shared functions for low-level drivers.
-This module is not used directly by end-users. Rather, it
-is used by many other comedi drivers.
+Cheers.
 
-To compile this driver as a module, choose M here: the module will be
-called comedi_fc.
-
-Symbol: COMEDI_FC [=n]
-Prompt: Comedi shared functions for low-level driver support
-  Defined at drivers/staging/comedi/Kconfig:1294
-  Depends on: STAGING [=y] && !STAGING_EXCLUDE_BUILD [=n]
-  Location:
-    -> Device Drivers
-      -> Staging drivers (STAGING [=y])
-        -> Exclude Staging drivers from being built (STAGING_EXCLUDE_BUILD [=n])
-
-  Selected by: COMEDI_TEST [=n] && STAGING [=y] && !STAGING_EXCLUDE_BUILD [=n]
-&& COMEDI_MISC_DRIVERS [=n] || COMEDI_DAS16M1 [=n] && STAGING [=y] &&
-!STAGING_EXCLUDE_BUILD [=n] && COMEDI_ISA_DRIVERS [=n] && ISA [=n] ||
-COMEDI_DAS16 [=n] && STAGING [=y] && !STAGING_EXCLUDE_BUILD [=n] &&
-COMEDI_ISA_DRIVERS [=n] && ISA [=n] || COMEDI_DAS800 [=n] && STAGING [=y] &&
-!STAGING_EXCLUDE_BUILD [=n] && COMEDI_ISA_DRIVERS [=n] && ISA [=n] ||
-COMEDI_DAS1800 [=n] && STAGING [=y] && !STAGING_EXCLUDE_BUILD [=n] &&
-COMEDI_ISA_DRIVERS [=n] && ISA [=n] || COMEDI_DT282X [=n] && STAGING [=y] &&
-!STAGING_EXCLUDE_BUILD [=n] && COMEDI_ISA_DRIVERS [=n] && ISA [=n] ||
-COMEDI_ADDI_APCI_3001 [=n] && STAGING [=y] && !STAGING_EXCLUDE_BUILD [=n] &&
-COMEDI_PCI_DRIVERS [=n] && PCI [=y] || COMEDI_ADDI_APCI_3120 [=n] && STAGING
-[=y] && !STAGING_EXCLUDE_BUILD [=n] && COMEDI_PCI_DRIVERS [=n] && PCI [=y] ||
-COMEDI_ADL_PCI9111 [=n] && STAGING [=y] && !STAGING_EXCLUDE_BUILD [=n] &&
-COMEDI_PCI_DRIVERS [=n] && PCI [=y] || COMEDI_ADL_PCI9118 [=n] && STAGING [=y]
-&& !STAGING_EXCLUDE_BUILD [=n] && COMEDI_PCI_DRIVERS [=n] && PCI [=y] ||
-COMEDI_AMPLC_PCI224 [=n] && STAGING [=y] && !STAGING_EXCLUDE_BUILD [=n] &&
-COMEDI_PCI_DRIVERS [=n] && PCI [=y] || COMEDI_GSC_HPDI [=n] && STAGING [=y] &&
-!STAGING_EXCLUDE_BUILD [=n] && COMEDI_PCI_DRIVERS [=n] && PCI [=y] ||
-COMEDI_CB_PCIDAS64 [=n] && STAGING [=y] && !STAGING_EXCLUDE_BUILD [=n] &&
-COMEDI_PCI_DRIVERS [=n] && PCI [=y] || COMEDI_CB_PCIDAS [=n] && STAGING [=y] &&
-!STAGING_EXCLUDE_BUILD [=n] && COMEDI_PCI_DRIVERS [=n] && PCI [=y] ||
-COMEDI_S626 [=n] && STAGING [=y] && !STAGING_EXCLUDE_BUILD [=n] &&
-COMEDI_PCI_DRIVERS [=n] && PCI [=y] || COMEDI_NI_MIO_CS [=n] && STAGING [=y] &&
-!STAGING_EXCLUDE_BUILD [=n] && COMEDI_PCMCIA_DRIVERS [=n] && PCMCIA [=y] &&
-COMEDI_NI_TIO [=n] && COMEDI_NI_COMMON [=n] || COMEDI_USBDUXFAST [=n] &&
-STAGING [=y] && !STAGING_EXCLUDE_BUILD [=n] && COMEDI_USB_DRIVERS [=n] && USB
-[=y] || COMEDI_NI_LABPC [=n] && STAGING [=y] && !STAGING_EXCLUDE_BUILD [=n] &&
-COMEDI_NI_COMMON [=n]
-
-(Last line wrapped for readability). That includes these dups:
-
-     19  !STAGING_EXCLUDE_BUILD [=n]
-     18  STAGING [=y]
-      9  COMEDI_PCI_DRIVERS [=n]
-      5  COMEDI_ISA_DRIVERS [=n]
-
-It would probably be harder to reduce these:
-
-      1  PCI [=y] || COMEDI_S626 [=n] 
-      1  PCI [=y] || COMEDI_NI_MIO_CS [=n] 
-      1  PCI [=y] || COMEDI_GSC_HPDI [=n] 
-      1  PCI [=y] || COMEDI_CB_PCIDAS64 [=n] 
-      1  PCI [=y] || COMEDI_CB_PCIDAS [=n] 
-      1  PCI [=y] || COMEDI_AMPLC_PCI224 [=n] 
-      1  PCI [=y] || COMEDI_ADL_PCI9118 [=n] 
-      1  PCI [=y] || COMEDI_ADL_PCI9111 [=n] 
-      1  PCI [=y] || COMEDI_ADDI_APCI_3120 [=n] 
-      1  ISA [=n] || COMEDI_DT282X [=n] 
-      1  ISA [=n] || COMEDI_DAS800 [=n] 
-      1  ISA [=n] || COMEDI_DAS1800 [=n] 
-      1  ISA [=n] || COMEDI_DAS16 [=n] 
-      1  ISA [=n] || COMEDI_ADDI_APCI_3001 [=n] 
-
-(Is there a reason these don't print with () around them?  It looks like it
-needs them to enforce proper semantics...)
-
-
-
-
-
---==_Exmh_1274368903_4237P
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.10 (GNU/Linux)
-Comment: Exmh version 2.5 07/13/2001
-
-iD8DBQFL9VOHcC3lWbTT17ARAoiBAKDwrqLYAMeJVqXixRkdH4KnIAeUjACeO+qi
-vn1gxJFZjK6XgeBgtFm52S8=
-=yofM
------END PGP SIGNATURE-----
-
---==_Exmh_1274368903_4237P--
-
+-- 
+Felipe Contreras
