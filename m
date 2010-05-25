@@ -1,35 +1,52 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from 81-208-25-124.ip.fastwebnet.it ([81.208.25.124]:54182 "EHLO
-	mailserver.cidimi.it" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1756067Ab0EXS7p (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 24 May 2010 14:59:45 -0400
-Subject: Oncology Doctors - 2,200 records all with emails
-Reply-To: jenifferknowles@81-208-25-124.ip.fastwebnet.it
-From: "Lanny Norman" <jenifferknowles@81-208-25-124.ip.fastwebnet.it>
-Message-ID: <1274718635101523154@mailserver>
-Date: Mon, 24 May 2010 14:59:45 -0400
+Received: from trinity.fluff.org ([89.16.178.74]:54929 "EHLO trinity.fluff.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1755678Ab0EYAvJ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 24 May 2010 20:51:09 -0400
+From: Ben Dooks <ben-linux@fluff.org>
+Subject: [PATCH] kbuild: kallsysms: throw away result of fgets()
+Date: Tue, 25 May 2010 01:51:00 +0100
+Message-Id: <1274748661-15253-3-git-send-email-ben-linux@fluff.org>
+In-Reply-To: <1274748661-15253-1-git-send-email-ben-linux@fluff.org>
+References: <1274748661-15253-1-git-send-email-ben-linux@fluff.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: numerique@onisep.fr, info@g2.cz, webmaster@ccapta.org
+To: linux-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org
+Cc: Ben Dooks <ben-linux@fluff.org>
 
-Here's a business list package on sale this week only:
+fgets() is being used to skip a line, so throw the result away
+to remove the following warning:
 
-Business List Silver Package
+scripts/kallsyms.c: In function ‘read_symbol’:
+scripts/kallsyms.c:112: warning: ignoring return value of ‘fgets’, declared with attribute warn_unused_result
 
-Manufacturers Database - 1,057,119 records with 476,509 emails
-Real Estate Agents - 1 million records with emails
-US New Business Database - 4.8 million records all with emails
-Financial Planners Database - 148,857 records all with emails
-Finance and Money Professionals Database - 116,568 records all with emails
+Signed-off-by: Ben Dooks <ben-linux@fluff.org>
 
+tmp-fix-kallsysms
+---
+ scripts/kallsyms.c |    6 +++++-
+ 1 files changed, 5 insertions(+), 1 deletions(-)
 
-All complete lists above: $345
+diff --git a/scripts/kallsyms.c b/scripts/kallsyms.c
+index 86c3896..87c3d38 100644
+--- a/scripts/kallsyms.c
++++ b/scripts/kallsyms.c
+@@ -109,7 +109,11 @@ static int read_symbol(FILE *in, struct sym_entry *s)
+ 	if (rc != 3) {
+ 		if (rc != EOF) {
+ 			/* skip line */
+-			fgets(str, 500, in);
++			char *tmp = fgets(str, 500, in);
++
++			/* shut unused-result warning up */
++			if (!tmp)
++				str[0] = '\0';
+ 		}
+ 		return -1;
+ 	}
+-- 
+1.6.3.3
 
-
-There are more packages and not just for business. we also have healthcare, consumers and more. Contact me here for more info or to get samples: Wendi.Ash@inspiresuccess.in
-
-  
-
-
-to terminate please send a blank message to disappear@inspiresuccess.in
