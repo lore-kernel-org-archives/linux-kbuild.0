@@ -1,71 +1,73 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pw0-f46.google.com ([209.85.160.46]:63097 "EHLO
-	mail-pw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755504Ab0E0O4P (ORCPT
+Received: from hrndva-omtalb.mail.rr.com ([71.74.56.125]:60731 "EHLO
+	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756656Ab0E0SuL (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 27 May 2010 10:56:15 -0400
-Date: Thu, 27 May 2010 23:01:22 +0800
-From: =?utf-8?Q?Am=C3=A9rico?= Wang <xiyou.wangcong@gmail.com>
-Subject: Re: [PATCH] gconfig: fix build failure on fedora 13
-Message-ID: <20100527150122.GC3600@hack>
-References: <1274952149.2210.12.camel@castor.rsk>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1274952149.2210.12.camel@castor.rsk>
+	Thu, 27 May 2010 14:50:11 -0400
+Subject: Re: [PATCH] streamline_config.pl: use references rather than
+ copied data structures
+From: Steven Rostedt <rostedt@goodmis.org>
+Reply-To: rostedt@goodmis.org
+In-Reply-To: <201005271624.44746.toralf.foerster@gmx.de>
+References: <201005271342.09066.toralf.foerster@gmx.de>
+	 <1274965649.22648.263.camel@gandalf.stny.rr.com>
+	 <201005271624.44746.toralf.foerster@gmx.de>
+Content-Type: text/plain; charset="ISO-8859-15"
+Date: Thu, 27 May 2010 14:50:07 -0400
+Message-ID: <1274986207.22648.268.camel@gandalf.stny.rr.com>
+Mime-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Richard Kennedy <richard@rsk.demon.co.uk>
-Cc: Roman Zippel <zippel@linux-m68k.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, lkml <linux-kernel@vger.kernel.org>, Steven Rostedt <rostedt@goodmis.org>
+To: Toralf =?ISO-8859-1?Q?F=F6rster?= <toralf.foerster@gmx.de>
+Cc: zippel@linux-m68k.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Thu, May 27, 2010 at 10:22:28AM +0100, Richard Kennedy wrote:
->Making gconfig fails on fedora 13 as the linker cannot resolve dlsym.
->    
->Adding libdl to the link command fixes this.
->    
->make shows this error :-
->    /usr/bin/ld: scripts/kconfig/kconfig_load.o: undefined reference to symbol 'dlsym@@GLIBC_2.2.5'
->    /usr/bin/ld: note: 'dlsym@@GLIBC_2.2.5' is defined in DSO /lib64/libdl.so.2 so try adding it to the linker command line
->    /lib64/libdl.so.2: could not read symbols: Invalid operation
->
->tested on x86_64 fedora 13.
->
->Signed-off-by: Richard Kennedy <richard@rsk.demon.co.uk>
+On Thu, 2010-05-27 at 16:24 +0200, Toralf Förster wrote:
+> Steven Rostedt wrote at 15:07:29
+> > On Thu, 2010-05-27 at 13:42 +0200, Toralf Förster wrote:
 
-Looks good to me.
-
-Reviewed-by: WANG Cong <xiyou.wangcong@gmail.com>
-
-Thanks.
-
-
->---
->patch against 2.6.34, built & tested on x86_64. 
->
->regards
->Richard
->
->diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
->index 186c466..9842611 100644
->--- a/scripts/kconfig/Makefile
->+++ b/scripts/kconfig/Makefile
->@@ -208,7 +208,7 @@ HOSTCFLAGS_zconf.tab.o	:= -I$(src)
-> HOSTLOADLIBES_qconf	= $(KC_QT_LIBS) -ldl
-> HOSTCXXFLAGS_qconf.o	= $(KC_QT_CFLAGS) -D LKC_DIRECT_LINK
+> Understood and accepted.
 > 
->-HOSTLOADLIBES_gconf	= `pkg-config --libs gtk+-2.0 gmodule-2.0 libglade-2.0`
->+HOSTLOADLIBES_gconf	= `pkg-config --libs gtk+-2.0 gmodule-2.0 libglade-2.0` -ldl
-> HOSTCFLAGS_gconf.o	= `pkg-config --cflags gtk+-2.0 gmodule-2.0 libglade-2.0` \
->                           -D LKC_DIRECT_LINK
+> What's about the following 2 snippets (a trivial typo and an attempt to 
+> prevent a possible trap) ? :
 > 
->
->
->--
->To unsubscribe from this list: send the line "unsubscribe linux-kernel" in
->the body of a message to majordomo@vger.kernel.org
->More majordomo info at  http://vger.kernel.org/majordomo-info.html
->Please read the FAQ at  http://www.tux.org/lkml/
 
--- 
-Live like a child, think like the god.
- 
+OK, this is better :-)
+
+-- Steve
+
+> 
+> diff --git a/scripts/kconfig/streamline_config.pl 
+> b/scripts/kconfig/streamline_config.pl
+> index afbd54a..3f54911 100644
+> --- a/scripts/kconfig/streamline_config.pl
+> +++ b/scripts/kconfig/streamline_config.pl
+> @@ -242,7 +242,7 @@ foreach my $makefile (@makefiles) {
+>             foreach my $obj (split /\s+/,$objs) {
+>                 $obj =~ s/-/_/g;
+>                 if ($obj =~ /(.*)\.o$/) {
+> -                   # Objects may bes enabled by more than one config.
+> +                   # Objects may be enabled by more than one config.
+>                     # Store configs in an array.
+>                     my @arr;
+> 
+> 
+> 
+> diff --git a/scripts/kconfig/streamline_config.pl 
+> b/scripts/kconfig/streamline_config.pl
+> index afbd54a..9726946 100644
+> --- a/scripts/kconfig/streamline_config.pl
+> +++ b/scripts/kconfig/streamline_config.pl
+> @@ -307,7 +307,7 @@ close (LIN);
+>  my %configs;
+>  foreach my $module (keys(%modules)) {
+>      if (defined($objects{$module})) {
+> -       @arr = @{$objects{$module}};
+> +       my @arr = @{$objects{$module}};
+>         foreach my $conf (@arr) {
+>             $configs{$conf} = $module;
+>         }
+> 
+> 
+
+
