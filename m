@@ -1,58 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.gmx.net ([213.165.64.20]:44535 "HELO mail.gmx.net"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with SMTP
-	id S933528Ab0E0LmN convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 27 May 2010 07:42:13 -0400
-From: Toralf =?iso-8859-1?q?F=F6rster?= <toralf.foerster@gmx.de>
-Subject: [PATCH] streamline_config.pl: use references rather than copied data structures
-Date: Thu, 27 May 2010 13:42:08 +0200
+Received: from mgw1.diku.dk ([130.225.96.91]:49419 "EHLO mgw1.diku.dk"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1755421Ab0E0Lse (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 27 May 2010 07:48:34 -0400
+From: Nicolas Palix <npalix@diku.dk>
+Subject: Re: [PATCH 4/4] Add scripts/coccinelle/resource_size.cocci
+Date: Thu, 27 May 2010 13:48:30 +0200
+References: <1273508667-5152-1-git-send-email-npalix@diku.dk> <1273508667-5152-5-git-send-email-npalix@diku.dk> <o2y84144f021005100952z1a7e991dt21341fb8f7c76af@mail.gmail.com>
+In-Reply-To: <o2y84144f021005100952z1a7e991dt21341fb8f7c76af@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: Text/Plain;
   charset="iso-8859-1"
-Content-Transfer-Encoding: 8BIT
-Message-Id: <201005271342.09066.toralf.foerster@gmx.de>
+Content-Transfer-Encoding: 7bit
+Message-Id: <201005271348.31452.npalix@diku.dk>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: rostedt@goodmis.org
-Cc: zippel@linux-m68k.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Pekka Enberg <penberg@cs.helsinki.fi>
+Cc: Randy Dunlap <rdunlap@xenotime.net>, Roland Dreier <rdreier@cisco.com>, Joe Perches <joe@perches.com>, Andrew Morton <akpm@linux-foundation.org>, "David S. Miller" <davem@davemloft.net>, Michal Marek <mmarek@suse.cz>, Sam Ravnborg <sam@ravnborg.org>, Julia Lawall <julia@diku.dk>, Gilles Muller <Gilles.Muller@lip6.fr>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, cocci@diku.dk, Wolfram Sang <w.sang@pengutronix.de>, Kernel Janitors <kernel-janitors@vger.kernel.org>
 
-IMHO there's no need for a copy-by-value
+On Monday 10 May 2010 18:52:10 Pekka Enberg wrote:
+> On Mon, May 10, 2010 at 7:24 PM, Nicolas Palix <npalix@diku.dk> wrote:
+> > @@ -0,0 +1,94 @@
+> > +///
+> > +/// Use resource_size function on resource object
+> > +/// instead of explicit computation.
+> > +///
+> > +//  Confidence: High
+> > +//  Copyright: (C) 2009, 2010 Nicolas Palix, DIKU.  GPLv2.
+> > +//  Copyright: (C) 2009, 2010 Julia Lawall, DIKU.  GPLv2.
+> > +//  Copyright: (C) 2009, 2010 Gilles Muller, INRIA/LiP6.  GPLv2.
+> > +//  URL: http://coccinelle.lip6.fr/
+> > +//  Options:
+> > +//
+> > +//  Keywords: resource_size
+> > +//  Version min: 2.6.27 resource_size
+> 
+> I guess we don't need this versioning in mainline?
+> 
 
-Signed-off-by: Toralf Foerster <toralf.foerster@gmx.de>
----
- scripts/kconfig/streamline_config.pl |    6 +++---
- 1 files changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/scripts/kconfig/streamline_config.pl 
-b/scripts/kconfig/streamline_config.pl
-index afbd54a..574e68f 100644
---- a/scripts/kconfig/streamline_config.pl
-+++ b/scripts/kconfig/streamline_config.pl
-@@ -406,14 +406,14 @@ close(CIN);
- loop:
- foreach my $module (keys(%modules)) {
-     if (defined($objects{$module})) {
--       my @arr = @{$objects{$module}};
--       foreach my $conf (@arr) {
-+       my $arr = $objects{$module};
-+       foreach my $conf (@{$arr}) {
-            if (defined($setconfigs{$conf})) {
-                next loop;
-            }
-        }
-        print STDERR "module $module did not have configs";
--       foreach my $conf (@arr) {
-+       foreach my $conf (@{$arr}) {
-            print STDERR " " , $conf;
-        }
-        print STDERR "\n";
--- 
-1.6.4.4
+It's indeed not essential for the mainline. It's however
+helpful to document the internal APIs and will help people
+who want to (back)port this patch series on other branches,
+potentially branches forked before 2.6.27 for instance.
 
 -- 
-MfG/Sincerely
-Toralf Förster
-
-pgp finger print: 7B1A 07F4 EC82 0F90 D4C2 8936 872A E508 7DB6 9DA3
-
+Nicolas Palix
