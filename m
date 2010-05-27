@@ -1,9 +1,9 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from hrndva-omtalb.mail.rr.com ([71.74.56.125]:60731 "EHLO
+Received: from hrndva-omtalb.mail.rr.com ([71.74.56.125]:59126 "EHLO
 	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756656Ab0E0SuL (ORCPT
+	with ESMTP id S1759537Ab0E0TwJ (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 27 May 2010 14:50:11 -0400
+	Thu, 27 May 2010 15:52:09 -0400
 Subject: Re: [PATCH] streamline_config.pl: use references rather than
  copied data structures
 From: Steven Rostedt <rostedt@goodmis.org>
@@ -13,8 +13,8 @@ References: <201005271342.09066.toralf.foerster@gmx.de>
 	 <1274965649.22648.263.camel@gandalf.stny.rr.com>
 	 <201005271624.44746.toralf.foerster@gmx.de>
 Content-Type: text/plain; charset="ISO-8859-15"
-Date: Thu, 27 May 2010 14:50:07 -0400
-Message-ID: <1274986207.22648.268.camel@gandalf.stny.rr.com>
+Date: Thu, 27 May 2010 15:52:06 -0400
+Message-ID: <1274989926.22648.281.camel@gandalf.stny.rr.com>
 Mime-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -23,8 +23,6 @@ To: Toralf =?ISO-8859-1?Q?F=F6rster?= <toralf.foerster@gmx.de>
 Cc: zippel@linux-m68k.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
 On Thu, 2010-05-27 at 16:24 +0200, Toralf Förster wrote:
-> Steven Rostedt wrote at 15:07:29
-> > On Thu, 2010-05-27 at 13:42 +0200, Toralf Förster wrote:
 
 > Understood and accepted.
 > 
@@ -32,7 +30,11 @@ On Thu, 2010-05-27 at 16:24 +0200, Toralf Förster wrote:
 > prevent a possible trap) ? :
 > 
 
-OK, this is better :-)
+Can you make a proper patch out of this (with signed-off-by as well).
+Also your patches have major whitespace damage. Could you fix your mail
+client.
+
+Thanks,
 
 -- Steve
 
