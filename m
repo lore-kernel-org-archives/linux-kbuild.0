@@ -1,38 +1,51 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from 8bytes.org ([88.198.83.132]:40853 "EHLO 8bytes.org"
+Received: from 8bytes.org ([88.198.83.132]:39719 "EHLO 8bytes.org"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754121Ab0E1HJW (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 28 May 2010 03:09:22 -0400
-Date: Fri, 28 May 2010 09:09:21 +0200
+	id S1752775Ab0E1HMW (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 28 May 2010 03:12:22 -0400
+Date: Fri, 28 May 2010 09:04:01 +0200
 From: Joerg Roedel <joro@8bytes.org>
-Subject: Re: [PATCH 0/4] Add a Coccinelle front-end script
-Message-ID: <20100528070921.GK1237@8bytes.org>
-References: <1273508667-5152-1-git-send-email-npalix@diku.dk>
+Subject: Re: [PATCH 1/4] Add targets to use the Coccinelle checker
+Message-ID: <20100528070401.GJ1237@8bytes.org>
+References: <1273508667-5152-1-git-send-email-npalix@diku.dk> <1273508667-5152-2-git-send-email-npalix@diku.dk> <20100512064230.GC5718@cr0.nay.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <1273508667-5152-1-git-send-email-npalix@diku.dk>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20100512064230.GC5718@cr0.nay.redhat.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nicolas Palix <npalix@diku.dk>
-Cc: Randy Dunlap <rdunlap@xenotime.net>, Roland Dreier <rdreier@cisco.com>, Joe Perches <joe@perches.com>, Andrew Morton <akpm@linux-foundation.org>, "David S. Miller" <davem@davemloft.net>, Michal Marek <mmarek@suse.cz>, Sam Ravnborg <sam@ravnborg.org>, Julia Lawall <julia@diku.dk>, Gilles Muller <Gilles.Muller@lip6.fr>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, cocci@diku.dk, Wolfram Sang <w.sang@pengutronix.de>, Kernel Janitors <kernel-janitors@vger.kernel.org>
+To: =?iso-8859-1?Q?Am=E9rico?= Wang <xiyou.wangcong@gmail.com>
+Cc: Nicolas Palix <npalix@diku.dk>, Randy Dunlap <rdunlap@xenotime.net>, Roland Dreier <rdreier@cisco.com>, Joe Perches <joe@perches.com>, Andrew Morton <akpm@linux-foundation.org>, "David S. Miller" <davem@davemloft.net>, Michal Marek <mmarek@suse.cz>, Sam Ravnborg <sam@ravnborg.org>, Julia Lawall <julia@diku.dk>, Gilles Muller <Gilles.Muller@lip6.fr>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, cocci@diku.dk, Wolfram Sang <w.sang@pengutronix.de>, Kernel Janitors <kernel-janitors@vger.kernel.org>
 
-On Mon, May 10, 2010 at 06:24:23PM +0200, Nicolas Palix wrote:
-> Three semantic patches, with a low rate of false positives, are also
-> included.
+On Wed, May 12, 2010 at 02:42:30PM +0800, Américo Wang wrote:
+> On Mon, May 10, 2010 at 06:24:24PM +0200, Nicolas Palix wrote:
+> >Four targets are added. Each one generates a different
+> >output kind: context, patch, org, report.
+> >Every SmPL file in 'scripts/coccinelle' is given to the spatch frontend
+> >(located in the 'scripts' directory), and applied to the entire
+> >source tree.
+> >
+> >Signed-off-by: Nicolas Palix <npalix@diku.dk>
+> >Signed-off-by: Julia Lawall <julia@diku.dk>
+> 
+> This is great!
 
-Is there a way to annotate false positives so that they do not produce
-warnings over and over?
+Totally agreed.
 
-> Other semantic patches will be provided later. Note that a semantic
-> patch does not need to define all four modes. As many semantic patches
-> may be proposed later, they are organized under sub-directories of
-> 'scripts/coccinelle/'.
+> I would like to see coccinelle to be integrated with kbuild, but the
+> name 'coccicheck' is really confusing, how about 'sema_check'? Which
+> means 'semantic check'.
 
-Don't know how complex the coccinelle software itself is, but I think it
-would make sense to ship it with the kernel-sources too. That together
-with a README and everything is perfect :-)
-Thanks for the great work, this should definitly be upstream.
+I think its okay to keep coccicheck because its the name of the tool
+called. We do the same with 'make cscope'.
+But since I am a bit lazy I would prefer a shorter name, probably just
+'make cocci'?
+
+> Or we can use something like for sparse, i.e. 'make C=1' etc..
+
+Yes, this would also make sense. As a developer I could add this and
+only the code I changed is checked.
 
 	Joerg
 
