@@ -1,75 +1,38 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from hrndva-omtalb.mail.rr.com ([71.74.56.125]:59126 "EHLO
-	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1759537Ab0E0TwJ (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 27 May 2010 15:52:09 -0400
-Subject: Re: [PATCH] streamline_config.pl: use references rather than
- copied data structures
-From: Steven Rostedt <rostedt@goodmis.org>
-Reply-To: rostedt@goodmis.org
-In-Reply-To: <201005271624.44746.toralf.foerster@gmx.de>
-References: <201005271342.09066.toralf.foerster@gmx.de>
-	 <1274965649.22648.263.camel@gandalf.stny.rr.com>
-	 <201005271624.44746.toralf.foerster@gmx.de>
-Content-Type: text/plain; charset="ISO-8859-15"
-Date: Thu, 27 May 2010 15:52:06 -0400
-Message-ID: <1274989926.22648.281.camel@gandalf.stny.rr.com>
-Mime-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Received: from 8bytes.org ([88.198.83.132]:40853 "EHLO 8bytes.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754121Ab0E1HJW (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 28 May 2010 03:09:22 -0400
+Date: Fri, 28 May 2010 09:09:21 +0200
+From: Joerg Roedel <joro@8bytes.org>
+Subject: Re: [PATCH 0/4] Add a Coccinelle front-end script
+Message-ID: <20100528070921.GK1237@8bytes.org>
+References: <1273508667-5152-1-git-send-email-npalix@diku.dk>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1273508667-5152-1-git-send-email-npalix@diku.dk>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Toralf =?ISO-8859-1?Q?F=F6rster?= <toralf.foerster@gmx.de>
-Cc: zippel@linux-m68k.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Nicolas Palix <npalix@diku.dk>
+Cc: Randy Dunlap <rdunlap@xenotime.net>, Roland Dreier <rdreier@cisco.com>, Joe Perches <joe@perches.com>, Andrew Morton <akpm@linux-foundation.org>, "David S. Miller" <davem@davemloft.net>, Michal Marek <mmarek@suse.cz>, Sam Ravnborg <sam@ravnborg.org>, Julia Lawall <julia@diku.dk>, Gilles Muller <Gilles.Muller@lip6.fr>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, cocci@diku.dk, Wolfram Sang <w.sang@pengutronix.de>, Kernel Janitors <kernel-janitors@vger.kernel.org>
 
-On Thu, 2010-05-27 at 16:24 +0200, Toralf Förster wrote:
+On Mon, May 10, 2010 at 06:24:23PM +0200, Nicolas Palix wrote:
+> Three semantic patches, with a low rate of false positives, are also
+> included.
 
-> Understood and accepted.
-> 
-> What's about the following 2 snippets (a trivial typo and an attempt to 
-> prevent a possible trap) ? :
-> 
+Is there a way to annotate false positives so that they do not produce
+warnings over and over?
 
-Can you make a proper patch out of this (with signed-off-by as well).
-Also your patches have major whitespace damage. Could you fix your mail
-client.
+> Other semantic patches will be provided later. Note that a semantic
+> patch does not need to define all four modes. As many semantic patches
+> may be proposed later, they are organized under sub-directories of
+> 'scripts/coccinelle/'.
 
-Thanks,
+Don't know how complex the coccinelle software itself is, but I think it
+would make sense to ship it with the kernel-sources too. That together
+with a README and everything is perfect :-)
+Thanks for the great work, this should definitly be upstream.
 
--- Steve
-
-> 
-> diff --git a/scripts/kconfig/streamline_config.pl 
-> b/scripts/kconfig/streamline_config.pl
-> index afbd54a..3f54911 100644
-> --- a/scripts/kconfig/streamline_config.pl
-> +++ b/scripts/kconfig/streamline_config.pl
-> @@ -242,7 +242,7 @@ foreach my $makefile (@makefiles) {
->             foreach my $obj (split /\s+/,$objs) {
->                 $obj =~ s/-/_/g;
->                 if ($obj =~ /(.*)\.o$/) {
-> -                   # Objects may bes enabled by more than one config.
-> +                   # Objects may be enabled by more than one config.
->                     # Store configs in an array.
->                     my @arr;
-> 
-> 
-> 
-> diff --git a/scripts/kconfig/streamline_config.pl 
-> b/scripts/kconfig/streamline_config.pl
-> index afbd54a..9726946 100644
-> --- a/scripts/kconfig/streamline_config.pl
-> +++ b/scripts/kconfig/streamline_config.pl
-> @@ -307,7 +307,7 @@ close (LIN);
->  my %configs;
->  foreach my $module (keys(%modules)) {
->      if (defined($objects{$module})) {
-> -       @arr = @{$objects{$module}};
-> +       my @arr = @{$objects{$module}};
->         foreach my $conf (@arr) {
->             $configs{$conf} = $module;
->         }
-> 
-> 
-
+	Joerg
 
