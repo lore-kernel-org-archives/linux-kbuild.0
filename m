@@ -1,46 +1,42 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from hrndva-omtalb.mail.rr.com ([71.74.56.123]:40455 "EHLO
-	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1758332Ab0E1Orv (ORCPT
+Received: from dynamic-adsl-62-10-230-133.clienti.tiscali.it ([62.10.230.133]:2851
+	"HELO yepwqd.tiscali.it" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with SMTP id S1758897Ab0E1Pzb (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 28 May 2010 10:47:51 -0400
-Message-Id: <20100528144749.072671097@goodmis.org>
-Date: Fri, 28 May 2010 10:43:24 -0400
-From: Steven Rostedt <rostedt@goodmis.org>
-Subject: [PATCH 1/3] [PATCH 1/3] kconfig: Make a variable local in streamline_config.pl
-References: <20100528144323.232583082@goodmis.org>
-Content-Disposition: inline; filename=0001-kconfig-Make-a-variable-local-in-streamline_config.p.patch
+	Fri, 28 May 2010 11:55:31 -0400
+Message-ID: <4BFFE6E2.1030606@itasoi.com>
+Date: Fri, 28 May 2010 17:55:23 +0200
+From: Beth Atchison <shelfs@v-kool-hk.com>
+MIME-Version: 1.0
+Subject: He Day." SHARP: _Immortal Hour._ had for father one of the
+Content-Type: application/octet-stream; name="apostleship.rtf"
+Content-Transfer-Encoding: base64
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, Andrew Morton <akpm@linux-foundation.org>, linux-kbuild@vger.kernel.org, Toralf Foerster <toralf.foerster@gmx.de>
+To: Acerra Kroll <linux-kbuild@vger.kernel.org>
 
-From: Toralf Foerster <toralf.foerster@gmx.de>
-
-Proper perl requires that local variables should be declared with 'my',
-otherwise this may produce errors.
-
-Signed-off-by: Toralf Foerster <toralf.foerster@gmx.de>
-LKML-Reference: <201005281025.00358.toralf.foerster@gmx.de>
-Signed-off-by: Steven Rostedt <rostedt@goodmis.org>
----
- scripts/kconfig/streamline_config.pl |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
-
-diff --git a/scripts/kconfig/streamline_config.pl b/scripts/kconfig/streamline_config.pl
-index afbd54a..9726946 100644
---- a/scripts/kconfig/streamline_config.pl
-+++ b/scripts/kconfig/streamline_config.pl
-@@ -307,7 +307,7 @@ close (LIN);
- my %configs;
- foreach my $module (keys(%modules)) {
-     if (defined($objects{$module})) {
--	@arr = @{$objects{$module}};
-+	my @arr = @{$objects{$module}};
- 	foreach my $conf (@arr) {
- 	    $configs{$conf} = $module;
- 	}
--- 
-1.7.0
-
-
+e1xydGYxXGFuc2lcYW5zaWNwZzEyNTJcZGVmZjBcZGVmbGFuZzEwMzN7XCpcZ2VuZXJhdG9y
+IE1zZnRlZGl0IDIuNi42LjUzNTE7fXtcZm9udHRibHtcZjBcZm5pbFxmY2hhcnNldDAgQ2Fs
+aWJyaTt9fQ0Ke1wqXGdlbmVyYXRvciBNc2Z0ZWRpdCAyLjYuNi41MzUxO317XGNvbG9ydGJs
+IDtccmVkMFxncmVlbjBcYmx1ZTI1NTtccmVkMTkyXGdyZWVuODBcYmx1ZTc3O1xyZWQwXGdy
+ZWVuMTc2XGJsdWU4MDtccmVkMjA0XGdyZWVuMTgwXGJsdWUwO1xyZWQyNTVcZ3JlZW4wXGJs
+dWUwO1xyZWQyMjNcZ3JlZW4yMDZcYmx1ZTQ7XHJlZDE1NVxncmVlbjBcYmx1ZTIxMTtccmVk
+NzlcZ3JlZW4xMjlcYmx1ZTE4OTtccmVkMTY1XGdyZWVuMTY1XGJsdWUxNjU7XHJlZDEyOFxn
+cmVlbjE1OFxibHVlMTk0O1xyZWQyNDdcZ3JlZW4xNTBcYmx1ZTcwO1xyZWQwXGdyZWVuNzdc
+Ymx1ZTE4NztccmVkNzVcZ3JlZW4xNzJcYmx1ZTE5ODtccmVkMjIxXGdyZWVuMTMyXGJsdWUx
+MzI7XHJlZDUxXGdyZWVuNTFcYmx1ZTUxO1xyZWQxNThcZ3JlZW4xMjRcYmx1ZTEyNDtccmVk
+MTU1XGdyZWVuMTg3XGJsdWU4OTt9DQp7XCpcZ2VuZXJhdG9yIE1zZnRlZGl0IDIuNi42LjUz
+NTE7fVx2aWV3a2luZDRcdWMxXHBhcmRcc2EyMDBcc2wyNzZcc2xtdWx0MVxsYW5nOVxmMFxm
+czMye1xmaWVsZHtcKlxmbGRpbnN0e0hZUEVSTElOSyAiaHtcKlxkZCAyLjYuNi41MzUxO310
+dHA6Ly93d3cubWE5NS5ydSJ9fXtcZmxkcnNsdHtcdWxcY2YxIGh0dHA6Ly93d3cubWE5NS5y
+dX19fVxmMFxjZjFcYlxmczMyICAtIE9yZGVyIHRoZSBjaGVhcGVzdCBtZWRpY2F0aW9ucyBu
+b3chXHBhcg0KVmlhZ3JhIFxjZjQgQ2lhbGlzIFxjZjMgVmlhZ3JhIFByb2Zlc3Npb25hbCBc
+Y2Y1IENpYWxpcyBQcm9mZXNzaW9uYWwgXGNmNiBWaWFncmEgU3VwZXIgQWN0aXZlKyBcY2Yz
+IENpYWxpcyBTdXBlciBBY3RpdmUrIFxjZjcgTGV2aXRyYVxjZjAgIFxjZjggVmlhZ3JhIFNv
+ZnQgVGFicyBcY2Y5IENpYWxpcyBTb2Z0IFRhYnNcY2YxMCAgXGNmMTEgTGV2aXRyYSBQcm9m
+ZXNzaW9uYWwgXGNmNCBGZW1hbGUgVmlhZ3JhIFxjZjEyIFByb3BlY2lhIFxjZjcgQWNvbXBs
+aWEgXGNmNiBYZW5pY2FsXGNmMCAgXGNmNSBCcmFuZCBMZXZpdHJhIFxjZjEzIEZlbWFsZSBD
+aWFsaXMgXGNmMTQgTGV2aXRyYSBTdXBlciBBY3RpdmUrIFxjZjE1IFRhbWlmbHVcY2YwICBc
+Y2Y3IFZQWExcY2YwICBcY2YxNiBWaWFncmEgU29mdCBGbGF2b3VyZWQgXGNmNSBCcmFuZCBW
+aWFncmEgXGNmMTcgQnJhbmQgQ2lhbGlzXGNmMA0Ke1wqXGdlbmVyYXRvciBNc2Z0ZWRpdCAy
+LjYuNi41MzUxO319
