@@ -1,34 +1,59 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from hrndva-omtalb.mail.rr.com ([71.74.56.124]:33944 "EHLO
+Received: from hrndva-omtalb.mail.rr.com ([71.74.56.122]:56543 "EHLO
 	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757490Ab0E1Oru (ORCPT
+	with ESMTP id S1758329Ab0E1Oru (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
 	Fri, 28 May 2010 10:47:50 -0400
-Message-Id: <20100528144323.232583082@goodmis.org>
-Date: Fri, 28 May 2010 10:43:23 -0400
+Message-Id: <20100528144749.537275730@goodmis.org>
+Date: Fri, 28 May 2010 10:43:26 -0400
 From: Steven Rostedt <rostedt@goodmis.org>
-Subject: [PATCH 0/3] [GIT PULL] kconfig: minor updates to streamline_config.pl
+Subject: [PATCH 3/3] [PATCH 3/3] kconfig: Hide error output in find command in streamline_config.pl
+References: <20100528144323.232583082@goodmis.org>
+Content-Disposition: inline; filename=0003-kconfig-Hide-error-output-in-find-command-in-streaml.patch
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, Andrew Morton <akpm@linux-foundation.org>, linux-kbuild@vger.kernel.org
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, Andrew Morton <akpm@linux-foundation.org>, linux-kbuild@vger.kernel.org, Toralf Foerster <toralf.foerster@gmx.de>
 
-Linus,
+From: =?UTF-8?q?Toralf=20F=C3=B6rster?= <toralf.foerster@gmx.de>
 
-These are minor updates for the streamline_config.pl script.
+Finding the list of Makefiles in streamline-config should not report errors.
 
-Please pull the latest for-linus tree, which can be found at:
+Also move the "chomp" to the @makefiles array instead of doing it in the
+for loop. This is more efficient, and does not make it any less readable
+by C programmers.
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/rostedt/linux-2.6-kconfig.git
+Signed-off-by: Toralf Foerster <toralf.foerster@gmx.de>
+LKML-Reference: <201005262022.02928.toralf.foerster@gmx.de>
+Signed-off-by: Steven Rostedt <rostedt@goodmis.org>
+---
+ scripts/kconfig/streamline_config.pl |    5 +++--
+ 1 files changed, 3 insertions(+), 2 deletions(-)
 
-    branch: for-linus
+diff --git a/scripts/kconfig/streamline_config.pl b/scripts/kconfig/streamline_config.pl
+index 2f8bde8..c70a27d 100644
+--- a/scripts/kconfig/streamline_config.pl
++++ b/scripts/kconfig/streamline_config.pl
+@@ -115,7 +115,9 @@ my $ksource = $ARGV[0];
+ my $kconfig = $ARGV[1];
+ my $lsmod_file = $ARGV[2];
+ 
+-my @makefiles = `find $ksource -name Makefile`;
++my @makefiles = `find $ksource -name Makefile 2>/dev/null`;
++chomp @makefiles;
++
+ my %depends;
+ my %selects;
+ my %prompts;
+@@ -215,7 +217,6 @@ if ($kconfig) {
+ 
+ # Read all Makefiles to map the configs to the objects
+ foreach my $makefile (@makefiles) {
+-    chomp $makefile;
+ 
+     open(MIN,$makefile) || die "Can't open $makefile";
+     while (<MIN>) {
+-- 
+1.7.0
 
 
-Toralf Foerster (3):
-      kconfig: Make a variable local in streamline_config.pl
-      kconfig: Fix typo in comment in streamline_config.pl
-      kconfig: Hide error output in find command in streamline_config.pl
-
-----
- scripts/kconfig/streamline_config.pl |    9 +++++----
- 1 files changed, 5 insertions(+), 4 deletions(-)
