@@ -1,45 +1,48 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx01.sz.bfs.de ([194.94.69.103]:56017 "EHLO mx01.sz.bfs.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754552Ab0E1Hjf (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 28 May 2010 03:39:35 -0400
-Message-ID: <4BFF7331.9080806@bfs.de>
-Date: Fri, 28 May 2010 09:39:29 +0200
-From: walter harms <wharms@bfs.de>
-Reply-To: wharms@bfs.de
+Received: from mail.gmx.net ([213.165.64.20]:38773 "HELO mail.gmx.net"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with SMTP
+	id S1756959Ab0E1IZC (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 28 May 2010 04:25:02 -0400
+From: Toralf Foerster <toralf.foerster@gmx.de>
+Subject: [PATCH] streamline_config.pl: make a variable local
+Date: Fri, 28 May 2010 10:24:59 +0200
 MIME-Version: 1.0
-Subject: Re: [PATCH 0/4] Add a Coccinelle front-end script
-References: <1273508667-5152-1-git-send-email-npalix@diku.dk> <20100528070921.GK1237@8bytes.org> <20100528072504.GB3344@pengutronix.de> <Pine.LNX.4.64.1005280931230.9138@ask.diku.dk>
-In-Reply-To: <Pine.LNX.4.64.1005280931230.9138@ask.diku.dk>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: Text/Plain;
+  charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Message-Id: <201005281025.00358.toralf.foerster@gmx.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Julia Lawall <julia@diku.dk>
-Cc: Wolfram Sang <w.sang@pengutronix.de>, Joerg Roedel <joro@8bytes.org>, Nicolas Palix <npalix@diku.dk>, Randy Dunlap <rdunlap@xenotime.net>, Roland Dreier <rdreier@cisco.com>, Joe Perches <joe@perches.com>, Andrew Morton <akpm@linux-foundation.org>, "David S. Miller" <davem@davemloft.net>, Michal Marek <mmarek@suse.cz>, Sam Ravnborg <sam@ravnborg.org>, Gilles Muller <Gilles.Muller@lip6.fr>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, cocci@diku.dk, Kernel Janitors <kernel-janitors@vger.kernel.org>
+To: Steven Rostedt <rostedt@goodmis.org>
+Cc: zippel@linux-m68k.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+
+to prevent a possible pitfall
+
+Signed-off-by: Toralf Foerster <toralf.foerster@gmx.de>
+---
+ scripts/kconfig/streamline_config.pl |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/scripts/kconfig/streamline_config.pl b/scripts/kconfig/streamline_config.pl
+index afbd54a..9726946 100644
+--- a/scripts/kconfig/streamline_config.pl
++++ b/scripts/kconfig/streamline_config.pl
+@@ -307,7 +307,7 @@ close (LIN);
+ my %configs;
+ foreach my $module (keys(%modules)) {
+     if (defined($objects{$module})) {
+-       @arr = @{$objects{$module}};
++       my @arr = @{$objects{$module}};
+        foreach my $conf (@arr) {
+            $configs{$conf} = $module;
+        }
+-- 
+1.6.4.4
 
 
+-- 
+MfG/Sincerely
+Toralf Foerster
 
-Julia Lawall schrieb:
-> On Fri, 28 May 2010, Wolfram Sang wrote:
-> 
->>> Don't know how complex the coccinelle software itself is, but I think it
->>> would make sense to ship it with the kernel-sources too. That together
->> You can easily find out by browsing the homepage of coccinelle.
-> 
-> Over 100 000 lines of code.
-> 
-> julia
-> --
-
-coccinelle is a great programm and should have its own repository.
-I don not thing thats a clever idea to integrate it directly into
-the kernel source tree. IMHO it would hinder the development of coccinelle
-in the long term.
-
-re,
- wh
-
-
-
+pgp finger print: 7B1A 07F4 EC82 0F90 D4C2 8936 872A E508 7DB6 9DA3
 
