@@ -1,34 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from 8bytes.org ([88.198.83.132]:43042 "EHLO 8bytes.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753028Ab0E1JPV (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 28 May 2010 05:15:21 -0400
-Date: Fri, 28 May 2010 11:15:20 +0200
-From: Joerg Roedel <joro@8bytes.org>
-Subject: Re: [PATCH 0/4] Add a Coccinelle front-end script
-Message-ID: <20100528091520.GL1237@8bytes.org>
-References: <1273508667-5152-1-git-send-email-npalix@diku.dk> <20100528070921.GK1237@8bytes.org> <20100528072504.GB3344@pengutronix.de> <Pine.LNX.4.64.1005280931230.9138@ask.diku.dk>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Pine.LNX.4.64.1005280931230.9138@ask.diku.dk>
+Received: from hrndva-omtalb.mail.rr.com ([71.74.56.122]:44620 "EHLO
+	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755788Ab0E1OPh (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 28 May 2010 10:15:37 -0400
+Subject: Re: [PATCH] streamline_config.pl: make a variable local
+From: Steven Rostedt <rostedt@goodmis.org>
+Reply-To: rostedt@goodmis.org
+In-Reply-To: <201005281025.00358.toralf.foerster@gmx.de>
+References: <201005281025.00358.toralf.foerster@gmx.de>
+Content-Type: text/plain; charset="ISO-8859-15"
+Date: Fri, 28 May 2010 10:15:35 -0400
+Message-ID: <1275056135.22648.586.camel@gandalf.stny.rr.com>
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Julia Lawall <julia@diku.dk>
-Cc: Wolfram Sang <w.sang@pengutronix.de>, Nicolas Palix <npalix@diku.dk>, Randy Dunlap <rdunlap@xenotime.net>, Roland Dreier <rdreier@cisco.com>, Joe Perches <joe@perches.com>, Andrew Morton <akpm@linux-foundation.org>, "David S. Miller" <davem@davemloft.net>, Michal Marek <mmarek@suse.cz>, Sam Ravnborg <sam@ravnborg.org>, Gilles Muller <Gilles.Muller@lip6.fr>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, cocci@diku.dk, Kernel Janitors <kernel-janitors@vger.kernel.org>
+To: Toralf Foerster <toralf.foerster@gmx.de>
+Cc: zippel@linux-m68k.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Fri, May 28, 2010 at 09:31:34AM +0200, Julia Lawall wrote:
-> On Fri, 28 May 2010, Wolfram Sang wrote:
+On Fri, 2010-05-28 at 10:24 +0200, Toralf Foerster wrote:
+> to prevent a possible pitfall
 > 
-> > > Don't know how complex the coccinelle software itself is, but I think it
-> > > would make sense to ship it with the kernel-sources too. That together
-> > 
-> > You can easily find out by browsing the homepage of coccinelle.
+> Signed-off-by: Toralf Foerster <toralf.foerster@gmx.de>
+> ---
+>  scripts/kconfig/streamline_config.pl |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
 > 
-> Over 100 000 lines of code.
+> diff --git a/scripts/kconfig/streamline_config.pl b/scripts/kconfig/streamline_config.pl
+> index afbd54a..9726946 100644
+> --- a/scripts/kconfig/streamline_config.pl
+> +++ b/scripts/kconfig/streamline_config.pl
+> @@ -307,7 +307,7 @@ close (LIN);
+>  my %configs;
+>  foreach my $module (keys(%modules)) {
+>      if (defined($objects{$module})) {
+> -       @arr = @{$objects{$module}};
+> +       my @arr = @{$objects{$module}};
 
-I just noticed that distributions already ship it in their repositories.
-So this its okay to keep it outside the kernel sources.
 
-	Joerg
+Either your mail client, or the method you use to get these into your
+mail is causing whitespace issues. There are tabs here that your patch
+has converted into spaces, causing the patch to fail to apply.
+
+I've fixed it up, but please fix this before sending more patches.
+
+-- Steve
+
+>         foreach my $conf (@arr) {
+>             $configs{$conf} = $module;
+>         }
+> -- 
+> 1.6.4.4
+> 
+> 
+
 
