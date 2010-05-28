@@ -1,58 +1,34 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from hrndva-omtalb.mail.rr.com ([71.74.56.122]:44620 "EHLO
+Received: from hrndva-omtalb.mail.rr.com ([71.74.56.124]:33944 "EHLO
 	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755788Ab0E1OPh (ORCPT
+	with ESMTP id S1757490Ab0E1Oru (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 28 May 2010 10:15:37 -0400
-Subject: Re: [PATCH] streamline_config.pl: make a variable local
+	Fri, 28 May 2010 10:47:50 -0400
+Message-Id: <20100528144323.232583082@goodmis.org>
+Date: Fri, 28 May 2010 10:43:23 -0400
 From: Steven Rostedt <rostedt@goodmis.org>
-Reply-To: rostedt@goodmis.org
-In-Reply-To: <201005281025.00358.toralf.foerster@gmx.de>
-References: <201005281025.00358.toralf.foerster@gmx.de>
-Content-Type: text/plain; charset="ISO-8859-15"
-Date: Fri, 28 May 2010 10:15:35 -0400
-Message-ID: <1275056135.22648.586.camel@gandalf.stny.rr.com>
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Subject: [PATCH 0/3] [GIT PULL] kconfig: minor updates to streamline_config.pl
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Toralf Foerster <toralf.foerster@gmx.de>
-Cc: zippel@linux-m68k.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: linux-kernel@vger.kernel.org
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, Andrew Morton <akpm@linux-foundation.org>, linux-kbuild@vger.kernel.org
 
-On Fri, 2010-05-28 at 10:24 +0200, Toralf Foerster wrote:
-> to prevent a possible pitfall
-> 
-> Signed-off-by: Toralf Foerster <toralf.foerster@gmx.de>
-> ---
->  scripts/kconfig/streamline_config.pl |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
-> 
-> diff --git a/scripts/kconfig/streamline_config.pl b/scripts/kconfig/streamline_config.pl
-> index afbd54a..9726946 100644
-> --- a/scripts/kconfig/streamline_config.pl
-> +++ b/scripts/kconfig/streamline_config.pl
-> @@ -307,7 +307,7 @@ close (LIN);
->  my %configs;
->  foreach my $module (keys(%modules)) {
->      if (defined($objects{$module})) {
-> -       @arr = @{$objects{$module}};
-> +       my @arr = @{$objects{$module}};
+Linus,
+
+These are minor updates for the streamline_config.pl script.
+
+Please pull the latest for-linus tree, which can be found at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/rostedt/linux-2.6-kconfig.git
+
+    branch: for-linus
 
 
-Either your mail client, or the method you use to get these into your
-mail is causing whitespace issues. There are tabs here that your patch
-has converted into spaces, causing the patch to fail to apply.
+Toralf Foerster (3):
+      kconfig: Make a variable local in streamline_config.pl
+      kconfig: Fix typo in comment in streamline_config.pl
+      kconfig: Hide error output in find command in streamline_config.pl
 
-I've fixed it up, but please fix this before sending more patches.
-
--- Steve
-
->         foreach my $conf (@arr) {
->             $configs{$conf} = $module;
->         }
-> -- 
-> 1.6.4.4
-> 
-> 
-
-
+----
+ scripts/kconfig/streamline_config.pl |    9 +++++----
+ 1 files changed, 5 insertions(+), 4 deletions(-)
