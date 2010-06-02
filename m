@@ -1,55 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor.suse.de ([195.135.220.2]:39474 "EHLO mx1.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:59475 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752416Ab0FATzg (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 1 Jun 2010 15:55:36 -0400
-Message-ID: <4C0565AC.8020205@suse.cz>
-Date: Tue, 01 Jun 2010 21:55:24 +0200
+	id S1751759Ab0FBMoh (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 2 Jun 2010 08:44:37 -0400
+Message-ID: <4C065232.7000501@suse.cz>
+Date: Wed, 02 Jun 2010 14:44:34 +0200
 From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Subject: Re: [GIT] kbuild changes for 2.6.35
-References: <20100527144459.GA14513@sepie.suse.cz> <alpine.LFD.2.00.1005300921000.4639@i5.linux-foundation.org> <20100531120223.GA11700@sepie.suse.cz> <alpine.LFD.2.00.1006010823080.3637@i5.linux-foundation.org>
-In-Reply-To: <alpine.LFD.2.00.1006010823080.3637@i5.linux-foundation.org>
+Subject: Re: [PATCH] kconfig: introduce nonint_oldconfig and	loose_nonint_oldconfig
+ (v3)
+References: <20100413194747.GX31193@redhat.com> <20100413130031.d4dec19b.randy.dunlap@oracle.com> <20100413201759.GY31193@redhat.com> <4BC4D310.6060705@oracle.com> <20100413210352.GA31193@redhat.com> <4BC5C190.3020501@suse.cz> <20100506164834.GL20778@redhat.com>
+In-Reply-To: <20100506164834.GL20778@redhat.com>
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, a.beregalov@gmail.com, andi@firstfloor.org, dzickus@redhat.com, fejes@joco.name, g.liakhovetski@gmx.de, gthelen@google.com, hschauhan@nulltrace.org, hui.zhu@windriver.com, jan3sobi3ski@gmail.com, jay@goldhive.com, jgunthorpe@obsidianresearch.com, jkacur@redhat.com, joe@perches.com, kirr@mns.spb.ru, lizf@cn.fujitsu.com, nir.tzachar@gmail.com, rabin@rab.in, rientjes@google.com, roland@redhat.com, saalwaechter@gmail.com, shemminger@vyatta.com, tabbott@ksplice.com, u.kleine-koenig@pengutronix.de, vbendeb@google.com, vda.linux@googlemail.com, wuzhangjin@gmail.com, xt28@gmx.de
+To: Aristeu Rozanski <aris@redhat.com>
+Cc: Randy Dunlap <randy.dunlap@oracle.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, davej@redhat.com, kyle@redhat.com, vgoyal@redhat.com, arjan@linux.intel.com
 
-On 1.6.2010 17:32, Linus Torvalds wrote:
-> No, the commits themselves are likely fine, although for the future it 
-> really would be good to make things like that more descriptive. I just 
-> want people to try to argue for _why_ I should do a pull, and _what_ I'm 
-> getting in their "please pull" thing.
+On 6.5.2010 18:48, Aristeu Rozanski wrote:
+> This patch has been around for a long time in Fedora and Red Hat Enterprise
+> Linux kernels and it may be useful for others. The nonint_oldconfig target
+> will fail and print the unset config options while loose_nonint_oldconfig will
+> simply let the config option unset. They're useful in distro kernel packages
+> where the config files are built using a combination of smaller config files.
 > 
-> It's not always necessary, and some people do it better than others. For 
-> an example of a really good pull request, look at the ones David Miller 
-> sends me for networking - they explain what's going on in the pull, so 
-> it's always easy to pull them because just the request makes me feel like 
-> David is really on top of things, and lets me have some 30'000 ft overview 
-> of what's going on.
-
-OK, I'll try to do better job next time. I'm also going to use different
-branches for kbuild / kconfig / trivial stuff like .gitignore / etc from
-now on, so that you don't get a all-or-nothing pull request in the next
-merge window (something that Sam suggested).
-
-
-> At the same time, in many cases I obviously pull _without_ any kind of 
-> real explanation - and that tends to be especially true with maintainers 
-> that I've worked with for a long time, or areas that are so specialized 
-> that they are almost self-explanatory (let's be honest: when a filesystem 
-> maintainer asks me to pull their special filesystem, I'm perfectly happy 
-> with the overview of "30 changesets to XFS", and there's no need for much 
-> explanation, although a rough overview of what's been going on is always 
-> good to see).
+> Arjan van de Ven wrote the initial nonint_config and Roland McGrath added the
+> loose_nonint_oldconfig.
 > 
-> So the reason I ask for explanations for kbuild is that not only have we 
-> had different maintainers, it's an area that affects a lot of different 
-> things and has historically had issues with odd architectures or old 
-> binutils tools etc.
+> v2:
+> - when -B and -b are used, return "2" so the reason can be distinguished from
+>   other errors
+> v3:
+> - help updated
+> - nonint_oldconfig won't update the config file if options are missing
+> 
+> Signed-off-by: Arjan van de Ven <arjan@redhat.com> [defunct email]
+> Whatevered-by: Kyle McMartin <kyle@redhat.com>
+> Acked-by: Arjan van de Ven <arjan@linux.intel.com>
+> Acked-by: Randy Dunlap <randy.dunlap@oracle.com>
+> Signed-off-by: Aristeu Rozanski <aris@redhat.com>
 
-I see. Thanks a lot for pulling the changes now.
+Sorry for the delay. Applied now.
 
 Michal
