@@ -1,68 +1,88 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from moutng.kundenserver.de ([212.227.126.187]:55967 "EHLO
-	moutng.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755411Ab0FBOoy convert rfc822-to-8bit (ORCPT
+Received: from rcsinet10.oracle.com ([148.87.113.121]:44039 "EHLO
+	rcsinet10.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932812Ab0FBQvY (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 2 Jun 2010 10:44:54 -0400
-From: Thomas Weber <weber@corscience.de>
-Subject: [PATCH] scripts: confdata: Fix fwrite warning
-Date: Wed,  2 Jun 2010 16:44:19 +0200
-Message-Id: <1275489859-31874-1-git-send-email-weber@corscience.de>
+	Wed, 2 Jun 2010 12:51:24 -0400
+Message-ID: <4C068BAA.4030004@oracle.com>
+Date: Wed, 02 Jun 2010 09:49:46 -0700
+From: Randy Dunlap <randy.dunlap@oracle.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+Subject: [TEMP PATCH] Re: make ARM=arm menuconfig problem in mainline
+References: <AANLkTikC61Y9g-WbqwgGDghDSy2XtgraFSRoZYkHRGTG@mail.gmail.com>	<AANLkTilEYHVHJrj_KgF48OYCSEUcsKLi57Q_Y73d9va-@mail.gmail.com>	<20100602085748.6771e025.randy.dunlap@oracle.com> <AANLkTilpzeYVExQfLgpVmS3bPvb_h3kmWaatidekI-0r@mail.gmail.com>
+In-Reply-To: <AANLkTilpzeYVExQfLgpVmS3bPvb_h3kmWaatidekI-0r@mail.gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: zippel@linux-m68k.org
-Cc: Thomas Weber <weber@corscience.de>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Nobin Mathew <nobin.mathew@gmail.com>
+Cc: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org, Ben Dooks <ben-linux@fluff.org>
 
-I get for:
-scripts/kconfig/confdata.c:508
-scripts/kconfig/confdata.c:759
-scripts/kconfig/confdata.c:760
+On 06/02/10 09:08, Nobin Mathew wrote:
+> 
+> On Wed, Jun 2, 2010 at 9:27 PM, Randy Dunlap <randy.dunlap@oracle.com> wrote:
+>> On Wed, 2 Jun 2010 20:04:28 +0530 Nobin Mathew wrote:
+>>
+>>> adding linux-arm-kernel@lists.infradead.org
+>>>
+>>> Hi,
+>>>
+>>> The following entry creates problem in ARM System type menu. I am
+>>> using a Fedora 12 system.
+>>
+>> What kind of problem does it create?
+>> It seems to work for me (on f11, not f12).
+>> Does it have something to do with F12 specifically?
+>>
+>>
+>>> Length of bool "Samsung S3C2410, S3C2412, S3C2413, S3C2416, S3C2440,
+>>> S3C2442, S3C2443, S3C2450" is the problem. How can I fix it.
+>>
+>> Describe the problem, please.
 
-warning: ignoring return value of ‘fwrite’, declared with attribute warn_unused_result
+[please don't top-post]
 
-So check the return value and handle the error.
+> Sorry if attachments are not allowed, when I go to select ARM system
+> type(OMAP, Davinci etc), I am not seeing any entries there in the pop
+> up window. When I remove  bool "Samsung S3C2410, S3C2412, S3C2413,
+> S3C2416, S3C2440,
+>>> S3C2442, S3C2443, S3C2450"  it is working fine. I feel it is something to do with length of that string.
+> 
+> Thanks
+> Nobin
 
-Signed-off-by: Thomas Weber <weber@corscience.de>
----
- scripts/kconfig/confdata.c |   15 ++++++++++++---
- 1 files changed, 12 insertions(+), 3 deletions(-)
 
-diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
-index c4dec80..4741fea 100644
---- a/scripts/kconfig/confdata.c
-+++ b/scripts/kconfig/confdata.c
-@@ -505,7 +505,10 @@ int conf_write(const char *name)
- 				while (1) {
- 					l = strcspn(str, "\"\\");
- 					if (l) {
--						fwrite(str, l, 1, out);
-+						if (fwrite(str, l, 1, out) != 1) {
-+							fprintf(stderr, "write str failed\n");
-+							return 1;
-+						}
- 						str += l;
- 					}
- 					if (!*str)
-@@ -756,8 +759,14 @@ int conf_write_autoconf(void)
- 			while (1) {
- 				l = strcspn(str, "\"\\");
- 				if (l) {
--					fwrite(str, l, 1, out);
--					fwrite(str, l, 1, out_h);
-+					if (fwrite(str, l, 1, out) != 1) {
-+						fprintf(stderr, "write str failed\n");
-+						return 1;
-+					}
-+					if (fwrite(str, l, 1, out_h) != 1) {
-+						fprintf(stderr, "write str failed\n");
-+						return 1;
-+					}
- 					str += l;
- 				}
- 				if (!*str)
+OK, I see that now.  Well, it is some kind of problem.
+Adding cc to linux-kbuild mailing list.
+
+
+The patch below fixes the problem temporarily, but the bool string length does
+seem to be a problem.
+
+Thanks for your report.
+
 -- 
-1.7.1
+From: Randy Dunlap <randy.dunlap@oracle.com>
 
+The bool "long string" causes the choices not to be displayed,
+so temporarily change it to a shorter string until a real fix
+is found.
+
+Signed-off-by: Randy Dunlap <randy.dunlap@oracle.com>
+Reported-by: Nobin Mathew <nobin.mathew@gmail.com>
+Cc: Ben Dooks <ben-linux@fluff.org>
+---
+ arch/arm/Kconfig |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+--- linux-next-20100602.orig/arch/arm/Kconfig
++++ linux-next-20100602/arch/arm/Kconfig
+@@ -629,7 +629,7 @@ config ARCH_SA1100
+ 	  Support for StrongARM 11x0 based boards.
+ 
+ config ARCH_S3C2410
+-	bool "Samsung S3C2410, S3C2412, S3C2413, S3C2416, S3C2440, S3C2442, S3C2443, S3C2450"
++	bool "Samsung S3C24xx"
+ 	select GENERIC_GPIO
+ 	select ARCH_HAS_CPUFREQ
+ 	select HAVE_CLK
