@@ -1,66 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cn.fujitsu.com ([222.73.24.84]:55027 "EHLO song.cn.fujitsu.com"
+Received: from cn.fujitsu.com ([222.73.24.84]:64378 "EHLO song.cn.fujitsu.com"
 	rhost-flags-OK-FAIL-OK-OK) by vger.kernel.org with ESMTP
-	id S1751054Ab0FCGut (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 3 Jun 2010 02:50:49 -0400
-Message-ID: <4C07515D.9030505@cn.fujitsu.com>
-Date: Thu, 03 Jun 2010 14:53:17 +0800
+	id S1755593Ab0FCHWO (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 3 Jun 2010 03:22:14 -0400
+Message-ID: <4C0758B7.5070907@cn.fujitsu.com>
+Date: Thu, 03 Jun 2010 15:24:39 +0800
 From: Li Zefan <lizf@cn.fujitsu.com>
 MIME-Version: 1.0
-Subject: Re: [TEMP PATCH v2] Re: make ARM=arm menuconfig problem in mainline
-References: <AANLkTikC61Y9g-WbqwgGDghDSy2XtgraFSRoZYkHRGTG@mail.gmail.com> <AANLkTilEYHVHJrj_KgF48OYCSEUcsKLi57Q_Y73d9va-@mail.gmail.com> <20100602085748.6771e025.randy.dunlap@oracle.com> <AANLkTilpzeYVExQfLgpVmS3bPvb_h3kmWaatidekI-0r@mail.gmail.com> <4C068BAA.4030004@oracle.com> <20100603002526.GV4720@trinity.fluff.org> <4C07017A.50007@oracle.com>
-In-Reply-To: <4C07017A.50007@oracle.com>
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: [PATCH 1/2] menuconfig: fix to center checklist correctly in a corner
+ case
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Randy Dunlap <randy.dunlap@oracle.com>
-Cc: Ben Dooks <ben-linux@fluff.org>, Nobin Mathew <nobin.mathew@gmail.com>, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>
+Cc: Randy Dunlap <randy.dunlap@oracle.com>, Nobin Mathew <nobin.mathew@gmail.com>, Ben Dooks <ben-linux@fluff.org>, LKML <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 
-Randy Dunlap wrote:
-> On 06/02/10 17:25, Ben Dooks wrote:
->> On Wed, Jun 02, 2010 at 09:49:46AM -0700, Randy Dunlap wrote:
->>> On 06/02/10 09:08, Nobin Mathew wrote:
->>>> On Wed, Jun 2, 2010 at 9:27 PM, Randy Dunlap <randy.dunlap@oracle.com> wrote:
->>>>> On Wed, 2 Jun 2010 20:04:28 +0530 Nobin Mathew wrote:
->>>>>
->>>>>> adding linux-arm-kernel@lists.infradead.org
->>>>>>
->>>>>> Hi,
->>>>>>
->>>>>> The following entry creates problem in ARM System type menu. I am
->>>>>> using a Fedora 12 system.
->>>>> What kind of problem does it create?
->>>>> It seems to work for me (on f11, not f12).
->>>>> Does it have something to do with F12 specifically?
->>>>>
->>>>>
->>>>>> Length of bool "Samsung S3C2410, S3C2412, S3C2413, S3C2416, S3C2440,
->>>>>> S3C2442, S3C2443, S3C2450" is the problem. How can I fix it.
->>>>> Describe the problem, please.
->>> [please don't top-post]
->>
->> I can think of several solutions, the first being to remove the S3C prefix
->> friom all these.
->>
->> S3C24XX is not acceptable, there's S3C series that are either too old to
->> be bothered with, or don't fit under this architecture.
-> 
-> and not in the current kernel tree?
-> I did not find any others in the current tree....
-> 
->> how about Samsung S3C: 2410,2412/3,2416,2440/2442,2443,2450
-> 
-> OK, that works.
-> 
-> For kbuild/kconfig people:  run:
-> make ARCH=arm O=test menuconfig
-> 
-> and then select System Type & ARM system type.  The kconfig "choice" menu at this
-> point looks empty.  It seems to be just a text windowing/display problem.
-> Pressing the down/up arrow keys will display the choices, although not where they
-> should be displayed in the rectangle, and they can be selected there.
-> 
+Run:
+	make ARCH=arm menuconfig
 
-I've found out the cause of this bug, and I'll cook up a patch soon. ;)
+And then select "System Type" -> "ARM system type". The kconfig
+"choice" menu at this point looks empty.
+
+It's because config ARCH_S3C2410 has a long prompt:
+
+config ARCH_S3C2410
+        bool "Samsung S3C2410, S3C2412, S3C2413, S3C2416, S3C2440, S3C2442, S3C2443, S3C2450"
+	...
+
+menuconfig centers the checklist according to this prompt without
+considering the width of the list, and then things get wrong.
+
+Reported-by: Nobin Mathew <nobin.mathew@gmail.com>
+Signed-off-by: Li Zefan <lizf@cn.fujitsu.com>
+---
+
+Please queue these 2 patches for 2.6.35.
+
+---
+ scripts/kconfig/lxdialog/checklist.c |    1 +
+ 1 files changed, 1 insertions(+), 0 deletions(-)
+
+diff --git a/scripts/kconfig/lxdialog/checklist.c b/scripts/kconfig/lxdialog/checklist.c
+index bcc6f19..c92a05a 100644
+--- a/scripts/kconfig/lxdialog/checklist.c
++++ b/scripts/kconfig/lxdialog/checklist.c
+@@ -175,6 +175,7 @@ do_resize:
+ 	check_x = 0;
+ 	item_foreach()
+ 		check_x = MAX(check_x, strlen(item_str()) + 4);
++	check_x = MIN(check_x, list_width);
+ 
+ 	check_x = (list_width - check_x) / 2;
+ 	item_x = check_x + 4;
+-- 
+1.6.3
 
