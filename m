@@ -1,38 +1,81 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor.suse.de ([195.135.220.2]:56771 "EHLO mx1.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755655Ab0FDNqt (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 4 Jun 2010 09:46:49 -0400
-Date: Fri, 4 Jun 2010 15:46:47 +0200
-From: Michal Marek <mmarek@suse.cz>
-Subject: [GIT] kbuild fix
-Message-ID: <20100604134647.GA10031@sepie.suse.cz>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Received: from smtp1.linux-foundation.org ([140.211.169.13]:47248 "EHLO
+	smtp1.linux-foundation.org" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1757133Ab0FDWQd (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 4 Jun 2010 18:16:33 -0400
+Date: Fri, 4 Jun 2010 15:16:13 -0700
+From: Andrew Morton <akpm@linux-foundation.org>
+Subject: Re: [PATCH] scripts: confdata: Fix fwrite warning
+Message-Id: <20100604151613.2594bf7c.akpm@linux-foundation.org>
+In-Reply-To: <1275489859-31874-1-git-send-email-weber@corscience.de>
+References: <1275489859-31874-1-git-send-email-weber@corscience.de>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: richard@rsk.demon.co.uk, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Thomas Weber <weber@corscience.de>
+Cc: zippel@linux-m68k.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Hi Linus,
+On Wed,  2 Jun 2010 16:44:19 +0200
+Thomas Weber <weber@corscience.de> wrote:
 
-There is a oneliner fix for 'make gconfig' on recent Fedora. Technically
-it's not a 2.6.35-rc1 regression, it is caused by newer gtk2 or
-something, but it's a safe fix to include.
+> I get for:
+> scripts/kconfig/confdata.c:508
+> scripts/kconfig/confdata.c:759
+> scripts/kconfig/confdata.c:760
+> 
+> warning: ignoring return value of ___fwrite___, declared with attribute warn_unused_result
+> 
+> So check the return value and handle the error.
+> 
+> Signed-off-by: Thomas Weber <weber@corscience.de>
+> ---
+>  scripts/kconfig/confdata.c |   15 ++++++++++++---
+>  1 files changed, 12 insertions(+), 3 deletions(-)
+> 
+> diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
+> index c4dec80..4741fea 100644
+> --- a/scripts/kconfig/confdata.c
+> +++ b/scripts/kconfig/confdata.c
+> @@ -505,7 +505,10 @@ int conf_write(const char *name)
+>  				while (1) {
+>  					l = strcspn(str, "\"\\");
+>  					if (l) {
+> -						fwrite(str, l, 1, out);
+> +						if (fwrite(str, l, 1, out) != 1) {
+> +							fprintf(stderr, "write str failed\n");
+> +							return 1;
+> +						}
 
-Thanks,
-Michal
+Missing an fclose(out), although that probably doesn't matter a lot in
+practice
 
-The following changes since commit 67a3e12b05e055c0415c556a315a3d3eb637e29e:
+Also, we prefer to avoid putting `return' statements deep inside large
+C functions as they can easily lead to resource leaks.  Such as
+forgetting to fclose(out) ;)
 
-  Linux 2.6.35-rc1 (2010-05-30 13:21:02 -0700)
+>  						str += l;
+>  					}
+>  					if (!*str)
+> @@ -756,8 +759,14 @@ int conf_write_autoconf(void)
+>  			while (1) {
+>  				l = strcspn(str, "\"\\");
+>  				if (l) {
+> -					fwrite(str, l, 1, out);
+> -					fwrite(str, l, 1, out_h);
+> +					if (fwrite(str, l, 1, out) != 1) {
+> +						fprintf(stderr, "write str failed\n");
+> +						return 1;
+> +					}
+> +					if (fwrite(str, l, 1, out_h) != 1) {
+> +						fprintf(stderr, "write str failed\n");
+> +						return 1;
+> +					}
 
-are available in the git repository at:
-  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild-2.6.git rc-fixes
+Dittoes.
 
-Richard Kennedy (1):
-      gconfig: fix build failure on fedora 13
+Also, this patch would be neater if it added a little helper function
+around fwrite(), rather than triplicating the same code sequence.
 
- scripts/kconfig/Makefile |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
