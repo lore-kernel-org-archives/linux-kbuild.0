@@ -1,12 +1,12 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mgw1.diku.dk ([130.225.96.91]:38538 "EHLO mgw1.diku.dk"
+Received: from mgw2.diku.dk ([130.225.96.92]:51333 "EHLO mgw2.diku.dk"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1758002Ab0FFPPb (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 6 Jun 2010 11:15:31 -0400
+	id S1757942Ab0FFPPY (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 6 Jun 2010 11:15:24 -0400
 From: Nicolas Palix <npalix@diku.dk>
-Subject: [PATCH 4/7] Add scripts/coccinelle/alloc/kzalloc-simple.cocci
-Date: Sun,  6 Jun 2010 17:15:04 +0200
-Message-Id: <1275837307-4283-5-git-send-email-npalix@diku.dk>
+Subject: [PATCH 1/7] Add a target to use the Coccinelle checker
+Date: Sun,  6 Jun 2010 17:15:01 +0200
+Message-Id: <1275837307-4283-2-git-send-email-npalix@diku.dk>
 In-Reply-To: <1275837307-4283-1-git-send-email-npalix@diku.dk>
 References: <1275837307-4283-1-git-send-email-npalix@diku.dk>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -14,106 +14,164 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: Randy Dunlap <rdunlap@xenotime.net>, Roland Dreier <rdreier@cisco.com>, Joe Perches <joe@perches.com>, Andrew Morton <akpm@linux-foundation.org>, "David S. Miller" <davem@davemloft.net>, Michal Marek <mmarek@suse.cz>, Sam Ravnborg <sam@ravnborg.org>, Julia Lawall <julia@diku.dk>, Gilles Muller <Gilles.Muller@lip6.fr>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, cocci@diku.dk, Wolfram Sang <w.sang@pengutronix.de>, Kernel Janitors <kernel-janitors@vger.kernel.org>, =?UTF-8?q?Am=C3=A9rico=20Wang?= <xiyou.wangcong@gmail.com>, Andy Isaacson <adi@hexapodia.org>, Linus Torvalds <torvalds@linux-foundation.org>, Pekka Enberg <penberg@cs.helsinki.fi>, walter harms <wharms@bfs.de>, Joerg Roedel <joro@8bytes.org>, Jan Engelhardt <jengelh@medozas.de>
 Cc: Nicolas Palix <npalix@diku.dk>
 
-This semantic patch replaces a pair of calls to kmalloc and memset
-by a single call to kzalloc.
+A 'coccicheck' target is added. It can be called with four different
+modes. Each one generates a different kind of output, i.e. context,
+patch, org, report, according to the corresponding mode to be
+activated.
 
-It only looks for simple cases to avoid false positives.
+The new target calls the 'coccicheck' front-end in the 'scripts'
+directory with the MODE argument. Every SmPL file in the
+subdirectories of 'scripts/coccinelle' is then given to the front-end
+and applied to the entire source tree.
+
+The four modes behave as follows:
+
+'report' generates a list in the following format:
+  file:line:column-column: message
+
+'patch' proposes a fix, when possible.
+
+'context' highlights lines of interest and their context in a
+diff-like style. Lines of interest are indicated with '-'.
+
+'org' generates a report in the Org mode format of Emacs.
 
 Signed-off-by: Nicolas Palix <npalix@diku.dk>
 Signed-off-by: Julia Lawall <julia@diku.dk>
 ---
- scripts/coccinelle/alloc/kzalloc-simple.cocci |   82 +++++++++++++++++++++++++
- 1 files changed, 82 insertions(+), 0 deletions(-)
- create mode 100644 scripts/coccinelle/alloc/kzalloc-simple.cocci
+ MAINTAINERS           |   10 +++++++++
+ Makefile              |   10 ++++++--
+ scripts/Makefile.help |    3 ++
+ scripts/coccicheck    |   54 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 74 insertions(+), 3 deletions(-)
+ create mode 100644 scripts/Makefile.help
+ create mode 100755 scripts/coccicheck
 
-diff --git a/scripts/coccinelle/alloc/kzalloc-simple.cocci b/scripts/coccinelle/alloc/kzalloc-simple.cocci
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 67accd7..5b3c95e 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1569,6 +1569,16 @@ L:	platform-driver-x86@vger.kernel.org
+ S:	Supported
+ F:	drivers/platform/x86/classmate-laptop.c
+ 
++COCCINELLE/Semantic Patches (SmPL)
++M:	Julia Lawall <julia@diku.dk>
++M:	Gilles Muller <Gilles.Muller@lip6.fr>
++M:	Nicolas Palix <npalix@diku.dk>
++L:	cocci@diku.dk (moderated for non-subscribers)
++W:	http://coccinelle.lip6.fr/
++S:	Supported
++F:	scripts/coccinelle/
++F:	scripts/coccicheck
++
+ CODA FILE SYSTEM
+ M:	Jan Harkes <jaharkes@cs.cmu.edu>
+ M:	coda@cs.cmu.edu
+diff --git a/Makefile b/Makefile
+index 654c31a..09d9d08 100644
+--- a/Makefile
++++ b/Makefile
+@@ -412,7 +412,7 @@ endif
+ # of make so .config is not included in this case either (for *config).
+ 
+ no-dot-config-targets := clean mrproper distclean \
+-			 cscope TAGS tags help %docs check% \
++			 cscope TAGS tags help %docs check% coccicheck \
+ 			 include/linux/version.h headers_% \
+ 			 kernelrelease kernelversion
+ 
+@@ -1279,8 +1279,9 @@ help:
+ 	@echo  '  includecheck    - Check for duplicate included header files'
+ 	@echo  '  export_report   - List the usages of all exported symbols'
+ 	@echo  '  headers_check   - Sanity check on exported headers'
+-	@echo  '  headerdep       - Detect inclusion cycles in headers'; \
+-	 echo  ''
++	@echo  '  headerdep       - Detect inclusion cycles in headers'
++	@$(MAKE) -f $(srctree)/scripts/Makefile.help checker-help
++	@echo  ''
+ 	@echo  'Kernel packaging:'
+ 	@$(MAKE) $(build)=$(package-dir) help
+ 	@echo  ''
+@@ -1439,6 +1440,9 @@ versioncheck:
+ 		-name '*.[hcS]' -type f -print | sort \
+ 		| xargs $(PERL) -w $(srctree)/scripts/checkversion.pl
+ 
++coccicheck:
++	$(Q)$(CONFIG_SHELL) $(srctree)/scripts/$@
++
+ namespacecheck:
+ 	$(PERL) $(srctree)/scripts/namespace.pl
+ 
+diff --git a/scripts/Makefile.help b/scripts/Makefile.help
 new file mode 100644
-index 0000000..2eae828
+index 0000000..d03608f
 --- /dev/null
-+++ b/scripts/coccinelle/alloc/kzalloc-simple.cocci
-@@ -0,0 +1,82 @@
-+///
-+/// kzalloc should be used rather than kmalloc followed by memset 0
-+///
-+// Confidence: High
-+// Copyright: (C) 2009-2010 Julia Lawall, Nicolas Palix, DIKU.  GPLv2.
-+// Copyright: (C) 2009-2010 Gilles Muller, INRIA/LiP6.  GPLv2.
-+// URL: http://coccinelle.lip6.fr/rules/kzalloc.html
-+// Options: -no_includes -include_headers
-+//
-+// Keywords: kmalloc, kzalloc
-+// Version min: < 2.6.12 kmalloc
-+// Version min:   2.6.14 kzalloc
-+//
++++ b/scripts/Makefile.help
+@@ -0,0 +1,3 @@
 +
-+virtual context
-+virtual patch
-+virtual org
-+virtual report
++checker-help:
++	@echo  '  coccicheck      - Check with Coccinelle.'
+diff --git a/scripts/coccicheck b/scripts/coccicheck
+new file mode 100755
+index 0000000..037424b
+--- /dev/null
++++ b/scripts/coccicheck
+@@ -0,0 +1,54 @@
++#!/bin/sh
 +
-+//----------------------------------------------------------
-+//  For context mode
-+//----------------------------------------------------------
++SPATCH="`which ${SPATCH:=spatch}`"
 +
-+@depends on context@
-+type T, T2;
-+expression x;
-+expression E1,E2;
-+statement S;
-+@@
++if [ ! -x "$SPATCH" ]; then
++    echo 'spatch is part of the Coccinelle project and is available at http://coccinelle.lip6.fr/'
++    exit 1
++fi
 +
-+* x = (T)kmalloc(E1,E2);
-+  if ((x==NULL) || ...) S
-+* memset((T2)x,0,E1);
++if [ "$MODE" = "" ] ; then
++    echo 'You have not explicitly specify the mode to use. Fallback to "report".'
++    echo 'You can specify the mode with "make coccicheck MODE=<mode>"'
++    echo 'Available modes are: report, patch, context, org'
++    MODE="report"
++fi
 +
-+//----------------------------------------------------------
-+//  For patch mode
-+//----------------------------------------------------------
++echo ''
++echo 'Please check for false positives in the output before submitting a patch.'
++echo 'When using "patch" mode, carefully review the patch before submitting it.'
++echo ''
 +
-+@depends on patch@
-+type T, T2;
-+expression x;
-+expression E1,E2;
-+statement S;
-+@@
++function coccinelle {
++    COCCI="$1"
++    DIR="$2"
 +
-+- x = (T)kmalloc(E1,E2);
-++ x = kzalloc(E1,E2);
-+  if ((x==NULL) || ...) S
-+- memset((T2)x,0,E1);
++    OPT=`grep "Option" $COCCI | cut -d':' -f2`
++    FILE=`echo $COCCI | sed "s|$DIR/||"`
 +
-+//----------------------------------------------------------
-+//  For org mode
-+//----------------------------------------------------------
++    echo "Processing `basename $COCCI` with option(s) \"$OPT\""
++    echo 'Message example to submit a patch:'
 +
-+@r depends on org || report@
-+type T, T2;
-+expression x;
-+expression E1,E2;
-+statement S;
-+position p;
-+@@
++    sed -e '/\/\/\//!d' -e 's|^///||' $COCCI
 +
-+ x = (T)kmalloc@p(E1,E2);
-+ if ((x==NULL) || ...) S
-+ memset((T2)x,0,E1);
++    echo ' The semantic patch that makes this change is available'
++    echo " in $FILE."
++    echo ''
++    echo ' More information about semantic patching is available at'
++    echo ' http://coccinelle.lip6.fr/'
++    echo ''
 +
-+@script:python depends on org@
-+p << r.p;
-+x << r.x;
-+@@
++#   The option '-parse_cocci' can be used to syntaxically check the SmPL files.
++#
++#    $SPATCH -D $MODE -very_quiet -parse_cocci $COCCI $OPT > /dev/null
 +
-+msg="%s" % (x)
-+msg_safe=msg.replace("[","@(").replace("]",")")
-+coccilib.org.print_todo(p[0], msg_safe)
++    $SPATCH -D $MODE -very_quiet -sp_file $COCCI $OPT -dir $DIR
++}
 +
-+@script:python depends on report@
-+p << r.p;
-+x << r.x;
-+@@
-+
-+msg="WARNING: kzalloc should be used for %s, instead of kmalloc/memset" % (x)
-+coccilib.report.print_report(p[0], msg)
++if [ "$COCCI" = "" ] ; then
++    for f in `find $srctree/scripts/coccinelle/ -name '*.cocci' -type f | sort`; do
++	coccinelle $f $srctree;
++    done
++else
++    coccinelle $COCCI $srctree
++fi
 -- 
 1.7.0.4
 
