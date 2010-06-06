@@ -1,94 +1,42 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mgw2.diku.dk ([130.225.96.92]:51378 "EHLO mgw2.diku.dk"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1758005Ab0FFPPd (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 6 Jun 2010 11:15:33 -0400
-From: Nicolas Palix <npalix@diku.dk>
-Subject: [PATCH 6/7] Add scripts/coccinelle/err_cast.cocci
-Date: Sun,  6 Jun 2010 17:15:06 +0200
-Message-Id: <1275837307-4283-7-git-send-email-npalix@diku.dk>
-In-Reply-To: <1275837307-4283-1-git-send-email-npalix@diku.dk>
-References: <1275837307-4283-1-git-send-email-npalix@diku.dk>
+Received: from c-76-99-194-5.hsd1.de.comcast.net ([76.99.194.5]:3216 "HELO
+	asltdw.comcast.net" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with SMTP id S1757973Ab0FFPxu (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 6 Jun 2010 11:53:50 -0400
+Message-ID: <4C0BC432.9090901@agroweb.nl>
+Date: Sun, 06 Jun 2010 11:53:51 -0400
+From: Sandoval Autaubo <demodulating@agroweb.nl>
+MIME-Version: 1.0
+Subject: Rs, "Do this in commemoration of
+Content-Type: application/octet-stream; name="geosyncline.rtf"
+Content-Transfer-Encoding: base64
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Randy Dunlap <rdunlap@xenotime.net>, Roland Dreier <rdreier@cisco.com>, Joe Perches <joe@perches.com>, Andrew Morton <akpm@linux-foundation.org>, "David S. Miller" <davem@davemloft.net>, Michal Marek <mmarek@suse.cz>, Sam Ravnborg <sam@ravnborg.org>, Julia Lawall <julia@diku.dk>, Gilles Muller <Gilles.Muller@lip6.fr>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, cocci@diku.dk, Wolfram Sang <w.sang@pengutronix.de>, Kernel Janitors <kernel-janitors@vger.kernel.org>, =?UTF-8?q?Am=C3=A9rico=20Wang?= <xiyou.wangcong@gmail.com>, Andy Isaacson <adi@hexapodia.org>, Linus Torvalds <torvalds@linux-foundation.org>, Pekka Enberg <penberg@cs.helsinki.fi>, walter harms <wharms@bfs.de>, Joerg Roedel <joro@8bytes.org>, Jan Engelhardt <jengelh@medozas.de>
-Cc: Nicolas Palix <npalix@diku.dk>
+To: Vargas Bacigalupi <linux-kbuild@vger.kernel.org>
 
-Add a Coccinelle file to use the ERR_CAST function
-
-Before the release 2.6.25, one had to use ERR_PTR(PTR_ERR(...))  to
-convert the pointer type of an error. Since then, the function
-ERR_CAST has been available for that purpose.
-
-Signed-off-by: Nicolas Palix <npalix@diku.dk>
-Signed-off-by: Julia Lawall <julia@diku.dk>
----
- scripts/coccinelle/err_cast.cocci |   56 +++++++++++++++++++++++++++++++++++++
- 1 files changed, 56 insertions(+), 0 deletions(-)
- create mode 100644 scripts/coccinelle/err_cast.cocci
-
-diff --git a/scripts/coccinelle/err_cast.cocci b/scripts/coccinelle/err_cast.cocci
-new file mode 100644
-index 0000000..2ce1150
---- /dev/null
-+++ b/scripts/coccinelle/err_cast.cocci
-@@ -0,0 +1,56 @@
-+///
-+/// Use ERR_CAST inlined function instead of ERR_PTR(PTR_ERR(...))
-+///
-+// Confidence: High
-+// Copyright: (C) 2009, 2010 Nicolas Palix, DIKU.  GPLv2.
-+// Copyright: (C) 2009, 2010 Julia Lawall, DIKU.  GPLv2.
-+// Copyright: (C) 2009, 2010 Gilles Muller, INRIA/LiP6.  GPLv2.
-+// URL: http://coccinelle.lip6.fr/
-+// Options:
-+//
-+// Keywords: ERR_PTR, PTR_ERR, ERR_CAST
-+// Version min: 2.6.25
-+//
-+
-+virtual context
-+virtual patch
-+virtual org
-+virtual report
-+
-+
-+@ depends on context && !patch && !org && !report@
-+expression x;
-+@@
-+
-+* ERR_PTR(PTR_ERR(x))
-+
-+@ depends on !context && patch && !org && !report @
-+expression x;
-+@@
-+
-+- ERR_PTR(PTR_ERR(x))
-++ ERR_CAST(x)
-+
-+@r depends on !context && !patch && (org || report)@
-+expression x;
-+position p;
-+@@
-+
-+ ERR_PTR@p(PTR_ERR(x))
-+
-+@script:python depends on org@
-+p << r.p;
-+x << r.x;
-+@@
-+
-+msg="WARNING ERR_CAST can be used with %s" % (x)
-+msg_safe=msg.replace("[","@(").replace("]",")")
-+coccilib.org.print_todo(p[0], msg_safe)
-+
-+@script:python depends on report@
-+p << r.p;
-+x << r.x;
-+@@
-+
-+msg="WARNING: ERR_CAST can be used with %s" % (x)
-+coccilib.report.print_report(p[0], msg)
--- 
-1.7.0.4
-
+e1xydGYxXGFuc2lcYW5zaWNwZzEyNTJcZGVmZjBcZGVmbGFuZzEwMzN7XCpcZ2VuZXJhdG9y
+IE1zZnRlZGl0IDUuMTguMzUuMjkyMjt9e1xmb250dGJse1xmMFxmbmlsXGZjaGFyc2V0MCBD
+YWxpYnJpO319DQp7XCpcZ2VuZXJhdG9yIE1zZnRlZGl0IDUuMTguMzUuMjkyMjt9e1xjb2xv
+cnRibCA7XHJlZDBcZ3JlZW4wXGJsdWUyNTU7XHJlZDE5MlxncmVlbjgwXGJsdWU3NztccmVk
+MFxncmVlbjE3NlxibHVlODA7XHJlZDIwNFxncmVlbjE4MFxibHVlMDtccmVkMjU1XGdyZWVu
+MFxibHVlMDtccmVkMjIzXGdyZWVuMjA2XGJsdWU0O1xyZWQxNTVcZ3JlZW4wXGJsdWUyMTE7
+XHJlZDc5XGdyZWVuMTI5XGJsdWUxODk7XHJlZDE2NVxncmVlbjE2NVxibHVlMTY1O1xyZWQx
+MjhcZ3JlZW4xNThcYmx1ZTE5NDtccmVkMjQ3XGdyZWVuMTUwXGJsdWU3MDtccmVkMFxncmVl
+bjc3XGJsdWUxODc7XHJlZDc1XGdyZWVuMTcyXGJsdWUxOTg7XHJlZDIyMVxncmVlbjEzMlxi
+bHVlMTMyO1xyZWQ1MVxncmVlbjUxXGJsdWU1MTtccmVkMTU4XGdyZWVuMTI0XGJsdWUxMjQ7
+XHJlZDE1NVxncmVlbjE4N1xibHVlODk7fQ0Ke1wqXGdlbmVyYXRvciBNc2Z0ZWRpdCA1LjE4
+LjM1LjI5MjI7fVx2aWV3a2luZDRcdWMxXHBhcmRcc2EyMDBcc2wyNzZcc2xtdWx0MVxsYW5n
+OVxmMFxmczMye1xmaWVsZHtcKlxmbGRpbnN0e0hZUEVSTElOSyAiaHtcKlxkZCA1LjE4LjM1
+LjI5MjI7fXR0cDovL3d3dy5tYTk1LnJ1In19e1xmbGRyc2x0e1x1bFxjZjEgaHR0cDovL3d3
+dy5tYTk1LnJ1fX19XGYwXGNmMVxiXGZzMzIgIC0gT3JkZXIgdGhlIGNoZWFwZXN0IG1lZGlj
+YXRpb25zIG5vdyFccGFyDQpWaWFncmEgXGNmNCBDaWFsaXMgXGNmMyBWaWFncmEgUHJvZmVz
+c2lvbmFsIFxjZjUgQ2lhbGlzIFByb2Zlc3Npb25hbCBcY2Y2IFZpYWdyYSBTdXBlciBBY3Rp
+dmUrIFxjZjMgQ2lhbGlzIFN1cGVyIEFjdGl2ZSsgXGNmNyBMZXZpdHJhXGNmMCAgXGNmOCBW
+aWFncmEgU29mdCBUYWJzIFxjZjkgQ2lhbGlzIFNvZnQgVGFic1xjZjEwICBcY2YxMSBMZXZp
+dHJhIFByb2Zlc3Npb25hbCBcY2Y0IEZlbWFsZSBWaWFncmEgXGNmMTIgUHJvcGVjaWEgXGNm
+NyBBY29tcGxpYSBcY2Y2IFhlbmljYWxcY2YwICBcY2Y1IEJyYW5kIExldml0cmEgXGNmMTMg
+RmVtYWxlIENpYWxpcyBcY2YxNCBMZXZpdHJhIFN1cGVyIEFjdGl2ZSsgXGNmMTUgVGFtaWZs
+dVxjZjAgIFxjZjcgVlBYTFxjZjAgIFxjZjE2IFZpYWdyYSBTb2Z0IEZsYXZvdXJlZCBcY2Y1
+IEJyYW5kIFZpYWdyYSBcY2YxNyBCcmFuZCBDaWFsaXNcY2YwDQp7XCpcZ2VuZXJhdG9yIE1z
+ZnRlZGl0IDUuMTguMzUuMjkyMjt9fQ==
