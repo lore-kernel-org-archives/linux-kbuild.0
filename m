@@ -1,42 +1,59 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from c-76-99-194-5.hsd1.de.comcast.net ([76.99.194.5]:3216 "HELO
-	asltdw.comcast.net" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with SMTP id S1757973Ab0FFPxu (ORCPT
+Received: from pqueueb.post.tele.dk ([193.162.153.10]:46463 "EHLO
+	pqueueb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752475Ab0FFSQb (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 6 Jun 2010 11:53:50 -0400
-Message-ID: <4C0BC432.9090901@agroweb.nl>
-Date: Sun, 06 Jun 2010 11:53:51 -0400
-From: Sandoval Autaubo <demodulating@agroweb.nl>
+	Sun, 6 Jun 2010 14:16:31 -0400
+Date: Sun, 6 Jun 2010 20:16:07 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: [PATCH 1/7] Add a target to use the Coccinelle checker
+Message-ID: <20100606181607.GA15535@merkur.ravnborg.org>
+References: <1275837307-4283-1-git-send-email-npalix@diku.dk> <1275837307-4283-2-git-send-email-npalix@diku.dk>
 MIME-Version: 1.0
-Subject: Rs, "Do this in commemoration of
-Content-Type: application/octet-stream; name="geosyncline.rtf"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1275837307-4283-2-git-send-email-npalix@diku.dk>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Vargas Bacigalupi <linux-kbuild@vger.kernel.org>
+To: Nicolas Palix <npalix@diku.dk>
+Cc: Randy Dunlap <rdunlap@xenotime.net>, Roland Dreier <rdreier@cisco.com>, Joe Perches <joe@perches.com>, Andrew Morton <akpm@linux-foundation.org>, "David S. Miller" <davem@davemloft.net>, Michal Marek <mmarek@suse.cz>, Julia Lawall <julia@diku.dk>, Gilles Muller <Gilles.Muller@lip6.fr>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, cocci@diku.dk, Wolfram Sang <w.sang@pengutronix.de>, Kernel Janitors <kernel-janitors@vger.kernel.org>, Am?rico Wang <xiyou.wangcong@gmail.com>, Andy Isaacson <adi@hexapodia.org>, Linus Torvalds <torvalds@linux-foundation.org>, Pekka Enberg <penberg@cs.helsinki.fi>, walter harms <wharms@bfs.de>, Joerg Roedel <joro@8bytes.org>, Jan Engelhardt <jengelh@medozas.de>
 
-e1xydGYxXGFuc2lcYW5zaWNwZzEyNTJcZGVmZjBcZGVmbGFuZzEwMzN7XCpcZ2VuZXJhdG9y
-IE1zZnRlZGl0IDUuMTguMzUuMjkyMjt9e1xmb250dGJse1xmMFxmbmlsXGZjaGFyc2V0MCBD
-YWxpYnJpO319DQp7XCpcZ2VuZXJhdG9yIE1zZnRlZGl0IDUuMTguMzUuMjkyMjt9e1xjb2xv
-cnRibCA7XHJlZDBcZ3JlZW4wXGJsdWUyNTU7XHJlZDE5MlxncmVlbjgwXGJsdWU3NztccmVk
-MFxncmVlbjE3NlxibHVlODA7XHJlZDIwNFxncmVlbjE4MFxibHVlMDtccmVkMjU1XGdyZWVu
-MFxibHVlMDtccmVkMjIzXGdyZWVuMjA2XGJsdWU0O1xyZWQxNTVcZ3JlZW4wXGJsdWUyMTE7
-XHJlZDc5XGdyZWVuMTI5XGJsdWUxODk7XHJlZDE2NVxncmVlbjE2NVxibHVlMTY1O1xyZWQx
-MjhcZ3JlZW4xNThcYmx1ZTE5NDtccmVkMjQ3XGdyZWVuMTUwXGJsdWU3MDtccmVkMFxncmVl
-bjc3XGJsdWUxODc7XHJlZDc1XGdyZWVuMTcyXGJsdWUxOTg7XHJlZDIyMVxncmVlbjEzMlxi
-bHVlMTMyO1xyZWQ1MVxncmVlbjUxXGJsdWU1MTtccmVkMTU4XGdyZWVuMTI0XGJsdWUxMjQ7
-XHJlZDE1NVxncmVlbjE4N1xibHVlODk7fQ0Ke1wqXGdlbmVyYXRvciBNc2Z0ZWRpdCA1LjE4
-LjM1LjI5MjI7fVx2aWV3a2luZDRcdWMxXHBhcmRcc2EyMDBcc2wyNzZcc2xtdWx0MVxsYW5n
-OVxmMFxmczMye1xmaWVsZHtcKlxmbGRpbnN0e0hZUEVSTElOSyAiaHtcKlxkZCA1LjE4LjM1
-LjI5MjI7fXR0cDovL3d3dy5tYTk1LnJ1In19e1xmbGRyc2x0e1x1bFxjZjEgaHR0cDovL3d3
-dy5tYTk1LnJ1fX19XGYwXGNmMVxiXGZzMzIgIC0gT3JkZXIgdGhlIGNoZWFwZXN0IG1lZGlj
-YXRpb25zIG5vdyFccGFyDQpWaWFncmEgXGNmNCBDaWFsaXMgXGNmMyBWaWFncmEgUHJvZmVz
-c2lvbmFsIFxjZjUgQ2lhbGlzIFByb2Zlc3Npb25hbCBcY2Y2IFZpYWdyYSBTdXBlciBBY3Rp
-dmUrIFxjZjMgQ2lhbGlzIFN1cGVyIEFjdGl2ZSsgXGNmNyBMZXZpdHJhXGNmMCAgXGNmOCBW
-aWFncmEgU29mdCBUYWJzIFxjZjkgQ2lhbGlzIFNvZnQgVGFic1xjZjEwICBcY2YxMSBMZXZp
-dHJhIFByb2Zlc3Npb25hbCBcY2Y0IEZlbWFsZSBWaWFncmEgXGNmMTIgUHJvcGVjaWEgXGNm
-NyBBY29tcGxpYSBcY2Y2IFhlbmljYWxcY2YwICBcY2Y1IEJyYW5kIExldml0cmEgXGNmMTMg
-RmVtYWxlIENpYWxpcyBcY2YxNCBMZXZpdHJhIFN1cGVyIEFjdGl2ZSsgXGNmMTUgVGFtaWZs
-dVxjZjAgIFxjZjcgVlBYTFxjZjAgIFxjZjE2IFZpYWdyYSBTb2Z0IEZsYXZvdXJlZCBcY2Y1
-IEJyYW5kIFZpYWdyYSBcY2YxNyBCcmFuZCBDaWFsaXNcY2YwDQp7XCpcZ2VuZXJhdG9yIE1z
-ZnRlZGl0IDUuMTguMzUuMjkyMjt9fQ==
+On Sun, Jun 06, 2010 at 05:15:01PM +0200, Nicolas Palix wrote:
+> A 'coccicheck' target is added. It can be called with four different
+> modes. Each one generates a different kind of output, i.e. context,
+> patch, org, report, according to the corresponding mode to be
+> activated.
+> 
+> The new target calls the 'coccicheck' front-end in the 'scripts'
+> directory with the MODE argument. Every SmPL file in the
+> subdirectories of 'scripts/coccinelle' is then given to the front-end
+> and applied to the entire source tree.
+> 
+> The four modes behave as follows:
+> 
+> 'report' generates a list in the following format:
+>   file:line:column-column: message
+> 
+> 'patch' proposes a fix, when possible.
+> 
+> 'context' highlights lines of interest and their context in a
+> diff-like style. Lines of interest are indicated with '-'.
+> 
+> 'org' generates a report in the Org mode format of Emacs.
+> 
+> Signed-off-by: Nicolas Palix <npalix@diku.dk>
+> Signed-off-by: Julia Lawall <julia@diku.dk>
+
+Hi Nicolas.
+
+This is almost what I had in mind - thanks.
+
+Most importantly it no longer add all the stuff
+to the top-level Makefile but defer this to a script.
+
+If/when we decide to move all the checkers to scripts/*
+we can do the last adjustments.
+
+Acked-by: Sam Ravnborg <sam@ravnborg.org>
+
+	Sam
