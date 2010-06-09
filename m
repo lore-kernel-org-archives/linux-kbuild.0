@@ -1,54 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:52502 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751670Ab0FGV3K (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 7 Jun 2010 17:29:10 -0400
-Message-ID: <4C0D64A2.9020701@suse.cz>
-Date: Mon, 07 Jun 2010 23:29:06 +0200
-From: Michal Marek <mmarek@suse.cz>
+Received: from [211.233.36.121] ([211.233.36.121]:32928 "EHLO mail.nstek.com"
+	rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with ESMTP
+	id S1755538Ab0FIAg1 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 8 Jun 2010 20:36:27 -0400
+Message-Id: <201006082346.o58NkhSQ008272@mail.nstek.com>
+Reply-To: <atmpayout_dept2010@yahoo.com.hk>
+From: "ATM PAYOUT ALERT 2010" <info@atm.com>
+Subject: *****IMMEDIATE PAYMENT NOTIFICATION
+Date: Wed, 9 Jun 2010 00:48:30 -0700
 MIME-Version: 1.0
-Subject: Re: [PATCH] kconfig qconf: port to QT4
-References: <1275846668-17863-1-git-send-email-alexander.stein@informatik.tu-chemnitz.de> <4C0CE9FC.60905@suse.cz> <201006071912.54313.alexander.stein@informatik.tu-chemnitz.de>
-In-Reply-To: <201006071912.54313.alexander.stein@informatik.tu-chemnitz.de>
-Content-Type: text/plain; charset=ISO-8859-2
+Content-Type: text/plain;
+	charset="Windows-1251"
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Alexander Stein <alexander.stein@informatik.tu-chemnitz.de>
-Cc: Roman Zippel <zippel@linux-m68k.org>, linux-kbuild@vger.kernel.org, lkml <linux-kernel@vger.kernel.org>
+To: linux-wireless@vger.kernel.org, linux-sh@vger.kernel.org, linux-rdma@vger.kernel.org, linux-pci@vger.kernel.org, linux-parisc@vger.kernel.org, linux-omap@vger.kernel.org, linux-media@vger.kernel.org, linux-kernel-owner@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-input@vger.kernel.org, linux-ide@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org, linux-btrfs@vger.kernel.org, linux-acpi@vger.kernel.org, lily@unitedenvirotech.com, linville@tuxdriver.com, linda.vieira@so.mnscu.edu, linux-driver@qlogic.com, linuxppc-dev@ozlabs.org, linda_alick@nps.gov, lisa.battles@mirant.com, linda.turner@microchip.com, linux-cifs-client@lists.samba.org, linux-mtd@lists.infradead.org, linux-geode@lists.infradead.org, linux-arm-kernel@lists.infradead.org, lilalola@laposte.net, lisa.f.vidonic1@jsc.nasa.gov, linell.l.rush@intel.com, lilymunster@hotmail.com, lindap@harmsco.com, lilian.aceves@gmail.com, limburg@globalxs.nl, linckens@geo.unibe.ch, lindsay.bulso@genzyme.com, linda.yenni@equivine.com, linnrandom@earthllink.net, lightrw@dow.com, linda.yung@compaq.com20larry.lo, linda.kupstis@cityofboston.gov, linda_zitzner@chemtrace.com, likelsey@charter.net, lindstadtgl@cdm.com, lindemande@cdm.com, lillsk9@ccrtc.com, linda.papenfus.b@bayer.com, lightng62@att.net, lindalewis9@aol.com
 
-On 7.6.2010 19:12, Alexander Stein wrote:
-> Hello Michal,
-> 
-> Am Montag 07 Juni 2010, 14:45:48 schrieb Michal Marek:
->> I've only very little experience with Qt 3 or 4. The patch basically
->> changes most QSomeClass to Q3SomeClass, which is the Qt3-compatible
->> wrapper around QSomeClass. Now is it possible to still support Qt3? E.g.
->> have a header file that #defines Q3SomeClass back to QSomeClass and does
->> similar with the Qt headers, would that be possible? I know that Qt4 has
->> be there for five years already, but if the cost of keeping support for
->> old userspace is not too hight, I would try it.
-> 
-> I never thought about qt3 compatibility but It seems to me that renaming the 
-> qt3 compat classes and revert the header file name changes should suffice to 
-> compile against qt3 again. But then somebody else has to do the makefile magic 
-> to support both versions. Also which version should be prefered if both are 
-> available?
-
-I'd say the Qt4 version, leaving the qt3 for those who have no other
-option (and then letting it bitrot once the last user installs Qt4 :-)).
+OUR REF:FRN/ATM/882
+YOUR REF:CLAIMS/ATM/882
 
 
->> BTW, after applying your patch, make xconfig starts ok, but clicking in
->> the main menu does nothing, and if I close the close button, it does not
->> exit, but stops reacting to any input (but it still handles window
->> resize). The qt3 version would display the "Save changes?" dialog here.
-> 
-> I can click in the window around and closing the window using the X button 
-> asks me about saving the changes. Which QT version do you use actually?
+This is to officially inform you that(ATM Card Number;(5179123456789120) has
+been accredited in your favor.Your Personal Identification  Number is 882.
+The ATM Card Value is $6.8 MILLION USD.You are advice to contact
+Mr. Jeffery Simpson via Email(atmpayout_dept2010@yahoo.com.hk) with the following
+information's; you can call on this cell# +2348060770530
 
+Full Name:
+Delivery Address:
+Phone Number:
+Country:
+OCCUPATION:
+SEX:
+Age:
 
-Strange, now it works fine. I'll play with it a bit more and then I'll
-tell you for sure.
+Please Note that you are to pay the sum of $205 USD for the delivery of your
+ATM Card by Firstflight Courier Express.
 
-Michal
+Best Regards,
+Senator David Mark.
