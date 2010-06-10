@@ -1,31 +1,76 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from 8bytes.org ([88.198.83.132]:41043 "EHLO 8bytes.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1758786Ab0FJLwI (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 10 Jun 2010 07:52:08 -0400
-Date: Thu, 10 Jun 2010 13:52:06 +0200
-From: Joerg Roedel <joro@8bytes.org>
-Subject: Re: [PATCH 0/7] Add some checks to be used with Coccinelle
-Message-ID: <20100610115205.GA8302@8bytes.org>
-References: <1275837307-4283-1-git-send-email-npalix@diku.dk>
+Received: from ksp.mff.cuni.cz ([195.113.26.206]:36453 "EHLO
+	atrey.karlin.mff.cuni.cz" rhost-flags-OK-OK-OK-FAIL)
+	by vger.kernel.org with ESMTP id S1753456Ab0FJNz1 (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 10 Jun 2010 09:55:27 -0400
+Date: Thu, 10 Jun 2010 15:55:17 +0200
+From: Pavel Machek <pavel@ucw.cz>
+Subject: Re: [ANNOUNCE] GSoC project: Improving kconfig using a SAT solver
+Message-ID: <20100610135517.GA4514@ucw.cz>
+References: <AANLkTil73ArhX2w6b_v1bmWjP1FA5zUTfPzK2N4waOu1@mail.gmail.com>
+ <87tyq63eux.fsf@basil.nowhere.org>
+ <AANLkTiktV26Xu_qXFPdTRMLe5UwWnjpqvEKitjRElF6R@mail.gmail.com>
+ <1274102511.4418.18.camel@mulgrave.site>
+ <AANLkTil9lmdG5LY2SFk3cMsPOK-gUm2diMFL_o5bT08u@mail.gmail.com>
+ <1274106526.4418.40.camel@mulgrave.site>
+ <alpine.DEB.2.01.1005172258360.27232@asgard.lang.hm>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1275837307-4283-1-git-send-email-npalix@diku.dk>
+In-Reply-To: <alpine.DEB.2.01.1005172258360.27232@asgard.lang.hm>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nicolas Palix <npalix@diku.dk>
-Cc: Randy Dunlap <rdunlap@xenotime.net>, Roland Dreier <rdreier@cisco.com>, Joe Perches <joe@perches.com>, Andrew Morton <akpm@linux-foundation.org>, "David S. Miller" <davem@davemloft.net>, Michal Marek <mmarek@suse.cz>, Sam Ravnborg <sam@ravnborg.org>, Julia Lawall <julia@diku.dk>, Gilles Muller <Gilles.Muller@lip6.fr>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, cocci@diku.dk, Wolfram Sang <w.sang@pengutronix.de>, Kernel Janitors <kernel-janitors@vger.kernel.org>, =?iso-8859-1?Q?Am=E9rico?= Wang <xiyou.wangcong@gmail.com>, Andy Isaacson <adi@hexapodia.org>, Linus Torvalds <torvalds@linux-foundation.org>, Pekka Enberg <penberg@cs.helsinki.fi>, walter harms <wharms@bfs.de>, Jan Engelhardt <jengelh@medozas.de>
+To: david@lang.hm
+Cc: James Bottomley <James.Bottomley@HansenPartnership.com>, Vegard Nossum <vegard.nossum@gmail.com>, Andi Kleen <andi@firstfloor.org>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Bart Massey <bart@cs.pdx.edu>, Michal Marek <mmarek@suse.cz>, Greg Kroah-Hartman <greg@kroah.com>, Ingo Molnar <mingo@elte.hu>
 
-On Sun, Jun 06, 2010 at 05:15:00PM +0200, Nicolas Palix wrote:
-> This patch series adds a front-end to use Coccinelle.  It also
-> includes a documentation file describing how to use the new
-> 'coccicheck' target. Finally, some SmPL examples are provided.
+Hi!
+
+> >>Even if the problem is different from zypper's, it is also here
+> >>possible to get an unsatisfiable instance. You are right that, yes,
+> >>the kconfig files on their own should always be satisfiable. But
+> >>that's before the user has made any choices at all. An example of an
+> >>unsatisfiable instance would be one where the user demands that 1.
+> >>some USB driver is enabled, while 2. USB support in general is
+> >>disabled.
+> >
+> >Actually, these are two separate problems.  The first is basic
+> >consistency within the Kconfig subsytstem (something that select
+> >currently damages for us).  The second is what to present to the user,
+> >which is where the inception of the select problem came from.  A user
+> >doesn't really want to know that USB device X depends on usb storage,
+> >SCSI and a raft of other things ... they just want it to configure a
+> >kernel that supports their device.  In particular, we don't want to
+> >present every possible option to users and then try to work out a
+> >solution, we really need guided configuration (which, in some measure,
+> >is what we have today: if you don't select general USB, you won't see
+> >any USB drivers.  Or more importantly, if you select an Adaptec SCSI
+> >card, we just enable whichever transport library it needs).
 > 
-> Signed-off-by: Nicolas Palix <npalix@diku.dk>
-> Signed-off-by: Julia Lawall <julia@diku.dk>
+> There are two modes people can be in when configuring a kernel.
+> 
+> 1. I want to configure a kernel to support my hardware, enable
+> anything else needed to make it work.
+> 
+> 2. I really care about having a small kernel, don't enable anything
+> I have disabled (but help me figure out why something I want isn't
+> available)
 
-Looks good to me. Hope we will see lot of more scripts in the future :-)
+There are more...
 
-Acked-by: Joerg Roedel <joerg.roedel@amd.com>
+...part of the problem is that kconfig is both user-dependend (what
+filesystems do I use) and machine dependend (what does hw need).
 
+Current defconfig system is unfortunately not quite there :-(.
+
+What would be nice for machines like Sharp Zaurus (spitz) would be
+defconfig which answered =Y for hardware spitz definitely has (sound),
+=N for hardware that can't be connected (anything pci), and something
+different (=M?)  for hardware that can be connected to it
+(pcmcia)... leaving 'user' options like filesystems configured ... up
+to the user.
+								Pavel
+
+-- 
+(english) http://www.livejournal.com/~pavelmachek
+(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blog.html
