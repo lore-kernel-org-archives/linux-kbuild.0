@@ -1,76 +1,40 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ksp.mff.cuni.cz ([195.113.26.206]:36453 "EHLO
-	atrey.karlin.mff.cuni.cz" rhost-flags-OK-OK-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1753456Ab0FJNz1 (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 10 Jun 2010 09:55:27 -0400
-Date: Thu, 10 Jun 2010 15:55:17 +0200
-From: Pavel Machek <pavel@ucw.cz>
-Subject: Re: [ANNOUNCE] GSoC project: Improving kconfig using a SAT solver
-Message-ID: <20100610135517.GA4514@ucw.cz>
-References: <AANLkTil73ArhX2w6b_v1bmWjP1FA5zUTfPzK2N4waOu1@mail.gmail.com>
- <87tyq63eux.fsf@basil.nowhere.org>
- <AANLkTiktV26Xu_qXFPdTRMLe5UwWnjpqvEKitjRElF6R@mail.gmail.com>
- <1274102511.4418.18.camel@mulgrave.site>
- <AANLkTil9lmdG5LY2SFk3cMsPOK-gUm2diMFL_o5bT08u@mail.gmail.com>
- <1274106526.4418.40.camel@mulgrave.site>
- <alpine.DEB.2.01.1005172258360.27232@asgard.lang.hm>
+Received: from cantor.suse.de ([195.135.220.2]:60183 "EHLO mx1.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1756386Ab0FKOAA (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 11 Jun 2010 10:00:00 -0400
+Date: Fri, 11 Jun 2010 15:59:57 +0200
+From: Michal Marek <mmarek@suse.cz>
+Subject: [GIT] kbuild fixes
+Message-ID: <20100611135957.GA26561@sepie.suse.cz>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <alpine.DEB.2.01.1005172258360.27232@asgard.lang.hm>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: david@lang.hm
-Cc: James Bottomley <James.Bottomley@HansenPartnership.com>, Vegard Nossum <vegard.nossum@gmail.com>, Andi Kleen <andi@firstfloor.org>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Bart Massey <bart@cs.pdx.edu>, Michal Marek <mmarek@suse.cz>, Greg Kroah-Hartman <greg@kroah.com>, Ingo Molnar <mingo@elte.hu>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: mmarek@suse.cz, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Hi!
+Hi Linus,
 
-> >>Even if the problem is different from zypper's, it is also here
-> >>possible to get an unsatisfiable instance. You are right that, yes,
-> >>the kconfig files on their own should always be satisfiable. But
-> >>that's before the user has made any choices at all. An example of an
-> >>unsatisfiable instance would be one where the user demands that 1.
-> >>some USB driver is enabled, while 2. USB support in general is
-> >>disabled.
-> >
-> >Actually, these are two separate problems.  The first is basic
-> >consistency within the Kconfig subsytstem (something that select
-> >currently damages for us).  The second is what to present to the user,
-> >which is where the inception of the select problem came from.  A user
-> >doesn't really want to know that USB device X depends on usb storage,
-> >SCSI and a raft of other things ... they just want it to configure a
-> >kernel that supports their device.  In particular, we don't want to
-> >present every possible option to users and then try to work out a
-> >solution, we really need guided configuration (which, in some measure,
-> >is what we have today: if you don't select general USB, you won't see
-> >any USB drivers.  Or more importantly, if you select an Adaptec SCSI
-> >card, we just enable whichever transport library it needs).
-> 
-> There are two modes people can be in when configuring a kernel.
-> 
-> 1. I want to configure a kernel to support my hardware, enable
-> anything else needed to make it work.
-> 
-> 2. I really care about having a small kernel, don't enable anything
-> I have disabled (but help me figure out why something I want isn't
-> available)
+please pull these two commits that fix the way modules.builtin is
+generated.
 
-There are more...
+Thanks,
+Michal
 
-...part of the problem is that kconfig is both user-dependend (what
-filesystems do I use) and machine dependend (what does hw need).
+The following changes since commit 63a07cb64ccc3ceae619d3298545d602ab5ecd38:
 
-Current defconfig system is unfortunately not quite there :-(.
+  Merge git://git.kernel.org/pub/scm/linux/kernel/git/davem/net-2.6 (2010-06-09 12:44:19 -0700)
 
-What would be nice for machines like Sharp Zaurus (spitz) would be
-defconfig which answered =Y for hardware spitz definitely has (sound),
-=N for hardware that can't be connected (anything pci), and something
-different (=M?)  for hardware that can be connected to it
-(pcmcia)... leaving 'user' options like filesystems configured ... up
-to the user.
-								Pavel
+are available in the git repository at:
 
--- 
-(english) http://www.livejournal.com/~pavelmachek
-(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blog.html
+  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild-2.6.git rc-fixes
+
+Michal Marek (2):
+      kbuild: Generate modules.builtin in make modules
+      kbuild: Create output directory in Makefile.modbuiltin
+
+ Makefile                    |    4 ++--
+ scripts/Makefile.modbuiltin |    5 +++++
+ 2 files changed, 7 insertions(+), 2 deletions(-)
