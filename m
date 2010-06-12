@@ -1,34 +1,37 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mtl01-1-88-161-186-188.fbx.proxad.net ([88.161.186.188]:2855
-	"HELO fzykt.proxad.net" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with SMTP id S1753642Ab0FLLKl (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 12 Jun 2010 07:10:41 -0400
-Message-ID: <4C136AAA.8030403@clydesnow.com>
-Date: Sat, 12 Jun 2010 13:19:36 +0200
-From: Zukoski Kirsch <barmaid@delmia.de>
+Received: from cantor.suse.de ([195.135.220.2]:38673 "EHLO mx1.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751995Ab0FLSHh (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 12 Jun 2010 14:07:37 -0400
+Date: Sat, 12 Jun 2010 20:07:35 +0200
+From: Michal Marek <mmarek@suse.cz>
+Subject: [GIT] kbuild modpost fix
+Message-ID: <20100612180735.GA31404@sepie.suse.cz>
 MIME-Version: 1.0
-Subject: ttages w
-Content-Type: application/octet-stream; name="cretonne.rtf"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Anast Kuehn <linux-kbuild@vger.kernel.org>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: khc@pm.waw.pl, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-e1xydGYxXGFuc2lcYW5zaWNwZzEyNTFcZGVmZjBcZGVmbGFuZzEwNDl7XGZvbnR0Ymx7XGYw
-XGZzd2lzc1xmcHJxMlxmY2hhcnNldDIwNHtcKlxmbmFtZSBBcmlhbDt9QXJpYWwgQ1lSO317
-XGYxXGZzd2lzc1xmY2hhcnNldDIwNHtcKlxmbmFtZSBBcmlhbDt9QXJpYWwgQ1lSO319DQp7
-XGNvbG9ydGJsIDtccmVkMFxncmVlbjBcYmx1ZTI1NTtccmVkMFxncmVlbjEyOFxibHVlMDt9
-DQp7XCpcZ2VuZXJhdG9yIE1zZnRlZGl0IDIuMTMuMjAuNTU2MTt9XHZpZXdraW5kNFx1YzFc
-cGFyZFxzYTIwMFxzbDI3NlxzbG11bHQxXGxhbmc5XGYwXGZzMzJ7XGZpZWxke1wqXGZsZGlu
-c3R7SFlQRVJMSU5LICJoe1wqXGRkIDIuMTMuMjAuNTU2MTt9dHRwOi8vZ2FtZXpkcmVhbXMu
-aW5mbyJ9fXtcZmxkcnNsdHtcdWxcY2YxIGh0dHA6Ly9nYW1lemRyZWFtcy5pbmZvfX19XGYw
-XGNmMVxiXGZzMzIgIC0gT05MSU5FIENBU0lOTyFccGFyDQpcbGluZVxjZjJcYlxmMFxmczI4
-IFZJUCBDTFVCIENhc2lubyBpcyBhIGdyZWF0IG9ubGluZSBjYXNpbm8gdGhhdCBvZmZlcnMg
-dGhlIHVuaXF1ZSBjb21iaW5hdGlvbiBvZiB0b3AgcXVhbGl0eSBnYW1lcywgaGlnaCBwYXlv
-dXRzIGFuZCBhIDI0LzcgcHJvZmVzc2lvbmFsIGN1c3RvbWVyIHN1cHBvcnQuXHBhcg0KXHBh
-cjEwMCBwcm9ncmVzc2l2ZSBnYW1lcyB3aXRoIHRvd2VyaW5nIGphY2twb3RzLCB3aGljaCBh
-cmUgcmVhZHkgdG8gZXhwbG9kZSBhbmQgY2FuIG1ha2UgbXVsdGktbWlsbGlvbmFpcmVzIG91
-dCBvZiBWSVAgQ0xVQiBwbGF5ZXJzISBEb3dubG9hZCB0aGUgc29mdHdhcmUgZm9yIGZyZWUs
-IHBpY2sgdXAgdGhlIGluY3JlZGlibGUgJDc3NyBXZWxjb21lIEJvbnVzIG9uIHlvdSB3YXkg
-aW4gYW5kIHN0YXJ0IHBsYXlpbmcgJiB3aW5uaW5nIVxwYXINCn0NCgA=
+Hi Linus,
+
+Please pull another kbuild fix. This time it's a pointer arithmetics
+overflow in modpost that started to show up with newer gcc.
+
+Thanks,
+Michal
+
+The following changes since commit 607b30fcf20c6e5339591692db6ffa0b15e041a0:
+
+  kbuild: Create output directory in Makefile.modbuiltin (2010-06-10 12:23:08 +0200)
+
+are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild-2.6.git rc-fixes
+
+Krzysztof Halasa (1):
+      kbuild: Fix modpost segfault
+
+ scripts/mod/modpost.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
