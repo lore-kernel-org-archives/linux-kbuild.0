@@ -1,23 +1,25 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:55552 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751743Ab0FNMTd (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 14 Jun 2010 08:19:33 -0400
-Message-ID: <4C161E54.2050105@suse.cz>
-Date: Mon, 14 Jun 2010 14:19:32 +0200
-From: Michal Marek <mmarek@suse.cz>
-MIME-Version: 1.0
-Subject: Re: [PATCH 1/1] kbuild: fix LOCALVERSION handling to match description
-References: <1276508470-21731-1-git-send-email-apw@canonical.com>
+Received: from smtp-out.google.com ([216.239.44.51]:20829 "EHLO
+	smtp-out.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753963Ab0FNU0W (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 14 Jun 2010 16:26:22 -0400
+Date: Mon, 14 Jun 2010 13:26:16 -0700 (PDT)
+From: David Rientjes <rientjes@google.com>
+Subject: Re: [PATCH 1/1] kbuild: fix LOCALVERSION handling to match
+ description
 In-Reply-To: <1276508470-21731-1-git-send-email-apw@canonical.com>
-Content-Type: text/plain; charset=ISO-8859-2
-Content-Transfer-Encoding: 7bit
+Message-ID: <alpine.DEB.2.00.1006141325080.25461@chino.kir.corp.google.com>
+References: <1276508470-21731-1-git-send-email-apw@canonical.com>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Andy Whitcroft <apw@canonical.com>
-Cc: Sam Ravnborg <sam@ravnborg.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, David Rientjes <rientjes@google.com>
+Cc: Michal Marek <mmarek@suse.cz>, Sam Ravnborg <sam@ravnborg.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On 14.6.2010 11:41, Andy Whitcroft wrote:
+On Mon, 14 Jun 2010, Andy Whitcroft wrote:
+
 > In the commit below the version string handling was modified, adding
 > a '+' where no other version information was supplied:
 > 
@@ -41,26 +43,7 @@ On 14.6.2010 11:41, Andy Whitcroft wrote:
 > to suppress any suffix.
 > 
 > Signed-off-by: Andy Whitcroft <apw@canonical.com>
-> ---
->  Makefile |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
-> 
-> diff --git a/Makefile b/Makefile
-> index d49d96c..662e820 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -944,7 +944,7 @@ ifdef CONFIG_LOCALVERSION_AUTO
->  	localver-extra = $(scm-identifier)
->  else
->  	ifneq ($(scm-identifier),)
-> -		ifeq ($(LOCALVERSION),)
-> +		ifeq ("$(origin LOCALVERSION)", "undefined")
->  			localver-extra = +
->  		endif
->  	endif
 
-David, do you Ack this change? To me this seems like a reasonable
-compromise.
+Acked-by: David Rientjes <rientjes@google.com>
 
-Michal
-
+This should be pushed for rc4.
