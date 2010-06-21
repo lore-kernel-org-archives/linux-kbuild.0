@@ -1,34 +1,85 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from host1-215-static.4-79-b.business.telecomitalia.it ([79.4.215.1]:1724
-	"HELO lzpghy.telecomitalia.it" rhost-flags-OK-OK-OK-FAIL)
-	by vger.kernel.org with SMTP id S1755791Ab0FPG23 (ORCPT
+Received: from smtp1.linux-foundation.org ([140.211.169.13]:50106 "EHLO
+	smtp1.linux-foundation.org" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1757268Ab0FUTHC (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 16 Jun 2010 02:28:29 -0400
-Message-ID: <4C186ECB.9070101@metcom.com>
-Date: Thu, 01 Jan 2004 00:39:25 +0100
-From: Lebeck Vu <agile@subvertmag.com>
-MIME-Version: 1.0
-Subject: examination of the specific points which have just been discussed,
-Content-Type: application/octet-stream; name="bailer.rtf"
-Content-Transfer-Encoding: base64
+	Mon, 21 Jun 2010 15:07:02 -0400
+Date: Mon, 21 Jun 2010 12:06:13 -0700
+From: Andrew Morton <akpm@linux-foundation.org>
+Subject: Re: [PATCH] Fix CONFIG_CROSS_COMPILE issue in .config
+Message-Id: <20100621120613.86cad1a4.akpm@linux-foundation.org>
+In-Reply-To: <AANLkTim2mi0wbJJl17OkbCJbRt-s5phR4sumn5GsJKUp@mail.gmail.com>
+References: <AANLkTim2mi0wbJJl17OkbCJbRt-s5phR4sumn5GsJKUp@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Malhi Schulte <linux-kbuild@vger.kernel.org>
+To: Tiago Maluta <tiago.maluta@gmail.com>
+Cc: linux-kernel@vger.kernel.org, Roland McGrath <roland@redhat.com>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
 
-e1xydGYxXGFuc2lcYW5zaWNwZzEyNTFcZGVmZjBcZGVmbGFuZzEwNDl7XGZvbnR0Ymx7XGYw
-XGZzd2lzc1xmcHJxMlxmY2hhcnNldDIwNHtcKlxmbmFtZSBBcmlhbDt9QXJpYWwgQ1lSO317
-XGYxXGZzd2lzc1xmY2hhcnNldDIwNHtcKlxmbmFtZSBBcmlhbDt9QXJpYWwgQ1lSO319DQp7
-XGNvbG9ydGJsIDtccmVkMFxncmVlbjBcYmx1ZTI1NTtccmVkMFxncmVlbjEyOFxibHVlMDt9
-DQp7XCpcZ2VuZXJhdG9yIE1zZnRlZGl0IDUuNC4yNy4yOTcwO31cdmlld2tpbmQ0XHVjMVxw
-YXJkXHNhMjAwXHNsMjc2XHNsbXVsdDFcbGFuZzlcZjBcZnMzMntcZmllbGR7XCpcZmxkaW5z
-dHtIWVBFUkxJTksgImh7XCpcZGQgNS40LjI3LjI5NzA7fXR0cDovL2dvbGRydXNob25saW5l
-LmluZm8ifX17XGZsZHJzbHR7XHVsXGNmMSBodHRwOi8vZ29sZHJ1c2hvbmxpbmUuaW5mb319
-fVxmMFxjZjFcYlxmczMyICAtIE9OTElORSBDQVNJTk8hXHBhcg0KXGxpbmVcY2YyXGJcZjBc
-ZnMyOCBWSVAgQ0xVQiBDYXNpbm8gaXMgYSBncmVhdCBvbmxpbmUgY2FzaW5vIHRoYXQgb2Zm
-ZXJzIHRoZSB1bmlxdWUgY29tYmluYXRpb24gb2YgdG9wIHF1YWxpdHkgZ2FtZXMsIGhpZ2gg
-cGF5b3V0cyBhbmQgYSAyNC83IHByb2Zlc3Npb25hbCBjdXN0b21lciBzdXBwb3J0LlxwYXIN
-ClxwYXIxMDAgcHJvZ3Jlc3NpdmUgZ2FtZXMgd2l0aCB0b3dlcmluZyBqYWNrcG90cywgd2hp
-Y2ggYXJlIHJlYWR5IHRvIGV4cGxvZGUgYW5kIGNhbiBtYWtlIG11bHRpLW1pbGxpb25haXJl
-cyBvdXQgb2YgVklQIENMVUIgcGxheWVycyEgRG93bmxvYWQgdGhlIHNvZnR3YXJlIGZvciBm
-cmVlLCBwaWNrIHVwIHRoZSBpbmNyZWRpYmxlICQ3NzcgV2VsY29tZSBCb251cyBvbiB5b3Ug
-d2F5IGluIGFuZCBzdGFydCBwbGF5aW5nICYgd2lubmluZyFccGFyDQp9DQoA
+On Thu, 17 Jun 2010 12:50:52 +0000
+Tiago Maluta <tiago.maluta@gmail.com> wrote:
+
+> Linux has an recent option to define CROSS_COMPILE in menuconfig.
+> 
+> Typically, one of the options when building for another target is
+> ('arm' is just an example):
+> 
+> # make ARCH=arm CROSS_COMPILE=arm-cc O=../build
+> 
+> If I omit CROSS_COMPILE and use the new way in .config:
+> CONFIG_CROSS_COMPILE="arm-cc"
+> 
+> I got:
+> 
+>    cc1: error: unrecognized command line option "-mlittle-endian"
+>    cc1: error: unrecognized command line option "-mabi=aapcs-linux"
+>    cc1: error: unrecognized command line option "-mno-thumb-interwork"
+>    /usr/src/linux/kernel/bounds.c:1: error: bad value (armv5t) for
+> -march= switch
+>    /usr/src/linux/kernel/bounds.c:1: error: bad value (armv5t) for
+> -mtune= switch
+>    make[2]: *** [kernel/bounds.s] Error 1
+>    make[1]: *** [prepare0] Error 2
+>    make: *** [sub-make] Error 2
+> 
+> Verbose output clearly says that I'm using the host compiler instead
+> cross compiler.
+> This patch fixed my problem:
+> 
+> ---
+> __Makefile |______ 2 +-
+> __1 files changed, 1 insertions(+), 1 deletions(-)
+> 
+> diff --git a/Makefile b/Makefile
+> index d49d96c..5a6c7d5 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -190,7 +190,7 @@ SUBARCH := $(shell uname -m | sed -e s/i.86/i386/
+> -e s/sun4u/sparc64/ \
+> __export KBUILD_BUILDHOST := $(SUBARCH)
+> __ARCH____________________ ?= $(SUBARCH)
+> __CROSS_COMPILE__ ?=
+> -CROSS_COMPILE__ ?= $(CONFIG_CROSS_COMPILE:"%"=%)
+> +CROSS_COMPILE__ := $(shell grep CONFIG_CROSS_COMPILE .config | cut -d'"' -f2)
+> 
+> __# Architecture as present in compile.h
+> __UTS_MACHINE______ := $(ARCH)
+> --
+
+Perhaps the "%"=% thing isn't supported with your version of make(1). 
+Which version are you using?
+
+Directly grepping .config probably isn't the right thing to do. 
+Maybe `patsubst' can be used here.
+
+
+
+Administrivia:
+
+Your email client wordwraps the patches and replaces tabs with weird
+non-ascii characters.  
+
+Please include a Signed-off-by: with patches, as described in
+Documentation/SubmittingPatches, thanks.
