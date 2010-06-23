@@ -1,30 +1,117 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from 74-93-104-97-Washington.hfc.comcastbusiness.net ([74.93.104.97]:40065
-	"EHLO sunset.davemloft.net" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1755856Ab0FVVRJ (ORCPT
+Received: from mail-ww0-f46.google.com ([74.125.82.46]:64850 "EHLO
+	mail-ww0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750749Ab0FWDpA convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 22 Jun 2010 17:17:09 -0400
-Date: Tue, 22 Jun 2010 14:17:21 -0700 (PDT)
-Message-Id: <20100622.141721.242120880.davem@davemloft.net>
-Subject: Re: Error "Unknown relocation: 36" on module load on Sparc
-From: David Miller <davem@davemloft.net>
-In-Reply-To: <20100622193530.GA26041@merkur.ravnborg.org>
-References: <20100616.133540.189696272.davem@davemloft.net>
-	<4C210A07.80906@vlnb.net>
-	<20100622193530.GA26041@merkur.ravnborg.org>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+	Tue, 22 Jun 2010 23:45:00 -0400
+MIME-Version: 1.0
+In-Reply-To: <4C1FC35C.8090201@suse.cz>
+References: <AANLkTim2mi0wbJJl17OkbCJbRt-s5phR4sumn5GsJKUp@mail.gmail.com>
+	<20100621120613.86cad1a4.akpm@linux-foundation.org> <4C1FC35C.8090201@suse.cz>
+From: Tiago Maluta <tiago.maluta@gmail.com>
+Date: Wed, 23 Jun 2010 00:44:39 -0300
+Message-ID: <AANLkTil2-YNAa-jyOYD4cNtbJQ1XQJ6-v3iJ6wxpz7br@mail.gmail.com>
+Subject: Re: [PATCH] Fix CONFIG_CROSS_COMPILE issue in .config
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: sam@ravnborg.org
-Cc: vst@vlnb.net, sparclinux@vger.kernel.org, simone.ricci@gmail.com, scst-devel@lists.sourceforge.net, linux-kernel@vger.kernel.org, Nick.Couchman@seakr.com, mmarek@suse.cz, linux-kbuild@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>
+Cc: Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org, Roland McGrath <roland@redhat.com>, linux-kbuild@vger.kernel.org
 
-From: Sam Ravnborg <sam@ravnborg.org>
-Date: Tue, 22 Jun 2010 21:35:30 +0200
+On Mon, Jun 21, 2010 at 4:54 PM, Michal Marek <mmarek@suse.cz> wrote:
+> On 21.6.2010 21:06, Andrew Morton wrote:
+>> On Thu, 17 Jun 2010 12:50:52 +0000
+>> Tiago Maluta <tiago.maluta@gmail.com> wrote:
+>>
+>>> Linux has an recent option to define CROSS_COMPILE in menuconfig.
+>>>
+>>> Typically, one of the options when building for another target is
+>>> ('arm' is just an example):
+>>>
+>>> # make ARCH=arm CROSS_COMPILE=arm-cc O=../build
+>>>
+>>> If I omit CROSS_COMPILE and use the new way in .config:
+>>> CONFIG_CROSS_COMPILE="arm-cc"
+>>>
+>>> I got:
+>>>
+>>>    cc1: error: unrecognized command line option "-mlittle-endian"
+>>>    cc1: error: unrecognized command line option "-mabi=aapcs-linux"
+>>>    cc1: error: unrecognized command line option "-mno-thumb-interwork"
+>>>    /usr/src/linux/kernel/bounds.c:1: error: bad value (armv5t) for
+>>> -march= switch
+>>>    /usr/src/linux/kernel/bounds.c:1: error: bad value (armv5t) for
+>>> -mtune= switch
+>>>    make[2]: *** [kernel/bounds.s] Error 1
+>>>    make[1]: *** [prepare0] Error 2
+>>>    make: *** [sub-make] Error 2
+>>>
+>>> Verbose output clearly says that I'm using the host compiler instead
+>>> cross compiler.
+>>> This patch fixed my problem:
+>>>
+>>> ---
+>>> __Makefile |______ 2 +-
+>>> __1 files changed, 1 insertions(+), 1 deletions(-)
+>>>
+>>> diff --git a/Makefile b/Makefile
+>>> index d49d96c..5a6c7d5 100644
+>>> --- a/Makefile
+>>> +++ b/Makefile
+>>> @@ -190,7 +190,7 @@ SUBARCH := $(shell uname -m | sed -e s/i.86/i386/
+>>> -e s/sun4u/sparc64/ \
+>>> __export KBUILD_BUILDHOST := $(SUBARCH)
+>>> __ARCH____________________ ?= $(SUBARCH)
+>>> __CROSS_COMPILE__ ?=
+>>> -CROSS_COMPILE__ ?= $(CONFIG_CROSS_COMPILE:"%"=%)
+>>> +CROSS_COMPILE__ := $(shell grep CONFIG_CROSS_COMPILE .config | cut -d'"' -f2)
+>>>
+>>> __# Architecture as present in compile.h
+>>> __UTS_MACHINE______ := $(ARCH)
+>>> --
+>>
+>> Perhaps the "%"=% thing isn't supported with your version of make(1).
+>> Which version are you using?
+>
+> My guess is that something expands $(CROSS_COMPILE) before make
+> silentoldconfig generates include/config/auto.conf (which is where the
+> makefile reads the CONFIG_* variables from). Tiago, can you try changing
+> the $(shell ...) line to
+>
+> CROSS_COMPILE := $(shell ls include/config/auto.conf >&2; \
+>    echo "CONFIG_CROSS_COMPILE $(CONFIG_CROSS_COMPILE) >&2; \
+>    grep CONFIG_CROSS_COMPILE .config | cut -d'"'  -f2)
+>
+> and tell us what it prints?
 
-> Most of your Makefile looks fine - I guess we need to find the bug
-> in the build environmnet and not in the Makefile.
+I'm using GNU Make 3.81.
 
-Sam, note that these guys are working with 2.6.26 or some
-ancient kernel like that :-/
+I think you missed a quote in echo..., I using:
+
+CROSS_COMPILE := $(shell ls include/config/auto.conf >&2; \
+    echo "CONFIG_CROSS_COMPILE" $(CONFIG_CROSS_COMPILE) >&2; \
+    grep CONFIG_CROSS_COMPILE .config | cut -d'"'  -f2)
+
+And the output:
+$ make ARCH=arm O=../build
+
+include/config/auto.conf
+CONFIG_CROSS_COMPILE
+  Using /usr/src/linux as source for kernel
+  GEN     /usr/src/build/Makefile
+  CHK     include/linux/version.h
+  CHK     include/generated/utsrelease.h
+make[2]: `include/generated/mach-types.h' is up to date.
+  CALL    /usr/src/linux/scripts/checksyscalls.sh
+  CHK     include/generated/compile.h
+  CC      arch/arm/mm/init.o
+
+^C
+
+Means that is nothing CONFIG_CROSS_COMPILE.
+
+I agree with Andrew, directly grepping .config isn't the right thing to do.
+I'd like to discuss a better solution.
+
+--tm
