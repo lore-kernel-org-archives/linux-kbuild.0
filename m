@@ -1,117 +1,112 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ww0-f46.google.com ([74.125.82.46]:64850 "EHLO
-	mail-ww0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750749Ab0FWDpA convert rfc822-to-8bit (ORCPT
+Received: from webhosting01.bon.m2soft.com ([195.38.20.32]:39137 "EHLO
+	webhosting01.bon.m2soft.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1752644Ab0FZOQm (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 22 Jun 2010 23:45:00 -0400
-MIME-Version: 1.0
-In-Reply-To: <4C1FC35C.8090201@suse.cz>
-References: <AANLkTim2mi0wbJJl17OkbCJbRt-s5phR4sumn5GsJKUp@mail.gmail.com>
-	<20100621120613.86cad1a4.akpm@linux-foundation.org> <4C1FC35C.8090201@suse.cz>
-From: Tiago Maluta <tiago.maluta@gmail.com>
-Date: Wed, 23 Jun 2010 00:44:39 -0300
-Message-ID: <AANLkTil2-YNAa-jyOYD4cNtbJQ1XQJ6-v3iJ6wxpz7br@mail.gmail.com>
-Subject: Re: [PATCH] Fix CONFIG_CROSS_COMPILE issue in .config
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 8BIT
+	Sat, 26 Jun 2010 10:16:42 -0400
+Date: Sat, 26 Jun 2010 15:00:21 +0200
+From: Nicolas Kaiser <nikai@nikai.net>
+Subject: [PATCH] Documentation/kbuild: fixed typos and wording
+Message-ID: <20100626150021.254b95b3@absol.kitzblitz>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Michal Marek <mmarek@suse.cz>
-Cc: Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org, Roland McGrath <roland@redhat.com>, linux-kbuild@vger.kernel.org
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org
 
-On Mon, Jun 21, 2010 at 4:54 PM, Michal Marek <mmarek@suse.cz> wrote:
-> On 21.6.2010 21:06, Andrew Morton wrote:
->> On Thu, 17 Jun 2010 12:50:52 +0000
->> Tiago Maluta <tiago.maluta@gmail.com> wrote:
->>
->>> Linux has an recent option to define CROSS_COMPILE in menuconfig.
->>>
->>> Typically, one of the options when building for another target is
->>> ('arm' is just an example):
->>>
->>> # make ARCH=arm CROSS_COMPILE=arm-cc O=../build
->>>
->>> If I omit CROSS_COMPILE and use the new way in .config:
->>> CONFIG_CROSS_COMPILE="arm-cc"
->>>
->>> I got:
->>>
->>>    cc1: error: unrecognized command line option "-mlittle-endian"
->>>    cc1: error: unrecognized command line option "-mabi=aapcs-linux"
->>>    cc1: error: unrecognized command line option "-mno-thumb-interwork"
->>>    /usr/src/linux/kernel/bounds.c:1: error: bad value (armv5t) for
->>> -march= switch
->>>    /usr/src/linux/kernel/bounds.c:1: error: bad value (armv5t) for
->>> -mtune= switch
->>>    make[2]: *** [kernel/bounds.s] Error 1
->>>    make[1]: *** [prepare0] Error 2
->>>    make: *** [sub-make] Error 2
->>>
->>> Verbose output clearly says that I'm using the host compiler instead
->>> cross compiler.
->>> This patch fixed my problem:
->>>
->>> ---
->>> __Makefile |______ 2 +-
->>> __1 files changed, 1 insertions(+), 1 deletions(-)
->>>
->>> diff --git a/Makefile b/Makefile
->>> index d49d96c..5a6c7d5 100644
->>> --- a/Makefile
->>> +++ b/Makefile
->>> @@ -190,7 +190,7 @@ SUBARCH := $(shell uname -m | sed -e s/i.86/i386/
->>> -e s/sun4u/sparc64/ \
->>> __export KBUILD_BUILDHOST := $(SUBARCH)
->>> __ARCH____________________ ?= $(SUBARCH)
->>> __CROSS_COMPILE__ ?=
->>> -CROSS_COMPILE__ ?= $(CONFIG_CROSS_COMPILE:"%"=%)
->>> +CROSS_COMPILE__ := $(shell grep CONFIG_CROSS_COMPILE .config | cut -d'"' -f2)
->>>
->>> __# Architecture as present in compile.h
->>> __UTS_MACHINE______ := $(ARCH)
->>> --
->>
->> Perhaps the "%"=% thing isn't supported with your version of make(1).
->> Which version are you using?
->
-> My guess is that something expands $(CROSS_COMPILE) before make
-> silentoldconfig generates include/config/auto.conf (which is where the
-> makefile reads the CONFIG_* variables from). Tiago, can you try changing
-> the $(shell ...) line to
->
-> CROSS_COMPILE := $(shell ls include/config/auto.conf >&2; \
->    echo "CONFIG_CROSS_COMPILE $(CONFIG_CROSS_COMPILE) >&2; \
->    grep CONFIG_CROSS_COMPILE .config | cut -d'"'  -f2)
->
-> and tell us what it prints?
+Fixed some typos and wording.
 
-I'm using GNU Make 3.81.
+Signed-off-by: Nicolas Kaiser <nikai@nikai.net>
+---
+ Documentation/kbuild/kbuild.txt    |    8 ++++----
+ Documentation/kbuild/makefiles.txt |   20 ++++++++++----------
+ 2 files changed, 14 insertions(+), 14 deletions(-)
 
-I think you missed a quote in echo..., I using:
-
-CROSS_COMPILE := $(shell ls include/config/auto.conf >&2; \
-    echo "CONFIG_CROSS_COMPILE" $(CONFIG_CROSS_COMPILE) >&2; \
-    grep CONFIG_CROSS_COMPILE .config | cut -d'"'  -f2)
-
-And the output:
-$ make ARCH=arm O=../build
-
-include/config/auto.conf
-CONFIG_CROSS_COMPILE
-  Using /usr/src/linux as source for kernel
-  GEN     /usr/src/build/Makefile
-  CHK     include/linux/version.h
-  CHK     include/generated/utsrelease.h
-make[2]: `include/generated/mach-types.h' is up to date.
-  CALL    /usr/src/linux/scripts/checksyscalls.sh
-  CHK     include/generated/compile.h
-  CC      arch/arm/mm/init.o
-
-^C
-
-Means that is nothing CONFIG_CROSS_COMPILE.
-
-I agree with Andrew, directly grepping .config isn't the right thing to do.
-I'd like to discuss a better solution.
-
---tm
+diff --git a/Documentation/kbuild/kbuild.txt b/Documentation/kbuild/kbuild.txt
+index 634c625..0d8addb 100644
+--- a/Documentation/kbuild/kbuild.txt
++++ b/Documentation/kbuild/kbuild.txt
+@@ -40,15 +40,15 @@ Set the directory to look for the kernel source when building external
+ modules.
+ The directory can be specified in several ways:
+ 1) Use "M=..." on the command line
+-2) Environmnet variable KBUILD_EXTMOD
+-3) Environmnet variable SUBDIRS
++2) Environment variable KBUILD_EXTMOD
++3) Environment variable SUBDIRS
+ The possibilities are listed in the order they take precedence.
+ Using "M=..." will always override the others.
+ 
+ KBUILD_OUTPUT
+ --------------------------------------------------
+ Specify the output directory when building the kernel.
+-The output directory can also be specificed using "O=...".
++The output directory can also be specified using "O=...".
+ Setting "O=..." takes precedence over KBUILD_OUTPUT.
+ 
+ ARCH
+@@ -90,7 +90,7 @@ The script will be called with the following arguments:
+     $3 - kernel map file
+     $4 - default install path (use root directory if blank)
+ 
+-The implmentation of "make install" is architecture specific
++The implementation of "make install" is architecture specific
+ and it may differ from the above.
+ 
+ INSTALLKERNEL is provided to enable the possibility to
+diff --git a/Documentation/kbuild/makefiles.txt b/Documentation/kbuild/makefiles.txt
+index 71c602d..c0c9b1c 100644
+--- a/Documentation/kbuild/makefiles.txt
++++ b/Documentation/kbuild/makefiles.txt
+@@ -284,12 +284,12 @@ more details, with real examples.
+ --- 3.7 Compilation flags
+ 
+     ccflags-y, asflags-y and ldflags-y
+-	The three flags listed above applies only to the kbuild makefile
+-	where they are assigned. They are used for all the normal
+-	cc, as and ld invocation happenign during a recursive build.
++	These three flags apply only to the kbuild makefile in which they
++	are assigned. They are used for all the normal cc, as and ld
++	invocations happening during a recursive build.
+ 	Note: Flags with the same behaviour were previously named:
+ 	EXTRA_CFLAGS, EXTRA_AFLAGS and EXTRA_LDFLAGS.
+-	They are yet supported but their use are deprecated.
++	They are still supported but their usage is deprecated.
+ 
+ 	ccflags-y specifies options for compiling C files with $(CC).
+ 
+@@ -318,9 +318,9 @@ more details, with real examples.
+ 		ldflags-y := -x
+ 
+     subdir-ccflags-y, subdir-asflags-y
+-	The two flags listed above are similar to ccflags-y and as-falgs-y.
+-	The difference is that the subdir- variants has effect for the kbuild
+-	file where tey are present and all subdirectories.
++	The two flags listed above are similar to ccflags-y and as-flags-y.
++	The difference is that the subdir- variants have effect for the kbuild
++	file where they are present and all subdirectories.
+ 	Options specified using subdir-* are added to the commandline before
+ 	the options specified using the non-subdir variants.
+ 
+@@ -1176,14 +1176,14 @@ When kbuild executes, the following steps are followed (roughly):
+ === 7 Kbuild syntax for exported headers
+ 
+ The kernel include a set of headers that is exported to userspace.
+-Many headers can be exported as-is but other headers requires  a
++Many headers can be exported as-is but other headers require a
+ minimal pre-processing before they are ready for user-space.
+ The pre-processing does:
+ - drop kernel specific annotations
+ - drop include of compiler.h
+-- drop all sections that is kernel internat (guarded by ifdef __KERNEL__)
++- drop all sections that are kernel internal (guarded by ifdef __KERNEL__)
+ 
+-Each relevant directory contain a file name "Kbuild" which specify the
++Each relevant directory contains a file name "Kbuild" which specifies the
+ headers to be exported.
+ See subsequent chapter for the syntax of the Kbuild file.
+ 
+-- 
+1.7.1
