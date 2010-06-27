@@ -1,124 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from rcsinet10.oracle.com ([148.87.113.121]:61289 "EHLO
-	rcsinet10.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752194Ab0F0Ahv (ORCPT
+Received: from webhosting01.bon.m2soft.com ([195.38.20.32]:55210 "EHLO
+	webhosting01.bon.m2soft.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1754531Ab0F0KC1 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 26 Jun 2010 20:37:51 -0400
-Date: Sat, 26 Jun 2010 17:37:36 -0700
-From: Randy Dunlap <randy.dunlap@oracle.com>
-Subject: Re: [PATCH] Documentation/kbuild: fixed typos and wording
-Message-Id: <20100626173736.e5946273.randy.dunlap@oracle.com>
-In-Reply-To: <20100626150021.254b95b3@absol.kitzblitz>
-References: <20100626150021.254b95b3@absol.kitzblitz>
+	Sun, 27 Jun 2010 06:02:27 -0400
+Date: Sun, 27 Jun 2010 12:00:25 +0200
+From: Nicolas Kaiser <nikai@nikai.net>
+Subject: [PATCH] net/Makefile: conditionally descend to wireless and
+ ieee802154
+Message-ID: <20100627120025.0232a9d0@absol.kitzblitz>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nicolas Kaiser <nikai@nikai.net>
-Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org
+To: "David S. Miller" <davem@davemloft.net>
+Cc: netdev@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Sat, 26 Jun 2010 15:00:21 +0200 Nicolas Kaiser wrote:
+Don't descend to wireless and ieee802154 unless they are actually used.
 
-> Fixed some typos and wording.
-> 
-> Signed-off-by: Nicolas Kaiser <nikai@nikai.net>
-
-Acked-by: Randy Dunlap <randy.dunlap@oracle.com>
-
-Thanks.
-
-> ---
->  Documentation/kbuild/kbuild.txt    |    8 ++++----
->  Documentation/kbuild/makefiles.txt |   20 ++++++++++----------
->  2 files changed, 14 insertions(+), 14 deletions(-)
-> 
-> diff --git a/Documentation/kbuild/kbuild.txt b/Documentation/kbuild/kbuild.txt
-> index 634c625..0d8addb 100644
-> --- a/Documentation/kbuild/kbuild.txt
-> +++ b/Documentation/kbuild/kbuild.txt
-> @@ -40,15 +40,15 @@ Set the directory to look for the kernel source when building external
->  modules.
->  The directory can be specified in several ways:
->  1) Use "M=..." on the command line
-> -2) Environmnet variable KBUILD_EXTMOD
-> -3) Environmnet variable SUBDIRS
-> +2) Environment variable KBUILD_EXTMOD
-> +3) Environment variable SUBDIRS
->  The possibilities are listed in the order they take precedence.
->  Using "M=..." will always override the others.
->  
->  KBUILD_OUTPUT
->  --------------------------------------------------
->  Specify the output directory when building the kernel.
-> -The output directory can also be specificed using "O=...".
-> +The output directory can also be specified using "O=...".
->  Setting "O=..." takes precedence over KBUILD_OUTPUT.
->  
->  ARCH
-> @@ -90,7 +90,7 @@ The script will be called with the following arguments:
->      $3 - kernel map file
->      $4 - default install path (use root directory if blank)
->  
-> -The implmentation of "make install" is architecture specific
-> +The implementation of "make install" is architecture specific
->  and it may differ from the above.
->  
->  INSTALLKERNEL is provided to enable the possibility to
-> diff --git a/Documentation/kbuild/makefiles.txt b/Documentation/kbuild/makefiles.txt
-> index 71c602d..c0c9b1c 100644
-> --- a/Documentation/kbuild/makefiles.txt
-> +++ b/Documentation/kbuild/makefiles.txt
-> @@ -284,12 +284,12 @@ more details, with real examples.
->  --- 3.7 Compilation flags
->  
->      ccflags-y, asflags-y and ldflags-y
-> -	The three flags listed above applies only to the kbuild makefile
-> -	where they are assigned. They are used for all the normal
-> -	cc, as and ld invocation happenign during a recursive build.
-> +	These three flags apply only to the kbuild makefile in which they
-> +	are assigned. They are used for all the normal cc, as and ld
-> +	invocations happening during a recursive build.
->  	Note: Flags with the same behaviour were previously named:
->  	EXTRA_CFLAGS, EXTRA_AFLAGS and EXTRA_LDFLAGS.
-> -	They are yet supported but their use are deprecated.
-> +	They are still supported but their usage is deprecated.
->  
->  	ccflags-y specifies options for compiling C files with $(CC).
->  
-> @@ -318,9 +318,9 @@ more details, with real examples.
->  		ldflags-y := -x
->  
->      subdir-ccflags-y, subdir-asflags-y
-> -	The two flags listed above are similar to ccflags-y and as-falgs-y.
-> -	The difference is that the subdir- variants has effect for the kbuild
-> -	file where tey are present and all subdirectories.
-> +	The two flags listed above are similar to ccflags-y and as-flags-y.
-> +	The difference is that the subdir- variants have effect for the kbuild
-> +	file where they are present and all subdirectories.
->  	Options specified using subdir-* are added to the commandline before
->  	the options specified using the non-subdir variants.
->  
-> @@ -1176,14 +1176,14 @@ When kbuild executes, the following steps are followed (roughly):
->  === 7 Kbuild syntax for exported headers
->  
->  The kernel include a set of headers that is exported to userspace.
-> -Many headers can be exported as-is but other headers requires  a
-> +Many headers can be exported as-is but other headers require a
->  minimal pre-processing before they are ready for user-space.
->  The pre-processing does:
->  - drop kernel specific annotations
->  - drop include of compiler.h
-> -- drop all sections that is kernel internat (guarded by ifdef __KERNEL__)
-> +- drop all sections that are kernel internal (guarded by ifdef __KERNEL__)
->  
-> -Each relevant directory contain a file name "Kbuild" which specify the
-> +Each relevant directory contains a file name "Kbuild" which specifies the
->  headers to be exported.
->  See subsequent chapter for the syntax of the Kbuild file.
->  
-> -- 
-
+Signed-off-by: Nicolas Kaiser <nikai@nikai.net>
 ---
-~Randy
-*** Remember to use Documentation/SubmitChecklist when testing your code ***
+ net/Makefile |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/net/Makefile b/net/Makefile
+index cb7bdc1..41d4200 100644
+--- a/net/Makefile
++++ b/net/Makefile
+@@ -50,7 +50,7 @@ endif
+ obj-$(CONFIG_IP_DCCP)		+= dccp/
+ obj-$(CONFIG_IP_SCTP)		+= sctp/
+ obj-$(CONFIG_RDS)		+= rds/
+-obj-y				+= wireless/
++obj-$(CONFIG_WIRELESS)		+= wireless/
+ obj-$(CONFIG_MAC80211)		+= mac80211/
+ obj-$(CONFIG_TIPC)		+= tipc/
+ obj-$(CONFIG_NETLABEL)		+= netlabel/
+@@ -61,7 +61,7 @@ obj-$(CONFIG_CAIF)		+= caif/
+ ifneq ($(CONFIG_DCB),)
+ obj-y				+= dcb/
+ endif
+-obj-y				+= ieee802154/
++obj-$(CONFIG_IEEE802154)	+= ieee802154/
+ 
+ ifeq ($(CONFIG_NET),y)
+ obj-$(CONFIG_SYSCTL)		+= sysctl_net.o
+-- 
+1.7.1
