@@ -1,56 +1,30 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:31067 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755897Ab0F1DBP (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 27 Jun 2010 23:01:15 -0400
-Date: Sun, 27 Jun 2010 23:01:06 -0400
-From: Amerigo Wang <amwang@redhat.com>
-Message-Id: <20100628030516.5187.49089.sendpatchset@localhost.localdomain>
+Received: from smtp-out.google.com ([74.125.121.35]:28722 "EHLO
+	smtp-out.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750799Ab0F1JIm (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 28 Jun 2010 05:08:42 -0400
+Date: Mon, 28 Jun 2010 02:08:36 -0700 (PDT)
+From: David Rientjes <rientjes@google.com>
+Subject: Re: [PATCH 1/2] Makefile: fix missing dash when using make
+ LOCALVERSION=xxx
 In-Reply-To: <20100628030507.5187.95903.sendpatchset@localhost.localdomain>
+Message-ID: <alpine.DEB.2.00.1006280207580.28072@chino.kir.corp.google.com>
 References: <20100628030507.5187.95903.sendpatchset@localhost.localdomain>
-Subject: [PATCH 2/2] Makefile: "make kernelrelease" should show the correct full kernel version
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: linux-kbuild@vger.kernel.org, David Rientjes <rientjes@google.com>, Michal Marek <mmarek@suse.cz>, Amerigo Wang <amwang@redhat.com>
+To: Amerigo Wang <amwang@redhat.com>
+Cc: linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
 
-From: Amerigo Wang <amwang@redhat.com>
-Date: Mon, 28 Jun 2010 10:45:21 +0800
+On Sun, 27 Jun 2010, Amerigo Wang wrote:
 
-After commit 85a256d8e0116c8f5ad276730830f5d4d473344d, 'make kernelrelease' doesn't
-show the correct full kernel version. This patch fixes it, 'make kernelrelease' will
-show the same version name with the one you finally get.
+> From: Amerigo Wang <amwang@redhat.com>
+> Date: Mon, 28 Jun 2010 10:42:28 +0800
+> 
+> When I use make LOCALVERSION=local and LOCALVERSION_AUTO is not set,
+> I got "2.6.35-rc3local". It is supposed to be "2.6.35-rc3-local".
+> 
 
-Cc: David Rientjes <rientjes@google.com>
-Cc: Michal Marek <mmarek@suse.cz>
-Signed-off-by: Amerigo Wang <amwang@redhat.com>
----
- Makefile |    5 ++---
- 1 files changed, 2 insertions(+), 3 deletions(-)
-
-diff --git a/Makefile b/Makefile
-index 710f91c..2b517a1 100644
---- a/Makefile
-+++ b/Makefile
-@@ -414,7 +414,7 @@ endif
- no-dot-config-targets := clean mrproper distclean \
- 			 cscope TAGS tags help %docs check% \
- 			 include/linux/version.h headers_% \
--			 kernelrelease kernelversion
-+			 kernelversion
- 
- config-targets := 0
- mixed-targets  := 0
-@@ -1468,8 +1468,7 @@ checkstack:
- 	$(PERL) $(src)/scripts/checkstack.pl $(CHECKSTACK_ARCH)
- 
- kernelrelease:
--	$(if $(wildcard include/config/kernel.release), $(Q)echo $(KERNELRELEASE), \
--	$(error kernelrelease not valid - run 'make prepare' to update it))
-+	@echo $(kernelrelease)
- kernelversion:
- 	@echo $(KERNELVERSION)
- 
--- 
-1.6.5.2
-
+No, a `-' is not implied when using LOCALVERSION=.
