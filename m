@@ -1,45 +1,106 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor.suse.de ([195.135.220.2]:46352 "EHLO mx1.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:57057 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752564Ab0F2Lm4 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 29 Jun 2010 07:42:56 -0400
+	id S1750869Ab0F2MNS (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 29 Jun 2010 08:13:18 -0400
+Date: Tue, 29 Jun 2010 14:13:15 +0200
 From: Michal Marek <mmarek@suse.cz>
-Subject: [PATCH] MAINTAINERS: Update kbuild git URLs
-Date: Tue, 29 Jun 2010 13:42:43 +0200
-Message-Id: <1277811763-3916-1-git-send-email-mmarek@suse.cz>
+Subject: Re: [PATCH 2/2] Makefile: "make kernelrelease" should show the
+ correct full kernel version
+Message-ID: <20100629121315.GA13335@sepie.suse.cz>
+References: <20100628030507.5187.95903.sendpatchset@localhost.localdomain>
+ <20100628030516.5187.49089.sendpatchset@localhost.localdomain>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20100628030516.5187.49089.sendpatchset@localhost.localdomain>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, Stephen Rothwell <sfr@canb.auug.org.au>
+To: Amerigo Wang <amwang@redhat.com>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, David Rientjes <rientjes@google.com>
 
-The kbuild tree was moved to git.kernel.org so that people can find it
-more easily.
+On Sun, Jun 27, 2010 at 11:01:06PM -0400, Amerigo Wang wrote:
+> From: Amerigo Wang <amwang@redhat.com>
+> Date: Mon, 28 Jun 2010 10:45:21 +0800
+> 
+> After commit 85a256d8e0116c8f5ad276730830f5d4d473344d, 'make kernelrelease' doesn't
+> show the correct full kernel version. This patch fixes it, 'make kernelrelease' will
+> show the same version name with the one you finally get.
+> 
+> Cc: David Rientjes <rientjes@google.com>
+> Cc: Michal Marek <mmarek@suse.cz>
+> Signed-off-by: Amerigo Wang <amwang@redhat.com>
+> ---
+>  Makefile |    5 ++---
+>  1 files changed, 2 insertions(+), 3 deletions(-)
+> 
+> diff --git a/Makefile b/Makefile
+> index 710f91c..2b517a1 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -414,7 +414,7 @@ endif
+>  no-dot-config-targets := clean mrproper distclean \
+>  			 cscope TAGS tags help %docs check% \
+>  			 include/linux/version.h headers_% \
+> -			 kernelrelease kernelversion
+> +			 kernelversion
+>  
+>  config-targets := 0
+>  mixed-targets  := 0
+> @@ -1468,8 +1468,7 @@ checkstack:
+>  	$(PERL) $(src)/scripts/checkstack.pl $(CHECKSTACK_ARCH)
+>  
+>  kernelrelease:
+> -	$(if $(wildcard include/config/kernel.release), $(Q)echo $(KERNELRELEASE), \
+> -	$(error kernelrelease not valid - run 'make prepare' to update it))
+> +	@echo $(kernelrelease)
+>  kernelversion:
+>  	@echo $(KERNELVERSION)
 
+AFAICS it was broken even before 85a256d. Nevertheless, the patch is
+correct, but conflicts with 0915512 in the kbuild tree. What about this
+one?
+
+From 01ab17887f4cdcb8bb5a5d1bc3b160d186e6e99b Mon Sep 17 00:00:00 2001
+From: Amerigo Wang <amwang@redhat.com>
+Date: Mon, 28 Jun 2010 10:45:21 +0800
+Subject: [PATCH] Makefile: "make kernelrelease" should show the correct full kernel version
+
+After commit 85a256d8e0116c8f5ad276730830f5d4d473344d, 'make kernelrelease'
+doesn't show the correct full kernel version. This patch fixes it,
+'make kernelrelease' will show the same version name with the one
+you finally get.
+
+Cc: David Rientjes <rientjes@google.com>
+Cc: Michal Marek <mmarek@suse.cz>
+Signed-off-by: Amerigo Wang <amwang@redhat.com>
+[mmarek: merged with 0915512 and added dependency on
+include/config/kernel.release]
 Signed-off-by: Michal Marek <mmarek@suse.cz>
----
 
-Stephen, could you please update your linux-next list accordingly? I'll be
-pushing to both repositories for the time being.
-
----
- MAINTAINERS |    4 ++--
- 1 files changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 0572b7e..e4f9e41 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -3098,8 +3098,8 @@ F:	fs/autofs4/
+diff --git a/Makefile b/Makefile
+index a86ac8c..dceb4f1 100644
+--- a/Makefile
++++ b/Makefile
+@@ -414,7 +414,7 @@ endif
+ no-dot-config-targets := clean mrproper distclean \
+ 			 cscope TAGS tags help %docs check% \
+ 			 include/linux/version.h headers_% \
+-			 kernelrelease kernelversion
++			 kernelversion
  
- KERNEL BUILD + files below scripts/ (unless maintained elsewhere)
- M:	Michal Marek <mmarek@suse.cz>
--T:	git git://repo.or.cz/linux-kbuild.git for-next
--T:	git git://repo.or.cz/linux-kbuild.git for-linus
-+T:	git git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild-2.6.git for-next
-+T:	git git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild-2.6.git rc-fixes
- L:	linux-kbuild@vger.kernel.org
- S:	Maintained
- F:	Documentation/kbuild/
--- 
-1.7.1
-
+ config-targets := 0
+ mixed-targets  := 0
+@@ -1395,9 +1395,9 @@ checkstack:
+ 	$(OBJDUMP) -d vmlinux $$(find . -name '*.ko') | \
+ 	$(PERL) $(src)/scripts/checkstack.pl $(CHECKSTACK_ARCH)
+ 
+-kernelrelease:
+-	$(if $(wildcard include/config/kernel.release), $(Q)echo $(KERNELRELEASE), \
+-	$(error kernelrelease not valid - run 'make prepare' to update it))
++kernelrelease: include/config/kernel.release
++	@echo $(KERNELRELEASE)
++
+ kernelversion:
+ 	@echo $(KERNELVERSION)
+ 
