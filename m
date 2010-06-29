@@ -1,147 +1,40 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from rcsinet10.oracle.com ([148.87.113.121]:42110 "EHLO
-	rcsinet10.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751470Ab0F1U6u (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 28 Jun 2010 16:58:50 -0400
-Date: Mon, 28 Jun 2010 13:57:56 -0700
-From: Randy Dunlap <randy.dunlap@oracle.com>
-Subject: Re: [PATCH] Documentation/kbuild: fixed typos and wording
-Message-Id: <20100628135756.7fbaad2d.randy.dunlap@oracle.com>
-In-Reply-To: <4C28BAE3.8030909@oracle.com>
-References: <20100626150021.254b95b3@absol.kitzblitz>
-	<20100626173736.e5946273.randy.dunlap@oracle.com>
-	<4C28B801.7050709@suse.cz>
-	<4C28BAE3.8030909@oracle.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Received: from mx1.redhat.com ([209.132.183.28]:15663 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751990Ab0F2Blt (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 28 Jun 2010 21:41:49 -0400
+Message-ID: <4C29504F.4010204@redhat.com>
+Date: Tue, 29 Jun 2010 09:45:51 +0800
+From: Cong Wang <amwang@redhat.com>
+MIME-Version: 1.0
+Subject: Re: [PATCH 1/2] Makefile: fix missing dash when using make LOCALVERSION=xxx
+References: <20100628030507.5187.95903.sendpatchset@localhost.localdomain> <alpine.DEB.2.00.1006280207580.28072@chino.kir.corp.google.com> <4C286A8F.9080508@redhat.com> <alpine.DEB.2.00.1006281145590.25490@chino.kir.corp.google.com>
+In-Reply-To: <alpine.DEB.2.00.1006281145590.25490@chino.kir.corp.google.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>, Nicolas Kaiser <nikai@nikai.net>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org
+To: David Rientjes <rientjes@google.com>
+Cc: linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
 
-On Mon, 28 Jun 2010 08:08:19 -0700 Randy Dunlap wrote:
+On 06/29/10 02:46, David Rientjes wrote:
+> On Mon, 28 Jun 2010, Cong Wang wrote:
+>
+>> But in your patch description, you said:
+>>
+>>      Without CONFIG_LOCALVERSION_AUTO, "make" results in v2.6.32-rc4+
+>>      unless the repository is at the Linux v2.6.32-rc4 commit (in which
+>>      case the version would be v2.6.32-rc4).  If "make LOCALVERSION=kbuild"
+>>      were used, it results in v2.6.32-rc4-kbuild.
+>>
+>> So, shouldn't that be "make LOCALVERSION=-kbuild"?
+>>
+>
+> Yup, that's what it should have said.  That doesn't mean that we need to
+> change the long-standing behavior of LOCALVERSION= to add an implied `-',
+> though.
 
-> On 06/28/10 07:56, Michal Marek wrote:
-> > On 27.6.2010 02:37, Randy Dunlap wrote:
-> >> On Sat, 26 Jun 2010 15:00:21 +0200 Nicolas Kaiser wrote:
-> >>
-> >>> Fixed some typos and wording.
-> >>>
-> >>> Signed-off-by: Nicolas Kaiser <nikai@nikai.net>
-> >>
-> >> Acked-by: Randy Dunlap <randy.dunlap@oracle.com>
-> > 
-> > Randy, are you adding this to the kernel-doc tree? There are already
-> > patches from matt mooney, sometimes touching the same paragraphs as this
-> > one.
-> 
-> Oh, thanks for the warning, I hadn't noticed that.
-> I guess that it makes more sense for me to add this one also
-> and fix up any merge problems.  Will do.
-
-OK, merged with matt mooney's patches.
-
-Nicolas's resulting patch is here:
-http://oss.oracle.com/~rdunlap/kernel-doc-patches/current/docs-kbuild-typos-wording.patch
+Ok, but your patch description is the only doc I found, so... :)
 
 Thanks.
 
-> > Michal
-> > 
-> >>
-> >> Thanks.
-> >>
-> >>> ---
-> >>>  Documentation/kbuild/kbuild.txt    |    8 ++++----
-> >>>  Documentation/kbuild/makefiles.txt |   20 ++++++++++----------
-> >>>  2 files changed, 14 insertions(+), 14 deletions(-)
-> >>>
-> >>> diff --git a/Documentation/kbuild/kbuild.txt b/Documentation/kbuild/kbuild.txt
-> >>> index 634c625..0d8addb 100644
-> >>> --- a/Documentation/kbuild/kbuild.txt
-> >>> +++ b/Documentation/kbuild/kbuild.txt
-> >>> @@ -40,15 +40,15 @@ Set the directory to look for the kernel source when building external
-> >>>  modules.
-> >>>  The directory can be specified in several ways:
-> >>>  1) Use "M=..." on the command line
-> >>> -2) Environmnet variable KBUILD_EXTMOD
-> >>> -3) Environmnet variable SUBDIRS
-> >>> +2) Environment variable KBUILD_EXTMOD
-> >>> +3) Environment variable SUBDIRS
-> >>>  The possibilities are listed in the order they take precedence.
-> >>>  Using "M=..." will always override the others.
-> >>>  
-> >>>  KBUILD_OUTPUT
-> >>>  --------------------------------------------------
-> >>>  Specify the output directory when building the kernel.
-> >>> -The output directory can also be specificed using "O=...".
-> >>> +The output directory can also be specified using "O=...".
-> >>>  Setting "O=..." takes precedence over KBUILD_OUTPUT.
-> >>>  
-> >>>  ARCH
-> >>> @@ -90,7 +90,7 @@ The script will be called with the following arguments:
-> >>>      $3 - kernel map file
-> >>>      $4 - default install path (use root directory if blank)
-> >>>  
-> >>> -The implmentation of "make install" is architecture specific
-> >>> +The implementation of "make install" is architecture specific
-> >>>  and it may differ from the above.
-> >>>  
-> >>>  INSTALLKERNEL is provided to enable the possibility to
-> >>> diff --git a/Documentation/kbuild/makefiles.txt b/Documentation/kbuild/makefiles.txt
-> >>> index 71c602d..c0c9b1c 100644
-> >>> --- a/Documentation/kbuild/makefiles.txt
-> >>> +++ b/Documentation/kbuild/makefiles.txt
-> >>> @@ -284,12 +284,12 @@ more details, with real examples.
-> >>>  --- 3.7 Compilation flags
-> >>>  
-> >>>      ccflags-y, asflags-y and ldflags-y
-> >>> -	The three flags listed above applies only to the kbuild makefile
-> >>> -	where they are assigned. They are used for all the normal
-> >>> -	cc, as and ld invocation happenign during a recursive build.
-> >>> +	These three flags apply only to the kbuild makefile in which they
-> >>> +	are assigned. They are used for all the normal cc, as and ld
-> >>> +	invocations happening during a recursive build.
-> >>>  	Note: Flags with the same behaviour were previously named:
-> >>>  	EXTRA_CFLAGS, EXTRA_AFLAGS and EXTRA_LDFLAGS.
-> >>> -	They are yet supported but their use are deprecated.
-> >>> +	They are still supported but their usage is deprecated.
-> >>>  
-> >>>  	ccflags-y specifies options for compiling C files with $(CC).
-> >>>  
-> >>> @@ -318,9 +318,9 @@ more details, with real examples.
-> >>>  		ldflags-y := -x
-> >>>  
-> >>>      subdir-ccflags-y, subdir-asflags-y
-> >>> -	The two flags listed above are similar to ccflags-y and as-falgs-y.
-> >>> -	The difference is that the subdir- variants has effect for the kbuild
-> >>> -	file where tey are present and all subdirectories.
-> >>> +	The two flags listed above are similar to ccflags-y and as-flags-y.
-> >>> +	The difference is that the subdir- variants have effect for the kbuild
-> >>> +	file where they are present and all subdirectories.
-> >>>  	Options specified using subdir-* are added to the commandline before
-> >>>  	the options specified using the non-subdir variants.
-> >>>  
-> >>> @@ -1176,14 +1176,14 @@ When kbuild executes, the following steps are followed (roughly):
-> >>>  === 7 Kbuild syntax for exported headers
-> >>>  
-> >>>  The kernel include a set of headers that is exported to userspace.
-> >>> -Many headers can be exported as-is but other headers requires  a
-> >>> +Many headers can be exported as-is but other headers require a
-> >>>  minimal pre-processing before they are ready for user-space.
-> >>>  The pre-processing does:
-> >>>  - drop kernel specific annotations
-> >>>  - drop include of compiler.h
-> >>> -- drop all sections that is kernel internat (guarded by ifdef __KERNEL__)
-> >>> +- drop all sections that are kernel internal (guarded by ifdef __KERNEL__)
-> >>>  
-> >>> -Each relevant directory contain a file name "Kbuild" which specify the
-> >>> +Each relevant directory contains a file name "Kbuild" which specifies the
-> >>>  headers to be exported.
-> >>>  See subsequent chapter for the syntax of the Kbuild file.
-
----
-~Randy
-*** Remember to use Documentation/SubmitChecklist when testing your code ***
