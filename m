@@ -1,32 +1,29 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor.suse.de ([195.135.220.2]:50209 "EHLO mx1.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754599Ab0F2Nn1 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 29 Jun 2010 09:43:27 -0400
-Message-ID: <4C29F87E.3090308@suse.cz>
-Date: Tue, 29 Jun 2010 15:43:26 +0200
-From: Michal Marek <mmarek@suse.cz>
-MIME-Version: 1.0
-Subject: Re: "make gconfig" fails to compile
-References: <4C29F6B1.3060205@fastmail.com.au>
-In-Reply-To: <4C29F6B1.3060205@fastmail.com.au>
-Content-Type: text/plain; charset=ISO-8859-1
+Received: from 74-93-104-97-Washington.hfc.comcastbusiness.net ([74.93.104.97]:54650
+	"EHLO sunset.davemloft.net" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1752569Ab0F2Wcl (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 29 Jun 2010 18:32:41 -0400
+Date: Tue, 29 Jun 2010 15:32:54 -0700 (PDT)
+Message-Id: <20100629.153254.63029948.davem@davemloft.net>
+Subject: Re: [PATCH] net/Makefile: conditionally descend to wireless and
+ ieee802154
+From: David Miller <davem@davemloft.net>
+In-Reply-To: <20100627120025.0232a9d0@absol.kitzblitz>
+References: <20100627120025.0232a9d0@absol.kitzblitz>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Allan Duncan <amd2345@fastmail.com.au>
-Cc: linux-kbuild@vger.kernel.org
+To: nikai@nikai.net
+Cc: netdev@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On 29.6.2010 15:35, Allan Duncan wrote:
-> The last couple of kernels I've built (2.6.33.5 and 2.6.34) barfed on 
-> gconfig.
-> I think it is due to an update of fedora's libraries, anyway the file
-> scripts/kconfig/Makefile line 201:
-> HOSTLOADLIBES_gconf     = `pkg-config --libs gtk+-2.0 gmodule-2.0 
-> libglade-2.0`
-> needs " -ldl" added to the end, like qconf a few lines above has.
+From: Nicolas Kaiser <nikai@nikai.net>
+Date: Sun, 27 Jun 2010 12:00:25 +0200
 
-See http://git.kernel.org/linus/cbab05f, it should automatically appear
-in the next stable releases.
+> Don't descend to wireless and ieee802154 unless they are actually used.
+> 
+> Signed-off-by: Nicolas Kaiser <nikai@nikai.net>
 
-Michal
+Applied.
