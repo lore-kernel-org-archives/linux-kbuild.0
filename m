@@ -1,75 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from metis.ext.pengutronix.de ([92.198.50.35]:58399 "EHLO
-	metis.ext.pengutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752363Ab0F2G6p (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 29 Jun 2010 02:58:45 -0400
-Date: Tue, 29 Jun 2010 08:58:17 +0200
-From: Uwe =?iso-8859-1?Q?Kleine-K=F6nig?=
-	<u.kleine-koenig@pengutronix.de>
-Subject: Re: Subject: [PATCH] arm: fix KConfig warning for mach-mx25
-Message-ID: <20100629065817.GA23160@pengutronix.de>
-References: <201006290005.20875.PeterHuewe@gmx.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <201006290005.20875.PeterHuewe@gmx.de>
+Received: from cantor.suse.de ([195.135.220.2]:46352 "EHLO mx1.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752564Ab0F2Lm4 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 29 Jun 2010 07:42:56 -0400
+From: Michal Marek <mmarek@suse.cz>
+Subject: [PATCH] MAINTAINERS: Update kbuild git URLs
+Date: Tue, 29 Jun 2010 13:42:43 +0200
+Message-Id: <1277811763-3916-1-git-send-email-mmarek@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Peter =?iso-8859-1?Q?H=FCwe?= <PeterHuewe@gmx.de>
-Cc: Sascha Hauer <kernel@pengutronix.de>, Russell King <linux@arm.linux.org.uk>, Baruch Siach <baruch@tkos.co.il>, Eric =?iso-8859-1?Q?B=E9nard?= <eric@eukrea.com>, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, Russell King <rmk+kernel@arm.linux.org.uk>, linux-kbuild@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, Stephen Rothwell <sfr@canb.auug.org.au>
 
-Hiho,
+The kbuild tree was moved to git.kernel.org so that people can find it
+more easily.
 
-[added linux-kbuild@vger.kernel.org to Cc:]
+Signed-off-by: Michal Marek <mmarek@suse.cz>
+---
 
-On Tue, Jun 29, 2010 at 12:05:20AM +0200, Peter Hüwe wrote:
-> From: Peter Huewe <peterhuewe@gmx.de
-> 
-> This patch fixes a KConfig warning:
-> "arch/arm/mach-mx25/Kconfig:18:warning: choice value used outside its
-> choice group"
-> 
-> Signed-off-by: Peter Huewe <peterhuewe@gmx.de>
-The problem also goes away when renaming one of the two
-MACH_EUKREA_MBIMXSD_BASEBOARD (the other MACH_EUKREA_MBIMXSD_BASEBOARD
-is in arch/arm/mach-mx3/Kconfig).  AFAIK Eric already sent a patch to
-fix this.  I think this is the real issue, I don't know why the warning
-goes away with your patch.
+Stephen, could you please update your linux-next list accordingly? I'll be
+pushing to both repositories for the time being.
 
-Nevertheless I like your patch.  And note there are two other variables
-in arch/arm/mach-mx2 that could benefit from the same "fix".  (But as I
-moved this file in my tree I suggest to wait until my changes hit Linus'
-tree and then fix arch/arm/mach-imx/Kconfig.)
+---
+ MAINTAINERS |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
 
-Best regards
-Uwe
-
-> ---
-> KernelVersion: linux-next-20100628
->  arch/arm/mach-mx25/Kconfig |    3 +--
->  1 files changed, 1 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/arm/mach-mx25/Kconfig b/arch/arm/mach-mx25/Kconfig
-> index 3a6668e..2f436ed 100644
-> --- a/arch/arm/mach-mx25/Kconfig
-> +++ b/arch/arm/mach-mx25/Kconfig
-> @@ -15,8 +15,7 @@ choice
->  	default MACH_EUKREA_MBIMXSD_BASEBOARD
->  
->  config MACH_EUKREA_MBIMXSD_BASEBOARD
-> -	prompt "Eukrea MBIMXSD development board"
-> -	bool
-> +	bool "Eukrea MBIMXSD development board"
->  	help
->  	  This adds board specific devices that can be found on Eukrea's
->  	  MBIMXSD evaluation board.
-> -- 
-> 1.7.1
-
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 0572b7e..e4f9e41 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -3098,8 +3098,8 @@ F:	fs/autofs4/
+ 
+ KERNEL BUILD + files below scripts/ (unless maintained elsewhere)
+ M:	Michal Marek <mmarek@suse.cz>
+-T:	git git://repo.or.cz/linux-kbuild.git for-next
+-T:	git git://repo.or.cz/linux-kbuild.git for-linus
++T:	git git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild-2.6.git for-next
++T:	git git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild-2.6.git rc-fixes
+ L:	linux-kbuild@vger.kernel.org
+ S:	Maintained
+ F:	Documentation/kbuild/
 -- 
-Pengutronix e.K.                           | Uwe Kleine-König            |
-Industrial Linux Solutions                 | http://www.pengutronix.de/  |
-Pengutronix e.K.                           | Uwe Kleine-König            |
-Industrial Linux Solutions                 | http://www.pengutronix.de/  |
+1.7.1
+
