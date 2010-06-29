@@ -1,40 +1,75 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:15663 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751990Ab0F2Blt (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 28 Jun 2010 21:41:49 -0400
-Message-ID: <4C29504F.4010204@redhat.com>
-Date: Tue, 29 Jun 2010 09:45:51 +0800
-From: Cong Wang <amwang@redhat.com>
+Received: from metis.ext.pengutronix.de ([92.198.50.35]:58399 "EHLO
+	metis.ext.pengutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752363Ab0F2G6p (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 29 Jun 2010 02:58:45 -0400
+Date: Tue, 29 Jun 2010 08:58:17 +0200
+From: Uwe =?iso-8859-1?Q?Kleine-K=F6nig?=
+	<u.kleine-koenig@pengutronix.de>
+Subject: Re: Subject: [PATCH] arm: fix KConfig warning for mach-mx25
+Message-ID: <20100629065817.GA23160@pengutronix.de>
+References: <201006290005.20875.PeterHuewe@gmx.de>
 MIME-Version: 1.0
-Subject: Re: [PATCH 1/2] Makefile: fix missing dash when using make LOCALVERSION=xxx
-References: <20100628030507.5187.95903.sendpatchset@localhost.localdomain> <alpine.DEB.2.00.1006280207580.28072@chino.kir.corp.google.com> <4C286A8F.9080508@redhat.com> <alpine.DEB.2.00.1006281145590.25490@chino.kir.corp.google.com>
-In-Reply-To: <alpine.DEB.2.00.1006281145590.25490@chino.kir.corp.google.com>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <201006290005.20875.PeterHuewe@gmx.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: David Rientjes <rientjes@google.com>
-Cc: linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
+To: Peter =?iso-8859-1?Q?H=FCwe?= <PeterHuewe@gmx.de>
+Cc: Sascha Hauer <kernel@pengutronix.de>, Russell King <linux@arm.linux.org.uk>, Baruch Siach <baruch@tkos.co.il>, Eric =?iso-8859-1?Q?B=E9nard?= <eric@eukrea.com>, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, Russell King <rmk+kernel@arm.linux.org.uk>, linux-kbuild@vger.kernel.org
 
-On 06/29/10 02:46, David Rientjes wrote:
-> On Mon, 28 Jun 2010, Cong Wang wrote:
->
->> But in your patch description, you said:
->>
->>      Without CONFIG_LOCALVERSION_AUTO, "make" results in v2.6.32-rc4+
->>      unless the repository is at the Linux v2.6.32-rc4 commit (in which
->>      case the version would be v2.6.32-rc4).  If "make LOCALVERSION=kbuild"
->>      were used, it results in v2.6.32-rc4-kbuild.
->>
->> So, shouldn't that be "make LOCALVERSION=-kbuild"?
->>
->
-> Yup, that's what it should have said.  That doesn't mean that we need to
-> change the long-standing behavior of LOCALVERSION= to add an implied `-',
-> though.
+Hiho,
 
-Ok, but your patch description is the only doc I found, so... :)
+[added linux-kbuild@vger.kernel.org to Cc:]
 
-Thanks.
+On Tue, Jun 29, 2010 at 12:05:20AM +0200, Peter Hüwe wrote:
+> From: Peter Huewe <peterhuewe@gmx.de
+> 
+> This patch fixes a KConfig warning:
+> "arch/arm/mach-mx25/Kconfig:18:warning: choice value used outside its
+> choice group"
+> 
+> Signed-off-by: Peter Huewe <peterhuewe@gmx.de>
+The problem also goes away when renaming one of the two
+MACH_EUKREA_MBIMXSD_BASEBOARD (the other MACH_EUKREA_MBIMXSD_BASEBOARD
+is in arch/arm/mach-mx3/Kconfig).  AFAIK Eric already sent a patch to
+fix this.  I think this is the real issue, I don't know why the warning
+goes away with your patch.
 
+Nevertheless I like your patch.  And note there are two other variables
+in arch/arm/mach-mx2 that could benefit from the same "fix".  (But as I
+moved this file in my tree I suggest to wait until my changes hit Linus'
+tree and then fix arch/arm/mach-imx/Kconfig.)
+
+Best regards
+Uwe
+
+> ---
+> KernelVersion: linux-next-20100628
+>  arch/arm/mach-mx25/Kconfig |    3 +--
+>  1 files changed, 1 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/arm/mach-mx25/Kconfig b/arch/arm/mach-mx25/Kconfig
+> index 3a6668e..2f436ed 100644
+> --- a/arch/arm/mach-mx25/Kconfig
+> +++ b/arch/arm/mach-mx25/Kconfig
+> @@ -15,8 +15,7 @@ choice
+>  	default MACH_EUKREA_MBIMXSD_BASEBOARD
+>  
+>  config MACH_EUKREA_MBIMXSD_BASEBOARD
+> -	prompt "Eukrea MBIMXSD development board"
+> -	bool
+> +	bool "Eukrea MBIMXSD development board"
+>  	help
+>  	  This adds board specific devices that can be found on Eukrea's
+>  	  MBIMXSD evaluation board.
+> -- 
+> 1.7.1
+
+-- 
+Pengutronix e.K.                           | Uwe Kleine-König            |
+Industrial Linux Solutions                 | http://www.pengutronix.de/  |
+Pengutronix e.K.                           | Uwe Kleine-König            |
+Industrial Linux Solutions                 | http://www.pengutronix.de/  |
