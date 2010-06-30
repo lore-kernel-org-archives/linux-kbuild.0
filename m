@@ -1,71 +1,88 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:1452 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751031Ab0F3Kf1 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 30 Jun 2010 06:35:27 -0400
-Message-ID: <4C2B1EE0.2080301@redhat.com>
-Date: Wed, 30 Jun 2010 18:39:28 +0800
-From: Cong Wang <amwang@redhat.com>
-MIME-Version: 1.0
-Subject: Re: [PATCH 2/2] Makefile: "make kernelrelease" should show the correct
- full kernel version
-References: <20100628030507.5187.95903.sendpatchset@localhost.localdomain> <20100628030516.5187.49089.sendpatchset@localhost.localdomain> <20100629121315.GA13335@sepie.suse.cz>
-In-Reply-To: <20100629121315.GA13335@sepie.suse.cz>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
+Message-Id: <4C2B50750200007800008CFC@vpn.id2.novell.com>
+Date: Wed, 30 Jun 2010 13:11:01 +0100
+From: "Jan Beulich" <JBeulich@novell.com>
+Subject: [PATCH] don't write invisible choice values
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8BIT
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, David Rientjes <rientjes@google.com>
+To: zippel@linux-m68k.org, sam@ravnborg.org
+Cc: linux-kbuild@vger.kernel.org
 
-On 06/29/10 20:13, Michal Marek wrote:
-> On Sun, Jun 27, 2010 at 11:01:06PM -0400, Amerigo Wang wrote:
->> From: Amerigo Wang<amwang@redhat.com>
->> Date: Mon, 28 Jun 2010 10:45:21 +0800
->>
->> After commit 85a256d8e0116c8f5ad276730830f5d4d473344d, 'make kernelrelease' doesn't
->> show the correct full kernel version. This patch fixes it, 'make kernelrelease' will
->> show the same version name with the one you finally get.
->>
->> Cc: David Rientjes<rientjes@google.com>
->> Cc: Michal Marek<mmarek@suse.cz>
->> Signed-off-by: Amerigo Wang<amwang@redhat.com>
->> ---
->>   Makefile |    5 ++---
->>   1 files changed, 2 insertions(+), 3 deletions(-)
->>
->> diff --git a/Makefile b/Makefile
->> index 710f91c..2b517a1 100644
->> --- a/Makefile
->> +++ b/Makefile
->> @@ -414,7 +414,7 @@ endif
->>   no-dot-config-targets := clean mrproper distclean \
->>   			 cscope TAGS tags help %docs check% \
->>   			 include/linux/version.h headers_% \
->> -			 kernelrelease kernelversion
->> +			 kernelversion
->>
->>   config-targets := 0
->>   mixed-targets  := 0
->> @@ -1468,8 +1468,7 @@ checkstack:
->>   	$(PERL) $(src)/scripts/checkstack.pl $(CHECKSTACK_ARCH)
->>
->>   kernelrelease:
->> -	$(if $(wildcard include/config/kernel.release), $(Q)echo $(KERNELRELEASE), \
->> -	$(error kernelrelease not valid - run 'make prepare' to update it))
->> +	@echo $(kernelrelease)
->>   kernelversion:
->>   	@echo $(KERNELVERSION)
->
-> AFAICS it was broken even before 85a256d. Nevertheless, the patch is
-> correct, but conflicts with 0915512 in the kbuild tree. What about this
-> one?
->
+This makes it so "make oldconfig" really prompts for any choice where
+options that previously weren't visible just became so. Previously one
+would have to remember to go over all choice values and check whether
+some that previously couldn't be selected now can be.
 
-Hmm, I am not sure. IIRC, my first try was also using KERNELRELEASE but it
-didn't work. Note, I may remember wrongly. :)
+Signed-off-by: Jan Beulich <jbeulich@novell.com>
 
-Have you tested it? Sorry that currently I don't have time to test it, I am
-quite busy with other stuffs...
+---
+ scripts/kconfig/symbol.c |   24 ++++++++++++------------
+ 1 file changed, 12 insertions(+), 12 deletions(-)
 
-Thanks!
+--- linux-2.6.35-rc3/scripts/kconfig/symbol.c
++++ 2.6.35-rc3-kconfig-invisible-choice-values/scripts/kconfig/symbol.c
+@@ -222,13 +222,15 @@ static struct symbol *sym_calc_choice(st
+ 	struct property *prop;
+ 	struct expr *e;
+ 
++	/* first calculate all choice values' visibilities */
++	prop = sym_get_choice_prop(sym);
++	expr_list_for_each_sym(prop->expr, e, def_sym)
++		sym_calc_visibility(def_sym);
++
+ 	/* is the user choice visible? */
+ 	def_sym = sym->def[S_DEF_USER].val;
+-	if (def_sym) {
+-		sym_calc_visibility(def_sym);
+-		if (def_sym->visible != no)
+-			return def_sym;
+-	}
++	if (def_sym && def_sym->visible != no)
++		return def_sym;
+ 
+ 	/* any of the defaults visible? */
+ 	for_all_defaults(sym, prop) {
+@@ -236,18 +238,15 @@ static struct symbol *sym_calc_choice(st
+ 		if (prop->visible.tri == no)
+ 			continue;
+ 		def_sym = prop_get_symbol(prop);
+-		sym_calc_visibility(def_sym);
+ 		if (def_sym->visible != no)
+ 			return def_sym;
+ 	}
+ 
+ 	/* just get the first visible value */
+ 	prop = sym_get_choice_prop(sym);
+-	expr_list_for_each_sym(prop->expr, e, def_sym) {
+-		sym_calc_visibility(def_sym);
++	expr_list_for_each_sym(prop->expr, e, def_sym)
+ 		if (def_sym->visible != no)
+ 			return def_sym;
+-	}
+ 
+ 	/* no choice? reset tristate value */
+ 	sym->curr.tri = no;
+@@ -365,12 +364,13 @@ void sym_calc_value(struct symbol *sym)
+ 
+ 	if (sym_is_choice(sym)) {
+ 		struct symbol *choice_sym;
+-		int flags = sym->flags & (SYMBOL_CHANGED | SYMBOL_WRITE);
+ 
+ 		prop = sym_get_choice_prop(sym);
+ 		expr_list_for_each_sym(prop->expr, e, choice_sym) {
+-			choice_sym->flags |= flags;
+-			if (flags & SYMBOL_CHANGED)
++			if ((sym->flags & SYMBOL_WRITE) &&
++			    choice_sym->visible != no)
++				choice_sym->flags |= SYMBOL_WRITE;
++			if (sym->flags & SYMBOL_CHANGED)
+ 				sym_set_changed(choice_sym);
+ 		}
+ 	}
+
+
+
