@@ -1,88 +1,71 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Message-Id: <4C2B50750200007800008CFC@vpn.id2.novell.com>
-Date: Wed, 30 Jun 2010 13:11:01 +0100
-From: "Jan Beulich" <JBeulich@novell.com>
-Subject: [PATCH] don't write invisible choice values
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8BIT
+Received: from mail-bw0-f46.google.com ([209.85.214.46]:42355 "EHLO
+	mail-bw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754928Ab0F3S7A (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 30 Jun 2010 14:59:00 -0400
+Date: Wed, 30 Jun 2010 22:58:54 +0400
+From: Kulikov Vasiliy <segooon@gmail.com>
+Subject: Re: [PATCH 1/7] Add a target to use the Coccinelle checker
+Message-ID: <20100630185851.GA17502@shinshilla>
+References: <1275837307-4283-1-git-send-email-npalix@diku.dk>
+ <1275837307-4283-2-git-send-email-npalix@diku.dk>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <1275837307-4283-2-git-send-email-npalix@diku.dk>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: zippel@linux-m68k.org, sam@ravnborg.org
-Cc: linux-kbuild@vger.kernel.org
+To: Nicolas Palix <npalix@diku.dk>
+Cc: Randy Dunlap <rdunlap@xenotime.net>, Roland Dreier <rdreier@cisco.com>, Joe Perches <joe@perches.com>, Andrew Morton <akpm@linux-foundation.org>, "David S. Miller" <davem@davemloft.net>, Michal Marek <mmarek@suse.cz>, Sam Ravnborg <sam@ravnborg.org>, Julia Lawall <julia@diku.dk>, Gilles Muller <Gilles.Muller@lip6.fr>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, cocci@diku.dk, Wolfram Sang <w.sang@pengutronix.de>, Kernel Janitors <kernel-janitors@vger.kernel.org>, =?iso-8859-1?Q?Am=E9rico?= Wang <xiyou.wangcong@gmail.com>, Andy Isaacson <adi@hexapodia.org>, Linus Torvalds <torvalds@linux-foundation.org>, Pekka Enberg <penberg@cs.helsinki.fi>, walter harms <wharms@bfs.de>, Joerg Roedel <joro@8bytes.org>, Jan Engelhardt <jengelh@medozas.de>
 
-This makes it so "make oldconfig" really prompts for any choice where
-options that previously weren't visible just became so. Previously one
-would have to remember to go over all choice values and check whether
-some that previously couldn't be selected now can be.
+Hi,
 
-Signed-off-by: Jan Beulich <jbeulich@novell.com>
+On Sun, Jun 06, 2010 at 17:15 +0200, Nicolas Palix wrote:
+> +    echo ' The semantic patch that makes this change is available'
+> +    echo " in $FILE."
+> +    echo ''
+> +    echo ' More information about semantic patching is available at'
+> +    echo ' http://coccinelle.lip6.fr/'
+> +    echo ''
+> +
+> +    $SPATCH -D $MODE -very_quiet -sp_file $COCCI $OPT -dir $DIR
 
----
- scripts/kconfig/symbol.c |   24 ++++++++++++------------
- 1 file changed, 12 insertions(+), 12 deletions(-)
+Here I've got output:
 
---- linux-2.6.35-rc3/scripts/kconfig/symbol.c
-+++ 2.6.35-rc3-kconfig-invisible-choice-values/scripts/kconfig/symbol.c
-@@ -222,13 +222,15 @@ static struct symbol *sym_calc_choice(st
- 	struct property *prop;
- 	struct expr *e;
- 
-+	/* first calculate all choice values' visibilities */
-+	prop = sym_get_choice_prop(sym);
-+	expr_list_for_each_sym(prop->expr, e, def_sym)
-+		sym_calc_visibility(def_sym);
-+
- 	/* is the user choice visible? */
- 	def_sym = sym->def[S_DEF_USER].val;
--	if (def_sym) {
--		sym_calc_visibility(def_sym);
--		if (def_sym->visible != no)
--			return def_sym;
--	}
-+	if (def_sym && def_sym->visible != no)
-+		return def_sym;
- 
- 	/* any of the defaults visible? */
- 	for_all_defaults(sym, prop) {
-@@ -236,18 +238,15 @@ static struct symbol *sym_calc_choice(st
- 		if (prop->visible.tri == no)
- 			continue;
- 		def_sym = prop_get_symbol(prop);
--		sym_calc_visibility(def_sym);
- 		if (def_sym->visible != no)
- 			return def_sym;
- 	}
- 
- 	/* just get the first visible value */
- 	prop = sym_get_choice_prop(sym);
--	expr_list_for_each_sym(prop->expr, e, def_sym) {
--		sym_calc_visibility(def_sym);
-+	expr_list_for_each_sym(prop->expr, e, def_sym)
- 		if (def_sym->visible != no)
- 			return def_sym;
--	}
- 
- 	/* no choice? reset tristate value */
- 	sym->curr.tri = no;
-@@ -365,12 +364,13 @@ void sym_calc_value(struct symbol *sym)
- 
- 	if (sym_is_choice(sym)) {
- 		struct symbol *choice_sym;
--		int flags = sym->flags & (SYMBOL_CHANGED | SYMBOL_WRITE);
- 
- 		prop = sym_get_choice_prop(sym);
- 		expr_list_for_each_sym(prop->expr, e, choice_sym) {
--			choice_sym->flags |= flags;
--			if (flags & SYMBOL_CHANGED)
-+			if ((sym->flags & SYMBOL_WRITE) &&
-+			    choice_sym->visible != no)
-+				choice_sym->flags |= SYMBOL_WRITE;
-+			if (sym->flags & SYMBOL_CHANGED)
- 				sym_set_changed(choice_sym);
- 		}
- 	}
+/usr/lib/coccinelle/spatch: unknown option `-very_quiet'.
+Usage: spatch -sp_file <SP> <infile> [-o <outfile>] [-iso_file <iso>] [options]
+Options are:
+[...]
 
 
+I use ubuntu Lucid 10.04 as said in Documentation/coccinelle.txt.
 
+$ LANG=C apt-cache policy coccinelle
+[...]
+  Installed: 0.2.0.deb-1ubuntu2
+[...]
+
+
+If I delete -very_quiet then It runs OK, but output is not ommited:
+
+init_defs_builtins: /usr/share/coccinelle/standard.h
+HANDLING: /home/vasya/dev/linux-next/security/min_addr.c
+HANDLING: /home/vasya/dev/linux-next/security/keys/proc.c
+HANDLING: /home/vasya/dev/linux-next/security/keys/keyring.c
+HANDLING: /home/vasya/dev/linux-next/security/keys/gc.c
+HANDLING: /home/vasya/dev/linux-next/security/keys/process_keys.c
+HANDLING: /home/vasya/dev/linux-next/security/keys/request_key_auth.c
+[...]
+
+
+> +if [ "$COCCI" = "" ] ; then
+> +    for f in `find $srctree/scripts/coccinelle/ -name '*.cocci' -type f | sort`; do
+> +	coccinelle $f $srctree;
+> +    done
+> +else
+> +    coccinelle $COCCI $srctree
+> +fi
+
+I think it is more usefull to use $M instead of $srctree to run simple
+'make coccicheck'.
