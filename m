@@ -1,715 +1,222 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from jack.hrz.tu-chemnitz.de ([134.109.132.46]:34924 "EHLO
-	jack.hrz.tu-chemnitz.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754636Ab0GMTsu (ORCPT
+Received: from mail-px0-f174.google.com ([209.85.212.174]:54064 "EHLO
+	mail-px0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752714Ab0GMXGN (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 13 Jul 2010 15:48:50 -0400
-From: Alexander Stein <alexander.stein@informatik.tu-chemnitz.de>
-Subject: [PATCH v2] kconfig qconf: port to QT4
-Date: Tue, 13 Jul 2010 21:26:56 +0200
-Message-Id: <1279049216-22480-1-git-send-email-alexander.stein@informatik.tu-chemnitz.de>
-In-Reply-To: <4C0D64A2.9020701@suse.cz>
-References: <4C0D64A2.9020701@suse.cz>
+	Tue, 13 Jul 2010 19:06:13 -0400
+Subject: [RFC PATCH] Kconfig: Enable Kconfig fragments to be used for defconfig
+From: Grant Likely <grant.likely@secretlab.ca>
+Date: Tue, 13 Jul 2010 17:04:58 -0600
+Message-ID: <20100713230352.6781.18644.stgit@angua>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Michal Marek <mmarek@suse.cz>, Roman Zippel <zippel@linux-m68k.org>, lkml <linux-kernel@vger.kernel.org>, Alexander Stein <alexander.stein@informatik.tu-chemnitz.de>
+To: linuxppc-dev@lists.ozlabs.org, Nicolas Pitre <nico@fluxnic.net>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Linus Torvalds <torvalds@linux-foundation.org>, Russell King <rmk@arm.linux.org.uk>
+Cc: Tony Lindgren <tony@atomide.com>, Daniel Walker <dwalker@codeaurora.org>, Uwe =?utf-8?q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
 
-A straight forward port to QT4 using qt3to4 and compiling against
-  qt3support
+This is a proof of concept at the moment, but if the corner cases
+can be sorted out, then this might be the best way to replace
+the defconfig functionality.  This patch implements Linus' idea
+for using Kconfig fragments to replicate the *_defconfig functionality
 
-* rewritten makefile rules to detect QT4 by using qmake which is hopefully
-  portable enough
-* If no QT4, QT3 will by tried instead
-* Classes renamed using qt3to4
-  * If build using QT3 renamed to QT3 class names using defines
-* ConfigInfoView::menu has to be renamed as QT4 moc strips struct from
-  struct menu and creates a name conflict
+Essentially, this patch adds a new <board>_defconfig target that is
+processed if a <board>.Kconfig file is present in the $(ARCH)/configs
+directory instead of the current <board>_defconfig file.  The target
+works by passing the $(ARCH)/configs/<board>.Kconfig to Kconfig
+instead of the architecture's default $(ARCH)/Kconfig file.
 
-Signed-off-by: Alexander Stein <alexander.stein@informatik.tu-chemnitz.de>
+<board>.Kconfig defines new board specific config items (prefixed with
+"generateconfig_" which default to 'y' or 'm' and select the options
+that the platform cares about.  It also then either the architecture
+default Kconfig, or another Kconfig fragment that includes the default
+one (therefore the fragments can be 'stacked' to include, say, default
+options for the architecture, or particular chipset).
+
+This patch includes sample Kconfig fragments for the PowerPC 83xx and
+5200 platforms to demonstrate the concept, but it should work in exactly
+the same way for ARM or any other architecture.  With the sample,
+'mpc5200_defconfig', 'mpc83xx_defconfig' and even 'ppc32_defconfig' are
+all valid targets (although the ppc32_defconfig won't actually include
+any particular board support).
+
+An interesting side effect of this approach is that it can be used to
+'overlay' the configuration for a board over top of the existing config.
+I went ahead and added the %_oldconfig option to do this which could
+be useful for building a kernel that supports multiple boards, or for
+adding in a set of debug options.
+
+Another advantage of this approach is that it doesn't immediately
+eliminate the old defconfig files so that platforms can be migrated to
+this new method one at a time.
+
+Current problems:
+- I haven't figured out a way for the fragment to force an option to
+  be "n", or to set a value, for example "CONFIG_LOG_BUF_SHIFT=16".
+  This may require changing the syntax.
+- It still doesn't resolve dependencies.  A solver would help with this.
+  For the time being I work around the problem by running the generated
+  config through 'oldconfig' and looking for differences.  If the files
+  differ (ignoring comments and generateconfig_* options) after oldconfig,
+  then the <board>_defconfig target returns a failure.  (but leaves the
+  new .config intact so the user can resolve it with menuconfig).  This
+  way at least the user is told when a Kconfig fragment is invalid.
+
+Signed-off-by: Grant Likely <grant.likely@secretlab.ca>
 ---
-Changes in v2:
-* Use QT3 as fallback if no QT4 is available
-* Rename class names using defines for QT3
+ arch/powerpc/configs/mpc5200.Kconfig |   24 +++++++++++++++++++++
+ arch/powerpc/configs/mpc83xx.Kconfig |   35 +++++++++++++++++++++++++++++++
+ arch/powerpc/configs/ppc32.Kconfig   |   39 ++++++++++++++++++++++++++++++++++
+ scripts/kconfig/Makefile             |   18 +++++++++++++++-
+ 4 files changed, 115 insertions(+), 1 deletions(-)
+ create mode 100644 arch/powerpc/configs/mpc5200.Kconfig
+ create mode 100644 arch/powerpc/configs/mpc83xx.Kconfig
+ create mode 100644 arch/powerpc/configs/ppc32.Kconfig
 
- scripts/kconfig/Makefile |   78 ++++++++++++++----------
- scripts/kconfig/qconf.cc |  151 +++++++++++++++++++++++++---------------------
- scripts/kconfig/qconf.h  |   74 +++++++++++------------
- 3 files changed, 164 insertions(+), 139 deletions(-)
-
+diff --git a/arch/powerpc/configs/mpc5200.Kconfig b/arch/powerpc/configs/mpc5200.Kconfig
+new file mode 100644
+index 0000000..1281dd1
+--- /dev/null
++++ b/arch/powerpc/configs/mpc5200.Kconfig
+@@ -0,0 +1,24 @@
++config generateconfig_MPC5200_YES
++	def_bool y
++	select PPC_MPC52xx
++	select PPC_MPC5200_SIMPLE
++	select PPC_EFIKA
++	select PPC_LITE5200
++	select PPC_MEDIA5200
++	select PPC_MPC5200_BUGFIX
++	select PPC_MPC5200_GPIO
++	select PPC_MPC5200_LPBFIFO
++	select PPC_BESTCOMM
++	select SIMPLE_GPIO
++	select SERIAL_MPC52xx
++	select SERIAL_MPC52xx_CONSOLE
++	select MTD
++	select PATA_MPC52xx
++	select SPI_MPC52xx
++	select SPI_MPC52xx_PSC
++	select I2C_MPC
++	select FEC_MPC52xx
++	select LXT_PHY
++	select WATCHDOG
++
++source arch/powerpc/configs/ppc32.Kconfig
+diff --git a/arch/powerpc/configs/mpc83xx.Kconfig b/arch/powerpc/configs/mpc83xx.Kconfig
+new file mode 100644
+index 0000000..818fdec
+--- /dev/null
++++ b/arch/powerpc/configs/mpc83xx.Kconfig
+@@ -0,0 +1,35 @@
++config generateconfig_MPC83xx_YES
++	def_bool y
++	select PPC_83xx
++	select EMBEDDED
++	select MPC831x_RDB
++	select MPC832x_MDS
++	select MPC832x_RDB
++	select MPC834x_MDS
++	select MPC834x_ITX
++	select MPC836x_MDS
++	select MPC836x_RDK
++	select MPC837x_MDS
++	select MPC837x_RDB
++	select SBC834x
++	select ASP834x
++	select QUICC_ENGINE
++	select OE_GPIO
++	select MATH_EMULATION
++	select SATA_FSL
++	select SATA_SIL
++	select MARVELL_PHY
++	select DAVICOM_PHY
++	select VITESSE_PHY
++	select ICPLUS_PHY
++	select FIXED_PHY
++	select FSL_PQ_MDIO
++	select GIANFAR
++	select UCC_GETH
++	select SERIAL_8250
++	select SERIAL_8250_CONSOLE
++	select I2C_MPC
++	select GPIOLIB
++	select WATCHDOG
++
++source arch/powerpc/configs/ppc32.Kconfig
+diff --git a/arch/powerpc/configs/ppc32.Kconfig b/arch/powerpc/configs/ppc32.Kconfig
+new file mode 100644
+index 0000000..66e39f0
+--- /dev/null
++++ b/arch/powerpc/configs/ppc32.Kconfig
+@@ -0,0 +1,39 @@
++config generateconfig_PPC32_YES
++	def_bool y
++	select EXPERIMENTAL
++	select DEVTMPFS
++	select PPC32
++	select SYSVIPC
++	select BLK_DEV_INITRD
++	select NO_HZ
++	select HIGH_RES_TIMERS
++	select GPIO
++	select SPI
++	select SPI_SPIDEV
++	select I2C
++	select I2C_CHARDEV
++	select USB
++	select NET
++	select SCSI
++	select BLK_DEV_SD
++	select ATA
++	select PACKET
++	select UNIX
++	select INET
++	select IP_MULTICAST
++	select IP_PNP
++	select IP_PNP_DHCP
++	select NETDEVICES
++	select NET_ETHERNET
++	select PROC_DEVICETREE
++	select INOTIFY
++	select TMPFS
++	select NFS_FS
++	select ROOT_NFS
++	select PRINTK_TIME
++
++config generateconfig_PPC32_MODULE
++	def_tristate m
++
++source arch/powerpc/Kconfig
++
 diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
-index 7ea649d..eb3c2f6 100644
+index 7ea649d..4e9afd9 100644
 --- a/scripts/kconfig/Makefile
 +++ b/scripts/kconfig/Makefile
-@@ -233,40 +233,52 @@ $(obj)/.tmp_qtcheck: $(src)/Makefile
- # QT needs some extra effort...
- $(obj)/.tmp_qtcheck:
- 	@set -e; echo "  CHECK   qt"; dir=""; pkg=""; \
--	pkg-config --exists qt 2> /dev/null && pkg=qt; \
--	pkg-config --exists qt-mt 2> /dev/null && pkg=qt-mt; \
--	if [ -n "$$pkg" ]; then \
--	  cflags="\$$(shell pkg-config $$pkg --cflags)"; \
--	  libs="\$$(shell pkg-config $$pkg --libs)"; \
--	  moc="\$$(shell pkg-config $$pkg --variable=prefix)/bin/moc"; \
--	  dir="$$(pkg-config $$pkg --variable=prefix)"; \
-+	qmake=$(shell which qmake); \
-+	if [ -z $$qmake ]; then \
-+	    echo "* Unable to find the QT4 tool qmake. Trying to use QT3"; \
-+	    pkg-config --exists qt 2> /dev/null && pkg=qt; \
-+	    pkg-config --exists qt-mt 2> /dev/null && pkg=qt-mt; \
-+	    if [ -n "$$pkg" ]; then \
-+	      cflags="\$$(shell pkg-config $$pkg --cflags)"; \
-+	      libs="\$$(shell pkg-config $$pkg --libs)"; \
-+	      moc="\$$(shell pkg-config $$pkg --variable=prefix)/bin/moc"; \
-+	      dir="$$(pkg-config $$pkg --variable=prefix)"; \
-+	    else \
-+	      for d in $$QTDIR /usr/share/qt* /usr/lib/qt*; do \
-+	        if [ -f $$d/include/qconfig.h ]; then dir=$$d; break; fi; \
-+	      done; \
-+	      if [ -z "$$dir" ]; then \
-+	        echo "*"; \
-+	        echo "* Unable to find any QT installation. Please make sure that"; \
-+	        echo "* the QT4 or QT3 development package is correctly installed and"; \
-+	        echo "* either qmake can be found or install pkg-config or set"; \
-+	        echo "* the QTDIR environment variable to the correct location."; \
-+	        echo "*"; \
-+	        false; \
-+	      fi; \
-+	      libpath=$$dir/lib; lib=qt; osdir=""; \
-+	      $(HOSTCXX) -print-multi-os-directory > /dev/null 2>&1 && \
-+	        osdir=x$$($(HOSTCXX) -print-multi-os-directory); \
-+	      test -d $$libpath/$$osdir && libpath=$$libpath/$$osdir; \
-+	      test -f $$libpath/libqt-mt.so && lib=qt-mt; \
-+	      cflags="-I$$dir/include"; \
-+	      libs="-L$$libpath -Wl,-rpath,$$libpath -l$$lib"; \
-+	      moc="$$dir/bin/moc"; \
-+	    fi; \
-+	    if [ ! -x $$dir/bin/moc -a -x /usr/bin/moc ]; then \
-+	      echo "*"; \
-+	      echo "* Unable to find $$dir/bin/moc, using /usr/bin/moc instead."; \
-+	      echo "*"; \
-+	      moc="/usr/bin/moc"; \
-+	    fi; \
-+	    cflags="$$cflags -DUSE_QT3"; \
- 	else \
--	  for d in $$QTDIR /usr/share/qt* /usr/lib/qt*; do \
--	    if [ -f $$d/include/qconfig.h ]; then dir=$$d; break; fi; \
--	  done; \
--	  if [ -z "$$dir" ]; then \
--	    echo "*"; \
--	    echo "* Unable to find the QT3 installation. Please make sure that"; \
--	    echo "* the QT3 development package is correctly installed and"; \
--	    echo "* either install pkg-config or set the QTDIR environment"; \
--	    echo "* variable to the correct location."; \
--	    echo "*"; \
--	    false; \
--	  fi; \
--	  libpath=$$dir/lib; lib=qt; osdir=""; \
--	  $(HOSTCXX) -print-multi-os-directory > /dev/null 2>&1 && \
--	    osdir=x$$($(HOSTCXX) -print-multi-os-directory); \
--	  test -d $$libpath/$$osdir && libpath=$$libpath/$$osdir; \
--	  test -f $$libpath/libqt-mt.so && lib=qt-mt; \
--	  cflags="-I$$dir/include"; \
--	  libs="-L$$libpath -Wl,-rpath,$$libpath -l$$lib"; \
--	  moc="$$dir/bin/moc"; \
--	fi; \
--	if [ ! -x $$dir/bin/moc -a -x /usr/bin/moc ]; then \
--	  echo "*"; \
--	  echo "* Unable to find $$dir/bin/moc, using /usr/bin/moc instead."; \
--	  echo "*"; \
--	  moc="/usr/bin/moc"; \
-+	  headerpath="\$$(shell $$qmake -query QT_INSTALL_HEADERS)"; \
-+	  libpath="\$$(shell $$qmake -query QT_INSTALL_LIBS)"; \
-+	  binpath="\$$(shell $$qmake -query QT_INSTALL_BINS)"; \
-+	  cflags="-I$$headerpath -I$$headerpath/QtCore -I$$headerpath/QtGui -I$$headerpath/Qt3Support -DQT3_SUPPORT"; \
-+	  libs="-L$$libpath -Wl,-rpath,$$libpath -lQtCore -lQtGui -lQt3Support"; \
-+	  moc="$$binpath/moc"; \
- 	fi; \
- 	echo "KC_QT_CFLAGS=$$cflags" > $@; \
- 	echo "KC_QT_LIBS=$$libs" >> $@; \
-diff --git a/scripts/kconfig/qconf.cc b/scripts/kconfig/qconf.cc
-index 00c5150..d287689 100644
---- a/scripts/kconfig/qconf.cc
-+++ b/scripts/kconfig/qconf.cc
-@@ -3,25 +3,40 @@
-  * Released under the terms of the GNU GPL v2.0.
-  */
+@@ -117,7 +117,23 @@ else
+ 	$(Q)$< -D arch/$(SRCARCH)/configs/$(KBUILD_DEFCONFIG) $(Kconfig)
+ endif
  
--#include <qapplication.h>
-+#ifdef USE_QT3
- #include <qmainwindow.h>
-+#include <qvbox.h>
-+#include <qvaluelist.h>
-+#include <qtextbrowser.h>
-+#include <qaction.h>
-+#include <qheader.h>
-+#include <qfiledialog.h>
-+#include <qdragobject.h>
-+#include <qpopupmenu.h>
-+#else
-+#include <q3mainwindow.h>
-+#include <q3vbox.h>
-+#include <q3valuelist.h>
-+#include <q3textbrowser.h>
-+#include <q3action.h>
-+#include <q3header.h>
-+#include <q3filedialog.h>
-+#include <q3dragobject.h>
-+#include <q3popupmenu.h>
-+#endif
+-%_defconfig: $(obj)/conf
++# New-style defconfig using Kconfig fragments
++%_defconfig: $(obj)/conf arch/$(SRCARCH)/configs/%.Kconfig
++	$(Q)$< -D /dev/null arch/$(SRCARCH)/configs/$*.Kconfig
++	$(Q)sed '/^#/d;/^CONFIG_generateconfig_/d' $(objtree)/.config > $(objtree)/.config-diff1
++	$(Q)$< -o $(Kconfig) > /dev/null # oldconfig test to make sure it doesn't change
++	$(Q)sed '/^#/d' $(objtree)/.config > $(objtree)/.config-diff2
++	$(Q)diff -u $(objtree)/.config-diff1 $(objtree)/.config-diff2
 +
-+#include <qapplication.h>
- #include <qdesktopwidget.h>
- #include <qtoolbar.h>
- #include <qlayout.h>
--#include <qvbox.h>
- #include <qsplitter.h>
--#include <qlistview.h>
--#include <qtextbrowser.h>
- #include <qlineedit.h>
- #include <qlabel.h>
- #include <qpushbutton.h>
- #include <qmenubar.h>
- #include <qmessagebox.h>
--#include <qaction.h>
--#include <qheader.h>
--#include <qfiledialog.h>
--#include <qdragobject.h>
- #include <qregexp.h>
-+#include <qevent.h>
- 
- #include <stdlib.h>
- 
-@@ -39,7 +54,7 @@
- static QApplication *configApp;
- static ConfigSettings *configSettings;
- 
--QAction *ConfigMainWindow::saveAction;
-+Q3Action *ConfigMainWindow::saveAction;
- 
- static inline QString qgettext(const char* str)
- {
-@@ -54,9 +69,9 @@ static inline QString qgettext(const QString& str)
- /**
-  * Reads a list of integer values from the application settings.
-  */
--QValueList<int> ConfigSettings::readSizes(const QString& key, bool *ok)
-+Q3ValueList<int> ConfigSettings::readSizes(const QString& key, bool *ok)
- {
--	QValueList<int> result;
-+	Q3ValueList<int> result;
- 	QStringList entryList = readListEntry(key, ok);
- 	if (ok) {
- 		QStringList::Iterator it;
-@@ -70,10 +85,10 @@ QValueList<int> ConfigSettings::readSizes(const QString& key, bool *ok)
- /**
-  * Writes a list of integer values to the application settings.
-  */
--bool ConfigSettings::writeSizes(const QString& key, const QValueList<int>& value)
-+bool ConfigSettings::writeSizes(const QString& key, const Q3ValueList<int>& value)
- {
- 	QStringList stringList;
--	QValueList<int>::ConstIterator it;
-+	Q3ValueList<int>::ConstIterator it;
- 
- 	for (it = value.begin(); it != value.end(); ++it)
- 		stringList.push_back(QString::number(*it));
-@@ -422,7 +437,7 @@ void ConfigList::updateList(ConfigItem* item)
- 	if (!rootEntry) {
- 		if (mode != listMode)
- 			goto update;
--		QListViewItemIterator it(this);
-+		Q3ListViewItemIterator it(this);
- 		ConfigItem* item;
- 
- 		for (; it.current(); ++it) {
-@@ -553,7 +568,7 @@ void ConfigList::setParentMenu(void)
- 		return;
- 	setRootMenu(menu_get_parent_menu(rootEntry->parent));
- 
--	QListViewItemIterator it(this);
-+	Q3ListViewItemIterator it(this);
- 	for (; (item = (ConfigItem*)it.current()); it++) {
- 		if (item->menu == oldroot) {
- 			setCurrentItem(item);
-@@ -635,7 +650,7 @@ void ConfigList::updateMenuList(P* parent, struct menu* menu)
- 
- void ConfigList::keyPressEvent(QKeyEvent* ev)
- {
--	QListViewItem* i = currentItem();
-+	Q3ListViewItem* i = currentItem();
- 	ConfigItem* item;
- 	struct menu *menu;
- 	enum prop_type type;
-@@ -801,10 +816,10 @@ void ConfigList::contextMenuEvent(QContextMenuEvent *e)
- {
- 	if (e->y() <= header()->geometry().bottom()) {
- 		if (!headerPopup) {
--			QAction *action;
-+			Q3Action *action;
- 
--			headerPopup = new QPopupMenu(this);
--			action = new QAction(NULL, _("Show Name"), 0, this);
-+			headerPopup = new Q3PopupMenu(this);
-+			action = new Q3Action(NULL, _("Show Name"), 0, this);
- 			  action->setToggleAction(TRUE);
- 			  connect(action, SIGNAL(toggled(bool)),
- 				  parent(), SLOT(setShowName(bool)));
-@@ -812,7 +827,7 @@ void ConfigList::contextMenuEvent(QContextMenuEvent *e)
- 				  action, SLOT(setOn(bool)));
- 			  action->setOn(showName);
- 			  action->addTo(headerPopup);
--			action = new QAction(NULL, _("Show Range"), 0, this);
-+			action = new Q3Action(NULL, _("Show Range"), 0, this);
- 			  action->setToggleAction(TRUE);
- 			  connect(action, SIGNAL(toggled(bool)),
- 				  parent(), SLOT(setShowRange(bool)));
-@@ -820,7 +835,7 @@ void ConfigList::contextMenuEvent(QContextMenuEvent *e)
- 				  action, SLOT(setOn(bool)));
- 			  action->setOn(showRange);
- 			  action->addTo(headerPopup);
--			action = new QAction(NULL, _("Show Data"), 0, this);
-+			action = new Q3Action(NULL, _("Show Data"), 0, this);
- 			  action->setToggleAction(TRUE);
- 			  connect(action, SIGNAL(toggled(bool)),
- 				  parent(), SLOT(setShowData(bool)));
-@@ -898,7 +913,7 @@ void ConfigView::setShowData(bool b)
- 
- void ConfigList::setAllOpen(bool open)
- {
--	QListViewItemIterator it(this);
-+	Q3ListViewItemIterator it(this);
- 
- 	for (; it.current(); it++)
- 		it.current()->setOpen(open);
-@@ -921,7 +936,7 @@ void ConfigView::updateListAll(void)
- }
- 
- ConfigInfoView::ConfigInfoView(QWidget* parent, const char *name)
--	: Parent(parent, name), sym(0), menu(0)
-+	: Parent(parent, name), sym(0), _menu(0)
- {
- 	if (name) {
- 		configSettings->beginGroup(name);
-@@ -944,7 +959,7 @@ void ConfigInfoView::setShowDebug(bool b)
- {
- 	if (_showDebug != b) {
- 		_showDebug = b;
--		if (menu)
-+		if (_menu)
- 			menuInfo();
- 		else if (sym)
- 			symbolInfo();
-@@ -954,11 +969,11 @@ void ConfigInfoView::setShowDebug(bool b)
- 
- void ConfigInfoView::setInfo(struct menu *m)
- {
--	if (menu == m)
-+	if (_menu == m)
- 		return;
--	menu = m;
-+	_menu = m;
- 	sym = NULL;
--	if (!menu)
-+	if (!_menu)
- 		clear();
- 	else
- 		menuInfo();
-@@ -968,17 +983,17 @@ void ConfigInfoView::setSource(const QString& name)
- {
- 	const char *p = name.latin1();
- 
--	menu = NULL;
-+	_menu = NULL;
- 	sym = NULL;
- 
- 	switch (p[0]) {
- 	case 'm':
- 		struct menu *m;
- 
--		if (sscanf(p, "m%p", &m) == 1 && menu != m) {
--			menu = m;
-+		if (sscanf(p, "m%p", &m) == 1 && _menu != m) {
-+			_menu = m;
- 			menuInfo();
--			emit menuSelected(menu);
-+			emit menuSelected(_menu);
- 		}
- 		break;
- 	case 's':
-@@ -1013,11 +1028,11 @@ void ConfigInfoView::menuInfo(void)
- 	struct symbol* sym;
- 	QString head, debug, help;
- 
--	sym = menu->sym;
-+	sym = _menu->sym;
- 	if (sym) {
--		if (menu->prompt) {
-+		if (_menu->prompt) {
- 			head += "<big><b>";
--			head += print_filter(_(menu->prompt->text));
-+			head += print_filter(_(_menu->prompt->text));
- 			head += "</b></big>";
- 			if (sym->name) {
- 				head += " (";
-@@ -1043,23 +1058,23 @@ void ConfigInfoView::menuInfo(void)
- 			debug = debug_info(sym);
- 
- 		struct gstr help_gstr = str_new();
--		menu_get_ext_help(menu, &help_gstr);
-+		menu_get_ext_help(_menu, &help_gstr);
- 		help = print_filter(str_get(&help_gstr));
- 		str_free(&help_gstr);
--	} else if (menu->prompt) {
-+	} else if (_menu->prompt) {
- 		head += "<big><b>";
--		head += print_filter(_(menu->prompt->text));
-+		head += print_filter(_(_menu->prompt->text));
- 		head += "</b></big><br><br>";
- 		if (showDebug()) {
--			if (menu->prompt->visible.expr) {
-+			if (_menu->prompt->visible.expr) {
- 				debug += "&nbsp;&nbsp;dep: ";
--				expr_print(menu->prompt->visible.expr, expr_print_help, &debug, E_NONE);
-+				expr_print(_menu->prompt->visible.expr, expr_print_help, &debug, E_NONE);
- 				debug += "<br><br>";
- 			}
- 		}
- 	}
- 	if (showDebug())
--		debug += QString().sprintf("defined at %s:%d<br><br>", menu->file->name, menu->lineno);
-+		debug += QString().sprintf("defined at %s:%d<br><br>", _menu->file->name, _menu->lineno);
- 
- 	setText(head + debug + help);
- }
-@@ -1162,10 +1177,10 @@ void ConfigInfoView::expr_print_help(void *data, struct symbol *sym, const char
- 		*text += str2;
- }
- 
--QPopupMenu* ConfigInfoView::createPopupMenu(const QPoint& pos)
-+Q3PopupMenu* ConfigInfoView::createPopupMenu(const QPoint& pos)
- {
--	QPopupMenu* popup = Parent::createPopupMenu(pos);
--	QAction* action = new QAction(NULL, _("Show Debug Info"), 0, popup);
-+	Q3PopupMenu* popup = Parent::createPopupMenu(pos);
-+	Q3Action* action = new Q3Action(NULL, _("Show Debug Info"), 0, popup);
- 	  action->setToggleAction(TRUE);
- 	  connect(action, SIGNAL(toggled(bool)), SLOT(setShowDebug(bool)));
- 	  connect(this, SIGNAL(showDebugChanged(bool)), action, SLOT(setOn(bool)));
-@@ -1222,7 +1237,7 @@ ConfigSearchWindow::ConfigSearchWindow(ConfigMainWindow* parent, const char *nam
- 			y = configSettings->readNumEntry("/window y", 0, &ok);
- 		if (ok)
- 			move(x, y);
--		QValueList<int> sizes = configSettings->readSizes("/split", &ok);
-+		Q3ValueList<int> sizes = configSettings->readSizes("/split", &ok);
- 		if (ok)
- 			split->setSizes(sizes);
- 		configSettings->endGroup();
-@@ -1309,60 +1324,60 @@ ConfigMainWindow::ConfigMainWindow(void)
- 	configList->setFocus();
- 
- 	menu = menuBar();
--	toolBar = new QToolBar("Tools", this);
-+	toolBar = new Q3ToolBar("Tools", this);
- 
--	backAction = new QAction("Back", QPixmap(xpm_back), _("Back"), 0, this);
-+	backAction = new Q3Action("Back", QPixmap(xpm_back), _("Back"), 0, this);
- 	  connect(backAction, SIGNAL(activated()), SLOT(goBack()));
- 	  backAction->setEnabled(FALSE);
--	QAction *quitAction = new QAction("Quit", _("&Quit"), Qt::CTRL + Qt::Key_Q, this);
-+	Q3Action *quitAction = new Q3Action("Quit", _("&Quit"), Qt::CTRL + Qt::Key_Q, this);
- 	  connect(quitAction, SIGNAL(activated()), SLOT(close()));
--	QAction *loadAction = new QAction("Load", QPixmap(xpm_load), _("&Load"), Qt::CTRL + Qt::Key_L, this);
-+	Q3Action *loadAction = new Q3Action("Load", QPixmap(xpm_load), _("&Load"), Qt::CTRL + Qt::Key_L, this);
- 	  connect(loadAction, SIGNAL(activated()), SLOT(loadConfig()));
--	saveAction = new QAction("Save", QPixmap(xpm_save), _("&Save"), Qt::CTRL + Qt::Key_S, this);
-+	saveAction = new Q3Action("Save", QPixmap(xpm_save), _("&Save"), Qt::CTRL + Qt::Key_S, this);
- 	  connect(saveAction, SIGNAL(activated()), SLOT(saveConfig()));
- 	conf_set_changed_callback(conf_changed);
- 	// Set saveAction's initial state
- 	conf_changed();
--	QAction *saveAsAction = new QAction("Save As...", _("Save &As..."), 0, this);
-+	Q3Action *saveAsAction = new Q3Action("Save As...", _("Save &As..."), 0, this);
- 	  connect(saveAsAction, SIGNAL(activated()), SLOT(saveConfigAs()));
--	QAction *searchAction = new QAction("Find", _("&Find"), Qt::CTRL + Qt::Key_F, this);
-+	Q3Action *searchAction = new Q3Action("Find", _("&Find"), Qt::CTRL + Qt::Key_F, this);
- 	  connect(searchAction, SIGNAL(activated()), SLOT(searchConfig()));
--	QAction *singleViewAction = new QAction("Single View", QPixmap(xpm_single_view), _("Single View"), 0, this);
-+	Q3Action *singleViewAction = new Q3Action("Single View", QPixmap(xpm_single_view), _("Single View"), 0, this);
- 	  connect(singleViewAction, SIGNAL(activated()), SLOT(showSingleView()));
--	QAction *splitViewAction = new QAction("Split View", QPixmap(xpm_split_view), _("Split View"), 0, this);
-+	Q3Action *splitViewAction = new Q3Action("Split View", QPixmap(xpm_split_view), _("Split View"), 0, this);
- 	  connect(splitViewAction, SIGNAL(activated()), SLOT(showSplitView()));
--	QAction *fullViewAction = new QAction("Full View", QPixmap(xpm_tree_view), _("Full View"), 0, this);
-+	Q3Action *fullViewAction = new Q3Action("Full View", QPixmap(xpm_tree_view), _("Full View"), 0, this);
- 	  connect(fullViewAction, SIGNAL(activated()), SLOT(showFullView()));
- 
--	QAction *showNameAction = new QAction(NULL, _("Show Name"), 0, this);
-+	Q3Action *showNameAction = new Q3Action(NULL, _("Show Name"), 0, this);
- 	  showNameAction->setToggleAction(TRUE);
- 	  connect(showNameAction, SIGNAL(toggled(bool)), configView, SLOT(setShowName(bool)));
- 	  connect(configView, SIGNAL(showNameChanged(bool)), showNameAction, SLOT(setOn(bool)));
- 	  showNameAction->setOn(configView->showName());
--	QAction *showRangeAction = new QAction(NULL, _("Show Range"), 0, this);
-+	Q3Action *showRangeAction = new Q3Action(NULL, _("Show Range"), 0, this);
- 	  showRangeAction->setToggleAction(TRUE);
- 	  connect(showRangeAction, SIGNAL(toggled(bool)), configView, SLOT(setShowRange(bool)));
- 	  connect(configView, SIGNAL(showRangeChanged(bool)), showRangeAction, SLOT(setOn(bool)));
- 	  showRangeAction->setOn(configList->showRange);
--	QAction *showDataAction = new QAction(NULL, _("Show Data"), 0, this);
-+	Q3Action *showDataAction = new Q3Action(NULL, _("Show Data"), 0, this);
- 	  showDataAction->setToggleAction(TRUE);
- 	  connect(showDataAction, SIGNAL(toggled(bool)), configView, SLOT(setShowData(bool)));
- 	  connect(configView, SIGNAL(showDataChanged(bool)), showDataAction, SLOT(setOn(bool)));
- 	  showDataAction->setOn(configList->showData);
--	QAction *showAllAction = new QAction(NULL, _("Show All Options"), 0, this);
-+	Q3Action *showAllAction = new Q3Action(NULL, _("Show All Options"), 0, this);
- 	  showAllAction->setToggleAction(TRUE);
- 	  connect(showAllAction, SIGNAL(toggled(bool)), configView, SLOT(setShowAll(bool)));
- 	  connect(showAllAction, SIGNAL(toggled(bool)), menuView, SLOT(setShowAll(bool)));
- 	  showAllAction->setOn(configList->showAll);
--	QAction *showDebugAction = new QAction(NULL, _("Show Debug Info"), 0, this);
-+	Q3Action *showDebugAction = new Q3Action(NULL, _("Show Debug Info"), 0, this);
- 	  showDebugAction->setToggleAction(TRUE);
- 	  connect(showDebugAction, SIGNAL(toggled(bool)), helpText, SLOT(setShowDebug(bool)));
- 	  connect(helpText, SIGNAL(showDebugChanged(bool)), showDebugAction, SLOT(setOn(bool)));
- 	  showDebugAction->setOn(helpText->showDebug());
- 
--	QAction *showIntroAction = new QAction(NULL, _("Introduction"), 0, this);
-+	Q3Action *showIntroAction = new Q3Action(NULL, _("Introduction"), 0, this);
- 	  connect(showIntroAction, SIGNAL(activated()), SLOT(showIntro()));
--	QAction *showAboutAction = new QAction(NULL, _("About"), 0, this);
-+	Q3Action *showAboutAction = new Q3Action(NULL, _("About"), 0, this);
- 	  connect(showAboutAction, SIGNAL(activated()), SLOT(showAbout()));
- 
- 	// init tool bar
-@@ -1376,7 +1391,7 @@ ConfigMainWindow::ConfigMainWindow(void)
- 	fullViewAction->addTo(toolBar);
- 
- 	// create config menu
--	QPopupMenu* config = new QPopupMenu(this);
-+	Q3PopupMenu* config = new Q3PopupMenu(this);
- 	menu->insertItem(_("&File"), config);
- 	loadAction->addTo(config);
- 	saveAction->addTo(config);
-@@ -1385,12 +1400,12 @@ ConfigMainWindow::ConfigMainWindow(void)
- 	quitAction->addTo(config);
- 
- 	// create edit menu
--	QPopupMenu* editMenu = new QPopupMenu(this);
-+	Q3PopupMenu* editMenu = new Q3PopupMenu(this);
- 	menu->insertItem(_("&Edit"), editMenu);
- 	searchAction->addTo(editMenu);
- 
- 	// create options menu
--	QPopupMenu* optionMenu = new QPopupMenu(this);
-+	Q3PopupMenu* optionMenu = new Q3PopupMenu(this);
- 	menu->insertItem(_("&Option"), optionMenu);
- 	showNameAction->addTo(optionMenu);
- 	showRangeAction->addTo(optionMenu);
-@@ -1400,7 +1415,7 @@ ConfigMainWindow::ConfigMainWindow(void)
- 	showDebugAction->addTo(optionMenu);
- 
- 	// create help menu
--	QPopupMenu* helpMenu = new QPopupMenu(this);
-+	Q3PopupMenu* helpMenu = new Q3PopupMenu(this);
- 	menu->insertSeparator();
- 	menu->insertItem(_("&Help"), helpMenu);
- 	showIntroAction->addTo(helpMenu);
-@@ -1435,7 +1450,7 @@ ConfigMainWindow::ConfigMainWindow(void)
- 		showSplitView();
- 
- 	// UI setup done, restore splitter positions
--	QValueList<int> sizes = configSettings->readSizes("/split1", &ok);
-+	Q3ValueList<int> sizes = configSettings->readSizes("/split1", &ok);
- 	if (ok)
- 		split1->setSizes(sizes);
- 
-@@ -1446,7 +1461,7 @@ ConfigMainWindow::ConfigMainWindow(void)
- 
- void ConfigMainWindow::loadConfig(void)
- {
--	QString s = QFileDialog::getOpenFileName(conf_get_configname(), NULL, this);
-+	QString s = Q3FileDialog::getOpenFileName(conf_get_configname(), NULL, this);
- 	if (s.isNull())
- 		return;
- 	if (conf_read(QFile::encodeName(s)))
-@@ -1462,7 +1477,7 @@ void ConfigMainWindow::saveConfig(void)
- 
- void ConfigMainWindow::saveConfigAs(void)
- {
--	QString s = QFileDialog::getSaveFileName(conf_get_configname(), NULL, this);
-+	QString s = Q3FileDialog::getSaveFileName(conf_get_configname(), NULL, this);
- 	if (s.isNull())
- 		return;
- 	if (conf_write(QFile::encodeName(s)))
-diff --git a/scripts/kconfig/qconf.h b/scripts/kconfig/qconf.h
-index b3b5657..3853ae8 100644
---- a/scripts/kconfig/qconf.h
-+++ b/scripts/kconfig/qconf.h
-@@ -3,26 +3,25 @@
-  * Released under the terms of the GNU GPL v2.0.
-  */
- 
-+#ifdef USE_QT3
- #include <qlistview.h>
--#if QT_VERSION >= 300
--#include <qsettings.h>
- #else
--class QSettings {
--public:
--	void beginGroup(const QString& group) { }
--	void endGroup(void) { }
--	bool readBoolEntry(const QString& key, bool def = FALSE, bool* ok = 0) const
--	{ if (ok) *ok = FALSE; return def; }
--	int readNumEntry(const QString& key, int def = 0, bool* ok = 0) const
--	{ if (ok) *ok = FALSE; return def; }
--	QString readEntry(const QString& key, const QString& def = QString::null, bool* ok = 0) const
--	{ if (ok) *ok = FALSE; return def; }
--	QStringList readListEntry(const QString& key, bool* ok = 0) const
--	{ if (ok) *ok = FALSE; return QStringList(); }
--	template <class t>
--	bool writeEntry(const QString& key, t value)
--	{ return TRUE; }
--};
-+#include <q3listview.h>
-+#endif
-+#include <qsettings.h>
++# This is kind of useful.  The new-style defconfig using Kconfig fragments
++# can also be used to successively pull in the options a defconfig cares
++# about overtop of the current config.
++%_oldconfig: $(obj)/conf arch/$(SRCARCH)/configs/%.Kconfig
++	$(Q)$< -o arch/$(SRCARCH)/configs/$*.Kconfig
++	$(Q)$< -o $(Kconfig) > /dev/null # oldconfig to clear out the temporary items
 +
-+#ifdef USE_QT3
-+#define Q3ValueList             QValueList
-+#define Q3PopupMenu             QPopupMenu
-+#define Q3ListView              QListView
-+#define Q3ListViewItem          QListViewItem
-+#define Q3VBox                  QVBox
-+#define Q3TextBrowser           QTextBrowser
-+#define Q3MainWindow            QMainWindow
-+#define Q3Action                QAction
-+#define Q3ToolBar               QToolBar
-+#define Q3ListViewItemIterator  QListViewItemIterator
-+#define Q3FileDialog            QFileDialog
- #endif
++# Old-style defconfig using full (or trimmed) .config files.
++%_defconfig: $(obj)/conf arch/$(SRCARCH)/configs/%_defconfig
+ 	$(Q)$< -D arch/$(SRCARCH)/configs/$@ $(Kconfig)
  
- class ConfigView;
-@@ -31,11 +30,10 @@ class ConfigItem;
- class ConfigLineEdit;
- class ConfigMainWindow;
- 
--
- class ConfigSettings : public QSettings {
- public:
--	QValueList<int> readSizes(const QString& key, bool *ok);
--	bool writeSizes(const QString& key, const QValueList<int>& value);
-+	Q3ValueList<int> readSizes(const QString& key, bool *ok);
-+	bool writeSizes(const QString& key, const Q3ValueList<int>& value);
- };
- 
- enum colIdx {
-@@ -45,9 +43,9 @@ enum listMode {
- 	singleMode, menuMode, symbolMode, fullMode, listMode
- };
- 
--class ConfigList : public QListView {
-+class ConfigList : public Q3ListView {
- 	Q_OBJECT
--	typedef class QListView Parent;
-+	typedef class Q3ListView Parent;
- public:
- 	ConfigList(ConfigView* p, const char *name = 0);
- 	void reinit(void);
-@@ -129,17 +127,17 @@ public:
- 	struct menu *rootEntry;
- 	QColorGroup disabledColorGroup;
- 	QColorGroup inactivedColorGroup;
--	QPopupMenu* headerPopup;
-+	Q3PopupMenu* headerPopup;
- 
- private:
- 	int colMap[colNr];
- 	int colRevMap[colNr];
- };
- 
--class ConfigItem : public QListViewItem {
--	typedef class QListViewItem Parent;
-+class ConfigItem : public Q3ListViewItem {
-+	typedef class Q3ListViewItem Parent;
- public:
--	ConfigItem(QListView *parent, ConfigItem *after, struct menu *m, bool v)
-+	ConfigItem(Q3ListView *parent, ConfigItem *after, struct menu *m, bool v)
- 	: Parent(parent, after), menu(m), visible(v), goParent(false)
- 	{
- 		init();
-@@ -149,7 +147,7 @@ public:
- 	{
- 		init();
- 	}
--	ConfigItem(QListView *parent, ConfigItem *after, bool v)
-+	ConfigItem(Q3ListView *parent, ConfigItem *after, bool v)
- 	: Parent(parent, after), menu(0), visible(v), goParent(true)
- 	{
- 		init();
-@@ -213,9 +211,9 @@ public:
- 	ConfigItem *item;
- };
- 
--class ConfigView : public QVBox {
-+class ConfigView : public Q3VBox {
- 	Q_OBJECT
--	typedef class QVBox Parent;
-+	typedef class Q3VBox Parent;
- public:
- 	ConfigView(QWidget* parent, const char *name = 0);
- 	~ConfigView(void);
-@@ -244,9 +242,9 @@ public:
- 	ConfigView* nextView;
- };
- 
--class ConfigInfoView : public QTextBrowser {
-+class ConfigInfoView : public Q3TextBrowser {
- 	Q_OBJECT
--	typedef class QTextBrowser Parent;
-+	typedef class Q3TextBrowser Parent;
- public:
- 	ConfigInfoView(QWidget* parent, const char *name = 0);
- 	bool showDebug(void) const { return _showDebug; }
-@@ -267,11 +265,11 @@ protected:
- 	QString debug_info(struct symbol *sym);
- 	static QString print_filter(const QString &str);
- 	static void expr_print_help(void *data, struct symbol *sym, const char *str);
--	QPopupMenu* createPopupMenu(const QPoint& pos);
-+	Q3PopupMenu* createPopupMenu(const QPoint& pos);
- 	void contentsContextMenuEvent(QContextMenuEvent *e);
- 
- 	struct symbol *sym;
--	struct menu *menu;
-+	struct menu *_menu;
- 	bool _showDebug;
- };
- 
-@@ -295,10 +293,10 @@ protected:
- 	struct symbol **result;
- };
- 
--class ConfigMainWindow : public QMainWindow {
-+class ConfigMainWindow : public Q3MainWindow {
- 	Q_OBJECT
- 
--	static QAction *saveAction;
-+	static Q3Action *saveAction;
- 	static void conf_changed(void);
- public:
- 	ConfigMainWindow(void);
-@@ -327,8 +325,8 @@ protected:
- 	ConfigView *configView;
- 	ConfigList *configList;
- 	ConfigInfoView *helpText;
--	QToolBar *toolBar;
--	QAction *backAction;
-+	Q3ToolBar *toolBar;
-+	Q3Action *backAction;
- 	QSplitter* split1;
- 	QSplitter* split2;
- };
--- 
-1.7.1.1
+ # Help text used by make help
 
