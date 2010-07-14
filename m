@@ -1,77 +1,81 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from relais.videotron.ca ([24.201.245.36]:25395 "EHLO
-	relais.videotron.ca" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751253Ab0GNAHB (ORCPT
+Received: from one.firstfloor.org ([213.235.205.2]:34182 "EHLO
+	one.firstfloor.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752957Ab0GNNn7 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 13 Jul 2010 20:07:01 -0400
-MIME-version: 1.0
-Content-transfer-encoding: 7BIT
-Content-type: TEXT/PLAIN; charset=US-ASCII
-Date: Tue, 13 Jul 2010 20:07:00 -0400 (EDT)
-From: Nicolas Pitre <nico@fluxnic.net>
-Subject: Re: [RFC PATCH] Kconfig: Enable Kconfig fragments to be used for
- defconfig
-In-reply-to: <1279064008.4609.48.camel@c-dwalke-linux.qualcomm.com>
-Message-id: <alpine.LFD.2.00.1007131941140.10598@xanadu.home>
-References: <20100713230352.6781.18644.stgit@angua>
- <1279062881.4609.34.camel@c-dwalke-linux.qualcomm.com>
- <AANLkTin69tN3NQHD2wvkA0G-lj3f9tSZEnhzdyJdTh9m@mail.gmail.com>
- <1279064008.4609.48.camel@c-dwalke-linux.qualcomm.com>
+	Wed, 14 Jul 2010 09:43:59 -0400
+Date: Wed, 14 Jul 2010 15:43:52 +0200
+From: Andi Kleen <andi@firstfloor.org>
+Subject: [PATCH] Kbuild: Add option to set -femit-struct-debug-baseonly 
+Message-ID: <20100714134352.GA10341@basil.fritz.box>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Daniel Walker <dwalker@codeaurora.org>
-Cc: Grant Likely <grant.likely@secretlab.ca>, linuxppc-dev@lists.ozlabs.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Linus Torvalds <torvalds@linux-foundation.org>, Russell King <rmk@arm.linux.org.uk>, Tony Lindgren <tony@atomide.com>, =?ISO-8859-15?Q?Uwe_Kleine-K=F6nig?= <u.kleine-koenig@pengutronix.de>
+To: mmarek@suse.cz, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, ak@linux.intel.com
 
-On Tue, 13 Jul 2010, Daniel Walker wrote:
-> On Tue, 2010-07-13 at 17:21 -0600, Grant Likely wrote:
-> > On Tue, Jul 13, 2010 at 5:14 PM, Daniel Walker <dwalker@codeaurora.org> wrote:
-> > > It just doesn't feel like Kconfig was meant to do this, it feel like
-> > > somewhat of an abuse ..
-> > 
-> > Why?  It uses the Kconfig language itself to specify additional
-> > constraints on the final configuration.  Seems to be the essence of
-> > elegance to me.  :-)
-> 
-> To my mind the only problem with the current defconfig formatting is the
-> size of the files. If those files are 5-10 lines instead of 2000 lines,
-> then I think the readability problem isn't really an issue any more..
+Kbuild: Add option to set -femit-struct-debug-baseonly 
 
-That's one issue indeed.
+Newer gcc has a -femit-struct-debug-baseonly option that dramatically
+reduces the size of object files with debug info. What it does
+is to only emit type information for structures when the structures
+are defined in the same file or in a header file.
 
-But there is another issue that is somewhat related, which is to be able 
-to categorize config options.
+This means the type information for most headers are not included.
+This is not good when the type information is actually
+needed (e.g. with kgdb or systemtap) 
 
-Currently the defconfig files carry information about the proper driver 
-to enable in order to support devices soldered on the board and 
-therefore which are not "optional".  That might be a particular RTC 
-chip, or a particular ethernet block integrated into a SOC, etc.  Of 
-course we want to preserve the ability to disable support for those 
-things, but by default people want to have all the right drivers 
-selected for all the built-in hardware when selecting a target 
-machine/board without having to dig into a datasheet for that target.
+But often kernel hackers only care about line numbers and don't
+need all the type information anyways. In this case setting
+the option can be a big win:
 
-The defconfig files also carry config options that are totally 
-arbitrary.  What type of filesystem, what kind of network protocol, what 
-USB device drivers (not host controller driver), what amount of 
-debugging options, all those are unrelated to the actual hardware and 
-may vary from one user to another.
+A build dir for a specific x86-64 configuration with gcc 4.5
+shrunk from 2.3G to 1.2G. The compilation was also nearly a minute
+faster.
 
-Furthermore, in order to reduce the number of defconfig files, we tried 
-to combine as many targets into a single kernel image.  That increases 
-build test coverage with fewer builds which is good, but then the info 
-about specific drivers required for a specific target but not for 
-another target in the same defconfig is now lost.  It is therefore quite 
-hard to produce a highly optimized configuration for a single target 
-without doing some digging again.
+Signed-off-by: Andi Kleen <ak@linux.intel.com>
 
-So it is really in the Kconfig file that all those hardware specific 
-options can be expressed in a clear and readable way.  When BOARD_XYZ is 
-selected and STD_CONFIG is selected, then automatically select RTC_FOO, 
-select ETH_BAR, select LED_BAZ, etc. Of course we would want required 
-dependencies to be automatically selected as well.
+---
+ Makefile          |    4 ++++
+ lib/Kconfig.debug |   12 ++++++++++++
+ 2 files changed, 16 insertions(+)
 
-But all the rest is arbitrary and could be part of common shared 
-profiles or the like in defconfig format.
-
-
-Nicolas
+Index: linux-2.6.34-ak/Makefile
+===================================================================
+--- linux-2.6.34-ak.orig/Makefile
++++ linux-2.6.34-ak/Makefile
+@@ -554,6 +554,10 @@ KBUILD_CFLAGS	+= -g
+ KBUILD_AFLAGS	+= -gdwarf-2
+ endif
+ 
++ifdef CONFIG_DEBUG_INFO_REDUCED
++KBUILD_CFLAGS 	+= $(call cc-option, -femit-struct-debug-baseonly)
++endif
++
+ ifdef CONFIG_FUNCTION_TRACER
+ KBUILD_CFLAGS	+= -pg
+ endif
+Index: linux-2.6.34-ak/lib/Kconfig.debug
+===================================================================
+--- linux-2.6.34-ak.orig/lib/Kconfig.debug
++++ linux-2.6.34-ak/lib/Kconfig.debug
+@@ -616,6 +616,18 @@ config DEBUG_INFO
+ 
+ 	  If unsure, say N.
+ 
++config DEBUG_INFO_REDUCED
++	bool "Reduce debugging information"
++	depends on DEBUG_INFO
++	help
++	  If you say Y here gcc is instructed to generate less debugging information
++          for structure types. This means that tools that need full debugging information
++          (like kgdb or systemtap) won't be happy. But if you merely need debugging
++          information to resolve line numbers there is no loss.
++          Advantage is that build directory object sizes shrink dramatically over
++          a full DEBUG_INFO build and compile times are reduced too.
++          Only works with newer gcc versions.
++
+ config DEBUG_VM
+ 	bool "Debug VM"
+ 	depends on DEBUG_KERNEL
