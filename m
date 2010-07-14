@@ -1,81 +1,80 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from one.firstfloor.org ([213.235.205.2]:34182 "EHLO
-	one.firstfloor.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752957Ab0GNNn7 (ORCPT
+Received: from smtp.nokia.com ([192.100.105.134]:57180 "EHLO
+	mgw-mx09.nokia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753841Ab0GNOGE (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 14 Jul 2010 09:43:59 -0400
-Date: Wed, 14 Jul 2010 15:43:52 +0200
-From: Andi Kleen <andi@firstfloor.org>
-Subject: [PATCH] Kbuild: Add option to set -femit-struct-debug-baseonly 
-Message-ID: <20100714134352.GA10341@basil.fritz.box>
+	Wed, 14 Jul 2010 10:06:04 -0400
+From: Alexander Shishkin <virtuoso@slind.org>
+Subject: [PATCH] [RFC] implement size_append in perl
+Date: Wed, 14 Jul 2010 17:01:03 +0300
+Message-Id: <1279116063-4499-1-git-send-email-virtuoso@slind.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: mmarek@suse.cz, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, ak@linux.intel.com
+To: linux-kbuild@vger.kernel.org
+Cc: Alexander Shishkin <virtuoso@slind.org>, =?UTF-8?q?Sebastian=20Dalfu=C3=9F?= <sd@sedf.de>, Oliver Hartkopp <oliver@hartkopp.net>, Michael Guntsche <mike@it-loops.com>, Jonathan Nieder <jrnieder@gmail.com>, Michael Tokarev <mjt@tls.msk.ru>, Alek Du <alek.du@intel.com>, Andrew Morton <akpm@linux-foundation.org>, Michal Marek <mmarek@suse.cz>, Russell King <rmk@arm.linux.org.uk>, "H. Peter Anvin" <hpa@zytor.com>, Albin Tonnerre <albin.tonnerre@free-electrons.com>, linux-kernel@vger.kernel.org
 
-Kbuild: Add option to set -femit-struct-debug-baseonly 
+The current implementation has been several times fixed to work around
+different shells and build environments and it remains a somewhat tricky
+shell script. This patch replaces all the dependencies by a single line
+of perl. Build dependency on perl is not new, so that shouldn't be a
+problem.
 
-Newer gcc has a -femit-struct-debug-baseonly option that dramatically
-reduces the size of object files with debug info. What it does
-is to only emit type information for structures when the structures
-are defined in the same file or in a header file.
+The new implementation does exactly what it's supposed to: it outputs
+a little-endian 32-bit unsigned integer of a file's length.
 
-This means the type information for most headers are not included.
-This is not good when the type information is actually
-needed (e.g. with kgdb or systemtap) 
+This might simplify matters with different build environments and
+different shells and is also considerably shorter and hopefully more
+readable.
 
-But often kernel hackers only care about line numbers and don't
-need all the type information anyways. In this case setting
-the option can be a big win:
-
-A build dir for a specific x86-64 configuration with gcc 4.5
-shrunk from 2.3G to 1.2G. The compilation was also nearly a minute
-faster.
-
-Signed-off-by: Andi Kleen <ak@linux.intel.com>
+Signed-off-by: Alexander Shishkin <virtuoso@slind.org>
+Cc: Sebastian Dalfuß <sd@sedf.de>
+Cc: Oliver Hartkopp <oliver@hartkopp.net>
+Cc: Michael Guntsche <mike@it-loops.com>
+Cc: Jonathan Nieder <jrnieder@gmail.com>
+Cc: Michael Tokarev <mjt@tls.msk.ru>
+Cc: Alek Du <alek.du@intel.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>
+Cc: Michal Marek <mmarek@suse.cz>
+Cc: Russell King <rmk@arm.linux.org.uk>
+Cc: H. Peter Anvin <hpa@zytor.com>
+Cc: Albin Tonnerre <albin.tonnerre@free-electrons.com>
+Cc: linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
 
 ---
- Makefile          |    4 ++++
- lib/Kconfig.debug |   12 ++++++++++++
- 2 files changed, 16 insertions(+)
+ scripts/Makefile.lib |   16 +---------------
+ 1 files changed, 1 insertions(+), 15 deletions(-)
 
-Index: linux-2.6.34-ak/Makefile
-===================================================================
---- linux-2.6.34-ak.orig/Makefile
-+++ linux-2.6.34-ak/Makefile
-@@ -554,6 +554,10 @@ KBUILD_CFLAGS	+= -g
- KBUILD_AFLAGS	+= -gdwarf-2
- endif
+diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+index 54fd1b7..5bfd872 100644
+--- a/scripts/Makefile.lib
++++ b/scripts/Makefile.lib
+@@ -213,21 +213,7 @@ cmd_gzip = (cat $(filter-out FORCE,$^) | gzip -f -9 > $@) || \
  
-+ifdef CONFIG_DEBUG_INFO_REDUCED
-+KBUILD_CFLAGS 	+= $(call cc-option, -femit-struct-debug-baseonly)
-+endif
-+
- ifdef CONFIG_FUNCTION_TRACER
- KBUILD_CFLAGS	+= -pg
- endif
-Index: linux-2.6.34-ak/lib/Kconfig.debug
-===================================================================
---- linux-2.6.34-ak.orig/lib/Kconfig.debug
-+++ linux-2.6.34-ak/lib/Kconfig.debug
-@@ -616,6 +616,18 @@ config DEBUG_INFO
- 
- 	  If unsure, say N.
- 
-+config DEBUG_INFO_REDUCED
-+	bool "Reduce debugging information"
-+	depends on DEBUG_INFO
-+	help
-+	  If you say Y here gcc is instructed to generate less debugging information
-+          for structure types. This means that tools that need full debugging information
-+          (like kgdb or systemtap) won't be happy. But if you merely need debugging
-+          information to resolve line numbers there is no loss.
-+          Advantage is that build directory object sizes shrink dramatically over
-+          a full DEBUG_INFO build and compile times are reduced too.
-+          Only works with newer gcc versions.
-+
- config DEBUG_VM
- 	bool "Debug VM"
- 	depends on DEBUG_KERNEL
+ # Bzip2 and LZMA do not include size in file... so we have to fake that;
+ # append the size as a 32-bit littleendian number as gzip does.
+-size_append = printf $(shell						\
+-dec_size=0;								\
+-for F in $1; do								\
+-	fsize=$$(stat -c "%s" $$F);					\
+-	dec_size=$$(expr $$dec_size + $$fsize);				\
+-done;									\
+-printf "%08x\n" $$dec_size |						\
+-	sed 's/\(..\)/\1 /g' | {					\
+-		read ch0 ch1 ch2 ch3;					\
+-		for ch in $$ch3 $$ch2 $$ch1 $$ch0; do			\
+-			printf '%s%03o' '\\' $$((0x$$ch)); 		\
+-		done;							\
+-	}								\
+-)
+-
++size_append = $(PERL) -e 'print pack("V", (stat "$(lastword $1)")[7])'
+ quiet_cmd_bzip2 = BZIP2   $@
+ cmd_bzip2 = (cat $(filter-out FORCE,$^) | \
+ 	bzip2 -9 && $(call size_append, $(filter-out FORCE,$^))) > $@ || \
+-- 
+1.7.1
+
