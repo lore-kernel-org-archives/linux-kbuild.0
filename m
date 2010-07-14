@@ -1,55 +1,98 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from filtteri6.pp.htv.fi ([213.243.153.189]:37520 "EHLO
-	filtteri6.pp.htv.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754305Ab0GNQSQ (ORCPT
+Received: from wolverine01.qualcomm.com ([199.106.114.254]:62681 "EHLO
+	wolverine01.qualcomm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755416Ab0GNQWu (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 14 Jul 2010 12:18:16 -0400
-Date: Wed, 14 Jul 2010 19:17:04 +0300
-From: Alexander Shishkin <virtuoso@slind.org>
-Subject: Re: [PATCH] [RFC] implement size_append in perl
-Message-ID: <20100714161704.GE23436@shisha.kicks-ass.net>
-References: <1279116063-4499-1-git-send-email-virtuoso@slind.org>
- <20100714152337.GA13125@merkur.ravnborg.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20100714152337.GA13125@merkur.ravnborg.org>
+	Wed, 14 Jul 2010 12:22:50 -0400
+Subject: Re: [RFC PATCH] Kconfig: Enable Kconfig fragments to be used for
+ defconfig
+From: Daniel Walker <dwalker@codeaurora.org>
+In-Reply-To: <alpine.LFD.2.00.1007131941140.10598@xanadu.home>
+References: <20100713230352.6781.18644.stgit@angua>
+	 <1279062881.4609.34.camel@c-dwalke-linux.qualcomm.com>
+	 <AANLkTin69tN3NQHD2wvkA0G-lj3f9tSZEnhzdyJdTh9m@mail.gmail.com>
+	 <1279064008.4609.48.camel@c-dwalke-linux.qualcomm.com>
+	 <alpine.LFD.2.00.1007131941140.10598@xanadu.home>
+Content-Type: text/plain; charset="UTF-8"
+Date: Wed, 14 Jul 2010 09:22:43 -0700
+Message-ID: <1279124563.21162.14.camel@c-dwalke-linux.qualcomm.com>
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: linux-kbuild@vger.kernel.org, Sebastian Dalfu? <sd@sedf.de>, Oliver Hartkopp <oliver@hartkopp.net>, Michael Guntsche <mike@it-loops.com>, Jonathan Nieder <jrnieder@gmail.com>, Michael Tokarev <mjt@tls.msk.ru>, Alek Du <alek.du@intel.com>, Andrew Morton <akpm@linux-foundation.org>, Michal Marek <mmarek@suse.cz>, Russell King <rmk@arm.linux.org.uk>, "H. Peter Anvin" <hpa@zytor.com>, Albin Tonnerre <albin.tonnerre@free-electrons.com>, linux-kernel@vger.kernel.org
+To: Nicolas Pitre <nico@fluxnic.net>
+Cc: Grant Likely <grant.likely@secretlab.ca>, linuxppc-dev@lists.ozlabs.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Linus Torvalds <torvalds@linux-foundation.org>, Russell King <rmk@arm.linux.org.uk>, Tony Lindgren <tony@atomide.com>, Uwe =?ISO-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@pengutronix.de>
 
-On Wed, Jul 14, 2010 at 05:23:37 +0200, Sam Ravnborg wrote:
-> On Wed, Jul 14, 2010 at 05:01:03PM +0300, Alexander Shishkin wrote:
-> > The current implementation has been several times fixed to work around
-> > different shells and build environments and it remains a somewhat tricky
-> > shell script. This patch replaces all the dependencies by a single line
-> > of perl. Build dependency on perl is not new, so that shouldn't be a
-> > problem.
-> > 
-> > The new implementation does exactly what it's supposed to: it outputs
-> > a little-endian 32-bit unsigned integer of a file's length.
-> > 
-> > This might simplify matters with different build environments and
-> > different shells and is also considerably shorter and hopefully more
-> > readable.
+On Tue, 2010-07-13 at 20:07 -0400, Nicolas Pitre wrote:
+
+> That's one issue indeed.
 > 
-> Reminds me that I had a patch that moved this to mkpiggy.c.
-> Goggle gave this hit:
+> But there is another issue that is somewhat related, which is to be able 
+> to categorize config options.
 > 
->     http://lists.openwall.net/linux-kernel/2009/12/20/92
-
-Ok, thanks for the reference.
-
-> I will try to update this to cover arm also and check
-> if other archs needs this.
+> Currently the defconfig files carry information about the proper driver 
+> to enable in order to support devices soldered on the board and 
+> therefore which are not "optional".  That might be a particular RTC 
+> chip, or a particular ethernet block integrated into a SOC, etc.  Of 
+> course we want to preserve the ability to disable support for those 
+> things, but by default people want to have all the right drivers 
+> selected for all the built-in hardware when selecting a target 
+> machine/board without having to dig into a datasheet for that target.
 > 
-> In other word - move thes size stuff to mkpiggy so we
-> skip this extra step.
+> The defconfig files also carry config options that are totally 
+> arbitrary.  What type of filesystem, what kind of network protocol, what 
+> USB device drivers (not host controller driver), what amount of 
+> debugging options, all those are unrelated to the actual hardware and 
+> may vary from one user to another.
 
-Hm, maybe this mkpiggy can be made arch-independent and moved to scripts/
-as well?
+Right.
 
-Regards,
---
-Alex
+> Furthermore, in order to reduce the number of defconfig files, we tried 
+> to combine as many targets into a single kernel image.  That increases 
+> build test coverage with fewer builds which is good, but then the info 
+> about specific drivers required for a specific target but not for 
+> another target in the same defconfig is now lost.  It is therefore quite 
+> hard to produce a highly optimized configuration for a single target 
+> without doing some digging again.
+> 
+> So it is really in the Kconfig file that all those hardware specific 
+> options can be expressed in a clear and readable way.  When BOARD_XYZ is 
+> selected and STD_CONFIG is selected, then automatically select RTC_FOO, 
+> select ETH_BAR, select LED_BAZ, etc. Of course we would want required 
+> dependencies to be automatically selected as well.
+
+I see..
+
+> But all the rest is arbitrary and could be part of common shared 
+> profiles or the like in defconfig format.
+
+I'm sure most people will want to have a config isolated to their
+specific device. That to me seems reasonable because everyone wants the
+smallest possible kernel they can get for their given device.
+
+Then there would be a smaller group who wants to create multi-device
+images. I don't see this being the average users tho, or kernel hackers.
+
+To me there is little difference between doing,
+
+CONFIG_ARCH_MSM=y
+
+or
+
+select ARCH_MSM
+
+they are basically doing the same thing. So doing anything in Kconfig is
+a lateral move .. Converting over to Kconfig in this case doesn't makes
+sense to me.
+
+Could we do something more like adding an "#include" option into the
+defconfigs .. Then you could create defconfigs that hold multiple
+devices without a massive rework to what we currently have. 
+
+Daniel
+
+
+-- 
+Sent by an consultant of the Qualcomm Innovation Center, Inc.
+The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum.
+
