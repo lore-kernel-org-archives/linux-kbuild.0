@@ -1,37 +1,102 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from filtteri5.pp.htv.fi ([213.243.153.188]:34017 "EHLO
-	filtteri5.pp.htv.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757468Ab0GNUuS (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 14 Jul 2010 16:50:18 -0400
-Date: Wed, 14 Jul 2010 23:48:22 +0300
-From: Alexander Shishkin <virtuoso@slind.org>
-Subject: Re: [PATCH] [RFC] implement size_append in perl
-Message-ID: <20100714204822.GF23436@shisha.kicks-ass.net>
-References: <1279116063-4499-1-git-send-email-virtuoso@slind.org>
- <20100714152337.GA13125@merkur.ravnborg.org>
- <20100714161704.GE23436@shisha.kicks-ass.net>
- <4C3DEC90.8060603@zytor.com>
+Received: from cantor.suse.de ([195.135.220.2]:51847 "EHLO mx1.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S932643Ab0GOIma (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 15 Jul 2010 04:42:30 -0400
+Date: Thu, 15 Jul 2010 10:42:33 +0200
+From: Michal Marek <mmarek@suse.cz>
+Subject: Re: "make rpm" failed with parameter "--scm-only"
+Message-ID: <20100715084233.GA5835@sepie.suse.cz>
+References: <A24AE1FFE7AEC5489F83450EE98351BF1BD77643B1@shsmsx502.ccr.corp.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <4C3DEC90.8060603@zytor.com>
+In-Reply-To: <A24AE1FFE7AEC5489F83450EE98351BF1BD77643B1@shsmsx502.ccr.corp.intel.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "H. Peter Anvin" <hpa@zytor.com>
-Cc: Sam Ravnborg <sam@ravnborg.org>, linux-kbuild@vger.kernel.org, Sebastian Dalfu? <sd@sedf.de>, Oliver Hartkopp <oliver@hartkopp.net>, Michael Guntsche <mike@it-loops.com>, Jonathan Nieder <jrnieder@gmail.com>, Michael Tokarev <mjt@tls.msk.ru>, Alek Du <alek.du@intel.com>, Andrew Morton <akpm@linux-foundation.org>, Michal Marek <mmarek@suse.cz>, Russell King <rmk@arm.linux.org.uk>, Albin Tonnerre <albin.tonnerre@free-electrons.com>, linux-kernel@vger.kernel.org
+To: "Zheng, Jiajia" <jiajia.zheng@intel.com>
+Cc: "Guy, Wey-Yi W" <wey-yi.w.guy@intel.com>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-On Wed, Jul 14, 2010 at 09:57:52 -0700, H. Peter Anvin wrote:
-> On 07/14/2010 09:17 AM, Alexander Shishkin wrote:
-> > 
-> > Hm, maybe this mkpiggy can be made arch-independent and moved to scripts/
-> > as well?
-> > 
+On Thu, Jul 15, 2010 at 11:23:19AM +0800, Zheng, Jiajia wrote:
+> Hi Marek,
 > 
-> It depends on which architectures want this wrapping format.
+> This is jiajia, Intel Wireless QA. 
+> When I was compiling iwlwifi-2.6, "make rpm" failed. 
+> 
+> # make rpm
+> make clean
+> set -e; cd ..; ln -sf /usr/src/iwlwifi-2.6 kernel-2.6.35rc4wl
+> /bin/sh /usr/src/iwlwifi-2.6/scripts/setlocalversion --scm-only > /usr/src/iwlwifi-2.6/.scmversion
+> cat: .scmversion: input file is output file
+> make[1]: *** [rpm] Error 1
+> make: *** [rpm] Error 2
+> 
+> If the "--scm-only" parameter is removed from iwlwifi-2.6/scripts/package/Makefile, "make rpm" works. 
+> 
+> I noticed that it was introduced by commit#09155120cf0ffe6f0c8aba3aa625831405b65996.
 
-Yes, well, when it's more than one, it already kind of makes sense.
+Ah crap :-/. The following patch should fix it. BTW, if you remove the
+--scm-only option and use the LOCALVERSION mechanism, then the resulting
+kernel release string will have the localversion twice.
 
-Regards,
---
-Alex
+From 1df62f9175665a0573fe9708cb8604584a9b7bd5 Mon Sep 17 00:00:00 2001
+From: Michal Marek <mmarek@suse.cz>
+Date: Thu, 15 Jul 2010 10:36:37 +0200
+Subject: [PATCH] kbuild: Fix make rpm
+
+make rpm was broken by commit 0915512:
+make clean
+set -e; cd ..; ln -sf /usr/src/iwlwifi-2.6 kernel-2.6.35rc4wl
+/bin/sh /usr/src/iwlwifi-2.6/scripts/setlocalversion --scm-only >
+/usr/src/iwlwifi-2.6/.scmversion
+cat: .scmversion: input file is output file
+make[1]: *** [rpm] Error 1
+
+Reported-by: "Zheng, Jiajia" <jiajia.zheng@intel.com>
+Signed-off-by: Michal Marek <mmarek@suse.cz>
+
+diff --git a/scripts/package/Makefile b/scripts/package/Makefile
+index 3a681ef..d2c29b6 100644
+--- a/scripts/package/Makefile
++++ b/scripts/package/Makefile
+@@ -44,7 +44,7 @@ rpm-pkg rpm: $(objtree)/kernel.spec FORCE
+ 	fi
+ 	$(MAKE) clean
+ 	$(PREV) ln -sf $(srctree) $(KERNELPATH)
+-	$(CONFIG_SHELL) $(srctree)/scripts/setlocalversion --scm-only > $(objtree)/.scmversion
++	$(CONFIG_SHELL) $(srctree)/scripts/setlocalversion --save-scmversion
+ 	$(PREV) tar -cz $(RCS_TAR_IGNORE) -f $(KERNELPATH).tar.gz $(KERNELPATH)/.
+ 	$(PREV) rm $(KERNELPATH)
+ 	rm -f $(objtree)/.scmversion
+diff --git a/scripts/setlocalversion b/scripts/setlocalversion
+index d6a866e..951b067 100755
+--- a/scripts/setlocalversion
++++ b/scripts/setlocalversion
+@@ -10,13 +10,13 @@
+ #
+ 
+ usage() {
+-	echo "Usage: $0 [--scm-only] [srctree]" >&2
++	echo "Usage: $0 [--save-scmversion] [srctree]" >&2
+ 	exit 1
+ }
+ 
+ scm_only=false
+ srctree=.
+-if test "$1" = "--scm-only"; then
++if test "$1" = "--save-scmversion"; then
+ 	scm_only=true
+ 	shift
+ fi
+@@ -131,7 +131,10 @@ collect_files()
+ }
+ 
+ if $scm_only; then
+-	scm_version
++	if test ! -e .scmversion; then
++		res=$(scm_version)
++		echo "$res" >.scmversion
++	fi
+ 	exit
+ fi
+ 
