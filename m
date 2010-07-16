@@ -1,46 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from moutng.kundenserver.de ([212.227.126.186]:61509 "EHLO
-	moutng.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1759141Ab0GPUCP (ORCPT
+Received: from mail-gw0-f46.google.com ([74.125.83.46]:52448 "EHLO
+	mail-gw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1759181Ab0GPUCh (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 16 Jul 2010 16:02:15 -0400
-From: Arnd Bergmann <arnd@arndb.de>
-Subject: Re: [RFC PATCH] Kconfig: Enable Kconfig fragments to be used for defconfig
-Date: Fri, 16 Jul 2010 22:01:09 +0200
-References: <20100713230352.6781.18644.stgit@angua> <1279296221.17878.66.camel@e102109-lin.cambridge.arm.com> <AANLkTinyFBTKYaryFANYheTuP-biJUws2x01NRNZPb4M@mail.gmail.com>
-In-Reply-To: <AANLkTinyFBTKYaryFANYheTuP-biJUws2x01NRNZPb4M@mail.gmail.com>
+	Fri, 16 Jul 2010 16:02:37 -0400
+Message-ID: <4C40BAD1.8090908@garzik.org>
+Date: Fri, 16 Jul 2010 16:02:25 -0400
+From: Jeff Garzik <jeff@garzik.org>
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-1"
+Subject: Re: I did a git pull and a plus appeared
+References: <20100716121802.65fdfa24@lembas.zaitcev.lan>
+In-Reply-To: <20100716121802.65fdfa24@lembas.zaitcev.lan>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Content-Transfer-Encoding: 7bit
-Message-Id: <201007162201.09629.arnd@arndb.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Grant Likely <grant.likely@secretlab.ca>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, linuxppc-dev@lists.ozlabs.org, Nicolas Pitre <nico@fluxnic.net>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Linus Torvalds <torvalds@linux-foundation.org>, Russell King <rmk@arm.linux.org.uk>, Tony Lindgren <tony@atomide.com>, Daniel Walker <dwalker@codeaurora.org>, Uwe =?iso-8859-1?q?Kleine-K=F6nig?= <u.kleine-koenig@pengutronix.de>, Stephen Rothwell <sfr@canb.auug.org.au>
+To: Pete Zaitcev <zaitcev@redhat.com>
+Cc: linux-kbuild@vger.kernel.org, nico-linuxsetlocalversion@schottelius.org, linux-kernel@vger.kernel.org
 
-On Friday 16 July 2010 19:57:55 Grant Likely wrote:
-> On Fri, Jul 16, 2010 at 10:03 AM, Catalin Marinas
-> <catalin.marinas@arm.com> wrote:
-> > On Wed, 2010-07-14 at 00:04 +0100, Grant Likely wrote:
-> 
-> sfr and I were talking about your patch the other day.  Just warning
-> on incomplete dependencies is enough to make it actually workable for
-> me (without my ugly post-processing step).  I was very happy to hear
-> that it is in linux-next.
-> 
-> Last missing piece is being able to do "select FOO = n", which Stephen
-> is currently working on.
+On 07/16/2010 02:18 PM, Pete Zaitcev wrote:
+> Dear All:
+>
+> I have a tree that existed for a few years (a clone of Linus' tree).
+> Today I did a git pull in it, and a plus appeared in the built version.
+> E.g. after "make modules_install":
+>
+> [root@niphredil linux-2.6-tip]# ls /lib/modules/
+> 2.6.33.1-19.fc13.x86_64  2.6.34-rc6-tip                    2.6.35-rc1-tip
+> 2.6.34-43.fc14.x86_64    2.6.35-0.36.rc4.git5.fc14.x86_64  2.6.35-rc5-tip+
+> [root@niphredil linux-2.6-tip]#
+>
+> How do I get rid of the plus? I have (had for a long time):
+>
+> [zaitcev@niphredil linux-2.6-tip]$ grep LOCAL .config
+> CONFIG_LOCALVERSION="-tip"
+> # CONFIG_LOCALVERSION_AUTO is not set
+> CONFIG_X86_LOCAL_APIC=y
+> [zaitcev@niphredil linux-2.6-tip]$
 
-Are there a lot of symbols for which this is needed? If there is only
-a handful, you could work around this by selectively adding
+Is the '+' listed at the top of the toplevel Makefile?
 
-config FOO
-	bool "foo"
-	default !FOO_DISABLE
-
-config FOO_DISABLE
-	def_bool "n"
+	Jeff
 
 
-		Arnd
+
