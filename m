@@ -1,48 +1,40 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from moutng.kundenserver.de ([212.227.126.187]:64676 "EHLO
-	moutng.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1759161Ab0GPULh (ORCPT
+Received: from 74-93-104-97-Washington.hfc.comcastbusiness.net ([74.93.104.97]:49703
+	"EHLO sunset.davemloft.net" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S966100Ab0GPUPF (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 16 Jul 2010 16:11:37 -0400
-From: Arnd Bergmann <arnd@arndb.de>
-Subject: Re: [RFC PATCH] Kconfig: Enable Kconfig fragments to be used for defconfig
-Date: Fri, 16 Jul 2010 22:11:31 +0200
-References: <20100713230352.6781.18644.stgit@angua> <alpine.LFD.2.00.1007161439240.10598@xanadu.home> <AANLkTikqHnyFVJF0Pzwy2xtKeNSXYAPFdPkAkLiXK8Ls@mail.gmail.com>
-In-Reply-To: <AANLkTikqHnyFVJF0Pzwy2xtKeNSXYAPFdPkAkLiXK8Ls@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-1"
+	Fri, 16 Jul 2010 16:15:05 -0400
+Date: Fri, 16 Jul 2010 13:15:21 -0700 (PDT)
+Message-Id: <20100716.131521.55876531.davem@davemloft.net>
+Subject: Re: I did a git pull and a plus appeared
+From: David Miller <davem@davemloft.net>
+In-Reply-To: <4C40BAD1.8090908@garzik.org>
+References: <20100716121802.65fdfa24@lembas.zaitcev.lan>
+	<4C40BAD1.8090908@garzik.org>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
-Message-Id: <201007162211.31973.arnd@arndb.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Nicolas Pitre <nico@fluxnic.net>, Russell King - ARM Linux <linux@arm.linux.org.uk>, Grant Likely <grant.likely@secretlab.ca>, Catalin Marinas <catalin.marinas@arm.com>, linuxppc-dev@lists.ozlabs.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>, linux-kbuild@vger.kernel.org, lkml <linux-kernel@vger.kernel.org>, linux-arm-kernel@lists.infradead.org, Tony Lindgren <tony@atomide.com>, Daniel Walker <dwalker@codeaurora.org>, Uwe =?iso-8859-1?q?Kleine-K=F6nig?= <u.kleine-koenig@pengutronix.de>, Stephen Rothwell <sfr@canb.auug.org.au>
+To: jeff@garzik.org
+Cc: zaitcev@redhat.com, linux-kbuild@vger.kernel.org, nico-linuxsetlocalversion@schottelius.org, linux-kernel@vger.kernel.org
 
-On Friday 16 July 2010 20:46:17 Linus Torvalds wrote:
-> Maybe a full "solver" is unnecessary, for example, but just a simple
-> "automatically enable the direct dependencies and scream when it's not
-> simple any more" would take care of 99% of the common cases, and then
-> warn when it needs some manual help.
+From: Jeff Garzik <jeff@garzik.org>
+Date: Fri, 16 Jul 2010 16:02:25 -0400
 
-I think the recursion should also be limited to cases where the
-dependency is a valid selectable option, i.e. not for
+> On 07/16/2010 02:18 PM, Pete Zaitcev wrote:
+>> How do I get rid of the plus? I have (had for a long time):
+>>
+>> [zaitcev@niphredil linux-2.6-tip]$ grep LOCAL .config
+>> CONFIG_LOCALVERSION="-tip"
+>> # CONFIG_LOCALVERSION_AUTO is not set
+>> CONFIG_X86_LOCAL_APIC=y
+>> [zaitcev@niphredil linux-2.6-tip]$
+> 
+> Is the '+' listed at the top of the toplevel Makefile?
 
-# this architecture does not support MMIO
-config HAS_IOMEM 
-	def_bool 'n'
+It's being put there by Kbuild, this has been discussed quite a bit
+over the past few weeks I think.
 
-config PCI
-	bool "PCI Device drivers"
-	depends on HAS_IOMEM
+The "+" comes from scripts/setlocalversion
 
-config FOO
-	tristate "Some device driver"
-	depends on PCI
-
-In this case, it would be straightforward for the solver to enable PCI
-for when something selects CONFIG_FOO, but it should print a warning
-if this is attempted while HAS_IOMEM is unconditionally disabled,
-since that puts it into the "not simple" category.
-
-	Arnd
