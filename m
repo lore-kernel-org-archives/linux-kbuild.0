@@ -1,46 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-gw0-f46.google.com ([74.125.83.46]:52448 "EHLO
-	mail-gw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1759181Ab0GPUCh (ORCPT
+Received: from cam-admin0.cambridge.arm.com ([217.140.96.50]:40901 "EHLO
+	cam-admin0.cambridge.arm.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1759158Ab0GPUKO (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 16 Jul 2010 16:02:37 -0400
-Message-ID: <4C40BAD1.8090908@garzik.org>
-Date: Fri, 16 Jul 2010 16:02:25 -0400
-From: Jeff Garzik <jeff@garzik.org>
-MIME-Version: 1.0
-Subject: Re: I did a git pull and a plus appeared
-References: <20100716121802.65fdfa24@lembas.zaitcev.lan>
-In-Reply-To: <20100716121802.65fdfa24@lembas.zaitcev.lan>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+	Fri, 16 Jul 2010 16:10:14 -0400
+Subject: Re: [RFC PATCH] Kconfig: Enable Kconfig fragments to be used for
+ defconfig
+From: Catalin Marinas <catalin.marinas@arm.com>
+In-Reply-To: <AANLkTikqHnyFVJF0Pzwy2xtKeNSXYAPFdPkAkLiXK8Ls@mail.gmail.com>
+References: <20100713230352.6781.18644.stgit@angua>
+	 <1279296221.17878.66.camel@e102109-lin.cambridge.arm.com>
+	 <AANLkTinyFBTKYaryFANYheTuP-biJUws2x01NRNZPb4M@mail.gmail.com>
+	 <alpine.LFD.2.00.1007161406120.10598@xanadu.home>
+	 <20100716183028.GB26854@n2100.arm.linux.org.uk>
+	 <alpine.LFD.2.00.1007161439240.10598@xanadu.home>
+	 <AANLkTikqHnyFVJF0Pzwy2xtKeNSXYAPFdPkAkLiXK8Ls@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Date: Fri, 16 Jul 2010 21:09:36 +0100
+Message-ID: <1279310976.18579.8.camel@e102109-lin.cambridge.arm.com>
+Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Pete Zaitcev <zaitcev@redhat.com>
-Cc: linux-kbuild@vger.kernel.org, nico-linuxsetlocalversion@schottelius.org, linux-kernel@vger.kernel.org
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Nicolas Pitre <nico@fluxnic.net>, Stephen Rothwell <sfr@canb.auug.org.au>, Daniel Walker <dwalker@codeaurora.org>, Russell King - ARM Linux <linux@arm.linux.org.uk>, linux-kbuild@vger.kernel.org, Tony Lindgren <tony@atomide.com>, Uwe =?ISO-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@pengutronix.de>, lkml <linux-kernel@vger.kernel.org>, Grant Likely <grant.likely@secretlab.ca>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, linuxppc-dev@lists.ozlabs.org, linux-arm-kernel@lists.infradead.org
 
-On 07/16/2010 02:18 PM, Pete Zaitcev wrote:
-> Dear All:
->
-> I have a tree that existed for a few years (a clone of Linus' tree).
-> Today I did a git pull in it, and a plus appeared in the built version.
-> E.g. after "make modules_install":
->
-> [root@niphredil linux-2.6-tip]# ls /lib/modules/
-> 2.6.33.1-19.fc13.x86_64  2.6.34-rc6-tip                    2.6.35-rc1-tip
-> 2.6.34-43.fc14.x86_64    2.6.35-0.36.rc4.git5.fc14.x86_64  2.6.35-rc5-tip+
-> [root@niphredil linux-2.6-tip]#
->
-> How do I get rid of the plus? I have (had for a long time):
->
-> [zaitcev@niphredil linux-2.6-tip]$ grep LOCAL .config
-> CONFIG_LOCALVERSION="-tip"
-> # CONFIG_LOCALVERSION_AUTO is not set
-> CONFIG_X86_LOCAL_APIC=y
-> [zaitcev@niphredil linux-2.6-tip]$
+On Fri, 2010-07-16 at 19:46 +0100, Linus Torvalds wrote:
+> On Fri, Jul 16, 2010 at 11:40 AM, Nicolas Pitre <nico@fluxnic.net> wrote:
+> >
+> > DOH.
+> 
+> Well, it's possible that the correct approach is a mixture.
+> 
+> Automatically do the trivial cases (recursive selects, dependencies
+> that are simple or of the form "x && y" etc), and warn about the cases
+> that aren't trivial (where "not trivial" may not necessarily be about
+> fundamentally ambiguous ones, but just "complex enough that I won't
+> even try").
 
-Is the '+' listed at the top of the toplevel Makefile?
+There is still a risk with this approach when the Kconfig isn't entirely
+correct. For example, on ARM we have (I pushed a patch already):
 
-	Jeff
+config CPU_32v6K
+	depends on CPU_V6
 
+config CPU_V7
+	select CPU_32v6K
 
+In this simple approach, we end up selecting CPU_V6 when we only need
+CPU_V7. There other places like this in the kernel.
+
+Of course, kbuild could still warn but if people rely on this feature to
+select options automatically I suspect they would ignore the warnings.
+
+-- 
+Catalin
 
