@@ -1,36 +1,52 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from caramon.arm.linux.org.uk ([78.32.30.218]:60384 "EHLO
-	caramon.arm.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1758740Ab0GPSHb (ORCPT
+Received: from smtp1.linux-foundation.org ([140.211.169.13]:59430 "EHLO
+	smtp1.linux-foundation.org" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1758754Ab0GPSSE (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 16 Jul 2010 14:07:31 -0400
-Date: Fri, 16 Jul 2010 19:07:01 +0100
-From: Russell King - ARM Linux <linux@arm.linux.org.uk>
+	Fri, 16 Jul 2010 14:18:04 -0400
+MIME-Version: 1.0
+In-Reply-To: <20100716180701.GA26854@n2100.arm.linux.org.uk>
+References: <20100713230352.6781.18644.stgit@angua>
+	<1279296221.17878.66.camel@e102109-lin.cambridge.arm.com>
+	<AANLkTinyFBTKYaryFANYheTuP-biJUws2x01NRNZPb4M@mail.gmail.com>
+	<20100716180701.GA26854@n2100.arm.linux.org.uk>
+Date: Fri, 16 Jul 2010 11:17:24 -0700
+Message-ID: <AANLkTik_pGP2oI0UQmjiz7BndmvFXDs1G2b9Au15y6n1@mail.gmail.com>
 Subject: Re: [RFC PATCH] Kconfig: Enable Kconfig fragments to be used for
 	defconfig
-Message-ID: <20100716180701.GA26854@n2100.arm.linux.org.uk>
-References: <20100713230352.6781.18644.stgit@angua> <1279296221.17878.66.camel@e102109-lin.cambridge.arm.com> <AANLkTinyFBTKYaryFANYheTuP-biJUws2x01NRNZPb4M@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <AANLkTinyFBTKYaryFANYheTuP-biJUws2x01NRNZPb4M@mail.gmail.com>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Grant Likely <grant.likely@secretlab.ca>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, linuxppc-dev@lists.ozlabs.org, Nicolas Pitre <nico@fluxnic.net>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Linus Torvalds <torvalds@linux-foundation.org>, Tony Lindgren <tony@atomide.com>, Daniel Walker <dwalker@codeaurora.org>, Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@pengutronix.de>, Stephen Rothwell <sfr@canb.auug.org.au>
+To: Russell King - ARM Linux <linux@arm.linux.org.uk>
+Cc: Grant Likely <grant.likely@secretlab.ca>, Catalin Marinas <catalin.marinas@arm.com>, linuxppc-dev@lists.ozlabs.org, Nicolas Pitre <nico@fluxnic.net>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Tony Lindgren <tony@atomide.com>, Daniel Walker <dwalker@codeaurora.org>, =?ISO-8859-1?Q?Uwe_Kleine=2DK=F6nig?= <u.kleine-koenig@pengutronix.de>, Stephen Rothwell <sfr@canb.auug.org.au>
 
-On Fri, Jul 16, 2010 at 11:57:55AM -0600, Grant Likely wrote:
-> Last missing piece is being able to do "select FOO = n", which Stephen
-> is currently working on.
+On Fri, Jul 16, 2010 at 11:07 AM, Russell King - ARM Linux
+<linux@arm.linux.org.uk> wrote:
+>
+> I thought Linus' idea was to use:
+>
+> KBUILD_KCONFIG=file make allnoconfig
 
-I thought Linus' idea was to use:
+See an earlier reply - that is indeed what I suggested, and yes, it
+avoids the need to be able to "unselect" things.
 
-KBUILD_KCONFIG=file make allnoconfig
+However, it turns out that even then you do want to extend the Kconfig
+language with the ability to select particular values. Not for boolean
+(or even tristate things), but for things that select an integer or
+string value etc.
 
-in which case any option which would be presented to the user which hasn't
-been selected by 'file' ends up being set to n.  That means there's no
-need for a special "select FOO=n" construct.
+So the "select OPTION=xyz" syntax ends up being a good thing even for
+the "-n" (allnoconfig) case too.
 
-See one of Linus' replies on June 3:
-Message-ID: <alpine.LFD.2.00.1006031317410.8175@i5.linux-foundation.org>
+And while I think the allnoconfig model has some advantages (the
+Kconfig input file ends up being independent of the default values),
+that very fact ends up being a disadvantage too (the Kconfig input
+file likely ends up being larger, since _hopefully_ the defaults are
+sane).
 
+So I'm not at all married to the "allnoconfig" model. It's one way of
+doing things, but I think the argument that we should start with the
+defaults and modify those instead is not an invalid one.
+
+                     Linus
