@@ -1,72 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cam-admin0.cambridge.arm.com ([217.140.96.50]:43639 "EHLO
-	cam-admin0.cambridge.arm.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1758829Ab0GPUpr (ORCPT
+Received: from mail2.shareable.org ([80.68.89.115]:55585 "EHLO
+	mail2.shareable.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755004Ab0GPXta (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 16 Jul 2010 16:45:47 -0400
-Subject: Re: [RFC PATCH] Kconfig: Enable Kconfig fragments to be used for
- defconfig
-From: Catalin Marinas <catalin.marinas@arm.com>
-In-Reply-To: <AANLkTimKpmZaGRYfYs8HGDz-_VG8ePXN6bZvl2-YcNdR@mail.gmail.com>
-References: <20100713230352.6781.18644.stgit@angua>
-	 <1279296221.17878.66.camel@e102109-lin.cambridge.arm.com>
-	 <AANLkTinyFBTKYaryFANYheTuP-biJUws2x01NRNZPb4M@mail.gmail.com>
-	 <alpine.LFD.2.00.1007161406120.10598@xanadu.home>
-	 <20100716183028.GB26854@n2100.arm.linux.org.uk>
-	 <alpine.LFD.2.00.1007161439240.10598@xanadu.home>
-	 <AANLkTikqHnyFVJF0Pzwy2xtKeNSXYAPFdPkAkLiXK8Ls@mail.gmail.com>
-	 <1279310976.18579.8.camel@e102109-lin.cambridge.arm.com>
-	 <AANLkTimKpmZaGRYfYs8HGDz-_VG8ePXN6bZvl2-YcNdR@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Date: Fri, 16 Jul 2010 21:44:36 +0100
-Message-ID: <1279313076.20418.3.camel@e102109-lin.cambridge.arm.com>
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+	Fri, 16 Jul 2010 19:49:30 -0400
+Date: Sat, 17 Jul 2010 00:49:18 +0100
+From: Jamie Lokier <jamie@shareable.org>
+Subject: Re: [RFC PATCH] Kconfig: Enable Kconfig fragments to be used for defconfig
+Message-ID: <20100716234918.GA31060@shareable.org>
+References: <20100713230352.6781.18644.stgit@angua> <1279062881.4609.34.camel@c-dwalke-linux.qualcomm.com> <AANLkTin69tN3NQHD2wvkA0G-lj3f9tSZEnhzdyJdTh9m@mail.gmail.com> <1279064008.4609.48.camel@c-dwalke-linux.qualcomm.com> <alpine.LFD.2.00.1007131941140.10598@xanadu.home> <1279124563.21162.14.camel@c-dwalke-linux.qualcomm.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1279124563.21162.14.camel@c-dwalke-linux.qualcomm.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Grant Likely <grant.likely@secretlab.ca>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, Nicolas Pitre <nico@fluxnic.net>, Stephen Rothwell <sfr@canb.auug.org.au>, Daniel Walker <dwalker@codeaurora.org>, Russell King - ARM Linux <linux@arm.linux.org.uk>, linux-kbuild@vger.kernel.org, Tony Lindgren <tony@atomide.com>, Uwe =?ISO-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@pengutronix.de>, lkml <linux-kernel@vger.kernel.org>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, linuxppc-dev@lists.ozlabs.org, linux-arm-kernel@lists.infradead.org
+To: Daniel Walker <dwalker@codeaurora.org>
+Cc: Nicolas Pitre <nico@fluxnic.net>, linux-kbuild@vger.kernel.org, Tony Lindgren <tony@atomide.com>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, linux-kernel@vger.kernel.org, Grant Likely <grant.likely@secretlab.ca>, Linus Torvalds <torvalds@linux-foundation.org>, Russell King <rmk@arm.linux.org.uk>, Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@pengutronix.de>, linuxppc-dev@lists.ozlabs.org, linux-arm-kernel@lists.infradead.org
 
-On Fri, 2010-07-16 at 21:17 +0100, Grant Likely wrote:
-> On Fri, Jul 16, 2010 at 2:09 PM, Catalin Marinas
-> <catalin.marinas@arm.com> wrote:
-> > On Fri, 2010-07-16 at 19:46 +0100, Linus Torvalds wrote:
-> >> On Fri, Jul 16, 2010 at 11:40 AM, Nicolas Pitre <nico@fluxnic.net> wrote:
-> >> >
-> >> > DOH.
-> >>
-> >> Well, it's possible that the correct approach is a mixture.
-> >>
-> >> Automatically do the trivial cases (recursive selects, dependencies
-> >> that are simple or of the form "x && y" etc), and warn about the cases
-> >> that aren't trivial (where "not trivial" may not necessarily be about
-> >> fundamentally ambiguous ones, but just "complex enough that I won't
-> >> even try").
-> >
-> > There is still a risk with this approach when the Kconfig isn't entirely
-> > correct. For example, on ARM we have (I pushed a patch already):
-> >
-> > config CPU_32v6K
-> >        depends on CPU_V6
-> >
-> > config CPU_V7
-> >        select CPU_32v6K
-> >
-> > In this simple approach, we end up selecting CPU_V6 when we only need
-> > CPU_V7. There other places like this in the kernel.
-> >
-> > Of course, kbuild could still warn but if people rely on this feature to
-> > select options automatically I suspect they would ignore the warnings.
+Daniel Walker wrote:
+> > But all the rest is arbitrary and could be part of common shared 
+> > profiles or the like in defconfig format.
 > 
-> In my first patch, I made Kconfig problems errors instead of warnings.
->  That would prevent people from ignoring them.
+> I'm sure most people will want to have a config isolated to their
+> specific device. That to me seems reasonable because everyone wants the
+> smallest possible kernel they can get for their given device.
 
-My point was that if we allow kbuild to select dependencies
-automatically (as per Nico's initial suggestion, followed up by Linus),
-in the above situation CPU_V7 would trigger the selection of CPU_V6 and
-I don't want this. If we rely on such automatic selection of the
-"depends on" options, we can't make the warnings be errors.
+Indeed, but people who want the smallest possible kernel for their
+specific device _in a particular use context_ tend to want:
 
--- 
-Catalin
+  - To disable support for parts of the device they aren't using.
+    For example, an SoC with integrated ethernet that isn't actually
+    wired up on their board, or where they're using an external ethernet
+    chip instead for some reason.
 
+  - To choose what's modular and what isn't, even for integrated
+    parts.  For example to control the bootup sequence, they might
+    want to delay integrated USB and IDE initialisation, which is done by
+    making those modular and loading them after bringing up a splash
+    screen earlier in the boot scripts.
+
+So there is still a need to be able to override the drivers and
+settings, but it's still incredibly useful to have defaults which
+describe the SoC or board accurately.
+
+-- Jamie
