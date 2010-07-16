@@ -1,46 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp1.linux-foundation.org ([140.211.169.13]:45728 "EHLO
-	smtp1.linux-foundation.org" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1756269Ab0GPSyC (ORCPT
+Received: from moutng.kundenserver.de ([212.227.126.186]:61509 "EHLO
+	moutng.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1759141Ab0GPUCP (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 16 Jul 2010 14:54:02 -0400
+	Fri, 16 Jul 2010 16:02:15 -0400
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: Re: [RFC PATCH] Kconfig: Enable Kconfig fragments to be used for defconfig
+Date: Fri, 16 Jul 2010 22:01:09 +0200
+References: <20100713230352.6781.18644.stgit@angua> <1279296221.17878.66.camel@e102109-lin.cambridge.arm.com> <AANLkTinyFBTKYaryFANYheTuP-biJUws2x01NRNZPb4M@mail.gmail.com>
+In-Reply-To: <AANLkTinyFBTKYaryFANYheTuP-biJUws2x01NRNZPb4M@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <alpine.LFD.2.00.1007161439240.10598@xanadu.home>
-References: <20100713230352.6781.18644.stgit@angua>
-	<1279296221.17878.66.camel@e102109-lin.cambridge.arm.com>
-	<AANLkTinyFBTKYaryFANYheTuP-biJUws2x01NRNZPb4M@mail.gmail.com>
-	<alpine.LFD.2.00.1007161406120.10598@xanadu.home>
-	<20100716183028.GB26854@n2100.arm.linux.org.uk>
-	<alpine.LFD.2.00.1007161439240.10598@xanadu.home>
-Date: Fri, 16 Jul 2010 11:46:17 -0700
-Message-ID: <AANLkTikqHnyFVJF0Pzwy2xtKeNSXYAPFdPkAkLiXK8Ls@mail.gmail.com>
-Subject: Re: [RFC PATCH] Kconfig: Enable Kconfig fragments to be used for
-	defconfig
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: Text/Plain;
+  charset="iso-8859-1"
+Content-Transfer-Encoding: 7bit
+Message-Id: <201007162201.09629.arnd@arndb.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nicolas Pitre <nico@fluxnic.net>
-Cc: Russell King - ARM Linux <linux@arm.linux.org.uk>, Grant Likely <grant.likely@secretlab.ca>, Catalin Marinas <catalin.marinas@arm.com>, linuxppc-dev@lists.ozlabs.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>, linux-kbuild@vger.kernel.org, lkml <linux-kernel@vger.kernel.org>, linux-arm-kernel@lists.infradead.org, Tony Lindgren <tony@atomide.com>, Daniel Walker <dwalker@codeaurora.org>, =?ISO-8859-1?Q?Uwe_Kleine=2DK=F6nig?= <u.kleine-koenig@pengutronix.de>, Stephen Rothwell <sfr@canb.auug.org.au>
+To: Grant Likely <grant.likely@secretlab.ca>
+Cc: Catalin Marinas <catalin.marinas@arm.com>, linuxppc-dev@lists.ozlabs.org, Nicolas Pitre <nico@fluxnic.net>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Linus Torvalds <torvalds@linux-foundation.org>, Russell King <rmk@arm.linux.org.uk>, Tony Lindgren <tony@atomide.com>, Daniel Walker <dwalker@codeaurora.org>, Uwe =?iso-8859-1?q?Kleine-K=F6nig?= <u.kleine-koenig@pengutronix.de>, Stephen Rothwell <sfr@canb.auug.org.au>
 
-On Fri, Jul 16, 2010 at 11:40 AM, Nicolas Pitre <nico@fluxnic.net> wrote:
->
-> DOH.
+On Friday 16 July 2010 19:57:55 Grant Likely wrote:
+> On Fri, Jul 16, 2010 at 10:03 AM, Catalin Marinas
+> <catalin.marinas@arm.com> wrote:
+> > On Wed, 2010-07-14 at 00:04 +0100, Grant Likely wrote:
+> 
+> sfr and I were talking about your patch the other day.  Just warning
+> on incomplete dependencies is enough to make it actually workable for
+> me (without my ugly post-processing step).  I was very happy to hear
+> that it is in linux-next.
+> 
+> Last missing piece is being able to do "select FOO = n", which Stephen
+> is currently working on.
 
-Well, it's possible that the correct approach is a mixture.
+Are there a lot of symbols for which this is needed? If there is only
+a handful, you could work around this by selectively adding
 
-Automatically do the trivial cases (recursive selects, dependencies
-that are simple or of the form "x && y" etc), and warn about the cases
-that aren't trivial (where "not trivial" may not necessarily be about
-fundamentally ambiguous ones, but just "complex enough that I won't
-even try").
+config FOO
+	bool "foo"
+	default !FOO_DISABLE
 
-Maybe a full "solver" is unnecessary, for example, but just a simple
-"automatically enable the direct dependencies and scream when it's not
-simple any more" would take care of 99% of the common cases, and then
-warn when it needs some manual help.
+config FOO_DISABLE
+	def_bool "n"
 
-So it's not a strict "one or the other" issue. The solution could be
-"some of both".
 
-                     Linus
+		Arnd
