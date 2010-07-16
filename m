@@ -1,47 +1,36 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-gx0-f174.google.com ([209.85.161.174]:55953 "EHLO
-	mail-gx0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756716Ab0GPR6W convert rfc822-to-8bit (ORCPT
+Received: from caramon.arm.linux.org.uk ([78.32.30.218]:60384 "EHLO
+	caramon.arm.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1758740Ab0GPSHb (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 16 Jul 2010 13:58:22 -0400
-MIME-Version: 1.0
-In-Reply-To: <1279296221.17878.66.camel@e102109-lin.cambridge.arm.com>
-References: <20100713230352.6781.18644.stgit@angua> <1279296221.17878.66.camel@e102109-lin.cambridge.arm.com>
-From: Grant Likely <grant.likely@secretlab.ca>
-Date: Fri, 16 Jul 2010 11:57:55 -0600
-Message-ID: <AANLkTinyFBTKYaryFANYheTuP-biJUws2x01NRNZPb4M@mail.gmail.com>
+	Fri, 16 Jul 2010 14:07:31 -0400
+Date: Fri, 16 Jul 2010 19:07:01 +0100
+From: Russell King - ARM Linux <linux@arm.linux.org.uk>
 Subject: Re: [RFC PATCH] Kconfig: Enable Kconfig fragments to be used for
 	defconfig
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 8BIT
+Message-ID: <20100716180701.GA26854@n2100.arm.linux.org.uk>
+References: <20100713230352.6781.18644.stgit@angua> <1279296221.17878.66.camel@e102109-lin.cambridge.arm.com> <AANLkTinyFBTKYaryFANYheTuP-biJUws2x01NRNZPb4M@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <AANLkTinyFBTKYaryFANYheTuP-biJUws2x01NRNZPb4M@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: linuxppc-dev@lists.ozlabs.org, Nicolas Pitre <nico@fluxnic.net>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Linus Torvalds <torvalds@linux-foundation.org>, Russell King <rmk@arm.linux.org.uk>, Tony Lindgren <tony@atomide.com>, Daniel Walker <dwalker@codeaurora.org>, =?ISO-8859-1?Q?Uwe_Kleine=2DK=F6nig?= <u.kleine-koenig@pengutronix.de>, Stephen Rothwell <sfr@canb.auug.org.au>
+To: Grant Likely <grant.likely@secretlab.ca>
+Cc: Catalin Marinas <catalin.marinas@arm.com>, linuxppc-dev@lists.ozlabs.org, Nicolas Pitre <nico@fluxnic.net>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Linus Torvalds <torvalds@linux-foundation.org>, Tony Lindgren <tony@atomide.com>, Daniel Walker <dwalker@codeaurora.org>, Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@pengutronix.de>, Stephen Rothwell <sfr@canb.auug.org.au>
 
-On Fri, Jul 16, 2010 at 10:03 AM, Catalin Marinas
-<catalin.marinas@arm.com> wrote:
-> On Wed, 2010-07-14 at 00:04 +0100, Grant Likely wrote:
->> - It still doesn't resolve dependencies.  A solver would help with this.
->>   For the time being I work around the problem by running the generated
->>   config through 'oldconfig' and looking for differences.  If the files
->>   differ (ignoring comments and generateconfig_* options) after oldconfig,
->>   then the <board>_defconfig target returns a failure.  (but leaves the
->>   new .config intact so the user can resolve it with menuconfig).  This
->>   way at least the user is told when a Kconfig fragment is invalid.
->
-> It's not a solver but I'm pushing a patch to warn on selecting symbols
-> with unmet dependencies so that you can select further symbols (manual
-> solving). The patch is in linux-next but you also can grab it from:
->
-> http://git.kernel.org/?p=linux/kernel/git/cmarinas/linux-2.6-cm.git;a=commitdiff_plain;h=5d87db2d2a332784bbf2b1ec3e141486f4d41d6f
+On Fri, Jul 16, 2010 at 11:57:55AM -0600, Grant Likely wrote:
+> Last missing piece is being able to do "select FOO = n", which Stephen
+> is currently working on.
 
-sfr and I were talking about your patch the other day.  Just warning
-on incomplete dependencies is enough to make it actually workable for
-me (without my ugly post-processing step).  I was very happy to hear
-that it is in linux-next.
+I thought Linus' idea was to use:
 
-Last missing piece is being able to do "select FOO = n", which Stephen
-is currently working on.
+KBUILD_KCONFIG=file make allnoconfig
 
-g.
+in which case any option which would be presented to the user which hasn't
+been selected by 'file' ends up being set to n.  That means there's no
+need for a special "select FOO=n" construct.
+
+See one of Linus' replies on June 3:
+Message-ID: <alpine.LFD.2.00.1006031317410.8175@i5.linux-foundation.org>
+
