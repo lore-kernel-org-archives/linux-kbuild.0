@@ -1,71 +1,62 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx3.schottelius.org ([77.109.138.221]:59644 "EHLO
-	mx3.schottelius.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752409Ab0GQUPF (ORCPT
+Received: from mail-yx0-f174.google.com ([209.85.213.174]:41639 "EHLO
+	mail-yx0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752229Ab0GSFVS convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 17 Jul 2010 16:15:05 -0400
-Date: Sat, 17 Jul 2010 22:16:04 +0200
-From: Nico Schottelius <nico-nospam@schottelius.org>
-Subject: Re: I did a git pull and a plus appeared
-Message-ID: <20100717201604.GA4904@schottelius.org>
-References: <20100716121802.65fdfa24@lembas.zaitcev.lan>
- <4C40BAD1.8090908@garzik.org>
- <20100716.131521.55876531.davem@davemloft.net>
- <20100716182609.4cad56e1@lembas.zaitcev.lan>
+	Mon, 19 Jul 2010 01:21:18 -0400
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="5vNYLRcllDrimb99"
-Content-Disposition: inline
-In-Reply-To: <20100716182609.4cad56e1@lembas.zaitcev.lan>
+In-Reply-To: <20100716234918.GA31060@shareable.org>
+References: <20100713230352.6781.18644.stgit@angua> <1279062881.4609.34.camel@c-dwalke-linux.qualcomm.com>
+	<AANLkTin69tN3NQHD2wvkA0G-lj3f9tSZEnhzdyJdTh9m@mail.gmail.com>
+	<1279064008.4609.48.camel@c-dwalke-linux.qualcomm.com> <alpine.LFD.2.00.1007131941140.10598@xanadu.home>
+	<1279124563.21162.14.camel@c-dwalke-linux.qualcomm.com> <20100716234918.GA31060@shareable.org>
+From: Grant Likely <grant.likely@secretlab.ca>
+Date: Sun, 18 Jul 2010 23:20:57 -0600
+Message-ID: <AANLkTilqZKk_tzGTLqhD7bNVGX_avXwy7_fXvoR96qNL@mail.gmail.com>
+Subject: Re: [RFC PATCH] Kconfig: Enable Kconfig fragments to be used for
+	defconfig
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Pete Zaitcev <zaitcev@redhat.com>
-Cc: David Miller <davem@davemloft.net>, jeff@garzik.org, linux-kbuild@vger.kernel.org, nico-linuxsetlocalversion@schottelius.org, linux-kernel@vger.kernel.org
+To: Jamie Lokier <jamie@shareable.org>
+Cc: Daniel Walker <dwalker@codeaurora.org>, Nicolas Pitre <nico@fluxnic.net>, linux-kbuild@vger.kernel.org, Tony Lindgren <tony@atomide.com>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, linux-kernel@vger.kernel.org, Linus Torvalds <torvalds@linux-foundation.org>, Russell King <rmk@arm.linux.org.uk>, =?ISO-8859-1?Q?Uwe_Kleine=2DK=F6nig?= <u.kleine-koenig@pengutronix.de>, linuxppc-dev@lists.ozlabs.org, linux-arm-kernel@lists.infradead.org
 
+On Fri, Jul 16, 2010 at 5:49 PM, Jamie Lokier <jamie@shareable.org> wrote:
+> Daniel Walker wrote:
+>> > But all the rest is arbitrary and could be part of common shared
+>> > profiles or the like in defconfig format.
+>>
+>> I'm sure most people will want to have a config isolated to their
+>> specific device. That to me seems reasonable because everyone wants the
+>> smallest possible kernel they can get for their given device.
 
---5vNYLRcllDrimb99
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Just to be clear (specifically for me as a maintainer) the purpose of
+defconfigs is not to provide the best optimized kernel configuration
+for each given board.  defconfigs are useful as a reasonable working
+starting point, and to provide build coverage testing.
 
-Hey guys,
+> Indeed, but people who want the smallest possible kernel for their
+> specific device _in a particular use context_ tend to want:
+>
+>  - To disable support for parts of the device they aren't using.
+>    For example, an SoC with integrated ethernet that isn't actually
+>    wired up on their board, or where they're using an external ethernet
+>    chip instead for some reason.
+>
+>  - To choose what's modular and what isn't, even for integrated
+>    parts.  For example to control the bootup sequence, they might
+>    want to delay integrated USB and IDE initialisation, which is done by
+>    making those modular and loading them after bringing up a splash
+>    screen earlier in the boot scripts.
+>
+> So there is still a need to be able to override the drivers and
+> settings, but it's still incredibly useful to have defaults which
+> describe the SoC or board accurately.
 
-Pete Zaitcev [Fri, Jul 16, 2010 at 06:26:09PM -0600]:
-> > The "+" comes from scripts/setlocalversion
->=20
-> Right, found that quickly, but the question is what the authors' intent w=
-as.
-> I cannot tell from the code. Folks at #kernel seem to think the plus means
-> "built from a tarball", in which case this is a bug (the kernel was built
-> from a cloned tree).
->=20
-> I can easily add '+' to the list of filename characters in my terminal,
-> just thought to ask in case it's a bug.
+Yes.  The defconfig is only a starting point.  Maintaining the actual
+config for the shipped kernel is the job of the distribution vendor
+and I have zero interest in maintaining those configurations in the
+kernel tree.
 
-I'm soon on a long trip, has anybody fixed it already?
-
-Otherwise I'm having a look at it.
-
-Cheers,
-
-Nico
-
---=20
-New PGP key: 7ED9 F7D3 6B10 81D7 0EC5  5C09 D7DC C8E4 3187 7DF0
-Please resign, if you signed 9885188C or 8D0E27A4.
-
-Currently moving *.schottelius.org to http://www.nico.schottelius.org/ ...
-
---5vNYLRcllDrimb99
-Content-Type: application/pgp-signature
-Content-Disposition: inline
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.10 (GNU/Linux)
-
-iEYEARECAAYFAkxCD4QACgkQ19zI5DGHffDrCwCfXatluxtP6gcWHrHwilFQLZ96
-JYkAoI078XE7NG7qdYQcGBbl/5kJ52Gd
-=A3V6
------END PGP SIGNATURE-----
-
---5vNYLRcllDrimb99--
+g.
