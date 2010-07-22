@@ -1,59 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:35141 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S932171Ab0GUNlw (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 21 Jul 2010 09:41:52 -0400
-Message-ID: <4C46F930.1040506@suse.cz>
-Date: Wed, 21 Jul 2010 15:42:08 +0200
-From: Michal Marek <mmarek@suse.cz>
-MIME-Version: 1.0
-Subject: Re: "make rpm" failed with parameter "--scm-only"
-References: <A24AE1FFE7AEC5489F83450EE98351BF1BD77643B1@shsmsx502.ccr.corp.intel.com> <20100715084233.GA5835@sepie.suse.cz> <20100720132851.GA31205@sepie.suse.cz> <A24AE1FFE7AEC5489F83450EE98351BF1BDE3704AC@shsmsx502.ccr.corp.intel.com>
-In-Reply-To: <A24AE1FFE7AEC5489F83450EE98351BF1BDE3704AC@shsmsx502.ccr.corp.intel.com>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+Received: from mail-ww0-f44.google.com ([74.125.82.44]:40650 "EHLO
+	mail-ww0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752685Ab0GVMZD (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 22 Jul 2010 08:25:03 -0400
+Received: by wwj40 with SMTP id 40so3365667wwj.1
+        for <linux-kbuild@vger.kernel.org>; Thu, 22 Jul 2010 05:25:02 -0700 (PDT)
+From: Peter Korsgaard <jacmet@sunsite.dk>
+Subject: [PATCH] kconfig: make randconfig fair for booleans
+Date: Thu, 22 Jul 2010 14:24:57 +0200
+Message-Id: <1279801497-810-1-git-send-email-jacmet@sunsite.dk>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Zheng, Jiajia" <jiajia.zheng@intel.com>
-Cc: "Guy, Wey-Yi W" <wey-yi.w.guy@intel.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>
+To: linux-kbuild@vger.kernel.org, zippel@linux-m68k.org, mmarek@suse.cz, sam@ravnborg.org
+Cc: Peter Korsgaard <jacmet@sunsite.dk>
 
-On 21.7.2010 03:30, Zheng, Jiajia wrote:
-> Michal Marek wrote:
->> were you able to test the fix? I'd like to send it to Linus.
->>
-> Thank you. This patch works OK. 
+Give boolean symbols a 50% chance of getting enabled, rather than 67%.
 
-Thanks a lot for testing it.
+Signed-off-by: Peter Korsgaard <jacmet@sunsite.dk>
+---
+ scripts/kconfig/confdata.c |    3 ++-
+ 1 files changed, 2 insertions(+), 1 deletions(-)
 
-> But I still saw below warnings. Of course, it was not introduced by your patch because that I saw such warnings before. Could you also take a look if there's some problem with Makefile? 
-> ...
-> + make clean
-> make[2]: warning: jobserver unavailable: using -j1.  Add `+' to parent make rule.
+diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
+index c4dec80..210a49e 100644
+--- a/scripts/kconfig/confdata.c
++++ b/scripts/kconfig/confdata.c
+@@ -862,7 +862,8 @@ void conf_set_all_new_symbols(enum conf_def_mode mode)
+ 				sym->def[S_DEF_USER].tri = no;
+ 				break;
+ 			case def_random:
+-				sym->def[S_DEF_USER].tri = (tristate)(rand() % 3);
++				cnt = sym_get_type(sym) == S_TRISTATE ? 3 : 2;
++				sym->def[S_DEF_USER].tri = (tristate)(rand() % cnt);
+ 				break;
+ 			default:
+ 				continue;
+-- 
+1.7.1
 
-I found the explanation in the make info page:
-
-`warning: jobserver unavailable: using -j1.  Add `+' to parent make rule.'
-     In order for `make' processes to communicate, the parent will pass
-     information to the child.  Since this could result in problems if
-     the child process isn't actually a `make', the parent will only do
-     this if it thinks the child is a `make'.  The parent uses the
-     normal algorithms to determine this (*note How the `MAKE' Variable
-     Works: MAKE Variable.).  If the makefile is constructed such that
-     the parent doesn't know the child is a `make' process, then the
-     child will receive only part of the information necessary. [...]
-
-Which is our case: The parent make only sees the rpmbuild call. The fix
-would probably be to clear all make environment variables before running
-rpmbuild.
-
-> + make -j4
-> make[2]: warning: -jN forced in submake: disabling jobserver mode.
-
-Another symptom of the same problem.
-
-
-> I got a RPM package: kernel-2.6.35rc5wl+-6.x86_64.rpm
-
-Great :).
-
-Michal
