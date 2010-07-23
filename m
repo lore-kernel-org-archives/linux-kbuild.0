@@ -1,47 +1,35 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor.suse.de ([195.135.220.2]:39484 "EHLO mx1.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751633Ab0GWOZ0 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 23 Jul 2010 10:25:26 -0400
-Date: Fri, 23 Jul 2010 16:25:15 +0200
-From: Michal Marek <mmarek@suse.cz>
-Subject: [GIT] kbuild fixes for 2.6.35
-Message-ID: <20100723142515.GA524@sepie.suse.cz>
+Received: from pqueueb.post.tele.dk ([193.162.153.10]:60454 "EHLO
+	pqueueb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751383Ab0GWVMA (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 23 Jul 2010 17:12:00 -0400
+Received: from pfepb.post.tele.dk (pfepb.post.tele.dk [195.41.46.236])
+	by pqueueb.post.tele.dk (Postfix) with ESMTP id 510D283E9
+	for <linux-kbuild@vger.kernel.org>; Fri, 23 Jul 2010 23:11:59 +0200 (CEST)
+Date: Fri, 23 Jul 2010 23:11:38 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: [PATCH] kconfig: make randconfig fair for booleans
+Message-ID: <20100723211138.GA27379@merkur.ravnborg.org>
+References: <1279801497-810-1-git-send-email-jacmet@sunsite.dk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <1279801497-810-1-git-send-email-jacmet@sunsite.dk>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: bebarino@gmail.com, gentoo@mgorny.alt.pl, mmarek@suse.cz, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Peter Korsgaard <jacmet@sunsite.dk>, Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org, zippel@linux-m68k.org
 
-Hi Linus,
+On Thu, Jul 22, 2010 at 02:24:57PM +0200, Peter Korsgaard wrote:
+> Give boolean symbols a 50% chance of getting enabled, rather than 67%.
+> 
+> Signed-off-by: Peter Korsgaard <jacmet@sunsite.dk>
 
-there are three more fixes for kbuild bugs that appeared in 2.6.35. The
-first two are fixes to the setlocalversion script, the third one fixes a
-format string bug in nconfig (nconfig was added in this release cycle).
+Good catch!
 
-Please pull from the below url, thanks.
-Michal
+Acked-by: Sam Ravnborg <sam@ravnborg.org>
 
-The following changes since commit 1c5474a65bf15a4cb162dfff86d6d0b5a08a740c:
+Michal - I assume you apply this for next merge window.
 
-  Linux 2.6.35-rc5 (2010-07-12 14:55:33 -0700)
-
-are available in the git repository at:
-  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild-2.6.git rc-fixes
-
-Michal Marek (1):
-      kbuild: Fix make rpm
-
-Michał Górny (1):
-      kbuild: Make the setlocalversion script POSIX-compliant
-
-Stephen Boyd (1):
-      nconfig: Fix segfault when help contains special characters
-
- scripts/kconfig/nconf.gui.c |    2 +-
- scripts/package/Makefile    |    2 +-
- scripts/setlocalversion     |   16 ++++++++++------
- 3 files changed, 12 insertions(+), 8 deletions(-)
+	Sam
