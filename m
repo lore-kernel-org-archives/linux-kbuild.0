@@ -1,46 +1,73 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail4.comsite.net ([205.238.176.238]:2340 "EHLO
-	mail4.comsite.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752143Ab0GVPTj (ORCPT
+Received: from mail-pz0-f46.google.com ([209.85.210.46]:63710 "EHLO
+	mail-pz0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751122Ab0GWHE3 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 22 Jul 2010 11:19:39 -0400
-From: Milton Miller <miltonm@bga.com>
-Subject: [PATCH] setlocalversion: fix version for untaged nontip mercurial revs
-Message-Id: <fix-hg-id-resend1@mdm.bga.com>
-Date: Thu, 22 Jul 2010 10:19:38 -0500
+	Fri, 23 Jul 2010 03:04:29 -0400
+From: Stephen Boyd <bebarino@gmail.com>
+Subject: [PATCH] nconfig: Fix segfault when help contains special characters
+Date: Fri, 23 Jul 2010 00:04:14 -0700
+Message-Id: <1279868654-15743-1-git-send-email-bebarino@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>, gentoo@mgorny.alt.pl
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Nir Tzachar <nir.tzachar@gmail.com>
 
-The manpage for cut says it will return all lines without the delimiter
-unless -s is specified.
+nconfig segfaults when help text contains the character '%'. For a quick
+example, navigate to the kernel compression options and get the help for
+bzip2. Doing so triggers a call to mvwprintw() with a string containing
+'%' and no extra arguments to fill in the specifier's value. Fix this
+case by printing the literal string retrieved from the kconfig.
 
-When I backed up my mecurial tree to generate modules, I found that the
-scm part of localversion was turning up blank.
+ #0  0x00002b52b6b11d83 in vfprintf () from /lib/libc.so.6
+ #1  0x00002b52b6bad010 in __vsnprintf_chk () from /lib/libc.so.6
+ #2  0x00002b52b623991b in _nc_printf_string () from
+ /lib/libncursesw.so.5
+ #3  0x00002b52b6234cff in vwprintw () from /lib/libncursesw.so.5
+ #4  0x00002b52b6234db9 in mvwprintw () from /lib/libncursesw.so.5
+ #5  0x00000000004151d8 in fill_window (win=0x21b64c0,
+     text=0x21b62b0 "CONFIG_KERNEL_BZIP2:\n\nIts compression ratio and
+     speed is intermediate.\nDecompression speed is slowest among the
+     three.  The kernel\nsize is about 10% smaller with bzip2, in
+     comparison to gzip.\nBzip2 us"...)
+     at scripts/kconfig/nconf.gui.c:229
+ #6  0x0000000000416335 in show_scroll_win (main_window=0x21a5630,
+         title=0x157fa30 "Bzip2",
+ 	    text=0x21b62b0 "CONFIG_KERNEL_BZIP2:\n\nIts compression
+ 	    ratio and speed is intermediate.\nDecompression speed is
+ 	    slowest among the three.  The kernel\nsize is about 10%
+ 	    smaller with bzip2, in comparison to gzip.\nBzip2 us"...)
+     at scripts/kconfig/nconf.gui.c:535
+ #7  0x00000000004055b2 in show_help (menu=0x157f9d0)
+         at scripts/kconfig/nconf.c:1257
+ #8  0x0000000000405897 in conf_choice (menu=0x157f130)
+ 	    at scripts/kconfig/nconf.c:1321
+ #9  0x0000000000405326 in conf (menu=0x157d130) at
+ 	    scripts/kconfig/nconf.c:1208
+ #10 0x00000000004052e8 in conf (menu=0xb434a0) at
+ 	    scripts/kconfig/nconf.c:1203
+ #11 0x0000000000406092 in main (ac=2, av=0x7fff96a93c38)
 
-Signed-off-by: Milton Miller <miltonm@bga.com>
 Cc: Michal Marek <mmarek@suse.cz>
-Cc: "Michał Górny" <gentoo@mgorny.alt.pl>
-
+Cc: Nir Tzachar <nir.tzachar@gmail.com>
+Signed-off-by: Stephen Boyd <bebarino@gmail.com>
 ---
-This version is against linux next-20100721.  The diff against 35-rc
-would be shifted left one tab stop and have different line numbers, should
-this be sent to stable.
+ scripts/kconfig/nconf.gui.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-Resend without 8-bit characters (maintainers name) in header
-Added linux-kbuild@vger.kernel.org which get-maintainer did not
+diff --git a/scripts/kconfig/nconf.gui.c b/scripts/kconfig/nconf.gui.c
+index 115edb4..a9d9344 100644
+--- a/scripts/kconfig/nconf.gui.c
++++ b/scripts/kconfig/nconf.gui.c
+@@ -226,7 +226,7 @@ void fill_window(WINDOW *win, const char *text)
+ 		int len = get_line_length(line);
+ 		strncpy(tmp, line, min(len, x));
+ 		tmp[len] = '\0';
+-		mvwprintw(win, i, 0, tmp);
++		mvwprintw(win, i, 0, "%s", tmp);
+ 	}
+ }
+ 
+-- 
+1.7.2.rc3.57.g77b5b
 
-diff --git a/scripts/setlocalversion b/scripts/setlocalversion
-index a7b9f76..872312f 100755
---- a/scripts/setlocalversion
-+++ b/scripts/setlocalversion
-@@ -86,7 +86,7 @@ scm_version()
- 
- 	# Check for mercurial and a mercurial repo.
- 	if hgid=`hg id 2>/dev/null`; then
--		tag=`printf '%s' "$hgid" | cut -d' ' -f2`
-+		tag=`printf '%s' "$hgid" | cut -s -d' ' -f2`
- 
- 		# Do we have an untagged version?
- 		if [ -z "$tag" -o "$tag" = tip ]; then
