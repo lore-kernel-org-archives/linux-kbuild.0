@@ -1,37 +1,78 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-fx0-f46.google.com ([209.85.161.46]:63316 "EHLO
-	mail-fx0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752198Ab0GYIaN (ORCPT
+Received: from pfepa.post.tele.dk ([195.41.46.235]:54791 "EHLO
+	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751820Ab0GYVis (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 25 Jul 2010 04:30:13 -0400
+	Sun, 25 Jul 2010 17:38:48 -0400
+Date: Sun, 25 Jul 2010 23:38:46 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: [PATCH 1/4] kconfig: save location of config symbols
+Message-ID: <20100725213846.GA5834@merkur.ravnborg.org>
+References: <20100725213808.GA5814@merkur.ravnborg.org>
 MIME-Version: 1.0
-In-Reply-To: <4C49601E.5060605@suse.cz>
-References: <1279868654-15743-1-git-send-email-bebarino@gmail.com>
-	<4C49601E.5060605@suse.cz>
-Date: Sun, 25 Jul 2010 11:30:11 +0300
-Message-ID: <AANLkTikK71ttjp0-NEyg9JCrj2fO8AdsUjPwqTVFTxV=@mail.gmail.com>
-Subject: Re: [PATCH] nconfig: Fix segfault when help contains special
-	characters
-From: Nir Tzachar <nir.tzachar@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20100725213808.GA5814@merkur.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: Stephen Boyd <bebarino@gmail.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: lkml <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Stephen Rothwell <sfr@canb.auug.org.au>, Roman Zippel <zippel@linux-m68k.org>, Michal Marek <mmarek@suse.cz>, Uwe Kleine-Koig <u.kleine-koenig@pengutronix.de>, Linus Torvalds <torvalds@linux-foundation.org>
 
-2010/7/23 Michal Marek <mmarek@suse.cz>:
-> On 23.7.2010 09:04, Stephen Boyd wrote:
->> nconfig segfaults when help text contains the character '%'. For a quick
->> example, navigate to the kernel compression options and get the help for
->> bzip2. Doing so triggers a call to mvwprintw() with a string containing
->> '%' and no extra arguments to fill in the specifier's value. Fix this
->> case by printing the literal string retrieved from the kconfig.
->
-> Thanks, applied.
->
-> Michal
+From f427c3886d7916ad8c6575964a753a33507d9f2e Mon Sep 17 00:00:00 2001
+From: Sam Ravnborg <sam@ravnborg.org>
+Date: Sat, 24 Jul 2010 20:17:33 +0200
+Subject: [PATCH 1/4] kconfig: save location of config symbols
 
+When we add a new config symbol save the file/line
+so we later can refer to their location.
 
-Thanks. It is also nice to see people are using nconfig.
+The information is saved as a property to a config symbol
+because we may have multiple definitions of the same symbol.
 
-Cheers.
+Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
+---
+ scripts/kconfig/expr.h   |    1 +
+ scripts/kconfig/menu.c   |    2 ++
+ scripts/kconfig/symbol.c |    2 ++
+ 3 files changed, 5 insertions(+), 0 deletions(-)
+
+diff --git a/scripts/kconfig/expr.h b/scripts/kconfig/expr.h
+index 891cd9c..4526a58 100644
+--- a/scripts/kconfig/expr.h
++++ b/scripts/kconfig/expr.h
+@@ -131,6 +131,7 @@ enum prop_type {
+ 	P_SELECT,   /* select BAR */
+ 	P_RANGE,    /* range 7..100 (for a symbol) */
+ 	P_ENV,      /* value from environment variable */
++	P_SYMBOL,   /* where a symbol is defined */
+ };
+ 
+ struct property {
+diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
+index 203632c..6400823 100644
+--- a/scripts/kconfig/menu.c
++++ b/scripts/kconfig/menu.c
+@@ -58,6 +58,8 @@ void menu_add_entry(struct symbol *sym)
+ 	*last_entry_ptr = menu;
+ 	last_entry_ptr = &menu->next;
+ 	current_entry = menu;
++	if (sym)
++		menu_add_prop(P_SYMBOL, NULL, NULL, NULL);
+ }
+ 
+ void menu_end_entry(void)
+diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
+index 2e7a048..de36f3e 100644
+--- a/scripts/kconfig/symbol.c
++++ b/scripts/kconfig/symbol.c
+@@ -943,6 +943,8 @@ const char *prop_get_type_name(enum prop_type type)
+ 		return "select";
+ 	case P_RANGE:
+ 		return "range";
++	case P_SYMBOL:
++		return "symbol";
+ 	case P_UNKNOWN:
+ 		break;
+ 	}
+-- 
+1.6.0.6
+
