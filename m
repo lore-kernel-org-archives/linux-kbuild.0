@@ -1,388 +1,79 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepa.post.tele.dk ([195.41.46.235]:54917 "EHLO
-	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752745Ab0GYVkW (ORCPT
+Received: from pqueuea.post.tele.dk ([193.162.153.9]:56899 "EHLO
+	pqueuea.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750818Ab0GYWMD (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 25 Jul 2010 17:40:22 -0400
-Date: Sun, 25 Jul 2010 23:40:21 +0200
+	Sun, 25 Jul 2010 18:12:03 -0400
+Received: from pfepb.post.tele.dk (pfepb.post.tele.dk [195.41.46.236])
+	by pqueuea.post.tele.dk (Postfix) with ESMTP id 7D3BEDBCF9
+	for <linux-kbuild@vger.kernel.org>; Sun, 25 Jul 2010 23:38:30 +0200 (CEST)
+Date: Sun, 25 Jul 2010 23:38:08 +0200
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: [PATCH 4/4] kconfig: add savedefconfig
-Message-ID: <20100725214021.GD5834@merkur.ravnborg.org>
-References: <20100725213808.GA5814@merkur.ravnborg.org>
+Subject: [RFC] kconfig: introduce alldefconfig + savedefconfig
+Message-ID: <20100725213808.GA5814@merkur.ravnborg.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20100725213808.GA5814@merkur.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: lkml <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Stephen Rothwell <sfr@canb.auug.org.au>, Roman Zippel <zippel@linux-m68k.org>, Michal Marek <mmarek@suse.cz>, Uwe Kleine-Koig <u.kleine-koenig@pengutronix.de>, Linus Torvalds <torvalds@linux-foundation.org>
+To: lkml <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Stephen Rothwell <sfr@canb.auug.org.au>, Roman Zippel <zippel@linux-m68k.org>, Michal Marek <mmarek@suse.cz>, Uwe Kleine-Koig <u.kleine-koenig@pengutronix.de>, Linus Torvalds <torvalds@linux-foundation.org>, Sam Ravnborg <sam@ravnborg.org>
 
-From 5edffcc6890a7dbd43b8da9c453bee794e81e7c7 Mon Sep 17 00:00:00 2001
-From: Sam Ravnborg <sam@ravnborg.org>
-Date: Sun, 25 Jul 2010 23:18:47 +0200
-Subject: [PATCH 4/4] kconfig: add savedefconfig
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
+After reading some of the mails about the
+defconfig files I decided to take a look at kconfig.
 
-savedefconfig is used to save a minimal configuration
-that is useful for a defconfig.
+We already decided to go for a solution where the defconfig
+files contains only the minimal configuration.
+Uwe developed a script to assist but having native support
+in kconfig is preferable.
 
-Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
-Cc: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
-Cc: Stephen Rothwell <sfr@canb.auug.org.au>
----
- scripts/kconfig/Makefile    |    7 +++-
- scripts/kconfig/conf.c      |   20 ++++++++-
- scripts/kconfig/confdata.c  |   94 ++++++++++++++++++++++++++++++++++++++++++
- scripts/kconfig/lkc.h       |    2 +
- scripts/kconfig/lkc_proto.h |    1 +
- scripts/kconfig/symbol.c    |   96 +++++++++++++++++++++++++++++++++++++++++++
- 6 files changed, 217 insertions(+), 3 deletions(-)
+This patch set introduce "alldefconfig".
+alldefconfig create a configuration with all values set
+to default values.
+This can be usefull when we check if we do have a sane
+set of default values. Rhe config can be inspected
+using menuconfig.
 
-diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
-index 366711a..aeb04c2 100644
---- a/scripts/kconfig/Makefile
-+++ b/scripts/kconfig/Makefile
-@@ -95,7 +95,8 @@ update-po-config: $(obj)/kxgettext $(obj)/gconf.glade.h
- 	$(Q)rm -f arch/um/Kconfig.arch
- 	$(Q)rm -f $(obj)/config.pot
- 
--PHONY += randconfig allyesconfig allnoconfig allmodconfig alldefconfig defconfig
-+PHONY += randconfig allyesconfig allnoconfig allmodconfig alldefconfig
-+PHONY += defconfig savedefconfig
- 
- randconfig: $(obj)/conf
- 	$< -r $(Kconfig)
-@@ -112,6 +113,9 @@ allmodconfig: $(obj)/conf
- alldefconfig: $(obj)/conf
- 	$< -f $(Kconfig)
- 
-+savedefconfig: $(obj)/conf
-+	$< -M defconfig $(Kconfig)
-+
- defconfig: $(obj)/conf
- ifeq ($(KBUILD_DEFCONFIG),)
- 	$< -d $(Kconfig)
-@@ -140,6 +144,7 @@ help:
- 	@echo  '  allmodconfig	  - New config selecting modules when possible'
- 	@echo  '  allyesconfig	  - New config where all options are accepted with yes'
- 	@echo  '  allnoconfig	  - New config where all options are answered with no'
-+	@echo  '  savedefconfig   - Save current config as ./defconfig (minimal config)'
- 
- # lxdialog stuff
- check-lxdialog  := $(srctree)/$(src)/lxdialog/check-lxdialog.sh
-diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
-index 2b4775e..b1a903b 100644
---- a/scripts/kconfig/conf.c
-+++ b/scripts/kconfig/conf.c
-@@ -28,7 +28,8 @@ enum {
- 	set_mod,
- 	set_no,
- 	set_default,
--	set_random
-+	set_random,
-+	save_defconfig,
- } input_mode = ask_all;
- char *defconfig_file;
- 
-@@ -440,7 +441,7 @@ int main(int ac, char **av)
- 	bindtextdomain(PACKAGE, LOCALEDIR);
- 	textdomain(PACKAGE);
- 
--	while ((opt = getopt(ac, av, "osdD:nmyfrh")) != -1) {
-+	while ((opt = getopt(ac, av, "osdD:nmM:yfrh")) != -1) {
- 		switch (opt) {
- 		case 'o':
- 			input_mode = ask_silent;
-@@ -485,6 +486,10 @@ int main(int ac, char **av)
- 			input_mode = set_random;
- 			break;
- 		}
-+		case 'M':
-+			input_mode = save_defconfig;
-+			defconfig_file = optarg;
-+			break;
- 		case 'h':
- 			printf(_("See README for usage info\n"));
- 			exit(0);
-@@ -553,6 +558,9 @@ int main(int ac, char **av)
- 		else if (!stat("all.config", &tmpstat))
- 			conf_read_simple("all.config", S_DEF_USER);
- 		break;
-+	case save_defconfig:
-+		conf_read(NULL);
-+		break;
- 	default:
- 		break;
- 	}
-@@ -601,6 +609,8 @@ int main(int ac, char **av)
- 			check_conf(&rootmenu);
- 		} while (conf_cnt);
- 		break;
-+	case save_defconfig:
-+		break;
- 	}
- 
- 	if (sync_kconfig) {
-@@ -615,6 +625,12 @@ int main(int ac, char **av)
- 			fprintf(stderr, _("\n*** Error during update of the kernel configuration.\n\n"));
- 			return 1;
- 		}
-+	} else if (input_mode == save_defconfig) {
-+		if (conf_write_defconfig(defconfig_file)) {
-+			fprintf(stderr, _("\n*** Error during writing of mini config to %s.\n\n"),
-+			        defconfig_file);
-+			return 1;
-+		}
- 	} else {
- 		if (conf_write(NULL)) {
- 			fprintf(stderr, _("\n*** Error during writing of the kernel configuration.\n\n"));
-diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
-index c4dec80..76c4e23 100644
---- a/scripts/kconfig/confdata.c
-+++ b/scripts/kconfig/confdata.c
-@@ -396,6 +396,100 @@ int conf_read(const char *name)
- 	return 0;
- }
- 
-+/*
-+ * Write out a minimal config.
-+ * All values that has default values are skipped as this is redundant.
-+ */
-+int conf_write_defconfig(const char *filename)
-+{
-+	struct symbol *sym;
-+	const char *str;
-+	FILE *out;
-+	int i, l;
-+
-+	out = fopen(filename, "w");
-+	if (!out)
-+		return 1;
-+
-+	sym_clear_all_valid();
-+
-+	for_all_symbols(i, sym) {
-+		sym_calc_value(sym);
-+		if (!(sym->flags & SYMBOL_WRITE) || !sym->name)
-+			goto next_symbol;
-+		/* If we cannot change the symbol - skip */
-+		if (!sym_is_changable(sym))
-+			goto next_symbol;
-+		/* If symbol equals to default value - skip */
-+		if (strcmp(sym_get_string_value(sym), sym_get_string_default(sym)) == 0)
-+			goto next_symbol;
-+
-+		/* choice symbols does not have a value - skip */
-+		if (sym_is_choice(sym))
-+			goto next_symbol;
-+		/*
-+		 * If symbol is a choice value and equals to the
-+		 * default for a choice - skip.
-+		 * But only if value equal to "y".
-+		 */
-+		if (sym_is_choice_value(sym)) {
-+			struct symbol *cs;
-+			struct symbol *ds;
-+
-+			cs = prop_get_symbol(sym_get_choice_prop(sym));
-+			ds = sym_choice_default(cs);
-+			if (sym == ds) {
-+				if ((sym->type == S_BOOLEAN ||
-+				     sym->type == S_TRISTATE) &&
-+				     sym_get_tristate_value(sym) == yes)
-+					goto next_symbol;
-+			}
-+		}
-+		switch (sym->type) {
-+		case S_BOOLEAN:
-+		case S_TRISTATE:
-+			switch (sym_get_tristate_value(sym)) {
-+			case no:
-+				fprintf(out, "# CONFIG_%s is not set\n", sym->name);
-+				break;
-+			case yes:
-+				fprintf(out, "CONFIG_%s=y\n", sym->name);
-+				break;
-+			case mod:
-+				fprintf(out, "CONFIG_%s=m\n", sym->name);
-+				break;
-+			}
-+			break;
-+		case S_STRING:
-+			str = sym_get_string_value(sym);
-+			fprintf(out, "CONFIG_%s=\"", sym->name);
-+			while (1) {
-+				l = strcspn(str, "\"\\");
-+				if (l) {
-+					fwrite(str, l, 1, out);
-+					str += l;
-+				}
-+				if (!*str)
-+					break;
-+				fprintf(out, "\\%c", *str++);
-+			}
-+			fputs("\"\n", out);
-+			break;
-+		case S_HEX:
-+		case S_INT:
-+			str = sym_get_string_value(sym);
-+			fprintf(out, "CONFIG_%s=%s\n", sym->name, str);
-+			break;
-+		default:
-+			break;
-+		}
-+next_symbol:
-+		;
-+	}
-+	fclose(out);
-+	return 0;
-+}
-+
- int conf_write(const char *name)
- {
- 	FILE *out;
-diff --git a/scripts/kconfig/lkc.h b/scripts/kconfig/lkc.h
-index ce6549c..76db065 100644
---- a/scripts/kconfig/lkc.h
-+++ b/scripts/kconfig/lkc.h
-@@ -126,6 +126,8 @@ void sym_init(void);
- void sym_clear_all_valid(void);
- void sym_set_all_changed(void);
- void sym_set_changed(struct symbol *sym);
-+struct symbol *sym_choice_default(struct symbol *sym);
-+const char *sym_get_string_default(struct symbol *sym);
- struct symbol *sym_check_deps(struct symbol *sym);
- struct property *prop_alloc(enum prop_type type, struct symbol *sym);
- struct symbol *prop_get_symbol(struct property *prop);
-diff --git a/scripts/kconfig/lkc_proto.h b/scripts/kconfig/lkc_proto.h
-index 7cadcad..e30d5f2 100644
---- a/scripts/kconfig/lkc_proto.h
-+++ b/scripts/kconfig/lkc_proto.h
-@@ -4,6 +4,7 @@ P(conf_parse,void,(const char *name));
- P(conf_read,int,(const char *name));
- P(conf_read_simple,int,(const char *name, int));
- P(conf_write,int,(const char *name));
-+P(conf_write_defconfig,int,(const char *name));
- P(conf_write_autoconf,int,(void));
- P(conf_get_changed,bool,(void));
- P(conf_set_changed_callback, void,(void (*fn)(void)));
-diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
-index 0ea9c46..0bda646 100644
---- a/scripts/kconfig/symbol.c
-+++ b/scripts/kconfig/symbol.c
-@@ -216,6 +216,41 @@ static void sym_calc_visibility(struct symbol *sym)
- 	}
- }
- 
-+/*
-+ * Find the default isymbol for a choice.
-+ * First try the default values for the choice symbol
-+ * Next locate the first visible choice value
-+ * Return NULL if none was found
-+ */
-+struct symbol *sym_choice_default(struct symbol *sym)
-+{
-+	struct property *prop;
-+	struct symbol *def_sym;
-+	struct expr *e;
-+
-+	/* any of the defaults visible? */
-+	for_all_defaults(sym, prop) {
-+		prop->visible.tri = expr_calc_value(prop->visible.expr);
-+		if (prop->visible.tri == no)
-+			continue;
-+		def_sym = prop_get_symbol(prop);
-+		sym_calc_visibility(def_sym);
-+		if (def_sym->visible != no)
-+			return def_sym;
-+	}
-+
-+	/* just get the first visible value */
-+	prop = sym_get_choice_prop(sym);
-+	expr_list_for_each_sym(prop->expr, e, def_sym) {
-+		sym_calc_visibility(def_sym);
-+		if (def_sym->visible != no)
-+			return def_sym;
-+	}
-+
-+	/* failed to locate any defaults */
-+	return NULL;
-+}
-+
- static struct symbol *sym_calc_choice(struct symbol *sym)
- {
- 	struct symbol *def_sym;
-@@ -646,6 +681,67 @@ const char *sym_get_string_value(struct symbol *sym)
- 	return (const char *)sym->curr.val;
- }
- 
-+/*
-+ * Find the default value associated to a symbol.
-+ * For tristate symbol hande the modules=n case
-+ * in which case "m" bocomes "y".
-+ * If the symbol does not have any default fallback
-+ * to the fixed default values.
-+ */
-+const char *sym_get_string_default(struct symbol *sym)
-+{
-+	struct property *prop;
-+	struct symbol *ds;
-+	tristate val;
-+
-+	prop = sym_get_default_prop(sym);
-+	if (!prop)
-+		goto default_value;
-+	ds = prop_get_symbol(prop);
-+	if (!ds)
-+		goto default_value;
-+
-+	switch (sym->type) {
-+	case S_BOOLEAN:
-+	case S_TRISTATE:
-+		val = sym_get_tristate_value(ds);
-+		switch (val) {
-+		case no:
-+			return "n";
-+		case yes:
-+			return "y";
-+		case mod:
-+			if (sym_is_choice_value(sym))
-+				return "m";
-+			sym_calc_value(modules_sym);
-+			if (modules_sym->curr.tri == no)
-+				return "y";
-+			else
-+				return "m";
-+		}
-+		break;
-+	default:
-+		return (const char *)ds->curr.val;
-+	}
-+
-+default_value:
-+
-+	switch (sym->type) {
-+	case S_BOOLEAN:
-+	case S_TRISTATE:
-+		return "n";
-+	case S_INT:
-+	case S_HEX:
-+		return "0";
-+	case S_STRING:
-+		return "";
-+	case S_OTHER:
-+	case S_UNKNOWN:
-+		break;
-+	}
-+	return "";
-+}
-+
- bool sym_is_changable(struct symbol *sym)
- {
- 	return sym->visible > sym->rev_dep.tri;
--- 
-1.6.0.6
+The patches also introduce "savedefconfig" which
+reads the current configuration and save it
+as a minimal configuration.
 
+In my testing I benchmarked it with one
+of the arm defconfings and the final result is
+the same (symbols appear in different order).
+
+The first two patches is not relevant to the above.
+They was just stuff I had pending.
+
+
+The patches has seen only light testing for now,
+and any feedback is welcome.
+
+After finishing off these patches I will take a closer
+look at the patch form Stephen that introduce
+a more advanced select.
+
+Note: Anyone that have heard from Roman Zippel recently?
+
+The patches:
+
+Roman Zippel (1):
+      kconfig: print more info when we see a recursive dependency
+
+Sam Ravnborg (3):
+      kconfig: save location of config symbols
+      kconfig: add alldefconfig
+      kconfig: add savedefconfig
+
+
+ Documentation/kbuild/kconfig.txt |    2 +-
+ scripts/kconfig/Makefile         |   13 ++-
+ scripts/kconfig/conf.c           |   46 ++++++--
+ scripts/kconfig/confdata.c       |   94 +++++++++++++++
+ scripts/kconfig/expr.h           |    1 +
+ scripts/kconfig/lkc.h            |    2 +
+ scripts/kconfig/lkc_proto.h      |    1 +
+ scripts/kconfig/menu.c           |    2 +
+ scripts/kconfig/symbol.c         |  242 +++++++++++++++++++++++++++++++++++---
+ 9 files changed, 373 insertions(+), 30 deletions(-)
+
+	Sam
