@@ -1,48 +1,81 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepb.post.tele.dk ([195.41.46.236]:56734 "EHLO
-	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752639Ab0GZVsh (ORCPT
+Received: from pfepa.post.tele.dk ([195.41.46.235]:59167 "EHLO
+	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752637Ab0GZWRV (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 26 Jul 2010 17:48:37 -0400
-Date: Mon, 26 Jul 2010 23:48:36 +0200
+	Mon, 26 Jul 2010 18:17:21 -0400
+Date: Tue, 27 Jul 2010 00:17:17 +0200
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH 3/3] kbuild: allow user to assign LDFLAGS_MODULE
-Message-ID: <20100726214836.GA22433@merkur.ravnborg.org>
-References: <20100726203814.GA18828@merkur.ravnborg.org> <20100726204432.GC18853@merkur.ravnborg.org> <AANLkTimrZwE+_awxxoQtdkeS7OVY+jDMawyfkYUas58G@mail.gmail.com>
+Subject: Re: [RFC][PATCH] kconfig: implement select with values
+Message-ID: <20100726221717.GA22439@merkur.ravnborg.org>
+References: <20100720043706.3813715a.sfr@canb.auug.org.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <AANLkTimrZwE+_awxxoQtdkeS7OVY+jDMawyfkYUas58G@mail.gmail.com>
+In-Reply-To: <20100720043706.3813715a.sfr@canb.auug.org.au>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Mike Frysinger <vapier.adi@gmail.com>
-Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild <linux-kbuild@vger.kernel.org>, lkml <linux-kernel@vger.kernel.org>, Tony Luck <tony.luck@intel.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Benjamin Herrenschmidt <benh@kernel.crashing.org>
+To: Stephen Rothwell <sfr@canb.auug.org.au>
+Cc: Michal Marek <mmarek@suse.cz>, LKML <linux-kernel@vger.kernel.org>, ppc-dev <linuxppc-dev@lists.ozlabs.org>, linux-kbuild@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>, Linus <torvalds@linux-foundation.org>, Steven Rostedt <rostedt@goodmis.org>, Roman Zippel <zippel@linux-m68k.org>, Francis Galiegue <fgaliegue@gmail.com>, Jiri Kosina <jkosina@suse.cz>, Andi Kleen <ak@linux.intel.com>, Catalin Marinas <catalin.marinas@arm.com>, Nir Tzachar <nir.tzachar@gmail.com>, Vadim Bendebury <vbendeb@google.com>, Li Zefan <lizf@cn.fujitsu.com>, Cheng Renquan <crquan@gmail.com>, Trevor Keith <tsrk@tsrk.net>, Josh Triplett <josh@joshtriplett.org>, Grant Likely <grant.likely@secretlab.ca>
 
-On Mon, Jul 26, 2010 at 04:54:05PM -0400, Mike Frysinger wrote:
-> On Mon, Jul 26, 2010 at 16:44, Sam Ravnborg wrote:
-> > From ce765a28adeb8878413a49ce62f442022d6a5b6a Mon Sep 17 00:00:00 2001
-> > From: Sam Ravnborg <sam@ravnborg.org>
-> > Date: Mon, 26 Jul 2010 22:20:12 +0200
-> > Subject: [PATCH 3/3] kbuild: allow user to assign LDFLAGS_MODULE
-> >
-> > Do not use LDFLAGS_MODULE in the top-level Makefile.
-> > So if user assign a value to LDFALGS_MODULE the
-> > original value is not lost.
-> >
-> > Use a kbuild internal variable that archs can use,
-> > and update all archs that used LDFALGS_MODULE.
+On Tue, Jul 20, 2010 at 04:37:06AM +1000, Stephen Rothwell wrote:
+> This is a fairly brute force approach to allowing a Kconfig "select"
+> to specify an excplicit value for the selected config sybmol.
 > 
-> assuming end behavior is the same, the Blackfin part is:
-> Acked-by: Mike Frysinger <vapier@gentoo.org>
-
-It is :-)
-
+> The syntax of select is changed to:
 > 
-> also, could you say the same thing for CFLAGS_MODULE ?
+> 	"select" <symbol> [<expr>] ["if" expr]
+> 
+> The approach taken is to add a list of <value, dependency expression>
+> pairs to the symbol and check them whenever the reverse depends (from
+> a current-style select) are checked.
 
-Good point. Need to do the same here.
-I also realised I need to update Documentation/kbuild/makefiles.txt
+I do not see the need for this feature.
+I have read most of the postings in the defconfig battle and
+I saw Linus' select suggestion.
 
-Michal - I will send an updated serie tomorrow.
+But we can do almost all of this today (or tomorrow).
+
+Consider following Kconfig file:
+
+    config USB_SUPPORT
+            def_bool n
+
+    config NET
+            def_bool y
+
+    source arch/x86/Kconfig
+
+We use the feature that we can specify the same
+config option several times.
+And the first default value that is "visible"
+will be used.
+
+So it allows us to enable and disable any option.
+
+And if we for example want to set a specific LOG_BUF_SHIFT
+we use the same trick:
+
+    config LOG_BUF_SHIFT
+            int
+            default 14
+
+
+Now in the original suggestion of Linus he used:
+
+    KBUILD_KCONFIG=Mykconfig make allnoconfig
+
+And "allnoconfig" would make the modified defaults useless.
+
+But the soon-to-be-introduced alldefconfig is more sensible.
+
+alldefconfig uses default values for everything.
+
+So with alldefconfig I think we have all the features we need
+to create sensible default configs in the Kconfig language.
+
+And therefore I do not see the need for the extension to select.
+For the same reason I did not look closer at the implementation.
 
 	Sam
+
