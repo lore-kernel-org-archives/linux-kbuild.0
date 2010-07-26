@@ -1,47 +1,35 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepb.post.tele.dk ([195.41.46.236]:43639 "EHLO
-	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751702Ab0GYWUZ (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 25 Jul 2010 18:20:25 -0400
-Date: Mon, 26 Jul 2010 00:20:23 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [RFC] kconfig: introduce alldefconfig + savedefconfig
-Message-ID: <20100725222023.GA9835@merkur.ravnborg.org>
-References: <20100725213808.GA5814@merkur.ravnborg.org>
+Received: from cantor.suse.de ([195.135.220.2]:54282 "EHLO mx1.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752909Ab0GZJ75 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 26 Jul 2010 05:59:57 -0400
+Message-ID: <4C4D5C7F.2030602@suse.cz>
+Date: Mon, 26 Jul 2010 11:59:27 +0200
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20100725213808.GA5814@merkur.ravnborg.org>
+Subject: Re: [PATCH] kconfig: make randconfig fair for booleans
+References: <1279801497-810-1-git-send-email-jacmet@sunsite.dk> <20100723211138.GA27379@merkur.ravnborg.org>
+In-Reply-To: <20100723211138.GA27379@merkur.ravnborg.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: lkml <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Stephen Rothwell <sfr@canb.auug.org.au>, Roman Zippel <zippel@linux-m68k.org>, Michal Marek <mmarek@suse.cz>, Uwe Kleine-Koig <u.kleine-koenig@pengutronix.de>, Linus Torvalds <torvalds@linux-foundation.org>
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: Peter Korsgaard <jacmet@sunsite.dk>, linux-kbuild@vger.kernel.org, zippel@linux-m68k.org
 
-> in kconfig is preferable.
+On 23.7.2010 23:11, Sam Ravnborg wrote:
+> On Thu, Jul 22, 2010 at 02:24:57PM +0200, Peter Korsgaard wrote:
+>> Give boolean symbols a 50% chance of getting enabled, rather than 67%.
+>>
+>> Signed-off-by: Peter Korsgaard <jacmet@sunsite.dk>
 > 
-> This patch set introduce "alldefconfig".
-> alldefconfig create a configuration with all values set
-> to default values.
-> This can be usefull when we check if we do have a sane
-> set of default values. Rhe config can be inspected
-> using menuconfig.
+> Good catch!
 > 
-> The patches also introduce "savedefconfig" which
-> reads the current configuration and save it
-> as a minimal configuration.
+> Acked-by: Sam Ravnborg <sam@ravnborg.org>
+> 
+> Michal - I assume you apply this for next merge window.
 
-A funny detail that I used in my testing.
+Yes, will do. I've been busy (again :)) for the last two weeks, so only
+reviewed the few patches for .35.
 
-If we create a config based solely on default values like this:
-
-   make alldefconfig
-
-then when we later save the minimal config like this:
-
-    make savedefconfig
-
-then the resulting defconfig file is empty.
-This is as expected because all symbols has default values
-so there is no need to save the value of any symbol.
-
-	Sam
+Michal
