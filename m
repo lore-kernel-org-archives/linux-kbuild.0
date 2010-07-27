@@ -1,96 +1,109 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-gx0-f174.google.com ([209.85.161.174]:47417 "EHLO
-	mail-gx0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754780Ab0GZWrW convert rfc822-to-8bit (ORCPT
+Received: from pfepa.post.tele.dk ([195.41.46.235]:57334 "EHLO
+	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752754Ab0G0Gp3 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 26 Jul 2010 18:47:22 -0400
-MIME-Version: 1.0
-In-Reply-To: <20100726221717.GA22439@merkur.ravnborg.org>
-References: <20100720043706.3813715a.sfr@canb.auug.org.au>
-	<20100726221717.GA22439@merkur.ravnborg.org>
-From: Grant Likely <grant.likely@secretlab.ca>
-Date: Mon, 26 Jul 2010 16:47:01 -0600
-Message-ID: <AANLkTikP3nZd-LionO27vsinjXz=upKbDZeErSD4CAfz@mail.gmail.com>
+	Tue, 27 Jul 2010 02:45:29 -0400
+Date: Tue, 27 Jul 2010 08:45:23 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
 Subject: Re: [RFC][PATCH] kconfig: implement select with values
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 8BIT
+Message-ID: <20100727064523.GA25872@merkur.ravnborg.org>
+References: <20100720043706.3813715a.sfr@canb.auug.org.au> <20100726221717.GA22439@merkur.ravnborg.org> <AANLkTikP3nZd-LionO27vsinjXz=upKbDZeErSD4CAfz@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <AANLkTikP3nZd-LionO27vsinjXz=upKbDZeErSD4CAfz@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
+To: Grant Likely <grant.likely@secretlab.ca>
 Cc: Stephen Rothwell <sfr@canb.auug.org.au>, Michal Marek <mmarek@suse.cz>, LKML <linux-kernel@vger.kernel.org>, ppc-dev <linuxppc-dev@lists.ozlabs.org>, linux-kbuild@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>, Linus <torvalds@linux-foundation.org>, Steven Rostedt <rostedt@goodmis.org>, Roman Zippel <zippel@linux-m68k.org>, Francis Galiegue <fgaliegue@gmail.com>, Jiri Kosina <jkosina@suse.cz>, Andi Kleen <ak@linux.intel.com>, Catalin Marinas <catalin.marinas@arm.com>, Nir Tzachar <nir.tzachar@gmail.com>, Vadim Bendebury <vbendeb@google.com>, Li Zefan <lizf@cn.fujitsu.com>, Cheng Renquan <crquan@gmail.com>, Trevor Keith <tsrk@tsrk.net>, Josh Triplett <josh@joshtriplett.org>
 
-Hi Sam,
+> 
+> Cute.  I didn't know this was possible.  I'll give it a try and see
+> how it works for me.  Do override config options also pickup
+> select/depends constraints applied by later definitions?  I think that
+> would be necessary to kick out warnings when a defconfig selection
+> isn't actually achievable.
 
-On Mon, Jul 26, 2010 at 4:17 PM, Sam Ravnborg <sam@ravnborg.org> wrote:
-> On Tue, Jul 20, 2010 at 04:37:06AM +1000, Stephen Rothwell wrote:
->> This is a fairly brute force approach to allowing a Kconfig "select"
->> to specify an excplicit value for the selected config sybmol.
->>
->> The syntax of select is changed to:
->>
->>       "select" <symbol> [<expr>] ["if" expr]
->>
->> The approach taken is to add a list of <value, dependency expression>
->> pairs to the symbol and check them whenever the reverse depends (from
->> a current-style select) are checked.
->
-> I do not see the need for this feature.
-> I have read most of the postings in the defconfig battle and
-> I saw Linus' select suggestion.
->
-> But we can do almost all of this today (or tomorrow).
->
-> Consider following Kconfig file:
->
->    config USB_SUPPORT
->            def_bool n
->
->    config NET
->            def_bool y
->
->    source arch/x86/Kconfig
->
-> We use the feature that we can specify the same
-> config option several times.
-> And the first default value that is "visible"
-> will be used.
->
-> So it allows us to enable and disable any option.
->
-> And if we for example want to set a specific LOG_BUF_SHIFT
-> we use the same trick:
->
->    config LOG_BUF_SHIFT
->            int
->            default 14
+kconfig allows one to add more properties to a config
+symbol by defining the symbol again.
 
-Cute.  I didn't know this was possible.  I'll give it a try and see
-how it works for me.  Do override config options also pickup
-select/depends constraints applied by later definitions?  I think that
-would be necessary to kick out warnings when a defconfig selection
-isn't actually achievable.
+So:
+config FOO
+	bool
+	prompt "foo prompt"
+	default y
+	help
+	  Help text
 
-g.
+Is the same as:
+config FOO
+	bool
 
->
->
-> Now in the original suggestion of Linus he used:
->
->    KBUILD_KCONFIG=Mykconfig make allnoconfig
->
-> And "allnoconfig" would make the modified defaults useless.
->
-> But the soon-to-be-introduced alldefconfig is more sensible.
->
-> alldefconfig uses default values for everything.
+config FOO
+	prompt "foo prompt"
 
-I basically used defconfig in the prototype that I posted.  I think it
-works well for me, and I've got it integrated into the build targets
-(just like Stephen's earlier patch) without having to do a
-KBUILD_KCONFIG trick.
+config FOO
+	default y
 
-g.
+config FOO
+	help
+	  help text
 
--- 
-Grant Likely, B.Sc., P.Eng.
-Secret Lab Technologies Ltd.
+The abvoe four lines can be located in different files.
+
+And likewise kconfig allows the same property to be
+specified twice or more.
+
+So it is OK to say:
+
+config BAR
+	tristate "bar prompt"
+	default m
+	default y
+
+Here kconfig just picks the first default is see.
+
+And the example in my original mail uses the feature
+that we can specify several defaults - and kconfig uses the first.
+
+
+For choices the same is possible but then you need to use
+a named choice - something that no one does today in the kernel.
+
+choice CHOICE_X86_CPU
+	default M386
+
+endchoice
+
+Here we change the default to M386 which becomes the
+selected if we use "alldefconfig".
+
+[Note: It does not work until we use named choices in arch/x86/Kconfig.cpu]
+
+> 
+> > Now in the original suggestion of Linus he used:
+> >
+> >    KBUILD_KCONFIG=Mykconfig make allnoconfig
+> >
+> > And "allnoconfig" would make the modified defaults useless.
+> >
+> > But the soon-to-be-introduced alldefconfig is more sensible.
+> >
+> > alldefconfig uses default values for everything.
+> 
+> I basically used defconfig in the prototype that I posted.  I think it
+> works well for me, and I've got it integrated into the build targets
+> (just like Stephen's earlier patch) without having to do a
+> KBUILD_KCONFIG trick.
+
+"defconfig" with an empty file gives same config as "alldefconfig" so
+it makes sense. But we wanted to drop the use of defconfig files
+in favour of files with Kconfig syntax.
+So alldefconfig is just a better fit here.
+
+[The above btw. also makes "savedefconfig" less usefull].
+
+	Sam
+
