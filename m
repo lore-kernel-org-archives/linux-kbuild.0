@@ -1,85 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pw0-f46.google.com ([209.85.160.46]:38696 "EHLO
-	mail-pw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753240Ab0G1GTD (ORCPT
+Received: from metis.ext.pengutronix.de ([92.198.50.35]:55743 "EHLO
+	metis.ext.pengutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751830Ab0G1Gr3 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 28 Jul 2010 02:19:03 -0400
-Date: Wed, 28 Jul 2010 14:23:13 +0800
-From: =?utf-8?Q?Am=C3=A9rico?= Wang <xiyou.wangcong@gmail.com>
-Subject: Re: [PATCH 2.6.35-rc6] kconfig: fix MODULES-related bug in case of
- no .config
-Message-ID: <20100728062313.GC5161@cr0.nay.redhat.com>
-References: <20100727192727.GA17954@ulf>
- <20100727195742.GA18079@ulf>
+	Wed, 28 Jul 2010 02:47:29 -0400
+Date: Wed, 28 Jul 2010 08:47:23 +0200
+From: Uwe =?iso-8859-1?Q?Kleine-K=F6nig?=
+	<u.kleine-koenig@pengutronix.de>
+Subject: Re: [RFC] kconfig: introduce alldefconfig + savedefconfig
+Message-ID: <20100728064723.GA14914@pengutronix.de>
+References: <20100725213808.GA5814@merkur.ravnborg.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20100727195742.GA18079@ulf>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20100725213808.GA5814@merkur.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ulf Magnusson <ulfalizer.lkml@gmail.com>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: lkml <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Stephen Rothwell <sfr@canb.auug.org.au>, Roman Zippel <zippel@linux-m68k.org>, Michal Marek <mmarek@suse.cz>, Linus Torvalds <torvalds@linux-foundation.org>
 
-On Tue, Jul 27, 2010 at 09:57:43PM +0200, Ulf Magnusson wrote:
->On Tue, Jul 27, 2010 at 09:27:27PM +0200, Ulf Magnusson wrote:
->> Hi,
->> 
->> There seems to be a kconfig bug due to MODULES not always being evaluated if no
->> .config is found. Take the following Kconfig as an example:
->> 
->> config MODULES
->> 	def_bool y
->> 
->> config FOO
->> 	def_tristate m
->> 
->> With no .config, the following configuration is generated:
->> 
->> CONFIG_MODULES=y
->> CONFIG_FOO=y
->> 
->> With an empty .config, the following:
->> 
->> CONFIG_MODULES=y
->> CONFIG_FOO=m
->> 
->> Tristate choice statements can also exhibit the problem, due to having an
->> implicit rev_dep (select) containing "m".
->> 
->> The problem is that MODULES is never evaluted in conf_read_simple() unless
->> there's a .config. The following patch fixes this.
+Hi Sam,
 
-<snip>
-
->
->Silly error in the patch. The correct patch follows.
->
->Signed-off-by: Ulf Magnusson <ulfalizer.lkml@gmail.com>
->
-
-Sounds good for me.
-
-Reviewed-by: WANG Cong <xiyou.wangcong@gmail.com>
-
-
->diff -uNr linux.vanilla/scripts/kconfig/confdata.c linux.new/scripts/kconfig/confdata.c
->--- linux.vanilla/scripts/kconfig/confdata.c	2010-07-27 16:47:43.443006287 +0200
->+++ linux.new/scripts/kconfig/confdata.c	2010-07-27 21:48:07.471550551 +0200
->@@ -170,8 +170,11 @@
-> 		if (in)
-> 			goto load;
-> 		sym_add_change_count(1);
->-		if (!sym_defconfig_list)
->+		if (!sym_defconfig_list) {
->+			if (modules_sym)
->+				sym_calc_value(modules_sym);
-> 			return 1;
->+		}
+On Sun, Jul 25, 2010 at 11:38:08PM +0200, Sam Ravnborg wrote:
+> After reading some of the mails about the
+> defconfig files I decided to take a look at kconfig.
 > 
-> 		for_all_defaults(sym_defconfig_list, prop) {
-> 			if (expr_calc_value(prop->visible.expr) == no ||
->--
->To unsubscribe from this list: send the line "unsubscribe linux-kernel" in
->the body of a message to majordomo@vger.kernel.org
->More majordomo info at  http://vger.kernel.org/majordomo-info.html
->Please read the FAQ at  http://www.tux.org/lkml/
+> We already decided to go for a solution where the defconfig
+> files contains only the minimal configuration.
+> Uwe developed a script to assist but having native support
+> in kconfig is preferable.
+> 
+> This patch set introduce "alldefconfig".
+> alldefconfig create a configuration with all values set
+> to default values.
+> This can be usefull when we check if we do have a sane
+> set of default values. Rhe config can be inspected
+> using menuconfig.
+> 
+> The patches also introduce "savedefconfig" which
+> reads the current configuration and save it
+> as a minimal configuration.
+> 
+> In my testing I benchmarked it with one
+> of the arm defconfings and the final result is
+> the same (symbols appear in different order).
+I would prefer to have them in the same order.  I havn't checked the
+details, but I really like getting support for minimal defconfigs done
+in kconfig directly.
+
+Thanks
+Uwe
+
+-- 
+Pengutronix e.K.                           | Uwe Kleine-König            |
+Industrial Linux Solutions                 | http://www.pengutronix.de/  |
