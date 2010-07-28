@@ -1,13 +1,14 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepb.post.tele.dk ([195.41.46.236]:46826 "EHLO
+Received: from pfepb.post.tele.dk ([195.41.46.236]:59315 "EHLO
 	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754457Ab0G1S27 (ORCPT
+	with ESMTP id S1755343Ab0G1Sa0 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 28 Jul 2010 14:28:59 -0400
-Date: Wed, 28 Jul 2010 20:28:58 +0200
+	Wed, 28 Jul 2010 14:30:26 -0400
+Date: Wed, 28 Jul 2010 20:30:24 +0200
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: [PATCH 3/3] frv: clean up arch/frv/Makefile
-Message-ID: <20100728182858.GC29232@merkur.ravnborg.org>
+Subject: Re: [PATCH v2 0/3] update of various kbuild flags to allow user
+	settings
+Message-ID: <20100728183024.GD29232@merkur.ravnborg.org>
 References: <20100728182523.GA29198@merkur.ravnborg.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
@@ -16,105 +17,57 @@ In-Reply-To: <20100728182523.GA29198@merkur.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Michal Marek <mmarek@suse.cz>, linux-kbuild <linux-kbuild@vger.kernel.org>, lkml <linux-kernel@vger.kernel.org>, Denys Vlasenko <vda.linux@googlemail.com>
-Cc: David Howells <dhowells@redhat.com>
+Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>, Chen Liqin <liqin.chen@sunplusct.com>, David Howells <dhowells@redhat.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Haavard Skinnemoen <hskinnemoen@atmel.com>, Hirokazu Takata <takata@linux-m32r.org>, Martin Schwidefsky <schwidefsky@de.ibm.com>, Mike Frysinger <vapier@gentoo.org>, Ralf Baechle <ralf@linux-mips.org>, Tony Luck <tony.luck@intel.com>
 
-From 2193dfaff6e2260a3ac1d2f578616640d601db55 Mon Sep 17 00:00:00 2001
-From: Sam Ravnborg <sam@ravnborg.org>
-Date: Wed, 28 Jul 2010 19:33:00 +0200
-Subject: [PATCH 3/3] frv: clean up arch/frv/Makefile
+On Wed, Jul 28, 2010 at 08:25:23PM +0200, Sam Ravnborg wrote:
+> Denys Vlasenko complained that he could not set
+> a moduel specific linker flags on the command line.
+> 
+> It turned out that the cause of this was kbuild
+> that assigned a value to a variables that
+> may be modified by the user.
+> So any user supplied value would overwrite
+> the kbuild assigned value.
+> 
+> Fix this so we use internal variables for kbuild
+> feering up the official variables for use by
+> the user.
+> 
+> Changes in v2:
+> Fix so we can now specify both module and built-in
+> options on command line.
+> Combine all *_MODULE changes in one patch.
+> Add a new patch for *_KERNEL changes.
+> Document the new variables in makefiles.txt
+> Document the variables that may be set on the command line
+> in kbuild.txt
+> 
+> The frv Makefile saw a bigger cleanup this time.
+> I suggest to merge it through kbuild.git because the
+> update is dependent on the first patch in this serie.
 
-- removed a lot of unused variable assignmnets
-- removed unused bootstrap target
-- replaced ARCHMODFLAGS with proper KBUILD_{A,C}FLAGS_MODULE assignmnets
+Forgot the stats:
 
-The resuting Makefile has not been tested due to lack of toolchain,
-but these were all trivial changes.
 
-Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
-Cc: David Howells <dhowells@redhat.com>
----
- arch/frv/Makefile |   22 ++--------------------
- 1 files changed, 2 insertions(+), 20 deletions(-)
+Sam Ravnborg (3):
+      kbuild: allow assignment to {A,C,LD}FLAGS_MODULE on the command line
+      kbuild: allow assignment to {A,C}FLAGS_KERNEL on the command line
+      frv: clean up arch/frv/Makefile
 
-diff --git a/arch/frv/Makefile b/arch/frv/Makefile
-index 310c47a..7ff8457 100644
---- a/arch/frv/Makefile
-+++ b/arch/frv/Makefile
-@@ -23,20 +23,14 @@
- # Copyright (C) 1994 by Hamish Macdonald
- #
- 
--CCSPECS	:= $(shell $(CC) -v 2>&1 | grep "^Reading specs from " | head -1 | cut -c20-)
--CCDIR	:= $(strip $(patsubst %/specs,%,$(CCSPECS)))
--CPUCLASS := fr400
--
--# test for cross compiling
--COMPILE_ARCH = $(shell uname -m)
--
- ifdef CONFIG_MMU
- UTS_SYSNAME = -DUTS_SYSNAME=\"Linux\"
- else
- UTS_SYSNAME = -DUTS_SYSNAME=\"uClinux\"
- endif
- 
--ARCHMODFLAGS	+= -G0 -mlong-calls
-+KBUILD_AFLAGS_MODULE += -G0 -mlong-calls
-+KBUILD_CFLAGS_MODULE += -G0 -mlong-calls
- 
- ifdef CONFIG_GPREL_DATA_8
- KBUILD_CFLAGS	+= -G8
-@@ -54,7 +48,6 @@ endif
- 
- ifdef CONFIG_GC_SECTIONS
- KBUILD_CFLAGS	+= -ffunction-sections -fdata-sections
--LINKFLAGS	+= --gc-sections
- endif
- 
- ifndef CONFIG_FRAME_POINTER
-@@ -64,16 +57,13 @@ endif
- ifdef CONFIG_CPU_FR451_COMPILE
- KBUILD_CFLAGS	+= -mcpu=fr450
- KBUILD_AFLAGS	+= -mcpu=fr450
--ASFLAGS		+= -mcpu=fr450
- else
- ifdef CONFIG_CPU_FR551_COMPILE
- KBUILD_CFLAGS	+= -mcpu=fr550
- KBUILD_AFLAGS	+= -mcpu=fr550
--ASFLAGS		+= -mcpu=fr550
- else
- KBUILD_CFLAGS	+= -mcpu=fr400
- KBUILD_AFLAGS	+= -mcpu=fr400
--ASFLAGS		+= -mcpu=fr400
- endif
- endif
- 
-@@ -83,14 +73,12 @@ endif
- KBUILD_CFLAGS	+= -mno-fdpic -mgpr-32 -msoft-float -mno-media
- KBUILD_CFLAGS	+= -ffixed-fcc3 -ffixed-cc3 -ffixed-gr15 -ffixed-icc2
- KBUILD_AFLAGS	+= -mno-fdpic
--ASFLAGS		+= -mno-fdpic
- 
- # make sure the .S files get compiled with debug info
- # and disable optimisations that are unhelpful whilst debugging
- ifdef CONFIG_DEBUG_INFO
- #KBUILD_CFLAGS	+= -O1
- KBUILD_AFLAGS	+= -Wa,--gdwarf2
--ASFLAGS		+= -Wa,--gdwarf2
- endif
- 
- head-y		:= arch/frv/kernel/head.o arch/frv/kernel/init_task.o
-@@ -105,11 +93,5 @@ all: Image
- Image: vmlinux
- 	$(Q)$(MAKE) $(build)=arch/frv/boot $@
- 
--bootstrap:
--	$(Q)$(MAKEBOOT) bootstrap
--
- archclean:
- 	$(Q)$(MAKE) $(clean)=arch/frv/boot
--
--archdep: scripts/mkdep symlinks
--	$(Q)$(MAKE) $(build)=arch/frv/boot dep
--- 
-1.6.0.6
+ Documentation/kbuild/kbuild.txt    |   26 ++++++++++++++++++++++++--
+ Documentation/kbuild/makefiles.txt |   27 ++++++++++++++++++++++-----
+ Makefile                           |   17 ++++++++++++-----
+ arch/avr32/Makefile                |    2 +-
+ arch/blackfin/Makefile             |    4 ++--
+ arch/frv/Makefile                  |   22 ++--------------------
+ arch/ia64/Makefile                 |    6 +++---
+ arch/m32r/Makefile                 |    4 ++--
+ arch/m68k/Makefile                 |    2 +-
+ arch/mips/Makefile                 |    6 ++++--
+ arch/powerpc/Makefile              |    2 +-
+ arch/s390/Makefile                 |    3 ++-
+ arch/score/Makefile                |    3 ++-
+ scripts/Makefile.build             |   11 +++++++----
+ scripts/Makefile.modpost           |    7 ++++---
+ 15 files changed, 89 insertions(+), 53 deletions(-)
 
