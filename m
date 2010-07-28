@@ -1,489 +1,91 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepb.post.tele.dk ([195.41.46.236]:50662 "EHLO
-	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752170Ab0G1UgZ (ORCPT
+Received: from mail-fx0-f46.google.com ([209.85.161.46]:33096 "EHLO
+	mail-fx0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751768Ab0G1XsP (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 28 Jul 2010 16:36:25 -0400
-Date: Wed, 28 Jul 2010 22:36:22 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: [RFC PATCH] kconfig: use long options in conf
-Message-ID: <20100728203622.GA32086@merkur.ravnborg.org>
-References: <20100725213808.GA5814@merkur.ravnborg.org> <20100725214021.GD5834@merkur.ravnborg.org> <4C4EFE80.7050808@suse.cz>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4C4EFE80.7050808@suse.cz>
+	Wed, 28 Jul 2010 19:48:15 -0400
+From: Denys Vlasenko <vda.linux@googlemail.com>
+Subject: [PATCH 0/4] function/data-sections
+Date: Thu, 29 Jul 2010 01:47:52 +0200
+Message-Id: <1280360876-2571-1-git-send-email-vda.linux@googlemail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: lkml <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Stephen Rothwell <sfr@canb.auug.org.au>, Roman Zippel <zippel@linux-m68k.org>, Uwe Kleine-Koig <u.kleine-koenig@pengutronix.de>, Linus Torvalds <torvalds@linux-foundation.org>
+To: Michal Marek <mmarek@suse.cz>, linux-kbuild <linux-kbuild@vger.kernel.org>, linux-arch@vger.kernel.org, Parisc List <linux-parisc@vger.kernel.org>
+Cc: lkml <linux-kernel@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, Tim Abbott <tabbott@ksplice.com>, Tim Bird <tim.bird@am.sony.com>, James Bottomley <James.Bottomley@hansenpartnership.com>, Matt Fleming <matt@console-pimps.org>, Arnd Bergmann <arnd@arndb.de>, Anders Kaseorg <andersk@mit.edu>, Andi Kleen <andi@firstfloor.org>, Stephen Rothwell <sfr@canb.auug.org.au>, Denys Vlasenko <vda.linux@googlemail.com>
 
-Hi Michal.
+Hi Michal,
 
-I cooked up the following to introduce long options in conf.
-But in the process I dropped the short options. Is this OK?
+Please take this patch series onto linux-kbuild.
 
-Usign the same name in conf.c as used as make target really
-helped the readability.
+Most of work needed for working -ffunction-sections -fdata-sections build
+is already in the mainline, but a few bits are still missing.
+In order to have a working kernel with this make invocation:
+    make KCFLAGS="-ffunction-sections -fdata-sections"
+we need these patches:
 
-Note: Patch on top of kbuild.get for-next.
+modpost: support objects with more than 64k sections
+    This patch is in -mm, it still did not reach mainline,
+    thus resending. Sam suggested some readability improvements.
+module linker script: coalesce function and data sections
+kernel linker stripts: accomodate function and data sections
+boot linker stripts: accomodate function and data sections
 
-It is an RFC patch as I plan to submit a larger serie
-when I get the defconfig stuff redone.
-But you requested this and it was a logical first step.
+Please see individual patches for more detailed changelogs.
 
-	Sam
+A rough idea what sort of size savings are achievable
+with section garbage collection:
+Kernel:
+   text   data    bss     dec    hex filename
+8299299 857324 785348 9941971 97b3d3 2.6.35-rc4/vmlinux
+7566908 832388 717844 9117140 8b1dd4 2.6.35-rc4-fsgs/vmlinux
+  -9.2%  -2.9%  -9.0%   -8.6%
+The largest module in the build:
+ 451009  54640   2224  507873  7bfe1 2.6.35-rc4/fs/xfs/xfs.ko
+ 450521  54292   2202  507015  7bc87 2.6.35-rc4-fsgs/fs/xfs/xfs.ko
+(negligible size change since section garbage collection
+for modules is not done. TODO: figure out how to do it)
+
+Signed-off-by: Denys Vlasenko <vda.linux@googlemail.com>
+Acked-by: Sam Ravnborg <sam@ravnborg.org>
 
 
-From 95feb38e5411958df4c5cf7c2e11a9cb53c11c1a Mon Sep 17 00:00:00 2001
-From: Sam Ravnborg <sam@ravnborg.org>
-Date: Wed, 28 Jul 2010 22:25:04 +0200
-Subject: [PATCH] kconfig: use long options in conf
+Denys Vlasenko (4):
+  modpost: support objects with more than 64k sections
+  module linker script: coalesce sections
+  kernel linker stripts: accomodate function and data sections
+  boot linker stripts: accomodate function and data sections
 
-The list of options supported by conf is growing
-and their abbreviation did not resemble anything usefull.
-
-So drop the single letter options in favour of long options.
-
-The long options are named equal to what we know from
-the make target.
-The internal implmentation was changed to match this,
-resulting in much more readable code.
-
-Support for short options is dropped - no one is supposed
-to call this program direct anyway.
-
-Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
----
- scripts/kconfig/Makefile |   64 ++++++++----------
- scripts/kconfig/conf.c   |  165 ++++++++++++++++++++++------------------------
- 2 files changed, 108 insertions(+), 121 deletions(-)
-
-diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
-index 0a34335..ed3f157 100644
---- a/scripts/kconfig/Makefile
-+++ b/scripts/kconfig/Makefile
-@@ -21,17 +21,17 @@ menuconfig: $(obj)/mconf
- 	$< $(Kconfig)
- 
- config: $(obj)/conf
--	$< $(Kconfig)
-+	$< --oldaskconfig $(Kconfig)
- 
- nconfig: $(obj)/nconf
- 	$< $(Kconfig)
- 
- oldconfig: $(obj)/conf
--	$< -o $(Kconfig)
-+	$< --$@ $(Kconfig)
- 
- silentoldconfig: $(obj)/conf
- 	$(Q)mkdir -p include/generated
--	$< -s $(Kconfig)
-+	$< --$@ $(Kconfig)
- 
- # if no path is given, then use src directory to find file
- ifdef LSMOD
-@@ -44,15 +44,15 @@ endif
- localmodconfig: $(obj)/streamline_config.pl $(obj)/conf
- 	$(Q)mkdir -p include/generated
- 	$(Q)perl $< $(srctree) $(Kconfig) $(LSMOD_F) > .tmp.config
--	$(Q)if [ -f .config ]; then 				\
--			cmp -s .tmp.config .config ||		\
--			(mv -f .config .config.old.1;		\
--			 mv -f .tmp.config .config;		\
--			 $(obj)/conf -s $(Kconfig);		\
--			 mv -f .config.old.1 .config.old)	\
--	else							\
--			mv -f .tmp.config .config;		\
--			$(obj)/conf -s $(Kconfig);		\
-+	$(Q)if [ -f .config ]; then					\
-+			cmp -s .tmp.config .config ||			\
-+			(mv -f .config .config.old.1;			\
-+			 mv -f .tmp.config .config;			\
-+			 $(obj)/conf --silentoldconfig $(Kconfig);	\
-+			 mv -f .config.old.1 .config.old)		\
-+	else								\
-+			mv -f .tmp.config .config;			\
-+			$(obj)/conf --silentoldconfig $(Kconfig);	\
- 	fi
- 	$(Q)rm -f .tmp.config
- 
-@@ -60,23 +60,23 @@ localyesconfig: $(obj)/streamline_config.pl $(obj)/conf
- 	$(Q)mkdir -p include/generated
- 	$(Q)perl $< $(srctree) $(Kconfig) $(LSMOD_F) > .tmp.config
- 	$(Q)sed -i s/=m/=y/ .tmp.config
--	$(Q)if [ -f .config ]; then 				\
--			cmp -s .tmp.config .config ||		\
--			(mv -f .config .config.old.1;		\
--			 mv -f .tmp.config .config;		\
--			 $(obj)/conf -s $(Kconfig);		\
--			 mv -f .config.old.1 .config.old)	\
--	else							\
--			mv -f .tmp.config .config;		\
--			$(obj)/conf -s $(Kconfig);		\
-+	$(Q)if [ -f .config ]; then					\
-+			cmp -s .tmp.config .config ||			\
-+			(mv -f .config .config.old.1;			\
-+			 mv -f .tmp.config .config;			\
-+			 $(obj)/conf --silentoldconfig $(Kconfig);	\
-+			 mv -f .config.old.1 .config.old)		\
-+	else								\
-+			mv -f .tmp.config .config;			\
-+			$(obj)/conf --silentoldconfig $(Kconfig);	\
- 	fi
- 	$(Q)rm -f .tmp.config
- 
- nonint_oldconfig: $(obj)/conf
--	$< -b $(Kconfig)
-+	$< --$@ $(Kconfig)
- 
- loose_nonint_oldconfig: $(obj)/conf
--	$< -B $(Kconfig)
-+	$< --$@ $(Kconfig)
- 
- # Create new linux.pot file
- # Adjust charset to UTF-8 in .po file to accept UTF-8 in Kconfig files
-@@ -104,27 +104,21 @@ update-po-config: $(obj)/kxgettext $(obj)/gconf.glade.h
- PHONY += randconfig allyesconfig allnoconfig allmodconfig defconfig
- 
- randconfig: $(obj)/conf
--	$< -r $(Kconfig)
--
--allyesconfig: $(obj)/conf
--	$< -y $(Kconfig)
--
--allnoconfig: $(obj)/conf
--	$< -n $(Kconfig)
-+	$< --allrandconfig $(Kconfig)
- 
--allmodconfig: $(obj)/conf
--	$< -m $(Kconfig)
-+allnoconfig allyesconfig allmodconfig: $(obj)/conf
-+	$< --$@ $(Kconfig)
- 
- defconfig: $(obj)/conf
- ifeq ($(KBUILD_DEFCONFIG),)
--	$< -d $(Kconfig)
-+	$< --defconfig $(Kconfig)
- else
- 	@echo "*** Default configuration is based on '$(KBUILD_DEFCONFIG)'"
--	$(Q)$< -D arch/$(SRCARCH)/configs/$(KBUILD_DEFCONFIG) $(Kconfig)
-+	$(Q)$< --readdefconfig=arch/$(SRCARCH)/configs/$(KBUILD_DEFCONFIG) $(Kconfig)
- endif
- 
- %_defconfig: $(obj)/conf
--	$(Q)$< -D arch/$(SRCARCH)/configs/$@ $(Kconfig)
-+	$(Q)$< --readdefconfig=arch/$(SRCARCH)/configs/$@ $(Kconfig)
- 
- # Help text used by make help
- help:
-diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
-index bde01b4..36bd331 100644
---- a/scripts/kconfig/conf.c
-+++ b/scripts/kconfig/conf.c
-@@ -10,6 +10,7 @@
- #include <string.h>
- #include <time.h>
- #include <unistd.h>
-+#include <getopt.h>
- #include <sys/stat.h>
- #include <sys/time.h>
- 
-@@ -23,18 +24,20 @@
- static void conf(struct menu *menu);
- static void check_conf(struct menu *menu);
- 
--enum {
--	ask_all,
--	ask_new,
--	ask_silent,
--	dont_ask,
--	dont_ask_dont_tell,
--	set_default,
--	set_yes,
--	set_mod,
--	set_no,
--	set_random
--} input_mode = ask_all;
-+enum input_mode {
-+	oldaskconfig,
-+	silentoldconfig,
-+	oldconfig,
-+	allnoconfig,
-+	allyesconfig,
-+	allmodconfig,
-+	allrandconfig,
-+	defconfig,
-+	readdefconfig,
-+	nonint_oldconfig,
-+	loose_nonint_oldconfig,
-+} input_mode = oldaskconfig;
-+
- char *defconfig_file;
- 
- static int indent = 1;
-@@ -100,14 +103,14 @@ static int conf_askvalue(struct symbol *sym, const char *def)
- 	}
- 
- 	switch (input_mode) {
--	case ask_new:
--	case ask_silent:
-+	case oldconfig:
-+	case silentoldconfig:
- 		if (sym_has_value(sym)) {
- 			printf("%s\n", def);
- 			return 0;
- 		}
- 		check_stdin();
--	case ask_all:
-+	case oldaskconfig:
- 		fflush(stdout);
- 		fgets(line, 128, stdin);
- 		return 1;
-@@ -297,15 +300,15 @@ static int conf_choice(struct menu *menu)
- 			printf("?");
- 		printf("]: ");
- 		switch (input_mode) {
--		case ask_new:
--		case ask_silent:
-+		case oldconfig:
-+		case silentoldconfig:
- 			if (!is_new) {
- 				cnt = def;
- 				printf("%d\n", cnt);
- 				break;
- 			}
- 			check_stdin();
--		case ask_all:
-+		case oldaskconfig:
- 			fflush(stdout);
- 			fgets(line, 128, stdin);
- 			strip(line);
-@@ -363,9 +366,9 @@ static void conf(struct menu *menu)
- 
- 		switch (prop->type) {
- 		case P_MENU:
--			if ((input_mode == ask_silent ||
--			     input_mode == dont_ask ||
--			     input_mode == dont_ask_dont_tell) &&
-+			if ((input_mode == silentoldconfig ||
-+			     input_mode == nonint_oldconfig ||
-+			     input_mode == loose_nonint_oldconfig) &&
- 			    rootEntry != menu) {
- 				check_conf(menu);
- 				return;
-@@ -424,9 +427,9 @@ static void check_conf(struct menu *menu)
- 	if (sym && !sym_has_value(sym)) {
- 		if (sym_is_changable(sym) ||
- 		    (sym_is_choice(sym) && sym_get_tristate_value(sym) == yes)) {
--			if (input_mode == dont_ask ||
--			    input_mode == dont_ask_dont_tell) {
--				if (input_mode == dont_ask &&
-+			if (input_mode == nonint_oldconfig ||
-+			    input_mode == loose_nonint_oldconfig) {
-+				if (input_mode == nonint_oldconfig &&
- 				    sym->name && !sym_is_choice_value(sym)) {
- 					if (!unset_variables)
- 						fprintf(stderr, "The following"
-@@ -448,6 +451,21 @@ static void check_conf(struct menu *menu)
- 		check_conf(child);
- }
- 
-+static struct option long_opts[] = {
-+	{"oldaskconfig",    no_argument,       NULL, oldaskconfig},
-+	{"oldconfig",       no_argument,       NULL, oldconfig},
-+	{"silentoldconfig", no_argument,       NULL, silentoldconfig},
-+	{"defconfig",       no_argument,       NULL, defconfig},
-+	{"readdefconfig",   required_argument, NULL, readdefconfig},
-+	{"allnoconfig",     no_argument,       NULL, allnoconfig},
-+	{"allyesconfig",    no_argument,       NULL, allyesconfig},
-+	{"allmodconfig",    no_argument,       NULL, allmodconfig},
-+	{"allrandconfig",   no_argument,       NULL, allrandconfig},
-+	{"nonint_oldconfig",       no_argument, NULL, nonint_oldconfig},
-+	{"loose_nonint_oldconfig", no_argument, NULL, loose_nonint_oldconfig},
-+	{NULL, 0, NULL, 0}
-+};
-+
- int main(int ac, char **av)
- {
- 	int opt;
-@@ -458,38 +476,16 @@ int main(int ac, char **av)
- 	bindtextdomain(PACKAGE, LOCALEDIR);
- 	textdomain(PACKAGE);
- 
--	while ((opt = getopt(ac, av, "osbBdD:nmyrh")) != -1) {
-+	while ((opt = getopt_long_only(ac, av, "", long_opts, NULL)) != -1) {
-+		input_mode = (enum input_mode)opt;
- 		switch (opt) {
--		case 'o':
--			input_mode = ask_silent;
--			break;
--		case 's':
--			input_mode = ask_silent;
-+		case silentoldconfig:
- 			sync_kconfig = 1;
- 			break;
--		case 'b':
--			input_mode = dont_ask;
--			break;
--		case 'B':
--			input_mode = dont_ask_dont_tell;
--			break;
--		case 'd':
--			input_mode = set_default;
--			break;
--		case 'D':
--			input_mode = set_default;
-+		case readdefconfig:
- 			defconfig_file = optarg;
- 			break;
--		case 'n':
--			input_mode = set_no;
--			break;
--		case 'm':
--			input_mode = set_mod;
--			break;
--		case 'y':
--			input_mode = set_yes;
--			break;
--		case 'r':
-+		case allrandconfig:
- 		{
- 			struct timeval now;
- 			unsigned int seed;
-@@ -502,17 +498,12 @@ int main(int ac, char **av)
- 
- 			seed = (unsigned int)((now.tv_sec + 1) * (now.tv_usec + 1));
- 			srand(seed);
--
--			input_mode = set_random;
- 			break;
- 		}
--		case 'h':
--			printf(_("See README for usage info\n"));
--			exit(0);
--			break;
--		default:
-+		case '?':
- 			fprintf(stderr, _("See README for usage info\n"));
- 			exit(1);
-+			break;
- 		}
- 	}
- 	if (ac == optind) {
-@@ -537,7 +528,8 @@ int main(int ac, char **av)
- 	}
- 
- 	switch (input_mode) {
--	case set_default:
-+	case defconfig:
-+	case readdefconfig:
- 		if (!defconfig_file)
- 			defconfig_file = conf_get_default_confname();
- 		if (conf_read(defconfig_file)) {
-@@ -547,27 +539,27 @@ int main(int ac, char **av)
- 			exit(1);
- 		}
- 		break;
--	case ask_silent:
--	case ask_all:
--	case ask_new:
--	case dont_ask:
--	case dont_ask_dont_tell:
-+	case silentoldconfig:
-+	case oldaskconfig:
-+	case oldconfig:
-+	case nonint_oldconfig:
-+	case loose_nonint_oldconfig:
- 		conf_read(NULL);
- 		break;
--	case set_no:
--	case set_mod:
--	case set_yes:
--	case set_random:
-+	case allnoconfig:
-+	case allyesconfig:
-+	case allmodconfig:
-+	case allrandconfig:
- 		name = getenv("KCONFIG_ALLCONFIG");
- 		if (name && !stat(name, &tmpstat)) {
- 			conf_read_simple(name, S_DEF_USER);
- 			break;
- 		}
- 		switch (input_mode) {
--		case set_no:	 name = "allno.config"; break;
--		case set_mod:	 name = "allmod.config"; break;
--		case set_yes:	 name = "allyes.config"; break;
--		case set_random: name = "allrandom.config"; break;
-+		case allnoconfig:	name = "allno.config"; break;
-+		case allyesconfig:	name = "allyes.config"; break;
-+		case allmodconfig:	name = "allmod.config"; break;
-+		case allrandconfig:	name = "allrandom.config"; break;
- 		default: break;
- 		}
- 		if (!stat(name, &tmpstat))
-@@ -592,37 +584,38 @@ int main(int ac, char **av)
- 	}
- 
- 	switch (input_mode) {
--	case set_no:
-+	case allnoconfig:
- 		conf_set_all_new_symbols(def_no);
- 		break;
--	case set_yes:
-+	case allyesconfig:
- 		conf_set_all_new_symbols(def_yes);
- 		break;
--	case set_mod:
-+	case allmodconfig:
- 		conf_set_all_new_symbols(def_mod);
- 		break;
--	case set_random:
-+	case allrandconfig:
- 		conf_set_all_new_symbols(def_random);
- 		break;
--	case set_default:
-+	case defconfig:
-+	case readdefconfig:
- 		conf_set_all_new_symbols(def_default);
- 		break;
--	case ask_new:
--	case ask_all:
-+	case oldconfig:
-+	case oldaskconfig:
- 		rootEntry = &rootmenu;
- 		conf(&rootmenu);
--		input_mode = ask_silent;
-+		input_mode = silentoldconfig;
- 		/* fall through */
--	case dont_ask:
--	case dont_ask_dont_tell:
--	case ask_silent:
-+	case nonint_oldconfig:
-+	case loose_nonint_oldconfig:
-+	case silentoldconfig:
- 		/* Update until a loop caused no more changes */
- 		do {
- 			conf_cnt = 0;
- 			check_conf(&rootmenu);
- 		} while (conf_cnt &&
--			 (input_mode != dont_ask &&
--			  input_mode != dont_ask_dont_tell));
-+			 (input_mode != nonint_oldconfig &&
-+			  input_mode != loose_nonint_oldconfig));
- 		break;
- 	}
- 
-@@ -638,7 +631,7 @@ int main(int ac, char **av)
- 			fprintf(stderr, _("\n*** Error during update of the kernel configuration.\n\n"));
- 			return 1;
- 		}
--	} else if (!unset_variables || input_mode != dont_ask) {
-+	} else if (!unset_variables || input_mode != nonint_oldconfig) {
- 		if (conf_write(NULL)) {
- 			fprintf(stderr, _("\n*** Error during writing of the kernel configuration.\n\n"));
- 			exit(1);
--- 
-1.6.0.6
+ arch/alpha/boot/bootloader.lds               |    6 +-
+ arch/arm/boot/bootp/bootp.lds                |    1 +
+ arch/cris/boot/compressed/decompress_v10.lds |    3 +
+ arch/cris/boot/compressed/decompress_v32.lds |    3 +
+ arch/cris/boot/rescue/rescue_v10.lds         |    2 +
+ arch/cris/boot/rescue/rescue_v32.lds         |    3 +
+ arch/frv/kernel/vmlinux.lds.S                |    1 -
+ arch/h8300/boot/compressed/vmlinux.lds       |    2 +
+ arch/h8300/boot/compressed/vmlinux.scr       |    1 +
+ arch/ia64/hp/sim/boot/bootloader.lds         |    6 +-
+ arch/ia64/scripts/check-segrel.lds           |    4 +-
+ arch/m32r/boot/compressed/vmlinux.lds.S      |    6 +-
+ arch/m32r/boot/compressed/vmlinux.scr        |    1 +
+ arch/m68knommu/kernel/vmlinux.lds.S          |    1 +
+ arch/mips/lasat/image/romscript.normal       |    1 +
+ arch/mn10300/boot/compressed/vmlinux.lds     |    1 +
+ arch/parisc/kernel/vmlinux.lds.S             |    1 +
+ arch/powerpc/boot/zImage.coff.lds.S          |    2 +
+ arch/powerpc/boot/zImage.lds.S               |    2 +
+ arch/powerpc/boot/zImage.ps3.lds.S           |    2 +
+ arch/sh/boot/compressed/vmlinux.scr          |    1 +
+ arch/sh/kernel/vsyscall/vsyscall.lds.S       |    2 +-
+ arch/x86/boot/setup.ld                       |    3 +-
+ arch/x86/kernel/acpi/realmode/wakeup.lds.S   |    1 +
+ arch/x86/kernel/vmlinux.lds.S                |    1 +
+ arch/xtensa/boot/boot-elf/boot.lds.S         |    5 +-
+ arch/xtensa/boot/boot-redboot/boot.ld        |    5 +-
+ include/asm-generic/vmlinux.lds.h            |   18 ++++-
+ scripts/mod/file2alias.c                     |    6 +-
+ scripts/mod/modpost.c                        |  102 +++++++++++++++++++-------
+ scripts/mod/modpost.h                        |   43 +++++++++++
+ scripts/module-common.lds                    |   23 ++++++
+ 32 files changed, 213 insertions(+), 46 deletions(-)
 
