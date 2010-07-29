@@ -1,58 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepb.post.tele.dk ([195.41.46.236]:38397 "EHLO
+Received: from pfepb.post.tele.dk ([195.41.46.236]:38549 "EHLO
 	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755078Ab0G2T2E (ORCPT
+	with ESMTP id S1755124Ab0G2T3l (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 29 Jul 2010 15:28:04 -0400
-Date: Thu, 29 Jul 2010 21:28:01 +0200
+	Thu, 29 Jul 2010 15:29:41 -0400
+Date: Thu, 29 Jul 2010 21:29:38 +0200
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: How to access if/endif dependencies programmatically?
-Message-ID: <20100729192801.GA7877@merkur.ravnborg.org>
-References: <AANLkTim9b=n7CvnSJhwDrE_HrnJOJ0H=EpOkGBvJt1CC@mail.gmail.com> <20100729091650.GA6085@merkur.ravnborg.org> <AANLkTin1kVoL0kaozsb26id7nsM-BfN1wx1sWf1=EpMi@mail.gmail.com> <AANLkTikEWncPf_tWzcVzMm_trrbiH++EdrtJRD5c-jO_@mail.gmail.com>
+Subject: Re: [RFC PATCH] kconfig: use long options in conf
+Message-ID: <20100729192938.GB7877@merkur.ravnborg.org>
+References: <20100725213808.GA5814@merkur.ravnborg.org> <20100725214021.GD5834@merkur.ravnborg.org> <4C4EFE80.7050808@suse.cz> <20100728203622.GA32086@merkur.ravnborg.org> <4C51473A.4000605@suse.cz> <20100729093946.GA6725@merkur.ravnborg.org> <4C515318.40706@suse.cz> <20100729073016.ba265b59.rdunlap@xenotime.net>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <AANLkTikEWncPf_tWzcVzMm_trrbiH++EdrtJRD5c-jO_@mail.gmail.com>
+In-Reply-To: <20100729073016.ba265b59.rdunlap@xenotime.net>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Vegard Nossum <vegard.nossum@gmail.com>
-Cc: kbuild <linux-kbuild@vger.kernel.org>
+To: Randy Dunlap <rdunlap@xenotime.net>
+Cc: Michal Marek <mmarek@suse.cz>, lkml <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Stephen Rothwell <sfr@canb.auug.org.au>, Roman Zippel <zippel@linux-m68k.org>, Uwe Kleine-Koig <u.kleine-koenig@pengutronix.de>, Linus Torvalds <torvalds@linux-foundation.org>
 
-> >
-> > Can the two prompts have different "depends on"-dependencies, or are
-> > the following two definitions exactly equivalent?
-> >
-> I guess what I really meant was this:
+On Thu, Jul 29, 2010 at 07:30:16AM -0700, Randy Dunlap wrote:
+> On Thu, 29 Jul 2010 12:08:24 +0200 Michal Marek wrote:
 > 
-> 1)
-> config C
-> bool "c"
-> depends on A
-> depends on B
-
-Here symbol "C" has one prompt "c".
-And in the menu structure it depends on A && B.
-
+> > On 29.7.2010 11:39, Sam Ravnborg wrote:
+> > > I had in mind to deprecate randconfig in favour of allrandconfig
+> > > to get more consitency in the names.
+> > > But I failed to document this in the changelog.
+> > > 
+> > > I can submit the following as a real patch if you agree.
+> > 
+> > To me it seems like a change for the sake of change :), but if you like
+> > to have the targets named all*config consistenly, I'm OK with it.
 > 
-> 2)
-> config C
-> bool "c1"
-> depends on A
-> config C
-> bool "c2"
-> depends on B
+> 
+> Well, there are scripts that know the old name, so if it's just change
+> for the sake of change, let's not.
 
-Here symbol "C" has two prompts.
-Prompt "c1" depends on A - so this prompt is only shown when A is y (or m)
-Prompt "c2" depends on B - so it is only shown when B is y (or m)
-
-If both A and B is set then both prompts are visible.
-You will then see when you select one prompt the other will be selected too.
-
-This is very easy to test with a small config file to menuconfig.
-
-> (This version should actually create two different prompts instead of
-> just adding dependencies to the same symbol.)
-Correct.
+I will respin the patches where I drop this change and keep "randconfig".
+Thanks for input from both of you!
 
 	Sam
