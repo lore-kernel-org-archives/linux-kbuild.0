@@ -1,39 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:47887 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751992Ab0G2JBZ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 29 Jul 2010 05:01:25 -0400
-Message-ID: <4C51432D.3020600@suse.cz>
-Date: Thu, 29 Jul 2010 11:00:29 +0200
-From: Michal Marek <mmarek@suse.cz>
+Received: from mail-fx0-f46.google.com ([209.85.161.46]:64964 "EHLO
+	mail-fx0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751992Ab0G2JBp (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 29 Jul 2010 05:01:45 -0400
+Received: by fxm14 with SMTP id 14so60721fxm.19
+        for <linux-kbuild@vger.kernel.org>; Thu, 29 Jul 2010 02:01:44 -0700 (PDT)
 MIME-Version: 1.0
-Subject: Re: [PATCH v2 0/3] update of various kbuild flags to allow user	settings
-References: <20100728182523.GA29198@merkur.ravnborg.org>
-In-Reply-To: <20100728182523.GA29198@merkur.ravnborg.org>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+Date: Thu, 29 Jul 2010 11:01:43 +0200
+Message-ID: <AANLkTim9b=n7CvnSJhwDrE_HrnJOJ0H=EpOkGBvJt1CC@mail.gmail.com>
+Subject: How to access if/endif dependencies programmatically?
+From: Vegard Nossum <vegard.nossum@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, lkml <linux-kernel@vger.kernel.org>, Denys Vlasenko <vda.linux@googlemail.com>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Chen Liqin <liqin.chen@sunplusct.com>, David Howells <dhowells@redhat.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Haavard Skinnemoen <hskinnemoen@atmel.com>, Hirokazu Takata <takata@linux-m32r.org>, Martin Schwidefsky <schwidefsky@de.ibm.com>, Mike Frysinger <vapier@gentoo.org>, Ralf Baechle <ralf@linux-mips.org>, Tony Luck <tony.luck@intel.com>
+To: kbuild <linux-kbuild@vger.kernel.org>
 
-On 28.7.2010 20:25, Sam Ravnborg wrote:
-> Denys Vlasenko complained that he could not set
-> a moduel specific linker flags on the command line.
-> 
-> It turned out that the cause of this was kbuild
-> that assigned a value to a variables that
-> may be modified by the user.
-> So any user supplied value would overwrite
-> the kbuild assigned value.
-> 
-> Fix this so we use internal variables for kbuild
-> feering up the official variables for use by
-> the user.
+Hi,
 
-Acked-by: Michal Marek <mmarek@suse.cz>
+Consider the following kconfig fragment:
 
-but I'll wait a while before applying it so that the arch maintainers
-can object to / ack the arch-specific changes.
+config A
 
-Michal
+if A
+config B
+endif
+
+Here, it would seem that B depends on A. But how can I access this
+information programmatically? The struct symbol for B doesn't seem to
+contain any properties at all, since it has no prompt or defaults.
+
+If it had any properties, I would get this information from
+prop->menu->dep, since prop->menu seems to be the same across all
+properties, even if the option doesn't have a prompt. Can we put a
+pointer to this menu directly in struct symbol? Or can I add another
+property to the symbol containing this information? Any hints for the
+best way to do this would be appreciated.
+
+Thanks,
+
+
+Vegard
