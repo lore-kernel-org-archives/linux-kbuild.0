@@ -1,57 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:23244 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1757499Ab0G2PNa (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 29 Jul 2010 11:13:30 -0400
-Date: Thu, 29 Jul 2010 11:16:51 -0400
-From: Aristeu Rozanski <aris@redhat.com>
-Subject: Re: [RFC PATCH] kconfig: use long options in conf
-Message-ID: <20100729151650.GA20261@redhat.com>
-References: <20100725213808.GA5814@merkur.ravnborg.org> <20100725214021.GD5834@merkur.ravnborg.org> <4C4EFE80.7050808@suse.cz> <20100728203622.GA32086@merkur.ravnborg.org> <20100729081316.GA4990@merkur.ravnborg.org> <4C5148A5.10809@suse.cz> <20100729144748.GI6249@redhat.com> <4C519899.9020206@suse.cz>
+Received: from pfepb.post.tele.dk ([195.41.46.236]:38397 "EHLO
+	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755078Ab0G2T2E (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 29 Jul 2010 15:28:04 -0400
+Date: Thu, 29 Jul 2010 21:28:01 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: How to access if/endif dependencies programmatically?
+Message-ID: <20100729192801.GA7877@merkur.ravnborg.org>
+References: <AANLkTim9b=n7CvnSJhwDrE_HrnJOJ0H=EpOkGBvJt1CC@mail.gmail.com> <20100729091650.GA6085@merkur.ravnborg.org> <AANLkTin1kVoL0kaozsb26id7nsM-BfN1wx1sWf1=EpMi@mail.gmail.com> <AANLkTikEWncPf_tWzcVzMm_trrbiH++EdrtJRD5c-jO_@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <4C519899.9020206@suse.cz>
+In-Reply-To: <AANLkTikEWncPf_tWzcVzMm_trrbiH++EdrtJRD5c-jO_@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: Sam Ravnborg <sam@ravnborg.org>, lkml <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Stephen Rothwell <sfr@canb.auug.org.au>, Roman Zippel <zippel@linux-m68k.org>, Uwe Kleine-Koig <u.kleine-koenig@pengutronix.de>, Linus Torvalds <torvalds@linux-foundation.org>
+To: Vegard Nossum <vegard.nossum@gmail.com>
+Cc: kbuild <linux-kbuild@vger.kernel.org>
 
-On Thu, Jul 29, 2010 at 05:04:57PM +0200, Michal Marek wrote:
-> On 29.7.2010 16:47, Aristeu Rozanski wrote:
-> > On Thu, Jul 29, 2010 at 11:23:49AM +0200, Michal Marek wrote:
-> >> On 29.7.2010 10:13, Sam Ravnborg wrote:
-> >>> On Wed, Jul 28, 2010 at 10:36:22PM +0200, Sam Ravnborg wrote:
-> >>>> Hi Michal.
-> >>>>
-> >>>> I cooked up the following to introduce long options in conf.
-> >>>> But in the process I dropped the short options. Is this OK?
-> >>>
-> >>> On top of this patch I did another two.
-> >>> They fixup the *nonint_oldconfig targets:
-> >>>
-> >>> nonint_oldconfig:
-> >>> - renamed to listnewconfig
-> >>> - print new options to stdout (to better support redirect)
-> >>> - no longer saves a new configuration
-> >>> - does ot exist with a failure code if there is new options
-> > but this kills its usefulness. nonint_oldconfig is used so you can script
-> > the use of a generated configuration (think distro kernel RPMs). if something
-> > is not set, it fails listing what's not set. otherwise it'll save the
-> > configuration and whatever script is using it can proceed.
-> > "listnewconfig" is a new, different target to me.
+> >
+> > Can the two prompts have different "depends on"-dependencies, or are
+> > the following two definitions exactly equivalent?
+> >
+> I guess what I really meant was this:
 > 
-> How about
-> new=$(make listnewconfig)
-> if test -n "$new"; then
->     echo "Please set the following options:" >&2
->     echo "$new" >&2
->     exit 1
-> fi
-> ? Wouldn't that be the same as nonint_oldconfig before?
-what's the other use cases for listnewconfig (other than a incomplete
-nonint_oldconfig)?
+> 1)
+> config C
+> bool "c"
+> depends on A
+> depends on B
 
--- 
-Aristeu
+Here symbol "C" has one prompt "c".
+And in the menu structure it depends on A && B.
 
+> 
+> 2)
+> config C
+> bool "c1"
+> depends on A
+> config C
+> bool "c2"
+> depends on B
+
+Here symbol "C" has two prompts.
+Prompt "c1" depends on A - so this prompt is only shown when A is y (or m)
+Prompt "c2" depends on B - so it is only shown when B is y (or m)
+
+If both A and B is set then both prompts are visible.
+You will then see when you select one prompt the other will be selected too.
+
+This is very easy to test with a small config file to menuconfig.
+
+> (This version should actually create two different prompts instead of
+> just adding dependencies to the same symbol.)
+Correct.
+
+	Sam
