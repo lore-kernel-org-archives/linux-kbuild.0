@@ -1,57 +1,73 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:63058 "EHLO mx1.redhat.com"
+Received: from cantor.suse.de ([195.135.220.2]:49486 "EHLO mx1.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754214Ab0G2Ook (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 29 Jul 2010 10:44:40 -0400
-Date: Thu, 29 Jul 2010 10:47:49 -0400
-From: Aristeu Rozanski <aris@redhat.com>
-Subject: Re: [RFC PATCH] kconfig: use long options in conf
-Message-ID: <20100729144748.GI6249@redhat.com>
-References: <20100725213808.GA5814@merkur.ravnborg.org> <20100725214021.GD5834@merkur.ravnborg.org> <4C4EFE80.7050808@suse.cz> <20100728203622.GA32086@merkur.ravnborg.org> <20100729081316.GA4990@merkur.ravnborg.org> <4C5148A5.10809@suse.cz>
+	id S1757729Ab0G2Oz3 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 29 Jul 2010 10:55:29 -0400
+Date: Thu, 29 Jul 2010 16:54:41 +0200
+From: Michal Marek <mmarek@suse.cz>
+Subject: Re: [PATCH 2.6.35-rc6] kconfig: fix MODULES-related bug in case of
+ no .config
+Message-ID: <20100729145438.GA18251@sepie.suse.cz>
+References: <20100727192727.GA17954@ulf>
+ <20100727195742.GA18079@ulf>
+ <20100728062313.GC5161@cr0.nay.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <4C5148A5.10809@suse.cz>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20100728062313.GC5161@cr0.nay.redhat.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: Sam Ravnborg <sam@ravnborg.org>, lkml <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Stephen Rothwell <sfr@canb.auug.org.au>, Roman Zippel <zippel@linux-m68k.org>, Uwe Kleine-Koig <u.kleine-koenig@pengutronix.de>, Linus Torvalds <torvalds@linux-foundation.org>
+To: =?iso-8859-1?Q?Am=E9rico?= Wang <xiyou.wangcong@gmail.com>
+Cc: Ulf Magnusson <ulfalizer.lkml@gmail.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Thu, Jul 29, 2010 at 11:23:49AM +0200, Michal Marek wrote:
-> On 29.7.2010 10:13, Sam Ravnborg wrote:
-> > On Wed, Jul 28, 2010 at 10:36:22PM +0200, Sam Ravnborg wrote:
-> >> Hi Michal.
-> >>
-> >> I cooked up the following to introduce long options in conf.
-> >> But in the process I dropped the short options. Is this OK?
-> > 
-> > On top of this patch I did another two.
-> > They fixup the *nonint_oldconfig targets:
-> > 
-> > nonint_oldconfig:
-> > - renamed to listnewconfig
-> > - print new options to stdout (to better support redirect)
-> > - no longer saves a new configuration
-> > - does ot exist with a failure code if there is new options
-but this kills its usefulness. nonint_oldconfig is used so you can script
-the use of a generated configuration (think distro kernel RPMs). if something
-is not set, it fails listing what's not set. otherwise it'll save the
-configuration and whatever script is using it can proceed.
-"listnewconfig" is a new, different target to me.
-
-> > loose_noninit_oldconfig:
-> > - renamed to oldnoconfig
-> > - does ot exist with a failure code if there is new options
-> > 
-> > This is a lot cleaner and much more sensible names.
-> > And they still support the suecase where they
-> > list new options and can set them to n per default.
+On Wed, Jul 28, 2010 at 02:23:13PM +0800, Américo Wang wrote:
+> On Tue, Jul 27, 2010 at 09:57:43PM +0200, Ulf Magnusson wrote:
+> >On Tue, Jul 27, 2010 at 09:27:27PM +0200, Ulf Magnusson wrote:
+> >> Hi,
+> >> 
+> >> There seems to be a kconfig bug due to MODULES not always being evaluated if no
+> >> .config is found. Take the following Kconfig as an example:
+> >> 
+> >> config MODULES
+> >> 	def_bool y
+> >> 
+> >> config FOO
+> >> 	def_tristate m
+> >> 
+> >> With no .config, the following configuration is generated:
+> >> 
+> >> CONFIG_MODULES=y
+> >> CONFIG_FOO=y
+> >> 
+> >> With an empty .config, the following:
+> >> 
+> >> CONFIG_MODULES=y
+> >> CONFIG_FOO=m
+> >> 
+> >> Tristate choice statements can also exhibit the problem, due to having an
+> >> implicit rev_dep (select) containing "m".
+> >> 
+> >> The problem is that MODULES is never evaluted in conf_read_simple() unless
+> >> there's a .config. The following patch fixes this.
 > 
-> I do not object, these new targets are only in the kbuild tree atm, so
-> users are not relying on them yet. And the new names indeed describe
-> better what they do. Aristeu?
-oldnoconfig is fine to me.
+> <snip>
+> 
+> >
+> >Silly error in the patch. The correct patch follows.
 
--- 
-Aristeu
+Even the previous patch was correct, sym_calc_value() does nothing if
+the argument is NULL.
 
+> >
+> >Signed-off-by: Ulf Magnusson <ulfalizer.lkml@gmail.com>
+> >
+> 
+> Sounds good for me.
+> 
+> Reviewed-by: WANG Cong <xiyou.wangcong@gmail.com>
+
+Thanks. Added for  2.6.36 to kbuild-2.6.git (this is not a .35
+regression AFAICS).
+
+Michal
