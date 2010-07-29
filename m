@@ -1,70 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-fx0-f46.google.com ([209.85.161.46]:45248 "EHLO
-	mail-fx0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753560Ab0G2LmN (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 29 Jul 2010 07:42:13 -0400
-Received: by fxm14 with SMTP id 14so135340fxm.19
-        for <linux-kbuild@vger.kernel.org>; Thu, 29 Jul 2010 04:42:12 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <AANLkTin1kVoL0kaozsb26id7nsM-BfN1wx1sWf1=EpMi@mail.gmail.com>
-References: <AANLkTim9b=n7CvnSJhwDrE_HrnJOJ0H=EpOkGBvJt1CC@mail.gmail.com>
-	<20100729091650.GA6085@merkur.ravnborg.org>
-	<AANLkTin1kVoL0kaozsb26id7nsM-BfN1wx1sWf1=EpMi@mail.gmail.com>
-Date: Thu, 29 Jul 2010 13:42:12 +0200
-Message-ID: <AANLkTikEWncPf_tWzcVzMm_trrbiH++EdrtJRD5c-jO_@mail.gmail.com>
-Subject: Re: How to access if/endif dependencies programmatically?
-From: Vegard Nossum <vegard.nossum@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Received: from xenotime.net ([72.52.115.56]:38657 "HELO xenotime.net"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with SMTP
+	id S1757348Ab0G2Oa1 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 29 Jul 2010 10:30:27 -0400
+Received: from chimera.site ([173.50.240.230]) by xenotime.net for <linux-kbuild@vger.kernel.org>; Thu, 29 Jul 2010 07:30:17 -0700
+Date: Thu, 29 Jul 2010 07:30:16 -0700
+From: Randy Dunlap <rdunlap@xenotime.net>
+Subject: Re: [RFC PATCH] kconfig: use long options in conf
+Message-Id: <20100729073016.ba265b59.rdunlap@xenotime.net>
+In-Reply-To: <4C515318.40706@suse.cz>
+References: <20100725213808.GA5814@merkur.ravnborg.org>
+	<20100725214021.GD5834@merkur.ravnborg.org>
+	<4C4EFE80.7050808@suse.cz>
+	<20100728203622.GA32086@merkur.ravnborg.org>
+	<4C51473A.4000605@suse.cz>
+	<20100729093946.GA6725@merkur.ravnborg.org>
+	<4C515318.40706@suse.cz>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: kbuild <linux-kbuild@vger.kernel.org>
+To: Michal Marek <mmarek@suse.cz>
+Cc: Sam Ravnborg <sam@ravnborg.org>, lkml <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Stephen Rothwell <sfr@canb.auug.org.au>, Roman Zippel <zippel@linux-m68k.org>, Uwe Kleine-Koig <u.kleine-koenig@pengutronix.de>, Linus Torvalds <torvalds@linux-foundation.org>
 
-On 29 July 2010 13:29, Vegard Nossum <vegard.nossum@gmail.com> wrote:
->> See how B shows up in two places with different dependencies.
->> Therefore dependencies are an attribute of the menu - not the symbol.
->>
->> So to properly inspect dependencies you need to traverse the menus,
->> not the symbols as they may be used in several places.
->
-> Hm, wow, thanks for the explanation, that helps a lot.
->
-> There is still just one symbol "B", right, but it has two prompts?
-> (And each prompt/menu has a different set of dependencies.)
->
-> Can the two prompts have different "depends on"-dependencies, or are
-> the following two definitions exactly equivalent?
->
-> 1)
-> config C
-> depends on A
-> depends on B
->
-> 2)
-> config C
-> depends on A
-> config C
-> depends on B
+On Thu, 29 Jul 2010 12:08:24 +0200 Michal Marek wrote:
 
-I guess what I really meant was this:
-
-1)
-config C
-bool "c"
-depends on A
-depends on B
-
-2)
-config C
-bool "c1"
-depends on A
-config C
-bool "c2"
-depends on B
-
-(This version should actually create two different prompts instead of
-just adding dependencies to the same symbol.)
+> On 29.7.2010 11:39, Sam Ravnborg wrote:
+> > I had in mind to deprecate randconfig in favour of allrandconfig
+> > to get more consitency in the names.
+> > But I failed to document this in the changelog.
+> > 
+> > I can submit the following as a real patch if you agree.
+> 
+> To me it seems like a change for the sake of change :), but if you like
+> to have the targets named all*config consistenly, I'm OK with it.
 
 
-Vegard
+Well, there are scripts that know the old name, so if it's just change
+for the sake of change, let's not.
+
+---
+~Randy
+*** Remember to use Documentation/SubmitChecklist when testing your code ***
