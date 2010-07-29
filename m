@@ -1,29 +1,54 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:1418 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754638Ab0G2JK2 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 29 Jul 2010 05:10:28 -0400
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <201007290324.36745.vda.linux@googlemail.com>
-References: <201007290324.36745.vda.linux@googlemail.com> <1280360876-2571-3-git-send-email-vda.linux@googlemail.com> <1280360876-2571-1-git-send-email-vda.linux@googlemail.com> <29025.1280363105@redhat.com>
-Subject: Re: [PATCH 2/4] module linker script: coalesce function and data sections
-Date: Thu, 29 Jul 2010 10:09:57 +0100
-Message-ID: <30881.1280394597@redhat.com>
+Received: from pfepb.post.tele.dk ([195.41.46.236]:54912 "EHLO
+	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755584Ab0G2JQv (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 29 Jul 2010 05:16:51 -0400
+Date: Thu, 29 Jul 2010 11:16:50 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: How to access if/endif dependencies programmatically?
+Message-ID: <20100729091650.GA6085@merkur.ravnborg.org>
+References: <AANLkTim9b=n7CvnSJhwDrE_HrnJOJ0H=EpOkGBvJt1CC@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <AANLkTim9b=n7CvnSJhwDrE_HrnJOJ0H=EpOkGBvJt1CC@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Denys Vlasenko <vda.linux@googlemail.com>
-Cc: dhowells@redhat.com, Michal Marek <mmarek@suse.cz>, linux-kbuild <linux-kbuild@vger.kernel.org>, linux-arch@vger.kernel.org, Parisc List <linux-parisc@vger.kernel.org>, lkml <linux-kernel@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, Tim Abbott <tabbott@ksplice.com>, Tim Bird <tim.bird@am.sony.com>, James Bottomley <James.Bottomley@hansenpartnership.com>, Matt Fleming <matt@console-pimps.org>, Arnd Bergmann <arnd@arndb.de>, Anders Kaseorg <andersk@mit.edu>, Andi Kleen <andi@firstfloor.org>, Stephen Rothwell <sfr@canb.auug.org.au>
+To: Vegard Nossum <vegard.nossum@gmail.com>
+Cc: kbuild <linux-kbuild@vger.kernel.org>
 
-Denys Vlasenko <vda.linux@googlemail.com> wrote:
-
-> linker groups all similarly-named input sections into one output section
-> with the same name, if the name does not match any rule in the linker
-> script.
+On Thu, Jul 29, 2010 at 11:01:43AM +0200, Vegard Nossum wrote:
+> Hi,
 > 
-> Basically, it should work as if there is a rule:
+> Consider the following kconfig fragment:
 > 
-> .sbss    0 : AT(0) { *(.sbss) }
+> config A
+> 
+> if A
+> config B
+> endif
 
-Okay, thanks.
+The dependencies control the visibility.
+The try to explain this consider this adopted
+Kconfig file fragment:
 
-David
+config A
+	bool "A"
+
+config B
+	bool "B"
+
+if A
+config B
+	prompt "BB"
+endif
+
+
+See how B shows up in two places with different dependencies.
+Therefore dependencies are an attribute of the menu - not the symbol.
+
+So to properly inspect dependencies you need to traverse the menus,
+not the symbols as they may be used in several places.
+
+	Sam
