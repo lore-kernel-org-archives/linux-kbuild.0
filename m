@@ -1,43 +1,29 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-fx0-f46.google.com ([209.85.161.46]:64964 "EHLO
-	mail-fx0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751992Ab0G2JBp (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 29 Jul 2010 05:01:45 -0400
-Received: by fxm14 with SMTP id 14so60721fxm.19
-        for <linux-kbuild@vger.kernel.org>; Thu, 29 Jul 2010 02:01:44 -0700 (PDT)
-MIME-Version: 1.0
-Date: Thu, 29 Jul 2010 11:01:43 +0200
-Message-ID: <AANLkTim9b=n7CvnSJhwDrE_HrnJOJ0H=EpOkGBvJt1CC@mail.gmail.com>
-Subject: How to access if/endif dependencies programmatically?
-From: Vegard Nossum <vegard.nossum@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Received: from mx1.redhat.com ([209.132.183.28]:1418 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754638Ab0G2JK2 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 29 Jul 2010 05:10:28 -0400
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <201007290324.36745.vda.linux@googlemail.com>
+References: <201007290324.36745.vda.linux@googlemail.com> <1280360876-2571-3-git-send-email-vda.linux@googlemail.com> <1280360876-2571-1-git-send-email-vda.linux@googlemail.com> <29025.1280363105@redhat.com>
+Subject: Re: [PATCH 2/4] module linker script: coalesce function and data sections
+Date: Thu, 29 Jul 2010 10:09:57 +0100
+Message-ID: <30881.1280394597@redhat.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: kbuild <linux-kbuild@vger.kernel.org>
+To: Denys Vlasenko <vda.linux@googlemail.com>
+Cc: dhowells@redhat.com, Michal Marek <mmarek@suse.cz>, linux-kbuild <linux-kbuild@vger.kernel.org>, linux-arch@vger.kernel.org, Parisc List <linux-parisc@vger.kernel.org>, lkml <linux-kernel@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, Tim Abbott <tabbott@ksplice.com>, Tim Bird <tim.bird@am.sony.com>, James Bottomley <James.Bottomley@hansenpartnership.com>, Matt Fleming <matt@console-pimps.org>, Arnd Bergmann <arnd@arndb.de>, Anders Kaseorg <andersk@mit.edu>, Andi Kleen <andi@firstfloor.org>, Stephen Rothwell <sfr@canb.auug.org.au>
 
-Hi,
+Denys Vlasenko <vda.linux@googlemail.com> wrote:
 
-Consider the following kconfig fragment:
+> linker groups all similarly-named input sections into one output section
+> with the same name, if the name does not match any rule in the linker
+> script.
+> 
+> Basically, it should work as if there is a rule:
+> 
+> .sbss    0 : AT(0) { *(.sbss) }
 
-config A
+Okay, thanks.
 
-if A
-config B
-endif
-
-Here, it would seem that B depends on A. But how can I access this
-information programmatically? The struct symbol for B doesn't seem to
-contain any properties at all, since it has no prompt or defaults.
-
-If it had any properties, I would get this information from
-prop->menu->dep, since prop->menu seems to be the same across all
-properties, even if the option doesn't have a prompt. Can we put a
-pointer to this menu directly in struct symbol? Or can I add another
-property to the symbol containing this information? Any hints for the
-best way to do this would be appreciated.
-
-Thanks,
-
-
-Vegard
+David
