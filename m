@@ -1,33 +1,40 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:13721 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1758692Ab0G3Oua (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 30 Jul 2010 10:50:30 -0400
-Date: Fri, 30 Jul 2010 10:53:31 -0400
-From: Aristeu Rozanski <aris@redhat.com>
-Subject: Re: [RFC PATCH] kconfig: use long options in conf
-Message-ID: <20100730145330.GL20261@redhat.com>
-References: <4C4EFE80.7050808@suse.cz> <20100728203622.GA32086@merkur.ravnborg.org> <20100729081316.GA4990@merkur.ravnborg.org> <4C5148A5.10809@suse.cz> <20100729144748.GI6249@redhat.com> <4C519899.9020206@suse.cz> <20100729151650.GA20261@redhat.com> <20100729193454.GC7877@merkur.ravnborg.org> <20100729195052.GB20261@redhat.com> <20100729230419.GA9357@merkur.ravnborg.org>
+Received: from metis.ext.pengutronix.de ([92.198.50.35]:39530 "EHLO
+	metis.ext.pengutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932314Ab0G3Snk (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 30 Jul 2010 14:43:40 -0400
+From: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?=
+	<u.kleine-koenig@pengutronix.de>
+Subject: [PATCH] trivial: fix a typo in a filename
+Date: Fri, 30 Jul 2010 20:43:20 +0200
+Message-Id: <1280515401-13610-1-git-send-email-u.kleine-koenig@pengutronix.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20100729230419.GA9357@merkur.ravnborg.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: Michal Marek <mmarek@suse.cz>, lkml <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Stephen Rothwell <sfr@canb.auug.org.au>, Roman Zippel <zippel@linux-m68k.org>, Uwe Kleine-Koig <u.kleine-koenig@pengutronix.de>, Linus Torvalds <torvalds@linux-foundation.org>
+To: trivial@kernel.org
+Cc: Michal Marek <mmarek@suse.cz>, =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>, Ingo Molnar <mingo@elte.hu>, Mathieu Desnoyers <mathieu.desnoyers@polymtl.ca>, Christoph Hellwig <hch@lst.de>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Fri, Jul 30, 2010 at 01:04:19AM +0200, Sam Ravnborg wrote:
-> First off let me correct myself.
-> nonint_oldconfig does the following:
-> - print any new options to stderr
-> - if tere are any new options exit with exit code 2
-> - it does _not_ touch the current configuration (as I wrongly implied above)
-it does touch the current configuration if there aren't new options
-but whatever
+Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
+---
+ scripts/Makefile.modpost |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-Acked-by: Aristeu Rozanski <aris@redhat.com>
-
+diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
+index 8f14c81..82a2420 100644
+--- a/scripts/Makefile.modpost
++++ b/scripts/Makefile.modpost
+@@ -30,7 +30,7 @@
+ #     - See include/linux/module.h for more details
+ 
+ # Step 4 is solely used to allow module versioning in external modules,
+-# where the CRC of each module is retrieved from the Module.symers file.
++# where the CRC of each module is retrieved from the Module.symvers file.
+ 
+ # KBUILD_MODPOST_WARN can be set to avoid error out in case of undefined
+ # symbols in the final module linking stage
 -- 
-Aristeu
+1.7.1
 
