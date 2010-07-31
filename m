@@ -1,116 +1,127 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepb.post.tele.dk ([195.41.46.236]:60007 "EHLO
-	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752072Ab0GaV3L (ORCPT
+Received: from pfepa.post.tele.dk ([195.41.46.235]:32983 "EHLO
+	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756833Ab0GaVbw (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 31 Jul 2010 17:29:11 -0400
-Date: Sat, 31 Jul 2010 23:29:07 +0200
+	Sat, 31 Jul 2010 17:31:52 -0400
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: [PATCH v2 0/9] kconfig: introduce saveconfig and alldefconfig
-	(+more)
-Message-ID: <20100731212907.GA7554@merkur.ravnborg.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Subject: [PATCH] kconfig: rename loose_nonint_oldconfig => oldnoconfig
+Date: Sat, 31 Jul 2010 23:31:43 +0200
+Message-Id: <1280611910-8155-2-git-send-email-sam@ravnborg.org>
+In-Reply-To: <20100731212907.GA7554@merkur.ravnborg.org>
+References: <20100731212907.GA7554@merkur.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>, lkml <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Uwe Kleine-K?nig <u.kleine-koenig@pengutronix.de>, Randy Dunlap <rdunlap@xenotime.net>, Roman Zippel <zippel@linux-m68k.org>, Aristeu Rozanski <aris@redhat.com>
+To: Michal Marek <mmarek@suse.cz>, lkml <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
+Cc: Sam Ravnborg <sam@ravnborg.org>, Aristeu Rozanski <aris@redhat.com>
 
-This is an update of patches previous posted.
+Rename target to something that fall more in line
+with the other kconfig targets.
 
-Version 2 have addressed the following feedback:
-- Drop the idea of introducing allrandconfig (Michal, Randy)
-- Do more code refactoring (Michal)
-- Use long options in conf.c (Michal)
-- savedefconfig shall list symbols in same order as in .config (Uwe)
+oldnoconfig shall read as:
+
+- read the old configuration and set all new options to no
+
+Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
+Cc: Aristeu Rozanski <aris@redhat.com>
+---
+ scripts/kconfig/Makefile |    7 +++----
+ scripts/kconfig/conf.c   |   14 +++++++-------
+ 2 files changed, 10 insertions(+), 11 deletions(-)
+
+diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
+index b712bdb..0e3c670 100644
+--- a/scripts/kconfig/Makefile
++++ b/scripts/kconfig/Makefile
+@@ -100,9 +100,9 @@ PHONY += allnoconfig allyesconfig allmodconfig randconfig
+ allnoconfig allyesconfig allmodconfig randconfig: $(obj)/conf
+ 	$< --$@ $(Kconfig)
  
-The major feature is the introduction of "make savedefconfig".
-
-Make savedefconfig creates a minimal configuration
-as have been discussed recently and which is already
-done for arm and powerpc.
-savedefconfig utilise the knowledge kconfig has to do so
-much faster than the phyton script posted.
-
-The implementation was checked against several arm defconfigs.
-This was btw. a great source as it allowed me to finetune the
-implementation without having to spent hours looking at the
-generated files.
-
-One minor issue was not solved..
-when a symbol has a default value that is not within
-a valid range (the range may be limited by another symbol),
-then savedefconfig saves the config symbol with the default value.
-The final configuration is OK and this is so seldom that
-it does not matter in practice.
-[I found only one symbol that in a few configurations triggered this]
-
-Introducing savedefconfig does not say that I dislike the idea
-of specifying defconfigs partly/fully using Kconfig fragments.
-We just needed something better than the brute-force phython
-script and I could see this being usefull anyway.
-
-
-The patch also introduce another new target: alldefconfig
-alldefconfig creates a configuration with all symbols equals
-their default value.
-Now where we start to use the default values even more this
-can be usefull to check that there is a sensible set of
-default values.
-
-alldefconfig proved good as testing for savedefconfig
-
-    make alldefconfig
-    make savedefconfig
-
-Creates an empty defconfig file - because all symbols has
-their default value.
-
-
-The patchset in addition contains the following changes:
-- use long options in conf.c.
-  This increased the readability of this file quite a lot
-- rename of loose_nonint_oldconfig to oldnoconfig
-- replace nonint_oldconfig with listnewconfig
-  listnewconfig does not exit with a failure code
-  if there is new options. nonint_oldconfig did so
-- improved warnings for recursive dependencies
-  this also fixes a segmentation fault I have seen in handling
-  recursive dependecies
-
-I consider this version ready for merge.
-The patches are created on top of kbuild.git for-next.
-
-I will trim cc: in the actual patches.
-
-Note: the patch from Roman Zippel is an old patch I digged up.
-Unfortunately I have not heard from Roman lately.
-I have in private mail suggested Michal to take over
-kconfig maintainership to document the current state of affairs.
-
-	Sam
-
-Roman Zippel (1):
-      kconfig: print more info when we see a recursive dependency
-
-Sam Ravnborg (8):
-      kconfig: use long options in conf
-      kconfig: rename loose_nonint_oldconfig => oldnoconfig
-      kconfig: change nonint_oldconfig to listnewconfig
-      kconfig: save location of config symbols
-      kconfig: add alldefconfig
-      kconfig: refactor code in symbol.c
-      kconfig: code refactoring in confdata.c
-      kconfig: add savedefconfig
-
- Documentation/kbuild/kconfig.txt |    2 +-
- scripts/kconfig/Makefile         |   87 ++++++-------
- scripts/kconfig/conf.c           |  196 ++++++++++++++--------------
- scripts/kconfig/confdata.c       |  213 +++++++++++++++++++++----------
- scripts/kconfig/expr.h           |    1 +
- scripts/kconfig/lkc.h            |    2 +
- scripts/kconfig/lkc_proto.h      |    1 +
- scripts/kconfig/menu.c           |    2 +
- scripts/kconfig/symbol.c         |  264 ++++++++++++++++++++++++++++++++++----
- 9 files changed, 526 insertions(+), 242 deletions(-)
+-PHONY += nonint_oldconfig loose_nonint_oldconfig defconfig
++PHONY += nonint_oldconfig oldnoconfig defconfig
+ 
+-nonint_oldconfig loose_nonint_oldconfig: $(obj)/conf
++nonint_oldconfig oldnoconfig: $(obj)/conf
+ 	$< --$@ $(Kconfig)
+ 
+ defconfig: $(obj)/conf
+@@ -134,8 +134,7 @@ help:
+ 	@echo  '  allnoconfig	  - New config where all options are answered with no'
+ 	@echo  '  nonint_oldconfig - Checks the current configuration and fails if an option is '
+ 	@echo  '                    not set'
+-	@echo  '  loose_nonint_oldconfig - Same as nonint_oldconfig, but updates the config file with '
+-	@echo  '                    missing config options as unset'
++	@echo  '  oldnoconfig     - Same as silentoldconfig but set new symbols to n (unset)'
+ 
+ # lxdialog stuff
+ check-lxdialog  := $(srctree)/$(src)/lxdialog/check-lxdialog.sh
+diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
+index 2dec584..1f86fca 100644
+--- a/scripts/kconfig/conf.c
++++ b/scripts/kconfig/conf.c
+@@ -34,7 +34,7 @@ enum input_mode {
+ 	randconfig,
+ 	defconfig,
+ 	nonint_oldconfig,
+-	loose_nonint_oldconfig,
++	oldnoconfig,
+ } input_mode = oldaskconfig;
+ 
+ char *defconfig_file;
+@@ -367,7 +367,7 @@ static void conf(struct menu *menu)
+ 		case P_MENU:
+ 			if ((input_mode == silentoldconfig ||
+ 			     input_mode == nonint_oldconfig ||
+-			     input_mode == loose_nonint_oldconfig) &&
++			     input_mode == oldnoconfig) &&
+ 			    rootEntry != menu) {
+ 				check_conf(menu);
+ 				return;
+@@ -427,7 +427,7 @@ static void check_conf(struct menu *menu)
+ 		if (sym_is_changable(sym) ||
+ 		    (sym_is_choice(sym) && sym_get_tristate_value(sym) == yes)) {
+ 			if (input_mode == nonint_oldconfig ||
+-			    input_mode == loose_nonint_oldconfig) {
++			    input_mode == oldnoconfig) {
+ 				if (input_mode == nonint_oldconfig &&
+ 				    sym->name && !sym_is_choice_value(sym)) {
+ 					if (!unset_variables)
+@@ -460,7 +460,7 @@ static struct option long_opts[] = {
+ 	{"allmodconfig",    no_argument,       NULL, allmodconfig},
+ 	{"randconfig",      no_argument,       NULL, randconfig},
+ 	{"nonint_oldconfig",       no_argument, NULL, nonint_oldconfig},
+-	{"loose_nonint_oldconfig", no_argument, NULL, loose_nonint_oldconfig},
++	{"oldnoconfig",     no_argument,       NULL, oldnoconfig},
+ 	{NULL, 0, NULL, 0}
+ };
+ 
+@@ -540,7 +540,7 @@ int main(int ac, char **av)
+ 	case oldaskconfig:
+ 	case oldconfig:
+ 	case nonint_oldconfig:
+-	case loose_nonint_oldconfig:
++	case oldnoconfig:
+ 		conf_read(NULL);
+ 		break;
+ 	case allnoconfig:
+@@ -603,7 +603,7 @@ int main(int ac, char **av)
+ 		input_mode = silentoldconfig;
+ 		/* fall through */
+ 	case nonint_oldconfig:
+-	case loose_nonint_oldconfig:
++	case oldnoconfig:
+ 	case silentoldconfig:
+ 		/* Update until a loop caused no more changes */
+ 		do {
+@@ -611,7 +611,7 @@ int main(int ac, char **av)
+ 			check_conf(&rootmenu);
+ 		} while (conf_cnt &&
+ 			 (input_mode != nonint_oldconfig &&
+-			  input_mode != loose_nonint_oldconfig));
++			  input_mode != oldnoconfig));
+ 		break;
+ 	}
+ 
+-- 
+1.6.0.6
 
