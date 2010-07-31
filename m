@@ -1,275 +1,345 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepb.post.tele.dk ([195.41.46.236]:40612 "EHLO
+Received: from pfepb.post.tele.dk ([195.41.46.236]:40623 "EHLO
 	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757022Ab0GaVfh (ORCPT
+	with ESMTP id S1757113Ab0GaVfi (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 31 Jul 2010 17:35:37 -0400
+	Sat, 31 Jul 2010 17:35:38 -0400
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: [PATCH 5/9] kconfig: print more info when we see a recursive dependency
-Date: Sat, 31 Jul 2010 23:35:30 +0200
-Message-Id: <1280612134-8220-5-git-send-email-sam@ravnborg.org>
+Subject: [PATCH 9/9] kconfig: add savedefconfig
+Date: Sat, 31 Jul 2010 23:35:34 +0200
+Message-Id: <1280612134-8220-9-git-send-email-sam@ravnborg.org>
 In-Reply-To: <20100731213429.GA8200@merkur.ravnborg.org>
 References: <20100731213429.GA8200@merkur.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Michal Marek <mmarek@suse.cz>, lkml <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
-Cc: Roman Zippel <zippel@linux-m68k.org>, Sam Ravnborg <sam@ravnborg.org>
+Cc: Sam Ravnborg <sam@ravnborg.org>
 
-From: Roman Zippel <zippel@linux-m68k.org>
+savedefconfig will save a minimal config to a file
+named "defconfig".
 
-Consider following kconfig file:
+The config symbols are saved in the same order as
+they appear in the menu structure so it should
+be possible to map them to the relevant menus
+if desired.
 
-config TEST1
-	bool "test 1"
-	depends on TEST2
+The implementation was tested against several minimal
+configs for arm which was created using brute-force.
 
-config TEST2
-	bool "test 2"
-	depends on TEST1
+There was one regression related to default numbers
+which had their valid range further limited by another symbol.
 
-Previously kconfig would report:
+Sample:
 
-foo:6:error: found recursive dependency: TEST2 -> TEST1 -> TEST2
+config FOO
+	int "foo"
+	default 4
 
-With the following patch kconfig reports:
-foo:5:error: recursive dependency detected!
-foo:5:  symbol TEST2 depends on TEST1
-foo:1:  symbol TEST1 depends on TEST2
+config BAR
+	int "bar"
+	range 0 FOO
 
-Note that we now report where the offending symbols are defined.
-This can be a great help for complex situations involving
-several files.
+If FOO is set to 3 then BAR cannot take a value higher than 3.
+But the current implementation will set BAR equal to 4.
 
-Patch is originally from Roman Zippel with a few adjustments by Sam.
+This is seldomly used and the final configuration is OK,
+and the fix was non-trivial.
+So it was documented in the code and left as is.
 
 Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
-Cc: Roman Zippel <zippel@linux-m68k.org>
 ---
- scripts/kconfig/symbol.c |  142 +++++++++++++++++++++++++++++++++++++++++-----
- 1 files changed, 127 insertions(+), 15 deletions(-)
+ scripts/kconfig/Makefile    |    6 +++-
+ scripts/kconfig/conf.c      |   14 ++++++++
+ scripts/kconfig/confdata.c  |   76 +++++++++++++++++++++++++++++++++++++++++++
+ scripts/kconfig/lkc.h       |    1 +
+ scripts/kconfig/lkc_proto.h |    1 +
+ scripts/kconfig/symbol.c    |   74 +++++++++++++++++++++++++++++++++++++++++
+ 6 files changed, 171 insertions(+), 1 deletions(-)
 
-diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
-index 9f180ab..bc1e158 100644
---- a/scripts/kconfig/symbol.c
-+++ b/scripts/kconfig/symbol.c
-@@ -783,6 +783,110 @@ struct symbol **sym_re_search(const char *pattern)
- 	return sym_arr;
+diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
+index 0bf1fb6..647dd5a 100644
+--- a/scripts/kconfig/Makefile
++++ b/scripts/kconfig/Makefile
+@@ -100,11 +100,14 @@ PHONY += allnoconfig allyesconfig allmodconfig alldefconfig randconfig
+ allnoconfig allyesconfig allmodconfig alldefconfig randconfig: $(obj)/conf
+ 	$< --$@ $(Kconfig)
+ 
+-PHONY += listnewconfig oldnoconfig defconfig
++PHONY += listnewconfig oldnoconfig savedefconfig defconfig
+ 
+ listnewconfig oldnoconfig: $(obj)/conf
+ 	$< --$@ $(Kconfig)
+ 
++savedefconfig: $(obj)/conf
++	$< --$@=defconfig $(Kconfig)
++
+ defconfig: $(obj)/conf
+ ifeq ($(KBUILD_DEFCONFIG),)
+ 	$< --defconfig $(Kconfig)
+@@ -128,6 +131,7 @@ help:
+ 	@echo  '  localyesconfig  - Update current config converting local mods to core'
+ 	@echo  '  silentoldconfig - Same as oldconfig, but quietly, additionally update deps'
+ 	@echo  '  defconfig	  - New config with default from ARCH supplied defconfig'
++	@echo  '  savedefconfig   - Save current config as ./defconfig (minimal config)'
+ 	@echo  '  allnoconfig	  - New config where all options are answered with no'
+ 	@echo  '  allyesconfig	  - New config where all options are accepted with yes'
+ 	@echo  '  allmodconfig	  - New config selecting modules when possible'
+diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
+index c8bd33c..010600e 100644
+--- a/scripts/kconfig/conf.c
++++ b/scripts/kconfig/conf.c
+@@ -30,6 +30,7 @@ enum input_mode {
+ 	alldefconfig,
+ 	randconfig,
+ 	defconfig,
++	savedefconfig,
+ 	listnewconfig,
+ 	oldnoconfig,
+ } input_mode = oldaskconfig;
+@@ -444,6 +445,7 @@ static struct option long_opts[] = {
+ 	{"oldconfig",       no_argument,       NULL, oldconfig},
+ 	{"silentoldconfig", no_argument,       NULL, silentoldconfig},
+ 	{"defconfig",       optional_argument, NULL, defconfig},
++	{"savedefconfig",   required_argument, NULL, savedefconfig},
+ 	{"allnoconfig",     no_argument,       NULL, allnoconfig},
+ 	{"allyesconfig",    no_argument,       NULL, allyesconfig},
+ 	{"allmodconfig",    no_argument,       NULL, allmodconfig},
+@@ -471,6 +473,7 @@ int main(int ac, char **av)
+ 			sync_kconfig = 1;
+ 			break;
+ 		case defconfig:
++		case savedefconfig:
+ 			defconfig_file = optarg;
+ 			break;
+ 		case randconfig:
+@@ -526,6 +529,9 @@ int main(int ac, char **av)
+ 			exit(1);
+ 		}
+ 		break;
++	case savedefconfig:
++		conf_read(NULL);
++		break;
+ 	case silentoldconfig:
+ 	case oldaskconfig:
+ 	case oldconfig:
+@@ -591,6 +597,8 @@ int main(int ac, char **av)
+ 	case defconfig:
+ 		conf_set_all_new_symbols(def_default);
+ 		break;
++	case savedefconfig:
++		break;
+ 	case oldconfig:
+ 	case oldaskconfig:
+ 		rootEntry = &rootmenu;
+@@ -622,6 +630,12 @@ int main(int ac, char **av)
+ 			fprintf(stderr, _("\n*** Error during update of the kernel configuration.\n\n"));
+ 			return 1;
+ 		}
++	} else if (input_mode == savedefconfig) {
++		if (conf_write_defconfig(defconfig_file)) {
++			fprintf(stderr, _("n*** Error while saving defconfig to: %s\n\n"),
++			        defconfig_file);
++			return 1;
++		}
+ 	} else if (input_mode != listnewconfig) {
+ 		if (conf_write(NULL)) {
+ 			fprintf(stderr, _("\n*** Error during writing of the kernel configuration.\n\n"));
+diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
+index d4fd55e..8de6f51 100644
+--- a/scripts/kconfig/confdata.c
++++ b/scripts/kconfig/confdata.c
+@@ -454,6 +454,82 @@ static void conf_write_symbol(struct symbol *sym, enum symbol_type type,
+ 	}
  }
  
 +/*
-+ * When we check for recursive dependencies we use a stack to save
-+ * current state so we can print out relevant info to user.
-+ * The entries are located on the call stack so no need to free memory.
-+ * Note inser() remove() must always match to properly clear the stack.
++ * Write out a minimal config.
++ * All values that has default values are skipped as this is redundant.
 + */
-+static struct dep_stack {
-+	struct dep_stack *prev, *next;
++int conf_write_defconfig(const char *filename)
++{
 +	struct symbol *sym;
-+	struct property *prop;
-+	struct expr *expr;
-+} *check_top;
++	struct menu *menu;
++	FILE *out;
 +
-+static void dep_stack_insert(struct dep_stack *stack, struct symbol *sym)
-+{
-+	memset(stack, 0, sizeof(*stack));
-+	if (check_top)
-+		check_top->next = stack;
-+	stack->prev = check_top;
-+	stack->sym = sym;
-+	check_top = stack;
-+}
++	out = fopen(filename, "w");
++	if (!out)
++		return 1;
 +
-+static void dep_stack_remove(void)
-+{
-+	check_top = check_top->prev;
-+	if (check_top)
-+		check_top->next = NULL;
-+}
++	sym_clear_all_valid();
 +
-+/*
-+ * Called when we have detected a recursive dependency.
-+ * check_top point to the top of the stact so we use
-+ * the ->prev pointer to locate the bottom of the stack.
-+ */
-+static void sym_check_print_recursive(struct symbol *last_sym)
-+{
-+	struct dep_stack *stack;
-+	struct symbol *sym, *next_sym;
-+	struct menu *menu = NULL;
-+	struct property *prop;
-+	struct dep_stack cv_stack;
++	/* Traverse all menus to find all relevant symbols */
++	menu = rootmenu.list;
 +
-+	if (sym_is_choice_value(last_sym)) {
-+		dep_stack_insert(&cv_stack, last_sym);
-+		last_sym = prop_get_symbol(sym_get_choice_prop(last_sym));
-+	}
++	while (menu != NULL)
++	{
++		sym = menu->sym;
++		if (sym == NULL) {
++			if (!menu_is_visible(menu))
++				goto next_menu;
++		} else if (!sym_is_choice(sym)) {
++			sym_calc_value(sym);
++			if (!(sym->flags & SYMBOL_WRITE))
++				goto next_menu;
++			sym->flags &= ~SYMBOL_WRITE;
++			/* If we cannot change the symbol - skip */
++			if (!sym_is_changable(sym))
++				goto next_menu;
++			/* If symbol equals to default value - skip */
++			if (strcmp(sym_get_string_value(sym), sym_get_string_default(sym)) == 0)
++				goto next_menu;
 +
-+	for (stack = check_top; stack != NULL; stack = stack->prev)
-+		if (stack->sym == last_sym)
-+			break;
-+	if (!stack) {
-+		fprintf(stderr, "unexpected recursive dependency error\n");
-+		return;
-+	}
++			/*
++			 * If symbol is a choice value and equals to the
++			 * default for a choice - skip.
++			 * But only if value equal to "y".
++			 */
++			if (sym_is_choice_value(sym)) {
++				struct symbol *cs;
++				struct symbol *ds;
 +
-+	for (; stack; stack = stack->next) {
-+		sym = stack->sym;
-+		next_sym = stack->next ? stack->next->sym : last_sym;
-+		prop = stack->prop;
-+
-+		/* for choice values find the menu entry (used below) */
-+		if (sym_is_choice(sym) || sym_is_choice_value(sym)) {
-+			for (prop = sym->prop; prop; prop = prop->next) {
-+				menu = prop->menu;
-+				if (prop->menu)
++				cs = prop_get_symbol(sym_get_choice_prop(sym));
++				ds = sym_choice_default(cs);
++				if (sym == ds) {
++					if ((sym->type == S_BOOLEAN ||
++					sym->type == S_TRISTATE) &&
++					sym_get_tristate_value(sym) == yes)
++						goto next_menu;
++				}
++			}
++			conf_write_symbol(sym, sym->type, out, true);
++		}
++next_menu:
++		if (menu->list != NULL) {
++			menu = menu->list;
++		}
++		else if (menu->next != NULL) {
++			menu = menu->next;
++		} else {
++			while ((menu = menu->parent)) {
++				if (menu->next != NULL) {
++					menu = menu->next;
 +					break;
++				}
 +			}
 +		}
-+		if (stack->sym == last_sym)
-+			fprintf(stderr, "%s:%d:error: recursive dependency detected!\n",
-+				prop->file->name, prop->lineno);
-+		if (stack->expr) {
-+			fprintf(stderr, "%s:%d:\tsymbol %s %s value contains %s\n",
-+				prop->file->name, prop->lineno,
-+				sym->name ? sym->name : "<choice>",
-+				prop_get_type_name(prop->type),
-+				next_sym->name ? next_sym->name : "<choice>");
-+		} else if (stack->prop) {
-+			fprintf(stderr, "%s:%d:\tsymbol %s depends on %s\n",
-+				prop->file->name, prop->lineno,
-+				sym->name ? sym->name : "<choice>",
-+				next_sym->name ? next_sym->name : "<choice>");
-+		} else if (sym_is_choice(sym)) {
-+			fprintf(stderr, "%s:%d:\tchoice %s contains symbol %s\n",
-+				menu->file->name, menu->lineno,
-+				sym->name ? sym->name : "<choice>",
-+				next_sym->name ? next_sym->name : "<choice>");
-+		} else if (sym_is_choice_value(sym)) {
-+			fprintf(stderr, "%s:%d:\tsymbol %s is part of choice %s\n",
-+				menu->file->name, menu->lineno,
-+				sym->name ? sym->name : "<choice>",
-+				next_sym->name ? next_sym->name : "<choice>");
-+		} else {
-+			fprintf(stderr, "%s:%d:\tsymbol %s is selected by %s\n",
-+				prop->file->name, prop->lineno,
-+				sym->name ? sym->name : "<choice>",
-+				next_sym->name ? next_sym->name : "<choice>");
++	}
++	fclose(out);
++	return 0;
++}
++
+ int conf_write(const char *name)
+ {
+ 	FILE *out;
+diff --git a/scripts/kconfig/lkc.h b/scripts/kconfig/lkc.h
+index 755b819..76db065 100644
+--- a/scripts/kconfig/lkc.h
++++ b/scripts/kconfig/lkc.h
+@@ -127,6 +127,7 @@ void sym_clear_all_valid(void);
+ void sym_set_all_changed(void);
+ void sym_set_changed(struct symbol *sym);
+ struct symbol *sym_choice_default(struct symbol *sym);
++const char *sym_get_string_default(struct symbol *sym);
+ struct symbol *sym_check_deps(struct symbol *sym);
+ struct property *prop_alloc(enum prop_type type, struct symbol *sym);
+ struct symbol *prop_get_symbol(struct property *prop);
+diff --git a/scripts/kconfig/lkc_proto.h b/scripts/kconfig/lkc_proto.h
+index 7cadcad..9a948c9 100644
+--- a/scripts/kconfig/lkc_proto.h
++++ b/scripts/kconfig/lkc_proto.h
+@@ -3,6 +3,7 @@
+ P(conf_parse,void,(const char *name));
+ P(conf_read,int,(const char *name));
+ P(conf_read_simple,int,(const char *name, int));
++P(conf_write_defconfig,int,(const char *name));
+ P(conf_write,int,(const char *name));
+ P(conf_write_autoconf,int,(void));
+ P(conf_get_changed,bool,(void));
+diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
+index 0a013ab..e95718f 100644
+--- a/scripts/kconfig/symbol.c
++++ b/scripts/kconfig/symbol.c
+@@ -661,6 +661,80 @@ bool sym_set_string_value(struct symbol *sym, const char *newval)
+ 	return true;
+ }
+ 
++/*
++ * Find the default value associated to a symbol.
++ * For tristate symbol handle the modules=n case
++ * in which case "m" becomes "y".
++ * If the symbol does not have any default then fallback
++ * to the fixed default values.
++ */
++const char *sym_get_string_default(struct symbol *sym)
++{
++	struct property *prop;
++	struct symbol *ds;
++	const char *str;
++	tristate val;
++
++	sym_calc_visibility(sym);
++	sym_calc_value(modules_sym);
++	val = symbol_no.curr.tri;
++	str = symbol_empty.curr.val;
++
++	/* If symbol has a default value look it up */
++	prop = sym_get_default_prop(sym);
++	if (prop != NULL) {
++		switch (sym->type) {
++		case S_BOOLEAN:
++		case S_TRISTATE:
++			/* The visibility imay limit the value from yes => mod */
++			val = EXPR_AND(expr_calc_value(prop->expr), prop->visible.tri);
++			break;
++		default:
++			/*
++			 * The following fails to handle the situation
++			 * where a default value is further limited by
++			 * the valid range.
++			 */
++			ds = prop_get_symbol(prop);
++			if (ds != NULL) {
++				sym_calc_value(ds);
++				str = (const char *)ds->curr.val;
++			}
 +		}
 +	}
 +
-+	if (check_top == &cv_stack)
-+		dep_stack_remove();
++	/* Handle select statements */
++	val = EXPR_OR(val, sym->rev_dep.tri);
++
++	/* transpose mod to yes if modules are not enabled */
++	if (val == mod)
++		if (!sym_is_choice_value(sym) && modules_sym->curr.tri == no)
++			val = yes;
++
++	/* transpose mod to yes if type is bool */
++	if (sym->type == S_BOOLEAN && val == mod)
++		val = yes;
++
++	switch (sym->type) {
++	case S_BOOLEAN:
++	case S_TRISTATE:
++		switch (val) {
++		case no: return "n";
++		case mod: return "m";
++		case yes: return "y";
++		}
++	case S_INT:
++	case S_HEX:
++		return str;
++	case S_STRING:
++		return str;
++	case S_OTHER:
++	case S_UNKNOWN:
++		break;
++	}
++	return "";
 +}
- 
- static struct symbol *sym_check_expr_deps(struct expr *e)
++
+ const char *sym_get_string_value(struct symbol *sym)
  {
-@@ -819,24 +923,33 @@ static struct symbol *sym_check_sym_deps(struct symbol *sym)
- {
- 	struct symbol *sym2;
- 	struct property *prop;
-+	struct dep_stack stack;
-+
-+	dep_stack_insert(&stack, sym);
- 
- 	sym2 = sym_check_expr_deps(sym->rev_dep.expr);
- 	if (sym2)
--		return sym2;
-+		goto out;
- 
- 	for (prop = sym->prop; prop; prop = prop->next) {
- 		if (prop->type == P_CHOICE || prop->type == P_SELECT)
- 			continue;
-+		stack.prop = prop;
- 		sym2 = sym_check_expr_deps(prop->visible.expr);
- 		if (sym2)
- 			break;
- 		if (prop->type != P_DEFAULT || sym_is_choice(sym))
- 			continue;
-+		stack.expr = prop->expr;
- 		sym2 = sym_check_expr_deps(prop->expr);
- 		if (sym2)
- 			break;
-+		stack.expr = NULL;
- 	}
- 
-+out:
-+	dep_stack_remove();
-+
- 	return sym2;
- }
- 
-@@ -845,6 +958,9 @@ static struct symbol *sym_check_choice_deps(struct symbol *choice)
- 	struct symbol *sym, *sym2;
- 	struct property *prop;
- 	struct expr *e;
-+	struct dep_stack stack;
-+
-+	dep_stack_insert(&stack, choice);
- 
- 	prop = sym_get_choice_prop(choice);
- 	expr_list_for_each_sym(prop->expr, e, sym)
-@@ -858,10 +974,8 @@ static struct symbol *sym_check_choice_deps(struct symbol *choice)
- 
- 	expr_list_for_each_sym(prop->expr, e, sym) {
- 		sym2 = sym_check_sym_deps(sym);
--		if (sym2) {
--			fprintf(stderr, " -> %s", sym->name);
-+		if (sym2)
- 			break;
--		}
- 	}
- out:
- 	expr_list_for_each_sym(prop->expr, e, sym)
-@@ -871,6 +985,8 @@ out:
- 	    prop_get_symbol(sym_get_choice_prop(sym2)) == choice)
- 		sym2 = choice;
- 
-+	dep_stack_remove();
-+
- 	return sym2;
- }
- 
-@@ -880,18 +996,20 @@ struct symbol *sym_check_deps(struct symbol *sym)
- 	struct property *prop;
- 
- 	if (sym->flags & SYMBOL_CHECK) {
--		fprintf(stderr, "%s:%d:error: found recursive dependency: %s",
--		        sym->prop->file->name, sym->prop->lineno,
--			sym->name ? sym->name : "<choice>");
-+		sym_check_print_recursive(sym);
- 		return sym;
- 	}
- 	if (sym->flags & SYMBOL_CHECKED)
- 		return NULL;
- 
- 	if (sym_is_choice_value(sym)) {
-+		struct dep_stack stack;
-+
- 		/* for choice groups start the check with main choice symbol */
-+		dep_stack_insert(&stack, sym);
- 		prop = sym_get_choice_prop(sym);
- 		sym2 = sym_check_deps(prop_get_symbol(prop));
-+		dep_stack_remove();
- 	} else if (sym_is_choice(sym)) {
- 		sym2 = sym_check_choice_deps(sym);
- 	} else {
-@@ -900,14 +1018,8 @@ struct symbol *sym_check_deps(struct symbol *sym)
- 		sym->flags &= ~SYMBOL_CHECK;
- 	}
- 
--	if (sym2) {
--		fprintf(stderr, " -> %s", sym->name ? sym->name : "<choice>");
--		if (sym2 == sym) {
--			fprintf(stderr, "\n");
--			zconfnerrs++;
--			sym2 = NULL;
--		}
--	}
-+	if (sym2 && sym2 == sym)
-+		sym2 = NULL;
- 
- 	return sym2;
- }
+ 	tristate val;
 -- 
 1.6.0.6
 
