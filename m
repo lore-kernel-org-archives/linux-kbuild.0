@@ -1,233 +1,75 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepb.post.tele.dk ([195.41.46.236]:40624 "EHLO
+Received: from pfepb.post.tele.dk ([195.41.46.236]:40608 "EHLO
 	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757112Ab0GaVfi (ORCPT
+	with ESMTP id S1757018Ab0GaVfg (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 31 Jul 2010 17:35:38 -0400
+	Sat, 31 Jul 2010 17:35:36 -0400
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: [PATCH 8/9] kconfig: code refactoring in confdata.c
-Date: Sat, 31 Jul 2010 23:35:33 +0200
-Message-Id: <1280612134-8220-8-git-send-email-sam@ravnborg.org>
+Subject: [PATCH 4/9] kconfig: save location of config symbols
+Date: Sat, 31 Jul 2010 23:35:29 +0200
+Message-Id: <1280612134-8220-4-git-send-email-sam@ravnborg.org>
 In-Reply-To: <20100731213429.GA8200@merkur.ravnborg.org>
 References: <20100731213429.GA8200@merkur.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Michal Marek <mmarek@suse.cz>, lkml <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
-Cc: Sam Ravnborg <sam@ravnborg.org>
+Cc: Sam Ravnborg <sam@ravnborg.org>, Roman Zippel <zippel@linux-m68k.org>
 
-Add a a few local functions to avoid some code duplication
-No functional changes.
+When we add a new config symbol save the file/line
+so we later can refer to their location.
+
+The information is saved as a property to a config symbol
+because we may have multiple definitions of the same symbol.
+
+This has the side-effect that a symbol always has
+at least one property.
 
 Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
+Cc: Roman Zippel <zippel@linux-m68k.org>
 ---
- scripts/kconfig/confdata.c |  137 ++++++++++++++++++++++---------------------
- 1 files changed, 70 insertions(+), 67 deletions(-)
+ scripts/kconfig/expr.h   |    1 +
+ scripts/kconfig/menu.c   |    2 ++
+ scripts/kconfig/symbol.c |    2 ++
+ 3 files changed, 5 insertions(+), 0 deletions(-)
 
-diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
-index 210a49e..d4fd55e 100644
---- a/scripts/kconfig/confdata.c
-+++ b/scripts/kconfig/confdata.c
-@@ -396,15 +396,73 @@ int conf_read(const char *name)
- 	return 0;
+diff --git a/scripts/kconfig/expr.h b/scripts/kconfig/expr.h
+index 75a31e4..6ee2e4f 100644
+--- a/scripts/kconfig/expr.h
++++ b/scripts/kconfig/expr.h
+@@ -132,6 +132,7 @@ enum prop_type {
+ 	P_SELECT,   /* select BAR */
+ 	P_RANGE,    /* range 7..100 (for a symbol) */
+ 	P_ENV,      /* value from environment variable */
++	P_SYMBOL,   /* where a symbol is defined */
+ };
+ 
+ struct property {
+diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
+index 1179989..4fb5902 100644
+--- a/scripts/kconfig/menu.c
++++ b/scripts/kconfig/menu.c
+@@ -58,6 +58,8 @@ void menu_add_entry(struct symbol *sym)
+ 	*last_entry_ptr = menu;
+ 	last_entry_ptr = &menu->next;
+ 	current_entry = menu;
++	if (sym)
++		menu_add_symbol(P_SYMBOL, sym, NULL);
  }
  
-+/* Write a S_STRING */
-+static void conf_write_string(bool headerfile, const char *name,
-+                              const char *str, FILE *out)
-+{
-+	int l;
-+	if (headerfile)
-+		fprintf(out, "#define CONFIG_%s \"", name);
-+	else
-+		fprintf(out, "CONFIG_%s=\"", name);
-+
-+	while (1) {
-+		l = strcspn(str, "\"\\");
-+		if (l) {
-+			fwrite(str, l, 1, out);
-+			str += l;
-+		}
-+		if (!*str)
-+			break;
-+		fprintf(out, "\\%c", *str++);
-+	}
-+	fputs("\"\n", out);
-+}
-+
-+static void conf_write_symbol(struct symbol *sym, enum symbol_type type,
-+                              FILE *out, bool write_no)
-+{
-+	const char *str;
-+
-+	switch (type) {
-+	case S_BOOLEAN:
-+	case S_TRISTATE:
-+		switch (sym_get_tristate_value(sym)) {
-+		case no:
-+			if (write_no)
-+				fprintf(out, "# CONFIG_%s is not set\n", sym->name);
-+			break;
-+		case mod:
-+			fprintf(out, "CONFIG_%s=m\n", sym->name);
-+			break;
-+		case yes:
-+			fprintf(out, "CONFIG_%s=y\n", sym->name);
-+			break;
-+		}
-+		break;
-+	case S_STRING:
-+		conf_write_string(false, sym->name, sym_get_string_value(sym), out);
-+		break;
-+	case S_HEX:
-+	case S_INT:
-+		str = sym_get_string_value(sym);
-+		fprintf(out, "CONFIG_%s=%s\n", sym->name, str);
-+		break;
-+	case S_OTHER:
-+	case S_UNKNOWN:
-+		break;
-+	}
-+}
-+
- int conf_write(const char *name)
- {
- 	FILE *out;
- 	struct symbol *sym;
- 	struct menu *menu;
- 	const char *basename;
--	char dirname[128], tmpname[128], newname[128];
--	int type, l;
- 	const char *str;
-+	char dirname[128], tmpname[128], newname[128];
-+	enum symbol_type type;
- 	time_t now;
- 	int use_timestamp = 1;
- 	char *env;
-@@ -484,50 +542,11 @@ int conf_write(const char *name)
- 				if (modules_sym->curr.tri == no)
- 					type = S_BOOLEAN;
- 			}
--			switch (type) {
--			case S_BOOLEAN:
--			case S_TRISTATE:
--				switch (sym_get_tristate_value(sym)) {
--				case no:
--					fprintf(out, "# CONFIG_%s is not set\n", sym->name);
--					break;
--				case mod:
--					fprintf(out, "CONFIG_%s=m\n", sym->name);
--					break;
--				case yes:
--					fprintf(out, "CONFIG_%s=y\n", sym->name);
--					break;
--				}
--				break;
--			case S_STRING:
--				str = sym_get_string_value(sym);
--				fprintf(out, "CONFIG_%s=\"", sym->name);
--				while (1) {
--					l = strcspn(str, "\"\\");
--					if (l) {
--						fwrite(str, l, 1, out);
--						str += l;
--					}
--					if (!*str)
--						break;
--					fprintf(out, "\\%c", *str++);
--				}
--				fputs("\"\n", out);
--				break;
--			case S_HEX:
--				str = sym_get_string_value(sym);
--				if (str[0] != '0' || (str[1] != 'x' && str[1] != 'X')) {
--					fprintf(out, "CONFIG_%s=%s\n", sym->name, str);
--					break;
--				}
--			case S_INT:
--				str = sym_get_string_value(sym);
--				fprintf(out, "CONFIG_%s=%s\n", sym->name, str);
--				break;
--			}
-+			/* Write config symbol to file */
-+			conf_write_symbol(sym, type, out, true);
- 		}
- 
--	next:
-+next:
- 		if (menu->list) {
- 			menu = menu->list;
- 			continue;
-@@ -679,7 +698,7 @@ int conf_write_autoconf(void)
- 	const char *name;
- 	FILE *out, *tristate, *out_h;
- 	time_t now;
--	int i, l;
-+	int i;
- 
- 	sym_clear_all_valid();
- 
-@@ -729,6 +748,11 @@ int conf_write_autoconf(void)
- 		sym_calc_value(sym);
- 		if (!(sym->flags & SYMBOL_WRITE) || !sym->name)
- 			continue;
-+
-+		/* write symbol to config file */
-+		conf_write_symbol(sym, sym->type, out, false);
-+
-+		/* update autoconf and tristate files */
- 		switch (sym->type) {
- 		case S_BOOLEAN:
- 		case S_TRISTATE:
-@@ -736,12 +760,10 @@ int conf_write_autoconf(void)
- 			case no:
- 				break;
- 			case mod:
--				fprintf(out, "CONFIG_%s=m\n", sym->name);
- 				fprintf(tristate, "CONFIG_%s=M\n", sym->name);
- 				fprintf(out_h, "#define CONFIG_%s_MODULE 1\n", sym->name);
- 				break;
- 			case yes:
--				fprintf(out, "CONFIG_%s=y\n", sym->name);
- 				if (sym->type == S_TRISTATE)
- 					fprintf(tristate, "CONFIG_%s=Y\n",
- 							sym->name);
-@@ -750,35 +772,16 @@ int conf_write_autoconf(void)
- 			}
- 			break;
- 		case S_STRING:
--			str = sym_get_string_value(sym);
--			fprintf(out, "CONFIG_%s=\"", sym->name);
--			fprintf(out_h, "#define CONFIG_%s \"", sym->name);
--			while (1) {
--				l = strcspn(str, "\"\\");
--				if (l) {
--					fwrite(str, l, 1, out);
--					fwrite(str, l, 1, out_h);
--					str += l;
--				}
--				if (!*str)
--					break;
--				fprintf(out, "\\%c", *str);
--				fprintf(out_h, "\\%c", *str);
--				str++;
--			}
--			fputs("\"\n", out);
--			fputs("\"\n", out_h);
-+			conf_write_string(true, sym->name, sym_get_string_value(sym), out_h);
- 			break;
- 		case S_HEX:
- 			str = sym_get_string_value(sym);
- 			if (str[0] != '0' || (str[1] != 'x' && str[1] != 'X')) {
--				fprintf(out, "CONFIG_%s=%s\n", sym->name, str);
- 				fprintf(out_h, "#define CONFIG_%s 0x%s\n", sym->name, str);
- 				break;
- 			}
- 		case S_INT:
- 			str = sym_get_string_value(sym);
--			fprintf(out, "CONFIG_%s=%s\n", sym->name, str);
- 			fprintf(out_h, "#define CONFIG_%s %s\n", sym->name, str);
- 			break;
- 		default:
+ void menu_end_entry(void)
+diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
+index c127fa3..9f180ab 100644
+--- a/scripts/kconfig/symbol.c
++++ b/scripts/kconfig/symbol.c
+@@ -961,6 +961,8 @@ const char *prop_get_type_name(enum prop_type type)
+ 		return "select";
+ 	case P_RANGE:
+ 		return "range";
++	case P_SYMBOL:
++		return "symbol";
+ 	case P_UNKNOWN:
+ 		break;
+ 	}
 -- 
 1.6.0.6
 
