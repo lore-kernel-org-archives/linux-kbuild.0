@@ -1,126 +1,184 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepa.post.tele.dk ([195.41.46.235]:33006 "EHLO
+Received: from pfepa.post.tele.dk ([195.41.46.235]:32988 "EHLO
 	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756856Ab0GaVby (ORCPT
+	with ESMTP id S1756836Ab0GaVbw (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 31 Jul 2010 17:31:54 -0400
+	Sat, 31 Jul 2010 17:31:52 -0400
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: [PATCH] kconfig: add alldefconfig
-Date: Sat, 31 Jul 2010 23:31:47 +0200
-Message-Id: <1280611910-8155-6-git-send-email-sam@ravnborg.org>
+Subject: [PATCH] kconfig: change nonint_oldconfig to listnewconfig
+Date: Sat, 31 Jul 2010 23:31:44 +0200
+Message-Id: <1280611910-8155-3-git-send-email-sam@ravnborg.org>
 In-Reply-To: <20100731212907.GA7554@merkur.ravnborg.org>
 References: <20100731212907.GA7554@merkur.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Michal Marek <mmarek@suse.cz>, lkml <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
-Cc: Sam Ravnborg <sam@ravnborg.org>
+Cc: Sam Ravnborg <sam@ravnborg.org>, Aristeu Rozanski <aris@redhat.com>
 
-alldefconfig create a configuration with all values set
-to their default value (form the Kconfig files).
+Rename to a name that better match the other kconfig targets.
 
-This may be useful when we try to use more sensible default
-values and may also be used in combination with
-the minimal defconfigs.
+listnewconfig shall read as:
+
+- list new options compared to current configuration
+
+New options are now written to stdout so one can redirect the output.
+
+Do not exit with an error code if there is new options.
+
+These are feature changes compared to the original
+nonint_oldconfig - but as this feature has not yet been in a
+released kernel it should not matter.
+
+It is still possible to do:
+
+make listnewconfig
+lookup new config options in Kconfig*
+edit .config
 
 Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
+Cc: Aristeu Rozanski <aris@redhat.com>
 ---
- Documentation/kbuild/kconfig.txt |    2 +-
- scripts/kconfig/Makefile         |   13 +++++++------
- scripts/kconfig/conf.c           |    7 +++++++
- 3 files changed, 15 insertions(+), 7 deletions(-)
+ scripts/kconfig/Makefile |    7 +++----
+ scripts/kconfig/conf.c   |   34 +++++++++++-----------------------
+ 2 files changed, 14 insertions(+), 27 deletions(-)
 
-diff --git a/Documentation/kbuild/kconfig.txt b/Documentation/kbuild/kconfig.txt
-index b2cb16e..cca46b1 100644
---- a/Documentation/kbuild/kconfig.txt
-+++ b/Documentation/kbuild/kconfig.txt
-@@ -65,7 +65,7 @@ also use the environment variable KCONFIG_ALLCONFIG as a flag or a
- filename that contains config symbols that the user requires to be
- set to a specific value.  If KCONFIG_ALLCONFIG is used without a
- filename, "make *config" checks for a file named
--"all{yes/mod/no/random}.config" (corresponding to the *config command
-+"all{yes/mod/no/def/random}.config" (corresponding to the *config command
- that was used) for symbol values that are to be forced.  If this file
- is not found, it checks for a file named "all.config" to contain forced
- values.
 diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
-index 2900d11..0bf1fb6 100644
+index 0e3c670..2900d11 100644
 --- a/scripts/kconfig/Makefile
 +++ b/scripts/kconfig/Makefile
-@@ -95,9 +95,9 @@ update-po-config: $(obj)/kxgettext $(obj)/gconf.glade.h
- 	$(Q)rm -f arch/um/Kconfig.arch
- 	$(Q)rm -f $(obj)/config.pot
- 
--PHONY += allnoconfig allyesconfig allmodconfig randconfig
-+PHONY += allnoconfig allyesconfig allmodconfig alldefconfig randconfig
- 
--allnoconfig allyesconfig allmodconfig randconfig: $(obj)/conf
-+allnoconfig allyesconfig allmodconfig alldefconfig randconfig: $(obj)/conf
+@@ -100,9 +100,9 @@ PHONY += allnoconfig allyesconfig allmodconfig randconfig
+ allnoconfig allyesconfig allmodconfig randconfig: $(obj)/conf
  	$< --$@ $(Kconfig)
  
- PHONY += listnewconfig oldnoconfig defconfig
-@@ -127,11 +127,12 @@ help:
- 	@echo  '  localmodconfig  - Update current config disabling modules not loaded'
- 	@echo  '  localyesconfig  - Update current config converting local mods to core'
- 	@echo  '  silentoldconfig - Same as oldconfig, but quietly, additionally update deps'
--	@echo  '  randconfig	  - New config with random answer to all options'
--	@echo  '  defconfig	  - New config with default answer to all options'
--	@echo  '  allmodconfig	  - New config selecting modules when possible'
--	@echo  '  allyesconfig	  - New config where all options are accepted with yes'
-+	@echo  '  defconfig	  - New config with default from ARCH supplied defconfig'
+-PHONY += nonint_oldconfig oldnoconfig defconfig
++PHONY += listnewconfig oldnoconfig defconfig
+ 
+-nonint_oldconfig oldnoconfig: $(obj)/conf
++listnewconfig oldnoconfig: $(obj)/conf
+ 	$< --$@ $(Kconfig)
+ 
+ defconfig: $(obj)/conf
+@@ -132,8 +132,7 @@ help:
+ 	@echo  '  allmodconfig	  - New config selecting modules when possible'
+ 	@echo  '  allyesconfig	  - New config where all options are accepted with yes'
  	@echo  '  allnoconfig	  - New config where all options are answered with no'
-+	@echo  '  allyesconfig	  - New config where all options are accepted with yes'
-+	@echo  '  allmodconfig	  - New config selecting modules when possible'
-+	@echo  '  alldefconfig    - New config with all symbols set to default'
-+	@echo  '  randconfig	  - New config with random answer to all options'
- 	@echo  '  listnewconfig   - List new options'
+-	@echo  '  nonint_oldconfig - Checks the current configuration and fails if an option is '
+-	@echo  '                    not set'
++	@echo  '  listnewconfig   - List new options'
  	@echo  '  oldnoconfig     - Same as silentoldconfig but set new symbols to n (unset)'
  
+ # lxdialog stuff
 diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
-index ff5c914..c8bd33c 100644
+index 1f86fca..ff5c914 100644
 --- a/scripts/kconfig/conf.c
 +++ b/scripts/kconfig/conf.c
-@@ -27,6 +27,7 @@ enum input_mode {
- 	allnoconfig,
- 	allyesconfig,
+@@ -17,10 +17,6 @@
+ #define LKC_DIRECT_LINK
+ #include "lkc.h"
+ 
+-/* Return codes */
+-#define EUNSETOPT	2	/* if -B and -b are used and unset config
+-				 * options were found */
+-
+ static void conf(struct menu *menu);
+ static void check_conf(struct menu *menu);
+ 
+@@ -33,7 +29,7 @@ enum input_mode {
  	allmodconfig,
-+	alldefconfig,
  	randconfig,
  	defconfig,
- 	listnewconfig,
-@@ -446,6 +447,7 @@ static struct option long_opts[] = {
- 	{"allnoconfig",     no_argument,       NULL, allnoconfig},
+-	nonint_oldconfig,
++	listnewconfig,
+ 	oldnoconfig,
+ } input_mode = oldaskconfig;
+ 
+@@ -45,7 +41,6 @@ static int sync_kconfig;
+ static int conf_cnt;
+ static char line[128];
+ static struct menu *rootEntry;
+-static int unset_variables;
+ 
+ static void print_help(struct menu *menu)
+ {
+@@ -366,7 +361,7 @@ static void conf(struct menu *menu)
+ 		switch (prop->type) {
+ 		case P_MENU:
+ 			if ((input_mode == silentoldconfig ||
+-			     input_mode == nonint_oldconfig ||
++			     input_mode == listnewconfig ||
+ 			     input_mode == oldnoconfig) &&
+ 			    rootEntry != menu) {
+ 				check_conf(menu);
+@@ -426,16 +421,9 @@ static void check_conf(struct menu *menu)
+ 	if (sym && !sym_has_value(sym)) {
+ 		if (sym_is_changable(sym) ||
+ 		    (sym_is_choice(sym) && sym_get_tristate_value(sym) == yes)) {
+-			if (input_mode == nonint_oldconfig ||
+-			    input_mode == oldnoconfig) {
+-				if (input_mode == nonint_oldconfig &&
+-				    sym->name && !sym_is_choice_value(sym)) {
+-					if (!unset_variables)
+-						fprintf(stderr, "The following"
+-						  " variables are not set:\n");
+-					fprintf(stderr, "CONFIG_%s\n",
+-							sym->name);
+-					unset_variables++;
++			if (input_mode == listnewconfig) {
++				if (sym->name && !sym_is_choice_value(sym)) {
++					printf("CONFIG_%s\n", sym->name);
+ 				}
+ 			} else {
+ 				if (!conf_cnt++)
+@@ -459,7 +447,7 @@ static struct option long_opts[] = {
  	{"allyesconfig",    no_argument,       NULL, allyesconfig},
  	{"allmodconfig",    no_argument,       NULL, allmodconfig},
-+	{"alldefconfig",    no_argument,       NULL, alldefconfig},
  	{"randconfig",      no_argument,       NULL, randconfig},
- 	{"listnewconfig",   no_argument,       NULL, listnewconfig},
+-	{"nonint_oldconfig",       no_argument, NULL, nonint_oldconfig},
++	{"listnewconfig",   no_argument,       NULL, listnewconfig},
  	{"oldnoconfig",     no_argument,       NULL, oldnoconfig},
-@@ -534,6 +536,7 @@ int main(int ac, char **av)
- 	case allnoconfig:
- 	case allyesconfig:
- 	case allmodconfig:
-+	case alldefconfig:
- 	case randconfig:
- 		name = getenv("KCONFIG_ALLCONFIG");
- 		if (name && !stat(name, &tmpstat)) {
-@@ -544,6 +547,7 @@ int main(int ac, char **av)
- 		case allnoconfig:	name = "allno.config"; break;
- 		case allyesconfig:	name = "allyes.config"; break;
- 		case allmodconfig:	name = "allmod.config"; break;
-+		case alldefconfig:	name = "alldef.config"; break;
- 		case randconfig:	name = "allrandom.config"; break;
- 		default: break;
+ 	{NULL, 0, NULL, 0}
+ };
+@@ -539,7 +527,7 @@ int main(int ac, char **av)
+ 	case silentoldconfig:
+ 	case oldaskconfig:
+ 	case oldconfig:
+-	case nonint_oldconfig:
++	case listnewconfig:
+ 	case oldnoconfig:
+ 		conf_read(NULL);
+ 		break;
+@@ -602,7 +590,7 @@ int main(int ac, char **av)
+ 		conf(&rootmenu);
+ 		input_mode = silentoldconfig;
+ 		/* fall through */
+-	case nonint_oldconfig:
++	case listnewconfig:
+ 	case oldnoconfig:
+ 	case silentoldconfig:
+ 		/* Update until a loop caused no more changes */
+@@ -610,7 +598,7 @@ int main(int ac, char **av)
+ 			conf_cnt = 0;
+ 			check_conf(&rootmenu);
+ 		} while (conf_cnt &&
+-			 (input_mode != nonint_oldconfig &&
++			 (input_mode != listnewconfig &&
+ 			  input_mode != oldnoconfig));
+ 		break;
+ 	}
+@@ -627,11 +615,11 @@ int main(int ac, char **av)
+ 			fprintf(stderr, _("\n*** Error during update of the kernel configuration.\n\n"));
+ 			return 1;
  		}
-@@ -578,6 +582,9 @@ int main(int ac, char **av)
- 	case allmodconfig:
- 		conf_set_all_new_symbols(def_mod);
- 		break;
-+	case alldefconfig:
-+		conf_set_all_new_symbols(def_default);
-+		break;
- 	case randconfig:
- 		conf_set_all_new_symbols(def_random);
- 		break;
+-	} else if (!unset_variables || input_mode != nonint_oldconfig) {
++	} else if (input_mode != listnewconfig) {
+ 		if (conf_write(NULL)) {
+ 			fprintf(stderr, _("\n*** Error during writing of the kernel configuration.\n\n"));
+ 			exit(1);
+ 		}
+ 	}
+-	return unset_variables ? EUNSETOPT : 0;
++	return 0;
+ }
 -- 
 1.6.0.6
 
