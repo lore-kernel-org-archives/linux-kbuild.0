@@ -1,52 +1,68 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepa.post.tele.dk ([195.41.46.235]:46753 "EHLO
-	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753305Ab0HAJ3A (ORCPT
+Received: from mail-fx0-f46.google.com ([209.85.161.46]:64836 "EHLO
+	mail-fx0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753963Ab0HAKVt convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 1 Aug 2010 05:29:00 -0400
-Date: Sun, 1 Aug 2010 11:28:59 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH] nconfig: add search support
-Message-ID: <20100801092859.GA12213@merkur.ravnborg.org>
-References: <AANLkTik1p0oK=-msd0a-4wA88Z-Cv29qHVNUYeEETcJD@mail.gmail.com> <1280647233-2578-1-git-send-email-nir.tzachar@gmail.com>
+	Sun, 1 Aug 2010 06:21:49 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <1280647233-2578-1-git-send-email-nir.tzachar@gmail.com>
+In-Reply-To: <20100801092859.GA12213@merkur.ravnborg.org>
+References: <AANLkTik1p0oK=-msd0a-4wA88Z-Cv29qHVNUYeEETcJD@mail.gmail.com>
+	<1280647233-2578-1-git-send-email-nir.tzachar@gmail.com>
+	<20100801092859.GA12213@merkur.ravnborg.org>
+Date: Sun, 1 Aug 2010 13:21:47 +0300
+Message-ID: <AANLkTimXahVmYCo+UJYDkK_qQxCz0HByBGV9WoJtXWkP@mail.gmail.com>
+Subject: Re: [PATCH] nconfig: add search support
+From: Nir Tzachar <nir.tzachar@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: nir.tzachar@gmail.com
+To: Sam Ravnborg <sam@ravnborg.org>
 Cc: mmarek@suse.cz, rdunlap@xenotime.net, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, trapdoor6@gmail.com, justinmattock@gmail.com
 
-On Sun, Aug 01, 2010 at 10:20:33AM +0300, nir.tzachar@gmail.com wrote:
-> From: Nir Tzachar <nir.tzachar@gmail.com>
-> 
-> Remove the old hotkeys feature, and replace by a regular string search.
-> >From nconfig help:
-> 
-> Pressing '/' triggers search mode. nconfig does regular string match, case
-> insensitive, starting at the begining of each menu line.
-> Pressing Enter highlights the next match, Backspace removes one character from
-> the match string. Pressing either '/' again or ESC exits search mode.
-> 
-> Rebind the '/' key (which allowed to search for symbols) to F8
-> 
-> Signed-off-by: Nir Tzachar <nir.tzachar@gmail.com>
+On Sun, Aug 1, 2010 at 12:28 PM, Sam Ravnborg <sam@ravnborg.org> wrote:
+> On Sun, Aug 01, 2010 at 10:20:33AM +0300, nir.tzachar@gmail.com wrote:
+>> From: Nir Tzachar <nir.tzachar@gmail.com>
+>>
+>> Remove the old hotkeys feature, and replace by a regular string search.
+>> >From nconfig help:
+>>
+>> Pressing '/' triggers search mode. nconfig does regular string match, case
+>> insensitive, starting at the begining of each menu line.
+>> Pressing Enter highlights the next match, Backspace removes one character from
+>> the match string. Pressing either '/' again or ESC exits search mode.
+>>
+>> Rebind the '/' key (which allowed to search for symbols) to F8
+>>
+>> Signed-off-by: Nir Tzachar <nir.tzachar@gmail.com>
+>
+> Got following warning when I build:
+> scripts/kconfig/nconf.c: In function ât_mext_matchâscripts/kconfig/nconf.c:512: warning: implicit declaration of function âblankâ
+>
+> The searching works great! And good to see the capitilazation gone.
 
-Got following warning when I build:
-scripts/kconfig/nconf.c: In function Ã¢t_mext_matchÃ¢scripts/kconfig/nconf.c:512: warning: implicit declaration of function Ã¢blankÃ¢
+Perhaps now we can make nconfig the default?? ;)
 
-The searching works great! And good to see the capitilazation gone.
+> But it is ackward that I have to press ESC to leave searcing.
+>
+> I can navigate up/down, but entering a menu should terminate search.
+> Also pressing enter (to select a symbol) should terminate search.
+>
+> I also tried to do first search using "/", then search for a symbol using F8.
+> Again search was not terminated when I came back.
+>
+> There is likely much more cases...
 
-But it is ackward that I have to press ESC to leave searcing.
+Sure, but we need to come up with a good description of the behavior
+we desire. As we did not discuss it, I just went ahead and implemented
+a POC.
 
-I can navigate up/down, but entering a menu should terminate search.
-Also pressing enter (to select a symbol) should terminate search.
+As to your input, the main problem with terminating a search is how to
+still allow iteration between possible matches. We can let Return
+terminate the search and use a different key (say, 'p') to navigate to
+the next match. However, I dislike this idea, but if no one can come
+up with something prettier, I'll implement it.
 
-I also tried to do first search using "/", then search for a symbol using F8.
-Again search was not terminated when I came back.
+>        Sam
 
-There is likely much more cases...
-
-	Sam
+Cheers.
