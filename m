@@ -1,72 +1,67 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from xenotime.net ([72.52.115.56]:56746 "HELO xenotime.net"
+Received: from xenotime.net ([72.52.115.56]:48775 "HELO xenotime.net"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with SMTP
-	id S1753988Ab0HBQdE (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 2 Aug 2010 12:33:04 -0400
-Received: from chimera.site ([173.50.240.230]) by xenotime.net for <linux-kbuild@vger.kernel.org>; Mon, 2 Aug 2010 09:32:58 -0700
-Date: Mon, 2 Aug 2010 09:32:57 -0700
-From: Randy Dunlap <rdunlap@xenotime.net>
-Subject: Re: [PATCH] nconfig: add search support
-Message-Id: <20100802093257.41a5debe.rdunlap@xenotime.net>
+	id S1751835Ab0HBVW3 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 2 Aug 2010 17:22:29 -0400
+Received: from www.xenotime.net ([2001:470:0:13c::4834:7338]) by xenotime.net for <linux-kbuild@vger.kernel.org>; Mon, 2 Aug 2010 14:22:19 -0700
+Message-ID: <57767.148.87.67.132.1280784139.squirrel@www.xenotime.net>
 In-Reply-To: <1280647233-2578-1-git-send-email-nir.tzachar@gmail.com>
 References: <AANLkTik1p0oK=-msd0a-4wA88Z-Cv29qHVNUYeEETcJD@mail.gmail.com>
-	<1280647233-2578-1-git-send-email-nir.tzachar@gmail.com>
-Mime-Version: 1.0
+    <1280647233-2578-1-git-send-email-nir.tzachar@gmail.com>
+Date: Mon, 2 Aug 2010 14:22:19 -0700 (PDT)
+Subject: Re: [PATCH] nconfig: add search support
+From: rdunlap@xenotime.net
+MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 7BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: nir.tzachar@gmail.com
-Cc: mmarek@suse.cz, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, sam@ravnborg.org, trapdoor6@gmail.com, justinmattock@gmail.com
+Cc: mmarek@suse.cz, rdunlap@xenotime.net, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, sam@ravnborg.org, trapdoor6@gmail.com, justinmattock@gmail.com
 
-On Sun,  1 Aug 2010 10:20:33 +0300 nir.tzachar@gmail.com wrote:
-
+On Sun, August 1, 2010 12:20 am, nir.tzachar@gmail.com wrote:
 > From: Nir Tzachar <nir.tzachar@gmail.com>
-> 
+>
+>
 > Remove the old hotkeys feature, and replace by a regular string search.
 > From nconfig help:
-> 
-> Pressing '/' triggers search mode. nconfig does regular string match, case
-> insensitive, starting at the begining of each menu line.
-
-What is a "regular string match"?
-That's not the same as a regular expression match, right?
-
-Maybe it's a "simple string match"?
-
-> Pressing Enter highlights the next match, Backspace removes one character from
+>
+>
+> Pressing '/' triggers search mode. nconfig does regular string match,
+> case insensitive, starting at the begining of each menu line. Pressing
+> Enter highlights the next match, Backspace removes one character from
 > the match string. Pressing either '/' again or ESC exits search mode.
-> 
+>
 > Rebind the '/' key (which allowed to search for symbols) to F8
-> 
+>
+>
 > Signed-off-by: Nir Tzachar <nir.tzachar@gmail.com>
 > ---
->  scripts/kconfig/nconf.c |  261 ++++++++++++++++++++++-------------------------
->  scripts/kconfig/nconf.h |    3 +-
->  2 files changed, 125 insertions(+), 139 deletions(-)
-> 
-> diff --git a/scripts/kconfig/nconf.c b/scripts/kconfig/nconf.c
-> index 762caf8..2a7cb37 100644
-> --- a/scripts/kconfig/nconf.c
-> +++ b/scripts/kconfig/nconf.c
-> @@ -41,9 +41,12 @@ static const char nconf_readme[] = N_(
->  "   pressing <Enter> of <right-arrow>. Use <Esc> or <left-arrow> to go back.\n"
->  "   Submenus are designated by \"--->\".\n"
->  "\n"
-> -"   Shortcut: Press the option's highlighted letter (hotkey).\n"
-> -"             Pressing a hotkey more than once will sequence\n"
-> -"             through all visible items which use that hotkey.\n"
-> +"   Searching: pressing '/' triggers search mode. nconfig does a\n"
-> +"              regular string match, case insensitive, starting at\n"
-> +"              the begining of each menu line.\n"
-> +"              Pressing Enter highlights the next match, Backspace\n"
-> +"              removes one character from the match string.\n"
-> +"              Pressing either '/' again or ESC exits search mode.\n"
->  "\n"
->  "   You may also use the <PAGE UP> and <PAGE DOWN> keys to scroll\n"
->  "   unseen options into view.\n"
+> scripts/kconfig/nconf.c |  261
+> ++++++++++++++++++++++-------------------------
+> scripts/kconfig/nconf.h |    3 +- 2 files changed, 125 insertions(+), 139
+> deletions(-)
 
 
----
-~Randy
-*** Remember to use Documentation/SubmitChecklist when testing your code ***
+A few other comments:
+
+These help text lines should end with a period:
+
+  Pressing SpaceBar toggles between the above options
+
+  <Esc> always leaves the current window
+
+
+The F-key help along the bottom line should be forced to fit
+into 80 columns.  F9 (exit) especially should be visible.
+
+
+This F3 should be F5:
+
+  Press <Esc>, <F3> or <left-arrow> to go back one menu,
+
+
+How about we make nconfig the default in linux-next
+so that it will be used more?
+
+
