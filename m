@@ -1,93 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-fx0-f46.google.com ([209.85.161.46]:49470 "EHLO
-	mail-fx0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756608Ab0HCNqV convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 3 Aug 2010 09:46:21 -0400
+Received: from cantor.suse.de ([195.135.220.2]:60886 "EHLO mx1.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1756696Ab0HCNsw (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 3 Aug 2010 09:48:52 -0400
+Message-ID: <4C581DEE.8080205@suse.cz>
+Date: Tue, 03 Aug 2010 15:47:26 +0200
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-In-Reply-To: <4C581CD8.1050606@gmail.com>
-References: <1280790966-417-1-git-send-email-justinmattock@gmail.com>
-	<4C57E88B.8070505@suse.cz>
-	<4C581CD8.1050606@gmail.com>
-Date: Tue, 3 Aug 2010 16:46:19 +0300
-Message-ID: <AANLkTikPt7-+ThJccOGehERTPS8qBtEtyMB9Ebr2m=PQ@mail.gmail.com>
-Subject: Re: [PATCH]scripts/kconfig/nconf.gui.c Fix warning: value computed is
-	not used
-From: Nir Tzachar <nir.tzachar@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 8BIT
+Subject: Re: [PATCH 2/4] module linker script: coalesce function and data
+ sections
+References: <1280360876-2571-1-git-send-email-vda.linux@googlemail.com> <1280360876-2571-3-git-send-email-vda.linux@googlemail.com>
+In-Reply-To: <1280360876-2571-3-git-send-email-vda.linux@googlemail.com>
+Content-Type: text/plain; charset=ISO-8859-2
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Justin P. Mattock" <justinmattock@gmail.com>
-Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, zippel@linux-m68k.org, lkml <linux-kernel@vger.kernel.org>
+To: Denys Vlasenko <vda.linux@googlemail.com>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, linux-arch@vger.kernel.org, Parisc List <linux-parisc@vger.kernel.org>, lkml <linux-kernel@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, Tim Abbott <tabbott@ksplice.com>, Tim Bird <tim.bird@am.sony.com>, James Bottomley <James.Bottomley@hansenpartnership.com>, Matt Fleming <matt@console-pimps.org>, Arnd Bergmann <arnd@arndb.de>, Anders Kaseorg <andersk@mit.edu>, Andi Kleen <andi@firstfloor.org>, Stephen Rothwell <sfr@canb.auug.org.au>
 
-2010/8/3 Justin P. Mattock <justinmattock@gmail.com>:
-> On 08/03/2010 02:59 AM, Michal Marek wrote:
->>
->> On 3.8.2010 01:16, Justin P. Mattock wrote:
->>>
->>> The below patch fixes some warning messages Im getting when doing
->>> make nconfig
->>>
->>>  make nconfig
->>>   HOSTCC  scripts/kconfig/nconf.gui.o
->>> scripts/kconfig/nconf.gui.c: In function 'print_in_middle':
->>> scripts/kconfig/nconf.gui.c:170:2: warning: value computed is not used
->>> scripts/kconfig/nconf.gui.c: In function 'btn_dialog':
->>> scripts/kconfig/nconf.gui.c:300:2: warning: value computed is not used
->>> scripts/kconfig/nconf.gui.c:304:2: warning: value computed is not used
->>> scripts/kconfig/nconf.gui.c: In function 'dialog_inputbox':
->>> scripts/kconfig/nconf.gui.c:395:2: warning: value computed is not used
->>> scripts/kconfig/nconf.gui.c:397:2: warning: value computed is not used
->>> scripts/kconfig/nconf.gui.c:399:2: warning: value computed is not used
->>> scripts/kconfig/nconf.gui.c:404:2: warning: value computed is not used
->>> scripts/kconfig/nconf.gui.c: In function 'show_scroll_win':
->>> scripts/kconfig/nconf.gui.c:534:2: warning: value computed is not used
->>> scripts/kconfig/nconf.gui.c:549:2: warning: value computed is not used
->>> scripts/kconfig/nconf.gui.c:551:2: warning: value computed is not used
->>>   HOSTLD  scripts/kconfig/nconf
->>> scripts/kconfig/nconf arch/x86/Kconfig
->>>
->>> I looked around for a way to fix these, but am not familiar with ncurses.
->>> if there's a better way let me know and/or send a seperate fix.
->>>
->>> Signed-off-by: Justin P. Mattock<justinmattock@gmail.com>
->>>
->>> ---
->>>  scripts/kconfig/nconf.gui.c |   11 -----------
->>>  1 files changed, 0 insertions(+), 11 deletions(-)
->>>
->>> diff --git a/scripts/kconfig/nconf.gui.c b/scripts/kconfig/nconf.gui.c
->>> index a9d9344..08a5a04 100644
->>> --- a/scripts/kconfig/nconf.gui.c
->>> +++ b/scripts/kconfig/nconf.gui.c
->>> @@ -167,7 +167,6 @@ void print_in_middle(WINDOW *win,
->>>        length = strlen(string);
->>>        temp = (width - length) / 2;
->>>        x = startx + (int)temp;
->>> -       wattrset(win, color);
->>
->> Huh? :) This change makes nconfig look black and white. I'm all for
->> eliminating warnings, but please do not eliminate features at the same
->> time (or submit a patch with "Subject: make nconfig black and white" and
->> do not mask it as warning fixes).
->>
->> Michal
->>
->
-> hmm.. make nconfig is black and white even without this patch, is that
-> normal?
+On 29.7.2010 01:47, Denys Vlasenko wrote:
+>  SECTIONS {
+> +
+> +	/* Coalesce sections produced by gcc -ffunction-sections */
+> +	.text   0 : AT(0) { *(.text .text.[A-Za-z0-9_$^]*) }
+> +
+> +	/* Coalesce sections produced by gcc -fdata-sections */
+> +	.rodata 0 : AT(0) { *(.rodata .rodata.[A-Za-z0-9_$^]*) }
+> +	.data   0 : AT(0) { *(.data .data.[A-Za-z0-9_$^]*) }
+> +	.bss    0 : AT(0) { *(.bss .bss.[A-Za-z0-9_$^]*) }
+> +
+>  	/DISCARD/ : { *(.discard) }
+>  }
 
-No. It should be using colors. Which terminal are you using? Also,
-make sure you do not have the wide characters version of ncurses
-installed.
+I'm now getting
 
-> as for the patch not real sure how to handle these(ncurses), but at least
-> you know now.. as for masking this with warning fixes.. ouch!! that's a
-> first... these are what gcc 4.6 are giving me not the other way around my
-> friend.
+ld:/home/mmarek/linux-2.6/scripts/module-common.lds:23: ignoring invalid
+character `^' in script
+ld:/home/mmarek/linux-2.6/scripts/module-common.lds:26: ignoring invalid
+character `^' in script
+ld:/home/mmarek/linux-2.6/scripts/module-common.lds:27: ignoring invalid
+character `^' in script
+ld:/home/mmarek/linux-2.6/scripts/module-common.lds:28: ignoring invalid
+character `^' in script
 
-These warnings are all noise, but should be solved in the last patch I
-sent Michal.
+when linking modules and a similar warning when linking vmlinux (caused
+by the next patch in series). I tried writing the carets as \^, but that
+doesn't help at all...
 
-Cheers.
+$ ld --version
+GNU ld (GNU Binutils; openSUSE Factory) 2.20.0.20100122-7
+
+Michal
