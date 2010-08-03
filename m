@@ -1,108 +1,77 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pv0-f174.google.com ([74.125.83.174]:36002 "EHLO
-	mail-pv0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751727Ab0HBXQJ (ORCPT
+Received: from mail-fx0-f46.google.com ([209.85.161.46]:42360 "EHLO
+	mail-fx0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751189Ab0HCEhq convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 2 Aug 2010 19:16:09 -0400
-From: "Justin P. Mattock" <justinmattock@gmail.com>
-Subject: [PATCH]scripts/kconfig/nconf.gui.c Fix warning: value computed is not used
-Date: Mon,  2 Aug 2010 16:16:06 -0700
-Message-Id: <1280790966-417-1-git-send-email-justinmattock@gmail.com>
+	Tue, 3 Aug 2010 00:37:46 -0400
+MIME-Version: 1.0
+In-Reply-To: <20100802093257.41a5debe.rdunlap@xenotime.net>
+References: <AANLkTik1p0oK=-msd0a-4wA88Z-Cv29qHVNUYeEETcJD@mail.gmail.com>
+	<1280647233-2578-1-git-send-email-nir.tzachar@gmail.com>
+	<20100802093257.41a5debe.rdunlap@xenotime.net>
+Date: Tue, 3 Aug 2010 07:37:44 +0300
+Message-ID: <AANLkTik4PmwBrP9DEoOUad6=-cf8tC=vMU7AmoAMBDzy@mail.gmail.com>
+Subject: Re: [PATCH] nconfig: add search support
+From: Nir Tzachar <nir.tzachar@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: zippel@linux-m68k.org, mmarek@suse.cz, linux-kernel@vger.kernel.org, "Justin P. Mattock" <justinmattock@gmail.com>
+To: Randy Dunlap <rdunlap@xenotime.net>
+Cc: mmarek@suse.cz, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, sam@ravnborg.org, trapdoor6@gmail.com, justinmattock@gmail.com
 
-The below patch fixes some warning messages Im getting when doing
-make nconfig
+On Mon, Aug 2, 2010 at 7:32 PM, Randy Dunlap <rdunlap@xenotime.net> wrote:
+> On Sun,  1 Aug 2010 10:20:33 +0300 nir.tzachar@gmail.com wrote:
+>
+>> From: Nir Tzachar <nir.tzachar@gmail.com>
+>>
+>> Remove the old hotkeys feature, and replace by a regular string search.
+>> From nconfig help:
+>>
+>> Pressing '/' triggers search mode. nconfig does regular string match, case
+>> insensitive, starting at the begining of each menu line.
+>
+> What is a "regular string match"?
+> That's not the same as a regular expression match, right?
+>
+> Maybe it's a "simple string match"?
 
- make nconfig
-  HOSTCC  scripts/kconfig/nconf.gui.o
-scripts/kconfig/nconf.gui.c: In function 'print_in_middle':
-scripts/kconfig/nconf.gui.c:170:2: warning: value computed is not used
-scripts/kconfig/nconf.gui.c: In function 'btn_dialog':
-scripts/kconfig/nconf.gui.c:300:2: warning: value computed is not used
-scripts/kconfig/nconf.gui.c:304:2: warning: value computed is not used
-scripts/kconfig/nconf.gui.c: In function 'dialog_inputbox':
-scripts/kconfig/nconf.gui.c:395:2: warning: value computed is not used
-scripts/kconfig/nconf.gui.c:397:2: warning: value computed is not used
-scripts/kconfig/nconf.gui.c:399:2: warning: value computed is not used
-scripts/kconfig/nconf.gui.c:404:2: warning: value computed is not used
-scripts/kconfig/nconf.gui.c: In function 'show_scroll_win':
-scripts/kconfig/nconf.gui.c:534:2: warning: value computed is not used
-scripts/kconfig/nconf.gui.c:549:2: warning: value computed is not used
-scripts/kconfig/nconf.gui.c:551:2: warning: value computed is not used
-  HOSTLD  scripts/kconfig/nconf
-scripts/kconfig/nconf arch/x86/Kconfig
+strcasecmp. I've considered using regex or fnmatch, but it seemed an overkill.
 
-I looked around for a way to fix these, but am not familiar with ncurses.
-if there's a better way let me know and/or send a seperate fix.
-
-Signed-off-by: Justin P. Mattock <justinmattock@gmail.com>
-
----
- scripts/kconfig/nconf.gui.c |   11 -----------
- 1 files changed, 0 insertions(+), 11 deletions(-)
-
-diff --git a/scripts/kconfig/nconf.gui.c b/scripts/kconfig/nconf.gui.c
-index a9d9344..08a5a04 100644
---- a/scripts/kconfig/nconf.gui.c
-+++ b/scripts/kconfig/nconf.gui.c
-@@ -167,7 +167,6 @@ void print_in_middle(WINDOW *win,
- 	length = strlen(string);
- 	temp = (width - length) / 2;
- 	x = startx + (int)temp;
--	wattrset(win, color);
- 	mvwprintw(win, y, x, "%s", string);
- 	refresh();
- }
-@@ -297,11 +296,9 @@ int btn_dialog(WINDOW *main_window, const char *msg, int btn_num, ...)
- 	set_menu_fore(menu, attributes[DIALOG_MENU_FORE]);
- 	set_menu_back(menu, attributes[DIALOG_MENU_BACK]);
- 
--	wattrset(win, attributes[DIALOG_BOX]);
- 	box(win, 0, 0);
- 
- 	/* print message */
--	wattrset(msg_win, attributes[DIALOG_TEXT]);
- 	fill_window(msg_win, msg);
- 
- 	set_menu_win(menu, win);
-@@ -392,16 +389,11 @@ int dialog_inputbox(WINDOW *main_window,
- 	form_win = derwin(win, 1, prompt_width, prompt_lines+3, 2);
- 	keypad(form_win, TRUE);
- 
--	wattrset(form_win, attributes[INPUT_FIELD]);
--
--	wattrset(win, attributes[INPUT_BOX]);
- 	box(win, 0, 0);
--	wattrset(win, attributes[INPUT_HEADING]);
- 	if (title)
- 		mvwprintw(win, 0, 3, "%s", title);
- 
- 	/* print message */
--	wattrset(prompt_win, attributes[INPUT_TEXT]);
- 	fill_window(prompt_win, prompt);
- 
- 	mvwprintw(form_win, 0, 0, "%*s", prompt_width, " ");
-@@ -531,7 +523,6 @@ void show_scroll_win(WINDOW *main_window,
- 
- 	/* create the pad */
- 	pad = newpad(total_lines+10, total_cols+10);
--	wattrset(pad, attributes[SCROLLWIN_TEXT]);
- 	fill_window(pad, text);
- 
- 	win_lines = min(total_lines+4, LINES-2);
-@@ -546,9 +537,7 @@ void show_scroll_win(WINDOW *main_window,
- 	win = newwin(win_lines, win_cols, y, x);
- 	keypad(win, TRUE);
- 	/* show the help in the help window, and show the help panel */
--	wattrset(win, attributes[SCROLLWIN_BOX]);
- 	box(win, 0, 0);
--	wattrset(win, attributes[SCROLLWIN_HEADING]);
- 	mvwprintw(win, 0, 3, " %s ", title);
- 	panel = new_panel(win);
- 
--- 
-1.7.1.rc1.21.gf3bd6
-
+>> Pressing Enter highlights the next match, Backspace removes one character from
+>> the match string. Pressing either '/' again or ESC exits search mode.
+>>
+>> Rebind the '/' key (which allowed to search for symbols) to F8
+>>
+>> Signed-off-by: Nir Tzachar <nir.tzachar@gmail.com>
+>> ---
+>>  scripts/kconfig/nconf.c |  261 ++++++++++++++++++++++-------------------------
+>>  scripts/kconfig/nconf.h |    3 +-
+>>  2 files changed, 125 insertions(+), 139 deletions(-)
+>>
+>> diff --git a/scripts/kconfig/nconf.c b/scripts/kconfig/nconf.c
+>> index 762caf8..2a7cb37 100644
+>> --- a/scripts/kconfig/nconf.c
+>> +++ b/scripts/kconfig/nconf.c
+>> @@ -41,9 +41,12 @@ static const char nconf_readme[] = N_(
+>>  "   pressing <Enter> of <right-arrow>. Use <Esc> or <left-arrow> to go back.\n"
+>>  "   Submenus are designated by \"--->\".\n"
+>>  "\n"
+>> -"   Shortcut: Press the option's highlighted letter (hotkey).\n"
+>> -"             Pressing a hotkey more than once will sequence\n"
+>> -"             through all visible items which use that hotkey.\n"
+>> +"   Searching: pressing '/' triggers search mode. nconfig does a\n"
+>> +"              regular string match, case insensitive, starting at\n"
+>> +"              the begining of each menu line.\n"
+>> +"              Pressing Enter highlights the next match, Backspace\n"
+>> +"              removes one character from the match string.\n"
+>> +"              Pressing either '/' again or ESC exits search mode.\n"
+>>  "\n"
+>>  "   You may also use the <PAGE UP> and <PAGE DOWN> keys to scroll\n"
+>>  "   unseen options into view.\n"
+>
+>
+> ---
+> ~Randy
+> *** Remember to use Documentation/SubmitChecklist when testing your code ***
+>
