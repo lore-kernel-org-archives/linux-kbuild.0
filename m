@@ -1,80 +1,68 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-fx0-f46.google.com ([209.85.161.46]:50442 "EHLO
-	mail-fx0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754960Ab0HCElX convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 3 Aug 2010 00:41:23 -0400
+Received: from cantor2.suse.de ([195.135.220.15]:36159 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754194Ab0HCKA6 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 3 Aug 2010 06:00:58 -0400
+Message-ID: <4C57E88B.8070505@suse.cz>
+Date: Tue, 03 Aug 2010 11:59:39 +0200
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-In-Reply-To: <57767.148.87.67.132.1280784139.squirrel@www.xenotime.net>
-References: <AANLkTik1p0oK=-msd0a-4wA88Z-Cv29qHVNUYeEETcJD@mail.gmail.com>
-	<1280647233-2578-1-git-send-email-nir.tzachar@gmail.com>
-	<57767.148.87.67.132.1280784139.squirrel@www.xenotime.net>
-Date: Tue, 3 Aug 2010 07:41:21 +0300
-Message-ID: <AANLkTimyDwWtLbc682rW-QORjU0+r+txZO-iKAini1H1@mail.gmail.com>
-Subject: Re: [PATCH] nconfig: add search support
-From: Nir Tzachar <nir.tzachar@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 8BIT
+Subject: Re: [PATCH]scripts/kconfig/nconf.gui.c Fix warning: value computed
+ is not used
+References: <1280790966-417-1-git-send-email-justinmattock@gmail.com>
+In-Reply-To: <1280790966-417-1-git-send-email-justinmattock@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-2
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: rdunlap@xenotime.net
-Cc: mmarek@suse.cz, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, sam@ravnborg.org, trapdoor6@gmail.com, justinmattock@gmail.com
+To: "Justin P. Mattock" <justinmattock@gmail.com>
+Cc: linux-kbuild@vger.kernel.org, zippel@linux-m68k.org, lkml <linux-kernel@vger.kernel.org>, Nir Tzachar <nir.tzachar@gmail.com>
 
-On Tue, Aug 3, 2010 at 12:22 AM,  <rdunlap@xenotime.net> wrote:
-> On Sun, August 1, 2010 12:20 am, nir.tzachar@gmail.com wrote:
->> From: Nir Tzachar <nir.tzachar@gmail.com>
->>
->>
->> Remove the old hotkeys feature, and replace by a regular string search.
->> From nconfig help:
->>
->>
->> Pressing '/' triggers search mode. nconfig does regular string match,
->> case insensitive, starting at the begining of each menu line. Pressing
->> Enter highlights the next match, Backspace removes one character from
->> the match string. Pressing either '/' again or ESC exits search mode.
->>
->> Rebind the '/' key (which allowed to search for symbols) to F8
->>
->>
->> Signed-off-by: Nir Tzachar <nir.tzachar@gmail.com>
->> ---
->> scripts/kconfig/nconf.c |  261
->> ++++++++++++++++++++++-------------------------
->> scripts/kconfig/nconf.h |    3 +- 2 files changed, 125 insertions(+), 139
->> deletions(-)
->
->
-> A few other comments:
->
-> These help text lines should end with a period:
->
->  Pressing SpaceBar toggles between the above options
->
->  <Esc> always leaves the current window
->
+On 3.8.2010 01:16, Justin P. Mattock wrote:
+> The below patch fixes some warning messages Im getting when doing
+> make nconfig
+> 
+>  make nconfig
+>   HOSTCC  scripts/kconfig/nconf.gui.o
+> scripts/kconfig/nconf.gui.c: In function 'print_in_middle':
+> scripts/kconfig/nconf.gui.c:170:2: warning: value computed is not used
+> scripts/kconfig/nconf.gui.c: In function 'btn_dialog':
+> scripts/kconfig/nconf.gui.c:300:2: warning: value computed is not used
+> scripts/kconfig/nconf.gui.c:304:2: warning: value computed is not used
+> scripts/kconfig/nconf.gui.c: In function 'dialog_inputbox':
+> scripts/kconfig/nconf.gui.c:395:2: warning: value computed is not used
+> scripts/kconfig/nconf.gui.c:397:2: warning: value computed is not used
+> scripts/kconfig/nconf.gui.c:399:2: warning: value computed is not used
+> scripts/kconfig/nconf.gui.c:404:2: warning: value computed is not used
+> scripts/kconfig/nconf.gui.c: In function 'show_scroll_win':
+> scripts/kconfig/nconf.gui.c:534:2: warning: value computed is not used
+> scripts/kconfig/nconf.gui.c:549:2: warning: value computed is not used
+> scripts/kconfig/nconf.gui.c:551:2: warning: value computed is not used
+>   HOSTLD  scripts/kconfig/nconf
+> scripts/kconfig/nconf arch/x86/Kconfig
+> 
+> I looked around for a way to fix these, but am not familiar with ncurses.
+> if there's a better way let me know and/or send a seperate fix.
+> 
+> Signed-off-by: Justin P. Mattock <justinmattock@gmail.com>
+> 
+> ---
+>  scripts/kconfig/nconf.gui.c |   11 -----------
+>  1 files changed, 0 insertions(+), 11 deletions(-)
+> 
+> diff --git a/scripts/kconfig/nconf.gui.c b/scripts/kconfig/nconf.gui.c
+> index a9d9344..08a5a04 100644
+> --- a/scripts/kconfig/nconf.gui.c
+> +++ b/scripts/kconfig/nconf.gui.c
+> @@ -167,7 +167,6 @@ void print_in_middle(WINDOW *win,
+>  	length = strlen(string);
+>  	temp = (width - length) / 2;
+>  	x = startx + (int)temp;
+> -	wattrset(win, color);
 
-Sure.
+Huh? :) This change makes nconfig look black and white. I'm all for
+eliminating warnings, but please do not eliminate features at the same
+time (or submit a patch with "Subject: make nconfig black and white" and
+do not mask it as warning fixes).
 
-> The F-key help along the bottom line should be forced to fit
-> into 80 columns.  F9 (exit) especially should be visible.
-
-They were, however I think that the symbol search (F-8) kind of ruind
-it. I'll shorten its name.
-
->
-> This F3 should be F5:
->
->  Press <Esc>, <F3> or <left-arrow> to go back one menu,
-
-10x.
-
->
-> How about we make nconfig the default in linux-next
-> so that it will be used more?
-
-I would love to see that. Let me finalize a patch which properly
-supports searching (based on Sam's input) so as to remove the current
-upper case ugliness.
-
-Cheers.
+Michal
