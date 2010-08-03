@@ -1,42 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:46075 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:46347 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1756010Ab0HCM33 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 3 Aug 2010 08:29:29 -0400
-Message-ID: <4C580B4E.1050906@suse.cz>
-Date: Tue, 03 Aug 2010 14:27:58 +0200
+	id S1756156Ab0HCMcK (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 3 Aug 2010 08:32:10 -0400
+Message-ID: <4C580BF9.6090706@suse.cz>
+Date: Tue, 03 Aug 2010 14:30:49 +0200
 From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Subject: Re: [PATCH v2 0/3] update of various kbuild flags to allow user	settings
-References: <20100728182523.GA29198@merkur.ravnborg.org> <4C51432D.3020600@suse.cz>
-In-Reply-To: <4C51432D.3020600@suse.cz>
+Subject: Re: [PATCH v2 0/9] kconfig: introduce saveconfig and alldefconfig
+ (+more)
+References: <20100731212907.GA7554@merkur.ravnborg.org>
+In-Reply-To: <20100731212907.GA7554@merkur.ravnborg.org>
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Sam Ravnborg <sam@ravnborg.org>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, lkml <linux-kernel@vger.kernel.org>, Denys Vlasenko <vda.linux@googlemail.com>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Chen Liqin <liqin.chen@sunplusct.com>, David Howells <dhowells@redhat.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Haavard Skinnemoen <hskinnemoen@atmel.com>, Hirokazu Takata <takata@linux-m32r.org>, Martin Schwidefsky <schwidefsky@de.ibm.com>, Mike Frysinger <vapier@gentoo.org>, Ralf Baechle <ralf@linux-mips.org>, Tony Luck <tony.luck@intel.com>
+Cc: lkml <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Uwe Kleine-K?nig <u.kleine-koenig@pengutronix.de>, Randy Dunlap <rdunlap@xenotime.net>, Roman Zippel <zippel@linux-m68k.org>, Aristeu Rozanski <aris@redhat.com>
 
-On 29.7.2010 11:00, Michal Marek wrote:
-> On 28.7.2010 20:25, Sam Ravnborg wrote:
->> Denys Vlasenko complained that he could not set
->> a moduel specific linker flags on the command line.
->>
->> It turned out that the cause of this was kbuild
->> that assigned a value to a variables that
->> may be modified by the user.
->> So any user supplied value would overwrite
->> the kbuild assigned value.
->>
->> Fix this so we use internal variables for kbuild
->> feering up the official variables for use by
->> the user.
+On 31.7.2010 23:29, Sam Ravnborg wrote:
+> This is an update of patches previous posted.
 > 
-> Acked-by: Michal Marek <mmarek@suse.cz>
+> Version 2 have addressed the following feedback:
+> - Drop the idea of introducing allrandconfig (Michal, Randy)
+> - Do more code refactoring (Michal)
+> - Use long options in conf.c (Michal)
+> - savedefconfig shall list symbols in same order as in .config (Uwe)
+>  
+> The major feature is the introduction of "make savedefconfig".
 > 
-> but I'll wait a while before applying it so that the arch maintainers
-> can object to / ack the arch-specific changes.
+> Make savedefconfig creates a minimal configuration
+> as have been discussed recently and which is already
+> done for arm and powerpc.
+> savedefconfig utilise the knowledge kconfig has to do so
+> much faster than the phyton script posted.
+> [...]
 
-Applied. I'll be sending a pull request to Linus on Wednesday.
+Applied, thanks.
 
 Michal
