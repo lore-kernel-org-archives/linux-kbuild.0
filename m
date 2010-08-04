@@ -1,90 +1,103 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor.suse.de ([195.135.220.2]:47990 "EHLO mx1.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:40661 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S932661Ab0HDMpY (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 4 Aug 2010 08:45:24 -0400
-Date: Wed, 4 Aug 2010 14:43:53 +0200
+	id S932619Ab0HDMxW (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 4 Aug 2010 08:53:22 -0400
+Date: Wed, 4 Aug 2010 14:51:56 +0200
 From: Michal Marek <mmarek@suse.cz>
-Subject: [GIT] kbuild: core changes
-Message-ID: <20100804124353.GA21328@sepie.suse.cz>
+Subject: [GIT] kbuild: kconfig changes
+Message-ID: <20100804125156.GA23464@sepie.suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: amwang@redhat.com, andi@firstfloor.org, dzickus@redhat.com, mmarek@suse.cz, sam@ravnborg.org, u.kleine-koenig@pengutronix.de, vda.linux@googlemail.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: JBeulich@novell.com, aris@redhat.com, catalin.marinas@arm.com, jacmet@sunsite.dk, justinmattock@gmail.com, lizf@cn.fujitsu.com, mmarek@suse.cz, sam@ravnborg.org, ulfalizer.lkml@gmail.com, zippel@linux-m68k.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
 Hi Linus,
 
-I decided to split the kbuild stuff into multiple branches:
-* kbuild - changes to the Makefile and scripts used during build
-* kconfig
-* packaging - changes to scripts/package/
-* misc - all other stuff, i.e. not build-critical scripts and .gitignore
+this is the kconfig part of kbuild. We have four new *config targets:
+* oldnoconfig: set all new options to 'n'
+* listnewconfig: list all unset config options
+* alldefconfig: set all options to their defaults specified in Kconfig
   files
+* savedefconfig: write a defconfig file with only the differences from
+  an alldefconfig (aka minimal defconfig)
 
-Please let me know if this is OK for you or if you would prefer a single
-pull request with the four branches merged into one next time.
+Kconfig also warns when a select statement selects a symbol with unmet
+dependencies (which typically results in a broken config). Li Zefan did
+quite some usability fixes to the visual config interfaces.
 
-Anyway, here is the kbuild branch. Nothing particulary exciting this
-time. Sam made passing of custom compiler / assembler and linker flags
-more consistent, the following external variables are now supported (one
-doesn't have to remember to add any kbuild-internal flags):
-
-make AFLAGS_KERNEL=... CFLAGS_KERNEL=... \
-     AFLAGS_MODULE=... CFLAGS_MODULE=... LDFLAGS_MODULE=...
-
+Michal
 
 The following changes since commit 9fe6206f400646a2322096b56c59891d530e8d51:
 
   Linux 2.6.35 (2010-08-01 15:11:14 -0700)
 
 are available in the git repository at:
-  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild-2.6.git kbuild
+  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild-2.6.git kconfig
 
-Amerigo Wang (1):
-      Makefile: "make kernelrelease" should show the correct full kernel version
+Aristeu Rozanski (1):
+      kconfig: introduce nonint_oldconfig and loose_nonint_oldconfig
 
-Andi Kleen (1):
-      Kbuild: Add option to set -femit-struct-debug-baseonly
+Catalin Marinas (1):
+      kbuild: Warn on selecting symbols with unmet direct dependencies
 
-Denys Vlasenko (1):
-      modpost: support objects with more than 64k sections
+Jan Beulich (1):
+      kconfig: Don't write invisible choice values
 
-Don Zickus (1):
-      Makefile.build: make KBUILD_SYMTYPES work again
+Justin P. Mattock (1):
+      scripts:conf.c Fix warning: variable 'type' set but not used
 
-Michal Marek (2):
-      Merge branch 'setlocalversion-speedup' into kbuild/kbuild
-      Merge commit 'v2.6.35' into kbuild/kbuild
+Li Zefan (11):
+      kconfig: print symbol type in help text
+      kconfig: print the range of integer/hex symbol in help text
+      kconfig: fix to tag NEW symbols correctly
+      menuconfig: improive help text a bit
+      gconfig: fix to tag NEW symbols correctly
+      gconfig: fix null pointer warning
+      xconfig: clean up
+      xconfig: remove unused function
+      xconfig: add support to show hidden options which have prompts
+      menuconfig: fix to center checklist correctly in a corner case
+      menuconfig: truncate list items
 
-Sam Ravnborg (3):
-      kbuild: allow assignment to {A,C,LD}FLAGS_MODULE on the command line
-      kbuild: allow assignment to {A,C}FLAGS_KERNEL on the command line
-      frv: clean up arch/frv/Makefile
+Michal Marek (1):
+      Merge commit 'v2.6.35' into kbuild/kconfig
 
-Uwe Kleine-König (1):
-      trivial: fix a typo in a filename
+Peter Korsgaard (1):
+      kconfig: make randconfig fair for booleans
 
- Documentation/kbuild/kbuild.txt    |   26 ++++++++-
- Documentation/kbuild/makefiles.txt |   27 ++++++++--
- Makefile                           |   29 +++++++---
- arch/avr32/Makefile                |    2 +-
- arch/blackfin/Makefile             |    4 +-
- arch/frv/Makefile                  |   22 +-------
- arch/ia64/Makefile                 |    6 +-
- arch/m32r/Makefile                 |    4 +-
- arch/m68k/Makefile                 |    2 +-
- arch/mips/Makefile                 |    6 ++-
- arch/powerpc/Makefile              |    2 +-
- arch/s390/Makefile                 |    3 +-
- arch/score/Makefile                |    3 +-
- lib/Kconfig.debug                  |   13 +++++
- scripts/Makefile.build             |   37 +++++++------
- scripts/Makefile.modpost           |    9 ++--
- scripts/mod/file2alias.c           |    6 +-
- scripts/mod/modpost.c              |  102 ++++++++++++++++++++++++++---------
- scripts/mod/modpost.h              |   43 +++++++++++++++
- 19 files changed, 246 insertions(+), 100 deletions(-)
+Roman Zippel (1):
+      kconfig: print more info when we see a recursive dependency
+
+Sam Ravnborg (8):
+      kconfig: use long options in conf
+      kconfig: rename loose_nonint_oldconfig => oldnoconfig
+      kconfig: change nonint_oldconfig to listnewconfig
+      kconfig: save location of config symbols
+      kconfig: add alldefconfig
+      kconfig: refactor code in symbol.c
+      kconfig: code refactoring in confdata.c
+      kconfig: add savedefconfig
+
+Ulf Magnusson (1):
+      kconfig: fix MODULES-related bug in case of no .config
+
+ Documentation/kbuild/kconfig.txt     |    2 +-
+ scripts/kconfig/Makefile             |   77 +++++-----
+ scripts/kconfig/conf.c               |  181 ++++++++++++---------
+ scripts/kconfig/confdata.c           |  221 ++++++++++++++++++--------
+ scripts/kconfig/expr.c               |    2 +-
+ scripts/kconfig/expr.h               |    3 +
+ scripts/kconfig/gconf.c              |    7 +-
+ scripts/kconfig/lkc.h                |    2 +
+ scripts/kconfig/lkc_proto.h          |    1 +
+ scripts/kconfig/lxdialog/checklist.c |   10 +-
+ scripts/kconfig/mconf.c              |    2 +-
+ scripts/kconfig/menu.c               |   27 +++-
+ scripts/kconfig/qconf.cc             |  106 +++++++------
+ scripts/kconfig/qconf.h              |   17 ++-
+ scripts/kconfig/symbol.c             |  292 ++++++++++++++++++++++++++++++----
+ 15 files changed, 667 insertions(+), 283 deletions(-)
