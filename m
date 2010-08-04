@@ -1,83 +1,79 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-px0-f174.google.com ([209.85.212.174]:33675 "EHLO
-	mail-px0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756408Ab0HDWDH (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 4 Aug 2010 18:03:07 -0400
-Received: by pxi14 with SMTP id 14so2226100pxi.19
-        for <linux-kbuild@vger.kernel.org>; Wed, 04 Aug 2010 15:03:06 -0700 (PDT)
-Date: Wed, 4 Aug 2010 16:03:16 -0600
-From: Jean Sacren <sakiwit@gmail.com>
-Subject: [PATCH 2/2] kconfig: Fix warning: ignoring return value of 'fgets'
-Message-ID: <20100804220316.GA10547@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Received: from xenotime.net ([72.52.115.56]:42446 "HELO xenotime.net"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with SMTP
+	id S1752288Ab0HDXpi (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 4 Aug 2010 19:45:38 -0400
+Received: from chimera.site ([173.50.240.230]) by xenotime.net for <linux-kbuild@vger.kernel.org>; Wed, 4 Aug 2010 16:45:31 -0700
+Date: Wed, 4 Aug 2010 16:45:31 -0700
+From: Randy Dunlap <rdunlap@xenotime.net>
+Subject: [Bugme-new] [Bug 16510] New: LINUX_VERSION_CODE undefined in
+ include/linux/version.h
+Message-Id: <20100804164531.6232de6d.rdunlap@xenotime.net>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: Jiri Kosina <jkosina@suse.cz>, Roman Zippel <zippel@linux-m68k.org>, linux-kbuild@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
 
-This fix facilitates fgets() either it returns on success or on error or
-when end of file occurs.
+Hi,
 
-Signed-off-by: Jean Sacren <sakiwit@gmail.com>
-Cc: stable <stable@kernel.org>
----
- scripts/kconfig/conf.c |   15 +++++++++++++--
- scripts/kconfig/lkc.h  |    3 +++
- 2 files changed, 16 insertions(+), 2 deletions(-)
+Please look at the messages in this kernel bugzilla.
 
-diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
-index 9960d1c..692d459 100644
---- a/scripts/kconfig/conf.c
-+++ b/scripts/kconfig/conf.c
-@@ -102,7 +102,7 @@ static int conf_askvalue(struct symbol *sym, const char *def)
- 		check_stdin();
- 	case ask_all:
- 		fflush(stdout);
--		fgets(line, 128, stdin);
-+		xfgets(line, 128, stdin);
- 		return 1;
- 	default:
- 		break;
-@@ -304,7 +304,7 @@ static int conf_choice(struct menu *menu)
- 			check_stdin();
- 		case ask_all:
- 			fflush(stdout);
--			fgets(line, 128, stdin);
-+			xfgets(line, 128, stdin);
- 			strip(line);
- 			if (line[0] == '?') {
- 				print_help(menu);
-@@ -615,3 +615,14 @@ int main(int ac, char **av)
- 	}
- 	return 0;
- }
-+/*
-+ * Helper function to facilitate fgets() by Jean Sacren.
-+ */
-+void xfgets(str, size, in)
-+	char *str;
-+	int size;
-+	FILE *in;
-+{
-+	if (fgets(str, size, in) == NULL)
-+		fprintf(stderr, "\nError in reading or end of file.\n");
-+}
-diff --git a/scripts/kconfig/lkc.h b/scripts/kconfig/lkc.h
-index 90fe55a..c9bd96f 100644
---- a/scripts/kconfig/lkc.h
-+++ b/scripts/kconfig/lkc.h
-@@ -72,6 +72,9 @@ void zconf_nextfile(const char *name);
- int zconf_lineno(void);
- char *zconf_curname(void);
- 
-+/* conf.c */
-+void xfgets(char *str, int size, FILE *in);
-+
- /* confdata.c */
- const char *conf_get_configname(void);
- const char *conf_get_autoconfig_name(void);
+include/linux/version.h is incompletely generated (using ksh).
+
+---------------------------------------------------------------------------------
+
+Begin forwarded message:
+
+Date: Wed, 4 Aug 2010 07:13:43 GMT
+From: bugzilla-daemon@bugzilla.kernel.org
+To: bugme-new@lists.osdl.org
+Subject: [Bugme-new] [Bug 16510] New: LINUX_VERSION_CODE undefined in include/linux/version.h
+
+
+https://bugzilla.kernel.org/show_bug.cgi?id=16510
+
+           Summary: LINUX_VERSION_CODE undefined in
+                    include/linux/version.h
+           Product: Other
+           Version: 2.5
+    Kernel Version: 2.6.35
+          Platform: All
+        OS/Version: Linux
+              Tree: Mainline
+            Status: NEW
+          Severity: high
+          Priority: P1
+         Component: Configuration
+        AssignedTo: other_configuration@kernel-bugs.osdl.org
+        ReportedBy: jd1008@gmail.com
+        Regression: No
+
+
+I had just run make oldconfig followed by make xconfig on linux-2.6.35.
+During make, I got the following compilation error:
+
+  CC      kernel/irq/autoprobe.o
+kernel/power/snapshot.c: In function ‘init_header_complete’:
+kernel/power/snapshot.c:1547: error: expected expression before ‘;’ token
+kernel/power/snapshot.c: In function ‘check_image_kernel’:
+kernel/power/snapshot.c:1553: error: expected expression before ‘)’ token
+make[2]: *** [kernel/power/snapshot.o] Error 1
+make[1]: *** [kernel/power] Error 2
+make[1]: *** Waiting for unfinished jobs....
+
+So, I looked at lines 1547  and  1553
+and the problem was that LINUX_VERSION_CODE
+was left undefined in include/linux/version.h
+
+My .config file is attached.
+
 -- 
-1.7.1
+Configure bugmail: https://bugzilla.kernel.org/userprefs.cgi?tab=email
+------- You are receiving this mail because: -------
+You are on the CC list for the bug.
+
+---
+~Randy
+*** Remember to use Documentation/SubmitChecklist when testing your code ***
