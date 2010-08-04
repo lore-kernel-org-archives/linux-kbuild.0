@@ -1,123 +1,142 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pw0-f46.google.com ([209.85.160.46]:33096 "EHLO
-	mail-pw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756404Ab0HCQVz (ORCPT
+Received: from mail-bw0-f46.google.com ([209.85.214.46]:56063 "EHLO
+	mail-bw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757621Ab0HDMQR convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 3 Aug 2010 12:21:55 -0400
-Message-ID: <4C584233.9080404@gmail.com>
-Date: Tue, 03 Aug 2010 09:22:11 -0700
-From: "Justin P. Mattock" <justinmattock@gmail.com>
+	Wed, 4 Aug 2010 08:16:17 -0400
 MIME-Version: 1.0
-Subject: Re: [PATCH]scripts/kconfig/nconf.gui.c Fix warning: value computed
- is 	not used
-References: <1280790966-417-1-git-send-email-justinmattock@gmail.com>	<4C57E88B.8070505@suse.cz>	<4C581CD8.1050606@gmail.com>	<AANLkTikPt7-+ThJccOGehERTPS8qBtEtyMB9Ebr2m=PQ@mail.gmail.com>	<4C582883.6090203@gmail.com> <AANLkTinf9AgQ-mPTmNGzbbkYOH3xbuw_E2pT80YbrUZ4@mail.gmail.com>
-In-Reply-To: <AANLkTinf9AgQ-mPTmNGzbbkYOH3xbuw_E2pT80YbrUZ4@mail.gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <AANLkTil2-YNAa-jyOYD4cNtbJQ1XQJ6-v3iJ6wxpz7br@mail.gmail.com>
+References: <AANLkTim2mi0wbJJl17OkbCJbRt-s5phR4sumn5GsJKUp@mail.gmail.com>
+	<20100621120613.86cad1a4.akpm@linux-foundation.org>
+	<4C1FC35C.8090201@suse.cz>
+	<AANLkTil2-YNAa-jyOYD4cNtbJQ1XQJ6-v3iJ6wxpz7br@mail.gmail.com>
+Date: Wed, 4 Aug 2010 14:16:15 +0200
+Message-ID: <AANLkTinC6Sqs7W--=14nmJFDcTS4HQn0=ysn7VhYDDX6@mail.gmail.com>
+Subject: Re: [PATCH] Fix CONFIG_CROSS_COMPILE issue in .config
+From: Yegor Yefremov <yegorslists@googlemail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nir Tzachar <nir.tzachar@gmail.com>
-Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, zippel@linux-m68k.org, lkml <linux-kernel@vger.kernel.org>
+To: Tiago Maluta <tiago.maluta@gmail.com>
+Cc: Michal Marek <mmarek@suse.cz>, Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org, Roland McGrath <roland@redhat.com>, linux-kbuild@vger.kernel.org
 
-On 08/03/2010 08:54 AM, Nir Tzachar wrote:
-> On Tue, Aug 3, 2010 at 5:32 PM, Justin P. Mattock
-> <justinmattock@gmail.com>  wrote:
->> On 08/03/2010 06:46 AM, Nir Tzachar wrote:
+On Wed, Jun 23, 2010 at 5:44 AM, Tiago Maluta <tiago.maluta@gmail.com> wrote:
+> On Mon, Jun 21, 2010 at 4:54 PM, Michal Marek <mmarek@suse.cz> wrote:
+>> On 21.6.2010 21:06, Andrew Morton wrote:
+>>> On Thu, 17 Jun 2010 12:50:52 +0000
+>>> Tiago Maluta <tiago.maluta@gmail.com> wrote:
 >>>
->>> 2010/8/3 Justin P. Mattock<justinmattock@gmail.com>:
+>>>> Linux has an recent option to define CROSS_COMPILE in menuconfig.
 >>>>
->>>> On 08/03/2010 02:59 AM, Michal Marek wrote:
->>>>>
->>>>> On 3.8.2010 01:16, Justin P. Mattock wrote:
->>>>>>
->>>>>> The below patch fixes some warning messages Im getting when doing
->>>>>> make nconfig
->>>>>>
->>>>>>   make nconfig
->>>>>>    HOSTCC  scripts/kconfig/nconf.gui.o
->>>>>> scripts/kconfig/nconf.gui.c: In function 'print_in_middle':
->>>>>> scripts/kconfig/nconf.gui.c:170:2: warning: value computed is not used
->>>>>> scripts/kconfig/nconf.gui.c: In function 'btn_dialog':
->>>>>> scripts/kconfig/nconf.gui.c:300:2: warning: value computed is not used
->>>>>> scripts/kconfig/nconf.gui.c:304:2: warning: value computed is not used
->>>>>> scripts/kconfig/nconf.gui.c: In function 'dialog_inputbox':
->>>>>> scripts/kconfig/nconf.gui.c:395:2: warning: value computed is not used
->>>>>> scripts/kconfig/nconf.gui.c:397:2: warning: value computed is not used
->>>>>> scripts/kconfig/nconf.gui.c:399:2: warning: value computed is not used
->>>>>> scripts/kconfig/nconf.gui.c:404:2: warning: value computed is not used
->>>>>> scripts/kconfig/nconf.gui.c: In function 'show_scroll_win':
->>>>>> scripts/kconfig/nconf.gui.c:534:2: warning: value computed is not used
->>>>>> scripts/kconfig/nconf.gui.c:549:2: warning: value computed is not used
->>>>>> scripts/kconfig/nconf.gui.c:551:2: warning: value computed is not used
->>>>>>    HOSTLD  scripts/kconfig/nconf
->>>>>> scripts/kconfig/nconf arch/x86/Kconfig
->>>>>>
->>>>>> I looked around for a way to fix these, but am not familiar with
->>>>>> ncurses.
->>>>>> if there's a better way let me know and/or send a seperate fix.
->>>>>>
->>>>>> Signed-off-by: Justin P. Mattock<justinmattock@gmail.com>
->>>>>>
->>>>>> ---
->>>>>>   scripts/kconfig/nconf.gui.c |   11 -----------
->>>>>>   1 files changed, 0 insertions(+), 11 deletions(-)
->>>>>>
->>>>>> diff --git a/scripts/kconfig/nconf.gui.c b/scripts/kconfig/nconf.gui.c
->>>>>> index a9d9344..08a5a04 100644
->>>>>> --- a/scripts/kconfig/nconf.gui.c
->>>>>> +++ b/scripts/kconfig/nconf.gui.c
->>>>>> @@ -167,7 +167,6 @@ void print_in_middle(WINDOW *win,
->>>>>>         length = strlen(string);
->>>>>>         temp = (width - length) / 2;
->>>>>>         x = startx + (int)temp;
->>>>>> -       wattrset(win, color);
->>>>>
->>>>> Huh? :) This change makes nconfig look black and white. I'm all for
->>>>> eliminating warnings, but please do not eliminate features at the same
->>>>> time (or submit a patch with "Subject: make nconfig black and white" and
->>>>> do not mask it as warning fixes).
->>>>>
->>>>> Michal
->>>>>
+>>>> Typically, one of the options when building for another target is
+>>>> ('arm' is just an example):
 >>>>
->>>> hmm.. make nconfig is black and white even without this patch, is that
->>>> normal?
+>>>> # make ARCH=arm CROSS_COMPILE=arm-cc O=../build
+>>>>
+>>>> If I omit CROSS_COMPILE and use the new way in .config:
+>>>> CONFIG_CROSS_COMPILE="arm-cc"
+>>>>
+>>>> I got:
+>>>>
+>>>>    cc1: error: unrecognized command line option "-mlittle-endian"
+>>>>    cc1: error: unrecognized command line option "-mabi=aapcs-linux"
+>>>>    cc1: error: unrecognized command line option "-mno-thumb-interwork"
+>>>>    /usr/src/linux/kernel/bounds.c:1: error: bad value (armv5t) for
+>>>> -march= switch
+>>>>    /usr/src/linux/kernel/bounds.c:1: error: bad value (armv5t) for
+>>>> -mtune= switch
+>>>>    make[2]: *** [kernel/bounds.s] Error 1
+>>>>    make[1]: *** [prepare0] Error 2
+>>>>    make: *** [sub-make] Error 2
+>>>>
+>>>> Verbose output clearly says that I'm using the host compiler instead
+>>>> cross compiler.
+>>>> This patch fixed my problem:
+>>>>
+>>>> ---
+>>>> __Makefile |______ 2 +-
+>>>> __1 files changed, 1 insertions(+), 1 deletions(-)
+>>>>
+>>>> diff --git a/Makefile b/Makefile
+>>>> index d49d96c..5a6c7d5 100644
+>>>> --- a/Makefile
+>>>> +++ b/Makefile
+>>>> @@ -190,7 +190,7 @@ SUBARCH := $(shell uname -m | sed -e s/i.86/i386/
+>>>> -e s/sun4u/sparc64/ \
+>>>> __export KBUILD_BUILDHOST := $(SUBARCH)
+>>>> __ARCH____________________ ?= $(SUBARCH)
+>>>> __CROSS_COMPILE__ ?=
+>>>> -CROSS_COMPILE__ ?= $(CONFIG_CROSS_COMPILE:"%"=%)
+>>>> +CROSS_COMPILE__ := $(shell grep CONFIG_CROSS_COMPILE .config | cut -d'"' -f2)
+>>>>
+>>>> __# Architecture as present in compile.h
+>>>> __UTS_MACHINE______ := $(ARCH)
+>>>> --
 >>>
->>> No. It should be using colors. Which terminal are you using? Also,
->>> make sure you do not have the wide characters version of ncurses
->>> installed.
+>>> Perhaps the "%"=% thing isn't supported with your version of make(1).
+>>> Which version are you using?
 >>
->> Im using xterm.. ncurses was built with --enable-widec on both machines
->> which probably explains why the whole black and white look.
+>> My guess is that something expands $(CROSS_COMPILE) before make
+>> silentoldconfig generates include/config/auto.conf (which is where the
+>> makefile reads the CONFIG_* variables from). Tiago, can you try changing
+>> the $(shell ...) line to
+>>
+>> CROSS_COMPILE := $(shell ls include/config/auto.conf >&2; \
+>>    echo "CONFIG_CROSS_COMPILE $(CONFIG_CROSS_COMPILE) >&2; \
+>>    grep CONFIG_CROSS_COMPILE .config | cut -d'"'  -f2)
+>>
+>> and tell us what it prints?
 >
-> There is a problem with ncurses compiled with wide characters support.
-> We need to make sure nconfig is linked only against the regular
-> version, and only the regular headers are used. If you are willing,
-> take a look at scripts/kconfig/lxdialog/check-lxdialog.sh and see if
-> removing all mentions of ncursesw fixes the problem.
+> I'm using GNU Make 3.81.
 >
-
-I'll have a look and see.
-
-> There might also be a problem if your include files are set up
-> incorrectly, that is, /usr/include/ncurses.h is actually from the wide
-> version and you are linking against the regular version. I think
-> someone mentioned this was a problem on debian.
+> I think you missed a quote in echo..., I using:
 >
-> Cheers.
+> CROSS_COMPILE := $(shell ls include/config/auto.conf >&2; \
+>    echo "CONFIG_CROSS_COMPILE" $(CONFIG_CROSS_COMPILE) >&2; \
+>    grep CONFIG_CROSS_COMPILE .config | cut -d'"'  -f2)
 >
+> And the output:
+> $ make ARCH=arm O=../build
 >
+> include/config/auto.conf
+> CONFIG_CROSS_COMPILE
+>  Using /usr/src/linux as source for kernel
+>  GEN     /usr/src/build/Makefile
+>  CHK     include/linux/version.h
+>  CHK     include/generated/utsrelease.h
+> make[2]: `include/generated/mach-types.h' is up to date.
+>  CALL    /usr/src/linux/scripts/checksyscalls.sh
+>  CHK     include/generated/compile.h
+>  CC      arch/arm/mm/init.o
+>
+> ^C
+>
+> Means that is nothing CONFIG_CROSS_COMPILE.
+>
+> I agree with Andrew, directly grepping .config isn't the right thing to do.
+> I'd like to discuss a better solution.
 
-ncurses is a bit funky to build i.e. my system is cblfs so I used this 
-to build:
-http://cross-lfs.org/view/clfs-sysroot/alpha/final-system/ncurses.html
+What about such a solution:
 
-from what I remember I built ncurses normally, then rebuilt with the 
-newer libs(*++w.a) or widec etc.. things get a bit confusing with the 
-symlinks in there.
-(main reason(I think)for doing this at the time is the screen for the 
-nvidia drivers gets all messd up without the widec switch turned on)
+just remove empty  CROSS_COMPILE  ?=
 
-Anyways I'll have a look and see.
+Regards,
+Yegor
 
-Justin P. Mattock
+Fix CONFIG_CROSS_COMPILE issue in .config
+
+Signed-off-by: Yegor Yefremov <yegorslists@googlemail.com>
+
+Index: b/Makefile
+===================================================================
+--- a/Makefile	2010-08-02 00:11:14.000000000 +0200
++++ b/Makefile	2010-08-04 14:08:51.000000000 +0200
+@@ -189,7 +189,6 @@
+ # Note: Some architectures assign CROSS_COMPILE in their arch/*/Makefile
+ export KBUILD_BUILDHOST := $(SUBARCH)
+ ARCH		?= $(SUBARCH)
+-CROSS_COMPILE	?=
+ CROSS_COMPILE	?= $(CONFIG_CROSS_COMPILE:"%"=%)
+
+ # Architecture as present in compile.h
