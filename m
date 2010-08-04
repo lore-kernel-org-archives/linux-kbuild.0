@@ -1,142 +1,90 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-bw0-f46.google.com ([209.85.214.46]:56063 "EHLO
-	mail-bw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757621Ab0HDMQR convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 4 Aug 2010 08:16:17 -0400
+Received: from cantor.suse.de ([195.135.220.2]:47990 "EHLO mx1.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S932661Ab0HDMpY (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 4 Aug 2010 08:45:24 -0400
+Date: Wed, 4 Aug 2010 14:43:53 +0200
+From: Michal Marek <mmarek@suse.cz>
+Subject: [GIT] kbuild: core changes
+Message-ID: <20100804124353.GA21328@sepie.suse.cz>
 MIME-Version: 1.0
-In-Reply-To: <AANLkTil2-YNAa-jyOYD4cNtbJQ1XQJ6-v3iJ6wxpz7br@mail.gmail.com>
-References: <AANLkTim2mi0wbJJl17OkbCJbRt-s5phR4sumn5GsJKUp@mail.gmail.com>
-	<20100621120613.86cad1a4.akpm@linux-foundation.org>
-	<4C1FC35C.8090201@suse.cz>
-	<AANLkTil2-YNAa-jyOYD4cNtbJQ1XQJ6-v3iJ6wxpz7br@mail.gmail.com>
-Date: Wed, 4 Aug 2010 14:16:15 +0200
-Message-ID: <AANLkTinC6Sqs7W--=14nmJFDcTS4HQn0=ysn7VhYDDX6@mail.gmail.com>
-Subject: Re: [PATCH] Fix CONFIG_CROSS_COMPILE issue in .config
-From: Yegor Yefremov <yegorslists@googlemail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Tiago Maluta <tiago.maluta@gmail.com>
-Cc: Michal Marek <mmarek@suse.cz>, Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org, Roland McGrath <roland@redhat.com>, linux-kbuild@vger.kernel.org
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: amwang@redhat.com, andi@firstfloor.org, dzickus@redhat.com, mmarek@suse.cz, sam@ravnborg.org, u.kleine-koenig@pengutronix.de, vda.linux@googlemail.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Wed, Jun 23, 2010 at 5:44 AM, Tiago Maluta <tiago.maluta@gmail.com> wrote:
-> On Mon, Jun 21, 2010 at 4:54 PM, Michal Marek <mmarek@suse.cz> wrote:
->> On 21.6.2010 21:06, Andrew Morton wrote:
->>> On Thu, 17 Jun 2010 12:50:52 +0000
->>> Tiago Maluta <tiago.maluta@gmail.com> wrote:
->>>
->>>> Linux has an recent option to define CROSS_COMPILE in menuconfig.
->>>>
->>>> Typically, one of the options when building for another target is
->>>> ('arm' is just an example):
->>>>
->>>> # make ARCH=arm CROSS_COMPILE=arm-cc O=../build
->>>>
->>>> If I omit CROSS_COMPILE and use the new way in .config:
->>>> CONFIG_CROSS_COMPILE="arm-cc"
->>>>
->>>> I got:
->>>>
->>>>    cc1: error: unrecognized command line option "-mlittle-endian"
->>>>    cc1: error: unrecognized command line option "-mabi=aapcs-linux"
->>>>    cc1: error: unrecognized command line option "-mno-thumb-interwork"
->>>>    /usr/src/linux/kernel/bounds.c:1: error: bad value (armv5t) for
->>>> -march= switch
->>>>    /usr/src/linux/kernel/bounds.c:1: error: bad value (armv5t) for
->>>> -mtune= switch
->>>>    make[2]: *** [kernel/bounds.s] Error 1
->>>>    make[1]: *** [prepare0] Error 2
->>>>    make: *** [sub-make] Error 2
->>>>
->>>> Verbose output clearly says that I'm using the host compiler instead
->>>> cross compiler.
->>>> This patch fixed my problem:
->>>>
->>>> ---
->>>> __Makefile |______ 2 +-
->>>> __1 files changed, 1 insertions(+), 1 deletions(-)
->>>>
->>>> diff --git a/Makefile b/Makefile
->>>> index d49d96c..5a6c7d5 100644
->>>> --- a/Makefile
->>>> +++ b/Makefile
->>>> @@ -190,7 +190,7 @@ SUBARCH := $(shell uname -m | sed -e s/i.86/i386/
->>>> -e s/sun4u/sparc64/ \
->>>> __export KBUILD_BUILDHOST := $(SUBARCH)
->>>> __ARCH____________________ ?= $(SUBARCH)
->>>> __CROSS_COMPILE__ ?=
->>>> -CROSS_COMPILE__ ?= $(CONFIG_CROSS_COMPILE:"%"=%)
->>>> +CROSS_COMPILE__ := $(shell grep CONFIG_CROSS_COMPILE .config | cut -d'"' -f2)
->>>>
->>>> __# Architecture as present in compile.h
->>>> __UTS_MACHINE______ := $(ARCH)
->>>> --
->>>
->>> Perhaps the "%"=% thing isn't supported with your version of make(1).
->>> Which version are you using?
->>
->> My guess is that something expands $(CROSS_COMPILE) before make
->> silentoldconfig generates include/config/auto.conf (which is where the
->> makefile reads the CONFIG_* variables from). Tiago, can you try changing
->> the $(shell ...) line to
->>
->> CROSS_COMPILE := $(shell ls include/config/auto.conf >&2; \
->>    echo "CONFIG_CROSS_COMPILE $(CONFIG_CROSS_COMPILE) >&2; \
->>    grep CONFIG_CROSS_COMPILE .config | cut -d'"'  -f2)
->>
->> and tell us what it prints?
->
-> I'm using GNU Make 3.81.
->
-> I think you missed a quote in echo..., I using:
->
-> CROSS_COMPILE := $(shell ls include/config/auto.conf >&2; \
->    echo "CONFIG_CROSS_COMPILE" $(CONFIG_CROSS_COMPILE) >&2; \
->    grep CONFIG_CROSS_COMPILE .config | cut -d'"'  -f2)
->
-> And the output:
-> $ make ARCH=arm O=../build
->
-> include/config/auto.conf
-> CONFIG_CROSS_COMPILE
->  Using /usr/src/linux as source for kernel
->  GEN     /usr/src/build/Makefile
->  CHK     include/linux/version.h
->  CHK     include/generated/utsrelease.h
-> make[2]: `include/generated/mach-types.h' is up to date.
->  CALL    /usr/src/linux/scripts/checksyscalls.sh
->  CHK     include/generated/compile.h
->  CC      arch/arm/mm/init.o
->
-> ^C
->
-> Means that is nothing CONFIG_CROSS_COMPILE.
->
-> I agree with Andrew, directly grepping .config isn't the right thing to do.
-> I'd like to discuss a better solution.
+Hi Linus,
 
-What about such a solution:
+I decided to split the kbuild stuff into multiple branches:
+* kbuild - changes to the Makefile and scripts used during build
+* kconfig
+* packaging - changes to scripts/package/
+* misc - all other stuff, i.e. not build-critical scripts and .gitignore
+  files
 
-just remove empty  CROSS_COMPILE  ?=
+Please let me know if this is OK for you or if you would prefer a single
+pull request with the four branches merged into one next time.
 
-Regards,
-Yegor
+Anyway, here is the kbuild branch. Nothing particulary exciting this
+time. Sam made passing of custom compiler / assembler and linker flags
+more consistent, the following external variables are now supported (one
+doesn't have to remember to add any kbuild-internal flags):
 
-Fix CONFIG_CROSS_COMPILE issue in .config
+make AFLAGS_KERNEL=... CFLAGS_KERNEL=... \
+     AFLAGS_MODULE=... CFLAGS_MODULE=... LDFLAGS_MODULE=...
 
-Signed-off-by: Yegor Yefremov <yegorslists@googlemail.com>
 
-Index: b/Makefile
-===================================================================
---- a/Makefile	2010-08-02 00:11:14.000000000 +0200
-+++ b/Makefile	2010-08-04 14:08:51.000000000 +0200
-@@ -189,7 +189,6 @@
- # Note: Some architectures assign CROSS_COMPILE in their arch/*/Makefile
- export KBUILD_BUILDHOST := $(SUBARCH)
- ARCH		?= $(SUBARCH)
--CROSS_COMPILE	?=
- CROSS_COMPILE	?= $(CONFIG_CROSS_COMPILE:"%"=%)
+The following changes since commit 9fe6206f400646a2322096b56c59891d530e8d51:
 
- # Architecture as present in compile.h
+  Linux 2.6.35 (2010-08-01 15:11:14 -0700)
+
+are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild-2.6.git kbuild
+
+Amerigo Wang (1):
+      Makefile: "make kernelrelease" should show the correct full kernel version
+
+Andi Kleen (1):
+      Kbuild: Add option to set -femit-struct-debug-baseonly
+
+Denys Vlasenko (1):
+      modpost: support objects with more than 64k sections
+
+Don Zickus (1):
+      Makefile.build: make KBUILD_SYMTYPES work again
+
+Michal Marek (2):
+      Merge branch 'setlocalversion-speedup' into kbuild/kbuild
+      Merge commit 'v2.6.35' into kbuild/kbuild
+
+Sam Ravnborg (3):
+      kbuild: allow assignment to {A,C,LD}FLAGS_MODULE on the command line
+      kbuild: allow assignment to {A,C}FLAGS_KERNEL on the command line
+      frv: clean up arch/frv/Makefile
+
+Uwe Kleine-K�nig (1):
+      trivial: fix a typo in a filename
+
+ Documentation/kbuild/kbuild.txt    |   26 ++++++++-
+ Documentation/kbuild/makefiles.txt |   27 ++++++++--
+ Makefile                           |   29 +++++++---
+ arch/avr32/Makefile                |    2 +-
+ arch/blackfin/Makefile             |    4 +-
+ arch/frv/Makefile                  |   22 +-------
+ arch/ia64/Makefile                 |    6 +-
+ arch/m32r/Makefile                 |    4 +-
+ arch/m68k/Makefile                 |    2 +-
+ arch/mips/Makefile                 |    6 ++-
+ arch/powerpc/Makefile              |    2 +-
+ arch/s390/Makefile                 |    3 +-
+ arch/score/Makefile                |    3 +-
+ lib/Kconfig.debug                  |   13 +++++
+ scripts/Makefile.build             |   37 +++++++------
+ scripts/Makefile.modpost           |    9 ++--
+ scripts/mod/file2alias.c           |    6 +-
+ scripts/mod/modpost.c              |  102 ++++++++++++++++++++++++++---------
+ scripts/mod/modpost.h              |   43 +++++++++++++++
+ 19 files changed, 246 insertions(+), 100 deletions(-)
