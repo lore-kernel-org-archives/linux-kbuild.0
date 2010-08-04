@@ -1,15 +1,15 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pv0-f174.google.com ([74.125.83.174]:59909 "EHLO
-	mail-pv0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751686Ab0HDWAz (ORCPT
+Received: from mail-px0-f174.google.com ([209.85.212.174]:33675 "EHLO
+	mail-px0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756408Ab0HDWDH (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 4 Aug 2010 18:00:55 -0400
-Received: by pvc7 with SMTP id 7so2227348pvc.19
-        for <linux-kbuild@vger.kernel.org>; Wed, 04 Aug 2010 15:00:54 -0700 (PDT)
-Date: Wed, 4 Aug 2010 16:01:02 -0600
+	Wed, 4 Aug 2010 18:03:07 -0400
+Received: by pxi14 with SMTP id 14so2226100pxi.19
+        for <linux-kbuild@vger.kernel.org>; Wed, 04 Aug 2010 15:03:06 -0700 (PDT)
+Date: Wed, 4 Aug 2010 16:03:16 -0600
 From: Jean Sacren <sakiwit@gmail.com>
-Subject: [PATCH 1/2] kconfig: Fix warning: ignoring return value of 'fwrite'
-Message-ID: <20100804220102.GA10534@mail.gmail.com>
+Subject: [PATCH 2/2] kconfig: Fix warning: ignoring return value of 'fgets'
+Message-ID: <20100804220316.GA10547@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
@@ -18,71 +18,66 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: Michal Marek <mmarek@suse.cz>
 Cc: Jiri Kosina <jkosina@suse.cz>, Roman Zippel <zippel@linux-m68k.org>, linux-kbuild@vger.kernel.org
 
-This fix facilitates fwrite() in both confdata.c and expr.c, either it
-succeeds in writing, or an error occurs, or the end of file is reached.
+This fix facilitates fgets() either it returns on success or on error or
+when end of file occurs.
 
 Signed-off-by: Jean Sacren <sakiwit@gmail.com>
 Cc: stable <stable@kernel.org>
 ---
- scripts/kconfig/confdata.c |    6 +++---
- scripts/kconfig/expr.c     |    2 +-
- scripts/kconfig/lkc.h      |    7 +++++++
- 3 files changed, 11 insertions(+), 4 deletions(-)
+ scripts/kconfig/conf.c |   15 +++++++++++++--
+ scripts/kconfig/lkc.h  |    3 +++
+ 2 files changed, 16 insertions(+), 2 deletions(-)
 
-diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
-index c4dec80..0fe158c 100644
---- a/scripts/kconfig/confdata.c
-+++ b/scripts/kconfig/confdata.c
-@@ -505,7 +505,7 @@ int conf_write(const char *name)
- 				while (1) {
- 					l = strcspn(str, "\"\\");
- 					if (l) {
--						fwrite(str, l, 1, out);
-+						xfwrite(str, l, 1, out);
- 						str += l;
- 					}
- 					if (!*str)
-@@ -756,8 +756,8 @@ int conf_write_autoconf(void)
- 			while (1) {
- 				l = strcspn(str, "\"\\");
- 				if (l) {
--					fwrite(str, l, 1, out);
--					fwrite(str, l, 1, out_h);
-+					xfwrite(str, l, 1, out);
-+					xfwrite(str, l, 1, out_h);
- 					str += l;
- 				}
- 				if (!*str)
-diff --git a/scripts/kconfig/expr.c b/scripts/kconfig/expr.c
-index d83f232..b5c47e1 100644
---- a/scripts/kconfig/expr.c
-+++ b/scripts/kconfig/expr.c
-@@ -1087,7 +1087,7 @@ void expr_print(struct expr *e, void (*fn)(void *, struct symbol *, const char *
- 
- static void expr_print_file_helper(void *data, struct symbol *sym, const char *str)
- {
--	fwrite(str, strlen(str), 1, data);
-+	xfwrite(str, strlen(str), 1, data);
+diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
+index 9960d1c..692d459 100644
+--- a/scripts/kconfig/conf.c
++++ b/scripts/kconfig/conf.c
+@@ -102,7 +102,7 @@ static int conf_askvalue(struct symbol *sym, const char *def)
+ 		check_stdin();
+ 	case ask_all:
+ 		fflush(stdout);
+-		fgets(line, 128, stdin);
++		xfgets(line, 128, stdin);
+ 		return 1;
+ 	default:
+ 		break;
+@@ -304,7 +304,7 @@ static int conf_choice(struct menu *menu)
+ 			check_stdin();
+ 		case ask_all:
+ 			fflush(stdout);
+-			fgets(line, 128, stdin);
++			xfgets(line, 128, stdin);
+ 			strip(line);
+ 			if (line[0] == '?') {
+ 				print_help(menu);
+@@ -615,3 +615,14 @@ int main(int ac, char **av)
+ 	}
+ 	return 0;
  }
- 
- void expr_fprint(struct expr *e, FILE *out)
++/*
++ * Helper function to facilitate fgets() by Jean Sacren.
++ */
++void xfgets(str, size, in)
++	char *str;
++	int size;
++	FILE *in;
++{
++	if (fgets(str, size, in) == NULL)
++		fprintf(stderr, "\nError in reading or end of file.\n");
++}
 diff --git a/scripts/kconfig/lkc.h b/scripts/kconfig/lkc.h
-index ce6549c..90fe55a 100644
+index 90fe55a..c9bd96f 100644
 --- a/scripts/kconfig/lkc.h
 +++ b/scripts/kconfig/lkc.h
-@@ -80,6 +80,13 @@ void sym_set_change_count(int count);
- void sym_add_change_count(int count);
- void conf_set_all_new_symbols(enum conf_def_mode mode);
+@@ -72,6 +72,9 @@ void zconf_nextfile(const char *name);
+ int zconf_lineno(void);
+ char *zconf_curname(void);
  
-+/* confdata.c and expr.c */
-+static inline void xfwrite(const void *str, size_t len, size_t count, FILE *out)
-+{
-+	if (fwrite(str, len, count, out) < count)
-+		fprintf(stderr, "\nError in writing or end of file.\n");
-+}
++/* conf.c */
++void xfgets(char *str, int size, FILE *in);
 +
- /* kconfig_load.c */
- void kconfig_load(void);
- 
+ /* confdata.c */
+ const char *conf_get_configname(void);
+ const char *conf_get_autoconfig_name(void);
 -- 
 1.7.1
