@@ -1,78 +1,71 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from xenotime.net ([72.52.115.56]:42446 "HELO xenotime.net"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with SMTP
-	id S1752288Ab0HDXpi (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 4 Aug 2010 19:45:38 -0400
-Received: from chimera.site ([173.50.240.230]) by xenotime.net for <linux-kbuild@vger.kernel.org>; Wed, 4 Aug 2010 16:45:31 -0700
-Date: Wed, 4 Aug 2010 16:45:31 -0700
-From: Randy Dunlap <rdunlap@xenotime.net>
-Subject: [Bugme-new] [Bug 16510] New: LINUX_VERSION_CODE undefined in
- include/linux/version.h
-Message-Id: <20100804164531.6232de6d.rdunlap@xenotime.net>
+Received: from rcsinet10.oracle.com ([148.87.113.121]:31939 "EHLO
+	rcsinet10.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750881Ab0HEREY (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 5 Aug 2010 13:04:24 -0400
+Date: Thu, 5 Aug 2010 10:04:08 -0700
+From: Randy Dunlap <randy.dunlap@oracle.com>
+Subject: Re: [PATCH] nconfig: add search support
+Message-Id: <20100805100408.5b724047.randy.dunlap@oracle.com>
+In-Reply-To: <1280838492-9942-1-git-send-email-nir.tzachar@gmail.com>
+References: <AANLkTimyDwWtLbc682rW-QORjU0+r+txZO-iKAini1H1@mail.gmail.com>
+	<1280838492-9942-1-git-send-email-nir.tzachar@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
+To: nir.tzachar@gmail.com
+Cc: mmarek@suse.cz, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, sam@ravnborg.org, randy.dunlap@oracle.com
 
-Hi,
+On Tue,  3 Aug 2010 15:28:12 +0300 nir.tzachar@gmail.com wrote:
 
-Please look at the messages in this kernel bugzilla.
+> From: Nir Tzachar <nir.tzachar@gmail.com>
+> 
+> Remove the old hotkeys feature, and replace by a regular string search.
+> Behaviour of search is as advised by Sam.
+> 
+> From nconfig help:
+> 
+> Searching: pressing '/' triggers search mode. nconfig performs a
+>            regular string compare, case insensitive, starting at
 
-include/linux/version.h is incompletely generated (using ksh).
+I would say: simple string compare
+"regular" has no meaning (at least for me) there.
 
----------------------------------------------------------------------------------
+>            the beginning of each menu line.\n"
+>            Pressing the up/down keys highlights the previous/next
+>            matching item. Backspace removes one character from the
+>            match string. Pressing either '/' again or ESC exits\
+>            search mode. All other keys behave normally.
+> 
+> Miscellaneous other changes (including Rundy's Justin's input).
 
-Begin forwarded message:
+Yes, the bottom menu and the typos are fixed.  Thanks.
 
-Date: Wed, 4 Aug 2010 07:13:43 GMT
-From: bugzilla-daemon@bugzilla.kernel.org
-To: bugme-new@lists.osdl.org
-Subject: [Bugme-new] [Bug 16510] New: LINUX_VERSION_CODE undefined in include/linux/version.h
+However, I'm not finding this terribly useful, mostly due to it starting
+comparison at the beginning of each menu line.
 
+E.g., I'd like to be able to find "emulations" in the top-level menu here:
+	Executable file formats / Emulations  --->
 
-https://bugzilla.kernel.org/show_bug.cgi?id=16510
-
-           Summary: LINUX_VERSION_CODE undefined in
-                    include/linux/version.h
-           Product: Other
-           Version: 2.5
-    Kernel Version: 2.6.35
-          Platform: All
-        OS/Version: Linux
-              Tree: Mainline
-            Status: NEW
-          Severity: high
-          Priority: P1
-         Component: Configuration
-        AssignedTo: other_configuration@kernel-bugs.osdl.org
-        ReportedBy: jd1008@gmail.com
-        Regression: No
+or I'd like to be able to find "crc" menu items in any sub-menu.
+Maybe I should just stick to config symbol searches.  I don't think it's all
+that likely that people will know how each menu line text begins.
 
 
-I had just run make oldconfig followed by make xconfig on linux-2.6.35.
-During make, I got the following compilation error:
+As for the search UI, I'd rather that it be presented like the symbol search,
+in a box, instead of just a single line at the top of the screen.
 
-  CC      kernel/irq/autoprobe.o
-kernel/power/snapshot.c: In function ‘init_header_complete’:
-kernel/power/snapshot.c:1547: error: expected expression before ‘;’ token
-kernel/power/snapshot.c: In function ‘check_image_kernel’:
-kernel/power/snapshot.c:1553: error: expected expression before ‘)’ token
-make[2]: *** [kernel/power/snapshot.o] Error 1
-make[1]: *** [kernel/power] Error 2
-make[1]: *** Waiting for unfinished jobs....
 
-So, I looked at lines 1547  and  1553
-and the problem was that LINUX_VERSION_CODE
-was left undefined in include/linux/version.h
+> Signed-off-by: Nir Tzachar <nir.tzachar@gmail.com>
+> ---
+>  scripts/kconfig/nconf.c     |  350 +++++++++++++++++++++++++------------------
+>  scripts/kconfig/nconf.gui.c |   20 ++--
+>  scripts/kconfig/nconf.h     |    3 +-
+>  3 files changed, 213 insertions(+), 160 deletions(-)
 
-My .config file is attached.
-
--- 
-Configure bugmail: https://bugzilla.kernel.org/userprefs.cgi?tab=email
-------- You are receiving this mail because: -------
-You are on the CC list for the bug.
 
 ---
 ~Randy
