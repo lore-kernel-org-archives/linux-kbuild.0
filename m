@@ -1,55 +1,64 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepa.post.tele.dk ([195.41.46.235]:54638 "EHLO
+Received: from pfepa.post.tele.dk ([195.41.46.235]:55852 "EHLO
 	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756868Ab0HFNq0 (ORCPT
+	with ESMTP id S1761382Ab0HFNya (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 6 Aug 2010 09:46:26 -0400
-Date: Fri, 6 Aug 2010 15:46:24 +0200
+	Fri, 6 Aug 2010 09:54:30 -0400
+Date: Fri, 6 Aug 2010 15:54:29 +0200
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: make-3.82 and built in firmware
-Message-ID: <20100806134624.GA25864@merkur.ravnborg.org>
-References: <4C5C03D5.1040108@gmail.com>
+Subject: Re: [PATCH] nconfig: add search support
+Message-ID: <20100806135429.GB25864@merkur.ravnborg.org>
+References: <AANLkTimyDwWtLbc682rW-QORjU0+r+txZO-iKAini1H1@mail.gmail.com> <1280838492-9942-1-git-send-email-nir.tzachar@gmail.com> <20100805100408.5b724047.randy.dunlap@oracle.com> <AANLkTi=9hBYy4k=tJBo38O98z_O646ZpStqNdEYWP3MO@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <4C5C03D5.1040108@gmail.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <AANLkTi=9hBYy4k=tJBo38O98z_O646ZpStqNdEYWP3MO@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andrew Benton <b3nton@gmail.com>, linux-kbuild <linux-kbuild@vger.kernel.org>
-Cc: linux-kernel@vger.kernel.org
+To: Nir Tzachar <nir.tzachar@gmail.com>
+Cc: Randy Dunlap <randy.dunlap@oracle.com>, mmarek@suse.cz, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Fri, Aug 06, 2010 at 01:45:09PM +0100, Andrew Benton wrote:
-> Hello World
-> I recently upgraded to the latest version of make, 3.82. One of the 
-> problems I've had with it is that I can no longer recompile my kernel 
-> with built in firmware enabled. If I have 
-> CONFIG_FIRMWARE_IN_KERNEL=y
-> then the build fails like so:
+> >>
+> >> Searching: pressing '/' triggers search mode. nconfig performs a
+> >>            regular string compare, case insensitive, starting at
+> >
+> > I would say: simple string compare
+> > "regular" has no meaning (at least for me) there.
+
+pressing '/' triggers interactive search mode. nconfig search for the
+string in the menu prompts (no regex support).
+
+[Just a suggestion for a bt different wording]
+
+> > Maybe I should just stick to config symbol searches.  I don't think it's all
+> > that likely that people will know how each menu line text begins.
+> >
+> >
 > 
->   IKCFG   kernel/config_data.h
->   CC      kernel/configs.o
->   LD      kernel/built-in.o
-> make[2]: *** No rule to make target `/tmp/linux-build-dir/firmware/radeon/', needed by `firmware/radeon/R100_cp.bin.gen.S'.  Stop.
-> make[1]: *** [firmware] Error 2
-> make: *** [sub-make] Error 2
-> andy:~/save/src/linux-2.6$ 
+> We can replace strcasecmp with strcasestr. I agree it would be more useful.
 
-Thanks for the report.
-I saw a similar report whare make 3.82 was accused - maybe this was also from you.
+This is better.
 
-Can you positively confirm that this is a make 3.82 issue - or do you just expect so?
+> 
+> > As for the search UI, I'd rather that it be presented like the symbol search,
+> > in a box, instead of just a single line at the top of the screen.
+> 
+> But then it is not interactive. I was aiming for something similar to
+> vim's search, where the search is matched as you type and the only
+> free terminal real-estate to display the match string was at the top
+> of the screen. I think such a minimal design is better than a
+> cumbersome text box which displays the search results afterwards (as
+> is symbol search), as the search is only intended for the currently
+> displayed menu and the user would usually just want to save the extra
+> typing of navigating to a specific menu item.
 
-To narrow down this a bit further can I ask you
-to send the output of "make -j1 V=1" - especially
-the lines before you see the bug.
+It was introduced to replace the "hotkey" support, and as such is useful.
+If we want to search for content of all prompts then we should extend
+the symbols search to do so.
+Maybe we should just let it search for both symbols _and_ propmts.
 
-[-j1 is to force you to avoid parallel makes
- as this may clutter up the output]
-
-Please also post a copy of your configuration
-as this allows us to better reproduce what you see.
-
-> Please CC, I'm not subscribed
-No problem - we always do so at lkml.
+If one search for HOTPLUG_CPU there is no hits in any propmts anyway.
+And if one search for "Pentium" there is no config symbol hits.
 
 	Sam
