@@ -1,84 +1,89 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pz0-f46.google.com ([209.85.210.46]:56948 "EHLO
-	mail-pz0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750969Ab0HFTvv (ORCPT
+Received: from mail-iw0-f174.google.com ([209.85.214.174]:41336 "EHLO
+	mail-iw0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751953Ab0HFXTU convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 6 Aug 2010 15:51:51 -0400
-Message-ID: <4C5C67F0.8070408@gmail.com>
-Date: Fri, 06 Aug 2010 12:52:16 -0700
-From: "Justin P. Mattock" <justinmattock@gmail.com>
+	Fri, 6 Aug 2010 19:19:20 -0400
 MIME-Version: 1.0
-Subject: Re: [PATCH] kconfig: fix make oldconfig
-References: <20100804125156.GA23464@sepie.suse.cz> <AANLkTi=hYsksUJUsrETjFouLDiKhwQHgD2oQ7XLyrOC-@mail.gmail.com> 	<4C5B64EA.2000804@gmail.com> <AANLkTikpsvpHuB-mWVfmqTRRMvbvhJz2LmoYBgtn4NQE@mail.gmail.com> 	<20100806051354.GA24343@merkur.ravnborg.org> <4C5BE229.1090801@suse.cz> 	<AANLkTimWHnxbYzkJ1KhuS3DgTuSRz-gMnzEJvbsY835g@mail.gmail.com> 	<20100806175217.GA8944@merkur.ravnborg.org> <AANLkTimkngSrDFUcHOySkf22yY3Qr3p+m2qnwDzre+zk@mail.gmail.com>
-In-Reply-To: <AANLkTimkngSrDFUcHOySkf22yY3Qr3p+m2qnwDzre+zk@mail.gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20100804125156.GA23464@sepie.suse.cz>
+References: <20100804125156.GA23464@sepie.suse.cz>
+Date: Fri, 6 Aug 2010 16:19:19 -0700
+Message-ID: <AANLkTinN4npO7qfSa-42B-Cq5mKZX+--H0=1SuSrWTEP@mail.gmail.com>
+Subject: Re: [GIT] kbuild: kconfig changes
+From: =?ISO-8859-1?Q?Arve_Hj=F8nnev=E5g?= <arve@android.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Sam Ravnborg <sam@ravnborg.org>, Michal Marek <mmarek@suse.cz>, JBeulich@novell.com, aris@redhat.com, catalin.marinas@arm.com, jacmet@sunsite.dk, lizf@cn.fujitsu.com, ulfalizer.lkml@gmail.com, zippel@linux-m68k.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, JBeulich@novell.com, aris@redhat.com, catalin.marinas@arm.com, jacmet@sunsite.dk, justinmattock@gmail.com, lizf@cn.fujitsu.com, sam@ravnborg.org, ulfalizer.lkml@gmail.com, zippel@linux-m68k.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On 08/06/2010 11:09 AM, Linus Torvalds wrote:
-> On Fri, Aug 6, 2010 at 10:52 AM, Sam Ravnborg<sam@ravnborg.org>  wrote:
->>
->> Hmm, I wonder why you call oldconfig explicitly?
->>
->> A plain "make -j16" executes "silentoldconfig" if there
->> is any changes in a Kconfig* file or in .config.
->> Just double checked and it works as I expected.
->>
->> So you are asked if there is any new options anyway even
->> if you skip your "oldconfig" step.
+On Wed, Aug 4, 2010 at 5:51 AM, Michal Marek <mmarek@suse.cz> wrote:
+> Hi Linus,
 >
-> Try this:
+> this is the kconfig part of kbuild. We have four new *config targets:
+> * oldnoconfig: set all new options to 'n'
+> * listnewconfig: list all unset config options
+> * alldefconfig: set all options to their defaults specified in Kconfig
+>  files
+> * savedefconfig: write a defconfig file with only the differences from
+>  an alldefconfig (aka minimal defconfig)
 >
->     git clean -dqfx
->     make -j16>  ../makes
+> Kconfig also warns when a select statement selects a symbol with unmet
+> dependencies (which typically results in a broken config). Li Zefan did
+> quite some usability fixes to the visual config interfaces.
 >
-> It doesn't work, because "make silentconfig" will say
+> Michal
 >
->    ***
->    *** You have not yet configured your kernel!
->    *** (missing kernel config file ".config")
->    ***
->    *** Please run some configurator (e.g. "make oldconfig" or
->    *** "make menuconfig" or "make xconfig").
->    ***
+> The following changes since commit 9fe6206f400646a2322096b56c59891d530e8d51:
 >
-> which is why I always run "make oldconfig".
+>  Linux 2.6.35 (2010-08-01 15:11:14 -0700)
 >
-> Sure, I could do it only when I need to, but quite frankly, it's much
-> easier to just always do the thing that works, rather than try
-> something that doesn't work, do something else, and then re-try the
-> thing that can fail.
+> are available in the git repository at:
+>  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild-2.6.git kconfig
 >
->                       Linus
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kernel" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> Please read the FAQ at  http://www.tux.org/lkml/
+> Aristeu Rozanski (1):
+>      kconfig: introduce nonint_oldconfig and loose_nonint_oldconfig
 >
+> Catalin Marinas (1):
+>      kbuild: Warn on selecting symbols with unmet direct dependencies
+>
+> Jan Beulich (1):
+>      kconfig: Don't write invisible choice values
+
+This change prevents some the minimal defconfig options from working.
+Specifically our usb gadget drivers do not get set. Reverting this
+part of the changes fixes my problem, but I don't know what other side
+effects it may have:
+
+diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
+index e95718f..1797226 100644
+--- a/scripts/kconfig/symbol.c
++++ b/scripts/kconfig/symbol.c
+@@ -261,18 +261,14 @@ struct symbol *sym_choice_default(struct symbol *sym)
+ static struct symbol *sym_calc_choice(struct symbol *sym)
+ {
+        struct symbol *def_sym;
+-       struct property *prop;
+-       struct expr *e;
+-
+-       /* first calculate all choice values' visibilities */
+-       prop = sym_get_choice_prop(sym);
+-       expr_list_for_each_sym(prop->expr, e, def_sym)
+-               sym_calc_visibility(def_sym);
+
+        /* is the user choice visible? */
+        def_sym = sym->def[S_DEF_USER].val;
+-       if (def_sym && def_sym->visible != no)
+-               return def_sym;
++       if (def_sym) {
++               sym_calc_visibility(def_sym);
++               if (def_sym->visible != no)
++                       return def_sym;
++       }
+
+        def_sym = sym_choice_default(sym);
 
 
-the above command does break over here. using the make oldconfig command 
-seems to be working after I did the make menuconfig.
-
-Now before doing all of this I did make a copy of the entire kernel for 
-a new system Im building(clfs) so I went into that tree and did a make 
-oldconfig and(luckily) hit the non responsive oldconfig thing that Linus 
-had originally posted.
-
-here is a strace of when make oldconfig was not working(with git log at 
-the top)
-
-http://fpaste.org/317B/
-
-and strace of a git pull today and make oldconfig does not crap out and 
-starts asking me y/n options:
-
-http://fpaste.org/QWWn/
-
-hope this helps with debugging and such.
-
-Justin P. Mattock
+-- 
+Arve Hjønnevåg
