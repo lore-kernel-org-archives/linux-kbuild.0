@@ -1,83 +1,84 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-fx0-f46.google.com ([209.85.161.46]:53530 "EHLO
-	mail-fx0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751141Ab0HFTWM convert rfc822-to-8bit (ORCPT
+Received: from mail-pz0-f46.google.com ([209.85.210.46]:56948 "EHLO
+	mail-pz0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750969Ab0HFTvv (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 6 Aug 2010 15:22:12 -0400
+	Fri, 6 Aug 2010 15:51:51 -0400
+Message-ID: <4C5C67F0.8070408@gmail.com>
+Date: Fri, 06 Aug 2010 12:52:16 -0700
+From: "Justin P. Mattock" <justinmattock@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20100806135429.GB25864@merkur.ravnborg.org>
-References: <AANLkTimyDwWtLbc682rW-QORjU0+r+txZO-iKAini1H1@mail.gmail.com>
-	<1280838492-9942-1-git-send-email-nir.tzachar@gmail.com>
-	<20100805100408.5b724047.randy.dunlap@oracle.com>
-	<AANLkTi=9hBYy4k=tJBo38O98z_O646ZpStqNdEYWP3MO@mail.gmail.com>
-	<20100806135429.GB25864@merkur.ravnborg.org>
-Date: Fri, 6 Aug 2010 22:22:10 +0300
-Message-ID: <AANLkTinz4sdP5vENRqn9MgmfovWKK0vBj5bHNzP4ABjx@mail.gmail.com>
-Subject: Re: [PATCH] nconfig: add search support
-From: Nir Tzachar <nir.tzachar@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 8BIT
+Subject: Re: [PATCH] kconfig: fix make oldconfig
+References: <20100804125156.GA23464@sepie.suse.cz> <AANLkTi=hYsksUJUsrETjFouLDiKhwQHgD2oQ7XLyrOC-@mail.gmail.com> 	<4C5B64EA.2000804@gmail.com> <AANLkTikpsvpHuB-mWVfmqTRRMvbvhJz2LmoYBgtn4NQE@mail.gmail.com> 	<20100806051354.GA24343@merkur.ravnborg.org> <4C5BE229.1090801@suse.cz> 	<AANLkTimWHnxbYzkJ1KhuS3DgTuSRz-gMnzEJvbsY835g@mail.gmail.com> 	<20100806175217.GA8944@merkur.ravnborg.org> <AANLkTimkngSrDFUcHOySkf22yY3Qr3p+m2qnwDzre+zk@mail.gmail.com>
+In-Reply-To: <AANLkTimkngSrDFUcHOySkf22yY3Qr3p+m2qnwDzre+zk@mail.gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>, Randy Dunlap <randy.dunlap@oracle.com>
-Cc: mmarek@suse.cz, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Sam Ravnborg <sam@ravnborg.org>, Michal Marek <mmarek@suse.cz>, JBeulich@novell.com, aris@redhat.com, catalin.marinas@arm.com, jacmet@sunsite.dk, lizf@cn.fujitsu.com, ulfalizer.lkml@gmail.com, zippel@linux-m68k.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Fri, Aug 6, 2010 at 4:54 PM, Sam Ravnborg <sam@ravnborg.org> wrote:
->> >>
->> >> Searching: pressing '/' triggers search mode. nconfig performs a
->> >>            regular string compare, case insensitive, starting at
->> >
->> > I would say: simple string compare
->> > "regular" has no meaning (at least for me) there.
->
-> pressing '/' triggers interactive search mode. nconfig search for the
-> string in the menu prompts (no regex support).
->
-> [Just a suggestion for a bt different wording]
->
->> > Maybe I should just stick to config symbol searches.  I don't think it's all
->> > that likely that people will know how each menu line text begins.
->> >
->> >
+On 08/06/2010 11:09 AM, Linus Torvalds wrote:
+> On Fri, Aug 6, 2010 at 10:52 AM, Sam Ravnborg<sam@ravnborg.org>  wrote:
 >>
->> We can replace strcasecmp with strcasestr. I agree it would be more useful.
->
-> This is better.
->
+>> Hmm, I wonder why you call oldconfig explicitly?
 >>
->> > As for the search UI, I'd rather that it be presented like the symbol search,
->> > in a box, instead of just a single line at the top of the screen.
+>> A plain "make -j16" executes "silentoldconfig" if there
+>> is any changes in a Kconfig* file or in .config.
+>> Just double checked and it works as I expected.
 >>
->> But then it is not interactive. I was aiming for something similar to
->> vim's search, where the search is matched as you type and the only
->> free terminal real-estate to display the match string was at the top
->> of the screen. I think such a minimal design is better than a
->> cumbersome text box which displays the search results afterwards (as
->> is symbol search), as the search is only intended for the currently
->> displayed menu and the user would usually just want to save the extra
->> typing of navigating to a specific menu item.
+>> So you are asked if there is any new options anyway even
+>> if you skip your "oldconfig" step.
 >
-> It was introduced to replace the "hotkey" support, and as such is useful.
-> If we want to search for content of all prompts then we should extend
-> the symbols search to do so.
-> Maybe we should just let it search for both symbols _and_ propmts.
-
-There is a different alternative which slipped my mind, which can be
-useful for Randy's use case: just use the single menu mode of nconfig
-and then the search feature will give you the behavior you desire
-(i.e., jumping to the globally matching prompt).
-
-> If one search for HOTPLUG_CPU there is no hits in any propmts anyway.
-> And if one search for "Pentium" there is no config symbol hits.
-
-If such a search cannot return the menu context of the matching
-symbol, there is no way for nconfig to jump to the matching menu. But
-a different approach may be to add the symbol search to nconfig's
-search, such that instead of just matching the prompt, nconfig will
-also match the symbol.
-
-Cheers,
-Nir.
-
->        Sam
+> Try this:
 >
+>     git clean -dqfx
+>     make -j16>  ../makes
+>
+> It doesn't work, because "make silentconfig" will say
+>
+>    ***
+>    *** You have not yet configured your kernel!
+>    *** (missing kernel config file ".config")
+>    ***
+>    *** Please run some configurator (e.g. "make oldconfig" or
+>    *** "make menuconfig" or "make xconfig").
+>    ***
+>
+> which is why I always run "make oldconfig".
+>
+> Sure, I could do it only when I need to, but quite frankly, it's much
+> easier to just always do the thing that works, rather than try
+> something that doesn't work, do something else, and then re-try the
+> thing that can fail.
+>
+>                       Linus
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-kernel" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> Please read the FAQ at  http://www.tux.org/lkml/
+>
+
+
+the above command does break over here. using the make oldconfig command 
+seems to be working after I did the make menuconfig.
+
+Now before doing all of this I did make a copy of the entire kernel for 
+a new system Im building(clfs) so I went into that tree and did a make 
+oldconfig and(luckily) hit the non responsive oldconfig thing that Linus 
+had originally posted.
+
+here is a strace of when make oldconfig was not working(with git log at 
+the top)
+
+http://fpaste.org/317B/
+
+and strace of a git pull today and make oldconfig does not crap out and 
+starts asking me y/n options:
+
+http://fpaste.org/QWWn/
+
+hope this helps with debugging and such.
+
+Justin P. Mattock
