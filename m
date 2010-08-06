@@ -1,70 +1,31 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepb.post.tele.dk ([195.41.46.236]:49450 "EHLO
-	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756861Ab0HFOJZ (ORCPT
+Received: from smtp1.linux-foundation.org ([140.211.169.13]:49497 "EHLO
+	smtp1.linux-foundation.org" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1759119Ab0HFQUD (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 6 Aug 2010 10:09:25 -0400
-Date: Fri, 6 Aug 2010 16:09:23 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH] nconfig: add search support
-Message-ID: <20100806140923.GA26456@merkur.ravnborg.org>
-References: <AANLkTimyDwWtLbc682rW-QORjU0+r+txZO-iKAini1H1@mail.gmail.com> <1280838492-9942-1-git-send-email-nir.tzachar@gmail.com> <20100805100408.5b724047.randy.dunlap@oracle.com>
+	Fri, 6 Aug 2010 12:20:03 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20100805100408.5b724047.randy.dunlap@oracle.com>
+In-Reply-To: <4C5BE229.1090801@suse.cz>
+References: <20100804125156.GA23464@sepie.suse.cz> <AANLkTi=hYsksUJUsrETjFouLDiKhwQHgD2oQ7XLyrOC-@mail.gmail.com>
+	<4C5B64EA.2000804@gmail.com> <AANLkTikpsvpHuB-mWVfmqTRRMvbvhJz2LmoYBgtn4NQE@mail.gmail.com>
+	<20100806051354.GA24343@merkur.ravnborg.org> <4C5BE229.1090801@suse.cz>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Fri, 6 Aug 2010 09:19:23 -0700
+Message-ID: <AANLkTimWHnxbYzkJ1KhuS3DgTuSRz-gMnzEJvbsY835g@mail.gmail.com>
+Subject: Re: [PATCH] kconfig: fix make oldconfig
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Randy Dunlap <randy.dunlap@oracle.com>
-Cc: nir.tzachar@gmail.com, mmarek@suse.cz, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>
+Cc: Sam Ravnborg <sam@ravnborg.org>, "Justin P. Mattock" <justinmattock@gmail.com>, JBeulich@novell.com, aris@redhat.com, catalin.marinas@arm.com, jacmet@sunsite.dk, lizf@cn.fujitsu.com, ulfalizer.lkml@gmail.com, zippel@linux-m68k.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-> 
-> or I'd like to be able to find "crc" menu items in any sub-menu.
-> Maybe I should just stick to config symbol searches.  I don't think it's all
-> that likely that people will know how each menu line text begins.
+On Fri, Aug 6, 2010 at 3:21 AM, Michal Marek <mmarek@suse.cz> wrote:
+>
+> Linus, will you apply this directly or should I apply it to the kbuild
+> tree and send you a pull request?
 
-Following patch extends symbols search to search _both_ for CONFIG_
-symbols AND prompts.
+I took it directly, since I spend a lot of time doing "make oldconfig
+; make -j16" which is why I found this (after pulling, I tend verify
+that at least nothing broke my _own_ configuration)
 
-I think this could be a usefull extension.
-You are navigation much more around than me in the
-Kconfig files / editors. What do you think?
-
-As this is an extension in the core part it will take effect
-for all the editors (which is good).
-[gconf does not use sym_re_search() - I assume this feature is
-missing in that editor]. 
-
-I will cook up a proper patch only if I get positive feedback.
-
-	Sam
-
-diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
-index e95718f..8cda9c0 100644
---- a/scripts/kconfig/symbol.c
-+++ b/scripts/kconfig/symbol.c
-@@ -842,6 +842,7 @@ struct symbol *sym_find(const char *name)
- 
- struct symbol **sym_re_search(const char *pattern)
- {
-+	struct property *prop;
- 	struct symbol *sym, **sym_arr = NULL;
- 	int i, cnt, size;
- 	regex_t re;
-@@ -854,9 +855,15 @@ struct symbol **sym_re_search(const char *pattern)
- 		return NULL;
- 
- 	for_all_symbols(i, sym) {
-+		bool found = false;
- 		if (sym->flags & SYMBOL_CONST || !sym->name)
- 			continue;
--		if (regexec(&re, sym->name, 0, NULL, 0))
-+		if (!regexec(&re, sym->name, 0, NULL, 0))
-+			found = true;
-+		for_all_prompts(sym, prop)
-+			if (!regexec(&re, prop->text, 0, NULL, 0))
-+				found = true;
-+		if (!found)
- 			continue;
- 		if (cnt + 1 >= size) {
- 			void *tmp = sym_arr;
+             Linus
