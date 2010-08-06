@@ -1,57 +1,83 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp1.linux-foundation.org ([140.211.169.13]:46766 "EHLO
-	smtp1.linux-foundation.org" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751136Ab0HFSKo (ORCPT
+Received: from mail-fx0-f46.google.com ([209.85.161.46]:53530 "EHLO
+	mail-fx0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751141Ab0HFTWM convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 6 Aug 2010 14:10:44 -0400
+	Fri, 6 Aug 2010 15:22:12 -0400
 MIME-Version: 1.0
-In-Reply-To: <20100806175217.GA8944@merkur.ravnborg.org>
-References: <20100804125156.GA23464@sepie.suse.cz> <AANLkTi=hYsksUJUsrETjFouLDiKhwQHgD2oQ7XLyrOC-@mail.gmail.com>
-	<4C5B64EA.2000804@gmail.com> <AANLkTikpsvpHuB-mWVfmqTRRMvbvhJz2LmoYBgtn4NQE@mail.gmail.com>
-	<20100806051354.GA24343@merkur.ravnborg.org> <4C5BE229.1090801@suse.cz>
-	<AANLkTimWHnxbYzkJ1KhuS3DgTuSRz-gMnzEJvbsY835g@mail.gmail.com>
-	<20100806175217.GA8944@merkur.ravnborg.org>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Fri, 6 Aug 2010 11:09:41 -0700
-Message-ID: <AANLkTimkngSrDFUcHOySkf22yY3Qr3p+m2qnwDzre+zk@mail.gmail.com>
-Subject: Re: [PATCH] kconfig: fix make oldconfig
+In-Reply-To: <20100806135429.GB25864@merkur.ravnborg.org>
+References: <AANLkTimyDwWtLbc682rW-QORjU0+r+txZO-iKAini1H1@mail.gmail.com>
+	<1280838492-9942-1-git-send-email-nir.tzachar@gmail.com>
+	<20100805100408.5b724047.randy.dunlap@oracle.com>
+	<AANLkTi=9hBYy4k=tJBo38O98z_O646ZpStqNdEYWP3MO@mail.gmail.com>
+	<20100806135429.GB25864@merkur.ravnborg.org>
+Date: Fri, 6 Aug 2010 22:22:10 +0300
+Message-ID: <AANLkTinz4sdP5vENRqn9MgmfovWKK0vBj5bHNzP4ABjx@mail.gmail.com>
+Subject: Re: [PATCH] nconfig: add search support
+From: Nir Tzachar <nir.tzachar@gmail.com>
 Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: Michal Marek <mmarek@suse.cz>, "Justin P. Mattock" <justinmattock@gmail.com>, JBeulich@novell.com, aris@redhat.com, catalin.marinas@arm.com, jacmet@sunsite.dk, lizf@cn.fujitsu.com, ulfalizer.lkml@gmail.com, zippel@linux-m68k.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Sam Ravnborg <sam@ravnborg.org>, Randy Dunlap <randy.dunlap@oracle.com>
+Cc: mmarek@suse.cz, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Fri, Aug 6, 2010 at 10:52 AM, Sam Ravnborg <sam@ravnborg.org> wrote:
+On Fri, Aug 6, 2010 at 4:54 PM, Sam Ravnborg <sam@ravnborg.org> wrote:
+>> >>
+>> >> Searching: pressing '/' triggers search mode. nconfig performs a
+>> >>            regular string compare, case insensitive, starting at
+>> >
+>> > I would say: simple string compare
+>> > "regular" has no meaning (at least for me) there.
 >
-> Hmm, I wonder why you call oldconfig explicitly?
+> pressing '/' triggers interactive search mode. nconfig search for the
+> string in the menu prompts (no regex support).
 >
-> A plain "make -j16" executes "silentoldconfig" if there
-> is any changes in a Kconfig* file or in .config.
-> Just double checked and it works as I expected.
+> [Just a suggestion for a bt different wording]
 >
-> So you are asked if there is any new options anyway even
-> if you skip your "oldconfig" step.
+>> > Maybe I should just stick to config symbol searches.  I don't think it's all
+>> > that likely that people will know how each menu line text begins.
+>> >
+>> >
+>>
+>> We can replace strcasecmp with strcasestr. I agree it would be more useful.
+>
+> This is better.
+>
+>>
+>> > As for the search UI, I'd rather that it be presented like the symbol search,
+>> > in a box, instead of just a single line at the top of the screen.
+>>
+>> But then it is not interactive. I was aiming for something similar to
+>> vim's search, where the search is matched as you type and the only
+>> free terminal real-estate to display the match string was at the top
+>> of the screen. I think such a minimal design is better than a
+>> cumbersome text box which displays the search results afterwards (as
+>> is symbol search), as the search is only intended for the currently
+>> displayed menu and the user would usually just want to save the extra
+>> typing of navigating to a specific menu item.
+>
+> It was introduced to replace the "hotkey" support, and as such is useful.
+> If we want to search for content of all prompts then we should extend
+> the symbols search to do so.
+> Maybe we should just let it search for both symbols _and_ propmts.
 
-Try this:
+There is a different alternative which slipped my mind, which can be
+useful for Randy's use case: just use the single menu mode of nconfig
+and then the search feature will give you the behavior you desire
+(i.e., jumping to the globally matching prompt).
 
-   git clean -dqfx
-   make -j16 > ../makes
+> If one search for HOTPLUG_CPU there is no hits in any propmts anyway.
+> And if one search for "Pentium" there is no config symbol hits.
 
-It doesn't work, because "make silentconfig" will say
+If such a search cannot return the menu context of the matching
+symbol, there is no way for nconfig to jump to the matching menu. But
+a different approach may be to add the symbol search to nconfig's
+search, such that instead of just matching the prompt, nconfig will
+also match the symbol.
 
-  ***
-  *** You have not yet configured your kernel!
-  *** (missing kernel config file ".config")
-  ***
-  *** Please run some configurator (e.g. "make oldconfig" or
-  *** "make menuconfig" or "make xconfig").
-  ***
+Cheers,
+Nir.
 
-which is why I always run "make oldconfig".
-
-Sure, I could do it only when I need to, but quite frankly, it's much
-easier to just always do the thing that works, rather than try
-something that doesn't work, do something else, and then re-try the
-thing that can fail.
-
-                     Linus
+>        Sam
+>
