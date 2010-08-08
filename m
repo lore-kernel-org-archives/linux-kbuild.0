@@ -1,50 +1,32 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepb.post.tele.dk ([195.41.46.236]:48750 "EHLO
-	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754171Ab0HHPhz (ORCPT
+Received: from pfepa.post.tele.dk ([195.41.46.235]:33110 "EHLO
+	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754192Ab0HHPmf (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 8 Aug 2010 11:37:55 -0400
-Date: Sun, 8 Aug 2010 17:37:53 +0200
+	Sun, 8 Aug 2010 11:42:35 -0400
+Date: Sun, 8 Aug 2010 17:42:33 +0200
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH] nconfig: add search support
-Message-ID: <20100808153753.GA4205@merkur.ravnborg.org>
-References: <1281275406-27540-1-git-send-email-nir.tzachar@gmail.com>
+Subject: nconfig - F2, F3 misbehaves..
+Message-ID: <20100808154233.GB4205@merkur.ravnborg.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1281275406-27540-1-git-send-email-nir.tzachar@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: nir.tzachar@gmail.com
-Cc: mmarek@suse.cz, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, randy.dunlap@oracle.com
+To: nir.tzachar@gmail.com, linux-kbuild <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.cz>
 
-On Sun, Aug 08, 2010 at 04:50:06PM +0300, nir.tzachar@gmail.com wrote:
-> From: Nir Tzachar <nir.tzachar@gmail.com>
-> 
-> Remove the old hotkeys feature, and replace it by an interactive string
-> search.
-> >From nconfig help:
-> 
-> Searching: pressing '/' triggers interactive search mode.
->            nconfig performs a case insensitive search for the string
->            in the menu prompts (no regex support).
->            Pressing the up/down keys highlights the previous/next
->            matching item. Backspace removes one character from the
->            match string. Pressing either '/' again or ESC exits
->            search mode. All other keys behave normally.
-> 
-> Miscellaneous other changes (including Rundy's and Justin's input).
-> 
-> Signed-off-by: Nir Tzachar <nir.tzachar@gmail.com>
+Hi Nir.
 
-I like this search mode much better than the hotkey stuff.
-And with the new key assignments things works almost as I would expect.
+When I press F2 at one of the top-level menus
+then nconfig exits and a '~' is written to stdout.
 
-I am not sure if I prefer "space" to bind to usual
-function or that it can be used to enter a whitespace.
+Same happens when I press F3.
 
-And getting rid of the capitalization was good!
+If I press F2 or F3 at a submenu then I see only the README,
+and when I get back I am one level up in the menus.
 
-Acked-by: Sam Ravnborg <sam@ravnborg.org>
+I have not tried to debug this.
+It happens with and without the search patch.
+
 
 	Sam
