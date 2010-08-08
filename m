@@ -1,47 +1,78 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-fx0-f46.google.com ([209.85.161.46]:41476 "EHLO
-	mail-fx0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754366Ab0HHQLy convert rfc822-to-8bit (ORCPT
+Received: from mail-bw0-f46.google.com ([209.85.214.46]:54331 "EHLO
+	mail-bw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750712Ab0HHRIv (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 8 Aug 2010 12:11:54 -0400
-Received: by fxm14 with SMTP id 14so4606207fxm.19
-        for <linux-kbuild@vger.kernel.org>; Sun, 08 Aug 2010 09:11:52 -0700 (PDT)
-MIME-Version: 1.0
+	Sun, 8 Aug 2010 13:08:51 -0400
+From: nir.tzachar@gmail.com
+Subject: [PATCH] nconfig: properly map function keys.
+Date: Sun,  8 Aug 2010 20:08:39 +0300
+Message-Id: <1281287319-32281-1-git-send-email-nir.tzachar@gmail.com>
 In-Reply-To: <20100808154233.GB4205@merkur.ravnborg.org>
 References: <20100808154233.GB4205@merkur.ravnborg.org>
-Date: Sun, 8 Aug 2010 19:11:52 +0300
-Message-ID: <AANLkTikDRoBx7mjXmigcac0wBdExDiBRhYPVS-mKe2YG@mail.gmail.com>
-Subject: Re: nconfig - F2, F3 misbehaves..
-From: Nir Tzachar <nir.tzachar@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.cz>
+To: sam@ravnborg.org, mmarek@suse.cz
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, nir.tzachar@gmail.com
 
-On Sun, Aug 8, 2010 at 6:42 PM, Sam Ravnborg <sam@ravnborg.org> wrote:
-> Hi Nir.
->
-> When I press F2 at one of the top-level menus
-> then nconfig exits and a '~' is written to stdout.
->
-> Same happens when I press F3.
->
-> If I press F2 or F3 at a submenu then I see only the README,
-> and when I get back I am one level up in the menus.
+From: Nir Tzachar <nir.tzachar@gmail.com>
 
-This implies that the function keys are not processed correctly by
-ncurses; e.g., they are seen as two characters, one of them is ESC. I
-believe this is the reason why you are getting one menu back.
+Hi Sam. Please try the following patch and see if it helps.
 
-> I have not tried to debug this.
-> It happens with and without the search patch.
 
-Can you please try with a different terminal emulator? Also check that
-you have a terminfo file which matches your terminal and TERM
-environment variable.
+Subject: [PATCH] nconfig: properly map function keys.
+When $TERM=xterm,xterm-color,vt220 map function keys properly.
 
->
->        Sam
->
+Signed-off-by: Nir Tzachar <nir.tzachar@gmail.com>
+---
+ scripts/kconfig/nconf.c |   23 ++++++++++++++++++++---
+ 1 files changed, 20 insertions(+), 3 deletions(-)
+
+diff --git a/scripts/kconfig/nconf.c b/scripts/kconfig/nconf.c
+index c6feb41..a641a66 100644
+--- a/scripts/kconfig/nconf.c
++++ b/scripts/kconfig/nconf.c
+@@ -1537,13 +1537,13 @@ int main(int ac, char **av)
+ 
+ 	/* Initialize curses */
+ 	initscr();
+-	/* set color theme */
+-	set_colors();
+-
+ 	cbreak();
+ 	noecho();
+ 	keypad(stdscr, TRUE);
+ 	curs_set(0);
++	/* set color theme */
++	set_colors();
++
+ 
+ 	if (COLS < 75 || LINES < 20) {
+ 		endwin();
+@@ -1552,6 +1552,23 @@ int main(int ac, char **av)
+ 		return 1;
+ 	}
+ 
++	const char *term = getenv("TERM");
++	if (strcmp(term, "xterm") == 0 ||
++	    strcmp(term, "xterm-color") == 0 ||
++	    strcmp(term, "vt220") == 0) {
++		define_key("\033[H", KEY_HOME);
++		define_key("\033[F", KEY_END);
++		define_key("\033OP", KEY_F(1));
++		define_key("\033OQ", KEY_F(2));
++		define_key("\033OR", KEY_F(3));
++		define_key("\033OS", KEY_F(4));
++		define_key("\033[16~", KEY_F(5));
++		define_key("\033[17~", KEY_F(6));
++		define_key("\033[18", KEY_F(7));
++		define_key("\033[19~", KEY_F(8));
++		define_key("\033[20~", KEY_F(9));
++	}
++
+ 	notimeout(stdscr, FALSE);
+ 	ESCDELAY = 1;
+ 
+-- 
+1.6.4.4
+
