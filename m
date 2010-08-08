@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-bw0-f46.google.com ([209.85.214.46]:54331 "EHLO
+Received: from mail-bw0-f46.google.com ([209.85.214.46]:64232 "EHLO
 	mail-bw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750712Ab0HHRIv (ORCPT
+	with ESMTP id S1750712Ab0HHRKv (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 8 Aug 2010 13:08:51 -0400
+	Sun, 8 Aug 2010 13:10:51 -0400
 From: nir.tzachar@gmail.com
-Subject: [PATCH] nconfig: properly map function keys.
-Date: Sun,  8 Aug 2010 20:08:39 +0300
-Message-Id: <1281287319-32281-1-git-send-email-nir.tzachar@gmail.com>
+Subject: resend [PATCH] nconfig: properly map function keys.
+Date: Sun,  8 Aug 2010 20:11:00 +0300
+Message-Id: <1281287460-32332-1-git-send-email-nir.tzachar@gmail.com>
 In-Reply-To: <20100808154233.GB4205@merkur.ravnborg.org>
 References: <20100808154233.GB4205@merkur.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -17,10 +17,8 @@ Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, nir.tzachar@gmai
 
 From: Nir Tzachar <nir.tzachar@gmail.com>
 
-Hi Sam. Please try the following patch and see if it helps.
+Previous patch was missing a '~' in F7.
 
-
-Subject: [PATCH] nconfig: properly map function keys.
 When $TERM=xterm,xterm-color,vt220 map function keys properly.
 
 Signed-off-by: Nir Tzachar <nir.tzachar@gmail.com>
@@ -65,7 +63,7 @@ index c6feb41..a641a66 100644
 +		define_key("\033OS", KEY_F(4));
 +		define_key("\033[16~", KEY_F(5));
 +		define_key("\033[17~", KEY_F(6));
-+		define_key("\033[18", KEY_F(7));
++		define_key("\033[18~", KEY_F(7));
 +		define_key("\033[19~", KEY_F(8));
 +		define_key("\033[20~", KEY_F(9));
 +	}
