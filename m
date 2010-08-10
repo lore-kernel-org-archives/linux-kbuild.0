@@ -1,73 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepb.post.tele.dk ([195.41.46.236]:42476 "EHLO
-	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754047Ab0HHS6c (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 8 Aug 2010 14:58:32 -0400
-Date: Sun, 8 Aug 2010 20:58:31 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: resend [PATCH] nconfig: properly map function keys.
-Message-ID: <20100808185831.GA6213@merkur.ravnborg.org>
-References: <20100808154233.GB4205@merkur.ravnborg.org> <1281287460-32332-1-git-send-email-nir.tzachar@gmail.com>
+Received: from mx1.redhat.com ([209.132.183.28]:61529 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753473Ab0HJHdb (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 10 Aug 2010 03:33:31 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1281287460-32332-1-git-send-email-nir.tzachar@gmail.com>
+Content-Type: text/plain; charset=unknown
+Content-Transfer-Encoding: 8bit
+From: Roland McGrath <roland@redhat.com>
+Subject: Re: [PATCH] Fix CONFIG_CROSS_COMPILE issue in .config
+In-Reply-To: Yegor Yefremov's message of  Tuesday, 10 August 2010 08:43:18 +0200 <AANLkTikvRqTR6TjP9H4-_RHhax24YRPv9PCxn165RTWs@mail.gmail.com>
+References: <AANLkTim2mi0wbJJl17OkbCJbRt-s5phR4sumn5GsJKUp@mail.gmail.com>
+	<20100621120613.86cad1a4.akpm@linux-foundation.org>
+	<4C1FC35C.8090201@suse.cz>
+	<AANLkTil2-YNAa-jyOYD4cNtbJQ1XQJ6-v3iJ6wxpz7br@mail.gmail.com>
+	<AANLkTinC6Sqs7W--=14nmJFDcTS4HQn0=ysn7VhYDDX6@mail.gmail.com>
+	<adaocdg3fng.fsf@roland-alpha.cisco.com>
+	<20100805222623.39A3240208@magilla.sf.frob.com>
+	<AANLkTikvRqTR6TjP9H4-_RHhax24YRPv9PCxn165RTWs@mail.gmail.com>
+Message-Id: <20100810073317.F2A8C40542@magilla.sf.frob.com>
+Date: Tue, 10 Aug 2010 00:33:17 -0700 (PDT)
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: nir.tzachar@gmail.com
-Cc: mmarek@suse.cz, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Yegor Yefremov <yegorslists@googlemail.com>
+Cc: Roland Dreier <rdreier@cisco.com>, Tiago Maluta <tiago.maluta@gmail.com>, Michal Marek <mmarek@suse.cz>, Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-On Sun, Aug 08, 2010 at 08:11:00PM +0300, nir.tzachar@gmail.com wrote:
-> From: Nir Tzachar <nir.tzachar@gmail.com>
+> On Fri, Aug 6, 2010 at 12:26 AM, Roland McGrath <roland@redhat.com> wrote:
+> >> Yes, this make sense to me.  It's not clear to me why we ever needed
+> >> the conditional assignment of an empty CROSS_COMPILE (that code predates
+> >> the start of git history) [...]
+> >
+> > Perhaps someone used make --warn-undefined-variables.
 > 
-> Previous patch was missing a '~' in F7.
-> 
-> When $TERM=xterm,xterm-color,vt220 map function keys properly.
-> 
-> Signed-off-by: Nir Tzachar <nir.tzachar@gmail.com>
-> ---
->  scripts/kconfig/nconf.c |   23 ++++++++++++++++++++---
->  1 files changed, 20 insertions(+), 3 deletions(-)
-> 
-> diff --git a/scripts/kconfig/nconf.c b/scripts/kconfig/nconf.c
-> index c6feb41..a641a66 100644
-> --- a/scripts/kconfig/nconf.c
-> +++ b/scripts/kconfig/nconf.c
-> @@ -1537,13 +1537,13 @@ int main(int ac, char **av)
->  
->  	/* Initialize curses */
->  	initscr();
-> -	/* set color theme */
-> -	set_colors();
-> -
->  	cbreak();
->  	noecho();
->  	keypad(stdscr, TRUE);
->  	curs_set(0);
-> +	/* set color theme */
-> +	set_colors();
-> +
->  
->  	if (COLS < 75 || LINES < 20) {
->  		endwin();
-> @@ -1552,6 +1552,23 @@ int main(int ac, char **av)
->  		return 1;
->  	}
->  
-> +	const char *term = getenv("TERM");
-> +	if (strcmp(term, "xterm") == 0 ||
-> +	    strcmp(term, "xterm-color") == 0 ||
-> +	    strcmp(term, "vt220") == 0) {
-> +		define_key("\033[H", KEY_HOME);
-> +		define_key("\033[F", KEY_END);
-> +		define_key("\033OP", KEY_F(1));
-> +		define_key("\033OQ", KEY_F(2));
-> +		define_key("\033OR", KEY_F(3));
-> +		define_key("\033OS", KEY_F(4));
+> Are there any other comments or is the patch valid? Should I resend it
+> as a new thread?
 
-I had to change the above to "\033[11~", "\033[12~" etc, then it worked.
-My terminal emulation is xterm and I did not try any other.
+The patch is fine.  The comments were just about how it might have gotten
+to be how it was before now.
 
-	Sam
-
+Thanks,
+Roland
