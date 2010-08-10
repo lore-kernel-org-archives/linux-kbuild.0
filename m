@@ -1,33 +1,52 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:43779 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1757458Ab0HJLXQ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 10 Aug 2010 07:23:16 -0400
-Message-ID: <4C613627.1090907@suse.cz>
-Date: Tue, 10 Aug 2010 13:21:11 +0200
-From: Michal Marek <mmarek@suse.cz>
+Received: from pfepa.post.tele.dk ([195.41.46.235]:59862 "EHLO
+	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932118Ab0HJOZW (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 10 Aug 2010 10:25:22 -0400
+Date: Tue, 10 Aug 2010 16:25:20 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: [GIT] kbuild: kconfig changes
+Message-ID: <20100810142520.GA15073@merkur.ravnborg.org>
+References: <20100804125156.GA23464@sepie.suse.cz> <AANLkTinN4npO7qfSa-42B-Cq5mKZX+--H0=1SuSrWTEP@mail.gmail.com> <20100807040101.GA30520@merkur.ravnborg.org> <AANLkTinOWBfsncSZw3bvHa6Mp+eb5dzibKSV15OKgW2M@mail.gmail.com> <20100808155712.GA4804@merkur.ravnborg.org> <4C615C84.6060300@suse.cz>
 MIME-Version: 1.0
-Subject: Re: [PATCH] Fix CONFIG_CROSS_COMPILE issue in .config
-References: <AANLkTim2mi0wbJJl17OkbCJbRt-s5phR4sumn5GsJKUp@mail.gmail.com>	<20100621120613.86cad1a4.akpm@linux-foundation.org>	<4C1FC35C.8090201@suse.cz>	<AANLkTil2-YNAa-jyOYD4cNtbJQ1XQJ6-v3iJ6wxpz7br@mail.gmail.com>	<AANLkTinC6Sqs7W--=14nmJFDcTS4HQn0=ysn7VhYDDX6@mail.gmail.com>	<adaocdg3fng.fsf@roland-alpha.cisco.com>	<20100805222623.39A3240208@magilla.sf.frob.com> <AANLkTikvRqTR6TjP9H4-_RHhax24YRPv9PCxn165RTWs@mail.gmail.com>
-In-Reply-To: <AANLkTikvRqTR6TjP9H4-_RHhax24YRPv9PCxn165RTWs@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4C615C84.6060300@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Yegor Yefremov <yegorslists@googlemail.com>
-Cc: Roland McGrath <roland@redhat.com>, Roland Dreier <rdreier@cisco.com>, Tiago Maluta <tiago.maluta@gmail.com>, Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>
+Cc: Arve Hj?nnev?g <arve@android.com>, Linus Torvalds <torvalds@linux-foundation.org>, JBeulich@novell.com, aris@redhat.com, catalin.marinas@arm.com, jacmet@sunsite.dk, justinmattock@gmail.com, lizf@cn.fujitsu.com, ulfalizer.lkml@gmail.com, zippel@linux-m68k.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On 10.8.2010 08:43, Yegor Yefremov wrote:
-> On Fri, Aug 6, 2010 at 12:26 AM, Roland McGrath <roland@redhat.com> wrote:
->>> Yes, this make sense to me.  It's not clear to me why we ever needed
->>> the conditional assignment of an empty CROSS_COMPILE (that code predates
->>> the start of git history) [...]
->>
->> Perhaps someone used make --warn-undefined-variables.
+> > 
+> > The reason why your patch cured it was that we then no
+> > longer triggered the bug (at least I guess so I did not look to close).
+> > 
+> > I will look into this as time permits. I assume the fix is simple
+> > when I find the reason.
 > 
-> Are there any other comments or is the patch valid? Should I resend it
-> as a new thread?
+> I'm looking into it now, but understanding the kconfig internals is not
+> easy...
+Nope...
 
-No problem at your side, the patch is fine and I applied it now.
+What I have understood so far...
 
-Michal
+If we have a choice then the choice is represented by a symbol.
+symbol->def[S_DEF_USER] is set to the selected symbol.
+If we read all the choice values then we set:
+symbol->flags |= SYMBOL_DEF_USER
+
+If we have a choice where we do not have all choice_values
+which is the case with the minimal defconfig then the
+missing choice_value results in that SYMBOL_DEF_USER
+is not set.
+[See confdata:conf_read after the sym_ok label]
+
+Later in symbol.c:sym_calc_value the visibility
+is set to mod if we do not have all values.
+
+And therefore the coice value is set to m not y.
+
+I will look a bit more at it tonight.
+
+	Sam
