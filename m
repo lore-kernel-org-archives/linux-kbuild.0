@@ -1,92 +1,49 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepa.post.tele.dk ([195.41.46.235]:47970 "EHLO
-	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757129Ab0HKUez (ORCPT
+Received: from mail-ww0-f42.google.com ([74.125.82.42]:50308 "EHLO
+	mail-ww0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1758179Ab0HKXjh convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 11 Aug 2010 16:34:55 -0400
-Date: Wed, 11 Aug 2010 22:34:53 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [GIT] kbuild: kconfig changes
-Message-ID: <20100811203453.GB28777@merkur.ravnborg.org>
-References: <20100804125156.GA23464@sepie.suse.cz> <AANLkTinN4npO7qfSa-42B-Cq5mKZX+--H0=1SuSrWTEP@mail.gmail.com> <20100807040101.GA30520@merkur.ravnborg.org> <AANLkTinOWBfsncSZw3bvHa6Mp+eb5dzibKSV15OKgW2M@mail.gmail.com> <20100811195131.GA24193@merkur.ravnborg.org>
+	Wed, 11 Aug 2010 19:39:37 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20100811195131.GA24193@merkur.ravnborg.org>
+In-Reply-To: <20100811203453.GB28777@merkur.ravnborg.org>
+References: <20100804125156.GA23464@sepie.suse.cz>
+	<AANLkTinN4npO7qfSa-42B-Cq5mKZX+--H0=1SuSrWTEP@mail.gmail.com>
+	<20100807040101.GA30520@merkur.ravnborg.org>
+	<AANLkTinOWBfsncSZw3bvHa6Mp+eb5dzibKSV15OKgW2M@mail.gmail.com>
+	<20100811195131.GA24193@merkur.ravnborg.org>
+	<20100811203453.GB28777@merkur.ravnborg.org>
+Date: Wed, 11 Aug 2010 16:39:35 -0700
+Message-ID: <AANLkTimcVwfq4Vm9TjY0vyvJcHpvHt+DzO73=a7693mx@mail.gmail.com>
+Subject: Re: [GIT] kbuild: kconfig changes
+From: =?ISO-8859-1?Q?Arve_Hj=F8nnev=E5g?= <arve@android.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arve Hj?nnev?g <arve@android.com>
+To: Sam Ravnborg <sam@ravnborg.org>
 Cc: Michal Marek <mmarek@suse.cz>, Linus Torvalds <torvalds@linux-foundation.org>, JBeulich@novell.com, aris@redhat.com, catalin.marinas@arm.com, jacmet@sunsite.dk, justinmattock@gmail.com, lizf@cn.fujitsu.com, ulfalizer.lkml@gmail.com, zippel@linux-m68k.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-> 
-> Unfortunately the bug I had discovered is another bug.
-> If I do:
-> 	make ARCH=avr32 atngw100_defconfig
-> 	make ARCH=avr32 savedefconfig
-> 	cp defconfig arch/avr32/configs/atngw100_defconfig
-> 	make ARCH=avr32 atngw100_defconfig
-> 	diff -u .config .config.old
-> 
-> then the diff shows an unexpected difference.
-> 
-> I will continue of that issue.
-Fixed it - see patch below.
+On Wed, Aug 11, 2010 at 1:34 PM, Sam Ravnborg <sam@ravnborg.org> wrote:
+>>
+>> Unfortunately the bug I had discovered is another bug.
+>> If I do:
+>>       make ARCH=avr32 atngw100_defconfig
+>>       make ARCH=avr32 savedefconfig
+>>       cp defconfig arch/avr32/configs/atngw100_defconfig
+>>       make ARCH=avr32 atngw100_defconfig
+>>       diff -u .config .config.old
+>>
+>> then the diff shows an unexpected difference.
+>>
+>> I will continue of that issue.
+> Fixed it - see patch below.
+>
+> @Michal - I will do a proper patch submission if Arve
+> can confirm that the problem he saw has been fixed
+> with these patches.
+>
 
-@Michal - I will do a proper patch submission if Arve
-can confirm that the problem he saw has been fixed
-with these patches.
+Your first patch fixes the problem I saw.
 
-	Sam
-
-From d93f83bbd650499c146f29a8a4de2b1f98dfbefe Mon Sep 17 00:00:00 2001
-From: Sam Ravnborg <sam@ravnborg.org>
-Date: Wed, 11 Aug 2010 22:29:05 +0200
-Subject: [PATCH] kconfig: fix savedefconfig for tristate choices
-
-savedefconfig failed to save choice symbols equal to 'y'
-for tristate choices.
-This resulted in this value being lost.
-
-In particular is fixes an issue where
-
-make ARCH=avr32 atngw100_defconfig
-make ARCH=avr32 savedefconfig
-cp defconfig arch/avr32/configs/atngw100_defconfig
-make ARCH=avr32 atngw100_defconfig
-diff -u .config .config.old
-
-failed to produce an identical .config.
-
-Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
----
- scripts/kconfig/confdata.c |    7 +++----
- 1 files changed, 3 insertions(+), 4 deletions(-)
-
-diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
-index f81f263..e5d66e4 100644
---- a/scripts/kconfig/confdata.c
-+++ b/scripts/kconfig/confdata.c
-@@ -497,7 +497,7 @@ int conf_write_defconfig(const char *filename)
- 			/*
- 			 * If symbol is a choice value and equals to the
- 			 * default for a choice - skip.
--			 * But only if value equal to "y".
-+			 * But only if value is bool and equal to "y" .
- 			 */
- 			if (sym_is_choice_value(sym)) {
- 				struct symbol *cs;
-@@ -506,9 +506,8 @@ int conf_write_defconfig(const char *filename)
- 				cs = prop_get_symbol(sym_get_choice_prop(sym));
- 				ds = sym_choice_default(cs);
- 				if (sym == ds) {
--					if ((sym->type == S_BOOLEAN ||
--					sym->type == S_TRISTATE) &&
--					sym_get_tristate_value(sym) == yes)
-+					if ((sym->type == S_BOOLEAN) &&
-+					    sym_get_tristate_value(sym) == yes)
- 						goto next_menu;
- 				}
- 			}
 -- 
-1.6.0.6
-
+Arve Hjønnevåg
