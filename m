@@ -1,39 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepa.post.tele.dk ([195.41.46.235]:48248 "EHLO
-	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753336Ab0HLUo0 (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 12 Aug 2010 16:44:26 -0400
-Date: Thu, 12 Aug 2010 22:44:25 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Upcoming cleanup patches
-Message-ID: <20100812204425.GA32630@merkur.ravnborg.org>
+Received: from cantor2.suse.de ([195.135.220.15]:60648 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S934058Ab0HLWbC (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 12 Aug 2010 18:31:02 -0400
+Date: Fri, 13 Aug 2010 00:28:43 +0200
+From: Michal Marek <mmarek@suse.cz>
+Subject: Re: [PATCH] nconfig: Fix segfault when menu is empty
+Message-ID: <20100812222843.GA19505@sepie.suse.cz>
+References: <4C569703.9010607@udo.edu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <4C569703.9010607@udo.edu>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: lkml <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>
+To: Andrej Gelenberg <andrej.gelenberg@udo.edu>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Nir Tzachar <nir.tzachar@gmail.com>
 
-I am planning to submit to larger cleanup patches soonish.
-One of them rely on two patches, and I have asked Michal
-to get them upstream soonish.
+On Mon, Aug 02, 2010 at 11:59:31AM +0200, Andrej Gelenberg wrote:
+> there is a small bug in nconf, which cause segfault in empty menus
+> (press right arrow in empty menu). Patch is attached.
+> 
+> Regards,
+> Andrej Gelenberg
 
-The first patch is actually a pseudo patch.
-It is a small script that convert the remaining *defconfig
-files so they follow the minimal format.
-I plan to ask Linus to run the script.
-diffstat looks impressive...
+> From 60265c2f3db2616d3dc493785a47a301f73419bd Mon Sep 17 00:00:00 2001
+> From: Andrej Gelenberg <andrej.gelenberg@udo.edu>
+> Date: Mon, 2 Aug 2010 11:41:36 +0200
+> Subject: [PATCH] nconfig: Fix segfault when menu is empty
+> 
+> nconf crush with segfault if press right arrow in empty menu.
+> 
+> Signed-off-by: Andrej Gelenberg <andrej.gelenberg@udo.edu>
+> ---
+>  scripts/kconfig/nconf.c |    1 +
+>  1 files changed, 1 insertions(+), 0 deletions(-)
+> 
+> diff --git a/scripts/kconfig/nconf.c b/scripts/kconfig/nconf.c
+> index 762caf8..3db3ca6 100644
+> --- a/scripts/kconfig/nconf.c
+> +++ b/scripts/kconfig/nconf.c
+> @@ -676,6 +676,7 @@ static void *item_data(void)
+>  	struct mitem *mcur;
+>  
+>  	cur = current_item(curses_menu);
+> +	if ( ! cur ) return NULL;
+>  	mcur = (struct mitem *) item_userptr(cur);
+>  	return mcur->usrptr;
 
-Linus - if you prefer a pull request I can do so.
+Applied after fixing indentation (see Documentation/CodingStyle).
 
-The second patch eliminates use of unifdef-y in
-all the Kbuild files in include/*
-
-unifdef-y and header-y has the same functionality,
-and there is no reason to keep the former.
-But the Kbuild files has historically seen
-quite some chrunch so I am waiting a few
-more days before touching them.
-
-	Sam
+Michal
