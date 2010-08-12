@@ -1,53 +1,38 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:60648 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:32867 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S934058Ab0HLWbC (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 12 Aug 2010 18:31:02 -0400
-Date: Fri, 13 Aug 2010 00:28:43 +0200
+	id S1752489Ab0HLWwt (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 12 Aug 2010 18:52:49 -0400
+Date: Fri, 13 Aug 2010 00:50:31 +0200
 From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [PATCH] nconfig: Fix segfault when menu is empty
-Message-ID: <20100812222843.GA19505@sepie.suse.cz>
-References: <4C569703.9010607@udo.edu>
+Subject: Re: [PATCH 1/2] kconfig: Fix warning: ignoring return value of
+ 'fwrite'
+Message-ID: <20100812225031.GA19690@sepie.suse.cz>
+References: <20100804220102.GA10534@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <4C569703.9010607@udo.edu>
+In-Reply-To: <20100804220102.GA10534@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andrej Gelenberg <andrej.gelenberg@udo.edu>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Nir Tzachar <nir.tzachar@gmail.com>
+To: Jean Sacren <sakiwit@gmail.com>
+Cc: Jiri Kosina <jkosina@suse.cz>, Roman Zippel <zippel@linux-m68k.org>, linux-kbuild@vger.kernel.org
 
-On Mon, Aug 02, 2010 at 11:59:31AM +0200, Andrej Gelenberg wrote:
-> there is a small bug in nconf, which cause segfault in empty menus
-> (press right arrow in empty menu). Patch is attached.
+On Wed, Aug 04, 2010 at 04:01:02PM -0600, Jean Sacren wrote:
+> This fix facilitates fwrite() in both confdata.c and expr.c, either it
+> succeeds in writing, or an error occurs, or the end of file is reached.
 > 
-> Regards,
-> Andrej Gelenberg
-
-> From 60265c2f3db2616d3dc493785a47a301f73419bd Mon Sep 17 00:00:00 2001
-> From: Andrej Gelenberg <andrej.gelenberg@udo.edu>
-> Date: Mon, 2 Aug 2010 11:41:36 +0200
-> Subject: [PATCH] nconfig: Fix segfault when menu is empty
-> 
-> nconf crush with segfault if press right arrow in empty menu.
-> 
-> Signed-off-by: Andrej Gelenberg <andrej.gelenberg@udo.edu>
+> Signed-off-by: Jean Sacren <sakiwit@gmail.com>
+> Cc: stable <stable@kernel.org>
 > ---
->  scripts/kconfig/nconf.c |    1 +
->  1 files changed, 1 insertions(+), 0 deletions(-)
-> 
-> diff --git a/scripts/kconfig/nconf.c b/scripts/kconfig/nconf.c
-> index 762caf8..3db3ca6 100644
-> --- a/scripts/kconfig/nconf.c
-> +++ b/scripts/kconfig/nconf.c
-> @@ -676,6 +676,7 @@ static void *item_data(void)
->  	struct mitem *mcur;
->  
->  	cur = current_item(curses_menu);
-> +	if ( ! cur ) return NULL;
->  	mcur = (struct mitem *) item_userptr(cur);
->  	return mcur->usrptr;
+>  scripts/kconfig/confdata.c |    6 +++---
+>  scripts/kconfig/expr.c     |    2 +-
+>  scripts/kconfig/lkc.h      |    7 +++++++
+>  3 files changed, 11 insertions(+), 4 deletions(-)
 
-Applied after fixing indentation (see Documentation/CodingStyle).
+I applied this and the second patch (sorry for the delay), but I dropped
+the Cc: stable line. It's just a warning, nothing critical, and the
+context is different in released kernels, so why bother Greg with
+manually resolving conflicts.
 
 Michal
