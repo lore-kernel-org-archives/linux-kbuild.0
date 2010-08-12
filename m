@@ -1,57 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor.suse.de ([195.135.220.2]:40223 "EHLO mx1.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:33422 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752489Ab0HLW6c (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 12 Aug 2010 18:58:32 -0400
-Date: Fri, 13 Aug 2010 00:56:13 +0200
+	id S1760456Ab0HLXSl (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 12 Aug 2010 19:18:41 -0400
+Date: Fri, 13 Aug 2010 01:16:20 +0200
 From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [PATCH] setlocalversion: fix version for untaged nontip
- mercurial revs
-Message-ID: <20100812225613.GB19690@sepie.suse.cz>
-References: <fix-hg-id-resend1@mdm.bga.com>
+Subject: [GIT] kbuild: kconfig late changes
+Message-ID: <20100812231620.GA21703@sepie.suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <fix-hg-id-resend1@mdm.bga.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Milton Miller <miltonm@bga.com>
-Cc: gentoo@mgorny.alt.pl, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: andrej.gelenberg@udo.edu, sakiwit@gmail.com, sam@ravnborg.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Thu, Jul 22, 2010 at 10:19:38AM -0500, Milton Miller wrote:
-> The manpage for cut says it will return all lines without the delimiter
-> unless -s is specified.
-> 
-> When I backed up my mecurial tree to generate modules, I found that the
-> scm part of localversion was turning up blank.
-> 
-> Signed-off-by: Milton Miller <miltonm@bga.com>
-> Cc: Michal Marek <mmarek@suse.cz>
-> Cc: "Michał Górny" <gentoo@mgorny.alt.pl>
-> 
-> ---
-> This version is against linux next-20100721.  The diff against 35-rc
-> would be shifted left one tab stop and have different line numbers, should
-> this be sent to stable.
-> 
-> Resend without 8-bit characters (maintainers name) in header
-> Added linux-kbuild@vger.kernel.org which get-maintainer did not
-> 
-> diff --git a/scripts/setlocalversion b/scripts/setlocalversion
-> index a7b9f76..872312f 100755
-> --- a/scripts/setlocalversion
-> +++ b/scripts/setlocalversion
-> @@ -86,7 +86,7 @@ scm_version()
->  
->  	# Check for mercurial and a mercurial repo.
->  	if hgid=`hg id 2>/dev/null`; then
-> -		tag=`printf '%s' "$hgid" | cut -d' ' -f2`
-> +		tag=`printf '%s' "$hgid" | cut -s -d' ' -f2`
->  
->  		# Do we have an untagged version?
->  		if [ -z "$tag" -o "$tag" = tip ]; then
+Hi Linus,
 
-Sorry, I somehow missed this patch. I applied it now.
+Sam made two important fixes to 'make savedefconfig' and plans to submit
+a defconfig trimming patch in this merge window. Also, there are three
+small fixes that came after the merge window opened, but should not hurt
+(if you don't like merging them for .36, then please pull at least the
+two patches from Sam up to a64b44e).
 
+Thanks,
 Michal
+
+The following changes since commit e4d6152b520184be87aa65cb7035bf87acd27c14:
+
+  Merge branch 'kconfig' of git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild-2.6 (2010-08-05 14:12:07 -0700)
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild-2.6.git kconfig
+
+Andrej Gelenberg (1):
+      nconfig: Fix segfault when menu is empty
+
+Jean Sacren (2):
+      kconfig: Fix warning: ignoring return value of 'fwrite'
+      kconfig: Fix warning: ignoring return value of 'fgets'
+
+Sam Ravnborg (2):
+      kconfig: fix savedefconfig for tristate choices
+      kconfig: fix tristate choice with minimal config
+
+ scripts/kconfig/conf.c     |   15 +++++-
+ scripts/kconfig/confdata.c |  111 ++++++++++++++++++++++++++++----------------
+ scripts/kconfig/expr.c     |    2 +-
+ scripts/kconfig/lkc.h      |   10 ++++
+ scripts/kconfig/nconf.c    |    2 +
+ 5 files changed, 97 insertions(+), 43 deletions(-)
