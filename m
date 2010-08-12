@@ -1,38 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:32867 "EHLO mx2.suse.de"
+Received: from cantor.suse.de ([195.135.220.2]:40223 "EHLO mx1.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752489Ab0HLWwt (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 12 Aug 2010 18:52:49 -0400
-Date: Fri, 13 Aug 2010 00:50:31 +0200
+	id S1752489Ab0HLW6c (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 12 Aug 2010 18:58:32 -0400
+Date: Fri, 13 Aug 2010 00:56:13 +0200
 From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [PATCH 1/2] kconfig: Fix warning: ignoring return value of
- 'fwrite'
-Message-ID: <20100812225031.GA19690@sepie.suse.cz>
-References: <20100804220102.GA10534@mail.gmail.com>
+Subject: Re: [PATCH] setlocalversion: fix version for untaged nontip
+ mercurial revs
+Message-ID: <20100812225613.GB19690@sepie.suse.cz>
+References: <fix-hg-id-resend1@mdm.bga.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20100804220102.GA10534@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <fix-hg-id-resend1@mdm.bga.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jean Sacren <sakiwit@gmail.com>
-Cc: Jiri Kosina <jkosina@suse.cz>, Roman Zippel <zippel@linux-m68k.org>, linux-kbuild@vger.kernel.org
+To: Milton Miller <miltonm@bga.com>
+Cc: gentoo@mgorny.alt.pl, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-On Wed, Aug 04, 2010 at 04:01:02PM -0600, Jean Sacren wrote:
-> This fix facilitates fwrite() in both confdata.c and expr.c, either it
-> succeeds in writing, or an error occurs, or the end of file is reached.
+On Thu, Jul 22, 2010 at 10:19:38AM -0500, Milton Miller wrote:
+> The manpage for cut says it will return all lines without the delimiter
+> unless -s is specified.
 > 
-> Signed-off-by: Jean Sacren <sakiwit@gmail.com>
-> Cc: stable <stable@kernel.org>
+> When I backed up my mecurial tree to generate modules, I found that the
+> scm part of localversion was turning up blank.
+> 
+> Signed-off-by: Milton Miller <miltonm@bga.com>
+> Cc: Michal Marek <mmarek@suse.cz>
+> Cc: "Michał Górny" <gentoo@mgorny.alt.pl>
+> 
 > ---
->  scripts/kconfig/confdata.c |    6 +++---
->  scripts/kconfig/expr.c     |    2 +-
->  scripts/kconfig/lkc.h      |    7 +++++++
->  3 files changed, 11 insertions(+), 4 deletions(-)
+> This version is against linux next-20100721.  The diff against 35-rc
+> would be shifted left one tab stop and have different line numbers, should
+> this be sent to stable.
+> 
+> Resend without 8-bit characters (maintainers name) in header
+> Added linux-kbuild@vger.kernel.org which get-maintainer did not
+> 
+> diff --git a/scripts/setlocalversion b/scripts/setlocalversion
+> index a7b9f76..872312f 100755
+> --- a/scripts/setlocalversion
+> +++ b/scripts/setlocalversion
+> @@ -86,7 +86,7 @@ scm_version()
+>  
+>  	# Check for mercurial and a mercurial repo.
+>  	if hgid=`hg id 2>/dev/null`; then
+> -		tag=`printf '%s' "$hgid" | cut -d' ' -f2`
+> +		tag=`printf '%s' "$hgid" | cut -s -d' ' -f2`
+>  
+>  		# Do we have an untagged version?
+>  		if [ -z "$tag" -o "$tag" = tip ]; then
 
-I applied this and the second patch (sorry for the delay), but I dropped
-the Cc: stable line. It's just a warning, nothing critical, and the
-context is different in released kernels, so why bother Greg with
-manually resolving conflicts.
+Sorry, I somehow missed this patch. I applied it now.
 
 Michal
