@@ -1,36 +1,126 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor.suse.de ([195.135.220.2]:45639 "EHLO mx1.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1759109Ab0HLJO4 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 12 Aug 2010 05:14:56 -0400
-Message-ID: <4C63BB09.80609@suse.cz>
-Date: Thu, 12 Aug 2010 11:12:41 +0200
-From: Michal Marek <mmarek@suse.cz>
+Received: from mail-pw0-f46.google.com ([209.85.160.46]:52011 "EHLO
+	mail-pw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752977Ab0HLRVR (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 12 Aug 2010 13:21:17 -0400
+Received: by pwi4 with SMTP id 4so217828pwi.19
+        for <linux-kbuild@vger.kernel.org>; Thu, 12 Aug 2010 10:21:17 -0700 (PDT)
+Date: Thu, 12 Aug 2010 11:21:22 -0600
+From: Jean Sacren <sakiwit@gmail.com>
+Subject: [PATCH 1/1] kconfig: fix warning: ignoring return value, declared
+ with attribute warn_unused_result
+Message-ID: <20100812172122.GA21339@mail.gmail.com>
 MIME-Version: 1.0
-Subject: Re: [PATCH 0/2] kconfig: fixes for savedefconfig
-References: <20100812071023.GA11148@merkur.ravnborg.org>
-In-Reply-To: <20100812071023.GA11148@merkur.ravnborg.org>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, lkml <linux-kernel@vger.kernel.org>, =?ISO-8859-1?Q?Arve_Hj=F8nnev=E5g?= <arve@android.com>
+To: Michal Marek <mmarek@suse.cz>
+Cc: Jiri Kosina <jkosina@suse.cz>, Roman Zippel <zippel@linux-m68k.org>, linux-kbuild@vger.kernel.org
 
-On 12.8.2010 09:10, Sam Ravnborg wrote:
-> While tranislating all remaining defconfigs in
-> the kernel to the minimal format I encountered
-> an issue where the resulting .config was not
-> equal to the original.
-> 
-> This was tracked down to missing info in the saved defconfig file.
-> 
-> Arve reported another problem with tristate choice that was
-> reproduceable with a small config sample.
-> 
-> The followng patches fixes both issues.
-> There is no outstanding issue with respect to savedefconfig.
+Hush up the unnecessary gcc warnings when fwrite() or fgets() are
+called.
 
-Applied, thanks a lot Sam!
+Signed-off-by: Jean Sacren <sakiwit@gmail.com>
+Cc: stable <stable@kernel.org>
+---
+ scripts/kconfig/conf.c     |    6 ++++--
+ scripts/kconfig/confdata.c |    8 +++++---
+ scripts/kconfig/expr.c     |    3 ++-
+ 3 files changed, 11 insertions(+), 6 deletions(-)
 
-Michal
+diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
+index 9960d1c..beaa533 100644
+--- a/scripts/kconfig/conf.c
++++ b/scripts/kconfig/conf.c
+@@ -77,6 +77,7 @@ static void check_stdin(void)
+ 
+ static int conf_askvalue(struct symbol *sym, const char *def)
+ {
++	char *dummy;
+ 	enum symbol_type type = sym_get_type(sym);
+ 
+ 	if (!sym_has_value(sym))
+@@ -102,7 +103,7 @@ static int conf_askvalue(struct symbol *sym, const char *def)
+ 		check_stdin();
+ 	case ask_all:
+ 		fflush(stdout);
+-		fgets(line, 128, stdin);
++		dummy = fgets(line, 128, stdin);
+ 		return 1;
+ 	default:
+ 		break;
+@@ -230,6 +231,7 @@ static int conf_choice(struct menu *menu)
+ 	struct menu *child;
+ 	int type;
+ 	bool is_new;
++	char *dummy;
+ 
+ 	sym = menu->sym;
+ 	type = sym_get_type(sym);
+@@ -304,7 +306,7 @@ static int conf_choice(struct menu *menu)
+ 			check_stdin();
+ 		case ask_all:
+ 			fflush(stdout);
+-			fgets(line, 128, stdin);
++			dummy = fgets(line, 128, stdin);
+ 			strip(line);
+ 			if (line[0] == '?') {
+ 				print_help(menu);
+diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
+index c4dec80..52c6c3d 100644
+--- a/scripts/kconfig/confdata.c
++++ b/scripts/kconfig/confdata.c
+@@ -408,6 +408,7 @@ int conf_write(const char *name)
+ 	time_t now;
+ 	int use_timestamp = 1;
+ 	char *env;
++	size_t dummy;
+ 
+ 	dirname[0] = 0;
+ 	if (name && name[0]) {
+@@ -505,7 +506,7 @@ int conf_write(const char *name)
+ 				while (1) {
+ 					l = strcspn(str, "\"\\");
+ 					if (l) {
+-						fwrite(str, l, 1, out);
++						dummy = fwrite(str, l, 1, out);
+ 						str += l;
+ 					}
+ 					if (!*str)
+@@ -680,6 +681,7 @@ int conf_write_autoconf(void)
+ 	FILE *out, *tristate, *out_h;
+ 	time_t now;
+ 	int i, l;
++	size_t dummy;
+ 
+ 	sym_clear_all_valid();
+ 
+@@ -756,8 +758,8 @@ int conf_write_autoconf(void)
+ 			while (1) {
+ 				l = strcspn(str, "\"\\");
+ 				if (l) {
+-					fwrite(str, l, 1, out);
+-					fwrite(str, l, 1, out_h);
++					dummy = fwrite(str, l, 1, out);
++					dummy = fwrite(str, l, 1, out_h);
+ 					str += l;
+ 				}
+ 				if (!*str)
+diff --git a/scripts/kconfig/expr.c b/scripts/kconfig/expr.c
+index d83f232..99a058d 100644
+--- a/scripts/kconfig/expr.c
++++ b/scripts/kconfig/expr.c
+@@ -1087,7 +1087,8 @@ void expr_print(struct expr *e, void (*fn)(void *, struct symbol *, const char *
+ 
+ static void expr_print_file_helper(void *data, struct symbol *sym, const char *str)
+ {
+-	fwrite(str, strlen(str), 1, data);
++	size_t dummy;
++	dummy = fwrite(str, strlen(str), 1, data);
+ }
+ 
+ void expr_fprint(struct expr *e, FILE *out)
+-- 
+1.7.1
