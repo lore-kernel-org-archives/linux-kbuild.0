@@ -1,144 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepa.post.tele.dk ([195.41.46.235]:34719 "EHLO
+Received: from pfepa.post.tele.dk ([195.41.46.235]:35139 "EHLO
 	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1760847Ab0HLTcB (ORCPT
+	with ESMTP id S1753158Ab0HLTdy (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 12 Aug 2010 15:32:01 -0400
-Date: Thu, 12 Aug 2010 21:31:58 +0200
+	Thu, 12 Aug 2010 15:33:54 -0400
+Date: Thu, 12 Aug 2010 21:33:53 +0200
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH 1/1] kconfig: fix warning: ignoring return value,
-	declared with attribute warn_unused_result
-Message-ID: <20100812193158.GA32373@merkur.ravnborg.org>
-References: <20100812172122.GA21339@mail.gmail.com>
+Subject: Re: [PATCH 0/2] kconfig: fixes for savedefconfig
+Message-ID: <20100812193353.GB32373@merkur.ravnborg.org>
+References: <20100812071023.GA11148@merkur.ravnborg.org> <4C63BB09.80609@suse.cz>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20100812172122.GA21339@mail.gmail.com>
+In-Reply-To: <4C63BB09.80609@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jean Sacren <sakiwit@gmail.com>
-Cc: Michal Marek <mmarek@suse.cz>, Jiri Kosina <jkosina@suse.cz>, Roman Zippel <zippel@linux-m68k.org>, linux-kbuild@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, lkml <linux-kernel@vger.kernel.org>, Arve =?iso-8859-1?B?SGr4bm5lduVn?= <arve@android.com>
 
-On Thu, Aug 12, 2010 at 11:21:22AM -0600, Jean Sacren wrote:
-> Hush up the unnecessary gcc warnings when fwrite() or fgets() are
-> called.
+On Thu, Aug 12, 2010 at 11:12:41AM +0200, Michal Marek wrote:
+> On 12.8.2010 09:10, Sam Ravnborg wrote:
+> > While tranislating all remaining defconfigs in
+> > the kernel to the minimal format I encountered
+> > an issue where the resulting .config was not
+> > equal to the original.
+> > 
+> > This was tracked down to missing info in the saved defconfig file.
+> > 
+> > Arve reported another problem with tristate choice that was
+> > reproduceable with a small config sample.
+> > 
+> > The followng patches fixes both issues.
+> > There is no outstanding issue with respect to savedefconfig.
 > 
-> Signed-off-by: Jean Sacren <sakiwit@gmail.com>
-> Cc: stable <stable@kernel.org>
+> Applied, thanks a lot Sam!
 
-I actullay liked the first version you posted better than this.
-But ayway a few comments:
-- Please always include the warning you fix.
-  This makes it much easier to ask google if a patch for the
-  same issue already exists
-- Please redo the patch on top of Linus-latest.
-  We refactored some code and this patch will no longer apply
-- Please cc: Mike Frysinger as he sent a patch to fix the same warnings
+I would like to see these patches hit mainline soonish.
+I have a small shellscript that will convert remaining defconfigs to
+the minimal format and like it to be run just before after -rc1.
+But these patches is needed before I can ask Linus to run the script.
 
 	Sam
-
-
-> ---
->  scripts/kconfig/conf.c     |    6 ++++--
->  scripts/kconfig/confdata.c |    8 +++++---
->  scripts/kconfig/expr.c     |    3 ++-
->  3 files changed, 11 insertions(+), 6 deletions(-)
-> 
-> diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
-> index 9960d1c..beaa533 100644
-> --- a/scripts/kconfig/conf.c
-> +++ b/scripts/kconfig/conf.c
-> @@ -77,6 +77,7 @@ static void check_stdin(void)
->  
->  static int conf_askvalue(struct symbol *sym, const char *def)
->  {
-> +	char *dummy;
->  	enum symbol_type type = sym_get_type(sym);
->  
->  	if (!sym_has_value(sym))
-> @@ -102,7 +103,7 @@ static int conf_askvalue(struct symbol *sym, const char *def)
->  		check_stdin();
->  	case ask_all:
->  		fflush(stdout);
-> -		fgets(line, 128, stdin);
-> +		dummy = fgets(line, 128, stdin);
->  		return 1;
->  	default:
->  		break;
-> @@ -230,6 +231,7 @@ static int conf_choice(struct menu *menu)
->  	struct menu *child;
->  	int type;
->  	bool is_new;
-> +	char *dummy;
->  
->  	sym = menu->sym;
->  	type = sym_get_type(sym);
-> @@ -304,7 +306,7 @@ static int conf_choice(struct menu *menu)
->  			check_stdin();
->  		case ask_all:
->  			fflush(stdout);
-> -			fgets(line, 128, stdin);
-> +			dummy = fgets(line, 128, stdin);
->  			strip(line);
->  			if (line[0] == '?') {
->  				print_help(menu);
-> diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
-> index c4dec80..52c6c3d 100644
-> --- a/scripts/kconfig/confdata.c
-> +++ b/scripts/kconfig/confdata.c
-> @@ -408,6 +408,7 @@ int conf_write(const char *name)
->  	time_t now;
->  	int use_timestamp = 1;
->  	char *env;
-> +	size_t dummy;
->  
->  	dirname[0] = 0;
->  	if (name && name[0]) {
-> @@ -505,7 +506,7 @@ int conf_write(const char *name)
->  				while (1) {
->  					l = strcspn(str, "\"\\");
->  					if (l) {
-> -						fwrite(str, l, 1, out);
-> +						dummy = fwrite(str, l, 1, out);
->  						str += l;
->  					}
->  					if (!*str)
-> @@ -680,6 +681,7 @@ int conf_write_autoconf(void)
->  	FILE *out, *tristate, *out_h;
->  	time_t now;
->  	int i, l;
-> +	size_t dummy;
->  
->  	sym_clear_all_valid();
->  
-> @@ -756,8 +758,8 @@ int conf_write_autoconf(void)
->  			while (1) {
->  				l = strcspn(str, "\"\\");
->  				if (l) {
-> -					fwrite(str, l, 1, out);
-> -					fwrite(str, l, 1, out_h);
-> +					dummy = fwrite(str, l, 1, out);
-> +					dummy = fwrite(str, l, 1, out_h);
->  					str += l;
->  				}
->  				if (!*str)
-> diff --git a/scripts/kconfig/expr.c b/scripts/kconfig/expr.c
-> index d83f232..99a058d 100644
-> --- a/scripts/kconfig/expr.c
-> +++ b/scripts/kconfig/expr.c
-> @@ -1087,7 +1087,8 @@ void expr_print(struct expr *e, void (*fn)(void *, struct symbol *, const char *
->  
->  static void expr_print_file_helper(void *data, struct symbol *sym, const char *str)
->  {
-> -	fwrite(str, strlen(str), 1, data);
-> +	size_t dummy;
-> +	dummy = fwrite(str, strlen(str), 1, data);
->  }
->  
->  void expr_fprint(struct expr *e, FILE *out)
-> -- 
-> 1.7.1
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
