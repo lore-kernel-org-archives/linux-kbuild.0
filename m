@@ -1,43 +1,39 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepa.post.tele.dk ([195.41.46.235]:35139 "EHLO
+Received: from pfepa.post.tele.dk ([195.41.46.235]:48248 "EHLO
 	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753158Ab0HLTdy (ORCPT
+	with ESMTP id S1753336Ab0HLUo0 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 12 Aug 2010 15:33:54 -0400
-Date: Thu, 12 Aug 2010 21:33:53 +0200
+	Thu, 12 Aug 2010 16:44:26 -0400
+Date: Thu, 12 Aug 2010 22:44:25 +0200
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH 0/2] kconfig: fixes for savedefconfig
-Message-ID: <20100812193353.GB32373@merkur.ravnborg.org>
-References: <20100812071023.GA11148@merkur.ravnborg.org> <4C63BB09.80609@suse.cz>
+Subject: Upcoming cleanup patches
+Message-ID: <20100812204425.GA32630@merkur.ravnborg.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <4C63BB09.80609@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, lkml <linux-kernel@vger.kernel.org>, Arve =?iso-8859-1?B?SGr4bm5lduVn?= <arve@android.com>
+To: lkml <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>
 
-On Thu, Aug 12, 2010 at 11:12:41AM +0200, Michal Marek wrote:
-> On 12.8.2010 09:10, Sam Ravnborg wrote:
-> > While tranislating all remaining defconfigs in
-> > the kernel to the minimal format I encountered
-> > an issue where the resulting .config was not
-> > equal to the original.
-> > 
-> > This was tracked down to missing info in the saved defconfig file.
-> > 
-> > Arve reported another problem with tristate choice that was
-> > reproduceable with a small config sample.
-> > 
-> > The followng patches fixes both issues.
-> > There is no outstanding issue with respect to savedefconfig.
-> 
-> Applied, thanks a lot Sam!
+I am planning to submit to larger cleanup patches soonish.
+One of them rely on two patches, and I have asked Michal
+to get them upstream soonish.
 
-I would like to see these patches hit mainline soonish.
-I have a small shellscript that will convert remaining defconfigs to
-the minimal format and like it to be run just before after -rc1.
-But these patches is needed before I can ask Linus to run the script.
+The first patch is actually a pseudo patch.
+It is a small script that convert the remaining *defconfig
+files so they follow the minimal format.
+I plan to ask Linus to run the script.
+diffstat looks impressive...
+
+Linus - if you prefer a pull request I can do so.
+
+The second patch eliminates use of unifdef-y in
+all the Kbuild files in include/*
+
+unifdef-y and header-y has the same functionality,
+and there is no reason to keep the former.
+But the Kbuild files has historically seen
+quite some chrunch so I am waiting a few
+more days before touching them.
 
 	Sam
