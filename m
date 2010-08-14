@@ -1,44 +1,62 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor.suse.de ([195.135.220.2]:40652 "EHLO mx1.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752189Ab0HLXYa (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 12 Aug 2010 19:24:30 -0400
-Date: Fri, 13 Aug 2010 01:22:10 +0200
-From: Michal Marek <mmarek@suse.cz>
-Subject: [GIT] kbuild: 2 late fixes
-Message-ID: <20100812232210.GA22347@sepie.suse.cz>
+Received: from pfepa.post.tele.dk ([195.41.46.235]:34743 "EHLO
+	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756216Ab0HNMnb (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 14 Aug 2010 08:43:31 -0400
+Date: Sat, 14 Aug 2010 14:43:29 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: [PATCH]
+Message-ID: <20100814124329.GA28377@merkur.ravnborg.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: miltonm@bga.com, yegorslists@googlemail.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>, linux-kbuild <linux-kbuild@vger.kernel.org>, lkml <linux-kernel@vger.kernel.org>
 
-Hi Linus,
+From 705dbd8a31520722bda78e1bc731e2880f8df0ff Mon Sep 17 00:00:00 2001
+From: Sam Ravnborg <sam@ravnborg.org>
+Date: Sat, 14 Aug 2010 14:40:00 +0200
+Subject: [PATCH] kconfig: fix segfault when detecting recursive dependency
 
-Please pull these two kbuild fixes that came after the merge window
-opened (the one from Milton did come before 2.6.35 actually, but I
-overlooked it).
+Following sample Kconfig generated a segfault:
 
-Thanks,
-Michal
+config FOO
+        bool
+        select PERF_EVENTS if HAVE_HW_BREAKPOINT
 
+config PERF_EVENTS
+        bool
 
-The following changes since commit da9e82b3b8989fc09e2a4c45b9da604ba2b4c46d:
+config HAVE_HW_BREAKPOINT
+        bool
+        depends on PERF_EVENTS
 
-  Merge branch 'kbuild' of git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild-2.6 (2010-08-05 14:10:07 -0700)
+Fix by reverting back to a valid property if there was no
+property on the stack of symbols.
 
-are available in the git repository at:
+The above pattern were seen in sh Kconfig.
+A fix for the Kconfig file has been sent to the sh folks.
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild-2.6.git kbuild
+Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
+---
+ scripts/kconfig/symbol.c |    2 ++
+ 1 files changed, 2 insertions(+), 0 deletions(-)
 
-Milton Miller (1):
-      setlocalversion: fix version for untaged nontip mercurial revs
+diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
+index e95718f..943712c 100644
+--- a/scripts/kconfig/symbol.c
++++ b/scripts/kconfig/symbol.c
+@@ -937,6 +937,8 @@ static void sym_check_print_recursive(struct symbol *last_sym)
+ 		sym = stack->sym;
+ 		next_sym = stack->next ? stack->next->sym : last_sym;
+ 		prop = stack->prop;
++		if (prop == NULL)
++			prop = stack->sym->prop;
+ 
+ 		/* for choice values find the menu entry (used below) */
+ 		if (sym_is_choice(sym) || sym_is_choice_value(sym)) {
+-- 
+1.6.0.6
 
-Yegor Yefremov (1):
-      Fix CONFIG_CROSS_COMPILE issue in .config
-
- Makefile                |    1 -
- scripts/setlocalversion |    2 +-
- 2 files changed, 1 insertions(+), 2 deletions(-)
