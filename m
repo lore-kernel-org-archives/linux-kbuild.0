@@ -1,83 +1,44 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepb.post.tele.dk ([195.41.46.236]:37373 "EHLO
-	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755411Ab0HNV3C (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 14 Aug 2010 17:29:02 -0400
-Date: Sat, 14 Aug 2010 23:29:00 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: [PATCH] kconfig: fix savedefconfig with choice marked optional
-Message-ID: <20100814212900.GA29962@merkur.ravnborg.org>
+Received: from cantor2.suse.de ([195.135.220.15]:43985 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1757105Ab0HNWiZ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 14 Aug 2010 18:38:25 -0400
+Message-ID: <4C671ADF.6090006@suse.cz>
+Date: Sun, 15 Aug 2010 00:38:23 +0200
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Subject: Re: [PATCH] kconfig: fix segfault when detecting recursive dependency
+References: <20100814124329.GA28377@merkur.ravnborg.org> <20100814124458.GA28387@merkur.ravnborg.org>
+In-Reply-To: <20100814124458.GA28387@merkur.ravnborg.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>, linux-kbuild <linux-kbuild@vger.kernel.org>, lkml <linux-kernel@vger.kernel.org>
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, lkml <linux-kernel@vger.kernel.org>
 
-From db5b47421d4e9c2f3a35bc3aaa4a1423b767e00a Mon Sep 17 00:00:00 2001
-From: Sam Ravnborg <sam@ravnborg.org>
-Date: Sat, 14 Aug 2010 23:22:16 +0200
-Subject: [PATCH] kconfig: fix savedefconfig with choice marked optional
+Dne 14.8.2010 14:44, Sam Ravnborg napsal(a):
+> From 705dbd8a31520722bda78e1bc731e2880f8df0ff Mon Sep 17 00:00:00 2001
+> From: Sam Ravnborg <sam@ravnborg.org>
+> Date: Sat, 14 Aug 2010 14:40:00 +0200
+> Subject: [PATCH] kconfig: fix segfault when detecting recursive dependency
+> 
+> Following sample Kconfig generated a segfault:
+> 
+> config FOO
+>         bool
+>         select PERF_EVENTS if HAVE_HW_BREAKPOINT
+> 
+> config PERF_EVENTS
+>         bool
+> 
+> config HAVE_HW_BREAKPOINT
+>         bool
+>         depends on PERF_EVENTS
+> 
+> Fix by reverting back to a valid property if there was no
+> property on the stack of symbols.
 
-savedefconfig failed to save the correct minimal config
-when it encountered a choice marked optional.
+Applied, thanks.
 
-Consider following minimal configuration:
-$cat Kconfig
-choice
-	prompt "choice"
-	optional
-
-config A
-	bool "a"
-
-config B
-	bool "b"
-
-endchoice
-
-$cat .config | grep -v ^#
-CONFIG_A=y
-
-$conf --savedefconfig=defconfig Kconfig
-
-would before this fix result in an empty file, because
-kconfig would assume that CONFIG_A=y is a default value.
-But because the choice is optional the default is that
-both A and B are =n.
-
-Fix so we handle optional choices correct.
-
-Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
----
- scripts/kconfig/confdata.c |    6 ++++--
- 1 files changed, 4 insertions(+), 2 deletions(-)
-
-diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
-index c39327e..515253f 100644
---- a/scripts/kconfig/confdata.c
-+++ b/scripts/kconfig/confdata.c
-@@ -497,7 +497,9 @@ int conf_write_defconfig(const char *filename)
- 			/*
- 			 * If symbol is a choice value and equals to the
- 			 * default for a choice - skip.
--			 * But only if value is bool and equal to "y" .
-+			 * But only if value is bool and equal to "y" and
-+			 * choice is not "optional".
-+			 * (If choice is "optional" then all values can be "n")
- 			 */
- 			if (sym_is_choice_value(sym)) {
- 				struct symbol *cs;
-@@ -505,7 +507,7 @@ int conf_write_defconfig(const char *filename)
- 
- 				cs = prop_get_symbol(sym_get_choice_prop(sym));
- 				ds = sym_choice_default(cs);
--				if (sym == ds) {
-+				if (!sym_is_optional(cs) && sym == ds) {
- 					if ((sym->type == S_BOOLEAN) &&
- 					    sym_get_tristate_value(sym) == yes)
- 						goto next_menu;
--- 
-1.6.0.6
-
+Michal
