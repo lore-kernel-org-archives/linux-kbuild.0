@@ -1,48 +1,39 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qy0-f181.google.com ([209.85.216.181]:63689 "EHLO
-	mail-qy0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756155Ab0HNX0X (ORCPT
+Received: from pfepa.post.tele.dk ([195.41.46.235]:46957 "EHLO
+	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756598Ab0HOBPp (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 14 Aug 2010 19:26:23 -0400
-MIME-Version: 1.0
-Reply-To: sedat.dilek@gmail.com
-Date: Sun, 15 Aug 2010 01:26:22 +0200
-Message-ID: <AANLkTimYDzCowvmKgSDp0BJjLHadvtDgCVJkZgdAt4u7@mail.gmail.com>
+	Sat, 14 Aug 2010 21:15:45 -0400
+Date: Sun, 15 Aug 2010 03:15:42 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
 Subject: Re: [PATCH] kconfig: fix savedefconfig with choice marked optional
-From: Sedat Dilek <sedat.dilek@googlemail.com>
-Content-Type: text/plain; charset=UTF-8
+Message-ID: <20100815011542.GA30094@merkur.ravnborg.org>
+References: <AANLkTimYDzCowvmKgSDp0BJjLHadvtDgCVJkZgdAt4u7@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <AANLkTimYDzCowvmKgSDp0BJjLHadvtDgCVJkZgdAt4u7@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>, Sam Ravnborg <sam@ravnborg.org>, LKML <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org
+To: sedat.dilek@gmail.com
+Cc: Michal Marek <mmarek@suse.cz>, LKML <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org
 
-Recent kbuild/kconfig patches seem not to be in
-<http://repo.or.cz/w/linux-kbuild.git>?
+On Sun, Aug 15, 2010 at 01:26:22AM +0200, Sedat Dilek wrote:
+> Recent kbuild/kconfig patches seem not to be in
+> <http://repo.or.cz/w/linux-kbuild.git>?
+> 
+> Looks like there is a new home:
+> 
+> -T:      git git://repo.or.cz/linux-kbuild.git for-next
+> -T:      git git://repo.or.cz/linux-kbuild.git for-linus
+> +T:      git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild-2.6.git
+> for-next
+> +T:      git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild-2.6.git
+> for-linus
 
-Looks like there is a new home:
+This is already fixed in upstream. You need to update
+your source repository.
 
--T:      git git://repo.or.cz/linux-kbuild.git for-next
--T:      git git://repo.or.cz/linux-kbuild.git for-linus
-+T:      git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild-2.6.git
-for-next
-+T:      git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild-2.6.git
-for-linus
+See: http://git.kernel.org/?p=linux/kernel/git/torvalds/linux-2.6.git;a=commitdiff;h=3631d9a2e503ec9c36b0599b2e45548e5c410516
 
-Also, I would appreciate to have the Vcs-Browser URL (to say it in
-"Debian language") in the MAINTAINERS file.
-Personally, I check the GIT repos/branches via web-browser.
-
-T:      http://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild-2.6.git
-T:      https://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild-2.6.git
-
-What do you think of that?
-
-- Sedat -
-
-$ grep kbuild MAINTAINERS
-L:      linux-kbuild@vger.kernel.org
-Q:      http://patchwork.kernel.org/project/linux-kbuild/list/
-F:      Documentation/kbuild/kconfig-language.txt
-T:      git git://repo.or.cz/linux-kbuild.git for-next
-T:      git git://repo.or.cz/linux-kbuild.git for-linus
-L:      linux-kbuild@vger.kernel.org
-F:      Documentation/kbuild/
+	Sam
