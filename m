@@ -1,136 +1,64 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
 Received: from mail-gx0-f174.google.com ([209.85.161.174]:63818 "EHLO
 	mail-gx0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751627Ab0HPE2q (ORCPT
+	with ESMTP id S1751627Ab0HPE2t (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 16 Aug 2010 00:28:46 -0400
-Received: by gxk23 with SMTP id 23so1750426gxk.19
-        for <linux-kbuild@vger.kernel.org>; Sun, 15 Aug 2010 21:28:45 -0700 (PDT)
+	Mon, 16 Aug 2010 00:28:49 -0400
+Received: by mail-gx0-f174.google.com with SMTP id 23so1750426gxk.19
+        for <linux-kbuild@vger.kernel.org>; Sun, 15 Aug 2010 21:28:49 -0700 (PDT)
 From: Arnaud Lacombe <lacombar@gmail.com>
-Subject: [PATCH 1/4] kbuild: don't assign `stdout' and `stderr'
-Date: Mon, 16 Aug 2010 00:19:03 -0400
-Message-Id: <1281932346-19067-1-git-send-email-lacombar@gmail.com>
+Subject: [PATCH 2/4] kbuild: don't include `check-lxdialog' ldflags in global HOST_LOADLIBES
+Date: Mon, 16 Aug 2010 00:19:04 -0400
+Message-Id: <1281932346-19067-2-git-send-email-lacombar@gmail.com>
+In-Reply-To: <1281932346-19067-1-git-send-email-lacombar@gmail.com>
+References: <1281932346-19067-1-git-send-email-lacombar@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Sam Ravnborg <sam@ravnborg.org>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, Arnaud Lacombe <lacombar@gmail.com>, Nir Tzachar <nir.tzachar@gmail.com>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, Arnaud Lacombe <lacombar@gmail.com>
 
-These may not be modifiable, as per C99 comment:
+On BSD systems, `check-lxdialog' would select -lcurses as the default
+curses library which would conflict with -lncurses at runtime: curses'
+compatible symbols are getting handled by the system's curses library while the
+ncurses-specific symbols are getting handled by the ports' ncurses.
 
-section 7.19.5.4, note 232:
-"
-The primary use of the freopen function is to change the file associated with a
-standard text stream (stderr, stdin, or stdout), as those identifiers need not
-be modifiable lvalues to which the value returned by the fopen function may be
-assigned.
-"
-
-Use a duplicate of stdout as ncurses' output terminal, then redirect it
-to /dev/null for conf_write().
-
-This fixes nconf.c build on NetBSD.
+This fixes `nconf' segmentation fault on these systems.
 
 Signed-off-by: Arnaud Lacombe <lacombar@gmail.com>
-CC: Nir Tzachar <nir.tzachar@gmail.com>
 ---
- scripts/kconfig/nconf.c |   46 +++++++++++++++++++++-------------------------
- 1 files changed, 21 insertions(+), 25 deletions(-)
+ scripts/kconfig/Makefile |    5 +++--
+ 1 files changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/scripts/kconfig/nconf.c b/scripts/kconfig/nconf.c
-index 2ba71bc..e08a064 100644
---- a/scripts/kconfig/nconf.c
-+++ b/scripts/kconfig/nconf.c
-@@ -709,25 +709,6 @@ static const char *set_config_filename(const char *config_filename)
- 	return menu_backtitle;
- }
+diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
+index de934de..7522a8b 100644
+--- a/scripts/kconfig/Makefile
++++ b/scripts/kconfig/Makefile
+@@ -146,7 +146,6 @@ check-lxdialog  := $(srctree)/$(src)/lxdialog/check-lxdialog.sh
+ # Use recursively expanded variables so we do not call gcc unless
+ # we really need to do so. (Do not call gcc as part of make mrproper)
+ HOST_EXTRACFLAGS = $(shell $(CONFIG_SHELL) $(check-lxdialog) -ccflags)
+-HOST_LOADLIBES   = $(shell $(CONFIG_SHELL) $(check-lxdialog) -ldflags $(HOSTCC))
  
--/* command = 0 is supress, 1 is restore */
--static void supress_stdout(int command)
--{
--	static FILE *org_stdout;
--	static FILE *org_stderr;
--
--	if (command == 0) {
--		org_stdout = stdout;
--		org_stderr = stderr;
--		stdout = fopen("/dev/null", "a");
--		stderr = fopen("/dev/null", "a");
--	} else {
--		fclose(stdout);
--		fclose(stderr);
--		stdout = org_stdout;
--		stderr = org_stderr;
--	}
--}
--
- /* return = 0 means we are successful.
-  * -1 means go on doing what you were doing
-  */
-@@ -753,9 +734,7 @@ static int do_exit(void)
- 	/* if we got here, the user really wants to exit */
- 	switch (res) {
- 	case 0:
--		supress_stdout(0);
- 		res = conf_write(filename);
--		supress_stdout(1);
- 		if (res)
- 			btn_dialog(
- 				main_window,
-@@ -1449,9 +1428,7 @@ static void conf_save(void)
- 		case 0:
- 			if (!dialog_input_result[0])
- 				return;
--			supress_stdout(0);
- 			res = conf_write(dialog_input_result);
--			supress_stdout(1);
- 			if (!res) {
- 				char buf[1024];
- 				sprintf(buf, "%s %s",
-@@ -1495,6 +1472,8 @@ void setup_windows(void)
- int main(int ac, char **av)
- {
- 	char *mode;
-+	FILE *fp;
-+	int fd;
+ HOST_EXTRACFLAGS += -DLOCALE
  
- 	setlocale(LC_ALL, "");
- 	bindtextdomain(PACKAGE, LOCALEDIR);
-@@ -1509,8 +1488,25 @@ int main(int ac, char **av)
- 			single_menu_mode = 1;
- 	}
+@@ -208,7 +207,7 @@ clean-files     += config.pot linux.pot
+ PHONY += $(obj)/dochecklxdialog
+ $(addprefix $(obj)/,$(lxdialog)): $(obj)/dochecklxdialog
+ $(obj)/dochecklxdialog:
+-	$(Q)$(CONFIG_SHELL) $(check-lxdialog) -check $(HOSTCC) $(HOST_EXTRACFLAGS) $(HOST_LOADLIBES)
++	$(Q)$(CONFIG_SHELL) $(check-lxdialog) -check $(HOSTCC) $(HOST_EXTRACFLAGS) $(HOSTLOADLIBES_mconf)
  
-+	/* Duplicate stdout before redirecting it */
-+	fd = dup(STDOUT_FILENO);
-+	if (fd < 0) {
-+		perror("dup");
-+		return 1;
-+	}
+ always := dochecklxdialog
+ 
+@@ -226,6 +225,8 @@ HOSTLOADLIBES_gconf	= `pkg-config --libs gtk+-2.0 gmodule-2.0 libglade-2.0` -ldl
+ HOSTCFLAGS_gconf.o	= `pkg-config --cflags gtk+-2.0 gmodule-2.0 libglade-2.0` \
+                           -D LKC_DIRECT_LINK
+ 
++HOSTLOADLIBES_mconf   = $(shell $(CONFIG_SHELL) $(check-lxdialog) -ldflags $(HOSTCC))
 +
-+	fp = fdopen(fd, "a");
-+	if (fp == NULL) {
-+		perror("fdopen");
-+		return 1;
-+	}
-+
-+	freopen("/dev/null", "a", stdout);
-+	freopen("/dev/null", "a", stderr);
-+
- 	/* Initialize curses */
--	initscr();
-+	newterm(NULL, fp, stdin);
-+
- 	/* set color theme */
- 	set_colors();
+ HOSTLOADLIBES_nconf	= -lmenu -lpanel -lncurses
+ $(obj)/qconf.o: $(obj)/.tmp_qtcheck
  
-@@ -1521,7 +1517,7 @@ int main(int ac, char **av)
- 
- 	if (COLS < 75 || LINES < 20) {
- 		endwin();
--		printf("Your terminal should have at "
-+		fprintf(fp, "Your terminal should have at "
- 			"least 20 lines and 75 columns\n");
- 		return 1;
- 	}
 -- 
 1.7.2.30.gc37d7.dirty
 
