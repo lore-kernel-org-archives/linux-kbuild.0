@@ -1,34 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wy0-f174.google.com ([74.125.82.174]:59503 "EHLO
-	mail-wy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753863Ab0HPNRl (ORCPT
+Received: from pfepa.post.tele.dk ([195.41.46.235]:40174 "EHLO
+	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752023Ab0HPR1A (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 16 Aug 2010 09:17:41 -0400
-Message-ID: <4C693A6F.4000501@gmail.com>
-Date: Mon, 16 Aug 2010 14:17:35 +0100
-From: Andrew Benton <b3nton@gmail.com>
+	Mon, 16 Aug 2010 13:27:00 -0400
+Date: Mon, 16 Aug 2010 19:26:58 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: [RFC 1/2] kbuild: genericizes package name
+Message-ID: <20100816172658.GA7881@merkur.ravnborg.org>
+References: <1281934457-4225-1-git-send-email-lacombar@gmail.com> <1281934457-4225-2-git-send-email-lacombar@gmail.com> <4C692795.1020907@suse.cz> <4C692DC0.7020002@suse.cz>
 MIME-Version: 1.0
-Subject: Re: [PATCH] fixes for using make 3.82
-References: <4C6936120200007800010064@vpn.id2.novell.com> <20100816114131.GA7122@merkur.ravnborg.org> <4C6942D102000078000100C9@vpn.id2.novell.com>
-In-Reply-To: <4C6942D102000078000100C9@vpn.id2.novell.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4C692DC0.7020002@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jan Beulich <JBeulich@novell.com>
-Cc: Sam Ravnborg <sam@ravnborg.org>, Michal Marek <mmarek@suse.cz>, linux-kbuild <linux-kbuild@vger.kernel.org>, linux-kernel@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>
+Cc: Arnaud Lacombe <lacombar@gmail.com>, Roman Zippel <zippel@linux-m68k.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-On 16/08/10 12:53, Jan Beulich wrote:
->>>> On 16.08.10 at 13:41, Sam Ravnborg<sam@ravnborg.org>  wrote:
->> Added: Michael Marek (kbuild maintainer) + linux-kbuild.
->>
->> I assume this fixes firmware build reported by Andrew Benton (cc:ed).
->
-> Yes, it does (I had observed the same, which prompted the fix).
->
+On Mon, Aug 16, 2010 at 02:23:28PM +0200, Michal Marek wrote:
+> Dne 16.8.2010 13:57, Michal Marek napsal(a):
+> > Dne 16.8.2010 06:54, Arnaud Lacombe napsal(a):
+> >> -	sym = sym_lookup("KERNELVERSION", 0);
+> >> +	sym = sym_lookup("PROJECTVERSION", 0);
+> > 
+> > The required change to the top-level Makefile is missing. I suggest you
+> > rather replace "KERNELVERSION" with a macro defaulting to
+> > "KERNELVERSION", so that we don't have to change it in the Makefile and
+> > other scripts.
+> 
+> Maybe a cleaner way would be to use the same syntax as for
+> DEFCONFIG_LIST or MODULES, i.e. mark KERNELVERSION specially in the
+> Kconfig file:
+> 
+> config KERNELVERSION
+>     string
+>     option version env=
+> 
+> and then look for a symbol with this property in kconfig.
 
-I can confirm that the patch fixes the problem, I can compile the kernel 
-with make-3.82.
-Many thanks.
+I liked my proposal better - but alas that require some kconfig changes.
+I would be glad to receive your opinion on the suggested changes before
+putting too much time on it.
 
-Andy
+Note: I have not touced upon the "how do external projects build kconfig".
+I dunno yet what to do there and I consider the other topics more relevant
+as this will help existing users that have already solved the build stuff.
+
+	Sam
