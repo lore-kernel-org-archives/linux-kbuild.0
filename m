@@ -1,40 +1,63 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:43052 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751680Ab0HPMX3 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 16 Aug 2010 08:23:29 -0400
-Message-ID: <4C692DC0.7020002@suse.cz>
-Date: Mon, 16 Aug 2010 14:23:28 +0200
-From: Michal Marek <mmarek@suse.cz>
+Received: from mail-iw0-f174.google.com ([209.85.214.174]:44733 "EHLO
+	mail-iw0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753597Ab0HPMfB convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 16 Aug 2010 08:35:01 -0400
 MIME-Version: 1.0
-Subject: Re: [RFC 1/2] kbuild: genericizes package name
-References: <1281934457-4225-1-git-send-email-lacombar@gmail.com> <1281934457-4225-2-git-send-email-lacombar@gmail.com> <4C692795.1020907@suse.cz>
-In-Reply-To: <4C692795.1020907@suse.cz>
-Content-Type: text/plain; charset=ISO-8859-2
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <4C613627.1090907@suse.cz>
+References: <AANLkTim2mi0wbJJl17OkbCJbRt-s5phR4sumn5GsJKUp@mail.gmail.com>
+	<20100621120613.86cad1a4.akpm@linux-foundation.org>
+	<4C1FC35C.8090201@suse.cz>
+	<AANLkTil2-YNAa-jyOYD4cNtbJQ1XQJ6-v3iJ6wxpz7br@mail.gmail.com>
+	<AANLkTinC6Sqs7W--=14nmJFDcTS4HQn0=ysn7VhYDDX6@mail.gmail.com>
+	<adaocdg3fng.fsf@roland-alpha.cisco.com>
+	<20100805222623.39A3240208@magilla.sf.frob.com>
+	<AANLkTikvRqTR6TjP9H4-_RHhax24YRPv9PCxn165RTWs@mail.gmail.com>
+	<4C613627.1090907@suse.cz>
+Date: Mon, 16 Aug 2010 22:35:00 +1000
+Message-ID: <AANLkTimncLdNZCcpcEi9M7-jCuw5FE+xDT7v5--ByfMn@mail.gmail.com>
+Subject: Re: [PATCH] Fix CONFIG_CROSS_COMPILE issue in .config
+From: Andrew Hendry <andrew.hendry@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnaud Lacombe <lacombar@gmail.com>
-Cc: Sam Ravnborg <sam@ravnborg.org>, Roman Zippel <zippel@linux-m68k.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: Michal Marek <mmarek@suse.cz>
+Cc: Yegor Yefremov <yegorslists@googlemail.com>, Roland McGrath <roland@redhat.com>, Roland Dreier <rdreier@cisco.com>, Tiago Maluta <tiago.maluta@gmail.com>, Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-Dne 16.8.2010 13:57, Michal Marek napsal(a):
-> Dne 16.8.2010 06:54, Arnaud Lacombe napsal(a):
->> -	sym = sym_lookup("KERNELVERSION", 0);
->> +	sym = sym_lookup("PROJECTVERSION", 0);
-> 
-> The required change to the top-level Makefile is missing. I suggest you
-> rather replace "KERNELVERSION" with a macro defaulting to
-> "KERNELVERSION", so that we don't have to change it in the Makefile and
-> other scripts.
+This gives some errors on my ubuntu build for -rc1, reverting lets it
+build normally. Am I missing something?
 
-Maybe a cleaner way would be to use the same syntax as for
-DEFCONFIG_LIST or MODULES, i.e. mark KERNELVERSION specially in the
-Kconfig file:
+ahendry@ubuntu:~/linux/linux-2.6$ make
+make: ngcc: Command not found
+  CHK     include/linux/version.h
+  CHK     include/generated/utsrelease.h
+  CC      kernel/bounds.s
+/bin/sh: ngcc: not found
+make[1]: *** [kernel/bounds.s] Error 127
+make: *** [prepare0] Error 2
 
-config KERNELVERSION
-    string
-    option version env=
+.config has CONFIG_CROSS_COMPILE="n"
 
-and then look for a symbol with this property in kconfig.
-
-Michal
+On Tue, Aug 10, 2010 at 9:21 PM, Michal Marek <mmarek@suse.cz> wrote:
+> On 10.8.2010 08:43, Yegor Yefremov wrote:
+>> On Fri, Aug 6, 2010 at 12:26 AM, Roland McGrath <roland@redhat.com> wrote:
+>>>> Yes, this make sense to me.  It's not clear to me why we ever needed
+>>>> the conditional assignment of an empty CROSS_COMPILE (that code predates
+>>>> the start of git history) [...]
+>>>
+>>> Perhaps someone used make --warn-undefined-variables.
+>>
+>> Are there any other comments or is the patch valid? Should I resend it
+>> as a new thread?
+>
+> No problem at your side, the patch is fine and I applied it now.
+>
+> Michal
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-kernel" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> Please read the FAQ at  http://www.tux.org/lkml/
+>
