@@ -1,15 +1,15 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-gy0-f174.google.com ([209.85.160.174]:64883 "EHLO
-	mail-gy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750797Ab0HPE7m (ORCPT
+Received: from mail-gw0-f46.google.com ([74.125.83.46]:37372 "EHLO
+	mail-gw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750797Ab0HPE7o (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 16 Aug 2010 00:59:42 -0400
-Received: by gyg10 with SMTP id 10so1734776gyg.19
-        for <linux-kbuild@vger.kernel.org>; Sun, 15 Aug 2010 21:59:42 -0700 (PDT)
+	Mon, 16 Aug 2010 00:59:44 -0400
+Received: by gwj17 with SMTP id 17so779354gwj.19
+        for <linux-kbuild@vger.kernel.org>; Sun, 15 Aug 2010 21:59:44 -0700 (PDT)
 From: Arnaud Lacombe <lacombar@gmail.com>
-Subject: [RFC 1/2] kbuild: genericizes package name
-Date: Mon, 16 Aug 2010 00:54:16 -0400
-Message-Id: <1281934457-4225-2-git-send-email-lacombar@gmail.com>
+Subject: [RFC 2/2] kbuild: genericizes kbuild's config prefix
+Date: Mon, 16 Aug 2010 00:54:17 -0400
+Message-Id: <1281934457-4225-3-git-send-email-lacombar@gmail.com>
 In-Reply-To: <1281934457-4225-1-git-send-email-lacombar@gmail.com>
 References: <1281934457-4225-1-git-send-email-lacombar@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -20,375 +20,268 @@ Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, Arnaud Lacombe <lacombar@gmail.
 Signed-off-by: Arnaud Lacombe <lacombar@gmail.com>
 
 ---
- scripts/kconfig/conf.c              |   12 ++++++------
- scripts/kconfig/confdata.c          |    8 ++++----
- scripts/kconfig/gconf.c             |    4 ++--
- scripts/kconfig/lkc.h               |    7 ++++++-
- scripts/kconfig/mconf.c             |   34 +++++++++++++++++-----------------
- scripts/kconfig/nconf.c             |   20 +++++++++-----------
- scripts/kconfig/qconf.cc            |    6 +++---
- scripts/kconfig/zconf.tab.c_shipped |    2 +-
- scripts/kconfig/zconf.y             |    2 +-
- 9 files changed, 49 insertions(+), 46 deletions(-)
+ scripts/kconfig/confdata.c |   40 ++++++++++++++++++++--------------------
+ scripts/kconfig/mconf.c    |   10 +++++-----
+ scripts/kconfig/menu.c     |    2 +-
+ scripts/kconfig/nconf.c    |   20 ++++++++++----------
+ 4 files changed, 36 insertions(+), 36 deletions(-)
 
-diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
-index 5b7c86e..8233d85 100644
---- a/scripts/kconfig/conf.c
-+++ b/scripts/kconfig/conf.c
-@@ -508,8 +508,8 @@ int main(int ac, char **av)
- 		name = conf_get_configname();
- 		if (stat(name, &tmpstat)) {
- 			fprintf(stderr, _("***\n"
--				"*** You have not yet configured your kernel!\n"
--				"*** (missing kernel config file \"%s\")\n"
-+				"*** Configuration file \"%s\" not found!\n"
-+				"*** " PACKAGE_LONG " has not yet been configured.\n"
- 				"***\n"
- 				"*** Please run some configurator (e.g. \"make oldconfig\" or\n"
- 				"*** \"make menuconfig\" or \"make xconfig\").\n"
-@@ -571,7 +571,7 @@ int main(int ac, char **av)
- 			name = getenv("KCONFIG_NOSILENTUPDATE");
- 			if (name && *name) {
- 				fprintf(stderr,
--					_("\n*** Kernel configuration requires explicit update.\n\n"));
-+					_("\n*** " PACKAGE_LONG " configuration requires explicit update.\n\n"));
- 				return 1;
- 			}
- 		}
-@@ -623,11 +623,11 @@ int main(int ac, char **av)
- 		 * All other commands are only used to generate a config.
- 		 */
- 		if (conf_get_changed() && conf_write(NULL)) {
--			fprintf(stderr, _("\n*** Error during writing of the kernel configuration.\n\n"));
-+			fprintf(stderr, _("\n*** Error during writing of the " PACKAGE_LONG " configuration.\n\n"));
- 			exit(1);
- 		}
- 		if (conf_write_autoconf()) {
--			fprintf(stderr, _("\n*** Error during update of the kernel configuration.\n\n"));
-+			fprintf(stderr, _("\n*** Error during update of the " PACKAGE_LONG " configuration.\n\n"));
- 			return 1;
- 		}
- 	} else if (input_mode == savedefconfig) {
-@@ -638,7 +638,7 @@ int main(int ac, char **av)
- 		}
- 	} else if (input_mode != listnewconfig) {
- 		if (conf_write(NULL)) {
--			fprintf(stderr, _("\n*** Error during writing of the kernel configuration.\n\n"));
-+			fprintf(stderr, _("\n*** Error during writing of the " PACKAGE_LONG " configuration.\n\n"));
- 			exit(1);
- 		}
- 	}
 diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
-index c39327e..74327c3 100644
+index 74327c3..f0f6cdc 100644
 --- a/scripts/kconfig/confdata.c
 +++ b/scripts/kconfig/confdata.c
-@@ -579,7 +579,7 @@ int conf_write(const char *name)
- 	if (!out)
- 		return 1;
+@@ -222,22 +222,22 @@ load:
+ 		sym = NULL;
+ 		switch (line[0]) {
+ 		case '#':
+-			if (memcmp(line + 2, "CONFIG_", 7))
++			if (memcmp(line + 2, KBUILD_PREFIX, KBUILD_PREFIX_LEN))
+ 				continue;
+-			p = strchr(line + 9, ' ');
++			p = strchr(line + 2 + KBUILD_PREFIX_LEN, ' ');
+ 			if (!p)
+ 				continue;
+ 			*p++ = 0;
+ 			if (strncmp(p, "is not set", 10))
+ 				continue;
+ 			if (def == S_DEF_USER) {
+-				sym = sym_find(line + 9);
++				sym = sym_find(line + 2 + KBUILD_PREFIX_LEN);
+ 				if (!sym) {
+ 					sym_add_change_count(1);
+ 					break;
+ 				}
+ 			} else {
+-				sym = sym_lookup(line + 9, 0);
++				sym = sym_lookup(line + 2 + KBUILD_PREFIX_LEN, 0);
+ 				if (sym->type == S_UNKNOWN)
+ 					sym->type = S_BOOLEAN;
+ 			}
+@@ -255,11 +255,11 @@ load:
+ 			}
+ 			break;
+ 		case 'C':
+-			if (memcmp(line, "CONFIG_", 7)) {
++			if (memcmp(line, KBUILD_PREFIX, KBUILD_PREFIX_LEN)) {
+ 				conf_warning("unexpected data");
+ 				continue;
+ 			}
+-			p = strchr(line + 7, '=');
++			p = strchr(line + KBUILD_PREFIX_LEN, '=');
+ 			if (!p)
+ 				continue;
+ 			*p++ = 0;
+@@ -270,13 +270,13 @@ load:
+ 					*p2 = 0;
+ 			}
+ 			if (def == S_DEF_USER) {
+-				sym = sym_find(line + 7);
++				sym = sym_find(line + KBUILD_PREFIX_LEN);
+ 				if (!sym) {
+ 					sym_add_change_count(1);
+ 					break;
+ 				}
+ 			} else {
+-				sym = sym_lookup(line + 7, 0);
++				sym = sym_lookup(line + KBUILD_PREFIX_LEN, 0);
+ 				if (sym->type == S_UNKNOWN)
+ 					sym->type = S_OTHER;
+ 			}
+@@ -405,9 +405,9 @@ static void conf_write_string(bool headerfile, const char *name,
+ {
+ 	int l;
+ 	if (headerfile)
+-		fprintf(out, "#define CONFIG_%s \"", name);
++		fprintf(out, "#define " KBUILD_PREFIX "%s \"", name);
+ 	else
+-		fprintf(out, "CONFIG_%s=\"", name);
++		fprintf(out, KBUILD_PREFIX "%s=\"", name);
  
--	sym = sym_lookup("KERNELVERSION", 0);
-+	sym = sym_lookup("PROJECTVERSION", 0);
- 	sym_calc_value(sym);
- 	time(&now);
- 	env = getenv("KCONFIG_NOTIMESTAMP");
-@@ -588,7 +588,7 @@ int conf_write(const char *name)
- 
- 	fprintf(out, _("#\n"
- 		       "# Automatically generated make config: don't edit\n"
--		       "# Linux kernel version: %s\n"
-+		       "# " PACKAGE_LONG " version: %s\n"
- 		       "%s%s"
- 		       "#\n"),
- 		     sym_get_string_value(sym),
-@@ -807,7 +807,7 @@ int conf_write_autoconf(void)
- 	time(&now);
- 	fprintf(out, "#\n"
- 		     "# Automatically generated make config: don't edit\n"
--		     "# Linux kernel version: %s\n"
-+		     "# " PACKAGE_LONG " version: %s\n"
- 		     "# %s"
- 		     "#\n",
- 		     sym_get_string_value(sym), ctime(&now));
-@@ -816,7 +816,7 @@ int conf_write_autoconf(void)
- 			  "\n");
- 	fprintf(out_h, "/*\n"
- 		       " * Automatically generated C config: don't edit\n"
--		       " * Linux kernel version: %s\n"
-+		       " * " PACKAGE_LONG " version: %s\n"
- 		       " * %s"
- 		       " */\n"
- 		       "#define AUTOCONF_INCLUDED\n",
-diff --git a/scripts/kconfig/gconf.c b/scripts/kconfig/gconf.c
-index d669882..0f93dc6 100644
---- a/scripts/kconfig/gconf.c
-+++ b/scripts/kconfig/gconf.c
-@@ -210,8 +210,8 @@ void init_main_window(const gchar * glade_file)
- 					  /*"style", PANGO_STYLE_OBLIQUE, */
- 					  NULL);
- 
--	sprintf(title, _("Linux Kernel v%s Configuration"),
--		getenv("KERNELVERSION"));
-+	sprintf(title, _("%s v%s Configuration"),
-+		PACKAGE_LONG, getenv("KERNELVERSION"));
- 	gtk_window_set_title(GTK_WINDOW(main_wnd), title);
- 
- 	gtk_widget_show(main_wnd);
-diff --git a/scripts/kconfig/lkc.h b/scripts/kconfig/lkc.h
-index bdf71bd..1fcd756 100644
---- a/scripts/kconfig/lkc.h
-+++ b/scripts/kconfig/lkc.h
-@@ -31,7 +31,12 @@ extern "C" {
- 
- #define SRCTREE "srctree"
- 
--#define PACKAGE "linux"
-+#define PACKAGE			"linux"
-+#define PACKAGE_LONG		"Linux Kernel"
-+
-+#define KBUILD_PREFIX		"CONFIG_"
-+#define KBUILD_PREFIX_LEN	(sizeof(KBUILD_PREFIX) - 1)
-+
- #define LOCALEDIR "/usr/share/locale"
- 
- #define _(text) gettext(text)
+ 	while (1) {
+ 		l = strcspn(str, "\"\\");
+@@ -433,13 +433,13 @@ static void conf_write_symbol(struct symbol *sym, enum symbol_type type,
+ 		switch (sym_get_tristate_value(sym)) {
+ 		case no:
+ 			if (write_no)
+-				fprintf(out, "# CONFIG_%s is not set\n", sym->name);
++				fprintf(out, "# " KBUILD_PREFIX "%s is not set\n", sym->name);
+ 			break;
+ 		case mod:
+-			fprintf(out, "CONFIG_%s=m\n", sym->name);
++			fprintf(out, KBUILD_PREFIX "%s=m\n", sym->name);
+ 			break;
+ 		case yes:
+-			fprintf(out, "CONFIG_%s=y\n", sym->name);
++			fprintf(out, KBUILD_PREFIX "%s=y\n", sym->name);
+ 			break;
+ 		}
+ 		break;
+@@ -449,7 +449,7 @@ static void conf_write_symbol(struct symbol *sym, enum symbol_type type,
+ 	case S_HEX:
+ 	case S_INT:
+ 		str = sym_get_string_value(sym);
+-		fprintf(out, "CONFIG_%s=%s\n", sym->name, str);
++		fprintf(out, KBUILD_PREFIX "%s=%s\n", sym->name, str);
+ 		break;
+ 	case S_OTHER:
+ 	case S_UNKNOWN:
+@@ -838,14 +838,14 @@ int conf_write_autoconf(void)
+ 			case no:
+ 				break;
+ 			case mod:
+-				fprintf(tristate, "CONFIG_%s=M\n", sym->name);
+-				fprintf(out_h, "#define CONFIG_%s_MODULE 1\n", sym->name);
++				fprintf(tristate, KBUILD_PREFIX "%s=M\n", sym->name);
++				fprintf(out_h, "#define " KBUILD_PREFIX "%s_MODULE 1\n", sym->name);
+ 				break;
+ 			case yes:
+ 				if (sym->type == S_TRISTATE)
+-					fprintf(tristate, "CONFIG_%s=Y\n",
++					fprintf(tristate, KBUILD_PREFIX "%s=Y\n",
+ 							sym->name);
+-				fprintf(out_h, "#define CONFIG_%s 1\n", sym->name);
++				fprintf(out_h, "#define " KBUILD_PREFIX "%s 1\n", sym->name);
+ 				break;
+ 			}
+ 			break;
+@@ -855,12 +855,12 @@ int conf_write_autoconf(void)
+ 		case S_HEX:
+ 			str = sym_get_string_value(sym);
+ 			if (str[0] != '0' || (str[1] != 'x' && str[1] != 'X')) {
+-				fprintf(out_h, "#define CONFIG_%s 0x%s\n", sym->name, str);
++				fprintf(out_h, "#define " KBUILD_PREFIX "%s 0x%s\n", sym->name, str);
+ 				break;
+ 			}
+ 		case S_INT:
+ 			str = sym_get_string_value(sym);
+-			fprintf(out_h, "#define CONFIG_%s %s\n", sym->name, str);
++			fprintf(out_h, "#define " KBUILD_PREFIX "%s %s\n", sym->name, str);
+ 			break;
+ 		default:
+ 			break;
 diff --git a/scripts/kconfig/mconf.c b/scripts/kconfig/mconf.c
-index d2f6e05..c2caf0c 100644
+index c2caf0c..b9b08cd 100644
 --- a/scripts/kconfig/mconf.c
 +++ b/scripts/kconfig/mconf.c
-@@ -25,10 +25,10 @@
- static const char mconf_readme[] = N_(
- "Overview\n"
- "--------\n"
--"Some kernel features may be built directly into the kernel.\n"
-+"Some " PACKAGE_LONG " features may be built directly into it.\n"
- "Some may be made into loadable runtime modules.  Some features\n"
- "may be completely removed altogether.  There are also certain\n"
--"kernel parameters which are not really features, but must be\n"
-+PACKAGE_LONG " parameters which are not really features, but must be\n"
- "entered in as decimal or hexadecimal numbers or possibly text.\n"
- "\n"
- "Menu items beginning with following braces represent features that\n"
-@@ -117,7 +117,7 @@ static const char mconf_readme[] = N_(
- "-----------------------------\n"
- "Menuconfig supports the use of alternate configuration files for\n"
- "those who, for various reasons, find it necessary to switch\n"
--"between different kernel configurations.\n"
-+"between different " PACKAGE_LONG " configurations.\n"
- "\n"
- "At the end of the main menu you will find two options.  One is\n"
- "for saving the current configuration to a file of your choosing.\n"
-@@ -150,7 +150,7 @@ static const char mconf_readme[] = N_(
- "\n"
- "Optional personality available\n"
- "------------------------------\n"
--"If you prefer to have all of the kernel options listed in a single\n"
-+"If you prefer to have all of the " PACKAGE_LONG " options listed in a single\n"
- "menu, rather than the default multimenu hierarchy, run the menuconfig\n"
- "with MENUCONFIG_MODE environment variable set to single_menu. Example:\n"
- "\n"
-@@ -207,11 +207,11 @@ load_config_text[] = N_(
- 	"last retrieved.  Leave blank to abort."),
- load_config_help[] = N_(
+@@ -232,7 +232,7 @@ save_config_help[] = N_(
+ 	"leave this blank.\n"),
+ search_help[] = N_(
  	"\n"
--	"For various reasons, one may wish to keep several different kernel\n"
-+	"For various reasons, one may wish to keep several different " PACKAGE_LONG "\n"
- 	"configurations available on a single machine.\n"
- 	"\n"
- 	"If you have saved a previous configuration in a file other than the\n"
--	"kernel's default, entering the name of the file here will allow you\n"
-+	PACKAGE_LONG "'s default, entering the name of the file here will allow you\n"
- 	"to modify that configuration.\n"
- 	"\n"
- 	"If you are uncertain, then you have probably never used alternate\n"
-@@ -221,7 +221,7 @@ save_config_text[] = N_(
- 	"as an alternate.  Leave blank to abort."),
- save_config_help[] = N_(
- 	"\n"
--	"For various reasons, one may wish to keep different kernel\n"
-+	"For various reasons, one may wish to keep different " PACKAGE_LONG "\n"
- 	"configurations available on a single machine.\n"
- 	"\n"
- 	"Entering a file name here will allow you to later retrieve, modify\n"
-@@ -265,9 +265,9 @@ search_help[] = N_(
- 	"Only relevant lines are shown.\n"
- 	"\n\n"
- 	"Search examples:\n"
--	"Examples: USB	=> find all CONFIG_ symbols containing USB\n"
--	"          ^USB => find all CONFIG_ symbols starting with USB\n"
--	"          USB$ => find all CONFIG_ symbols ending with USB\n"
-+	"Examples: USB	=> find all " KBUILD_PREFIX " symbols containing USB\n"
-+	"          ^USB => find all " KBUILD_PREFIX " symbols starting with USB\n"
-+	"          USB$ => find all " KBUILD_PREFIX " symbols ending with USB\n"
- 	"\n");
- 
- static int indent;
-@@ -292,10 +292,10 @@ static void set_config_filename(const char *config_filename)
- 	int size;
- 	struct symbol *sym;
- 
--	sym = sym_lookup("KERNELVERSION", 0);
-+	sym = sym_lookup("PROJECTVERSION", 0);
- 	sym_calc_value(sym);
- 	size = snprintf(menu_backtitle, sizeof(menu_backtitle),
--	                _("%s - Linux Kernel v%s Configuration"),
-+	                _("%s - %s v%s Configuration"), PACKAGE_LONG,
- 		        config_filename, sym_get_string_value(sym));
- 	if (size >= sizeof(menu_backtitle))
- 		menu_backtitle[sizeof(menu_backtitle)-1] = '\0';
-@@ -834,7 +834,7 @@ int main(int ac, char **av)
- 		if (conf_get_changed())
- 			res = dialog_yesno(NULL,
- 					   _("Do you wish to save your "
--					     "new kernel configuration?\n"
-+					     "new configuration?\n"
- 					     "<ESC><ESC> to continue."),
- 					   6, 60);
- 		else
-@@ -846,20 +846,20 @@ int main(int ac, char **av)
- 	case 0:
- 		if (conf_write(filename)) {
- 			fprintf(stderr, _("\n\n"
--				"Error during writing of the kernel configuration.\n"
--				"Your kernel configuration changes were NOT saved."
-+				"Error while writing of the configuration.\n"
-+				"Your " PACKAGE_LONG " configuration changes were NOT saved."
- 				"\n\n"));
- 			return 1;
- 		}
- 	case -1:
- 		printf(_("\n\n"
--			"*** End of Linux kernel configuration.\n"
-+			"*** End of " PACKAGE_LONG " configuration.\n"
- 			"*** Execute 'make' to build the kernel or try 'make help'."
- 			"\n\n"));
- 		break;
- 	default:
- 		fprintf(stderr, _("\n\n"
--			"Your kernel configuration changes were NOT saved."
-+			"Your " PACKAGE_LONG " configuration changes were NOT saved."
- 			"\n\n"));
+-	"Search for CONFIG_ symbols and display their relations.\n"
++	"Search for " KBUILD_PREFIX " symbols and display their relations.\n"
+ 	"Regular expressions are allowed.\n"
+ 	"Example: search for \"^FOO\"\n"
+ 	"Result:\n"
+@@ -249,7 +249,7 @@ search_help[] = N_(
+ 	"Selected by: BAR\n"
+ 	"-----------------------------------------------------------------\n"
+ 	"o The line 'Prompt:' shows the text used in the menu structure for\n"
+-	"  this CONFIG_ symbol\n"
++	"  this " KBUILD_PREFIX " symbol\n"
+ 	"o The 'Defined at' line tell at what file / line number the symbol\n"
+ 	"  is defined\n"
+ 	"o The 'Depends on:' line tell what symbols needs to be defined for\n"
+@@ -316,7 +316,7 @@ static void search_conf(void)
+ again:
+ 	dialog_clear();
+ 	dres = dialog_inputbox(_("Search Configuration Parameter"),
+-			      _("Enter CONFIG_ (sub)string to search for "
++			      _("Enter " KBUILD_PREFIX " (sub)string to search for "
+ 				"(with or without \"CONFIG\")"),
+ 			      10, 75, "");
+ 	switch (dres) {
+@@ -329,9 +329,9 @@ again:
+ 		return;
  	}
  
+-	/* strip CONFIG_ if necessary */
++	/* strip the prefix if necessary */
+ 	dialog_input = dialog_input_result;
+-	if (strncasecmp(dialog_input_result, "CONFIG_", 7) == 0)
++	if (strncasecmp(dialog_input_result, KBUILD_PREFIX, KBUILD_PREFIX_LEN) == 0)
+ 		dialog_input += 7;
+ 
+ 	sym_arr = sym_re_search(dialog_input);
+diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
+index 4fb5902..b4800d8 100644
+--- a/scripts/kconfig/menu.c
++++ b/scripts/kconfig/menu.c
+@@ -566,7 +566,7 @@ void menu_get_ext_help(struct menu *menu, struct gstr *help)
+ 
+ 	if (menu_has_help(menu)) {
+ 		if (sym->name) {
+-			str_printf(help, "CONFIG_%s:\n\n", sym->name);
++			str_printf(help, KBUILD_PREFIX "%s:\n\n", sym->name);
+ 			str_append(help, _(menu_get_help(menu)));
+ 			str_append(help, "\n");
+ 		}
 diff --git a/scripts/kconfig/nconf.c b/scripts/kconfig/nconf.c
-index 2ba71bc..f5550a9 100644
+index f5550a9..6cb19dc 100644
 --- a/scripts/kconfig/nconf.c
 +++ b/scripts/kconfig/nconf.c
-@@ -12,10 +12,10 @@
- static const char nconf_readme[] = N_(
- "Overview\n"
- "--------\n"
--"Some kernel features may be built directly into the kernel.\n"
-+"Some " PACKAGE_LONG " features may be built directly in it.\n"
- "Some may be made into loadable runtime modules.  Some features\n"
- "may be completely removed altogether.  There are also certain\n"
--"kernel parameters which are not really features, but must be\n"
-+PACKAGE_LONG " parameters which are not really features, but must be\n"
- "entered in as decimal or hexadecimal numbers or possibly text.\n"
+@@ -210,7 +210,7 @@ save_config_help[] = N_(
+ "leave this blank.\n"),
+ search_help[] = N_(
  "\n"
- "Menu items beginning with following braces represent features that\n"
-@@ -695,10 +695,10 @@ static const char *set_config_filename(const char *config_filename)
- 	int size;
- 	struct symbol *sym;
+-"Search for CONFIG_ symbols and display their relations.\n"
++"Search for " KBUILD_PREFIX " symbols and display their relations.\n"
+ "Regular expressions are allowed.\n"
+ "Example: search for \"^FOO\"\n"
+ "Result:\n"
+@@ -227,7 +227,7 @@ search_help[] = N_(
+ "Selected by: BAR\n"
+ "-----------------------------------------------------------------\n"
+ "o The line 'Prompt:' shows the text used in the menu structure for\n"
+-"  this CONFIG_ symbol\n"
++"  this " KBUILD_PREFIX " symbol\n"
+ "o The 'Defined at' line tell at what file / line number the symbol\n"
+ "  is defined\n"
+ "o The 'Depends on:' line tell what symbols needs to be defined for\n"
+@@ -243,9 +243,9 @@ search_help[] = N_(
+ "Only relevant lines are shown.\n"
+ "\n\n"
+ "Search examples:\n"
+-"Examples: USB   = > find all CONFIG_ symbols containing USB\n"
+-"          ^USB => find all CONFIG_ symbols starting with USB\n"
+-"          USB$ => find all CONFIG_ symbols ending with USB\n"
++"Examples: USB   = > find all " KBUILD_PREFIX " symbols containing USB\n"
++"          ^USB => find all " KBUILD_PREFIX " symbols starting with USB\n"
++"          USB$ => find all " KBUILD_PREFIX " symbols ending with USB\n"
+ "\n");
  
--	sym = sym_lookup("KERNELVERSION", 0);
-+	sym = sym_lookup("PROJECTVERSION", 0);
- 	sym_calc_value(sym);
- 	size = snprintf(menu_backtitle, sizeof(menu_backtitle),
--			_("%s - Linux Kernel v%s Configuration"),
-+			_("%s - %s v%s Configuration"), PACKAGE_LONG,
- 			config_filename, sym_get_string_value(sym));
- 	if (size >= sizeof(menu_backtitle))
- 		menu_backtitle[sizeof(menu_backtitle)-1] = '\0';
-@@ -739,8 +739,7 @@ static int do_exit(void)
- 		return 0;
+ struct mitem {
+@@ -800,8 +800,8 @@ static void search_conf(void)
+ again:
+ 	dres = dialog_inputbox(main_window,
+ 			_("Search Configuration Parameter"),
+-			_("Enter CONFIG_ (sub)string to search for "
+-				"(with or without \"CONFIG\")"),
++			_("Enter " KBUILD_PREFIX " (sub)string to search for "
++				"(with or without \"" KBUILD_PREFIX "\")"),
+ 			"", dialog_input_result, 99);
+ 	switch (dres) {
+ 	case 0:
+@@ -814,9 +814,9 @@ again:
+ 		return;
  	}
- 	res = btn_dialog(main_window,
--			_("Do you wish to save your "
--				"new kernel configuration?\n"
-+			_("Do you wish to save your new configuration?\n"
- 				"<ESC> to cancel and resume nconfig."),
- 			2,
- 			"   <save>   ",
-@@ -759,9 +758,8 @@ static int do_exit(void)
- 		if (res)
- 			btn_dialog(
- 				main_window,
--				_("Error during writing of the kernel "
--				  "configuration.\n"
--				  "Your kernel configuration "
-+				_("Error during writing of configuration.\n"
-+				  "Your " PACKAGE_LONG " configuration "
- 				  "changes were NOT saved."),
- 				  1,
- 				  "<OK>");
-@@ -769,7 +767,7 @@ static int do_exit(void)
- 			char buf[1024];
- 			snprintf(buf, 1024,
- 				_("Configuration written to %s\n"
--				  "End of Linux kernel configuration.\n"
-+				  "End of " PACKAGE_LONG " configuration.\n"
- 				  "Execute 'make' to build the kernel or try"
- 				  " 'make help'."), filename);
- 			btn_dialog(
-@@ -782,7 +780,7 @@ static int do_exit(void)
- 	default:
- 		btn_dialog(
- 			main_window,
--			_("Your kernel configuration changes were NOT saved."),
-+			_("Your " PACKAGE_LONG " configuration changes were NOT saved."),
- 			1,
- 			"<OK>");
- 		break;
-diff --git a/scripts/kconfig/qconf.cc b/scripts/kconfig/qconf.cc
-index 820df2d..9bcf572 100644
---- a/scripts/kconfig/qconf.cc
-+++ b/scripts/kconfig/qconf.cc
-@@ -1263,8 +1263,8 @@ ConfigMainWindow::ConfigMainWindow(void)
- 	char title[256];
  
- 	QDesktopWidget *d = configApp->desktop();
--	snprintf(title, sizeof(title), _("Linux Kernel v%s Configuration"),
--		getenv("KERNELVERSION"));
-+	snprintf(title, sizeof(title), _("%s v%s Configuration"),
-+		PACKAGE_LONG, getenv("PROJECTVERSION"));
- 	setCaption(title);
+-	/* strip CONFIG_ if necessary */
++	/* strip the prefix if necessary */
+ 	dialog_input = dialog_input_result;
+-	if (strncasecmp(dialog_input_result, "CONFIG_", 7) == 0)
++	if (strncasecmp(dialog_input_result, KBUILD_PREFIX, KBUILD_PREFIX_LEN) == 0)
+ 		dialog_input += 7;
  
- 	width = configSettings->readNumEntry("/window width", d->width() - 64);
-@@ -1633,7 +1633,7 @@ void ConfigMainWindow::closeEvent(QCloseEvent* e)
+ 	sym_arr = sym_re_search(dialog_input);
+@@ -1246,7 +1246,7 @@ static void show_help(struct menu *menu)
  
- void ConfigMainWindow::showIntro(void)
- {
--	static const QString str = _("Welcome to the qconf graphical kernel configuration tool for Linux.\n\n"
-+	static const QString str = _("Welcome to the qconf graphical configuration tool for " PACKAGE_LONG ".\n\n"
- 		"For each option, a blank box indicates the feature is disabled, a check\n"
- 		"indicates it is enabled, and a dot indicates that it is to be compiled\n"
- 		"as a module.  Clicking on the box will cycle through the three states.\n\n"
-diff --git a/scripts/kconfig/zconf.tab.c_shipped b/scripts/kconfig/zconf.tab.c_shipped
-index 32a9eef..b8a7dad 100644
---- a/scripts/kconfig/zconf.tab.c_shipped
-+++ b/scripts/kconfig/zconf.tab.c_shipped
-@@ -2224,7 +2224,7 @@ void conf_parse(const char *name)
- 	modules_sym = sym_lookup(NULL, 0);
- 	modules_sym->type = S_BOOLEAN;
- 	modules_sym->flags |= SYMBOL_AUTO;
--	rootmenu.prompt = menu_add_prompt(P_MENU, "Linux Kernel Configuration", NULL);
-+	rootmenu.prompt = menu_add_prompt(P_MENU, PACKAGE_LONG " Configuration", NULL);
- 
- #if YYDEBUG
- 	if (getenv("ZCONF_DEBUG"))
-diff --git a/scripts/kconfig/zconf.y b/scripts/kconfig/zconf.y
-index 23dfd3b..9dc83e6 100644
---- a/scripts/kconfig/zconf.y
-+++ b/scripts/kconfig/zconf.y
-@@ -479,7 +479,7 @@ void conf_parse(const char *name)
- 	modules_sym = sym_lookup(NULL, 0);
- 	modules_sym->type = S_BOOLEAN;
- 	modules_sym->flags |= SYMBOL_AUTO;
--	rootmenu.prompt = menu_add_prompt(P_MENU, "Linux Kernel Configuration", NULL);
-+	rootmenu.prompt = menu_add_prompt(P_MENU, PACKAGE_LONG " Configuration", NULL);
- 
- #if YYDEBUG
- 	if (getenv("ZCONF_DEBUG"))
+ 	if (menu && menu->sym && menu_has_help(menu)) {
+ 		if (menu->sym->name) {
+-			str_printf(&help, "CONFIG_%s:\n\n", menu->sym->name);
++			str_printf(&help, KBUILD_PREFIX "%s:\n\n", menu->sym->name);
+ 			str_append(&help, _(menu_get_help(menu)));
+ 			str_append(&help, "\n");
+ 			get_symbol_str(&help, menu->sym);
 -- 
 1.7.2.30.gc37d7.dirty
 
