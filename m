@@ -1,54 +1,66 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ozlabs.org ([203.10.76.45]:55117 "EHLO ozlabs.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750795Ab0HPKoD (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 16 Aug 2010 06:44:03 -0400
-From: Rusty Russell <rusty@rustcorp.com.au>
-Subject: Re: [PATCH] modules: don't call depmod when overriding external module install path
-Date: Mon, 16 Aug 2010 20:13:45 +0930
-References: <1281945814-9720-1-git-send-email-jcm@jonmasters.org>
-In-Reply-To: <1281945814-9720-1-git-send-email-jcm@jonmasters.org>
+Received: from pfepa.post.tele.dk ([195.41.46.235]:36919 "EHLO
+	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751114Ab0HPLld (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 16 Aug 2010 07:41:33 -0400
+Date: Mon, 16 Aug 2010 13:41:31 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: [PATCH] fixes for using make 3.82
+Message-ID: <20100816114131.GA7122@merkur.ravnborg.org>
+References: <4C6936120200007800010064@vpn.id2.novell.com>
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-15"
-Content-Transfer-Encoding: 7bit
-Message-Id: <201008162013.46252.rusty@rustcorp.com.au>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4C6936120200007800010064@vpn.id2.novell.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jon Masters <jcm@jonmasters.org>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
+To: Jan Beulich <JBeulich@novell.com>, Michal Marek <mmarek@suse.cz>, linux-kbuild <linux-kbuild@vger.kernel.org>
+Cc: linux-kernel@vger.kernel.org, Andrew Benton <b3nton@gmail.com>
 
-On Mon, 16 Aug 2010 05:33:34 pm Jon Masters wrote:
-> Recent kernels include an additional call to depmod during the installation
-> of external kernel modules as a convenience, in order to ensure that those
-> modules are picked up by the module loading tools/initramfs scripts, etc.
-> Although this call is potentially of some value, it should not be made
-> when explicitly setting INSTALL_MOD_PATH to a different location. This
-> avoids creating extraneous modules.* files that will never be used.
+Added: Michael Marek (kbuild maintainer) + linux-kbuild.
+
+I assume this fixes firmware build reported by Andrew Benton (cc:ed).
+
+	Sam
+
+On Mon, Aug 16, 2010 at 11:58:58AM +0100, Jan Beulich wrote:
+> It doesn't like pattern and explicit rules to be on the same line,
+> and it seems to be more picky when matching file (or really directory)
+> names with different numbers of trailing slashes.
 > 
-> Signed-off-by: Jon Masters <jcm@jonmasters.org>
+> Signed-off-by: Jan Beulich <jbeulich@novell.com>
 
-Acked-by: Rusty Russell <rusty@rustcorp.com.au>
-
-I leave the Makefile stuff to the kbuild people...
-
+Acked-by: Sam Ravnborg <sam@ravnborg.org>
+> 
 > ---
->  Makefile |    2 ++
->  1 files changed, 2 insertions(+), 0 deletions(-)
+>  firmware/Makefile  |    2 +-
+>  scripts/mkmakefile |    4 +++-
+>  2 files changed, 4 insertions(+), 2 deletions(-)
 > 
-> diff --git a/Makefile b/Makefile
-> index f3bdff8..2b904f2 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -1325,7 +1325,9 @@ _emodinst_:
+> --- linux-2.6.36-rc1/firmware/Makefile
+> +++ 2.6.36-rc1-make-3.82-fixes/firmware/Makefile
+> @@ -142,7 +142,7 @@ fw-shipped-$(CONFIG_YAM) += yam/1200.bin
+>  fw-shipped-all := $(fw-shipped-y) $(fw-shipped-m) $(fw-shipped-)
 >  
->  PHONY += _emodinst_post
->  _emodinst_post: _emodinst_
-> +ifeq ($(INSTALL_MOD_PATH),)
->  	$(call cmd,depmod)
-> +endif
+>  # Directories which we _might_ need to create, so we have a rule for them.
+> -firmware-dirs := $(sort $(patsubst %,$(objtree)/$(obj)/%/,$(dir $(fw-external-y) $(fw-shipped-all))))
+> +firmware-dirs := $(sort $(addprefix $(objtree)/$(obj)/,$(dir $(fw-external-y) $(fw-shipped-all))))
 >  
->  clean-dirs := $(addprefix _clean_,$(KBUILD_EXTMOD))
-
-Thanks,
-Rusty.
+>  quiet_cmd_mkdir = MKDIR   $(patsubst $(objtree)/%,%,$@)
+>        cmd_mkdir = mkdir -p $@
+> --- linux-2.6.36-rc1/scripts/mkmakefile
+> +++ 2.6.36-rc1-make-3.82-fixes/scripts/mkmakefile
+> @@ -44,7 +44,9 @@ all:
+>  
+>  Makefile:;
+>  
+> -\$(all) %/: all
+> +\$(all): all
+>  	@:
+>  
+> +%/: all
+> +	@:
+>  EOF
+> 
+> 
