@@ -1,40 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepa.post.tele.dk ([195.41.46.235]:39911 "EHLO
-	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752689Ab0HPVuG (ORCPT
+Received: from dallas.jonmasters.org ([72.29.103.172]:34777 "EHLO
+	dallas.jonmasters.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756457Ab0HPWvD (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 16 Aug 2010 17:50:06 -0400
-Date: Mon, 16 Aug 2010 23:50:02 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [RFC 0/2] Factor Kconfig's prefix and package name
-Message-ID: <20100816215002.GA8711@merkur.ravnborg.org>
-References: <1281934457-4225-1-git-send-email-lacombar@gmail.com> <20100816123642.GA7233@merkur.ravnborg.org> <AANLkTi=gODj4S0vWfa512sMM__MLhoZo9aU1y1pbN0gf@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <AANLkTi=gODj4S0vWfa512sMM__MLhoZo9aU1y1pbN0gf@mail.gmail.com>
+	Mon, 16 Aug 2010 18:51:03 -0400
+Subject: Re: [PATCH] modules: don't call depmod when overriding external
+ module install path
+From: Jon Masters <jonathan@jonmasters.org>
+In-Reply-To: <201008162013.46252.rusty@rustcorp.com.au>
+References: <1281945814-9720-1-git-send-email-jcm@jonmasters.org>
+	 <201008162013.46252.rusty@rustcorp.com.au>
+Content-Type: text/plain; charset="UTF-8"
+Date: Mon, 16 Aug 2010 18:26:33 -0400
+Message-ID: <1281997594.27736.232.camel@constitution.bos.jonmasters.org>
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnaud Lacombe <lacombar@gmail.com>
-Cc: Roman Zippel <zippel@linux-m68k.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.cz>
+To: Rusty Russell <rusty@rustcorp.com.au>
+Cc: Jon Masters <jcm@jonmasters.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
 
+On Mon, 2010-08-16 at 20:13 +0930, Rusty Russell wrote:
+> On Mon, 16 Aug 2010 05:33:34 pm Jon Masters wrote:
+> > Recent kernels include an additional call to depmod during the installation
+> > of external kernel modules as a convenience, in order to ensure that those
+> > modules are picked up by the module loading tools/initramfs scripts, etc.
+> > Although this call is potentially of some value, it should not be made
+> > when explicitly setting INSTALL_MOD_PATH to a different location. This
+> > avoids creating extraneous modules.* files that will never be used.
+> > 
+> > Signed-off-by: Jon Masters <jcm@jonmasters.org>
 > 
-> > 3) Do not hardcode "CONFIG_"
-> >  - I suggest to introduce a single define named "CONFIG_".
-> >    All the places that hardcode the length should be
-> >    replaced by strlen(CONFIG_).
-> >  - The define should be conditional like this:
-> > #if !defined(CONFIG_)
-> > #define CONFIG_ "CONFIG_"
-> > #endif
-> >    In this way other users can just use -DCONFIG_=BR2_ as they prefer.
-> >
-> agreed. the only thing I am not really fond of is that "strlen(...)"
-> is computed at runtime, whereas "sizeof(...)-1" is a build time
-> constant, but this might not be that worth.
+> Acked-by: Rusty Russell <rusty@rustcorp.com.au>
+> 
+> I leave the Makefile stuff to the kbuild people...
 
-gcc will recognize that strlen("CONFIG_") is a constant
-and will optimize out the call.
+Hey, thanks for forwarding. I figured I would do that, but I see you
+already did. And yea, next time I'll ping the Kbuild folks directly.
 
-	Sam
+Jon.
+
+
