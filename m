@@ -1,117 +1,48 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor.suse.de ([195.135.220.2]:34697 "EHLO mx1.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755646Ab0HQL1L (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 17 Aug 2010 07:27:11 -0400
-Message-ID: <4C6A7167.3060608@suse.cz>
-Date: Tue, 17 Aug 2010 13:24:23 +0200
-From: Michal Marek <mmarek@suse.cz>
+Received: from mail-wy0-f174.google.com ([74.125.82.174]:56291 "EHLO
+	mail-wy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753730Ab0HQP2W (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 17 Aug 2010 11:28:22 -0400
+Received: by wyb32 with SMTP id 32so7155704wyb.19
+        for <linux-kbuild@vger.kernel.org>; Tue, 17 Aug 2010 08:28:21 -0700 (PDT)
 MIME-Version: 1.0
-Subject: Re: [PATCH] kbuild: implement the `mainmenu' directive
-References: <AANLkTinuJJXAB6b0ap6yn0X9nM7grQmYxoJSdyOPVmVj@mail.gmail.com> <1282023725-20428-1-git-send-email-lacombar@gmail.com>
-In-Reply-To: <1282023725-20428-1-git-send-email-lacombar@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-2
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20100817082732.GA26082@sepie.suse.cz>
+References: <1281932346-19067-1-git-send-email-lacombar@gmail.com>
+	<20100817082732.GA26082@sepie.suse.cz>
+Date: Tue, 17 Aug 2010 11:28:21 -0400
+Message-ID: <AANLkTinLti_zp=MQ58eddBCXrDRWQgO=LW76RcTZ1K+N@mail.gmail.com>
+Subject: Re: [PATCH 1/4] kbuild: don't assign `stdout' and `stderr'
+From: Arnaud Lacombe <lacombar@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnaud Lacombe <lacombar@gmail.com>
-Cc: Sam Ravnborg <sam@ravnborg.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: Michal Marek <mmarek@suse.cz>
+Cc: Sam Ravnborg <sam@ravnborg.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Nir Tzachar <nir.tzachar@gmail.com>
 
-On 17.8.2010 07:42, Arnaud Lacombe wrote:
-> note: the prompt is voluntarily still a bare `const char *'. It may need
-> to be represented in a more detailled way, say a `struct property'.
-> 
-> Signed-off-by: Arnaud Lacombe <lacombar@gmail.com>
-> 
-> ---
->  scripts/kconfig/lkc.h   |    2 ++
->  scripts/kconfig/menu.c  |   23 +++++++++++++++++++++++
->  scripts/kconfig/zconf.y |    9 ++++++++-
->  3 files changed, 33 insertions(+), 1 deletions(-)
-> 
-> diff --git a/scripts/kconfig/lkc.h b/scripts/kconfig/lkc.h
-> index bdf71bd..f00854f 100644
-> --- a/scripts/kconfig/lkc.h
-> +++ b/scripts/kconfig/lkc.h
-> @@ -94,6 +94,8 @@ static inline void xfwrite(const void *str, size_t len, size_t count, FILE *out)
->  void kconfig_load(void);
->  
->  /* menu.c */
-> +void mainmenu_set_prompt(char *);
-> +const char *mainmenu_get_prompt(void);
->  void _menu_init(void);
->  void menu_warn(struct menu *menu, const char *fmt, ...);
->  struct menu *menu_add_menu(void);
-> diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
-> index 4fb5902..6aa219e 100644
-> --- a/scripts/kconfig/menu.c
-> +++ b/scripts/kconfig/menu.c
-> @@ -38,6 +38,29 @@ static void prop_warn(struct property *prop, const char *fmt, ...)
->  	va_end(ap);
->  }
->  
-> +static const char *mainmenu_prompt = NULL;
+Hi,
 
-Keep the "Linux Kernel Configuration" default here.
+On Tue, Aug 17, 2010 at 4:27 AM, Michal Marek <mmarek@suse.cz> wrote:
+> On Mon, Aug 16, 2010 at 12:19:03AM -0400, Arnaud Lacombe wrote:
+>> These may not be modifiable, as per C99 comment:
+>>
+>> section 7.19.5.4, note 232:
+>> "
+>> The primary use of the freopen function is to change the file associated with a
+>> standard text stream (stderr, stdin, or stdout), as those identifiers need not
+>> be modifiable lvalues to which the value returned by the fopen function may be
+>> assigned.
+>> "
+>>
+>> Use a duplicate of stdout as ncurses' output terminal, then redirect it
+>> to /dev/null for conf_write().
+>
+> I would much rather get rid of this redirection completely. The config
+> library should not play with stdout, but let the frontends display
+> messages as they wish.
+>
+sounds reasonable to me, I didn't want at first to dig too much in
+kconfig's internals, which would have lead to modification in other
+part of the code.
 
-> +
-> +void mainmenu_set_prompt(char *prompt)
-> +{
-> +	if (mainmenu_prompt != NULL)
-> +		fprintf(stderr, "%s:%d:warning: mainmenu redefined\n",
-> +		    current_file->name, zconf_lineno());
-
-... and do not warn here.
-
-> +
-> +	if (isspace(*prompt)) {
-> +		fprintf(stderr, "%s:%d:warning: leading whitespace ignored\n",
-> +		    current_file->name, zconf_lineno());
-> +		while (isspace(*prompt))
-> +			prompt++;
-> +	}
-
-The lexer already eats whitespace I think, so this might not be necessary.
-
-Michal
-
-> +
-> +	mainmenu_prompt = prompt;
-> +}
-> +
-> +const char *mainmenu_get_prompt(void)
-> +{
-> +	return mainmenu_prompt;
-> +}
-> +
->  void _menu_init(void)
->  {
->  	current_entry = current_menu = &rootmenu;
-> diff --git a/scripts/kconfig/zconf.y b/scripts/kconfig/zconf.y
-> index 23dfd3b..18c9a28 100644
-> --- a/scripts/kconfig/zconf.y
-> +++ b/scripts/kconfig/zconf.y
-> @@ -111,7 +111,7 @@ stmt_list:
->  	| stmt_list common_stmt
->  	| stmt_list choice_stmt
->  	| stmt_list menu_stmt
-> -	| stmt_list T_MAINMENU prompt nl
-> +	| stmt_list mainmenu_stmt
->  	| stmt_list end			{ zconf_error("unexpected end statement"); }
->  	| stmt_list T_WORD error T_EOL	{ zconf_error("unknown statement \"%s\"", $2); }
->  	| stmt_list option_name error T_EOL
-> @@ -342,6 +342,13 @@ if_block:
->  	| if_block choice_stmt
->  ;
->  
-> +/* mainmenu entry */
-> +
-> +mainmenu_stmt: T_MAINMENU prompt nl
-> +{
-> +	mainmenu_set_prompt($2);
-> +};
-> +
->  /* menu entry */
->  
->  menu: T_MENU prompt T_EOL
-
+ - Arnaud
