@@ -1,54 +1,84 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from xenotime.net ([72.52.115.56]:33122 "HELO xenotime.net"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with SMTP
-	id S1757712Ab0HQQAy (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 17 Aug 2010 12:00:54 -0400
-Received: from chimera.site ([173.50.240.230]) by xenotime.net for <linux-kbuild@vger.kernel.org>; Tue, 17 Aug 2010 09:00:45 -0700
-Date: Tue, 17 Aug 2010 09:00:44 -0700
-From: Randy Dunlap <rdunlap@xenotime.net>
-Subject: Re: bug LINUX_VERSION_CODE undefined
-Message-Id: <20100817090044.d4026453.rdunlap@xenotime.net>
-In-Reply-To: <AANLkTimC=VDH=m9SoDK3BGzk7eCKRj6dEVzU230_kFPH@mail.gmail.com>
-References: <AANLkTik2VDPSZvMzQ8rv38jBDKmRaM9-TL9nhqxj_VSQ@mail.gmail.com>
-	<AANLkTimC=VDH=m9SoDK3BGzk7eCKRj6dEVzU230_kFPH@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Received: from pfepb.post.tele.dk ([195.41.46.236]:58056 "EHLO
+	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750759Ab0HQU0b (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 17 Aug 2010 16:26:31 -0400
+Date: Tue, 17 Aug 2010 22:26:30 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: [PATCH] kbuild: implement the `mainmenu' directive
+Message-ID: <20100817202630.GB11592@merkur.ravnborg.org>
+References: <AANLkTinuJJXAB6b0ap6yn0X9nM7grQmYxoJSdyOPVmVj@mail.gmail.com> <1282023725-20428-1-git-send-email-lacombar@gmail.com> <4C6A7167.3060608@suse.cz>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4C6A7167.3060608@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sergey Naumov <sknaumov@gmail.com>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>
+Cc: Arnaud Lacombe <lacombar@gmail.com>, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-On Tue, 17 Aug 2010 13:29:38 +0400 Sergey Naumov wrote:
-
-> Hello. This is my first message to this list so please be patient.
+On Tue, Aug 17, 2010 at 01:24:23PM +0200, Michal Marek wrote:
+> On 17.8.2010 07:42, Arnaud Lacombe wrote:
+> > note: the prompt is voluntarily still a bare `const char *'. It may need
+> > to be represented in a more detailled way, say a `struct property'.
+> > 
+> > Signed-off-by: Arnaud Lacombe <lacombar@gmail.com>
+> > 
+> > ---
+> >  scripts/kconfig/lkc.h   |    2 ++
+> >  scripts/kconfig/menu.c  |   23 +++++++++++++++++++++++
+> >  scripts/kconfig/zconf.y |    9 ++++++++-
+> >  3 files changed, 33 insertions(+), 1 deletions(-)
+> > 
+> > diff --git a/scripts/kconfig/lkc.h b/scripts/kconfig/lkc.h
+> > index bdf71bd..f00854f 100644
+> > --- a/scripts/kconfig/lkc.h
+> > +++ b/scripts/kconfig/lkc.h
+> > @@ -94,6 +94,8 @@ static inline void xfwrite(const void *str, size_t len, size_t count, FILE *out)
+> >  void kconfig_load(void);
+> >  
+> >  /* menu.c */
+> > +void mainmenu_set_prompt(char *);
+> > +const char *mainmenu_get_prompt(void);
+> >  void _menu_init(void);
+> >  void menu_warn(struct menu *menu, const char *fmt, ...);
+> >  struct menu *menu_add_menu(void);
+> > diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
+> > index 4fb5902..6aa219e 100644
+> > --- a/scripts/kconfig/menu.c
+> > +++ b/scripts/kconfig/menu.c
+> > @@ -38,6 +38,29 @@ static void prop_warn(struct property *prop, const char *fmt, ...)
+> >  	va_end(ap);
+> >  }
+> >  
+> > +static const char *mainmenu_prompt = NULL;
 > 
-> I have encountered compilation error due to
-> #define LINUX_VERSION_CODE
-> in include/linux/version.h
+> Keep the "Linux Kernel Configuration" default here.
+
+Or alternative named it "mainmenu" - to give user a hint what this is about.
+
 > 
-> This happens because $(VERSION) variable in the main Makefile has a
-> value of 2.6.35.2 instead of 2,
-> so "expr" utility fails to generate LINUX_VERSION_CODE value with an
-> error "non-numeric argument" or smth.
+> > +
+> > +void mainmenu_set_prompt(char *prompt)
+> > +{
+> > +	if (mainmenu_prompt != NULL)
+> > +		fprintf(stderr, "%s:%d:warning: mainmenu redefined\n",
+> > +		    current_file->name, zconf_lineno());
+> 
+> ... and do not warn here.
+> 
+> > +
+> > +	if (isspace(*prompt)) {
+> > +		fprintf(stderr, "%s:%d:warning: leading whitespace ignored\n",
+> > +		    current_file->name, zconf_lineno());
+> > +		while (isspace(*prompt))
+> > +			prompt++;
+> > +	}
+> 
+> The lexer already eats whitespace I think, so this might not be necessary.
 
-AFAIK, it usually happens due to some shell not liking some syntax in the Makefile.
-What shell are you using?
+menu_add_prop() does something similar so I think not.
+But I did not check.
 
-
-> I have found only one link (
-> http://www.spinics.net/lists/linux-kbuild/msg03230.html ) to this
-> issue in the Internet,
-> but there is no response to it, so I decided to post this message.
-
-There are replies in the bugzilla entry, including a possible fix.
-  https://bugzilla.kernel.org/show_bug.cgi?id=16510
-
-
-> Please subscribe me personally to answers to this post.
-
-Michal, did you do anything with your suggested fix?
-
----
-~Randy
-*** Remember to use Documentation/SubmitChecklist when testing your code ***
+	Sam
