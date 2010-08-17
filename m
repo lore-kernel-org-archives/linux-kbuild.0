@@ -1,15 +1,16 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor.suse.de ([195.135.220.2]:57589 "EHLO mx1.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:49178 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1757315Ab0HQJDF (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 17 Aug 2010 05:03:05 -0400
-Message-ID: <4C6A4FA2.80907@suse.cz>
-Date: Tue, 17 Aug 2010 11:00:18 +0200
+	id S1757148Ab0HQJES (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 17 Aug 2010 05:04:18 -0400
+Message-ID: <4C6A4FEB.3020405@suse.cz>
+Date: Tue, 17 Aug 2010 11:01:31 +0200
 From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Subject: Re: [PATCH 3/4] kbuild: `nconf' needs -lintl
-References: <1281932346-19067-1-git-send-email-lacombar@gmail.com> <1281932346-19067-3-git-send-email-lacombar@gmail.com>
-In-Reply-To: <1281932346-19067-3-git-send-email-lacombar@gmail.com>
+Subject: Re: [PATCH 2/4] kbuild: don't include `check-lxdialog' ldflags in
+ global HOST_LOADLIBES
+References: <1281932346-19067-1-git-send-email-lacombar@gmail.com> <1281932346-19067-2-git-send-email-lacombar@gmail.com>
+In-Reply-To: <1281932346-19067-2-git-send-email-lacombar@gmail.com>
 Content-Type: text/plain; charset=ISO-8859-2
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -18,23 +19,19 @@ To: Arnaud Lacombe <lacombar@gmail.com>
 Cc: Sam Ravnborg <sam@ravnborg.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
 
 On 16.8.2010 06:19, Arnaud Lacombe wrote:
-> -HOSTLOADLIBES_nconf	= -lmenu -lpanel -lncurses
-> +HOSTLOADLIBES_nconf	= -lmenu -lpanel -lncurses -lintl
+> On BSD systems, `check-lxdialog' would select -lcurses as the default
+> curses library which would conflict with -lncurses at runtime: curses'
+> compatible symbols are getting handled by the system's curses library while the
+> ncurses-specific symbols are getting handled by the ports' ncurses.
+> 
+> This fixes `nconf' segmentation fault on these systems.
+> 
+> Signed-off-by: Arnaud Lacombe <lacombar@gmail.com>
+> ---
+>  scripts/kconfig/Makefile |    5 +++--
+>  1 files changed, 3 insertions(+), 2 deletions(-)
 
-This will not work on Linux though, the libintl functions are part of
-glibc itself. There is already scripts/kconfig/check.sh and the
-following snippet in scripts/kconfig/lkc.h
+I applied this and the typo fix.
 
-#ifndef KBUILD_NO_NLS
-# include <libintl.h>
-#else
-static inline const char *gettext(const char *txt) { return txt; }
-static inline void textdomain(const char *domainname) {}
-static inline void bindtextdomain(const char *name, const char *dir) {}
-#endif
-
-that take care of disabling libintl support if it doesn't work. Not
-optimal, but it should build in theory. Could you debug why it does not
-work on NetBSD?
-
+Thanks,
 Michal
