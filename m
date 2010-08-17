@@ -1,41 +1,33 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pw0-f46.google.com ([209.85.160.46]:40741 "EHLO
-	mail-pw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754783Ab0HQCrz (ORCPT
+Received: from mail-ww0-f44.google.com ([74.125.82.44]:37237 "EHLO
+	mail-ww0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753528Ab0HQC4X (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 16 Aug 2010 22:47:55 -0400
-Date: Tue, 17 Aug 2010 10:51:44 +0800
-From: =?utf-8?Q?Am=C3=A9rico?= Wang <xiyou.wangcong@gmail.com>
-Subject: Re: [PATCH] modules: don't call depmod when overriding external
- module install path
-Message-ID: <20100817025144.GA5095@cr0.nay.redhat.com>
-References: <1281945814-9720-1-git-send-email-jcm@jonmasters.org>
- <201008162013.46252.rusty@rustcorp.com.au>
+	Mon, 16 Aug 2010 22:56:23 -0400
+Received: by wwi17 with SMTP id 17so419848wwi.1
+        for <linux-kbuild@vger.kernel.org>; Mon, 16 Aug 2010 19:56:22 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <201008162013.46252.rusty@rustcorp.com.au>
+In-Reply-To: <20100817021937.GA9849@merkur.ravnborg.org>
+References: <1281934457-4225-1-git-send-email-lacombar@gmail.com>
+	<20100816123642.GA7233@merkur.ravnborg.org>
+	<AANLkTimkEBaLs9Mx8V3_PLdj_-ioaRRo3JAjLH4MJBRd@mail.gmail.com>
+	<20100817021937.GA9849@merkur.ravnborg.org>
+Date: Mon, 16 Aug 2010 22:56:22 -0400
+Message-ID: <AANLkTinuJJXAB6b0ap6yn0X9nM7grQmYxoJSdyOPVmVj@mail.gmail.com>
+Subject: Re: [RFC 0/2] Factor Kconfig's prefix and package name
+From: Arnaud Lacombe <lacombar@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Rusty Russell <rusty@rustcorp.com.au>
-Cc: Jon Masters <jcm@jonmasters.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: Roman Zippel <zippel@linux-m68k.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.cz>
 
-On Mon, Aug 16, 2010 at 08:13:45PM +0930, Rusty Russell wrote:
->On Mon, 16 Aug 2010 05:33:34 pm Jon Masters wrote:
->> Recent kernels include an additional call to depmod during the installation
->> of external kernel modules as a convenience, in order to ensure that those
->> modules are picked up by the module loading tools/initramfs scripts, etc.
->> Although this call is potentially of some value, it should not be made
->> when explicitly setting INSTALL_MOD_PATH to a different location. This
->> avoids creating extraneous modules.* files that will never be used.
->> 
->> Signed-off-by: Jon Masters <jcm@jonmasters.org>
->
->Acked-by: Rusty Russell <rusty@rustcorp.com.au>
->
->I leave the Makefile stuff to the kbuild people...
->
+Hi,
 
-Looks good for me,
+On Mon, Aug 16, 2010 at 10:19 PM, Sam Ravnborg <sam@ravnborg.org> wrote:
+> If you look closer you will see that the prompt in zconf.y is not used
+> at all.
+>
+yep, that part is done, now lets have a look to the symbol replacement stuff...
 
-Acked-by: WANG Cong <xiyou.wangcong@gmail.com>
+ - Arnaud
