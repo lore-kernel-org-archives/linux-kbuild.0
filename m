@@ -1,80 +1,54 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-fx0-f46.google.com ([209.85.161.46]:50644 "EHLO
-	mail-fx0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757123Ab0HQPzJ convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 17 Aug 2010 11:55:09 -0400
-Received: by fxm13 with SMTP id 13so3568796fxm.19
-        for <linux-kbuild@vger.kernel.org>; Tue, 17 Aug 2010 08:55:08 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <4C6A4FA2.80907@suse.cz>
-References: <1281932346-19067-1-git-send-email-lacombar@gmail.com>
-	<1281932346-19067-3-git-send-email-lacombar@gmail.com>
-	<4C6A4FA2.80907@suse.cz>
-Date: Tue, 17 Aug 2010 11:55:07 -0400
-Message-ID: <AANLkTindfnx2htJ--AjyMsKatjkAfXmH+po3pGz6DmfD@mail.gmail.com>
-Subject: Re: [PATCH 3/4] kbuild: `nconf' needs -lintl
-From: Arnaud Lacombe <lacombar@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 8BIT
+Received: from xenotime.net ([72.52.115.56]:33122 "HELO xenotime.net"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with SMTP
+	id S1757712Ab0HQQAy (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 17 Aug 2010 12:00:54 -0400
+Received: from chimera.site ([173.50.240.230]) by xenotime.net for <linux-kbuild@vger.kernel.org>; Tue, 17 Aug 2010 09:00:45 -0700
+Date: Tue, 17 Aug 2010 09:00:44 -0700
+From: Randy Dunlap <rdunlap@xenotime.net>
+Subject: Re: bug LINUX_VERSION_CODE undefined
+Message-Id: <20100817090044.d4026453.rdunlap@xenotime.net>
+In-Reply-To: <AANLkTimC=VDH=m9SoDK3BGzk7eCKRj6dEVzU230_kFPH@mail.gmail.com>
+References: <AANLkTik2VDPSZvMzQ8rv38jBDKmRaM9-TL9nhqxj_VSQ@mail.gmail.com>
+	<AANLkTimC=VDH=m9SoDK3BGzk7eCKRj6dEVzU230_kFPH@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: Sam Ravnborg <sam@ravnborg.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: Sergey Naumov <sknaumov@gmail.com>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-Hi,
+On Tue, 17 Aug 2010 13:29:38 +0400 Sergey Naumov wrote:
 
-2010/8/17 Michal Marek <mmarek@suse.cz>:
-> On 16.8.2010 06:19, Arnaud Lacombe wrote:
->> -HOSTLOADLIBES_nconf  = -lmenu -lpanel -lncurses
->> +HOSTLOADLIBES_nconf  = -lmenu -lpanel -lncurses -lintl
->
-> This will not work on Linux though, the libintl functions are part of
-> glibc itself. There is already scripts/kconfig/check.sh and the
-> following snippet in scripts/kconfig/lkc.h
->
-> #ifndef KBUILD_NO_NLS
-> # include <libintl.h>
-> #else
-> static inline const char *gettext(const char *txt) { return txt; }
-> static inline void textdomain(const char *domainname) {}
-> static inline void bindtextdomain(const char *name, const char *dir) {}
-> #endif
->
-> that take care of disabling libintl support if it doesn't work. Not
-> optimal, but it should build in theory. Could you debug why it does not
-> work on NetBSD?
->
-there seems to be competition between setting HOST_EXTRACFLAGS from
-the command line and its assignment in the Makefile:
+> Hello. This is my first message to this list so please be patient.
+> 
+> I have encountered compilation error due to
+> #define LINUX_VERSION_CODE
+> in include/linux/version.h
+> 
+> This happens because $(VERSION) variable in the main Makefile has a
+> value of 2.6.35.2 instead of 2,
+> so "expr" utility fails to generate LINUX_VERSION_CODE value with an
+> error "non-numeric argument" or smth.
 
-% gmake -v
-GNU Make 3.81
+AFAIK, it usually happens due to some shell not liking some syntax in the Makefile.
+What shell are you using?
 
-Using the `menuconfig' target:
 
-works:
-% gmake V=1 menuconfig
-[...]
-sh //linux-2.6-stable/scripts/kconfig/lxdialog/check-lxdialog.sh
--check gcc -DCURSES_LOC="<curses.h>" -DLOCALE -DKBUILD_NO_NLS -lcurses
-[...]
+> I have found only one link (
+> http://www.spinics.net/lists/linux-kbuild/msg03230.html ) to this
+> issue in the Internet,
+> but there is no response to it, so I decided to post this message.
 
-does not work:
-% gmake HOST_EXTRACFLAGS="-DUMMY=1" V=1 menuconfig
-[...]
-sh /linux-2.6-stable/scripts/kconfig/lxdialog/check-lxdialog.sh -check
-gcc -DUMMY=1 -lcurses
-[...]
+There are replies in the bugzilla entry, including a possible fix.
+  https://bugzilla.kernel.org/show_bug.cgi?id=16510
 
-The same apply with `nconfig'. It is built with the command line
-HOST_EXTRACFLAGS and the one in the Makefile is ignored.
 
-As a side note, `nconfig' on NetBSD must be build with:
+> Please subscribe me personally to answers to this post.
 
-HOST_EXTRACFLAGS:="-I/usr/pkg/include/ -I/usr/pkg/include/ncurses/"
-HOSTLDFLAGS="-Wl,-rpath=/usr/pkg/lib/ -L/usr/pkg/lib/"
+Michal, did you do anything with your suggested fix?
 
-as ncurses is not the default system curses library.
-
- - Arnaud
+---
+~Randy
+*** Remember to use Documentation/SubmitChecklist when testing your code ***
