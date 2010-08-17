@@ -1,48 +1,80 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wy0-f174.google.com ([74.125.82.174]:56291 "EHLO
-	mail-wy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753730Ab0HQP2W (ORCPT
+Received: from mail-fx0-f46.google.com ([209.85.161.46]:50644 "EHLO
+	mail-fx0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757123Ab0HQPzJ convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 17 Aug 2010 11:28:22 -0400
-Received: by wyb32 with SMTP id 32so7155704wyb.19
-        for <linux-kbuild@vger.kernel.org>; Tue, 17 Aug 2010 08:28:21 -0700 (PDT)
+	Tue, 17 Aug 2010 11:55:09 -0400
+Received: by fxm13 with SMTP id 13so3568796fxm.19
+        for <linux-kbuild@vger.kernel.org>; Tue, 17 Aug 2010 08:55:08 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20100817082732.GA26082@sepie.suse.cz>
+In-Reply-To: <4C6A4FA2.80907@suse.cz>
 References: <1281932346-19067-1-git-send-email-lacombar@gmail.com>
-	<20100817082732.GA26082@sepie.suse.cz>
-Date: Tue, 17 Aug 2010 11:28:21 -0400
-Message-ID: <AANLkTinLti_zp=MQ58eddBCXrDRWQgO=LW76RcTZ1K+N@mail.gmail.com>
-Subject: Re: [PATCH 1/4] kbuild: don't assign `stdout' and `stderr'
+	<1281932346-19067-3-git-send-email-lacombar@gmail.com>
+	<4C6A4FA2.80907@suse.cz>
+Date: Tue, 17 Aug 2010 11:55:07 -0400
+Message-ID: <AANLkTindfnx2htJ--AjyMsKatjkAfXmH+po3pGz6DmfD@mail.gmail.com>
+Subject: Re: [PATCH 3/4] kbuild: `nconf' needs -lintl
 From: Arnaud Lacombe <lacombar@gmail.com>
 Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Michal Marek <mmarek@suse.cz>
-Cc: Sam Ravnborg <sam@ravnborg.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Nir Tzachar <nir.tzachar@gmail.com>
+Cc: Sam Ravnborg <sam@ravnborg.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
 
 Hi,
 
-On Tue, Aug 17, 2010 at 4:27 AM, Michal Marek <mmarek@suse.cz> wrote:
-> On Mon, Aug 16, 2010 at 12:19:03AM -0400, Arnaud Lacombe wrote:
->> These may not be modifiable, as per C99 comment:
->>
->> section 7.19.5.4, note 232:
->> "
->> The primary use of the freopen function is to change the file associated with a
->> standard text stream (stderr, stdin, or stdout), as those identifiers need not
->> be modifiable lvalues to which the value returned by the fopen function may be
->> assigned.
->> "
->>
->> Use a duplicate of stdout as ncurses' output terminal, then redirect it
->> to /dev/null for conf_write().
+2010/8/17 Michal Marek <mmarek@suse.cz>:
+> On 16.8.2010 06:19, Arnaud Lacombe wrote:
+>> -HOSTLOADLIBES_nconf  = -lmenu -lpanel -lncurses
+>> +HOSTLOADLIBES_nconf  = -lmenu -lpanel -lncurses -lintl
 >
-> I would much rather get rid of this redirection completely. The config
-> library should not play with stdout, but let the frontends display
-> messages as they wish.
+> This will not work on Linux though, the libintl functions are part of
+> glibc itself. There is already scripts/kconfig/check.sh and the
+> following snippet in scripts/kconfig/lkc.h
 >
-sounds reasonable to me, I didn't want at first to dig too much in
-kconfig's internals, which would have lead to modification in other
-part of the code.
+> #ifndef KBUILD_NO_NLS
+> # include <libintl.h>
+> #else
+> static inline const char *gettext(const char *txt) { return txt; }
+> static inline void textdomain(const char *domainname) {}
+> static inline void bindtextdomain(const char *name, const char *dir) {}
+> #endif
+>
+> that take care of disabling libintl support if it doesn't work. Not
+> optimal, but it should build in theory. Could you debug why it does not
+> work on NetBSD?
+>
+there seems to be competition between setting HOST_EXTRACFLAGS from
+the command line and its assignment in the Makefile:
+
+% gmake -v
+GNU Make 3.81
+
+Using the `menuconfig' target:
+
+works:
+% gmake V=1 menuconfig
+[...]
+sh //linux-2.6-stable/scripts/kconfig/lxdialog/check-lxdialog.sh
+-check gcc -DCURSES_LOC="<curses.h>" -DLOCALE -DKBUILD_NO_NLS -lcurses
+[...]
+
+does not work:
+% gmake HOST_EXTRACFLAGS="-DUMMY=1" V=1 menuconfig
+[...]
+sh /linux-2.6-stable/scripts/kconfig/lxdialog/check-lxdialog.sh -check
+gcc -DUMMY=1 -lcurses
+[...]
+
+The same apply with `nconfig'. It is built with the command line
+HOST_EXTRACFLAGS and the one in the Makefile is ignored.
+
+As a side note, `nconfig' on NetBSD must be build with:
+
+HOST_EXTRACFLAGS:="-I/usr/pkg/include/ -I/usr/pkg/include/ncurses/"
+HOSTLDFLAGS="-Wl,-rpath=/usr/pkg/lib/ -L/usr/pkg/lib/"
+
+as ncurses is not the default system curses library.
 
  - Arnaud
