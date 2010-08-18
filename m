@@ -1,41 +1,90 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wy0-f174.google.com ([74.125.82.174]:64718 "EHLO
-	mail-wy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750793Ab0HRFhD convert rfc822-to-8bit (ORCPT
+Received: from mail4-relais-sop.national.inria.fr ([192.134.164.105]:3041 "EHLO
+	mail4-relais-sop.national.inria.fr" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1750828Ab0HRH3j (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 18 Aug 2010 01:37:03 -0400
+	Wed, 18 Aug 2010 03:29:39 -0400
+Message-ID: <4C6B88A5.4050305@inria.fr>
+Date: Wed, 18 Aug 2010 09:15:49 +0200
+From: Brice Goglin <Brice.Goglin@inria.fr>
 MIME-Version: 1.0
-In-Reply-To: <4C6A2FC2.9050908@suse.cz>
-References: <1281592579-343-1-git-send-email-vapier@gentoo.org>
- <20100817054640.GD5095@cr0.nay.redhat.com> <4C6A2FC2.9050908@suse.cz>
-From: Mike Frysinger <vapier@gentoo.org>
-Date: Wed, 18 Aug 2010 01:36:41 -0400
-Message-ID: <AANLkTi=nadv1Cu2azb3arh6M_Of6cVN1RXONwoHb7pf1@mail.gmail.com>
-Subject: Re: [PATCH] kconfig: fix warnings in fgets/fwrite usage
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+Subject: Re: [PATCH 2/2] Makefile: "make kernelrelease" should show the correct
+ full kernel version
+References: <20100628030507.5187.95903.sendpatchset@localhost.localdomain> <20100628030516.5187.49089.sendpatchset@localhost.localdomain>
+In-Reply-To: <20100628030516.5187.49089.sendpatchset@localhost.localdomain>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: =?UTF-8?Q?Am=C3=A9rico_Wang?= <xiyou.wangcong@gmail.com>, linux-kbuild@vger.kernel.org, Roman Zippel <zippel@linux-m68k.org>, linux-kernel@vger.kernel.org
+To: Amerigo Wang <amwang@redhat.com>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, David Rientjes <rientjes@google.com>, Michal Marek <mmarek@suse.cz>
 
-On Tue, Aug 17, 2010 at 02:44, Michal Marek wrote:
-> On 17.8.2010 07:46, Américo Wang wrote:
->> On Thu, Aug 12, 2010 at 01:56:19AM -0400, Mike Frysinger wrote:
->>> Add some helper functions that abort on failure, and change the fwrite
->>> and fget calls to use those.  This should kill off all the ugly gcc
->>> warnings that some distros emit about ignoring return values due to
->>> usage of warn_unused_result attributes.
->>>
->>> Signed-off-by: Mike Frysinger <vapier@gentoo.org>
->>
->> Looks good to me,
->>
->> Acked-by: WANG Cong <xiyou.wangcong@gmail.com>
+This patch (actually 01ab17887 in 2.6.36-rc1) reveals what looks like a
+problem to me: make kernelrelease always regenerates
+include/config/kernel.release even if it's already more recent than
+include/config/auto.conf. Is this the expected behavior? Do we really
+need include/config/kernel.release to depend on FORCE?
+
+$ make kernelrelease -d
+[...]
+Considering target file `kernelrelease'.
+ File `kernelrelease' does not exist.
+  Considering target file `include/config/kernel.release'.
+    Pruning file `include/config/auto.conf'.
+    Considering target file `FORCE'.
+     File `FORCE' does not exist.
+     Finished prerequisites of target file `FORCE'.
+    Must remake target `FORCE'.
+    Successfully remade target file `FORCE'.
+   Finished prerequisites of target file `include/config/kernel.release'.
+   Prerequisite `include/config/auto.conf' is older than target `include/config/kernel.release'.
+   Prerequisite `FORCE' of target `include/config/kernel.release' does not exist.
+  Must remake target `include/config/kernel.release'.
+
+
+Thanks,
+Brice
+
+
+
+
+Le 28/06/2010 05:01, Amerigo Wang a �crit :
+> From: Amerigo Wang <amwang@redhat.com>
+> Date: Mon, 28 Jun 2010 10:45:21 +0800
 >
-> I already merged similar patches by Jean Sacren, see commits bf5e327 and
-> 4418a2b in kbuild-2.6.git.
+> After commit 85a256d8e0116c8f5ad276730830f5d4d473344d, 'make kernelrelease' doesn't
+> show the correct full kernel version. This patch fixes it, 'make kernelrelease' will
+> show the same version name with the one you finally get.
+>
+> Cc: David Rientjes <rientjes@google.com>
+> Cc: Michal Marek <mmarek@suse.cz>
+> Signed-off-by: Amerigo Wang <amwang@redhat.com>
+> ---
+>  Makefile |    5 ++---
+>  1 files changed, 2 insertions(+), 3 deletions(-)
+>
+> diff --git a/Makefile b/Makefile
+> index 710f91c..2b517a1 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -414,7 +414,7 @@ endif
+>  no-dot-config-targets := clean mrproper distclean \
+>  			 cscope TAGS tags help %docs check% \
+>  			 include/linux/version.h headers_% \
+> -			 kernelrelease kernelversion
+> +			 kernelversion
+>  
+>  config-targets := 0
+>  mixed-targets  := 0
+> @@ -1468,8 +1468,7 @@ checkstack:
+>  	$(PERL) $(src)/scripts/checkstack.pl $(CHECKSTACK_ARCH)
+>  
+>  kernelrelease:
+> -	$(if $(wildcard include/config/kernel.release), $(Q)echo $(KERNELRELEASE), \
+> -	$(error kernelrelease not valid - run 'make prepare' to update it))
+> +	@echo $(kernelrelease)
+>  kernelversion:
+>  	@echo $(KERNELVERSION)
+>  
+>   
 
-guess i should have posted the patches when i wrote them (March).  oh
-well, as long as it's fixed ;).
--mike
