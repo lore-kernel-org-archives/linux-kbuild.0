@@ -1,40 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wy0-f174.google.com ([74.125.82.174]:61250 "EHLO
-	mail-wy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751249Ab0HWARX (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 22 Aug 2010 20:17:23 -0400
-Received: by wyb32 with SMTP id 32so6162000wyb.19
-        for <linux-kbuild@vger.kernel.org>; Sun, 22 Aug 2010 17:17:21 -0700 (PDT)
+Received: from cantor.suse.de ([195.135.220.2]:58314 "EHLO mx1.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753501Ab0HWJma (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 23 Aug 2010 05:42:30 -0400
+Date: Sat, 21 Aug 2010 22:13:50 +0200
+From: Michal Marek <mmarek@suse.cz>
+Subject: [GIT] kbuild fixes for 2.6.36-rc2
+Message-ID: <20100821201350.GA9144@sepie.suse.cz>
 MIME-Version: 1.0
-In-Reply-To: <1282521786-26699-1-git-send-email-lacombar@gmail.com>
-References: <AANLkTindfnx2htJ--AjyMsKatjkAfXmH+po3pGz6DmfD@mail.gmail.com>
-	<1282521786-26699-1-git-send-email-lacombar@gmail.com>
-Date: Sun, 22 Aug 2010 20:17:21 -0400
-Message-ID: <AANLkTimrN2=DZrAgh=Q4NCgz+UhJ+THdwGPoJRK_826c@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: don't overwrite HOST_EXTRACFLAGS
-From: Arnaud Lacombe <lacombar@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: JBeulich@novell.com, amwang@redhat.com, mmarek@suse.cz, sam@ravnborg.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Hi,
+Hi Linus,
 
-On Sun, Aug 22, 2010 at 8:03 PM, Arnaud Lacombe <lacombar@gmail.com> wrote:
-> These might be used by the user to specify extra arguments for the host
-> compiler.
->
-Do'h... the original patch was against -rc1 and changed both
-HOST_EXTRACFLAGS and HOST_LOADLIBES, but I cherry-picked it to be
-against your `for-next' and more particularly commit 7080e47bb, which
-removes the assignation of HOST_LOADLIBES. As I didn't pay attention
-and kept the plural :/
+there are some post-rc1 kbuild fixes:
+* Two kconfig fixes by Sam.
+* A fix for new make version by Jan (this is technically no a rc1
+  regression, but we should fix it sooner rather than later).
+* Two setlocalversion fixes, one by Amerigo, one by me.
 
-Anyway, with this patch and specifying HOST_EXTRACFLAGS in the
-environment rather than as a gmake(1) argument, it is properly
-appended. nconf links and runs fine on NetBSD. It should not impact
-other environment.
+Thanks,
+Michal
 
- - Arnaud
+
+The following changes since commit da5cabf80e2433131bf0ed8993abc0f7ea618c73:
+
+  Linux 2.6.36-rc1 (2010-08-15 17:41:37 -0700)
+
+are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild-2.6.git rc-fixes
+
+Amerigo Wang (1):
+      makefile: not need to regenerate kernel.release file when make kernelrelease
+
+Jan Beulich (1):
+      fixes for using make 3.82
+
+Michal Marek (2):
+      Merge commit 'v2.6.36-rc1' into kbuild/rc-fixes
+      setlocalversion: Ignote SCMs above the linux source tree
+
+Sam Ravnborg (2):
+      kconfig: fix savedefconfig with choice marked optional
+      kconfig: fix segfault when detecting recursive dependency
+
+ Makefile                   |    4 ++--
+ firmware/Makefile          |    2 +-
+ scripts/kconfig/confdata.c |    6 ++++--
+ scripts/kconfig/symbol.c   |    2 ++
+ scripts/mkmakefile         |    4 +++-
+ scripts/setlocalversion    |    4 ++--
+ 6 files changed, 14 insertions(+), 8 deletions(-)
