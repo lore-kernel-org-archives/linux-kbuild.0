@@ -1,31 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor.suse.de ([195.135.220.2]:50718 "EHLO mx1.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750828Ab0HTMAd (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 20 Aug 2010 08:00:33 -0400
-Message-ID: <4C6E6DB7.8000403@suse.cz>
-Date: Fri, 20 Aug 2010 13:57:43 +0200
-From: Michal Marek <mmarek@suse.cz>
-MIME-Version: 1.0
-Subject: Re: [Patch] makefile: not need to regenerate kernel.release file
- when make kernelrelease
-References: <20100820094028.6321.95741.sendpatchset@localhost.localdomain>
-In-Reply-To: <20100820094028.6321.95741.sendpatchset@localhost.localdomain>
-Content-Type: text/plain; charset=ISO-8859-2; format=flowed
-Content-Transfer-Encoding: 7bit
+Received: from mail-gx0-f174.google.com ([209.85.161.174]:53195 "EHLO
+	mail-gx0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751129Ab0HWAFY (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 22 Aug 2010 20:05:24 -0400
+Received: by gxk23 with SMTP id 23so1881934gxk.19
+        for <linux-kbuild@vger.kernel.org>; Sun, 22 Aug 2010 17:05:23 -0700 (PDT)
+From: Arnaud Lacombe <lacombar@gmail.com>
+Subject: [PATCH] kbuild: don't overwrite HOST_EXTRACFLAGS
+Date: Sun, 22 Aug 2010 20:03:06 -0400
+Message-Id: <1282521786-26699-1-git-send-email-lacombar@gmail.com>
+In-Reply-To: <AANLkTindfnx2htJ--AjyMsKatjkAfXmH+po3pGz6DmfD@mail.gmail.com>
+References: <AANLkTindfnx2htJ--AjyMsKatjkAfXmH+po3pGz6DmfD@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Amerigo Wang <amwang@redhat.com>
-Cc: linux-kernel@vger.kernel.org, Brice Goglin <Brice.Goglin@inria.fr>, akpm@linux-foundation.org, linux-kbuild@vger.kernel.org
+To: Sam Ravnborg <sam@ravnborg.org>, Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, Arnaud Lacombe <lacombar@gmail.com>
 
-On 20.8.2010 11:36, Amerigo Wang wrote:
-> Brice reported that 'kernelrelease' has a dependence on include/config/kernel.release,
-> causes this file to be regenerated every time when invoke it. It doesn't have to.
->
-> Reported-by: Brice Goglin<Brice.Goglin@inria.fr>
-> Tested-by: Brice Goglin<Brice.Goglin@inria.fr>
-> Signed-off-by: WANG Cong<amwang@redhat.com>
+These might be used by the user to specify extra arguments for the host
+compiler.
 
-Thanks, applied. And sorry for breaking your previous patch.
+Signed-off-by: Arnaud Lacombe <lacombar@gmail.com>
+---
+ scripts/kconfig/Makefile |    6 ++----
+ 1 files changed, 2 insertions(+), 4 deletions(-)
 
-Michal
+diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
+index 7d129f0..051eba2 100644
+--- a/scripts/kconfig/Makefile
++++ b/scripts/kconfig/Makefile
+@@ -145,10 +145,8 @@ check-lxdialog  := $(srctree)/$(src)/lxdialog/check-lxdialog.sh
+ 
+ # Use recursively expanded variables so we do not call gcc unless
+ # we really need to do so. (Do not call gcc as part of make mrproper)
+-HOST_EXTRACFLAGS = $(shell $(CONFIG_SHELL) $(check-lxdialog) -ccflags)
+-
+-HOST_EXTRACFLAGS += -DLOCALE
+-
++HOST_EXTRACFLAGS += $(shell $(CONFIG_SHELL) $(check-lxdialog) -ccflags) \
++                    -DLOCALE
+ 
+ # ===========================================================================
+ # Shared Makefile for the various kconfig executables:
+-- 
+1.7.2.30.gc37d7.dirty
+
