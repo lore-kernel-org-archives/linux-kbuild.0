@@ -1,63 +1,40 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:35012 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750725Ab0HWK4d (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 23 Aug 2010 06:56:33 -0400
-Message-ID: <4C7253DF.7050802@suse.cz>
-Date: Mon, 23 Aug 2010 12:56:31 +0200
-From: Michal Marek <mmarek@suse.cz>
-MIME-Version: 1.0
-Subject: Re: [GIT] kbuild fixes for 2.6.36-rc2
-References: <20100821201350.GA9144@sepie.suse.cz>
-In-Reply-To: <20100821201350.GA9144@sepie.suse.cz>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
+Received: from mail-fx0-f46.google.com ([209.85.161.46]:44537 "EHLO
+	mail-fx0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753308Ab0HWQDw (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 23 Aug 2010 12:03:52 -0400
+Received: by fxm13 with SMTP id 13so3051934fxm.19
+        for <linux-kbuild@vger.kernel.org>; Mon, 23 Aug 2010 09:03:51 -0700 (PDT)
+From: Arnaud Lacombe <lacombar@gmail.com>
+Subject: [RFC] kbuild: use getopt_long(), not its _only() variant
+Date: Mon, 23 Aug 2010 12:01:24 -0400
+Message-Id: <1282579284-20102-1-git-send-email-lacombar@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, JBeulich@novell.com, amwang@redhat.com, sam@ravnborg.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild <linux-kbuild@vger.kernel.org>, Arnaud Lacombe <lacombar@gmail.com>
 
-On 21.8.2010 22:13, Michal Marek wrote:
-> Hi Linus,
->
-> there are some post-rc1 kbuild fixes:
-> * Two kconfig fixes by Sam.
-> * A fix for new make version by Jan (this is technically no a rc1
->    regression, but we should fix it sooner rather than later).
-> * Two setlocalversion fixes, one by Amerigo, one by me.
+NetBSD lacks getopt_long_only() whereas getopt_long() works just fine.
 
-Postfix on my machine died, so I missed -rc2 unfortunately. Can you 
-please pull for -rc3. Thanks.
+Signed-off-by: Arnaud Lacombe <lacombar@gmail.com>
+---
+ scripts/kconfig/conf.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-Michal
-
-
-> The following changes since commit da5cabf80e2433131bf0ed8993abc0f7ea618c73:
->
->    Linux 2.6.36-rc1 (2010-08-15 17:41:37 -0700)
->
-> are available in the git repository at:
->    git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild-2.6.git rc-fixes
->
-> Amerigo Wang (1):
->        makefile: not need to regenerate kernel.release file when make kernelrelease
->
-> Jan Beulich (1):
->        fixes for using make 3.82
->
-> Michal Marek (2):
->        Merge commit 'v2.6.36-rc1' into kbuild/rc-fixes
->        setlocalversion: Ignote SCMs above the linux source tree
->
-> Sam Ravnborg (2):
->        kconfig: fix savedefconfig with choice marked optional
->        kconfig: fix segfault when detecting recursive dependency
->
->   Makefile                   |    4 ++--
->   firmware/Makefile          |    2 +-
->   scripts/kconfig/confdata.c |    6 ++++--
->   scripts/kconfig/symbol.c   |    2 ++
->   scripts/mkmakefile         |    4 +++-
->   scripts/setlocalversion    |    4 ++--
->   6 files changed, 14 insertions(+), 8 deletions(-)
+diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
+index 5b7c86e..ecb16c0 100644
+--- a/scripts/kconfig/conf.c
++++ b/scripts/kconfig/conf.c
+@@ -466,7 +466,7 @@ int main(int ac, char **av)
+ 	bindtextdomain(PACKAGE, LOCALEDIR);
+ 	textdomain(PACKAGE);
+ 
+-	while ((opt = getopt_long_only(ac, av, "", long_opts, NULL)) != -1) {
++	while ((opt = getopt_long(ac, av, "", long_opts, NULL)) != -1) {
+ 		input_mode = (enum input_mode)opt;
+ 		switch (opt) {
+ 		case silentoldconfig:
+-- 
+1.7.2.30.gc37d7.dirty
 
