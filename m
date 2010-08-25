@@ -1,92 +1,62 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.michael-prokop.at ([88.198.6.110]:52465 "EHLO
-	mail.michael-prokop.at" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S933210Ab0HXXNc (ORCPT
+Received: from brigitte.telenet-ops.be ([195.130.137.66]:58075 "EHLO
+	brigitte.telenet-ops.be" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753149Ab0HYK1o (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 24 Aug 2010 19:13:32 -0400
-Date: Wed, 25 Aug 2010 01:03:49 +0200
-From: Michael Prokop <mika@grml.org>
-Subject: scripts/setlocalversion: information retrieval about git
-	repository state
-Message-ID: <2010-08-25T00-33-12@devnull.michael-prokop.at>
+	Wed, 25 Aug 2010 06:27:44 -0400
+Date: Wed, 25 Aug 2010 12:22:40 +0200 (CEST)
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Subject: [PATCH] checksyscalls: Fix stand-alone usage
+Message-ID: <alpine.DEB.2.00.1008251221270.22455@ayla.of.borg>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="5FNPeqk0egs0iuvD"
-Content-Disposition: inline
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: nico-linuxsetlocalversion@schottelius.org
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: linux-kbuild@vger.kernel.org, Linux Kernel Development <linux-kernel@vger.kernel.org>
 
+The usage help in the comments
+  - refers to the wrong script name,
+  - doesn't mention that $srctree must be set.
 
---5FNPeqk0egs0iuvD
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Hence correct the script name, and derive the source tree path from the script
+path, so we no longer need to rely on $srctree being set by the caller.
 
-Hi,
+Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
+---
+ scripts/checksyscalls.sh |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
 
-(please Cc me on replies as I'm not subscribed to linux-kbuild@)
+diff --git a/scripts/checksyscalls.sh b/scripts/checksyscalls.sh
+index 6bb42e7..3ab316e 100755
+--- a/scripts/checksyscalls.sh
++++ b/scripts/checksyscalls.sh
+@@ -6,7 +6,7 @@
+ # and listed below so they are ignored.
+ #
+ # Usage:
+-# syscallchk gcc gcc-options
++# checksyscalls.sh gcc gcc-options
+ #
+ 
+ ignore_list() {
+@@ -204,5 +204,5 @@ sed -n -e '/^\#define/ s/[^_]*__NR_\([^[:space:]]*\).*/\
+ \#endif/p' $1
+ }
+ 
+-(ignore_list && syscall_list ${srctree}/arch/x86/include/asm/unistd_32.h) | \
++(ignore_list && syscall_list $(dirname $0)/../arch/x86/include/asm/unistd_32.h) | \
+ $* -E -x c - > /dev/null
+-- 
+1.7.0.4
 
-while building Debian packages of my own kernel version I stumbled
-upon a build problem with a Debian mechanism, see
-http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=591793
+Gr{oetje,eeting}s,
 
-Why I'm reporting this issue: in scripts/setlocalversion there's the
-following comment (hint: "apped" should be "append"):
+						Geert
 
-        # apped a plus sign if the repository is not in a clean tagged
-        # state and  LOCALVERSION= is not specified
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
 
-Ok, so testing with a clean and untagged state and empty
-LOCALVERSION using master of current
-git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux-2.6.git:
-
-  % cd linux-2.6
-  % make defconfig
-  % make prepare
-  % git status
-  # On branch master
-  nothing to commit (working directory clean)
-  % scripts/setlocalversion
-  +
-
-Alright. But:
-
-  % git branch
-  * master
-  % git show master | head -1
-  commit d1b113bb028999e82a8528e1484be8c23fb5a7d9
-  % git tag master-test d1b113bb028999e82a8528e1484be8c23fb5a7d9
-  % scripts/setlocalversion
-  +
-
-Huh? Ok, scripts/setlocalversion uses 'git describe --exact-match':
-
-  % git describe --exact-match
-  fatal: no tag exactly matches 'd1b113bb028999e82a8528e1484be8c23fb5a7d9'
-  % git branch --contains d1b113bb028999e82a8528e1484be8c23fb5a7d9
-  * master
-
-For my understanding this *is* a tagged and clean state of the
-repository. But I'm not sure whether that's a bug in 'git describe
---exact-match' or if scripts/setlocalversion of recent kernel
-versions should be adjusted (either the check for the untagged state
-or clarify/improve the comment about it).
-
-regards,
--mika-
-
---5FNPeqk0egs0iuvD
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Digital signature
-Content-Disposition: inline
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.9 (GNU/Linux)
-
-iEYEARECAAYFAkx0T9UACgkQ2N9T+zficuihkQCfbe9DhAB2rYWxAuC/0x9cmxBZ
-OHUAniW3KPqVrtv1iKetUff7WaWfX4np
-=HXdR
------END PGP SIGNATURE-----
-
---5FNPeqk0egs0iuvD--
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+							    -- Linus Torvalds
