@@ -1,32 +1,48 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:41444 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:57244 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751660Ab0H0O0s (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 27 Aug 2010 10:26:48 -0400
-Message-ID: <4C77CB27.1070700@suse.cz>
-Date: Fri, 27 Aug 2010 16:26:47 +0200
+	id S1756973Ab0HaLX4 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 31 Aug 2010 07:23:56 -0400
+Date: Tue, 31 Aug 2010 13:23:53 +0200
 From: Michal Marek <mmarek@suse.cz>
+Subject: Re: [RFC] kbuild: use getopt_long(), not its _only() variant
+Message-ID: <20100831112353.GB18142@sepie.suse.cz>
+References: <1282579284-20102-1-git-send-email-lacombar@gmail.com>
 MIME-Version: 1.0
-Subject: Re: scripts/setlocalversion: information retrieval about git	repository
- state
-References: <2010-08-25T00-33-12@devnull.michael-prokop.at>
-In-Reply-To: <2010-08-25T00-33-12@devnull.michael-prokop.at>
-Content-Type: text/plain; charset=ISO-8859-2
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1282579284-20102-1-git-send-email-lacombar@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michael Prokop <mika@grml.org>
-Cc: linux-kbuild@vger.kernel.org, nico-linuxsetlocalversion@schottelius.org
+To: Arnaud Lacombe <lacombar@gmail.com>
+Cc: Sam Ravnborg <sam@ravnborg.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-On 25.8.2010 01:03, Michael Prokop wrote:
-> Huh? Ok, scripts/setlocalversion uses 'git describe --exact-match':
+On Mon, Aug 23, 2010 at 12:01:24PM -0400, Arnaud Lacombe wrote:
+> NetBSD lacks getopt_long_only() whereas getopt_long() works just fine.
 > 
->   % git describe --exact-match
->   fatal: no tag exactly matches 'd1b113bb028999e82a8528e1484be8c23fb5a7d9'
->   % git branch --contains d1b113bb028999e82a8528e1484be8c23fb5a7d9
->   * master
+> Signed-off-by: Arnaud Lacombe <lacombar@gmail.com>
+> ---
+>  scripts/kconfig/conf.c |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
+> 
+> diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
+> index 5b7c86e..ecb16c0 100644
+> --- a/scripts/kconfig/conf.c
+> +++ b/scripts/kconfig/conf.c
+> @@ -466,7 +466,7 @@ int main(int ac, char **av)
+>  	bindtextdomain(PACKAGE, LOCALEDIR);
+>  	textdomain(PACKAGE);
+>  
+> -	while ((opt = getopt_long_only(ac, av, "", long_opts, NULL)) != -1) {
+> +	while ((opt = getopt_long(ac, av, "", long_opts, NULL)) != -1) {
+>  		input_mode = (enum input_mode)opt;
+>  		switch (opt) {
+>  		case silentoldconfig:
 
-Git describe only looks at annotated or signed tags (git tag -a/-s) by
-default.
+scripts/kconfig/Makefile uses the two-dash notation, so
+getopt_long_only() really isn't necessary. Applied to
+kbuild-2.6.git#kconfig.
 
 Michal
+
+
