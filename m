@@ -1,60 +1,44 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from jack.hrz.tu-chemnitz.de ([134.109.132.46]:54043 "EHLO
-	jack.hrz.tu-chemnitz.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752825Ab0IBQwp (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 2 Sep 2010 12:52:45 -0400
-From: Alexander Stein <alexander.stein@informatik.tu-chemnitz.de>
-Subject: Re: [PATCH] xconfig: Change the titlebar if using Qt3
-Date: Thu, 2 Sep 2010 18:52:39 +0200
-References: <1283355997-6900-1-git-send-email-mmarek@suse.cz>
-In-Reply-To: <1283355997-6900-1-git-send-email-mmarek@suse.cz>
+Received: from smtp13.ono.com ([62.42.230.16]:52216 "EHLO resmaa13.ono.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1753764Ab0ICCjb (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 2 Sep 2010 22:39:31 -0400
+Date: Fri, 3 Sep 2010 04:33:28 +0200
+From: Guillem Jover <guillem@hadrons.org>
+Subject: [PATCH] kbuild, deb-pkg: Check if KBUILD_IMAGE exists before
+ copying it
+Message-ID: <20100903023328.GA15380@gaara.hadrons.org>
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-15"
-Content-Transfer-Encoding: 7bit
-Message-Id: <201009021852.40023.alexander.stein@informatik.tu-chemnitz.de>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: linux-kbuild@vger.kernel.org
 
-Hello Marek,
+Avoid an error when doing cp over the image when it does not contain
+the full path to the file.
 
-On Wednesday 01 September 2010 17:46:37 Michal Marek wrote:
-> Qt4 is now used by default and will get more testing. In case someone
-> still uses Qt3 and reports a bug, make it easy to recognize that this is
-> Qt3.
-> 
-> Cc: Alexander Stein <alexander.stein@informatik.tu-chemnitz.de>
-> Signed-off-by: Michal Marek <mmarek@suse.cz>
-> ---
->  scripts/kconfig/qconf.cc |   10 ++++++++--
->  1 files changed, 8 insertions(+), 2 deletions(-)
-> 
-> diff --git a/scripts/kconfig/qconf.cc b/scripts/kconfig/qconf.cc
-> index 88d3874..a04e451 100644
-> --- a/scripts/kconfig/qconf.cc
-> +++ b/scripts/kconfig/qconf.cc
-> @@ -1274,8 +1274,14 @@ ConfigMainWindow::ConfigMainWindow(void)
->  	char title[256];
-> 
->  	QDesktopWidget *d = configApp->desktop();
-> -	snprintf(title, sizeof(title), _("Linux Kernel v%s Configuration"),
-> -		getenv("KERNELVERSION"));
-> +	snprintf(title, sizeof(title), _("Linux Kernel v%s Configuration%s"),
-> +		getenv("KERNELVERSION"),
-> +#if QT_VERSION < 0x040000
-> +		" (Qt3)"
-> +#else
-> +		""
-> +#endif
-> +		);
->  	setCaption(title);
-> 
->  	width = configSettings->readNumEntry("/window width", d->width() - 64);
+Signed-off-by: Guillem Jover <guillem@hadrons.org>
+---
+ scripts/package/builddeb |    4 +++-
+ 1 files changed, 3 insertions(+), 1 deletions(-)
 
-Looks fine to me.
+diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+index 5f1e2fc..49b74e1 100644
+--- a/scripts/package/builddeb
++++ b/scripts/package/builddeb
+@@ -66,7 +66,9 @@ else
+ 	cp System.map "$tmpdir/boot/System.map-$version"
+ 	cp .config "$tmpdir/boot/config-$version"
+ 	# Not all arches include the boot path in KBUILD_IMAGE
+-	if ! cp $KBUILD_IMAGE "$tmpdir/boot/vmlinuz-$version"; then
++	if [ -e $KBUILD_IMAGE ]; then
++		cp $KBUILD_IMAGE "$tmpdir/boot/vmlinuz-$version"
++	else
+ 		cp arch/$ARCH/boot/$KBUILD_IMAGE "$tmpdir/boot/vmlinuz-$version"
+ 	fi
+ fi
+-- 
+1.7.1
 
-Best regards,
-Alexander
