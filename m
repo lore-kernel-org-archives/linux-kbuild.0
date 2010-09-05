@@ -1,28 +1,44 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from aa012msr.fastwebnet.it ([85.18.95.72]:41496 "EHLO
-	aa012msr.fastwebnet.it" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754082Ab0IDQG0 (ORCPT
+Received: from pfepa.post.tele.dk ([195.41.46.235]:35272 "EHLO
+	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750941Ab0IEGSA (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 4 Sep 2010 12:06:26 -0400
-Message-ID: <9230417.1223821283614803164.JavaMail.defaultUser@defaultHost>
-Date: Sat, 4 Sep 2010 17:40:03 +0200 (CEST)
-From: "desk@live.com" <autocicognara@fastwebnet.it>
-Reply-To: JU4343@ymail.com
-Subject: Mutual Support
+	Sun, 5 Sep 2010 02:18:00 -0400
+Date: Sun, 5 Sep 2010 08:17:58 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: [PATCH] kbuild: fix oldnoconfig to do the right thing
+Message-ID: <20100905061758.GA29547@merkur.ravnborg.org>
+References: <20100901152130.GY2684@bombadil.infradead.org>
 MIME-Version: 1.0
-Content-Type: text/plain;charset="UTF-8"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20100901152130.GY2684@bombadil.infradead.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
+To: Kyle McMartin <kyle@mcmartin.ca>
+Cc: linux-kbuild@vger.kernel.org, aris@redhat.com, linux-kernel@vger.kernel.org
 
-Dear Sir/Madam,
+On Wed, Sep 01, 2010 at 11:21:30AM -0400, Kyle McMartin wrote:
+> From: Kyle McMartin <kyle@redhat.com>
+> 
+> Commit 861b4ea4 broke oldnoconfig when removed the oldnoconfig checks on
+>                        if (input_mode == nonint_oldconfig ||
+>                            input_mode == oldnoconfig) {
+>                                if (input_mode == nonint_oldconfig &&
+>                                    sym->name &&
+>                                     !sym_is_choice_value(sym)) {
+> to avoid oldnoconfig chugging through the else stanza.
+> 
+> Fix that to restore expected behaviour (which I've confirmed in the
+> Fedora kernel build that the configs end up looking the same.)
 
-  I am Judith Johnson a solicitor at law, i have a proposal for you kindle get b
-ack to me for more information on my private email address at:judith4343@hotmail
-.com
+I played aroud with this.
+I looks like the only difference I got was that before
+your patch oldnoconfig produced a lot of output to stdout.
+With your patch is was silent.
 
-God Bless you and you Family.
+The resulting config was the same.
 
-Sincerely,
-Judith Johnson
+We obviously want the silent variant.
 
+Acked-by: Sam Ravnborg <sam@ravnborg.org>
