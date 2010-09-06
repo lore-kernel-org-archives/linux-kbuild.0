@@ -1,12 +1,12 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor.suse.de ([195.135.220.2]:39538 "EHLO mx1.suse.de"
+Received: from cantor.suse.de ([195.135.220.2]:39544 "EHLO mx1.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754671Ab0IFLsr (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 6 Sep 2010 07:48:47 -0400
+	id S1750885Ab0IFLtD (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 6 Sep 2010 07:49:03 -0400
 From: Michal Marek <mmarek@suse.cz>
-Subject: [PATCH 1/3] kbuild: Really don't clean bounds.h and asm-offsets.h
-Date: Mon,  6 Sep 2010 13:48:14 +0200
-Message-Id: <1283773696-3911-2-git-send-email-mmarek@suse.cz>
+Subject: [PATCH 2/3] kbuild: Do not run make clean in $(srctree)
+Date: Mon,  6 Sep 2010 13:48:15 +0200
+Message-Id: <1283773696-3911-3-git-send-email-mmarek@suse.cz>
 In-Reply-To: <1283773696-3911-1-git-send-email-mmarek@suse.cz>
 References: <1283773696-3911-1-git-send-email-mmarek@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -14,61 +14,24 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org
 
-Commit 7d3cc8b tried to keep bounds.h and asm-offsets.h during make
-clean by filtering these out of $(clean-files), but they are listed in
-$(targets) and $(always) and thus removed automatically. Introduce a new
-$(no-clean-files) variable to really skip such files in Makefile.clean.
-
 Signed-off-by: Michal Marek <mmarek@suse.cz>
 ---
- Documentation/kbuild/makefiles.txt |    7 +++++++
- Kbuild                             |    4 ++--
- scripts/Makefile.clean             |    2 ++
- 3 files changed, 11 insertions(+), 2 deletions(-)
+ Makefile |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-diff --git a/Documentation/kbuild/makefiles.txt b/Documentation/kbuild/makefiles.txt
-index 0135155..fcd1a98 100644
---- a/Documentation/kbuild/makefiles.txt
-+++ b/Documentation/kbuild/makefiles.txt
-@@ -779,6 +779,13 @@ This will delete the directory debian, including all subdirectories.
- Kbuild will assume the directories to be in the same relative path as the
- Makefile if no absolute path is specified (path does not start with '/').
+diff --git a/Makefile b/Makefile
+index b98943a..d71bfde 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1180,7 +1180,7 @@ MRPROPER_FILES += .config .config.old .version .old_version             \
+ #
+ clean: rm-dirs  := $(CLEAN_DIRS)
+ clean: rm-files := $(CLEAN_FILES)
+-clean-dirs      := $(addprefix _clean_,$(srctree) $(vmlinux-alldirs) Documentation)
++clean-dirs      := $(addprefix _clean_, . $(vmlinux-alldirs) Documentation)
  
-+To exclude certain files from make clean, use the $(no-clean-files) variable.
-+This is only a special case used in the top level Kbuild file:
-+
-+	Example:
-+		#Kbuild
-+		no-clean-files := $(bounds-file) $(offsets-file)
-+
- Usually kbuild descends down in subdirectories due to "obj-* := dir/",
- but in the architecture makefiles where the kbuild infrastructure
- is not sufficient this sometimes needs to be explicit.
-diff --git a/Kbuild b/Kbuild
-index e3737ad..18a8bfb 100644
---- a/Kbuild
-+++ b/Kbuild
-@@ -94,5 +94,5 @@ PHONY += missing-syscalls
- missing-syscalls: scripts/checksyscalls.sh FORCE
- 	$(call cmd,syscalls)
- 
--# Delete all targets during make clean
--clean-files := $(addprefix $(objtree)/,$(filter-out $(bounds-file) $(offsets-file),$(targets)))
-+# Keep these two files during make clean
-+no-clean-files := $(bounds-file) $(offsets-file)
-diff --git a/scripts/Makefile.clean b/scripts/Makefile.clean
-index 6f89fbb..686cb0d 100644
---- a/scripts/Makefile.clean
-+++ b/scripts/Makefile.clean
-@@ -45,6 +45,8 @@ __clean-files	:= $(extra-y) $(always)                  \
- 		   $(host-progs)                         \
- 		   $(hostprogs-y) $(hostprogs-m) $(hostprogs-)
- 
-+__clean-files   := $(filter-out $(no-clean-files), $(__clean-files))
-+
- # as clean-files is given relative to the current directory, this adds
- # a $(obj) prefix, except for absolute paths
- 
+ PHONY += $(clean-dirs) clean archclean
+ $(clean-dirs):
 -- 
 1.7.1
 
