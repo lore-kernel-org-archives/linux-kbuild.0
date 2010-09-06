@@ -1,61 +1,29 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:48244 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:48859 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751007Ab0IFLci (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 6 Sep 2010 07:32:38 -0400
-Message-ID: <4C84D154.7070303@suse.cz>
-Date: Mon, 06 Sep 2010 13:32:36 +0200
+	id S1753417Ab0IFLsi (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 6 Sep 2010 07:48:38 -0400
 From: Michal Marek <mmarek@suse.cz>
-MIME-Version: 1.0
-Subject: Re: [PATCH] xconfig: Change the titlebar if using Qt3
-References: <1283355997-6900-1-git-send-email-mmarek@suse.cz> <201009021852.40023.alexander.stein@informatik.tu-chemnitz.de>
-In-Reply-To: <201009021852.40023.alexander.stein@informatik.tu-chemnitz.de>
-Content-Type: text/plain; charset=ISO-8859-15
-Content-Transfer-Encoding: 7bit
+Subject: [PATCH 0/3] make clean fixes
+Date: Mon,  6 Sep 2010 13:48:13 +0200
+Message-Id: <1283773696-3911-1-git-send-email-mmarek@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Alexander Stein <alexander.stein@informatik.tu-chemnitz.de>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
 
-On 2.9.2010 18:52, Alexander Stein wrote:
-> Hello Marek,
-> 
-> On Wednesday 01 September 2010 17:46:37 Michal Marek wrote:
->> Qt4 is now used by default and will get more testing. In case someone
->> still uses Qt3 and reports a bug, make it easy to recognize that this is
->> Qt3.
->>
->> Cc: Alexander Stein <alexander.stein@informatik.tu-chemnitz.de>
->> Signed-off-by: Michal Marek <mmarek@suse.cz>
->> ---
->>  scripts/kconfig/qconf.cc |   10 ++++++++--
->>  1 files changed, 8 insertions(+), 2 deletions(-)
->>
->> diff --git a/scripts/kconfig/qconf.cc b/scripts/kconfig/qconf.cc
->> index 88d3874..a04e451 100644
->> --- a/scripts/kconfig/qconf.cc
->> +++ b/scripts/kconfig/qconf.cc
->> @@ -1274,8 +1274,14 @@ ConfigMainWindow::ConfigMainWindow(void)
->>  	char title[256];
->>
->>  	QDesktopWidget *d = configApp->desktop();
->> -	snprintf(title, sizeof(title), _("Linux Kernel v%s Configuration"),
->> -		getenv("KERNELVERSION"));
->> +	snprintf(title, sizeof(title), _("Linux Kernel v%s Configuration%s"),
->> +		getenv("KERNELVERSION"),
->> +#if QT_VERSION < 0x040000
->> +		" (Qt3)"
->> +#else
->> +		""
->> +#endif
->> +		);
->>  	setCaption(title);
->>
->>  	width = configSettings->readNumEntry("/window width", d->width() - 64);
-> 
-> Looks fine to me.
+Two fixes and one cleanup of 'make clean'
 
-OK, I committed it with "Acked-by: <you>"
-
-thanks,
 Michal
+
+Michal Marek (3):
+  kbuild: Really don't clean bounds.h and asm-offsets.h
+  kbuild: Do not run make clean in $(srctree)
+  kbuild: Use a single clean rule for kernel and external modules
+
+ Documentation/kbuild/makefiles.txt |    7 +++++++
+ Kbuild                             |    4 ++--
+ Makefile                           |   33 +++++++++++++--------------------
+ scripts/Makefile.clean             |    2 ++
+ 4 files changed, 24 insertions(+), 22 deletions(-)
+
