@@ -1,47 +1,35 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.michael-prokop.at ([88.198.6.110]:60028 "EHLO
-	mail.michael-prokop.at" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750963Ab0IFJ53 (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 6 Sep 2010 05:57:29 -0400
-From: Michael Prokop <mika@grml.org>
-Subject: [PATCH] scripts/setlocalversion: update comment regarding information retrieval about git repository state
-Date: Mon,  6 Sep 2010 11:57:19 +0200
-Message-Id: <1283767039-27872-1-git-send-email-mika@grml.org>
-In-Reply-To: <4C80E5B9.3080405@suse.cz>
+Received: from cantor2.suse.de ([195.135.220.15]:48052 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754491Ab0IFL12 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 6 Sep 2010 07:27:28 -0400
+Date: Mon, 6 Sep 2010 13:27:27 +0200
+From: Michal Marek <mmarek@suse.cz>
+Subject: Re: [PATCH] scripts/setlocalversion: update comment regarding
+ information retrieval about git repository state
+Message-ID: <20100906112727.GA2617@sepie.suse.cz>
 References: <4C80E5B9.3080405@suse.cz>
+ <1283767039-27872-1-git-send-email-mika@grml.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1283767039-27872-1-git-send-email-mika@grml.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, nico-linuxsetlocalversion@schottelius.org
-Cc: Michael Prokop <mika@grml.org>
+To: Michael Prokop <mika@grml.org>
+Cc: linux-kbuild@vger.kernel.org, nico-linuxsetlocalversion@schottelius.org
 
-A tagged repository state isn't enough, git describe only
-looks at signed or annotated tags (git tag -a/-s). This
-documentation update makes sure the comment matches the
-current behaviour.
+On Mon, Sep 06, 2010 at 11:57:19AM +0200, Michael Prokop wrote:
+> A tagged repository state isn't enough, git describe only
+> looks at signed or annotated tags (git tag -a/-s). This
+> documentation update makes sure the comment matches the
+> current behaviour.
+> 
+> Signed-off-by: Michael Prokop <mika@grml.org>
+> ---
+>  scripts/setlocalversion |    6 ++++--
+>  1 files changed, 4 insertions(+), 2 deletions(-)
 
-Signed-off-by: Michael Prokop <mika@grml.org>
----
- scripts/setlocalversion |    6 ++++--
- 1 files changed, 4 insertions(+), 2 deletions(-)
+Thanks, applied.
 
-diff --git a/scripts/setlocalversion b/scripts/setlocalversion
-index 057b6b3..ef8729f 100755
---- a/scripts/setlocalversion
-+++ b/scripts/setlocalversion
-@@ -160,8 +160,10 @@ if test "$CONFIG_LOCALVERSION_AUTO" = "y"; then
- 	# full scm version string
- 	res="$res$(scm_version)"
- else
--	# apped a plus sign if the repository is not in a clean tagged
--	# state and  LOCALVERSION= is not specified
-+	# append a plus sign if the repository is not in a clean
-+	# annotated or signed tagged state (as git describe only
-+	# looks at signed or annotated tags - git tag -a/-s) and
-+	# LOCALVERSION= is not specified
- 	if test "${LOCALVERSION+set}" != "set"; then
- 		scm=$(scm_version --short)
- 		res="$res${scm:++}"
--- 
-1.7.1
-
+Michal
