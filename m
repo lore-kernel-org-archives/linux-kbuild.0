@@ -1,44 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepa.post.tele.dk ([195.41.46.235]:35272 "EHLO
-	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750941Ab0IEGSA (ORCPT
+Received: from mail.michael-prokop.at ([88.198.6.110]:60028 "EHLO
+	mail.michael-prokop.at" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750963Ab0IFJ53 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 5 Sep 2010 02:18:00 -0400
-Date: Sun, 5 Sep 2010 08:17:58 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH] kbuild: fix oldnoconfig to do the right thing
-Message-ID: <20100905061758.GA29547@merkur.ravnborg.org>
-References: <20100901152130.GY2684@bombadil.infradead.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20100901152130.GY2684@bombadil.infradead.org>
+	Mon, 6 Sep 2010 05:57:29 -0400
+From: Michael Prokop <mika@grml.org>
+Subject: [PATCH] scripts/setlocalversion: update comment regarding information retrieval about git repository state
+Date: Mon,  6 Sep 2010 11:57:19 +0200
+Message-Id: <1283767039-27872-1-git-send-email-mika@grml.org>
+In-Reply-To: <4C80E5B9.3080405@suse.cz>
+References: <4C80E5B9.3080405@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Kyle McMartin <kyle@mcmartin.ca>
-Cc: linux-kbuild@vger.kernel.org, aris@redhat.com, linux-kernel@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, nico-linuxsetlocalversion@schottelius.org
+Cc: Michael Prokop <mika@grml.org>
 
-On Wed, Sep 01, 2010 at 11:21:30AM -0400, Kyle McMartin wrote:
-> From: Kyle McMartin <kyle@redhat.com>
-> 
-> Commit 861b4ea4 broke oldnoconfig when removed the oldnoconfig checks on
->                        if (input_mode == nonint_oldconfig ||
->                            input_mode == oldnoconfig) {
->                                if (input_mode == nonint_oldconfig &&
->                                    sym->name &&
->                                     !sym_is_choice_value(sym)) {
-> to avoid oldnoconfig chugging through the else stanza.
-> 
-> Fix that to restore expected behaviour (which I've confirmed in the
-> Fedora kernel build that the configs end up looking the same.)
+A tagged repository state isn't enough, git describe only
+looks at signed or annotated tags (git tag -a/-s). This
+documentation update makes sure the comment matches the
+current behaviour.
 
-I played aroud with this.
-I looks like the only difference I got was that before
-your patch oldnoconfig produced a lot of output to stdout.
-With your patch is was silent.
+Signed-off-by: Michael Prokop <mika@grml.org>
+---
+ scripts/setlocalversion |    6 ++++--
+ 1 files changed, 4 insertions(+), 2 deletions(-)
 
-The resulting config was the same.
+diff --git a/scripts/setlocalversion b/scripts/setlocalversion
+index 057b6b3..ef8729f 100755
+--- a/scripts/setlocalversion
++++ b/scripts/setlocalversion
+@@ -160,8 +160,10 @@ if test "$CONFIG_LOCALVERSION_AUTO" = "y"; then
+ 	# full scm version string
+ 	res="$res$(scm_version)"
+ else
+-	# apped a plus sign if the repository is not in a clean tagged
+-	# state and  LOCALVERSION= is not specified
++	# append a plus sign if the repository is not in a clean
++	# annotated or signed tagged state (as git describe only
++	# looks at signed or annotated tags - git tag -a/-s) and
++	# LOCALVERSION= is not specified
+ 	if test "${LOCALVERSION+set}" != "set"; then
+ 		scm=$(scm_version --short)
+ 		res="$res${scm:++}"
+-- 
+1.7.1
 
-We obviously want the silent variant.
-
-Acked-by: Sam Ravnborg <sam@ravnborg.org>
