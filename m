@@ -1,12 +1,12 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor.suse.de ([195.135.220.2]:39544 "EHLO mx1.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:48870 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750885Ab0IFLtD (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 6 Sep 2010 07:49:03 -0400
+	id S1751573Ab0IFLtE (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 6 Sep 2010 07:49:04 -0400
 From: Michal Marek <mmarek@suse.cz>
-Subject: [PATCH 2/3] kbuild: Do not run make clean in $(srctree)
-Date: Mon,  6 Sep 2010 13:48:15 +0200
-Message-Id: <1283773696-3911-3-git-send-email-mmarek@suse.cz>
+Subject: [PATCH 3/3] kbuild: Use a single clean rule for kernel and external modules
+Date: Mon,  6 Sep 2010 13:48:16 +0200
+Message-Id: <1283773696-3911-4-git-send-email-mmarek@suse.cz>
 In-Reply-To: <1283773696-3911-1-git-send-email-mmarek@suse.cz>
 References: <1283773696-3911-1-git-send-email-mmarek@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -14,24 +14,70 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org
 
+The list of patterns for the external modules case was constantly
+lagging behind.
+
 Signed-off-by: Michal Marek <mmarek@suse.cz>
 ---
- Makefile |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+ Makefile |   31 ++++++++++++-------------------
+ 1 files changed, 12 insertions(+), 19 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index b98943a..d71bfde 100644
+index d71bfde..414a646 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -1180,7 +1180,7 @@ MRPROPER_FILES += .config .config.old .version .old_version             \
- #
- clean: rm-dirs  := $(CLEAN_DIRS)
- clean: rm-files := $(CLEAN_FILES)
--clean-dirs      := $(addprefix _clean_,$(srctree) $(vmlinux-alldirs) Documentation)
-+clean-dirs      := $(addprefix _clean_, . $(vmlinux-alldirs) Documentation)
- 
- PHONY += $(clean-dirs) clean archclean
+@@ -1186,15 +1186,7 @@ PHONY += $(clean-dirs) clean archclean
  $(clean-dirs):
+ 	$(Q)$(MAKE) $(clean)=$(patsubst _clean_%,%,$@)
+ 
+-clean: archclean $(clean-dirs)
+-	$(call cmd,rmdirs)
+-	$(call cmd,rmfiles)
+-	@find . $(RCS_FIND_IGNORE) \
+-		\( -name '*.[oas]' -o -name '*.ko' -o -name '.*.cmd' \
+-		-o -name '.*.d' -o -name '.*.tmp' -o -name '*.mod.c' \
+-		-o -name '*.symtypes' -o -name 'modules.order' \
+-		-o -name modules.builtin -o -name '.tmp_*.o.*' \
+-		-o -name '*.gcno' \) -type f -print | xargs rm -f
++clean: archclean
+ 
+ # mrproper - Delete all generated files, including .config
+ #
+@@ -1392,16 +1384,7 @@ $(clean-dirs):
+ 	$(Q)$(MAKE) $(clean)=$(patsubst _clean_%,%,$@)
+ 
+ clean:	rm-dirs := $(MODVERDIR)
+-clean: rm-files := $(KBUILD_EXTMOD)/Module.symvers \
+-                   $(KBUILD_EXTMOD)/modules.order \
+-                   $(KBUILD_EXTMOD)/modules.builtin
+-clean: $(clean-dirs)
+-	$(call cmd,rmdirs)
+-	$(call cmd,rmfiles)
+-	@find $(KBUILD_EXTMOD) $(RCS_FIND_IGNORE) \
+-		\( -name '*.[oas]' -o -name '*.ko' -o -name '.*.cmd' \
+-		-o -name '.*.d' -o -name '.*.tmp' -o -name '*.mod.c' \
+-		-o -name '*.gcno' \) -type f -print | xargs rm -f
++clean: rm-files := $(KBUILD_EXTMOD)/Module.symvers
+ 
+ help:
+ 	@echo  '  Building external modules.'
+@@ -1418,6 +1401,16 @@ prepare: ;
+ scripts: ;
+ endif # KBUILD_EXTMOD
+ 
++clean: $(clean-dirs)
++	$(call cmd,rmdirs)
++	$(call cmd,rmfiles)
++	@find $(or $(KBUILD_EXTMOD), .) $(RCS_FIND_IGNORE) \
++		\( -name '*.[oas]' -o -name '*.ko' -o -name '.*.cmd' \
++		-o -name '.*.d' -o -name '.*.tmp' -o -name '*.mod.c' \
++		-o -name '*.symtypes' -o -name 'modules.order' \
++		-o -name modules.builtin -o -name '.tmp_*.o.*' \
++		-o -name '*.gcno' \) -type f -print | xargs rm -f
++
+ # Generate tags for editors
+ # ---------------------------------------------------------------------------
+ quiet_cmd_tags = GEN     $@
 -- 
 1.7.1
 
