@@ -1,15 +1,15 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-gx0-f174.google.com ([209.85.161.174]:36832 "EHLO
-	mail-gx0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752394Ab0IKPxv (ORCPT
+Received: from mail-gw0-f46.google.com ([74.125.83.46]:53064 "EHLO
+	mail-gw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752394Ab0IKPxx (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 11 Sep 2010 11:53:51 -0400
-Received: by gxk23 with SMTP id 23so1555729gxk.19
-        for <linux-kbuild@vger.kernel.org>; Sat, 11 Sep 2010 08:53:50 -0700 (PDT)
+	Sat, 11 Sep 2010 11:53:53 -0400
+Received: by gwj17 with SMTP id 17so1555732gwj.19
+        for <linux-kbuild@vger.kernel.org>; Sat, 11 Sep 2010 08:53:52 -0700 (PDT)
 From: Arnaud Lacombe <lacombar@gmail.com>
-Subject: [PATCH 01/15] kconfig: replace a `switch()' statement by a more flexible `if()' statement
-Date: Sat, 11 Sep 2010 11:51:08 -0400
-Message-Id: <1284220282-3500-2-git-send-email-lacombar@gmail.com>
+Subject: [PATCH 02/15] kconfig: rephrase help text not to mention the internal prefix
+Date: Sat, 11 Sep 2010 11:51:09 -0400
+Message-Id: <1284220282-3500-3-git-send-email-lacombar@gmail.com>
 In-Reply-To: <1284220282-3500-1-git-send-email-lacombar@gmail.com>
 References: <1284220282-3500-1-git-send-email-lacombar@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -17,60 +17,84 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: Sam Ravnborg <sam@ravnborg.org>, Michal Marek <mmarek@suse.cz>
 Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, Arnaud Lacombe <lacombar@gmail.com>
 
-With the upcoming dynamical configuration prefix, we can no longer assume that
-the prefix will start by a 'C'. As such, we can no longer hardcode this value in
-the `case ...:', so replace the `switch() { ... }' statement by a more flexible
-'if () { ... }' statement.
-
 Signed-off-by: Arnaud Lacombe <lacombar@gmail.com>
 ---
- scripts/kconfig/confdata.c |   19 +++++--------------
- 1 files changed, 5 insertions(+), 14 deletions(-)
+ scripts/kconfig/mconf.c |   10 +++++-----
+ scripts/kconfig/nconf.c |   12 ++++++------
+ 2 files changed, 11 insertions(+), 11 deletions(-)
 
-diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
-index dc11d51..d9181de 100644
---- a/scripts/kconfig/confdata.c
-+++ b/scripts/kconfig/confdata.c
-@@ -221,8 +221,7 @@ load:
- 	while (fgets(line, sizeof(line), in)) {
- 		conf_lineno++;
- 		sym = NULL;
--		switch (line[0]) {
--		case '#':
-+		if (line[0] == '#') {
- 			if (memcmp(line + 2, "CONFIG_", 7))
- 				continue;
- 			p = strchr(line + 9, ' ');
-@@ -254,12 +253,7 @@ load:
- 			default:
- 				;
- 			}
--			break;
--		case 'C':
--			if (memcmp(line, "CONFIG_", 7)) {
--				conf_warning("unexpected data");
--				continue;
--			}
-+		} else if (memcmp(line, "CONFIG_", 7) == 0) {
- 			p = strchr(line + 7, '=');
- 			if (!p)
- 				continue;
-@@ -286,12 +280,9 @@ load:
- 			}
- 			if (conf_set_sym_val(sym, def, def_flags, p))
- 				continue;
--			break;
--		case '\r':
--		case '\n':
--			break;
--		default:
--			conf_warning("unexpected data");
-+		} else {
-+			if (line[0] != '\r' && line[0] != '\n')
-+				conf_warning("unexpected data");
- 			continue;
- 		}
- 		if (sym && sym_is_choice_value(sym)) {
+diff --git a/scripts/kconfig/mconf.c b/scripts/kconfig/mconf.c
+index d2f6e05..5c3d0c4 100644
+--- a/scripts/kconfig/mconf.c
++++ b/scripts/kconfig/mconf.c
+@@ -232,7 +232,7 @@ save_config_help[] = N_(
+ 	"leave this blank.\n"),
+ search_help[] = N_(
+ 	"\n"
+-	"Search for CONFIG_ symbols and display their relations.\n"
++	"Search for symbols and display their relations.\n"
+ 	"Regular expressions are allowed.\n"
+ 	"Example: search for \"^FOO\"\n"
+ 	"Result:\n"
+@@ -249,7 +249,7 @@ search_help[] = N_(
+ 	"Selected by: BAR\n"
+ 	"-----------------------------------------------------------------\n"
+ 	"o The line 'Prompt:' shows the text used in the menu structure for\n"
+-	"  this CONFIG_ symbol\n"
++	"  this symbol\n"
+ 	"o The 'Defined at' line tell at what file / line number the symbol\n"
+ 	"  is defined\n"
+ 	"o The 'Depends on:' line tell what symbols needs to be defined for\n"
+@@ -265,9 +265,9 @@ search_help[] = N_(
+ 	"Only relevant lines are shown.\n"
+ 	"\n\n"
+ 	"Search examples:\n"
+-	"Examples: USB	=> find all CONFIG_ symbols containing USB\n"
+-	"          ^USB => find all CONFIG_ symbols starting with USB\n"
+-	"          USB$ => find all CONFIG_ symbols ending with USB\n"
++	"Examples: USB	=> find all symbols containing USB\n"
++	"          ^USB => find all symbols starting with USB\n"
++	"          USB$ => find all symbols ending with USB\n"
+ 	"\n");
+ 
+ static int indent;
+diff --git a/scripts/kconfig/nconf.c b/scripts/kconfig/nconf.c
+index 18a215d..b8a9f37 100644
+--- a/scripts/kconfig/nconf.c
++++ b/scripts/kconfig/nconf.c
+@@ -217,8 +217,8 @@ save_config_help[] = N_(
+ "leave this blank.\n"),
+ search_help[] = N_(
+ "\n"
+-"Search for CONFIG_ symbols and display their relations.\n"
+-"Regular expressions are allowed.\n"
++"Search for symbols and display their relations. Regular expressions\n"
++"are allowed.\n"
+ "Example: search for \"^FOO\"\n"
+ "Result:\n"
+ "-----------------------------------------------------------------\n"
+@@ -234,7 +234,7 @@ search_help[] = N_(
+ "Selected by: BAR\n"
+ "-----------------------------------------------------------------\n"
+ "o The line 'Prompt:' shows the text used in the menu structure for\n"
+-"  this CONFIG_ symbol\n"
++"  this symbol\n"
+ "o The 'Defined at' line tell at what file / line number the symbol\n"
+ "  is defined\n"
+ "o The 'Depends on:' line tell what symbols needs to be defined for\n"
+@@ -250,9 +250,9 @@ search_help[] = N_(
+ "Only relevant lines are shown.\n"
+ "\n\n"
+ "Search examples:\n"
+-"Examples: USB   = > find all CONFIG_ symbols containing USB\n"
+-"          ^USB => find all CONFIG_ symbols starting with USB\n"
+-"          USB$ => find all CONFIG_ symbols ending with USB\n"
++"Examples: USB   = > find all symbols containing USB\n"
++"          ^USB => find all symbols starting with USB\n"
++"          USB$ => find all symbols ending with USB\n"
+ "\n");
+ 
+ struct mitem {
 -- 
 1.7.2.30.gc37d7.dirty
 
