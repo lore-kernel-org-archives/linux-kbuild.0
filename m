@@ -1,63 +1,36 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pw0-f46.google.com ([209.85.160.46]:56910 "EHLO
-	mail-pw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754456Ab0IMHSX (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 13 Sep 2010 03:18:23 -0400
-Message-ID: <4C8DD067.6060005@gmail.com>
-Date: Mon, 13 Sep 2010 00:19:03 -0700
-From: "Justin P. Mattock" <justinmattock@gmail.com>
+Received: from cantor.suse.de ([195.135.220.2]:60882 "EHLO mx1.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750871Ab0IMKn7 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 13 Sep 2010 06:43:59 -0400
+Message-ID: <4C8E006D.6020706@suse.cz>
+Date: Mon, 13 Sep 2010 12:43:57 +0200
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Subject: Re: 2.6.36-rc3 - Unable to build: "Error: input truncated"
-References: <4C8CB5A1.9040500@tuxonice.net>	<201009121934.37033.rjw@sisk.pl>	<4C8D5D41.90104@tuxonice.net> <20100912201152.a4ada04a.randy.dunlap@oracle.com> <4C8DB031.6050008@tuxonice.net> <4C8DB674.5040200@gmail.com> <4C8DC01A.4030206@tuxonice.net> <4C8DC6B9.3050701@gmail.com> <4C8DCA43.5000608@tuxonice.net>
-In-Reply-To: <4C8DCA43.5000608@tuxonice.net>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: Re: [PATCH] nconfig: Fix help for choice menus
+References: <1284107570-17124-1-git-send-email-bebarino@gmail.com> <AANLkTimy0Ygv6rtL7MA+Lf5_AX5F-VFiDeJZ7GMLbLia@mail.gmail.com>
+In-Reply-To: <AANLkTimy0Ygv6rtL7MA+Lf5_AX5F-VFiDeJZ7GMLbLia@mail.gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nigel Cunningham <nigel@tuxonice.net>
-Cc: Randy Dunlap <randy.dunlap@oracle.com>, "Rafael J. Wysocki" <rjw@sisk.pl>, LKML <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org
+To: Nir Tzachar <nir.tzachar@gmail.com>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, bebarino@gmail.com
 
-On 09/12/2010 11:52 PM, Nigel Cunningham wrote:
-> Hi.
->
-> On 13/09/10 16:37, Justin P. Mattock wrote:
->> On 09/12/2010 11:09 PM, Nigel Cunningham wrote:
->>> Hi.
->>>
->>> On 13/09/10 15:28, Justin P. Mattock wrote:
->>>> probably the same thing I was hitting last week or similar... bisected
->>>> resulted in crazy numbers(way back in may) long story short
->>>> git clean -fx resolved the error over here..(so tied up with other
->>>> things something as simple as that, I forgot)
->>>>
->>>> hope this helps..
->>>
->>> 'fraid not.
->>>
->>> What I have since noticed, though, is that my currently running (2.6.34)
->>> .config doesn't trigger it, whereas the one with some changes I made the
->>> other day does. Looks like I have a couple of ways in which to find out
->>> the cause :)
->>>
->>> Nigel
->>>
->>
->>
->> ahh.. I see.. yeah over here it was the same .config lots of commits
->> here and there, numerous recompiles of a same module that probably
->> triggered my error(stale files and such).. but if your hitting a .config
->> change then that's different..(hopefully you remember what you
->> changed...can be a bit daunting if going in and feeling generous and
->> such..(but then again maybe that's just me..)).
->
-> I still have the old one - I compile all my kernels with that option
-> that makes /proc/config.gz. Better go. Getting dinner ready :)
->
-> Nigel
->
+On 12.9.2010 10:06, Nir Tzachar wrote:
+> On Fri, Sep 10, 2010 at 11:32 AM, Stephen Boyd <bebarino@gmail.com> wrote:
+>> When getting the help for a choice menu with a help section (for example
+>> the "Choose SLAB allocator" menu) nconfig pops up a window with nothing
+>> inside it. This is due to show_help() passing an empty string to
+>> show_scroll_win()'s 3rd argument. The option really does have help
+>> though, but it isn't a config symbol, so just add the help text for
+>> the option, and don't try to add anything else like the config option
+>> name.
+> 
+> 
+> Acked-by: Nir Tzachar <nir.tzachar@gmail.com>
 
 
-yep..  hope you catch this...
+Thanks, applied.
 
-Justin P. Mattock
+Michal
