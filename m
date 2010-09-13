@@ -1,39 +1,38 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:51720 "EHLO mx2.suse.de"
+Received: from cantor.suse.de ([195.135.220.2]:46416 "EHLO mx1.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751696Ab0IMOyP (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 13 Sep 2010 10:54:15 -0400
-Message-ID: <4C8E3B15.2040807@suse.cz>
-Date: Mon, 13 Sep 2010 16:54:13 +0200
+	id S1750920Ab0IMPYk (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 13 Sep 2010 11:24:40 -0400
+Message-ID: <4C8E4236.6080108@suse.cz>
+Date: Mon, 13 Sep 2010 17:24:38 +0200
 From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Subject: Re: Kconfig add reportoldconfig and updateoldconfig targets
-References: <20100913143830.GK2919@stro.at>
-In-Reply-To: <20100913143830.GK2919@stro.at>
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [PATCH 0/3] make clean fixes
+References: <1283773696-3911-1-git-send-email-mmarek@suse.cz>
+In-Reply-To: <1283773696-3911-1-git-send-email-mmarek@suse.cz>
+Content-Type: text/plain; charset=ISO-8859-2
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: maximilian attems <max@stro.at>
-Cc: linux-kbuild@vger.kernel.org, Bastian Blank <waldi@debian.org>, Ben Hutchings <ben@decadent.org.uk>
+To: linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
 
-On 13.9.2010 16:38, maximilian attems wrote:
-> From: Bastian Blank <waldi@debian.org>
+On 6.9.2010 13:48, Michal Marek wrote:
+> Two fixes and one cleanup of 'make clean'
 > 
-> This patch has been around for a looong time in Debian kernels
-> and might be useful for others. The reportoldconfig target
-> is used for the official linux-2.6 image builds. It outputs
-> to the build log the changed configs and sets any unset to
-> it's default. 
+> Michal
+> 
+> Michal Marek (3):
+>   kbuild: Really don't clean bounds.h and asm-offsets.h
+>   kbuild: Do not run make clean in $(srctree)
+>   kbuild: Use a single clean rule for kernel and external modules
+> 
+>  Documentation/kbuild/makefiles.txt |    7 +++++++
+>  Kbuild                             |    4 ++--
+>  Makefile                           |   33 +++++++++++++--------------------
+>  scripts/Makefile.clean             |    2 ++
+>  4 files changed, 24 insertions(+), 22 deletions(-)
 
-2.6.26-rc1 has listnewconfig and oldnoconfig, which do more or less the
-same. And I think we have enough *config targets already, so unless
-there is a problem that is hard to solve with the current kconfig plus
-some scripting (*), I'd vote for not adding further special-purpose
-*config targets.
-
-(*) Such as the defconfig cleanup that took hours with a brute-force
-python script, but was easily achieved by a patch that added the
-savedefconfig target.
+I added this to the kbuild tree.
 
 Michal
