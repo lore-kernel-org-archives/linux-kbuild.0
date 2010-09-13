@@ -1,242 +1,39 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from baikonur.stro.at ([213.239.196.228]:59879 "EHLO
-	baikonur.stro.at" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751949Ab0IMOjL (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 13 Sep 2010 10:39:11 -0400
-Date: Mon, 13 Sep 2010 16:38:31 +0200
-From: maximilian attems <max@stro.at>
-Subject: Kconfig add reportoldconfig and updateoldconfig targets
-Message-ID: <20100913143830.GK2919@stro.at>
+Received: from cantor2.suse.de ([195.135.220.15]:51720 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751696Ab0IMOyP (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 13 Sep 2010 10:54:15 -0400
+Message-ID: <4C8E3B15.2040807@suse.cz>
+Date: Mon, 13 Sep 2010 16:54:13 +0200
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Subject: Re: Kconfig add reportoldconfig and updateoldconfig targets
+References: <20100913143830.GK2919@stro.at>
+In-Reply-To: <20100913143830.GK2919@stro.at>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
-Cc: Bastian Blank <waldi@debian.org>, Ben Hutchings <ben@decadent.org.uk>
+To: maximilian attems <max@stro.at>
+Cc: linux-kbuild@vger.kernel.org, Bastian Blank <waldi@debian.org>, Ben Hutchings <ben@decadent.org.uk>
 
-From: Bastian Blank <waldi@debian.org>
+On 13.9.2010 16:38, maximilian attems wrote:
+> From: Bastian Blank <waldi@debian.org>
+> 
+> This patch has been around for a looong time in Debian kernels
+> and might be useful for others. The reportoldconfig target
+> is used for the official linux-2.6 image builds. It outputs
+> to the build log the changed configs and sets any unset to
+> it's default. 
 
-This patch has been around for a looong time in Debian kernels
-and might be useful for others. The reportoldconfig target
-is used for the official linux-2.6 image builds. It outputs
-to the build log the changed configs and sets any unset to
-it's default. 
+2.6.26-rc1 has listnewconfig and oldnoconfig, which do more or less the
+same. And I think we have enough *config targets already, so unless
+there is a problem that is hard to solve with the current kconfig plus
+some scripting (*), I'd vote for not adding further special-purpose
+*config targets.
 
+(*) Such as the defconfig cleanup that took hours with a brute-force
+python script, but was easily achieved by a patch that added the
+savedefconfig target.
 
-Signed-off-by: Bastian Blank <waldi@debian.org>
-Signed-off-by: Ben Hutchings <ben@decadent.org.uk>
-Signed-off-by: maximilian attems <max@stro.at>
-
----
-
- scripts/kconfig/Makefile    |    8 ++-
- scripts/kconfig/conf.c      |   11 ++++
- scripts/kconfig/confdata.c  |   80 ++++++++++++++++++++++++++++++++++
- scripts/kconfig/expr.h      |    1 
- scripts/kconfig/lkc_proto.h |    1 
- 5 files changed, 100 insertions(+), 1 deletion(-)
-
-diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
-index de934de..57e96aa 100644
---- a/scripts/kconfig/Makefile
-+++ b/scripts/kconfig/Makefile
-@@ -3,7 +3,7 @@
- # These targets are used from top-level makefile
- 
- PHONY += oldconfig xconfig gconfig menuconfig config silentoldconfig update-po-config \
--	localmodconfig localyesconfig
-+	localmodconfig localyesconfig reportoldconfig updateoldconfig
- 
- ifdef KBUILD_KCONFIG
- Kconfig := $(KBUILD_KCONFIG)
-@@ -29,10 +29,16 @@ nconfig: $(obj)/nconf
- oldconfig: $(obj)/conf
- 	$< --$@ $(Kconfig)
- 
-+reportoldconfig: $(obj)/conf
-+	$< --$@ $(Kconfig)
-+
- silentoldconfig: $(obj)/conf
- 	$(Q)mkdir -p include/generated
- 	$< --$@ $(Kconfig)
- 
-+updateoldconfig: $(obj)/conf
-+	$< --$@ $(Kconfig)
-+
- # if no path is given, then use src directory to find file
- ifdef LSMOD
- LSMOD_F := $(LSMOD)
-diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
-index 5b7c86e..9c2171c 100644
---- a/scripts/kconfig/conf.c
-+++ b/scripts/kconfig/conf.c
-@@ -33,6 +33,8 @@ enum input_mode {
- 	savedefconfig,
- 	listnewconfig,
- 	oldnoconfig,
-+	reportoldconfig,
-+	updateoldconfig,
- } input_mode = oldaskconfig;
- 
- char *defconfig_file;
-@@ -453,6 +455,8 @@ static struct option long_opts[] = {
- 	{"randconfig",      no_argument,       NULL, randconfig},
- 	{"listnewconfig",   no_argument,       NULL, listnewconfig},
- 	{"oldnoconfig",     no_argument,       NULL, oldnoconfig},
-+	{"reportoldconfig", no_argument,       NULL, reportoldconfig},
-+	{"updateoldconfig", no_argument,       NULL, updateoldconfig},
- 	{NULL, 0, NULL, 0}
- };
- 
-@@ -530,6 +534,8 @@ int main(int ac, char **av)
- 		}
- 		break;
- 	case savedefconfig:
-+	case reportoldconfig:
-+	case updateoldconfig:
- 		conf_read(NULL);
- 		break;
- 	case silentoldconfig:
-@@ -595,6 +601,8 @@ int main(int ac, char **av)
- 		conf_set_all_new_symbols(def_random);
- 		break;
- 	case defconfig:
-+	case reportoldconfig:
-+	case updateoldconfig:
- 		conf_set_all_new_symbols(def_default);
- 		break;
- 	case savedefconfig:
-@@ -618,6 +626,9 @@ int main(int ac, char **av)
- 		break;
- 	}
- 
-+	if (input_mode == reportoldconfig)
-+		conf_write_changes();
-+
- 	if (sync_kconfig) {
- 		/* silentoldconfig is used during the build so we shall update autoconf.
- 		 * All other commands are only used to generate a config.
-diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
-index 515253f..ee81b42 100644
---- a/scripts/kconfig/confdata.c
-+++ b/scripts/kconfig/confdata.c
-@@ -893,6 +893,85 @@ int conf_write_autoconf(void)
- 	return 0;
- }
- 
-+void conf_write_changes(void)
-+{
-+	struct symbol *sym;
-+	struct menu *menu;
-+	int l;
-+	const char *str;
-+
-+	fprintf(stdout, "\n#\n"
-+			"# Changes:\n"
-+			"#\n");
-+	menu = rootmenu.list;
-+	while (menu) {
-+		sym = menu->sym;
-+		if (sym &&
-+		    !(sym->flags & SYMBOL_CHOICE) &&
-+		    sym->flags & SYMBOL_WRITE &&
-+		    sym->flags & SYMBOL_NEW &&
-+		    sym->visible != no &&
-+		    sym_is_changable(sym)) {
-+			switch (sym->type) {
-+			case S_BOOLEAN:
-+			case S_TRISTATE:
-+				switch (sym_get_tristate_value(sym)) {
-+				case no:
-+					fprintf(stdout, "# CONFIG_%s is not set\n", sym->name);
-+					break;
-+				case mod:
-+					fprintf(stdout, "CONFIG_%s=m\n", sym->name);
-+					break;
-+				case yes:
-+					fprintf(stdout, "CONFIG_%s=y\n", sym->name);
-+					break;
-+				}
-+				break;
-+			case S_STRING:
-+				str = sym_get_string_value(sym);
-+				fprintf(stdout, "CONFIG_%s=\"", sym->name);
-+				while (1) {
-+					l = strcspn(str, "\"\\");
-+					if (l) {
-+						fwrite(str, l, 1, stdout);
-+						str += l;
-+					}
-+					if (!*str)
-+						break;
-+					fprintf(stdout, "\\%c", *str++);
-+				}
-+				fputs("\"\n", stdout);
-+				break;
-+			case S_HEX:
-+				str = sym_get_string_value(sym);
-+				if (str[0] != '0' || (str[1] != 'x' && str[1] != 'X')) {
-+					fprintf(stdout, "CONFIG_%s=%s\n", sym->name, str);
-+					break;
-+				}
-+			case S_INT:
-+				str = sym_get_string_value(sym);
-+				fprintf(stdout, "CONFIG_%s=%s\n", sym->name, str);
-+				break;
-+                        default:
-+                                break;
-+			}
-+		}
-+
-+		if (menu->list) {
-+			menu = menu->list;
-+			continue;
-+		}
-+		if (menu->next)
-+			menu = menu->next;
-+		else while ((menu = menu->parent)) {
-+			if (menu->next) {
-+				menu = menu->next;
-+				break;
-+			}
-+		}
-+	}
-+}
-+
- static int sym_change_count;
- static void (*conf_changed_callback)(void);
- 
-@@ -991,6 +1070,7 @@ void conf_set_all_new_symbols(enum conf_def_mode mode)
- 	for_all_symbols(i, sym) {
- 		if (sym_has_value(sym))
- 			continue;
-+		sym->flags |= SYMBOL_NEW;
- 		switch (sym_get_type(sym)) {
- 		case S_BOOLEAN:
- 		case S_TRISTATE:
-diff --git a/scripts/kconfig/expr.h b/scripts/kconfig/expr.h
-index 6ee2e4f..09a6a7c 100644
---- a/scripts/kconfig/expr.h
-+++ b/scripts/kconfig/expr.h
-@@ -107,6 +107,7 @@ struct symbol {
- #define SYMBOL_DEF_AUTO   0x20000  /* symbol.def[S_DEF_AUTO] is valid */
- #define SYMBOL_DEF3       0x40000  /* symbol.def[S_DEF_3] is valid */
- #define SYMBOL_DEF4       0x80000  /* symbol.def[S_DEF_4] is valid */
-+#define SYMBOL_NEW        0x100000
- 
- #define SYMBOL_MAXLENGTH	256
- #define SYMBOL_HASHSIZE		9973
-diff --git a/scripts/kconfig/lkc_proto.h b/scripts/kconfig/lkc_proto.h
-index 9a948c9..d5aeb72 100644
---- a/scripts/kconfig/lkc_proto.h
-+++ b/scripts/kconfig/lkc_proto.h
-@@ -6,6 +6,7 @@ P(conf_read_simple,int,(const char *name, int));
- P(conf_write_defconfig,int,(const char *name));
- P(conf_write,int,(const char *name));
- P(conf_write_autoconf,int,(void));
-+P(conf_write_changes,void,(void));
- P(conf_get_changed,bool,(void));
- P(conf_set_changed_callback, void,(void (*fn)(void)));
- 
+Michal
