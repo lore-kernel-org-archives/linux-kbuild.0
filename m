@@ -1,43 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepa.post.tele.dk ([195.41.46.235]:57300 "EHLO
-	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752738Ab0ISJyV (ORCPT
+Received: from mail-wy0-f174.google.com ([74.125.82.174]:49926 "EHLO
+	mail-wy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752869Ab0ISOxS convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 19 Sep 2010 05:54:21 -0400
-Date: Sun, 19 Sep 2010 11:54:19 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH]
-Message-ID: <20100919095419.GC25704@merkur.ravnborg.org>
-References: <7vhbhmxyeb.fsf@alter.siamese.dyndns.org>
+	Sun, 19 Sep 2010 10:53:18 -0400
+Received: by wyf22 with SMTP id 22so3606814wyf.19
+        for <linux-kbuild@vger.kernel.org>; Sun, 19 Sep 2010 07:53:17 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7vhbhmxyeb.fsf@alter.siamese.dyndns.org>
+In-Reply-To: <20100919094244.GA25704@merkur.ravnborg.org>
+References: <1284220282-3500-1-git-send-email-lacombar@gmail.com>
+	<1284220282-3500-7-git-send-email-lacombar@gmail.com>
+	<20100919094244.GA25704@merkur.ravnborg.org>
+Date: Sun, 19 Sep 2010 10:53:17 -0400
+Message-ID: <AANLkTi=bO7WT1g=RrGbEW35asjus3cQapoUv64e=Ugxr@mail.gmail.com>
+Subject: Re: [PATCH 06/15] kconfig: implement the `mainmenu' directive
+From: Arnaud Lacombe <lacombar@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Junio C Hamano <gitster@pobox.com>
-Cc: Roman Zippel <zippel@linux-m68k.org>, Michal Marek <mmarek@suse.cz>, Li Zefan <lizf@cn.fujitsu.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-On Sat, Sep 18, 2010 at 07:25:32PM -0700, Junio C Hamano wrote:
-> In 60f33b8 (kconfig: get rid of stray a.o, support ncursesw, 2006-01-15),
-> support to link menuconfig with ncursesw library was added.  To compute
-> the linker command option -l, we check "libncursesw.{so,a,dylib}" to allow
-> ncursesw to be used as a replacement ncurses.  However, when checking what
-> header file to include, we do not check /usr/include/ncursesw directory.
-> 
-> Add /usr/include/ncursesw to the list of directories that are checked.
-> With this patch, on my Debian Lenny box with libncursesw5-dev package but
-> not libncurses5-dev package, I can say "make menuconfig".
-> 
-> Signed-off-by: Junio C Hamano <gitster@pobox.com>
+Hi,
 
-Except for the missing patch subject then it looks OK.
+On Sun, Sep 19, 2010 at 5:42 AM, Sam Ravnborg <sam@ravnborg.org> wrote:
+> On Sat, Sep 11, 2010 at 11:51:13AM -0400, Arnaud Lacombe wrote:
+>> [...]
+>>  %%
+>> -input: stmt_list;
+>> +input: nl start | start;
+>> +
+>> +start: mainmenu_stmt stmt_list | stmt_list;
+>>
+>
+> With the above the mainmenu is mandatory.
+> So there is no longer a need to explicit give it a promt as
+> is done in conf_parse:
+>
+>        modules_sym->flags |= SYMBOL_AUTO;
+>        rootmenu.prompt = menu_add_prompt(P_MENU, "Linux Kernel Configuration", NULL);
+>
+>
+> And if we delete this (now not needed) assignment, we no longer requre
+> the patch that silence warning about redefinition of rootmeny prompt.
+>
+No, it is not mandatory. My first implementation made it mandatory,
+but I loosen the requirement after you asked me that it would be nice
+not to have it mandatory for simple Kconfig file. Making it that way
+also save some trouble on UML, but I'll come back on that later on.
 
-Suggested subject:
-kconfig: fix menuconfig on debian lenny
-
-Add as this is a fix we should Cc: <stable@kerne.org>?
-
-Acked-by: Sam Ravnborg <sam@ravnborg.org>
-
-	Sam
+ - Arnaud
