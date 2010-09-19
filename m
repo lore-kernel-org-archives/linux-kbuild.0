@@ -1,256 +1,105 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ww0-f44.google.com ([74.125.82.44]:33326 "EHLO
-	mail-ww0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751461Ab0ISE4p (ORCPT
+Received: from pfepa.post.tele.dk ([195.41.46.235]:55104 "EHLO
+	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752338Ab0ISJmq (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 19 Sep 2010 00:56:45 -0400
-Received: by wwb39 with SMTP id 39so2331908wwb.1
-        for <linux-kbuild@vger.kernel.org>; Sat, 18 Sep 2010 21:56:43 -0700 (PDT)
+	Sun, 19 Sep 2010 05:42:46 -0400
+Date: Sun, 19 Sep 2010 11:42:44 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: [PATCH 06/15] kconfig: implement the `mainmenu' directive
+Message-ID: <20100919094244.GA25704@merkur.ravnborg.org>
+References: <1284220282-3500-1-git-send-email-lacombar@gmail.com> <1284220282-3500-7-git-send-email-lacombar@gmail.com>
 MIME-Version: 1.0
-Date: Sun, 19 Sep 2010 00:56:43 -0400
-Message-ID: <AANLkTim1EmMOFERs7rwG=zg_AZrXtojE7dKV7Rhf17Ww@mail.gmail.com>
-Subject: Stale expression reference causing use-after-free
-From: Arnaud Lacombe <lacombar@gmail.com>
-Content-Type: multipart/mixed; boundary=0016e659f62c4b3bfc0490959fc2
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1284220282-3500-7-git-send-email-lacombar@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Catalin Marinas <catalin.marinas@arm.com>, Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org
+To: Arnaud Lacombe <lacombar@gmail.com>
+Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild <linux-kbuild@vger.kernel.org>
 
---0016e659f62c4b3bfc0490959fc2
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
+On Sat, Sep 11, 2010 at 11:51:13AM -0400, Arnaud Lacombe wrote:
+> If specified, the directive must be placed at the top of the Kconfig file.
+> 
+> We need to change the grammar to make the mainmenu directive set the
+> `rootmenu' prompt. This reflect how menu_add_prompt() works internally, ie.
+> set the prompt of the `current_entry', pointing originally to `rootmenu'.
+> 
+> Signed-off-by: Arnaud Lacombe <lacombar@gmail.com>
+> ---
+>  Documentation/kbuild/kconfig-language.txt |    3 ++-
+>  scripts/kconfig/zconf.y                   |   14 +++++++++++---
+>  2 files changed, 13 insertions(+), 4 deletions(-)
+> 
+> diff --git a/Documentation/kbuild/kconfig-language.txt b/Documentation/kbuild/kconfig-language.txt
+> index b472e4e..2fe93ca 100644
+> --- a/Documentation/kbuild/kconfig-language.txt
+> +++ b/Documentation/kbuild/kconfig-language.txt
+> @@ -322,7 +322,8 @@ mainmenu:
+>  	"mainmenu" <prompt>
+>  
+>  This sets the config program's title bar if the config program chooses
+> -to use it.
+> +to use it. It should be placed at the top of the configuration, before any
+> +other statement.
+>  
+>  
+>  Kconfig hints
+> diff --git a/scripts/kconfig/zconf.y b/scripts/kconfig/zconf.y
+> index 23dfd3b..e9b14efd 100644
+> --- a/scripts/kconfig/zconf.y
+> +++ b/scripts/kconfig/zconf.y
+> @@ -36,7 +36,7 @@ static struct menu *current_menu, *current_entry;
+>  #define YYERROR_VERBOSE
+>  #endif
+>  %}
+> -%expect 26
+> +%expect 28
+>  
+>  %union
+>  {
+> @@ -104,14 +104,15 @@ static struct menu *current_menu, *current_entry;
+>  %}
+>  
+>  %%
+> -input: stmt_list;
+> +input: nl start | start;
+> +
+> +start: mainmenu_stmt stmt_list | stmt_list;
+>  
+>  stmt_list:
+>  	  /* empty */
+>  	| stmt_list common_stmt
+>  	| stmt_list choice_stmt
+>  	| stmt_list menu_stmt
+> -	| stmt_list T_MAINMENU prompt nl
+>  	| stmt_list end			{ zconf_error("unexpected end statement"); }
+>  	| stmt_list T_WORD error T_EOL	{ zconf_error("unknown statement \"%s\"", $2); }
+>  	| stmt_list option_name error T_EOL
+> @@ -342,6 +343,13 @@ if_block:
+>  	| if_block choice_stmt
+>  ;
+>  
+> +/* mainmenu entry */
+> +
+> +mainmenu_stmt: T_MAINMENU prompt nl
+> +{
+> +	menu_add_prompt(P_MENU, $2, NULL);
+> +};
+> +
+>  /* menu entry */
+>  
+>  menu: T_MENU prompt T_EOL
 
-Hi,
+With the above the mainmenu is mandatory.
+So there is no longer a need to explicit give it a promt as
+is done in conf_parse:
 
-I've been experiencing a use-after-free with the current kconfig (from
-for-next, but I believe mainline is affected too), related to the
-introduction of commit 246cf9c26bf11f2bffbecea6e5bd222eee7b1df8. The
-symptoms with the attached test case and patch to highlight the
-problem is the following:
+        modules_sym->flags |= SYMBOL_AUTO;
+        rootmenu.prompt = menu_add_prompt(P_MENU, "Linux Kernel Configuration", NULL);
 
-% scripts/kconfig/mconf Kconfig.testcase
-[...]
-Invalid expr 0xbb9124a0 at scripts/kconfig/menu.c:295 in
-menu_finalize(): 41414141
-zsh: abort (core dumped)  scripts/kconfig/mconf Kconfig.testcase
 
-The backtrace is not really surprising:
+And if we delete this (now not needed) assignment, we no longer requre
+the patch that silence warning about redefinition of rootmeny prompt.
 
-#2  0xbbb9fbd6 in abort () from /usr/lib/libc.so.12
-#3  0x0804f23a in menu_finalize (parent=3D0xbb911e20) at
-scripts/kconfig/menu.c:295
-#4  0x0804eb6d in menu_finalize (parent=3D0xbb911df0) at
-scripts/kconfig/menu.c:292
-#5  0x0804f166 in menu_finalize (parent=3D0xbb911d60) at
-scripts/kconfig/menu.c:320
-#6  0x0804eb6d in menu_finalize (parent=3D0xbb911c10) at
-scripts/kconfig/menu.c:292
-#7  0x0804eb6d in menu_finalize (parent=3D0x8069ea0) at scripts/kconfig/men=
-u.c:292
-#8  0x080535d7 in conf_parse (name=3D0x804aa61 "=C7\004$") at
-scripts/kconfig/zconf.tab.c:2242
-#9  0x0804aa61 in main (ac=3DCannot access memory at address 0x0
-
-(gdb) frame 3
-#3  0x0804f23a in menu_finalize (parent=3D0xbb911e20) at
-scripts/kconfig/menu.c:295
-295                     EXPR_CHECK(parent->dir_dep);
-
-So far, I tracked this issue down to the faulty expression being freed
-by expr_eliminate_dups1() in the previous iteration of
-menu_initialize(), on the following line
-
-basedep =3D expr_eliminate_dups(basedep);
-
-The testcase is a stripped down Kconfig from the tree.
-
- - Arnaud
-
---0016e659f62c4b3bfc0490959fc2
-Content-Type: application/octet-stream; name="Kconfig.testcase"
-Content-Disposition: attachment; filename="Kconfig.testcase"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_ge9fe6bb0
-
-c291cmNlICJLY29uZmlnLnRlc3RjYXNlLmwxIgo=
---0016e659f62c4b3bfc0490959fc2
-Content-Type: application/octet-stream; name="Kconfig.testcase.l1"
-Content-Disposition: attachment; filename="Kconfig.testcase.l1"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_ge9felu91
-
-Y29uZmlnIERVTU1ZX0JPT0xfMAoJYm9vbAoKY29uZmlnIERVTU1ZX0JPT0xfMQoJYm9vbAoKY29u
-ZmlnIERVTU1ZX0JPT0xfMgoJYm9vbAoKY29uZmlnIERVTU1ZX0JPT0xfMwoJYm9vbAoJZGVmYXVs
-dCB5Cgpjb25maWcgRFVNTVlfQk9PTF80Cglib29sCglkZWZhdWx0IChEVU1NWV9DT05EXzUgfHwg
-RFVNTVlfQ09ORF82KQoKY29uZmlnIERVTU1ZX1NUUklOR18wCglzdHJpbmcKCWRlZmF1bHQgInN0
-cmluZzAiIGlmIERVTU1ZX0NPTkRfNwoJZGVmYXVsdCAic3RyaW5nMSIgaWYgRFVNTVlfQ09ORF84
-Cgpjb25maWcgRFVNTVlfQk9PTF81ICMgbWF5YmUgdW5uZWVkZWQKCWJvb2wKCWRlZmF1bHQgeQoK
-Y29uZmlnIERVTU1ZX0JPT0xfNgoJYm9vbAoJZGVmYXVsdCB5Cgpjb25maWcgRFVNTVlfQk9PTF83
-Cglib29sCglkZWZhdWx0IHkKCXNlbGVjdCBEVU1NWV9TRUxFQ1RfMCBpZiBEVU1NWV9DT05EXzAK
-CXNlbGVjdCBEVU1NWV9TRUxFQ1RfMQoJc2VsZWN0IERVTU1ZX1NFTEVDVF8yCglzZWxlY3QgRFVN
-TVlfU0VMRUNUXzMKCXNlbGVjdCBEVU1NWV9TRUxFQ1RfNAoKY29uZmlnIERVTU1ZX0JPT0xfOAoJ
-Ym9vbAoJZGVmYXVsdCB5CglkZXBlbmRzIG9uIERVTU1ZX0NPTkRfOSB8fCAoRFVNTVlfQ09ORF8x
-MCAmJiBEVU1NWV9DT05EXzExKQoKY29uZmlnIERVTU1ZX0JPT0xfOQoJYm9vbAoJZGVmYXVsdCB5
-CglzZWxlY3QgRFVNTVlfU0VMRUNUXzUKCXNlbGVjdCBEVU1NWV9TRUxFQ1RfNgoJc2VsZWN0IERV
-TU1ZX1NFTEVDVF83IGlmICghRFVNTVlfQ09ORF8xIHx8ICFEVU1NWV9DT05EXzIpCglzZWxlY3Qg
-RFVNTVlfU0VMRUNUXzgKCXNlbGVjdCBEVU1NWV9TRUxFQ1RfOQoKY29uZmlnIERVTU1ZX0JPT0xf
-MTAKCWJvb2wKCWRlZmF1bHQgeQoJc2VsZWN0IERVTU1ZX1NFTEVDVF8xMAoJc2VsZWN0IERVTU1Z
-X1NFTEVDVF8xMQoJc2VsZWN0IERVTU1ZX1NFTEVDVF8xMgoJc2VsZWN0IERVTU1ZX1NFTEVDVF8x
-MwoJc2VsZWN0IERVTU1ZX1NFTEVDVF8xNAoKY29uZmlnIERVTU1ZX0JPT0xfMTEKCWJvb2wKCWRl
-ZmF1bHQgeQoJc2VsZWN0IERVTU1ZX1NFTEVDVF8xNQoJc2VsZWN0IERVTU1ZX1NFTEVDVF8xNgoJ
-c2VsZWN0IERVTU1ZX1NFTEVDVF8xNwoJc2VsZWN0IERVTU1ZX1NFTEVDVF8xOAoJc2VsZWN0IERV
-TU1ZX1NFTEVDVF8xOQoKY29uZmlnIERVTU1ZX0JPT0xfMTIKCWJvb2wKCWRlZmF1bHQgeQoJc2Vs
-ZWN0IERVTU1ZX1NFTEVDVF8yMCBpZiBEVU1NWV9DT05EXzMKCXNlbGVjdCBEVU1NWV9TRUxFQ1Rf
-MjEKCXNlbGVjdCBEVU1NWV9TRUxFQ1RfMjIKCXNlbGVjdCBEVU1NWV9TRUxFQ1RfMjMKCXNlbGVj
-dCBEVU1NWV9TRUxFQ1RfMjQKCmNvbmZpZyBEVU1NWV9CT09MXzEzCglib29sCglkZWZhdWx0IChE
-VU1NWV9DT05EXzEyIHx8IERVTU1ZX0NPTkRfMTMgfHwgRFVNTVlfQ09ORF8xNCkKCXNlbGVjdCBE
-VU1NWV9TRUxFQ1RfMjUKCXNlbGVjdCBEVU1NWV9TRUxFQ1RfMjYgaWYgRFVNTVlfQ09ORF80Cglz
-ZWxlY3QgRFVNTVlfU0VMRUNUXzI3CglzZWxlY3QgRFVNTVlfU0VMRUNUXzI4CglzZWxlY3QgRFVN
-TVlfU0VMRUNUXzI5Cgpjb25maWcgRFVNTVlfQk9PTF8xNAoJYm9vbAoJZGVmYXVsdCB5CglkZXBl
-bmRzIG9uIERVTU1ZX0NPTkRfMTUKCXNlbGVjdCBEVU1NWV9TRUxFQ1RfMzAKCXNlbGVjdCBEVU1N
-WV9TRUxFQ1RfMzEKCXNlbGVjdCBEVU1NWV9TRUxFQ1RfMzIKCXNlbGVjdCBEVU1NWV9TRUxFQ1Rf
-MzMKCXNlbGVjdCBEVU1NWV9TRUxFQ1RfMzQgaWYgRFVNTVlfQ09ORF8xNgoKY29uZmlnIERVTU1Z
-X0JPT0xfMTYKCWJvb2wKCWRlZmF1bHQgeQoKY29uZmlnIERVTU1ZX0JPT0xfMTcKCWJvb2wKCWRl
-ZmF1bHQgeQoKY29uZmlnIERVTU1ZX0JPT0xfMTgKCWJvb2wKCWRlZmF1bHQgeQoKY29uZmlnIERV
-TU1ZX0JPT0xfMTkKCWJvb2wKCWRlZmF1bHQgeQoKY29uZmlnIERVTU1ZX0JPT0xfMjAKCWJvb2wK
-CWRlZmF1bHQgeQoKY29uZmlnIERVTU1ZX0JPT0xfMjEKCWJvb2wKCWRlZmF1bHQgeQoKY29uZmln
-IERVTU1ZX0JPT0xfMjIKCWJvb2wKCWRlZmF1bHQgeQoKY29uZmlnIERVTU1ZX0JPT0xfMjMKCWJv
-b2wKCWRlZmF1bHQgeQoKY29uZmlnIERVTU1ZX0JPT0xfMjQKCWJvb2wKCWRlZmF1bHQgeQoKY29u
-ZmlnIERVTU1ZX0JPT0xfMzAKCWJvb2wKCWRlZmF1bHQgeQoKY29uZmlnIERVTU1ZX0JPT0xfMjUK
-CWJvb2wKCWRlZmF1bHQgeQoKY29uZmlnIERVTU1ZX0JPT0xfMjYKCWJvb2wKCWRlZmF1bHQgeQoK
-Y29uZmlnIERVTU1ZX0JPT0xfMjcKCWJvb2wKCWRlZmF1bHQgeQoKY29uZmlnIERVTU1ZX0JPT0xf
-MjgKCWJvb2wKCWRlZmF1bHQgeQoKY29uZmlnIERVTU1ZX0JPT0xfMjkKCWJvb2wKCWRlZmF1bHQg
-eQoKY29uZmlnIERVTU1ZX0JPT0xfMzAKCWJvb2wKCWRlZmF1bHQgeQoJZGVwZW5kcyBvbiBEVU1N
-WV9DT05EXzE3ICYmIERVTU1ZX0NPTkRfMTggJiYgRFVNTVlfQ09ORF8xOQoKY29uZmlnIERVTU1Z
-X1NUUklOR18xCglzdHJpbmcKCW9wdGlvbiBlbnY9IkVOVjAiCgpjb25maWcgRFVNTVlfU1RSSU5H
-XzIKCXN0cmluZwoJb3B0aW9uIGVudj0iRU5WMSIKCmNvbmZpZyBEVU1NWV9TVFJJTkdfMwoJc3Ry
-aW5nCglkZXBlbmRzIG9uICFVTUwKCW9wdGlvbiBkZWZjb25maWdfbGlzdAoJZGVmYXVsdCAic3Ry
-aW5nMiIKCWRlZmF1bHQgInN0cmluZzMiCglkZWZhdWx0ICJzdHJpbmc0IgoJZGVmYXVsdCAiX3N0
-cmluZzUiCglkZWZhdWx0ICJzdHJpbmc2IgoKbWVudSAiZHVtbXkgbWVudSAwIgoKY29uZmlnIERV
-TU1ZX0JPT0xfMzEKCWJvb2wgInByb21wdDAiCgpjb25maWcgRFVNTVlfQk9PTF8zMgoJYm9vbAoK
-bWVudWNvbmZpZyBEVU1NWV9CT09MXzMzCglib29sICJwcm9tcHQxIgoJZGVwZW5kcyBvbiBEVU1N
-WV9DT05EXzIwCgppZiBEVU1NWV9CT09MXzMzCgpjb25maWcgRFVNTVlfQk9PTF8zNAoJYm9vbCAi
-cHJvbXB0MiIKCWRlcGVuZHMgb24gRFVNTVlfQk9PTF8zMwoKY29uZmlnIERVTU1ZX0JPT0xfMzUK
-CWJvb2wgInByb21wdDMiCglkZXBlbmRzIG9uIERVTU1ZX0NPTkRfMjEKCmNvbmZpZyBEVU1NWV9C
-T09MXzM2Cglib29sICJwcm9tcHQ0IgoJZGVwZW5kcyBvbiBEVU1NWV9DT05EXzIyICYmIERVTU1Z
-X0NPTkRfMjMKCm1lbnVjb25maWcgRFVNTVlfQk9PTF8zNwoJYm9vbCAicHJvbXB0NSIKCWRlcGVu
-ZHMgb24gRFVNTVlfQ09ORF8yNAoKZW5kaWYKCmVuZG1lbnUKCg==
---0016e659f62c4b3bfc0490959fc2
-Content-Type: text/x-patch; charset=US-ASCII; name="instrumentation.diff"
-Content-Disposition: attachment; filename="instrumentation.diff"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_ge9ffnb12
-
-ZGlmZiAtLWdpdCBhL0tjb25maWcudGVzdGNhc2UgYi9LY29uZmlnLnRlc3RjYXNlCm5ldyBmaWxl
-IG1vZGUgMTAwNjQ0CmluZGV4IDAwMDAwMDAuLmNiNjYzZTkKLS0tIC9kZXYvbnVsbAorKysgYi9L
-Y29uZmlnLnRlc3RjYXNlCkBAIC0wLDAgKzEgQEAKK3NvdXJjZSAiS2NvbmZpZy50ZXN0Y2FzZS5s
-MSIKZGlmZiAtLWdpdCBhL0tjb25maWcudGVzdGNhc2UubDEgYi9LY29uZmlnLnRlc3RjYXNlLmwx
-Cm5ldyBmaWxlIG1vZGUgMTAwNjQ0CmluZGV4IDAwMDAwMDAuLjc5ZWMxOWUKLS0tIC9kZXYvbnVs
-bAorKysgYi9LY29uZmlnLnRlc3RjYXNlLmwxCkBAIC0wLDAgKzEsMjE2IEBACitjb25maWcgRFVN
-TVlfQk9PTF8wCisJYm9vbAorCitjb25maWcgRFVNTVlfQk9PTF8xCisJYm9vbAorCitjb25maWcg
-RFVNTVlfQk9PTF8yCisJYm9vbAorCitjb25maWcgRFVNTVlfQk9PTF8zCisJYm9vbAorCWRlZmF1
-bHQgeQorCitjb25maWcgRFVNTVlfQk9PTF80CisJYm9vbAorCWRlZmF1bHQgKERVTU1ZX0NPTkRf
-NSB8fCBEVU1NWV9DT05EXzYpCisKK2NvbmZpZyBEVU1NWV9TVFJJTkdfMAorCXN0cmluZworCWRl
-ZmF1bHQgInN0cmluZzAiIGlmIERVTU1ZX0NPTkRfNworCWRlZmF1bHQgInN0cmluZzEiIGlmIERV
-TU1ZX0NPTkRfOAorCitjb25maWcgRFVNTVlfQk9PTF81ICMgbWF5YmUgdW5uZWVkZWQKKwlib29s
-CisJZGVmYXVsdCB5CisKK2NvbmZpZyBEVU1NWV9CT09MXzYKKwlib29sCisJZGVmYXVsdCB5CisK
-K2NvbmZpZyBEVU1NWV9CT09MXzcKKwlib29sCisJZGVmYXVsdCB5CisJc2VsZWN0IERVTU1ZX1NF
-TEVDVF8wIGlmIERVTU1ZX0NPTkRfMAorCXNlbGVjdCBEVU1NWV9TRUxFQ1RfMQorCXNlbGVjdCBE
-VU1NWV9TRUxFQ1RfMgorCXNlbGVjdCBEVU1NWV9TRUxFQ1RfMworCXNlbGVjdCBEVU1NWV9TRUxF
-Q1RfNAorCitjb25maWcgRFVNTVlfQk9PTF84CisJYm9vbAorCWRlZmF1bHQgeQorCWRlcGVuZHMg
-b24gRFVNTVlfQ09ORF85IHx8IChEVU1NWV9DT05EXzEwICYmIERVTU1ZX0NPTkRfMTEpCisKK2Nv
-bmZpZyBEVU1NWV9CT09MXzkKKwlib29sCisJZGVmYXVsdCB5CisJc2VsZWN0IERVTU1ZX1NFTEVD
-VF81CisJc2VsZWN0IERVTU1ZX1NFTEVDVF82CisJc2VsZWN0IERVTU1ZX1NFTEVDVF83IGlmICgh
-RFVNTVlfQ09ORF8xIHx8ICFEVU1NWV9DT05EXzIpCisJc2VsZWN0IERVTU1ZX1NFTEVDVF84CisJ
-c2VsZWN0IERVTU1ZX1NFTEVDVF85CisKK2NvbmZpZyBEVU1NWV9CT09MXzEwCisJYm9vbAorCWRl
-ZmF1bHQgeQorCXNlbGVjdCBEVU1NWV9TRUxFQ1RfMTAKKwlzZWxlY3QgRFVNTVlfU0VMRUNUXzEx
-CisJc2VsZWN0IERVTU1ZX1NFTEVDVF8xMgorCXNlbGVjdCBEVU1NWV9TRUxFQ1RfMTMKKwlzZWxl
-Y3QgRFVNTVlfU0VMRUNUXzE0CisKK2NvbmZpZyBEVU1NWV9CT09MXzExCisJYm9vbAorCWRlZmF1
-bHQgeQorCXNlbGVjdCBEVU1NWV9TRUxFQ1RfMTUKKwlzZWxlY3QgRFVNTVlfU0VMRUNUXzE2CisJ
-c2VsZWN0IERVTU1ZX1NFTEVDVF8xNworCXNlbGVjdCBEVU1NWV9TRUxFQ1RfMTgKKwlzZWxlY3Qg
-RFVNTVlfU0VMRUNUXzE5CisKK2NvbmZpZyBEVU1NWV9CT09MXzEyCisJYm9vbAorCWRlZmF1bHQg
-eQorCXNlbGVjdCBEVU1NWV9TRUxFQ1RfMjAgaWYgRFVNTVlfQ09ORF8zCisJc2VsZWN0IERVTU1Z
-X1NFTEVDVF8yMQorCXNlbGVjdCBEVU1NWV9TRUxFQ1RfMjIKKwlzZWxlY3QgRFVNTVlfU0VMRUNU
-XzIzCisJc2VsZWN0IERVTU1ZX1NFTEVDVF8yNAorCitjb25maWcgRFVNTVlfQk9PTF8xMworCWJv
-b2wKKwlkZWZhdWx0IChEVU1NWV9DT05EXzEyIHx8IERVTU1ZX0NPTkRfMTMgfHwgRFVNTVlfQ09O
-RF8xNCkKKwlzZWxlY3QgRFVNTVlfU0VMRUNUXzI1CisJc2VsZWN0IERVTU1ZX1NFTEVDVF8yNiBp
-ZiBEVU1NWV9DT05EXzQKKwlzZWxlY3QgRFVNTVlfU0VMRUNUXzI3CisJc2VsZWN0IERVTU1ZX1NF
-TEVDVF8yOAorCXNlbGVjdCBEVU1NWV9TRUxFQ1RfMjkKKworY29uZmlnIERVTU1ZX0JPT0xfMTQK
-Kwlib29sCisJZGVmYXVsdCB5CisJZGVwZW5kcyBvbiBEVU1NWV9DT05EXzE1CisJc2VsZWN0IERV
-TU1ZX1NFTEVDVF8zMAorCXNlbGVjdCBEVU1NWV9TRUxFQ1RfMzEKKwlzZWxlY3QgRFVNTVlfU0VM
-RUNUXzMyCisJc2VsZWN0IERVTU1ZX1NFTEVDVF8zMworCXNlbGVjdCBEVU1NWV9TRUxFQ1RfMzQg
-aWYgRFVNTVlfQ09ORF8xNgorCitjb25maWcgRFVNTVlfQk9PTF8xNgorCWJvb2wKKwlkZWZhdWx0
-IHkKKworY29uZmlnIERVTU1ZX0JPT0xfMTcKKwlib29sCisJZGVmYXVsdCB5CisKK2NvbmZpZyBE
-VU1NWV9CT09MXzE4CisJYm9vbAorCWRlZmF1bHQgeQorCitjb25maWcgRFVNTVlfQk9PTF8xOQor
-CWJvb2wKKwlkZWZhdWx0IHkKKworY29uZmlnIERVTU1ZX0JPT0xfMjAKKwlib29sCisJZGVmYXVs
-dCB5CisKK2NvbmZpZyBEVU1NWV9CT09MXzIxCisJYm9vbAorCWRlZmF1bHQgeQorCitjb25maWcg
-RFVNTVlfQk9PTF8yMgorCWJvb2wKKwlkZWZhdWx0IHkKKworY29uZmlnIERVTU1ZX0JPT0xfMjMK
-Kwlib29sCisJZGVmYXVsdCB5CisKK2NvbmZpZyBEVU1NWV9CT09MXzI0CisJYm9vbAorCWRlZmF1
-bHQgeQorCitjb25maWcgRFVNTVlfQk9PTF8zMAorCWJvb2wKKwlkZWZhdWx0IHkKKworY29uZmln
-IERVTU1ZX0JPT0xfMjUKKwlib29sCisJZGVmYXVsdCB5CisKK2NvbmZpZyBEVU1NWV9CT09MXzI2
-CisJYm9vbAorCWRlZmF1bHQgeQorCitjb25maWcgRFVNTVlfQk9PTF8yNworCWJvb2wKKwlkZWZh
-dWx0IHkKKworY29uZmlnIERVTU1ZX0JPT0xfMjgKKwlib29sCisJZGVmYXVsdCB5CisKK2NvbmZp
-ZyBEVU1NWV9CT09MXzI5CisJYm9vbAorCWRlZmF1bHQgeQorCitjb25maWcgRFVNTVlfQk9PTF8z
-MAorCWJvb2wKKwlkZWZhdWx0IHkKKwlkZXBlbmRzIG9uIERVTU1ZX0NPTkRfMTcgJiYgRFVNTVlf
-Q09ORF8xOCAmJiBEVU1NWV9DT05EXzE5CisKK2NvbmZpZyBEVU1NWV9TVFJJTkdfMQorCXN0cmlu
-ZworCW9wdGlvbiBlbnY9IkVOVjAiCisKK2NvbmZpZyBEVU1NWV9TVFJJTkdfMgorCXN0cmluZwor
-CW9wdGlvbiBlbnY9IkVOVjEiCisKK2NvbmZpZyBEVU1NWV9TVFJJTkdfMworCXN0cmluZworCWRl
-cGVuZHMgb24gIVVNTAorCW9wdGlvbiBkZWZjb25maWdfbGlzdAorCWRlZmF1bHQgInN0cmluZzIi
-CisJZGVmYXVsdCAic3RyaW5nMyIKKwlkZWZhdWx0ICJzdHJpbmc0IgorCWRlZmF1bHQgIl9zdHJp
-bmc1IgorCWRlZmF1bHQgInN0cmluZzYiCisKK21lbnUgImR1bW15IG1lbnUgMCIKKworY29uZmln
-IERVTU1ZX0JPT0xfMzEKKwlib29sICJwcm9tcHQwIgorCitjb25maWcgRFVNTVlfQk9PTF8zMgor
-CWJvb2wKKworbWVudWNvbmZpZyBEVU1NWV9CT09MXzMzCisJYm9vbCAicHJvbXB0MSIKKwlkZXBl
-bmRzIG9uIERVTU1ZX0NPTkRfMjAKKworaWYgRFVNTVlfQk9PTF8zMworCitjb25maWcgRFVNTVlf
-Qk9PTF8zNAorCWJvb2wgInByb21wdDIiCisJZGVwZW5kcyBvbiBEVU1NWV9CT09MXzMzCisKK2Nv
-bmZpZyBEVU1NWV9CT09MXzM1CisJYm9vbCAicHJvbXB0MyIKKwlkZXBlbmRzIG9uIERVTU1ZX0NP
-TkRfMjEKKworY29uZmlnIERVTU1ZX0JPT0xfMzYKKwlib29sICJwcm9tcHQ0IgorCWRlcGVuZHMg
-b24gRFVNTVlfQ09ORF8yMiAmJiBEVU1NWV9DT05EXzIzCisKK21lbnVjb25maWcgRFVNTVlfQk9P
-TF8zNworCWJvb2wgInByb21wdDUiCisJZGVwZW5kcyBvbiBEVU1NWV9DT05EXzI0CisKK2VuZGlm
-CisKK2VuZG1lbnUKKwpkaWZmIC0tZ2l0IGEvc2NyaXB0cy9rY29uZmlnL2V4cHIuYyBiL3Njcmlw
-dHMva2NvbmZpZy9leHByLmMKaW5kZXggMzMwZTdjMC4uNjVmN2FiMyAxMDA2NDQKLS0tIGEvc2Ny
-aXB0cy9rY29uZmlnL2V4cHIuYworKysgYi9zY3JpcHRzL2tjb25maWcvZXhwci5jCkBAIC03MSw2
-ICs3MSw4IEBAIHN0cnVjdCBleHByICpleHByX2NvcHkoc3RydWN0IGV4cHIgKm9yZykKIAlpZiAo
-IW9yZykKIAkJcmV0dXJuIE5VTEw7CiAKKwlFWFBSX0NIRUNLKG9yZyk7CisKIAllID0gbWFsbG9j
-KHNpemVvZigqb3JnKSk7CiAJbWVtY3B5KGUsIG9yZywgc2l6ZW9mKCpvcmcpKTsKIAlzd2l0Y2gg
-KG9yZy0+dHlwZSkgewpAQCAtMTAxLDExICsxMDMsMTMgQEAgc3RydWN0IGV4cHIgKmV4cHJfY29w
-eShzdHJ1Y3QgZXhwciAqb3JnKQogCXJldHVybiBlOwogfQogCi12b2lkIGV4cHJfZnJlZShzdHJ1
-Y3QgZXhwciAqZSkKK3ZvaWQgX2V4cHJfZnJlZShzdHJ1Y3QgZXhwciAqZSkKIHsKIAlpZiAoIWUp
-CiAJCXJldHVybjsKIAorCUVYUFJfQ0hFQ0soZSk7CisKIAlzd2l0Y2ggKGUtPnR5cGUpIHsKIAlj
-YXNlIEVfU1lNQk9MOgogCQlicmVhazsKQEAgLTEyNCw2ICsxMjgsOSBAQCB2b2lkIGV4cHJfZnJl
-ZShzdHJ1Y3QgZXhwciAqZSkKIAkJcHJpbnRmKCJob3cgdG8gZnJlZSB0eXBlICVkP1xuIiwgZS0+
-dHlwZSk7CiAJCWJyZWFrOwogCX0KKworCW1lbXNldChlLCAnQScsIHNpemVvZihlKSk7CisKIAlm
-cmVlKGUpOwogfQogCmRpZmYgLS1naXQgYS9zY3JpcHRzL2tjb25maWcvZXhwci5oIGIvc2NyaXB0
-cy9rY29uZmlnL2V4cHIuaAppbmRleCA2ZWUyZTRmLi4wYWRjMTA0IDEwMDY0NAotLS0gYS9zY3Jp
-cHRzL2tjb25maWcvZXhwci5oCisrKyBiL3NjcmlwdHMva2NvbmZpZy9leHByLmgKQEAgLTQ4LDYg
-KzQ4LDI2IEBAIHN0cnVjdCBleHByIHsKICNkZWZpbmUgRVhQUl9BTkQoZGVwMSwgZGVwMikJKCgo
-ZGVwMSk8KGRlcDIpKT8oZGVwMSk6KGRlcDIpKQogI2RlZmluZSBFWFBSX05PVChkZXApCQkoMi0o
-ZGVwKSkKIAorI2lmIDEKKyNkZWZpbmUgZXhwcl9mcmVlKGUpCQkJCQkJCVwKKyh7CQkJCQkJCQkJ
-XAorCWZwcmludGYoc3RkZXJyLCAiJXM6ICVwOiVkXG4iLCBfX2Z1bmNfXywgZSwgX19MSU5FX18p
-OwkJXAorCV9leHByX2ZyZWUoZSk7CQkJCQkJCVwKKwllID0gTlVMTDsJCQkJCQkJXAorfSkKKyNl
-bHNlCisjZGVmaW5lIGV4cHJfZnJlZShlKQlfZXhwcl9mcmVlKGUpOworI2VuZGlmCisKKyNkZWZp
-bmUgRVhQUl9DSEVDSyhlKQkJCQkJCQlcCisoewkJCQkJCQkJCVwKKwlpZiAoKGUpICE9IE5VTEwg
-JiYgKChlKS0+dHlwZSA8IEVfTk9ORSB8fCAoZSktPnR5cGUgPiBFX1JBTkdFKSkgeyBcCisJCWZw
-cmludGYoc3RkZXJyLCAiSW52YWxpZCBleHByICVwIGF0ICVzOiVkIGluICVzKCk6ICV4XG4iLCBc
-CisJCSAgICBlLCBfX0ZJTEVfXywgX19MSU5FX18sIF9fZnVuY19fLCAoZSktPnR5cGUpOwlcCisJ
-CWFib3J0KCk7CQkJCQkJXAorCX0JCQkJCQkJCVwKK30pCisKICNkZWZpbmUgZXhwcl9saXN0X2Zv
-cl9lYWNoX3N5bShsLCBlLCBzKSBcCiAJZm9yIChlID0gKGwpOyBlICYmIChzID0gZS0+cmlnaHQu
-c3ltKTsgZSA9IGUtPmxlZnQuZXhwcikKIApAQCAtMTkzLDcgKzIxMyw3IEBAIHN0cnVjdCBleHBy
-ICpleHByX2FsbG9jX2NvbXAoZW51bSBleHByX3R5cGUgdHlwZSwgc3RydWN0IHN5bWJvbCAqczEs
-IHN0cnVjdCBzeW1iCiBzdHJ1Y3QgZXhwciAqZXhwcl9hbGxvY19hbmQoc3RydWN0IGV4cHIgKmUx
-LCBzdHJ1Y3QgZXhwciAqZTIpOwogc3RydWN0IGV4cHIgKmV4cHJfYWxsb2Nfb3Ioc3RydWN0IGV4
-cHIgKmUxLCBzdHJ1Y3QgZXhwciAqZTIpOwogc3RydWN0IGV4cHIgKmV4cHJfY29weShzdHJ1Y3Qg
-ZXhwciAqb3JnKTsKLXZvaWQgZXhwcl9mcmVlKHN0cnVjdCBleHByICplKTsKK3ZvaWQgX2V4cHJf
-ZnJlZShzdHJ1Y3QgZXhwciAqZSk7CiBpbnQgZXhwcl9lcShzdHJ1Y3QgZXhwciAqZTEsIHN0cnVj
-dCBleHByICplMik7CiB2b2lkIGV4cHJfZWxpbWluYXRlX2VxKHN0cnVjdCBleHByICoqZXAxLCBz
-dHJ1Y3QgZXhwciAqKmVwMik7CiB0cmlzdGF0ZSBleHByX2NhbGNfdmFsdWUoc3RydWN0IGV4cHIg
-KmUpOwpkaWZmIC0tZ2l0IGEvc2NyaXB0cy9rY29uZmlnL21lbnUuYyBiL3NjcmlwdHMva2NvbmZp
-Zy9tZW51LmMKaW5kZXggNGZiNTkwMi4uMzU2MzIzOSAxMDA2NDQKLS0tIGEvc2NyaXB0cy9rY29u
-ZmlnL21lbnUuYworKysgYi9zY3JpcHRzL2tjb25maWcvbWVudS5jCkBAIC0yOTIsNiArMjkyLDcg
-QEAgdm9pZCBtZW51X2ZpbmFsaXplKHN0cnVjdCBtZW51ICpwYXJlbnQpCiAJCQltZW51X2ZpbmFs
-aXplKG1lbnUpOwogCX0gZWxzZSBpZiAoc3ltKSB7CiAJCS8qIGlnbm9yZSBpbmhlcml0ZWQgZGVw
-ZW5kZW5jaWVzIGZvciBkaXJfZGVwICovCisJCUVYUFJfQ0hFQ0socGFyZW50LT5kaXJfZGVwKTsK
-IAkJc3ltLT5kaXJfZGVwLmV4cHIgPSBleHByX3RyYW5zZm9ybShleHByX2NvcHkocGFyZW50LT5k
-aXJfZGVwKSk7CiAJCXN5bS0+ZGlyX2RlcC5leHByID0gZXhwcl9lbGltaW5hdGVfZHVwcyhzeW0t
-PmRpcl9kZXAuZXhwcik7CiAK
---0016e659f62c4b3bfc0490959fc2--
+	Sam
