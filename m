@@ -1,60 +1,144 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepb.post.tele.dk ([195.41.46.236]:36695 "EHLO
-	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751946Ab0ISTbU (ORCPT
+Received: from mail-wy0-f174.google.com ([74.125.82.174]:35896 "EHLO
+	mail-wy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754403Ab0ITCyS (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 19 Sep 2010 15:31:20 -0400
-Date: Sun, 19 Sep 2010 21:31:18 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH]
-Message-ID: <20100919193118.GA26308@merkur.ravnborg.org>
-References: <7vhbhmxyeb.fsf@alter.siamese.dyndns.org> <20100919095419.GC25704@merkur.ravnborg.org> <7v8w2xy4pq.fsf@alter.siamese.dyndns.org>
+	Sun, 19 Sep 2010 22:54:18 -0400
+Received: by wyf22 with SMTP id 22so3900736wyf.19
+        for <linux-kbuild@vger.kernel.org>; Sun, 19 Sep 2010 19:54:17 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7v8w2xy4pq.fsf@alter.siamese.dyndns.org>
+In-Reply-To: <AANLkTim1EmMOFERs7rwG=zg_AZrXtojE7dKV7Rhf17Ww@mail.gmail.com>
+References: <AANLkTim1EmMOFERs7rwG=zg_AZrXtojE7dKV7Rhf17Ww@mail.gmail.com>
+Date: Sun, 19 Sep 2010 22:54:17 -0400
+Message-ID: <AANLkTinMZj-_neS4jNM+b6-Dk7qzVMsR6DwyX2SHk3kt@mail.gmail.com>
+Subject: Re: Stale expression reference causing use-after-free
+From: Arnaud Lacombe <lacombar@gmail.com>
+Content-Type: multipart/mixed; boundary=0016e6d7df984155da0490a80727
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Junio C Hamano <junio@pobox.com>
-Cc: Roman Zippel <zippel@linux-m68k.org>, Michal Marek <mmarek@suse.cz>, Li Zefan <lizf@cn.fujitsu.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Catalin Marinas <catalin.marinas@arm.com>, Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org
 
-On Sun, Sep 19, 2010 at 11:21:21AM -0700, Junio C Hamano wrote:
-> Sam Ravnborg <sam@ravnborg.org> writes:
-> 
-> > On Sat, Sep 18, 2010 at 07:25:32PM -0700, Junio C Hamano wrote:
-> >> In 60f33b8 (kconfig: get rid of stray a.o, support ncursesw, 2006-01-15),
-> >> support to link menuconfig with ncursesw library was added.  To compute
-> >> the linker command option -l, we check "libncursesw.{so,a,dylib}" to allow
-> >> ncursesw to be used as a replacement ncurses.  However, when checking what
-> >> header file to include, we do not check /usr/include/ncursesw directory.
-> >> 
-> >> Add /usr/include/ncursesw to the list of directories that are checked.
-> >> With this patch, on my Debian Lenny box with libncursesw5-dev package but
-> >> not libncurses5-dev package, I can say "make menuconfig".
-> >> 
-> >> Signed-off-by: Junio C Hamano <gitster@pobox.com>
-> >
-> > Except for the missing patch subject then it looks OK.
-> > Suggested subject:
-> > kconfig: fix menuconfig on debian lenny
-> 
-> Sorry, the missing subject really was sloppy of me, and thanks.
-> 
-> > Add as this is a fix we should Cc: <stable@kerne.org>?
-> 
-> I don't think the fix deserves to be in stable.  It does not look like
-> 60f33b8 made it possible to use ncursesw on a box like mine so the patch
-> is not evan an regression-fix.
-OK
-> 
-> > Acked-by: Sam Ravnborg <sam@ravnborg.org>
-> 
-> Thanks; is it my responsibility to follow-up the thread with identical
-> patch with updated Subject and with your Ack, hoping somebody in kbuild
-> team would pick it up?
+--0016e6d7df984155da0490a80727
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
 
-I assume Michal will pick it up anyway - but if you do it would make
-it simpler for him to do so.
-So no need..
+Hi,
 
-	Sam
+It would seem that this issue is responsible for the crash I've seen
+randomly happening with gconf (2.6.36-rc6, before my generalization's
+branch). So far, I've traced it to the following line in
+menu_finalize():
+
+sym->dir_dep.expr =3D expr_transform(expr_copy(parent->dir_dep));
+
+The crash happen in expr_copy(). expr_transform() is never being
+called. The trace is the following:
+
+Program received signal SIGSEGV, Segmentation fault.
+0xbb1f085c in ?? () from /usr/lib/libc.so.12
+(gdb) bt
+#0  0xbb1f085c in ?? () from /usr/lib/libc.so.12
+#1  0xbb1f0e4b in malloc () from /usr/lib/libc.so.12
+#2  0x0805277f in expr_copy (org=3D0xba790fd0) at scripts/kconfig/expr.c:79
+#3  0x080527e9 in expr_copy (org=3D0xba790fd0) at scripts/kconfig/expr.c:86
+#4  0x00000001 in ?? ()
+#5  0x00000000 in ?? ()
+
+however, with the small patch attached, we get a bit more information:
+
+(gdb) print expr_copy_nest
+$1 =3D 43391
+
+After reducing the stack size from 2048k (default) to 1024k:
+
+(gdb) print expr_copy_nest
+$1 =3D 21545
+
+and bumping it to 4096k:
+
+(gdb) print expr_copy_nest
+$1 =3D 87081
+
+so we're dying from stack exhaustion, because expr_copy() is given a
+really nasty symbol:
+
+(gdb) print org
+$5 =3D (struct expr *) 0xba790fd0
+(gdb) print *org
+$6 =3D {type =3D E_NOT, left =3D {expr =3D 0xba790fd0, sym =3D 0xba790fd0},
+right =3D {expr =3D 0x0, sym =3D 0x0}}
+
+Reverting 246cf9c26bf11f2bffbecea6e5bd222eee7b1df8 fixes the crash.
+
+ - Arnaud
+
+
+On Sun, Sep 19, 2010 at 12:56 AM, Arnaud Lacombe <lacombar@gmail.com> wrote=
+:
+> Hi,
+>
+> I've been experiencing a use-after-free with the current kconfig (from
+> for-next, but I believe mainline is affected too), related to the
+> introduction of commit 246cf9c26bf11f2bffbecea6e5bd222eee7b1df8. The
+> symptoms with the attached test case and patch to highlight the
+> problem is the following:
+>
+> % scripts/kconfig/mconf Kconfig.testcase
+> [...]
+> Invalid expr 0xbb9124a0 at scripts/kconfig/menu.c:295 in
+> menu_finalize(): 41414141
+> zsh: abort (core dumped) =A0scripts/kconfig/mconf Kconfig.testcase
+>
+> The backtrace is not really surprising:
+>
+> #2 =A00xbbb9fbd6 in abort () from /usr/lib/libc.so.12
+> #3 =A00x0804f23a in menu_finalize (parent=3D0xbb911e20) at
+> scripts/kconfig/menu.c:295
+> #4 =A00x0804eb6d in menu_finalize (parent=3D0xbb911df0) at
+> scripts/kconfig/menu.c:292
+> #5 =A00x0804f166 in menu_finalize (parent=3D0xbb911d60) at
+> scripts/kconfig/menu.c:320
+> #6 =A00x0804eb6d in menu_finalize (parent=3D0xbb911c10) at
+> scripts/kconfig/menu.c:292
+> #7 =A00x0804eb6d in menu_finalize (parent=3D0x8069ea0) at scripts/kconfig=
+/menu.c:292
+> #8 =A00x080535d7 in conf_parse (name=3D0x804aa61 "=C7\004$") at
+> scripts/kconfig/zconf.tab.c:2242
+> #9 =A00x0804aa61 in main (ac=3DCannot access memory at address 0x0
+>
+> (gdb) frame 3
+> #3 =A00x0804f23a in menu_finalize (parent=3D0xbb911e20) at
+> scripts/kconfig/menu.c:295
+> 295 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 EXPR_CHECK(parent->dir_dep);
+>
+> So far, I tracked this issue down to the faulty expression being freed
+> by expr_eliminate_dups1() in the previous iteration of
+> menu_initialize(), on the following line
+>
+> basedep =3D expr_eliminate_dups(basedep);
+>
+> The testcase is a stripped down Kconfig from the tree.
+>
+> =A0- Arnaud
+>
+
+--0016e6d7df984155da0490a80727
+Content-Type: text/x-patch; charset=US-ASCII; name="expr.c.diff"
+Content-Disposition: attachment; filename="expr.c.diff"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_geaqeaa13
+
+ZGlmZiAtLWdpdCBhL3NjcmlwdHMva2NvbmZpZy9leHByLmMgYi9zY3JpcHRzL2tjb25maWcvZXhw
+ci5jCmluZGV4IGNjZDY1NjMuLmUyYjdmMDEgMTAwNjQ0Ci0tLSBhL3NjcmlwdHMva2NvbmZpZy9l
+eHByLmMKKysrIGIvc2NyaXB0cy9rY29uZmlnL2V4cHIuYwpAQCAtNjMsMTIgKzU5LDE4IEBAIHN0
+cnVjdCBleHByICpleHByX2FsbG9jX29yKHN0cnVjdCBleHByICplMSwgc3RydWN0IGV4cHIgKmUy
+KQogCXJldHVybiBlMiA/IGV4cHJfYWxsb2NfdHdvKEVfT1IsIGUxLCBlMikgOiBlMTsKIH0KIAor
+aW50IGV4cHJfY29weV9uZXN0ID0gMDsKKwogc3RydWN0IGV4cHIgKmV4cHJfY29weShzdHJ1Y3Qg
+ZXhwciAqb3JnKQogewogCXN0cnVjdCBleHByICplOwogCi0JaWYgKCFvcmcpCi0JCXJldHVybiBO
+VUxMOworCWV4cHJfY29weV9uZXN0Kys7CisKKwlpZiAoIW9yZykgeworCQllID0gTlVMTDsKKwkJ
+Z290byBiYWlsX291dDsKKwl9CiAKIAllID0gbWFsbG9jKHNpemVvZigqb3JnKSk7CiAJbWVtY3B5
+KGUsIG9yZywgc2l6ZW9mKCpvcmcpKTsKQEAgLTk3LDYgKzk5LDkgQEAgc3RydWN0IGV4cHIgKmV4
+cHJfY29weShzdHJ1Y3QgZXhwciAqb3JnKQogCQlicmVhazsKIAl9CiAKK2JhaWxfb3V0OgorCWV4
+cHJfY29weV9uZXN0LS07CisKIAlyZXR1cm4gZTsKIH0KIAo=
+--0016e6d7df984155da0490a80727--
