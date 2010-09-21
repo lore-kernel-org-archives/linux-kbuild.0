@@ -1,46 +1,82 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor.suse.de ([195.135.220.2]:41510 "EHLO mx1.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755965Ab0ITMLj (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 20 Sep 2010 08:11:39 -0400
-Message-ID: <4C974F78.4020202@suse.cz>
-Date: Mon, 20 Sep 2010 14:11:36 +0200
-From: Michal Marek <mmarek@suse.cz>
-MIME-Version: 1.0
-Subject: Re: [PATCH]
-References: <7vhbhmxyeb.fsf@alter.siamese.dyndns.org> <20100919095419.GC25704@merkur.ravnborg.org> <7v8w2xy4pq.fsf@alter.siamese.dyndns.org>
-In-Reply-To: <7v8w2xy4pq.fsf@alter.siamese.dyndns.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Received: from cam-admin0.cambridge.arm.com ([217.140.96.50]:59686 "EHLO
+	cam-admin0.cambridge.arm.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1753922Ab0IUMdH (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 21 Sep 2010 08:33:07 -0400
+Subject: Re: Stale expression reference causing use-after-free
+From: Catalin Marinas <catalin.marinas@arm.com>
+In-Reply-To: <AANLkTinMZj-_neS4jNM+b6-Dk7qzVMsR6DwyX2SHk3kt@mail.gmail.com>
+References: <AANLkTim1EmMOFERs7rwG=zg_AZrXtojE7dKV7Rhf17Ww@mail.gmail.com>
+	 <AANLkTinMZj-_neS4jNM+b6-Dk7qzVMsR6DwyX2SHk3kt@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Date: Tue, 21 Sep 2010 13:32:59 +0100
+Message-ID: <1285072379.15732.70.camel@e102109-lin.cambridge.arm.com>
+Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Junio C Hamano <junio@pobox.com>
-Cc: Sam Ravnborg <sam@ravnborg.org>, Roman Zippel <zippel@linux-m68k.org>, Li Zefan <lizf@cn.fujitsu.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Arnaud Lacombe <lacombar@gmail.com>
+Cc: Michal Marek <mmarek@suse.cz>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>
 
-On 19.9.2010 20:21, Junio C Hamano wrote:
-> Sam Ravnborg <sam@ravnborg.org> writes:
->> On Sat, Sep 18, 2010 at 07:25:32PM -0700, Junio C Hamano wrote:
->>> In 60f33b8 (kconfig: get rid of stray a.o, support ncursesw, 2006-01-15),
->>> support to link menuconfig with ncursesw library was added.  To compute
->>> the linker command option -l, we check "libncursesw.{so,a,dylib}" to allow
->>> ncursesw to be used as a replacement ncurses.  However, when checking what
->>> header file to include, we do not check /usr/include/ncursesw directory.
->>>
->>> Add /usr/include/ncursesw to the list of directories that are checked.
->>> With this patch, on my Debian Lenny box with libncursesw5-dev package but
->>> not libncurses5-dev package, I can say "make menuconfig".
->>>
->>> Signed-off-by: Junio C Hamano <gitster@pobox.com>
->>
+Hi Arnaud,
+
+On Sun, 2010-09-19 at 22:54 -0400, Arnaud Lacombe wrote:
+> It would seem that this issue is responsible for the crash I've seen
+> randomly happening with gconf (2.6.36-rc6, before my generalization's
+> branch). So far, I've traced it to the following line in
+> menu_finalize():
+> 
+> sym->dir_dep.expr = expr_transform(expr_copy(parent->dir_dep));
+> 
+> The crash happen in expr_copy(). expr_transform() is never being
+> called. The trace is the following:
+> 
+> Program received signal SIGSEGV, Segmentation fault.
 [...]
-> 
->> Acked-by: Sam Ravnborg <sam@ravnborg.org>
-> 
-> Thanks; is it my responsibility to follow-up the thread with identical
-> patch with updated Subject and with your Ack, hoping somebody in kbuild
-> team would pick it up?
+> so we're dying from stack exhaustion, because expr_copy() is given a
+> really nasty symbol:
+[...]
+> Reverting 246cf9c26bf11f2bffbecea6e5bd222eee7b1df8 fixes the crash.
 
-I fixed the subject line myself and applied it to kbuild-2.6.git#kconfig.
+Thanks for investigating this. The expr_copy() is a recursive function
+and it could indeed run out of stack.
 
-Thanks,
-Michal
+I wonder if we really need the expr_copy() here. It looks to me like
+expr_transform() already does some memory allocations:
+
+
+kbuild: Avoid additional copy of the 'depends' expression
+
+From: Catalin Marinas <catalin.marinas@arm.com>
+
+Commit 246cf9c26b introduced the tracking of direct dependency to
+provide additional warning when they are not met. With some complex
+dependencies, the expr_copy() function called on such expressions may
+cause stack exhaustion. The patch removes the superfluous expr_copy()
+call since expr_transform handles symbol duplication already.
+
+Signed-off-by: Catalin Marinas <catalin.marinas@arm.com>
+Reported-by: Arnaud Lacombe <lacombar@gmail.com>
+---
+ scripts/kconfig/menu.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
+index 4fb5902..7298806 100644
+--- a/scripts/kconfig/menu.c
++++ b/scripts/kconfig/menu.c
+@@ -292,7 +292,7 @@ void menu_finalize(struct menu *parent)
+ 			menu_finalize(menu);
+ 	} else if (sym) {
+ 		/* ignore inherited dependencies for dir_dep */
+-		sym->dir_dep.expr = expr_transform(expr_copy(parent->dir_dep));
++		sym->dir_dep.expr = expr_transform(parent->dir_dep);
+ 		sym->dir_dep.expr = expr_eliminate_dups(sym->dir_dep.expr);
+ 
+ 		basedep = parent->prompt ? parent->prompt->visible.expr : NULL;
+
+
+-- 
+Catalin
+
