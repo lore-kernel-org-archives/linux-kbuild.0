@@ -1,29 +1,29 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from xenotime.net ([72.52.115.56]:53859 "HELO xenotime.net"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with SMTP
-	id S1754955Ab0IWTGr (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 23 Sep 2010 15:06:47 -0400
-Received: from chimera.site ([173.50.240.230]) by xenotime.net for <linux-kbuild@vger.kernel.org>; Thu, 23 Sep 2010 12:06:42 -0700
-Date: Thu, 23 Sep 2010 12:06:41 -0700
-From: Randy Dunlap <rdunlap@xenotime.net>
-Subject: search functions
-Message-Id: <20100923120641.dbd32f10.rdunlap@xenotime.net>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Received: from mail-iw0-f174.google.com ([209.85.214.174]:47094 "EHLO
+	mail-iw0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750746Ab0IYCZo (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 24 Sep 2010 22:25:44 -0400
+MIME-Version: 1.0
+In-Reply-To: <1285224585-29457-1-git-send-email-mfm@muteddisk.com>
+References: <1285224585-29457-1-git-send-email-mfm@muteddisk.com>
+Date: Sat, 25 Sep 2010 10:25:43 +0800
+Message-ID: <AANLkTimvJ_2ud1Lksv7J3WbdJQOMw+346v6YByk_pVok@mail.gmail.com>
+Subject: Re: [PATCH 01/20] kernel: change to new flag variable
+From: =?UTF-8?Q?Am=C3=A9rico_Wang?= <xiyou.wangcong@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
+To: matt mooney <mfm@muteddisk.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>, Pavel Machek <pavel@ucw.cz>, "Rafael J. Wysocki" <rjw@sisk.pl>, Peter Oberparleiter <oberpar@linux.vnet.ibm.com>, linux-pm@lists.linux-foundation.org, linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org, linux-kbuild <linux-kbuild@vger.kernel.org>
 
+On Thu, Sep 23, 2010 at 2:49 PM, matt mooney <mfm@muteddisk.com> wrote:
+> Replace EXTRA_CFLAGS with ccflags-y.
+>
+> Signed-off-by: matt mooney <mfm@muteddisk.com>
 
-I'm confused.  I could swear that in the past I could search for
-kconfig symbols that do not have a prompt (using xconfig, ctrl-F).
+ACK to the whole patch set.
 
-E.g., OF_DEVICE in linux-2.6.36-rc5.
+Please Cc linux-kbuild when you send patches for makefiles.
 
-I can't do this now.  Could I have done it in the past?
-What would it take to add this?
-
-thanks,
----
-~Randy
+Thanks!
