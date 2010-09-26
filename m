@@ -1,33 +1,103 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-iw0-f174.google.com ([209.85.214.174]:49189 "EHLO
-	mail-iw0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753270Ab0IYCwU (ORCPT
+Received: from mailout-de.gmx.net ([213.165.64.22]:33888 "HELO mail.gmx.net"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with SMTP
+	id S1754598Ab0IZI77 convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 24 Sep 2010 22:52:20 -0400
+	Sun, 26 Sep 2010 04:59:59 -0400
+From: Toralf =?utf-8?q?F=C3=B6rster?= <toralf.foerster@gmx.de>
+Subject: "make randconfig" gives a looong warning
+Date: Sun, 26 Sep 2010 10:59:55 +0200
 MIME-Version: 1.0
-In-Reply-To: <e0bdab5d2e8c52041c003de68ba774c3e706716c.1285355033.git.mfm@muteddisk.com>
-References: <e0bdab5d2e8c52041c003de68ba774c3e706716c.1285355033.git.mfm@muteddisk.com>
-Date: Sat, 25 Sep 2010 10:52:20 +0800
-Message-ID: <AANLkTinDVs46mn1apGUy2ALauzO+f5sOhKhWr8MGk8=n@mail.gmail.com>
-Subject: Re: [PATCH 01/24] base: change to new flag variable
-From: =?UTF-8?Q?Am=C3=A9rico_Wang?= <xiyou.wangcong@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: Text/Plain;
+  charset="utf-8"
+Content-Transfer-Encoding: 8BIT
+Message-Id: <201009261059.55952.toralf.foerster@gmx.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: matt mooney <mfm@muteddisk.com>
-Cc: kernel-janitors@vger.kernel.org, Greg Kroah-Hartman <gregkh@suse.de>, linux-kernel@vger.kernel.org, linux-kbuild <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.cz>
+To: linux-kbuild@vger.kernel.org
 
-On Sat, Sep 25, 2010 at 3:17 AM, matt mooney <mfm@muteddisk.com> wrote:
-> Replace EXTRA_CFLAGS with ccflags-y.
->
-> Signed-off-by: matt mooney <mfm@muteddisk.com>
+Hello,
 
-Nice work, matt!
+for a longer time I didn't run ma QA script and now I'm wondering whether this 
+message is worth to be reported or not :
 
-The whole patch set looks good for me:
+ make randconfig ...
+warning: (PM_SLEEP_SMP && SMP && (ARCH_SUSPEND_POSSIBLE || 
+ARCH_HIBERNATION_POSSIBLE) && PM_SLEEP) selects HOTPLUG_CPU which has unmet 
+direct dependencies (SMP && HOTPLUG)
+warning: (MICROCODE || MICROCODE_INTEL && MICROCODE || MICROCODE_AMD && 
+MICROCODE || PCMCIA_LOAD_CIS && PCCARD && PCMCIA && EXPERIMENTAL || USB_IRDA 
+&& NET && IRDA && USB || BT_HCIBCM203X && NET && BT && USB || BT_HCIBFUSB && 
+NET && BT && USB || BT_HCIBT3C && NET && BT && PCMCIA || BT_MRVL_SDIO && NET 
+&& BT && BT_MRVL && MMC || BT_ATH3K && NET && BT && BT_HCIBTUSB || IWMC3200TOP 
+&& MISC_DEVICES && MMC && EXPERIMENTAL || SCSI_AIC94XX && SCSI_LOWLEVEL && 
+SCSI && PCI || SCSI_MVSAS && SCSI_LOWLEVEL && SCSI && PCI || SCSI_IPR && 
+SCSI_LOWLEVEL && PCI && SCSI && ATA || SCSI_QLA_FC && SCSI_LOWLEVEL && PCI && 
+SCSI || BNX2 && NETDEVICES && NETDEV_1000 && PCI || SPIDER_NET && NETDEVICES 
+&& NETDEV_1000 && PCI && (PPC_IBM_CELL_BLADE || PPC_CELLEB) || CHELSIO_T3 && 
+NETDEVICES && NETDEV_10000 && CHELSIO_T3_DEPENDS || CHELSIO_T4 && NETDEVICES 
+&& NETDEV_10000 && CHELSIO_T4_DEPENDS || MYRI10GE && NETDEVICES && 
+NETDEV_10000 && PCI && INET || NETXEN_NIC && NETDEVICES && NETDEV_10000 && PCI 
+|| BNX2X && NETDEVICES && NETDEV_10000 && PCI || QLCNIC && NETDEVICES && 
+NETDEV_10000 && PCI || TMS380TR && NETDEVICES && TR && (PCI || ISA && 
+ISA_DMA_API || MCA) || LIBERTAS_THINFIRM && NETDEVICES && WLAN && MAC80211 || 
+ATMEL && NETDEVICES && WLAN && (PCI || PCMCIA) || PCMCIA_ATMEL && NETDEVICES 
+&& WLAN && ATMEL && PCMCIA || AT76C50X_USB && NETDEVICES && WLAN && MAC80211 
+&& USB || PRISM54 && NETDEVICES && WLAN && PCI && EXPERIMENTAL || USB_ZD1201 
+&& NETDEVICES && WLAN && USB || B43 && NETDEVICES && WLAN && SSB_POSSIBLE && 
+MAC80211 && HAS_DMA || B43LEGACY && NETDEVICES && WLAN && SSB_POSSIBLE && 
+MAC80211 && HAS_DMA || IPW2100 && NETDEVICES && WLAN && PCI && CFG80211 || 
+IPW2200 && NETDEVICES && WLAN && PCI && CFG80211 && CFG80211_WEXT || IWLWIFI 
+&& NETDEVICES && WLAN && PCI && MAC80211 || IWM && NETDEVICES && WLAN && MMC 
+&& EXPERIMENTAL && CFG80211 || LIBERTAS && NETDEVICES && WLAN && CFG80211 || 
+HERMES && NETDEVICES && WLAN && (PPC_PMAC || PCI || PCMCIA) && CFG80211 && 
+CFG80211_WEXT || ORINOCO_USB && NETDEVICES && WLAN && USB && HERMES || 
+P54_COMMON && NETDEVICES && WLAN && MAC80211 && EXPERIMENTAL || WL1251 && 
+NETDEVICES && WLAN && WL12XX && GENERIC_HARDIRQS || WL1271 && NETDEVICES && 
+WLAN && WL12XX && GENERIC_HARDIRQS && INET || ZD1211RW && NETDEVICES && WLAN 
+&& USB && MAC80211 && EXPERIMENTAL || AR9170_USB && NETDEVICES && WLAN && 
+ATH_COMMON && USB && MAC80211 || RT2X00_LIB_FIRMWARE && NETDEVICES && WLAN && 
+RT2X00 || WIMAX_I2400M && NETDEVICES && WIMAX || ATM_FORE200E && ATM_DRIVERS 
+&& NETDEVICES && ATM && (PCI || SBUS) || ATM_SOLOS && ATM_DRIVERS && 
+NETDEVICES && ATM && PCI || CYCLADES && SERIAL_NONSTANDARD && (PCI || ISA) || 
+MOXA_INTELLIO && SERIAL_NONSTANDARD && (ISA || EISA || PCI) || ISI && 
+SERIAL_NONSTANDARD && PCI || SERIAL_ICOM && HAS_IOMEM && PCI && (PPC_ISERIES 
+|| PPC_PSERIES) || SERIAL_QE && HAS_IOMEM && QUICC_ENGINE || VIDEO_SAA7164 && 
+MEDIA_SUPPORT && VIDEO_CAPTURE_DRIVERS && VIDEO_V4L2 && DVB_CORE && PCI && I2C 
+|| DVB_LGS8GXX && MEDIA_SUPPORT && DVB_CAPTURE_DRIVERS && DVB_FE_CUSTOMISE && 
+DVB_CORE && I2C || DRM_R128 && HAS_IOMEM && DRM && PCI || DRM_RADEON && 
+HAS_IOMEM && DRM && PCI || DRM_MGA && HAS_IOMEM && DRM && PCI || SND_SB16_CSP 
+&& SOUND && !M68K && SND && SND_ISA && (SND_SB16 || SND_SBAWE) && (BROKEN || 
+!PPC) || SND_SSCAPE && SOUND && !M68K && SND && SND_ISA || SND_WAVEFRONT && 
+SOUND && !M68K && SND && SND_ISA || SND_MSND_PINNACLE && SOUND && !M68K && SND 
+&& SND_ISA && X86 && EXPERIMENTAL || SND_MSND_CLASSIC && SOUND && !M68K && SND 
+&& SND_ISA && X86 && EXPERIMENTAL || SND_ASIHPI && SOUND && !M68K && SND && 
+SND_PCI && X86 || SND_DARLA20 && SOUND && !M68K && SND && SND_PCI || 
+SND_GINA20 && SOUND && !M68K && SND && SND_PCI || SND_LAYLA20 && SOUND && 
+!M68K && SND && SND_PCI || SND_DARLA24 && SOUND && !M68K && SND && SND_PCI || 
+SND_GINA24 && SOUND && !M68K && SND && SND_PCI || SND_LAYLA24 && SOUND && 
+!M68K && SND && SND_PCI || SND_MONA && SOUND && !M68K && SND && SND_PCI || 
+SND_MIA && SOUND && !M68K && SND && SND_PCI || SND_ECHO3G && SOUND && !M68K && 
+SND && SND_PCI || SND_INDIGO && SOUND && !M68K && SND && SND_PCI || 
+SND_INDIGOIO && SOUND && !M68K && SND && SND_PCI || SND_INDIGODJ && SOUND && 
+!M68K && SND && SND_PCI || SND_INDIGOIOX && SOUND && !M68K && SND && SND_PCI 
+|| SND_INDIGODJX && SOUND && !M68K && SND && SND_PCI || SND_EMU10K1 && SOUND 
+&& !M68K && SND && SND_PCI || SND_RIPTIDE && SOUND && !M68K && SND && SND_PCI 
+|| SND_HDA_PATCH_LOADER && SOUND && !M68K && SND && SND_PCI && SND_HDA_INTEL 
+&& EXPERIMENTAL || SND_SOC_SH4_SIU && SOUND && !M68K && SND && SND_SOC && 
+(SUPERH || ARCH_SHMOBILE) && HAVE_CLK || USB_ISIGHTFW && USB_SUPPORT && USB || 
+USB_SPEEDTOUCH && USB_SUPPORT && USB_ATM || USB_CXACRU && USB_SUPPORT && 
+USB_ATM || USB_UEAGLEATM && USB_SUPPORT && USB_ATM || UWB_I1480U && UWB && 
+UWB_HWA || RT2860 && STAGING && !STAGING_EXCLUDE_BUILD && PCI && X86 && WLAN 
+|| RT2870 && STAGING && !STAGING_EXCLUDE_BUILD && USB && (X86 || ARM) && WLAN 
+|| DRM_NOUVEAU && STAGING && !STAGING_EXCLUDE_BUILD && DRM && PCI || TI_ST && 
+STAGING && !STAGING_EXCLUDE_BUILD && RFKILL || DELL_RBU && X86) selects 
+FW_LOADER which has unmet direct dependencies (HOTPLUG)
 
-Acked-by: WANG Cong <xiyou.wangcong@gmail.com>
 
-Just please do remember to Cc linux-kbuild and Michal next time.
+-- 
+MfG/Kind regards
+Toralf Förster
 
-Thanks!
+pgp finger print: 7B1A 07F4 EC82 0F90 D4C2 8936 872A E508 7DB6 9DA3
+
