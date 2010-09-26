@@ -1,109 +1,74 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from qmta07.emeryville.ca.mail.comcast.net ([76.96.30.64]:32818 "EHLO
-	qmta07.emeryville.ca.mail.comcast.net" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1757027Ab0IZSIi (ORCPT
+Received: from mail-qy0-f174.google.com ([209.85.216.174]:43342 "EHLO
+	mail-qy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753851Ab0IZUYa (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 26 Sep 2010 14:08:38 -0400
-Date: Sun, 26 Sep 2010 11:07:26 -0700
-From: matt mooney <mfm@muteddisk.com>
-Subject: Re: [PATCH 05/24] i2c: change to new flag variable
-Message-ID: <20100926180726.GD8191@haskell.muteddisk.com>
-References: <e0bdab5d2e8c52041c003de68ba774c3e706716c.1285355033.git.mfm@muteddisk.com>
- <9968d4260be8850200cc9c7dfe08addf611468b4.1285355033.git.mfm@muteddisk.com>
- <036514b5dd23c5af14303519d79d60d79adccbee.1285355033.git.mfm@muteddisk.com>
- <ffbd189ef2d414ea7c87ffe2b40fce87877dc014.1285355033.git.mfm@muteddisk.com>
- <b3e2061e1e6703f7b84c0484030e07de6000546a.1285355033.git.mfm@muteddisk.com>
- <20100925132611.03ef0882@endymion.delvare>
- <20100926021217.GC8191@haskell.muteddisk.com>
- <20100926092931.68980448@endymion.delvare>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20100926092931.68980448@endymion.delvare>
+	Sun, 26 Sep 2010 16:24:30 -0400
+Received: by qyk36 with SMTP id 36so4056808qyk.19
+        for <linux-kbuild@vger.kernel.org>; Sun, 26 Sep 2010 13:24:29 -0700 (PDT)
+From: Arnaud Lacombe <lacombar@gmail.com>
+Subject: [PATCH] kconfig: delay symbol direct dependency initialization
+Date: Sun, 26 Sep 2010 16:22:03 -0400
+Message-Id: <1285532523-10180-1-git-send-email-lacombar@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jean Delvare <khali@linux-fr.org>
-Cc: kernel-janitors@vger.kernel.org, "Ben Dooks (embedded platforms)" <ben-linux@fluff.org>, linux-i2c@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, Arnaud Lacombe <lacombar@gmail.com>, Catalin Marinas <catalin.marinas@arm.com>
 
-On 09:29 Sun 26 Sep     , Jean Delvare wrote:
-> On Sat, 25 Sep 2010 19:12:17 -0700, matt mooney wrote:
-> > On 13:26 Sat 25 Sep     , Jean Delvare wrote:
-> > > On Fri, 24 Sep 2010 12:17:15 -0700, matt mooney wrote:
-> > > > Replace EXTRA_CFLAGS with ccflags-y.
-> > > > 
-> > > > Signed-off-by: matt mooney <mfm@muteddisk.com>
-> > > > ---
-> > > >  drivers/i2c/Makefile        |    4 +---
-> > > >  drivers/i2c/algos/Makefile  |    4 +---
-> > > >  drivers/i2c/busses/Makefile |    4 +---
-> > > >  drivers/i2c/muxes/Makefile  |    4 +---
-> > > >  4 files changed, 4 insertions(+), 12 deletions(-)
-> > > > 
-> > > > diff --git a/drivers/i2c/Makefile b/drivers/i2c/Makefile
-> > > > index c00fd66..23ac61e 100644
-> > > > --- a/drivers/i2c/Makefile
-> > > > +++ b/drivers/i2c/Makefile
-> > > > @@ -9,6 +9,4 @@ obj-$(CONFIG_I2C_CHARDEV)	+= i2c-dev.o
-> > > >  obj-$(CONFIG_I2C_MUX)		+= i2c-mux.o
-> > > >  obj-y				+= algos/ busses/ muxes/
-> > > >  
-> > > > -ifeq ($(CONFIG_I2C_DEBUG_CORE),y)
-> > > > -EXTRA_CFLAGS += -DDEBUG
-> > > > -endif
-> > > > +ccflags-$(CONFIG_I2C_DEBUG_CORE) := -DDEBUG
-> > > > diff --git a/drivers/i2c/algos/Makefile b/drivers/i2c/algos/Makefile
-> > > > index 18b3e96..215303f 100644
-> > > > --- a/drivers/i2c/algos/Makefile
-> > > > +++ b/drivers/i2c/algos/Makefile
-> > > > @@ -6,6 +6,4 @@ obj-$(CONFIG_I2C_ALGOBIT)	+= i2c-algo-bit.o
-> > > >  obj-$(CONFIG_I2C_ALGOPCF)	+= i2c-algo-pcf.o
-> > > >  obj-$(CONFIG_I2C_ALGOPCA)	+= i2c-algo-pca.o
-> > > >  
-> > > > -ifeq ($(CONFIG_I2C_DEBUG_ALGO),y)
-> > > > -EXTRA_CFLAGS += -DDEBUG
-> > > > -endif
-> > > > +ccflags-$(CONFIG_I2C_DEBUG_ALGO) := -DDEBUG
-> > > > diff --git a/drivers/i2c/busses/Makefile b/drivers/i2c/busses/Makefile
-> > > > index c3ef492..033ad41 100644
-> > > > --- a/drivers/i2c/busses/Makefile
-> > > > +++ b/drivers/i2c/busses/Makefile
-> > > > @@ -76,6 +76,4 @@ obj-$(CONFIG_I2C_STUB)		+= i2c-stub.o
-> > > >  obj-$(CONFIG_SCx200_ACB)	+= scx200_acb.o
-> > > >  obj-$(CONFIG_SCx200_I2C)	+= scx200_i2c.o
-> > > >  
-> > > > -ifeq ($(CONFIG_I2C_DEBUG_BUS),y)
-> > > > -EXTRA_CFLAGS += -DDEBUG
-> > > > -endif
-> > > > +ccflags-$(CONFIG_I2C_DEBUG_BUS) := -DDEBUG
-> > > > diff --git a/drivers/i2c/muxes/Makefile b/drivers/i2c/muxes/Makefile
-> > > > index bd83b52..6f49786 100644
-> > > > --- a/drivers/i2c/muxes/Makefile
-> > > > +++ b/drivers/i2c/muxes/Makefile
-> > > > @@ -3,6 +3,4 @@
-> > > >  
-> > > >  obj-$(CONFIG_I2C_MUX_PCA954x)	+= pca954x.o
-> > > >  
-> > > > -ifeq ($(CONFIG_I2C_DEBUG_BUS),y)
-> > > > -EXTRA_CFLAGS += -DDEBUG
-> > > > -endif
-> > > > +ccflags-$(CONFIG_I2C_DEBUG_BUS) := -DDEBUG
-> > > 
-> > > If this is the way the whole kernel is going, I have no objection. 
-> > 
-> > Sam had implemented these newer style flag variables a while back as an
-> > eloquent way of handling conditional flags. A lot of newer (and some older)
-> > modules and subsystems were using them already, so to provide uniformity and for
-> > an eventual removal of the deprecated flags, I converted all remaining instances
-> > to the newer style. (IMHO, I think it flows better with the way the rest of the
-> > build system works.)
-> 
-> Fine with me. What's the planned merge path for this patch? Will you
-> push all the patches upstream yourself, or do you expect me to pick
-> this one?
+This fixes the use-after-free and associated crash in kconfig introduced
+in commit 246cf9c26bf11f2bffbecea6e5bd222eee7b1df8.
 
-I was hoping subsystem maintainers would pick them up, but a lot of the patches
-have been acked without being applied. My new plan is to have the unapplied ones
-go through the kbuild tree. So you can either pick it up or just ack it.
+Signed-off-by: Arnaud Lacombe <lacombar@gmail.com>
+Acked-by: Catalin Marinas <catalin.marinas@arm.com>
+---
+ scripts/kconfig/expr.h |    1 -
+ scripts/kconfig/menu.c |    7 ++-----
+ 2 files changed, 2 insertions(+), 6 deletions(-)
 
-Thanks,
-mfm
+diff --git a/scripts/kconfig/expr.h b/scripts/kconfig/expr.h
+index 2b95a58..2788c7a 100644
+--- a/scripts/kconfig/expr.h
++++ b/scripts/kconfig/expr.h
+@@ -165,7 +165,6 @@ struct menu {
+ 	struct symbol *sym;
+ 	struct property *prompt;
+ 	struct expr *dep;
+-	struct expr *dir_dep;
+ 	unsigned int flags;
+ 	char *help;
+ 	struct file *file;
+diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
+index 4fb5902..edda8b4 100644
+--- a/scripts/kconfig/menu.c
++++ b/scripts/kconfig/menu.c
+@@ -107,7 +107,6 @@ static struct expr *menu_check_dep(struct expr *e)
+ void menu_add_dep(struct expr *dep)
+ {
+ 	current_entry->dep = expr_alloc_and(current_entry->dep, menu_check_dep(dep));
+-	current_entry->dir_dep = current_entry->dep;
+ }
+ 
+ void menu_set_type(int type)
+@@ -291,10 +290,6 @@ void menu_finalize(struct menu *parent)
+ 		for (menu = parent->list; menu; menu = menu->next)
+ 			menu_finalize(menu);
+ 	} else if (sym) {
+-		/* ignore inherited dependencies for dir_dep */
+-		sym->dir_dep.expr = expr_transform(expr_copy(parent->dir_dep));
+-		sym->dir_dep.expr = expr_eliminate_dups(sym->dir_dep.expr);
+-
+ 		basedep = parent->prompt ? parent->prompt->visible.expr : NULL;
+ 		basedep = expr_trans_compare(basedep, E_UNEQUAL, &symbol_no);
+ 		basedep = expr_eliminate_dups(expr_transform(basedep));
+@@ -325,6 +320,8 @@ void menu_finalize(struct menu *parent)
+ 			parent->next = last_menu->next;
+ 			last_menu->next = NULL;
+ 		}
++
++		sym->dir_dep.expr = parent->dep;
+ 	}
+ 	for (menu = parent->list; menu; menu = menu->next) {
+ 		if (sym && sym_is_choice(sym) &&
+-- 
+1.7.2.30.gc37d7.dirty
+
