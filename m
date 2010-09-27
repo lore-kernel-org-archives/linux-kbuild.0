@@ -1,61 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cam-admin0.cambridge.arm.com ([217.140.96.50]:49247 "EHLO
-	cam-admin0.cambridge.arm.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1754678Ab0I0K5H (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 27 Sep 2010 06:57:07 -0400
-Subject: Re: [RFC] kconfig: simplify select-with-unmet-direct-dependency
- warning
-From: Catalin Marinas <catalin.marinas@arm.com>
-In-Reply-To: <1285532648-28943-1-git-send-email-lacombar@gmail.com>
-References: <1285532648-28943-1-git-send-email-lacombar@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Date: Mon, 27 Sep 2010 11:57:03 +0100
-Message-ID: <1285585023.31188.7.camel@e102109-lin.cambridge.arm.com>
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Received: from [210.160.156.84] ([210.160.156.84]:49828 "EHLO pdinc.co.jp"
+	rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with ESMTP
+	id S1755783Ab0I0PU7 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 27 Sep 2010 11:20:59 -0400
+Received: from vvv (unknown [41.217.65.4])
+	by pdinc.co.jp (Postfix) with ESMTP id 9A40E4F2F0B1
+	for <linux-kbuild@vger.kernel.org>; Tue, 28 Sep 2010 00:21:10 +0900 (JST)
+Message-ID: <02bd2e1f-40448-004f6811225347@vvv>
+Reply-To: "Vijay Rahul" <vijayrsed@inbox.lv>
+From: "Vijay Rahul" <vijayrse@yahoo.co.uk>
+Subject: greetings / invitation
+Date: Mon, 27 Sep 2010 16:20:54 +0100
+MIME-Version: 1.0
+Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnaud Lacombe <lacombar@gmail.com>
-Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: linux-kbuild@vger.kernel.org
 
-On Sun, 2010-09-26 at 21:24 +0100, Arnaud Lacombe wrote:
-> This is an attempt to simplify the expressing printed by kconfig when a
-> symbol is selected but still has direct unmet dependency.
 
-I haven't analysed the patch but I gave it a try and the result is a bit
-weird.
+Hello. Hope you are having a nice week.
 
-I tried an ARMv7 platform which has CPU_V7 enabled. This selects
-CPU_32v6K. The simplified entries:
 
-config CPU_V7
-	bool "Support ARM V7 processor"
-	select CPU_32v6K
+Before I proceed, let me acknowledge that I am aware this is certainly not a conventional way of approach to establish a relationship of trust, but you will realize the need for my action.
 
-I changed CPU_32v6K to not depend on CPU_V7:
 
-config CPU_32v6K
-	bool "Support ARM V6K processor extensions"
-	depends on CPU_V6
+My name is Vijay K. Rahul; I am 26 years of age, an aspiring venture capitalist, currently working and residing in Scotland, United-Kingdom. I got your fax contact information through Internet public records while searching for a contact list of my dad’s associates around the world. I feel I would be freer dealing with you based on location.
 
-There is another option which isn't set in my config, however it gets
-reported:
 
-config CPU_MMP2
-	bool
-	select CPU_V6
-	select CPU_32v6K
+My step brother and I are interested in building a business relationship with you and directing our accessible accumulated fund in excess of 6 digits into a viable line of business under your stewardship based on your expertise. Due to surrounding circumstances, we cannot handle it ourselves. The sum in total was generated through government contracts and sales of coffee and timber which I have the documents as proof of ownership and origin should you require them.
 
-And the error kbuild reports with this patch is:
 
-warning: (CPU_V7 && CPU_MMP2) selects CPU_32v6K which has unmet direct
-dependencies (CPU_V6)
+Your share will be 30% of the gross for all your anticipated assistance after successfully moving and re-profiling. The money is currently stored as highly rated valuables in a security company vault where it is secured and insured.
 
-The weird thing is the inclusion of CPU_MMP2 above. First of all, it
-isn't set in my .config. Secondly, it selects CPU_V6 so CPU_32v6K would
-have met its dependency.
 
--- 
-Catalin
+We have worked out the modalities for the eventual transfer and you are required to participate as our foreign partner in this business arrangement. We would be glad to furnish you with further details.
+
+
+Kindly consider this proposal and respond via email.
+
+
+Respectfully,
+
+Vijay Rahul
 
