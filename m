@@ -1,52 +1,35 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pw0-f46.google.com ([209.85.160.46]:59717 "EHLO
-	mail-pw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751065Ab0I0ITl (ORCPT
+Received: from cam-admin0.cambridge.arm.com ([217.140.96.50]:48482 "EHLO
+	cam-admin0.cambridge.arm.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1755305Ab0I0Kvb (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 27 Sep 2010 04:19:41 -0400
-Date: Mon, 27 Sep 2010 16:24:11 +0800
-From: =?utf-8?Q?Am=C3=A9rico?= Wang <xiyou.wangcong@gmail.com>
-Subject: Re: [PATCH] kbuild: remove duplicate -I flag in addtree
-Message-ID: <20100927082411.GD5785@cr0.nay.redhat.com>
-References: <1285553472-924-1-git-send-email-mfm@muteddisk.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1285553472-924-1-git-send-email-mfm@muteddisk.com>
+	Mon, 27 Sep 2010 06:51:31 -0400
+Subject: Re: [PATCH] kconfig: delay symbol direct dependency initialization
+From: Catalin Marinas <catalin.marinas@arm.com>
+In-Reply-To: <1285532523-10180-1-git-send-email-lacombar@gmail.com>
+References: <1285532523-10180-1-git-send-email-lacombar@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Date: Mon, 27 Sep 2010 11:51:25 +0100
+Message-ID: <1285584685.31188.1.camel@e102109-lin.cambridge.arm.com>
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: matt mooney <mfm@muteddisk.com>
-Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
+To: Arnaud Lacombe <lacombar@gmail.com>
+Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-On Sun, Sep 26, 2010 at 07:11:12PM -0700, matt mooney wrote:
->When O= is used, any -I flag given that is not an absolute path gets
->duplicated. The $(1) appended to the conditional clause covers the
->absolute case, but due to being outside of the conditional statement
->it gets added everytime.
->
->Signed-off-by: matt mooney <mfm@muteddisk.com>
-
-Acked-by: WANG Cong <xiyou.wangcong@gmail.com>
-
->---
-> scripts/Kbuild.include |    2 +-
-> 1 files changed, 1 insertions(+), 1 deletions(-)
->
->diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
->index ed2773e..08c74ed 100644
->--- a/scripts/Kbuild.include
->+++ b/scripts/Kbuild.include
->@@ -158,7 +158,7 @@ modbuiltin := -f $(if $(KBUILD_SRC),$(srctree)/)scripts/Makefile.modbuiltin obj
-> # Prefix -I with $(srctree) if it is not an absolute path.
-> # skip if -I has no parameter
-> addtree = $(if $(patsubst -I%,%,$(1)), \
->-$(if $(filter-out -I/%,$(1)),$(patsubst -I%,-I$(srctree)/%,$(1))) $(1))
->+$(if $(filter-out -I/%,$(1)),$(patsubst -I%,-I$(srctree)/%,$(1)),$(1)))
+On Sun, 2010-09-26 at 21:22 +0100, Arnaud Lacombe wrote:
+> This fixes the use-after-free and associated crash in kconfig introduced
+> in commit 246cf9c26bf11f2bffbecea6e5bd222eee7b1df8.
 > 
-> # Find all -I options and call addtree
-> flags = $(foreach o,$($(1)),$(if $(filter -I%,$(o)),$(call addtree,$(o)),$(o)))
+> Signed-off-by: Arnaud Lacombe <lacombar@gmail.com>
+> Acked-by: Catalin Marinas <catalin.marinas@arm.com>
 
+Thanks for this.
 
-The original code also missed a comma, this patch fixes it.
+Michal, could we please push this to mainline before 2.6.36 is released?
+It fixes a serious bug IMHO. Thanks.
 
-Thanks!
+-- 
+Catalin
+
