@@ -1,41 +1,52 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from qmta11.emeryville.ca.mail.comcast.net ([76.96.27.211]:37558
-	"EHLO qmta11.emeryville.ca.mail.comcast.net" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1758702Ab0I0CMf (ORCPT
+Received: from mail-pw0-f46.google.com ([209.85.160.46]:59717 "EHLO
+	mail-pw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751065Ab0I0ITl (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 26 Sep 2010 22:12:35 -0400
-From: matt mooney <mfm@muteddisk.com>
-Subject: [PATCH] kbuild: remove duplicate -I flag in addtree
-Date: Sun, 26 Sep 2010 19:11:12 -0700
-Message-Id: <1285553472-924-1-git-send-email-mfm@muteddisk.com>
+	Mon, 27 Sep 2010 04:19:41 -0400
+Date: Mon, 27 Sep 2010 16:24:11 +0800
+From: =?utf-8?Q?Am=C3=A9rico?= Wang <xiyou.wangcong@gmail.com>
+Subject: Re: [PATCH] kbuild: remove duplicate -I flag in addtree
+Message-ID: <20100927082411.GD5785@cr0.nay.redhat.com>
+References: <1285553472-924-1-git-send-email-mfm@muteddisk.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1285553472-924-1-git-send-email-mfm@muteddisk.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
+To: matt mooney <mfm@muteddisk.com>
+Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
 
-When O= is used, any -I flag given that is not an absolute path gets
-duplicated. The $(1) appended to the conditional clause covers the
-absolute case, but due to being outside of the conditional statement
-it gets added everytime.
+On Sun, Sep 26, 2010 at 07:11:12PM -0700, matt mooney wrote:
+>When O= is used, any -I flag given that is not an absolute path gets
+>duplicated. The $(1) appended to the conditional clause covers the
+>absolute case, but due to being outside of the conditional statement
+>it gets added everytime.
+>
+>Signed-off-by: matt mooney <mfm@muteddisk.com>
 
-Signed-off-by: matt mooney <mfm@muteddisk.com>
----
- scripts/Kbuild.include |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+Acked-by: WANG Cong <xiyou.wangcong@gmail.com>
 
-diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
-index ed2773e..08c74ed 100644
---- a/scripts/Kbuild.include
-+++ b/scripts/Kbuild.include
-@@ -158,7 +158,7 @@ modbuiltin := -f $(if $(KBUILD_SRC),$(srctree)/)scripts/Makefile.modbuiltin obj
- # Prefix -I with $(srctree) if it is not an absolute path.
- # skip if -I has no parameter
- addtree = $(if $(patsubst -I%,%,$(1)), \
--$(if $(filter-out -I/%,$(1)),$(patsubst -I%,-I$(srctree)/%,$(1))) $(1))
-+$(if $(filter-out -I/%,$(1)),$(patsubst -I%,-I$(srctree)/%,$(1)),$(1)))
- 
- # Find all -I options and call addtree
- flags = $(foreach o,$($(1)),$(if $(filter -I%,$(o)),$(call addtree,$(o)),$(o)))
--- 
-1.7.2.1
+>---
+> scripts/Kbuild.include |    2 +-
+> 1 files changed, 1 insertions(+), 1 deletions(-)
+>
+>diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
+>index ed2773e..08c74ed 100644
+>--- a/scripts/Kbuild.include
+>+++ b/scripts/Kbuild.include
+>@@ -158,7 +158,7 @@ modbuiltin := -f $(if $(KBUILD_SRC),$(srctree)/)scripts/Makefile.modbuiltin obj
+> # Prefix -I with $(srctree) if it is not an absolute path.
+> # skip if -I has no parameter
+> addtree = $(if $(patsubst -I%,%,$(1)), \
+>-$(if $(filter-out -I/%,$(1)),$(patsubst -I%,-I$(srctree)/%,$(1))) $(1))
+>+$(if $(filter-out -I/%,$(1)),$(patsubst -I%,-I$(srctree)/%,$(1)),$(1)))
+> 
+> # Find all -I options and call addtree
+> flags = $(foreach o,$($(1)),$(if $(filter -I%,$(o)),$(call addtree,$(o)),$(o)))
 
+
+The original code also missed a comma, this patch fixes it.
+
+Thanks!
