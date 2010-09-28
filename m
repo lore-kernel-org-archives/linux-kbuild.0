@@ -1,42 +1,35 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor.suse.de ([195.135.220.2]:44349 "EHLO mx1.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1756773Ab0I0VZn (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 27 Sep 2010 17:25:43 -0400
-Message-ID: <4CA10BD5.5090302@suse.cz>
-Date: Mon, 27 Sep 2010 23:25:41 +0200
-From: Michal Marek <mmarek@suse.cz>
+Received: from wolverine02.qualcomm.com ([199.106.114.251]:45675 "EHLO
+	wolverine02.qualcomm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750717Ab0I1EA2 (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 28 Sep 2010 00:00:28 -0400
+Message-ID: <4CA1685B.1000601@codeaurora.org>
+Date: Mon, 27 Sep 2010 21:00:27 -0700
+From: Stephen Boyd <sboyd@codeaurora.org>
 MIME-Version: 1.0
-Subject: Re: [DIFF] kbuild-generic-v6 -> kbuild/kconfig/kbuild-generic-v7
-References: <1284264744-27530-1-git-send-email-lacombar@gmail.com> <1285175274-10232-1-git-send-email-lacombar@gmail.com>
-In-Reply-To: <1285175274-10232-1-git-send-email-lacombar@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-2
+Subject: Translating a .S to a .c and back fails
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnaud Lacombe <lacombar@gmail.com>
-Cc: Sam Ravnborg <sam@ravnborg.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: linux-kbuild@vger.kernel.org
+Cc: Michal Marek <mmarek@suse.cz>
 
-On 22.9.2010 19:07, Arnaud Lacombe wrote:
-> Hi,
-> 
-> Changes since branch `kbuild-generic-v6' are:
->  - rebase against `kbuild/kconfig'
->  - extra parens/column fixes after Michal's comments
->  - delayed window initialization for gconf in order to wait for rootmenu
->    initialization.
->  - commit tagging
-> 
-> Note that I kept the grammar change and parser regeneration in two separate
-> commits, one after the other.
-> 
-> This branch merge without conflict with 2.6.36-rc5 and the next-20100921 tree.
-> Tested with {x,n,menu}config on i386, sh and um.
-> 
-> The updated series is available in the git repository at:
-> 
->  git://github.com/lacombar/linux-2.6.git kbuild/kconfig/kbuild-generic-v7
+ I've recently posted a patch to translate ARM's delay.S in arch/arm/lib
+into a C file[1]. This works fine and I can build the tree with the .S
+file and then build the tree with the .C file. After I do that I can't
+switch back to the .S version of the tree without first removing the
+.delay.o.cmd file in my build output directory. It seems that the build
+system can't recognize when a C file turns into an assembly file.
 
-Pulled, thanks.
+Anyone else seen this problem? I admit it is pretty rare, but it becomes
+annoying with things like automated building, bisecting, etc. where I
+don't make clean all the time.
 
-Michal
+[1] http://lkml.org/lkml/2010/9/27/605
+
+-- 
+Sent by an employee of the Qualcomm Innovation Center, Inc.
+The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum.
+
