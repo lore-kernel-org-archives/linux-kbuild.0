@@ -1,29 +1,33 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:49999 "EHLO mx2.suse.de"
+Received: from cantor.suse.de ([195.135.220.2]:54498 "EHLO mx1.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1756126Ab0I3UCx (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 30 Sep 2010 16:02:53 -0400
-Date: Thu, 30 Sep 2010 22:02:46 +0200
+	id S1754788Ab0I3UvV (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 30 Sep 2010 16:51:21 -0400
+Message-ID: <4CA4F846.8070704@suse.cz>
+Date: Thu, 30 Sep 2010 22:51:18 +0200
 From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [PATCH -next] kconfig: Don't go out from read config loop when
- you read new symbol
-Message-ID: <20100930200246.GA25629@sepie.suse.cz>
-References: <87sk0rghne.fsf@elisp.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87sk0rghne.fsf@elisp.net>
+Subject: Re: [PATCH 08/20] m68knommu: change to new flag variables
+References: <1285224645-29728-1-git-send-email-mfm@muteddisk.com> <4CA18E00.7090207@snapgear.com> <20100928071606.GA13303@haskell.muteddisk.com> <4CA34F0B.6010605@suse.cz> <20100929231521.GA21930@haskell.muteddisk.com>
+In-Reply-To: <20100929231521.GA21930@haskell.muteddisk.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Naohiro Aota <naota@elisp.net>
-Cc: Roman Zippel <zippel@linux-m68k.org>, Arnaud Lacombe <lacombar@gmail.com>, linux-kernel@vger.kernel.org, linux-next@vger.kernel.org, linux-kbuild@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>, Ulf Magnusson <ulfalizer.lkml@gmail.com>, Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@pengutronix.de>
+To: Greg Ungerer <gerg@snapgear.com>, Greg Ungerer <gerg@uclinux.org>, Andrew Morton <akpm@linux-foundation.org>, David Howells <dhowells@redhat.com>, Tim Abbott <tabbott@ksplice.com>, linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-On Fri, Oct 01, 2010 at 04:23:17AM +0900, Naohiro Aota wrote:
-> commit 8baefd30b5b0101aa07aa75da44a9eee881eed28 of linux-next replaced
-> a `switch()' statement with some `if()' statements, but left `break's
-> in the `switch()' statement untouched. This cause read config loop to
-> exit and so "make oldconfig" is not much usable (see below).
+On 30.9.2010 01:15, matt mooney wrote:
+> Okay, if anybody else asks, I will definitely ask them kindly to pick them
+> up. There are, however, some patches that will need to go through the kbuild
+> tree because some maintainers have already acked the patches and not picked them
+> up.
 
-Good catch, applied.
+You can ask them to apply the patches :).
+
+
+ I will wait a couple more weeks, and then I will resend to you and the
+> kbuild list with all acks added.
+
+OK.
 
 Michal
