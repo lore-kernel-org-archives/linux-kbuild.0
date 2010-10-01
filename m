@@ -1,33 +1,62 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor.suse.de ([195.135.220.2]:54498 "EHLO mx1.suse.de"
+Received: from mx1.redhat.com ([209.132.183.28]:6115 "EHLO mx1.redhat.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754788Ab0I3UvV (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 30 Sep 2010 16:51:21 -0400
-Message-ID: <4CA4F846.8070704@suse.cz>
-Date: Thu, 30 Sep 2010 22:51:18 +0200
-From: Michal Marek <mmarek@suse.cz>
+	id S1753215Ab0JAGYh (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 1 Oct 2010 02:24:37 -0400
+Message-ID: <4CA57F93.8010101@redhat.com>
+Date: Fri, 01 Oct 2010 14:28:35 +0800
+From: Cong Wang <amwang@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [PATCH 08/20] m68knommu: change to new flag variables
-References: <1285224645-29728-1-git-send-email-mfm@muteddisk.com> <4CA18E00.7090207@snapgear.com> <20100928071606.GA13303@haskell.muteddisk.com> <4CA34F0B.6010605@suse.cz> <20100929231521.GA21930@haskell.muteddisk.com>
-In-Reply-To: <20100929231521.GA21930@haskell.muteddisk.com>
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [PATCH 1/4] Fix wrong source path in scripts/namespace.pl
+References: <1285828138-5873-1-git-send-email-amwang@redhat.com> <20101001145618.613e3e1f@s6510>
+In-Reply-To: <20101001145618.613e3e1f@s6510>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Greg Ungerer <gerg@snapgear.com>, Greg Ungerer <gerg@uclinux.org>, Andrew Morton <akpm@linux-foundation.org>, David Howells <dhowells@redhat.com>, Tim Abbott <tabbott@ksplice.com>, linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: Stephen Hemminger <shemminger@vyatta.com>
+Cc: linux-kbuild@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>, Michal Marek <mmarek@suse.cz>, linux-kernel@vger.kernel.org
 
-On 30.9.2010 01:15, matt mooney wrote:
-> Okay, if anybody else asks, I will definitely ask them kindly to pick them
-> up. There are, however, some patches that will need to go through the kbuild
-> tree because some maintainers have already acked the patches and not picked them
-> up.
+On 10/01/10 13:56, Stephen Hemminger wrote:
+> On Thu, 30 Sep 2010 14:28:55 +0800
+> Amerigo Wang<amwang@redhat.com>  wrote:
+>
+>> File::Find will do chdir automatically, so we need to get
+>> the absolute patch with $File::Find::dir.
+>>
+>> Reported-by: Stephen Hemminger<shemminger@vyatta.com>
+>> Signed-off-by: Amerigo Wang<amwang@redhat.com>
+>> ---
+>>   scripts/namespace.pl |    8 ++++----
+>>   1 files changed, 4 insertions(+), 4 deletions(-)
+>
+> How did you test this? I tried your patches and when I run
+> it on a compiled kernel in a way that most developers would
+> do it:
+>   $ make allmodconfig
+>   $ make
+>   $ ./scripts/namespace.pl
 
-You can ask them to apply the patches :).
 
+I use 'make namespacecheck'.
 
- I will wait a couple more weeks, and then I will resend to you and the
-> kbuild list with all acks added.
+>
+> With your patch it still doesn't find the kernel source files.
+> I find it frustrating because my patch worked, yours didn't.
+>
+> --------
+> No source file found for arch/x86/crypto/aes-i586-asm_32.o
+> No source file found for arch/x86/crypto/aes_glue.o
+...
 
-OK.
+Actually, this shows it is working. :)
 
-Michal
+There are two reasons why you got so many of these:
+
+1) You didn't do a 'make mrproper', so some source file may be
+deleted or renamed in git repo;
+
+2) There are no path/to/foo.c for path/to/foo.o which is
+normal, we should add those files to exception list.
+
+I got much fewer of such warning when I tested it.
