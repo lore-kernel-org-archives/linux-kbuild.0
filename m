@@ -1,17 +1,17 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qy0-f174.google.com ([209.85.216.174]:52988 "EHLO
-	mail-qy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755820Ab0JDNql convert rfc822-to-8bit (ORCPT
+Received: from mail-yx0-f174.google.com ([209.85.213.174]:47115 "EHLO
+	mail-yx0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755925Ab0JDNqt convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 4 Oct 2010 09:46:41 -0400
+	Mon, 4 Oct 2010 09:46:49 -0400
 MIME-Version: 1.0
 In-Reply-To: <4CA9D97A.7020109@suse.cz>
 References: <AANLkTinwXj92VLVYqDhvUAusY_MdBQPAYnGBKVgfNLrO@mail.gmail.com>
 	<20100924093206.GD5453@cr0.nay.redhat.com>
 	<AANLkTi=ykH+gTujw+x1c107V6wXfZUT66uHBQ1o6NgK+@mail.gmail.com>
 	<4CA9D97A.7020109@suse.cz>
-Date: Mon, 4 Oct 2010 14:46:15 +0100
-Message-ID: <AANLkTik8gppo7cRw-5qGaUXDHg1D1CzLcEU5JKx5A0oG@mail.gmail.com>
+Date: Mon, 4 Oct 2010 14:46:48 +0100
+Message-ID: <AANLkTim5cNUT+pN7Ay3Wf-VxTrfUc2h=G=tYPtBn=tsU@mail.gmail.com>
 Subject: Re: [PATCH] kconfig: Use PATH_MAX instead of 128 for path buffer sizes.
 From: Will Newton <will.newton@gmail.com>
 Content-Type: text/plain; charset=ISO-8859-1
