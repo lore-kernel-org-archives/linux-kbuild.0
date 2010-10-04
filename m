@@ -1,17 +1,17 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-yx0-f174.google.com ([209.85.213.174]:47115 "EHLO
-	mail-yx0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755925Ab0JDNqt convert rfc822-to-8bit (ORCPT
+Received: from mail-gw0-f46.google.com ([74.125.83.46]:62911 "EHLO
+	mail-gw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755914Ab0JDNrc convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 4 Oct 2010 09:46:49 -0400
+	Mon, 4 Oct 2010 09:47:32 -0400
 MIME-Version: 1.0
 In-Reply-To: <4CA9D97A.7020109@suse.cz>
 References: <AANLkTinwXj92VLVYqDhvUAusY_MdBQPAYnGBKVgfNLrO@mail.gmail.com>
 	<20100924093206.GD5453@cr0.nay.redhat.com>
 	<AANLkTi=ykH+gTujw+x1c107V6wXfZUT66uHBQ1o6NgK+@mail.gmail.com>
 	<4CA9D97A.7020109@suse.cz>
-Date: Mon, 4 Oct 2010 14:46:48 +0100
-Message-ID: <AANLkTim5cNUT+pN7Ay3Wf-VxTrfUc2h=G=tYPtBn=tsU@mail.gmail.com>
+Date: Mon, 4 Oct 2010 14:47:26 +0100
+Message-ID: <AANLkTinp4TfW4DecdZJ7X_mSjSqwO0UMmr64v9-27YSX@mail.gmail.com>
 Subject: Re: [PATCH] kconfig: Use PATH_MAX instead of 128 for path buffer sizes.
 From: Will Newton <will.newton@gmail.com>
 Content-Type: text/plain; charset=ISO-8859-1
@@ -47,5 +47,4 @@ Thanks!
 The reason I send the patches in both ways is because last time I
 checked the gmail web interface will mangle an inline patch, but not
 an attached one, and most people like an inline patch for review
-purposes. I'll have to check to see if there's another way to avoid
-that problem.
+purposes. I'll have to check to see if there's another way to avo
