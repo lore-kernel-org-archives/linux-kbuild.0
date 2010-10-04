@@ -1,50 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-gw0-f46.google.com ([74.125.83.46]:62911 "EHLO
-	mail-gw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755914Ab0JDNrc convert rfc822-to-8bit (ORCPT
+Received: from cantor.suse.de ([195.135.220.2]:40505 "EHLO mx1.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753128Ab0JDPKr convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 4 Oct 2010 09:47:32 -0400
+	Mon, 4 Oct 2010 11:10:47 -0400
+Date: Mon, 4 Oct 2010 17:10:45 +0200
+From: Michal Marek <mmarek@suse.cz>
+Subject: Re: [PATCH] kbuild: remove duplicate -I flag in addtree
+Message-ID: <20101004151045.GA5637@sepie.suse.cz>
+References: <1285553472-924-1-git-send-email-mfm@muteddisk.com>
 MIME-Version: 1.0
-In-Reply-To: <4CA9D97A.7020109@suse.cz>
-References: <AANLkTinwXj92VLVYqDhvUAusY_MdBQPAYnGBKVgfNLrO@mail.gmail.com>
-	<20100924093206.GD5453@cr0.nay.redhat.com>
-	<AANLkTi=ykH+gTujw+x1c107V6wXfZUT66uHBQ1o6NgK+@mail.gmail.com>
-	<4CA9D97A.7020109@suse.cz>
-Date: Mon, 4 Oct 2010 14:47:26 +0100
-Message-ID: <AANLkTinp4TfW4DecdZJ7X_mSjSqwO0UMmr64v9-27YSX@mail.gmail.com>
-Subject: Re: [PATCH] kconfig: Use PATH_MAX instead of 128 for path buffer sizes.
-From: Will Newton <will.newton@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: 8BIT
+In-Reply-To: <1285553472-924-1-git-send-email-mfm@muteddisk.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: =?ISO-8859-1?Q?Am=E9rico_Wang?= <xiyou.wangcong@gmail.com>, Linux Kernel list <linux-kernel@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, linux-kbuild@vger.kernel.org
+To: matt mooney <mfm@muteddisk.com>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
 
-On Mon, Oct 4, 2010 at 2:41 PM, Michal Marek <mmarek@suse.cz> wrote:
-> On 4.10.2010 15:00, Will Newton wrote:
->> On Fri, Sep 24, 2010 at 10:32 AM, Américo Wang <xiyou.wangcong@gmail.com> wrote:
->>> On Wed, Sep 22, 2010 at 03:59:13PM +0100, Will Newton wrote:
->>>> This prevents the buffers being overflowed when using a config
->>>> file with a long name. PATH_MAX is used elsewhere in the same
->>>> file, so use it here as well.
->>>>
->>>> Signed-off-by: Will Newton <will.newton@imgtec.com>
->>>
->>> Acked-by: WANG Cong <xiyou.wangcong@gmail.com>
->>>
->>> Thanks!
->>
->> Ping!
->>
->> Could someone take this please?
->
-> Sorry, applied now. BTW, please do not send patches inline _and_ as
-> attachments at the same time, it confuses git am.
+On Sun, Sep 26, 2010 at 07:11:12PM -0700, matt mooney wrote:
+> When O= is used, any -I flag given that is not an absolute path gets
+> duplicated. The $(1) appended to the conditional clause covers the
+> absolute case, but due to being outside of the conditional statement
+> it gets added everytime.
+> 
+> Signed-off-by: matt mooney <mfm@muteddisk.com>
+> ---
+>  scripts/Kbuild.include |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
+> 
+> diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
+> index ed2773e..08c74ed 100644
+> --- a/scripts/Kbuild.include
+> +++ b/scripts/Kbuild.include
+> @@ -158,7 +158,7 @@ modbuiltin := -f $(if $(KBUILD_SRC),$(srctree)/)scripts/Makefile.modbuiltin obj
+>  # Prefix -I with $(srctree) if it is not an absolute path.
+>  # skip if -I has no parameter
+>  addtree = $(if $(patsubst -I%,%,$(1)), \
+> -$(if $(filter-out -I/%,$(1)),$(patsubst -I%,-I$(srctree)/%,$(1))) $(1))
+> +$(if $(filter-out -I/%,$(1)),$(patsubst -I%,-I$(srctree)/%,$(1)),$(1)))
 
-Thanks!
+$ mkdir _build-new; make O=_build-new defconfig; make O=_build-new V=1 all
+fails with
 
-The reason I send the patches in both ways is because last time I
-checked the gmail web interface will mangle an inline patch, but not
-an attached one, and most people like an inline patch for review
-purposes. I'll have to check to see if there's another way to avo
+  perl /home/mmarek/linux-2.6/kernel/timeconst.pl 1000 > kernel/timeconst.h
+  gcc -Wp,-MD,kernel/.time.o.d  -nostdinc -isystem /usr/lib64/gcc/x86_64-suse-linux/4.5/include -I/home/mmarek/linux-2.6/arch/x86/include -Iinclude  -I/home/mmarek/linux-2.6/include -include include/generated/autoconf.h  -I/home/mmarek/linux-2.6/kernel -D__KERNEL__ -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs -fno-strict-aliasing -fno-common -Werror-implicit-function-declaration -Wno-format-security -fno-delete-null-pointer-checks -Os -m64 -mtune=generic -mno-red-zone -mcmodel=kernel -funit-at-a-time -maccumulate-outgoing-args -DCONFIG_AS_CFI=1 -DCONFIG_AS_CFI_SIGNAL_FRAME=1 -DCONFIG_AS_CFI_SECTIONS=1 -pipe -Wno-sign-compare -fno-asynchronous-unwind-tables -mno-sse -mno-mmx -mno-sse2 -mno-3dnow -Wframe-larger-than=2048 -fno-stack-protector -fno-omit-frame-pointer -fno-optimize-sibling-calls -Wdeclaration-after-statement -Wno-pointer-sign -fno-strict-overflow -fconserve-stack    -D"KBUILD_STR(s)=#s" -D"KBUILD_BASENAME=KBUILD_STR(time)"  -D"KBUILD_MODNAME=KBUILD_STR(time)"  -c -o kernel/time.o /home/mmarek/linux-2.6/kernel/time.c
+/home/mmarek/linux-2.6/kernel/time.c:44:23: fatal error: timeconst.h: No such file or directory
+
+The correct gcc line without your patch is 
+  gcc -Wp,-MD,kernel/.time.o.d  -nostdinc -isystem /usr/lib64/gcc/x86_64-suse-linux/4.5/include -I/home/mmarek/linux-2.6/arch/x86/include -Iinclude  -I/home/mmarek/linux-2.6/include -include include/generated/autoconf.h  -I/home/mmarek/linux-2.6/kernel -Ikernel -D__KERNEL__ -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs -fno-strict-aliasing -fno-common -Werror-implicit-function-declaration -Wno-format-security -fno-delete-null-pointer-checks -Os -m64 -mtune=generic -mno-red-zone -mcmodel=kernel -funit-at-a-time -maccumulate-outgoing-args -DCONFIG_AS_CFI=1 -DCONFIG_AS_CFI_SIGNAL_FRAME=1 -DCONFIG_AS_CFI_SECTIONS=1 -pipe -Wno-sign-compare -fno-asynchronous-unwind-tables -mno-sse -mno-mmx -mno-sse2 -mno-3dnow -Wframe-larger-than=2048 -fno-stack-protector -fno-omit-frame-pointer -fno-optimize-sibling-calls -Wdeclaration-after-statement -Wno-pointer-sign -fno-strict-overflow -fconserve-stack    -D"KBUILD_STR(s)=#s" -D"KBUILD_BASENAME=KBUILD_STR(time)"  -D"KBUILD_MODNAME=KBUILD_STR(time)"  -c -o kernel/time.o /home/mmarek/linux-2.6/kernel/time.c
+
+The difference is that with your patch it is lacking the -Ikernel
+include, so it does not search for generated header files in $(obj).
+
+Michal
