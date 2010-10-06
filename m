@@ -1,53 +1,553 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from qmta07.emeryville.ca.mail.comcast.net ([76.96.30.64]:51382 "EHLO
-	qmta07.emeryville.ca.mail.comcast.net" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S932248Ab0JFHsw (ORCPT
+Received: from qmta12.emeryville.ca.mail.comcast.net ([76.96.27.227]:43685
+	"EHLO qmta12.emeryville.ca.mail.comcast.net" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S932329Ab0JFHyB (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 6 Oct 2010 03:48:52 -0400
+	Wed, 6 Oct 2010 03:54:01 -0400
 From: matt mooney <mfm@muteddisk.com>
-Subject: [PATCH] power: makefile cleanup
-Date: Wed,  6 Oct 2010 00:46:27 -0700
-Message-Id: <1286351187-24245-1-git-send-email-mfm@muteddisk.com>
+Subject: [RFC PATCH] usb: makefile cleanup
+Date: Wed,  6 Oct 2010 00:51:41 -0700
+Message-Id: <1286351501-24413-1-git-send-email-mfm@muteddisk.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Anton Vorontsov <cbouatmailru@gmail.com>
-Cc: David Woodhouse <dwmw2@infradead.org>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, kernel-janitors@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
+Cc: Michal Marek <mmarek@suse.cz>, Sam Ravnborg <sam@ravnborg.org>
 
-Replace EXTRA_CFLAGS with ccflags-y; remove if-statements and replace
-with lists using the kbuild idiom.
+For all modules, change <module>-objs to <module>-y; remove
+if-statements and replace with lists using the kbuild idiom; move
+flags to the top of the file; and fix alignment while trying to
+maintain the original scheme in each file.
 
 None of the dependencies are modified.
 
 Signed-off-by: matt mooney <mfm@muteddisk.com>
 ---
- drivers/power/Makefile |   16 ++++------------
- 1 files changed, 4 insertions(+), 12 deletions(-)
 
-diff --git a/drivers/power/Makefile b/drivers/power/Makefile
-index 10143aa..430243e 100644
---- a/drivers/power/Makefile
-+++ b/drivers/power/Makefile
-@@ -1,16 +1,8 @@
--power_supply-objs := power_supply_core.o
-+ccflags-$(CONFIG_POWER_SUPPLY_DEBUG) := -DDEBUG
+So here is a sample cleanup patch; I am not posting it to greg-kh or
+the rest of the necessary usb guys yet because I would like to know
+what you guys think first.
+
+Thanks,
+mfm
+
+ drivers/usb/atm/Makefile            |    4 +-
+ drivers/usb/c67x00/Makefile         |    6 ++--
+ drivers/usb/core/Makefile           |   19 ++++------
+ drivers/usb/early/Makefile          |    2 +-
+ drivers/usb/gadget/Makefile         |   39 +++++++++-----------
+ drivers/usb/host/Makefile           |   19 +++++-----
+ drivers/usb/host/whci/Kbuild        |    2 +-
+ drivers/usb/misc/Makefile           |   42 +++++++++++-----------
+ drivers/usb/misc/sisusbvga/Makefile |    3 +-
+ drivers/usb/mon/Makefile            |    2 +-
+ drivers/usb/musb/Makefile           |   66 ++++++++--------------------------
+ drivers/usb/otg/Makefile            |    7 ++--
+ drivers/usb/serial/Makefile         |    9 ++---
+ drivers/usb/storage/Makefile        |   37 ++++++++++---------
+ drivers/usb/wusbcore/Makefile       |   17 +++++----
+ 15 files changed, 116 insertions(+), 158 deletions(-)
+
+diff --git a/drivers/usb/atm/Makefile b/drivers/usb/atm/Makefile
+index d40a126..a5d792e 100644
+--- a/drivers/usb/atm/Makefile
++++ b/drivers/usb/atm/Makefile
+@@ -2,10 +2,10 @@
+ # Makefile for USB ATM/xDSL drivers
+ #
  
--ifeq ($(CONFIG_SYSFS),y)
--power_supply-objs += power_supply_sysfs.o
++ccflags-$(CONFIG_USB_DEBUG) := -DDEBUG
++
+ obj-$(CONFIG_USB_CXACRU)	+= cxacru.o
+ obj-$(CONFIG_USB_SPEEDTOUCH)	+= speedtch.o
+ obj-$(CONFIG_USB_UEAGLEATM)	+= ueagle-atm.o
+ obj-$(CONFIG_USB_ATM)		+= usbatm.o
+ obj-$(CONFIG_USB_XUSBATM)	+= xusbatm.o
+-
+-ccflags-$(CONFIG_USB_DEBUG)	:= -DDEBUG
+diff --git a/drivers/usb/c67x00/Makefile b/drivers/usb/c67x00/Makefile
+index 868bc41..b121868 100644
+--- a/drivers/usb/c67x00/Makefile
++++ b/drivers/usb/c67x00/Makefile
+@@ -2,8 +2,8 @@
+ # Makefile for Cypress C67X00 USB Controller
+ #
+ 
+-ccflags-$(CONFIG_USB_DEBUG)		+= -DDEBUG
++ccflags-$(CONFIG_USB_DEBUG) := -DDEBUG
+ 
+-obj-$(CONFIG_USB_C67X00_HCD)		+= c67x00.o
++obj-$(CONFIG_USB_C67X00_HCD)	+= c67x00.o
+ 
+-c67x00-objs := c67x00-drv.o c67x00-ll-hpi.o c67x00-hcd.o c67x00-sched.o
++c67x00-y := c67x00-drv.o c67x00-ll-hpi.o c67x00-hcd.o c67x00-sched.o
+diff --git a/drivers/usb/core/Makefile b/drivers/usb/core/Makefile
+index 17c8e2d..507a4e1 100644
+--- a/drivers/usb/core/Makefile
++++ b/drivers/usb/core/Makefile
+@@ -2,18 +2,13 @@
+ # Makefile for USB Core files and filesystem
+ #
+ 
+-usbcore-objs	:= usb.o hub.o hcd.o urb.o message.o driver.o \
+-			config.o file.o buffer.o sysfs.o endpoint.o \
+-			devio.o notify.o generic.o quirks.o devices.o
+-
+-ifeq ($(CONFIG_PCI),y)
+-	usbcore-objs	+= hcd-pci.o
+-endif
++ccflags-$(CONFIG_USB_DEBUG) := -DDEBUG
+ 
+-ifeq ($(CONFIG_USB_DEVICEFS),y)
+-	usbcore-objs	+= inode.o
+-endif
++usbcore-y := usb.o hub.o hcd.o urb.o message.o driver.o
++usbcore-y += config.o file.o buffer.o sysfs.o endpoint.o
++usbcore-y += devio.o notify.o generic.o quirks.o devices.o
+ 
+-obj-$(CONFIG_USB)	+= usbcore.o
++usbcore-$(CONFIG_PCI)		+= hcd-pci.o
++usbcore-$(CONFIG_USB_DEVICEFS)	+= inode.o
+ 
+-ccflags-$(CONFIG_USB_DEBUG) := -DDEBUG
++obj-$(CONFIG_USB)		+= usbcore.o
+diff --git a/drivers/usb/early/Makefile b/drivers/usb/early/Makefile
+index dfedee8..24bbe51 100644
+--- a/drivers/usb/early/Makefile
++++ b/drivers/usb/early/Makefile
+@@ -2,4 +2,4 @@
+ # Makefile for early USB devices
+ #
+ 
+-obj-$(CONFIG_EARLY_PRINTK_DBGP)        += ehci-dbgp.o
++obj-$(CONFIG_EARLY_PRINTK_DBGP) += ehci-dbgp.o
+diff --git a/drivers/usb/gadget/Makefile b/drivers/usb/gadget/Makefile
+index c682005..5780db4 100644
+--- a/drivers/usb/gadget/Makefile
++++ b/drivers/usb/gadget/Makefile
+@@ -1,7 +1,7 @@
+ #
+ # USB peripheral controller drivers
+ #
+-ccflags-$(CONFIG_USB_GADGET_DEBUG)	:= -DDEBUG
++ccflags-$(CONFIG_USB_GADGET_DEBUG) := -DDEBUG
+ 
+ obj-$(CONFIG_USB_DUMMY_HCD)	+= dummy_hcd.o
+ obj-$(CONFIG_USB_NET2280)	+= net2280.o
+@@ -16,10 +16,8 @@ obj-$(CONFIG_USB_S3C2410)	+= s3c2410_udc.o
+ obj-$(CONFIG_USB_AT91)		+= at91_udc.o
+ obj-$(CONFIG_USB_ATMEL_USBA)	+= atmel_usba_udc.o
+ obj-$(CONFIG_USB_FSL_USB2)	+= fsl_usb2_udc.o
+-fsl_usb2_udc-objs		:= fsl_udc_core.o
+-ifeq ($(CONFIG_ARCH_MXC),y)
+-fsl_usb2_udc-objs		+= fsl_mxc_udc.o
+-endif
++fsl_usb2_udc-y			:= fsl_udc_core.o
++fsl_usb2_udc-$(CONFIG_ARCH_MXC)	+= fsl_mxc_udc.o
+ obj-$(CONFIG_USB_M66592)	+= m66592-udc.o
+ obj-$(CONFIG_USB_R8A66597)	+= r8a66597-udc.o
+ obj-$(CONFIG_USB_FSL_QE)	+= fsl_qe_udc.o
+@@ -30,21 +28,21 @@ obj-$(CONFIG_USB_LANGWELL)	+= langwell_udc.o
+ #
+ # USB gadget drivers
+ #
+-g_zero-objs			:= zero.o
+-g_audio-objs			:= audio.o
+-g_ether-objs			:= ether.o
+-g_serial-objs			:= serial.o
+-g_midi-objs			:= gmidi.o
+-gadgetfs-objs			:= inode.o
+-g_file_storage-objs		:= file_storage.o
+-g_mass_storage-objs		:= mass_storage.o
+-g_printer-objs			:= printer.o
+-g_cdc-objs			:= cdc2.o
+-g_multi-objs			:= multi.o
+-g_hid-objs			:= hid.o
+-g_dbgp-objs			:= dbgp.o
+-g_nokia-objs			:= nokia.o
+-g_webcam-objs			:= webcam.o
++g_zero-y			:= zero.o
++g_audio-y			:= audio.o
++g_ether-y			:= ether.o
++g_serial-y			:= serial.o
++g_midi-y			:= gmidi.o
++gadgetfs-y			:= inode.o
++g_file_storage-y		:= file_storage.o
++g_mass_storage-y		:= mass_storage.o
++g_printer-y			:= printer.o
++g_cdc-y				:= cdc2.o
++g_multi-y			:= multi.o
++g_hid-y				:= hid.o
++g_dbgp-y			:= dbgp.o
++g_nokia-y			:= nokia.o
++g_webcam-y			:= webcam.o
+ 
+ obj-$(CONFIG_USB_ZERO)		+= g_zero.o
+ obj-$(CONFIG_USB_AUDIO)		+= g_audio.o
+@@ -62,4 +60,3 @@ obj-$(CONFIG_USB_G_DBGP)	+= g_dbgp.o
+ obj-$(CONFIG_USB_G_MULTI)	+= g_multi.o
+ obj-$(CONFIG_USB_G_NOKIA)	+= g_nokia.o
+ obj-$(CONFIG_USB_G_WEBCAM)	+= g_webcam.o
+-
+diff --git a/drivers/usb/host/Makefile b/drivers/usb/host/Makefile
+index f041442..fc10a03 100644
+--- a/drivers/usb/host/Makefile
++++ b/drivers/usb/host/Makefile
+@@ -2,15 +2,17 @@
+ # Makefile for USB Host Controller Drivers
+ #
+ 
+-ccflags-$(CONFIG_USB_DEBUG)	:= -DDEBUG
++ccflags-$(CONFIG_USB_DEBUG) := -DDEBUG
+ 
+-isp1760-objs := isp1760-hcd.o isp1760-if.o
+-fhci-objs := fhci-hcd.o fhci-hub.o fhci-q.o fhci-mem.o \
+-	     fhci-tds.o fhci-sched.o
+-ifeq ($(CONFIG_FHCI_DEBUG),y)
+-fhci-objs += fhci-dbg.o
+-endif
+-xhci-hcd-objs := xhci.o xhci-mem.o xhci-pci.o xhci-ring.o xhci-hub.o xhci-dbg.o
++isp1760-y := isp1760-hcd.o isp1760-if.o
++
++fhci-y := fhci-hcd.o fhci-hub.o fhci-q.o
++fhci-y += fhci-mem.o fhci-tds.o fhci-sched.o
++
++fhci-$(CONFIG_FHCI_DEBUG) += fhci-dbg.o
++
++xhci-hcd-y := xhci.o xhci-mem.o xhci-pci.o
++xhci-hcd-y += xhci-ring.o xhci-hub.o xhci-dbg.o
+ 
+ obj-$(CONFIG_USB_WHCI_HCD)	+= whci/
+ 
+@@ -31,4 +33,3 @@ obj-$(CONFIG_USB_R8A66597_HCD)	+= r8a66597-hcd.o
+ obj-$(CONFIG_USB_ISP1760_HCD)	+= isp1760.o
+ obj-$(CONFIG_USB_HWA_HCD)	+= hwa-hc.o
+ obj-$(CONFIG_USB_IMX21_HCD)	+= imx21-hcd.o
+-
+diff --git a/drivers/usb/host/whci/Kbuild b/drivers/usb/host/whci/Kbuild
+index 11e5040..26df013 100644
+--- a/drivers/usb/host/whci/Kbuild
++++ b/drivers/usb/host/whci/Kbuild
+@@ -3,7 +3,7 @@ obj-$(CONFIG_USB_WHCI_HCD) += whci-hcd.o
+ whci-hcd-y := \
+ 	asl.o	\
+ 	debug.o \
+-	hcd.o 	\
++	hcd.o	\
+ 	hw.o	\
+ 	init.o	\
+ 	int.o	\
+diff --git a/drivers/usb/misc/Makefile b/drivers/usb/misc/Makefile
+index 92d1ce0..f21165b 100644
+--- a/drivers/usb/misc/Makefile
++++ b/drivers/usb/misc/Makefile
+@@ -3,26 +3,26 @@
+ # (the ones that don't fit into any other categories)
+ #
+ 
+-obj-$(CONFIG_USB_ADUTUX)	+= adutux.o
+-obj-$(CONFIG_USB_APPLEDISPLAY)	+= appledisplay.o
+-obj-$(CONFIG_USB_CYPRESS_CY7C63)+= cypress_cy7c63.o
+-obj-$(CONFIG_USB_CYTHERM)	+= cytherm.o
+-obj-$(CONFIG_USB_EMI26)		+= emi26.o
+-obj-$(CONFIG_USB_EMI62)		+= emi62.o
+-obj-$(CONFIG_USB_FTDI_ELAN)	+= ftdi-elan.o
+-obj-$(CONFIG_USB_IDMOUSE)	+= idmouse.o
+-obj-$(CONFIG_USB_IOWARRIOR)	+= iowarrior.o
+-obj-$(CONFIG_USB_ISIGHTFW)	+= isight_firmware.o
+-obj-$(CONFIG_USB_LCD)		+= usblcd.o
+-obj-$(CONFIG_USB_LD)		+= ldusb.o
+-obj-$(CONFIG_USB_LED)		+= usbled.o
+-obj-$(CONFIG_USB_LEGOTOWER)	+= legousbtower.o
+-obj-$(CONFIG_USB_RIO500)	+= rio500.o
+-obj-$(CONFIG_USB_TEST)		+= usbtest.o
+-obj-$(CONFIG_USB_TRANCEVIBRATOR)	+= trancevibrator.o
+-obj-$(CONFIG_USB_USS720)	+= uss720.o
+-obj-$(CONFIG_USB_SEVSEG)	+= usbsevseg.o
++ccflags-$(CONFIG_USB_DEBUG) := -DDEBUG
+ 
+-obj-$(CONFIG_USB_SISUSBVGA)	+= sisusbvga/
++obj-$(CONFIG_USB_ADUTUX)		+= adutux.o
++obj-$(CONFIG_USB_APPLEDISPLAY)		+= appledisplay.o
++obj-$(CONFIG_USB_CYPRESS_CY7C63)	+= cypress_cy7c63.o
++obj-$(CONFIG_USB_CYTHERM)		+= cytherm.o
++obj-$(CONFIG_USB_EMI26)			+= emi26.o
++obj-$(CONFIG_USB_EMI62)			+= emi62.o
++obj-$(CONFIG_USB_FTDI_ELAN)		+= ftdi-elan.o
++obj-$(CONFIG_USB_IDMOUSE)		+= idmouse.o
++obj-$(CONFIG_USB_IOWARRIOR)		+= iowarrior.o
++obj-$(CONFIG_USB_ISIGHTFW)		+= isight_firmware.o
++obj-$(CONFIG_USB_LCD)			+= usblcd.o
++obj-$(CONFIG_USB_LD)			+= ldusb.o
++obj-$(CONFIG_USB_LED)			+= usbled.o
++obj-$(CONFIG_USB_LEGOTOWER)		+= legousbtower.o
++obj-$(CONFIG_USB_RIO500)		+= rio500.o
++obj-$(CONFIG_USB_TEST)			+= usbtest.o
++obj-$(CONFIG_USB_TRANCEVIBRATOR)	+= trancevibrator.o
++obj-$(CONFIG_USB_USS720)		+= uss720.o
++obj-$(CONFIG_USB_SEVSEG)		+= usbsevseg.o
+ 
+-ccflags-$(CONFIG_USB_DEBUG)	:= -DDEBUG
++obj-$(CONFIG_USB_SISUSBVGA)		+= sisusbvga/
+diff --git a/drivers/usb/misc/sisusbvga/Makefile b/drivers/usb/misc/sisusbvga/Makefile
+index 7f934cf..3142476 100644
+--- a/drivers/usb/misc/sisusbvga/Makefile
++++ b/drivers/usb/misc/sisusbvga/Makefile
+@@ -4,5 +4,4 @@
+ 
+ obj-$(CONFIG_USB_SISUSBVGA) += sisusbvga.o
+ 
+-sisusbvga-objs := sisusb.o sisusb_init.o sisusb_con.o
+-
++sisusbvga-y := sisusb.o sisusb_init.o sisusb_con.o
+diff --git a/drivers/usb/mon/Makefile b/drivers/usb/mon/Makefile
+index 384b198..8ed24ab 100644
+--- a/drivers/usb/mon/Makefile
++++ b/drivers/usb/mon/Makefile
+@@ -2,6 +2,6 @@
+ # Makefile for USB monitor
+ #
+ 
+-usbmon-objs	:= mon_main.o mon_stat.o mon_text.o mon_bin.o
++usbmon-y := mon_main.o mon_stat.o mon_text.o mon_bin.o
+ 
+ obj-$(CONFIG_USB_MON)	+= usbmon.o
+diff --git a/drivers/usb/musb/Makefile b/drivers/usb/musb/Makefile
+index 4fd29f8..b1f79ae 100644
+--- a/drivers/usb/musb/Makefile
++++ b/drivers/usb/musb/Makefile
+@@ -2,49 +2,22 @@
+ # for USB OTG silicon based on Mentor Graphics INVENTRA designs
+ #
+ 
+-musb_hdrc-objs := musb_core.o
+-
+-obj-$(CONFIG_USB_MUSB_HDRC)	+= musb_hdrc.o
+-
+-ifeq ($(CONFIG_ARCH_DAVINCI_DMx),y)
+-	musb_hdrc-objs	+= davinci.o
 -endif
 -
--ifeq ($(CONFIG_LEDS_TRIGGERS),y)
--power_supply-objs += power_supply_leds.o
+-ifeq ($(CONFIG_USB_TUSB6010),y)
+-	musb_hdrc-objs	+= tusb6010.o
 -endif
 -
--ifeq ($(CONFIG_POWER_SUPPLY_DEBUG),y)
--EXTRA_CFLAGS += -DDEBUG
+-ifeq ($(CONFIG_ARCH_OMAP2430),y)
+-	musb_hdrc-objs	+= omap2430.o
 -endif
-+power_supply-y				:= power_supply_core.o
-+power_supply-$(CONFIG_SYSFS)		+= power_supply_sysfs.o
-+power_supply-$(CONFIG_LEDS_TRIGGERS)	+= power_supply_leds.o
+-
+-ifeq ($(CONFIG_ARCH_OMAP3430),y)
+-	musb_hdrc-objs	+= omap2430.o
+-endif
+-
+-ifeq ($(CONFIG_ARCH_OMAP4),y)
+-	musb_hdrc-objs  += omap2430.o
+-endif
+-
+-ifeq ($(CONFIG_BF54x),y)
+-	musb_hdrc-objs	+= blackfin.o
+-endif
+-
+-ifeq ($(CONFIG_BF52x),y)
+-	musb_hdrc-objs	+= blackfin.o
+-endif
++ccflags-$(CONFIG_USB_MUSB_DEBUG) := -DDEBUG
  
- obj-$(CONFIG_POWER_SUPPLY)	+= power_supply.o
+-ifeq ($(CONFIG_USB_GADGET_MUSB_HDRC),y)
+-	musb_hdrc-objs		+= musb_gadget_ep0.o musb_gadget.o
+-endif
++obj-$(CONFIG_USB_MUSB_HDRC) += musb_hdrc.o
  
+-ifeq ($(CONFIG_USB_MUSB_HDRC_HCD),y)
+-	musb_hdrc-objs		+= musb_virthub.o musb_host.o
+-endif
++musb_hdrc-y := musb_core.o
+ 
+-ifeq ($(CONFIG_DEBUG_FS),y)
+-	musb_hdrc-objs		+= musb_debugfs.o
+-endif
++musb_hdrc-$(CONFIG_ARCH_DAVINCI_DMx)		+= davinci.o
++musb_hdrc-$(CONFIG_USB_TUSB6010)		+= tusb6010.o
++musb_hdrc-$(CONFIG_ARCH_OMAP2430)		+= omap2430.o
++musb_hdrc-$(CONFIG_ARCH_OMAP3430)		+= omap2430.o
++musb_hdrc-$(CONFIG_ARCH_OMAP4)			+= omap2430.o
++musb_hdrc-$(CONFIG_BF54x)			+= blackfin.o
++musb_hdrc-$(CONFIG_BF52x)			+= blackfin.o
++musb_hdrc-$(CONFIG_USB_GADGET_MUSB_HDRC)	+= musb_gadget_ep0.o musb_gadget.o
++musb_hdrc-$(CONFIG_USB_MUSB_HDRC_HCD)		+= musb_virthub.o musb_host.o
++musb_hdrc-$(CONFIG_DEBUG_FS)			+= musb_debugfs.o
+ 
+ # the kconfig must guarantee that only one of the
+ # possible I/O schemes will be enabled at a time ...
+@@ -54,24 +27,17 @@ endif
+ ifneq ($(CONFIG_MUSB_PIO_ONLY),y)
+ 
+   ifeq ($(CONFIG_USB_INVENTRA_DMA),y)
+-    musb_hdrc-objs		+= musbhsdma.o
++    musb_hdrc-y			+= musbhsdma.o
+ 
+   else
+     ifeq ($(CONFIG_USB_TI_CPPI_DMA),y)
+-      musb_hdrc-objs		+= cppi_dma.o
++      musb_hdrc-y		+= cppi_dma.o
+ 
+     else
+       ifeq ($(CONFIG_USB_TUSB_OMAP_DMA),y)
+-        musb_hdrc-objs		+= tusb6010_omap.o
++	musb_hdrc-y		+= tusb6010_omap.o
+ 
+       endif
+     endif
+   endif
+ endif
+-
+-
+-################################################################################
+-
+-# Debugging
+-
+-ccflags-$(CONFIG_USB_MUSB_DEBUG) := -DDEBUG
+diff --git a/drivers/usb/otg/Makefile b/drivers/usb/otg/Makefile
+index aeb49a8..5d28372 100644
+--- a/drivers/usb/otg/Makefile
++++ b/drivers/usb/otg/Makefile
+@@ -2,6 +2,9 @@
+ # OTG infrastructure and transceiver drivers
+ #
+ 
++ccflags-$(CONFIG_USB_DEBUG)		:= -DDEBUG
++ccflags-$(CONFIG_USB_GADGET_DEBUG)	+= -DDEBUG
++
+ # infrastructure
+ obj-$(CONFIG_USB_OTG_UTILS)	+= otg.o
+ 
+@@ -11,7 +14,3 @@ obj-$(CONFIG_ISP1301_OMAP)	+= isp1301_omap.o
+ obj-$(CONFIG_TWL4030_USB)	+= twl4030-usb.o
+ obj-$(CONFIG_NOP_USB_XCEIV)	+= nop-usb-xceiv.o
+ obj-$(CONFIG_USB_ULPI)		+= ulpi.o
+-
+-ccflags-$(CONFIG_USB_DEBUG)	+= -DDEBUG
+-ccflags-$(CONFIG_USB_GADGET_DEBUG) += -DDEBUG
+-
+diff --git a/drivers/usb/serial/Makefile b/drivers/usb/serial/Makefile
+index 40ebe17..9e536ee 100644
+--- a/drivers/usb/serial/Makefile
++++ b/drivers/usb/serial/Makefile
+@@ -6,10 +6,10 @@
+ 
+ obj-$(CONFIG_USB_SERIAL)			+= usbserial.o
+ 
+-usbserial-obj-$(CONFIG_USB_SERIAL_CONSOLE)	+= console.o
+-usbserial-obj-$(CONFIG_USB_EZUSB)		+= ezusb.o
++usbserial-y := usb-serial.o generic.o bus.o
+ 
+-usbserial-objs	:= usb-serial.o generic.o bus.o $(usbserial-obj-y)
++usbserial-$(CONFIG_USB_SERIAL_CONSOLE)	+= console.o
++usbserial-$(CONFIG_USB_EZUSB)		+= ezusb.o
+ 
+ obj-$(CONFIG_USB_SERIAL_AIRCABLE)		+= aircable.o
+ obj-$(CONFIG_USB_SERIAL_ARK3116)		+= ark3116.o
+@@ -58,6 +58,5 @@ obj-$(CONFIG_USB_SERIAL_TI)			+= ti_usb_3410_5052.o
+ obj-$(CONFIG_USB_SERIAL_VISOR)			+= visor.o
+ obj-$(CONFIG_USB_SERIAL_WHITEHEAT)		+= whiteheat.o
+ obj-$(CONFIG_USB_SERIAL_XIRCOM)			+= keyspan_pda.o
+-obj-$(CONFIG_USB_SERIAL_VIVOPAY_SERIAL)	+= vivopay-serial.o
++obj-$(CONFIG_USB_SERIAL_VIVOPAY_SERIAL)		+= vivopay-serial.o
+ obj-$(CONFIG_USB_SERIAL_ZIO)			+= zio.o
+-
+diff --git a/drivers/usb/storage/Makefile b/drivers/usb/storage/Makefile
+index 786f086..660a5fc 100644
+--- a/drivers/usb/storage/Makefile
++++ b/drivers/usb/storage/Makefile
+@@ -5,20 +5,21 @@
+ # Rewritten to use lists instead of if-statements.
+ #
+ 
+-ccflags-y	:= -Idrivers/scsi
++ccflags-y := -Idrivers/scsi
+ 
+-obj-$(CONFIG_USB_STORAGE)	+= usb-storage.o
++obj-$(CONFIG_USB_STORAGE) += usb-storage.o
+ 
+-usb-storage-obj-$(CONFIG_USB_STORAGE_DEBUG)	+= debug.o
++usb-storage-y := scsiglue.o protocol.o transport.o usb.o
++usb-storage-y += initializers.o sierra_ms.o option_ms.o
++
++usb-storage-$(CONFIG_USB_STORAGE_DEBUG) += debug.o
+ 
+-usb-storage-objs :=	scsiglue.o protocol.o transport.o usb.o \
+-			initializers.o sierra_ms.o option_ms.o $(usb-storage-obj-y)
+ 
+ ifeq ($(CONFIG_USB_LIBUSUAL),)
+-	usb-storage-objs	+= usual-tables.o
++	usb-storage-y += usual-tables.o
+ else
+ 	obj-$(CONFIG_USB)	+= usb-libusual.o
+-	usb-libusual-objs	:= libusual.o usual-tables.o
++	usb-libusual-y		:= libusual.o usual-tables.o
+ endif
+ 
+ obj-$(CONFIG_USB_STORAGE_ALAUDA)	+= ums-alauda.o
+@@ -33,14 +34,14 @@ obj-$(CONFIG_USB_STORAGE_SDDR09)	+= ums-sddr09.o
+ obj-$(CONFIG_USB_STORAGE_SDDR55)	+= ums-sddr55.o
+ obj-$(CONFIG_USB_STORAGE_USBAT)		+= ums-usbat.o
+ 
+-ums-alauda-objs		:= alauda.o
+-ums-cypress-objs	:= cypress_atacb.o
+-ums-datafab-objs	:= datafab.o
+-ums-freecom-objs	:= freecom.o
+-ums-isd200-objs		:= isd200.o
+-ums-jumpshot-objs	:= jumpshot.o
+-ums-karma-objs		:= karma.o
+-ums-onetouch-objs	:= onetouch.o
+-ums-sddr09-objs		:= sddr09.o
+-ums-sddr55-objs		:= sddr55.o
+-ums-usbat-objs		:= shuttle_usbat.o
++ums-alauda-y		:= alauda.o
++ums-cypress-y		:= cypress_atacb.o
++ums-datafab-y		:= datafab.o
++ums-freecom-y		:= freecom.o
++ums-isd200-y		:= isd200.o
++ums-jumpshot-y		:= jumpshot.o
++ums-karma-y		:= karma.o
++ums-onetouch-y		:= onetouch.o
++ums-sddr09-y		:= sddr09.o
++ums-sddr55-y		:= sddr55.o
++ums-usbat-y		:= shuttle_usbat.o
+diff --git a/drivers/usb/wusbcore/Makefile b/drivers/usb/wusbcore/Makefile
+index f0d8045..b3bd313 100644
+--- a/drivers/usb/wusbcore/Makefile
++++ b/drivers/usb/wusbcore/Makefile
+@@ -1,9 +1,11 @@
++ccflags-$(CONFIG_USB_WUSB_CBAF_DEBUG) := -DDEBUG
++
+ obj-$(CONFIG_USB_WUSB)		+= wusbcore.o
+ obj-$(CONFIG_USB_HWA_HCD)	+= wusb-wa.o
+ obj-$(CONFIG_USB_WUSB_CBAF)	+= wusb-cbaf.o
+ 
+ 
+-wusbcore-objs := 	\
++wusbcore-y :=		\
+ 	crypto.o	\
+ 	devconnect.o	\
+ 	dev-sysfs.o	\
+@@ -14,11 +16,10 @@ wusbcore-objs := 	\
+ 	security.o	\
+ 	wusbhc.o
+ 
+-wusb-cbaf-objs := cbaf.o
++wusb-cbaf-y := cbaf.o
+ 
+-wusb-wa-objs :=	wa-hc.o		\
+-		wa-nep.o	\
+-		wa-rpipe.o	\
+-		wa-xfer.o
+-
+-ccflags-$(CONFIG_USB_WUSB_CBAF_DEBUG) := -DDEBUG
++wusb-wa-y :=		\
++	wa-hc.o		\
++	wa-nep.o	\
++	wa-rpipe.o	\
++	wa-xfer.o
 -- 
 1.7.2.3
 
