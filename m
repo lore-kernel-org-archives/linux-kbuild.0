@@ -1,26 +1,26 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from qmta03.emeryville.ca.mail.comcast.net ([76.96.30.32]:51499 "EHLO
-	qmta03.emeryville.ca.mail.comcast.net" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1759577Ab0JGATP (ORCPT
+Received: from qmta07.emeryville.ca.mail.comcast.net ([76.96.30.64]:40867 "EHLO
+	qmta07.emeryville.ca.mail.comcast.net" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S932573Ab0JGAdW (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 6 Oct 2010 20:19:15 -0400
-Date: Wed, 6 Oct 2010 17:17:03 -0700
+	Wed, 6 Oct 2010 20:33:22 -0400
+Date: Wed, 6 Oct 2010 17:31:10 -0700
 From: matt mooney <mfm@muteddisk.com>
 Subject: Re: [RFC PATCH] usb: makefile cleanup
-Message-ID: <20101007001703.GA31483@haskell.muteddisk.com>
+Message-ID: <20101007003110.GB31483@haskell.muteddisk.com>
 References: <1286351501-24413-1-git-send-email-mfm@muteddisk.com>
- <4CAC6521.3050303@suse.cz>
+ <20101006165004.GA25221@merkur.ravnborg.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <4CAC6521.3050303@suse.cz>
+In-Reply-To: <20101006165004.GA25221@merkur.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>
 
-On 14:01 Wed 06 Oct     , Michal Marek wrote:
-> On 6.10.2010 09:51, matt mooney wrote:
+On 18:50 Wed 06 Oct     , Sam Ravnborg wrote:
+> On Wed, Oct 06, 2010 at 12:51:41AM -0700, matt mooney wrote:
 > > For all modules, change <module>-objs to <module>-y; remove
 > > if-statements and replace with lists using the kbuild idiom; move
 > > flags to the top of the file; and fix alignment while trying to
@@ -29,61 +29,83 @@ On 14:01 Wed 06 Oct     , Michal Marek wrote:
 > > None of the dependencies are modified.
 > > 
 > > Signed-off-by: matt mooney <mfm@muteddisk.com>
-> > ---
-> > 
-> > So here is a sample cleanup patch; I am not posting it to greg-kh or
-> > the rest of the necessary usb guys yet because I would like to know
-> > what you guys think first.
 > 
-> The elimination of conditionals in Makefiles is definitely worth it. Not
-> sure about pure whitespace fixes, if the USB developers don't show
-> interest, you can try pushing these through trivial@kernel.org. I have
-> only one remark below:
-
-I questioned this myself, but I concluded that whitespace fixes help with
-readability (of course this is purely subjective).
-
-> > diff --git a/drivers/usb/musb/Makefile b/drivers/usb/musb/Makefile
-> > index 4fd29f8..b1f79ae 100644
-> > --- a/drivers/usb/musb/Makefile
-> > +++ b/drivers/usb/musb/Makefile
-> > [...]
-> >  # the kconfig must guarantee that only one of the
-> >  # possible I/O schemes will be enabled at a time ...
-> > @@ -54,24 +27,17 @@ endif
-> >  ifneq ($(CONFIG_MUSB_PIO_ONLY),y)
-> >  
-> >    ifeq ($(CONFIG_USB_INVENTRA_DMA),y)
-> > -    musb_hdrc-objs		+= musbhsdma.o
-> > +    musb_hdrc-y			+= musbhsdma.o
-> >  
-> >    else
-> >      ifeq ($(CONFIG_USB_TI_CPPI_DMA),y)
-> > -      musb_hdrc-objs		+= cppi_dma.o
-> > +      musb_hdrc-y		+= cppi_dma.o
-> >  
-> >      else
-> >        ifeq ($(CONFIG_USB_TUSB_OMAP_DMA),y)
-> > -        musb_hdrc-objs		+= tusb6010_omap.o
-> > +	musb_hdrc-y		+= tusb6010_omap.o
-> >  
-> >        endif
-> >      endif
-> >    endif
-> >  endif
+> Looks good. I agree with Michal's comment about
+> moving the complexity from MAkefile to Kconfig.
+> But I think that should be a follow-up patch.
 > 
-> So this wasn't exactly elegant before and you are only changing *-objs
-> to *-y. Looking at drivers/usb/musb/Kconfig, al the three USB_*_DMA
-> depend on !MUSB_PIO_ONLY, so the outermost if statement can go away.
-> Furthermore, the intent seems to be to only enable one of the four modes
-> (MUSB_PIO_ONLY, USB_INVENTRA_DMA, USB_TI_CPPI_DMA or USB_TUSB_OMAP_DMA),
-> so it is a perfect candidate for a "choice" group. Have a look e.g. at
-> "PCI access mode" in arch/x86/Kconfig. Then, the Makefile part can be
-> reduced to three lines without any ifs.
+> You can add my:
+> Acked-by: Sam Ravnborg <sam@ravnborg.org>
+> 
+> Two trivial comments...
+> You can keep my ack independent of addressing these comments or not.
+> 
+> 	Sam
+> 
+> > diff --git a/drivers/usb/host/whci/Kbuild b/drivers/usb/host/whci/Kbuild
+> > index 11e5040..26df013 100644
+> > --- a/drivers/usb/host/whci/Kbuild
+> > +++ b/drivers/usb/host/whci/Kbuild
+> > @@ -3,7 +3,7 @@ obj-$(CONFIG_USB_WHCI_HCD) += whci-hcd.o
+> >  whci-hcd-y := \
+> >  	asl.o	\
+> >  	debug.o \
+> > -	hcd.o 	\
+> > +	hcd.o	\
+> >  	hw.o	\
+> >  	init.o	\
+> >  	int.o	\
+> 
+> I would be good to loose the "\"
+> 
+> > diff --git a/drivers/usb/wusbcore/Makefile b/drivers/usb/wusbcore/Makefile
+> > index f0d8045..b3bd313 100644
+> > --- a/drivers/usb/wusbcore/Makefile
+> > +++ b/drivers/usb/wusbcore/Makefile
+> > @@ -1,9 +1,11 @@
+> > +ccflags-$(CONFIG_USB_WUSB_CBAF_DEBUG) := -DDEBUG
+> > +
+> >  obj-$(CONFIG_USB_WUSB)		+= wusbcore.o
+> >  obj-$(CONFIG_USB_HWA_HCD)	+= wusb-wa.o
+> >  obj-$(CONFIG_USB_WUSB_CBAF)	+= wusb-cbaf.o
+> >  
+> >  
+> > -wusbcore-objs := 	\
+> > +wusbcore-y :=		\
+> >  	crypto.o	\
+> >  	devconnect.o	\
+> >  	dev-sysfs.o	\
+> > @@ -14,11 +16,10 @@ wusbcore-objs := 	\
+> >  	security.o	\
+> >  	wusbhc.o
+> >  
+> > -wusb-cbaf-objs := cbaf.o
+> > +wusb-cbaf-y := cbaf.o
+> >  
+> > -wusb-wa-objs :=	wa-hc.o		\
+> > -		wa-nep.o	\
+> > -		wa-rpipe.o	\
+> > -		wa-xfer.o
+> > -
+> > -ccflags-$(CONFIG_USB_WUSB_CBAF_DEBUG) := -DDEBUG
+> > +wusb-wa-y :=		\
+> > +	wa-hc.o		\
+> > +	wa-nep.o	\
+> > +	wa-rpipe.o	\
+> > +	wa-xfer.o
+> This file could also benefit from loosing the excessive use of "\".
 
-I thought this section was more of a Kconfig issue although I am not all that
-familiar with Kconfig yet. After I look into it a little more and better
-understand your advice, I will send a separate patch to fix this.
+I know, I am not a fan of this either. My reasoning for leaving it is that the
+original author wanted each file to be on a separate line, so I felt I had two
+choices: 1) combine some of the files onto a single line and add another
+statement with +=, or 2) keep all on a their own line and use += for all. In the
+end, I figured it was at least better than some of those other multi file
+statements using "\" that either lined up oddly or had to resort to spaces. (Not
+to mention, I worried that this change would be unwelcomed; however, I really
+wanted to make it.) 
+
+So I will add your ack and send the patch off to see how the changes are
+received.
 
 Thanks,
 mfm
