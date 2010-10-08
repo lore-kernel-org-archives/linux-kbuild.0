@@ -1,37 +1,40 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([18.85.46.34]:33128 "EHLO
-	bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1758041Ab0JHOgp (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 8 Oct 2010 10:36:45 -0400
-Date: Fri, 8 Oct 2010 10:36:42 -0400
-From: Kyle McMartin <kyle@mcmartin.ca>
-Subject: Re: [PATCH] kbuild: fix oldnoconfig to do the right thing
-Message-ID: <20101008143642.GA24144@bombadil.infradead.org>
-References: <20100901152130.GY2684@bombadil.infradead.org>
- <20100905061758.GA29547@merkur.ravnborg.org>
- <20100908115553.GC2617@sepie.suse.cz>
+Received: from cantor.suse.de ([195.135.220.2]:54833 "EHLO mx1.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1758316Ab0JHOyl (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 8 Oct 2010 10:54:41 -0400
+Message-ID: <4CAF30AE.3040305@suse.cz>
+Date: Fri, 08 Oct 2010 16:54:38 +0200
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20100908115553.GC2617@sepie.suse.cz>
+Subject: Re: [PATCH] kbuild: fix oldnoconfig to do the right thing
+References: <20100901152130.GY2684@bombadil.infradead.org> <20100905061758.GA29547@merkur.ravnborg.org> <20100908115553.GC2617@sepie.suse.cz> <20101008143642.GA24144@bombadil.infradead.org>
+In-Reply-To: <20101008143642.GA24144@bombadil.infradead.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: Sam Ravnborg <sam@ravnborg.org>, Kyle McMartin <kyle@mcmartin.ca>, linux-kbuild@vger.kernel.org, aris@redhat.com, linux-kernel@vger.kernel.org, torvalds@linux-foundation.org
+To: Kyle McMartin <kyle@mcmartin.ca>
+Cc: Sam Ravnborg <sam@ravnborg.org>, linux-kbuild@vger.kernel.org, aris@redhat.com, linux-kernel@vger.kernel.org, torvalds@linux-foundation.org
 
-On Wed, Sep 08, 2010 at 01:55:53PM +0200, Michal Marek wrote:
-> I found that when running make oldnoconfig on the kconfig branch of
-> kbuild.git (which is currently a 2.6.35 + kconfig changes) against a
-> 2.6.35-rc1 x86_64 defconfig, it mysteriously switches from
-> CONFIG_KERNEL_GZIP=y to CONFIG_KERNEL_LZO=y. With Kyle's patch it
-> doesn't do this. I applied the patch now.
+On 8.10.2010 16:36, Kyle McMartin wrote:
+> On Wed, Sep 08, 2010 at 01:55:53PM +0200, Michal Marek wrote:
+>> I found that when running make oldnoconfig on the kconfig branch of
+>> kbuild.git (which is currently a 2.6.35 + kconfig changes) against a
+>> 2.6.35-rc1 x86_64 defconfig, it mysteriously switches from
+>> CONFIG_KERNEL_GZIP=y to CONFIG_KERNEL_LZO=y. With Kyle's patch it
+>> doesn't do this. I applied the patch now.
+>>
 > 
+> Hi Michal,
+> 
+> Can we get this sent to Linus before 2.6.36? It would be awkward to
+> release 2.6.36 with oldnoconfig working the broken way, and then patch
+> it after release.
 
-Hi Michal,
+Oh, sorry, I didn't realize that this is a regression from 2.6.35 and
+applied it to the kconfig branch, which is part of for-next. I'll try to
+send a pull request with this patch and two other later today, but I
+don't know if Linus is going to accept it.
 
-Can we get this sent to Linus before 2.6.36? It would be awkward to
-release 2.6.36 with oldnoconfig working the broken way, and then patch
-it after release.
-
---Kyle
+Michal
