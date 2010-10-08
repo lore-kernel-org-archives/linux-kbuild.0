@@ -1,38 +1,78 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wy0-f174.google.com ([74.125.82.174]:45617 "EHLO
-	mail-wy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756333Ab0JHIz2 (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 8 Oct 2010 04:55:28 -0400
-Date: Fri, 8 Oct 2010 10:55:09 +0200
-From: Dan Carpenter <error27@gmail.com>
-Subject: Re: [PATCH 00/33] Staging: Fixed <module-objs> to <module>-y
-Message-ID: <20101008085508.GG11681@bicker>
-References: <AANLkTi=Hc2eWzOQ_xKBYsqfwkkiKGU0v42jUhLQ8K7dU@mail.gmail.com> <AANLkTinynZj9bYFAyfRTF2uopmLe6Ls4YGdZPqCAJTpR@mail.gmail.com>
+Received: from cantor2.suse.de ([195.135.220.15]:47651 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752942Ab0JHOER (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 8 Oct 2010 10:04:17 -0400
+Message-ID: <4CAF24DF.4090002@suse.cz>
+Date: Fri, 08 Oct 2010 16:04:15 +0200
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <AANLkTinynZj9bYFAyfRTF2uopmLe6Ls4YGdZPqCAJTpR@mail.gmail.com>
+Subject: Re: [PATCH] Fix LOCALVERSION append plus logic
+References: <1286482732-12087-1-git-send-email-alan.tull@freescale.com>
+In-Reply-To: <1286482732-12087-1-git-send-email-alan.tull@freescale.com>
+Content-Type: text/plain; charset=ISO-8859-2
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: matt mooney <mfmooney@gmail.com>
-Cc: T Dent <tdent48227@gmail.com>, greg@kroah.com, linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org, sam@ravnborg.org, linux-kbuild@vger.kernel.org
+To: alan.tull@freescale.com
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Fri, Oct 08, 2010 at 12:16:35AM -0700, matt mooney wrote:
-> On Thu, Oct 7, 2010 at 6:35 PM, T Dent <tdent48227@gmail.com> wrote:
-> > I patch against the next-20101006 tree.
-> >
-> > The patch series replace use of <module>-objs with <module>-y in the
-> > staging directory.
+On 7.10.2010 22:18, alan.tull@freescale.com wrote:
+> From: Alan Tull <alan.tull@freescale.com>
 > 
-> Commit messages are written in the present tense. You happen to be
-> using two different tenses within the commit message, which is truly
-> odd.
+> This change fixes the logic to do what the comment says
+> when CONFIG_LOCALVERSION_AUTO and CONFIG_LOCALVERSION are
+> both not set.
+> 
+> Also fix a spelling error in the comment.
+> 
+> If the kernel tree is in git, here's the config
+> permutations (with CONFIG_LOCALVERSION_AUTO turned off)
+> and the image name resulting:
+> 
+> CONFIG_LOCALVERSION=""
+> results:
+> patched   :   Linux-2.6.35.3+
 
-Maybe *you* write in the present tense.  Commit messages are important,
-yes, but this in the end we all understood the message fine.  Please
-don't be a jerk.
+That's a result of patching the kernel and thus moving away from the
+v2.6.35.3 tag.
 
-regards,
-dan carpenter
 
+> unpatched :   Linux-2.6.35.3
+> 
+> CONFIG_LOCALVERSION="-something"
+> results:
+> patched   :   Linux-2.6.35.3-something
+> unpatched :   Linux-2.6.35.3-something+
+
+Dunno how you got this, was it really a clean 2.6.35.3?
+
+
+> Signed-off-by: Alan Tull <alan.tull@freescale.com>
+> ---
+>  scripts/setlocalversion |    4 ++--
+>  1 files changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/scripts/setlocalversion b/scripts/setlocalversion
+> index 64a9cb5..4488a33 100755
+> --- a/scripts/setlocalversion
+> +++ b/scripts/setlocalversion
+> @@ -160,9 +160,9 @@ if test "$CONFIG_LOCALVERSION_AUTO" = "y"; then
+>  	# full scm version string
+>  	res="$res$(scm_version)"
+>  else
+> -	# apped a plus sign if the repository is not in a clean tagged
+> +	# append a plus sign if the repository is not in a clean tagged
+>  	# state and  LOCALVERSION= is not specified
+> -	if test "${LOCALVERSION+set}" != "set"; then
+> +	if test "$CONFIG_LOCALVERSION" = ""; then
+>  		scm=$(scm_version --short)
+>  		res="$res${scm:++}"
+>  	fi
+
+CONFIG_LOCALVERSION does not play any role here, the documented way to
+disable the plus sign is the LOCALVERSION environment or make variable:
+
+make LOCALVERSION= all
+
+Michal
