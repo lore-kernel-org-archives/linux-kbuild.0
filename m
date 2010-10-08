@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-iw0-f174.google.com ([209.85.214.174]:55788 "EHLO
+Received: from mail-iw0-f174.google.com ([209.85.214.174]:34703 "EHLO
 	mail-iw0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756435Ab0JHACl (ORCPT
+	with ESMTP id S1756701Ab0JHACs (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 7 Oct 2010 20:02:41 -0400
+	Thu, 7 Oct 2010 20:02:48 -0400
 From: Tracey Dent <tdent48227@gmail.com>
-Subject: [PATCH 28/33] Staging: tm6000: Makefile: replace the use of <module>-objs with <module>-y
-Date: Thu,  7 Oct 2010 20:01:48 -0400
-Message-Id: <1286496113-11897-28-git-send-email-tdent48227@gmail.com>
+Subject: [PATCH 33/33] Staging: zram: Makefile: replace the use of <module>-objs with <module>-y
+Date: Thu,  7 Oct 2010 20:01:53 -0400
+Message-Id: <1286496113-11897-33-git-send-email-tdent48227@gmail.com>
 In-Reply-To: <1286496113-11897-1-git-send-email-tdent48227@gmail.com>
 References: <1286496113-11897-1-git-send-email-tdent48227@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -19,19 +19,18 @@ Changed <module>-objs to <module>-y in Makefile.
 
 Signed-off-by: Tracey Dent <tdent48227@gmail.com>
 ---
- drivers/staging/tm6000/Makefile |    2 +-
+ drivers/staging/zram/Makefile |    2 +-
  1 files changed, 1 insertions(+), 1 deletions(-)
 
-diff --git a/drivers/staging/tm6000/Makefile b/drivers/staging/tm6000/Makefile
-index d8ccdaa..395515b 100644
---- a/drivers/staging/tm6000/Makefile
-+++ b/drivers/staging/tm6000/Makefile
-@@ -1,4 +1,4 @@
--tm6000-objs := tm6000-cards.o \
-+tm6000-y := tm6000-cards.o \
- 		   tm6000-core.o  \
- 		   tm6000-i2c.o   \
- 		   tm6000-video.o \
+diff --git a/drivers/staging/zram/Makefile b/drivers/staging/zram/Makefile
+index c01160a..b1709c5 100644
+--- a/drivers/staging/zram/Makefile
++++ b/drivers/staging/zram/Makefile
+@@ -1,3 +1,3 @@
+-zram-objs	:=	zram_drv.o zram_sysfs.o xvmalloc.o
++zram-y	:=	zram_drv.o zram_sysfs.o xvmalloc.o
+ 
+ obj-$(CONFIG_ZRAM)	+=	zram.o
 -- 
 1.7.3.1.50.g1e633
 
