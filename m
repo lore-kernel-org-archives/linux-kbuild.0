@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
 Received: from mail-iw0-f174.google.com ([209.85.214.174]:59236 "EHLO
 	mail-iw0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755338Ab0JHACS (ORCPT
+	with ESMTP id S1754978Ab0JHACM (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 7 Oct 2010 20:02:18 -0400
+	Thu, 7 Oct 2010 20:02:12 -0400
 From: Tracey Dent <tdent48227@gmail.com>
-Subject: [PATCH 13/33] Staging: hv: Makefile: replace the use of <module>-objs with <module>-y
-Date: Thu,  7 Oct 2010 20:01:33 -0400
-Message-Id: <1286496113-11897-13-git-send-email-tdent48227@gmail.com>
+Subject: [PATCH 09/33] Staging: go7007: Makefile: makefile cleanup
+Date: Thu,  7 Oct 2010 20:01:29 -0400
+Message-Id: <1286496113-11897-9-git-send-email-tdent48227@gmail.com>
 In-Reply-To: <1286496113-11897-1-git-send-email-tdent48227@gmail.com>
 References: <1286496113-11897-1-git-send-email-tdent48227@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,31 +15,42 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: greg@kroah.com
 Cc: linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org, sam@ravnborg.org, linux-kbuild@vger.kernel.org, Tracey Dent <tdent48227@gmail.com>
 
-Changed <module>-objs to <module>-y in Makefile.
+Changed <module>-objs to <module>-y in Makefile. Also, Replace EXTRA_CFLAGS with ccflags-y
 
 Signed-off-by: Tracey Dent <tdent48227@gmail.com>
 ---
- drivers/staging/hv/Makefile |    8 ++++----
- 1 files changed, 4 insertions(+), 4 deletions(-)
+ drivers/staging/go7007/Makefile |   10 +++++-----
+ 1 files changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/staging/hv/Makefile b/drivers/staging/hv/Makefile
-index b63515c..cd1c43a 100644
---- a/drivers/staging/hv/Makefile
-+++ b/drivers/staging/hv/Makefile
-@@ -4,9 +4,9 @@ obj-$(CONFIG_HYPERV_BLOCK)	+= hv_blkvsc.o
- obj-$(CONFIG_HYPERV_NET)	+= hv_netvsc.o
- obj-$(CONFIG_HYPERV_UTILS)	+= hv_utils.o
+diff --git a/drivers/staging/go7007/Makefile b/drivers/staging/go7007/Makefile
+index d37b7ed..60a9185 100644
+--- a/drivers/staging/go7007/Makefile
++++ b/drivers/staging/go7007/Makefile
+@@ -14,10 +14,10 @@ obj-$(CONFIG_VIDEO_GO7007_UDA1342) += wis-uda1342.o
+ obj-$(CONFIG_VIDEO_GO7007_SONY_TUNER) += wis-sony-tuner.o
+ obj-$(CONFIG_VIDEO_GO7007_TW2804) += wis-tw2804.o
  
--hv_vmbus-objs := vmbus_drv.o osd.o \
-+hv_vmbus-y := vmbus_drv.o osd.o \
- 		 vmbus.o hv.o connection.o channel.o \
- 		 channel_mgmt.o channel_interface.o ring_buffer.o
--hv_storvsc-objs := storvsc_drv.o storvsc.o
--hv_blkvsc-objs := blkvsc_drv.o blkvsc.o
--hv_netvsc-objs := netvsc_drv.o netvsc.o rndis_filter.o
-+hv_storvsc-y := storvsc_drv.o storvsc.o
-+hv_blkvsc-y := blkvsc_drv.o blkvsc.o
-+hv_netvsc-y := netvsc_drv.o netvsc.o rndis_filter.o
+-go7007-objs += go7007-v4l2.o go7007-driver.o go7007-i2c.o go7007-fw.o \
++go7007-y := go7007-v4l2.o go7007-driver.o go7007-i2c.o go7007-fw.o \
+ 		snd-go7007.o
+ 
+-s2250-objs += s2250-board.o
++s2250-y := s2250-board.o
+ 
+ # Uncomment when the saa7134 patches get into upstream
+ #ifneq ($(CONFIG_VIDEO_SAA7134),)
+@@ -27,8 +27,8 @@ s2250-objs += s2250-board.o
+ 
+ # S2250 needs cypress ezusb loader from dvb-usb
+ ifneq ($(CONFIG_VIDEO_GO7007_USB_S2250_BOARD),)
+-EXTRA_CFLAGS += -Idrivers/media/dvb/dvb-usb
++ccflags-y := -Idrivers/media/dvb/dvb-usb
+ endif
+ 
+-EXTRA_CFLAGS += -Idrivers/media/dvb/frontends
+-EXTRA_CFLAGS += -Idrivers/media/dvb/dvb-core
++ccflags-y += -Idrivers/media/dvb/frontends
++ccflags-y += -Idrivers/media/dvb/dvb-core
 -- 
 1.7.3.1.50.g1e633
 
