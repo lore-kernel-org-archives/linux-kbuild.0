@@ -1,41 +1,52 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor.suse.de ([195.135.220.2]:34907 "EHLO mx1.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:59314 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1756793Ab0JITik (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 9 Oct 2010 15:38:40 -0400
-Message-ID: <4CB0C49A.7020900@suse.cz>
-Date: Sat, 09 Oct 2010 21:38:02 +0200
+	id S1752756Ab0JIVpf (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 9 Oct 2010 17:45:35 -0400
 From: Michal Marek <mmarek@suse.cz>
-MIME-Version: 1.0
-Subject: Re: [PATCH] kbuild: fix oldnoconfig to do the right thing
-References: <20100901152130.GY2684@bombadil.infradead.org> <20100905061758.GA29547@merkur.ravnborg.org> <20100908115553.GC2617@sepie.suse.cz> <20101008143642.GA24144@bombadil.infradead.org> <4CAF30AE.3040305@suse.cz> <20101008151220.GB24144@bombadil.infradead.org>
-In-Reply-To: <20101008151220.GB24144@bombadil.infradead.org>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+Subject: [PATCH] kconfig: Temporarily disable dependency warnings
+Date: Sat,  9 Oct 2010 23:45:01 +0200
+Message-Id: <1286660701-31557-1-git-send-email-mmarek@suse.cz>
+In-Reply-To: <20101008150343.GF4088@hack>
+References: <20101008150343.GF4088@hack>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Kyle McMartin <kyle@mcmartin.ca>
-Cc: Sam Ravnborg <sam@ravnborg.org>, linux-kbuild@vger.kernel.org, aris@redhat.com, linux-kernel@vger.kernel.org, torvalds@linux-foundation.org
+To: linux-kbuild@vger.kernel.org
+Cc: catalin.marinas@arm.com, sfr@canb.auug.org.au, linux-next@vger.kernel.org, linux-kernel@vger.kernel.org, lacombar@gmail.com, xiyou.wangcong@gmail.com
 
-On 8.10.2010 17:12, Kyle McMartin wrote:
-> On Fri, Oct 08, 2010 at 04:54:38PM +0200, Michal Marek wrote:
->> Oh, sorry, I didn't realize that this is a regression from 2.6.35 and
->> applied it to the kconfig branch, which is part of for-next. I'll try to
->> send a pull request with this patch and two other later today, but I
->> don't know if Linus is going to accept it.
->>
-> 
-> It's not a regression from .35, just trying to avoid unexpected changes
+After fixing a use-after-free bug in kconfig, a 'make defconfig' or
+'make allmodconfig' fills the screen with warnings that were not
+detected before. Given that we are close to the release now, disable the
+warnings temporarily and deal with them after 2.6.36.
 
-Yeah, I meant "bug introduced in 2.6.36-rc1".
+Signed-off-by: Michal Marek <mmarek@suse.cz>
+---
+ scripts/kconfig/symbol.c |    2 ++
+ 1 files changed, 2 insertions(+), 0 deletions(-)
 
+diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
+index 943712c..1f8b305 100644
+--- a/scripts/kconfig/symbol.c
++++ b/scripts/kconfig/symbol.c
+@@ -349,16 +349,18 @@ void sym_calc_value(struct symbol *sym)
+ 							      prop->visible.tri);
+ 				}
+ 			}
+ 		calc_newval:
++#if 0
+ 			if (sym->dir_dep.tri == no && sym->rev_dep.tri != no) {
+ 				fprintf(stderr, "warning: (");
+ 				expr_fprint(sym->rev_dep.expr, stderr);
+ 				fprintf(stderr, ") selects %s which has unmet direct dependencies (",
+ 					sym->name);
+ 				expr_fprint(sym->dir_dep.expr, stderr);
+ 				fprintf(stderr, ")\n");
+ 			}
++#endif
+ 			newval.tri = EXPR_OR(newval.tri, sym->rev_dep.tri);
+ 		}
+ 		if (newval.tri == mod && sym_get_type(sym) == S_BOOLEAN)
+ 			newval.tri = yes;
+-- 
+1.7.1
 
-> to how parts of the build system work after release (which means it
-> could be perceived as a regression from .36 to .37)
-> 
-> IE: Someone begins to expect this behaviour in 2.6.36, and then
->  the patch goes into 2.6.37-rc1, so 2.6.37 behaves differently.
-
-I see.
-
-Michal
