@@ -1,59 +1,61 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:59949 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755753Ab0JIWko (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 9 Oct 2010 18:40:44 -0400
-Date: Sun, 10 Oct 2010 00:40:41 +0200
-From: Michal Marek <mmarek@suse.cz>
-Subject: [GIT] kconfig rc fixes
-Message-ID: <20101009224041.GA901@sepie.suse.cz>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Received: from xenotime.net ([72.52.115.56]:43118 "HELO xenotime.net"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with SMTP
+	id S1751716Ab0JJRTI (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 10 Oct 2010 13:19:08 -0400
+Received: from chimera.site ([173.50.240.230]) by xenotime.net for <linux-kbuild@vger.kernel.org>; Sun, 10 Oct 2010 10:19:04 -0700
+Date: Sun, 10 Oct 2010 10:19:04 -0700
+From: Randy Dunlap <rdunlap@xenotime.net>
+Subject: Re: [Bugme-new] [Bug 19852] New: extract-ikconfig only works with
+ gzip'ed kernel images
+Message-Id: <20101010101904.b20bf9c8.rdunlap@xenotime.net>
+In-Reply-To: <bug-19852-10286@https.bugzilla.kernel.org/>
+References: <bug-19852-10286@https.bugzilla.kernel.org/>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: kyle@redhat.com, lacombar@gmail.com, mmarek@suse.cz, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Dick Streefland <dick@streefland.net>
+Cc: linux-kbuild@vger.kernel.org
 
-Hi Linus,
+On Thu, 7 Oct 2010 17:06:32 GMT bugzilla-daemon@bugzilla.kernel.org wrote:
 
-I have three fixes that should ideally go into 2.6.36:
+Hi Dick,
 
-1) Kyle's make oldnoconfig fix: make oldnoconfig was added and later got
-   broken, all in 2.6.36-rc1.
-2) Arnaud's fix for a crash in kconfig caused by a use-after-free bug.
-   This fix has the unfortunate side effect that most configurations
-   (e.g. make defconfig on x86) start printing warnings several lines
-   long. These warnings are valid, but were not detected before. To
-   avoid receiving tens of reports about this once 2.6.36 is out, I
-   decided to comment out the warnings completely for the final release,
-   as there is not enough time to fix the root causes.
+Please look at this kernel bugzilla entry.
+Thanks.
 
-Please consider for 2.6.36. Or if you are only willing to take either 1)
-or 2), let me know and I'll prepare such branch.
+> https://bugzilla.kernel.org/show_bug.cgi?id=19852
+> 
+>                URL: https://bugs.gentoo.org/show_bug.cgi?id=340021
+>            Summary: extract-ikconfig only works with gzip'ed kernel images
+>            Product: Other
+>            Version: 2.5
+>           Platform: All
+>         OS/Version: Linux
+>               Tree: Mainline
+>             Status: NEW
+>           Severity: normal
+>           Priority: P1
+>          Component: Other
+>         AssignedTo: other_other@kernel-bugs.osdl.org
+>         ReportedBy: jlec@gentoo.org
+>         Regression: No
+> 
+> 
+> When anything else then CONFIG_KERNEL_GZIP is selected e.g.
+> CONFIG_KERNEL_BZIP2, the script extract-ikconfig fails with "extract-ikconfig:
+> Cannot find kernel config."
+> This should be either checked in the script or support for pther compression
+> methods may be nice.
+> 
+> -- 
+> Configure bugmail: https://bugzilla.kernel.org/userprefs.cgi?tab=email
+> ------- You are receiving this mail because: -------
+> You are on the CC list for the bug.
 
-Thanks,
-Michal
 
-
-The following changes since commit cb655d0f3d57c23db51b981648e452988c0223f9:
-
-  Linux 2.6.36-rc7 (2010-10-06 13:39:52 -0700)
-
-are available in the git repository at:
-  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild-2.6.git rc-fixes
-
-Arnaud Lacombe (1):
-      kconfig: delay symbol direct dependency initialization
-
-Kyle McMartin (1):
-      kbuild: fix oldnoconfig to do the right thing
-
-Michal Marek (1):
-      kconfig: Temporarily disable dependency warnings
-
- scripts/kconfig/conf.c   |    2 +-
- scripts/kconfig/expr.h   |    1 -
- scripts/kconfig/menu.c   |    7 ++-----
- scripts/kconfig/symbol.c |    2 ++
- 4 files changed, 5 insertions(+), 7 deletions(-)
+---
+~Randy
+*** Remember to use Documentation/SubmitChecklist when testing your code ***
