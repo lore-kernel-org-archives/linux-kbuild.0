@@ -1,46 +1,44 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor.suse.de ([195.135.220.2]:33193 "EHLO mx1.suse.de"
+Received: from e8.ny.us.ibm.com ([32.97.182.138]:37662 "EHLO e8.ny.us.ibm.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754055Ab0JLNUM (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 12 Oct 2010 09:20:12 -0400
-From: Michal Marek <mmarek@suse.cz>
-Subject: [PATCH] Revert "kconfig: Temporarily disable dependency warnings"
-Date: Tue, 12 Oct 2010 15:19:46 +0200
-Message-Id: <1286889586-13483-1-git-send-email-mmarek@suse.cz>
-In-Reply-To: <20101011145930.11fe570c.randy.dunlap@oracle.com>
-References: <20101011145930.11fe570c.randy.dunlap@oracle.com>
+	id S1751910Ab0JMRkA (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 13 Oct 2010 13:40:00 -0400
+From: Nishanth Aravamudan <nacc@us.ibm.com>
+Subject: [PATCH] scripts/package: don't break if %{_smp_mflags} isn't set
+Date: Wed, 13 Oct 2010 10:39:45 -0700
+Message-Id: <1286991585-4099-1-git-send-email-nacc@us.ibm.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: randy.dunlap@oracle.com
-Cc: catalin.marinas@arm.com, linux-kbuild@vger.kernel.org, sfr@canb.auug.org.au, linux-next@vger.kernel.org, linux-kernel@vger.kernel.org, lacombar@gmail.com, xiyou.wangcong@gmail.com
+To: nacc@us.ibm.com
+Cc: jk@ozlabs.org, elendil@planet.nl, Michal Marek <mmarek@suse.cz>, Gilles Espinasse <g.esp@free.fr>, Jiri Kosina <jkosina@suse.cz>, John Saalwaechter <saalwaechter@gmail.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-This reverts commit 71ebc01, which was a 2.6.36-only stopgap solution.
+Same fix as in 13797b77d419fc1b16eebf2993bf7b5cea65f0bf is needed for the "new"
+line invoking _smp_mflags for modules_install. Without the fix, `make
+binrpm-pkg` fails with:
 
-Signed-off-by: Michal Marek <mmarek@suse.cz>
++ make '%{_smp_mflags}' KBUILD_SRC= modules_install
+make[2]: warning: jobserver unavailable: using -j1.  Add `+' to parent make rule.
+make[2]: *** No rule to make target `%{_smp_mflags}'.  Stop.
+error: Bad exit status from /var/tmp/rpm-tmp.8S9B9e (%install)
+
+Signed-off-by: Nishanth Aravamudan <nacc@us.ibm.com>
 ---
- scripts/kconfig/symbol.c |    2 --
- 1 files changed, 0 insertions(+), 2 deletions(-)
+ scripts/package/mkspec |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
-index cb00568..c0efe10 100644
---- a/scripts/kconfig/symbol.c
-+++ b/scripts/kconfig/symbol.c
-@@ -350,7 +350,6 @@ void sym_calc_value(struct symbol *sym)
- 				}
- 			}
- 		calc_newval:
--#if 0
- 			if (sym->dir_dep.tri == no && sym->rev_dep.tri != no) {
- 				fprintf(stderr, "warning: (");
- 				expr_fprint(sym->rev_dep.expr, stderr);
-@@ -359,7 +358,6 @@ void sym_calc_value(struct symbol *sym)
- 				expr_fprint(sym->dir_dep.expr, stderr);
- 				fprintf(stderr, ")\n");
- 			}
--#endif
- 			newval.tri = EXPR_OR(newval.tri, sym->rev_dep.tri);
- 		}
- 		if (newval.tri == mod && sym_get_type(sym) == S_BOOLEAN)
+diff --git a/scripts/package/mkspec b/scripts/package/mkspec
+index 15440f5..e1c1d5b 100755
+--- a/scripts/package/mkspec
++++ b/scripts/package/mkspec
+@@ -70,7 +70,7 @@ echo 'mkdir -p $RPM_BUILD_ROOT/boot $RPM_BUILD_ROOT/lib/modules'
+ echo 'mkdir -p $RPM_BUILD_ROOT/lib/firmware'
+ echo "%endif"
+ 
+-echo 'INSTALL_MOD_PATH=$RPM_BUILD_ROOT make %{_smp_mflags} KBUILD_SRC= modules_install'
++echo 'INSTALL_MOD_PATH=$RPM_BUILD_ROOT make %{?_smp_mflags} KBUILD_SRC= modules_install'
+ echo "%ifarch ia64"
+ echo 'cp $KBUILD_IMAGE $RPM_BUILD_ROOT'"/boot/efi/vmlinuz-$KERNELRELEASE"
+ echo 'ln -s '"efi/vmlinuz-$KERNELRELEASE" '$RPM_BUILD_ROOT'"/boot/"
 -- 
 1.7.1
 
