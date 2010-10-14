@@ -1,124 +1,68 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from hrndva-omtalb.mail.rr.com ([71.74.56.125]:42948 "EHLO
-	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755919Ab0JNVBi (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 14 Oct 2010 17:01:38 -0400
-Message-Id: <20101014210136.230687571@goodmis.org>
-Date: Thu, 14 Oct 2010 17:00:16 -0400
-From: Steven Rostedt <rostedt@goodmis.org>
-Subject: [PATCH 2/3] ftrace/x86: Add support for C version of recordmcount
-References: <20101014210014.895157788@goodmis.org>
-Content-Disposition: inline; filename=0002-ftrace-x86-Add-support-for-C-version-of-recordmcount.patch
+Received: from cantor2.suse.de ([195.135.220.15]:56591 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1755691Ab0JNVho (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 14 Oct 2010 17:37:44 -0400
+Message-ID: <4CB7781D.80103@suse.cz>
+Date: Thu, 14 Oct 2010 23:37:33 +0200
+From: Michal Marek <mmarek@suse.cz>
+MIME-Version: 1.0
+Subject: Re: [RFC PATCH net-next] drivers/net Documentation/networking: Create
+ directory intel_wired_lan
+References: <1286743352.11039.165.camel@Joe-Laptop>	 <AANLkTikVKufQRuMGd=cdig7ff4k2aw9Q1FWwMz3pgon-@mail.gmail.com>	 <1286841648.26045.17.camel@Joe-Laptop>	 <1287008906.1117.428.camel@Joe-Laptop>	 <1287032255.4113.14.camel@jtkirshe-MOBL1>	 <1287035857.1117.528.camel@Joe-Laptop>	 <1287048849.3319.20.camel@jtkirshe-MOBL1> <1287084643.1117.602.camel@Joe-Laptop>
+In-Reply-To: <1287084643.1117.602.camel@Joe-Laptop>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: Ingo Molnar <mingo@elte.hu>, Andrew Morton <akpm@linux-foundation.org>, Frederic Weisbecker <fweisbec@gmail.com>, linux-arch@vger.kernel.org, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, John Reiser <jreiser@bitwagon.com>
+To: Joe Perches <joe@perches.com>
+Cc: jeffrey.t.kirsher@intel.com, Sam Ravnborg <sam@ravnborg.org>, linux-kbuild@vger.kernel.org, "Brandeburg, Jesse" <jesse.brandeburg@intel.com>, "Allan, Bruce W" <bruce.w.allan@intel.com>, "Wyborny, Carolyn" <carolyn.wyborny@intel.com>, "Skidmore, Donald C" <donald.c.skidmore@intel.com>, "Rose, Gregory V" <gregory.v.rose@intel.com>, "Waskiewicz Jr, Peter P" <peter.p.waskiewicz.jr@intel.com>, "Duyck, Alexander H" <alexander.h.duyck@intel.com>, "Ronciak, John" <john.ronciak@intel.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, e1000-devel <e1000-devel@lists.sourceforge.net>
 
-From: Steven Rostedt <srostedt@redhat.com>
+On 14.10.2010 21:30, Joe Perches wrote:
+> On Thu, 2010-10-14 at 02:34 -0700, Jeff Kirsher wrote:
+>> On Wed, 2010-10-13 at 22:57 -0700, Joe Perches wrote:
+>>> On Wed, 2010-10-13 at 21:57 -0700, Jeff Kirsher wrote:
+>>>> On Wed, 2010-10-13 at 15:28 -0700, Joe Perches wrote:
+>>>> Sorry I am not ignoring you, I was taking a closer look at your patch.
+>>>>> What regression testing would actually be done?
+>>>> The Makefile and Kconfig needs more work.  I applied your patch and none
+>>>> of the Intel Wired drivers build.
+>>> Care to describe the Makefile/Kconfig issues you have seen?
+>>> I built it allyesconfig, defconfig, allmodconfig and allnoconfig.
+>> Yeah, I found all of those built without errors, but if you build the
+>> Intel Wired LAN drivers as modules, you will not find the *.ko files
+>> after the build.  The Kconfig files look fine, the problem was with the
+>> Makefiles.  Instead of creating a drivers/net/intel_wired_lan/Makefile,
+>> I simply changed the path in drivers/net/Makefile to the updated path
+>> and that resolved the issue.
+> 
+> (adding a few cc's and a link for history)
+> 
+> http://lkml.org/lkml/2010/10/10/207
+> 
+> That's the way I had done it originally as well, but I found
+> you couldn't build the directory with:
+> 
+> 	make drivers/net/intel_wired_lan/
+> 
+> so I created a Makefile in the new directory below with
+> the elements necessary.
+> 
+> Perhaps there's some missing functionality in the build system
+> when the Kconfig file resides in a higher directory and the
+> directory being built doesn't have a Kconfig file?
 
-This patch adds the support for the C version of recordmcount and
-compile times show ~ 12% improvement.
-
-After verifying this works, other archs can add:
-
- HAVE_C_MCOUNT_RECORD
-
-in its Kconfig and it will use the C version of recordmcount
-instead of the perl version.
-
-Cc: <linux-arch@vger.kernel.org>
-Cc: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org
-Cc: John Reiser <jreiser@bitwagon.com>
-Signed-off-by: Steven Rostedt <rostedt@goodmis.org>
----
- Makefile               |    6 ++++++
- arch/x86/Kconfig       |    1 +
- kernel/trace/Kconfig   |    5 +++++
- scripts/Makefile       |    1 +
- scripts/Makefile.build |    4 ++++
- 5 files changed, 17 insertions(+), 0 deletions(-)
-
-diff --git a/Makefile b/Makefile
-index 534c09c..0dd3a8d 100644
---- a/Makefile
-+++ b/Makefile
-@@ -568,6 +568,12 @@ endif
- 
- ifdef CONFIG_FUNCTION_TRACER
- KBUILD_CFLAGS	+= -pg
-+ifdef CONFIG_DYNAMIC_FTRACE
-+	ifdef CONFIG_HAVE_C_MCOUNT_RECORD
-+		BUILD_C_RECORDMCOUNT := y
-+		export BUILD_C_RECORDMCOUNT
-+	endif
-+endif
- endif
- 
- # We trigger additional mismatches with less inlining
-diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
-index c14d8b4..788b50e 100644
---- a/arch/x86/Kconfig
-+++ b/arch/x86/Kconfig
-@@ -33,6 +33,7 @@ config X86
- 	select HAVE_KRETPROBES
- 	select HAVE_OPTPROBES
- 	select HAVE_FTRACE_MCOUNT_RECORD
-+	select HAVE_C_MCOUNT_RECORD
- 	select HAVE_DYNAMIC_FTRACE
- 	select HAVE_FUNCTION_TRACER
- 	select HAVE_FUNCTION_GRAPH_TRACER
-diff --git a/kernel/trace/Kconfig b/kernel/trace/Kconfig
-index 538501c..df00fbb 100644
---- a/kernel/trace/Kconfig
-+++ b/kernel/trace/Kconfig
-@@ -49,6 +49,11 @@ config HAVE_SYSCALL_TRACEPOINTS
- 	help
- 	  See Documentation/trace/ftrace-design.txt
- 
-+config HAVE_C_MCOUNT_RECORD
-+	bool
-+	help
-+	  C version of recordmcount available?
-+
- config TRACER_MAX_TRACE
- 	bool
- 
-diff --git a/scripts/Makefile b/scripts/Makefile
-index 842dbc2..2e08810 100644
---- a/scripts/Makefile
-+++ b/scripts/Makefile
-@@ -11,6 +11,7 @@ hostprogs-$(CONFIG_KALLSYMS)     += kallsyms
- hostprogs-$(CONFIG_LOGO)         += pnmtologo
- hostprogs-$(CONFIG_VT)           += conmakehash
- hostprogs-$(CONFIG_IKCONFIG)     += bin2c
-+hostprogs-$(BUILD_C_RECORDMCOUNT) += recordmcount
- 
- always		:= $(hostprogs-y) $(hostprogs-m)
- 
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index a1a5cf9..4d03a7e 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -209,12 +209,16 @@ cmd_modversions =								\
- endif
- 
- ifdef CONFIG_FTRACE_MCOUNT_RECORD
-+ifdef BUILD_C_RECORDMCOUNT
-+cmd_record_mcount = $(srctree)/scripts/recordmcount "$(@)";
-+else
- cmd_record_mcount = set -e ; perl $(srctree)/scripts/recordmcount.pl "$(ARCH)" \
- 	"$(if $(CONFIG_CPU_BIG_ENDIAN),big,little)" \
- 	"$(if $(CONFIG_64BIT),64,32)" \
- 	"$(OBJDUMP)" "$(OBJCOPY)" "$(CC)" "$(LD)" "$(NM)" "$(RM)" "$(MV)" \
- 	"$(if $(part-of-module),1,0)" "$(@)";
- endif
-+endif
- 
- define rule_cc_o_c
- 	$(call echo-cmd,checksrc) $(cmd_checksrc)			  \
--- 
-1.7.1
+This has nothing to do with Kconfig files, I assume you meant Makefiles.
 
 
+> I think it'd wrong to duplicate the makefile components in
+> 2 places to allow "make subdir/" and I wonder if there's a
+> good solution for this.
+
+There is no duplication needed, drivers/net/Makefile needs to contain
+obj-y += intel_wired_lan/ and drivers/net/intel_wired_lan/Makefile
+similar lines for its subdirs. I see your original patch was lacking an
+entry in drivers/net/Makefile, so perhaps that was the problem Jeff was
+seeing?
+
+Michal
