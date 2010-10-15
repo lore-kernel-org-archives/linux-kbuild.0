@@ -1,47 +1,62 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from hrndva-omtalb.mail.rr.com ([71.74.56.123]:33440 "EHLO
-	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756382Ab0JOQOL (ORCPT
+Received: from mail-bw0-f46.google.com ([209.85.214.46]:51238 "EHLO
+	mail-bw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753667Ab0JPS5x (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 15 Oct 2010 12:14:11 -0400
-Message-Id: <20101015161409.316533201@goodmis.org>
-Date: Fri, 15 Oct 2010 12:13:36 -0400
-From: Steven Rostedt <rostedt@goodmis.org>
-Subject: [PATCH 2/2] ftrace: Use objtree for C version of recordmcount
-References: <20101015161334.766423984@goodmis.org>
-Content-Disposition: inline; filename=0002-ftrace-Use-objtree-for-C-version-of-recordmcount.patch
+	Sat, 16 Oct 2010 14:57:53 -0400
+Received: by bwz15 with SMTP id 15so1911337bwz.19
+        for <linux-kbuild@vger.kernel.org>; Sat, 16 Oct 2010 11:57:36 -0700 (PDT)
+MIME-Version: 1.0
+Date: Fri, 15 Oct 2010 13:54:51 +0300
+Message-ID: <AANLkTinjZOS+n6RfdshXdOk7uN4neEKPitT12srK1GsF@mail.gmail.com>
+Subject: kconfig issue with 'choice' and defconfigs
+From: Felipe Contreras <felipe.contreras@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: Ingo Molnar <mingo@elte.hu>, Andrew Morton <akpm@linux-foundation.org>, Frederic Weisbecker <fweisbec@gmail.com>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
-
-From: Steven Rostedt <srostedt@redhat.com>
-
-The C version of recordmcount is compiled to a binary, which will
-end up located in the objtree. If the kernel is built with O=path,
-the srctree will not include the binary recordmcount caller.
-
+To: linux-kbuild@vger.kernel.org
 Cc: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org
-Signed-off-by: Steven Rostedt <rostedt@goodmis.org>
+
+Hi,
+
+I noticed this when playing with USB (USB_GADGET_MUSB_HDRC), basically
+anything 'choice' related doesn't play nice with defconfigs.
+
+Any ideas?
+
+./scripts/kconfig/conf --defconfig=/dev/null testconfig
+
+testconfig:
 ---
- scripts/Makefile.build |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+config FRIEND
+	bool
+	select MARK
+	default y
 
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index 4d03a7e..4db60b2 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -210,7 +210,7 @@ endif
- 
- ifdef CONFIG_FTRACE_MCOUNT_RECORD
- ifdef BUILD_C_RECORDMCOUNT
--cmd_record_mcount = $(srctree)/scripts/recordmcount "$(@)";
-+cmd_record_mcount = $(objtree)/scripts/recordmcount "$(@)";
- else
- cmd_record_mcount = set -e ; perl $(srctree)/scripts/recordmcount.pl "$(ARCH)" \
- 	"$(if $(CONFIG_CPU_BIG_ENDIAN),big,little)" \
+choice
+	prompt "pick one"
+
+config NOONE
+	bool "no one"
+
+config JOHN
+	bool "john"
+
+config JOHNJR
+	tristate
+	depends on JOHN
+	default FRIEND
+
+config MARK
+	bool "mark"
+
+endchoice
+---
+
+CONFIG_FRIEND=y
+CONFIG_NOONE=y
+# CONFIG_JOHN is not set
+# CONFIG_MARK is not set
+
 -- 
-1.7.1
-
-
+Felipe Contreras
