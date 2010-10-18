@@ -1,87 +1,54 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from hrndva-omtalb.mail.rr.com ([71.74.56.122]:39060 "EHLO
-	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S933126Ab0JRV0z (ORCPT
+Received: from smtp1.linux-foundation.org ([140.211.169.13]:37420 "EHLO
+	smtp1.linux-foundation.org" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1755118Ab0JRXjt (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 18 Oct 2010 17:26:55 -0400
-Subject: [PATCH v2][GIT PULL] ftrace: Remove recursion between recordmcount
- and scripts/mod/empty
-From: Steven Rostedt <rostedt@goodmis.org>
-Content-Type: text/plain; charset="ISO-8859-15"
-Date: Mon, 18 Oct 2010 17:26:53 -0400
-Message-ID: <1287437213.16971.333.camel@gandalf.stny.rr.com>
+	Mon, 18 Oct 2010 19:39:49 -0400
+Date: Mon, 18 Oct 2010 16:39:35 -0700
+From: Andrew Morton <akpm@linux-foundation.org>
+Subject: Re: [PATCH v2][GIT PULL] ftrace: Remove recursion between
+ recordmcount and scripts/mod/empty
+Message-Id: <20101018163935.48260a13.akpm@linux-foundation.org>
+In-Reply-To: <1287437213.16971.333.camel@gandalf.stny.rr.com>
+References: <1287437213.16971.333.camel@gandalf.stny.rr.com>
 Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: LKML <linux-kernel@vger.kernel.org>
-Cc: Ingo Molnar <mingo@elte.hu>, Andrew Morton <akpm@linux-foundation.org>, Frederic Weisbecker <fweisbec@gmail.com>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <mmarek@suse.cz>, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: Steven Rostedt <rostedt@goodmis.org>
+Cc: LKML <linux-kernel@vger.kernel.org>, Ingo Molnar <mingo@elte.hu>, Frederic Weisbecker <fweisbec@gmail.com>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <mmarek@suse.cz>, linux-kbuild <linux-kbuild@vger.kernel.org>
 
+On Mon, 18 Oct 2010 17:26:53 -0400
+Steven Rostedt <rostedt@goodmis.org> wrote:
 
-Ingo,
+> Please pull the latest tip/perf/recordmcount-2 tree
 
-Please pull the latest tip/perf/recordmcount-2 tree, which can be found at:
+Today's linux-next has some problems.
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/rostedt/linux-2.6-trace.git
-tip/perf/recordmcount-2
+make mrproper
+make allmodconfig
+make
 
+  CHK     include/linux/version.h
+  UPD     include/linux/version.h
+  CHK     include/generated/utsrelease.h
+  UPD     include/generated/utsrelease.h
+  CC      kernel/bounds.s
+  GEN     include/generated/bounds.h
+  CC      arch/x86/kernel/asm-offsets.s
+  GEN     include/generated/asm-offsets.h
+  CALL    scripts/checksyscalls.sh
+  HOSTCC  scripts/genksyms/genksyms.o
+  SHIPPED scripts/genksyms/lex.c
+  SHIPPED scripts/genksyms/parse.h
+  SHIPPED scripts/genksyms/keywords.c
+  HOSTCC  scripts/genksyms/lex.o
+  SHIPPED scripts/genksyms/parse.c
+  HOSTCC  scripts/genksyms/parse.o
+  HOSTLD  scripts/genksyms/genksyms
+  CC      scripts/mod/empty.o
+/bin/sh: /usr/src/25/scripts/recordmcount: No such file or directory
 
-Steven Rostedt (1):
-      ftrace: Remove recursion between recordmcount and scripts/mod/empty
-
-----
- scripts/Makefile.build |    8 +++++++-
- 1 files changed, 7 insertions(+), 1 deletions(-)
----------------------------
-commit d7b4d6de57d414a6384376880f2caf7125a45494
-Author: Steven Rostedt <srostedt@redhat.com>
-Date:   Mon Oct 18 14:42:00 2010 -0400
-
-    ftrace: Remove recursion between recordmcount and scripts/mod/empty
-    
-    When DYNAMIC_FTRACE is enabled and we use the C version of recordmcount,
-    all objects are run through the recordmcount program to create a
-    separate section that stores all the callers of mcount.
-    
-    The build process has a special file: scripts/mod/empty.o. This is
-    built from empty.c which is literally an empty file (except for a
-    single comment). This file is used to find information about the target
-    elf format, like endianness and word size.
-    
-    The problem comes up when we need to build recordmcount. The
-    build process requires that empty.o is built first. The build rules
-    for empty.o will try to execute recordmcount on the empty.o file.
-    We get an error that recordmcount does not exist.
-    
-    To avoid this recursion, the build file will skip running recordmcount
-    if the file that it is building is script/mod/empty.o.
-    
-    [ extra comment Suggested-by: Sam Ravnborg <sam@ravnborg.org> ]
-    
-    Reported-by: Ingo Molnar <mingo@elte.hu>
-    Tested-by: Ingo Molnar <mingo@elte.hu>
-    Cc: Michal Marek <mmarek@suse.cz>
-    Cc: linux-kbuild@vger.kernel.org
-    Signed-off-by: Steven Rostedt <rostedt@goodmis.org>
-
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index 4db60b2..843bd4f 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -210,7 +210,13 @@ endif
- 
- ifdef CONFIG_FTRACE_MCOUNT_RECORD
- ifdef BUILD_C_RECORDMCOUNT
--cmd_record_mcount = $(objtree)/scripts/recordmcount "$(@)";
-+# Due to recursion, we must skip empty.o.
-+# The empty.o file is created in the make process in order to determine
-+#  the target endianness and word size. It is made before all other C
-+#  files, including recordmcount.
-+cmd_record_mcount = if [ $(@) != "scripts/mod/empty.o" ]; then			\
-+			$(objtree)/scripts/recordmcount "$(@)";			\
-+		    fi;
- else
- cmd_record_mcount = set -e ; perl $(srctree)/scripts/recordmcount.pl "$(ARCH)" \
- 	"$(if $(CONFIG_CPU_BIG_ENDIAN),big,little)" \
-
-
+If you run `make' a few times, scritps/recordmcount eventually turns
+up and the build runs OK.  Some ordering thing or a race or whatever?
