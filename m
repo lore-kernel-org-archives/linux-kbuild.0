@@ -1,15 +1,17 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from hrndva-omtalb.mail.rr.com ([71.74.56.124]:61192 "EHLO
+Received: from hrndva-omtalb.mail.rr.com ([71.74.56.122]:37186 "EHLO
 	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755694Ab0JRSxQ (ORCPT
+	with ESMTP id S1754457Ab0JRTN2 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 18 Oct 2010 14:53:16 -0400
-Subject: [PATCH][GIT PULL] ftrace: Remove recursion between recordmcount
- and scripts/mod/empty
+	Mon, 18 Oct 2010 15:13:28 -0400
+Subject: [RFC] better fix? (was: Re: [PATCH][GIT PULL] ftrace: Remove
+ recursion between recordmcount and scripts/mod/empty)
 From: Steven Rostedt <rostedt@goodmis.org>
+In-Reply-To: <1287427989.16971.304.camel@gandalf.stny.rr.com>
+References: <1287427989.16971.304.camel@gandalf.stny.rr.com>
 Content-Type: text/plain; charset="ISO-8859-15"
-Date: Mon, 18 Oct 2010 14:53:09 -0400
-Message-ID: <1287427989.16971.304.camel@gandalf.stny.rr.com>
+Date: Mon, 18 Oct 2010 15:13:26 -0400
+Message-ID: <1287429206.16971.325.camel@gandalf.stny.rr.com>
 Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -17,69 +19,77 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: LKML <linux-kernel@vger.kernel.org>
 Cc: Ingo Molnar <mingo@elte.hu>, Frederic Weisbecker <fweisbec@gmail.com>, Andrew Morton <akpm@linux-foundation.org>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>
 
+On Mon, 2010-10-18 at 14:53 -0400, Steven Rostedt wrote:
 
-Ingo,
+Just calling attention to this...
 
-Please pull the latest tip/perf/recordmcount tree, which can be found at:
+> diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+> index 4db60b2..9f2d5b4 100644
+> --- a/scripts/Makefile.build
+> +++ b/scripts/Makefile.build
+> @@ -210,7 +210,11 @@ endif
+>  
+>  ifdef CONFIG_FTRACE_MCOUNT_RECORD
+>  ifdef BUILD_C_RECORDMCOUNT
+> -cmd_record_mcount = $(objtree)/scripts/recordmcount "$(@)";
+> +# Due to recursion, we must skip the empty.o file
+> +#  TBD: Find a better way to do this.
+> +cmd_record_mcount = if [ $(@) != "scripts/mod/empty.o" ]; then			\
+> +			$(objtree)/scripts/recordmcount "$(@)";			\
+> +		    fi;
+>  else
+>  cmd_record_mcount = set -e ; perl $(srctree)/scripts/recordmcount.pl "$(ARCH)" \
+>  	"$(if $(CONFIG_CPU_BIG_ENDIAN),big,little)" \
+> 
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/rostedt/linux-2.6-trace.git
-tip/perf/recordmcount
+This is pretty much a hack, would adding a patch like the following be a
+better idea?
 
-
-Steven Rostedt (1):
-      ftrace: Remove recursion between recordmcount and scripts/mod/empty
-
-----
- scripts/Makefile.build |    6 +++++-
- 1 files changed, 5 insertions(+), 1 deletions(-)
----------------------------
-commit 0ae78b8f70eccd69febf70c688d15ae1253303e0
-Author: Steven Rostedt <srostedt@redhat.com>
-Date:   Mon Oct 18 14:42:00 2010 -0400
-
-    ftrace: Remove recursion between recordmcount and scripts/mod/empty
-    
-    When DYNAMIC_FTRACE is enabled and we use the C version of recordmcount,
-    all objects are run through the recordmcount program to create a
-    separate section that stores all the callers of mcount.
-    
-    The build process has a special file: scripts/mod/empty.o. This is
-    built from empty.c which is literally an empty file (except for a
-    single comment). This file is used to find information about the target
-    elf format, like endianness and word size.
-    
-    The problem comes up when we need to build recordmcount. The
-    build process requires that empty.o is built first. The build rules
-    for empty.o will try to execute recordmcount on the empty.o file.
-    We get an error that recordmcount does not exist.
-    
-    To avoid this recursion, the build file will skip running recordmcount
-    if the file that it is building is script/mod/empty.o.
-    
-    Perhaps a new rule is needed, or we may open-code empty.o build.
-    
-    Reported-by: Ingo Molnar <mingo@elte.hu>
-    Tested-by: Ingo Molnar <mingo@elte.hu>
-    Cc: Michal Marek <mmarek@suse.cz>
-    Cc: linux-kbuild@vger.kernel.org
-    Signed-off-by: Steven Rostedt <rostedt@goodmis.org>
+-- Steve
 
 diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index 4db60b2..9f2d5b4 100644
+index 9f2d5b4..86e360a 100644
 --- a/scripts/Makefile.build
 +++ b/scripts/Makefile.build
-@@ -210,7 +210,11 @@ endif
+@@ -210,11 +210,7 @@ endif
  
  ifdef CONFIG_FTRACE_MCOUNT_RECORD
  ifdef BUILD_C_RECORDMCOUNT
--cmd_record_mcount = $(objtree)/scripts/recordmcount "$(@)";
-+# Due to recursion, we must skip the empty.o file
-+#  TBD: Find a better way to do this.
-+cmd_record_mcount = if [ $(@) != "scripts/mod/empty.o" ]; then			\
-+			$(objtree)/scripts/recordmcount "$(@)";			\
-+		    fi;
+-# Due to recursion, we must skip the empty.o file
+-#  TBD: Find a better way to do this.
+-cmd_record_mcount = if [ $(@) != "scripts/mod/empty.o" ]; then			\
+-			$(objtree)/scripts/recordmcount "$(@)";			\
+-		    fi;
++cmd_record_mcount = $(objtree)/scripts/recordmcount "$(@)";
  else
  cmd_record_mcount = set -e ; perl $(srctree)/scripts/recordmcount.pl "$(ARCH)" \
  	"$(if $(CONFIG_CPU_BIG_ENDIAN),big,little)" \
+@@ -236,11 +232,26 @@ define rule_cc_o_c
+ 	mv -f $(dot-target).tmp $(dot-target).cmd
+ endef
+ 
++define rule_cc_o_c_notrace
++	$(call echo-cmd,checksrc) $(cmd_checksrc)			  \
++	$(call echo-cmd,cc_o_c) $(cmd_cc_o_c);				  \
++	$(cmd_modversions)						  \
++	scripts/basic/fixdep $(depfile) $@ '$(call make-cmd,cc_o_c)' >    \
++	                                              $(dot-target).tmp;  \
++	rm -f $(depfile);						  \
++	mv -f $(dot-target).tmp $(dot-target).cmd
++endef
++
+ # Built-in and composite module parts
+ $(obj)/%.o: $(src)/%.c FORCE
+ 	$(call cmd,force_checksrc)
+ 	$(call if_changed_rule,cc_o_c)
+ 
++# Due to recursion, recordmcount must not be called on empty.o
++$(objtree)/scripts/mod/empty.o: $(srctree)/scripts/mod/empty.c
++	$(call cmd,force_checksrc)
++	$(call if_changed_rule,cc_o_c_notrace)
++
+ # Single-part modules are special since we need to mark them in $(MODVERDIR)
+ 
+ $(single-used-m): $(obj)/%.o: $(src)/%.c FORCE
 
 
