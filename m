@@ -1,55 +1,38 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepb.post.tele.dk ([195.41.46.236]:40099 "EHLO
-	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755040Ab0JRTf7 (ORCPT
+Received: from hrndva-omtalb.mail.rr.com ([71.74.56.123]:51583 "EHLO
+	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755900Ab0JRVD5 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 18 Oct 2010 15:35:59 -0400
-Date: Mon, 18 Oct 2010 21:35:56 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
+	Mon, 18 Oct 2010 17:03:57 -0400
 Subject: Re: [RFC] better fix? (was: Re: [PATCH][GIT PULL] ftrace: Remove
-	recursion between recordmcount and scripts/mod/empty)
-Message-ID: <20101018193556.GA10147@merkur.ravnborg.org>
-References: <1287427989.16971.304.camel@gandalf.stny.rr.com> <1287429206.16971.325.camel@gandalf.stny.rr.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1287429206.16971.325.camel@gandalf.stny.rr.com>
+ recursion between recordmcount and scripts/mod/empty)
+From: Steven Rostedt <rostedt@goodmis.org>
+In-Reply-To: <20101018193556.GA10147@merkur.ravnborg.org>
+References: <1287427989.16971.304.camel@gandalf.stny.rr.com>
+	 <1287429206.16971.325.camel@gandalf.stny.rr.com>
+	 <20101018193556.GA10147@merkur.ravnborg.org>
+Content-Type: text/plain; charset="ISO-8859-15"
+Date: Mon, 18 Oct 2010 17:03:55 -0400
+Message-ID: <1287435835.16971.330.camel@gandalf.stny.rr.com>
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Steven Rostedt <rostedt@goodmis.org>
+To: Sam Ravnborg <sam@ravnborg.org>
 Cc: LKML <linux-kernel@vger.kernel.org>, Ingo Molnar <mingo@elte.hu>, Frederic Weisbecker <fweisbec@gmail.com>, Andrew Morton <akpm@linux-foundation.org>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
 
-On Mon, Oct 18, 2010 at 03:13:26PM -0400, Steven Rostedt wrote:
-> On Mon, 2010-10-18 at 14:53 -0400, Steven Rostedt wrote:
-> 
-> Just calling attention to this...
-> 
-> > diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-> > index 4db60b2..9f2d5b4 100644
-> > --- a/scripts/Makefile.build
-> > +++ b/scripts/Makefile.build
-> > @@ -210,7 +210,11 @@ endif
-> >  
-> >  ifdef CONFIG_FTRACE_MCOUNT_RECORD
-> >  ifdef BUILD_C_RECORDMCOUNT
-> > -cmd_record_mcount = $(objtree)/scripts/recordmcount "$(@)";
-> > +# Due to recursion, we must skip the empty.o file
-> > +#  TBD: Find a better way to do this.
-> > +cmd_record_mcount = if [ $(@) != "scripts/mod/empty.o" ]; then			\
-> > +			$(objtree)/scripts/recordmcount "$(@)";			\
-> > +		    fi;
-> >  else
-> >  cmd_record_mcount = set -e ; perl $(srctree)/scripts/recordmcount.pl "$(ARCH)" \
-> >  	"$(if $(CONFIG_CPU_BIG_ENDIAN),big,little)" \
-> > 
-> 
-> This is pretty much a hack, would adding a patch like the following be a
-> better idea?
+On Mon, 2010-10-18 at 21:35 +0200, Sam Ravnborg wrote:
 
-I prefer the hack above...
-It is obvious what it does. And the hack is simple.
+> An additional comment about the origin of empty.o is needed.
+> Only very few people knows that we generate empty.o in scripts/
 
-An additional comment about the origin of empty.o is needed.
-Only very few people knows that we generate empty.o in scripts/
+OK, how are you with this comment?
 
-	Sam
+# Due to recursion, we must skip the empty.o file.
+# The empty.o file is created in the make process in order
+#  to determine the target endianness and word size.
+#  It is made before all other C files, including recordmcount.
+
+-- Steve
+
+
