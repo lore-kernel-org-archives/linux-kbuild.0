@@ -1,45 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pw0-f46.google.com ([209.85.160.46]:46079 "EHLO
-	mail-pw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755380Ab0JVPsT (ORCPT
+Received: from rcsinet10.oracle.com ([148.87.113.121]:17191 "EHLO
+	rcsinet10.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1758713Ab0JVSlg (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 22 Oct 2010 11:48:19 -0400
-From: Namhyung Kim <namhyung@gmail.com>
-Subject: [PATCH] kconfig: don't select 64 bit option on sparc32 all{yes,mod}config
-Date: Sat, 23 Oct 2010 00:48:04 +0900
-Message-Id: <1287762484-8154-1-git-send-email-namhyung@gmail.com>
+	Fri, 22 Oct 2010 14:41:36 -0400
+Date: Fri, 22 Oct 2010 11:40:19 -0700
+From: Randy Dunlap <randy.dunlap@oracle.com>
+Subject: Re: 2.6.36, make oldconfig broken
+Message-Id: <20101022114019.60839ff2.randy.dunlap@oracle.com>
+In-Reply-To: <201010221229.36996.gene.heskett@gmail.com>
+References: <201010221229.36996.gene.heskett@gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Roman Zippel <zippel@linux-m68k.org>
-Cc: linux-kbuild@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, linux-kernel@vger.kernel.org
+To: Gene Heskett <gene.heskett@gmail.com>
+Cc: LKML <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org
 
-The SPARC architecture provides 64BIT config option to select
-build type and it is set to 1 on ARCH=sparc64 as a default value.
-But in case of 32-bit, it is also set to 1 by the allyesconfig
-logic, end result would be the same as of sparc64. So I think
-it would be better if plain ARCH=sparc all{yes,mod}config do not
-set it then we can test 32-bit build by default.
+On Fri, 22 Oct 2010 12:29:36 -0400 Gene Heskett wrote:
 
-Signed-off-by: Namhyung Kim <namhyung@gmail.com>
+[adding linux-kbuild]
+
+> Greets all;
+> 
+> I have managed to get 2.6.36 to a semi-usable state, but I have major 
+> breakage yet.
+> 
+> Question: what happens if I simply move my working 2.6.35.7 .config into the 
+> 2.6.36 tree and build it from that?
+
+I think that it runs 'make oldconfig' automatically for you.
+
+> It can't be any worse than what the broken 'make oldconfig' did to it.  What 
+> it output changed the disk drivers, graphic card drivers and just plain 
+> threw away at least a hundred lines in the multimedia drivers section.
+> 
+> How do you suggest I recover from this if just building from the 2.6.35.7 
+> .conf doesn't work?
+
+Please send your 2.6.35.7 .config file so that we can generate & see the
+changes.
+
 ---
- scripts/kconfig/confdata.c |    4 ++++
- 1 files changed, 4 insertions(+), 0 deletions(-)
-
-diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
-index 515253f..9820c77 100644
---- a/scripts/kconfig/confdata.c
-+++ b/scripts/kconfig/confdata.c
-@@ -1018,6 +1018,10 @@ void conf_set_all_new_symbols(enum conf_def_mode mode)
- 			break;
- 		}
- 
-+		/* Do not set 64 bit option when sparc32 allyesconfig */
-+		if (sym->name && strcmp(sym->name, "64BIT") == 0 &&
-+		    strcmp(getenv("ARCH"), "sparc") == 0)
-+			sym->def[S_DEF_USER].tri = no;
- 	}
- 
- 	sym_clear_all_valid();
--- 
-1.7.0.4
-
+~Randy
+*** Remember to use Documentation/SubmitChecklist when testing your code ***
