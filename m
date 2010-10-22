@@ -1,88 +1,103 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from rcsinet10.oracle.com ([148.87.113.121]:41008 "EHLO
-	rcsinet10.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756211Ab0JVVUk (ORCPT
+Received: from 59-72-223.ftth.xms.internl.net ([85.223.72.59]:54083 "EHLO
+	salamandra.streefland.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752802Ab0JVWPV (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 22 Oct 2010 17:20:40 -0400
-Message-ID: <4CC20011.5010809@oracle.com>
-Date: Fri, 22 Oct 2010 14:20:17 -0700
-From: Randy Dunlap <randy.dunlap@oracle.com>
+	Fri, 22 Oct 2010 18:15:21 -0400
+Date: Sat, 23 Oct 2010 00:02:44 +0200
+From: Dick Streefland <dick@streefland.net>
+Subject: scripts/extract-ikconfig: add support for bzip2, lzma and lzo
+Message-ID: <20101022220244.GA28887@streefland.net>
 MIME-Version: 1.0
-Subject: Re: 2.6.36, make oldconfig broken
-References: <201010221229.36996.gene.heskett@gmail.com> <20101022114019.60839ff2.randy.dunlap@oracle.com> <201010221608.36754.gene.heskett@gmail.com>
-In-Reply-To: <201010221608.36754.gene.heskett@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Gene Heskett <gene.heskett@gmail.com>
-Cc: LKML <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
+Cc: Michal Marek <mmarek@suse.cz>
 
-On 10/22/10 13:08, Gene Heskett wrote:
-> On Friday, October 22, 2010, Randy Dunlap wrote:
->> On Fri, 22 Oct 2010 12:29:36 -0400 Gene Heskett wrote:
->>
->> [adding linux-kbuild]
->>
->>> Greets all;
->>>
->>> I have managed to get 2.6.36 to a semi-usable state, but I have major
->>> breakage yet.
->>>
->>> Question: what happens if I simply move my working 2.6.35.7 .config
->>> into the 2.6.36 tree and build it from that?
->>
->> I think that it runs 'make oldconfig' automatically for you.
->>
->>> It can't be any worse than what the broken 'make oldconfig' did to it. 
->>> What it output changed the disk drivers, graphic card drivers and just
->>> plain threw away at least a hundred lines in the multimedia drivers
->>> section.
+Add support for kernels compressed with bzip2, lzma or lzo to the
+extract-ikconfig script.
 
-When I use your config-2.6.36.7 file on 2.6.36 and run 'make oldconfig',
-I don't see anything like changes in disk or graphics card drivers and
-I don't see 100 or more lines thrown away in the multimedia drivers.
+Signed-off-by: Dick Streefland <dick@streefland.net>
+Tested-by: Justin <jlec@gentoo.org>
+---
 
-Did you use 'make oldconfig' or did you use that script that you have
-mentioned and posted in the past?  Could it be causing problems?
+ scripts/extract-ikconfig |   41 +++++++++++++++++++++++++++--------------
+ 1 files changed, 27 insertions(+), 14 deletions(-)
 
-
->>> How do you suggest I recover from this if just building from the
->>> 2.6.35.7 .conf doesn't work?
->>
->> Please send your 2.6.35.7 .config file so that we can generate & see the
->> changes.
-> 
-> Attached Randy, & many thanks.
-> 
-> Just for S&G I overwrote the generated .config in the 2.6.36 tree with these 
-> files, and ran a make xconfig, which bitched about line 3109, and which I 
-> don't recall ever playing with, "RAR_REGISTER" IIRC, so I saved it without 
-> any other changes and built/installed & booted from that now.
-> 
-> My only problem now seems to be with cheese for my elderly webcam and my 
-> experience with using the nvidia drivers on my milling machine would seem 
-> to indicate that the nvidia blob is locking out the IRQ's for too long, 
-> which interferes with the steady stream my webcam puts out, so I get a 
-> partial screen and a shell window full of:
-> ibv4lconvert: Error decompressing JPEG: fill_nbits error: need 5 more bits
-> libv4lconvert: Error decompressing JPEG: fill_nbits error: need 2 more bits
-> 
-> Which of course is not your fault as I'm 'tainted'.  And it works well with 
-> the vesa driver, which also points an accusing finger at the nvidia driver 
-> blob.  What else is new. ;-)
-> 
-> But I'll be interested in what you get.  Its stuff like this that have made 
-> me wary of downloading the kernel images in .bz2 formats, too many times I 
-> have had to go back and get the .gz version because the unpacking of the 
-> .bz2 upchucked and silently threw away a subdir tree, and only a fresh 
-> download fixes it, blowing it away and unpacking the bz2 again will only fix 
-> it occasionally.  I started with the tar.gz of course this time.
-
-Curiouser and curiouser.
-I always download & build from .bz2 tarballs, with no problems.
-
-
--- 
-~Randy
-*** Remember to use Documentation/SubmitChecklist when testing your code ***
+diff --git a/scripts/extract-ikconfig b/scripts/extract-ikconfig
+index 37f30d3..1512c0a 100755
+--- a/scripts/extract-ikconfig
++++ b/scripts/extract-ikconfig
+@@ -7,12 +7,10 @@
+ # The obscure use of the "tr" filter is to work around older versions of
+ # "grep" that report the byte offset of the line instead of the pattern.
+ #
+-# (c) 2009, Dick Streefland <dick@streefland.net>
++# (c) 2009,2010 Dick Streefland <dick@streefland.net>
+ # Licensed under the terms of the GNU General Public License.
+ # ----------------------------------------------------------------------
+ 
+-gz1='\037\213\010'
+-gz2='01'
+ cf1='IKCFG_ST\037\213\010'
+ cf2='0123456789'
+ 
+@@ -21,11 +19,25 @@ dump_config()
+ 	if	pos=`tr "$cf1\n$cf2" "\n$cf2=" < "$1" | grep -abo "^$cf2"`
+ 	then
+ 		pos=${pos%%:*}
+-		tail -c+$(($pos+8)) "$1" | zcat -q
+-		exit 0
++		tail -c+$(($pos+8)) "$1" | zcat > $tmp1 2> /dev/null
++		if	[ $? != 1 ]
++		then	# exit status must be 0 or 2 (trailing garbage warning)
++			cat $tmp1
++			exit 0
++		fi
+ 	fi
+ }
+ 
++try_decompress()
++{
++	for	pos in `tr "$1\n$2" "\n$2=" < "$img" | grep -abo "^$2"`
++	do
++		pos=${pos%%:*}
++		tail -c+$pos "$img" | $3 > $tmp2 2> /dev/null
++		dump_config $tmp2
++	done
++}
++
+ # Check invocation:
+ me=${0##*/}
+ img=$1
+@@ -35,18 +47,19 @@ then
+ 	exit 2
+ fi
+ 
++# Prepare temp files:
++tmp1=/tmp/ikconfig$$.1
++tmp2=/tmp/ikconfig$$.2
++trap "rm -f $tmp1 $tmp2" 0
++
+ # Initial attempt for uncompressed images or objects:
+ dump_config "$img"
+ 
+-# That didn't work, so decompress and try again:
+-tmp=/tmp/ikconfig$$
+-trap "rm -f $tmp" 0
+-for	pos in `tr "$gz1\n$gz2" "\n$gz2=" < "$img" | grep -abo "^$gz2"`
+-do
+-	pos=${pos%%:*}
+-	tail -c+$pos "$img" | zcat 2> /dev/null > $tmp
+-	dump_config $tmp
+-done
++# That didn't work, so retry after decompression.
++try_decompress '\037\213\010' xy  gunzip
++try_decompress 'BZh'          xy  bunzip2
++try_decompress '\135\0\0\0'   xxx unlzma
++try_decompress '\211\114\132' xy  'lzop -d'
+ 
+ # Bail out:
+ echo "$me: Cannot find kernel config." >&2
