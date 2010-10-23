@@ -1,79 +1,61 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mtaout02-winn.ispmail.ntl.com ([81.103.221.48]:47720 "EHLO
-	mtaout02-winn.ispmail.ntl.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1755276Ab0JWBjr convert rfc822-to-8bit
-	(ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 22 Oct 2010 21:39:47 -0400
-Date: Sat, 23 Oct 2010 02:39:43 +0100
-From: Ken Moffat <zarniwhoop@ntlworld.com>
+Received: from mail.wdtv.com ([66.118.69.84]:33874 "EHLO mail.wdtv.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751204Ab0JWCSm (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 22 Oct 2010 22:18:42 -0400
+From: Gene Heskett <gene.heskett@gmail.com>
 Subject: Re: 2.6.36, make oldconfig broken
-Message-ID: <20101023013943.GB20750@deepthought>
-References: <201010221229.36996.gene.heskett@gmail.com> <201010221608.36754.gene.heskett@gmail.com> <4CC20011.5010809@oracle.com> <201010222054.52066.gene.heskett@gmail.com>
+Date: Fri, 22 Oct 2010 22:18:38 -0400
+References: <201010221229.36996.gene.heskett@gmail.com> <4CC20011.5010809@oracle.com> <20101023010717.GA20750@deepthought>
+In-Reply-To: <20101023010717.GA20750@deepthought>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <201010222054.52066.gene.heskett@gmail.com>
-Content-Transfer-Encoding: 8BIT
+Content-Type: Text/Plain;
+  charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <201010222218.38266.gene.heskett@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Gene Heskett <gene.heskett@gmail.com>
+To: Ken Moffat <zarniwhoop@ntlworld.com>
 Cc: Randy Dunlap <randy.dunlap@oracle.com>, LKML <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org
 
-On Fri, Oct 22, 2010 at 08:54:51PM -0400, Gene Heskett wrote:
-> 
-> It hasn't been edited since I ran it, so I'll attach it.  Maybe you can see 
-> something I missed.
-> 
-Hi Gene,
+On Friday, October 22, 2010, Ken Moffat wrote:
+>On Fri, Oct 22, 2010 at 02:20:17PM -0700, Randy Dunlap wrote:
+>> On 10/22/10 13:08, Gene Heskett wrote:
+>> > But I'll be interested in what you get.  Its stuff like this that
+>> > have made me wary of downloading the kernel images in .bz2 formats,
+>> > too many times I have had to go back and get the .gz version because
+>> > the unpacking of the .bz2 upchucked and silently threw away a subdir
+>> > tree, and only a fresh download fixes it, blowing it away and
+>> > unpacking the bz2 again will only fix it occasionally.  I started
+>> > with the tar.gz of course this time.
+>> 
+>> Curiouser and curiouser.
+>> I always download & build from .bz2 tarballs, with no problems.
+>
+> On my own x86 machines, I can remember seeing apparently corrupted
+>.tar.bz2 files twice in the last eight-or-so years.  In each case,
+>untarring reported an error, it didn't silently lose files and
+>directories, and in each case the problem was failing memory.
+>
+> In Gene's case, I recommend running memtest86 or better ('+') as
+>soon as possible.  On my problematic x86 boxes, memtest86 started to
+>report errors within a minute or so of starting.  If it runs for a
+>whole cycle, the memory is probably ok.
+>
+>ken
 
- I don't see anything that is immediately wrong (but, it's late and
-I'll be going to bed as soon as webkit has finished compiling on my
-desktop, so my concentration might be lacking), but it does seem
-overly complex.  I've long since given up trying to script kernel
-builds, it mostly isn't necessary if you aren't creating a distro.
+I haven't done that in 6 months or so, but will the next time I reboot.  
+The last time I had any errors from memtest+ was about 18 months back, and 
+a thorough re-seating of the memory seemed to fix it.  Maybe its due again?
 
- I appreciate your comment about fingers - mine are mostly ok, but
-prone to operating in the wrong order so that I often generate typos
-such as 'teh'.  What works for me is -
+Thanks for the reminder Ken.  One tends to 'get in a rut' in the later 
+years, forgetting such.
 
-1. build in ~/ : I often have current and "previous, but still
-usable" systems on the same machine, and I share /home between them.
-Arguably, building as a user may prevent some disastrous actions,
-but backups are always useful - I remember your past comments about
-using amanda so I'm sure you've already got that covered.
+I will report what happens when I do.
 
-2. for each kernel version of interest (typically, current and next
-- over time the old one drops out and a new one rolls in) :
- create a first version (untar, or untar and patch).
- I then rename it to 2.6.xx-stable or 2.6.xx-rc.
-
- For the patches I use
-bzcat /path/to/patch-2.6.whatever.bz2 | patch -p1
-(yes, send me tickets for "useless uses of cat" if you wish ;)
-
-3. When I want to test a new -rc, or a release has come out, cd into
-the tree and
- head Makefile
-to confirm which (-rc) patch was last applied.
-revert that: bzcat /path/to/that-patch.bz2 | patch -p1 -R
-apply the new one
-
-and then just make oldconfig and continue (or, for the first rc of a
-new version, zcat /proc/config.gz >.config && make oldconfig.
-
- To keep track of errant fingers, you can read the commandline
-before hitting <enter>, you can also run 'make modules_install' as a
-user - it won't work, but it will confirm which version it is trying
-to install.
-
- Sorry if this comes across as trying to teach you things you
-already know, but the process should be simple enough to not need
-scripting!  Of course, my video hardware doesn't need out-of-tree
-firmware nor other drivers.  Perhaps in that situation I might try
-to script it all.  From painful experience, the usual problem with
-scripts is a failure to detect errors or unexpected results.  Keep
-things simple if you can.
-
-ken
 -- 
-das eine Mal als Tragödie, das andere Mal als Farce
+Cheers, Gene
+"There are four boxes to be used in defense of liberty:
+ soap, ballot, jury, and ammo. Please use in that order."
+-Ed Howdershelt (Author)
+To the landlord belongs the doorknobs.
