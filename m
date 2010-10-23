@@ -1,61 +1,49 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.wdtv.com ([66.118.69.84]:33874 "EHLO mail.wdtv.com"
+Received: from mx3.mail.elte.hu ([157.181.1.138]:52947 "EHLO mx3.mail.elte.hu"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751204Ab0JWCSm (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 22 Oct 2010 22:18:42 -0400
-From: Gene Heskett <gene.heskett@gmail.com>
+	id S1756951Ab0JWNlJ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 23 Oct 2010 09:41:09 -0400
+Date: Sat, 23 Oct 2010 15:41:02 +0200
+From: Ingo Molnar <mingo@elte.hu>
 Subject: Re: 2.6.36, make oldconfig broken
-Date: Fri, 22 Oct 2010 22:18:38 -0400
-References: <201010221229.36996.gene.heskett@gmail.com> <4CC20011.5010809@oracle.com> <20101023010717.GA20750@deepthought>
-In-Reply-To: <20101023010717.GA20750@deepthought>
+Message-ID: <20101023134102.GA7893@elte.hu>
+References: <201010221229.36996.gene.heskett@gmail.com>
+ <20101022114019.60839ff2.randy.dunlap@oracle.com>
+ <201010221608.36754.gene.heskett@gmail.com>
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <201010222218.38266.gene.heskett@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <201010221608.36754.gene.heskett@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ken Moffat <zarniwhoop@ntlworld.com>
+To: Gene Heskett <gene.heskett@gmail.com>
 Cc: Randy Dunlap <randy.dunlap@oracle.com>, LKML <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org
 
-On Friday, October 22, 2010, Ken Moffat wrote:
->On Fri, Oct 22, 2010 at 02:20:17PM -0700, Randy Dunlap wrote:
->> On 10/22/10 13:08, Gene Heskett wrote:
->> > But I'll be interested in what you get.  Its stuff like this that
->> > have made me wary of downloading the kernel images in .bz2 formats,
->> > too many times I have had to go back and get the .gz version because
->> > the unpacking of the .bz2 upchucked and silently threw away a subdir
->> > tree, and only a fresh download fixes it, blowing it away and
->> > unpacking the bz2 again will only fix it occasionally.  I started
->> > with the tar.gz of course this time.
->> 
->> Curiouser and curiouser.
->> I always download & build from .bz2 tarballs, with no problems.
->
-> On my own x86 machines, I can remember seeing apparently corrupted
->.tar.bz2 files twice in the last eight-or-so years.  In each case,
->untarring reported an error, it didn't silently lose files and
->directories, and in each case the problem was failing memory.
->
-> In Gene's case, I recommend running memtest86 or better ('+') as
->soon as possible.  On my problematic x86 boxes, memtest86 started to
->report errors within a minute or so of starting.  If it runs for a
->whole cycle, the memory is probably ok.
->
->ken
 
-I haven't done that in 6 months or so, but will the next time I reboot.  
-The last time I had any errors from memtest+ was about 18 months back, and 
-a thorough re-seating of the memory seemed to fix it.  Maybe its due again?
+hi Gene,
 
-Thanks for the reminder Ken.  One tends to 'get in a rut' in the later 
-years, forgetting such.
+* Gene Heskett <gene.heskett@gmail.com> wrote:
 
-I will report what happens when I do.
+> > Please send your 2.6.35.7 .config file so that we can generate & see the 
+> > changes.
+> 
+> Attached Randy, & many thanks.
+> 
+> Just for S&G I overwrote the generated .config in the 2.6.36 tree with these 
+> files, and ran a make xconfig, which bitched about line 3109, and which I don't 
+> recall ever playing with, "RAR_REGISTER" IIRC, so I saved it without any other 
+> changes and built/installed & booted from that now.
 
--- 
-Cheers, Gene
-"There are four boxes to be used in defense of liberty:
- soap, ballot, jury, and ammo. Please use in that order."
--Ed Howdershelt (Author)
-To the landlord belongs the doorknobs.
+In case it's useful: i take old .config's and put them into new kernels all the 
+time, and i very much depend on configured drivers and options not going away 
+suddenly. I know lots of other developers depend on that as well.
+
+In the hundreds or so cases i've done this manually in the past few years i only 
+remember less than 5 cases where this didnt work in an 'as expected' way.
+
+So this should really work for you. If it doesnt when going from 2.6.35 to 2.6.36 
+then that's very likely a bug somewhere which we want to fix ...
+
+Thanks,
+
+	Ingo
