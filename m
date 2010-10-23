@@ -1,117 +1,242 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from xenotime.net ([72.52.115.56]:37322 "HELO xenotime.net"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with SMTP
-	id S1752802Ab0JVWRG (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 22 Oct 2010 18:17:06 -0400
-Received: from chimera.site ([173.50.240.230]) by xenotime.net for <linux-kbuild@vger.kernel.org>; Fri, 22 Oct 2010 15:16:55 -0700
-Date: Fri, 22 Oct 2010 15:16:54 -0700
-From: Randy Dunlap <rdunlap@xenotime.net>
-Subject: Re: scripts/extract-ikconfig: add support for bzip2, lzma and lzo
-Message-Id: <20101022151654.cafb7655.rdunlap@xenotime.net>
-In-Reply-To: <20101022220244.GA28887@streefland.net>
-References: <20101022220244.GA28887@streefland.net>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Received: from mail.wdtv.com ([66.118.69.84]:60736 "EHLO mail.wdtv.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751705Ab0JWAyz (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 22 Oct 2010 20:54:55 -0400
+From: Gene Heskett <gene.heskett@gmail.com>
+Subject: Re: 2.6.36, make oldconfig broken
+Date: Fri, 22 Oct 2010 20:54:51 -0400
+References: <201010221229.36996.gene.heskett@gmail.com> <201010221608.36754.gene.heskett@gmail.com> <4CC20011.5010809@oracle.com>
+In-Reply-To: <4CC20011.5010809@oracle.com>
+MIME-Version: 1.0
+Content-Type: Multipart/Mixed;
+  boundary="Boundary-00=_cJjwMo9cJmck6ZV"
+Message-Id: <201010222054.52066.gene.heskett@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Dick Streefland <dick@streefland.net>
-Cc: linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>
+To: Randy Dunlap <randy.dunlap@oracle.com>
+Cc: LKML <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org
 
-On Sat, 23 Oct 2010 00:02:44 +0200 Dick Streefland wrote:
+--Boundary-00=_cJjwMo9cJmck6ZV
+Content-Type: Text/Plain;
+  charset="utf-8"
+Content-Transfer-Encoding: 7bit
 
-> Add support for kernels compressed with bzip2, lzma or lzo to the
-> extract-ikconfig script.
+On Friday, October 22, 2010, Randy Dunlap wrote:
+>On 10/22/10 13:08, Gene Heskett wrote:
+>> On Friday, October 22, 2010, Randy Dunlap wrote:
+>>> On Fri, 22 Oct 2010 12:29:36 -0400 Gene Heskett wrote:
+>>> 
+>>> [adding linux-kbuild]
+>>> 
+>>>> Greets all;
+>>>> 
+>>>> I have managed to get 2.6.36 to a semi-usable state, but I have major
+>>>> breakage yet.
+>>>> 
+>>>> Question: what happens if I simply move my working 2.6.35.7 .config
+>>>> into the 2.6.36 tree and build it from that?
+>>> 
+>>> I think that it runs 'make oldconfig' automatically for you.
+>>> 
+>>>> It can't be any worse than what the broken 'make oldconfig' did to
+>>>> it. What it output changed the disk drivers, graphic card drivers
+>>>> and just plain threw away at least a hundred lines in the multimedia
+>>>> drivers section.
+>
+>When I use your config-2.6.36.7 file on 2.6.36 and run 'make oldconfig',
+Correction, that config was from 2.6.35.7.
 
-Fixes kernel bugzilla #19852:
-https://bugzilla.kernel.org/show_bug.cgi?id=19852
+>I don't see anything like changes in disk or graphics card drivers and
+>I don't see 100 or more lines thrown away in the multimedia drivers.
+>
+>Did you use 'make oldconfig' or did you use that script that you have
+>mentioned and posted in the past?  Could it be causing problems?
 
+My script (buildit26) takes an old argument and a new argument, that and 
+any patch names needed are edited into it, not passed as arguments, 
+although I have thought of doing that, but as that can lead to typu's 
+getting past these old fingers, I don't trust me doing it with live 
+arguments.  It copy's the old .configs to /tmp long enough to unpack the 
+new, then copy's them into the new tree.  And they do a make oldconfig after 
+any patches have been applied.
 
-> Signed-off-by: Dick Streefland <dick@streefland.net>
-> Tested-by: Justin <jlec@gentoo.org>
-> ---
-> 
->  scripts/extract-ikconfig |   41 +++++++++++++++++++++++++++--------------
->  1 files changed, 27 insertions(+), 14 deletions(-)
-> 
-> diff --git a/scripts/extract-ikconfig b/scripts/extract-ikconfig
-> index 37f30d3..1512c0a 100755
-> --- a/scripts/extract-ikconfig
-> +++ b/scripts/extract-ikconfig
-> @@ -7,12 +7,10 @@
->  # The obscure use of the "tr" filter is to work around older versions of
->  # "grep" that report the byte offset of the line instead of the pattern.
->  #
-> -# (c) 2009, Dick Streefland <dick@streefland.net>
-> +# (c) 2009,2010 Dick Streefland <dick@streefland.net>
->  # Licensed under the terms of the GNU General Public License.
->  # ----------------------------------------------------------------------
->  
-> -gz1='\037\213\010'
-> -gz2='01'
->  cf1='IKCFG_ST\037\213\010'
->  cf2='0123456789'
->  
-> @@ -21,11 +19,25 @@ dump_config()
->  	if	pos=`tr "$cf1\n$cf2" "\n$cf2=" < "$1" | grep -abo "^$cf2"`
->  	then
->  		pos=${pos%%:*}
-> -		tail -c+$(($pos+8)) "$1" | zcat -q
-> -		exit 0
-> +		tail -c+$(($pos+8)) "$1" | zcat > $tmp1 2> /dev/null
-> +		if	[ $? != 1 ]
-> +		then	# exit status must be 0 or 2 (trailing garbage warning)
-> +			cat $tmp1
-> +			exit 0
-> +		fi
->  	fi
->  }
->  
-> +try_decompress()
-> +{
-> +	for	pos in `tr "$1\n$2" "\n$2=" < "$img" | grep -abo "^$2"`
-> +	do
-> +		pos=${pos%%:*}
-> +		tail -c+$pos "$img" | $3 > $tmp2 2> /dev/null
-> +		dump_config $tmp2
-> +	done
-> +}
-> +
->  # Check invocation:
->  me=${0##*/}
->  img=$1
-> @@ -35,18 +47,19 @@ then
->  	exit 2
->  fi
->  
-> +# Prepare temp files:
-> +tmp1=/tmp/ikconfig$$.1
-> +tmp2=/tmp/ikconfig$$.2
-> +trap "rm -f $tmp1 $tmp2" 0
-> +
->  # Initial attempt for uncompressed images or objects:
->  dump_config "$img"
->  
-> -# That didn't work, so decompress and try again:
-> -tmp=/tmp/ikconfig$$
-> -trap "rm -f $tmp" 0
-> -for	pos in `tr "$gz1\n$gz2" "\n$gz2=" < "$img" | grep -abo "^$gz2"`
-> -do
-> -	pos=${pos%%:*}
-> -	tail -c+$pos "$img" | zcat 2> /dev/null > $tmp
-> -	dump_config $tmp
-> -done
-> +# That didn't work, so retry after decompression.
-> +try_decompress '\037\213\010' xy  gunzip
-> +try_decompress 'BZh'          xy  bunzip2
-> +try_decompress '\135\0\0\0'   xxx unlzma
-> +try_decompress '\211\114\132' xy  'lzop -d'
->  
->  # Bail out:
->  echo "$me: Cannot find kernel config." >&2
-> --
+It hasn't been edited since I ran it, so I'll attach it.  Maybe you can see 
+something I missed.
 
+Thanks Randy.
 
----
-~Randy
-*** Remember to use Documentation/SubmitChecklist when testing your code ***
+-- 
+Cheers, Gene
+"There are four boxes to be used in defense of liberty:
+ soap, ballot, jury, and ammo. Please use in that order."
+-Ed Howdershelt (Author)
+About the only thing on a farm that has an easy time is the dog.
+
+--Boundary-00=_cJjwMo9cJmck6ZV
+Content-Type: application/x-shellscript;
+  name="buildit26"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+	filename="buildit26"
+
+#!/bin/bash
+# This is intended to allow a from scratch start of a known good
+# set of configs based on the last full release.
+# This is the src to get the known good configs from
+VEROLD="linux-2.6.35.7"
+# This is the src file to be used
+VERSRC="linux-2.6.36"
+NEWVERNUM="2.6.36"
+VNAME="linux-"$NEWVERNUM
+echo $VNAME
+# These are the patchfile(s) to be used
+VERP1="patch-"$NEWVERNUM
+echo $VERP1
+sleep 3
+#VERP3=""
+#VERP3=""
+#VERP4=""
+#VERP5=""
+#VERP6=""
+#VERP7=""
+#VERP8=""
+#VERP9=""
+#echo $VERP1
+#echo $VERP2
+#echo $VERP3
+#echo $VERP3
+#echo $VERP4
+#echo $VERP5
+#echo $VERP6
+#echo $VERP7
+#echo $VERP8
+#echo $VERP9
+# and this is what to name it
+echo "if above isn't correct hit ctl-c"
+sleep 5
+# get to it
+echo
+pwd
+echo $VEROLD
+sleep 1
+cd $VEROLD
+pwd
+sleep 1
+echo copying older configs to safe place
+cp -f .config /var/.config26
+cp -f .config.old /var/.config.old26
+cp -f makeit /var/makeit26
+# back out
+cd ..
+echo the next line should be usr src
+pwd
+echo
+sleep 1
+echo mv unpatched kernel tree out of the way
+echo moveing $VERSRC to $VERSRC.keep
+echo this will remove an existing one!
+sleep 5 #time to hit ctl-c
+echo timeout  -  doing it
+touch $VERSRC #in case it doesn't exist
+mv $VERSRC $VERSRC.keep
+echo
+ls -l $VERSRC.keep #see what it was?
+sleep 1
+echo unpacking a fresh copy of the base version from scratch
+echo
+#tar xjf $VERSRC.tar.bz2
+rm -fR $VNAME #blow it away if it exists
+tar xzf $VERSRC.tar.gz
+echo
+#echo "unpacking the patch(es)"
+#gunzip $VERP1.gz
+#gunzip $VERP2.gz
+#gunzip $VERP3.gz
+# add more as required
+echo
+echo done.
+mv $VERSRC $VNAME
+echo
+ls -l $VNAME
+sleep 1
+echo restoreing original srcs
+mv $VERSRC.keep $VERSRC
+echo
+cd $VNAME
+pwd
+#sleep 1
+ COPY the firmware/radeon stuff over
+mkdir firmware/radeon
+## did it make it?
+echo firmware contents
+ls firmware
+echo
+echo 'firmware/radeon contents'
+ls firmware/radeon
+echo
+echo make sure the old one is there
+ls ../$VEROLD/firmware/radeon
+echo now copy it
+cp -f ../$VEROLD/firmware/radeon/* ./firmware/radeon/
+echo
+echo was the copy good
+ls firmware/radeon
+# apply the patches
+echo
+#echo Applying patch $VERP1
+#echo
+#sleep 1
+#patch -p1 <"../"$VERP1
+#echo
+#echo patch $VERP1 done
+#echo now applying $VERP2
+#sleep 1
+#echo
+#patch -p1 <"../"$VERP2
+#sleep 1
+#echo
+#echo patch $VERP2 done
+#echo
+#echo - now applying $VERP3
+#sleep 2
+#patch -p1 <"../"$VERP3
+#sleep 2
+#echo
+#echo done - now applying $VERP4
+#sleep 2
+#echo
+#patch -p1 <$VERP4
+#sleep 2
+#echo
+#echo done - now applying $VERP5
+#sleep 2
+#echo
+#patch -p1 <$VERP5
+#sleep 2
+#echo
+#echo done - now applying $VERP6.
+#sleep 2
+#echo
+#patch -p1 <$VERP6
+#sleep 2
+#echo done - now applying $VERP7
+#sleep 2
+#patch -p1 <$VERP7
+#echo done - now applying $VERP8
+#sleep 2
+#patch -p1 <$VERP8
+#echo done - now applyng patch $VERP9
+#sleep 2
+#patch -p1 <$VERP9
+echo done
+# suggested by Marcelo
+cp /var/.config26 .config
+cp /var/.config.old26 .config.old
+cp /var/makeit26 makeit
+make oldconfig
+make mrproper
+make xconfig
+#make menuconfig
+
+--Boundary-00=_cJjwMo9cJmck6ZV--
