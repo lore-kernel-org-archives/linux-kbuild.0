@@ -1,84 +1,38 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from rcsinet10.oracle.com ([148.87.113.121]:38837 "EHLO
-	rcsinet10.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752811Ab0JXBgT (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 23 Oct 2010 21:36:19 -0400
-Message-ID: <4CC38D8F.7010104@oracle.com>
-Date: Sat, 23 Oct 2010 18:36:15 -0700
-From: Randy Dunlap <randy.dunlap@oracle.com>
+Received: from cantor2.suse.de ([195.135.220.15]:37116 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S933047Ab0JXWKL (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 24 Oct 2010 18:10:11 -0400
+Message-ID: <4CC4AEBB.6000505@suse.cz>
+Date: Mon, 25 Oct 2010 00:10:03 +0200
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Subject: Re: 2.6.36, make oldconfig broken
-References: <201010221229.36996.gene.heskett@gmail.com> <201010221608.36754.gene.heskett@gmail.com> <4CC20011.5010809@oracle.com> <201010222054.52066.gene.heskett@gmail.com>
-In-Reply-To: <201010222054.52066.gene.heskett@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: [PATCH] kconfig: don't select 64 bit option on sparc32 all{yes,mod}config
+References: <1287762484-8154-1-git-send-email-namhyung@gmail.com>
+In-Reply-To: <1287762484-8154-1-git-send-email-namhyung@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-2
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Gene Heskett <gene.heskett@gmail.com>
-Cc: LKML <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org
+To: Namhyung Kim <namhyung@gmail.com>
+Cc: Roman Zippel <zippel@linux-m68k.org>, linux-kbuild@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, linux-kernel@vger.kernel.org
 
-On 10/22/10 17:54, Gene Heskett wrote:
-> On Friday, October 22, 2010, Randy Dunlap wrote:
->> On 10/22/10 13:08, Gene Heskett wrote:
->>> On Friday, October 22, 2010, Randy Dunlap wrote:
->>>> On Fri, 22 Oct 2010 12:29:36 -0400 Gene Heskett wrote:
->>>>
->>>> [adding linux-kbuild]
->>>>
->>>>> Greets all;
->>>>>
->>>>> I have managed to get 2.6.36 to a semi-usable state, but I have major
->>>>> breakage yet.
->>>>>
->>>>> Question: what happens if I simply move my working 2.6.35.7 .config
->>>>> into the 2.6.36 tree and build it from that?
->>>>
->>>> I think that it runs 'make oldconfig' automatically for you.
->>>>
->>>>> It can't be any worse than what the broken 'make oldconfig' did to
->>>>> it. What it output changed the disk drivers, graphic card drivers
->>>>> and just plain threw away at least a hundred lines in the multimedia
->>>>> drivers section.
->>
->> When I use your config-2.6.36.7 file on 2.6.36 and run 'make oldconfig',
-> Correction, that config was from 2.6.35.7.
+On 22.10.2010 17:48, Namhyung Kim wrote:
+> The SPARC architecture provides 64BIT config option to select
+> build type and it is set to 1 on ARCH=sparc64 as a default value.
+> But in case of 32-bit, it is also set to 1 by the allyesconfig
+> logic, end result would be the same as of sparc64. So I think
+> it would be better if plain ARCH=sparc all{yes,mod}config do not
+> set it then we can test 32-bit build by default.
 > 
->> I don't see anything like changes in disk or graphics card drivers and
->> I don't see 100 or more lines thrown away in the multimedia drivers.
->>
->> Did you use 'make oldconfig' or did you use that script that you have
->> mentioned and posted in the past?  Could it be causing problems?
-> 
-> My script (buildit26) takes an old argument and a new argument, that and 
-> any patch names needed are edited into it, not passed as arguments, 
-> although I have thought of doing that, but as that can lead to typu's 
-> getting past these old fingers, I don't trust me doing it with live 
-> arguments.  It copy's the old .configs to /tmp long enough to unpack the 
-> new, then copy's them into the new tree.  And they do a make oldconfig after 
-> any patches have been applied.
-> 
-> It hasn't been edited since I ran it, so I'll attach it.  Maybe you can see 
-> something I missed.
+> Signed-off-by: Namhyung Kim <namhyung@gmail.com>
+> ---
+>  scripts/kconfig/confdata.c |    4 ++++
 
-Hi Gene,
+Can't this be fixed in the sparc Makefile/Kconfig instead? E.g. have
+ARCH=sparc -> ask
+ARCH=sparc64 -> CONFIG_64BIT=y
+ARCH=sparc32 -> # CONFIG_64BIT is not set
+like the x86/i386/x86_64 ARCH option for x86.
 
-I don't understand the last few lines of buildit26 script:
-
-make oldconfig
-make mrproper
-make xconfig
-
-
-'make mrproper' is going to blow away the .config file that was just generated
-by 'make oldconfig'.  'make help' in the kernel top-level directory says (for mrproper):
-
-  mrproper        - Remove all generated files + config + various backup files
-
-then 'make xconfig' is basically going to give you a 'make defconfig', so yes,
-you would see lots of .config file differences from the previous kernel version.
-
-
--- 
-~Randy
-*** Remember to use Documentation/SubmitChecklist when testing your code ***
+Michal
