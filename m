@@ -1,64 +1,84 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.wdtv.com ([66.118.69.84]:34019 "EHLO mail.wdtv.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1756926Ab0JWQ0t (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 23 Oct 2010 12:26:49 -0400
-From: Gene Heskett <gene.heskett@gmail.com>
-Subject: Re: 2.6.36, make oldconfig broken
-Date: Sat, 23 Oct 2010 12:26:45 -0400
-References: <201010221229.36996.gene.heskett@gmail.com> <201010221608.36754.gene.heskett@gmail.com> <20101023134102.GA7893@elte.hu>
-In-Reply-To: <20101023134102.GA7893@elte.hu>
+Received: from rcsinet10.oracle.com ([148.87.113.121]:38837 "EHLO
+	rcsinet10.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752811Ab0JXBgT (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 23 Oct 2010 21:36:19 -0400
+Message-ID: <4CC38D8F.7010104@oracle.com>
+Date: Sat, 23 Oct 2010 18:36:15 -0700
+From: Randy Dunlap <randy.dunlap@oracle.com>
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="utf-8"
+Subject: Re: 2.6.36, make oldconfig broken
+References: <201010221229.36996.gene.heskett@gmail.com> <201010221608.36754.gene.heskett@gmail.com> <4CC20011.5010809@oracle.com> <201010222054.52066.gene.heskett@gmail.com>
+In-Reply-To: <201010222054.52066.gene.heskett@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-Message-Id: <201010231226.45446.gene.heskett@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ingo Molnar <mingo@elte.hu>
-Cc: Randy Dunlap <randy.dunlap@oracle.com>, LKML <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org
+To: Gene Heskett <gene.heskett@gmail.com>
+Cc: LKML <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org
 
-On Saturday, October 23, 2010, Ingo Molnar wrote:
->hi Gene,
->
->* Gene Heskett <gene.heskett@gmail.com> wrote:
->> > Please send your 2.6.35.7 .config file so that we can generate & see
->> > the changes.
->> 
->> Attached Randy, & many thanks.
->> 
->> Just for S&G I overwrote the generated .config in the 2.6.36 tree with
->> these files, and ran a make xconfig, which bitched about line 3109,
->> and which I don't recall ever playing with, "RAR_REGISTER" IIRC, so I
->> saved it without any other changes and built/installed & booted from
->> that now.
->
->In case it's useful: i take old .config's and put them into new kernels
->all the time, and i very much depend on configured drivers and options
->not going away suddenly. I know lots of other developers depend on that
->as well.
->
->In the hundreds or so cases i've done this manually in the past few years
->i only remember less than 5 cases where this didnt work in an 'as
->expected' way.
->
->So this should really work for you. If it doesnt when going from 2.6.35
->to 2.6.36 then that's very likely a bug somewhere which we want to fix
->...
->
->Thanks,
->
->	Ingo
+On 10/22/10 17:54, Gene Heskett wrote:
+> On Friday, October 22, 2010, Randy Dunlap wrote:
+>> On 10/22/10 13:08, Gene Heskett wrote:
+>>> On Friday, October 22, 2010, Randy Dunlap wrote:
+>>>> On Fri, 22 Oct 2010 12:29:36 -0400 Gene Heskett wrote:
+>>>>
+>>>> [adding linux-kbuild]
+>>>>
+>>>>> Greets all;
+>>>>>
+>>>>> I have managed to get 2.6.36 to a semi-usable state, but I have major
+>>>>> breakage yet.
+>>>>>
+>>>>> Question: what happens if I simply move my working 2.6.35.7 .config
+>>>>> into the 2.6.36 tree and build it from that?
+>>>>
+>>>> I think that it runs 'make oldconfig' automatically for you.
+>>>>
+>>>>> It can't be any worse than what the broken 'make oldconfig' did to
+>>>>> it. What it output changed the disk drivers, graphic card drivers
+>>>>> and just plain threw away at least a hundred lines in the multimedia
+>>>>> drivers section.
+>>
+>> When I use your config-2.6.36.7 file on 2.6.36 and run 'make oldconfig',
+> Correction, that config was from 2.6.35.7.
+> 
+>> I don't see anything like changes in disk or graphics card drivers and
+>> I don't see 100 or more lines thrown away in the multimedia drivers.
+>>
+>> Did you use 'make oldconfig' or did you use that script that you have
+>> mentioned and posted in the past?  Could it be causing problems?
+> 
+> My script (buildit26) takes an old argument and a new argument, that and 
+> any patch names needed are edited into it, not passed as arguments, 
+> although I have thought of doing that, but as that can lead to typu's 
+> getting past these old fingers, I don't trust me doing it with live 
+> arguments.  It copy's the old .configs to /tmp long enough to unpack the 
+> new, then copy's them into the new tree.  And they do a make oldconfig after 
+> any patches have been applied.
+> 
+> It hasn't been edited since I ran it, so I'll attach it.  Maybe you can see 
+> something I missed.
 
-It was suggested elsewhere in this thread that I run memcheck the next time 
-I reboot.  Maybe that will spit something out.  I'll post if it does or 
-doesn't when I do.
+Hi Gene,
+
+I don't understand the last few lines of buildit26 script:
+
+make oldconfig
+make mrproper
+make xconfig
+
+
+'make mrproper' is going to blow away the .config file that was just generated
+by 'make oldconfig'.  'make help' in the kernel top-level directory says (for mrproper):
+
+  mrproper        - Remove all generated files + config + various backup files
+
+then 'make xconfig' is basically going to give you a 'make defconfig', so yes,
+you would see lots of .config file differences from the previous kernel version.
+
 
 -- 
-Cheers, Gene
-"There are four boxes to be used in defense of liberty:
- soap, ballot, jury, and ammo. Please use in that order."
--Ed Howdershelt (Author)
-Bride, n.:
-	A woman with a fine prospect of happiness behind her.
-		-- Ambrose Bierce, "The Devil's Dictionary"
+~Randy
+*** Remember to use Documentation/SubmitChecklist when testing your code ***
