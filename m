@@ -1,14 +1,14 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from fb2.tech.numericable.fr ([82.216.111.50]:51713 "EHLO
+Received: from fb2.tech.numericable.fr ([82.216.111.50]:37436 "EHLO
 	fb2.tech.numericable.fr" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S933366Ab0J0A2a convert rfc822-to-8bit (ORCPT
+	with ESMTP id S933367Ab0J0A2a convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
 	Tue, 26 Oct 2010 20:28:30 -0400
 From: "Dr. Robert William" <pascale.vial@noos.fr>
-Date: Wed, 27 Oct 2010 02:18:22 +0200 (CEST)
+Date: Wed, 27 Oct 2010 02:18:43 +0200 (CEST)
 Subject: Yours Faithfully
 MIME-Version: 1.0
-Message-ID: <ea-mime-4cc76fce-7cb7-16467aff@webmail.numericable.fr>
+Message-ID: <ea-mime-4cc76fe3-7d5c-238fc8d@webmail.numericable.fr>
 Content-Type: text/plain;
 	charset="UTF-8"
 Content-Transfer-Encoding: 8BIT
