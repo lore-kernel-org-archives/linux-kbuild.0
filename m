@@ -1,66 +1,33 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from rcsinet10.oracle.com ([148.87.113.121]:17773 "EHLO
-	rcsinet10.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751680Ab0JYOnI (ORCPT
+Received: from fb1.tech.numericable.fr ([82.216.111.51]:41569 "EHLO
+	fb1.tech.numericable.fr" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752334Ab0J0A0P convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 25 Oct 2010 10:43:08 -0400
-Message-ID: <4CC59765.5080908@oracle.com>
-Date: Mon, 25 Oct 2010 07:42:45 -0700
-From: Randy Dunlap <randy.dunlap@oracle.com>
+	Tue, 26 Oct 2010 20:26:15 -0400
+From: "Dr. Robert William" <pascale.vial@noos.fr>
+Date: Wed, 27 Oct 2010 02:18:23 +0200 (CEST)
+Subject: Yours Faithfully
 MIME-Version: 1.0
-Subject: Re: [PATCH] kbuild: check return value of asprintf()
-References: <1287757930-2766-1-git-send-email-namhyung@gmail.com> <4CC54E4D.7040401@suse.cz>
-In-Reply-To: <4CC54E4D.7040401@suse.cz>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Message-ID: <ea-mime-4cc76fcf-7d4d-6ac86778@webmail.numericable.fr>
+Content-Type: text/plain;
+	charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: Namhyung Kim <namhyung@gmail.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: pascale.vial@noos.fr
 
-On 10/25/10 02:30, Michal Marek wrote:
-> (adding Randy to CC)
+Good News My Dear Friend,
+ 
+I'm happy to inform you about my success in getting those funds transferred under the co-operation of a new partner from Paraguay. Presently i'm in Paraguay for investment projects with my own share of the total sum. meanwhile,i didn't forget your past efforts and attempts to assist me in transferring those funds despite that it failed us some how.
+Now contact my secretary in Benin Republic
 
-Thanks, Michal.
-
-Acked-by: Randy Dunlap <randy.dunlap@oracle.com>
-
-
-> On 22.10.2010 16:32, Namhyung Kim wrote:
->> Check return value of asprintf() in docsect() and exit if error
->> occurs. This removes following warning:
->>
->>   HOSTCC  scripts/basic/docproc
->> scripts/basic/docproc.c: In function ‘docsect’:
->> scripts/basic/docproc.c:336: warning: ignoring return value of ‘asprintf’,
->> 				declared with attribute warn_unused_result
->>
->> Signed-off-by: Namhyung Kim <namhyung@gmail.com>
->> ---
->> The patch is on top of v2.6.36, thanks.
->>
->>  scripts/basic/docproc.c |    5 ++++-
->>  1 files changed, 4 insertions(+), 1 deletions(-)
->>
->> diff --git a/scripts/basic/docproc.c b/scripts/basic/docproc.c
->> index fc3b18d..98dec87 100644
->> --- a/scripts/basic/docproc.c
->> +++ b/scripts/basic/docproc.c
->> @@ -333,7 +333,10 @@ static void docsect(char *filename, char *line)
->>  		if (*s == '\n')
->>  			*s = '\0';
->>  
->> -	asprintf(&s, "DOC: %s", line);
->> +	if (asprintf(&s, "DOC: %s", line) < 0) {
->> +		perror("asprintf");
->> +		exit(1);
->> +	}
->>  	consume_symbol(s);
->>  	free(s);
->>  
-> 
+His name is Mr. Timothy Adams
+Phone Number: +229 97373889
+Email:  timothyadams90@gmail.com
+ 
+Please do let me know immediately you receive it so that we can share the joy after all the sufferings at that time. in the moment, I'm very busy here because of the investment projects which me and the new partner are having at hand, finally, remember that I had forwarded instruction to the secretary on your behalf to receive that money, so feel free to get in touch with Mr. Timothy Adams on timothyadams90@gmail.com, he will send the amount to you without any delay.
+ 
+Yours Faithfully
+Dr Robert William
 
 
--- 
-~Randy
-*** Remember to use Documentation/SubmitChecklist when testing your code ***
