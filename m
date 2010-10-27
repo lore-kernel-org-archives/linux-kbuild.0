@@ -1,68 +1,126 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:40431 "EHLO mx2.suse.de"
+Received: from cantor.suse.de ([195.135.220.2]:59847 "EHLO mx1.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752481Ab0J0WSY (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 27 Oct 2010 18:18:24 -0400
-Message-ID: <4CC8A534.80504@suse.cz>
-Date: Thu, 28 Oct 2010 00:18:28 +0200
+	id S1754016Ab0J0WXl (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 27 Oct 2010 18:23:41 -0400
+Message-ID: <4CC8A670.3070800@suse.cz>
+Date: Thu, 28 Oct 2010 00:23:44 +0200
 From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Subject: Re: [PATCH] kbuild: check return value of asprintf()
-References: <1287757930-2766-1-git-send-email-namhyung@gmail.com> <4CC54E4D.7040401@suse.cz> <4CC59765.5080908@oracle.com>
-In-Reply-To: <4CC59765.5080908@oracle.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Subject: Re: scripts/extract-ikconfig: add support for bzip2, lzma and lzo
+References: <20101022220244.GA28887@streefland.net> <20101022151654.cafb7655.rdunlap@xenotime.net>
+In-Reply-To: <20101022151654.cafb7655.rdunlap@xenotime.net>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Randy Dunlap <randy.dunlap@oracle.com>
-Cc: Namhyung Kim <namhyung@gmail.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Randy Dunlap <rdunlap@xenotime.net>
+Cc: Dick Streefland <dick@streefland.net>, linux-kbuild@vger.kernel.org
 
-On 25.10.2010 16:42, Randy Dunlap wrote:
-> On 10/25/10 02:30, Michal Marek wrote:
->> (adding Randy to CC)
+On 23.10.2010 00:16, Randy Dunlap wrote:
+> On Sat, 23 Oct 2010 00:02:44 +0200 Dick Streefland wrote:
 > 
-> Thanks, Michal.
+>> Add support for kernels compressed with bzip2, lzma or lzo to the
+>> extract-ikconfig script.
 > 
-> Acked-by: Randy Dunlap <randy.dunlap@oracle.com>
+> Fixes kernel bugzilla #19852:
+> https://bugzilla.kernel.org/show_bug.cgi?id=19852
 
-OK, applied to kbuild-2.6.git#misc.
+Applied to kbuild-2.6.git#misc, thanks.
 
 Michal
 > 
 > 
->> On 22.10.2010 16:32, Namhyung Kim wrote:
->>> Check return value of asprintf() in docsect() and exit if error
->>> occurs. This removes following warning:
->>>
->>>   HOSTCC  scripts/basic/docproc
->>> scripts/basic/docproc.c: In function ‘docsect’:
->>> scripts/basic/docproc.c:336: warning: ignoring return value of ‘asprintf’,
->>> 				declared with attribute warn_unused_result
->>>
->>> Signed-off-by: Namhyung Kim <namhyung@gmail.com>
->>> ---
->>> The patch is on top of v2.6.36, thanks.
->>>
->>>  scripts/basic/docproc.c |    5 ++++-
->>>  1 files changed, 4 insertions(+), 1 deletions(-)
->>>
->>> diff --git a/scripts/basic/docproc.c b/scripts/basic/docproc.c
->>> index fc3b18d..98dec87 100644
->>> --- a/scripts/basic/docproc.c
->>> +++ b/scripts/basic/docproc.c
->>> @@ -333,7 +333,10 @@ static void docsect(char *filename, char *line)
->>>  		if (*s == '\n')
->>>  			*s = '\0';
->>>  
->>> -	asprintf(&s, "DOC: %s", line);
->>> +	if (asprintf(&s, "DOC: %s", line) < 0) {
->>> +		perror("asprintf");
->>> +		exit(1);
->>> +	}
->>>  	consume_symbol(s);
->>>  	free(s);
->>>  
+>> Signed-off-by: Dick Streefland <dick@streefland.net>
+>> Tested-by: Justin <jlec@gentoo.org>
+>> ---
 >>
+>>  scripts/extract-ikconfig |   41 +++++++++++++++++++++++++++--------------
+>>  1 files changed, 27 insertions(+), 14 deletions(-)
+>>
+>> diff --git a/scripts/extract-ikconfig b/scripts/extract-ikconfig
+>> index 37f30d3..1512c0a 100755
+>> --- a/scripts/extract-ikconfig
+>> +++ b/scripts/extract-ikconfig
+>> @@ -7,12 +7,10 @@
+>>  # The obscure use of the "tr" filter is to work around older versions of
+>>  # "grep" that report the byte offset of the line instead of the pattern.
+>>  #
+>> -# (c) 2009, Dick Streefland <dick@streefland.net>
+>> +# (c) 2009,2010 Dick Streefland <dick@streefland.net>
+>>  # Licensed under the terms of the GNU General Public License.
+>>  # ----------------------------------------------------------------------
+>>  
+>> -gz1='\037\213\010'
+>> -gz2='01'
+>>  cf1='IKCFG_ST\037\213\010'
+>>  cf2='0123456789'
+>>  
+>> @@ -21,11 +19,25 @@ dump_config()
+>>  	if	pos=`tr "$cf1\n$cf2" "\n$cf2=" < "$1" | grep -abo "^$cf2"`
+>>  	then
+>>  		pos=${pos%%:*}
+>> -		tail -c+$(($pos+8)) "$1" | zcat -q
+>> -		exit 0
+>> +		tail -c+$(($pos+8)) "$1" | zcat > $tmp1 2> /dev/null
+>> +		if	[ $? != 1 ]
+>> +		then	# exit status must be 0 or 2 (trailing garbage warning)
+>> +			cat $tmp1
+>> +			exit 0
+>> +		fi
+>>  	fi
+>>  }
+>>  
+>> +try_decompress()
+>> +{
+>> +	for	pos in `tr "$1\n$2" "\n$2=" < "$img" | grep -abo "^$2"`
+>> +	do
+>> +		pos=${pos%%:*}
+>> +		tail -c+$pos "$img" | $3 > $tmp2 2> /dev/null
+>> +		dump_config $tmp2
+>> +	done
+>> +}
+>> +
+>>  # Check invocation:
+>>  me=${0##*/}
+>>  img=$1
+>> @@ -35,18 +47,19 @@ then
+>>  	exit 2
+>>  fi
+>>  
+>> +# Prepare temp files:
+>> +tmp1=/tmp/ikconfig$$.1
+>> +tmp2=/tmp/ikconfig$$.2
+>> +trap "rm -f $tmp1 $tmp2" 0
+>> +
+>>  # Initial attempt for uncompressed images or objects:
+>>  dump_config "$img"
+>>  
+>> -# That didn't work, so decompress and try again:
+>> -tmp=/tmp/ikconfig$$
+>> -trap "rm -f $tmp" 0
+>> -for	pos in `tr "$gz1\n$gz2" "\n$gz2=" < "$img" | grep -abo "^$gz2"`
+>> -do
+>> -	pos=${pos%%:*}
+>> -	tail -c+$pos "$img" | zcat 2> /dev/null > $tmp
+>> -	dump_config $tmp
+>> -done
+>> +# That didn't work, so retry after decompression.
+>> +try_decompress '\037\213\010' xy  gunzip
+>> +try_decompress 'BZh'          xy  bunzip2
+>> +try_decompress '\135\0\0\0'   xxx unlzma
+>> +try_decompress '\211\114\132' xy  'lzop -d'
+>>  
+>>  # Bail out:
+>>  echo "$me: Cannot find kernel config." >&2
+>> --
 > 
 > 
+> ---
+> ~Randy
+> *** Remember to use Documentation/SubmitChecklist when testing your code ***
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
