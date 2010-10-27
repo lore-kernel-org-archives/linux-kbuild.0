@@ -1,218 +1,83 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-fx0-f46.google.com ([209.85.161.46]:53448 "EHLO
-	mail-fx0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754994Ab0J0Ojr convert rfc822-to-8bit (ORCPT
+Received: from mail-qw0-f46.google.com ([209.85.216.46]:58950 "EHLO
+	mail-qw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751847Ab0J0QYu (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 27 Oct 2010 10:39:47 -0400
-MIME-Version: 1.0
-In-Reply-To: <1288185700.18238.117.camel@gandalf.stny.rr.com>
-References: <f603e1dc44524b81ebc423dd226eb44d837a37be.1288175801.git.wuzhangjin@gmail.com>
-	<1288185700.18238.117.camel@gandalf.stny.rr.com>
-Date: Wed, 27 Oct 2010 22:39:45 +0800
-Message-ID: <AANLkTikxQxCYHEe5bJCx9dNY6AZNpVBgHLxp99+MbzgH@mail.gmail.com>
-Subject: Re: [PATCH] ftrace: Speed up recordmcount
-From: wu zhangjin <wuzhangjin@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 8BIT
+	Wed, 27 Oct 2010 12:24:50 -0400
+From: Wu Zhangjin <wuzhangjin@gmail.com>
+Subject: [v2 PATCH] ftrace: Speed up recordmcount
+Date: Thu, 28 Oct 2010 00:24:34 +0800
+Message-Id: <3dc8cddf022eb7024f9f2cf857529a15bee8999a.1288196498.git.wuzhangjin@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Steven Rostedt <rostedt@goodmis.org>
-Cc: linux-kernel@vger.kernel.org, mingo@elte.hu, John Reiser <jreiser@bitwagon.com>, Michal Marek <mmarek@suse.cz>, linux-kbuild <linux-kbuild@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>
+To: rostedt@goodmis.org, linux-kernel@vger.kernel.org
+Cc: mingo@elte.hu, John Reiser <jreiser@bitwagon.com>, Sam Ravnborg <sam@ravnborg.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.cz>, Wu Zhangjin <wuzhangjin@gmail.com>
 
-On Wed, Oct 27, 2010 at 9:21 PM, Steven Rostedt <rostedt@goodmis.org> wrote:
-> [ Added kbuild maintainers ]
->
-> On Wed, 2010-10-27 at 18:39 +0800, Wu Zhangjin wrote:
->> From: Wu Zhangjin <wuzhangjin@gmail.com>
->>
->> cmd_record_mcount is only needed for the targets who are compiled with
->> -pg, so, only define it when CONFIG_FTRACE_MCOUNT_RECORD is defined and
->> only use it for the targets who are compiled with -pg.
->
-> Thanks! I was going to do this myself, but just have not gotten around
-> to it.
+From: Wu Zhangjin <wuzhangjin@gmail.com>
 
-When I found the C version of recordmcount tried to cope with the
-files under arch/mips/boot/compressed/, I felt a little nervous and
-tried to fix it ;-)
+cmd_record_mcount is used to locate the _mcount symbols in the object
+files, only the files compiled with -pg has the _mcount symbol, so, it
+is only needed for such files, but the current cmd_record_mcount is used
+for all of the object files, so, we need to fix it and speed it up.
 
->
->>
->> Signed-off-by: Wu Zhangjin <wuzhangjin@gmail.com>
->
-> I need a SoB from Michal to apply it.
->
->> ---
->>  Makefile               |   11 ++++++++---
->>  scripts/Makefile.build |   26 ++++++++++++++++----------
->>  2 files changed, 24 insertions(+), 13 deletions(-)
->>
->> diff --git a/Makefile b/Makefile
->> index 3e43805..60d7a87 100644
->> --- a/Makefile
->> +++ b/Makefile
->> @@ -576,9 +576,14 @@ endif
->>  ifdef CONFIG_FUNCTION_TRACER
->>  KBUILD_CFLAGS        += -pg
->>  ifdef CONFIG_DYNAMIC_FTRACE
->> -     ifdef CONFIG_HAVE_C_RECORDMCOUNT
->> -             BUILD_C_RECORDMCOUNT := y
->> -             export BUILD_C_RECORDMCOUNT
->> +     ifdef CONFIG_FTRACE_MCOUNT_RECORD
->
-> FTRACE_MCOUNT_RECORD depends on DYNAMIC_FTRACE, so if you require
-> FTRACE_MCOUNT_RECORD, you can remove the ifdef CONFIG_DYNAMIC_FTRACE.
+Since -pg may be removed by the method used in kernel/trace/Makefile:
 
-ok, will remove it.
+ORIG_CFLAGS := $(KBUILD_CFLAGS)
+KBUILD_CFLAGS = $(subst -pg,,$(ORIG_CFLAGS))
 
->
->
->> +             DEFINE_CMD_RECORD_MCOUNT := y
->> +             export DEFINE_CMD_RECORD_MCOUNT
->> +
->> +             ifdef CONFIG_HAVE_C_RECORDMCOUNT
->> +                     BUILD_C_RECORDMCOUNT := y
->> +                     export BUILD_C_RECORDMCOUNT
->> +             endif
->>       endif
->>  endif
->>  endif
->> diff --git a/scripts/Makefile.build b/scripts/Makefile.build
->> index 5ad25e1..ceb5175 100644
->> --- a/scripts/Makefile.build
->> +++ b/scripts/Makefile.build
->> @@ -208,22 +208,28 @@ cmd_modversions =                                                               \
->>       fi;
->>  endif
->>
->> -ifdef CONFIG_FTRACE_MCOUNT_RECORD
->> +ifdef DEFINE_CMD_RECORD_MCOUNT
->>  ifdef BUILD_C_RECORDMCOUNT
->>  # Due to recursion, we must skip empty.o.
->>  # The empty.o file is created in the make process in order to determine
->>  #  the target endianness and word size. It is made before all other C
->>  #  files, including recordmcount.
->> -cmd_record_mcount = if [ $(@) != "scripts/mod/empty.o" ]; then                       \
->> -                     $(objtree)/scripts/recordmcount "$(@)";                 \
->> -                 fi;
->> +cmd_record_mcount =                                                  \
->> +     if [ "$(findstring -pg,$(KBUILD_CFLAGS))" == "-pg" ]; then      \
->> +             if [ $(@) != "scripts/mod/empty.o" ]; then              \
->> +                     $(objtree)/scripts/recordmcount "$(@)";         \
->> +             fi;                                                     \
->> +     fi;
->>  else
->> -cmd_record_mcount = set -e ; perl $(srctree)/scripts/recordmcount.pl "$(ARCH)" \
->> -     "$(if $(CONFIG_CPU_BIG_ENDIAN),big,little)" \
->> -     "$(if $(CONFIG_64BIT),64,32)" \
->> -     "$(OBJDUMP)" "$(OBJCOPY)" "$(CC) $(KBUILD_CFLAGS)" \
->> -     "$(LD)" "$(NM)" "$(RM)" "$(MV)" \
->> -     "$(if $(part-of-module),1,0)" "$(@)";
->> +cmd_record_mcount =                                                  \
->> +     if [ "$(findstring -pg,$(KBUILD_CFLAGS))" == "-pg" ]; then      \
->> +             set -e ; perl $(srctree)/scripts/recordmcount.pl "$(ARCH)" \
->> +             "$(if $(CONFIG_CPU_BIG_ENDIAN),big,little)"             \
->> +             "$(if $(CONFIG_64BIT),64,32)"                           \
->> +             "$(OBJDUMP)" "$(OBJCOPY)" "$(CC) $(KBUILD_CFLAGS)"      \
->> +             "$(LD)" "$(NM)" "$(RM)" "$(MV)"                         \
->> +             "$(if $(part-of-module),1,0)" "$(@)";                   \
->> +     fi;
->>  endif
->>  endif
->>
->
->
-> Note, this does not catch objects that have the -pg stripped by
-> CFLAGS_REMOVE_object.o
+Or may be removed by the method used in arch/x86/kernel/Makefile:
 
-Just checked the scripts/Makefile.lib and found c_flags:
+CONFIG_REMOVE_file.o = -pg
 
-106 _c_flags       = $(filter-out $(CFLAGS_REMOVE_$(basetarget).o),
-$(orig_c_flags))
+So, we must check the last variable stores the compiling flags, that is
+c_flags(Please refer to cmd_cc_o_c and rule_cc_o_c defined in
+scripts/Makefile.build) and since the CFLAGS_REMOVE_file.o is already
+filtered in _c_flags(Please refer to scripts/Makefile.lib) and _c_flags
+has less symbols, therefore, we only need to check _c_flags.
 
-And after used it instead of KBUILD_CFLAGS, it works well. Here is the
-testing result:
+---------------
+Changes from v1:
 
-1. The normal files with -pg
+  o Don't touch Makefile for CONFIG_FTRACE_MCOUNT_RECORD is enough
+  o Use _c_flags intead of KBUILD_CFLAGS to cover CONFIG_REMOVE_file.o = -pg
+  (feedback from Steven Rostedt <rostedt@goodmis.org>)
 
-$ make ARCH=mips CROSS_COMPILE=mips64el-unknown-linux-gnu- -j5 init/main.o
-  CHK     include/linux/version.h
-  CHK     include/generated/utsrelease.h
-  Checking missing-syscalls for N32
-  CALL    scripts/checksyscalls.sh
-  Checking missing-syscalls for O32
-  CALL    scripts/checksyscalls.sh
-  CALL    scripts/checksyscalls.sh
-  CC      init/main.o
-****printed by scripts/recordmcount.c: main
+Signed-off-by: Wu Zhangjin <wuzhangjin@gmail.com>
+---
+ scripts/Makefile.build |   13 +++++++++----
+ 1 files changed, 9 insertions(+), 4 deletions(-)
 
-2. the files with CONFIG_REMOVE_file.o = -pg
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index 5ad25e1..0ad6108 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -214,17 +214,22 @@ ifdef BUILD_C_RECORDMCOUNT
+ # The empty.o file is created in the make process in order to determine
+ #  the target endianness and word size. It is made before all other C
+ #  files, including recordmcount.
+-cmd_record_mcount = if [ $(@) != "scripts/mod/empty.o" ]; then			\
+-			$(objtree)/scripts/recordmcount "$(@)";			\
+-		    fi;
++sub_cmd_record_mcount =					\
++	if [ $(@) != "scripts/mod/empty.o" ]; then	\
++		$(objtree)/scripts/recordmcount "$(@)";	\
++	fi;
+ else
+-cmd_record_mcount = set -e ; perl $(srctree)/scripts/recordmcount.pl "$(ARCH)" \
++sub_cmd_record_mcount = set -e ; perl $(srctree)/scripts/recordmcount.pl "$(ARCH)" \
+ 	"$(if $(CONFIG_CPU_BIG_ENDIAN),big,little)" \
+ 	"$(if $(CONFIG_64BIT),64,32)" \
+ 	"$(OBJDUMP)" "$(OBJCOPY)" "$(CC) $(KBUILD_CFLAGS)" \
+ 	"$(LD)" "$(NM)" "$(RM)" "$(MV)" \
+ 	"$(if $(part-of-module),1,0)" "$(@)";
+ endif
++cmd_record_mcount = 						\
++	if [ "$(findstring -pg,$(_c_flags))" == "-pg" ]; then	\
++		$(sub_cmd_record_mcount)			\
++	fi;
+ endif
+ 
+ define rule_cc_o_c
+-- 
+1.7.1
 
-$ make ARCH=mips CROSS_COMPILE=mips64el-unknown-linux-gnu- -j5
-arch/mips/kernel/ftrace.o
-  CHK     include/linux/version.h
-  CHK     include/generated/utsrelease.h
-  Checking missing-syscalls for N32
-  CALL    scripts/checksyscalls.sh
-  Checking missing-syscalls for O32
-  CALL    scripts/checksyscalls.sh
-  CALL    scripts/checksyscalls.sh
-  CC      arch/mips/kernel/ftrace.o
-
-3. the files with obvious filter of -pg
-
-$ make ARCH=mips CROSS_COMPILE=mips64el-unknown-linux-gnu- -j5
-arch/mips/boot/compressed/dbg.o
-  CHK     include/linux/version.h
-  CHK     include/generated/utsrelease.h
-  Checking missing-syscalls for N32
-  CALL    scripts/checksyscalls.sh
-  Checking missing-syscalls for O32
-  CALL    scripts/checksyscalls.sh
-  CALL    scripts/checksyscalls.sh
-  CC      arch/mips/boot/compressed/dbg.o
-
-$ make ARCH=mips CROSS_COMPILE=mips64el-unknown-linux-gnu- -j5
-kernel/trace/ftrace.o
-  CHK     include/linux/version.h
-  CHK     include/generated/utsrelease.h
-  Checking missing-syscalls for N32
-  CALL    scripts/checksyscalls.sh
-  Checking missing-syscalls for O32
-  CALL    scripts/checksyscalls.sh
-  CALL    scripts/checksyscalls.sh
-  CC      kernel/trace/ftrace.o
-
->
->
-> How about something like this:
->
-> ifdef DEFINE_CMD_RECORD_MCOUNT
-> ifdef BUILD_C_RECORDMCOUNT
-> sub_cmd_record_mcount = if [ $(@) != "scripts/mod/empty.o" ]; then              \
->                        $(objtree)/scripts/recordmcount "$(@)";                 \
->                    fi;
-> else
-> sub_cmd_record_mcount = set -e ; perl $(srctree)/scripts/recordmcount.pl "$(ARCH)" \
->        "$(if $(CONFIG_CPU_BIG_ENDIAN),big,little)"                     \
->        "$(if $(CONFIG_64BIT),64,32)"                                   \
->        "$(OBJDUMP)" "$(OBJCOPY)" "$(CC) $(KBUILD_CFLAGS)"              \
->        "$(LD)" "$(NM)" "$(RM)" "$(MV)"                                 \
->        "$(if $(part-of-module),1,0)" "$(@)";
-> endif
-> cmd_record_mcount =                                                     \
->        if [ "$(findstring -pg, $(_c_flags))" == "-pg" ]; then          \
->                $(sub_cmd_record_mcount)                                \
->        fi;
-> endif
->
->
->
-> I tested the above and it seemed to work (although, I did it on another
-> machine, and copied it here by hand, so this version may have a typo).
->
-
-Yeah, this removed the duplicated findstring, will fix the typo and apply it.
-
-Thanks!
-Wu Zhangjin
