@@ -1,81 +1,146 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from 124x34x33x190.ap124.ftth.ucom.ne.jp ([124.34.33.190]:52630 "EHLO
-	master.linux-sh.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752702Ab0J0D0Q (ORCPT
+Received: from hrndva-omtalb.mail.rr.com ([71.74.56.124]:42532 "EHLO
+	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757705Ab0J0NVo (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 26 Oct 2010 23:26:16 -0400
-Date: Wed, 27 Oct 2010 12:25:49 +0900
-From: Paul Mundt <lethal@linux-sh.org>
-Subject: Re: [PATCH 2/3] ftrace/x86: Add support for C version of recordmcount
-Message-ID: <20101027032548.GA5341@linux-sh.org>
-References: <20101014210014.895157788@goodmis.org> <20101014210136.230687571@goodmis.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20101014210136.230687571@goodmis.org>
+	Wed, 27 Oct 2010 09:21:44 -0400
+Subject: Re: [PATCH] ftrace: Speed up recordmcount
+From: Steven Rostedt <rostedt@goodmis.org>
+In-Reply-To: <f603e1dc44524b81ebc423dd226eb44d837a37be.1288175801.git.wuzhangjin@gmail.com>
+References: <f603e1dc44524b81ebc423dd226eb44d837a37be.1288175801.git.wuzhangjin@gmail.com>
+Content-Type: text/plain; charset="ISO-8859-15"
+Date: Wed, 27 Oct 2010 09:21:40 -0400
+Message-ID: <1288185700.18238.117.camel@gandalf.stny.rr.com>
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Steven Rostedt <rostedt@goodmis.org>
-Cc: linux-kernel@vger.kernel.org, Ingo Molnar <mingo@elte.hu>, Andrew Morton <akpm@linux-foundation.org>, Frederic Weisbecker <fweisbec@gmail.com>, linux-arch@vger.kernel.org, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, John Reiser <jreiser@bitwagon.com>
+To: Wu Zhangjin <wuzhangjin@gmail.com>
+Cc: linux-kernel@vger.kernel.org, mingo@elte.hu, John Reiser <jreiser@bitwagon.com>, Michal Marek <mmarek@suse.cz>, linux-kbuild <linux-kbuild@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>
 
-On Thu, Oct 14, 2010 at 05:00:16PM -0400, Steven Rostedt wrote:
-> From: Steven Rostedt <srostedt@redhat.com>
+[ Added kbuild maintainers ]
+
+On Wed, 2010-10-27 at 18:39 +0800, Wu Zhangjin wrote:
+> From: Wu Zhangjin <wuzhangjin@gmail.com>
 > 
-> This patch adds the support for the C version of recordmcount and
-> compile times show ~ 12% improvement.
+> cmd_record_mcount is only needed for the targets who are compiled with
+> -pg, so, only define it when CONFIG_FTRACE_MCOUNT_RECORD is defined and
+> only use it for the targets who are compiled with -pg.
+
+Thanks! I was going to do this myself, but just have not gotten around
+to it.
+
 > 
-> After verifying this works, other archs can add:
+> Signed-off-by: Wu Zhangjin <wuzhangjin@gmail.com>
+
+I need a SoB from Michal to apply it.
+
+> ---
+>  Makefile               |   11 ++++++++---
+>  scripts/Makefile.build |   26 ++++++++++++++++----------
+>  2 files changed, 24 insertions(+), 13 deletions(-)
 > 
->  HAVE_C_MCOUNT_RECORD
-> 
-> in its Kconfig and it will use the C version of recordmcount
-> instead of the perl version.
-> 
-While I haven't had the chance to debug this yet, turning it on for SH
-blows up immediately:
+> diff --git a/Makefile b/Makefile
+> index 3e43805..60d7a87 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -576,9 +576,14 @@ endif
+>  ifdef CONFIG_FUNCTION_TRACER
+>  KBUILD_CFLAGS	+= -pg
+>  ifdef CONFIG_DYNAMIC_FTRACE
+> -	ifdef CONFIG_HAVE_C_RECORDMCOUNT
+> -		BUILD_C_RECORDMCOUNT := y
+> -		export BUILD_C_RECORDMCOUNT
+> +	ifdef CONFIG_FTRACE_MCOUNT_RECORD
 
-ftrace: allocating 15200 entries in 30 pages
-------------[ cut here ]------------
-WARNING: at /home/pmundt/devel/git/sh-2.6/kernel/trace/ftrace.c:1007
-Modules linked in:
+FTRACE_MCOUNT_RECORD depends on DYNAMIC_FTRACE, so if you require
+FTRACE_MCOUNT_RECORD, you can remove the ifdef CONFIG_DYNAMIC_FTRACE.
 
-Pid : 0, Comm:           swapper
-CPU : 0                  Not tainted  (2.6.36-05622-g38ab134-dirty #508)
 
-PC is at ftrace_bug+0x78/0x23c
-PR is at ftrace_bug+0x74/0x23c
-PC  : 80064df4 SP  : 8056ff70 SR  : 400080f0 TEA : c0000004
-R0  : 00000001 R1  : 00000001 R2  : 8064d862 R3  : 8056ff64
-R4  : 805b47b4 R5  : 00000001 R6  : 00000000 R7  : 00000001
-R8  : 803b15d8 R9  : 00000001 R10 : 9fc38be8 R11 : 00000000
-R12 : 8064e88c R13 : 8064e880 R14 : 8056ff70
-MACH: 00000000 MACL: 003d0900 GBR : 296e1678 PR  : 80064df0
+> +		DEFINE_CMD_RECORD_MCOUNT := y
+> +		export DEFINE_CMD_RECORD_MCOUNT
+> +
+> +		ifdef CONFIG_HAVE_C_RECORDMCOUNT
+> +			BUILD_C_RECORDMCOUNT := y
+> +			export BUILD_C_RECORDMCOUNT
+> +		endif
+>  	endif
+>  endif
+>  endif
+> diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+> index 5ad25e1..ceb5175 100644
+> --- a/scripts/Makefile.build
+> +++ b/scripts/Makefile.build
+> @@ -208,22 +208,28 @@ cmd_modversions =								\
+>  	fi;
+>  endif
+>  
+> -ifdef CONFIG_FTRACE_MCOUNT_RECORD
+> +ifdef DEFINE_CMD_RECORD_MCOUNT
+>  ifdef BUILD_C_RECORDMCOUNT
+>  # Due to recursion, we must skip empty.o.
+>  # The empty.o file is created in the make process in order to determine
+>  #  the target endianness and word size. It is made before all other C
+>  #  files, including recordmcount.
+> -cmd_record_mcount = if [ $(@) != "scripts/mod/empty.o" ]; then			\
+> -			$(objtree)/scripts/recordmcount "$(@)";			\
+> -		    fi;
+> +cmd_record_mcount =							\
+> +	if [ "$(findstring -pg,$(KBUILD_CFLAGS))" == "-pg" ]; then	\
+> +		if [ $(@) != "scripts/mod/empty.o" ]; then		\
+> +			$(objtree)/scripts/recordmcount "$(@)";		\
+> +		fi;							\
+> +	fi;
+>  else
+> -cmd_record_mcount = set -e ; perl $(srctree)/scripts/recordmcount.pl "$(ARCH)" \
+> -	"$(if $(CONFIG_CPU_BIG_ENDIAN),big,little)" \
+> -	"$(if $(CONFIG_64BIT),64,32)" \
+> -	"$(OBJDUMP)" "$(OBJCOPY)" "$(CC) $(KBUILD_CFLAGS)" \
+> -	"$(LD)" "$(NM)" "$(RM)" "$(MV)" \
+> -	"$(if $(part-of-module),1,0)" "$(@)";
+> +cmd_record_mcount = 							\
+> +	if [ "$(findstring -pg,$(KBUILD_CFLAGS))" == "-pg" ]; then	\
+> +		set -e ; perl $(srctree)/scripts/recordmcount.pl "$(ARCH)" \
+> +		"$(if $(CONFIG_CPU_BIG_ENDIAN),big,little)" 		\
+> +		"$(if $(CONFIG_64BIT),64,32)" 				\
+> +		"$(OBJDUMP)" "$(OBJCOPY)" "$(CC) $(KBUILD_CFLAGS)" 	\
+> +		"$(LD)" "$(NM)" "$(RM)" "$(MV)" 			\
+> +		"$(if $(part-of-module),1,0)" "$(@)";			\
+> +	fi;
+>  endif
+>  endif
+>  
 
-Call trace:
- [<80066a86>] ftrace_process_locs+0x15a/0x284
- [<803b15d8>] dns_query+0x0/0x26c
- [<805f6a1a>] ftrace_init+0x112/0x1a8
- [<801deec0>] strlen+0x0/0x58
- [<8008f098>] get_zeroed_page+0x0/0x34
- [<805f0918>] start_kernel+0x3e0/0x480
- [<801deec0>] strlen+0x0/0x58
- [<801eb388>] debug_smp_processor_id+0x0/0xe4
- [<80002132>] _stext+0x132/0x140
 
-Code:
-  80064dee:  mov       r9, r5
-  80064df0:  tst       r9, r9
-  80064df2:  bt        80064df6
-->80064df4:  trapa     #62
-  80064df6:  bra       80064ef2
-  80064df8:  mov       r9, r5
-  80064dfa:  mov.l     80064f68 <ftrace_bug+0x1ec/0x23c>, r1  ! 8064d862 <__warned.27604+0x0/0x1>
-  80064dfc:  mov.b     r2, @r1
-  80064dfe:  mov.l     80064f48 <ftrace_bug+0x1cc/0x23c>, r1  ! 8057021c <ftrace_disabled+0x0/0x4>
+Note, this does not catch objects that have the -pg stripped by
+CFLAGS_REMOVE_object.o
 
----[ end trace 4eaa2a86a8e2da22 ]---
-ftrace failed to modify [<803b15d8>] dns_query+0x0/0x26c
- actual: 02:d1:22:4f
-Testing tracer nop: PASSED
 
-Suggestions?
+How about something like this:
+
+ifdef DEFINE_CMD_RECORD_MCOUNT
+ifdef BUILD_C_RECORDMCOUNT
+sub_cmd_record_mcount = if [ $(@) != "scripts/mod/empty.o" ]; then		\
+			$(objtree)/scripts/recordmcount "$(@)";			\
+		    fi;
+else
+sub_cmd_record_mcount = set -e ; perl $(srctree)/scripts/recordmcount.pl "$(ARCH)" \
+	"$(if $(CONFIG_CPU_BIG_ENDIAN),big,little)"			\
+	"$(if $(CONFIG_64BIT),64,32)"					\
+	"$(OBJDUMP)" "$(OBJCOPY)" "$(CC) $(KBUILD_CFLAGS)"		\
+	"$(LD)" "$(NM)" "$(RM)" "$(MV)"					\
+	"$(if $(part-of-module),1,0)" "$(@)";
+endif
+cmd_record_mcount =							\
+	if [ "$(findstring -pg, $(_c_flags))" == "-pg" ]; then		\
+		$(sub_cmd_record_mcount)				\
+	fi;
+endif
+
+
+I tested the above and it seemed to work (although, I did it on another
+machine, and copied it here by hand, so this version may have a typo).
+
+-- Steve
+
+
