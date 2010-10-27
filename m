@@ -1,83 +1,68 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qw0-f46.google.com ([209.85.216.46]:58950 "EHLO
-	mail-qw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751847Ab0J0QYu (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 27 Oct 2010 12:24:50 -0400
-From: Wu Zhangjin <wuzhangjin@gmail.com>
-Subject: [v2 PATCH] ftrace: Speed up recordmcount
-Date: Thu, 28 Oct 2010 00:24:34 +0800
-Message-Id: <3dc8cddf022eb7024f9f2cf857529a15bee8999a.1288196498.git.wuzhangjin@gmail.com>
+Received: from cantor2.suse.de ([195.135.220.15]:40431 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752481Ab0J0WSY (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 27 Oct 2010 18:18:24 -0400
+Message-ID: <4CC8A534.80504@suse.cz>
+Date: Thu, 28 Oct 2010 00:18:28 +0200
+From: Michal Marek <mmarek@suse.cz>
+MIME-Version: 1.0
+Subject: Re: [PATCH] kbuild: check return value of asprintf()
+References: <1287757930-2766-1-git-send-email-namhyung@gmail.com> <4CC54E4D.7040401@suse.cz> <4CC59765.5080908@oracle.com>
+In-Reply-To: <4CC59765.5080908@oracle.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: rostedt@goodmis.org, linux-kernel@vger.kernel.org
-Cc: mingo@elte.hu, John Reiser <jreiser@bitwagon.com>, Sam Ravnborg <sam@ravnborg.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.cz>, Wu Zhangjin <wuzhangjin@gmail.com>
+To: Randy Dunlap <randy.dunlap@oracle.com>
+Cc: Namhyung Kim <namhyung@gmail.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-From: Wu Zhangjin <wuzhangjin@gmail.com>
+On 25.10.2010 16:42, Randy Dunlap wrote:
+> On 10/25/10 02:30, Michal Marek wrote:
+>> (adding Randy to CC)
+> 
+> Thanks, Michal.
+> 
+> Acked-by: Randy Dunlap <randy.dunlap@oracle.com>
 
-cmd_record_mcount is used to locate the _mcount symbols in the object
-files, only the files compiled with -pg has the _mcount symbol, so, it
-is only needed for such files, but the current cmd_record_mcount is used
-for all of the object files, so, we need to fix it and speed it up.
+OK, applied to kbuild-2.6.git#misc.
 
-Since -pg may be removed by the method used in kernel/trace/Makefile:
-
-ORIG_CFLAGS := $(KBUILD_CFLAGS)
-KBUILD_CFLAGS = $(subst -pg,,$(ORIG_CFLAGS))
-
-Or may be removed by the method used in arch/x86/kernel/Makefile:
-
-CONFIG_REMOVE_file.o = -pg
-
-So, we must check the last variable stores the compiling flags, that is
-c_flags(Please refer to cmd_cc_o_c and rule_cc_o_c defined in
-scripts/Makefile.build) and since the CFLAGS_REMOVE_file.o is already
-filtered in _c_flags(Please refer to scripts/Makefile.lib) and _c_flags
-has less symbols, therefore, we only need to check _c_flags.
-
----------------
-Changes from v1:
-
-  o Don't touch Makefile for CONFIG_FTRACE_MCOUNT_RECORD is enough
-  o Use _c_flags intead of KBUILD_CFLAGS to cover CONFIG_REMOVE_file.o = -pg
-  (feedback from Steven Rostedt <rostedt@goodmis.org>)
-
-Signed-off-by: Wu Zhangjin <wuzhangjin@gmail.com>
----
- scripts/Makefile.build |   13 +++++++++----
- 1 files changed, 9 insertions(+), 4 deletions(-)
-
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index 5ad25e1..0ad6108 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -214,17 +214,22 @@ ifdef BUILD_C_RECORDMCOUNT
- # The empty.o file is created in the make process in order to determine
- #  the target endianness and word size. It is made before all other C
- #  files, including recordmcount.
--cmd_record_mcount = if [ $(@) != "scripts/mod/empty.o" ]; then			\
--			$(objtree)/scripts/recordmcount "$(@)";			\
--		    fi;
-+sub_cmd_record_mcount =					\
-+	if [ $(@) != "scripts/mod/empty.o" ]; then	\
-+		$(objtree)/scripts/recordmcount "$(@)";	\
-+	fi;
- else
--cmd_record_mcount = set -e ; perl $(srctree)/scripts/recordmcount.pl "$(ARCH)" \
-+sub_cmd_record_mcount = set -e ; perl $(srctree)/scripts/recordmcount.pl "$(ARCH)" \
- 	"$(if $(CONFIG_CPU_BIG_ENDIAN),big,little)" \
- 	"$(if $(CONFIG_64BIT),64,32)" \
- 	"$(OBJDUMP)" "$(OBJCOPY)" "$(CC) $(KBUILD_CFLAGS)" \
- 	"$(LD)" "$(NM)" "$(RM)" "$(MV)" \
- 	"$(if $(part-of-module),1,0)" "$(@)";
- endif
-+cmd_record_mcount = 						\
-+	if [ "$(findstring -pg,$(_c_flags))" == "-pg" ]; then	\
-+		$(sub_cmd_record_mcount)			\
-+	fi;
- endif
- 
- define rule_cc_o_c
--- 
-1.7.1
+Michal
+> 
+> 
+>> On 22.10.2010 16:32, Namhyung Kim wrote:
+>>> Check return value of asprintf() in docsect() and exit if error
+>>> occurs. This removes following warning:
+>>>
+>>>   HOSTCC  scripts/basic/docproc
+>>> scripts/basic/docproc.c: In function ‘docsect’:
+>>> scripts/basic/docproc.c:336: warning: ignoring return value of ‘asprintf’,
+>>> 				declared with attribute warn_unused_result
+>>>
+>>> Signed-off-by: Namhyung Kim <namhyung@gmail.com>
+>>> ---
+>>> The patch is on top of v2.6.36, thanks.
+>>>
+>>>  scripts/basic/docproc.c |    5 ++++-
+>>>  1 files changed, 4 insertions(+), 1 deletions(-)
+>>>
+>>> diff --git a/scripts/basic/docproc.c b/scripts/basic/docproc.c
+>>> index fc3b18d..98dec87 100644
+>>> --- a/scripts/basic/docproc.c
+>>> +++ b/scripts/basic/docproc.c
+>>> @@ -333,7 +333,10 @@ static void docsect(char *filename, char *line)
+>>>  		if (*s == '\n')
+>>>  			*s = '\0';
+>>>  
+>>> -	asprintf(&s, "DOC: %s", line);
+>>> +	if (asprintf(&s, "DOC: %s", line) < 0) {
+>>> +		perror("asprintf");
+>>> +		exit(1);
+>>> +	}
+>>>  	consume_symbol(s);
+>>>  	free(s);
+>>>  
+>>
+> 
+> 
 
