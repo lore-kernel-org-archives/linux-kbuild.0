@@ -1,93 +1,79 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor.suse.de ([195.135.220.2]:38425 "EHLO mx1.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:48380 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1758873Ab0J1VGG (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 28 Oct 2010 17:06:06 -0400
-Message-ID: <4CC9E5B5.5040402@suse.cz>
-Date: Thu, 28 Oct 2010 23:05:57 +0200
+	id S1760452Ab0J1WCf (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 28 Oct 2010 18:02:35 -0400
+Date: Fri, 29 Oct 2010 00:02:31 +0200
 From: Michal Marek <mmarek@suse.cz>
+Subject: [GIT] kbuild core changes for 2.6.37-rc1
+Message-ID: <20101028220231.GA29698@sepie.suse.cz>
 MIME-Version: 1.0
-Subject: Re: [v2 PATCH] ftrace: Speed up recordmcount
-References: <3dc8cddf022eb7024f9f2cf857529a15bee8999a.1288196498.git.wuzhangjin@gmail.com>
-In-Reply-To: <3dc8cddf022eb7024f9f2cf857529a15bee8999a.1288196498.git.wuzhangjin@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-2
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Wu Zhangjin <wuzhangjin@gmail.com>
-Cc: rostedt@goodmis.org, linux-kernel@vger.kernel.org, mingo@elte.hu, John Reiser <jreiser@bitwagon.com>, Sam Ravnborg <sam@ravnborg.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: andy.shevchenko@gmail.com, brueckner@linux.vnet.ibm.com, mika@grml.org, mmarek@suse.cz, sakiwit@gmail.com, vapier.adi@gmail.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On 27.10.2010 18:24, Wu Zhangjin wrote:
-> From: Wu Zhangjin <wuzhangjin@gmail.com>
-> 
-> cmd_record_mcount is used to locate the _mcount symbols in the object
-> files, only the files compiled with -pg has the _mcount symbol, so, it
-> is only needed for such files, but the current cmd_record_mcount is used
-> for all of the object files, so, we need to fix it and speed it up.
-> 
-> Since -pg may be removed by the method used in kernel/trace/Makefile:
-> 
-> ORIG_CFLAGS := $(KBUILD_CFLAGS)
-> KBUILD_CFLAGS = $(subst -pg,,$(ORIG_CFLAGS))
-> 
-> Or may be removed by the method used in arch/x86/kernel/Makefile:
-> 
-> CONFIG_REMOVE_file.o = -pg
+Hi Linus,
 
-CFLAGS_REMOVE_file.o
+please pull these kbuild changes for 2.6.37-rc1:
+* usr/initramfs cleanup and fix (and a fix to build Blackfin again)
+* 'make clean' cleanup and fix
+* two more minor fixes
 
+Nothing really exciting this time, I have three more branches that will
+follow.
 
-> So, we must check the last variable stores the compiling flags, that is
-> c_flags(Please refer to cmd_cc_o_c and rule_cc_o_c defined in
-> scripts/Makefile.build) and since the CFLAGS_REMOVE_file.o is already
-> filtered in _c_flags(Please refer to scripts/Makefile.lib) and _c_flags
-> has less symbols, therefore, we only need to check _c_flags.
-> 
-> ---------------
-> Changes from v1:
-> 
->   o Don't touch Makefile for CONFIG_FTRACE_MCOUNT_RECORD is enough
->   o Use _c_flags intead of KBUILD_CFLAGS to cover CONFIG_REMOVE_file.o = -pg
->   (feedback from Steven Rostedt <rostedt@goodmis.org>)
-> 
-> Signed-off-by: Wu Zhangjin <wuzhangjin@gmail.com>
+Michal
 
-Acked-by: Michal Marek <mmarek@suse.cz>
+The following changes since commit da5cabf80e2433131bf0ed8993abc0f7ea618c73:
 
+  Linux 2.6.36-rc1 (2010-08-15 17:41:37 -0700)
 
-> ---
->  scripts/Makefile.build |   13 +++++++++----
->  1 files changed, 9 insertions(+), 4 deletions(-)
-> 
-> diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-> index 5ad25e1..0ad6108 100644
-> --- a/scripts/Makefile.build
-> +++ b/scripts/Makefile.build
-> @@ -214,17 +214,22 @@ ifdef BUILD_C_RECORDMCOUNT
->  # The empty.o file is created in the make process in order to determine
->  #  the target endianness and word size. It is made before all other C
->  #  files, including recordmcount.
-> -cmd_record_mcount = if [ $(@) != "scripts/mod/empty.o" ]; then			\
-> -			$(objtree)/scripts/recordmcount "$(@)";			\
-> -		    fi;
-> +sub_cmd_record_mcount =					\
-> +	if [ $(@) != "scripts/mod/empty.o" ]; then	\
-> +		$(objtree)/scripts/recordmcount "$(@)";	\
-> +	fi;
->  else
-> -cmd_record_mcount = set -e ; perl $(srctree)/scripts/recordmcount.pl "$(ARCH)" \
-> +sub_cmd_record_mcount = set -e ; perl $(srctree)/scripts/recordmcount.pl "$(ARCH)" \
->  	"$(if $(CONFIG_CPU_BIG_ENDIAN),big,little)" \
->  	"$(if $(CONFIG_64BIT),64,32)" \
->  	"$(OBJDUMP)" "$(OBJCOPY)" "$(CC) $(KBUILD_CFLAGS)" \
->  	"$(LD)" "$(NM)" "$(RM)" "$(MV)" \
->  	"$(if $(part-of-module),1,0)" "$(@)";
->  endif
-> +cmd_record_mcount = 						\
-> +	if [ "$(findstring -pg,$(_c_flags))" == "-pg" ]; then	\
-> +		$(sub_cmd_record_mcount)			\
-> +	fi;
->  endif
->  
->  define rule_cc_o_c
+are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild-2.6.git kbuild
 
+Andy Shevchenko (1):
+      scripts/mod/modpost.c: fix commentary accordingly to last changes
+
+Hendrik Brueckner (2):
+      initramfs: generalize initramfs_data.xxx.S variants
+      initramfs: fix initramfs size calculation
+
+Jean Sacren (1):
+      scripts/kallsyms: Enable error messages while hush up unnecessary warnings
+
+Michael Prokop (1):
+      scripts/setlocalversion: update comment
+
+Michal Marek (4):
+      kbuild: Really don't clean bounds.h and asm-offsets.h
+      kbuild: Do not run make clean in $(srctree)
+      kbuild: Use a single clean rule for kernel and external modules
+      Merge branch 'kbuild/clean' into kbuild/kbuild
+
+Mike Frysinger (1):
+      initramfs: Fix build break on symbol-prefixed archs
+
+ Documentation/kbuild/makefiles.txt |    7 +++++++
+ Kbuild                             |    4 ++--
+ Makefile                           |   33 +++++++++++++--------------------
+ include/asm-generic/vmlinux.lds.h  |    3 ++-
+ init/initramfs.c                   |    9 ++++-----
+ scripts/Makefile.clean             |    2 ++
+ scripts/Makefile.lib               |    4 +++-
+ scripts/kallsyms.c                 |    8 ++------
+ scripts/mod/modpost.c              |    5 ++++-
+ scripts/setlocalversion            |    6 ++++--
+ usr/Makefile                       |    6 ++++--
+ usr/initramfs_data.S               |   21 ++++++++++++++-------
+ usr/initramfs_data.bz2.S           |   29 -----------------------------
+ usr/initramfs_data.gz.S            |   29 -----------------------------
+ usr/initramfs_data.lzma.S          |   29 -----------------------------
+ usr/initramfs_data.lzo.S           |   29 -----------------------------
+ 16 files changed, 61 insertions(+), 163 deletions(-)
+ delete mode 100644 usr/initramfs_data.bz2.S
+ delete mode 100644 usr/initramfs_data.gz.S
+ delete mode 100644 usr/initramfs_data.lzma.S
+ delete mode 100644 usr/initramfs_data.lzo.S
