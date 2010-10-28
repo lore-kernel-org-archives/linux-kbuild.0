@@ -1,47 +1,97 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:41022 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752046Ab0J0W4s (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 27 Oct 2010 18:56:48 -0400
-Message-ID: <4CC8AE34.30607@suse.cz>
-Date: Thu, 28 Oct 2010 00:56:52 +0200
-From: Michal Marek <mmarek@suse.cz>
-MIME-Version: 1.0
-Subject: Re: [PATCH 1/4] kbuild: don't assign `stdout' and `stderr'
-References: <1281932346-19067-1-git-send-email-lacombar@gmail.com>	<20100817082732.GA26082@sepie.suse.cz> <AANLkTimaeNoK9yDyoFHma_zLu+euSjXfni298_nEKHWK@mail.gmail.com>
-In-Reply-To: <AANLkTimaeNoK9yDyoFHma_zLu+euSjXfni298_nEKHWK@mail.gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
+Received: from hrndva-omtalb.mail.rr.com ([71.74.56.122]:56358 "EHLO
+	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932457Ab0J1CVU (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 27 Oct 2010 22:21:20 -0400
+Subject: Re: [v2 PATCH] ftrace: Speed up recordmcount
+From: Steven Rostedt <rostedt@goodmis.org>
+In-Reply-To: <3dc8cddf022eb7024f9f2cf857529a15bee8999a.1288196498.git.wuzhangjin@gmail.com>
+References: <3dc8cddf022eb7024f9f2cf857529a15bee8999a.1288196498.git.wuzhangjin@gmail.com>
+Content-Type: text/plain; charset="ISO-8859-15"
+Date: Wed, 27 Oct 2010 22:21:18 -0400
+Message-ID: <1288232478.18238.138.camel@gandalf.stny.rr.com>
+Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnaud Lacombe <lacombar@gmail.com>
-Cc: Sam Ravnborg <sam@ravnborg.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Nir Tzachar <nir.tzachar@gmail.com>
+To: Wu Zhangjin <wuzhangjin@gmail.com>
+Cc: linux-kernel@vger.kernel.org, mingo@elte.hu, John Reiser <jreiser@bitwagon.com>, Sam Ravnborg <sam@ravnborg.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.cz>
 
-On 21.10.2010 04:22, Arnaud Lacombe wrote:
-> Hi Michal,
+Michal,
+
+Can you give an Acked-by: on this patch?
+
+Thanks!
+
+-- Steve
+
+
+On Thu, 2010-10-28 at 00:24 +0800, Wu Zhangjin wrote:
+> From: Wu Zhangjin <wuzhangjin@gmail.com>
 > 
-> On Tue, Aug 17, 2010 at 4:27 AM, Michal Marek <mmarek@suse.cz> wrote:
->> On Mon, Aug 16, 2010 at 12:19:03AM -0400, Arnaud Lacombe wrote:
->>> These may not be modifiable, as per C99 comment:
->>>
->>> section 7.19.5.4, note 232:
->>> "
->>> The primary use of the freopen function is to change the file associated with a
->>> standard text stream (stderr, stdin, or stdout), as those identifiers need not
->>> be modifiable lvalues to which the value returned by the fopen function may be
->>> assigned.
->>> "
->>>
->>> Use a duplicate of stdout as ncurses' output terminal, then redirect it
->>> to /dev/null for conf_write().
->>
->> I would much rather get rid of this redirection completely. The config
->> library should not play with stdout, but let the frontends display
->> messages as they wish. This patch does it for nconfig. Nir, what do you
->> think?
->>
-> any news about this ? AFAICS, it not in `kbuild/kconfig'.
+> cmd_record_mcount is used to locate the _mcount symbols in the object
+> files, only the files compiled with -pg has the _mcount symbol, so, it
+> is only needed for such files, but the current cmd_record_mcount is used
+> for all of the object files, so, we need to fix it and speed it up.
+> 
+> Since -pg may be removed by the method used in kernel/trace/Makefile:
+> 
+> ORIG_CFLAGS := $(KBUILD_CFLAGS)
+> KBUILD_CFLAGS = $(subst -pg,,$(ORIG_CFLAGS))
+> 
+> Or may be removed by the method used in arch/x86/kernel/Makefile:
+> 
+> CONFIG_REMOVE_file.o = -pg
+> 
+> So, we must check the last variable stores the compiling flags, that is
+> c_flags(Please refer to cmd_cc_o_c and rule_cc_o_c defined in
+> scripts/Makefile.build) and since the CFLAGS_REMOVE_file.o is already
+> filtered in _c_flags(Please refer to scripts/Makefile.lib) and _c_flags
+> has less symbols, therefore, we only need to check _c_flags.
+> 
+> ---------------
+> Changes from v1:
+> 
+>   o Don't touch Makefile for CONFIG_FTRACE_MCOUNT_RECORD is enough
+>   o Use _c_flags intead of KBUILD_CFLAGS to cover CONFIG_REMOVE_file.o = -pg
+>   (feedback from Steven Rostedt <rostedt@goodmis.org>)
+> 
+> Signed-off-by: Wu Zhangjin <wuzhangjin@gmail.com>
+> ---
+>  scripts/Makefile.build |   13 +++++++++----
+>  1 files changed, 9 insertions(+), 4 deletions(-)
+> 
+> diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+> index 5ad25e1..0ad6108 100644
+> --- a/scripts/Makefile.build
+> +++ b/scripts/Makefile.build
+> @@ -214,17 +214,22 @@ ifdef BUILD_C_RECORDMCOUNT
+>  # The empty.o file is created in the make process in order to determine
+>  #  the target endianness and word size. It is made before all other C
+>  #  files, including recordmcount.
+> -cmd_record_mcount = if [ $(@) != "scripts/mod/empty.o" ]; then			\
+> -			$(objtree)/scripts/recordmcount "$(@)";			\
+> -		    fi;
+> +sub_cmd_record_mcount =					\
+> +	if [ $(@) != "scripts/mod/empty.o" ]; then	\
+> +		$(objtree)/scripts/recordmcount "$(@)";	\
+> +	fi;
+>  else
+> -cmd_record_mcount = set -e ; perl $(srctree)/scripts/recordmcount.pl "$(ARCH)" \
+> +sub_cmd_record_mcount = set -e ; perl $(srctree)/scripts/recordmcount.pl "$(ARCH)" \
+>  	"$(if $(CONFIG_CPU_BIG_ENDIAN),big,little)" \
+>  	"$(if $(CONFIG_64BIT),64,32)" \
+>  	"$(OBJDUMP)" "$(OBJCOPY)" "$(CC) $(KBUILD_CFLAGS)" \
+>  	"$(LD)" "$(NM)" "$(RM)" "$(MV)" \
+>  	"$(if $(part-of-module),1,0)" "$(@)";
+>  endif
+> +cmd_record_mcount = 						\
+> +	if [ "$(findstring -pg,$(_c_flags))" == "-pg" ]; then	\
+> +		$(sub_cmd_record_mcount)			\
+> +	fi;
+>  endif
+>  
+>  define rule_cc_o_c
 
-Sorry, I forgot about this patch. It's merged into the kconfig branch now.
 
-Michal
