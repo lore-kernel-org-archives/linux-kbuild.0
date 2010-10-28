@@ -1,157 +1,146 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:48697 "EHLO mx2.suse.de"
+Received: from cantor.suse.de ([195.135.220.2]:40140 "EHLO mx1.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751725Ab0J1WT7 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 28 Oct 2010 18:19:59 -0400
-Date: Fri, 29 Oct 2010 00:19:56 +0200
+	id S1751924Ab0J1W3p (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 28 Oct 2010 18:29:45 -0400
+Date: Fri, 29 Oct 2010 00:29:42 +0200
 From: Michal Marek <mmarek@suse.cz>
-Subject: [GIT] kconfig changes for 2.6.37-rc1
-Message-ID: <20101028221956.GA30585@sepie.suse.cz>
+Subject: [GIT] kbuild misc changes for 2.6.37-rc1
+Message-ID: <20101028222942.GA1852@sepie.suse.cz>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: alexander.stein@informatik.tu-chemnitz.de, andrea.gelmini@gelma.net, bebarino@gmail.com, gitster@pobox.com, justinmattock@gmail.com, kyle@redhat.com, lacombar@gmail.com, mmarek@suse.cz, naota@elisp.net, nir.tzachar@gmail.com, will.newton@gmail.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: Nicolas.Palix@inria.fr, amwang@redhat.com, dick@streefland.net, julia@diku.dk, mfm@muteddisk.com, mmarek@suse.cz, namhyung@gmail.com, npalix.work@gmail.com, npalix@diku.dk, shemminger@vyatta.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
 Hi Linus,
 
-this is the kconfig stuff for 2.6.37-rc1:
-* kconfig portability fixes and generalization
-* xconfig ported to Qt4
-* nconfig search redesigned
-* kconfig warnings enabled again, these were disabled late in the 2.6.36
-  rc phase, which is why the shortlog is since 2.6.36-rc8 (I had to
-  merge the rc-fixes branch)
-* other small fixes
-
-Note:  71d8066 (kbuild: fix oldnoconfig to do the right thing) made it
-already into 2.6.36 as e9203c9, but it was originally meant for this
-merge window and I did not want to rebase the branch. Please let me know
-if that's a problem.
+please pull these assorted kbuild updates for 2.6.37-rc1:
+* make coccicheck updates
+* kbuild documentation improved
+* scripts/namespace.pl (make namespacecheck) fixes
+* scripts/extract-ikconfig support for bzip2, lzma and lzo-compressed
+  kernels
+* small fix for scripts/basic/docproc, which is the reason why I merged
+  v2.6.36, because the code to be fixed went via another tree in the
+  rc phase.
 
 Michal
 
-The following changes since commit cd07202cc8262e1669edff0d97715f3dd9260917:
+The following changes since commit f6f94e2ab1b33f0082ac22d71f66385a60d8157f:
 
-  Linux 2.6.36-rc8 (2010-10-14 16:26:43 -0700)
+  Linux 2.6.36 (2010-10-20 13:30:22 -0700)
 
 are available in the git repository at:
-  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild-2.6.git kconfig
+  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild-2.6.git misc
 
-Alexander Stein (2):
-      kconfig qconf: port to QT4
-      Fix QT4 moc, cflags libs detection on dual QT3/Qt4 systems
+Amerigo Wang (3):
+      scripts/namespace.pl: fix wrong source path
+      scripts/namespace.pl: some bug fixes
+      scripts/namespace.pl: improve to get more correct results
 
-Andrea Gelmini (1):
-      README: cite nconfig
+Dick Streefland (1):
+      scripts/extract-ikconfig: add support for bzip2, lzma and lzo
 
-Arnaud Lacombe (22):
-      kbuild: confdata.c explicitly reference errno, thus need <errno.h>
-      kbuild: don't include `check-lxdialog' ldflags in global HOST_LOADLIBES
-      kbuild: fix typo
-      kbuild: don't overwrite HOST_EXTRACFLAGS
-      kbuild: use getopt_long(), not its _only() variant
-      kconfig: replace a `switch()' statement by a more flexible `if()' statement
-      kconfig: rephrase help text not to mention the internal prefix
-      kconfig: allow build-time definition of the internal config prefix
-      kconfig: rephrase help texts/comments not to include the package name
-      kconfig: allow PACKAGE to be defined on the compiler's command-line
-      kconfig: implement the `mainmenu' directive
-      kconfig: regen parser
-      kconfig: add a symbol string expansion helper
-      kconfig: expand by default the rootmenu's prompt
-      kconfig: delay gconf window initialization
-      kconfig: replace KERNELVERSION usage by the mainmenu's prompt
-      kconfig: don't emit warning upon rootmenu's prompt redefinition
-      kconfig: constify file name
-      kconfig: use the file's name of sourced file
-      kconfig: expand file names
-      kbuild: migrate all arch to the kconfig mainmenu upgrade
-      kbuild: convert `arch/tile' to the kconfig mainmenu upgrade
+Julia Lawall (2):
+      Coccinelle: Find nested lock+irqsave functions that use the same flags variables.
+      Coccinelle: Find doubled arguments to boolean or bit operators.
 
-Junio C Hamano (1):
-      kconfig: fix menuconfig on debian lenny
+Michal Marek (2):
+      Merge commit 'v2.6.36' into kbuild/misc
+      Revert "namespace: add source file location exceptions"
 
-Justin P. Mattock (1):
-      scripts/kconfig/gconf.glade Update broken web addresses.
+Namhyung Kim (1):
+      kbuild: check return value of asprintf()
 
-Kyle McMartin (1):
-      kbuild: fix oldnoconfig to do the right thing
+Nicolas Palix (26):
+      Coccinelle: Add null/eno.cocci
+      Coccinelle: Add null/kmerr.cocci
+      Coccinelle: Move deref_null.cocci to a more appropriate directory
+      Coccinelle: Add locks/call_kern.cocci
+      Coccinelle: Add locks/double_lock.cocci
+      Coccinelle: Add locks/mini_lock.cocci
+      Coccinelle: Add iterators/fen.cocci
+      Coccinelle: Add iterators/itnull.cocci
+      Coccinelle: Add iterators/list_entry_update.cocci
+      Coccinelle: Add free/kfree.cocci
+      Coccinelle: Add api/kstrdup.cocci
+      Coccinelle: Add api/memdup.cocci
+      Coccinelle: Add api/memdup_user
+      Coccinelle: Move err_cast.cocci to the api directory
+      Coccinelle: Move resource_size.cocci to the api directory
+      Coccinelle: Move alloc directory into api directory
+      Coccinelle: Add misc/doubleinit.cocci
+      Coccinelle: Add misc/ifcol.cocci
+      MAINTAINERS: Coccinelle: Update email address
+      Coccinelle: Update documentation
+      Coccinelle: Improve user information with a new kind of comment
+      Coccinelle: Use new comment format to explain kfree.cocci
+      Coccinelle: Add a new mode named 'chain'
+      Coccinelle: Use the -no_show_diff option for org and report mode
+      Coccinelle: Fix documentation
+      Coccinelle: Add contextual message
 
-Michal Marek (9):
-      kconfig: Allow frontends to display messages themselves
-      xconfig: Change the titlebar if using Qt3
-      kconfig: Simplify Makefile for xconfig
-      Merge branch 'kbuild/kconfig/kbuild-generic-v7' of http://github.com/lacombar/linux-2.6 into kbuild/kconfig
-      kconfig: Propagate const
-      kconfig: Fix realloc usage()
-      Merge branch 'kbuild/rc-fixes' into kbuild/kconfig
-      Revert "kconfig: Temporarily disable dependency warnings"
-      Merge branch 'message-callback' into kbuild/kconfig
+Stephen Hemminger (2):
+      scripts/namespace.pl: update file exclusion list
+      namespace: add source file location exceptions
 
-Naohiro Aota (1):
-      kconfig: Don't go out from read config loop when you read new symbol
+matt mooney (3):
+      Documentation/kbuild: major edit of modules.txt sections 1-4
+      Documentation/kbuild: major edit of modules.txt sections 5-8
+      Documentation/kbuild: modules.txt cleanup
 
-Nir Tzachar (1):
-      nconfig: add search support
-
-Stephen Boyd (1):
-      nconfig: Fix help for choice menus
-
-Will Newton (1):
-      kconfig: Use PATH_MAX instead of 128 for path buffer sizes.
-
- Documentation/kbuild/kconfig-language.txt  |    3 +-
- Kconfig                                    |   11 +
- README                                     |    1 +
- arch/alpha/Kconfig                         |    4 -
- arch/arm/Kconfig                           |    7 -
- arch/avr32/Kconfig                         |    7 -
- arch/blackfin/Kconfig                      |    7 -
- arch/cris/Kconfig                          |    7 -
- arch/frv/Kconfig                           |    6 -
- arch/h8300/Kconfig                         |    7 -
- arch/ia64/Kconfig                          |    7 -
- arch/m32r/Kconfig                          |    7 -
- arch/m68k/Kconfig                          |    6 -
- arch/m68knommu/Kconfig                     |    7 -
- arch/microblaze/Kconfig                    |    5 -
- arch/mips/Kconfig                          |    2 -
- arch/mn10300/Kconfig                       |    9 -
- arch/parisc/Kconfig                        |    7 -
- arch/powerpc/Kconfig                       |    6 -
- arch/s390/Kconfig                          |    7 -
- arch/score/Kconfig                         |    5 -
- arch/sh/Kconfig                            |    7 -
- arch/sparc/Kconfig                         |    6 -
- arch/tile/Kconfig                          |    2 -
- arch/um/Kconfig.common                     |    2 -
- arch/x86/Kconfig                           |    3 -
- arch/xtensa/Kconfig                        |    5 -
- scripts/kconfig/Makefile                   |   87 +++--
- scripts/kconfig/conf.c                     |   15 +-
- scripts/kconfig/confdata.c                 |  126 ++++---
- scripts/kconfig/expr.h                     |    2 +-
- scripts/kconfig/gconf.c                    |   20 +-
- scripts/kconfig/gconf.glade                |    1 -
- scripts/kconfig/kxgettext.c                |   15 +-
- scripts/kconfig/lex.zconf.c_shipped        |    7 +-
- scripts/kconfig/lkc.h                      |    8 +-
- scripts/kconfig/lkc_proto.h                |    3 +
- scripts/kconfig/lxdialog/check-lxdialog.sh |    2 +
- scripts/kconfig/mconf.c                    |   64 ++--
- scripts/kconfig/menu.c                     |    6 +-
- scripts/kconfig/nconf.c                    |  487 ++++++++++++-------------
- scripts/kconfig/nconf.gui.c                |   22 +-
- scripts/kconfig/nconf.h                    |    3 +-
- scripts/kconfig/qconf.cc                   |  174 +++++----
- scripts/kconfig/qconf.h                    |   76 ++--
- scripts/kconfig/symbol.c                   |   51 +++-
- scripts/kconfig/util.c                     |    7 +-
- scripts/kconfig/zconf.l                    |    7 +-
- scripts/kconfig/zconf.tab.c_shipped        |  547 ++++++++++++++--------------
- scripts/kconfig/zconf.y                    |   18 +-
- 50 files changed, 946 insertions(+), 955 deletions(-)
- create mode 100644 Kconfig
+ Documentation/coccinelle.txt                       |   50 +-
+ Documentation/kbuild/modules.txt                   |  733 ++++++++++----------
+ MAINTAINERS                                        |    2 +-
+ scripts/basic/docproc.c                            |    5 +-
+ scripts/coccicheck                                 |   46 +-
+ .../{ => api}/alloc/drop_kmalloc_cast.cocci        |    0
+ .../{ => api}/alloc/kzalloc-simple.cocci           |    6 +-
+ scripts/coccinelle/{ => api}/err_cast.cocci        |    0
+ scripts/coccinelle/api/kstrdup.cocci               |   39 +
+ scripts/coccinelle/api/memdup.cocci                |   40 ++
+ scripts/coccinelle/api/memdup_user.cocci           |   35 +
+ scripts/coccinelle/{ => api}/resource_size.cocci   |    0
+ scripts/coccinelle/free/kfree.cocci                |  117 ++++
+ scripts/coccinelle/iterators/fen.cocci             |   64 ++
+ scripts/coccinelle/iterators/itnull.cocci          |   58 ++
+ .../coccinelle/iterators/list_entry_update.cocci   |   62 ++
+ scripts/coccinelle/locks/call_kern.cocci           |   74 ++
+ scripts/coccinelle/locks/double_lock.cocci         |   92 +++
+ scripts/coccinelle/locks/flags.cocci               |   80 +++
+ scripts/coccinelle/locks/mini_lock.cocci           |   95 +++
+ scripts/coccinelle/misc/doubleinit.cocci           |   53 ++
+ scripts/coccinelle/misc/ifcol.cocci                |   48 ++
+ scripts/coccinelle/{ => null}/deref_null.cocci     |    0
+ scripts/coccinelle/null/eno.cocci                  |   20 +
+ scripts/coccinelle/null/kmerr.cocci                |   72 ++
+ scripts/coccinelle/tests/doublebitand.cocci        |   54 ++
+ scripts/coccinelle/tests/doubletest.cocci          |   40 ++
+ scripts/extract-ikconfig                           |   41 +-
+ scripts/namespace.pl                               |  147 +++--
+ 29 files changed, 1597 insertions(+), 476 deletions(-)
+ rename scripts/coccinelle/{ => api}/alloc/drop_kmalloc_cast.cocci (100%)
+ rename scripts/coccinelle/{ => api}/alloc/kzalloc-simple.cocci (87%)
+ rename scripts/coccinelle/{ => api}/err_cast.cocci (100%)
+ create mode 100644 scripts/coccinelle/api/kstrdup.cocci
+ create mode 100644 scripts/coccinelle/api/memdup.cocci
+ create mode 100644 scripts/coccinelle/api/memdup_user.cocci
+ rename scripts/coccinelle/{ => api}/resource_size.cocci (100%)
+ create mode 100644 scripts/coccinelle/free/kfree.cocci
+ create mode 100644 scripts/coccinelle/iterators/fen.cocci
+ create mode 100644 scripts/coccinelle/iterators/itnull.cocci
+ create mode 100644 scripts/coccinelle/iterators/list_entry_update.cocci
+ create mode 100644 scripts/coccinelle/locks/call_kern.cocci
+ create mode 100644 scripts/coccinelle/locks/double_lock.cocci
+ create mode 100644 scripts/coccinelle/locks/flags.cocci
+ create mode 100644 scripts/coccinelle/locks/mini_lock.cocci
+ create mode 100644 scripts/coccinelle/misc/doubleinit.cocci
+ create mode 100644 scripts/coccinelle/misc/ifcol.cocci
+ rename scripts/coccinelle/{ => null}/deref_null.cocci (100%)
+ create mode 100644 scripts/coccinelle/null/eno.cocci
+ create mode 100644 scripts/coccinelle/null/kmerr.cocci
+ create mode 100644 scripts/coccinelle/tests/doublebitand.cocci
+ create mode 100644 scripts/coccinelle/tests/doubletest.cocci
