@@ -1,94 +1,23 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from hrndva-omtalb.mail.rr.com ([71.74.56.122]:63323 "EHLO
-	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752205Ab0J2FoZ (ORCPT
+Received: from mail403.opentransfer.com ([98.130.1.133]:55878 "HELO
+	mail403.opentransfer.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with SMTP id S1758896Ab0J2MIs (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 29 Oct 2010 01:44:25 -0400
-Message-Id: <20101029054424.291908153@goodmis.org>
-Date: Fri, 29 Oct 2010 01:43:14 -0400
-From: Steven Rostedt <rostedt@goodmis.org>
-Subject: [PATCH 4/5] [PATCH 4/5] kconfig: Fix streamline_config to read multi line deps in Kconfig files
-References: <20101029054310.790179545@goodmis.org>
-Content-Disposition: inline; filename=0004-kconfig-Fix-streamline_config-to-read-multi-line-dep.patch
+	Fri, 29 Oct 2010 08:08:48 -0400
+Message-ID: <3B997B64E0C94A689C4C5FDBD09AF912@PC200810081817>
+From: "Yihe Chen" <yihect@juliantec.info>
+Subject: 
+Date: Fri, 29 Oct 2010 20:01:55 +0800
+MIME-Version: 1.0
+Content-Type: text/plain;
+	format=flowed;
+	charset="gb2312";
+	reply-type=original
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, Andrew Morton <akpm@linux-foundation.org>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
+To: linux kbuild list <linux-kbuild@vger.kernel.org>
 
-From: Steven Rostedt <srostedt@redhat.com>
-
-I noticed that some Kconfig files have multi line dependencies
-that continue with a backslash. Those dependencies on the next
-line will be missed by streamline_config.
-
-For example:
-
-config CS89x0
-	tristate "CS89x0 support"
-	depends on NET_ETHERNET && (ISA || EISA || MACH_IXDP2351 \
-		|| ARCH_IXDP2X01 || MACH_MX31ADS)
-
-The "|| ARCH_IXDP2X01 || MACH_MX31ADS)" will not be processed.
-
-This patch adds code to handle this case.
-
-Signed-off-by: Steven Rostedt <rostedt@goodmis.org>
----
- scripts/kconfig/streamline_config.pl |   19 ++++++++++++++++++-
- 1 files changed, 18 insertions(+), 1 deletions(-)
-
-diff --git a/scripts/kconfig/streamline_config.pl b/scripts/kconfig/streamline_config.pl
-index 883748c..ebba407 100644
---- a/scripts/kconfig/streamline_config.pl
-+++ b/scripts/kconfig/streamline_config.pl
-@@ -125,7 +125,6 @@ my %selects;
- my %prompts;
- my %objects;
- my $var;
--my $cont = 0;
- my $iflevel = 0;
- my @ifdeps;
- 
-@@ -139,6 +138,9 @@ sub read_kconfig {
-     my $config;
-     my @kconfigs;
- 
-+    my $cont = 0;
-+    my $line;
-+
-     my $source = "$ksource/$kconfig";
-     my $last_source = "";
- 
-@@ -153,6 +155,19 @@ sub read_kconfig {
-     while (<KIN>) {
- 	chomp;
- 
-+	# Make sure that lines ending with \ continue
-+	if ($cont) {
-+	    $_ = $line . " " . $_;
-+	}
-+
-+	if (s/\\$//) {
-+	    $cont = 1;
-+	    $line = $_;
-+	    next;
-+	}
-+
-+	$cont = 0;
-+
- 	# collect any Kconfig sources
- 	if (/^source\s*"(.*)"/) {
- 	    $kconfigs[$#kconfigs+1] = $1;
-@@ -230,6 +245,8 @@ if ($kconfig) {
- # Read all Makefiles to map the configs to the objects
- foreach my $makefile (@makefiles) {
- 
-+    my $cont = 0;
-+
-     open(MIN,$makefile) || die "Can't open $makefile";
-     while (<MIN>) {
- 	my $objs;
--- 
-1.7.1
-
+Where to find information or helping stuff or usage info on those config 
+tools, like conf/gconf etc. 
 
