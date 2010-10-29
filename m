@@ -1,63 +1,93 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from hrndva-omtalb.mail.rr.com ([71.74.56.125]:63327 "EHLO
+Received: from hrndva-omtalb.mail.rr.com ([71.74.56.122]:63323 "EHLO
 	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752265Ab0J2Fo0 (ORCPT
+	with ESMTP id S1752205Ab0J2FoZ (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 29 Oct 2010 01:44:26 -0400
-Message-Id: <20101029054423.498608001@goodmis.org>
-Date: Fri, 29 Oct 2010 01:43:11 -0400
+	Fri, 29 Oct 2010 01:44:25 -0400
+Message-Id: <20101029054424.291908153@goodmis.org>
+Date: Fri, 29 Oct 2010 01:43:14 -0400
 From: Steven Rostedt <rostedt@goodmis.org>
-Subject: [PATCH 1/5] [PATCH 1/5] kconfig: Make localmodconfig handle environment variables
+Subject: [PATCH 4/5] [PATCH 4/5] kconfig: Fix streamline_config to read multi line deps in Kconfig files
 References: <20101029054310.790179545@goodmis.org>
-Content-Disposition: inline; filename=0001-kconfig-Make-localmodconfig-handle-environment-varia.patch
+Content-Disposition: inline; filename=0004-kconfig-Fix-streamline_config-to-read-multi-line-dep.patch
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, Andrew Morton <akpm@linux-foundation.org>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, Arnaud Lacombe <lacombar@gmail.com>, Sam Ravnborg <sam@ravnborg.org>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, Andrew Morton <akpm@linux-foundation.org>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
 
 From: Steven Rostedt <srostedt@redhat.com>
 
-The commit 838a2e55e6a4e9e8a10451ed2ef0f7a08dabdb04
- kbuild: migrate all arch to the kconfig mainmenu upgrade
+I noticed that some Kconfig files have multi line dependencies
+that continue with a backslash. Those dependencies on the next
+line will be missed by streamline_config.
 
-Broke make localmodconfig. The reason was that it added a
-environment variable to the kconfig source, which the
-streamline_config.pl could not handle.
+For example:
 
-This patch changes streamline_config.pl to handle kconfig sources
-using environment variables in their names.
+config CS89x0
+	tristate "CS89x0 support"
+	depends on NET_ETHERNET && (ISA || EISA || MACH_IXDP2351 \
+		|| ARCH_IXDP2X01 || MACH_MX31ADS)
 
-Cc: Arnaud Lacombe <lacombar@gmail.com>
-Cc: Sam Ravnborg <sam@ravnborg.org>
-Cc: Michal Marek <mmarek@suse.cz>
+The "|| ARCH_IXDP2X01 || MACH_MX31ADS)" will not be processed.
+
+This patch adds code to handle this case.
+
 Signed-off-by: Steven Rostedt <rostedt@goodmis.org>
 ---
- scripts/kconfig/streamline_config.pl |   12 +++++++++++-
- 1 files changed, 11 insertions(+), 1 deletions(-)
+ scripts/kconfig/streamline_config.pl |   19 ++++++++++++++++++-
+ 1 files changed, 18 insertions(+), 1 deletions(-)
 
 diff --git a/scripts/kconfig/streamline_config.pl b/scripts/kconfig/streamline_config.pl
-index c70a27d..cc10bcf 100644
+index 883748c..ebba407 100644
 --- a/scripts/kconfig/streamline_config.pl
 +++ b/scripts/kconfig/streamline_config.pl
-@@ -137,7 +137,17 @@ sub read_kconfig {
+@@ -125,7 +125,6 @@ my %selects;
+ my %prompts;
+ my %objects;
+ my $var;
+-my $cont = 0;
+ my $iflevel = 0;
+ my @ifdeps;
+ 
+@@ -139,6 +138,9 @@ sub read_kconfig {
      my $config;
      my @kconfigs;
  
--    open(KIN, "$ksource/$kconfig") || die "Can't open $kconfig";
-+    my $source = "$ksource/$kconfig";
-+    my $last_source = "";
++    my $cont = 0;
++    my $line;
 +
-+    # Check for any environment variables used
-+    while ($source =~ /\$(\w+)/ && $last_source ne $source) {
-+	my $env = $1;
-+	$last_source = $source;
-+	$source =~ s/\$$env/$ENV{$env}/;
-+    }
-+
-+    open(KIN, "$source") || die "Can't open $kconfig";
+     my $source = "$ksource/$kconfig";
+     my $last_source = "";
+ 
+@@ -153,6 +155,19 @@ sub read_kconfig {
      while (<KIN>) {
  	chomp;
  
++	# Make sure that lines ending with \ continue
++	if ($cont) {
++	    $_ = $line . " " . $_;
++	}
++
++	if (s/\\$//) {
++	    $cont = 1;
++	    $line = $_;
++	    next;
++	}
++
++	$cont = 0;
++
+ 	# collect any Kconfig sources
+ 	if (/^source\s*"(.*)"/) {
+ 	    $kconfigs[$#kconfigs+1] = $1;
+@@ -230,6 +245,8 @@ if ($kconfig) {
+ # Read all Makefiles to map the configs to the objects
+ foreach my $makefile (@makefiles) {
+ 
++    my $cont = 0;
++
+     open(MIN,$makefile) || die "Can't open $makefile";
+     while (<MIN>) {
+ 	my $objs;
 -- 
 1.7.1
 
