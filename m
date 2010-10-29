@@ -1,59 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.asbjorn.biz ([217.195.185.3]:57933 "EHLO mail.asbjorn.biz"
+Received: from vostochny.stro.at ([78.47.22.85]:52718 "EHLO vostochny.stro.at"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751069Ab0KAXpV (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 1 Nov 2010 19:45:21 -0400
-From: Asbjoern Sloth Toennesen <asbjorn@asbjorn.biz>
-Subject: [PATCH] kbuild, deb-pkg: fix Architecture field when cross compiling
-Date: Mon,  1 Nov 2010 23:31:01 +0000
-Message-Id: <1288654261-8269-1-git-send-email-asbjorn@asbjorn.biz>
+	id S1750976Ab0KBKY2 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 2 Nov 2010 06:24:28 -0400
+From: maximilian attems <max@stro.at>
+Subject: [PATCH] kbuild, deb-pkg: Fix build with paranoid umask
+Date: Fri, 29 Oct 2010 15:55:50 +0200
+Message-Id: <1288360550-26710-1-git-send-email-max@stro.at>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
+Cc: Michal Marek <mmarek@suse.cz>, maximilian attems <max@stro.at>
 
-If the environment variable CROSS_COMPILE is set, override
-the Architecture control field, based on the value of the
-ARCH environment variable.
+umask 077
+make deb-pkg
+<snipp ..>
+dpkg-deb: building package `linux-image-2.6.36+' in `../linux-image-2.6.36+_2.6.36+-4_amd64.deb'.
+dpkg-deb: control directory has bad permissions 700 (must be >=0755 and <=0775)
+make[1]: *** [deb-pkg] Error 2
 
-With this patch the following make command:
-
-	make CROSS_COMPILE='' ARCH=i386 deb-pkg
-
-will output an i386 Debian package instead of an amd64 one,
-when run on amd64 machine.
-
-Signed-off-by: Asbjoern Sloth Toennesen <asbjorn@asbjorn.biz>
+Reported-by: Bastian Blank <waldi@debian.org>
+Signed-off-by: maximilian attems <max@stro.at>
 ---
- scripts/package/builddeb |   14 +++++++++++++-
- 1 files changed, 13 insertions(+), 1 deletions(-)
+ scripts/package/builddeb |    6 ++++--
+ 1 files changed, 4 insertions(+), 2 deletions(-)
 
 diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-index 49b74e1..e5b7b9b 100644
+index 49b74e1..4dfec9a 100644
 --- a/scripts/package/builddeb
 +++ b/scripts/package/builddeb
-@@ -25,8 +25,20 @@ create_package() {
- 	chown -R root:root "$pdir"
- 	chmod -R go-w "$pdir"
+@@ -49,8 +49,10 @@ fi
  
-+	# Check for cross compilation
-+	local forcearch=""
-+	env | grep -q CROSS_COMPILE
-+	if [ $? -eq 0 ] ; then
-+		local debarch=""
-+		case "$ARCH" in
-+			x86_64) debarch="amd64" ;;
-+			*) debarch="$ARCH" ;;
-+		esac
-+		forcearch="-DArchitecture=$debarch"
-+	fi
-+
- 	# Create the package
--	dpkg-gencontrol -isp -p$pname -P"$pdir"
-+	dpkg-gencontrol -isp $forcearch -p$pname -P"$pdir"
- 	dpkg --build "$pdir" ..
- }
- 
+ # Setup the directory structure
+ rm -rf "$tmpdir" "$fwdir"
+-mkdir -p "$tmpdir/DEBIAN" "$tmpdir/lib" "$tmpdir/boot" "$tmpdir/usr/share/doc/$packagename"
+-mkdir -p "$fwdir/DEBIAN" "$fwdir/lib" "$fwdir/usr/share/doc/$fwpackagename"
++mkdir -m 755 -p "$tmpdir/DEBIAN"
++mkdir -p  "$tmpdir/lib" "$tmpdir/boot" "$tmpdir/usr/share/doc/$packagename"
++mkdir -m 755 -p "$fwdir/DEBIAN"
++mkdir -p "$fwdir/lib" "$fwdir/usr/share/doc/$fwpackagename"
+ if [ "$ARCH" = "um" ] ; then
+ 	mkdir -p "$tmpdir/usr/lib/uml/modules/$version" "$tmpdir/usr/bin"
+ fi
 -- 
-1.7.2.3
+1.7.1
 
