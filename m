@@ -1,23 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail403.opentransfer.com ([98.130.1.133]:55878 "HELO
-	mail403.opentransfer.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with SMTP id S1758896Ab0J2MIs (ORCPT
+Received: from mail-bw0-f46.google.com ([209.85.214.46]:36270 "EHLO
+	mail-bw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S933836Ab0J2NET (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 29 Oct 2010 08:08:48 -0400
-Message-ID: <3B997B64E0C94A689C4C5FDBD09AF912@PC200810081817>
-From: "Yihe Chen" <yihect@juliantec.info>
-Subject: 
-Date: Fri, 29 Oct 2010 20:01:55 +0800
-MIME-Version: 1.0
-Content-Type: text/plain;
-	format=flowed;
-	charset="gb2312";
-	reply-type=original
-Content-Transfer-Encoding: 7bit
+	Fri, 29 Oct 2010 09:04:19 -0400
+From: "Kirill A. Shutsemov" <kirill@shutemov.name>
+Subject: [PATCH 1/2] kbuild: introduce ARCH_LIST for headers_install_all
+Date: Fri, 29 Oct 2010 16:04:00 +0300
+Message-Id: <1288357441-23100-1-git-send-email-kirill@shutemov.name>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux kbuild list <linux-kbuild@vger.kernel.org>
+To: Sam Ravnborg <sam@ravnborg.org>, David Woodhouse <dwmw2@infradead.org>
+Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, "Kirill A. Shutemov" <kirill@shutemov.name>
 
-Where to find information or helping stuff or usage info on those config 
-tools, like conf/gconf etc. 
+From: Kirill A. Shutemov <kirill@shutemov.name>
+
+Using ARCH_LIST you can specify subset of architectures you want to get
+headers for.
+
+Signed-off-by: Kirill A. Shutemov <kirill@shutemov.name>
+---
+ Documentation/make/headers_install.txt |    5 +++--
+ scripts/headers.sh                     |    2 +-
+ 2 files changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/Documentation/make/headers_install.txt b/Documentation/make/headers_install.txt
+index f2481ca..1abace6 100644
+--- a/Documentation/make/headers_install.txt
++++ b/Documentation/make/headers_install.txt
+@@ -39,8 +39,9 @@ INSTALL_HDR_PATH indicates where to install the headers.  It defaults to
+ The command "make headers_install_all" exports headers for all architectures
+ simultaneously.  (This is mostly of interest to distribution maintainers,
+ who create an architecture-independent tarball from the resulting include
+-directory.)  Remember to provide the appropriate linux/asm directory via "mv"
+-or "ln -s" before building a C library with headers exported this way.
++directory.)  You also can use ARCH_LIST to specify list of architectures.
++Remember to provide the appropriate linux/asm directory via "mv" or "ln -s"
++before building a C library with headers exported this way.
+ 
+ The kernel header export infrastructure is maintained by David Woodhouse
+ <dwmw2@infradead.org>.
+diff --git a/scripts/headers.sh b/scripts/headers.sh
+index 1ddcdd3..62bc527 100755
+--- a/scripts/headers.sh
++++ b/scripts/headers.sh
+@@ -13,7 +13,7 @@ do_command()
+ 	fi
+ }
+ 
+-archs=$(ls ${srctree}/arch)
++archs=${ARCH_LIST:-$(ls ${srctree}/arch)}
+ 
+ for arch in ${archs}; do
+ 	case ${arch} in
+-- 
+1.7.3.2
 
