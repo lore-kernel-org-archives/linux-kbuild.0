@@ -1,41 +1,56 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor.suse.de ([195.135.220.2]:40272 "EHLO mx1.suse.de"
+Received: from chilli.pcug.org.au ([203.10.76.44]:51940 "EHLO smtps.tip.net.au"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751924Ab0J1WcS (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 28 Oct 2010 18:32:18 -0400
-Date: Fri, 29 Oct 2010 00:32:17 +0200
-From: Michal Marek <mmarek@suse.cz>
-Subject: [GIT] kbuild packaging changes for 2.6.37-rc1
-Message-ID: <20101028223217.GA4769@sepie.suse.cz>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+	id S1755663Ab0J2Aho (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 28 Oct 2010 20:37:44 -0400
+Date: Fri, 29 Oct 2010 11:37:31 +1100
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+Subject: Re: [PATCH] Revert
+ "kconfig: Temporarily disable dependency warnings"
+Message-Id: <20101029113731.5c7c54b9.sfr@canb.auug.org.au>
+In-Reply-To: <1286889586-13483-1-git-send-email-mmarek@suse.cz>
+References: <20101011145930.11fe570c.randy.dunlap@oracle.com>
+	<1286889586-13483-1-git-send-email-mmarek@suse.cz>
+Mime-Version: 1.0
+Content-Type: multipart/signed; protocol="application/pgp-signature";
+ micalg="PGP-SHA1";
+ boundary="Signature=_Fri__29_Oct_2010_11_37_31_+1100_vFZDSyxDyrwv6m=A"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: guillem@hadrons.org, nacc@us.ibm.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>
+Cc: randy.dunlap@oracle.com, catalin.marinas@arm.com, linux-kbuild@vger.kernel.org, linux-next@vger.kernel.org, linux-kernel@vger.kernel.org, lacombar@gmail.com, xiyou.wangcong@gmail.com
 
-Hi Linus,
+--Signature=_Fri__29_Oct_2010_11_37_31_+1100_vFZDSyxDyrwv6m=A
+Content-Type: text/plain; charset=US-ASCII
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-please also pull these two fixes for make rpm-pkg and make deb-pkg,
-respectively.
+On Tue, 12 Oct 2010 15:19:46 +0200 Michal Marek <mmarek@suse.cz> wrote:
+>
+> This reverts commit 71ebc01, which was a 2.6.36-only stopgap solution.
 
-Thanks,
-Michal
+I was hoping that we would have the number of these warnings down to
+something reasonable before this revert made it into Linus' tree ...
 
-The following changes since commit da5cabf80e2433131bf0ed8993abc0f7ea618c73:
+I guess fixing the V4L stuff will become a bit more urgent, now :-)
+--=20
+Cheers,
+Stephen Rothwell                    sfr@canb.auug.org.au
+http://www.canb.auug.org.au/~sfr/
 
-  Linux 2.6.36-rc1 (2010-08-15 17:41:37 -0700)
+--Signature=_Fri__29_Oct_2010_11_37_31_+1100_vFZDSyxDyrwv6m=A
+Content-Type: application/pgp-signature
 
-are available in the git repository at:
-  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild-2.6.git packaging
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
 
-Guillem Jover (1):
-      kbuild, deb-pkg: Check if KBUILD_IMAGE exists before copying it
+iQEcBAEBAgAGBQJMyhdLAAoJEDMEi1NhKgbsW4wH/3DSwcOtVPtACdCfGxtv0jZe
+C5X/DStxzyEy1yPf2zmUqut5FwpduZK/hucFnffG3AYfrbaP98jsl6GBdlRZNeAF
+7ypsa3xkROCePdQI1Ig8cnvj/pc1nmqcldFrmdRqhYkOPXvHF/7AnBL4agpreB0K
+C+eu+ChsE25WaXSLtOqigECcFrP6YZdOdi4hkzHrv1F9ULrCdRZPCR4HZMXh+U8G
+DWlHoEr9ko084LXJJU8G2ZweOh6IAJ9oxgmfkR+D9C6uN4n0BnewGA5gAzpgxr+U
+OhBE/EI4Iir45jwkgsbD0yJDJTQnLHIax7DBLJDpvsCs4mAW95CU9xm23/C8r/w=
+=FY/p
+-----END PGP SIGNATURE-----
 
-Nishanth Aravamudan (1):
-      scripts/package: don't break if %{_smp_mflags} isn't set
-
- scripts/package/builddeb |    4 +++-
- scripts/package/mkspec   |    2 +-
- 2 files changed, 4 insertions(+), 2 deletions(-)
+--Signature=_Fri__29_Oct_2010_11_37_31_+1100_vFZDSyxDyrwv6m=A--
