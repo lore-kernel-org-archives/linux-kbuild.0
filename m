@@ -1,41 +1,90 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from rcsinet10.oracle.com ([148.87.113.121]:41891 "EHLO
-	rcsinet10.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932458Ab0J2RIo (ORCPT
+Received: from mail-iw0-f174.google.com ([209.85.214.174]:38918 "EHLO
+	mail-iw0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752122Ab0J3A0s convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 29 Oct 2010 13:08:44 -0400
-Date: Fri, 29 Oct 2010 10:07:07 -0700
-From: Randy Dunlap <randy.dunlap@oracle.com>
-Subject: Re: config help
-Message-Id: <20101029100707.2a9afc5c.randy.dunlap@oracle.com>
-In-Reply-To: <3B997B64E0C94A689C4C5FDBD09AF912@PC200810081817>
-References: <3B997B64E0C94A689C4C5FDBD09AF912@PC200810081817>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+	Fri, 29 Oct 2010 20:26:48 -0400
+MIME-Version: 1.0
+In-Reply-To: <20101029054423.498608001@goodmis.org>
+References: <20101029054310.790179545@goodmis.org>
+	<20101029054423.498608001@goodmis.org>
+Date: Fri, 29 Oct 2010 20:26:46 -0400
+Message-ID: <AANLkTi=a8dp-WUNHAkx2fZ5GgNHmDw+ee7MDeUSL44Z0@mail.gmail.com>
+Subject: Re: [PATCH 1/5] [PATCH 1/5] kconfig: Make localmodconfig handle
+ environment variables
+From: Arnaud Lacombe <lacombar@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Yihe Chen <yihect@juliantec.info>
-Cc: linux kbuild list <linux-kbuild@vger.kernel.org>
+To: Steven Rostedt <rostedt@goodmis.org>
+Cc: linux-kernel@vger.kernel.org, Linus Torvalds <torvalds@linux-foundation.org>, Andrew Morton <akpm@linux-foundation.org>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>, Roman Zippel <zippel@linux-m68k.org>
 
-On Fri, 29 Oct 2010 20:01:55 +0800 Yihe Chen wrote:
+Hi,
 
-> Where to find information or helping stuff or usage info on those config 
-> tools, like conf/gconf etc. 
+On Fri, Oct 29, 2010 at 1:43 AM, Steven Rostedt <rostedt@goodmis.org> wrote:
+> From: Steven Rostedt <srostedt@redhat.com>
+>
+> The commit 838a2e55e6a4e9e8a10451ed2ef0f7a08dabdb04
+>  kbuild: migrate all arch to the kconfig mainmenu upgrade
+>
+> Broke make localmodconfig. The reason was that it added a
+> environment variable to the kconfig source, which the
+> streamline_config.pl could not handle.
+>
+Technically, it is _not_ an environment variable; it is a kconfig
+symbol's name. In this particular case, both name collide and the
+kconfig symbol happens to get its default value from the environment.
+The real fixes, from my point of view, would be to have a perl binding
+of the kconfig backend and get rid of read_kconfig(). That said, your
+patch is broken if a symbol happen not to match an environment
+variable (both in name and value).
 
+Btw, two questions:
+ - who has authority on kconfig ? Michal or you ? MAINTAINERS say
+"Roman Zippel", but AFAIK, this is no longer valid.
+ - what is the delay someone in CC: is given the time to answer a
+patch ? I see that this one particularly is already in Linus' tree.
 
-Begin with the README file in the top-level directory of the linux source tree.
+Thanks,
+ - Arnaud
 
-For menuconfig:  use ?
-
-For nconfig (in recent kernels):  use 1 or <F1>
-
-For gconfig:  click on Help
-
-For xconfig:  click on Help
-
-There is also some help info in Documentation/kbuild/kconfig.txt .
-
----
-~Randy
-*** Remember to use Documentation/SubmitChecklist when testing your code ***
+> This patch changes streamline_config.pl to handle kconfig sources
+> using environment variables in their names.
+>
+> Cc: Arnaud Lacombe <lacombar@gmail.com>
+> Cc: Sam Ravnborg <sam@ravnborg.org>
+> Cc: Michal Marek <mmarek@suse.cz>
+> Signed-off-by: Steven Rostedt <rostedt@goodmis.org>
+> ---
+>  scripts/kconfig/streamline_config.pl |   12 +++++++++++-
+>  1 files changed, 11 insertions(+), 1 deletions(-)
+>
+> diff --git a/scripts/kconfig/streamline_config.pl b/scripts/kconfig/streamline_config.pl
+> index c70a27d..cc10bcf 100644
+> --- a/scripts/kconfig/streamline_config.pl
+> +++ b/scripts/kconfig/streamline_config.pl
+> @@ -137,7 +137,17 @@ sub read_kconfig {
+>     my $config;
+>     my @kconfigs;
+>
+> -    open(KIN, "$ksource/$kconfig") || die "Can't open $kconfig";
+> +    my $source = "$ksource/$kconfig";
+> +    my $last_source = "";
+> +
+> +    # Check for any environment variables used
+> +    while ($source =~ /\$(\w+)/ && $last_source ne $source) {
+> +       my $env = $1;
+> +       $last_source = $source;
+> +       $source =~ s/\$$env/$ENV{$env}/;
+> +    }
+> +
+> +    open(KIN, "$source") || die "Can't open $kconfig";
+>     while (<KIN>) {
+>        chomp;
+>
+> --
+> 1.7.1
+>
+>
+>
