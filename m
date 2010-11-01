@@ -1,56 +1,72 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-iw0-f174.google.com ([209.85.214.174]:57534 "EHLO
-	mail-iw0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752823Ab0JaWFy (ORCPT
+Received: from rcsinet10.oracle.com ([148.87.113.121]:32713 "EHLO
+	rcsinet10.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751931Ab0KAR2M (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 31 Oct 2010 18:05:54 -0400
+	Mon, 1 Nov 2010 13:28:12 -0400
+Message-ID: <4CCEEB74.9010809@oracle.com>
+Date: Mon, 01 Nov 2010 09:31:48 -0700
+From: Randy Dunlap <randy.dunlap@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <1288402042.29632.50.camel@gandalf.stny.rr.com>
-References: <20101029054310.790179545@goodmis.org>
-	<20101029054423.498608001@goodmis.org>
-	<AANLkTi=a8dp-WUNHAkx2fZ5GgNHmDw+ee7MDeUSL44Z0@mail.gmail.com>
-	<1288402042.29632.50.camel@gandalf.stny.rr.com>
-Date: Sun, 31 Oct 2010 18:05:53 -0400
-Message-ID: <AANLkTi=JXFppmiyyo=Hc614=FpDhOO4h8SLTs=CUOvQv@mail.gmail.com>
-Subject: Re: [PATCH 1/5] [PATCH 1/5] kconfig: Make localmodconfig handle
- environment variables
-From: Arnaud Lacombe <lacombar@gmail.com>
+Subject: Re: config help
+References: <3B997B64E0C94A689C4C5FDBD09AF912@PC200810081817> <20101029100707.2a9afc5c.randy.dunlap@oracle.com> <942B93F2162249F3B4CE745DAF6FD9E1@PC200810081817>
+In-Reply-To: <942B93F2162249F3B4CE745DAF6FD9E1@PC200810081817>
 Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Steven Rostedt <rostedt@goodmis.org>, Michal Marek <mmarek@suse.cz>
-Cc: linux-kernel@vger.kernel.org, Linus Torvalds <torvalds@linux-foundation.org>, Andrew Morton <akpm@linux-foundation.org>, linux-kbuild@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>, Roman Zippel <zippel@linux-m68k.org>
+To: Yihe Chen <yihect@juliantec.info>
+Cc: linux kbuild list <linux-kbuild@vger.kernel.org>
 
-Hi,
+On 10/29/10 18:24, Yihe Chen wrote:
+>> On Fri, 29 Oct 2010 20:01:55 +0800 Yihe Chen wrote:
+>>
+>>> Where to find information or helping stuff or usage info on those config
+>>> tools, like conf/gconf etc.
+>>
+>>
+>> Begin with the README file in the top-level directory of the linux
+>> source tree.
+>>
+>> For menuconfig:  use ?
+>>
+>> For nconfig (in recent kernels):  use 1 or <F1>
+>>
+>> For gconfig:  click on Help
+>>
+>> For xconfig:  click on Help
+>>
+>> There is also some help info in Documentation/kbuild/kconfig.txt .
+>>
+> /
+> First, thanks for your reply. I'm reanding scripts/kconfig/Makfile, and
+> tacking
+> notice of some options used with conf tool, like -r -y -n -m -d and -D.
 
-On Fri, Oct 29, 2010 at 9:27 PM, Steven Rostedt <rostedt@goodmis.org> wrote:
-> On Fri, 2010-10-29 at 20:26 -0400, Arnaud Lacombe wrote:
->> Hi,
->
->> Technically, it is _not_ an environment variable; it is a kconfig
->> symbol's name. In this particular case, both name collide and the
->> kconfig symbol happens to get its default value from the environment.
->> The real fixes, from my point of view, would be to have a perl binding
->> of the kconfig backend and get rid of read_kconfig(). That said, your
->> patch is broken if a symbol happen not to match an environment
->> variable (both in name and value).
->
-> That sounds like a proper fix. Unfortunately, I don't have the time to
-> work on this now, and although this fix works by coincidence, it
-> never-the-less works, as suppose to just having localmodconfig crash.
->
-yes, sure.
+What kernel version are you looking at?  Something before 2.6.36 ?
+I ask that because in 2.6.36 and later, the config command line tool only
+uses long option strings (like --oldconfig), not short option strings
+(like -o).
 
-> But you are right. After KS and Plumbers, I'll work on doing something
-> like that. That can probably solve some of the other issues I'm having
-> (still keeping too many modules enabled).
->
-I have some work in progress in this area: cleanup, better split
-between the kconfig backend and frontend, and eventually a perl
-binding. That would all be an interesting goal for .38 :-)
+Anyway, in 2.6.35, scripts/kconfig/Makefile is fairly clear on those
+short option strings:
 
-Currently I got the parser working within perl, but I'm not really
-really sure of what I can currently do with it and how the whole thing
-interface to one another :)
+-o	oldconfig
+-s	silentoldconfig
+-r	randconfig
+-y	allyesconfig
+-n	allnoconfig
+-m	allmodconfig
+-d	defconfig
+-D filename	use filename as default configuration
 
- - Arnaud
+> Now I havn't a clear understanding on those meaning. I want to look some
+> text notice
+> about this. Though I could find info from scripts/kconfig/conf.c, I
+> don't want to
+> befoul my fingers by the fucking code currently.
+
+
+-- 
+~Randy
+*** Remember to use Documentation/SubmitChecklist when testing your code ***
