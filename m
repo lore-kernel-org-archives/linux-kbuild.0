@@ -1,65 +1,104 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.asbjorn.biz ([217.195.185.3]:53964 "EHLO mail.asbjorn.biz"
+Received: from mx1.redhat.com ([209.132.183.28]:64243 "EHLO mx1.redhat.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751001Ab0KDCrK (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 3 Nov 2010 22:47:10 -0400
-From: Asbjoern Sloth Toennesen <asbjorn@asbjorn.biz>
-Subject: [PATCH] kbuild, deb-pkg: fix Architecture field when cross compiling
-Date: Thu,  4 Nov 2010 02:42:40 +0000
-Message-Id: <1288838560-6173-1-git-send-email-asbjorn@asbjorn.biz>
-In-Reply-To: <4CD20F85.7040005@asbjorn.biz>
-References: <4CD20F85.7040005@asbjorn.biz>
+	id S1752756Ab0KDDTU (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 3 Nov 2010 23:19:20 -0400
+Message-ID: <4CD22627.2000607@redhat.com>
+Date: Wed, 03 Nov 2010 23:19:03 -0400
+From: Mauro Carvalho Chehab <mchehab@redhat.com>
+MIME-Version: 1.0
+Subject: Re: REGRESSION: Re: [GIT] kconfig rc fixes
+References: <20101009224041.GA901@sepie.suse.cz>	<4CD1E232.30406@redhat.com> <AANLkTimyh-k8gYwuNi6nZFp3oviQ33+M3fDRzZ+sJN9i@mail.gmail.com>
+In-Reply-To: <AANLkTimyh-k8gYwuNi6nZFp3oviQ33+M3fDRzZ+sJN9i@mail.gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, debian-kernel@lists.debian.org
+To: Arnaud Lacombe <lacombar@gmail.com>
+Cc: Michal Marek <mmarek@suse.cz>, Linus Torvalds <torvalds@linux-foundation.org>, kyle@redhat.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Linux Media Mailing List <linux-media@vger.kernel.org>
 
-Attempt to guess the correct value of the Architecture control
-field, based on the ARCH environment variable. Fallback to letting
-deb-gencontrol use the host platform's architecture.
+Em 03-11-2010 22:31, Arnaud Lacombe escreveu:
+> Hi,
+> 
+> On Wed, Nov 3, 2010 at 6:29 PM, Mauro Carvalho Chehab
+> <mchehab@redhat.com> wrote:
+>> Em 09-10-2010 18:40, Michal Marek escreveu:
+>>>
+>>> Arnaud Lacombe (1):
+>>>       kconfig: delay symbol direct dependency initialization
+>>
+>> This patch generated a regression with V4L build. After applying it,
+>> some Kconfig dependencies that used to work with V4L Kconfig broke.
+>>
+> of course, but they were all-likely buggy. If a compiler version N
+> outputs a new legitimate warning because of a bug in the code, you do
+> not switch back to the previous version because the warning wasn't
+> there, you fix the code.
+> 
+> That said, please point me to a false positive, eventually with a
+> minimal testcase, and I'll be happy to fix the issue.
 
-With this patch the following make command:
+Arnaud,
 
-	make ARCH=i386 deb-pkg
+In the case of V4L and DVB drivers, what happens is that the same 
+USB (or PCI) bridge driver can be attached to lots of
+different chipsets that do analog/digital/audio decoding/encoding.
 
-will output an i386 Debian package instead of an amd64 one,
-when run on amd64 machine.
+A normal user won't need to open his USB TV stick just to see TV on it.
+It just needs to select a bridge driver, and all possible options for encoders
+and decoders are auto-selected.
 
-Signed-off-by: Asbjoern Sloth Toennesen <asbjorn@asbjorn.biz>
----
- scripts/package/builddeb |   18 +++++++++++++++++-
- 1 files changed, 17 insertions(+), 1 deletions(-)
+If you're an advanced user (or are developing an embedded hardware), you
+know exactly what are the components inside the board/stick. So, the
+Kconfig allows to disable the automatic auto-selection, doing manual
+selection.
 
-diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-index 5f1e2fc..02fd63f 100644
---- a/scripts/package/builddeb
-+++ b/scripts/package/builddeb
-@@ -25,8 +25,24 @@ create_package() {
- 	chown -R root:root "$pdir"
- 	chmod -R go-w "$pdir"
- 
-+	# Attempt to find correct debian architecture
-+	local forcearch="" debarch=""
-+	case "$ARCH" in
-+		x86_64) debarch="amd64" ;;
-+		i386|ia64) debarch="$ARCH" ;;
-+		*)
-+			case "$SUBARCH" in
-+				arm) debarch=$(grep -q CONFIG_AEABI=y .config \
-+						&& echo armel || echo arm) ;;
-+			esac
-+			;;
-+	esac
-+	if [ -n "$debarch" ] ; then
-+		forcearch="-DArchitecture=$debarch"
-+	fi
-+
- 	# Create the package
--	dpkg-gencontrol -isp -p$pname -P"$pdir"
-+	dpkg-gencontrol -isp $forcearch -p$pname -P"$pdir"
- 	dpkg --build "$pdir" ..
- }
- 
--- 
-1.7.2.3
+The logic basically implements it, using Kconfig way, on a logic like:
+
+	auto = ask_user_if_ancillary_drivers_should_be_auto_selected();
+	driver_foo = ask_user_if_driver_foo_should_be_selected();
+	if (driver_foo && auto) {
+		select(bar1);
+		select(bar2);
+		select(bar3);
+		select(bar4);
+	}
+...
+	if (!auto) {
+		open_menu()
+		ask_user_if_bar1_should_be_selected();
+		ask_user_if_bar2_should_be_selected();
+		ask_user_if_bar3_should_be_selected();
+		ask_user_if_bar4_should_be_selected();
+...
+		close_menu()
+	}
+
+Or, on Kconfig language:
+
+>> config VIDEO_HELPER_CHIPS_AUTO
+>>        bool "Autoselect pertinent encoders/decoders and other helper chips"
+>>
+>> config VIDEO_IVTV
+>>        select VIDEO_WM8739 if VIDEO_HELPER_CHIPS_AUTO
+>>
+>> menu "Encoders/decoders and other helper chips"
+>>        depends on !VIDEO_HELPER_CHIPS_AUTO
+>>
+>> config VIDEO_WM8739
+>>        tristate "Wolfson Microelectronics WM8739 stereo audio ADC"
+>>
+
+I don't see anything wrong on such logic. It is valid in C, and it is also valid
+(and works properly) at Kconfig language.
+
+So, the warning is a false positive.
+
+If you want to see the real logic, just look at drivers/media/.../Kconfig stuff.
+You'll see it at almost all Kconfig files. There are hundreds of dependencies
+using this kind of logic. This is used by all tuners (21 Kconfig items, at
+drivers/media/common/Kconfig), by several I2C devices (40+ Kconfig items at
+drivers/media/video/Kconfig), and by almost all bridge drivers.
+
+Mauro.
 
