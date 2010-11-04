@@ -1,38 +1,65 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-gx0-f174.google.com ([209.85.161.174]:59623 "EHLO
-	mail-gx0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750769Ab0KDEUs (ORCPT
+Received: from pfepb.post.tele.dk ([195.41.46.236]:42339 "EHLO
+	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754187Ab0KDF6C (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 4 Nov 2010 00:20:48 -0400
-Received: by gxk23 with SMTP id 23so1067316gxk.19
-        for <linux-kbuild@vger.kernel.org>; Wed, 03 Nov 2010 21:20:47 -0700 (PDT)
-From: Arnaud Lacombe <lacombar@gmail.com>
-Subject: [PATCH] kconfig: the day kconfig warns about "select"-abuse has come
-Date: Thu,  4 Nov 2010 00:16:08 -0400
-Message-Id: <1288844168-21539-1-git-send-email-lacombar@gmail.com>
+	Thu, 4 Nov 2010 01:58:02 -0400
+Date: Thu, 4 Nov 2010 06:58:00 +0100
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: [PATCH] kbuild, deb-pkg: fix Architecture field when cross
+	compiling
+Message-ID: <20101104055800.GA11781@merkur.ravnborg.org>
+References: <4CD22ACF.1000407@asbjorn.it> <1288842244-6863-1-git-send-email-asbjorn@asbjorn.biz>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1288842244-6863-1-git-send-email-asbjorn@asbjorn.biz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, Arnaud Lacombe <lacombar@gmail.com>, catalin.marinas@arm.com
+To: Asbjoern Sloth Toennesen <asbjorn@asbjorn.biz>
+Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, debian-kernel@lists.debian.org
 
-CC: catalin.marinas@arm.com
-Signed-off-by: Arnaud Lacombe <lacombar@gmail.com>
----
- Documentation/kbuild/kconfig-language.txt |    1 -
- 1 files changed, 0 insertions(+), 1 deletions(-)
+On Thu, Nov 04, 2010 at 03:44:04AM +0000, Asbjoern Sloth Toennesen wrote:
+> Attempt to guess the correct value of the Architecture control
+> field, based on the ARCH environment variable. Fallback to letting
+> deb-gencontrol use the host platform's architecture.
+> 
+> With this patch the following make command:
+> 
+> 	make ARCH=i386 deb-pkg
+> 
+> will output an i386 Debian package instead of an amd64 one,
+> when run on amd64 machine.
+> 
+> Signed-off-by: Asbjoern Sloth Toennesen <asbjorn@asbjorn.biz>
+> ---
+>  scripts/package/builddeb |   17 ++++++++++++++++-
+>  1 files changed, 16 insertions(+), 1 deletions(-)
+> 
+> diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+> index 5f1e2fc..43b8826 100644
+> --- a/scripts/package/builddeb
+> +++ b/scripts/package/builddeb
+> @@ -25,8 +25,23 @@ create_package() {
+>  	chown -R root:root "$pdir"
+>  	chmod -R go-w "$pdir"
+>  
+> +	# Attempt to find the correct Debian architecture
+> +	local forcearch="" debarch=""
+> +	case "$ARCH" in
+> +	i386|ia64)
+> +		debarch="$ARCH" ;;
+> +	x86_64)
+> +		debarch="amd64" ;;
 
-diff --git a/Documentation/kbuild/kconfig-language.txt b/Documentation/kbuild/kconfig-language.txt
-index 2fe93ca..5b9b1be 100644
---- a/Documentation/kbuild/kconfig-language.txt
-+++ b/Documentation/kbuild/kconfig-language.txt
-@@ -112,7 +112,6 @@ applicable everywhere (see syntax).
- 	(no prompts anywhere) and for symbols with no dependencies.
- 	That will limit the usefulness but on the other hand avoid
- 	the illegal configurations all over.
--	kconfig should one day warn about such things.
- 
- - numerical ranges: "range" <symbol> <symbol> ["if" <expr>]
-   This allows to limit the range of possible input values for int
--- 
-1.7.2.30.gc37d7.dirty
+On the commandline I can say ARCH=x86 - will it do the right thing then?
 
+> +	*)
+> +		grep -q CONFIG_ARM=y .config &&
+> +			debarch=arm$(grep -q CONFIG_AEABI=y .config && echo el)
+> +	esac
+
+sparc may be know as sparc32, sparc64 and sparc these days.
+I recall that at least in the past debian supported sparc.
+
+	Sam
