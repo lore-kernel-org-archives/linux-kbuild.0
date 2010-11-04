@@ -1,73 +1,67 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-yw0-f46.google.com ([209.85.213.46]:60659 "EHLO
+Received: from mail-yw0-f46.google.com ([209.85.213.46]:35518 "EHLO
 	mail-yw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752345Ab0KDScI (ORCPT
+	with ESMTP id S1750858Ab0KDSeI convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 4 Nov 2010 14:32:08 -0400
+	Thu, 4 Nov 2010 14:34:08 -0400
 MIME-Version: 1.0
-In-Reply-To: <4CD2F735.2040903@redhat.com>
+In-Reply-To: <4CD1E232.30406@redhat.com>
 References: <20101009224041.GA901@sepie.suse.cz>
 	<4CD1E232.30406@redhat.com>
-	<AANLkTimyh-k8gYwuNi6nZFp3oviQ33+M3fDRzZ+sJN9i@mail.gmail.com>
-	<4CD22627.2000607@redhat.com>
-	<AANLkTi=Eb8k6gmeGqvC=Zbo2mj51oHcbCncZGt00u9Tx@mail.gmail.com>
-	<4CD29493.5020101@redhat.com>
-	<20101104101910.920efbed.randy.dunlap@oracle.com>
-	<4CD2F735.2040903@redhat.com>
-Date: Thu, 4 Nov 2010 14:32:07 -0400
-Message-ID: <AANLkTikx+RkV82Cb1YQfYNzVWpMqRQOnvhNY4LtS64FC@mail.gmail.com>
+Date: Thu, 4 Nov 2010 14:34:07 -0400
+Message-ID: <AANLkTiksbQQsXDydmohz6TiR4u-QNSJkfZHnkLOKizF7@mail.gmail.com>
 Subject: Re: REGRESSION: Re: [GIT] kconfig rc fixes
 From: Arnaud Lacombe <lacombar@gmail.com>
 Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Mauro Carvalho Chehab <mchehab@redhat.com>
-Cc: Randy Dunlap <randy.dunlap@oracle.com>, Michal Marek <mmarek@suse.cz>, Linus Torvalds <torvalds@linux-foundation.org>, kyle@redhat.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Linux Media Mailing List <linux-media@vger.kernel.org>
+Cc: Michal Marek <mmarek@suse.cz>, Linus Torvalds <torvalds@linux-foundation.org>, kyle@redhat.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Linux Media Mailing List <linux-media@vger.kernel.org>
 
 Hi,
 
-On Thu, Nov 4, 2010 at 2:11 PM, Mauro Carvalho Chehab
+On Wed, Nov 3, 2010 at 6:29 PM, Mauro Carvalho Chehab
 <mchehab@redhat.com> wrote:
-> [...]
-> Yes, but this makes things worse: it will allow compiling drivers that Kernel
-> will never use, as they won't work without an I2C adapter, and the I2C adapter
-> is not compiled.
+> Basically, we have things there like:
 >
-> Worse than that: if you go into all V4L bridge drivers, that implements the I2C
-> adapters and disable them, the I2C ancillary adapters will still be compiled
-> (as they won't return to 'n'), but they will never ever be used...
+> config VIDEO_HELPER_CHIPS_AUTO
+>        bool "Autoselect pertinent encoders/decoders and other helper chips"
 >
-> So, no, this is not a solution.
+> config VIDEO_IVTV
+>        select VIDEO_WM8739 if VIDEO_HELPER_CHIPS_AUTO
 >
-> What we need is to prompt the menu only if the user wants to do some manual configuration.
-> Otherwise, just use the selects done by the drivers that implement the I2C bus adapters,
-> and have some code to use those selected I2C devices.
+> menu "Encoders/decoders and other helper chips"
+>        depends on !VIDEO_HELPER_CHIPS_AUTO
 >
-These is an easy solution: doing as
-`Documentation/kbuild/kconfig-language.txt' say it should be done:
+> config VIDEO_WM8739
+>        tristate "Wolfson Microelectronics WM8739 stereo audio ADC"
+>
+Where do you get that code from ? this particular one is not in 2.6.37-rc1:
 
-config MODULES
-        bool "modules ?"
-        default y
+% git describe
+v2.6.37-rc1-27-gff8b16d
 
-config AUTO
-        bool "AUTO"
-
-config IVTV
-        tristate "IVTV"
-        select WM42 if AUTO
-
-menu "TV"
-        depends on !AUTO
-
-config WM42_USER
-        tristate "WM42"
-        select WM42
-
-endmenu
-
-config WM42
-        tristate
-        default n
+% head -20 drivers/media/video/ivtv/Kconfig
+config VIDEO_IVTV
+        tristate "Conexant cx23416/cx23415 MPEG encoder/decoder support"
+        depends on VIDEO_V4L2 && PCI && I2C
+        depends on INPUT   # due to VIDEO_IR
+        select I2C_ALGOBIT
+        depends on VIDEO_IR
+        select VIDEO_TUNER
+        select VIDEO_TVEEPROM
+        select VIDEO_CX2341X
+        select VIDEO_CX25840
+        select VIDEO_MSP3400
+        select VIDEO_SAA711X
+        select VIDEO_SAA717X
+        select VIDEO_SAA7127
+        select VIDEO_CS53L32A
+        select VIDEO_M52790
+        select VIDEO_WM8775
+        select VIDEO_WM8739
+        select VIDEO_VP27SMPX
+        select VIDEO_UPD64031A
 
  - Arnaud
