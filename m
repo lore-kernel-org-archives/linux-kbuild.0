@@ -1,27 +1,38 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:47540 "EHLO mx2.suse.de"
+Received: from mail.asbjorn.biz ([217.195.185.3]:53505 "EHLO mail.asbjorn.biz"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753947Ab0KCXZp (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 3 Nov 2010 19:25:45 -0400
-Message-ID: <4CD1EF71.1090303@suse.cz>
-Date: Thu, 04 Nov 2010 00:25:37 +0100
-From: Michal Marek <mmarek@suse.cz>
+	id S1754602Ab0KDBuV (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 3 Nov 2010 21:50:21 -0400
+Message-ID: <4CD20F85.7040005@asbjorn.biz>
+Date: Thu, 04 Nov 2010 01:42:29 +0000
+From: =?UTF-8?B?QXNiasO4cm4gU2xvdGggVMO4bm5lc2Vu?= <asbjorn@asbjorn.biz>
 MIME-Version: 1.0
 Subject: Re: [PATCH] kbuild, deb-pkg: fix Architecture field when cross compiling
 References: <1288654261-8269-1-git-send-email-asbjorn@asbjorn.biz> <4CD1E8C4.2020405@suse.cz>
 In-Reply-To: <4CD1E8C4.2020405@suse.cz>
-Content-Type: text/plain; charset=ISO-8859-2
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Asbjoern Sloth Toennesen <asbjorn@asbjorn.biz>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, debian-kernel@lists.debian.org
 
-On 3.11.2010 23:57, Michal Marek wrote:
-> build a kernel for a different architecture. make rpm-pkg seems to
-> suffer from the same problem, btw.
+On 11/03/2010 10:57 PM, Michal Marek wrote:
+> I know very little about debian packaging, but shouldn't this be done in
+> all cases, regardless of CROSS_COMPILE being set or not? You even show
+> in the above example that in some cases you don't need CROSS_COMPILE to
+> build a kernel for a different architecture.
 
-rpm-pkg actually handles this properly, it runs rpmbuild --target
-$(UTS_MACHINE).
+I had a problem earlier with Kbuild ignoring ARCH if CROSS_COMPILE
+wasn't set, but can't reproduce with the current kernel, but I also
+started out with upgrading it from .26, since squeezes .32 doesn't work
+on Soekris net4501. So this is no longer an issue.
 
-Michal
+The other reason for make it dependent on CROSS_COMPILE at least to
+begin with is that the ARCH -> debarch translation table doesn't have to
+be as complete since it doesn't break anything in the currently working
+non-cross compile senario. If this doesn't matter then I will send a new
+patch, that doesn't depend on CROSS_COMPILE being set.
+
+I have CC'ed the debian-kernel list, for people not on LKML:
+https://patchwork.kernel.org/patch/296182/
