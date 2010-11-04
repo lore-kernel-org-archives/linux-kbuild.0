@@ -1,38 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.asbjorn.biz ([217.195.185.3]:53505 "EHLO mail.asbjorn.biz"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754602Ab0KDBuV (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 3 Nov 2010 21:50:21 -0400
-Message-ID: <4CD20F85.7040005@asbjorn.biz>
-Date: Thu, 04 Nov 2010 01:42:29 +0000
-From: =?UTF-8?B?QXNiasO4cm4gU2xvdGggVMO4bm5lc2Vu?= <asbjorn@asbjorn.biz>
+Received: from mail-gx0-f174.google.com ([209.85.161.174]:57539 "EHLO
+	mail-gx0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751739Ab0KDCbn convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 3 Nov 2010 22:31:43 -0400
 MIME-Version: 1.0
-Subject: Re: [PATCH] kbuild, deb-pkg: fix Architecture field when cross compiling
-References: <1288654261-8269-1-git-send-email-asbjorn@asbjorn.biz> <4CD1E8C4.2020405@suse.cz>
-In-Reply-To: <4CD1E8C4.2020405@suse.cz>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <4CD1E232.30406@redhat.com>
+References: <20101009224041.GA901@sepie.suse.cz>
+	<4CD1E232.30406@redhat.com>
+Date: Wed, 3 Nov 2010 22:31:42 -0400
+Message-ID: <AANLkTimyh-k8gYwuNi6nZFp3oviQ33+M3fDRzZ+sJN9i@mail.gmail.com>
+Subject: Re: REGRESSION: Re: [GIT] kconfig rc fixes
+From: Arnaud Lacombe <lacombar@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, debian-kernel@lists.debian.org
+To: Mauro Carvalho Chehab <mchehab@redhat.com>
+Cc: Michal Marek <mmarek@suse.cz>, Linus Torvalds <torvalds@linux-foundation.org>, kyle@redhat.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Linux Media Mailing List <linux-media@vger.kernel.org>
 
-On 11/03/2010 10:57 PM, Michal Marek wrote:
-> I know very little about debian packaging, but shouldn't this be done in
-> all cases, regardless of CROSS_COMPILE being set or not? You even show
-> in the above example that in some cases you don't need CROSS_COMPILE to
-> build a kernel for a different architecture.
+Hi,
 
-I had a problem earlier with Kbuild ignoring ARCH if CROSS_COMPILE
-wasn't set, but can't reproduce with the current kernel, but I also
-started out with upgrading it from .26, since squeezes .32 doesn't work
-on Soekris net4501. So this is no longer an issue.
+On Wed, Nov 3, 2010 at 6:29 PM, Mauro Carvalho Chehab
+<mchehab@redhat.com> wrote:
+> Em 09-10-2010 18:40, Michal Marek escreveu:
+>>
+>> Arnaud Lacombe (1):
+>>       kconfig: delay symbol direct dependency initialization
+>
+> This patch generated a regression with V4L build. After applying it,
+> some Kconfig dependencies that used to work with V4L Kconfig broke.
+>
+of course, but they were all-likely buggy. If a compiler version N
+outputs a new legitimate warning because of a bug in the code, you do
+not switch back to the previous version because the warning wasn't
+there, you fix the code.
 
-The other reason for make it dependent on CROSS_COMPILE at least to
-begin with is that the ARCH -> debarch translation table doesn't have to
-be as complete since it doesn't break anything in the currently working
-non-cross compile senario. If this doesn't matter then I will send a new
-patch, that doesn't depend on CROSS_COMPILE being set.
+That said, please point me to a false positive, eventually with a
+minimal testcase, and I'll be happy to fix the issue.
 
-I have CC'ed the debian-kernel list, for people not on LKML:
-https://patchwork.kernel.org/patch/296182/
+ - Arnaud
+
+> Basically, we have things there like:
+>
+> config VIDEO_HELPER_CHIPS_AUTO
+>        bool "Autoselect pertinent encoders/decoders and other helper chips"
+>
+> config VIDEO_IVTV
+>        select VIDEO_WM8739 if VIDEO_HELPER_CHIPS_AUTO
+>
+> menu "Encoders/decoders and other helper chips"
+>        depends on !VIDEO_HELPER_CHIPS_AUTO
+>
+> config VIDEO_WM8739
+>        tristate "Wolfson Microelectronics WM8739 stereo audio ADC"
+>
+this is broken.
