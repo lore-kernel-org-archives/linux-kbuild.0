@@ -1,52 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.asbjorn.biz ([217.195.185.3]:45602 "EHLO mail.asbjorn.biz"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752910Ab0KFTFc (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 6 Nov 2010 15:05:32 -0400
-From: Asbjoern Sloth Toennesen <asbjorn@asbjorn.biz>
-Subject: [PATCH] kbuild, deb-pkg: support overriding userland architecture
-Date: Sat,  6 Nov 2010 19:05:20 +0000
-Message-Id: <1289070320-20726-1-git-send-email-asbjorn@asbjorn.biz>
-In-Reply-To: <4CD5A6C8.8030603@asbjorn.biz>
-References: <4CD5A6C8.8030603@asbjorn.biz>
+Received: from mail-yw0-f46.google.com ([209.85.213.46]:44901 "EHLO
+	mail-yw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751866Ab0KFVde (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 6 Nov 2010 17:33:34 -0400
+From: Arnaud Lacombe <lacombar@gmail.com>
+Subject: [PATCH 0/5] Re: REGRESSION: Re: [GIT] kconfig rc fixes
+Date: Sat,  6 Nov 2010 17:30:22 -0400
+Message-Id: <1289079027-3037-1-git-send-email-lacombar@gmail.com>
+In-Reply-To: <4CD300AC.3010708@redhat.com>
+References: <4CD300AC.3010708@redhat.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, debian-kernel@lists.debian.org
+To: linux-kbuild@vger.kernel.org, linux-media@vger.kernel.org
+Cc: Mauro Carvalho Chehab <mchehab@redhat.com>, Michal Marek <mmarek@suse.cz>, Arnaud Lacombe <lacombar@gmail.com>
 
-Usefull if building for sparc64 userland, because the
-sparc and sparc64 userlands use the same 64-bit kernel,
-making it impossible to always select the correct userland
-architecture for the resulting debian package.
+Hi,
 
-Might also be usefull, if you want a i386 userland with a amd64 kernel.
+This should do the job.
 
-Example usage:
-	make DEBARCH=i386 deb-pkg
+A.
 
-This patch is based on my 'kbuild, deb-pkg: select
-userland architecture based on UTS_MACHINE' patch.
+Arnaud Lacombe (5):
+  kconfig: add an option to determine a menu's visibility
+  kconfig: regen parser
+  Revert "i2c: Fix Kconfig dependencies"
+  media/video: convert Kconfig to use the menu's `visible' keyword
+  i2c/algos: convert Kconfig to use the menu's `visible' keyword
 
-LKML-reference: <alpine.DEB.2.02.1011051437500.13287@aurora.sdinet.de>
-Signed-off-by: Asbjoern Sloth Toennesen <asbjorn@asbjorn.biz>
----
- scripts/package/builddeb |    3 +++
- 1 files changed, 3 insertions(+), 0 deletions(-)
+ drivers/i2c/Kconfig                  |    3 +-
+ drivers/i2c/algos/Kconfig            |   14 +-
+ drivers/media/video/Kconfig          |    2 +-
+ scripts/kconfig/expr.h               |    1 +
+ scripts/kconfig/lkc.h                |    1 +
+ scripts/kconfig/menu.c               |   11 +
+ scripts/kconfig/zconf.gperf          |    1 +
+ scripts/kconfig/zconf.hash.c_shipped |  122 ++++----
+ scripts/kconfig/zconf.tab.c_shipped  |  570 +++++++++++++++++----------------
+ scripts/kconfig/zconf.y              |   21 +-
+ 10 files changed, 393 insertions(+), 353 deletions(-)
 
-diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-index 0043ccd..4772a73 100644
---- a/scripts/package/builddeb
-+++ b/scripts/package/builddeb
-@@ -54,6 +54,9 @@ create_package() {
- 		echo "Please add support for $UTS_MACHINE to ${0} ..." >&2
- 		echo "" >&2
- 	esac
-+	if [ -n "$DEBARCH" ] ; then
-+		debarch="$DEBARCH"
-+	fi
- 	if [ -n "$debarch" ] ; then
- 		forcearch="-DArchitecture=$debarch"
- 	fi
 -- 
-1.7.2.3
+1.7.2.30.gc37d7.dirty
 
