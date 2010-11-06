@@ -1,55 +1,52 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.asbjorn.biz ([217.195.185.3]:58139 "EHLO mail.asbjorn.biz"
+Received: from mail.asbjorn.biz ([217.195.185.3]:45602 "EHLO mail.asbjorn.biz"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751828Ab0KFTEo (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 6 Nov 2010 15:04:44 -0400
-Message-ID: <4CD5A6C8.8030603@asbjorn.biz>
-Date: Sat, 06 Nov 2010 19:04:40 +0000
-From: =?UTF-8?B?QXNiasO4cm4gU2xvdGggVMO4bm5lc2Vu?= <asbjorn@asbjorn.biz>
-MIME-Version: 1.0
-Subject: Re: [PATCH] kbuild, deb-pkg: select userland architecture based on
- UTS_MACHINE
-References: <4CD406C7.8090801@asbjorn.biz> <1288963808-7057-1-git-send-email-asbjorn@asbjorn.biz> <alpine.DEB.2.02.1011051437500.13287@aurora.sdinet.de>
-In-Reply-To: <alpine.DEB.2.02.1011051437500.13287@aurora.sdinet.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+	id S1752910Ab0KFTFc (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 6 Nov 2010 15:05:32 -0400
+From: Asbjoern Sloth Toennesen <asbjorn@asbjorn.biz>
+Subject: [PATCH] kbuild, deb-pkg: support overriding userland architecture
+Date: Sat,  6 Nov 2010 19:05:20 +0000
+Message-Id: <1289070320-20726-1-git-send-email-asbjorn@asbjorn.biz>
+In-Reply-To: <4CD5A6C8.8030603@asbjorn.biz>
+References: <4CD5A6C8.8030603@asbjorn.biz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sven-Haegar Koch <haegar@sdinet.de>
-Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, debian-kernel@lists.debian.org
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, debian-kernel@lists.debian.org
 
-On 11/05/2010 01:42 PM, Sven-Haegar Koch wrote:
-> On Fri, 5 Nov 2010, Asbjoern Sloth Toennesen wrote:
-> 
->> Instead of creating the debian package for the compiling userland,
->> create it for a userland matching the kernel thats being compiled.
-> 
->> Eg. with this patch the following make command:
->>
->> 	make ARCH=i386 deb-pkg
->>
->> will output an i386 Debian package instead of an amd64 one,
->> when run on an amd64 machine.
-> 
-> How do I either select a differnet package-arch or reverse to the 
-> current way?
-> 
-> I am right now using 'make ARCH=x86_64 deb-pkg' on a 32bit userspace
-> environment running with a 64bit kernel, wanting to create packages to 
-> be installed in this i386 arch.
->
-> (As I want 64bit support where possible (mostly for AES-NI support in 
-> dm-crypt), but don't have the time available to do a complete userspace 
-> reinstall and reconfiguration)
+Usefull if building for sparc64 userland, because the
+sparc and sparc64 userlands use the same 64-bit kernel,
+making it impossible to always select the correct userland
+architecture for the resulting debian package.
 
-Sounds like an one off thing, so in your case forcing the installation
-should work:
+Might also be usefull, if you want a i386 userland with a amd64 kernel.
 
-	dpkg --force-architecture linux-image-*.deb
+Example usage:
+	make DEBARCH=i386 deb-pkg
 
-The problem with that approach is that it doesn't work with APT, but I
-doubt that there are any private APT repositories with this environment.
+This patch is based on my 'kbuild, deb-pkg: select
+userland architecture based on UTS_MACHINE' patch.
 
-The issue with one kernel and 2 userspaces will also arise in sparc,
-when the sparc64 userland gets going. So it will need to be dealt with
-at some point, so I create a 3 lines additional patch for it.
+LKML-reference: <alpine.DEB.2.02.1011051437500.13287@aurora.sdinet.de>
+Signed-off-by: Asbjoern Sloth Toennesen <asbjorn@asbjorn.biz>
+---
+ scripts/package/builddeb |    3 +++
+ 1 files changed, 3 insertions(+), 0 deletions(-)
+
+diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+index 0043ccd..4772a73 100644
+--- a/scripts/package/builddeb
++++ b/scripts/package/builddeb
+@@ -54,6 +54,9 @@ create_package() {
+ 		echo "Please add support for $UTS_MACHINE to ${0} ..." >&2
+ 		echo "" >&2
+ 	esac
++	if [ -n "$DEBARCH" ] ; then
++		debarch="$DEBARCH"
++	fi
+ 	if [ -n "$debarch" ] ; then
+ 		forcearch="-DArchitecture=$debarch"
+ 	fi
+-- 
+1.7.2.3
+
