@@ -1,80 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qw0-f46.google.com ([209.85.216.46]:46941 "EHLO
-	mail-qw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751675Ab0KGQtD (ORCPT
+Received: from pfepa.post.tele.dk ([195.41.46.235]:60790 "EHLO
+	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753132Ab0KGRHD (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 7 Nov 2010 11:49:03 -0500
-From: Ben Gamari <bgamari.foss@gmail.com>
-Subject: [PATCH] Debug fixdep
-Date: Sun,  7 Nov 2010 11:48:53 -0500
-Message-Id: <1289148533-15106-1-git-send-email-bgamari.foss@gmail.com>
+	Sun, 7 Nov 2010 12:07:03 -0500
+Date: Sun, 7 Nov 2010 18:07:00 +0100
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: Bus error on make allyesconfig, kernelbuild with HEAD
+Message-ID: <20101107170700.GA22684@merkur.ravnborg.org>
+References: <20100729105225.GA13192@faui48a.informatik.uni-erlangen.de> <AANLkTi=cYgV69VyNZ+TKs_f-+3AJmyo_RaYS57R72j50@mail.gmail.com> <20100729121002.GC13192@faui48a.informatik.uni-erlangen.de> <20100730084353.GB5638@cr0.nay.redhat.com> <87d3qicwxn.fsf@gmail.com> <87aalmcv0p.fsf@gmail.com> <20101106162426.GA14361@merkur.ravnborg.org> <87tyjtjd7m.fsf@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 In-Reply-To: <87tyjtjd7m.fsf@gmail.com>
-References: <87tyjtjd7m.fsf@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: xiyou.wangcong@gmail.com, Christoph Egger <siccegge@cs.fau.de>, linux-kernel@vger.kernel.org, linux-kbuild <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.cz>
-Cc: Ben Gamari <bgamari.foss@gmail.com>
+To: Ben Gamari <bgamari.foss@gmail.com>
+Cc: =?iso-8859-1?Q?Am=E9rico?= Wang <xiyou.wangcong@gmail.com>, Christoph Egger <siccegge@cs.fau.de>, linux-kernel@vger.kernel.org, linux-kbuild <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.cz>
 
----
- scripts/basic/fixdep.c |   16 ++++++++++++++--
- 1 files changed, 14 insertions(+), 2 deletions(-)
+On Sun, Nov 07, 2010 at 11:44:13AM -0500, Ben Gamari wrote:
+> On Sat, 6 Nov 2010 17:24:26 +0100, Sam Ravnborg <sam@ravnborg.org> wrote:
+> > Took a quick look.
+> > Does the following patch fix it?
+> > 
+> > if m == p then we will stay in the while look looking for a space.
+> > I did not audit all of the code - there may be other issues..
+> > 
+> P.S. Sorry for the noise
+> 
+> Looks like something very odd is happening here. Seems like stat is
+> giving us the wrong size. As seen below, ls reports the file size to be
+> 5247 whereas st.stat indicates a size substantially larger than
+> that. Output from make with attached patch applied:
+> 
+> $ ls -l scripts/basic/.fixdep.d
+> -rw-r--r-- 1 bgamari bgamari 5247 2010-11-07 11:35 scripts/basic/.fixdep.d
+> $ make V=1
+> In file included from /usr/local/angstrom/arm/arm-angstrom-linux-gnueabi/usr/include/stdlib.h:903,
+>                  from scripts/basic/fixdep.c:112:
+> /usr/local/angstrom/arm/arm-angstrom-linux-gnueabi/usr/include/bits/stdlib.h:65: warning: no previous prototype for ‘ptsname_r’
+> file=scripts/basic/.fixdep.d
+> st.size=2ad5f6cecb36
 
-diff --git a/scripts/basic/fixdep.c b/scripts/basic/fixdep.c
-index ea26b23..f1b58d6 100644
---- a/scripts/basic/fixdep.c
-+++ b/scripts/basic/fixdep.c
-@@ -303,6 +303,9 @@ static void parse_dep_file(void *map, size_t len)
- 	char *p;
- 	char s[PATH_MAX];
- 
-+        fprintf(stderr, "map=%p, len=%zx\n", map, len);
-+        fprintf(stderr, "m=%p, end=%p\n", m, end);
-+        fprintf(stderr, "eh?=%zx\n", (size_t)end - (size_t)len);
- 	p = strchr(m, ':');
- 	if (!p) {
- 		fprintf(stderr, "fixdep: parse error\n");
-@@ -314,16 +317,23 @@ static void parse_dep_file(void *map, size_t len)
- 
- 	clear_config();
- 
-+        fprintf(stderr, "map=%p, len=%zx, end=%p\n", map, len, end);
- 	while (m < end) {
--		while (m < end && (*m == ' ' || *m == '\\' || *m == '\n'))
-+		while (m <= end && (*m == ' ' || *m == '\\' || *m == '\n')) {
-+                        fprintf(stderr, "m=%p\n", m);
- 			m++;
-+                }
- 		p = m;
--		while (p < end && *p != ' ') p++;
-+                fprintf(stderr, "A: p=%p, end=%p, str=%s\n", p, end, p);
-+		while (p <= end && *p != ' ') p++;
-+                fprintf(stderr, "B: p=%p, end=%p\n", p, end);
- 		if (p == end) {
- 			do p--; while (!isalnum(*p));
-+                        fprintf(stderr, "c%c ", *p);
- 			p++;
- 		}
- 		memcpy(s, m, p-m); s[p-m] = 0;
-+                fprintf(stderr, "C: p=%p, s=%s\n", p, s);
- 		if (strrcmp(s, "include/generated/autoconf.h") &&
- 		    strrcmp(s, "arch/um/include/uml-config.h") &&
- 		    strrcmp(s, ".ver")) {
-@@ -342,6 +352,7 @@ static void print_deps(void)
- 	int fd;
- 	void *map;
- 
-+        fprintf(stderr, "file=%s\n", depfile);
- 	fd = open(depfile, O_RDONLY);
- 	if (fd < 0) {
- 		fprintf(stderr, "fixdep: ");
-@@ -354,6 +365,7 @@ static void print_deps(void)
- 		close(fd);
- 		return;
- 	}
-+        fprintf(stderr, "st.size=%zx\n", st.st_size);
- 	map = mmap(NULL, st.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
- 	if ((long) map == -1) {
- 		perror("fixdep: mmap");
--- 
-1.7.0.4
+Interesting and valueable information!
 
+Looks like fstat() failed for some odd reason
+Could you try to check the return value of fstat().
+
+If it retruns less than 0 then print out errno (preferable using perror()).
+
+	Sam
