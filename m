@@ -1,45 +1,27 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pv0-f174.google.com ([74.125.83.174]:55505 "EHLO
-	mail-pv0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750805Ab0KGIWu (ORCPT
+Received: from mail-qw0-f46.google.com ([209.85.216.46]:64415 "EHLO
+	mail-qw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750984Ab0KGQjq (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 7 Nov 2010 03:22:50 -0500
-Date: Sun, 7 Nov 2010 16:24:07 +0800
-From: =?utf-8?Q?Am=C3=A9rico?= Wang <xiyou.wangcong@gmail.com>
-Subject: Re: [PATCH] kbuild, deb-pkg: support overriding userland
-	architecture
-Message-ID: <20101107082407.GO3046@hack>
-References: <4CD5A6C8.8030603@asbjorn.biz> <1289070320-20726-1-git-send-email-asbjorn@asbjorn.biz>
+	Sun, 7 Nov 2010 11:39:46 -0500
+From: Ben Gamari <bgamari.foss@gmail.com>
+Subject: Re: Bus error on make allyesconfig, kernelbuild with HEAD
+In-Reply-To: <20101106162426.GA14361@merkur.ravnborg.org>
+References: <20100729105225.GA13192@faui48a.informatik.uni-erlangen.de> <AANLkTi=cYgV69VyNZ+TKs_f-+3AJmyo_RaYS57R72j50@mail.gmail.com> <20100729121002.GC13192@faui48a.informatik.uni-erlangen.de> <20100730084353.GB5638@cr0.nay.redhat.com> <87d3qicwxn.fsf@gmail.com> <87aalmcv0p.fsf@gmail.com> <20101106162426.GA14361@merkur.ravnborg.org>
+Date: Sun, 07 Nov 2010 11:39:42 -0500
+Message-ID: <87wropjdf5.fsf@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1289070320-20726-1-git-send-email-asbjorn@asbjorn.biz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Asbjoern Sloth Toennesen <asbjorn@asbjorn.biz>
-Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, debian-kernel@lists.debian.org
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: =?utf-8?Q?Am=C3=A9rico?= Wang <xiyou.wangcong@gmail.com>, Christoph Egger <siccegge@cs.fau.de>, linux-kernel@vger.kernel.org, linux-kbuild <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.cz>
 
-On Sat, Nov 06, 2010 at 07:05:20PM +0000, Asbjoern Sloth Toennesen wrote:
->Usefull if building for sparc64 userland, because the
->sparc and sparc64 userlands use the same 64-bit kernel,
->making it impossible to always select the correct userland
->architecture for the resulting debian package.
->
->Might also be usefull, if you want a i386 userland with a amd64 kernel.
->
->Example usage:
->	make DEBARCH=i386 deb-pkg
->
->This patch is based on my 'kbuild, deb-pkg: select
->userland architecture based on UTS_MACHINE' patch.
->
-
-This is a good idea. :)
-
-Reviewed-by: WANG Cong <xiyou.wangcong@gmail.com>
-
-Thanks.
-
--- 
-Live like a child, think like the god.
- 
+On Sat, 6 Nov 2010 17:24:26 +0100, Sam Ravnborg <sam@ravnborg.org> wrote:
+> Took a quick look.
+> Does the following patch fix it?
+> 
+> if m == p then we will stay in the while look looking for a space.
+> I did not audit all of the code - there may be other issues..
+> 
+Looks like something very strange is happening here. Debugging patch attached.
