@@ -1,35 +1,56 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-iw0-f174.google.com ([209.85.214.174]:39438 "EHLO
-	mail-iw0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753845Ab0KHMiR convert rfc822-to-8bit (ORCPT
+Received: from pqueueb.post.tele.dk ([193.162.153.10]:38323 "EHLO
+	pqueueb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754286Ab0KHSWf (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 8 Nov 2010 07:38:17 -0500
-From: Ben Gamari <bgamari.foss@gmail.com>
-Subject: Re: fstat suddenly return -EINVAL [Was: Bus error on make allyesconfig, kernelbuild with HEAD]
-In-Reply-To: <20101108101920.GA5527@cr0.nay.redhat.com>
-References: <20100729121002.GC13192@faui48a.informatik.uni-erlangen.de> <20100730084353.GB5638@cr0.nay.redhat.com> <87d3qicwxn.fsf@gmail.com> <87aalmcv0p.fsf@gmail.com> <20101106162426.GA14361@merkur.ravnborg.org> <87tyjtjd7m.fsf@gmail.com> <20101107170700.GA22684@merkur.ravnborg.org> <87mxplypid.fsf@gmail.com> <20101107223056.GA23871@merkur.ravnborg.org> <87lj54raw3.fsf@gmail.com> <20101108101920.GA5527@cr0.nay.redhat.com>
-Date: Mon, 08 Nov 2010 07:38:13 -0500
-Message-ID: <87d3qgq9ca.fsf@gmail.com>
+	Mon, 8 Nov 2010 13:22:35 -0500
+Date: Mon, 8 Nov 2010 19:22:09 +0100
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: fstat suddenly return -EINVAL [Was: Bus error on make
+	allyesconfig, kernelbuild with HEAD]
+Message-ID: <20101108182209.GA26742@merkur.ravnborg.org>
+References: <87d3qicwxn.fsf@gmail.com> <87aalmcv0p.fsf@gmail.com> <20101106162426.GA14361@merkur.ravnborg.org> <87tyjtjd7m.fsf@gmail.com> <20101107170700.GA22684@merkur.ravnborg.org> <87mxplypid.fsf@gmail.com> <20101107223056.GA23871@merkur.ravnborg.org> <87lj54raw3.fsf@gmail.com> <20101108101920.GA5527@cr0.nay.redhat.com> <87d3qgq9ca.fsf@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <87d3qgq9ca.fsf@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: =?utf-8?Q?Am=C3=A9rico?= Wang <xiyou.wangcong@gmail.com>
-Cc: Sam Ravnborg <sam@ravnborg.org>, Christoph Egger <siccegge@cs.fau.de>, linux-kernel@vger.kernel.org, linux-kbuild <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.cz>
+To: Ben Gamari <bgamari.foss@gmail.com>
+Cc: =?iso-8859-1?Q?Am=E9rico?= Wang <xiyou.wangcong@gmail.com>, Christoph Egger <siccegge@cs.fau.de>, linux-kernel@vger.kernel.org, linux-kbuild <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.cz>
 
-On Mon, 8 Nov 2010 18:20:02 +0800, AmÃ©rico Wang <xiyou.wangcong@gmail.com> wrote:
-> But fixdep should be compiled by the host compiler...
+On Mon, Nov 08, 2010 at 07:38:13AM -0500, Ben Gamari wrote:
+> On Mon, 8 Nov 2010 18:20:02 +0800, Américo Wang <xiyou.wangcong@gmail.com> wrote:
+> > But fixdep should be compiled by the host compiler...
+> > 
+> Very good point.
 > 
-Very good point.
-
-> So, does this error also occur when you do non-cross compiling on the
-> same partition?
+> > So, does this error also occur when you do non-cross compiling on the
+> > same partition?
+> > 
+> Hmm, it seems to be fine when not cross-compiling. Interesting.
 > 
-Hmm, it seems to be fine when not cross-compiling. Interesting.
+> > Thanks for your testing!
+> 
+> No worries!
 
-> Thanks for your testing!
+Hi Ben - interesting information.
 
-No worries!
+Do you see that this bug trigger for the same file always?
+You could try to print out the filename if fstat fails.
 
-- Ben
+If this happens while accessing the same file then try to
+check if this file has any special permissions / security settings.
+[I looked a bit on the kernel side of fstat() and it looked
+like a security check could result in EINVAL].
+
+Again if it is always the same file try if you can read it
+using less/vi.
+
+From your previous posting it looks like you have some special setting
+that impact your choice of HOST gcc.
+Do you define HOSTCC somewhere?
+
+
+	Sam
