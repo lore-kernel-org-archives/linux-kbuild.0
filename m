@@ -1,46 +1,107 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from hrndva-omtalb.mail.rr.com ([71.74.56.125]:41138 "EHLO
-	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753870Ab0KIAtR (ORCPT
+Received: from mail-ww0-f44.google.com ([74.125.82.44]:35881 "EHLO
+	mail-ww0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751126Ab0KIFfm (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 8 Nov 2010 19:49:17 -0500
-Subject: Re: [PATCH 1/5] [PATCH 1/5] kconfig: Make localmodconfig handle
- environment variables
-From: Steven Rostedt <rostedt@goodmis.org>
-In-Reply-To: <AANLkTi=JXFppmiyyo=Hc614=FpDhOO4h8SLTs=CUOvQv@mail.gmail.com>
-References: <20101029054310.790179545@goodmis.org>
-	 <20101029054423.498608001@goodmis.org>
-	 <AANLkTi=a8dp-WUNHAkx2fZ5GgNHmDw+ee7MDeUSL44Z0@mail.gmail.com>
-	 <1288402042.29632.50.camel@gandalf.stny.rr.com>
-	 <AANLkTi=JXFppmiyyo=Hc614=FpDhOO4h8SLTs=CUOvQv@mail.gmail.com>
-Content-Type: text/plain; charset="ISO-8859-15"
-Date: Mon, 08 Nov 2010 19:49:07 -0500
-Message-ID: <1289263747.12418.78.camel@gandalf.stny.rr.com>
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+	Tue, 9 Nov 2010 00:35:42 -0500
+MIME-Version: 1.0
+In-Reply-To: <4CC9E5B5.5040402@suse.cz>
+References: <3dc8cddf022eb7024f9f2cf857529a15bee8999a.1288196498.git.wuzhangjin@gmail.com>
+	<4CC9E5B5.5040402@suse.cz>
+Date: Tue, 9 Nov 2010 13:35:40 +0800
+Message-ID: <AANLkTimS7YsZo+AGyTJq+G4kqsviRMRbdgt3NqZgEUws@mail.gmail.com>
+Subject: Re: [v2 PATCH] ftrace: Speed up recordmcount
+From: wu zhangjin <wuzhangjin@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnaud Lacombe <lacombar@gmail.com>
-Cc: Michal Marek <mmarek@suse.cz>, linux-kernel@vger.kernel.org, Linus Torvalds <torvalds@linux-foundation.org>, Andrew Morton <akpm@linux-foundation.org>, linux-kbuild@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>, Roman Zippel <zippel@linux-m68k.org>
+To: rostedt@goodmis.org
+Cc: linux-kernel@vger.kernel.org, mingo@elte.hu, John Reiser <jreiser@bitwagon.com>, Sam Ravnborg <sam@ravnborg.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.cz>
 
-On Sun, 2010-10-31 at 18:05 -0400, Arnaud Lacombe wrote:
-> Hi,
+Hi, Steve
 
-> > But you are right. After KS and Plumbers, I'll work on doing something
-> > like that. That can probably solve some of the other issues I'm having
-> > (still keeping too many modules enabled).
-> >
-> I have some work in progress in this area: cleanup, better split
-> between the kconfig backend and frontend, and eventually a perl
-> binding. That would all be an interesting goal for .38 :-)
-> 
-> Currently I got the parser working within perl, but I'm not really
-> really sure of what I can currently do with it and how the whole thing
-> interface to one another :)
+On 10/29/10, Michal Marek <mmarek@suse.cz> wrote:
+> On 27.10.2010 18:24, Wu Zhangjin wrote:
+>> From: Wu Zhangjin <wuzhangjin@gmail.com>
+>>
+>> cmd_record_mcount is used to locate the _mcount symbols in the object
+>> files, only the files compiled with -pg has the _mcount symbol, so, it
+>> is only needed for such files, but the current cmd_record_mcount is used
+>> for all of the object files, so, we need to fix it and speed it up.
+>>
+>> Since -pg may be removed by the method used in kernel/trace/Makefile:
+>>
+>> ORIG_CFLAGS := $(KBUILD_CFLAGS)
+>> KBUILD_CFLAGS = $(subst -pg,,$(ORIG_CFLAGS))
+>>
+>> Or may be removed by the method used in arch/x86/kernel/Makefile:
+>>
+>> CONFIG_REMOVE_file.o = -pg
+>
+> CFLAGS_REMOVE_file.o
+>
 
-Let me know what you got, I would really like localmodconfig to have
-this back end. It should really help get a minimal config as well.
+Did you apply this patch, should I fix this typo and resend it to you?
 
--- Steve
+Best Regards,
+Wu Zhangjin
 
-
+>
+>> So, we must check the last variable stores the compiling flags, that is
+>> c_flags(Please refer to cmd_cc_o_c and rule_cc_o_c defined in
+>> scripts/Makefile.build) and since the CFLAGS_REMOVE_file.o is already
+>> filtered in _c_flags(Please refer to scripts/Makefile.lib) and _c_flags
+>> has less symbols, therefore, we only need to check _c_flags.
+>>
+>> ---------------
+>> Changes from v1:
+>>
+>>   o Don't touch Makefile for CONFIG_FTRACE_MCOUNT_RECORD is enough
+>>   o Use _c_flags intead of KBUILD_CFLAGS to cover CONFIG_REMOVE_file.o =
+>> -pg
+>>   (feedback from Steven Rostedt <rostedt@goodmis.org>)
+>>
+>> Signed-off-by: Wu Zhangjin <wuzhangjin@gmail.com>
+>
+> Acked-by: Michal Marek <mmarek@suse.cz>
+>
+>
+>> ---
+>>  scripts/Makefile.build |   13 +++++++++----
+>>  1 files changed, 9 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+>> index 5ad25e1..0ad6108 100644
+>> --- a/scripts/Makefile.build
+>> +++ b/scripts/Makefile.build
+>> @@ -214,17 +214,22 @@ ifdef BUILD_C_RECORDMCOUNT
+>>  # The empty.o file is created in the make process in order to determine
+>>  #  the target endianness and word size. It is made before all other C
+>>  #  files, including recordmcount.
+>> -cmd_record_mcount = if [ $(@) != "scripts/mod/empty.o" ]; then			\
+>> -			$(objtree)/scripts/recordmcount "$(@)";			\
+>> -		    fi;
+>> +sub_cmd_record_mcount =					\
+>> +	if [ $(@) != "scripts/mod/empty.o" ]; then	\
+>> +		$(objtree)/scripts/recordmcount "$(@)";	\
+>> +	fi;
+>>  else
+>> -cmd_record_mcount = set -e ; perl $(srctree)/scripts/recordmcount.pl
+>> "$(ARCH)" \
+>> +sub_cmd_record_mcount = set -e ; perl $(srctree)/scripts/recordmcount.pl
+>> "$(ARCH)" \
+>>  	"$(if $(CONFIG_CPU_BIG_ENDIAN),big,little)" \
+>>  	"$(if $(CONFIG_64BIT),64,32)" \
+>>  	"$(OBJDUMP)" "$(OBJCOPY)" "$(CC) $(KBUILD_CFLAGS)" \
+>>  	"$(LD)" "$(NM)" "$(RM)" "$(MV)" \
+>>  	"$(if $(part-of-module),1,0)" "$(@)";
+>>  endif
+>> +cmd_record_mcount = 						\
+>> +	if [ "$(findstring -pg,$(_c_flags))" == "-pg" ]; then	\
+>> +		$(sub_cmd_record_mcount)			\
+>> +	fi;
+>>  endif
+>>
+>>  define rule_cc_o_c
+>
+>
