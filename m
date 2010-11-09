@@ -1,65 +1,127 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from rcsinet10.oracle.com ([148.87.113.121]:57238 "EHLO
-	rcsinet10.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753497Ab0KIRDB (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 9 Nov 2010 12:03:01 -0500
-Date: Tue, 9 Nov 2010 09:01:23 -0800
-From: Randy Dunlap <randy.dunlap@oracle.com>
-Subject: Re: [PATCH] serial: 8250: fix uninitialized compiler warning
-Message-Id: <20101109090123.6a12f3f2.randy.dunlap@oracle.com>
-In-Reply-To: <1289321723.2260.14.camel@cowboy>
-References: <1289321723.2260.14.camel@cowboy>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Received: from mx1.redhat.com ([209.132.183.28]:44499 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752670Ab0KIRci (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 9 Nov 2010 12:32:38 -0500
+Message-ID: <4CD985AF.4040706@redhat.com>
+Date: Tue, 09 Nov 2010 15:32:31 -0200
+From: Mauro Carvalho Chehab <mchehab@redhat.com>
+MIME-Version: 1.0
+Subject: Re: [PATCH 0/5] Re: REGRESSION: Re: [GIT] kconfig rc fixes
+References: <4CD300AC.3010708@redhat.com> <1289079027-3037-1-git-send-email-lacombar@gmail.com>
+In-Reply-To: <1289079027-3037-1-git-send-email-lacombar@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: dave@gnu.org
-Cc: Greg Kroah-Hartman <gregkh@suse.de>, LKML <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, linux-serial@vger.kernel.org
+To: Arnaud Lacombe <lacombar@gmail.com>, Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org, linux-media@vger.kernel.org
 
-On Tue, 09 Nov 2010 13:55:23 -0300 Davidlohr Bueso wrote:
+Hi Arnaud,
 
-> From: Davidlohr Bueso <dave@gnu.org>
+Em 06-11-2010 19:30, Arnaud Lacombe escreveu:
+> Hi,
 > 
-> This addresses:
+> This should do the job.
 > 
->   CC [M]  drivers/serial/8250.o
-> drivers/serial/8250.c: In function ‘serial8250_shutdown’:
-> drivers/serial/8250.c:1696: warning: ‘i’ may be used uninitialized in this function
-> drivers/serial/8250.c:1696: note: ‘i’ was declared here
-
-so in your analysis of this compiler warning, was the warning correct & justified,
-or was it false?  I.e., is the init to NULL needed?
-
-If it was false, could we just quieten the warning by using:
-
-	struct irq_info *unitialized_var(i);
-
-plus #include <linux/compiler.h> ?
-
-
-> Signed-off-by: Davidlohr Bueso <dave@gnu.org>
-> ---
->  drivers/serial/8250.c |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
+> A.
 > 
-> diff --git a/drivers/serial/8250.c b/drivers/serial/8250.c
-> index 4d8e14b..f734eee 100644
-> --- a/drivers/serial/8250.c
-> +++ b/drivers/serial/8250.c
-> @@ -1693,7 +1693,7 @@ static int serial_link_irq_chain(struct uart_8250_port *up)
->  
->  static void serial_unlink_irq_chain(struct uart_8250_port *up)
->  {
-> -	struct irq_info *i;
-> +	struct irq_info *i = NULL;
->  	struct hlist_node *n;
->  	struct hlist_head *h;
->  
-> -- 
+> Arnaud Lacombe (5):
+>   kconfig: add an option to determine a menu's visibility
+>   kconfig: regen parser
+>   Revert "i2c: Fix Kconfig dependencies"
+>   media/video: convert Kconfig to use the menu's `visible' keyword
+>   i2c/algos: convert Kconfig to use the menu's `visible' keyword
+> 
+>  drivers/i2c/Kconfig                  |    3 +-
+>  drivers/i2c/algos/Kconfig            |   14 +-
+>  drivers/media/video/Kconfig          |    2 +-
+>  scripts/kconfig/expr.h               |    1 +
+>  scripts/kconfig/lkc.h                |    1 +
+>  scripts/kconfig/menu.c               |   11 +
+>  scripts/kconfig/zconf.gperf          |    1 +
+>  scripts/kconfig/zconf.hash.c_shipped |  122 ++++----
+>  scripts/kconfig/zconf.tab.c_shipped  |  570 +++++++++++++++++----------------
+>  scripts/kconfig/zconf.y              |   21 +-
+>  10 files changed, 393 insertions(+), 353 deletions(-)
 
+Patches look OK to my eyes. One more patch is needed, in order to fix build
+warnings when customise is enabled for tuners and/or for DVB frontends.
+I'm enclosing the fix.
+
+For this patch series:
+Acked-by: Mauro Carvalho Chehab <mchehab@redhat.com>
+
+Michal,
+
+Would you apply those fixes to your tree, or do you prefer if I send them via
+my tree?
+
+Thanks,
+Mauro
 
 ---
-~Randy
-*** Remember to use Documentation/SubmitChecklist when testing your code ***
+
+
+commit f53404d53c026548e03444f7ed33e8027716425d
+Author: Mauro Carvalho Chehab <mchehab@redhat.com>
+Date:   Tue Nov 9 15:29:05 2010 -0200
+
+    [media] Fix Kconfig errors due to two visible menus
+    
+    Use the new visible Kconfig keyword to avoid producing error for two menus
+    that are visible only if Tuner/frontend customise options are enabled.
+    
+    Signed-off-by: Mauro Carvalho Chehab <mchehab@redhat.com>
+
+diff --git a/drivers/media/common/tuners/Kconfig b/drivers/media/common/tuners/Kconfig
+index 2385e6c..78b0895 100644
+--- a/drivers/media/common/tuners/Kconfig
++++ b/drivers/media/common/tuners/Kconfig
+@@ -31,7 +31,7 @@ config MEDIA_TUNER
+ 	select MEDIA_TUNER_TDA9887 if !MEDIA_TUNER_CUSTOMISE
+ 	select MEDIA_TUNER_MC44S803 if !MEDIA_TUNER_CUSTOMISE
+ 
+-menuconfig MEDIA_TUNER_CUSTOMISE
++config MEDIA_TUNER_CUSTOMISE
+ 	bool "Customize analog and hybrid tuner modules to build"
+ 	depends on MEDIA_TUNER
+ 	default y if EMBEDDED
+@@ -44,7 +44,8 @@ menuconfig MEDIA_TUNER_CUSTOMISE
+ 
+ 	  If unsure say N.
+ 
+-if MEDIA_TUNER_CUSTOMISE
++menu "Customize TV tuners"
++	visible if MEDIA_TUNER_CUSTOMISE
+ 
+ config MEDIA_TUNER_SIMPLE
+ 	tristate "Simple tuner support"
+@@ -185,5 +186,4 @@ config MEDIA_TUNER_TDA18218
+ 	default m if MEDIA_TUNER_CUSTOMISE
+ 	help
+ 	  NXP TDA18218 silicon tuner driver.
+-
+-endif # MEDIA_TUNER_CUSTOMISE
++endmenu
+diff --git a/drivers/media/dvb/frontends/Kconfig b/drivers/media/dvb/frontends/Kconfig
+index e9062b0..96b2701 100644
+--- a/drivers/media/dvb/frontends/Kconfig
++++ b/drivers/media/dvb/frontends/Kconfig
+@@ -12,9 +12,8 @@ config DVB_FE_CUSTOMISE
+ 
+ 	  If unsure say N.
+ 
+-if DVB_FE_CUSTOMISE
+-
+ menu "Customise DVB Frontends"
++	visible if DVB_FE_CUSTOMISE
+ 
+ comment "Multistandard (satellite) frontends"
+ 	depends on DVB_CORE
+@@ -619,5 +618,3 @@ config DVB_DUMMY_FE
+ 	tristate "Dummy frontend driver"
+ 	default n
+ endmenu
+-
+-endif
