@@ -1,68 +1,39 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from hapkido.dreamhost.com ([66.33.216.122]:36507 "EHLO
-	hapkido.dreamhost.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755435Ab0KILSD (ORCPT
+Received: from hrndva-omtalb.mail.rr.com ([71.74.56.124]:45647 "EHLO
+	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751223Ab0KINxz (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 9 Nov 2010 06:18:03 -0500
-Received: from homiemail-a38.g.dreamhost.com (caiajhbdcaib.dreamhost.com [208.97.132.81])
-	by hapkido.dreamhost.com (Postfix) with ESMTP id E915717990D
-	for <linux-kbuild@vger.kernel.org>; Tue,  9 Nov 2010 03:18:01 -0800 (PST)
-Subject: unmet dependencies
-From: Davidlohr Bueso <dave@gnu.org>
-Reply-To: dave@gnu.org
-Content-Type: text/plain; charset="UTF-8"
-Date: Tue, 09 Nov 2010 08:17:08 -0300
-Message-ID: <1289301428.2260.1.camel@cowboy>
+	Tue, 9 Nov 2010 08:53:55 -0500
+Subject: Re: [v2 PATCH] ftrace: Speed up recordmcount
+From: Steven Rostedt <rostedt@goodmis.org>
+In-Reply-To: <AANLkTimS7YsZo+AGyTJq+G4kqsviRMRbdgt3NqZgEUws@mail.gmail.com>
+References: <3dc8cddf022eb7024f9f2cf857529a15bee8999a.1288196498.git.wuzhangjin@gmail.com>
+	 <4CC9E5B5.5040402@suse.cz>
+	 <AANLkTimS7YsZo+AGyTJq+G4kqsviRMRbdgt3NqZgEUws@mail.gmail.com>
+Content-Type: text/plain; charset="ISO-8859-15"
+Date: Tue, 09 Nov 2010 08:53:52 -0500
+Message-ID: <1289310832.12418.88.camel@gandalf.stny.rr.com>
 Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
+To: wu zhangjin <wuzhangjin@gmail.com>
+Cc: linux-kernel@vger.kernel.org, mingo@elte.hu, John Reiser <jreiser@bitwagon.com>, Sam Ravnborg <sam@ravnborg.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.cz>
 
-Hi,
+On Tue, 2010-11-09 at 13:35 +0800, wu zhangjin wrote:
 
-Todays randconfig on Linus' latest tree is producing:
+> Did you apply this patch, should I fix this typo and resend it to you?
 
-warning: (HAVE_TEXT_POKE_SMP && SMP) selects STOP_MACHINE which has
-unmet direct dependencies (SMP && MODULE_UNLOAD || HOTPLUG_CPU)
-warning: (MTD_NAND && MTD || MTD_DOC2000 && MTD || MTD_DOC2001 && MTD ||
-MTD_DOC2001PLUS && MTD) selects MTD_NAND_IDS which has unmet direct
-dependencies (MTD && MTD_NAND)
-warning: (IMA && SECURITY && !S390) selects TCG_TPM which has unmet
-direct dependencies (HAS_IOMEM && EXPERIMENTAL)
-warning: (SFC && NETDEVICES && NETDEV_10000 && PCI && INET || I2C_VIA &&
-I2C && PCI && EXPERIMENTAL || I2C_HYDRA && I2C && PCI && PPC_CHRP &&
-EXPERIMENTAL || I2C_GPIO && I2C && GENERIC_GPIO || I2C_IXP2000 && I2C &&
-ARCH_IXP2000 || I2C_SIMTEC && I2C || I2C_VERSATILE && I2C &&
-(ARCH_VERSATILE || ARCH_REALVIEW || ARCH_VEXPRESS) || I2C_PARPORT && I2C
-&& PARPORT || I2C_PARPORT_LIGHT && I2C || I2C_ACORN && I2C && ARCH_ACORN
-|| SCx200_I2C && I2C && SCx200_GPIO || VIDEO_BT848 && MEDIA_SUPPORT &&
-VIDEO_CAPTURE_DRIVERS && VIDEO_DEV && PCI && I2C && VIDEO_V4L2 && INPUT
-&& VIDEO_IR || VIDEO_CX88 && MEDIA_SUPPORT && VIDEO_CAPTURE_DRIVERS &&
-VIDEO_V4L2 && VIDEO_DEV && PCI && I2C && INPUT && VIDEO_IR ||
-VIDEO_CX23885 && MEDIA_SUPPORT && VIDEO_CAPTURE_DRIVERS && VIDEO_V4L2 &&
-DVB_CORE && VIDEO_DEV && PCI && I2C && INPUT && IR_CORE || VIDEO_AU0828
-&& MEDIA_SUPPORT && VIDEO_CAPTURE_DRIVERS && I2C && INPUT && DVB_CORE &&
-USB && VIDEO_V4L2 || VIDEO_IVTV && MEDIA_SUPPORT &&
-VIDEO_CAPTURE_DRIVERS && VIDEO_V4L2 && PCI && I2C && INPUT && VIDEO_IR
-|| VIDEO_CX18 && MEDIA_SUPPORT && VIDEO_CAPTURE_DRIVERS && VIDEO_V4L2 &&
-DVB_CORE && PCI && I2C && EXPERIMENTAL && INPUT && VIDEO_IR ||
-VIDEO_SAA7164 && MEDIA_SUPPORT && VIDEO_CAPTURE_DRIVERS && VIDEO_V4L2 &&
-DVB_CORE && PCI && I2C || DVB_PLUTO2 && MEDIA_SUPPORT &&
-DVB_CAPTURE_DRIVERS && DVB_CORE && PCI && I2C || DRM && HAS_IOMEM &&
-(AGP || AGP=n) && !EMULATED_CMPXCHG && MMU || FB_DDC && HAS_IOMEM && FB
-|| FB_VIA && HAS_IOMEM && FB && PCI && X86 || VIDEO_CX25821 && STAGING
-&& !STAGING_EXCLUDE_BUILD && DVB_CORE && VIDEO_DEV && PCI && I2C &&
-INPUT && BKL && VIDEO_IR) selects I2C_ALGOBIT which has unmet direct
-dependencies (I2C && I2C_HELPER_AUTO)
-warning: (I2C_PCA_PLATFORM && I2C || I2C_PCA_ISA && I2C && ISA) selects
-I2C_ALGOPCA which has unmet direct dependencies (I2C && I2C_HELPER_AUTO)
-warning: (GPIO_VX855 && GPIOLIB) selects MFD_VX855 which has unmet
-direct dependencies (MFD_SUPPORT && PCI)
-warning: (CRYPTO_LRW && CRYPTO && EXPERIMENTAL || CRYPTO_XTS && CRYPTO
-&& EXPERIMENTAL || CRYPTO_GHASH && CRYPTO) selects CRYPTO_GF128MUL which
-has unmet direct dependencies (CRYPTO && EXPERIMENTAL)
+I applied it, but during testing it triggered a bug in the build system.
+
+I'm looking into it. It is not really related to this patch, but I can't
+submit it till the build is fix.
+
+Also, since it is not that critical of a patch, I think I'll queue it
+for 2.6.38, just to be safe.
 
 Thanks,
-Davidlohr
+
+-- Steve
+
 
