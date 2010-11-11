@@ -1,60 +1,36 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-bw0-f46.google.com ([209.85.214.46]:52747 "EHLO
-	mail-bw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757279Ab0KJXUN (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 10 Nov 2010 18:20:13 -0500
-From: "Kirill A. Shutsemov" <kirill@shutemov.name>
-Subject: [PATCH] kbuild: introduce HDR_ARCH_LIST for headers_install_all
-Date: Thu, 11 Nov 2010 01:19:40 +0200
-Message-Id: <1289431180-30562-1-git-send-email-kirill@shutemov.name>
-In-Reply-To: <20101107075841.GM3046@hack>
-References: <20101107075841.GM3046@hack>
+Received: from cantor2.suse.de ([195.135.220.15]:44354 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753249Ab0KKPh1 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 11 Nov 2010 10:37:27 -0500
+Date: Thu, 11 Nov 2010 16:37:25 +0100
+From: Michal Marek <mmarek@suse.cz>
+Subject: Re: [PATCH] kbuild, deb-pkg: Fix build with paranoid umask
+Message-ID: <20101111153725.GA7979@sepie.suse.cz>
+References: <1288360550-26710-1-git-send-email-max@stro.at>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1288360550-26710-1-git-send-email-max@stro.at>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>, David Woodhouse <dwmw2@infradead.org>
-Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, =?UTF-8?q?Am=C3=A9rico=20Wang?= <xiyou.wangcong@gmail.com>, "Kirill A. Shutemov" <kirill@shutemov.name>
+To: maximilian attems <max@stro.at>
+Cc: linux-kbuild@vger.kernel.org
 
-From: Kirill A. Shutemov <kirill@shutemov.name>
+On Fri, Oct 29, 2010 at 03:55:50PM +0200, maximilian attems wrote:
+> umask 077
+> make deb-pkg
+> <snipp ..>
+> dpkg-deb: building package `linux-image-2.6.36+' in `../linux-image-2.6.36+_2.6.36+-4_amd64.deb'.
+> dpkg-deb: control directory has bad permissions 700 (must be >=0755 and <=0775)
+> make[1]: *** [deb-pkg] Error 2
+> 
+> Reported-by: Bastian Blank <waldi@debian.org>
+> Signed-off-by: maximilian attems <max@stro.at>
+> ---
+>  scripts/package/builddeb |    6 ++++--
+>  1 files changed, 4 insertions(+), 2 deletions(-)
 
-Using HDR_ARCH_LIST you can specify subset of architectures you want to get
-headers for.
+Thanks, applied.
 
-Signed-off-by: Kirill A. Shutemov <kirill@shutemov.name>
----
- Documentation/make/headers_install.txt |    5 +++--
- scripts/headers.sh                     |    2 +-
- 2 files changed, 4 insertions(+), 3 deletions(-)
-
-diff --git a/Documentation/make/headers_install.txt b/Documentation/make/headers_install.txt
-index f2481ca..951eb9f 100644
---- a/Documentation/make/headers_install.txt
-+++ b/Documentation/make/headers_install.txt
-@@ -39,8 +39,9 @@ INSTALL_HDR_PATH indicates where to install the headers.  It defaults to
- The command "make headers_install_all" exports headers for all architectures
- simultaneously.  (This is mostly of interest to distribution maintainers,
- who create an architecture-independent tarball from the resulting include
--directory.)  Remember to provide the appropriate linux/asm directory via "mv"
--or "ln -s" before building a C library with headers exported this way.
-+directory.)  You also can use HDR_ARCH_LIST to specify list of architectures.
-+Remember to provide the appropriate linux/asm directory via "mv" or "ln -s"
-+before building a C library with headers exported this way.
- 
- The kernel header export infrastructure is maintained by David Woodhouse
- <dwmw2@infradead.org>.
-diff --git a/scripts/headers.sh b/scripts/headers.sh
-index 1ddcdd3..978b42b 100755
---- a/scripts/headers.sh
-+++ b/scripts/headers.sh
-@@ -13,7 +13,7 @@ do_command()
- 	fi
- }
- 
--archs=$(ls ${srctree}/arch)
-+archs=${HDR_ARCH_LIST:-$(ls ${srctree}/arch)}
- 
- for arch in ${archs}; do
- 	case ${arch} in
--- 
-1.7.3.2
-
+Michal 
