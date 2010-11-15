@@ -1,41 +1,48 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pz0-f46.google.com ([209.85.210.46]:39282 "EHLO
-	mail-pz0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932499Ab0KOQ5X convert rfc822-to-8bit (ORCPT
+Received: from mail-qy0-f174.google.com ([209.85.216.174]:53852 "EHLO
+	mail-qy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932705Ab0KOQ60 convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 15 Nov 2010 11:57:23 -0500
+	Mon, 15 Nov 2010 11:58:26 -0500
+Received: by qyk12 with SMTP id 12so3914973qyk.19
+        for <linux-kbuild@vger.kernel.org>; Mon, 15 Nov 2010 08:58:25 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <1289079027-3037-2-git-send-email-lacombar@gmail.com>
-References: <4CD300AC.3010708@redhat.com>
-	<1289079027-3037-2-git-send-email-lacombar@gmail.com>
-Date: Mon, 15 Nov 2010 11:57:22 -0500
-Message-ID: <AANLkTinwmSOSnQ6SsLy4ijXmocccX=o+iHh+9otfmAmN@mail.gmail.com>
-Subject: Re: [PATCH 1/5] kconfig: add an option to determine a menu's visibility
+In-Reply-To: <1288844168-21539-1-git-send-email-lacombar@gmail.com>
+References: <1288844168-21539-1-git-send-email-lacombar@gmail.com>
+Date: Mon, 15 Nov 2010 11:58:25 -0500
+Message-ID: <AANLkTinYCfhSKWPER6sbXHL0RDnjCd1MDUduNHDSL_g+@mail.gmail.com>
+Subject: Re: [PATCH] kconfig: the day kconfig warns about "select"-abuse has come
 From: Arnaud Lacombe <lacombar@gmail.com>
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Mauro Carvalho Chehab <mchehab@redhat.com>, Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org, linux-media@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, Arnaud Lacombe <lacombar@gmail.com>, catalin.marinas@arm.com
 
-Hi all
+Hi,
 
-On Sat, Nov 6, 2010 at 5:30 PM, Arnaud Lacombe <lacombar@gmail.com> wrote:
-> This option is aimed to add the possibility to control a menu's visibility
-> without adding dependency to the expression to all the submenu.
->
+On Thu, Nov 4, 2010 at 12:16 AM, Arnaud Lacombe <lacombar@gmail.com> wrote:
+> CC: catalin.marinas@arm.com
 > Signed-off-by: Arnaud Lacombe <lacombar@gmail.com>
 > ---
->  scripts/kconfig/expr.h      |    1 +
->  scripts/kconfig/lkc.h       |    1 +
->  scripts/kconfig/menu.c      |   11 +++++++++++
->  scripts/kconfig/zconf.gperf |    1 +
->  scripts/kconfig/zconf.y     |   21 ++++++++++++++++++---
->  5 files changed, 32 insertions(+), 3 deletions(-)
+>  Documentation/kbuild/kconfig-language.txt |    1 -
+>  1 files changed, 0 insertions(+), 1 deletions(-)
 >
-Michal, I don't think you commented on this ? Mauro, has it been
-worked around differently ?
-
-Thanks,
- - Arnaud
+> diff --git a/Documentation/kbuild/kconfig-language.txt b/Documentation/kbuild/kconfig-language.txt
+> index 2fe93ca..5b9b1be 100644
+> --- a/Documentation/kbuild/kconfig-language.txt
+> +++ b/Documentation/kbuild/kconfig-language.txt
+> @@ -112,7 +112,6 @@ applicable everywhere (see syntax).
+>        (no prompts anywhere) and for symbols with no dependencies.
+>        That will limit the usefulness but on the other hand avoid
+>        the illegal configurations all over.
+> -       kconfig should one day warn about such things.
+>
+>  - numerical ranges: "range" <symbol> <symbol> ["if" <expr>]
+>   This allows to limit the range of possible input values for int
+> --
+> 1.7.2.30.gc37d7.dirty
+>
+>
+Ping ?
