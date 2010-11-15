@@ -1,32 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from farizej.centrum.cz ([90.183.38.130]:41907 "EHLO
-	farizej.centrum.cz" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757684Ab0KOQ0w (ORCPT
+Received: from mail-pz0-f46.google.com ([209.85.210.46]:39282 "EHLO
+	mail-pz0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932499Ab0KOQ5X convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 15 Nov 2010 11:26:52 -0500
-Received: by mail255.centrum.cz id S50334648Ab0KOQ0u (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org> + 1 other);
-	Mon, 15 Nov 2010 17:26:50 +0100
-Date: Mon, 15 Nov 2010 17:26:50 +0100
-From: <amandasaleeby1@centrum.sk>
+	Mon, 15 Nov 2010 11:57:23 -0500
 MIME-Version: 1.0
-Message-ID: <201011151726.24759@centrum.cz>
-Subject: hello
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <1289079027-3037-2-git-send-email-lacombar@gmail.com>
+References: <4CD300AC.3010708@redhat.com>
+	<1289079027-3037-2-git-send-email-lacombar@gmail.com>
+Date: Mon, 15 Nov 2010 11:57:22 -0500
+Message-ID: <AANLkTinwmSOSnQ6SsLy4ijXmocccX=o+iHh+9otfmAmN@mail.gmail.com>
+Subject: Re: [PATCH 1/5] kconfig: add an option to determine a menu's visibility
+From: Arnaud Lacombe <lacombar@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: amandasaleeby1 <amandasaleeby1@centrum.sk>
+To: Mauro Carvalho Chehab <mchehab@redhat.com>, Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org, linux-media@vger.kernel.org
 
-hello with love and trust
-my dearest friend compliment of the day to you.my name is Amanda favour a
-girl of 23years old honest trusting kind caring loving and fun with
-compassionate and generous nature viewing your email address which really interest
-me to know more about you that is having communication friendship with you
-if you will have the desire with me.so that we can get to know each other
-better sharing feelings and thought together .i will like you to write me
-through my email for easiest communication.i will be waiting to read from
-you.I will be waiting for your mail;please make sure you replied to me with the email address below,it is very confidential and private,thanks and have a nice day.
-here is my email address
-Amandasaleeby@she.com
+Hi all
 
+On Sat, Nov 6, 2010 at 5:30 PM, Arnaud Lacombe <lacombar@gmail.com> wrote:
+> This option is aimed to add the possibility to control a menu's visibility
+> without adding dependency to the expression to all the submenu.
+>
+> Signed-off-by: Arnaud Lacombe <lacombar@gmail.com>
+> ---
+>  scripts/kconfig/expr.h      |    1 +
+>  scripts/kconfig/lkc.h       |    1 +
+>  scripts/kconfig/menu.c      |   11 +++++++++++
+>  scripts/kconfig/zconf.gperf |    1 +
+>  scripts/kconfig/zconf.y     |   21 ++++++++++++++++++---
+>  5 files changed, 32 insertions(+), 3 deletions(-)
+>
+Michal, I don't think you commented on this ? Mauro, has it been
+worked around differently ?
+
+Thanks,
+ - Arnaud
