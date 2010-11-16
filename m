@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
 Received: from mail-iw0-f174.google.com ([209.85.214.174]:38110 "EHLO
 	mail-iw0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755803Ab0KPWmQ (ORCPT
+	with ESMTP id S1751014Ab0KPWmU (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 16 Nov 2010 17:42:16 -0500
+	Tue, 16 Nov 2010 17:42:20 -0500
 From: dirk.brandewie@gmail.com
-Subject: [PATCH 1/5] of: Add support for linking device tree blobs into vmlinux
-Date: Tue, 16 Nov 2010 14:41:36 -0800
-Message-Id: <9129f0a21ea48fb2dcb89cea290e88f3e8c0d8a2.1289943240.git.dirk.brandewie@gmail.com>
+Subject: [PATCH 3/5] x86/of:  Add building device tree blob(s) into image.
+Date: Tue, 16 Nov 2010 14:41:38 -0800
+Message-Id: <35263573f57fd7e780dede628cf489212bfa1400.1289943240.git.dirk.brandewie@gmail.com>
 In-Reply-To: <cover.1289943240.git.dirk.brandewie@gmail.com>
 References: <cover.1289943240.git.dirk.brandewie@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -17,102 +17,76 @@ Cc: sodaville@linutronix.de, arjan@linux.intel.com, dirk.brandewie@gmail.com, li
 
 From: Dirk Brandewie <dirk.brandewie@gmail.com>
 
-This patch adds support for linking device tree blobs into
-vmlinux. Modifies asm-generic/vmlinux.lds.h to add linking
-.dtb.init.rodata sections into the .init.data section of the vmlinux
-image. Modifies scripts/Makefile.lib to add a kbuild command to
-compile DTS files to device tree blobs and a rule to create objects to
-wrap the blobs for linking.
+This patch adds linking device tree blobs into vmlinux. DTB's are
+added by adding the blob object name to list of objects to be linked
+into the image.
+e.g:
+  obj-$(CONFIG_TEST_DTB) += test.dtb.o
 
-The DTB's are placed on 32 byte boundries to allow parsing the blob
-with driver/of/fdt.c during early boot without having to copy the blob
-to get the structure alignment GCC expects.
-
-A DTB is linked in by adding the DTB object to the list of objects to
-be linked into vmlinux in the archtecture specific Makefile using
-   obj-y += foo.dtb.o
+The set of DTB linked into the image is controlled the Kconfig file
+in arch/x86/kernel/dts/Kconfig
 
 Signed-off-by: Dirk Brandewie <dirk.brandewie@gmail.com>
 ---
- include/asm-generic/vmlinux.lds.h |   19 +++++++++++++++++--
- scripts/Makefile.lib              |   20 ++++++++++++++++++++
- 2 files changed, 37 insertions(+), 2 deletions(-)
+ arch/x86/Kconfig            |    6 +++++-
+ arch/x86/kernel/Makefile    |    6 ++++++
+ arch/x86/kernel/dts/Kconfig |    7 +++++++
+ 3 files changed, 18 insertions(+), 1 deletions(-)
+ create mode 100644 arch/x86/kernel/dts/Kconfig
 
-diff --git a/include/asm-generic/vmlinux.lds.h b/include/asm-generic/vmlinux.lds.h
-index bd69d79..ea671e7 100644
---- a/include/asm-generic/vmlinux.lds.h
-+++ b/include/asm-generic/vmlinux.lds.h
-@@ -67,7 +67,14 @@
-  * Align to a 32 byte boundary equal to the
-  * alignment gcc 4.5 uses for a struct
-  */
--#define STRUCT_ALIGN() . = ALIGN(32)
-+#define STRUCT_ALIGNMENT 32
-+#define STRUCT_ALIGN() . = ALIGN(STRUCT_ALIGNMENT)
-+
-+/* Device tree blobs linked into the kernel need to have proper
-+ * structure alignment to be parsed by the flat device tree library
-+ * used in early boot
-+*/
-+#define DTB_ALIGNMENT STRUCT_ALIGNMENT
+diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
+index 5904f38..f2f516a 100644
+--- a/arch/x86/Kconfig
++++ b/arch/x86/Kconfig
+@@ -299,13 +299,17 @@ config X86_BIGSMP
+ 	---help---
+ 	  This option is needed for the systems that have more than 8 CPUs
  
- /* The actual configuration determine if the init/exit sections
-  * are handled as text/data or they can be discarded (which
-@@ -146,6 +153,13 @@
- #define TRACE_SYSCALLS()
- #endif
+-config X86_OF
++menuconfig X86_OF
+ 	bool "Support for device tree"
+ 	select OF
+ 	select OF_FLATTREE
+ 	---help---
+ 	  Device tree support on X86.
  
++if X86_OF
++source arch/x86/kernel/dts/Kconfig
++endif
 +
-+#define KERNEL_DTB()							\
-+	. = ALIGN(DTB_ALIGNMENT);					\
-+	VMLINUX_SYMBOL(__dtb_start) = .;				\
-+	*(.dtb.init.rodata)						\
-+	VMLINUX_SYMBOL(__dtb_end) = .;
-+
- /* .data section */
- #define DATA_DATA							\
- 	*(.data)							\
-@@ -468,7 +482,8 @@
- 	MCOUNT_REC()							\
- 	DEV_DISCARD(init.rodata)					\
- 	CPU_DISCARD(init.rodata)					\
--	MEM_DISCARD(init.rodata)
-+	MEM_DISCARD(init.rodata)					\
-+	KERNEL_DTB()
+ if X86_32
+ config X86_EXTENDED_PLATFORM
+ 	bool "Support for extended (non-PC) x86 platforms"
+diff --git a/arch/x86/kernel/Makefile b/arch/x86/kernel/Makefile
+index 586df14..49e017d 100644
+--- a/arch/x86/kernel/Makefile
++++ b/arch/x86/kernel/Makefile
+@@ -114,6 +114,12 @@ obj-$(CONFIG_SWIOTLB)			+= pci-swiotlb.o
+ obj-$(CONFIG_X86_OF)			+= prom.o
  
- #define INIT_TEXT							\
- 	*(.init.text)							\
-diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-index 4c72c11..29db062 100644
---- a/scripts/Makefile.lib
-+++ b/scripts/Makefile.lib
-@@ -200,6 +200,26 @@ quiet_cmd_gzip = GZIP    $@
- cmd_gzip = (cat $(filter-out FORCE,$^) | gzip -f -9 > $@) || \
- 	(rm -f $@ ; false)
- 
-+# DTC
-+#  ---------------------------------------------------------------------------
-+$(obj)/%.dtb.S: $(obj)/%.dtb FORCE
-+	@echo '#include <asm-generic/vmlinux.lds.h>' > $@
-+	@echo '.section .dtb.init.rodata,"a"' >> $@
-+	@echo '.balign DTB_ALIGNMENT' >> $@
-+	@echo '.global __dtb_$(*F)_begin' >> $@
-+	@echo '__dtb_$(*F)_begin:' >> $@
-+	@echo '.incbin "$<" ' >> $@
-+	@echo '__dtb_$(*F)_end:' >> $@
-+	@echo '.global __dtb_$(*F)_end' >> $@
-+	@echo '.balign DTB_ALIGNMENT' >> $@
+ ###
++# device tree blobs
++obj-$(CONFIG_CE4100_DTB) += ce4100.dtb.o
++obj-$(CONFIG_TEST_DTB) += test.dtb.o
 +
-+DTC = $(objtree)/scripts/dtc/dtc
 +
-+quiet_cmd_dtc = DTC	$@
-+      cmd_dtc = $(DTC) -O dtb -o $(obj)/$*.dtb -b 0 $(DTS_FLAGS) $(src)/dts/$*.dts
++###
+ # 64 bit specific files
+ ifeq ($(CONFIG_X86_64),y)
+ 	obj-$(CONFIG_AUDIT)		+= audit_64.o
+diff --git a/arch/x86/kernel/dts/Kconfig b/arch/x86/kernel/dts/Kconfig
+new file mode 100644
+index 0000000..d3e5cd4
+--- /dev/null
++++ b/arch/x86/kernel/dts/Kconfig
+@@ -0,0 +1,7 @@
++config CE4100_DTB
++       bool "Intel CE4100"
 +
-+$(obj)/%.dtb: $(src)/dts/%.dts
-+	$(call if_changed,dtc)
- 
- # Bzip2
- # ---------------------------------------------------------------------------
++config TEST_DTB
++       bool "Test DTS"
++
++
 -- 
 1.7.2.3
 
