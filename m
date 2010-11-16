@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
 Received: from mail-iw0-f174.google.com ([209.85.214.174]:38110 "EHLO
 	mail-iw0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1758260Ab0KPWmX (ORCPT
+	with ESMTP id S1755803Ab0KPWmQ (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 16 Nov 2010 17:42:23 -0500
+	Tue, 16 Nov 2010 17:42:16 -0500
 From: dirk.brandewie@gmail.com
-Subject: [PATCH 5/5] of/microblaze: Move build to use generic dts->dtb rule
-Date: Tue, 16 Nov 2010 14:41:40 -0800
-Message-Id: <7828dfd67fafcc2bb41e5bde40ac2ed7ef429142.1289943240.git.dirk.brandewie@gmail.com>
+Subject: [PATCH 1/5] of: Add support for linking device tree blobs into vmlinux
+Date: Tue, 16 Nov 2010 14:41:36 -0800
+Message-Id: <9129f0a21ea48fb2dcb89cea290e88f3e8c0d8a2.1289943240.git.dirk.brandewie@gmail.com>
 In-Reply-To: <cover.1289943240.git.dirk.brandewie@gmail.com>
 References: <cover.1289943240.git.dirk.brandewie@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -17,44 +17,102 @@ Cc: sodaville@linutronix.de, arjan@linux.intel.com, dirk.brandewie@gmail.com, li
 
 From: Dirk Brandewie <dirk.brandewie@gmail.com>
 
-This patch changes arch/microblaze/boot/Makefile to use the generic
-rule build the device tree blobs in scripts/Makefile.lib
+This patch adds support for linking device tree blobs into
+vmlinux. Modifies asm-generic/vmlinux.lds.h to add linking
+.dtb.init.rodata sections into the .init.data section of the vmlinux
+image. Modifies scripts/Makefile.lib to add a kbuild command to
+compile DTS files to device tree blobs and a rule to create objects to
+wrap the blobs for linking.
+
+The DTB's are placed on 32 byte boundries to allow parsing the blob
+with driver/of/fdt.c during early boot without having to copy the blob
+to get the structure alignment GCC expects.
+
+A DTB is linked in by adding the DTB object to the list of objects to
+be linked into vmlinux in the archtecture specific Makefile using
+   obj-y += foo.dtb.o
 
 Signed-off-by: Dirk Brandewie <dirk.brandewie@gmail.com>
 ---
- arch/microblaze/boot/Makefile |   13 +------------
- 1 files changed, 1 insertions(+), 12 deletions(-)
+ include/asm-generic/vmlinux.lds.h |   19 +++++++++++++++++--
+ scripts/Makefile.lib              |   20 ++++++++++++++++++++
+ 2 files changed, 37 insertions(+), 2 deletions(-)
 
-diff --git a/arch/microblaze/boot/Makefile b/arch/microblaze/boot/Makefile
-index be01d78..4fda765 100644
---- a/arch/microblaze/boot/Makefile
-+++ b/arch/microblaze/boot/Makefile
-@@ -10,9 +10,6 @@ targets := linux.bin linux.bin.gz simpleImage.%
+diff --git a/include/asm-generic/vmlinux.lds.h b/include/asm-generic/vmlinux.lds.h
+index bd69d79..ea671e7 100644
+--- a/include/asm-generic/vmlinux.lds.h
++++ b/include/asm-generic/vmlinux.lds.h
+@@ -67,7 +67,14 @@
+  * Align to a 32 byte boundary equal to the
+  * alignment gcc 4.5 uses for a struct
+  */
+-#define STRUCT_ALIGN() . = ALIGN(32)
++#define STRUCT_ALIGNMENT 32
++#define STRUCT_ALIGN() . = ALIGN(STRUCT_ALIGNMENT)
++
++/* Device tree blobs linked into the kernel need to have proper
++ * structure alignment to be parsed by the flat device tree library
++ * used in early boot
++*/
++#define DTB_ALIGNMENT STRUCT_ALIGNMENT
  
- OBJCOPYFLAGS := -O binary
+ /* The actual configuration determine if the init/exit sections
+  * are handled as text/data or they can be discarded (which
+@@ -146,6 +153,13 @@
+ #define TRACE_SYSCALLS()
+ #endif
  
--# Where the DTS files live
--dtstree         := $(srctree)/$(src)/dts
--
- # Ensure system.dtb exists
- $(obj)/linked_dtb.o: $(obj)/system.dtb
++
++#define KERNEL_DTB()							\
++	. = ALIGN(DTB_ALIGNMENT);					\
++	VMLINUX_SYMBOL(__dtb_start) = .;				\
++	*(.dtb.init.rodata)						\
++	VMLINUX_SYMBOL(__dtb_end) = .;
++
+ /* .data section */
+ #define DATA_DATA							\
+ 	*(.data)							\
+@@ -468,7 +482,8 @@
+ 	MCOUNT_REC()							\
+ 	DEV_DISCARD(init.rodata)					\
+ 	CPU_DISCARD(init.rodata)					\
+-	MEM_DISCARD(init.rodata)
++	MEM_DISCARD(init.rodata)					\
++	KERNEL_DTB()
  
-@@ -51,14 +48,6 @@ $(obj)/simpleImage.%: vmlinux FORCE
- 	$(call if_changed,strip)
- 	@echo 'Kernel: $@ is ready' ' (#'`cat .version`')'
+ #define INIT_TEXT							\
+ 	*(.init.text)							\
+diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+index 4c72c11..29db062 100644
+--- a/scripts/Makefile.lib
++++ b/scripts/Makefile.lib
+@@ -200,6 +200,26 @@ quiet_cmd_gzip = GZIP    $@
+ cmd_gzip = (cat $(filter-out FORCE,$^) | gzip -f -9 > $@) || \
+ 	(rm -f $@ ; false)
  
--# Rule to build device tree blobs
--DTC = $(objtree)/scripts/dtc/dtc
--
--# Rule to build device tree blobs
--quiet_cmd_dtc = DTC     $@
--	cmd_dtc = $(DTC) -O dtb -o $(obj)/$*.dtb -b 0 -p 1024 $(dtstree)/$*.dts
--
--$(obj)/%.dtb: $(dtstree)/%.dts FORCE
--	$(call if_changed,dtc)
-+DTS_FLAGS := -p 1024
++# DTC
++#  ---------------------------------------------------------------------------
++$(obj)/%.dtb.S: $(obj)/%.dtb FORCE
++	@echo '#include <asm-generic/vmlinux.lds.h>' > $@
++	@echo '.section .dtb.init.rodata,"a"' >> $@
++	@echo '.balign DTB_ALIGNMENT' >> $@
++	@echo '.global __dtb_$(*F)_begin' >> $@
++	@echo '__dtb_$(*F)_begin:' >> $@
++	@echo '.incbin "$<" ' >> $@
++	@echo '__dtb_$(*F)_end:' >> $@
++	@echo '.global __dtb_$(*F)_end' >> $@
++	@echo '.balign DTB_ALIGNMENT' >> $@
++
++DTC = $(objtree)/scripts/dtc/dtc
++
++quiet_cmd_dtc = DTC	$@
++      cmd_dtc = $(DTC) -O dtb -o $(obj)/$*.dtb -b 0 $(DTS_FLAGS) $(src)/dts/$*.dts
++
++$(obj)/%.dtb: $(src)/dts/%.dts
++	$(call if_changed,dtc)
  
- clean-files += *.dtb simpleImage.*.unstrip linux.bin.ub
+ # Bzip2
+ # ---------------------------------------------------------------------------
 -- 
 1.7.2.3
 
