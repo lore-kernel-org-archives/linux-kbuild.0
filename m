@@ -1,92 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-iw0-f174.google.com ([209.85.214.174]:38110 "EHLO
+Received: from mail-iw0-f174.google.com ([209.85.214.174]:62134 "EHLO
 	mail-iw0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751014Ab0KPWmU (ORCPT
+	with ESMTP id S1757418Ab0KQAQf convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 16 Nov 2010 17:42:20 -0500
-From: dirk.brandewie@gmail.com
-Subject: [PATCH 3/5] x86/of:  Add building device tree blob(s) into image.
-Date: Tue, 16 Nov 2010 14:41:38 -0800
-Message-Id: <35263573f57fd7e780dede628cf489212bfa1400.1289943240.git.dirk.brandewie@gmail.com>
-In-Reply-To: <cover.1289943240.git.dirk.brandewie@gmail.com>
-References: <cover.1289943240.git.dirk.brandewie@gmail.com>
+	Tue, 16 Nov 2010 19:16:35 -0500
+MIME-Version: 1.0
+In-Reply-To: <348d48851a244bbd60bbfc4d60bee330e5c91eae.1289943240.git.dirk.brandewie@gmail.com>
+References: <cover.1289943240.git.dirk.brandewie@gmail.com> <348d48851a244bbd60bbfc4d60bee330e5c91eae.1289943240.git.dirk.brandewie@gmail.com>
+From: Grant Likely <grant.likely@secretlab.ca>
+Date: Tue, 16 Nov 2010 17:16:14 -0700
+Message-ID: <AANLkTik2TP_DUWstn_qmq1oz4HaPHqkoGkN5f1oUiHQa@mail.gmail.com>
+Subject: Re: [PATCH 2/5] of/fdt: add kernel command line option for dtb_compat string
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: devicetree-discuss@lists.ozlabs.org
-Cc: sodaville@linutronix.de, arjan@linux.intel.com, dirk.brandewie@gmail.com, linuxppc-dev@lists.ozlabs.org, microblaze-uclinux@itee.uq.edu.au, linux-arch@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: dirk.brandewie@gmail.com
+Cc: devicetree-discuss@lists.ozlabs.org, linux-arch@vger.kernel.org, linux-kbuild@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org, sodaville@linutronix.de, microblaze-uclinux@itee.uq.edu.au, arjan@linux.intel.com
 
-From: Dirk Brandewie <dirk.brandewie@gmail.com>
+On Tue, Nov 16, 2010 at 3:41 PM,  <dirk.brandewie@gmail.com> wrote:
+> From: Dirk Brandewie <dirk.brandewie@gmail.com>
+>
+> Adds a kernel command line option "dtb_compat=<string>" and functions
+> for architecture/platform specific code to retrieve the command line
+> string and locate the compatible DTB linked into the kernel
+>
+> of_flat_dt_get_dtb_compatible_string() returns a pointer string passed
+> from the command line or a pointer to an empty string.
+>
+> of_flat_dt_find_compatible_dtb() returns a pointer to a DTB that is
+> compatible with the "compatible" string or a NULL pointer if no
+> matching DTB is present.
+>
+> Signed-off-by: Dirk Brandewie <dirk.brandewie@gmail.com>
+> ---
+[...]
+> +void __init *of_flat_dt_find_compatible_dtb(char *name)
+> +{
+> +       void *rc = NULL;
+> +       unsigned long root, size;
+> +       struct boot_param_header  *orig_initial_boot_params;
+> +       uint8_t *blob;
+> +
+> +       orig_initial_boot_params = initial_boot_params;
+> +       blob = __dtb_start;
+> +       initial_boot_params = (struct boot_param_header *)blob;
+> +
+> +       while (blob < __dtb_end &&
+> +               (be32_to_cpu(initial_boot_params->magic) == OF_DT_HEADER)) {
 
-This patch adds linking device tree blobs into vmlinux. DTB's are
-added by adding the blob object name to list of objects to be linked
-into the image.
-e.g:
-  obj-$(CONFIG_TEST_DTB) += test.dtb.o
+The kernel needs to complain *loudly* if this occurs because it
+represents a bug.  I'm tempted to say use BUG, but that would halt the
+kernel and prevent any possibility of kernel log output.  WARN_ON() is
+probably best.
 
-The set of DTB linked into the image is controlled the Kconfig file
-in arch/x86/kernel/dts/Kconfig
-
-Signed-off-by: Dirk Brandewie <dirk.brandewie@gmail.com>
----
- arch/x86/Kconfig            |    6 +++++-
- arch/x86/kernel/Makefile    |    6 ++++++
- arch/x86/kernel/dts/Kconfig |    7 +++++++
- 3 files changed, 18 insertions(+), 1 deletions(-)
- create mode 100644 arch/x86/kernel/dts/Kconfig
-
-diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
-index 5904f38..f2f516a 100644
---- a/arch/x86/Kconfig
-+++ b/arch/x86/Kconfig
-@@ -299,13 +299,17 @@ config X86_BIGSMP
- 	---help---
- 	  This option is needed for the systems that have more than 8 CPUs
- 
--config X86_OF
-+menuconfig X86_OF
- 	bool "Support for device tree"
- 	select OF
- 	select OF_FLATTREE
- 	---help---
- 	  Device tree support on X86.
- 
-+if X86_OF
-+source arch/x86/kernel/dts/Kconfig
-+endif
-+
- if X86_32
- config X86_EXTENDED_PLATFORM
- 	bool "Support for extended (non-PC) x86 platforms"
-diff --git a/arch/x86/kernel/Makefile b/arch/x86/kernel/Makefile
-index 586df14..49e017d 100644
---- a/arch/x86/kernel/Makefile
-+++ b/arch/x86/kernel/Makefile
-@@ -114,6 +114,12 @@ obj-$(CONFIG_SWIOTLB)			+= pci-swiotlb.o
- obj-$(CONFIG_X86_OF)			+= prom.o
- 
- ###
-+# device tree blobs
-+obj-$(CONFIG_CE4100_DTB) += ce4100.dtb.o
-+obj-$(CONFIG_TEST_DTB) += test.dtb.o
-+
-+
-+###
- # 64 bit specific files
- ifeq ($(CONFIG_X86_64),y)
- 	obj-$(CONFIG_AUDIT)		+= audit_64.o
-diff --git a/arch/x86/kernel/dts/Kconfig b/arch/x86/kernel/dts/Kconfig
-new file mode 100644
-index 0000000..d3e5cd4
---- /dev/null
-+++ b/arch/x86/kernel/dts/Kconfig
-@@ -0,0 +1,7 @@
-+config CE4100_DTB
-+       bool "Intel CE4100"
-+
-+config TEST_DTB
-+       bool "Test DTS"
-+
-+
--- 
-1.7.2.3
-
+g.
