@@ -1,64 +1,88 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-iw0-f174.google.com ([209.85.214.174]:35029 "EHLO
-	mail-iw0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756851Ab0KQC7P (ORCPT
+Received: from mail-qw0-f46.google.com ([209.85.216.46]:41708 "EHLO
+	mail-qw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752332Ab0KQDpn convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 16 Nov 2010 21:59:15 -0500
+	Tue, 16 Nov 2010 22:45:43 -0500
 MIME-Version: 1.0
-In-Reply-To: <4CE33C14.9030503@gmail.com>
-References: <cover.1289943240.git.dirk.brandewie@gmail.com>
- <9129f0a21ea48fb2dcb89cea290e88f3e8c0d8a2.1289943240.git.dirk.brandewie@gmail.com>
- <4CE32453.2090403@caviumnetworks.com> <4CE33C14.9030503@gmail.com>
-From: Grant Likely <grant.likely@secretlab.ca>
-Date: Tue, 16 Nov 2010 19:58:54 -0700
-Message-ID: <AANLkTi=T_bqEswe32dTAfL4++WAitc7+VHnyjqP2sQfi@mail.gmail.com>
-Subject: Re: [PATCH 1/5] of: Add support for linking device tree blobs into vmlinux
+Date: Tue, 16 Nov 2010 22:45:42 -0500
+Message-ID: <AANLkTinop4_JT4JLtdmWkydPgDDU=TyZNbtiBbgeh1dj@mail.gmail.com>
+Subject: Behavior of BUG() [Was: Re: [PATCH 2/5] of/fdt: add kernel command
+ line option for dtb_compat string]
+From: Arnaud Lacombe <lacombar@gmail.com>
 Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Dirk Brandewie <dirk.brandewie@gmail.com>
-Cc: David Daney <ddaney@caviumnetworks.com>, devicetree-discuss@lists.ozlabs.org, sodaville@linutronix.de, arjan@linux.intel.com, linuxppc-dev@lists.ozlabs.org, microblaze-uclinux@itee.uq.edu.au, linux-arch@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Matt Mackall <mpm@selenic.com>, linux-kernel@vger.kernel.org
+Cc: dirk.brandewie@gmail.com, linux-arch@vger.kernel.org, linux-kbuild@vger.kernel.org, Grant Likely <grant.likely@secretlab.ca>
 
-On Tue, Nov 16, 2010 at 7:21 PM, Dirk Brandewie
-<dirk.brandewie@gmail.com> wrote:
->
-> On 11/16/2010 04:39 PM, David Daney wrote:
->>
->> Thanks for doing this. However I have a few comments...
->>
->> On 11/16/2010 02:41 PM, dirk.brandewie@gmail.com wrote:
->>>
->>> From: Dirk Brandewie<dirk.brandewie@gmail.com>
->>>
->>> /* .data section */
->>> #define DATA_DATA \
->>> *(.data) \
->>> @@ -468,7 +482,8 @@
->>> MCOUNT_REC() \
->>> DEV_DISCARD(init.rodata) \
->>> CPU_DISCARD(init.rodata) \
->>> - MEM_DISCARD(init.rodata)
->>> + MEM_DISCARD(init.rodata) \
->>> + KERNEL_DTB()
->>>
->>
->> I thought the init.rodata was only for data used by __init things.
->> Although the
->> current linker scripts do not put it in the section that gets recycled as
->> usable
->> memory.
->>
->> IIRC the unflattened version of the device tree has pointers to the
->> flattened
->> data. Since the device tree nodes are live for the entire kernel
->> lifecycle,
->> shouldn't the device tree blobs be in non-init memory?
->>
->
-> The contents of the blob get copied to allocated memory during
-> unflatten_device_tree() so the blob that is linked in is no longer needed
-> after init.
+Hi,
 
-Have you written a patch to add this behaviour?  The current code doesn't.  :-)
+[CC: list reduced as starting a new thread, most on the context
+removed as this concern a different issue.]
 
-g.
+On Tue, Nov 16, 2010 at 7:16 PM, Grant Likely <grant.likely@secretlab.ca> wrote:
+> On Tue, Nov 16, 2010 at 3:41 PM,  <dirk.brandewie@gmail.com> wrote:
+>> From: Dirk Brandewie <dirk.brandewie@gmail.com>
+>> [...]
+> The kernel needs to complain *loudly* if this occurs because it
+> represents a bug.  I'm tempted to say use BUG, but that would halt the
+> kernel and prevent any possibility of kernel log output.
+> [...]
+does it ? if CONFIG_BUG is not enabled and the arch has no define for
+it, the default does _nothing_:
+
+from `include/asm-generic/bug.h':
+
+#else /* !CONFIG_BUG */
+#ifndef HAVE_ARCH_BUG
+#define BUG() do {} while(0)
+#endif
+
+#ifndef HAVE_ARCH_BUG_ON
+#define BUG_ON(condition) do { if (condition) ; } while(0)
+#endif
+[...]
+
+gcc is triggering about ~30 warnings (like [0]) on code path using
+BUG(). Most of these path assume BUG() will never return, which is not
+true.
+
+The commit message introducing this behavior state:
+
+commit c8538a7aa5527d02c7191ac5da124efadf6a2827
+Author: Matt Mackall <mpm@selenic.com>
+Date:   Sun May 1 08:59:01 2005 -0700
+
+    [PATCH] remove all kernel BUGs
+
+    This patch eliminates all kernel BUGs, trims about 35k off the typical
+    kernel, and makes the system slightly faster.
+
+    Signed-off-by: Matt Mackall <mpm@selenic.com>
+    Signed-off-by: Andrew Morton <akpm@osdl.org>
+    Signed-off-by: Linus Torvalds <torvalds@osdl.org>
+
+[...]
+
++config BUG
++       bool "BUG() support" if EMBEDDED
++       default y
++       help
++          Disabling this option eliminates support for BUG and WARN, reducing
++          the size of your kernel image and potentially quietly ignoring
++          numerous fatal conditions. You should only consider disabling this
++          option for embedded systems with no facilities for reporting errors.
+
+So how should BUG() been used ?
+ 1) assuming it will never _ever_ return ?
+ 2) assuming it may return ?
+
+if (1), its definition has to be changed, if (2) a lot of path have to be fixed.
+
+Thanks in advance,
+ - Arnaud
+
+[0]: fs/dcache.c:1899:1: warning: control reaches end of non-void
+function, line match an old revision, but the BUG() is still there.
