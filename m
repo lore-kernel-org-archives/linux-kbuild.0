@@ -1,195 +1,129 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from shadbolt.e.decadent.org.uk ([88.96.1.126]:37179 "EHLO
-	shadbolt.e.decadent.org.uk" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1750699Ab0KWFAF convert rfc822-to-8bit
-	(ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 23 Nov 2010 00:00:05 -0500
-From: Ben Hutchings <ben@decadent.org.uk>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-Date: Tue, 23 Nov 2010 04:59:57 +0000
-Message-ID: <1290488397.6770.1404.camel@localhost>
-Mime-Version: 1.0
-Subject: [PATCH] Kbuild: kconfig: Verbose version of --listnewconfig
+Received: from rcsinet10.oracle.com ([148.87.113.121]:39133 "EHLO
+	rcsinet10.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750706Ab0KWTnm (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 23 Nov 2010 14:43:42 -0500
+Message-ID: <4CEC18FF.9030807@oracle.com>
+Date: Tue, 23 Nov 2010 11:41:51 -0800
+From: Randy Dunlap <randy.dunlap@oracle.com>
+MIME-Version: 1.0
+Subject: Re: linux-next: Tree for November 23 (randconfig problem?)
+References: <20101123140609.2b6503ff.sfr@canb.auug.org.au>	<AANLkTi===xonvuovLS5Ch=coMDjzLQ4XSsPRDowDJ4L2@mail.gmail.com>	<20101123091551.f3ed937f.randy.dunlap@oracle.com> <AANLkTikLJW0be+kVgEnAZDbiDMVbYOrA7f5VYs+KHSe_@mail.gmail.com>
+In-Reply-To: <AANLkTikLJW0be+kVgEnAZDbiDMVbYOrA7f5VYs+KHSe_@mail.gmail.com>
+Content-Type: text/plain; charset=ISO-8859-2
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Roman Zippel <zippel@linux-m68k.org>, Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org, Debian kernel maintainers <debian-kernel@lists.debian.org>
+To: Zimny Lech <napohybelskurwysynom2010@gmail.com>
+Cc: Stephen Rothwell <sfr@canb.auug.org.au>, linux-next@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, linux kbuild list <linux-kbuild@vger.kernel.org>
 
-If the KBUILD_VERBOSE environment variable is set to non-zero, show
-the default values of new symbols and not just their names.
+On 11/23/10 11:04, Zimny Lech wrote:
+> 2010/11/23 Randy Dunlap <randy.dunlap@oracle.com>:
+>> On Tue, 23 Nov 2010 16:43:22 +0100 Zimny Lech wrote:
+>>
+>>> Ave
+>>>
+>>> 2010/11/23 Stephen Rothwell <sfr@canb.auug.org.au>:
+>>>> Hi all,
+>>>>
+>>>> Changes since 20101122:
+>>>>
+>>>
+>>>
+>>> Random config generator has failed :)
+>>
+>> Hi,
+>> What do you mean by this?
+> 
+> This is what I get from "make" after "make randconfig".
+> 
+>>  I'm not seeing any randconfig generator problems.
+>> Are you using any options or inputs to kconfig?
+> 
+> No.
+> 
+> I'm using script below to build kernel - nothing really unusual. Log
+> and config for this failed build are attached to previous email
 
-Based on work by Bastian Blank <waldi@debian.org> and
-maximilian attems <max@stro.at>.
+[script deleted]
 
-Signed-off-by: Ben Hutchings <ben@decadent.org.uk>
----
- scripts/kconfig/conf.c     |   90 +++++++++++++++++++++++++++++++++++++++-----
- scripts/kconfig/confdata.c |    1 +
- scripts/kconfig/expr.h     |    2 +
- 3 files changed, 83 insertions(+), 10 deletions(-)
+OK, I see what you mean (I can reproduce it), but I don't see how it
+happens.  It looks like, from drivers/usb/gadget/Kconfig:
 
-diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
-index 5459a38..6d37d5c 100644
---- a/scripts/kconfig/conf.c
-+++ b/scripts/kconfig/conf.c
-@@ -363,7 +363,6 @@ static void conf(struct menu *menu)
- 		switch (prop->type) {
- 		case P_MENU:
- 			if ((input_mode == silentoldconfig ||
--			     input_mode == listnewconfig ||
- 			     input_mode == oldnoconfig) &&
- 			    rootEntry != menu) {
- 				check_conf(menu);
-@@ -423,11 +422,7 @@ static void check_conf(struct menu *menu)
- 	if (sym && !sym_has_value(sym)) {
- 		if (sym_is_changable(sym) ||
- 		    (sym_is_choice(sym) && sym_get_tristate_value(sym) == yes)) {
--			if (input_mode == listnewconfig) {
--				if (sym->name && !sym_is_choice_value(sym)) {
--					printf("%s%s\n", CONFIG_, sym->name);
--				}
--			} else if (input_mode != oldnoconfig) {
-+			if (input_mode != oldnoconfig) {
- 				if (!conf_cnt++)
- 					printf(_("*\n* Restart config...\n*\n"));
- 				rootEntry = menu_get_parent_menu(menu);
-@@ -440,6 +435,78 @@ static void check_conf(struct menu *menu)
- 		check_conf(child);
- }
- 
-+static void report_conf(struct menu *menu, bool verbose)
-+{
-+	struct symbol *sym;
-+	struct menu *child;
-+	int l;
-+	const char *str;
-+
-+	if (!menu_is_visible(menu))
-+		return;
-+
-+	if (verbose && menu == &rootmenu) {
-+		printf("\n#\n"
-+		       "# Changes:\n"
-+		       "#\n");
-+	}
-+
-+	sym = menu->sym;
-+	if (sym && (sym->flags & SYMBOL_NEW) &&
-+	    sym_is_changable(sym) && sym->name && !sym_is_choice_value(sym)) {
-+		if (verbose) {
-+			switch (sym->type) {
-+			case S_BOOLEAN:
-+			case S_TRISTATE:
-+				switch (sym_get_tristate_value(sym)) {
-+				case no:
-+					printf("# CONFIG_%s is not set\n", sym->name);
-+					break;
-+				case mod:
-+					printf("CONFIG_%s=m\n", sym->name);
-+					break;
-+				case yes:
-+					printf("CONFIG_%s=y\n", sym->name);
-+					break;
-+				}
-+				break;
-+			case S_STRING:
-+				str = sym_get_string_value(sym);
-+				printf("CONFIG_%s=\"", sym->name);
-+				while (1) {
-+					l = strcspn(str, "\"\\");
-+					if (l) {
-+						fwrite(str, l, 1, stdout);
-+						str += l;
-+					}
-+					if (!*str)
-+						break;
-+					printf("\\%c", *str++);
-+				}
-+				fputs("\"\n", stdout);
-+				break;
-+			case S_HEX:
-+				str = sym_get_string_value(sym);
-+				if (str[0] != '0' || (str[1] != 'x' && str[1] != 'X')) {
-+					printf("CONFIG_%s=%s\n", sym->name, str);
-+					break;
-+				}
-+			case S_INT:
-+				str = sym_get_string_value(sym);
-+				printf("CONFIG_%s=%s\n", sym->name, str);
-+				break;
-+			default:
-+				break;
-+			}
-+		} else {
-+			printf("CONFIG_%s\n", sym->name);
-+		}
-+	}
-+
-+	for (child = menu->list; child; child = child->next)
-+		report_conf(child, verbose);
-+}
-+
- static struct option long_opts[] = {
- 	{"oldaskconfig",    no_argument,       NULL, oldaskconfig},
- 	{"oldconfig",       no_argument,       NULL, oldconfig},
-@@ -460,6 +527,7 @@ int main(int ac, char **av)
- {
- 	int opt;
- 	const char *name;
-+	const char *value;
- 	struct stat tmpstat;
- 
- 	setlocale(LC_ALL, "");
-@@ -604,16 +672,18 @@ int main(int ac, char **av)
- 		input_mode = silentoldconfig;
- 		/* fall through */
- 	case oldconfig:
--	case listnewconfig:
- 	case oldnoconfig:
- 	case silentoldconfig:
- 		/* Update until a loop caused no more changes */
- 		do {
- 			conf_cnt = 0;
- 			check_conf(&rootmenu);
--		} while (conf_cnt &&
--			 (input_mode != listnewconfig &&
--			  input_mode != oldnoconfig));
-+		} while (conf_cnt && input_mode != oldnoconfig);
-+		break;
-+	case listnewconfig:
-+		conf_set_all_new_symbols(def_default);
-+		value = getenv("KBUILD_VERBOSE");
-+		report_conf(&rootmenu, value && atoi(value));
- 		break;
- 	}
- 
-diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
-index c06f150..3682ef5 100644
---- a/scripts/kconfig/confdata.c
-+++ b/scripts/kconfig/confdata.c
-@@ -1009,6 +1009,7 @@ void conf_set_all_new_symbols(enum conf_def_mode mode)
- 	for_all_symbols(i, sym) {
- 		if (sym_has_value(sym))
- 			continue;
-+		sym->flags |= SYMBOL_NEW;
- 		switch (sym_get_type(sym)) {
- 		case S_BOOLEAN:
- 		case S_TRISTATE:
-diff --git a/scripts/kconfig/expr.h b/scripts/kconfig/expr.h
-index 184eb6a..b267933 100644
---- a/scripts/kconfig/expr.h
-+++ b/scripts/kconfig/expr.h
-@@ -108,6 +108,8 @@ struct symbol {
- #define SYMBOL_DEF3       0x40000  /* symbol.def[S_DEF_3] is valid */
- #define SYMBOL_DEF4       0x80000  /* symbol.def[S_DEF_4] is valid */
- 
-+#define SYMBOL_NEW        0x100000 /* symbol is new (loaded config did not provide a value) */
-+
- #define SYMBOL_MAXLENGTH	256
- #define SYMBOL_HASHSIZE		9973
- 
+#
+# USB Gadget Drivers
+#
+choice
+	tristate "USB Gadget Drivers"
+	depends on USB_GADGET && USB_GADGET_SELECTED
+	default USB_ETH
+
+none of the choices inside this choice block was enabled by the randconfig.
+
+Anybody in linux-kbuild land see how that can happen?
+
+Zimny, one way that you can work around this is to run:
+
+$ yes '' | make
+
+or
+$ yes '' | make oldconfig
+after the 'make randconfig'.  That sets the unknown kconfig symbol(s) to their
+default values.
+
+
+>>> USB Gadget Support (USB_GADGET) [Y/n/?] y
+>>>   Debugging messages (DEVELOPMENT) (USB_GADGET_DEBUG) [Y/n/?] y
+>>>   Debugging information files (DEVELOPMENT) (USB_GADGET_DEBUG_FILES) [N/y/?] n
+>>>   Debugging information files in debugfs (DEVELOPMENT)
+>>> (USB_GADGET_DEBUG_FS) [Y/n/?] y
+>>>   Maximum VBUS Power usage (2-500 mA) (USB_GADGET_VBUS_DRAW) [2] 2
+>>>   USB Peripheral Controller
+>>>   > 1. Renesas R8A66597 USB Peripheral Controller (USB_GADGET_R8A66597)
+>>>     2. Renesas M66592 USB Peripheral Controller (USB_GADGET_M66592)
+>>>   choice[1-2?]: 1
+>>>   USB Gadget Drivers
+>>>     1. Gadget Zero (DEVELOPMENT) (USB_ZERO)
+>>>     2. Audio Gadget (EXPERIMENTAL) (USB_AUDIO)
+>>>   > 3. Ethernet Gadget (with CDC Ethernet support) (USB_ETH)
+>>>     4. Serial Gadget (with CDC ACM and CDC OBEX support) (USB_G_SERIAL)
+>>>     5. Printer Gadget (USB_G_PRINTER)
+>>>     6. CDC Composite Device (Ethernet and ACM) (USB_CDC_COMPOSITE)
+>>>     7. HID Gadget (USB_G_HID)
+>>>     8. EHCI Debug Device Gadget (USB_G_DBGP)
+>>>   choice[1-8?]: 3
+>>>     RNDIS support (USB_ETH_RNDIS) [Y/n/?] (NEW) aborted!
+>>>
+>>> Console input/output is redirected. Run 'make oldconfig' to update
+>>> configuration.
+>>>
+>>> make[3]: *** [silentoldconfig] Error 1
+>>> make[2]: *** [silentoldconfig] Error 2
+>>> make[1]: *** No rule to make target `include/config/auto.conf', needed
+>>> by `include/config/kernel.release'.  Stop.
+>>> make: *** [sub-make] Error 2
+
+
+CONFIG_USB_GADGET=y
+CONFIG_USB_GADGET_DEBUG=y
+# CONFIG_USB_GADGET_DEBUG_FILES is not set
+CONFIG_USB_GADGET_DEBUG_FS=y
+CONFIG_USB_GADGET_VBUS_DRAW=2
+CONFIG_USB_GADGET_SELECTED=y
+CONFIG_USB_GADGET_R8A66597=y
+CONFIG_USB_R8A66597=y
+# CONFIG_USB_GADGET_M66592 is not set
+CONFIG_USB_GADGET_DUALSPEED=y
+# CONFIG_USB_ZERO is not set
+# CONFIG_USB_AUDIO is not set
+# CONFIG_USB_ETH is not set
+# CONFIG_USB_G_SERIAL is not set
+# CONFIG_USB_G_PRINTER is not set
+# CONFIG_USB_CDC_COMPOSITE is not set
+# CONFIG_USB_G_HID is not set
+# CONFIG_USB_G_DBGP is not set
+
 -- 
-1.7.2.3
-
-
+~Randy
+*** Remember to use Documentation/SubmitChecklist when testing your code ***
