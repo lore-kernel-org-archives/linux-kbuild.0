@@ -1,18 +1,34 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mtaout20.012.net.il ([80.179.55.166]:33460 "EHLO
-	mtaout20.012.net.il" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751609Ab0KYLUM (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 25 Nov 2010 06:20:12 -0500
-Date: Wed, 24 Nov 2010 05:33:06 -0800
-From: Juliana <amberjuliana.yahoo.com.hk@[69.243.149.144]>
-Subject: RE
-Reply-to: fedex001@gala.net
-Message-id: <0LCF00C8QTWFS470@a-mtaout20.012.net.il>
-MIME-version: 1.0
-Content-type: text/plain; charset=Windows-1251
-Content-transfer-encoding: 7bit
+Received: from cantor.suse.de ([195.135.220.2]:53545 "EHLO mx1.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752661Ab0KYOXR (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 25 Nov 2010 09:23:17 -0500
+Date: Thu, 25 Nov 2010 15:23:15 +0100
+From: Michal Marek <mmarek@suse.cz>
+Subject: Re: [PATCH 1/1] kconfig: sym_expand_string_value: allow for string
+ termination when reallocing
+Message-ID: <20101125142315.GA8192@sepie.suse.cz>
+References: <1288645304-2794-1-git-send-email-apw@canonical.com>
+ <1288645304-2794-2-git-send-email-apw@canonical.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1288645304-2794-2-git-send-email-apw@canonical.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
+To: Andy Whitcroft <apw@canonical.com>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-contact fedex Confirmable Bank-draft of $750.000.00
+On Mon, Nov 01, 2010 at 09:01:44PM +0000, Andy Whitcroft wrote:
+> When expanding a parameterised string we may run out of space, this
+> triggers a realloc.  When computing the new allocation size we do not allow
+> for the terminating '\0'.  Allow for this when calculating the new length.
+> 
+> Signed-off-by: Andy Whitcroft <apw@canonical.com>
+> ---
+>  scripts/kconfig/symbol.c |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
+
+Applied to kbuild-2.6.git#rc-fixes, thanks.
+
+Michal
