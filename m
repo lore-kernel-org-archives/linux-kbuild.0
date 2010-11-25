@@ -1,38 +1,65 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepb.post.tele.dk ([195.41.46.236]:51403 "EHLO
-	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751747Ab0KYTKh (ORCPT
+Received: from casper.infradead.org ([85.118.1.10]:53453 "EHLO
+	casper.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752045Ab0KYT0x (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 25 Nov 2010 14:10:37 -0500
-Date: Thu, 25 Nov 2010 20:10:35 +0100
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH] kbuild, deb-pkg: support overriding userland
-	architecture
-Message-ID: <20101125191035.GB20087@merkur.ravnborg.org>
-References: <4CD5A6C8.8030603@asbjorn.biz> <1289070320-20726-1-git-send-email-asbjorn@asbjorn.biz> <20101125143739.GC8192@sepie.suse.cz>
+	Thu, 25 Nov 2010 14:26:53 -0500
+Message-ID: <4CEEB86F.8070105@infradead.org>
+Date: Thu, 25 Nov 2010 17:26:39 -0200
+From: Mauro Carvalho Chehab <mchehab@infradead.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20101125143739.GC8192@sepie.suse.cz>
+Subject: Re: [PATCH] Revert "kconfig: Temporarily disable dependency warnings"
+References: <20101011145930.11fe570c.randy.dunlap@oracle.com>	<1286889586-13483-1-git-send-email-mmarek@suse.cz>	<20101029113731.5c7c54b9.sfr@canb.auug.org.au>	<20101122114801.2eee4c4d.sfr@canb.auug.org.au>	<AANLkTikwxBZUupGNA-gsrxWYpyCKK7wiVZu82WaUST-K@mail.gmail.com>	<20101122135715.121b5eb7.sfr@canb.auug.org.au> <AANLkTi=io3tsuL8Hd2a0y8PyBYYAzb-gkJo1GfmpcF+L@mail.gmail.com>
+In-Reply-To: <AANLkTi=io3tsuL8Hd2a0y8PyBYYAzb-gkJo1GfmpcF+L@mail.gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: Asbjoern Sloth Toennesen <asbjorn@asbjorn.biz>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, debian-kernel@lists.debian.org
+To: Arnaud Lacombe <lacombar@gmail.com>
+Cc: Stephen Rothwell <sfr@canb.auug.org.au>, Michal Marek <mmarek@suse.cz>, randy.dunlap@oracle.com, catalin.marinas@arm.com, linux-kbuild@vger.kernel.org, linux-next@vger.kernel.org, linux-kernel@vger.kernel.org, xiyou.wangcong@gmail.com
 
-On Thu, Nov 25, 2010 at 03:37:39PM +0100, Michal Marek wrote:
-> On Sat, Nov 06, 2010 at 07:05:20PM +0000, Asbjoern Sloth Toennesen wrote:
-> > Usefull if building for sparc64 userland, because the
-> > sparc and sparc64 userlands use the same 64-bit kernel,
-> > making it impossible to always select the correct userland
-> > architecture for the resulting debian package.
-> > 
-> > Might also be usefull, if you want a i386 userland with a amd64 kernel.
-> > 
-> > Example usage:
-> > 	make DEBARCH=i386 deb-pkg
+Em 25-11-2010 15:16, Arnaud Lacombe escreveu:
+> Hi,
 > 
-> This variable deserves a mention in Documentation/kbuild/kbuild.txt not
-> just in the commit log. Otherwise the patch is OK with me.  
-kbuild related variables is usually named KBUILD_* - but not all of them.
+> On Sun, Nov 21, 2010 at 9:57 PM, Stephen Rothwell <sfr@canb.auug.org.au> wrote:
+>> Hi,
+>>
+>> On Sun, 21 Nov 2010 20:58:54 -0500 Arnaud Lacombe <lacombar@gmail.com> wrote:
+>>>
+>>> There is 2 patches which fixes that by adding to the kconfig language
+>>> a "visible" property to menus, 1 revert of "another" solution (which
+>>> works but does not scale) and 2 patch which makes usage of the new
+>>> property. Ack-ed and complemented by Mauro, but still waiting
+>>> review/blessing by Michal.
+>>>
+>>> The core change is available here: https://patchwork.kernel.org/patch/306412/
+>>>
+>>> Alternatively, if you don't care about the menu structure, Randy
+>>> proposed a one-liner.
+>>
+>> OK, good to know it is being worked on.  Thanks.
+>>
+> FYI, I withdrawn the patches and ask for them not to be merged[0], as
+> there is a clear lack of interest to see this issue resolved.
+> 
+> Mauro, may I ask you to remove my patches from:
+> 
+> git://git.kernel.org/pub/scm/linux/kernel/git/mchehab/linux-next.git
+> kconfig_fixes
+> 
+> please ?
 
-	Sam
+I prefer to have them there, while the issue remains at .37/-next builds.
+
+It is a pain to see all those warnings polluting my console, every time 
+I recompile things, and I can't simply do a grep to discard MEDIA 
+warnings/errors (as someone proposed), as this may prevent me to get real
+errors at media builds.
+
+The better is to give more time to Marek/Sam to review your patch
+series and ack or, if they don't agree, to send an alternative patchset
+to fix the issues or to revert the changeset that started to produce 
+those troubles.
+
+Cheers,
+Mauro
