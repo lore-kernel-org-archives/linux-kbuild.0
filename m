@@ -1,47 +1,38 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepb.post.tele.dk ([195.41.46.236]:51228 "EHLO
+Received: from pfepb.post.tele.dk ([195.41.46.236]:51403 "EHLO
 	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751544Ab0KYTJI (ORCPT
+	with ESMTP id S1751747Ab0KYTKh (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 25 Nov 2010 14:09:08 -0500
-Date: Thu, 25 Nov 2010 20:09:06 +0100
+	Thu, 25 Nov 2010 14:10:37 -0500
+Date: Thu, 25 Nov 2010 20:10:35 +0100
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH 1/5] kconfig: add an option to determine a menu's
-	visibility
-Message-ID: <20101125190906.GA20087@merkur.ravnborg.org>
-References: <4CD300AC.3010708@redhat.com> <1289079027-3037-2-git-send-email-lacombar@gmail.com> <AANLkTi=WS6cveqzxVmwC2wucaCpEJJLHXx0A8XbAChRb@mail.gmail.com>
+Subject: Re: [PATCH] kbuild, deb-pkg: support overriding userland
+	architecture
+Message-ID: <20101125191035.GB20087@merkur.ravnborg.org>
+References: <4CD5A6C8.8030603@asbjorn.biz> <1289070320-20726-1-git-send-email-asbjorn@asbjorn.biz> <20101125143739.GC8192@sepie.suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <AANLkTi=WS6cveqzxVmwC2wucaCpEJJLHXx0A8XbAChRb@mail.gmail.com>
+In-Reply-To: <20101125143739.GC8192@sepie.suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnaud Lacombe <lacombar@gmail.com>
-Cc: linux-kbuild@vger.kernel.org, linux-media@vger.kernel.org, Mauro Carvalho Chehab <mchehab@redhat.com>, Michal Marek <mmarek@suse.cz>
+To: Michal Marek <mmarek@suse.cz>
+Cc: Asbjoern Sloth Toennesen <asbjorn@asbjorn.biz>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, debian-kernel@lists.debian.org
 
-On Thu, Nov 25, 2010 at 12:06:46PM -0500, Arnaud Lacombe wrote:
-> Hi folks,
+On Thu, Nov 25, 2010 at 03:37:39PM +0100, Michal Marek wrote:
+> On Sat, Nov 06, 2010 at 07:05:20PM +0000, Asbjoern Sloth Toennesen wrote:
+> > Usefull if building for sparc64 userland, because the
+> > sparc and sparc64 userlands use the same 64-bit kernel,
+> > making it impossible to always select the correct userland
+> > architecture for the resulting debian package.
+> > 
+> > Might also be usefull, if you want a i386 userland with a amd64 kernel.
+> > 
+> > Example usage:
+> > 	make DEBARCH=i386 deb-pkg
 > 
-> On Sat, Nov 6, 2010 at 5:30 PM, Arnaud Lacombe <lacombar@gmail.com> wrote:
-> > This option is aimed to add the possibility to control a menu's visibility
-> > without adding dependency to the expression to all the submenu.
-> >
-> > Signed-off-by: Arnaud Lacombe <lacombar@gmail.com>
-> > ---
-> >  scripts/kconfig/expr.h      |    1 +
-> >  scripts/kconfig/lkc.h       |    1 +
-> >  scripts/kconfig/menu.c      |   11 +++++++++++
-> >  scripts/kconfig/zconf.gperf |    1 +
-> >  scripts/kconfig/zconf.y     |   21 ++++++++++++++++++---
-> >  5 files changed, 32 insertions(+), 3 deletions(-)
-> >
-> As there seem to be no interested from Michal to either, ACK, NACK, or
-
-Hi Arnaud.
-I have these sitting in my TODO pile.
-But I have other things that I need to do first and I expect
-these other things to take a couple of weeks.
-[Not Linux related - just busy at my day-job/night-job]
+> This variable deserves a mention in Documentation/kbuild/kbuild.txt not
+> just in the commit log. Otherwise the patch is OK with me.  
+kbuild related variables is usually named KBUILD_* - but not all of them.
 
 	Sam
