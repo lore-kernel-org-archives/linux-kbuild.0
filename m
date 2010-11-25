@@ -1,42 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-yx0-f174.google.com ([209.85.213.174]:51428 "EHLO
-	mail-yx0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753389Ab0KYSJr convert rfc822-to-8bit (ORCPT
+Received: from pfepb.post.tele.dk ([195.41.46.236]:51228 "EHLO
+	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751544Ab0KYTJI (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 25 Nov 2010 13:09:47 -0500
+	Thu, 25 Nov 2010 14:09:08 -0500
+Date: Thu, 25 Nov 2010 20:09:06 +0100
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: [PATCH 1/5] kconfig: add an option to determine a menu's
+	visibility
+Message-ID: <20101125190906.GA20087@merkur.ravnborg.org>
+References: <4CD300AC.3010708@redhat.com> <1289079027-3037-2-git-send-email-lacombar@gmail.com> <AANLkTi=WS6cveqzxVmwC2wucaCpEJJLHXx0A8XbAChRb@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <AANLkTi=eTvdfPjgd0pGVmBx6zCB8yL3qNVq0MR1wH88b@mail.gmail.com>
-References: <20101011145930.11fe570c.randy.dunlap@oracle.com>
-	<1286889586-13483-1-git-send-email-mmarek@suse.cz>
-	<20101029113731.5c7c54b9.sfr@canb.auug.org.au>
-	<20101122114801.2eee4c4d.sfr@canb.auug.org.au>
-	<AANLkTikwxBZUupGNA-gsrxWYpyCKK7wiVZu82WaUST-K@mail.gmail.com>
-	<20101122135715.121b5eb7.sfr@canb.auug.org.au>
-	<AANLkTi=io3tsuL8Hd2a0y8PyBYYAzb-gkJo1GfmpcF+L@mail.gmail.com>
-	<AANLkTi=eTvdfPjgd0pGVmBx6zCB8yL3qNVq0MR1wH88b@mail.gmail.com>
-Date: Thu, 25 Nov 2010 13:09:46 -0500
-Message-ID: <AANLkTik-vnDTRTshpXE7ufjCM9AcfLGQV5v9CcjV=zJx@mail.gmail.com>
-Subject: Re: [PATCH] Revert "kconfig: Temporarily disable dependency warnings"
-From: Arnaud Lacombe <lacombar@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <AANLkTi=WS6cveqzxVmwC2wucaCpEJJLHXx0A8XbAChRb@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Stephen Rothwell <sfr@canb.auug.org.au>, Michal Marek <mmarek@suse.cz>, randy.dunlap@oracle.com, linux-kbuild@vger.kernel.org, linux-next@vger.kernel.org, linux-kernel@vger.kernel.org, xiyou.wangcong@gmail.com, Mauro Carvalho Chehab <mchehab@infradead.org>
+To: Arnaud Lacombe <lacombar@gmail.com>
+Cc: linux-kbuild@vger.kernel.org, linux-media@vger.kernel.org, Mauro Carvalho Chehab <mchehab@redhat.com>, Michal Marek <mmarek@suse.cz>
 
-Hi,
+On Thu, Nov 25, 2010 at 12:06:46PM -0500, Arnaud Lacombe wrote:
+> Hi folks,
+> 
+> On Sat, Nov 6, 2010 at 5:30 PM, Arnaud Lacombe <lacombar@gmail.com> wrote:
+> > This option is aimed to add the possibility to control a menu's visibility
+> > without adding dependency to the expression to all the submenu.
+> >
+> > Signed-off-by: Arnaud Lacombe <lacombar@gmail.com>
+> > ---
+> >  scripts/kconfig/expr.h      |    1 +
+> >  scripts/kconfig/lkc.h       |    1 +
+> >  scripts/kconfig/menu.c      |   11 +++++++++++
+> >  scripts/kconfig/zconf.gperf |    1 +
+> >  scripts/kconfig/zconf.y     |   21 ++++++++++++++++++---
+> >  5 files changed, 32 insertions(+), 3 deletions(-)
+> >
+> As there seem to be no interested from Michal to either, ACK, NACK, or
 
-On Thu, Nov 25, 2010 at 12:43 PM, Catalin Marinas
-<catalin.marinas@arm.com> wrote:
-> Now, commenting on your patches, you added a new statement, 'visible
-> if...' for menus. Can we not change it to something like:
->
-> -menu "I2C Algorithms"
-> -       depends on !I2C_HELPER_AUTO
-> +menu "I2C Algorithms" if !I2C_HELPER_AUTO
->
-no because if_expr are translated internally in term of dependency,
-which we don't want.
+Hi Arnaud.
+I have these sitting in my TODO pile.
+But I have other things that I need to do first and I expect
+these other things to take a couple of weeks.
+[Not Linux related - just busy at my day-job/night-job]
 
- - Arnaud
+	Sam
