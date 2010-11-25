@@ -1,190 +1,61 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-gw0-f46.google.com ([74.125.83.46]:49534 "EHLO
-	mail-gw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752802Ab0KYRGr convert rfc822-to-8bit (ORCPT
+Received: from mail-yx0-f174.google.com ([209.85.213.174]:61845 "EHLO
+	mail-yx0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753445Ab0KYRQQ convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 25 Nov 2010 12:06:47 -0500
+	Thu, 25 Nov 2010 12:16:16 -0500
 MIME-Version: 1.0
-In-Reply-To: <1289079027-3037-2-git-send-email-lacombar@gmail.com>
-References: <4CD300AC.3010708@redhat.com>
-	<1289079027-3037-2-git-send-email-lacombar@gmail.com>
-Date: Thu, 25 Nov 2010 12:06:46 -0500
-Message-ID: <AANLkTi=WS6cveqzxVmwC2wucaCpEJJLHXx0A8XbAChRb@mail.gmail.com>
-Subject: Re: [PATCH 1/5] kconfig: add an option to determine a menu's visibility
+In-Reply-To: <20101122135715.121b5eb7.sfr@canb.auug.org.au>
+References: <20101011145930.11fe570c.randy.dunlap@oracle.com>
+	<1286889586-13483-1-git-send-email-mmarek@suse.cz>
+	<20101029113731.5c7c54b9.sfr@canb.auug.org.au>
+	<20101122114801.2eee4c4d.sfr@canb.auug.org.au>
+	<AANLkTikwxBZUupGNA-gsrxWYpyCKK7wiVZu82WaUST-K@mail.gmail.com>
+	<20101122135715.121b5eb7.sfr@canb.auug.org.au>
+Date: Thu, 25 Nov 2010 12:16:13 -0500
+Message-ID: <AANLkTi=io3tsuL8Hd2a0y8PyBYYAzb-gkJo1GfmpcF+L@mail.gmail.com>
+Subject: Re: [PATCH] Revert "kconfig: Temporarily disable dependency warnings"
 From: Arnaud Lacombe <lacombar@gmail.com>
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org, linux-media@vger.kernel.org
-Cc: Mauro Carvalho Chehab <mchehab@redhat.com>, Michal Marek <mmarek@suse.cz>, Arnaud Lacombe <lacombar@gmail.com>
+To: Stephen Rothwell <sfr@canb.auug.org.au>
+Cc: Michal Marek <mmarek@suse.cz>, randy.dunlap@oracle.com, catalin.marinas@arm.com, linux-kbuild@vger.kernel.org, linux-next@vger.kernel.org, linux-kernel@vger.kernel.org, xiyou.wangcong@gmail.com, Mauro Carvalho Chehab <mchehab@infradead.org>
 
-Hi folks,
+Hi,
 
-On Sat, Nov 6, 2010 at 5:30 PM, Arnaud Lacombe <lacombar@gmail.com> wrote:
-> This option is aimed to add the possibility to control a menu's visibility
-> without adding dependency to the expression to all the submenu.
+On Sun, Nov 21, 2010 at 9:57 PM, Stephen Rothwell <sfr@canb.auug.org.au> wrote:
+> Hi,
 >
-> Signed-off-by: Arnaud Lacombe <lacombar@gmail.com>
-> ---
->  scripts/kconfig/expr.h      |    1 +
->  scripts/kconfig/lkc.h       |    1 +
->  scripts/kconfig/menu.c      |   11 +++++++++++
->  scripts/kconfig/zconf.gperf |    1 +
->  scripts/kconfig/zconf.y     |   21 ++++++++++++++++++---
->  5 files changed, 32 insertions(+), 3 deletions(-)
+> On Sun, 21 Nov 2010 20:58:54 -0500 Arnaud Lacombe <lacombar@gmail.com> wrote:
+>>
+>> There is 2 patches which fixes that by adding to the kconfig language
+>> a "visible" property to menus, 1 revert of "another" solution (which
+>> works but does not scale) and 2 patch which makes usage of the new
+>> property. Ack-ed and complemented by Mauro, but still waiting
+>> review/blessing by Michal.
+>>
+>> The core change is available here: https://patchwork.kernel.org/patch/306412/
+>>
+>> Alternatively, if you don't care about the menu structure, Randy
+>> proposed a one-liner.
 >
-As there seem to be no interested from Michal to either, ACK, NACK, or
-even comment this series, please let me withdraw these patches. If
-this mail is not enough to void the patch, I hope to still be able to
-withdraw my Signed-off-by from this particular series, and thus no
-longer be able to certify the origin of the patches to prevent their
-merge.
+> OK, good to know it is being worked on.  Thanks.
+>
+FYI, I withdrawn the patches and ask for them not to be merged[0], as
+there is a clear lack of interest to see this issue resolved.
 
-I guess lot of people will keep being pissed by these warnings.
+Mauro, may I ask you to remove my patches from:
 
-I hope another solution will be found or someone will have fun wasting
-time re-writting the patch.
+git://git.kernel.org/pub/scm/linux/kernel/git/mchehab/linux-next.git
+kconfig_fixes
+
+please ?
 
 Thanks,
  - Arnaud
 
-ps: as we all live a world of consensus, I can still be convinced to
-change my mind if interest arise.
-
-> diff --git a/scripts/kconfig/expr.h b/scripts/kconfig/expr.h
-> index 184eb6a..e57826c 100644
-> --- a/scripts/kconfig/expr.h
-> +++ b/scripts/kconfig/expr.h
-> @@ -164,6 +164,7 @@ struct menu {
->        struct menu *list;
->        struct symbol *sym;
->        struct property *prompt;
-> +       struct expr *visibility;
->        struct expr *dep;
->        unsigned int flags;
->        char *help;
-> diff --git a/scripts/kconfig/lkc.h b/scripts/kconfig/lkc.h
-> index 753cdbd..3f7240d 100644
-> --- a/scripts/kconfig/lkc.h
-> +++ b/scripts/kconfig/lkc.h
-> @@ -107,6 +107,7 @@ void menu_end_menu(void);
->  void menu_add_entry(struct symbol *sym);
->  void menu_end_entry(void);
->  void menu_add_dep(struct expr *dep);
-> +void menu_add_visibility(struct expr *dep);
->  struct property *menu_add_prop(enum prop_type type, char *prompt, struct expr *expr, struct expr *dep);
->  struct property *menu_add_prompt(enum prop_type type, char *prompt, struct expr *dep);
->  void menu_add_expr(enum prop_type type, struct expr *expr, struct expr *dep);
-> diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
-> index 7e83aef..b9d9aa1 100644
-> --- a/scripts/kconfig/menu.c
-> +++ b/scripts/kconfig/menu.c
-> @@ -152,6 +152,12 @@ struct property *menu_add_prompt(enum prop_type type, char *prompt, struct expr
->        return menu_add_prop(type, prompt, NULL, dep);
->  }
->
-> +void menu_add_visibility(struct expr *expr)
-> +{
-> +       current_entry->visibility = expr_alloc_and(current_entry->visibility,
-> +           expr);
-> +}
-> +
->  void menu_add_expr(enum prop_type type, struct expr *expr, struct expr *dep)
->  {
->        menu_add_prop(type, NULL, expr, dep);
-> @@ -410,6 +416,11 @@ bool menu_is_visible(struct menu *menu)
->        if (!menu->prompt)
->                return false;
->
-> +       if (menu->visibility) {
-> +               if (expr_calc_value(menu->visibility) == no)
-> +                       return no;
-> +       }
-> +
->        sym = menu->sym;
->        if (sym) {
->                sym_calc_value(sym);
-> diff --git a/scripts/kconfig/zconf.gperf b/scripts/kconfig/zconf.gperf
-> index d8bc742..c9e690e 100644
-> --- a/scripts/kconfig/zconf.gperf
-> +++ b/scripts/kconfig/zconf.gperf
-> @@ -38,6 +38,7 @@ hex,          T_TYPE,         TF_COMMAND, S_HEX
->  string,                T_TYPE,         TF_COMMAND, S_STRING
->  select,                T_SELECT,       TF_COMMAND
->  range,         T_RANGE,        TF_COMMAND
-> +visible,       T_VISIBLE,      TF_COMMAND
->  option,                T_OPTION,       TF_COMMAND
->  on,            T_ON,           TF_PARAM
->  modules,       T_OPT_MODULES,  TF_OPTION
-> diff --git a/scripts/kconfig/zconf.y b/scripts/kconfig/zconf.y
-> index 2abd3c7..49fb4ab 100644
-> --- a/scripts/kconfig/zconf.y
-> +++ b/scripts/kconfig/zconf.y
-> @@ -36,7 +36,7 @@ static struct menu *current_menu, *current_entry;
->  #define YYERROR_VERBOSE
->  #endif
->  %}
-> -%expect 28
-> +%expect 30
->
->  %union
->  {
-> @@ -68,6 +68,7 @@ static struct menu *current_menu, *current_entry;
->  %token <id>T_DEFAULT
->  %token <id>T_SELECT
->  %token <id>T_RANGE
-> +%token <id>T_VISIBLE
->  %token <id>T_OPTION
->  %token <id>T_ON
->  %token <string> T_WORD
-> @@ -123,7 +124,7 @@ stmt_list:
->  ;
->
->  option_name:
-> -       T_DEPENDS | T_PROMPT | T_TYPE | T_SELECT | T_OPTIONAL | T_RANGE | T_DEFAULT
-> +       T_DEPENDS | T_PROMPT | T_TYPE | T_SELECT | T_OPTIONAL | T_RANGE | T_DEFAULT | T_VISIBLE
->  ;
->
->  common_stmt:
-> @@ -359,7 +360,7 @@ menu: T_MENU prompt T_EOL
->        printd(DEBUG_PARSE, "%s:%d:menu\n", zconf_curname(), zconf_lineno());
->  };
->
-> -menu_entry: menu depends_list
-> +menu_entry: menu visibility_list depends_list
->  {
->        $$ = menu_add_menu();
->  };
-> @@ -430,6 +431,19 @@ depends: T_DEPENDS T_ON expr T_EOL
->        printd(DEBUG_PARSE, "%s:%d:depends on\n", zconf_curname(), zconf_lineno());
->  };
->
-> +/* visibility option */
-> +
-> +visibility_list:
-> +         /* empty */
-> +       | visibility_list visible
-> +       | visibility_list T_EOL
-> +;
-> +
-> +visible: T_VISIBLE if_expr
-> +{
-> +       menu_add_visibility($2);
-> +};
-> +
->  /* prompt statement */
->
->  prompt_stmt_opt:
-> @@ -526,6 +540,7 @@ static const char *zconf_tokenname(int token)
->        case T_IF:              return "if";
->        case T_ENDIF:           return "endif";
->        case T_DEPENDS:         return "depends";
-> +       case T_VISIBLE:         return "visible";
->        }
->        return "<token>";
->  }
-> --
-> 1.7.2.30.gc37d7.dirty
->
->
+[0]: cf. Message-id
+<AANLkTi=WS6cveqzxVmwC2wucaCpEJJLHXx0A8XbAChRb@mail.gmail.com> on
+linux-kbuild@
