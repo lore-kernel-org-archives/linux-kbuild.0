@@ -1,65 +1,51 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from casper.infradead.org ([85.118.1.10]:53453 "EHLO
-	casper.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752045Ab0KYT0x (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 25 Nov 2010 14:26:53 -0500
-Message-ID: <4CEEB86F.8070105@infradead.org>
-Date: Thu, 25 Nov 2010 17:26:39 -0200
-From: Mauro Carvalho Chehab <mchehab@infradead.org>
+Received: from cantor.suse.de ([195.135.220.2]:50681 "EHLO mx1.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754068Ab0KZKbS (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 26 Nov 2010 05:31:18 -0500
+Message-ID: <4CEF8C74.8010600@suse.cz>
+Date: Fri, 26 Nov 2010 11:31:16 +0100
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Subject: Re: [PATCH] Revert "kconfig: Temporarily disable dependency warnings"
-References: <20101011145930.11fe570c.randy.dunlap@oracle.com>	<1286889586-13483-1-git-send-email-mmarek@suse.cz>	<20101029113731.5c7c54b9.sfr@canb.auug.org.au>	<20101122114801.2eee4c4d.sfr@canb.auug.org.au>	<AANLkTikwxBZUupGNA-gsrxWYpyCKK7wiVZu82WaUST-K@mail.gmail.com>	<20101122135715.121b5eb7.sfr@canb.auug.org.au> <AANLkTi=io3tsuL8Hd2a0y8PyBYYAzb-gkJo1GfmpcF+L@mail.gmail.com>
-In-Reply-To: <AANLkTi=io3tsuL8Hd2a0y8PyBYYAzb-gkJo1GfmpcF+L@mail.gmail.com>
+Subject: Re: [PATCH 1/5] kconfig: add an option to determine a menu's visibility
+References: <4CD300AC.3010708@redhat.com>	<1289079027-3037-2-git-send-email-lacombar@gmail.com> <AANLkTi=WS6cveqzxVmwC2wucaCpEJJLHXx0A8XbAChRb@mail.gmail.com>
+In-Reply-To: <AANLkTi=WS6cveqzxVmwC2wucaCpEJJLHXx0A8XbAChRb@mail.gmail.com>
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Arnaud Lacombe <lacombar@gmail.com>
-Cc: Stephen Rothwell <sfr@canb.auug.org.au>, Michal Marek <mmarek@suse.cz>, randy.dunlap@oracle.com, catalin.marinas@arm.com, linux-kbuild@vger.kernel.org, linux-next@vger.kernel.org, linux-kernel@vger.kernel.org, xiyou.wangcong@gmail.com
+Cc: linux-kbuild@vger.kernel.org, linux-media@vger.kernel.org, Mauro Carvalho Chehab <mchehab@redhat.com>
 
-Em 25-11-2010 15:16, Arnaud Lacombe escreveu:
-> Hi,
+On 25.11.2010 18:06, Arnaud Lacombe wrote:
+> Hi folks,
 > 
-> On Sun, Nov 21, 2010 at 9:57 PM, Stephen Rothwell <sfr@canb.auug.org.au> wrote:
->> Hi,
+> On Sat, Nov 6, 2010 at 5:30 PM, Arnaud Lacombe <lacombar@gmail.com> wrote:
+>> This option is aimed to add the possibility to control a menu's visibility
+>> without adding dependency to the expression to all the submenu.
 >>
->> On Sun, 21 Nov 2010 20:58:54 -0500 Arnaud Lacombe <lacombar@gmail.com> wrote:
->>>
->>> There is 2 patches which fixes that by adding to the kconfig language
->>> a "visible" property to menus, 1 revert of "another" solution (which
->>> works but does not scale) and 2 patch which makes usage of the new
->>> property. Ack-ed and complemented by Mauro, but still waiting
->>> review/blessing by Michal.
->>>
->>> The core change is available here: https://patchwork.kernel.org/patch/306412/
->>>
->>> Alternatively, if you don't care about the menu structure, Randy
->>> proposed a one-liner.
+>> Signed-off-by: Arnaud Lacombe <lacombar@gmail.com>
+>> ---
+>>  scripts/kconfig/expr.h      |    1 +
+>>  scripts/kconfig/lkc.h       |    1 +
+>>  scripts/kconfig/menu.c      |   11 +++++++++++
+>>  scripts/kconfig/zconf.gperf |    1 +
+>>  scripts/kconfig/zconf.y     |   21 ++++++++++++++++++---
+>>  5 files changed, 32 insertions(+), 3 deletions(-)
 >>
->> OK, good to know it is being worked on.  Thanks.
->>
-> FYI, I withdrawn the patches and ask for them not to be merged[0], as
-> there is a clear lack of interest to see this issue resolved.
-> 
-> Mauro, may I ask you to remove my patches from:
-> 
-> git://git.kernel.org/pub/scm/linux/kernel/git/mchehab/linux-next.git
-> kconfig_fixes
-> 
-> please ?
+> As there seem to be no interested from Michal to either, ACK, NACK, or
+> even comment this series, please let me withdraw these patches. If
+> this mail is not enough to void the patch, I hope to still be able to
+> withdraw my Signed-off-by from this particular series, and thus no
+> longer be able to certify the origin of the patches to prevent their
+> merge.
 
-I prefer to have them there, while the issue remains at .37/-next builds.
+Hi Arnaud,
 
-It is a pain to see all those warnings polluting my console, every time 
-I recompile things, and I can't simply do a grep to discard MEDIA 
-warnings/errors (as someone proposed), as this may prevent me to get real
-errors at media builds.
+I'm sorry, I was sick for longer time and am now going through the
+patches that accumulated during that time. I understand your
+frustration, but the fact that I commented / applied some other patches
+yesterday and not this one does not mean that I'm ignoring it. Please
+accept my apologies, I'm looking at your patch right now...
 
-The better is to give more time to Marek/Sam to review your patch
-series and ack or, if they don't agree, to send an alternative patchset
-to fix the issues or to revert the changeset that started to produce 
-those troubles.
-
-Cheers,
-Mauro
+Michal
