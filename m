@@ -1,58 +1,98 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-iw0-f174.google.com ([209.85.214.174]:62620 "EHLO
-	mail-iw0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751902Ab0KZOuM convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 26 Nov 2010 09:50:12 -0500
+Received: from cantor.suse.de ([195.135.220.2]:34221 "EHLO mx1.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751798Ab0KZQPN (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 26 Nov 2010 11:15:13 -0500
+Date: Fri, 26 Nov 2010 17:15:11 +0100
+From: Michal Marek <mmarek@suse.cz>
+Subject: Re: [PATCH 1/5] kconfig: add an option to determine a menu's
+ visibility
+Message-ID: <20101126161511.GD9418@sepie.suse.cz>
+References: <4CD300AC.3010708@redhat.com>
+ <1289079027-3037-2-git-send-email-lacombar@gmail.com>
+ <AANLkTi=WS6cveqzxVmwC2wucaCpEJJLHXx0A8XbAChRb@mail.gmail.com>
+ <4CEF8C74.8010600@suse.cz>
 MIME-Version: 1.0
-In-Reply-To: <4CEFB731.4050307@suse.cz>
-References: <20101011145930.11fe570c.randy.dunlap@oracle.com>
-	<1286889586-13483-1-git-send-email-mmarek@suse.cz>
-	<20101029113731.5c7c54b9.sfr@canb.auug.org.au>
-	<20101122114801.2eee4c4d.sfr@canb.auug.org.au>
-	<AANLkTikwxBZUupGNA-gsrxWYpyCKK7wiVZu82WaUST-K@mail.gmail.com>
-	<20101122135715.121b5eb7.sfr@canb.auug.org.au>
-	<AANLkTi=io3tsuL8Hd2a0y8PyBYYAzb-gkJo1GfmpcF+L@mail.gmail.com>
-	<AANLkTi=eTvdfPjgd0pGVmBx6zCB8yL3qNVq0MR1wH88b@mail.gmail.com>
-	<AANLkTik-vnDTRTshpXE7ufjCM9AcfLGQV5v9CcjV=zJx@mail.gmail.com>
-	<AANLkTimBAx_yg9S1yqKsXeC048WMkus9aBz5RJAUWBpH@mail.gmail.com>
-	<4CEFB731.4050307@suse.cz>
-Date: Fri, 26 Nov 2010 14:50:10 +0000
-Message-ID: <AANLkTi=jMWL7z=30AnJ0An2HtygserxDbkzagv5_hU1h@mail.gmail.com>
-Subject: Re: [PATCH] Revert "kconfig: Temporarily disable dependency warnings"
-From: Catalin Marinas <catalin.marinas@arm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4CEF8C74.8010600@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: Arnaud Lacombe <lacombar@gmail.com>, Stephen Rothwell <sfr@canb.auug.org.au>, randy.dunlap@oracle.com, linux-kbuild@vger.kernel.org, linux-next@vger.kernel.org, linux-kernel@vger.kernel.org, xiyou.wangcong@gmail.com, Mauro Carvalho Chehab <mchehab@infradead.org>
+To: Arnaud Lacombe <lacombar@gmail.com>
+Cc: linux-kbuild@vger.kernel.org, linux-media@vger.kernel.org, Mauro Carvalho Chehab <mchehab@redhat.com>
 
-On 26 November 2010 13:33, Michal Marek <mmarek@suse.cz> wrote:
-> On 26.11.2010 13:33, Catalin Marinas wrote:
->> On 25 November 2010 18:09, Arnaud Lacombe <lacombar@gmail.com> wrote:
->>> On Thu, Nov 25, 2010 at 12:43 PM, Catalin Marinas
->>> <catalin.marinas@arm.com> wrote:
->>>> Now, commenting on your patches, you added a new statement, 'visible
->>>> if...' for menus. Can we not change it to something like:
->>>>
->>>> -menu "I2C Algorithms"
->>>> -       depends on !I2C_HELPER_AUTO
->>>> +menu "I2C Algorithms" if !I2C_HELPER_AUTO
->>>>
->>> no because if_expr are translated internally in term of dependency,
->>> which we don't want.
->>
->> That's correct but I was wondering whether we could change this kind
->> of 'if' to a visibility attribute or a weaker dependency and avoid
->> 'select' warnings. This way we wouldn't introduce new keywords to the
->> kconfig language.
->
-> I quite like the "visible if" notation because it makes it explicit that
-> it only affects the display of the menu and does not add any dependency
-> to the data.
+On Fri, Nov 26, 2010 at 11:31:16AM +0100, Michal Marek wrote:
+> On 25.11.2010 18:06, Arnaud Lacombe wrote:
+> > Hi folks,
+> > 
+> > On Sat, Nov 6, 2010 at 5:30 PM, Arnaud Lacombe <lacombar@gmail.com> wrote:
+> >> This option is aimed to add the possibility to control a menu's visibility
+> >> without adding dependency to the expression to all the submenu.
+> >>
+> >> Signed-off-by: Arnaud Lacombe <lacombar@gmail.com>
+> >> ---
+> >>  scripts/kconfig/expr.h      |    1 +
+> >>  scripts/kconfig/lkc.h       |    1 +
+> >>  scripts/kconfig/menu.c      |   11 +++++++++++
+> >>  scripts/kconfig/zconf.gperf |    1 +
+> >>  scripts/kconfig/zconf.y     |   21 ++++++++++++++++++---
+> >>  5 files changed, 32 insertions(+), 3 deletions(-)
+> >>
+> > As there seem to be no interested from Michal to either, ACK, NACK, or
+> > even comment this series, please let me withdraw these patches. If
+> > this mail is not enough to void the patch, I hope to still be able to
+> > withdraw my Signed-off-by from this particular series, and thus no
+> > longer be able to certify the origin of the patches to prevent their
+> > merge.
+> 
+> Hi Arnaud,
+> 
+> I'm sorry, I was sick for longer time and am now going through the
+> patches that accumulated during that time. I understand your
+> frustration, but the fact that I commented / applied some other patches
+> yesterday and not this one does not mean that I'm ignoring it. Please
+> accept my apologies, I'm looking at your patch right now...
 
-That's fine by me. If you like this feature then it could get upstream :)
+So the patches look OK to me, I added your patches to
+kbuild-2.6.git#menu-visibility and merged the branch to for-next. The
+new syntax should be documented in
+Documentation/kbuild/kconfig-language.txt, below is a first attempt at
+it. If the patches work fine in linux-next _and_ you give me permission
+to push them to Linus, I'll move them to rc-fixes and send a pull
+request.
 
--- 
-Catalin
+Michal
+
+
+Subject: [PATCH] kconfig: Document the new "visible if" syntax
+
+Signed-off-by: Michal Marek <mmarek@suse.cz>
+
+diff --git a/Documentation/kbuild/kconfig-language.txt b/Documentation/kbuild/kconfig-language.txt
+index 2fe93ca..2522cca 100644
+--- a/Documentation/kbuild/kconfig-language.txt
++++ b/Documentation/kbuild/kconfig-language.txt
+@@ -114,6 +114,13 @@ applicable everywhere (see syntax).
+ 	the illegal configurations all over.
+ 	kconfig should one day warn about such things.
+ 
++- limiting menu display: "visible if" <expr>
++  This attribute is only applicable to menu blocks, if the condition is
++  false, the menu block is not displayed to the user (the symbols
++  contained there can still be selected by other symbols, though). It is
++  similar to a conditional "prompt" attribude for individual menu
++  entries.
++
+ - numerical ranges: "range" <symbol> <symbol> ["if" <expr>]
+   This allows to limit the range of possible input values for int
+   and hex symbols. The user can only input a value which is larger than
+@@ -300,7 +307,8 @@ menu:
+ 	"endmenu"
+ 
+ This defines a menu block, see "Menu structure" above for more
+-information. The only possible options are dependencies.
++information. The only possible options are dependencies and "visible"
++attributes.
+ 
+ if:
+ 
