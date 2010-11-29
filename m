@@ -1,53 +1,64 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from na3sys009aog114.obsmtp.com ([74.125.149.211]:58118 "HELO
-	na3sys009aog114.obsmtp.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with SMTP id S1755538Ab0KZS4S (ORCPT
+Received: from mtagate5.uk.ibm.com ([194.196.100.165]:57164 "EHLO
+	mtagate5.uk.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750742Ab0K2Joi (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 26 Nov 2010 13:56:18 -0500
-From: Ben Gardiner <bengardiner@nanometrics.ca>
-Subject: [PATCH] kbuild: fix interaction of CONFIG_IKCONFIG and KCONFIG_CONFIG
-Date: Fri, 26 Nov 2010 13:56:10 -0500
-Message-Id: <1290797770-22877-1-git-send-email-bengardiner@nanometrics.ca>
+	Mon, 29 Nov 2010 04:44:38 -0500
+Message-ID: <4CF37603.5080301@de.ibm.com>
+Date: Mon, 29 Nov 2010 10:44:35 +0100
+From: Christian Borntraeger <borntraeger@de.ibm.com>
+MIME-Version: 1.0
+Subject: Re: [PATCH] Built kernel without -O2 option
+References: <AANLkTimewZ4QhxzL2vOYYV85pegy8Fu6Rb4XUAPqGUXS@mail.gmail.com> <20101129081619.GD5218@cr0.nay.redhat.com>
+In-Reply-To: <20101129081619.GD5218@cr0.nay.redhat.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>, Roman Zippel <zippel@linux-m68k.org>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: =?ISO-8859-1?Q?Am=E9rico_Wang?= <xiyou.wangcong@gmail.com>
+Cc: Hui Zhu <teawater@gmail.com>, linux-kernel@vger.kernel.org, gdb@sourceware.org, hellogcc@freelists.org, linux-kbuild@vger.kernel.org
 
-Change the use of .config in kernel/Makefile to $(KCONFIG_CONFIG).
+Am 29.11.2010 09:16, schrieb Américo Wang:
+> On Mon, Nov 29, 2010 at 11:56:15AM +0800, Hui Zhu wrote:
+>> Hi,
+>>
+>> Now, there are a lot of ways to debug the Linux kernel with GDB, like
+>> qemu, kgtp or kgdb and so on.
+>> But the developer more like add a printk. It have a lot of reason, a big one is:
+>> (gdb) p ret
+>> $3 = <value optimized out>
+>> And the code execution order is not right.
+>>
+>> This is becuase the Kernel is bult with gcc -O2.  Gcc will not
+>> generate enough debug message with file with -O2.
+>> So GDB cannot work very well with Linux kernel.
+>>
+>> So I make a patch that add a option in "Kernel hacking" called "Close
+>> GCC optimization".  It will make kernel be built without -O2.
+>>
+>> I built and use it in i386 and x86_64.  I will try to make it OK in other arch.
+>>
+> 
+> The problem is that some functions _have to_ be inlined and gcc without -O2
+> doesn't inline them. Have check all the cases? I doubt.
 
-Currently, if you try to build a kernel with KCONFIG_CONFIG set (to a value
-not equal to .config) and the config file pointed to by KCONFIG_CONFIG sets
-CONFIG_IKCONFIG then the build will fail with:
+In essence -O2 just tells gcc to activate a list of optimizations
+gcc  -Q -O2 --help=optimizers
+tells you what.
 
-make[1]: *** No rule to make target `.config', needed by `kernel/config_data.gz'.  Stop.
+So what about making this patch much smaller by explicitely using the optimizations
+that are absolutely necessary?
+e.g: 
+-finline-small-functions -finline-functions-called-once
+(what else do we need?)
 
-I think this has been present since the introduction of KCONFIG_CONFIG
-in 14cdd3c402bf7c66f0bcd76e290f0770a54a4b21.
+We might even  be able to collapse this with the optimize for size option,
+by providing a Kconfig entry that allows to choose between
 
-Signed-off-by: Ben Gardiner <bengardiner@nanometrics.ca>
-CC: Roman Zippel <zippel@linux-m68k.org>
-CC: Michal Marek <mmarek@suse.cz>
+-O0 -finline-small-functions -finline-functions-called-once
+-O1 -finline-small-functions -finline-functions-called-once
+-Os
+-O2
+-O3
 
----
-based on 698fd6a2c3ca05ec796072defb5c415289a86cdc of
-git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux-2.6.git
-
- kernel/Makefile |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
-
-diff --git a/kernel/Makefile b/kernel/Makefile
-index 0b5ff08..33e0a39 100644
---- a/kernel/Makefile
-+++ b/kernel/Makefile
-@@ -121,7 +121,7 @@ $(obj)/configs.o: $(obj)/config_data.h
- # config_data.h contains the same information as ikconfig.h but gzipped.
- # Info from config_data can be extracted from /proc/config*
- targets += config_data.gz
--$(obj)/config_data.gz: .config FORCE
-+$(obj)/config_data.gz: $(KCONFIG_CONFIG) FORCE
- 	$(call if_changed,gzip)
- 
- quiet_cmd_ikconfiggz = IKCFG   $@
--- 
-1.7.0.4
-
+Christian
