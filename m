@@ -1,43 +1,25 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from hofr.at ([212.69.189.236]:35279 "EHLO mail.hofr.at"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753520Ab0K2MHH (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 29 Nov 2010 07:07:07 -0500
-Date: Mon, 29 Nov 2010 12:57:24 +0100
-From: Nicholas Mc Guire <der.herr@hofr.at>
-Subject: Re: [PATCH] Built kernel without -O2 option
-Message-ID: <20101129115724.GA32318@opentech.at>
-References: <AANLkTimewZ4QhxzL2vOYYV85pegy8Fu6Rb4XUAPqGUXS@mail.gmail.com> <20101129081619.GD5218@cr0.nay.redhat.com> <4CF37603.5080301@de.ibm.com> <52488.94.211.195.167.1291029121.squirrel@gate.crashing.org> <4CF38BBA.4020202@de.ibm.com>
+Received: from web82505.mail.mud.yahoo.com ([209.191.86.192]:27787 "HELO
+	web82505.mail.mud.yahoo.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with SMTP id S1752512Ab0K3QhB convert rfc822-to-8bit
+	(ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 30 Nov 2010 11:37:01 -0500
+Message-ID: <402513.43676.qm@web82505.mail.mud.yahoo.com>
+Date: Tue, 30 Nov 2010 08:30:18 -0800 (PST)
+From: pat-estes@sbcglobal.net
+Subject: =?iso-8859-1?Q?Your_Email_Id_has_won_=A31=2C000=2C000=2E00=2E_in_the_Brit?=
+ =?iso-8859-1?Q?ish_Xmas_Grant_Promo=2E_send_your?=
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4CF38BBA.4020202@de.ibm.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: Segher Boessenkool <segher@kernel.crashing.org>, Am?rico Wang <xiyou.wangcong@gmail.com>, Hui Zhu <teawater@gmail.com>, linux-kernel@vger.kernel.org, gdb@sourceware.org, hellogcc@freelists.org, linux-kbuild@vger.kernel.org
 
-On Mon, 29 Nov 2010, Christian Borntraeger wrote:
 
-> Am 29.11.2010 12:12, schrieb Segher Boessenkool:
-> >> In essence -O2 just tells gcc to activate a list of optimizations
-> >> gcc  -Q -O2 --help=optimizers
+Name....Location...Country....
 
-I think for completness you would need to pass
 
- gcc -Wextra -Q -O2 --help=optimizers
 
-or you could miss some options
 
-> >> tells you what.
-> > 
-> > Not quite; see http://gcc.gnu.org/wiki/FAQ#optimization-options .
-> > 
-> 
-> Erm...right. Thank you.
 
-well I guess you always could explicidly turn off all optioins with 
--fnoWHATEVER you want to disable and thus remove all unwanted flags 
-- admitedly a bit painfull though.
 
-hofrat
