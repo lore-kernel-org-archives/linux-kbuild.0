@@ -1,53 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:39938 "EHLO mx2.suse.de"
+Received: from vostochny.stro.at ([78.47.22.85]:33783 "EHLO vostochny.stro.at"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754898Ab0LCNhV (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 3 Dec 2010 08:37:21 -0500
-Message-ID: <4CF8F295.6050205@suse.cz>
-Date: Fri, 03 Dec 2010 14:37:25 +0100
-From: Michal Marek <mmarek@suse.cz>
+	id S1753891Ab0LCRsD (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 3 Dec 2010 12:48:03 -0500
+Date: Fri, 3 Dec 2010 18:48:00 +0100
+From: maximilian attems <max@stro.at>
+Subject: Re: [PATCH] kbuild, deb-pkg: support overriding userland architecture
+Message-ID: <20101203174800.GA952@stro.at>
+References: <4CD5A6C8.8030603@asbjorn.biz>
+ <1289070320-20726-1-git-send-email-asbjorn@asbjorn.biz>
 MIME-Version: 1.0
-Subject: Re: scripted kconfig replies?
-References: <20101121204600.83bfd043.rdunlap@xenotime.net> <4CF8F169.7050008@suse.cz>
-In-Reply-To: <4CF8F169.7050008@suse.cz>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1289070320-20726-1-git-send-email-asbjorn@asbjorn.biz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Randy Dunlap <rdunlap@xenotime.net>
-Cc: linux-kbuild@vger.kernel.org
+To: Asbjoern Sloth Toennesen <asbjorn@asbjorn.biz>
+Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, debian-kernel@lists.debian.org
 
-On 3.12.2010 14:32, Michal Marek wrote:
-> On 22.11.2010 05:46, Randy Dunlap wrote:
->> Hi,
->>
->> I'd like to be able to write a script that handles 'make oldconfig'
->> queries for unknown kconfig symbols.  The script would take options
->> like:  set all tristate prompts to one of y/m/n, set all boolean prompts
->> to one of y/n.  (and just use defaults for numeric or string symbols)
->>
->> This would allow me to automate some kernel configs.  I don't think
->> that kconfig itself is the right place for this feature.
->>
->> Should this be doable?  Can anyone give me a pointer of what to use,
->> where to begin?
+hello Asbjoern,
+
+On Sat, 06 Nov 2010, Asbjoern Sloth Toennesen wrote:
+
+> Usefull if building for sparc64 userland, because the
+> sparc and sparc64 userlands use the same 64-bit kernel,
+> making it impossible to always select the correct userland
+> architecture for the resulting debian package.
 > 
-> You can utilize KCONFIG_ALLCONFIG for this:
-> $ mv .config config-old
-> $ KCONFIG_ALLCONFIG make all<yes|mod|no|rand>config
-
-$ KCONFIG_ALLCONFIG=config-old make all<yes|mod|no|rand>config
-
-of course.
-
-Michal
+> Might also be usefull, if you want a i386 userland with a amd64 kernel.
 > 
-> The file pointed to by KCONFIG_ALLCONFIG lists options that you wish to
-> be set to a given value, see Documentation/kbuild/kconfig.txt.
+> Example usage:
+> 	make DEBARCH=i386 deb-pkg
 > 
-> Michal
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> This patch is based on my 'kbuild, deb-pkg: select
+> userland architecture based on UTS_MACHINE' patch.
 
+care to repost with KBUILD_ prefix, to keep namespace sane and mention
+in  Documentation/kbuild/kbuild.txt together with the relevant acks.
+It be really cool to have that in next 2.6.38.
+
+thanks
+ 
+> LKML-reference: <alpine.DEB.2.02.1011051437500.13287@aurora.sdinet.de>
+> Signed-off-by: Asbjoern Sloth Toennesen <asbjorn@asbjorn.biz>
+
+Acked-by: maximilian attems <max@stro.at>
