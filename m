@@ -1,22 +1,18 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-iw0-f174.google.com ([209.85.214.174]:64490 "EHLO
+Received: from mail-iw0-f174.google.com ([209.85.214.174]:55855 "EHLO
 	mail-iw0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755843Ab0LDVOK convert rfc822-to-8bit (ORCPT
+	with ESMTP id S1755692Ab0LDVni convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 4 Dec 2010 16:14:10 -0500
-Received: by iwn6 with SMTP id 6so1487997iwn.19
-        for <linux-kbuild@vger.kernel.org>; Sat, 04 Dec 2010 13:14:10 -0800 (PST)
+	Sat, 4 Dec 2010 16:43:38 -0500
+Received: by iwn6 with SMTP id 6so1510778iwn.19
+        for <linux-kbuild@vger.kernel.org>; Sat, 04 Dec 2010 13:43:37 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <1291496832.8025.79.camel@localhost>
+In-Reply-To: <1291482609.8025.57.camel@localhost>
 References: <1290488397.6770.1404.camel@localhost>
 	<20101203122347.GA12395@sepie.suse.cz>
 	<1291482609.8025.57.camel@localhost>
-	<AANLkTikjmWJ1+NFTHWGRBrZ2jKGs4r3O_tv+9yfCBEWC@mail.gmail.com>
-	<1291487421.8025.69.camel@localhost>
-	<AANLkTik8OgrFRYKF6PS5MkawDDojmF_yEnFtTcnjz4Pp@mail.gmail.com>
-	<1291496832.8025.79.camel@localhost>
-Date: Sat, 4 Dec 2010 16:14:10 -0500
-Message-ID: <AANLkTimTz=AtE6FL-+HDniWwO256yuaqEJyoPWRThYqf@mail.gmail.com>
+Date: Sat, 4 Dec 2010 16:43:37 -0500
+Message-ID: <AANLkTinez2Db1rFvLv-uf6koc+9JzHhkV8x8mFhrW5ER@mail.gmail.com>
 Subject: Re: [PATCHv2] Kbuild: kconfig: Verbose version of --listnewconfig
 From: Arnaud Lacombe <lacombar@gmail.com>
 Content-Type: text/plain; charset=ISO-8859-1
@@ -28,28 +24,58 @@ Cc: Michal Marek <mmarek@suse.cz>, Roman Zippel <zippel@linux-m68k.org>, linux-k
 
 Hi,
 
-On Sat, Dec 4, 2010 at 4:07 PM, Ben Hutchings <ben@decadent.org.uk> wrote:
-[...]
->> >> I would not expect to see any header if there is no new symbol(s).
->> >> However, that might complicate the code too much. Btw, I find
->> >> "Changes" to be misleading, is that header necessary ?
->> >
->> > We use this feature (or an earlier version of it) in automated kernel
->> > builds in Debian, so we expect the output to appear in build logs and
->> > the header makes it easier to pick out.
->> >
->> That's easily doable outside kconfig.
->
-> No it isn't, as the Kconfig code must be built as part of the
-> listnewconfig target.  (Building just the code first will provoke
-> warnings about the invalid config.)
->
-echo "#"
-echo "# Changes:"
-echo "#"
-make [...] listnewconfig
+[This message is a bit out-of-scope of this patch]
 
-does the job, without introducing extra header others do not seem to
-want to see.
+On Sat, Dec 4, 2010 at 12:10 PM, Ben Hutchings <ben@decadent.org.uk> wrote:
+> diff --git a/scripts/kconfig/expr.h b/scripts/kconfig/expr.h
+> index 184eb6a..b267933 100644
+> --- a/scripts/kconfig/expr.h
+> +++ b/scripts/kconfig/expr.h
+> @@ -108,6 +108,8 @@ struct symbol {
+>  #define SYMBOL_DEF3       0x40000  /* symbol.def[S_DEF_3] is valid */
+>  #define SYMBOL_DEF4       0x80000  /* symbol.def[S_DEF_4] is valid */
+>
+> +#define SYMBOL_NEW        0x100000 /* symbol is new (loaded config did not provide a value) */
+> +
+>  #define SYMBOL_MAXLENGTH       256
+>  #define SYMBOL_HASHSIZE                9973
+>
+Just for the record, as long as I like this explicit flag, it does
+only make sense for the S_DEF_USER case.
 
- - Arnaud
+Kconfig seems to have been thought originally to support multiple
+state of the tree (through the S_DEF_* flags). However, there has been
+years after years more and more code written solely for the S_DEF_USER
+case. Nowadays, making useful use of these S_DEF_* flags has became
+pretty much impossible.
+
+If the goal of this patch was just to provide a verbose
+--listnewconfig, that should have been doable within check_conf().
+
+Just a side note, using conf_write symbol() has the disadvantage to print:
+
+# CONFIG_FOO is not set
+
+instead of
+
+CONFIG_FOO=n
+
+or
+
+CONFIG_FOO is not set
+
+I've never been a big fan of having the format included in a generic
+library. I guess the caller should specify a printer callback. That
+would avoid also the `headerfile' fuss of conf_write_string.
+
+I'd suggest the printer callback to be of the form:
+
+struct conf_printer_callback {
+    void (*print_set)(struct symbol *);
+    void (*print_unset)(struct symbol *);
+    void (*print_comment)(struct symbol *);
+}
+
+that way, conf_write() and conf_write_autoconf() would also share more code...
+
+ - Arnaud, who had other plan for the day :/
