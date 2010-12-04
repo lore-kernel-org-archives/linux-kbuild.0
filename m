@@ -1,54 +1,68 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.asbjorn.biz ([217.195.185.3]:54083 "EHLO mail.asbjorn.biz"
+Received: from cantor2.suse.de ([195.135.220.15]:41923 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753323Ab0LCTh2 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 3 Dec 2010 14:37:28 -0500
-Message-ID: <4CF946F5.6040103@asbjorn.biz>
-Date: Fri, 03 Dec 2010 19:37:25 +0000
-From: =?UTF-8?B?QXNiasO4cm4gU2xvdGggVMO4bm5lc2Vu?= <asbjorn@asbjorn.biz>
+	id S1755167Ab0LDN5f (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 4 Dec 2010 08:57:35 -0500
+Date: Sat, 4 Dec 2010 14:57:32 +0100
+From: Michal Marek <mmarek@suse.cz>
+Subject: [GIT] kbuild and kconfig fixes for 2.6.37-rc5
+Message-ID: <20101204135732.GA12774@sepie.suse.cz>
 MIME-Version: 1.0
-Subject: Re: [PATCH] kbuild, deb-pkg: support overriding userland architecture
-References: <4CD5A6C8.8030603@asbjorn.biz> <1289070320-20726-1-git-send-email-asbjorn@asbjorn.biz> <20101203174800.GA952@stro.at>
-In-Reply-To: <20101203174800.GA952@stro.at>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: maximilian attems <max@stro.at>
-Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, debian-kernel@lists.debian.org
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: brueckner@linux.vnet.ibm.com, lacombar@gmail.com, mchehab@redhat.com, mmarek@suse.cz, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Hi Max,
+Hi Linus,
 
-On 12/03/2010 05:48 PM, maximilian attems wrote:
-> On Sat, 06 Nov 2010, Asbjoern Sloth Toennesen wrote:
->> Usefull if building for sparc64 userland, because the
->> sparc and sparc64 userlands use the same 64-bit kernel,
->> making it impossible to always select the correct userland
->> architecture for the resulting debian package.
->>
->> Might also be usefull, if you want a i386 userland with a amd64 kernel.
->>
->> Example usage:
->> 	make DEBARCH=i386 deb-pkg
->>
->> This patch is based on my 'kbuild, deb-pkg: select
->> userland architecture based on UTS_MACHINE' patch.
->
-> care to repost with KBUILD_ prefix, to keep namespace sane and mention
-> in  Documentation/kbuild/kbuild.txt together with the relevant acks.
-> It be really cool to have that in next 2.6.38.
+please pull these kbuild/kconfig fixes for the next -rc. The largest
+part are fixes for the annoying kconfig warnings, contributed by Arnaud
+Lacombe and Mauro Carvalho Chehab. The solution adds a new 'visible if'
+keyword to the Kconfig language, so it's not exactly something that one
+would expect in the rc phase, but the kconfig change is not huge (the
+large diff is due to generated files) and it is deployed only in those
+five Kconfig files that had the warnings and were hard to fix by other
+means.  The second part is a forgotten patch by Hendrik Brueckner to
+usr/initramfs, that fixes build for Blackfin and h8300.
 
-Sure its on my todo for the weekend, have just had an insane week.
+Michal
 
-I just noticed the armhf port effort yesterday, that would also need
-this patch, I will add your Ack-by when sending the updated patch.
+The following changes since commit e8a7e48bb248a1196484d3f8afa53bded2b24e71:
 
-I also have a bunch of e1000e cleanups scheduled for 2.6.38, will submit
-to netdev this weekend as well.
+  Linux 2.6.37-rc4 (2010-11-29 20:42:04 -0800)
 
-Thanks, for the reminding effort.
+are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild-2.6.git rc-fixes
 
--- 
-Best regards
-Asbjørn Sloth Tønnesen
-asbjorn.biz
+Arnaud Lacombe (5):
+      kconfig: add an option to determine a menu's visibility
+      kconfig: regen parser
+      Revert "i2c: Fix Kconfig dependencies"
+      media/video: convert Kconfig to use the menu's `visible' keyword
+      i2c/algos: convert Kconfig to use the menu's `visible' keyword
+
+Hendrik Brueckner (1):
+      initramfs: Really fix build break on symbol-prefixed archs
+
+Mauro Carvalho Chehab (1):
+      [media] Fix Kconfig errors due to two visible menus
+
+Michal Marek (1):
+      Merge branch 'kconfig_fixes' of git://git.kernel.org/.../mchehab/linux-next into kbuild/rc-fixes
+
+ drivers/i2c/Kconfig                  |    3 +-
+ drivers/i2c/algos/Kconfig            |   14 +-
+ drivers/media/common/tuners/Kconfig  |    8 +-
+ drivers/media/dvb/frontends/Kconfig  |    5 +-
+ drivers/media/video/Kconfig          |    2 +-
+ scripts/kconfig/expr.h               |    1 +
+ scripts/kconfig/lkc.h                |    1 +
+ scripts/kconfig/menu.c               |   11 +
+ scripts/kconfig/zconf.gperf          |    1 +
+ scripts/kconfig/zconf.hash.c_shipped |  122 ++++----
+ scripts/kconfig/zconf.tab.c_shipped  |  570 +++++++++++++++++----------------
+ scripts/kconfig/zconf.y              |   21 +-
+ usr/initramfs_data.S                 |    5 +-
+ 13 files changed, 401 insertions(+), 363 deletions(-)
