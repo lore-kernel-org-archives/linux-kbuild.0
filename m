@@ -1,81 +1,80 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-yx0-f174.google.com ([209.85.213.174]:48417 "EHLO
-	mail-yx0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751481Ab0LEGgL (ORCPT
+Received: from mail-gx0-f180.google.com ([209.85.161.180]:38377 "EHLO
+	mail-gx0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751186Ab0LEGjV (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 5 Dec 2010 01:36:11 -0500
-Received: by yxt3 with SMTP id 3so4972274yxt.19
-        for <linux-kbuild@vger.kernel.org>; Sat, 04 Dec 2010 22:36:11 -0800 (PST)
+	Sun, 5 Dec 2010 01:39:21 -0500
+Received: by gxk19 with SMTP id 19so5953082gxk.11
+        for <linux-kbuild@vger.kernel.org>; Sat, 04 Dec 2010 22:39:20 -0800 (PST)
 From: Arnaud Lacombe <lacombar@gmail.com>
-Subject: [PATCH 2/2] [RFC] kconfig/listnewconfig: show default value of new symbel
-Date: Sun,  5 Dec 2010 01:35:19 -0500
-Message-Id: <1291530919-5601-2-git-send-email-lacombar@gmail.com>
-In-Reply-To: <1291530919-5601-1-git-send-email-lacombar@gmail.com>
-References: <1291530919-5601-1-git-send-email-lacombar@gmail.com>
+Subject: [PATCH] kconfig: nuke second argument of conf_write_symbol()
+Date: Sun,  5 Dec 2010 01:33:16 -0500
+Message-Id: <1291530796-16379-1-git-send-email-lacombar@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: Arnaud Lacombe <lacombar@gmail.com>, Ben Hutchings <ben@decadent.org.uk>
+Cc: Arnaud Lacombe <lacombar@gmail.com>
 
-note: I would not mind adding the KCONFIG_VERBOSE logic.
+Replacing S_TRISTATE by S_BOOLEAN is a no-op for conf_write_symbol().
 
-Original idea and implementation by Bastian Blank <waldi@debian.org>,
-Maximilian Attems <max@stro.at> and Ben Hutchings <ben@decadent.org.uk>
-
-CC: Ben Hutchings <ben@decadent.org.uk>
 Signed-off-by: Arnaud Lacombe <lacombar@gmail.com>
 ---
- scripts/kconfig/conf.c     |   14 +++++++++++++-
- scripts/kconfig/confdata.c |    4 ++--
- 2 files changed, 15 insertions(+), 3 deletions(-)
+ scripts/kconfig/confdata.c |   17 +++++------------
+ 1 files changed, 5 insertions(+), 12 deletions(-)
 
-diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
-index 5459a38..1b58129 100644
---- a/scripts/kconfig/conf.c
-+++ b/scripts/kconfig/conf.c
-@@ -411,6 +411,17 @@ conf_childs:
- 		indent -= 2;
- }
- 
-+
-+static void
-+listnewconfig_print_symbol(FILE *fp, struct symbol *sym, const char *val, void *arg)
-+{
-+	fprintf(fp, "%s%s (default: %s)\n", CONFIG_, sym->name, val);
-+}
-+
-+static struct conf_printer listnewconfig_printers = {
-+	.print_symbol = listnewconfig_print_symbol,
-+};
-+
- static void check_conf(struct menu *menu)
- {
- 	struct symbol *sym;
-@@ -425,7 +436,8 @@ static void check_conf(struct menu *menu)
- 		    (sym_is_choice(sym) && sym_get_tristate_value(sym) == yes)) {
- 			if (input_mode == listnewconfig) {
- 				if (sym->name && !sym_is_choice_value(sym)) {
--					printf("%s%s\n", CONFIG_, sym->name);
-+					conf_write_symbol(stdout, sym,
-+					    &listnewconfig_printers, NULL);
- 				}
- 			} else if (input_mode != oldnoconfig) {
- 				if (!conf_cnt++)
 diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
-index 31d06da..6f2f3a4 100644
+index f349bdc..6fd43d7 100644
 --- a/scripts/kconfig/confdata.c
 +++ b/scripts/kconfig/confdata.c
-@@ -548,8 +548,8 @@ static struct conf_printer tristate_printer_cb =
-  *
-  */
+@@ -440,12 +440,11 @@ static void conf_write_string(bool headerfile, const char *name,
+ 	fputs("\"\n", out);
+ }
  
--static void conf_write_symbol(FILE *fp, struct symbol *sym,
--			      struct conf_printer *printer, void *printer_arg)
-+void conf_write_symbol(FILE *fp, struct symbol *sym,
-+		       struct conf_printer *printer, void *printer_arg)
+-static void conf_write_symbol(struct symbol *sym, enum symbol_type type,
+-                              FILE *out, bool write_no)
++static void conf_write_symbol(struct symbol *sym, FILE *out, bool write_no)
  {
  	const char *str;
  
+-	switch (type) {
++	switch (sym->type) {
+ 	case S_BOOLEAN:
+ 	case S_TRISTATE:
+ 		switch (sym_get_tristate_value(sym)) {
+@@ -532,7 +531,7 @@ int conf_write_defconfig(const char *filename)
+ 						goto next_menu;
+ 				}
+ 			}
+-			conf_write_symbol(sym, sym->type, out, true);
++			conf_write_symbol(sym, out, true);
+ 		}
+ next_menu:
+ 		if (menu->list != NULL) {
+@@ -633,14 +632,8 @@ int conf_write(const char *name)
+ 			if (!(sym->flags & SYMBOL_WRITE))
+ 				goto next;
+ 			sym->flags &= ~SYMBOL_WRITE;
+-			type = sym->type;
+-			if (type == S_TRISTATE) {
+-				sym_calc_value(modules_sym);
+-				if (modules_sym->curr.tri == no)
+-					type = S_BOOLEAN;
+-			}
+ 			/* Write config symbol to file */
+-			conf_write_symbol(sym, type, out, true);
++			conf_write_symbol(sym, out, true);
+ 		}
+ 
+ next:
+@@ -842,7 +835,7 @@ int conf_write_autoconf(void)
+ 			continue;
+ 
+ 		/* write symbol to config file */
+-		conf_write_symbol(sym, sym->type, out, false);
++		conf_write_symbol(sym, out, false);
+ 
+ 		/* update autoconf and tristate files */
+ 		switch (sym->type) {
 -- 
 1.7.2.30.gc37d7.dirty
 
