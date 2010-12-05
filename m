@@ -1,31 +1,65 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-iw0-f174.google.com ([209.85.214.174]:49393 "EHLO
-	mail-iw0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751481Ab0LEG4R (ORCPT
+Received: from gerard.telenet-ops.be ([195.130.132.48]:45589 "EHLO
+	gerard.telenet-ops.be" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752734Ab0LEJ4I (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 5 Dec 2010 01:56:17 -0500
-Received: by iwn6 with SMTP id 6so1858185iwn.19
-        for <linux-kbuild@vger.kernel.org>; Sat, 04 Dec 2010 22:56:16 -0800 (PST)
+	Sun, 5 Dec 2010 04:56:08 -0500
+Date: Sun, 5 Dec 2010 10:50:56 +0100 (CET)
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Subject: [PATCH/resend] checksyscalls: Fix stand-alone usage
+Message-ID: <alpine.DEB.2.00.1012051047510.17705@ayla.of.borg>
 MIME-Version: 1.0
-In-Reply-To: <1291531935-6183-2-git-send-email-lacombar@gmail.com>
-References: <1291531935-6183-1-git-send-email-lacombar@gmail.com>
-	<1291531935-6183-2-git-send-email-lacombar@gmail.com>
-Date: Sun, 5 Dec 2010 01:56:16 -0500
-Message-ID: <AANLkTikAaCEGWCjkvMmDrirk79oD7hPy+JQHXaFry+K-@mail.gmail.com>
-Subject: Re: [PATCH 2/2] kconfig/conf: add command line options' description
-From: Arnaud Lacombe <lacombar@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Arnaud Lacombe <lacombar@gmail.com>
+To: Michal Marek <mmarek@suse.cz>
+Cc: Andrew Morton <akpm@linux-foundation.org>, linux-kbuild@vger.kernel.org, Linux Kernel Development <linux-kernel@vger.kernel.org>
 
-Hi Folks,
+The usage help in the comments
+  - refers to the wrong script name,
+  - doesn't mention that $srctree must be set.
 
-On Sun, Dec 5, 2010 at 1:52 AM, Arnaud Lacombe <lacombar@gmail.com> wrote:
-> [...]
-That should be all for tonight. my kconfig queue is a bit smaller now.
-Michal, Sam, whoever read this mail, I allow you to hate me ;-)
+Hence correct the script name, and derive the source tree path from the script
+path, so we no longer need to rely on $srctree being set by the caller.
 
-ENEEDFOOD,
- - Arnaud
+Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
+Acked-by: Sam Ravnborg <sam@ravnborg.org>
+---
+Sent before on 2010-08-25.
+
+ scripts/checksyscalls.sh |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/scripts/checksyscalls.sh b/scripts/checksyscalls.sh
+index 6bb42e7..3ab316e 100755
+--- a/scripts/checksyscalls.sh
++++ b/scripts/checksyscalls.sh
+@@ -6,7 +6,7 @@
+ # and listed below so they are ignored.
+ #
+ # Usage:
+-# syscallchk gcc gcc-options
++# checksyscalls.sh gcc gcc-options
+ #
+ 
+ ignore_list() {
+@@ -204,5 +204,5 @@ sed -n -e '/^\#define/ s/[^_]*__NR_\([^[:space:]]*\).*/\
+ \#endif/p' $1
+ }
+ 
+-(ignore_list && syscall_list ${srctree}/arch/x86/include/asm/unistd_32.h) | \
++(ignore_list && syscall_list $(dirname $0)/../arch/x86/include/asm/unistd_32.h) | \
+ $* -E -x c - > /dev/null
+-- 
+1.7.0.4
+
+Gr{oetje,eeting}s,
+
+						Geert
+
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+							    -- Linus Torvalds
