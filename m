@@ -1,65 +1,71 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from gerard.telenet-ops.be ([195.130.132.48]:45589 "EHLO
-	gerard.telenet-ops.be" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752734Ab0LEJ4I (ORCPT
+Received: from rcsinet10.oracle.com ([148.87.113.121]:41824 "EHLO
+	rcsinet10.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754325Ab0LEQMf (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 5 Dec 2010 04:56:08 -0500
-Date: Sun, 5 Dec 2010 10:50:56 +0100 (CET)
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Subject: [PATCH/resend] checksyscalls: Fix stand-alone usage
-Message-ID: <alpine.DEB.2.00.1012051047510.17705@ayla.of.borg>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+	Sun, 5 Dec 2010 11:12:35 -0500
+Date: Sun, 5 Dec 2010 08:11:08 -0800
+From: Randy Dunlap <randy.dunlap@oracle.com>
+Subject: Re: [GIT] kbuild and kconfig fixes for 2.6.37-rc5
+Message-Id: <20101205081108.9bdb7504.randy.dunlap@oracle.com>
+In-Reply-To: <AANLkTimeyo==XJWUaUs8EzJvA8azkk3sw9FXQhMjuo6M@mail.gmail.com>
+References: <20101204135732.GA12774@sepie.suse.cz>
+	<AANLkTimeyo==XJWUaUs8EzJvA8azkk3sw9FXQhMjuo6M@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: Andrew Morton <akpm@linux-foundation.org>, linux-kbuild@vger.kernel.org, Linux Kernel Development <linux-kernel@vger.kernel.org>
+To: trapdoor6@gmail.com
+Cc: Michal Marek <mmarek@suse.cz>, Linus Torvalds <torvalds@linux-foundation.org>, brueckner@linux.vnet.ibm.com, lacombar@gmail.com, mchehab@redhat.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-The usage help in the comments
-  - refers to the wrong script name,
-  - doesn't mention that $srctree must be set.
+On Sun, 5 Dec 2010 15:42:46 +0000 trapDoor wrote:
 
-Hence correct the script name, and derive the source tree path from the script
-path, so we no longer need to rely on $srctree being set by the caller.
+> Hello,
+> I couldn't wait and I merged the changes into my copy of mainline
+> tree. The merge was successful, no conflicts and the merge-diffstat
+> was exactly the same as above. However, when  running oldconfig on the
+> patched kernel I still get lots of warnings:
+> 
+> warning: (GPIO_RDC321X && PCI && GPIOLIB) selects MFD_RDC321X which
+> has unmet direct dependencies (MFD_SUPPORT && PCI)
+> warning: (I2C_ISCH && I2C && PCI || GPIO_SCH && GPIOLIB && PCI ||
+> GPIO_VX855 && GPIOLIB || GPIO_RDC321X && PCI && GPIOLIB ||
+> MFD_88PM860X && MFD_SUPPORT && I2C=y && GENERIC_HARDIRQS || MFD_ASIC3
+> && MFD_SUPPORT && GENERIC_HARDIRQS && GPIOLIB && ARM ||
+> MFD_SH_MOBILE_SDHI && MFD_SUPPORT && (SUPERH || ARCH_SHMOBILE) ||
+> MFD_DAVINCI_VOICECODEC && MFD_SUPPORT || HTC_PASIC3 && MFD_SUPPORT ||
+> TPS6507X && MFD_SUPPORT && I2C || TWL4030_CODEC && MFD_SUPPORT &&
+> TWL4030_CORE || MFD_STMPE && MFD_SUPPORT && I2C=y && GENERIC_HARDIRQS
+> || MFD_TC35892 && MFD_SUPPORT && I2C=y && GENERIC_HARDIRQS ||
+> MFD_T7L66XB && MFD_SUPPORT && ARM && HAVE_CLK || MFD_TC6387XB &&
+> MFD_SUPPORT && ARM && HAVE_CLK || MFD_TC6393XB && MFD_SUPPORT &&
+> GPIOLIB && ARM || MFD_MAX8925 && MFD_SUPPORT && I2C=y &&
+> GENERIC_HARDIRQS || MFD_MAX8998 && MFD_SUPPORT && I2C=y &&
+> GENERIC_HARDIRQS || MFD_WM8400 && MFD_SUPPORT && I2C || MFD_WM831X_I2C
+> && MFD_SUPPORT && I2C=y && GENERIC_HARDIRQS || MFD_WM831X_SPI &&
+> MFD_SUPPORT && SPI_MASTER && GENERIC_HARDIRQS || MFD_WM8994 &&
+> MFD_SUPPORT && I2C=y && GENERIC_HARDIRQS || MFD_MC13XXX && MFD_SUPPORT
+> && SPI_MASTER || AB3100_CORE && MFD_SUPPORT && I2C=y && ABX500_CORE ||
+> AB8500_CORE && MFD_SUPPORT && GENERIC_HARDIRQS && ABX500_CORE &&
+> SPI_MASTER && ARCH_U8500 || AB3550_CORE && MFD_SUPPORT && I2C=y &&
+> GENERIC_HARDIRQS && ABX500_CORE || MFD_TIMBERDALE && MFD_SUPPORT &&
+> PCI && GPIOLIB || LPC_SCH && MFD_SUPPORT && PCI || MFD_RDC321X &&
+> MFD_SUPPORT && PCI || MFD_JANZ_CMODIO && MFD_SUPPORT && PCI ||
+> MFD_JZ4740_ADC && MFD_SUPPORT && MACH_JZ4740 || MFD_TPS6586X &&
+> MFD_SUPPORT && I2C=y && GPIOLIB && GENERIC_HARDIRQS || MFD_VX855 &&
+> MFD_SUPPORT && PCI) selects MFD_CORE which has unmet direct
+> dependencies (MFD_SUPPORT)
+> 
 
-Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
-Acked-by: Sam Ravnborg <sam@ravnborg.org>
+That's 2 warnings.  I have sent a patch for the first one.
+Looks like I need to resend it.
+
+
+> 
+> Were these warnings supposed to be fixed by this patch set as well? Or
+> is it something in my config (attached)?
+
 ---
-Sent before on 2010-08-25.
-
- scripts/checksyscalls.sh |    4 ++--
- 1 files changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/scripts/checksyscalls.sh b/scripts/checksyscalls.sh
-index 6bb42e7..3ab316e 100755
---- a/scripts/checksyscalls.sh
-+++ b/scripts/checksyscalls.sh
-@@ -6,7 +6,7 @@
- # and listed below so they are ignored.
- #
- # Usage:
--# syscallchk gcc gcc-options
-+# checksyscalls.sh gcc gcc-options
- #
- 
- ignore_list() {
-@@ -204,5 +204,5 @@ sed -n -e '/^\#define/ s/[^_]*__NR_\([^[:space:]]*\).*/\
- \#endif/p' $1
- }
- 
--(ignore_list && syscall_list ${srctree}/arch/x86/include/asm/unistd_32.h) | \
-+(ignore_list && syscall_list $(dirname $0)/../arch/x86/include/asm/unistd_32.h) | \
- $* -E -x c - > /dev/null
--- 
-1.7.0.4
-
-Gr{oetje,eeting}s,
-
-						Geert
-
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-							    -- Linus Torvalds
+~Randy
+*** Remember to use Documentation/SubmitChecklist when testing your code ***
