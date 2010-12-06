@@ -1,164 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from shadbolt.e.decadent.org.uk ([88.96.1.126]:37061 "EHLO
-	shadbolt.e.decadent.org.uk" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1750891Ab0LFAvC convert rfc822-to-8bit
-	(ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 5 Dec 2010 19:51:02 -0500
-From: Ben Hutchings <ben@decadent.org.uk>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-Date: Mon, 06 Dec 2010 00:50:49 +0000
-Message-ID: <1291596649.8025.104.camel@localhost>
-Mime-Version: 1.0
-Subject: [PATCHv3] Kbuild: kconfig: Verbose version of --listnewconfig
+Received: from cantor2.suse.de ([195.135.220.15]:35513 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750990Ab0LFGoX (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 6 Dec 2010 01:44:23 -0500
+Message-ID: <4CFC8640.2030105@suse.cz>
+Date: Mon, 06 Dec 2010 07:44:16 +0100
+From: Michal Marek <mmarek@suse.cz>
+MIME-Version: 1.0
+Subject: Re: [GIT] kbuild and kconfig fixes for 2.6.37-rc5
+References: <20101204135732.GA12774@sepie.suse.cz>	<AANLkTimeyo==XJWUaUs8EzJvA8azkk3sw9FXQhMjuo6M@mail.gmail.com> <AANLkTi=95UvsLTUFkS6bsFk9pO_iGgXfeoMf8BOVm0ed@mail.gmail.com>
+In-Reply-To: <AANLkTi=95UvsLTUFkS6bsFk9pO_iGgXfeoMf8BOVm0ed@mail.gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>, Roman Zippel <zippel@linux-m68k.org>
-Cc: Arnaud Lacombe <lacombar@gmail.com>, linux-kbuild@vger.kernel.org, Debian kernel maintainers <debian-kernel@lists.debian.org>
+To: Arnaud Lacombe <lacombar@gmail.com>
+Cc: trapdoor6@gmail.com, Linus Torvalds <torvalds@linux-foundation.org>, brueckner@linux.vnet.ibm.com, mchehab@redhat.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-If the KCONFIG_VERBOSE environment variable is set, show the default
-values of new symbols and not just their names.
+On 5.12.2010 17:13, Arnaud Lacombe wrote:
+> Hi,
+> 
+> On Sun, Dec 5, 2010 at 10:42 AM, trapDoor <trapdoor6@gmail.com> wrote:
+>> On Sat, Dec 4, 2010 at 1:57 PM, Michal Marek <mmarek@suse.cz> wrote:
+>>> Hi Linus,
+>>>
+>>> please pull these kbuild/kconfig fixes for the next -rc. The largest
+>>> part are fixes for the annoying kconfig warnings, contributed by Arnaud
+>>> Lacombe and Mauro Carvalho Chehab. The solution adds a new 'visible if'
+>>> keyword to the Kconfig language, so it's not exactly something that one
+>>> would expect in the rc phase, but the kconfig change is not huge (the
+>>> large diff is due to generated files) and it is deployed only in those
+>>> five Kconfig files that had the warnings and were hard to fix by other
+>>> means.  The second part is a forgotten patch by Hendrik Brueckner to
+>>> usr/initramfs, that fixes build for Blackfin and h8300.
+>> Hello,
+>> I couldn't wait and I merged the changes into my copy of mainline
+>> tree. The merge was successful, no conflicts and the merge-diffstat
+>> was exactly the same as above. However, when  running oldconfig on the
+>> patched kernel I still get lots of warnings:
+>>
+<sip>
+>>
+> Technically, this is two warning, though really verbose :)
+> 
+>>
+>> Were these warnings supposed to be fixed by this patch set as well? Or
+>> is it something in my config (attached)?
+>>
+> No. The kconfig language update is meant to be a solution for the +150
+> warnings triggered by the media and i2c tree, without making it
+> impossible to maintain. The notion of "dependency" was too strong for
+> the expected usage.
 
-Based on work by Bastian Blank <waldi@debian.org> and
-maximilian attems <max@stro.at>.  Simplified by Michal Marek
-<mmarek@suse.cz>.
+Yes, sorry for giving false hopes in my mail :-).
 
-Signed-off-by: Ben Hutchings <ben@decadent.org.uk>
----
-I believe this incorporates all the comments made on v2.
-
-Ben.
-
- scripts/kconfig/conf.c      |   37 +++++++++++++++++++++++++++----------
- scripts/kconfig/confdata.c  |    5 +++--
- scripts/kconfig/expr.h      |    2 ++
- scripts/kconfig/lkc_proto.h |    1 +
- 4 files changed, 33 insertions(+), 12 deletions(-)
-
-diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
-index 5459a38..31e4e7d 100644
---- a/scripts/kconfig/conf.c
-+++ b/scripts/kconfig/conf.c
-@@ -363,7 +363,6 @@ static void conf(struct menu *menu)
- 		switch (prop->type) {
- 		case P_MENU:
- 			if ((input_mode == silentoldconfig ||
--			     input_mode == listnewconfig ||
- 			     input_mode == oldnoconfig) &&
- 			    rootEntry != menu) {
- 				check_conf(menu);
-@@ -423,11 +422,7 @@ static void check_conf(struct menu *menu)
- 	if (sym && !sym_has_value(sym)) {
- 		if (sym_is_changable(sym) ||
- 		    (sym_is_choice(sym) && sym_get_tristate_value(sym) == yes)) {
--			if (input_mode == listnewconfig) {
--				if (sym->name && !sym_is_choice_value(sym)) {
--					printf("%s%s\n", CONFIG_, sym->name);
--				}
--			} else if (input_mode != oldnoconfig) {
-+			if (input_mode != oldnoconfig) {
- 				if (!conf_cnt++)
- 					printf(_("*\n* Restart config...\n*\n"));
- 				rootEntry = menu_get_parent_menu(menu);
-@@ -440,6 +435,27 @@ static void check_conf(struct menu *menu)
- 		check_conf(child);
- }
- 
-+static void report_conf(struct menu *menu, bool verbose)
-+{
-+	struct symbol *sym;
-+	struct menu *child;
-+
-+	if (!menu_is_visible(menu))
-+		return;
-+
-+	sym = menu->sym;
-+	if (sym && (sym->flags & SYMBOL_NEW) &&
-+	    sym_is_changable(sym) && sym->name && !sym_is_choice_value(sym)) {
-+		if (verbose)
-+			conf_write_symbol(sym, sym->type, stdout, true);
-+		else
-+			printf("%s%s\n", CONFIG_, sym->name);
-+	}
-+
-+	for (child = menu->list; child; child = child->next)
-+		report_conf(child, verbose);
-+}
-+
- static struct option long_opts[] = {
- 	{"oldaskconfig",    no_argument,       NULL, oldaskconfig},
- 	{"oldconfig",       no_argument,       NULL, oldconfig},
-@@ -604,16 +620,17 @@ int main(int ac, char **av)
- 		input_mode = silentoldconfig;
- 		/* fall through */
- 	case oldconfig:
--	case listnewconfig:
- 	case oldnoconfig:
- 	case silentoldconfig:
- 		/* Update until a loop caused no more changes */
- 		do {
- 			conf_cnt = 0;
- 			check_conf(&rootmenu);
--		} while (conf_cnt &&
--			 (input_mode != listnewconfig &&
--			  input_mode != oldnoconfig));
-+		} while (conf_cnt && input_mode != oldnoconfig);
-+		break;
-+	case listnewconfig:
-+		conf_set_all_new_symbols(def_default);
-+		report_conf(&rootmenu, getenv("KCONFIG_VERBOSE") != NULL);
- 		break;
- 	}
- 
-diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
-index c06f150..fbbacac 100644
---- a/scripts/kconfig/confdata.c
-+++ b/scripts/kconfig/confdata.c
-@@ -440,8 +440,8 @@ static void conf_write_string(bool headerfile, const char *name,
- 	fputs("\"\n", out);
- }
- 
--static void conf_write_symbol(struct symbol *sym, enum symbol_type type,
--                              FILE *out, bool write_no)
-+void conf_write_symbol(struct symbol *sym, enum symbol_type type,
-+		       FILE *out, bool write_no)
- {
- 	const char *str;
- 
-@@ -1009,6 +1009,7 @@ void conf_set_all_new_symbols(enum conf_def_mode mode)
- 	for_all_symbols(i, sym) {
- 		if (sym_has_value(sym))
- 			continue;
-+		sym->flags |= SYMBOL_NEW;
- 		switch (sym_get_type(sym)) {
- 		case S_BOOLEAN:
- 		case S_TRISTATE:
-diff --git a/scripts/kconfig/expr.h b/scripts/kconfig/expr.h
-index 184eb6a..b267933 100644
---- a/scripts/kconfig/expr.h
-+++ b/scripts/kconfig/expr.h
-@@ -108,6 +108,8 @@ struct symbol {
- #define SYMBOL_DEF3       0x40000  /* symbol.def[S_DEF_3] is valid */
- #define SYMBOL_DEF4       0x80000  /* symbol.def[S_DEF_4] is valid */
- 
-+#define SYMBOL_NEW        0x100000 /* symbol is new (loaded config did not provide a value) */
-+
- #define SYMBOL_MAXLENGTH	256
- #define SYMBOL_HASHSIZE		9973
- 
-diff --git a/scripts/kconfig/lkc_proto.h b/scripts/kconfig/lkc_proto.h
-index 17342fe..6da571b 100644
---- a/scripts/kconfig/lkc_proto.h
-+++ b/scripts/kconfig/lkc_proto.h
-@@ -7,6 +7,7 @@ P(conf_read_simple,int,(const char *name, int));
- P(conf_write_defconfig,int,(const char *name));
- P(conf_write,int,(const char *name));
- P(conf_write_autoconf,int,(void));
-+P(conf_write_symbol, void,(struct symbol*, enum symbol_type, FILE*, bool));
- P(conf_get_changed,bool,(void));
- P(conf_set_changed_callback, void,(void (*fn)(void)));
- P(conf_set_message_callback, void,(void (*fn)(const char *fmt, va_list ap)));
--- 
-1.7.2.3
-
-
+Michal
