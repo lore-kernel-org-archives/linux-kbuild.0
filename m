@@ -1,50 +1,124 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from rcsinet10.oracle.com ([148.87.113.121]:55066 "EHLO
-	rcsinet10.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753863Ab0LFTBS (ORCPT
+Received: from mail-vw0-f46.google.com ([209.85.212.46]:47832 "EHLO
+	mail-vw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751744Ab0LFT2w (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 6 Dec 2010 14:01:18 -0500
-Message-ID: <4CFD324B.8050800@oracle.com>
-Date: Mon, 06 Dec 2010 10:58:19 -0800
-From: Randy Dunlap <randy.dunlap@oracle.com>
-MIME-Version: 1.0
-Subject: Re: [GIT] kbuild and kconfig fixes for 2.6.37-rc5
-References: <20101204135732.GA12774@sepie.suse.cz>	<AANLkTimeyo==XJWUaUs8EzJvA8azkk3sw9FXQhMjuo6M@mail.gmail.com>	<20101205081108.9bdb7504.randy.dunlap@oracle.com>	<AANLkTimm1Xn4wwNAoDJ4hjnOmBOnxBgcsCzVEJTEag97@mail.gmail.com>	<AANLkTimXRBz7-mz_E_xdc85pGi7ExMy67XfDVF7jEt+Y@mail.gmail.com>	<4CFD258B.4030604@oracle.com> <AANLkTi=uMk74hYa-2aoVgj-F1h=+zGC2T=m4i__OwwQM@mail.gmail.com>
-In-Reply-To: <AANLkTi=uMk74hYa-2aoVgj-F1h=+zGC2T=m4i__OwwQM@mail.gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+	Mon, 6 Dec 2010 14:28:52 -0500
+Received: by vws16 with SMTP id 16so2851834vws.19
+        for <linux-kbuild@vger.kernel.org>; Mon, 06 Dec 2010 11:28:52 -0800 (PST)
+From: Arnaud Lacombe <lacombar@gmail.com>
+Subject: [PATCHv2] kconfig: simplify select-with-unmet-direct-dependency warning
+Date: Mon,  6 Dec 2010 14:27:49 -0500
+Message-Id: <1291663669-13077-1-git-send-email-lacombar@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnaud Lacombe <lacombar@gmail.com>
-Cc: Catalin Marinas <catalin.marinas@arm.com>, trapdoor6@gmail.com, Michal Marek <mmarek@suse.cz>, Linus Torvalds <torvalds@linux-foundation.org>, brueckner@linux.vnet.ibm.com, mchehab@redhat.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
+Cc: Arnaud Lacombe <lacombar@gmail.com>, Catalin Marinas <catalin.marinas@arm.com>
 
-On 12/06/10 10:56, Arnaud Lacombe wrote:
-> Hi,
-> 
-> On Mon, Dec 6, 2010 at 1:03 PM, Randy Dunlap <randy.dunlap@oracle.com> wrote:
->> On 12/06/10 10:01, Catalin Marinas wrote:
->> [...]
->>> This could be simplified to only show the first option of every '&&'
->>> expression, something like below:
->>>
->>> warning: I2C_ISCH selects MFD_CORE...
->>> warning: GPIO_SCH selects MFD_CORE...
->>>
->>> But I couldn't figure out whether the expression reduction code in
->>> kbuild reorders the options or not.
->>
-> This was the purpose of a patch I send a month or two ago, though, you
-> defeated it with cases the code was not taking into account. I updated
-> it since, but did not post it. I'll post it on linux-kbuild@ and
-> continue the discussion there.
-> 
->> I'm pretty sure that I have seen cases where the faulty kconfig is not the
->> first one listed, so all of them need to be available.
->>
-> do you have an example ?
+Hi,
 
-Not at hand, but I'll be on the lookout for one.
+This is an updated version of the patch I sent in mid-September to simplify the
+unmet dependency warnings.
 
+ - Arnaud
+
+---
+
+This is an attempt to simplify the expressing printed by kconfig when a
+symbol is selected but still has direct unmet dependency.
+
+First, the symbol reverse dependency is split in sub-expression. Then,
+each sub-expression is checked to ensure that it does not contains the
+unmet dependency. This removes all the false-positive symbols which
+already have the correct dependency. Finally, only the symbol doing the
+"select" is printed, instead of the full dependency tree.
+
+CC: Catalin Marinas <catalin.marinas@arm.com>
+Signed-off-by: Arnaud Lacombe <lacombar@gmail.com>
+---
+ scripts/kconfig/expr.c      |   35 ++++++++++++++++++++++++++++++++++-
+ scripts/kconfig/lkc_proto.h |    2 +-
+ scripts/kconfig/symbol.c    |    6 +++++-
+ 3 files changed, 40 insertions(+), 3 deletions(-)
+
+diff --git a/scripts/kconfig/expr.c b/scripts/kconfig/expr.c
+index 330e7c0..0a56c54 100644
+--- a/scripts/kconfig/expr.c
++++ b/scripts/kconfig/expr.c
+@@ -1013,7 +1013,40 @@ int expr_compare_type(enum expr_type t1, enum expr_type t2)
+ #endif
+ }
+ 
+-void expr_print(struct expr *e, void (*fn)(void *, struct symbol *, const char *), void *data, int prevtoken)
++static inline struct expr *
++expr_get_leftmost_symbol(const struct expr *e)
++{
++
++	if (e == NULL)
++		return NULL;
++
++	while (e->type != E_SYMBOL)
++		e = e->left.expr;
++
++	return expr_copy(e);
++}
++
++/*
++ * Given expression `e1' and `e2', returns the leaf of the longest
++ * sub-expression of `e1' not containing 'e2.
++ */
++struct expr *expr_simplify_unmet_dep(struct expr *e1, struct expr *e2)
++{
++	struct expr *e, *ret;
++
++	if (e1->type == E_OR)
++		return expr_alloc_and(
++		    expr_simplify_unmet_dep(e1->left.expr, e2),
++		    expr_simplify_unmet_dep(e1->right.expr, e2));
++
++	e = expr_alloc_and(expr_copy(e1), expr_copy(e2));
++	e = expr_eliminate_dups(e);
++	ret = (!expr_eq(e, e1)) ? e1 : NULL;
++	expr_free(e);
++	return expr_get_leftmost_symbol(ret);
++}
++
++void expr_print(const struct expr *e, void (*fn)(void *, struct symbol *, const char *), void *data, int prevtoken)
+ {
+ 	if (!e) {
+ 		fn(data, NULL, "y");
+diff --git a/scripts/kconfig/lkc_proto.h b/scripts/kconfig/lkc_proto.h
+index 47fe9c3..466eb1a 100644
+--- a/scripts/kconfig/lkc_proto.h
++++ b/scripts/kconfig/lkc_proto.h
+@@ -51,4 +51,4 @@ P(prop_get_type_name,const char *,(enum prop_type type));
+ 
+ /* expr.c */
+ P(expr_compare_type,int,(enum expr_type t1, enum expr_type t2));
+-P(expr_print,void,(struct expr *e, void (*fn)(void *, struct symbol *, const char *), void *data, int prevtoken));
++P(expr_print,void,(const struct expr *e, void (*fn)(void *, struct symbol *, const char *), void *data, int prevtoken));
+diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
+index 3acce4d..0c28a79 100644
+--- a/scripts/kconfig/symbol.c
++++ b/scripts/kconfig/symbol.c
+@@ -351,12 +351,16 @@ void sym_calc_value(struct symbol *sym)
+ 			}
+ 		calc_newval:
+ 			if (sym->dir_dep.tri == no && sym->rev_dep.tri != no) {
++				struct expr *e;
++				e = expr_simplify_unmet_dep(sym->rev_dep.expr,
++				    sym->dir_dep.expr);
+ 				fprintf(stderr, "warning: (");
+-				expr_fprint(sym->rev_dep.expr, stderr);
++				expr_fprint(e, stderr);
+ 				fprintf(stderr, ") selects %s which has unmet direct dependencies (",
+ 					sym->name);
+ 				expr_fprint(sym->dir_dep.expr, stderr);
+ 				fprintf(stderr, ")\n");
++				expr_free(e);
+ 			}
+ 			newval.tri = EXPR_OR(newval.tri, sym->rev_dep.tri);
+ 		}
 -- 
-~Randy
-*** Remember to use Documentation/SubmitChecklist when testing your code ***
+1.7.2.30.gc37d7.dirty
+
