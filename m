@@ -1,102 +1,71 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-fx0-f43.google.com ([209.85.161.43]:37184 "EHLO
-	mail-fx0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753666Ab0LHI5J convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 8 Dec 2010 03:57:09 -0500
-MIME-Version: 1.0
-In-Reply-To: <4CFEB6EB.9070502@redhat.com>
-References: <AANLkTikVM=zakYF7uhX1mYHy9QUVL6dmEPNsmV7=oyuh@mail.gmail.com>
-	<AANLkTi=iH6QOAph0iW6MR2khD5KCe8mRLPe8Y3QnTTTW@mail.gmail.com>
-	<AANLkTik2SWrmVJ1o98-e2CwJP9SAo6oMmnuLc4K+rT1R@mail.gmail.com>
-	<AANLkTikdNXdDoixEzGbirH+U_v62vDeEMGaRRpvTsJpu@mail.gmail.com>
-	<AANLkTin8Xf9SPcHrBPRPg+cnbWO94CwB4u6KQ2it1+Y9@mail.gmail.com>
-	<4CFEB6EB.9070502@redhat.com>
-Date: Wed, 8 Dec 2010 09:57:07 +0100
-Message-ID: <AANLkTiki9TXX46ELDuPUEXpW7pQsH666-TU7t1qmh5iC@mail.gmail.com>
-Subject: Re: visibility changes (was: Re: [GIT] kbuild and kconfig fixes for 2.6.37-rc5)
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+Received: from mail.asbjorn.biz ([217.195.185.3]:34024 "EHLO mail.asbjorn.biz"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751432Ab0LHVgF (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 8 Dec 2010 16:36:05 -0500
+From: Asbjoern Sloth Toennesen <asbjorn@asbjorn.biz>
+Subject: [PATCH v2] kbuild, deb-pkg: support overriding userland architecture
+Date: Wed,  8 Dec 2010 21:35:50 +0000
+Message-Id: <1291844150-4541-1-git-send-email-asbjorn@asbjorn.biz>
+In-Reply-To: <20101125143739.GC8192@sepie.suse.cz>
+References: <20101125143739.GC8192@sepie.suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Mauro Carvalho Chehab <mchehab@redhat.com>
-Cc: Arnaud Lacombe <lacombar@gmail.com>, Michal Marek <mmarek@suse.cz>, Linus Torvalds <torvalds@linux-foundation.org>, brueckner@linux.vnet.ibm.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, debian-kernel@lists.debian.org
 
-On Tue, Dec 7, 2010 at 23:36, Mauro Carvalho Chehab <mchehab@redhat.com> wrote:
-> Em 07-12-2010 18:45, Geert Uytterhoeven escreveu:
->> On Tue, Dec 7, 2010 at 21:40, Arnaud Lacombe <lacombar@gmail.com> wrote:
->>> On Tue, Dec 7, 2010 at 3:31 PM, Geert Uytterhoeven <geert@linux-m68k.org> wrote:
->>>> On Tue, Dec 7, 2010 at 20:51, Arnaud Lacombe <lacombar@gmail.com> wrote:
->>>>> On Tue, Dec 7, 2010 at 2:07 PM, Geert Uytterhoeven <geert@linux-m68k.org> wrote:
->>>>>> On Sat, Dec 4, 2010 at 14:57, Michal Marek <mmarek@suse.cz> wrote:
->>>>>>> please pull these kbuild/kconfig fixes for the next -rc. The largest
->>>>>>> part are fixes for the annoying kconfig warnings, contributed by Arnaud
->>>>>>> Lacombe and Mauro Carvalho Chehab. The solution adds a new 'visible if'
->>>>>>> keyword to the Kconfig language, so it's not exactly something that one
->>>>>>> would expect in the rc phase, but the kconfig change is not huge (the
->>>>>>> large diff is due to generated files) and it is deployed only in those
->>>>>>> five Kconfig files that had the warnings and were hard to fix by other
->>>>>>> means.  The second part is a forgotten patch by Hendrik Brueckner to
->>>>>>> usr/initramfs, that fixes build for Blackfin and h8300.
->>>>>>
->>>>>>> Arnaud Lacombe (5):
->>>>>>>      kconfig: add an option to determine a menu's visibility
->>>>>>
->>>>>> Hmm, this changeset also went in through the v4l tree?
->>>>>>
->>>>> Mauro merely imported the set in his tree to give them visibility and
->>>>> testing, but they went in trough the kbuild tree after being in -next
->>>>> for a week.
->>>>
->>>> Hmm, git show 86e187ff9bce9fbed7bfed92ae34f491cf1af50f doesn't
->>>> show a SoB from Michal...
->>>>
->>> Why would you expect it to ? Most of the commit in Linus' tree are not
->>> personally SoB by him.
->>
->> Sorry, you're right.
->>
->>>>>> BTW, I got confused:
->>>>>>  - make allmodconfig causes e.g.:
->>>>>>        CONFIG_VIDEO_HELPER_CHIPS_AUTO=y
->>>>>>        CONFIG_VIDEO_TVAUDIO=m
->>>>>>    => good
->>>>>>  - make oldconfig for my config with almost everything selected,
->>>>>> except for stuff I know that breaks:
->>>>>>        CONFIG_VIDEO_HELPER_CHIPS_AUTO=y
->>>>>>        # CONFIG_VIDEO_TVAUDIO is not set
->>>>>>    and no way to manually set CONFIG_VIDEO_TVAUDIO=y?
->>>>>>    => bad!
->>>>> that's difficult to judge without your old configuration.
->>>>> VIDEO_TVAUDIO is only selected by VIDEO_BT848 which you don't give
->>>>> information about.
->>>>
->>>> I don't have PCI, so I cannot enable VIDEO_BT848.
->>>>
->>> so why do you expect VIDEO_TVAUDIO to be enabled ?
->>
->> I don't expect it to be enabled, I expected to be able to enable it.
->> Allmodconfig
->> does enable it.
->
-> Why do you want to enable a device that doesn't work? There's no other driver
-> but bttv that has upport for the devices implemented by tvaudio module.
->
-> /me is confused...
+Usefull if building for sparc64 userland, because the
+sparc and sparc64 userlands use the same 64-bit kernel,
+making it impossible to always select the correct userland
+architecture for the resulting debian package.
 
-Compile coverage?
+Might also be usefull, if you want a i386 userland with a amd64 kernel.
 
-Haven't checked yet whether it gets enabled with allyesconfig, but allyesconfig
-contains a few things that don't work.
+Example usage:
+	make DEBARCH=i386 deb-pkg
 
-Gr{oetje,eeting}s,
+LKML-reference: <alpine.DEB.2.02.1011051437500.13287@aurora.sdinet.de>
+Signed-off-by: Asbjoern Sloth Toennesen <asbjorn@asbjorn.biz>
+Reviewed-by: WANG Cong <xiyou.wangcong@gmail.com>
+Acked-by: maximilian attems <max@stro.at>
+---
+ Documentation/kbuild/kbuild.txt |    8 ++++++++
+ scripts/package/builddeb        |    3 +++
+ 2 files changed, 11 insertions(+), 0 deletions(-)
 
-                        Geert
+diff --git a/Documentation/kbuild/kbuild.txt b/Documentation/kbuild/kbuild.txt
+index 634c625..2940df0 100644
+--- a/Documentation/kbuild/kbuild.txt
++++ b/Documentation/kbuild/kbuild.txt
+@@ -60,6 +60,14 @@ But some architectures such as x86 and sparc have aliases.
+ x86: i386 for 32 bit, x86_64 for 64 bit
+ sparc: sparc for 32 bit, sparc64 for 64 bit
+ 
++DEBARCH
++--------------------------------------------------
++For the deb-pkg target, allows overriding the normal heuristics deployed by
++deb-deb. Normally deb-pkg attempts to guess the right architecture based on
++the UTS_MACHINE variable, and on some architectures also the kernel config.
++The value of DEBARCH is assumed (not checked) to be a valid Debian
++architecture.
++
+ CROSS_COMPILE
+ --------------------------------------------------
+ Specify an optional fixed part of the binutils filename.
+diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+index 5d6be3f..22b6995 100644
+--- a/scripts/package/builddeb
++++ b/scripts/package/builddeb
+@@ -54,6 +54,9 @@ create_package() {
+ 		echo "Please add support for $UTS_MACHINE to ${0} ..." >&2
+ 		echo "" >&2
+ 	esac
++	if [ -n "$DEBARCH" ] ; then
++		debarch="$DEBARCH"
++	fi
+ 	if [ -n "$debarch" ] ; then
+ 		forcearch="-DArchitecture=$debarch"
+ 	fi
+-- 
+1.7.2.3
 
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
