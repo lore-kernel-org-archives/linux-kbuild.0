@@ -1,57 +1,76 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.asbjorn.biz ([217.195.185.3]:60033 "EHLO mail.asbjorn.biz"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753932Ab0LIPmJ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 9 Dec 2010 10:42:09 -0500
-Message-ID: <4D00F8CF.7010907@asbjorn.biz>
-Date: Thu, 09 Dec 2010 15:42:07 +0000
-From: =?UTF-8?B?QXNiasO4cm4gU2xvdGggVMO4bm5lc2Vu?= <asbjorn@asbjorn.biz>
+Received: from mail-gy0-f174.google.com ([209.85.160.174]:40189 "EHLO
+	mail-gy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750933Ab0LIP6m convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 9 Dec 2010 10:58:42 -0500
+Received: by gyb11 with SMTP id 11so1450665gyb.19
+        for <linux-kbuild@vger.kernel.org>; Thu, 09 Dec 2010 07:58:41 -0800 (PST)
 MIME-Version: 1.0
-Subject: Re: [PATCH v3] kbuild, deb-pkg: support overriding userland architecture
-References: <4D00F473.9090009@asbjorn.biz> <1291908254-19468-1-git-send-email-asbjorn@asbjorn.biz> <4D00F709.1000406@suse.cz>
-In-Reply-To: <4D00F709.1000406@suse.cz>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <4D009D4A0200007800026DDB@vpn.id2.novell.com>
+References: <4D009D4A0200007800026DDB@vpn.id2.novell.com>
+Date: Thu, 9 Dec 2010 10:58:41 -0500
+Message-ID: <AANLkTikrnC4mbFN31Ct90St7f7Hv0a0Z4TR6qPs+4w-t@mail.gmail.com>
+Subject: Re: [PATCH] fix undesirable side effect of adding "visible" menu attribute
+From: Arnaud Lacombe <lacombar@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, debian-kernel@lists.debian.org
+To: Jan Beulich <JBeulich@novell.com>
+Cc: linux-kbuild@vger.kernel.org, mchehab@redhat.com, Michal Marek <mmarek@suse.cz>
 
-On 12/09/2010 03:34 PM, Michal Marek wrote:
-> On 9.12.2010 16:24, Asbjoern Sloth Toennesen wrote:
->> Usefull if building for sparc64 userland, because the
->> sparc and sparc64 userlands use the same 64-bit kernel,
->> making it impossible to always select the correct userland
->> architecture for the resulting debian package.
->>
->> Might also be usefull, if you want a i386 userland with a amd64 kernel.
->>
->> Example usage:
->> 	make KBUILD_DEBARCH=i386 deb-pkg
->>
->> LKML-reference: <alpine.DEB.2.02.1011051437500.13287@aurora.sdinet.de>
->> Signed-off-by: Asbjoern Sloth Toennesen <asbjorn@asbjorn.biz>
->> Reviewed-by: WANG Cong <xiyou.wangcong@gmail.com>
->> Acked-by: maximilian attems <max@stro.at>
->> ---
->>  Documentation/kbuild/kbuild.txt |    8 ++++++++
->>  scripts/package/builddeb        |    3 +++
->>  2 files changed, 11 insertions(+), 0 deletions(-)
->>
->> diff --git a/Documentation/kbuild/kbuild.txt b/Documentation/kbuild/kbuild.txt
->> index 634c625..9cf3bf0 100644
->> --- a/Documentation/kbuild/kbuild.txt
->> +++ b/Documentation/kbuild/kbuild.txt
->> @@ -60,6 +60,14 @@ But some architectures such as x86 and sparc have aliases.
->>  x86: i386 for 32 bit, x86_64 for 64 bit
->>  sparc: sparc for 32 bit, sparc64 for 64 bit
->>  
->> +KBUILD_DEBARCH
->> +--------------------------------------------------
->> +For the deb-pkg target, allows overriding the normal heuristics deployed by
->> +deb-deb. Normally deb-pkg attempts to guess the right architecture based on
->    ^^^^^^^
-> 
-> deb-pkg?
+Hi,
 
-Sure. Anything else before I make a v4?
+On Thu, Dec 9, 2010 at 3:11 AM, Jan Beulich <JBeulich@novell.com> wrote:
+> This lead to non-selected, non-user-selectable options to be written
+> out to .config. This is not only pointless, but also preventing the
+> user to be prompted should any of those options eventually become
+> visible (e.g. by de-selecting the *_AUTO options the "visible"
+> attribute was added for.
+>
+> Furthermore it is quite logical for the "visible" attribute of a menu
+> to control the visibility of all contained prompts, which is what the
+> patch does.
+>
+> Signed-off-by: Jan Beulich <jbeulich@novell.com>
+>
+> ---
+>  scripts/kconfig/menu.c |   14 ++++++++++++++
+>  1 file changed, 14 insertions(+)
+>
+> --- 2.6.37-rc5/scripts/kconfig/menu.c
+> +++ 2.6.37-rc5-kconfig-propagate-visibility/scripts/kconfig/menu.c
+> @@ -140,6 +140,20 @@ struct property *menu_add_prop(enum prop
+>                }
+>                if (current_entry->prompt && current_entry != &rootmenu)
+>                        prop_warn(prop, "prompt redefined");
+> +
+> +               /* Apply all upper menus' visibilities to actual prompts. */
+> +               if(type == P_PROMPT) {
+> +                       struct menu *menu = current_entry;
+> +
+> +                       while ((menu = menu->parent) != NULL) {
+> +                               if (!menu->visibility)
+> +                                       continue;
+> +                               prop->visible.expr
+> +                                       = expr_alloc_and(prop->visible.expr,
+> +                                                        menu->visibility);
+> +                       }
+> +               }
+> +
+Shouldn't this better to be done in menu_finalize() ?
+
+I'm not either a big fan of testing `menu->visibility' truth, it is an
+expression which should be expended by the proper expr_* accessor to
+have less things to fix later.
+
+ - Arnaud
+
+>                current_entry->prompt = prop;
+>        }
+>        prop->text = prompt;
+>
+>
+>
+>
