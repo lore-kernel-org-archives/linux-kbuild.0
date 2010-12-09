@@ -1,71 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.asbjorn.biz ([217.195.185.3]:34024 "EHLO mail.asbjorn.biz"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751432Ab0LHVgF (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 8 Dec 2010 16:36:05 -0500
-From: Asbjoern Sloth Toennesen <asbjorn@asbjorn.biz>
-Subject: [PATCH v2] kbuild, deb-pkg: support overriding userland architecture
-Date: Wed,  8 Dec 2010 21:35:50 +0000
-Message-Id: <1291844150-4541-1-git-send-email-asbjorn@asbjorn.biz>
-In-Reply-To: <20101125143739.GC8192@sepie.suse.cz>
-References: <20101125143739.GC8192@sepie.suse.cz>
+Message-Id: <4D009D4A0200007800026DDB@vpn.id2.novell.com>
+Date: Thu, 09 Dec 2010 08:11:38 +0000
+From: "Jan Beulich" <JBeulich@novell.com>
+Subject: [PATCH] fix undesirable side effect of adding "visible" menu
+	 attribute
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8BIT
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, debian-kernel@lists.debian.org
+To: linux-kbuild@vger.kernel.org
+Cc: Arnaud Lacombe <lacombar@gmail.com>, mchehab@redhat.com, Michal Marek <mmarek@suse.cz>
 
-Usefull if building for sparc64 userland, because the
-sparc and sparc64 userlands use the same 64-bit kernel,
-making it impossible to always select the correct userland
-architecture for the resulting debian package.
+This lead to non-selected, non-user-selectable options to be written
+out to .config. This is not only pointless, but also preventing the
+user to be prompted should any of those options eventually become
+visible (e.g. by de-selecting the *_AUTO options the "visible"
+attribute was added for.
 
-Might also be usefull, if you want a i386 userland with a amd64 kernel.
+Furthermore it is quite logical for the "visible" attribute of a menu
+to control the visibility of all contained prompts, which is what the
+patch does.
 
-Example usage:
-	make DEBARCH=i386 deb-pkg
+Signed-off-by: Jan Beulich <jbeulich@novell.com>
 
-LKML-reference: <alpine.DEB.2.02.1011051437500.13287@aurora.sdinet.de>
-Signed-off-by: Asbjoern Sloth Toennesen <asbjorn@asbjorn.biz>
-Reviewed-by: WANG Cong <xiyou.wangcong@gmail.com>
-Acked-by: maximilian attems <max@stro.at>
 ---
- Documentation/kbuild/kbuild.txt |    8 ++++++++
- scripts/package/builddeb        |    3 +++
- 2 files changed, 11 insertions(+), 0 deletions(-)
+ scripts/kconfig/menu.c |   14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
-diff --git a/Documentation/kbuild/kbuild.txt b/Documentation/kbuild/kbuild.txt
-index 634c625..2940df0 100644
---- a/Documentation/kbuild/kbuild.txt
-+++ b/Documentation/kbuild/kbuild.txt
-@@ -60,6 +60,14 @@ But some architectures such as x86 and sparc have aliases.
- x86: i386 for 32 bit, x86_64 for 64 bit
- sparc: sparc for 32 bit, sparc64 for 64 bit
- 
-+DEBARCH
-+--------------------------------------------------
-+For the deb-pkg target, allows overriding the normal heuristics deployed by
-+deb-deb. Normally deb-pkg attempts to guess the right architecture based on
-+the UTS_MACHINE variable, and on some architectures also the kernel config.
-+The value of DEBARCH is assumed (not checked) to be a valid Debian
-+architecture.
+--- 2.6.37-rc5/scripts/kconfig/menu.c
++++ 2.6.37-rc5-kconfig-propagate-visibility/scripts/kconfig/menu.c
+@@ -140,6 +140,20 @@ struct property *menu_add_prop(enum prop
+ 		}
+ 		if (current_entry->prompt && current_entry != &rootmenu)
+ 			prop_warn(prop, "prompt redefined");
 +
- CROSS_COMPILE
- --------------------------------------------------
- Specify an optional fixed part of the binutils filename.
-diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-index 5d6be3f..22b6995 100644
---- a/scripts/package/builddeb
-+++ b/scripts/package/builddeb
-@@ -54,6 +54,9 @@ create_package() {
- 		echo "Please add support for $UTS_MACHINE to ${0} ..." >&2
- 		echo "" >&2
- 	esac
-+	if [ -n "$DEBARCH" ] ; then
-+		debarch="$DEBARCH"
-+	fi
- 	if [ -n "$debarch" ] ; then
- 		forcearch="-DArchitecture=$debarch"
- 	fi
--- 
-1.7.2.3
++		/* Apply all upper menus' visibilities to actual prompts. */
++		if(type == P_PROMPT) {
++			struct menu *menu = current_entry;
++
++			while ((menu = menu->parent) != NULL) {
++				if (!menu->visibility)
++					continue;
++				prop->visible.expr
++					= expr_alloc_and(prop->visible.expr,
++							 menu->visibility);
++			}
++		}
++
+ 		current_entry->prompt = prop;
+ 	}
+ 	prop->text = prompt;
+
+
 
