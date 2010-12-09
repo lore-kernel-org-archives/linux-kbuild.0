@@ -1,57 +1,42 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Message-Id: <4D009D4A0200007800026DDB@vpn.id2.novell.com>
-Date: Thu, 09 Dec 2010 08:11:38 +0000
-From: "Jan Beulich" <JBeulich@novell.com>
-Subject: [PATCH] fix undesirable side effect of adding "visible" menu
-	 attribute
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8BIT
+Received: from vostochny.stro.at ([78.47.22.85]:40309 "EHLO vostochny.stro.at"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751222Ab0LIOYs (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 9 Dec 2010 09:24:48 -0500
+Date: Thu, 9 Dec 2010 14:24:47 +0000
+From: maximilian attems <max@stro.at>
+Subject: Re: [PATCH v2] kbuild, deb-pkg: support overriding userland
+	architecture
+Message-ID: <20101209142447.GA12350@vostochny.stro.at>
+References: <20101125143739.GC8192@sepie.suse.cz> <1291844150-4541-1-git-send-email-asbjorn@asbjorn.biz>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <1291844150-4541-1-git-send-email-asbjorn@asbjorn.biz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Arnaud Lacombe <lacombar@gmail.com>, mchehab@redhat.com, Michal Marek <mmarek@suse.cz>
+To: Asbjoern Sloth Toennesen <asbjorn@asbjorn.biz>
+Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, debian-kernel@lists.debian.org
 
-This lead to non-selected, non-user-selectable options to be written
-out to .config. This is not only pointless, but also preventing the
-user to be prompted should any of those options eventually become
-visible (e.g. by de-selecting the *_AUTO options the "visible"
-attribute was added for.
+On Wed, Dec 08, 2010 at 09:35:50PM +0000, Asbjoern Sloth Toennesen wrote:
+> Usefull if building for sparc64 userland, because the
+> sparc and sparc64 userlands use the same 64-bit kernel,
+> making it impossible to always select the correct userland
+> architecture for the resulting debian package.
+> 
+> Might also be usefull, if you want a i386 userland with a amd64 kernel.
+> 
+> Example usage:
+> 	make DEBARCH=i386 deb-pkg
 
-Furthermore it is quite logical for the "visible" attribute of a menu
-to control the visibility of all contained prompts, which is what the
-patch does.
+hmm the conclusion was to prepend a KBUILD_ prefix for a kbuild variable?
+Any reason why that was overlooked?
 
-Signed-off-by: Jan Beulich <jbeulich@novell.com>
+I checked man devscripts and saw yet no definition of DEBARCH, but in order
+not to have any potential conflicts and to keep namespase sane I think
+it is very much preferred to use KBUILD_DEBARCH.
 
----
- scripts/kconfig/menu.c |   14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+thanks
 
---- 2.6.37-rc5/scripts/kconfig/menu.c
-+++ 2.6.37-rc5-kconfig-propagate-visibility/scripts/kconfig/menu.c
-@@ -140,6 +140,20 @@ struct property *menu_add_prop(enum prop
- 		}
- 		if (current_entry->prompt && current_entry != &rootmenu)
- 			prop_warn(prop, "prompt redefined");
-+
-+		/* Apply all upper menus' visibilities to actual prompts. */
-+		if(type == P_PROMPT) {
-+			struct menu *menu = current_entry;
-+
-+			while ((menu = menu->parent) != NULL) {
-+				if (!menu->visibility)
-+					continue;
-+				prop->visible.expr
-+					= expr_alloc_and(prop->visible.expr,
-+							 menu->visibility);
-+			}
-+		}
-+
- 		current_entry->prompt = prop;
- 	}
- 	prop->text = prompt;
-
-
-
+-- 
+maks
