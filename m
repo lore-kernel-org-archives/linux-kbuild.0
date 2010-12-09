@@ -1,56 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:36510 "EHLO mx2.suse.de"
+Received: from mail.asbjorn.biz ([217.195.185.3]:60033 "EHLO mail.asbjorn.biz"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751563Ab0LIPef (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 9 Dec 2010 10:34:35 -0500
-Message-ID: <4D00F709.1000406@suse.cz>
-Date: Thu, 09 Dec 2010 16:34:33 +0100
-From: Michal Marek <mmarek@suse.cz>
+	id S1753932Ab0LIPmJ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 9 Dec 2010 10:42:09 -0500
+Message-ID: <4D00F8CF.7010907@asbjorn.biz>
+Date: Thu, 09 Dec 2010 15:42:07 +0000
+From: =?UTF-8?B?QXNiasO4cm4gU2xvdGggVMO4bm5lc2Vu?= <asbjorn@asbjorn.biz>
 MIME-Version: 1.0
 Subject: Re: [PATCH v3] kbuild, deb-pkg: support overriding userland architecture
-References: <4D00F473.9090009@asbjorn.biz> <1291908254-19468-1-git-send-email-asbjorn@asbjorn.biz>
-In-Reply-To: <1291908254-19468-1-git-send-email-asbjorn@asbjorn.biz>
-Content-Type: text/plain; charset=ISO-8859-2
+References: <4D00F473.9090009@asbjorn.biz> <1291908254-19468-1-git-send-email-asbjorn@asbjorn.biz> <4D00F709.1000406@suse.cz>
+In-Reply-To: <4D00F709.1000406@suse.cz>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Asbjoern Sloth Toennesen <asbjorn@asbjorn.biz>
+To: Michal Marek <mmarek@suse.cz>
 Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, debian-kernel@lists.debian.org
 
-On 9.12.2010 16:24, Asbjoern Sloth Toennesen wrote:
-> Usefull if building for sparc64 userland, because the
-> sparc and sparc64 userlands use the same 64-bit kernel,
-> making it impossible to always select the correct userland
-> architecture for the resulting debian package.
+On 12/09/2010 03:34 PM, Michal Marek wrote:
+> On 9.12.2010 16:24, Asbjoern Sloth Toennesen wrote:
+>> Usefull if building for sparc64 userland, because the
+>> sparc and sparc64 userlands use the same 64-bit kernel,
+>> making it impossible to always select the correct userland
+>> architecture for the resulting debian package.
+>>
+>> Might also be usefull, if you want a i386 userland with a amd64 kernel.
+>>
+>> Example usage:
+>> 	make KBUILD_DEBARCH=i386 deb-pkg
+>>
+>> LKML-reference: <alpine.DEB.2.02.1011051437500.13287@aurora.sdinet.de>
+>> Signed-off-by: Asbjoern Sloth Toennesen <asbjorn@asbjorn.biz>
+>> Reviewed-by: WANG Cong <xiyou.wangcong@gmail.com>
+>> Acked-by: maximilian attems <max@stro.at>
+>> ---
+>>  Documentation/kbuild/kbuild.txt |    8 ++++++++
+>>  scripts/package/builddeb        |    3 +++
+>>  2 files changed, 11 insertions(+), 0 deletions(-)
+>>
+>> diff --git a/Documentation/kbuild/kbuild.txt b/Documentation/kbuild/kbuild.txt
+>> index 634c625..9cf3bf0 100644
+>> --- a/Documentation/kbuild/kbuild.txt
+>> +++ b/Documentation/kbuild/kbuild.txt
+>> @@ -60,6 +60,14 @@ But some architectures such as x86 and sparc have aliases.
+>>  x86: i386 for 32 bit, x86_64 for 64 bit
+>>  sparc: sparc for 32 bit, sparc64 for 64 bit
+>>  
+>> +KBUILD_DEBARCH
+>> +--------------------------------------------------
+>> +For the deb-pkg target, allows overriding the normal heuristics deployed by
+>> +deb-deb. Normally deb-pkg attempts to guess the right architecture based on
+>    ^^^^^^^
 > 
-> Might also be usefull, if you want a i386 userland with a amd64 kernel.
-> 
-> Example usage:
-> 	make KBUILD_DEBARCH=i386 deb-pkg
-> 
-> LKML-reference: <alpine.DEB.2.02.1011051437500.13287@aurora.sdinet.de>
-> Signed-off-by: Asbjoern Sloth Toennesen <asbjorn@asbjorn.biz>
-> Reviewed-by: WANG Cong <xiyou.wangcong@gmail.com>
-> Acked-by: maximilian attems <max@stro.at>
-> ---
->  Documentation/kbuild/kbuild.txt |    8 ++++++++
->  scripts/package/builddeb        |    3 +++
->  2 files changed, 11 insertions(+), 0 deletions(-)
-> 
-> diff --git a/Documentation/kbuild/kbuild.txt b/Documentation/kbuild/kbuild.txt
-> index 634c625..9cf3bf0 100644
-> --- a/Documentation/kbuild/kbuild.txt
-> +++ b/Documentation/kbuild/kbuild.txt
-> @@ -60,6 +60,14 @@ But some architectures such as x86 and sparc have aliases.
->  x86: i386 for 32 bit, x86_64 for 64 bit
->  sparc: sparc for 32 bit, sparc64 for 64 bit
->  
-> +KBUILD_DEBARCH
-> +--------------------------------------------------
-> +For the deb-pkg target, allows overriding the normal heuristics deployed by
-> +deb-deb. Normally deb-pkg attempts to guess the right architecture based on
-   ^^^^^^^
+> deb-pkg?
 
-deb-pkg?
-
-Michal
+Sure. Anything else before I make a v4?
