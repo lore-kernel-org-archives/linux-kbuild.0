@@ -1,44 +1,71 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Message-Id: <4D01149A020000780002705C@vpn.id2.novell.com>
-Date: Thu, 09 Dec 2010 16:40:42 +0000
-From: "Jan Beulich" <JBeulich@novell.com>
-Subject: Re: [PATCH] fix undesirable side effect of adding "visible"
-	 menu attribute
-References: <4D009D4A0200007800026DDB@vpn.id2.novell.com>
- <AANLkTikrnC4mbFN31Ct90St7f7Hv0a0Z4TR6qPs+4w-t@mail.gmail.com>
- <AANLkTi=vnF-3JoBN+PYGXAXN2SDBocbLUQMRV2kPNo5U@mail.gmail.com>
-In-Reply-To: <AANLkTi=vnF-3JoBN+PYGXAXN2SDBocbLUQMRV2kPNo5U@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8BIT
-Content-Disposition: inline
+Received: from mail.asbjorn.biz ([217.195.185.3]:37935 "EHLO mail.asbjorn.biz"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752623Ab0LLRsE (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 12 Dec 2010 12:48:04 -0500
+From: Asbjoern Sloth Toennesen <asbjorn@asbjorn.biz>
+Subject: [PATCH v4] kbuild, deb-pkg: support overriding userland architecture
+Date: Sun, 12 Dec 2010 17:39:40 +0000
+Message-Id: <1292175580-22085-1-git-send-email-asbjorn@asbjorn.biz>
+In-Reply-To: <4D00F709.1000406@suse.cz>
+References: <4D00F709.1000406@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnaud Lacombe <lacombar@gmail.com>
-Cc: mchehab@redhat.com, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, debian-kernel@lists.debian.org
 
->>> On 09.12.10 at 17:07, Arnaud Lacombe <lacombar@gmail.com> wrote:
-> On Thu, Dec 9, 2010 at 10:58 AM, Arnaud Lacombe <lacombar@gmail.com> wrote:
-> [..]
->> I'm not either a big fan of testing `menu->visibility' truth, it is an
->> expression which should be expended by the proper expr_* accessor to
->> have less things to fix later.
->>
-> gniarf, forget about that paragraph, I'm not fully awaken :/
-> 
-> What I thought about was the case where the visible property would
-> explicitly default to 'y' in which case the expression will have to be
-> simplified/manipulated, in that case, menu_finalize() will be the
-> place to do that, so this come back to my first comment.
+Usefull if building for sparc64 userland, because the
+sparc and sparc64 userlands use the same 64-bit kernel,
+making it impossible to always select the correct userland
+architecture for the resulting debian package.
 
-I'm not sure in menu_finalize() you can properly/easily deal with
-multiple prompts associated with the same symbol under different
-menus.
+Might also be usefull, if you want a i386 userland with a amd64 kernel.
 
-Anyway, the patch I proposed works (for me), and I'm hoping
-to get it in unless someone (you?) comes up with a better one.
-Not fixing the (presumably unintended) side effect of your
-earlier patch seems undesirable to me.
+Example usage:
+	make KBUILD_DEBARCH=i386 deb-pkg
 
-Jan
+LKML-reference: <alpine.DEB.2.02.1011051437500.13287@aurora.sdinet.de>
+Signed-off-by: Asbjoern Sloth Toennesen <asbjorn@asbjorn.biz>
+Reviewed-by: WANG Cong <xiyou.wangcong@gmail.com>
+Acked-by: maximilian attems <max@stro.at>
+---
+ Documentation/kbuild/kbuild.txt |    8 ++++++++
+ scripts/package/builddeb        |    3 +++
+ 2 files changed, 11 insertions(+), 0 deletions(-)
+
+diff --git a/Documentation/kbuild/kbuild.txt b/Documentation/kbuild/kbuild.txt
+index 634c625..b146eb8 100644
+--- a/Documentation/kbuild/kbuild.txt
++++ b/Documentation/kbuild/kbuild.txt
+@@ -51,6 +51,14 @@ Specify the output directory when building the kernel.
+ The output directory can also be specificed using "O=...".
+ Setting "O=..." takes precedence over KBUILD_OUTPUT.
+ 
++KBUILD_DEBARCH
++--------------------------------------------------
++For the deb-pkg target, allows overriding the normal heuristics deployed by
++deb-pkg. Normally deb-pkg attempts to guess the right architecture based on
++the UTS_MACHINE variable, and on some architectures also the kernel config.
++The value of KBUILD_DEBARCH is assumed (not checked) to be a valid Debian
++architecture.
++
+ ARCH
+ --------------------------------------------------
+ Set ARCH to the architecture to be built.
+diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+index 5d6be3f..ffe2419 100644
+--- a/scripts/package/builddeb
++++ b/scripts/package/builddeb
+@@ -54,6 +54,9 @@ create_package() {
+ 		echo "Please add support for $UTS_MACHINE to ${0} ..." >&2
+ 		echo "" >&2
+ 	esac
++	if [ -n "$KBUILD_DEBARCH" ] ; then
++		debarch="$KBUILD_DEBARCH"
++	fi
+ 	if [ -n "$debarch" ] ; then
+ 		forcearch="-DArchitecture=$debarch"
+ 	fi
+-- 
+1.7.2.3
 
