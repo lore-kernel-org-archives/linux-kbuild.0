@@ -1,35 +1,61 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:54306 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:56367 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751014Ab0LNOL3 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 14 Dec 2010 09:11:29 -0500
-Message-ID: <4D077B0C.2000503@suse.cz>
-Date: Tue, 14 Dec 2010 15:11:24 +0100
+	id S1753219Ab0LNP3V (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 14 Dec 2010 10:29:21 -0500
+Message-ID: <4D078D53.4040700@suse.cz>
+Date: Tue, 14 Dec 2010 16:29:23 +0100
 From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Subject: Re: [PATCH v3] headers_install: check exit status of unifdef
-References: <1290552096-28568-1-git-send-email-vapier@gentoo.org> <1290560042-30381-1-git-send-email-vapier@gentoo.org>
-In-Reply-To: <1290560042-30381-1-git-send-email-vapier@gentoo.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] kbuild: fix interaction of CONFIG_IKCONFIG and KCONFIG_CONFIG
+References: <1290797770-22877-1-git-send-email-bengardiner@nanometrics.ca>
+In-Reply-To: <1290797770-22877-1-git-send-email-bengardiner@nanometrics.ca>
+Content-Type: text/plain; charset=ISO-8859-2; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Mike Frysinger <vapier@gentoo.org>
-Cc: linux-kbuild@vger.kernel.org
+To: Ben Gardiner <bengardiner@nanometrics.ca>
+Cc: Roman Zippel <zippel@linux-m68k.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On 24.11.2010 01:54, Mike Frysinger wrote:
-> If unifdef fails for any reason (like segfaulting), we should be aborting
-> the install steps.  So check its exit status in this unlikely scenario.
+On 26.11.2010 19:56, Ben Gardiner wrote:
+> Change the use of .config in kernel/Makefile to $(KCONFIG_CONFIG).
 >
-> Reported-by: Diego Elio Pettenò<flameeyes@gentoo.org>
-> Signed-off-by: Mike Frysinger<vapier@gentoo.org>
+> Currently, if you try to build a kernel with KCONFIG_CONFIG set (to a value
+> not equal to .config) and the config file pointed to by KCONFIG_CONFIG sets
+> CONFIG_IKCONFIG then the build will fail with:
+>
+> make[1]: *** No rule to make target `.config', needed by `kernel/config_data.gz'.  Stop.
+>
+> I think this has been present since the introduction of KCONFIG_CONFIG
+> in 14cdd3c402bf7c66f0bcd76e290f0770a54a4b21.
+>
+> Signed-off-by: Ben Gardiner<bengardiner@nanometrics.ca>
+> CC: Roman Zippel<zippel@linux-m68k.org>
+> CC: Michal Marek<mmarek@suse.cz>
+>
 > ---
-> v3
-> 	- fix thinko pointed out by Randy
+> based on 698fd6a2c3ca05ec796072defb5c415289a86cdc of
+> git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux-2.6.git
 >
->   scripts/headers_install.pl |    7 +++++++
->   1 files changed, 7 insertions(+), 0 deletions(-)
+>   kernel/Makefile |    2 +-
+>   1 files changed, 1 insertions(+), 1 deletions(-)
+>
+> diff --git a/kernel/Makefile b/kernel/Makefile
+> index 0b5ff08..33e0a39 100644
+> --- a/kernel/Makefile
+> +++ b/kernel/Makefile
+> @@ -121,7 +121,7 @@ $(obj)/configs.o: $(obj)/config_data.h
+>   # config_data.h contains the same information as ikconfig.h but gzipped.
+>   # Info from config_data can be extracted from /proc/config*
+>   targets += config_data.gz
+> -$(obj)/config_data.gz: .config FORCE
+> +$(obj)/config_data.gz: $(KCONFIG_CONFIG) FORCE
+>   	$(call if_changed,gzip)
+>
+>   quiet_cmd_ikconfiggz = IKCFG   $@
 
-Applied to kbuild-2.6#kbuild, thanks.
+The problem is that KCONFIG_CONFIG is not exported in the top-level 
+Makefile. If you want to use it in other Makefiles, you need to add the 
+export.
 
 Michal
