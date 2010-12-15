@@ -1,49 +1,56 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from nat.scz.novell.com ([213.151.88.252]:34724 "EHLO pobox.suse.cz"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1752460Ab0LOWtt (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 15 Dec 2010 17:49:49 -0500
-Date: Wed, 15 Dec 2010 23:49:48 +0100
-From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [PATCH 1/5] kconfig: make hexadecimal prefix mandatory for
-	S_HEX default value
-Message-ID: <20101215224948.GC21436@pobox.suse.cz>
-References: <1291530566-23531-1-git-send-email-lacombar@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1291530566-23531-1-git-send-email-lacombar@gmail.com>
+Received: from smtp11.smtpout.orange.fr ([80.12.242.133]:28304 "EHLO
+	smtp.smtpout.orange.fr" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752261Ab0LOXTE (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 15 Dec 2010 18:19:04 -0500
+From: "Yann E. MORIN" <yann.morin.1998@anciens.enib.fr>
+Subject: [PATCH] Documentation/kbuild: add info that 'choice' can have a symbol name
+Date: Thu, 16 Dec 2010 00:19:00 +0100
+Message-Id: <1292455140-5869-1-git-send-email-yann.morin.1998@anciens.enib.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnaud Lacombe <lacombar@gmail.com>
-Cc: linux-kbuild@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
+Cc: Roman Zippel <zippel@linux-m68k.org>, Arnaud Lacombe <lacombar@gmail.com>
 
-On Sun, Dec 05, 2010 at 01:29:24AM -0500, Arnaud Lacombe wrote:
-> Signed-off-by: Arnaud Lacombe <lacombar@gmail.com>
-> ---
->  scripts/kconfig/symbol.c |    6 ++++--
->  1 files changed, 4 insertions(+), 2 deletions(-)
-> 
-> diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
-> index af6e9f3..ad7dbe7 100644
-> --- a/scripts/kconfig/symbol.c
-> +++ b/scripts/kconfig/symbol.c
-> @@ -548,8 +548,10 @@ bool sym_string_valid(struct symbol *sym, const char *str)
->  		}
->  		return true;
->  	case S_HEX:
-> -		if (str[0] == '0' && (str[1] == 'x' || str[1] == 'X'))
-> -			str += 2;
-> +		if (str[0] != '\0' &&
-> +		    !(str[0] == '0' && (str[1] == 'x' || str[1] == 'X')))
-> +			return false;
-> +		str += 2;
->  		ch = *str++;
->  		do {
->  			if (!isxdigit(ch))
+Changeset 5a1aa8a1 added the possibility to name a choice,
+and to have the same choice be defined multiple times.
+But the documentation was forgotten, so this updates it accordingly.
 
-I think that saying "hex" is enough to express that the value is to be
-interpreted in hexadecimal, so let's keep the 0x prefix optional.
-Kconfig prints enough warnings these days... ;)
+Thanks to Arnaud Lacombe for pointing it to me in the first place:
+  http://www.spinics.net/lists/linux-kbuild/msg03940.html
 
-Michal
+Signed-off-by: "Yann E. MORIN" <yann.morin.1998@anciens.enib.fr>
+Cc: Roman Zippel <zippel@linux-m68k.org>
+Cc: Arnaud Lacombe <lacombar@gmail.com>
+---
+ Documentation/kbuild/kconfig-language.txt |    6 +++++-
+ 1 files changed, 5 insertions(+), 1 deletions(-)
+
+diff --git a/Documentation/kbuild/kconfig-language.txt b/Documentation/kbuild/kconfig-language.txt
+index 2fe93ca..a4bbaaf 100644
+--- a/Documentation/kbuild/kconfig-language.txt
++++ b/Documentation/kbuild/kconfig-language.txt
+@@ -268,7 +268,7 @@ separate list of options.
+ 
+ choices:
+ 
+-	"choice"
++	"choice" [symbol]
+ 	<choice options>
+ 	<choice block>
+ 	"endchoice"
+@@ -282,6 +282,10 @@ single driver can be compiled/loaded into the kernel, but all drivers
+ can be compiled as modules.
+ A choice accepts another option "optional", which allows to set the
+ choice to 'n' and no entry needs to be selected.
++If no [symbol] is associated with a choice, then you can not have multiple
++definitions of that choice. If a [symbol] is associated to the choice,
++then you may define the same choice (ie. with the same entries) in another
++place.
+ 
+ comment:
+ 
+-- 
+1.7.1
+
