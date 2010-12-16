@@ -1,69 +1,59 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pqueuea.post.tele.dk ([193.162.153.9]:36346 "EHLO
-	pqueuea.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751819Ab0LPWCa (ORCPT
+Received: from mail-iw0-f174.google.com ([209.85.214.174]:50665 "EHLO
+	mail-iw0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752222Ab0LPXtH (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 16 Dec 2010 17:02:30 -0500
-Received: from pfepb.post.tele.dk (pfepb.post.tele.dk [195.41.46.236])
-	by pqueuea.post.tele.dk (Postfix) with ESMTP id 1B541DBAA7
-	for <linux-kbuild@vger.kernel.org>; Thu, 16 Dec 2010 22:42:14 +0100 (CET)
-Date: Thu, 16 Dec 2010 22:41:51 +0100
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [kbuild-devel] Fwd: PATCH: Put .zdebug* section on white list
-Message-ID: <20101216214151.GA4665@merkur.ravnborg.org>
-References: <4D0A75C4.4070907@zytor.com>
+	Thu, 16 Dec 2010 18:49:07 -0500
+Received: by iwn9 with SMTP id 9so126191iwn.19
+        for <linux-kbuild@vger.kernel.org>; Thu, 16 Dec 2010 15:49:06 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4D0A75C4.4070907@zytor.com>
+In-Reply-To: <20101216212614.GD21436@pobox.suse.cz>
+References: <4D009D4A0200007800026DDB@vpn.id2.novell.com>
+	<20101216212614.GD21436@pobox.suse.cz>
+Date: Thu, 16 Dec 2010 18:49:06 -0500
+Message-ID: <AANLkTi=Va4upUfgX8+kSKMOaepSGy3AVTA9az4OecvY4@mail.gmail.com>
+Subject: Re: [PATCH] fix undesirable side effect of adding "visible" menu attribute
+From: Arnaud Lacombe <lacombar@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "H. Peter Anvin" <hpa@zytor.com>, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: Michal Marek <mmarek@suse.cz>
+Cc: Jan Beulich <JBeulich@novell.com>, linux-kbuild@vger.kernel.org, mchehab@redhat.com
 
-I guess you wanted to forward this to the list at vger...
+Hi,
 
-	Sam
+On Thu, Dec 16, 2010 at 4:26 PM, Michal Marek <mmarek@suse.cz> wrote:
+> On Thu, Dec 09, 2010 at 08:11:38AM +0000, Jan Beulich wrote:
+>> This lead to non-selected, non-user-selectable options to be written
+>> out to .config. This is not only pointless, but also preventing the
+>> user to be prompted should any of those options eventually become
+>> visible (e.g. by de-selecting the *_AUTO options the "visible"
+>> attribute was added for.
+>>
+>> Furthermore it is quite logical for the "visible" attribute of a menu
+>> to control the visibility of all contained prompts, which is what the
+>> patch does.
+>>
+>> Signed-off-by: Jan Beulich <jbeulich@novell.com>
+>
+> It also fixes the issue that all{mod,yes}config set some options from
+> the invisible menus that cannot be selected interactively (e.g.
+> I2C_ALGOPCF, that is only selected by I2C_ELEKTOR on !SMP), so this
+> patch is
+>
+> Acked-by: Michal Marek <mmarek@suse.cz>
+>
+> unless Arnaud has a good reason not to take it.
+>
+Actually, I wanted to keep the parsing and tree construction as simple
+as possible. Fix-up like that should really happen in menu_finalize()
+as we will anyway traverse all the menus once again there and it is
+already doing all kind of dependency simplification, so that would
+keep everything at the same place.
 
-On Thu, Dec 16, 2010 at 12:25:40PM -0800, H. Peter Anvin wrote:
+Say that if I do not show up with a version which would move this in
+menu_finalize() by the end of the week (sooner if you want that for
+.37), feel free to forget about this mail. Hopefully, I'll not move
+back to Linux this week-end, so I should have the time to do that.
 
-> From: "H.J. Lu" <hjl.tools@gmail.com>
-> Subject: PATCH: Put .zdebug* section on white list
-> To: LKML <linux-kernel@vger.kernel.org>, "H. Peter Anvin" <hpa@zytor.com>
-> Date: Wed, 15 Dec 2010 17:11:22 -0800
-> Message-ID: <AANLkTik90p-L+4_GnwXzoekCK0E2uemZD6tOK_kEFd2n@mail.gmail.com>
-> 
-> Hi,
-> 
-> "as --compress-debug-sections" will generate compressed debug sections
-> with section names ".zdebug*".  This patch puts .zdebug* section on
-> white list.
-> 
-> 
-> -- 
-> H.J.
-
-> diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-> index 6a087ff..2bab622 100644
-> --- a/scripts/mod/modpost.c
-> +++ b/scripts/mod/modpost.c
-> @@ -790,6 +790,7 @@ static const char *section_white_list[] =
->  {
->  	".comment*",
->  	".debug*",
-> +	".zdebug*",		/* Compressed debug sections. */
->  	".GCC-command-line",	/* mn10300 */
->  	".mdebug*",        /* alpha, score, mips etc. */
->  	".pdr",            /* alpha, score, mips etc. */
-
-
-> ------------------------------------------------------------------------------
-> Lotusphere 2011
-> Register now for Lotusphere 2011 and learn how
-> to connect the dots, take your collaborative environment
-> to the next level, and enter the era of Social Business.
-> http://p.sf.net/sfu/lotusphere-d2d
-> _______________________________________________
-> kbuild-devel mailing list
-> kbuild-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/kbuild-devel
-
+ - Arnaud
