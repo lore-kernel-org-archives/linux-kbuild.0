@@ -1,43 +1,52 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from nat.scz.novell.com ([213.151.88.252]:42363 "EHLO pobox.suse.cz"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1754040Ab0LPV0Q (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 16 Dec 2010 16:26:16 -0500
-Date: Thu, 16 Dec 2010 22:26:14 +0100
+Received: from cantor2.suse.de ([195.135.220.15]:56214 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1756001Ab0LPVn4 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 16 Dec 2010 16:43:56 -0500
+Message-ID: <4D0A8813.7060909@suse.cz>
+Date: Thu, 16 Dec 2010 22:43:47 +0100
 From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [PATCH] fix undesirable side effect of adding "visible" menu
-	attribute
-Message-ID: <20101216212614.GD21436@pobox.suse.cz>
-References: <4D009D4A0200007800026DDB@vpn.id2.novell.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4D009D4A0200007800026DDB@vpn.id2.novell.com>
+Subject: Re: visibility changes (was: Re: [GIT] kbuild and kconfig fixes for
+ 2.6.37-rc5)
+References: <AANLkTikVM=zakYF7uhX1mYHy9QUVL6dmEPNsmV7=oyuh@mail.gmail.com>	<AANLkTi=iH6QOAph0iW6MR2khD5KCe8mRLPe8Y3QnTTTW@mail.gmail.com>	<AANLkTik2SWrmVJ1o98-e2CwJP9SAo6oMmnuLc4K+rT1R@mail.gmail.com>	<AANLkTikdNXdDoixEzGbirH+U_v62vDeEMGaRRpvTsJpu@mail.gmail.com> <AANLkTin8Xf9SPcHrBPRPg+cnbWO94CwB4u6KQ2it1+Y9@mail.gmail.com>
+In-Reply-To: <AANLkTin8Xf9SPcHrBPRPg+cnbWO94CwB4u6KQ2it1+Y9@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jan Beulich <JBeulich@novell.com>
-Cc: linux-kbuild@vger.kernel.org, Arnaud Lacombe <lacombar@gmail.com>, mchehab@redhat.com
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: Arnaud Lacombe <lacombar@gmail.com>, Linus Torvalds <torvalds@linux-foundation.org>, brueckner@linux.vnet.ibm.com, mchehab@redhat.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Thu, Dec 09, 2010 at 08:11:38AM +0000, Jan Beulich wrote:
-> This lead to non-selected, non-user-selectable options to be written
-> out to .config. This is not only pointless, but also preventing the
-> user to be prompted should any of those options eventually become
-> visible (e.g. by de-selecting the *_AUTO options the "visible"
-> attribute was added for.
-> 
-> Furthermore it is quite logical for the "visible" attribute of a menu
-> to control the visibility of all contained prompts, which is what the
-> patch does.
-> 
-> Signed-off-by: Jan Beulich <jbeulich@novell.com>
+On 7.12.2010 21:45, Geert Uytterhoeven wrote:
+> On Tue, Dec 7, 2010 at 21:40, Arnaud Lacombe<lacombar@gmail.com>  wrote:
+>> On Tue, Dec 7, 2010 at 3:31 PM, Geert Uytterhoeven<geert@linux-m68k.org>  wrote:
+>>> On Tue, Dec 7, 2010 at 20:51, Arnaud Lacombe<lacombar@gmail.com>  wrote:
+>>>> On Tue, Dec 7, 2010 at 2:07 PM, Geert Uytterhoeven<geert@linux-m68k.org>  wrote:
+>>>>> BTW, I got confused:
+>>>>>   - make allmodconfig causes e.g.:
+>>>>>         CONFIG_VIDEO_HELPER_CHIPS_AUTO=y
+>>>>>         CONFIG_VIDEO_TVAUDIO=m
+>>>>>     =>  good
+>>>>>   - make oldconfig for my config with almost everything selected,
+>>>>> except for stuff I know that breaks:
+>>>>>         CONFIG_VIDEO_HELPER_CHIPS_AUTO=y
+>>>>>         # CONFIG_VIDEO_TVAUDIO is not set
+>>>>>     and no way to manually set CONFIG_VIDEO_TVAUDIO=y?
+>>>>>     =>  bad!
+>>>> that's difficult to judge without your old configuration.
+>>>> VIDEO_TVAUDIO is only selected by VIDEO_BT848 which you don't give
+>>>> information about.
+>>>
+>>> I don't have PCI, so I cannot enable VIDEO_BT848.
+>>>
+>> so why do you expect VIDEO_TVAUDIO to be enabled ?
+>
+> I don't expect it to be enabled, I expected to be able to enable it.
+> Allmodconfig
+> does enable it.
 
-It also fixes the issue that all{mod,yes}config set some options from
-the invisible menus that cannot be selected interactively (e.g.
-I2C_ALGOPCF, that is only selected by I2C_ELEKTOR on !SMP), so this
-patch is
-
-Acked-by: Michal Marek <mmarek@suse.cz>
-
-unless Arnaud has a good reason not to take it.
+Actually allmodconfig should not enable it, as it did not so before the 
+patch. See Jan's fix at https://patchwork.kernel.org/patch/393302/
 
 Michal
