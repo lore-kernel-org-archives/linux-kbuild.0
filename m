@@ -1,34 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Message-Id: <4D0B2511020000780002899F@vpn.id2.novell.com>
-Date: Fri, 17 Dec 2010 07:53:37 +0000
-From: "Jan Beulich" <JBeulich@novell.com>
-Subject: Re: [PATCH] fix undesirable side effect of adding "visible"
-	 menu attribute
-References: <4D009D4A0200007800026DDB@vpn.id2.novell.com>
- <20101216212614.GD21436@pobox.suse.cz>
- <AANLkTi=Va4upUfgX8+kSKMOaepSGy3AVTA9az4OecvY4@mail.gmail.com>
- <AANLkTim+63yNuMqUm5RkDXHHBw8mN-wo4=TsnJMjGBXL@mail.gmail.com>
-In-Reply-To: <AANLkTim+63yNuMqUm5RkDXHHBw8mN-wo4=TsnJMjGBXL@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Received: from mail-vw0-f46.google.com ([209.85.212.46]:39619 "EHLO
+	mail-vw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754425Ab0LQNd3 convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 17 Dec 2010 08:33:29 -0500
+MIME-Version: 1.0
+In-Reply-To: <AANLkTinyLQUN6fMwWQDxvPpfRTo-4kHPVsggPSoAGhv-@mail.gmail.com>
+References: <AANLkTinyLQUN6fMwWQDxvPpfRTo-4kHPVsggPSoAGhv-@mail.gmail.com>
+From: Richard Genoud <richard.genoud@gmail.com>
+Date: Fri, 17 Dec 2010 14:33:11 +0100
+Message-ID: <AANLkTin=vr14wPJottefmfsgfyYZbfcmchQerq+0oP5J@mail.gmail.com>
+Subject: Re: make xconfig broken on 2.6.37-rc2
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8BIT
-Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnaud Lacombe <lacombar@gmail.com>, Michal Marek <mmarek@suse.cz>
-Cc: mchehab@redhat.com, linux-kbuild@vger.kernel.org
+To: Ameya Palande <2ameya@gmail.com>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Roman Zippel <zippel@linux-m68k.org>
 
->>> On 17.12.10 at 03:03, Arnaud Lacombe <lacombar@gmail.com> wrote:
-> hum, I just thought of something. Instead of adding more complexity to
-> the menu children, why would {,m,n,q}conf descend to these submenus at
-> first. they should just ignore all the childs if the parent is not
-> meant to be visible and go to the next node on the same level. When I
-> close the front door of my house, I do expect people to stop right
-> there, not continue to check any door I may have left open inside.
+2010/11/17 Ameya Palande <2ameya@gmail.com>:
+> Hi,
+>
+> When I try to do "make xconfig" on 2.6.37-rc2 it gives me following error:
+>
+>  HOSTCXX scripts/kconfig/qconf.o
+> In file included from scripts/kconfig/qconf.cc:48:
+> scripts/kconfig/qconf.moc:13: fatal error: private/qucomextra_p.h: No
+> such file or directory
+> compilation terminated.
+> make[1]: *** [scripts/kconfig/qconf.o] Error 1
+> make: *** [xconfig] Error 2
+>
+> My host is ubuntu 10.10 x86-32 with libqt3 and libqt4 both installed.
 
-Isn't that what's happening? I don't think the problem is with the
-frontends - it's the backend that writes out settings of options it
-didn't before (and shouldn't).
+hi !
+this is due to moc which points by default to /usr/bin/moc-qt3
+just make it point to moc-qt4 :
+sudo update-alternatives --config moc
 
-Jan
+then make distclean, make xconfig.
 
+richard
