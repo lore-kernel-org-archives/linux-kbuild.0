@@ -1,42 +1,39 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-iw0-f174.google.com ([209.85.214.174]:52364 "EHLO
-	mail-iw0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751761Ab0LRGiJ (ORCPT
+Received: from smtp09.smtpout.orange.fr ([80.12.242.131]:52861 "EHLO
+	smtp.smtpout.orange.fr" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757185Ab0LRXAR (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 18 Dec 2010 01:38:09 -0500
-Received: by iwn9 with SMTP id 9so1467639iwn.19
-        for <linux-kbuild@vger.kernel.org>; Fri, 17 Dec 2010 22:38:08 -0800 (PST)
+	Sat, 18 Dec 2010 18:00:17 -0500
+From: "Yann E. MORIN" <yann.morin.1998@anciens.enib.fr>
+Subject: Re: [PATCH] Documentation/kbuild: add info that 'choice' can have a symbol name
+Date: Sun, 19 Dec 2010 00:00:14 +0100
+References: <1292455140-5869-1-git-send-email-yann.morin.1998@anciens.enib.fr>
+In-Reply-To: <1292455140-5869-1-git-send-email-yann.morin.1998@anciens.enib.fr>
 MIME-Version: 1.0
-Date: Sat, 18 Dec 2010 01:38:08 -0500
-Message-ID: <AANLkTi=GSHBCyioFjLZBMjHi=xjeeq+b5e7o6_1zWi-T@mail.gmail.com>
-Subject: Unmet dependency warning duplication
-From: Arnaud Lacombe <lacombar@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+Message-Id: <201012190000.14206.yann.morin.1998@anciens.enib.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Michal Marek <mmarek@suse.cz>
+Cc: Roman Zippel <zippel@linux-m68k.org>, Arnaud Lacombe <lacombar@gmail.com>
 
-Hi,
+On Thursday 16 December 2010 00:19:00 Yann E. MORIN wrote:
+> Changeset 5a1aa8a1 added the possibility to name a choice,
+> and to have the same choice be defined multiple times.
+> But the documentation was forgotten, so this updates it accordingly.
 
-Just for the record, I believe that the current location where the
-"select unmet dependency" warning is triggered, that is in
-sym_calc_value(), is a bad choice. It leads to a `silentoldconfig' to
-output the warning twice:
+Ping? Any comment?
 
-% gmake silentoldconfig
-  HOSTCC  scripts/kconfig/zconf.tab.o
-  HOSTLD  scripts/kconfig/conf
-scripts/kconfig/conf --silentoldconfig Kconfig
-warning: (OLPC && X86_32) selects OLPC_OPENFIRMWARE which has unmet
-direct dependencies (X86_32 && !X86_64 && !X86_PAE)
+Regards,
+Yann E. MORIN.
 
-warning: (OLPC && X86_32) selects OLPC_OPENFIRMWARE which has unmet
-direct dependencies (X86_32 && !X86_64 && !X86_PAE)
-
-and I somehow remember that it also causes junk to be displayed when
-mconf's UI is being displayed.
-
-I'll try to come back with a patch later on.
-
- - Arnaud
+-- 
+.-----------------.--------------------.------------------.--------------------.
+|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
+| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
+| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
+| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
+'------------------------------^-------^------------------^--------------------'
