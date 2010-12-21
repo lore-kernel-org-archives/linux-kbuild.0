@@ -1,32 +1,101 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:43105 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750874Ab0LURTN (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 21 Dec 2010 12:19:13 -0500
-Date: Tue, 21 Dec 2010 18:19:11 +0100
-From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [PATCH] Documentation/kbuild: add info that 'choice' can have a
- symbol name
-Message-ID: <20101221171902.GA15604@sepie.suse.cz>
-References: <1292455140-5869-1-git-send-email-yann.morin.1998@anciens.enib.fr>
- <201012190000.14206.yann.morin.1998@anciens.enib.fr>
+Received: from mail-iw0-f174.google.com ([209.85.214.174]:63197 "EHLO
+	mail-iw0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751966Ab0LURyf convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 21 Dec 2010 12:54:35 -0500
+Received: by iwn9 with SMTP id 9so4442232iwn.19
+        for <linux-kbuild@vger.kernel.org>; Tue, 21 Dec 2010 09:54:34 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <201012190000.14206.yann.morin.1998@anciens.enib.fr>
+In-Reply-To: <4D10DA09.6070009@suse.cz>
+References: <1291530919-5601-1-git-send-email-lacombar@gmail.com>
+	<1291530919-5601-2-git-send-email-lacombar@gmail.com>
+	<4D10DA09.6070009@suse.cz>
+Date: Tue, 21 Dec 2010 12:54:34 -0500
+Message-ID: <AANLkTinFHR_A8yJ1pG4OaEVf7Q_Trx9Ch1kVMjGkV-N_@mail.gmail.com>
+Subject: Re: [PATCH 2/2] [RFC] kconfig/listnewconfig: show default value of
+ new symbel
+From: Arnaud Lacombe <lacombar@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Yann E. MORIN" <yann.morin.1998@anciens.enib.fr>
-Cc: linux-kbuild@vger.kernel.org, Roman Zippel <zippel@linux-m68k.org>, Arnaud Lacombe <lacombar@gmail.com>
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org, Ben Hutchings <ben@decadent.org.uk>
 
-On Sun, Dec 19, 2010 at 12:00:14AM +0100, Yann E. MORIN wrote:
-> On Thursday 16 December 2010 00:19:00 Yann E. MORIN wrote:
-> > Changeset 5a1aa8a1 added the possibility to name a choice,
-> > and to have the same choice be defined multiple times.
-> > But the documentation was forgotten, so this updates it accordingly.
-> 
-> Ping? Any comment?
+Hi,
 
-Applied to kbuild-2.6.git#misc, thanks for your patience.
+2010/12/21 Michal Marek <mmarek@suse.cz>:
+> On 5.12.2010 07:35, Arnaud Lacombe wrote:
+>> note: I would not mind adding the KCONFIG_VERBOSE logic.
+>>
+>> Original idea and implementation by Bastian Blank <waldi@debian.org>,
+>> Maximilian Attems <max@stro.at> and Ben Hutchings <ben@decadent.org.uk>
+>>
+>> CC: Ben Hutchings <ben@decadent.org.uk>
+>> Signed-off-by: Arnaud Lacombe <lacombar@gmail.com>
+>> ---
+>>  scripts/kconfig/conf.c     |   14 +++++++++++++-
+>>  scripts/kconfig/confdata.c |    4 ++--
+>>  2 files changed, 15 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
+>> index 5459a38..1b58129 100644
+>> --- a/scripts/kconfig/conf.c
+>> +++ b/scripts/kconfig/conf.c
+>> @@ -411,6 +411,17 @@ conf_childs:
+>>               indent -= 2;
+>>  }
+>>
+>> +
+>> +static void
+>> +listnewconfig_print_symbol(FILE *fp, struct symbol *sym, const char *val, void *arg)
+>> +{
+>> +     fprintf(fp, "%s%s (default: %s)\n", CONFIG_, sym->name, val);
+>> +}
+>
+> Ben, do you have an opinion on this format versus the standard .config
+> produced by your patch?
+>
+FWIW, this was just a quick and dirty implementation using the
+previous patch. I do not really care about the printed format, nor how
+it interacts with the environment. So I'm open to anything :)
 
-Michal
+ - Arnaud
+
+> Michal
+>> +
+>> +static struct conf_printer listnewconfig_printers = {
+>> +     .print_symbol = listnewconfig_print_symbol,
+>> +};
+>> +
+>>  static void check_conf(struct menu *menu)
+>>  {
+>>       struct symbol *sym;
+>> @@ -425,7 +436,8 @@ static void check_conf(struct menu *menu)
+>>                   (sym_is_choice(sym) && sym_get_tristate_value(sym) == yes)) {
+>>                       if (input_mode == listnewconfig) {
+>>                               if (sym->name && !sym_is_choice_value(sym)) {
+>> -                                     printf("%s%s\n", CONFIG_, sym->name);
+>> +                                     conf_write_symbol(stdout, sym,
+>> +                                         &listnewconfig_printers, NULL);
+>>                               }
+>>                       } else if (input_mode != oldnoconfig) {
+>>                               if (!conf_cnt++)
+>> diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
+>> index 31d06da..6f2f3a4 100644
+>> --- a/scripts/kconfig/confdata.c
+>> +++ b/scripts/kconfig/confdata.c
+>> @@ -548,8 +548,8 @@ static struct conf_printer tristate_printer_cb =
+>>   *
+>>   */
+>>
+>> -static void conf_write_symbol(FILE *fp, struct symbol *sym,
+>> -                           struct conf_printer *printer, void *printer_arg)
+>> +void conf_write_symbol(FILE *fp, struct symbol *sym,
+>> +                    struct conf_printer *printer, void *printer_arg)
+>>  {
+>>       const char *str;
+>>
+>
+>
