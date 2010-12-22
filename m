@@ -1,58 +1,74 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qw0-f46.google.com ([209.85.216.46]:45986 "EHLO
-	mail-qw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751882Ab0LVSaV (ORCPT
+Received: from mail-iw0-f174.google.com ([209.85.214.174]:55396 "EHLO
+	mail-iw0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750943Ab0LVT5n (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 22 Dec 2010 13:30:21 -0500
-Received: by qwa26 with SMTP id 26so5427670qwa.19
-        for <linux-kbuild@vger.kernel.org>; Wed, 22 Dec 2010 10:30:21 -0800 (PST)
-From: Ben Gamari <bgamari.foss@gmail.com>
-Subject: [PATCH] Make fixdep error handling more explicit
-Date: Wed, 22 Dec 2010 13:30:14 -0500
-Message-Id: <1293042614-27726-1-git-send-email-bgamari.foss@gmail.com>
+	Wed, 22 Dec 2010 14:57:43 -0500
+From: dirk.brandewie@gmail.com
+Subject: [PATCH 0/4] V3 Add ability to link device blob(s) into vmlinux
+Date: Wed, 22 Dec 2010 11:57:25 -0800
+Message-Id: <1293047849-26078-1-git-send-email-dirk.brandewie@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Ben Gamari <bgamari.foss@gmail.com>
+To: linux-kernel@vger.kernel.org
+Cc: devicetree-discuss@lists.ozlabs.org, linuxppc-dev@lists.ozlabs.org, microblaze-uclinux@itee.uq.edu.au, linux-arch@vger.kernel.org, mmarek@suse.cz, dirk.brandewie@gmail.com, linux-kbuild@vger.kernel.org
 
-Also add missing error handling to fstat call
+From: Dirk Brandewie <dirk.brandewie@gmail.com>
 
-Signed-off-by: Ben Gamari <bgamari.foss@gmail.com>
----
- scripts/basic/fixdep.c |   10 +++++++---
- 1 files changed, 7 insertions(+), 3 deletions(-)
+This patch set adds the ability to link device tree blobs into
+vmlinux. 
 
-diff --git a/scripts/basic/fixdep.c b/scripts/basic/fixdep.c
-index ea26b23..184fb89 100644
---- a/scripts/basic/fixdep.c
-+++ b/scripts/basic/fixdep.c
-@@ -273,7 +273,7 @@ static void do_config_file(char *filename)
+Patch 1 implements the changes to include/asm-generic/vmlinux.lds.h and
+adds a generic rule for generating DTB objects to be linked vmlinux.
+
+Patch 2 implements linking a DTB into an x86 image.
+
+Patch 3-4 move {powerpc,microblaze}/boot/Makefile to use the dtc rule
+in patch 1.
+
+This patch set has been tested on x86.
+
+Powerpc and Microblaze have been compile tested with and without patch
+3 and 4 applied.
+
+Changes from V1:
+
+Documentation added for dtc command in Makefile.lib to
+Documentation/kbuild/makefiles.txt
+Separate DTB_ALIGNMENT define removed.
+FORCE removed from dtc rule.
+Removed hardcoded path to dts files from dtc command.  
+Moved %.dtb: %.dts rule to arch specific makefiles. 
  
- 	fd = open(filename, O_RDONLY);
- 	if (fd < 0) {
--		fprintf(stderr, "fixdep: ");
-+		fprintf(stderr, "fixdep: error opening config file: ");
- 		perror(filename);
- 		exit(2);
- 	}
-@@ -344,11 +344,15 @@ static void print_deps(void)
- 
- 	fd = open(depfile, O_RDONLY);
- 	if (fd < 0) {
--		fprintf(stderr, "fixdep: ");
-+		fprintf(stderr, "fixdep: error opening depfile: ");
- 		perror(depfile);
- 		exit(2);
- 	}
--	fstat(fd, &st);
-+	if (fstat(fd, &st) < 0) {
-+                fprintf(stderr, "fixdep: error fstat'ing depfile: ");
-+                perror(depfile);
-+                exit(2);
-+        }
- 	if (st.st_size == 0) {
- 		fprintf(stderr,"fixdep: %s is empty\n",depfile);
- 		close(fd);
+Patch for adding kernel command line option to pass in dtb_compat
+string dropped from this set will be submitted seperately.
+
+Changes from V2:
+
+Rule to create assembly wrapper for blob changed to use Sam Ravnborgs
+suggested implementation.
+
+Rules in architecture specific Makefiles changed to use the cmd
+function instead of the if_changed function.
+
+Changes from V3:
+
+Cosmetic fix of DTC quiet command
+
+Dirk Brandewie (4):
+  of: Add support for linking device tree blobs into vmlinux
+  x86/of: Add building device tree blob(s) into image.
+  of/powerpc: Use generic rule to build dtb's
+  microblaze/of: Use generic rule to build dtb's
+
+ Documentation/kbuild/makefiles.txt |   15 +++++++++++++++
+ arch/microblaze/boot/Makefile      |   12 +++---------
+ arch/powerpc/boot/Makefile         |    8 +++-----
+ arch/x86/platform/ce4100/Makefile  |   10 ++++++++++
+ include/asm-generic/vmlinux.lds.h  |   13 +++++++++++--
+ scripts/Makefile.lib               |   23 +++++++++++++++++++++++
+ 6 files changed, 65 insertions(+), 16 deletions(-)
+
 -- 
-1.7.0.4
+1.7.2.3
 
