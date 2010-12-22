@@ -1,13 +1,15 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-iw0-f174.google.com ([209.85.214.174]:55396 "EHLO
-	mail-iw0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750943Ab0LVT5n (ORCPT
+Received: from mail-iy0-f174.google.com ([209.85.210.174]:51700 "EHLO
+	mail-iy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752194Ab0LVT5u (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 22 Dec 2010 14:57:43 -0500
+	Wed, 22 Dec 2010 14:57:50 -0500
 From: dirk.brandewie@gmail.com
-Subject: [PATCH 0/4] V3 Add ability to link device blob(s) into vmlinux
-Date: Wed, 22 Dec 2010 11:57:25 -0800
-Message-Id: <1293047849-26078-1-git-send-email-dirk.brandewie@gmail.com>
+Subject: [PATCH 4/4] microblaze/of: Use generic rule to build dtb's
+Date: Wed, 22 Dec 2010 11:57:29 -0800
+Message-Id: <1293047849-26078-5-git-send-email-dirk.brandewie@gmail.com>
+In-Reply-To: <1293047849-26078-1-git-send-email-dirk.brandewie@gmail.com>
+References: <1293047849-26078-1-git-send-email-dirk.brandewie@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org
@@ -15,60 +17,46 @@ Cc: devicetree-discuss@lists.ozlabs.org, linuxppc-dev@lists.ozlabs.org, microbla
 
 From: Dirk Brandewie <dirk.brandewie@gmail.com>
 
-This patch set adds the ability to link device tree blobs into
-vmlinux. 
+Modify arch/powerpc/boot/Makefile to use dtc command in
+scripts/Makefile.lib
 
-Patch 1 implements the changes to include/asm-generic/vmlinux.lds.h and
-adds a generic rule for generating DTB objects to be linked vmlinux.
+Signed-off-by: Dirk Brandewie <dirk.brandewie@gmail.com>
+---
+ arch/microblaze/boot/Makefile |   12 +++---------
+ 1 files changed, 3 insertions(+), 9 deletions(-)
 
-Patch 2 implements linking a DTB into an x86 image.
-
-Patch 3-4 move {powerpc,microblaze}/boot/Makefile to use the dtc rule
-in patch 1.
-
-This patch set has been tested on x86.
-
-Powerpc and Microblaze have been compile tested with and without patch
-3 and 4 applied.
-
-Changes from V1:
-
-Documentation added for dtc command in Makefile.lib to
-Documentation/kbuild/makefiles.txt
-Separate DTB_ALIGNMENT define removed.
-FORCE removed from dtc rule.
-Removed hardcoded path to dts files from dtc command.  
-Moved %.dtb: %.dts rule to arch specific makefiles. 
+diff --git a/arch/microblaze/boot/Makefile b/arch/microblaze/boot/Makefile
+index be01d78..4c4e58e 100644
+--- a/arch/microblaze/boot/Makefile
++++ b/arch/microblaze/boot/Makefile
+@@ -10,9 +10,6 @@ targets := linux.bin linux.bin.gz simpleImage.%
  
-Patch for adding kernel command line option to pass in dtb_compat
-string dropped from this set will be submitted seperately.
-
-Changes from V2:
-
-Rule to create assembly wrapper for blob changed to use Sam Ravnborgs
-suggested implementation.
-
-Rules in architecture specific Makefiles changed to use the cmd
-function instead of the if_changed function.
-
-Changes from V3:
-
-Cosmetic fix of DTC quiet command
-
-Dirk Brandewie (4):
-  of: Add support for linking device tree blobs into vmlinux
-  x86/of: Add building device tree blob(s) into image.
-  of/powerpc: Use generic rule to build dtb's
-  microblaze/of: Use generic rule to build dtb's
-
- Documentation/kbuild/makefiles.txt |   15 +++++++++++++++
- arch/microblaze/boot/Makefile      |   12 +++---------
- arch/powerpc/boot/Makefile         |    8 +++-----
- arch/x86/platform/ce4100/Makefile  |   10 ++++++++++
- include/asm-generic/vmlinux.lds.h  |   13 +++++++++++--
- scripts/Makefile.lib               |   23 +++++++++++++++++++++++
- 6 files changed, 65 insertions(+), 16 deletions(-)
-
+ OBJCOPYFLAGS := -O binary
+ 
+-# Where the DTS files live
+-dtstree         := $(srctree)/$(src)/dts
+-
+ # Ensure system.dtb exists
+ $(obj)/linked_dtb.o: $(obj)/system.dtb
+ 
+@@ -51,14 +48,11 @@ $(obj)/simpleImage.%: vmlinux FORCE
+ 	$(call if_changed,strip)
+ 	@echo 'Kernel: $@ is ready' ' (#'`cat .version`')'
+ 
+-# Rule to build device tree blobs
+-DTC = $(objtree)/scripts/dtc/dtc
+ 
+ # Rule to build device tree blobs
+-quiet_cmd_dtc = DTC     $@
+-	cmd_dtc = $(DTC) -O dtb -o $(obj)/$*.dtb -b 0 -p 1024 $(dtstree)/$*.dts
++DTC_FLAGS := -p 1024
+ 
+-$(obj)/%.dtb: $(dtstree)/%.dts FORCE
+-	$(call if_changed,dtc)
++$(obj)/%.dtb: $(src)/dts/%.dts FORCE
++	$(call cmd,dtc)
+ 
+ clean-files += *.dtb simpleImage.*.unstrip linux.bin.ub
 -- 
 1.7.2.3
 
