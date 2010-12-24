@@ -1,71 +1,79 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-px0-f174.google.com ([209.85.212.174]:52998 "EHLO
-	mail-px0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751957Ab0LWWNc (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 23 Dec 2010 17:13:32 -0500
-Date: Thu, 23 Dec 2010 15:13:29 -0700
-From: Grant Likely <grant.likely@secretlab.ca>
-Subject: Re: [PATCH 3/4] of/powerpc: Use generic rule to build dtb's
-Message-ID: <20101223221329.GJ20384@angua.secretlab.ca>
-References: <1293047849-26078-1-git-send-email-dirk.brandewie@gmail.com>
- <1293047849-26078-4-git-send-email-dirk.brandewie@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1293047849-26078-4-git-send-email-dirk.brandewie@gmail.com>
+Received: from thunk.org ([69.25.196.29]:57313 "EHLO thunker.thunk.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752910Ab0LYDCA (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 24 Dec 2010 22:02:00 -0500
+From: "Theodore Ts'o" <tytso@mit.edu>
+Subject: [PATCH] kbuild: create linux-headers package in deb-pkg
+Date: Fri, 24 Dec 2010 09:42:10 -0500
+Message-Id: <1293201730-1583-1-git-send-email-tytso@mit.edu>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: dirk.brandewie@gmail.com
-Cc: linux-kernel@vger.kernel.org, devicetree-discuss@lists.ozlabs.org, linuxppc-dev@lists.ozlabs.org, microblaze-uclinux@itee.uq.edu.au, linux-arch@vger.kernel.org, mmarek@suse.cz, linux-kbuild@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Theodore Ts'o <tytso@mit.edu>
 
-On Wed, Dec 22, 2010 at 11:57:28AM -0800, dirk.brandewie@gmail.com wrote:
-> From: Dirk Brandewie <dirk.brandewie@gmail.com>
-> 
-> Modify arch/powerpc/boot/Makefile to use dtc command in
-> scripts/Makefile.lib
-> 
-> Signed-off-by: Dirk Brandewie <dirk.brandewie@gmail.com>
+Create a linux-headers-$KVER.deb package which can be used to build
+external modules without having the source tree around.
 
-applied, thanks
+Signed-off-by: "Theodore Ts'o" <tytso@mit.edu>
+---
+ scripts/package/builddeb |   28 +++++++++++++++++++++++++++-
+ 1 files changed, 27 insertions(+), 1 deletions(-)
 
-g.
+diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+index 49b74e1..cb5b29d 100644
+--- a/scripts/package/builddeb
++++ b/scripts/package/builddeb
+@@ -40,15 +40,17 @@ else
+ fi
+ tmpdir="$objtree/debian/tmp"
+ fwdir="$objtree/debian/fwtmp"
++hdrdir="$objtree/debian/hdrtmp"
+ packagename=linux-image-$version
+ fwpackagename=linux-firmware-image
++hdrpackagename=linux-headers-$version
+ 
+ if [ "$ARCH" = "um" ] ; then
+ 	packagename=user-mode-linux-$version
+ fi
+ 
+ # Setup the directory structure
+-rm -rf "$tmpdir" "$fwdir"
++rm -rf "$tmpdir" "$fwdir" "$hdrdir"
+ mkdir -p "$tmpdir/DEBIAN" "$tmpdir/lib" "$tmpdir/boot" "$tmpdir/usr/share/doc/$packagename"
+ mkdir -p "$fwdir/DEBIAN" "$fwdir/lib" "$fwdir/usr/share/doc/$fwpackagename"
+ if [ "$ARCH" = "um" ] ; then
+@@ -188,6 +190,30 @@ EOF
+ 
+ fi
+ 
++# Build header package
++find . -name Makefile -o -name Kconfig\* -o -name \*.pl > /tmp/files$$
++find arch/x86/include include scripts -type f >> /tmp/files$$
++(cd $objtree; find .config Module.symvers include scripts -type f >> /tmp/objfiles$$)
++destdir=$hdrdir/usr/src/linux-headers-$version
++mkdir -p "$destdir" "$hdrdir/DEBIAN" "$hdrdir/usr/share/doc/$hdrpackagename"
++tar -c -f - -T /tmp/files$$ | (cd $destdir; tar -xf -)
++(cd $objtree; tar -c -f - -T /tmp/objfiles$$) | (cd $destdir; tar -xf -)
++rm -f /tmp/files$$ /tmp/objfiles$$
++arch=$(dpkg --print-architecture)
++
++cat <<EOF >> debian/control
++
++Package: $hdrpackagename
++Provides: linux-headers, linux-headers-2.6
++Architecture: $arch
++Description: Linux kernel headers for $KERNELRELEASE on $arch
++ This package provides kernel header files for $KERNELRELEASE on $arch
++ .
++ This is useful for people who need to build external modules
++EOF
++
++create_package "$hdrpackagename" "$hdrdir"
++
+ # Do we have firmware? Move it out of the way and build it into a package.
+ if [ -e "$tmpdir/lib/firmware" ]; then
+ 	mv "$tmpdir/lib/firmware" "$fwdir/lib/"
+-- 
+1.7.3.1
 
-> ---
->  arch/powerpc/boot/Makefile |    8 +++-----
->  1 files changed, 3 insertions(+), 5 deletions(-)
-> 
-> diff --git a/arch/powerpc/boot/Makefile b/arch/powerpc/boot/Makefile
-> index fae8192..96deec6 100644
-> --- a/arch/powerpc/boot/Makefile
-> +++ b/arch/powerpc/boot/Makefile
-> @@ -35,7 +35,7 @@ endif
->  
->  BOOTCFLAGS	+= -I$(obj) -I$(srctree)/$(obj)
->  
-> -DTS_FLAGS	?= -p 1024
-> +DTC_FLAGS	?= -p 1024
->  
->  $(obj)/4xx.o: BOOTCFLAGS += -mcpu=405
->  $(obj)/ebony.o: BOOTCFLAGS += -mcpu=405
-> @@ -332,10 +332,8 @@ $(obj)/treeImage.%: vmlinux $(obj)/%.dtb $(wrapperbits)
->  	$(call if_changed,wrap,treeboot-$*,,$(obj)/$*.dtb)
->  
->  # Rule to build device tree blobs
-> -DTC = $(objtree)/scripts/dtc/dtc
-> -
-> -$(obj)/%.dtb: $(dtstree)/%.dts
-> -	$(DTC) -O dtb -o $(obj)/$*.dtb -b 0 $(DTS_FLAGS) $(dtstree)/$*.dts
-> +$(obj)/%.dtb: $(src)/dts/%.dts
-> +	$(call cmd,dtc)
->  
->  # If there isn't a platform selected then just strip the vmlinux.
->  ifeq (,$(image-y))
-> -- 
-> 1.7.2.3
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kernel" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> Please read the FAQ at  http://www.tux.org/lkml/
