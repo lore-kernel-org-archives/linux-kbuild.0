@@ -1,76 +1,60 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor.suse.de ([195.135.220.2]:42148 "EHLO mx1.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752392Ab1AFNz7 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 6 Jan 2011 08:55:59 -0500
-Date: Thu, 6 Jan 2011 14:55:58 +0100
-From: Michal Marek <mmarek@suse.cz>
-Subject: Re: Kernel build ignores missing mkimage on building uImage
-Message-ID: <20110106135558.GC1841@sepie.suse.cz>
-References: <4D0B8D85.5090605@antcom.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4D0B8D85.5090605@antcom.de>
+Received: from mail-wy0-f174.google.com ([74.125.82.174]:39041 "EHLO
+	mail-wy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753243Ab1AFPmw (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 6 Jan 2011 10:42:52 -0500
+Received: by wyb28 with SMTP id 28so16513830wyb.19
+        for <linux-kbuild@vger.kernel.org>; Thu, 06 Jan 2011 07:42:51 -0800 (PST)
+From: Peter Korsgaard <jacmet@sunsite.dk>
+Subject: [PATCH] nconf: handle comment entries within choice/endchoice
+Date: Thu,  6 Jan 2011 16:42:45 +0100
+Message-Id: <1294328565-2750-1-git-send-email-jacmet@sunsite.dk>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Roland Stigge <stigge@antcom.de>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: mmarek@suse.cz, nir.tzachar@gmail.com, sam@ravnborg.org, linux-kbuild@vger.kernel.org
+Cc: Peter Korsgaard <jacmet@sunsite.dk>
 
-On Fri, Dec 17, 2010 at 05:19:17PM +0100, Roland Stigge wrote:
-> Hi,
-> 
-> on building an uImage, I get:
-> 
-> $ make uImage
->   CHK     include/linux/version.h
->   CHK     include/generated/utsrelease.h
-> make[1]: `include/generated/mach-types.h' is up to date.
->   CALL    scripts/checksyscalls.sh
->   CHK     include/generated/compile.h
->   Kernel: arch/arm/boot/Image is ready
->   SHIPPED arch/arm/boot/compressed/lib1funcs.S
->   AS      arch/arm/boot/compressed/lib1funcs.o
->   LD      arch/arm/boot/compressed/vmlinux
->   OBJCOPY arch/arm/boot/zImage
->   Kernel: arch/arm/boot/zImage is ready
->   UIMAGE  arch/arm/boot/uImage
-> "mkimage" command not found - U-Boot images will not be built
->   Image arch/arm/boot/uImage is ready
-> $
-> 
-> I.e. it says: "uImage is ready" even though the uImage file doesn't
-> exist because mkimage is missing.
-> 
-> (I'm working with Linux' current mainline GIT and also see that the
-> problem is also present in the mmarek repo on git.kernel.org.)
-> 
-> I propose the attached patch.
-> 
-> Thanks for considering.
+Equivalent to af6c1598 (kconfig: handle comment entries within
+choice/endchoice), but for nconfig instead.
 
-The patch makes sense and afaics none of the architectures relies on
-this behaviour (either they can't work without mkimage, or a
-uimage-style target has to be requested by the user). Can I assume
-"Signed-off-by: Roland Stigge <stigge@antcom.de>" on this patch.
+Implement support for comment entries within choice groups. Comment entries
+are displayed visually distinct from normal configs, and selecting them is
+a no-op.
 
-Thanks,
-Michal
-> 
-> bye,
->   Roland
+Signed-off-by: Peter Korsgaard <jacmet@sunsite.dk>
+---
+ scripts/kconfig/nconf.c |    8 ++++++--
+ 1 files changed, 6 insertions(+), 2 deletions(-)
 
-> diff --git a/scripts/mkuboot.sh b/scripts/mkuboot.sh
-> index 2e3d3cd..446739c 100755
-> --- a/scripts/mkuboot.sh
-> +++ b/scripts/mkuboot.sh
-> @@ -11,7 +11,7 @@ if [ -z "${MKIMAGE}" ]; then
->  	if [ -z "${MKIMAGE}" ]; then
->  		# Doesn't exist
->  		echo '"mkimage" command not found - U-Boot images will not be built' >&2
-> -		exit 0;
-> +		exit 1;
->  	fi
->  fi
->  
+diff --git a/scripts/kconfig/nconf.c b/scripts/kconfig/nconf.c
+index 272a987..f343105 100644
+--- a/scripts/kconfig/nconf.c
++++ b/scripts/kconfig/nconf.c
+@@ -1266,9 +1266,13 @@ static void conf_choice(struct menu *menu)
+ 			if (child->sym == sym_get_choice_value(menu->sym))
+ 				item_make(child, ':', "<X> %s",
+ 						_(menu_get_prompt(child)));
+-			else
++			else if (child->sym)
+ 				item_make(child, ':', "    %s",
+ 						_(menu_get_prompt(child)));
++			else
++				item_make(child, ':', "*** %s ***",
++						_(menu_get_prompt(child)));
++
+ 			if (child->sym == active){
+ 				last_top_row = top_row(curses_menu);
+ 				selected_index = i;
+@@ -1334,7 +1338,7 @@ static void conf_choice(struct menu *menu)
+ 			break;
+ 
+ 		child = item_data();
+-		if (!child || !menu_is_visible(child))
++		if (!child || !menu_is_visible(child) || !child->sym)
+ 			continue;
+ 		switch (res) {
+ 		case ' ':
+-- 
+1.7.1
 
