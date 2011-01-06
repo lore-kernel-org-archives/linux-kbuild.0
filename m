@@ -1,88 +1,42 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepa.post.tele.dk ([195.41.46.235]:55436 "EHLO
-	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752800Ab1AFQMk (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 6 Jan 2011 11:12:40 -0500
-Date: Thu, 6 Jan 2011 17:12:38 +0100
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: kbuild system regression (final '/' in directory names)
-Message-ID: <20110106161238.GA15497@merkur.ravnborg.org>
-References: <20110106092849.GA1841@sepie.suse.cz> <Pine.LNX.4.44L0.1101061050140.1916-100000@iolanthe.rowland.org>
+Received: from antcom.de ([188.40.178.216]:53177 "EHLO chuck.antcom.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752864Ab1AFX2h (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 6 Jan 2011 18:28:37 -0500
+Message-ID: <4D265022.5020700@antcom.de>
+Date: Fri, 07 Jan 2011 00:28:34 +0100
+From: Roland Stigge <stigge@antcom.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Pine.LNX.4.44L0.1101061050140.1916-100000@iolanthe.rowland.org>
+Subject: Re: Kernel build ignores missing mkimage on building uImage
+References: <4D0B8D85.5090605@antcom.de> <20110106135558.GC1841@sepie.suse.cz>
+In-Reply-To: <20110106135558.GC1841@sepie.suse.cz>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Alan Stern <stern@rowland.harvard.edu>
-Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
+Hi,
+
+On 06/01/11 14:55, Michal Marek wrote:
+>> I.e. it says: "uImage is ready" even though the uImage file doesn't
+>> exist because mkimage is missing.
+>>
+>> (I'm working with Linux' current mainline GIT and also see that the
+>> problem is also present in the mmarek repo on git.kernel.org.)
+>>
+>> I propose the attached patch.
+>>
+>> Thanks for considering.
 > 
-> By the way, there seems to be a lot of unnecessary build activity when 
-> a single module is changed.  For example:
-> 
-> [stern@iolanthe usb-2.6]$ make drivers/usb/gadget/
->   CHK     include/linux/version.h
->   CHK     include/generated/utsrelease.h
->   CALL    scripts/checksyscalls.sh
-> [stern@iolanthe usb-2.6]$ touch drivers/usb/gadget/printer.c
-> [stern@iolanthe usb-2.6]$ make drivers/usb/gadget/
->   CHK     include/linux/version.h
->   CHK     include/generated/utsrelease.h
->   CALL    scripts/checksyscalls.sh
->   CC [M]  drivers/usb/gadget/printer.o
->   LD [M]  drivers/usb/gadget/g_zero.o
->   LD [M]  drivers/usb/gadget/g_ether.o
->   LD [M]  drivers/usb/gadget/gadgetfs.o
->   LD [M]  drivers/usb/gadget/g_file_storage.o
->   LD [M]  drivers/usb/gadget/g_serial.o
->   LD [M]  drivers/usb/gadget/g_printer.o
->   LD [M]  drivers/usb/gadget/g_cdc.o
-> 
-> It's perfectly understandable that printer.o and g_printer.o need to be 
-> rebuilt.  But why all those other "LD [M]" lines?
-Good question...
-$ make allmodconfig
-...
-$ make drivers/usb/gadget/
-...
-$ make drivers/usb/gadget/
-  CHK     include/linux/version.h
-  CHK     include/generated/utsrelease.h
-  CALL    scripts/checksyscalls.sh
-$ touch drivers/usb/gadget/printer.c
-$ make V=2 drivers/usb/gadget/
-  CHK     include/linux/version.h
-  CHK     include/generated/utsrelease.h
-  CALL    scripts/checksyscalls.sh - due to target is PHONY
-  CC [M]  drivers/usb/gadget/printer.o - due to: drivers/usb/gadget/printer.c
-  LD [M]  drivers/usb/gadget/g_zero.o - due to: drivers/usb/gadget/printer.o
-  LD [M]  drivers/usb/gadget/g_audio.o - due to: drivers/usb/gadget/printer.o
-  LD [M]  drivers/usb/gadget/g_ether.o - due to: drivers/usb/gadget/printer.o
-  LD [M]  drivers/usb/gadget/gadgetfs.o - due to: drivers/usb/gadget/printer.o
-  LD [M]  drivers/usb/gadget/g_file_storage.o - due to: drivers/usb/gadget/printer.o
-  LD [M]  drivers/usb/gadget/g_mass_storage.o - due to: drivers/usb/gadget/printer.o
-  LD [M]  drivers/usb/gadget/g_serial.o - due to: drivers/usb/gadget/printer.o
-  LD [M]  drivers/usb/gadget/g_printer.o - due to: drivers/usb/gadget/printer.o
-  LD [M]  drivers/usb/gadget/g_midi.o - due to: drivers/usb/gadget/printer.o
-  LD [M]  drivers/usb/gadget/g_cdc.o - due to: drivers/usb/gadget/printer.o
-  LD [M]  drivers/usb/gadget/g_hid.o - due to: drivers/usb/gadget/printer.o
-  LD [M]  drivers/usb/gadget/g_dbgp.o - due to: drivers/usb/gadget/printer.o
-  LD [M]  drivers/usb/gadget/g_multi.o - due to: drivers/usb/gadget/printer.o
-  LD [M]  drivers/usb/gadget/g_nokia.o - due to: drivers/usb/gadget/printer.o
-  LD [M]  drivers/usb/gadget/g_webcam.o - due to: drivers/usb/gadget/printer.o
+> The patch makes sense and afaics none of the architectures relies on
+> this behaviour (either they can't work without mkimage, or a
+> uimage-style target has to be requested by the user). Can I assume
+> "Signed-off-by: Roland Stigge <stigge@antcom.de>" on this patch.
 
-Yup - this is a limitation in kbuild...
-From Makefile.build:
-# We would rather have a list of rules like
-#       foo.o: $(foo-objs)
-# but that's not so easy, so we rather make all composite objects depend
-# on the set of all their parts
+Yes!
 
-We do not properly handle the prerequisites of individual
-composite modules.
-So a composite module depend on all .o files used in
-any composite module (in the same dir).
+Thanks,
 
-	Sam
+Roland
