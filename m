@@ -1,60 +1,31 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:33591 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753988Ab1AGWYo (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 7 Jan 2011 17:24:44 -0500
-Date: Fri, 7 Jan 2011 23:24:43 +0100
-From: Michal Marek <mmarek@suse.cz>
-Subject: [GIT] kbuild/kconfig updates for 2.6.38-rc1
-Message-ID: <20110107222443.GA14100@sepie.suse.cz>
+Received: from mail-qw0-f46.google.com ([209.85.216.46]:63802 "EHLO
+	mail-qw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751808Ab1AGWcj (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 7 Jan 2011 17:32:39 -0500
+Received: by qwa26 with SMTP id 26so18288182qwa.19
+        for <linux-kbuild@vger.kernel.org>; Fri, 07 Jan 2011 14:32:38 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+In-Reply-To: <20110107150221.GD1841@sepie.suse.cz>
+References: <1294328565-2750-1-git-send-email-jacmet@sunsite.dk>
+	<20110107150221.GD1841@sepie.suse.cz>
+Date: Fri, 7 Jan 2011 23:32:36 +0100
+Message-ID: <AANLkTikZEG+crVGuY7N-UbpeZTsOMf62t8xSUi5K3BoT@mail.gmail.com>
+Subject: Re: [PATCH] nconf: handle comment entries within choice/endchoice
+From: Peter Korsgaard <jacmet@sunsite.dk>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: jacmet@sunsite.dk, lacombar@gmail.com, mmarek@suse.cz, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>
+Cc: nir.tzachar@gmail.com, sam@ravnborg.org, linux-kbuild@vger.kernel.org
 
-Hi Linus,
+On Fri, Jan 7, 2011 at 4:02 PM, Michal Marek <mmarek@suse.cz> wrote:
 
-nothing exciting in the kconfig branch either: The infamous dependency
-warnings are a bit easier to read now, the rest is mostly code cleanup.
+> OK, applied, but is this actually used somewhere?
 
-Michal
+Afaik nowhere in the kernel, but we do use it in Buildroot (which uses
+kconfig like several other projects).
 
-The following changes since commit c8ddb2713c624f432fa5fe3c7ecffcdda46ea0d4:
-
-  Linux 2.6.37-rc1 (2010-11-01 07:54:12 -0400)
-
-are available in the git repository at:
-  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild-2.6.git kconfig
-
-Arnaud Lacombe (11):
-      kconfig: the day kconfig warns about "select"-abuse has come
-      kconfig: do not define AUTOCONF_INCLUDED
-      kconfig: nuke second argument of conf_write_symbol()
-      kbuild/nconf: fix spaces damage
-      kbuild/gconf: add dummy inline for bind_textdomain_codeset()
-      kconfig: fix typos
-      kconfig/conf: merge duplicate switch's case
-      kconfig: fix `zconfdebug' extern declaration
-      kconfig: add more S_INT and S_HEX consistency checks
-      kconfig: simplify select-with-unmet-direct-dependency warning
-      kconfig: fix warning
-
-Michal Marek (1):
-      kconfig: Make expr_copy() take a const argument
-
-Peter Korsgaard (1):
-      nconf: handle comment entries within choice/endchoice
-
- Documentation/kbuild/kconfig-language.txt |    1 -
- scripts/kconfig/conf.c                    |    2 -
- scripts/kconfig/confdata.c                |   27 ++++++------------
- scripts/kconfig/expr.c                    |   44 ++++++++++++++++++++++++++++-
- scripts/kconfig/expr.h                    |    3 +-
- scripts/kconfig/lkc.h                     |    7 +++-
- scripts/kconfig/menu.c                    |   15 ++++++++--
- scripts/kconfig/nconf.c                   |   10 ++++--
- scripts/kconfig/symbol.c                  |    8 ++++-
- 9 files changed, 84 insertions(+), 33 deletions(-)
+-- 
+Bye, Peter Korsgaard
