@@ -1,25 +1,24 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:33427 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:33591 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754122Ab1AGWPI (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 7 Jan 2011 17:15:08 -0500
-Date: Fri, 7 Jan 2011 23:15:03 +0100
+	id S1753988Ab1AGWYo (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 7 Jan 2011 17:24:44 -0500
+Date: Fri, 7 Jan 2011 23:24:43 +0100
 From: Michal Marek <mmarek@suse.cz>
-Subject: [GIT] kbuild core updates for 2.6.38-rc1
-Message-ID: <20110107221503.GA13373@sepie.suse.cz>
+Subject: [GIT] kbuild/kconfig updates for 2.6.38-rc1
+Message-ID: <20110107222443.GA14100@sepie.suse.cz>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: akpm@linux-foundation.org, bengardiner@nanometrics.ca, bgamari.foss@gmail.com, eric.dumazet@gmail.com, geert@linux-m68k.org, hjl.tools@gmail.com, jj@chaosbits.net, kirill@shutemov.name, lacombar@gmail.com, mmarek@suse.cz, olof@lixom.net, stigge@antcom.de, thomas@wytron.com.tw, vapier@gentoo.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: jacmet@sunsite.dk, lacombar@gmail.com, mmarek@suse.cz, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
 Hi Linus,
 
-plese pull following kbuild updates for 2.6.38-rc1. It's quite boring
-this time: two modpost fixes, a fixdep optimization that makes
-allmodconfig build 2% faster and a couple of small but welcome fixes.
+nothing exciting in the kconfig branch either: The infamous dependency
+warnings are a bit easier to read now, the rest is mostly code cleanup.
 
 Michal
 
@@ -28,62 +27,34 @@ The following changes since commit c8ddb2713c624f432fa5fe3c7ecffcdda46ea0d4:
   Linux 2.6.37-rc1 (2010-11-01 07:54:12 -0400)
 
 are available in the git repository at:
-  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild-2.6.git kbuild
+  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild-2.6.git kconfig
 
-Andrew Morton (1):
-      gen_init_cpio: checkpatch fixes
-
-Arnaud Lacombe (1):
-      scripts/genksyms: fix header usage
-
-Ben Gamari (1):
-      Make fixdep error handling more explicit
-
-Ben Gardiner (1):
-      kbuild: fix interaction of CONFIG_IKCONFIG and KCONFIG_CONFIG
-
-Eric Dumazet (1):
-      fixdep: use hash table instead of a single array
-
-Geert Uytterhoeven (1):
-      checksyscalls: Fix stand-alone usage
-
-H.J. Lu (1):
-      modpost: Put .zdebug* section on white list
-
-Jesper Juhl (1):
-      gen_init_cpio: Avoid race between call to stat() and call to open()
-
-Kirill A. Shutemov (2):
-      kbuild: introduce HDR_ARCH_LIST for headers_install_all
-      kbuild: export linux/{a.out,kvm,kvm_para}.h on headers_install_all
+Arnaud Lacombe (11):
+      kconfig: the day kconfig warns about "select"-abuse has come
+      kconfig: do not define AUTOCONF_INCLUDED
+      kconfig: nuke second argument of conf_write_symbol()
+      kbuild/nconf: fix spaces damage
+      kbuild/gconf: add dummy inline for bind_textdomain_codeset()
+      kconfig: fix typos
+      kconfig/conf: merge duplicate switch's case
+      kconfig: fix `zconfdebug' extern declaration
+      kconfig: add more S_INT and S_HEX consistency checks
+      kconfig: simplify select-with-unmet-direct-dependency warning
+      kconfig: fix warning
 
 Michal Marek (1):
-      Merge commit 'v2.6.37-rc1' into kbuild/kbuild
+      kconfig: Make expr_copy() take a const argument
 
-Mike Frysinger (1):
-      headers_install: check exit status of unifdef
+Peter Korsgaard (1):
+      nconf: handle comment entries within choice/endchoice
 
-Olof Johansson (1):
-      modpost: Fix address calculation in reloc_location()
-
-Roland Stigge (1):
-      mkuboot.sh: Fail if mkimage is missing
-
-Thomas Chou (1):
-      gen_init_cpio: remove leading `/' from file names
-
- Documentation/make/headers_install.txt |    5 +-
- Makefile                               |    1 +
- include/linux/Kbuild                   |    9 ++-
- kernel/Makefile                        |    2 +-
- scripts/basic/fixdep.c                 |  119 ++++++++++++++++++--------------
- scripts/checksyscalls.sh               |    4 +-
- scripts/genksyms/parse.c_shipped       |    2 +-
- scripts/genksyms/parse.y               |    2 +-
- scripts/headers.sh                     |    2 +-
- scripts/headers_install.pl             |    7 ++
- scripts/mkuboot.sh                     |    2 +-
- scripts/mod/modpost.c                  |    3 +-
- usr/gen_init_cpio.c                    |   20 ++++--
- 13 files changed, 108 insertions(+), 70 deletions(-)
+ Documentation/kbuild/kconfig-language.txt |    1 -
+ scripts/kconfig/conf.c                    |    2 -
+ scripts/kconfig/confdata.c                |   27 ++++++------------
+ scripts/kconfig/expr.c                    |   44 ++++++++++++++++++++++++++++-
+ scripts/kconfig/expr.h                    |    3 +-
+ scripts/kconfig/lkc.h                     |    7 +++-
+ scripts/kconfig/menu.c                    |   15 ++++++++--
+ scripts/kconfig/nconf.c                   |   10 ++++--
+ scripts/kconfig/symbol.c                  |    8 ++++-
+ 9 files changed, 84 insertions(+), 33 deletions(-)
