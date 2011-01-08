@@ -1,26 +1,56 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ey0-f174.google.com ([209.85.215.174]:33640 "EHLO
-	mail-ey0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752824Ab1AHQ3Q (ORCPT
+Received: from moutng.kundenserver.de ([212.227.17.9]:49152 "EHLO
+	moutng.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751685Ab1AHUxq (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 8 Jan 2011 11:29:16 -0500
-Date: Sat, 8 Jan 2011 18:29:07 +0200
-From: Alexey Dobriyan <adobriyan@gmail.com>
-Subject: Re: [GIT] kbuild misc updates for 2.6.38-rc1
-Message-ID: <20110108162907.GA4592@p183.telecom.by>
-References: <20110107230426.GA15371@sepie.suse.cz>
- <20110107232754.GB8237@pengutronix.de>
- <4D27A329.7010801@suse.cz>
+	Sat, 8 Jan 2011 15:53:46 -0500
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: Re: [RFC] kbuild: generic support for asm-generic
+Date: Sat, 8 Jan 2011 21:53:31 +0100
+References: <20110108130302.GA21698@merkur.ravnborg.org>
+In-Reply-To: <20110108130302.GA21698@merkur.ravnborg.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4D27A329.7010801@suse.cz>
+Content-Type: Text/Plain;
+  charset="iso-8859-1"
+Content-Transfer-Encoding: 7bit
+Message-Id: <201101082153.31837.arnd@arndb.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@pengutronix.de>, Linus Torvalds <torvalds@linux-foundation.org>, ak@linux.intel.com, akpm@linux-foundation.org, jonas.aberg@stericsson.com, julia@diku.dk, xiyou.wangcong@gmail.com, yann.morin.1998@anciens.enib.fr, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: lkml <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, linux arch <linux-arch@vger.kernel.org>, Guan Xuetao <guanxuetao@mprc.pku.edu.cn>, Michal Marek <mmarek@suse.cz>
 
-On Sat, Jan 08, 2011 at 12:35:05AM +0100, Michal Marek wrote:
-> Alexey, how much would it hurt you if the commit stayed as is?
+On Saturday 08 January 2011, Sam Ravnborg wrote:
+> Hi Arnd et all.
+> 
+> This is my second attempt to provide generic support for
+> architectures that use existing headers from asm-generic.
+> 
+> With this kbuild will read the file: arch/$ARCH/include/asm-generic
+> 
+> For each file listed in this file a wrapper is generated in
+> arch/$ARCH/inclue/generated/asm/
+> 
+> The patch include support so headers_install works.
+> 
+> The inspiration came from the unicore32 patchset,
+> but I redid this to make it more general.
+> 
+> I will follow-up with two patches.
+> One that implment the functionality.
+> A second that convert two headers in x86 to use the
+> new asm-generic stuff (only as an example).
 
-Doesn't matter as long as I can have my prototypes back. :-)
+Very nice patch!
+
+This is something I'd certainly like to see upstream, and you made
+a good point about keeping it seperate from the unicore32 submission.
+
+One detail I don't like too much is that you now have two different
+formats for specifying lists of headers to do something with.
+
+Instead of the new arch/*/include/asm-generic file, how about listing
+all files that are actually provided by the architecture as "header-y"
+in arch/*/include/asm/Kbuild, and listing all files as something
+else in include/asm-generic/Kbuild and include/asm-generic/Kbuild.asm?
+
+	Arnd
