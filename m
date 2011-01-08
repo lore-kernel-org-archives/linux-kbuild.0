@@ -1,54 +1,26 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from metis.ext.pengutronix.de ([92.198.50.35]:49083 "EHLO
-	metis.ext.pengutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753046Ab1AHQYQ (ORCPT
+Received: from mail-ey0-f174.google.com ([209.85.215.174]:33640 "EHLO
+	mail-ey0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752824Ab1AHQ3Q (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 8 Jan 2011 11:24:16 -0500
-Date: Sat, 8 Jan 2011 17:24:05 +0100
-From: Uwe =?iso-8859-1?Q?Kleine-K=F6nig?=
-	<u.kleine-koenig@pengutronix.de>
+	Sat, 8 Jan 2011 11:29:16 -0500
+Date: Sat, 8 Jan 2011 18:29:07 +0200
+From: Alexey Dobriyan <adobriyan@gmail.com>
 Subject: Re: [GIT] kbuild misc updates for 2.6.38-rc1
-Message-ID: <20110108162405.GD8237@pengutronix.de>
+Message-ID: <20110108162907.GA4592@p183.telecom.by>
 References: <20110107230426.GA15371@sepie.suse.cz>
  <20110107232754.GB8237@pengutronix.de>
  <4D27A329.7010801@suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
 In-Reply-To: <4D27A329.7010801@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>, Alexey Dobriyan <adobriyan@gmail.com>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, ak@linux.intel.com, akpm@linux-foundation.org, jonas.aberg@stericsson.com, julia@diku.dk, xiyou.wangcong@gmail.com, yann.morin.1998@anciens.enib.fr, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-
-Hi Michal, hi Alexey,
+To: Michal Marek <mmarek@suse.cz>
+Cc: Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@pengutronix.de>, Linus Torvalds <torvalds@linux-foundation.org>, ak@linux.intel.com, akpm@linux-foundation.org, jonas.aberg@stericsson.com, julia@diku.dk, xiyou.wangcong@gmail.com, yann.morin.1998@anciens.enib.fr, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
 On Sat, Jan 08, 2011 at 12:35:05AM +0100, Michal Marek wrote:
-> On 8.1.2011 00:27, Uwe Kleine-König wrote:
-> > Hi Michal,
-> > 
-> > On Sat, Jan 08, 2011 at 12:04:26AM +0100, Michal Marek wrote:
-> >> Uwe Kleine-König (1):
-> >>       tags: put function prototypes back!
-> > this is wrong.  It was Alexey who authored that patch.  I only pinged
-> > and forwarded it a few times.
-> 
-> Grr. You should added a second From: header to the message body in that
-> case, git am supports this. Rewinding the branch while Linus is possibly
-> reviewing it might not be a great idea. Alexey, how much would it hurt
-> you if the commit stayed as is?
-hmm, actually I know that, and wonder why send-email didn't add it.
+> Alexey, how much would it hurt you if the commit stayed as is?
 
-... some research ...  strange, in my repo I'm already the author for
-this patch.  So it seems the error is really on my side.  I don't
-remember but I guess git-am failed for me and then I commited without
-taking care to keep the original author.  @Alexey: sorry for messing
-this up.
-
-Best regards
-Uwe
-
--- 
-Pengutronix e.K.                           | Uwe Kleine-König            |
-Industrial Linux Solutions                 | http://www.pengutronix.de/  |
+Doesn't matter as long as I can have my prototypes back. :-)
