@@ -1,70 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepb.post.tele.dk ([195.41.46.236]:32850 "EHLO
-	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752045Ab1AHNFT (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 8 Jan 2011 08:05:19 -0500
-Date: Sat, 8 Jan 2011 14:05:18 +0100
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: [EXAMPLE PATCH 2/2] x86: start to utilize kbuild asm-generic
-	support
-Message-ID: <20110108130518.GB25461@merkur.ravnborg.org>
+Received: from chilli.pcug.org.au ([203.10.76.44]:59222 "EHLO smtps.tip.net.au"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752351Ab1AHNp6 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 8 Jan 2011 08:45:58 -0500
+Date: Sun, 9 Jan 2011 00:45:39 +1100
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+Subject: Re: [PATCH 1/2] kbuild: asm-generic support
+Message-Id: <20110109004539.5bf33510.sfr@canb.auug.org.au>
+In-Reply-To: <20110108130427.GA25461@merkur.ravnborg.org>
 References: <20110108130302.GA21698@merkur.ravnborg.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20110108130302.GA21698@merkur.ravnborg.org>
+	<20110108130427.GA25461@merkur.ravnborg.org>
+Mime-Version: 1.0
+Content-Type: multipart/signed; protocol="application/pgp-signature";
+ micalg="PGP-SHA1";
+ boundary="Signature=_Sun__9_Jan_2011_00_45_39_+1100_pqCfy2+KC9Q3YZl0"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: lkml <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, linux arch <linux-arch@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>, Guan Xuetao <guanxuetao@mprc.pku.edu.cn>, Michal Marek <mmarek@suse.cz>
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: lkml <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, linux arch <linux-arch@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>, Guan Xuetao <guanxuetao@mprc.pku.edu.cn>, Michal Marek <mmarek@suse.cz>
 
-From fd70bb929b975f02879860aefb48f0b0a14d7aab Mon Sep 17 00:00:00 2001
-From: Sam Ravnborg <sam@ravnborg.org>
-Date: Sat, 8 Jan 2011 13:50:52 +0100
-Subject: [PATCH 2/2] x86: start to utilize kbuild asm-generic support
+--Signature=_Sun__9_Jan_2011_00_45_39_+1100_pqCfy2+KC9Q3YZl0
+Content-Type: text/plain; charset=US-ASCII
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
----
- arch/x86/.gitignore             |    1 +
- arch/x86/include/asm-generic    |    3 +++
- arch/x86/include/asm/termbits.h |    1 -
- arch/x86/include/asm/termios.h  |    1 -
- 4 files changed, 4 insertions(+), 2 deletions(-)
- create mode 100644 arch/x86/include/asm-generic
- delete mode 100644 arch/x86/include/asm/termbits.h
- delete mode 100644 arch/x86/include/asm/termios.h
+Hi Sam,
 
-diff --git a/arch/x86/.gitignore b/arch/x86/.gitignore
-index 0280790..1448346 100644
---- a/arch/x86/.gitignore
-+++ b/arch/x86/.gitignore
-@@ -1,3 +1,4 @@
- boot/compressed/vmlinux
- tools/test_get_len
-+include/generated
- 
-diff --git a/arch/x86/include/asm-generic b/arch/x86/include/asm-generic
-new file mode 100644
-index 0000000..50aa036
---- /dev/null
-+++ b/arch/x86/include/asm-generic
-@@ -0,0 +1,3 @@
-+# generic headers from include/asm-generic/
-+termbits.h
-+termios.h
-diff --git a/arch/x86/include/asm/termbits.h b/arch/x86/include/asm/termbits.h
-deleted file mode 100644
-index 3935b10..0000000
---- a/arch/x86/include/asm/termbits.h
-+++ /dev/null
-@@ -1 +0,0 @@
--#include <asm-generic/termbits.h>
-diff --git a/arch/x86/include/asm/termios.h b/arch/x86/include/asm/termios.h
-deleted file mode 100644
-index 280d78a..0000000
---- a/arch/x86/include/asm/termios.h
-+++ /dev/null
-@@ -1 +0,0 @@
--#include <asm-generic/termios.h>
--- 
-1.6.0.6
+On Sat, 8 Jan 2011 14:04:27 +0100 Sam Ravnborg <sam@ravnborg.org> wrote:
+>
+> -LINUXINCLUDE    :=3D -I$(srctree)/arch/$(hdr-arch)/include -Iinclude \
+> +LINUXINCLUDE    :=3D -I$(srctree)/arch/$(hdr-arch)/include \
+> +                   -Iarch/$(hrd-arch)/include/generated -Iinclude \
+                               ^^^
+hdr-arch?
 
+--=20
+Cheers,
+Stephen Rothwell                    sfr@canb.auug.org.au
+http://www.canb.auug.org.au/~sfr/
+
+--Signature=_Sun__9_Jan_2011_00_45_39_+1100_pqCfy2+KC9Q3YZl0
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iQEcBAEBAgAGBQJNKGqDAAoJEDMEi1NhKgbsK7cIAIpyFKyokfnp2U89n3rW4/Aa
+u7V4p3ZMLn62soxpGh1rGXcxotRkqDZrqYlCbPjX0Gu2zXX02sCLl8EXqV6nZbpS
+ArFbEatYNward2tNfGbC+5oDFk+cjuRytHXc/JfqpejZwDhCwe/OeP9ZQl/P+jB1
+2JQDA/a1gVB8ilzLvyBoJClRcd9X0R6qArn+JjiZetJNEPt0FhtZ0s384FTLs387
+63v0WKpn+QS7AphuppuFjVqMxTitXQoofYpiaBYgE1J5NViYbErLUgkkoIOGmYkl
+E63rwMJ0fkdFIQYHJppNMz/FXEsZmXBRy9xaizNMckWl7EDU7qGzK4IKU218H+U=
+=5zls
+-----END PGP SIGNATURE-----
+
+--Signature=_Sun__9_Jan_2011_00_45_39_+1100_pqCfy2+KC9Q3YZl0--
