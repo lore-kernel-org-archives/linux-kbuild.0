@@ -1,83 +1,77 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepb.post.tele.dk ([195.41.46.236]:43878 "EHLO
-	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751641Ab1AHVdz (ORCPT
+Received: from moutng.kundenserver.de ([212.227.126.186]:51926 "EHLO
+	moutng.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751383Ab1AIAQK (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 8 Jan 2011 16:33:55 -0500
-Date: Sat, 8 Jan 2011 22:33:53 +0100
-From: Sam Ravnborg <sam@ravnborg.org>
+	Sat, 8 Jan 2011 19:16:10 -0500
+From: Arnd Bergmann <arnd@arndb.de>
 Subject: Re: [RFC] kbuild: generic support for asm-generic
-Message-ID: <20110108213353.GA24666@merkur.ravnborg.org>
-References: <20110108130302.GA21698@merkur.ravnborg.org> <201101082153.31837.arnd@arndb.de>
+Date: Sun, 9 Jan 2011 01:15:58 +0100
+References: <20110108130302.GA21698@merkur.ravnborg.org> <201101082153.31837.arnd@arndb.de> <20110108213353.GA24666@merkur.ravnborg.org>
+In-Reply-To: <20110108213353.GA24666@merkur.ravnborg.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <201101082153.31837.arnd@arndb.de>
+Content-Type: Text/Plain;
+  charset="iso-8859-1"
+Content-Transfer-Encoding: 7bit
+Message-Id: <201101090115.59234.arnd@arndb.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>
+To: Sam Ravnborg <sam@ravnborg.org>
 Cc: lkml <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, linux arch <linux-arch@vger.kernel.org>, Guan Xuetao <guanxuetao@mprc.pku.edu.cn>, Michal Marek <mmarek@suse.cz>
 
-On Sat, Jan 08, 2011 at 09:53:31PM +0100, Arnd Bergmann wrote:
-> On Saturday 08 January 2011, Sam Ravnborg wrote:
-> > Hi Arnd et all.
-> > 
-> > This is my second attempt to provide generic support for
-> > architectures that use existing headers from asm-generic.
-> > 
-> > With this kbuild will read the file: arch/$ARCH/include/asm-generic
-> > 
-> > For each file listed in this file a wrapper is generated in
-> > arch/$ARCH/inclue/generated/asm/
-> > 
-> > The patch include support so headers_install works.
-> > 
-> > The inspiration came from the unicore32 patchset,
-> > but I redid this to make it more general.
-> > 
-> > I will follow-up with two patches.
-> > One that implment the functionality.
-> > A second that convert two headers in x86 to use the
-> > new asm-generic stuff (only as an example).
+On Saturday 08 January 2011, Sam Ravnborg wrote:
+> We need a variables to express:
+> In include/asm-generic/Kbuild.asm
+> - This file exists in a generic variant and it is exported.
+>   The arch may use it verbatim or may have a local variant
+
+Actually, this is not how we traditionally use Kbuild.asm:
+This file is only included from the other asm/Kbuild files to
+get the list of common files that should be exported from the
+architectures. Originally, this included even files that had
+no asm-generic counterpart, but that has probably changed now.
+
+The naming of that file may have been a bit confusing.
+
+We already have the list of exported files in
+include/asm-generic/Kbuild that sort of does what you describe.
+
+> In arch/$(ARCH)/include/Kbuild.asm-generic
+> - This file is provided verbatim by asm-generic
+
+I would just put this information into the 
+arch/$(ARCH)/include/Kbuild file, with a different variable
+name.
+
+The other complication is that not all the files that an
+architecture may take verbatim from asm-generic are also
+exported.
+
+> Something like:
 > 
-> Very nice patch!
+> export-y - for files listed in Kbuild.asm
+> generic-y - for files listed in Kbuild.asm-generic
 > 
-> This is something I'd certainly like to see upstream, and you made
-> a good point about keeping it seperate from the unicore32 submission.
-> 
-> One detail I don't like too much is that you now have two different
-> formats for specifying lists of headers to do something with.
-> 
-> Instead of the new arch/*/include/asm-generic file, how about listing
-> all files that are actually provided by the architecture as "header-y"
-> in arch/*/include/asm/Kbuild, and listing all files as something
-> else in include/asm-generic/Kbuild and include/asm-generic/Kbuild.asm?
+> I will try to come up with a patch that uses this - or something
+> similar.
 
-Good point.
-I will try to address this together with the comments from Guang.
+Ok.
 
-If we use Kbuild syntax then I think we shall name the file
-something like
- 
-    Kbuild.asm-generic
+Would it be enough to have this?:
 
-I need to think about the naming of the variables...
+"generic-y" in arch/$(ARCH)/include/asm/Kbuild:
+  The architecture does not provide this header, the kernel should use
+  the asm-generic version through a generated file.
 
-We need a variables to express:
-In include/asm-generic/Kbuild.asm
-- This file exists in a generic variant and it is exported.
-  The arch may use it verbatim or may have a local variant
+"header-y" in arch/$(ARCH)/include/asm/Kbuild and include/asm-generic/Kbuild.asm:
+  This file gets exported to user space (as before), and may come from either
+  arch/$(ARCH)/include/asm or include/asm-generic (if listed as generic-y).
 
-In arch/$(ARCH)/include/Kbuild.asm-generic
-- This file is provided verbatim by asm-generic
+"header-y" in include/asm-generic/Kbuild: The asm-generic version of the header
+ gets installed. We always do this, because there might be reasons to install
+ headers for multiple architectures (with a symlink or similar).
 
+We could either install the generated file or a copy of the asm-generic file
+for any exported header that the architecture does not have itself.
 
-Something like:
-
-export-y - for files listed in Kbuild.asm
-generic-y - for files listed in Kbuild.asm-generic
-
-I will try to come up with a patch that uses this - or something
-similar.
-
-	Sam
+	Arnd
