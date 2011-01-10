@@ -1,58 +1,67 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pqueueb.post.tele.dk ([193.162.153.10]:34397 "EHLO
-	pqueueb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752073Ab1AJQ1G (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 10 Jan 2011 11:27:06 -0500
-Date: Mon, 10 Jan 2011 17:26:39 +0100
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH 1/2] kbuild: asm-generic support
-Message-ID: <20110110162639.GB13763@merkur.ravnborg.org>
-References: <20110108130302.GA21698@merkur.ravnborg.org> <20110109192707.GA12387@merkur.ravnborg.org> <20110109192907.GA12403@merkur.ravnborg.org> <004e01cbb0c8$4de80470$e9b80d50$@mprc.pku.edu.cn>
+Received: from vostochny.stro.at ([78.47.22.85]:43244 "EHLO vostochny.stro.at"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751393Ab1AJRqn (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 10 Jan 2011 12:46:43 -0500
+Date: Mon, 10 Jan 2011 18:46:40 +0100
+From: maximilian attems <max@stro.at>
+Subject: Re: [PATCH] kbuild: create linux-headers package in deb-pkg
+Message-ID: <20110110174640.GA619@stro.at>
+References: <1293201730-1583-1-git-send-email-tytso@mit.edu>
+ <20101225112026.GF20262@vostochny.stro.at>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <004e01cbb0c8$4de80470$e9b80d50$@mprc.pku.edu.cn>
+In-Reply-To: <20101225112026.GF20262@vostochny.stro.at>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Guan Xuetao <guanxuetao@mprc.pku.edu.cn>
-Cc: 'lkml' <linux-kernel@vger.kernel.org>, 'linux-kbuild' <linux-kbuild@vger.kernel.org>, 'linux arch' <linux-arch@vger.kernel.org>, 'Arnd Bergmann' <arnd@arndb.de>, 'Michal Marek' <mmarek@suse.cz>
+To: linux-kbuild@vger.kernel.org
+Cc: Michal Marek <mmarek@suse.cz>, Theodore Ts'o <tytso@mit.edu>, linux-kernel@vger.kernel.org
 
-Hi Guan (I will try to spell you name correct fom now on!)
+Seems review went unnoticed, due to using signature.
 
-> > +	During the prepare phase of the build a wrapper include
-> > +	file is generated in the directory:
+On Sat, 25 Dec 2010, maximilian attems wrote:
+> > +# Build header package
+> > +find . -name Makefile -o -name Kconfig\* -o -name \*.pl > /tmp/files$$
+> > +find arch/x86/include include scripts -type f >> /tmp/files$$
+> x86 centric?
+
+this will break on any non x86 arch, what is the correct variable
+for $ARCH?
+
+> > +(cd $objtree; find .config Module.symvers include scripts -type f >> /tmp/objfiles$$)
+> > +destdir=$hdrdir/usr/src/linux-headers-$version
+> > +mkdir -p "$destdir" "$hdrdir/DEBIAN" "$hdrdir/usr/share/doc/$hdrpackagename"
+> could move up to the other mkdir calls.
+
+we did that already.
+
+> > +tar -c -f - -T /tmp/files$$ | (cd $destdir; tar -xf -)
+> > +(cd $objtree; tar -c -f - -T /tmp/objfiles$$) | (cd $destdir; tar -xf -)
+> > +rm -f /tmp/files$$ /tmp/objfiles$$
+> > +arch=$(dpkg --print-architecture)
 > > +
-> > +		arch/$(ARCH)/include/generated/asm
-> IMHO, the directory could be include/generated/asm
-
-We have moved all the arch specific files away from include/*
-which is why I invented arch/$(ARCH)/include/generated.
-
-I was actually considering:
-
-   arch/$(ARCH)/generated.
-
-But using include/generated just seems wrong.
-
-> > 
-> >  # Work out what needs to be removed
-> > @@ -47,8 +54,12 @@ quiet_cmd_install = INSTALL $(printdir) ($(words $(all-files))\
-> >        cmd_install = \
-> >          $(PERL) $< $(srctree)/$(obj) $(install) $(SRCARCH) $(header-y); \
-> >          $(PERL) $< $(objtree)/$(obj) $(install) $(SRCARCH) $(objhdr-y); \
-> > +        for F in $(wrapper-files); do                                   \
-> > +                echo "\#include <asm-generic/$$F>" > $(install)/$$F;    \
-> > +        done;                                                           \
-> >          touch $@
-> > 
+> > +cat <<EOF >> debian/control
 > > +
-> Empty line.
-> 
+> > +Package: $hdrpackagename
+> > +Provides: linux-headers, linux-headers-2.6
+> > +Architecture: $arch
+> not sure if that will interfere with the new crosscompile feature
+> of deb-pkg in linux-next.
 
-Will fix.
+aboves arch call seems redundant with what we already have.
 
-As noticed in another mail the patchset has the same issue with rebuilding.
-This will likewise be included in next version.
+> > +Description: Linux kernel headers for $KERNELRELEASE on $arch
+> > + This package provides kernel header files for $KERNELRELEASE on $arch
+> > + .
+> > + This is useful for people who need to build external modules
+> > +EOF
+> > +
+> > +create_package "$hdrpackagename" "$hdrdir"
+> > +
+> >  # Do we have firmware? Move it out of the way and build it into a package.
+> >  if [ -e "$tmpdir/lib/firmware" ]; then
+> >  	mv "$tmpdir/lib/firmware" "$fwdir/lib/"
 
-	Sam
+-- 
+maks
