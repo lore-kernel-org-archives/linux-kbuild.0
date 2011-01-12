@@ -1,54 +1,38 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.gentoo.org ([140.211.166.183]:58949 "EHLO smtp.gentoo.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751755Ab1ALFp7 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 12 Jan 2011 00:45:59 -0500
-From: Mike Frysinger <vapier@gentoo.org>
-Subject: [PATCH] setlocalversion: update mercurial tag parsing
-Date: Wed, 12 Jan 2011 00:53:52 -0500
-Message-Id: <1294811632-23688-1-git-send-email-vapier@gentoo.org>
+Received: from mail-bw0-f46.google.com ([209.85.214.46]:48432 "EHLO
+	mail-bw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755029Ab1ALRdw (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 12 Jan 2011 12:33:52 -0500
+Received: by bwz15 with SMTP id 15so733043bwz.19
+        for <linux-kbuild@vger.kernel.org>; Wed, 12 Jan 2011 09:33:51 -0800 (PST)
+MIME-Version: 1.0
+Date: Wed, 12 Jan 2011 18:33:50 +0100
+Message-ID: <AANLkTi=XeygsSSM8Yx+VaznC0MPfP8Ptw7oN1MHBrH+a@mail.gmail.com>
+Subject: Building an external x86_64 module from an x86 (32-bit) machine?
+From: Philippe Auphelle <pauphelle@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>
-Cc: Mike Crowe <mcrowe@zipitwireless.com>
+To: linux-kbuild@vger.kernel.org
 
-From: Mike Crowe <mcrowe@zipitwireless.com>
+Hi,
 
-The tag output of hg doesn't quite match what setlocalversion currently
-expects, so update it to handle the latest format.
+Running a 2.6.35 kernel, and gcc 4.4.5, I'm trying to build both an
+x86 (32) and an x86_64 external (out of tree) module from my x86
+(32-bit) dev machine.
 
-Signed-off-by: Mike Crowe <mcrowe@zipitwireless.com>
-Signed-off-by: Mike Frysinger <vapier@gentoo.org>
----
- scripts/setlocalversion |   14 +++++++++-----
- 1 files changed, 9 insertions(+), 5 deletions(-)
+I have tried various tricks, such as using ARCH=X86_64 when running
+make, but to no avail so far: Whatever I do, V=1 shows kbuild invoking
+gcc with -m32 and ld with elf_i386.
 
-diff --git a/scripts/setlocalversion b/scripts/setlocalversion
-index ef8729f..4d40384 100755
---- a/scripts/setlocalversion
-+++ b/scripts/setlocalversion
-@@ -86,12 +86,16 @@ scm_version()
- 
- 	# Check for mercurial and a mercurial repo.
- 	if test -d .hg && hgid=`hg id 2>/dev/null`; then
--		tag=`printf '%s' "$hgid" | cut -s -d' ' -f2`
--
--		# Do we have an untagged version?
--		if [ -z "$tag" -o "$tag" = tip ]; then
--			id=`printf '%s' "$hgid" | sed 's/[+ ].*//'`
-+		# Do we have an tagged version?  If so, latesttagdistance == 1
-+		if [ "`hg log -r . --template '{latesttagdistance}'`" == "1" ]; then
-+			id=`hg log -r . --template '{latesttag}'`
- 			printf '%s%s' -hg "$id"
-+		else
-+			tag=`printf '%s' "$hgid" | cut -d' ' -f2`
-+			if [ -z "$tag" -o "$tag" = tip ]; then
-+				id=`printf '%s' "$hgid" | sed 's/[+ ].*//'`
-+				printf '%s%s' -hg "$id"
-+			fi
- 		fi
- 
- 		# Are there uncommitted changes?
--- 
-1.7.4.rc1
+I have googled around for a few hours without finding a solution to
+the problem.
+Since the x86 arch is unified and gcc is able to gen (and link) x86_64
+targets, it looks like this could be done, and I must be missing
+something.
+Could anyone point me to the right direction?
 
+TIA!
+
+PhA.
