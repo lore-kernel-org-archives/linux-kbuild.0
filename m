@@ -1,77 +1,54 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from vostochny.stro.at ([78.47.22.85]:41783 "EHLO vostochny.stro.at"
+Received: from cantor2.suse.de ([195.135.220.15]:49267 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754728Ab1AMOim (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 13 Jan 2011 09:38:42 -0500
-Date: Thu, 13 Jan 2011 14:38:41 +0000
-From: maximilian attems <max@stro.at>
-Subject: Re: [PATCH] kbuild: create linux-headers package in deb-pkg
-Message-ID: <20110113143840.GN20262@vostochny.stro.at>
-References: <1293201730-1583-1-git-send-email-tytso@mit.edu> <20101225112026.GF20262@vostochny.stro.at> <20110110174640.GA619@stro.at> <4D2F044E.7060607@suse.cz>
+	id S1756717Ab1AMQOI (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 13 Jan 2011 11:14:08 -0500
+Message-ID: <4D2F24CD.5040101@suse.cz>
+Date: Thu, 13 Jan 2011 17:14:05 +0100
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <4D2F044E.7060607@suse.cz>
+Subject: Re: [PATCH 1/2] kbuild: asm-generic support
+References: <20110108130302.GA21698@merkur.ravnborg.org> <20110109192707.GA12387@merkur.ravnborg.org> <20110109192907.GA12403@merkur.ravnborg.org>
+In-Reply-To: <20110109192907.GA12403@merkur.ravnborg.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org, Theodore Ts'o <tytso@mit.edu>, linux-kernel@vger.kernel.org, Ralf =?iso-8859-1?Q?R=F6sch?= <ralf.roesch@rw-gmbh.de>, debian-kernel@lists.debian.org, Ben Hutchings <ben@decadent.org.uk>
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: lkml <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, linux arch <linux-arch@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>, Guan Xuetao <guanxuetao@mprc.pku.edu.cn>
 
-On Thu, Jan 13, 2011 at 02:55:26PM +0100, Michal Marek wrote:
-> On 10.1.2011 18:46, maximilian attems wrote:
-> >>> +find . -name Makefile -o -name Kconfig\* -o -name \*.pl > /tmp/files$$
-> >>> +find arch/x86/include include scripts -type f >> /tmp/files$$
-> >> x86 centric?
-> > 
-> > this will break on any non x86 arch, what is the correct variable
-> > for $ARCH?
-> 
-> This should be changed to arch/$SRCARCH/include.
+On 9.1.2011 20:29, Sam Ravnborg wrote:
+> diff --git a/scripts/asm-generic.sh b/scripts/asm-generic.sh
+> new file mode 100644
+> index 0000000..d28127f
+> --- /dev/null
+> +++ b/scripts/asm-generic.sh
+> @@ -0,0 +1,33 @@
+> +#!/bin/sh
+> +#
+> +# include/asm-generic contains a lot of files that are used
+> +# verbatim by several architectures.
+> +#
+> +# This scripts read the file arch/$(ARCH)/include/asm/Kbuild
+> +# and for each file listed in this file with generic-y create
+> +# a small wrapper file in arch/$(ARCH)/include/generated/
+> +
+> +# read list of header files form Kbuild
+> +# The file has make syntax which looks like this:
+> +#
+> +# generic-y += <filename>
+> +
+> +srcdir=${srctree}/arch/$1/include/asm
+> +gendir=arch/$1/include/generated/asm
+> +
+> +# Read the list of files (note that the list uses make syntax)
+> +files=$( cat ${srcdir}/Kbuild | \
+> +          grep -v ^# | grep generic-y | cut -d '=' -f 2)
 
-thanks for the pointer, sent patch, that was the easy part.
- 
- 
-> >>> +tar -c -f - -T /tmp/files$$ | (cd $destdir; tar -xf -)
-> >>> +(cd $objtree; tar -c -f - -T /tmp/objfiles$$) | (cd $destdir; tar -xf -)
-> >>> +rm -f /tmp/files$$ /tmp/objfiles$$
-> >>> +arch=$(dpkg --print-architecture)
-> >>> +
-> >>> +cat <<EOF >> debian/control
-> >>> +
-> >>> +Package: $hdrpackagename
-> >>> +Provides: linux-headers, linux-headers-2.6
-> >>> +Architecture: $arch
-> >> not sure if that will interfere with the new crosscompile feature
-> >> of deb-pkg in linux-next.
-> > 
-> > aboves arch call seems redundant with what we already have.
-> 
-> Yes, please remove it. 
+Now that the list of required generic headers is in a Kbuild file, it
+would be better to let make parse it, instead of enforcing one way to
+construct the list (it is the preferred way, but C files that do not
+conform to Documentation/CodingStyle are not rejected by the compiler
+either). I will post a patch when I'm back online in the evening.
 
-will look at it again in a calmer moment.
-
-> BTW, here is a bugreport I got privately about
-> the very same issue:
-> On 12.1.2011 10:02, Ralf Rösch wrote:
-> | [...]
-> | Attached you will find a patch to complete the build successfully for my
-> | mipsel target.
-> | The dpkg --print-architecture shows i386 which results in error:
-> | dpkg-gencontrol: Fehler: aktuelle Host-Architektur »mipsel« erscheint
-> | nicht in der Architekturliste (i386) des Pakets
-> | (current host architecture 'mipsel' does not appear in package's list
-> i386)
-> | so I changed "arch" temporary to "any".
-> |
-> | It would be nice if it would be possible to make the kernel-headers
-> | installable on any host.
-> | They are needed very frequently for cross-compiling. (I already possible
-> | with dpkg force).
-
-Added Ben Hutchings and d-kernel on Cc. I do not use OOT modules, so
-I don't have a strong word on that, but from what I see in Debian
-they are arch specific.
-
--- 
-maks
+Michal
