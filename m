@@ -1,63 +1,112 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepa.post.tele.dk ([195.41.46.235]:55688 "EHLO
-	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756717Ab1AMRBd (ORCPT
+Received: from mail-iy0-f174.google.com ([209.85.210.174]:56398 "EHLO
+	mail-iy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757335Ab1AMRmO convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 13 Jan 2011 12:01:33 -0500
-Date: Thu, 13 Jan 2011 18:01:31 +0100
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH 1/2] kbuild: asm-generic support
-Message-ID: <20110113170131.GA28377@merkur.ravnborg.org>
-References: <20110108130302.GA21698@merkur.ravnborg.org> <20110109192707.GA12387@merkur.ravnborg.org> <20110109192907.GA12403@merkur.ravnborg.org> <4D2F24CD.5040101@suse.cz>
+	Thu, 13 Jan 2011 12:42:14 -0500
+Received: by iyj18 with SMTP id 18so1735574iyj.19
+        for <linux-kbuild@vger.kernel.org>; Thu, 13 Jan 2011 09:42:13 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4D2F24CD.5040101@suse.cz>
+In-Reply-To: <AANLkTinGQ8q2GDkr4rYC3JT3DggfzH3GQOKmthJtp+4S@mail.gmail.com>
+References: <AANLkTi=XeygsSSM8Yx+VaznC0MPfP8Ptw7oN1MHBrH+a@mail.gmail.com>
+	<AANLkTinM4WoR=rSUbk4j94U9pqSgJOdB84A+5sfj71dK@mail.gmail.com>
+	<AANLkTi=NLmekT9SfgiuS2FGnGXNYyXBKZxorobEBLbMh@mail.gmail.com>
+	<AANLkTinGQ8q2GDkr4rYC3JT3DggfzH3GQOKmthJtp+4S@mail.gmail.com>
+Date: Thu, 13 Jan 2011 12:42:13 -0500
+Message-ID: <AANLkTikMW799DXo2RuEir1q-zxOvXp4oUT=NYpTrrVwS@mail.gmail.com>
+Subject: Re: Building an external x86_64 module from an x86 (32-bit) machine?
+From: Arnaud Lacombe <lacombar@gmail.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: lkml <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, linux arch <linux-arch@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>, Guan Xuetao <guanxuetao@mprc.pku.edu.cn>
+To: Philippe Auphelle <pauphelle@gmail.com>
+Cc: linux-kbuild@vger.kernel.org
 
-On Thu, Jan 13, 2011 at 05:14:05PM +0100, Michal Marek wrote:
-> On 9.1.2011 20:29, Sam Ravnborg wrote:
-> > diff --git a/scripts/asm-generic.sh b/scripts/asm-generic.sh
-> > new file mode 100644
-> > index 0000000..d28127f
-> > --- /dev/null
-> > +++ b/scripts/asm-generic.sh
-> > @@ -0,0 +1,33 @@
-> > +#!/bin/sh
-> > +#
-> > +# include/asm-generic contains a lot of files that are used
-> > +# verbatim by several architectures.
-> > +#
-> > +# This scripts read the file arch/$(ARCH)/include/asm/Kbuild
-> > +# and for each file listed in this file with generic-y create
-> > +# a small wrapper file in arch/$(ARCH)/include/generated/
-> > +
-> > +# read list of header files form Kbuild
-> > +# The file has make syntax which looks like this:
-> > +#
-> > +# generic-y += <filename>
-> > +
-> > +srcdir=${srctree}/arch/$1/include/asm
-> > +gendir=arch/$1/include/generated/asm
-> > +
-> > +# Read the list of files (note that the list uses make syntax)
-> > +files=$( cat ${srcdir}/Kbuild | \
-> > +          grep -v ^# | grep generic-y | cut -d '=' -f 2)
-> 
-> Now that the list of required generic headers is in a Kbuild file, it
-> would be better to let make parse it, instead of enforcing one way to
-> construct the list (it is the preferred way, but C files that do not
-> conform to Documentation/CodingStyle are not rejected by the compiler
-> either). I will post a patch when I'm back online in the evening.
-Would be great!
+Hi,
 
-Guan also pointed out a less than minor issue...
-I overwrite the files each time so that I force a rebuild.
+On Thu, Jan 13, 2011 at 11:57 AM, Philippe Auphelle <pauphelle@gmail.com> wrote:
+> OK, problem solved, case closed!
+>
+> Now in case this can help someone else, the whole recipe follows, and
+> it should work for generating various x86 kernels of any bitness from
+> a single 32-bit or 64-bit Linux, AND from there out-of-tree modules.
+> It just requires the regular native x86 gcc toolchain (post 4.2.2
+> version) for either 32 or 64-bit x86, no cross compiler, no nuttin',
+> just (may be) all or part of the packages corresponding on your distro
+> to debian's lib64gcc1.deb, libc6-amd64.deb, libc6-dev-amd64.deb and
+> g++4.4-multilib.deb
+> Since I already had those installed, I couldn't check what part, if
+> any, was needed to kbuild to x86_64.
+>
+> What I wanted to do was to configure and prepare kernel configs for
+> 32-bit and 64-bit x86 kernels in “remote” directories, i.e. in
+> directories that were out of the kernel source tree.
+> The linux.com page mentioned below is about the only source I found
+> for detailed info about handling multiple kernel targets with kbuild,
+> with all the gory details, explanations, do's and don't:
+>
+> http://www.linux.com/learn/linux-career-center/29812-the-kernel-newbie-corner-building-and-running-a-new-kernel
+>
+> Then it took me some time to figure out a peculiar behavior of make
+> menuconfig : make menuconfig does NOT prompt for 64-bitness UNLESS it
+> is called with an ARCH setting like:
+>
+> make ARCH=x86 O=/home/foo/2.6.35-24-generic-x86_64 menuconfig
+>
+> The trick is to set ARCH=x86. When using ARCH=x86_64, not only does
+> "make menuconfig" NOT prompt for bitness, but it does NOT set bitness
+> to 64-bit either.
+> I knew that 64-bit prompt existed because I had seen once before,
+> during my previous (and failed) attempts, but couldn't figure out how
+> I had triggered it (and why I couldn't see it again). And it took me
+> quite a while to figure this one out!
+> (side note):
+> What I would ideally expect menuconfig to do is this:
+> When ARCH= is set to any form of x86 (be it x86, x86_64, i386 or
+> X86_32), I would expect menuconfig to show the prompt for bitness,
+> with the 64-bit prompt preset by menuconfig according to the ARCH
+> value that was provided. I suppose this would be just as useful for
+> other non-x86 ARCH targets that have variable bitnesses, too.
+>
+> Anyway, the whole process to kbuild an x86_64 external module from a
+> 32-bit x86 machine is thus:
+> Create a specific .config file set for 64-bit in a remote directory,
+> using something like:
+> make ARCH=x86 O=/home/foo/2.6.35-24-generic-x86_64 menuconfig
+>
+> Use
+> make ARCH=x86_64 O=/home/foo/2.6.35-24-generic-x86_64 modules_prepare
+> to prepare the remote kernel tree for external module building (see
+> Documentation/kbuild/modules.txt, “ How to build external modules”).
+>
+> Or (preferably) use a plain make
+> make ARCH=x86_64 O=/home/foo/2.6.35-24-generic-x86_64
+> to run a full kernel build. The later is most likely better, since as
+> Arnaud mentoned above, Documentation/kbuild/modules.txt says:
+>
+> NOTE: "modules_prepare" will not build Module.symvers even if
+> CONFIG_MODVERSIONS is set; therefore, a full kernel build needs to be
+> executed to make module versioning work.
+>
+> CAVEAT:
+> On the modules_prepare or plain build make operations, note that one
+> MUST use the ARCH=x86_64 (and NOT the ARCH=x86 such as "make
+> menuconfig" wants). Otherwise, the make will be done for a 32-bit
+> target and will immediately fail somehow because of mismatching
+> options between the .config file and the make logic.
+>
+> I just completed the full x86_64 kernel build, that worked perfectly,
+> and I do have a brand new x86_64 object kernel tree in my "remote"
+> target directory. And yes, all the .ko are x86_64 ones, too. ;-)
+> And following this, my own make for my external module happily cranked
+> out an x86_64 external module.
+>
+> Thanks for your help! /PhA.
+>
+Going though this, I think you went on the wrong mailing list as what
+you describe is mostly how the x86 folks setup their stuff, not a
+kbuild/kconfig per-se, as tools, issue(s). I guess you should address
+any request to them directly.
 
-If you do not find time then I will update the
-patch during the weekend.
-
-	Sam
+ - Arnaud
