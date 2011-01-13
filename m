@@ -1,38 +1,77 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-bw0-f46.google.com ([209.85.214.46]:61247 "EHLO
-	mail-bw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932610Ab1AMJ1m (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 13 Jan 2011 04:27:42 -0500
-Received: by bwz15 with SMTP id 15so1334806bwz.19
-        for <linux-kbuild@vger.kernel.org>; Thu, 13 Jan 2011 01:27:40 -0800 (PST)
+Received: from cantor.suse.de ([195.135.220.2]:57805 "EHLO mx1.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1756839Ab1AMNz2 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 13 Jan 2011 08:55:28 -0500
+Message-ID: <4D2F044E.7060607@suse.cz>
+Date: Thu, 13 Jan 2011 14:55:26 +0100
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-In-Reply-To: <AANLkTinM4WoR=rSUbk4j94U9pqSgJOdB84A+5sfj71dK@mail.gmail.com>
-References: <AANLkTi=XeygsSSM8Yx+VaznC0MPfP8Ptw7oN1MHBrH+a@mail.gmail.com>
-	<AANLkTinM4WoR=rSUbk4j94U9pqSgJOdB84A+5sfj71dK@mail.gmail.com>
-Date: Thu, 13 Jan 2011 10:27:40 +0100
-Message-ID: <AANLkTi=NLmekT9SfgiuS2FGnGXNYyXBKZxorobEBLbMh@mail.gmail.com>
-Subject: Re: Building an external x86_64 module from an x86 (32-bit) machine?
-From: Philippe Auphelle <pauphelle@gmail.com>
+Subject: Re: [PATCH] kbuild: create linux-headers package in deb-pkg
+References: <1293201730-1583-1-git-send-email-tytso@mit.edu> <20101225112026.GF20262@vostochny.stro.at> <20110110174640.GA619@stro.at>
+In-Reply-To: <20110110174640.GA619@stro.at>
 Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
+To: maximilian attems <max@stro.at>
+Cc: linux-kbuild@vger.kernel.org, Theodore Ts'o <tytso@mit.edu>, linux-kernel@vger.kernel.org, =?ISO-8859-1?Q?Ralf_R=F6sch?= <ralf.roesch@rw-gmbh.de>
 
-Arnaud,
+On 10.1.2011 18:46, maximilian attems wrote:
+> Seems review went unnoticed, due to using signature.
 
-> I suppose that you ensured that your kernel tree when you are building
-> for x86-32 has been "prepared" for building for x86-32, and that you
-> are using a dedicated x86-64 config and preparation when you try to
-> build for x86-64 ?
+Oh, indeed, I thought that was just full-quote in your email, sorry.
 
-I do use a dedicated x86_64 config, but I didn't prepare.
-That's most likely the clue I was missing.
-Since all this stuff happens automagically when kbuilding for the
-running kernel, it just becomes tricky when you have to decouple the
-steps and understand what really goes on below.
+> On Sat, 25 Dec 2010, maximilian attems wrote:
+>>> +# Build header package
+>>> +find . -name Makefile -o -name Kconfig\* -o -name \*.pl > /tmp/files$$
+>>> +find arch/x86/include include scripts -type f >> /tmp/files$$
+>> x86 centric?
+> 
+> this will break on any non x86 arch, what is the correct variable
+> for $ARCH?
 
-I'll come back with the results if I get through it (or more questions
-if I don't ;-) )
+This should be changed to arch/$SRCARCH/include.
 
-Thanks alot! /PhA.
+
+>>> +(cd $objtree; find .config Module.symvers include scripts -type f >> /tmp/objfiles$$)
+>>> +destdir=$hdrdir/usr/src/linux-headers-$version
+>>> +mkdir -p "$destdir" "$hdrdir/DEBIAN" "$hdrdir/usr/share/doc/$hdrpackagename"
+>> could move up to the other mkdir calls.
+> 
+> we did that already.
+> 
+>>> +tar -c -f - -T /tmp/files$$ | (cd $destdir; tar -xf -)
+>>> +(cd $objtree; tar -c -f - -T /tmp/objfiles$$) | (cd $destdir; tar -xf -)
+>>> +rm -f /tmp/files$$ /tmp/objfiles$$
+>>> +arch=$(dpkg --print-architecture)
+>>> +
+>>> +cat <<EOF >> debian/control
+>>> +
+>>> +Package: $hdrpackagename
+>>> +Provides: linux-headers, linux-headers-2.6
+>>> +Architecture: $arch
+>> not sure if that will interfere with the new crosscompile feature
+>> of deb-pkg in linux-next.
+> 
+> aboves arch call seems redundant with what we already have.
+
+Yes, please remove it. BTW, here is a bugreport I got privately about
+the very same issue:
+On 12.1.2011 10:02, Ralf Rösch wrote:
+| [...]
+| Attached you will find a patch to complete the build successfully for my
+| mipsel target.
+| The dpkg --print-architecture shows i386 which results in error:
+| dpkg-gencontrol: Fehler: aktuelle Host-Architektur »mipsel« erscheint
+| nicht in der Architekturliste (i386) des Pakets
+| (current host architecture 'mipsel' does not appear in package's list
+i386)
+| so I changed "arch" temporary to "any".
+|
+| It would be nice if it would be possible to make the kernel-headers
+| installable on any host.
+| They are needed very frequently for cross-compiling. (I already possible
+| with dpkg force).
+
+Michal
