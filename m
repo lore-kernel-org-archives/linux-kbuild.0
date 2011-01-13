@@ -1,77 +1,39 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor.suse.de ([195.135.220.2]:57805 "EHLO mx1.suse.de"
+Received: from vostochny.stro.at ([78.47.22.85]:46745 "EHLO vostochny.stro.at"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1756839Ab1AMNz2 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 13 Jan 2011 08:55:28 -0500
-Message-ID: <4D2F044E.7060607@suse.cz>
-Date: Thu, 13 Jan 2011 14:55:26 +0100
-From: Michal Marek <mmarek@suse.cz>
-MIME-Version: 1.0
-Subject: Re: [PATCH] kbuild: create linux-headers package in deb-pkg
-References: <1293201730-1583-1-git-send-email-tytso@mit.edu> <20101225112026.GF20262@vostochny.stro.at> <20110110174640.GA619@stro.at>
-In-Reply-To: <20110110174640.GA619@stro.at>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 8bit
+	id S1754728Ab1AMOe0 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 13 Jan 2011 09:34:26 -0500
+From: maximilian attems <max@stro.at>
+Subject: [PATCH] deb-pkg: Use $SRCARCH for include path
+Date: Thu, 13 Jan 2011 15:34:20 +0100
+Message-Id: <1294929260-9511-1-git-send-email-max@stro.at>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: maximilian attems <max@stro.at>
-Cc: linux-kbuild@vger.kernel.org, Theodore Ts'o <tytso@mit.edu>, linux-kernel@vger.kernel.org, =?ISO-8859-1?Q?Ralf_R=F6sch?= <ralf.roesch@rw-gmbh.de>
+To: linux-kbuild@vger.kernel.org
+Cc: Michal Marek <mmarek@suse.cz>, maximilian attems <max@stro.at>
 
-On 10.1.2011 18:46, maximilian attems wrote:
-> Seems review went unnoticed, due to using signature.
+Fix x86 centric path to allow building kernel-header packages for
+other architecture.
 
-Oh, indeed, I thought that was just full-quote in your email, sorry.
+Thanks: Michal Marek <mmarek@suse.cz>
+Signed-off-by: maximilian attems <max@stro.at>
+---
+ scripts/package/builddeb |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-> On Sat, 25 Dec 2010, maximilian attems wrote:
->>> +# Build header package
->>> +find . -name Makefile -o -name Kconfig\* -o -name \*.pl > /tmp/files$$
->>> +find arch/x86/include include scripts -type f >> /tmp/files$$
->> x86 centric?
-> 
-> this will break on any non x86 arch, what is the correct variable
-> for $ARCH?
+diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+index b0b2357..ebc6d6e 100644
+--- a/scripts/package/builddeb
++++ b/scripts/package/builddeb
+@@ -239,7 +239,7 @@ fi
+ 
+ # Build header package
+ find . -name Makefile -o -name Kconfig\* -o -name \*.pl > /tmp/files$$
+-find arch/x86/include include scripts -type f >> /tmp/files$$
++find arch/$SRCARCH/include include scripts -type f >> /tmp/files$$
+ (cd $objtree; find .config Module.symvers include scripts -type f >> /tmp/objfiles$$)
+ destdir=$kernel_headers_dir/usr/src/linux-headers-$version
+ mkdir -p "$destdir"
+-- 
+1.7.2.3
 
-This should be changed to arch/$SRCARCH/include.
-
-
->>> +(cd $objtree; find .config Module.symvers include scripts -type f >> /tmp/objfiles$$)
->>> +destdir=$hdrdir/usr/src/linux-headers-$version
->>> +mkdir -p "$destdir" "$hdrdir/DEBIAN" "$hdrdir/usr/share/doc/$hdrpackagename"
->> could move up to the other mkdir calls.
-> 
-> we did that already.
-> 
->>> +tar -c -f - -T /tmp/files$$ | (cd $destdir; tar -xf -)
->>> +(cd $objtree; tar -c -f - -T /tmp/objfiles$$) | (cd $destdir; tar -xf -)
->>> +rm -f /tmp/files$$ /tmp/objfiles$$
->>> +arch=$(dpkg --print-architecture)
->>> +
->>> +cat <<EOF >> debian/control
->>> +
->>> +Package: $hdrpackagename
->>> +Provides: linux-headers, linux-headers-2.6
->>> +Architecture: $arch
->> not sure if that will interfere with the new crosscompile feature
->> of deb-pkg in linux-next.
-> 
-> aboves arch call seems redundant with what we already have.
-
-Yes, please remove it. BTW, here is a bugreport I got privately about
-the very same issue:
-On 12.1.2011 10:02, Ralf Rösch wrote:
-| [...]
-| Attached you will find a patch to complete the build successfully for my
-| mipsel target.
-| The dpkg --print-architecture shows i386 which results in error:
-| dpkg-gencontrol: Fehler: aktuelle Host-Architektur »mipsel« erscheint
-| nicht in der Architekturliste (i386) des Pakets
-| (current host architecture 'mipsel' does not appear in package's list
-i386)
-| so I changed "arch" temporary to "any".
-|
-| It would be nice if it would be possible to make the kernel-headers
-| installable on any host.
-| They are needed very frequently for cross-compiling. (I already possible
-| with dpkg force).
-
-Michal
