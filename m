@@ -1,34 +1,29 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:46972 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:46999 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752536Ab1ANXlc (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 14 Jan 2011 18:41:32 -0500
-Date: Sat, 15 Jan 2011 00:41:30 +0100
+	id S1752362Ab1ANXn6 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 14 Jan 2011 18:43:58 -0500
+Date: Sat, 15 Jan 2011 00:43:57 +0100
 From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [PATCH] setlocalversion: update mercurial tag parsing
-Message-ID: <20110114234130.GA27291@sepie.suse.cz>
-References: <1294811632-23688-1-git-send-email-vapier@gentoo.org>
+Subject: Re: [PATCH] deb-pkg: Use $SRCARCH for include path
+Message-ID: <20110114234356.GB27291@sepie.suse.cz>
+References: <1294929260-9511-1-git-send-email-max@stro.at>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1294811632-23688-1-git-send-email-vapier@gentoo.org>
+In-Reply-To: <1294929260-9511-1-git-send-email-max@stro.at>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Mike Frysinger <vapier@gentoo.org>
-Cc: linux-kbuild@vger.kernel.org, Mike Crowe <mcrowe@zipitwireless.com>
+To: maximilian attems <max@stro.at>
+Cc: linux-kbuild@vger.kernel.org
 
-On Wed, Jan 12, 2011 at 12:53:52AM -0500, Mike Frysinger wrote:
-> From: Mike Crowe <mcrowe@zipitwireless.com>
+On Thu, Jan 13, 2011 at 03:34:20PM +0100, maximilian attems wrote:
+> Fix x86 centric path to allow building kernel-header packages for
+> other architecture.
 > 
-> The tag output of hg doesn't quite match what setlocalversion currently
-> expects, so update it to handle the latest format.
-> 
-> Signed-off-by: Mike Crowe <mcrowe@zipitwireless.com>
-> Signed-off-by: Mike Frysinger <vapier@gentoo.org>
-> ---
->  scripts/setlocalversion |   14 +++++++++-----
->  1 files changed, 9 insertions(+), 5 deletions(-)
+> Thanks: Michal Marek <mmarek@suse.cz>
+> Signed-off-by: maximilian attems <max@stro.at>
 
-Thanks, applied to kbuild-2.6.git#misc.
+Thanks, applied to kbuild-2.6.git#packaging.
 
 Michal
