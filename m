@@ -1,131 +1,49 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from qmta05.emeryville.ca.mail.comcast.net ([76.96.30.48]:55368 "EHLO
-	qmta05.emeryville.ca.mail.comcast.net" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751923Ab1ANONM (ORCPT
+Received: from qmta10.emeryville.ca.mail.comcast.net ([76.96.30.17]:59551 "EHLO
+	qmta10.emeryville.ca.mail.comcast.net" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1752245Ab1ANONQ (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 14 Jan 2011 09:13:12 -0500
+	Fri, 14 Jan 2011 09:13:16 -0500
 From: matt mooney <mfm@muteddisk.com>
-Subject: [RESEND PATCH 00/27] update makefiles to use the newer flag variables
-Date: Fri, 14 Jan 2011 06:12:23 -0800
-Message-Id: <cover.1295006561.git.mfm@muteddisk.com>
+Subject: [RESEND PATCH 01/27] kernel: change to new flag variable
+Date: Fri, 14 Jan 2011 06:12:24 -0800
+Message-Id: <24def639d4d33e9f50e11d7ae33f6039b6f92573.1295006565.git.mfm@muteddisk.com>
+In-Reply-To: <cover.1295006561.git.mfm@muteddisk.com>
+References: <cover.1295006561.git.mfm@muteddisk.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Michal Marek <mmarek@suse.cz>
 Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Hi Michal,
+Replace EXTRA_CFLAGS with ccflags-y.
 
-These are the patches that never made their way into the linux-next tree.
-I have added all of the acks that came through.
+Signed-off-by: matt mooney <mfm@muteddisk.com>
+Acked-by: WANG Cong <xiyou.wangcong@gmail.com>
+---
+ kernel/gcov/Makefile  |    2 +-
+ kernel/power/Makefile |    3 ++-
+ 2 files changed, 3 insertions(+), 2 deletions(-)
 
-Thanks,
-matt
-
-
-matt mooney (27):
-  kernel: change to new flag variable
-  alpha: change to new flag variables
-  arm: change to new flag variables
-  h8300: change to new flag variable
-  ia64: change to new flag variables
-  m68k: change to new flag variables
-  microblaze: change to new flag variable
-  mips: change to new flag variable
-  s390: change to new flag variable
-  um: change to new flag variables
-  xtensa: change to new flag variable
-  fs: change to new flag variable
-  char: change to new flag variable
-  dma: change to new flag variable
-  hwmon: change to new flag variable
-  ide: change to new flag variable
-  ieee802154: change to new flag variable
-  isdn: change to new flag variable
-  memstick: change to new flag variable
-  message: change to new flag variable
-  misc: change to new flag variable
-  net: change to new flag variable
-  pps: change to new flag variable
-  rapidio: change to new flag variable
-  rtc: change to new flag variable
-  scsi: change to new flag variable
-  video: change to new flag variable
-
- arch/alpha/kernel/Makefile                  |    4 ++--
- arch/alpha/lib/Makefile                     |    4 ++--
- arch/alpha/math-emu/Makefile                |    2 +-
- arch/alpha/mm/Makefile                      |    2 +-
- arch/alpha/oprofile/Makefile                |    2 +-
- arch/arm/boot/compressed/Makefile           |    4 ++--
- arch/arm/vfp/Makefile                       |    4 ++--
- arch/h8300/boot/compressed/Makefile         |    2 +-
- arch/ia64/kvm/Makefile                      |    4 ++--
- arch/ia64/sn/kernel/Makefile                |    2 +-
- arch/ia64/sn/kernel/sn2/Makefile            |    2 +-
- arch/ia64/sn/pci/Makefile                   |    2 +-
- arch/ia64/sn/pci/pcibr/Makefile             |    2 +-
- arch/ia64/uv/kernel/Makefile                |    2 +-
- arch/m68k/math-emu/Makefile                 |    4 ++--
- arch/microblaze/kernel/cpu/Makefile         |    2 +-
- arch/mips/Makefile                          |    4 ++--
- arch/mips/bcm63xx/boards/Makefile           |    2 +-
- arch/mips/fw/arc/Makefile                   |    2 +-
- arch/mips/jz4740/Makefile                   |    2 +-
- arch/mips/oprofile/Makefile                 |    2 +-
- arch/mips/pmc-sierra/yosemite/Makefile      |    2 +-
- arch/mips/powertv/Makefile                  |    2 +-
- arch/mips/powertv/asic/Makefile             |    2 +-
- arch/mips/powertv/pci/Makefile              |    2 +-
- arch/s390/boot/Makefile                     |    2 +-
- arch/s390/kvm/Makefile                      |    2 +-
- arch/s390/math-emu/Makefile                 |    2 +-
- arch/um/sys-ppc/Makefile                    |   10 +++++-----
- arch/xtensa/boot/Makefile                   |    2 +-
- arch/xtensa/boot/lib/Makefile               |    2 +-
- drivers/char/mwave/Makefile                 |    4 ++--
- drivers/char/mwave/README                   |    2 +-
- drivers/dma/Makefile                        |    8 ++------
- drivers/hwmon/Makefile                      |    4 +---
- drivers/ide/Makefile                        |    2 +-
- drivers/ieee802154/Makefile                 |    2 +-
- drivers/isdn/hisax/Makefile                 |    2 +-
- drivers/memstick/Makefile                   |    4 +---
- drivers/memstick/core/Makefile              |    4 ----
- drivers/memstick/host/Makefile              |    4 ----
- drivers/message/fusion/Makefile             |    2 +-
- drivers/misc/cb710/Makefile                 |    4 +---
- drivers/misc/sgi-gru/Makefile               |    4 +---
- drivers/net/caif/Makefile                   |    4 +---
- drivers/net/skfp/Makefile                   |    2 +-
- drivers/net/wan/lmc/Makefile                |    2 +-
- drivers/net/wireless/hostap/hostap_config.h |    4 ++--
- drivers/net/wireless/zd1211rw/Makefile      |    4 +---
- drivers/pps/clients/Makefile                |    4 +---
- drivers/rapidio/Makefile                    |    4 +---
- drivers/rapidio/switches/Makefile           |    4 -----
- drivers/rtc/Makefile                        |    4 +---
- drivers/scsi/aacraid/Makefile               |    2 +-
- drivers/scsi/aic94xx/Makefile               |    4 +---
- drivers/scsi/libsas/Makefile                |    6 ++----
- drivers/scsi/lpfc/Makefile                  |    6 ++----
- drivers/scsi/mvsas/Makefile                 |    4 +---
- drivers/scsi/pcmcia/Makefile                |    2 +-
- drivers/video/intelfb/Makefile              |    5 +----
- fs/affs/Makefile                            |    2 +-
- fs/coda/Makefile                            |    2 +-
- fs/gfs2/Makefile                            |    2 +-
- fs/jfs/Makefile                             |    2 +-
- fs/ncpfs/Makefile                           |    2 +-
- fs/ntfs/Makefile                            |   19 +++++++------------
- fs/ocfs2/Makefile                           |    4 ++--
- fs/ocfs2/dlm/Makefile                       |    2 +-
- fs/ocfs2/dlmfs/Makefile                     |    2 +-
- fs/reiserfs/Makefile                        |    4 +---
- fs/xfs/Makefile                             |    7 ++-----
- kernel/gcov/Makefile                        |    2 +-
- kernel/power/Makefile                       |    3 ++-
- 73 files changed, 95 insertions(+), 149 deletions(-)
-
+diff --git a/kernel/gcov/Makefile b/kernel/gcov/Makefile
+index 3f76100..e97ca59 100644
+--- a/kernel/gcov/Makefile
++++ b/kernel/gcov/Makefile
+@@ -1,3 +1,3 @@
+-EXTRA_CFLAGS := -DSRCTREE='"$(srctree)"' -DOBJTREE='"$(objtree)"'
++ccflags-y := -DSRCTREE='"$(srctree)"' -DOBJTREE='"$(objtree)"'
+ 
+ obj-$(CONFIG_GCOV_KERNEL) := base.o fs.o gcc_3_4.o
+diff --git a/kernel/power/Makefile b/kernel/power/Makefile
+index c350e18..c5ebc6a 100644
+--- a/kernel/power/Makefile
++++ b/kernel/power/Makefile
+@@ -1,4 +1,5 @@
+-ccflags-$(CONFIG_PM_DEBUG)	:=	-DDEBUG
++
++ccflags-$(CONFIG_PM_DEBUG)	:= -DDEBUG
+ 
+ obj-$(CONFIG_PM)		+= main.o
+ obj-$(CONFIG_PM_SLEEP)		+= console.o
 -- 
 1.7.3.4
 
