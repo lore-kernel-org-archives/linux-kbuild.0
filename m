@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
 Received: from qmta01.emeryville.ca.mail.comcast.net ([76.96.30.16]:50197 "EHLO
 	qmta01.emeryville.ca.mail.comcast.net" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1757682Ab1ANOTU (ORCPT
+	by vger.kernel.org with ESMTP id S1757753Ab1ANOTX (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 14 Jan 2011 09:19:20 -0500
+	Fri, 14 Jan 2011 09:19:23 -0500
 From: matt mooney <mfm@muteddisk.com>
-Subject: [RESEND PATCH 13/27] char: change to new flag variable
-Date: Fri, 14 Jan 2011 06:12:36 -0800
-Message-Id: <a58843383b54133255c341e8988a09b74f8c1901.1295006565.git.mfm@muteddisk.com>
+Subject: [RESEND PATCH 17/27] ieee802154: change to new flag variable
+Date: Fri, 14 Jan 2011 06:12:40 -0800
+Message-Id: <103b89667745fc3022720260762ce611d40fc49a.1295006565.git.mfm@muteddisk.com>
 In-Reply-To: <cover.1295006561.git.mfm@muteddisk.com>
 References: <cover.1295006561.git.mfm@muteddisk.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -19,38 +19,20 @@ Replace EXTRA_CFLAGS with ccflags-y.
 
 Signed-off-by: matt mooney <mfm@muteddisk.com>
 Acked-by: WANG Cong <xiyou.wangcong@gmail.com>
+Acked-by: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
 ---
- drivers/char/mwave/Makefile |    4 ++--
- drivers/char/mwave/README   |    2 +-
- 2 files changed, 3 insertions(+), 3 deletions(-)
+ drivers/ieee802154/Makefile |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-diff --git a/drivers/char/mwave/Makefile b/drivers/char/mwave/Makefile
-index 26b4fce..efa6a82 100644
---- a/drivers/char/mwave/Makefile
-+++ b/drivers/char/mwave/Makefile
-@@ -9,7 +9,7 @@ obj-$(CONFIG_MWAVE) += mwave.o
- mwave-y := mwavedd.o smapi.o tp3780i.o 3780i.o
+diff --git a/drivers/ieee802154/Makefile b/drivers/ieee802154/Makefile
+index e0e8e1a..6899913 100644
+--- a/drivers/ieee802154/Makefile
++++ b/drivers/ieee802154/Makefile
+@@ -1,3 +1,3 @@
+ obj-$(CONFIG_IEEE802154_FAKEHARD) += fakehard.o
  
- # To have the mwave driver disable other uarts if necessary
--# EXTRA_CFLAGS += -DMWAVE_FUTZ_WITH_OTHER_DEVICES
-+# ccflags-y := -DMWAVE_FUTZ_WITH_OTHER_DEVICES
- 
- # To compile in lots (~20 KiB) of run-time enablable printk()s for debugging:
--ccflags-y := -DMW_TRACE
-+ccflags-y += -DMW_TRACE
-diff --git a/drivers/char/mwave/README b/drivers/char/mwave/README
-index 480251f..c2a58f4 100644
---- a/drivers/char/mwave/README
-+++ b/drivers/char/mwave/README
-@@ -11,7 +11,7 @@ are not saved by the BIOS and so do not persist after unload and reload.
- 	0x0008 tp3780i tracing
- 
-         Tracing only occurs if the driver has been compiled with the
--        MW_TRACE macro #defined  (i.e. let EXTRA_CFLAGS += -DMW_TRACE
-+        MW_TRACE macro #defined  (i.e. let ccflags-y := -DMW_TRACE
-         in the Makefile).
- 
-   mwave_3780i_irq=5/7/10/11/15
+-EXTRA_CFLAGS += -DDEBUG -DCONFIG_FFD
++ccflags-y := -DDEBUG -DCONFIG_FFD
 -- 
 1.7.3.4
 
