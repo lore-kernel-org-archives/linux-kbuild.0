@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from qmta09.emeryville.ca.mail.comcast.net ([76.96.30.96]:51815 "EHLO
-	qmta09.emeryville.ca.mail.comcast.net" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1757521Ab1ANONd (ORCPT
+Received: from qmta06.emeryville.ca.mail.comcast.net ([76.96.30.56]:49971 "EHLO
+	qmta06.emeryville.ca.mail.comcast.net" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1757415Ab1ANON1 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 14 Jan 2011 09:13:33 -0500
+	Fri, 14 Jan 2011 09:13:27 -0500
 From: matt mooney <mfm@muteddisk.com>
-Subject: [RESEND PATCH 14/27] dma: change to new flag variable
-Date: Fri, 14 Jan 2011 06:12:37 -0800
-Message-Id: <93e344b0355b9f89daf740bfc63a9ce7478f544a.1295006565.git.mfm@muteddisk.com>
+Subject: [RESEND PATCH 08/27] mips: change to new flag variable
+Date: Fri, 14 Jan 2011 06:12:31 -0800
+Message-Id: <e04dfe29d5c5c6900a4f5200528c1fb4f6abd07d.1295006565.git.mfm@muteddisk.com>
 In-Reply-To: <cover.1295006561.git.mfm@muteddisk.com>
 References: <cover.1295006561.git.mfm@muteddisk.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -20,25 +20,114 @@ Replace EXTRA_CFLAGS with ccflags-y.
 Signed-off-by: matt mooney <mfm@muteddisk.com>
 Acked-by: WANG Cong <xiyou.wangcong@gmail.com>
 ---
- drivers/dma/Makefile |    8 ++------
- 1 files changed, 2 insertions(+), 6 deletions(-)
+ arch/mips/Makefile                     |    4 ++--
+ arch/mips/bcm63xx/boards/Makefile      |    2 +-
+ arch/mips/fw/arc/Makefile              |    2 +-
+ arch/mips/jz4740/Makefile              |    2 +-
+ arch/mips/oprofile/Makefile            |    2 +-
+ arch/mips/pmc-sierra/yosemite/Makefile |    2 +-
+ arch/mips/powertv/Makefile             |    2 +-
+ arch/mips/powertv/asic/Makefile        |    2 +-
+ arch/mips/powertv/pci/Makefile         |    2 +-
+ 9 files changed, 10 insertions(+), 10 deletions(-)
 
-diff --git a/drivers/dma/Makefile b/drivers/dma/Makefile
-index 64b21f5..1be065a 100644
---- a/drivers/dma/Makefile
-+++ b/drivers/dma/Makefile
-@@ -1,9 +1,5 @@
--ifeq ($(CONFIG_DMADEVICES_DEBUG),y)
--	ccflags-y	+= -DDEBUG
--endif
--ifeq ($(CONFIG_DMADEVICES_VDEBUG),y)
--	ccflags-y	+= -DVERBOSE_DEBUG
--endif
-+ccflags-$(CONFIG_DMADEVICES_DEBUG)  := -DDEBUG
-+ccflags-$(CONFIG_DMADEVICES_VDEBUG) += -DVERBOSE_DEBUG
+diff --git a/arch/mips/Makefile b/arch/mips/Makefile
+index 7c1102e..ac1d5b6 100644
+--- a/arch/mips/Makefile
++++ b/arch/mips/Makefile
+@@ -286,11 +286,11 @@ CLEAN_FILES += vmlinux.32 vmlinux.64
+ archprepare:
+ ifdef CONFIG_MIPS32_N32
+ 	@echo '  Checking missing-syscalls for N32'
+-	$(Q)$(MAKE) $(build)=. missing-syscalls EXTRA_CFLAGS="-mabi=n32"
++	$(Q)$(MAKE) $(build)=. missing-syscalls ccflags-y="-mabi=n32"
+ endif
+ ifdef CONFIG_MIPS32_O32
+ 	@echo '  Checking missing-syscalls for O32'
+-	$(Q)$(MAKE) $(build)=. missing-syscalls EXTRA_CFLAGS="-mabi=32"
++	$(Q)$(MAKE) $(build)=. missing-syscalls ccflags-y="-mabi=32"
+ endif
  
- obj-$(CONFIG_DMA_ENGINE) += dmaengine.o
- obj-$(CONFIG_NET_DMA) += iovlock.o
+ install:
+diff --git a/arch/mips/bcm63xx/boards/Makefile b/arch/mips/bcm63xx/boards/Makefile
+index e5cc86d..9f64fb4 100644
+--- a/arch/mips/bcm63xx/boards/Makefile
++++ b/arch/mips/bcm63xx/boards/Makefile
+@@ -1,3 +1,3 @@
+ obj-$(CONFIG_BOARD_BCM963XX)		+= board_bcm963xx.o
+ 
+-EXTRA_CFLAGS += -Werror
++ccflags-y := -Werror
+diff --git a/arch/mips/fw/arc/Makefile b/arch/mips/fw/arc/Makefile
+index e0aaad4..5314b37 100644
+--- a/arch/mips/fw/arc/Makefile
++++ b/arch/mips/fw/arc/Makefile
+@@ -9,4 +9,4 @@ lib-$(CONFIG_ARC_MEMORY)	+= memory.o
+ lib-$(CONFIG_ARC_CONSOLE)	+= arc_con.o
+ lib-$(CONFIG_ARC_PROMLIB)	+= promlib.o
+ 
+-EXTRA_CFLAGS			+= -Werror
++ccflags-y			:= -Werror
+diff --git a/arch/mips/jz4740/Makefile b/arch/mips/jz4740/Makefile
+index a604eae..a9dff33 100644
+--- a/arch/mips/jz4740/Makefile
++++ b/arch/mips/jz4740/Makefile
+@@ -17,4 +17,4 @@ obj-$(CONFIG_JZ4740_QI_LB60)	+= board-qi_lb60.o
+ 
+ obj-$(CONFIG_PM) += pm.o
+ 
+-EXTRA_CFLAGS += -Werror -Wall
++ccflags-y := -Werror -Wall
+diff --git a/arch/mips/oprofile/Makefile b/arch/mips/oprofile/Makefile
+index 02cc65e..4b9d704 100644
+--- a/arch/mips/oprofile/Makefile
++++ b/arch/mips/oprofile/Makefile
+@@ -1,4 +1,4 @@
+-EXTRA_CFLAGS := -Werror
++ccflags-y := -Werror
+ 
+ obj-$(CONFIG_OPROFILE) += oprofile.o
+ 
+diff --git a/arch/mips/pmc-sierra/yosemite/Makefile b/arch/mips/pmc-sierra/yosemite/Makefile
+index b16f95c..02f5fb9 100644
+--- a/arch/mips/pmc-sierra/yosemite/Makefile
++++ b/arch/mips/pmc-sierra/yosemite/Makefile
+@@ -6,4 +6,4 @@ obj-y    += irq.o prom.o py-console.o setup.o
+ 
+ obj-$(CONFIG_SMP)		+= smp.o
+ 
+-EXTRA_CFLAGS += -Werror
++ccflags-y := -Werror
+diff --git a/arch/mips/powertv/Makefile b/arch/mips/powertv/Makefile
+index baf6e90..348d2e8 100644
+--- a/arch/mips/powertv/Makefile
++++ b/arch/mips/powertv/Makefile
+@@ -28,4 +28,4 @@ obj-y += init.o ioremap.o memory.o powertv_setup.o reset.o time.o \
+ 
+ obj-$(CONFIG_USB) += powertv-usb.o
+ 
+-EXTRA_CFLAGS += -Wall
++ccflags-y := -Wall
+diff --git a/arch/mips/powertv/asic/Makefile b/arch/mips/powertv/asic/Makefile
+index f0e95dc..d810a33 100644
+--- a/arch/mips/powertv/asic/Makefile
++++ b/arch/mips/powertv/asic/Makefile
+@@ -20,4 +20,4 @@ obj-y += asic-calliope.o asic-cronus.o asic-gaia.o asic-zeus.o \
+ 	asic_devices.o asic_int.o irq_asic.o prealloc-calliope.o \
+ 	prealloc-cronus.o prealloc-cronuslite.o prealloc-gaia.o prealloc-zeus.o
+ 
+-EXTRA_CFLAGS += -Wall -Werror
++ccflags-y := -Wall -Werror
+diff --git a/arch/mips/powertv/pci/Makefile b/arch/mips/powertv/pci/Makefile
+index f5c6246..5783201 100644
+--- a/arch/mips/powertv/pci/Makefile
++++ b/arch/mips/powertv/pci/Makefile
+@@ -18,4 +18,4 @@
+ 
+ obj-$(CONFIG_PCI)	+= fixup-powertv.o
+ 
+-EXTRA_CFLAGS += -Wall -Werror
++ccflags-y := -Wall -Werror
 -- 
 1.7.3.4
 
