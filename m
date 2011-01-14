@@ -1,89 +1,131 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qy0-f174.google.com ([209.85.216.174]:58173 "EHLO
-	mail-qy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752447Ab1ANMHG (ORCPT
+Received: from qmta05.emeryville.ca.mail.comcast.net ([76.96.30.48]:55368 "EHLO
+	qmta05.emeryville.ca.mail.comcast.net" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751923Ab1ANONM (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 14 Jan 2011 07:07:06 -0500
-MIME-Version: 1.0
-Date: Fri, 14 Jan 2011 20:07:05 +0800
-Message-ID: <AANLkTinVE6PaRKLUwHHMfY=QRfP9zcM0FF6XVdeG_LGi@mail.gmail.com>
-Subject: [PATCH] kbuild: add GNU GLOBAL tags generation
-From: Jianbin Kang <kjbmail@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
+	Fri, 14 Jan 2011 09:13:12 -0500
+From: matt mooney <mfm@muteddisk.com>
+Subject: [RESEND PATCH 00/27] update makefiles to use the newer flag variables
+Date: Fri, 14 Jan 2011 06:12:23 -0800
+Message-Id: <cover.1295006561.git.mfm@muteddisk.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-GNU GLOBAL (http://www.gnu.org/software/global/) is a source code tagging system
-It is really cheap to support it in kbuild system.
+Hi Michal,
 
-Signed-off-by: Jianbin Kang <kjbmail@gmail.com>
----
-diff --git a/Makefile b/Makefile
-index 74b2555..127a371 100644
---- a/Makefile
-+++ b/Makefile
-@@ -420,7 +420,7 @@ endif
- # of make so .config is not included in this case either (for *config).
+These are the patches that never made their way into the linux-next tree.
+I have added all of the acks that came through.
 
- no-dot-config-targets := clean mrproper distclean \
--			 cscope TAGS tags help %docs check% coccicheck \
-+			 cscope gtags TAGS tags help %docs check% coccicheck \
- 			 include/linux/version.h headers_% \
- 			 kernelversion %src-pkg
+Thanks,
+matt
 
-@@ -1134,7 +1134,7 @@ CLEAN_FILES +=	vmlinux System.map \
- MRPROPER_DIRS  += include/config usr/include include/generated
- MRPROPER_FILES += .config .config.old .version .old_version             \
-                   include/linux/version.h                               \
--		  Module.symvers tags TAGS cscope*
-+		  Module.symvers tags TAGS cscope* GPATH GTAGS GRTAGS GSYMS
 
- # clean - Delete most, but leave enough to build external modules
- #
-@@ -1221,6 +1221,7 @@ help:
- 	@echo  '  modules_prepare - Set up for building external modules'
- 	@echo  '  tags/TAGS	  - Generate tags file for editors'
- 	@echo  '  cscope	  - Generate cscope index'
-+	@echo  '  gtags           - Generate GNU GLOBAL index'
- 	@echo  '  kernelrelease	  - Output the release version string'
- 	@echo  '  kernelversion	  - Output the version stored in Makefile'
- 	@echo  '  headers_install - Install sanitised kernel headers to
-INSTALL_HDR_PATH'; \
-@@ -1379,7 +1380,7 @@ clean: $(clean-dirs)
- quiet_cmd_tags = GEN     $@
-       cmd_tags = $(CONFIG_SHELL) $(srctree)/scripts/tags.sh $@
+matt mooney (27):
+  kernel: change to new flag variable
+  alpha: change to new flag variables
+  arm: change to new flag variables
+  h8300: change to new flag variable
+  ia64: change to new flag variables
+  m68k: change to new flag variables
+  microblaze: change to new flag variable
+  mips: change to new flag variable
+  s390: change to new flag variable
+  um: change to new flag variables
+  xtensa: change to new flag variable
+  fs: change to new flag variable
+  char: change to new flag variable
+  dma: change to new flag variable
+  hwmon: change to new flag variable
+  ide: change to new flag variable
+  ieee802154: change to new flag variable
+  isdn: change to new flag variable
+  memstick: change to new flag variable
+  message: change to new flag variable
+  misc: change to new flag variable
+  net: change to new flag variable
+  pps: change to new flag variable
+  rapidio: change to new flag variable
+  rtc: change to new flag variable
+  scsi: change to new flag variable
+  video: change to new flag variable
 
--tags TAGS cscope: FORCE
-+tags TAGS cscope gtags: FORCE
- 	$(call cmd,tags)
+ arch/alpha/kernel/Makefile                  |    4 ++--
+ arch/alpha/lib/Makefile                     |    4 ++--
+ arch/alpha/math-emu/Makefile                |    2 +-
+ arch/alpha/mm/Makefile                      |    2 +-
+ arch/alpha/oprofile/Makefile                |    2 +-
+ arch/arm/boot/compressed/Makefile           |    4 ++--
+ arch/arm/vfp/Makefile                       |    4 ++--
+ arch/h8300/boot/compressed/Makefile         |    2 +-
+ arch/ia64/kvm/Makefile                      |    4 ++--
+ arch/ia64/sn/kernel/Makefile                |    2 +-
+ arch/ia64/sn/kernel/sn2/Makefile            |    2 +-
+ arch/ia64/sn/pci/Makefile                   |    2 +-
+ arch/ia64/sn/pci/pcibr/Makefile             |    2 +-
+ arch/ia64/uv/kernel/Makefile                |    2 +-
+ arch/m68k/math-emu/Makefile                 |    4 ++--
+ arch/microblaze/kernel/cpu/Makefile         |    2 +-
+ arch/mips/Makefile                          |    4 ++--
+ arch/mips/bcm63xx/boards/Makefile           |    2 +-
+ arch/mips/fw/arc/Makefile                   |    2 +-
+ arch/mips/jz4740/Makefile                   |    2 +-
+ arch/mips/oprofile/Makefile                 |    2 +-
+ arch/mips/pmc-sierra/yosemite/Makefile      |    2 +-
+ arch/mips/powertv/Makefile                  |    2 +-
+ arch/mips/powertv/asic/Makefile             |    2 +-
+ arch/mips/powertv/pci/Makefile              |    2 +-
+ arch/s390/boot/Makefile                     |    2 +-
+ arch/s390/kvm/Makefile                      |    2 +-
+ arch/s390/math-emu/Makefile                 |    2 +-
+ arch/um/sys-ppc/Makefile                    |   10 +++++-----
+ arch/xtensa/boot/Makefile                   |    2 +-
+ arch/xtensa/boot/lib/Makefile               |    2 +-
+ drivers/char/mwave/Makefile                 |    4 ++--
+ drivers/char/mwave/README                   |    2 +-
+ drivers/dma/Makefile                        |    8 ++------
+ drivers/hwmon/Makefile                      |    4 +---
+ drivers/ide/Makefile                        |    2 +-
+ drivers/ieee802154/Makefile                 |    2 +-
+ drivers/isdn/hisax/Makefile                 |    2 +-
+ drivers/memstick/Makefile                   |    4 +---
+ drivers/memstick/core/Makefile              |    4 ----
+ drivers/memstick/host/Makefile              |    4 ----
+ drivers/message/fusion/Makefile             |    2 +-
+ drivers/misc/cb710/Makefile                 |    4 +---
+ drivers/misc/sgi-gru/Makefile               |    4 +---
+ drivers/net/caif/Makefile                   |    4 +---
+ drivers/net/skfp/Makefile                   |    2 +-
+ drivers/net/wan/lmc/Makefile                |    2 +-
+ drivers/net/wireless/hostap/hostap_config.h |    4 ++--
+ drivers/net/wireless/zd1211rw/Makefile      |    4 +---
+ drivers/pps/clients/Makefile                |    4 +---
+ drivers/rapidio/Makefile                    |    4 +---
+ drivers/rapidio/switches/Makefile           |    4 -----
+ drivers/rtc/Makefile                        |    4 +---
+ drivers/scsi/aacraid/Makefile               |    2 +-
+ drivers/scsi/aic94xx/Makefile               |    4 +---
+ drivers/scsi/libsas/Makefile                |    6 ++----
+ drivers/scsi/lpfc/Makefile                  |    6 ++----
+ drivers/scsi/mvsas/Makefile                 |    4 +---
+ drivers/scsi/pcmcia/Makefile                |    2 +-
+ drivers/video/intelfb/Makefile              |    5 +----
+ fs/affs/Makefile                            |    2 +-
+ fs/coda/Makefile                            |    2 +-
+ fs/gfs2/Makefile                            |    2 +-
+ fs/jfs/Makefile                             |    2 +-
+ fs/ncpfs/Makefile                           |    2 +-
+ fs/ntfs/Makefile                            |   19 +++++++------------
+ fs/ocfs2/Makefile                           |    4 ++--
+ fs/ocfs2/dlm/Makefile                       |    2 +-
+ fs/ocfs2/dlmfs/Makefile                     |    2 +-
+ fs/reiserfs/Makefile                        |    4 +---
+ fs/xfs/Makefile                             |    7 ++-----
+ kernel/gcov/Makefile                        |    2 +-
+ kernel/power/Makefile                       |    3 ++-
+ 73 files changed, 95 insertions(+), 149 deletions(-)
 
- # Scripts to check various things for consistency
-diff --git a/scripts/tags.sh b/scripts/tags.sh
-index bbbe584..0a64ea4 100755
---- a/scripts/tags.sh
-+++ b/scripts/tags.sh
-@@ -114,6 +114,11 @@ docscope()
- 	cscope -b -f cscope.out
- }
+-- 
+1.7.3.4
 
-+dogtags()
-+{
-+	all_sources | gtags -f -
-+}
-+
- exuberant()
- {
- 	all_sources | xargs $1 -a                               \
-@@ -187,6 +192,10 @@ case "$1" in
- 		docscope
- 		;;
-
-+	"gtags")
-+		dogtags
-+		;;
-+
- 	"tags")
- 		rm -f tags
- 		xtags ctags
