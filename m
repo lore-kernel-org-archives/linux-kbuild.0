@@ -1,29 +1,28 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:46999 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:47224 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752362Ab1ANXn6 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 14 Jan 2011 18:43:58 -0500
-Date: Sat, 15 Jan 2011 00:43:57 +0100
+	id S1753449Ab1ANX4h (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 14 Jan 2011 18:56:37 -0500
+Date: Sat, 15 Jan 2011 00:56:36 +0100
 From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [PATCH] deb-pkg: Use $SRCARCH for include path
-Message-ID: <20110114234356.GB27291@sepie.suse.cz>
-References: <1294929260-9511-1-git-send-email-max@stro.at>
+Subject: Re: [PATCH] kbuild: add GNU GLOBAL tags generation
+Message-ID: <20110114235636.GC27291@sepie.suse.cz>
+References: <AANLkTinVE6PaRKLUwHHMfY=QRfP9zcM0FF6XVdeG_LGi@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1294929260-9511-1-git-send-email-max@stro.at>
+In-Reply-To: <AANLkTinVE6PaRKLUwHHMfY=QRfP9zcM0FF6XVdeG_LGi@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: maximilian attems <max@stro.at>
-Cc: linux-kbuild@vger.kernel.org
+To: Jianbin Kang <kjbmail@gmail.com>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-On Thu, Jan 13, 2011 at 03:34:20PM +0100, maximilian attems wrote:
-> Fix x86 centric path to allow building kernel-header packages for
-> other architecture.
+On Fri, Jan 14, 2011 at 08:07:05PM +0800, Jianbin Kang wrote:
+> GNU GLOBAL (http://www.gnu.org/software/global/) is a source code tagging system
+> It is really cheap to support it in kbuild system.
 > 
-> Thanks: Michal Marek <mmarek@suse.cz>
-> Signed-off-by: maximilian attems <max@stro.at>
+> Signed-off-by: Jianbin Kang <kjbmail@gmail.com>
 
-Thanks, applied to kbuild-2.6.git#packaging.
+Thanks, applied to kbuild-2.6.git#misc.
 
 Michal
