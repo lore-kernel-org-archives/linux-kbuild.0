@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from qmta11.emeryville.ca.mail.comcast.net ([76.96.27.211]:40996
-	"EHLO qmta11.emeryville.ca.mail.comcast.net" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1757817Ab1ANOT2 (ORCPT
+Received: from qmta02.emeryville.ca.mail.comcast.net ([76.96.30.24]:54781 "EHLO
+	qmta02.emeryville.ca.mail.comcast.net" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1757211Ab1ANOTM (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 14 Jan 2011 09:19:28 -0500
+	Fri, 14 Jan 2011 09:19:12 -0500
 From: matt mooney <mfm@muteddisk.com>
-Subject: [RESEND PATCH 10/27] um: change to new flag variables
-Date: Fri, 14 Jan 2011 06:12:33 -0800
-Message-Id: <5aad31d623bac32d84886aa95e8ac0b934df1a49.1295006565.git.mfm@muteddisk.com>
+Subject: [RESEND PATCH 09/27] s390: change to new flag variable
+Date: Fri, 14 Jan 2011 06:12:32 -0800
+Message-Id: <b70d5991caea5f3865cd31e1a117a017421a80a0.1295006565.git.mfm@muteddisk.com>
 In-Reply-To: <cover.1295006561.git.mfm@muteddisk.com>
 References: <cover.1295006561.git.mfm@muteddisk.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,56 +15,52 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: Michal Marek <mmarek@suse.cz>
 Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Replace EXTRA_CFLAGS with ccflags-y and EXTRA_AFLAGS with asflags-y.
+Replace EXTRA_CFLAGS with ccflags-y.
 
 Signed-off-by: matt mooney <mfm@muteddisk.com>
 Acked-by: WANG Cong <xiyou.wangcong@gmail.com>
 ---
- arch/um/sys-ppc/Makefile |   10 +++++-----
- 1 files changed, 5 insertions(+), 5 deletions(-)
+ arch/s390/boot/Makefile     |    2 +-
+ arch/s390/kvm/Makefile      |    2 +-
+ arch/s390/math-emu/Makefile |    2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/arch/um/sys-ppc/Makefile b/arch/um/sys-ppc/Makefile
-index b8bc844..20d363b 100644
---- a/arch/um/sys-ppc/Makefile
-+++ b/arch/um/sys-ppc/Makefile
-@@ -6,7 +6,7 @@ OBJ = built-in.o
- OBJS = ptrace.o sigcontext.o checksum.o miscthings.o misc.o \
- 	ptrace_user.o sysrq.o
+diff --git a/arch/s390/boot/Makefile b/arch/s390/boot/Makefile
+index 8800cf09..635d677 100644
+--- a/arch/s390/boot/Makefile
++++ b/arch/s390/boot/Makefile
+@@ -6,7 +6,7 @@ COMPILE_VERSION := __linux_compile_version_id__`hostname |  \
+ 			tr -c '[0-9A-Za-z]' '_'`__`date | \
+ 			tr -c '[0-9A-Za-z]' '_'`_t
  
--EXTRA_AFLAGS := -DCONFIG_PPC32 -I. -I$(srctree)/arch/ppc/kernel
-+asflags-y := -DCONFIG_PPC32 -I. -I$(srctree)/arch/ppc/kernel
+-EXTRA_CFLAGS  := -DCOMPILE_VERSION=$(COMPILE_VERSION) -gstabs -I.
++ccflags-y  := -DCOMPILE_VERSION=$(COMPILE_VERSION) -gstabs -I.
  
- all: $(OBJ)
+ targets := image
+ targets += bzImage
+diff --git a/arch/s390/kvm/Makefile b/arch/s390/kvm/Makefile
+index e5221ec..860d265 100644
+--- a/arch/s390/kvm/Makefile
++++ b/arch/s390/kvm/Makefile
+@@ -8,7 +8,7 @@
  
-@@ -15,10 +15,10 @@ $(OBJ): $(OBJS)
- 	$(LD) $(LINKFLAGS) --start-group $^ --end-group -o $@
+ common-objs = $(addprefix ../../../virt/kvm/, kvm_main.o)
  
- ptrace_user.o: ptrace_user.c
--	$(CC) -D__KERNEL__ $(USER_CFLAGS) $(EXTRA_CFLAGS) -c -o $@ $<
-+	$(CC) -D__KERNEL__ $(USER_CFLAGS) $(ccflags-y) -c -o $@ $<
+-EXTRA_CFLAGS += -Ivirt/kvm -Iarch/s390/kvm
++ccflags-y := -Ivirt/kvm -Iarch/s390/kvm
  
- sigcontext.o: sigcontext.c
--	$(CC) $(USER_CFLAGS) $(EXTRA_CFLAGS) -c -o $@ $<
-+	$(CC) $(USER_CFLAGS) $(ccflags-y) -c -o $@ $<
+ kvm-objs := $(common-objs) kvm-s390.o sie64a.o intercept.o interrupt.o priv.o sigp.o diag.o
+ obj-$(CONFIG_KVM) += kvm.o
+diff --git a/arch/s390/math-emu/Makefile b/arch/s390/math-emu/Makefile
+index c848903..51d3995 100644
+--- a/arch/s390/math-emu/Makefile
++++ b/arch/s390/math-emu/Makefile
+@@ -4,4 +4,4 @@
  
- checksum.S:
- 	rm -f $@
-@@ -53,13 +53,13 @@ ppc_defs.h: mk_defs.c ppc_defs.head \
- checksum.o: checksum.S
- 	rm -f asm
- 	ln -s $(srctree)/include/asm-ppc asm
--	$(CC) $(EXTRA_AFLAGS) $(KBUILD_AFLAGS) -D__ASSEMBLY__ -D__UM_PPC__ -c $< -o $*.o
-+	$(CC) $(asflags-y) $(KBUILD_AFLAGS) -D__ASSEMBLY__ -D__UM_PPC__ -c $< -o $*.o
- 	rm -f asm
+ obj-$(CONFIG_MATHEMU) := math.o
  
- misc.o: misc.S ppc_defs.h
- 	rm -f asm
- 	ln -s $(srctree)/include/asm-ppc asm
--	$(CC) $(EXTRA_AFLAGS) $(KBUILD_AFLAGS) -D__ASSEMBLY__ -D__UM_PPC__ -c $< -o $*.o
-+	$(CC) $(asflags-y) $(KBUILD_AFLAGS) -D__ASSEMBLY__ -D__UM_PPC__ -c $< -o $*.o
- 	rm -f asm
- 
- clean-files := $(OBJS) ppc_defs.h checksum.S mk_defs.c
+-EXTRA_CFLAGS := -I$(src) -Iinclude/math-emu -w
++ccflags-y := -I$(src) -Iinclude/math-emu -w
 -- 
 1.7.3.4
 
