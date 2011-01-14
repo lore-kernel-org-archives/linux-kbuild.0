@@ -1,27 +1,26 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qw0-f46.google.com ([209.85.216.46]:46867 "EHLO
-	mail-qw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751530Ab1ANL4O (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 14 Jan 2011 06:56:14 -0500
+Received: from cantor.suse.de ([195.135.220.2]:34339 "EHLO mx1.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752160Ab1ANMAJ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 14 Jan 2011 07:00:09 -0500
+Message-ID: <4D303AC8.9070100@suse.cz>
+Date: Fri, 14 Jan 2011 13:00:08 +0100
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-In-Reply-To: <4D302EB4.7000005@suse.cz>
-References: <AANLkTi=BPra1SJ3BHN0L1e6L9MKj3EJ0agjaA+m7CkGj@mail.gmail.com>
-	<4D302EB4.7000005@suse.cz>
-Date: Fri, 14 Jan 2011 19:56:12 +0800
-Message-ID: <AANLkTimeJnWVOyYYo5WjBWzK9JsRfsAJZFx1VUh5prRi@mail.gmail.com>
 Subject: Re: [PATCH] kbuild: add global tags generation (fixed signed-off-by)
-From: Jianbin Kang <kjbmail@gmail.com>
+References: <AANLkTi=BPra1SJ3BHN0L1e6L9MKj3EJ0agjaA+m7CkGj@mail.gmail.com> <4D302EB4.7000005@suse.cz>
+In-Reply-To: <4D302EB4.7000005@suse.cz>
 Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
+To: Jianbin Kang <kjbmail@gmail.com>
 Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
->
+On 14.1.2011 12:08, Michal Marek wrote:
 > "global index" is not clear to someone who does not know about GNU
 > global, could you change it to "Generate to GNU global index"?
->
-Ok, I will fix it later.
 
-Jianbin
+I meant "Generate GNU global index" of course.
+
+Michal
