@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from qmta07.emeryville.ca.mail.comcast.net ([76.96.30.64]:50025 "EHLO
-	qmta07.emeryville.ca.mail.comcast.net" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1757413Ab1ANOT3 (ORCPT
+Received: from qmta02.emeryville.ca.mail.comcast.net ([76.96.30.24]:54725 "EHLO
+	qmta02.emeryville.ca.mail.comcast.net" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1757404Ab1ANOT3 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
 	Fri, 14 Jan 2011 09:19:29 -0500
 From: matt mooney <mfm@muteddisk.com>
-Subject: [RESEND PATCH 21/27] misc: change to new flag variable
-Date: Fri, 14 Jan 2011 06:12:44 -0800
-Message-Id: <a9b05db21707b67d629c9d200ff558063ad84cb1.1295006565.git.mfm@muteddisk.com>
+Subject: [RESEND PATCH 18/27] isdn: change to new flag variable
+Date: Fri, 14 Jan 2011 06:12:41 -0800
+Message-Id: <e19eff48eb0bbfdbdc115f632cfa74837e11c3a1.1295006565.git.mfm@muteddisk.com>
 In-Reply-To: <cover.1295006561.git.mfm@muteddisk.com>
 References: <cover.1295006561.git.mfm@muteddisk.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -19,35 +19,24 @@ Replace EXTRA_CFLAGS with ccflags-y.
 
 Signed-off-by: matt mooney <mfm@muteddisk.com>
 Acked-by: WANG Cong <xiyou.wangcong@gmail.com>
+Acked-by: David S. Miller <davem@davemloft.net>
 ---
- drivers/misc/cb710/Makefile   |    4 +---
- drivers/misc/sgi-gru/Makefile |    4 +---
- 2 files changed, 2 insertions(+), 6 deletions(-)
+ drivers/isdn/hisax/Makefile |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-diff --git a/drivers/misc/cb710/Makefile b/drivers/misc/cb710/Makefile
-index 7b80cbf..467c8e9 100644
---- a/drivers/misc/cb710/Makefile
-+++ b/drivers/misc/cb710/Makefile
-@@ -1,6 +1,4 @@
--ifeq ($(CONFIG_CB710_DEBUG),y)
--	EXTRA_CFLAGS		+= -DDEBUG
--endif
-+ccflags-$(CONFIG_CB710_DEBUG)	:= -DDEBUG
+diff --git a/drivers/isdn/hisax/Makefile b/drivers/isdn/hisax/Makefile
+index ab638b08..646368f 100644
+--- a/drivers/isdn/hisax/Makefile
++++ b/drivers/isdn/hisax/Makefile
+@@ -4,7 +4,7 @@
  
- obj-$(CONFIG_CB710_CORE)	+= cb710.o
+ # Define maximum number of cards
  
-diff --git a/drivers/misc/sgi-gru/Makefile b/drivers/misc/sgi-gru/Makefile
-index 7c4c306..0003a1d 100644
---- a/drivers/misc/sgi-gru/Makefile
-+++ b/drivers/misc/sgi-gru/Makefile
-@@ -1,6 +1,4 @@
--ifdef CONFIG_SGI_GRU_DEBUG
--  EXTRA_CFLAGS	+= -DDEBUG
--endif
-+ccflags-$(CONFIG_SGI_GRU_DEBUG)	:= -DDEBUG
+-EXTRA_CFLAGS      += -DHISAX_MAX_CARDS=$(CONFIG_HISAX_MAX_CARDS)
++ccflags-y      := -DHISAX_MAX_CARDS=$(CONFIG_HISAX_MAX_CARDS)
  
- obj-$(CONFIG_SGI_GRU) := gru.o
- gru-y := grufile.o grumain.o grufault.o grutlbpurge.o gruprocfs.o grukservices.o gruhandles.o grukdump.o
+ obj-$(CONFIG_ISDN_DRV_HISAX)		+= hisax.o
+ obj-$(CONFIG_HISAX_SEDLBAUER_CS)	+= sedlbauer_cs.o
 -- 
 1.7.3.4
 
