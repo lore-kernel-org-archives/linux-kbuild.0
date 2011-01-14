@@ -1,55 +1,118 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from qmta02.emeryville.ca.mail.comcast.net ([76.96.30.24]:54725 "EHLO
-	qmta02.emeryville.ca.mail.comcast.net" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1757511Ab1ANOTL (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 14 Jan 2011 09:19:11 -0500
-From: matt mooney <mfm@muteddisk.com>
-Subject: [RESEND PATCH 11/27] xtensa: change to new flag variable
-Date: Fri, 14 Jan 2011 06:12:34 -0800
-Message-Id: <9e01720a9d8455b3ddd7a84465ed8ef700d0e857.1295006565.git.mfm@muteddisk.com>
-In-Reply-To: <cover.1295006561.git.mfm@muteddisk.com>
-References: <cover.1295006561.git.mfm@muteddisk.com>
+Received: from cantor2.suse.de ([195.135.220.15]:57274 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751928Ab1ANOn4 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 14 Jan 2011 09:43:56 -0500
+Date: Fri, 14 Jan 2011 15:43:54 +0100
+From: Michal Marek <mmarek@suse.cz>
+Subject: Re: [PATCH 1/2] kbuild: asm-generic support
+Message-ID: <20110114144354.GA23611@sepie.suse.cz>
+References: <20110108130302.GA21698@merkur.ravnborg.org>
+ <20110109192707.GA12387@merkur.ravnborg.org>
+ <20110109192907.GA12403@merkur.ravnborg.org>
+ <4D2F24CD.5040101@suse.cz>
+ <20110113170131.GA28377@merkur.ravnborg.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20110113170131.GA28377@merkur.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: lkml <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, linux arch <linux-arch@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>, Guan Xuetao <guanxuetao@mprc.pku.edu.cn>
 
-Replace EXTRA_CFLAGS with ccflags-y.
+On Thu, Jan 13, 2011 at 06:01:31PM +0100, Sam Ravnborg wrote:
+> On Thu, Jan 13, 2011 at 05:14:05PM +0100, Michal Marek wrote:
+> > On 9.1.2011 20:29, Sam Ravnborg wrote:
+> > > diff --git a/scripts/asm-generic.sh b/scripts/asm-generic.sh
+> > > new file mode 100644
+> > > index 0000000..d28127f
+> > > --- /dev/null
+> > > +++ b/scripts/asm-generic.sh
+> > > @@ -0,0 +1,33 @@
+> > > +#!/bin/sh
+> > > +#
+> > > +# include/asm-generic contains a lot of files that are used
+> > > +# verbatim by several architectures.
+> > > +#
+> > > +# This scripts read the file arch/$(ARCH)/include/asm/Kbuild
+> > > +# and for each file listed in this file with generic-y create
+> > > +# a small wrapper file in arch/$(ARCH)/include/generated/
+> > > +
+> > > +# read list of header files form Kbuild
+> > > +# The file has make syntax which looks like this:
+> > > +#
+> > > +# generic-y += <filename>
+> > > +
+> > > +srcdir=${srctree}/arch/$1/include/asm
+> > > +gendir=arch/$1/include/generated/asm
+> > > +
+> > > +# Read the list of files (note that the list uses make syntax)
+> > > +files=$( cat ${srcdir}/Kbuild | \
+> > > +          grep -v ^# | grep generic-y | cut -d '=' -f 2)
+> > 
+> > Now that the list of required generic headers is in a Kbuild file, it
+> > would be better to let make parse it, instead of enforcing one way to
+> > construct the list (it is the preferred way, but C files that do not
+> > conform to Documentation/CodingStyle are not rejected by the compiler
+> > either). I will post a patch when I'm back online in the evening.
+> Would be great!
+> 
+> Guan also pointed out a less than minor issue...
+> I overwrite the files each time so that I force a rebuild.
 
-Signed-off-by: matt mooney <mfm@muteddisk.com>
-Acked-by: WANG Cong <xiyou.wangcong@gmail.com>
----
- arch/xtensa/boot/Makefile     |    2 +-
- arch/xtensa/boot/lib/Makefile |    2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+Hi,
 
-diff --git a/arch/xtensa/boot/Makefile b/arch/xtensa/boot/Makefile
-index 8657c62..068f143 100644
---- a/arch/xtensa/boot/Makefile
-+++ b/arch/xtensa/boot/Makefile
-@@ -14,7 +14,7 @@ HOSTFLAGS	+= -Iarch/$(ARCH)/boot/include
+this should do the trick (the deletion of scripts/asm-generic.sh is left
+out for brevity). I initially wanted to use this also from
+Makefile.headersinst, but there we only want to export headers listed in
+header-y, so I gave up on this idea.
+
+Michal
+
+diff --git a/Makefile b/Makefile
+index 5a29426..6ede051 100644
+--- a/Makefile
++++ b/Makefile
+@@ -416,7 +416,7 @@ endif
+ # Support for using generic headers in asm-generic
+ PHONY += asm-generic
+ asm-generic:
+-	$(Q)$(CONFIG_SHELL) $(srctree)/scripts/asm-generic.sh $(SRCARCH)
++	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.asm-generic obj=arch/$(SRCARCH)/include/generated/asm
  
- BIG_ENDIAN	:= $(shell echo -e __XTENSA_EB__ | $(CC) -E - | grep -v "\#")
- 
--export EXTRA_CFLAGS
-+export ccflags-y
- export BIG_ENDIAN
- 
- subdir-y	:= lib
-diff --git a/arch/xtensa/boot/lib/Makefile b/arch/xtensa/boot/lib/Makefile
-index d3d2aa2..ad8952e 100644
---- a/arch/xtensa/boot/lib/Makefile
-+++ b/arch/xtensa/boot/lib/Makefile
-@@ -6,7 +6,7 @@ zlib	:= inffast.c inflate.c inftrees.c
- 
- lib-y	+= $(zlib:.c=.o) zmem.o
- 
--EXTRA_CFLAGS	+= -Ilib/zlib_inflate
-+ccflags-y	:= -Ilib/zlib_inflate
- 
- quiet_cmd_copy_zlib = COPY    $@
-       cmd_copy_zlib = cat $< > $@
--- 
-1.7.3.4
+ # To make sure we do not include .config for any of the *config targets
+ # catch them early, and hand them over to scripts/kconfig/Makefile
+diff --git a/scripts/Makefile.asm-generic b/scripts/Makefile.asm-generic
+new file mode 100644
+index 0000000..b4f2547
+--- /dev/null
++++ b/scripts/Makefile.asm-generic
+@@ -0,0 +1,26 @@
++# include/asm-generic contains a lot of files that are used
++# verbatim by several architectures.
++#
++# This Makefile reads the file arch/$(SRCARCH)/include/asm/Kbuild
++# and for each file listed in this file with generic-y creates
++# a small wrapper file in $(obj) (arch/$(SRCARCH)/include/generated/asm)
++
++kbuild-file := $(srctree)/arch/$(SRCARCH)/include/asm/Kbuild
++include $(kbuild-file)
++
++include scripts/Kbuild.include
++
++
++ifneq ($(KBUILD_SRC),)
++# Create output directory if not already present
++_dummy := $(shell [ -d $(obj) ] || mkdir -p $(obj))
++endif
++
++quiet_cmd_wrap = WRAP    $@
++cmd_wrap = echo "\#include <asm-generic/$*.h>" >$@
++
++all: $(patsubst %, $(obj)/%, $(generic-y))
++
++$(obj)/%.h:
++	$(call cmd,wrap)
++
 
