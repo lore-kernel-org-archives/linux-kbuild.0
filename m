@@ -1,28 +1,27 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:47224 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753449Ab1ANX4h (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 14 Jan 2011 18:56:37 -0500
-Date: Sat, 15 Jan 2011 00:56:36 +0100
-From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [PATCH] kbuild: add GNU GLOBAL tags generation
-Message-ID: <20110114235636.GC27291@sepie.suse.cz>
-References: <AANLkTinVE6PaRKLUwHHMfY=QRfP9zcM0FF6XVdeG_LGi@mail.gmail.com>
+Received: from mail-fx0-f46.google.com ([209.85.161.46]:53324 "EHLO
+	mail-fx0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752362Ab1AOVfa (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 15 Jan 2011 16:35:30 -0500
+Received: by fxm20 with SMTP id 20so4281475fxm.19
+        for <linux-kbuild@vger.kernel.org>; Sat, 15 Jan 2011 13:35:28 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <AANLkTinVE6PaRKLUwHHMfY=QRfP9zcM0FF6XVdeG_LGi@mail.gmail.com>
+Date: Sat, 15 Jan 2011 22:35:28 +0100
+Message-ID: <AANLkTi=FYc=o04qZUoOT9u=7YMkqu-mtxT=EeJvR3iVg@mail.gmail.com>
+Subject: Where is the end of "menuconfig" entry scope?
+From: Filip Honckiewicz <f.honckiewicz@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jianbin Kang <kjbmail@gmail.com>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
 
-On Fri, Jan 14, 2011 at 08:07:05PM +0800, Jianbin Kang wrote:
-> GNU GLOBAL (http://www.gnu.org/software/global/) is a source code tagging system
-> It is really cheap to support it in kbuild system.
-> 
-> Signed-off-by: Jianbin Kang <kjbmail@gmail.com>
+Hi!
+I just want to ask you - Great Developers - where is the end of
+"menuconfig" entry scope? I read kconfig-language.txt, but there are
+some lacks in documentation, so I don't know which (and why?)
+suboption is the last suboption of menuconfig. Is this defined by end
+of Kconfig file or what?
 
-Thanks, applied to kbuild-2.6.git#misc.
-
-Michal
+Greetings
+Filip Honckiewicz
