@@ -1,61 +1,66 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-bw0-f46.google.com ([209.85.214.46]:35593 "EHLO
-	mail-bw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751821Ab1ARPA2 convert rfc822-to-8bit (ORCPT
+Received: from shadbolt.e.decadent.org.uk ([88.96.1.126]:46774 "EHLO
+	shadbolt.e.decadent.org.uk" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1752497Ab1ARTxJ (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 18 Jan 2011 10:00:28 -0500
-Received: by bwz15 with SMTP id 15so3435185bwz.19
-        for <linux-kbuild@vger.kernel.org>; Tue, 18 Jan 2011 07:00:27 -0800 (PST)
+	Tue, 18 Jan 2011 14:53:09 -0500
+Date: Tue, 18 Jan 2011 19:52:58 +0000
+From: Ben Hutchings <ben@decadent.org.uk>
+Subject: Re: [PATCH] kbuild: create linux-headers package in deb-pkg
+Message-ID: <20110118195258.GA21934@decadent.org.uk>
+References: <1293201730-1583-1-git-send-email-tytso@mit.edu> <20101225112026.GF20262@vostochny.stro.at> <20110110174640.GA619@stro.at> <4D2F044E.7060607@suse.cz> <20110113143840.GN20262@vostochny.stro.at>
 MIME-Version: 1.0
-In-Reply-To: <4D356FB9.7040807@suse.cz>
-References: <AANLkTi=FYc=o04qZUoOT9u=7YMkqu-mtxT=EeJvR3iVg@mail.gmail.com>
-	<4D3431CF.5070407@suse.cz>
-	<AANLkTi=wkCsaeouJ=92v62JU7cfLQuDQ-nQoEMOuzep4@mail.gmail.com>
-	<201101172350.26646.yann.morin.1998@anciens.enib.fr>
-	<4D356FB9.7040807@suse.cz>
-Date: Tue, 18 Jan 2011 15:59:57 +0100
-Message-ID: <AANLkTinMd0GJiczZJeW_YjHsJor3pw0KWG0tz=JxpmHR@mail.gmail.com>
-Subject: Re: Where is the end of "menuconfig" entry scope?
-From: Filip Honckiewicz <f.honckiewicz@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20110113143840.GN20262@vostochny.stro.at>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org
+To: maximilian attems <max@stro.at>
+Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, Theodore Ts'o <tytso@mit.edu>, linux-kernel@vger.kernel.org, Ralf =?iso-8859-1?Q?R=F6sch?= <ralf.roesch@rw-gmbh.de>, debian-kernel@lists.debian.org
 
-2011/1/18 Michal Marek <mmarek@suse.cz>:
-> On 17.1.2011 23:50, Yann E. MORIN wrote:
->> Filip, All,
->>
->> On Monday 17 January 2011 23:39:17 Filip Honckiewicz wrote:
->>> It helped me a lot and now it's clear. Your example shows everything.
->>> In kconfig-language.txt there is:
->>>  "This is similar to the simple config entry above, but it also gives
->>> a hint to front ends, that all suboptions should be displayed as a
->>> separate list of options." and this "suboptions" fool me that if
->>> there're suboptions than there has to be ending of menuconfig entry;)
->>
->> Maybe expressing this in a more understandable way, such as:
->>
->>   The menuconfig scope ends with the last config options that depends
->>   on that menuconfig entry.
->
-> Then such sentence would have to be added to "config" as well. Or just
-> point people to the Menu structure chapter.
->
-> Michal
->
+On Thu, Jan 13, 2011 at 02:38:41PM +0000, maximilian attems wrote:
+> On Thu, Jan 13, 2011 at 02:55:26PM +0100, Michal Marek wrote:
+[...]
+> > BTW, here is a bugreport I got privately about
+> > the very same issue:
+> > On 12.1.2011 10:02, Ralf Rösch wrote:
+> > | [...]
+> > | Attached you will find a patch to complete the build successfully for my
+> > | mipsel target.
+> > | The dpkg --print-architecture shows i386 which results in error:
+> > | dpkg-gencontrol: Fehler: aktuelle Host-Architektur »mipsel« erscheint
+> > | nicht in der Architekturliste (i386) des Pakets
+> > | (current host architecture 'mipsel' does not appear in package's list
+> > i386)
+> > | so I changed "arch" temporary to "any".
+> > |
+> > | It would be nice if it would be possible to make the kernel-headers
+> > | installable on any host.
+> > | They are needed very frequently for cross-compiling. (I already possible
+> > | with dpkg force).
+> 
+> Added Ben Hutchings and d-kernel on Cc. I do not use OOT modules, so
+> I don't have a strong word on that, but from what I see in Debian
+> they are arch specific.
 
-I agree with Michal. It makes no sense. But maybe remove "suboptions"
-and change whole sentence to something like this:
-"This is similar to the simple config entry above, but it also gives a
-hint to front ends, that all other options that depends on this entry
-should be displayed as a
-separate list of options."
+Kernel header packages should be labelled with the target architecture.
+This is because the headers include some generated files that are both
+architecture- and configuration-specific.
 
-and maybe add Michal's example to "Menu structure" chapter to show
-this little difference between config and menuconfig. Or maybe not;)
+Any package of libraries or headers for some architecture is in theory
+useful for cross-development on any other architecture, yet we do not
+label them as architecture: all.  If we did that, we would then have to
+use a different name and installation path for each target so that they
+are co-installable; this would also bloat the package list files.  You
+should normally be able to convert a package for use in cross-
+development using dpkg-cross, which changes its name and paths
+accordingly.  However I don't know how well this will work for kernel
+headers.
 
-Sorry for my english.
-Filip
+Ben.
+
+-- 
+Ben Hutchings
+We get into the habit of living before acquiring the habit of thinking.
+                                                              - Albert Camus
