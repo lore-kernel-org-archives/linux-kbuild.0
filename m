@@ -1,32 +1,52 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ppsw-51.csi.cam.ac.uk ([131.111.8.151]:57727 "EHLO
-	ppsw-51.csi.cam.ac.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752338Ab1AXLrQ (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 24 Jan 2011 06:47:16 -0500
-Date: Mon, 24 Jan 2011 11:47:14 +0000
-From: Tony Finch <dot@dotat.at>
-Subject: Re: [PATCH] unifdef: update to upstream version 2.5
-In-Reply-To: <20110122145409.GA1499@sepie.suse.cz>
-Message-ID: <alpine.LSU.2.00.1101241146580.5244@hermes-1.csi.cam.ac.uk>
-References: <E1PfI64-00041z-0d@hermes-1.csi.cam.ac.uk> <20110119043605.GA9903@cr0.nay.redhat.com> <20110122145409.GA1499@sepie.suse.cz>
+Received: from smtp6-g21.free.fr ([212.27.42.6]:52280 "EHLO smtp6-g21.free.fr"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752022Ab1AXNmC (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 24 Jan 2011 08:42:02 -0500
+From: =?UTF-8?q?Nicolas=20de=20Peslo=C3=BCan?=
+	<nicolas.2p.debian@free.fr>
+Subject: [PATCH] deb-pkg: Fix building outside of source tree (O=...).
+Date: Mon, 24 Jan 2011 14:41:41 +0100
+Message-Id: <1295876501-805-1-git-send-email-nicolas.2p.debian@free.fr>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: =?ISO-8859-15?Q?Am=E9rico_Wang?= <xiyou.wangcong@gmail.com>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Tony Finch <dot@dotat.at>
+To: mmarek@suse.cz, linux-kbuild@vger.kernel.org
+Cc: nicolas.2p.debian@free.fr
 
-On Sat, 22 Jan 2011, Michal Marek wrote:
->
-> None of the changes affect the way unifdef is used in the kernel build,
-> so I happily applied the patch to kbuild-2.6.git#kbuild.
+When building linux-headers package using deb-pkg, builddeb erroneously assume
+current directory is the source tree. This is not true if building in another
+directory, using make O=... deb-pkg.
 
-Thank you!
+This patch fix this problem.
 
-Tony.
+Signed-off-by: Nicolas de Pesloüan <nicolas.2p.debian@free.fr>
+---
+ scripts/package/builddeb |    6 +++---
+ 1 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+index ebc6d6e..f6cbc3d 100644
+--- a/scripts/package/builddeb
++++ b/scripts/package/builddeb
+@@ -238,12 +238,12 @@ EOF
+ fi
+ 
+ # Build header package
+-find . -name Makefile -o -name Kconfig\* -o -name \*.pl > /tmp/files$$
+-find arch/$SRCARCH/include include scripts -type f >> /tmp/files$$
++(cd $srctree; find . -name Makefile -o -name Kconfig\* -o -name \*.pl > /tmp/files$$)
++(cd $srctree; find arch/$SRCARCH/include include scripts -type f >> /tmp/files$$)
+ (cd $objtree; find .config Module.symvers include scripts -type f >> /tmp/objfiles$$)
+ destdir=$kernel_headers_dir/usr/src/linux-headers-$version
+ mkdir -p "$destdir"
+-tar -c -f - -T /tmp/files$$ | (cd $destdir; tar -xf -)
++(cd $srctree; tar -c -f - -T /tmp/files$$) | (cd $destdir; tar -xf -)
+ (cd $objtree; tar -c -f - -T /tmp/objfiles$$) | (cd $destdir; tar -xf -)
+ rm -f /tmp/files$$ /tmp/objfiles$$
+ arch=$(dpkg --print-architecture)
 -- 
-f.anthony.n.finch  <dot@dotat.at>  http://dotat.at/
-HUMBER THAMES DOVER WIGHT PORTLAND: NORTH BACKING WEST OR NORTHWEST, 5 TO 7,
-DECREASING 4 OR 5, OCCASIONALLY 6 LATER IN HUMBER AND THAMES. MODERATE OR
-ROUGH. RAIN THEN FAIR. GOOD.
+1.7.2.3
+
