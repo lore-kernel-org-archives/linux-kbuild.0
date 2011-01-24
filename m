@@ -1,45 +1,28 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from 59-72-223.ftth.xms.internl.net ([85.223.72.59]:39456 "EHLO
-	salamandra.streefland.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752748Ab1AWX4i (ORCPT
+Received: from mail-qy0-f174.google.com ([209.85.216.174]:63871 "EHLO
+	mail-qy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751118Ab1AXFVE (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 23 Jan 2011 18:56:38 -0500
-Date: Mon, 24 Jan 2011 00:44:57 +0100
-From: Dick Streefland <dick@streefland.net>
-Subject: [PATCH] scripts/extract-ikconfig: add xz compression support
-Message-ID: <20110123234457.GB2321@streefland.net>
+	Mon, 24 Jan 2011 00:21:04 -0500
+Date: Mon, 24 Jan 2011 13:20:53 +0800
+From: =?utf-8?Q?Am=C3=A9rico?= Wang <xiyou.wangcong@gmail.com>
+Subject: Re: [PATCH] scripts/extract-ikconfig: add xz compression support
+Message-ID: <20110124052053.GD6971@cr0.nay.redhat.com>
+References: <20110123234457.GB2321@streefland.net>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <20110123234457.GB2321@streefland.net>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, Arkadiusz Miskiewicz <arekm@maven.pl>
+To: Dick Streefland <dick@streefland.net>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Arkadiusz Miskiewicz <arekm@maven.pl>
 
-Add support for kernels compressed with xz to the extract-ikconfig script.
+On Mon, Jan 24, 2011 at 12:44:57AM +0100, Dick Streefland wrote:
+>Add support for kernels compressed with xz to the extract-ikconfig script.
+>
+>Signed-off-by: Dick Streefland <dick@streefland.net>
 
-Signed-off-by: Dick Streefland <dick@streefland.net>
----
- scripts/extract-ikconfig |    9 +++++----
- 1 files changed, 5 insertions(+), 4 deletions(-)
+Acked-by: WANG Cong <xiyou.wangcong@gmail.com>
 
-diff --git a/scripts/extract-ikconfig b/scripts/extract-ikconfig
-index 1512c0a..e186242 100755
---- a/scripts/extract-ikconfig
-+++ b/scripts/extract-ikconfig
-@@ -56,10 +56,11 @@ trap "rm -f $tmp1 $tmp2" 0
- dump_config "$img"
- 
- # That didn't work, so retry after decompression.
--try_decompress '\037\213\010' xy  gunzip
--try_decompress 'BZh'          xy  bunzip2
--try_decompress '\135\0\0\0'   xxx unlzma
--try_decompress '\211\114\132' xy  'lzop -d'
-+try_decompress '\037\213\010' xy    gunzip
-+try_decompress '\3757zXZ\000' abcde unxz
-+try_decompress 'BZh'          xy    bunzip2
-+try_decompress '\135\0\0\0'   xxx   unlzma
-+try_decompress '\211\114\132' xy    'lzop -d'
- 
- # Bail out:
- echo "$me: Cannot find kernel config." >&2
+Thanks.
