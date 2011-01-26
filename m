@@ -1,35 +1,26 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ey0-f174.google.com ([209.85.215.174]:59923 "EHLO
-	mail-ey0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752560Ab1AZIqF (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 26 Jan 2011 03:46:05 -0500
-Received: by eye27 with SMTP id 27so347290eye.19
-        for <linux-kbuild@vger.kernel.org>; Wed, 26 Jan 2011 00:46:03 -0800 (PST)
-Message-ID: <4D3FDF48.5070402@gmail.com>
-Date: Wed, 26 Jan 2011 11:46:00 +0300
-From: Nikolai Kondrashov <spbnick@gmail.com>
-MIME-Version: 1.0
-Subject: Re: [PATCH] deb-pkg: Fix building outside of source tree (O=...).
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
+Message-Id: <4D3FF944020000780002E872@vpn.id2.novell.com>
+Date: Wed, 26 Jan 2011 09:36:52 +0000
+From: "Jan Beulich" <JBeulich@novell.com>
+Subject: Do we still need -C in cmd_cpp_lds_S?
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8BIT
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: =?ISO-8859-1?Q?Nicolas_de_Peslo=C3=BCan?= <nicolas.2p.debian@free.fr>
-Cc: linux-kbuild@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
 
-> When building linux-headers package using deb-pkg, builddeb erroneously
-> assume current directory is the source tree. This is not true if building
-> in another directory, using make O=... deb-pkg.
->
-> This patch fix this problem.
-Thanks, Nicolas, it works!
+This got introduced universally for all arches when (for 2.5.32) the
+rule got made common (ia64, mips64, and sh had -C in their rules).
+It seems questionable to me that this is needed at all, but if some
+arch indeed needs it for whatever reason, couldn't this be put in
+arch/$(ARCH)/Makefile's customization of CPPFLAGS_vmlinux.lds?
 
-This problem was holding me from testing my patches and I didn't have enough
-time to find the fix myself.
+The point being that -C results in pre-processing directives to be
+retained (confusing ld) if they follow a comment on the same line,
+thus placing unnecessary restrictions on (potentially generated)
+header files.
 
-FWIW,
-Tested-by: Nikolai Kondrashov <spbnick@gmail.com>
+Thanks, Jan
 
-Sincerely,
-Nick
