@@ -1,26 +1,31 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Message-Id: <4D3FF944020000780002E872@vpn.id2.novell.com>
-Date: Wed, 26 Jan 2011 09:36:52 +0000
-From: "Jan Beulich" <JBeulich@novell.com>
-Subject: Do we still need -C in cmd_cpp_lds_S?
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8BIT
+Received: from vostochny.stro.at ([78.47.22.85]:44748 "EHLO vostochny.stro.at"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751847Ab1AZJwE (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 26 Jan 2011 04:52:04 -0500
+Date: Wed, 26 Jan 2011 10:52:01 +0100
+From: maximilian attems <max@stro.at>
+Subject: Re: [PATCH] deb-pkg: Fix building outside of source tree (O=...).
+Message-ID: <20110126095200.GK5982@stro.at>
+References: <1295876501-805-1-git-send-email-nicolas.2p.debian@free.fr>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <1295876501-805-1-git-send-email-nicolas.2p.debian@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
+To: Nicolas de =?iso-8859-1?Q?Peslo=FCan?= <nicolas.2p.debian@free.fr>
+Cc: mmarek@suse.cz, linux-kbuild@vger.kernel.org
 
-This got introduced universally for all arches when (for 2.5.32) the
-rule got made common (ia64, mips64, and sh had -C in their rules).
-It seems questionable to me that this is needed at all, but if some
-arch indeed needs it for whatever reason, couldn't this be put in
-arch/$(ARCH)/Makefile's customization of CPPFLAGS_vmlinux.lds?
+On Mon, 24 Jan 2011, Nicolas de Pesloüan wrote:
 
-The point being that -C results in pre-processing directives to be
-retained (confusing ld) if they follow a comment on the same line,
-thus placing unnecessary restrictions on (potentially generated)
-header files.
+> When building linux-headers package using deb-pkg, builddeb erroneously assume
+> current directory is the source tree. This is not true if building in another
+> directory, using make O=... deb-pkg.
+> 
+> This patch fix this problem.
+> 
+> Signed-off-by: Nicolas de Pesloüan <nicolas.2p.debian@free.fr>
 
-Thanks, Jan
-
+Acked-by: maximilian attems <max@stro.at>
