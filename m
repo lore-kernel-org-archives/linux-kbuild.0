@@ -1,56 +1,68 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from lo.gmane.org ([80.91.229.12]:36189 "EHLO lo.gmane.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755062Ab1A1IpJ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 28 Jan 2011 03:45:09 -0500
-Received: from list by lo.gmane.org with local (Exim 4.69)
-	(envelope-from <glkd-linux-kbuild@m.gmane.org>)
-	id 1Pijx2-0004ND-Ev
-	for linux-kbuild@vger.kernel.org; Fri, 28 Jan 2011 09:45:04 +0100
-Received: from 60.247.97.98 ([60.247.97.98])
-        by main.gmane.org with esmtp (Gmexim 0.1 (Debian))
-        id 1AlnuQ-0007hv-00
-        for <linux-kbuild@vger.kernel.org>; Fri, 28 Jan 2011 09:45:04 +0100
-Received: from xiyou.wangcong by 60.247.97.98 with local (Gmexim 0.1 (Debian))
-        id 1AlnuQ-0007hv-00
-        for <linux-kbuild@vger.kernel.org>; Fri, 28 Jan 2011 09:45:04 +0100
-From: WANG Cong <xiyou.wangcong@gmail.com>
-Subject: Re: [Patch] make installkernel configurable from command line (was
- Re: how to avoid that install.sh goes mad, if I am not root?)
-Date: Fri, 28 Jan 2011 07:58:07 +0000 (UTC)
-Message-ID: <ihtsue$921$2@dough.gmane.org>
-References: <4D388A08.1010004@afaics.de>
-	<19768.44428.482148.361069@pilspetsen.it.uu.se>
-	<ihbvd1$jbj$3@dough.gmane.org> <4D3A03CA.2060507@afaics.de>
-	<20110124102159.GD5510@cr0.nay.redhat.com>
-	<19773.26066.137666.718852@pilspetsen.it.uu.se>
-	<20110125054800.GC13618@cr0.nay.redhat.com>
-	<19775.61731.753606.576942@pilspetsen.it.uu.se>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Received: from mail-fx0-f46.google.com ([209.85.161.46]:46944 "EHLO
+	mail-fx0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751220Ab1A1WWX (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 28 Jan 2011 17:22:23 -0500
+Received: by fxm20 with SMTP id 20so3858690fxm.19
+        for <linux-kbuild@vger.kernel.org>; Fri, 28 Jan 2011 14:22:21 -0800 (PST)
+Message-ID: <4D43417A.1020603@gmail.com>
+Date: Fri, 28 Jan 2011 23:21:46 +0100
+From: Zdenek Kaspar <zkaspar82@gmail.com>
+MIME-Version: 1.0
+Subject: Add make tarxz-pkg build option
+Content-Type: multipart/mixed;
+ boundary="------------070600010209070205040006"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
 
-On Wed, 26 Jan 2011 11:02:11 +0100, Mikael Pettersson wrote:
-> 
-> Tested.  This works as far as not overriding root's ~/bin/installkernel
-> if it exists, but it fails to give precedence to an explicit
-> command-line INSTALLKERNEL=... over the built-in fallbacks.  I don't see
-> an easy way to fix that without first consolidating all archs'
-> INSTALLKERNEL handling into the top-level Makefile.
+This is a multi-part message in MIME format.
+--------------070600010209070205040006
+Content-Type: text/plain; charset=ISO-8859-2
+Content-Transfer-Encoding: 7bit
 
+Hi! Most distributions use xz-utils already, is it possible to add
+tarxz-pkg option ?
 
-Yes, exactly, I can expect this.
+NB: If someone thinks xz -9 is a bit hardcore, it's not much different
+like when bzip2 -9 was introduced into buildtar as an option imo..
 
-> 
-> Not using make install and just invoking your own install script
-> directly works, so I'm not sure this is worth the trouble (unless you
-> can unify all archs' INSTALLKERNEL handling as a side-effect / cleanup).
+TIA, Z.
 
-Agreed, I will have a try.
+--------------070600010209070205040006
+Content-Type: text/plain;
+ name="add-tarxz-target.diff"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+ filename="add-tarxz-target.diff"
 
-Thanks!
+Signed-off-by: Zdenek Kaspar <zkaspar82@gmail.com>
 
+--- a/scripts/package/Makefile	2011-01-28 23:05:03.000000000 +0100
++++ b/scripts/package/Makefile	2011-01-28 23:07:10.000000000 +0100
+@@ -142,7 +142,9 @@
+ 	@echo '  tar-pkg             - Build the kernel as an uncompressed tarball'
+ 	@echo '  targz-pkg           - Build the kernel as a gzip compressed tarball'
+ 	@echo '  tarbz2-pkg          - Build the kernel as a bzip2 compressed tarball'
++	@echo '  tarxz-pkg           - Build the kernel as a xz compressed tarball'
+ 	@echo '  perf-tar-src-pkg    - Build $(perf-tar).tar source tarball'
+ 	@echo '  perf-targz-src-pkg  - Build $(perf-tar).tar.gz source tarball'
+ 	@echo '  perf-tarbz2-src-pkg - Build $(perf-tar).tar.bz2 source tarball'
++	@echo '  perf-tarxz-src-pkg  - Build $(perf-tar).tar.xz source tarball'
+ 
+--- a/scripts/package/buildtar	2011-01-28 23:05:03.000000000 +0100
++++ b/scripts/package/buildtar	2011-01-28 23:08:20.000000000 +0100
+@@ -35,6 +35,10 @@
+ 		compress="bzip2 -c9"
+ 		file_ext=".bz2"
+ 		;;
++	tarxz-pkg)
++		compress="xz -c9"
++		file_ext=".xz"
++		;;
+ 	*)
+ 		echo "Unknown tarball target \"${1}\" requested, please add it to ${0}." >&2
+ 		exit 1
+
+--------------070600010209070205040006--
