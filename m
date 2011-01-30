@@ -1,47 +1,55 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-fx0-f46.google.com ([209.85.161.46]:46944 "EHLO
+Received: from mail-fx0-f46.google.com ([209.85.161.46]:33833 "EHLO
 	mail-fx0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751220Ab1A1WWX (ORCPT
+	with ESMTP id S1752096Ab1A3LS4 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 28 Jan 2011 17:22:23 -0500
-Received: by fxm20 with SMTP id 20so3858690fxm.19
-        for <linux-kbuild@vger.kernel.org>; Fri, 28 Jan 2011 14:22:21 -0800 (PST)
-Message-ID: <4D43417A.1020603@gmail.com>
-Date: Fri, 28 Jan 2011 23:21:46 +0100
+	Sun, 30 Jan 2011 06:18:56 -0500
+Received: by fxm20 with SMTP id 20so4731119fxm.19
+        for <linux-kbuild@vger.kernel.org>; Sun, 30 Jan 2011 03:18:55 -0800 (PST)
+Message-ID: <4D45491B.80007@gmail.com>
+Date: Sun, 30 Jan 2011 12:18:51 +0100
 From: Zdenek Kaspar <zkaspar82@gmail.com>
 MIME-Version: 1.0
-Subject: Add make tarxz-pkg build option
+Subject: Re: Add make tarxz-pkg build option
+References: <4D43417A.1020603@gmail.com>
+In-Reply-To: <4D43417A.1020603@gmail.com>
 Content-Type: multipart/mixed;
- boundary="------------070600010209070205040006"
+ boundary="------------000904090109020806080307"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 
 This is a multi-part message in MIME format.
---------------070600010209070205040006
+--------------000904090109020806080307
 Content-Type: text/plain; charset=ISO-8859-2
 Content-Transfer-Encoding: 7bit
 
-Hi! Most distributions use xz-utils already, is it possible to add
-tarxz-pkg option ?
+oops.. now with proper perf-tarxz-src-pkg.
 
-NB: If someone thinks xz -9 is a bit hardcore, it's not much different
-like when bzip2 -9 was introduced into buildtar as an option imo..
+Z.
 
-TIA, Z.
-
---------------070600010209070205040006
+--------------000904090109020806080307
 Content-Type: text/plain;
- name="add-tarxz-target.diff"
+ name="add-tarxz-target-v2.diff"
 Content-Transfer-Encoding: 7bit
 Content-Disposition: attachment;
- filename="add-tarxz-target.diff"
+ filename="add-tarxz-target-v2.diff"
 
 Signed-off-by: Zdenek Kaspar <zkaspar82@gmail.com>
 
---- a/scripts/package/Makefile	2011-01-28 23:05:03.000000000 +0100
-+++ b/scripts/package/Makefile	2011-01-28 23:07:10.000000000 +0100
-@@ -142,7 +142,9 @@
+--- linux-2.6-HEAD-1f0324c.orig/scripts/package/Makefile	2011-01-28 03:24:34.000000000 +0100
++++ linux-2.6-HEAD-1f0324c/scripts/package/Makefile	2011-01-30 11:58:38.875576503 +0100
+@@ -127,7 +127,8 @@
+ $(if $(findstring tar-src,$@),,                                     \
+ $(if $(findstring bz2,$@),bzip2,                                    \
+ $(if $(findstring gz,$@),gzip,                                      \
+-$(error unknown target $@)))                                       \
++$(if $(findstring xz,$@),xz,                                        \
++$(error unknown target $@))))                                       \
+ 	-f -9 $(perf-tar).tar)
+ 
+ perf-%pkg: FORCE
+@@ -142,7 +143,9 @@
  	@echo '  tar-pkg             - Build the kernel as an uncompressed tarball'
  	@echo '  targz-pkg           - Build the kernel as a gzip compressed tarball'
  	@echo '  tarbz2-pkg          - Build the kernel as a bzip2 compressed tarball'
@@ -51,8 +59,8 @@ Signed-off-by: Zdenek Kaspar <zkaspar82@gmail.com>
  	@echo '  perf-tarbz2-src-pkg - Build $(perf-tar).tar.bz2 source tarball'
 +	@echo '  perf-tarxz-src-pkg  - Build $(perf-tar).tar.xz source tarball'
  
---- a/scripts/package/buildtar	2011-01-28 23:05:03.000000000 +0100
-+++ b/scripts/package/buildtar	2011-01-28 23:08:20.000000000 +0100
+--- linux-2.6-HEAD-1f0324c.orig/scripts/package/buildtar	2011-01-28 03:24:34.000000000 +0100
++++ linux-2.6-HEAD-1f0324c/scripts/package/buildtar	2011-01-30 11:43:57.728196352 +0100
 @@ -35,6 +35,10 @@
  		compress="bzip2 -c9"
  		file_ext=".bz2"
@@ -65,4 +73,4 @@ Signed-off-by: Zdenek Kaspar <zkaspar82@gmail.com>
  		echo "Unknown tarball target \"${1}\" requested, please add it to ${0}." >&2
  		exit 1
 
---------------070600010209070205040006--
+--------------000904090109020806080307--
