@@ -1,127 +1,77 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp08.smtpout.orange.fr ([80.12.242.130]:45466 "EHLO
-	smtp.smtpout.orange.fr" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754877Ab1A3XP3 (ORCPT
+Received: from mail-iw0-f174.google.com ([209.85.214.174]:39752 "EHLO
+	mail-iw0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753561Ab1BBArP convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 30 Jan 2011 18:15:29 -0500
-From: "Yann E. MORIN" <yann.morin.1998@anciens.enib.fr>
-Subject: [PATCH 1/2] kconfig: allow multiple inclusion of the same file
-Date: Mon, 31 Jan 2011 00:15:20 +0100
-Message-Id: <1296429321-6991-2-git-send-email-yann.morin.1998@anciens.enib.fr>
-In-Reply-To: <1296429321-6991-1-git-send-email-yann.morin.1998@anciens.enib.fr>
-References: <1296429321-6991-1-git-send-email-yann.morin.1998@anciens.enib.fr>
+	Tue, 1 Feb 2011 19:47:15 -0500
+MIME-Version: 1.0
+In-Reply-To: <20110201232750.GA30800@ulf>
+References: <20110201232750.GA30800@ulf>
+Date: Tue, 1 Feb 2011 19:47:14 -0500
+Message-ID: <AANLkTinuLrUYJZzkmCVu9ZAYz-z2k-_cYb7opa2+Uutm@mail.gmail.com>
+Subject: Re: [PATCH] [ANNOUNCE] kconfig: Kconfiglib: a flexible Python Kconfig parser
+From: Arnaud Lacombe <lacombar@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
+To: Ulf Magnusson <ulfalizer.lkml@gmail.com>
+Cc: linux-kbuild@vger.kernel.org, zippel@linux-m68k.org, mmarek@suse.cz, rdunlap@xenotime.net, akpm@linux-foundation.org, andrea.gelmini@gelma.net, linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org
 
-Allow 'source'ing the same file from multiple places (eg. from
-different files, and/or under different conditions).
+Hi,
 
-To avoid circular inclusion, scan the source-ancestry of the
-current file, and abort if already sourced in this branch.
+On Tue, Feb 1, 2011 at 6:27 PM, Ulf Magnusson <ulfalizer.lkml@gmail.com> wrote:
+> Hi,
+>
+> This is the initial release of Kconfiglib: a Python library for
+> scripting, debugging, and extracting information from Kconfig-based
+> configuration systems.  It can be used to programmatically generate a
+> .config when the '*conf' tools are too inflexible, to quickly find out
+> interesting information about a Kconfig configuration such as dependency
+> relations between symbols and where undefined symbols are referenced,
+> and in applications that need to parse and extract information from
+> Kconfig files.
+>
+Does that mean that when a kconfig-language change will happen, one
+will not only must have to be Lex/YaCC and C fluent, but also, perl
+and python ? That seem to be a lot of duplication to me.
 
-Regenerate the pre-parsed lex.zconf.c_shipped file.
+I'd rather see the backend be changed so that it could be used with
+SWIG to generate language bindings. I had WIP in this area, but
+changes needed are rather intrusive. That said, the testsuite might be
+interesting, I've been thinking about that for quite some time.
 
-Signed-off-by: "Yann E. MORIN" <yann.morin.1998@anciens.enib.fr>
----
- scripts/kconfig/lex.zconf.c_shipped |   29 +++++++++++++++++++----------
- scripts/kconfig/zconf.l             |   29 +++++++++++++++++++----------
- 2 files changed, 38 insertions(+), 20 deletions(-)
+ - Arnaud
 
-diff --git a/scripts/kconfig/lex.zconf.c_shipped b/scripts/kconfig/lex.zconf.c_shipped
-index 6eb0397..f4b3b1a 100644
---- a/scripts/kconfig/lex.zconf.c_shipped
-+++ b/scripts/kconfig/lex.zconf.c_shipped
-@@ -2368,6 +2368,7 @@ void zconf_initscan(const char *name)
- 
- void zconf_nextfile(const char *name)
- {
-+	struct file *iter;
- 	struct file *file = file_lookup(name);
- 	struct buffer *buf = malloc(sizeof(*buf));
- 	memset(buf, 0, sizeof(*buf));
-@@ -2383,16 +2384,24 @@ void zconf_nextfile(const char *name)
- 	buf->parent = current_buf;
- 	current_buf = buf;
- 
--	if (file->flags & FILE_BUSY) {
--		printf("%s:%d: do not source '%s' from itself\n",
--		       zconf_curname(), zconf_lineno(), name);
--		exit(1);
--	}
--	if (file->flags & FILE_SCANNED) {
--		printf("%s:%d: file '%s' is already sourced from '%s'\n",
--		       zconf_curname(), zconf_lineno(), name,
--		       file->parent->name);
--		exit(1);
-+	for (iter = current_file->parent; iter; iter = iter->parent ) {
-+		if (!strcmp(current_file->name,iter->name) ) {
-+			printf("%s:%d: recursive inclusion detected. "
-+			       "Inclusion path:\n  current file : '%s'\n",
-+			       zconf_curname(), zconf_lineno(),
-+			       zconf_curname());
-+			iter = current_file->parent;
-+			while (iter && \
-+			       strcmp(iter->name,current_file->name)) {
-+				printf("  included from: '%s:%d'\n",
-+				       iter->name, iter->lineno-1);
-+				iter = iter->parent;
-+			}
-+			if (iter)
-+				printf("  included from: '%s:%d'\n",
-+				       iter->name, iter->lineno+1);
-+			exit(1);
-+		}
- 	}
- 	file->flags |= FILE_BUSY;
- 	file->lineno = 1;
-diff --git a/scripts/kconfig/zconf.l b/scripts/kconfig/zconf.l
-index 3dbaec1..f23e3af 100644
---- a/scripts/kconfig/zconf.l
-+++ b/scripts/kconfig/zconf.l
-@@ -299,6 +299,7 @@ void zconf_initscan(const char *name)
- 
- void zconf_nextfile(const char *name)
- {
-+	struct file *iter;
- 	struct file *file = file_lookup(name);
- 	struct buffer *buf = malloc(sizeof(*buf));
- 	memset(buf, 0, sizeof(*buf));
-@@ -314,16 +315,24 @@ void zconf_nextfile(const char *name)
- 	buf->parent = current_buf;
- 	current_buf = buf;
- 
--	if (file->flags & FILE_BUSY) {
--		printf("%s:%d: do not source '%s' from itself\n",
--		       zconf_curname(), zconf_lineno(), name);
--		exit(1);
--	}
--	if (file->flags & FILE_SCANNED) {
--		printf("%s:%d: file '%s' is already sourced from '%s'\n",
--		       zconf_curname(), zconf_lineno(), name,
--		       file->parent->name);
--		exit(1);
-+	for (iter = current_file->parent; iter; iter = iter->parent ) {
-+		if (!strcmp(current_file->name,iter->name) ) {
-+			printf("%s:%d: recursive inclusion detected. "
-+			       "Inclusion path:\n  current file : '%s'\n",
-+			       zconf_curname(), zconf_lineno(),
-+			       zconf_curname());
-+			iter = current_file->parent;
-+			while (iter && \
-+			       strcmp(iter->name,current_file->name)) {
-+				printf("  included from: '%s:%d'\n",
-+				       iter->name, iter->lineno-1);
-+				iter = iter->parent;
-+			}
-+			if (iter)
-+				printf("  included from: '%s:%d'\n",
-+				       iter->name, iter->lineno+1);
-+			exit(1);
-+		}
- 	}
- 	file->flags |= FILE_BUSY;
- 	file->lineno = 1;
--- 
-1.7.1
-
+> For a much longer introduction including multiple examples, see
+> arch/kconfig/kconfiglib.py.
+>
+> Have fun!
+>
+> Signed-off-by: Ulf Magnusson <ulfalizer.lkml@gmail.com>
+> ---
+> Convenience links:
+>
+> Documentation, generated from kconfiglib.py with pydoc -w:
+> http://dl.dropbox.com/u/10406197/kconfiglib.html
+>
+> Examples as separate files:
+> http://dl.dropbox.com/u/10406197/kconfiglib-examples.tar.gz
+>
+>
+> The patch should be preferably be applied to a recent kernel, i.e. Linus's
+> (2.6.38-rc3 at the time of writing).  Due to recent Kconfig changes, the
+> kconfigtest.py test suite - which compares output character-for-character -
+> will indicate failure on older (a few months old) kernels versions even though
+> the outputs are functionally equivalent.
+>
+>  Documentation/kbuild/kconfig-language.txt |    5 +
+>  Documentation/kbuild/kconfig.txt          |    8 +
+>  README                                    |   13 +
+>  scripts/kconfig/Makefile                  |   26 +-
+>  scripts/kconfig/kconfiglib.py             | 3918 +++++++++++++++++++++++++++++
+>  scripts/kconfig/kconfigtest.py            |  396 +++
+>  6 files changed, 4365 insertions(+), 1 deletions(-)
+>  create mode 100644 scripts/kconfig/kconfiglib.py
+>  create mode 100644 scripts/kconfig/kconfigtest.py
+> [...]
