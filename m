@@ -1,97 +1,76 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-bw0-f46.google.com ([209.85.214.46]:57365 "EHLO
-	mail-bw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751480Ab1BBCCi (ORCPT
+Received: from mail-fx0-f46.google.com ([209.85.161.46]:42012 "EHLO
+	mail-fx0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750904Ab1BBJee (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 1 Feb 2011 21:02:38 -0500
-Date: Wed, 2 Feb 2011 03:02:26 +0100
-From: Ulf Magnusson <ulfalizer.lkml@gmail.com>
-Subject: Re: [PATCH] [ANNOUNCE] kconfig: Kconfiglib: a flexible Python
- Kconfig parser
-Message-ID: <20110202020225.GA31558@ulf>
-References: <20110201232750.GA30800@ulf>
- <AANLkTinuLrUYJZzkmCVu9ZAYz-z2k-_cYb7opa2+Uutm@mail.gmail.com>
+	Wed, 2 Feb 2011 04:34:34 -0500
+Received: by fxm20 with SMTP id 20so7799781fxm.19
+        for <linux-kbuild@vger.kernel.org>; Wed, 02 Feb 2011 01:34:33 -0800 (PST)
+Message-ID: <4D492525.20402@gmail.com>
+Date: Wed, 02 Feb 2011 10:34:29 +0100
+From: =?UTF-8?B?Tmljb2xhcyBkZSBQZXNsb8O8YW4=?=
+	<nicolas.2p.debian@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+Subject: Re: [PATCH] deb-pkg: Fix building outside of source tree (O=...).
+References: <1295876501-805-1-git-send-email-nicolas.2p.debian@free.fr>
+In-Reply-To: <1295876501-805-1-git-send-email-nicolas.2p.debian@free.fr>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <AANLkTinuLrUYJZzkmCVu9ZAYz-z2k-_cYb7opa2+Uutm@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnaud Lacombe <lacombar@gmail.com>
-Cc: linux-kbuild@vger.kernel.org, zippel@linux-m68k.org, mmarek@suse.cz, rdunlap@xenotime.net, akpm@linux-foundation.org, andrea.gelmini@gelma.net, linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, ulfalizer.lkml@gmail.com
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org, Nikolai Kondrashov <spbnick@gmail.com>, maximilian attems <max@stro.at>
 
-On Tue, Feb 01, 2011 at 07:47:14PM -0500, Arnaud Lacombe wrote:
-> Hi,
-> 
-> On Tue, Feb 1, 2011 at 6:27 PM, Ulf Magnusson <ulfalizer.lkml@gmail.com> wrote:
-> > Hi,
-> >
-> > This is the initial release of Kconfiglib: a Python library for
-> > scripting, debugging, and extracting information from Kconfig-based
-> > configuration systems.  It can be used to programmatically generate a
-> > .config when the '*conf' tools are too inflexible, to quickly find out
-> > interesting information about a Kconfig configuration such as dependency
-> > relations between symbols and where undefined symbols are referenced,
-> > and in applications that need to parse and extract information from
-> > Kconfig files.
-> >
-> Does that mean that when a kconfig-language change will happen, one
-> will not only must have to be Lex/YaCC and C fluent, but also, perl
-> and python ? That seem to be a lot of duplication to me.
-> 
-> I'd rather see the backend be changed so that it could be used with
-> SWIG to generate language bindings. I had WIP in this area, but
-> changes needed are rather intrusive. That said, the testsuite might be
-> interesting, I've been thinking about that for quite some time.
-> 
->  - Arnaud
-> 
-I originally experimented with patching the back end, but as you say the
-changes would probably have to be very invasive/obfuscating in order to
-extract all the information you can get out of Kconfiglib.  So I instead
-went the minimally invasive route with a completely stand-alone library
-together with a test suite.
+Le 24/01/2011 14:41, Nicolas de Pesloüan a écrit :
 
-I'm willing to update Kconfiglib when future additions/modifications are
-made to the Kconfig language so that all tests in the compatibility test
-suite keep passing.  I've added lots of comments and documentation to
-internal methods and tried to keep the code clean and straightforward,
-so it should be pretty easy for others to get into the code as well.
+Hi Michal,
 
-If by Perl you're referring to streamline_config.pl, I suspect it could
-be rewritten as a smallish Kconfiglib script, though I haven't looked at
-it closely.  That version might also be much better at respecting symbol
-dependencies.
-> > For a much longer introduction including multiple examples, see
-> > arch/kconfig/kconfiglib.py.
-> >
-> > Have fun!
-> >
-> > Signed-off-by: Ulf Magnusson <ulfalizer.lkml@gmail.com>
-> > ---
-> > Convenience links:
-> >
-> > Documentation, generated from kconfiglib.py with pydoc -w:
-> > http://dl.dropbox.com/u/10406197/kconfiglib.html
-> >
-> > Examples as separate files:
-> > http://dl.dropbox.com/u/10406197/kconfiglib-examples.tar.gz
-> >
-> >
-> > The patch should be preferably be applied to a recent kernel, i.e. Linus's
-> > (2.6.38-rc3 at the time of writing).  Due to recent Kconfig changes, the
-> > kconfigtest.py test suite - which compares output character-for-character -
-> > will indicate failure on older (a few months old) kernels versions even though
-> > the outputs are functionally equivalent.
-> >
-> >  Documentation/kbuild/kconfig-language.txt |    5 +
-> >  Documentation/kbuild/kconfig.txt          |    8 +
-> >  README                                    |   13 +
-> >  scripts/kconfig/Makefile                  |   26 +-
-> >  scripts/kconfig/kconfiglib.py             | 3918 +++++++++++++++++++++++++++++
-> >  scripts/kconfig/kconfigtest.py            |  396 +++
-> >  6 files changed, 4365 insertions(+), 1 deletions(-)
-> >  create mode 100644 scripts/kconfig/kconfiglib.py
-> >  create mode 100644 scripts/kconfig/kconfigtest.py
-> > [...]
+Any troubles with my patch? I still don't find it in any branchs of 
+git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild-2.6.git
+
+It depends on commit 1b9a50d931a04ba007cc1a926fead3ff4b5afa9b, from Maximilian Attems, (in 
+for-next), because it changes the same lines in scripts/package/builddeb.
+
+But, as the problem it fixes cause make deb-pkg to fail, it might be pushed to rc-fixes... ?
+
+Do you want me to rebase it on rc-fixes? (This would cause a future merge to fail when applying the 
+patch from Maximilian, but...).
+
+	Nicolas.
+
+> When building linux-headers package using deb-pkg, builddeb erroneously assume
+> current directory is the source tree. This is not true if building in another
+> directory, using make O=... deb-pkg.
+>
+> This patch fix this problem.
+>
+> Signed-off-by: Nicolas de Pesloüan<nicolas.2p.debian@free.fr>
+
+Tested-by: Nikolai Kondrashov <spbnick@gmail.com>
+Acked-by: maximilian attems <max@stro.at>
+
+> ---
+>   scripts/package/builddeb |    6 +++---
+>   1 files changed, 3 insertions(+), 3 deletions(-)
+>
+> diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+> index ebc6d6e..f6cbc3d 100644
+> --- a/scripts/package/builddeb
+> +++ b/scripts/package/builddeb
+> @@ -238,12 +238,12 @@ EOF
+>   fi
+>
+>   # Build header package
+> -find . -name Makefile -o -name Kconfig\* -o -name \*.pl>  /tmp/files$$
+> -find arch/$SRCARCH/include include scripts -type f>>  /tmp/files$$
+> +(cd $srctree; find . -name Makefile -o -name Kconfig\* -o -name \*.pl>  /tmp/files$$)
+> +(cd $srctree; find arch/$SRCARCH/include include scripts -type f>>  /tmp/files$$)
+>   (cd $objtree; find .config Module.symvers include scripts -type f>>  /tmp/objfiles$$)
+>   destdir=$kernel_headers_dir/usr/src/linux-headers-$version
+>   mkdir -p "$destdir"
+> -tar -c -f - -T /tmp/files$$ | (cd $destdir; tar -xf -)
+> +(cd $srctree; tar -c -f - -T /tmp/files$$) | (cd $destdir; tar -xf -)
+>   (cd $objtree; tar -c -f - -T /tmp/objfiles$$) | (cd $destdir; tar -xf -)
+>   rm -f /tmp/files$$ /tmp/objfiles$$
+>   arch=$(dpkg --print-architecture)
+
