@@ -1,111 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-bw0-f46.google.com ([209.85.214.46]:33258 "EHLO
-	mail-bw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752582Ab1BDXQY (ORCPT
+Received: from mail-gw0-f46.google.com ([74.125.83.46]:41748 "EHLO
+	mail-gw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751085Ab1BDXm5 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 4 Feb 2011 18:16:24 -0500
-Date: Sat, 5 Feb 2011 00:16:15 +0100
-From: Ulf Magnusson <ulfalizer.lkml@gmail.com>
-Subject: [PATCH] kconfig: undefined symbols can crash dependency loop
- detection
-Message-ID: <20110204231611.GA9344@ulf>
+	Fri, 4 Feb 2011 18:42:57 -0500
+Message-ID: <4D4C8EFA.40207@landley.net>
+Date: Fri, 04 Feb 2011 17:42:50 -0600
+From: Rob Landley <rob@landley.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+Subject: Re: [PATCH] [ANNOUNCE] kconfig: Kconfiglib: a flexible Python Kconfig
+ parser
+References: <20110201232750.GA30800@ulf> <20110204143529.f49e92e5.rdunlap@xenotime.net>
+In-Reply-To: <20110204143529.f49e92e5.rdunlap@xenotime.net>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: zippel@linux-m68k.org, linux-kernel@vger.kernel.org
+To: Randy Dunlap <rdunlap@xenotime.net>
+Cc: Ulf Magnusson <ulfalizer.lkml@gmail.com>, linux-kbuild@vger.kernel.org, zippel@linux-m68k.org, mmarek@suse.cz, akpm@linux-foundation.org, andrea.gelmini@gelma.net, linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org
 
-The Kconfig
+On 02/04/2011 04:35 PM, Randy Dunlap wrote:
+>> The patch should be preferably be applied to a recent kernel, i.e. Linus's
+>> (2.6.38-rc3 at the time of writing).  Due to recent Kconfig changes, the
+>> kconfigtest.py test suite - which compares output character-for-character -
+>> will indicate failure on older (a few months old) kernels versions even though
+>> the outputs are functionally equivalent.
+>>
+>>  Documentation/kbuild/kconfig-language.txt |    5 +
+>>  Documentation/kbuild/kconfig.txt          |    8 +
+>>  README                                    |   13 +
+>>  scripts/kconfig/Makefile                  |   26 +-
+>>  scripts/kconfig/kconfiglib.py             | 3918 +++++++++++++++++++++++++++++
+>>  scripts/kconfig/kconfigtest.py            |  396 +++
+>>  6 files changed, 4365 insertions(+), 1 deletions(-)
+>>  create mode 100644 scripts/kconfig/kconfiglib.py
+>>  create mode 100644 scripts/kconfig/kconfigtest.py
 
-config FOO
-	bool "FOO" if BAR
-	select BAR
+Wait, I thought this was an extra standalone library.  Are you saying
+you want to make it so Linux will no longer compile on a build machine
+that doesn't have Python installed?
 
-has a dependency loop involving an undefined symbol BAR. This causes a
-segfault in sym_check_print_recursive() as it assumes all symbols have a
-non-null 'prop', which is not the case for undefined symbols. This is a
-proposed fix.
+If this is merely an extra developer tool ala bloat-o-meter and
+checkpatch.pl then it's merely uninteresting to me.  (I myself wrote a
+quick and dirty http://kernel.org/doc/make/menuconfig2html.py to
+generate http://kernel.org/doc/menuconfig/x86.html and friends years
+ago, and I still run it to update that once in a while.  There's not
+much to it.)
 
-Signed-off-by: Ulf Magnusson <ulfalizer.lkml@gmail.com>
----
- scripts/kconfig/symbol.c |   32 ++++++++++++++++++++++++++++----
- 1 files changed, 28 insertions(+), 4 deletions(-)
+But adding new prerequities to a build machine would be really annoying
+for my use cases.
 
-diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
-index a796c95..81a217f 100644
---- a/scripts/kconfig/symbol.c
-+++ b/scripts/kconfig/symbol.c
-@@ -5,6 +5,7 @@
- 
- #include <ctype.h>
- #include <stdlib.h>
-+#include <stdio.h>
- #include <string.h>
- #include <regex.h>
- #include <sys/utsname.h>
-@@ -972,6 +973,10 @@ static void sym_check_print_recursive(struct symbol *last_sym)
- 	struct menu *menu = NULL;
- 	struct property *prop;
- 	struct dep_stack cv_stack;
-+	const char *filename;
-+	int lineno;
-+	char undef_msg_buf[100];
-+	int snprintf_size;
- 
- 	if (sym_is_choice_value(last_sym)) {
- 		dep_stack_insert(&cv_stack, last_sym);
-@@ -1001,18 +1006,37 @@ static void sym_check_print_recursive(struct symbol *last_sym)
- 					break;
- 			}
- 		}
-+
-+		if (prop) {
-+			filename = prop->file->name;
-+			lineno = prop->lineno;
-+		} else {
-+			/* The dependency loop involves an undefined symbol.
-+			 * Checking sym->name is probably unnecessary here, but
-+			 * just to be on the safe side. */
-+			snprintf_size = snprintf(undef_msg_buf,
-+						 sizeof(undef_msg_buf),
-+						 "<no file, %s is undefined>",
-+						 sym->name ? sym->name :
-+							     "<choice>");
-+			if (snprintf_size > sizeof(undef_msg_buf))
-+				undef_msg_buf[sizeof(undef_msg_buf) - 1] = '\0';
-+			filename = undef_msg_buf;
-+			lineno = 0;
-+		}
-+
- 		if (stack->sym == last_sym)
- 			fprintf(stderr, "%s:%d:error: recursive dependency detected!\n",
--				prop->file->name, prop->lineno);
-+				filename, lineno);
- 		if (stack->expr) {
- 			fprintf(stderr, "%s:%d:\tsymbol %s %s value contains %s\n",
--				prop->file->name, prop->lineno,
-+				filename, lineno,
- 				sym->name ? sym->name : "<choice>",
- 				prop_get_type_name(prop->type),
- 				next_sym->name ? next_sym->name : "<choice>");
- 		} else if (stack->prop) {
- 			fprintf(stderr, "%s:%d:\tsymbol %s depends on %s\n",
--				prop->file->name, prop->lineno,
-+				filename, lineno,
- 				sym->name ? sym->name : "<choice>",
- 				next_sym->name ? next_sym->name : "<choice>");
- 		} else if (sym_is_choice(sym)) {
-@@ -1027,7 +1051,7 @@ static void sym_check_print_recursive(struct symbol *last_sym)
- 				next_sym->name ? next_sym->name : "<choice>");
- 		} else {
- 			fprintf(stderr, "%s:%d:\tsymbol %s is selected by %s\n",
--				prop->file->name, prop->lineno,
-+				filename, lineno,
- 				sym->name ? sym->name : "<choice>",
- 				next_sym->name ? next_sym->name : "<choice>");
- 		}
--- 
-1.7.0.4
-
+Rob
