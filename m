@@ -1,123 +1,111 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from xenotime.net ([72.52.115.56]:40734 "HELO xenotime.net"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with SMTP
-	id S1751849Ab1BDWfk (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 4 Feb 2011 17:35:40 -0500
-Received: from chimera.site ([173.50.240.230]) by xenotime.net for <linux-kbuild@vger.kernel.org>; Fri, 4 Feb 2011 14:35:29 -0800
-Date: Fri, 4 Feb 2011 14:35:29 -0800
-From: Randy Dunlap <rdunlap@xenotime.net>
-Subject: Re: [PATCH] [ANNOUNCE] kconfig: Kconfiglib: a flexible Python
- Kconfig parser
-Message-Id: <20110204143529.f49e92e5.rdunlap@xenotime.net>
-In-Reply-To: <20110201232750.GA30800@ulf>
-References: <20110201232750.GA30800@ulf>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Received: from mail-bw0-f46.google.com ([209.85.214.46]:33258 "EHLO
+	mail-bw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752582Ab1BDXQY (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 4 Feb 2011 18:16:24 -0500
+Date: Sat, 5 Feb 2011 00:16:15 +0100
+From: Ulf Magnusson <ulfalizer.lkml@gmail.com>
+Subject: [PATCH] kconfig: undefined symbols can crash dependency loop
+ detection
+Message-ID: <20110204231611.GA9344@ulf>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ulf Magnusson <ulfalizer.lkml@gmail.com>
-Cc: linux-kbuild@vger.kernel.org, zippel@linux-m68k.org, mmarek@suse.cz, akpm@linux-foundation.org, andrea.gelmini@gelma.net, linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
+Cc: zippel@linux-m68k.org, linux-kernel@vger.kernel.org
 
-On Wed, 2 Feb 2011 00:27:55 +0100 Ulf Magnusson wrote:
+The Kconfig
 
-> Hi,
-> 
-> This is the initial release of Kconfiglib: a Python library for
-> scripting, debugging, and extracting information from Kconfig-based
-> configuration systems.  It can be used to programmatically generate a
-> .config when the '*conf' tools are too inflexible, to quickly find out
-> interesting information about a Kconfig configuration such as dependency
-> relations between symbols and where undefined symbols are referenced,
-> and in applications that need to parse and extract information from
-> Kconfig files.
-> 
-> For a much longer introduction including multiple examples, see
-> arch/kconfig/kconfiglib.py.
-> 
-> Have fun!
-> 
-> Signed-off-by: Ulf Magnusson <ulfalizer.lkml@gmail.com>
-> ---
-> Convenience links:
-> 
-> Documentation, generated from kconfiglib.py with pydoc -w:
-> http://dl.dropbox.com/u/10406197/kconfiglib.html
-> 
-> Examples as separate files:
-> http://dl.dropbox.com/u/10406197/kconfiglib-examples.tar.gz
-> 
-> 
-> The patch should be preferably be applied to a recent kernel, i.e. Linus's
-> (2.6.38-rc3 at the time of writing).  Due to recent Kconfig changes, the
-> kconfigtest.py test suite - which compares output character-for-character -
-> will indicate failure on older (a few months old) kernels versions even though
-> the outputs are functionally equivalent.
-> 
->  Documentation/kbuild/kconfig-language.txt |    5 +
->  Documentation/kbuild/kconfig.txt          |    8 +
->  README                                    |   13 +
->  scripts/kconfig/Makefile                  |   26 +-
->  scripts/kconfig/kconfiglib.py             | 3918 +++++++++++++++++++++++++++++
->  scripts/kconfig/kconfigtest.py            |  396 +++
->  6 files changed, 4365 insertions(+), 1 deletions(-)
->  create mode 100644 scripts/kconfig/kconfiglib.py
->  create mode 100644 scripts/kconfig/kconfigtest.py
-> 
+config FOO
+	bool "FOO" if BAR
+	select BAR
 
-> diff --git a/README b/README
-> index 1b81d28..bb5e68f 100644
-> --- a/README
-> +++ b/README
-> @@ -196,6 +196,19 @@ CONFIGURING the kernel:
->  			   values to 'n' as much as possible.
->  	"make randconfig"  Create a ./.config file by setting symbol
->  			   values to random values.
-> +	"make scriptconfig SCRIPT=<path to script>" Run a Kconfiglib
-> +			   script (see scripts/kconfig/kconfiglib.py).  This
-> +			   can be used to programatically generate a
-> +			   ./.config, and for applications that need to
-> +			   extract information from Kconfig files.
-> +	"make iscriptconfig" Launch an interactive Python shell
-> +			   for running Kconfiglib on the architecture's
-> +			   Kconfig configuration.  The kconfiglib and sys
-> +			   (for sys.argv[1] - the base Kconfig file) modules
-> +			   will be imported automatically, and a Config
-> +			   instance 'c' will be created for the architecture
-> +			   (using c = kconfiglib.Config(sys.argv[1])).
-> +
->  
->     You can find more information on using the Linux kernel config tools
->     in Documentation/kbuild/kconfig.txt.
+has a dependency loop involving an undefined symbol BAR. This causes a
+segfault in sym_check_print_recursive() as it assumes all symbols have a
+non-null 'prop', which is not the case for undefined symbols. This is a
+proposed fix.
 
-Hi Ulf,
-
-This is interesting.  I just wish I could read it.  ;)
-I'll get over it.
-
-
-1.  It would be really Good to have "make scriptconfig SCRIPT=<path to script>"
-and "make iscriptconfig" (similar to above, but shortened) in "make help" output.
-
-2.  My first test (using your ex1.py script) failed because I used O=xx64 (build
-directory):
-
-rddunlap@chimera:lnx-2638-rc3> make O=xx64 scriptconfig SCRIPT=~/pkg/kconfiglib/ex1.py
-  GEN     /lnx/src/lnx-2638-rc3/xx64/Makefile
-Traceback (most recent call last):
-  File "/home/rddunlap/pkg/kconfiglib/ex1.py", line 1, in <module>
-    import kconfiglib
-ImportError: No module named kconfiglib
-make[2]: *** [scriptconfig] Error 1
-make[1]: *** [scriptconfig] Error 2
-make: *** [sub-make] Error 2
-
-Does kconfiglib support O=builddir generally?  I can't tell that it does (yet)
-since all ex[1-7].py fail in this manner.
-It needs to support/allow O=builddir.
-
-Thanks.  I'll keep looking...
-
+Signed-off-by: Ulf Magnusson <ulfalizer.lkml@gmail.com>
 ---
-~Randy
-*** Remember to use Documentation/SubmitChecklist when testing your code ***
+ scripts/kconfig/symbol.c |   32 ++++++++++++++++++++++++++++----
+ 1 files changed, 28 insertions(+), 4 deletions(-)
+
+diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
+index a796c95..81a217f 100644
+--- a/scripts/kconfig/symbol.c
++++ b/scripts/kconfig/symbol.c
+@@ -5,6 +5,7 @@
+ 
+ #include <ctype.h>
+ #include <stdlib.h>
++#include <stdio.h>
+ #include <string.h>
+ #include <regex.h>
+ #include <sys/utsname.h>
+@@ -972,6 +973,10 @@ static void sym_check_print_recursive(struct symbol *last_sym)
+ 	struct menu *menu = NULL;
+ 	struct property *prop;
+ 	struct dep_stack cv_stack;
++	const char *filename;
++	int lineno;
++	char undef_msg_buf[100];
++	int snprintf_size;
+ 
+ 	if (sym_is_choice_value(last_sym)) {
+ 		dep_stack_insert(&cv_stack, last_sym);
+@@ -1001,18 +1006,37 @@ static void sym_check_print_recursive(struct symbol *last_sym)
+ 					break;
+ 			}
+ 		}
++
++		if (prop) {
++			filename = prop->file->name;
++			lineno = prop->lineno;
++		} else {
++			/* The dependency loop involves an undefined symbol.
++			 * Checking sym->name is probably unnecessary here, but
++			 * just to be on the safe side. */
++			snprintf_size = snprintf(undef_msg_buf,
++						 sizeof(undef_msg_buf),
++						 "<no file, %s is undefined>",
++						 sym->name ? sym->name :
++							     "<choice>");
++			if (snprintf_size > sizeof(undef_msg_buf))
++				undef_msg_buf[sizeof(undef_msg_buf) - 1] = '\0';
++			filename = undef_msg_buf;
++			lineno = 0;
++		}
++
+ 		if (stack->sym == last_sym)
+ 			fprintf(stderr, "%s:%d:error: recursive dependency detected!\n",
+-				prop->file->name, prop->lineno);
++				filename, lineno);
+ 		if (stack->expr) {
+ 			fprintf(stderr, "%s:%d:\tsymbol %s %s value contains %s\n",
+-				prop->file->name, prop->lineno,
++				filename, lineno,
+ 				sym->name ? sym->name : "<choice>",
+ 				prop_get_type_name(prop->type),
+ 				next_sym->name ? next_sym->name : "<choice>");
+ 		} else if (stack->prop) {
+ 			fprintf(stderr, "%s:%d:\tsymbol %s depends on %s\n",
+-				prop->file->name, prop->lineno,
++				filename, lineno,
+ 				sym->name ? sym->name : "<choice>",
+ 				next_sym->name ? next_sym->name : "<choice>");
+ 		} else if (sym_is_choice(sym)) {
+@@ -1027,7 +1051,7 @@ static void sym_check_print_recursive(struct symbol *last_sym)
+ 				next_sym->name ? next_sym->name : "<choice>");
+ 		} else {
+ 			fprintf(stderr, "%s:%d:\tsymbol %s is selected by %s\n",
+-				prop->file->name, prop->lineno,
++				filename, lineno,
+ 				sym->name ? sym->name : "<choice>",
+ 				next_sym->name ? next_sym->name : "<choice>");
+ 		}
+-- 
+1.7.0.4
+
