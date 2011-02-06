@@ -1,56 +1,86 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-bw0-f46.google.com ([209.85.214.46]:34621 "EHLO
+Received: from mail-bw0-f46.google.com ([209.85.214.46]:45013 "EHLO
 	mail-bw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753348Ab1BFRdJ (ORCPT
+	with ESMTP id S1753003Ab1BFS00 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 6 Feb 2011 12:33:09 -0500
-Date: Sun, 6 Feb 2011 18:33:00 +0100
+	Sun, 6 Feb 2011 13:26:26 -0500
+Date: Sun, 6 Feb 2011 19:26:16 +0100
 From: Ulf Magnusson <ulfalizer.lkml@gmail.com>
-Subject: Re: Why is linux-kbuild/doc dropping some of my mails?
-Message-ID: <20110206173259.GA12461@ulf>
-References: <20110206154831.GA12296@ulf>
- <20110206075734.e912fe70.rdunlap@xenotime.net>
- <20110206160500.GA12451@ulf>
- <20110206083512.a29f4d9c.rdunlap@xenotime.net>
+Subject: [PATCH v3] [ANNOUNCE] kconfig: Kconfiglib: a flexible Python
+ Kconfig parser
+Message-ID: <20110206182612.GA17388@ulf>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20110206083512.a29f4d9c.rdunlap@xenotime.net>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Randy Dunlap <rdunlap@xenotime.net>
-Cc: linux-kbuild@vger.kernel.org, linux-doc@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
+Cc: zippel@linux-m68k.org, mmarek@suse.cz, rdunlap@xenotime.net, akpm@linux-foundation.org, andrea.gelmini@gelma.net, linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org
 
-On Sun, Feb 06, 2011 at 08:35:12AM -0800, Randy Dunlap wrote:
-> On Sun, 6 Feb 2011 17:05:01 +0100 Ulf Magnusson wrote:
-> 
-> > On Sun, Feb 06, 2011 at 07:57:34AM -0800, Randy Dunlap wrote:
-> > > On Sun, 6 Feb 2011 16:48:32 +0100 Ulf Magnusson wrote:
-> > > 
-> > > > linux-kbuild and linux-doc dropped both of my Kconfiglib patches, while
-> > > > linux-kernel accepted them:
-> > > > https://lkml.org/lkml/2011/2/1/439 (initial)
-> > > > https://lkml.org/lkml/2011/2/5/174 (version 2)
-> > > > 
-> > > > Any idea why? Looked over SubmittingPatches but couldn't find anything
-> > > > obvious.
-> > > 
-> > > AFAIK, lkml has a message size limit of 300 KB or 400 KB, while
-> > > kbuild and doc have a limit of (probably) 100 KB.
-> > > 
-> > Version 2 is only 13k though - it builds on the first one.
-> 
-> OK, then you can try some of the Supplementary tools at
-> http://vger.kernel.org/ and/or check the taboo list to see if your
-> patch includes things that are not allowed:
-> http://vger.kernel.org/majordomo-info.html#taboo
-> 
-> If all else fails, you can ask <postmaster@vger.kernel.org> .
-> 
-Never mind, it appears at http://www.spinics.net/lists/linux-kbuild/
-now. Strangely, so does this thread. Maybe I just got lucky with the
-timing, or the archive updates work in mysterious ways..
+This patch builds on https://lkml.org/lkml/2011/2/5/174 . A compound patch
+(original patch + all fixes) is available at
+http://dl.dropbox.com/u/10406197/kconfiglib.patch (apply with 'git am').
 
-Excuse the spam.
+Changelog:
+v3:
+	- Forgot to update the documentation for get_mainmenu_text() in v2.
+	- s/effect/affect/ in example 7.
 
-/Ulf
+v2:
+	- Now supports alternative output directories (O=).
+	- $-references were expanded as environment variables in some
+	  contexts ('source', 'mainmenu', and 'defconfig') where they should
+	  have been expanded as symbol values - fixed. The reason this broke
+	  so little is that all symbols whose value come from an environment
+	  variable are currently called the same thing as that variable.
+	- Added the internal special symbol UNAME_RELEASE, used by
+	  DEFCONFIG_LIST. Previously get_defconfig_filename() failed to find
+	  .configs whose DEFCONFIG_LIST entry involved UNAME_RELEASE - now
+	  works.
+	- get_defconfig_filename() now searches relative to $srctree before
+	  looking in the current directory, just like the C implementation.
+	- Updated example 1 to work regardless of build directory.
+	- Precompiled a few regexes.
+
+Signed-off-by: Ulf Magnusson <ulfalizer.lkml@gmail.com>
+---
+Convenience links:
+
+Latest documentation (generated with pydoc -w kconfiglib):
+http://dl.dropbox.com/u/10406197/kconfiglib.html
+
+Latest example files (ex1.py updated in v2):
+http://dl.dropbox.com/u/10406197/kconfiglib-examples.tar.gz
+
+ scripts/kconfig/kconfiglib.py |    8 ++++----
+ 1 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/scripts/kconfig/kconfiglib.py b/scripts/kconfig/kconfiglib.py
+index fa3d5ee..964e5cb 100644
+--- a/scripts/kconfig/kconfiglib.py
++++ b/scripts/kconfig/kconfiglib.py
+@@ -323,7 +323,7 @@ while True:
+ 
+                 sym.set_value(lower_bound)
+ 
+-                # We just changed the value of some symbol. As this may effect
++                # We just changed the value of some symbol. As this may affect
+                 # other symbols, keep going.
+                 done = False
+ 
+@@ -708,9 +708,9 @@ class Config():
+         return self.arch
+ 
+     def get_mainmenu_text(self):
+-        """Returns the text of the 'mainmenu' statement (with environment
+-        variables expanded to the value they had when the Config was created),
+-        or None if the configuration has no 'mainmenu' statement."""
++        """Returns the text of the 'mainmenu' statement (with $-references to
++        symbols replaced by symbol values), or None if the configuration has no
++        'mainmenu' statement."""
+         return self._expand_sym_refs(self.mainmenu_text)
+ 
+     def get_defconfig_filename(self):
+-- 
+1.7.0.4
+
