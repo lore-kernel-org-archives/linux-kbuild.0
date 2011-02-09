@@ -1,32 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mailfw02.zoner.fi ([84.34.147.249]:27712 "EHLO
-	mailfw02.zoner.fi" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750825Ab1BIUSc (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 9 Feb 2011 15:18:32 -0500
-From: Lasse Collin <lasse.collin@tukaani.org>
-Subject: Re: [PATCH] adjust XZ_DEC_* Kconfig defaults
-Date: Wed, 9 Feb 2011 22:18:25 +0200
-References: <4D5260530200007800030F22@vpn.id2.novell.com> <201102091151.08930.lasse.collin@tukaani.org> <20110209112718.0622417f.rdunlap@xenotime.net>
-In-Reply-To: <20110209112718.0622417f.rdunlap@xenotime.net>
+Received: from cantor2.suse.de ([195.135.220.15]:45038 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750730Ab1BIWUS (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 9 Feb 2011 17:20:18 -0500
+Date: Wed, 9 Feb 2011 23:20:17 +0100
+From: Michal Marek <mmarek@suse.cz>
+Subject: [GIT] kbuild packaging fixes
+Message-ID: <20110209222017.GA16053@sepie.suse.cz>
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Message-Id: <201102092218.25081.lasse.collin@tukaani.org>
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Randy Dunlap <rdunlap@xenotime.net>
-Cc: Jan Beulich <JBeulich@novell.com>, linux-kbuild@vger.kernel.org
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: max@stro.at, mmarek@suse.cz, nicolas.2p.debian@free.fr, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On 2011-02-09 Randy Dunlap wrote:
-> Did you see this email?  what do you think of it?
-> 
-> https://lkml.org/lkml/2011/2/1/438
-> Subject: Change DECOMPRESS_LZMA to boolean
+Hi Linus,
 
-No, I didn't see it. Seems that the five DECOMPRESS_* symbols should all 
-be booleans. They cannot be built as modules.
+these two patches fix problems with 'make deb-pkg' introduced in
+2.6.38-rc1. Please pull.
 
--- 
-Lasse Collin  |  IRC: Larhzu @ IRCnet & Freenode
+Thanks,
+Michal
+
+
+The following changes since commit c56eb8fb6dccb83d9fe62fd4dc00c834de9bc470:
+
+  Linux 2.6.38-rc1 (2011-01-18 15:14:02 -0800)
+
+are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild-2.6.git rc-fixes
+
+Michal Marek (1):
+      Merge branch 'kbuild/packaging' into kbuild/rc-fixes
+
+Nicolas de Pesloüan (1):
+      deb-pkg: Fix building outside of source tree (O=...).
+
+maximilian attems (1):
+      deb-pkg: Use $SRCARCH for include path
+
+ scripts/package/builddeb |    6 +++---
+ 1 files changed, 3 insertions(+), 3 deletions(-)
