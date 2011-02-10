@@ -1,98 +1,72 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wy0-f174.google.com ([74.125.82.174]:62208 "EHLO
-	mail-wy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757161Ab1BJWfj (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 10 Feb 2011 17:35:39 -0500
-Date: Thu, 10 Feb 2011 23:35:31 +0100
-From: Ulf Magnusson <ulfalizer.lkml@gmail.com>
-Subject: Re: [PATCH] kconfig: undefined symbols can crash dependency loop
- detection
-Message-ID: <20110210223529.GA19824@ulf>
-References: <20110204231611.GA9344@ulf>
- <4D54030B.5040407@suse.cz>
+Received: from cantor.suse.de ([195.135.220.2]:58912 "EHLO mx1.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1756819Ab1BJXOs (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 10 Feb 2011 18:14:48 -0500
+Message-ID: <4D54715C.6060909@suse.cz>
+Date: Fri, 11 Feb 2011 00:14:36 +0100
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <4D54030B.5040407@suse.cz>
+Subject: Re: [PATCH] [ANNOUNCE] kconfig: Kconfiglib: a flexible Python Kconfig
+ parser
+References: <20110201232750.GA30800@ulf>
+In-Reply-To: <20110201232750.GA30800@ulf>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org, zippel@linux-m68k.org, linux-kernel@vger.kernel.org
+To: Ulf Magnusson <ulfalizer.lkml@gmail.com>
+Cc: linux-kbuild@vger.kernel.org, rdunlap@xenotime.net, akpm@linux-foundation.org, andrea.gelmini@gelma.net, linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, Arnaud Lacombe <lacombar@gmail.com>
 
-On Thu, Feb 10, 2011 at 04:23:55PM +0100, Michal Marek wrote:
-> On 5.2.2011 00:16, Ulf Magnusson wrote:
-> > The Kconfig
-> > 
-> > config FOO
-> > 	bool "FOO" if BAR
-> > 	select BAR
-> > 
-> > has a dependency loop involving an undefined symbol BAR. This causes a
-> > segfault in sym_check_print_recursive() as it assumes all symbols have a
-> > non-null 'prop', which is not the case for undefined symbols. This is a
-> > proposed fix.
-> > 
-> > Signed-off-by: Ulf Magnusson <ulfalizer.lkml@gmail.com>
-> > ---
-> >  scripts/kconfig/symbol.c |   32 ++++++++++++++++++++++++++++----
-> >  1 files changed, 28 insertions(+), 4 deletions(-)
-> > 
-> > diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
-> > index a796c95..81a217f 100644
-> > --- a/scripts/kconfig/symbol.c
-> > +++ b/scripts/kconfig/symbol.c
-> > @@ -5,6 +5,7 @@
-> >  
-> >  #include <ctype.h>
-> >  #include <stdlib.h>
-> > +#include <stdio.h>
-> >  #include <string.h>
-> >  #include <regex.h>
-> >  #include <sys/utsname.h>
-> > @@ -972,6 +973,10 @@ static void sym_check_print_recursive(struct symbol *last_sym)
-> >  	struct menu *menu = NULL;
-> >  	struct property *prop;
-> >  	struct dep_stack cv_stack;
-> > +	const char *filename;
-> > +	int lineno;
-> > +	char undef_msg_buf[100];
-> > +	int snprintf_size;
-> >  
-> >  	if (sym_is_choice_value(last_sym)) {
-> >  		dep_stack_insert(&cv_stack, last_sym);
-> > @@ -1001,18 +1006,37 @@ static void sym_check_print_recursive(struct symbol *last_sym)
-> >  					break;
-> >  			}
-> >  		}
-> > +
-> > +		if (prop) {
-> > +			filename = prop->file->name;
-> > +			lineno = prop->lineno;
-> > +		} else {
-> > +			/* The dependency loop involves an undefined symbol.
-> > +			 * Checking sym->name is probably unnecessary here, but
-> > +			 * just to be on the safe side. */
-> > +			snprintf_size = snprintf(undef_msg_buf,
-> > +						 sizeof(undef_msg_buf),
-> > +						 "<no file, %s is undefined>",
-> > +						 sym->name ? sym->name :
-> > +							     "<choice>");
-> > +			if (snprintf_size > sizeof(undef_msg_buf))
-> > +				undef_msg_buf[sizeof(undef_msg_buf) - 1] = '\0';
-> > +			filename = undef_msg_buf;
-> > +			lineno = 0;
+On 2.2.2011 00:27, Ulf Magnusson wrote:
+> Hi,
 > 
-> Good catch. But as this handles a corner case involving a severely
-> borken Kconfig file, I would simply do
-> filename = "<unknown>";
-> lineno = 0;
-> and be done with it.
->
-Yeah, it probably isn't very likely to occur in practise, though it
-would also happen if a symbol selects an undefined symbol it depends on
-via an enclosing menu or if.
+> This is the initial release of Kconfiglib: a Python library for
+> scripting, debugging, and extracting information from Kconfig-based
+> configuration systems.  It can be used to programmatically generate a
+> .config when the '*conf' tools are too inflexible, to quickly find out
+> interesting information about a Kconfig configuration such as dependency
+> relations between symbols and where undefined symbols are referenced,
+> and in applications that need to parse and extract information from
+> Kconfig files.
+> 
+> For a much longer introduction including multiple examples, see
+> arch/kconfig/kconfiglib.py.
 
-Pick whatever version you prefer :)
+Hi,
 
-/Ulf
+this looks like a very powerful tool, but I have a similar concern like
+Arnaud had - being completely standalone, it reimplements most of the C
+kconfig code. One option to reduce this duplication would be a swig
+wrapper, another one would be to let the C code parse the Kconfig files
+and write the required information in some digested form, that would be
+easier to parse by scripts. Something like:
+$ scripts/kconfig/conf_inspect --kconfig=Kconfig --eval='FOO || BAR'
+y
+$ scripts/kconfig/conf_inspect ... --dump-symbols
+config FOO
+type: bool
+valule: m
+visible: y
+prompt: "zzz"
+depends: X & Y
+select: Z
+...
+$ scripts/kconfig/conf_inspect ... --dump-symbols \
+    --fields='depends,select,value'
+config FOO
+depends: X & Y
+select: Z
+value: m
+
+config BAR
+...
+
+etc. The idea is that for instance instead of parsing the Kconfig files,
+the Python code could fill it's data structures by reading the flat dump
+provided by the C kconfig. There would be still lot to do in Python,
+e.g. parsing and evaluating expressions, but it would be a small step
+forward already. And people wanting to write quick&dirty scripts in
+bash/awk/perl would make use of the C code as well.
+
+Michal
