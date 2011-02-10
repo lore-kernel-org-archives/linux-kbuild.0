@@ -1,72 +1,36 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor.suse.de ([195.135.220.2]:58912 "EHLO mx1.suse.de"
+Received: from terminus.zytor.com ([198.137.202.10]:53049 "EHLO mail.zytor.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1756819Ab1BJXOs (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 10 Feb 2011 18:14:48 -0500
-Message-ID: <4D54715C.6060909@suse.cz>
-Date: Fri, 11 Feb 2011 00:14:36 +0100
-From: Michal Marek <mmarek@suse.cz>
+	id S1757240Ab1BJX4G (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 10 Feb 2011 18:56:06 -0500
+Message-ID: <4D547B0C.9020508@zytor.com>
+Date: Thu, 10 Feb 2011 15:55:56 -0800
+From: "H. Peter Anvin" <hpa@zytor.com>
 MIME-Version: 1.0
-Subject: Re: [PATCH] [ANNOUNCE] kconfig: Kconfiglib: a flexible Python Kconfig
- parser
-References: <20110201232750.GA30800@ulf>
-In-Reply-To: <20110201232750.GA30800@ulf>
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: Specific processing during user space header generation
+References: <4D532BEF.1040602@zytor.com> <20110210055459.GA31333@merkur.ravnborg.org>
+In-Reply-To: <20110210055459.GA31333@merkur.ravnborg.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ulf Magnusson <ulfalizer.lkml@gmail.com>
-Cc: linux-kbuild@vger.kernel.org, rdunlap@xenotime.net, akpm@linux-foundation.org, andrea.gelmini@gelma.net, linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, Arnaud Lacombe <lacombar@gmail.com>
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: linux-kbuild@vger.kernel.org
 
-On 2.2.2011 00:27, Ulf Magnusson wrote:
-> Hi,
-> 
-> This is the initial release of Kconfiglib: a Python library for
-> scripting, debugging, and extracting information from Kconfig-based
-> configuration systems.  It can be used to programmatically generate a
-> .config when the '*conf' tools are too inflexible, to quickly find out
-> interesting information about a Kconfig configuration such as dependency
-> relations between symbols and where undefined symbols are referenced,
-> and in applications that need to parse and extract information from
-> Kconfig files.
-> 
-> For a much longer introduction including multiple examples, see
-> arch/kconfig/kconfiglib.py.
+On 02/09/2011 09:54 PM, Sam Ravnborg wrote:
+> On Wed, Feb 09, 2011 at 04:06:07PM -0800, H. Peter Anvin wrote:
+>> I'm stuck with a problem where a header needs specific postprocessing in
+>> addition to what headers_install.pl does.  Is that possible as things
+>> currently sit, or will that require changes to the core kbuild scripts?
+> You will nned to patch core kbuild.
+> We do no processing apart from headers_install.pl - so there is no place
+> to hook in.
+> And headers_install.pl has not been prepared to do any tricks like that.
 
-Hi,
+Would you (plural) consider a patchset looking something like:
 
-this looks like a very powerful tool, but I have a similar concern like
-Arnaud had - being completely standalone, it reimplements most of the C
-kconfig code. One option to reduce this duplication would be a swig
-wrapper, another one would be to let the C code parse the Kconfig files
-and write the required information in some digested form, that would be
-easier to parse by scripts. Something like:
-$ scripts/kconfig/conf_inspect --kconfig=Kconfig --eval='FOO || BAR'
-y
-$ scripts/kconfig/conf_inspect ... --dump-symbols
-config FOO
-type: bool
-valule: m
-visible: y
-prompt: "zzz"
-depends: X & Y
-select: Z
-...
-$ scripts/kconfig/conf_inspect ... --dump-symbols \
-    --fields='depends,select,value'
-config FOO
-depends: X & Y
-select: Z
-value: m
+when processing foo.h, also look for foo.h.pl; if so, invoke that from
+inside headers_install.pl?
 
-config BAR
-...
+	-hpa
 
-etc. The idea is that for instance instead of parsing the Kconfig files,
-the Python code could fill it's data structures by reading the flat dump
-provided by the C kconfig. There would be still lot to do in Python,
-e.g. parsing and evaluating expressions, but it would be a small step
-forward already. And people wanting to write quick&dirty scripts in
-bash/awk/perl would make use of the C code as well.
-
-Michal
