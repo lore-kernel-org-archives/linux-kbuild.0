@@ -1,40 +1,61 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor.suse.de ([195.135.220.2]:57269 "EHLO mx1.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755295Ab1BKPNS (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 11 Feb 2011 10:13:18 -0500
-Date: Fri, 11 Feb 2011 16:13:16 +0100
-From: Michal Marek <mmarek@suse.cz>
-Subject: Re: Specific processing during user space header generation
-Message-ID: <20110211151316.GA18745@sepie.suse.cz>
-References: <4D532BEF.1040602@zytor.com>
- <20110210055459.GA31333@merkur.ravnborg.org>
- <4D547B0C.9020508@zytor.com>
+Received: from mail-bw0-f46.google.com ([209.85.214.46]:52865 "EHLO
+	mail-bw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757730Ab1BKQVx (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 11 Feb 2011 11:21:53 -0500
+Received: by bwz15 with SMTP id 15so3359782bwz.19
+        for <linux-kbuild@vger.kernel.org>; Fri, 11 Feb 2011 08:21:52 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4D547B0C.9020508@zytor.com>
+Date: Fri, 11 Feb 2011 17:21:51 +0100
+Message-ID: <AANLkTikb+SNFdrC+CD0q74kdazQCQ48cviyhSc9czT4d@mail.gmail.com>
+Subject: Kconfig files indentation inconsistency in help text
+From: Filip Honckiewicz <f.honckiewicz@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "H. Peter Anvin" <hpa@zytor.com>
-Cc: Sam Ravnborg <sam@ravnborg.org>, linux-kbuild@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
 
-On Thu, Feb 10, 2011 at 03:55:56PM -0800, H. Peter Anvin wrote:
-> On 02/09/2011 09:54 PM, Sam Ravnborg wrote:
-> > On Wed, Feb 09, 2011 at 04:06:07PM -0800, H. Peter Anvin wrote:
-> >> I'm stuck with a problem where a header needs specific postprocessing in
-> >> addition to what headers_install.pl does.  Is that possible as things
-> >> currently sit, or will that require changes to the core kbuild scripts?
-> > You will nned to patch core kbuild.
-> > We do no processing apart from headers_install.pl - so there is no place
-> > to hook in.
-> > And headers_install.pl has not been prepared to do any tricks like that.
-> 
-> Would you (plural) consider a patchset looking something like:
-> 
-> when processing foo.h, also look for foo.h.pl; if so, invoke that from
-> inside headers_install.pl?
+Hello!
 
-Something like this should work.
+I want to draw your attention on inconsistency in indentation in
+Kconfig files. Reading Documentation/kbuild/kconfig-language.txt:
+ "(...)The end of the help text is determined by
+  the indentation level, this means it ends at the first line which has
+ a smaller indentation than the first line of the help text."
 
-Michal
+Firstly, how the indentation should be counted?
+
+From Documentation/CodingStyle:
+"Tabs are 8 characters, and thus indentations are also 8 characters.(...)"
+and
+"Outside of comments, documentation and except in Kconfig, spaces are never
+used for indentation, and the above example is deliberately broken."
+
+There are places in Kconfig files that have mixed tabs and spaces like
+in fs/proc/Kconfig where last line of help text in config
+PROC_PAGE_MONITOR starts with ten spaces, but previous lines starts
+with tab and two spaces. Allowing such inconsistence forces to make
+some hacks when building entries tree which are present because e.g.
+make menuconfig shows help text of PROC_PAGE_MONITOR normally despite
+this eight spaces instead of one tab and two spaces. I believe that
+tab + two spaces and 10 spaces are not the same even if it looks the
+same in someones editor.
+
+Another problem are entries with help texts started by blank lines,
+e.g. config SPARSE_IRQ existing in kernel/irq/Kconfig. SPARSE_IRQ
+depends on HAVE_SPARSE_IRQ. make manuconfig says, that HAVE_SPARSE_IRQ
+is set to "y", but cannot find SPARSE_IRQ symbol. If help text "ends
+at the first line which has a smaller indentation than the first line
+of the help text", but it starts with blank line, then all next lines
+should be treated as help text. But I suppose that there is some
+nowhere written assumption that help text ends with end of file too...
+Otherwise it shouldn't work.
+
+Sorry for complainig but I think this ambiguities should be resolved
+or at least written somewhere in CodingStyle or kconfig-language.txt,
+but prefer to not use dirty hacks for strange exceptions;) If I could
+help in some way, please tell me.
+
+Cheers!
+Filip
