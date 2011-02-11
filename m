@@ -1,44 +1,55 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepa.post.tele.dk ([195.41.46.235]:40002 "EHLO
-	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757999Ab1BKTOb (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 11 Feb 2011 14:14:31 -0500
-Date: Fri, 11 Feb 2011 20:14:30 +0100
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: Specific processing during user space header generation
-Message-ID: <20110211191430.GA6227@merkur.ravnborg.org>
-References: <4D532BEF.1040602@zytor.com> <20110210055459.GA31333@merkur.ravnborg.org> <4D547B0C.9020508@zytor.com>
+Received: from terminus.zytor.com ([198.137.202.10]:50574 "EHLO mail.zytor.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1757264Ab1BKUIS (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 11 Feb 2011 15:08:18 -0500
+Message-ID: <4D55972E.90506@zytor.com>
+Date: Fri, 11 Feb 2011 12:08:14 -0800
+From: "H. Peter Anvin" <hpa@zytor.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4D547B0C.9020508@zytor.com>
+Subject: Re: Specific processing during user space header generation
+References: <4D532BEF.1040602@zytor.com> <20110210055459.GA31333@merkur.ravnborg.org> <4D547B0C.9020508@zytor.com> <20110211191430.GA6227@merkur.ravnborg.org>
+In-Reply-To: <20110211191430.GA6227@merkur.ravnborg.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "H. Peter Anvin" <hpa@zytor.com>
+To: Sam Ravnborg <sam@ravnborg.org>
 Cc: linux-kbuild@vger.kernel.org
 
-On Thu, Feb 10, 2011 at 03:55:56PM -0800, H. Peter Anvin wrote:
-> On 02/09/2011 09:54 PM, Sam Ravnborg wrote:
-> > On Wed, Feb 09, 2011 at 04:06:07PM -0800, H. Peter Anvin wrote:
-> >> I'm stuck with a problem where a header needs specific postprocessing in
-> >> addition to what headers_install.pl does.  Is that possible as things
-> >> currently sit, or will that require changes to the core kbuild scripts?
-> > You will nned to patch core kbuild.
-> > We do no processing apart from headers_install.pl - so there is no place
-> > to hook in.
-> > And headers_install.pl has not been prepared to do any tricks like that.
+On 02/11/2011 11:14 AM, Sam Ravnborg wrote:
 > 
-> Would you (plural) consider a patchset looking something like:
+> The purpose of headers_install is to install the existing kernel headers
+> and during the installation process do some minimal adjustments to make
+> then suit userspace consumption.
 > 
-> when processing foo.h, also look for foo.h.pl; if so, invoke that from
-> inside headers_install.pl?
+> What you suggest smells like something else - care to explain what
+> you have in mind?
+> 
 
-The purpose of headers_install is to install the existing kernel headers
-and during the installation process do some minimal adjustments to make
-then suit userspace consumption.
+I am working with H.J. Lu on an experimental native 32-bit ABI for
+x86-64.  As a result, we are adding an <asm/unistd_x32.h> for new system
+call numbers.
 
-What you suggest smells like something else - care to explain what
-you have in mind?
+Now, the kernel needs to use both <asm/unistd_64.h> and
+<asm/unistd_x32.h>, since as far as the kernel are concerned they are
+both 64-bit system calls.  As such, the latter contains symbols like:
 
-	Sam
+	__NR_x32_ioctl
+
+... however, when used in user space, we want it to look like
+
+	__NR_ioctl
+
+... just like any other ABI.
+
+Incidentally we have a similar situation with the i386 ABI, but that one
+is sort of backwards -- since unistd_32.h is also used by native 32
+bits, we can't just make the transformation for userspace there.
+
+The alternative, of course (which would also work for the native 32 bit
+case, now when I think about it) is for the human-written file to be the
+user space version, and use a script to generate the kernel version.
+
+	-hpa
+
