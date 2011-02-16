@@ -1,105 +1,62 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-iy0-f174.google.com ([209.85.210.174]:35750 "EHLO
-	mail-iy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753362Ab1BPQxN convert rfc822-to-8bit (ORCPT
+Received: from pqueuea.post.tele.dk ([193.162.153.9]:49900 "EHLO
+	pqueuea.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751742Ab1BPUMF (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 16 Feb 2011 11:53:13 -0500
-Received: by iyj8 with SMTP id 8so1406705iyj.19
-        for <linux-kbuild@vger.kernel.org>; Wed, 16 Feb 2011 08:53:12 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <4D5BD54D.7070209@suse.cz>
-References: <AANLkTimpG+9nvad8WnjaORcyZR8Yu5AaYwbQDGOWDjYJ@mail.gmail.com>
-	<4D5BD54D.7070209@suse.cz>
-Date: Wed, 16 Feb 2011 11:53:12 -0500
-Message-ID: <AANLkTikmA4nVdJL3Vu6uPJkxqM-xnQ93B6aiQbCFa0jn@mail.gmail.com>
+	Wed, 16 Feb 2011 15:12:05 -0500
+Received: from pfepb.post.tele.dk (pfepb.post.tele.dk [195.41.46.236])
+	by pqueuea.post.tele.dk (Postfix) with ESMTP id A3E3EDB95C
+	for <linux-kbuild@vger.kernel.org>; Wed, 16 Feb 2011 21:12:04 +0100 (CET)
+Date: Wed, 16 Feb 2011 21:11:39 +0100
+From: Sam Ravnborg <sam@ravnborg.org>
 Subject: Re: kbuild/kconfig for non-Linux projects
-From: Arnaud Lacombe <lacombar@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 8BIT
+Message-ID: <20110216201139.GB25184@merkur.ravnborg.org>
+References: <AANLkTimpG+9nvad8WnjaORcyZR8Yu5AaYwbQDGOWDjYJ@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <AANLkTimpG+9nvad8WnjaORcyZR8Yu5AaYwbQDGOWDjYJ@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: Thomas De Schampheleire <patrickdepinguin+kbuild@gmail.com>, linux-kbuild@vger.kernel.org
+To: Thomas De Schampheleire <patrickdepinguin+kbuild@gmail.com>
+Cc: linux-kbuild@vger.kernel.org
 
-Hi,
+On Wed, Feb 16, 2011 at 10:08:08AM +0100, Thomas De Schampheleire wrote:
+> Hi,
+> 
+> I'm interested in using kbuild/kconfig for other projects than the
+> Linux kernel. I notice that a lot of projects (e.g. Buildroot,
+> Busybox, uClibc, OpenBricks, ...) are already using this framework,
+> but it's unclear to me which steps are needed to do so.
+> 
+> I found a related thread on this mailing list that seemed to have died out.
+> http://www.mail-archive.com/kbuild-devel@lists.sourceforge.net/msg02487.html
+> 
+> I also found a code repository 'menuconfig' here, although I doubt
+> that this is an official one:
+> http://code.google.com/p/menuconfig/source/browse/trunk/
+> 
+> Specifically, I'd like to know:
+> * are there 'official' sources to kbuild in some repository outside
+> the linux kernel?
+> * which steps are needed to use kbuild in a project other than the
+> linux kernel? Is there some documentation available?
 
-On Wed, Feb 16, 2011 at 8:46 AM, Michal Marek <mmarek@suse.cz> wrote:
-> On 16.2.2011 10:08, Thomas De Schampheleire wrote:
->> Hi,
->>
->> I'm interested in using kbuild/kconfig for other projects than the
->> Linux kernel. I notice that a lot of projects (e.g. Buildroot,
->> Busybox, uClibc, OpenBricks, ...) are already using this framework,
->> but it's unclear to me which steps are needed to do so.
->
-> You should talk to Arnaud Lacombe, who has done quite some work in this
-> direction on kconfig (portability and ability to easily "rebrand"
-> kconfig).
->
-using kconfig outside the linux kernel tree should be trivial,
-normally, as you said, all the Linux "branding" should have been made
-configurable. The trick might be to have the correct Makefile glue to
-let it build. If you want some of the work pre-done, I just pushed an
-old repository of mine on github. It should contains only what's
-needed to build the various part of kconfig:
+You could take a look at klibc - the kbuild integration used
+there is much simpler than what we have in the kernel.
+It may need a little refresh - but copying over
+Kbuild.include should be 90% of the update.
 
-https://github.com/lacombar/kconfig/
+As for documentation - you should at least read Documentation/kbuild/*
 
-I did not really touch it since October 2010, so it is certainly
-missing parts (especially bug fixes). Moreover, it squashes commit to
-keep the history clean, but I tried to keep the shortlog to have an
-idea what has been going on. Last warning, I do not guarantee the tree
-integrity (ie. I love rebasing :))
+> * what is the license under which kbuild is distributed? In case it's
+> GPL, does this impact the license of the software project using
+> kbuild, i.e. does using kbuild imply the project being a derived work?
 
-'hope that would help,
- - Arnaud
+kbuild is part of the build-system. So there is nothing wrong using kbuild
+to build your proprietary (closed source) stuff.
+So kbuild are under GPLv2 - but that does not impact you program.
 
-> Honestly, I don't know if kbuild is used outside of the kernel
-> and if it would make sense at all. It might be easier to write the
-> Makefiles yourself. It's not that large and most of it is linux-specific
-> anyway:
->
-> $ wc -l Makefile scripts/Makefile.* scripts/Kbuild.include
->  1533 Makefile
->   405 scripts/Makefile.build
->   104 scripts/Makefile.clean
->    72 scripts/Makefile.fwinst
->   103 scripts/Makefile.headersinst
->     3 scripts/Makefile.help
->   170 scripts/Makefile.host
->   244 scripts/Makefile.lib
->    60 scripts/Makefile.modbuiltin
->    35 scripts/Makefile.modinst
->   153 scripts/Makefile.modpost
->   262 scripts/Kbuild.include
->  3144 total
->
->
->
->> I found a related thread on this mailing list that seemed to have died out.
->> http://www.mail-archive.com/kbuild-devel@lists.sourceforge.net/msg02487.html
->>
->> I also found a code repository 'menuconfig' here, although I doubt
->> that this is an official one:
->> http://code.google.com/p/menuconfig/source/browse/trunk/
->>
->> Specifically, I'd like to know:
->> * are there 'official' sources to kbuild in some repository outside
->> the linux kernel?
->
-> No, it is maintained as part of the kernel.
->
->
->> * which steps are needed to use kbuild in a project other than the
->> linux kernel? Is there some documentation available?
->> * what is the license under which kbuild is distributed? In case it's
->> GPL, does this impact the license of the software project using
->> kbuild, i.e. does using kbuild imply the project being a derived work?
->
-> The license is GPLv2. Using kconfig as a separate tool to configure
-> options should probably be OK, I'm not so sure about using kbuild. You
-> should ask a lawyer. Or ask Kai Germaschewski and Sam Ravnborg if they
-> will sue you or not :-). Also see the first paragraph.
->
-> Michal
->
+Good luck!
+
+	Sam
