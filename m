@@ -1,98 +1,105 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ww0-f44.google.com ([74.125.82.44]:36647 "EHLO
-	mail-ww0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751856Ab1BPPUb (ORCPT
+Received: from mail-iy0-f174.google.com ([209.85.210.174]:35750 "EHLO
+	mail-iy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753362Ab1BPQxN convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 16 Feb 2011 10:20:31 -0500
-Date: Wed, 16 Feb 2011 16:20:21 +0100
-From: Ulf Magnusson <ulfalizer.lkml@gmail.com>
-Subject: Re: [PATCH] [ANNOUNCE] kconfig: Kconfiglib: a flexible Python
- Kconfig parser
-Message-ID: <20110216152020.GA20012@ulf>
-References: <20110201232750.GA30800@ulf>
- <4D54715C.6060909@suse.cz>
- <20110216044830.GA19364@ulf>
+	Wed, 16 Feb 2011 11:53:13 -0500
+Received: by iyj8 with SMTP id 8so1406705iyj.19
+        for <linux-kbuild@vger.kernel.org>; Wed, 16 Feb 2011 08:53:12 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20110216044830.GA19364@ulf>
+In-Reply-To: <4D5BD54D.7070209@suse.cz>
+References: <AANLkTimpG+9nvad8WnjaORcyZR8Yu5AaYwbQDGOWDjYJ@mail.gmail.com>
+	<4D5BD54D.7070209@suse.cz>
+Date: Wed, 16 Feb 2011 11:53:12 -0500
+Message-ID: <AANLkTikmA4nVdJL3Vu6uPJkxqM-xnQ93B6aiQbCFa0jn@mail.gmail.com>
+Subject: Re: kbuild/kconfig for non-Linux projects
+From: Arnaud Lacombe <lacombar@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, rdunlap@xenotime.net, akpm@linux-foundation.org, andrea.gelmini@gelma.net, linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, Arnaud Lacombe <lacombar@gmail.com>
+To: Michal Marek <mmarek@suse.cz>
+Cc: Thomas De Schampheleire <patrickdepinguin+kbuild@gmail.com>, linux-kbuild@vger.kernel.org
 
-On Wed, Feb 16, 2011 at 05:48:32AM +0100, Ulf Magnusson wrote:
-> On Fri, Feb 11, 2011 at 12:14:36AM +0100, Michal Marek wrote:
-> > On 2.2.2011 00:27, Ulf Magnusson wrote:
-> > > Hi,
-> > > 
-> > > This is the initial release of Kconfiglib: a Python library for
-> > > scripting, debugging, and extracting information from Kconfig-based
-> > > configuration systems.  It can be used to programmatically generate a
-> > > .config when the '*conf' tools are too inflexible, to quickly find out
-> > > interesting information about a Kconfig configuration such as dependency
-> > > relations between symbols and where undefined symbols are referenced,
-> > > and in applications that need to parse and extract information from
-> > > Kconfig files.
-> > > 
-> > > For a much longer introduction including multiple examples, see
-> > > arch/kconfig/kconfiglib.py.
-> > 
-> > Hi,
-> > 
-> > this looks like a very powerful tool, but I have a similar concern like
-> > Arnaud had - being completely standalone, it reimplements most of the C
-> > kconfig code. One option to reduce this duplication would be a swig
-> > wrapper, another one would be to let the C code parse the Kconfig files
-> > and write the required information in some digested form, that would be
-> > easier to parse by scripts. Something like:
-> > $ scripts/kconfig/conf_inspect --kconfig=Kconfig --eval='FOO || BAR'
-> > y
-> > $ scripts/kconfig/conf_inspect ... --dump-symbols
-> > config FOO
-> > type: bool
-> > valule: m
-> > visible: y
-> > prompt: "zzz"
-> > depends: X & Y
-> > select: Z
-> > ...
-> > $ scripts/kconfig/conf_inspect ... --dump-symbols \
-> >     --fields='depends,select,value'
-> > config FOO
-> > depends: X & Y
-> > select: Z
-> > value: m
-> > 
-> > config BAR
-> > ...
-> > 
-> > etc. The idea is that for instance instead of parsing the Kconfig files,
-> > the Python code could fill it's data structures by reading the flat dump
-> > provided by the C kconfig. There would be still lot to do in Python,
-> > e.g. parsing and evaluating expressions, but it would be a small step
-> > forward already. And people wanting to write quick&dirty scripts in
-> > bash/awk/perl would make use of the C code as well.
-> >
-> Offloading some of the parsing to a new tool would probably be doable,
-> though some Kconfig subleties might complicate things. For example,
-> symbols that appear within choices aren't seen as real selectable choice
-> items if they depend on previous symbols in specific ways (see
-> _determine_actual_items() in kconfiglib.py), and capturing this
-> information in the output while at the same preserving the ordering of
-> the symbols could be messy. I guess you could sort this out within
-> Kconfiglib instead, though other tools might then have to reimplement
-> the same (messy) rules.
-> 
-Then again, ordering information is retained (for example, assignments
-in .config files are written out in the order symbols appear within the
-Kconfig files), so you could probably just iterate over all items in
-Kconfig order after parsing + implicit submenu creation (which causes
-the weird choice behavior) to capture such stuff as well.
+Hi,
 
-> I'm not so sure about offloading anything else this way. For dynamically
-> updating symbol values in a script you would need to somehow preserve
-> state between invocations (or pass huge lists of assignments back and
-> forth), which could lead to an unwieldy protocol. You might need to go
-> the SWIG route instead.
+On Wed, Feb 16, 2011 at 8:46 AM, Michal Marek <mmarek@suse.cz> wrote:
+> On 16.2.2011 10:08, Thomas De Schampheleire wrote:
+>> Hi,
+>>
+>> I'm interested in using kbuild/kconfig for other projects than the
+>> Linux kernel. I notice that a lot of projects (e.g. Buildroot,
+>> Busybox, uClibc, OpenBricks, ...) are already using this framework,
+>> but it's unclear to me which steps are needed to do so.
+>
+> You should talk to Arnaud Lacombe, who has done quite some work in this
+> direction on kconfig (portability and ability to easily "rebrand"
+> kconfig).
+>
+using kconfig outside the linux kernel tree should be trivial,
+normally, as you said, all the Linux "branding" should have been made
+configurable. The trick might be to have the correct Makefile glue to
+let it build. If you want some of the work pre-done, I just pushed an
+old repository of mine on github. It should contains only what's
+needed to build the various part of kconfig:
 
-/Ulf
+https://github.com/lacombar/kconfig/
+
+I did not really touch it since October 2010, so it is certainly
+missing parts (especially bug fixes). Moreover, it squashes commit to
+keep the history clean, but I tried to keep the shortlog to have an
+idea what has been going on. Last warning, I do not guarantee the tree
+integrity (ie. I love rebasing :))
+
+'hope that would help,
+ - Arnaud
+
+> Honestly, I don't know if kbuild is used outside of the kernel
+> and if it would make sense at all. It might be easier to write the
+> Makefiles yourself. It's not that large and most of it is linux-specific
+> anyway:
+>
+> $ wc -l Makefile scripts/Makefile.* scripts/Kbuild.include
+>  1533 Makefile
+>   405 scripts/Makefile.build
+>   104 scripts/Makefile.clean
+>    72 scripts/Makefile.fwinst
+>   103 scripts/Makefile.headersinst
+>     3 scripts/Makefile.help
+>   170 scripts/Makefile.host
+>   244 scripts/Makefile.lib
+>    60 scripts/Makefile.modbuiltin
+>    35 scripts/Makefile.modinst
+>   153 scripts/Makefile.modpost
+>   262 scripts/Kbuild.include
+>  3144 total
+>
+>
+>
+>> I found a related thread on this mailing list that seemed to have died out.
+>> http://www.mail-archive.com/kbuild-devel@lists.sourceforge.net/msg02487.html
+>>
+>> I also found a code repository 'menuconfig' here, although I doubt
+>> that this is an official one:
+>> http://code.google.com/p/menuconfig/source/browse/trunk/
+>>
+>> Specifically, I'd like to know:
+>> * are there 'official' sources to kbuild in some repository outside
+>> the linux kernel?
+>
+> No, it is maintained as part of the kernel.
+>
+>
+>> * which steps are needed to use kbuild in a project other than the
+>> linux kernel? Is there some documentation available?
+>> * what is the license under which kbuild is distributed? In case it's
+>> GPL, does this impact the license of the software project using
+>> kbuild, i.e. does using kbuild imply the project being a derived work?
+>
+> The license is GPLv2. Using kconfig as a separate tool to configure
+> options should probably be OK, I'm not so sure about using kbuild. You
+> should ask a lawyer. Or ask Kai Germaschewski and Sam Ravnborg if they
+> will sue you or not :-). Also see the first paragraph.
+>
+> Michal
+>
