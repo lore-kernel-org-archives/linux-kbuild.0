@@ -1,55 +1,91 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from terminus.zytor.com ([198.137.202.10]:50574 "EHLO mail.zytor.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1757264Ab1BKUIS (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 11 Feb 2011 15:08:18 -0500
-Message-ID: <4D55972E.90506@zytor.com>
-Date: Fri, 11 Feb 2011 12:08:14 -0800
-From: "H. Peter Anvin" <hpa@zytor.com>
+Received: from mail-ey0-f174.google.com ([209.85.215.174]:45771 "EHLO
+	mail-ey0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756159Ab1BPEsk (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 15 Feb 2011 23:48:40 -0500
+Date: Wed, 16 Feb 2011 05:48:32 +0100
+From: Ulf Magnusson <ulfalizer.lkml@gmail.com>
+Subject: Re: [PATCH] [ANNOUNCE] kconfig: Kconfiglib: a flexible Python
+ Kconfig parser
+Message-ID: <20110216044830.GA19364@ulf>
+References: <20110201232750.GA30800@ulf>
+ <4D54715C.6060909@suse.cz>
 MIME-Version: 1.0
-Subject: Re: Specific processing during user space header generation
-References: <4D532BEF.1040602@zytor.com> <20110210055459.GA31333@merkur.ravnborg.org> <4D547B0C.9020508@zytor.com> <20110211191430.GA6227@merkur.ravnborg.org>
-In-Reply-To: <20110211191430.GA6227@merkur.ravnborg.org>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <4D54715C.6060909@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: linux-kbuild@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org, rdunlap@xenotime.net, akpm@linux-foundation.org, andrea.gelmini@gelma.net, linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, Arnaud Lacombe <lacombar@gmail.com>
 
-On 02/11/2011 11:14 AM, Sam Ravnborg wrote:
+On Fri, Feb 11, 2011 at 12:14:36AM +0100, Michal Marek wrote:
+> On 2.2.2011 00:27, Ulf Magnusson wrote:
+> > Hi,
+> > 
+> > This is the initial release of Kconfiglib: a Python library for
+> > scripting, debugging, and extracting information from Kconfig-based
+> > configuration systems.  It can be used to programmatically generate a
+> > .config when the '*conf' tools are too inflexible, to quickly find out
+> > interesting information about a Kconfig configuration such as dependency
+> > relations between symbols and where undefined symbols are referenced,
+> > and in applications that need to parse and extract information from
+> > Kconfig files.
+> > 
+> > For a much longer introduction including multiple examples, see
+> > arch/kconfig/kconfiglib.py.
 > 
-> The purpose of headers_install is to install the existing kernel headers
-> and during the installation process do some minimal adjustments to make
-> then suit userspace consumption.
+> Hi,
 > 
-> What you suggest smells like something else - care to explain what
-> you have in mind?
+> this looks like a very powerful tool, but I have a similar concern like
+> Arnaud had - being completely standalone, it reimplements most of the C
+> kconfig code. One option to reduce this duplication would be a swig
+> wrapper, another one would be to let the C code parse the Kconfig files
+> and write the required information in some digested form, that would be
+> easier to parse by scripts. Something like:
+> $ scripts/kconfig/conf_inspect --kconfig=Kconfig --eval='FOO || BAR'
+> y
+> $ scripts/kconfig/conf_inspect ... --dump-symbols
+> config FOO
+> type: bool
+> valule: m
+> visible: y
+> prompt: "zzz"
+> depends: X & Y
+> select: Z
+> ...
+> $ scripts/kconfig/conf_inspect ... --dump-symbols \
+>     --fields='depends,select,value'
+> config FOO
+> depends: X & Y
+> select: Z
+> value: m
 > 
+> config BAR
+> ...
+> 
+> etc. The idea is that for instance instead of parsing the Kconfig files,
+> the Python code could fill it's data structures by reading the flat dump
+> provided by the C kconfig. There would be still lot to do in Python,
+> e.g. parsing and evaluating expressions, but it would be a small step
+> forward already. And people wanting to write quick&dirty scripts in
+> bash/awk/perl would make use of the C code as well.
+>
+Offloading some of the parsing to a new tool would probably be doable,
+though some Kconfig subleties might complicate things. For example,
+symbols that appear within choices aren't seen as real selectable choice
+items if they depend on previous symbols in specific ways (see
+_determine_actual_items() in kconfiglib.py), and capturing this
+information in the output while at the same preserving the ordering of
+the symbols could be messy. I guess you could sort this out within
+Kconfiglib instead, though other tools might then have to reimplement
+the same (messy) rules.
 
-I am working with H.J. Lu on an experimental native 32-bit ABI for
-x86-64.  As a result, we are adding an <asm/unistd_x32.h> for new system
-call numbers.
+I'm not so sure about offloading anything else this way. For dynamically
+updating symbol values in a script you would need to somehow preserve
+state between invocations (or pass huge lists of assignments back and
+forth), which could lead to an unwieldy protocol. You might need to go
+the SWIG route instead.
 
-Now, the kernel needs to use both <asm/unistd_64.h> and
-<asm/unistd_x32.h>, since as far as the kernel are concerned they are
-both 64-bit system calls.  As such, the latter contains symbols like:
-
-	__NR_x32_ioctl
-
-... however, when used in user space, we want it to look like
-
-	__NR_ioctl
-
-... just like any other ABI.
-
-Incidentally we have a similar situation with the i386 ABI, but that one
-is sort of backwards -- since unistd_32.h is also used by native 32
-bits, we can't just make the transformation for userspace there.
-
-The alternative, of course (which would also work for the native 32 bit
-case, now when I think about it) is for the human-written file to be the
-user space version, and use a script to generate the kernel version.
-
-	-hpa
-
+/Ulf
