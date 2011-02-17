@@ -1,68 +1,66 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Message-Id: <4D5D3309020000780003264A@vpn.id2.novell.com>
-Date: Thu, 17 Feb 2011 13:39:05 +0000
+Message-Id: <4D5D3361020000780003264D@vpn.id2.novell.com>
+Date: Thu, 17 Feb 2011 13:40:33 +0000
 From: "Jan Beulich" <JBeulich@novell.com>
-Subject: [PATCH] streamline kernel/irq/Kconfig
+Subject: [PATCH] streamline Kconfig-s under lib/
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8BIT
 Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: tglx@linutronix.de
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
 
-"def_bool n" without prompt is pointless, these should be just "bool".
+"def_bool n" without prompt is pointless, this should be just "bool".
+
+'n' defaults are also pretty pointless and actually bogus when used
+with prompt-less config options.
+
+The "bool"/"default y" pair with no prompt can be expressed more
+compactly using def_bool.
 
 Signed-off-by: Jan Beulich <jbeulich@novell.com>
 
 ---
- kernel/irq/Kconfig |   16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+ lib/Kconfig    |    5 ++---
+ lib/xz/Kconfig |    2 --
+ 2 files changed, 2 insertions(+), 5 deletions(-)
 
---- 2.6.38-rc5/kernel/irq/Kconfig
-+++ 2.6.38-rc5-kconfig-irq/kernel/irq/Kconfig
-@@ -1,5 +1,5 @@
- config HAVE_GENERIC_HARDIRQS
+--- 2.6.38-rc5/lib/Kconfig
++++ 2.6.38-rc5-kconfig-lib/lib/Kconfig
+@@ -3,7 +3,7 @@
+ #
+ 
+ config BINARY_PRINTF
 -	def_bool n
 +	bool
  
- if HAVE_GENERIC_HARDIRQS
- menu "IRQ subsystem"
-@@ -11,26 +11,26 @@ config GENERIC_HARDIRQS
+ menu "Library routines"
  
- # Select this to disable the deprecated stuff
- config GENERIC_HARDIRQS_NO_DEPRECATED
--       def_bool n
-+	bool
+@@ -23,8 +23,7 @@ config GENERIC_FIND_NEXT_BIT
+ 	bool
  
- # Options selectable by the architecture code
- config HAVE_SPARSE_IRQ
--       def_bool n
-+	bool
+ config GENERIC_FIND_LAST_BIT
+-	bool
+-	default y
++	def_bool y
  
- config GENERIC_IRQ_PROBE
--	def_bool n
-+	bool
+ config CRC_CCITT
+ 	tristate "CRC-CCITT functions"
+--- 2.6.38-rc5/lib/xz/Kconfig
++++ 2.6.38-rc5-kconfig-lib/lib/xz/Kconfig
+@@ -44,11 +44,9 @@ config XZ_DEC_SPARC
  
- config GENERIC_PENDING_IRQ
--	def_bool n
-+	bool
+ config XZ_DEC_BCJ
+ 	bool
+-	default n
  
- config AUTO_IRQ_AFFINITY
--       def_bool n
-+	bool
- 
- config IRQ_PER_CPU
--       def_bool n
-+	bool
- 
- config HARDIRQS_SW_RESEND
--       def_bool n
-+	bool
- 
- config SPARSE_IRQ
- 	bool "Support sparse irq numbering"
+ config XZ_DEC_TEST
+ 	tristate "XZ decompressor tester"
+-	default n
+ 	depends on XZ_DEC
+ 	help
+ 	  This allows passing .xz files to the in-kernel XZ decoder via
 
 
 
