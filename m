@@ -1,115 +1,38 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Message-Id: <4D5D36CA0200007800032664@vpn.id2.novell.com>
-Date: Thu, 17 Feb 2011 13:55:06 +0000
-From: "Jan Beulich" <JBeulich@novell.com>
-Subject: [PATCH] re-order and improve fs/nfs/Kconfig
+Received: from earthlight.etchedpixels.co.uk ([81.2.110.250]:40200 "EHLO
+	www.etchedpixels.co.uk" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1753278Ab1BQQtN (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 17 Feb 2011 11:49:13 -0500
+Date: Thu, 17 Feb 2011 16:49:45 +0000
+From: Alan Cox <alan@lxorguk.ukuu.org.uk>
+Subject: Misbehaviour with "make foo.ko"
+Message-ID: <20110217164945.1cf0b31e@lxorguk.ukuu.org.uk>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8BIT
-Content-Disposition: inline
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Trond.Myklebust@netapp.com
-Cc: linux-kbuild@vger.kernel.org, linux-nfs@vger.kernel.org
+To: mmarek@suse.cz, linux-kbuild@vger.kernel.org
 
-To maintain menu hierarchy, options depending on NFS_V4 should directly
-follow that parent option.
+Trying to rebuild single modules gets into a mess
 
-The either-or selection of which DNS resolver to use can be done more
-cleanly using a choice.
-
-For DNS_RESOLVER to be selected to 'm' (instead of 'y') when NFS_FS=m,
-the "select" must be moved up (and made conditional).
-
-Signed-off-by: Jan Beulich <jbeulich@novell.com>
-
----
- fs/nfs/Kconfig |   61 +++++++++++++++++++++++++++++----------------------------
- 1 file changed, 32 insertions(+), 29 deletions(-)
-
---- 2.6.38-rc5/fs/nfs/Kconfig
-+++ 2.6.38-rc5-kconfig-nfs/fs/nfs/Kconfig
-@@ -64,6 +64,7 @@ config NFS_V4
- 	bool "NFS client support for NFS version 4"
- 	depends on NFS_FS
- 	select SUNRPC_GSS
-+	select DNS_RESOLVER if NFS_USE_KERNEL_DNS
- 	help
- 	  This option enables support for version 4 of the NFS protocol
- 	  (RFC 3530) in the kernel's NFS client.
-@@ -74,9 +75,39 @@ config NFS_V4
- 
- 	  If unsure, say Y.
- 
-+choice
-+	prompt "NFS DNS resolver"
-+	default NFS_USE_KERNEL_DNS
-+	depends on NFS_V4
-+	help
-+	  The kernel now provides a method for translating a host name into an
-+	  IP address.  Select the first option if you would rather use your
-+	  own DNS resolver script.
-+
-+config NFS_USE_LEGACY_DNS
-+	bool "Use the legacy NFS DNS resolver"
-+	help
-+
-+config NFS_USE_KERNEL_DNS
-+	bool "Use the in-kernel DNS resolver"
-+	select KEYS
-+
-+endchoice
-+
-+config NFS_USE_NEW_IDMAPPER
-+	bool "Use the new idmapper upcall routine"
-+	depends on NFS_V4 && KEYS
-+	help
-+	  Say Y here if you want NFS to use the new idmapper upcall functions.
-+	  You will need /sbin/request-key (usually provided by the keyutils
-+	  package).  For details, read
-+	  <file:Documentation/filesystems/nfs/idmapper.txt>.
-+
-+	  If you are unsure, say N.
-+
- config NFS_V4_1
- 	bool "NFS client support for NFSv4.1 (EXPERIMENTAL)"
--	depends on NFS_FS && NFS_V4 && EXPERIMENTAL
-+	depends on NFS_V4 && EXPERIMENTAL
- 	select PNFS_FILE_LAYOUT
- 	help
- 	  This option enables support for minor version 1 of the NFSv4 protocol
-@@ -104,31 +135,3 @@ config NFS_FSCACHE
- 	help
- 	  Say Y here if you want NFS data to be cached locally on disc through
- 	  the general filesystem cache manager
--
--config NFS_USE_LEGACY_DNS
--	bool "Use the legacy NFS DNS resolver"
--	depends on NFS_V4
--	help
--	  The kernel now provides a method for translating a host name into an
--	  IP address.  Select Y here if you would rather use your own DNS
--	  resolver script.
--
--	  If unsure, say N
--
--config NFS_USE_KERNEL_DNS
--	bool
--	depends on NFS_V4 && !NFS_USE_LEGACY_DNS
--	select DNS_RESOLVER
--	select KEYS
--	default y
--
--config NFS_USE_NEW_IDMAPPER
--	bool "Use the new idmapper upcall routine"
--	depends on NFS_V4 && KEYS
--	help
--	  Say Y here if you want NFS to use the new idmapper upcall functions.
--	  You will need /sbin/request-key (usually provided by the keyutils
--	  package).  For details, read
--	  <file:Documentation/filesystems/nfs/idmapper.txt>.
--
--	  If you are unsure, say N.
+[alan@pyx linux-psbdev]$ make drivers/staging/mrst/pvr/psb_gfx.ko
+  CHK     include/linux/version.h
+  CHK     include/generated/utsrelease.h
+  CALL    scripts/checksyscalls.sh
+  CC [M]  drivers/staging/mrst/pvr/../drv/psb_fb.o
+  CC [M]  drivers/staging/mrst/pvr/../drv/psb_intel_lvds.o
+  LD [M]  drivers/staging/mrst/pvr/psb_gfx.o
+  MODPOST 1 modules
+ERROR: "ttm_object_device_release" [drivers/staging/mrst/pvr/psb_gfx.ko]
+undefined!
+ERROR ...
 
 
 
+The box has lots of modules but it seems the MODPOST stage when you build
+a single .ko target erroneously only gets processed for that module,
+which goes wrong as a result.
+
+Alan
