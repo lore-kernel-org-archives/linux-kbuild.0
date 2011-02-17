@@ -1,92 +1,36 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Message-Id: <4D5D31E3020000780003263F@vpn.id2.novell.com>
-Date: Thu, 17 Feb 2011 13:34:11 +0000
+Message-Id: <4D5D32630200007800032642@vpn.id2.novell.com>
+Date: Thu, 17 Feb 2011 13:36:19 +0000
 From: "Jan Beulich" <JBeulich@novell.com>
-Subject: [PATCH] simplify kernel/power/Kconfig
+Subject: [PATCH] small adjustment to net/mac80211/Kconfig
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8BIT
 Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Rafael J. Wysocki" <rjw@sisk.pl>, pavel@ucw.cz
-Cc: Linux-pm mailing list <linux-pm@lists.linux-foundation.org>, linux-kbuild@vger.kernel.org
+To: johannes@sipsolutions.net
+Cc: linux-kbuild@vger.kernel.org, linux-wireless@vger.kernel.org
 
-'n' defaults are pretty pointless and actually bogus when used with
-prompt-less config options.
-
-The "bool"/"default y" pair with no prompt can be expressed more
-compactly using def_bool.
+"def_bool n" without prompt is pointless, this should be just "bool".
 
 Signed-off-by: Jan Beulich <jbeulich@novell.com>
 
 ---
- kernel/power/Kconfig |   13 +++----------
- 1 file changed, 3 insertions(+), 10 deletions(-)
+ net/mac80211/Kconfig |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
---- 2.6.38-rc5/kernel/power/Kconfig
-+++ 2.6.38-rc5-kconfig-power/kernel/power/Kconfig
-@@ -30,7 +30,6 @@ config PM_DEBUG
- config PM_ADVANCED_DEBUG
- 	bool "Extra PM attributes in sysfs for low-level debugging/testing"
- 	depends on PM_DEBUG
--	default n
- 	---help---
- 	Add extra sysfs attributes allowing one to access some Power Management
- 	fields of device objects from user space.  If you are not a kernel
-@@ -39,7 +38,6 @@ config PM_ADVANCED_DEBUG
- config PM_VERBOSE
- 	bool "Verbose Power Management debugging"
- 	depends on PM_DEBUG
--	default n
- 	---help---
- 	This option enables verbose messages from the Power Management code.
+--- 2.6.38-rc5/net/mac80211/Kconfig
++++ 2.6.38-rc5-kconfig-mac80211/net/mac80211/Kconfig
+@@ -17,7 +17,7 @@ comment "CFG80211 needs to be enabled fo
+ if MAC80211 != n
  
-@@ -67,7 +65,6 @@ config PM_TRACE_RTC
- 	depends on CAN_PM_TRACE
- 	depends on X86
- 	select PM_TRACE
--	default n
- 	---help---
- 	This enables some cheesy code to save the last PM event point in the
- 	RTC across reboots, so that you can debug a machine that just hangs
-@@ -82,23 +79,20 @@ config PM_TRACE_RTC
- 	set to an invalid time after a resume.
+ config MAC80211_HAS_RC
+-	def_bool n
++	bool
  
- config PM_SLEEP_SMP
--	bool
-+	def_bool y
- 	depends on SMP
- 	depends on ARCH_SUSPEND_POSSIBLE || ARCH_HIBERNATION_POSSIBLE
- 	depends on PM_SLEEP
- 	select HOTPLUG
- 	select HOTPLUG_CPU
--	default y
- 
- config PM_SLEEP
--	bool
-+	def_bool y
- 	depends on SUSPEND || HIBERNATION || XEN_SAVE_RESTORE
--	default y
- 
- config PM_SLEEP_ADVANCED_DEBUG
- 	bool
- 	depends on PM_ADVANCED_DEBUG
--	default n
- 
- config SUSPEND
- 	bool "Suspend to RAM and standby"
-@@ -237,9 +231,8 @@ config PM_RUNTIME
- 	  wake-up events.
- 
- config PM_OPS
--	bool
-+	def_bool y
- 	depends on PM_SLEEP || PM_RUNTIME
--	default y
- 
- config ARCH_HAS_OPP
- 	bool
+ config MAC80211_RC_PID
+ 	bool "PID controller based rate control algorithm" if EXPERT
 
 
 
