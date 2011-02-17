@@ -1,86 +1,92 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Message-Id: <4D5D30CA020000780003263A@vpn.id2.novell.com>
-Date: Thu, 17 Feb 2011 13:29:30 +0000
+Message-Id: <4D5D31E3020000780003263F@vpn.id2.novell.com>
+Date: Thu, 17 Feb 2011 13:34:11 +0000
 From: "Jan Beulich" <JBeulich@novell.com>
-Subject: [PATCH] cxgb{3,4}: streamline Kconfig options
+Subject: [PATCH] simplify kernel/power/Kconfig
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8BIT
 Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: divy@chelsio.com, dm@chelsio.com
-Cc: linux-kbuild@vger.kernel.org, netdev@vger.kernel.org
+To: "Rafael J. Wysocki" <rjw@sisk.pl>, pavel@ucw.cz
+Cc: Linux-pm mailing list <linux-pm@lists.linux-foundation.org>, linux-kbuild@vger.kernel.org
 
-The CHELSIO_T{3,4}_DEPENDS options are really awkward, and can be
-easily dropped if the reverse dependencies of SCSI_CXGB{3,4}_ISCSI on
-the former get converted to normal (forward) ones referring to
-CHELSIO_T{3,4}.
+'n' defaults are pretty pointless and actually bogus when used with
+prompt-less config options.
+
+The "bool"/"default y" pair with no prompt can be expressed more
+compactly using def_bool.
 
 Signed-off-by: Jan Beulich <jbeulich@novell.com>
 
 ---
- drivers/net/Kconfig               |   14 ++------------
- drivers/scsi/cxgbi/cxgb3i/Kconfig |    3 +--
- drivers/scsi/cxgbi/cxgb4i/Kconfig |    3 +--
- 3 files changed, 4 insertions(+), 16 deletions(-)
+ kernel/power/Kconfig |   13 +++----------
+ 1 file changed, 3 insertions(+), 10 deletions(-)
 
---- 2.6.38-rc5/drivers/net/Kconfig
-+++ 2.6.38-rc5-kconfig-chelsio/drivers/net/Kconfig
-@@ -2594,14 +2594,9 @@ config CHELSIO_T1_1G
- 	  Enables support for Chelsio's gigabit Ethernet PCI cards.  If you
- 	  are using only 10G cards say 'N' here.
- 
--config CHELSIO_T3_DEPENDS
--	tristate
--	depends on PCI && INET
--	default y
--
- config CHELSIO_T3
- 	tristate "Chelsio Communications T3 10Gb Ethernet support"
--	depends on CHELSIO_T3_DEPENDS
-+	depends on PCI && INET
- 	select FW_LOADER
- 	select MDIO
- 	help
-@@ -2619,14 +2614,9 @@ config CHELSIO_T3
- 	  To compile this driver as a module, choose M here: the module
- 	  will be called cxgb3.
- 
--config CHELSIO_T4_DEPENDS
--	tristate
--	depends on PCI && INET
--	default y
--
- config CHELSIO_T4
- 	tristate "Chelsio Communications T4 Ethernet support"
--	depends on CHELSIO_T4_DEPENDS
-+	depends on PCI && INET
- 	select FW_LOADER
- 	select MDIO
- 	help
---- 2.6.38-rc5/drivers/scsi/cxgbi/cxgb3i/Kconfig
-+++ 2.6.38-rc5-kconfig-chelsio/drivers/scsi/cxgbi/cxgb3i/Kconfig
-@@ -1,7 +1,6 @@
- config SCSI_CXGB3_ISCSI
- 	tristate "Chelsio T3 iSCSI support"
--	depends on CHELSIO_T3_DEPENDS
--	select CHELSIO_T3
-+	depends on CHELSIO_T3
- 	select SCSI_ISCSI_ATTRS
+--- 2.6.38-rc5/kernel/power/Kconfig
++++ 2.6.38-rc5-kconfig-power/kernel/power/Kconfig
+@@ -30,7 +30,6 @@ config PM_DEBUG
+ config PM_ADVANCED_DEBUG
+ 	bool "Extra PM attributes in sysfs for low-level debugging/testing"
+ 	depends on PM_DEBUG
+-	default n
  	---help---
- 	  This driver supports iSCSI offload for the Chelsio T3 devices.
---- 2.6.38-rc5/drivers/scsi/cxgbi/cxgb4i/Kconfig
-+++ 2.6.38-rc5-kconfig-chelsio/drivers/scsi/cxgbi/cxgb4i/Kconfig
-@@ -1,7 +1,6 @@
- config SCSI_CXGB4_ISCSI
- 	tristate "Chelsio T4 iSCSI support"
--	depends on CHELSIO_T4_DEPENDS
--	select CHELSIO_T4
-+	depends on CHELSIO_T4
- 	select SCSI_ISCSI_ATTRS
+ 	Add extra sysfs attributes allowing one to access some Power Management
+ 	fields of device objects from user space.  If you are not a kernel
+@@ -39,7 +38,6 @@ config PM_ADVANCED_DEBUG
+ config PM_VERBOSE
+ 	bool "Verbose Power Management debugging"
+ 	depends on PM_DEBUG
+-	default n
  	---help---
- 	  This driver supports iSCSI offload for the Chelsio T4 devices.
+ 	This option enables verbose messages from the Power Management code.
+ 
+@@ -67,7 +65,6 @@ config PM_TRACE_RTC
+ 	depends on CAN_PM_TRACE
+ 	depends on X86
+ 	select PM_TRACE
+-	default n
+ 	---help---
+ 	This enables some cheesy code to save the last PM event point in the
+ 	RTC across reboots, so that you can debug a machine that just hangs
+@@ -82,23 +79,20 @@ config PM_TRACE_RTC
+ 	set to an invalid time after a resume.
+ 
+ config PM_SLEEP_SMP
+-	bool
++	def_bool y
+ 	depends on SMP
+ 	depends on ARCH_SUSPEND_POSSIBLE || ARCH_HIBERNATION_POSSIBLE
+ 	depends on PM_SLEEP
+ 	select HOTPLUG
+ 	select HOTPLUG_CPU
+-	default y
+ 
+ config PM_SLEEP
+-	bool
++	def_bool y
+ 	depends on SUSPEND || HIBERNATION || XEN_SAVE_RESTORE
+-	default y
+ 
+ config PM_SLEEP_ADVANCED_DEBUG
+ 	bool
+ 	depends on PM_ADVANCED_DEBUG
+-	default n
+ 
+ config SUSPEND
+ 	bool "Suspend to RAM and standby"
+@@ -237,9 +231,8 @@ config PM_RUNTIME
+ 	  wake-up events.
+ 
+ config PM_OPS
+-	bool
++	def_bool y
+ 	depends on PM_SLEEP || PM_RUNTIME
+-	default y
+ 
+ config ARCH_HAS_OPP
+ 	bool
 
 
 
