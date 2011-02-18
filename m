@@ -1,55 +1,109 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor.suse.de ([195.135.220.2]:39050 "EHLO mx1.suse.de"
+Received: from ogre.sisk.pl ([217.79.144.158]:32945 "EHLO ogre.sisk.pl"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751170Ab1BQWcA (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 17 Feb 2011 17:32:00 -0500
-Message-ID: <4D5DA1DC.4040902@suse.cz>
-Date: Thu, 17 Feb 2011 23:31:56 +0100
-From: Michal Marek <mmarek@suse.cz>
+	id S1752846Ab1BRAIe (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 17 Feb 2011 19:08:34 -0500
+From: "Rafael J. Wysocki" <rjw@sisk.pl>
+Subject: Re: [PATCH] simplify kernel/power/Kconfig
+Date: Fri, 18 Feb 2011 01:08:14 +0100
+References: <4D5D31E3020000780003263F@vpn.id2.novell.com>
+In-Reply-To: <4D5D31E3020000780003263F@vpn.id2.novell.com>
 MIME-Version: 1.0
-Subject: Re: Misbehaviour with "make foo.ko"
-References: <20110217164945.1cf0b31e@lxorguk.ukuu.org.uk>
-In-Reply-To: <20110217164945.1cf0b31e@lxorguk.ukuu.org.uk>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: Text/Plain;
+  charset="iso-8859-1"
 Content-Transfer-Encoding: 7bit
+Message-Id: <201102180108.14916.rjw@sisk.pl>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Alan Cox <alan@lxorguk.ukuu.org.uk>
-Cc: linux-kbuild@vger.kernel.org
+To: Jan Beulich <JBeulich@novell.com>
+Cc: pavel@ucw.cz, Linux-pm mailing list <linux-pm@lists.linux-foundation.org>, linux-kbuild@vger.kernel.org
 
-On 17.2.2011 17:49, Alan Cox wrote:
-> Trying to rebuild single modules gets into a mess
+On Thursday, February 17, 2011, Jan Beulich wrote:
+> 'n' defaults are pretty pointless and actually bogus when used with
+> prompt-less config options.
 > 
-> [alan@pyx linux-psbdev]$ make drivers/staging/mrst/pvr/psb_gfx.ko
->   CHK     include/linux/version.h
->   CHK     include/generated/utsrelease.h
->   CALL    scripts/checksyscalls.sh
->   CC [M]  drivers/staging/mrst/pvr/../drv/psb_fb.o
->   CC [M]  drivers/staging/mrst/pvr/../drv/psb_intel_lvds.o
->   LD [M]  drivers/staging/mrst/pvr/psb_gfx.o
->   MODPOST 1 modules
-> ERROR: "ttm_object_device_release" [drivers/staging/mrst/pvr/psb_gfx.ko]
-> undefined!
-> ERROR ...
+> The "bool"/"default y" pair with no prompt can be expressed more
+> compactly using def_bool.
+> 
+> Signed-off-by: Jan Beulich <jbeulich@novell.com>
 
-It works fine here with 2.6.38-rc5 and ext3.ko:
+Applied to suspend-2.6/linux-next, but I had to rebase it.  Please
+remember to check if the patch applies to linux-next next time.
 
-$ touch fs/ext3/namei.c
-$ make O=/dev/shm/build fs/ext3/ext3.ko
-  Using /labs/mmarek/linux-2.6 as source for kernel
-  GEN     /dev/shm/build/Makefile
-  CHK     include/linux/version.h
-  CHK     include/generated/utsrelease.h
-  CALL    /labs/mmarek/linux-2.6/scripts/checksyscalls.sh
-  CC [M]  fs/ext3/namei.o
-  LD [M]  fs/ext3/ext3.o
-  MODPOST 3065 modules
-WARNING: modpost: Found 56 section mismatch(es).
-To see full details build your kernel with:
-'make CONFIG_DEBUG_SECTION_MISMATCH=y'
-  LD [M]  fs/ext3/ext3.ko
-$
+Thanks,
+Rafael
 
-Where do I find the psb_gfx driver? I don't see it in linux-next.
 
-Michal
+> ---
+>  kernel/power/Kconfig |   13 +++----------
+>  1 file changed, 3 insertions(+), 10 deletions(-)
+> 
+> --- 2.6.38-rc5/kernel/power/Kconfig
+> +++ 2.6.38-rc5-kconfig-power/kernel/power/Kconfig
+> @@ -30,7 +30,6 @@ config PM_DEBUG
+>  config PM_ADVANCED_DEBUG
+>  	bool "Extra PM attributes in sysfs for low-level debugging/testing"
+>  	depends on PM_DEBUG
+> -	default n
+>  	---help---
+>  	Add extra sysfs attributes allowing one to access some Power Management
+>  	fields of device objects from user space.  If you are not a kernel
+> @@ -39,7 +38,6 @@ config PM_ADVANCED_DEBUG
+>  config PM_VERBOSE
+>  	bool "Verbose Power Management debugging"
+>  	depends on PM_DEBUG
+> -	default n
+>  	---help---
+>  	This option enables verbose messages from the Power Management code.
+>  
+> @@ -67,7 +65,6 @@ config PM_TRACE_RTC
+>  	depends on CAN_PM_TRACE
+>  	depends on X86
+>  	select PM_TRACE
+> -	default n
+>  	---help---
+>  	This enables some cheesy code to save the last PM event point in the
+>  	RTC across reboots, so that you can debug a machine that just hangs
+> @@ -82,23 +79,20 @@ config PM_TRACE_RTC
+>  	set to an invalid time after a resume.
+>  
+>  config PM_SLEEP_SMP
+> -	bool
+> +	def_bool y
+>  	depends on SMP
+>  	depends on ARCH_SUSPEND_POSSIBLE || ARCH_HIBERNATION_POSSIBLE
+>  	depends on PM_SLEEP
+>  	select HOTPLUG
+>  	select HOTPLUG_CPU
+> -	default y
+>  
+>  config PM_SLEEP
+> -	bool
+> +	def_bool y
+>  	depends on SUSPEND || HIBERNATION || XEN_SAVE_RESTORE
+> -	default y
+>  
+>  config PM_SLEEP_ADVANCED_DEBUG
+>  	bool
+>  	depends on PM_ADVANCED_DEBUG
+> -	default n
+>  
+>  config SUSPEND
+>  	bool "Suspend to RAM and standby"
+> @@ -237,9 +231,8 @@ config PM_RUNTIME
+>  	  wake-up events.
+>  
+>  config PM_OPS
+> -	bool
+> +	def_bool y
+>  	depends on PM_SLEEP || PM_RUNTIME
+> -	default y
+>  
+>  config ARCH_HAS_OPP
+>  	bool
+> 
+> 
+> 
+> 
+> 
+
