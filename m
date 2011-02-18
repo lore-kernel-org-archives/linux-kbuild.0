@@ -1,109 +1,66 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ogre.sisk.pl ([217.79.144.158]:32945 "EHLO ogre.sisk.pl"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752846Ab1BRAIe (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 17 Feb 2011 19:08:34 -0500
-From: "Rafael J. Wysocki" <rjw@sisk.pl>
-Subject: Re: [PATCH] simplify kernel/power/Kconfig
-Date: Fri, 18 Feb 2011 01:08:14 +0100
-References: <4D5D31E3020000780003263F@vpn.id2.novell.com>
-In-Reply-To: <4D5D31E3020000780003263F@vpn.id2.novell.com>
+Received: from mail-qw0-f46.google.com ([209.85.216.46]:52458 "EHLO
+	mail-qw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756973Ab1BRPz7 (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 18 Feb 2011 10:55:59 -0500
+Received: by qwd7 with SMTP id 7so458611qwd.19
+        for <linux-kbuild@vger.kernel.org>; Fri, 18 Feb 2011 07:55:58 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-1"
-Content-Transfer-Encoding: 7bit
-Message-Id: <201102180108.14916.rjw@sisk.pl>
+In-Reply-To: <20110216201139.GB25184@merkur.ravnborg.org>
+References: <AANLkTimpG+9nvad8WnjaORcyZR8Yu5AaYwbQDGOWDjYJ@mail.gmail.com>
+	<20110216201139.GB25184@merkur.ravnborg.org>
+Date: Fri, 18 Feb 2011 16:55:56 +0100
+Message-ID: <AANLkTinepdVhjkKz9OQ96c52=i5-y7fxPVpS_Ni3nvMv@mail.gmail.com>
+Subject: Re: kbuild/kconfig for non-Linux projects
+From: Thomas De Schampheleire <patrickdepinguin+kbuild@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jan Beulich <JBeulich@novell.com>
-Cc: pavel@ucw.cz, Linux-pm mailing list <linux-pm@lists.linux-foundation.org>, linux-kbuild@vger.kernel.org
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: linux-kbuild@vger.kernel.org
 
-On Thursday, February 17, 2011, Jan Beulich wrote:
-> 'n' defaults are pretty pointless and actually bogus when used with
-> prompt-less config options.
-> 
-> The "bool"/"default y" pair with no prompt can be expressed more
-> compactly using def_bool.
-> 
-> Signed-off-by: Jan Beulich <jbeulich@novell.com>
+Hi,
 
-Applied to suspend-2.6/linux-next, but I had to rebase it.  Please
-remember to check if the patch applies to linux-next next time.
+On Wed, Feb 16, 2011 at 9:11 PM, Sam Ravnborg <sam@ravnborg.org> wrote:
+> On Wed, Feb 16, 2011 at 10:08:08AM +0100, Thomas De Schampheleire wrote:
+>> Hi,
+>>
+>> I'm interested in using kbuild/kconfig for other projects than the
+>> Linux kernel. I notice that a lot of projects (e.g. Buildroot,
+>> Busybox, uClibc, OpenBricks, ...) are already using this framework,
+>> but it's unclear to me which steps are needed to do so.
+>>
+>> I found a related thread on this mailing list that seemed to have died out.
+>> http://www.mail-archive.com/kbuild-devel@lists.sourceforge.net/msg02487.html
+>>
+>> I also found a code repository 'menuconfig' here, although I doubt
+>> that this is an official one:
+>> http://code.google.com/p/menuconfig/source/browse/trunk/
+>>
+>> Specifically, I'd like to know:
+>> * are there 'official' sources to kbuild in some repository outside
+>> the linux kernel?
+>> * which steps are needed to use kbuild in a project other than the
+>> linux kernel? Is there some documentation available?
+>
+> You could take a look at klibc - the kbuild integration used
+> there is much simpler than what we have in the kernel.
+> It may need a little refresh - but copying over
+> Kbuild.include should be 90% of the update.
+>
+> As for documentation - you should at least read Documentation/kbuild/*
+>
+>> * what is the license under which kbuild is distributed? In case it's
+>> GPL, does this impact the license of the software project using
+>> kbuild, i.e. does using kbuild imply the project being a derived work?
+>
+> kbuild is part of the build-system. So there is nothing wrong using kbuild
+> to build your proprietary (closed source) stuff.
+> So kbuild are under GPLv2 - but that does not impact you program.
 
-Thanks,
-Rafael
+Thank you all for the input! I'll take a look at the links you
+provided and try it out.
 
-
-> ---
->  kernel/power/Kconfig |   13 +++----------
->  1 file changed, 3 insertions(+), 10 deletions(-)
-> 
-> --- 2.6.38-rc5/kernel/power/Kconfig
-> +++ 2.6.38-rc5-kconfig-power/kernel/power/Kconfig
-> @@ -30,7 +30,6 @@ config PM_DEBUG
->  config PM_ADVANCED_DEBUG
->  	bool "Extra PM attributes in sysfs for low-level debugging/testing"
->  	depends on PM_DEBUG
-> -	default n
->  	---help---
->  	Add extra sysfs attributes allowing one to access some Power Management
->  	fields of device objects from user space.  If you are not a kernel
-> @@ -39,7 +38,6 @@ config PM_ADVANCED_DEBUG
->  config PM_VERBOSE
->  	bool "Verbose Power Management debugging"
->  	depends on PM_DEBUG
-> -	default n
->  	---help---
->  	This option enables verbose messages from the Power Management code.
->  
-> @@ -67,7 +65,6 @@ config PM_TRACE_RTC
->  	depends on CAN_PM_TRACE
->  	depends on X86
->  	select PM_TRACE
-> -	default n
->  	---help---
->  	This enables some cheesy code to save the last PM event point in the
->  	RTC across reboots, so that you can debug a machine that just hangs
-> @@ -82,23 +79,20 @@ config PM_TRACE_RTC
->  	set to an invalid time after a resume.
->  
->  config PM_SLEEP_SMP
-> -	bool
-> +	def_bool y
->  	depends on SMP
->  	depends on ARCH_SUSPEND_POSSIBLE || ARCH_HIBERNATION_POSSIBLE
->  	depends on PM_SLEEP
->  	select HOTPLUG
->  	select HOTPLUG_CPU
-> -	default y
->  
->  config PM_SLEEP
-> -	bool
-> +	def_bool y
->  	depends on SUSPEND || HIBERNATION || XEN_SAVE_RESTORE
-> -	default y
->  
->  config PM_SLEEP_ADVANCED_DEBUG
->  	bool
->  	depends on PM_ADVANCED_DEBUG
-> -	default n
->  
->  config SUSPEND
->  	bool "Suspend to RAM and standby"
-> @@ -237,9 +231,8 @@ config PM_RUNTIME
->  	  wake-up events.
->  
->  config PM_OPS
-> -	bool
-> +	def_bool y
->  	depends on PM_SLEEP || PM_RUNTIME
-> -	default y
->  
->  config ARCH_HAS_OPP
->  	bool
-> 
-> 
-> 
-> 
-> 
-
+Best regards,
+Thomas
