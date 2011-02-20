@@ -1,12 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx3.mail.elte.hu ([157.181.1.138]:41514 "EHLO mx3.mail.elte.hu"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754393Ab1BTRLm (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 20 Feb 2011 12:11:42 -0500
-Date: Sun, 20 Feb 2011 18:11:22 +0100
-From: Ingo Molnar <mingo@elte.hu>
+Received: from pfepa.post.tele.dk ([195.41.46.235]:51083 "EHLO
+	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754351Ab1BTR5L (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 20 Feb 2011 12:57:11 -0500
+Date: Sun, 20 Feb 2011 18:57:09 +0100
+From: Sam Ravnborg <sam@ravnborg.org>
 Subject: Re: [PATCH] kbuild: Add extra gcc checks
-Message-ID: <20110220171122.GA7050@elte.hu>
+Message-ID: <20110220175709.GA5178@merkur.ravnborg.org>
 References: <1298219710-9846-1-git-send-email-bp@alien8.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
@@ -15,11 +16,9 @@ In-Reply-To: <1298219710-9846-1-git-send-email-bp@alien8.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Borislav Petkov <bp@alien8.de>
-Cc: Michal Marek <mmarek@suse.cz>, torvalds@linux-foundation.org, x86@kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+Cc: Michal Marek <mmarek@suse.cz>, torvalds@linux-foundation.org, x86@kernel.org, linux-kernel@vger.kernel.org, Ingo Molnar <mingo@elte.hu>, linux-kbuild@vger.kernel.org
 
-
-* Borislav Petkov <bp@alien8.de> wrote:
-
+On Sun, Feb 20, 2011 at 05:35:10PM +0100, Borislav Petkov wrote:
 > Add a 'W=1' Makefile switch which adds additional checking per build
 > object.
 > 
@@ -40,15 +39,15 @@ Cc: Michal Marek <mmarek@suse.cz>, torvalds@linux-foundation.org, x86@kernel.org
 > Cc: Michal Marek <mmarek@suse.cz>
 > Cc: linux-kbuild@vger.kernel.org
 > Signed-off-by: Borislav Petkov <bp@alien8.de>
+> ---
+>  Makefile |   31 +++++++++++++++++++++++++++++++
+>  1 files changed, 31 insertions(+), 0 deletions(-)
 
-Nice.
+I like the idea.
+But can we avoid polluting the top-level Makefile?
+That file is full of unreadable stuff, and adding more
+is not good.
 
-Acked-by: Ingo Molnar <mingo@elte.hu>
+Makefile.lib or Makefile.build seems like a better place for this.
 
-We enable a lot of GCC warnings in tools/perf/ as well, and while there are false 
-positives occasionally, the general effect on code quality is positive. We combine 
-it with -Werror to make sure warnings do not accumulate.
-
-Thanks,
-
-	Ingo
+	Sam
