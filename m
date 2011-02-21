@@ -1,67 +1,111 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.skyhub.de ([78.46.96.112]:51083 "EHLO mail.skyhub.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755810Ab1BUEyn (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 20 Feb 2011 23:54:43 -0500
-Date: Mon, 21 Feb 2011 05:54:39 +0100
-From: Borislav Petkov <bp@alien8.de>
-Subject: Re: [PATCH] kbuild: Add extra gcc checks
-Message-ID: <20110221045439.GB31194@liondog.tnic>
-References: <1298219710-9846-1-git-send-email-bp@alien8.de>
- <20110220175709.GA5178@merkur.ravnborg.org>
- <20110220193906.GC6713@liondog.tnic>
- <1298232047.1284.14.camel@Joe-Laptop>
- <20110221022707.GB18332@liondog.tnic>
- <AANLkTikGb7_1sv8zthkt_5qp4ciGbWHQVupx3MmOjfWJ@mail.gmail.com>
+Received: from mail-iy0-f174.google.com ([209.85.210.174]:39570 "EHLO
+	mail-iy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751176Ab1BUFWB convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 21 Feb 2011 00:22:01 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <AANLkTikGb7_1sv8zthkt_5qp4ciGbWHQVupx3MmOjfWJ@mail.gmail.com>
+In-Reply-To: <20110221043714.GA31194@liondog.tnic>
+References: <1298219710-9846-1-git-send-email-bp@alien8.de>
+	<20110220175709.GA5178@merkur.ravnborg.org>
+	<20110220193906.GC6713@liondog.tnic>
+	<20110220195222.GA12915@merkur.ravnborg.org>
+	<20110221022316.GA18332@liondog.tnic>
+	<AANLkTimZhB8Ong=nJ_mjit+VRtb7g+TQhT9_wvojQ0-e@mail.gmail.com>
+	<20110221043714.GA31194@liondog.tnic>
+Date: Mon, 21 Feb 2011 00:22:00 -0500
+Message-ID: <AANLkTinO+3=4OmRq-vKXVbLV_jtMO45vN3LiY-omz21d@mail.gmail.com>
+Subject: Re: [PATCH -v3] kbuild: Add extra gcc checks
+From: Arnaud Lacombe <lacombar@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnaud Lacombe <lacombar@gmail.com>
-Cc: Joe Perches <joe@perches.com>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <mmarek@suse.cz>, torvalds@linux-foundation.org, x86@kernel.org, linux-kernel@vger.kernel.org, Ingo Molnar <mingo@elte.hu>, linux-kbuild@vger.kernel.org
+To: Borislav Petkov <bp@alien8.de>, Arnaud Lacombe <lacombar@gmail.com>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <mmarek@suse.cz>, torvalds@linux-foundation.org, x86@kernel.org, linux-kernel@vger.kernel.org, Ingo Molnar <mingo@elte.hu>, linux-kbuild@vger.kernel.org
 
-On Sun, Feb 20, 2011 at 10:34:57PM -0500, Arnaud Lacombe wrote:
-> Hi,
-> 
-> On Sun, Feb 20, 2011 at 9:27 PM, Borislav Petkov <bp@alien8.de> wrote:
-> > On Sun, Feb 20, 2011 at 12:00:47PM -0800, Joe Perches wrote:
-> >> > +EXTRA_CFLAGS += -Wextra -Wno-unused
-> >>
-> >> Why add -Wno-unused ?
-> >>
-> >> If it's because of verbosity, maybe
-> >
-> > Nah, it's because it is too noisy and spits too many false positives.
-> >
-> "too noisy" is a subjective point of view.
+Hi,
 
-Ok, does "too many false positives" objectify it a bit more to your
-taste?
+On Sun, Feb 20, 2011 at 11:37 PM, Borislav Petkov <bp@alien8.de> wrote:
+> On Sun, Feb 20, 2011 at 10:26:13PM -0500, Arnaud Lacombe wrote:
+>
+>> > The idea behind this option is targeted at developers who, in the
+>> > process of writing their code, want to do the occasional
+>> >
+>> > make W=1 [target.o]
+>> >
+>> > and let gcc do more extensive code checking for them. Then, they
+>> > could eyeball the output for valid gcc warnings about various
+>> > bugs/discrepancies which are not reported during the normal build
+>> > process.
+>> >
+>
+> [..]
+>
+>> > +ifeq ("$(origin W)", "command line")
+>> > +  KBUILD_ENABLE_EXTRA_GCC_CHECKS = 1
+>> > +  export KBUILD_ENABLE_EXTRA_GCC_CHECKS
+>> > +endif
+>> > +
+>> You never check CC is gcc. How can you assert this ?
+>
+> Hmm, I somehow knew that the other compilers are going to come into the
+> discussion :).
+>
+>> Moreover, can you certify that all the compiler supported to build
+>> Linux do support the set of new warnings ?
+>
+> Well, as you've probably already read in the commit message, this
+> option is for devs only, in case they want to do a build-check whether
+> the couple of lines they just added to a .c file trigger new compiler
+> warnings. So, no, I cannot certify this and I don't have to - this is
+> not meant for production use anyway.
+>
+People _will_ end up using it in production.
 
-> > For example, it reports the arguments of all those stubs from the
-> > headers which are provided for the else-branch of a CONFIG_* option,
-> > etc.
-> >
-> and by the same way, you silence function marked with
-> `warn_unused_result', unless I misread the manpage.
+>> What about icc ?
+>
+> I don't know, is anyone using it to build the kernel?
+then what would be the point of, say `include/linux/compiler-intel.h' ?
 
-Can you point me to that passage, I cannot find it in my gcc manpage.
+> Even if so, icc
+> might have a completely different set of -W options (totally guessing
+> here) so you shouldn't use 'make W=1' with it.
+>
 
-> If you want to silence something specific, why not just the `no'
-> variant of the thing you do not want ?
+>> old gcc?
+>
+> Yes, cc-option should be used in that case, I'll redo the patch.
+>
+>> LLVM/clang ?
+>
+> Can you even build the kernel with it?
+>
+At first sight, partly[0].
 
-Yes, '-Wunused -Wno-unused-parameter' looks better.
+> But to make sure we're on the realistic side of things.
+Whose realistic side ? yours ? If not, are you speaking for all the
+Linux community ? I do not think so.
 
-> Btw, could you not take the same approach as the one taken by the BSD,
-> which is 3 or 4 different level of new warnings. That way, you keep
-> the noisy stuff for the highest warning level.
+> First of all,
+> the purpose of this is to quickly get gcc scream out while building your
+> changes. Secondly, let's face it, the majority of developers, if not
+> all, use gcc the kernel code is full of gcc-isms so accomodating all
+> the compilers to such a quick-and-dirty test option is just plain too
+> much.
+That's a statement I would not make. Lots of compiler dependent stuff
+is buried in <linux/compiler.h> for a good reason.
 
-Nope, because there's no reason for it. I want to have one switch that
-craps out all the possible warnings gcc can spit, I catch the build
-output, fix the bugs and that's it.
+> Look at it this way: it is cheaper to upgrade your dev environment
+> than add unnecessary and ugly code to kbuild. Even the argument with
+> older gcc versions cannot weigh in enough in favor of the cc-option -
+> simply upgrade your gcc.
+>
+Do you speak for users, in the embedded world, of BSP whose supporting
+company either went defunct or is no longer maintaining the toolchain
+for a dark platform, or say an architecture, in kernel, which do not
+have support in mainstream binutils and support's patches are tied
+with a given version of binutils/gcc ?
 
--- 
-Regards/Gruss,
-    Boris.
+ - Arnaud
+
+[0]: http://lists.cs.uiuc.edu/pipermail/cfe-dev/2010-October/011711.html
