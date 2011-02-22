@@ -1,34 +1,49 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from 74-93-104-97-Washington.hfc.comcastbusiness.net ([74.93.104.97]:46167
-	"EHLO sunset.davemloft.net" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1754642Ab1BVSOV (ORCPT
+Received: from eazy.amigager.de ([213.239.192.238]:49866 "EHLO
+	eazy.amigager.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754863Ab1BVTcy (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 22 Feb 2011 13:14:21 -0500
-Date: Tue, 22 Feb 2011 10:14:57 -0800 (PST)
-Message-Id: <20110222.101457.39195901.davem@davemloft.net>
-Subject: Re: [PATCH] cxgb{3,4}: streamline Kconfig options
-From: David Miller <davem@davemloft.net>
-In-Reply-To: <4D5D30CA020000780003263A@vpn.id2.novell.com>
-References: <4D5D30CA020000780003263A@vpn.id2.novell.com>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+	Tue, 22 Feb 2011 14:32:54 -0500
+Received: from mac.home (port-92-206-0-194.dynamic.qsc.de [92.206.0.194])
+	by eazy.amigager.de (Postfix) with ESMTPA id 23FACF4805D
+	for <linux-kbuild@vger.kernel.org>; Tue, 22 Feb 2011 20:26:11 +0100 (CET)
+Date: Tue, 22 Feb 2011 20:26:08 +0100
+From: Tino Keitel <tino@tikei.de>
+Subject: [PATCH] .gitignore: ignore *.xz files
+Message-ID: <20110222192608.GA7125@mac.home>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: JBeulich@novell.com
-Cc: divy@chelsio.com, dm@chelsio.com, linux-kbuild@vger.kernel.org, netdev@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
 
-From: "Jan Beulich" <JBeulich@novell.com>
-Date: Thu, 17 Feb 2011 13:29:30 +0000
+The kernel image can now be xz compressed. Ignore such files.
 
-> The CHELSIO_T{3,4}_DEPENDS options are really awkward, and can be
-> easily dropped if the reverse dependencies of SCSI_CXGB{3,4}_ISCSI on
-> the former get converted to normal (forward) ones referring to
-> CHELSIO_T{3,4}.
-> 
-> Signed-off-by: Jan Beulich <jbeulich@novell.com>
+Acked-by: Jesper Juhl <jj@chaosbits.net>
+Signed-off-by: Tino Keitel <tino@tikei.de>
+---
+ .gitignore |    1 +
+ 1 files changed, 1 insertions(+), 0 deletions(-)
 
-I think the goal of these strange rules is not to be complicated
-on purpose, but rather to cause the iSCSI drivers to appear without
-the user having to know that he needs to enable the networking
-driver in order for that to happen.
+diff --git a/.gitignore b/.gitignore
+index 8faa6c0..c0128d3 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -29,6 +29,7 @@ modules.builtin
+ *.bz2
+ *.lzma
+ *.lzo
++*.xz
+ *.patch
+ *.gcno
+ 
+-- 
+1.7.2.3
+
+--
+To unsubscribe from this list: send the line "unsubscribe linux-kernel" in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Please read the FAQ at  http://www.tux.org/lkml/
+
