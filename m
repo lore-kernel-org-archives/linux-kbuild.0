@@ -1,39 +1,34 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor.suse.de ([195.135.220.2]:33122 "EHLO mx1.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752805Ab1BUOUi (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 21 Feb 2011 09:20:38 -0500
-Date: Mon, 21 Feb 2011 15:20:36 +0100
-From: Michal Marek <mmarek@suse.cz>
-Subject: [GIT] kbuild anticipatory fix
-Message-ID: <20110221142036.GA3583@sepie.suse.cz>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Received: from 74-93-104-97-Washington.hfc.comcastbusiness.net ([74.93.104.97]:46167
+	"EHLO sunset.davemloft.net" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1754642Ab1BVSOV (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 22 Feb 2011 13:14:21 -0500
+Date: Tue, 22 Feb 2011 10:14:57 -0800 (PST)
+Message-Id: <20110222.101457.39195901.davem@davemloft.net>
+Subject: Re: [PATCH] cxgb{3,4}: streamline Kconfig options
+From: David Miller <davem@davemloft.net>
+In-Reply-To: <4D5D30CA020000780003263A@vpn.id2.novell.com>
+References: <4D5D30CA020000780003263A@vpn.id2.novell.com>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: mmarek@suse.cz, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, sfr@canb.auug.org.au
+To: JBeulich@novell.com
+Cc: divy@chelsio.com, dm@chelsio.com, linux-kbuild@vger.kernel.org, netdev@vger.kernel.org
 
-Hi Linus,
+From: "Jan Beulich" <JBeulich@novell.com>
+Date: Thu, 17 Feb 2011 13:29:30 +0000
 
-Commit 9599ec0 in the tip tree is going to replace
-arch/x86/lib/memmove_64.c with arch/x86/lib/memmove_64.S, which breaks
-build if one does not run 'make clean' after merging that commit. While
-this is not a regression, the kbuild fix is rather simple and will avoid
-the annoyance in the merge window if merged now. Please consider.
+> The CHELSIO_T{3,4}_DEPENDS options are really awkward, and can be
+> easily dropped if the reverse dependencies of SCSI_CXGB{3,4}_ISCSI on
+> the former get converted to normal (forward) ones referring to
+> CHELSIO_T{3,4}.
+> 
+> Signed-off-by: Jan Beulich <jbeulich@novell.com>
 
-Michal
-
-The following changes since commit 85e2efbb1db9a18d218006706d6e4fbeb0216213:
-
-  Linux 2.6.38-rc5 (2011-02-15 19:23:45 -0800)
-
-are available in the git repository at:
-  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild-2.6.git rc-fixes
-
-Michal Marek (1):
-      fixdep: Do not record dependency on the source file itself
-
- scripts/basic/fixdep.c |   12 +++++++++++-
- 1 files changed, 11 insertions(+), 1 deletions(-)
+I think the goal of these strange rules is not to be complicated
+on purpose, but rather to cause the iSCSI drivers to appear without
+the user having to know that he needs to enable the networking
+driver in order for that to happen.
