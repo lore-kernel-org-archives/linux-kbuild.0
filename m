@@ -1,142 +1,64 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor.suse.de ([195.135.220.2]:34609 "EHLO mx1.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751511Ab1BZR14 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 26 Feb 2011 12:27:56 -0500
-Message-ID: <4D693817.8000100@suse.com>
-Date: Sat, 26 Feb 2011 12:27:51 -0500
-From: Jeff Mahoney <jeffm@suse.com>
+Received: from mail-iw0-f174.google.com ([209.85.214.174]:53119 "EHLO
+	mail-iw0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752163Ab1BZTrC convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 26 Feb 2011 14:47:02 -0500
 MIME-Version: 1.0
-Subject: Re: [PATCH 1/2] kconfig: add support for type handlers
-References: <4D671556.80607@suse.com>	<20110225060706.GA12723@merkur.ravnborg.org>	<4D684CF5.2060206@suse.com> <AANLkTikD2EiTbqMTCK7GUCTkTig3C5H2fMHbgodMfA4w@mail.gmail.com>
-In-Reply-To: <AANLkTikD2EiTbqMTCK7GUCTkTig3C5H2fMHbgodMfA4w@mail.gmail.com>
+In-Reply-To: <20110225060706.GA12723@merkur.ravnborg.org>
+References: <4D671556.80607@suse.com>
+	<20110225060706.GA12723@merkur.ravnborg.org>
+Date: Sat, 26 Feb 2011 14:47:01 -0500
+Message-ID: <AANLkTimFd+KFKgiOF8iVoM8Pk77Zy+5CsFs5BCYqCw=L@mail.gmail.com>
+Subject: Re: [PATCH] Add ``cloneconfig'' target
+From: Arnaud Lacombe <lacombar@gmail.com>
 Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnaud Lacombe <lacombar@gmail.com>
-Cc: Sam Ravnborg <sam@ravnborg.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Roman Zippel <zippel@linux-m68k.org>, linux-kbuild@vger.kernel.org
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: Jeff Mahoney <jeffm@suse.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Roman Zippel <zippel@linux-m68k.org>, linux-kbuild@vger.kernel.org
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hi,
 
-On 02/25/2011 08:28 PM, Arnaud Lacombe wrote:
-> Hi,
-> 
-> On Fri, Feb 25, 2011 at 7:44 PM, Jeff Mahoney <jeffm@suse.com> wrote:
->>  This patch adds type handlers for compressed config files. Initial
->>  support provides callouts for gzip and bzip2, but there's no reason
->>  others could be added if demand is there.
->>
->>  This is intended to allow /proc/config.gz be a configuration source
->>  for 'make oldconfig' when .config is absent.
->>
-> this can be trivially scripted, any reason it _has_ to be done within kconfig ?
+On Fri, Feb 25, 2011 at 1:07 AM, Sam Ravnborg <sam@ravnborg.org> wrote:
+> We already have something remotely similar in kconfig.
+> We use the following list:
+> config DEFCONFIG_LIST
+>        string
+>        depends on !UML
+>        option defconfig_list
+>        default "/lib/modules/$UNAME_RELEASE/.config"
+>        default "/etc/kernel-config"
+>        default "/boot/config-$UNAME_RELEASE"
+>        default "$ARCH_DEFCONFIG"
+>        default "arch/$ARCH/defconfig"
+>
+I may argue that anything within the Linux tree which point
+_by_default_ to something outside the tree itself is broken. Say I try
+to build a Linux kernel on a system with has its own non-kconfig
+`/etc/kernel-config', I guess this would make the configuration fail.
 
-This is what the original patch I posted did, and I was asked to teach
-kconfig how to do it itself.
+> It would be better to teach kconfig to read /proc/config.gz
+> and then add it to the list above.
+>
+Why ? Thing should be kept simple. kconfig's job is not to know about
+the trillion file format which exist in the world, even more if the
+implementation is made by building a command[0], executing it in a
+separate process and reading the output. This is the shell's job. What
+may be useful in the contrary would be to eventually teach kconfig to
+read from <stdin>.
 
-- -Jeff
+ - Arnaud
 
+[0]: which is built depending on an extension, which is even more awful ...
 
->> Signed-off-by: Jeff Mahoney <jeffm@suse.com>
->> ---
->>
->>  scripts/kconfig/zconf.l |   50 ++++++++++++++++++++++++++++++++++++++++++++++--
->>  1 file changed, 48 insertions(+), 2 deletions(-)
->>
->> --- a/scripts/kconfig/zconf.l
->> +++ b/scripts/kconfig/zconf.l
->> @@ -256,6 +256,44 @@ static void zconf_endhelp(void)
->>        BEGIN(INITIAL);
->>  }
->>
->> +static const struct type_handler {
->> +       const char *suffix;
->> +       const char *command;
->> +} type_handlers[] = {
->> +       {
->> +               .suffix = ".gz",
->> +               .command = "zcat",
->> +       },
->> +       {
->> +               .suffix = ".bz2",
->> +               .command = "bzcat",
->> +       },
->> +       /* Whatever other algorithms you like */
->> +       {}
->> +};
->> +
->> +static const struct type_handler *get_type_handler(const char *name)
->> +{
->> +       char *p = rindex(name, '.');
->> +       if (p) {
->> +               const struct type_handler *ops = type_handlers;
->> +               for (ops = type_handlers; ops->suffix; ops++) {
->> +                       if (!strcasecmp(ops->suffix, p))
->> +                               break;
->> +               }
->> +               if (!ops->suffix)
->> +                       return NULL;
->> +               return ops;
->> +       }
->> +       return NULL;
->> +}
->> +
->> +static FILE *zconf_popen(const char *command, const char *name)
->> +{
->> +       char cmdbuf[PATH_MAX + strlen(command) + 2];
->> +       snprintf(cmdbuf, sizeof(cmdbuf), "%s %s", command, name);
->> +       return popen(cmdbuf, "r");
->> +}
->>
->>  /*
->>  * Try to open specified file with following names:
->> @@ -267,15 +305,23 @@ static void zconf_endhelp(void)
->>  */
->>  FILE *zconf_fopen(const char *name)
->>  {
->> +       const struct type_handler *handler = get_type_handler(name);
->>        char *env, fullname[PATH_MAX+1];
->>        FILE *f;
->>
->> -       f = fopen(name, "r");
->> +       if (handler)
->> +               f = zconf_popen(handler->command, name);
->> +       else
->> +               f = fopen(name, "r");
->> +
->>        if (!f && name != NULL && name[0] != '/') {
->>                env = getenv(SRCTREE);
->>                if (env) {
->>                        sprintf(fullname, "%s/%s", env, name);
->> -                       f = fopen(fullname, "r");
->> +                       if (handler)
->> +                               f = zconf_popen(handler->command, fullname);
->> +                       else
->> +                               f = fopen(fullname, "r");
->>                }
->>        }
->>        return f;
->>
->> --
->> Jeff Mahoney
->> SUSE Labs
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->>
-
-
-- -- 
-Jeff Mahoney
-SUSE Labs
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.16 (GNU/Linux)
-Comment: Using GnuPG with SUSE - http://enigmail.mozdev.org/
-
-iEYEARECAAYFAk1pOBcACgkQLPWxlyuTD7JlJACfVPh3NV+X5cz7l8BYgxkf1E2j
-mGsAoIpMp0AMjIjl5mm3OaR2H3N65PpP
-=Sd++
------END PGP SIGNATURE-----
+> This list is used if you just type "make enuconfig" without
+> any configuration.
+>
+>        Sam
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
