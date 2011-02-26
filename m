@@ -1,71 +1,51 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-iy0-f174.google.com ([209.85.210.174]:52184 "EHLO
-	mail-iy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752198Ab1BZTuH convert rfc822-to-8bit (ORCPT
+Received: from pfepa.post.tele.dk ([195.41.46.235]:52535 "EHLO
+	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751293Ab1BZWSl (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 26 Feb 2011 14:50:07 -0500
-MIME-Version: 1.0
-In-Reply-To: <4D671556.80607@suse.com>
-References: <4D671556.80607@suse.com>
-Date: Sat, 26 Feb 2011 14:50:06 -0500
-Message-ID: <AANLkTimt1y_QwtRpAj1F9Nvh3j2VSJGw7MvtQSzW_oG9@mail.gmail.com>
+	Sat, 26 Feb 2011 17:18:41 -0500
+Date: Sat, 26 Feb 2011 23:18:38 +0100
+From: Sam Ravnborg <sam@ravnborg.org>
 Subject: Re: [PATCH] Add ``cloneconfig'' target
-From: Arnaud Lacombe <lacombar@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 8BIT
+Message-ID: <20110226221838.GA24028@merkur.ravnborg.org>
+References: <4D671556.80607@suse.com> <20110225060706.GA12723@merkur.ravnborg.org> <AANLkTimFd+KFKgiOF8iVoM8Pk77Zy+5CsFs5BCYqCw=L@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <AANLkTimFd+KFKgiOF8iVoM8Pk77Zy+5CsFs5BCYqCw=L@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jeff Mahoney <jeffm@suse.com>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Roman Zippel <zippel@linux-m68k.org>, linux-kbuild@vger.kernel.org
+To: Arnaud Lacombe <lacombar@gmail.com>
+Cc: Jeff Mahoney <jeffm@suse.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Roman Zippel <zippel@linux-m68k.org>, linux-kbuild@vger.kernel.org
 
-Hi,
+On Sat, Feb 26, 2011 at 02:47:01PM -0500, Arnaud Lacombe wrote:
+> Hi,
+> 
+> On Fri, Feb 25, 2011 at 1:07 AM, Sam Ravnborg <sam@ravnborg.org> wrote:
+> > We already have something remotely similar in kconfig.
+> > We use the following list:
+> > config DEFCONFIG_LIST
+> >        string
+> >        depends on !UML
+> >        option defconfig_list
+> >        default "/lib/modules/$UNAME_RELEASE/.config"
+> >        default "/etc/kernel-config"
+> >        default "/boot/config-$UNAME_RELEASE"
+> >        default "$ARCH_DEFCONFIG"
+> >        default "arch/$ARCH/defconfig"
+> >
+> I may argue that anything within the Linux tree which point
+> _by_default_ to something outside the tree itself is broken.
+The above allows the average user to just type "make menuconfig"
+and then the configuration of the current kernel is presented to
+the user. This is convinient in many cases.
+We know the /proc/config.gz is an incresingly popular way to gain
+access to the configuration of the running kernel. So extending
+the already know and working way to obtaing the configuration
+of the running kernel to suppport /proc/config.gz is logical.
+The fact that the configuration is gzipped does not warrant
+a new option to deal with this that almost duplicate the
+existing functionality.
 
-On Thu, Feb 24, 2011 at 9:35 PM, Jeff Mahoney <jeffm@suse.com> wrote:
-> Cloneconfig takes the first configuration it finds which appears
-> to belong to the running kernel, and configures the kernel sources
-> to match this configuration as closely as possible.
->
-> Signed-off-by: Andreas Gruenbacher <agruen@suse.de>
-> Signed-off-by: Jeff Mahoney <jeffm@suse.com>
-> ---
->  scripts/kconfig/Makefile |   17 +++++++++++++++++
->  1 file changed, 17 insertions(+)
->
-> --- a/scripts/kconfig/Makefile
-> +++ b/scripts/kconfig/Makefile
-> @@ -99,6 +99,23 @@ PHONY += allnoconfig allyesconfig allmod
->
->  allnoconfig allyesconfig allmodconfig alldefconfig randconfig: $(obj)/conf
->        $< --$@ $(Kconfig)
-> +
-> +UNAME_RELEASE := $(shell uname -r)
-> +CLONECONFIG := $(firstword $(wildcard /proc/config.gz \
-> +                                     /lib/modules/$(UNAME_RELEASE)/.config \
-> +                                     /etc/kernel-config \
-> +                                     /boot/config-$(UNAME_RELEASE)))
-> +cloneconfig: $(obj)/conf
-> +       $(Q)case "$(CLONECONFIG)" in                            \
-> +       '')     echo -e "The configuration of the running"      \
-> +                       "kernel could not be determined\n";     \
-You do not need the '\n', nor the '-e', echo(1) appends a newline by default.
-
-> +               false ;;                                        \
-> +       *.gz)   gzip -cd $(CLONECONFIG) > .config.running ;;    \
-> +       *)      cat $(CLONECONFIG) > .config.running ;;         \
-> +       esac &&                                                 \
-> +       echo -e "Cloning configuration file $(CLONECONFIG)\n"
-see above.
-
-> +       $(Q)$< -D .config.running arch/$(SRCARCH)/Kconfig
-> +
->
->  PHONY += listnewconfig oldnoconfig savedefconfig defconfig
->
-> --
-> Jeff Mahoney
-> SUSE Labs
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
+	Sam
