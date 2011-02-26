@@ -1,100 +1,109 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from stargate.chelsio.com ([67.207.112.58]:20939 "EHLO
-	stargate.chelsio.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751325Ab1BYTvg (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 25 Feb 2011 14:51:36 -0500
-Message-ID: <4D680842.6050309@chelsio.com>
-Date: Fri, 25 Feb 2011 11:51:30 -0800
-From: Dimitris Michailidis <dm@chelsio.com>
+Received: from cantor2.suse.de ([195.135.220.15]:35529 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S933024Ab1BZAol (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 25 Feb 2011 19:44:41 -0500
+Message-ID: <4D684CF5.2060206@suse.com>
+Date: Fri, 25 Feb 2011 19:44:37 -0500
+From: Jeff Mahoney <jeffm@suse.com>
 MIME-Version: 1.0
-Subject: Re: [PATCH] cxgb{3,4}: streamline Kconfig options
-References: <4D5D30CA020000780003263A@vpn.id2.novell.com> <20110222.101457.39195901.davem@davemloft.net> <4D64E5720200007800033420@vpn.id2.novell.com> <20110223.122709.193705956.davem@davemloft.net> <4D661E2702000078000336B5@vpn.id2.novell.com> <4D66B45B.2050604@chelsio.com>
-In-Reply-To: <4D66B45B.2050604@chelsio.com>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [PATCH 1/2] kconfig: add support for type handlers
+References: <4D671556.80607@suse.com> <20110225060706.GA12723@merkur.ravnborg.org>
+In-Reply-To: <20110225060706.GA12723@merkur.ravnborg.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jan Beulich <JBeulich@novell.com>
-Cc: David Miller <davem@davemloft.net>, divy@chelsio.com, linux-kbuild@vger.kernel.org, netdev@vger.kernel.org
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Roman Zippel <zippel@linux-m68k.org>, linux-kbuild@vger.kernel.org
 
-Dimitris Michailidis wrote:
-> Jan Beulich wrote:
-> 
->> As to that INET vs NET dependency - is it possible that the
->> network drivers really just need NET, but the iSCSI ones need
->> INET? In which case the only common dependency would be
->> PCI - certainly not worth a custom helper option.
-> 
-> Reading the commit message that introduced CHELSIO_T3_DEPENDS, it talks 
-> of hidden dependencies that select does not see.  I am not sure which 
-> exactly but since it's been a few years since that commit I'll try to 
-> see what the situation is today without the *_DEPENDS symbols and let 
-> you know.
+ This patch adds type handlers for compressed config files. Initial
+ support provides callouts for gzip and bzip2, but there's no reason
+ others could be added if demand is there.
 
-I looked into this and found that with the current Kconfig the iSCSI driver 
-does not appear in the SCSI menu until one first enables NETDEVICES and 
-NETDEV_10000 in the network driver menu.  It appears that the *_DEPENDS 
-symbols were added to capture dependencies on such symbols within the 
-network driver Kconfig, besides the dependencies the driver's entry listed 
-explicitly.
+ This is intended to allow /proc/config.gz be a configuration source
+ for 'make oldconfig' when .config is absent.
 
-The patch below removes *T4*_DEPENDS and the network drivers' unnecessary 
-dependency on INET, and updates the iSCSI driver's entry so it is visible 
-without requiring any net driver options to be enabled first and has 
-adequate selects to be able to build the net driver (this part is adapted 
-from bnx2i's Kconfig entry).  I still need to do the T3 part of this and 
-check that there isn't a conflict with the current scsi tree.  Just for 
-review at this time.
+Signed-off-by: Jeff Mahoney <jeffm@suse.com>
+---
 
-diff --git a/drivers/net/Kconfig b/drivers/net/Kconfig
-index 0382332..0d314d5 100644
---- a/drivers/net/Kconfig
-+++ b/drivers/net/Kconfig
-@@ -2619,14 +2619,9 @@ config CHELSIO_T3
-  	  To compile this driver as a module, choose M here: the module
-  	  will be called cxgb3.
+ scripts/kconfig/zconf.l |   50 ++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 48 insertions(+), 2 deletions(-)
 
--config CHELSIO_T4_DEPENDS
--	tristate
--	depends on PCI && INET
--	default y
--
-  config CHELSIO_T4
-  	tristate "Chelsio Communications T4 Ethernet support"
--	depends on CHELSIO_T4_DEPENDS
-+	depends on PCI
-  	select FW_LOADER
-  	select MDIO
-  	help
-@@ -2644,14 +2639,9 @@ config CHELSIO_T4
-  	  To compile this driver as a module choose M here; the module
-  	  will be called cxgb4.
+--- a/scripts/kconfig/zconf.l
++++ b/scripts/kconfig/zconf.l
+@@ -256,6 +256,44 @@ static void zconf_endhelp(void)
+ 	BEGIN(INITIAL);
+ }
+ 
++static const struct type_handler {
++	const char *suffix;
++	const char *command;
++} type_handlers[] = {
++	{
++		.suffix = ".gz",
++		.command = "zcat",
++	},
++	{
++		.suffix = ".bz2",
++		.command = "bzcat",
++	},
++	/* Whatever other algorithms you like */
++	{}
++};
++
++static const struct type_handler *get_type_handler(const char *name)
++{
++	char *p = rindex(name, '.');
++	if (p) {
++		const struct type_handler *ops = type_handlers;
++		for (ops = type_handlers; ops->suffix; ops++) {
++			if (!strcasecmp(ops->suffix, p))
++				break;
++		}
++		if (!ops->suffix)
++			return NULL;
++		return ops;
++	}
++	return NULL;
++}
++
++static FILE *zconf_popen(const char *command, const char *name)
++{
++	char cmdbuf[PATH_MAX + strlen(command) + 2];
++	snprintf(cmdbuf, sizeof(cmdbuf), "%s %s", command, name);
++	return popen(cmdbuf, "r");
++}
+ 
+ /*
+  * Try to open specified file with following names:
+@@ -267,15 +305,23 @@ static void zconf_endhelp(void)
+  */
+ FILE *zconf_fopen(const char *name)
+ {
++	const struct type_handler *handler = get_type_handler(name);
+ 	char *env, fullname[PATH_MAX+1];
+ 	FILE *f;
+ 
+-	f = fopen(name, "r");
++	if (handler)
++		f = zconf_popen(handler->command, name);
++	else
++		f = fopen(name, "r");
++
+ 	if (!f && name != NULL && name[0] != '/') {
+ 		env = getenv(SRCTREE);
+ 		if (env) {
+ 			sprintf(fullname, "%s/%s", env, name);
+-			f = fopen(fullname, "r");
++			if (handler)
++				f = zconf_popen(handler->command, fullname);
++			else
++				f = fopen(fullname, "r");
+ 		}
+ 	}
+ 	return f;
 
--config CHELSIO_T4VF_DEPENDS
--	tristate
--	depends on PCI && INET
--	default y
--
-  config CHELSIO_T4VF
-  	tristate "Chelsio Communications T4 Virtual Function Ethernet support"
--	depends on CHELSIO_T4VF_DEPENDS
-+	depends on PCI
-  	help
-  	  This driver supports Chelsio T4-based gigabit and 10Gb Ethernet
-  	  adapters with PCI-E SR-IOV Virtual Functions.
-diff --git a/drivers/scsi/cxgbi/cxgb4i/Kconfig 
-b/drivers/scsi/cxgbi/cxgb4i/Kconfig
-index bb94b39..d5302c2 100644
---- a/drivers/scsi/cxgbi/cxgb4i/Kconfig
-+++ b/drivers/scsi/cxgbi/cxgb4i/Kconfig
-@@ -1,6 +1,8 @@
-  config SCSI_CXGB4_ISCSI
-  	tristate "Chelsio T4 iSCSI support"
--	depends on CHELSIO_T4_DEPENDS
-+	depends on PCI && INET
-+	select NETDEVICES
-+	select NETDEV_10000
-  	select CHELSIO_T4
-  	select SCSI_ISCSI_ATTRS
-  	---help---
+-- 
+Jeff Mahoney
+SUSE Labs
