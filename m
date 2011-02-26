@@ -1,40 +1,65 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-iy0-f174.google.com ([209.85.210.174]:56133 "EHLO
-	mail-iy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751204Ab1BZX2n (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 26 Feb 2011 18:28:43 -0500
+Received: from cantor2.suse.de ([195.135.220.15]:32982 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751087Ab1BZXeN (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 26 Feb 2011 18:34:13 -0500
+Message-ID: <4D698DF1.7060303@suse.com>
+Date: Sat, 26 Feb 2011 18:34:09 -0500
+From: Jeff Mahoney <jeffm@suse.com>
 MIME-Version: 1.0
-In-Reply-To: <AANLkTi=+AU3gJJOov8R1fNcZVE7iNpbTLDuMB5PHUk8s@mail.gmail.com>
-References: <4D671556.80607@suse.com>
-	<20110225060706.GA12723@merkur.ravnborg.org>
-	<AANLkTimFd+KFKgiOF8iVoM8Pk77Zy+5CsFs5BCYqCw=L@mail.gmail.com>
-	<20110226221838.GA24028@merkur.ravnborg.org>
-	<AANLkTi=+AU3gJJOov8R1fNcZVE7iNpbTLDuMB5PHUk8s@mail.gmail.com>
-Date: Sat, 26 Feb 2011 18:28:43 -0500
-Message-ID: <AANLkTikigj1rDHrUaySHAYrW=GPPezbmcaDfx78AqE1_@mail.gmail.com>
 Subject: Re: [PATCH] Add ``cloneconfig'' target
-From: Arnaud Lacombe <lacombar@gmail.com>
+References: <4D671556.80607@suse.com>	<20110225060706.GA12723@merkur.ravnborg.org>	<AANLkTimFd+KFKgiOF8iVoM8Pk77Zy+5CsFs5BCYqCw=L@mail.gmail.com>	<AANLkTimTm40Sp5-kMaL4d1oXf3CzytZsBCus3DN0jwD-@mail.gmail.com> <AANLkTi=bJRh=0N6wP3LJWTQHSXsX4xdE7oOzK0CFcTfc@mail.gmail.com>
+In-Reply-To: <AANLkTi=bJRh=0N6wP3LJWTQHSXsX4xdE7oOzK0CFcTfc@mail.gmail.com>
 Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: Jeff Mahoney <jeffm@suse.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Roman Zippel <zippel@linux-m68k.org>, linux-kbuild@vger.kernel.org
+To: Arnaud Lacombe <lacombar@gmail.com>
+Cc: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>, Sam Ravnborg <sam@ravnborg.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Roman Zippel <zippel@linux-m68k.org>, linux-kbuild@vger.kernel.org
 
-Hi,
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
 
-On Sat, Feb 26, 2011 at 6:03 PM, Arnaud Lacombe <lacombar@gmail.com> wrote:
->> The fact that the configuration is gzipped does not warrant
->> a new option to deal with this that almost duplicate the
->> existing functionality.
+On 02/26/2011 05:57 PM, Arnaud Lacombe wrote:
+> Hi,
+> 
+> On Sat, Feb 26, 2011 at 5:47 PM, Miguel Ojeda
+> <miguel.ojeda.sandonis@gmail.com> wrote:
+>> On Sat, Feb 26, 2011 at 8:47 PM, Arnaud Lacombe <lacombar@gmail.com> wrote:
+>>> Why ? Thing should be kept simple. kconfig's job is not to know about
+>>> the trillion file format which exist in the world, even more if the
+>>> implementation is made by building a command[0], executing it in a
+>>> separate process and reading the output. This is the shell's job. What
+>>> may be useful in the contrary would be to eventually teach kconfig to
+>>> read from <stdin>.
 >>
-> agree.
->
-Let me precise, as there may be confusion. I agree about the new
-target issue, but definitively think this kconfig "option" (more a
-hack, which required a special option within kconfig) should be
-handled by Kbuild, not Kconfig, ie. I'd discard "option
-defconfig_list". File decompression (and eventually which config to
-pick) should be done prior to the invocation of Kconfig.
+>> /proc/config.gz is provided by the kernel and its format is defined by
+>> kconfig itself which is, as well, part of the kernel (it is not one
+>> random format from a pool of a trillion), so it will be nice if
+>> kconfig learns how to read its own configuration from there.
+>>
+> your point being ? kconfig is not only used by the Linux kernel, and
+> you cannot expect the feature to only be used in the cozy Linux kernel
+> environment.
 
- - Arnaud
+But this argument isn't really relevant. As with all of the other files
+listed in the defconfig_list, if it's missing (or can't be read), it
+will move on to the next one. Decompressing it first just makes things
+/more/ confusing since the initial message of 'defaults read from...'
+will read the name of the decompressed temporary file, not the source.
+It makes more sense to see it as "reading defaults from /proc/config.gz
+since that's obvious to anyone with kernel experience.
+
+- -Jeff
+
+- -- 
+Jeff Mahoney
+SUSE Labs
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.16 (GNU/Linux)
+Comment: Using GnuPG with SUSE - http://enigmail.mozdev.org/
+
+iEYEARECAAYFAk1pjfEACgkQLPWxlyuTD7Ki0wCfU8KrumyxlD+qTFajlhc1eHOn
+rMoAn0PqPyBYhBWlFTBT8YaL8/MWjw1J
+=PVwv
+-----END PGP SIGNATURE-----
