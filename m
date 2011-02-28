@@ -1,59 +1,102 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from 74-93-104-97-Washington.hfc.comcastbusiness.net ([74.93.104.97]:43786
-	"EHLO sunset.davemloft.net" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1754838Ab1B1VSd (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 28 Feb 2011 16:18:33 -0500
-Date: Mon, 28 Feb 2011 13:19:10 -0800 (PST)
-Message-Id: <20110228.131910.242129416.davem@davemloft.net>
-Subject: Re: [PATCH] cxgb{3,4}: streamline Kconfig options
-From: David Miller <davem@davemloft.net>
-In-Reply-To: <4D6B68BE020000780003402E@vpn.id2.novell.com>
-References: <4D66B45B.2050604@chelsio.com>
-	<4D680842.6050309@chelsio.com>
-	<4D6B68BE020000780003402E@vpn.id2.novell.com>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+Received: from mail.skyhub.de ([78.46.96.112]:37901 "EHLO mail.skyhub.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751372Ab1B1Vbi (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 28 Feb 2011 16:31:38 -0500
+Date: Mon, 28 Feb 2011 22:31:34 +0100
+From: Borislav Petkov <bp@alien8.de>
+Subject: Re: [PATCH -v4] kbuild: Add extra gcc checks
+Message-ID: <20110228213134.GA10825@liondog.tnic>
+References: <20110221110322.GA9819@liondog.tnic>
+ <201102282207.33489.arnd@arndb.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <201102282207.33489.arnd@arndb.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: JBeulich@novell.com
-Cc: dm@chelsio.com, divy@chelsio.com, linux-kbuild@vger.kernel.org, netdev@vger.kernel.org
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: Sam Ravnborg <sam@ravnborg.org>, Michal Marek <mmarek@suse.cz>, torvalds@linux-foundation.org, x86@kernel.org, linux-kernel@vger.kernel.org, Ingo Molnar <mingo@elte.hu>, linux-kbuild@vger.kernel.org, bp@amd64.org
 
-From: "Jan Beulich" <JBeulich@novell.com>
-Date: Mon, 28 Feb 2011 08:19:58 +0000
-
->>>> On 25.02.11 at 20:51, Dimitris Michailidis <dm@chelsio.com> wrote:
->> Dimitris Michailidis wrote:
->>> Jan Beulich wrote:
->>> 
->>>> As to that INET vs NET dependency - is it possible that the
->>>> network drivers really just need NET, but the iSCSI ones need
->>>> INET? In which case the only common dependency would be
->>>> PCI - certainly not worth a custom helper option.
->>> 
->>> Reading the commit message that introduced CHELSIO_T3_DEPENDS, it talks 
->>> of hidden dependencies that select does not see.  I am not sure which 
->>> exactly but since it's been a few years since that commit I'll try to 
->>> see what the situation is today without the *_DEPENDS symbols and let 
->>> you know.
->> 
->> I looked into this and found that with the current Kconfig the iSCSI driver 
->> does not appear in the SCSI menu until one first enables NETDEVICES and 
->> NETDEV_10000 in the network driver menu.  It appears that the *_DEPENDS 
->> symbols were added to capture dependencies on such symbols within the 
->> network driver Kconfig, besides the dependencies the driver's entry listed 
->> explicitly.
->> 
->> The patch below removes *T4*_DEPENDS and the network drivers' unnecessary 
->> dependency on INET, and updates the iSCSI driver's entry so it is visible 
->> without requiring any net driver options to be enabled first and has 
->> adequate selects to be able to build the net driver (this part is adapted 
->> from bnx2i's Kconfig entry).  I still need to do the T3 part of this and 
->> check that there isn't a conflict with the current scsi tree.  Just for 
->> review at this time.
+On Mon, Feb 28, 2011 at 10:07:33PM +0100, Arnd Bergmann wrote:
+> On Monday 21 February 2011 12:03:22 Borislav Petkov wrote:
+> > Add a 'W=1' Makefile switch which adds additional checking per build
+> > object.
+> >
+> > The idea behind this option is targeted at developers who, in the
+> > process of writing their code, want to do the occasional
+> >
+> > make W=1 [target.o]
 > 
-> Thanks, this looks good to me.
+> Great stuff, I really like the idea!
 
-Dimitris, please submit this anew with a proper commit log messag and
-signoff.  Thanks.
+Thanks. :)
+
+> 
+> > +# $(call cc-option... ) handles gcc -W.. options which
+> > +# are not supported by all versions of the compiler
+> > +ifdef KBUILD_ENABLE_EXTRA_GCC_CHECKS
+> > +ifneq ($(call cc-version),)
+> > +KBUILD_EXTRA_WARNINGS := -Wextra
+> > +KBUILD_EXTRA_WARNINGS += -Wunused -Wno-unused-parameter
+> > +KBUILD_EXTRA_WARNINGS += -Waggregate-return
+> > +KBUILD_EXTRA_WARNINGS += -Wbad-function-cast
+> > +KBUILD_EXTRA_WARNINGS += -Wcast-qual
+> > +KBUILD_EXTRA_WARNINGS += -Wcast-align
+> > +KBUILD_EXTRA_WARNINGS += -Wconversion
+> > +KBUILD_EXTRA_WARNINGS += -Wdisabled-optimization
+> > +KBUILD_EXTRA_WARNINGS += -Wlogical-op
+> > +KBUILD_EXTRA_WARNINGS += -Wmissing-declarations
+> > +KBUILD_EXTRA_WARNINGS += -Wmissing-format-attribute
+> > +KBUILD_EXTRA_WARNINGS += $(call cc-option, -Wmissing-include-dirs,)
+> > +KBUILD_EXTRA_WARNINGS += -Wmissing-prototypes
+> > +KBUILD_EXTRA_WARNINGS += -Wnested-externs
+> > +KBUILD_EXTRA_WARNINGS += -Wold-style-definition
+> > +KBUILD_EXTRA_WARNINGS += $(call cc-option, -Woverlength-strings,)
+> > +KBUILD_EXTRA_WARNINGS += -Wpacked
+> > +KBUILD_EXTRA_WARNINGS += -Wpacked-bitfield-compat
+> > +KBUILD_EXTRA_WARNINGS += -Wpadded
+> > +KBUILD_EXTRA_WARNINGS += -Wpointer-arith
+> > +KBUILD_EXTRA_WARNINGS += -Wredundant-decls
+> > +KBUILD_EXTRA_WARNINGS += -Wshadow
+> > +KBUILD_EXTRA_WARNINGS += -Wswitch-default
+> > +KBUILD_EXTRA_WARNINGS += $(call cc-option, -Wvla,)
+> > +KBUILD_CFLAGS += $(KBUILD_EXTRA_WARNINGS)
+> > +endif
+> > +endif
+> 
+> I would be a little more selective here. Maybe we can have two levels
+> W=1 and W=2, with the full set getting enabled by W=2, and the smaller
+> set getting enabled in W=1. The reason is that many of the warnings
+> are pointless or even hurting code quality, while others (e.g.
+> -Wmissing-declarations) are generally useful and the only reason for
+> not enabling them is that they cause too many warnings with existing
+> code.
+
+My intention was not to have multiple levels of warnings because then
+you have to go and enable the different levels and have to remember
+which level you used last, etc, etc.
+
+Instead I am thinking along with the following lines:
+
+make W=1 [path/to/kernel/file.o] 2>w.log
+
+and then take a look at w.log and start fixing warnings.
+
+You can selectively ignore some of the warnings since, as you say
+yourself above, some simply make you write ugly code like enforcing
+casts just for the sake of shutting up the compiler. A great deal of the
+warnings come from includes which are hard to fix or gcc is issuing the
+warning wrong since we do sick sh*t with C in the kernel and that's OK
+:).
+
+But in all cases you have all the warnings in one single file and that's
+it. If a certain -W option is useless, we should rather remove it since
+it doesn't help anyway. The selection above is clearly not complete so
+I'd rather drop some instead of including different W=x levels.
+
+Hmm... ?
+
+-- 
+Regards/Gruss,
+    Boris.
