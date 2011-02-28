@@ -1,21 +1,21 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.skyhub.de ([78.46.96.112]:41243 "EHLO mail.skyhub.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754351Ab1B1SYo (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 28 Feb 2011 13:24:44 -0500
-Date: Mon, 28 Feb 2011 19:24:40 +0100
-From: Borislav Petkov <bp@alien8.de>
+Received: from pqueueb.post.tele.dk ([193.162.153.10]:37466 "EHLO
+	pqueueb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753325Ab1B1Sil (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 28 Feb 2011 13:38:41 -0500
+Date: Mon, 28 Feb 2011 19:38:16 +0100
+From: Sam Ravnborg <sam@ravnborg.org>
 Subject: Re: [PATCH -v4] kbuild: Add extra gcc checks
-Message-ID: <20110228182440.GA12411@a1.tnic>
+Message-ID: <20110228183816.GA1759@merkur.ravnborg.org>
 References: <20110221110322.GA9819@liondog.tnic>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <20110221110322.GA9819@liondog.tnic>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>, Michal Marek <mmarek@suse.cz>
-Cc: torvalds@linux-foundation.org, x86@kernel.org, linux-kernel@vger.kernel.org, Ingo Molnar <mingo@elte.hu>, linux-kbuild@vger.kernel.org, bp@amd64.org
+To: Borislav Petkov <bp@alien8.de>, Michal Marek <mmarek@suse.cz>, torvalds@linux-foundation.org, x86@kernel.org, linux-kernel@vger.kernel.org, Ingo Molnar <mingo@elte.hu>, linux-kbuild@vger.kernel.org, bp@amd64.org
 
 On Mon, Feb 21, 2011 at 12:03:22PM +0100, Borislav Petkov wrote:
 > 
@@ -48,17 +48,42 @@ On Mon, Feb 21, 2011 at 12:03:22PM +0100, Borislav Petkov wrote:
 > Cc: linux-kbuild@vger.kernel.org
 > Acked-by: Ingo Molnar <mingo@elte.hu>
 > Signed-off-by: Borislav Petkov <bp@alien8.de>
+> ---
+>  Makefile               |    6 ++++++
+>  scripts/Makefile.build |   37 ++++++++++++++++++++++++++++++++++++-
+>  2 files changed, 42 insertions(+), 1 deletions(-)
+> 
+> diff --git a/Makefile b/Makefile
+> index c9c8c8f..c3bca9c 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -102,6 +102,11 @@ ifeq ("$(origin O)", "command line")
+>    KBUILD_OUTPUT := $(O)
+>  endif
+>  
+> +ifeq ("$(origin W)", "command line")
+> +  KBUILD_ENABLE_EXTRA_GCC_CHECKS = 1
+> +  export KBUILD_ENABLE_EXTRA_GCC_CHECKS
+> +endif
 
-Ping?
+It is simpler to just write:
+export KBUILD_ENABLE_EXTRA_GCC_CHECKS := 1
 
-Michal, Sam,
 
-any news here? FWIW, I've been build-testing amd64_edac.c with it and
-have caught a bunch of buglets with it. IMHO, it really helps to enable
-more extensive gcc checking in debugging builds.
+> +#
+> +# make W=1 settings
+> +#
+> +# $(call cc-option... ) handles gcc -W.. options which
+> +# are not supported by all versions of the compiler
+> +ifdef KBUILD_ENABLE_EXTRA_GCC_CHECKS
 
-Thanks.
+> +ifneq ($(call cc-version),)
+This check looks redundant.
 
--- 
-Regards/Gruss,
-Boris.
+You introduce a new environment variable "KBUILD_ENABLE_EXTRA_GCC_CHECKS".
+We actually ty to document these in Documentation/kbuild/kbuild.txt
+
+Fix the above and you can add my:
+Acked-by: Sam Ravnborg <sam@ravnborg.org>
+
+	Sam
