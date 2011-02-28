@@ -1,109 +1,64 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Message-Id: <4D6B68BE020000780003402E@vpn.id2.novell.com>
-Date: Mon, 28 Feb 2011 08:19:58 +0000
-From: "Jan Beulich" <JBeulich@novell.com>
-Subject: Re: [PATCH] cxgb{3,4}: streamline Kconfig options
-References: <4D5D30CA020000780003263A@vpn.id2.novell.com>
- <20110222.101457.39195901.davem@davemloft.net>
- <4D64E5720200007800033420@vpn.id2.novell.com>
- <20110223.122709.193705956.davem@davemloft.net>
- <4D661E2702000078000336B5@vpn.id2.novell.com>
- <4D66B45B.2050604@chelsio.com> <4D680842.6050309@chelsio.com>
-In-Reply-To: <4D680842.6050309@chelsio.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8BIT
+Received: from mail.skyhub.de ([78.46.96.112]:41243 "EHLO mail.skyhub.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754351Ab1B1SYo (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 28 Feb 2011 13:24:44 -0500
+Date: Mon, 28 Feb 2011 19:24:40 +0100
+From: Borislav Petkov <bp@alien8.de>
+Subject: Re: [PATCH -v4] kbuild: Add extra gcc checks
+Message-ID: <20110228182440.GA12411@a1.tnic>
+References: <20110221110322.GA9819@liondog.tnic>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
+In-Reply-To: <20110221110322.GA9819@liondog.tnic>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Dimitris Michailidis <dm@chelsio.com>
-Cc: divy@chelsio.com, David Miller <davem@davemloft.net>, linux-kbuild@vger.kernel.org, netdev@vger.kernel.org
+To: Sam Ravnborg <sam@ravnborg.org>, Michal Marek <mmarek@suse.cz>
+Cc: torvalds@linux-foundation.org, x86@kernel.org, linux-kernel@vger.kernel.org, Ingo Molnar <mingo@elte.hu>, linux-kbuild@vger.kernel.org, bp@amd64.org
 
->>> On 25.02.11 at 20:51, Dimitris Michailidis <dm@chelsio.com> wrote:
-> Dimitris Michailidis wrote:
->> Jan Beulich wrote:
->> 
->>> As to that INET vs NET dependency - is it possible that the
->>> network drivers really just need NET, but the iSCSI ones need
->>> INET? In which case the only common dependency would be
->>> PCI - certainly not worth a custom helper option.
->> 
->> Reading the commit message that introduced CHELSIO_T3_DEPENDS, it talks 
->> of hidden dependencies that select does not see.  I am not sure which 
->> exactly but since it's been a few years since that commit I'll try to 
->> see what the situation is today without the *_DEPENDS symbols and let 
->> you know.
+On Mon, Feb 21, 2011 at 12:03:22PM +0100, Borislav Petkov wrote:
 > 
-> I looked into this and found that with the current Kconfig the iSCSI driver 
-> does not appear in the SCSI menu until one first enables NETDEVICES and 
-> NETDEV_10000 in the network driver menu.  It appears that the *_DEPENDS 
-> symbols were added to capture dependencies on such symbols within the 
-> network driver Kconfig, besides the dependencies the driver's entry listed 
-> explicitly.
+> Add a 'W=1' Makefile switch which adds additional checking per build
+> object.
 > 
-> The patch below removes *T4*_DEPENDS and the network drivers' unnecessary 
-> dependency on INET, and updates the iSCSI driver's entry so it is visible 
-> without requiring any net driver options to be enabled first and has 
-> adequate selects to be able to build the net driver (this part is adapted 
-> from bnx2i's Kconfig entry).  I still need to do the T3 part of this and 
-> check that there isn't a conflict with the current scsi tree.  Just for 
-> review at this time.
-
-Thanks, this looks good to me.
-
-Jan
-
-> diff --git a/drivers/net/Kconfig b/drivers/net/Kconfig
-> index 0382332..0d314d5 100644
-> --- a/drivers/net/Kconfig
-> +++ b/drivers/net/Kconfig
-> @@ -2619,14 +2619,9 @@ config CHELSIO_T3
->   	  To compile this driver as a module, choose M here: the module
->   	  will be called cxgb3.
+> The idea behind this option is targeted at developers who, in the
+> process of writing their code, want to do the occasional
 > 
-> -config CHELSIO_T4_DEPENDS
-> -	tristate
-> -	depends on PCI && INET
-> -	default y
-> -
->   config CHELSIO_T4
->   	tristate "Chelsio Communications T4 Ethernet support"
-> -	depends on CHELSIO_T4_DEPENDS
-> +	depends on PCI
->   	select FW_LOADER
->   	select MDIO
->   	help
-> @@ -2644,14 +2639,9 @@ config CHELSIO_T4
->   	  To compile this driver as a module choose M here; the module
->   	  will be called cxgb4.
+> make W=1 [target.o]
 > 
-> -config CHELSIO_T4VF_DEPENDS
-> -	tristate
-> -	depends on PCI && INET
-> -	default y
-> -
->   config CHELSIO_T4VF
->   	tristate "Chelsio Communications T4 Virtual Function Ethernet support"
-> -	depends on CHELSIO_T4VF_DEPENDS
-> +	depends on PCI
->   	help
->   	  This driver supports Chelsio T4-based gigabit and 10Gb Ethernet
->   	  adapters with PCI-E SR-IOV Virtual Functions.
-> diff --git a/drivers/scsi/cxgbi/cxgb4i/Kconfig 
-> b/drivers/scsi/cxgbi/cxgb4i/Kconfig
-> index bb94b39..d5302c2 100644
-> --- a/drivers/scsi/cxgbi/cxgb4i/Kconfig
-> +++ b/drivers/scsi/cxgbi/cxgb4i/Kconfig
-> @@ -1,6 +1,8 @@
->   config SCSI_CXGB4_ISCSI
->   	tristate "Chelsio T4 iSCSI support"
-> -	depends on CHELSIO_T4_DEPENDS
-> +	depends on PCI && INET
-> +	select NETDEVICES
-> +	select NETDEV_10000
->   	select CHELSIO_T4
->   	select SCSI_ISCSI_ATTRS
->   	---help---
+> and let gcc do more extensive code checking for them. Then, they
+> could eyeball the output for valid gcc warnings about various
+> bugs/discrepancies which are not reported during the normal build
+> process.
+> 
+> For more background information and a use case, read through this
+> thread: http://marc.info/?l=kernel-janitors&m=129802065918147&w=2
+> 
+> -v4: Enable this for gcc only. Also, check for options which are not
+> supported by every gcc version we use to build the kernel. Adding those
+> checks for _every_ option slows down the build noticeably so be sensible
+> here and add it only when your gcc version chokes on a particular
+> option.
+> 
+> -v[2..3]: move to Makefile.build
+> 
+> Cc: Michal Marek <mmarek@suse.cz>
+> Cc: Sam Ravnborg <sam@ravnborg.org>
+> Cc: linux-kbuild@vger.kernel.org
+> Acked-by: Ingo Molnar <mingo@elte.hu>
+> Signed-off-by: Borislav Petkov <bp@alien8.de>
 
+Ping?
 
+Michal, Sam,
 
+any news here? FWIW, I've been build-testing amd64_edac.c with it and
+have caught a bunch of buglets with it. IMHO, it really helps to enable
+more extensive gcc checking in debugging builds.
+
+Thanks.
+
+-- 
+Regards/Gruss,
+Boris.
