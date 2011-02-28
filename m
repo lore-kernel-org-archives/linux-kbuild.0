@@ -1,45 +1,109 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepa.post.tele.dk ([195.41.46.235]:33091 "EHLO
-	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751752Ab1B0Soz (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 27 Feb 2011 13:44:55 -0500
-Date: Sun, 27 Feb 2011 19:44:53 +0100
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH] Add ``cloneconfig'' target
-Message-ID: <20110227184453.GA28732@merkur.ravnborg.org>
-References: <4D671556.80607@suse.com> <20110225060706.GA12723@merkur.ravnborg.org> <AANLkTimFd+KFKgiOF8iVoM8Pk77Zy+5CsFs5BCYqCw=L@mail.gmail.com> <20110226221838.GA24028@merkur.ravnborg.org> <AANLkTi=+AU3gJJOov8R1fNcZVE7iNpbTLDuMB5PHUk8s@mail.gmail.com> <AANLkTikigj1rDHrUaySHAYrW=GPPezbmcaDfx78AqE1_@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Message-Id: <4D6B68BE020000780003402E@vpn.id2.novell.com>
+Date: Mon, 28 Feb 2011 08:19:58 +0000
+From: "Jan Beulich" <JBeulich@novell.com>
+Subject: Re: [PATCH] cxgb{3,4}: streamline Kconfig options
+References: <4D5D30CA020000780003263A@vpn.id2.novell.com>
+ <20110222.101457.39195901.davem@davemloft.net>
+ <4D64E5720200007800033420@vpn.id2.novell.com>
+ <20110223.122709.193705956.davem@davemloft.net>
+ <4D661E2702000078000336B5@vpn.id2.novell.com>
+ <4D66B45B.2050604@chelsio.com> <4D680842.6050309@chelsio.com>
+In-Reply-To: <4D680842.6050309@chelsio.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8BIT
 Content-Disposition: inline
-In-Reply-To: <AANLkTikigj1rDHrUaySHAYrW=GPPezbmcaDfx78AqE1_@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnaud Lacombe <lacombar@gmail.com>
-Cc: Jeff Mahoney <jeffm@suse.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Roman Zippel <zippel@linux-m68k.org>, linux-kbuild@vger.kernel.org
+To: Dimitris Michailidis <dm@chelsio.com>
+Cc: divy@chelsio.com, David Miller <davem@davemloft.net>, linux-kbuild@vger.kernel.org, netdev@vger.kernel.org
 
-On Sat, Feb 26, 2011 at 06:28:43PM -0500, Arnaud Lacombe wrote:
-> Hi,
+>>> On 25.02.11 at 20:51, Dimitris Michailidis <dm@chelsio.com> wrote:
+> Dimitris Michailidis wrote:
+>> Jan Beulich wrote:
+>> 
+>>> As to that INET vs NET dependency - is it possible that the
+>>> network drivers really just need NET, but the iSCSI ones need
+>>> INET? In which case the only common dependency would be
+>>> PCI - certainly not worth a custom helper option.
+>> 
+>> Reading the commit message that introduced CHELSIO_T3_DEPENDS, it talks 
+>> of hidden dependencies that select does not see.  I am not sure which 
+>> exactly but since it's been a few years since that commit I'll try to 
+>> see what the situation is today without the *_DEPENDS symbols and let 
+>> you know.
 > 
-> On Sat, Feb 26, 2011 at 6:03 PM, Arnaud Lacombe <lacombar@gmail.com> wrote:
-> >> The fact that the configuration is gzipped does not warrant
-> >> a new option to deal with this that almost duplicate the
-> >> existing functionality.
-> >>
-> > agree.
-> >
-> Let me precise, as there may be confusion. I agree about the new
-> target issue, but definitively think this kconfig "option" (more a
-> hack, which required a special option within kconfig) should be
-> handled by Kbuild, not Kconfig, ie. I'd discard "option
-> defconfig_list". File decompression (and eventually which config to
-> pick) should be done prior to the invocation of Kconfig.
+> I looked into this and found that with the current Kconfig the iSCSI driver 
+> does not appear in the SCSI menu until one first enables NETDEVICES and 
+> NETDEV_10000 in the network driver menu.  It appears that the *_DEPENDS 
+> symbols were added to capture dependencies on such symbols within the 
+> network driver Kconfig, besides the dependencies the driver's entry listed 
+> explicitly.
+> 
+> The patch below removes *T4*_DEPENDS and the network drivers' unnecessary 
+> dependency on INET, and updates the iSCSI driver's entry so it is visible 
+> without requiring any net driver options to be enabled first and has 
+> adequate selects to be able to build the net driver (this part is adapted 
+> from bnx2i's Kconfig entry).  I still need to do the T3 part of this and 
+> check that there isn't a conflict with the current scsi tree.  Just for 
+> review at this time.
 
-If you can come up with something simpler and better than
-what we have today then fine.
-Simplifying kconfgi would be good.
+Thanks, this looks good to me.
 
-But at least barebox uses defconfig_list - an maybe others.
-We need to consider non-kernel users too.
+Jan
 
-	Sam
+> diff --git a/drivers/net/Kconfig b/drivers/net/Kconfig
+> index 0382332..0d314d5 100644
+> --- a/drivers/net/Kconfig
+> +++ b/drivers/net/Kconfig
+> @@ -2619,14 +2619,9 @@ config CHELSIO_T3
+>   	  To compile this driver as a module, choose M here: the module
+>   	  will be called cxgb3.
+> 
+> -config CHELSIO_T4_DEPENDS
+> -	tristate
+> -	depends on PCI && INET
+> -	default y
+> -
+>   config CHELSIO_T4
+>   	tristate "Chelsio Communications T4 Ethernet support"
+> -	depends on CHELSIO_T4_DEPENDS
+> +	depends on PCI
+>   	select FW_LOADER
+>   	select MDIO
+>   	help
+> @@ -2644,14 +2639,9 @@ config CHELSIO_T4
+>   	  To compile this driver as a module choose M here; the module
+>   	  will be called cxgb4.
+> 
+> -config CHELSIO_T4VF_DEPENDS
+> -	tristate
+> -	depends on PCI && INET
+> -	default y
+> -
+>   config CHELSIO_T4VF
+>   	tristate "Chelsio Communications T4 Virtual Function Ethernet support"
+> -	depends on CHELSIO_T4VF_DEPENDS
+> +	depends on PCI
+>   	help
+>   	  This driver supports Chelsio T4-based gigabit and 10Gb Ethernet
+>   	  adapters with PCI-E SR-IOV Virtual Functions.
+> diff --git a/drivers/scsi/cxgbi/cxgb4i/Kconfig 
+> b/drivers/scsi/cxgbi/cxgb4i/Kconfig
+> index bb94b39..d5302c2 100644
+> --- a/drivers/scsi/cxgbi/cxgb4i/Kconfig
+> +++ b/drivers/scsi/cxgbi/cxgb4i/Kconfig
+> @@ -1,6 +1,8 @@
+>   config SCSI_CXGB4_ISCSI
+>   	tristate "Chelsio T4 iSCSI support"
+> -	depends on CHELSIO_T4_DEPENDS
+> +	depends on PCI && INET
+> +	select NETDEVICES
+> +	select NETDEV_10000
+>   	select CHELSIO_T4
+>   	select SCSI_ISCSI_ATTRS
+>   	---help---
+
+
+
