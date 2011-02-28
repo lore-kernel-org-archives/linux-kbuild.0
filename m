@@ -1,89 +1,73 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pqueueb.post.tele.dk ([193.162.153.10]:37466 "EHLO
-	pqueueb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753325Ab1B1Sil (ORCPT
+Received: from moutng.kundenserver.de ([212.227.17.9]:56084 "EHLO
+	moutng.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754776Ab1B1VHj (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 28 Feb 2011 13:38:41 -0500
-Date: Mon, 28 Feb 2011 19:38:16 +0100
-From: Sam Ravnborg <sam@ravnborg.org>
+	Mon, 28 Feb 2011 16:07:39 -0500
+From: Arnd Bergmann <arnd@arndb.de>
 Subject: Re: [PATCH -v4] kbuild: Add extra gcc checks
-Message-ID: <20110228183816.GA1759@merkur.ravnborg.org>
+Date: Mon, 28 Feb 2011 22:07:33 +0100
 References: <20110221110322.GA9819@liondog.tnic>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
 In-Reply-To: <20110221110322.GA9819@liondog.tnic>
+MIME-Version: 1.0
+Content-Type: Text/Plain;
+  charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <201102282207.33489.arnd@arndb.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Borislav Petkov <bp@alien8.de>, Michal Marek <mmarek@suse.cz>, torvalds@linux-foundation.org, x86@kernel.org, linux-kernel@vger.kernel.org, Ingo Molnar <mingo@elte.hu>, linux-kbuild@vger.kernel.org, bp@amd64.org
+To: Borislav Petkov <bp@alien8.de>
+Cc: Sam Ravnborg <sam@ravnborg.org>, Michal Marek <mmarek@suse.cz>, torvalds@linux-foundation.org, x86@kernel.org, linux-kernel@vger.kernel.org, Ingo Molnar <mingo@elte.hu>, linux-kbuild@vger.kernel.org, bp@amd64.org
 
-On Mon, Feb 21, 2011 at 12:03:22PM +0100, Borislav Petkov wrote:
-> 
+On Monday 21 February 2011 12:03:22 Borislav Petkov wrote:
 > Add a 'W=1' Makefile switch which adds additional checking per build
 > object.
-> 
+>
 > The idea behind this option is targeted at developers who, in the
 > process of writing their code, want to do the occasional
-> 
+>
 > make W=1 [target.o]
-> 
-> and let gcc do more extensive code checking for them. Then, they
-> could eyeball the output for valid gcc warnings about various
-> bugs/discrepancies which are not reported during the normal build
-> process.
-> 
-> For more background information and a use case, read through this
-> thread: http://marc.info/?l=kernel-janitors&m=129802065918147&w=2
-> 
-> -v4: Enable this for gcc only. Also, check for options which are not
-> supported by every gcc version we use to build the kernel. Adding those
-> checks for _every_ option slows down the build noticeably so be sensible
-> here and add it only when your gcc version chokes on a particular
-> option.
-> 
-> -v[2..3]: move to Makefile.build
-> 
-> Cc: Michal Marek <mmarek@suse.cz>
-> Cc: Sam Ravnborg <sam@ravnborg.org>
-> Cc: linux-kbuild@vger.kernel.org
-> Acked-by: Ingo Molnar <mingo@elte.hu>
-> Signed-off-by: Borislav Petkov <bp@alien8.de>
-> ---
->  Makefile               |    6 ++++++
->  scripts/Makefile.build |   37 ++++++++++++++++++++++++++++++++++++-
->  2 files changed, 42 insertions(+), 1 deletions(-)
-> 
-> diff --git a/Makefile b/Makefile
-> index c9c8c8f..c3bca9c 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -102,6 +102,11 @@ ifeq ("$(origin O)", "command line")
->    KBUILD_OUTPUT := $(O)
->  endif
->  
-> +ifeq ("$(origin W)", "command line")
-> +  KBUILD_ENABLE_EXTRA_GCC_CHECKS = 1
-> +  export KBUILD_ENABLE_EXTRA_GCC_CHECKS
-> +endif
 
-It is simpler to just write:
-export KBUILD_ENABLE_EXTRA_GCC_CHECKS := 1
+Great stuff, I really like the idea!
 
-
-> +#
-> +# make W=1 settings
-> +#
 > +# $(call cc-option... ) handles gcc -W.. options which
 > +# are not supported by all versions of the compiler
 > +ifdef KBUILD_ENABLE_EXTRA_GCC_CHECKS
-
 > +ifneq ($(call cc-version),)
-This check looks redundant.
+> +KBUILD_EXTRA_WARNINGS := -Wextra
+> +KBUILD_EXTRA_WARNINGS += -Wunused -Wno-unused-parameter
+> +KBUILD_EXTRA_WARNINGS += -Waggregate-return
+> +KBUILD_EXTRA_WARNINGS += -Wbad-function-cast
+> +KBUILD_EXTRA_WARNINGS += -Wcast-qual
+> +KBUILD_EXTRA_WARNINGS += -Wcast-align
+> +KBUILD_EXTRA_WARNINGS += -Wconversion
+> +KBUILD_EXTRA_WARNINGS += -Wdisabled-optimization
+> +KBUILD_EXTRA_WARNINGS += -Wlogical-op
+> +KBUILD_EXTRA_WARNINGS += -Wmissing-declarations
+> +KBUILD_EXTRA_WARNINGS += -Wmissing-format-attribute
+> +KBUILD_EXTRA_WARNINGS += $(call cc-option, -Wmissing-include-dirs,)
+> +KBUILD_EXTRA_WARNINGS += -Wmissing-prototypes
+> +KBUILD_EXTRA_WARNINGS += -Wnested-externs
+> +KBUILD_EXTRA_WARNINGS += -Wold-style-definition
+> +KBUILD_EXTRA_WARNINGS += $(call cc-option, -Woverlength-strings,)
+> +KBUILD_EXTRA_WARNINGS += -Wpacked
+> +KBUILD_EXTRA_WARNINGS += -Wpacked-bitfield-compat
+> +KBUILD_EXTRA_WARNINGS += -Wpadded
+> +KBUILD_EXTRA_WARNINGS += -Wpointer-arith
+> +KBUILD_EXTRA_WARNINGS += -Wredundant-decls
+> +KBUILD_EXTRA_WARNINGS += -Wshadow
+> +KBUILD_EXTRA_WARNINGS += -Wswitch-default
+> +KBUILD_EXTRA_WARNINGS += $(call cc-option, -Wvla,)
+> +KBUILD_CFLAGS += $(KBUILD_EXTRA_WARNINGS)
+> +endif
+> +endif
 
-You introduce a new environment variable "KBUILD_ENABLE_EXTRA_GCC_CHECKS".
-We actually ty to document these in Documentation/kbuild/kbuild.txt
+I would be a little more selective here. Maybe we can have two levels
+W=1 and W=2, with the full set getting enabled by W=2, and the smaller
+set getting enabled in W=1. The reason is that many of the warnings
+are pointless or even hurting code quality, while others (e.g.
+-Wmissing-declarations) are generally useful and the only reason for
+not enabling them is that they cause too many warnings with existing
+code.
 
-Fix the above and you can add my:
-Acked-by: Sam Ravnborg <sam@ravnborg.org>
-
-	Sam
+	Arnd
