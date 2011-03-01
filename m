@@ -1,102 +1,74 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.skyhub.de ([78.46.96.112]:37901 "EHLO mail.skyhub.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751372Ab1B1Vbi (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 28 Feb 2011 16:31:38 -0500
-Date: Mon, 28 Feb 2011 22:31:34 +0100
-From: Borislav Petkov <bp@alien8.de>
-Subject: Re: [PATCH -v4] kbuild: Add extra gcc checks
-Message-ID: <20110228213134.GA10825@liondog.tnic>
-References: <20110221110322.GA9819@liondog.tnic>
- <201102282207.33489.arnd@arndb.de>
+Received: from mail-bw0-f46.google.com ([209.85.214.46]:36220 "EHLO
+	mail-bw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753543Ab1CAAtH convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 28 Feb 2011 19:49:07 -0500
+Received: by bwz15 with SMTP id 15so4192015bwz.19
+        for <linux-kbuild@vger.kernel.org>; Mon, 28 Feb 2011 16:49:05 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <201102282207.33489.arnd@arndb.de>
+Date: Tue, 1 Mar 2011 01:49:05 +0100
+Message-ID: <AANLkTinBrt-fr_e61thAqLO-MN90BA6a28Lain8u__sR@mail.gmail.com>
+Subject: Minimal kernel config generator based on Kconfig language
+From: Filip Honckiewicz <f.honckiewicz@gmail.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: Sam Ravnborg <sam@ravnborg.org>, Michal Marek <mmarek@suse.cz>, torvalds@linux-foundation.org, x86@kernel.org, linux-kernel@vger.kernel.org, Ingo Molnar <mingo@elte.hu>, linux-kbuild@vger.kernel.org, bp@amd64.org
+To: linux-kbuild@vger.kernel.org
 
-On Mon, Feb 28, 2011 at 10:07:33PM +0100, Arnd Bergmann wrote:
-> On Monday 21 February 2011 12:03:22 Borislav Petkov wrote:
-> > Add a 'W=1' Makefile switch which adds additional checking per build
-> > object.
-> >
-> > The idea behind this option is targeted at developers who, in the
-> > process of writing their code, want to do the occasional
-> >
-> > make W=1 [target.o]
-> 
-> Great stuff, I really like the idea!
+Hi!
 
-Thanks. :)
+I am working on automatic kernel configurator (which is part of my
+thesis) written in python, that will provide config as minimal as
+possible. First stage of the project is to take loaded module names of
+running kernel and add theirs config options to some created
+previously config file (I use for testing make allnoconfig).
 
-> 
-> > +# $(call cc-option... ) handles gcc -W.. options which
-> > +# are not supported by all versions of the compiler
-> > +ifdef KBUILD_ENABLE_EXTRA_GCC_CHECKS
-> > +ifneq ($(call cc-version),)
-> > +KBUILD_EXTRA_WARNINGS := -Wextra
-> > +KBUILD_EXTRA_WARNINGS += -Wunused -Wno-unused-parameter
-> > +KBUILD_EXTRA_WARNINGS += -Waggregate-return
-> > +KBUILD_EXTRA_WARNINGS += -Wbad-function-cast
-> > +KBUILD_EXTRA_WARNINGS += -Wcast-qual
-> > +KBUILD_EXTRA_WARNINGS += -Wcast-align
-> > +KBUILD_EXTRA_WARNINGS += -Wconversion
-> > +KBUILD_EXTRA_WARNINGS += -Wdisabled-optimization
-> > +KBUILD_EXTRA_WARNINGS += -Wlogical-op
-> > +KBUILD_EXTRA_WARNINGS += -Wmissing-declarations
-> > +KBUILD_EXTRA_WARNINGS += -Wmissing-format-attribute
-> > +KBUILD_EXTRA_WARNINGS += $(call cc-option, -Wmissing-include-dirs,)
-> > +KBUILD_EXTRA_WARNINGS += -Wmissing-prototypes
-> > +KBUILD_EXTRA_WARNINGS += -Wnested-externs
-> > +KBUILD_EXTRA_WARNINGS += -Wold-style-definition
-> > +KBUILD_EXTRA_WARNINGS += $(call cc-option, -Woverlength-strings,)
-> > +KBUILD_EXTRA_WARNINGS += -Wpacked
-> > +KBUILD_EXTRA_WARNINGS += -Wpacked-bitfield-compat
-> > +KBUILD_EXTRA_WARNINGS += -Wpadded
-> > +KBUILD_EXTRA_WARNINGS += -Wpointer-arith
-> > +KBUILD_EXTRA_WARNINGS += -Wredundant-decls
-> > +KBUILD_EXTRA_WARNINGS += -Wshadow
-> > +KBUILD_EXTRA_WARNINGS += -Wswitch-default
-> > +KBUILD_EXTRA_WARNINGS += $(call cc-option, -Wvla,)
-> > +KBUILD_CFLAGS += $(KBUILD_EXTRA_WARNINGS)
-> > +endif
-> > +endif
-> 
-> I would be a little more selective here. Maybe we can have two levels
-> W=1 and W=2, with the full set getting enabled by W=2, and the smaller
-> set getting enabled in W=1. The reason is that many of the warnings
-> are pointless or even hurting code quality, while others (e.g.
-> -Wmissing-declarations) are generally useful and the only reason for
-> not enabling them is that they cause too many warnings with existing
-> code.
+I created some parser that builds entries tree - holding all entries
+with their attributes like dependencies and references to parents,
+etc. - but in future it could be replaced by Kconfiglib (patched to
+kernel some time ago), because it looks nicer. I also wrote
+lekser/parser which builds expression tree to resolve dependencies.
 
-My intention was not to have multiple levels of warnings because then
-you have to go and enable the different levels and have to remember
-which level you used last, etc, etc.
+I know that streamline_config.pl exists but I wanted to create tool
+that is more flexible. My approach is to resolve dependencies “from
+behind”. Tools like make menuconfig forces to enable some lower level
+options before enabling this appropriate - higher level options
+otherwise high level option will not be visible. I want to do this
+opposite way what should help to automatize process of creating
+configuration. For example system has loaded “radeon” module. We can
+automatically get corresponding config option (DRM_RADEON), enable it
+and enable all options which it depends on, going upper and upper
+through DRM, PCI, HAS_IOMEM, etc.
 
-Instead I am thinking along with the following lines:
+But I have problems with Kconfig syntax and understanding all of
+dependencies which are implemented in configuration tools like make
+menuconfig, but described not enought in kconfig-language, so I am
+asking you for help, because I will not jump over some things only by
+myself:(
 
-make W=1 [path/to/kernel/file.o] 2>w.log
+My questions:
+1. How dependencies impacts on possible values of config? Can I set
+“m” value for config option if dependency expression returns “y” or
+can I set “y” if dependency expression returns “m”?
+2. How config value impacts on value of selects? For example can I set
+“y” for selects if config option has “m” value? What will change if we
+add “if” clause in select?
+3. Use case: I use make allnoconfig to generate initial config and my
+“tool” to enable DRM_CONFIG what results enabling also some
+dependencies and select options too what looks ok when I analyze it
+using pen and sheet of paper. So why, when I use make allnoconfig and
+then enable proper option using make menuconfig it also enables dozen
+of another? Where is the connection?
+4. Could anyone show me on DRM_CONFIG example looking on its
+dependendencies and selects which options should be enabled, but doing
+it from behind, I mean I know that I want to set DRM_CONFIG to “m”
+value, so how should I set dependencies going upper and upper?
 
-and then take a look at w.log and start fixing warnings.
+I would be very very very grateful for help and I thought this
+explanation could be very helpful not only for me, but for anyone who
+want to understand kconfig system.
 
-You can selectively ignore some of the warnings since, as you say
-yourself above, some simply make you write ugly code like enforcing
-casts just for the sake of shutting up the compiler. A great deal of the
-warnings come from includes which are hard to fix or gcc is issuing the
-warning wrong since we do sick sh*t with C in the kernel and that's OK
-:).
-
-But in all cases you have all the warnings in one single file and that's
-it. If a certain -W option is useless, we should rather remove it since
-it doesn't help anyway. The selection above is clearly not complete so
-I'd rather drop some instead of including different W=x levels.
-
-Hmm... ?
-
--- 
-Regards/Gruss,
-    Boris.
+Yours faithfully
+Filip
