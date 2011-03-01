@@ -1,151 +1,64 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.skyhub.de ([78.46.96.112]:35667 "EHLO mail.skyhub.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754615Ab1CAIfc (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 1 Mar 2011 03:35:32 -0500
-Date: Tue, 1 Mar 2011 09:35:29 +0100
-From: Borislav Petkov <bp@alien8.de>
-Subject: [PATCH -v5] kbuild: Add extra gcc checks
-Message-ID: <20110301083529.GA767@liondog.tnic>
+Received: from moutng.kundenserver.de ([212.227.126.186]:58812 "EHLO
+	moutng.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755822Ab1CALfx (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 1 Mar 2011 06:35:53 -0500
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: Re: [PATCH -v4] kbuild: Add extra gcc checks
+Date: Tue, 1 Mar 2011 12:35:00 +0100
+References: <20110221110322.GA9819@liondog.tnic> <201102282207.33489.arnd@arndb.de> <20110228213134.GA10825@liondog.tnic>
+In-Reply-To: <20110228213134.GA10825@liondog.tnic>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+Content-Type: Text/Plain;
+  charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <201103011235.00389.arnd@arndb.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: Arnd Bergmann <arnd@arndb.de>, Sam Ravnborg <sam@ravnborg.org>, torvalds@linux-foundation.org, x86@kernel.org, linux-kernel@vger.kernel.org, Ingo Molnar <mingo@elte.hu>, linux-kbuild@vger.kernel.org, bp@amd64.org
+To: Borislav Petkov <bp@alien8.de>
+Cc: Sam Ravnborg <sam@ravnborg.org>, Michal Marek <mmarek@suse.cz>, torvalds@linux-foundation.org, x86@kernel.org, linux-kernel@vger.kernel.org, Ingo Molnar <mingo@elte.hu>, linux-kbuild@vger.kernel.org, bp@amd64.org
 
-Add a 'W=1' Makefile switch which adds additional checking per build
-object.
+On Monday 28 February 2011, Borislav Petkov wrote:
+> My intention was not to have multiple levels of warnings because then
+> you have to go and enable the different levels and have to remember
+> which level you used last, etc, etc.
 
-The idea behind this option is targeted at developers who, in the
-process of writing their code, want to do the occasional
+I wasn't suggesting more than two, so the two would have very distinct
+definitions:
 
-make W=1 [target.o]
+W=1: Warnings that we would like to fix all over the tree, patches to
+     remove these are always welcome and you can build the entire kernel
+     with it. Once they are all fixed, we can make the warnings the default.
 
-and let gcc do more extensive code checking for them. Then, they
-could eyeball the output for valid gcc warnings about various
-bugs/discrepancies which are not reported during the normal build
-process.
+W=2: Warnings that we know we don't always want to fix, meant for what
+     you describe here -- you build a single file and decide what to
+     do based on common sense. 
 
-For more background information and a use case, read through this
-thread: http://marc.info/?l=kernel-janitors&m=129802065918147&w=2
+> Instead I am thinking along with the following lines:
+> 
+> make W=1 [path/to/kernel/file.o] 2>w.log
+> 
+> and then take a look at w.log and start fixing warnings.
+> 
+> You can selectively ignore some of the warnings since, as you say
+> yourself above, some simply make you write ugly code like enforcing
+> casts just for the sake of shutting up the compiler. A great deal of the
+> warnings come from includes which are hard to fix or gcc is issuing the
+> warning wrong since we do sick sh*t with C in the kernel and that's OK
+> :).
 
--v5: Document internal kbuild variable which is introduced by this.
-Simplify assignment.
+Yes, I understand that.
 
--v4: Enable this for gcc only. Also, check for options which are not
-supported by every gcc version we use to build the kernel. Adding those
-checks for _every_ option slows down the build noticeably so be sensible
-here and add it only when your gcc version chokes on a particular
-option.
+> But in all cases you have all the warnings in one single file and that's
+> it. If a certain -W option is useless, we should rather remove it since
+> it doesn't help anyway. The selection above is clearly not complete so
+> I'd rather drop some instead of including different W=x levels.
+> 
+> Hmm... ?
 
--v[2..3]: move to Makefile.build
+I'd have to see the output myself. My feeling is that a lot of the
+-Wextra warnings are not that useful, but I don't know which ones
+are included in -Wextra these days.
 
-Cc: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org
-Acked-by: Sam Ravnborg <sam@ravnborg.org>
-Acked-by: Ingo Molnar <mingo@elte.hu>
-Signed-off-by: Borislav Petkov <bp@alien8.de>
----
- Documentation/kbuild/kbuild.txt |    5 +++++
- Makefile                        |    5 +++++
- scripts/Makefile.build          |   35 ++++++++++++++++++++++++++++++++++-
- 3 files changed, 44 insertions(+), 1 deletions(-)
-
-diff --git a/Documentation/kbuild/kbuild.txt b/Documentation/kbuild/kbuild.txt
-index 4a99031..376538c 100644
---- a/Documentation/kbuild/kbuild.txt
-+++ b/Documentation/kbuild/kbuild.txt
-@@ -196,3 +196,8 @@ to be included in the databases, separated by blank space. E.g.:
- To get all available archs you can also specify all. E.g.:
- 
-     $ make ALLSOURCE_ARCHS=all tags
-+
-+KBUILD_ENABLE_EXTRA_GCC_CHECKS
-+--------------------------------------------------
-+If enabled over the make command line with "W=1", it turns on additional
-+gcc -W... options for more extensive build-time checking.
-diff --git a/Makefile b/Makefile
-index c9c8c8f..8c4614f 100644
---- a/Makefile
-+++ b/Makefile
-@@ -102,6 +102,10 @@ ifeq ("$(origin O)", "command line")
-   KBUILD_OUTPUT := $(O)
- endif
- 
-+ifeq ("$(origin W)", "command line")
-+  export KBUILD_ENABLE_EXTRA_GCC_CHECKS := 1
-+endif
-+
- # That's our default target when none is given on the command line
- PHONY := _all
- _all:
-@@ -1262,6 +1266,7 @@ help:
- 	@echo  '  make O=dir [targets] Locate all output files in "dir", including .config'
- 	@echo  '  make C=1   [targets] Check all c source with $$CHECK (sparse by default)'
- 	@echo  '  make C=2   [targets] Force check of all c source with $$CHECK'
-+	@echo  '  make W=1   [targets] Enable extra gcc checks'
- 	@echo  ''
- 	@echo  'Execute "make" or "make all" to build all targets marked with [*] '
- 	@echo  'For further info see the ./README file'
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index 4eb99ab..d5f925a 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -49,6 +49,40 @@ ifeq ($(KBUILD_NOPEDANTIC),)
-                 $(error CFLAGS was changed in "$(kbuild-file)". Fix it to use EXTRA_CFLAGS)
-         endif
- endif
-+
-+#
-+# make W=1 settings
-+#
-+# $(call cc-option... ) handles gcc -W.. options which
-+# are not supported by all versions of the compiler
-+ifdef KBUILD_ENABLE_EXTRA_GCC_CHECKS
-+KBUILD_EXTRA_WARNINGS := -Wextra
-+KBUILD_EXTRA_WARNINGS += -Wunused -Wno-unused-parameter
-+KBUILD_EXTRA_WARNINGS += -Waggregate-return
-+KBUILD_EXTRA_WARNINGS += -Wbad-function-cast
-+KBUILD_EXTRA_WARNINGS += -Wcast-qual
-+KBUILD_EXTRA_WARNINGS += -Wcast-align
-+KBUILD_EXTRA_WARNINGS += -Wconversion
-+KBUILD_EXTRA_WARNINGS += -Wdisabled-optimization
-+KBUILD_EXTRA_WARNINGS += -Wlogical-op
-+KBUILD_EXTRA_WARNINGS += -Wmissing-declarations
-+KBUILD_EXTRA_WARNINGS += -Wmissing-format-attribute
-+KBUILD_EXTRA_WARNINGS += $(call cc-option, -Wmissing-include-dirs,)
-+KBUILD_EXTRA_WARNINGS += -Wmissing-prototypes
-+KBUILD_EXTRA_WARNINGS += -Wnested-externs
-+KBUILD_EXTRA_WARNINGS += -Wold-style-definition
-+KBUILD_EXTRA_WARNINGS += $(call cc-option, -Woverlength-strings,)
-+KBUILD_EXTRA_WARNINGS += -Wpacked
-+KBUILD_EXTRA_WARNINGS += -Wpacked-bitfield-compat
-+KBUILD_EXTRA_WARNINGS += -Wpadded
-+KBUILD_EXTRA_WARNINGS += -Wpointer-arith
-+KBUILD_EXTRA_WARNINGS += -Wredundant-decls
-+KBUILD_EXTRA_WARNINGS += -Wshadow
-+KBUILD_EXTRA_WARNINGS += -Wswitch-default
-+KBUILD_EXTRA_WARNINGS += $(call cc-option, -Wvla,)
-+KBUILD_CFLAGS += $(KBUILD_EXTRA_WARNINGS)
-+endif
-+
- include scripts/Makefile.lib
- 
- ifdef host-progs
-@@ -403,7 +437,6 @@ ifneq ($(cmd_files),)
-   include $(cmd_files)
- endif
- 
--
- # Declare the contents of the .PHONY variable as phony.  We keep that
- # information in a variable se we can use it in if_changed and friends.
- 
--- 
-1.7.4.1.48.g5673d
-
-
--- 
-Regards/Gruss,
-    Boris.
+	Arnd
