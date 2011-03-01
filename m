@@ -1,64 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from moutng.kundenserver.de ([212.227.126.186]:58812 "EHLO
-	moutng.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755822Ab1CALfx (ORCPT
+Received: from mail-iy0-f174.google.com ([209.85.210.174]:35249 "EHLO
+	mail-iy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753048Ab1CANVs (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 1 Mar 2011 06:35:53 -0500
-From: Arnd Bergmann <arnd@arndb.de>
+	Tue, 1 Mar 2011 08:21:48 -0500
+Date: Tue, 1 Mar 2011 21:20:50 +0800
+From: =?utf-8?Q?Am=C3=A9rico?= Wang <xiyou.wangcong@gmail.com>
 Subject: Re: [PATCH -v4] kbuild: Add extra gcc checks
-Date: Tue, 1 Mar 2011 12:35:00 +0100
-References: <20110221110322.GA9819@liondog.tnic> <201102282207.33489.arnd@arndb.de> <20110228213134.GA10825@liondog.tnic>
-In-Reply-To: <20110228213134.GA10825@liondog.tnic>
+Message-ID: <20110301132050.GA24374@cr0.private>
+References: <20110221110322.GA9819@liondog.tnic>
+ <201102282207.33489.arnd@arndb.de>
+ <20110228213134.GA10825@liondog.tnic>
+ <201103011235.00389.arnd@arndb.de>
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <201103011235.00389.arnd@arndb.de>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <201103011235.00389.arnd@arndb.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Borislav Petkov <bp@alien8.de>
-Cc: Sam Ravnborg <sam@ravnborg.org>, Michal Marek <mmarek@suse.cz>, torvalds@linux-foundation.org, x86@kernel.org, linux-kernel@vger.kernel.org, Ingo Molnar <mingo@elte.hu>, linux-kbuild@vger.kernel.org, bp@amd64.org
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: Borislav Petkov <bp@alien8.de>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <mmarek@suse.cz>, torvalds@linux-foundation.org, x86@kernel.org, linux-kernel@vger.kernel.org, Ingo Molnar <mingo@elte.hu>, linux-kbuild@vger.kernel.org, bp@amd64.org
 
-On Monday 28 February 2011, Borislav Petkov wrote:
-> My intention was not to have multiple levels of warnings because then
-> you have to go and enable the different levels and have to remember
-> which level you used last, etc, etc.
+On Tue, Mar 01, 2011 at 12:35:00PM +0100, Arnd Bergmann wrote:
+>On Monday 28 February 2011, Borislav Petkov wrote:
+>> My intention was not to have multiple levels of warnings because then
+>> you have to go and enable the different levels and have to remember
+>> which level you used last, etc, etc.
+>
+>I wasn't suggesting more than two, so the two would have very distinct
+>definitions:
+>
+>W=1: Warnings that we would like to fix all over the tree, patches to
+>     remove these are always welcome and you can build the entire kernel
+>     with it. Once they are all fixed, we can make the warnings the default.
+>
+>W=2: Warnings that we know we don't always want to fix, meant for what
+>     you describe here -- you build a single file and decide what to
+>     do based on common sense. 
+>
 
-I wasn't suggesting more than two, so the two would have very distinct
-definitions:
+Right, this makes sense. Borislav, could you implement this?
 
-W=1: Warnings that we would like to fix all over the tree, patches to
-     remove these are always welcome and you can build the entire kernel
-     with it. Once they are all fixed, we can make the warnings the default.
+Thanks.
 
-W=2: Warnings that we know we don't always want to fix, meant for what
-     you describe here -- you build a single file and decide what to
-     do based on common sense. 
-
-> Instead I am thinking along with the following lines:
-> 
-> make W=1 [path/to/kernel/file.o] 2>w.log
-> 
-> and then take a look at w.log and start fixing warnings.
-> 
-> You can selectively ignore some of the warnings since, as you say
-> yourself above, some simply make you write ugly code like enforcing
-> casts just for the sake of shutting up the compiler. A great deal of the
-> warnings come from includes which are hard to fix or gcc is issuing the
-> warning wrong since we do sick sh*t with C in the kernel and that's OK
-> :).
-
-Yes, I understand that.
-
-> But in all cases you have all the warnings in one single file and that's
-> it. If a certain -W option is useless, we should rather remove it since
-> it doesn't help anyway. The selection above is clearly not complete so
-> I'd rather drop some instead of including different W=x levels.
-> 
-> Hmm... ?
-
-I'd have to see the output myself. My feeling is that a lot of the
--Wextra warnings are not that useful, but I don't know which ones
-are included in -Wextra these days.
-
-	Arnd
