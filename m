@@ -1,40 +1,39 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp11.smtpout.orange.fr ([80.12.242.133]:20080 "EHLO
-	smtp.smtpout.orange.fr" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752980Ab1CBTsS (ORCPT
+Received: from mail-wy0-f174.google.com ([74.125.82.174]:38899 "EHLO
+	mail-wy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757667Ab1CBVLs (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 2 Mar 2011 14:48:18 -0500
-From: "Yann E. MORIN" <yann.morin.1998@anciens.enib.fr>
-Subject: Re: [PATCH 0/2] kconfig: allow multiple inclusion of the same file (resent)
-Date: Wed, 2 Mar 2011 20:48:10 +0100
-References: <1298572603-1907-1-git-send-email-yann.morin.1998@anciens.enib.fr>
-In-Reply-To: <1298572603-1907-1-git-send-email-yann.morin.1998@anciens.enib.fr>
+	Wed, 2 Mar 2011 16:11:48 -0500
+Received: by wyg36 with SMTP id 36so437257wyg.19
+        for <linux-kbuild@vger.kernel.org>; Wed, 02 Mar 2011 13:11:46 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
-Message-Id: <201103022048.10776.yann.morin.1998@anciens.enib.fr>
+Date: Wed, 2 Mar 2011 22:11:46 +0100
+Message-ID: <AANLkTi=vPJ_TacWUswaS9Zc-2ji0Wn5GhF2M+EKExoME@mail.gmail.com>
+Subject: KBuild question
+From: Tom Bart <tbartcz@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 
-Hello All!
+Hello,
+I have spend some time analysing KBuild source files. However there is
+one thing that is not clear for me. In the main makefile I have found
+the following statement:
 
-On Thursday 24 February 2011 19:36:41 Yann E. MORIN wrote:
-> This patch series makes it possible to source a file multiple times,
-> eg. from different files, and/or under different conditions. Care has
-> been taken to avoid circular inclusion, of course.
+Most importantly: sub-Makefiles should only ever modify files in
+their own directory. If in some directory we have a dependency on
+a file in another dir (which doesn't happen often, but it's often
+unavoidable when linking the built-in.o targets which finally
+turn into vmlinux), we will call a sub make in that other dir, and
+after that we are sure that everything which is in that other dir
+is now up to date.
 
-Ping ?
-
-Regards,
-Yann E. MORIN.
-
--- 
-.-----------------.--------------------.------------------.--------------------.
-|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
-| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
-| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
-| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
-'------------------------------^-------^------------------^--------------------'
+Kernel is build in a recursive manner. I understand that according to
+the citation firstly all dependencies between different directories
+are identified and then the sub-directory walk through process is
+started. Unfortunately I cannot fine where this functionality is
+implemented? Can somebody point me the right place or maybe my line of
+reasoning is simply wrong?
+Regards
+Tomasz Bartczak
