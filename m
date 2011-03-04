@@ -1,74 +1,128 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.mail.elte.hu ([157.181.151.9]:39480 "EHLO mx2.mail.elte.hu"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1756674Ab1CCIao (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 3 Mar 2011 03:30:44 -0500
-Date: Thu, 3 Mar 2011 09:30:35 +0100
-From: Ingo Molnar <mingo@elte.hu>
-Subject: Re: RFC: x86: kill binutils 2.16.x?
-Message-ID: <20110303083035.GB14854@elte.hu>
-References: <4D6E8932.1010405@zytor.com>
- <alpine.LFD.2.00.1103022152420.2701@localhost6.localdomain6>
- <4D6EB07C.5040004@zytor.com>
- <alpine.LFD.2.00.1103022216180.2701@localhost6.localdomain6>
- <4D6ECBDB.6090307@zytor.com>
+Received: from metis.ext.pengutronix.de ([92.198.50.35]:41795 "EHLO
+	metis.ext.pengutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750757Ab1CDW2V (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 4 Mar 2011 17:28:21 -0500
+Date: Fri, 4 Mar 2011 23:28:16 +0100
+From: Uwe =?iso-8859-1?Q?Kleine-K=F6nig?=
+	<u.kleine-koenig@pengutronix.de>
+Subject: Re: [PATCH] ARM: imx: move selection between i.MX21 and i.MX27 to
+ CPU family choice
+Message-ID: <20110304222816.GZ22310@pengutronix.de>
+References: <20110302112559.GC22310@pengutronix.de>
+ <1299086585-22707-1-git-send-email-u.kleine-koenig@pengutronix.de>
+ <20110303121153.GJ29521@pengutronix.de>
+ <20110303162513.GS22310@pengutronix.de>
+ <20110303180026.GC18351@pengutronix.de>
+ <20110303201009.GT22310@pengutronix.de>
+ <20110304081916.GB29521@pengutronix.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <4D6ECBDB.6090307@zytor.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20110304081916.GB29521@pengutronix.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "H. Peter Anvin" <hpa@zytor.com>
-Cc: Thomas Gleixner <tglx@linutronix.de>, linux-kbuild <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>
+To: Sascha Hauer <s.hauer@pengutronix.de>
+Cc: Richard Zhao <richard.zhao@freescale.com>, kernel@pengutronix.de, linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org
 
+[added linux-kbuild to Cc:]
 
-* H. Peter Anvin <hpa@zytor.com> wrote:
+Hello,
 
-> On 03/02/2011 01:17 PM, Thomas Gleixner wrote:
-> > On Wed, 2 Mar 2011, H. Peter Anvin wrote:
-> > 
-> >> On 03/02/2011 12:54 PM, Thomas Gleixner wrote:
-> >>>
-> >>> Please lets get rid of known to be broken shite instead of trying to
-> >>> work around it for no good reasons. How old is that crap again ?
-> >>>
-> >>
-> >> 2005-2006.
-> > 
-> > Time enough even for enterprise folks to sort that out. Please kill it
-> > ASAP.
-> > 
-> > Thanks,
-> > 
-> 
-> kbuild people: is there a way to test for a specific assembler version
-> in Kbuild (and error out the build for it?)
+yet another reply to your mail, the last one for today, I promise.
 
-Could we add a testcase for one of the more egregious breakages and bail out then? 
-That way we don't have to get the version information right - broken prereleases 
-would be covered as well.
+> +config ARCH_IMX_MULTI_OMX27
+> +	select ARCH_ALLOW_IMX27
+> +	bool "i.MX27 support"
+s/OMX/IMX/
 
-For example this sequence:
+Other than that is works.  One ugly thing about that patch is that when
+starting with
 
-.irp idx,0,1,2
-.if 0 > \idx
-.endif
-.endr
+ │       *** enable ARM_PATCH_PHYS_VIRT and AUTO_ZRELADDR to get *** │
+ │       *** support for multiple i.MX Families ***                  │
+ │       Select i.MX CPU (i.MX27 support)  --->                      │
+ │     *** MX27 platforms: ***                                       │
+ │ [*] MX27ADS platform                                              │
+ │ [*] Phytec phyCORE-i.MX27 CPU module (pcm038)                     │
 
-Will break on 2.16, right? It builds fine on 2.20.
+and then enabling ARM_PATCH_PHYS_VIRT and AUTO_ZRELADDR this yields
 
-This is how specific GAS functionality is tested in arch/powerpc:
+ │ [ ]   i.MX1 support (NEW)                                         │
+ │ [ ]   i.MX21 support (NEW)                                        │
+ │ [ ]   i.MX25 support (NEW)                                        │
+ │ [ ]   i.MX27 support (NEW)                                        │
+ │ [ ]   i.MX31 and i.MX35 support (NEW)                             │
 
-        @if ! /bin/echo dssall | $(AS) -many -o $(TOUT) >/dev/null 2>&1 ; then \
-                echo -n '*** ${VERSION}.${PATCHLEVEL} kernels no longer build ' ; \
-                echo 'correctly with old versions of binutils.' ; \
-                echo '*** Please upgrade your binutils to 2.12.1 or newer' ; \
-                false ; \
-        fi
+.
 
-This would also be a 'constructive' (and safest) way of blacklisting binutils: we'd 
-really only exclude binutils that is truly buggy.
+At least the machines enabled before are reselected when enabling "i.MX27
+support". Still it would be nice if "i.MX27 support" would be
+autoselected in this case. Any ideas?
+[For those that didn't see Sascha's patch, the construct in
+arch/arm/mach-imx/Kconfig is:
 
-Thanks,
+	config ARCH_ALLOW_IMX1
+		bool
 
-	Ingo
+	config ARCH_ALLOW_IMX21
+		bool
+	...
+
+	if ARM_PATCH_PHYS_VIRT && AUTO_ZRELADDR
+	config ARCH_IMX_MULTI_IMX1
+		select ARCH_ALLOW_IMX1
+		bool "i.MX1 support"
+
+	config ARCH_IMX_MULTI_IMX21
+		select ARCH_ALLOW_IMX21
+		bool "i.MX21 support"
+	...
+	endif
+
+	if !(ARM_PATCH_PHYS_VIRT && AUTO_ZRELADDR)
+	choice
+		prompt "Select i.MX CPU"
+	config ARCH_IMX_ONLY_IMX1
+		select ARCH_ALLOW_IMX1
+		bool "i.MX1 support"
+
+	config ARCH_IMX_ONLY_IMX21
+		select ARCH_ALLOW_IMX21
+		bool "i.MX21 support"
+	...
+	endchoice
+	endif
+]
+
+I merged Sascha's patch into my "move mach-mx3/* to mach-imx" series;
+the tree is provided at
+
+	git://git.pengutronix.de/git/ukl/linux-2.6.git multi-soc-kernel
+
+. As this tree doesn't contain ARM_PATCH_PHYS_VIRT yet, I tested the UI
+with the patch below.
+
+Best regards
+Uwe
+
+diff --git a/arch/arm/mach-imx/Kconfig b/arch/arm/mach-imx/Kconfig
+index cfc398a..f5e0638 100644
+--- a/arch/arm/mach-imx/Kconfig
++++ b/arch/arm/mach-imx/Kconfig
+@@ -106,6 +106,9 @@ config ARCH_ALLOW_IMX31
+ config ARCH_ALLOW_IMX35
+ 	bool
+ 
++config ARM_PATCH_PHYS_VIRT
++	bool "testme"
++
+ if ARM_PATCH_PHYS_VIRT && AUTO_ZRELADDR
+ config ARCH_IMX_MULTI_IMX1
+ 	select ARCH_ALLOW_IMX1
+
+-- 
+Pengutronix e.K.                           | Uwe Kleine-König            |
+Industrial Linux Solutions                 | http://www.pengutronix.de/  |
