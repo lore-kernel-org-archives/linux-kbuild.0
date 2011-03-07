@@ -1,128 +1,62 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from metis.ext.pengutronix.de ([92.198.50.35]:41795 "EHLO
-	metis.ext.pengutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750757Ab1CDW2V (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 4 Mar 2011 17:28:21 -0500
-Date: Fri, 4 Mar 2011 23:28:16 +0100
-From: Uwe =?iso-8859-1?Q?Kleine-K=F6nig?=
-	<u.kleine-koenig@pengutronix.de>
-Subject: Re: [PATCH] ARM: imx: move selection between i.MX21 and i.MX27 to
- CPU family choice
-Message-ID: <20110304222816.GZ22310@pengutronix.de>
-References: <20110302112559.GC22310@pengutronix.de>
- <1299086585-22707-1-git-send-email-u.kleine-koenig@pengutronix.de>
- <20110303121153.GJ29521@pengutronix.de>
- <20110303162513.GS22310@pengutronix.de>
- <20110303180026.GC18351@pengutronix.de>
- <20110303201009.GT22310@pengutronix.de>
- <20110304081916.GB29521@pengutronix.de>
+Received: from trent.utfs.org ([194.246.123.103]:54292 "EHLO trent.utfs.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752200Ab1CGAaA (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 6 Mar 2011 19:30:00 -0500
+Date: Sun, 6 Mar 2011 16:22:21 -0800 (PST)
+From: Christian Kujau <lists@nerdbynature.de>
+Subject: cannot create include/linux/version.h.tmp: Read-only file system
+Message-ID: <alpine.DEB.2.01.1103061600260.23816@trent.utfs.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20110304081916.GB29521@pengutronix.de>
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sascha Hauer <s.hauer@pengutronix.de>
-Cc: Richard Zhao <richard.zhao@freescale.com>, kernel@pengutronix.de, linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org
+To: LKML <linux-kernel@vger.kernel.org>
+Cc: nicolas.2p.debian@free.fr, mmarek@suse.cz, max@stro.at, linux-kbuild@vger.kernel.org
 
-[added linux-kbuild to Cc:]
+Hi,
 
-Hello,
+I'm trying to build a kernel with O= with the kernel source residing 
+on a readonly NFS share. The main build finishes just fine, vmlinux & the 
+modules are all built, but "make deb-pkg" and "make rpm-pkg" fail to 
+build:
 
-yet another reply to your mail, the last one for today, I promise.
+--------------------------
+$ make V=1 O=/mnt/sdb/s0/ deb-pkg
+[...]
+set -e; : '  CHK     include/linux/version.h'; mkdir -p 
+include/linux/; 	
+(echo \#define LINUX_VERSION_CODE 132646; echo '#define 
+KERNEL_VERSION(a,b,c) (((a) << 16) + ((b) << 8) + (c))';) < 
+/usr/local/src/linux-2.6-git/Makefile > include/linux/version.h.tmp; if [ 
+-r include/linux/version.h ] && cmp -s include/linux/version.h 
+include/linux/version.h.tmp; then rm -f include/linux/version.h.tmp; else 
+: '  UPD     include/linux/version.h'; mv -f include/linux/version.h.tmp 
+include/linux/version.h; fi
+/bin/sh: cannot create include/linux/version.h.tmp: Read-only file system
+make[4]: *** [include/linux/version.h] Error 2
 
-> +config ARCH_IMX_MULTI_OMX27
-> +	select ARCH_ALLOW_IMX27
-> +	bool "i.MX27 support"
-s/OMX/IMX/
+--------------------------
+$ make V=1 O=/mnt/sdb/s0/ rpm-pkg
+[...]
+make -f /usr/local/src/linux-2.6-git/scripts/Makefile.clean 
+obj=arch/x86/boot/compressed
+  rm -rf .tmp_versions
+  rm -f vmlinux System.map .tmp_kallsyms* .tmp_version .tmp_vmlinux* 
+.tmp_System.map
+set -e; cd ..; ln -sf /usr/local/src/linux-2.6-git kernel-2.6.38rc7
+ln: creating symbolic link `kernel-2.6.38rc7': Permission denied
+make[2]: *** [rpm-pkg] Error 1
+--------------------------
 
-Other than that is works.  One ugly thing about that patch is that when
-starting with
+The full buidlogs are here: http://nerdbynature.de/bits/2.6.38-rc7/make/
 
- │       *** enable ARM_PATCH_PHYS_VIRT and AUTO_ZRELADDR to get *** │
- │       *** support for multiple i.MX Families ***                  │
- │       Select i.MX CPU (i.MX27 support)  --->                      │
- │     *** MX27 platforms: ***                                       │
- │ [*] MX27ADS platform                                              │
- │ [*] Phytec phyCORE-i.MX27 CPU module (pcm038)                     │
+Note that e.g. "make binrpm-pkg" succeeds and puts the .rpm in $HOME, I 
+wonder if at least deb-pkg could be fixed..?
 
-and then enabling ARM_PATCH_PHYS_VIRT and AUTO_ZRELADDR this yields
-
- │ [ ]   i.MX1 support (NEW)                                         │
- │ [ ]   i.MX21 support (NEW)                                        │
- │ [ ]   i.MX25 support (NEW)                                        │
- │ [ ]   i.MX27 support (NEW)                                        │
- │ [ ]   i.MX31 and i.MX35 support (NEW)                             │
-
-.
-
-At least the machines enabled before are reselected when enabling "i.MX27
-support". Still it would be nice if "i.MX27 support" would be
-autoselected in this case. Any ideas?
-[For those that didn't see Sascha's patch, the construct in
-arch/arm/mach-imx/Kconfig is:
-
-	config ARCH_ALLOW_IMX1
-		bool
-
-	config ARCH_ALLOW_IMX21
-		bool
-	...
-
-	if ARM_PATCH_PHYS_VIRT && AUTO_ZRELADDR
-	config ARCH_IMX_MULTI_IMX1
-		select ARCH_ALLOW_IMX1
-		bool "i.MX1 support"
-
-	config ARCH_IMX_MULTI_IMX21
-		select ARCH_ALLOW_IMX21
-		bool "i.MX21 support"
-	...
-	endif
-
-	if !(ARM_PATCH_PHYS_VIRT && AUTO_ZRELADDR)
-	choice
-		prompt "Select i.MX CPU"
-	config ARCH_IMX_ONLY_IMX1
-		select ARCH_ALLOW_IMX1
-		bool "i.MX1 support"
-
-	config ARCH_IMX_ONLY_IMX21
-		select ARCH_ALLOW_IMX21
-		bool "i.MX21 support"
-	...
-	endchoice
-	endif
-]
-
-I merged Sascha's patch into my "move mach-mx3/* to mach-imx" series;
-the tree is provided at
-
-	git://git.pengutronix.de/git/ukl/linux-2.6.git multi-soc-kernel
-
-. As this tree doesn't contain ARM_PATCH_PHYS_VIRT yet, I tested the UI
-with the patch below.
-
-Best regards
-Uwe
-
-diff --git a/arch/arm/mach-imx/Kconfig b/arch/arm/mach-imx/Kconfig
-index cfc398a..f5e0638 100644
---- a/arch/arm/mach-imx/Kconfig
-+++ b/arch/arm/mach-imx/Kconfig
-@@ -106,6 +106,9 @@ config ARCH_ALLOW_IMX31
- config ARCH_ALLOW_IMX35
- 	bool
- 
-+config ARM_PATCH_PHYS_VIRT
-+	bool "testme"
-+
- if ARM_PATCH_PHYS_VIRT && AUTO_ZRELADDR
- config ARCH_IMX_MULTI_IMX1
- 	select ARCH_ALLOW_IMX1
-
+Thanks,
+Christian.
 -- 
-Pengutronix e.K.                           | Uwe Kleine-König            |
-Industrial Linux Solutions                 | http://www.pengutronix.de/  |
+BOFH excuse #3:
+
+electromagnetic radiation from satellite debris
