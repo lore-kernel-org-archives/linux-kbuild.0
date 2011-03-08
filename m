@@ -1,75 +1,67 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ey0-f174.google.com ([209.85.215.174]:57583 "EHLO
-	mail-ey0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753611Ab1CHV70 convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 8 Mar 2011 16:59:26 -0500
-MIME-Version: 1.0
-In-Reply-To: <1299619716.22236.32.camel@pasglop>
-References: <4D6E8932.1010405@zytor.com> <alpine.LFD.2.00.1103022152420.2701@localhost6.localdomain6>
- <4D6EB07C.5040004@zytor.com> <alpine.LFD.2.00.1103022216180.2701@localhost6.localdomain6>
- <4D6ECBDB.6090307@zytor.com> <20110303083035.GB14854@elte.hu>
- <AANLkTik4aTN8+Ob_GVwF17v6pDNGg2DEZJubBazs2e3L@mail.gmail.com> <1299619716.22236.32.camel@pasglop>
-From: Kyle Moffett <kyle@moffetthome.net>
-Date: Tue, 8 Mar 2011 16:59:05 -0500
-Message-ID: <AANLkTikAnb39XhR0hdZAzTKGJ-P1rH+ZxtD+Dea7-364@mail.gmail.com>
+Received: from gate.crashing.org ([63.228.1.57]:33453 "EHLO gate.crashing.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754819Ab1CHXOT (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 8 Mar 2011 18:14:19 -0500
 Subject: Re: RFC: x86: kill binutils 2.16.x?
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+In-Reply-To: <AANLkTikAnb39XhR0hdZAzTKGJ-P1rH+ZxtD+Dea7-364@mail.gmail.com>
+References: <4D6E8932.1010405@zytor.com>
+	 <alpine.LFD.2.00.1103022152420.2701@localhost6.localdomain6>
+	 <4D6EB07C.5040004@zytor.com>
+	 <alpine.LFD.2.00.1103022216180.2701@localhost6.localdomain6>
+	 <4D6ECBDB.6090307@zytor.com> <20110303083035.GB14854@elte.hu>
+	 <AANLkTik4aTN8+Ob_GVwF17v6pDNGg2DEZJubBazs2e3L@mail.gmail.com>
+	 <1299619716.22236.32.camel@pasglop>
+	 <AANLkTikAnb39XhR0hdZAzTKGJ-P1rH+ZxtD+Dea7-364@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Date: Wed, 09 Mar 2011 10:13:28 +1100
+Message-ID: <1299626008.22236.47.camel@pasglop>
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+To: Kyle Moffett <kyle@moffetthome.net>
 Cc: Ingo Molnar <mingo@elte.hu>, "H. Peter Anvin" <hpa@zytor.com>, Thomas Gleixner <tglx@linutronix.de>, linux-kbuild <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>, linuxppc-dev@lists.ozlabs.org, Kyle Moffett <Kyle.D.Moffett@boeing.com>, Kumar Gala <kumar.gala@freescale.com>
 
-On Tue, Mar 8, 2011 at 16:28, Benjamin Herrenschmidt
-<benh@kernel.crashing.org> wrote:
-> On Tue, 2011-03-08 at 14:57 -0500, Kyle Moffett wrote:
->> Specifically the e500 doesn't have a normal PowerPC FPU, it has a
->> custom FPU built using extended integer registers instead, and it
->> happens to borrow the AltiVec opcode range to do it.
->>
->> When trying to port Debian to the platform we were getting SIGILL's
->> all over the place until binutils got updated to reject all of the
->> unsupported opcodes on this particular platform.  Now of course we get
->> build errors, but that's a lot easier to debug and fix. :-D
->>
->> Basically, binutils no longer supports "-many" (because too many
->> opcodes conflict), and the test itself would fail anyways (because
->> "dssall" is not valid on "any" PowerPC).
->
-> Note that this freescale "SPE" fiasco is just that ... a fiasco :-) I
-> don't think there's that many cases of opcode overlap outside of it.
+On Tue, 2011-03-08 at 16:59 -0500, Kyle Moffett wrote:
+> 
+> The problem is not with the kernel compile itself, but with the 2.12
+> "dssall" binutils test.  Basically, recent binutils treats e500 as
+> effectively a separate architecture that happens to share *most* of
+> the opcodes with regular PowerPC. 
 
-I absolutely agree on the "fiasco" part, although I'm pretty sure that
-there's a large number of incompatible ARM variants (even 16-bit vs.
-32-bit opcodes).  Unfortunately there's a lot of shipped hardware to
-be supported and maintained...
+This is bogus. Newer e500 don't have that SPE crap afaik and BookI and
+II of the architecture have been converged. In fact, Scott, don't newer
+FSL chips also support real lwsync ?
 
+>  Any opcode which is not understood
+> by the e500 chip is either convert to an equivalent opcode which is
+> understood (IE: lwsync => sync), or failed with an error.  This means
+> that the kernel compile aborts early telling me to upgrade to a newer
+> version of binutils.
 
-> Now regarding the kernel, the best is probably for nasty cases like that
-> to use hand coded opcodes (see ppc-opcodes.h) and stick to a more
-> "generic" setting for binutils, since it should be possible to build
-> kernels that support multiple types of BookE CPUs with different
-> floating point units.
+This is more bogosity in binutils. lwsync is designed to fallback as
+sync if not supported in -HW-, binutils shouldn't silently swallow it.
 
-The problem is not with the kernel compile itself, but with the 2.12
-"dssall" binutils test.  Basically, recent binutils treats e500 as
-effectively a separate architecture that happens to share *most* of
-the opcodes with regular PowerPC.  Any opcode which is not understood
-by the e500 chip is either convert to an equivalent opcode which is
-understood (IE: lwsync => sync), or failed with an error.  This means
-that the kernel compile aborts early telling me to upgrade to a newer
-version of binutils.
+Or is it that FSL failed on the original e500 and make lwsync actually
+trap ?
 
-This was *critical* for getting an actual Debian distribution
-bootstrapped on the e500 cores, because so much software assumes
-PowerPC == altivec (ffmpeg), hardcodes 'asm("lwsync")' for memory
-barriers (80+ packages in Debian), or includes hand-coded
-floating-point ASM instructions (libffi).  Noisy build errors are
-better than silent runtime failures any day of the week.
+> This was *critical* for getting an actual Debian distribution
+> bootstrapped on the e500 cores, because so much software assumes
+> PowerPC == altivec (ffmpeg), hardcodes 'asm("lwsync")' for memory
+> barriers (80+ packages in Debian), or includes hand-coded
+> floating-point ASM instructions (libffi).  Noisy build errors are
+> better than silent runtime failures any day of the week.
+> 
+> At the very least that test needs to be turned off if
+> CONFIG_ALTIVEC=n, because the kernel builds and runs fine otherwise.
 
-At the very least that test needs to be turned off if
-CONFIG_ALTIVEC=n, because the kernel builds and runs fine otherwise.
+I think the right thing is to keep that as e500-legacy or something,
+because afaik, newer e500's don't have most of these issues and could be
+treated as "normal" powerpc again.
 
 Cheers,
-Kyle Moffett
+Ben.
+
+
