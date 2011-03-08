@@ -1,52 +1,68 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from gate.crashing.org ([63.228.1.57]:45088 "EHLO gate.crashing.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755777Ab1CHVaK (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 8 Mar 2011 16:30:10 -0500
+Received: from am1ehsobe003.messaging.microsoft.com ([213.199.154.206]:21774
+	"EHLO AM1EHSOBE003.bigfish.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751471Ab1CHV7I (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 8 Mar 2011 16:59:08 -0500
+Date: Tue, 8 Mar 2011 15:56:30 -0600
+From: Scott Wood <scottwood@freescale.com>
 Subject: Re: RFC: x86: kill binutils 2.16.x?
-From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
-In-Reply-To: <AANLkTik4aTN8+Ob_GVwF17v6pDNGg2DEZJubBazs2e3L@mail.gmail.com>
+Message-ID: <20110308155630.1eb6f67d@schlenkerla>
+In-Reply-To: <1299619716.22236.32.camel@pasglop>
 References: <4D6E8932.1010405@zytor.com>
-	 <alpine.LFD.2.00.1103022152420.2701@localhost6.localdomain6>
-	 <4D6EB07C.5040004@zytor.com>
-	 <alpine.LFD.2.00.1103022216180.2701@localhost6.localdomain6>
-	 <4D6ECBDB.6090307@zytor.com> <20110303083035.GB14854@elte.hu>
-	 <AANLkTik4aTN8+Ob_GVwF17v6pDNGg2DEZJubBazs2e3L@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Date: Wed, 09 Mar 2011 08:28:36 +1100
-Message-ID: <1299619716.22236.32.camel@pasglop>
-Mime-Version: 1.0
+	<alpine.LFD.2.00.1103022152420.2701@localhost6.localdomain6>
+	<4D6EB07C.5040004@zytor.com>
+	<alpine.LFD.2.00.1103022216180.2701@localhost6.localdomain6>
+	<4D6ECBDB.6090307@zytor.com>
+	<20110303083035.GB14854@elte.hu>
+	<AANLkTik4aTN8+Ob_GVwF17v6pDNGg2DEZJubBazs2e3L@mail.gmail.com>
+	<1299619716.22236.32.camel@pasglop>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="US-ASCII"
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Kyle Moffett <kyle@moffetthome.net>
-Cc: Ingo Molnar <mingo@elte.hu>, "H. Peter Anvin" <hpa@zytor.com>, Thomas Gleixner <tglx@linutronix.de>, linux-kbuild <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>, linuxppc-dev@lists.ozlabs.org, Kyle Moffett <Kyle.D.Moffett@boeing.com>, Kumar Gala <kumar.gala@freescale.com>
+To: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+Cc: Kyle Moffett <kyle@moffetthome.net>, Andrew Morton <akpm@linux-foundation.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Kumar Gala <kumar.gala@freescale.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Kyle Moffett <Kyle.D.Moffett@boeing.com>, "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@elte.hu>, linuxppc-dev@lists.ozlabs.org, Thomas Gleixner <tglx@linutronix.de>
 
-On Tue, 2011-03-08 at 14:57 -0500, Kyle Moffett wrote:
+On Wed, 9 Mar 2011 08:28:36 +1100
+Benjamin Herrenschmidt <benh@kernel.crashing.org> wrote:
+
+> On Tue, 2011-03-08 at 14:57 -0500, Kyle Moffett wrote:
+> > 
+> > Specifically the e500 doesn't have a normal PowerPC FPU, it has a
+> > custom FPU built using extended integer registers instead, and it
+> > happens to borrow the AltiVec opcode range to do it.
+> > 
+> > When trying to port Debian to the platform we were getting SIGILL's
+> > all over the place until binutils got updated to reject all of the
+> > unsupported opcodes on this particular platform.  Now of course we get
+> > build errors, but that's a lot easier to debug and fix. :-D
+> > 
+> > Basically, binutils no longer supports "-many" (because too many
+> > opcodes conflict), and the test itself would fail anyways (because
+> > "dssall" is not valid on "any" PowerPC). 
 > 
-> Specifically the e500 doesn't have a normal PowerPC FPU, it has a
-> custom FPU built using extended integer registers instead, and it
-> happens to borrow the AltiVec opcode range to do it.
+> Note that this freescale "SPE" fiasco is just that ... a fiasco :-) I
+> don't think there's that many cases of opcode overlap outside of it.
 > 
-> When trying to port Debian to the platform we were getting SIGILL's
-> all over the place until binutils got updated to reject all of the
-> unsupported opcodes on this particular platform.  Now of course we get
-> build errors, but that's a lot easier to debug and fix. :-D
-> 
-> Basically, binutils no longer supports "-many" (because too many
-> opcodes conflict), and the test itself would fail anyways (because
-> "dssall" is not valid on "any" PowerPC). 
+> Now regarding the kernel, the best is probably for nasty cases like that
+> to use hand coded opcodes (see ppc-opcodes.h) and stick to a more
+> "generic" setting for binutils, since it should be possible to build
+> kernels that support multiple types of BookE CPUs with different
+> floating point units.
 
-Note that this freescale "SPE" fiasco is just that ... a fiasco :-) I
-don't think there's that many cases of opcode overlap outside of it.
+Combined kernels between e500v1/2 and e500mc are currently not supported
+for other reasons (current kconfig doesn't prohibit it, but it doesn't
+work), such as a cache line size difference (a hardcoded L1_CACHE_BYTES is
+used in various places for loops), an inability to enable SPE when e500mc
+is enabled, etc.
 
-Now regarding the kernel, the best is probably for nasty cases like that
-to use hand coded opcodes (see ppc-opcodes.h) and stick to a more
-"generic" setting for binutils, since it should be possible to build
-kernels that support multiple types of BookE CPUs with different
-floating point units.
+Kumar recently internally said we're not going to bother making it work.
+I'm inclined to agree, given you can't even run the same userspace (unless
+you don't use hard floating point at all).  It's one thing to not want to
+require a separate kernel for each board, but there's a point of
+diminishing returns.
 
-Cheers,
-Ben.
-
+-Scott
 
