@@ -1,35 +1,63 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-bw0-f46.google.com ([209.85.214.46]:50699 "EHLO
-	mail-bw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756512Ab1CGXgp (ORCPT
+Received: from mail-ey0-f174.google.com ([209.85.215.174]:47686 "EHLO
+	mail-ey0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756170Ab1CHT5u convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 7 Mar 2011 18:36:45 -0500
-Received: by bwz15 with SMTP id 15so4178152bwz.19
-        for <linux-kbuild@vger.kernel.org>; Mon, 07 Mar 2011 15:36:43 -0800 (PST)
+	Tue, 8 Mar 2011 14:57:50 -0500
 MIME-Version: 1.0
-In-Reply-To: <86ipw1x452.fsf@peer.zerties.org>
-References: <AANLkTinBrt-fr_e61thAqLO-MN90BA6a28Lain8u__sR@mail.gmail.com>
-	<86ipw1x452.fsf@peer.zerties.org>
-Date: Tue, 8 Mar 2011 00:36:43 +0100
-Message-ID: <AANLkTik843JCzkpa4KhPkAszpjSyyv0NPVc-LhN0-sDD@mail.gmail.com>
-Subject: Re: Minimal kernel config generator based on Kconfig language
-From: Filip Honckiewicz <f.honckiewicz@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
+In-Reply-To: <20110303083035.GB14854@elte.hu>
+References: <4D6E8932.1010405@zytor.com> <alpine.LFD.2.00.1103022152420.2701@localhost6.localdomain6>
+ <4D6EB07C.5040004@zytor.com> <alpine.LFD.2.00.1103022216180.2701@localhost6.localdomain6>
+ <4D6ECBDB.6090307@zytor.com> <20110303083035.GB14854@elte.hu>
+From: Kyle Moffett <kyle@moffetthome.net>
+Date: Tue, 8 Mar 2011 14:57:29 -0500
+Message-ID: <AANLkTik4aTN8+Ob_GVwF17v6pDNGg2DEZJubBazs2e3L@mail.gmail.com>
+Subject: Re: RFC: x86: kill binutils 2.16.x?
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Christian Dietrich <stettberger@dokucode.de>
-Cc: linux-kbuild@vger.kernel.org, vamos-dev@lists.informatik.uni-erlangen.de
+To: Ingo Molnar <mingo@elte.hu>
+Cc: "H. Peter Anvin" <hpa@zytor.com>, Thomas Gleixner <tglx@linutronix.de>, linux-kbuild <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, linuxppc-dev@lists.ozlabs.org, Kyle Moffett <Kyle.D.Moffett@boeing.com>, Kumar Gala <kumar.gala@freescale.com>
 
-Hello,
+On Thu, Mar 3, 2011 at 03:30, Ingo Molnar <mingo@elte.hu> wrote:
+> This is how specific GAS functionality is tested in arch/powerpc:
+>
+>        @if ! /bin/echo dssall | $(AS) -many -o $(TOUT) >/dev/null 2>&1 ; then \
+>                echo -n '*** ${VERSION}.${PATCHLEVEL} kernels no longer build ' ; \
+>                echo 'correctly with old versions of binutils.' ; \
+>                echo '*** Please upgrade your binutils to 2.12.1 or newer' ; \
+>                false ; \
+>        fi
+>
+> This would also be a 'constructive' (and safest) way of blacklisting binutils: we'd
+> really only exclude binutils that is truly buggy.
 
-I had no internet for few days and couldn't check the links you sent
-(now I'll do it as soon as possible), but I would like to thank you
-Christian for response and tips about upper bound, lower bound and how
-to understand dependencies and selects. There are many other
-attributes which I'm not sure of semantics, but I try to understand it
-testing make menuconfig and watching differences in generated .config
-or checking mconf code. I am very appreciate for your help.
+Hrm... well... actually...
 
-It would be nice to have semantics explained in documentation btw
+It's funny that you brought up this particular case.  While I agree
+that it's good in general, it's causing problems for me building a
+kernel using a recent e500 gcc/binutils (triplet
+"powerpc-linux-gnuspe").
 
-Filip
+Specifically the e500 doesn't have a normal PowerPC FPU, it has a
+custom FPU built using extended integer registers instead, and it
+happens to borrow the AltiVec opcode range to do it.
+
+When trying to port Debian to the platform we were getting SIGILL's
+all over the place until binutils got updated to reject all of the
+unsupported opcodes on this particular platform.  Now of course we get
+build errors, but that's a lot easier to debug and fix. :-D
+
+Basically, binutils no longer supports "-many" (because too many
+opcodes conflict), and the test itself would fail anyways (because
+"dssall" is not valid on "any" PowerPC).
+
+So while I think that it is entirely reasonable to add a similar test
+for buggy x86 binutils, I'm actually about to send a patch to remove
+that particular check from the powerpc Makefile.  Since the "required"
+binutils 2.12.1 was released in May 2002 (almost 9 years ago) it's
+probably not even worth testing for anymore.
+
+Cheers,
+Kyle Moffett
