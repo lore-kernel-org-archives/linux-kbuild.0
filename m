@@ -1,61 +1,37 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx3.mail.elte.hu ([157.181.1.138]:58796 "EHLO mx3.mail.elte.hu"
+Received: from mail.perches.com ([173.55.12.10]:4152 "EHLO mail.perches.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751984Ab1CIPLt (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 9 Mar 2011 10:11:49 -0500
-Date: Wed, 9 Mar 2011 16:11:34 +0100
-From: Ingo Molnar <mingo@elte.hu>
-Subject: Re: [PATCH -v5] kbuild: Add extra gcc checks
-Message-ID: <20110309151134.GA15730@elte.hu>
-References: <20110301083529.GA767@liondog.tnic>
- <20110309144504.GA1096@sepie.suse.cz>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20110309144504.GA1096@sepie.suse.cz>
+	id S1751367Ab1CIRWy (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 9 Mar 2011 12:22:54 -0500
+Subject: Re: problem with ccflags := -Werror in Makefiles when building
+ with gcc 4.6.0
+From: Joe Perches <joe@perches.com>
+In-Reply-To: <AANLkTi=3xRFt-p+HUMWwTUcUzFaxY6y9bovJiqdHTwrn@mail.gmail.com>
+References: <AANLkTi=3xRFt-p+HUMWwTUcUzFaxY6y9bovJiqdHTwrn@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Date: Wed, 09 Mar 2011 09:22:50 -0800
+Message-ID: <1299691370.20104.127.camel@Joe-Laptop>
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: Borislav Petkov <bp@alien8.de>, Arnd Bergmann <arnd@arndb.de>, Sam Ravnborg <sam@ravnborg.org>, torvalds@linux-foundation.org, x86@kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, bp@amd64.org
+To: Douglas Mencken <dougmencken@gmail.com>
+Cc: linux-kernel@vger.kernel.org, Borislav Petkov <bp@alien8.de>, Michal Marek <mmarek@suse.cz>, Sam Ravnborg <sam@ravnborg.org>, Ingo Molnar <mingo@elte.hu>, linux-kbuild <linux-kbuild@vger.kernel.org>
+
+On Wed, 2011-03-09 at 17:28 +0100, Douglas Mencken wrote:
+> When building with gcc 4.6.0 with the new type of warnings introduced,
+> -Wunused-but-set-variable, many directories with ccflags set to
+> -Werror in Makefile fail to build.
+
+After the kbuild W=<level> gets accepted,
+it might be reasonable to add another W
+level to make warnings fatal and remove
+all -Werror entries from the various Makefiles.
+
+See Borislav's patch
+https://lkml.org/lkml/2011/3/1/76
+
+and Ingo's idea
+https://lkml.org/lkml/2011/3/9/186
 
 
-* Michal Marek <mmarek@suse.cz> wrote:
-
-> On Tue, Mar 01, 2011 at 09:35:29AM +0100, Borislav Petkov wrote:
-> > Add a 'W=1' Makefile switch which adds additional checking per build
-> > object.
-> > 
-> > The idea behind this option is targeted at developers who, in the
-> > process of writing their code, want to do the occasional
-> > 
-> > make W=1 [target.o]
-> > 
-> > and let gcc do more extensive code checking for them. Then, they
-> > could eyeball the output for valid gcc warnings about various
-> > bugs/discrepancies which are not reported during the normal build
-> > process.
-> > 
-> > For more background information and a use case, read through this
-> > thread: http://marc.info/?l=kernel-janitors&m=129802065918147&w=2
-> > 
-> > -v5: Document internal kbuild variable which is introduced by this.
-> > Simplify assignment.
-> 
-> Thanks, applied to kbuild-2.6.git#packaging. If someone comes up with a
-> good selection of warnings for W=1 and W=2, we can change it later.
-
-Another, related, very nice kbuild feature would be to allow for arch maintainers to 
-mark certain files as "should only build fine without warnings" - i.e. -Werror 
-should be the default. There would be a Kconfig feature to opt out of this, 
-CONFIG_CC_IGNORE_WARNINGS=y or so. This would allow for people to still build the 
-kernel with old (or buggy) versions of GCC.
-
-arch/x86/ would start using this by gradually marking more and more files as -Werror 
-by default. Some architectures like arch/sparc/ and arch/powerpc/ already build with 
--Werror enabled - but for arch/x86/ we cannot force this (we cannot break the build 
-for who knows how many people) so we want to do it gradually and with a way out for 
-users with buggy compilers.
-
-Thanks,
-
-	Ingo
