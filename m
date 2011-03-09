@@ -1,37 +1,39 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepa.post.tele.dk ([195.41.46.235]:33411 "EHLO
+Received: from pfepa.post.tele.dk ([195.41.46.235]:34007 "EHLO
 	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757128Ab1CIR42 (ORCPT
+	with ESMTP id S1755546Ab1CISAi (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 9 Mar 2011 12:56:28 -0500
-Date: Wed, 9 Mar 2011 18:56:25 +0100
+	Wed, 9 Mar 2011 13:00:38 -0500
+Date: Wed, 9 Mar 2011 19:00:37 +0100
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH -v5] kbuild: Add extra gcc checks
-Message-ID: <20110309175625.GA29181@merkur.ravnborg.org>
-References: <20110301083529.GA767@liondog.tnic> <20110309144504.GA1096@sepie.suse.cz> <20110309151134.GA15730@elte.hu>
+Subject: Re: problem with ccflags := -Werror in Makefiles when building
+	with gcc 4.6.0
+Message-ID: <20110309180037.GA29233@merkur.ravnborg.org>
+References: <AANLkTi=3xRFt-p+HUMWwTUcUzFaxY6y9bovJiqdHTwrn@mail.gmail.com> <1299691370.20104.127.camel@Joe-Laptop>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20110309151134.GA15730@elte.hu>
+In-Reply-To: <1299691370.20104.127.camel@Joe-Laptop>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ingo Molnar <mingo@elte.hu>
-Cc: Michal Marek <mmarek@suse.cz>, Borislav Petkov <bp@alien8.de>, Arnd Bergmann <arnd@arndb.de>, torvalds@linux-foundation.org, x86@kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, bp@amd64.org
+To: Joe Perches <joe@perches.com>
+Cc: Douglas Mencken <dougmencken@gmail.com>, linux-kernel@vger.kernel.org, Borislav Petkov <bp@alien8.de>, Michal Marek <mmarek@suse.cz>, Ingo Molnar <mingo@elte.hu>, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-> Another, related, very nice kbuild feature would be to allow for arch maintainers to 
-> mark certain files as "should only build fine without warnings" - i.e. -Werror 
-> should be the default. There would be a Kconfig feature to opt out of this, 
-> CONFIG_CC_IGNORE_WARNINGS=y or so. This would allow for people to still build the 
-> kernel with old (or buggy) versions of GCC.
+On Wed, Mar 09, 2011 at 09:22:50AM -0800, Joe Perches wrote:
+> On Wed, 2011-03-09 at 17:28 +0100, Douglas Mencken wrote:
+> > When building with gcc 4.6.0 with the new type of warnings introduced,
+> > -Wunused-but-set-variable, many directories with ccflags set to
+> > -Werror in Makefile fail to build.
+> 
+> After the kbuild W=<level> gets accepted,
+> it might be reasonable to add another W
+> level to make warnings fatal and remove
+> all -Werror entries from the various Makefiles.
 
-To add -Werror for all files conditionally you can do:
+It does not make sense to remove -Werror.
+They are there by default.
 
-    ccflags-$(CONFIG_WERROR) += -Werror
-
-For individual files we can then drop -Werror like this:
-
-    CFLAGS_REMOVE_foobar.o := -Werror
-
-So it should be doable with the existing infrastructure.
+It is just plain wrong to go removing -Werror that has been there for ages.
+Either we fix the warnings or we tell gcc to shut up.
 
 	Sam
