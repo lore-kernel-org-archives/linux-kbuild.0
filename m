@@ -1,13 +1,12 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from s15228384.onlinehome-server.info ([87.106.30.177]:44251 "EHLO
-	mail.x86-64.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757069Ab1CIPGc (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 9 Mar 2011 10:06:32 -0500
-Date: Wed, 9 Mar 2011 16:06:18 +0100
-From: Borislav Petkov <bp@amd64.org>
+Received: from mx3.mail.elte.hu ([157.181.1.138]:58796 "EHLO mx3.mail.elte.hu"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751984Ab1CIPLt (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 9 Mar 2011 10:11:49 -0500
+Date: Wed, 9 Mar 2011 16:11:34 +0100
+From: Ingo Molnar <mingo@elte.hu>
 Subject: Re: [PATCH -v5] kbuild: Add extra gcc checks
-Message-ID: <20110309150618.GA2368@aftab>
+Message-ID: <20110309151134.GA15730@elte.hu>
 References: <20110301083529.GA767@liondog.tnic>
  <20110309144504.GA1096@sepie.suse.cz>
 MIME-Version: 1.0
@@ -17,9 +16,11 @@ In-Reply-To: <20110309144504.GA1096@sepie.suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Michal Marek <mmarek@suse.cz>
-Cc: Borislav Petkov <bp@alien8.de>, Arnd Bergmann <arnd@arndb.de>, Sam Ravnborg <sam@ravnborg.org>, "torvalds@linux-foundation.org" <torvalds@linux-foundation.org>, "x86@kernel.org" <x86@kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Ingo Molnar <mingo@elte.hu>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "bp@amd64.org" <bp@amd64.org>
+Cc: Borislav Petkov <bp@alien8.de>, Arnd Bergmann <arnd@arndb.de>, Sam Ravnborg <sam@ravnborg.org>, torvalds@linux-foundation.org, x86@kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, bp@amd64.org
 
-On Wed, Mar 09, 2011 at 09:45:04AM -0500, Michal Marek wrote:
+
+* Michal Marek <mmarek@suse.cz> wrote:
+
 > On Tue, Mar 01, 2011 at 09:35:29AM +0100, Borislav Petkov wrote:
 > > Add a 'W=1' Makefile switch which adds additional checking per build
 > > object.
@@ -43,17 +44,18 @@ On Wed, Mar 09, 2011 at 09:45:04AM -0500, Michal Marek wrote:
 > Thanks, applied to kbuild-2.6.git#packaging. If someone comes up with a
 > good selection of warnings for W=1 and W=2, we can change it later.
 
-Yeah, I was going to do that but am terribly busy at the moment. I'll do
-an initial proposal against your kbuild branch when I get a chance.
+Another, related, very nice kbuild feature would be to allow for arch maintainers to 
+mark certain files as "should only build fine without warnings" - i.e. -Werror 
+should be the default. There would be a Kconfig feature to opt out of this, 
+CONFIG_CC_IGNORE_WARNINGS=y or so. This would allow for people to still build the 
+kernel with old (or buggy) versions of GCC.
 
-Thanks.
+arch/x86/ would start using this by gradually marking more and more files as -Werror 
+by default. Some architectures like arch/sparc/ and arch/powerpc/ already build with 
+-Werror enabled - but for arch/x86/ we cannot force this (we cannot break the build 
+for who knows how many people) so we want to do it gradually and with a way out for 
+users with buggy compilers.
 
--- 
-Regards/Gruss,
-Boris.
+Thanks,
 
-Advanced Micro Devices GmbH
-Einsteinring 24, 85609 Dornach
-General Managers: Alberto Bozzo, Andrew Bowd
-Registration: Dornach, Gemeinde Aschheim, Landkreis Muenchen
-Registergericht Muenchen, HRB Nr. 43632
+	Ingo
