@@ -1,50 +1,70 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from gate.crashing.org ([63.228.1.57]:34822 "EHLO gate.crashing.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S932179Ab1CIEk2 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 8 Mar 2011 23:40:28 -0500
-Message-ID: <62749.94.211.195.167.1299645589.squirrel@gate.crashing.org>
-In-Reply-To: <AANLkTikAnb39XhR0hdZAzTKGJ-P1rH+ZxtD+Dea7-364@mail.gmail.com>
-References: <4D6E8932.1010405@zytor.com>
-    <alpine.LFD.2.00.1103022152420.2701@localhost6.localdomain6>
-    <4D6EB07C.5040004@zytor.com>
-    <alpine.LFD.2.00.1103022216180.2701@localhost6.localdomain6>
-    <4D6ECBDB.6090307@zytor.com> <20110303083035.GB14854@elte.hu>
-    <AANLkTik4aTN8+Ob_GVwF17v6pDNGg2DEZJubBazs2e3L@mail.gmail.com>
-    <1299619716.22236.32.camel@pasglop>
-    <AANLkTikAnb39XhR0hdZAzTKGJ-P1rH+ZxtD+Dea7-364@mail.gmail.com>
-Date: Wed, 9 Mar 2011 05:39:49 +0100 (CET)
-Subject: Re: RFC: x86: kill binutils 2.16.x?
-From: "Segher Boessenkool" <segher@kernel.crashing.org>
+Received: from mail-ew0-f46.google.com ([209.85.215.46]:33307 "EHLO
+	mail-ew0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751156Ab1CIF15 convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 9 Mar 2011 00:27:57 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7BIT
+From: Kyle Moffett <kyle@moffetthome.net>
+Date: Wed, 9 Mar 2011 00:22:11 -0500
+Message-ID: <AANLkTi=PXwh7ZCT1hW=OgBSH_U5CXaDt7yj+dSjfstJU@mail.gmail.com>
+Subject: powerpc/e500: binutils tests [Was: RFC: x86: kill binutils 2.16.x?]
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Kyle Moffett <kyle@moffetthome.net>
-Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>, Ingo Molnar <mingo@elte.hu>, "H. Peter Anvin" <hpa@zytor.com>, Thomas Gleixner <tglx@linutronix.de>, linux-kbuild <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>, linuxppc-dev@lists.ozlabs.org, Kyle Moffett <kyle.d.moffett@boeing.com>, Kumar Gala <kumar.gala@freescale.com>
+To: Segher Boessenkool <segher@kernel.crashing.org>
+Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>, Ingo Molnar <mingo@elte.hu>, "H. Peter Anvin" <hpa@zytor.com>, Thomas Gleixner <tglx@linutronix.de>, linux-kbuild <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>, linuxppc-dev@lists.ozlabs.org, Kyle Moffett <kyle.d.moffett@boeing.com>, Kumar Gala <kumar.gala@freescale.com>, sebastian@breakpoint.cc
 
-> The problem is not with the kernel compile itself, but with the 2.12
-> "dssall" binutils test.  Basically, recent binutils treats e500 as
-> effectively a separate architecture that happens to share *most* of
-> the opcodes with regular PowerPC.  Any opcode which is not understood
-> by the e500 chip is either convert to an equivalent opcode which is
-> understood (IE: lwsync => sync), or failed with an error.  This means
-> that the kernel compile aborts early telling me to upgrade to a newer
-> version of binutils.
+On Tue, Mar 8, 2011 at 23:39, Segher Boessenkool
+<segher@kernel.crashing.org> wrote:
+>> The problem is not with the kernel compile itself, but with the 2.12
+>> "dssall" binutils test.  Basically, recent binutils treats e500 as
+>> effectively a separate architecture that happens to share *most* of
+>> the opcodes with regular PowerPC.  Any opcode which is not understood
+>> by the e500 chip is either convert to an equivalent opcode which is
+>> understood (IE: lwsync => sync), or failed with an error.  This means
+>> that the kernel compile aborts early telling me to upgrade to a newer
+>> version of binutils.
+>
+> $ echo dssall | powerpc-linux-as -many -me500
+> $ powerpc-linux-objdump -d a.out | grep 0:
+>   0:   7e 00 06 6c     dssall
+> $ powerpc-linux-as --version | head -1
+> GNU assembler (GNU Binutils) 2.21.51.20110309
+>
+> What version of binutils does not work?  (I also checked with
+> -me500x2, -me500mc, -mspe, and various combinations.  lwsync
+> is indeed converted to a regular sync (well, "msync") for e500
+> and e500x2).
 
-$ echo dssall | powerpc-linux-as -many -me500
-$ powerpc-linux-objdump -d a.out | grep 0:
-   0:   7e 00 06 6c     dssall
-$ powerpc-linux-as --version | head -1
-GNU assembler (GNU Binutils) 2.21.51.20110309
+Hmm, something's fishy here.
 
+Just going based on this changeset, the floating point and AltiVec
+opcodes are *supposed* to generate hard errors:
+  http://sourceware.org/ml/binutils-cvs/2010-06/msg00070.html
 
-What version of binutils does not work?  (I also checked with
--me500x2, -me500mc, -mspe, and various combinations.  lwsync
-is indeed converted to a regular sync (well, "msync") for e500
-and e500x2).
+Oh... that patch only disables the opcodes if "-many" is not specified.
 
+Aha! The native compiler on my Debian e500 boxes right now is hidden
+behind a small wrapper script which removes "-many" and "-Wa,-many"
+and generates errors for anything else that isn't "-me500".  My GCC
+also excludes the "-many" option when calling the linker directly.
 
-Segher
+So I think this is only a "local" problem right now, actually, sorry
+for the noise and confusion.  If I log into that system and run "echo
+dssall | as", I get the expected hard error, and due to the wrapper
+scripts in place I get the same error from "echo dssall | as -me500x2
+-many"
 
+Unfortunately I still need to have the assembler generate hard errors
+when someone tries to natively compile code with AltiVec or
+classic-FPU instructions, otherwise I have no way of detecting
+unported software at build-time.
+
+Would a patch to make the Altivec "dssall" test conditional on
+CONFIG_ALTIVEC be acceptable?  That really is the only test that
+causes the kernel compile to fail with the strict wrappers.
+
+Cheers,
+Kyle Moffett
