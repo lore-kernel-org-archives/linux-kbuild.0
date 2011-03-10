@@ -1,38 +1,97 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from moutng.kundenserver.de ([212.227.17.9]:52535 "EHLO
-	moutng.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752200Ab1CJL4T (ORCPT
+Received: from hrndva-omtalb.mail.rr.com ([71.74.56.123]:54307 "EHLO
+	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751533Ab1CJRhf (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 10 Mar 2011 06:56:19 -0500
-From: Arnd Bergmann <arnd@arndb.de>
-Subject: Re: [PATCH -v5] kbuild: Add extra gcc checks
-Date: Thu, 10 Mar 2011 12:56:06 +0100
-References: <20110301083529.GA767@liondog.tnic> <20110309175625.GA29181@merkur.ravnborg.org> <20110310090444.GA25522@elte.hu>
-In-Reply-To: <20110310090444.GA25522@elte.hu>
-MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-1"
+	Thu, 10 Mar 2011 12:37:35 -0500
+Subject: Sucky dependencies found in video saa7134 rc
+From: Steven Rostedt <rostedt@goodmis.org>
+Content-Type: text/plain; charset="ISO-8859-15"
+Date: Thu, 10 Mar 2011 12:37:33 -0500
+Message-ID: <1299778653.15854.370.camel@gandalf.stny.rr.com>
+Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
-Message-Id: <201103101256.06745.arnd@arndb.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ingo Molnar <mingo@elte.hu>
-Cc: Sam Ravnborg <sam@ravnborg.org>, Michal Marek <mmarek@suse.cz>, Borislav Petkov <bp@alien8.de>, torvalds@linux-foundation.org, x86@kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, bp@amd64.org
+To: LKML <linux-kernel@vger.kernel.org>
+Cc: Mauro Carvalho Chehab <mchehab@redhat.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.cz>
 
-On Thursday 10 March 2011, Ingo Molnar wrote:
-> Also, adding 3 lines per object file is pretty ugly - would it be possible to create 
-> a nicer, compact, single-line way to someone condense a CONFIG_ERROR opt-out 
-> mechanism, the -Werror default and the single-object-file into a single rule?
-> 
-> Something like:
-> 
->   obj-werror-y += sched.o
+Running randconfigs with ktest seems to find this crap all over. It's
+not just saa7134, it happens else where too, but this is the one that
+I'm currently looking at.
 
-I haven't tried it, but it could work (or be made to work) recursively,
-so you can link multiple objects together and have them use the same flag e.g.
+I'm also not blaming the saa7134 driver, but I think we need to find a
+way to fix Kconfig to handle this. Maybe it is in the works. I don't
+know.
 
-obj-y += obj_werror.o
-ccflags-obj_werror.o += -Werror
-obj-werror-y += sched.o module.o user.o
+Here's the issue:
 
-	Arnd
+1) in the Makefile in drivers/media/video/saa7134/ we have:
+
+aa7134-y :=	saa7134-cards.o saa7134-core.o saa7134-i2c.o
+saa7134-y +=	saa7134-ts.o saa7134-tvaudio.o saa7134-vbi.o
+saa7134-y +=	saa7134-video.o
+saa7134-$(CONFIG_VIDEO_SAA7134_RC) += saa7134-input.o
+
+2) in the Kconfig of that directory:
+
+config VIDEO_SAA7134_RC
+	bool "Philips SAA7134 Remote Controller support"
+	depends on RC_CORE
+	depends on VIDEO_SAA7134
+	default y
+
+3) in the Makefile of drivers/media/rc
+
+obj-$(CONFIG_RC_CORE) += rc-core.o
+
+4) in the Kconfig of that directory:
+
+menuconfig RC_CORE
+	tristate "Remote Controller adapters"
+	depends on INPUT
+	default INPUT
+
+And finally in the .config produced by randconfig:
+
+CONFIG_RC_CORE=m
+CONFIG_VIDEO_SAA7134=y
+CONFIG_VIDEO_SAA7134_RC=y
+
+Thus, RC_CORE is a module and the SAA7134 input file is built in, which
+gives me the following error:
+
+drivers/built-in.o: In function `saa7134_input_init1':
+/home/rostedt/work/autotest/nobackup/linux-test.git/drivers/media/video/saa7134/saa7134-input.c:737: undefined reference to `rc_allocate_device'
+/home/rostedt/work/autotest/nobackup/linux-test.git/drivers/media/video/saa7134/saa7134-input.c:780: undefined reference to `rc_register_device'
+/home/rostedt/work/autotest/nobackup/linux-test.git/drivers/media/video/saa7134/saa7134-input.c:787: undefined reference to `rc_free_device'
+drivers/built-in.o: In function `saa7134_input_fini':
+/home/rostedt/work/autotest/nobackup/linux-test.git/drivers/media/video/saa7134/saa7134-input.c:799: undefined reference to `rc_unregister_device'
+drivers/built-in.o: In function `ir_raw_decode_timer_end':
+/home/rostedt/work/autotest/nobackup/linux-test.git/drivers/media/video/saa7134/saa7134-input.c:400: undefined reference to `ir_raw_event_handle'
+drivers/built-in.o: In function `build_key':
+/home/rostedt/work/autotest/nobackup/linux-test.git/drivers/media/video/saa7134/saa7134-input.c:93: undefined reference to `rc_keydown_notimeout'
+/home/rostedt/work/autotest/nobackup/linux-test.git/drivers/media/video/saa7134/saa7134-input.c:101: undefined reference to `rc_keydown_notimeout'
+/home/rostedt/work/autotest/nobackup/linux-test.git/drivers/media/video/saa7134/saa7134-input.c:102: undefined reference to `rc_keyup'
+drivers/built-in.o: In function `saa7134_raw_decode_irq':
+/home/rostedt/work/autotest/nobackup/linux-test.git/drivers/media/video/saa7134/saa7134-input.c:920: undefined reference to `ir_raw_event_store_edge'
+make[1]: *** [.tmp_vmlinux1] Error 1
+
+I know this is just a randconfig and I doubt that people will actually
+run into this problem, but randconfig should always produce a kernel
+that can compile, and preferably boot ;)
+
+I think the issue here is that we should never allowed that SAA7134_RC
+be set to 'y' when RC_CORE is 'm'. I need to look at the kconfig code
+and see if there's a way to prevent that 'y' if its dependencies have
+'m'.
+
+Hmm, but that may not work either :( This may be a Makefile issue, as
+that 'y' is not really a builtin to the kernel but a builtin to a module
+that may or may not be built into the kernel. Which makes this
+dependency agnostic to the Kconfigs. God what a horrible tangled web we
+weave!
+
+-- Steve
+
+
