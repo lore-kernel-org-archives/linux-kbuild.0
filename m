@@ -1,70 +1,65 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.skyhub.de ([78.46.96.112]:44993 "EHLO mail.skyhub.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751405Ab1CJJUj (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 10 Mar 2011 04:20:39 -0500
-Date: Thu, 10 Mar 2011 10:20:34 +0100
-From: Borislav Petkov <bp@alien8.de>
+Received: from pfepa.post.tele.dk ([195.41.46.235]:35418 "EHLO
+	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750766Ab1CJKZO (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 10 Mar 2011 05:25:14 -0500
+Date: Thu, 10 Mar 2011 11:25:11 +0100
+From: Sam Ravnborg <sam@ravnborg.org>
 Subject: Re: [PATCH -v5] kbuild: Add extra gcc checks
-Message-ID: <20110310092034.GA21454@liondog.tnic>
-References: <20110301083529.GA767@liondog.tnic>
- <20110309144504.GA1096@sepie.suse.cz>
- <20110309151134.GA15730@elte.hu>
- <20110309175625.GA29181@merkur.ravnborg.org>
- <20110310090444.GA25522@elte.hu>
+Message-ID: <20110310102511.GA30886@merkur.ravnborg.org>
+References: <20110301083529.GA767@liondog.tnic> <20110309144504.GA1096@sepie.suse.cz> <20110309151134.GA15730@elte.hu> <20110309175625.GA29181@merkur.ravnborg.org> <20110310090444.GA25522@elte.hu> <4D78971C.6090107@suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20110310090444.GA25522@elte.hu>
+In-Reply-To: <4D78971C.6090107@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ingo Molnar <mingo@elte.hu>
-Cc: Sam Ravnborg <sam@ravnborg.org>, Michal Marek <mmarek@suse.cz>, Arnd Bergmann <arnd@arndb.de>, torvalds@linux-foundation.org, x86@kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, bp@amd64.org
+To: Michal Marek <mmarek@suse.cz>
+Cc: Ingo Molnar <mingo@elte.hu>, Borislav Petkov <bp@alien8.de>, Arnd Bergmann <arnd@arndb.de>, torvalds@linux-foundation.org, x86@kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, bp@amd64.org
 
-On Thu, Mar 10, 2011 at 10:04:44AM +0100, Ingo Molnar wrote:
+> One way without extending the current rules could be:
 > 
-> * Sam Ravnborg <sam@ravnborg.org> wrote:
+> ifdef CONFIG_CC_WERROR
+> Werror := -Werror
+> endif
 > 
-> > > Another, related, very nice kbuild feature would be to allow for arch maintainers to 
-> > > mark certain files as "should only build fine without warnings" - i.e. -Werror 
-> > > should be the default. There would be a Kconfig feature to opt out of this, 
-> > > CONFIG_CC_IGNORE_WARNINGS=y or so. This would allow for people to still build the 
-> > > kernel with old (or buggy) versions of GCC.
-> > 
-> > To add -Werror for all files conditionally you can do:
-> > 
-> >     ccflags-$(CONFIG_WERROR) += -Werror
-> > 
-> > For individual files we can then drop -Werror like this:
-> > 
-> >     CFLAGS_REMOVE_foobar.o := -Werror
-> > 
-> > So it should be doable with the existing infrastructure.
+> CFLAGS_sched.o := $(Werror)
+> CFLAGS_another.o := $(Werror)
 > 
-> Stupid question: is there an existing kbuild rule that i could use to enable -Werror 
-> for a single .o file, such as kernel/sched.o - without affecting other files in 
-> kernel/ that i do not maintain?
-> 
-> Also, adding 3 lines per object file is pretty ugly - would it be possible to create 
-> a nicer, compact, single-line way to someone condense a CONFIG_ERROR opt-out 
-> mechanism, the -Werror default and the single-object-file into a single rule?
-> 
-> Something like:
-> 
->   obj-werror-y += sched.o
+> What do you think?
 
-I believe you can do
+We could extend kbuild to support something like this:
 
-CFLAGS_sched.o = -Werror
+    ccflags-<filename>-y := -Werror
 
-or similar but you'll have to try it out. I remember doing a more
-involved per-object flags fumbling with the popcnt stuff, i.e. you might
-want to take a look at d61931d89be506372d01a90d1755f6d0a9fafe2d where
-we pass it an arch-specific config option so you can have per-object,
-per-arch build flags :).
+Sample:
 
-HTH.
+    ccflags-sched.o-$(CONFIG_WERROR) := -Werror
 
--- 
-Regards/Gruss,
-    Boris.
+The above is a nice counterpart to the existing ccflags-y.
+And we could then deprecate CLFAGS_<filename> as we have today.
+
+To remove options we could use:
+
+ccflags-<filename>-remove-y := -pg
+
+This is a replacement of the undocumented CFLAGS_REMOVE_<filename> variant.
+
+Today:
+    ifdef CONFIG_FUNCTION_TRACER
+    CFLAGS_REMOVE_lockdep.o = -pg
+    endif
+
+Could be replaced with:
+
+   ccflags-lockdep.o-remove-$(CONFIG_FUNCTION_TRACER) := -pg
+
+The ifdef often cover more than one file so we save less lines in
+reality than the example says.
+
+
+All looks rather trivial to implement.
+But it is maybe a bit too cryptic?
+
+	Sam
