@@ -1,57 +1,84 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from hrndva-omtalb.mail.rr.com ([71.74.56.124]:38913 "EHLO
+Received: from hrndva-omtalb.mail.rr.com ([71.74.56.125]:53462 "EHLO
 	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751459Ab1CJWla (ORCPT
+	with ESMTP id S1751307Ab1CKCoy (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 10 Mar 2011 17:41:30 -0500
-Subject: [PATCH] saa7134: Fix strange kconfig dependency on RC_CORE
+	Thu, 10 Mar 2011 21:44:54 -0500
+Subject: [PATCH] netconsole: Fix strange kconfig dependency on configfs
 From: Steven Rostedt <rostedt@goodmis.org>
-In-Reply-To: <4D7918E5.4090104@redhat.com>
-References: <1299778653.15854.370.camel@gandalf.stny.rr.com>
-	 <4D7918E5.4090104@redhat.com>
 Content-Type: text/plain; charset="ISO-8859-15"
-Date: Thu, 10 Mar 2011 17:41:29 -0500
-Message-ID: <1299796889.15854.447.camel@gandalf.stny.rr.com>
+Date: Thu, 10 Mar 2011 21:44:51 -0500
+Message-ID: <1299811491.15854.891.camel@gandalf.stny.rr.com>
 Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Mauro Carvalho Chehab <mchehab@redhat.com>
-Cc: LKML <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.cz>, Linux Media Mailing List <linux-media@vger.kernel.org>
+To: LKML <linux-kernel@vger.kernel.org>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.cz>, "Nicholas A. Bellinger" <nab@linux-iscsi.org>, Joel Becker <jlbec@evilplan.org>, Randy Dunlap <randy.dunlap@oracle.com>, Stephen Rothwell <sfr@canb.auug.org.au>, James Bottomley <James.Bottomley@suse.de>, Andrew Morton <akpm@linux-foundation.org>
 
-As the code in saa7134-input is not a module, but the config for it is
-set as a boolean instead of a tristate, this causes a strange dependency
-on RC_CORE.
+Doing ktest rand config tests, I hit the following build bug:
 
-VIDEO_SAA7134_RC (which determines if saa7134-input.o is built) depends
-on RC_CORE and VIDEO_SAA7134. If VIDEO_SAA7134 is compiled as 'y' but
-RC_CORE is compiled as 'm' VIDEO_SAA7134_RC can still be set to 'y'
-which causes undefined symbols that it needs from RC_CORE.
+  LD      .tmp_vmlinux1
+drivers/built-in.o: In function `netconsole_target_get':
+/home/rostedt/work/autotest/nobackup/linux-test.git/drivers/net/netconsole.c:127: undefined reference to `config_item_get'
+drivers/built-in.o: In function `netconsole_target_put':
+/home/rostedt/work/autotest/nobackup/linux-test.git/drivers/net/netconsole.c:133: undefined reference to `config_item_put'
+drivers/built-in.o: In function `netconsole_target_get':
+/home/rostedt/work/autotest/nobackup/linux-test.git/drivers/net/netconsole.c:127: undefined reference to `config_item_get'
+drivers/built-in.o: In function `netconsole_target_put':
+/home/rostedt/work/autotest/nobackup/linux-test.git/drivers/net/netconsole.c:133: undefined reference to `config_item_put'
+drivers/built-in.o: In function `drop_netconsole_target':
+/home/rostedt/work/autotest/nobackup/linux-test.git/drivers/net/netconsole.c:634: undefined reference to `config_item_put'
+drivers/built-in.o: In function `make_netconsole_target':
+/home/rostedt/work/autotest/nobackup/linux-test.git/drivers/net/netconsole.c:607: undefined reference to `config_item_init_type_name'
+drivers/built-in.o: In function `dynamic_netconsole_init':
+/home/rostedt/work/autotest/nobackup/linux-test.git/drivers/net/netconsole.c:109: undefined reference to `config_group_init'
+/home/rostedt/work/autotest/nobackup/linux-test.git/drivers/net/netconsole.c:111: undefined reference to `configfs_register_subsystem'
+drivers/built-in.o: In function `dynamic_netconsole_exit':
+/home/rostedt/work/autotest/nobackup/linux-test.git/drivers/net/netconsole.c:116: undefined reference to `configfs_unregister_subsystem'
+make[1]: *** [.tmp_vmlinux1] Error 1
 
-The simplest solution is to not allow VIDEO_SAA7134_RC be enabled if
-RC_CORE compiled as a module (m) and VIDEO_SA7134 is compiled into the
-kernel (y).
+The .config had the following settings:
 
-Suggested-by: Mauro Carvalho Chehab <mchehab@redhat.com>
+CONFIG_CONFIGFS_FS=m
+CONFIG_NETCONSOLE=y
+CONFIG_NETCONSOLE_DYNAMIC=y
+
+NETCONSOLE_DYNAMIC depends on NETCONSOLE and CONFIGFS_FS, but
+NETCONSOLE_DYNAMIC is just a boolean and not a tristate, where both
+NETCONSOLE and CONFIGFS_FS are tristates and can be built as modules.
+
+As we can see from the resulting config, NETCONSOLE_DYNAMIC can be set
+to be builtin when CONFIGFS_FS which it depends on is built as a module.
+
+The simplest solution is not to allow NETCONSOLE_DYNAMIC be enabled if
+CONFIGFS_FS is a module but NETCONSOLE is built in, as
+NETCONSOLE_DYNAMIC depends on code that is only compiled in when
+CONFIGFS_FS is set.
+
 Cc: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>
+Cc: Nicholas A. Bellinger <nab@linux-iscsi.org>
+Cc: Joel Becker <jlbec@evilplan.org>
+Cc: Randy Dunlap <randy.dunlap@oracle.com>
+CC: Stephen Rothwell <sfr@canb.auug.org.au>
+Cc: James Bottomley <James.Bottomley@suse.de>
 Signed-off-by: Steven Rostedt <rostedt@goodmis.org>
 
 ---
- drivers/media/video/saa7134/Kconfig |    1 +
+ drivers/net/Kconfig |    1 +
  1 file changed, 1 insertion(+)
 
-Index: linux-test.git/drivers/media/video/saa7134/Kconfig
+Index: linux-test.git/drivers/net/Kconfig
 ===================================================================
---- linux-test.git.orig/drivers/media/video/saa7134/Kconfig	2011-03-07 22:01:13.046263327 -0500
-+++ linux-test.git/drivers/media/video/saa7134/Kconfig	2011-03-10 16:18:26.426709736 -0500
-@@ -28,6 +28,7 @@ config VIDEO_SAA7134_RC
- 	bool "Philips SAA7134 Remote Controller support"
- 	depends on RC_CORE
- 	depends on VIDEO_SAA7134
-+	depends on !(RC_CORE=m && VIDEO_SAA7134=y)
- 	default y
- 	---help---
- 	  Enables Remote Controller support on saa7134 driver.
+--- linux-test.git.orig/drivers/net/Kconfig	2011-03-10 18:19:54.644008709 -0500
++++ linux-test.git/drivers/net/Kconfig	2011-03-10 18:21:21.320194133 -0500
+@@ -3390,6 +3390,7 @@ config NETCONSOLE
+ config NETCONSOLE_DYNAMIC
+ 	bool "Dynamic reconfiguration of logging targets"
+ 	depends on NETCONSOLE && SYSFS && CONFIGFS_FS
++	depends on !(NETCONSOLE=y && CONFIGFS_FS=m)
+ 	help
+ 	  This option enables the ability to dynamically reconfigure target
+ 	  parameters (interface, IP addresses, port numbers, MAC addresses)
 
 
