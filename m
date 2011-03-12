@@ -1,176 +1,104 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:52207 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750905Ab1CKG7t (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 11 Mar 2011 01:59:49 -0500
-Received: from int-mx01.intmail.prod.int.phx2.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-	by mx1.redhat.com (8.14.4/8.14.4) with ESMTP id p2B6xnhB011900
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-SHA bits=256 verify=OK)
-	for <linux-kbuild@vger.kernel.org>; Fri, 11 Mar 2011 01:59:49 -0500
-Received: from localhost (beach.nrt.redhat.com [10.64.200.71])
-	by int-mx01.intmail.prod.int.phx2.redhat.com (8.13.8/8.13.8) with ESMTP id p2B6xlPq025207
-	for <linux-kbuild@vger.kernel.org>; Fri, 11 Mar 2011 01:59:48 -0500
-Date: Fri, 11 Mar 2011 15:59:47 +0900 (JST)
-Message-Id: <20110311.155947.824460700302079643.yamato@redhat.com>
-Subject: [PATCH] Introducing TAGSFALGS
-From: Masatake YAMATO <yamato@redhat.com>
+Received: from mail.linux-iscsi.org ([67.23.28.174]:58184 "EHLO
+	linux-iscsi.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753519Ab1CLCxH (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 11 Mar 2011 21:53:07 -0500
+Subject: Re: [PATCH] netconsole: Fix strange kconfig dependency on configfs
+From: "Nicholas A. Bellinger" <nab@linux-iscsi.org>
+In-Reply-To: <1299811491.15854.891.camel@gandalf.stny.rr.com>
+References: <1299811491.15854.891.camel@gandalf.stny.rr.com>
+Content-Type: text/plain
+Date: Fri, 11 Mar 2011 18:46:20 -0800
+Message-Id: <1299897980.20043.36.camel@haakon2.linux-iscsi.org>
 Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
+To: Steven Rostedt <rostedt@goodmis.org>
+Cc: LKML <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.cz>, Joel Becker <jlbec@evilplan.org>, Randy Dunlap <randy.dunlap@oracle.com>, Stephen Rothwell <sfr@canb.auug.org.au>, James Bottomley <James.Bottomley@suse.de>, Andrew Morton <akpm@linux-foundation.org>, Ingo Molnar <mingo@elte.hu>
 
-This patch introduces TAGSFALGS which is passed to the indexer invoked
-via tags, TAGS, scope, or gtags target.
+On Thu, 2011-03-10 at 21:44 -0500, Steven Rostedt wrote:
+> Doing ktest rand config tests, I hit the following build bug:
+> 
+>   LD      .tmp_vmlinux1
+> drivers/built-in.o: In function `netconsole_target_get':
+> /home/rostedt/work/autotest/nobackup/linux-test.git/drivers/net/netconsole.c:127: undefined reference to `config_item_get'
+> drivers/built-in.o: In function `netconsole_target_put':
+> /home/rostedt/work/autotest/nobackup/linux-test.git/drivers/net/netconsole.c:133: undefined reference to `config_item_put'
+> drivers/built-in.o: In function `netconsole_target_get':
+> /home/rostedt/work/autotest/nobackup/linux-test.git/drivers/net/netconsole.c:127: undefined reference to `config_item_get'
+> drivers/built-in.o: In function `netconsole_target_put':
+> /home/rostedt/work/autotest/nobackup/linux-test.git/drivers/net/netconsole.c:133: undefined reference to `config_item_put'
+> drivers/built-in.o: In function `drop_netconsole_target':
+> /home/rostedt/work/autotest/nobackup/linux-test.git/drivers/net/netconsole.c:634: undefined reference to `config_item_put'
+> drivers/built-in.o: In function `make_netconsole_target':
+> /home/rostedt/work/autotest/nobackup/linux-test.git/drivers/net/netconsole.c:607: undefined reference to `config_item_init_type_name'
+> drivers/built-in.o: In function `dynamic_netconsole_init':
+> /home/rostedt/work/autotest/nobackup/linux-test.git/drivers/net/netconsole.c:109: undefined reference to `config_group_init'
+> /home/rostedt/work/autotest/nobackup/linux-test.git/drivers/net/netconsole.c:111: undefined reference to `configfs_register_subsystem'
+> drivers/built-in.o: In function `dynamic_netconsole_exit':
+> /home/rostedt/work/autotest/nobackup/linux-test.git/drivers/net/netconsole.c:116: undefined reference to `configfs_unregister_subsystem'
+> make[1]: *** [.tmp_vmlinux1] Error 1
+> 
+> The .config had the following settings:
+> 
+> CONFIG_CONFIGFS_FS=m
+> CONFIG_NETCONSOLE=y
+> CONFIG_NETCONSOLE_DYNAMIC=y
+> 
+> NETCONSOLE_DYNAMIC depends on NETCONSOLE and CONFIGFS_FS, but
+> NETCONSOLE_DYNAMIC is just a boolean and not a tristate, where both
+> NETCONSOLE and CONFIGFS_FS are tristates and can be built as modules.
+> 
+> As we can see from the resulting config, NETCONSOLE_DYNAMIC can be set
+> to be builtin when CONFIGFS_FS which it depends on is built as a module.
+> 
+> The simplest solution is not to allow NETCONSOLE_DYNAMIC be enabled if
+> CONFIGFS_FS is a module but NETCONSOLE is built in, as
+> NETCONSOLE_DYNAMIC depends on code that is only compiled in when
+> CONFIGFS_FS is set.
+> 
+> Cc: Michal Marek <mmarek@suse.cz>
+> Cc: Nicholas A. Bellinger <nab@linux-iscsi.org>
+> Cc: Joel Becker <jlbec@evilplan.org>
+> Cc: Randy Dunlap <randy.dunlap@oracle.com>
+> CC: Stephen Rothwell <sfr@canb.auug.org.au>
+> Cc: James Bottomley <James.Bottomley@suse.de>
+> Signed-off-by: Steven Rostedt <rostedt@goodmis.org>
+> 
 
-Here is an example:
+Hi Steven,
 
-     make O=/tmp/build TAGSFLAGS="--excmd=number" tags
+This particular case was reported by Ingo and fixed back in January by
+converting this to properly use 'select CONFIGFS', but it appears that
+this series did not get picked up.
 
-Signed-off-by: Masatake YAMATO <yamato@redhat.com>
----
- Makefile        |    3 ++-
- scripts/tags.sh |   52 ++++++++++++++++++++++++++++++++--------------------
- 2 files changed, 34 insertions(+), 21 deletions(-)
+[PATCH RESEND 0/4] Fix kconfig breakage wrt to CONFIGFS_FS
+http://marc.info/?l=linux-netdev&m=129615549321425&w=2
 
-diff --git a/Makefile b/Makefile
-index 26492be..fd36251 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1383,8 +1383,9 @@ clean: $(clean-dirs)
- 
- # Generate tags for editors
- # ---------------------------------------------------------------------------
-+TAGSFLAGS =
- quiet_cmd_tags = GEN     $@
--      cmd_tags = $(CONFIG_SHELL) $(srctree)/scripts/tags.sh $@
-+      cmd_tags = $(CONFIG_SHELL) $(srctree)/scripts/tags.sh $@ $(TAGSFLAGS)
- 
- tags TAGS cscope gtags: FORCE
- 	$(call cmd,tags)
-diff --git a/scripts/tags.sh b/scripts/tags.sh
-index bd6185d..53c8989 100755
---- a/scripts/tags.sh
-+++ b/scripts/tags.sh
-@@ -111,17 +111,20 @@ all_defconfigs()
- docscope()
- {
- 	(echo \-k; echo \-q; all_sources) > cscope.files
--	cscope -b -f cscope.out
-+	cscope "$@" -b -f cscope.out
- }
- 
- dogtags()
- {
--	all_sources | gtags -f -
-+	all_sources | gtags "$@" -f -
- }
- 
- exuberant()
- {
--	all_sources | xargs $1 -a                               \
-+        cmd=$1
-+	shift
-+	
-+	all_sources | xargs $cmd "$@" -a                        \
- 	-I __initdata,__exitdata,__acquires,__releases          \
- 	-I __read_mostly,____cacheline_aligned                  \
- 	-I ____cacheline_aligned_in_smp                         \
-@@ -134,15 +137,15 @@ exuberant()
- 	--regex-c++='/^TRACE_EVENT\(([^,)]*).*/trace_\1/'		\
- 	--regex-c++='/^DEFINE_EVENT\(([^,)]*).*/trace_\1/'
- 
--	all_kconfigs | xargs $1 -a                              \
-+	all_kconfigs | xargs $cmd "$@" -a                       \
- 	--langdef=kconfig --language-force=kconfig              \
- 	--regex-kconfig='/^[[:blank:]]*(menu|)config[[:blank:]]+([[:alnum:]_]+)/\2/'
- 
--	all_kconfigs | xargs $1 -a                              \
-+	all_kconfigs | xargs $cmd "$@" -a                       \
- 	--langdef=kconfig --language-force=kconfig              \
- 	--regex-kconfig='/^[[:blank:]]*(menu|)config[[:blank:]]+([[:alnum:]_]+)/CONFIG_\2/'
- 
--	all_defconfigs | xargs -r $1 -a                         \
-+	all_defconfigs | xargs -r $cmd "$@" -a                  \
- 	--langdef=dotconfig --language-force=dotconfig          \
- 	--regex-dotconfig='/^#?[[:blank:]]*(CONFIG_[[:alnum:]_]+)/\1/'
- 
-@@ -150,28 +153,34 @@ exuberant()
- 
- emacs()
- {
--	all_sources | xargs $1 -a                               \
-+        cmd=$1
-+	shift
-+    
-+	all_sources | xargs $cmd "$@" -a                        \
- 	--regex='/^ENTRY(\([^)]*\)).*/\1/'                      \
- 	--regex='/^SYSCALL_DEFINE[0-9]?(\([^,)]*\).*/sys_\1/'
- 
--	all_kconfigs | xargs $1 -a                              \
-+	all_kconfigs | xargs $cmd "$@" -a                       \
- 	--regex='/^[ \t]*\(\(menu\)*config\)[ \t]+\([a-zA-Z0-9_]+\)/\3/'
- 
--	all_kconfigs | xargs $1 -a                              \
-+	all_kconfigs | xargs $cmd "$@" -a                       \
- 	--regex='/^[ \t]*\(\(menu\)*config\)[ \t]+\([a-zA-Z0-9_]+\)/CONFIG_\3/'
- 
--	all_defconfigs | xargs -r $1 -a                         \
-+	all_defconfigs | xargs -r $cmd "$@" -a                  \
- 	--regex='/^#?[ \t]?\(CONFIG_[a-zA-Z0-9_]+\)/\1/'
- }
- 
- xtags()
- {
--	if $1 --version 2>&1 | grep -iq exuberant; then
--		exuberant $1
--	elif $1 --version 2>&1 | grep -iq emacs; then
--		emacs $1
-+        cmd=$1
-+        shift
-+
-+	if $cmd --version 2>&1 | grep -iq exuberant; then
-+		exuberant $cmd "$@"
-+	elif $cmd --version 2>&1 | grep -iq emacs; then
-+		emacs $cmd "$@"
- 	else
--		all_sources | xargs $1 -a
-+		all_sources | xargs $cmd "$@" -a
-         fi
- }
- 
-@@ -187,22 +196,25 @@ if [ "${ARCH}" = "um" ]; then
- 	fi
- fi
- 
--case "$1" in
-+target=$1
-+shift
-+
-+case "$target" in
- 	"cscope")
--		docscope
-+		docscope $@
- 		;;
- 
- 	"gtags")
--		dogtags
-+		dogtags $@
- 		;;
- 
- 	"tags")
- 		rm -f tags
--		xtags ctags
-+		xtags ctags $@
- 		;;
- 
- 	"TAGS")
- 		rm -f TAGS
--		xtags etags
-+		xtags etags $@
- 		;;
- esac
--- 
-1.7.4
+Would someone be so kind as to carry these..?
+
+Thanks,
+
+--nab
+
+> ---
+>  drivers/net/Kconfig |    1 +
+>  1 file changed, 1 insertion(+)
+> 
+> Index: linux-test.git/drivers/net/Kconfig
+> ===================================================================
+> --- linux-test.git.orig/drivers/net/Kconfig	2011-03-10 18:19:54.644008709 -0500
+> +++ linux-test.git/drivers/net/Kconfig	2011-03-10 18:21:21.320194133 -0500
+> @@ -3390,6 +3390,7 @@ config NETCONSOLE
+>  config NETCONSOLE_DYNAMIC
+>  	bool "Dynamic reconfiguration of logging targets"
+>  	depends on NETCONSOLE && SYSFS && CONFIGFS_FS
+> +	depends on !(NETCONSOLE=y && CONFIGFS_FS=m)
+>  	help
+>  	  This option enables the ability to dynamically reconfigure target
+>  	  parameters (interface, IP addresses, port numbers, MAC addresses)
+> 
+> 
 
