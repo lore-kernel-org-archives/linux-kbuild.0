@@ -1,104 +1,36 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.linux-iscsi.org ([67.23.28.174]:58184 "EHLO
-	linux-iscsi.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753519Ab1CLCxH (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 11 Mar 2011 21:53:07 -0500
-Subject: Re: [PATCH] netconsole: Fix strange kconfig dependency on configfs
-From: "Nicholas A. Bellinger" <nab@linux-iscsi.org>
-In-Reply-To: <1299811491.15854.891.camel@gandalf.stny.rr.com>
-References: <1299811491.15854.891.camel@gandalf.stny.rr.com>
-Content-Type: text/plain
-Date: Fri, 11 Mar 2011 18:46:20 -0800
-Message-Id: <1299897980.20043.36.camel@haakon2.linux-iscsi.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Received: from cantor2.suse.de ([195.135.220.15]:56932 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751880Ab1CMGap (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 13 Mar 2011 01:30:45 -0500
+From: Michal Marek <mmarek@suse.cz>
+Subject: [PATCH 0/7] genksyms: Track changes to enum constant
+Date: Sun, 13 Mar 2011 07:30:18 +0100
+Message-Id: <1299997825-18977-1-git-send-email-mmarek@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Steven Rostedt <rostedt@goodmis.org>
-Cc: LKML <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.cz>, Joel Becker <jlbec@evilplan.org>, Randy Dunlap <randy.dunlap@oracle.com>, Stephen Rothwell <sfr@canb.auug.org.au>, James Bottomley <James.Bottomley@suse.de>, Andrew Morton <akpm@linux-foundation.org>, Ingo Molnar <mingo@elte.hu>
+To: linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
 
-On Thu, 2011-03-10 at 21:44 -0500, Steven Rostedt wrote:
-> Doing ktest rand config tests, I hit the following build bug:
-> 
->   LD      .tmp_vmlinux1
-> drivers/built-in.o: In function `netconsole_target_get':
-> /home/rostedt/work/autotest/nobackup/linux-test.git/drivers/net/netconsole.c:127: undefined reference to `config_item_get'
-> drivers/built-in.o: In function `netconsole_target_put':
-> /home/rostedt/work/autotest/nobackup/linux-test.git/drivers/net/netconsole.c:133: undefined reference to `config_item_put'
-> drivers/built-in.o: In function `netconsole_target_get':
-> /home/rostedt/work/autotest/nobackup/linux-test.git/drivers/net/netconsole.c:127: undefined reference to `config_item_get'
-> drivers/built-in.o: In function `netconsole_target_put':
-> /home/rostedt/work/autotest/nobackup/linux-test.git/drivers/net/netconsole.c:133: undefined reference to `config_item_put'
-> drivers/built-in.o: In function `drop_netconsole_target':
-> /home/rostedt/work/autotest/nobackup/linux-test.git/drivers/net/netconsole.c:634: undefined reference to `config_item_put'
-> drivers/built-in.o: In function `make_netconsole_target':
-> /home/rostedt/work/autotest/nobackup/linux-test.git/drivers/net/netconsole.c:607: undefined reference to `config_item_init_type_name'
-> drivers/built-in.o: In function `dynamic_netconsole_init':
-> /home/rostedt/work/autotest/nobackup/linux-test.git/drivers/net/netconsole.c:109: undefined reference to `config_group_init'
-> /home/rostedt/work/autotest/nobackup/linux-test.git/drivers/net/netconsole.c:111: undefined reference to `configfs_register_subsystem'
-> drivers/built-in.o: In function `dynamic_netconsole_exit':
-> /home/rostedt/work/autotest/nobackup/linux-test.git/drivers/net/netconsole.c:116: undefined reference to `configfs_unregister_subsystem'
-> make[1]: *** [.tmp_vmlinux1] Error 1
-> 
-> The .config had the following settings:
-> 
-> CONFIG_CONFIGFS_FS=m
-> CONFIG_NETCONSOLE=y
-> CONFIG_NETCONSOLE_DYNAMIC=y
-> 
-> NETCONSOLE_DYNAMIC depends on NETCONSOLE and CONFIGFS_FS, but
-> NETCONSOLE_DYNAMIC is just a boolean and not a tristate, where both
-> NETCONSOLE and CONFIGFS_FS are tristates and can be built as modules.
-> 
-> As we can see from the resulting config, NETCONSOLE_DYNAMIC can be set
-> to be builtin when CONFIGFS_FS which it depends on is built as a module.
-> 
-> The simplest solution is not to allow NETCONSOLE_DYNAMIC be enabled if
-> CONFIGFS_FS is a module but NETCONSOLE is built in, as
-> NETCONSOLE_DYNAMIC depends on code that is only compiled in when
-> CONFIGFS_FS is set.
-> 
-> Cc: Michal Marek <mmarek@suse.cz>
-> Cc: Nicholas A. Bellinger <nab@linux-iscsi.org>
-> Cc: Joel Becker <jlbec@evilplan.org>
-> Cc: Randy Dunlap <randy.dunlap@oracle.com>
-> CC: Stephen Rothwell <sfr@canb.auug.org.au>
-> Cc: James Bottomley <James.Bottomley@suse.de>
-> Signed-off-by: Steven Rostedt <rostedt@goodmis.org>
-> 
+This series makes genksyms remember the values of enum constants and use them
+during symbol expansion. This makes sure that patches like
 
-Hi Steven,
+| enum e {
+|  	E1,
+| 	E2,
+|+	E3,
+| 	E_MAX
+| };
+|
+| struct s {
+| 	int a[E_MAX];
+| }
+|
+| int f(struct s *s) { ... }
+| EXPORT_SYMBOL(f)
 
-This particular case was reported by Ingo and fixed back in January by
-converting this to properly use 'select CONFIGFS', but it appears that
-this series did not get picked up.
+change the checksum of the exported symbol. Previously, it would just use the
+string "E_MAX" in the calculation and the change would go unnoticed. The main
+part is in patches 6/7 and 7/7, the rest are cleanups and preparatory patches.
 
-[PATCH RESEND 0/4] Fix kconfig breakage wrt to CONFIGFS_FS
-http://marc.info/?l=linux-netdev&m=129615549321425&w=2
-
-Would someone be so kind as to carry these..?
-
-Thanks,
-
---nab
-
-> ---
->  drivers/net/Kconfig |    1 +
->  1 file changed, 1 insertion(+)
-> 
-> Index: linux-test.git/drivers/net/Kconfig
-> ===================================================================
-> --- linux-test.git.orig/drivers/net/Kconfig	2011-03-10 18:19:54.644008709 -0500
-> +++ linux-test.git/drivers/net/Kconfig	2011-03-10 18:21:21.320194133 -0500
-> @@ -3390,6 +3390,7 @@ config NETCONSOLE
->  config NETCONSOLE_DYNAMIC
->  	bool "Dynamic reconfiguration of logging targets"
->  	depends on NETCONSOLE && SYSFS && CONFIGFS_FS
-> +	depends on !(NETCONSOLE=y && CONFIGFS_FS=m)
->  	help
->  	  This option enables the ability to dynamically reconfigure target
->  	  parameters (interface, IP addresses, port numbers, MAC addresses)
-> 
-> 
-
+Michal
