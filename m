@@ -1,12 +1,12 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor.suse.de ([195.135.220.2]:44106 "EHLO mx1.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:56938 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752622Ab1CMGa5 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 13 Mar 2011 01:30:57 -0500
+	id S1753386Ab1CMGbB (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 13 Mar 2011 01:31:01 -0500
 From: Michal Marek <mmarek@suse.cz>
-Subject: [PATCH 1/7] genksyms: Do not paste the bison header file to lex.c
-Date: Sun, 13 Mar 2011 07:30:19 +0100
-Message-Id: <1299997825-18977-2-git-send-email-mmarek@suse.cz>
+Subject: [PATCH 6/7] genksyms: Track changes to enum constants
+Date: Sun, 13 Mar 2011 07:30:24 +0100
+Message-Id: <1299997825-18977-7-git-send-email-mmarek@suse.cz>
 In-Reply-To: <1299997825-18977-1-git-send-email-mmarek@suse.cz>
 References: <1299997825-18977-1-git-send-email-mmarek@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -14,232 +14,284 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org
 
-The header is already #included, no need to include it a second time.
-lex.c_shipped was regenerated using flex-2.5.35.
+Enum constants can be used as array sizes; if the enum itself does not
+appear in the symbol expansion, a change in the enum constant will go
+unnoticed. Therefore, remember the value of each enum constant and
+expand each occurence to <constant> <value>.
+
+Note: The changes won't take effect until the lexer and parser are
+rebuilt by the next patch.
 
 Signed-off-by: Michal Marek <mmarek@suse.cz>
 ---
- scripts/genksyms/Makefile      |    4 +-
- scripts/genksyms/lex.c_shipped |  150 ++--------------------------------------
- 2 files changed, 7 insertions(+), 147 deletions(-)
+ scripts/genksyms/genksyms.c |   71 ++++++++++++++++++++++++++++++++++++++++---
+ scripts/genksyms/genksyms.h |    5 ++-
+ scripts/genksyms/lex.l      |   30 ++++++++++++++++--
+ scripts/genksyms/parse.y    |   34 ++++++++++++++++++--
+ 4 files changed, 127 insertions(+), 13 deletions(-)
 
-diff --git a/scripts/genksyms/Makefile b/scripts/genksyms/Makefile
-index e420fe4..13d03cf 100644
---- a/scripts/genksyms/Makefile
-+++ b/scripts/genksyms/Makefile
-@@ -28,9 +28,9 @@ $(obj)/keywords.c: $(obj)/keywords.gperf FORCE
- # flex
+diff --git a/scripts/genksyms/genksyms.c b/scripts/genksyms/genksyms.c
+index 4a35081..f9e7553 100644
+--- a/scripts/genksyms/genksyms.c
++++ b/scripts/genksyms/genksyms.c
+@@ -62,6 +62,7 @@ static const struct {
+ 	[SYM_ENUM]       = {'e', "enum"},
+ 	[SYM_STRUCT]     = {'s', "struct"},
+ 	[SYM_UNION]      = {'u', "union"},
++	[SYM_ENUM_CONST] = {'E', "enum constant"},
+ };
  
- quiet_cmd_lex.c = FLEX    $@
--      cmd_lex.c = flex -o$@ -d $< $(obj)/parse.h
-+      cmd_lex.c = flex -o$@ -d $<
+ static int equal_list(struct string_list *a, struct string_list *b);
+@@ -149,10 +150,16 @@ static unsigned long crc32(const char *s)
  
--$(obj)/lex.c: $(obj)/lex.l $(obj)/parse.h $(obj)/keywords.c FORCE
-+$(obj)/lex.c: $(obj)/lex.l $(obj)/keywords.c FORCE
- 	$(call if_changed,lex.c)
- 	cp $@ $@_shipped
- 
-diff --git a/scripts/genksyms/lex.c_shipped b/scripts/genksyms/lex.c_shipped
-index 2ac23bc..b54044a 100644
---- a/scripts/genksyms/lex.c_shipped
-+++ b/scripts/genksyms/lex.c_shipped
-@@ -79,6 +79,7 @@ typedef int flex_int32_t;
- typedef unsigned char flex_uint8_t; 
- typedef unsigned short int flex_uint16_t;
- typedef unsigned int flex_uint32_t;
-+#endif /* ! C99 */
- 
- /* Limits of integral types. */
- #ifndef INT8_MIN
-@@ -109,8 +110,6 @@ typedef unsigned int flex_uint32_t;
- #define UINT32_MAX             (4294967295U)
- #endif
- 
--#endif /* ! C99 */
--
- #endif /* ! FLEXINT_H */
- 
- /* %endif */
-@@ -672,7 +671,7 @@ char *yytext;
- 
- /* We don't do multiple input files.  */
- #define YY_NO_INPUT 1
--#line 676 "scripts/genksyms/lex.c"
-+#line 675 "scripts/genksyms/lex.c"
- 
- #define INITIAL 0
- #define V2_TOKENS 1
-@@ -808,7 +807,7 @@ static int input (void );
- 	if ( YY_CURRENT_BUFFER_LVALUE->yy_is_interactive ) \
- 		{ \
- 		int c = '*'; \
--		size_t n; \
-+		int n; \
- 		for ( n = 0; n < max_size && \
- 			     (c = getc( yyin )) != EOF && c != '\n'; ++n ) \
- 			buf[n] = (char) c; \
-@@ -923,7 +922,7 @@ YY_DECL
- 
- 
-  /* Keep track of our location in the original source files.  */
--#line 927 "scripts/genksyms/lex.c"
-+#line 926 "scripts/genksyms/lex.c"
- 
- 	if ( !(yy_init) )
- 		{
-@@ -1114,7 +1113,7 @@ YY_RULE_SETUP
- #line 97 "scripts/genksyms/lex.l"
- ECHO;
- 	YY_BREAK
--#line 1118 "scripts/genksyms/lex.c"
-+#line 1117 "scripts/genksyms/lex.c"
- case YY_STATE_EOF(INITIAL):
- case YY_STATE_EOF(V2_TOKENS):
- 	yyterminate();
-@@ -2567,143 +2566,4 @@ fini:
- 
-   return token;
+ static enum symbol_type map_to_ns(enum symbol_type t)
+ {
+-	if (t == SYM_TYPEDEF)
+-		t = SYM_NORMAL;
+-	else if (t == SYM_UNION)
+-		t = SYM_STRUCT;
++	switch (t) {
++	case SYM_ENUM_CONST:
++	case SYM_NORMAL:
++	case SYM_TYPEDEF:
++		return SYM_NORMAL;
++	case SYM_ENUM:
++	case SYM_STRUCT:
++	case SYM_UNION:
++		return SYM_STRUCT;
++	}
+ 	return t;
  }
--/* A Bison parser, made by GNU Bison 2.3.  */
--
--/* Skeleton interface for Bison's Yacc-like parsers in C
--
--   Copyright (C) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006
--   Free Software Foundation, Inc.
--
--   This program is free software; you can redistribute it and/or modify
--   it under the terms of the GNU General Public License as published by
--   the Free Software Foundation; either version 2, or (at your option)
--   any later version.
--
--   This program is distributed in the hope that it will be useful,
--   but WITHOUT ANY WARRANTY; without even the implied warranty of
--   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
--   GNU General Public License for more details.
--
--   You should have received a copy of the GNU General Public License
--   along with this program; if not, write to the Free Software
--   Foundation, Inc., 51 Franklin Street, Fifth Floor,
--   Boston, MA 02110-1301, USA.  */
--
--/* As a special exception, you may create a larger work that contains
--   part or all of the Bison parser skeleton and distribute that work
--   under terms of your choice, so long as that work isn't itself a
--   parser generator using the skeleton or a modified version thereof
--   as a parser skeleton.  Alternatively, if you modify or redistribute
--   the parser skeleton itself, you may (at your option) remove this
--   special exception, which will cause the skeleton and the resulting
--   Bison output files to be licensed under the GNU General Public
--   License without this special exception.
--
--   This special exception was added by the Free Software Foundation in
--   version 2.2 of Bison.  */
--
--/* Tokens.  */
--#ifndef YYTOKENTYPE
--# define YYTOKENTYPE
--   /* Put the tokens into the symbol table, so that GDB and other debuggers
--      know about them.  */
--   enum yytokentype {
--     ASM_KEYW = 258,
--     ATTRIBUTE_KEYW = 259,
--     AUTO_KEYW = 260,
--     BOOL_KEYW = 261,
--     CHAR_KEYW = 262,
--     CONST_KEYW = 263,
--     DOUBLE_KEYW = 264,
--     ENUM_KEYW = 265,
--     EXTERN_KEYW = 266,
--     EXTENSION_KEYW = 267,
--     FLOAT_KEYW = 268,
--     INLINE_KEYW = 269,
--     INT_KEYW = 270,
--     LONG_KEYW = 271,
--     REGISTER_KEYW = 272,
--     RESTRICT_KEYW = 273,
--     SHORT_KEYW = 274,
--     SIGNED_KEYW = 275,
--     STATIC_KEYW = 276,
--     STRUCT_KEYW = 277,
--     TYPEDEF_KEYW = 278,
--     UNION_KEYW = 279,
--     UNSIGNED_KEYW = 280,
--     VOID_KEYW = 281,
--     VOLATILE_KEYW = 282,
--     TYPEOF_KEYW = 283,
--     EXPORT_SYMBOL_KEYW = 284,
--     ASM_PHRASE = 285,
--     ATTRIBUTE_PHRASE = 286,
--     BRACE_PHRASE = 287,
--     BRACKET_PHRASE = 288,
--     EXPRESSION_PHRASE = 289,
--     CHAR = 290,
--     DOTS = 291,
--     IDENT = 292,
--     INT = 293,
--     REAL = 294,
--     STRING = 295,
--     TYPE = 296,
--     OTHER = 297,
--     FILENAME = 298
--   };
--#endif
--/* Tokens.  */
--#define ASM_KEYW 258
--#define ATTRIBUTE_KEYW 259
--#define AUTO_KEYW 260
--#define BOOL_KEYW 261
--#define CHAR_KEYW 262
--#define CONST_KEYW 263
--#define DOUBLE_KEYW 264
--#define ENUM_KEYW 265
--#define EXTERN_KEYW 266
--#define EXTENSION_KEYW 267
--#define FLOAT_KEYW 268
--#define INLINE_KEYW 269
--#define INT_KEYW 270
--#define LONG_KEYW 271
--#define REGISTER_KEYW 272
--#define RESTRICT_KEYW 273
--#define SHORT_KEYW 274
--#define SIGNED_KEYW 275
--#define STATIC_KEYW 276
--#define STRUCT_KEYW 277
--#define TYPEDEF_KEYW 278
--#define UNION_KEYW 279
--#define UNSIGNED_KEYW 280
--#define VOID_KEYW 281
--#define VOLATILE_KEYW 282
--#define TYPEOF_KEYW 283
--#define EXPORT_SYMBOL_KEYW 284
--#define ASM_PHRASE 285
--#define ATTRIBUTE_PHRASE 286
--#define BRACE_PHRASE 287
--#define BRACKET_PHRASE 288
--#define EXPRESSION_PHRASE 289
--#define CHAR 290
--#define DOTS 291
--#define IDENT 292
--#define INT 293
--#define REAL 294
--#define STRING 295
--#define TYPE 296
--#define OTHER 297
--#define FILENAME 298
--
--
--
--
--#if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
--typedef int YYSTYPE;
--# define yystype YYSTYPE /* obsolescent; will be withdrawn */
--# define YYSTYPE_IS_DECLARED 1
--# define YYSTYPE_IS_TRIVIAL 1
--#endif
--
--extern YYSTYPE yylval;
--
  
+@@ -191,10 +198,47 @@ static struct symbol *__add_symbol(const char *name, enum symbol_type type,
+ 			    struct string_list *defn, int is_extern,
+ 			    int is_reference)
+ {
+-	unsigned long h = crc32(name) % HASH_BUCKETS;
++	unsigned long h;
+ 	struct symbol *sym;
+ 	enum symbol_status status = STATUS_UNCHANGED;
++	/* The parser adds symbols in the order their declaration completes,
++	 * so it is safe to store the value of the previous enum constant in
++	 * a static variable.
++	 */
++	static int enum_counter;
++	static struct string_list *last_enum_expr;
++
++	if (type == SYM_ENUM_CONST) {
++		if (defn) {
++			free_list(last_enum_expr, NULL);
++			last_enum_expr = copy_list_range(defn, NULL);
++			enum_counter = 1;
++		} else {
++			struct string_list *expr;
++			char buf[20];
++
++			snprintf(buf, sizeof(buf), "%d", enum_counter++);
++			if (last_enum_expr) {
++				expr = copy_list_range(last_enum_expr, NULL);
++				defn = concat_list(mk_node("("),
++						   expr,
++						   mk_node(")"),
++						   mk_node("+"),
++						   mk_node(buf), NULL);
++			} else {
++				defn = mk_node(buf);
++			}
++		}
++	} else if (type == SYM_ENUM) {
++		free_list(last_enum_expr, NULL);
++		last_enum_expr = NULL;
++		enum_counter = 0;
++		if (!name)
++			/* Anonymous enum definition, nothing more to do */
++			return NULL;
++	}
+ 
++	h = crc32(name) % HASH_BUCKETS;
+ 	for (sym = symtab[h]; sym; sym = sym->hash_next) {
+ 		if (map_to_ns(sym->type) == map_to_ns(type) &&
+ 		    strcmp(name, sym->name) == 0) {
+@@ -343,6 +387,22 @@ struct string_list *copy_node(struct string_list *node)
+ 	return newnode;
+ }
+ 
++struct string_list *copy_list_range(struct string_list *start,
++				    struct string_list *end)
++{
++	struct string_list *res, *n;
++
++	if (start == end)
++		return NULL;
++	n = res = copy_node(start);
++	for (start = start->next; start != end; start = start->next) {
++		n->next = copy_node(start);
++		n = n->next;
++	}
++	n->next = NULL;
++	return res;
++}
++
+ static int equal_list(struct string_list *a, struct string_list *b)
+ {
+ 	while (a && b) {
+@@ -512,6 +572,7 @@ static unsigned long expand_and_crc_sym(struct symbol *sym, unsigned long crc)
+ 			crc = partial_crc32_one(' ', crc);
+ 			break;
+ 
++		case SYM_ENUM_CONST:
+ 		case SYM_TYPEDEF:
+ 			subsym = find_symbol(cur->string, cur->tag, 0);
+ 			/* FIXME: Bad reference files can segfault here. */
+diff --git a/scripts/genksyms/genksyms.h b/scripts/genksyms/genksyms.h
+index 9fdafb6..7ec52ae 100644
+--- a/scripts/genksyms/genksyms.h
++++ b/scripts/genksyms/genksyms.h
+@@ -26,7 +26,8 @@
+ #include <stdio.h>
+ 
+ enum symbol_type {
+-	SYM_NORMAL, SYM_TYPEDEF, SYM_ENUM, SYM_STRUCT, SYM_UNION
++	SYM_NORMAL, SYM_TYPEDEF, SYM_ENUM, SYM_STRUCT, SYM_UNION,
++	SYM_ENUM_CONST
+ };
+ 
+ enum symbol_status {
+@@ -66,6 +67,8 @@ void export_symbol(const char *);
+ void free_node(struct string_list *list);
+ void free_list(struct string_list *s, struct string_list *e);
+ struct string_list *copy_node(struct string_list *);
++struct string_list *copy_list_range(struct string_list *start,
++				    struct string_list *end);
+ 
+ int yylex(void);
+ int yyparse(void);
+diff --git a/scripts/genksyms/lex.l b/scripts/genksyms/lex.l
+index c125d06..e4ddd49 100644
+--- a/scripts/genksyms/lex.l
++++ b/scripts/genksyms/lex.l
+@@ -99,12 +99,23 @@ MC_TOKEN		([~%^&*+=|<>/-]=)|(&&)|("||")|(->)|(<<)|(>>)
+ 
+ /* Macros to append to our phrase collection list.  */
+ 
++/*
++ * We mark any token, that that equals to a known enumerator, as
++ * SYM_ENUM_CONST. The parser will change this for struct and union tags later,
++ * the only problem is struct and union members:
++ *    enum e { a, b }; struct s { int a, b; }
++ * but in this case, the only effect will be, that the ABI checksums become
++ * more volatile, which is acceptable. Also, such collisions are quite rare,
++ * so far it was only observed in include/linux/telephony.h.
++ */
+ #define _APP(T,L)	do {						   \
+ 			  cur_node = next_node;				   \
+ 			  next_node = xmalloc(sizeof(*next_node));	   \
+ 			  next_node->next = cur_node;			   \
+ 			  cur_node->string = memcpy(xmalloc(L+1), T, L+1); \
+-			  cur_node->tag = SYM_NORMAL;			   \
++			  cur_node->tag =				   \
++			    find_symbol(cur_node->string, SYM_ENUM_CONST, 1)?\
++			    SYM_ENUM_CONST : SYM_NORMAL ;		   \
+ 			} while (0)
+ 
+ #define APP		_APP(yytext, yyleng)
+@@ -182,8 +193,8 @@ repeat:
+ 
+ 		  case STRUCT_KEYW:
+ 		  case UNION_KEYW:
+-		    dont_want_brace_phrase = 3;
+ 		  case ENUM_KEYW:
++		    dont_want_brace_phrase = 3;
+ 		    suppress_type_lookup = 2;
+ 		    goto fini;
+ 
+@@ -312,7 +323,20 @@ repeat:
+ 	  ++count;
+ 	  APP;
+ 	  goto repeat;
+-	case ')': case ']': case '}':
++	case '}':
++	  /* is this the last line of an enum declaration? */
++	  if (count == 0)
++	    {
++	      /* Put back the token we just read so's we can find it again
++		 after registering the expression.  */
++	      unput(token);
++
++	      lexstate = ST_NORMAL;
++	      token = EXPRESSION_PHRASE;
++	      break;
++	    }
++	  /* FALLTHRU */
++	case ')': case ']':
+ 	  --count;
+ 	  APP;
+ 	  goto repeat;
+diff --git a/scripts/genksyms/parse.y b/scripts/genksyms/parse.y
+index 09a265c..ba5c242 100644
+--- a/scripts/genksyms/parse.y
++++ b/scripts/genksyms/parse.y
+@@ -25,6 +25,7 @@
+ 
+ #include <assert.h>
+ #include <stdlib.h>
++#include <string.h>
+ #include "genksyms.h"
+ 
+ static int is_typedef;
+@@ -227,16 +228,19 @@ type_specifier:
+ 		  add_symbol(i->string, SYM_UNION, s, is_extern);
+ 		  $$ = $3;
+ 		}
+-	| ENUM_KEYW IDENT BRACE_PHRASE
++	| ENUM_KEYW IDENT enum_body
+ 		{ struct string_list *s = *$3, *i = *$2, *r;
+ 		  r = copy_node(i); r->tag = SYM_ENUM;
+ 		  r->next = (*$1)->next; *$3 = r; (*$1)->next = NULL;
+ 		  add_symbol(i->string, SYM_ENUM, s, is_extern);
+ 		  $$ = $3;
+ 		}
+-
+-	/* Anonymous s/u/e definitions.  Nothing needs doing.  */
+-	| ENUM_KEYW BRACE_PHRASE			{ $$ = $2; }
++	/*
++	 * Anonymous enum definition. Tell add_symbol() to restart its counter.
++	 */
++	| ENUM_KEYW enum_body
++		{ add_symbol(NULL, SYM_ENUM, NULL, 0); $$ = $2; }
++	/* Anonymous s/u definitions.  Nothing needs doing.  */
+ 	| STRUCT_KEYW class_body			{ $$ = $2; }
+ 	| UNION_KEYW class_body				{ $$ = $2; }
+ 	;
+@@ -449,6 +453,28 @@ attribute_opt:
+ 	| attribute_opt ATTRIBUTE_PHRASE
+ 	;
+ 
++enum_body:
++	'{' enumerator_list '}'				{ $$ = $3; }
++	| '{' enumerator_list ',' '}'			{ $$ = $4; }
++	 ;
++
++enumerator_list:
++	enumerator
++	| enumerator_list ',' enumerator
++
++enumerator:
++	IDENT
++		{
++			const char *name = strdup((*$1)->string);
++			add_symbol(name, SYM_ENUM_CONST, NULL, 0);
++		}
++	| IDENT '=' EXPRESSION_PHRASE
++		{
++			const char *name = strdup((*$1)->string);
++			struct string_list *expr = copy_list_range(*$3, *$2);
++			add_symbol(name, SYM_ENUM_CONST, expr, 0);
++		}
++
+ asm_definition:
+ 	ASM_PHRASE ';'					{ $$ = $2; }
+ 	;
 -- 
 1.7.4.1
 
