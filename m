@@ -1,56 +1,72 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor.suse.de ([195.135.220.2]:53393 "EHLO mx1.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754605Ab1CMNkE (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 13 Mar 2011 09:40:04 -0400
-Message-ID: <4D7CC931.1090204@suse.cz>
-Date: Sun, 13 Mar 2011 14:40:01 +0100
-From: Michal Marek <mmarek@suse.cz>
+Received: from smtp-out.google.com ([216.239.44.51]:42676 "EHLO
+	smtp-out.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750986Ab1COGe3 (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 15 Mar 2011 02:34:29 -0400
+Subject: [PATCH] KBuild: silence "'scripts/unifdef' is up to date."
+From: Mike Waychison <mikew@google.com>
+Date: Mon, 14 Mar 2011 23:34:25 -0700
+Message-ID: <20110315063425.9538.11565.stgit@mike.mtv.corp.google.com>
 MIME-Version: 1.0
-Subject: Re: [PATCH 0/7] genksyms: Track changes to enum constant
-References: <1299997825-18977-1-git-send-email-mmarek@suse.cz> <20110313071902.GA3377@merkur.ravnborg.org>
-In-Reply-To: <20110313071902.GA3377@merkur.ravnborg.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-On 13.3.2011 08:19, Sam Ravnborg wrote:
-> Hi Michal.
-> 
-> Patch serie looks good.
-> You can add my ack to all of them if you do a second round.
+Patch applies to 2.6.38-rc8.
 
-Thanks.
+While changing our build system over to use the headers_install target
+as part of our klibc build, the following message started showing up in
+our logs:
 
+make[2]: `scripts/unifdef' is up to date.
 
-> On Sun, Mar 13, 2011 at 07:30:18AM +0100, Michal Marek wrote:
->> This series makes genksyms remember the values of enum constants and use them
->> during symbol expansion. This makes sure that patches like
->>
->> | enum e {
->> |  	E1,
->> | 	E2,
->> |+	E3,
->> | 	E_MAX
->> | };
->> |
->> | struct s {
->> | 	int a[E_MAX];
->> | }
->> |
->> | int f(struct s *s) { ... }
->> | EXPORT_SYMBOL(f)
->>
->> change the checksum of the exported symbol. Previously, it would just use the
->> string "E_MAX" in the calculation and the change would go unnoticed. The main
->> part is in patches 6/7 and 7/7, the rest are cleanups and preparatory patches.
-> 
-> This nice explanation would be good to include in the changelog
-> of 7/8 so "git log" give a better intro to the changes.
+It turns out that the build blindly invokes a recursive make on this
+target, which causes make to emit this message when the target is
+already up to date.  This isn't seen for most targets as the rest of the
+build relies primarily on the default target and on PHONY targets when
+invoking make recursively.
 
-Good idea, I'll update the patch description.
+Silence the above message when building unifdef as part of
+headers_install by hiding it behind a new PHONY target called
+"build_unifdef" that has an empty recipe.
 
-Michal
+Signed-off-by: Mike Waychison <mikew@google.com>
+---
+ Makefile         |    2 +-
+ scripts/Makefile |    5 +++++
+ 2 files changed, 6 insertions(+), 1 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 504f788..5d7e0b2 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1018,7 +1018,7 @@ hdr-dst = $(if $(KBUILD_HEADERS), dst=include/asm-$(hdr-arch), dst=include/asm)
+ 
+ PHONY += __headers
+ __headers: include/linux/version.h scripts_basic FORCE
+-	$(Q)$(MAKE) $(build)=scripts scripts/unifdef
++	$(Q)$(MAKE) $(build)=scripts build_unifdef
+ 
+ PHONY += headers_install_all
+ headers_install_all:
+diff --git a/scripts/Makefile b/scripts/Makefile
+index 2e08810..fcea261 100644
+--- a/scripts/Makefile
++++ b/scripts/Makefile
+@@ -18,6 +18,11 @@ always		:= $(hostprogs-y) $(hostprogs-m)
+ # The following hostprogs-y programs are only build on demand
+ hostprogs-y += unifdef
+ 
++# This target is used internally to avoid "is up to date" messages
++PHONY += build_unifdef
++build_unifdef: scripts/unifdef FORCE
++	@:
++
+ subdir-$(CONFIG_MODVERSIONS) += genksyms
+ subdir-y                     += mod
+ subdir-$(CONFIG_SECURITY_SELINUX) += selinux
+
