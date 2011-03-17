@@ -1,66 +1,28 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor.suse.de ([195.135.220.2]:56082 "EHLO mx1.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:41507 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750779Ab1CQNbg (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 17 Mar 2011 09:31:36 -0400
-Message-ID: <4D820D35.600@suse.cz>
-Date: Thu, 17 Mar 2011 14:31:33 +0100
+	id S1751817Ab1CQOSV (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 17 Mar 2011 10:18:21 -0400
+Message-ID: <4D82182B.5020202@suse.cz>
+Date: Thu, 17 Mar 2011 15:18:19 +0100
 From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Subject: Re: [RESEND PATCH 00/27] update makefiles to use the newer flag variables
-References: <cover.1295006561.git.mfm@muteddisk.com>	<20110317131508.GB30807@sepie.suse.cz> <AANLkTikiBgigwOkXbYpTqr-4ihVYrmYB49pvh7k2toLz@mail.gmail.com>
-In-Reply-To: <AANLkTikiBgigwOkXbYpTqr-4ihVYrmYB49pvh7k2toLz@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: [PATCH 0/7] genksyms: Track changes to enum constant
+References: <1299997825-18977-1-git-send-email-mmarek@suse.cz> <20110313071902.GA3377@merkur.ravnborg.org> <4D7CC931.1090204@suse.cz>
+In-Reply-To: <4D7CC931.1090204@suse.cz>
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Geert Uytterhoeven <geert@linux-m68k.org>
-Cc: matt mooney <mfm@muteddisk.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On 17.3.2011 14:19, Geert Uytterhoeven wrote:
-> On Thu, Mar 17, 2011 at 14:15, Michal Marek <mmarek@suse.cz> wrote:
->> On Fri, Jan 14, 2011 at 06:12:23AM -0800, matt mooney wrote:
->>> These are the patches that never made their way into the linux-next tree.
->>> I have added all of the acks that came through.
+On 13.3.2011 14:40, Michal Marek wrote:
+>> This nice explanation would be good to include in the changelog
+>> of 7/8 so "git log" give a better intro to the changes.
 > 
->>>   m68k: change to new flag variables
-> 
->> I committed these to kbuild.2.6.git#trivial and will send a pull request
->> to Linus.
-> 
-> JFYI, the m68k one went in last night through the m68k tree.
+> Good idea, I'll update the patch description.
 
-I did a rebase onto linux-next and back, so that I don't duplicate
-patches that have been picked up by subsystem maintainers already. This
-is the resulting shortlog, m68k is not there:
-
-matt mooney (25):
-      kernel: change to new flag variable
-      arm: change to new flag variables
-      h8300: change to new flag variable
-      ia64: change to new flag variables
-      microblaze: change to new flag variable
-      mips: change to new flag variable
-      s390: change to new flag variable
-      um: change to new flag variables
-      xtensa: change to new flag variable
-      fs: change to new flag variable
-      char: change to new flag variable
-      dma: change to new flag variable
-      hwmon: change to new flag variable
-      ide: change to new flag variable
-      ieee802154: change to new flag variable
-      isdn: change to new flag variable
-      memstick: change to new flag variable
-      message: change to new flag variable
-      misc: change to new flag variable
-      net: change to new flag variable
-      pps: change to new flag variable
-      rapidio: change to new flag variable
-      rtc: change to new flag variable
-      scsi: change to new flag variable
-      video: change to new flag variable
-
-I guess I should be more verbose than "thanks, applied" next time :).
+I updated the patch description and merged this into kbuild-2.6.git#kbuild.
 
 Michal
