@@ -1,64 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor.suse.de ([195.135.220.2]:55529 "EHLO mx1.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752240Ab1CQNPJ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 17 Mar 2011 09:15:09 -0400
-Date: Thu, 17 Mar 2011 14:15:08 +0100
-From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [RESEND PATCH 00/27] update makefiles to use the newer flag
- variables
-Message-ID: <20110317131508.GB30807@sepie.suse.cz>
-References: <cover.1295006561.git.mfm@muteddisk.com>
+Received: from mail-fx0-f46.google.com ([209.85.161.46]:43261 "EHLO
+	mail-fx0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754320Ab1CQNUB convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 17 Mar 2011 09:20:01 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cover.1295006561.git.mfm@muteddisk.com>
+In-Reply-To: <20110317131508.GB30807@sepie.suse.cz>
+References: <cover.1295006561.git.mfm@muteddisk.com>
+	<20110317131508.GB30807@sepie.suse.cz>
+Date: Thu, 17 Mar 2011 14:19:59 +0100
+Message-ID: <AANLkTikiBgigwOkXbYpTqr-4ihVYrmYB49pvh7k2toLz@mail.gmail.com>
+Subject: Re: [RESEND PATCH 00/27] update makefiles to use the newer flag variables
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: matt mooney <mfm@muteddisk.com>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>
+Cc: matt mooney <mfm@muteddisk.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Fri, Jan 14, 2011 at 06:12:23AM -0800, matt mooney wrote:
-> Hi Michal,
-> 
-> These are the patches that never made their way into the linux-next tree.
-> I have added all of the acks that came through.
-> 
-> Thanks,
-> matt
-> 
-> 
-> matt mooney (27):
->   kernel: change to new flag variable
->   alpha: change to new flag variables
->   arm: change to new flag variables
->   h8300: change to new flag variable
->   ia64: change to new flag variables
->   m68k: change to new flag variables
->   microblaze: change to new flag variable
->   mips: change to new flag variable
->   s390: change to new flag variable
->   um: change to new flag variables
->   xtensa: change to new flag variable
->   fs: change to new flag variable
->   char: change to new flag variable
->   dma: change to new flag variable
->   hwmon: change to new flag variable
->   ide: change to new flag variable
->   ieee802154: change to new flag variable
->   isdn: change to new flag variable
->   memstick: change to new flag variable
->   message: change to new flag variable
->   misc: change to new flag variable
->   net: change to new flag variable
->   pps: change to new flag variable
->   rapidio: change to new flag variable
->   rtc: change to new flag variable
->   scsi: change to new flag variable
->   video: change to new flag variable
+On Thu, Mar 17, 2011 at 14:15, Michal Marek <mmarek@suse.cz> wrote:
+> On Fri, Jan 14, 2011 at 06:12:23AM -0800, matt mooney wrote:
+>> These are the patches that never made their way into the linux-next tree.
+>> I have added all of the acks that came through.
 
-I committed these to kbuild.2.6.git#trivial and will send a pull request
-to Linus.
+>>   m68k: change to new flag variables
 
-Thanks,
-Michal
+> I committed these to kbuild.2.6.git#trivial and will send a pull request
+> to Linus.
+
+JFYI, the m68k one went in last night through the m68k tree.
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
