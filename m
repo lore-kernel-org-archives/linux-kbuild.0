@@ -1,45 +1,64 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:37143 "EHLO mx2.suse.de"
+Received: from cantor.suse.de ([195.135.220.2]:55529 "EHLO mx1.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753257Ab1CQMj7 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 17 Mar 2011 08:39:59 -0400
-Date: Thu, 17 Mar 2011 13:39:58 +0100
+	id S1752240Ab1CQNPJ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 17 Mar 2011 09:15:09 -0400
+Date: Thu, 17 Mar 2011 14:15:08 +0100
 From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [PATCH] modpost: fix trailing comma
-Message-ID: <20110317123958.GA30807@sepie.suse.cz>
-References: <20110315141347.d4ee75d3.randy.dunlap@oracle.com>
+Subject: Re: [RESEND PATCH 00/27] update makefiles to use the newer flag
+ variables
+Message-ID: <20110317131508.GB30807@sepie.suse.cz>
+References: <cover.1295006561.git.mfm@muteddisk.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20110315141347.d4ee75d3.randy.dunlap@oracle.com>
+In-Reply-To: <cover.1295006561.git.mfm@muteddisk.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Randy Dunlap <randy.dunlap@oracle.com>
-Cc: linux-kbuild@vger.kernel.org, lkml <linux-kernel@vger.kernel.org>
+To: matt mooney <mfm@muteddisk.com>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Tue, Mar 15, 2011 at 02:13:47PM -0700, Randy Dunlap wrote:
-> From: Randy Dunlap <randy.dunlap@oracle.com>
+On Fri, Jan 14, 2011 at 06:12:23AM -0800, matt mooney wrote:
+> Hi Michal,
 > 
-> Consolidate locations that print a section whitelist into
-> calls to print_section_list().
+> These are the patches that never made their way into the linux-next tree.
+> I have added all of the acks that came through.
 > 
-> Fix print_section_list() so that it does not print a trailing
-> comma & space:
+> Thanks,
+> matt
 > 
-> If the reference is valid then annotate the
-> variable with __init* or __refdata (see linux/init.h) or name the variable:
-> *_template, *_timer, *_sht, *_ops, *_probe, *_probe_one, *_console, 
 > 
-> becomes:
-> If the reference is valid then annotate the
-> variable with __init* or __refdata (see linux/init.h) or name the variable:
-> *_template, *_timer, *_sht, *_ops, *_probe, *_probe_one, *_console
-> 
-> Signed-off-by: Randy Dunlap <randy.dunlap@oracle.com>
-> ---
->  scripts/mod/modpost.c |   23 +++++++++++++++--------
->  1 file changed, 15 insertions(+), 8 deletions(-)
+> matt mooney (27):
+>   kernel: change to new flag variable
+>   alpha: change to new flag variables
+>   arm: change to new flag variables
+>   h8300: change to new flag variable
+>   ia64: change to new flag variables
+>   m68k: change to new flag variables
+>   microblaze: change to new flag variable
+>   mips: change to new flag variable
+>   s390: change to new flag variable
+>   um: change to new flag variables
+>   xtensa: change to new flag variable
+>   fs: change to new flag variable
+>   char: change to new flag variable
+>   dma: change to new flag variable
+>   hwmon: change to new flag variable
+>   ide: change to new flag variable
+>   ieee802154: change to new flag variable
+>   isdn: change to new flag variable
+>   memstick: change to new flag variable
+>   message: change to new flag variable
+>   misc: change to new flag variable
+>   net: change to new flag variable
+>   pps: change to new flag variable
+>   rapidio: change to new flag variable
+>   rtc: change to new flag variable
+>   scsi: change to new flag variable
+>   video: change to new flag variable
 
-Applied to kbuild-2.6.git#kbuild, thanks.
+I committed these to kbuild.2.6.git#trivial and will send a pull request
+to Linus.
 
+Thanks,
 Michal
