@@ -1,47 +1,44 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:33620 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:37143 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754000Ab1CQLc5 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 17 Mar 2011 07:32:57 -0400
-Date: Thu, 17 Mar 2011 12:32:55 +0100
+	id S1753257Ab1CQMj7 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 17 Mar 2011 08:39:59 -0400
+Date: Thu, 17 Mar 2011 13:39:58 +0100
 From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [PATCH] KBuild: silence "'scripts/unifdef' is up to date."
-Message-ID: <20110317113255.GA28330@sepie.suse.cz>
-References: <20110315063425.9538.11565.stgit@mike.mtv.corp.google.com>
- <ilnq8l$rjj$1@dough.gmane.org>
+Subject: Re: [PATCH] modpost: fix trailing comma
+Message-ID: <20110317123958.GA30807@sepie.suse.cz>
+References: <20110315141347.d4ee75d3.randy.dunlap@oracle.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ilnq8l$rjj$1@dough.gmane.org>
+In-Reply-To: <20110315141347.d4ee75d3.randy.dunlap@oracle.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: WANG Cong <xiyou.wangcong@gmail.com>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Randy Dunlap <randy.dunlap@oracle.com>
+Cc: linux-kbuild@vger.kernel.org, lkml <linux-kernel@vger.kernel.org>
 
-On Tue, Mar 15, 2011 at 01:40:37PM +0000, WANG Cong wrote:
-> On Mon, 14 Mar 2011 23:34:25 -0700, Mike Waychison wrote:
+On Tue, Mar 15, 2011 at 02:13:47PM -0700, Randy Dunlap wrote:
+> From: Randy Dunlap <randy.dunlap@oracle.com>
 > 
-> > Patch applies to 2.6.38-rc8.
-> > 
-> > While changing our build system over to use the headers_install target
-> > as part of our klibc build, the following message started showing up in
-> > our logs:
-> > 
-> > make[2]: `scripts/unifdef' is up to date.
-> > 
-> > It turns out that the build blindly invokes a recursive make on this
-> > target, which causes make to emit this message when the target is
-> > already up to date.  This isn't seen for most targets as the rest of the
-> > build relies primarily on the default target and on PHONY targets when
-> > invoking make recursively.
-> > 
-> > Silence the above message when building unifdef as part of
-> > headers_install by hiding it behind a new PHONY target called
-> > "build_unifdef" that has an empty recipe.
-> > 
-> > Signed-off-by: Mike Waychison <mikew@google.com> ---
+> Consolidate locations that print a section whitelist into
+> calls to print_section_list().
 > 
-> Acked-by: WANG Cong <xiyou.wangcong@gmail.com>
+> Fix print_section_list() so that it does not print a trailing
+> comma & space:
+> 
+> If the reference is valid then annotate the
+> variable with __init* or __refdata (see linux/init.h) or name the variable:
+> *_template, *_timer, *_sht, *_ops, *_probe, *_probe_one, *_console, 
+> 
+> becomes:
+> If the reference is valid then annotate the
+> variable with __init* or __refdata (see linux/init.h) or name the variable:
+> *_template, *_timer, *_sht, *_ops, *_probe, *_probe_one, *_console
+> 
+> Signed-off-by: Randy Dunlap <randy.dunlap@oracle.com>
+> ---
+>  scripts/mod/modpost.c |   23 +++++++++++++++--------
+>  1 file changed, 15 insertions(+), 8 deletions(-)
 
 Applied to kbuild-2.6.git#kbuild, thanks.
 
