@@ -1,52 +1,82 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from shadbolt.e.decadent.org.uk ([88.96.1.126]:33295 "EHLO
-	shadbolt.e.decadent.org.uk" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1750938Ab1CSE0P convert rfc822-to-8bit
-	(ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 19 Mar 2011 00:26:15 -0400
-From: Ben Hutchings <ben@decadent.org.uk>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-Date: Sat, 19 Mar 2011 04:26:10 +0000
-Message-ID: <1300508770.26693.73.camel@localhost>
-Mime-Version: 1.0
-Subject: [PATCH] kconfig: Avoid buffer underrun in choice input
+Received: from cantor2.suse.de ([195.135.220.15]:33495 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1755080Ab1CSI6H (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 19 Mar 2011 04:58:07 -0400
+Date: Sat, 19 Mar 2011 09:58:02 +0100
+From: Michal Marek <mmarek@suse.cz>
+Subject: [GIT] kbuild core updates for 2.6.39-rc1
+Message-ID: <20110319085802.GA18336@sepie.suse.cz>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Roman Zippel <zippel@linux-m68k.org>
-Cc: linux-kbuild@vger.kernel.org
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: bp@alien8.de, dot@dotat.at, mikew@google.com, mmarek@suse.cz, randy.dunlap@oracle.com, u.kleine-koenig@pengutronix.de, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-commit 40aee729b350672c2550640622416a855e27938f ('kconfig: fix default
-value for choice input') fixed some cases where kconfig would select
-the wrong option from a choice with a single valid option and thus
-enter an infinite loop.
+Hi Linus,
 
-However, this broke the test for user input of the form 'N?', because
-when kconfig selects the single valid option the input is zero-length
-and the test will read the byte before the input buffer.  If this
-happens to contain '?' (as it will in a mips build on Debian unstable
-today) then kconfig again enters an infinite loop.
+please pull these kbuild updates for 2.6.39-rc1:
 
-Signed-off-by: Ben Hutchings <ben@decadent.org.uk>
-Cc: stable@kernel.org [2.6.17+]
----
- scripts/kconfig/conf.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
-
-diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
-index 659326c..006ad81 100644
---- a/scripts/kconfig/conf.c
-+++ b/scripts/kconfig/conf.c
-@@ -332,7 +332,7 @@ static int conf_choice(struct menu *menu)
- 		}
- 		if (!child)
- 			continue;
--		if (line[strlen(line) - 1] == '?') {
-+		if (line[0] && line[strlen(line) - 1] == '?') {
- 			print_help(child);
- 			continue;
- 		}
--- 
-1.7.4.1
+* Section mismatch analysis enabled by default
+  - there are only a few warnings for defconfig builds,
+    all{yes,mod}config still has a lot of them. Depending on the general
+    perception of this change, we might disable it later in the rc phase
+    again.
+* Update of unifdef. This is a noop for kbuild, but being in sync
+  with upstream is good.
+* make W=1 mode that enables a lot of non-default gcc warnings.
+* genksyms detects changes in enum constant values.
+* two minor fixes.
 
 
+The following changes since commit c56eb8fb6dccb83d9fe62fd4dc00c834de9bc470:
+
+  Linux 2.6.38-rc1 (2011-01-18 15:14:02 -0800)
+
+are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild-2.6.git kbuild
+
+Borislav Petkov (1):
+      kbuild: Add extra gcc checks
+
+Michal Marek (8):
+      genksyms: Do not paste the bison header file to lex.c
+      genksyms: Simplify lexer
+      genksyms: Simplify printing of symbol types
+      genksyms: Add helpers for building string lists
+      genksyms: simplify usage of find_symbol()
+      genksyms: Track changes to enum constants
+      genksyms: Regenerate lexer and parser
+      Merge branch 'genksyms-enum' into kbuild/kbuild
+
+Mike Waychison (1):
+      KBuild: silence "'scripts/unifdef' is up to date."
+
+Randy Dunlap (1):
+      modpost: fix trailing comma
+
+Tony Finch (1):
+      unifdef: update to upstream version 2.5
+
+Uwe Kleine-König (1):
+      kbuild: reenable section mismatch analysis
+
+ Documentation/kbuild/kbuild.txt  |    5 +
+ Makefile                         |    7 +-
+ lib/Kconfig.debug                |    4 -
+ scripts/Makefile                 |    5 +
+ scripts/Makefile.build           |   35 ++-
+ scripts/genksyms/Makefile        |    4 +-
+ scripts/genksyms/genksyms.c      |  192 +++++--
+ scripts/genksyms/genksyms.h      |    7 +-
+ scripts/genksyms/lex.c_shipped   |  427 ++++++----------
+ scripts/genksyms/lex.l           |   44 ++-
+ scripts/genksyms/parse.c_shipped | 1071 ++++++++++++++++++++++----------------
+ scripts/genksyms/parse.h_shipped |   72 +--
+ scripts/genksyms/parse.y         |   34 ++-
+ scripts/mod/modpost.c            |   23 +-
+ scripts/unifdef.c                |  247 +++++++---
+ 15 files changed, 1237 insertions(+), 940 deletions(-)
