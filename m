@@ -1,75 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-iy0-f174.google.com ([209.85.210.174]:56386 "EHLO
-	mail-iy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751541Ab1CUTf1 convert rfc822-to-8bit (ORCPT
+Received: from swampdragon.chaosbits.net ([90.184.90.115]:18646 "EHLO
+	swampdragon.chaosbits.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753867Ab1CUUIe (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 21 Mar 2011 15:35:27 -0400
+	Mon, 21 Mar 2011 16:08:34 -0400
+Date: Mon, 21 Mar 2011 21:08:24 +0100 (CET)
+From: Jesper Juhl <jj@chaosbits.net>
+Subject: PATCH][RFC][resend] CC_OPTIMIZE_FOR_SIZE should default to N
+Message-ID: <alpine.LNX.2.00.1103212105490.15815@swampdragon.chaosbits.net>
 MIME-Version: 1.0
-In-Reply-To: <alpine.LNX.2.00.1103212013060.15815@swampdragon.chaosbits.net>
-References: <alpine.LNX.2.00.1103212013060.15815@swampdragon.chaosbits.net>
-Date: Mon, 21 Mar 2011 15:35:27 -0400
-Message-ID: <AANLkTinD4ze=pZpGGmJ5vor9sbbBfuktAdRqpqiEHZW7@mail.gmail.com>
-Subject: Re: [PATCH][resend] Do not potentially overflow string in sumversion
-From: Arnaud Lacombe <lacombar@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 8BIT
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jesper Juhl <jj@chaosbits.net>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, WANG Cong <xiyou.wangcong@gmail.com>, James Morris <jmorris@intercode.com.au>, James Morris <jmorris@namei.org>, "David S. Miller" <davem@redhat.com>, David Miller <davem@davemloft.net>, Steve French <sfrench@us.ibm.com>, Steve French <smfrench@gmail.com>, Andrew Tridgell <tridge@samba.org>
+To: linux-kernel@vger.kernel.org
+Cc: Andrew Morton <akpm@linux-foundation.org>, "Paul E. McKenney" <paulmck@linux.vnet.ibm.com>, Ingo Molnar <mingo@elte.hu>, Daniel Lezcano <daniel.lezcano@free.fr>, Eric Paris <eparis@redhat.com>, Roman Zippel <zippel@linux-m68k.org>, linux-kbuild@vger.kernel.org
 
-Hi,
+I believe that the majority of systems we are built on want a -O2 compiled 
+kernel. Optimizing for size (-Os) is mainly benneficial for embedded 
+systems and systems with very small CPU caches (correct me if I'm wrong).
+So it seems wrong to me that CC_OPTIMIZE_FOR_SIZE defaults to 'y' and 
+recommends saying 'Y' if unsure. I believe it should default to 'n' and 
+recommend that if unsure. People who bennefit from -Os know who they are 
+and can enable the option if needed/wanted - the majority shouldn't 
+select this. Right?
 
-On Mon, Mar 21, 2011 at 3:17 PM, Jesper Juhl <jj@chaosbits.net> wrote:
-> In scripts/mod/sumversion.c (in get_src_version()) we call
-> getenv("MODVERDIR"). This returns a pointer to a string of unknown length.
-> This string of unknown length we then pass on as an argument to sprintf()
-> and tell it to write the result to 'filelist' which has a, very much
-> fixed, size of 'PATH_MAX + 1'. If the string returned by getenv() is too
-> long we'll overrun the statically allocated buffer.
-> This patch prevents the buffer overrun by using snprintf() and telling it
-> to copy a maximum of 'PATH_MAX + 1' bytes (including the terminating \0).
->
-> Signed-off-by: Jesper Juhl <jj@chaosbits.net>
-> Acked-by: WANG Cong <xiyou.wangcong@gmail.com>
-> ---
->  sumversion.c |    2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
->  compile tested only. Patch against Linus' tree as of right now.
->
-> diff --git
-> a/scripts/mod/sumversion.c
-> b/scripts/mod/sumversion.c
-> index 9dfcd6d..522c675 100644
-> --- a/scripts/mod/sumversion.c
-> +++ b/scripts/mod/sumversion.c
-> @@ -416,7 +416,7 @@ void get_src_version(const char *modname, char sum[], unsigned sumlen)
->                basename = strrchr(modname, '/') + 1;
->        else
->                basename = modname;
-> -       sprintf(filelist, "%s/%.*s.mod", modverdir,
-> +       snprintf(filelist, PATH_MAX + 1, "%s/%.*s.mod", modverdir,
->                (int) strlen(basename) - 2, basename);
->
-Please, do not use hardcoded size. The `sizeof' operator would be much
-more appropriate. Moreover, if you want thing to be done pedantically,
-you should also check that you do not get a truncated output. If
-snprintf() truncates the output, this should be reported and the error
-path should be followed, not to fail silently.
+Signed-off-by: Jesper Juhl <jj@chaosbits.net>
+---
+ Kconfig |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
- - Arnaud
+diff --git a/init/Kconfig b/init/Kconfig
+index 56240e7..0d63dfa 100644
+--- a/init/Kconfig
++++ b/init/Kconfig
+@@ -903,12 +903,12 @@ endif
+ 
+ config CC_OPTIMIZE_FOR_SIZE
+ 	bool "Optimize for size"
+-	default y
++	default n
+ 	help
+ 	  Enabling this option will pass "-Os" instead of "-O2" to gcc
+ 	  resulting in a smaller kernel.
+ 
+-	  If unsure, say Y.
++	  If unsure, say N.
+ 
+ config SYSCTL
+ 	bool
 
->        file = grab_file(filelist, &len);
->
->
-> --
-> Jesper Juhl <jj@chaosbits.net>       http://www.chaosbits.net/
-> Don't top-post http://www.catb.org/jargon/html/T/top-post.html
-> Plain text mails only, please.
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
+
+-- 
+Jesper Juhl <jj@chaosbits.net>       http://www.chaosbits.net/
+Don't top-post http://www.catb.org/jargon/html/T/top-post.html
+Plain text mails only, please.
+
