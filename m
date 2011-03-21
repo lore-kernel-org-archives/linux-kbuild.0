@@ -1,57 +1,80 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from swampdragon.chaosbits.net ([90.184.90.115]:18646 "EHLO
-	swampdragon.chaosbits.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753867Ab1CUUIe (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 21 Mar 2011 16:08:34 -0400
-Date: Mon, 21 Mar 2011 21:08:24 +0100 (CET)
-From: Jesper Juhl <jj@chaosbits.net>
-Subject: PATCH][RFC][resend] CC_OPTIMIZE_FOR_SIZE should default to N
-Message-ID: <alpine.LNX.2.00.1103212105490.15815@swampdragon.chaosbits.net>
+Received: from cantor.suse.de ([195.135.220.2]:35703 "EHLO mx1.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754397Ab1CUVPC (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 21 Mar 2011 17:15:02 -0400
+Date: Mon, 21 Mar 2011 22:15:00 +0100
+From: Michal Marek <mmarek@suse.cz>
+Subject: [GIT] kbuild updates v2
+Message-ID: <20110321211500.GA21251@sepie.suse.cz>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: Andrew Morton <akpm@linux-foundation.org>, "Paul E. McKenney" <paulmck@linux.vnet.ibm.com>, Ingo Molnar <mingo@elte.hu>, Daniel Lezcano <daniel.lezcano@free.fr>, Eric Paris <eparis@redhat.com>, Roman Zippel <zippel@linux-m68k.org>, linux-kbuild@vger.kernel.org
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: bp@alien8.de, dot@dotat.at, mikew@google.com, mmarek@suse.cz, randy.dunlap@oracle.com, u.kleine-koenig@pengutronix.de, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-I believe that the majority of systems we are built on want a -O2 compiled 
-kernel. Optimizing for size (-Os) is mainly benneficial for embedded 
-systems and systems with very small CPU caches (correct me if I'm wrong).
-So it seems wrong to me that CC_OPTIMIZE_FOR_SIZE defaults to 'y' and 
-recommends saying 'Y' if unsure. I believe it should default to 'n' and 
-recommend that if unsure. People who bennefit from -Os know who they are 
-and can enable the option if needed/wanted - the majority shouldn't 
-select this. Right?
+Hi Linus,
 
-Signed-off-by: Jesper Juhl <jj@chaosbits.net>
----
- Kconfig |    4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+please pull these kbuild updates for v2.6.39-rc1:
 
-diff --git a/init/Kconfig b/init/Kconfig
-index 56240e7..0d63dfa 100644
---- a/init/Kconfig
-+++ b/init/Kconfig
-@@ -903,12 +903,12 @@ endif
- 
- config CC_OPTIMIZE_FOR_SIZE
- 	bool "Optimize for size"
--	default y
-+	default n
- 	help
- 	  Enabling this option will pass "-Os" instead of "-O2" to gcc
- 	  resulting in a smaller kernel.
- 
--	  If unsure, say Y.
-+	  If unsure, say N.
- 
- config SYSCTL
- 	bool
+* CONFIG_DEBUG_SECTION_MISMATCH can be selected in the configuration
+  (so allyesconfig and allmodconfig select it, obviously)
+* Update of unifdef. This is a noop for kbuild, but being in sync
+  with upstream is good.
+* make W=1 mode that enables a lot of non-default gcc warnings.
+* genksyms detects changes in enum constant values.
+* two minor fixes.
 
 
--- 
-Jesper Juhl <jj@chaosbits.net>       http://www.chaosbits.net/
-Don't top-post http://www.catb.org/jargon/html/T/top-post.html
-Plain text mails only, please.
+The following changes since commit c56eb8fb6dccb83d9fe62fd4dc00c834de9bc470:
 
+  Linux 2.6.38-rc1 (2011-01-18 15:14:02 -0800)
+
+are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild-2.6.git kbuild
+
+Borislav Petkov (1):
+      kbuild: Add extra gcc checks
+
+Michal Marek (9):
+      genksyms: Do not paste the bison header file to lex.c
+      genksyms: Simplify lexer
+      genksyms: Simplify printing of symbol types
+      genksyms: Add helpers for building string lists
+      genksyms: simplify usage of find_symbol()
+      genksyms: Track changes to enum constants
+      genksyms: Regenerate lexer and parser
+      Merge branch 'genksyms-enum' into kbuild/kbuild
+      kbuild: Make DEBUG_SECTION_MISMATCH selectable, but not on by default
+
+Mike Waychison (1):
+      KBuild: silence "'scripts/unifdef' is up to date."
+
+Randy Dunlap (1):
+      modpost: fix trailing comma
+
+Tony Finch (1):
+      unifdef: update to upstream version 2.5
+
+Uwe Kleine-König (1):
+      kbuild: reenable section mismatch analysis
+
+ Documentation/kbuild/kbuild.txt  |    5 +
+ Makefile                         |    7 +-
+ lib/Kconfig.debug                |    5 -
+ scripts/Makefile                 |    5 +
+ scripts/Makefile.build           |   35 ++-
+ scripts/genksyms/Makefile        |    4 +-
+ scripts/genksyms/genksyms.c      |  192 +++++--
+ scripts/genksyms/genksyms.h      |    7 +-
+ scripts/genksyms/lex.c_shipped   |  427 ++++++----------
+ scripts/genksyms/lex.l           |   44 ++-
+ scripts/genksyms/parse.c_shipped | 1071 ++++++++++++++++++++++----------------
+ scripts/genksyms/parse.h_shipped |   72 +--
+ scripts/genksyms/parse.y         |   34 ++-
+ scripts/mod/modpost.c            |   23 +-
+ scripts/unifdef.c                |  247 +++++++---
+ 15 files changed, 1237 insertions(+), 941 deletions(-)
