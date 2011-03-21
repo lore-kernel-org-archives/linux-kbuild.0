@@ -1,131 +1,56 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor.suse.de ([195.135.220.2]:51749 "EHLO mx1.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755948Ab1CSJUF (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 19 Mar 2011 05:20:05 -0400
-Date: Sat, 19 Mar 2011 10:20:03 +0100
-From: Michal Marek <mmarek@suse.cz>
-Subject: [GIT] kbuild: Makefile cleanups all over the tree
-Message-ID: <20110319092003.GA19739@sepie.suse.cz>
+Received: from smtp1.linux-foundation.org ([140.211.169.13]:59191 "EHLO
+	smtp1.linux-foundation.org" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1752382Ab1CUAyT convert rfc822-to-8bit
+	(ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 20 Mar 2011 20:54:19 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+In-Reply-To: <20110319085802.GA18336@sepie.suse.cz>
+References: <20110319085802.GA18336@sepie.suse.cz>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Sun, 20 Mar 2011 17:53:24 -0700
+Message-ID: <AANLkTin5vYaU83K0YOdD1OgCS24LA8XBSvNfmGFnjhGF@mail.gmail.com>
+Subject: Re: [GIT] kbuild core updates for 2.6.39-rc1
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: mfm@muteddisk.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>
+Cc: bp@alien8.de, dot@dotat.at, mikew@google.com, randy.dunlap@oracle.com, u.kleine-koenig@pengutronix.de, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Hi Linus,
+On Sat, Mar 19, 2011 at 1:58 AM, Michal Marek <mmarek@suse.cz> wrote:
+>
+> * Section mismatch analysis enabled by default
+>  - there are only a few warnings for defconfig builds,
+>    all{yes,mod}config still has a lot of them. Depending on the general
+>    perception of this change, we might disable it later in the rc phase
+>    again.
 
-there is one more branch this time. Matt Mooney did a cleanup of our
-Makefiles, mostly getting rid of EXTRA_CFLAGS assignments in favor of
-cflags-y.  These are commits that haven't been picked up by the
-respective subsystem maintainers. The branch is based on v2.6.38 to
-avoid some conflicts. The only one happens in drivers/hwmon/Makefile and
-is trivial to resolve. Please pull.
+No.
 
-Thanks,
-Michal
+We don't enable stuff like this by default. Not when it actually
+changes some really fundamental compiler flags, and thus the whole "we
+can disable it late in -rc again" is a totally broken option, since if
+we have any compiler issues, we'd want to know it early.
 
-The following changes since commit 521cb40b0c44418a4fd36dc633f575813d59a43d:
+And we _know_ we are going to disable it, since it enables the "don't
+inline" flag to gcc for called-once functions. So there's no question
+at all what the default should be in any release kernel.
 
-  Linux 2.6.38 (2011-03-14 18:20:32 -0700)
+Anyway - in general, enabling options like this had better have some
+_seriously_ major reasons. IOW, major known issues that just have to
+be sorted out and cannot be sorted out any other way. That doesn't
+seem to be the case here.
 
-are available in the git repository at:
-  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild-2.6.git trivial
+WE DO NOT EVER ENABLE NEW THINGS BY DEFAULT. I know, I know - every
+developer always thinks that _his_ code is special and magically so
+important that it should be enabled by default, but no, that is simply
+not the case. The only reason to enable something by default is that
+it used to never be a config option in the first place, so if somebody
+builds a new kernel, and he used to just silently get the feature,
+then the new config option is still on by default.
 
-matt mooney (25):
-      kernel: change to new flag variable
-      arm: change to new flag variables
-      h8300: change to new flag variable
-      ia64: change to new flag variables
-      microblaze: change to new flag variable
-      mips: change to new flag variable
-      s390: change to new flag variable
-      um: change to new flag variables
-      xtensa: change to new flag variable
-      fs: change to new flag variable
-      char: change to new flag variable
-      dma: change to new flag variable
-      hwmon: change to new flag variable
-      ide: change to new flag variable
-      ieee802154: change to new flag variable
-      isdn: change to new flag variable
-      memstick: change to new flag variable
-      message: change to new flag variable
-      misc: change to new flag variable
-      net: change to new flag variable
-      pps: change to new flag variable
-      rapidio: change to new flag variable
-      rtc: change to new flag variable
-      scsi: change to new flag variable
-      video: change to new flag variable
+Not pulling. This is a pet peeve of mine. We don't use "set to 'y' on
+default" as a way to trick people into enabling code. No, no, no.
 
- arch/arm/boot/compressed/Makefile           |    4 ++--
- arch/arm/vfp/Makefile                       |    4 ++--
- arch/h8300/boot/compressed/Makefile         |    2 +-
- arch/ia64/kvm/Makefile                      |    4 ++--
- arch/ia64/sn/kernel/Makefile                |    2 +-
- arch/ia64/sn/kernel/sn2/Makefile            |    2 +-
- arch/ia64/sn/pci/Makefile                   |    2 +-
- arch/ia64/sn/pci/pcibr/Makefile             |    2 +-
- arch/ia64/uv/kernel/Makefile                |    2 +-
- arch/microblaze/kernel/cpu/Makefile         |    2 +-
- arch/mips/Makefile                          |    4 ++--
- arch/mips/bcm63xx/boards/Makefile           |    2 +-
- arch/mips/fw/arc/Makefile                   |    2 +-
- arch/mips/jz4740/Makefile                   |    2 +-
- arch/mips/oprofile/Makefile                 |    2 +-
- arch/mips/pmc-sierra/yosemite/Makefile      |    2 +-
- arch/mips/powertv/Makefile                  |    2 +-
- arch/mips/powertv/asic/Makefile             |    2 +-
- arch/mips/powertv/pci/Makefile              |    2 +-
- arch/s390/boot/Makefile                     |    2 +-
- arch/s390/kvm/Makefile                      |    2 +-
- arch/s390/math-emu/Makefile                 |    2 +-
- arch/um/sys-ppc/Makefile                    |   10 +++++-----
- arch/xtensa/boot/Makefile                   |    2 +-
- arch/xtensa/boot/lib/Makefile               |    2 +-
- drivers/char/mwave/Makefile                 |    4 ++--
- drivers/char/mwave/README                   |    2 +-
- drivers/dma/Makefile                        |    8 ++------
- drivers/hwmon/Makefile                      |    4 +---
- drivers/ide/Makefile                        |    2 +-
- drivers/ieee802154/Makefile                 |    2 +-
- drivers/isdn/hisax/Makefile                 |    2 +-
- drivers/memstick/Makefile                   |    4 +---
- drivers/memstick/core/Makefile              |    4 ----
- drivers/memstick/host/Makefile              |    4 ----
- drivers/message/fusion/Makefile             |    2 +-
- drivers/misc/cb710/Makefile                 |    4 +---
- drivers/misc/sgi-gru/Makefile               |    4 +---
- drivers/net/caif/Makefile                   |    4 +---
- drivers/net/skfp/Makefile                   |    2 +-
- drivers/net/wan/lmc/Makefile                |    2 +-
- drivers/net/wireless/hostap/hostap_config.h |    4 ++--
- drivers/net/wireless/zd1211rw/Makefile      |    4 +---
- drivers/pps/clients/Makefile                |    4 +---
- drivers/rapidio/Makefile                    |    4 +---
- drivers/rapidio/switches/Makefile           |    4 ----
- drivers/rtc/Makefile                        |    4 +---
- drivers/scsi/aacraid/Makefile               |    2 +-
- drivers/scsi/aic94xx/Makefile               |    4 +---
- drivers/scsi/libsas/Makefile                |    2 +-
- drivers/scsi/lpfc/Makefile                  |    6 ++----
- drivers/scsi/mvsas/Makefile                 |    4 +---
- drivers/scsi/pcmcia/Makefile                |    2 +-
- drivers/video/intelfb/Makefile              |    5 +----
- fs/affs/Makefile                            |    2 +-
- fs/coda/Makefile                            |    2 +-
- fs/gfs2/Makefile                            |    2 +-
- fs/jfs/Makefile                             |    2 +-
- fs/ncpfs/Makefile                           |    2 +-
- fs/ntfs/Makefile                            |   19 +++++++------------
- fs/ocfs2/Makefile                           |    4 ++--
- fs/ocfs2/dlm/Makefile                       |    2 +-
- fs/ocfs2/dlmfs/Makefile                     |    2 +-
- fs/reiserfs/Makefile                        |    4 +---
- fs/xfs/Makefile                             |    7 ++-----
- kernel/gcov/Makefile                        |    2 +-
- kernel/power/Makefile                       |    3 ++-
- 67 files changed, 85 insertions(+), 137 deletions(-)
+                             Linus
