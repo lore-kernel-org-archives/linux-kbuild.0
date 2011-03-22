@@ -1,48 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx3.mail.elte.hu ([157.181.1.138]:52981 "EHLO mx3.mail.elte.hu"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753590Ab1CVK1z (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 22 Mar 2011 06:27:55 -0400
-Date: Tue, 22 Mar 2011 11:27:41 +0100
-From: Ingo Molnar <mingo@elte.hu>
-Subject: Re: PATCH][RFC][resend] CC_OPTIMIZE_FOR_SIZE should default to N
-Message-ID: <20110322102741.GA4448@elte.hu>
-References: <alpine.LNX.2.00.1103212105490.15815@swampdragon.chaosbits.net>
- <AANLkTinmAJsXy=iJ5Fq-+CLTAGXTtLGhULRUf=Q1rkY1@mail.gmail.com>
+Received: from mail-pv0-f174.google.com ([74.125.83.174]:48057 "EHLO
+	mail-pv0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751944Ab1CVOjU (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 22 Mar 2011 10:39:20 -0400
+Date: Tue, 22 Mar 2011 22:38:43 +0800
+From: Harry Wei <jiaweiwei.xiyou@gmail.com>
+Subject: [PATCH]Clean up CodingStyle for scripts/kconfig/gconf.c
+Message-ID: <20110322143839.GA10291@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <AANLkTinmAJsXy=iJ5Fq-+CLTAGXTtLGhULRUf=Q1rkY1@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Pekka Enberg <penberg@kernel.org>
-Cc: Jesper Juhl <jj@chaosbits.net>, linux-kernel@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>, "Paul E. McKenney" <paulmck@linux.vnet.ibm.com>, Daniel Lezcano <daniel.lezcano@free.fr>, Eric Paris <eparis@redhat.com>, Roman Zippel <zippel@linux-m68k.org>, linux-kbuild@vger.kernel.org, Linus Torvalds <torvalds@linux-foundation.org>, Steven Rostedt <rostedt@goodmis.org>
+To: zippel@linux-m68k.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: greg@kroah.com, joe@perches.com, akpm@linux-foundation.org
 
+Hi us,
+   	Clean up CodingStyle for scripts/kconfig/gconf.c.
 
-* Pekka Enberg <penberg@kernel.org> wrote:
+Thanks.
+Best Regards.
+Harry Wei.
 
-> Hi Jesper,
-> 
-> On Mon, Mar 21, 2011 at 10:08 PM, Jesper Juhl <jj@chaosbits.net> wrote:
-> > I believe that the majority of systems we are built on want a -O2 compiled
-> > kernel. Optimizing for size (-Os) is mainly benneficial for embedded
-> > systems and systems with very small CPU caches (correct me if I'm wrong).
-> 
-> Please take a look at commit 0910b44 ("Expose "Optimize for size"
-> option for everybody") for the reasoning behind defaulting to -Os.
+Signed-off-by: Harry Wei <harryxiyou@gmail.com>
+---
+ scripts/kconfig/gconf.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-If that situation has changed - if GCC has regressed in this area then a commit 
-changing the default IMHO gains a lot of credibility if it is backed by careful 
-measurements using perf stat --repeat or similar tools.
+diff --git a/scripts/kconfig/gconf.c b/scripts/kconfig/gconf.c
+index 4558961..56da945 100644
+--- a/scripts/kconfig/gconf.c
++++ b/scripts/kconfig/gconf.c
+@@ -7,7 +7,7 @@
+  */
+ 
+ #ifdef HAVE_CONFIG_H
+-#  include <config.h>
++#include <config.h>
+ #endif
+ 
+ #include "lkc.h"
+-- 
+1.7.0.4
 
-See the hard numbers in this upstream commit for example:
-
-  ea7145477a46: x86: Separate out entry text section
-
-there we were able to prove the positive effects of a pretty subtle change to 
-the layout of the instruction cache, with a measurement noise in the 0.1% 
-range.
-
-Thanks,
-
-	Ingo
