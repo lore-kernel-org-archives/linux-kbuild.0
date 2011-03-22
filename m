@@ -1,62 +1,61 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp1.linux-foundation.org ([140.211.169.13]:43494 "EHLO
-	smtp1.linux-foundation.org" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1752265Ab1CVRA5 (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 22 Mar 2011 13:00:57 -0400
-MIME-Version: 1.0
-In-Reply-To: <20110322102741.GA4448@elte.hu>
-References: <alpine.LNX.2.00.1103212105490.15815@swampdragon.chaosbits.net>
- <AANLkTinmAJsXy=iJ5Fq-+CLTAGXTtLGhULRUf=Q1rkY1@mail.gmail.com> <20110322102741.GA4448@elte.hu>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Tue, 22 Mar 2011 09:59:59 -0700
-Message-ID: <AANLkTikz+vJGFuysDXAdVb33q1q3L547dXNJa9NmeqeM@mail.gmail.com>
-Subject: Re: PATCH][RFC][resend] CC_OPTIMIZE_FOR_SIZE should default to N
-Content-Type: text/plain; charset=ISO-8859-1
+Received: from www.linuxtv.org ([130.149.80.248]:58956 "EHLO www.linuxtv.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750757Ab1CVSft (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 22 Mar 2011 14:35:49 -0400
+From: Mauro Carvalho Chehab <mchehab@redhat.com>
+Date: Tue, 22 Mar 2011 18:31:26 +0100
+Subject: [git:v4l-dvb/for_v2.6.39] [media] saa7134: Fix strange kconfig dependency on RC_CORE
+Reply-to: linux-media@vger.kernel.org
+Message-Id: <E1Q2683-0005ZV-Bq@www.linuxtv.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ingo Molnar <mingo@elte.hu>
-Cc: Pekka Enberg <penberg@kernel.org>, Jesper Juhl <jj@chaosbits.net>, linux-kernel@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>, "Paul E. McKenney" <paulmck@linux.vnet.ibm.com>, Daniel Lezcano <daniel.lezcano@free.fr>, Eric Paris <eparis@redhat.com>, Roman Zippel <zippel@linux-m68k.org>, linux-kbuild@vger.kernel.org, Steven Rostedt <rostedt@goodmis.org>
+To: linuxtv-commits@linuxtv.org
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, Steven Rostedt <rostedt@goodmis.org>, Michal Marek <mmarek@suse.cz>
 
-On Tue, Mar 22, 2011 at 3:27 AM, Ingo Molnar <mingo@elte.hu> wrote:
->
-> If that situation has changed - if GCC has regressed in this area then a commit
-> changing the default IMHO gains a lot of credibility if it is backed by careful
-> measurements using perf stat --repeat or similar tools.
+This is an automatic generated email to let you know that the following patch were queued at the 
+http://git.linuxtv.org/media_tree.git tree:
 
-Also, please don't back up any numbers for the "-O2 is faster than
--Os" case with some benchmark that is hot in the caches.
+Subject: [media] saa7134: Fix strange kconfig dependency on RC_CORE
+Author:  Steven Rostedt <rostedt@goodmis.org>
+Date:    Thu Mar 10 19:41:29 2011 -0300
 
-The thing is, many optimizations that make the code larger look really
-good if there are no cache misses, and the code is run a million times
-in a tight loop.
+As the code in saa7134-input is not a module, but the config for it is
+set as a boolean instead of a tristate, this causes a strange dependency
+on RC_CORE.
 
-But kernel code in particular tends to not be like that. Yes, there
-are cases where we spend 75% of the time in the kernel (my own
-personal favorite is "git diff") basically having user space loop
-around just one single operation. But it is _really_ quite rare in
-real life. Most of the time, user space will blow the kernel caches
-out of the water, and the kernel loops will be on the order of a few
-entries (eg a "loop" may be the loop around a pathname lookup, and
-loops over three path components). Not millions.
+VIDEO_SAA7134_RC (which determines if saa7134-input.o is built) depends
+on RC_CORE and VIDEO_SAA7134. If VIDEO_SAA7134 is compiled as 'y' but
+RC_CORE is compiled as 'm' VIDEO_SAA7134_RC can still be set to 'y'
+which causes undefined symbols that it needs from RC_CORE.
 
-The rule-of-thumb should be simple: 10% larger code likely means 10%
-more I$ misses. Does the larger -O2 code make up for it?
+The simplest solution is to not allow VIDEO_SAA7134_RC be enabled if
+RC_CORE compiled as a module (m) and VIDEO_SA7134 is compiled into the
+kernel (y).
 
-Now, the downside of -Os has always been that it's not all that widely
-used, so we've hit compiler bugs several times. That's been almost
-enough to make me think that it's not worth it. But currently I don't
-think we have any known issues, and probably exactly _because_ we use
--Os it seems that gcc hasn't that many regressions. It was much more
-painful when we started trying to use -Os.
+Suggested-by: Mauro Carvalho Chehab <mchehab@redhat.com>
 
-(That said, gcc -Os isn't all that wonderful. It tends to sometimes
-generate really crappy code just because it's smaller, ie using a
-multiply instruction in a critical code window just because doing a
-few shifts and adds is larger. And that can be _so_ much slower that
-it really hurts. So we might be better off with a model where we can
-say "this code is important and really core kernel code that everybody
-uses, do -O2 for this", and just compile _most_ of the kernel with
--Os)
+Cc: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>
+Signed-off-by: Steven Rostedt <rostedt@goodmis.org>
+Signed-off-by: Mauro Carvalho Chehab <mchehab@redhat.com>
 
-                             Linus
+ drivers/media/video/saa7134/Kconfig |    1 +
+ 1 files changed, 1 insertions(+), 0 deletions(-)
+
+---
+
+http://git.linuxtv.org/media_tree.git?a=commitdiff;h=7c696f20036849846aa8a1d2ea895f1ab59e0c8e
+
+diff --git a/drivers/media/video/saa7134/Kconfig b/drivers/media/video/saa7134/Kconfig
+index 380f1b2..39fc018 100644
+--- a/drivers/media/video/saa7134/Kconfig
++++ b/drivers/media/video/saa7134/Kconfig
+@@ -28,6 +28,7 @@ config VIDEO_SAA7134_RC
+ 	bool "Philips SAA7134 Remote Controller support"
+ 	depends on RC_CORE
+ 	depends on VIDEO_SAA7134
++	depends on !(RC_CORE=m && VIDEO_SAA7134=y)
+ 	default y
+ 	---help---
+ 	  Enables Remote Controller support on saa7134 driver.
