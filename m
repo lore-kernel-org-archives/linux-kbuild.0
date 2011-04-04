@@ -1,81 +1,51 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cpoproxy1-pub.bluehost.com ([69.89.21.11]:45041 "HELO
-	cpoproxy1-pub.bluehost.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with SMTP id S1752037Ab1DDQWb (ORCPT
+Received: from bipbip.grupopie.com ([195.23.16.24]:39180 "EHLO
+	bipbip.grupopie.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754807Ab1DDQ2J (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 4 Apr 2011 12:22:31 -0400
-Date: Mon, 4 Apr 2011 09:22:29 -0700
-From: Randy Dunlap <rdunlap@xenotime.net>
-Subject: Re: [PATCH 1/2] Kconfig: improve KALLSYMS_ALL documentation
-Message-Id: <20110404092229.ad3f9311.rdunlap@xenotime.net>
-In-Reply-To: <1301913651-9055-1-git-send-email-dedekind1@gmail.com>
-References: <1301913651-9055-1-git-send-email-dedekind1@gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+	Mon, 4 Apr 2011 12:28:09 -0400
+Message-ID: <4D99EB3E.1020202@grupopie.com>
+Date: Mon, 04 Apr 2011 17:01:02 +0100
+From: Paulo Marques <pmarques@grupopie.com>
+MIME-Version: 1.0
+Subject: Re: [PATCH 2/2] kbuild: move KALLSYMS_EXTRA_PASS from Kconfig to
+ Makefile
+References: <1301913651-9055-1-git-send-email-dedekind1@gmail.com>	 <1301913651-9055-2-git-send-email-dedekind1@gmail.com>	 <131611.1301921158@localhost> <1301921230.2760.79.camel@localhost>	 <7621.1301930536@localhost> <1301931464.2760.101.camel@localhost>
+In-Reply-To: <1301931464.2760.101.camel@localhost>
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Artem Bityutskiy <dedekind1@gmail.com>
-Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Paulo Marques <pmarques@grupopie.com>
+To: dedekind1@gmail.com
+Cc: Valdis.Kletnieks@vt.edu, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Mon,  4 Apr 2011 13:40:50 +0300 Artem Bityutskiy wrote:
-
-> From: Artem Bityutskiy <Artem.Bityutskiy@nokia.com>
+Artem Bityutskiy wrote:
+> On Mon, 2011-04-04 at 11:22 -0400, Valdis.Kletnieks@vt.edu wrote:
+>> [...]
+>> When was the last time we actually saw such a bug report?  I'm suspecting that
+>> all the affected people just set the variable and get on with their lives.  So
+>> we should either just make it automatic if that's what people are going to do,
+>> or we rip the entire "EXTRA_PASS' stuff out forcibly and *make* people fix the
+>> actual underlying issue that causes the extra pass to be needed...
 > 
-> Dumb users like myself are not able to grasp from the existing KALLSYMS_ALL
-> documentation that this option is not what they need. Improve the help
-> message and make it clearer that KALLSYMS is enough in the majority of
-> use cases, and KALLSYMS_ALL should really be used very rarely.
+> I do not know when this bug was last seen, but I'd not remove this
+> "extra pass" work around so far. WRT automatic fix-up - I do not have
+> strong opinion here, but Paulo Marques pointed in another thread that
+> due to various alignment issues the bug is tricky and may come back. So
+> probably removing working code is not very wise. Thus, it seems the way
+> I proposed in this patch is a good balance.
 > 
-> Signed-off-by: Artem Bityutskiy <Artem.Bityutskiy@nokia.com>
-> Cc: Paulo Marques <pmarques@grupopie.com>
-> Cc: Michal Marek <mmarek@suse.cz>
-> 
-> ---
->  init/Kconfig |   18 ++++++++++++------
->  1 files changed, 12 insertions(+), 6 deletions(-)
-> 
-> diff --git a/init/Kconfig b/init/Kconfig
-> index 56240e7..dae5297 100644
-> --- a/init/Kconfig
-> +++ b/init/Kconfig
-> @@ -968,12 +968,18 @@ config KALLSYMS_ALL
->  	bool "Include all symbols in kallsyms"
->  	depends on DEBUG_KERNEL && KALLSYMS
->  	help
-> -	   Normally kallsyms only contains the symbols of functions, for nicer
-> -	   OOPS messages.  Some debuggers can use kallsyms for other
-> -	   symbols too: say Y here to include all symbols, if you need them 
-> -	   and you don't care about adding 300k to the size of your kernel.
-> -
-> -	   Say N.
-> +	   Normally kallsyms only contains the symbols of functions for nicer
-> +	   OOPS messages and backtraces(i.e., symbols from the text and inittext
+> But anyway, if Michal Marek requests to change this, I'll do this (he is
+> the Maintainer).
 
-add space:                   backtraces (i.e.,
+Doing a search on a mail archive for "Inconsistent kallsyms data"
+results in a dozen or so threads, and the last one seems to be on alpha
+in 2008.
 
-> +	   sections). This is sufficient for most cases. And only in very rare
-> +	   cases (e.g., when a debugger is used) all symbols are required (e.g.,
-> +	   names of variables from the data sections, etc).
-> +
-> +	   This option makes sure that all symbols are loaded into the kernel
-> +	   image (i.e., symbols from all sections) in cost of increased kernel
-> +	   size (depending on the kernel configuration, it may be 300KiB or
-> +	   something like this).
-> +
-> +	   Say N unless you really need all symbols.
->  
->  config KALLSYMS_EXTRA_PASS
->  	bool "Do an extra kallsyms pass"
-> -- 
-> 1.7.2.3
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Not very frequent for certain, but not in the "never been seen" category
+either.
 
+-- 
+Paulo Marques - www.grupopie.com
 
----
-~Randy
-*** Remember to use Documentation/SubmitChecklist when testing your code ***
+"All I ask is a chance to prove that money can't make me happy."
