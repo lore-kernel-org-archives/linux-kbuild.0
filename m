@@ -1,55 +1,86 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor.suse.de ([195.135.220.2]:44466 "EHLO mx1.suse.de"
+Received: from cantor.suse.de ([195.135.220.2]:44454 "EHLO mx1.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754147Ab1DEO7i (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 5 Apr 2011 10:59:38 -0400
+	id S1754124Ab1DEO7g (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 5 Apr 2011 10:59:36 -0400
 From: Michal Marek <mmarek@suse.cz>
-Subject: [PATCH 23/34] scsi/wd33c93: Drop __TIME__ usage
-Date: Tue,  5 Apr 2011 16:59:10 +0200
-Message-Id: <1302015561-21047-24-git-send-email-mmarek@suse.cz>
+Subject: [PATCH 15/34] baycom: Drop __TIME__ usage
+Date: Tue,  5 Apr 2011 16:59:02 +0200
+Message-Id: <1302015561-21047-16-git-send-email-mmarek@suse.cz>
 In-Reply-To: <1302015561-21047-1-git-send-email-mmarek@suse.cz>
 References: <1302015561-21047-1-git-send-email-mmarek@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, "James E.J. Bottomley" <James.Bottomley@suse.de>, linux-scsi@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, Thomas Sailer <t.sailer@alumni.ethz.ch>, linux-hams@vger.kernel.org, netdev@vger.kernel.org
 
 The kernel already prints its build timestamp during boot, no need to
 repeat it in random drivers and produce different object files each
 time.
 
-Cc: "James E.J. Bottomley" <James.Bottomley@suse.de>
-Cc: linux-scsi@vger.kernel.org
+Cc: Thomas Sailer <t.sailer@alumni.ethz.ch>
+Cc: linux-hams@vger.kernel.org
+Cc: netdev@vger.kernel.org
 Signed-off-by: Michal Marek <mmarek@suse.cz>
 ---
- drivers/scsi/wd33c93.c |    7 +++----
- 1 files changed, 3 insertions(+), 4 deletions(-)
+ drivers/net/hamradio/baycom_epp.c     |    2 +-
+ drivers/net/hamradio/baycom_par.c     |    2 +-
+ drivers/net/hamradio/baycom_ser_fdx.c |    2 +-
+ drivers/net/hamradio/baycom_ser_hdx.c |    2 +-
+ 4 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/scsi/wd33c93.c b/drivers/scsi/wd33c93.c
-index 5f697e0..6c983a2 100644
---- a/drivers/scsi/wd33c93.c
-+++ b/drivers/scsi/wd33c93.c
-@@ -2052,8 +2052,7 @@ wd33c93_init(struct Scsi_Host *instance, const wd33c93_regs regs,
- 	for (i = 0; i < MAX_SETUP_ARGS; i++)
- 		printk("%s,", setup_args[i]);
- 	printk("\n");
--	printk("           Version %s - %s, Compiled %s at %s\n",
--	       WD33C93_VERSION, WD33C93_DATE, __DATE__, __TIME__);
-+	printk("           Version %s - %s\n", WD33C93_VERSION, WD33C93_DATE);
- }
+diff --git a/drivers/net/hamradio/baycom_epp.c b/drivers/net/hamradio/baycom_epp.c
+index a3c0dc9..9537aaa 100644
+--- a/drivers/net/hamradio/baycom_epp.c
++++ b/drivers/net/hamradio/baycom_epp.c
+@@ -69,7 +69,7 @@ static const char paranoia_str[] = KERN_ERR
  
- int
-@@ -2133,8 +2132,8 @@ wd33c93_proc_info(struct Scsi_Host *instance, char *buf, char **start, off_t off
- 	bp = buf;
- 	*bp = '\0';
- 	if (hd->proc & PR_VERSION) {
--		sprintf(tbuf, "\nVersion %s - %s. Compiled %s %s",
--			WD33C93_VERSION, WD33C93_DATE, __DATE__, __TIME__);
-+		sprintf(tbuf, "\nVersion %s - %s.",
-+			WD33C93_VERSION, WD33C93_DATE);
- 		strcat(bp, tbuf);
- 	}
- 	if (hd->proc & PR_INFO) {
+ static const char bc_drvname[] = "baycom_epp";
+ static const char bc_drvinfo[] = KERN_INFO "baycom_epp: (C) 1998-2000 Thomas Sailer, HB9JNX/AE4WA\n"
+-"baycom_epp: version 0.7 compiled " __TIME__ " " __DATE__ "\n";
++"baycom_epp: version 0.7\n";
+ 
+ /* --------------------------------------------------------------------- */
+ 
+diff --git a/drivers/net/hamradio/baycom_par.c b/drivers/net/hamradio/baycom_par.c
+index 5f5af9a..279d229 100644
+--- a/drivers/net/hamradio/baycom_par.c
++++ b/drivers/net/hamradio/baycom_par.c
+@@ -102,7 +102,7 @@
+ 
+ static const char bc_drvname[] = "baycom_par";
+ static const char bc_drvinfo[] = KERN_INFO "baycom_par: (C) 1996-2000 Thomas Sailer, HB9JNX/AE4WA\n"
+-"baycom_par: version 0.9 compiled " __TIME__ " " __DATE__ "\n";
++"baycom_par: version 0.9\n";
+ 
+ /* --------------------------------------------------------------------- */
+ 
+diff --git a/drivers/net/hamradio/baycom_ser_fdx.c b/drivers/net/hamradio/baycom_ser_fdx.c
+index 3e25f10..99cdce3 100644
+--- a/drivers/net/hamradio/baycom_ser_fdx.c
++++ b/drivers/net/hamradio/baycom_ser_fdx.c
+@@ -92,7 +92,7 @@
+ 
+ static const char bc_drvname[] = "baycom_ser_fdx";
+ static const char bc_drvinfo[] = KERN_INFO "baycom_ser_fdx: (C) 1996-2000 Thomas Sailer, HB9JNX/AE4WA\n"
+-"baycom_ser_fdx: version 0.10 compiled " __TIME__ " " __DATE__ "\n";
++"baycom_ser_fdx: version 0.10\n";
+ 
+ /* --------------------------------------------------------------------- */
+ 
+diff --git a/drivers/net/hamradio/baycom_ser_hdx.c b/drivers/net/hamradio/baycom_ser_hdx.c
+index 1686f6d..d92fe6c 100644
+--- a/drivers/net/hamradio/baycom_ser_hdx.c
++++ b/drivers/net/hamradio/baycom_ser_hdx.c
+@@ -80,7 +80,7 @@
+ 
+ static const char bc_drvname[] = "baycom_ser_hdx";
+ static const char bc_drvinfo[] = KERN_INFO "baycom_ser_hdx: (C) 1996-2000 Thomas Sailer, HB9JNX/AE4WA\n"
+-"baycom_ser_hdx: version 0.10 compiled " __TIME__ " " __DATE__ "\n";
++"baycom_ser_hdx: version 0.10\n";
+ 
+ /* --------------------------------------------------------------------- */
+ 
 -- 
 1.7.4.1
 
