@@ -1,54 +1,83 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qw0-f46.google.com ([209.85.216.46]:65507 "EHLO
-	mail-qw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752402Ab1DEShy convert rfc822-to-8bit (ORCPT
+Received: from mail-iy0-f174.google.com ([209.85.210.174]:42484 "EHLO
+	mail-iy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752723Ab1DES5p convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 5 Apr 2011 14:37:54 -0400
+	Tue, 5 Apr 2011 14:57:45 -0400
 MIME-Version: 1.0
-In-Reply-To: <1302015561-21047-20-git-send-email-mmarek@suse.cz>
+In-Reply-To: <1302015561-21047-2-git-send-email-mmarek@suse.cz>
 References: <1302015561-21047-1-git-send-email-mmarek@suse.cz>
-	<1302015561-21047-20-git-send-email-mmarek@suse.cz>
-Date: Tue, 5 Apr 2011 20:37:53 +0200
-Message-ID: <BANLkTimVbujtDnF7uJNgfT-oPYGBfR7WLA@mail.gmail.com>
-Subject: Re: [PATCH 19/34] rt2x00: Drop __TIME__ usage
-From: Ivo Van Doorn <ivdoorn@gmail.com>
+	<1302015561-21047-2-git-send-email-mmarek@suse.cz>
+Date: Tue, 5 Apr 2011 14:57:44 -0400
+Message-ID: <BANLkTinwKzasKmB_fFzXd+W7F6GGuPO6+g@mail.gmail.com>
+Subject: Re: [PATCH 01/34] kconfig: Do not record timestamp in auto.conf and autoconf.h
+From: Arnaud Lacombe <lacombar@gmail.com>
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Gertjan van Wingerde <gwingerde@gmail.com>, linux-wireless@vger.kernel.org, netdev@vger.kernel.org
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Tue, Apr 5, 2011 at 4:59 PM, Michal Marek <mmarek@suse.cz> wrote:
-> The kernel already prints its build timestamp during boot, no need to
-> repeat it in random drivers and produce different object files each
-> time.
+Hi,
+
+On Tue, Apr 5, 2011 at 10:58 AM, Michal Marek <mmarek@suse.cz> wrote:
+> Timestamps in file data are useless and there is already one in .config
 >
-> Cc: Ivo van Doorn <IvDoorn@gmail.com>
-> Cc: Gertjan van Wingerde <gwingerde@gmail.com>
-> Cc: linux-wireless@vger.kernel.org
-> Cc: netdev@vger.kernel.org
+hum, shouldn't this be tunable via KCONFIG_NOTIMESTAMP ? This might be
+useful to know when the file was generated, independently of the
+.config, as conf_write() and conf_write_autoconf() are independent
+from one another.
+
+ - Arnaud
+
 > Signed-off-by: Michal Marek <mmarek@suse.cz>
-
-Acked-by: Ivo van Doorn <IvDoorn@gmail.com>
-
 > ---
->  drivers/net/wireless/rt2x00/rt2x00debug.c |    1 -
->  1 files changed, 0 insertions(+), 1 deletions(-)
+>  scripts/kconfig/confdata.c |    8 ++------
+>  1 files changed, 2 insertions(+), 6 deletions(-)
 >
-> diff --git a/drivers/net/wireless/rt2x00/rt2x00debug.c b/drivers/net/wireless/rt2x00/rt2x00debug.c
-> index c92db32..66166ef 100644
-> --- a/drivers/net/wireless/rt2x00/rt2x00debug.c
-> +++ b/drivers/net/wireless/rt2x00/rt2x00debug.c
-> @@ -568,7 +568,6 @@ static struct dentry *rt2x00debug_create_file_driver(const char *name,
->        blob->data = data;
->        data += sprintf(data, "driver:\t%s\n", intf->rt2x00dev->ops->name);
->        data += sprintf(data, "version:\t%s\n", DRV_VERSION);
-> -       data += sprintf(data, "compiled:\t%s %s\n", __DATE__, __TIME__);
->        blob->size = strlen(blob->data);
+> diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
+> index 61c35bf..834eecb 100644
+> --- a/scripts/kconfig/confdata.c
+> +++ b/scripts/kconfig/confdata.c
+> @@ -784,7 +784,6 @@ int conf_write_autoconf(void)
+>        const char *str;
+>        const char *name;
+>        FILE *out, *tristate, *out_h;
+> -       time_t now;
+>        int i;
 >
->        return debugfs_create_blob(name, S_IRUSR, intf->driver_folder, blob);
+>        sym_clear_all_valid();
+> @@ -811,22 +810,19 @@ int conf_write_autoconf(void)
+>                return 1;
+>        }
+>
+> -       time(&now);
+>        fprintf(out, "#\n"
+>                     "# Automatically generated make config: don't edit\n"
+>                     "# %s\n"
+> -                    "# %s"
+>                     "#\n",
+> -                    rootmenu.prompt->text, ctime(&now));
+> +                    rootmenu.prompt->text);
+>        fprintf(tristate, "#\n"
+>                          "# Automatically generated - do not edit\n"
+>                          "\n");
+>        fprintf(out_h, "/*\n"
+>                       " * Automatically generated C config: don't edit\n"
+>                       " * %s\n"
+> -                      " * %s"
+>                       " */\n",
+> -                      rootmenu.prompt->text, ctime(&now));
+> +                      rootmenu.prompt->text);
+>
+>        for_all_symbols(i, sym) {
+>                sym_calc_value(sym);
 > --
 > 1.7.4.1
 >
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 >
