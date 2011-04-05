@@ -1,83 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-iy0-f174.google.com ([209.85.210.174]:42484 "EHLO
-	mail-iy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752723Ab1DES5p convert rfc822-to-8bit (ORCPT
+Received: from lennier.cc.vt.edu ([198.82.162.213]:40883 "EHLO
+	lennier.cc.vt.edu" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754307Ab1DETRn (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 5 Apr 2011 14:57:45 -0400
-MIME-Version: 1.0
-In-Reply-To: <1302015561-21047-2-git-send-email-mmarek@suse.cz>
-References: <1302015561-21047-1-git-send-email-mmarek@suse.cz>
-	<1302015561-21047-2-git-send-email-mmarek@suse.cz>
-Date: Tue, 5 Apr 2011 14:57:44 -0400
-Message-ID: <BANLkTinwKzasKmB_fFzXd+W7F6GGuPO6+g@mail.gmail.com>
-Subject: Re: [PATCH 01/34] kconfig: Do not record timestamp in auto.conf and autoconf.h
-From: Arnaud Lacombe <lacombar@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 8BIT
+	Tue, 5 Apr 2011 15:17:43 -0400
+Subject: Re: [PATCH 12/34] isdn/diva: Drop __TIME__ usage
+In-Reply-To: Your message of "Tue, 05 Apr 2011 17:10:34 +0200."
+             <alpine.DEB.2.00.1104051709040.7262@justus.melware.de>
+From: Valdis.Kletnieks@vt.edu
+References: <1302015561-21047-1-git-send-email-mmarek@suse.cz> <1302015561-21047-13-git-send-email-mmarek@suse.cz>
+            <alpine.DEB.2.00.1104051709040.7262@justus.melware.de>
+Mime-Version: 1.0
+Content-Type: multipart/signed; boundary="==_Exmh_1302031056_4766P";
+	 micalg=pgp-sha1; protocol="application/pgp-signature"
+Content-Transfer-Encoding: 7bit
+Date: Tue, 05 Apr 2011 15:17:36 -0400
+Message-ID: <20627.1302031056@localhost>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Armin Schindler <armin@melware.de>
+Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org
 
-Hi,
+--==_Exmh_1302031056_4766P
+Content-Type: text/plain; charset=us-ascii
 
-On Tue, Apr 5, 2011 at 10:58 AM, Michal Marek <mmarek@suse.cz> wrote:
-> Timestamps in file data are useless and there is already one in .config
->
-hum, shouldn't this be tunable via KCONFIG_NOTIMESTAMP ? This might be
-useful to know when the file was generated, independently of the
-.config, as conf_write() and conf_write_autoconf() are independent
-from one another.
+On Tue, 05 Apr 2011 17:10:34 +0200, Armin Schindler said:
+> On Tue, 5 Apr 2011, Michal Marek wrote:
+> > The kernel already prints its build timestamp during boot, no need to
+> > repeat it in random drivers and produce different object files each
+> > time.
+> 
+> The module can be build separately from the kernel, therefore it can have
+> an own build timestamp.
 
- - Arnaud
+If the same code is being built as an out-of-tree module, that's a possibly
+good reason for a code version variable, but what does the build timestamp
+actually tell you?  If you already know foo_driver.c version 0.814 was buiilt
+against 2.6.41-rc2, in what cases does it matter if the compile was on Tuesday
+or Thursday - especially since an 'ls -l foo_driver.ko' will tell you?  If it's
+a matter of "the target .config changed on Wednesday", a build timestamp still
+doesn't help over 'ls -l'.
 
-> Signed-off-by: Michal Marek <mmarek@suse.cz>
-> ---
->  scripts/kconfig/confdata.c |    8 ++------
->  1 files changed, 2 insertions(+), 6 deletions(-)
->
-> diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
-> index 61c35bf..834eecb 100644
-> --- a/scripts/kconfig/confdata.c
-> +++ b/scripts/kconfig/confdata.c
-> @@ -784,7 +784,6 @@ int conf_write_autoconf(void)
->        const char *str;
->        const char *name;
->        FILE *out, *tristate, *out_h;
-> -       time_t now;
->        int i;
->
->        sym_clear_all_valid();
-> @@ -811,22 +810,19 @@ int conf_write_autoconf(void)
->                return 1;
->        }
->
-> -       time(&now);
->        fprintf(out, "#\n"
->                     "# Automatically generated make config: don't edit\n"
->                     "# %s\n"
-> -                    "# %s"
->                     "#\n",
-> -                    rootmenu.prompt->text, ctime(&now));
-> +                    rootmenu.prompt->text);
->        fprintf(tristate, "#\n"
->                          "# Automatically generated - do not edit\n"
->                          "\n");
->        fprintf(out_h, "/*\n"
->                       " * Automatically generated C config: don't edit\n"
->                       " * %s\n"
-> -                      " * %s"
->                       " */\n",
-> -                      rootmenu.prompt->text, ctime(&now));
-> +                      rootmenu.prompt->text);
->
->        for_all_symbols(i, sym) {
->                sym_calc_value(sym);
-> --
-> 1.7.4.1
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
+
+--==_Exmh_1302031056_4766P
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+Comment: Exmh version 2.5 07/13/2001
+
+iD8DBQFNm2rQcC3lWbTT17ARAoBZAKDnh8ChIPQ+yitrNK1VhQT4oAxrTQCeKw1t
+kliGImEzd5WLgHkBid0pTps=
+=6wj5
+-----END PGP SIGNATURE-----
+
+--==_Exmh_1302031056_4766P--
+
