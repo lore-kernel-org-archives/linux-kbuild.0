@@ -1,44 +1,34 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.solarflare.com ([216.237.3.220]:58556 "EHLO
-	exchange.solarflare.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754135Ab1DEPhp (ORCPT
+Received: from out3.smtp.messagingengine.com ([66.111.4.27]:46246 "EHLO
+	out3.smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1755011Ab1DEPwU (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 5 Apr 2011 11:37:45 -0400
-Subject: Re: [PATCH 12/34] isdn/diva: Drop __TIME__ usage
-From: Ben Hutchings <bhutchings@solarflare.com>
-In-Reply-To: <alpine.DEB.2.00.1104051709040.7262@justus.melware.de>
-References: <1302015561-21047-1-git-send-email-mmarek@suse.cz>
-	 <1302015561-21047-13-git-send-email-mmarek@suse.cz>
-	 <alpine.DEB.2.00.1104051709040.7262@justus.melware.de>
-Content-Type: text/plain; charset="UTF-8"
-Date: Tue, 05 Apr 2011 16:37:41 +0100
-Message-ID: <1302017861.2932.13.camel@bwh-desktop>
-Mime-Version: 1.0
+	Tue, 5 Apr 2011 11:52:20 -0400
+Message-ID: <4D9B3AA4.5090402@fastmail.fm>
+Date: Tue, 05 Apr 2011 16:52:04 +0100
+From: Jack Stone <jwjstone@fastmail.fm>
+MIME-Version: 1.0
+Subject: Re: [PATCH 07/34] kbuild: Allow to override LINUX_COMPILE_BY and
+ LINUX_COMPILE_HOST macros
+References: <1302015561-21047-1-git-send-email-mmarek@suse.cz> <1302015561-21047-8-git-send-email-mmarek@suse.cz>
+In-Reply-To: <1302015561-21047-8-git-send-email-mmarek@suse.cz>
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Armin Schindler <armin@melware.de>
-Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Tue, 2011-04-05 at 17:10 +0200, Armin Schindler wrote:
-> On Tue, 5 Apr 2011, Michal Marek wrote:
-> > The kernel already prints its build timestamp during boot, no need to
-> > repeat it in random drivers and produce different object files each
-> > time.
-> 
-> The module can be build separately from the kernel, therefore it can have
-> an own build timestamp.
-[...]
+On 05/04/2011 15:58, Michal Marek wrote:
+> -  echo \#define LINUX_COMPILE_BY \"`whoami`\"
+> -  echo \#define LINUX_COMPILE_HOST \"`hostname | $UTS_TRUNCATE`\"
+> +  echo \#define LINUX_COMPILE_BY \"`echo $KBUILD_BUILD_USER | $UTS_TRUNCATE`\"
+> +  echo \#define LINUX_COMPILE_HOST \"`echo $KBUILD_BUILD_HOST | $UTS_TRUNCATE`\"
 
-If you want to distribute an out-of-tree version, that's your own
-business.  It shouldn't limit what is done with the in-tree version.
-Perhaps we could make modpost add a build timestamp to OOT modules,
-though.
+Shouldn't these be the variables defined above otherwise we get empty
+LINUX_COMPILE_{BY,HOST} in the case the corresponding environment
+variable is unset.
 
-Ben.
+Thanks,
 
--- 
-Ben Hutchings, Senior Software Engineer, Solarflare
-Not speaking for my employer; that's the marketing department's job.
-They asked us to note that Solarflare product names are trademarked.
-
+Jack
