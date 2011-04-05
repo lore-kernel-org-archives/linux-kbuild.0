@@ -1,62 +1,48 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.nokia.com ([147.243.128.24]:30813 "EHLO mgw-da01.nokia.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752967Ab1DEKVt (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 5 Apr 2011 06:21:49 -0400
-From: Artem Bityutskiy <dedekind1@gmail.com>
-Subject: [PATCH v2 1/2] Kconfig: improve KALLSYMS_ALL documentation
-Date: Tue,  5 Apr 2011 13:24:57 +0300
-Message-Id: <1301999098-21412-1-git-send-email-dedekind1@gmail.com>
+Received: from lebrac.rtp-net.org ([88.191.135.105]:47984 "EHLO
+	lebrac.rtp-net.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752571Ab1DEOHf (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 5 Apr 2011 10:07:35 -0400
+Message-Id: <20110405135751.825663425@rtp-net.org>
+Date: Tue, 05 Apr 2011 15:57:45 +0200
+From: Arnaud Patard (Rtp) <arnaud.patard@rtp-net.org>
+Subject: [patch 1/1] Fix firmware installation
+Content-Disposition: inline; filename=toto.patch
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Paulo Marques <pmarques@grupopie.com>, Randy Dunlap <rdunlap@xenotime.net>
+To: linux-kbuild@vger.kernel.org
+Cc: Michal Marek <mmarek@suse.cz>
 
-From: Artem Bityutskiy <Artem.Bityutskiy@nokia.com>
+When installing modules which have their firmware only in firmware/
+(no subdirectory), the build fails with:
 
-Dumb users like myself are not able to grasp from the existing KALLSYMS_ALL
-documentation that this option is not what they need. Improve the help
-message and make it clearer that KALLSYMS is enough in the majority of
-use cases, and KALLSYMS_ALL should really be used very rarely.
+$ make INSTALL_MOD_PATH=/home/rtp/devel/kernel/BUILD/kernel-x86_64/temp-root KERNELRELEASE=2.6.38.2-desktop-2.mga modules_install 
+  INSTALL  drivers/usb/serial/usbserial.ko
+  INSTALL  drivers/usb/serial/whiteheat.ko
+make[1]: *** No rule to make target `/home/rtp/devel/kernel/BUILD/kernel-x86_64/temp-root/lib/firmware/./', needed by `/home/rtp/devel/kernel/BUILD/kernel-x86_64/temp-root/lib/firmware/whiteheat_loader.fw'.  Stop.
+make: *** [_modinst_post] Error 2
 
-Signed-off-by: Artem Bityutskiy <Artem.Bityutskiy@nokia.com>
----
- init/Kconfig |   18 ++++++++++++------
- 1 files changed, 12 insertions(+), 6 deletions(-)
+If one is building a kernel with a module like 3c359, which has its firmware 
+in firmware/3com/, the mkdir -p firmware/3com/ will create the firmware/ 
+directory, allowing to install firmwares in firmware/, masking the error.
 
-Changelog:
-v1->v2:
-	* Spelling fix
+I noticed it while building with make 3.82, so this problem may be related
+to that.
 
-diff --git a/init/Kconfig b/init/Kconfig
-index 56240e7..563065d 100644
---- a/init/Kconfig
-+++ b/init/Kconfig
-@@ -968,12 +968,18 @@ config KALLSYMS_ALL
- 	bool "Include all symbols in kallsyms"
- 	depends on DEBUG_KERNEL && KALLSYMS
- 	help
--	   Normally kallsyms only contains the symbols of functions, for nicer
--	   OOPS messages.  Some debuggers can use kallsyms for other
--	   symbols too: say Y here to include all symbols, if you need them 
--	   and you don't care about adding 300k to the size of your kernel.
--
--	   Say N.
-+	   Normally kallsyms only contains the symbols of functions for nicer
-+	   OOPS messages and backtraces (i.e., symbols from the text and inittext
-+	   sections). This is sufficient for most cases. And only in very rare
-+	   cases (e.g., when a debugger is used) all symbols are required (e.g.,
-+	   names of variables from the data sections, etc).
-+
-+	   This option makes sure that all symbols are loaded into the kernel
-+	   image (i.e., symbols from all sections) in cost of increased kernel
-+	   size (depending on the kernel configuration, it may be 300KiB or
-+	   something like this).
-+
-+	   Say N unless you really need all symbols.
+Signed-off-by: Arnaud Patard <arnaud.patard@rtp-net.org>
+Index: linux-2.6.38/scripts/Makefile.fwinst
+===================================================================
+--- linux-2.6.38.orig/scripts/Makefile.fwinst
++++ linux-2.6.38/scripts/Makefile.fwinst
+@@ -27,7 +27,7 @@ endif
+ installed-mod-fw := $(addprefix $(INSTALL_FW_PATH)/,$(mod-fw))
  
- config KALLSYMS_EXTRA_PASS
- 	bool "Do an extra kallsyms pass"
--- 
-1.7.2.3
+ installed-fw := $(addprefix $(INSTALL_FW_PATH)/,$(fw-shipped-all))
+-installed-fw-dirs := $(sort $(dir $(installed-fw))) $(INSTALL_FW_PATH)/.
++installed-fw-dirs := $(sort $(dir $(installed-fw))) $(INSTALL_FW_PATH)/./
+ 
+ # Workaround for make < 3.81, where .SECONDEXPANSION doesn't work.
+ PHONY += $(INSTALL_FW_PATH)/$$(%) install-all-dirs
+
 
