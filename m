@@ -1,62 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:56447 "EHLO mx2.suse.de"
+Received: from cantor.suse.de ([195.135.220.2]:44476 "EHLO mx1.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754035Ab1DEO7b (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 5 Apr 2011 10:59:31 -0400
+	id S1754171Ab1DEO7l (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 5 Apr 2011 10:59:41 -0400
 From: Michal Marek <mmarek@suse.cz>
-Subject: [PATCH 02/34] kbuild: Call gzip with -n
-Date: Tue,  5 Apr 2011 16:58:49 +0200
-Message-Id: <1302015561-21047-3-git-send-email-mmarek@suse.cz>
+Subject: [PATCH 34/34] checkpatch: Warn about usage of __DATE__, __TIME__ and __TIMESTAMP__
+Date: Tue,  5 Apr 2011 16:59:21 +0200
+Message-Id: <1302015561-21047-35-git-send-email-mmarek@suse.cz>
 In-Reply-To: <1302015561-21047-1-git-send-email-mmarek@suse.cz>
 References: <1302015561-21047-1-git-send-email-mmarek@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, Andy Whitcroft <apw@canonical.com>
 
-The timestamps recorded in the .gz files add no value.
+The __TIME__ and __DATE__ macros are evil. Every C textbook mentions
+them, but forgets to add the tiny detail that they make sure that your
+code will never result in the same binary. __TIMESTAMP__ is a bit more
+sane, but again produces noise as soon as you switch branches back and
+forth, or apply a patch and revert it.
 
+Cc: Andy Whitcroft <apw@canonical.com>
 Signed-off-by: Michal Marek <mmarek@suse.cz>
 ---
- scripts/Makefile.lib          |    2 +-
- scripts/gen_initramfs_list.sh |    4 ++--
- 2 files changed, 3 insertions(+), 3 deletions(-)
+ scripts/checkpatch.pl |    5 +++++
+ 1 files changed, 5 insertions(+), 0 deletions(-)
 
-diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-index 1c702ca..93b2b59 100644
---- a/scripts/Makefile.lib
-+++ b/scripts/Makefile.lib
-@@ -197,7 +197,7 @@ cmd_objcopy = $(OBJCOPY) $(OBJCOPYFLAGS) $(OBJCOPYFLAGS_$(@F)) $< $@
- # ---------------------------------------------------------------------------
+diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
+index 4c0383d..dbcdf04 100755
+--- a/scripts/checkpatch.pl
++++ b/scripts/checkpatch.pl
+@@ -2804,6 +2804,11 @@ sub process {
+ 			WARN("__func__ should be used instead of gcc specific __FUNCTION__\n"  . $herecurr);
+ 		}
  
- quiet_cmd_gzip = GZIP    $@
--cmd_gzip = (cat $(filter-out FORCE,$^) | gzip -f -9 > $@) || \
-+cmd_gzip = (cat $(filter-out FORCE,$^) | gzip -n -f -9 > $@) || \
- 	(rm -f $@ ; false)
- 
- # DTC
-diff --git a/scripts/gen_initramfs_list.sh b/scripts/gen_initramfs_list.sh
-index 55caecd..4a43fe1 100644
---- a/scripts/gen_initramfs_list.sh
-+++ b/scripts/gen_initramfs_list.sh
-@@ -226,7 +226,7 @@ cpio_list=
- output="/dev/stdout"
- output_file=""
- is_cpio_compressed=
--compr="gzip -9 -f"
-+compr="gzip -n -9 -f"
- 
- arg="$1"
- case "$arg" in
-@@ -240,7 +240,7 @@ case "$arg" in
- 		output_file="$1"
- 		cpio_list="$(mktemp ${TMPDIR:-/tmp}/cpiolist.XXXXXX)"
- 		output=${cpio_list}
--		echo "$output_file" | grep -q "\.gz$" && compr="gzip -9 -f"
-+		echo "$output_file" | grep -q "\.gz$" && compr="gzip -n -9 -f"
- 		echo "$output_file" | grep -q "\.bz2$" && compr="bzip2 -9 -f"
- 		echo "$output_file" | grep -q "\.lzma$" && compr="lzma -9 -f"
- 		echo "$output_file" | grep -q "\.xz$" && \
++# check for pointless usage of __TIME__ and friends
++		if ($line =~ /\b__(TIME|DATE|TIMESTAMP)__\b/) {
++			WARN("Usage of __$1__ should be avoided to keep the build deterministic\n" . $herecurr);
++		}
++
+ # check for semaphores initialized locked
+ 		if ($line =~ /^.\s*sema_init.+,\W?0\W?\)/) {
+ 			WARN("consider using a completion\n" . $herecurr);
 -- 
 1.7.4.1
 
