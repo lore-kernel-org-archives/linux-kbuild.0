@@ -1,46 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor.suse.de ([195.135.220.2]:44474 "EHLO mx1.suse.de"
+Received: from cantor.suse.de ([195.135.220.2]:44471 "EHLO mx1.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754166Ab1DEO7k (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 5 Apr 2011 10:59:40 -0400
+	id S1754158Ab1DEO7j (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 5 Apr 2011 10:59:39 -0400
 From: Michal Marek <mmarek@suse.cz>
-Subject: [PATCH 29/34] tipc: Drop __TIME__ usage
-Date: Tue,  5 Apr 2011 16:59:16 +0200
-Message-Id: <1302015561-21047-30-git-send-email-mmarek@suse.cz>
+Subject: [PATCH 30/34] rio: Drop __DATE__ usage
+Date: Tue,  5 Apr 2011 16:59:17 +0200
+Message-Id: <1302015561-21047-31-git-send-email-mmarek@suse.cz>
 In-Reply-To: <1302015561-21047-1-git-send-email-mmarek@suse.cz>
 References: <1302015561-21047-1-git-send-email-mmarek@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, Jon Maloy <jon.maloy@ericsson.com>, Allan Stephens <allan.stephens@windriver.com>, tipc-discussion@lists.sourceforge.net, netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, Greg Kroah-Hartman <gregkh@suse.de>
 
 The kernel already prints its build timestamp during boot, no need to
 repeat it in random drivers and produce different object files each
-time.
+time. As the buildDate field is part of the userspace API, I replaced it
+with the date of the last code change.
 
-Cc: Jon Maloy <jon.maloy@ericsson.com>
-Cc: Allan Stephens <allan.stephens@windriver.com>
-Cc: tipc-discussion@lists.sourceforge.net
-Cc: netdev@vger.kernel.org
+Cc: Greg Kroah-Hartman <gregkh@suse.de>
 Signed-off-by: Michal Marek <mmarek@suse.cz>
 ---
- net/tipc/core.c |    3 +--
- 1 files changed, 1 insertions(+), 2 deletions(-)
+ drivers/char/rio/rioinit.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-diff --git a/net/tipc/core.c b/net/tipc/core.c
-index e071579..33532fe 100644
---- a/net/tipc/core.c
-+++ b/net/tipc/core.c
-@@ -185,8 +185,7 @@ static int __init tipc_init(void)
- 	if (tipc_log_resize(CONFIG_TIPC_LOG) != 0)
- 		warn("Unable to create log buffer\n");
+diff --git a/drivers/char/rio/rioinit.c b/drivers/char/rio/rioinit.c
+index 24a282b..fb62b38 100644
+--- a/drivers/char/rio/rioinit.c
++++ b/drivers/char/rio/rioinit.c
+@@ -381,7 +381,7 @@ struct rioVersion *RIOVersid(void)
+ {
+     strlcpy(stVersion.version, "RIO driver for linux V1.0",
+ 	    sizeof(stVersion.version));
+-    strlcpy(stVersion.buildDate, __DATE__,
++    strlcpy(stVersion.buildDate, "Aug 15 2010",
+ 	    sizeof(stVersion.buildDate));
  
--	info("Activated (version " TIPC_MOD_VER
--	     " compiled " __DATE__ " " __TIME__ ")\n");
-+	info("Activated (version " TIPC_MOD_VER ")\n");
- 
- 	tipc_own_addr = 0;
- 	tipc_remote_management = 1;
+     return &stVersion;
 -- 
 1.7.4.1
 
