@@ -1,44 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:56494 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:56492 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754115Ab1DEO7g (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	id S1754093Ab1DEO7g (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
 	Tue, 5 Apr 2011 10:59:36 -0400
 From: Michal Marek <mmarek@suse.cz>
-Subject: [PATCH 24/34] usb/u132-hcd: Drop __TIME__ usage
-Date: Tue,  5 Apr 2011 16:59:11 +0200
-Message-Id: <1302015561-21047-25-git-send-email-mmarek@suse.cz>
+Subject: [PATCH 20/34] parport: Drop __TIME__ usage
+Date: Tue,  5 Apr 2011 16:59:07 +0200
+Message-Id: <1302015561-21047-21-git-send-email-mmarek@suse.cz>
 In-Reply-To: <1302015561-21047-1-git-send-email-mmarek@suse.cz>
 References: <1302015561-21047-1-git-send-email-mmarek@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, Tony Olech <tony.olech@elandigitalsystems.com>, linux-usb@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, Arnaud Giersch <arnaud.giersch@free.fr>
 
 The kernel already prints its build timestamp during boot, no need to
 repeat it in random drivers and produce different object files each
 time.
 
-Cc: Tony Olech <tony.olech@elandigitalsystems.com>
-Cc: linux-usb@vger.kernel.org
+Cc: Arnaud Giersch <arnaud.giersch@free.fr>
 Signed-off-by: Michal Marek <mmarek@suse.cz>
 ---
- drivers/usb/host/u132-hcd.c |    3 +--
- 1 files changed, 1 insertions(+), 2 deletions(-)
+ drivers/parport/parport_ip32.c |    1 -
+ 1 files changed, 0 insertions(+), 1 deletions(-)
 
-diff --git a/drivers/usb/host/u132-hcd.c b/drivers/usb/host/u132-hcd.c
-index fab7649..dc6dd22 100644
---- a/drivers/usb/host/u132-hcd.c
-+++ b/drivers/usb/host/u132-hcd.c
-@@ -3229,8 +3229,7 @@ static int __init u132_hcd_init(void)
- 	mutex_init(&u132_module_lock);
- 	if (usb_disabled())
- 		return -ENODEV;
--	printk(KERN_INFO "driver %s built at %s on %s\n", hcd_name, __TIME__,
--		__DATE__);
-+	printk(KERN_INFO "driver %s\n", hcd_name);
- 	workqueue = create_singlethread_workqueue("u132");
- 	retval = platform_driver_register(&u132_platform_driver);
- 	return retval;
+diff --git a/drivers/parport/parport_ip32.c b/drivers/parport/parport_ip32.c
+index d3d7809..0dc34f1 100644
+--- a/drivers/parport/parport_ip32.c
++++ b/drivers/parport/parport_ip32.c
+@@ -2203,7 +2203,6 @@ static __exit void parport_ip32_unregister_port(struct parport *p)
+ static int __init parport_ip32_init(void)
+ {
+ 	pr_info(PPIP32 "SGI IP32 built-in parallel port driver v0.6\n");
+-	pr_debug1(PPIP32 "Compiled on %s, %s\n", __DATE__, __TIME__);
+ 	this_port = parport_ip32_probe_port();
+ 	return IS_ERR(this_port) ? PTR_ERR(this_port) : 0;
+ }
 -- 
 1.7.4.1
 
