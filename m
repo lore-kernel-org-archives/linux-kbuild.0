@@ -1,44 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:56489 "EHLO mx2.suse.de"
+Received: from cantor.suse.de ([195.135.220.2]:44437 "EHLO mx1.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754090Ab1DEO7f (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	id S1754069Ab1DEO7f (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
 	Tue, 5 Apr 2011 10:59:35 -0400
 From: Michal Marek <mmarek@suse.cz>
-Subject: [PATCH 17/34] hdlcdrv: Drop __TIME__ usage
-Date: Tue,  5 Apr 2011 16:59:04 +0200
-Message-Id: <1302015561-21047-18-git-send-email-mmarek@suse.cz>
+Subject: [PATCH 09/34] x86: Allow to override the ROOT_DEV variable
+Date: Tue,  5 Apr 2011 16:58:56 +0200
+Message-Id: <1302015561-21047-10-git-send-email-mmarek@suse.cz>
 In-Reply-To: <1302015561-21047-1-git-send-email-mmarek@suse.cz>
 References: <1302015561-21047-1-git-send-email-mmarek@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, Thomas Sailer <t.sailer@alumni.ethz.ch>, linux-hams@vger.kernel.org, netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org
 
-The kernel already prints its build timestamp during boot, no need to
-repeat it in random drivers and produce different object files each
-time.
-
-Cc: Thomas Sailer <t.sailer@alumni.ethz.ch>
-Cc: linux-hams@vger.kernel.org
-Cc: netdev@vger.kernel.org
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: Ingo Molnar <mingo@redhat.com>
+Cc: "H. Peter Anvin" <hpa@zytor.com>
+Cc: x86@kernel.org
 Signed-off-by: Michal Marek <mmarek@suse.cz>
 ---
- drivers/net/hamradio/hdlcdrv.c |    2 +-
+ arch/x86/boot/Makefile |    2 +-
  1 files changed, 1 insertions(+), 1 deletions(-)
 
-diff --git a/drivers/net/hamradio/hdlcdrv.c b/drivers/net/hamradio/hdlcdrv.c
-index 5b37579..a4a3516 100644
---- a/drivers/net/hamradio/hdlcdrv.c
-+++ b/drivers/net/hamradio/hdlcdrv.c
-@@ -749,7 +749,7 @@ EXPORT_SYMBOL(hdlcdrv_unregister);
- static int __init hdlcdrv_init_driver(void)
- {
- 	printk(KERN_INFO "hdlcdrv: (C) 1996-2000 Thomas Sailer HB9JNX/AE4WA\n");
--	printk(KERN_INFO "hdlcdrv: version 0.8 compiled " __TIME__ " " __DATE__ "\n");
-+	printk(KERN_INFO "hdlcdrv: version 0.8\n");
- 	return 0;
- }
+diff --git a/arch/x86/boot/Makefile b/arch/x86/boot/Makefile
+index f7cb086..7a70c60 100644
+--- a/arch/x86/boot/Makefile
++++ b/arch/x86/boot/Makefile
+@@ -13,7 +13,7 @@
+ # This can be either FLOPPY, CURRENT, /dev/xxxx or empty, in which case
+ # the default of FLOPPY is used by 'build'.
  
+-ROOT_DEV	:= CURRENT
++ROOT_DEV	?= CURRENT
+ 
+ # If you want to preset the SVGA mode, uncomment the next line and
+ # set SVGA_MODE to whatever number you want.
 -- 
 1.7.4.1
 
