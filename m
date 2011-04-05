@@ -1,44 +1,65 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pqueueb.post.tele.dk ([193.162.153.10]:35815 "EHLO
-	pqueueb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754579Ab1DEU2F (ORCPT
+Received: from mail-iw0-f174.google.com ([209.85.214.174]:63594 "EHLO
+	mail-iw0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752770Ab1DEWZW convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 5 Apr 2011 16:28:05 -0400
-Date: Tue, 5 Apr 2011 22:01:53 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH 12/34] isdn/diva: Drop __TIME__ usage
-Message-ID: <20110405200153.GA17632@merkur.ravnborg.org>
-References: <1302015561-21047-1-git-send-email-mmarek@suse.cz> <1302015561-21047-13-git-send-email-mmarek@suse.cz> <alpine.DEB.2.00.1104051709040.7262@justus.melware.de> <1302017861.2932.13.camel@bwh-desktop> <alpine.DEB.2.00.1104051806230.7624@justus.melware.de>
+	Tue, 5 Apr 2011 18:25:22 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <alpine.DEB.2.00.1104051806230.7624@justus.melware.de>
+In-Reply-To: <1302015561-21047-30-git-send-email-mmarek@suse.cz>
+References: <1302015561-21047-1-git-send-email-mmarek@suse.cz>
+	<1302015561-21047-30-git-send-email-mmarek@suse.cz>
+Date: Tue, 5 Apr 2011 18:25:21 -0400
+Message-ID: <BANLkTimxWBC9J5+gDTkZe-J19fkr9vyLcw@mail.gmail.com>
+Subject: Re: [PATCH 29/34] tipc: Drop __TIME__ usage
+From: Paul Gortmaker <paul.gortmaker@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Armin Schindler <armin@melware.de>
-Cc: Ben Hutchings <bhutchings@solarflare.com>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Jon Maloy <jon.maloy@ericsson.com>, Allan Stephens <allan.stephens@windriver.com>, tipc-discussion@lists.sourceforge.net, netdev@vger.kernel.org
 
-On Tue, Apr 05, 2011 at 06:07:05PM +0200, Armin Schindler wrote:
-> On Tue, 5 Apr 2011, Ben Hutchings wrote:
->> On Tue, 2011-04-05 at 17:10 +0200, Armin Schindler wrote:
->>> On Tue, 5 Apr 2011, Michal Marek wrote:
->>>> The kernel already prints its build timestamp during boot, no need to
->>>> repeat it in random drivers and produce different object files each
->>>> time.
->>>
->>> The module can be build separately from the kernel, therefore it can have
->>> an own build timestamp.
->> [...]
->>
->> If you want to distribute an out-of-tree version, that's your own
->> business.  It shouldn't limit what is done with the in-tree version.
->> Perhaps we could make modpost add a build timestamp to OOT modules,
->> though.
+On Tue, Apr 5, 2011 at 10:59 AM, Michal Marek <mmarek@suse.cz> wrote:
+> The kernel already prints its build timestamp during boot, no need to
+> repeat it in random drivers and produce different object files each
+> time.
+
+I'll make sure this gets bundled into the next batch of tipc updates
+I proxy to DaveM.   The ccache users should be happier.
+
+Thanks,
+Paul.
+
 >
-> I know out-of-tree stuff doesn't matter here. But I'm thinking
-> about just doing 'make modules'.
-
-If we needs this somehow a generic solution is required.
-Ad hoc solutions in some modules is not the way to go.
-
-	Sam
+> Cc: Jon Maloy <jon.maloy@ericsson.com>
+> Cc: Allan Stephens <allan.stephens@windriver.com>
+> Cc: tipc-discussion@lists.sourceforge.net
+> Cc: netdev@vger.kernel.org
+> Signed-off-by: Michal Marek <mmarek@suse.cz>
+> ---
+>  net/tipc/core.c |    3 +--
+>  1 files changed, 1 insertions(+), 2 deletions(-)
+>
+> diff --git a/net/tipc/core.c b/net/tipc/core.c
+> index e071579..33532fe 100644
+> --- a/net/tipc/core.c
+> +++ b/net/tipc/core.c
+> @@ -185,8 +185,7 @@ static int __init tipc_init(void)
+>        if (tipc_log_resize(CONFIG_TIPC_LOG) != 0)
+>                warn("Unable to create log buffer\n");
+>
+> -       info("Activated (version " TIPC_MOD_VER
+> -            " compiled " __DATE__ " " __TIME__ ")\n");
+> +       info("Activated (version " TIPC_MOD_VER ")\n");
+>
+>        tipc_own_addr = 0;
+>        tipc_remote_management = 1;
+> --
+> 1.7.4.1
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-kernel" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> Please read the FAQ at  http://www.tux.org/lkml/
+>
