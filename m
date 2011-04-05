@@ -1,51 +1,44 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor.suse.de ([195.135.220.2]:44465 "EHLO mx1.suse.de"
+Received: from cantor.suse.de ([195.135.220.2]:44458 "EHLO mx1.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754143Ab1DEO7i (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 5 Apr 2011 10:59:38 -0400
+	id S1754140Ab1DEO7h (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 5 Apr 2011 10:59:37 -0400
 From: Michal Marek <mmarek@suse.cz>
-Subject: [PATCH 21/34] aacraid: Drop __TIME__ usage
-Date: Tue,  5 Apr 2011 16:59:08 +0200
-Message-Id: <1302015561-21047-22-git-send-email-mmarek@suse.cz>
+Subject: [PATCH 18/34] wan/pc300: Drop __TIME__ usage
+Date: Tue,  5 Apr 2011 16:59:05 +0200
+Message-Id: <1302015561-21047-19-git-send-email-mmarek@suse.cz>
 In-Reply-To: <1302015561-21047-1-git-send-email-mmarek@suse.cz>
 References: <1302015561-21047-1-git-send-email-mmarek@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, Adaptec OEM Raid Solutions <aacraid@adaptec.com>, linux-scsi@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org
 
 The kernel already prints its build timestamp during boot, no need to
 repeat it in random drivers and produce different object files each
 time.
 
-Cc: Adaptec OEM Raid Solutions <aacraid@adaptec.com>
-Cc: linux-scsi@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: netdev@vger.kernel.org
 Signed-off-by: Michal Marek <mmarek@suse.cz>
 ---
- drivers/scsi/aacraid/linit.c |    3 +--
+ drivers/net/wan/pc300_drv.c |    3 +--
  1 files changed, 1 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/scsi/aacraid/linit.c b/drivers/scsi/aacraid/linit.c
-index 2c93d94..7babcbb 100644
---- a/drivers/scsi/aacraid/linit.c
-+++ b/drivers/scsi/aacraid/linit.c
-@@ -58,7 +58,6 @@
- #ifndef AAC_DRIVER_BRANCH
- #define AAC_DRIVER_BRANCH		""
- #endif
--#define AAC_DRIVER_BUILD_DATE		__DATE__ " " __TIME__
- #define AAC_DRIVERNAME			"aacraid"
+diff --git a/drivers/net/wan/pc300_drv.c b/drivers/net/wan/pc300_drv.c
+index f875cfa..80ae503 100644
+--- a/drivers/net/wan/pc300_drv.c
++++ b/drivers/net/wan/pc300_drv.c
+@@ -3242,8 +3242,7 @@ static inline void show_version(void)
+ 	rcsdate++;
+ 	tmp = strrchr(rcsdate, ' ');
+ 	*tmp = '\0';
+-	printk(KERN_INFO "Cyclades-PC300 driver %s %s (built %s %s)\n", 
+-		rcsvers, rcsdate, __DATE__, __TIME__);
++	printk(KERN_INFO "Cyclades-PC300 driver %s %s\n", rcsvers, rcsdate);
+ }				/* show_version */
  
- #ifdef AAC_DRIVER_BUILD
-@@ -66,7 +65,7 @@
- #define str(x) _str(x)
- #define AAC_DRIVER_FULL_VERSION	AAC_DRIVER_VERSION "[" str(AAC_DRIVER_BUILD) "]" AAC_DRIVER_BRANCH
- #else
--#define AAC_DRIVER_FULL_VERSION	AAC_DRIVER_VERSION AAC_DRIVER_BRANCH " " AAC_DRIVER_BUILD_DATE
-+#define AAC_DRIVER_FULL_VERSION	AAC_DRIVER_VERSION AAC_DRIVER_BRANCH
- #endif
- 
- MODULE_AUTHOR("Red Hat Inc and Adaptec");
+ static const struct net_device_ops cpc_netdev_ops = {
 -- 
 1.7.4.1
 
