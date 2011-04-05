@@ -1,45 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:56484 "EHLO mx2.suse.de"
+Received: from cantor.suse.de ([195.135.220.2]:44443 "EHLO mx1.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754079Ab1DEO7f (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	id S1754074Ab1DEO7f (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
 	Tue, 5 Apr 2011 10:59:35 -0400
 From: Michal Marek <mmarek@suse.cz>
-Subject: [PATCH 16/34] nand/denali: Drop __TIME__ usage
-Date: Tue,  5 Apr 2011 16:59:03 +0200
-Message-Id: <1302015561-21047-17-git-send-email-mmarek@suse.cz>
+Subject: [PATCH 12/34] isdn/diva: Drop __TIME__ usage
+Date: Tue,  5 Apr 2011 16:58:59 +0200
+Message-Id: <1302015561-21047-13-git-send-email-mmarek@suse.cz>
 In-Reply-To: <1302015561-21047-1-git-send-email-mmarek@suse.cz>
 References: <1302015561-21047-1-git-send-email-mmarek@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, Chuanxiao Dong <chuanxiao.dong@intel.com>, David Woodhouse <dwmw2@infradead.org>, linux-mtd@lists.infradead.org
+Cc: linux-kernel@vger.kernel.org, Armin Schindler <mac@melware.de>, netdev@vger.kernel.org
 
 The kernel already prints its build timestamp during boot, no need to
 repeat it in random drivers and produce different object files each
 time.
 
-Cc: Chuanxiao Dong <chuanxiao.dong@intel.com>
-Cc: David Woodhouse <dwmw2@infradead.org>
-Cc: linux-mtd@lists.infradead.org
+Cc: Armin Schindler <mac@melware.de>
+Cc: netdev@vger.kernel.org
 Signed-off-by: Michal Marek <mmarek@suse.cz>
 ---
- drivers/mtd/nand/denali.c |    3 +--
- 1 files changed, 1 insertions(+), 2 deletions(-)
+ drivers/isdn/hardware/eicon/divasfunc.c |    5 ++---
+ 1 files changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/mtd/nand/denali.c b/drivers/mtd/nand/denali.c
-index 8c8d3c8..7a3cf8c 100644
---- a/drivers/mtd/nand/denali.c
-+++ b/drivers/mtd/nand/denali.c
-@@ -1721,8 +1721,7 @@ static struct pci_driver denali_pci_driver = {
- 
- static int __devinit denali_init(void)
+diff --git a/drivers/isdn/hardware/eicon/divasfunc.c b/drivers/isdn/hardware/eicon/divasfunc.c
+index d36a4c0..0bbee78 100644
+--- a/drivers/isdn/hardware/eicon/divasfunc.c
++++ b/drivers/isdn/hardware/eicon/divasfunc.c
+@@ -113,9 +113,8 @@ void diva_xdi_didd_remove_adapter(int card)
+ static void start_dbg(void)
  {
--	printk(KERN_INFO "Spectra MTD driver built on %s @ %s\n",
--			__DATE__, __TIME__);
-+	printk(KERN_INFO "Spectra MTD driver\n");
- 	return pci_register_driver(&denali_pci_driver);
+ 	DbgRegister("DIVAS", DRIVERRELEASE_DIVAS, (debugmask) ? debugmask : DBG_DEFAULT);
+-	DBG_LOG(("DIVA ISDNXDI BUILD (%s[%s]-%s-%s)",
+-		 DIVA_BUILD, diva_xdi_common_code_build, __DATE__,
+-		 __TIME__))
++	DBG_LOG(("DIVA ISDNXDI BUILD (%s[%s])",
++		 DIVA_BUILD, diva_xdi_common_code_build))
  }
  
+ /*
 -- 
 1.7.4.1
 
