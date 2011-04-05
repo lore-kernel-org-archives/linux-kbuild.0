@@ -1,47 +1,44 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor.suse.de ([195.135.220.2]:44476 "EHLO mx1.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:56489 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754171Ab1DEO7l (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 5 Apr 2011 10:59:41 -0400
+	id S1754090Ab1DEO7f (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 5 Apr 2011 10:59:35 -0400
 From: Michal Marek <mmarek@suse.cz>
-Subject: [PATCH 34/34] checkpatch: Warn about usage of __DATE__, __TIME__ and __TIMESTAMP__
-Date: Tue,  5 Apr 2011 16:59:21 +0200
-Message-Id: <1302015561-21047-35-git-send-email-mmarek@suse.cz>
+Subject: [PATCH 17/34] hdlcdrv: Drop __TIME__ usage
+Date: Tue,  5 Apr 2011 16:59:04 +0200
+Message-Id: <1302015561-21047-18-git-send-email-mmarek@suse.cz>
 In-Reply-To: <1302015561-21047-1-git-send-email-mmarek@suse.cz>
 References: <1302015561-21047-1-git-send-email-mmarek@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, Andy Whitcroft <apw@canonical.com>
+Cc: linux-kernel@vger.kernel.org, Thomas Sailer <t.sailer@alumni.ethz.ch>, linux-hams@vger.kernel.org, netdev@vger.kernel.org
 
-The __TIME__ and __DATE__ macros are evil. Every C textbook mentions
-them, but forgets to add the tiny detail that they make sure that your
-code will never result in the same binary. __TIMESTAMP__ is a bit more
-sane, but again produces noise as soon as you switch branches back and
-forth, or apply a patch and revert it.
+The kernel already prints its build timestamp during boot, no need to
+repeat it in random drivers and produce different object files each
+time.
 
-Cc: Andy Whitcroft <apw@canonical.com>
+Cc: Thomas Sailer <t.sailer@alumni.ethz.ch>
+Cc: linux-hams@vger.kernel.org
+Cc: netdev@vger.kernel.org
 Signed-off-by: Michal Marek <mmarek@suse.cz>
 ---
- scripts/checkpatch.pl |    5 +++++
- 1 files changed, 5 insertions(+), 0 deletions(-)
+ drivers/net/hamradio/hdlcdrv.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
-index 4c0383d..dbcdf04 100755
---- a/scripts/checkpatch.pl
-+++ b/scripts/checkpatch.pl
-@@ -2804,6 +2804,11 @@ sub process {
- 			WARN("__func__ should be used instead of gcc specific __FUNCTION__\n"  . $herecurr);
- 		}
+diff --git a/drivers/net/hamradio/hdlcdrv.c b/drivers/net/hamradio/hdlcdrv.c
+index 5b37579..a4a3516 100644
+--- a/drivers/net/hamradio/hdlcdrv.c
++++ b/drivers/net/hamradio/hdlcdrv.c
+@@ -749,7 +749,7 @@ EXPORT_SYMBOL(hdlcdrv_unregister);
+ static int __init hdlcdrv_init_driver(void)
+ {
+ 	printk(KERN_INFO "hdlcdrv: (C) 1996-2000 Thomas Sailer HB9JNX/AE4WA\n");
+-	printk(KERN_INFO "hdlcdrv: version 0.8 compiled " __TIME__ " " __DATE__ "\n");
++	printk(KERN_INFO "hdlcdrv: version 0.8\n");
+ 	return 0;
+ }
  
-+# check for pointless usage of __TIME__ and friends
-+		if ($line =~ /\b__(TIME|DATE|TIMESTAMP)__\b/) {
-+			WARN("Usage of __$1__ should be avoided to keep the build deterministic\n" . $herecurr);
-+		}
-+
- # check for semaphores initialized locked
- 		if ($line =~ /^.\s*sema_init.+,\W?0\W?\)/) {
- 			WARN("consider using a completion\n" . $herecurr);
 -- 
 1.7.4.1
 
