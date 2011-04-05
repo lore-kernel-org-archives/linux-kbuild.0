@@ -1,44 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor.suse.de ([195.135.220.2]:44453 "EHLO mx1.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:56493 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754125Ab1DEO7g (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	id S1754103Ab1DEO7g (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
 	Tue, 5 Apr 2011 10:59:36 -0400
 From: Michal Marek <mmarek@suse.cz>
-Subject: [PATCH 13/34] media/radio-maxiradio: Drop __TIME__ usage
-Date: Tue,  5 Apr 2011 16:59:00 +0200
-Message-Id: <1302015561-21047-14-git-send-email-mmarek@suse.cz>
+Subject: [PATCH 22/34] scsi/in2000: Drop __TIME__ usage
+Date: Tue,  5 Apr 2011 16:59:09 +0200
+Message-Id: <1302015561-21047-23-git-send-email-mmarek@suse.cz>
 In-Reply-To: <1302015561-21047-1-git-send-email-mmarek@suse.cz>
 References: <1302015561-21047-1-git-send-email-mmarek@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, Mauro Carvalho Chehab <mchehab@redhat.com>, linux-media@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, "James E.J. Bottomley" <James.Bottomley@suse.de>, linux-scsi@vger.kernel.org
 
 The kernel already prints its build timestamp during boot, no need to
 repeat it in random drivers and produce different object files each
 time.
 
-Cc: Mauro Carvalho Chehab <mchehab@redhat.com>
-Cc: linux-media@vger.kernel.org
+Cc: "James E.J. Bottomley" <James.Bottomley@suse.de>
+Cc: linux-scsi@vger.kernel.org
 Signed-off-by: Michal Marek <mmarek@suse.cz>
 ---
- drivers/media/radio/radio-maxiradio.c |    3 +--
- 1 files changed, 1 insertions(+), 2 deletions(-)
+ drivers/scsi/in2000.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-diff --git a/drivers/media/radio/radio-maxiradio.c b/drivers/media/radio/radio-maxiradio.c
-index 5c2a905..e83e840 100644
---- a/drivers/media/radio/radio-maxiradio.c
-+++ b/drivers/media/radio/radio-maxiradio.c
-@@ -412,8 +412,7 @@ static int __devinit maxiradio_init_one(struct pci_dev *pdev, const struct pci_d
- 		goto err_out_free_region;
+diff --git a/drivers/scsi/in2000.c b/drivers/scsi/in2000.c
+index 6568aab..6096d93 100644
+--- a/drivers/scsi/in2000.c
++++ b/drivers/scsi/in2000.c
+@@ -2228,7 +2228,7 @@ static int in2000_proc_info(struct Scsi_Host *instance, char *buf, char **start,
+ 	bp = buf;
+ 	*bp = '\0';
+ 	if (hd->proc & PR_VERSION) {
+-		sprintf(tbuf, "\nVersion %s - %s. Compiled %s %s", IN2000_VERSION, IN2000_DATE, __DATE__, __TIME__);
++		sprintf(tbuf, "\nVersion %s - %s.", IN2000_VERSION, IN2000_DATE);
+ 		strcat(bp, tbuf);
  	}
- 
--	v4l2_info(v4l2_dev, "version " DRIVER_VERSION
--			" time " __TIME__ "  " __DATE__ "\n");
-+	v4l2_info(v4l2_dev, "version " DRIVER_VERSION "\n");
- 
- 	v4l2_info(v4l2_dev, "found Guillemot MAXI Radio device (io = 0x%x)\n",
- 	       dev->io);
+ 	if (hd->proc & PR_INFO) {
 -- 
 1.7.4.1
 
