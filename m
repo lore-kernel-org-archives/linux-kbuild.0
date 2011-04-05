@@ -1,43 +1,128 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:56482 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:56481 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754068Ab1DEO7f (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	id S1754056Ab1DEO7f (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
 	Tue, 5 Apr 2011 10:59:35 -0400
 From: Michal Marek <mmarek@suse.cz>
-Subject: [PATCH 10/34] cyclades: Drop __TIME__ usage
-Date: Tue,  5 Apr 2011 16:58:57 +0200
-Message-Id: <1302015561-21047-11-git-send-email-mmarek@suse.cz>
+Subject: [PATCH 08/34] initramfs: Use KBUILD_BUILD_TIMESTAMP for generated entries
+Date: Tue,  5 Apr 2011 16:58:55 +0200
+Message-Id: <1302015561-21047-9-git-send-email-mmarek@suse.cz>
 In-Reply-To: <1302015561-21047-1-git-send-email-mmarek@suse.cz>
 References: <1302015561-21047-1-git-send-email-mmarek@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, Greg Kroah-Hartman <gregkh@suse.de>
+Cc: linux-kernel@vger.kernel.org
 
-The kernel already prints its build timestamp during boot, no need to
-repeat it in random drivers and produce different object files each
-time.
+gen_init_cpio uses the current time for symlinks, special files and
+directories. Make it possible to override this with the
+KBUILD_BUILD_TIMESTAMP variable for reproducible builds.
 
-Cc: Greg Kroah-Hartman <gregkh@suse.de>
 Signed-off-by: Michal Marek <mmarek@suse.cz>
 ---
- drivers/char/cyclades.c |    3 +--
- 1 files changed, 1 insertions(+), 2 deletions(-)
+ scripts/gen_initramfs_list.sh |    4 ++++
+ usr/gen_init_cpio.c           |   17 +++++++++++------
+ 2 files changed, 15 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/char/cyclades.c b/drivers/char/cyclades.c
-index 4f152c2..a82ad97 100644
---- a/drivers/char/cyclades.c
-+++ b/drivers/char/cyclades.c
-@@ -4099,8 +4099,7 @@ static int __init cy_init(void)
- 	if (!cy_serial_driver)
- 		goto err;
+diff --git a/scripts/gen_initramfs_list.sh b/scripts/gen_initramfs_list.sh
+index 4a43fe1..18cde32 100644
+--- a/scripts/gen_initramfs_list.sh
++++ b/scripts/gen_initramfs_list.sh
+@@ -283,6 +283,10 @@ while [ $# -gt 0 ]; do
+ 	esac
+ done
  
--	printk(KERN_INFO "Cyclades driver " CY_VERSION " (built %s %s)\n",
--			__DATE__, __TIME__);
-+	printk(KERN_INFO "Cyclades driver " CY_VERSION "\n");
++if test -n "$KBUILD_BUILD_TIMESTAMP"; then
++	export CPIO_TIMESTAMP=$(date -d"$KBUILD_BUILD_TIMESTAMP" +%s)
++fi
++
+ # If output_file is set we will generate cpio archive and compress it
+ # we are carefull to delete tmp files
+ if [ ! -z ${output_file} ]; then
+diff --git a/usr/gen_init_cpio.c b/usr/gen_init_cpio.c
+index 7f06884..11f604d 100644
+--- a/usr/gen_init_cpio.c
++++ b/usr/gen_init_cpio.c
+@@ -22,6 +22,7 @@
  
- 	/* Initialize the tty_driver structure */
+ static unsigned int offset;
+ static unsigned int ino = 721;
++static time_t default_mtime;
  
+ struct file_handler {
+ 	const char *type;
+@@ -102,7 +103,6 @@ static int cpio_mkslink(const char *name, const char *target,
+ 			 unsigned int mode, uid_t uid, gid_t gid)
+ {
+ 	char s[256];
+-	time_t mtime = time(NULL);
+ 
+ 	if (name[0] == '/')
+ 		name++;
+@@ -114,7 +114,7 @@ static int cpio_mkslink(const char *name, const char *target,
+ 		(long) uid,		/* uid */
+ 		(long) gid,		/* gid */
+ 		1,			/* nlink */
+-		(long) mtime,		/* mtime */
++		(long) default_mtime,	/* mtime */
+ 		(unsigned)strlen(target)+1, /* filesize */
+ 		3,			/* major */
+ 		1,			/* minor */
+@@ -152,7 +152,6 @@ static int cpio_mkgeneric(const char *name, unsigned int mode,
+ 		       uid_t uid, gid_t gid)
+ {
+ 	char s[256];
+-	time_t mtime = time(NULL);
+ 
+ 	if (name[0] == '/')
+ 		name++;
+@@ -164,7 +163,7 @@ static int cpio_mkgeneric(const char *name, unsigned int mode,
+ 		(long) uid,		/* uid */
+ 		(long) gid,		/* gid */
+ 		2,			/* nlink */
+-		(long) mtime,		/* mtime */
++		(long) default_mtime,	/* mtime */
+ 		0,			/* filesize */
+ 		3,			/* major */
+ 		1,			/* minor */
+@@ -242,7 +241,6 @@ static int cpio_mknod(const char *name, unsigned int mode,
+ 		       unsigned int maj, unsigned int min)
+ {
+ 	char s[256];
+-	time_t mtime = time(NULL);
+ 
+ 	if (dev_type == 'b')
+ 		mode |= S_IFBLK;
+@@ -259,7 +257,7 @@ static int cpio_mknod(const char *name, unsigned int mode,
+ 		(long) uid,		/* uid */
+ 		(long) gid,		/* gid */
+ 		1,			/* nlink */
+-		(long) mtime,		/* mtime */
++		(long) default_mtime,	/* mtime */
+ 		0,			/* filesize */
+ 		3,			/* major */
+ 		1,			/* minor */
+@@ -529,6 +527,7 @@ int main (int argc, char *argv[])
+ 	char *args, *type;
+ 	int ec = 0;
+ 	int line_nr = 0;
++	const char *env;
+ 
+ 	if (2 != argc) {
+ 		usage(argv[0]);
+@@ -544,6 +543,12 @@ int main (int argc, char *argv[])
+ 		exit(1);
+ 	}
+ 
++	env = getenv("CPIO_TIMESTAMP");
++	if (env)
++		default_mtime = atol(env);
++	if (!default_mtime)
++		default_mtime = time(NULL);
++
+ 	while (fgets(line, LINE_SIZE, cpio_list)) {
+ 		int type_idx;
+ 		size_t slen = strlen(line);
 -- 
 1.7.4.1
 
