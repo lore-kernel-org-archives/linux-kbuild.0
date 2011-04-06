@@ -1,41 +1,44 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:51008 "EHLO mx2.suse.de"
+Received: from cantor.suse.de ([195.135.220.2]:40545 "EHLO mx1.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753247Ab1DFHro (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 6 Apr 2011 03:47:44 -0400
-Message-ID: <4D9C1AA0.9030008@suse.cz>
-Date: Wed, 06 Apr 2011 09:47:44 +0200
+	id S1753912Ab1DFIGw (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 6 Apr 2011 04:06:52 -0400
+Message-ID: <4D9C1F1C.50802@suse.cz>
+Date: Wed, 06 Apr 2011 10:06:52 +0200
 From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Subject: Re: [PATCH 09/34] x86: Allow to override the ROOT_DEV variable
-References: <1302015561-21047-1-git-send-email-mmarek@suse.cz> <1302015561-21047-10-git-send-email-mmarek@suse.cz> <4D9B3581.6080105@zytor.com>
-In-Reply-To: <4D9B3581.6080105@zytor.com>
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: [PATCH 12/34] isdn/diva: Drop __TIME__ usage
+References: <1302015561-21047-1-git-send-email-mmarek@suse.cz> <1302015561-21047-13-git-send-email-mmarek@suse.cz>            <alpine.DEB.2.00.1104051709040.7262@justus.melware.de> <20627.1302031056@localhost>
+In-Reply-To: <20627.1302031056@localhost>
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "H. Peter Anvin" <hpa@zytor.com>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, x86@kernel.org
+To: Valdis.Kletnieks@vt.edu
+Cc: Armin Schindler <armin@melware.de>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org
 
-On 5.4.2011 17:30, H. Peter Anvin wrote:
->> --- a/arch/x86/boot/Makefile
->> +++ b/arch/x86/boot/Makefile
->> @@ -13,7 +13,7 @@
->>  # This can be either FLOPPY, CURRENT, /dev/xxxx or empty, in which case
->>  # the default of FLOPPY is used by 'build'.
->>  
->> -ROOT_DEV	:= CURRENT
->> +ROOT_DEV	?= CURRENT
->>  
->>  # If you want to preset the SVGA mode, uncomment the next line and
->>  # set SVGA_MODE to whatever number you want.
+On 5.4.2011 21:17, Valdis.Kletnieks@vt.edu wrote:
+> On Tue, 05 Apr 2011 17:10:34 +0200, Armin Schindler said:
+>> On Tue, 5 Apr 2011, Michal Marek wrote:
+>>> The kernel already prints its build timestamp during boot, no need to
+>>> repeat it in random drivers and produce different object files each
+>>> time.
+>>
+>> The module can be build separately from the kernel, therefore it can have
+>> an own build timestamp.
 > 
-> Is this a good thing?  As far as I understand ?= it may mean picking
-> something up from the outside environment.
-> 
-> Since ROOT_DEV has been obsolete for 15 years or more, this would seem
-> to be a needless new error mode.
+> If the same code is being built as an out-of-tree module, that's a possibly
+> good reason for a code version variable, but what does the build timestamp
+> actually tell you?  If you already know foo_driver.c version 0.814 was buiilt
+> against 2.6.41-rc2, in what cases does it matter if the compile was on Tuesday
+> or Thursday - especially since an 'ls -l foo_driver.ko' will tell you?  If it's
+> a matter of "the target .config changed on Wednesday", a build timestamp still
+> doesn't help over 'ls -l'.
 
-So can we just set the default root device to (0, 0)?
+Exactly. Build timestamps are only a poor substitute for proper version
+tracking. If you want to be able to reproduce the build of a binary, you
+want it to embed some source revision, not the date when you built it.
+For the kernel, you can use KBUILD_BUILD_TIMESTAMP=<source timestamp>,
+for out-of-tree modules, you need to come up with something own.
 
 Michal
