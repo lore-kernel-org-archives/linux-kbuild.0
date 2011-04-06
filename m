@@ -1,31 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor.suse.de ([195.135.220.2]:41074 "EHLO mx1.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754152Ab1DFIXH (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 6 Apr 2011 04:23:07 -0400
-Message-ID: <4D9C22EB.7070106@suse.cz>
-Date: Wed, 06 Apr 2011 10:23:07 +0200
-From: Michal Marek <mmarek@suse.cz>
+Received: from mail-iy0-f174.google.com ([209.85.210.174]:64426 "EHLO
+	mail-iy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754224Ab1DFQZg (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 6 Apr 2011 12:25:36 -0400
 MIME-Version: 1.0
-Subject: Re: [PATCH 33/34] usb/lh7a40x_udc: Drop __DATE__ usage
-References: <1302015561-21047-1-git-send-email-mmarek@suse.cz> <1302015561-21047-34-git-send-email-mmarek@suse.cz> <20110405162512.GB11737@n2100.arm.linux.org.uk>
-In-Reply-To: <20110405162512.GB11737@n2100.arm.linux.org.uk>
+In-Reply-To: <4D9C1842.6000602@suse.cz>
+References: <1302015561-21047-1-git-send-email-mmarek@suse.cz>
+	<1302015561-21047-2-git-send-email-mmarek@suse.cz>
+	<BANLkTinwKzasKmB_fFzXd+W7F6GGuPO6+g@mail.gmail.com>
+	<4D9C1842.6000602@suse.cz>
+Date: Wed, 6 Apr 2011 12:25:35 -0400
+Message-ID: <BANLkTi=dCYQcAk8ezF6V_uY7BMEyNAFUTQ@mail.gmail.com>
+Subject: Re: [PATCH 01/34] kconfig: Do not record timestamp in auto.conf and autoconf.h
+From: Arnaud Lacombe <lacombar@gmail.com>
 Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Russell King - ARM Linux <linux@arm.linux.org.uk>
-Cc: linux-kbuild@vger.kernel.org, linux-usb@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Marc Singer <elf@buici.com>
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On 5.4.2011 18:25, Russell King - ARM Linux wrote:
-> On Tue, Apr 05, 2011 at 04:59:20PM +0200, Michal Marek wrote:
->> The kernel already prints its build timestamp during boot, no need to
->> repeat it in random drivers and produce different object files each
->> time.
-> 
-> This file no longer exists.
+Hi,
 
-I only tested the series on top of 2.6.38. I dropped this patch now,
-sorry for the noise.
+On Wed, Apr 6, 2011 at 3:37 AM, Michal Marek <mmarek@suse.cz> wrote:
+> On 5.4.2011 20:57, Arnaud Lacombe wrote:
+>> Hi,
+>>
+>> On Tue, Apr 5, 2011 at 10:58 AM, Michal Marek <mmarek@suse.cz> wrote:
+>>> Timestamps in file data are useless and there is already one in .config
+>>>
+>> hum, shouldn't this be tunable via KCONFIG_NOTIMESTAMP ? This might be
+>> useful to know when the file was generated, independently of the
+>> .config, as conf_write() and conf_write_autoconf() are independent
+>> from one another.
+>
+> Yeah, but ls -l include/generated/autoconf.h will tell you the same,
+> won't it?
+>
+Not if the file is spread to other machine/fs. Not that I care much
+though, but for consistency, either KCONFIG_NOTIMESTAMP is honored in
+every places where timestamps are used, or it should be killed
+altogether.
 
-Michal
+ - Arnaud
