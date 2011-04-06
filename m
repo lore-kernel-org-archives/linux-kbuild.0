@@ -1,50 +1,85 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor.suse.de ([195.135.220.2]:37419 "EHLO mx1.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751049Ab1DFUjN (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 6 Apr 2011 16:39:13 -0400
-Message-ID: <4D9CCF71.8060906@suse.cz>
-Date: Wed, 06 Apr 2011 22:39:13 +0200
-From: Michal Marek <mmarek@suse.cz>
-MIME-Version: 1.0
-Subject: Re: [PATCH 01/34] kconfig: Do not record timestamp in auto.conf and
- autoconf.h
-References: <1302015561-21047-1-git-send-email-mmarek@suse.cz>	<1302015561-21047-2-git-send-email-mmarek@suse.cz>	<BANLkTinwKzasKmB_fFzXd+W7F6GGuPO6+g@mail.gmail.com>	<4D9C1842.6000602@suse.cz> <BANLkTi=dCYQcAk8ezF6V_uY7BMEyNAFUTQ@mail.gmail.com>
-In-Reply-To: <BANLkTi=dCYQcAk8ezF6V_uY7BMEyNAFUTQ@mail.gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+Received: from wolverine02.qualcomm.com ([199.106.114.251]:60242 "EHLO
+	wolverine02.qualcomm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756664Ab1DFWHz (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 6 Apr 2011 18:07:55 -0400
+From: Stephen Boyd <sboyd@codeaurora.org>
+Subject: [PATCH] nconfig: Silence unused return values from wattrset
+Date: Wed,  6 Apr 2011 15:07:49 -0700
+Message-Id: <1302127669-15272-1-git-send-email-sboyd@codeaurora.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnaud Lacombe <lacombar@gmail.com>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>, Roman Zippel <zippel@linux-m68k.org>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Nir Tzachar <nir.tzachar@gmail.com>
 
-On 6.4.2011 18:25, Arnaud Lacombe wrote:
-> Hi,
-> 
-> On Wed, Apr 6, 2011 at 3:37 AM, Michal Marek <mmarek@suse.cz> wrote:
->> On 5.4.2011 20:57, Arnaud Lacombe wrote:
->>> Hi,
->>>
->>> On Tue, Apr 5, 2011 at 10:58 AM, Michal Marek <mmarek@suse.cz> wrote:
->>>> Timestamps in file data are useless and there is already one in .config
->>>>
->>> hum, shouldn't this be tunable via KCONFIG_NOTIMESTAMP ? This might be
->>> useful to know when the file was generated, independently of the
->>> .config, as conf_write() and conf_write_autoconf() are independent
->>> from one another.
->>
->> Yeah, but ls -l include/generated/autoconf.h will tell you the same,
->> won't it?
->>
-> Not if the file is spread to other machine/fs. Not that I care much
-> though, but for consistency, either KCONFIG_NOTIMESTAMP is honored in
-> every places where timestamps are used, or it should be killed
-> altogether.
+Ignore the return value from wattrset since we ignore the return
+value in nconf.gui.c as well.
 
-Or we kill the timestamps in the other places :). auto.conf and
-autoconf.h are "internal" files, .config is the file supplied and edited
-by the user and I can see that some might find the embedded timestamp
-useful. But I doubt that anyone needs the timestamp in auto.conf and
-autoconf.h.
+scripts/kconfig/nconf.c: In function 'print_function_line':
+scripts/kconfig/nconf.c:376: warning: value computed is not used
+scripts/kconfig/nconf.c:380: warning: value computed is not used
+scripts/kconfig/nconf.c:387: warning: value computed is not used
+scripts/kconfig/nconf.c: In function 'show_menu':
+scripts/kconfig/nconf.c:956: warning: value computed is not used
+scripts/kconfig/nconf.c:961: warning: value computed is not used
+scripts/kconfig/nconf.c:963: warning: value computed is not used
+scripts/kconfig/nconf.c:965: warning: value computed is not used
 
-Michal
+Cc: Nir Tzachar <nir.tzachar@gmail.com>
+Signed-off-by: Stephen Boyd <sboyd@codeaurora.org>
+---
+ scripts/kconfig/nconf.c |   14 +++++++-------
+ 1 files changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/scripts/kconfig/nconf.c b/scripts/kconfig/nconf.c
+index db56377..488dd74 100644
+--- a/scripts/kconfig/nconf.c
++++ b/scripts/kconfig/nconf.c
+@@ -373,18 +373,18 @@ static void print_function_line(void)
+ 	const int skip = 1;
+ 
+ 	for (i = 0; i < function_keys_num; i++) {
+-		wattrset(main_window, attributes[FUNCTION_HIGHLIGHT]);
++		(void) wattrset(main_window, attributes[FUNCTION_HIGHLIGHT]);
+ 		mvwprintw(main_window, LINES-3, offset,
+ 				"%s",
+ 				function_keys[i].key_str);
+-		wattrset(main_window, attributes[FUNCTION_TEXT]);
++		(void) wattrset(main_window, attributes[FUNCTION_TEXT]);
+ 		offset += strlen(function_keys[i].key_str);
+ 		mvwprintw(main_window, LINES-3,
+ 				offset, "%s",
+ 				function_keys[i].func);
+ 		offset += strlen(function_keys[i].func) + skip;
+ 	}
+-	wattrset(main_window, attributes[NORMAL]);
++	(void) wattrset(main_window, attributes[NORMAL]);
+ }
+ 
+ /* help */
+@@ -953,16 +953,16 @@ static void show_menu(const char *prompt, const char *instructions,
+ 	current_instructions = instructions;
+ 
+ 	clear();
+-	wattrset(main_window, attributes[NORMAL]);
++	(void) wattrset(main_window, attributes[NORMAL]);
+ 	print_in_middle(stdscr, 1, 0, COLS,
+ 			menu_backtitle,
+ 			attributes[MAIN_HEADING]);
+ 
+-	wattrset(main_window, attributes[MAIN_MENU_BOX]);
++	(void) wattrset(main_window, attributes[MAIN_MENU_BOX]);
+ 	box(main_window, 0, 0);
+-	wattrset(main_window, attributes[MAIN_MENU_HEADING]);
++	(void) wattrset(main_window, attributes[MAIN_MENU_HEADING]);
+ 	mvwprintw(main_window, 0, 3, " %s ", prompt);
+-	wattrset(main_window, attributes[NORMAL]);
++	(void) wattrset(main_window, attributes[NORMAL]);
+ 
+ 	set_menu_items(curses_menu, curses_menu_items);
+ 
+-- 
+Sent by an employee of the Qualcomm Innovation Center, Inc.
+The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum.
+
