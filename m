@@ -1,35 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:50778 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:51008 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752702Ab1DFHhl (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 6 Apr 2011 03:37:41 -0400
-Message-ID: <4D9C1842.6000602@suse.cz>
-Date: Wed, 06 Apr 2011 09:37:38 +0200
+	id S1753247Ab1DFHro (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 6 Apr 2011 03:47:44 -0400
+Message-ID: <4D9C1AA0.9030008@suse.cz>
+Date: Wed, 06 Apr 2011 09:47:44 +0200
 From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Subject: Re: [PATCH 01/34] kconfig: Do not record timestamp in auto.conf and
- autoconf.h
-References: <1302015561-21047-1-git-send-email-mmarek@suse.cz>	<1302015561-21047-2-git-send-email-mmarek@suse.cz> <BANLkTinwKzasKmB_fFzXd+W7F6GGuPO6+g@mail.gmail.com>
-In-Reply-To: <BANLkTinwKzasKmB_fFzXd+W7F6GGuPO6+g@mail.gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [PATCH 09/34] x86: Allow to override the ROOT_DEV variable
+References: <1302015561-21047-1-git-send-email-mmarek@suse.cz> <1302015561-21047-10-git-send-email-mmarek@suse.cz> <4D9B3581.6080105@zytor.com>
+In-Reply-To: <4D9B3581.6080105@zytor.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnaud Lacombe <lacombar@gmail.com>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: "H. Peter Anvin" <hpa@zytor.com>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, x86@kernel.org
 
-On 5.4.2011 20:57, Arnaud Lacombe wrote:
-> Hi,
+On 5.4.2011 17:30, H. Peter Anvin wrote:
+>> --- a/arch/x86/boot/Makefile
+>> +++ b/arch/x86/boot/Makefile
+>> @@ -13,7 +13,7 @@
+>>  # This can be either FLOPPY, CURRENT, /dev/xxxx or empty, in which case
+>>  # the default of FLOPPY is used by 'build'.
+>>  
+>> -ROOT_DEV	:= CURRENT
+>> +ROOT_DEV	?= CURRENT
+>>  
+>>  # If you want to preset the SVGA mode, uncomment the next line and
+>>  # set SVGA_MODE to whatever number you want.
 > 
-> On Tue, Apr 5, 2011 at 10:58 AM, Michal Marek <mmarek@suse.cz> wrote:
->> Timestamps in file data are useless and there is already one in .config
->>
-> hum, shouldn't this be tunable via KCONFIG_NOTIMESTAMP ? This might be
-> useful to know when the file was generated, independently of the
-> .config, as conf_write() and conf_write_autoconf() are independent
-> from one another.
+> Is this a good thing?  As far as I understand ?= it may mean picking
+> something up from the outside environment.
+> 
+> Since ROOT_DEV has been obsolete for 15 years or more, this would seem
+> to be a needless new error mode.
 
-Yeah, but ls -l include/generated/autoconf.h will tell you the same,
-won't it?
+So can we just set the default root device to (0, 0)?
 
 Michal
