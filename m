@@ -1,39 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor.suse.de ([195.135.220.2]:42382 "EHLO mx1.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752664Ab1DHLU3 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 8 Apr 2011 07:20:29 -0400
-Date: Fri, 8 Apr 2011 13:20:27 +0200
-From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [PATCH] kconfig: Avoid buffer underrun in choice input
-Message-ID: <20110408112027.GA4894@sepie.suse.cz>
-References: <1300508770.26693.73.camel@localhost>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1300508770.26693.73.camel@localhost>
+Received: from cpoproxy1-pub.bluehost.com ([69.89.21.11]:41769 "HELO
+	cpoproxy1-pub.bluehost.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with SMTP id S1757775Ab1DHTvS (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 8 Apr 2011 15:51:18 -0400
+Date: Fri, 8 Apr 2011 12:51:10 -0700
+From: Jesse Barnes <jbarnes@virtuousgeek.org>
+Subject: Re: [PATCH] move some .pci_fixup_* sections into .init
+Message-ID: <20110408125110.52aa90c4@jbarnes-desktop>
+In-Reply-To: <4D5262C30200007800030F9C@vpn.id2.novell.com>
+References: <4D5262C30200007800030F9C@vpn.id2.novell.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ben Hutchings <ben@decadent.org.uk>
-Cc: Roman Zippel <zippel@linux-m68k.org>, linux-kbuild@vger.kernel.org
+To: Jan Beulich <JBeulich@novell.com>
+Cc: linux-kbuild@vger.kernel.org, mingo@elte.hu, tglx@linutronix.de, linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org, hpa@zytor.com
 
-On Sat, Mar 19, 2011 at 04:26:10AM +0000, Ben Hutchings wrote:
-> commit 40aee729b350672c2550640622416a855e27938f ('kconfig: fix default
-> value for choice input') fixed some cases where kconfig would select
-> the wrong option from a choice with a single valid option and thus
-> enter an infinite loop.
+On Wed, 09 Feb 2011 08:47:47 +0000
+"Jan Beulich" <JBeulich@novell.com> wrote:
+
+> .pci_fixup_final is only used from .init.text, and hence can (along
+> with the respective handler functions) reside in .init.*.
 > 
-> However, this broke the test for user input of the form 'N?', because
-> when kconfig selects the single valid option the input is zero-length
-> and the test will read the byte before the input buffer.  If this
-> happens to contain '?' (as it will in a mips build on Debian unstable
-> today) then kconfig again enters an infinite loop.
+> Several other .pci_fixup_* sections are needed only during boot and
+> suspend/resume, and can therefore be moved into .init.* if
+> !CONFIG_PM_OPS.
 > 
-> Signed-off-by: Ben Hutchings <ben@decadent.org.uk>
-> Cc: stable@kernel.org [2.6.17+]
-> ---
->  scripts/kconfig/conf.c |    2 +-
+> While generally section mismatch checking is being turned on by this
+> patch for all of .pci_fixup_*, for .pci_fixup_header it is being
+> suppressed for the moment as it caused way too much fallout.
+> Theoretically, all respective handlers must get their __init/__devinit
+> removed, as this gets processed from a non-__init, non-__devinit
+> function.
+> 
+> This also adds a previously missing comma in the definition of
+> ALL_INIT_DATA_SECTIONS.
+> 
+> Signed-off-by: Jan Beulich <jbeulich@novell.com>
+> Cc: H. Peter Anvin <hpa@zytor.com>
+> Cc: Jesse Barnes <jbarnes@virtuousgeek.org>
+> Cc: Thomas Gleixner <tglx@linutronix.de>
+> Cc: Ingo Molnar <mingo@elte.hu>
 
-Applied to kbuild-2.6.git#kconfig, thanks.
+This didn't apply for me, but I'd be happy to take the PCI parts, can
+you re-send against my linux-next branch (assuming it's not already
+applied to some other tree).
 
-Michal
+Thanks,
+-- 
+Jesse Barnes, Intel Open Source Technology Center
