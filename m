@@ -1,53 +1,39 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cpoproxy1-pub.bluehost.com ([69.89.21.11]:41769 "HELO
-	cpoproxy1-pub.bluehost.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with SMTP id S1757775Ab1DHTvS (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 8 Apr 2011 15:51:18 -0400
-Date: Fri, 8 Apr 2011 12:51:10 -0700
-From: Jesse Barnes <jbarnes@virtuousgeek.org>
-Subject: Re: [PATCH] move some .pci_fixup_* sections into .init
-Message-ID: <20110408125110.52aa90c4@jbarnes-desktop>
-In-Reply-To: <4D5262C30200007800030F9C@vpn.id2.novell.com>
-References: <4D5262C30200007800030F9C@vpn.id2.novell.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Received: from paul.0au.de ([94.23.237.123]:40616 "EHLO 0au.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1755660Ab1DIUzv (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 9 Apr 2011 16:55:51 -0400
+Received: from mail by 0au.de with spam-scanned (Exim 4.74)
+	(envelope-from <a@0au.de>)
+	id 1Q8fCB-0005XJ-0n
+	for linux-kbuild@vger.kernel.org; Sat, 09 Apr 2011 22:55:51 +0200
+Date: Sat, 9 Apr 2011 22:55:32 +0200
+From: Valentin Ochs <a@0au.de>
+Subject: [PATCH] fixdep: define _POSIX_C_SOURCE
+Message-ID: <20110409205532.GE4663@erwin>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jan Beulich <JBeulich@novell.com>
-Cc: linux-kbuild@vger.kernel.org, mingo@elte.hu, tglx@linutronix.de, linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org, hpa@zytor.com
+Cc: trivial@kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Wed, 09 Feb 2011 08:47:47 +0000
-"Jan Beulich" <JBeulich@novell.com> wrote:
+fixdep.c uses PATH_MAX without defining the required _POSIX_C_SOURCE
+feature test macro.  This prevents compilation with the musl libc.
+The patch applies to 2.6.38.2.
 
-> .pci_fixup_final is only used from .init.text, and hence can (along
-> with the respective handler functions) reside in .init.*.
-> 
-> Several other .pci_fixup_* sections are needed only during boot and
-> suspend/resume, and can therefore be moved into .init.* if
-> !CONFIG_PM_OPS.
-> 
-> While generally section mismatch checking is being turned on by this
-> patch for all of .pci_fixup_*, for .pci_fixup_header it is being
-> suppressed for the moment as it caused way too much fallout.
-> Theoretically, all respective handlers must get their __init/__devinit
-> removed, as this gets processed from a non-__init, non-__devinit
-> function.
-> 
-> This also adds a previously missing comma in the definition of
-> ALL_INIT_DATA_SECTIONS.
-> 
-> Signed-off-by: Jan Beulich <jbeulich@novell.com>
-> Cc: H. Peter Anvin <hpa@zytor.com>
-> Cc: Jesse Barnes <jbarnes@virtuousgeek.org>
-> Cc: Thomas Gleixner <tglx@linutronix.de>
-> Cc: Ingo Molnar <mingo@elte.hu>
+Best regards,
+Valentin
 
-This didn't apply for me, but I'd be happy to take the PCI parts, can
-you re-send against my linux-next branch (assuming it's not already
-applied to some other tree).
-
-Thanks,
--- 
-Jesse Barnes, Intel Open Source Technology Center
+Signed-off-by: Valentin Ochs <a@0au.de>
+---
+--- a/scripts/basic/fixdep.c
++++ b/scripts/basic/fixdep.c
+@@ -102,6 +102,7 @@
+  * through arch/um/include/uml-config.h; this fixdep "bug" makes sure that
+  * those files will have correct dependencies.
+  */
++#define _POSIX_C_SOURCE 200809L
+ #include <sys/types.h>
+ #include <sys/stat.h>
+ #include <sys/mman.h>
