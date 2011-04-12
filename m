@@ -1,139 +1,40 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp-out3.tiscali.nl ([195.241.79.178]:57057 "EHLO
+Received: from smtp-out3.tiscali.nl ([195.241.79.178]:35742 "EHLO
 	smtp-out3.tiscali.nl" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751097Ab1DLFRN (ORCPT
+	with ESMTP id S1755131Ab1DLHMA (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 12 Apr 2011 01:17:13 -0400
+	Tue, 12 Apr 2011 03:12:00 -0400
 Subject: Re: [PATCH 09/34] x86: Allow to override the ROOT_DEV variable
 From: Paul Bolle <pebolle@tiscali.nl>
-In-Reply-To: <20110411150820.GA22004@sepie.suse.cz>
+In-Reply-To: <17983.1302578741@localhost>
 References: <1302015561-21047-1-git-send-email-mmarek@suse.cz>
 	 <1302015561-21047-10-git-send-email-mmarek@suse.cz>
 	 <4D9B3581.6080105@zytor.com> <4D9C1AA0.9030008@suse.cz>
-	 <20110411150820.GA22004@sepie.suse.cz>
+	 <20110411150820.GA22004@sepie.suse.cz>  <17983.1302578741@localhost>
 Content-Type: text/plain; charset="UTF-8"
-Date: Tue, 12 Apr 2011 07:01:10 +0200
-Message-ID: <1302584470.26451.11.camel@x61.thuisdomein>
+Date: Tue, 12 Apr 2011 09:11:50 +0200
+Message-ID: <1302592310.26451.16.camel@x61.thuisdomein>
 Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: "H. Peter Anvin" <hpa@zytor.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, x86@kernel.org
+To: Valdis.Kletnieks@vt.edu
+Cc: Michal Marek <mmarek@suse.cz>, "H. Peter Anvin" <hpa@zytor.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, x86@kernel.org
 
-On Mon, 2011-04-11 at 17:08 +0200, Michal Marek wrote:
-> Subject: [PATCH] x86: Do not set the rood_dev field in bzImage
-> 
-> This has been obsoleted by the root= commandline for several years.
-> People who still depend on this will surely have a copy of the rdev
-> command around, the rest of the world gets rid of another piece of
-> buildhost-dependent data in the build.
-> 
-> Cc: Thomas Gleixner <tglx@linutronix.de>
-> Cc: Ingo Molnar <mingo@redhat.com>
-> Cc: "H. Peter Anvin" <hpa@zytor.com>
-> Cc: x86@kernel.org
-> Signed-off-by: Michal Marek <mmarek@suse.cz>
-> ---
->  arch/x86/boot/Makefile |    9 +--------
->  1 files changed, 1 insertions(+), 8 deletions(-)
-> 
-> diff --git a/arch/x86/boot/Makefile b/arch/x86/boot/Makefile
-> index f7cb086..95365a8 100644
-> --- a/arch/x86/boot/Makefile
-> +++ b/arch/x86/boot/Makefile
-> @@ -9,12 +9,6 @@
->  # Changed by many, many contributors over the years.
->  #
->  
-> -# ROOT_DEV specifies the default root-device when making the image.
-> -# This can be either FLOPPY, CURRENT, /dev/xxxx or empty, in which case
-> -# the default of FLOPPY is used by 'build'.
-> -
-> -ROOT_DEV	:= CURRENT
-> -
->  # If you want to preset the SVGA mode, uncomment the next line and
->  # set SVGA_MODE to whatever number you want.
->  # Set it to -DSVGA_MODE=NORMAL_VGA if you just want the EGA/VGA mode.
-> @@ -75,8 +69,7 @@ GCOV_PROFILE := n
->  $(obj)/bzImage: asflags-y  := $(SVGA_MODE)
->  
->  quiet_cmd_image = BUILD   $@
-> -cmd_image = $(obj)/tools/build $(obj)/setup.bin $(obj)/vmlinux.bin \
-> -	$(ROOT_DEV) > $@
-> +cmd_image = $(obj)/tools/build $(obj)/setup.bin $(obj)/vmlinux.bin > $@
->  
->  $(obj)/bzImage: $(obj)/setup.bin $(obj)/vmlinux.bin $(obj)/tools/build FORCE
->  	$(call if_changed,image)
+On Mon, 2011-04-11 at 23:25 -0400, Valdis.Kletnieks@vt.edu wrote:
 
-I'm not familiar with the rdev command. I assume it allows one to
-manipulate the two rootdev bytes in a kernel image. Anyhow, shouldn't
-the above patch be complemented with something like the following?
+> Does the default of FLOPPY still get used after this patch, or is this a stale comment?
 
-diff --git a/arch/x86/boot/tools/build.c b/arch/x86/boot/tools/build.c
-index ee3a4ea..fdc60a0 100644
---- a/arch/x86/boot/tools/build.c
-+++ b/arch/x86/boot/tools/build.c
-@@ -130,7 +130,7 @@ static void die(const char * str, ...)
- 
- static void usage(void)
- {
--	die("Usage: build setup system [rootdev] [> image]");
-+	die("Usage: build setup system [> image]");
- }
- 
- int main(int argc, char ** argv)
-@@ -138,39 +138,14 @@ int main(int argc, char ** argv)
- 	unsigned int i, sz, setup_sectors;
- 	int c;
- 	u32 sys_size;
--	u8 major_root, minor_root;
- 	struct stat sb;
- 	FILE *file;
- 	int fd;
- 	void *kernel;
- 	u32 crc = 0xffffffffUL;
- 
--	if ((argc < 3) || (argc > 4))
-+	if (argc != 3)
- 		usage();
--	if (argc > 3) {
--		if (!strcmp(argv[3], "CURRENT")) {
--			if (stat("/", &sb)) {
--				perror("/");
--				die("Couldn't stat /");
--			}
--			major_root = major(sb.st_dev);
--			minor_root = minor(sb.st_dev);
--		} else if (strcmp(argv[3], "FLOPPY")) {
--			if (stat(argv[3], &sb)) {
--				perror(argv[3]);
--				die("Couldn't stat root device.");
--			}
--			major_root = major(sb.st_rdev);
--			minor_root = minor(sb.st_rdev);
--		} else {
--			major_root = 0;
--			minor_root = 0;
--		}
--	} else {
--		major_root = DEFAULT_MAJOR_ROOT;
--		minor_root = DEFAULT_MINOR_ROOT;
--	}
--	fprintf(stderr, "Root device is (%d, %d)\n", major_root, minor_root);
- 
- 	/* Copy the setup code */
- 	file = fopen(argv[1], "r");
-@@ -193,8 +168,8 @@ int main(int argc, char ** argv)
- 	memset(buf+c, 0, i-c);
- 
- 	/* Set the default root device */
--	buf[508] = minor_root;
--	buf[509] = major_root;
-+	buf[508] = DEFAULT_MINOR_ROOT;
-+	buf[509] = DEFAULT_MAJOR_ROOT;
- 
- 	fprintf(stderr, "Setup is %d bytes (padded to %d bytes).\n", c, i);
- 
+It looks like a stale comment to me. The default currently actually is
+0, 0 (major, minor). I'm not sure "FLOPPY" even works. Is
+'stat("FLOPPY", ...)' legal?
 
+> Also, I sort of expected to see more code removed that *used* the no-longer-passed
+> value of ROOT_DEV.
+
+That's what I expect too. See my addendum to Michal's patch in the
+message I sent a few hours ago.
+
+
+Paul Bolle
 
