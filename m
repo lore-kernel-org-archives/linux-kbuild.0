@@ -1,40 +1,40 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp-out3.tiscali.nl ([195.241.79.178]:35742 "EHLO
-	smtp-out3.tiscali.nl" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755131Ab1DLHMA (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 12 Apr 2011 03:12:00 -0400
-Subject: Re: [PATCH 09/34] x86: Allow to override the ROOT_DEV variable
-From: Paul Bolle <pebolle@tiscali.nl>
-In-Reply-To: <17983.1302578741@localhost>
-References: <1302015561-21047-1-git-send-email-mmarek@suse.cz>
-	 <1302015561-21047-10-git-send-email-mmarek@suse.cz>
-	 <4D9B3581.6080105@zytor.com> <4D9C1AA0.9030008@suse.cz>
-	 <20110411150820.GA22004@sepie.suse.cz>  <17983.1302578741@localhost>
-Content-Type: text/plain; charset="UTF-8"
-Date: Tue, 12 Apr 2011 09:11:50 +0200
-Message-ID: <1302592310.26451.16.camel@x61.thuisdomein>
-Mime-Version: 1.0
+Received: from cantor2.suse.de ([195.135.220.15]:33103 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753303Ab1DLJBs (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 12 Apr 2011 05:01:48 -0400
+Message-ID: <4DA414F7.1090302@suse.cz>
+Date: Tue, 12 Apr 2011 11:01:43 +0200
+From: Michal Marek <mmarek@suse.cz>
+MIME-Version: 1.0
+Subject: Re: [PATCH v2] kbuild: Allow to override LINUX_COMPILE_BY and LINUX_COMPILE_HOST
+ macros
+References: <4D9B3AA4.5090402@fastmail.fm>            <1302534289-17689-1-git-send-email-mmarek@suse.cz> <18001.1302578757@localhost>
+In-Reply-To: <18001.1302578757@localhost>
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Valdis.Kletnieks@vt.edu
-Cc: Michal Marek <mmarek@suse.cz>, "H. Peter Anvin" <hpa@zytor.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, x86@kernel.org
+Cc: jwjstone@fastmail.fm, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Mon, 2011-04-11 at 23:25 -0400, Valdis.Kletnieks@vt.edu wrote:
+On 12.4.2011 05:25, Valdis.Kletnieks@vt.edu wrote:
+> On Mon, 11 Apr 2011 17:04:49 +0200, Michal Marek said:
+>> Make it possible to override the user@host string displayed during boot
+>> and in /proc/version by the environment variables KBUILD_BUILD_USER and
+>> KBUILD_BUILD_HOST. 
+> 
+>> +
+>> +KBUILD_BUILD_TIMESTAMP
+> 
+> Changelog section doesn't match actual patch.  Other than that, I'm OK on this.
 
-> Does the default of FLOPPY still get used after this patch, or is this a stale comment?
+I changed it to
 
-It looks like a stale comment to me. The default currently actually is
-0, 0 (major, minor). I'm not sure "FLOPPY" even works. Is
-'stat("FLOPPY", ...)' legal?
+  Make it possible to override the user@host string displayed during boot
+  and in /proc/version by the environment variables KBUILD_BUILD_USER and
+  KBUILD_BUILD_HOST. Several distributions patch scripts/mkcompile_h to
+  achieve this, so let's provide an official way. Also, document the
+  KBUILD_BUILD_TIMESTAMP variable while at it.
 
-> Also, I sort of expected to see more code removed that *used* the no-longer-passed
-> value of ROOT_DEV.
-
-That's what I expect too. See my addendum to Michal's patch in the
-message I sent a few hours ago.
-
-
-Paul Bolle
-
+Michal
