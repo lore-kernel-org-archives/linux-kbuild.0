@@ -1,92 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:40079 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753015Ab1DKPIY (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 11 Apr 2011 11:08:24 -0400
-Date: Mon, 11 Apr 2011 17:08:21 +0200
-From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [PATCH 09/34] x86: Allow to override the ROOT_DEV variable
-Message-ID: <20110411150820.GA22004@sepie.suse.cz>
-References: <1302015561-21047-1-git-send-email-mmarek@suse.cz>
- <1302015561-21047-10-git-send-email-mmarek@suse.cz>
- <4D9B3581.6080105@zytor.com>
- <4D9C1AA0.9030008@suse.cz>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4D9C1AA0.9030008@suse.cz>
+Received: from lennier.cc.vt.edu ([198.82.162.213]:60554 "EHLO
+	lennier.cc.vt.edu" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756509Ab1DLD0D (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 11 Apr 2011 23:26:03 -0400
+Subject: Re: [PATCH v2] kbuild: Allow to override LINUX_COMPILE_BY and LINUX_COMPILE_HOST macros
+In-Reply-To: Your message of "Mon, 11 Apr 2011 17:04:49 +0200."
+             <1302534289-17689-1-git-send-email-mmarek@suse.cz>
+From: Valdis.Kletnieks@vt.edu
+References: <4D9B3AA4.5090402@fastmail.fm>
+            <1302534289-17689-1-git-send-email-mmarek@suse.cz>
+Mime-Version: 1.0
+Content-Type: multipart/signed; boundary="==_Exmh_1302578757_5348P";
+	 micalg=pgp-sha1; protocol="application/pgp-signature"
+Content-Transfer-Encoding: 7bit
+Date: Mon, 11 Apr 2011 23:25:57 -0400
+Message-ID: <18001.1302578757@localhost>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "H. Peter Anvin" <hpa@zytor.com>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, x86@kernel.org
+To: Michal Marek <mmarek@suse.cz>
+Cc: jwjstone@fastmail.fm, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Wed, Apr 06, 2011 at 09:47:44AM +0200, Michal Marek wrote:
-> On 5.4.2011 17:30, H. Peter Anvin wrote:
-> >> --- a/arch/x86/boot/Makefile
-> >> +++ b/arch/x86/boot/Makefile
-> >> @@ -13,7 +13,7 @@
-> >>  # This can be either FLOPPY, CURRENT, /dev/xxxx or empty, in which case
-> >>  # the default of FLOPPY is used by 'build'.
-> >>  
-> >> -ROOT_DEV	:= CURRENT
-> >> +ROOT_DEV	?= CURRENT
-> >>  
-> >>  # If you want to preset the SVGA mode, uncomment the next line and
-> >>  # set SVGA_MODE to whatever number you want.
-> > 
-> > Is this a good thing?  As far as I understand ?= it may mean picking
-> > something up from the outside environment.
-> > 
-> > Since ROOT_DEV has been obsolete for 15 years or more, this would seem
-> > to be a needless new error mode.
-> 
-> So can we just set the default root device to (0, 0)?
+--==_Exmh_1302578757_5348P
+Content-Type: text/plain; charset=us-ascii
 
-Like this?
+On Mon, 11 Apr 2011 17:04:49 +0200, Michal Marek said:
+> Make it possible to override the user@host string displayed during boot
+> and in /proc/version by the environment variables KBUILD_BUILD_USER and
+> KBUILD_BUILD_HOST. 
 
-Subject: [PATCH] x86: Do not set the rood_dev field in bzImage
+> +
+> +KBUILD_BUILD_TIMESTAMP
 
-This has been obsoleted by the root= commandline for several years.
-People who still depend on this will surely have a copy of the rdev
-command around, the rest of the world gets rid of another piece of
-buildhost-dependent data in the build.
+Changelog section doesn't match actual patch.  Other than that, I'm OK on this.
 
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Cc: Ingo Molnar <mingo@redhat.com>
-Cc: "H. Peter Anvin" <hpa@zytor.com>
-Cc: x86@kernel.org
-Signed-off-by: Michal Marek <mmarek@suse.cz>
----
- arch/x86/boot/Makefile |    9 +--------
- 1 files changed, 1 insertions(+), 8 deletions(-)
+--==_Exmh_1302578757_5348P
+Content-Type: application/pgp-signature
 
-diff --git a/arch/x86/boot/Makefile b/arch/x86/boot/Makefile
-index f7cb086..95365a8 100644
---- a/arch/x86/boot/Makefile
-+++ b/arch/x86/boot/Makefile
-@@ -9,12 +9,6 @@
- # Changed by many, many contributors over the years.
- #
- 
--# ROOT_DEV specifies the default root-device when making the image.
--# This can be either FLOPPY, CURRENT, /dev/xxxx or empty, in which case
--# the default of FLOPPY is used by 'build'.
--
--ROOT_DEV	:= CURRENT
--
- # If you want to preset the SVGA mode, uncomment the next line and
- # set SVGA_MODE to whatever number you want.
- # Set it to -DSVGA_MODE=NORMAL_VGA if you just want the EGA/VGA mode.
-@@ -75,8 +69,7 @@ GCOV_PROFILE := n
- $(obj)/bzImage: asflags-y  := $(SVGA_MODE)
- 
- quiet_cmd_image = BUILD   $@
--cmd_image = $(obj)/tools/build $(obj)/setup.bin $(obj)/vmlinux.bin \
--	$(ROOT_DEV) > $@
-+cmd_image = $(obj)/tools/build $(obj)/setup.bin $(obj)/vmlinux.bin > $@
- 
- $(obj)/bzImage: $(obj)/setup.bin $(obj)/vmlinux.bin $(obj)/tools/build FORCE
- 	$(call if_changed,image)
--- 
-1.7.4.1
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+Comment: Exmh version 2.5 07/13/2001
+
+iD8DBQFNo8ZFcC3lWbTT17ARAn/tAKDPK4FWOpL/gBSB8dVtjuLJBYN9AACgg0qg
+oTXNm96m8yN3jUTHNWA+5wo=
+=gslI
+-----END PGP SIGNATURE-----
+
+--==_Exmh_1302578757_5348P--
 
