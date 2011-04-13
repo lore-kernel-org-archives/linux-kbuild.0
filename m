@@ -1,39 +1,130 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-fx0-f46.google.com ([209.85.161.46]:64206 "EHLO
-	mail-fx0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1758211Ab1DMKck (ORCPT
+Received: from 75.98.165.80.static.a2webhosting.com ([75.98.165.80]:42098 "EHLO
+	greenroomsoftware.com" rhost-flags-OK-FAIL-OK-OK) by vger.kernel.org
+	with ESMTP id S932320Ab1DMWCX (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 13 Apr 2011 06:32:40 -0400
-Subject: Re: [PATCH v2 1/2] Kconfig: improve KALLSYMS_ALL documentation
-From: Artem Bityutskiy <dedekind1@gmail.com>
-Reply-To: dedekind1@gmail.com
-In-Reply-To: <1301999098-21412-1-git-send-email-dedekind1@gmail.com>
-References: <1301999098-21412-1-git-send-email-dedekind1@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Date: Wed, 13 Apr 2011 13:22:52 +0300
-Message-ID: <1302690172.2768.20.camel@localhost>
-Mime-Version: 1.0
-Content-Transfer-Encoding: 8bit
+	Wed, 13 Apr 2011 18:02:23 -0400
+Message-ID: <4DA613A3.7070600@greenroomsoftware.com>
+Date: Wed, 13 Apr 2011 17:20:35 -0400
+From: Robert <robert@greenroomsoftware.com>
+MIME-Version: 1.0
+Subject: [PATCH] kbuild, deb-pkg: set host machine after dpkg-gencontrol
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Paulo Marques <pmarques@grupopie.com>, Randy Dunlap <rdunlap@xenotime.net>
+To: linux-kbuild@vger.kernel.orglinux-kbuild@vger.kernel.org, robertcnelson@gmail.com
 
-On Tue, 2011-04-05 at 13:24 +0300, Artem Bityutskiy wrote:
-> From: Artem Bityutskiy <Artem.Bityutskiy@nokia.com>
-> 
-> Dumb users like myself are not able to grasp from the existing KALLSYMS_ALL
-> documentation that this option is not what they need. Improve the help
-> message and make it clearer that KALLSYMS is enough in the majority of
-> use cases, and KALLSYMS_ALL should really be used very rarely.
-> 
-> Signed-off-by: Artem Bityutskiy <Artem.Bityutskiy@nokia.com>
+This is my first patch, so hopefully I've done it correctly.  Details follow.
 
-Michal,
+Regards,
+Robert Gordon
 
-what's the fate of these 2 patches? Will you merge them?
 
+scripts/package/builddeb script was setting the host machine
+$arch in the KERNEL/debian/control prior to an invocation of
+dpkg-gencontrol.  The patch modifies the script to guarantee the correct
+debian arch for the target is written to the control file instead.
+
+Signed-off-by: Robert Gordon <robert@greenroomsoftware.com>
+---
+ scripts/package/builddeb |   70 +++++++++++++++++++++++----------------------
+ 1 files changed, 36 insertions(+), 34 deletions(-)
+
+diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+index f6cbc3d..2a15fda 100644
+--- a/scripts/package/builddeb
++++ b/scripts/package/builddeb
+@@ -26,37 +26,7 @@ create_package() {
+ 	chmod -R go-w "$pdir"
+ 
+ 	# Attempt to find the correct Debian architecture
+-	local forcearch="" debarch=""
+-	case "$UTS_MACHINE" in
+-	i386|ia64|alpha)
+-		debarch="$UTS_MACHINE" ;;
+-	x86_64)
+-		debarch=amd64 ;;
+-	sparc*)
+-		debarch=sparc ;;
+-	s390*)
+-		debarch=s390 ;;
+-	ppc*)
+-		debarch=powerpc ;;
+-	parisc*)
+-		debarch=hppa ;;
+-	mips*)
+-		debarch=mips$(grep -q CPU_LITTLE_ENDIAN=y .config && echo el) ;;
+-	arm*)
+-		debarch=arm$(grep -q CONFIG_AEABI=y .config && echo el) ;;
+-	*)
+-		echo "" >&2
+-		echo "** ** **  WARNING  ** ** **" >&2
+-		echo "" >&2
+-		echo "Your architecture doesn't have it's equivalent" >&2
+-		echo "Debian userspace architecture defined!" >&2
+-		echo "Falling back to using your current userspace instead!" >&2
+-		echo "Please add support for $UTS_MACHINE to ${0} ..." >&2
+-		echo "" >&2
+-	esac
+-	if [ -n "$KBUILD_DEBARCH" ] ; then
+-		debarch="$KBUILD_DEBARCH"
+-	fi
++	local forcearch=""
+ 	if [ -n "$debarch" ] ; then
+ 		forcearch="-DArchitecture=$debarch"
+ 	fi
+@@ -66,6 +36,38 @@ create_package() {
+ 	dpkg --build "$pdir" ..
+ }
+ 
++#Set the correct debian arch
++case "$UTS_MACHINE" in
++i386|ia64|alpha)
++    debarch="$UTS_MACHINE" ;;
++x86_64)
++    debarch=amd64 ;;
++sparc*)
++    debarch=sparc ;;
++s390*)
++    debarch=s390 ;;
++ppc*)
++    debarch=powerpc ;;
++parisc*)
++    debarch=hppa ;;
++mips*)
++    debarch=mips$(grep -q CPU_LITTLE_ENDIAN=y .config && echo el) ;;
++arm*)
++    debarch=arm$(grep -q CONFIG_AEABI=y .config && echo el) ;;
++*)
++    echo "" >&2
++    echo "** ** **  WARNING  ** ** **" >&2
++    echo "" >&2
++    echo "Your architecture doesn't have it's equivalent" >&2
++    echo "Debian userspace architecture defined!" >&2
++    echo "Falling back to using your current userspace instead!" >&2
++    echo "Please add support for $UTS_MACHINE to ${0} ..." >&2
++    echo "" >&2
++esac
++if [ -n "$KBUILD_DEBARCH" ] ; then
++    debarch="$KBUILD_DEBARCH"
++fi
++
+ # Some variables and settings used throughout the script
+ version=$KERNELRELEASE
+ revision=$(cat .version)
+@@ -252,9 +254,9 @@ cat <<EOF >> debian/control
+ 
+ Package: $kernel_headers_packagename
+ Provides: linux-headers, linux-headers-2.6
+-Architecture: $arch
+-Description: Linux kernel headers for $KERNELRELEASE on $arch
+- This package provides kernel header files for $KERNELRELEASE on $arch
++Architecture: $debarch
++Description: Linux kernel headers for $KERNELRELEASE on $debarch
++ This package provides kernel header files for $KERNELRELEASE on $debarch
+  .
+  This is useful for people who need to build external modules
+ EOF
 -- 
-Best Regards,
-Artem Bityutskiy (Артём Битюцкий)
 
