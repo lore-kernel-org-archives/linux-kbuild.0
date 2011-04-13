@@ -1,121 +1,39 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor.suse.de ([195.135.220.2]:37581 "EHLO mx1.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750881Ab1DLLbk (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 12 Apr 2011 07:31:40 -0400
-From: Michal Marek <mmarek@suse.cz>
-Subject: [PATCH v2] x86: Do not set the root_dev field in bzImage
-Date: Tue, 12 Apr 2011 13:30:24 +0200
-Message-Id: <1302607824-24699-1-git-send-email-mmarek@suse.cz>
-In-Reply-To: <20110411150820.GA22004@sepie.suse.cz>
-References: <20110411150820.GA22004@sepie.suse.cz>
+Received: from mail-fx0-f46.google.com ([209.85.161.46]:64206 "EHLO
+	mail-fx0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1758211Ab1DMKck (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 13 Apr 2011 06:32:40 -0400
+Subject: Re: [PATCH v2 1/2] Kconfig: improve KALLSYMS_ALL documentation
+From: Artem Bityutskiy <dedekind1@gmail.com>
+Reply-To: dedekind1@gmail.com
+In-Reply-To: <1301999098-21412-1-git-send-email-dedekind1@gmail.com>
+References: <1301999098-21412-1-git-send-email-dedekind1@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Date: Wed, 13 Apr 2011 13:22:52 +0300
+Message-ID: <1302690172.2768.20.camel@localhost>
+Mime-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org, Paul Bolle <pebolle@tiscali.nl>
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Paulo Marques <pmarques@grupopie.com>, Randy Dunlap <rdunlap@xenotime.net>
 
-This has been obsoleted by the root= commandline for several years.
-People who still depend on this will surely have a copy of the rdev
-command around, the rest of the world gets rid of another piece of
-buildhost-dependent data in the build. Thanks to Paul Bolle for the
-build.c cleanup.
+On Tue, 2011-04-05 at 13:24 +0300, Artem Bityutskiy wrote:
+> From: Artem Bityutskiy <Artem.Bityutskiy@nokia.com>
+> 
+> Dumb users like myself are not able to grasp from the existing KALLSYMS_ALL
+> documentation that this option is not what they need. Improve the help
+> message and make it clearer that KALLSYMS is enough in the majority of
+> use cases, and KALLSYMS_ALL should really be used very rarely.
+> 
+> Signed-off-by: Artem Bityutskiy <Artem.Bityutskiy@nokia.com>
 
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Cc: Ingo Molnar <mingo@redhat.com>
-Cc: "H. Peter Anvin" <hpa@zytor.com>
-Cc: x86@kernel.org
-Cc: Paul Bolle <pebolle@tiscali.nl>
-Signed-off-by: Michal Marek <mmarek@suse.cz>
+Michal,
 
-diff --git a/arch/x86/boot/Makefile b/arch/x86/boot/Makefile
-index f7cb086..95365a8 100644
---- a/arch/x86/boot/Makefile
-+++ b/arch/x86/boot/Makefile
-@@ -9,12 +9,6 @@
- # Changed by many, many contributors over the years.
- #
- 
--# ROOT_DEV specifies the default root-device when making the image.
--# This can be either FLOPPY, CURRENT, /dev/xxxx or empty, in which case
--# the default of FLOPPY is used by 'build'.
--
--ROOT_DEV	:= CURRENT
--
- # If you want to preset the SVGA mode, uncomment the next line and
- # set SVGA_MODE to whatever number you want.
- # Set it to -DSVGA_MODE=NORMAL_VGA if you just want the EGA/VGA mode.
-@@ -75,8 +69,7 @@ GCOV_PROFILE := n
- $(obj)/bzImage: asflags-y  := $(SVGA_MODE)
- 
- quiet_cmd_image = BUILD   $@
--cmd_image = $(obj)/tools/build $(obj)/setup.bin $(obj)/vmlinux.bin \
--	$(ROOT_DEV) > $@
-+cmd_image = $(obj)/tools/build $(obj)/setup.bin $(obj)/vmlinux.bin > $@
- 
- $(obj)/bzImage: $(obj)/setup.bin $(obj)/vmlinux.bin $(obj)/tools/build FORCE
- 	$(call if_changed,image)
-diff --git a/arch/x86/boot/tools/build.c b/arch/x86/boot/tools/build.c
-index ee3a4ea..fdc60a0 100644
---- a/arch/x86/boot/tools/build.c
-+++ b/arch/x86/boot/tools/build.c
-@@ -130,7 +130,7 @@ static void die(const char * str, ...)
- 
- static void usage(void)
- {
--	die("Usage: build setup system [rootdev] [> image]");
-+	die("Usage: build setup system [> image]");
- }
- 
- int main(int argc, char ** argv)
-@@ -138,39 +138,14 @@ int main(int argc, char ** argv)
- 	unsigned int i, sz, setup_sectors;
- 	int c;
- 	u32 sys_size;
--	u8 major_root, minor_root;
- 	struct stat sb;
- 	FILE *file;
- 	int fd;
- 	void *kernel;
- 	u32 crc = 0xffffffffUL;
- 
--	if ((argc < 3) || (argc > 4))
-+	if (argc != 3)
- 		usage();
--	if (argc > 3) {
--		if (!strcmp(argv[3], "CURRENT")) {
--			if (stat("/", &sb)) {
--				perror("/");
--				die("Couldn't stat /");
--			}
--			major_root = major(sb.st_dev);
--			minor_root = minor(sb.st_dev);
--		} else if (strcmp(argv[3], "FLOPPY")) {
--			if (stat(argv[3], &sb)) {
--				perror(argv[3]);
--				die("Couldn't stat root device.");
--			}
--			major_root = major(sb.st_rdev);
--			minor_root = minor(sb.st_rdev);
--		} else {
--			major_root = 0;
--			minor_root = 0;
--		}
--	} else {
--		major_root = DEFAULT_MAJOR_ROOT;
--		minor_root = DEFAULT_MINOR_ROOT;
--	}
--	fprintf(stderr, "Root device is (%d, %d)\n", major_root, minor_root);
- 
- 	/* Copy the setup code */
- 	file = fopen(argv[1], "r");
-@@ -193,8 +168,8 @@ int main(int argc, char ** argv)
- 	memset(buf+c, 0, i-c);
- 
- 	/* Set the default root device */
--	buf[508] = minor_root;
--	buf[509] = major_root;
-+	buf[508] = DEFAULT_MINOR_ROOT;
-+	buf[509] = DEFAULT_MAJOR_ROOT;
- 
- 	fprintf(stderr, "Setup is %d bytes (padded to %d bytes).\n", c, i);
- 
+what's the fate of these 2 patches? Will you merge them?
+
+-- 
+Best Regards,
+Artem Bityutskiy (Артём Битюцкий)
+
