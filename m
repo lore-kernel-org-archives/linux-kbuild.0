@@ -1,55 +1,39 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from fep21.mx.upcmail.net ([62.179.121.41]:46803 "EHLO
-	fep21.mx.upcmail.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751974Ab1DOIkB (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 15 Apr 2011 04:40:01 -0400
-Reply-To: <drawsupdate111@hotmail.co.uk>
-From: "2011 NOTIFICATION" <aagrawal@sociology.du.ac.in>
-Subject: 
-Date: Fri, 15 Apr 2011 13:53:00 +0530
+Received: from cantor2.suse.de ([195.135.220.15]:59151 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754292Ab1DONbg (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 15 Apr 2011 09:31:36 -0400
+Date: Fri, 15 Apr 2011 15:31:30 +0200
+From: Michal Marek <mmarek@suse.cz>
+Subject: Re: [PATCH 0/2] kconfig: allow multiple inclusion of the same file
+ (resent)
+Message-ID: <20110415133129.GA10833@sepie.suse.cz>
+References: <1298572603-1907-1-git-send-email-yann.morin.1998@anciens.enib.fr>
+ <201103152058.57151.yann.morin.1998@anciens.enib.fr>
 MIME-Version: 1.0
-Content-Type: multipart/mixed;
-	boundary="----=_NextPart_000_00AC_01C2A9A6.6894B11E"
-Message-Id: <20110415082307.ZSHD1429.viefep13-int.chello.at@edge02.upcmail.net>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <201103152058.57151.yann.morin.1998@anciens.enib.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
+To: "Yann E. MORIN" <yann.morin.1998@anciens.enib.fr>
+Cc: linux-kbuild@vger.kernel.org
 
-This is a multi-part message in MIME format.
+On Tue, Mar 15, 2011 at 08:58:57PM +0100, Yann E. MORIN wrote:
+> Hello !
+> 
+> On Thursday 24 February 2011 19:36:41 Yann E. MORIN wrote:
+> > This patch series makes it possible to source a file multiple times,
+> > eg. from different files, and/or under different conditions. Care has
+> > been taken to avoid circular inclusion, of course.
+> 
+> Really, no comment on this? :-)
+> 
+> Even if it is not wanted upstream, any comment on the validity of the code?
 
-------=_NextPart_000_00AC_01C2A9A6.6894B11E
-Content-Type: text/plain;
-	charset="koi8-u"
-Content-Transfer-Encoding: 7bit
+Sorry for the delay. I had a look at the patch now, and it doesn't allow
+anything worse than what is already possible if you open-code the
+included kconfig snippet. So I merged it into kbuild-2.6.git#kconfig.
 
-KINDLY DOWNLOAD ATTACHMENNT AND FILL FORM
-
-------=_NextPart_000_00AC_01C2A9A6.6894B11E
-Content-Type: application/octet-stream;
-	name="COCA COLA NOTIFICATION.txt"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment;
-	filename="COCA COLA NOTIFICATION.txt"
-
-REVQVCBDT0NBLUNPTEEgQVZFTlVFDQpTVEFNRk9SRCBCUklER0UgTE9ORE9O
-Lg0KU1cxViAzRFcgVU5JVEVEIEtJTkdET00NCg0KQXR0ZW50aW9uIFdpbm5l
-cg0KDQpUaGlzIGVtYWlsIGlzIHRvIG5vdGlmeSB5b3UgdGhhdCB5b3VyIGVt
-YWlsIGFkZHJlc3Mgd2FzDQpyYW5kb21seSBzZWxlY3RlZCBhbmQgZW50ZXJl
-ZCBpbnRvIG91ciBmcmVlIFRoaXJkIENhdGVnb3J5DQpkcmF3cy5Zb3UgaGF2
-ZSBzdWJzZXF1ZW50bHkgZW1lcmdlZCBhIHdpbm5lciBhbmQgdGhlcmVmb3Jl
-DQplbnRpdGxlZCB0byBhIHN1YnN0YW50aWFsIGFtb3VudCBvZiAxLDAwMCww
-MDAuMDAgR3JlYXQgQnJpdGlzaA0KUG91bmRzLmtpbmRseSBjb25maXJtIHJl
-Y2VpcHQgb2YgdGhpcyBlbWFpbCwgYnkgZm9yd2FyZGluZw0KWW91ciBEZXRh
-aWxzIHRvIHRoZSBjbGFpbXMgZGVwYXJ0bWVudC4NCg0KTmFtZTogVG9tbXkg
-Um9nZXINCkVtYWlsOmRyYXdzdXBkYXRlMTExQGhvdG1haWwuY28udWsNCg0K
-SU1QT1JUQU5UIEZJTEwgT1VUIFRISVMgV0lOTkVSUyBWRVJJRklDQVRJT04g
-Rk9STSBCRUxPVzoNCg0KRlVMTCBOQU1FUy0tLS0tLS0tLS0NCkRBVEUgT0Yg
-QklSVEgtLS0tLS0tLS0NClNFWC4tLS0tLS0tLS0tLS0tLS0tDQpDT05UQUNU
-IEFERFJFU1MtLS0tLS0tLS0tDQpDT1VOVFJZLS0tLS0tLS0tLS0tLS0tLS0t
-LS0NCk1PQklMRSBOVU1CRVItLS0tLS0tLS0tLS0tLQ0KT0NDVVBBVElPTi0t
-LS0tLS0tLS0NCkUtTUFJTCBJRC0tLS0tLS0tLS0tLS0tDQoNCkNvbmdyYXR1
-bGF0aW9ucyBvbmNlIGFnYWluLg0KT25saW5lIENvLWNvb3JkaW5hdG9yDQoN
-ClRoZSBDb2NhLUNvbGEgQ29tcGFueS4gQ29weSBSaWdodCAyMDExIEFsbCBS
-aWdodCBSZXNlcnZl
-
-------=_NextPart_000_00AC_01C2A9A6.6894B11E--
+Thanks,
+Michal
