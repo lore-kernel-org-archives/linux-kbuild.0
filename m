@@ -1,133 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from 75.98.165.80.static.a2webhosting.com ([75.98.165.80]:39293 "EHLO
-	greenroomsoftware.com" rhost-flags-OK-FAIL-OK-OK) by vger.kernel.org
-	with ESMTP id S1755576Ab1DOSXh (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 15 Apr 2011 14:23:37 -0400
-From: Robert Gordon <robert@greenroomsoftware.com>
+Received: from vostochny.stro.at ([78.47.22.85]:56757 "EHLO vostochny.stro.at"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751923Ab1DQW3r (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 17 Apr 2011 18:29:47 -0400
+Date: Mon, 18 Apr 2011 00:29:45 +0200
+From: maximilian attems <max@stro.at>
 Subject: Re: [PATCH] kbuild, deb-pkg: set host machine after dpkg-gencontrol
-Date: Fri, 15 Apr 2011 14:23:26 -0400
-Message-Id: <1302891806-10458-1-git-send-email-robert@greenroomsoftware.com>
+Message-ID: <20110417222945.GC14561@stro.at>
+References: <1302891806-10458-1-git-send-email-robert@greenroomsoftware.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1302891806-10458-1-git-send-email-robert@greenroomsoftware.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Robert Nelson <robertcnelson@gmail.com>, maximilian attems <max@stro.at>, Robert Gordon <robert@greenroomsoftware.com>
+To: Robert Gordon <robert@greenroomsoftware.com>
+Cc: linux-kbuild@vger.kernel.org, Robert Nelson <robertcnelson@gmail.com>
 
-This patch was prepared using git format-patch and git send-email.  Details follow.
-Regards,
-Robert Gordon
+On Fri, 15 Apr 2011, Robert Gordon wrote:
 
-scripts/package/builddeb script was setting the host machine $arch in the KERNEL/debian/control prior to an invocation of dpkg-gencontrol.  The patch modifies the script to guarantee the correct debian arch for the target is written to the control file instead.  The issue originally arose in the 2.6.38 series.
+> This patch was prepared using git format-patch and git send-email.  Details follow.
+> Regards,
+> Robert Gordon
 
- Signed-off-by: Robert Gordon <robert@greenroomsoftware.com>
-
----
- scripts/package/builddeb |   73 +++++++++++++++++++++++----------------------
- 1 files changed, 37 insertions(+), 36 deletions(-)
-
-diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-index f6cbc3d..975e39a 100644
---- a/scripts/package/builddeb
-+++ b/scripts/package/builddeb
-@@ -25,38 +25,7 @@ create_package() {
- 	chown -R root:root "$pdir"
- 	chmod -R go-w "$pdir"
+thanks so the patch was now applyable and so testable. (:
  
--	# Attempt to find the correct Debian architecture
--	local forcearch="" debarch=""
--	case "$UTS_MACHINE" in
--	i386|ia64|alpha)
--		debarch="$UTS_MACHINE" ;;
--	x86_64)
--		debarch=amd64 ;;
--	sparc*)
--		debarch=sparc ;;
--	s390*)
--		debarch=s390 ;;
--	ppc*)
--		debarch=powerpc ;;
--	parisc*)
--		debarch=hppa ;;
--	mips*)
--		debarch=mips$(grep -q CPU_LITTLE_ENDIAN=y .config && echo el) ;;
--	arm*)
--		debarch=arm$(grep -q CONFIG_AEABI=y .config && echo el) ;;
--	*)
--		echo "" >&2
--		echo "** ** **  WARNING  ** ** **" >&2
--		echo "" >&2
--		echo "Your architecture doesn't have it's equivalent" >&2
--		echo "Debian userspace architecture defined!" >&2
--		echo "Falling back to using your current userspace instead!" >&2
--		echo "Please add support for $UTS_MACHINE to ${0} ..." >&2
--		echo "" >&2
--	esac
--	if [ -n "$KBUILD_DEBARCH" ] ; then
--		debarch="$KBUILD_DEBARCH"
--	fi
-+	local forcearch=""
- 	if [ -n "$debarch" ] ; then
- 		forcearch="-DArchitecture=$debarch"
- 	fi
-@@ -66,6 +35,39 @@ create_package() {
- 	dpkg --build "$pdir" ..
- }
+> scripts/package/builddeb script was setting the host machine $arch in the KERNEL/debian/control prior to an invocation of dpkg-gencontrol.  The patch modifies the script to guarantee the correct debian arch for the target is written to the control file instead.  The issue originally arose in the 2.6.38 series.
+
+hmm don't be shy to use line-breaks in the desc for next times..
  
-+# Attempt to find the correct Debian architecture
-+case "$UTS_MACHINE" in
-+i386|ia64|alpha)
-+	debarch="$UTS_MACHINE" ;;
-+x86_64)
-+	debarch=amd64 ;;
-+sparc*)
-+	debarch=sparc ;;
-+s390*)
-+	debarch=s390 ;;
-+ppc*)
-+	debarch=powerpc ;;
-+parisc*)
-+	debarch=hppa ;;
-+mips*)
-+	debarch=mips$(grep -q CPU_LITTLE_ENDIAN=y .config && echo el) ;;
-+arm*)
-+	debarch=arm$(grep -q CONFIG_AEABI=y .config && echo el) ;;
-+*)
-+	echo "" >&2
-+	echo "** ** **  WARNING  ** ** **" >&2
-+	echo "" >&2
-+	echo "Your architecture doesn't have it's equivalent" >&2
-+	echo "Debian userspace architecture defined!" >&2
-+	echo "Falling back to using your current userspace instead!" >&2
-+	echo "Please add support for $UTS_MACHINE to ${0} ..." >&2
-+	echo "" >&2
-+esac
-+if [ -n "$KBUILD_DEBARCH" ] ; then
-+	debarch="$KBUILD_DEBARCH"
-+fi
-+
-+
- # Some variables and settings used throughout the script
- version=$KERNELRELEASE
- revision=$(cat .version)
-@@ -246,15 +248,14 @@ mkdir -p "$destdir"
- (cd $srctree; tar -c -f - -T /tmp/files$$) | (cd $destdir; tar -xf -)
- (cd $objtree; tar -c -f - -T /tmp/objfiles$$) | (cd $destdir; tar -xf -)
- rm -f /tmp/files$$ /tmp/objfiles$$
--arch=$(dpkg --print-architecture)
- 
- cat <<EOF >> debian/control
- 
- Package: $kernel_headers_packagename
- Provides: linux-headers, linux-headers-2.6
--Architecture: $arch
--Description: Linux kernel headers for $KERNELRELEASE on $arch
-- This package provides kernel header files for $KERNELRELEASE on $arch
-+Architecture: $debarch
-+Description: Linux kernel headers for $KERNELRELEASE on $debarch
-+ This package provides kernel header files for $KERNELRELEASE on $debarch
-  .
-  This is useful for people who need to build external modules
- EOF
+>  Signed-off-by: Robert Gordon <robert@greenroomsoftware.com>
+
+rudimentary testing showed, that `make deb-pkg` works,
+but `make ARCH=i386 deb-pkg` on an amd64 Debian box seems borked:
++ dpkg-gencontrol -isp -DArchitecture=i386 -plinux-headers-2.6.39-rc3+
+-P/media/data/mattems/src/linux-2.6/debian/hdrtmp
+dpkg-gencontrol: error: current host architecture 'amd64' does not appear in package's architecture list (i386)
+
+had no time to investigate yet, hope you will do.
+
+greetings
+
 -- 
-1.7.1
-
+maks
