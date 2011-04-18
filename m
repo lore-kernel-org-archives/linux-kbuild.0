@@ -1,38 +1,49 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:46367 "EHLO mx2.suse.de"
+Received: from vostochny.stro.at ([78.47.22.85]:36310 "EHLO vostochny.stro.at"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753300Ab1DRNGT (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 18 Apr 2011 09:06:19 -0400
-Date: Mon, 18 Apr 2011 15:06:17 +0200
-From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [PATCH v2] initramfs: Use KBUILD_BUILD_TIMESTAMP for generated
- entries
-Message-ID: <20110418130617.GF9715@sepie.suse.cz>
-References: <gen-initramfs-timestamp@mdm.bga.com>
- <1302534382-20077-1-git-send-email-mmarek@suse.cz>
+	id S1754586Ab1DRQG1 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 18 Apr 2011 12:06:27 -0400
+Date: Mon, 18 Apr 2011 16:06:26 +0000
+From: maximilian attems <max@stro.at>
+Subject: Re: [PATCH] kbuild, deb-pkg: set host machine after dpkg-gencontrol
+Message-ID: <20110418160625.GA13973@vostochny.stro.at>
+References: <1302891806-10458-1-git-send-email-robert@greenroomsoftware.com>
+ <20110417222945.GC14561@stro.at>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1302534382-20077-1-git-send-email-mmarek@suse.cz>
+In-Reply-To: <20110417222945.GC14561@stro.at>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: miltonm@bga.com
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Robert Gordon <robert@greenroomsoftware.com>
+Cc: linux-kbuild@vger.kernel.org, Robert Nelson <robertcnelson@gmail.com>
 
-On Mon, Apr 11, 2011 at 05:06:22PM +0200, Michal Marek wrote:
-> gen_init_cpio gets the current time and uses it for each symlink,
-> special file, and directory.  Grab the current time once and make it
-> possible to override it with the KBUILD_BUILD_TIMESTAMP variable for
-> reproducible builds.
+On Mon, Apr 18, 2011 at 12:29:45AM +0200, maximilian attems wrote:
+> On Fri, 15 Apr 2011, Robert Gordon wrote:
 > 
-> Signed-off-by: Michal Marek <mmarek@suse.cz>
-> ---
->  Documentation/kbuild/kbuild.txt |    3 +-
->  scripts/gen_initramfs_list.sh   |    9 ++++++-
->  usr/gen_init_cpio.c             |   53 +++++++++++++++++++++++++++++---------
->  3 files changed, 50 insertions(+), 15 deletions(-)
+> > This patch was prepared using git format-patch and git send-email.  Details follow.
+> > Regards,
+> > Robert Gordon
+> 
+> thanks so the patch was now applyable and so testable. (:
+>  
+> > scripts/package/builddeb script was setting the host machine $arch in the KERNEL/debian/control prior to an invocation of dpkg-gencontrol.  The patch modifies the script to guarantee the correct debian arch for the target is written to the control file instead.  The issue originally arose in the 2.6.38 series.
+> 
+> hmm don't be shy to use line-breaks in the desc for next times..
+>  
+> >  Signed-off-by: Robert Gordon <robert@greenroomsoftware.com>
+> 
+> rudimentary testing showed, that `make deb-pkg` works,
+> but `make ARCH=i386 deb-pkg` on an amd64 Debian box seems borked:
+> + dpkg-gencontrol -isp -DArchitecture=i386 -plinux-headers-2.6.39-rc3+
+> -P/media/data/mattems/src/linux-2.6/debian/hdrtmp
+> dpkg-gencontrol: error: current host architecture 'amd64' does not appear in package's architecture list (i386)
 
-Pushed to kbuild-2.6.git#kbuild.
+at a second look your patch is just wrong the arch overriding is
+currently correctly done in create_package(), with the debian/control
+file having the host arch written to it.
 
-Michal
+so please post what exactly you were trying to build in the first place?
 
+-- 
+maks
