@@ -1,44 +1,55 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:49312 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750974Ab1DSHW5 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 19 Apr 2011 03:22:57 -0400
-Date: Tue, 19 Apr 2011 09:22:54 +0200
-From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [PATCH] nconfig: Silence unused return values from wattrset
-Message-ID: <20110419072254.GA13661@sepie.suse.cz>
-References: <1302127669-15272-1-git-send-email-sboyd@codeaurora.org>
- <4DACBD80.9080705@codeaurora.org>
+Received: from mail-yi0-f46.google.com ([209.85.218.46]:49798 "EHLO
+	mail-yi0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752960Ab1DSHfe convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 19 Apr 2011 03:35:34 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4DACBD80.9080705@codeaurora.org>
+In-Reply-To: <4DAD327B.4030904@suse.cz>
+References: <BANLkTikYuYVvXiHvi_kr2H7n29k=veThtw@mail.gmail.com>
+	<4DAD327B.4030904@suse.cz>
+Date: Tue, 19 Apr 2011 15:35:33 +0800
+Message-ID: <BANLkTikspr9jVNF-VZbnc_MxUYNWad7Kkg@mail.gmail.com>
+Subject: Re: LOCALVERSION in setlocalversion
+From: Haojian Zhuang <haojian.zhuang@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Stephen Boyd <sboyd@codeaurora.org>
-Cc: Roman Zippel <zippel@linux-m68k.org>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Nir Tzachar <nir.tzachar@gmail.com>
+To: Michal Marek <mmarek@suse.cz>
+Cc: zippel@linux-m68k.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Mon, Apr 18, 2011 at 03:38:56PM -0700, Stephen Boyd wrote:
-> On 04/06/2011 03:07 PM, Stephen Boyd wrote:
-> > Ignore the return value from wattrset since we ignore the return
-> > value in nconf.gui.c as well.
-> >
-> > scripts/kconfig/nconf.c: In function 'print_function_line':
-> > scripts/kconfig/nconf.c:376: warning: value computed is not used
-> > scripts/kconfig/nconf.c:380: warning: value computed is not used
-> > scripts/kconfig/nconf.c:387: warning: value computed is not used
-> > scripts/kconfig/nconf.c: In function 'show_menu':
-> > scripts/kconfig/nconf.c:956: warning: value computed is not used
-> > scripts/kconfig/nconf.c:961: warning: value computed is not used
-> > scripts/kconfig/nconf.c:963: warning: value computed is not used
-> > scripts/kconfig/nconf.c:965: warning: value computed is not used
-> >
-> > Cc: Nir Tzachar <nir.tzachar@gmail.com>
-> > Signed-off-by: Stephen Boyd <sboyd@codeaurora.org>
-> > ---
-> 
-> Ping? Nack? Ack?
+On Tue, Apr 19, 2011 at 2:58 PM, Michal Marek <mmarek@suse.cz> wrote:
+> On 19.4.2011 08:42, Haojian Zhuang wrote:
+>> In scripts/setlocalversion under linux kernel tree, the scripts seems
+>> a little strange.
+> [...]
+>>         # append a plus sign if the repository is not in a clean
+>>         # annotated or signed tagged state (as git describe only
+>>         # looks at signed or annotated tags - git tag -a/-s) and
+>>         # LOCALVERSION= is not specified
+>>         if test "${LOCALVERSION+set}" != "set"; then
+>>                 scm=$(scm_version --short)
+>>                 res="$res${scm:++}"
+>>         fi
+>> fi
+>>
+>> LOCALVERSION isn't assigned in any place. Only CONFIG_LOCALVERSION
+>> can be assigned in .config file.
+>> Why do we need to check LOCALVERSION at here?
+>
+> It can be set on the commandline:
+>
+> make LOCALVERSION=something
+>
+> Michal
+>
 
-Sorry, I missed this patch. I applied it do kbuild-2.6.git#kconfig now.
+Thanks a lot. It works.
 
-Michal
+I still have a question. I can't find the semantic of
+${LOCALVERSION+set} in some
+shell tutorials. Could you help me to figure out a link of introducing this?
+
+Best Regards
+Haojian
