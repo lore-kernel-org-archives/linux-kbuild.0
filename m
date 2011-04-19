@@ -1,47 +1,81 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-iy0-f174.google.com ([209.85.210.174]:65219 "EHLO
-	mail-iy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752529Ab1DSRHZ convert rfc822-to-8bit (ORCPT
+Received: from mail-ww0-f44.google.com ([74.125.82.44]:48313 "EHLO
+	mail-ww0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752384Ab1DSSXW (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 19 Apr 2011 13:07:25 -0400
+	Tue, 19 Apr 2011 14:23:22 -0400
+Received: by wwa36 with SMTP id 36so7282834wwa.1
+        for <linux-kbuild@vger.kernel.org>; Tue, 19 Apr 2011 11:23:21 -0700 (PDT)
+Message-ID: <4DADD316.9020000@gmail.com>
+Date: Tue, 19 Apr 2011 19:23:18 +0100
+From: Marcin Nowakowski <marcin.nowakowski.000@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <BANLkTin3rQangWB+G0Y_FDK5RgqESDihrA@mail.gmail.com>
-References: <20110410020923.GI4663@erwin>
-	<BANLkTink1mKJMccy1bLdkYsh5XBvDF4sSw@mail.gmail.com>
-	<20110410143153.GJ4663@erwin>
-	<4DAD5BCB.8010604@suse.cz>
-	<BANLkTin3rQangWB+G0Y_FDK5RgqESDihrA@mail.gmail.com>
-Date: Tue, 19 Apr 2011 13:07:24 -0400
-Message-ID: <BANLkTi=vdpzxbu_r1cnRHJTR+_J3FHwafQ@mail.gmail.com>
-Subject: Re: [PATCH v2] kconfig/kbuild: define _POSIX_C_SOURCE
-From: Arnaud Lacombe <lacombar@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 8BIT
+Subject: Re: [kbuild patch] mkcompile_h produces warnings when using domain
+ logins
+References: <4D9B63B2.1080701@gmail.com> <4DAD47B4.3080908@suse.cz>
+In-Reply-To: <4DAD47B4.3080908@suse.cz>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Michal Marek <mmarek@suse.cz>
-Cc: Valentin Ochs <a@0au.de>, Roman Zippel <zippel@linux-m68k.org>, trivial@kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: linux-kbuild@vger.kernel.org
 
-Hi,
-
-On Tue, Apr 19, 2011 at 1:03 PM, Arnaud Lacombe <lacombar@gmail.com> wrote:
-> diff --git a/Makefile b/Makefile
-> index d6592b6..0490413 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -233,7 +233,7 @@ CONFIG_SHELL := $(shell if [ -x "$$BASH" ]; then
-> echo $$BASH; \
+On 19/04/11 09:28, Michal Marek wrote:
+> (CC linux-kbuild, please do not send patches to public projects privately)
 >
->  HOSTCC       = gcc
->  HOSTCXX      = g++
-> -HOSTCFLAGS   = -Wall -Wmissing-prototypes -Wstrict-prototypes -O2
-> -fomit-frame-pointer
-> +HOSTCFLAGS   = -D_POSIX_C_SOURCE=200112L -Wall -Wmissing-prototypes
-> -Wstrict-prototypes -O2 -fomit-frame-pointer
->  HOSTCXXFLAGS = -O2
+> On 5.4.2011 20:47, Marcin Nowakowski wrote:
+>> Fix handling of backslash character in LINUX_COMPILE_BY name
+>>
+>> When using a domain login, `whoami` returns the login in
+>> user\domain format. This leads to either warnings on unrecognised
+>> escape sequences or escaped characters being generated for the user.
+>> This patch ensures that any backslash is escaped to a double-backslash
+>> to make sure the name is preserved correctly
+>>
+>> Signed-off-by: Marcin Nowakowski<marcin.nowakowski.000@gmail.com>
+>> --- a/scripts/mkcompile_h
+>> +++ b/scripts/mkcompile_h
+>> @@ -64,7 +64,7 @@
+>>      echo \#define UTS_VERSION \"`echo $UTS_VERSION | $UTS_TRUNCATE`\"
+>>
+>>      echo \#define LINUX_COMPILE_TIME \"`date +%T`\"
+>> -  echo \#define LINUX_COMPILE_BY \"`whoami`\"
+>> +  echo \#define LINUX_COMPILE_BY \"`whoami | sed
+>> "s/\\\\\\\\/\\\\\\\\\\\\\\\\/"`\"
+>>      echo \#define LINUX_COMPILE_HOST \"`hostname | $UTS_TRUNCATE`\"
 >
-Sorry, gmail wrapped long lines, the relevant part is only:
+> Such long sequence of backslashes is rather unreadable. The same command
+> is equivalent to
+>
+>    sed 's/\\\\/\\\\\\\\/'
+>
+> if you use single quotes, but I wonder why you need to match two
+> backslashes. You say that whoami returns 'user\domain', so the above
+> regexp wouldn't match it.
 
-HOSTCFLAGS+= -D_POSIX_C_SOURCE=200112L
+The problem in this case is that when using back-quotes for command 
+substitution, backslashes are escaped so we need the extra layer of 
+escaping. However - having looked again at the bash documentation, I've 
+found that if $(...) syntax is used instead of `...` then backslashes 
+are treated literally. That, with addition of single quotes as you had 
+suggested should allow a simple
+echo \#define LINUX_COMPILE_BY \"$(whoami | sed 's/\\/\\\\/g')\"
+instead of the rather unreadable solution I initially suggested.
 
- - Arnaud
+> Also, is it necessary to reproduce the full
+> user\domain string in the macro? Or could we cut everything after the
+> backslash, like
+>
+>    sed  's/\\.*//'
+>
+> ? BTW, I changed the mkcompile_h script recently, see
+> http://git.kernel.org/?p=linux/kernel/git/mmarek/kbuild-2.6.git;a=blob;f=scripts/mkcompile_h;hb=refs/heads/for-next,
+> could you base any further version on the for-next branch of
+> kbuild.2.6.git or on linux-next?
+
+I'll re-send a new patched based on this tree and with the cleanup as 
+described above
+
+thanks
+Marcin
