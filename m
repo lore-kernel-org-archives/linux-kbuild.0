@@ -1,81 +1,122 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ww0-f44.google.com ([74.125.82.44]:48313 "EHLO
-	mail-ww0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752384Ab1DSSXW (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 19 Apr 2011 14:23:22 -0400
-Received: by wwa36 with SMTP id 36so7282834wwa.1
-        for <linux-kbuild@vger.kernel.org>; Tue, 19 Apr 2011 11:23:21 -0700 (PDT)
-Message-ID: <4DADD316.9020000@gmail.com>
-Date: Tue, 19 Apr 2011 19:23:18 +0100
-From: Marcin Nowakowski <marcin.nowakowski.000@gmail.com>
+Received: from cantor.suse.de ([195.135.220.2]:59347 "EHLO mx1.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1755044Ab1DTNud (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 20 Apr 2011 09:50:33 -0400
+Date: Wed, 20 Apr 2011 15:50:31 +0200
+From: Michal Marek <mmarek@suse.cz>
+Subject: Re: linux-next: build failure after merge of the kbuild tree
+Message-ID: <20110420135030.GA1901@sepie.suse.cz>
+References: <20110420082514.a9ec4d68.sfr@canb.auug.org.au>
 MIME-Version: 1.0
-Subject: Re: [kbuild patch] mkcompile_h produces warnings when using domain
- logins
-References: <4D9B63B2.1080701@gmail.com> <4DAD47B4.3080908@suse.cz>
-In-Reply-To: <4DAD47B4.3080908@suse.cz>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20110420082514.a9ec4d68.sfr@canb.auug.org.au>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org
+To: Stephen Rothwell <sfr@canb.auug.org.au>
+Cc: linux-next@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-On 19/04/11 09:28, Michal Marek wrote:
-> (CC linux-kbuild, please do not send patches to public projects privately)
->
-> On 5.4.2011 20:47, Marcin Nowakowski wrote:
->> Fix handling of backslash character in LINUX_COMPILE_BY name
->>
->> When using a domain login, `whoami` returns the login in
->> user\domain format. This leads to either warnings on unrecognised
->> escape sequences or escaped characters being generated for the user.
->> This patch ensures that any backslash is escaped to a double-backslash
->> to make sure the name is preserved correctly
->>
->> Signed-off-by: Marcin Nowakowski<marcin.nowakowski.000@gmail.com>
->> --- a/scripts/mkcompile_h
->> +++ b/scripts/mkcompile_h
->> @@ -64,7 +64,7 @@
->>      echo \#define UTS_VERSION \"`echo $UTS_VERSION | $UTS_TRUNCATE`\"
->>
->>      echo \#define LINUX_COMPILE_TIME \"`date +%T`\"
->> -  echo \#define LINUX_COMPILE_BY \"`whoami`\"
->> +  echo \#define LINUX_COMPILE_BY \"`whoami | sed
->> "s/\\\\\\\\/\\\\\\\\\\\\\\\\/"`\"
->>      echo \#define LINUX_COMPILE_HOST \"`hostname | $UTS_TRUNCATE`\"
->
-> Such long sequence of backslashes is rather unreadable. The same command
-> is equivalent to
->
->    sed 's/\\\\/\\\\\\\\/'
->
-> if you use single quotes, but I wonder why you need to match two
-> backslashes. You say that whoami returns 'user\domain', so the above
-> regexp wouldn't match it.
+On Wed, Apr 20, 2011 at 08:25:14AM +1000, Stephen Rothwell wrote:
+> Hi Michal,
+> 
+> After merging the kbuild tree, today's linux-next build (s390 allnoconfig)
+> failed like this:
+> 
+> /opt/crosstool/gcc-4.3.2-nolibc/bin/s390x-linux-ar: illegal option -- D
+> 
+> Caused by commit 09ff9fecc039 ("kbuild: Use the deterministic mode of ar").
+> 
+> $ /opt/crosstool/gcc-4.3.2-nolibc/bin/s390x-linux-ar --version
+> GNU ar (GNU Binutils) 2.19
+> 
+> I presume that this version of ar is now too old to build the kernel?
+> Documentation/Changes only mentions Binutils verion 2.12.
 
-The problem in this case is that when using back-quotes for command 
-substitution, backslashes are escaped so we need the extra layer of 
-escaping. However - having looked again at the bash documentation, I've 
-found that if $(...) syntax is used instead of `...` then backslashes 
-are treated literally. That, with addition of single quotes as you had 
-suggested should allow a simple
-echo \#define LINUX_COMPILE_BY \"$(whoami | sed 's/\\/\\\\/g')\"
-instead of the rather unreadable solution I initially suggested.
+Sorry about that, the following patch should fix it.
 
-> Also, is it necessary to reproduce the full
-> user\domain string in the macro? Or could we cut everything after the
-> backslash, like
->
->    sed  's/\\.*//'
->
-> ? BTW, I changed the mkcompile_h script recently, see
-> http://git.kernel.org/?p=linux/kernel/git/mmarek/kbuild-2.6.git;a=blob;f=scripts/mkcompile_h;hb=refs/heads/for-next,
-> could you base any further version on the for-next branch of
-> kbuild.2.6.git or on linux-next?
+Michal
 
-I'll re-send a new patched based on this tree and with the cleanup as 
-described above
 
-thanks
-Marcin
+Subject: [PATCH] kbuild: Fix build with binutils <= 2.19
+
+The D option of ar is only available in newer versions.
+
+Signed-off-by: Michal Marek <mmarek@suse.cz>
+
+diff --git a/Documentation/kbuild/makefiles.txt b/Documentation/kbuild/makefiles.txt
+index 5d145bb..40e082b 100644
+--- a/Documentation/kbuild/makefiles.txt
++++ b/Documentation/kbuild/makefiles.txt
+@@ -955,6 +955,11 @@ When kbuild executes, the following steps are followed (roughly):
+ 	used when linking modules. This is often a linker script.
+ 	From commandline LDFLAGS_MODULE shall be used (see kbuild.txt).
+ 
++    KBUILD_ARFLAGS   Options for $(AR) when creating archives
++
++	$(KBUILD_ARFLAGS) set by the top level Makefile to "D" (deterministic
++	mode) if this option is supported by $(AR).
++
+ --- 6.2 Add prerequisites to archprepare:
+ 
+ 	The archprepare: rule is used to list prerequisites that need to be
+diff --git a/Makefile b/Makefile
+index c3bd316..d7c4231 100644
+--- a/Makefile
++++ b/Makefile
+@@ -382,6 +382,7 @@ export KBUILD_CFLAGS CFLAGS_KERNEL CFLAGS_MODULE CFLAGS_GCOV
+ export KBUILD_AFLAGS AFLAGS_KERNEL AFLAGS_MODULE
+ export KBUILD_AFLAGS_MODULE KBUILD_CFLAGS_MODULE KBUILD_LDFLAGS_MODULE
+ export KBUILD_AFLAGS_KERNEL KBUILD_CFLAGS_KERNEL
++export KBUILD_ARFLAGS
+ 
+ # When compiling out-of-tree modules, put MODVERDIR in the module
+ # tree rather than in the kernel tree. The kernel tree might
+@@ -612,6 +613,9 @@ KBUILD_CFLAGS	+= $(call cc-option,-fno-strict-overflow)
+ # conserve stack if available
+ KBUILD_CFLAGS   += $(call cc-option,-fconserve-stack)
+ 
++# use the deterministic mode of AR if available
++KBUILD_ARFLAGS := $(call ar-option,D)
++
+ # check for 'asm goto'
+ ifeq ($(shell $(CONFIG_SHELL) $(srctree)/scripts/gcc-goto.sh $(CC)), y)
+ 	KBUILD_CFLAGS += -DCC_HAVE_ASM_GOTO
+diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
+index ed2773e..fae2d8d 100644
+--- a/scripts/Kbuild.include
++++ b/scripts/Kbuild.include
+@@ -141,6 +141,11 @@ cc-ldoption = $(call try-run,\
+ ld-option = $(call try-run,\
+ 	$(CC) /dev/null -c -o "$$TMPO" ; $(LD) $(1) "$$TMPO" -o "$$TMP",$(1),$(2))
+ 
++# ar-option
++# Usage: KBUILD_ARFLAGS := $(call ar-option,D)
++# Important: no spaces around options
++ar-option = $(call try-run, $(AR) rc$(1) "$$TMP",$(1),$(2))
++
+ ######
+ 
+ ###
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index 5f87d37..e1244ef 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -345,7 +345,7 @@ quiet_cmd_link_o_target = LD      $@
+ cmd_link_o_target = $(if $(strip $(obj-y)),\
+ 		      $(LD) $(ld_flags) -r -o $@ $(filter $(obj-y), $^) \
+ 		      $(cmd_secanalysis),\
+-		      rm -f $@; $(AR) rcsD $@)
++		      rm -f $@; $(AR) rcs$(KBUILD_ARFLAGS) $@)
+ 
+ $(builtin-target): $(obj-y) FORCE
+ 	$(call if_changed,link_o_target)
+@@ -371,7 +371,7 @@ $(modorder-target): $(subdir-ym) FORCE
+ #
+ ifdef lib-target
+ quiet_cmd_link_l_target = AR      $@
+-cmd_link_l_target = rm -f $@; $(AR) rcsD $@ $(lib-y)
++cmd_link_l_target = rm -f $@; $(AR) rcs$(KBUILD_ARFLAGS) $@ $(lib-y)
+ 
+ $(lib-target): $(lib-y) FORCE
+ 	$(call if_changed,link_l_target)
