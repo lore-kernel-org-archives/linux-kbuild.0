@@ -1,122 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor.suse.de ([195.135.220.2]:59347 "EHLO mx1.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755044Ab1DTNud (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 20 Apr 2011 09:50:33 -0400
-Date: Wed, 20 Apr 2011 15:50:31 +0200
-From: Michal Marek <mmarek@suse.cz>
-Subject: Re: linux-next: build failure after merge of the kbuild tree
-Message-ID: <20110420135030.GA1901@sepie.suse.cz>
-References: <20110420082514.a9ec4d68.sfr@canb.auug.org.au>
+Received: from 75.98.165.80.static.a2webhosting.com ([75.98.165.80]:36510 "EHLO
+	greenroomsoftware.com" rhost-flags-OK-FAIL-OK-OK) by vger.kernel.org
+	with ESMTP id S1751318Ab1DTRfS (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 20 Apr 2011 13:35:18 -0400
+Message-ID: <4DAF1952.4010206@greenroomsoftware.com>
+Date: Wed, 20 Apr 2011 10:35:14 -0700
+From: Robert Gordon <robert@greenroomsoftware.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20110420082514.a9ec4d68.sfr@canb.auug.org.au>
+Subject: Re: [PATCH] kbuild, deb-pkg: set host machine after dpkg-gencontrol
+References: <1302891806-10458-1-git-send-email-robert@greenroomsoftware.com> <20110417222945.GC14561@stro.at> <20110418160625.GA13973@vostochny.stro.at> <aa1e1ed259dba5b6db3c3516bab80eef@greenroomsoftware.com> <20110419143355.GC17786@vostochny.stro.at>
+In-Reply-To: <20110419143355.GC17786@vostochny.stro.at>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Stephen Rothwell <sfr@canb.auug.org.au>
-Cc: linux-next@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: maximilian attems <max@stro.at>
+Cc: linux-kbuild@vger.kernel.org, Robert Nelson <robertcnelson@gmail.com>
 
-On Wed, Apr 20, 2011 at 08:25:14AM +1000, Stephen Rothwell wrote:
-> Hi Michal,
-> 
-> After merging the kbuild tree, today's linux-next build (s390 allnoconfig)
-> failed like this:
-> 
-> /opt/crosstool/gcc-4.3.2-nolibc/bin/s390x-linux-ar: illegal option -- D
-> 
-> Caused by commit 09ff9fecc039 ("kbuild: Use the deterministic mode of ar").
-> 
-> $ /opt/crosstool/gcc-4.3.2-nolibc/bin/s390x-linux-ar --version
-> GNU ar (GNU Binutils) 2.19
-> 
-> I presume that this version of ar is now too old to build the kernel?
-> Documentation/Changes only mentions Binutils verion 2.12.
+On 04/19/2011 07:33 AM, maximilian attems wrote:
+> On Mon, Apr 18, 2011 at 03:28:28PM -0400, robert@greenroomsoftware.com wrote:
+>> Here is the original 'make' command:
+>> make ARCH=arm LOCALVERSION=-x1 CROSS_COMPILE=arm-linux-gnueabi-
+>> KDEB_PKGVERSION=1.0cross deb-pkg
+>>
+>> Here is how it fails:
+>> dpkg-gencontrol: error: current host architecture 'armel' does not
+>> appear in package's architecture list (i386)
+>> make[1]: *** [deb-pkg] Error 255
+>> make: *** [deb-pkg] Error 2
+>>
+> did you check how it dpkg-gencontrol is called?
+> just put an set -x on the top of builddeb.
+>
+Here is the output:
+dpkg-gencontrol -isp -DArchitecture=armel -plinux-headers-2.6.38.2-x1
+-P/opt/kernel_new/2.6-stable/KERNEL/debian/hdrtmp
+dpkg-gencontrol: error: current host architecture 'armel' does not
+appear in package's architecture list (i386)
+make[1]: *** [deb-pkg] Error 255
+make: *** [deb-pkg] Error 2
+[2]+  Done                    gedit KERNEL/scripts/package/builddeb
 
-Sorry about that, the following patch should fix it.
 
-Michal
+The information in the debian/control file remains the same, i.e. it
+seems to contain instructions to build headers for an i386.
 
-
-Subject: [PATCH] kbuild: Fix build with binutils <= 2.19
-
-The D option of ar is only available in newer versions.
-
-Signed-off-by: Michal Marek <mmarek@suse.cz>
-
-diff --git a/Documentation/kbuild/makefiles.txt b/Documentation/kbuild/makefiles.txt
-index 5d145bb..40e082b 100644
---- a/Documentation/kbuild/makefiles.txt
-+++ b/Documentation/kbuild/makefiles.txt
-@@ -955,6 +955,11 @@ When kbuild executes, the following steps are followed (roughly):
- 	used when linking modules. This is often a linker script.
- 	From commandline LDFLAGS_MODULE shall be used (see kbuild.txt).
- 
-+    KBUILD_ARFLAGS   Options for $(AR) when creating archives
-+
-+	$(KBUILD_ARFLAGS) set by the top level Makefile to "D" (deterministic
-+	mode) if this option is supported by $(AR).
-+
- --- 6.2 Add prerequisites to archprepare:
- 
- 	The archprepare: rule is used to list prerequisites that need to be
-diff --git a/Makefile b/Makefile
-index c3bd316..d7c4231 100644
---- a/Makefile
-+++ b/Makefile
-@@ -382,6 +382,7 @@ export KBUILD_CFLAGS CFLAGS_KERNEL CFLAGS_MODULE CFLAGS_GCOV
- export KBUILD_AFLAGS AFLAGS_KERNEL AFLAGS_MODULE
- export KBUILD_AFLAGS_MODULE KBUILD_CFLAGS_MODULE KBUILD_LDFLAGS_MODULE
- export KBUILD_AFLAGS_KERNEL KBUILD_CFLAGS_KERNEL
-+export KBUILD_ARFLAGS
- 
- # When compiling out-of-tree modules, put MODVERDIR in the module
- # tree rather than in the kernel tree. The kernel tree might
-@@ -612,6 +613,9 @@ KBUILD_CFLAGS	+= $(call cc-option,-fno-strict-overflow)
- # conserve stack if available
- KBUILD_CFLAGS   += $(call cc-option,-fconserve-stack)
- 
-+# use the deterministic mode of AR if available
-+KBUILD_ARFLAGS := $(call ar-option,D)
-+
- # check for 'asm goto'
- ifeq ($(shell $(CONFIG_SHELL) $(srctree)/scripts/gcc-goto.sh $(CC)), y)
- 	KBUILD_CFLAGS += -DCC_HAVE_ASM_GOTO
-diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
-index ed2773e..fae2d8d 100644
---- a/scripts/Kbuild.include
-+++ b/scripts/Kbuild.include
-@@ -141,6 +141,11 @@ cc-ldoption = $(call try-run,\
- ld-option = $(call try-run,\
- 	$(CC) /dev/null -c -o "$$TMPO" ; $(LD) $(1) "$$TMPO" -o "$$TMP",$(1),$(2))
- 
-+# ar-option
-+# Usage: KBUILD_ARFLAGS := $(call ar-option,D)
-+# Important: no spaces around options
-+ar-option = $(call try-run, $(AR) rc$(1) "$$TMP",$(1),$(2))
-+
- ######
- 
- ###
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index 5f87d37..e1244ef 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -345,7 +345,7 @@ quiet_cmd_link_o_target = LD      $@
- cmd_link_o_target = $(if $(strip $(obj-y)),\
- 		      $(LD) $(ld_flags) -r -o $@ $(filter $(obj-y), $^) \
- 		      $(cmd_secanalysis),\
--		      rm -f $@; $(AR) rcsD $@)
-+		      rm -f $@; $(AR) rcs$(KBUILD_ARFLAGS) $@)
- 
- $(builtin-target): $(obj-y) FORCE
- 	$(call if_changed,link_o_target)
-@@ -371,7 +371,7 @@ $(modorder-target): $(subdir-ym) FORCE
- #
- ifdef lib-target
- quiet_cmd_link_l_target = AR      $@
--cmd_link_l_target = rm -f $@; $(AR) rcsD $@ $(lib-y)
-+cmd_link_l_target = rm -f $@; $(AR) rcs$(KBUILD_ARFLAGS) $@ $(lib-y)
- 
- $(lib-target): $(lib-y) FORCE
- 	$(call if_changed,link_l_target)
+Regards,
+Robert
