@@ -1,125 +1,71 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from host6.netdorm.com ([64.182.105.6]:49469 "EHLO host6.netdorm.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751078Ab1DTTWn (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 20 Apr 2011 15:22:43 -0400
-Message-ID: <4DAF2720.1060906@verizon.net>
-Date: Wed, 20 Apr 2011 14:34:08 -0400
-From: Peter Foley <pefoley2@verizon.net>
-Reply-To: <pefoley2@verizon.net>
-MIME-Version: 1.0
-Subject: [PATCH 1/2] kbuild: move scripts/basic/docproc.c to scripts/docproc.c
-Content-Type: text/plain; charset="ISO-8859-1"
-Content-Transfer-Encoding: 7bit
+Received: from hrndva-omtalb.mail.rr.com ([71.74.56.123]:41031 "EHLO
+	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751721Ab1DUChk (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 20 Apr 2011 22:37:40 -0400
+Message-Id: <20110421023738.714956282@goodmis.org>
+Date: Wed, 20 Apr 2011 22:28:32 -0400
+From: Steven Rostedt <rostedt@goodmis.org>
+Subject: [RFC][PATCH 07/11] kbuild/recordmcount: Add RECORDMCOUNT_WARN to warn about mcount callers
+References: <20110421022825.535486725@goodmis.org>
+Content-Disposition: inline; filename=0007-kbuild-recordmcount-Add-RECORDMCOUNT_WARN-to-warn-ab.patch
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org
-Cc: linux-kbuild@vger.kernel.org, mmarek@suse.cz
+Cc: Ingo Molnar <mingo@elte.hu>, Andrew Morton <akpm@linux-foundation.org>, Frederic Weisbecker <fweisbec@gmail.com>, "H. Peter Anvin" <hpa@zytor.com>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
 
-From: Peter Foley <pefoley2@verizon.net>
+From: Steven Rostedt <srostedt@redhat.com>
 
-Move docproc from scripts/basic to scripts so it is only built for *doc targets
-instead of every time the kernel is built.
+When mcount is called in a section that ftrace will not modify it into
+a nop, we want to warn about this. But not warn about this always. Now
+if the user builds the kernel with the option RECORDMCOUNT_WARN=1 then
+the build will warn about mcount callers that are ignored and will just
+waste execution time.
 
-Signed-off-by: Peter Foley <pefoley2@verizon.net>
-
+Cc: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org
+Signed-off-by: Steven Rostedt <rostedt@goodmis.org>
 ---
- Documentation/DocBook/Makefile |    2 +-
- Makefile                       |    1 +
- scripts/.gitignore             |    1 +
- scripts/Makefile               |   11 +++++++----
- scripts/basic/.gitignore       |    2 --
- scripts/basic/Makefile         |    3 +--
- scripts/{basic => }/docproc.c  |    0
- 7 files changed, 11 insertions(+), 9 deletions(-)
- rename scripts/{basic => }/docproc.c (100%)
+ Makefile               |    1 +
+ scripts/Makefile.build |    5 ++++-
+ 2 files changed, 5 insertions(+), 1 deletions(-)
 
-diff --git a/Documentation/DocBook/Makefile b/Documentation/DocBook/Makefile
-index 8436b01..3cebfa0 100644
---- a/Documentation/DocBook/Makefile
-+++ b/Documentation/DocBook/Makefile
-@@ -73,7 +73,7 @@ installmandocs: mandocs
- ###
- #External programs used
- KERNELDOC = $(srctree)/scripts/kernel-doc
--DOCPROC   = $(objtree)/scripts/basic/docproc
-+DOCPROC   = $(objtree)/scripts/docproc
-  XMLTOFLAGS = -m $(srctree)/Documentation/DocBook/stylesheet.xsl
- XMLTOFLAGS += --skip-validation
 diff --git a/Makefile b/Makefile
-index b967b96..44d49a9 100644
+index 8392b64..4e484cf 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -1290,6 +1290,7 @@ $(help-board-dirs): help-%:
- # Documentation targets
- # ---------------------------------------------------------------------------
- %docs: scripts_basic FORCE
-+	$(Q)$(MAKE) $(build)=scripts build_docproc
- 	$(Q)$(MAKE) $(build)=Documentation/DocBook $@
-  else # KBUILD_EXTMOD
-diff --git a/scripts/.gitignore b/scripts/.gitignore
-index e2741d2..105b21f 100644
---- a/scripts/.gitignore
-+++ b/scripts/.gitignore
-@@ -8,3 +8,4 @@ bin2c
- unifdef
- ihex2fw
- recordmcount
-+docproc
-diff --git a/scripts/Makefile b/scripts/Makefile
-index fcea261..31a450c 100644
---- a/scripts/Makefile
-+++ b/scripts/Makefile
-@@ -5,7 +5,8 @@
- # kallsyms:      Find all symbols in vmlinux
- # pnmttologo:    Convert pnm files to logo files
- # conmakehash:   Create chartable
--# conmakehash:	 Create arrays for initializing the kernel console tables
-+# conmakehash:   Create arrays for initializing the kernel console tables
-+# docproc:       Used in Documentation/DocBook
-  hostprogs-$(CONFIG_KALLSYMS)     += kallsyms
- hostprogs-$(CONFIG_LOGO)         += pnmtologo
-@@ -16,12 +17,14 @@ hostprogs-$(BUILD_C_RECORDMCOUNT) += recordmcount
- always		:= $(hostprogs-y) $(hostprogs-m)
-  # The following hostprogs-y programs are only build on demand
--hostprogs-y += unifdef
-+hostprogs-y += unifdef docproc
- -# This target is used internally to avoid "is up to date" messages
--PHONY += build_unifdef
-+# These targets are used internally to avoid "is up to date" messages
-+PHONY += build_unifdef build_docproc
- build_unifdef: scripts/unifdef FORCE
- 	@:
-+build_docproc: scripts/docproc FORCE
-+	@:
-  subdir-$(CONFIG_MODVERSIONS) += genksyms
- subdir-y                     += mod
-diff --git a/scripts/basic/.gitignore b/scripts/basic/.gitignore
-index bf8b199..a776371 100644
---- a/scripts/basic/.gitignore
-+++ b/scripts/basic/.gitignore
-@@ -1,3 +1 @@
--hash
- fixdep
--docproc
-diff --git a/scripts/basic/Makefile b/scripts/basic/Makefile
-index 4c324a1..4fcef87 100644
---- a/scripts/basic/Makefile
-+++ b/scripts/basic/Makefile
-@@ -7,9 +7,8 @@
- # .config is included by main Makefile.
- # ---------------------------------------------------------------------------
- # fixdep: 	 Used to generate dependency information during build process
--# docproc:	 Used in Documentation/DocBook
- -hostprogs-y	:= fixdep docproc
-+hostprogs-y	:= fixdep
- always		:= $(hostprogs-y)
-  # fixdep is needed to compile other host programs
-diff --git a/scripts/basic/docproc.c b/scripts/docproc.c
-similarity index 100%
-rename from scripts/basic/docproc.c
-rename to scripts/docproc.c
+@@ -1268,6 +1268,7 @@ help:
+ 	@echo  '  make C=1   [targets] Check all c source with $$CHECK (sparse by default)'
+ 	@echo  '  make C=2   [targets] Force check of all c source with $$CHECK'
+ 	@echo  '  make W=1   [targets] Enable extra gcc checks'
++	@echo  '  make RECORDMCOUNT_WARN=1 [targets] Warn about ignored mcount sections'
+ 	@echo  ''
+ 	@echo  'Execute "make" or "make all" to build all targets marked with [*] '
+ 	@echo  'For further info see the ./README file'
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index d5f925a..fdca952 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -244,13 +244,16 @@ endif
+ 
+ ifdef CONFIG_FTRACE_MCOUNT_RECORD
+ ifdef BUILD_C_RECORDMCOUNT
++ifeq ("$(origin RECORDMCOUNT_WARN)", "command line")
++  RECORDMCOUNT_FLAGS = -w
++endif
+ # Due to recursion, we must skip empty.o.
+ # The empty.o file is created in the make process in order to determine
+ #  the target endianness and word size. It is made before all other C
+ #  files, including recordmcount.
+ sub_cmd_record_mcount =					\
+ 	if [ $(@) != "scripts/mod/empty.o" ]; then	\
+-		$(objtree)/scripts/recordmcount "$(@)";	\
++		$(objtree)/scripts/recordmcount $(RECORDMCOUNT_FLAGS) "$(@)";	\
+ 	fi;
+ else
+ sub_cmd_record_mcount = set -e ; perl $(srctree)/scripts/recordmcount.pl "$(ARCH)" \
 -- 
-1.7.5.rc1
+1.7.2.3
 
 
