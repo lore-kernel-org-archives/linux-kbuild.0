@@ -1,31 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:54103 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752150Ab1DUUkO (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 21 Apr 2011 16:40:14 -0400
-Message-ID: <4DB09629.7080008@suse.cz>
-Date: Thu, 21 Apr 2011 22:40:09 +0200
-From: Michal Marek <mmarek@suse.cz>
+Received: from pqueuea.post.tele.dk ([193.162.153.9]:48900 "EHLO
+	pqueuea.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754109Ab1DUVJL (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 21 Apr 2011 17:09:11 -0400
+Received: from pfepb.post.tele.dk (pfepb.post.tele.dk [195.41.46.236])
+	by pqueuea.post.tele.dk (Postfix) with ESMTP id 4A3BFDB954
+	for <linux-kbuild@vger.kernel.org>; Thu, 21 Apr 2011 23:09:10 +0200 (CEST)
+Date: Thu, 21 Apr 2011 23:08:52 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: [PATCH] kbuild: fix W=1 with gcc 4.3.2
+Message-ID: <20110421210852.GA6196@merkur.ravnborg.org>
 MIME-Version: 1.0
-Subject: Re: [RFC][PATCH 07/11] kbuild/recordmcount: Add RECORDMCOUNT_WARN
- to warn about mcount callers
-References: <20110421022825.535486725@goodmis.org> <20110421023738.714956282@goodmis.org>
-In-Reply-To: <20110421023738.714956282@goodmis.org>
-Content-Type: text/plain; charset=ISO-8859-2
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Steven Rostedt <rostedt@goodmis.org>
-Cc: linux-kernel@vger.kernel.org, Ingo Molnar <mingo@elte.hu>, Andrew Morton <akpm@linux-foundation.org>, Frederic Weisbecker <fweisbec@gmail.com>, "H. Peter Anvin" <hpa@zytor.com>, linux-kbuild@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>, linux-kbuild <linux-kbuild@vger.kernel.org>, lkml <linux-kernel@vger.kernel.org>, Dave Jones <davej@redhat.com>
 
-On 21.4.2011 04:28, Steven Rostedt wrote:
-> +ifeq ("$(origin RECORDMCOUNT_WARN)", "command line")
-> +  RECORDMCOUNT_FLAGS = -w
-> +endif
+Building a kernel using W=1 with gcc 4.3.2 failed like this:
 
-RECORDMCOUNT_WARN is IMO unlikely to be used with some other meaning in
-the environment, so I think you can drop the origin check. Nevertheless
+    cc1: error: unrecognized command line option "-Wpacked-bitfield-compat"
 
-Acked-by: Michal Marek <mmarek@suse.cz>
+Make use of this option dependent on the compiler.
 
-Michal
+Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
+Cc: Dave Jones <davej@redhat.com>
+---
+I do not see this a stable material - people running stable kernels
+have less value of W=1.
+
+And the amount of warnings are outright silly. We should really
+divide this up a bit so W=1 is semi usefull.
+
+	Sam
+
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index d5f925a..b280284 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -73,7 +73,7 @@ KBUILD_EXTRA_WARNINGS += -Wnested-externs
+ KBUILD_EXTRA_WARNINGS += -Wold-style-definition
+ KBUILD_EXTRA_WARNINGS += $(call cc-option, -Woverlength-strings,)
+ KBUILD_EXTRA_WARNINGS += -Wpacked
+-KBUILD_EXTRA_WARNINGS += -Wpacked-bitfield-compat
++KBUILD_EXTRA_WARNINGS += $(call cc-option, -Wpacked-bitfield-compat)
+ KBUILD_EXTRA_WARNINGS += -Wpadded
+ KBUILD_EXTRA_WARNINGS += -Wpointer-arith
+ KBUILD_EXTRA_WARNINGS += -Wredundant-decls
