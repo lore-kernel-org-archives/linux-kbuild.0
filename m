@@ -1,74 +1,140 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepa.post.tele.dk ([195.41.46.235]:57718 "EHLO
-	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754564Ab1DUVbs (ORCPT
+Received: from pfepb.post.tele.dk ([195.41.46.236]:47777 "EHLO
+	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753658Ab1DUVjF (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 21 Apr 2011 17:31:48 -0400
-Date: Thu, 21 Apr 2011 23:31:47 +0200
+	Thu, 21 Apr 2011 17:39:05 -0400
+Date: Thu, 21 Apr 2011 23:39:03 +0200
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: [PATCH] kbuild: fix W=1 with gcc 4.1.2 / 4.3.2
-Message-ID: <20110421213147.GA9660@merkur.ravnborg.org>
-References: <20110421210852.GA6196@merkur.ravnborg.org> <1303420403.2784.25.camel@edumazet-laptop>
+Subject: [RFC PATCH] kbuild: implement several W= levels
+Message-ID: <20110421213903.GB9660@merkur.ravnborg.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <1303420403.2784.25.camel@edumazet-laptop>
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Eric Dumazet <eric.dumazet@gmail.com>, Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, lkml <linux-kernel@vger.kernel.org>, Dave Jones <davej@redhat.com>
+To: Michal Marek <mmarek@suse.cz>, linux-kbuild <linux-kbuild@vger.kernel.org>, lkml <linux-kernel@vger.kernel.org>, Borislav Petkov <bp@alien8.de>
 
-From dbe15094545e5d6900bde8794df8f42ee5c948d0 Mon Sep 17 00:00:00 2001
-From: Sam Ravnborg <sam@ravnborg.org>
-Date: Thu, 21 Apr 2011 23:27:24 +0200
-Subject: [PATCH] kbuild: fix W=1 with gcc 4.1.2 / 4.3.2
+Building a kernel with "make W=1" produce far too much noise
+to be usefull.
 
-Building a kernel using W=1 with gcc 4.3.2 failed like this:
+Divide the warning options in three groups:
 
-    cc1: error: unrecognized command line option "-Wpacked-bitfield-compat"
+W=1 - usefull warning options
+W=2 - noisy but semi usefull warnign options
+W=3 - almost pure noise options
 
-Eric Dumazet <eric.dumazet@gmail.com> reported
-that gcc 4.1.2 failed like this:
+I do not feel strongly about the distinction between
+group 2 and 3. But we should consider what we add in group 1.
 
-    cc1: error: unrecognized command line option "-Wpacked-bitfield-compat"
 
-Make these options dependent on the compiler.
+Sample run on my box (x86, 32bit allyesconfig build)
+  CC      kernel/bounds.s
+kernel/bounds.c:14: warning: no previous prototype for ‘foo’
+  GEN     include/generated/bounds.h
+  CC      arch/x86/kernel/asm-offsets.s
+In file included from include/linux/sched.h:73,
+                 from arch/x86/kernel/asm-offsets.c:9:
+include/linux/signal.h: In function ‘sigorsets’:
+include/linux/signal.h:121: warning: nested extern declaration of ‘_NSIG_WORDS_is_unsupported_size’
+include/linux/signal.h: In function ‘sigandsets’:
+include/linux/signal.h:124: warning: nested extern declaration of ‘_NSIG_WORDS_is_unsupported_size’
+include/linux/signal.h: In function ‘signandsets’:
+include/linux/signal.h:127: warning: nested extern declaration of ‘_NSIG_WORDS_is_unsupported_size’
+include/linux/signal.h: In function ‘signotset’:
+include/linux/signal.h:151: warning: nested extern declaration of ‘_NSIG_WORDS_is_unsupported_size’
+arch/x86/kernel/asm-offsets.c: At top level:
+arch/x86/kernel/asm-offsets.c:30: warning: no previous prototype for ‘common’
 
-Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
-Cc: Dave Jones <davej@redhat.com>
-Cc: Eric Dumazet <eric.dumazet@gmail.com>
----
-
-I considered wrapping all warnings in $(call cc-option, ...)
-but I think we have the relevant warning options nailed now.
+the patch is only an RFC - and is not made on top
+of an upstream kernel with no additiona stuff applied.
 
 	Sam
 
- scripts/Makefile.build |    4 ++--
- 1 files changed, 2 insertions(+), 2 deletions(-)
-
+diff --git a/Makefile b/Makefile
+index b967b96..f0e138b 100644
+--- a/Makefile
++++ b/Makefile
+@@ -103,7 +103,7 @@ ifeq ("$(origin O)", "command line")
+ endif
+ 
+ ifeq ("$(origin W)", "command line")
+-  export KBUILD_ENABLE_EXTRA_GCC_CHECKS := 1
++  export KBUILD_ENABLE_EXTRA_GCC_CHECKS := $(W)
+ endif
+ 
+ # That's our default target when none is given on the command line
 diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index d5f925a..f43aef7 100644
+index d5f925a..b65f820 100644
 --- a/scripts/Makefile.build
 +++ b/scripts/Makefile.build
-@@ -64,7 +64,7 @@ KBUILD_EXTRA_WARNINGS += -Wcast-qual
- KBUILD_EXTRA_WARNINGS += -Wcast-align
- KBUILD_EXTRA_WARNINGS += -Wconversion
- KBUILD_EXTRA_WARNINGS += -Wdisabled-optimization
+@@ -56,31 +56,43 @@ endif
+ # $(call cc-option... ) handles gcc -W.. options which
+ # are not supported by all versions of the compiler
+ ifdef KBUILD_ENABLE_EXTRA_GCC_CHECKS
+-KBUILD_EXTRA_WARNINGS := -Wextra
+-KBUILD_EXTRA_WARNINGS += -Wunused -Wno-unused-parameter
+-KBUILD_EXTRA_WARNINGS += -Waggregate-return
+-KBUILD_EXTRA_WARNINGS += -Wbad-function-cast
+-KBUILD_EXTRA_WARNINGS += -Wcast-qual
+-KBUILD_EXTRA_WARNINGS += -Wcast-align
+-KBUILD_EXTRA_WARNINGS += -Wconversion
+-KBUILD_EXTRA_WARNINGS += -Wdisabled-optimization
 -KBUILD_EXTRA_WARNINGS += -Wlogical-op
-+KBUILD_EXTRA_WARNINGS += $(call cc-option, -Wlogical-op)
- KBUILD_EXTRA_WARNINGS += -Wmissing-declarations
- KBUILD_EXTRA_WARNINGS += -Wmissing-format-attribute
- KBUILD_EXTRA_WARNINGS += $(call cc-option, -Wmissing-include-dirs,)
-@@ -73,7 +73,7 @@ KBUILD_EXTRA_WARNINGS += -Wnested-externs
- KBUILD_EXTRA_WARNINGS += -Wold-style-definition
- KBUILD_EXTRA_WARNINGS += $(call cc-option, -Woverlength-strings,)
- KBUILD_EXTRA_WARNINGS += -Wpacked
+-KBUILD_EXTRA_WARNINGS += -Wmissing-declarations
+-KBUILD_EXTRA_WARNINGS += -Wmissing-format-attribute
+-KBUILD_EXTRA_WARNINGS += $(call cc-option, -Wmissing-include-dirs,)
+-KBUILD_EXTRA_WARNINGS += -Wmissing-prototypes
+-KBUILD_EXTRA_WARNINGS += -Wnested-externs
+-KBUILD_EXTRA_WARNINGS += -Wold-style-definition
+-KBUILD_EXTRA_WARNINGS += $(call cc-option, -Woverlength-strings,)
+-KBUILD_EXTRA_WARNINGS += -Wpacked
 -KBUILD_EXTRA_WARNINGS += -Wpacked-bitfield-compat
-+KBUILD_EXTRA_WARNINGS += $(call cc-option, -Wpacked-bitfield-compat)
- KBUILD_EXTRA_WARNINGS += -Wpadded
- KBUILD_EXTRA_WARNINGS += -Wpointer-arith
- KBUILD_EXTRA_WARNINGS += -Wredundant-decls
--- 
-1.6.0.6
-
+-KBUILD_EXTRA_WARNINGS += -Wpadded
+-KBUILD_EXTRA_WARNINGS += -Wpointer-arith
+-KBUILD_EXTRA_WARNINGS += -Wredundant-decls
+-KBUILD_EXTRA_WARNINGS += -Wshadow
+-KBUILD_EXTRA_WARNINGS += -Wswitch-default
+-KBUILD_EXTRA_WARNINGS += $(call cc-option, -Wvla,)
+-KBUILD_CFLAGS += $(KBUILD_EXTRA_WARNINGS)
++warning-1 := -Wextra
++warning-1 += -Wunused -Wno-unused-parameter
++warning-2 += -Waggregate-return
++warning-2 += -Wbad-function-cast
++warning-2 += -Wcast-qual
++warning-2 += -Wcast-align
++warning-3 += -Wconversion
++warning-2 += -Wdisabled-optimization
++warning-2 += -Wlogical-op
++warning-1 += -Wmissing-declarations
++warning-1 += -Wmissing-format-attribute
++warning-1 += $(call cc-option, -Wmissing-include-dirs,)
++warning-1 += -Wmissing-prototypes
++warning-1 += -Wnested-externs
++warning-2 += -Wold-style-definition
++warning-2 += $(call cc-option, -Woverlength-strings,)
++warning-3 += -Wpacked
++warning-3 += -Wpacked-bitfield-compat
++warning-3 += -Wpadded
++warning-3 += -Wpointer-arith
++warning-2 += -Wredundant-decls
++warning-2 += -Wshadow
++warning-3 += -Wswitch-default
++warning-3 += $(call cc-option, -Wvla,)
++ifeq ($(KBUILD_ENABLE_EXTRA_GCC_CHECKS),1)
++        KBUILD_CFLAGS += $(warning-1)
++else
++        ifeq ($(KBUILD_ENABLE_EXTRA_GCC_CHECKS),2)
++                KBUILD_CFLAGS += $(warning-1) $(warning-2)
++        else
++                ifeq ($(KBUILD_ENABLE_EXTRA_GCC_CHECKS),3)
++                        KBUILD_CFLAGS += $(warning-1) $(warning-2) $(warning-3)
++                else
++                        $(error W=$(KBUILD_ENABLE_EXTRA_GCC_CHECKS) is unknown)
++                endif
++        endif
++endif
+ endif
+ 
+ include scripts/Makefile.lib
