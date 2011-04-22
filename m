@@ -1,289 +1,162 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepa.post.tele.dk ([195.41.46.235]:57861 "EHLO
-	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755430Ab1DVPxv (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 22 Apr 2011 11:53:51 -0400
-Date: Fri, 22 Apr 2011 17:53:49 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: [PATCH v3] kbuild: asm-generic support
-Message-ID: <20110422155349.GA9579@merkur.ravnborg.org>
-References: <20110108130302.GA21698@merkur.ravnborg.org> <20110109192707.GA12387@merkur.ravnborg.org> <20110109192907.GA12403@merkur.ravnborg.org> <4D2F24CD.5040101@suse.cz> <20110113170131.GA28377@merkur.ravnborg.org> <20110114144354.GA23611@sepie.suse.cz>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20110114144354.GA23611@sepie.suse.cz>
+Received: from mail.skyhub.de ([78.46.96.112]:41415 "EHLO mail.skyhub.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1756236Ab1DVRus (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 22 Apr 2011 13:50:48 -0400
+From: Borislav Petkov <bp@alien8.de>
+Subject: [PATCH v3.1] kbuild: implement several W= levels
+Date: Fri, 22 Apr 2011 19:50:42 +0200
+Message-Id: <1303494642-18594-1-git-send-email-bp@alien8.de>
+In-Reply-To: <20110422110947.GA20715@merkur.ravnborg.org>
+References: <20110422110947.GA20715@merkur.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: lkml <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, linux arch <linux-arch@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>, Guan Xuetao <guanxuetao@mprc.pku.edu.cn>
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Borislav Petkov <bp@alien8.de>, Dave Jones <davej@redhat.com>
 
-From 34d0b72a343dd63c1c1b049e4ba6931f0dbcbc3f Mon Sep 17 00:00:00 2001
 From: Sam Ravnborg <sam@ravnborg.org>
-Date: Fri, 22 Apr 2011 14:45:13 +0200
-Subject: [PATCH] kbuild: asm-generic support
 
-There is an increasing amount of header files
-shared between individual architectures in asm-generic.
-To avoid a lot of dummy wrapper files that just
-include the corresponding file in asm-generic provide
-some basic support in kbuild for this.
+Building a kernel with "make W=1" produce far too much noise
+to be usefull.
 
-With the following patch an architecture can maintain
-a list of files in the file arch/$(ARCH)/include/asm/Kbuild
+Divide the warning options in three groups:
 
-To use a generic file just add:
+    W=1 - warnings that may be relevant and does not occur too often
+    W=2 - warnings that occur quite often but may still be relevant
+    W=3 - the more obscure warnings, can most likely be ignored
 
-        generic-y += <name-of-header-file.h>
+When building init/ on my box the levels produces:
 
-For each file listed kbuild will generate the necessary
-wrapper in arch/$(ARCH)/include/generated/asm.
+W=1 - 46 warnings
+W=2 - 863 warnings
+W=3 - 6496 warnings
 
-When installing userspace headers a wrapper is likewise created.
+Many warnings occur from .h files so fixing one file may have a nice
+effect on the total number of warnings.
 
-The original inspiration for this came from the unicore32
-patchset - although a different method is used.
+With these changes I am actually tempted to try W=1 now and then.
+Previously there were just too much noise.
 
-The patch includes several improvements from Arnd Bergmann.
-Michael Marek contributed Makefile.asm-generic.
+Borislav:
+
+- make the W= levels exclusive
+- move very noisy and making little sense for the kernel warnings to W=3
+- drop -Woverlength-strings due to useless warning message
+- copy explanatory text for the different warning levels to 'make help'
 
 Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
-Cc: Guan Xuetao <guanxuetao@mprc.pku.edu.cn>
-Cc: Arnd Bergmann <arnd@arndb.de>
+Signed-off-by: Borislav Petkov <bp@alien8.de>
+Cc: Dave Jones <davej@redhat.com>
 ---
+ Makefile               |    8 ++++-
+ scripts/Makefile.build |   65 ++++++++++++++++++++++++++++--------------------
+ 2 files changed, 44 insertions(+), 29 deletions(-)
 
-Hi Mikael.
-
-It took me a while to get back to this.
-I used your Makefile.asm-generic almost verbatim.
-
-Only change was that we always need to create the output directory.
-
-	Sam
-
- .gitignore                         |    1 +
- Documentation/kbuild/makefiles.txt |   36 ++++++++++++++++++++++++++++++++++++
- Makefile                           |   15 +++++++++++----
- scripts/Makefile.asm-generic       |   23 +++++++++++++++++++++++
- scripts/Makefile.headersinst       |   18 +++++++++++++++---
- 5 files changed, 86 insertions(+), 7 deletions(-)
- create mode 100644 scripts/Makefile.asm-generic
-
-diff --git a/.gitignore b/.gitignore
-index 5d56a3f..9dacde0 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -57,6 +57,7 @@ modules.builtin
- include/config
- include/linux/version.h
- include/generated
-+arch/*/include/generated
- 
- # stgit generated dirs
- patches-*
-diff --git a/Documentation/kbuild/makefiles.txt b/Documentation/kbuild/makefiles.txt
-index 5d145bb..7f2b8e7 100644
---- a/Documentation/kbuild/makefiles.txt
-+++ b/Documentation/kbuild/makefiles.txt
-@@ -40,11 +40,13 @@ This document describes the Linux kernel Makefiles.
- 	   --- 6.6 Commands useful for building a boot image
- 	   --- 6.7 Custom kbuild commands
- 	   --- 6.8 Preprocessing linker scripts
-+	   --- 6.9 Generic header files
- 
- 	=== 7 Kbuild syntax for exported headers
- 		--- 7.1 header-y
- 		--- 7.2 objhdr-y
- 		--- 7.3 destination-y
-+		--- 7.4 generic-y
- 
- 	=== 8 Kbuild Variables
- 	=== 9 Makefile language
-@@ -1209,6 +1211,14 @@ When kbuild executes, the following steps are followed (roughly):
- 	The kbuild infrastructure for *lds file are used in several
- 	architecture-specific files.
- 
-+--- 6.9 Generic header files
-+
-+	The directory include/asm-generic contains the header files
-+	that may be shared between individual architectures.
-+	The recommended approach how to use a generic header file is
-+	to list the file in the Kbuild file.
-+	See "7.4 generic-y" for further info on syntax etc.
-+
- === 7 Kbuild syntax for exported headers
- 
- The kernel include a set of headers that is exported to userspace.
-@@ -1265,6 +1275,32 @@ See subsequent chapter for the syntax of the Kbuild file.
- 	In the example above all exported headers in the Kbuild file
- 	will be located in the directory "include/linux" when exported.
- 
-+	--- 7.4 generic-y
-+
-+	If an architecture uses a verbatim copy of a header from
-+	include/asm-generic then this is listed in the file
-+	arch/$(ARCH)/include/asm/Kbuild like this:
-+
-+		Example:
-+			#arch/x86/include/asm/Kbuild
-+			generic-y += termios.h
-+			generic-y += rtc.h
-+
-+	During the prepare phase of the build a wrapper include
-+	file is generated in the directory:
-+
-+		arch/$(ARCH)/include/generated/asm
-+
-+	When a header is exported where the architecture uses
-+	the generic header a similar wrapper is generated as part
-+	of the set of exported headers in the directory:
-+
-+		usr/include/asm
-+
-+	The generated wrapper will in both cases look like the following:
-+
-+		Example: termios.h
-+			#include <asm-generic/termios.h>
- 
- === 8 Kbuild Variables
- 
 diff --git a/Makefile b/Makefile
-index b967b96..30b3852 100644
+index b967b96..17ce5d5 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -349,7 +349,8 @@ CFLAGS_GCOV	= -fprofile-arcs -ftest-coverage
- 
- # Use LINUXINCLUDE when you must reference the include/ directory.
- # Needed to be compatible with the O= option
--LINUXINCLUDE    := -I$(srctree)/arch/$(hdr-arch)/include -Iinclude \
-+LINUXINCLUDE    := -I$(srctree)/arch/$(hdr-arch)/include \
-+                   -Iarch/$(hdr-arch)/include/generated -Iinclude \
-                    $(if $(KBUILD_SRC), -I$(srctree)/include) \
-                    -include include/generated/autoconf.h
- 
-@@ -416,6 +417,11 @@ ifneq ($(KBUILD_SRC),)
- 	    $(srctree) $(objtree) $(VERSION) $(PATCHLEVEL)
+@@ -103,7 +103,7 @@ ifeq ("$(origin O)", "command line")
  endif
  
-+# Support for using generic headers in asm-generic
-+PHONY += asm-generic
-+asm-generic:
-+	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.asm-generic obj=arch/$(SRCARCH)/include/generated/asm
+ ifeq ("$(origin W)", "command line")
+-  export KBUILD_ENABLE_EXTRA_GCC_CHECKS := 1
++  export KBUILD_ENABLE_EXTRA_GCC_CHECKS := $(W)
+ endif
+ 
+ # That's our default target when none is given on the command line
+@@ -1267,7 +1267,11 @@ help:
+ 	@echo  '  make O=dir [targets] Locate all output files in "dir", including .config'
+ 	@echo  '  make C=1   [targets] Check all c source with $$CHECK (sparse by default)'
+ 	@echo  '  make C=2   [targets] Force check of all c source with $$CHECK'
+-	@echo  '  make W=1   [targets] Enable extra gcc checks'
++	@echo  '  make W=n   [targets] Enable extra gcc checks, n=1,2,3 where'
++	@echo  '		1: warnings which may be relevant and do not occur too often'
++	@echo  '		2: warnings which occur quite often but may still be relevant'
++	@echo  '		3: more obscure warnings, can most likely be ignored'
 +
- # To make sure we do not include .config for any of the *config targets
- # catch them early, and hand them over to scripts/kconfig/Makefile
- # It is allowed to specify more targets when calling make, including
-@@ -947,7 +953,7 @@ ifneq ($(KBUILD_SRC),)
+ 	@echo  ''
+ 	@echo  'Execute "make" or "make all" to build all targets marked with [*] '
+ 	@echo  'For further info see the ./README file'
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index d5f925a..ffb383c 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -51,36 +51,47 @@ ifeq ($(KBUILD_NOPEDANTIC),)
  endif
  
- # prepare2 creates a makefile if using a separate output directory
--prepare2: prepare3 outputmakefile
-+prepare2: prepare3 outputmakefile asm-generic
- 
- prepare1: prepare2 include/linux/version.h include/generated/utsrelease.h \
-                    include/config/auto.conf
-@@ -1021,7 +1027,7 @@ hdr-inst := -rR -f $(srctree)/scripts/Makefile.headersinst obj
- hdr-dst = $(if $(KBUILD_HEADERS), dst=include/asm-$(hdr-arch), dst=include/asm)
- 
- PHONY += __headers
--__headers: include/linux/version.h scripts_basic FORCE
-+__headers: include/linux/version.h scripts_basic asm-generic FORCE
- 	$(Q)$(MAKE) $(build)=scripts build_unifdef
- 
- PHONY += headers_install_all
-@@ -1136,7 +1142,8 @@ CLEAN_FILES +=	vmlinux System.map \
-                 .tmp_kallsyms* .tmp_version .tmp_vmlinux* .tmp_System.map
- 
- # Directories & files removed with 'make mrproper'
--MRPROPER_DIRS  += include/config usr/include include/generated
-+MRPROPER_DIRS  += include/config usr/include include/generated          \
-+                  arch/*/include/generated
- MRPROPER_FILES += .config .config.old .version .old_version             \
-                   include/linux/version.h                               \
- 		  Module.symvers tags TAGS cscope* GPATH GTAGS GRTAGS GSYMS
-diff --git a/scripts/Makefile.asm-generic b/scripts/Makefile.asm-generic
-new file mode 100644
-index 0000000..a687cb6
---- /dev/null
-+++ b/scripts/Makefile.asm-generic
-@@ -0,0 +1,23 @@
-+# include/asm-generic contains a lot of files that are used
-+# verbatim by several architectures.
+ #
+-# make W=1 settings
++# make W=... settings
+ #
+-# $(call cc-option... ) handles gcc -W.. options which
++# W=1 - warnings that may be relevant and does not occur too often
++# W=2 - warnings that occur quite often but may still be relevant
++# W=3 - the more obscure warnings, can most likely be ignored
 +#
-+# This Makefile reads the file arch/$(SRCARCH)/include/asm/Kbuild
-+# and for each file listed in this file with generic-y creates
-+# a small wrapper file in $(obj) (arch/$(SRCARCH)/include/generated/asm)
++# $(call cc-option, -W...) handles gcc -W.. options which
+ # are not supported by all versions of the compiler
+ ifdef KBUILD_ENABLE_EXTRA_GCC_CHECKS
+-KBUILD_EXTRA_WARNINGS := -Wextra
+-KBUILD_EXTRA_WARNINGS += -Wunused -Wno-unused-parameter
+-KBUILD_EXTRA_WARNINGS += -Waggregate-return
+-KBUILD_EXTRA_WARNINGS += -Wbad-function-cast
+-KBUILD_EXTRA_WARNINGS += -Wcast-qual
+-KBUILD_EXTRA_WARNINGS += -Wcast-align
+-KBUILD_EXTRA_WARNINGS += -Wconversion
+-KBUILD_EXTRA_WARNINGS += -Wdisabled-optimization
+-KBUILD_EXTRA_WARNINGS += -Wlogical-op
+-KBUILD_EXTRA_WARNINGS += -Wmissing-declarations
+-KBUILD_EXTRA_WARNINGS += -Wmissing-format-attribute
+-KBUILD_EXTRA_WARNINGS += $(call cc-option, -Wmissing-include-dirs,)
+-KBUILD_EXTRA_WARNINGS += -Wmissing-prototypes
+-KBUILD_EXTRA_WARNINGS += -Wnested-externs
+-KBUILD_EXTRA_WARNINGS += -Wold-style-definition
+-KBUILD_EXTRA_WARNINGS += $(call cc-option, -Woverlength-strings,)
+-KBUILD_EXTRA_WARNINGS += -Wpacked
+-KBUILD_EXTRA_WARNINGS += -Wpacked-bitfield-compat
+-KBUILD_EXTRA_WARNINGS += -Wpadded
+-KBUILD_EXTRA_WARNINGS += -Wpointer-arith
+-KBUILD_EXTRA_WARNINGS += -Wredundant-decls
+-KBUILD_EXTRA_WARNINGS += -Wshadow
+-KBUILD_EXTRA_WARNINGS += -Wswitch-default
+-KBUILD_EXTRA_WARNINGS += $(call cc-option, -Wvla,)
+-KBUILD_CFLAGS += $(KBUILD_EXTRA_WARNINGS)
++warning-1 := -Wextra -Wunused -Wno-unused-parameter
++warning-1 += -Wmissing-declarations
++warning-1 += -Wmissing-format-attribute
++warning-1 += -Wmissing-prototypes
++warning-1 += -Wold-style-definition
++warning-1 += $(call cc-option, -Wmissing-include-dirs)
 +
-+kbuild-file := $(srctree)/arch/$(SRCARCH)/include/asm/Kbuild
-+include $(kbuild-file)
++warning-2 := -Waggregate-return
++warning-2 += -Wcast-align
++warning-2 += -Wdisabled-optimization
++warning-2 += -Wnested-externs
++warning-2 += -Wshadow
++warning-2 += $(call cc-option, -Wlogical-op)
 +
-+include scripts/Kbuild.include
++warning-3 := -Wbad-function-cast
++warning-3 += -Wcast-qual
++warning-3 += -Wconversion
++warning-3 += -Wpacked
++warning-3 += -Wpadded
++warning-3 += -Wpointer-arith
++warning-3 += -Wredundant-decls
++warning-3 += -Wswitch-default
++warning-3 += $(call cc-option, -Wpacked-bitfield-compat)
++warning-3 += $(call cc-option, -Wvla)
 +
-+# Create output directory if not already present
-+_dummy := $(shell [ -d $(obj) ] || mkdir -p $(obj))
++warning := $(warning-$(KBUILD_ENABLE_EXTRA_GCC_CHECKS))
 +
-+quiet_cmd_wrap = WRAP    $@
-+cmd_wrap = echo "\#include <asm-generic/$*.h>" >$@
++ifeq ("$(warning)","")
++        $(error W=$(KBUILD_ENABLE_EXTRA_GCC_CHECKS) is unknown)
++endif
 +
-+all: $(patsubst %, $(obj)/%, $(generic-y))
-+
-+$(obj)/%.h:
-+	$(call cmd,wrap)
-+
-diff --git a/scripts/Makefile.headersinst b/scripts/Makefile.headersinst
-index f89cb87..7960b19 100644
---- a/scripts/Makefile.headersinst
-+++ b/scripts/Makefile.headersinst
-@@ -14,6 +14,7 @@ kbuild-file := $(srctree)/$(obj)/Kbuild
- include $(kbuild-file)
++KBUILD_CFLAGS += $(warning)
+ endif
  
- _dst := $(if $(destination-y),$(destination-y),$(_dst))
-+_src := $(srctree)/$(obj)
- 
- include scripts/Kbuild.include
- 
-@@ -27,10 +28,16 @@ header-y      := $(filter-out %/, $(header-y))
- install-file  := $(install)/.install
- check-file    := $(install)/.check
- 
-+# generic-y list all files an architecture uses from asm-generic
-+# Use this to build a list of headers which require a wrapper
-+wrapper-files := $(filter $(header-y), $(generic-y))
-+
- # all headers files for this dir
--all-files     := $(header-y) $(objhdr-y)
--input-files   := $(addprefix $(srctree)/$(obj)/,$(header-y)) \
-+header-y      := $(filter-out $(generic-y), $(header-y))
-+all-files     := $(header-y) $(objhdr-y) $(wrapper-files)
-+input-files   := $(addprefix $(_src)/,$(header-y)) \
-                  $(addprefix $(objtree)/$(obj)/,$(objhdr-y))
-+
- output-files  := $(addprefix $(install)/, $(all-files))
- 
- # Work out what needs to be removed
-@@ -47,8 +54,12 @@ quiet_cmd_install = INSTALL $(printdir) ($(words $(all-files))\
-       cmd_install = \
-         $(PERL) $< $(srctree)/$(obj) $(install) $(SRCARCH) $(header-y); \
-         $(PERL) $< $(objtree)/$(obj) $(install) $(SRCARCH) $(objhdr-y); \
-+        for F in $(wrapper-files); do                                   \
-+                echo "\#include <asm-generic/$$F>" > $(install)/$$F;    \
-+        done;                                                           \
-         touch $@
- 
-+
- quiet_cmd_remove = REMOVE  $(unwanted)
-       cmd_remove = rm -f $(unwanted-file)
- 
-@@ -69,7 +80,8 @@ __headersinst: $(subdirs) $(install-file)
- 	@:
- 
- targets += $(install-file)
--$(install-file): scripts/headers_install.pl $(input-files) FORCE
-+$(install-file): scripts/headers_install.pl \
-+                 $(input-files) FORCE
- 	$(if $(unwanted),$(call cmd,remove),)
- 	$(if $(wildcard $(dir $@)),,$(shell mkdir -p $(dir $@)))
- 	$(call if_changed,install)
+ include scripts/Makefile.lib
 -- 
-1.6.0.6
+1.7.5.rc1.16.g9db1
 
