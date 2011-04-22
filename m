@@ -1,162 +1,265 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.skyhub.de ([78.46.96.112]:41415 "EHLO mail.skyhub.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1756236Ab1DVRus (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 22 Apr 2011 13:50:48 -0400
-From: Borislav Petkov <bp@alien8.de>
-Subject: [PATCH v3.1] kbuild: implement several W= levels
-Date: Fri, 22 Apr 2011 19:50:42 +0200
-Message-Id: <1303494642-18594-1-git-send-email-bp@alien8.de>
-In-Reply-To: <20110422110947.GA20715@merkur.ravnborg.org>
-References: <20110422110947.GA20715@merkur.ravnborg.org>
+Received: from 75.98.165.80.static.a2webhosting.com ([75.98.165.80]:50655 "EHLO
+	greenroomsoftware.com" rhost-flags-OK-FAIL-OK-OK) by vger.kernel.org
+	with ESMTP id S1756413Ab1DVUYe (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 22 Apr 2011 16:24:34 -0400
+Message-ID: <4DB1E3FF.10009@greenroomsoftware.com>
+Date: Fri, 22 Apr 2011 13:24:31 -0700
+From: Robert Gordon <robert@greenroomsoftware.com>
+MIME-Version: 1.0
+Subject: Re: [PATCH] kbuild, deb-pkg: set host machine after dpkg-gencontrol
+References: <1302891806-10458-1-git-send-email-robert@greenroomsoftware.com> <20110417222945.GC14561@stro.at> <20110418160625.GA13973@vostochny.stro.at> <aa1e1ed259dba5b6db3c3516bab80eef@greenroomsoftware.com> <20110419143355.GC17786@vostochny.stro.at> <4DAF1952.4010206@greenroomsoftware.com>
+In-Reply-To: <4DAF1952.4010206@greenroomsoftware.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Borislav Petkov <bp@alien8.de>, Dave Jones <davej@redhat.com>
+To: maximilian attems <max@stro.at>
+Cc: linux-kbuild@vger.kernel.org, Robert Nelson <robertcnelson@gmail.com>
 
-From: Sam Ravnborg <sam@ravnborg.org>
+On 04/20/2011 10:35 AM, Robert Gordon wrote:
+> On 04/19/2011 07:33 AM, maximilian attems wrote:
+>> On Mon, Apr 18, 2011 at 03:28:28PM -0400, robert@greenroomsoftware.com wrote:
+>>> Here is the original 'make' command:
+>>> make ARCH=arm LOCALVERSION=-x1 CROSS_COMPILE=arm-linux-gnueabi-
+>>> KDEB_PKGVERSION=1.0cross deb-pkg
+>>>
+>>> Here is how it fails:
+>>> dpkg-gencontrol: error: current host architecture 'armel' does not
+>>> appear in package's architecture list (i386)
+>>> make[1]: *** [deb-pkg] Error 255
+>>> make: *** [deb-pkg] Error 2
+>>>
+>> did you check how it dpkg-gencontrol is called?
+>> just put an set -x on the top of builddeb.
+>>
+> Here is the output:
+> dpkg-gencontrol -isp -DArchitecture=armel -plinux-headers-2.6.38.2-x1
+> -P/opt/kernel_new/2.6-stable/KERNEL/debian/hdrtmp
+> dpkg-gencontrol: error: current host architecture 'armel' does not
+> appear in package's architecture list (i386)
+> make[1]: *** [deb-pkg] Error 255
+> make: *** [deb-pkg] Error 2
+> [2]+  Done                    gedit KERNEL/scripts/package/builddeb
+>
+>
+> The information in the debian/control file remains the same, i.e. it
+> seems to contain instructions to build headers for an i386.
+>
+> Regards,
+> Robert
 
-Building a kernel with "make W=1" produce far too much noise
-to be usefull.
 
-Divide the warning options in three groups:
+I have used the 2.6.39-rc4+ kernel to sort out the difficulties with
+building .deb packages for a non-x86 architecture.  I repeated the same
+steps four times:
+fakeroot make ARCH=[x86_64,arm] [CROSS_COMPILE=] deb-pkg
+cat debian/control
 
-    W=1 - warnings that may be relevant and does not occur too often
-    W=2 - warnings that occur quite often but may still be relevant
-    W=3 - the more obscure warnings, can most likely be ignored
+The four steps proceeded in this order:
+1) ARCH=x86_64, the patch I submitted was not applied - succeeded
+2) ARCH=x86_64, the patch I submitted was applied - failed
+3) ARCH=arm, the patched I submitted was applied - succeeded
+4) ARH=arm, the patched I submitted was removed - failed
 
-When building init/ on my box the levels produces:
+The problem appears to be in lines 43 & 44 of the latest patch I sent:
+x86_64)
+    debarch=amd64 ;;
 
-W=1 - 46 warnings
-W=2 - 863 warnings
-W=3 - 6496 warnings
+The debian arch for x86_64 is being set to amd64, which is getting
+written into the debian/control file prior to invocation of
+dpkg-gencontrol.  If my patch is not applied, i386 gets written into the
+debian/control file instead, and the x86_64 cross compile succeeds. 
+However, when my patch is not applied i386 is written into the
+debian/control file when cross compiling for arm, which leads to the
+script failing.  When my patch is applied, arm is written into the
+debian/control file, when cross compiling for arm, and this succeeds.
 
-Many warnings occur from .h files so fixing one file may have a nice
-effect on the total number of warnings.
+I will attempt to modify the debarch for x86_64 to remain x86_64 and see
+if that works.  If so, I'll submit a new patch.  The notes from what I
+have described so far are included below.
 
-With these changes I am actually tempted to try W=1 now and then.
-Previously there were just too much noise.
+Regards,
+Robert Gordon
 
-Borislav:
 
-- make the W= levels exclusive
-- move very noisy and making little sense for the kernel warnings to W=3
-- drop -Woverlength-strings due to useless warning message
-- copy explanatory text for the different warning levels to 'make help'
 
-Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
-Signed-off-by: Borislav Petkov <bp@alien8.de>
-Cc: Dave Jones <davej@redhat.com>
----
- Makefile               |    8 ++++-
- scripts/Makefile.build |   65 ++++++++++++++++++++++++++++--------------------
- 2 files changed, 44 insertions(+), 29 deletions(-)
+**********Using original /scripts/package/builddeb - succeeded ************
+fakeroot make ARCH=x86_64 deb-pkg
 
-diff --git a/Makefile b/Makefile
-index b967b96..17ce5d5 100644
---- a/Makefile
-+++ b/Makefile
-@@ -103,7 +103,7 @@ ifeq ("$(origin O)", "command line")
- endif
- 
- ifeq ("$(origin W)", "command line")
--  export KBUILD_ENABLE_EXTRA_GCC_CHECKS := 1
-+  export KBUILD_ENABLE_EXTRA_GCC_CHECKS := $(W)
- endif
- 
- # That's our default target when none is given on the command line
-@@ -1267,7 +1267,11 @@ help:
- 	@echo  '  make O=dir [targets] Locate all output files in "dir", including .config'
- 	@echo  '  make C=1   [targets] Check all c source with $$CHECK (sparse by default)'
- 	@echo  '  make C=2   [targets] Force check of all c source with $$CHECK'
--	@echo  '  make W=1   [targets] Enable extra gcc checks'
-+	@echo  '  make W=n   [targets] Enable extra gcc checks, n=1,2,3 where'
-+	@echo  '		1: warnings which may be relevant and do not occur too often'
-+	@echo  '		2: warnings which occur quite often but may still be relevant'
-+	@echo  '		3: more obscure warnings, can most likely be ignored'
-+
- 	@echo  ''
- 	@echo  'Execute "make" or "make all" to build all targets marked with [*] '
- 	@echo  'For further info see the ./README file'
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index d5f925a..ffb383c 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -51,36 +51,47 @@ ifeq ($(KBUILD_NOPEDANTIC),)
- endif
- 
- #
--# make W=1 settings
-+# make W=... settings
- #
--# $(call cc-option... ) handles gcc -W.. options which
-+# W=1 - warnings that may be relevant and does not occur too often
-+# W=2 - warnings that occur quite often but may still be relevant
-+# W=3 - the more obscure warnings, can most likely be ignored
-+#
-+# $(call cc-option, -W...) handles gcc -W.. options which
- # are not supported by all versions of the compiler
- ifdef KBUILD_ENABLE_EXTRA_GCC_CHECKS
--KBUILD_EXTRA_WARNINGS := -Wextra
--KBUILD_EXTRA_WARNINGS += -Wunused -Wno-unused-parameter
--KBUILD_EXTRA_WARNINGS += -Waggregate-return
--KBUILD_EXTRA_WARNINGS += -Wbad-function-cast
--KBUILD_EXTRA_WARNINGS += -Wcast-qual
--KBUILD_EXTRA_WARNINGS += -Wcast-align
--KBUILD_EXTRA_WARNINGS += -Wconversion
--KBUILD_EXTRA_WARNINGS += -Wdisabled-optimization
--KBUILD_EXTRA_WARNINGS += -Wlogical-op
--KBUILD_EXTRA_WARNINGS += -Wmissing-declarations
--KBUILD_EXTRA_WARNINGS += -Wmissing-format-attribute
--KBUILD_EXTRA_WARNINGS += $(call cc-option, -Wmissing-include-dirs,)
--KBUILD_EXTRA_WARNINGS += -Wmissing-prototypes
--KBUILD_EXTRA_WARNINGS += -Wnested-externs
--KBUILD_EXTRA_WARNINGS += -Wold-style-definition
--KBUILD_EXTRA_WARNINGS += $(call cc-option, -Woverlength-strings,)
--KBUILD_EXTRA_WARNINGS += -Wpacked
--KBUILD_EXTRA_WARNINGS += -Wpacked-bitfield-compat
--KBUILD_EXTRA_WARNINGS += -Wpadded
--KBUILD_EXTRA_WARNINGS += -Wpointer-arith
--KBUILD_EXTRA_WARNINGS += -Wredundant-decls
--KBUILD_EXTRA_WARNINGS += -Wshadow
--KBUILD_EXTRA_WARNINGS += -Wswitch-default
--KBUILD_EXTRA_WARNINGS += $(call cc-option, -Wvla,)
--KBUILD_CFLAGS += $(KBUILD_EXTRA_WARNINGS)
-+warning-1 := -Wextra -Wunused -Wno-unused-parameter
-+warning-1 += -Wmissing-declarations
-+warning-1 += -Wmissing-format-attribute
-+warning-1 += -Wmissing-prototypes
-+warning-1 += -Wold-style-definition
-+warning-1 += $(call cc-option, -Wmissing-include-dirs)
-+
-+warning-2 := -Waggregate-return
-+warning-2 += -Wcast-align
-+warning-2 += -Wdisabled-optimization
-+warning-2 += -Wnested-externs
-+warning-2 += -Wshadow
-+warning-2 += $(call cc-option, -Wlogical-op)
-+
-+warning-3 := -Wbad-function-cast
-+warning-3 += -Wcast-qual
-+warning-3 += -Wconversion
-+warning-3 += -Wpacked
-+warning-3 += -Wpadded
-+warning-3 += -Wpointer-arith
-+warning-3 += -Wredundant-decls
-+warning-3 += -Wswitch-default
-+warning-3 += $(call cc-option, -Wpacked-bitfield-compat)
-+warning-3 += $(call cc-option, -Wvla)
-+
-+warning := $(warning-$(KBUILD_ENABLE_EXTRA_GCC_CHECKS))
-+
-+ifeq ("$(warning)","")
-+        $(error W=$(KBUILD_ENABLE_EXTRA_GCC_CHECKS) is unknown)
-+endif
-+
-+KBUILD_CFLAGS += $(warning)
- endif
- 
- include scripts/Makefile.lib
--- 
-1.7.5.rc1.16.g9db1
++ dpkg-gencontrol -isp -DArchitecture=amd64 -plinux-headers-2.6.39-rc4+
+-P/opt/kernel-linus/linux-2.6/debian/hdrtmp
++ dpkg-gencontrol -isp -DArchitecture=amd64 -plinux-firmware-image
+-P/opt/kernel-linus/linux-2.6/debian/fwtmp
++ dpkg-gencontrol -isp -DArchitecture=amd64 -plinux-libc-dev
+-P/opt/kernel-linus/linux-2.6/debian/headertmp
++ dpkg-gencontrol -isp -DArchitecture=amd64 -plinux-image-2.6.39-rc4+
+-P/opt/kernel-linus/linux-2.6/debian/tmp
+
+cat debian/control
+Source: linux-upstream
+Section: kernel
+Priority: optional
+Maintainer: Anonymous <root@robert-VGN-Z690Y>
+Standards-Version: 3.8.4
+Homepage: http://www.kernel.org/
+
+Package: linux-image-2.6.39-rc4+
+Provides: linux-image, linux-image-2.6, linux-modules-2.6.39-rc4+
+Suggests: linux-firmware-image
+Architecture: any
+Description: Linux kernel, version 2.6.39-rc4+
+ This package contains the Linux kernel, modules and corresponding other
+ files, version: 2.6.39-rc4+.
+
+Package: linux-headers-2.6.39-rc4+
+Provides: linux-headers, linux-headers-2.6
+Architecture: i386
+Description: Linux kernel headers for 2.6.39-rc4+ on i386
+ This package provides kernel header files for 2.6.39-rc4+ on i386
+ .
+ This is useful for people who need to build external modules
+
+Package: linux-firmware-image
+Architecture: all
+Description: Linux kernel firmware, version 2.6.39-rc4+
+ This package contains firmware from the Linux kernel, version 2.6.39-rc4+.
+
+Package: linux-libc-dev
+Section: devel
+Provides: linux-kernel-headers
+Architecture: any
+Description: Linux support headers for userspace development
+ This package provides userspaces headers from the Linux kernel.  These
+headers
+ are used by the installed headers for GNU glibc and other system libraries.
+
+
+
+**********Using patched /scripts/package/builddeb - failed ************
+patch -p1 < builddeb.patch
+fakeroot make ARCH=x86_64 deb-pkg
+
++ dpkg-gencontrol -isp -DArchitecture=amd64 -plinux-headers-2.6.39-rc4+
+-P/opt/kernel-linus/linux-2.6/debian/hdrtmp
+dpkg-gencontrol: error: current host architecture 'i386' does not appear
+in package's architecture list (amd64)
+make[1]: *** [deb-pkg] Error 255
+make: *** [deb-pkg] Error 2
+
+cat debian/control
+Source: linux-upstream
+Section: kernel
+Priority: optional
+Maintainer: Anonymous <root@robert-VGN-Z690Y>
+Standards-Version: 3.8.4
+Homepage: http://www.kernel.org/
+
+Package: linux-image-2.6.39-rc4+
+Provides: linux-image, linux-image-2.6, linux-modules-2.6.39-rc4+
+Suggests: linux-firmware-image
+Architecture: any
+Description: Linux kernel, version 2.6.39-rc4+
+ This package contains the Linux kernel, modules and corresponding other
+ files, version: 2.6.39-rc4+.
+
+Package: linux-headers-2.6.39-rc4+
+Provides: linux-headers, linux-headers-2.6
+Architecture: amd64
+Description: Linux kernel headers for 2.6.39-rc4+ on amd64
+ This package provides kernel header files for 2.6.39-rc4+ on amd64
+ .
+ This is useful for people who need to build external modules
+
+
+
+**********Using patched /scripts/package/builddeb - succeeded ************
+fakeroot make ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- deb-pkg
+
++ dpkg-gencontrol -isp -DArchitecture=armel -plinux-headers-2.6.39-rc4+
+-P/opt/kernel-linus/linux-2.6/debian/hdrtmp
++ dpkg-gencontrol -isp -DArchitecture=armel -plinux-firmware-image
+-P/opt/kernel-linus/linux-2.6/debian/fwtmp
++ dpkg-gencontrol -isp -DArchitecture=armel -plinux-libc-dev
+-P/opt/kernel-linus/linux-2.6/debian/headertmp
++ dpkg-gencontrol -isp -DArchitecture=armel -plinux-image-2.6.39-rc4+
+-P/opt/kernel-linus/linux-2.6/debian/tmp
+
+cat debian/control
+Source: linux-upstream
+Section: kernel
+Priority: optional
+Maintainer: Anonymous <root@robert-VGN-Z690Y>
+Standards-Version: 3.8.4
+Homepage: http://www.kernel.org/
+
+Package: linux-image-2.6.39-rc4+
+Provides: linux-image, linux-image-2.6, linux-modules-2.6.39-rc4+
+Suggests: linux-firmware-image
+Architecture: any
+Description: Linux kernel, version 2.6.39-rc4+
+ This package contains the Linux kernel, modules and corresponding other
+ files, version: 2.6.39-rc4+.
+
+Package: linux-headers-2.6.39-rc4+
+Provides: linux-headers, linux-headers-2.6
+Architecture: armel
+Description: Linux kernel headers for 2.6.39-rc4+ on armel
+ This package provides kernel header files for 2.6.39-rc4+ on armel
+ .
+ This is useful for people who need to build external modules
+
+Package: linux-firmware-image
+Architecture: all
+Description: Linux kernel firmware, version 2.6.39-rc4+
+ This package contains firmware from the Linux kernel, version 2.6.39-rc4+.
+
+Package: linux-libc-dev
+Section: devel
+Provides: linux-kernel-headers
+Architecture: any
+Description: Linux support headers for userspace development
+ This package provides userspaces headers from the Linux kernel.  These
+headers
+ are used by the installed headers for GNU glibc and other system libraries.
+
+
+**********Using original /scripts/package/builddeb - failed ************
+fakeroot make ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- deb-pkg
+
++ dpkg-gencontrol -isp -DArchitecture=armel -plinux-headers-2.6.39-rc4+
+-P/opt/kernel-linus/linux-2.6/debian/hdrtmp
+dpkg-gencontrol: error: current host architecture 'armel' does not
+appear in package's architecture list (i386)
+make[1]: *** [deb-pkg] Error 255
+make: *** [deb-pkg] Error 2
+
+cat debian/control
+Source: linux-upstream
+Section: kernel
+Priority: optional
+Maintainer: Anonymous <root@robert-VGN-Z690Y>
+Standards-Version: 3.8.4
+Homepage: http://www.kernel.org/
+
+Package: linux-image-2.6.39-rc4+
+Provides: linux-image, linux-image-2.6, linux-modules-2.6.39-rc4+
+Suggests: linux-firmware-image
+Architecture: any
+Description: Linux kernel, version 2.6.39-rc4+
+ This package contains the Linux kernel, modules and corresponding other
+ files, version: 2.6.39-rc4+.
+
+Package: linux-headers-2.6.39-rc4+
+Provides: linux-headers, linux-headers-2.6
+Architecture: i386
+Description: Linux kernel headers for 2.6.39-rc4+ on i386
+ This package provides kernel header files for 2.6.39-rc4+ on i386
+ .
+ This is useful for people who need to build external modules
+
+
+
+
 
