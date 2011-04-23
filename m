@@ -1,265 +1,86 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from 75.98.165.80.static.a2webhosting.com ([75.98.165.80]:50655 "EHLO
-	greenroomsoftware.com" rhost-flags-OK-FAIL-OK-OK) by vger.kernel.org
-	with ESMTP id S1756413Ab1DVUYe (ORCPT
+Received: from shadbolt.e.decadent.org.uk ([88.96.1.126]:59803 "EHLO
+	shadbolt.e.decadent.org.uk" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751805Ab1DWRnE (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 22 Apr 2011 16:24:34 -0400
-Message-ID: <4DB1E3FF.10009@greenroomsoftware.com>
-Date: Fri, 22 Apr 2011 13:24:31 -0700
-From: Robert Gordon <robert@greenroomsoftware.com>
-MIME-Version: 1.0
-Subject: Re: [PATCH] kbuild, deb-pkg: set host machine after dpkg-gencontrol
-References: <1302891806-10458-1-git-send-email-robert@greenroomsoftware.com> <20110417222945.GC14561@stro.at> <20110418160625.GA13973@vostochny.stro.at> <aa1e1ed259dba5b6db3c3516bab80eef@greenroomsoftware.com> <20110419143355.GC17786@vostochny.stro.at> <4DAF1952.4010206@greenroomsoftware.com>
-In-Reply-To: <4DAF1952.4010206@greenroomsoftware.com>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+	Sat, 23 Apr 2011 13:43:04 -0400
+From: Ben Hutchings <ben@decadent.org.uk>
+Content-Type: multipart/signed; micalg="pgp-sha512"; protocol="application/pgp-signature"; boundary="=-PFyylESL2kTOmTCiUDZW"
+Date: Sat, 23 Apr 2011 18:42:56 +0100
+Message-ID: <1303580576.4815.3.camel@localhost>
+Mime-Version: 1.0
+Subject: [PATCH] kconfig: Avoid buffer underrun in choice input
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: maximilian attems <max@stro.at>
-Cc: linux-kbuild@vger.kernel.org, Robert Nelson <robertcnelson@gmail.com>
-
-On 04/20/2011 10:35 AM, Robert Gordon wrote:
-> On 04/19/2011 07:33 AM, maximilian attems wrote:
->> On Mon, Apr 18, 2011 at 03:28:28PM -0400, robert@greenroomsoftware.com wrote:
->>> Here is the original 'make' command:
->>> make ARCH=arm LOCALVERSION=-x1 CROSS_COMPILE=arm-linux-gnueabi-
->>> KDEB_PKGVERSION=1.0cross deb-pkg
->>>
->>> Here is how it fails:
->>> dpkg-gencontrol: error: current host architecture 'armel' does not
->>> appear in package's architecture list (i386)
->>> make[1]: *** [deb-pkg] Error 255
->>> make: *** [deb-pkg] Error 2
->>>
->> did you check how it dpkg-gencontrol is called?
->> just put an set -x on the top of builddeb.
->>
-> Here is the output:
-> dpkg-gencontrol -isp -DArchitecture=armel -plinux-headers-2.6.38.2-x1
-> -P/opt/kernel_new/2.6-stable/KERNEL/debian/hdrtmp
-> dpkg-gencontrol: error: current host architecture 'armel' does not
-> appear in package's architecture list (i386)
-> make[1]: *** [deb-pkg] Error 255
-> make: *** [deb-pkg] Error 2
-> [2]+  Done                    gedit KERNEL/scripts/package/builddeb
->
->
-> The information in the debian/control file remains the same, i.e. it
-> seems to contain instructions to build headers for an i386.
->
-> Regards,
-> Robert
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: LKML <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org, Roman Zippel <zippel@linux-m68k.org>
 
 
-I have used the 2.6.39-rc4+ kernel to sort out the difficulties with
-building .deb packages for a non-x86 architecture.  I repeated the same
-steps four times:
-fakeroot make ARCH=[x86_64,arm] [CROSS_COMPILE=] deb-pkg
-cat debian/control
+--=-PFyylESL2kTOmTCiUDZW
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The four steps proceeded in this order:
-1) ARCH=x86_64, the patch I submitted was not applied - succeeded
-2) ARCH=x86_64, the patch I submitted was applied - failed
-3) ARCH=arm, the patched I submitted was applied - succeeded
-4) ARH=arm, the patched I submitted was removed - failed
+commit 40aee729b350672c2550640622416a855e27938f ('kconfig: fix default
+value for choice input') fixed some cases where kconfig would select
+the wrong option from a choice with a single valid option and thus
+enter an infinite loop.
 
-The problem appears to be in lines 43 & 44 of the latest patch I sent:
-x86_64)
-    debarch=amd64 ;;
+However, this broke the test for user input of the form 'N?', because
+when kconfig selects the single valid option the input is zero-length
+and the test will read the byte before the input buffer.  If this
+happens to contain '?' (as it will in a mips build on Debian unstable
+today) then kconfig again enters an infinite loop.
 
-The debian arch for x86_64 is being set to amd64, which is getting
-written into the debian/control file prior to invocation of
-dpkg-gencontrol.  If my patch is not applied, i386 gets written into the
-debian/control file instead, and the x86_64 cross compile succeeds. 
-However, when my patch is not applied i386 is written into the
-debian/control file when cross compiling for arm, which leads to the
-script failing.  When my patch is applied, arm is written into the
-debian/control file, when cross compiling for arm, and this succeeds.
+Signed-off-by: Ben Hutchings <ben@decadent.org.uk>
+Cc: stable@kernel.org [2.6.17+]
+---
+Roman has failed to respond to this after 5 weeks and one reminder, so
+please take it directly.
 
-I will attempt to modify the debarch for x86_64 to remain x86_64 and see
-if that works.  If so, I'll submit a new patch.  The notes from what I
-have described so far are included below.
+Ben.
 
-Regards,
-Robert Gordon
+ scripts/kconfig/conf.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-
-
-**********Using original /scripts/package/builddeb - succeeded ************
-fakeroot make ARCH=x86_64 deb-pkg
-
-+ dpkg-gencontrol -isp -DArchitecture=amd64 -plinux-headers-2.6.39-rc4+
--P/opt/kernel-linus/linux-2.6/debian/hdrtmp
-+ dpkg-gencontrol -isp -DArchitecture=amd64 -plinux-firmware-image
--P/opt/kernel-linus/linux-2.6/debian/fwtmp
-+ dpkg-gencontrol -isp -DArchitecture=amd64 -plinux-libc-dev
--P/opt/kernel-linus/linux-2.6/debian/headertmp
-+ dpkg-gencontrol -isp -DArchitecture=amd64 -plinux-image-2.6.39-rc4+
--P/opt/kernel-linus/linux-2.6/debian/tmp
-
-cat debian/control
-Source: linux-upstream
-Section: kernel
-Priority: optional
-Maintainer: Anonymous <root@robert-VGN-Z690Y>
-Standards-Version: 3.8.4
-Homepage: http://www.kernel.org/
-
-Package: linux-image-2.6.39-rc4+
-Provides: linux-image, linux-image-2.6, linux-modules-2.6.39-rc4+
-Suggests: linux-firmware-image
-Architecture: any
-Description: Linux kernel, version 2.6.39-rc4+
- This package contains the Linux kernel, modules and corresponding other
- files, version: 2.6.39-rc4+.
-
-Package: linux-headers-2.6.39-rc4+
-Provides: linux-headers, linux-headers-2.6
-Architecture: i386
-Description: Linux kernel headers for 2.6.39-rc4+ on i386
- This package provides kernel header files for 2.6.39-rc4+ on i386
- .
- This is useful for people who need to build external modules
-
-Package: linux-firmware-image
-Architecture: all
-Description: Linux kernel firmware, version 2.6.39-rc4+
- This package contains firmware from the Linux kernel, version 2.6.39-rc4+.
-
-Package: linux-libc-dev
-Section: devel
-Provides: linux-kernel-headers
-Architecture: any
-Description: Linux support headers for userspace development
- This package provides userspaces headers from the Linux kernel.  These
-headers
- are used by the installed headers for GNU glibc and other system libraries.
-
-
-
-**********Using patched /scripts/package/builddeb - failed ************
-patch -p1 < builddeb.patch
-fakeroot make ARCH=x86_64 deb-pkg
-
-+ dpkg-gencontrol -isp -DArchitecture=amd64 -plinux-headers-2.6.39-rc4+
--P/opt/kernel-linus/linux-2.6/debian/hdrtmp
-dpkg-gencontrol: error: current host architecture 'i386' does not appear
-in package's architecture list (amd64)
-make[1]: *** [deb-pkg] Error 255
-make: *** [deb-pkg] Error 2
-
-cat debian/control
-Source: linux-upstream
-Section: kernel
-Priority: optional
-Maintainer: Anonymous <root@robert-VGN-Z690Y>
-Standards-Version: 3.8.4
-Homepage: http://www.kernel.org/
-
-Package: linux-image-2.6.39-rc4+
-Provides: linux-image, linux-image-2.6, linux-modules-2.6.39-rc4+
-Suggests: linux-firmware-image
-Architecture: any
-Description: Linux kernel, version 2.6.39-rc4+
- This package contains the Linux kernel, modules and corresponding other
- files, version: 2.6.39-rc4+.
-
-Package: linux-headers-2.6.39-rc4+
-Provides: linux-headers, linux-headers-2.6
-Architecture: amd64
-Description: Linux kernel headers for 2.6.39-rc4+ on amd64
- This package provides kernel header files for 2.6.39-rc4+ on amd64
- .
- This is useful for people who need to build external modules
-
-
-
-**********Using patched /scripts/package/builddeb - succeeded ************
-fakeroot make ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- deb-pkg
-
-+ dpkg-gencontrol -isp -DArchitecture=armel -plinux-headers-2.6.39-rc4+
--P/opt/kernel-linus/linux-2.6/debian/hdrtmp
-+ dpkg-gencontrol -isp -DArchitecture=armel -plinux-firmware-image
--P/opt/kernel-linus/linux-2.6/debian/fwtmp
-+ dpkg-gencontrol -isp -DArchitecture=armel -plinux-libc-dev
--P/opt/kernel-linus/linux-2.6/debian/headertmp
-+ dpkg-gencontrol -isp -DArchitecture=armel -plinux-image-2.6.39-rc4+
--P/opt/kernel-linus/linux-2.6/debian/tmp
-
-cat debian/control
-Source: linux-upstream
-Section: kernel
-Priority: optional
-Maintainer: Anonymous <root@robert-VGN-Z690Y>
-Standards-Version: 3.8.4
-Homepage: http://www.kernel.org/
-
-Package: linux-image-2.6.39-rc4+
-Provides: linux-image, linux-image-2.6, linux-modules-2.6.39-rc4+
-Suggests: linux-firmware-image
-Architecture: any
-Description: Linux kernel, version 2.6.39-rc4+
- This package contains the Linux kernel, modules and corresponding other
- files, version: 2.6.39-rc4+.
-
-Package: linux-headers-2.6.39-rc4+
-Provides: linux-headers, linux-headers-2.6
-Architecture: armel
-Description: Linux kernel headers for 2.6.39-rc4+ on armel
- This package provides kernel header files for 2.6.39-rc4+ on armel
- .
- This is useful for people who need to build external modules
-
-Package: linux-firmware-image
-Architecture: all
-Description: Linux kernel firmware, version 2.6.39-rc4+
- This package contains firmware from the Linux kernel, version 2.6.39-rc4+.
-
-Package: linux-libc-dev
-Section: devel
-Provides: linux-kernel-headers
-Architecture: any
-Description: Linux support headers for userspace development
- This package provides userspaces headers from the Linux kernel.  These
-headers
- are used by the installed headers for GNU glibc and other system libraries.
-
-
-**********Using original /scripts/package/builddeb - failed ************
-fakeroot make ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- deb-pkg
-
-+ dpkg-gencontrol -isp -DArchitecture=armel -plinux-headers-2.6.39-rc4+
--P/opt/kernel-linus/linux-2.6/debian/hdrtmp
-dpkg-gencontrol: error: current host architecture 'armel' does not
-appear in package's architecture list (i386)
-make[1]: *** [deb-pkg] Error 255
-make: *** [deb-pkg] Error 2
-
-cat debian/control
-Source: linux-upstream
-Section: kernel
-Priority: optional
-Maintainer: Anonymous <root@robert-VGN-Z690Y>
-Standards-Version: 3.8.4
-Homepage: http://www.kernel.org/
-
-Package: linux-image-2.6.39-rc4+
-Provides: linux-image, linux-image-2.6, linux-modules-2.6.39-rc4+
-Suggests: linux-firmware-image
-Architecture: any
-Description: Linux kernel, version 2.6.39-rc4+
- This package contains the Linux kernel, modules and corresponding other
- files, version: 2.6.39-rc4+.
-
-Package: linux-headers-2.6.39-rc4+
-Provides: linux-headers, linux-headers-2.6
-Architecture: i386
-Description: Linux kernel headers for 2.6.39-rc4+ on i386
- This package provides kernel header files for 2.6.39-rc4+ on i386
- .
- This is useful for people who need to build external modules
+diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
+index 659326c..006ad81 100644
+--- a/scripts/kconfig/conf.c
++++ b/scripts/kconfig/conf.c
+@@ -332,7 +332,7 @@ static int conf_choice(struct menu *menu)
+ 		}
+ 		if (!child)
+ 			continue;
+-		if (line[strlen(line) - 1] =3D=3D '?') {
++		if (line[0] && line[strlen(line) - 1] =3D=3D '?') {
+ 			print_help(child);
+ 			continue;
+ 		}
+--=20
+1.7.4.1
 
 
 
 
+--=-PFyylESL2kTOmTCiUDZW
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part
 
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iQIVAwUATbMPoOe/yOyVhhEJAQrIvQ//bGdWG9l8DHhEK+NnEYx/g5fz1MVmWdmI
+rMmRoJPSIww0ANnAW/GpKVAnbGRWfqIfTdVOiLhERts2UVEyhjXZFJl1eyc1aXlh
+9SkyMyXBJPUSFNUiiCoKCoFHBEah6SO6tjPCwezTVxTylS/LuyCOdPwwnXaDOYcn
+1Iwn3VaUQlhfOJG3Y4+xlDqgAXu6DYTcAwhpZmRkPpIdy/QOjNcKYi5wOwsIY5VZ
+BSdEdWein6u0M9ocyr7aEM0CDG2heNN4Y72KjYRYEHS7sPX3Qd0mH+sfjRTQ22dP
+cw98jVKje61ZwPXrIkA5PCnkYppzb7IC3EEmWuZ9IM/5CL9jSk/SlAb1FTCc0HUu
+f9qQXUZVJ+BaRxUgWHWsV6b+M6y6bPwQEWooV/sD12UscPlZGABymtuX/3g8Hz0+
+j2MPVmjnVQtaNcNj3eBbkOm+W0W6il+eNriBA1eXe8eScik8h+TxIvTBth72vuY2
+Hplzu2o7+ziIczvHmbwkKyCnzdrRbAXta5iBLPhS2ZUib+fwVpjEX+u0EM+ALNrq
+wH3ppy5tBVk5j9sbPnHjeTA1tMPdUPoaZZIYVmLjTW6YOCBVacaDG+P13rexkvMd
+3HvLqDF8ONFxBlbLms1acrXauNRkhaLNWpbY/wn8ObnyYrlrU2MX43mL/9xzwGqw
+I2zd2y9csHQ=
+=lBc1
+-----END PGP SIGNATURE-----
+
+--=-PFyylESL2kTOmTCiUDZW--
