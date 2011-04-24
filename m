@@ -1,48 +1,54 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-fx0-f46.google.com ([209.85.161.46]:53708 "EHLO
-	mail-fx0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755186Ab1DXIkB convert rfc822-to-8bit (ORCPT
+Received: from nd215.dnsexit.com ([64.182.102.215]:46298 "EHLO
+	box7.911domain.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1757624Ab1DXUTR (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 24 Apr 2011 04:40:01 -0400
+	Sun, 24 Apr 2011 16:19:17 -0400
+Message-ID: <4DB4832E.6080009@verizon.net>
+Date: Sun, 24 Apr 2011 16:08:14 -0400
+From: Peter Foley <pefoley2@verizon.net>
+Reply-To: <pefoley2@verizon.net>
 MIME-Version: 1.0
-In-Reply-To: <1303617721.3032.88.camel@localhost>
-References: <1303580576.4815.3.camel@localhost>
-	<20110423180450.GB25379@merkur.ravnborg.org>
-	<1303617721.3032.88.camel@localhost>
-Date: Sun, 24 Apr 2011 10:39:59 +0200
-Message-ID: <BANLkTin8p3B=hE1gdw=7V=d3RdSFifyVPQ@mail.gmail.com>
-Subject: Re: [PATCH] kconfig: Avoid buffer underrun in choice input
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+Subject: [PATCH] kbuild: allow headerdep to work in KBUILD_OUTPUT and add
+ targets to PHONY
+Content-Type: text/plain; charset="ISO-8859-1"
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ben Hutchings <ben@decadent.org.uk>
-Cc: Sam Ravnborg <sam@ravnborg.org>, Michal Marek <mmarek@suse.cz>, Linus Torvalds <torvalds@linux-foundation.org>, LKML <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org, Roman Zippel <zippel@linux-m68k.org>
+To: linux-kernel@vger.kernel.org
+Cc: linux-kbuild@vger.kernel.org, mmarek@suse.cz
 
-On Sun, Apr 24, 2011 at 06:02, Ben Hutchings <ben@decadent.org.uk> wrote:
-> On Sat, 2011-04-23 at 20:04 +0200, Sam Ravnborg wrote:
->> On Sat, Apr 23, 2011 at 06:42:56PM +0100, Ben Hutchings wrote:
->> > Roman has failed to respond to this after 5 weeks and one reminder, so
->> > please take it directly.
->>
->> No-one has heard from Roman Zippel in several years.
->> I have suggested Michal Marek to take over the maintainer
->> role - as he in practice is the kconfig maintainer.
->
-> Can someone please update MAINTAINERS then?  What is the point of it if
-> people don't update it for years?
+This patch fixes the headerdep target so it will work when make is executed from KBUILD_OUTPUT.
+It also adds a few targets to PHONY so they are always executed.
 
-I have removed him from AFFS, HFS, and m68k.
-I left the kbuild entry for the kbuild people.
+Signed-off-by: Peter Foley <pefoley2@verizon.net>
+---
+ Makefile |    5 ++++-
+ 1 files changed, 4 insertions(+), 1 deletions(-)
 
-Gr{oetje,eeting}s,
+diff --git a/Makefile b/Makefile
+index b967b96..093c9d2 100644
+--- a/Makefile
++++ b/Makefile
+@@ -991,7 +991,8 @@ include/generated/utsrelease.h: include/config/kernel.release FORCE
+ 
+ PHONY += headerdep
+ headerdep:
+-	$(Q)find include/ -name '*.h' | xargs --max-args 1 scripts/headerdep.pl
++	$(Q)find $(srctree)/include/ -name '*.h' | xargs --max-args 1 \
++	$(srctree)/scripts/headerdep.pl -I$(srctree)/include
+ 
+ # ---------------------------------------------------------------------------
+ 
+@@ -1392,6 +1393,8 @@ tags TAGS cscope gtags: FORCE
+ # Scripts to check various things for consistency
+ # ---------------------------------------------------------------------------
+ 
++PHONY += includecheck versioncheck coccicheck namespacecheck export_report
++
+ includecheck:
+ 	find * $(RCS_FIND_IGNORE) \
+ 		-name '*.[hcS]' -type f -print | sort \
+-- 
+1.7.5.rc1
 
-                        Geert
-
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
