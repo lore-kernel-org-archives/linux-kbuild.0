@@ -1,45 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ww0-f42.google.com ([74.125.82.42]:61904 "EHLO
-	mail-ww0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1758275Ab1DYMfY (ORCPT
+Received: from nd215.dnsexit.com ([64.182.102.215]:42755 "EHLO
+	box7.911domain.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1757735Ab1DYXu4 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 25 Apr 2011 08:35:24 -0400
-Received: by wwk4 with SMTP id 4so1288240wwk.1
-        for <linux-kbuild@vger.kernel.org>; Mon, 25 Apr 2011 05:35:23 -0700 (PDT)
-Message-ID: <4DB56A89.6060204@gmail.com>
-Date: Mon, 25 Apr 2011 13:35:21 +0100
-From: Marcin Nowakowski <marcin.nowakowski.000@gmail.com>
+	Mon, 25 Apr 2011 19:50:56 -0400
+Message-ID: <4DB608B1.9020201@verizon.net>
+Date: Mon, 25 Apr 2011 19:50:09 -0400
+From: Peter Foley <pefoley2@verizon.net>
+Reply-To: <pefoley2@verizon.net>
 MIME-Version: 1.0
-Subject: [PATCH V2] Fix handling of backlash character in LINUX_COMPILE_BY
- name
-References: <4D9B63B2.1080701@gmail.com>
-In-Reply-To: <4D9B63B2.1080701@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Subject: [PATCH] kbuild: allow includecheck and versioncheck to work in KBUILD_OUTPUT
+Content-Type: text/plain; charset="ISO-8859-1"
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
+To: linux-kernel@vger.kernel.org
+Cc: linux-kbuild@vger.kernel.org, mmarek@suse.cz
 
-When using a domain login, `whoami` returns the login in
-user\domain format. This leads to either warnings on unrecognised
-escape sequences or escaped characters being generated for the user.
-This patch ensures that any backslash is escaped to a double-backslash
-to make sure the name is preserved correctly. This patch does not
-enforce escaping on the KBUILD_BUILD_USER variable, as this is something
-the user has control of and can escape if required.
-V2 simplifies a very complex escape pattern introduced initially.
+This patch changes the includecheck and versioncheck targets
+so they will work when make is run from KBUILD_OUTDIR.
 
-Signed-off-by: Marcin Nowakowski <marcin.nowakowski.000@gmail.com>
-diff --git a/scripts/mkcompile_h b/scripts/mkcompile_h
-index 7ad6bf7..f221ddf 100755
---- a/scripts/mkcompile_h
-+++ b/scripts/mkcompile_h
-@@ -43,7 +43,7 @@ else
-  	TIMESTAMP=$KBUILD_BUILD_TIMESTAMP
-  fi
-  if test -z "$KBUILD_BUILD_USER"; then
--	LINUX_COMPILE_BY=`whoami`
-+	LINUX_COMPILE_BY=$(whoami | sed 's/\\/\\\\/')
-  else
-  	LINUX_COMPILE_BY=$KBUILD_BUILD_USER
-  fi
+Signed-off-by: Peter Foley <pefoley2@verizon.net>
+---
+ Makefile |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 2a5159a..a105395 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1395,12 +1395,12 @@ tags TAGS cscope gtags: FORCE
+ PHONY += includecheck versioncheck coccicheck namespacecheck export_report
+  includecheck:
+-	find * $(RCS_FIND_IGNORE) \
++	find $(srctree)/* $(RCS_FIND_IGNORE) \
+ 		-name '*.[hcS]' -type f -print | sort \
+ 		| xargs $(PERL) -w $(srctree)/scripts/checkincludes.pl
+  versioncheck:
+-	find * $(RCS_FIND_IGNORE) \
++	find $(srctree)/* $(RCS_FIND_IGNORE) \
+ 		-name '*.[hcS]' -type f -print | sort \
+ 		| xargs $(PERL) -w $(srctree)/scripts/checkversion.pl
+ -- 1.7.5.rc1
+
