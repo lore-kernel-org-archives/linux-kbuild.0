@@ -1,16 +1,16 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from nd215.dnsexit.com ([64.182.102.215]:58548 "EHLO
+Received: from nd215.dnsexit.com ([64.182.102.215]:58690 "EHLO
 	box7.911domain.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1759032Ab1DZWp5 (ORCPT
+	with ESMTP id S1759037Ab1DZWq2 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 26 Apr 2011 18:45:57 -0400
-Message-ID: <4DB74AFB.6080404@verizon.net>
-Date: Tue, 26 Apr 2011 18:45:15 -0400
+	Tue, 26 Apr 2011 18:46:28 -0400
+Message-ID: <4DB74B1B.3000100@verizon.net>
+Date: Tue, 26 Apr 2011 18:45:47 -0400
 From: Peter Foley <pefoley2@verizon.net>
 Reply-To: <pefoley2@verizon.net>
 MIME-Version: 1.0
-Subject: [PATCH V2 3/7] kbuild: change gconf to modify hostprogs-y like nconf
- and mconf
+Subject: [PATCH V2 6/7] kbuild: change update-po-config to reflect new layout
+ of arch/um
 Content-Type: text/plain; charset="ISO-8859-1"
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -18,37 +18,35 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org
 Cc: linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Arnaud Lacombe <lacombar@gmail.com>
 
-This patch makes gconf more like nconf and mconf
-by modifying hostprogs insted of gconf-objs.
+This patch changes update-po-config to reflect the new layout of arch/um.
 
 Signed-off-by: Peter Foley <pefoley2@verizon.net>
 ---
- scripts/kconfig/Makefile |    5 +++--
- 1 files changed, 3 insertions(+), 2 deletions(-)
+ scripts/kconfig/Makefile |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
-index b0b3dcb..74d9512 100644
+index 4507336..0674e78 100644
 --- a/scripts/kconfig/Makefile
 +++ b/scripts/kconfig/Makefile
-@@ -170,8 +170,9 @@ nconf-objs     := nconf.o zconf.tab.o nconf.gui.o
- kxgettext-objs	:= kxgettext.o zconf.tab.o
- qconf-cxxobjs	:= qconf.o
- qconf-objs	:= kconfig_load.o zconf.tab.o
-+gconf-objs	:= gconf.o kconfig_load.o zconf.tab.o
+@@ -84,7 +84,7 @@ update-po-config: $(obj)/kxgettext $(obj)/gconf.glade.h
+ 	    --directory=$(srctree) --directory=$(objtree)           \
+ 	    --output $(obj)/config.pot
+ 	$(Q)sed -i s/CHARSET/UTF-8/ $(obj)/config.pot
+-	$(Q)ln -fs Kconfig.i386 arch/um/Kconfig.arch
++	$(Q)ln -fs Kconfig.x86 arch/um/Kconfig
+ 	$(Q)(for i in `ls $(srctree)/arch/*/Kconfig`;    \
+ 	    do                                           \
+ 		echo "  GEN $$i";                        \
+@@ -93,7 +93,7 @@ update-po-config: $(obj)/kxgettext $(obj)/gconf.glade.h
+ 	    done )
+ 	$(Q)msguniq --sort-by-file --to-code=UTF-8 $(obj)/config.pot \
+ 	    --output $(obj)/linux.pot
+-	$(Q)rm -f $(srctree)/arch/um/Kconfig.arch
++	$(Q)rm -f $(srctree)/arch/um/Kconfig
+ 	$(Q)rm -f $(obj)/config.pot
 
--hostprogs-y := conf gconf
-+hostprogs-y := conf
-
- ifeq ($(MAKECMDGOALS),nconfig)
- 	hostprogs-y += nconf
-@@ -198,7 +199,7 @@ ifeq ($(qconf-target),1)
- endif
-
- ifeq ($(gconf-target),1)
--gconf-objs	:= gconf.o kconfig_load.o zconf.tab.o
-+	hostprogs-y += gconf
- endif
-
- clean-files	:= lkc_defs.h qconf.moc .tmp_qtcheck \
+ PHONY += allnoconfig allyesconfig allmodconfig alldefconfig randconfig
 -- 
 1.7.5.rc1
+
