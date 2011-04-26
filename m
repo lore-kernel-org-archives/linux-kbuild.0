@@ -1,48 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-iy0-f174.google.com ([209.85.210.174]:41516 "EHLO
-	mail-iy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752047Ab1DZU2X (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 26 Apr 2011 16:28:23 -0400
+Received: from cantor2.suse.de ([195.135.220.15]:58307 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754901Ab1DZUfp (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 26 Apr 2011 16:35:45 -0400
+Message-ID: <4DB72C9F.50401@suse.cz>
+Date: Tue, 26 Apr 2011 22:35:43 +0200
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-In-Reply-To: <4DB72810.60601@suse.cz>
-References: <4DB4832E.6080009@verizon.net>
-	<BANLkTikbo2tqcvAZ5_druZR+fYhBozakew@mail.gmail.com>
-	<4DB72810.60601@suse.cz>
-Date: Tue, 26 Apr 2011 16:28:23 -0400
-Message-ID: <BANLkTim=VMRwaLtcZDxOORdUvxUSOWNYyg@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: allow headerdep to work in KBUILD_OUTPUT and add
- targets to PHONY
-From: Arnaud Lacombe <lacombar@gmail.com>
+Subject: Re: [PATCH] kbuild: don't warn about linux/version.h not including
+ itself
+References: <4DB4B1F9.5040805@verizon.net>
+In-Reply-To: <4DB4B1F9.5040805@verizon.net>
 Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: pefoley2@verizon.net, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: pefoley2@verizon.net
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-Hi,
+On 25.4.2011 01:27, Peter Foley wrote:
+> This patch makes checkversion.pl not warn that include/linux/version.h
+> dosen't include itself.
+> 
+> Signed-off-by: Peter Foley <pefoley2@verizon.net>
+> ---
+>  scripts/checkversion.pl |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
+> 
+> diff --git a/scripts/checkversion.pl b/scripts/checkversion.pl
+> index b444e89..b9150c7 100755
+> --- a/scripts/checkversion.pl
+> +++ b/scripts/checkversion.pl
+> @@ -47,7 +47,7 @@ foreach my $file (@ARGV) {
+>      }
+>  
+>      # Report used version IDs without include?
+> -    if ($fUseVersion && ! $iLinuxVersion) {
+> +    if ($fUseVersion && ! $iLinuxVersion && $file !~ "include/linux/version.h") {
 
-On Tue, Apr 26, 2011 at 4:16 PM, Michal Marek <mmarek@suse.cz> wrote:
-> On 26.4.2011 08:52, Arnaud Lacombe wrote:
->> Hi,
->>
->> On Sun, Apr 24, 2011 at 4:08 PM, Peter Foley <pefoley2@verizon.net> wrote:
->>> This patch fixes the headerdep target so it will work when make is executed from KBUILD_OUTPUT.
->>> It also adds a few targets to PHONY so they are always executed.
->>>
->> one change, one patch, please.
->>
->> Why do you want that much consistency check to be always ran ?
->> Especially `coccicheck', which rely on a non-common program being
->> available.
->
-> The change is valid, but the changelog text is misleading. 'PHONY +=
-> foo' means that 'make foo' will always execute the commands for foo,
-> even if there is a file of the same name.
->
-my bad, I just confirmed that purpose by checking make doc :)
+A more obvious fix would be to check the filename right at the beginning
+of the loop and skip to the next iteration if it is version.h. Also, you
+should escape the '.' in the regexp.
 
- - Arnaud
-
-> Michal
->
+Michal
