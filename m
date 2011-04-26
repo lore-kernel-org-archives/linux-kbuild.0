@@ -1,41 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from nd215.dnsexit.com ([64.182.102.215]:58605 "EHLO
+Received: from nd215.dnsexit.com ([64.182.102.215]:40212 "EHLO
 	box7.911domain.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1759005Ab1DZWqI (ORCPT
+	with ESMTP id S1758196Ab1DZXC1 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 26 Apr 2011 18:46:08 -0400
-Message-ID: <4DB74B07.8080307@verizon.net>
-Date: Tue, 26 Apr 2011 18:45:27 -0400
+	Tue, 26 Apr 2011 19:02:27 -0400
+Message-ID: <4DB74ED0.9090204@verizon.net>
+Date: Tue, 26 Apr 2011 19:01:36 -0400
 From: Peter Foley <pefoley2@verizon.net>
 Reply-To: <pefoley2@verizon.net>
 MIME-Version: 1.0
-Subject: [PATCH V2 4/7] kbuild: rearrange clean-files
+Subject: Re: [PATCH V2 1/7] kbuild: only build kxgettext when needed
+References: <4DB74AE0.80409@verizon.net>
+In-Reply-To: <4DB74AE0.80409@verizon.net>
 Content-Type: text/plain; charset="ISO-8859-1"
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Arnaud Lacombe <lacombar@gmail.com>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Arnaud Lacombe <lacombar@gmail.com>
 
-This patch rearranges clean-files.
+Sorry, I forgot a space in this patch. A corrected version is below.
+
+This patch only builds kxgettext when running update-po-config
+which is the only target that uses it.
 
 Signed-off-by: Peter Foley <pefoley2@verizon.net>
 ---
- scripts/kconfig/Makefile |    4 ++--
- 1 files changed, 2 insertions(+), 2 deletions(-)
+ scripts/kconfig/Makefile |    6 +++++-
+ 1 files changed, 5 insertions(+), 1 deletions(-)
 
 diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
-index 74d9512..eacdefb 100644
+index 368ae30..fec830f 100644
 --- a/scripts/kconfig/Makefile
 +++ b/scripts/kconfig/Makefile
-@@ -202,8 +202,8 @@ ifeq ($(gconf-target),1)
- 	hostprogs-y += gconf
+@@ -169,7 +169,7 @@ mconf-objs     := mconf.o zconf.tab.o $(lxdialog)
+ nconf-objs     := nconf.o zconf.tab.o nconf.gui.o
+ kxgettext-objs	:= kxgettext.o zconf.tab.o
+ 
+-hostprogs-y := conf qconf gconf kxgettext
++hostprogs-y := conf qconf gconf
+ 
+ ifeq ($(MAKECMDGOALS),nconfig)
+ 	hostprogs-y += nconf
+@@ -179,6 +179,10 @@ ifeq ($(MAKECMDGOALS),menuconfig)
+ 	hostprogs-y += mconf
  endif
- -clean-files	:= lkc_defs.h qconf.moc .tmp_qtcheck \
--		   .tmp_gtkcheck zconf.tab.c lex.zconf.c zconf.hash.c gconf.glade.h
-+clean-files	:= lkc_defs.h qconf.moc .tmp_qtcheck .tmp_gtkcheck
-+clean-files	+= zconf.tab.c lex.zconf.c zconf.hash.c gconf.glade.h
- clean-files     += mconf qconf gconf nconf
- clean-files     += config.pot linux.pot
- -- 1.7.5.rc1
+ 
++ifeq ($(MAKECMDGOALS),update-po-config)
++	hostprogs-y += kxgettext
++endif
++
+ ifeq ($(MAKECMDGOALS),xconfig)
+ 	qconf-target := 1
+ endif
+-- 
+1.7.5.rc1
 
