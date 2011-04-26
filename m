@@ -1,15 +1,15 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from nd215.dnsexit.com ([64.182.102.215]:42880 "EHLO
+Received: from nd215.dnsexit.com ([64.182.102.215]:48515 "EHLO
 	box7.911domain.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1757270Ab1DYXvu (ORCPT
+	with ESMTP id S932167Ab1DZAM5 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 25 Apr 2011 19:51:50 -0400
-Message-ID: <4DB608EE.1060502@verizon.net>
-Date: Mon, 25 Apr 2011 19:51:10 -0400
+	Mon, 25 Apr 2011 20:12:57 -0400
+Message-ID: <4DB60DE1.8060402@verizon.net>
+Date: Mon, 25 Apr 2011 20:12:17 -0400
 From: Peter Foley <pefoley2@verizon.net>
 Reply-To: <pefoley2@verizon.net>
 MIME-Version: 1.0
-Subject: [PATCH] kbuild: fix sed error in export_report.pl
+Subject: [PATCH] kbuild: scripts/kconfig/Makefile cleanup and fixes
 Content-Type: text/plain; charset="ISO-8859-1"
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -17,25 +17,104 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org
 Cc: linux-kbuild@vger.kernel.org, mmarek@suse.cz
 
-This patch fixes a sed error in export_report.pl by escaping a $.
+This patch:
+Changes the update-po-config target to work when make is run from KBUILD_OUTDIR.
+Adds a check to only build kxgettext when needed.
+Changes the qconf and gconf targets to change hostprogs-y when they are being built
+	like nconfig and menuconfig instead of defining *-objs.
+Cleans up the clean-files definitions.
 
 Signed-off-by: Peter Foley <pefoley2@verizon.net>
 ---
- scripts/export_report.pl |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+ scripts/kconfig/Makefile |   35 +++++++++++++++++++++--------------
+ 1 files changed, 21 insertions(+), 14 deletions(-)
 
-diff --git a/scripts/export_report.pl b/scripts/export_report.pl
-index 04dce7c..91fa5a2 100644
---- a/scripts/export_report.pl
-+++ b/scripts/export_report.pl
-@@ -50,7 +50,7 @@ sub usage {
-  sub collectcfiles {
-     my @file
--	= `cat .tmp_versions/*.mod | grep '.*\.ko\$' | sed s/\.ko$/.mod.c/`;
-+	= `cat .tmp_versions/*.mod | grep '.*\.ko\$' | sed s/\.ko\$/.mod.c/`;
-     chomp @file;
-     return @file;
- }
+diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
+index 368ae30..c4206ce 100644
+--- a/scripts/kconfig/Makefile
++++ b/scripts/kconfig/Makefile
+@@ -77,14 +77,15 @@ localyesconfig: $(obj)/streamline_config.pl $(obj)/conf
+ # The symlink is used to repair a deficiency in arch/um
+ update-po-config: $(obj)/kxgettext $(obj)/gconf.glade.h
+ 	$(Q)echo "  GEN config"
+-	$(Q)xgettext --default-domain=linux              \
+-	    --add-comments --keyword=_ --keyword=N_      \
+-	    --from-code=UTF-8                            \
+-	    --files-from=scripts/kconfig/POTFILES.in     \
++	$(Q)xgettext --default-domain=linux                         \
++	    --add-comments --keyword=_ --keyword=N_                 \
++	    --from-code=UTF-8                                       \
++	    --files-from=$(srctree)/scripts/kconfig/POTFILES.in     \
++	    --directory=$(srctree) --directory=$(objtree)           \
+ 	    --output $(obj)/config.pot
+ 	$(Q)sed -i s/CHARSET/UTF-8/ $(obj)/config.pot
+-	$(Q)ln -fs Kconfig.i386 arch/um/Kconfig.arch
+-	$(Q)(for i in `ls arch/*/Kconfig`;               \
++	$(Q)ln -fs Kconfig.x86 $(srctree)/arch/um/Kconfig
++	$(Q)(for i in `ls $(srctree)/arch/*/Kconfig`;    \
+ 	    do                                           \
+ 		echo "  GEN $$i";                        \
+ 		$(obj)/kxgettext $$i                     \
+@@ -92,7 +93,7 @@ update-po-config: $(obj)/kxgettext $(obj)/gconf.glade.h
+ 	    done )
+ 	$(Q)msguniq --sort-by-file --to-code=UTF-8 $(obj)/config.pot \
+ 	    --output $(obj)/linux.pot
+-	$(Q)rm -f arch/um/Kconfig.arch
++	$(Q)rm -f $(srctree)/arch/um/Kconfig
+ 	$(Q)rm -f $(obj)/config.pot
+
+ PHONY += allnoconfig allyesconfig allmodconfig alldefconfig randconfig
+@@ -167,9 +168,12 @@ lxdialog += lxdialog/textbox.o lxdialog/yesno.o
+lxdialog/menubox.o
+ conf-objs	:= conf.o  zconf.tab.o
+ mconf-objs     := mconf.o zconf.tab.o $(lxdialog)
+ nconf-objs     := nconf.o zconf.tab.o nconf.gui.o
++qconf-cxxobjs	:= qconf.o
++qconf-objs	:= kconfig_load.o zconf.tab.o
++gconf-objs	:= gconf.o kconfig_load.o zconf.tab.o
+ kxgettext-objs	:= kxgettext.o zconf.tab.o
+
+-hostprogs-y := conf qconf gconf kxgettext
++hostprogs-y := conf
+
+ ifeq ($(MAKECMDGOALS),nconfig)
+ 	hostprogs-y += nconf
+@@ -186,18 +190,20 @@ ifeq ($(MAKECMDGOALS),gconfig)
+ 	gconf-target := 1
+ endif
+
++ifeq ($(MAKECMDGOALS),update-po-config)
++	hostprogs-y += kxgettext
++endif
+
+ ifeq ($(qconf-target),1)
+-qconf-cxxobjs	:= qconf.o
+-qconf-objs	:= kconfig_load.o zconf.tab.o
++	hostprogs-y += qconf
+ endif
+
+ ifeq ($(gconf-target),1)
+-gconf-objs	:= gconf.o kconfig_load.o zconf.tab.o
++	hostprogs-y += gconf
+ endif
+
+-clean-files	:= lkc_defs.h qconf.moc .tmp_qtcheck \
+-		   .tmp_gtkcheck zconf.tab.c lex.zconf.c zconf.hash.c gconf.glade.h
++clean-files	:= lkc_defs.h qconf.moc .tmp_qtcheck .tmp_gtkcheck
++clean-files     += zconf.tab.c lex.zconf.c zconf.hash.c gconf.glade.h
+ clean-files     += mconf qconf gconf nconf
+ clean-files     += config.pot linux.pot
+
+@@ -325,7 +331,8 @@ $(obj)/lkc_defs.h: $(src)/lkc_proto.h
+
+ # Extract gconf menu items for I18N support
+ $(obj)/gconf.glade.h: $(obj)/gconf.glade
+-	intltool-extract --type=gettext/glade $(obj)/gconf.glade
++	$(Q)intltool-extract --type=gettext/glade --srcdir $(srctree) \
++	$(src)/gconf.glade
+
+ ###
+ # The following requires flex/bison/gperf
 -- 
 1.7.5.rc1
 
