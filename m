@@ -1,170 +1,38 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor.suse.de ([195.135.220.2]:40995 "EHLO mx1.suse.de"
+Received: from cantor.suse.de ([195.135.220.2]:41694 "EHLO mx1.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753747Ab1DZTwl (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 26 Apr 2011 15:52:41 -0400
-Message-ID: <4DB72283.5000108@suse.cz>
-Date: Tue, 26 Apr 2011 21:52:35 +0200
+	id S1751846Ab1DZUQS (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 26 Apr 2011 16:16:18 -0400
+Message-ID: <4DB72810.60601@suse.cz>
+Date: Tue, 26 Apr 2011 22:16:16 +0200
 From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Subject: Re: [PATCH v3.1] kbuild: implement several W= levels
-References: <20110422110947.GA20715@merkur.ravnborg.org> <1303494642-18594-1-git-send-email-bp@alien8.de>
-In-Reply-To: <1303494642-18594-1-git-send-email-bp@alien8.de>
-Content-Type: text/plain; charset=ISO-8859-2
+Subject: Re: [PATCH] kbuild: allow headerdep to work in KBUILD_OUTPUT and
+ add targets to PHONY
+References: <4DB4832E.6080009@verizon.net> <BANLkTikbo2tqcvAZ5_druZR+fYhBozakew@mail.gmail.com>
+In-Reply-To: <BANLkTikbo2tqcvAZ5_druZR+fYhBozakew@mail.gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Borislav Petkov <bp@alien8.de>
-Cc: Sam Ravnborg <sam@ravnborg.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Dave Jones <davej@redhat.com>
+To: Arnaud Lacombe <lacombar@gmail.com>
+Cc: pefoley2@verizon.net, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-On 22.4.2011 19:50, Borislav Petkov wrote:
-> From: Sam Ravnborg <sam@ravnborg.org>
+On 26.4.2011 08:52, Arnaud Lacombe wrote:
+> Hi,
 > 
-> Building a kernel with "make W=1" produce far too much noise
-> to be usefull.
+> On Sun, Apr 24, 2011 at 4:08 PM, Peter Foley <pefoley2@verizon.net> wrote:
+>> This patch fixes the headerdep target so it will work when make is executed from KBUILD_OUTPUT.
+>> It also adds a few targets to PHONY so they are always executed.
+>>
+> one change, one patch, please.
 > 
-> Divide the warning options in three groups:
-> 
->     W=1 - warnings that may be relevant and does not occur too often
->     W=2 - warnings that occur quite often but may still be relevant
->     W=3 - the more obscure warnings, can most likely be ignored
-> 
-> When building init/ on my box the levels produces:
-> 
-> W=1 - 46 warnings
-> W=2 - 863 warnings
-> W=3 - 6496 warnings
+> Why do you want that much consistency check to be always ran ?
+> Especially `coccicheck', which rely on a non-common program being
+> available.
 
-I guess these numbers are not valid after your changes? Not that the
-exact numbers are important, but maybe the distribution change?
-Otherwise the patch looks good, thanks a lot to both of you!
+The change is valid, but the changelog text is misleading. 'PHONY +=
+foo' means that 'make foo' will always execute the commands for foo,
+even if there is a file of the same name.
 
 Michal
-> 
-> Many warnings occur from .h files so fixing one file may have a nice
-> effect on the total number of warnings.
-> 
-> With these changes I am actually tempted to try W=1 now and then.
-> Previously there were just too much noise.
-> 
-> Borislav:
-> 
-> - make the W= levels exclusive
-> - move very noisy and making little sense for the kernel warnings to W=3
-> - drop -Woverlength-strings due to useless warning message
-> - copy explanatory text for the different warning levels to 'make help'
-> 
-> Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
-> Signed-off-by: Borislav Petkov <bp@alien8.de>
-> Cc: Dave Jones <davej@redhat.com>
-> ---
->  Makefile               |    8 ++++-
->  scripts/Makefile.build |   65 ++++++++++++++++++++++++++++--------------------
->  2 files changed, 44 insertions(+), 29 deletions(-)
-> 
-> diff --git a/Makefile b/Makefile
-> index b967b96..17ce5d5 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -103,7 +103,7 @@ ifeq ("$(origin O)", "command line")
->  endif
->  
->  ifeq ("$(origin W)", "command line")
-> -  export KBUILD_ENABLE_EXTRA_GCC_CHECKS := 1
-> +  export KBUILD_ENABLE_EXTRA_GCC_CHECKS := $(W)
->  endif
->  
->  # That's our default target when none is given on the command line
-> @@ -1267,7 +1267,11 @@ help:
->  	@echo  '  make O=dir [targets] Locate all output files in "dir", including .config'
->  	@echo  '  make C=1   [targets] Check all c source with $$CHECK (sparse by default)'
->  	@echo  '  make C=2   [targets] Force check of all c source with $$CHECK'
-> -	@echo  '  make W=1   [targets] Enable extra gcc checks'
-> +	@echo  '  make W=n   [targets] Enable extra gcc checks, n=1,2,3 where'
-> +	@echo  '		1: warnings which may be relevant and do not occur too often'
-> +	@echo  '		2: warnings which occur quite often but may still be relevant'
-> +	@echo  '		3: more obscure warnings, can most likely be ignored'
-> +
->  	@echo  ''
->  	@echo  'Execute "make" or "make all" to build all targets marked with [*] '
->  	@echo  'For further info see the ./README file'
-> diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-> index d5f925a..ffb383c 100644
-> --- a/scripts/Makefile.build
-> +++ b/scripts/Makefile.build
-> @@ -51,36 +51,47 @@ ifeq ($(KBUILD_NOPEDANTIC),)
->  endif
->  
->  #
-> -# make W=1 settings
-> +# make W=... settings
->  #
-> -# $(call cc-option... ) handles gcc -W.. options which
-> +# W=1 - warnings that may be relevant and does not occur too often
-> +# W=2 - warnings that occur quite often but may still be relevant
-> +# W=3 - the more obscure warnings, can most likely be ignored
-> +#
-> +# $(call cc-option, -W...) handles gcc -W.. options which
->  # are not supported by all versions of the compiler
->  ifdef KBUILD_ENABLE_EXTRA_GCC_CHECKS
-> -KBUILD_EXTRA_WARNINGS := -Wextra
-> -KBUILD_EXTRA_WARNINGS += -Wunused -Wno-unused-parameter
-> -KBUILD_EXTRA_WARNINGS += -Waggregate-return
-> -KBUILD_EXTRA_WARNINGS += -Wbad-function-cast
-> -KBUILD_EXTRA_WARNINGS += -Wcast-qual
-> -KBUILD_EXTRA_WARNINGS += -Wcast-align
-> -KBUILD_EXTRA_WARNINGS += -Wconversion
-> -KBUILD_EXTRA_WARNINGS += -Wdisabled-optimization
-> -KBUILD_EXTRA_WARNINGS += -Wlogical-op
-> -KBUILD_EXTRA_WARNINGS += -Wmissing-declarations
-> -KBUILD_EXTRA_WARNINGS += -Wmissing-format-attribute
-> -KBUILD_EXTRA_WARNINGS += $(call cc-option, -Wmissing-include-dirs,)
-> -KBUILD_EXTRA_WARNINGS += -Wmissing-prototypes
-> -KBUILD_EXTRA_WARNINGS += -Wnested-externs
-> -KBUILD_EXTRA_WARNINGS += -Wold-style-definition
-> -KBUILD_EXTRA_WARNINGS += $(call cc-option, -Woverlength-strings,)
-> -KBUILD_EXTRA_WARNINGS += -Wpacked
-> -KBUILD_EXTRA_WARNINGS += -Wpacked-bitfield-compat
-> -KBUILD_EXTRA_WARNINGS += -Wpadded
-> -KBUILD_EXTRA_WARNINGS += -Wpointer-arith
-> -KBUILD_EXTRA_WARNINGS += -Wredundant-decls
-> -KBUILD_EXTRA_WARNINGS += -Wshadow
-> -KBUILD_EXTRA_WARNINGS += -Wswitch-default
-> -KBUILD_EXTRA_WARNINGS += $(call cc-option, -Wvla,)
-> -KBUILD_CFLAGS += $(KBUILD_EXTRA_WARNINGS)
-> +warning-1 := -Wextra -Wunused -Wno-unused-parameter
-> +warning-1 += -Wmissing-declarations
-> +warning-1 += -Wmissing-format-attribute
-> +warning-1 += -Wmissing-prototypes
-> +warning-1 += -Wold-style-definition
-> +warning-1 += $(call cc-option, -Wmissing-include-dirs)
-> +
-> +warning-2 := -Waggregate-return
-> +warning-2 += -Wcast-align
-> +warning-2 += -Wdisabled-optimization
-> +warning-2 += -Wnested-externs
-> +warning-2 += -Wshadow
-> +warning-2 += $(call cc-option, -Wlogical-op)
-> +
-> +warning-3 := -Wbad-function-cast
-> +warning-3 += -Wcast-qual
-> +warning-3 += -Wconversion
-> +warning-3 += -Wpacked
-> +warning-3 += -Wpadded
-> +warning-3 += -Wpointer-arith
-> +warning-3 += -Wredundant-decls
-> +warning-3 += -Wswitch-default
-> +warning-3 += $(call cc-option, -Wpacked-bitfield-compat)
-> +warning-3 += $(call cc-option, -Wvla)
-> +
-> +warning := $(warning-$(KBUILD_ENABLE_EXTRA_GCC_CHECKS))
-> +
-> +ifeq ("$(warning)","")
-> +        $(error W=$(KBUILD_ENABLE_EXTRA_GCC_CHECKS) is unknown)
-> +endif
-> +
-> +KBUILD_CFLAGS += $(warning)
->  endif
->  
->  include scripts/Makefile.lib
-
