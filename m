@@ -1,62 +1,42 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.skyhub.de ([78.46.96.112]:36112 "EHLO mail.skyhub.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751092Ab1DZUnN (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 26 Apr 2011 16:43:13 -0400
-Date: Tue, 26 Apr 2011 22:43:07 +0200
-From: Borislav Petkov <bp@alien8.de>
-Subject: Re: [PATCH v3.1] kbuild: implement several W= levels
-Message-ID: <20110426204307.GA15315@liondog.tnic>
-References: <20110422110947.GA20715@merkur.ravnborg.org>
- <1303494642-18594-1-git-send-email-bp@alien8.de>
- <4DB72283.5000108@suse.cz>
+Received: from nd215.dnsexit.com ([64.182.102.215]:47337 "EHLO
+	box7.911domain.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1754071Ab1DZVFQ (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 26 Apr 2011 17:05:16 -0400
+Message-ID: <4DB73357.5020403@verizon.net>
+Date: Tue, 26 Apr 2011 17:04:23 -0400
+From: Peter Foley <pefoley2@verizon.net>
+Reply-To: <pefoley2@verizon.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <4DB72283.5000108@suse.cz>
+Subject: Re: [PATCH] kbuild: mark unicore32 header export as broken
+References: <4DB4AEF7.3090607@verizon.net>	<BANLkTi=K3OEumicFMCT_Dh=xhpzfpa3JBw@mail.gmail.com> <BANLkTikFUhiDSEM_yLtbzmhfdUWBDv71ww@mail.gmail.com>
+In-Reply-To: <BANLkTikFUhiDSEM_yLtbzmhfdUWBDv71ww@mail.gmail.com>
+Content-Type: text/plain; charset="ISO-8859-1"
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: Sam Ravnborg <sam@ravnborg.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Dave Jones <davej@redhat.com>
+To: =?ISO-8859-1?Q?Am=E9rico_Wang?= <xiyou.wangcong@gmail.com>
+Cc: Arnaud Lacombe <lacombar@gmail.com>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, mmarek@suse.cz, gxt@mprc.pku.edu.cn
 
-On Tue, Apr 26, 2011 at 09:52:35PM +0200, Michal Marek wrote:
-> On 22.4.2011 19:50, Borislav Petkov wrote:
-> > From: Sam Ravnborg <sam@ravnborg.org>
-> > 
-> > Building a kernel with "make W=1" produce far too much noise
-> > to be usefull.
-> > 
-> > Divide the warning options in three groups:
-> > 
-> >     W=1 - warnings that may be relevant and does not occur too often
-> >     W=2 - warnings that occur quite often but may still be relevant
-> >     W=3 - the more obscure warnings, can most likely be ignored
-> > 
-> > When building init/ on my box the levels produces:
-> > 
-> > W=1 - 46 warnings
-> > W=2 - 863 warnings
-> > W=3 - 6496 warnings
+On 4/26/2011 1:07 PM, Américo Wang wrote:
+> On Tue, Apr 26, 2011 at 2:48 PM, Arnaud Lacombe <lacombar@gmail.com> wrote:
+>> Hi,
+>>
+>> On Sun, Apr 24, 2011 at 7:15 PM, Peter Foley <pefoley2@verizon.net> wrote:
+>>> This patch marks userspace header export for unicore32 as broken so that
+>>> it is skipped when running make headers_install_all.
+>>>
+>> Why ?
+>>
+>> I would expect you to send this to arch/unicore32 maintainer too, he
+>> is not in the CC: list.
 > 
-> I guess these numbers are not valid after your changes? Not that the
-> exact numbers are important, but maybe the distribution change?
+> +1
+> 
+> If you see errors when install kernel headers on unicore32, fix them instead
+> of marking it as broken.
 
-I think so too that those numbers don't mean a lot. Instead, this
-feature makes more sense IMHO if you use it on a single file:
-
-make W=1 <file.c> 2>before.log
-
-<make your changes>
-
-make W=1 <file.c> 2>after.log
-
-diff -uprN before.log after.log
-
-and you let the compiler tell you which warnings you've introduced. Then
-you do the same game with W=2 and W=3.
-
-Nice, huh. :)
-
--- 
-Regards/Gruss,
-    Boris.
+The problem with unicore32 is that it generates various stub headers at compile time in include/generated/asm.
+I believe the unicore32 maintainer is already aware of headers_install not working (see https://lkml.org/lkml/2011/1/8/11).
+I'm adding him to the CC list on this email. 
