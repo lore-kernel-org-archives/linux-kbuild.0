@@ -1,15 +1,15 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-iy0-f174.google.com ([209.85.210.174]:40987 "EHLO
-	mail-iy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756419Ab1DZGkE convert rfc822-to-8bit (ORCPT
+Received: from mail-iw0-f174.google.com ([209.85.214.174]:59294 "EHLO
+	mail-iw0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756886Ab1DZGse convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 26 Apr 2011 02:40:04 -0400
+	Tue, 26 Apr 2011 02:48:34 -0400
 MIME-Version: 1.0
-In-Reply-To: <4DB608EE.1060502@verizon.net>
-References: <4DB608EE.1060502@verizon.net>
-Date: Tue, 26 Apr 2011 02:40:03 -0400
-Message-ID: <BANLkTi=sjE-YF1+q1++Bk78n4bvs6W5Wgg@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: fix sed error in export_report.pl
+In-Reply-To: <4DB4AEF7.3090607@verizon.net>
+References: <4DB4AEF7.3090607@verizon.net>
+Date: Tue, 26 Apr 2011 02:48:34 -0400
+Message-ID: <BANLkTi=K3OEumicFMCT_Dh=xhpzfpa3JBw@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: mark unicore32 header export as broken
 From: Arnaud Lacombe <lacombar@gmail.com>
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 8BIT
@@ -20,31 +20,35 @@ Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, mmarek@suse.cz
 
 Hi,
 
-On Mon, Apr 25, 2011 at 7:51 PM, Peter Foley <pefoley2@verizon.net> wrote:
-> This patch fixes a sed error in export_report.pl by escaping a $.
+On Sun, Apr 24, 2011 at 7:15 PM, Peter Foley <pefoley2@verizon.net> wrote:
+> This patch marks userspace header export for unicore32 as broken so that
+> it is skipped when running make headers_install_all.
 >
-Which error ?
+Why ?
 
-Thanks,
+I would expect you to send this to arch/unicore32 maintainer too, he
+is not in the CC: list.
+
  - Arnaud
 
 > Signed-off-by: Peter Foley <pefoley2@verizon.net>
 > ---
->  scripts/export_report.pl |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
+>  scripts/headers.sh |    2 ++
+>  1 files changed, 2 insertions(+), 0 deletions(-)
 >
-> diff --git a/scripts/export_report.pl b/scripts/export_report.pl
-> index 04dce7c..91fa5a2 100644
-> --- a/scripts/export_report.pl
-> +++ b/scripts/export_report.pl
-> @@ -50,7 +50,7 @@ sub usage {
->  sub collectcfiles {
->     my @file
-> -       = `cat .tmp_versions/*.mod | grep '.*\.ko\$' | sed s/\.ko$/.mod.c/`;
-> +       = `cat .tmp_versions/*.mod | grep '.*\.ko\$' | sed s/\.ko\$/.mod.c/`;
->     chomp @file;
->     return @file;
->  }
+> diff --git a/scripts/headers.sh b/scripts/headers.sh
+> index 978b42b..3ae218e 100755
+> --- a/scripts/headers.sh
+> +++ b/scripts/headers.sh
+> @@ -21,6 +21,8 @@ for arch in ${archs}; do
+>                ;;
+>        cris)      # headers export are known broken
+>                ;;
+> +       unicore32) # broken
+> +               ;;
+>        *)
+>                if [ -d ${srctree}/arch/${arch} ]; then
+>                        do_command $1 ${arch}
 > --
 > 1.7.5.rc1
 >
