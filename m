@@ -1,15 +1,15 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from nd215.dnsexit.com ([64.182.102.215]:58651 "EHLO
+Received: from nd215.dnsexit.com ([64.182.102.215]:58747 "EHLO
 	box7.911domain.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1759020Ab1DZWqS (ORCPT
+	with ESMTP id S1759091Ab1DZWqq (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 26 Apr 2011 18:46:18 -0400
-Message-ID: <4DB74B11.1010200@verizon.net>
-Date: Tue, 26 Apr 2011 18:45:37 -0400
+	Tue, 26 Apr 2011 18:46:46 -0400
+Message-ID: <4DB74B2C.70606@verizon.net>
+Date: Tue, 26 Apr 2011 18:46:04 -0400
 From: Peter Foley <pefoley2@verizon.net>
 Reply-To: <pefoley2@verizon.net>
 MIME-Version: 1.0
-Subject: [PATCH V2 5/7] kbuild: make update-po-config work in KBUILD_OUTPUT
+Subject: [PATCH V2 7/7] kbuild: quiet commands unless V=1
 Content-Type: text/plain; charset="ISO-8859-1"
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -17,54 +17,30 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org
 Cc: linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Arnaud Lacombe <lacombar@gmail.com>
 
-This patch makes update-po-config work when make is invoked in KBUILD_OUTPUT.
-
+This patch quiets some commands unless V=1.
 Signed-off-by: Peter Foley <pefoley2@verizon.net>
 ---
- scripts/kconfig/Makefile |   16 +++++++++-------
- 1 files changed, 9 insertions(+), 7 deletions(-)
+ scripts/kconfig/Makefile |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
-index eacdefb..4507336 100644
+index 0674e78..572e5fa 100644
 --- a/scripts/kconfig/Makefile
 +++ b/scripts/kconfig/Makefile
-@@ -77,14 +77,15 @@ localyesconfig: $(obj)/streamline_config.pl $(obj)/conf
- # The symlink is used to repair a deficiency in arch/um
- update-po-config: $(obj)/kxgettext $(obj)/gconf.glade.h
- 	$(Q)echo "  GEN config"
--	$(Q)xgettext --default-domain=linux              \
--	    --add-comments --keyword=_ --keyword=N_      \
--	    --from-code=UTF-8                            \
--	    --files-from=scripts/kconfig/POTFILES.in     \
-+	$(Q)xgettext --default-domain=linux                         \
-+	    --add-comments --keyword=_ --keyword=N_                 \
-+	    --from-code=UTF-8                                       \
-+	    --files-from=$(srctree)/scripts/kconfig/POTFILES.in     \
-+	    --directory=$(srctree) --directory=$(objtree)           \
- 	    --output $(obj)/config.pot
- 	$(Q)sed -i s/CHARSET/UTF-8/ $(obj)/config.pot
- 	$(Q)ln -fs Kconfig.i386 arch/um/Kconfig.arch
--	$(Q)(for i in `ls arch/*/Kconfig`;               \
-+	$(Q)(for i in `ls $(srctree)/arch/*/Kconfig`;    \
- 	    do                                           \
- 		echo "  GEN $$i";                        \
- 		$(obj)/kxgettext $$i                     \
-@@ -92,7 +93,7 @@ update-po-config: $(obj)/kxgettext $(obj)/gconf.glade.h
- 	    done )
- 	$(Q)msguniq --sort-by-file --to-code=UTF-8 $(obj)/config.pot \
- 	    --output $(obj)/linux.pot
--	$(Q)rm -f arch/um/Kconfig.arch
-+	$(Q)rm -f $(srctree)/arch/um/Kconfig.arch
- 	$(Q)rm -f $(obj)/config.pot
-  PHONY += allnoconfig allyesconfig allmodconfig alldefconfig randconfig
-@@ -331,7 +332,8 @@ $(obj)/lkc_defs.h: $(src)/lkc_proto.h
-  # Extract gconf menu items for I18N support
+@@ -328,11 +328,11 @@ $(obj)/%.moc: $(src)/%.h
+ 	$(KC_QT_MOC) -i $< -o $@
+
+ $(obj)/lkc_defs.h: $(src)/lkc_proto.h
+-	sed < $< > $@ 's/P(\([^,]*\),.*/#define \1 (\*\1_p)/'
++	$(Q)sed < $< > $@ 's/P(\([^,]*\),.*/#define \1 (\*\1_p)/'
+
+ # Extract gconf menu items for I18N support
  $(obj)/gconf.glade.h: $(obj)/gconf.glade
--	intltool-extract --type=gettext/glade $(obj)/gconf.glade
-+	intltool-extract --type=gettext/glade --srcdir=$(srctree) \
-+	$(obj)/gconf.glade
-  ###
- # The following requires flex/bison/gperf
+-	intltool-extract --type=gettext/glade --srcdir=$(srctree) \
++	$(Q)intltool-extract --type=gettext/glade --srcdir=$(srctree) \
+ 	$(obj)/gconf.glade
+
+ ###
 -- 
 1.7.5.rc1
 
