@@ -1,42 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from nd215.dnsexit.com ([64.182.102.215]:47337 "EHLO
+Received: from nd215.dnsexit.com ([64.182.102.215]:38584 "EHLO
 	box7.911domain.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1754071Ab1DZVFQ (ORCPT
+	with ESMTP id S1758184Ab1DZVLd (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 26 Apr 2011 17:05:16 -0400
-Message-ID: <4DB73357.5020403@verizon.net>
-Date: Tue, 26 Apr 2011 17:04:23 -0400
+	Tue, 26 Apr 2011 17:11:33 -0400
+Message-ID: <4DB734DB.9000904@verizon.net>
+Date: Tue, 26 Apr 2011 17:10:51 -0400
 From: Peter Foley <pefoley2@verizon.net>
 Reply-To: <pefoley2@verizon.net>
 MIME-Version: 1.0
-Subject: Re: [PATCH] kbuild: mark unicore32 header export as broken
-References: <4DB4AEF7.3090607@verizon.net>	<BANLkTi=K3OEumicFMCT_Dh=xhpzfpa3JBw@mail.gmail.com> <BANLkTikFUhiDSEM_yLtbzmhfdUWBDv71ww@mail.gmail.com>
-In-Reply-To: <BANLkTikFUhiDSEM_yLtbzmhfdUWBDv71ww@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: fix sed error in export_report.pl
+References: <4DB608EE.1060502@verizon.net> <4DB6D959.6090008@suse.cz>
+In-Reply-To: <4DB6D959.6090008@suse.cz>
 Content-Type: text/plain; charset="ISO-8859-1"
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: =?ISO-8859-1?Q?Am=E9rico_Wang?= <xiyou.wangcong@gmail.com>
-Cc: Arnaud Lacombe <lacombar@gmail.com>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, mmarek@suse.cz, gxt@mprc.pku.edu.cn
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-On 4/26/2011 1:07 PM, Américo Wang wrote:
-> On Tue, Apr 26, 2011 at 2:48 PM, Arnaud Lacombe <lacombar@gmail.com> wrote:
->> Hi,
+On 4/26/2011 10:40 AM, Michal Marek wrote:
+> On 26.4.2011 01:51, Peter Foley wrote:
+>> This patch fixes a sed error in export_report.pl by escaping a $.
 >>
->> On Sun, Apr 24, 2011 at 7:15 PM, Peter Foley <pefoley2@verizon.net> wrote:
->>> This patch marks userspace header export for unicore32 as broken so that
->>> it is skipped when running make headers_install_all.
->>>
->> Why ?
+>> Signed-off-by: Peter Foley<pefoley2@verizon.net>
+>> ---
+>>   scripts/export_report.pl |    2 +-
+>>   1 files changed, 1 insertions(+), 1 deletions(-)
 >>
->> I would expect you to send this to arch/unicore32 maintainer too, he
->> is not in the CC: list.
+>> diff --git a/scripts/export_report.pl b/scripts/export_report.pl
+>> index 04dce7c..91fa5a2 100644
+>> --- a/scripts/export_report.pl
+>> +++ b/scripts/export_report.pl
+>> @@ -50,7 +50,7 @@ sub usage {
+>>    sub collectcfiles {
+>>       my @file
+>> -    = `cat .tmp_versions/*.mod | grep '.*\.ko\$' | sed s/\.ko$/.mod.c/`;
+>> +    = `cat .tmp_versions/*.mod | grep '.*\.ko\$' | sed
+>> s/\.ko\$/.mod.c/`;
 > 
-> +1
+> Please enclose the argument in single quotes instead.
 > 
-> If you see errors when install kernel headers on unicore32, fix them instead
-> of marking it as broken.
+> Michal
 
-The problem with unicore32 is that it generates various stub headers at compile time in include/generated/asm.
-I believe the unicore32 maintainer is already aware of headers_install not working (see https://lkml.org/lkml/2011/1/8/11).
-I'm adding him to the CC list on this email. 
+I tried doing that and still got:
+perl /usr/src/git/scripts/export_report.pl
+sed: -e expression #1, char 5: unterminated `s' command
+
+Peter
