@@ -1,70 +1,62 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from nd215.dnsexit.com ([64.182.102.215]:48047 "EHLO
-	box7.911domain.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1757620Ab1DZUg7 (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 26 Apr 2011 16:36:59 -0400
-Message-ID: <4DB72CB9.3050203@verizon.net>
-Date: Tue, 26 Apr 2011 16:36:09 -0400
-From: Peter Foley <pefoley2@verizon.net>
-Reply-To: <pefoley2@verizon.net>
+Received: from mail.skyhub.de ([78.46.96.112]:36112 "EHLO mail.skyhub.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751092Ab1DZUnN (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 26 Apr 2011 16:43:13 -0400
+Date: Tue, 26 Apr 2011 22:43:07 +0200
+From: Borislav Petkov <bp@alien8.de>
+Subject: Re: [PATCH v3.1] kbuild: implement several W= levels
+Message-ID: <20110426204307.GA15315@liondog.tnic>
+References: <20110422110947.GA20715@merkur.ravnborg.org>
+ <1303494642-18594-1-git-send-email-bp@alien8.de>
+ <4DB72283.5000108@suse.cz>
 MIME-Version: 1.0
-Subject: Re: [PATCH] kbuild: mark unicore32 header export as broken
-References: <4DB4AEF7.3090607@verizon.net> <BANLkTi=K3OEumicFMCT_Dh=xhpzfpa3JBw@mail.gmail.com>
-In-Reply-To: <BANLkTi=K3OEumicFMCT_Dh=xhpzfpa3JBw@mail.gmail.com>
-Content-Type: text/plain; charset="ISO-8859-1"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <4DB72283.5000108@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnaud Lacombe <lacombar@gmail.com>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, mmarek@suse.cz, gxt@mprc.pku.edu.cn
+To: Michal Marek <mmarek@suse.cz>
+Cc: Sam Ravnborg <sam@ravnborg.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Dave Jones <davej@redhat.com>
 
-On 4/26/2011 2:48 AM, Arnaud Lacombe wrote:
-> Hi,
+On Tue, Apr 26, 2011 at 09:52:35PM +0200, Michal Marek wrote:
+> On 22.4.2011 19:50, Borislav Petkov wrote:
+> > From: Sam Ravnborg <sam@ravnborg.org>
+> > 
+> > Building a kernel with "make W=1" produce far too much noise
+> > to be usefull.
+> > 
+> > Divide the warning options in three groups:
+> > 
+> >     W=1 - warnings that may be relevant and does not occur too often
+> >     W=2 - warnings that occur quite often but may still be relevant
+> >     W=3 - the more obscure warnings, can most likely be ignored
+> > 
+> > When building init/ on my box the levels produces:
+> > 
+> > W=1 - 46 warnings
+> > W=2 - 863 warnings
+> > W=3 - 6496 warnings
 > 
-> On Sun, Apr 24, 2011 at 7:15 PM, Peter Foley <pefoley2@verizon.net> wrote:
->> This patch marks userspace header export for unicore32 as broken so that
->> it is skipped when running make headers_install_all.
->>
-> Why ?
-> 
-> I would expect you to send this to arch/unicore32 maintainer too, he
-> is not in the CC: list.
-> 
->  - Arnaud
-> 
+> I guess these numbers are not valid after your changes? Not that the
+> exact numbers are important, but maybe the distribution change?
 
-Sorry, I've CC'd him on this email.
+I think so too that those numbers don't mean a lot. Instead, this
+feature makes more sense IMHO if you use it on a single file:
 
-The error I currently get is:
+make W=1 <file.c> 2>before.log
 
-  INSTALL include (0 file)
-make[3]: *** No rule to make target `/usr/src/git/arch/unicore32/include/asm/auxvec.h', needed by `/root/linux/t/usr/include/asm/.install'.  Stop.
-make[2]: *** [headers_install] Error 2
-make[1]: *** [sub-make] Error 2
-make: *** [all] Error 2
+<make your changes>
 
-Patch below.
+make W=1 <file.c> 2>after.log
 
-This patch marks userspace header export for unicore32 as broken so that
-it is skipped when running make headers_install_all.
+diff -uprN before.log after.log
 
-Signed-off-by: Peter Foley <pefoley2@verizon.net>
----
- scripts/headers.sh |    2 ++
- 1 files changed, 2 insertions(+), 0 deletions(-)
+and you let the compiler tell you which warnings you've introduced. Then
+you do the same game with W=2 and W=3.
 
-diff --git a/scripts/headers.sh b/scripts/headers.sh
-index 978b42b..3ae218e 100755
---- a/scripts/headers.sh
-+++ b/scripts/headers.sh
-@@ -21,6 +21,8 @@ for arch in ${archs}; do
- 		;;
- 	cris)      # headers export are known broken
- 		;;
-+	unicore32) # broken
-+		;;
- 	*)
- 		if [ -d ${srctree}/arch/${arch} ]; then
- 			do_command $1 ${arch}
--- 1.7.5.rc1 
+Nice, huh. :)
+
+-- 
+Regards/Gruss,
+    Boris.
