@@ -1,36 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-iw0-f174.google.com ([209.85.214.174]:59276 "EHLO
-	mail-iw0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754205Ab1DZRHC (ORCPT
+Received: from hrndva-omtalb.mail.rr.com ([71.74.56.125]:40289 "EHLO
+	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753003Ab1DZTIE (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 26 Apr 2011 13:07:02 -0400
-MIME-Version: 1.0
-In-Reply-To: <BANLkTi=K3OEumicFMCT_Dh=xhpzfpa3JBw@mail.gmail.com>
-References: <4DB4AEF7.3090607@verizon.net>
-	<BANLkTi=K3OEumicFMCT_Dh=xhpzfpa3JBw@mail.gmail.com>
-Date: Wed, 27 Apr 2011 01:07:01 +0800
-Message-ID: <BANLkTikFUhiDSEM_yLtbzmhfdUWBDv71ww@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: mark unicore32 header export as broken
-From: =?UTF-8?Q?Am=C3=A9rico_Wang?= <xiyou.wangcong@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+	Tue, 26 Apr 2011 15:08:04 -0400
+Subject: Re: [RFC][PATCH 07/11] kbuild/recordmcount: Add RECORDMCOUNT_WARN
+ to warn about mcount callers
+From: Steven Rostedt <rostedt@goodmis.org>
+In-Reply-To: <4DB09629.7080008@suse.cz>
+References: <20110421022825.535486725@goodmis.org>
+	 <20110421023738.714956282@goodmis.org>  <4DB09629.7080008@suse.cz>
+Content-Type: text/plain; charset="ISO-8859-15"
+Date: Tue, 26 Apr 2011 15:08:02 -0400
+Message-ID: <1303844882.18763.29.camel@gandalf.stny.rr.com>
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnaud Lacombe <lacombar@gmail.com>
-Cc: pefoley2@verizon.net, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, mmarek@suse.cz
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kernel@vger.kernel.org, Ingo Molnar <mingo@elte.hu>, Andrew Morton <akpm@linux-foundation.org>, Frederic Weisbecker <fweisbec@gmail.com>, "H. Peter Anvin" <hpa@zytor.com>, linux-kbuild@vger.kernel.org
 
-On Tue, Apr 26, 2011 at 2:48 PM, Arnaud Lacombe <lacombar@gmail.com> wrote:
-> Hi,
->
-> On Sun, Apr 24, 2011 at 7:15 PM, Peter Foley <pefoley2@verizon.net> wrote:
->> This patch marks userspace header export for unicore32 as broken so that
->> it is skipped when running make headers_install_all.
->>
-> Why ?
->
-> I would expect you to send this to arch/unicore32 maintainer too, he
-> is not in the CC: list.
+On Thu, 2011-04-21 at 22:40 +0200, Michal Marek wrote:
+> On 21.4.2011 04:28, Steven Rostedt wrote:
+> > +ifeq ("$(origin RECORDMCOUNT_WARN)", "command line")
+> > +  RECORDMCOUNT_FLAGS = -w
+> > +endif
+> 
+> RECORDMCOUNT_WARN is IMO unlikely to be used with some other meaning in
+> the environment, so I think you can drop the origin check. Nevertheless
 
-+1
+You haven't seen my environment variables ;)
 
-If you see errors when install kernel headers on unicore32, fix them instead
-of marking it as broken.
+> 
+> Acked-by: Michal Marek <mmarek@suse.cz>
+
+ Thanks!
+
+-- Steve
+
+
