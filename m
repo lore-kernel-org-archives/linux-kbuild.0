@@ -1,43 +1,67 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor.suse.de ([195.135.220.2]:35570 "EHLO mx1.suse.de"
+Received: from mail.skyhub.de ([78.46.96.112]:33594 "EHLO mail.skyhub.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1758655Ab1D0LTz (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 27 Apr 2011 07:19:55 -0400
-Message-ID: <4DB7FBD8.20109@suse.cz>
-Date: Wed, 27 Apr 2011 13:19:52 +0200
-From: Michal Marek <mmarek@suse.cz>
+	id S1752241Ab1D0LfG (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 27 Apr 2011 07:35:06 -0400
+Date: Wed, 27 Apr 2011 13:35:13 +0200
+From: Borislav Petkov <bp@alien8.de>
+Subject: Re: [PATCH v3.1] kbuild: implement several W= levels
+Message-ID: <20110427113513.GB18112@eferding.osrc.amd.com>
+References: <20110422110947.GA20715@merkur.ravnborg.org>
+ <1303494642-18594-1-git-send-email-bp@alien8.de>
+ <20110427082555.GC5726@merkur.ravnborg.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH] kconfig: Avoid buffer underrun in choice input
-References: <1303580576.4815.3.camel@localhost>
-In-Reply-To: <1303580576.4815.3.camel@localhost>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20110427082555.GC5726@merkur.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ben Hutchings <ben@decadent.org.uk>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, LKML <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org, Roman Zippel <zippel@linux-m68k.org>
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Dave Jones <davej@redhat.com>
 
-On 23.4.2011 19:42, Ben Hutchings wrote:
-> commit 40aee729b350672c2550640622416a855e27938f ('kconfig: fix default
-> value for choice input') fixed some cases where kconfig would select
-> the wrong option from a choice with a single valid option and thus
-> enter an infinite loop.
->
-> However, this broke the test for user input of the form 'N?', because
-> when kconfig selects the single valid option the input is zero-length
-> and the test will read the byte before the input buffer.  If this
-> happens to contain '?' (as it will in a mips build on Debian unstable
-> today) then kconfig again enters an infinite loop.
->
-> Signed-off-by: Ben Hutchings<ben@decadent.org.uk>
-> Cc: stable@kernel.org [2.6.17+]
-> ---
-> Roman has failed to respond to this after 5 weeks and one reminder, so
-> please take it directly.
+On Wed, Apr 27, 2011 at 10:25:55AM +0200, Sam Ravnborg wrote:
+> > - make the W= levels exclusive
+> I do not see the point in this really. This is not what most people would
+> expect.
+> When you ask for more you get more - not something else.
+> 
+> We see it with verbose levels where -vv give more output than -v etc.
+> 
+> Anyway - the important thing is to keep the relevant warnings at W=1 level.
+> Which is independendt of this change.
+> So consider the input and decide - I do not want to make a fuzz about it.
 
-I applied this on 8th April, see
-http://www.spinics.net/lists/linux-kbuild/msg04431.html. Please check 
-linux-next before reposting patches next time, now I either have to 
-rewind the kconfig branch or let Linus merge it with a duplicate commit :-(.
+I know, -vv.. increases verbosity is probably part of old unix tradition
+or common sense but it doesn't make much sense in this case, IMHO. When
+I use this, I want to see what the most relevant warnings are, maybe
+have a crack at them to fix them, and _then_ look at the less important
+ones (for an arbitrary definition of important warnings).
 
-Michal
+If we do this inclusive, then W=2 dumps the, let's call it, level 1
+_plus_ the new level 2 warnings, polluting the output with something
+I've already seen, but only partially. And then I start to think, did
+I see this one already, didn't I, which was it? By the time you enable
+W=3, the output becomes pretty useless. For example, W=3 generates 190+
+MB logfile here only with level 3 warnings. Now imagine all 3 levels
+combined.
+
+Dividing the output by level of importance doesn't have this problem and
+is much more workable, IMHO.
+
+But this is just my use case, it could be that I'm completely alone on
+this one. I'd love to hear what other people think.
+
+FWIW, we might even make this behavior configurable by having
+
+make W=1o
+
+meaning level 1 warnings only or whatever sick idea we come up with
+eventually.
+
+;-)
+
+Thanks.
+
+-- 
+Regards/Gruss,
+Boris.
