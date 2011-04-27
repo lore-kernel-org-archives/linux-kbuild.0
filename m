@@ -1,65 +1,35 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepb.post.tele.dk ([195.41.46.236]:35448 "EHLO
-	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1759954Ab1D0Uqn (ORCPT
+Received: from nd215.dnsexit.com ([64.182.102.215]:33606 "EHLO
+	box7.911domain.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1751069Ab1D0Vfc (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 27 Apr 2011 16:46:43 -0400
-Date: Wed, 27 Apr 2011 22:46:41 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH v3.2] kbuild: implement several W= levels
-Message-ID: <20110427204641.GB9005@merkur.ravnborg.org>
-References: <20110427113513.GB18112@eferding.osrc.amd.com> <1303935327-5154-1-git-send-email-bp@alien8.de>
+	Wed, 27 Apr 2011 17:35:32 -0400
+Message-ID: <4DB88BF7.1030905@verizon.net>
+Date: Wed, 27 Apr 2011 17:34:47 -0400
+From: Peter Foley <pefoley2@verizon.net>
+Reply-To: <pefoley2@verizon.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1303935327-5154-1-git-send-email-bp@alien8.de>
+Subject: [PATCH V2 resend 0/7] kbuild: scripts/kconfig/Makefile cleanup and
+ fixes
+Content-Type: text/plain; charset="ISO-8859-1"
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Borislav Petkov <bp@alien8.de>, Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Dave Jones <davej@redhat.com>, Geert Uytterhoeven <geert@linux-m68k.org>
+To: linux-kernel@vger.kernel.org
+Cc: linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Arnaud Lacombe <lacombar@gmail.com>
 
-On Wed, Apr 27, 2011 at 10:15:27PM +0200, Borislav Petkov wrote:
-> From: Sam Ravnborg <sam@ravnborg.org>
-> 
-> Building a kernel with "make W=1" produces far too much noise to be
-> useful.
-> 
-> Divide the warning options in three groups:
-> 
->     W=1 - warnings that may be relevant and does not occur too often
->     W=2 - warnings that occur quite often but may still be relevant
->     W=3 - the more obscure warnings, can most likely be ignored
-> 
-> When building the whole kernel, those levels produce:
-> 
-> W=1 - 4859 warnings
-> W=2 - 1394 warnings
-> W=3 - 86666 warnings
-> 
-> respectively. Warnings have been counted with Geert's script at
-> 
-> http://www.kernel.org/pub/linux/kernel/people/geert/linux-log/linux-log-summary.pl
-> 
-> Many warnings occur from .h files so fixing one file may have a nice
-> effect on the total number of warnings.
-> 
-> With these changes I am actually tempted to try W=1 now and then.
-> Previously there was just too much noise.
-> 
-> Borislav:
-> 
-> - make the W= levels exclusive
-> - move very noisy and making little sense for the kernel warnings to W=3
-> - drop -Woverlength-strings due to useless warning message
-> - copy explanatory text for the different warning levels to 'make help'
-> - recount warnings per level
-> 
-> Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
-> Signed-off-by: Borislav Petkov <bp@alien8.de>
-> Cc: Dave Jones <davej@redhat.com>
-> Cc: Geert Uytterhoeven <geert@linux-m68k.org>
-> ---
+This patch set:
+Changes the update-po-config target to work when make is run from
+KBUILD_OUTDIR.
+Changes the update-po-config target to reflect the new layout of arch/um.
+Adds a check to only build kxgettext when needed.
+Changes the qconf and gconf targets to change hostprogs-y when they are
+being built like nconf and mconf instead of defining *-objs.
+Cleans up the clean-files definitions.
+Silences comands unless V=1.
 
-Looks good. Michal - please apply.
+I've also attached the patches as requested by Michal Marek.
 
-	Sam
+Thanks,
+
+Peter
