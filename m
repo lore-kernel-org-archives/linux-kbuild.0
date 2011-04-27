@@ -1,61 +1,51 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mprc.pku.edu.cn ([162.105.203.9]:56111 "EHLO mprc.pku.edu.cn"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1756447Ab1D0CCe convert rfc822-to-8bit (ORCPT
+Received: from pfepa.post.tele.dk ([195.41.46.235]:60553 "EHLO
+	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752302Ab1D0IW2 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 26 Apr 2011 22:02:34 -0400
-From: "Guan Xuetao" <gxt@mprc.pku.edu.cn>
-References: <4DB4AEF7.3090607@verizon.net>	<BANLkTi=K3OEumicFMCT_Dh=xhpzfpa3JBw@mail.gmail.com> <BANLkTikFUhiDSEM_yLtbzmhfdUWBDv71ww@mail.gmail.com> <4DB73357.5020403@verizon.net>
-In-Reply-To: <4DB73357.5020403@verizon.net>
-Subject: RE: [PATCH] kbuild: mark unicore32 header export as broken
-Date: Wed, 27 Apr 2011 10:02:01 +0800
-Message-ID: <009f01cc047f$1b20bdb0$51623910$@mprc.pku.edu.cn>
+	Wed, 27 Apr 2011 04:22:28 -0400
+Date: Wed, 27 Apr 2011 10:22:26 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: [PATCH v3.1] kbuild: implement several W= levels
+Message-ID: <20110427082226.GB5726@merkur.ravnborg.org>
+References: <20110422110947.GA20715@merkur.ravnborg.org> <1303494642-18594-1-git-send-email-bp@alien8.de> <4DB72283.5000108@suse.cz> <20110426204307.GA15315@liondog.tnic>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="ISO-8859-1"
-Content-Transfer-Encoding: 8BIT
-Content-Language: zh-cn
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20110426204307.GA15315@liondog.tnic>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: pefoley2@verizon.net, =?ISO-8859-1?Q?'Am=E9rico_Wang'?= <xiyou.wangcong@gmail.com>, Sam Ravnborg <sam@ravnborg.org>
-Cc: 'Arnaud Lacombe' <lacombar@gmail.com>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, mmarek@suse.cz
+To: Borislav Petkov <bp@alien8.de>, Michal Marek <mmarek@suse.cz>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Dave Jones <davej@redhat.com>
 
-
-
-> -----Original Message-----
-> From: Peter Foley [mailto:pefoley2@verizon.net]
-> Sent: Wednesday, April 27, 2011 5:04 AM
-> To: Américo Wang
-> Cc: Arnaud Lacombe; linux-kernel@vger.kernel.org; linux-kbuild@vger.kernel.org; mmarek@suse.cz; gxt@mprc.pku.edu.cn
-> Subject: Re: [PATCH] kbuild: mark unicore32 header export as broken
+On Tue, Apr 26, 2011 at 10:43:07PM +0200, Borislav Petkov wrote:
+> On Tue, Apr 26, 2011 at 09:52:35PM +0200, Michal Marek wrote:
+> > On 22.4.2011 19:50, Borislav Petkov wrote:
+> > > From: Sam Ravnborg <sam@ravnborg.org>
+> > > 
+> > > Building a kernel with "make W=1" produce far too much noise
+> > > to be usefull.
+> > > 
+> > > Divide the warning options in three groups:
+> > > 
+> > >     W=1 - warnings that may be relevant and does not occur too often
+> > >     W=2 - warnings that occur quite often but may still be relevant
+> > >     W=3 - the more obscure warnings, can most likely be ignored
+> > > 
+> > > When building init/ on my box the levels produces:
+> > > 
+> > > W=1 - 46 warnings
+> > > W=2 - 863 warnings
+> > > W=3 - 6496 warnings
+> > 
+> > I guess these numbers are not valid after your changes? Not that the
+> > exact numbers are important, but maybe the distribution change?
 > 
-> On 4/26/2011 1:07 PM, Américo Wang wrote:
-> > On Tue, Apr 26, 2011 at 2:48 PM, Arnaud Lacombe <lacombar@gmail.com> wrote:
-> >> Hi,
-> >>
-> >> On Sun, Apr 24, 2011 at 7:15 PM, Peter Foley <pefoley2@verizon.net> wrote:
-> >>> This patch marks userspace header export for unicore32 as broken so that
-> >>> it is skipped when running make headers_install_all.
-> >>>
-> >> Why ?
-> >>
-> >> I would expect you to send this to arch/unicore32 maintainer too, he
-> >> is not in the CC: list.
-> >
-> > +1
-> >
-> > If you see errors when install kernel headers on unicore32, fix them instead
-> > of marking it as broken.
-> 
-> The problem with unicore32 is that it generates various stub headers at compile time in include/generated/asm.
-> I believe the unicore32 maintainer is already aware of headers_install not working (see https://lkml.org/lkml/2011/1/8/11).
-Yes, thanks.
-I am waiting for the generic-y patch by Sam. (also CC to Sam)
-Sorry to broke the rule of headers_install_all.
+> I think so too that those numbers don't mean a lot.
 
-Thanks Peter. The patch not applied since I do need headers_install.
+The numbers _only_ tell you that the amoun of warnings on W=1
+is down to a manageable number and they increase be the higher
+level.
 
-Thanks & Regards,
+Will you cook up a more correct changelog and resubmit?
 
-Guan Xuetao
-
+	Sam
