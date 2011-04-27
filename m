@@ -1,50 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-bw0-f46.google.com ([209.85.214.46]:64967 "EHLO
-	mail-bw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754686Ab1D0I2B convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 27 Apr 2011 04:28:01 -0400
+Received: from cantor.suse.de ([195.135.220.2]:35570 "EHLO mx1.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1758655Ab1D0LTz (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 27 Apr 2011 07:19:55 -0400
+Message-ID: <4DB7FBD8.20109@suse.cz>
+Date: Wed, 27 Apr 2011 13:19:52 +0200
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-In-Reply-To: <20110422104646.GB8324@liondog.tnic>
-References: <20110422102028.GA8324@liondog.tnic>
-	<20110422104646.GB8324@liondog.tnic>
-Date: Wed, 27 Apr 2011 10:27:59 +0200
-Message-ID: <BANLkTi=uk1LK0Arjx9cgbE==aUw1kNWhkg@mail.gmail.com>
-Subject: Re: [PATCH v3] kbuild: implement several W= levels
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+Subject: Re: [PATCH] kconfig: Avoid buffer underrun in choice input
+References: <1303580576.4815.3.camel@localhost>
+In-Reply-To: <1303580576.4815.3.camel@localhost>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Borislav Petkov <bp@alien8.de>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <mmarek@suse.cz>, Dave Jones <davej@redhat.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, lkml <linux-kernel@vger.kernel.org>
+To: Ben Hutchings <ben@decadent.org.uk>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, LKML <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org, Roman Zippel <zippel@linux-m68k.org>
 
-On Fri, Apr 22, 2011 at 12:46, Borislav Petkov <bp@alien8.de> wrote:
-> On Fri, Apr 22, 2011 at 12:20:28PM +0200, Borislav Petkov wrote:
->> But seriously, let me add my comments to your patch while they're fresh
->> in my head and let's see what we come up with in our combined and
->> perfectly orchestrated effort :).
+On 23.4.2011 19:42, Ben Hutchings wrote:
+> commit 40aee729b350672c2550640622416a855e27938f ('kconfig: fix default
+> value for choice input') fixed some cases where kconfig would select
+> the wrong option from a choice with a single valid option and thus
+> enter an infinite loop.
 >
-> Ok, this is starting to look like another kernelnewbies.org task:
+> However, this broke the test for user input of the form 'N?', because
+> when kconfig selects the single valid option the input is zero-length
+> and the test will read the byte before the input buffer.  If this
+> happens to contain '?' (as it will in a mips build on Debian unstable
+> today) then kconfig again enters an infinite loop.
 >
-> make W=x 2>>w.log
->
-> and stare at compiler output in the other xterm:
->
-> tail -f w.log
->
-> and the bugs are just waiting there to be fixed! :)
+> Signed-off-by: Ben Hutchings<ben@decadent.org.uk>
+> Cc: stable@kernel.org [2.6.17+]
+> ---
+> Roman has failed to respond to this after 5 weeks and one reminder, so
+> please take it directly.
 
-You can use http://www.kernel.org/pub/linux/kernel/people/geert/linux-log/linux-log-summary.pl
-to get a summary, sorted by number of occurrences. So you see which
-ones to fix first ;-)
+I applied this on 8th April, see
+http://www.spinics.net/lists/linux-kbuild/msg04431.html. Please check 
+linux-next before reposting patches next time, now I either have to 
+rewind the kconfig branch or let Linus merge it with a duplicate commit :-(.
 
-Gr{oetje,eeting}s,
-
-                        Geert
-
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+Michal
