@@ -1,50 +1,61 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from nd215.dnsexit.com ([64.182.102.215]:38926 "EHLO
-	box7.911domain.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1752503Ab1DZXIj (ORCPT
+Received: from mprc.pku.edu.cn ([162.105.203.9]:56111 "EHLO mprc.pku.edu.cn"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1756447Ab1D0CCe convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 26 Apr 2011 19:08:39 -0400
-Message-ID: <4DB7504C.6060507@verizon.net>
-Date: Tue, 26 Apr 2011 19:07:56 -0400
-From: Peter Foley <pefoley2@verizon.net>
-Reply-To: <pefoley2@verizon.net>
+	Tue, 26 Apr 2011 22:02:34 -0400
+From: "Guan Xuetao" <gxt@mprc.pku.edu.cn>
+References: <4DB4AEF7.3090607@verizon.net>	<BANLkTi=K3OEumicFMCT_Dh=xhpzfpa3JBw@mail.gmail.com> <BANLkTikFUhiDSEM_yLtbzmhfdUWBDv71ww@mail.gmail.com> <4DB73357.5020403@verizon.net>
+In-Reply-To: <4DB73357.5020403@verizon.net>
+Subject: RE: [PATCH] kbuild: mark unicore32 header export as broken
+Date: Wed, 27 Apr 2011 10:02:01 +0800
+Message-ID: <009f01cc047f$1b20bdb0$51623910$@mprc.pku.edu.cn>
 MIME-Version: 1.0
-Subject: [PATCH V2] kbuild: don't warn about include/linux/version.h not including
- itself
-Content-Type: text/plain; charset="ISO-8859-1"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain;
+	charset="ISO-8859-1"
+Content-Transfer-Encoding: 8BIT
+Content-Language: zh-cn
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>
+To: pefoley2@verizon.net, =?ISO-8859-1?Q?'Am=E9rico_Wang'?= <xiyou.wangcong@gmail.com>, Sam Ravnborg <sam@ravnborg.org>
+Cc: 'Arnaud Lacombe' <lacombar@gmail.com>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, mmarek@suse.cz
 
-This patch makes checkversion.pl not warn that include/linux/version.h
-dosen't include itself.
 
-Signed-off-by: Peter Foley <pefoley2@verizon.net>
----
- scripts/checkversion.pl |    3 +++
- 1 files changed, 3 insertions(+), 0 deletions(-)
 
-diff --git a/scripts/checkversion.pl b/scripts/checkversion.pl
-index b444e89..cf4b1dc 100755
---- a/scripts/checkversion.pl
-+++ b/scripts/checkversion.pl
-@@ -12,6 +12,8 @@ $| = 1;
- my $debugging;
- 
- foreach my $file (@ARGV) {
-+    if($file !~ "include/linux/version\.h")
-+    {
-     # Open this file.
-     open( my $f, '<', $file )
-       or die "Can't open $file: $!\n";
-@@ -67,4 +69,5 @@ foreach my $file (@ARGV) {
-     }
- 
-     close($f);
-+    }
- }
--- 
-1.7.5.rc1
+> -----Original Message-----
+> From: Peter Foley [mailto:pefoley2@verizon.net]
+> Sent: Wednesday, April 27, 2011 5:04 AM
+> To: Américo Wang
+> Cc: Arnaud Lacombe; linux-kernel@vger.kernel.org; linux-kbuild@vger.kernel.org; mmarek@suse.cz; gxt@mprc.pku.edu.cn
+> Subject: Re: [PATCH] kbuild: mark unicore32 header export as broken
+> 
+> On 4/26/2011 1:07 PM, Américo Wang wrote:
+> > On Tue, Apr 26, 2011 at 2:48 PM, Arnaud Lacombe <lacombar@gmail.com> wrote:
+> >> Hi,
+> >>
+> >> On Sun, Apr 24, 2011 at 7:15 PM, Peter Foley <pefoley2@verizon.net> wrote:
+> >>> This patch marks userspace header export for unicore32 as broken so that
+> >>> it is skipped when running make headers_install_all.
+> >>>
+> >> Why ?
+> >>
+> >> I would expect you to send this to arch/unicore32 maintainer too, he
+> >> is not in the CC: list.
+> >
+> > +1
+> >
+> > If you see errors when install kernel headers on unicore32, fix them instead
+> > of marking it as broken.
+> 
+> The problem with unicore32 is that it generates various stub headers at compile time in include/generated/asm.
+> I believe the unicore32 maintainer is already aware of headers_install not working (see https://lkml.org/lkml/2011/1/8/11).
+Yes, thanks.
+I am waiting for the generic-y patch by Sam. (also CC to Sam)
+Sorry to broke the rule of headers_install_all.
+
+Thanks Peter. The patch not applied since I do need headers_install.
+
+Thanks & Regards,
+
+Guan Xuetao
 
