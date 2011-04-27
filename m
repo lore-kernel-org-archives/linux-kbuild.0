@@ -1,85 +1,28 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from shadbolt.e.decadent.org.uk ([88.96.1.126]:49659 "EHLO
-	shadbolt.e.decadent.org.uk" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1759118Ab1D0NMx (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 27 Apr 2011 09:12:53 -0400
-From: Ben Hutchings <ben@decadent.org.uk>
-In-Reply-To: <4DB7FBD8.20109@suse.cz>
-References: <1303580576.4815.3.camel@localhost>  <4DB7FBD8.20109@suse.cz>
-Content-Type: multipart/signed; micalg="pgp-sha512"; protocol="application/pgp-signature"; boundary="=-mkjVeT0/pHGtJ/Z5lGkW"
-Date: Wed, 27 Apr 2011 14:12:38 +0100
-Message-ID: <1303909958.3032.407.camel@localhost>
-Mime-Version: 1.0
-Subject: Re: [PATCH] kconfig: Avoid buffer underrun in choice input
+Received: from cantor2.suse.de ([195.135.220.15]:32819 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1759372Ab1D0PSs (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 27 Apr 2011 11:18:48 -0400
+Message-ID: <4DB833D6.2000506@suse.cz>
+Date: Wed, 27 Apr 2011 17:18:46 +0200
+From: Michal Marek <mmarek@suse.cz>
+MIME-Version: 1.0
+Subject: Re: [PATCH V2 1/7] kbuild: only build kxgettext when needed
+References: <4DB74AE0.80409@verizon.net> <4DB74ED0.9090204@verizon.net>
+In-Reply-To: <4DB74ED0.9090204@verizon.net>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, LKML <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org, Roman Zippel <zippel@linux-m68k.org>
+To: pefoley2@verizon.net
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Arnaud Lacombe <lacombar@gmail.com>
 
+On 27.4.2011 01:01, Peter Foley wrote:
+> Sorry, I forgot a space in this patch. A corrected version is below.
 
---=-mkjVeT0/pHGtJ/Z5lGkW
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+The first patch actually applied OK, but patch 2/7 and 4/7 and maybe 
+other were malformed. Could you please resend the patches as MIME 
+attachments so that they are not modified by your mailer?
 
-On Wed, 2011-04-27 at 13:19 +0200, Michal Marek wrote:
-> On 23.4.2011 19:42, Ben Hutchings wrote:
-> > commit 40aee729b350672c2550640622416a855e27938f ('kconfig: fix default
-> > value for choice input') fixed some cases where kconfig would select
-> > the wrong option from a choice with a single valid option and thus
-> > enter an infinite loop.
-> >
-> > However, this broke the test for user input of the form 'N?', because
-> > when kconfig selects the single valid option the input is zero-length
-> > and the test will read the byte before the input buffer.  If this
-> > happens to contain '?' (as it will in a mips build on Debian unstable
-> > today) then kconfig again enters an infinite loop.
-> >
-> > Signed-off-by: Ben Hutchings<ben@decadent.org.uk>
-> > Cc: stable@kernel.org [2.6.17+]
-> > ---
-> > Roman has failed to respond to this after 5 weeks and one reminder, so
-> > please take it directly.
->=20
-> I applied this on 8th April, see
-> http://www.spinics.net/lists/linux-kbuild/msg04431.html.
-
-Sorry, I forgot that.
-
-> Please check=20
-> linux-next before reposting patches next time, now I either have to=20
-> rewind the kconfig branch or let Linus merge it with a duplicate commit :=
--(.
-
-But the fix belongs in this release (2.6.39), not the next.  So I looked
-in Linus' tree.
-
-Ben.
-
---=20
-Ben Hutchings
-Once a job is fouled up, anything done to improve it makes it worse.
-
---=-mkjVeT0/pHGtJ/Z5lGkW
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.11 (GNU/Linux)
-
-iQIVAwUATbgWRue/yOyVhhEJAQqszw//f3ffnu13sN3XtvlSHGnxP/7ojBJGhr/8
-s2N7l94IVbrivd0HRB2q771UxTaCCtAVLnOvDZdapfqqRQEdT1Nd8i0Clk5rFsxe
-7U70dMsVGPEQWExuptxa51vdfi8svOT6whj9Ty0wJNWK76UrBDuITK+MoQxYutP+
-NjdlH0din0rxxa6DoYKB87ZbNRPAzl64332zTUwIV5B8bPPH5P4XzcKM1vFnBUEz
-q50MRoInqepm3DpLwfLN6eC49vBGLosjqlwxCnPy8HpFjNImtA3q1R9uRyWSrMVo
-hoAl7khJcYMO0pFObJiLuI8EK1hJYEtxhVwGBrmtBzrFO8mFI0G3MqgkbRd/xG3i
-DWnlf2lxmQmW+xC8E+/ppl/wQ1XJ/89sRTCm7W4ng93+1wo+ddUNrPiVvRf2QQUa
-iAHHho9ltHh+eh2jqiAcbEuXKGERVpislj1fJN06hbN7RH3yk8NwDWoGtDHjZ2NR
-XoF+G/bx/B4Z54dYosmK/7yQK24X7Kq4FuxxgyXldDpxefjyJfSfuQ/b/0ko7GJL
-wv4+4N07Q8yXyhh0qMOav3ZEq//Ty9qKm6QRAXGBfaJ8EvKUyn8Kb1XIy+eLeksW
-ESn2SrIy6vhVOyjVs9/x7LpxveaRHwikGo1q3V56QFdGq+iTf+3G2vHRMtvA9kJp
-x9zmlUr+S3Y=
-=21Qe
------END PGP SIGNATURE-----
-
---=-mkjVeT0/pHGtJ/Z5lGkW--
+Thanks,
+Michal
