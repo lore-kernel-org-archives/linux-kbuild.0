@@ -1,38 +1,40 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from nd215.dnsexit.com ([64.182.102.215]:41671 "EHLO
-	box7.911domain.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1755686Ab1D0Q0i (ORCPT
+Received: from smtp1.linux-foundation.org ([140.211.169.13]:49686 "EHLO
+	smtp1.linux-foundation.org" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1752356Ab1D0Rgn (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 27 Apr 2011 12:26:38 -0400
-Message-ID: <4DB84390.7000202@verizon.net>
-Date: Wed, 27 Apr 2011 12:25:52 -0400
-From: Peter Foley <pefoley2@verizon.net>
-Reply-To: <pefoley2@verizon.net>
+	Wed, 27 Apr 2011 13:36:43 -0400
 MIME-Version: 1.0
-Subject: Re: [PATCH V2 1/7] kbuild: only build kxgettext when needed
-References: <4DB74AE0.80409@verizon.net> <4DB74ED0.9090204@verizon.net> <4DB833D6.2000506@suse.cz>
-In-Reply-To: <4DB833D6.2000506@suse.cz>
-Content-Type: text/plain; charset="ISO-8859-1"
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <4DB7FBD8.20109@suse.cz>
+References: <1303580576.4815.3.camel@localhost> <4DB7FBD8.20109@suse.cz>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Wed, 27 Apr 2011 10:35:49 -0700
+Message-ID: <BANLkTi=dbWOPcSqg5ueDzGJMoGDa9Bp3fA@mail.gmail.com>
+Subject: Re: [PATCH] kconfig: Avoid buffer underrun in choice input
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Arnaud Lacombe <lacombar@gmail.com>
+Cc: Ben Hutchings <ben@decadent.org.uk>, LKML <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org, Roman Zippel <zippel@linux-m68k.org>
 
-On 4/27/2011 11:18 AM, Michal Marek wrote:
-> On 27.4.2011 01:01, Peter Foley wrote:
->> Sorry, I forgot a space in this patch. A corrected version is below.
-> 
-> The first patch actually applied OK, but patch 2/7 and 4/7 and maybe
-> other were malformed. Could you please resend the patches as MIME
-> attachments so that they are not modified by your mailer?
-> 
-> Thanks,
-> Michal
+On Wed, Apr 27, 2011 at 4:19 AM, Michal Marek <mmarek@suse.cz> wrote:
+>
+> I applied this on 8th April, see
+> http://www.spinics.net/lists/linux-kbuild/msg04431.html. Please check
+> linux-next before reposting patches next time, now I either have to rewind
+> the kconfig branch or let Linus merge it with a duplicate commit :-(.
 
-Ok, I'll resend them.
-Sorry for any trouble.
+Merging the occasional duplicate is normal flow, don't worry about it.
+I'd much rather see the occasional smaller diffstat due to a diff that
+got applied in both sides than I'd see people rebasing just to avoid
+some silly duplicate.
 
-Thanks,
+It's if two branches consistently have many duplicates that I react,
+because it tends to be some systematic error (often excessive
+rebasing, but it could be some "ownership" argument too)
 
-Peter
+The "occasionally the same fix made it through two different trees" is
+not just normal, it's _expected_ in distributed development. If it
+never happens, that's a sign that people are serializing overmuch.
+
+                                   Linus
