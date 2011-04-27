@@ -1,112 +1,116 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from nd215.dnsexit.com ([64.182.102.215]:33757 "EHLO
+Received: from nd215.dnsexit.com ([64.182.102.215]:33706 "EHLO
 	box7.911domain.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1756699Ab1D0Vf7 (ORCPT
+	with ESMTP id S1759820Ab1D0Vft (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 27 Apr 2011 17:35:59 -0400
-Message-ID: <4DB88C14.4010900@verizon.net>
-Date: Wed, 27 Apr 2011 17:35:16 -0400
+	Wed, 27 Apr 2011 17:35:49 -0400
+Message-ID: <4DB88C0A.7070705@verizon.net>
+Date: Wed, 27 Apr 2011 17:35:06 -0400
 From: Peter Foley <pefoley2@verizon.net>
 Reply-To: <pefoley2@verizon.net>
 MIME-Version: 1.0
-Subject: [PATCH V2 resend 3/7] kbuild: change gconf to modify hostprogs-y
+Subject: [PATCH V2 resend 2/7] kbuild: change qconf to modify hostprogs-y
  like nconf and mconf
 Content-Type: multipart/mixed;
-	boundary="------------010801000507040802040508"
+	boundary="------------010704070601080301080303"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org
 Cc: linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Arnaud Lacombe <lacombar@gmail.com>
 
---------------010801000507040802040508
+--------------010704070601080301080303
 Content-Type: text/plain; charset="ISO-8859-1"
 Content-Transfer-Encoding: 7bit
 
-This patch makes gconf more like nconf and mconf
-by modifying hostprogs insted of gconf-objs.
+This patch makes qconf more like nconf and mconf
+by modifying hostprogs insted of qconf-objs.
 
 Signed-off-by: Peter Foley <pefoley2@verizon.net>
 ---
- scripts/kconfig/Makefile |    5 +++--
- 1 files changed, 3 insertions(+), 2 deletions(-)
+ scripts/kconfig/Makefile |    7 ++++---
+ 1 files changed, 4 insertions(+), 3 deletions(-)
 
 diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
-index b0b3dcb..74d9512 100644
+index fec830f..b0b3dcb 100644
 --- a/scripts/kconfig/Makefile
 +++ b/scripts/kconfig/Makefile
-@@ -170,8 +170,9 @@ nconf-objs     := nconf.o zconf.tab.o nconf.gui.o
+@@ -168,8 +168,10 @@ conf-objs	:= conf.o  zconf.tab.o
+ mconf-objs     := mconf.o zconf.tab.o $(lxdialog)
+ nconf-objs     := nconf.o zconf.tab.o nconf.gui.o
  kxgettext-objs	:= kxgettext.o zconf.tab.o
- qconf-cxxobjs	:= qconf.o
- qconf-objs	:= kconfig_load.o zconf.tab.o
-+gconf-objs	:= gconf.o kconfig_load.o zconf.tab.o
++qconf-cxxobjs	:= qconf.o
++qconf-objs	:= kconfig_load.o zconf.tab.o
 
--hostprogs-y := conf gconf
-+hostprogs-y := conf
+-hostprogs-y := conf qconf gconf
++hostprogs-y := conf gconf
 
  ifeq ($(MAKECMDGOALS),nconfig)
  	hostprogs-y += nconf
-@@ -198,7 +199,7 @@ ifeq ($(qconf-target),1)
+@@ -192,8 +194,7 @@ endif
+
+
+ ifeq ($(qconf-target),1)
+-qconf-cxxobjs	:= qconf.o
+-qconf-objs	:= kconfig_load.o zconf.tab.o
++	hostprogs-y += qconf
  endif
 
  ifeq ($(gconf-target),1)
--gconf-objs	:= gconf.o kconfig_load.o zconf.tab.o
-+	hostprogs-y += gconf
- endif
-
- clean-files	:= lkc_defs.h qconf.moc .tmp_qtcheck \
 -- 
 1.7.5.rc1
 
 
 
 
---------------010801000507040802040508
+--------------010704070601080301080303
 Content-Type: text/plain;
-	name="kbuild-change-gconf-to-modify-hostprogs-y-like-nconf.patch"
+	name="kbuild-change-qconf-to-modify-hostprogs-y-like-nconf.patch"
 Content-Transfer-Encoding: 7bit
 Content-Disposition: attachment;
-	filename="kbuild-change-gconf-to-modify-hostprogs-y-like-nconf.patch"
+	filename="kbuild-change-qconf-to-modify-hostprogs-y-like-nconf.patch"
 
-From 1e1409fed85ecc657f7929154c6c0930bfebab96 Mon Sep 17 00:00:00 2001
+From aa40714349234628e56fe92de1a37dd4b122ec2c Mon Sep 17 00:00:00 2001
 From: Peter Foley <pefoley2@verizon.net>
-Date: Tue, 26 Apr 2011 18:02:08 -0400
-Subject: [PATCH 3/7] kbuild: change gconf to modify hostprogs-y like nconf
+Date: Tue, 26 Apr 2011 18:00:05 -0400
+Subject: [PATCH 2/7] kbuild: change qconf to modify hostprogs-y like nconf
  and mconf
 
 
 Signed-off-by: Peter Foley <pefoley2@verizon.net>
 ---
- scripts/kconfig/Makefile |    5 +++--
- 1 files changed, 3 insertions(+), 2 deletions(-)
+ scripts/kconfig/Makefile |    7 ++++---
+ 1 files changed, 4 insertions(+), 3 deletions(-)
 
 diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
-index b0b3dcb..74d9512 100644
+index fec830f..b0b3dcb 100644
 --- a/scripts/kconfig/Makefile
 +++ b/scripts/kconfig/Makefile
-@@ -170,8 +170,9 @@ nconf-objs     := nconf.o zconf.tab.o nconf.gui.o
+@@ -168,8 +168,10 @@ conf-objs	:= conf.o  zconf.tab.o
+ mconf-objs     := mconf.o zconf.tab.o $(lxdialog)
+ nconf-objs     := nconf.o zconf.tab.o nconf.gui.o
  kxgettext-objs	:= kxgettext.o zconf.tab.o
- qconf-cxxobjs	:= qconf.o
- qconf-objs	:= kconfig_load.o zconf.tab.o
-+gconf-objs	:= gconf.o kconfig_load.o zconf.tab.o
++qconf-cxxobjs	:= qconf.o
++qconf-objs	:= kconfig_load.o zconf.tab.o
  
--hostprogs-y := conf gconf
-+hostprogs-y := conf
+-hostprogs-y := conf qconf gconf
++hostprogs-y := conf gconf
  
  ifeq ($(MAKECMDGOALS),nconfig)
  	hostprogs-y += nconf
-@@ -198,7 +199,7 @@ ifeq ($(qconf-target),1)
+@@ -192,8 +194,7 @@ endif
+ 
+ 
+ ifeq ($(qconf-target),1)
+-qconf-cxxobjs	:= qconf.o
+-qconf-objs	:= kconfig_load.o zconf.tab.o
++	hostprogs-y += qconf
  endif
  
  ifeq ($(gconf-target),1)
--gconf-objs	:= gconf.o kconfig_load.o zconf.tab.o
-+	hostprogs-y += gconf
- endif
- 
- clean-files	:= lkc_defs.h qconf.moc .tmp_qtcheck \
 -- 
 1.7.5.rc1
 
 
 
 
---------------010801000507040802040508--
+--------------010704070601080301080303--
