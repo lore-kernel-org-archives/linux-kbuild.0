@@ -1,67 +1,168 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from moutng.kundenserver.de ([212.227.126.187]:59071 "EHLO
-	moutng.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1759891Ab1D0Twp (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 27 Apr 2011 15:52:45 -0400
-From: Arnd Bergmann <arnd@arndb.de>
-Subject: Re: [PATCH v4] kbuild: asm-generic support
-Date: Wed, 27 Apr 2011 21:52:37 +0200
-References: <20110108130302.GA21698@merkur.ravnborg.org> <20110427194225.GA6551@merkur.ravnborg.org> <20110427194647.GA6621@merkur.ravnborg.org>
-In-Reply-To: <20110427194647.GA6621@merkur.ravnborg.org>
-MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-1"
-Content-Transfer-Encoding: 7bit
-Message-Id: <201104272152.37889.arnd@arndb.de>
+Received: from mail.skyhub.de ([78.46.96.112]:32816 "EHLO mail.skyhub.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752913Ab1D0UPd (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 27 Apr 2011 16:15:33 -0400
+From: Borislav Petkov <bp@alien8.de>
+Subject: [PATCH v3.2] kbuild: implement several W= levels
+Date: Wed, 27 Apr 2011 22:15:27 +0200
+Message-Id: <1303935327-5154-1-git-send-email-bp@alien8.de>
+In-Reply-To: <20110427113513.GB18112@eferding.osrc.amd.com>
+References: <20110427113513.GB18112@eferding.osrc.amd.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Sam Ravnborg <sam@ravnborg.org>
-Cc: Guan Xuetao <gxt@mprc.pku.edu.cn>, Michal Marek <mmarek@suse.cz>, 'lkml' <linux-kernel@vger.kernel.org>, 'linux-kbuild' <linux-kbuild@vger.kernel.org>, 'linux arch' <linux-arch@vger.kernel.org>, 'Guan Xuetao' <guanxuetao@mprc.pku.edu.cn>, Remis Lima Baima <remis.developer@googlemail.com>
+Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Borislav Petkov <bp@alien8.de>, Dave Jones <davej@redhat.com>, Geert Uytterhoeven <geert@linux-m68k.org>
 
-On Wednesday 27 April 2011 21:46:47 Sam Ravnborg wrote:
-> From 8546953f0c87d6b1c37c25df73511780c86ad89d Mon Sep 17 00:00:00 2001
-> From: Sam Ravnborg <sam@ravnborg.org>
-> Date: Fri, 22 Apr 2011 14:45:13 +0200
-> Subject: [PATCH] kbuild: asm-generic support
-> 
-> There is an increasing amount of header files
-> shared between individual architectures in asm-generic.
-> To avoid a lot of dummy wrapper files that just
-> include the corresponding file in asm-generic provide
-> some basic support in kbuild for this.
-> 
-> With the following patch an architecture can maintain
-> a list of files in the file arch/$(ARCH)/include/asm/Kbuild
-> 
-> To use a generic file just add:
-> 
->         generic-y += <name-of-header-file.h>
-> 
-> For each file listed kbuild will generate the necessary
-> wrapper in arch/$(ARCH)/include/generated/asm.
-> 
-> When installing userspace headers a wrapper is likewise created.
-> 
-> The original inspiration for this came from the unicore32
-> patchset - although a different method is used.
-> 
-> The patch includes several improvements from Arnd Bergmann.
-> Michael Marek contributed Makefile.asm-generic.
-> 
-> Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
-> Acked-by: Guan Xuetao <guanxuetao@mprc.pku.edu.cn>
-> Tested-by: Guan Xuetao <guanxuetao@mprc.pku.edu.cn>
-> Cc: Arnd Bergmann <arnd@arndb.de>
+From: Sam Ravnborg <sam@ravnborg.org>
 
-Acked-by: Arnd Bergmann <arnd@arndb.de>
+Building a kernel with "make W=1" produces far too much noise to be
+useful.
 
-I'm glad to see this finally happen.
+Divide the warning options in three groups:
 
-Maybe you can mention Remis Baima in the changelog as well,
-he did an earlier implementation back in the days when some
-architectures were still using include/asm-${ARCH}, which IIRC
-did not get merged because of the complexity associated with
-that.
+    W=1 - warnings that may be relevant and does not occur too often
+    W=2 - warnings that occur quite often but may still be relevant
+    W=3 - the more obscure warnings, can most likely be ignored
 
-	Arnd
+When building the whole kernel, those levels produce:
+
+W=1 - 4859 warnings
+W=2 - 1394 warnings
+W=3 - 86666 warnings
+
+respectively. Warnings have been counted with Geert's script at
+
+http://www.kernel.org/pub/linux/kernel/people/geert/linux-log/linux-log-summary.pl
+
+Many warnings occur from .h files so fixing one file may have a nice
+effect on the total number of warnings.
+
+With these changes I am actually tempted to try W=1 now and then.
+Previously there was just too much noise.
+
+Borislav:
+
+- make the W= levels exclusive
+- move very noisy and making little sense for the kernel warnings to W=3
+- drop -Woverlength-strings due to useless warning message
+- copy explanatory text for the different warning levels to 'make help'
+- recount warnings per level
+
+Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
+Signed-off-by: Borislav Petkov <bp@alien8.de>
+Cc: Dave Jones <davej@redhat.com>
+Cc: Geert Uytterhoeven <geert@linux-m68k.org>
+---
+ Makefile               |    8 ++++-
+ scripts/Makefile.build |   65 ++++++++++++++++++++++++++++--------------------
+ 2 files changed, 44 insertions(+), 29 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 5a7a2e4..b2a6808 100644
+--- a/Makefile
++++ b/Makefile
+@@ -103,7 +103,7 @@ ifeq ("$(origin O)", "command line")
+ endif
+ 
+ ifeq ("$(origin W)", "command line")
+-  export KBUILD_ENABLE_EXTRA_GCC_CHECKS := 1
++  export KBUILD_ENABLE_EXTRA_GCC_CHECKS := $(W)
+ endif
+ 
+ # That's our default target when none is given on the command line
+@@ -1267,7 +1267,11 @@ help:
+ 	@echo  '  make O=dir [targets] Locate all output files in "dir", including .config'
+ 	@echo  '  make C=1   [targets] Check all c source with $$CHECK (sparse by default)'
+ 	@echo  '  make C=2   [targets] Force check of all c source with $$CHECK'
+-	@echo  '  make W=1   [targets] Enable extra gcc checks'
++	@echo  '  make W=n   [targets] Enable extra gcc checks, n=1,2,3 where'
++	@echo  '		1: warnings which may be relevant and do not occur too often'
++	@echo  '		2: warnings which occur quite often but may still be relevant'
++	@echo  '		3: more obscure warnings, can most likely be ignored'
++
+ 	@echo  ''
+ 	@echo  'Execute "make" or "make all" to build all targets marked with [*] '
+ 	@echo  'For further info see the ./README file'
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index d5f925a..ffb383c 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -51,36 +51,47 @@ ifeq ($(KBUILD_NOPEDANTIC),)
+ endif
+ 
+ #
+-# make W=1 settings
++# make W=... settings
+ #
+-# $(call cc-option... ) handles gcc -W.. options which
++# W=1 - warnings that may be relevant and does not occur too often
++# W=2 - warnings that occur quite often but may still be relevant
++# W=3 - the more obscure warnings, can most likely be ignored
++#
++# $(call cc-option, -W...) handles gcc -W.. options which
+ # are not supported by all versions of the compiler
+ ifdef KBUILD_ENABLE_EXTRA_GCC_CHECKS
+-KBUILD_EXTRA_WARNINGS := -Wextra
+-KBUILD_EXTRA_WARNINGS += -Wunused -Wno-unused-parameter
+-KBUILD_EXTRA_WARNINGS += -Waggregate-return
+-KBUILD_EXTRA_WARNINGS += -Wbad-function-cast
+-KBUILD_EXTRA_WARNINGS += -Wcast-qual
+-KBUILD_EXTRA_WARNINGS += -Wcast-align
+-KBUILD_EXTRA_WARNINGS += -Wconversion
+-KBUILD_EXTRA_WARNINGS += -Wdisabled-optimization
+-KBUILD_EXTRA_WARNINGS += -Wlogical-op
+-KBUILD_EXTRA_WARNINGS += -Wmissing-declarations
+-KBUILD_EXTRA_WARNINGS += -Wmissing-format-attribute
+-KBUILD_EXTRA_WARNINGS += $(call cc-option, -Wmissing-include-dirs,)
+-KBUILD_EXTRA_WARNINGS += -Wmissing-prototypes
+-KBUILD_EXTRA_WARNINGS += -Wnested-externs
+-KBUILD_EXTRA_WARNINGS += -Wold-style-definition
+-KBUILD_EXTRA_WARNINGS += $(call cc-option, -Woverlength-strings,)
+-KBUILD_EXTRA_WARNINGS += -Wpacked
+-KBUILD_EXTRA_WARNINGS += -Wpacked-bitfield-compat
+-KBUILD_EXTRA_WARNINGS += -Wpadded
+-KBUILD_EXTRA_WARNINGS += -Wpointer-arith
+-KBUILD_EXTRA_WARNINGS += -Wredundant-decls
+-KBUILD_EXTRA_WARNINGS += -Wshadow
+-KBUILD_EXTRA_WARNINGS += -Wswitch-default
+-KBUILD_EXTRA_WARNINGS += $(call cc-option, -Wvla,)
+-KBUILD_CFLAGS += $(KBUILD_EXTRA_WARNINGS)
++warning-1 := -Wextra -Wunused -Wno-unused-parameter
++warning-1 += -Wmissing-declarations
++warning-1 += -Wmissing-format-attribute
++warning-1 += -Wmissing-prototypes
++warning-1 += -Wold-style-definition
++warning-1 += $(call cc-option, -Wmissing-include-dirs)
++
++warning-2 := -Waggregate-return
++warning-2 += -Wcast-align
++warning-2 += -Wdisabled-optimization
++warning-2 += -Wnested-externs
++warning-2 += -Wshadow
++warning-2 += $(call cc-option, -Wlogical-op)
++
++warning-3 := -Wbad-function-cast
++warning-3 += -Wcast-qual
++warning-3 += -Wconversion
++warning-3 += -Wpacked
++warning-3 += -Wpadded
++warning-3 += -Wpointer-arith
++warning-3 += -Wredundant-decls
++warning-3 += -Wswitch-default
++warning-3 += $(call cc-option, -Wpacked-bitfield-compat)
++warning-3 += $(call cc-option, -Wvla)
++
++warning := $(warning-$(KBUILD_ENABLE_EXTRA_GCC_CHECKS))
++
++ifeq ("$(warning)","")
++        $(error W=$(KBUILD_ENABLE_EXTRA_GCC_CHECKS) is unknown)
++endif
++
++KBUILD_CFLAGS += $(warning)
+ endif
+ 
+ include scripts/Makefile.lib
+-- 
+1.7.5.rc1.16.g9db1
+
