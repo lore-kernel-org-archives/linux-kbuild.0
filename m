@@ -1,74 +1,70 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-bw0-f46.google.com ([209.85.214.46]:46615 "EHLO
-	mail-bw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1759805Ab1D1NoQ convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 28 Apr 2011 09:44:16 -0400
+Received: from cantor2.suse.de ([195.135.220.15]:49195 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752327Ab1D1QRA (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 28 Apr 2011 12:17:00 -0400
+Date: Thu, 28 Apr 2011 18:16:57 +0200
+From: Michal Marek <mmarek@suse.cz>
+Subject: Re: [PATCH v5] kbuild: asm-generic support
+Message-ID: <20110428161657.GA1619@sepie.suse.cz>
+References: <20110108130302.GA21698@merkur.ravnborg.org>
+ <20110427194225.GA6551@merkur.ravnborg.org>
+ <20110427194647.GA6621@merkur.ravnborg.org>
+ <201104272152.37889.arnd@arndb.de>
+ <20110427202949.GA8881@merkur.ravnborg.org>
 MIME-Version: 1.0
-In-Reply-To: <4DB98854020000780003EA4D@vpn.id2.novell.com>
-References: <4DB85404020000780003E6D7@vpn.id2.novell.com>
-	<20110428104306.GC2431@osiris.boeblingen.de.ibm.com>
-	<4DB96E6A020000780003E9EB@vpn.id2.novell.com>
-	<BANLkTikJN92ogUfxAc+SgzvX1Q8r48ughw@mail.gmail.com>
-	<4DB9748B020000780003EA01@vpn.id2.novell.com>
-	<20110428125302.GD2431@osiris.boeblingen.de.ibm.com>
-	<4DB98854020000780003EA4D@vpn.id2.novell.com>
-Date: Thu, 28 Apr 2011 15:44:13 +0200
-Message-ID: <BANLkTinpjyKFMChWh5rVfRbpOsp6kGEXYw@mail.gmail.com>
-Subject: Re: [PATCH] allow placing exception table in .rodata (and do so on x86)
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20110427202949.GA8881@merkur.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jan Beulich <JBeulich@novell.com>
-Cc: Heiko Carstens <heiko.carstens@de.ibm.com>, mingo@elte.hu, tglx@linutronix.de, linux-arch@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, hpa@zytor.com
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: Arnd Bergmann <arnd@arndb.de>, Remis Lima Baima <remis.developer@googlemail.com>, Guan Xuetao <gxt@mprc.pku.edu.cn>, 'lkml' <linux-kernel@vger.kernel.org>, 'linux-kbuild' <linux-kbuild@vger.kernel.org>, 'linux arch' <linux-arch@vger.kernel.org>, 'Guan Xuetao' <guanxuetao@mprc.pku.edu.cn>
 
-On Thu, Apr 28, 2011 at 15:31, Jan Beulich <JBeulich@novell.com> wrote:
->>>> On 28.04.11 at 14:53, Heiko Carstens <heiko.carstens@de.ibm.com> wrote:
->> On Thu, Apr 28, 2011 at 01:07:07PM +0100, Jan Beulich wrote:
->>> >>> On 28.04.11 at 13:47, Geert Uytterhoeven <geert@linux-m68k.org> wrote:
->>> > On Thu, Apr 28, 2011 at 13:40, Jan Beulich <JBeulich@novell.com> wrote:
->>> >>>>> On 28.04.11 at 12:43, Heiko Carstens <heiko.carstens@de.ibm.com> wrote:
->>> >>> On Wed, Apr 27, 2011 at 04:36:04PM +0100, Jan Beulich wrote:
->>> >>> That's odd. The kernel actually writes to it (sort_main_extable()), so
->>> >>> it shouldn't be in the ro data section, but the data section.
->>> >>
->>> >> This area does get written, but only at boot time, before read-only
->>> >> data gets set to r/o (on x86 at least). With this in mind, it's better
->>> >> to place it in .rodata, as that way run-time protection will be in place
->>> >> (and I think you agree that it was misplaced in .text in any case).
->>> >
->>> > Which means it may be in ROM (which is really read-only) on some embedded
->>> > devices, so it cannot be sorted?
->>>
->>> Perhaps - but since sorting is a requirement, people building such
->>> systems must have found a way... Anyway, I don't see where both
->>
->> Yes, we found a way on s390: we put the exception table in the data section.
->>
->>> your and Heiko's comment are heading, since the situation is even
->>> worse without the patch afaics (since .text gets marked read-only
->>> as much as .rodata does, and could equally be placed in ROM).
->>
->> My point is that your default is wrong. If it makes sense to put the extable
->> into the rodata section then an architecture could do so. However making the
->> default to put data into the rodata section that is actually written to is
->> the wrong approach.
->> It just asks for breakage.
->
-> The patch doesn't make this the default - it just makes it possible
-> for an architecture to do so.
+On Wed, Apr 27, 2011 at 10:29:49PM +0200, Sam Ravnborg wrote:
+> From 1b46234aa99f235b48dce0068fb5fb56ddf6ddab Mon Sep 17 00:00:00 2001
+> From: Sam Ravnborg <sam@ravnborg.org>
+> Date: Fri, 22 Apr 2011 14:45:13 +0200
+> Subject: [PATCH] kbuild: asm-generic support
+> 
+> There is an increasing amount of header files
+> shared between individual architectures in asm-generic.
+> To avoid a lot of dummy wrapper files that just
+> include the corresponding file in asm-generic provide
+> some basic support in kbuild for this.
+> 
+> With the following patch an architecture can maintain
+> a list of files in the file arch/$(ARCH)/include/asm/Kbuild
+> 
+> To use a generic file just add:
+> 
+>         generic-y += <name-of-header-file.h>
+> 
+> For each file listed kbuild will generate the necessary
+> wrapper in arch/$(ARCH)/include/generated/asm.
+> 
+> When installing userspace headers a wrapper is likewise created.
+> 
+> The original inspiration for this came from the unicore32
+> patchset - although a different method is used.
+> 
+> The patch includes several improvements from Arnd Bergmann.
+> Michael Marek contributed Makefile.asm-generic.
+> 
+> Remis Baima did an intial implementation along to achive
+> the same - see https://patchwork.kernel.org/patch/13352/
+> 
+> Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
+> Acked-by: Guan Xuetao <guanxuetao@mprc.pku.edu.cn>
+> Tested-by: Guan Xuetao <guanxuetao@mprc.pku.edu.cn>
+> Acked-by: Arnd Bergmann <arnd@arndb.de>
+> Cc: Remis Lima Baima <remis.developer@googlemail.com>
+> ---
+> 
+> Changes from v4 => v5
+> - Mentioned Remis in changelog (thanks to Arnd)
+> - Added "Acked-by" from Arnd
 
-"asm-generic" is the default for new architectures.
+Applied to kbuild-2.6.git#kbuild, thanks a lot!
 
-Gr{oetje,eeting}s,
-
-                        Geert
-
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+Michal
