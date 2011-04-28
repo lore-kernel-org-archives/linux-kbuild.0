@@ -1,64 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:49233 "EHLO mx2.suse.de"
+Received: from cantor.suse.de ([195.135.220.2]:33659 "EHLO mx1.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752327Ab1D1QSN (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 28 Apr 2011 12:18:13 -0400
-Date: Thu, 28 Apr 2011 18:18:07 +0200
+	id S1757739Ab1D1QYv (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 28 Apr 2011 12:24:51 -0400
+Message-ID: <4DB994CE.40403@suse.cz>
+Date: Thu, 28 Apr 2011 18:24:46 +0200
 From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [PATCH v3.2] kbuild: implement several W= levels
-Message-ID: <20110428161807.GB1619@sepie.suse.cz>
-References: <20110427113513.GB18112@eferding.osrc.amd.com>
- <1303935327-5154-1-git-send-email-bp@alien8.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1303935327-5154-1-git-send-email-bp@alien8.de>
+Subject: Re: [PATCH v3.1] kbuild: implement several W= levels
+References: <20110422110947.GA20715@merkur.ravnborg.org> <1303494642-18594-1-git-send-email-bp@alien8.de> <20110427082555.GC5726@merkur.ravnborg.org>            <20110427113513.GB18112@eferding.osrc.amd.com> <11802.1303950320@localhost>
+In-Reply-To: <11802.1303950320@localhost>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Borislav Petkov <bp@alien8.de>
-Cc: Sam Ravnborg <sam@ravnborg.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Dave Jones <davej@redhat.com>, Geert Uytterhoeven <geert@linux-m68k.org>
+To: Valdis.Kletnieks@vt.edu
+Cc: Borislav Petkov <bp@alien8.de>, Sam Ravnborg <sam@ravnborg.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Dave Jones <davej@redhat.com>
 
-On Wed, Apr 27, 2011 at 10:15:27PM +0200, Borislav Petkov wrote:
-> From: Sam Ravnborg <sam@ravnborg.org>
-> 
-> Building a kernel with "make W=1" produces far too much noise to be
-> useful.
-> 
-> Divide the warning options in three groups:
-> 
->     W=1 - warnings that may be relevant and does not occur too often
->     W=2 - warnings that occur quite often but may still be relevant
->     W=3 - the more obscure warnings, can most likely be ignored
-> 
-> When building the whole kernel, those levels produce:
-> 
-> W=1 - 4859 warnings
-> W=2 - 1394 warnings
-> W=3 - 86666 warnings
-> 
-> respectively. Warnings have been counted with Geert's script at
-> 
-> http://www.kernel.org/pub/linux/kernel/people/geert/linux-log/linux-log-summary.pl
-> 
-> Many warnings occur from .h files so fixing one file may have a nice
-> effect on the total number of warnings.
-> 
-> With these changes I am actually tempted to try W=1 now and then.
-> Previously there was just too much noise.
-> 
-> Borislav:
-> 
-> - make the W= levels exclusive
-> - move very noisy and making little sense for the kernel warnings to W=3
-> - drop -Woverlength-strings due to useless warning message
-> - copy explanatory text for the different warning levels to 'make help'
-> - recount warnings per level
-> 
-> Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
-> Signed-off-by: Borislav Petkov <bp@alien8.de>
-> Cc: Dave Jones <davej@redhat.com>
-> Cc: Geert Uytterhoeven <geert@linux-m68k.org>
+On 28.4.2011 02:25, Valdis.Kletnieks@vt.edu wrote:
+> On Wed, 27 Apr 2011 13:35:13 +0200, Borislav Petkov said:
+>
+>> If we do this inclusive, then W=2 dumps the, let's call it, level 1
+>> _plus_ the new level 2 warnings, polluting the output with something
+>> I've already seen, but only partially. And then I start to think, did
+>> I see this one already, didn't I, which was it? By the time you enable
+>> W=3, the output becomes pretty useless. For example, W=3 generates 190+
+>> MB logfile here only with level 3 warnings. Now imagine all 3 levels
+>> combined.
+>
+> If each level is averaging 10x the previous level, then all 3 levels will only be 11%
+> bigger, or 211MB.
+>
+> You *really* want to get *all* the warnings - quite often, you'll be looking
+> at a set of 15 or 20 level-3 warnings.  And if you had the Level-2's in there as
+> well, you'd immediately realize that the single level-2 was the real root-cause
+> of all the cascating warnings.
 
-Applied to kbuild-2.6.git#kbuild, thanks!
+How about W=12 for level 1 and 2 warnings and W=123 for all levels?
 
 Michal
