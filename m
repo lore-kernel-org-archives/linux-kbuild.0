@@ -1,61 +1,55 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Message-Id: <4DB9748B020000780003EA01@vpn.id2.novell.com>
-Date: Thu, 28 Apr 2011 13:07:07 +0100
-From: "Jan Beulich" <JBeulich@novell.com>
-Subject: Re: [PATCH] allow placing exception table in .rodata (and do
-	 so on x86)
+Received: from mtagate3.uk.ibm.com ([194.196.100.163]:37841 "EHLO
+	mtagate3.uk.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751865Ab1D1MxF (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 28 Apr 2011 08:53:05 -0400
+Date: Thu, 28 Apr 2011 14:53:02 +0200
+From: Heiko Carstens <heiko.carstens@de.ibm.com>
+Subject: Re: [PATCH] allow placing exception table in .rodata (and do	 so
+ on x86)
+Message-ID: <20110428125302.GD2431@osiris.boeblingen.de.ibm.com>
 References: <4DB85404020000780003E6D7@vpn.id2.novell.com>
  <20110428104306.GC2431@osiris.boeblingen.de.ibm.com>
  <4DB96E6A020000780003E9EB@vpn.id2.novell.com>
  <BANLkTikJN92ogUfxAc+SgzvX1Q8r48ughw@mail.gmail.com>
-In-Reply-To: <BANLkTikJN92ogUfxAc+SgzvX1Q8r48ughw@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8BIT
+ <4DB9748B020000780003EA01@vpn.id2.novell.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <4DB9748B020000780003EA01@vpn.id2.novell.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Geert Uytterhoeven <geert@linux-m68k.org>
-Cc: Heiko Carstens <heiko.carstens@de.ibm.com>, mingo@elte.hu, tglx@linutronix.de, linux-arch@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, hpa@zytor.com
+To: Jan Beulich <JBeulich@novell.com>
+Cc: Geert Uytterhoeven <geert@linux-m68k.org>, mingo@elte.hu, tglx@linutronix.de, linux-arch@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, hpa@zytor.com
 
->>> On 28.04.11 at 13:47, Geert Uytterhoeven <geert@linux-m68k.org> wrote:
-> On Thu, Apr 28, 2011 at 13:40, Jan Beulich <JBeulich@novell.com> wrote:
->>>>> On 28.04.11 at 12:43, Heiko Carstens <heiko.carstens@de.ibm.com> wrote:
->>> On Wed, Apr 27, 2011 at 04:36:04PM +0100, Jan Beulich wrote:
->>>> This is since the table is really a set of pointers, i.e. misplaced in
->>>> .text.
->>>>
->>>> Quite likely other architectures would want to follow.
->>>>
->>>> Signed-off-by: Jan Beulich <jbeulich@novell.com>
->>>>
->>>
->>> [...]
->>>
->>>> --- 2.6.39-rc5/include/asm-generic/vmlinux.lds.h
->>>> +++ 2.6.39-rc5-extable-in-rodata/include/asm-generic/vmlinux.lds.h
->>>> @@ -226,6 +226,7 @@
->>>>              *(.rodata1)                                             \
->>>>      }                                                               \
->>>>                                                                      \
->>>> +    EXCEPTION_TABLE_RO                                              \
->>>
->>> That's odd. The kernel actually writes to it (sort_main_extable()), so
->>> it shouldn't be in the ro data section, but the data section.
->>
->> This area does get written, but only at boot time, before read-only
->> data gets set to r/o (on x86 at least). With this in mind, it's better
->> to place it in .rodata, as that way run-time protection will be in place
->> (and I think you agree that it was misplaced in .text in any case).
+On Thu, Apr 28, 2011 at 01:07:07PM +0100, Jan Beulich wrote:
+> >>> On 28.04.11 at 13:47, Geert Uytterhoeven <geert@linux-m68k.org> wrote:
+> > On Thu, Apr 28, 2011 at 13:40, Jan Beulich <JBeulich@novell.com> wrote:
+> >>>>> On 28.04.11 at 12:43, Heiko Carstens <heiko.carstens@de.ibm.com> wrote:
+> >>> On Wed, Apr 27, 2011 at 04:36:04PM +0100, Jan Beulich wrote:
+> >>> That's odd. The kernel actually writes to it (sort_main_extable()), so
+> >>> it shouldn't be in the ro data section, but the data section.
+> >>
+> >> This area does get written, but only at boot time, before read-only
+> >> data gets set to r/o (on x86 at least). With this in mind, it's better
+> >> to place it in .rodata, as that way run-time protection will be in place
+> >> (and I think you agree that it was misplaced in .text in any case).
+> > 
+> > Which means it may be in ROM (which is really read-only) on some embedded
+> > devices, so it cannot be sorted?
 > 
-> Which means it may be in ROM (which is really read-only) on some embedded
-> devices, so it cannot be sorted?
+> Perhaps - but since sorting is a requirement, people building such
+> systems must have found a way... Anyway, I don't see where both
 
-Perhaps - but since sorting is a requirement, people building such
-systems must have found a way... Anyway, I don't see where both
-your and Heiko's comment are heading, since the situation is even
-worse without the patch afaics (since .text gets marked read-only
-as much as .rodata does, and could equally be placed in ROM).
+Yes, we found a way on s390: we put the exception table in the data section.
 
-Jan
+> your and Heiko's comment are heading, since the situation is even
+> worse without the patch afaics (since .text gets marked read-only
+> as much as .rodata does, and could equally be placed in ROM).
 
+My point is that your default is wrong. If it makes sense to put the extable
+into the rodata section then an architecture could do so. However making the
+default to put data into the rodata section that is actually written to is
+the wrong approach.
+It just asks for breakage.
