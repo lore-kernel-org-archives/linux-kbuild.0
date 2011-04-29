@@ -1,55 +1,60 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:58826 "EHLO mx2.suse.de"
+Received: from cantor.suse.de ([195.135.220.2]:43776 "EHLO mx1.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751640Ab1D2Nbx (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 29 Apr 2011 09:31:53 -0400
+	id S1753241Ab1D2NrU (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 29 Apr 2011 09:47:20 -0400
+Date: Fri, 29 Apr 2011 15:47:18 +0200
 From: Michal Marek <mmarek@suse.cz>
-Subject: [PATCH] kbuild: Allow to combine multiple W= levels
-Date: Fri, 29 Apr 2011 15:31:33 +0200
-Message-Id: <1304083893-18849-1-git-send-email-mmarek@suse.cz>
-In-Reply-To: <71633.1304013549@localhost>
-References: <71633.1304013549@localhost>
+Subject: Re: [PATCH V2] kbuild: don't warn about include/linux/version.h not
+ including itself
+Message-ID: <20110429134718.GE1619@sepie.suse.cz>
+References: <4DB7504C.6060507@verizon.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4DB7504C.6060507@verizon.net>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Valdis.Kletnieks@vt.edu
-Cc: bp@alien8.de, sam@ravnborg.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, davej@redhat.com
+To: Peter Foley <pefoley2@verizon.net>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-Add support for make W=12, make W=123 and so on, to enable warnings from
-multiple W= levels. Normally, make W=<level> does not include warnings
-from the previous level.
+On Tue, Apr 26, 2011 at 07:07:56PM -0400, Peter Foley wrote:
+> This patch makes checkversion.pl not warn that include/linux/version.h
+> dosen't include itself.
+> 
+> Signed-off-by: Peter Foley <pefoley2@verizon.net>
+> ---
+>  scripts/checkversion.pl |    3 +++
+>  1 files changed, 3 insertions(+), 0 deletions(-)
+> 
+> diff --git a/scripts/checkversion.pl b/scripts/checkversion.pl
+> index b444e89..cf4b1dc 100755
+> --- a/scripts/checkversion.pl
+> +++ b/scripts/checkversion.pl
+> @@ -12,6 +12,8 @@ $| = 1;
+>  my $debugging;
+>  
+>  foreach my $file (@ARGV) {
+> +    if($file !~ "include/linux/version\.h")
+> +    {
+>      # Open this file.
 
-Signed-off-by: Michal Marek <mmarek@suse.cz>
----
- scripts/Makefile.build |    8 ++++++--
- 1 files changed, 6 insertions(+), 2 deletions(-)
+Enclosing the block in another pair of {...} is ugly, I changed it to
 
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index 9c0c481..28cef2a 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -60,6 +60,8 @@ endif
- # $(call cc-option, -W...) handles gcc -W.. options which
- # are not supported by all versions of the compiler
- ifdef KBUILD_ENABLE_EXTRA_GCC_CHECKS
-+warning-  := $(empty)
-+
- warning-1 := -Wextra -Wunused -Wno-unused-parameter
- warning-1 += -Wmissing-declarations
- warning-1 += -Wmissing-format-attribute
-@@ -85,9 +87,11 @@ warning-3 += -Wswitch-default
- warning-3 += $(call cc-option, -Wpacked-bitfield-compat)
- warning-3 += $(call cc-option, -Wvla)
+
+diff --git a/scripts/checkversion.pl b/scripts/checkversion.pl
+index b444e89..5e490a8 100755
+--- a/scripts/checkversion.pl
++++ b/scripts/checkversion.pl
+@@ -12,6 +12,7 @@ $| = 1;
+ my $debugging;
  
--warning := $(warning-$(KBUILD_ENABLE_EXTRA_GCC_CHECKS))
-+warning := $(warning-$(findstring 1, $(KBUILD_ENABLE_EXTRA_GCC_CHECKS)))
-+warning += $(warning-$(findstring 2, $(KBUILD_ENABLE_EXTRA_GCC_CHECKS)))
-+warning += $(warning-$(findstring 3, $(KBUILD_ENABLE_EXTRA_GCC_CHECKS)))
- 
--ifeq ("$(warning)","")
-+ifeq ("$(strip $(warning))","")
-         $(error W=$(KBUILD_ENABLE_EXTRA_GCC_CHECKS) is unknown)
- endif
- 
--- 
-1.7.4.1
+ foreach my $file (@ARGV) {
++    next if $file =~ "include/linux/version\.h";
+     # Open this file.
+     open( my $f, '<', $file )
+       or die "Can't open $file: $!\n";
 
+and pushed to kbuild-2.6.git#misc.
+
+Michal
