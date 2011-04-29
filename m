@@ -1,91 +1,54 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from nd215.dnsexit.com ([64.182.102.215]:51342 "EHLO
-	box7.911domain.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1756186Ab1D2WjB (ORCPT
+Received: from oproxy1-pub.bluehost.com ([66.147.249.253]:52025 "HELO
+	oproxy1-pub.bluehost.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with SMTP id S1755039Ab1D2Wqw (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 29 Apr 2011 18:39:01 -0400
-Message-ID: <4DBB3DD9.3080607@verizon.net>
-Date: Fri, 29 Apr 2011 18:38:17 -0400
-From: Peter Foley <pefoley2@verizon.net>
-Reply-To: <pefoley2@verizon.net>
-MIME-Version: 1.0
-Subject: [PATCH V2 2/7] kbuild: update scripts/basic/Makefile in preperation
- for moving docproc
-Content-Type: multipart/mixed;
-	boundary="------------000109050605050806060902"
+	Fri, 29 Apr 2011 18:46:52 -0400
+Date: Fri, 29 Apr 2011 15:46:49 -0700
+From: Randy Dunlap <rdunlap@xenotime.net>
+Subject: Re: [PATCH V2 0/7] kbuild: move scripts/basic/docproc.c to
+ scripts/docproc.c
+Message-Id: <20110429154649.848f9ba8.rdunlap@xenotime.net>
+In-Reply-To: <4DBB3DD4.9000000@verizon.net>
+References: <4DBB3DD4.9000000@verizon.net>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>
+To: pefoley2@verizon.net
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>
 
---------------000109050605050806060902
-Content-Type: text/plain; charset="ISO-8859-1"
-Content-Transfer-Encoding: 7bit
+On Fri, 29 Apr 2011 18:38:12 -0400 Peter Foley wrote:
 
-This patch updates scripts/basic/Makefile in preperation for moving docproc.
-
-Signed-off-by: Peter Foley <pefoley2@verizon.net>
----
- scripts/basic/Makefile |    3 +--
- 1 files changed, 1 insertions(+), 2 deletions(-)
-
-diff --git a/scripts/basic/Makefile b/scripts/basic/Makefile
-index 4c324a1..4fcef87 100644
---- a/scripts/basic/Makefile
-+++ b/scripts/basic/Makefile
-@@ -7,9 +7,8 @@
- # .config is included by main Makefile.
- #
----------------------------------------------------------------------------
- # fixdep: 	 Used to generate dependency information during build process
--# docproc:	 Used in Documentation/DocBook
-
--hostprogs-y	:= fixdep docproc
-+hostprogs-y	:= fixdep
- always		:= $(hostprogs-y)
-
- # fixdep is needed to compile other host programs
--- 
-1.7.5.rc1
+> This patchset moves scripts/basic/docproc to scripts/docproc.
+> This causes docproc to only be built for *doc targets rather than every
+> time the kernel is compiled.
+> 
+> Patches also attached as requested by Michal Marek.
 
 
+That's disappointing (the attachments).  Why was this requested?
 
---------------000109050605050806060902
+See Documentation/CodingStyle, section 7:
+
+"No MIME, no links, no compression, no attachments.  Just plain text."
+
+
+It also causes breakage in other people's patch merging/testing.
+E.g., I cannot save any one of these emails as I can with other patches
+and get a useful patch file.  Instead, the saved file contains lines like
+this (below) and each patch 2 times (inline and attachment).
+
+--------------060706070408040606010200
 Content-Type: text/plain;
-	name="kbuild-update-scripts-basic-Makefile-in-preperation-.patch"
+	name="kbuild-update-DocBook-Makefile-in-preperation-for-mo.patch"
 Content-Transfer-Encoding: 7bit
 Content-Disposition: attachment;
-	filename="kbuild-update-scripts-basic-Makefile-in-preperation-.patch"
-
-From 87935415b9162f2402fe6877ea413a72c5516be4 Mon Sep 17 00:00:00 2001
-From: Peter Foley <pefoley2@verizon.net>
-Date: Tue, 26 Apr 2011 19:14:24 -0400
-Subject: [PATCH 2/7] kbuild: update scripts/basic/Makefile in preperation for moving docproc
+	filename="kbuild-update-DocBook-Makefile-in-preperation-for-mo.patch"
 
 
-Signed-off-by: Peter Foley <pefoley2@verizon.net>
+
 ---
- scripts/basic/Makefile |    3 +--
- 1 files changed, 1 insertions(+), 2 deletions(-)
-
-diff --git a/scripts/basic/Makefile b/scripts/basic/Makefile
-index 4c324a1..4fcef87 100644
---- a/scripts/basic/Makefile
-+++ b/scripts/basic/Makefile
-@@ -7,9 +7,8 @@
- # .config is included by main Makefile.
- # ---------------------------------------------------------------------------
- # fixdep: 	 Used to generate dependency information during build process
--# docproc:	 Used in Documentation/DocBook
- 
--hostprogs-y	:= fixdep docproc
-+hostprogs-y	:= fixdep
- always		:= $(hostprogs-y)
- 
- # fixdep is needed to compile other host programs
--- 
-1.7.5.rc1
-
-
-
---------------000109050605050806060902--
+~Randy
+*** Remember to use Documentation/SubmitChecklist when testing your code ***
