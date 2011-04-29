@@ -1,37 +1,27 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from nd215.dnsexit.com ([64.182.102.215]:51855 "EHLO
+Received: from nd215.dnsexit.com ([64.182.102.215]:35839 "EHLO
 	box7.911domain.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1750721Ab1D2VU5 (ORCPT
+	with ESMTP id S932208Ab1D2VlF (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 29 Apr 2011 17:20:57 -0400
-Message-ID: <4DBB2B85.1040506@verizon.net>
-Date: Fri, 29 Apr 2011 17:20:05 -0400
+	Fri, 29 Apr 2011 17:41:05 -0400
+Message-ID: <4DBB3044.7090109@verizon.net>
+Date: Fri, 29 Apr 2011 17:40:20 -0400
 From: Peter Foley <pefoley2@verizon.net>
 Reply-To: <pefoley2@verizon.net>
 MIME-Version: 1.0
-Subject: Re: [PATCH 1/4] kbuild: add targets to PHONY
-References: <4DB73C94.1020701@verizon.net> <20110429123610.GD1619@sepie.suse.cz>
-In-Reply-To: <20110429123610.GD1619@sepie.suse.cz>
+Subject: [PATCH RESEND 0/4] kbuild: Makefile cleanups
 Content-Type: text/plain; charset="ISO-8859-1"
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Arnaud Lacombe <lacombar@gmail.com>
+To: linux-kernel@vger.kernel.org
+Cc: linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>
 
-On 4/29/2011 8:36 AM, Michal Marek wrote:
-> Hi,
-> 
-> could you repost also this series and the patch that moves docproc.c to
-> scripts with patches as attachments? The patches look OK, but they are
-> unfortunatelly corrupted (missing or excess space and missing context
-> sometimes).
-> 
-> thanks,
-> Michal
+This patch series adds some targets to PHONY and makes some targets work
+in KBUILD_OUTDIR.
 
-Ok, I'll do that.
+Patches also attached as requested by Michal Marek.
 
 Thanks,
 
-Peter Foley
+Peter
