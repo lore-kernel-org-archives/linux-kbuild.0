@@ -1,63 +1,82 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from nd215.dnsexit.com ([64.182.102.215]:47008 "EHLO
+Received: from nd215.dnsexit.com ([64.182.102.215]:39128 "EHLO
 	box7.911domain.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S932525Ab1D2XJr (ORCPT
+	with ESMTP id S934069Ab1D2XQ2 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 29 Apr 2011 19:09:47 -0400
-Message-ID: <4DBB450E.7080208@verizon.net>
-Date: Fri, 29 Apr 2011 19:09:02 -0400
+	Fri, 29 Apr 2011 19:16:28 -0400
+Message-ID: <4DBB469F.50804@verizon.net>
+Date: Fri, 29 Apr 2011 19:15:43 -0400
 From: Peter Foley <pefoley2@verizon.net>
 Reply-To: <pefoley2@verizon.net>
 MIME-Version: 1.0
 Subject: Re: [PATCH V2 0/7] kbuild: move scripts/basic/docproc.c to scripts/docproc.c
-References: <4DBB3DD4.9000000@verizon.net> <20110429154649.848f9ba8.rdunlap@xenotime.net>
-In-Reply-To: <20110429154649.848f9ba8.rdunlap@xenotime.net>
+References: <4DBB3DD4.9000000@verizon.net>	<20110429154649.848f9ba8.rdunlap@xenotime.net>	<4DBB42F9.7070407@suse.cz> <20110429160212.6662c08a.rdunlap@xenotime.net>
+In-Reply-To: <20110429160212.6662c08a.rdunlap@xenotime.net>
 Content-Type: text/plain; charset="ISO-8859-1"
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Randy Dunlap <rdunlap@xenotime.net>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>
+Cc: Michal Marek <mmarek@suse.cz>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-On 4/29/2011 6:46 PM, Randy Dunlap wrote:
-> On Fri, 29 Apr 2011 18:38:12 -0400 Peter Foley wrote:
+On 4/29/2011 7:02 PM, Randy Dunlap wrote:
+> On Sat, 30 Apr 2011 01:00:09 +0200 Michal Marek wrote:
 > 
->> This patchset moves scripts/basic/docproc to scripts/docproc.
->> This causes docproc to only be built for *doc targets rather than every
->> time the kernel is compiled.
+>> On 30.4.2011 00:46, Randy Dunlap wrote:
+>>> On Fri, 29 Apr 2011 18:38:12 -0400 Peter Foley wrote:
+>>>
+>>>> This patchset moves scripts/basic/docproc to scripts/docproc.
+>>>> This causes docproc to only be built for *doc targets rather than every
+>>>> time the kernel is compiled.
+>>>>
+>>>> Patches also attached as requested by Michal Marek.
+>>>
+>>>
+>>> That's disappointing (the attachments).  Why was this requested?
+>>>
+>>> See Documentation/CodingStyle, section 7:
+>>>
+>>> "No MIME, no links, no compression, no attachments.  Just plain text."
 >>
->> Patches also attached as requested by Michal Marek.
+>> and a couple of lines later:
+>> "Exception:  If your mailer is mangling patches then someone may ask
+>> you to re-send them using MIME."
+>>
+>> Which is exactly what happened here - the patches had missing or excess
+>> leading space and in some cases a context line was missing. So instead
+>> of manually reconstructing the patches, I asked Peter to resend them as
+>> attachments.
 > 
+> OK, thanks for explaining.
 > 
-> That's disappointing (the attachments).  Why was this requested?
+>> BUT - I didn't request to split this patch into seven pieces. Splitting
+>> patches into smaller parts is desired, but each part has to be self
+>> contained and not break stuff when the later parts are not applied. So
+>> when moving a .c file, then the corespoding Makefile changes need to be
+>> contained in the same patch. No need to resend the patch now, I'll fold
+>> the patches into one again, but please consider this next time.
 > 
-> See Documentation/CodingStyle, section 7:
+> Yes, a few of them could be merged IMO.
 > 
-> "No MIME, no links, no compression, no attachments.  Just plain text."
+>>> Instead, the saved file contains lines like
+>>> this (below) and each patch 2 times (inline and attachment).
+>>
+>> Yeah, only sending the attachment would be better in this case.
 > 
-> 
-> It also causes breakage in other people's patch merging/testing.
-> E.g., I cannot save any one of these emails as I can with other patches
-> and get a useful patch file.  Instead, the saved file contains lines like
-> this (below) and each patch 2 times (inline and attachment).
-> 
-> --------------060706070408040606010200
-> Content-Type: text/plain;
-> 	name="kbuild-update-DocBook-Makefile-in-preperation-for-mo.patch"
-> Content-Transfer-Encoding: 7bit
-> Content-Disposition: attachment;
-> 	filename="kbuild-update-DocBook-Makefile-in-preperation-for-mo.patch"
-> 
-> 
+> agreed.
 > 
 > ---
 > ~Randy
 > *** Remember to use Documentation/SubmitChecklist when testing your code ***
 
-See https://lkml.org/lkml/2011/4/29/89 for the attachment request.
-My current email client (thunderbird) seems to mangle any patches that I send.
-If anybody can suggest an email client that doesn't mangle patches I'll be happy to try it.
+Thanks for all the feedback.
+I'll try to take it into account in the future.
 
 Thanks,
 
 Peter
+
+
+
+
+
