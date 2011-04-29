@@ -1,86 +1,77 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from nd215.dnsexit.com ([64.182.102.215]:51359 "EHLO
+Received: from nd215.dnsexit.com ([64.182.102.215]:51362 "EHLO
 	box7.911domain.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S934012Ab1D2WjG (ORCPT
+	with ESMTP id S1755075Ab1D2WjI (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 29 Apr 2011 18:39:06 -0400
-Message-ID: <4DBB3DDD.2020808@verizon.net>
-Date: Fri, 29 Apr 2011 18:38:21 -0400
+	Fri, 29 Apr 2011 18:39:08 -0400
+Message-ID: <4DBB3DE0.5040105@verizon.net>
+Date: Fri, 29 Apr 2011 18:38:24 -0400
 From: Peter Foley <pefoley2@verizon.net>
 Reply-To: <pefoley2@verizon.net>
 MIME-Version: 1.0
-Subject: [PATCH V2 1/7] kbuild: update DocBook Makefile in preperation for
- moving docproc
+Subject: [PATCH V2 3/7] kbuild: update scripts/basic/.gitignore in preperation
+ for moving docproc
 Content-Type: multipart/mixed;
-	boundary="------------060706070408040606010200"
+	boundary="------------000004000908000201050504"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org
 Cc: linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>
 
---------------060706070408040606010200
+--------------000004000908000201050504
 Content-Type: text/plain; charset="ISO-8859-1"
 Content-Transfer-Encoding: 7bit
 
-This patch updates the DocBook Makefile in preperation for moving docproc.
+This patch updates scripts/basic/.gitignore in preperation for moving
+docproc.
 
 Signed-off-by: Peter Foley <pefoley2@verizon.net>
 ---
- Documentation/DocBook/Makefile |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+ scripts/basic/.gitignore |    2 --
+ 1 files changed, 0 insertions(+), 2 deletions(-)
 
-diff --git a/Documentation/DocBook/Makefile b/Documentation/DocBook/Makefile
-index 8436b01..3cebfa0 100644
---- a/Documentation/DocBook/Makefile
-+++ b/Documentation/DocBook/Makefile
-@@ -73,7 +73,7 @@ installmandocs: mandocs
- ###
- #External programs used
- KERNELDOC = $(srctree)/scripts/kernel-doc
--DOCPROC   = $(objtree)/scripts/basic/docproc
-+DOCPROC   = $(objtree)/scripts/docproc
-
- XMLTOFLAGS = -m $(srctree)/Documentation/DocBook/stylesheet.xsl
- XMLTOFLAGS += --skip-validation
+diff --git a/scripts/basic/.gitignore b/scripts/basic/.gitignore
+index bf8b199..a776371 100644
+--- a/scripts/basic/.gitignore
++++ b/scripts/basic/.gitignore
+@@ -1,3 +1 @@
+-hash
+ fixdep
+-docproc
 -- 
 1.7.5.rc1
 
 
 
---------------060706070408040606010200
+--------------000004000908000201050504
 Content-Type: text/plain;
-	name="kbuild-update-DocBook-Makefile-in-preperation-for-mo.patch"
+	name="kbuild-update-scripts-basic-.gitignore-in-preperatio.patch"
 Content-Transfer-Encoding: 7bit
 Content-Disposition: attachment;
-	filename="kbuild-update-DocBook-Makefile-in-preperation-for-mo.patch"
+	filename="kbuild-update-scripts-basic-.gitignore-in-preperatio.patch"
 
-From 47d59da1cf32635086e77fb515486d6dd4f32b76 Mon Sep 17 00:00:00 2001
+From 8368e39cf774cdbdec3c095307ed96f4f32bf4f1 Mon Sep 17 00:00:00 2001
 From: Peter Foley <pefoley2@verizon.net>
-Date: Tue, 26 Apr 2011 19:12:32 -0400
-Subject: [PATCH 1/7] kbuild: update DocBook Makefile in preperation for moving docproc
+Date: Tue, 26 Apr 2011 19:19:12 -0400
+Subject: [PATCH 3/7] kbuild: update scripts/basic/.gitignore in preperation for moving docproc
 
 
 Signed-off-by: Peter Foley <pefoley2@verizon.net>
 ---
- Documentation/DocBook/Makefile |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+ scripts/basic/.gitignore |    2 --
+ 1 files changed, 0 insertions(+), 2 deletions(-)
 
-diff --git a/Documentation/DocBook/Makefile b/Documentation/DocBook/Makefile
-index 8436b01..3cebfa0 100644
---- a/Documentation/DocBook/Makefile
-+++ b/Documentation/DocBook/Makefile
-@@ -73,7 +73,7 @@ installmandocs: mandocs
- ###
- #External programs used
- KERNELDOC = $(srctree)/scripts/kernel-doc
--DOCPROC   = $(objtree)/scripts/basic/docproc
-+DOCPROC   = $(objtree)/scripts/docproc
- 
- XMLTOFLAGS = -m $(srctree)/Documentation/DocBook/stylesheet.xsl
- XMLTOFLAGS += --skip-validation
+diff --git a/scripts/basic/.gitignore b/scripts/basic/.gitignore
+index bf8b199..a776371 100644
+--- a/scripts/basic/.gitignore
++++ b/scripts/basic/.gitignore
+@@ -1,3 +1 @@
+-hash
+ fixdep
+-docproc
 -- 
 1.7.5.rc1
 
 
 
---------------060706070408040606010200--
+--------------000004000908000201050504--
