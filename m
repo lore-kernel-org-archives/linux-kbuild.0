@@ -1,60 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:34102 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752102Ab1D2OhM (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 29 Apr 2011 10:37:12 -0400
-From: Michal Marek <mmarek@suse.cz>
-Subject: [PATCH] MAINTAINERS: Update KCONFIG entry
-Date: Fri, 29 Apr 2011 16:37:02 +0200
-Message-Id: <1304087822-22853-1-git-send-email-mmarek@suse.cz>
+Received: from oproxy4-pub.bluehost.com ([69.89.21.11]:37832 "HELO
+	oproxy4-pub.bluehost.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with SMTP id S1759779Ab1D2QN5 (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 29 Apr 2011 12:13:57 -0400
+Received: from static-50-53-38-135.bvtn.or.frontiernet.net ([50.53.38.135] helo=chimera.site)
+	by box742.bluehost.com with esmtpsa (TLSv1:AES256-SHA:256)
+	(Exim 4.69)
+	(envelope-from <rdunlap@xenotime.net>)
+	id 1QFqKK-0007nR-GV
+	for linux-kbuild@vger.kernel.org; Fri, 29 Apr 2011 10:13:56 -0600
+Date: Fri, 29 Apr 2011 09:10:58 -0700
+From: Randy Dunlap <rdunlap@xenotime.net>
+Message-Id: <20110429091058.d5d9fd54.rdunlap@xenotime.net>
+In-Reply-To: <20110429131940.4f4c938f.sfr@canb.auug.org.au>
+References: <20110429131940.4f4c938f.sfr@canb.auug.org.au>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Subject: Re: linux-next: Tree for April 29 (uml build issue)
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
+To: Stephen Rothwell <sfr@canb.auug.org.au>, linux-kbuiild@vger.kernel.org
+Cc: linux-next@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>
 
-Roman Zippel hasn't been active for several years. Add myself as kconfig
-maintainer, but change the mode to "Odd Fixes" to not set expectations
-too high. Also, remove the patchwork link, since it is not used for
-kbuild/kconfig.
+On Fri, 29 Apr 2011 13:19:40 +1000 Stephen Rothwell wrote:
 
-Signed-off-by: Michal Marek <mmarek@suse.cz>
+> Hi all,
+> 
+> Changes since 20110428:
+
+
+My uml builds fail with:
+
+  GEN     linux-next-20110429/UM64/Makefile
+scripts/kconfig/conf --silentoldconfig arch/um/Kconfig.x86
+  CC      arch/um/sys-x86_64/user-offsets.s
+  GEN     linux-next-20110429/UM64/Makefile
+linux-next-20110429/scripts/Makefile.asm-generic:9: linux-next-20110429/arch/um/include/asm/Kbuild: No such file or directory
+make[2]: *** No rule to make target `linux-next-20110429/arch/um/include/asm/Kbuild'.  Stop.
+
 ---
- CREDITS     |    4 ++++
- MAINTAINERS |    5 ++---
- 2 files changed, 6 insertions(+), 3 deletions(-)
-
-diff --git a/CREDITS b/CREDITS
-index 1d39a6d..d6585ab 100644
---- a/CREDITS
-+++ b/CREDITS
-@@ -3913,6 +3913,10 @@ S: Flandernstrasse 101
- S: D-73732 Esslingen
- S: Germany
- 
-+N: Roman Zippel
-+E: zippel@linux-m68k.org
-+D: AFFS and HFS filesystems, m68k maintainer, new kernel configuration in 2.5
-+
- N: Leonard N. Zubkoff
- W: http://www.dandelion.com/Linux/
- D: BusLogic SCSI driver
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 6b4b9cd..0398ba5 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -3577,10 +3577,9 @@ F:	Documentation/hwmon/k8temp
- F:	drivers/hwmon/k8temp.c
- 
- KCONFIG
--M:	Roman Zippel <zippel@linux-m68k.org>
-+M:	Michal Marek <mmarek@suse.cz>
- L:	linux-kbuild@vger.kernel.org
--Q:	http://patchwork.kernel.org/project/linux-kbuild/list/
--S:	Maintained
-+S:	Odd Fixes
- F:	Documentation/kbuild/kconfig-language.txt
- F:	scripts/kconfig/
- 
--- 
-1.7.4.1
-
+~Randy
+*** Remember to use Documentation/SubmitChecklist when testing your code ***
