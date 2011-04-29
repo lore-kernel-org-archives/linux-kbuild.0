@@ -1,45 +1,63 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from oproxy1-pub.bluehost.com ([66.147.249.253]:55848 "HELO
-	oproxy1-pub.bluehost.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with SMTP id S932787Ab1D2XEI (ORCPT
+Received: from nd215.dnsexit.com ([64.182.102.215]:47008 "EHLO
+	box7.911domain.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S932525Ab1D2XJr (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 29 Apr 2011 19:04:08 -0400
-Date: Fri, 29 Apr 2011 16:04:06 -0700
-From: Randy Dunlap <rdunlap@xenotime.net>
-Subject: Re: [PATCH V2 0/7] kbuild: move scripts/basic/docproc.c to
- scripts/docproc.c
-Message-Id: <20110429160406.5a1f56bc.rdunlap@xenotime.net>
-In-Reply-To: <20110429160053.bbe7c199.rdunlap@xenotime.net>
-References: <4DBB3DD4.9000000@verizon.net>
-	<20110429155915.f9059777.rdunlap@xenotime.net>
-	<20110429160053.bbe7c199.rdunlap@xenotime.net>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+	Fri, 29 Apr 2011 19:09:47 -0400
+Message-ID: <4DBB450E.7080208@verizon.net>
+Date: Fri, 29 Apr 2011 19:09:02 -0400
+From: Peter Foley <pefoley2@verizon.net>
+Reply-To: <pefoley2@verizon.net>
+MIME-Version: 1.0
+Subject: Re: [PATCH V2 0/7] kbuild: move scripts/basic/docproc.c to scripts/docproc.c
+References: <4DBB3DD4.9000000@verizon.net> <20110429154649.848f9ba8.rdunlap@xenotime.net>
+In-Reply-To: <20110429154649.848f9ba8.rdunlap@xenotime.net>
+Content-Type: text/plain; charset="ISO-8859-1"
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: lkml <linux-kernel@vger.kernel.org>
-Cc: pefoley2@verizon.net, linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>
+To: Randy Dunlap <rdunlap@xenotime.net>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>
 
-On Fri, 29 Apr 2011 16:00:53 -0700 Randy Dunlap wrote:
-
-> On Fri, 29 Apr 2011 15:59:15 -0700 Randy Dunlap wrote:
+On 4/29/2011 6:46 PM, Randy Dunlap wrote:
+> On Fri, 29 Apr 2011 18:38:12 -0400 Peter Foley wrote:
 > 
-> > On Fri, 29 Apr 2011 18:38:12 -0400 Peter Foley wrote:
-> > 
-> > > This patchset moves scripts/basic/docproc to scripts/docproc.
-> > > This causes docproc to only be built for *doc targets rather than every
-> > > time the kernel is compiled.
-> > > 
-> > > Patches also attached as requested by Michal Marek.
-> > 
-> > 
-> > Please test & fix when using O=output_dir.
+>> This patchset moves scripts/basic/docproc to scripts/docproc.
+>> This causes docproc to only be built for *doc targets rather than every
+>> time the kernel is compiled.
+>>
+>> Patches also attached as requested by Michal Marek.
 > 
-> Sorry, user error.  I missed applying patch 6/7.  :(
+> 
+> That's disappointing (the attachments).  Why was this requested?
+> 
+> See Documentation/CodingStyle, section 7:
+> 
+> "No MIME, no links, no compression, no attachments.  Just plain text."
+> 
+> 
+> It also causes breakage in other people's patch merging/testing.
+> E.g., I cannot save any one of these emails as I can with other patches
+> and get a useful patch file.  Instead, the saved file contains lines like
+> this (below) and each patch 2 times (inline and attachment).
+> 
+> --------------060706070408040606010200
+> Content-Type: text/plain;
+> 	name="kbuild-update-DocBook-Makefile-in-preperation-for-mo.patch"
+> Content-Transfer-Encoding: 7bit
+> Content-Disposition: attachment;
+> 	filename="kbuild-update-DocBook-Makefile-in-preperation-for-mo.patch"
+> 
+> 
+> 
+> ---
+> ~Randy
+> *** Remember to use Documentation/SubmitChecklist when testing your code ***
 
-Works successfully now.  :)
+See https://lkml.org/lkml/2011/4/29/89 for the attachment request.
+My current email client (thunderbird) seems to mangle any patches that I send.
+If anybody can suggest an email client that doesn't mangle patches I'll be happy to try it.
 
----
-~Randy
-*** Remember to use Documentation/SubmitChecklist when testing your code ***
+Thanks,
+
+Peter
