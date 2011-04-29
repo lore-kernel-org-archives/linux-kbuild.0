@@ -1,88 +1,90 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from nd215.dnsexit.com ([64.182.102.215]:35856 "EHLO
+Received: from nd215.dnsexit.com ([64.182.102.215]:35868 "EHLO
 	box7.911domain.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S933888Ab1D2VlJ (ORCPT
+	with ESMTP id S933899Ab1D2VlP (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 29 Apr 2011 17:41:09 -0400
-Message-ID: <4DBB3049.80008@verizon.net>
-Date: Fri, 29 Apr 2011 17:40:25 -0400
+	Fri, 29 Apr 2011 17:41:15 -0400
+Message-ID: <4DBB304D.3090703@verizon.net>
+Date: Fri, 29 Apr 2011 17:40:29 -0400
 From: Peter Foley <pefoley2@verizon.net>
 Reply-To: <pefoley2@verizon.net>
 MIME-Version: 1.0
-Subject: [PATCH RESEND 1/4] kbuild: add targets to PHONY
+Subject: [PATCH RESEND 2/4] kbuild: make headerdep work in KBUILD_OUTDIR
 Content-Type: multipart/mixed;
-	boundary="------------070501030709040807030804"
+	boundary="------------080106080807080207080209"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org
 Cc: linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>
 
---------------070501030709040807030804
+--------------080106080807080207080209
 Content-Type: text/plain; charset="ISO-8859-1"
 Content-Transfer-Encoding: 7bit
 
-This patch adds some targets to PHONY
-so they are built even if a file with the same name exists.
+This patch fixes the headerdep target so it works when make is invoked
+in KBUILD_OUTDIR.
 
 Signed-off-by: Peter Foley <pefoley2@verizon.net>
 ---
- Makefile |    2 ++
- 1 files changed, 2 insertions(+), 0 deletions(-)
+ Makefile |    3 ++-
+ 1 files changed, 2 insertions(+), 1 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index b967b96..2a5159a 100644
+index 2a5159a..093c9d2 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -1392,6 +1392,8 @@ tags TAGS cscope gtags: FORCE
- # Scripts to check various things for consistency
+@@ -991,7 +991,8 @@ include/generated/utsrelease.h:
+include/config/kernel.release FORCE
+
+ PHONY += headerdep
+ headerdep:
+-	$(Q)find include/ -name '*.h' | xargs --max-args 1 scripts/headerdep.pl
++	$(Q)find $(srctree)/include/ -name '*.h' | xargs --max-args 1 \
++	$(srctree)/scripts/headerdep.pl -I$(srctree)/include
+
  #
 ---------------------------------------------------------------------------
 
-+PHONY += includecheck versioncheck coccicheck namespacecheck export_report
-+
- includecheck:
- 	find * $(RCS_FIND_IGNORE) \
- 		-name '*.[hcS]' -type f -print | sort \
 -- 
 1.7.5.rc1
 
 
 
-
---------------070501030709040807030804
-Content-Type: text/plain; name="kbuild-add-targets-to-PHONY.patch"
+--------------080106080807080207080209
+Content-Type: text/plain;
+	name="kbuild-make-headerdep-work-in-KBUILD_OUTDIR.patch"
 Content-Transfer-Encoding: 7bit
 Content-Disposition: attachment;
-	filename="kbuild-add-targets-to-PHONY.patch"
+	filename="kbuild-make-headerdep-work-in-KBUILD_OUTDIR.patch"
 
-From efaa40bbd97091cd7b7eb3b18206d4b3e609654f Mon Sep 17 00:00:00 2001
+From 547283fa29efcfbfecd2f277bf03a06d726bd294 Mon Sep 17 00:00:00 2001
 From: Peter Foley <pefoley2@verizon.net>
-Date: Tue, 26 Apr 2011 17:15:01 -0400
-Subject: [PATCH 1/4] kbuild: add targets to PHONY
+Date: Tue, 26 Apr 2011 17:17:11 -0400
+Subject: [PATCH 2/4] kbuild: make headerdep work in KBUILD_OUTDIR
 
 
 Signed-off-by: Peter Foley <pefoley2@verizon.net>
 ---
- Makefile |    2 ++
- 1 files changed, 2 insertions(+), 0 deletions(-)
+ Makefile |    3 ++-
+ 1 files changed, 2 insertions(+), 1 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index b967b96..2a5159a 100644
+index 2a5159a..093c9d2 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -1392,6 +1392,8 @@ tags TAGS cscope gtags: FORCE
- # Scripts to check various things for consistency
+@@ -991,7 +991,8 @@ include/generated/utsrelease.h: include/config/kernel.release FORCE
+ 
+ PHONY += headerdep
+ headerdep:
+-	$(Q)find include/ -name '*.h' | xargs --max-args 1 scripts/headerdep.pl
++	$(Q)find $(srctree)/include/ -name '*.h' | xargs --max-args 1 \
++	$(srctree)/scripts/headerdep.pl -I$(srctree)/include
+ 
  # ---------------------------------------------------------------------------
  
-+PHONY += includecheck versioncheck coccicheck namespacecheck export_report
-+
- includecheck:
- 	find * $(RCS_FIND_IGNORE) \
- 		-name '*.[hcS]' -type f -print | sort \
 -- 
 1.7.5.rc1
 
 
 
-
---------------070501030709040807030804--
+--------------080106080807080207080209--
