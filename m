@@ -1,31 +1,91 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepb.post.tele.dk ([195.41.46.236]:42574 "EHLO
-	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1760678Ab1D2RoA (ORCPT
+Received: from mail-iw0-f174.google.com ([209.85.214.174]:47437 "EHLO
+	mail-iw0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1760735Ab1D2SNL convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 29 Apr 2011 13:44:00 -0400
-Date: Fri, 29 Apr 2011 19:43:58 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH] kbuild: Allow to combine multiple W= levels
-Message-ID: <20110429174358.GA12176@merkur.ravnborg.org>
-References: <71633.1304013549@localhost> <1304083893-18849-1-git-send-email-mmarek@suse.cz>
+	Fri, 29 Apr 2011 14:13:11 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
 In-Reply-To: <1304083893-18849-1-git-send-email-mmarek@suse.cz>
+References: <71633.1304013549@localhost>
+	<1304083893-18849-1-git-send-email-mmarek@suse.cz>
+Date: Fri, 29 Apr 2011 14:13:11 -0400
+Message-ID: <BANLkTimsNF=OeaLSnSt2gFdDaAbJ6tMFng@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: Allow to combine multiple W= levels
+From: Arnaud Lacombe <lacombar@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Michal Marek <mmarek@suse.cz>
-Cc: Valdis.Kletnieks@vt.edu, bp@alien8.de, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, davej@redhat.com
+Cc: Valdis.Kletnieks@vt.edu, bp@alien8.de, sam@ravnborg.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, davej@redhat.com
 
-On Fri, Apr 29, 2011 at 03:31:33PM +0200, Michal Marek wrote:
+Hi,
+
+On Fri, Apr 29, 2011 at 9:31 AM, Michal Marek <mmarek@suse.cz> wrote:
 > Add support for make W=12, make W=123 and so on, to enable warnings from
 > multiple W= levels. Normally, make W=<level> does not include warnings
 > from the previous level.
+>
+> Signed-off-by: Michal Marek <mmarek@suse.cz>
+> ---
+>  scripts/Makefile.build |    8 ++++++--
+>  1 files changed, 6 insertions(+), 2 deletions(-)
+>
+> diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+> index 9c0c481..28cef2a 100644
+> --- a/scripts/Makefile.build
+> +++ b/scripts/Makefile.build
+> @@ -60,6 +60,8 @@ endif
+>  # $(call cc-option, -W...) handles gcc -W.. options which
+>  # are not supported by all versions of the compiler
+>  ifdef KBUILD_ENABLE_EXTRA_GCC_CHECKS
+> +warning-  := $(empty)
+> +
+>  warning-1 := -Wextra -Wunused -Wno-unused-parameter
+>  warning-1 += -Wmissing-declarations
+>  warning-1 += -Wmissing-format-attribute
+> @@ -85,9 +87,11 @@ warning-3 += -Wswitch-default
+>  warning-3 += $(call cc-option, -Wpacked-bitfield-compat)
+>  warning-3 += $(call cc-option, -Wvla)
+>
+> -warning := $(warning-$(KBUILD_ENABLE_EXTRA_GCC_CHECKS))
+> +warning := $(warning-$(findstring 1, $(KBUILD_ENABLE_EXTRA_GCC_CHECKS)))
+> +warning += $(warning-$(findstring 2, $(KBUILD_ENABLE_EXTRA_GCC_CHECKS)))
+> +warning += $(warning-$(findstring 3, $(KBUILD_ENABLE_EXTRA_GCC_CHECKS)))
+>
+I do not really like that, it would mean that W=123, W=321, W=231 and
+W=132 would lead to the same result. What about a comma separated
+string, ala:
 
-Acked-by: Sam Ravnborg <sam@ravnborg.org>
+LEVELS=1,2,3,4
 
-I was considering W=all - but that gives less flexibility, which is
-what has been requested.
+comma:= ,
+empty:=
+space:= $(empty) $(empty)
 
-	Sam
+warning-1:= a
+warning-2:= b
+warning-3:= c
+warning-4:= d
+
+all:
+        echo $(foreach level, $(subst ${comma},${space},${LEVELS},
+${warning}), ${warning-${level}})
+
+It has the advantage to scale up without adding new code.
+
+ - Arnaud
+
+> -ifeq ("$(warning)","")
+> +ifeq ("$(strip $(warning))","")
+>         $(error W=$(KBUILD_ENABLE_EXTRA_GCC_CHECKS) is unknown)
+>  endif
+>
+> --
+> 1.7.4.1
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
