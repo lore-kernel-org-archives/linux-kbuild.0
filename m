@@ -1,74 +1,29 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:51522 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:51724 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755152Ab1EBPiP (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 2 May 2011 11:38:15 -0400
-Date: Mon, 2 May 2011 17:38:13 +0200
+	id S1751233Ab1EBPk2 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 2 May 2011 11:40:28 -0400
+Date: Mon, 2 May 2011 17:40:27 +0200
 From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [PATCH] kbuild: Allow to combine multiple W= levels
-Message-ID: <20110502153813.GC15769@sepie.suse.cz>
-References: <71633.1304013549@localhost>
- <1304083893-18849-1-git-send-email-mmarek@suse.cz>
+Subject: Re: [PATCH] kconfig-language: add to hints
+Message-ID: <20110502154027.GD15769@sepie.suse.cz>
+References: <20110428105852.975a6583.rdunlap@xenotime.net>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1304083893-18849-1-git-send-email-mmarek@suse.cz>
+In-Reply-To: <20110428105852.975a6583.rdunlap@xenotime.net>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Valdis.Kletnieks@vt.edu
-Cc: bp@alien8.de, sam@ravnborg.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, davej@redhat.com
+To: Randy Dunlap <rdunlap@xenotime.net>
+Cc: linux-kbuild@vger.kernel.org
 
-On Fri, Apr 29, 2011 at 03:31:33PM +0200, Michal Marek wrote:
-> Add support for make W=12, make W=123 and so on, to enable warnings from
-> multiple W= levels. Normally, make W=<level> does not include warnings
-> from the previous level.
+On Thu, Apr 28, 2011 at 10:58:52AM -0700, Randy Dunlap wrote:
+> From: Randy Dunlap <randy.dunlap@oracle.com>
 > 
-> Signed-off-by: Michal Marek <mmarek@suse.cz>
-> ---
->  scripts/Makefile.build |    8 ++++++--
->  1 files changed, 6 insertions(+), 2 deletions(-)
-> 
-> diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-> index 9c0c481..28cef2a 100644
-> --- a/scripts/Makefile.build
-> +++ b/scripts/Makefile.build
-> @@ -60,6 +60,8 @@ endif
->  # $(call cc-option, -W...) handles gcc -W.. options which
->  # are not supported by all versions of the compiler
->  ifdef KBUILD_ENABLE_EXTRA_GCC_CHECKS
-> +warning-  := $(empty)
-> +
->  warning-1 := -Wextra -Wunused -Wno-unused-parameter
->  warning-1 += -Wmissing-declarations
->  warning-1 += -Wmissing-format-attribute
-> @@ -85,9 +87,11 @@ warning-3 += -Wswitch-default
->  warning-3 += $(call cc-option, -Wpacked-bitfield-compat)
->  warning-3 += $(call cc-option, -Wvla)
->  
-> -warning := $(warning-$(KBUILD_ENABLE_EXTRA_GCC_CHECKS))
-> +warning := $(warning-$(findstring 1, $(KBUILD_ENABLE_EXTRA_GCC_CHECKS)))
-> +warning += $(warning-$(findstring 2, $(KBUILD_ENABLE_EXTRA_GCC_CHECKS)))
-> +warning += $(warning-$(findstring 3, $(KBUILD_ENABLE_EXTRA_GCC_CHECKS)))
->  
-> -ifeq ("$(warning)","")
-> +ifeq ("$(strip $(warning))","")
->          $(error W=$(KBUILD_ENABLE_EXTRA_GCC_CHECKS) is unknown)
->  endif
+> Explain a little about kconfig symbol dependencies and symbol
+> existence given optional kconfig language scenarios.
+> Yes, I was bitten by this.
 
-Pushed to kbuild-2.6.git#kbuild with the following make help update:
-
-diff --git a/Makefile b/Makefile
-index 4527dc2..d342502 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1290,7 +1290,7 @@ help:
- 	@echo  '		1: warnings which may be relevant and do not occur too often'
- 	@echo  '		2: warnings which occur quite often but may still be relevant'
- 	@echo  '		3: more obscure warnings, can most likely be ignored'
--
-+	@echo  '		Multiple levels can be combined with W=12 or W=123'
- 	@echo  ''
- 	@echo  'Execute "make" or "make all" to build all targets marked with [*] '
- 	@echo  'For further info see the ./README file'
+Pushed to kbuild-2.6.git#kconfig, thanks.
 
 Michal
