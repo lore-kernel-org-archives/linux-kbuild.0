@@ -1,29 +1,89 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:51724 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751233Ab1EBPk2 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 2 May 2011 11:40:28 -0400
-Date: Mon, 2 May 2011 17:40:27 +0200
-From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [PATCH] kconfig-language: add to hints
-Message-ID: <20110502154027.GD15769@sepie.suse.cz>
-References: <20110428105852.975a6583.rdunlap@xenotime.net>
+Received: from mail-iy0-f174.google.com ([209.85.210.174]:41635 "EHLO
+	mail-iy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751116Ab1EBPx4 convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 2 May 2011 11:53:56 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20110428105852.975a6583.rdunlap@xenotime.net>
+In-Reply-To: <20110502153813.GC15769@sepie.suse.cz>
+References: <71633.1304013549@localhost>
+	<1304083893-18849-1-git-send-email-mmarek@suse.cz>
+	<20110502153813.GC15769@sepie.suse.cz>
+Date: Mon, 2 May 2011 11:53:55 -0400
+Message-ID: <BANLkTi=xfP_1guk5ZuCj0R_r=XqaGwZw-w@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: Allow to combine multiple W= levels
+From: Arnaud Lacombe <lacombar@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Randy Dunlap <rdunlap@xenotime.net>
-Cc: linux-kbuild@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>
+Cc: Valdis.Kletnieks@vt.edu, bp@alien8.de, sam@ravnborg.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, davej@redhat.com
 
-On Thu, Apr 28, 2011 at 10:58:52AM -0700, Randy Dunlap wrote:
-> From: Randy Dunlap <randy.dunlap@oracle.com>
-> 
-> Explain a little about kconfig symbol dependencies and symbol
-> existence given optional kconfig language scenarios.
-> Yes, I was bitten by this.
+Hi Michal,
 
-Pushed to kbuild-2.6.git#kconfig, thanks.
+On Mon, May 2, 2011 at 11:38 AM, Michal Marek <mmarek@suse.cz> wrote:
+> On Fri, Apr 29, 2011 at 03:31:33PM +0200, Michal Marek wrote:
+>> Add support for make W=12, make W=123 and so on, to enable warnings from
+>> multiple W= levels. Normally, make W=<level> does not include warnings
+>> from the previous level.
+>>
+>> Signed-off-by: Michal Marek <mmarek@suse.cz>
+>> ---
+>>  scripts/Makefile.build |    8 ++++++--
+>>  1 files changed, 6 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+>> index 9c0c481..28cef2a 100644
+>> --- a/scripts/Makefile.build
+>> +++ b/scripts/Makefile.build
+>> @@ -60,6 +60,8 @@ endif
+>>  # $(call cc-option, -W...) handles gcc -W.. options which
+>>  # are not supported by all versions of the compiler
+>>  ifdef KBUILD_ENABLE_EXTRA_GCC_CHECKS
+>> +warning-  := $(empty)
+>> +
+>>  warning-1 := -Wextra -Wunused -Wno-unused-parameter
+>>  warning-1 += -Wmissing-declarations
+>>  warning-1 += -Wmissing-format-attribute
+>> @@ -85,9 +87,11 @@ warning-3 += -Wswitch-default
+>>  warning-3 += $(call cc-option, -Wpacked-bitfield-compat)
+>>  warning-3 += $(call cc-option, -Wvla)
+>>
+>> -warning := $(warning-$(KBUILD_ENABLE_EXTRA_GCC_CHECKS))
+>> +warning := $(warning-$(findstring 1, $(KBUILD_ENABLE_EXTRA_GCC_CHECKS)))
+>> +warning += $(warning-$(findstring 2, $(KBUILD_ENABLE_EXTRA_GCC_CHECKS)))
+>> +warning += $(warning-$(findstring 3, $(KBUILD_ENABLE_EXTRA_GCC_CHECKS)))
+>>
+>> -ifeq ("$(warning)","")
+>> +ifeq ("$(strip $(warning))","")
+>>          $(error W=$(KBUILD_ENABLE_EXTRA_GCC_CHECKS) is unknown)
+>>  endif
+>
+> Pushed to kbuild-2.6.git#kbuild with the following make help update:
+>
+you did not comment on the point I raised.
 
-Michal
+Thanks,
+ - Arnaud
+
+> diff --git a/Makefile b/Makefile
+> index 4527dc2..d342502 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -1290,7 +1290,7 @@ help:
+>        @echo  '                1: warnings which may be relevant and do not occur too often'
+>        @echo  '                2: warnings which occur quite often but may still be relevant'
+>        @echo  '                3: more obscure warnings, can most likely be ignored'
+> -
+> +       @echo  '                Multiple levels can be combined with W=12 or W=123'
+>        @echo  ''
+>        @echo  'Execute "make" or "make all" to build all targets marked with [*] '
+>        @echo  'For further info see the ./README file'
+>
+> Michal
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
