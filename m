@@ -1,56 +1,36 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor.suse.de ([195.135.220.2]:46313 "EHLO mx1.suse.de"
+Received: from cantor.suse.de ([195.135.220.2]:46348 "EHLO mx1.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755345Ab1EBUdW (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 2 May 2011 16:33:22 -0400
-Message-ID: <4DBF1509.2000702@suse.cz>
-Date: Mon, 02 May 2011 22:33:13 +0200
+	id S1753164Ab1EBUf5 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 2 May 2011 16:35:57 -0400
+Message-ID: <4DBF15AE.6020201@suse.cz>
+Date: Mon, 02 May 2011 22:35:58 +0200
 From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Subject: Re: linux-next: Tree for May 2 (uml builds fail)
-References: <20110502150150.d932642f.sfr@canb.auug.org.au> <20110502081948.1ccb9aef.rdunlap@xenotime.net> <20110502160405.GE15769@sepie.suse.cz> <20110502165208.GA18740@merkur.ravnborg.org>
-In-Reply-To: <20110502165208.GA18740@merkur.ravnborg.org>
+Subject: Re: [PATCH] kbuild: Allow to combine multiple W= levels
+References: <71633.1304013549@localhost>	<1304083893-18849-1-git-send-email-mmarek@suse.cz>	<BANLkTikMf4x0e3UhabUH+c_xnWJMQ3rkvg@mail.gmail.com>	<20110502170736.GB18740@merkur.ravnborg.org>	<BANLkTi==Tx6sXcA2Bk6Cp7wc1DY-7c1V3g@mail.gmail.com>	<2b5d75ba05bd7889ac80514015e36ad2.squirrel@www.skyhub.de> <BANLkTikQ6b8BMYXZcFzmavx-geqzqVvrvA@mail.gmail.com>
+In-Reply-To: <BANLkTikQ6b8BMYXZcFzmavx-geqzqVvrvA@mail.gmail.com>
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: Randy Dunlap <rdunlap@xenotime.net>, Stephen Rothwell <sfr@canb.auug.org.au>, linux-kbuild@vger.kernel.org, linux-next@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>
+To: Arnaud Lacombe <lacombar@gmail.com>
+Cc: boris@alien8.de, Sam Ravnborg <sam@ravnborg.org>, =?ISO-8859-1?Q?Am=E9?= =?ISO-8859-1?Q?rico_Wang?= <xiyou.wangcong@gmail.com>, valdis.kletnieks@vt.edu, bp@alien8.de, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, davej@redhat.com
 
-On 2.5.2011 18:52, Sam Ravnborg wrote:
-> On Mon, May 02, 2011 at 06:04:05PM +0200, Michal Marek wrote:
->> On Mon, May 02, 2011 at 08:19:48AM -0700, Randy Dunlap wrote:
->>> On Mon, 2 May 2011 15:01:50 +1000 Stephen Rothwell wrote:
->>>
->>>> Hi all,
->>>>
->>>> Changes since 20110429:
->>>
->>>
->>> uml builds on i386 or x86_64 fail with: (I'm using O=outputdir if it matters)
->>>
->>>   GEN     /lnx/src/NEXT/linux-next-20110502/UM64/Makefile
->>> scripts/kconfig/conf --silentoldconfig arch/um/Kconfig.x86
->>>   GEN     /lnx/src/NEXT/linux-next-20110502/UM64/Makefile
->>> /lnx/src/NEXT/linux-next-20110502/scripts/Makefile.asm-generic:9: /lnx/src/NEXT/linux-next-20110502/arch/um/include/asm/Kbuild: No such file or directory
->>> make[2]: *** No rule to make target `/lnx/src/NEXT/linux-next-20110502/arch/um/include/asm/Kbuild'.  Stop.
->>
->> This patch should fix it.
->>
->> Michal
->>
->> Subject: [PATCH] kbuild: Fix Makefile.asm-generic for um
->>
->> Do nothing if arch/$(SRCARCH)/include/asm/Kbuild does not exist, which
->> is the case of um.
->>
->> Reported-by: Randy Dunlap <rdunlap@xenotime.net>
->> Signed-off-by: Michal Marek <mmarek@suse.cz>
+On 2.5.2011 20:45, Arnaud Lacombe wrote:
+> Hi,
 > 
-> Makes sense - sorry for not catchign the um case!
-> 
-> Acked-by: Sam Ravnborg <sam@ravnborg.org>
+> On Mon, May 2, 2011 at 2:03 PM,  <boris@alien8.de> wrote:
+>> This is exactly why we're trying to get a feeling of this by _running_
+>> it and _then_ _bitching_ about it.
+>>
+> This is just what I did, might you consider it bullshit or not. I
+> really do _dislike_ Michal's interface. I proposed a solution, Americo
+> did too. I guess that unless a patch is submitted, this will go
+> nowhere.
 
-Thanks, pushed to kbuild-2.6.git#kbuild.
+Yes, feel free to submit a patch that does things better. Nothing is set
+in stone yet, the code isn't even merged into Linus' tree, let alone
+part of some official release.
 
 Michal
