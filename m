@@ -1,67 +1,42 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.skyhub.de ([78.46.96.112]:39122 "EHLO mail.skyhub.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752233Ab1EBSDJ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 2 May 2011 14:03:09 -0400
-Message-ID: <2b5d75ba05bd7889ac80514015e36ad2.squirrel@www.skyhub.de>
-In-Reply-To: <BANLkTi==Tx6sXcA2Bk6Cp7wc1DY-7c1V3g@mail.gmail.com>
-References: <71633.1304013549@localhost>
-    <1304083893-18849-1-git-send-email-mmarek@suse.cz>
-    <BANLkTikMf4x0e3UhabUH+c_xnWJMQ3rkvg@mail.gmail.com>
-    <20110502170736.GB18740@merkur.ravnborg.org>
-    <BANLkTi==Tx6sXcA2Bk6Cp7wc1DY-7c1V3g@mail.gmail.com>
-Date: Mon, 2 May 2011 20:03:05 +0200 (CEST)
-Subject: Re: [PATCH] kbuild: Allow to combine multiple W= levels
-From: boris@alien8.de
+Received: from mail-qy0-f181.google.com ([209.85.216.181]:64786 "EHLO
+	mail-qy0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756172Ab1EBSpA (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 2 May 2011 14:45:00 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7BIT
+In-Reply-To: <2b5d75ba05bd7889ac80514015e36ad2.squirrel@www.skyhub.de>
+References: <71633.1304013549@localhost>
+	<1304083893-18849-1-git-send-email-mmarek@suse.cz>
+	<BANLkTikMf4x0e3UhabUH+c_xnWJMQ3rkvg@mail.gmail.com>
+	<20110502170736.GB18740@merkur.ravnborg.org>
+	<BANLkTi==Tx6sXcA2Bk6Cp7wc1DY-7c1V3g@mail.gmail.com>
+	<2b5d75ba05bd7889ac80514015e36ad2.squirrel@www.skyhub.de>
+Date: Mon, 2 May 2011 14:45:00 -0400
+Message-ID: <BANLkTikQ6b8BMYXZcFzmavx-geqzqVvrvA@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: Allow to combine multiple W= levels
+From: Arnaud Lacombe <lacombar@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnaud Lacombe <lacombar@gmail.com>
-Cc: Sam Ravnborg <sam@ravnborg.org>, =?iso-8859-15?Q?Am=E9rico_Wang?= <xiyou.wangcong@gmail.com>, Michal Marek <mmarek@suse.cz>, valdis.kletnieks@vt.edu, bp@alien8.de, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, davej@redhat.com
+To: boris@alien8.de
+Cc: Sam Ravnborg <sam@ravnborg.org>, =?ISO-8859-1?Q?Am=E9rico_Wang?= <xiyou.wangcong@gmail.com>, Michal Marek <mmarek@suse.cz>, valdis.kletnieks@vt.edu, bp@alien8.de, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, davej@redhat.com
 
-I'm really getting tired of this!
+Hi,
 
-> Because you are not even sure of what you submitted is good for the kernel
-> ?
+On Mon, May 2, 2011 at 2:03 PM,  <boris@alien8.de> wrote:
+> This is exactly why we're trying to get a feeling of this by _running_
+> it and _then_ _bitching_ about it.
+>
+This is just what I did, might you consider it bullshit or not. I
+really do _dislike_ Michal's interface. I proposed a solution, Americo
+did too. I guess that unless a patch is submitted, this will go
+nowhere.
 
-No, because we need to get a feeling of what makes sense for all these
-options first. I'd rather do the learning-by-doing thing here and
-implement what makes sense than braindead frameworks.
+> And this is for DEVELOPERS only - if
+> they've introduced it in their scripts, then they should be able to fix
+> any changes very easily.
+This argument is worthless. As soon as it gets in mainline, everybody
+will be free to use it, newbs, QA, packager, ...
 
-> I think this has been done completely wrong, first all the extra
-> warnings got in (without a detailed impact implied by each one),
-
-WTF? http://marc.info/?l=linux-kbuild&m=130346037604547&w=2
-
-No one else did check those and said, ACK/NACK so we went in with this
-initial splitting first.
-
-> then it was decided to be split in several level (which I proposed on
-> Feb 20th, but was originally rejected by Borislav Petkov),
-
-Of course, because it made no sense at the time. Sam added it later with
-his proposal patch.
-
-> then, well, some may need to be removed because they are not good for
-> Linux.
-
-have you even tried all those options and come up with concrete
-suggestions on which options should go in and which shouldn't, and for
-what reasons? I don't think so. So until you do, I don't care what you
-have to say.
-
-[snip a bunch of bullshit]
-
-> Now, the drawback of your comment is that when it will be time to
-> change the interface, some will object because it will have been
-> started to be used by third party scripts, and as authors of third
-> party script, it is a PITA to have to check the kernel version to know
-> if I should W=1,2,3, or W=123 or if W=3 includes W=1 ...
-
-This is exactly why we're trying to get a feeling of this by _running_
-it and _then_ _bitching_ about it. And this is for DEVELOPERS only - if
-they've introduced it in their scripts, then they should be able to fix
-any changes very easily.
-
+ - Arnaud
