@@ -1,40 +1,75 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from oproxy4-pub.bluehost.com ([69.89.21.11]:54861 "HELO
-	oproxy4-pub.bluehost.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with SMTP id S1757862Ab1EBPTv (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 2 May 2011 11:19:51 -0400
-Date: Mon, 2 May 2011 08:19:48 -0700
-From: Randy Dunlap <rdunlap@xenotime.net>
-Subject: Re: linux-next: Tree for May 2 (uml builds fail)
-Message-Id: <20110502081948.1ccb9aef.rdunlap@xenotime.net>
-In-Reply-To: <20110502150150.d932642f.sfr@canb.auug.org.au>
-References: <20110502150150.d932642f.sfr@canb.auug.org.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Received: from cantor.suse.de ([195.135.220.2]:36696 "EHLO mx1.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751198Ab1EBPdI (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 2 May 2011 11:33:08 -0400
+Date: Mon, 2 May 2011 17:33:06 +0200
+From: Michal Marek <mmarek@suse.cz>
+Subject: Re: [PATCH 1/5] kconfig: add an option to determine a menu's
+ visibility
+Message-ID: <20110502153305.GB15769@sepie.suse.cz>
+References: <4CD300AC.3010708@redhat.com>
+ <1289079027-3037-2-git-send-email-lacombar@gmail.com>
+ <AANLkTi=WS6cveqzxVmwC2wucaCpEJJLHXx0A8XbAChRb@mail.gmail.com>
+ <4CEF8C74.8010600@suse.cz>
+ <20101126161511.GD9418@sepie.suse.cz>
+ <20101126081736.0ba8a90b.rdunlap@xenotime.net>
+ <20110428103802.24c77ff4.rdunlap@xenotime.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20110428103802.24c77ff4.rdunlap@xenotime.net>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Stephen Rothwell <sfr@canb.auug.org.au>, linux-kbuild@vger.kernel.org
-Cc: linux-next@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, Michal Marek <mmarek@suse.cz>, sam@ravnborg.org
+To: Randy Dunlap <rdunlap@xenotime.net>
+Cc: Arnaud Lacombe <lacombar@gmail.com>, linux-kbuild@vger.kernel.org, linux-media@vger.kernel.org, Mauro Carvalho Chehab <mchehab@redhat.com>
 
-On Mon, 2 May 2011 15:01:50 +1000 Stephen Rothwell wrote:
-
-> Hi all,
+On Thu, Apr 28, 2011 at 10:38:02AM -0700, Randy Dunlap wrote:
+> On Fri, 26 Nov 2010 08:17:36 -0800 Randy Dunlap wrote:
 > 
-> Changes since 20110429:
+> > On Fri, 26 Nov 2010 17:15:11 +0100 Michal Marek wrote:
+> > > Subject: [PATCH] kconfig: Document the new "visible if" syntax
+> 
+> Hi,
+> 
+> Can we get this kconfig-language.txt patch added to the kernel source tree, please?
 
+Thanks for the reminder, I pushed it to kbuild-2.6.git#kconfig now.
 
-uml builds on i386 or x86_64 fail with: (I'm using O=outputdir if it matters)
-
-  GEN     /lnx/src/NEXT/linux-next-20110502/UM64/Makefile
-scripts/kconfig/conf --silentoldconfig arch/um/Kconfig.x86
-  GEN     /lnx/src/NEXT/linux-next-20110502/UM64/Makefile
-/lnx/src/NEXT/linux-next-20110502/scripts/Makefile.asm-generic:9: /lnx/src/NEXT/linux-next-20110502/arch/um/include/asm/Kbuild: No such file or directory
-make[2]: *** No rule to make target `/lnx/src/NEXT/linux-next-20110502/arch/um/include/asm/Kbuild'.  Stop.
-
-
-
----
-~Randy
-*** Remember to use Documentation/SubmitChecklist when testing your code ***
+Michal
+> 
+> 
+> > > Signed-off-by: Michal Marek <mmarek@suse.cz>
+> > > 
+> > > diff --git a/Documentation/kbuild/kconfig-language.txt b/Documentation/kbuild/kconfig-language.txt
+> > > index 2fe93ca..2522cca 100644
+> > > --- a/Documentation/kbuild/kconfig-language.txt
+> > > +++ b/Documentation/kbuild/kconfig-language.txt
+> > > @@ -114,6 +114,13 @@ applicable everywhere (see syntax).
+> > >  	the illegal configurations all over.
+> > >  	kconfig should one day warn about such things.
+> > >  
+> > > +- limiting menu display: "visible if" <expr>
+> > > +  This attribute is only applicable to menu blocks, if the condition is
+> > > +  false, the menu block is not displayed to the user (the symbols
+> > > +  contained there can still be selected by other symbols, though). It is
+> > > +  similar to a conditional "prompt" attribude for individual menu
+> > > +  entries.
+> > > +
+> > 
+> > Default value of "visible" is true ??
+> > 
+> > >  - numerical ranges: "range" <symbol> <symbol> ["if" <expr>]
+> > >    This allows to limit the range of possible input values for int
+> > >    and hex symbols. The user can only input a value which is larger than
+> > > @@ -300,7 +307,8 @@ menu:
+> > >  	"endmenu"
+> > >  
+> > >  This defines a menu block, see "Menu structure" above for more
+> > > -information. The only possible options are dependencies.
+> > > +information. The only possible options are dependencies and "visible"
+> > > +attributes.
+> > >  
+> > >  if:
+> > >  
+> > > --
