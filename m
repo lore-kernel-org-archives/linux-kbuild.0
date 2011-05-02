@@ -1,55 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepb.post.tele.dk ([195.41.46.236]:60047 "EHLO
-	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751256Ab1EBQwL (ORCPT
+Received: from pfepa.post.tele.dk ([195.41.46.235]:37292 "EHLO
+	pfepa.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754093Ab1EBRHi (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 2 May 2011 12:52:11 -0400
-Date: Mon, 2 May 2011 18:52:08 +0200
+	Mon, 2 May 2011 13:07:38 -0400
+Date: Mon, 2 May 2011 19:07:36 +0200
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: linux-next: Tree for May 2 (uml builds fail)
-Message-ID: <20110502165208.GA18740@merkur.ravnborg.org>
-References: <20110502150150.d932642f.sfr@canb.auug.org.au> <20110502081948.1ccb9aef.rdunlap@xenotime.net> <20110502160405.GE15769@sepie.suse.cz>
+Subject: Re: [PATCH] kbuild: Allow to combine multiple W= levels
+Message-ID: <20110502170736.GB18740@merkur.ravnborg.org>
+References: <71633.1304013549@localhost> <1304083893-18849-1-git-send-email-mmarek@suse.cz> <BANLkTikMf4x0e3UhabUH+c_xnWJMQ3rkvg@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20110502160405.GE15769@sepie.suse.cz>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <BANLkTikMf4x0e3UhabUH+c_xnWJMQ3rkvg@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: Randy Dunlap <rdunlap@xenotime.net>, Stephen Rothwell <sfr@canb.auug.org.au>, linux-kbuild@vger.kernel.org, linux-next@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>
+To: =?iso-8859-1?Q?Am=E9rico?= Wang <xiyou.wangcong@gmail.com>
+Cc: Michal Marek <mmarek@suse.cz>, Valdis.Kletnieks@vt.edu, bp@alien8.de, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, davej@redhat.com
 
-On Mon, May 02, 2011 at 06:04:05PM +0200, Michal Marek wrote:
-> On Mon, May 02, 2011 at 08:19:48AM -0700, Randy Dunlap wrote:
-> > On Mon, 2 May 2011 15:01:50 +1000 Stephen Rothwell wrote:
-> > 
-> > > Hi all,
-> > > 
-> > > Changes since 20110429:
-> > 
-> > 
-> > uml builds on i386 or x86_64 fail with: (I'm using O=outputdir if it matters)
-> > 
-> >   GEN     /lnx/src/NEXT/linux-next-20110502/UM64/Makefile
-> > scripts/kconfig/conf --silentoldconfig arch/um/Kconfig.x86
-> >   GEN     /lnx/src/NEXT/linux-next-20110502/UM64/Makefile
-> > /lnx/src/NEXT/linux-next-20110502/scripts/Makefile.asm-generic:9: /lnx/src/NEXT/linux-next-20110502/arch/um/include/asm/Kbuild: No such file or directory
-> > make[2]: *** No rule to make target `/lnx/src/NEXT/linux-next-20110502/arch/um/include/asm/Kbuild'.  Stop.
+On Tue, May 03, 2011 at 12:16:15AM +0800, Américo Wang wrote:
+> On Fri, Apr 29, 2011 at 9:31 PM, Michal Marek <mmarek@suse.cz> wrote:
+> > Add support for make W=12, make W=123 and so on, to enable warnings from
+> > multiple W= levels. Normally, make W=<level> does not include warnings
+> > from the previous level.
+> >
 > 
-> This patch should fix it.
+> This interface is not friendly, at least not as normal as we often see.
+> W=x+1 is supposed to include warnings of W=x.
 > 
-> Michal
-> 
-> Subject: [PATCH] kbuild: Fix Makefile.asm-generic for um
-> 
-> Do nothing if arch/$(SRCARCH)/include/asm/Kbuild does not exist, which
-> is the case of um.
-> 
-> Reported-by: Randy Dunlap <rdunlap@xenotime.net>
-> Signed-off-by: Michal Marek <mmarek@suse.cz>
+> Please refine the interface.
 
-Makes sense - sorry for not catchign the um case!
+Until we see that several people have had benefit if W=...
+we should leave it as is now.
 
-Acked-by: Sam Ravnborg <sam@ravnborg.org>
+Then when people really start to use if we can refine it.
 
+IMO it is much more important to find the right sub-set
+of warnings to keep on W=1 level than how we see additional warnings.
+
+There may well be warnings where we say that the benefit of it is
+zero - or it is plain wrong in the kernel.
+Lets try to focus on this.
 
 	Sam
