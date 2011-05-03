@@ -1,68 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp10.smtpout.orange.fr ([80.12.242.132]:40677 "EHLO
-	smtp.smtpout.orange.fr" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750962Ab1ECWAc (ORCPT
+Received: from outmail011.snc4.facebook.com ([66.220.144.143]:40071 "EHLO
+	mx-out.facebook.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1752403Ab1ECWeg (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 3 May 2011 18:00:32 -0400
-From: "Yann E. MORIN" <yann.morin.1998@anciens.enib.fr>
+	Tue, 3 May 2011 18:34:36 -0400
+Date: Tue, 3 May 2011 15:34:35 -0700
+From: Arun Sharma <asharma@fb.com>
 Subject: Re: [PATCH] Make it possible to override INSTALL_HDR_PATH
-Date: Wed, 4 May 2011 00:00:29 +0200
+Message-ID: <20110503223435.GA14389@dev1756.snc6.facebook.com>
 References: <20110503214612.GA26479@dev1756.snc6.facebook.com>
-In-Reply-To: <20110503214612.GA26479@dev1756.snc6.facebook.com>
+ <201105040000.29351.yann.morin.1998@anciens.enib.fr>
 MIME-Version: 1.0
-Content-Type: text/plain;
-  charset="iso-8859-1"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Message-Id: <201105040000.29351.yann.morin.1998@anciens.enib.fr>
+In-Reply-To: <201105040000.29351.yann.morin.1998@anciens.enib.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Arun Sharma <asharma@fb.com>
+To: "Yann E. MORIN" <yann.morin.1998@anciens.enib.fr>
+Cc: linux-kbuild@vger.kernel.org, Arun Sharma <asharma@fb.com>
 
-Arun, All,
+On Wed, May 04, 2011 at 12:00:29AM +0200, Yann E. MORIN wrote:
+>   $ make INSTALL_HDR_PATH=$(pwd)/FOO ARCH=x86 headers_install
+>   $ ls -l FOO
 
-On Tuesday 03 May 2011 23:46:12 Arun Sharma wrote:
-> diff --git a/Makefile b/Makefile
-> index cb715df..ec68886 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -1009,7 +1009,7 @@ firmware_install: FORCE
->  # Kernel headers
->  
->  #Default location for installed headers
-> -export INSTALL_HDR_PATH = $(objtree)/usr
-> +export INSTALL_HDR_PATH ?= $(objtree)/usr
->  
->  hdr-inst := -rR -f $(srctree)/scripts/Makefile.headersinst obj
->  
+Works for me too :) I was trying:
 
-Already works for me here in 2.6.38.5:
-  $ head -n 5 Makefile
-  VERSION = 2
-  PATCHLEVEL = 6
-  SUBLEVEL = 38
-  EXTRAVERSION = .5
-  NAME = Flesh-Eating Bats with Fangs
-  $ rm -rf FOO
-  $ mkdir FOO
-  $ make INSTALL_HDR_PATH=$(pwd)/FOO ARCH=x86 headers_install
-  $ ls -l FOO
-  total 4
-  drwxr-xr-x 12 ymorin users 4096 2011-05-03 23:57 include
-  $ cat FOO/include/linux/version.h
-  #define LINUX_VERSION_CODE 132646
-  #define KERNEL_VERSION(a,b,c) (((a) << 16) + ((b) << 8) + (c))
-  $ make --version | head -n 1
-  GNU Make 3.81
+echo 'INSTALL_HDR_PATH=$RPM_BUILD_ROOT/usr make %{?_smp_mflags} headers_install'
 
-Regards,
-Yann E. MORIN.
+along the lines of:
 
--- 
-.-----------------.--------------------.------------------.--------------------.
-|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
-| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
-| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
-| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
-'------------------------------^-------^------------------^--------------------'
+scripts/packaging/mkspec:
+
+echo 'INSTALL_MOD_PATH=$RPM_BUILD_ROOT make %{?_smp_mflags} KBUILD_SRC=modules_install'
+
+While we're on the topic, could we enhance mkspec to spit out -devel and
+-headers rpms too? I can post patches if there is sufficient interest.
+
+It'd be nice to use the same mechanism to define/override:
+
+INSTALL_PATH
+INSTALL_MOD_PATH
+INSTALL_HDR_PATH
+
+ -Arun
