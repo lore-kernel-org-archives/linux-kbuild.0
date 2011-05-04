@@ -1,62 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from 75.98.165.80.static.a2webhosting.com ([75.98.165.80]:36876 "EHLO
-	greenroomsoftware.com" rhost-flags-OK-FAIL-OK-OK) by vger.kernel.org
-	with ESMTP id S1752195Ab1EDG13 (ORCPT
+Received: from mail-bw0-f46.google.com ([209.85.214.46]:41350 "EHLO
+	mail-bw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755150Ab1EDSP5 convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 4 May 2011 02:27:29 -0400
-From: Robert Gordon <robert@greenroomsoftware.com>
-Subject: [PATCH] kbuild, deb-pkg: set host machine $arch correctly when cross-compiling or not
-Date: Tue,  3 May 2011 23:27:18 -0700
-Message-Id: <1304490438-17099-1-git-send-email-robert@greenroomsoftware.com>
+	Wed, 4 May 2011 14:15:57 -0400
+MIME-Version: 1.0
+In-Reply-To: <1304087822-22853-1-git-send-email-mmarek@suse.cz>
+References: <1304087822-22853-1-git-send-email-mmarek@suse.cz>
+Date: Wed, 4 May 2011 20:15:55 +0200
+Message-ID: <BANLkTimP=DQu4_fwxux=5d0w7YanuURw4Q@mail.gmail.com>
+Subject: Re: [PATCH] MAINTAINERS: Update KCONFIG entry
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Robert Nelson <robertcnelson@gmail.com>, maximilian attems <max@stro.at>, Robert Gordon <robert@greenroomsoftware.com>
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-scripts/package/builddeb script was setting the host machine $arch
-in the KERNEL/debian/control prior to an invocation of dpkg-gencontrol.
-The existing method is appropriate for i386/x86_64 but fails when
-cross-compiling for non-intel.  The patch modifies the script to
-guarantee the correct $arch for the target is written to the control
-file.  This patch has been tested building x86_64 on an i386 machine
-and also when cross-compiling for ARM on an i386 machine.
-The issue first arose in the 2.6.38 release.
+On Fri, Apr 29, 2011 at 16:37, Michal Marek <mmarek@suse.cz> wrote:
+> Roman Zippel hasn't been active for several years. Add myself as kconfig
+> maintainer, but change the mode to "Odd Fixes" to not set expectations
+> too high. Also, remove the patchwork link, since it is not used for
+> kbuild/kconfig.
+>
+> Signed-off-by: Michal Marek <mmarek@suse.cz>
 
-Signed-off-by: Robert Gordon <robert@greenroomsoftware.com>
+Thanks for adding him to CREDITS!
 
----
- scripts/package/builddeb |   18 +++++++++++++++++-
- 1 files changed, 17 insertions(+), 1 deletions(-)
+Acked-by: Geert Uytterhoeven <geert@linux-m68k.org>
 
-diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-index f6cbc3d..91ced36 100644
---- a/scripts/package/builddeb
-+++ b/scripts/package/builddeb
-@@ -246,7 +246,23 @@ mkdir -p "$destdir"
- (cd $srctree; tar -c -f - -T /tmp/files$$) | (cd $destdir; tar -xf -)
- (cd $objtree; tar -c -f - -T /tmp/objfiles$$) | (cd $destdir; tar -xf -)
- rm -f /tmp/files$$ /tmp/objfiles$$
--arch=$(dpkg --print-architecture)
-+
-+case "$UTS_MACHINE" in
-+sparc*)
-+	arch=sparc ;;
-+s390*)
-+	arch=s390 ;;
-+ppc*)
-+	arch=powerpc ;;
-+parisc*)
-+	arch=hppa ;;
-+mips*)
-+	arch=mips$(grep -q CPU_LITTLE_ENDIAN=y .config && echo el) ;;
-+arm*)
-+	arch=arm$(grep -q CONFIG_AEABI=y .config && echo el) ;;
-+i386|ia64|alpha|x86_64|*)
-+	arch=$(dpkg --print-architecture) ;;
-+esac
- 
- cat <<EOF >> debian/control
- 
--- 
-1.7.1
+> ---
+>  CREDITS     |    4 ++++
+>  MAINTAINERS |    5 ++---
+>  2 files changed, 6 insertions(+), 3 deletions(-)
 
+Gr{oetje,eeting}s,
+
+                        Geert
+
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
