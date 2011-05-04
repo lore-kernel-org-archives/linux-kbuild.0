@@ -1,45 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from outmail011.snc4.facebook.com ([66.220.144.143]:40071 "EHLO
-	mx-out.facebook.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1752403Ab1ECWeg (ORCPT
+Received: from mail-pw0-f46.google.com ([209.85.160.46]:49283 "EHLO
+	mail-pw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752195Ab1EDGAK (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 3 May 2011 18:34:36 -0400
-Date: Tue, 3 May 2011 15:34:35 -0700
-From: Arun Sharma <asharma@fb.com>
-Subject: Re: [PATCH] Make it possible to override INSTALL_HDR_PATH
-Message-ID: <20110503223435.GA14389@dev1756.snc6.facebook.com>
-References: <20110503214612.GA26479@dev1756.snc6.facebook.com>
- <201105040000.29351.yann.morin.1998@anciens.enib.fr>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <201105040000.29351.yann.morin.1998@anciens.enib.fr>
+	Wed, 4 May 2011 02:00:10 -0400
+From: Nuno Subtil <subtil@gmail.com>
+Subject: [PATCH 1/1] deb-pkg: fix cross-compile build
+Date: Tue,  3 May 2011 22:59:10 -0700
+Message-Id: <1304488750-13606-1-git-send-email-subtil@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Yann E. MORIN" <yann.morin.1998@anciens.enib.fr>
-Cc: linux-kbuild@vger.kernel.org, Arun Sharma <asharma@fb.com>
+To: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, Nuno Subtil <subtil@gmail.com>
 
-On Wed, May 04, 2011 at 12:00:29AM +0200, Yann E. MORIN wrote:
->   $ make INSTALL_HDR_PATH=$(pwd)/FOO ARCH=x86 headers_install
->   $ ls -l FOO
+When generating the header package, scripts/package/builddeb was inferring the
+target architecture by looking at the output of dpkg --print-architecture. This
+allows KBUILD_DEBARCH to override that.
 
-Works for me too :) I was trying:
+Signed-off-by: Nuno Subtil <subtil@gmail.com>
+---
+ scripts/package/builddeb |    7 ++++++-
+ 1 files changed, 6 insertions(+), 1 deletions(-)
 
-echo 'INSTALL_HDR_PATH=$RPM_BUILD_ROOT/usr make %{?_smp_mflags} headers_install'
+diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+index f6cbc3d..9372145 100644
+--- a/scripts/package/builddeb
++++ b/scripts/package/builddeb
+@@ -246,7 +246,12 @@ mkdir -p "$destdir"
+ (cd $srctree; tar -c -f - -T /tmp/files$$) | (cd $destdir; tar -xf -)
+ (cd $objtree; tar -c -f - -T /tmp/objfiles$$) | (cd $destdir; tar -xf -)
+ rm -f /tmp/files$$ /tmp/objfiles$$
+-arch=$(dpkg --print-architecture)
++
++if [ -n "$KBUILD_DEBARCH" ] ; then
++	arch="$KBUILD_DEBARCH"
++else
++	arch=$(dpkg --print-architecture)
++fi
+ 
+ cat <<EOF >> debian/control
+ 
+-- 
+1.7.4.4
 
-along the lines of:
+Please Cc me on any replies related to this patch.
 
-scripts/packaging/mkspec:
+Thanks,
+Nuno
 
-echo 'INSTALL_MOD_PATH=$RPM_BUILD_ROOT make %{?_smp_mflags} KBUILD_SRC=modules_install'
-
-While we're on the topic, could we enhance mkspec to spit out -devel and
--headers rpms too? I can post patches if there is sufficient interest.
-
-It'd be nice to use the same mechanism to define/override:
-
-INSTALL_PATH
-INSTALL_MOD_PATH
-INSTALL_HDR_PATH
-
- -Arun
