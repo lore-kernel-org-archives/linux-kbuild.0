@@ -1,47 +1,51 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-bw0-f46.google.com ([209.85.214.46]:41350 "EHLO
-	mail-bw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755150Ab1EDSP5 convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 4 May 2011 14:15:57 -0400
+Received: from cantor.suse.de ([195.135.220.2]:51147 "EHLO mx1.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1755618Ab1EDUXL (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 4 May 2011 16:23:11 -0400
+Message-ID: <4DC1B5CF.3070803@suse.cz>
+Date: Wed, 04 May 2011 22:23:43 +0200
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-In-Reply-To: <1304087822-22853-1-git-send-email-mmarek@suse.cz>
-References: <1304087822-22853-1-git-send-email-mmarek@suse.cz>
-Date: Wed, 4 May 2011 20:15:55 +0200
-Message-ID: <BANLkTimP=DQu4_fwxux=5d0w7YanuURw4Q@mail.gmail.com>
-Subject: Re: [PATCH] MAINTAINERS: Update KCONFIG entry
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+Subject: Re: make rpm-pkg and version mismatch
+References: <20110503212706.GA26044@dev1756.snc6.facebook.com>
+In-Reply-To: <20110503212706.GA26044@dev1756.snc6.facebook.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Arun Sharma <asharma@fb.com>
+Cc: linux-kbuild@vger.kernel.org
 
-On Fri, Apr 29, 2011 at 16:37, Michal Marek <mmarek@suse.cz> wrote:
-> Roman Zippel hasn't been active for several years. Add myself as kconfig
-> maintainer, but change the mode to "Odd Fixes" to not set expectations
-> too high. Also, remove the patchwork link, since it is not used for
-> kbuild/kconfig.
+Dne 3.5.2011 23:27, Arun Sharma napsal(a):
 >
-> Signed-off-by: Michal Marek <mmarek@suse.cz>
+> make rpm-pkg produces files that look like: kernel-2.6.39rc5-2.x86_64.rpm
+> However, uname -r produces 2.6.39rc5 (-2 is missing).
+>
+> This differs from how some of the distributors are packaging the kernel.
+> Their setup includes %{release} in uname -r.
 
-Thanks for adding him to CREDITS!
+Distributors have control over the kernel uname -r string. make rpm, on 
+the other hand, needs to work with both the vanilla version strings, as 
+well as any crazy suffixes the user comes up with. Hence it uses the 
+uname -v version number as the rpm release, which is always defined.
 
-Acked-by: Geert Uytterhoeven <geert@linux-m68k.org>
 
-> ---
->  CREDITS     |    4 ++++
->  MAINTAINERS |    5 ++---
->  2 files changed, 6 insertions(+), 3 deletions(-)
+>
+> One way to achive that is:
+>
+> --- a/scripts/setlocalversion
+> +++ b/scripts/setlocalversion
+> @@ -170,4 +170,8 @@ else
+>          fi
+>   fi
+>
+> +# Append the RPM release
+> +release=`. ./scripts/mkversion`
+> +res="${res}-${release}"
+> +
 
-Gr{oetje,eeting}s,
+Please don't do that. make rpm has to work with the version string set 
+by the kernel, not the other way around.
 
-                        Geert
-
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+Michal
