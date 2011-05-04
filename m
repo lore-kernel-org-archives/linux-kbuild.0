@@ -1,50 +1,62 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pw0-f46.google.com ([209.85.160.46]:49283 "EHLO
-	mail-pw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752195Ab1EDGAK (ORCPT
+Received: from 75.98.165.80.static.a2webhosting.com ([75.98.165.80]:36876 "EHLO
+	greenroomsoftware.com" rhost-flags-OK-FAIL-OK-OK) by vger.kernel.org
+	with ESMTP id S1752195Ab1EDG13 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 4 May 2011 02:00:10 -0400
-From: Nuno Subtil <subtil@gmail.com>
-Subject: [PATCH 1/1] deb-pkg: fix cross-compile build
-Date: Tue,  3 May 2011 22:59:10 -0700
-Message-Id: <1304488750-13606-1-git-send-email-subtil@gmail.com>
+	Wed, 4 May 2011 02:27:29 -0400
+From: Robert Gordon <robert@greenroomsoftware.com>
+Subject: [PATCH] kbuild, deb-pkg: set host machine $arch correctly when cross-compiling or not
+Date: Tue,  3 May 2011 23:27:18 -0700
+Message-Id: <1304490438-17099-1-git-send-email-robert@greenroomsoftware.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, Nuno Subtil <subtil@gmail.com>
+To: linux-kbuild@vger.kernel.org
+Cc: Robert Nelson <robertcnelson@gmail.com>, maximilian attems <max@stro.at>, Robert Gordon <robert@greenroomsoftware.com>
 
-When generating the header package, scripts/package/builddeb was inferring the
-target architecture by looking at the output of dpkg --print-architecture. This
-allows KBUILD_DEBARCH to override that.
+scripts/package/builddeb script was setting the host machine $arch
+in the KERNEL/debian/control prior to an invocation of dpkg-gencontrol.
+The existing method is appropriate for i386/x86_64 but fails when
+cross-compiling for non-intel.  The patch modifies the script to
+guarantee the correct $arch for the target is written to the control
+file.  This patch has been tested building x86_64 on an i386 machine
+and also when cross-compiling for ARM on an i386 machine.
+The issue first arose in the 2.6.38 release.
 
-Signed-off-by: Nuno Subtil <subtil@gmail.com>
+Signed-off-by: Robert Gordon <robert@greenroomsoftware.com>
+
 ---
- scripts/package/builddeb |    7 ++++++-
- 1 files changed, 6 insertions(+), 1 deletions(-)
+ scripts/package/builddeb |   18 +++++++++++++++++-
+ 1 files changed, 17 insertions(+), 1 deletions(-)
 
 diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-index f6cbc3d..9372145 100644
+index f6cbc3d..91ced36 100644
 --- a/scripts/package/builddeb
 +++ b/scripts/package/builddeb
-@@ -246,7 +246,12 @@ mkdir -p "$destdir"
+@@ -246,7 +246,23 @@ mkdir -p "$destdir"
  (cd $srctree; tar -c -f - -T /tmp/files$$) | (cd $destdir; tar -xf -)
  (cd $objtree; tar -c -f - -T /tmp/objfiles$$) | (cd $destdir; tar -xf -)
  rm -f /tmp/files$$ /tmp/objfiles$$
 -arch=$(dpkg --print-architecture)
 +
-+if [ -n "$KBUILD_DEBARCH" ] ; then
-+	arch="$KBUILD_DEBARCH"
-+else
-+	arch=$(dpkg --print-architecture)
-+fi
++case "$UTS_MACHINE" in
++sparc*)
++	arch=sparc ;;
++s390*)
++	arch=s390 ;;
++ppc*)
++	arch=powerpc ;;
++parisc*)
++	arch=hppa ;;
++mips*)
++	arch=mips$(grep -q CPU_LITTLE_ENDIAN=y .config && echo el) ;;
++arm*)
++	arch=arm$(grep -q CONFIG_AEABI=y .config && echo el) ;;
++i386|ia64|alpha|x86_64|*)
++	arch=$(dpkg --print-architecture) ;;
++esac
  
  cat <<EOF >> debian/control
  
 -- 
-1.7.4.4
-
-Please Cc me on any replies related to this patch.
-
-Thanks,
-Nuno
+1.7.1
 
