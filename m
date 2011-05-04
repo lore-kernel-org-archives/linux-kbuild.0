@@ -1,53 +1,38 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from outmail005.snc4.facebook.com ([66.220.144.137]:64506 "EHLO
-	mx-out.facebook.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1753387Ab1EDUsM (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 4 May 2011 16:48:12 -0400
-Date: Wed, 4 May 2011 13:48:11 -0700
-From: Arun Sharma <asharma@fb.com>
-Subject: [PATCH] Replace '-' in kernel version with '_'
-Message-ID: <20110504204811.GA1803@dev1756.snc6.facebook.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Received: from cantor.suse.de ([195.135.220.2]:51666 "EHLO mx1.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753684Ab1EDUuE (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 4 May 2011 16:50:04 -0400
+From: Michal Marek <mmarek@suse.cz>
+Subject: [PATCH] rpm-pkg: Fix when current directory is a symlink
+Date: Wed,  4 May 2011 22:49:45 +0200
+Message-Id: <1304542185-14520-1-git-send-email-mmarek@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
 
-Removing the '-' results in hard to read filenames such as:
-kernel-2.6.35.2000042g76e4caf-28.x86_64.rpm
+The better fix would be to stop using the parent directory (principle of
+least surprise), but as long as we use it, use it consistently.
 
-kernel-2.6.35.2_000042_g76e4caf-28.x86_64.rpm is easier to
-read.
-
-Signed-off-by: Arun Sharma <asharma@fb.com>
+Signed-off-by: Michal Marek <mmarek@suse.cz>
+---
+ scripts/package/Makefile |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
 diff --git a/scripts/package/Makefile b/scripts/package/Makefile
-index d0b931b..30b437f 100644
+index 1b7eaea..006960e 100644
 --- a/scripts/package/Makefile
 +++ b/scripts/package/Makefile
-@@ -26,7 +26,7 @@ RPM := $(shell if [ -x "/usr/bin/rpmbuild" ]; then echo rpmbuild; \
- 	           else echo rpm; fi)
- 
+@@ -28,7 +28,7 @@ RPM := $(shell if [ -x "/usr/bin/rpmbuild" ]; then echo rpmbuild; \
  # Remove hyphens since they have special meaning in RPM filenames
--KERNELPATH := kernel-$(subst -,,$(KERNELRELEASE))
-+KERNELPATH := kernel-$(subst -,_,$(KERNELRELEASE))
+ KERNELPATH := kernel-$(subst -,_,$(KERNELRELEASE))
  MKSPEC     := $(srctree)/scripts/package/mkspec
- PREV       := set -e; cd ..;
+-PREV       := set -e; cd ..;
++PREV       := set -e; cd -P ..;
  
-diff --git a/scripts/package/mkspec b/scripts/package/mkspec
-index 65845b4..309a275 100755
---- a/scripts/package/mkspec
-+++ b/scripts/package/mkspec
-@@ -22,7 +22,7 @@ if [ "`grep CONFIG_DRM=y .config | cut -f2 -d\=`" = "y" ]; then
- fi
- 
- PROVIDES="$PROVIDES kernel-$KERNELRELEASE"
--__KERNELRELEASE=`echo $KERNELRELEASE | sed -e "s/-//g"`
-+__KERNELRELEASE=`echo $KERNELRELEASE | sed -e "s/-/_/g"`
- 
- echo "Name: kernel"
- echo "Summary: The Linux Kernel"
+ # rpm-pkg
+ # ---------------------------------------------------------------------------
 -- 
-1.7.4
+1.7.4.1
+
