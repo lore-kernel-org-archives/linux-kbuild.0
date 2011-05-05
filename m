@@ -1,51 +1,72 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor.suse.de ([195.135.220.2]:52712 "EHLO mx1.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:35950 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754693Ab1EEOSf (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 5 May 2011 10:18:35 -0400
-Date: Thu, 5 May 2011 16:18:33 +0200
+	id S1754342Ab1EEOXG (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 5 May 2011 10:23:06 -0400
+Date: Thu, 5 May 2011 16:23:05 +0200
 From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [RFC 1/9] genksyms: rename parser files
-Message-ID: <20110505141833.GF13293@sepie.suse.cz>
+Subject: Re: [RFC 2/9] genksyms: finalize rename
+Message-ID: <20110505142305.GG13293@sepie.suse.cz>
 References: <1304561004-2684-1-git-send-email-lacombar@gmail.com>
- <1304561004-2684-2-git-send-email-lacombar@gmail.com>
+ <1304561004-2684-3-git-send-email-lacombar@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1304561004-2684-2-git-send-email-lacombar@gmail.com>
+In-Reply-To: <1304561004-2684-3-git-send-email-lacombar@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Arnaud Lacombe <lacombar@gmail.com>
 Cc: linux-kbuild@vger.kernel.org
 
-On Wed, May 04, 2011 at 10:03:16PM -0400, Arnaud Lacombe wrote:
-> Rename parser's files to make them follow the same convention as `kconfig'.
-
-This mail didn't reach the mailing list, probably for size reasons. I
-suggest you create the patch with the -M option, it will be a bit harder to
-apply, but people will be able to see it.
-
-
+On Wed, May 04, 2011 at 10:03:17PM -0400, Arnaud Lacombe wrote:
 > ---
->  scripts/genksyms/genksyms.gperf          |   56 +
->  scripts/genksyms/genksyms.hash.c_shipped |  220 +++
->  scripts/genksyms/genksyms.l              |  409 +++++
->  scripts/genksyms/genksyms.tab.c_shipped  | 2353 ++++++++++++++++++++++++++
->  scripts/genksyms/genksyms.tab.h_shipped  |  139 ++
->  scripts/genksyms/genksyms.y              |  473 ++++++
->  scripts/genksyms/keywords.c_shipped      |  220 ---
->  scripts/genksyms/keywords.gperf          |   56 -
->  scripts/genksyms/lex.c_shipped           | 2709 ------------------------------
->  scripts/genksyms/lex.genksyms.c_shipped  | 2709 ++++++++++++++++++++++++++++++
->  scripts/genksyms/lex.l                   |  409 -----
->  scripts/genksyms/parse.c_shipped         | 2353 --------------------------
->  scripts/genksyms/parse.h_shipped         |  139 --
->  scripts/genksyms/parse.y                 |  473 ------
+>  scripts/genksyms/.gitignore |    6 ++--
+>  scripts/genksyms/Makefile   |   45 +++++++++++++-----------------------------
+>  scripts/genksyms/genksyms.c |   11 ++++-----
+>  scripts/genksyms/genksyms.l |    7 ++---
+>  scripts/genksyms/genksyms.y |    2 +
+>  5 files changed, 27 insertions(+), 44 deletions(-)
+> 
+> diff --git a/scripts/genksyms/.gitignore b/scripts/genksyms/.gitignore
+> index be5cadb..0983577 100644
+> --- a/scripts/genksyms/.gitignore
+> +++ b/scripts/genksyms/.gitignore
+> @@ -1,4 +1,4 @@
+> -keywords.c
+> -lex.c
+> -parse.[ch]
+>  genksyms
+> +genksyms.tab.c
+> +lex.genksyms.c
+> +genksyms.hash.c
+> diff --git a/scripts/genksyms/Makefile b/scripts/genksyms/Makefile
+> index e420fe4..82bb25f 100644
+> --- a/scripts/genksyms/Makefile
+> +++ b/scripts/genksyms/Makefile
+> @@ -2,52 +2,35 @@
+>  hostprogs-y	:= genksyms
+>  always		:= $(hostprogs-y)
+>  
+> -genksyms-objs	:= genksyms.o parse.o lex.o
+> +genksyms-objs	:= genksyms.o genksyms.tab.o
+>  
+>  # -I needed for generated C source (shipped source)
+>  HOSTCFLAGS_parse.o := -Wno-uninitialized -I$(src)
+>  
+> -# dependencies on generated files need to be listed explicitly
+> -$(obj)/lex.o: $(obj)/parse.h $(obj)/keywords.c
+> -
+>  # -I needed for generated C source (shipped source)
+>  HOSTCFLAGS_lex.o := -I$(src)
+>  
+> -ifdef GENERATE_PARSER
+> -
+> -# gperf
+> +clean-files	:= genksyms.tab.c lex.genksyms.c genksyms.hash.c
 
-Renaming lex.l is a good idea, lex.lex.c would look silly. But I would
-leave parse.y and keywords.gperf and only rename the _shipped files to
-match what the new rules do. The names are local to the directory, so
-there is no urgent need to change them (and the history is easier to
-view if there are fewer renames).
+Given that you are overwriting most of this by "kbuild: merge parser
+generation rules", I suggest you only do the necessary minimum at this
+point, i.e. only reflect the file renames and #include the lexer into
+the parser.
 
 Michal
