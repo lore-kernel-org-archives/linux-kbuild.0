@@ -1,66 +1,56 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-iw0-f174.google.com ([209.85.214.174]:55818 "EHLO
-	mail-iw0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752563Ab1EEOu2 convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 5 May 2011 10:50:28 -0400
-Received: by iwn34 with SMTP id 34so1884434iwn.19
-        for <linux-kbuild@vger.kernel.org>; Thu, 05 May 2011 07:50:27 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20110505133203.GE13293@sepie.suse.cz>
-References: <1304561004-2684-1-git-send-email-lacombar@gmail.com>
-	<1304561004-2684-8-git-send-email-lacombar@gmail.com>
-	<20110505133203.GE13293@sepie.suse.cz>
-Date: Thu, 5 May 2011 10:50:27 -0400
-Message-ID: <BANLkTim_PynQaLWfg3ExmBGEwZzFfGdRCQ@mail.gmail.com>
-Subject: Re: [RFC 7/9] kbuild: merge parser generation rules
-From: Arnaud Lacombe <lacombar@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 8BIT
+Received: from cantor.suse.de ([195.135.220.2]:55254 "EHLO mx1.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753152Ab1EEPXe (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 5 May 2011 11:23:34 -0400
+From: Michal Marek <mmarek@suse.cz>
+Subject: [PATCH v2] powerpc: Use the deterministic mode of ar
+Date: Thu,  5 May 2011 17:22:55 +0200
+Message-Id: <1304608975-21441-1-git-send-email-mmarek@suse.cz>
+In-Reply-To: <1302015561-21047-6-git-send-email-mmarek@suse.cz>
+References: <1302015561-21047-6-git-send-email-mmarek@suse.cz>
+In-Reply-To: <1302015561-21047-1-git-send-email-mmarek@suse.cz>
+References: <1302015561-21047-1-git-send-email-mmarek@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Paul Mackerras <paulus@samba.org>, linuxppc-dev@lists.ozlabs.org
+
+Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+Cc: Paul Mackerras <paulus@samba.org>
+Cc: linuxppc-dev@lists.ozlabs.org
+Signed-off-by: Michal Marek <mmarek@suse.cz>
+
+---
 
 Hi,
 
-On Thu, May 5, 2011 at 9:32 AM, Michal Marek <mmarek@suse.cz> wrote:
-> Hi Arnaud,
->
-> nice cleanup, I only have a few random comments to this and other patches.
->
-> On Wed, May 04, 2011 at 10:03:22PM -0400, Arnaud Lacombe wrote:
->>  # Shipped files
->>  # ===========================================================================
->>
->>  quiet_cmd_shipped = SHIPPED $@
->>  cmd_shipped = cat $< > $@
->>
->> -$(obj)/%:: $(src)/%_shipped
->> +$(obj)/%.tab.c: $(src)/%.tab.c_shipped
->> +     $(call cmd,shipped)
->> +
->> +$(obj)/lex.%.c: $(src)/lex.%.c_shipped
->> +     $(call cmd,shipped)
->> +
->> +$(obj)/%.hash.c: $(src)/%.hash.c_shipped
->>       $(call cmd,shipped)
->
-> Please don't change this rule, there are other uses of _shipped files in the
-> tree than just bison/lex/gperf generated files.
->
-I could not make the other implicit target work without changing this one. Ie:
+this version fixes build with binutils <= 2.19 by first checking if ar(1)
+supports the D option. It depends on a previous patch in the kbuild tree,
+commit 40df759e (kbuild: Fix build with binutils <= 2.19) in linux-next,
+so it will need to go through the kbuild tree. But feedback from the PPC
+maintainers would be appreciated.
 
-$(src)/%.tab.c_shipped: $(src)/%.y
-       $(call cmd,bison)
+Thanks
+Michal
 
-was not working with the _shipped rules left intact, but hardcoding
-stem value, eg.:
+---
+ arch/powerpc/boot/Makefile |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-$(src)/zconf.tab.c_shipped: $(src)/zconf.y
-       $(call cmd,bison)
+diff --git a/arch/powerpc/boot/Makefile b/arch/powerpc/boot/Makefile
+index 8917816..f0543f8 100644
+--- a/arch/powerpc/boot/Makefile
++++ b/arch/powerpc/boot/Makefile
+@@ -127,7 +127,7 @@ quiet_cmd_bootas = BOOTAS  $@
+       cmd_bootas = $(CROSS32CC) -Wp,-MD,$(depfile) $(BOOTAFLAGS) -c -o $@ $<
+ 
+ quiet_cmd_bootar = BOOTAR  $@
+-      cmd_bootar = $(CROSS32AR) -cr $@.$$$$ $(filter-out FORCE,$^); mv $@.$$$$ $@
++      cmd_bootar = $(CROSS32AR) -cr$(KBUILD_ARFLAGS) $@.$$$$ $(filter-out FORCE,$^); mv $@.$$$$ $@
+ 
+ $(obj-libfdt): $(obj)/%.o: $(srctree)/scripts/dtc/libfdt/%.c FORCE
+ 	$(call if_changed_dep,bootcc)
+-- 
+1.7.4.1
 
-was working, at least to link the different implicit target, but
-that's breaking other part. I'll try to re-investigate tonight.
-
- - Arnaud
