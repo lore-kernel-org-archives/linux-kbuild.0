@@ -1,56 +1,64 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor.suse.de ([195.135.220.2]:55254 "EHLO mx1.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753152Ab1EEPXe (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 5 May 2011 11:23:34 -0400
-From: Michal Marek <mmarek@suse.cz>
-Subject: [PATCH v2] powerpc: Use the deterministic mode of ar
-Date: Thu,  5 May 2011 17:22:55 +0200
-Message-Id: <1304608975-21441-1-git-send-email-mmarek@suse.cz>
-In-Reply-To: <1302015561-21047-6-git-send-email-mmarek@suse.cz>
-References: <1302015561-21047-6-git-send-email-mmarek@suse.cz>
-In-Reply-To: <1302015561-21047-1-git-send-email-mmarek@suse.cz>
-References: <1302015561-21047-1-git-send-email-mmarek@suse.cz>
+Received: from 75.98.165.80.static.a2webhosting.com ([75.98.165.80]:41353 "EHLO
+	greenroomsoftware.com" rhost-flags-OK-FAIL-OK-OK) by vger.kernel.org
+	with ESMTP id S1753363Ab1EEPmp (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 5 May 2011 11:42:45 -0400
+Message-ID: <4DC2C568.9090803@greenroomsoftware.com>
+Date: Thu, 05 May 2011 08:42:32 -0700
+From: Robert Gordon <robert@greenroomsoftware.com>
+MIME-Version: 1.0
+Subject: Re: [PATCH 1/1] deb-pkg: fix cross-compile build
+References: <1304488750-13606-1-git-send-email-subtil@gmail.com> <20110504204807.GB13293@sepie.suse.cz> <20110505090728.GC30678@vostochny.stro.at>
+In-Reply-To: <20110505090728.GC30678@vostochny.stro.at>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Paul Mackerras <paulus@samba.org>, linuxppc-dev@lists.ozlabs.org
+To: maximilian attems <max@stro.at>
+Cc: Michal Marek <mmarek@suse.cz>, Nuno Subtil <subtil@gmail.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>
-Cc: Paul Mackerras <paulus@samba.org>
-Cc: linuxppc-dev@lists.ozlabs.org
-Signed-off-by: Michal Marek <mmarek@suse.cz>
+On 05/05/2011 02:07 AM, maximilian attems wrote:
+> On Wed, May 04, 2011 at 10:48:07PM +0200, Michal Marek wrote:
+>> Adding Maks to CC.
+> thanks, this one looks, good please disguard the other patch.
+>  
+>> On Tue, May 03, 2011 at 10:59:10PM -0700, Nuno Subtil wrote:
+>>> When generating the header package, scripts/package/builddeb was inferring the
+>>> target architecture by looking at the output of dpkg --print-architecture. This
+>>> allows KBUILD_DEBARCH to override that.
+>>>
+>>> Signed-off-by: Nuno Subtil <subtil@gmail.com>
+> Acked-by: maximilian attems <max@stro.at>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Greetings,
 
----
+Compile breaks when using the following command:
+    fakeroot make ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- deb-pkg
 
-Hi,
+With 'set -x' in scripts/package/builddeb, the relevant output is:
+    + '[' -n '' ']'
+    ++ dpkg --print-architecture
+    + arch=i386
+This indicates that KBUILD_DEBARCH is not set.
 
-this version fixes build with binutils <= 2.19 by first checking if ar(1)
-supports the D option. It depends on a previous patch in the kbuild tree,
-commit 40df759e (kbuild: Fix build with binutils <= 2.19) in linux-next,
-so it will need to go through the kbuild tree. But feedback from the PPC
-maintainers would be appreciated.
+The debian/control file is written with the following section:
+    Package: linux-headers-2.6.39-rc5+
+    Provides: linux-headers, linux-headers-2.6
+    Architecture: i386
+    Description: Linux kernel headers for 2.6.39-rc5+ on i386
+     This package provides kernel header files for 2.6.39-rc5+ on i386
 
-Thanks
-Michal
+This produces the following error output:
+    + forcearch=-DArchitecture=armel
+    + dpkg-gencontrol -isp -DArchitecture=armel
+-plinux-headers-2.6.39-rc5+ -P/opt/kernel-linus/linux-2.6/debian/hdrtmp
+    dpkg-gencontrol: error: current host architecture 'armel' does not
+appear in package's architecture list (i386)
 
----
- arch/powerpc/boot/Makefile |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
-
-diff --git a/arch/powerpc/boot/Makefile b/arch/powerpc/boot/Makefile
-index 8917816..f0543f8 100644
---- a/arch/powerpc/boot/Makefile
-+++ b/arch/powerpc/boot/Makefile
-@@ -127,7 +127,7 @@ quiet_cmd_bootas = BOOTAS  $@
-       cmd_bootas = $(CROSS32CC) -Wp,-MD,$(depfile) $(BOOTAFLAGS) -c -o $@ $<
- 
- quiet_cmd_bootar = BOOTAR  $@
--      cmd_bootar = $(CROSS32AR) -cr $@.$$$$ $(filter-out FORCE,$^); mv $@.$$$$ $@
-+      cmd_bootar = $(CROSS32AR) -cr$(KBUILD_ARFLAGS) $@.$$$$ $(filter-out FORCE,$^); mv $@.$$$$ $@
- 
- $(obj-libfdt): $(obj)/%.o: $(srctree)/scripts/dtc/libfdt/%.c FORCE
- 	$(call if_changed_dep,bootcc)
--- 
-1.7.4.1
+Regards,
+Robert
 
