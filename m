@@ -1,103 +1,187 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-iw0-f174.google.com ([209.85.214.174]:61982 "EHLO
+Received: from mail-iw0-f174.google.com ([209.85.214.174]:41884 "EHLO
 	mail-iw0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752271Ab1EECDa (ORCPT
+	with ESMTP id S1752478Ab1EECDh (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 4 May 2011 22:03:30 -0400
-Received: by iwn34 with SMTP id 34so1461966iwn.19
-        for <linux-kbuild@vger.kernel.org>; Wed, 04 May 2011 19:03:30 -0700 (PDT)
+	Wed, 4 May 2011 22:03:37 -0400
+Received: by iwn34 with SMTP id 34so1462033iwn.19
+        for <linux-kbuild@vger.kernel.org>; Wed, 04 May 2011 19:03:37 -0700 (PDT)
 From: Arnaud Lacombe <lacombar@gmail.com>
-Subject: [RFC 0/9] Kbuild: factor parser rules
-Date: Wed,  4 May 2011 22:03:15 -0400
-Message-Id: <1304561004-2684-1-git-send-email-lacombar@gmail.com>
+Subject: [RFC 2/9] genksyms: finalize rename
+Date: Wed,  4 May 2011 22:03:17 -0400
+Message-Id: <1304561004-2684-3-git-send-email-lacombar@gmail.com>
+In-Reply-To: <1304561004-2684-1-git-send-email-lacombar@gmail.com>
+References: <1304561004-2684-1-git-send-email-lacombar@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Michal Marek <mmarek@suse.cz>, Arnaud Lacombe <lacombar@gmail.com>
 
-Hi Folks,
+---
+ scripts/genksyms/.gitignore |    6 ++--
+ scripts/genksyms/Makefile   |   45 +++++++++++++-----------------------------
+ scripts/genksyms/genksyms.c |   11 ++++-----
+ scripts/genksyms/genksyms.l |    7 ++---
+ scripts/genksyms/genksyms.y |    2 +
+ 5 files changed, 27 insertions(+), 44 deletions(-)
 
-I noticed recently that several program under scripts/ implement their own set
-of gperf/lex/yacc rules. The following patchset aims at factoring all these
-targets into `scripts/Makefiles.lib'. Patches do the job for `genksyms' and
-`kconfig', `dtc' remains to be done.
-
-I am not really happy with the file naming, in particular the lexer which breaks
-convention. I would prefer something ala:
- - parser: %.tab.c
- - lexer: %.lex.c
- - hash: %.hash.c
-
-Moreover, I'd prefer to build the lexer and parser as a different compilation
-unit, but that might be done later on.
-
-The following also allows to automatically regen the %_shipped file upon
-modification of its associated prerequiresite, provided REGENERATE_PARSERS is
-defined.
-
-The diff may look mistakenly large as I had to shuffle things around to make
-them match the same pattern.
-
-Known issue: there should be 2 new warnings introduced in `genksyms', only
-compile tested so far (only on tools, not on the full kernel), in particular,
-`gperf' options may need to be tuned.
-
-Patches are based on v2.6.38. Not for merge, so not signed off on purpose.
-
-Comments welcome!
- - Arnaud
-
-Arnaud Lacombe (9):
-  genksyms: rename parser files
-  genksyms: finalize rename
-  genksyms: pass hash and lookup functions name and target language
-    though the input file
-  genksyms: regen parser
-  kconfig: constify `kconf_id_lookup'
-  kconfig: regen parsers
-  kbuild: merge parser generation rules
-  kconfig: regen parser
-  genksyms: regen parser
-
- scripts/Makefile.lib                     |   31 +-
- scripts/genksyms/.gitignore              |    6 +-
- scripts/genksyms/Makefile                |   43 +-
- scripts/genksyms/genksyms.c              |   11 +-
- scripts/genksyms/genksyms.gperf          |   59 +
- scripts/genksyms/genksyms.hash.c_shipped |  220 +++
- scripts/genksyms/genksyms.l              |  408 +++++
- scripts/genksyms/genksyms.tab.c_shipped  | 2324 +++++++++++++++++++++++++
- scripts/genksyms/genksyms.y              |  475 ++++++
- scripts/genksyms/keywords.c_shipped      |  220 ---
- scripts/genksyms/keywords.gperf          |   56 -
- scripts/genksyms/lex.c_shipped           | 2709 ------------------------------
- scripts/genksyms/lex.genksyms.c_shipped  | 2242 ++++++++++++++++++++++++
- scripts/genksyms/lex.l                   |  409 -----
- scripts/genksyms/parse.c_shipped         | 2353 --------------------------
- scripts/genksyms/parse.h_shipped         |  139 --
- scripts/genksyms/parse.y                 |  473 ------
- scripts/kconfig/Makefile                 |   25 -
- scripts/kconfig/lex.zconf.c_shipped      |   26 +-
- scripts/kconfig/zconf.gperf              |    2 +-
- scripts/kconfig/zconf.hash.c_shipped     |  273 ++--
- scripts/kconfig/zconf.l                  |    4 +-
- scripts/kconfig/zconf.tab.c_shipped      |   32 +-
- scripts/kconfig/zconf.y                  |    8 +-
- 24 files changed, 5959 insertions(+), 6589 deletions(-)
- create mode 100644 scripts/genksyms/genksyms.gperf
- create mode 100644 scripts/genksyms/genksyms.hash.c_shipped
- create mode 100644 scripts/genksyms/genksyms.l
- create mode 100644 scripts/genksyms/genksyms.tab.c_shipped
- create mode 100644 scripts/genksyms/genksyms.y
- delete mode 100644 scripts/genksyms/keywords.c_shipped
- delete mode 100644 scripts/genksyms/keywords.gperf
- delete mode 100644 scripts/genksyms/lex.c_shipped
- create mode 100644 scripts/genksyms/lex.genksyms.c_shipped
- delete mode 100644 scripts/genksyms/lex.l
- delete mode 100644 scripts/genksyms/parse.c_shipped
- delete mode 100644 scripts/genksyms/parse.h_shipped
- delete mode 100644 scripts/genksyms/parse.y
-
+diff --git a/scripts/genksyms/.gitignore b/scripts/genksyms/.gitignore
+index be5cadb..0983577 100644
+--- a/scripts/genksyms/.gitignore
++++ b/scripts/genksyms/.gitignore
+@@ -1,4 +1,4 @@
+-keywords.c
+-lex.c
+-parse.[ch]
+ genksyms
++genksyms.tab.c
++lex.genksyms.c
++genksyms.hash.c
+diff --git a/scripts/genksyms/Makefile b/scripts/genksyms/Makefile
+index e420fe4..82bb25f 100644
+--- a/scripts/genksyms/Makefile
++++ b/scripts/genksyms/Makefile
+@@ -2,52 +2,35 @@
+ hostprogs-y	:= genksyms
+ always		:= $(hostprogs-y)
+ 
+-genksyms-objs	:= genksyms.o parse.o lex.o
++genksyms-objs	:= genksyms.o genksyms.tab.o
+ 
+ # -I needed for generated C source (shipped source)
+ HOSTCFLAGS_parse.o := -Wno-uninitialized -I$(src)
+ 
+-# dependencies on generated files need to be listed explicitly
+-$(obj)/lex.o: $(obj)/parse.h $(obj)/keywords.c
+-
+ # -I needed for generated C source (shipped source)
+ HOSTCFLAGS_lex.o := -I$(src)
+ 
+-ifdef GENERATE_PARSER
+-
+-# gperf
++clean-files	:= genksyms.tab.c lex.genksyms.c genksyms.hash.c
+ 
+-quiet_cmd_keywords.c = GPERF   $@
+-      cmd_keywords.c = gperf -L ANSI-C -a -C -E -g -H is_reserved_hash	\
+-		       -k 1,3,$$ -N is_reserved_word -p -t $< > $@
+-
+-$(obj)/keywords.c: $(obj)/keywords.gperf FORCE
+-	$(call if_changed,keywords.c)
+-	cp $@ $@_shipped
++$(obj)/genksyms.tab.o: $(obj)/lex.genksyms.c $(obj)/genksyms.hash.c
+ 
+-# flex
++ifdef GENKSYMS_GENPARSER
+ 
+-quiet_cmd_lex.c = FLEX    $@
+-      cmd_lex.c = flex -o$@ -d $< $(obj)/parse.h
++$(obj)/genksyms.tab.c: $(src)/genksyms.y
++$(obj)/lex.genksyms.c: $(src)/genksyms.l
++$(obj)/genksyms.hash.c: $(src)/genksyms.gperf
+ 
+-$(obj)/lex.c: $(obj)/lex.l $(obj)/parse.h $(obj)/keywords.c FORCE
+-	$(call if_changed,lex.c)
++%.tab.c: %.y
++	bison -l -b $* -p $(notdir $*) $<
+ 	cp $@ $@_shipped
+ 
+-# bison
+-
+-quiet_cmd_parse.c = BISON   $@
+-      cmd_parse.c = bison -o$@ -dtv $(filter-out FORCE,$^)
+-
+-$(obj)/parse.c: $(obj)/parse.y FORCE
+-	$(call if_changed,parse.c)
++lex.%.c: %.l
++	flex -L -P$(notdir $*) -o$@ $<
+ 	cp $@ $@_shipped
+-	cp $(@:.c=.h) $(@:.c=.h)_shipped
+ 
+-$(obj)/parse.h: $(obj)/parse.c ;
+-
+-clean-files	+= parse.output
++%.hash.c: %.gperf
++	gperf -t --output-file $@ -L ANSI-C -a -C -E -g -H is_reserved_hash -k 1,3,$$ -N is_reserved_word -p -t $<
++	cp $@ $@_shipped
+ 
+ endif
+ 
+-targets += keywords.c lex.c parse.c parse.h
+diff --git a/scripts/genksyms/genksyms.c b/scripts/genksyms/genksyms.c
+index f99115e..034c30b 100644
+--- a/scripts/genksyms/genksyms.c
++++ b/scripts/genksyms/genksyms.c
+@@ -748,11 +748,10 @@ int main(int argc, char **argv)
+ 	if ((strcmp(arch, "h8300") == 0) || (strcmp(arch, "blackfin") == 0))
+ 		mod_prefix = "_";
+ 	{
+-		extern int yydebug;
+-		extern int yy_flex_debug;
+-
+-		yydebug = (flag_debug > 1);
+-		yy_flex_debug = (flag_debug > 2);
++#ifdef YYDEBUG
++		extern int genksymsdebug = (flag_debug > 1);
++#endif
++		genksymsset_debug(flag_debug > 2);
+ 
+ 		debugfile = stderr;
+ 		/* setlinebuf(debugfile); */
+@@ -763,7 +762,7 @@ int main(int argc, char **argv)
+ 		fclose(ref_file);
+ 	}
+ 
+-	yyparse();
++	genksymsparse();
+ 
+ 	if (flag_dump_types && visited_symbols) {
+ 		while (visited_symbols != (struct symbol *)-1L) {
+diff --git a/scripts/genksyms/genksyms.l b/scripts/genksyms/genksyms.l
+index fe50ff9..06953f0 100644
+--- a/scripts/genksyms/genksyms.l
++++ b/scripts/genksyms/genksyms.l
+@@ -29,11 +29,10 @@
+ #include <ctype.h>
+ 
+ #include "genksyms.h"
+-#include "parse.h"
+ 
+ /* We've got a two-level lexer here.  We let flex do basic tokenization
+    and then we categorize those basic tokens in the second stage.  */
+-#define YY_DECL		static int yylex1(void)
++#define YY_DECL		static int genksymslex1(void)
+ 
+ %}
+ 
+@@ -98,7 +97,7 @@ MC_TOKEN		([~%^&*+=|<>/-]=)|(&&)|("||")|(->)|(<<)|(>>)
+ 
+ /* Bring in the keyword recognizer.  */
+ 
+-#include "keywords.c"
++#include "genksyms.hash.c"
+ 
+ 
+ /* Macros to append to our phrase collection list.  */
+@@ -141,7 +140,7 @@ yylex(void)
+     }
+ 
+ repeat:
+-  token = yylex1();
++  token = genksymslex1();
+ 
+   if (token == 0)
+     return 0;
+diff --git a/scripts/genksyms/genksyms.y b/scripts/genksyms/genksyms.y
+index 09a265c..bff24d4 100644
+--- a/scripts/genksyms/genksyms.y
++++ b/scripts/genksyms/genksyms.y
+@@ -471,3 +471,5 @@ yyerror(const char *e)
+ {
+   error_with_pos("%s", e);
+ }
++
++#include "lex.genksyms.c"
 -- 
 1.7.3.4.574.g608b.dirty
 
