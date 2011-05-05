@@ -1,30 +1,32 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-iw0-f174.google.com ([209.85.214.174]:50658 "EHLO
-	mail-iw0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752579Ab1EECGc (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 4 May 2011 22:06:32 -0400
-Received: by iwn34 with SMTP id 34so1463516iwn.19
-        for <linux-kbuild@vger.kernel.org>; Wed, 04 May 2011 19:06:32 -0700 (PDT)
+Received: from vostochny.stro.at ([78.47.22.85]:37334 "EHLO vostochny.stro.at"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751338Ab1EEJH3 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 5 May 2011 05:07:29 -0400
+Date: Thu, 5 May 2011 09:07:28 +0000
+From: maximilian attems <max@stro.at>
+Subject: Re: [PATCH 1/1] deb-pkg: fix cross-compile build
+Message-ID: <20110505090728.GC30678@vostochny.stro.at>
+References: <1304488750-13606-1-git-send-email-subtil@gmail.com>
+ <20110504204807.GB13293@sepie.suse.cz>
 MIME-Version: 1.0
-In-Reply-To: <1304561004-2684-3-git-send-email-lacombar@gmail.com>
-References: <1304561004-2684-1-git-send-email-lacombar@gmail.com>
-	<1304561004-2684-3-git-send-email-lacombar@gmail.com>
-Date: Wed, 4 May 2011 22:06:32 -0400
-Message-ID: <BANLkTi=5MAq31s1tWGPodS_bL0GgbhCxhw@mail.gmail.com>
-Subject: Re: [RFC 2/9] genksyms: finalize rename
-From: Arnaud Lacombe <lacombar@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20110504204807.GB13293@sepie.suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>
+Cc: Nuno Subtil <subtil@gmail.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Hi,
+On Wed, May 04, 2011 at 10:48:07PM +0200, Michal Marek wrote:
+> Adding Maks to CC.
 
-On Wed, May 4, 2011 at 10:03 PM, Arnaud Lacombe <lacombar@gmail.com> wrote:
->
-I kept this one separated from the previous to facilitate rebase after
-the branch has reach an acceptable state as I seem to remember this
-code has got a few changes in the -kbuild tree.
-
- - Arnaud
+thanks, this one looks, good please disguard the other patch.
+ 
+> On Tue, May 03, 2011 at 10:59:10PM -0700, Nuno Subtil wrote:
+> > When generating the header package, scripts/package/builddeb was inferring the
+> > target architecture by looking at the output of dpkg --print-architecture. This
+> > allows KBUILD_DEBARCH to override that.
+> > 
+> > Signed-off-by: Nuno Subtil <subtil@gmail.com>
+Acked-by: maximilian attems <max@stro.at>
