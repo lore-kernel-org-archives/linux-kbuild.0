@@ -1,37 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from casper.infradead.org ([85.118.1.10]:59998 "EHLO
-	casper.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754470Ab1EFTCk (ORCPT
+Received: from outmail019.snc4.facebook.com ([66.220.144.151]:44933 "EHLO
+	mx-out.facebook.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1753402Ab1EFWh2 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 6 May 2011 15:02:40 -0400
+	Fri, 6 May 2011 18:37:28 -0400
+Date: Fri, 6 May 2011 15:37:27 -0700
+From: Arun Sharma <asharma@fb.com>
 Subject: Re: [PATCH] Add $KERNELRELEASE to firmware install path
-From: David Woodhouse <dwmw2@infradead.org>
-Date: Fri, 06 May 2011 20:02:36 +0100
-In-Reply-To: <20110506184438.GA30417@dev1756.snc6.facebook.com>
+Message-ID: <20110506223727.GA29011@dev1756.snc6.facebook.com>
 References: <20110505173939.GA20575@dev1756.snc6.facebook.com>
-	 <4DC3CA39.30806@suse.cz> <1304677113.20656.2.camel@i7.infradead.org>
-	 <20110506184438.GA30417@dev1756.snc6.facebook.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Message-ID: <1304708557.20656.49.camel@i7.infradead.org>
-Mime-Version: 1.0
+ <4DC3CA39.30806@suse.cz>
+ <1304677113.20656.2.camel@i7.infradead.org>
+ <20110506184438.GA30417@dev1756.snc6.facebook.com>
+ <1304708557.20656.49.camel@i7.infradead.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1304708557.20656.49.camel@i7.infradead.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arun Sharma <asharma@fb.com>
-Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, lkml <linux-kernel@vger.kernel.org>
+To: David Woodhouse <dwmw2@infradead.org>
+Cc: Arun Sharma <asharma@fb.com>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, lkml <linux-kernel@vger.kernel.org>
 
-On Fri, 2011-05-06 at 11:44 -0700, Arun Sharma wrote:
+On Fri, May 06, 2011 at 08:02:36PM +0100, David Woodhouse wrote:
+> On Fri, 2011-05-06 at 11:44 -0700, Arun Sharma wrote:
+> > 
+> > Without this change, if you have two kernel rpms/debs from different
+> > kernel versions installed, they'll result in a namespace conflict
+> > (rpm/deb install will fail), which gets resolved by this patch. 
 > 
-> Without this change, if you have two kernel rpms/debs from different
-> kernel versions installed, they'll result in a namespace conflict
-> (rpm/deb install will fail), which gets resolved by this patch. 
+> The packages are broken then. They shouldn't include *any* files
+> in /lib/firmware.
+> 
+> Fix *that*, and the problem goes away.
 
-The packages are broken then. They shouldn't include *any* files
-in /lib/firmware.
+Sounds good.
 
-Fix *that*, and the problem goes away.
+Michal: Should I send you a patch that drops /lib/firmware?
 
-
--- 
-dwmw2
-
+ -Arun
