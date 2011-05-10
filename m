@@ -1,169 +1,108 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-iy0-f174.google.com ([209.85.210.174]:61889 "EHLO
-	mail-iy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751414Ab1EJSMO convert rfc822-to-8bit (ORCPT
+Received: from smtp04.smtpout.orange.fr ([80.12.242.126]:21519 "EHLO
+	smtp.smtpout.orange.fr" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750813Ab1EJSUB (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 10 May 2011 14:12:14 -0400
-Received: by iyb14 with SMTP id 14so5401092iyb.19
-        for <linux-kbuild@vger.kernel.org>; Tue, 10 May 2011 11:12:13 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <201105100053.37010.yann.morin.1998@anciens.enib.fr>
-References: <201105100053.37010.yann.morin.1998@anciens.enib.fr>
-Date: Tue, 10 May 2011 14:12:11 -0400
-Message-ID: <BANLkTinRk7zbr6odrFhW2YLcHvwnuzEJtg@mail.gmail.com>
+	Tue, 10 May 2011 14:20:01 -0400
+From: "Yann E. MORIN" <yann.morin.1998@anciens.enib.fr>
 Subject: Re: Choice visibility issue
-From: Arnaud Lacombe <lacombar@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 8BIT
+Date: Tue, 10 May 2011 20:19:58 +0200
+References: <201105100053.37010.yann.morin.1998@anciens.enib.fr>
+In-Reply-To: <201105100053.37010.yann.morin.1998@anciens.enib.fr>
+MIME-Version: 1.0
+Content-Type: text/plain;
+  charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+Message-Id: <201105102019.58746.yann.morin.1998@anciens.enib.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Yann E. MORIN" <yann.morin.1998@anciens.enib.fr>
-Cc: linux-kbuild@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
+Cc: Arnaud Lacombe <lacombar@gmail.com>
 
-Hi,
+All,
 
-On Mon, May 9, 2011 at 6:53 PM, Yann E. MORIN
-<yann.morin.1998@anciens.enib.fr> wrote:
-> Hello All!
->
+On Tuesday 10 May 2011 00:53:36 Yann E. MORIN wrote:
 > In case a choice appears in two places, and each instance depends on
 > different conditions, the visibility of the choice item is not coherent.
->
-> Take this simple example:
->
-> ---8<--- BEGIN ---8<---
-> # cat toto.in
-> source toto-A.in
-> source toto-B.in
->
-> # cat toto-A.in
-> config A
->    bool "A"
-> if A
-> choice C
->    bool "C"
-> config C1
->    bool "C1"
-> config C2
->    bool "C2"
-> endchoice
-> endif # A
->
-> # cat toto-B.in
-> config B
->    bool "B"
->    depends on ! A
-> if B
-> choice C
->    bool "C"
-> config C1
->    bool "C1"
-> config C2
->    bool "C2"
-> endchoice
-> endif # A
-> ---8<---  END  ---8<---
->
-> If neither A not B is selected, the choice is not visible (expected):
->  [ ] A
->  [ ]   B
-> ==> OK
->
-No, there is a first bug here, B should not appear as a child of A,
-but it is irrelevant to the other issue. [note for later,
-menu_finalize() is breaking the tree, damn dependency...]
 
-> If A is selected, then B is not visible (expected), and the choice is
-> visible directly below A (expected):
->  [*] A
->        C (C1)  --->
-> ==> OK
->
-> If A is not selected but B is, the choice is visible twice, once just
-> below B (expected), and once just below A (unexpected):
->  [ ] A
->        C (C1)  --->
->  [*]   B
->          C (C1)  --->
-> ==> KO
->
-> This last case is wrong IMHO. The choice should not be displayed just
-> below A, but only just below B.
->
-> The problem happens with all the frontends I was able to test with,
-> using linux-2.6.38.5 and linux-next dated yesterday:
-> - conf
-> - mconf
-> - nconf
-> - gconf
->
-> For the conf frontend, the issue happens only on the second run, not
-> on the first run, which somewhat makes sense. I was not able to run
-> xconfig, as I lack proper qt devel here.
->
-of course, your problem is in the backend.
+Using the previously posted exampl, but with not dependent on ! A
+we still have the issue:
+   [ ] A
+         C (C1)  --->
+   [*] B
+         C (C1)  --->
+==> KO
 
-> So:
-> - is this a limitation that can not be overcome?
-yes, the problem is that choice's visibility are only determined by
-the visibility of the underlying symbol. In your case, the same symbol
-appear in twice in the tree.
+Now, put the selection of A and B in achoice:
 
-> - if it can be overcome, where should I start to look at?
-you may want to try:
+---8<---
+  # cat toto-AB.in
+  choice AB
+      bool "AB"
+  config A
+      bool "A"
+  config B
+      bool "B"
+  endchoice # AB
+  if A
+  source toto-C.in
+  endif # A
+  if B
+  source toto-C.in
+  endif B
 
-diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
-index 5fdf10d..55b6fe0 100644
---- a/scripts/kconfig/menu.c
-+++ b/scripts/kconfig/menu.c
-@@ -279,6 +279,10 @@ void menu_finalize(struct menu *parent)
-                                        }
-                                }
-                        }
-+                       if (parent->prompt &&
-!expr_is_yes(parent->prompt->visible.expr)) {
-+                               parent->visibility =
-expr_alloc_and(parent->visibility,
-+                                           parent->prompt->visible.expr);
-+                       }
-                        /* set the type of the remaining choice values */
-                        for (menu = parent->list; menu; menu = menu->next) {
-                                current_entry = menu;
+  # cat toto-C.in
+  choice C
+      bool "C"
+  config C1
+      bool "C1"
+  config C2
+      bool "C2"
+  endchoice # C
+  config D
+      bool "D"
+---8<---
 
-I did not regress-tested it yet, but it seems to help in this specific case.
+With this new use case, the choice is always displayed twice, whether A or
+B is selected. But the option D is displayed only once.
 
-[I anticipate that GMail is gonna wrap lines ... d'oh!]
+If A is selected:
+      AB (A)  --->
+      C (C1)  --->
+  [ ] D
+      C (C1)  --->
 
->  (I'm not really fluent in flex/bison, and I got lost while
->  trying to see in mconf where the visibility was computed...)
->
-hints: not in the parser per-se ;)
+If B is selected (ditto):
+      AB (A)  --->
+      C (C1)  --->
+      C (C1)  --->
+  [ ] D
 
- - Arnaud
+Here is the help entry in case A is selected:
+  Symbol: C [=y]
+  Type  : boolean
+  Prompt: C
+    Defined at toto-C.in:1
+    Depends on: A [=y]
+  Prompt: C
+    Defined at toto-C.in:1
+    Depends on: B [=n]
+    Selected by: A [=y] && m || B [=n] && m
 
-> Some context:
-> I am using kconfig in crosstool-NG. In this context, A and B are two
-> different packages (glibc and eglibc) that share a common set of options,
-> of which the choice C (the kernel version to support). So the common
-> options are in a single file that is sourced twice, once from the glibc
-> config.in, and once from the eglibc.in (although the multiple sourcing
-> has not impact, as the example above demonstrates, and the two choices
-> can even be in a single file).
->
-> Thank you!
->
-> Regards,
-> Yann E. MORIN.
->
-> --
-> .-----------------.--------------------.------------------.--------------------.
-> |  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
-> | +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
-> | +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
-> | http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
-> '------------------------------^-------^------------------^--------------------'
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
+I still have no real clue on where/what to look for... I looked at the
+attribute 'visible if', but it applies only to menu blocks.
+
+Arnaud, I just saw your mail while writing this one, I'll look at your
+suggestion shortly. Thank you!
+
+Regards,
+Yann E. MORIN.
+
+-- 
+.-----------------.--------------------.------------------.--------------------.
+|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
+| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
+| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
+| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
+'------------------------------^-------^------------------^--------------------'
