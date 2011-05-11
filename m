@@ -1,59 +1,137 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-iw0-f174.google.com ([209.85.214.174]:33462 "EHLO
-	mail-iw0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752923Ab1EKCio convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 10 May 2011 22:38:44 -0400
-Received: by iwn34 with SMTP id 34so94685iwn.19
-        for <linux-kbuild@vger.kernel.org>; Tue, 10 May 2011 19:38:43 -0700 (PDT)
+Received: from cantor.suse.de ([195.135.220.2]:52238 "EHLO mx1.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1756486Ab1EKP6S (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 11 May 2011 11:58:18 -0400
+Message-ID: <4DCAA99B.1070208@suse.cz>
+Date: Wed, 11 May 2011 17:22:03 +0200
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-In-Reply-To: <201105102238.47557.yann.morin.1998@anciens.enib.fr>
-References: <201105100053.37010.yann.morin.1998@anciens.enib.fr>
-	<BANLkTinRk7zbr6odrFhW2YLcHvwnuzEJtg@mail.gmail.com>
-	<201105102238.47557.yann.morin.1998@anciens.enib.fr>
-Date: Tue, 10 May 2011 22:38:42 -0400
-Message-ID: <BANLkTi=_TJTEndK_1gGbZ-ruU6aqCQF_QA@mail.gmail.com>
-Subject: Re: Choice visibility issue
-From: Arnaud Lacombe <lacombar@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 8BIT
+Subject: Re: [PATCH v2] x86: Do not set the root_dev field in bzImage
+References: <20110411150820.GA22004@sepie.suse.cz> <1302607824-24699-1-git-send-email-mmarek@suse.cz>
+In-Reply-To: <1302607824-24699-1-git-send-email-mmarek@suse.cz>
+Content-Type: text/plain; charset=ISO-8859-2; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Yann E. MORIN" <yann.morin.1998@anciens.enib.fr>
-Cc: linux-kbuild@vger.kernel.org
+To: linux-kernel@vger.kernel.org, x86@kernel.org
+Cc: linux-kbuild@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, Paul Bolle <pebolle@tiscali.nl>
+
+On 12.4.2011 13:30, Michal Marek wrote:
+> This has been obsoleted by the root= commandline for several years.
+> People who still depend on this will surely have a copy of the rdev
+> command around, the rest of the world gets rid of another piece of
+> buildhost-dependent data in the build. Thanks to Paul Bolle for the
+> build.c cleanup.
+>
+> Cc: Thomas Gleixner<tglx@linutronix.de>
+> Cc: Ingo Molnar<mingo@redhat.com>
+> Cc: "H. Peter Anvin"<hpa@zytor.com>
+> Cc: x86@kernel.org
+> Cc: Paul Bolle<pebolle@tiscali.nl>
+> Signed-off-by: Michal Marek<mmarek@suse.cz>
 
 Hi,
 
-On Tue, May 10, 2011 at 4:38 PM, Yann E. MORIN
-<yann.morin.1998@anciens.enib.fr> wrote:
-> Arnaud, All,
->
-> On Tuesday 10 May 2011 20:12:11 Arnaud Lacombe wrote:
->> On Mon, May 9, 2011 at 6:53 PM, Yann E. MORIN
->> <yann.morin.1998@anciens.enib.fr> wrote:
->> > In case a choice appears in two places, and each instance depends on
->> > different conditions, the visibility of the choice item is not coherent.
-> [--SNIP--]
->> > If neither A not B is selected, the choice is not visible (expected):
->> >  [ ] A
->> >  [ ]   B
->> > ==> OK
->> >
->> No, there is a first bug here, B should not appear as a child of A,
->> but it is irrelevant to the other issue. [note for later,
->> menu_finalize() is breaking the tree, damn dependency...]
->
-> The first I saw this behavior, I thought as you did: B should not be
-> considered a child of A, as it does not depend on A, but on !A.
->
-> But then, B is directly dependent on the value of A, so it kind of makes
-> sense to treat it as a child of A, and indent it.
->
-> Of course, I don't really mind one way or the other. :-)
->
-I'd argue this is more a correctness one. A bare config symbol (that
-is not a menu or a choice of some sort) cannot do not have children,
-whatever the internal representation is. The same apply for choice
-_value_.
+Is this patch OK for the tip tree?
 
- - Arnaud
+Michal
+
+>
+> diff --git a/arch/x86/boot/Makefile b/arch/x86/boot/Makefile
+> index f7cb086..95365a8 100644
+> --- a/arch/x86/boot/Makefile
+> +++ b/arch/x86/boot/Makefile
+> @@ -9,12 +9,6 @@
+>   # Changed by many, many contributors over the years.
+>   #
+>
+> -# ROOT_DEV specifies the default root-device when making the image.
+> -# This can be either FLOPPY, CURRENT, /dev/xxxx or empty, in which case
+> -# the default of FLOPPY is used by 'build'.
+> -
+> -ROOT_DEV	:= CURRENT
+> -
+>   # If you want to preset the SVGA mode, uncomment the next line and
+>   # set SVGA_MODE to whatever number you want.
+>   # Set it to -DSVGA_MODE=NORMAL_VGA if you just want the EGA/VGA mode.
+> @@ -75,8 +69,7 @@ GCOV_PROFILE := n
+>   $(obj)/bzImage: asflags-y  := $(SVGA_MODE)
+>
+>   quiet_cmd_image = BUILD   $@
+> -cmd_image = $(obj)/tools/build $(obj)/setup.bin $(obj)/vmlinux.bin \
+> -	$(ROOT_DEV)>  $@
+> +cmd_image = $(obj)/tools/build $(obj)/setup.bin $(obj)/vmlinux.bin>  $@
+>
+>   $(obj)/bzImage: $(obj)/setup.bin $(obj)/vmlinux.bin $(obj)/tools/build FORCE
+>   	$(call if_changed,image)
+> diff --git a/arch/x86/boot/tools/build.c b/arch/x86/boot/tools/build.c
+> index ee3a4ea..fdc60a0 100644
+> --- a/arch/x86/boot/tools/build.c
+> +++ b/arch/x86/boot/tools/build.c
+> @@ -130,7 +130,7 @@ static void die(const char * str, ...)
+>
+>   static void usage(void)
+>   {
+> -	die("Usage: build setup system [rootdev] [>  image]");
+> +	die("Usage: build setup system [>  image]");
+>   }
+>
+>   int main(int argc, char ** argv)
+> @@ -138,39 +138,14 @@ int main(int argc, char ** argv)
+>   	unsigned int i, sz, setup_sectors;
+>   	int c;
+>   	u32 sys_size;
+> -	u8 major_root, minor_root;
+>   	struct stat sb;
+>   	FILE *file;
+>   	int fd;
+>   	void *kernel;
+>   	u32 crc = 0xffffffffUL;
+>
+> -	if ((argc<  3) || (argc>  4))
+> +	if (argc != 3)
+>   		usage();
+> -	if (argc>  3) {
+> -		if (!strcmp(argv[3], "CURRENT")) {
+> -			if (stat("/",&sb)) {
+> -				perror("/");
+> -				die("Couldn't stat /");
+> -			}
+> -			major_root = major(sb.st_dev);
+> -			minor_root = minor(sb.st_dev);
+> -		} else if (strcmp(argv[3], "FLOPPY")) {
+> -			if (stat(argv[3],&sb)) {
+> -				perror(argv[3]);
+> -				die("Couldn't stat root device.");
+> -			}
+> -			major_root = major(sb.st_rdev);
+> -			minor_root = minor(sb.st_rdev);
+> -		} else {
+> -			major_root = 0;
+> -			minor_root = 0;
+> -		}
+> -	} else {
+> -		major_root = DEFAULT_MAJOR_ROOT;
+> -		minor_root = DEFAULT_MINOR_ROOT;
+> -	}
+> -	fprintf(stderr, "Root device is (%d, %d)\n", major_root, minor_root);
+>
+>   	/* Copy the setup code */
+>   	file = fopen(argv[1], "r");
+> @@ -193,8 +168,8 @@ int main(int argc, char ** argv)
+>   	memset(buf+c, 0, i-c);
+>
+>   	/* Set the default root device */
+> -	buf[508] = minor_root;
+> -	buf[509] = major_root;
+> +	buf[508] = DEFAULT_MINOR_ROOT;
+> +	buf[509] = DEFAULT_MAJOR_ROOT;
+>
+>   	fprintf(stderr, "Setup is %d bytes (padded to %d bytes).\n", c, i);
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
