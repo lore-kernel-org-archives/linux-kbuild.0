@@ -1,60 +1,83 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ww0-f44.google.com ([74.125.82.44]:49570 "EHLO
-	mail-ww0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753754Ab1EKRam convert rfc822-to-8bit (ORCPT
+Received: from mail-iy0-f174.google.com ([209.85.210.174]:61003 "EHLO
+	mail-iy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755889Ab1EKVQj convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 11 May 2011 13:30:42 -0400
+	Wed, 11 May 2011 17:16:39 -0400
+Received: by iyb14 with SMTP id 14so682213iyb.19
+        for <linux-kbuild@vger.kernel.org>; Wed, 11 May 2011 14:16:38 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1303837564-18062-1-git-send-email-rabin@rab.in>
-References: <1303837564-18062-1-git-send-email-rabin@rab.in>
-From: Rabin Vincent <rabin@rab.in>
-Date: Wed, 11 May 2011 23:00:01 +0530
-Message-ID: <BANLkTimLre+UY1fY6+HXEsJicyh_oMnWdA@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: make KBUILD_NOCMDDEP=1 handle empty built-in.o
+In-Reply-To: <alpine.LNX.2.00.1105111126580.28291@pobox.suse.cz>
+References: <1305064543-7401-1-git-send-email-jim.cromie@gmail.com>
+	<alpine.LNX.2.00.1105111126580.28291@pobox.suse.cz>
+Date: Wed, 11 May 2011 17:16:38 -0400
+Message-ID: <BANLkTi=JzPH6m2aCehfE=9WbJkUiqzZgWQ@mail.gmail.com>
+Subject: Re: [PATCH] fix unterminated sed cmd in export_report.pl
+From: Arnaud Lacombe <lacombar@gmail.com>
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: mmarek@suse.cz
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Rabin Vincent <rabin@rab.in>
+To: Jiri Kosina <jkosina@suse.cz>
+Cc: Jim Cromie <jim.cromie@gmail.com>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
 
-On Tue, Apr 26, 2011 at 22:36, Rabin Vincent <rabin@rab.in> wrote:
-> Fix building with KBUILD_NOCMDDEP=1, which currently does not work
-> because it does not build built-in.o with no dependencies:
->
->  LD      fs/notify/built-in.o
-> ld: cannot find fs/notify/dnotify/built-in.o: No such file or directory
-> ld: cannot find fs/notify/inotify/built-in.o: No such file or directory
-> ld: cannot find fs/notify/fanotify/built-in.o: No such file or directory
->
-> Signed-off-by: Rabin Vincent <rabin@rab.in>
+Hi,
 
-Any comments on this patch?  I found KBUILD_NOCMDDEP useful
-when hunting down a bug that appeared only in a certain compiler
-version.  Used it to build some files using one compiler and the rest
-using the other.  It would be nice if it worked out of the box; it will
-after this patch.
+On Wed, May 11, 2011 at 5:27 AM, Jiri Kosina <jkosina@suse.cz> wrote:
+> On Tue, 10 May 2011, jim.cromie@gmail.com wrote:
+>
+>> From: Jim Cromie <jim.cromie@gmail.com>
+>>
+>> fix following err by escaping end-of-line $ in regex.
+>> perl /home/jimc/projects/lx/linux-2.6/scripts/export_report.pl > /dev/null
+>> sed: -e expression #1, char 5: unterminated `s' command
+>> sh: .mod.c/: not found
+>>
+>> without this fix, SECTION 2 of report is empty.
+>>
+>> Signed-off-by: Jim Cromie <jim.cromie@gmail.com>
+>> ---
+>>  scripts/export_report.pl |    2 +-
+>>  1 files changed, 1 insertions(+), 1 deletions(-)
+>>
+>> diff --git a/scripts/export_report.pl b/scripts/export_report.pl
+>> index 04dce7c..91fa5a2 100644
+>> --- a/scripts/export_report.pl
+>> +++ b/scripts/export_report.pl
+>> @@ -50,7 +50,7 @@ sub usage {
+>>
+>>  sub collectcfiles {
+>>      my @file
+>> -     = `cat .tmp_versions/*.mod | grep '.*\.ko\$' | sed s/\.ko$/.mod.c/`;
+>> +     = `cat .tmp_versions/*.mod | grep '.*\.ko\$' | sed s/\.ko\$/.mod.c/`;
+This is bogus. the first \ is still eaten by the shell. All what
+sed(1) will see is the '.'.
 
-> ---
->  scripts/Kbuild.include |    4 ++++
->  1 files changed, 4 insertions(+), 0 deletions(-)
+Btw, that's an awful lot of command to do a simple task. grep(1) and
+cat(1) can be done within sed(1), so I guess the patch should looks
+like:
+
+-     = `cat .tmp_versions/*.mod | grep '.*\.ko\$' | sed s/\.ko$/.mod.c/`;
++     = `sed '/\.ko$/!d; s/\.ko$/.mod.c/' .tmp_versions/*.mod`;
+
+[not tested]
+
+ - Arnaud
+
+>>      chomp @file;
+>>      return @file;
+>>  }
 >
-> diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
-> index ed2773e..fd31781 100644
-> --- a/scripts/Kbuild.include
-> +++ b/scripts/Kbuild.include
-> @@ -187,6 +187,10 @@ ifneq ($(KBUILD_NOCMDDEP),1)
->  # User may override this check using make KBUILD_NOCMDDEP=1
->  arg-check = $(strip $(filter-out $(cmd_$(1)), $(cmd_$@)) \
->                     $(filter-out $(cmd_$@),   $(cmd_$(1))) )
-> +else
-> +# Ensure that files with no dependencies are built.
-> +built-check = $(filter $(origin cmd_$@), undefined)
-> +arg-check = $(if $(strip $(obj-y)),,$(built-check))
->  endif
+> Thanks for the fix, Jim.
 >
->  # >'< substitution is for echo to work,
+> Adding Michal and linux-kbuild@, this should rather go in through his
+> tree.
+>
 > --
-> 1.7.4.1
->
+> Jiri Kosina
+> SUSE Labs
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 >
