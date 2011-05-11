@@ -1,35 +1,56 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:34508 "EHLO mx2.suse.de"
+Received: from cantor.suse.de ([195.135.220.2]:53746 "EHLO mx1.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1757545Ab1EKQ1W (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 11 May 2011 12:27:22 -0400
-Date: Wed, 11 May 2011 13:41:49 +0200
-From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [PATCH] kbuild: Fix GNU make v3.80 compatibility
-Message-ID: <20110511114149.GH13293@sepie.suse.cz>
-References: <612917f85f003cc05dbd3420ec718bc4@localhost>
+	id S1754671Ab1EKQhW (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 11 May 2011 12:37:22 -0400
+Date: Wed, 11 May 2011 11:27:49 +0200 (CEST)
+From: Jiri Kosina <jkosina@suse.cz>
+Subject: Re: [PATCH] fix unterminated sed cmd in export_report.pl
+In-Reply-To: <1305064543-7401-1-git-send-email-jim.cromie@gmail.com>
+Message-ID: <alpine.LNX.2.00.1105111126580.28291@pobox.suse.cz>
+References: <1305064543-7401-1-git-send-email-jim.cromie@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <612917f85f003cc05dbd3420ec718bc4@localhost>
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Kevin Cernekee <cernekee@gmail.com>
-Cc: linux-kbuild@vger.kernel.org, stable@kernel.org, linux-kernel@vger.kernel.org
+To: Jim Cromie <jim.cromie@gmail.com>
+Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
 
-On Tue, May 10, 2011 at 03:47:16PM -0700, Kevin Cernekee wrote:
-> According to Documentation/Changes, the kernel should be buildable with
-> GNU make 3.80+.  Commit 88d7be031f9f975bb3f50a0b5ef3796a671e7edf (kbuild:
-> Use a single clean rule for kernel and external modules) introduced the
-> "$(or" construct, which requires make 3.81.  This causes "make clean" to
-> malfunction when it is used with external modules.
+On Tue, 10 May 2011, jim.cromie@gmail.com wrote:
+
+> From: Jim Cromie <jim.cromie@gmail.com>
 > 
-> Replace "$(or" with an equivalent "$(if" expression, to restore backward
-> compatibility.
+> fix following err by escaping end-of-line $ in regex.
+> perl /home/jimc/projects/lx/linux-2.6/scripts/export_report.pl > /dev/null
+> sed: -e expression #1, char 5: unterminated `s' command
+> sh: .mod.c/: not found
 > 
-> Signed-off-by: Kevin Cernekee <cernekee@gmail.com>
-> Cc: stable@kernel.org
+> without this fix, SECTION 2 of report is empty.
+> 
+> Signed-off-by: Jim Cromie <jim.cromie@gmail.com>
+> ---
+>  scripts/export_report.pl |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
+> 
+> diff --git a/scripts/export_report.pl b/scripts/export_report.pl
+> index 04dce7c..91fa5a2 100644
+> --- a/scripts/export_report.pl
+> +++ b/scripts/export_report.pl
+> @@ -50,7 +50,7 @@ sub usage {
+>  
+>  sub collectcfiles {
+>      my @file
+> -	= `cat .tmp_versions/*.mod | grep '.*\.ko\$' | sed s/\.ko$/.mod.c/`;
+> +	= `cat .tmp_versions/*.mod | grep '.*\.ko\$' | sed s/\.ko\$/.mod.c/`;
+>      chomp @file;
+>      return @file;
+>  }
 
-Pushed to kbuild-2.6.git#kbuild, thanks.
+Thanks for the fix, Jim.
 
-Michal
+Adding Michal and linux-kbuild@, this should rather go in through his 
+tree.
+
+-- 
+Jiri Kosina
+SUSE Labs
