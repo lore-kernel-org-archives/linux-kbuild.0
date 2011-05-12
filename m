@@ -1,92 +1,88 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.vyatta.com ([76.74.103.46]:48590 "EHLO mail.vyatta.com"
+Received: from cantor2.suse.de ([195.135.220.15]:39489 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S932229Ab1EKWjo convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 11 May 2011 18:39:44 -0400
-Date: Wed, 11 May 2011 15:39:38 -0700
-From: Stephen Hemminger <shemminger@vyatta.com>
-Subject: Re: [PATCH] fix unterminated sed cmd in export_report.pl
-Message-ID: <20110511153938.2c441429@nehalam>
-In-Reply-To: <BANLkTimxtJeYMxnaA4Ovz0XOAZJKvB+yzA@mail.gmail.com>
-References: <1305064543-7401-1-git-send-email-jim.cromie@gmail.com>
-	<alpine.LNX.2.00.1105111126580.28291@pobox.suse.cz>
-	<BANLkTi=JzPH6m2aCehfE=9WbJkUiqzZgWQ@mail.gmail.com>
-	<BANLkTi=OfD7W7u7+ujRGjAbR3mYFaNwwMw@mail.gmail.com>
-	<BANLkTimxtJeYMxnaA4Ovz0XOAZJKvB+yzA@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+	id S1756572Ab1ELNd7 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 12 May 2011 09:33:59 -0400
+Date: Thu, 12 May 2011 15:33:56 +0200
+From: Michal Marek <mmarek@suse.cz>
+Subject: Re: [PATCH] kbuild: make KBUILD_NOCMDDEP=1 handle empty built-in.o
+Message-ID: <20110512133356.GI13293@sepie.suse.cz>
+References: <1303837564-18062-1-git-send-email-rabin@rab.in>
+ <BANLkTimLre+UY1fY6+HXEsJicyh_oMnWdA@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <BANLkTimLre+UY1fY6+HXEsJicyh_oMnWdA@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jim Cromie <jim.cromie@gmail.com>
-Cc: Arnaud Lacombe <lacombar@gmail.com>, Jiri Kosina <jkosina@suse.cz>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
+To: Rabin Vincent <rabin@rab.in>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-On Wed, 11 May 2011 16:26:23 -0600
-Jim Cromie <jim.cromie@gmail.com> wrote:
+On Wed, May 11, 2011 at 11:00:01PM +0530, Rabin Vincent wrote:
+> On Tue, Apr 26, 2011 at 22:36, Rabin Vincent <rabin@rab.in> wrote:
+> > Fix building with KBUILD_NOCMDDEP=1, which currently does not work
+> > because it does not build built-in.o with no dependencies:
+> >
+> >  LD      fs/notify/built-in.o
+> > ld: cannot find fs/notify/dnotify/built-in.o: No such file or directory
+> > ld: cannot find fs/notify/inotify/built-in.o: No such file or directory
+> > ld: cannot find fs/notify/fanotify/built-in.o: No such file or directory
+> >
+> > Signed-off-by: Rabin Vincent <rabin@rab.in>
+> 
+> Any comments on this patch?  I found KBUILD_NOCMDDEP useful
+> when hunting down a bug that appeared only in a certain compiler
+> version.  Used it to build some files using one compiler and the rest
+> using the other.  It would be nice if it worked out of the box; it will
+> after this patch.
 
-> On Wed, May 11, 2011 at 3:26 PM, Arnaud Lacombe <lacombar@gmail.com> wrote:
-> > Hi
-> >
-> > On Wed, May 11, 2011 at 5:16 PM, Arnaud Lacombe <lacombar@gmail.com> wrote:
-> >> - Â  Â  = `cat .tmp_versions/*.mod | grep '.*\.ko\$' | sed s/\.ko$/.mod.c/`;
-> >> + Â  Â  = `sed '/\.ko$/!d; s/\.ko$/.mod.c/' .tmp_versions/*.mod`;
-> >>
-> > Actually, my perl-fuu is not what it used to be, that one should be better:
-> >
-> > + Â  Â  = `sed '/\\.ko\$/!d; s/\\.ko\$/.mod.c/' .tmp_versions/*.mod`;
-> >
-> > The backslash before the '.' should be escaped as well to be passed to
-> > sed(1). I'll give it a try to confirm.
-> >
-> > Â - Arnaud
-> >
-> 
-> 
-> I agree w your complicated-construct sentiment re the cmd-pipeline.
-> 
-> this used to be done with a grep,
-> undone by
-> 
-> 
-> commit 91416cfdf98bdbc828fd3e5ca7208beba5979d63
-> Author: Stephen Hemminger <shemminger@vyatta.com>
-> Date:   Mon Feb 22 15:17:22 2010 -0800
-> 
->     export_report: fix perl warnings
-> 
->     Use local file handles, use three argument open.
->     Don't modify arguments in perl grep (use sed instead)
-> 
->     Signed-off-by: Stephen Hemminger <shemminger@vyatta.com>
->     Acked-by: WANG Cong <amwang@redhat.com>
->     Cc: Michal Marek <mmarek@suse.cz>
->     Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
->     Signed-off-by: Michal Marek <mmarek@suse.cz>
-> 
-> diff --git a/scripts/export_report.pl b/scripts/export_report.pl
-> index 705b5ba..04dce7c 100644
-> --- a/scripts/export_report.pl
-> +++ b/scripts/export_report.pl
-> @@ -49,10 +49,10 @@ sub usage {
->  }
-> 
->  sub collectcfiles {
-> -        my @file = `cat .tmp_versions/*.mod | grep '.*\.ko\$'`;
-> -        @file = grep {s/\.ko/.mod.c/} @file;
-> -       chomp @file;
-> -        return @file;
-> +    my @file
-> +       = `cat .tmp_versions/*.mod | grep '.*\.ko\$' | sed s/\.ko$/.mod.c/`;
-> +    chomp @file;
-> +    return @file;
->  }
-> 
-> 
-> the backslash escape noise in the subshell pipeline can be avoided
-> by returning to the grep, with less process spawning too
-> (not that this is executed often)
-> I'll try that.
+OK, so you have a use case for it. I was about to ask if it wouldn't be
+easier to drop this feature instead :).
 
-Even better would be doing the work in perl rather than using
-shell for this.
+> 
+> > ---
+> >  scripts/Kbuild.include |    4 ++++
+> >  1 files changed, 4 insertions(+), 0 deletions(-)
+> >
+> > diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
+> > index ed2773e..fd31781 100644
+> > --- a/scripts/Kbuild.include
+> > +++ b/scripts/Kbuild.include
+> > @@ -187,6 +187,10 @@ ifneq ($(KBUILD_NOCMDDEP),1)
+> >  # User may override this check using make KBUILD_NOCMDDEP=1
+> >  arg-check = $(strip $(filter-out $(cmd_$(1)), $(cmd_$@)) \
+> >                     $(filter-out $(cmd_$@),   $(cmd_$(1))) )
+> > +else
+> > +# Ensure that files with no dependencies are built.
+> > +built-check = $(filter $(origin cmd_$@), undefined)
+> > +arg-check = $(if $(strip $(obj-y)),,$(built-check))
+> >  endif
+
+I'm not sure if this is the rigt way to fix it. Kbuild.include should
+not care about obj-*. The problem is that arg-check is always empty with
+KBUILD_NOCMDDEP and if there are no other dependencies, the target will
+not be created, right? IMO we only need to make sure that during the
+first make run, arg-check always expands to non-empty, even with
+KBUILD_NOCMDDEP. So we can drop the $(obj-y) test and do it like this
+(untested), can't we?
+
+diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
+index c034dd7..be39cd1 100644
+--- a/scripts/Kbuild.include
++++ b/scripts/Kbuild.include
+@@ -197,6 +197,8 @@ ifneq ($(KBUILD_NOCMDDEP),1)
+ # User may override this check using make KBUILD_NOCMDDEP=1
+ arg-check = $(strip $(filter-out $(cmd_$(1)), $(cmd_$@)) \
+                     $(filter-out $(cmd_$@),   $(cmd_$(1))) )
++else
++arg-check = $(if $(strip $(cmd_$@)),,1)
+ endif
+ 
+ # >'< substitution is for echo to work,
+
+
+while at it, we should also add KBUILD_NOCMDDEP to
+Documentation/kbuild/kbuild.txt.
+
+Michal
