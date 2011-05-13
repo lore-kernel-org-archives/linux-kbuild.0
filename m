@@ -1,60 +1,38 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pz0-f46.google.com ([209.85.210.46]:54095 "EHLO
-	mail-pz0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932356Ab1EMAJP (ORCPT
+Received: from 75.98.165.80.static.a2webhosting.com ([75.98.165.80]:46800 "EHLO
+	greenroomsoftware.com" rhost-flags-OK-FAIL-OK-OK) by vger.kernel.org
+	with ESMTP id S1752216Ab1EMCuS (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 12 May 2011 20:09:15 -0400
-From: mfmooney@gmail.com
-Subject: [PATCH v2] package: Makefile: fix perf target bug
-Date: Thu, 12 May 2011 17:09:03 -0700
-Message-Id: <e5dfdb7d9a9909d6f9faa20c45115142ebce2ae2.1305244842.git.mfm@muteddisk.com>
-In-Reply-To: <BANLkTimrW=ZG2sGG1Q8QehSnh5rW1eBzGw@mail.gmail.com>
+	Thu, 12 May 2011 22:50:18 -0400
+Message-ID: <4DCC9C5F.2000301@greenroomsoftware.com>
+Date: Thu, 12 May 2011 19:50:07 -0700
+From: Robert Gordon <robert@greenroomsoftware.com>
+MIME-Version: 1.0
+Subject: Re: [PATCH 1/1] deb-pkg: fix cross-compile build
+References: <1304488750-13606-1-git-send-email-subtil@gmail.com> <20110504204807.GB13293@sepie.suse.cz> <20110505090728.GC30678@vostochny.stro.at> <4DC2C568.9090803@greenroomsoftware.com> <BANLkTinjBun=TzjveEiJsEJYKH_+NRCP7Q@mail.gmail.com> <4DC2EB2B.1050203@greenroomsoftware.com> <BANLkTimApO4j-Hsvo2OCc=PnEdOhHu76OA@mail.gmail.com> <20110510124123.GE13278@vostochny.stro.at> <4DCBE83C.2080403@greenroomsoftware.com> <BANLkTi=e62Whz+jyW-MtCN-nYGwUUBR6sg@mail.gmail.com>
+In-Reply-To: <BANLkTi=e62Whz+jyW-MtCN-nYGwUUBR6sg@mail.gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
+To: Nuno Subtil <subtil@gmail.com>
+Cc: maximilian attems <max@stro.at>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-From: matt mooney <mfm@muteddisk.com>
+On 5/12/11 12:45 PM, Nuno Subtil wrote:
+>> The debian/control file for an unpatched scripts/package/builddeb would
+>> assign 'i386' instead of 'amd64'.
+>
+> That seems wrong to me. Were the resulting packages actually usable on amd64?
 
-Specify --git-dir and --work-tree when building perf targets to
-allow out-of-tree builds using O=<build-dir>.
+I modeled my patch after behavior I saw in the unpatched script.  I had 
+also originally set x86_64 to amd64 with the exact results I get with 
+your patch.  So, I looked at what the unpatched kernel was doing, which 
+is putting i386 in those fields when building for x86_64 on an i386 
+machine.  I don't know the results would actually run because I don't 
+have an x86_64 myself.  It may not run, but it does build.
 
-The cat command had to be changed to allow proper file name expansion
-of the files listed in MANIFEST.
+cheers!
 
-Signed-off-by: matt mooney <mfm@muteddisk.com>
----
-Okay, so I decided to just go ahead and send this. It removes the --work-tree
-option from the git rev-parse command. I did test it the way you said, without
---work-tree on either statement, but the git archive command fails in that case.
 
-Thanks,
-matt
-
- scripts/package/Makefile |    9 ++++++---
- 1 files changed, 6 insertions(+), 3 deletions(-)
-
-diff --git a/scripts/package/Makefile b/scripts/package/Makefile
-index 1b7eaea..2747f1f 100644
---- a/scripts/package/Makefile
-+++ b/scripts/package/Makefile
-@@ -118,10 +118,13 @@ perf-tar=perf-$(KERNELVERSION)
- 
- quiet_cmd_perf_tar = TAR
-       cmd_perf_tar = \
--git archive --prefix=$(perf-tar)/ HEAD^{tree}                       \
--	$$(cat $(srctree)/tools/perf/MANIFEST) -o $(perf-tar).tar;  \
-+git --git-dir=$(srctree)/.git --work-tree=$(srctree)                \
-+	archive --prefix=$(perf-tar)/ HEAD^{tree}                   \
-+	$(addprefix $(srctree)/,                                    \
-+	  $(shell cat $(srctree)/tools/perf/MANIFEST))              \
-+	-o $(perf-tar).tar;                                         \
- mkdir -p $(perf-tar);                                               \
--git rev-parse HEAD > $(perf-tar)/HEAD;                              \
-+git --git-dir=$(srctree)/.git rev-parse HEAD > $(perf-tar)/HEAD;    \
- tar rf $(perf-tar).tar $(perf-tar)/HEAD;                            \
- rm -r $(perf-tar);                                                  \
- $(if $(findstring tar-src,$@),,                                     \
 -- 
-1.7.4.4
-
+*www.greenroomsoftware.com*
