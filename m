@@ -1,38 +1,56 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from 75.98.165.80.static.a2webhosting.com ([75.98.165.80]:46800 "EHLO
-	greenroomsoftware.com" rhost-flags-OK-FAIL-OK-OK) by vger.kernel.org
-	with ESMTP id S1752216Ab1EMCuS (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 12 May 2011 22:50:18 -0400
-Message-ID: <4DCC9C5F.2000301@greenroomsoftware.com>
-Date: Thu, 12 May 2011 19:50:07 -0700
-From: Robert Gordon <robert@greenroomsoftware.com>
-MIME-Version: 1.0
-Subject: Re: [PATCH 1/1] deb-pkg: fix cross-compile build
-References: <1304488750-13606-1-git-send-email-subtil@gmail.com> <20110504204807.GB13293@sepie.suse.cz> <20110505090728.GC30678@vostochny.stro.at> <4DC2C568.9090803@greenroomsoftware.com> <BANLkTinjBun=TzjveEiJsEJYKH_+NRCP7Q@mail.gmail.com> <4DC2EB2B.1050203@greenroomsoftware.com> <BANLkTimApO4j-Hsvo2OCc=PnEdOhHu76OA@mail.gmail.com> <20110510124123.GE13278@vostochny.stro.at> <4DCBE83C.2080403@greenroomsoftware.com> <BANLkTi=e62Whz+jyW-MtCN-nYGwUUBR6sg@mail.gmail.com>
-In-Reply-To: <BANLkTi=e62Whz+jyW-MtCN-nYGwUUBR6sg@mail.gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
+Received: from lo.gmane.org ([80.91.229.12]:57217 "EHLO lo.gmane.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1755588Ab1EMFWf (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 13 May 2011 01:22:35 -0400
+Received: from list by lo.gmane.org with local (Exim 4.69)
+	(envelope-from <glkd-linux-kbuild@m.gmane.org>)
+	id 1QKkpd-0002Yu-8w
+	for linux-kbuild@vger.kernel.org; Fri, 13 May 2011 07:22:33 +0200
+Received: from 60.247.97.98 ([60.247.97.98])
+        by main.gmane.org with esmtp (Gmexim 0.1 (Debian))
+        id 1AlnuQ-0007hv-00
+        for <linux-kbuild@vger.kernel.org>; Fri, 13 May 2011 07:22:33 +0200
+Received: from xiyou.wangcong by 60.247.97.98 with local (Gmexim 0.1 (Debian))
+        id 1AlnuQ-0007hv-00
+        for <linux-kbuild@vger.kernel.org>; Fri, 13 May 2011 07:22:33 +0200
+From: WANG Cong <xiyou.wangcong@gmail.com>
+Subject: Re: [PATCH v2] package: Makefile: fix perf target bug
+Date: Fri, 13 May 2011 05:22:20 +0000 (UTC)
+Message-ID: <iqif6b$rg0$1@dough.gmane.org>
+References: <BANLkTimrW=ZG2sGG1Q8QehSnh5rW1eBzGw@mail.gmail.com>
+	<e5dfdb7d9a9909d6f9faa20c45115142ebce2ae2.1305244842.git.mfm@muteddisk.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nuno Subtil <subtil@gmail.com>
-Cc: maximilian attems <max@stro.at>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
 
-On 5/12/11 12:45 PM, Nuno Subtil wrote:
->> The debian/control file for an unpatched scripts/package/builddeb would
->> assign 'i386' instead of 'amd64'.
->
-> That seems wrong to me. Were the resulting packages actually usable on amd64?
+On Thu, 12 May 2011 17:09:03 -0700, mfmooney wrote:
 
-I modeled my patch after behavior I saw in the unpatched script.  I had 
-also originally set x86_64 to amd64 with the exact results I get with 
-your patch.  So, I looked at what the unpatched kernel was doing, which 
-is putting i386 in those fields when building for x86_64 on an i386 
-machine.  I don't know the results would actually run because I don't 
-have an x86_64 myself.  It may not run, but it does build.
+> From: matt mooney <mfm@muteddisk.com>
+> 
+> Specify --git-dir and --work-tree when building perf targets to allow
+> out-of-tree builds using O=<build-dir>.
+> 
+> The cat command had to be changed to allow proper file name expansion of
+> the files listed in MANIFEST.
+> 
+> Signed-off-by: matt mooney <mfm@muteddisk.com> ---
+> Okay, so I decided to just go ahead and send this. It removes the
+> --work-tree option from the git rev-parse command. I did test it the way
+> you said, without --work-tree on either statement, but the git archive
+> command fails in that case.
+> 
 
-cheers!
+Looks like `git rev-parse` only needs the data in .git to work fine,
+so this patch looks good to me,
 
+Reviewed-by: WANG Cong <xiyou.wangcong@gmail.com>
 
--- 
-*www.greenroomsoftware.com*
+BTW, I think you need to Cc Ingo and Peter for perf changes.
+
+Thanks.
+
