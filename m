@@ -1,56 +1,51 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from lo.gmane.org ([80.91.229.12]:57217 "EHLO lo.gmane.org"
+Received: from cantor2.suse.de ([195.135.220.15]:42921 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755588Ab1EMFWf (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 13 May 2011 01:22:35 -0400
-Received: from list by lo.gmane.org with local (Exim 4.69)
-	(envelope-from <glkd-linux-kbuild@m.gmane.org>)
-	id 1QKkpd-0002Yu-8w
-	for linux-kbuild@vger.kernel.org; Fri, 13 May 2011 07:22:33 +0200
-Received: from 60.247.97.98 ([60.247.97.98])
-        by main.gmane.org with esmtp (Gmexim 0.1 (Debian))
-        id 1AlnuQ-0007hv-00
-        for <linux-kbuild@vger.kernel.org>; Fri, 13 May 2011 07:22:33 +0200
-Received: from xiyou.wangcong by 60.247.97.98 with local (Gmexim 0.1 (Debian))
-        id 1AlnuQ-0007hv-00
-        for <linux-kbuild@vger.kernel.org>; Fri, 13 May 2011 07:22:33 +0200
-From: WANG Cong <xiyou.wangcong@gmail.com>
-Subject: Re: [PATCH v2] package: Makefile: fix perf target bug
-Date: Fri, 13 May 2011 05:22:20 +0000 (UTC)
-Message-ID: <iqif6b$rg0$1@dough.gmane.org>
-References: <BANLkTimrW=ZG2sGG1Q8QehSnh5rW1eBzGw@mail.gmail.com>
-	<e5dfdb7d9a9909d6f9faa20c45115142ebce2ae2.1305244842.git.mfm@muteddisk.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+	id S1757797Ab1EMI0t (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 13 May 2011 04:26:49 -0400
+Message-ID: <4DCCEB48.7030602@suse.cz>
+Date: Fri, 13 May 2011 10:26:48 +0200
+From: Michal Marek <mmarek@suse.cz>
+MIME-Version: 1.0
+Subject: Re: [Resend PATCH] package: Makefile: fix perf target bug
+References: <1d7d3b31c0da82ce8ce75778922155b7004a8f7e.1305224477.git.mfm@muteddisk.com>	<4DCC4365.3030907@suse.cz>	<BANLkTimKpJoUnoYx8gXi6KCYgVpnXno4ow@mail.gmail.com>	<4DCC4F05.7010306@suse.cz> <BANLkTimrW=ZG2sGG1Q8QehSnh5rW1eBzGw@mail.gmail.com>
+In-Reply-To: <BANLkTimrW=ZG2sGG1Q8QehSnh5rW1eBzGw@mail.gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
+To: matt mooney <mfmooney@gmail.com>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
 
-On Thu, 12 May 2011 17:09:03 -0700, mfmooney wrote:
+On 12.5.2011 23:38, matt mooney wrote:
+> On Thu, May 12, 2011 at 2:20 PM, Michal Marek<mmarek@suse.cz>  wrote:
+>> On 12.5.2011 23:07, matt mooney wrote:
+>>> 2011/5/12 Michal Marek<mmarek@suse.cz>:
+>>>> Neither git archive not git rev-parse need the work tree, --git-dir=..
+>>>> is sufficient.
+>>>
+>>> Are you sure?
+>>
+>> Yes.
+>> $ cd /tmp
+>> $ git --git-dir=$HOME/linux-2.6/.git rev-parse HEAD
+>> e0a04b11e4059cab033469617c2a3ce2d8cab416
+>>
+>
+> You are right about that command, but it doesn't use the source tree.
 
-> From: matt mooney <mfm@muteddisk.com>
-> 
-> Specify --git-dir and --work-tree when building perf targets to allow
-> out-of-tree builds using O=<build-dir>.
-> 
-> The cat command had to be changed to allow proper file name expansion of
-> the files listed in MANIFEST.
-> 
-> Signed-off-by: matt mooney <mfm@muteddisk.com> ---
-> Okay, so I decided to just go ahead and send this. It removes the
-> --work-tree option from the git rev-parse command. I did test it the way
-> you said, without --work-tree on either statement, but the git archive
-> command fails in that case.
-> 
+Yes, neither git rev-parse nor git archive use the work tree. That's 
+what I tried to explain to you in my first mail.
 
-Looks like `git rev-parse` only needs the data in .git to work fine,
-so this patch looks good to me,
 
-Reviewed-by: WANG Cong <xiyou.wangcong@gmail.com>
+> Do a git --git-dir=$HOME/linux-2.6/.git status from /tmp and see what
+> happens.
 
-BTW, I think you need to Cc Ingo and Peter for perf changes.
+That's irrelevant, I only talked about archive and rev-parse.
 
-Thanks.
 
+> So do you want me to send a new patch without --work-tree= in git rev-parse?
+
+And in git archive.
+
+Michal
