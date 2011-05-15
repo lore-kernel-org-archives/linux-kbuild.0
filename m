@@ -1,38 +1,44 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-yw0-f46.google.com ([209.85.213.46]:53643 "EHLO
-	mail-yw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756548Ab1EOPkL (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 15 May 2011 11:40:11 -0400
-Date: Sun, 15 May 2011 12:40:02 -0300
-From: Arnaldo Carvalho de Melo <acme@ghostprotocols.net>
-Subject: Re: [PATCH v3] package: Makefile: fix perf target bug
-Message-ID: <20110515154002.GB6274@ghostprotocols.net>
-References: <4DCD8CE4.4090404@suse.cz>
- <b07e7ecdce48bc90a2cf83e8867494dae7cd174f.1305329845.git.mfm@muteddisk.com>
+Received: from mx1.redhat.com ([209.132.183.28]:11697 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751212Ab1EORAc (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 15 May 2011 13:00:32 -0400
+Date: Sun, 15 May 2011 18:59:45 +0200
+From: Veaceslav Falico <vfalico@redhat.com>
+Subject: [PATCH 1/1] igmp: fix ip_mc_clear_src to not reset
+ ip_mc_list->sf{mode,count}
+Message-ID: <20110515165945.GA20024@darkmag.usersys.redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <b07e7ecdce48bc90a2cf83e8867494dae7cd174f.1305329845.git.mfm@muteddisk.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: mfmooney@gmail.com
-Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
+To: "David S. Miller" <davem@davemloft.net>
+Cc: Michal Marek <mmarek@suse.cz>, Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>, "Pekka Savola (ipv6)" <pekkas@netcore.fi>, James Morris <jmorris@namei.org>, Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>, Patrick McHardy <kaber@trash.net>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org
 
-Em Fri, May 13, 2011 at 04:41:12PM -0700, mfmooney@gmail.com escreveu:
-> From: matt mooney <mfm@muteddisk.com>
-> 
-> Specify --git-dir when building perf targets to allow out-of-tree
-> builds using O=<build-dir>.
-> 
-> The shell command in `git archive' had to be modified to allow proper
-> file name expansion of the files listed in MANIFEST.
-> 
-> Signed-off-by: matt mooney <mfm@muteddisk.com>
+ip_mc_clear_src resets the imc->sfcount and imc->sfmode, without taking into
+account the current number of sockets listening on that multicast struct, which
+can lead to bogus routes for local listeners.
 
-Michal,
+On NETDEV_DOWN/UP event, if there were 3 multicast listeners for that interface's
+address, the imc->sfcount[MCAST_EXCLUDE] will be reset to 1. And after that a
+listener socket destroys, multicast traffic will not be delivered to local
+listeners because __mkroute_output drops the local flag for the route (by
+checking ip_check_mc).
 
-	Can I have your Reviewed-by or Acked-by for this one? Assuming
-all is ok by now :)
+Signed-off-by: Veaceslav Falico <vfalico@redhat.com>
 
-- Arnaldo
+diff --git a/net/ipv4/igmp.c b/net/ipv4/igmp.c
+index 1fd3d9c..b14f371 100644
+--- a/net/ipv4/igmp.c
++++ b/net/ipv4/igmp.c
+@@ -1775,9 +1775,6 @@ static void ip_mc_clear_src(struct ip_mc_list *pmc)
+ 		kfree(psf);
+ 	}
+ 	pmc->sources = NULL;
+-	pmc->sfmode = MCAST_EXCLUDE;
+-	pmc->sfcount[MCAST_INCLUDE] = 0;
+-	pmc->sfcount[MCAST_EXCLUDE] = 1;
+ }
+ 
+ 
