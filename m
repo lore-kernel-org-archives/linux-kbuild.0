@@ -1,44 +1,52 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:11697 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751212Ab1EORAc (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 15 May 2011 13:00:32 -0400
-Date: Sun, 15 May 2011 18:59:45 +0200
-From: Veaceslav Falico <vfalico@redhat.com>
-Subject: [PATCH 1/1] igmp: fix ip_mc_clear_src to not reset
- ip_mc_list->sf{mode,count}
-Message-ID: <20110515165945.GA20024@darkmag.usersys.redhat.com>
+Received: from mail-bw0-f46.google.com ([209.85.214.46]:33497 "EHLO
+	mail-bw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750953Ab1EORiB convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 15 May 2011 13:38:01 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+In-Reply-To: <20110512133356.GI13293@sepie.suse.cz>
+References: <1303837564-18062-1-git-send-email-rabin@rab.in>
+ <BANLkTimLre+UY1fY6+HXEsJicyh_oMnWdA@mail.gmail.com> <20110512133356.GI13293@sepie.suse.cz>
+From: Rabin Vincent <rabin@rab.in>
+Date: Sun, 15 May 2011 23:07:19 +0530
+Message-ID: <BANLkTiktdW3N35YYDB6dmUOMG1ZbQpYrow@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: make KBUILD_NOCMDDEP=1 handle empty built-in.o
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "David S. Miller" <davem@davemloft.net>
-Cc: Michal Marek <mmarek@suse.cz>, Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>, "Pekka Savola (ipv6)" <pekkas@netcore.fi>, James Morris <jmorris@namei.org>, Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>, Patrick McHardy <kaber@trash.net>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-ip_mc_clear_src resets the imc->sfcount and imc->sfmode, without taking into
-account the current number of sockets listening on that multicast struct, which
-can lead to bogus routes for local listeners.
+On Thu, May 12, 2011 at 19:03, Michal Marek <mmarek@suse.cz> wrote:
+> I'm not sure if this is the rigt way to fix it. Kbuild.include should
+> not care about obj-*. The problem is that arg-check is always empty with
+> KBUILD_NOCMDDEP and if there are no other dependencies, the target will
+> not be created, right? IMO we only need to make sure that during the
+> first make run, arg-check always expands to non-empty, even with
+> KBUILD_NOCMDDEP. So we can drop the $(obj-y) test and do it like this
+> (untested), can't we?
+>
+> diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
+> index c034dd7..be39cd1 100644
+> --- a/scripts/Kbuild.include
+> +++ b/scripts/Kbuild.include
+> @@ -197,6 +197,8 @@ ifneq ($(KBUILD_NOCMDDEP),1)
+>  # User may override this check using make KBUILD_NOCMDDEP=1
+>  arg-check = $(strip $(filter-out $(cmd_$(1)), $(cmd_$@)) \
+>                     $(filter-out $(cmd_$@),   $(cmd_$(1))) )
+> +else
+> +arg-check = $(if $(strip $(cmd_$@)),,1)
+>  endif
+>
+>  # >'< substitution is for echo to work,
 
-On NETDEV_DOWN/UP event, if there were 3 multicast listeners for that interface's
-address, the imc->sfcount[MCAST_EXCLUDE] will be reset to 1. And after that a
-listener socket destroys, multicast traffic will not be delivered to local
-listeners because __mkroute_output drops the local flag for the route (by
-checking ip_check_mc).
+This works for me, thanks.
 
-Signed-off-by: Veaceslav Falico <vfalico@redhat.com>
+Tested-by: Rabin Vincent <rabin@rab.in>
 
-diff --git a/net/ipv4/igmp.c b/net/ipv4/igmp.c
-index 1fd3d9c..b14f371 100644
---- a/net/ipv4/igmp.c
-+++ b/net/ipv4/igmp.c
-@@ -1775,9 +1775,6 @@ static void ip_mc_clear_src(struct ip_mc_list *pmc)
- 		kfree(psf);
- 	}
- 	pmc->sources = NULL;
--	pmc->sfmode = MCAST_EXCLUDE;
--	pmc->sfcount[MCAST_INCLUDE] = 0;
--	pmc->sfcount[MCAST_EXCLUDE] = 1;
- }
- 
- 
+> while at it, we should also add KBUILD_NOCMDDEP to
+> Documentation/kbuild/kbuild.txt.
+
+I will try to write up something for this.
