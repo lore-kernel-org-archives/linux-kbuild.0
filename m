@@ -1,45 +1,54 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor.suse.de ([195.135.220.2]:55103 "EHLO mx1.suse.de"
+Received: from cantor.suse.de ([195.135.220.2]:55767 "EHLO mx1.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755500Ab1EPOVV (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 16 May 2011 10:21:21 -0400
-Date: Mon, 16 May 2011 16:21:18 +0200
+	id S1755525Ab1EPOoP (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 16 May 2011 10:44:15 -0400
+Date: Mon, 16 May 2011 16:44:13 +0200
 From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [PATCH] Add $KERNELRELEASE to firmware install path
-Message-ID: <20110516142118.GM13293@sepie.suse.cz>
-References: <20110505173939.GA20575@dev1756.snc6.facebook.com>
- <4DC3CA39.30806@suse.cz>
- <1304677113.20656.2.camel@i7.infradead.org>
- <20110506184438.GA30417@dev1756.snc6.facebook.com>
- <1304708557.20656.49.camel@i7.infradead.org>
- <20110506223727.GA29011@dev1756.snc6.facebook.com>
+Subject: Re: [PATCH] kbuild: make KBUILD_NOCMDDEP=1 handle empty built-in.o
+Message-ID: <20110516144413.GN13293@sepie.suse.cz>
+References: <1303837564-18062-1-git-send-email-rabin@rab.in>
+ <BANLkTimLre+UY1fY6+HXEsJicyh_oMnWdA@mail.gmail.com>
+ <20110512133356.GI13293@sepie.suse.cz>
+ <BANLkTiktdW3N35YYDB6dmUOMG1ZbQpYrow@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20110506223727.GA29011@dev1756.snc6.facebook.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <BANLkTiktdW3N35YYDB6dmUOMG1ZbQpYrow@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arun Sharma <asharma@fb.com>
-Cc: David Woodhouse <dwmw2@infradead.org>, linux-kbuild@vger.kernel.org, lkml <linux-kernel@vger.kernel.org>
+To: Rabin Vincent <rabin@rab.in>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-On Fri, May 06, 2011 at 03:37:27PM -0700, Arun Sharma wrote:
-> On Fri, May 06, 2011 at 08:02:36PM +0100, David Woodhouse wrote:
-> > On Fri, 2011-05-06 at 11:44 -0700, Arun Sharma wrote:
-> > > 
-> > > Without this change, if you have two kernel rpms/debs from different
-> > > kernel versions installed, they'll result in a namespace conflict
-> > > (rpm/deb install will fail), which gets resolved by this patch. 
-> > 
-> > The packages are broken then. They shouldn't include *any* files
-> > in /lib/firmware.
-> > 
-> > Fix *that*, and the problem goes away.
+On Sun, May 15, 2011 at 11:07:19PM +0530, Rabin Vincent wrote:
+> On Thu, May 12, 2011 at 19:03, Michal Marek <mmarek@suse.cz> wrote:
+> > I'm not sure if this is the rigt way to fix it. Kbuild.include should
+> > not care about obj-*. The problem is that arg-check is always empty with
+> > KBUILD_NOCMDDEP and if there are no other dependencies, the target will
+> > not be created, right? IMO we only need to make sure that during the
+> > first make run, arg-check always expands to non-empty, even with
+> > KBUILD_NOCMDDEP. So we can drop the $(obj-y) test and do it like this
+> > (untested), can't we?
+> >
+> > diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
+> > index c034dd7..be39cd1 100644
+> > --- a/scripts/Kbuild.include
+> > +++ b/scripts/Kbuild.include
+> > @@ -197,6 +197,8 @@ ifneq ($(KBUILD_NOCMDDEP),1)
+> >  # User may override this check using make KBUILD_NOCMDDEP=1
+> >  arg-check = $(strip $(filter-out $(cmd_$(1)), $(cmd_$@)) \
+> >                     $(filter-out $(cmd_$@),   $(cmd_$(1))) )
+> > +else
+> > +arg-check = $(if $(strip $(cmd_$@)),,1)
+> >  endif
+> >
+> >  # >'< substitution is for echo to work,
 > 
-> Sounds good.
+> This works for me, thanks.
 > 
-> Michal: Should I send you a patch that drops /lib/firmware?
+> Tested-by: Rabin Vincent <rabin@rab.in>
 
-make deb-pkg generates a separate package with the firmware files. I
-would suggest we do the same for rpm.
+Thanks, pushed to kbuild-2.6.git#kbuild.
 
 Michal
