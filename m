@@ -1,39 +1,111 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor.suse.de ([195.135.220.2]:41567 "EHLO mx1.suse.de"
+Received: from cantor.suse.de ([195.135.220.2]:41800 "EHLO mx1.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751739Ab1EPIT5 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 16 May 2011 04:19:57 -0400
-Message-ID: <4DD0DE2C.4060806@suse.cz>
-Date: Mon, 16 May 2011 10:19:56 +0200
+	id S1751484Ab1EPI3e (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 16 May 2011 04:29:34 -0400
+Message-ID: <4DD0E06C.2040009@suse.cz>
+Date: Mon, 16 May 2011 10:29:32 +0200
 From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Subject: Re: [PATCH v3] package: Makefile: fix perf target bug
-References: <4DCD8CE4.4090404@suse.cz> <b07e7ecdce48bc90a2cf83e8867494dae7cd174f.1305329845.git.mfm@muteddisk.com> <20110515154002.GB6274@ghostprotocols.net>
-In-Reply-To: <20110515154002.GB6274@ghostprotocols.net>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: Re: [PATCH] kconfig: do not record timestamp in .config
+References: <1305516176-4072-1-git-send-email-lacombar@gmail.com>
+In-Reply-To: <1305516176-4072-1-git-send-email-lacombar@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-2; format=flowed
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnaldo Carvalho de Melo <acme@ghostprotocols.net>
-Cc: mfmooney@gmail.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
+To: Arnaud Lacombe <lacombar@gmail.com>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On 15.5.2011 17:40, Arnaldo Carvalho de Melo wrote:
-> Em Fri, May 13, 2011 at 04:41:12PM -0700, mfmooney@gmail.com escreveu:
->> From: matt mooney<mfm@muteddisk.com>
->>
->> Specify --git-dir when building perf targets to allow out-of-tree
->> builds using O=<build-dir>.
->>
->> The shell command in `git archive' had to be modified to allow proper
->> file name expansion of the files listed in MANIFEST.
->>
->> Signed-off-by: matt mooney<mfm@muteddisk.com>
+On 16.5.2011 05:22, Arnaud Lacombe wrote:
+> Hi Michal,
 >
-> Michal,
+> The following patch removes the timestamp in .config file. This is a
+> prerequiresite for the revised version of the printer merge I sent back
+> in December[0]. The issue is that heading comment generations will be
+> merged in a single function, and that would revert the deterministic
+> change you made in mid-April.
 >
-> 	Can I have your Reviewed-by or Acked-by for this one? Assuming
-> all is ok by now :)
+> The other options are either to have timestamp always enabled and
+> disable them selectively, but that might be a pain to implement, or to
+> have timestamp disable by default and an environment variable, say
+> KCONFIG_TIMESTAMP, to turn everything on manually.
 
-Reviewed-by: Michal Marek <mmarek@suse.cz>
+I personally am not a big fan of embedded timestamps, so
+
+Acked-by: Michal Marek <mmarek@suse.cz>
+
+But I'll wait some time before merging this, in case there are 
+objections from others...
 
 Michal
+
+
+>
+> Regards,
+>   - Arnaud
+>
+> [0]: https://patchwork.kernel.org/patch/380631/
+>
+> --
+>
+> From: Arnaud Lacombe<lacombar@gmail.com>
+> Subject: kconfig: do not record timestamp in .config
+>
+> Signed-off-by: Arnaud Lacombe<lacombar@gmail.com>
+> ---
+>   Documentation/kbuild/kconfig.txt |    5 -----
+>   scripts/kconfig/confdata.c       |   12 +-----------
+>   2 files changed, 1 insertions(+), 16 deletions(-)
+>
+> diff --git a/Documentation/kbuild/kconfig.txt b/Documentation/kbuild/kconfig.txt
+> index cca46b1..c313d71 100644
+> --- a/Documentation/kbuild/kconfig.txt
+> +++ b/Documentation/kbuild/kconfig.txt
+> @@ -48,11 +48,6 @@ KCONFIG_OVERWRITECONFIG
+>   If you set KCONFIG_OVERWRITECONFIG in the environment, Kconfig will not
+>   break symlinks when .config is a symlink to somewhere else.
+>
+> -KCONFIG_NOTIMESTAMP
+> ---------------------------------------------------
+> -If this environment variable exists and is non-null, the timestamp line
+> -in generated .config files is omitted.
+> -
+>   ______________________________________________________________________
+>   Environment variables for '{allyes/allmod/allno/rand}config'
+>
+> diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
+> index 834eecb..2bafd9a 100644
+> --- a/scripts/kconfig/confdata.c
+> +++ b/scripts/kconfig/confdata.c
+> @@ -560,8 +560,6 @@ int conf_write(const char *name)
+>   	const char *basename;
+>   	const char *str;
+>   	char dirname[PATH_MAX+1], tmpname[PATH_MAX+1], newname[PATH_MAX+1];
+> -	time_t now;
+> -	int use_timestamp = 1;
+>   	char *env;
+>
+>   	dirname[0] = 0;
+> @@ -598,19 +596,11 @@ int conf_write(const char *name)
+>   	if (!out)
+>   		return 1;
+>
+> -	time(&now);
+> -	env = getenv("KCONFIG_NOTIMESTAMP");
+> -	if (env&&  *env)
+> -		use_timestamp = 0;
+> -
+>   	fprintf(out, _("#\n"
+>   		       "# Automatically generated make config: don't edit\n"
+>   		       "# %s\n"
+> -		       "%s%s"
+>   		       "#\n"),
+> -		     rootmenu.prompt->text,
+> -		     use_timestamp ? "# " : "",
+> -		     use_timestamp ? ctime(&now) : "");
+> +		     rootmenu.prompt->text);
+>
+>   	if (!conf_get_changed())
+>   		sym_clear_all_valid();
+
