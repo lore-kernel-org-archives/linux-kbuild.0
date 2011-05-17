@@ -1,84 +1,111 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from outmail013.snc4.facebook.com ([66.220.144.145]:62403 "EHLO
-	mx-out.facebook.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1755826Ab1EQRhs (ORCPT
+Received: from e35.co.us.ibm.com ([32.97.110.153]:43891 "EHLO
+	e35.co.us.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755445Ab1EQRng (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 17 May 2011 13:37:48 -0400
-From: Arun Sharma <asharma@fb.com>
-Subject: [PATCH 5/6] kbuild: Append RPM release to $KERNELRELEASE
-Date: Tue, 17 May 2011 10:36:18 -0700
-Message-Id: <1305653779-3445-5-git-send-email-asharma@fb.com>
-In-Reply-To: <1305653779-3445-1-git-send-email-asharma@fb.com>
-References: <1305653779-3445-1-git-send-email-asharma@fb.com>
+	Tue, 17 May 2011 13:43:36 -0400
+In-Reply-To: <20110517143756.GE30366@darkmag.usersys.redhat.com>
+References: <20110515165945.GA20024@darkmag.usersys.redhat.com> <20110516.140359.111037536766782557.davem@davemloft.net> <OF948388D5.90B3F5A7-ON88257892.006C3228-88257892.0071B9D5@us.ibm.com> <20110517133801.GC30366@darkmag.usersys.redhat.com> <20110517143756.GE30366@darkmag.usersys.redhat.com>
+MIME-Version: 1.0
+Subject: Re: [PATCH v3 1/1] igmp: call ip_mc_clear_src() only when we have no users
+ of ip_mc_list
+From: David Stevens <dlstevens@us.ibm.com>
+Message-ID: <OF11F57B2A.6B43B7E6-ON88257893.005490B0-88257893.00615176@us.ibm.com>
+Date: Tue, 17 May 2011 10:42:59 -0700
+Content-Type: text/plain; charset="US-ASCII"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: Arun Sharma <asharma@fb.com>
+To: Veaceslav Falico <vfalico@redhat.com>
+Cc: David Miller <davem@davemloft.net>, jmorris@namei.org, kaber@trash.net, kuznet@ms2.inr.ac.ru, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, mmarek@suse.cz, netdev@vger.kernel.org, pekkas@netcore.fi, yoshfuji@linux-ipv6.org
 
-Provide the same consistency as distributor kernels.
-uname -r matches RPM name (includes the release)
+Veaceslav,
+        It looks to me like this will leak the source filters if we are 
+called from ip_mc_destroy_dev(),
+Even with your previous patch, you're assuming that we don't free the 
+ip_mc_list and so we have the
+same one when we up the device, but if there are no timers running, it 
+looks like refcnt canl go to 0 and free
+it. If we can ever free the ip_mc_list when users != 0 (or going to 0 
+immediately after the drop), we
+have to do the ip_mc_clear_src() or leak the list. I haven't looked at 
+this code in years, so I'll need
+to refresh my memory.
+        So, I'll look at that a bit more; at a minimum, I think you need 
+to do the clear_src
+also in the destroy case. We could lose the filters and set the exclude 
+count to users, instead
+of 1; but I like the idea of keeping the source filters across a down/up, 
+if we can be sure there
+are no cases where we free the ip_mc_list without first freeing all the 
+filters.
 
-Glossary:
+                                                                +-DLS
 
-KERNELRELEASE = what users see
-___KERNELRELEASE = KERNELRELEASE without RPM release
-__KERNELRELEASE = ___KERNELRELEASE with s/-/_/g
+Veaceslav Falico <vfalico@redhat.com> wrote on 05/17/2011 07:37:56 AM:
 
-Signed-off-by: Arun Sharma <asharma@fb.com>
----
- Makefile                 |    9 ++++++---
- scripts/package/Makefile |    2 +-
- scripts/package/mkspec   |    2 +-
- 3 files changed, 8 insertions(+), 5 deletions(-)
-
-diff --git a/Makefile b/Makefile
-index 28820f7..90d45f4 100644
---- a/Makefile
-+++ b/Makefile
-@@ -367,11 +367,14 @@ KBUILD_AFLAGS_MODULE  := -DMODULE
- KBUILD_CFLAGS_MODULE  := -DMODULE
- KBUILD_LDFLAGS_MODULE := -T $(srctree)/scripts/module-common.lds
- 
--# Read KERNELRELEASE from include/config/kernel.release (if it exists)
--KERNELRELEASE = $(shell cat include/config/kernel.release 2> /dev/null)
-+# Read ___KERNELRELEASE from include/config/kernel.release (if it exists)
-+___KERNELRELEASE = $(shell cat include/config/kernel.release 2> /dev/null)
-+# Append the release version only once. 
-+# Note: .version could change during the build.
-+KERNELRELEASE ?= $(___KERNELRELEASE)-$(shell /bin/sh scripts/mkversion)
- KERNELVERSION = $(VERSION).$(PATCHLEVEL).$(SUBLEVEL)$(EXTRAVERSION)
- 
--export VERSION PATCHLEVEL SUBLEVEL KERNELRELEASE KERNELVERSION
-+export VERSION PATCHLEVEL SUBLEVEL KERNELRELEASE KERNELVERSION ___KERNELRELEASE
- export ARCH SRCARCH CONFIG_SHELL HOSTCC HOSTCFLAGS CROSS_COMPILE AS LD CC
- export CPP AR NM STRIP OBJCOPY OBJDUMP
- export MAKE AWK GENKSYMS INSTALLKERNEL PERL UTS_MACHINE
-diff --git a/scripts/package/Makefile b/scripts/package/Makefile
-index 1b7eaea..0ec687b 100644
---- a/scripts/package/Makefile
-+++ b/scripts/package/Makefile
-@@ -26,7 +26,7 @@ RPM := $(shell if [ -x "/usr/bin/rpmbuild" ]; then echo rpmbuild; \
- 	           else echo rpm; fi)
- 
- # Remove hyphens since they have special meaning in RPM filenames
--KERNELPATH := kernel-$(subst -,_,$(KERNELRELEASE))
-+KERNELPATH := kernel-$(subst -,_,$(___KERNELRELEASE))
- MKSPEC     := $(srctree)/scripts/package/mkspec
- PREV       := set -e; cd ..;
- 
-diff --git a/scripts/package/mkspec b/scripts/package/mkspec
-index bf215c5..9a8c2fa 100755
---- a/scripts/package/mkspec
-+++ b/scripts/package/mkspec
-@@ -22,7 +22,7 @@ if [ "`grep CONFIG_DRM=y .config | cut -f2 -d\=`" = "y" ]; then
- fi
- 
- PROVIDES="$PROVIDES kernel-$KERNELRELEASE"
--__KERNELRELEASE=`echo $KERNELRELEASE | sed -e "s/-/_/g"`
-+__KERNELRELEASE=`echo $___KERNELRELEASE | sed -e "s/-/_/g"`
- 
- echo "Name: kernel"
- echo "Summary: The Linux Kernel"
--- 
-1.7.4
+> From: Veaceslav Falico <vfalico@redhat.com>
+> To: David Stevens/Beaverton/IBM@IBMUS
+> Cc: David Miller <davem@davemloft.net>, jmorris@namei.org, 
+> kaber@trash.net, kuznet@ms2.inr.ac.ru, linux-kbuild@vger.kernel.org,
+> linux-kernel@vger.kernel.org, mmarek@suse.cz, 
+> netdev@vger.kernel.org, pekkas@netcore.fi, yoshfuji@linux-ipv6.org
+> Date: 05/17/2011 07:39 AM
+> Subject: [PATCH v3 1/1] igmp: call ip_mc_clear_src() only when we 
+> have no users of ip_mc_list
+> 
+> In igmp_group_dropped() we call ip_mc_clear_src(), which resets the 
+number
+> of source filters per mulitcast. However, igmp_group_dropped() is also
+> called on NETDEV_DOWN, NETDEV_PRE_TYPE_CHANGE and NETDEV_UNREGISTER, 
+which
+> means that the group might get added back on NETDEV_UP, NETDEV_REGISTER 
+and
+> NETDEV_POST_TYPE_CHANGE respectively, leaving us with broken source
+> filters.
+> 
+> To fix that, we must clear the source filters only when there are no 
+users
+> in the ip_mc_list, i.e. in ip_mc_dec_group().
+> 
+> Correct version of the patch.
+> 
+> Signed-off-by: Veaceslav Falico <vfalico@redhat.com>
+> ---
+> diff --git a/net/ipv4/igmp.c b/net/ipv4/igmp.c
+> index 1fd3d9c..142ca0d 100644
+> --- a/net/ipv4/igmp.c
+> +++ b/net/ipv4/igmp.c
+> @@ -1169,20 +1169,18 @@ static void igmp_group_dropped(struct ip_mc_list 
+*im)
+> 
+>     if (!in_dev->dead) {
+>        if (IGMP_V1_SEEN(in_dev))
+> -         goto done;
+> +         return;
+>        if (IGMP_V2_SEEN(in_dev)) {
+>           if (reporter)
+>              igmp_send_report(in_dev, im, IGMP_HOST_LEAVE_MESSAGE);
+> -         goto done;
+> +         return;
+>        }
+>        /* IGMPv3 */
+>        igmpv3_add_delrec(in_dev, im);
+> 
+>        igmp_ifc_event(in_dev);
+>     }
+> -done:
+>  #endif
+> -   ip_mc_clear_src(im);
+>  }
+> 
+>  static void igmp_group_added(struct ip_mc_list *im)
+> @@ -1319,6 +1317,7 @@ void ip_mc_dec_group(struct in_device *in_dev,
+> __be32 addr)
+>              *ip = i->next_rcu;
+>              in_dev->mc_count--;
+>              igmp_group_dropped(i);
+> +            ip_mc_clear_src(i);
+> 
+>              if (!in_dev->dead)
+>                 ip_rt_multicast_event(in_dev);
 
