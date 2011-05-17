@@ -1,26 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:58699 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S932166Ab1EQTrA (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 17 May 2011 15:47:00 -0400
-Message-ID: <4DD2D0B3.4070208@suse.cz>
-Date: Tue, 17 May 2011 21:46:59 +0200
-From: Michal Marek <mmarek@suse.cz>
+Received: from pfepb.post.tele.dk ([195.41.46.236]:57719 "EHLO
+	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932084Ab1EQTxM (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 17 May 2011 15:53:12 -0400
+Date: Tue, 17 May 2011 21:53:10 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: [PATCH] kconfig: Only generate config_is_xxx for bool and
+	tristate options
+Message-ID: <20110517195310.GA17003@merkur.ravnborg.org>
+References: <1305646532-29114-1-git-send-email-mmarek@suse.cz>
 MIME-Version: 1.0
-Subject: Re: [PATCH 1/6] kbuild: Integrate with new-kernel-pkg
-References: <1305653779-3445-1-git-send-email-asharma@fb.com>
-In-Reply-To: <1305653779-3445-1-git-send-email-asharma@fb.com>
-Content-Type: text/plain; charset=ISO-8859-2
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1305646532-29114-1-git-send-email-mmarek@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arun Sharma <asharma@fb.com>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Jean-Christophe PLAGNIOL-VILLARD <plagnioj@jcrosoft.com>
 
-On 17.5.2011 19:36, Arun Sharma wrote:
-> Handles mkinitrd, updating the bootloader among other things.
+On Tue, May 17, 2011 at 05:35:32PM +0200, Michal Marek wrote:
+> For strings and integers, the config_is_xxx macros are useless and
+> sometimes misleading:
+> 
+>   #define CONFIG_INITRAMFS_SOURCE ""
+>   #define config_is_initramfs_source() 1
 
-This is a Fedora/RHEL specific script, please keep the mkspec script
-work on any rpm distribution.
+I'm late with this comment....
+Could we introduce "config_is_foo" using a syntax that
+does not break grepability?
 
-Michal
+Maybe a syntax like this?
+
+    #ifdef CONFIG_FOO
+
+and
+
+    if (KCONFIG_FOO())
+
+Grepping for the use of a symbol is a very typical thing,
+so we should try to keep this.
+And with the suggested syntax above I expect fixdep to
+catch up both usage types.
+
+	Sam
