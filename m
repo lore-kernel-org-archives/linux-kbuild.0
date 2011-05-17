@@ -1,46 +1,61 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pfepb.post.tele.dk ([195.41.46.236]:57719 "EHLO
-	pfepb.post.tele.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932084Ab1EQTxM (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 17 May 2011 15:53:12 -0400
-Date: Tue, 17 May 2011 21:53:10 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH] kconfig: Only generate config_is_xxx for bool and
-	tristate options
-Message-ID: <20110517195310.GA17003@merkur.ravnborg.org>
-References: <1305646532-29114-1-git-send-email-mmarek@suse.cz>
+Received: from cantor.suse.de ([195.135.220.2]:52286 "EHLO mx1.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S932217Ab1EQUNz (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 17 May 2011 16:13:55 -0400
+Message-ID: <4DD2D703.4030908@suse.cz>
+Date: Tue, 17 May 2011 22:13:55 +0200
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1305646532-29114-1-git-send-email-mmarek@suse.cz>
+Subject: Re: [PATCH 5/6] kbuild: Append RPM release to $KERNELRELEASE
+References: <1305653779-3445-1-git-send-email-asharma@fb.com> <1305653779-3445-5-git-send-email-asharma@fb.com>
+In-Reply-To: <1305653779-3445-5-git-send-email-asharma@fb.com>
+Content-Type: text/plain; charset=ISO-8859-2
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Jean-Christophe PLAGNIOL-VILLARD <plagnioj@jcrosoft.com>
+To: Arun Sharma <asharma@fb.com>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Tue, May 17, 2011 at 05:35:32PM +0200, Michal Marek wrote:
-> For strings and integers, the config_is_xxx macros are useless and
-> sometimes misleading:
+On 17.5.2011 19:36, Arun Sharma wrote:
+> Provide the same consistency as distributor kernels.
+> uname -r matches RPM name (includes the release)
 > 
->   #define CONFIG_INITRAMFS_SOURCE ""
->   #define config_is_initramfs_source() 1
+> Glossary:
+> 
+> KERNELRELEASE = what users see
+> ___KERNELRELEASE = KERNELRELEASE without RPM release
+> __KERNELRELEASE = ___KERNELRELEASE with s/-/_/g
+> 
+> Signed-off-by: Arun Sharma <asharma@fb.com>
+> ---
+>  Makefile                 |    9 ++++++---
+>  scripts/package/Makefile |    2 +-
+>  scripts/package/mkspec   |    2 +-
+>  3 files changed, 8 insertions(+), 5 deletions(-)
+> 
+> diff --git a/Makefile b/Makefile
+> index 28820f7..90d45f4 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -367,11 +367,14 @@ KBUILD_AFLAGS_MODULE  := -DMODULE
+>  KBUILD_CFLAGS_MODULE  := -DMODULE
+>  KBUILD_LDFLAGS_MODULE := -T $(srctree)/scripts/module-common.lds
+>  
+> -# Read KERNELRELEASE from include/config/kernel.release (if it exists)
+> -KERNELRELEASE = $(shell cat include/config/kernel.release 2> /dev/null)
+> +# Read ___KERNELRELEASE from include/config/kernel.release (if it exists)
+> +___KERNELRELEASE = $(shell cat include/config/kernel.release 2> /dev/null)
+> +# Append the release version only once. 
+> +# Note: .version could change during the build.
+> +KERNELRELEASE ?= $(___KERNELRELEASE)-$(shell /bin/sh scripts/mkversion)
 
-I'm late with this comment....
-Could we introduce "config_is_foo" using a syntax that
-does not break grepability?
+Please stop decorating the kernel release string for the sake of make
+rpm, thanks. If you really want the kernel release string match rpm's
+%{version}-%{release}, how about this: Let the user set
+CONFIG_LOCALVERSION=-<number> and check in make rpm if $KERNELRELEASE
+ends with -<number>. If so, use <number> in the Release: field and the
+rest in Version:, otherwise use the same scheme as before. That way, you
+won't force a new kernel release numbering scheme on anyone.
 
-Maybe a syntax like this?
-
-    #ifdef CONFIG_FOO
-
-and
-
-    if (KCONFIG_FOO())
-
-Grepping for the use of a symbol is a very typical thing,
-so we should try to keep this.
-And with the suggested syntax above I expect fixdep to
-catch up both usage types.
-
-	Sam
+Michal
