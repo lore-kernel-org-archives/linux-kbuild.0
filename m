@@ -1,73 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from hrndva-omtalb.mail.rr.com ([71.74.56.125]:41494 "EHLO
-	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757288Ab1ERQJJ (ORCPT
+Received: from oproxy6-pub.bluehost.com ([67.222.54.6]:59071 "HELO
+	oproxy6-pub.bluehost.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with SMTP id S933390Ab1ERSHV (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 18 May 2011 12:09:09 -0400
-Message-Id: <20110518160908.156314024@goodmis.org>
-Date: Wed, 18 May 2011 12:08:17 -0400
-From: Steven Rostedt <rostedt@goodmis.org>
-Subject: [PATCH 08/15] kbuild/recordmcount: Add RECORDMCOUNT_WARN to warn about mcount
-References: <20110518160809.724215604@goodmis.org>
-Content-Disposition: inline; filename=0008-kbuild-recordmcount-Add-RECORDMCOUNT_WARN-to-warn-ab.patch
- callers
+	Wed, 18 May 2011 14:07:21 -0400
+Received: from static-50-53-38-135.bvtn.or.frontiernet.net ([50.53.38.135] helo=chimera.site)
+	by box742.bluehost.com with esmtpa (Exim 4.69)
+	(envelope-from <rdunlap@xenotime.net>)
+	id 1QMl9S-00082H-Ep
+	for linux-kbuild@vger.kernel.org; Wed, 18 May 2011 12:07:18 -0600
+Date: Wed, 18 May 2011 11:07:16 -0700
+From: Randy Dunlap <rdunlap@xenotime.net>
+Subject: kconfig dependencies question
+Message-Id: <20110518110716.464ab10b.rdunlap@xenotime.net>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: Ingo Molnar <mingo@elte.hu>, Andrew Morton <akpm@linux-foundation.org>, Frederic Weisbecker <fweisbec@gmail.com>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
 
-From: Steven Rostedt <srostedt@redhat.com>
 
-When mcount is called in a section that ftrace will not modify it into
-a nop, we want to warn about this. But not warn about this always. Now
-if the user builds the kernel with the option RECORDMCOUNT_WARN=1 then
-the build will warn about mcount callers that are ignored and will just
-waste execution time.
+I see some builds that have this kconfig warning:
 
-Acked-by: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org
-Link: http://lkml.kernel.org/r/20110421023738.714956282@goodmis.org
-Signed-off-by: Steven Rostedt <rostedt@goodmis.org>
+warning: (IA32_EMULATION) selects COMPAT_BINFMT_ELF which has unmet direct dependencies (COMPAT && BINFMT_ELF)
+
+so I was trying to fix it.  We have:
+
+IA32_EMULATION selects COMPAT_BINFMT_ELF
+COMPAT_BINFMT_ELF depends on COMPAT && BINFMT_ELF
+COMPAT depends on IA32_EMULATION
+
+Is this not circular?  or is it just almost circular?  or am I just
+confuzed?
+
+Suggestions?
+
+thanks,
 ---
- Makefile               |    1 +
- scripts/Makefile.build |    5 ++++-
- 2 files changed, 5 insertions(+), 1 deletions(-)
-
-diff --git a/Makefile b/Makefile
-index 41ea6fb..e7d01ad 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1268,6 +1268,7 @@ help:
- 	@echo  '  make C=1   [targets] Check all c source with $$CHECK (sparse by default)'
- 	@echo  '  make C=2   [targets] Force check of all c source with $$CHECK'
- 	@echo  '  make W=1   [targets] Enable extra gcc checks'
-+	@echo  '  make RECORDMCOUNT_WARN=1 [targets] Warn about ignored mcount sections'
- 	@echo  ''
- 	@echo  'Execute "make" or "make all" to build all targets marked with [*] '
- 	@echo  'For further info see the ./README file'
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index 7d3f903..6165622 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -244,13 +244,16 @@ endif
- 
- ifdef CONFIG_FTRACE_MCOUNT_RECORD
- ifdef BUILD_C_RECORDMCOUNT
-+ifeq ("$(origin RECORDMCOUNT_WARN)", "command line")
-+  RECORDMCOUNT_FLAGS = -w
-+endif
- # Due to recursion, we must skip empty.o.
- # The empty.o file is created in the make process in order to determine
- #  the target endianness and word size. It is made before all other C
- #  files, including recordmcount.
- sub_cmd_record_mcount =					\
- 	if [ $(@) != "scripts/mod/empty.o" ]; then	\
--		$(objtree)/scripts/recordmcount "$(@)";	\
-+		$(objtree)/scripts/recordmcount $(RECORDMCOUNT_FLAGS) "$(@)";	\
- 	fi;
- recordmcount_source := $(srctree)/scripts/recordmcount.c \
- 		    $(srctree)/scripts/recordmcount.h
--- 
-1.7.4.4
-
-
+~Randy
