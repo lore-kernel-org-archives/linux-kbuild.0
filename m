@@ -1,70 +1,73 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-iw0-f174.google.com ([209.85.214.174]:38690 "EHLO
-	mail-iw0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754159Ab1ERG1V convert rfc822-to-8bit (ORCPT
+Received: from hrndva-omtalb.mail.rr.com ([71.74.56.125]:41494 "EHLO
+	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757288Ab1ERQJJ (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 18 May 2011 02:27:21 -0400
-MIME-Version: 1.0
-In-Reply-To: <20110518061919.GA18763@merkur.ravnborg.org>
-References: <1305646532-29114-1-git-send-email-mmarek@suse.cz>
-	<20110517195310.GA17003@merkur.ravnborg.org>
-	<20110518051645.GB15292@game.jcrosoft.org>
-	<20110518061919.GA18763@merkur.ravnborg.org>
-Date: Wed, 18 May 2011 02:27:21 -0400
-Message-ID: <BANLkTikJhjZeALwwRyaozQZp0=k8xcocog@mail.gmail.com>
-Subject: Re: [PATCH] kconfig: Only generate config_is_xxx for bool and
- tristate options
-From: Arnaud Lacombe <lacombar@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 8BIT
+	Wed, 18 May 2011 12:09:09 -0400
+Message-Id: <20110518160908.156314024@goodmis.org>
+Date: Wed, 18 May 2011 12:08:17 -0400
+From: Steven Rostedt <rostedt@goodmis.org>
+Subject: [PATCH 08/15] kbuild/recordmcount: Add RECORDMCOUNT_WARN to warn about mcount
+References: <20110518160809.724215604@goodmis.org>
+Content-Disposition: inline; filename=0008-kbuild-recordmcount-Add-RECORDMCOUNT_WARN-to-warn-ab.patch
+ callers
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: Jean-Christophe PLAGNIOL-VILLARD <plagnioj@jcrosoft.com>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: linux-kernel@vger.kernel.org
+Cc: Ingo Molnar <mingo@elte.hu>, Andrew Morton <akpm@linux-foundation.org>, Frederic Weisbecker <fweisbec@gmail.com>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
 
-Hi,
+From: Steven Rostedt <srostedt@redhat.com>
 
-On Wed, May 18, 2011 at 2:19 AM, Sam Ravnborg <sam@ravnborg.org> wrote:
-> On Wed, May 18, 2011 at 07:16:45AM +0200, Jean-Christophe PLAGNIOL-VILLARD wrote:
->> On 21:53 Tue 17 May     , Sam Ravnborg wrote:
->> > On Tue, May 17, 2011 at 05:35:32PM +0200, Michal Marek wrote:
->> > > For strings and integers, the config_is_xxx macros are useless and
->> > > sometimes misleading:
->> > >
->> > >   #define CONFIG_INITRAMFS_SOURCE ""
->> > >   #define config_is_initramfs_source() 1
->> >
->> > I'm late with this comment....
->> > Could we introduce "config_is_foo" using a syntax that
->> > does not break grepability?
->> >
->> > Maybe a syntax like this?
->> >
->> >     #ifdef CONFIG_FOO
->> >
->> > and
->> >
->> >     if (KCONFIG_FOO())
->> >
->> > Grepping for the use of a symbol is a very typical thing,
->> > so we should try to keep this.
->> > And with the suggested syntax above I expect fixdep to
->> > catch up both usage types.
->> I'll prefer kconfig_foo()
->> not uppercase
->>
->> but if we use KCONFIG_FOO no need to touch fixdep
->
-> fixdep is easy to fix - albeit it may cost a bit of processing time.
-> wht I worry much more about is users that miss uses of CONFIG_ symbols, because
-> they do not show up in "git grep CONFIG_FOO".
->
-agree.
+When mcount is called in a section that ftrace will not modify it into
+a nop, we want to warn about this. But not warn about this always. Now
+if the user builds the kernel with the option RECORDMCOUNT_WARN=1 then
+the build will warn about mcount callers that are ignored and will just
+waste execution time.
 
-> Using "if (KCONFIG_FOO()) users are also awre this is a configuration
-> decided condition - which is nice to stand out.
->
-this will not work if you do $(git -w CONFIG_FOO) to avoid getting all
-kind of noise in your search.
+Acked-by: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org
+Link: http://lkml.kernel.org/r/20110421023738.714956282@goodmis.org
+Signed-off-by: Steven Rostedt <rostedt@goodmis.org>
+---
+ Makefile               |    1 +
+ scripts/Makefile.build |    5 ++++-
+ 2 files changed, 5 insertions(+), 1 deletions(-)
 
- - Arnaud
+diff --git a/Makefile b/Makefile
+index 41ea6fb..e7d01ad 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1268,6 +1268,7 @@ help:
+ 	@echo  '  make C=1   [targets] Check all c source with $$CHECK (sparse by default)'
+ 	@echo  '  make C=2   [targets] Force check of all c source with $$CHECK'
+ 	@echo  '  make W=1   [targets] Enable extra gcc checks'
++	@echo  '  make RECORDMCOUNT_WARN=1 [targets] Warn about ignored mcount sections'
+ 	@echo  ''
+ 	@echo  'Execute "make" or "make all" to build all targets marked with [*] '
+ 	@echo  'For further info see the ./README file'
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index 7d3f903..6165622 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -244,13 +244,16 @@ endif
+ 
+ ifdef CONFIG_FTRACE_MCOUNT_RECORD
+ ifdef BUILD_C_RECORDMCOUNT
++ifeq ("$(origin RECORDMCOUNT_WARN)", "command line")
++  RECORDMCOUNT_FLAGS = -w
++endif
+ # Due to recursion, we must skip empty.o.
+ # The empty.o file is created in the make process in order to determine
+ #  the target endianness and word size. It is made before all other C
+ #  files, including recordmcount.
+ sub_cmd_record_mcount =					\
+ 	if [ $(@) != "scripts/mod/empty.o" ]; then	\
+-		$(objtree)/scripts/recordmcount "$(@)";	\
++		$(objtree)/scripts/recordmcount $(RECORDMCOUNT_FLAGS) "$(@)";	\
+ 	fi;
+ recordmcount_source := $(srctree)/scripts/recordmcount.c \
+ 		    $(srctree)/scripts/recordmcount.h
+-- 
+1.7.4.4
+
+
