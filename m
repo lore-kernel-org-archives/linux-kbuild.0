@@ -1,41 +1,55 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from oproxy6-pub.bluehost.com ([67.222.54.6]:59071 "HELO
-	oproxy6-pub.bluehost.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with SMTP id S933390Ab1ERSHV (ORCPT
+Received: from mail-pw0-f46.google.com ([209.85.160.46]:54721 "EHLO
+	mail-pw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932401Ab1ESMhF (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 18 May 2011 14:07:21 -0400
-Received: from static-50-53-38-135.bvtn.or.frontiernet.net ([50.53.38.135] helo=chimera.site)
-	by box742.bluehost.com with esmtpa (Exim 4.69)
-	(envelope-from <rdunlap@xenotime.net>)
-	id 1QMl9S-00082H-Ep
-	for linux-kbuild@vger.kernel.org; Wed, 18 May 2011 12:07:18 -0600
-Date: Wed, 18 May 2011 11:07:16 -0700
-From: Randy Dunlap <rdunlap@xenotime.net>
-Subject: kconfig dependencies question
-Message-Id: <20110518110716.464ab10b.rdunlap@xenotime.net>
+	Thu, 19 May 2011 08:37:05 -0400
+Subject: [PATCH 1/2] gconfig: enable rules hint for main treeviews
+From: Eduardo Silva <edsiper@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Date: Thu, 19 May 2011 08:37:01 -0400
+Message-ID: <1305808621.11775.3.camel@monotop>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
+To: Roman Zippel <zippel@linux-m68k.org>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
+Due to the large amount of rows in the treeviews, is difficult to
+match columns with rows, setting the rules hint to 'true' allows the
+treeview to alternate background colors in the rows making the data
+more readable.
 
-I see some builds that have this kconfig warning:
-
-warning: (IA32_EMULATION) selects COMPAT_BINFMT_ELF which has unmet direct dependencies (COMPAT && BINFMT_ELF)
-
-so I was trying to fix it.  We have:
-
-IA32_EMULATION selects COMPAT_BINFMT_ELF
-COMPAT_BINFMT_ELF depends on COMPAT && BINFMT_ELF
-COMPAT depends on IA32_EMULATION
-
-Is this not circular?  or is it just almost circular?  or am I just
-confuzed?
-
-Suggestions?
-
-thanks,
+Signed-off-by: Eduardo Silva <edsiper@gmail.com>
 ---
-~Randy
+ scripts/kconfig/gconf.c |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/scripts/kconfig/gconf.c b/scripts/kconfig/gconf.c
+index 4558961..0c8db7d 100644
+--- a/scripts/kconfig/gconf.c
++++ b/scripts/kconfig/gconf.c
+@@ -253,7 +253,7 @@ void init_left_tree(void)
+ 
+ 	gtk_tree_view_set_model(view, model1);
+ 	gtk_tree_view_set_headers_visible(view, TRUE);
+-	gtk_tree_view_set_rules_hint(view, FALSE);
++	gtk_tree_view_set_rules_hint(view, TRUE);
+ 
+ 	column = gtk_tree_view_column_new();
+ 	gtk_tree_view_append_column(view, column);
+@@ -298,7 +298,7 @@ void init_right_tree(void)
+ 
+ 	gtk_tree_view_set_model(view, model2);
+ 	gtk_tree_view_set_headers_visible(view, TRUE);
+-	gtk_tree_view_set_rules_hint(view, FALSE);
++	gtk_tree_view_set_rules_hint(view, TRUE);
+ 
+ 	column = gtk_tree_view_column_new();
+ 	gtk_tree_view_append_column(view, column);
+-- 
+1.7.4.1
+
+
+
