@@ -1,61 +1,67 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pz0-f46.google.com ([209.85.210.46]:38472 "EHLO
-	mail-pz0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752948Ab1EUIWK (ORCPT
+Received: from mail-vx0-f174.google.com ([209.85.220.174]:62652 "EHLO
+	mail-vx0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756029Ab1EUMpI (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 21 May 2011 04:22:10 -0400
-From: Jim Cromie <jim.cromie@gmail.com>
-Subject: [PATCH 2/3] sort SECTION 2 output of scripts/export_report.pl
-Date: Sat, 21 May 2011 02:21:47 -0600
-Message-Id: <1305966108-13399-3-git-send-email-jim.cromie@gmail.com>
-In-Reply-To: <1305966108-13399-1-git-send-email-jim.cromie@gmail.com>
-References: <1305966108-13399-1-git-send-email-jim.cromie@gmail.com>
+	Sat, 21 May 2011 08:45:08 -0400
+Received: by vxi39 with SMTP id 39so3199992vxi.19
+        for <linux-kbuild@vger.kernel.org>; Sat, 21 May 2011 05:45:08 -0700 (PDT)
+MIME-Version: 1.0
+Date: Sat, 21 May 2011 20:45:07 +0800
+Message-ID: <BANLkTi=7AiRbsVojWr=7VVS41EyFXaASGw@mail.gmail.com>
+Subject: question about kbuild system
+From: os user <gnusercn@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: linux-kbuild@vger.kernel.org, Jim Cromie <jim.cromie@gmail.com>
+To: linux-kbuild@vger.kernel.org
 
-Sort SECTION 2 modules by name.  Within those module listings, sort
-the symbol providers by name, and remove the count, as it is
-misleading; its the kernel-wide count of uses of that symbol, not the
-count pertaining to the module being outlined.  (this can be seen by
-grepping the output for a single symbol).  The count is still used to
-sort the symbols.
+Hi list,
 
-Signed-off-by: Jim Cromie <jim.cromie@gmail.com>
----
- scripts/export_report.pl |    8 +++++---
- 1 files changed, 5 insertions(+), 3 deletions(-)
+I have a question about the kbuild system. On ARM architecture, after
+running "make s3c6400_defconfig", I do "make -d -j1 uImage". I found,
 
-diff --git a/scripts/export_report.pl b/scripts/export_report.pl
-index 5499ff0..16bd240 100644
---- a/scripts/export_report.pl
-+++ b/scripts/export_report.pl
-@@ -25,11 +25,12 @@ sub alphabetically {
- sub print_depends_on {
- 	my ($href) = @_;
- 	print "\n";
--	while (my ($mod, $list) = each %$href) {
-+	for my $mod (sort keys %$href) {
-+		my $list = $href->{$mod};
- 		print "\t$mod:\n";
- 		foreach my $sym (sort numerically @{$list}) {
- 			my ($symbol, $no) = split /\s+/, $sym;
--			printf("\t\t%-25s\t%-25d\n", $symbol, $no);
-+			printf("\t\t%-25s\n", $symbol);
- 		}
- 		print "\n";
- 	}
-@@ -166,7 +167,8 @@ modules. Each module lists the modules, and the symbols from that module that
- it uses.  Each listed symbol reports the number of modules using it\n");
- 
- print "~"x80 , "\n";
--while (my ($thismod, $list) = each %MODULE) {
-+for my $thismod (sort keys %MODULE) {
-+	my $list = $MODULE{$thismod};
- 	my %depends;
- 	$thismod =~ s/\.mod\.c/.ko/;
- 	print "\t\t\t$thismod\n";
--- 
-1.7.4.1
+[...]
 
+Putting child 0x0255c0b0 (scripts_basic) PID 23546 on the chain.
+Live child 0x0255c0b0 (scripts_basic) PID 23546
+GNU Make 3.81
+Copyright (C) 2006  Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.
+There is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.
+
+This program built for x86_64-pc-linux-gnu
+Reading makefiles...
+Reading makefile `scripts/Makefile.build'...
+Reading makefile `include/config/auto.conf' (search path) (don't care)
+(no ~ expansion)...
+Reading makefile `scripts/Kbuild.include' (search path) (no ~ expansion)...
+Reading makefile
+`/home/eric/tmp/linux-2.6.37.1/scripts/basic/Makefile' (search path)
+(no ~ expansion)...
+Reading makefile `scripts/Makefile.lib' (search path) (no ~ expansion)...
+Reading makefile `scripts/Makefile.host' (search path) (no ~ expansion)...
+Reading makefile `scripts/basic/.docproc.cmd' (search path) (no ~ expansion)...
+Reading makefile `scripts/basic/.fixdep.cmd' (search path) (no ~ expansion)...
+Updating makefiles....
+ Considering target file `scripts/basic/.fixdep.cmd'.
+  Looking for an implicit rule for `scripts/basic/.fixdep.cmd'.
+  Trying pattern rule with stem `.fixdep.cmd'.
+  Trying implicit prerequisite `scripts/basic/.fixdep.cmd_shipped'.
+  No implicit rule found for `scripts/basic/.fixdep.cmd'.
+  Finished prerequisites of target file `scripts/basic/.fixdep.cmd'.
+ No need to remake target `scripts/basic/.fixdep.cmd'.
+Considering target file `scripts/basic/.docproc.cmd'.
+[...]
+
+I'm just curious where is the definition for  <implicit prerequisite
+`scripts/basic/.fixdep.cmd_shipped'> ?
+Normally Gnu Make will try a lot of internal rules to deal with
+<`scripts/basic/.fixdep.cmd'>, why here Gnu Make stop
+trying internal ruls so quickly?
+
+Thanks
+
+BR
+g
