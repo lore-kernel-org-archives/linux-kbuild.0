@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pv0-f174.google.com ([74.125.83.174]:35391 "EHLO
-	mail-pv0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753043Ab1EUIWK (ORCPT
+Received: from mail-pz0-f46.google.com ([209.85.210.46]:38472 "EHLO
+	mail-pz0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752799Ab1EUIWI (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 21 May 2011 04:22:10 -0400
+	Sat, 21 May 2011 04:22:08 -0400
 From: Jim Cromie <jim.cromie@gmail.com>
-Subject: [PATCH 3/3] in scripts/export_report.pl use warn() to issue WARNING, so they go to stderr.
-Date: Sat, 21 May 2011 02:21:48 -0600
-Message-Id: <1305966108-13399-4-git-send-email-jim.cromie@gmail.com>
+Subject: [PATCH 1/3] do collectcfiles work in perl itself, eschew shell pipeline
+Date: Sat, 21 May 2011 02:21:46 -0600
+Message-Id: <1305966108-13399-2-git-send-email-jim.cromie@gmail.com>
 In-Reply-To: <1305966108-13399-1-git-send-email-jim.cromie@gmail.com>
 References: <1305966108-13399-1-git-send-email-jim.cromie@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,49 +15,50 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org
 Cc: linux-kbuild@vger.kernel.org, Jim Cromie <jim.cromie@gmail.com>
 
-Also count CONFIG_MODVERSION warnings, and print an NB message at
-start of SECTION 2 if any were issued.  Section 2 will be empty
-if the build is lacking this CONFIG_ item, and user may have missed
-the warnings, as they're off screen.
+avoid spawning a shell pipeline doing cat, grep, sed,
+and do it all inside perl.  The <*.c> construct works
+at least as far back as 5.8.9
+
+Note that this is not just an optimization; the sed command
+in the pipeline was unterminated, due to lack of escape on the
+end-of-line (\$) in the regex, resulting in this:
+
+    $ perl ../linux-2.6/scripts/export_report.pl  > /dev/null
+    sed: -e expression #1, char 5: unterminated `s' command
+    sh: .mod.c/: not found
+
+Comments on an earlier patch sought an all-perl implementation.
 
 Signed-off-by: Jim Cromie <jim.cromie@gmail.com>
+cc: Michal Marek <mmarek@suse.cz>,
+cc: linux-kbuild@vger.kernel.org
+cc: Arnaud Lacombe lacombar@gmail.com
+cc: Stephen Hemminger shemminger@vyatta.com
 ---
- scripts/export_report.pl |    8 +++++++-
- 1 files changed, 7 insertions(+), 1 deletions(-)
+ scripts/export_report.pl |   10 ++++++++--
+ 1 files changed, 8 insertions(+), 2 deletions(-)
 
 diff --git a/scripts/export_report.pl b/scripts/export_report.pl
-index 16bd240..14c1638 100644
+index 04dce7c..5499ff0 100644
 --- a/scripts/export_report.pl
 +++ b/scripts/export_report.pl
-@@ -102,6 +102,8 @@ close($module_symvers);
- #
- # collect the usage count of each symbol.
- #
-+my $modversion_warnings = 0;
-+
- foreach my $thismod (@allcfiles) {
- 	my $module;
- 
-@@ -132,7 +134,8 @@ foreach my $thismod (@allcfiles) {
- 		}
- 	}
- 	if ($state != 2) {
--		print "WARNING:$thismod is not built with CONFIG_MODVERSION enabled\n";
-+		warn "WARNING:$thismod is not built with CONFIG_MODVERSION enabled\n";
-+		$modversion_warnings++;
- 	}
- 	close($module);
+@@ -49,8 +49,14 @@ sub usage {
  }
-@@ -166,6 +169,9 @@ printf("SECTION 2:\n\tThis section reports export-symbol-usage of in-kernel
- modules. Each module lists the modules, and the symbols from that module that
- it uses.  Each listed symbol reports the number of modules using it\n");
  
-+print "\nNB: Got $modversion_warnings CONFIG_MODVERSION warnings\n\n"
-+    if $modversion_warnings;
-+
- print "~"x80 , "\n";
- for my $thismod (sort keys %MODULE) {
- 	my $list = $MODULE{$thismod};
+ sub collectcfiles {
+-    my @file
+-	= `cat .tmp_versions/*.mod | grep '.*\.ko\$' | sed s/\.ko$/.mod.c/`;
++    my @file;
++    while (<.tmp_versions/*.mod>) {
++	open my $fh, '<', $_ or die "cant open $_: $!\n";
++	push (@file,
++	      grep s/\.ko/.mod.c/,	# change the suffix
++	      grep m/.+\.ko/,		# find the .ko path
++	      <$fh>);			# lines in opened file
++    }
+     chomp @file;
+     return @file;
+ }
 -- 
 1.7.4.1
 
