@@ -1,63 +1,81 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-iw0-f174.google.com ([209.85.214.174]:51941 "EHLO
-	mail-iw0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751786Ab1EWIjk convert rfc822-to-8bit (ORCPT
+Received: from r-mail2.rd.francetelecom.com ([217.108.152.42]:53801 "EHLO
+	r-mail2.rd.francetelecom.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1750883Ab1EWJEy (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 23 May 2011 04:39:40 -0400
-Received: by iwn34 with SMTP id 34so4568626iwn.19
-        for <linux-kbuild@vger.kernel.org>; Mon, 23 May 2011 01:39:40 -0700 (PDT)
+	Mon, 23 May 2011 05:04:54 -0400
+From: "Yann E. MORIN" <yann.morin.1998@anciens.enib.fr>
+Subject: Re: [RFCv2 07/13] kconfig: back-out parser prefix, from `zconf' to `yy'
+Date: Mon, 23 May 2011 10:54:47 +0200
+References: <1306138239-13440-1-git-send-email-lacombar@gmail.com> <1306138239-13440-8-git-send-email-lacombar@gmail.com>
+In-Reply-To: <1306138239-13440-8-git-send-email-lacombar@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <1306138239-13440-1-git-send-email-lacombar@gmail.com>
-References: <1306138239-13440-1-git-send-email-lacombar@gmail.com>
-Date: Mon, 23 May 2011 04:39:39 -0400
-Message-ID: <BANLkTiny1XfELLD8g5FFieLdU045BGe_ZA@mail.gmail.com>
-Subject: Re: [RFCv2 00/13] Kbuild: factor parser rules
-From: Arnaud Lacombe <lacombar@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain;
+  charset="iso-8859-1"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+Message-Id: <201105231054.47573.yann.morin.1998@anciens.enib.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Michal Marek <mmarek@suse.cz>, Arnaud Lacombe <lacombar@gmail.com>, David Gibson <david@gibson.dropbear.id.au>
+To: Arnaud Lacombe <lacombar@gmail.com>
+Cc: linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>
 
-Hi,
+Arnaud, All,
 
-On Mon, May 23, 2011 at 4:10 AM, Arnaud Lacombe <lacombar@gmail.com> wrote:
-> Hi,
-> [...]
-> A few notes:
->  - the parser should not include the lexer; however, this has the advantage to
->   avoid having to deals with the parser's header.
-fixed in https://github.com/lacombar/linux-2.6/commits/kbuild-implicit-parser-rule.
+On Monday 23 May 2011 101033 Arnaud Lacombe wrote:
+> ---
+>  scripts/kconfig/lkc.h   |    2 +-
+>  scripts/kconfig/zconf.l |   16 ++++++++--------
+>  scripts/kconfig/zconf.y |   22 +++++++++++-----------
+>  3 files changed, 20 insertions(+), 20 deletions(-)
+> 
+> diff --git a/scripts/kconfig/lkc.h b/scripts/kconfig/lkc.h
+> index febf0c9..716c36c 100644
+> --- a/scripts/kconfig/lkc.h
+> +++ b/scripts/kconfig/lkc.h
+> @@ -69,7 +69,7 @@ struct kconf_id {
+>  };
+>  
+>  #ifdef YYDEBUG
+> -extern int zconfdebug;
+> +extern int yyebug;
 
-new diffstat:
+Missing 'd' in yyebug, maybe? See below...
 
-% git ds -M v2.6.39..HEAD
- scripts/Makefile.lib                               |   38 ++-
- scripts/dtc/Makefile                               |   23 -
- scripts/dtc/dtc-lexer.lex.c_shipped                |   59 +---
- scripts/dtc/dtc-parser.tab.c_shipped               |  116 +----
- scripts/dtc/dtc-parser.tab.h_shipped               |   11 +-
- scripts/genksyms/.gitignore                        |    7 +-
- scripts/genksyms/Makefile                          |   48 +--
- scripts/genksyms/keywords.gperf                    |    3 +
- ...{keywords.c_shipped => keywords.hash.c_shipped} |   96 ++--
- scripts/genksyms/lex.l                             |    4 +-
- .../genksyms/{lex.c_shipped => lex.lex.c_shipped}  |  359 +--------------
- .../{parse.c_shipped => parse.tab.c_shipped}       |  198 +-------
- .../{parse.h_shipped => parse.tab.h_shipped}       |    7 +-
- scripts/kconfig/.gitignore                         |    2 +-
- scripts/kconfig/Makefile                           |   31 +--
- scripts/kconfig/lkc.h                              |    4 +-
- scripts/kconfig/zconf.gperf                        |    2 +-
- scripts/kconfig/zconf.hash.c_shipped               |  273 +++++++-----
- scripts/kconfig/zconf.l                            |   20 +-
- .../{lex.zconf.c_shipped => zconf.lex.c_shipped}   |  493 +++++++++-----------
- scripts/kconfig/zconf.tab.c_shipped                |  102 ++---
- .../zconf.tab.h_shipped}                           |   96 ++--
- scripts/kconfig/zconf.y                            |   44 +-
- 23 files changed, 668 insertions(+), 1368 deletions(-)
+[--SNIP--]
+> diff --git a/scripts/kconfig/zconf.y b/scripts/kconfig/zconf.y
+> index 98c5716..8564238 100644
+> --- a/scripts/kconfig/zconf.y
+> +++ b/scripts/kconfig/zconf.y
+> @@ -21,10 +21,10 @@
+>  
+>  int cdebug = PRINTD;
+>  
+> -extern int zconflex(void);
+> +extern int yylex(void);
+>  static void zconfprint(const char *err, ...);
+>  static void zconf_error(const char *err, ...);
+> -static void zconferror(const char *err);
+> +static void yyerror(const char *err);
+>  static bool zconf_endtoken(const struct kconf_id *id, int starttoken, int endtoken);
+>  
+>  struct symbol *symbol_hash[SYMBOL_HASHSIZE];
+> @@ -505,10 +505,10 @@ void conf_parse(const char *name)
+>  
+>  #if YYDEBUG
+>  	if (getenv("ZCONF_DEBUG"))
+> -		zconfdebug = 1;
+> +		yydebug = 1;
 
-That should remove any incompatibilities with the upstream dtc tree.
+... here we use yydebug with a 'd'.
 
- - Arnaud
+Regards,
+Yann E. MORIN.
+
+-- 
+.-----------------.--------------------.------------------.--------------------.
+|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
+| +0/33 662376056 | Software  Designer | \ / CAMPAIGN     |   ^                |
+| --==< O_o >==-- '------------.-------:  X  AGAINST      |  /e\  There is no  |
+| http://ymorin.is-a-geek.org/ | (*_*) | / \ HTML MAIL    |  """  conspiracy.  |
+'------------------------------'-------'------------------'--------------------'
