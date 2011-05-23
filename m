@@ -1,47 +1,89 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:59254 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752438Ab1EWLwd (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 23 May 2011 07:52:33 -0400
-Message-ID: <4DDA4A80.7040406@suse.cz>
-Date: Mon, 23 May 2011 13:52:32 +0200
-From: Michal Marek <mmarek@suse.cz>
-MIME-Version: 1.0
-Subject: Re: question about kbuild system
-References: <BANLkTi=7AiRbsVojWr=7VVS41EyFXaASGw@mail.gmail.com>
-In-Reply-To: <BANLkTi=7AiRbsVojWr=7VVS41EyFXaASGw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Received: from oproxy7-pub.bluehost.com ([67.222.55.9]:55759 "HELO
+	oproxy7-pub.bluehost.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with SMTP id S1752758Ab1EWPVG (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 23 May 2011 11:21:06 -0400
+Date: Mon, 23 May 2011 08:21:03 -0700
+From: Randy Dunlap <rdunlap@xenotime.net>
+Subject: Re: [PATCH 3/3] in scripts/export_report.pl use warn() to issue
+ WARNING, so they go to stderr.
+Message-Id: <20110523082103.ccced65c.rdunlap@xenotime.net>
+In-Reply-To: <1305966108-13399-4-git-send-email-jim.cromie@gmail.com>
+References: <1305966108-13399-1-git-send-email-jim.cromie@gmail.com>
+	<1305966108-13399-4-git-send-email-jim.cromie@gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: os user <gnusercn@gmail.com>
-Cc: linux-kbuild@vger.kernel.org
+To: Jim Cromie <jim.cromie@gmail.com>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-On 21.5.2011 14:45, os user wrote:
-[...]
->   Considering target file `scripts/basic/.fixdep.cmd'.
->    Looking for an implicit rule for `scripts/basic/.fixdep.cmd'.
->    Trying pattern rule with stem `.fixdep.cmd'.
->    Trying implicit prerequisite `scripts/basic/.fixdep.cmd_shipped'.
->    No implicit rule found for `scripts/basic/.fixdep.cmd'.
->    Finished prerequisites of target file `scripts/basic/.fixdep.cmd'.
->   No need to remake target `scripts/basic/.fixdep.cmd'.
-> Considering target file `scripts/basic/.docproc.cmd'.
-> [...]
->
-> I'm just curious where is the definition for<implicit prerequisite
-> `scripts/basic/.fixdep.cmd_shipped'>  ?
-> Normally Gnu Make will try a lot of internal rules to deal with
-> <`scripts/basic/.fixdep.cmd'>, why here Gnu Make stop
-> trying internal ruls so quickly?
+On Sat, 21 May 2011 02:21:48 -0600 Jim Cromie wrote:
 
-Internal rules are disabled in kbuild, see the toplevel Makefile:
-# Do not:
-# o  use make's built-in rules and variables
-#    (this increases performance and avoids hard-to-debug behaviour);
-# o  print "Entering directory ...";
-MAKEFLAGS += -rR --no-print-directory
+> Also count CONFIG_MODVERSION warnings, and print an NB message at
 
-The rule for _shipped files is in scripts/Makefile.lib
+CONFIG_MODVERSIONS
 
-Michal
+NB?  as in Note Well?
+
+Please just use NOTE:
+
+> start of SECTION 2 if any were issued.  Section 2 will be empty
+> if the build is lacking this CONFIG_ item, and user may have missed
+> the warnings, as they're off screen.
+> 
+> Signed-off-by: Jim Cromie <jim.cromie@gmail.com>
+> ---
+>  scripts/export_report.pl |    8 +++++++-
+>  1 files changed, 7 insertions(+), 1 deletions(-)
+> 
+> diff --git a/scripts/export_report.pl b/scripts/export_report.pl
+> index 16bd240..14c1638 100644
+> --- a/scripts/export_report.pl
+> +++ b/scripts/export_report.pl
+> @@ -102,6 +102,8 @@ close($module_symvers);
+>  #
+>  # collect the usage count of each symbol.
+>  #
+> +my $modversion_warnings = 0;
+> +
+>  foreach my $thismod (@allcfiles) {
+>  	my $module;
+>  
+> @@ -132,7 +134,8 @@ foreach my $thismod (@allcfiles) {
+>  		}
+>  	}
+>  	if ($state != 2) {
+> -		print "WARNING:$thismod is not built with CONFIG_MODVERSION enabled\n";
+> +		warn "WARNING:$thismod is not built with CONFIG_MODVERSION enabled\n";
+
+should be CONFIG_MODVERSIONS
+
+> +		$modversion_warnings++;
+>  	}
+>  	close($module);
+>  }
+> @@ -166,6 +169,9 @@ printf("SECTION 2:\n\tThis section reports export-symbol-usage of in-kernel
+>  modules. Each module lists the modules, and the symbols from that module that
+>  it uses.  Each listed symbol reports the number of modules using it\n");
+>  
+> +print "\nNB: Got $modversion_warnings CONFIG_MODVERSION warnings\n\n"
+
+should be CONFIG_MODVERSIONS
+
+and NOTE:
+
+
+> +    if $modversion_warnings;
+> +
+>  print "~"x80 , "\n";
+>  for my $thismod (sort keys %MODULE) {
+>  	my $list = $MODULE{$thismod};
+> -- 
+
+
+---
+~Randy
+*** Remember to use Documentation/SubmitChecklist when testing your code ***
