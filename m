@@ -1,50 +1,37 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor.suse.de ([195.135.220.2]:45976 "EHLO mx1.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:51759 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1756110Ab1EXNX3 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 24 May 2011 09:23:29 -0400
-Message-ID: <4DDBB150.2090602@suse.cz>
-Date: Tue, 24 May 2011 15:23:28 +0200
+	id S1756664Ab1EXNzb (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 24 May 2011 09:55:31 -0400
+Date: Tue, 24 May 2011 15:55:29 +0200
 From: Michal Marek <mmarek@suse.cz>
+Subject: Re: [PATCH 1/2] gconfig: enable rules hint for main treeviews
+Message-ID: <20110524135529.GA2276@sepie.suse.cz>
+References: <1305808621.11775.3.camel@monotop>
+ <20110519091309.ebeacbfb.randy.dunlap@oracle.com>
 MIME-Version: 1.0
-Subject: Re: [PATCH] Kconfig: add warning about permission of config file
-References: <1306167401.18840.8.camel@hiromu-MacBook>	 <BANLkTikhFdd_PRzCg3w9HD1TO=cmdmm6_A@mail.gmail.com> <1306242400.7501.10.camel@hiromu-MacBook>
-In-Reply-To: <1306242400.7501.10.camel@hiromu-MacBook>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20110519091309.ebeacbfb.randy.dunlap@oracle.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Hiromu Yakura <hiromu1996@gmail.com>
-Cc: Arnaud Lacombe <lacombar@gmail.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, zippel@linux-m68k.org
+To: Randy Dunlap <randy.dunlap@oracle.com>
+Cc: Eduardo Silva <edsiper@gmail.com>, Roman Zippel <zippel@linux-m68k.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On 24.5.2011 15:06, Hiromu Yakura wrote:
-> Hello,
-> thanks for replying.
->
-> On Mon, May 23, 2011 at 13:58, Arnaud Lacombe<lacombar@gmail.com>  wrote:
->> Do you have a precise way to reproduce this, in particular which
->> target is involved ? I tried to `chmod 555' the kernel root directory,
->> re-ran `conf' (through the `defconfig' target) and `mconf' (manually
->> for this one, as check-lxdialog.sh fails when invoked though make).
->> The former failed with:
->>
->> *** Error during writing of the configuration.
->>
->> gmake[1]: *** [defconfig] Error 1
->> gmake: *** [defconfig] Error 2
-> In my environment, this patch is working properly.
-> The output is as follows:
->
-> hiromu@hiromu-MacBook:/usr/src/linux-2.6$ ls -ld .
-> dr-xr-sr-x 25 hiromu hiromu 4096 May 24 21:41 .
-> hiromu@hiromu-MacBook:/usr/src/linux-2.6$ make defconfig
-> *** Default configuration is based on 'x86_64_defconfig'
-> *** Permission denied to write the configuration.
+On Thu, May 19, 2011 at 09:13:09AM -0700, Randy Dunlap wrote:
+> On Thu, 19 May 2011 08:37:01 -0400 Eduardo Silva wrote:
+> 
+> > Due to the large amount of rows in the treeviews, is difficult to
+> > match columns with rows, setting the rules hint to 'true' allows the
+> > treeview to alternate background colors in the rows making the data
+> > more readable.
+> > 
+> > Signed-off-by: Eduardo Silva <edsiper@gmail.com>
+> 
+> Tested-by: Randy Dunlap <randy.dunlap@oracle.com>
+> 
+> Nice.  Thanks.
 
-Arnaud's point is that your patch should not be necessary at all, 
-because kconfig already checks the return value of the fopen() call in 
-conf_write() and prints the above message if it fails. So do you have a 
-testcase where make <...>config without your patch returns without 
-error, but the configuration is not written?
+Applied, thanks.
 
 Michal
