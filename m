@@ -1,45 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pz0-f46.google.com ([209.85.210.46]:37973 "EHLO
-	mail-pz0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755704Ab1EXRxf convert rfc822-to-8bit (ORCPT
+Received: from mail-gw0-f46.google.com ([74.125.83.46]:49164 "EHLO
+	mail-gw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753777Ab1EXR7k (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 24 May 2011 13:53:35 -0400
+	Tue, 24 May 2011 13:59:40 -0400
 MIME-Version: 1.0
-In-Reply-To: <20110524141031.GC2276@sepie.suse.cz>
-References: <1305966108-13399-4-git-send-email-jim.cromie@gmail.com>
- <1306176297-6964-1-git-send-email-jim.cromie@gmail.com> <20110524141031.GC2276@sepie.suse.cz>
-From: Jim Cromie <jim.cromie@gmail.com>
-Date: Tue, 24 May 2011 11:53:05 -0600
-Message-ID: <BANLkTimoMJXG1jGmZcupgYEHa0Pd6d_0BA@mail.gmail.com>
-Subject: Re: [PATCH 0/3 rev2] fix scripts/export_report.pl
+In-Reply-To: <1306258716.7501.35.camel@hiromu-MacBook>
+References: <1306167401.18840.8.camel@hiromu-MacBook>
+	<BANLkTikhFdd_PRzCg3w9HD1TO=cmdmm6_A@mail.gmail.com>
+	<1306242400.7501.10.camel@hiromu-MacBook>
+	<4DDBB150.2090602@suse.cz>
+	<1306247192.7501.25.camel@hiromu-MacBook>
+	<4DDBC846.8050402@suse.cz>
+	<BANLkTin5ZDt5ZeckOJ2WsNUZm6mxmYiRwQ@mail.gmail.com>
+	<1306258716.7501.35.camel@hiromu-MacBook>
+Date: Tue, 24 May 2011 13:59:39 -0400
+Message-ID: <BANLkTikFT17GOgV1UJTFxEG+P2X-u4ZJjw@mail.gmail.com>
+Subject: Re: [PATCH] Kconfig: add warning about permission of config file
+From: Arnaud Lacombe <lacombar@gmail.com>
 Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: rdunlap@xenotime.net, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: Hiromu Yakura <hiromu1996@gmail.com>
+Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, zippel@linux-m68k.org
 
-On Tue, May 24, 2011 at 8:10 AM, Michal Marek <mmarek@suse.cz> wrote:
+Hi,
 
-> Applied to kbuild-2.6.git#misc after editing the subject lines a bit:
+On Tue, May 24, 2011 at 1:38 PM, Hiromu Yakura <hiromu1996@gmail.com> wrote:
+> On Tue, May 24, 2011, at 0:50, Arnaud Lacombe <lacombar@gmail.com>
+> wrote:
+>> On Tue, May 24, 2011 at 11:01 AM, Michal Marek <mmarek@suse.cz> wrote:
+>> > I see, qconf lacks a check for the return value of conf_write() in
+>> > ConfigMainWindow::closeEvent(), gconf does check the return value, but only
+>> > displays it in the bottom box of the main window instead of a message box.
+>> > Neither of them return failure in the error case. These bugs should be
+>> > indeed fixed.
+>> >
+>> agree.
+>>
+>> > But I don't like the directory permission check, it only
+>> > handles one case, but does not handle permission on the .config file itself
+>> > with KCONFIG_OVERWRITECONFIG=1, ENOSPC and so on.
+>> >
+>> seconded.
+> I'm sorry for forgetting to handle a case which was set KCONFIG_OVERWRITECONFIG.
+> So I rewrote the patch and attach it.
 >
-> Jim Cromie (3):
->      export_report: do collectcfiles work in perl itself
->      export_report: sort SECTION 2 output
->      export_report: use warn() to issue WARNING, so they go to stderr
+> Thanks for your advice.
 >
-> Michal
+> Signed-off-by: Hiromu Yakura <hiromu1996@gmail.com>
 >
+Let me re-state: your patch does not handle all the case where
+conf_write() may fails, and I do not think we want to preemptively
+check for all errors open(2) may return.
 
-thanks,
-
-can you point to the tree ?
-(I want to see what rewording is better)
-
-I didnt see it at git.kernel.org, nor where MAINTAINERS entry points
-(at least after converting it to http)
-
-T:	git git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild-2.6.git
-for-next
-T:	git git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild-2.6.git
-rc-fixes
+ - Arnaud
