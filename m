@@ -1,36 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:52311 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752653Ab1EXOKd (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 24 May 2011 10:10:33 -0400
-Date: Tue, 24 May 2011 16:10:31 +0200
-From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [PATCH 0/3 rev2] fix scripts/export_report.pl
-Message-ID: <20110524141031.GC2276@sepie.suse.cz>
-References: <1305966108-13399-4-git-send-email-jim.cromie@gmail.com>
- <1306176297-6964-1-git-send-email-jim.cromie@gmail.com>
+Received: from mail-iy0-f174.google.com ([209.85.210.174]:53124 "EHLO
+	mail-iy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932413Ab1EXOQL (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 24 May 2011 10:16:11 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1306176297-6964-1-git-send-email-jim.cromie@gmail.com>
+In-Reply-To: <4DD0E06C.2040009@suse.cz>
+References: <1305516176-4072-1-git-send-email-lacombar@gmail.com>
+	<4DD0E06C.2040009@suse.cz>
+Date: Tue, 24 May 2011 10:16:11 -0400
+Message-ID: <BANLkTi=bZe6T9hM+bUMBM1Jy5xVHP2x9cg@mail.gmail.com>
+Subject: Re: [PATCH] kconfig: do not record timestamp in .config
+From: Arnaud Lacombe <lacombar@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jim Cromie <jim.cromie@gmail.com>
-Cc: rdunlap@xenotime.net, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Mon, May 23, 2011 at 12:44:54PM -0600, Jim Cromie wrote:
-> thanks Randy,
-> 
-> rev2 fixes:
-> NB -> NOTE
-> cant -> cannot
-> CONFIG_MODVERSION -> CONFIG_MODVERSIONS (everywhere)
+Hi Michal,
 
-Applied to kbuild-2.6.git#misc after editing the subject lines a bit:
+2011/5/16 Michal Marek <mmarek@suse.cz>:
+> On 16.5.2011 05:22, Arnaud Lacombe wrote:
+>>
+>> Hi Michal,
+>>
+>> The following patch removes the timestamp in .config file. This is a
+>> prerequiresite for the revised version of the printer merge I sent back
+>> in December[0]. The issue is that heading comment generations will be
+>> merged in a single function, and that would revert the deterministic
+>> change you made in mid-April.
+>>
+>> The other options are either to have timestamp always enabled and
+>> disable them selectively, but that might be a pain to implement, or to
+>> have timestamp disable by default and an environment variable, say
+>> KCONFIG_TIMESTAMP, to turn everything on manually.
+>
+> I personally am not a big fan of embedded timestamps, so
+>
+> Acked-by: Michal Marek <mmarek@suse.cz>
+>
+Do you intend to merge that patch for .1 (or whatever Linus decides to
+call the next kernel) ?
 
-Jim Cromie (3):
-      export_report: do collectcfiles work in perl itself
-      export_report: sort SECTION 2 output
-      export_report: use warn() to issue WARNING, so they go to stderr
-
-Michal
+ - Arnaud
