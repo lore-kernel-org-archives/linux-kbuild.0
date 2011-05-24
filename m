@@ -1,30 +1,36 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor.suse.de ([195.135.220.2]:47275 "EHLO mx1.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:52311 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1756332Ab1EXNzr (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 24 May 2011 09:55:47 -0400
-Date: Tue, 24 May 2011 15:55:45 +0200
+	id S1752653Ab1EXOKd (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 24 May 2011 10:10:33 -0400
+Date: Tue, 24 May 2011 16:10:31 +0200
 From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [PATCH 2/2] gconfig: Hide unused left treeview when start up the
- interface
-Message-ID: <20110524135545.GB2276@sepie.suse.cz>
-References: <1305808705.11775.4.camel@monotop>
+Subject: Re: [PATCH 0/3 rev2] fix scripts/export_report.pl
+Message-ID: <20110524141031.GC2276@sepie.suse.cz>
+References: <1305966108-13399-4-git-send-email-jim.cromie@gmail.com>
+ <1306176297-6964-1-git-send-email-jim.cromie@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1305808705.11775.4.camel@monotop>
+In-Reply-To: <1306176297-6964-1-git-send-email-jim.cromie@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Eduardo Silva <edsiper@gmail.com>
-Cc: Roman Zippel <zippel@linux-m68k.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Jim Cromie <jim.cromie@gmail.com>
+Cc: rdunlap@xenotime.net, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-On Thu, May 19, 2011 at 08:38:25AM -0400, Eduardo Silva wrote:
-> When the gconfig program starts in full mode view, it shows the
-> left treeview which belongs to the 'split mode view'. The patch
-> fix this visual issue.
+On Mon, May 23, 2011 at 12:44:54PM -0600, Jim Cromie wrote:
+> thanks Randy,
 > 
-> Signed-off-by: Eduardo Silva <edsiper@gmail.com>
+> rev2 fixes:
+> NB -> NOTE
+> cant -> cannot
+> CONFIG_MODVERSION -> CONFIG_MODVERSIONS (everywhere)
 
-Applied, thanks.
+Applied to kbuild-2.6.git#misc after editing the subject lines a bit:
+
+Jim Cromie (3):
+      export_report: do collectcfiles work in perl itself
+      export_report: sort SECTION 2 output
+      export_report: use warn() to issue WARNING, so they go to stderr
 
 Michal
