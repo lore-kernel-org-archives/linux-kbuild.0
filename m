@@ -1,126 +1,62 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from dd12738.kasserver.com ([85.13.134.246]:45025 "EHLO
-	dd12738.kasserver.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751635Ab1EXUkK (ORCPT
+Received: from mail-pv0-f174.google.com ([74.125.83.174]:60587 "EHLO
+	mail-pv0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752334Ab1EXUqz (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 24 May 2011 16:40:10 -0400
-Received: from dd12738.kasserver.com (dd0800.kasserver.com [85.13.143.204])
-	by dd12738.kasserver.com (Postfix) with SMTP id CF171D602BD
-	for <linux-kbuild@vger.kernel.org>; Tue, 24 May 2011 22:29:35 +0200 (CEST)
-Subject: kernel=?UTF-8?B?IA==?=build=?UTF-8?B?IA==?=issue=?UTF-8?B?IA==?=whith=?UTF-8?B?ICI=?=make=?UTF-8?B?IA==?=tar-pkg=?UTF-8?B?IiA=?=with=?UTF-8?B?IA==?=INSTALL=?UTF-8?B?Xw==?=FW=?UTF-8?B?Xw==?=PATH=?UTF-8?B?IFs=?=patch=?UTF-8?B?IA==?=included=?UTF-8?B?XQ==?=
-from: "Maximilian Pasternak" <m.kbuild@bluescreen.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Message-Id: <20110524202935.CF171D602BD@dd12738.kasserver.com>
-Date: Tue, 24 May 2011 22:29:35 +0200 (CEST)
+	Tue, 24 May 2011 16:46:55 -0400
+Subject: Re: [PATCH] Kconfig: add warning about permission of config file
+From: Hiromu Yakura <hiromu1996@gmail.com>
+In-Reply-To: <BANLkTikFT17GOgV1UJTFxEG+P2X-u4ZJjw@mail.gmail.com>
+References: <1306167401.18840.8.camel@hiromu-MacBook>
+	 <BANLkTikhFdd_PRzCg3w9HD1TO=cmdmm6_A@mail.gmail.com>
+	 <1306242400.7501.10.camel@hiromu-MacBook> <4DDBB150.2090602@suse.cz>
+	 <1306247192.7501.25.camel@hiromu-MacBook> <4DDBC846.8050402@suse.cz>
+	 <BANLkTin5ZDt5ZeckOJ2WsNUZm6mxmYiRwQ@mail.gmail.com>
+	 <1306258716.7501.35.camel@hiromu-MacBook>
+	 <BANLkTikFT17GOgV1UJTFxEG+P2X-u4ZJjw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Date: Wed, 25 May 2011 05:46:50 +0900
+Message-ID: <1306270010.7501.43.camel@hiromu-MacBook>
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
+To: Arnaud Lacombe <lacombar@gmail.com>
+Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, zippel@linux-m68k.org
 
-Hello,
-
-i sent this some time ago to "linux-kernel" but did not get an answer
-so i try it again - hopefully this is the right list.
-
-I found "make tar-pkg" with set INSTALL_FW_PATH does not work like expected.
-
-Initial situation:
-------------------
-building a kernel package with
-| make tar-pkg INSTALL_FW_PATH=/somewhere
-
-
-Expected result:
-----------------
-* tar-archive including the firmware in folder /somehere
-
-
-Result:
--------
-* tar-archive without firmware
-* firmware on hd in folder /somewhere
-
-
-Reason:
--------
-Makefile:
-| # Firmware install
-| INSTALL_FW_PATH=$(INSTALL_MOD_PATH)/lib/firmware
-| export INSTALL FW PATH
- ...
-| firmware_install: FORCE
-| @mkdir -p $(objtree)/firmware
-| $(Q)$(MAKE) -f $(srctree)/scripts/Makefile.fwinst obj=firmware
-__fw_install
-
-Here INSTALL_MOD_PATH is not considered but is needed for packageing.
-
-
-Potential fix:
---------------
-
---- BEGIN PATCH -------------------------------------------------------
-diff -ur linux-2.6.38_orig/Makefile linux-2.6.38/Makefile
---- linux-2.6.38_orig/Makefile 2011-03-13 18:24:19.000000000 +0200
-+++ linux-2.6.38/Makefile 2011-03-13 18:31:05.000000000 +0200
-@@ -1028,8 +1028,9 @@
-
-#
----------------------------------------------------------------------------
-# Firmware install
--INSTALL_FW_PATH=$(INSTALL_MOD_PATH)/lib/firmware
--export INSTALL_FW_PATH
-+INSTALL_FW_PATH=/lib/firmware
-+INSTALL_FW_TO_PATH=$(INSTALL_MOD_PATH)$(INSTALL_FW_PATH)
-+export INSTALL_FW_TO_PATH
-
-PHONY += firmware_install
-firmware_install: FORCE
-diff -ur linux-2.6.38_orig/scripts/Makefile.fwinst
-linux-2.6.38/scripts/Makefile.fwinst
---- linux-2.6.38_orig/scripts/Makefile.fwinst 2011-03-13
-18:25:47.000000000 +0200
-+++ linux-2.6.38/scripts/Makefile.fwinst 2011-03-13
-18:29:38.000000000 +0200
-@@ -24,14 +24,14 @@
-mod-fw += $(fw-shipped-y)
-endif
-
--installed-mod-fw := $(addprefix $(INSTALL_FW_PATH)/,$(mod-fw))
-+installed-mod-fw := $(addprefix $(INSTALL_FW_TO_PATH)/,$(mod-fw))
-
--installed-fw := $(addprefix $(INSTALL_FW_PATH)/,$(fw-shipped-all))
--installed-fw-dirs := $(sort $(dir $(installed-fw))) $(INSTALL_FW_PATH)/.
-+installed-fw := $(addprefix $(INSTALL_FW_TO_PATH)/,$(fw-shipped-all))
-+installed-fw-dirs := $(sort $(dir $(installed-fw))) $(INSTALL_FW_TO_PATH)/.
-
-# Workaround for make < 3.81, where .SECONDEXPANSION doesn't work.
--PHONY += $(INSTALL_FW_PATH)/$$(%) install-all-dirs
--$(INSTALL_FW_PATH)/$$(%): install-all-dirs
-+PHONY += $(INSTALL_FW_TO_PATH)/$$(%) install-all-dirs
-+$(INSTALL_FW_TO_PATH)/$$(%): install-all-dirs
-@true
-install-all-dirs: $(installed-fw-dirs)
-@true
-@@ -42,7 +42,7 @@
-$(installed-fw-dirs):
-$(call cmd,mkdir)
-
--$(installed-fw): $(INSTALL_FW_PATH)/%: $(obj)/% |
-$(INSTALL_FW_PATH)/$$(dir %)
-+$(installed-fw): $(INSTALL_FW_TO_PATH)/%: $(obj)/% |
-$(INSTALL_FW_TO_PATH)/$$(dir %)
-$(call cmd,install)
-
-PHONY += __fw_install __fw_modinst FORCE
---- END PATCH ---------------------------------------------------------
-
-
-Thank you
-
-Maximilian
-
-
+On Tue, May 24, 2011, at 2:59, Arnaud Lacombe <lacombar@gmail.com>
+wrote:
+> Hi,
+> 
+> On Tue, May 24, 2011 at 1:38 PM, Hiromu Yakura <hiromu1996@gmail.com> wrote:
+> > On Tue, May 24, 2011, at 0:50, Arnaud Lacombe <lacombar@gmail.com>
+> > wrote:
+> >> On Tue, May 24, 2011 at 11:01 AM, Michal Marek <mmarek@suse.cz> wrote:
+> >> > I see, qconf lacks a check for the return value of conf_write() in
+> >> > ConfigMainWindow::closeEvent(), gconf does check the return value, but only
+> >> > displays it in the bottom box of the main window instead of a message box.
+> >> > Neither of them return failure in the error case. These bugs should be
+> >> > indeed fixed.
+> >> >
+> >> agree.
+> >>
+> >> > But I don't like the directory permission check, it only
+> >> > handles one case, but does not handle permission on the .config file itself
+> >> > with KCONFIG_OVERWRITECONFIG=1, ENOSPC and so on.
+> >> >
+> >> seconded.
+> > I'm sorry for forgetting to handle a case which was set KCONFIG_OVERWRITECONFIG.
+> > So I rewrote the patch and attach it.
+> >
+> > Thanks for your advice.
+> >
+> > Signed-off-by: Hiromu Yakura <hiromu1996@gmail.com>
+> >
+> Let me re-state: your patch does not handle all the case where
+> conf_write() may fails, and I do not think we want to preemptively
+> check for all errors open(2) may return.
+conf_write() is called after the configure changed.
+So I don't think we should handle the failed case of conf_write()
+because the purpose of this patch is not to losing changes.
 
 
