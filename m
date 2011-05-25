@@ -1,60 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from outmail010.snc4.facebook.com ([66.220.144.142]:41482 "EHLO
-	mx-out.facebook.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1753054Ab1EYUTP (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 25 May 2011 16:19:15 -0400
-From: Arun Sharma <asharma@fb.com>
-Subject: [PATCH] kbuild: Move firmware images to a separate RPM
-Date: Wed, 25 May 2011 13:19:08 -0700
-Message-Id: <1306354748-26727-1-git-send-email-asharma@fb.com>
+Received: from cantor2.suse.de ([195.135.220.15]:41376 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S932190Ab1EYUbZ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 25 May 2011 16:31:25 -0400
+Message-ID: <4DDD675B.6030405@suse.cz>
+Date: Wed, 25 May 2011 22:32:27 +0200
+From: Michal Marek <mmarek@suse.cz>
+MIME-Version: 1.0
+Subject: Re: [PATCH v2] x86: Do not set the root_dev field in bzImage
+References: <20110411150820.GA22004@sepie.suse.cz> <1302607824-24699-1-git-send-email-mmarek@suse.cz> <4DCAA99B.1070208@suse.cz>
+In-Reply-To: <4DCAA99B.1070208@suse.cz>
+Content-Type: text/plain; charset=ISO-8859-2
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: Arun Sharma <asharma@fb.com>
+To: linux-kernel@vger.kernel.org, x86@kernel.org
+Cc: linux-kbuild@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, Paul Bolle <pebolle@tiscali.nl>
 
-This allows multiple kernel RPMs to be installed without
-namespace conflicts.
+Dne 11.5.2011 17:22, Michal Marek napsal(a):
+> On 12.4.2011 13:30, Michal Marek wrote:
+>> This has been obsoleted by the root= commandline for several years.
+>> People who still depend on this will surely have a copy of the rdev
+>> command around, the rest of the world gets rid of another piece of
+>> buildhost-dependent data in the build. Thanks to Paul Bolle for the
+>> build.c cleanup.
+>>
+>> Cc: Thomas Gleixner<tglx@linutronix.de>
+>> Cc: Ingo Molnar<mingo@redhat.com>
+>> Cc: "H. Peter Anvin"<hpa@zytor.com>
+>> Cc: x86@kernel.org
+>> Cc: Paul Bolle<pebolle@tiscali.nl>
+>> Signed-off-by: Michal Marek<mmarek@suse.cz>
+> 
+> Hi,
+> 
+> Is this patch OK for the tip tree?
 
-Signed-off-by: Arun Sharma <asharma@fb.com>
----
- scripts/package/mkspec |   12 +++++++++++-
- 1 files changed, 11 insertions(+), 1 deletions(-)
+Hi,
 
-diff --git a/scripts/package/mkspec b/scripts/package/mkspec
-index b20bdac..35e68d1 100755
---- a/scripts/package/mkspec
-+++ b/scripts/package/mkspec
-@@ -68,6 +68,13 @@ echo "between the Linux kernel and userspace libraries and programs.  The"
- echo "header files define structures and constants that are needed for"
- echo "building most standard programs and are also needed for rebuilding the"
- echo "glibc package."
-+echo ""
-+echo "%package firmware"
-+echo "Summary: Set of firmware images in the kernel tree"
-+echo "Group: Development/System"
-+echo "%description firmware"
-+echo "Firmware images in the kernel tree provided for backward compability"
-+echo ""
- 
- if ! $PREBUILT; then
- echo "%prep"
-@@ -137,7 +144,6 @@ echo "%files"
- echo '%defattr (-, root, root)'
- echo "%dir /lib/modules"
- echo "/lib/modules/$KERNELRELEASE"
--echo "/lib/firmware"
- echo "/boot/*"
- echo ""
- echo "%files devel"
-@@ -148,3 +154,7 @@ echo "%files headers"
- echo '%defattr (-, root, root)'
- echo "/usr/include"
- echo ""
-+echo "%files firmware"
-+echo '%defattr (-, root, root)'
-+echo "/lib/firmware"
-+echo ""
--- 
-1.7.4
+I don't see the patch in today's linux-next. Can I get an Acked-by: to
+apply it to kbuild-2.6.git or can someone apply it to the tip tree?
+Thanks a lot.
 
+Michal
