@@ -1,54 +1,105 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:41661 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754135Ab1EYUqO (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 25 May 2011 16:46:14 -0400
-Message-ID: <4DDD6AD4.6040801@suse.cz>
-Date: Wed, 25 May 2011 22:47:16 +0200
-From: Michal Marek <mmarek@suse.cz>
+Received: from outappmail003.snc4.facebook.com ([66.220.144.157]:50436 "EHLO
+	mx-out.facebook.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1756637Ab1EYUqf (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 25 May 2011 16:46:35 -0400
+Date: Wed, 25 May 2011 13:46:34 -0700
+From: Arun Sharma <asharma@fb.com>
+Subject: Re: [PATCH 5/6] kbuild: Append RPM release to $KERNELRELEASE
+Message-ID: <20110525204634.GA31841@dev1756.snc6.facebook.com>
+References: <1305653779-3445-1-git-send-email-asharma@fb.com>
+ <1305653779-3445-5-git-send-email-asharma@fb.com>
+ <4DD2D703.4030908@suse.cz>
 MIME-Version: 1.0
-Subject: Re: [PATCH 26/34] dlm: Drop __TIME__ usage
-References: <1302015561-21047-1-git-send-email-mmarek@suse.cz> <1302015561-21047-27-git-send-email-mmarek@suse.cz>
-In-Reply-To: <1302015561-21047-27-git-send-email-mmarek@suse.cz>
-Content-Type: text/plain; charset=ISO-8859-2
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4DD2D703.4030908@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, Christine Caulfield <ccaulfie@redhat.com>, David Teigland <teigland@redhat.com>, cluster-devel@redhat.com
+To: Michal Marek <mmarek@suse.cz>
+Cc: Arun Sharma <asharma@fb.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Dne 5.4.2011 16:59, Michal Marek napsal(a):
-> The kernel already prints its build timestamp during boot, no need to
-> repeat it in random drivers and produce different object files each
-> time.
+On Tue, May 17, 2011 at 10:13:55PM +0200, Michal Marek wrote:
 > 
-> Cc: Christine Caulfield <ccaulfie@redhat.com>
-> Cc: David Teigland <teigland@redhat.com>
-> Cc: cluster-devel@redhat.com
-> Signed-off-by: Michal Marek <mmarek@suse.cz>
-> ---
->  fs/dlm/main.c |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
+> Please stop decorating the kernel release string for the sake of make
+> rpm, thanks. If you really want the kernel release string match rpm's
+> %{version}-%{release}, how about this: Let the user set
+> CONFIG_LOCALVERSION=-<number> and check in make rpm if $KERNELRELEASE
+> ends with -<number>. If so, use <number> in the Release: field and the
+> rest in Version:, otherwise use the same scheme as before. That way, you
+> won't force a new kernel release numbering scheme on anyone.
 
-Hi,
+This patch has been working better than the previous one for us and it
+has a similar property that it is a nop for developers who don't use
+rpm for packaging.
 
-I don't see this patch in today's linux-next. Any objection against me
-applying it to the kbuild-2.6.git repository?
+commit 29cbbfa5d840ac1ecd80a2045f05f6440d2c4c04
+Author: Arun Sharma <asharma@fb.com>
+Date:   Fri May 20 14:48:01 2011 -0700
 
-Thanks,
-Michal
-> 
-> diff --git a/fs/dlm/main.c b/fs/dlm/main.c
-> index b80e0aa..5a59efa 100644
-> --- a/fs/dlm/main.c
-> +++ b/fs/dlm/main.c
-> @@ -50,7 +50,7 @@ static int __init init_dlm(void)
->  	if (error)
->  		goto out_netlink;
->  
-> -	printk("DLM (built %s %s) installed\n", __DATE__, __TIME__);
-> +	printk("DLM installed\n");
->  
->  	return 0;
->  
+    kbuild: Use KERNELRELEASE from packaging scripts
+    
+    This adds two changes to the kernel Makefile:
+    
+    * Honor KERNELRELEASE if it's already set
+    * Allow external scripts to append $LOCAL_VERSION to
+      $EXTRA_VERSION
 
+diff --git a/Makefile b/Makefile
+index 123d858..01c51e4 100644
+--- a/Makefile
++++ b/Makefile
+@@ -368,7 +368,11 @@ KBUILD_CFLAGS_MODULE  := -DMODULE
+ KBUILD_LDFLAGS_MODULE := -T $(srctree)/scripts/module-common.lds
+ 
+ # Read KERNELRELEASE from include/config/kernel.release (if it exists)
+-KERNELRELEASE = $(shell cat include/config/kernel.release 2> /dev/null)
++# and if it's not already defined
++KERNELRELEASE ?= $(shell cat include/config/kernel.release 2> /dev/null)
++ifdef LOCAL_VERSION
++EXTRAVERSION := $(EXTRAVERSION)_$(LOCAL_VERSION)
++endif
+ KERNELVERSION = $(VERSION).$(PATCHLEVEL).$(SUBLEVEL)$(EXTRAVERSION)
+ 
+ export VERSION PATCHLEVEL SUBLEVEL KERNELRELEASE KERNELVERSION
+diff --git a/scripts/package/mkspec b/scripts/package/mkspec
+index 001814e..c496bd5 100755
+--- a/scripts/package/mkspec
++++ b/scripts/package/mkspec
+@@ -23,13 +23,16 @@ fi
+ 
+ PROVIDES="$PROVIDES kernel-$KERNELRELEASE"
+ __KERNELRELEASE=`echo $KERNELRELEASE | sed -e "s/-/_/g"`
++LOCAL_VERSION=`. $srctree/scripts/mkversion``$srctree/scripts/setlocalversion | sed 's/-/_/g'`
++KERNELRELEASE=${__KERNELRELEASE}-${LOCAL_VERSION}
++
+ 
+ echo "Name: kernel"
+ echo "Summary: The Linux Kernel"
+ echo "Version: $__KERNELRELEASE"
+ # we need to determine the NEXT version number so that uname and
+ # rpm -q will agree
+-echo "Release: `. $srctree/scripts/mkversion`"
++echo "Release: $LOCAL_VERSION"
+ echo "License: GPL"
+ echo "Group: System Environment/Kernel"
+ echo "Vendor: The Linux Community"
+@@ -84,6 +87,8 @@ fi
+ 
+ echo "%build"
+ echo 'rm -rf $RPM_BUILD_ROOT'
++echo "export KERNELRELEASE=%{version}-%{release}"
++echo "export LOCAL_VERSION=%{release}"
+ 
+ if ! $PREBUILT; then
+ echo "make clean && make %{?_smp_mflags}"
+@@ -91,6 +96,8 @@ echo ""
+ fi
+ 
+ echo "%install"
++echo "export KERNELRELEASE=%{version}-%{release}"
++echo "export LOCAL_VERSION=%{release}"
+ echo "%ifarch ia64"
+ echo 'mkdir -p $RPM_BUILD_ROOT/boot/efi $RPM_BUILD_ROOT/lib/modules'
+ echo 'mkdir -p $RPM_BUILD_ROOT/lib/firmware'
