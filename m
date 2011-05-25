@@ -1,26 +1,28 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:59393 "EHLO mx2.suse.de"
+Received: from cantor.suse.de ([195.135.220.2]:57076 "EHLO mx1.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S932318Ab1EYOCy (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 25 May 2011 10:02:54 -0400
-Date: Wed, 25 May 2011 16:02:52 +0200
+	id S1754647Ab1EYOls (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 25 May 2011 10:41:48 -0400
+Date: Wed, 25 May 2011 16:41:46 +0200
 From: Michal Marek <mmarek@suse.cz>
-Subject: [GIT] kbuild/packaging for 2.6.40
-Message-ID: <20110525140252.GA15749@sepie.suse.cz>
+Subject: [GIT] kbuild/misc for 2.6.40
+Message-ID: <20110525144146.GA17486@sepie.suse.cz>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: asharma@fb.com, mmarek@suse.cz, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: andi@lisas.de, jim.cromie@gmail.com, pefoley2@verizon.net, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
 Hi Linus,
 
-Please pull these packaging changes for the next release:
-* kernel-headers.rpm containing the exported userspace headers
-* 2 minor fixed for make rpm
+Misc kbuild updates:
+* export_report.pl fixes
+* fixes for make *check
+* scripts/patch-kernel fix to not require bash
 
+Please pull.
 Michal
 
 The following changes since commit 0ce790e7d736cedc563e1fb4e998babf5a4dbc3d:
@@ -28,15 +30,25 @@ The following changes since commit 0ce790e7d736cedc563e1fb4e998babf5a4dbc3d:
   Linux 2.6.39-rc1 (2011-03-29 12:09:47 -0700)
 
 are available in the git repository at:
-  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild-2.6.git packaging
+  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild-2.6.git misc
 
-Arun Sharma (2):
-      Replace '-' in kernel version with '_'
-      kbuild: Create a kernel-headers RPM
+Andreas Mohr (1):
+      eradicate bashisms in scripts/patch-kernel
 
-Michal Marek (1):
-      rpm-pkg: Fix when current directory is a symlink
+Jim Cromie (3):
+      export_report: do collectcfiles work in perl itself
+      export_report: sort SECTION 2 output
+      export_report: use warn() to issue WARNING, so they go to stderr
 
- scripts/package/Makefile |    4 ++--
- scripts/package/mkspec   |   19 ++++++++++++++++++-
- 2 files changed, 20 insertions(+), 3 deletions(-)
+Peter Foley (5):
+      kbuild: don't warn about include/linux/version.h not including itself
+      kbuild: add targets to PHONY
+      kbuild: make headerdep work in KBUILD_OUTDIR
+      kbuild: make includecheck work in KBUILD_OUTDIR
+      kbuild: make versioncheck work in KBUILD_OUTDIR
+
+ Makefile                 |    9 ++++++---
+ scripts/checkversion.pl  |    1 +
+ scripts/export_report.pl |   26 ++++++++++++++++++++------
+ scripts/patch-kernel     |    2 +-
+ 4 files changed, 28 insertions(+), 10 deletions(-)
