@@ -1,41 +1,27 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:58545 "EHLO mx2.suse.de"
+Received: from cantor.suse.de ([195.135.220.2]:55604 "EHLO mx1.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S932805Ab1EYNf4 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 25 May 2011 09:35:56 -0400
-Date: Wed, 25 May 2011 15:35:55 +0200
+	id S1757253Ab1EYNxs (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 25 May 2011 09:53:48 -0400
+Date: Wed, 25 May 2011 15:53:46 +0200
 From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [PATCH] kconfig: Only generate config_is_xxx for bool and
- tristate options
-Message-ID: <20110525133555.GG2276@sepie.suse.cz>
-References: <1305646532-29114-1-git-send-email-mmarek@suse.cz>
+Subject: Re: [PATCH 4/6] kbuild: Move firmware images to a separate RPM
+Message-ID: <20110525135346.GH2276@sepie.suse.cz>
+References: <1305653779-3445-1-git-send-email-asharma@fb.com>
+ <1305653779-3445-4-git-send-email-asharma@fb.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1305646532-29114-1-git-send-email-mmarek@suse.cz>
+In-Reply-To: <1305653779-3445-4-git-send-email-asharma@fb.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, Jean-Christophe PLAGNIOL-VILLARD <plagnioj@jcrosoft.com>
+To: Arun Sharma <asharma@fb.com>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Tue, May 17, 2011 at 05:35:32PM +0200, Michal Marek wrote:
-> For strings and integers, the config_is_xxx macros are useless and
-> sometimes misleading:
-> 
->   #define CONFIG_INITRAMFS_SOURCE ""
->   #define config_is_initramfs_source() 1
-> 
-> Cc: Jean-Christophe PLAGNIOL-VILLARD <plagnioj@jcrosoft.com>
-> Signed-off-by: Michal Marek <mmarek@suse.cz>
-> ---
->  scripts/kconfig/confdata.c |    8 +++-----
->  1 files changed, 3 insertions(+), 5 deletions(-)
+On Tue, May 17, 2011 at 10:36:17AM -0700, Arun Sharma wrote:
+> +echo 'make %{?_smp_mflags} INSTALL_FW_PATH=$RPM_BUILD_ROOT/lib/firmware KBUILD_SRC= firmware_install'
 
-I applied this to kbuild-2.6.git#kconfig, but I won't be sending this
-and the config_is_xxx patch to Linus now. First, I'm a bit in hurry and
-there have been proposals for either a different name of the macro, or a
-different implementation, second, the fixdep fix is not here, so we
-wouldn't be able to make use of the feature anyway. So let's settle on a
-final solution for 2.6.41 or 3.1 or whatever comes second next.
+I don't think we need firmware_install, just package the firmware
+installed by modules_install.
 
 Michal
