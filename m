@@ -1,42 +1,83 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-iy0-f174.google.com ([209.85.210.174]:58706 "EHLO
-	mail-iy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753245Ab1EXVtI (ORCPT
+Received: from mail-iw0-f174.google.com ([209.85.214.174]:47618 "EHLO
+	mail-iw0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752443Ab1EYFgv (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 24 May 2011 17:49:08 -0400
-MIME-Version: 1.0
-In-Reply-To: <1306270010.7501.43.camel@hiromu-MacBook>
-References: <1306167401.18840.8.camel@hiromu-MacBook>
-	<BANLkTikhFdd_PRzCg3w9HD1TO=cmdmm6_A@mail.gmail.com>
-	<1306242400.7501.10.camel@hiromu-MacBook>
-	<4DDBB150.2090602@suse.cz>
-	<1306247192.7501.25.camel@hiromu-MacBook>
-	<4DDBC846.8050402@suse.cz>
-	<BANLkTin5ZDt5ZeckOJ2WsNUZm6mxmYiRwQ@mail.gmail.com>
-	<1306258716.7501.35.camel@hiromu-MacBook>
-	<BANLkTikFT17GOgV1UJTFxEG+P2X-u4ZJjw@mail.gmail.com>
-	<1306270010.7501.43.camel@hiromu-MacBook>
-Date: Tue, 24 May 2011 17:49:08 -0400
-Message-ID: <BANLkTi=zVAMzbx7tXP2tOfBGE_hcMFzxOg@mail.gmail.com>
-Subject: Re: [PATCH] Kconfig: add warning about permission of config file
+	Wed, 25 May 2011 01:36:51 -0400
 From: Arnaud Lacombe <lacombar@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: [PATCH] kconfig: do not overwrite symbol direct dependency in assignment
+Date: Wed, 25 May 2011 01:36:44 -0400
+Message-Id: <1306301804-12319-1-git-send-email-lacombar@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Hiromu Yakura <hiromu1996@gmail.com>
-Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, zippel@linux-m68k.org
+To: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: Arnaud Lacombe <lacombar@gmail.com>
 
-Hi,
+Considering the following configuration:
 
-On Tue, May 24, 2011 at 4:46 PM, Hiromu Yakura <hiromu1996@gmail.com> wrote:
-> [...]
-> conf_write() is called after the configure changed.
-> So I don't think we should handle the failed case of conf_write()
-> because the purpose of this patch is not to losing changes.
->
-Then your patch is incomplete. only open(2) and write(2) can fail in
-more than 30 different ways, you check 1.
+config F
+    bool "F"
 
- - Arnaud
+choice AB
+    bool "AB"
+config A
+    bool "A"
+config B
+    bool "B"
+endchoice
 
-ps: I am not even addressing the race-condition introduced by your patch...
+if A
+config D
+    bool
+    default y if F
+    select E
+config E
+    bool "E"
+endif
+
+if B
+config D
+    bool
+    default y if F
+    select E
+config E
+    bool "E"
+endif
+
+The following configuration:
+
+CONFIG_F=y
+CONFIG_A=y
+CONFIG_D=y
+CONFIG_E=y
+
+emits a spurious warning:
+
+(D) selects E which has unmet direct dependencies (B)
+
+If a symbol appears in two different branch of the tree, it should inherit the
+dependency of both parent, not just the last one.
+
+Reported-by: Yann E. Morin <yann.morin.1998@anciens.enib.fr>
+Tested-by: Yann E. Morin <yann.morin.1998@anciens.enib.fr>
+Signed-off-by: Arnaud Lacombe <lacombar@gmail.com>
+---
+ scripts/kconfig/menu.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
+index 5fdf10d..d0c65e7 100644
+--- a/scripts/kconfig/menu.c
++++ b/scripts/kconfig/menu.c
+@@ -350,7 +350,7 @@ void menu_finalize(struct menu *parent)
+ 			last_menu->next = NULL;
+ 		}
+ 
+-		sym->dir_dep.expr = parent->dep;
++		sym->dir_dep.expr = expr_alloc_or(sym->dir_dep.expr, parent->dep);
+ 	}
+ 	for (menu = parent->list; menu; menu = menu->next) {
+ 		if (sym && sym_is_choice(sym) &&
+-- 
+1.7.3.4.574.g608b.dirty
+
