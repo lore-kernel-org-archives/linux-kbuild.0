@@ -1,41 +1,92 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from outappmail004.snc4.facebook.com ([66.220.144.158]:45392 "EHLO
-	mx-out.facebook.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751605Ab1EYTjK (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 25 May 2011 15:39:10 -0400
-Date: Wed, 25 May 2011 12:39:09 -0700
-From: Arun Sharma <asharma@fb.com>
-Subject: Re: [PATCH 6/6] kbuild: cleanup the rpm buildroot
-Message-ID: <20110525193909.GA23957@dev1756.snc6.facebook.com>
-References: <1305653779-3445-1-git-send-email-asharma@fb.com>
- <1305653779-3445-6-git-send-email-asharma@fb.com>
- <20110525135458.GI2276@sepie.suse.cz>
+Received: from cantor.suse.de ([195.135.220.2]:37912 "EHLO mx1.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754005Ab1EYUSj (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 25 May 2011 16:18:39 -0400
+Date: Wed, 25 May 2011 22:18:32 +0200
+From: Michal Marek <mmarek@suse.cz>
+Subject: [GIT] kbuild/kconfig
+Message-ID: <20110525201831.GA29210@sepie.suse.cz>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20110525135458.GI2276@sepie.suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: Arun Sharma <asharma@fb.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: ben@decadent.org.uk, edsiper@gmail.com, lacombar@gmail.com, mmarek@suse.cz, pefoley2@verizon.net, randy.dunlap@oracle.com, sboyd@codeaurora.org, yann.morin.1998@anciens.enib.fr, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Wed, May 25, 2011 at 03:54:58PM +0200, Michal Marek wrote:
-> On Tue, May 17, 2011 at 10:36:19AM -0700, Arun Sharma wrote:
-> >  echo "%build"
-> > +echo 'rm -rf $RPM_BUILD_ROOT'
-> 
-> Don't do it, this allows another user to create their or $RPM_BUILD_ROOT
-> and let you package it.
+Hi Linus,
 
-Here's the motivation for the change:
+This is the kconfig par of kbuild. Nothing really exciting this time.
+* No more timestamps in .config and friends
+* kconfig Makefile clanup and fixes
+* Misc other fixes
 
-mkspec has a BuildRoot that is deterministic (i.e. the next time I
-rebuild I get the same buildroot)
+In the next cycle will come a generic way to convert some
 
-> echo "BuildRoot: %{_tmppath}/%{name}-%{PACKAGE_VERSION}-root"
+  #ifdef CONFIG_FOO
 
-So if I were to restart a broken build, the build root could have old files
-that break the build even after the breakage is fixed.
+statements to
 
- -Arun
+  if (<something>)
+
+to improve build coverage. But it's not ready yet.
+
+Michal
+
+The following changes since commit 0ce790e7d736cedc563e1fb4e998babf5a4dbc3d:
+
+  Linux 2.6.39-rc1 (2011-03-29 12:09:47 -0700)
+
+are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild-2.6.git kconfig-for-40
+
+Arnaud Lacombe (2):
+      kconfig: do not record timestamp in .config
+      xconfig: merge code path to conf_write()
+
+Ben Hutchings (1):
+      kconfig: Avoid buffer underrun in choice input
+
+Eduardo Silva (2):
+      gconfig: enable rules hint for main treeviews
+      gconfig: Hide unused left treeview when start up the interface
+
+Michal Marek (3):
+      kconfig: Do not record timestamp in auto.conf and autoconf.h
+      kconfig: Document the new "visible if" syntax
+      MAINTAINERS: Update KCONFIG entry
+
+Peter Foley (7):
+      kconfig: only build kxgettext when needed
+      kconfig: change qconf to modify hostprogs-y like nconf and mconf
+      kconfig: change gconf to modify hostprogs-y like nconf and mconf
+      kconfig: rearrange clean-files
+      kconfig: make update-po-config work in KBUILD_OUTPUT
+      kconfig: change update-po-config to reflect new layout of arch/um
+      kconfig: quiet commands when V=0
+
+Randy Dunlap (1):
+      kconfig-language: add to hints
+
+Stephen Boyd (1):
+      nconfig: Silence unused return values from wattrset
+
+Yann E. MORIN (2):
+      kconfig: allow multiple inclusion of the same file
+      kconfig: get rid of unused flags
+
+ CREDITS                                   |    4 +++
+ Documentation/kbuild/kconfig-language.txt |   32 +++++++++++++++++++++++-
+ Documentation/kbuild/kconfig.txt          |    5 ----
+ MAINTAINERS                               |    5 +--
+ scripts/kconfig/Makefile                  |   38 +++++++++++++++++-----------
+ scripts/kconfig/conf.c                    |    2 +-
+ scripts/kconfig/confdata.c                |   20 ++-------------
+ scripts/kconfig/expr.h                    |    4 ---
+ scripts/kconfig/gconf.c                   |   12 ++++++---
+ scripts/kconfig/lex.zconf.c_shipped       |   33 ++++++++++++++----------
+ scripts/kconfig/nconf.c                   |   14 +++++-----
+ scripts/kconfig/qconf.cc                  |    5 +--
+ scripts/kconfig/zconf.l                   |   33 ++++++++++++++----------
+ 13 files changed, 119 insertions(+), 88 deletions(-)
