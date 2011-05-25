@@ -1,54 +1,44 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:41716 "EHLO mx2.suse.de"
+Received: from mx1.redhat.com ([209.132.183.28]:31531 "EHLO mx1.redhat.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754904Ab1EYUr3 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 25 May 2011 16:47:29 -0400
-Message-ID: <4DDD6B1F.1060303@suse.cz>
-Date: Wed, 25 May 2011 22:48:31 +0200
-From: Michal Marek <mmarek@suse.cz>
+	id S1754563Ab1EYUsC (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 25 May 2011 16:48:02 -0400
+Date: Wed, 25 May 2011 16:47:52 -0400
+From: David Teigland <teigland@redhat.com>
+Subject: Re: [PATCH 26/34] dlm: Drop __TIME__ usage
+Message-ID: <20110525204752.GA2114@redhat.com>
+References: <1302015561-21047-1-git-send-email-mmarek@suse.cz>
+ <1302015561-21047-27-git-send-email-mmarek@suse.cz>
+ <4DDD6AD4.6040801@suse.cz>
 MIME-Version: 1.0
-Subject: Re: [PATCH 27/34] gfs2: Drop __TIME__ usage
-References: <1302015561-21047-1-git-send-email-mmarek@suse.cz> <1302015561-21047-28-git-send-email-mmarek@suse.cz>
-In-Reply-To: <1302015561-21047-28-git-send-email-mmarek@suse.cz>
-Content-Type: text/plain; charset=ISO-8859-2
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4DDD6AD4.6040801@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, Steven Whitehouse <swhiteho@redhat.com>, cluster-devel@redhat.com
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Christine Caulfield <ccaulfie@redhat.com>, cluster-devel@redhat.com
 
-Dne 5.4.2011 16:59, Michal Marek napsal(a):
-> The kernel already prints its build timestamp during boot, no need to
-> repeat it in random drivers and produce different object files each
-> time.
+On Wed, May 25, 2011 at 10:47:16PM +0200, Michal Marek wrote:
+> Dne 5.4.2011 16:59, Michal Marek napsal(a):
+> > The kernel already prints its build timestamp during boot, no need to
+> > repeat it in random drivers and produce different object files each
+> > time.
+> > 
+> > Cc: Christine Caulfield <ccaulfie@redhat.com>
+> > Cc: David Teigland <teigland@redhat.com>
+> > Cc: cluster-devel@redhat.com
+> > Signed-off-by: Michal Marek <mmarek@suse.cz>
+> > ---
+> >  fs/dlm/main.c |    2 +-
+> >  1 files changed, 1 insertions(+), 1 deletions(-)
 > 
-> Cc: Steven Whitehouse <swhiteho@redhat.com>
-> Cc: cluster-devel@redhat.com
-> Signed-off-by: Michal Marek <mmarek@suse.cz>
-> ---
->  fs/gfs2/main.c |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
+> Hi,
+> 
+> I don't see this patch in today's linux-next. Any objection against me
+> applying it to the kbuild-2.6.git repository?
 
-Hi,
-
-I don't see this patch in today's linux-next. Any objection against me
-applying it to the kbuild-2.6.git repository?
-
+No, please do.
 Thanks,
-Michal
-
-
-> diff --git a/fs/gfs2/main.c b/fs/gfs2/main.c
-> index 72c31a3..07d057b 100644
-> --- a/fs/gfs2/main.c
-> +++ b/fs/gfs2/main.c
-> @@ -143,7 +143,7 @@ static int __init init_gfs2_fs(void)
->  
->  	gfs2_register_debugfs();
->  
-> -	printk("GFS2 (built %s %s) installed\n", __DATE__, __TIME__);
-> +	printk("GFS2 installed\n");
->  
->  	return 0;
->  
+Dave
 
