@@ -1,53 +1,39 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:41599 "EHLO mx2.suse.de"
+Received: from cantor.suse.de ([195.135.220.2]:38428 "EHLO mx1.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S932417Ab1EYUmH (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 25 May 2011 16:42:07 -0400
-Message-ID: <4DDD69DD.7030601@suse.cz>
-Date: Wed, 25 May 2011 22:43:09 +0200
+	id S1751885Ab1EYUn1 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 25 May 2011 16:43:27 -0400
+Message-ID: <4DDD6A2D.7050506@suse.cz>
+Date: Wed, 25 May 2011 22:44:29 +0200
 From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Subject: Re: [PATCH 18/34] wan/pc300: Drop __TIME__ usage
-References: <1302015561-21047-1-git-send-email-mmarek@suse.cz> <1302015561-21047-19-git-send-email-mmarek@suse.cz>
-In-Reply-To: <1302015561-21047-19-git-send-email-mmarek@suse.cz>
-Content-Type: text/plain; charset=ISO-8859-2
-Content-Transfer-Encoding: 7bit
+Subject: Re: [PATCH 20/34] parport: Drop __TIME__ usage
+References: <1302015561-21047-1-git-send-email-mmarek@suse.cz>	<1302015561-21047-21-git-send-email-mmarek@suse.cz> <wwetyeclb8x.fsf@powwow.iut-bm.univ-fcomte.fr>
+In-Reply-To: <wwetyeclb8x.fsf@powwow.iut-bm.univ-fcomte.fr>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org
+To: Arnaud Giersch <arnaud.giersch@free.fr>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Dne 5.4.2011 16:59, Michal Marek napsal(a):
-> The kernel already prints its build timestamp during boot, no need to
-> repeat it in random drivers and produce different object files each
-> time.
+Dne 5.4.2011 22:00, Arnaud Giersch napsal(a):
+> Mardi 05 avril 2011, vers 16:59:07 (+0200), Michal Marek a écrit :
 > 
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: netdev@vger.kernel.org
-> Signed-off-by: Michal Marek <mmarek@suse.cz>
-> ---
->  drivers/net/wan/pc300_drv.c |    3 +--
->  1 files changed, 1 insertions(+), 2 deletions(-)
+>> The kernel already prints its build timestamp during boot, no need to
+>> repeat it in random drivers and produce different object files each
+>> time.
+>>
+>> Cc: Arnaud Giersch <arnaud.giersch@free.fr>
+>> Signed-off-by: Michal Marek <mmarek@suse.cz>
+>> ---
+>>  drivers/parport/parport_ip32.c |    1 -
+>>  1 files changed, 0 insertions(+), 1 deletions(-)
+> 
+> I do not use this module anymore, but anyway...
+> 
+> Acked-by: Arnaud Giersch <arnaud.giersch@free.fr>
 
-I don't see the patch in today's linux-next. Does anyone object against
-me applying it to kbuild-2.6.git?
+Applied to kbuild-2.6.git#trivial
 
-Thanks,
 Michal
-
-
-> diff --git a/drivers/net/wan/pc300_drv.c b/drivers/net/wan/pc300_drv.c
-> index f875cfa..80ae503 100644
-> --- a/drivers/net/wan/pc300_drv.c
-> +++ b/drivers/net/wan/pc300_drv.c
-> @@ -3242,8 +3242,7 @@ static inline void show_version(void)
->  	rcsdate++;
->  	tmp = strrchr(rcsdate, ' ');
->  	*tmp = '\0';
-> -	printk(KERN_INFO "Cyclades-PC300 driver %s %s (built %s %s)\n", 
-> -		rcsvers, rcsdate, __DATE__, __TIME__);
-> +	printk(KERN_INFO "Cyclades-PC300 driver %s %s\n", rcsvers, rcsdate);
->  }				/* show_version */
->  
->  static const struct net_device_ops cpc_netdev_ops = {
-
