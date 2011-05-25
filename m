@@ -1,54 +1,35 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor.suse.de ([195.135.220.2]:57076 "EHLO mx1.suse.de"
+Received: from cantor.suse.de ([195.135.220.2]:58263 "EHLO mx1.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754647Ab1EYOls (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 25 May 2011 10:41:48 -0400
-Date: Wed, 25 May 2011 16:41:46 +0200
+	id S1754489Ab1EYPXY (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 25 May 2011 11:23:24 -0400
+Message-ID: <4DDD1EEA.6060907@suse.cz>
+Date: Wed, 25 May 2011 17:23:22 +0200
 From: Michal Marek <mmarek@suse.cz>
-Subject: [GIT] kbuild/misc for 2.6.40
-Message-ID: <20110525144146.GA17486@sepie.suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Subject: Re: [PATCH 15/34] baycom: Drop __TIME__ usage
+References: <1302015561-21047-1-git-send-email-mmarek@suse.cz>	 <1302015561-21047-16-git-send-email-mmarek@suse.cz> <1302015780.4124.53.camel@xbox360.hq.axsem.com>
+In-Reply-To: <1302015780.4124.53.camel@xbox360.hq.axsem.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: andi@lisas.de, jim.cromie@gmail.com, pefoley2@verizon.net, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Thomas Sailer <t.sailer@alumni.ethz.ch>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, linux-hams@vger.kernel.org, Linux Kernel Network Developers <netdev@vger.kernel.org>, lkml <linux-kernel@vger.kernel.org>
 
-Hi Linus,
+On 5.4.2011 17:03, Thomas Sailer wrote:
+> On Tue, 2011-04-05 at 16:59 +0200, Michal Marek wrote:
+>> The kernel already prints its build timestamp during boot, no need to
+>> repeat it in random drivers and produce different object files each
+>> time.
+>>
+>> Cc: Thomas Sailer<t.sailer@alumni.ethz.ch>
+>> Cc: linux-hams@vger.kernel.org
+>> Cc: netdev@vger.kernel.org
+>> Signed-off-by: Michal Marek<mmarek@suse.cz>
+> Acked-By: Thomas Sailer<t.sailer@alumni.ethz.ch>
 
-Misc kbuild updates:
-* export_report.pl fixes
-* fixes for make *check
-* scripts/patch-kernel fix to not require bash
+I didn't found the commit in today's linux-next, so I applied this to 
+kbuild-2.6.git#trivial.
 
-Please pull.
 Michal
-
-The following changes since commit 0ce790e7d736cedc563e1fb4e998babf5a4dbc3d:
-
-  Linux 2.6.39-rc1 (2011-03-29 12:09:47 -0700)
-
-are available in the git repository at:
-  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild-2.6.git misc
-
-Andreas Mohr (1):
-      eradicate bashisms in scripts/patch-kernel
-
-Jim Cromie (3):
-      export_report: do collectcfiles work in perl itself
-      export_report: sort SECTION 2 output
-      export_report: use warn() to issue WARNING, so they go to stderr
-
-Peter Foley (5):
-      kbuild: don't warn about include/linux/version.h not including itself
-      kbuild: add targets to PHONY
-      kbuild: make headerdep work in KBUILD_OUTDIR
-      kbuild: make includecheck work in KBUILD_OUTDIR
-      kbuild: make versioncheck work in KBUILD_OUTDIR
-
- Makefile                 |    9 ++++++---
- scripts/checkversion.pl  |    1 +
- scripts/export_report.pl |   26 ++++++++++++++++++++------
- scripts/patch-kernel     |    2 +-
- 4 files changed, 28 insertions(+), 10 deletions(-)
