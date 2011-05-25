@@ -1,68 +1,34 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from outmail006.snc4.facebook.com ([66.220.144.138]:36272 "EHLO
-	mx-out.facebook.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1755678Ab1EYUem (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 25 May 2011 16:34:42 -0400
-Date: Wed, 25 May 2011 13:34:41 -0700
-From: Arun Sharma <asharma@fb.com>
-Subject: Re: [PATCH 2/6] kbuild: Add a kernel-devel package
-Message-ID: <20110525203441.GA30980@dev1756.snc6.facebook.com>
-References: <1305653779-3445-1-git-send-email-asharma@fb.com>
- <1305653779-3445-2-git-send-email-asharma@fb.com>
+Received: from cantor2.suse.de ([195.135.220.15]:41500 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1755632Ab1EYUhZ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 25 May 2011 16:37:25 -0400
+Message-ID: <4DDD68C3.7000004@suse.cz>
+Date: Wed, 25 May 2011 22:38:27 +0200
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1305653779-3445-2-git-send-email-asharma@fb.com>
+Subject: Re: [PATCH 12/34] isdn/diva: Drop __TIME__ usage
+References: <1302015561-21047-1-git-send-email-mmarek@suse.cz> <1302015561-21047-13-git-send-email-mmarek@suse.cz> <alpine.DEB.2.00.1104051709040.7262@justus.melware.de>
+In-Reply-To: <alpine.DEB.2.00.1104051709040.7262@justus.melware.de>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arun Sharma <asharma@fb.com>
-Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Armin Schindler <armin@melware.de>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org
 
-[ Updated version of this patch. ]
+Dne 5.4.2011 17:10, Armin Schindler napsal(a):
+> On Tue, 5 Apr 2011, Michal Marek wrote:
+>> The kernel already prints its build timestamp during boot, no need to
+>> repeat it in random drivers and produce different object files each
+>> time.
+> 
+> The module can be build separately from the kernel, therefore it can have
+> an own build timestamp.
 
-    kbuild: Add a kernel-devel package
-    
-    Useful for building modules without having kernel sources
-    
-    Signed-off-by: Arun Sharma <asharma@fb.com>
+So the module timestamp and kernel timestamp vary by a couple of
+minutes. But is it really a problem? I don't think so. So is there an
+objection against applying this patch?
 
-diff --git a/scripts/package/mkspec b/scripts/package/mkspec
-index f5f0cb5..c79b777 100755
---- a/scripts/package/mkspec
-+++ b/scripts/package/mkspec
-@@ -49,6 +49,14 @@ echo ""
- echo "%description"
- echo "The Linux Kernel, the operating system core itself"
- echo ""
-+echo "%package devel"
-+echo "Summary: Development package for building kernel modules to match the $__KERNELRELEASE kernel"
-+echo "Group: System Environment/Kernel"
-+echo "AutoReqProv: no"
-+echo "%description -n kernel-devel"
-+echo "This package provides kernel headers and makefiles sufficient to build modules"
-+echo "against the $__KERNELRELEASE kernel package."
-+echo ""
- 
- if ! $PREBUILT; then
- echo "%prep"
-@@ -96,6 +104,11 @@ echo 'mv vmlinux.bz2 $RPM_BUILD_ROOT'"/boot/vmlinux-$KERNELRELEASE.bz2"
- echo 'mv vmlinux.orig vmlinux'
- echo "%endif"
- 
-+echo 'rm -rf $RPM_BUILD_ROOT'"/lib/modules/$KERNELRELEASE/{build,source}"
-+echo "mkdir -p "'$RPM_BUILD_ROOT'"/usr/src/kernels/$KERNELRELEASE"
-+echo "rsync -avz --exclude '.git/' --exclude '*vmlinux*' --exclude '.*' --exclude '*.o' --exclude '*.so' --exclude '*.ko' . "'$RPM_BUILD_ROOT'"/usr/src/kernels/$KERNELRELEASE/"
-+echo 'pushd $RPM_BUILD_ROOT'"/lib/modules/$KERNELRELEASE"' && ln -s build source && ln -s '"/usr/src/kernels/$KERNELRELEASE"' build && popd'
-+
- echo ""
- echo "%preun"
- echo '/sbin/new-kernel-pkg --rminitrd --rmmoddep --remove '"$KERNELRELEASE"' || exit $?'
-@@ -115,3 +128,7 @@ echo "/lib/modules/$KERNELRELEASE"
- echo "/lib/firmware"
- echo "/boot/*"
- echo ""
-+echo "%files devel"
-+echo '%defattr (-, root, root)'
-+echo "/usr/src/kernels/$KERNELRELEASE"
-+echo ""
+thanks,
+Michal
