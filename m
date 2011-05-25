@@ -1,74 +1,38 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-iw0-f174.google.com ([209.85.214.174]:44006 "EHLO
-	mail-iw0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752640Ab1EYFnA convert rfc822-to-8bit (ORCPT
+Received: from brigitte.telenet-ops.be ([195.130.137.66]:52352 "EHLO
+	brigitte.telenet-ops.be" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751757Ab1EYJKD (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 25 May 2011 01:43:00 -0400
-MIME-Version: 1.0
-In-Reply-To: <1306301804-12319-1-git-send-email-lacombar@gmail.com>
-References: <1306301804-12319-1-git-send-email-lacombar@gmail.com>
-Date: Wed, 25 May 2011 01:42:59 -0400
-Message-ID: <BANLkTim9a7RcjDk=DkXNZ-Foeo3E14Rd3Q@mail.gmail.com>
-Subject: Re: [PATCH] kconfig: do not overwrite symbol direct dependency in assignment
-From: Arnaud Lacombe <lacombar@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 8BIT
+	Wed, 25 May 2011 05:10:03 -0400
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Subject: [PATCH 2/4] kbuild: Fix reference to vermagic.h
+Date: Wed, 25 May 2011 11:09:59 +0200
+Message-Id: <1306314599-19233-1-git-send-email-geert@linux-m68k.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: Arnaud Lacombe <lacombar@gmail.com>
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Geert Uytterhoeven <geert@linux-m68k.org>
 
-Hi,
+It's "include/linux/vermagic.h", not "include/vermagic.h"
 
-On Wed, May 25, 2011 at 1:36 AM, Arnaud Lacombe <lacombar@gmail.com> wrote:
-> Considering the following configuration:
->
-> config F
->    bool "F"
->
-> choice AB
->    bool "AB"
-> config A
->    bool "A"
-> config B
->    bool "B"
-> endchoice
->
-> if A
-> config D
->    bool
->    default y if F
->    select E
-> config E
->    bool "E"
-> endif
->
-> if B
-> config D
->    bool
->    default y if F
->    select E
-> config E
->    bool "E"
-> endif
->
-> The following configuration:
->
-> CONFIG_F=y
-> CONFIG_A=y
-> CONFIG_D=y
-> CONFIG_E=y
->
-d'oh! this should have read:
+Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
+---
+ scripts/Makefile.modpost |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
- CONFIG_F=y
- CONFIG_A=y
- # CONFIG_B is not set
- CONFIG_D=y
- CONFIG_E=y
+diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
+index 56dfafc..08dce14 100644
+--- a/scripts/Makefile.modpost
++++ b/scripts/Makefile.modpost
+@@ -18,7 +18,7 @@
+ 
+ # Step 3 is used to place certain information in the module's ELF
+ # section, including information such as:
+-#   Version magic (see include/vermagic.h for full details)
++#   Version magic (see include/linux/vermagic.h for full details)
+ #     - Kernel release
+ #     - SMP is CONFIG_SMP
+ #     - PREEMPT is CONFIG_PREEMPT
+-- 
+1.7.0.4
 
-but I missed the leading space, and git decided to eat the assignment
-of CONFIG_B.
-
-sorry about that,
- - Arnaud
