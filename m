@@ -1,28 +1,42 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor.suse.de ([195.135.220.2]:55631 "EHLO mx1.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:59393 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1757890Ab1EYNy7 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 25 May 2011 09:54:59 -0400
-Date: Wed, 25 May 2011 15:54:58 +0200
+	id S932318Ab1EYOCy (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 25 May 2011 10:02:54 -0400
+Date: Wed, 25 May 2011 16:02:52 +0200
 From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [PATCH 6/6] kbuild: cleanup the rpm buildroot
-Message-ID: <20110525135458.GI2276@sepie.suse.cz>
-References: <1305653779-3445-1-git-send-email-asharma@fb.com>
- <1305653779-3445-6-git-send-email-asharma@fb.com>
+Subject: [GIT] kbuild/packaging for 2.6.40
+Message-ID: <20110525140252.GA15749@sepie.suse.cz>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1305653779-3445-6-git-send-email-asharma@fb.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arun Sharma <asharma@fb.com>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: asharma@fb.com, mmarek@suse.cz, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Tue, May 17, 2011 at 10:36:19AM -0700, Arun Sharma wrote:
->  echo "%build"
-> +echo 'rm -rf $RPM_BUILD_ROOT'
+Hi Linus,
 
-Don't do it, this allows another user to create their or $RPM_BUILD_ROOT
-and let you package it.
+Please pull these packaging changes for the next release:
+* kernel-headers.rpm containing the exported userspace headers
+* 2 minor fixed for make rpm
 
 Michal
+
+The following changes since commit 0ce790e7d736cedc563e1fb4e998babf5a4dbc3d:
+
+  Linux 2.6.39-rc1 (2011-03-29 12:09:47 -0700)
+
+are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild-2.6.git packaging
+
+Arun Sharma (2):
+      Replace '-' in kernel version with '_'
+      kbuild: Create a kernel-headers RPM
+
+Michal Marek (1):
+      rpm-pkg: Fix when current directory is a symlink
+
+ scripts/package/Makefile |    4 ++--
+ scripts/package/mkspec   |   19 ++++++++++++++++++-
+ 2 files changed, 20 insertions(+), 3 deletions(-)
