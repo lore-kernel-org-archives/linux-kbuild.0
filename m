@@ -1,70 +1,68 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from outmail010.snc4.facebook.com ([66.220.144.142]:41830 "EHLO
+Received: from outmail006.snc4.facebook.com ([66.220.144.138]:36272 "EHLO
 	mx-out.facebook.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S932326Ab1EYUba (ORCPT
+	with ESMTP id S1755678Ab1EYUem (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 25 May 2011 16:31:30 -0400
-Date: Wed, 25 May 2011 13:31:30 -0700
+	Wed, 25 May 2011 16:34:42 -0400
+Date: Wed, 25 May 2011 13:34:41 -0700
 From: Arun Sharma <asharma@fb.com>
-Subject: Re: [PATCH 1/6] kbuild: Integrate with new-kernel-pkg
-Message-ID: <20110525203130.GA29304@dev1756.snc6.facebook.com>
+Subject: Re: [PATCH 2/6] kbuild: Add a kernel-devel package
+Message-ID: <20110525203441.GA30980@dev1756.snc6.facebook.com>
 References: <1305653779-3445-1-git-send-email-asharma@fb.com>
- <4DD2D0B3.4070208@suse.cz>
- <20110517204520.GA21201@dev1756.snc6.facebook.com>
- <4DD2E9D9.7030207@suse.cz>
+ <1305653779-3445-2-git-send-email-asharma@fb.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <4DD2E9D9.7030207@suse.cz>
+In-Reply-To: <1305653779-3445-2-git-send-email-asharma@fb.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: Arun Sharma <asharma@fb.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Arun Sharma <asharma@fb.com>
+Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Tue, May 17, 2011 at 11:34:17PM +0200, Michal Marek wrote:
-> 
-> Or use /sbin/installkernel and let distros handle it.
+[ Updated version of this patch. ]
 
-Updated distro specific patch (not expecting you to apply it).
-The earlier version was mixed up with kernel-devel patch.
-
- -Arun
-
-commit cb73fb35a588922344763c075b2fce159df41fc7
-Author: Arun Sharma <asharma@fb.com>
-Date:   Sun Mar 6 08:08:53 2011 -0800
-
-    kbuild: Integrate with new-kernel-pkg
+    kbuild: Add a kernel-devel package
     
-    Handles mkinitrd, updating the bootloader among other things.
+    Useful for building modules without having kernel sources
     
     Signed-off-by: Arun Sharma <asharma@fb.com>
 
 diff --git a/scripts/package/mkspec b/scripts/package/mkspec
-index ed8b6a8..f5f0cb5 100755
+index f5f0cb5..c79b777 100755
 --- a/scripts/package/mkspec
 +++ b/scripts/package/mkspec
-@@ -40,6 +40,8 @@ echo "Source: kernel-$__KERNELRELEASE.tar.gz"
- fi
+@@ -49,6 +49,14 @@ echo ""
+ echo "%description"
+ echo "The Linux Kernel, the operating system core itself"
+ echo ""
++echo "%package devel"
++echo "Summary: Development package for building kernel modules to match the $__KERNELRELEASE kernel"
++echo "Group: System Environment/Kernel"
++echo "AutoReqProv: no"
++echo "%description -n kernel-devel"
++echo "This package provides kernel headers and makefiles sufficient to build modules"
++echo "against the $__KERNELRELEASE kernel package."
++echo ""
  
- echo "BuildRoot: %{_tmppath}/%{name}-%{PACKAGE_VERSION}-root"
-+echo "Requires(post): /sbin/new-kernel-pkg"
-+echo "Requires(preun): /sbin/new-kernel-pkg"
- echo "Provides: $PROVIDES"
- echo "%define __spec_install_post /usr/lib/rpm/brp-compress || :"
- echo "%define debug_package %{nil}"
-@@ -95,6 +97,14 @@ echo 'mv vmlinux.orig vmlinux'
+ if ! $PREBUILT; then
+ echo "%prep"
+@@ -96,6 +104,11 @@ echo 'mv vmlinux.bz2 $RPM_BUILD_ROOT'"/boot/vmlinux-$KERNELRELEASE.bz2"
+ echo 'mv vmlinux.orig vmlinux'
  echo "%endif"
  
- echo ""
-+echo "%preun"
-+echo '/sbin/new-kernel-pkg --rminitrd --rmmoddep --remove '"$KERNELRELEASE"' || exit $?'
++echo 'rm -rf $RPM_BUILD_ROOT'"/lib/modules/$KERNELRELEASE/{build,source}"
++echo "mkdir -p "'$RPM_BUILD_ROOT'"/usr/src/kernels/$KERNELRELEASE"
++echo "rsync -avz --exclude '.git/' --exclude '*vmlinux*' --exclude '.*' --exclude '*.o' --exclude '*.so' --exclude '*.ko' . "'$RPM_BUILD_ROOT'"/usr/src/kernels/$KERNELRELEASE/"
++echo 'pushd $RPM_BUILD_ROOT'"/lib/modules/$KERNELRELEASE"' && ln -s build source && ln -s '"/usr/src/kernels/$KERNELRELEASE"' build && popd'
 +
-+echo ""
-+echo "%post"
-+echo '/sbin/new-kernel-pkg --mkinitrd --depmod --install --make-default '"$KERNELRELEASE"' || exit $?'
-+
-+echo ""
- echo "%clean"
- echo 'rm -rf $RPM_BUILD_ROOT'
  echo ""
+ echo "%preun"
+ echo '/sbin/new-kernel-pkg --rminitrd --rmmoddep --remove '"$KERNELRELEASE"' || exit $?'
+@@ -115,3 +128,7 @@ echo "/lib/modules/$KERNELRELEASE"
+ echo "/lib/firmware"
+ echo "/boot/*"
+ echo ""
++echo "%files devel"
++echo '%defattr (-, root, root)'
++echo "/usr/src/kernels/$KERNELRELEASE"
++echo ""
