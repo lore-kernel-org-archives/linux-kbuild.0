@@ -1,24 +1,26 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:33153 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1757220Ab1EZLjJ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 26 May 2011 07:39:09 -0400
-Message-ID: <4DDE3BE1.5030302@suse.cz>
-Date: Thu, 26 May 2011 13:39:13 +0200
-From: Michal Marek <mmarek@suse.cz>
-MIME-Version: 1.0
+Received: from adelie.canonical.com ([91.189.90.139]:43044 "EHLO
+	adelie.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757075Ab1EZMm0 (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 26 May 2011 08:42:26 -0400
+Date: Thu, 26 May 2011 13:42:23 +0100
+From: Andy Whitcroft <apw@canonical.com>
 Subject: Re: [PATCH 34/34] checkpatch: Warn about usage of __DATE__, __TIME__
  and __TIMESTAMP__
-References: <1302015561-21047-1-git-send-email-mmarek@suse.cz> <1302015561-21047-35-git-send-email-mmarek@suse.cz>
+Message-ID: <20110526124223.GG2615@shadowen.org>
+References: <1302015561-21047-1-git-send-email-mmarek@suse.cz>
+ <1302015561-21047-35-git-send-email-mmarek@suse.cz>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 In-Reply-To: <1302015561-21047-35-git-send-email-mmarek@suse.cz>
-Content-Type: text/plain; charset=ISO-8859-2
-Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andy Whitcroft <apw@canonical.com>
+To: Michal Marek <mmarek@suse.cz>
 Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On 5.4.2011 16:59, Michal Marek wrote:
+On Tue, Apr 05, 2011 at 04:59:21PM +0200, Michal Marek wrote:
 > The __TIME__ and __DATE__ macros are evil. Every C textbook mentions
 > them, but forgets to add the tiny detail that they make sure that your
 > code will never result in the same binary. __TIMESTAMP__ is a bit more
@@ -30,15 +32,7 @@ On 5.4.2011 16:59, Michal Marek wrote:
 > ---
 >  scripts/checkpatch.pl |    5 +++++
 >  1 files changed, 5 insertions(+), 0 deletions(-)
-
-Hi Andy,
-
-any comments about this patch?
-
-Thanks,
-Michal
-
-
+> 
 > diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
 > index 4c0383d..dbcdf04 100755
 > --- a/scripts/checkpatch.pl
@@ -55,4 +49,9 @@ Michal
 >  # check for semaphores initialized locked
 >  		if ($line =~ /^.\s*sema_init.+,\W?0\W?\)/) {
 >  			WARN("consider using a completion\n" . $herecurr);
+> -- 
+> 1.7.4.1
 
+Looks reasonable to me.
+
+-apw
