@@ -1,46 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from shards.monkeyblade.net ([198.137.202.13]:58041 "EHLO
-	shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756536Ab1EYVjP (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 25 May 2011 17:39:15 -0400
-Date: Wed, 25 May 2011 17:39:07 -0400 (EDT)
-Message-Id: <20110525.173907.991720348148063903.davem@davemloft.net>
-Subject: Re: [PATCH 28/34] atm: Drop __TIME__ usage
-From: David Miller <davem@davemloft.net>
-In-Reply-To: <4DDD6B59.9000108@suse.cz>
-References: <1302015561-21047-1-git-send-email-mmarek@suse.cz>
-	<1302015561-21047-29-git-send-email-mmarek@suse.cz>
-	<4DDD6B59.9000108@suse.cz>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+Received: from mx1.melware.net ([78.47.171.162]:49889 "EHLO mx1.melware.net"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1756599Ab1EZIWF (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 26 May 2011 04:22:05 -0400
+Date: Thu, 26 May 2011 10:15:21 +0200 (CEST)
+From: Armin Schindler <armin@melware.de>
+Subject: Re: [PATCH 12/34] isdn/diva: Drop __TIME__ usage
+In-Reply-To: <4DDD68C3.7000004@suse.cz>
+Message-ID: <alpine.DEB.2.00.1105261012360.20696@justus.melware.de>
+References: <1302015561-21047-1-git-send-email-mmarek@suse.cz> <1302015561-21047-13-git-send-email-mmarek@suse.cz> <alpine.DEB.2.00.1104051709040.7262@justus.melware.de> <4DDD68C3.7000004@suse.cz>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII; format=flowed
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: mmarek@suse.cz
+To: Michal Marek <mmarek@suse.cz>
 Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org
 
-From: Michal Marek <mmarek@suse.cz>
-Date: Wed, 25 May 2011 22:49:29 +0200
+On Wed, 25 May 2011, Michal Marek wrote:
+> Dne 5.4.2011 17:10, Armin Schindler napsal(a):
+>> On Tue, 5 Apr 2011, Michal Marek wrote:
+>>> The kernel already prints its build timestamp during boot, no need to
+>>> repeat it in random drivers and produce different object files each
+>>> time.
+>>
+>> The module can be build separately from the kernel, therefore it can have
+>> an own build timestamp.
+>
+> So the module timestamp and kernel timestamp vary by a couple of
+> minutes. But is it really a problem?
 
-> Dne 5.4.2011 16:59, Michal Marek napsal(a):
->> The kernel already prints its build timestamp during boot, no need to
->> repeat it in random drivers and produce different object files each
->> time.
->> 
->> Cc: "David S. Miller" <davem@davemloft.net>
->> Cc: netdev@vger.kernel.org
->> Signed-off-by: Michal Marek <mmarek@suse.cz>
->> ---
->>  net/atm/lec.c |    2 +-
->>  net/atm/mpc.c |    2 +-
->>  2 files changed, 2 insertions(+), 2 deletions(-)
-> 
-> Hi,
-> 
-> I don't see this patch in today's linux-next. Any objection against me
-> applying it to the kbuild-2.6.git repository?
+It could be a lot more than minutes. But it isn't a problem.
+I just tried to keep the sources in sync with out-of-tree version.
 
-Please apply it:
+> I don't think so. So is there an
+> objection against applying this patch?
 
-Acked-by: David S. Miller <davem@davemloft.net>
+No objection. Please go ahead with the patch.
+
+Thanks
+Armin
