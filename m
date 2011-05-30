@@ -1,46 +1,66 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from lennier.cc.vt.edu ([198.82.162.213]:35494 "EHLO
-	lennier.cc.vt.edu" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751512Ab1E3PI4 (ORCPT
+Received: from oproxy4-pub.bluehost.com ([69.89.21.11]:58935 "HELO
+	oproxy4-pub.bluehost.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with SMTP id S1754744Ab1E3UB0 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 30 May 2011 11:08:56 -0400
-Subject: Re: [PATCH 2/4] kbuild: Fix <linux/version.h> for X.Y versions
-In-Reply-To: Your message of "Mon, 30 May 2011 16:50:50 +0200."
-             <1306767052-15593-3-git-send-email-mmarek@suse.cz>
-From: Valdis.Kletnieks@vt.edu
-References: <1306767052-15593-1-git-send-email-mmarek@suse.cz>
-            <1306767052-15593-3-git-send-email-mmarek@suse.cz>
+	Mon, 30 May 2011 16:01:26 -0400
+Date: Mon, 30 May 2011 13:01:23 -0700
+From: Randy Dunlap <rdunlap@xenotime.net>
+Subject: Re: [PATCH] Fix corruption of CONFIG_X86_32 in 'make oldconfig'
+Message-Id: <20110530130123.58153ec5.rdunlap@xenotime.net>
+In-Reply-To: <201105302040.55509.arnd@arndb.de>
+References: <1306707270.2029.377.camel@i7.infradead.org>
+	<201105301305.59166.arnd@arndb.de>
+	<20110530102731.fa9fbc4a.rdunlap@xenotime.net>
+	<201105302040.55509.arnd@arndb.de>
 Mime-Version: 1.0
-Content-Type: multipart/signed; boundary="==_Exmh_1306768129_2897P";
-	 micalg=pgp-sha1; protocol="application/pgp-signature"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Date: Mon, 30 May 2011 11:08:49 -0400
-Message-ID: <5164.1306768129@turing-police.cc.vt.edu>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Arnd Bergmann <arnd@arndb.de>, linux-kbuild@vger.kernel.org
+Cc: David Woodhouse <dwmw2@infradead.org>, John Stultz <john.stultz@linaro.org>, Ingo Molnar <mingo@elte.hu>, x86@kernel.org, linux-kernel@vger.kernel.org
 
---==_Exmh_1306768129_2897P
-Content-Type: text/plain; charset=us-ascii
+On Mon, 30 May 2011 20:40:55 +0200 Arnd Bergmann wrote:
 
-On Mon, 30 May 2011 16:50:50 +0200, Michal Marek said:
+> On Monday 30 May 2011 19:27:31 Randy Dunlap wrote:
+> > On Mon, 30 May 2011 13:05:58 +0200 Arnd Bergmann wrote:
+> > 
+> > Ingo recently wrote:
+> > | When it wont boot straight away (often it does) i use a 
+> > | Kconfig-needed set of minimal set of configs that enables the minimal 
+> > | hardware environment.
+> > 
+> > which I believe is the same method that is documented in
+> > Documentation/kbuild/kconfig.txt, subject "KCONFIG_ALLCONFIG": (partial text)
+> > 
+> > This enables you to create "miniature" config (miniconfig) or custom
+> > config files containing just the config symbols that you are interested
+> > in.  Then the kernel config system generates the full .config file,
+> > including symbols of your miniconfig file.
+> > 
+> > This 'KCONFIG_ALLCONFIG' file is a config file which contains
+> > (usually a subset of all) preset config symbols.  These variable
+> > settings are still subject to normal dependency checks.
+> > 
+> 
+> Very nice, I didn't know about it. Unfortunately, this seems to
+> suffer from the same problem as the generic "randconfig" -- it
+> ignores all "choice" statements and just uses the default:
+> 
+> Try for instance
+> 
+> KCONFIG_ALLCONFIG=arch/arm/configs/omap2plus_defconfig make \
+> 	O=obj-allmod/ allnoconfig ARCH=arm
+> 
+> This is supposed to set CONFIG_ARCH_OMAP, but it instead chooses
+> CONFIG_ARCH_VERSATILE, which means it's still useless for me.
 
-> +	expr $(VERSION) \* 65536 + $(PATCHLEVEL) \* 256 + 0$(SUBLEVEL));    \
+baa humbug.
 
-expr isn't going to interpret that last field as octal, is it?
+dear linux-kbuild, can "choice" choices be made random during
+"make randconfig", please?
 
---==_Exmh_1306768129_2897P
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.11 (GNU/Linux)
-Comment: Exmh version 2.5 07/13/2001
-
-iD8DBQFN47MBcC3lWbTT17ARAjs8AKDuRh/ZlXbZuvJAx9aur73aDQAgNgCgqpe1
-oNA5NbC+ZtkyW6R9aAX6sGQ=
-=nC+B
------END PGP SIGNATURE-----
-
---==_Exmh_1306768129_2897P--
-
+---
+~Randy
+*** Remember to use Documentation/SubmitChecklist when testing your code ***
