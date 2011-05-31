@@ -1,30 +1,30 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor.suse.de ([195.135.220.2]:57000 "EHLO mx1.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752439Ab1EaJBy (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 31 May 2011 05:01:54 -0400
-Message-ID: <4DE4AE80.9040904@suse.cz>
-Date: Tue, 31 May 2011 11:01:52 +0200
-From: Michal Marek <mmarek@suse.cz>
+Received: from mail-iy0-f174.google.com ([209.85.210.174]:49684 "EHLO
+	mail-iy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1758457Ab1EaJHp (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 31 May 2011 05:07:45 -0400
 MIME-Version: 1.0
+In-Reply-To: <1306767052-15593-3-git-send-email-mmarek@suse.cz>
+References: <1306767052-15593-1-git-send-email-mmarek@suse.cz>
+	<1306767052-15593-3-git-send-email-mmarek@suse.cz>
+Date: Tue, 31 May 2011 17:07:45 +0800
+Message-ID: <BANLkTinB96saeLFZPG88Rtjq30gioj8hRw@mail.gmail.com>
 Subject: Re: [PATCH 2/4] kbuild: Fix <linux/version.h> for X.Y versions
-References: <1306767052-15593-1-git-send-email-mmarek@suse.cz>            <1306767052-15593-3-git-send-email-mmarek@suse.cz> <5164.1306768129@turing-police.cc.vt.edu>
-In-Reply-To: <5164.1306768129@turing-police.cc.vt.edu>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
+From: =?UTF-8?Q?Am=C3=A9rico_Wang?= <xiyou.wangcong@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Valdis.Kletnieks@vt.edu
+To: Michal Marek <mmarek@suse.cz>
 Cc: Linus Torvalds <torvalds@linux-foundation.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On 30.5.2011 17:08, Valdis.Kletnieks@vt.edu wrote:
-> On Mon, 30 May 2011 16:50:50 +0200, Michal Marek said:
+On Mon, May 30, 2011 at 10:50 PM, Michal Marek <mmarek@suse.cz> wrote:
+> expr treats all numbers as decimals, so prepending a zero is safe. Note
+> that the KERNEL_VERSION() macro still takes three arguments, 3.0 has to be
+> written as KERNEL_VERSION(3,0,0).
 >
->> +	expr $(VERSION) \* 65536 + $(PATCHLEVEL) \* 256 + 0$(SUBLEVEL));    \
->
-> expr isn't going to interpret that last field as octal, is it?
+> Signed-off-by: Michal Marek <mmarek@suse.cz>
 
-As I wrote in the changelog: "expr treats all numbers as decimals, so 
-prepending a zero is safe." POSIX requires this, FWIW.
+Acked-by: WANG Cong <xiyou.wangcong@gmail.com>
 
-Michal
+Thanks.
