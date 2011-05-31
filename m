@@ -1,160 +1,377 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pv0-f174.google.com ([74.125.83.174]:35578 "EHLO
+Received: from mail-pv0-f174.google.com ([74.125.83.174]:45181 "EHLO
 	mail-pv0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751693Ab1EaAYG convert rfc822-to-8bit (ORCPT
+	with ESMTP id S1751901Ab1EaBYY convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 30 May 2011 20:24:06 -0400
+	Mon, 30 May 2011 21:24:24 -0400
+Received: by mail-pv0-f174.google.com with SMTP id 12so1797890pvg.19
+        for <linux-kbuild@vger.kernel.org>; Mon, 30 May 2011 18:24:24 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1306795186.2029.459.camel@i7.infradead.org>
-References: <1306707270.2029.377.camel@i7.infradead.org>
-	<20110530072300.GA9802@elte.hu>
-	<1306745835.2029.389.camel@i7.infradead.org>
-	<20110530104231.GF17821@elte.hu>
-	<20110530104656.GA19532@elte.hu>
-	<E934876C-FABB-41F8-8C5E-469AA42DBE91@mit.edu>
-	<20110530105809.GA20133@elte.hu>
-	<1A4DB87D-9B32-44C0-B7C9-47A003CABD96@mit.edu>
-	<alpine.LFD.2.02.1105301955210.3164@localhost6.localdomain6>
-	<20110530195545.GG2890@dhcp-172-31-194-241.cam.corp.google.com>
-	<alpine.LFD.2.02.1105302103220.3164@localhost6.localdomain6>
-	<1306795186.2029.459.camel@i7.infradead.org>
-Date: Mon, 30 May 2011 20:24:05 -0400
-Message-ID: <BANLkTik=uHr1eX44XV1pAHUfVQ-MorzOnw@mail.gmail.com>
-Subject: Re: [PATCH] Enable 'make CONFIG_FOO=y oldconfig'
+In-Reply-To: <1305518795-9360-1-git-send-email-lacombar@gmail.com>
+References: <1305518795-9360-1-git-send-email-lacombar@gmail.com>
+Date: Mon, 30 May 2011 21:24:23 -0400
+Message-ID: <BANLkTik=EiHpSE2LN0QQ2bgrT_2Xy2iwZQ@mail.gmail.com>
+Subject: Re: [RFC] kconfig: zconfdump() clean-up
 From: Arnaud Lacombe <lacombar@gmail.com>
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: David Woodhouse <dwmw2@infradead.org>
-Cc: Ted Ts'o <tytso@mit.edu>, Ingo Molnar <mingo@elte.hu>, x86@kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
+Cc: Michal Marek <mmarek@suse.cz>, Arnaud Lacombe <lacombar@gmail.com>
 
 Hi,
 
-On Mon, May 30, 2011 at 6:39 PM, David Woodhouse <dwmw2@infradead.org> wrote:
-> This allows you to set (and clear) config options on the make command
-> line, for all config targets. For example:
+On Mon, May 16, 2011 at 12:06 AM, Arnaud Lacombe <lacombar@gmail.com> wrote:
+> Hi Michal,
 >
->   make CONFIG_64BIT=n randconfig
->   make CONFIG_64BIT=n allmodconfig
->   make CONFIG_64BIT=y CONFIG_SATA_MV=y oldconfig
+> The following patch is a summarize of changes I made in zconfdump() last week
+> when debugging Yann's multiple choice issue. This might help debugging a bit,
+> espectially by exposing the tree depth.
 >
-> Signed-off-by: David Woodhouse <David.Woodhouse@intel.com>
+> Considering the following Kconfig:
 >
-This does not seem to work with:
-
-% make CONFIG_ARCH_OMAP=y ARCH=arm allnoconfig
-  HOSTCC  scripts/kconfig/conf.o
-  HOSTLD  scripts/kconfig/conf
-scripts/kconfig/conf --allnoconfig Kconfig
-#
-# configuration written to .config
-#
-
-% grep CONFIG_ARCH_OMAP .config
-# CONFIG_ARCH_OMAP is not set
-
-It would seem that the underlying symbol is not visible, triggering
-the failure of sym_set_tristate_value().
+> config A
+>   bool "A"
+> if A
+> choice C
+>   bool "C"
+> config C1
+>   bool "C1"
+> config C2
+>   bool "C2"
+> endchoice
+> endif # A
+>
+> config B
+>   bool "B"
+>   depends on ! A
+> if B
+> choice C
+>   bool "C"
+> config C1
+>   bool "C1"
+> config C2
+>   bool "C2"
+> endchoice
+> endif # A
+>
+> It generates the following output, after menu_finalize():
+>
+> config A
+>  boolean
+>  symbol
+>  prompt "A"
+>
+>        choice C
+>          boolean
+>          symbol
+>          #choice
+>          prompt "C" if A
+>
+>                config C1
+>                  boolean
+>                  symbol
+>                  prompt "C1" if C
+>                  #choice
+>
+>                config C2
+>                  boolean
+>                  symbol
+>                  prompt "C2" if C
+>                  #choice
+>
+>        endchoice
+>
+>        config B
+>          boolean
+>          symbol
+>          prompt "B" if !A
+>
+>                choice C
+>                  boolean
+>                  symbol
+>                  #choice
+>                  prompt "C" if B
+>
+>                        config C1
+>                          boolean
+>                          symbol
+>                          prompt "C1" if C
+>
+>                        config C2
+>                          boolean
+>                          symbol
+>                          prompt "C2" if C
+>
+>                endchoice
+>
+> instead of:
+>
+> config A
+>  boolean
+>  unknown prop 9!
+>  prompt "A"
+>
+> choice
+>  boolean
+>  unknown prop 9!
+>  #choice value
+>  prompt "C" if A
+>
+> config C1
+>  boolean
+>  unknown prop 9!
+>  prompt "C1" if C
+>  #choice value
+>
+> config C2
+>  boolean
+>  unknown prop 9!
+>  prompt "C2" if C
+>  #choice value
+>
+> config B
+>  boolean
+>  unknown prop 9!
+>  prompt "B" if !A
+>
+> choice
+>  boolean
+>  unknown prop 9!
+>  #choice value
+>  prompt "C" if B
+>
+> config C1
+>  boolean
+>  unknown prop 9!
+>  prompt "C1" if C
+>
+> config C2
+>  boolean
+>  unknown prop 9!
+>  prompt "C2" if C
+>
+> endmenu
+>
+> Broken down patches are available at:
+>
+> https://github.com/lacombar/linux-2.6/tree/kconfig-zconfdump
+>
+> Not for merge for now, even if it merges fine with your kbuild/kconfig's tip.
+>
+ping ?
 
  - Arnaud
 
-> diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
-> index 006ad81..2b91e3b 100644
-> --- a/scripts/kconfig/conf.c
-> +++ b/scripts/kconfig/conf.c
-> @@ -456,7 +456,7 @@ static struct option long_opts[] = {
->        {NULL, 0, NULL, 0}
->  };
+> Regards,
+>  - Arnaud
 >
-> -int main(int ac, char **av)
-> +int main(int ac, char **av, char **ep)
->  {
->        int opt;
->        const char *name;
-> @@ -563,6 +563,11 @@ int main(int ac, char **av)
->                break;
->        }
+> ---
+>  scripts/kconfig/zconf.y |  161 +++++++++++++++++++----------------------------
+>  1 files changed, 66 insertions(+), 95 deletions(-)
 >
-> +       for ( ; *ep;  ep++) {
-> +               if (!strncmp(*ep, CONFIG_, strlen(CONFIG_)))
-> +                       conf_set_symbol_from_env(*ep);
-> +       }
-> +
->        if (sync_kconfig) {
->                if (conf_get_changed()) {
->                        name = getenv("KCONFIG_NOSILENTUPDATE");
-> diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
-> index 61c35bf..e8ff902 100644
-> --- a/scripts/kconfig/confdata.c
-> +++ b/scripts/kconfig/confdata.c
-> @@ -338,6 +338,47 @@ setsym:
->        return 0;
+> diff --git a/scripts/kconfig/zconf.y b/scripts/kconfig/zconf.y
+> index 237ae2a..f18bc5a 100644
+> --- a/scripts/kconfig/zconf.y
+> +++ b/scripts/kconfig/zconf.y
+> @@ -612,129 +612,100 @@ static void print_quoted_string(FILE *out, const char *str)
+>        putc('"', out);
 >  }
 >
-> +void conf_set_symbol_from_env(char *str)
-> +{
-> +       char *p = strchr(str, '=');
-> +       struct symbol *sym;
-> +       int def = S_DEF_USER;
-> +       int def_flags = SYMBOL_DEF << def;
+> -static void print_symbol(FILE *out, struct menu *menu)
+> +static int indent;
 > +
-> +       if (!p)
+> +static void print_property(FILE *out, struct property *prop)
+>  {
+> -       struct symbol *sym = menu->sym;
+> -       struct property *prop;
+> +       const char *prop_string;
+>
+> -       if (sym_is_choice(sym))
+> -               fprintf(out, "\nchoice\n");
+> -       else
+> -               fprintf(out, "\nconfig %s\n", sym->name);
+> -       switch (sym->type) {
+> -       case S_BOOLEAN:
+> -               fputs("  boolean\n", out);
+> -               break;
+> -       case S_TRISTATE:
+> -               fputs("  tristate\n", out);
+> +       prop_string = prop_get_type_name(prop->type);
+> +       if (prop_string == NULL)
 > +               return;
 > +
-> +       *p = 0;
-> +       sym = sym_find(str + strlen(CONFIG_));
-> +       *p++ = '=';
+> +       fprintf(out, "%*s  %s%s ", indent * 8, "",
+> +           (prop->type == P_CHOICE) ? "#" : "",
+> +           prop_string);
 > +
-> +       if (!sym)
-> +               return;
-> +
-> +       if (!sym_set_string_value(sym, p))
-> +               return;
-> +       conf_message("CONFIG_%s set to %s from environment", sym->name, p);
-> +       if (sym && sym_is_choice_value(sym)) {
-> +               struct symbol *cs = prop_get_symbol(sym_get_choice_prop(sym));
-> +               switch (sym->def[def].tri) {
-> +               case no:
-> +                       break;
-> +               case mod:
-> +                       if (cs->def[def].tri == yes) {
-> +                               conf_warning("%s creates inconsistent choice state", sym->name);
-> +                               cs->flags &= ~def_flags;
-> +                       }
-> +                       break;
-> +               case yes:
-> +                       if (cs->def[def].tri != no)
-> +                               conf_warning("override: %s changes choice state", sym->name);
-> +                       cs->def[def].val = sym;
-> +                       break;
+> +       switch (prop->type) {
+> +       case P_PROMPT:
+> +               print_quoted_string(out, prop->text);
+> +               if (!expr_is_yes(prop->visible.expr)) {
+> +                       fputs(" if ", out);
+> +                       expr_fprint(prop->visible.expr, out);
 > +               }
-> +               cs->def[def].tri = EXPR_OR(cs->def[def].tri, sym->def[def].tri);
-> +       }
+>                break;
+> -       case S_STRING:
+> -               fputs("  string\n", out);
+> +       case P_DEFAULT:
+> +               expr_fprint(prop->expr, out);
+> +               if (!expr_is_yes(prop->visible.expr)) {
+> +                       fputs(" if ", out);
+> +                       expr_fprint(prop->visible.expr, out);
+> +               }
+>                break;
+> -       case S_INT:
+> -               fputs("  integer\n", out);
+> +       case P_SELECT:
+> +       case P_RANGE:
+> +               expr_fprint(prop->expr, out);
+>                break;
+> -       case S_HEX:
+> -               fputs("  hex\n", out);
+> +       case P_MENU:
+> +       case P_COMMENT:
+> +               print_quoted_string(out, prop->text);
+>                break;
+>        default:
+> -               fputs("  ???\n", out);
+>                break;
+>        }
+> +       fprintf(out, "\n");
 > +}
 > +
->  int conf_read(const char *name)
+> +static void print_symbol(FILE *out, struct menu *menu)
+> +{
+> +       struct symbol *sym = menu->sym;
+> +       struct property *prop;
+> +
+> +       fprintf(out, "%*s%s %s\n", indent * 8, "",
+> +           (sym_is_choice(sym)) ? "choice" : "config",
+> +           (sym->name) ? sym->name: "");
+> +       fprintf(out, "%*s  %s\n", indent * 8, "",
+> +           sym_type_name(sym->type));
+> +
+>        for (prop = sym->prop; prop; prop = prop->next) {
+>                if (prop->menu != menu)
+>                        continue;
+> -               switch (prop->type) {
+> -               case P_PROMPT:
+> -                       fputs("  prompt ", out);
+> -                       print_quoted_string(out, prop->text);
+> -                       if (!expr_is_yes(prop->visible.expr)) {
+> -                               fputs(" if ", out);
+> -                               expr_fprint(prop->visible.expr, out);
+> -                       }
+> -                       fputc('\n', out);
+> -                       break;
+> -               case P_DEFAULT:
+> -                       fputs( "  default ", out);
+> -                       expr_fprint(prop->expr, out);
+> -                       if (!expr_is_yes(prop->visible.expr)) {
+> -                               fputs(" if ", out);
+> -                               expr_fprint(prop->visible.expr, out);
+> -                       }
+> -                       fputc('\n', out);
+> -                       break;
+> -               case P_CHOICE:
+> -                       fputs("  #choice value\n", out);
+> -                       break;
+> -               case P_SELECT:
+> -                       fputs( "  select ", out);
+> -                       expr_fprint(prop->expr, out);
+> -                       fputc('\n', out);
+> -                       break;
+> -               case P_RANGE:
+> -                       fputs( "  range ", out);
+> -                       expr_fprint(prop->expr, out);
+> -                       fputc('\n', out);
+> -                       break;
+> -               case P_MENU:
+> -                       fputs( "  menu ", out);
+> -                       print_quoted_string(out, prop->text);
+> -                       fputc('\n', out);
+> -                       break;
+> -               case P_SYMBOL:
+> -                       break;
+> -               default:
+> -                       fprintf(out, "  unknown prop %d!\n", prop->type);
+> -                       break;
+> -               }
+> -       }
+> -       if (menu->help) {
+> -               int len = strlen(menu->help);
+> -               while (menu->help[--len] == '\n')
+> -                       menu->help[len] = 0;
+> -               fprintf(out, "  help\n%s\n", menu->help);
+> +               print_property(out, prop);
+>        }
+> +       fprintf(out, "\n");
+>  }
+>
+>  void zconfdump(FILE *out)
 >  {
->        struct symbol *sym, *choice_sym;
-> diff --git a/scripts/kconfig/lkc.h b/scripts/kconfig/lkc.h
-> index febf0c9..bf6fade 100644
-> --- a/scripts/kconfig/lkc.h
-> +++ b/scripts/kconfig/lkc.h
-> @@ -91,6 +91,7 @@ char *conf_get_default_confname(void);
->  void sym_set_change_count(int count);
->  void sym_add_change_count(int count);
->  void conf_set_all_new_symbols(enum conf_def_mode mode);
-> +void conf_set_symbol_from_env(char *);
+> -       struct property *prop;
+> -       struct symbol *sym;
+>        struct menu *menu;
 >
->  /* confdata.c and expr.c */
->  static inline void xfwrite(const void *str, size_t len, size_t count, FILE *out)
+>        menu = rootmenu.list;
+>        while (menu) {
+> -               if ((sym = menu->sym))
+> +               if (menu->sym)
+>                        print_symbol(out, menu);
+> -               else if ((prop = menu->prompt)) {
+> -                       switch (prop->type) {
+> -                       case P_COMMENT:
+> -                               fputs("\ncomment ", out);
+> -                               print_quoted_string(out, prop->text);
+> -                               fputs("\n", out);
+> -                               break;
+> -                       case P_MENU:
+> -                               fputs("\nmenu ", out);
+> -                               print_quoted_string(out, prop->text);
+> -                               fputs("\n", out);
+> -                               break;
+> -                       default:
+> -                               ;
+> -                       }
+> -                       if (!expr_is_yes(prop->visible.expr)) {
+> -                               fputs("  depends ", out);
+> -                               expr_fprint(prop->visible.expr, out);
+> -                               fputc('\n', out);
+> -                       }
+> +
+> +               if (menu->help) {
+> +                       int len = strlen(menu->help);
+> +                       while (menu->help[--len] == '\n')
+> +                               menu->help[len] = 0;
+> +                       fprintf(out, "%*s  help\n%s\n", indent * 8, "",
+> +                           menu->help);
+>                }
 >
->
+> -               if (menu->list)
+> +               if (menu->list) {
+> +                       indent++;
+>                        menu = menu->list;
+> +               }
+>                else if (menu->next)
+>                        menu = menu->next;
+>                else while ((menu = menu->parent)) {
+> -                       if (menu->prompt && menu->prompt->type == P_MENU)
+> -                               fputs("\nendmenu\n", out);
+> +                       if (menu != &rootmenu)
+> +                               indent--;
+> +                       fprintf(out, "%*s", indent * 8, "");
+> +                       if (menu->sym && sym_is_choice(menu->sym))
+> +                               fprintf(out, "endchoice\n\n");
+> +                       if (menu->prompt && menu->prompt->type == P_MENU &&
+> +                           menu != &rootmenu)
+> +                               fprintf(out, "endmenu\n\n");
+>                        if (menu->next) {
+>                                menu = menu->next;
+>                                break;
 > --
-> dwmw2
+> 1.7.3.4.574.g608b.dirty
 >
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 >
