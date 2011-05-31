@@ -1,30 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-iy0-f174.google.com ([209.85.210.174]:49684 "EHLO
-	mail-iy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1758457Ab1EaJHp (ORCPT
+Received: from casper.infradead.org ([85.118.1.10]:51308 "EHLO
+	casper.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753098Ab1EaPtI (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 31 May 2011 05:07:45 -0400
-MIME-Version: 1.0
-In-Reply-To: <1306767052-15593-3-git-send-email-mmarek@suse.cz>
-References: <1306767052-15593-1-git-send-email-mmarek@suse.cz>
-	<1306767052-15593-3-git-send-email-mmarek@suse.cz>
-Date: Tue, 31 May 2011 17:07:45 +0800
-Message-ID: <BANLkTinB96saeLFZPG88Rtjq30gioj8hRw@mail.gmail.com>
-Subject: Re: [PATCH 2/4] kbuild: Fix <linux/version.h> for X.Y versions
-From: =?UTF-8?Q?Am=C3=A9rico_Wang?= <xiyou.wangcong@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+	Tue, 31 May 2011 11:49:08 -0400
+Subject: Re: [PATCH] Enable 'make CONFIG_FOO=y oldconfig'
+From: David Woodhouse <dwmw2@infradead.org>
+Date: Tue, 31 May 2011 16:48:56 +0100
+In-Reply-To: <BANLkTik=uHr1eX44XV1pAHUfVQ-MorzOnw@mail.gmail.com>
+References: <1306707270.2029.377.camel@i7.infradead.org>
+	 <20110530072300.GA9802@elte.hu>
+	 <1306745835.2029.389.camel@i7.infradead.org>
+	 <20110530104231.GF17821@elte.hu> <20110530104656.GA19532@elte.hu>
+	 <E934876C-FABB-41F8-8C5E-469AA42DBE91@mit.edu>
+	 <20110530105809.GA20133@elte.hu>
+	 <1A4DB87D-9B32-44C0-B7C9-47A003CABD96@mit.edu>
+	 <alpine.LFD.2.02.1105301955210.3164@localhost6.localdomain6>
+	 <20110530195545.GG2890@dhcp-172-31-194-241.cam.corp.google.com>
+	 <alpine.LFD.2.02.1105302103220.3164@localhost6.localdomain6>
+	 <1306795186.2029.459.camel@i7.infradead.org>
+	 <BANLkTik=uHr1eX44XV1pAHUfVQ-MorzOnw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Message-ID: <1306856937.27477.3.camel@i7.infradead.org>
+Mime-Version: 1.0
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Arnaud Lacombe <lacombar@gmail.com>
+Cc: Ted Ts'o <tytso@mit.edu>, Ingo Molnar <mingo@elte.hu>, x86@kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-On Mon, May 30, 2011 at 10:50 PM, Michal Marek <mmarek@suse.cz> wrote:
-> expr treats all numbers as decimals, so prepending a zero is safe. Note
-> that the KERNEL_VERSION() macro still takes three arguments, 3.0 has to be
-> written as KERNEL_VERSION(3,0,0).
->
-> Signed-off-by: Michal Marek <mmarek@suse.cz>
+On Mon, 2011-05-30 at 20:24 -0400, Arnaud Lacombe wrote:
+> It would seem that the underlying symbol is not visible, triggering
+> the failure of sym_set_tristate_value().
 
-Acked-by: WANG Cong <xiyou.wangcong@gmail.com>
+Yes, this only lets you set *visible* symbols. If the symbol you're
+interested in is not visible because some of its dependencies are not
+set, it doesn't go and automatically enable those.
 
-Thanks.
+-- 
+David Woodhouse                            Open Source Technology Centre
+David.Woodhouse@intel.com                              Intel Corporation
+
