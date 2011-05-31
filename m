@@ -1,59 +1,93 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pz0-f46.google.com ([209.85.210.46]:55310 "EHLO
-	mail-pz0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752977Ab1EaQM7 convert rfc822-to-8bit (ORCPT
+Received: from mail-pw0-f46.google.com ([209.85.160.46]:39800 "EHLO
+	mail-pw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932869Ab1EaW4E convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 31 May 2011 12:12:59 -0400
+	Tue, 31 May 2011 18:56:04 -0400
 MIME-Version: 1.0
-In-Reply-To: <1306856937.27477.3.camel@i7.infradead.org>
-References: <1306707270.2029.377.camel@i7.infradead.org>
-	<20110530072300.GA9802@elte.hu>
-	<1306745835.2029.389.camel@i7.infradead.org>
-	<20110530104231.GF17821@elte.hu>
-	<20110530104656.GA19532@elte.hu>
-	<E934876C-FABB-41F8-8C5E-469AA42DBE91@mit.edu>
-	<20110530105809.GA20133@elte.hu>
-	<1A4DB87D-9B32-44C0-B7C9-47A003CABD96@mit.edu>
-	<alpine.LFD.2.02.1105301955210.3164@localhost6.localdomain6>
-	<20110530195545.GG2890@dhcp-172-31-194-241.cam.corp.google.com>
-	<alpine.LFD.2.02.1105302103220.3164@localhost6.localdomain6>
-	<1306795186.2029.459.camel@i7.infradead.org>
-	<BANLkTik=uHr1eX44XV1pAHUfVQ-MorzOnw@mail.gmail.com>
-	<1306856937.27477.3.camel@i7.infradead.org>
-Date: Tue, 31 May 2011 12:12:58 -0400
-Message-ID: <BANLkTi=VoL8ze0AcdkG_QmEH5049X2K6Zw@mail.gmail.com>
-Subject: Re: [PATCH] Enable 'make CONFIG_FOO=y oldconfig'
+In-Reply-To: <1306301804-12319-1-git-send-email-lacombar@gmail.com>
+References: <1306301804-12319-1-git-send-email-lacombar@gmail.com>
+Date: Tue, 31 May 2011 18:56:02 -0400
+Message-ID: <BANLkTim8=HGpN65sdRnwE_yPX4oO7CWOWA@mail.gmail.com>
+Subject: Re: [PATCH] kconfig: do not overwrite symbol direct dependency in assignment
 From: Arnaud Lacombe <lacombar@gmail.com>
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: David Woodhouse <dwmw2@infradead.org>
-Cc: Ted Ts'o <tytso@mit.edu>, Ingo Molnar <mingo@elte.hu>, x86@kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>
 
 Hi,
 
-On Tue, May 31, 2011 at 11:48 AM, David Woodhouse <dwmw2@infradead.org> wrote:
-> On Mon, 2011-05-30 at 20:24 -0400, Arnaud Lacombe wrote:
->> It would seem that the underlying symbol is not visible, triggering
->> the failure of sym_set_tristate_value().
+On Wed, May 25, 2011 at 1:36 AM, Arnaud Lacombe <lacombar@gmail.com> wrote:
+> Considering the following configuration:
 >
-> Yes, this only lets you set *visible* symbols. If the symbol you're
-> interested in is not visible because some of its dependencies are not
-> set, it doesn't go and automatically enable those.
+> config F
+>    bool "F"
 >
-As for this choice, it *is* visible. You are missing a call to
-`sym_calc_value()' (actually sym_calc_visibility() but it is not
-exported) before the conditional to correct the visibility.
+> choice AB
+>    bool "AB"
+> config A
+>    bool "A"
+> config B
+>    bool "B"
+> endchoice
+>
+> if A
+> config D
+>    bool
+>    default y if F
+>    select E
+> config E
+>    bool "E"
+> endif
+>
+> if B
+> config D
+>    bool
+>    default y if F
+>    select E
+> config E
+>    bool "E"
+> endif
+>
+> The following configuration:
+>
+> CONFIG_F=y
+> CONFIG_A=y
+> CONFIG_D=y
+> CONFIG_E=y
+>
+> emits a spurious warning:
+>
+> (D) selects E which has unmet direct dependencies (B)
+>
+> If a symbol appears in two different branch of the tree, it should inherit the
+> dependency of both parent, not just the last one.
+>
+> Reported-by: Yann E. Morin <yann.morin.1998@anciens.enib.fr>
+> Tested-by: Yann E. Morin <yann.morin.1998@anciens.enib.fr>
+> Signed-off-by: Arnaud Lacombe <lacombar@gmail.com>
+> ---
+>  scripts/kconfig/menu.c |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
+>
+ping ?
 
-Beside that, if the environment is to influence the configuration
-unconditionally, it would rather be better to do that when the Kconfig
-are parsed.
-
- - Arnaud
-
+> diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
+> index 5fdf10d..d0c65e7 100644
+> --- a/scripts/kconfig/menu.c
+> +++ b/scripts/kconfig/menu.c
+> @@ -350,7 +350,7 @@ void menu_finalize(struct menu *parent)
+>                        last_menu->next = NULL;
+>                }
+>
+> -               sym->dir_dep.expr = parent->dep;
+> +               sym->dir_dep.expr = expr_alloc_or(sym->dir_dep.expr, parent->dep);
+>        }
+>        for (menu = parent->list; menu; menu = menu->next) {
+>                if (sym && sym_is_choice(sym) &&
 > --
-> David Woodhouse                            Open Source Technology Centre
-> David.Woodhouse@intel.com                              Intel Corporation
+> 1.7.3.4.574.g608b.dirty
 >
 >
