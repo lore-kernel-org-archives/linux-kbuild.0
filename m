@@ -1,33 +1,65 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.condornet.sk ([92.245.1.11]:51518 "EHLO mail.condornet.sk"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753809Ab1FDQkX (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 4 Jun 2011 12:40:23 -0400
-Subject: (no subject)
-MIME-Version: 1.0
-Date: Sat, 04 Jun 2011 11:31:30 +0200
-From: =?UTF-8?Q? "=C2=A92011.Coca-Cola_Great_Britain" ?=
-	<info@coca-cola.co.uk>
-Reply-To: jim-gardner.c@live.com
-Message-ID: <3003ba5e86d03b6dd11e4ea661be82ae@localhost>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="UTF-8"
+Received: from mail-iy0-f174.google.com ([209.85.210.174]:34179 "EHLO
+	mail-iy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756562Ab1FFS6n (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 6 Jun 2011 14:58:43 -0400
+From: Arnaud Lacombe <lacombar@gmail.com>
+Subject: [PATCH 0/9] Random kconfig patches
+Date: Mon,  6 Jun 2011 14:58:22 -0400
+Message-Id: <1307386711-8866-1-git-send-email-lacombar@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
+To: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: Michal Marek <mmarek@suse.cz>, Arnaud Lacombe <lacombar@gmail.com>
 
+Hi Michal,
 
+You'll find hereafter a serie of relatively trivial (I hope) patches
+concerning kconfig. Mostly annotation, deadcode removal, and correctness.
+This serie is based on top of v3.0-rc1.
 
+As always, it is also available on my git repo on github:
+
+ git://github.com/lacombar/linux-2.6.git kconfig-trivial
+
+Regards,
+ - Arnaud
+
+Arnaud Lacombe (9):
+  kconfig: annotate non-trivial fall-trough
+  kconfig: fix return code for invalid boolean symbol in
+    conf_set_sym_val()
+  kconfig: add missing <stdarg.h> inclusion
+  kconfig: add missing <ctype.h> inclusion
+  kconfig: add missing <stdlib.h> inclusion
+  kconfig: nuke reference to SWIG
+  kconfig: nuke LKC_DIRECT_LINK cruft
+  kconfig/gconf: kill deadcode
+  kconfig/gconf: silent missing prototype warnings
+
+ scripts/kconfig/Makefile            |   23 +++++++-------------
+ scripts/kconfig/conf.c              |    5 +++-
+ scripts/kconfig/confdata.c          |    9 ++++++-
+ scripts/kconfig/expr.c              |    1 -
+ scripts/kconfig/expr.h              |    3 --
+ scripts/kconfig/gconf.c             |   38 +----------------------------------
+ scripts/kconfig/kconfig_load.c      |   35 --------------------------------
+ scripts/kconfig/kxgettext.c         |    1 -
+ scripts/kconfig/lex.zconf.c_shipped |    1 -
+ scripts/kconfig/lkc.h               |    5 ----
+ scripts/kconfig/mconf.c             |    2 +-
+ scripts/kconfig/menu.c              |    3 +-
+ scripts/kconfig/nconf.c             |    2 +-
+ scripts/kconfig/qconf.cc            |    4 ---
+ scripts/kconfig/symbol.c            |    1 -
+ scripts/kconfig/util.c              |    2 +
+ scripts/kconfig/zconf.l             |    1 -
+ scripts/kconfig/zconf.tab.c_shipped |    1 -
+ scripts/kconfig/zconf.y             |    1 -
+ 19 files changed, 26 insertions(+), 112 deletions(-)
+ delete mode 100644 scripts/kconfig/kconfig_load.c
 
 -- 
-04-06-20011
-Your Mail-ID has been awarded 750,000.00 GBP From The Coca-Cola Online
-Bonanza 2011. For claims send
-Name:
-Address:
-Phone No:
-Age: Sex:
-Occupation:
-Country:
-Contact: Mr. Jim Gardner
-Claims department : jim-gardner.c@live.com
-TEL: +44 755 284 8328
+1.7.3.4.574.g608b.dirty
+
