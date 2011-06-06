@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
 Received: from mail-iy0-f174.google.com ([209.85.210.174]:34179 "EHLO
 	mail-iy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756562Ab1FFS6y (ORCPT
+	with ESMTP id S1757506Ab1FFS6u (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 6 Jun 2011 14:58:54 -0400
+	Mon, 6 Jun 2011 14:58:50 -0400
 From: Arnaud Lacombe <lacombar@gmail.com>
-Subject: [PATCH 9/9] kconfig/gconf: silent missing prototype warnings
-Date: Mon,  6 Jun 2011 14:58:31 -0400
-Message-Id: <1307386711-8866-10-git-send-email-lacombar@gmail.com>
+Subject: [PATCH 6/9] kconfig: nuke reference to SWIG
+Date: Mon,  6 Jun 2011 14:58:28 -0400
+Message-Id: <1307386711-8866-7-git-send-email-lacombar@gmail.com>
 In-Reply-To: <1307386711-8866-1-git-send-email-lacombar@gmail.com>
 References: <1307386711-8866-1-git-send-email-lacombar@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,28 +15,35 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc: Michal Marek <mmarek@suse.cz>, Arnaud Lacombe <lacombar@gmail.com>
 
-As the `gconf' frontend is un-maintained, go the easy way by silencing
-the "warning: no previous prototype for '<fn>'" warnings.
+SWIG is not used (yet?) to create kconfig binding, so there is no point
+referencing it.
 
 Signed-off-by: Arnaud Lacombe <lacombar@gmail.com>
 ---
- scripts/kconfig/Makefile |    3 ++-
- 1 files changed, 2 insertions(+), 1 deletions(-)
+ scripts/kconfig/expr.h |    3 ---
+ 1 files changed, 0 insertions(+), 3 deletions(-)
 
-diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
-index 0460ac3..84abb2f 100644
---- a/scripts/kconfig/Makefile
-+++ b/scripts/kconfig/Makefile
-@@ -227,7 +227,8 @@ HOSTLOADLIBES_qconf	= $(KC_QT_LIBS)
- HOSTCXXFLAGS_qconf.o	= $(KC_QT_CFLAGS)
+diff --git a/scripts/kconfig/expr.h b/scripts/kconfig/expr.h
+index 16bfae2..80fce57 100644
+--- a/scripts/kconfig/expr.h
++++ b/scripts/kconfig/expr.h
+@@ -172,8 +172,6 @@ struct menu {
+ #define MENU_CHANGED		0x0001
+ #define MENU_ROOT		0x0002
  
- HOSTLOADLIBES_gconf	= `pkg-config --libs gtk+-2.0 gmodule-2.0 libglade-2.0`
--HOSTCFLAGS_gconf.o	= `pkg-config --cflags gtk+-2.0 gmodule-2.0 libglade-2.0`
-+HOSTCFLAGS_gconf.o	= `pkg-config --cflags gtk+-2.0 gmodule-2.0 libglade-2.0` \
-+                          -Wno-missing-prototypes
+-#ifndef SWIG
+-
+ extern struct file *file_list;
+ extern struct file *current_file;
+ struct file *lookup_file(const char *name);
+@@ -218,7 +216,6 @@ static inline int expr_is_no(struct expr *e)
+ {
+ 	return e && (e->type == E_SYMBOL && e->left.sym == &symbol_no);
+ }
+-#endif
  
- HOSTLOADLIBES_mconf   = $(shell $(CONFIG_SHELL) $(check-lxdialog) -ldflags $(HOSTCC))
- 
+ #ifdef __cplusplus
+ }
 -- 
 1.7.3.4.574.g608b.dirty
 
