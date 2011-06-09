@@ -1,46 +1,37 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from vms173003pub.verizon.net ([206.46.173.3]:48231 "EHLO
-	vms173003pub.verizon.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751288Ab1FIBA3 (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 8 Jun 2011 21:00:29 -0400
-Date: Wed, 08 Jun 2011 20:58:32 -0400 (EDT)
-From: Peter Foley <pefoley2@verizon.net>
-Subject: [PATCH] kbuild: silence Nothing to be done for 'all' message
-Message-id: <alpine.LNX.2.00.1106082047040.61251@linux.foleyremote.com>
-MIME-version: 1.0
-Content-type: TEXT/PLAIN; charset=US-ASCII
+Received: from cantor.suse.de ([195.135.220.2]:38297 "EHLO mx1.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753660Ab1FIJtr (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 9 Jun 2011 05:49:47 -0400
+Date: Thu, 9 Jun 2011 11:49:45 +0200
+From: Michal Marek <mmarek@suse.cz>
+Subject: Re: [PATCH] kbuild: silence Nothing to be done for 'all' message
+Message-ID: <20110609094945.GC4612@sepie.suse.cz>
+References: <alpine.LNX.2.00.1106082047040.61251@linux.foleyremote.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <alpine.LNX.2.00.1106082047040.61251@linux.foleyremote.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild Mailing List <linux-kbuild@vger.kernel.org>
-Cc: mmarek@suse.cz
+To: Peter Foley <pefoley2@verizon.net>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild Mailing List <linux-kbuild@vger.kernel.org>
 
+On Wed, Jun 08, 2011 at 08:58:32PM -0400, Peter Foley wrote:
+> 
+> This patch silences a Makefile.asm-generic message
+> by defining a dummy rule for all. 
+> 
+> make -f /usr/src/git/scripts/Makefile.asm-generic \
+>             obj=arch/x86/include/generated/asm
+> make[1]: Nothing to be done for `all'.
+> 
+> 
+> Signed-off-by: Peter Foley <pefoley2@verizon.net>
+> ---
+>  scripts/Makefile.asm-generic |    1 +
+>  1 files changed, 1 insertions(+), 0 deletions(-)
 
-This patch silences a Makefile.asm-generic message
-by defining a dummy rule for all. 
+Applied to kbuild-2.6.git#rc-fixes, thanks.
 
-make -f /usr/src/git/scripts/Makefile.asm-generic \
-            obj=arch/x86/include/generated/asm
-make[1]: Nothing to be done for `all'.
-
-
-Signed-off-by: Peter Foley <pefoley2@verizon.net>
----
- scripts/Makefile.asm-generic |    1 +
- 1 files changed, 1 insertions(+), 0 deletions(-)
-
-diff --git a/scripts/Makefile.asm-generic b/scripts/Makefile.asm-generic
-index 490122c..40caf3c 100644
---- a/scripts/Makefile.asm-generic
-+++ b/scripts/Makefile.asm-generic
-@@ -17,6 +17,7 @@ quiet_cmd_wrap = WRAP    $@
- cmd_wrap = echo "\#include <asm-generic/$*.h>" >$@
- 
- all: $(patsubst %, $(obj)/%, $(generic-y))
-+	@:
- 
- $(obj)/%.h:
- 	$(call cmd,wrap)
--- 
-1.7.5.3
-
+Michal
