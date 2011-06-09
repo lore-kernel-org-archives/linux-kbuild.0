@@ -1,43 +1,65 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor.suse.de ([195.135.220.2]:46958 "EHLO mx1.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:42865 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751372Ab1FIO5h (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 9 Jun 2011 10:57:37 -0400
+	id S1752896Ab1FIO5j (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 9 Jun 2011 10:57:39 -0400
 From: Michal Marek <mmarek@suse.cz>
-Subject: [PATCH v2 0/5] Fixes for X.Y kernel versions
-Date: Thu,  9 Jun 2011 16:57:23 +0200
-Message-Id: <1307631448-29848-1-git-send-email-mmarek@suse.cz>
+Subject: [PATCH v2 4/5] kbuild: Hack for depmod not handling X.Y versions
+Date: Thu,  9 Jun 2011 16:57:27 +0200
+Message-Id: <1307631448-29848-5-git-send-email-mmarek@suse.cz>
+In-Reply-To: <1307631448-29848-1-git-send-email-mmarek@suse.cz>
+References: <1307631448-29848-1-git-send-email-mmarek@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Linus Torvalds <torvalds@linux-foundation.org>
 Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Hi Linus,
+depmod from module-init-tools < 3.13 and the busybox depmod check if the
+kernel release starts with <num>.<num>.<num>. To support these versions,
+we create a symlink with two numbers prepended.
 
-Updated series to fix various kbuild parts to deal with a two-number kernel
-versions. I'll send you a pull request once git.kernel.org is up to date.
+Signed-off-by: Michal Marek <mmarek@suse.cz>
+---
+ scripts/depmod.sh |   25 ++++++++++++++++++++++++-
+ 1 files changed, 24 insertions(+), 1 deletions(-)
 
-Changes since v1:
-- Also support single-number kernel versions, just for fun.
-- Moved the depmod stuff to scripts/depmod.sh to keep the Makefile tidy
-- Check if the depmod hack is actually needed, as we have
-  a fixed module-init-tools since last week.
-
-Michal
-
-Michal Marek (5):
-  kbuild: Fix KERNELVERSION for empty SUBLEVEL or PATCHLEVEL
-  kbuild: Fix <linux/version.h> for empty SUBLEVEL or PATCHLEVEL
-  kbuild: Move depmod call to a separate script
-  kbuild: Hack for depmod not handling X.Y versions
-  perf: Use make kernelversion instead of parsing the Makefile
-
- Makefile                         |   16 ++----------
- scripts/depmod.sh                |   48 ++++++++++++++++++++++++++++++++++++++
- tools/perf/util/PERF-VERSION-GEN |    7 +----
- 3 files changed, 52 insertions(+), 19 deletions(-)
- create mode 100755 scripts/depmod.sh
-
+diff --git a/scripts/depmod.sh b/scripts/depmod.sh
+index 9f205da..3b029cb 100755
+--- a/scripts/depmod.sh
++++ b/scripts/depmod.sh
+@@ -18,8 +18,31 @@ fi
+ if ! test -r System.map -a -x "$DEPMOD"; then
+ 	exit 0
+ fi
++# older versions of depmod require the version string to start with three
++# numbers, so we cheat with a symlink here
++depmod_hack_needed=true
++mkdir -p .tmp_depmod/lib/modules/$KERNELRELEASE
++if "$DEPMOD" -b .tmp_depmod $KERNELRELEASE 2>/dev/null; then
++	if test -e .tmp_depmod/lib/modules/$KERNELRELEASE/modules.dep -o \
++		-e .tmp_depmod/lib/modules/$KERNELRELEASE/modules.dep.bin; then
++		depmod_hack_needed=false
++	fi
++fi
++if $depmod_hack_needed; then
++	symlink="$INSTALL_MOD_PATH/lib/modules/99.98.$KERNELRELEASE"
++	ln -s "$KERNELRELEASE" "$symlink"
++	KERNELRELEASE=99.98.$KERNELRELEASE
++fi
++
+ set -- -ae -F System.map
+ if test -n "$INSTALL_MOD_PATH"; then
+ 	set -- "$@" -b "$INSTALL_MOD_PATH"
+ fi
+-exec "$DEPMOD" "$@" "$KERNELRELEASE"
++"$DEPMOD" "$@" "$KERNELRELEASE"
++ret=$?
++
++if $depmod_hack_needed; then
++	rm -f "$symlink"
++fi
++
++exit $ret
 -- 
 1.7.4.2
 
