@@ -1,52 +1,42 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from vostochny.stro.at ([78.47.22.85]:57933 "EHLO vostochny.stro.at"
+Received: from cantor.suse.de ([195.135.220.2]:51458 "EHLO mx1.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752216Ab1FJKDl (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 10 Jun 2011 06:03:41 -0400
-Date: Fri, 10 Jun 2011 10:03:39 +0000
-From: maximilian attems <max@stro.at>
-Subject: Re: [GIT] kbuild fixes for 3.0
-Message-ID: <20110610100339.GE22466@vostochny.stro.at>
-References: <20110609214241.GA4849@sepie.suse.cz>
- <BANLkTim84t=yeqykZydEjHrVYGnO4xc5ew@mail.gmail.com>
- <BANLkTi=qaA_AMvq_78eon3Lr86wT2R497g@mail.gmail.com>
- <BANLkTinbXpFp43+EebWbWvs1Uu5wWvhxQQ@mail.gmail.com>
- <BANLkTinKMmYG7=KBHr2LfOYzcgbtszwy5g@mail.gmail.com>
- <BANLkTinQ2mL1eNPzMHjDjXnLyv58annZmA@mail.gmail.com>
- <BANLkTi=wQaUSagZjptGnvUHNpJeMm0C6yw@mail.gmail.com>
- <BANLkTinZGuOE3G5Ro0=LB9Y8wcHVgk-3ug@mail.gmail.com>
+	id S1755770Ab1FJMNd (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 10 Jun 2011 08:13:33 -0400
+Message-ID: <4DF20A68.2090307@suse.cz>
+Date: Fri, 10 Jun 2011 14:13:28 +0200
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <BANLkTinZGuOE3G5Ro0=LB9Y8wcHVgk-3ug@mail.gmail.com>
+Subject: Re: [GIT] kbuild fixes for 3.0
+References: <20110609214241.GA4849@sepie.suse.cz> <BANLkTim84t=yeqykZydEjHrVYGnO4xc5ew@mail.gmail.com> <BANLkTi=qaA_AMvq_78eon3Lr86wT2R497g@mail.gmail.com> <BANLkTinbXpFp43+EebWbWvs1Uu5wWvhxQQ@mail.gmail.com> <BANLkTinKMmYG7=KBHr2LfOYzcgbtszwy5g@mail.gmail.com> <BANLkTinQ2mL1eNPzMHjDjXnLyv58annZmA@mail.gmail.com>
+In-Reply-To: <BANLkTinQ2mL1eNPzMHjDjXnLyv58annZmA@mail.gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ray Lee <ray-lk@madrabbit.org>
-Cc: Arnaud Lacombe <lacombar@gmail.com>, Linus Torvalds <torvalds@linux-foundation.org>, Michal Marek <mmarek@suse.cz>, pefoley2@verizon.net, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Arnaud Lacombe <lacombar@gmail.com>, pefoley2@verizon.net, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Thu, Jun 09, 2011 at 10:53:34PM -0700, Ray Lee wrote:
-> On Thu, Jun 9, 2011 at 10:16 PM, Arnaud Lacombe <lacombar@gmail.com> wrote:
-> > Beside that, no matter what, you are about to break
-> > `/usr/sbin/sensors-detect' (from my Fedora 14), which rely on a 3
-> > digits version number:
-> 
-> Is there really any compelling technical reason to _not_ have Linus
-> release the kernels with a superfluous .0 on the end, with the
-> understanding that the -stable team gets to increment it for their
-> future releases? It'd make every kernel.org release exactly three
-> dotted decimals from here on out, which certainly simplifies things.
-> 
-> It seems like we're just borrowing trouble here by trying to drop it
-> down to two numbers.
-> 
-> (Not, mind you, that I give a damn at all one way or the other, but it
-> feels like you all are going to be spending a lot of time tripping
-> over poor assumptions in userspace rather than doing actual work.)
+On 10.6.2011 05:57, Linus Torvalds wrote:
+> On Thu, Jun 9, 2011 at 8:45 PM, Arnaud Lacombe<lacombar@gmail.com>  wrote:
+>>
+>> For the record, this should have been fixed by Michal in:
+>
+> You're missing the problem: we can't assume that people have updated user land.
+>
+> Furthermore, the very pull request I'm responding to actually tries to
+> handle this, see commit bfe5424a8b31 ("kbuild: Hack for depmod not
+> handling X.Y versions"), but it's just not working for me.
 
-you have forgotten the rule that linus himself is allowed to break userland. :P
+It handles what can be handled inside the kernel build, i.e. the depmod 
+called from the Makefile during modules_install.
 
-in Debian an three digit 3.0.0 release would also be very much appreciated as
-dpkg will order wrongly 3.0.0~rcX to 3.0.
 
--- 
-maks
+> And it's not working, because it only handles the "modules_install"
+> case, not the case where the system install scripts do their own
+> depmod.
+
+Yes, tools creating an initrd would need a similar workaround, that's a 
+pity :-(.
+
+Michal
