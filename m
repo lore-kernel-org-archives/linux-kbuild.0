@@ -1,95 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pz0-f46.google.com ([209.85.210.46]:54480 "EHLO
-	mail-pz0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750720Ab1FJFQO (ORCPT
+Received: from mail-gx0-f174.google.com ([209.85.161.174]:59302 "EHLO
+	mail-gx0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750864Ab1FJFyG (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 10 Jun 2011 01:16:14 -0400
+	Fri, 10 Jun 2011 01:54:06 -0400
 MIME-Version: 1.0
-In-Reply-To: <BANLkTinQ2mL1eNPzMHjDjXnLyv58annZmA@mail.gmail.com>
-References: <20110609214241.GA4849@sepie.suse.cz>
-	<BANLkTim84t=yeqykZydEjHrVYGnO4xc5ew@mail.gmail.com>
-	<BANLkTi=qaA_AMvq_78eon3Lr86wT2R497g@mail.gmail.com>
-	<BANLkTinbXpFp43+EebWbWvs1Uu5wWvhxQQ@mail.gmail.com>
-	<BANLkTinKMmYG7=KBHr2LfOYzcgbtszwy5g@mail.gmail.com>
-	<BANLkTinQ2mL1eNPzMHjDjXnLyv58annZmA@mail.gmail.com>
-Date: Fri, 10 Jun 2011 01:16:13 -0400
-Message-ID: <BANLkTi=wQaUSagZjptGnvUHNpJeMm0C6yw@mail.gmail.com>
+In-Reply-To: <BANLkTi=wQaUSagZjptGnvUHNpJeMm0C6yw@mail.gmail.com>
+References: <20110609214241.GA4849@sepie.suse.cz> <BANLkTim84t=yeqykZydEjHrVYGnO4xc5ew@mail.gmail.com>
+ <BANLkTi=qaA_AMvq_78eon3Lr86wT2R497g@mail.gmail.com> <BANLkTinbXpFp43+EebWbWvs1Uu5wWvhxQQ@mail.gmail.com>
+ <BANLkTinKMmYG7=KBHr2LfOYzcgbtszwy5g@mail.gmail.com> <BANLkTinQ2mL1eNPzMHjDjXnLyv58annZmA@mail.gmail.com>
+ <BANLkTi=wQaUSagZjptGnvUHNpJeMm0C6yw@mail.gmail.com>
+From: Ray Lee <ray-lk@madrabbit.org>
+Date: Thu, 9 Jun 2011 22:53:34 -0700
+Message-ID: <BANLkTinZGuOE3G5Ro0=LB9Y8wcHVgk-3ug@mail.gmail.com>
 Subject: Re: [GIT] kbuild fixes for 3.0
-From: Arnaud Lacombe <lacombar@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Michal Marek <mmarek@suse.cz>, pefoley2@verizon.net, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Arnaud Lacombe <lacombar@gmail.com>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, Michal Marek <mmarek@suse.cz>, pefoley2@verizon.net, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Hi,
+On Thu, Jun 9, 2011 at 10:16 PM, Arnaud Lacombe <lacombar@gmail.com> wrote:
+> Beside that, no matter what, you are about to break
+> `/usr/sbin/sensors-detect' (from my Fedora 14), which rely on a 3
+> digits version number:
 
-On Thu, Jun 9, 2011 at 11:57 PM, Linus Torvalds
-<torvalds@linux-foundation.org> wrote:
-> On Thu, Jun 9, 2011 at 8:45 PM, Arnaud Lacombe <lacombar@gmail.com> wrote:
->>
->> For the record, this should have been fixed by Michal in:
->
-> You're missing the problem: we can't assume that people have updated user land.
->
-I absolutely agree with you. But I am not the one about to decide to
-break a 15 years old interface :) [I gave me a 5 year delta as I have
-no idea how the version number was at that time; moreover, do not get
-me wrong, I do not really care about the kernel version being 2 or 3
-digits.].
+Is there really any compelling technical reason to _not_ have Linus
+release the kernels with a superfluous .0 on the end, with the
+understanding that the -stable team gets to increment it for their
+future releases? It'd make every kernel.org release exactly three
+dotted decimals from here on out, which certainly simplifies things.
 
-> Furthermore, the very pull request I'm responding to actually tries to
-> handle this, see commit bfe5424a8b31 ("kbuild: Hack for depmod not
-> handling X.Y versions"), but it's just not working for me.
->
-> And it's not working, because it only handles the "modules_install"
-> case, not the case where the system install scripts do their own
-> depmod.
->
-I totally agree! But, it is a technical challenge to give a 2 digit
-version number to an application expecting a 3 digit version number
-without much control over its environment.
+It seems like we're just borrowing trouble here by trying to drop it
+down to two numbers.
 
-Beside that, no matter what, you are about to break
-`/usr/sbin/sensors-detect' (from my Fedora 14), which rely on a 3
-digits version number:
+(Not, mind you, that I give a damn at all one way or the other, but it
+feels like you all are going to be spending a lot of time tripping
+over poor assumptions in userspace rather than doing actual work.)
 
-# [0] -> VERSION
-# [1] -> PATCHLEVEL
-# [2] -> SUBLEVEL
-# [3] -> EXTRAVERSION
-#
-use vars qw(@kernel_version $kernel_arch);
-
-sub initialize_kernel_version
-{
-        `uname -r` =~ /(\d+)\.(\d+)\.(\d+)(.*)/;
-        @kernel_version = ($1, $2, $3, $4);
-        chomp($kernel_arch = `uname -m`);
-
-        # We only support kernels >= 2.6.5
-        if (!kernel_version_at_least(2, 6, 5)) {
-                print "Kernel version is unsupported (too old, >=
-2.6.5 needed)\n";
-                exit -1;
-        }
-}
-
-sub kernel_version_at_least
-{
-        my ($vers, $plvl, $slvl) = @_;
-        return 1 if ($kernel_version[0] > $vers ||
-                     ($kernel_version[0] == $vers &&
-                      ($kernel_version[1] > $plvl ||
-                       ($kernel_version[1] == $plvl &&
-                        ($kernel_version[2] >= $slvl)))));
-        return 0;
-}
-
-would fail with:
-
-Kernel version is unsupported (too old, >= 2.6.5 needed)
-
-with "uname -r" being "3.0-rc2"
-
- - Arnaud
+~r.
