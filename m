@@ -1,17 +1,17 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pv0-f174.google.com ([74.125.83.174]:45029 "EHLO
-	mail-pv0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752547Ab1FJDlR convert rfc822-to-8bit (ORCPT
+Received: from mail-pw0-f46.google.com ([209.85.160.46]:56306 "EHLO
+	mail-pw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753657Ab1FJDqA convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 9 Jun 2011 23:41:17 -0400
+	Thu, 9 Jun 2011 23:46:00 -0400
 MIME-Version: 1.0
 In-Reply-To: <BANLkTinbXpFp43+EebWbWvs1Uu5wWvhxQQ@mail.gmail.com>
 References: <20110609214241.GA4849@sepie.suse.cz>
 	<BANLkTim84t=yeqykZydEjHrVYGnO4xc5ew@mail.gmail.com>
 	<BANLkTi=qaA_AMvq_78eon3Lr86wT2R497g@mail.gmail.com>
 	<BANLkTinbXpFp43+EebWbWvs1Uu5wWvhxQQ@mail.gmail.com>
-Date: Thu, 9 Jun 2011 23:41:16 -0400
-Message-ID: <BANLkTinO5oYzK76Q7FH0iNhUp2xFH5ZG7w@mail.gmail.com>
+Date: Thu, 9 Jun 2011 23:45:59 -0400
+Message-ID: <BANLkTinKMmYG7=KBHr2LfOYzcgbtszwy5g@mail.gmail.com>
 Subject: Re: [GIT] kbuild fixes for 3.0
 From: Arnaud Lacombe <lacombar@gmail.com>
 Content-Type: text/plain; charset=ISO-8859-1
@@ -55,13 +55,36 @@ On Thu, Jun 9, 2011 at 11:37 PM, Linus Torvalds
 > so it decides to do "uname()" to get the _current_ kernel version
 > instead, and that is where the confusion comes from.
 >
-> If it works for you, I suspect you're running a different distribution.
->
-Actually, I was just installing as a user with INSTALL_PATH set, so it
-did not get until the `new-kernel-pkg' step.
+For the record, this should have been fixed by Michal in:
+
+commit 3328d178247017affd90b7897393699f2f45227d
+Author: Michal Marek <mmarek@suse.cz>
+Date:   Mon May 30 15:58:43 2011 +0200
+
+    depmod: Handle X.Y kernel versions
+
+    What a stupid check.
+
+    Signed-off-by: Michal Marek <mmarek@suse.cz>
+    Signed-off-by: Jon Masters <jcm@jonmasters.org>
+
+from the module-init-tools git tree. Change is pretty trivial:
+
+diff --git a/depmod.c b/depmod.c
+index abfb11e..98a5efa 100644
+--- a/depmod.c
++++ b/depmod.c
+@@ -247,7 +247,7 @@ static int is_version_number(const char *version)
+ {
+        unsigned int dummy;
+
+-       return (sscanf(version, "%u.%u.%u", &dummy, &dummy, &dummy) == 3);
++       return (sscanf(version, "%u.%u", &dummy, &dummy) == 2);
+ }
 
  - Arnaud
 
-
+> If it works for you, I suspect you're running a different distribution.
+>
 >                  Linus
 >
