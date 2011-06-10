@@ -1,42 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor.suse.de ([195.135.220.2]:51458 "EHLO mx1.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755770Ab1FJMNd (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 10 Jun 2011 08:13:33 -0400
-Message-ID: <4DF20A68.2090307@suse.cz>
-Date: Fri, 10 Jun 2011 14:13:28 +0200
-From: Michal Marek <mmarek@suse.cz>
+Received: from mail-pw0-f46.google.com ([209.85.160.46]:37641 "EHLO
+	mail-pw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756753Ab1FJPGC (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 10 Jun 2011 11:06:02 -0400
 MIME-Version: 1.0
+In-Reply-To: <BANLkTinZGuOE3G5Ro0=LB9Y8wcHVgk-3ug@mail.gmail.com>
+References: <20110609214241.GA4849@sepie.suse.cz>
+	<BANLkTim84t=yeqykZydEjHrVYGnO4xc5ew@mail.gmail.com>
+	<BANLkTi=qaA_AMvq_78eon3Lr86wT2R497g@mail.gmail.com>
+	<BANLkTinbXpFp43+EebWbWvs1Uu5wWvhxQQ@mail.gmail.com>
+	<BANLkTinKMmYG7=KBHr2LfOYzcgbtszwy5g@mail.gmail.com>
+	<BANLkTinQ2mL1eNPzMHjDjXnLyv58annZmA@mail.gmail.com>
+	<BANLkTi=wQaUSagZjptGnvUHNpJeMm0C6yw@mail.gmail.com>
+	<BANLkTinZGuOE3G5Ro0=LB9Y8wcHVgk-3ug@mail.gmail.com>
+Date: Fri, 10 Jun 2011 16:06:01 +0100
+Message-ID: <BANLkTikb0=CvTbN_njhq7JyJwOigEa0eLA@mail.gmail.com>
 Subject: Re: [GIT] kbuild fixes for 3.0
-References: <20110609214241.GA4849@sepie.suse.cz> <BANLkTim84t=yeqykZydEjHrVYGnO4xc5ew@mail.gmail.com> <BANLkTi=qaA_AMvq_78eon3Lr86wT2R497g@mail.gmail.com> <BANLkTinbXpFp43+EebWbWvs1Uu5wWvhxQQ@mail.gmail.com> <BANLkTinKMmYG7=KBHr2LfOYzcgbtszwy5g@mail.gmail.com> <BANLkTinQ2mL1eNPzMHjDjXnLyv58annZmA@mail.gmail.com>
-In-Reply-To: <BANLkTinQ2mL1eNPzMHjDjXnLyv58annZmA@mail.gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
+From: Andy Whitcroft <apw@canonical.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Arnaud Lacombe <lacombar@gmail.com>, pefoley2@verizon.net, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Ray Lee <ray-lk@madrabbit.org>
+Cc: Arnaud Lacombe <lacombar@gmail.com>, Linus Torvalds <torvalds@linux-foundation.org>, Michal Marek <mmarek@suse.cz>, pefoley2@verizon.net, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, apw@canonical.com
 
-On 10.6.2011 05:57, Linus Torvalds wrote:
-> On Thu, Jun 9, 2011 at 8:45 PM, Arnaud Lacombe<lacombar@gmail.com>  wrote:
->>
->> For the record, this should have been fixed by Michal in:
+On Fri, Jun 10, 2011 at 6:53 AM, Ray Lee <ray-lk@madrabbit.org> wrote:
+> On Thu, Jun 9, 2011 at 10:16 PM, Arnaud Lacombe <lacombar@gmail.com> wrote:
+>> Beside that, no matter what, you are about to break
+>> `/usr/sbin/sensors-detect' (from my Fedora 14), which rely on a 3
+>> digits version number:
 >
-> You're missing the problem: we can't assume that people have updated user land.
+> Is there really any compelling technical reason to _not_ have Linus
+> release the kernels with a superfluous .0 on the end, with the
+> understanding that the -stable team gets to increment it for their
+> future releases? It'd make every kernel.org release exactly three
+> dotted decimals from here on out, which certainly simplifies things.
 >
-> Furthermore, the very pull request I'm responding to actually tries to
-> handle this, see commit bfe5424a8b31 ("kbuild: Hack for depmod not
-> handling X.Y versions"), but it's just not working for me.
+> It seems like we're just borrowing trouble here by trying to drop it
+> down to two numbers.
+>
+> (Not, mind you, that I give a damn at all one way or the other, but it
+> feels like you all are going to be spending a lot of time tripping
+> over poor assumptions in userspace rather than doing actual work.)
 
-It handles what can be handled inside the kernel build, i.e. the depmod 
-called from the Makefile during modules_install.
+As an experiment I have uploaded a 3.0 reporting kernel into Ubuntu
+Oneiric.  So far we have had issues with:
 
+ - depmod -- (as above)
+ - procps (ps/top) -- reporting errors on startup
+ - glibc version checks are preventing upgrade of that package
 
-> And it's not working, because it only handles the "modules_install"
-> case, not the case where the system install scripts do their own
-> depmod.
+I am sure there will be others, but the last one above has me cornered
+at the moment.  Cirtainly we can fix all of these but we are not going
+to make it easy for people with un-upgraded userspace if my experience
+is anything to go by.
 
-Yes, tools creating an initrd would need a similar workaround, that's a 
-pity :-(.
-
-Michal
+-apw
