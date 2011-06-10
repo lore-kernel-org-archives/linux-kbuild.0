@@ -1,90 +1,36 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pw0-f46.google.com ([209.85.160.46]:56306 "EHLO
-	mail-pw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753657Ab1FJDqA convert rfc822-to-8bit (ORCPT
+Received: from smtp1.linux-foundation.org ([140.211.169.13]:47381 "EHLO
+	smtp1.linux-foundation.org" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1753423Ab1FJD66 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 9 Jun 2011 23:46:00 -0400
+	Thu, 9 Jun 2011 23:58:58 -0400
 MIME-Version: 1.0
-In-Reply-To: <BANLkTinbXpFp43+EebWbWvs1Uu5wWvhxQQ@mail.gmail.com>
-References: <20110609214241.GA4849@sepie.suse.cz>
-	<BANLkTim84t=yeqykZydEjHrVYGnO4xc5ew@mail.gmail.com>
-	<BANLkTi=qaA_AMvq_78eon3Lr86wT2R497g@mail.gmail.com>
-	<BANLkTinbXpFp43+EebWbWvs1Uu5wWvhxQQ@mail.gmail.com>
-Date: Thu, 9 Jun 2011 23:45:59 -0400
-Message-ID: <BANLkTinKMmYG7=KBHr2LfOYzcgbtszwy5g@mail.gmail.com>
+In-Reply-To: <BANLkTinKMmYG7=KBHr2LfOYzcgbtszwy5g@mail.gmail.com>
+References: <20110609214241.GA4849@sepie.suse.cz> <BANLkTim84t=yeqykZydEjHrVYGnO4xc5ew@mail.gmail.com>
+ <BANLkTi=qaA_AMvq_78eon3Lr86wT2R497g@mail.gmail.com> <BANLkTinbXpFp43+EebWbWvs1Uu5wWvhxQQ@mail.gmail.com>
+ <BANLkTinKMmYG7=KBHr2LfOYzcgbtszwy5g@mail.gmail.com>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Thu, 9 Jun 2011 20:57:45 -0700
+Message-ID: <BANLkTinQ2mL1eNPzMHjDjXnLyv58annZmA@mail.gmail.com>
 Subject: Re: [GIT] kbuild fixes for 3.0
-From: Arnaud Lacombe <lacombar@gmail.com>
 Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
+To: Arnaud Lacombe <lacombar@gmail.com>
 Cc: Michal Marek <mmarek@suse.cz>, pefoley2@verizon.net, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Hi,
-
-On Thu, Jun 9, 2011 at 11:37 PM, Linus Torvalds
-<torvalds@linux-foundation.org> wrote:
-> On Thu, Jun 9, 2011 at 8:14 PM, Arnaud Lacombe <lacombar@gmail.com> wrote:
->>
->> any chance to share your .config ? x86-64's defconfig, plus Michal
->> branch merged on top of the tip of your tree, plus the following patch
->> removing the SUBLEVEL:
->>
->> diff --git a/Makefile b/Makefile
->> index 72c0e32..5c75864 100644
->> --- a/Makefile
->> +++ b/Makefile
->> @@ -1,6 +1,6 @@
->>  VERSION = 3
->>  PATCHLEVEL = 0
->> -SUBLEVEL = 0
->> +SUBLEVEL =
->>  EXTRAVERSION = -rc2
->>  NAME = Sneaky Weasel
->>
->> install is fine for me. What bugs me is that "git grep '\.temp'" in
->> that tree does not return anything relevant.
+On Thu, Jun 9, 2011 at 8:45 PM, Arnaud Lacombe <lacombar@gmail.com> wrote:
 >
-> "make install" just runs the distro install script, usually
-> /sbin/installkernel, which at least on F-14 will then run
-> /sbin/new-kernel-pkg /sbin/dracut to build the initrd etc.
->
-> And that runs "depmod", which seems to end up being confused: we give
-> it the new kernel version as an argument, but it seems to not like it,
-> so it decides to do "uname()" to get the _current_ kernel version
-> instead, and that is where the confusion comes from.
->
-For the record, this should have been fixed by Michal in:
+> For the record, this should have been fixed by Michal in:
 
-commit 3328d178247017affd90b7897393699f2f45227d
-Author: Michal Marek <mmarek@suse.cz>
-Date:   Mon May 30 15:58:43 2011 +0200
+You're missing the problem: we can't assume that people have updated user land.
 
-    depmod: Handle X.Y kernel versions
+Furthermore, the very pull request I'm responding to actually tries to
+handle this, see commit bfe5424a8b31 ("kbuild: Hack for depmod not
+handling X.Y versions"), but it's just not working for me.
 
-    What a stupid check.
+And it's not working, because it only handles the "modules_install"
+case, not the case where the system install scripts do their own
+depmod.
 
-    Signed-off-by: Michal Marek <mmarek@suse.cz>
-    Signed-off-by: Jon Masters <jcm@jonmasters.org>
-
-from the module-init-tools git tree. Change is pretty trivial:
-
-diff --git a/depmod.c b/depmod.c
-index abfb11e..98a5efa 100644
---- a/depmod.c
-+++ b/depmod.c
-@@ -247,7 +247,7 @@ static int is_version_number(const char *version)
- {
-        unsigned int dummy;
-
--       return (sscanf(version, "%u.%u.%u", &dummy, &dummy, &dummy) == 3);
-+       return (sscanf(version, "%u.%u", &dummy, &dummy) == 2);
- }
-
- - Arnaud
-
-> If it works for you, I suspect you're running a different distribution.
->
->                  Linus
->
+                       Linus
