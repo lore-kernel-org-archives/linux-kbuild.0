@@ -1,67 +1,68 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from na3sys009aog116.obsmtp.com ([74.125.149.240]:44775 "EHLO
-	na3sys009aog116.obsmtp.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1752736Ab1FNUQi (ORCPT
+Received: from out4.smtp.messagingengine.com ([66.111.4.28]:59862 "EHLO
+	out4.smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1753303Ab1FNUWF (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 14 Jun 2011 16:16:38 -0400
-Date: Tue, 14 Jun 2011 23:16:33 +0300
-From: Felipe Balbi <balbi@ti.com>
+	Tue, 14 Jun 2011 16:22:05 -0400
+Date: Tue, 14 Jun 2011 13:21:09 -0700
+From: Greg KH <greg@kroah.com>
 Subject: Re: generate one module from multiple object files (was: Re: [PATCH
  2/2] usb: gadget: convert all users to the new udc)
-Message-ID: <20110614201632.GD30763@legolas.emea.dhcp.ti.com>
-Reply-To: balbi@ti.com
-References: <20110614194151.GC30763@legolas.emea.dhcp.ti.com>
- <Pine.LNX.4.44L0.1106141553220.2102-100000@iolanthe.rowland.org>
+Message-ID: <20110614202109.GB16736@kroah.com>
+References: <20110614164513.GP2353@legolas.emea.dhcp.ti.com>
+ <Pine.LNX.4.44L0.1106141301000.2102-100000@iolanthe.rowland.org>
+ <20110614172859.GS2353@legolas.emea.dhcp.ti.com>
+ <BANLkTimRUyt-7gJc--Ja4XuAS5H0UBdNUg@mail.gmail.com>
+ <20110614183621.GA30763@legolas.emea.dhcp.ti.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="9UV9rz0O2dU/yYYn"
-Content-Disposition: inline
-In-Reply-To: <Pine.LNX.4.44L0.1106141553220.2102-100000@iolanthe.rowland.org>
-Sender: linux-kbuild-owner@vger.kernel.org
-List-ID: <linux-kbuild.vger.kernel.org>
-To: Alan Stern <stern@rowland.harvard.edu>
-Cc: Felipe Balbi <balbi@ti.com>, Arnaud Lacombe <lacombar@gmail.com>, Michal Nazarewicz <mina86@mina86.com>, Sebastian Andrzej Siewior <bigeasy@linutronix.de>, Greg KH <greg@kroah.com>, Linux USB Mailing List <linux-usb@vger.kernel.org>, linux-kbuild@vger.kernel.org
-
-
---9UV9rz0O2dU/yYYn
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20110614183621.GA30763@legolas.emea.dhcp.ti.com>
+Sender: linux-kbuild-owner@vger.kernel.org
+List-ID: <linux-kbuild.vger.kernel.org>
+To: Felipe Balbi <balbi@ti.com>
+Cc: Arnaud Lacombe <lacombar@gmail.com>, Alan Stern <stern@rowland.harvard.edu>, Michal Nazarewicz <mina86@mina86.com>, Sebastian Andrzej Siewior <bigeasy@linutronix.de>, Linux USB Mailing List <linux-usb@vger.kernel.org>, linux-kbuild@vger.kernel.org
 
-Hi,
+On Tue, Jun 14, 2011 at 09:36:22PM +0300, Felipe Balbi wrote:
+> Hi,
+> 
+> On Tue, Jun 14, 2011 at 01:48:39PM -0400, Arnaud Lacombe wrote:
+> > On Tue, Jun 14, 2011 at 1:29 PM, Felipe Balbi <balbi@ti.com> wrote:
+> > > [...]
+> > > In summary:
+> > >
+> > > We don't want to have library code into their own drivers because,
+> > I am not sure to parse that correctly, could you elaborate ?
+> 
+> u_*.c and composite.c are basically library code. We don't want to have
+> composite.ko and/or u_*.ko.
+> 
+> > > well, you can only have one gadget driver at a time anyway. And we don't
+> > > want separate compilation due to having stuff out of init sections.
+> > >
+> > on that last point, are you implying that section mapping is not kept
+> > across the different linking steps ?
+> 
+> could be. I don't remember all the details. That was back on 2.6.27
+> times. I would need to really revisit all the details on the archives.
+> 
+> What I remember is that Dave noted code shrunk when combining the source
+> files, even if he didn't mark all the other functions as "static".
+> 
+> Greg, do you remember why you started this discussion when you first
+> introduced g_utils.ko ??
 
-On Tue, Jun 14, 2011 at 04:01:29PM -0400, Alan Stern wrote:
-> Consider usbcore as an example.  Grepping through drivers/usb/core/*.c,
-> you'll see there are init routines in devio.c, inode.c, and usb.c. =20
-> These files are all compiled separately.  Yet they are linked into a
-> single object module, usbcore.ko, and the init sections work out just
-> fine.
->=20
-> In short, I don't see what's wrong with separate compilation. =20
-> Apparently the only problem David found was that it increased the size=20
-> of the final driver by 42 bytes.  Is that really worth worrying about?
+That was a while ago.  I think I was having some build issues with the
+including of the .c files due to some driver core changes I was working
+on, so I tried to create that, but then ran into other issues with
+#defines causing different things to be build in odd ways and breaking
+the parallel build system.
 
-probably not... But Greg initiated the discussion. It was something
-related with always recompiling the same objects or something. I really
-don't recall.
+I really can't remember the specifics, sorry.
 
---=20
-balbi
+If you can figure a way to clean this up, I would not object to that at
+all.
 
---9UV9rz0O2dU/yYYn
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Digital signature
+Sorry I can't be of more help here.
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.11 (GNU/Linux)
-
-iQEcBAEBAgAGBQJN98GgAAoJEAv8Txj19kN10MIH/1GVZCZR8p7iJMcwkF6T5b5H
-4YXR66+rFkFhiKBJjDaW/mixRMhRol8XDEijU11L+OEJUjggEzFlCVF6h6bo/XTj
-z1Hy/1961BsY6ixvEYf6e9zkLwqBkcMz0YUi2UsC7YNzuPmOClBGnJBNI89uj6ES
-OCKQHxC6rjnZmUcXGtkGJ8dL7hbZM+aF/coM9C8OmlYFEAVoVFpO4ebHp2Cnd2tr
-xEi4mJyW8S2QPFmU/n6cVXAtnVuABWyD/4QmF5VnzbXVdf1st1JOpZMWpzhLmIZ9
-uyjVvmYyMg8to0FrgpxKV2qhBk5GIL6xZebffK57RaHZ4nPHSh6tdb7YftkG3M0=
-=Zxxx
------END PGP SIGNATURE-----
-
---9UV9rz0O2dU/yYYn--
+greg k-h
