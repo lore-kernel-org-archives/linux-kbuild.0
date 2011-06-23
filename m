@@ -1,24 +1,38 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pubmailout.nutn.edu.tw ([140.133.2.32]:58992 "EHLO
-	pubmailout.pubmail.nutn.edu.tw" rhost-flags-OK-OK-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1758738Ab1FWCGt (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 22 Jun 2011 22:06:49 -0400
-Reply-To: <zhang3@livemail.tw>
-From: "Jianguo" <zhang43532@yahoo.com.hk>
-Subject: BUSINESS PROPOSAL.
-Date: Thu, 23 Jun 2011 02:52:09 +0100
+Received: from h5.dl5rb.org.uk ([81.2.74.5]:57981 "EHLO duck.linux-mips.net"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1758347Ab1FWQbx (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 23 Jun 2011 12:31:53 -0400
+Date: Thu, 23 Jun 2011 17:31:06 +0100
+From: Ralf Baechle <ralf@linux-mips.org>
+Subject: Re: [PATCH] STAGING: Comedi: Build only on arches providing
+ PAGE_KERNEL_NOCACHE
+Message-ID: <20110623163105.GC16892@linux-mips.org>
+References: <20110623114536.GA14011@linux-mips.org>
+ <BANLkTimR98qo5fjMRf-kZahcA=hE-E3+Hg@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="_iso-2022-jp$ESC"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20110623015213.EB82F1DD5A@pubmailout.pubmail.nutn.edu.tw>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <BANLkTimR98qo5fjMRf-kZahcA=hE-E3+Hg@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: Greg Kroah-Hartman <gregkh@suse.de>, devel@driverdev.osuosl.org, linux-kernel@vger.kernel.org, David Howells <dhowells@redhat.com>, linux-m32r@ml.linux-m32r.org, linux-m32r-ja@ml.linux-m32r.org, linux-am33-list@redhat.com, Paul Mundt <lethal@linux-sh.org>, linux-sh@vger.kernel.org, Chris Metcalf <cmetcalf@tilera.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org, linux-arch@vger.kernel.org, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
 
-My name is Z. Jianguo, I have a transaction of $21,830,000.00 to bring to your attention, if interested for more details, do kindly respond back to me (zjianguo42@yahoo.com.hk) for further explanation on the said transaction.
+On Thu, Jun 23, 2011 at 06:01:47PM +0200, Geert Uytterhoeven wrote:
 
-I would appreciate your kind response.
+> If only to get m68k/allmodconfig going again (hmm, there's another
+> staging driver
+> preventing a green light).
 
-Sincerely,
-Z. Jianguo
+I ran into this doing an allyesconfig.  Allyesconfig has one disadvantage,
+for choice it will only select the first or default option which means
+that option gets exercised well and all the other options not at all.  On
+MIPS that'd be IP22, 32-bit, R4x00, big endian, 4K pages, no multithreading,
+250Hz.  Make randconfig disables lots of things so often misses the
+opportunity to trigger some issues.
+
+I'd really want an "make allrandconfig" which enables as many options as
+possible but picks a random one from choice statements, something like that.
+
+  Ralf
