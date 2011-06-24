@@ -1,57 +1,81 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:35628 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:36421 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1757731Ab1FXNtm (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 24 Jun 2011 09:49:42 -0400
-Message-ID: <4E0495F4.7080300@suse.cz>
-Date: Fri, 24 Jun 2011 15:49:40 +0200
+	id S1753892Ab1FXOIZ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 24 Jun 2011 10:08:25 -0400
+Message-ID: <4E049A57.1030003@suse.cz>
+Date: Fri, 24 Jun 2011 16:08:23 +0200
 From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Subject: Re: [PATCH] Enable 'make CONFIG_FOO=y oldconfig'
-References: <1306707270.2029.377.camel@i7.infradead.org>	<20110530072300.GA9802@elte.hu>	<1306745835.2029.389.camel@i7.infradead.org>	<20110530104231.GF17821@elte.hu>	<20110530104656.GA19532@elte.hu>	<E934876C-FABB-41F8-8C5E-469AA42DBE91@mit.edu>	<20110530105809.GA20133@elte.hu>	<1A4DB87D-9B32-44C0-B7C9-47A003CABD96@mit.edu>	<alpine.LFD.2.02.1105301955210.3164@localhost6.localdomain6>	<20110530195545.GG2890@dhcp-172-31-194-241.cam.corp.google.com>	<alpine.LFD.2.02.1105302103220.3164@localhost6.localdomain6>	<1306795186.2029.459.camel@i7.infradead.org>	<BANLkTik=uHr1eX44XV1pAHUfVQ-MorzOnw@mail.gmail.com>	<1306856937.27477.3.camel@i7.infradead.org> <BANLkTi=VoL8ze0AcdkG_QmEH5049X2K6Zw@mail.gmail.com>
-In-Reply-To: <BANLkTi=VoL8ze0AcdkG_QmEH5049X2K6Zw@mail.gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: Re: [RFC] kconfig: zconfdump() clean-up
+References: <1305518795-9360-1-git-send-email-lacombar@gmail.com>
+In-Reply-To: <1305518795-9360-1-git-send-email-lacombar@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-2; format=flowed
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Arnaud Lacombe <lacombar@gmail.com>
-Cc: David Woodhouse <dwmw2@infradead.org>, Ted Ts'o <tytso@mit.edu>, Ingo Molnar <mingo@elte.hu>, x86@kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+Cc: linux-kbuild@vger.kernel.org
 
-On 31.5.2011 18:12, Arnaud Lacombe wrote:
-> Hi,
+On 16.5.2011 06:06, Arnaud Lacombe wrote:
+> Hi Michal,
 >
-> On Tue, May 31, 2011 at 11:48 AM, David Woodhouse<dwmw2@infradead.org>  wrote:
->> On Mon, 2011-05-30 at 20:24 -0400, Arnaud Lacombe wrote:
->>> It would seem that the underlying symbol is not visible, triggering
->>> the failure of sym_set_tristate_value().
->>
->> Yes, this only lets you set *visible* symbols. If the symbol you're
->> interested in is not visible because some of its dependencies are not
->> set, it doesn't go and automatically enable those.
->>
-> As for this choice, it *is* visible. You are missing a call to
-> `sym_calc_value()' (actually sym_calc_visibility() but it is not
-> exported) before the conditional to correct the visibility.
+> The following patch is a summarize of changes I made in zconfdump() last week
+> when debugging Yann's multiple choice issue. This might help debugging a bit,
+> espectially by exposing the tree depth.
+>
+> Considering the following Kconfig:
+>
+> config A
+>     bool "A"
+> if A
+> choice C
+>     bool "C"
+> config C1
+>     bool "C1"
+> config C2
+>     bool "C2"
+> endchoice
+> endif # A
+>
+> config B
+>     bool "B"
+>     depends on ! A
+> if B
+> choice C
+>     bool "C"
+> config C1
+>     bool "C1"
+> config C2
+>     bool "C2"
+> endchoice
+> endif # A
+>
+> It generates the following output, after menu_finalize():
+>
+> config A
+>    boolean
+>    symbol
+>    prompt "A"
+>
+>          choice C
+>            boolean
+>            symbol
+>            #choice
+>            prompt "C" if A
 
-David, will you post a patch with this fix?
+Why not. zconfdump() is only used for debugging and you've been doing 
+most of the kconfig work lately, so if this suits you, then I'll merge 
+it. I only spotted one minor issue:
 
-$ make CONFIG_ARCH_OMAP=y ARCH=arm allnoconfig
-$ grep CONFIG_ARCH_OMAP .config
-# CONFIG_ARCH_OMAP is not set
-vs.
-$ echo CONFIG_ARCH_OMAP=y >all.config
-$ make  ARCH=arm allnoconfig
-$ grep CONFIG_ARCH_OMAP .config
-CONFIG_ARCH_OMAP=y
-...
+commit 21685d396a123a576bbe487651cb5cc04fa5f9a3
+Author: Arnaud Lacombe <lacombar@gmail.com>
+Date:   Tue May 10 22:55:20 2011 -0400
 
+     kconfig/zconfdump(): output newline at the *end* of statement
 
-> Beside that, if the environment is to influence the configuration
-> unconditionally, it would rather be better to do that when the Kconfig
-> are parsed.
-
-I don't quite understand what you mean here. The environment variables 
-are evaluated right after the potential all*.config file is read. Do you 
-think there is a problem with that?
+puts the newline between the symbol statement and it's help text (if 
+any). So if there is help text defined, it will appear attached to the 
+next symbol. But it's not really an issue.
 
 Michal
