@@ -1,37 +1,34 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:40901 "EHLO mx2.suse.de"
+Received: from vostochny.stro.at ([78.47.22.85]:43144 "EHLO vostochny.stro.at"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754311Ab1FXPZj (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 24 Jun 2011 11:25:39 -0400
-Date: Fri, 24 Jun 2011 17:25:37 +0200
-From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [PATCH] kconfig: do not overwrite symbol direct dependency in
- assignment
-Message-ID: <20110624152537.GA13167@sepie.suse.cz>
-References: <1306301804-12319-1-git-send-email-lacombar@gmail.com>
- <1307511731-2786-1-git-send-email-lacombar@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1307511731-2786-1-git-send-email-lacombar@gmail.com>
+	id S1750893Ab1FYH2H (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 25 Jun 2011 03:28:07 -0400
+From: maximilian attems <max@stro.at>
+Subject: [PATCH] staging: iio light Kconfig fixlet
+Date: Sat, 25 Jun 2011 09:28:02 +0200
+Message-Id: <1308986882-29183-1-git-send-email-max@stro.at>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnaud Lacombe <lacombar@gmail.com>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
+Cc: Jonathan Cameron <jic23@cam.ac.uk>, maximilian attems <max@stro.at>
 
-On Wed, Jun 08, 2011 at 01:42:11AM -0400, Arnaud Lacombe wrote:
-> Hi Michal,
-> 
-> Re-sent, mostly to have the commit log right.
-> 
-> Regards,
->  - Arnaud
-> 
-> ---
-> From: Arnaud Lacombe <lacombar@gmail.com>
-> 
-> Considering the following configuration:
+No point to start comments with '\'.
 
-Applied to kbuild-2.6.git#kconfig, thanks.
+Signed-off-by: maximilian attems <max@stro.at>
+---
+ drivers/staging/iio/light/Kconfig |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-Michal
+diff --git a/drivers/staging/iio/light/Kconfig b/drivers/staging/iio/light/Kconfig
+index 46d62d1..1ad2d56 100644
+--- a/drivers/staging/iio/light/Kconfig
++++ b/drivers/staging/iio/light/Kconfig
+@@ -1,4 +1,4 @@
+-\#
++#
+ # Light sensors
+ #
+ comment "Light sensors"
+-- 
+1.7.2.5
+
