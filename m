@@ -1,40 +1,62 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from vms173013pub.verizon.net ([206.46.173.13]:52463 "EHLO
+Received: from vms173013pub.verizon.net ([206.46.173.13]:63900 "EHLO
 	vms173013pub.verizon.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754177Ab1F0XSU (ORCPT
+	with ESMTP id S1755414Ab1F0Xfe (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 27 Jun 2011 19:18:20 -0400
-Date: Mon, 27 Jun 2011 19:16:20 -0400 (EDT)
+	Mon, 27 Jun 2011 19:35:34 -0400
+Date: Mon, 27 Jun 2011 19:33:54 -0400 (EDT)
 From: Peter Foley <pefoley2@verizon.net>
-Subject: Re: [PATCH] kbuild: silence generated makefile message
-In-reply-to: <BANLkTimrUYk-8GSsf35mUmLVBAaO84R6dA@mail.gmail.com>
-Message-id: <alpine.LNX.2.00.1106271915160.38876@linux>
+Subject: [PATCH V2] kbuild: silence generated makefile message
+In-reply-to: <alpine.LNX.2.00.1106271915160.38876@linux>
+Message-id: <alpine.LNX.2.00.1106271932480.13060@linux>
 References: <alpine.LNX.2.00.1106271619350.24034@linux>
  <BANLkTimrUYk-8GSsf35mUmLVBAaO84R6dA@mail.gmail.com>
+ <alpine.LNX.2.00.1106271915160.38876@linux>
 MIME-version: 1.0
 Content-type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnaud Lacombe <lacombar@gmail.com>
-Cc: Peter Foley <pefoley2@verizon.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild Mailing List <linux-kbuild@vger.kernel.org>, mmarek@suse.cz
+To: Peter Foley <pefoley2@verizon.net>
+Cc: Arnaud Lacombe <lacombar@gmail.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild Mailing List <linux-kbuild@vger.kernel.org>, mmarek@suse.cz
 
-On Mon, 27 Jun 2011, Arnaud Lacombe wrote:
 
-> Hi,
-> 
-> On Mon, Jun 27, 2011 at 5:42 PM, Peter Foley <pefoley2@verizon.net> wrote:
-> >
-> > This patch silences the make -C /usr/src/git O=/usr/src/git/build/.
-> > message shown when using the generated makefile in KBUILD_OUTDIR.
-> >
-> I would expect verbose build to show that message. not hides it
-> unconditionally, no ?
-> 
->  - Arnaud
-> 
+This patch silences the "make -C /usr/src/git O=/usr/src/git/build/." 
+message shown when using the generated makefile in KBUILD_OUTDIR.
 
-Good point, I'll fix that.
 
-Thanks,
+Signed-off-by: Peter Foley <pefoley2@verizon.net>
+---
 
-Peter
+V2: Show message when V=1
+
+ scripts/mkmakefile |    6 +++++-
+ 1 files changed, 5 insertions(+), 1 deletions(-)
+
+diff --git a/scripts/mkmakefile b/scripts/mkmakefile
+index 5325423..ea26f37 100644
+--- a/scripts/mkmakefile
++++ b/scripts/mkmakefile
+@@ -30,6 +30,10 @@ PATCHLEVEL = $4
+ lastword = \$(word \$(words \$(1)),\$(1))
+ makedir := \$(dir \$(call lastword,\$(MAKEFILE_LIST)))
+ 
++ifneq (\$(V),1)
++Q := @
++endif
++
+ MAKEARGS := -C $1
+ MAKEARGS += O=\$(if \$(patsubst /%,,\$(makedir)),\$(CURDIR)/)\$(patsubst %/,%,\$(makedir))
+ 
+@@ -40,7 +44,7 @@ MAKEFLAGS += --no-print-directory
+ all	:= \$(filter-out all Makefile,\$(MAKECMDGOALS))
+ 
+ all:
+-	\$(MAKE) \$(MAKEARGS) \$(all)
++	\$(Q)\$(MAKE) \$(MAKEARGS) \$(all)
+ 
+ Makefile:;
+ 
+-- 
+1.7.5.3
+
+
