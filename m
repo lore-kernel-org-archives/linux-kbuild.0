@@ -1,33 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from exchange.2besource.com ([203.126.216.22]:54205 "EHLO
-	exchange03.2besource.com" rhost-flags-OK-OK-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1751122Ab1F3RID (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 30 Jun 2011 13:08:03 -0400
-Reply-To: <profmauriceiwu2221@yahoo.co.jp>
-From: "PROF.MAURICE IWU" <iwumaurice900@sify.com>
-Subject: Equity Business Investment
-Date: Thu, 30 Jun 2011 19:08:00 +0200
-MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="Windows-1251"
-Content-Transfer-Encoding: 7bit
-Message-ID: <EXCHANGE03QLVpSlSt7000005f7@exchange03.2besource.com>
+Received: from que31.charter.net ([209.225.8.23]:41231 "EHLO que31.charter.net"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751917Ab1F3XuV (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 30 Jun 2011 19:50:21 -0400
+From: Greg Dietsche <Gregory.Dietsche@cuw.edu>
+Subject: [PATCH] gitignore: ignore debian build directory
+Date: Thu, 30 Jun 2011 18:42:50 -0500
+Message-Id: <1309477370-5866-1-git-send-email-Gregory.Dietsche@cuw.edu>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
+To: mmarek@suse.cz
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Greg Dietsche <Gregory.Dietsche@cuw.edu>
 
-Equity Business Investment
-From Prof. Maurice Iwu 
+Have git ignore the Debian directory created when running:
+	make deb-pkg
 
-Dear Friend,
+Signed-off-by: Greg Dietsche <Gregory.Dietsche@cuw.edu>
+---
+ .gitignore |    5 +++++
+ 1 files changed, 5 insertions(+), 0 deletions(-)
 
-I am Prof. Maurice M. Iwu, Former Chairman Independent Electoral Commission 
-(INEC).Currently, I am on compulsory terminal leave presently in UK , 
-leading up to my final retirement from public service.
+diff --git a/.gitignore b/.gitignore
+index 9dacde0..dc243a6 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -46,6 +46,11 @@ modules.builtin
+ /Module.symvers
+ 
+ #
++#Debian directory (make deb-pkg)
++#
++/debian/
++
++#
+ # git files that we don't want to ignore even it they are dot-files
+ #
+ !.gitignore
+-- 
+1.7.2.5
 
-I am seeking your partnership in a mutual benefit project involving 
-investing into your company and secondly on properties and to be precise Estate Development or any other profitable venture of your great idea for our mutual benefit of Equity Market Investment.,
-
-Sincerely,
-Prof. Maurice M.Iwu.
-{INEC.}
