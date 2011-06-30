@@ -1,62 +1,33 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from vms173013pub.verizon.net ([206.46.173.13]:63900 "EHLO
-	vms173013pub.verizon.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755414Ab1F0Xfe (ORCPT
+Received: from exchange.2besource.com ([203.126.216.22]:54205 "EHLO
+	exchange03.2besource.com" rhost-flags-OK-OK-OK-FAIL)
+	by vger.kernel.org with ESMTP id S1751122Ab1F3RID (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 27 Jun 2011 19:35:34 -0400
-Date: Mon, 27 Jun 2011 19:33:54 -0400 (EDT)
-From: Peter Foley <pefoley2@verizon.net>
-Subject: [PATCH V2] kbuild: silence generated makefile message
-In-reply-to: <alpine.LNX.2.00.1106271915160.38876@linux>
-Message-id: <alpine.LNX.2.00.1106271932480.13060@linux>
-References: <alpine.LNX.2.00.1106271619350.24034@linux>
- <BANLkTimrUYk-8GSsf35mUmLVBAaO84R6dA@mail.gmail.com>
- <alpine.LNX.2.00.1106271915160.38876@linux>
-MIME-version: 1.0
-Content-type: TEXT/PLAIN; charset=US-ASCII
+	Thu, 30 Jun 2011 13:08:03 -0400
+Reply-To: <profmauriceiwu2221@yahoo.co.jp>
+From: "PROF.MAURICE IWU" <iwumaurice900@sify.com>
+Subject: Equity Business Investment
+Date: Thu, 30 Jun 2011 19:08:00 +0200
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="Windows-1251"
+Content-Transfer-Encoding: 7bit
+Message-ID: <EXCHANGE03QLVpSlSt7000005f7@exchange03.2besource.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Peter Foley <pefoley2@verizon.net>
-Cc: Arnaud Lacombe <lacombar@gmail.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild Mailing List <linux-kbuild@vger.kernel.org>, mmarek@suse.cz
 
+Equity Business Investment
+From Prof. Maurice Iwu 
 
-This patch silences the "make -C /usr/src/git O=/usr/src/git/build/." 
-message shown when using the generated makefile in KBUILD_OUTDIR.
+Dear Friend,
 
+I am Prof. Maurice M. Iwu, Former Chairman Independent Electoral Commission 
+(INEC).Currently, I am on compulsory terminal leave presently in UK , 
+leading up to my final retirement from public service.
 
-Signed-off-by: Peter Foley <pefoley2@verizon.net>
----
+I am seeking your partnership in a mutual benefit project involving 
+investing into your company and secondly on properties and to be precise Estate Development or any other profitable venture of your great idea for our mutual benefit of Equity Market Investment.,
 
-V2: Show message when V=1
-
- scripts/mkmakefile |    6 +++++-
- 1 files changed, 5 insertions(+), 1 deletions(-)
-
-diff --git a/scripts/mkmakefile b/scripts/mkmakefile
-index 5325423..ea26f37 100644
---- a/scripts/mkmakefile
-+++ b/scripts/mkmakefile
-@@ -30,6 +30,10 @@ PATCHLEVEL = $4
- lastword = \$(word \$(words \$(1)),\$(1))
- makedir := \$(dir \$(call lastword,\$(MAKEFILE_LIST)))
- 
-+ifneq (\$(V),1)
-+Q := @
-+endif
-+
- MAKEARGS := -C $1
- MAKEARGS += O=\$(if \$(patsubst /%,,\$(makedir)),\$(CURDIR)/)\$(patsubst %/,%,\$(makedir))
- 
-@@ -40,7 +44,7 @@ MAKEFLAGS += --no-print-directory
- all	:= \$(filter-out all Makefile,\$(MAKECMDGOALS))
- 
- all:
--	\$(MAKE) \$(MAKEARGS) \$(all)
-+	\$(Q)\$(MAKE) \$(MAKEARGS) \$(all)
- 
- Makefile:;
- 
--- 
-1.7.5.3
-
-
+Sincerely,
+Prof. Maurice M.Iwu.
+{INEC.}
