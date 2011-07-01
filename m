@@ -1,127 +1,60 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:32865 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:34847 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1756481Ab1GAOMB (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 1 Jul 2011 10:12:01 -0400
-Message-ID: <4E0DD5AF.5040604@suse.cz>
-Date: Fri, 01 Jul 2011 16:11:59 +0200
+	id S1756864Ab1GAOvQ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 1 Jul 2011 10:51:16 -0400
+Message-ID: <4E0DDEE3.3060207@suse.cz>
+Date: Fri, 01 Jul 2011 16:51:15 +0200
 From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Subject: Re: [RFC] Kconfig library check merge
-References: <1307387767-9237-1-git-send-email-lacombar@gmail.com>
-In-Reply-To: <1307387767-9237-1-git-send-email-lacombar@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-2; format=flowed
+Subject: Re: [PATCHv2] kconfig: introduce specialized printer
+References: <4D10D7DF.7040903@suse.cz> <1305517329-7558-1-git-send-email-lacombar@gmail.com> <20110609130119.GD4612@sepie.suse.cz>
+In-Reply-To: <20110609130119.GD4612@sepie.suse.cz>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Arnaud Lacombe <lacombar@gmail.com>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Jean-Christophe PLAGNIOL-VILLARD <plagnioj@jcrosoft.com>
 
-On 6.6.2011 21:16, Arnaud Lacombe wrote:
-> Hi Michal, Sam,
+On 9.6.2011 15:01, Michal Marek wrote:
+> On Sun, May 15, 2011 at 11:42:09PM -0400, Arnaud Lacombe wrote:
+>> Make conf_write_symbol() grammar agnostic to be able to use it from different
+>> code path. These path pass a printer callback which will print a symbol's name
+>> and its value in different format.
+>>
+>> conf_write_symbol()'s job become mostly only to prepare a string for the
+>> printer. This avoid to have to pass specialized flag to generic
+>> functions
+>>
+>> Signed-off-by: Arnaud Lacombe<lacombar@gmail.com>
+>> ---
+>>   scripts/kconfig/confdata.c  |  268 +++++++++++++++++++++++++++----------------
+>>   scripts/kconfig/lkc.h       |    5 +
+>>   scripts/kconfig/lkc_proto.h |    1 +
+>>   scripts/kconfig/symbol.c    |   46 +++++++-
+>>   4 files changed, 219 insertions(+), 101 deletions(-)
+>>
+>> History:
+>> v2: Address Michal's comment in msg-id<4D10D7DF.7040903@suse.cz>:
+>>   - add brief comment before each printer
+>>   - introduce a `skip_unset' variable in kconfig printer
+>>   - merge inner switch in an if() statement
+>>   - annotate fallthrough
+>>   - fix tristate printer behavior
 >
-> This is a bit a more deep patch. I was fed up of seeing the various library
-> check done for kconfig in at least 3 places in the scripts/kconfig/ tree. In
-> particular, the QT and GTK checks are far too messy to be in a Makefile, while
-> the gettext is pretty trivial and has its own shell script... Moreover, `nconf'
-> is missing explicit check for ncurses.
+> Hi,
 >
-> Anyway, here it is. It is a single huge patch _on_purpose_, merely meant to be a
-> proof of concept. It is based on the previous serie of trivial fixes.
+> below is my merge with current kbuild-2.6.git#kconfig, notably with the
+> config_is_xxx() stuff (which we should finalize somehow, but that's not
+> the point here). Please review, thanks.
 >
-> Most of the changes are made to rationalize the architecture. I thought in the
-> beginning of using autoconf/automake, but that'd be overkill. A single shell
-> script is far enough to do the job. All the checks only do a bunch of
-> verification, and export CFLAGS/LDFLAGS for building the frontend. The script
-> itself output a Makefile ready to be included for the top-level Makefile, with
-> the necessary check to trigger a re-check if the requested front-end is changed.
 >
-> Comments welcome!
+> Subject: [PATCH] kconfig: introduce specialized printer
 >
-> Regards,
->   - Arnaud
->
-> Cc: Sam Ravnborg<sam@ravnborg.org>
->
-> ---
->   scripts/kconfig/Makefile                   |  160 +++++++------------------
->   scripts/kconfig/check.sh                   |  184 ++++++++++++++++++++++++++--
->   scripts/kconfig/lxdialog/check-lxdialog.sh |   84 -------------
->   3 files changed, 216 insertions(+), 212 deletions(-)
->
-> diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
-> index 84abb2f..f8f853d 100644
-> --- a/scripts/kconfig/Makefile
-> +++ b/scripts/kconfig/Makefile
-> @@ -141,14 +141,6 @@ help:
->   	@echo  '  listnewconfig   - List new options'
->   	@echo  '  oldnoconfig     - Same as silentoldconfig but set new symbols to n (unset)'
->
-> -# lxdialog stuff
-> -check-lxdialog  := $(srctree)/$(src)/lxdialog/check-lxdialog.sh
-> -
-> -# Use recursively expanded variables so we do not call gcc unless
-> -# we really need to do so. (Do not call gcc as part of make mrproper)
-> -HOST_EXTRACFLAGS += $(shell $(CONFIG_SHELL) $(check-lxdialog) -ccflags) \
-> -                    -DLOCALE
-> -
->   # ===========================================================================
->   # Shared Makefile for the various kconfig executables:
->   # conf:	  Used for defconfig, oldconfig and related targets
-> @@ -173,14 +165,19 @@ qconf-cxxobjs	:= qconf.o
->   qconf-objs	:= zconf.tab.o
->   gconf-objs	:= gconf.o zconf.tab.o
->
-> -hostprogs-y := conf
-> +frontends-objs := $(conf-objs) $(mconf-objs) $(nconf-objs)
-> +frontends-objs := $(qconf-cxxobjs) $(gconf-objs)
-                   ^^
-Should be +=.
+> Rebase of Arnaud's patch on top of "kconfig: autogenerated config_is_xxx
+> macro".
 
-> +
-> +hostprogs-y :=
->
->   ifeq ($(MAKECMDGOALS),nconfig)
->   	hostprogs-y += nconf
-> +	ncurses-check := 1
->   endif
->
->   ifeq ($(MAKECMDGOALS),menuconfig)
->   	hostprogs-y += mconf
-> +	ncurses-check := 1
->   endif
->
->   ifeq ($(MAKECMDGOALS),update-po-config)
-> @@ -188,140 +185,67 @@ ifeq ($(MAKECMDGOALS),update-po-config)
->   endif
->
->   ifeq ($(MAKECMDGOALS),xconfig)
-> -	qconf-target := 1
-> -endif
-> -ifeq ($(MAKECMDGOALS),gconfig)
-> -	gconf-target := 1
-> -endif
-> -
-> -
-> -ifeq ($(qconf-target),1)
->   	hostprogs-y += qconf
-> +	qt-check := 1
->   endif
-> -
-> -ifeq ($(gconf-target),1)
-> +ifeq ($(MAKECMDGOALS),gconfig)
->   	hostprogs-y += gconf
-> +	gtk-check := 1
->   endif
-...
-> +KC_CHECK	:= gettext
-> +
-> +ifeq ($(ncurses-check),1)
-> +KC_CHECK	+= ncurses
->   endif
-
-You could also build the KC_CHECK right when doing the $(MAKECMDGOALS) 
-tests and drop the *-check variables. Otherwise it is a very nice 
-cleanup, thanks a lot!
+Pushed to kbuild-2.6.git#kconfig.
 
 Michal
