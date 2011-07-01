@@ -1,55 +1,127 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:60032 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:32865 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1756479Ab1GANrf (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 1 Jul 2011 09:47:35 -0400
-Date: Fri, 1 Jul 2011 15:47:34 +0200
+	id S1756481Ab1GAOMB (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 1 Jul 2011 10:12:01 -0400
+Message-ID: <4E0DD5AF.5040604@suse.cz>
+Date: Fri, 01 Jul 2011 16:11:59 +0200
 From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [PATCH V2] kbuild: silence generated makefile message
-Message-ID: <20110701134733.GB25895@sepie.suse.cz>
-References: <alpine.LNX.2.00.1106271619350.24034@linux>
- <BANLkTimrUYk-8GSsf35mUmLVBAaO84R6dA@mail.gmail.com>
- <alpine.LNX.2.00.1106271915160.38876@linux>
- <alpine.LNX.2.00.1106271932480.13060@linux>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <alpine.LNX.2.00.1106271932480.13060@linux>
+Subject: Re: [RFC] Kconfig library check merge
+References: <1307387767-9237-1-git-send-email-lacombar@gmail.com>
+In-Reply-To: <1307387767-9237-1-git-send-email-lacombar@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-2; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Peter Foley <pefoley2@verizon.net>
-Cc: Arnaud Lacombe <lacombar@gmail.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild Mailing List <linux-kbuild@vger.kernel.org>
+To: Arnaud Lacombe <lacombar@gmail.com>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>
 
-On Mon, Jun 27, 2011 at 07:33:54PM -0400, Peter Foley wrote:
-> 
-> This patch silences the "make -C /usr/src/git O=/usr/src/git/build/." 
-> message shown when using the generated makefile in KBUILD_OUTDIR.
-> 
-> 
-> Signed-off-by: Peter Foley <pefoley2@verizon.net>
+On 6.6.2011 21:16, Arnaud Lacombe wrote:
+> Hi Michal, Sam,
+>
+> This is a bit a more deep patch. I was fed up of seeing the various library
+> check done for kconfig in at least 3 places in the scripts/kconfig/ tree. In
+> particular, the QT and GTK checks are far too messy to be in a Makefile, while
+> the gettext is pretty trivial and has its own shell script... Moreover, `nconf'
+> is missing explicit check for ncurses.
+>
+> Anyway, here it is. It is a single huge patch _on_purpose_, merely meant to be a
+> proof of concept. It is based on the previous serie of trivial fixes.
+>
+> Most of the changes are made to rationalize the architecture. I thought in the
+> beginning of using autoconf/automake, but that'd be overkill. A single shell
+> script is far enough to do the job. All the checks only do a bunch of
+> verification, and export CFLAGS/LDFLAGS for building the frontend. The script
+> itself output a Makefile ready to be included for the top-level Makefile, with
+> the necessary check to trigger a re-check if the requested front-end is changed.
+>
+> Comments welcome!
+>
+> Regards,
+>   - Arnaud
+>
+> Cc: Sam Ravnborg<sam@ravnborg.org>
+>
 > ---
-> 
-> V2: Show message when V=1
-> 
->  scripts/mkmakefile |    6 +++++-
->  1 files changed, 5 insertions(+), 1 deletions(-)
-> 
-> diff --git a/scripts/mkmakefile b/scripts/mkmakefile
-> index 5325423..ea26f37 100644
-> --- a/scripts/mkmakefile
-> +++ b/scripts/mkmakefile
-> @@ -30,6 +30,10 @@ PATCHLEVEL = $4
->  lastword = \$(word \$(words \$(1)),\$(1))
->  makedir := \$(dir \$(call lastword,\$(MAKEFILE_LIST)))
->  
-> +ifneq (\$(V),1)
-> +Q := @
-> +endif
+>   scripts/kconfig/Makefile                   |  160 +++++++------------------
+>   scripts/kconfig/check.sh                   |  184 ++++++++++++++++++++++++++--
+>   scripts/kconfig/lxdialog/check-lxdialog.sh |   84 -------------
+>   3 files changed, 216 insertions(+), 212 deletions(-)
+>
+> diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
+> index 84abb2f..f8f853d 100644
+> --- a/scripts/kconfig/Makefile
+> +++ b/scripts/kconfig/Makefile
+> @@ -141,14 +141,6 @@ help:
+>   	@echo  '  listnewconfig   - List new options'
+>   	@echo  '  oldnoconfig     - Same as silentoldconfig but set new symbols to n (unset)'
+>
+> -# lxdialog stuff
+> -check-lxdialog  := $(srctree)/$(src)/lxdialog/check-lxdialog.sh
+> -
+> -# Use recursively expanded variables so we do not call gcc unless
+> -# we really need to do so. (Do not call gcc as part of make mrproper)
+> -HOST_EXTRACFLAGS += $(shell $(CONFIG_SHELL) $(check-lxdialog) -ccflags) \
+> -                    -DLOCALE
+> -
+>   # ===========================================================================
+>   # Shared Makefile for the various kconfig executables:
+>   # conf:	  Used for defconfig, oldconfig and related targets
+> @@ -173,14 +165,19 @@ qconf-cxxobjs	:= qconf.o
+>   qconf-objs	:= zconf.tab.o
+>   gconf-objs	:= gconf.o zconf.tab.o
+>
+> -hostprogs-y := conf
+> +frontends-objs := $(conf-objs) $(mconf-objs) $(nconf-objs)
+> +frontends-objs := $(qconf-cxxobjs) $(gconf-objs)
+                   ^^
+Should be +=.
 
-Please check if V=1 is passed on the commandline and not set in the
-environmnent, like the toplevel Makefile does:
-
-ifeq ("$(origin V)", "command line")
+> +
+> +hostprogs-y :=
+>
+>   ifeq ($(MAKECMDGOALS),nconfig)
+>   	hostprogs-y += nconf
+> +	ncurses-check := 1
+>   endif
+>
+>   ifeq ($(MAKECMDGOALS),menuconfig)
+>   	hostprogs-y += mconf
+> +	ncurses-check := 1
+>   endif
+>
+>   ifeq ($(MAKECMDGOALS),update-po-config)
+> @@ -188,140 +185,67 @@ ifeq ($(MAKECMDGOALS),update-po-config)
+>   endif
+>
+>   ifeq ($(MAKECMDGOALS),xconfig)
+> -	qconf-target := 1
+> -endif
+> -ifeq ($(MAKECMDGOALS),gconfig)
+> -	gconf-target := 1
+> -endif
+> -
+> -
+> -ifeq ($(qconf-target),1)
+>   	hostprogs-y += qconf
+> +	qt-check := 1
+>   endif
+> -
+> -ifeq ($(gconf-target),1)
+> +ifeq ($(MAKECMDGOALS),gconfig)
+>   	hostprogs-y += gconf
+> +	gtk-check := 1
+>   endif
 ...
+> +KC_CHECK	:= gettext
+> +
+> +ifeq ($(ncurses-check),1)
+> +KC_CHECK	+= ncurses
+>   endif
+
+You could also build the KC_CHECK right when doing the $(MAKECMDGOALS) 
+tests and drop the *-check variables. Otherwise it is a very nice 
+cleanup, thanks a lot!
 
 Michal
