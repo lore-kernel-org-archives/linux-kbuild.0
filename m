@@ -1,41 +1,28 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from que31.charter.net ([209.225.8.23]:41231 "EHLO que31.charter.net"
+Received: from cantor2.suse.de ([195.135.220.15]:59211 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751917Ab1F3XuV (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 30 Jun 2011 19:50:21 -0400
-From: Greg Dietsche <Gregory.Dietsche@cuw.edu>
-Subject: [PATCH] gitignore: ignore debian build directory
-Date: Thu, 30 Jun 2011 18:42:50 -0500
-Message-Id: <1309477370-5866-1-git-send-email-Gregory.Dietsche@cuw.edu>
+	id S1756460Ab1GANWA (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 1 Jul 2011 09:22:00 -0400
+Date: Fri, 1 Jul 2011 15:21:58 +0200
+From: Michal Marek <mmarek@suse.cz>
+Subject: Re: [PATCH] gitignore: ignore debian build directory
+Message-ID: <20110701132158.GA25895@sepie.suse.cz>
+References: <1309477370-5866-1-git-send-email-Gregory.Dietsche@cuw.edu>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1309477370-5866-1-git-send-email-Gregory.Dietsche@cuw.edu>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: mmarek@suse.cz
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Greg Dietsche <Gregory.Dietsche@cuw.edu>
+To: Greg Dietsche <Gregory.Dietsche@cuw.edu>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Have git ignore the Debian directory created when running:
-	make deb-pkg
+On Thu, Jun 30, 2011 at 06:42:50PM -0500, Greg Dietsche wrote:
+> Have git ignore the Debian directory created when running:
+> 	make deb-pkg
+> 
+> Signed-off-by: Greg Dietsche <Gregory.Dietsche@cuw.edu>
 
-Signed-off-by: Greg Dietsche <Gregory.Dietsche@cuw.edu>
----
- .gitignore |    5 +++++
- 1 files changed, 5 insertions(+), 0 deletions(-)
+Thanks, applied to kbuild-2.6.git#misc.
 
-diff --git a/.gitignore b/.gitignore
-index 9dacde0..dc243a6 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -46,6 +46,11 @@ modules.builtin
- /Module.symvers
- 
- #
-+#Debian directory (make deb-pkg)
-+#
-+/debian/
-+
-+#
- # git files that we don't want to ignore even it they are dot-files
- #
- !.gitignore
--- 
-1.7.2.5
-
+Michal
