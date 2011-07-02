@@ -1,44 +1,88 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
 Received: from mail-iy0-f174.google.com ([209.85.210.174]:41010 "EHLO
 	mail-iy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751833Ab1GBBrs (ORCPT
+	with ESMTP id S1753119Ab1GBBsB (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 1 Jul 2011 21:47:48 -0400
+	Fri, 1 Jul 2011 21:48:01 -0400
 From: Arnaud Lacombe <lacombar@gmail.com>
-Subject: [RFC 0/7] Kconfig library check merge
-Date: Fri,  1 Jul 2011 21:47:32 -0400
-Message-Id: <1309571259-15241-1-git-send-email-lacombar@gmail.com>
-In-Reply-To: <1307387767-9237-1-git-send-email-lacombar@gmail.com>
+Subject: [RFC 7/7] kconfig: add stub for nconf checks
+Date: Fri,  1 Jul 2011 21:47:39 -0400
+Message-Id: <1309571259-15241-8-git-send-email-lacombar@gmail.com>
+In-Reply-To: <1309571259-15241-1-git-send-email-lacombar@gmail.com>
 References: <1307387767-9237-1-git-send-email-lacombar@gmail.com>
+ <1309571259-15241-1-git-send-email-lacombar@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>
 Cc: Arnaud Lacombe <lacombar@gmail.com>
 
-Hi Michal,
+---
+ scripts/kconfig/Makefile |    4 +---
+ scripts/kconfig/check.sh |   14 ++++++++++++++
+ 2 files changed, 15 insertions(+), 3 deletions(-)
 
-You'll find hereafter a splitted-down version of my previous preliminary
-patch. I will eventually need to complete the second commit message, it is
-missing the purpose of the change, which AFAIR was a failure of something.
-
-Comments welcome!
-
- - Arnaud
-
-Arnaud Lacombe (7):
-  kconfig/Makefile: add pretty printer for moc(1)
-  kconfig/Makefile: ensure `conf' appears last in `hostprogs-y'
-  kconfig/check.sh: prepare for generic check
-  kconfig: move QT checks to `scripts/kconfig/check.sh'
-  kconfig: move GTK checks to `scripts/kconfig/check.sh'
-  kconfig: move ncurses checks to `scripts/kconfig/check.sh'
-  kconfig: add stub for nconf checks
-
- scripts/kconfig/Makefile                   |  155 +++++-----------------
- scripts/kconfig/check.sh                   |  199 ++++++++++++++++++++++++++--
- scripts/kconfig/lxdialog/check-lxdialog.sh |   84 ------------
- 3 files changed, 223 insertions(+), 215 deletions(-)
-
+diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
+index 4e934f1..2eb71ee 100644
+--- a/scripts/kconfig/Makefile
++++ b/scripts/kconfig/Makefile
+@@ -176,7 +176,7 @@ KC_CHECK := gettext
+ 
+ ifeq ($(MAKECMDGOALS),nconfig)
+ 	hostprogs-y += nconf
+-	KC_CHECK += ncurses
++	KC_CHECK += menu panel ncurses
+ endif
+ 
+ ifeq ($(MAKECMDGOALS),menuconfig)
+@@ -211,8 +211,6 @@ HOSTCFLAGS_zconf.tab.o	:= -I$(src)
+ 
+ HOSTCFLAGS_gconf.o	= -Wno-missing-prototypes
+ 
+-HOSTLOADLIBES_nconf	= -lmenu -lpanel
+-
+ need-check := $(addprefix $(obj)/,$(frontends-objs))
+ need-check += $(addprefix $(obj)/,$(lxdialog))
+ 
+diff --git a/scripts/kconfig/check.sh b/scripts/kconfig/check.sh
+index ec551b7..d19eca8 100755
+--- a/scripts/kconfig/check.sh
++++ b/scripts/kconfig/check.sh
+@@ -47,6 +47,12 @@ check_gtk()
+ 	echo "HOSTLOADLIBES_gconf	+= $libs"   >> ${obj}/.tmp_check
+ }
+ 
++check_menu()
++{
++
++	echo "HOSTLOADLIBES_nconf	+= -lmenu" >> ${obj}/.tmp_check
++}
++
+ check_ncurses()
+ {
+ 	local cflags=""
+@@ -96,6 +102,12 @@ check_ncurses()
+ 	echo "HOSTLOADLIBES_nconf	+= $libs"   >> ${obj}/.tmp_check
+ }
+ 
++check_panel()
++{
++
++	echo "HOSTLOADLIBES_nconf	+= -lpanel" >> ${obj}/.tmp_check
++}
++
+ check_qt()
+ {
+ 	local cflags=""
+@@ -163,7 +175,9 @@ for arg in $*; do
+ 	case $arg in
+ 	gettext)	;;
+ 	gtk)		;;
++	menu)		;;
+ 	ncurses)	;;
++	panel)		;;
+ 	qt)		;;
+ 	*)
+ 		echo "  *"
 -- 
 1.7.3.4.574.g608b.dirty
 
