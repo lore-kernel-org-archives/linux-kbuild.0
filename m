@@ -1,15 +1,15 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
 Received: from mail-iw0-f174.google.com ([209.85.214.174]:35815 "EHLO
 	mail-iw0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750899Ab1GBFKt (ORCPT
+	with ESMTP id S1750936Ab1GBFKu (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 2 Jul 2011 01:10:49 -0400
+	Sat, 2 Jul 2011 01:10:50 -0400
 Received: by mail-iw0-f174.google.com with SMTP id 6so3288158iwn.19
-        for <linux-kbuild@vger.kernel.org>; Fri, 01 Jul 2011 22:10:49 -0700 (PDT)
+        for <linux-kbuild@vger.kernel.org>; Fri, 01 Jul 2011 22:10:50 -0700 (PDT)
 From: Arnaud Lacombe <lacombar@gmail.com>
-Subject: [PATCH 1/5] kconfig: use calloc() for expr allocation
-Date: Sat,  2 Jul 2011 01:10:36 -0400
-Message-Id: <1309583440-4795-2-git-send-email-lacombar@gmail.com>
+Subject: [PATCH 2/5] kconfig/conf: reduce the scope of `defconfig_file'
+Date: Sat,  2 Jul 2011 01:10:37 -0400
+Message-Id: <1309583440-4795-3-git-send-email-lacombar@gmail.com>
 In-Reply-To: <1309583440-4795-1-git-send-email-lacombar@gmail.com>
 References: <1307386711-8866-1-git-send-email-lacombar@gmail.com>
  <1309583440-4795-1-git-send-email-lacombar@gmail.com>
@@ -18,55 +18,39 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>
 Cc: Arnaud Lacombe <lacombar@gmail.com>
 
+This variable is not used outside of main() so there is not much reason keeping
+it global. Ensure it is initialized as gcc has no way to know that normal
+execution path expect only one option switch to be given on the command line
+(except when we request help). As a result, we always initialize
+`defconfig_file' before using it.
+
 Signed-off-by: Arnaud Lacombe <lacombar@gmail.com>
 ---
- scripts/kconfig/expr.c |   12 ++++--------
- 1 files changed, 4 insertions(+), 8 deletions(-)
+ scripts/kconfig/conf.c |    4 +---
+ 1 files changed, 1 insertions(+), 3 deletions(-)
 
-diff --git a/scripts/kconfig/expr.c b/scripts/kconfig/expr.c
-index 792c62e..290ce41 100644
---- a/scripts/kconfig/expr.c
-+++ b/scripts/kconfig/expr.c
-@@ -13,8 +13,7 @@
+diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
+index 08c05bc..6431f5c 100644
+--- a/scripts/kconfig/conf.c
++++ b/scripts/kconfig/conf.c
+@@ -34,8 +34,6 @@ enum input_mode {
+ 	oldnoconfig,
+ } input_mode = oldaskconfig;
  
- struct expr *expr_alloc_symbol(struct symbol *sym)
+-char *defconfig_file;
+-
+ static int indent = 1;
+ static int valid_stdin = 1;
+ static int sync_kconfig;
+@@ -462,7 +460,7 @@ static struct option long_opts[] = {
+ int main(int ac, char **av)
  {
--	struct expr *e = malloc(sizeof(*e));
--	memset(e, 0, sizeof(*e));
-+	struct expr *e = calloc(1, sizeof(*e));
- 	e->type = E_SYMBOL;
- 	e->left.sym = sym;
- 	return e;
-@@ -22,8 +21,7 @@ struct expr *expr_alloc_symbol(struct symbol *sym)
+ 	int opt;
+-	const char *name;
++	const char *name, *defconfig_file = NULL /* gcc uninit */;
+ 	struct stat tmpstat;
  
- struct expr *expr_alloc_one(enum expr_type type, struct expr *ce)
- {
--	struct expr *e = malloc(sizeof(*e));
--	memset(e, 0, sizeof(*e));
-+	struct expr *e = calloc(1, sizeof(*e));
- 	e->type = type;
- 	e->left.expr = ce;
- 	return e;
-@@ -31,8 +29,7 @@ struct expr *expr_alloc_one(enum expr_type type, struct expr *ce)
- 
- struct expr *expr_alloc_two(enum expr_type type, struct expr *e1, struct expr *e2)
- {
--	struct expr *e = malloc(sizeof(*e));
--	memset(e, 0, sizeof(*e));
-+	struct expr *e = calloc(1, sizeof(*e));
- 	e->type = type;
- 	e->left.expr = e1;
- 	e->right.expr = e2;
-@@ -41,8 +38,7 @@ struct expr *expr_alloc_two(enum expr_type type, struct expr *e1, struct expr *e
- 
- struct expr *expr_alloc_comp(enum expr_type type, struct symbol *s1, struct symbol *s2)
- {
--	struct expr *e = malloc(sizeof(*e));
--	memset(e, 0, sizeof(*e));
-+	struct expr *e = calloc(1, sizeof(*e));
- 	e->type = type;
- 	e->left.sym = s1;
- 	e->right.sym = s2;
+ 	setlocale(LC_ALL, "");
 -- 
 1.7.3.4.574.g608b.dirty
 
