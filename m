@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-iy0-f174.google.com ([209.85.210.174]:41010 "EHLO
-	mail-iy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752411Ab1GBBrv (ORCPT
+Received: from mail-iw0-f174.google.com ([209.85.214.174]:42485 "EHLO
+	mail-iw0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752561Ab1GBBry (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 1 Jul 2011 21:47:51 -0400
+	Fri, 1 Jul 2011 21:47:54 -0400
 From: Arnaud Lacombe <lacombar@gmail.com>
-Subject: [RFC 1/7] kconfig/Makefile: add pretty printer for moc(1)
-Date: Fri,  1 Jul 2011 21:47:33 -0400
-Message-Id: <1309571259-15241-2-git-send-email-lacombar@gmail.com>
+Subject: [RFC 2/7] kconfig/Makefile: ensure `conf' appears last in `hostprogs-y'
+Date: Fri,  1 Jul 2011 21:47:34 -0400
+Message-Id: <1309571259-15241-3-git-send-email-lacombar@gmail.com>
 In-Reply-To: <1309571259-15241-1-git-send-email-lacombar@gmail.com>
 References: <1307387767-9237-1-git-send-email-lacombar@gmail.com>
  <1309571259-15241-1-git-send-email-lacombar@gmail.com>
@@ -17,26 +17,31 @@ To: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Michal Marek <mm
 Cc: Arnaud Lacombe <lacombar@gmail.com>
 
 ---
- scripts/kconfig/Makefile |    5 ++++-
- 1 files changed, 4 insertions(+), 1 deletions(-)
+ scripts/kconfig/Makefile |    4 +++-
+ 1 files changed, 3 insertions(+), 1 deletions(-)
 
 diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
-index 84abb2f..ce46407 100644
+index ce46407..8abde17 100644
 --- a/scripts/kconfig/Makefile
 +++ b/scripts/kconfig/Makefile
-@@ -320,8 +320,11 @@ $(obj)/zconf.tab.o: $(obj)/lex.zconf.c $(obj)/zconf.hash.c
+@@ -173,7 +173,7 @@ qconf-cxxobjs	:= qconf.o
+ qconf-objs	:= zconf.tab.o
+ gconf-objs	:= gconf.o zconf.tab.o
  
- $(obj)/qconf.o: $(obj)/qconf.moc
+-hostprogs-y := conf
++hostprogs-y :=
  
-+quiet_cmd_moc = MOC     $@
-+cmd_moc = $(KC_QT_MOC) -i $< -o $@
+ ifeq ($(MAKECMDGOALS),nconfig)
+ 	hostprogs-y += nconf
+@@ -203,6 +203,8 @@ ifeq ($(gconf-target),1)
+ 	hostprogs-y += gconf
+ endif
+ 
++hostprogs-y += conf
 +
- $(obj)/%.moc: $(src)/%.h
--	$(KC_QT_MOC) -i $< -o $@
-+	$(call cmd,moc)
- 
- # Extract gconf menu items for I18N support
- $(obj)/gconf.glade.h: $(obj)/gconf.glade
+ clean-files	:= qconf.moc .tmp_qtcheck .tmp_gtkcheck
+ clean-files	+= zconf.tab.c lex.zconf.c zconf.hash.c gconf.glade.h
+ clean-files     += mconf qconf gconf nconf
 -- 
 1.7.3.4.574.g608b.dirty
 
