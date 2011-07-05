@@ -1,40 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Message-Id: <4E12F9EB020000780004C219@nat28.tlf.novell.com>
-Date: Tue, 05 Jul 2011 10:47:55 +0100
-From: "Jan Beulich" <JBeulich@novell.com>
-Subject: Re: sorting of exports breaks modpost's GPL checking
-References: <4E11F1C6020000780004C089@nat28.tlf.novell.com>
- <CAPk1OjGKD+i=RkfMq9GX_HeOdNSH1o5Bp2Ge6QXGy0edi+1kSQ@mail.gmail.com>
-In-Reply-To: <CAPk1OjGKD+i=RkfMq9GX_HeOdNSH1o5Bp2Ge6QXGy0edi+1kSQ@mail.gmail.com>
+Received: from lennier.cc.vt.edu ([198.82.162.213]:41213 "EHLO
+	lennier.cc.vt.edu" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752455Ab1GEWjN (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 5 Jul 2011 18:39:13 -0400
+Subject: Re: [RFC 3/7] kconfig/check.sh: prepare for generic check
+In-Reply-To: Your message of "Fri, 01 Jul 2011 21:47:35 EDT."
+             <1309571259-15241-4-git-send-email-lacombar@gmail.com>
+From: Valdis.Kletnieks@vt.edu
+References: <1307387767-9237-1-git-send-email-lacombar@gmail.com> <1309571259-15241-1-git-send-email-lacombar@gmail.com>
+            <1309571259-15241-4-git-send-email-lacombar@gmail.com>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8BIT
-Content-Disposition: inline
+Content-Type: multipart/signed; boundary="==_Exmh_1309905474_18528P";
+	 micalg=pgp-sha1; protocol="application/pgp-signature"
+Content-Transfer-Encoding: 7bit
+Date: Tue, 05 Jul 2011 18:37:54 -0400
+Message-ID: <62528.1309905474@turing-police.cc.vt.edu>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Alessio Igor Bogani <abogani@kernel.org>
-Cc: rusty@rustcorp.com.au, linux-kbuild@vger.kernel.org
+To: Arnaud Lacombe <lacombar@gmail.com>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>
 
->>> On 05.07.11 at 11:36, Alessio Igor Bogani <abogani@kernel.org> wrote:
-> Dear Mr. Beulich,
-> 
-> 2011/7/4 Jan Beulich <JBeulich@novell.com>:
->> Is it known (and being worked on) that exported symbols residing
->> themselves in modules are no longer properly handled by modpost,
->> due to the .o files to be linked into .ko (other than vmlinux and the
->> .ko files) still carrying the ___ksymtab*+<symbol> sections?
->>
->> If not - what are the thoughts to resolve this?
-> [...]
-> 
-> Could you tell me how reproduce the problem?
+--==_Exmh_1309905474_18528P
+Content-Type: text/plain; charset=us-ascii
 
-Just look at Modules.symvers - all the symbols coming from modules
-will be tagged "(unknown)" rather than EXPORT_SYMBOL,
-EXPORT_SYMBOL_GPL, etc.
+On Fri, 01 Jul 2011 21:47:35 EDT, Arnaud Lacombe said:
 
-As to reproducing the actual bad behavior - creating a non-GPL
-module that consumes a GPL-only export should be all you need.
+> diff --git a/scripts/kconfig/check.sh b/scripts/kconfig/check.sh
 
-Jan
+Can this be check_libs.sh or similar, to better indicate the function?
+
+--==_Exmh_1309905474_18528P
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+Comment: Exmh version 2.5 07/13/2001
+
+iD8DBQFOE5JCcC3lWbTT17ARAgF0AJ4yZz+IKItC53NcQQ4mdAQC5wKr2QCfVq/d
+X8ub6EdKnPxmAF9Y5b+0nq8=
+=XmBj
+-----END PGP SIGNATURE-----
+
+--==_Exmh_1309905474_18528P--
 
