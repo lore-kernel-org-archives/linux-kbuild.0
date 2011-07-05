@@ -1,65 +1,38 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from vms173017pub.verizon.net ([206.46.173.17]:36275 "EHLO
-	vms173017pub.verizon.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752501Ab1GDW5U (ORCPT
+Received: from mail-fx0-f52.google.com ([209.85.161.52]:38674 "EHLO
+	mail-fx0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755007Ab1GEJgu (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 4 Jul 2011 18:57:20 -0400
-Date: Mon, 04 Jul 2011 18:55:23 -0400 (EDT)
-From: Peter Foley <pefoley2@verizon.net>
-Subject: Re: [PATCH V3] kbuild: silence generated makefile message
-In-reply-to: <20110701134733.GB25895@sepie.suse.cz>
-Message-id: <alpine.LNX.2.00.1107041852390.20463@linux>
-References: <alpine.LNX.2.00.1106271619350.24034@linux>
- <BANLkTimrUYk-8GSsf35mUmLVBAaO84R6dA@mail.gmail.com>
- <alpine.LNX.2.00.1106271915160.38876@linux>
- <alpine.LNX.2.00.1106271932480.13060@linux>
- <20110701134733.GB25895@sepie.suse.cz>
-MIME-version: 1.0
-Content-type: TEXT/PLAIN; charset=US-ASCII
+	Tue, 5 Jul 2011 05:36:50 -0400
+Received: by fxd18 with SMTP id 18so6012912fxd.11
+        for <linux-kbuild@vger.kernel.org>; Tue, 05 Jul 2011 02:36:48 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <4E11F1C6020000780004C089@nat28.tlf.novell.com>
+References: <4E11F1C6020000780004C089@nat28.tlf.novell.com>
+Date: Tue, 5 Jul 2011 11:36:48 +0200
+Message-ID: <CAPk1OjGKD+i=RkfMq9GX_HeOdNSH1o5Bp2Ge6QXGy0edi+1kSQ@mail.gmail.com>
+Subject: Re: sorting of exports breaks modpost's GPL checking
+From: Alessio Igor Bogani <abogani@kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: Peter Foley <pefoley2@verizon.net>, Arnaud Lacombe <lacombar@gmail.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild Mailing List <linux-kbuild@vger.kernel.org>
+To: Jan Beulich <JBeulich@novell.com>
+Cc: linux-kbuild@vger.kernel.org, rusty@rustcorp.com.au
 
-This patch silences the "make -C /usr/src/git O=/usr/src/git/build/." 
-message shown when using the generated makefile in KBUILD_OUTDIR.
+Dear Mr. Beulich,
 
-Signed-off-by: Peter Foley <pefoley2@verizon.net>
----
-V2: Show message when V=1
-V3: Check if V=1 comes from the commandline
+2011/7/4 Jan Beulich <JBeulich@novell.com>:
+> Is it known (and being worked on) that exported symbols residing
+> themselves in modules are no longer properly handled by modpost,
+> due to the .o files to be linked into .ko (other than vmlinux and the
+> .ko files) still carrying the ___ksymtab*+<symbol> sections?
+>
+> If not - what are the thoughts to resolve this?
+[...]
 
- scripts/mkmakefile |    9 ++++++++-
- 1 files changed, 8 insertions(+), 1 deletions(-)
+Could you tell me how reproduce the problem?
 
-diff --git a/scripts/mkmakefile b/scripts/mkmakefile
-index 5325423..0cc0442 100644
---- a/scripts/mkmakefile
-+++ b/scripts/mkmakefile
-@@ -30,6 +30,13 @@ PATCHLEVEL = $4
- lastword = \$(word \$(words \$(1)),\$(1))
- makedir := \$(dir \$(call lastword,\$(MAKEFILE_LIST)))
- 
-+ifeq ("\$(origin V)", "command line")
-+VERBOSE := \$(V)
-+endif
-+ifneq (\$(VERBOSE),1)
-+Q := @
-+endif
-+
- MAKEARGS := -C $1
- MAKEARGS += O=\$(if \$(patsubst /%,,\$(makedir)),\$(CURDIR)/)\$(patsubst %/,%,\$(makedir))
- 
-@@ -40,7 +47,7 @@ MAKEFLAGS += --no-print-directory
- all	:= \$(filter-out all Makefile,\$(MAKECMDGOALS))
- 
- all:
--	\$(MAKE) \$(MAKEARGS) \$(all)
-+	\$(Q)\$(MAKE) \$(MAKEARGS) \$(all)
- 
- Makefile:;
- 
--- 
-1.7.6
+Thanks!
 
-
+Ciao,
+Alessio
