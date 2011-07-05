@@ -1,46 +1,37 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from lennier.cc.vt.edu ([198.82.162.213]:41213 "EHLO
-	lennier.cc.vt.edu" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752455Ab1GEWjN (ORCPT
+Received: from mail-pv0-f174.google.com ([74.125.83.174]:33433 "EHLO
+	mail-pv0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751378Ab1GEWsB (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 5 Jul 2011 18:39:13 -0400
+	Tue, 5 Jul 2011 18:48:01 -0400
+MIME-Version: 1.0
+In-Reply-To: <62528.1309905474@turing-police.cc.vt.edu>
+References: <1307387767-9237-1-git-send-email-lacombar@gmail.com>
+	<1309571259-15241-1-git-send-email-lacombar@gmail.com>
+	<1309571259-15241-4-git-send-email-lacombar@gmail.com>
+	<62528.1309905474@turing-police.cc.vt.edu>
+Date: Tue, 5 Jul 2011 18:48:00 -0400
+Message-ID: <CACqU3MWxCNKnj39iyXeTOXgFvs_fx+dd6gUW4LFVUu+jH5KgkA@mail.gmail.com>
 Subject: Re: [RFC 3/7] kconfig/check.sh: prepare for generic check
-In-Reply-To: Your message of "Fri, 01 Jul 2011 21:47:35 EDT."
-             <1309571259-15241-4-git-send-email-lacombar@gmail.com>
-From: Valdis.Kletnieks@vt.edu
-References: <1307387767-9237-1-git-send-email-lacombar@gmail.com> <1309571259-15241-1-git-send-email-lacombar@gmail.com>
-            <1309571259-15241-4-git-send-email-lacombar@gmail.com>
-Mime-Version: 1.0
-Content-Type: multipart/signed; boundary="==_Exmh_1309905474_18528P";
-	 micalg=pgp-sha1; protocol="application/pgp-signature"
-Content-Transfer-Encoding: 7bit
-Date: Tue, 05 Jul 2011 18:37:54 -0400
-Message-ID: <62528.1309905474@turing-police.cc.vt.edu>
+From: Arnaud Lacombe <lacombar@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnaud Lacombe <lacombar@gmail.com>
+To: Valdis.Kletnieks@vt.edu
 Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>
 
---==_Exmh_1309905474_18528P
-Content-Type: text/plain; charset=us-ascii
+Hi,
 
-On Fri, 01 Jul 2011 21:47:35 EDT, Arnaud Lacombe said:
+On Tue, Jul 5, 2011 at 6:37 PM,  <Valdis.Kletnieks@vt.edu> wrote:
+> On Fri, 01 Jul 2011 21:47:35 EDT, Arnaud Lacombe said:
+>
+>> diff --git a/scripts/kconfig/check.sh b/scripts/kconfig/check.sh
+>
+> Can this be check_libs.sh or similar, to better indicate the function?
+>
+Definitively. I was tempted at some point to call it configure.sh and
+to rename the .tmp_check to .config.mk as it generates host-specific
+config for the main Makefile. I finally went the path of least
+modification.
 
-> diff --git a/scripts/kconfig/check.sh b/scripts/kconfig/check.sh
-
-Can this be check_libs.sh or similar, to better indicate the function?
-
---==_Exmh_1309905474_18528P
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.11 (GNU/Linux)
-Comment: Exmh version 2.5 07/13/2001
-
-iD8DBQFOE5JCcC3lWbTT17ARAgF0AJ4yZz+IKItC53NcQQ4mdAQC5wKr2QCfVq/d
-X8ub6EdKnPxmAF9Y5b+0nq8=
-=XmBj
------END PGP SIGNATURE-----
-
---==_Exmh_1309905474_18528P--
-
+ - Arnaud
