@@ -1,54 +1,81 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from wnohang.net ([178.79.154.173]:58304 "EHLO mail.wnohang.net"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753351Ab1GIQcb (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 9 Jul 2011 12:32:31 -0400
-Date: Sat, 9 Jul 2011 21:54:49 +0530
-From: Raghavendra D Prabhu <rprabhu@wnohang.net>
-Subject: [PATCH] Avoid Wunused-but-set warning
-Message-ID: <da20dc5c4160ed9a3da52f60799a1e4369fe3f27.1310228130.git.rprabhu@wnohang.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
+Received: from mail-wy0-f174.google.com ([74.125.82.174]:39580 "EHLO
+	mail-wy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755067Ab1GIXOA (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 9 Jul 2011 19:14:00 -0400
+From: Alessio Igor Bogani <abogani@kernel.org>
+Subject: [PATCH] modpost: Fix modpost's license checking
+Date: Sun, 10 Jul 2011 01:13:30 +0200
+Message-Id: <1310253210-1221-1-git-send-email-abogani@kernel.org>
+In-Reply-To: <CAPk1OjH4Otd-+q3tD6KYx9ZBT=zenYBvpQMm8LthPd1D1c+AKg@mail.gmail.com>
+References: <CAPk1OjH4Otd-+q3tD6KYx9ZBT=zenYBvpQMm8LthPd1D1c+AKg@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Nir Tzachar <nir.tzachar@gmail.com>, linux-kernel@vger.kernel.org
+To: Rusty Russell <rusty@rustcorp.com.au>, Jan Beulich <JBeulich@novell.com>
+Cc: Kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Tim Bird <tim.bird@am.sony.com>, Anders Kaseorg <andersk@ksplice.com>, Alessio Igor Bogani <abogani@kernel.org>
 
-Hi,
-     I am seeing Wunused-but-set warning while make nconfig.  Looks like
-     active_menu is not used. Removing it fixes the warning.
+The commit f02e8a6 sorts symbols placing each of them in its own elf section.
+The sorting and merging into the canonical sections are done by the linker.
+Unfortunately modpost to generate Module.symvers file parses vmlinux
+(already linked) and all modules object files (which aren't linked yet).
+These aren't sanitized by the linker yet. That breaks modpost that can't
+detect license properly for modules.
 
-Signed-off-by: Raghavendra D Prabhu <rprabhu@wnohang.net>
+This patch makes modpost aware of  the new exported symbols structure.
+
+This work was supported by a hardware donation from the CE Linux Forum.
+
+Signed-off-by: Alessio Igor Bogani <abogani@kernel.org>
 ---
-  scripts/kconfig/nconf.c |    2 --
-  1 files changed, 0 insertions(+), 2 deletions(-)
+ scripts/mod/modpost.c |   27 ++++++++++++++++++++++++++-
+ 1 files changed, 26 insertions(+), 1 deletions(-)
 
-diff --git a/scripts/kconfig/nconf.c b/scripts/kconfig/nconf.c
-index 488dd74..5dad8ae 100644
---- a/scripts/kconfig/nconf.c
-+++ b/scripts/kconfig/nconf.c
-@@ -1067,7 +1067,6 @@ static void conf(struct menu *menu)
-  	struct menu *submenu = 0;
-  	const char *prompt = menu_get_prompt(menu);
-  	struct symbol *sym;
--	struct menu *active_menu = NULL;
-  	int res;
-  	int current_index = 0;
-  	int last_top_row = 0;
-@@ -1152,7 +1151,6 @@ static void conf(struct menu *menu)
-  			continue;
-  
-  		submenu = (struct menu *) item_data();
--		active_menu = (struct menu *)item_data();
-  		if (!submenu || !menu_is_visible(submenu))
-  			continue;
-  		if (submenu)
+diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
+index 413c536..f41283c 100644
+--- a/scripts/mod/modpost.c
++++ b/scripts/mod/modpost.c
+@@ -254,6 +254,26 @@ static enum export export_no(const char *s)
+ 	return export_unknown;
+ }
+ 
++static const char *sec_name(struct elf_info *elf, int secindex);
++
++static enum export export_from_secname(struct elf_info *elf, unsigned int sec)
++{
++	const char *secname = sec_name(elf, sec);
++
++	if (strncmp(secname, "___ksymtab+", 11) == 0)
++		return export_plain;
++	else if (strncmp(secname, "___ksymtab_unused+", 18) == 0)
++		return export_unused;
++	else if (strncmp(secname, "___ksymtab_gpl+", 15) == 0)
++		return export_gpl;
++	else if (strncmp(secname, "___ksymtab_unused_gpl+", 22) == 0)
++		return export_unused_gpl;
++	else if (strncmp(secname, "___ksymtab_gpl_future+", 22) == 0)
++		return export_gpl_future;
++	else
++		return export_unknown;
++}
++
+ static enum export export_from_sec(struct elf_info *elf, unsigned int sec)
+ {
+ 	if (sec == elf->export_sec)
+@@ -563,7 +583,12 @@ static void handle_modversions(struct module *mod, struct elf_info *info,
+ 			       Elf_Sym *sym, const char *symname)
+ {
+ 	unsigned int crc;
+-	enum export export = export_from_sec(info, get_secindex(info, sym));
++	enum export export;
++
++	if (!is_vmlinux(mod->name) && strncmp(symname, "__ksymtab", 9) == 0)
++		export = export_from_secname(info, get_secindex(info, sym));
++	else
++		export = export_from_sec(info, get_secindex(info, sym));
+ 
+ 	switch (sym->st_shndx) {
+ 	case SHN_COMMON:
 -- 
-1.7.6
+1.7.4.1
 
---------------------------
-Raghavendra Prabhu
-GPG Id : 0xD72BE977
-Fingerprint: B93F EBCB 8E05 7039 CD3C A4B8 A616 DCA1 D72B E977
-www: wnohang.net
