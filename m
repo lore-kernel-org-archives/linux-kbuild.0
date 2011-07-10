@@ -1,54 +1,73 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-vx0-f174.google.com ([209.85.220.174]:34679 "EHLO
-	mail-vx0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756011Ab1GJRYY (ORCPT
+Received: from oproxy3-pub.bluehost.com ([69.89.21.8]:40819 "HELO
+	oproxy3-pub.bluehost.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with SMTP id S1755899Ab1GJSCo convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 10 Jul 2011 13:24:24 -0400
-MIME-Version: 1.0
+	Sun, 10 Jul 2011 14:02:44 -0400
+Date: Sun, 10 Jul 2011 11:02:41 -0700
+From: Randy Dunlap <rdunlap@xenotime.net>
+Subject: Re: [PATCH] Avoid Wunused-but-set warning
+Message-Id: <20110710110241.7650e03f.rdunlap@xenotime.net>
 In-Reply-To: <CACqU3MUFO9DGqnK99ApaKn00vzj5rCB5=kjuSZGZpPU8c_4G-A@mail.gmail.com>
 References: <da20dc5c4160ed9a3da52f60799a1e4369fe3f27.1310228130.git.rprabhu@wnohang.net>
 	<CAM_iQpXeqc01dyHpViyJCMSz6wz-1mWmGi=J0UynUG8tbd99kw@mail.gmail.com>
 	<CACqU3MUgVTpc6kBvBiw7rtyn_JTA-JPrbnvai3Vnq+UWk-jSbQ@mail.gmail.com>
 	<CAOJsxLF+4VOXJwRJL7npMngDTGztXk739_GcMLxsMzmsVcDCVw@mail.gmail.com>
 	<CACqU3MUFO9DGqnK99ApaKn00vzj5rCB5=kjuSZGZpPU8c_4G-A@mail.gmail.com>
-Date: Sun, 10 Jul 2011 20:24:24 +0300
-Message-ID: <CAOJsxLHW_9+8kqJpK=fjr=MXY2R99iTj0j_F6_JHyWDQextf6A@mail.gmail.com>
-Subject: Re: [PATCH] Avoid Wunused-but-set warning
-From: Pekka Enberg <penberg@kernel.org>
+Mime-Version: 1.0
 Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Arnaud Lacombe <lacombar@gmail.com>
-Cc: =?ISO-8859-1?Q?Am=E9rico_Wang?= <xiyou.wangcong@gmail.com>, Raghavendra D Prabhu <rprabhu@wnohang.net>, linux-kbuild@vger.kernel.org, Nir Tzachar <nir.tzachar@gmail.com>, linux-kernel@vger.kernel.org
+Cc: Pekka Enberg <penberg@kernel.org>, =?ISO-8859-1?Q?Am=E9rico?= Wang <xiyou.wangcong@gmail.com>, Raghavendra D Prabhu <rprabhu@wnohang.net>, linux-kbuild@vger.kernel.org, Nir Tzachar <nir.tzachar@gmail.com>, linux-kernel@vger.kernel.org
 
-Hi Arnaud!
+On Sun, 10 Jul 2011 12:49:20 -0400 Arnaud Lacombe wrote:
 
-On Sun, Jul 10, 2011 at 7:49 PM, Arnaud Lacombe <lacombar@gmail.com> wrote:
->> What kind of status do you need to ACK such a simple patch?
->>
+> Hi,
+> 
+> On Sun, Jul 10, 2011 at 12:28 PM, Pekka Enberg <penberg@kernel.org> wrote:
+> > On Sun, Jul 10, 2011 at 7:24 PM, Arnaud Lacombe <lacombar@gmail.com> wrote:
+> >> Hi,
+> >>
+> >> On Sun, Jul 10, 2011 at 12:16 PM, Américo Wang <xiyou.wangcong@gmail.com> wrote:
+> >>> On Sun, Jul 10, 2011 at 12:24 AM, Raghavendra D Prabhu
+> >>> <rprabhu@wnohang.net> wrote:
+> >>>> Hi,
+> >>>>    I am seeing Wunused-but-set warning while make nconfig.  Looks like
+> >>>>    active_menu is not used. Removing it fixes the warning.
+> >>>>
+> >>>> Signed-off-by: Raghavendra D Prabhu <rprabhu@wnohang.net>
+> >>>
+> >>> Acked-by: WANG Cong <xiyou.wangcong@gmail.com>
+> >>>
+> >> Out of curiosity, what is your status to ACK such patch ?
+> >
+> > What kind of status do you need to ACK such a simple patch?
+> >
 > As per Documentation/SubmittingPatches:
-
-[snip]
-
+> 
+> <<
+> 13) When to use Acked-by: and Cc:
+> The Signed-off-by: tag indicates that the signer was involved in the
+> development of the patch, or that he/she was in the patch's delivery path.
+> 
+> If a person was not directly involved in the preparation or handling of a
+> patch but wishes to signify and record their approval of it then they can
+> arrange to have an Acked-by: line added to the patch's changelog.
+> 
+> Acked-by: is often used by the maintainer of the affected code when that
+> maintainer neither contributed to nor forwarded the patch.
+> >>
+> 
 > That said, it is not a strong requirement... unfortunately. So, let's
 > have some fun and go ACK thousand of trivial patch just to generate
 > traffic on the LKML and give myself self-importance :-)
 
-Hey, thank you so much for quoting Documentation/SubmittingPatches for me!
+Acked-by: is mostly used as a weak version of Reviewed-by:
+and the "definition" in SubmittingPatches is not accurate IMO.
+I.e., it can be used by anyone.
 
-I've read it a long time ago but I now see I've completely
-misunderstood how things work around here. How silly of me to assume
-patches posted on LKML were fair game for anyone to review and that it
-was appreciated given that there's chronic lack of reviewers for
-pretty much everything. Thank you for setting me straight on the
-subject!
-
-I see you've been rather busy with important Kconfg work recently but
-I can only hope you'll find the time to enforce "Acked-by" status on
-LKML in the future as well!
-
-P.S. There are other tags such as Tested-by and Reviewed-by which you
-might also want to police a bit as well - I hear people without proper
-testing or reviewing status are doing those things all the time!
-
-                               Pekka
+---
+~Randy
+*** Remember to use Documentation/SubmitChecklist when testing your code ***
