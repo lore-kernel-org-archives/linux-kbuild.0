@@ -1,81 +1,122 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wy0-f174.google.com ([74.125.82.174]:39580 "EHLO
-	mail-wy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755067Ab1GIXOA (ORCPT
+Received: from mx1.HRZ.Uni-Dortmund.DE ([129.217.128.51]:53961 "EHLO
+	unimail.tu-dortmund.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755237Ab1GJCsP (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 9 Jul 2011 19:14:00 -0400
-From: Alessio Igor Bogani <abogani@kernel.org>
-Subject: [PATCH] modpost: Fix modpost's license checking
-Date: Sun, 10 Jul 2011 01:13:30 +0200
-Message-Id: <1310253210-1221-1-git-send-email-abogani@kernel.org>
-In-Reply-To: <CAPk1OjH4Otd-+q3tD6KYx9ZBT=zenYBvpQMm8LthPd1D1c+AKg@mail.gmail.com>
-References: <CAPk1OjH4Otd-+q3tD6KYx9ZBT=zenYBvpQMm8LthPd1D1c+AKg@mail.gmail.com>
+	Sat, 9 Jul 2011 22:48:15 -0400
+Message-ID: <4E1908BF.4010700@udo.edu>
+Date: Sun, 10 Jul 2011 04:04:47 +0200
+From: Andrej Gelenberg <andrej.gelenberg@udo.edu>
+MIME-Version: 1.0
+Subject: [PATCH] nconfig: prevent segfault on empty menu
+Content-Type: multipart/mixed;
+ boundary="------------060504070000080006070802"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Rusty Russell <rusty@rustcorp.com.au>, Jan Beulich <JBeulich@novell.com>
-Cc: Kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Tim Bird <tim.bird@am.sony.com>, Anders Kaseorg <andersk@ksplice.com>, Alessio Igor Bogani <abogani@kernel.org>
+To: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-The commit f02e8a6 sorts symbols placing each of them in its own elf section.
-The sorting and merging into the canonical sections are done by the linker.
-Unfortunately modpost to generate Module.symvers file parses vmlinux
-(already linked) and all modules object files (which aren't linked yet).
-These aren't sanitized by the linker yet. That breaks modpost that can't
-detect license properly for modules.
+This is a multi-part message in MIME format.
+--------------060504070000080006070802
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 
-This patch makes modpost aware of  the new exported symbols structure.
+Hello,
 
-This work was supported by a hardware donation from the CE Linux Forum.
+i found and fixed an NULL-dereference bug in nconf tool.
 
-Signed-off-by: Alessio Igor Bogani <abogani@kernel.org>
+How to reproduce:
+1. $ make nconfig
+2. disable "Kernel hacking -> Debug Filesystem"
+3. go to "General setup -> GCOV-based kernel profiling" and hit F2
+it should segfault
+
+Fix: i have added some checks for "struct menu*" to be NULL before it
+get dereferenced
+
+Regards,
+Andrej Gelenberg
+
+--------------060504070000080006070802
+Content-Type: text/plain;
+ name="0001-nconfig-prevent-segfault-on-empty-menu.patch"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+ filename="0001-nconfig-prevent-segfault-on-empty-menu.patch"
+
+From 82be343a388a02477ffb0d464e1f2810c61a1fda Mon Sep 17 00:00:00 2001
+From: Andrej Gelenberg <andrej.gelenberg@udo.edu>
+Date: Sun, 10 Jul 2011 03:44:50 +0200
+Subject: [PATCH] nconfig: prevent segfault on empty menu
+
+how to reproduce:
+1. $ make nconfig
+2. disable "Kernel hacking -> Debug Filesystem"
+3. go to "General setup -> GCOV-based kernel profiling" and hit F2
+it should segfault
+
+Fix: i have added some checks for "struct menu*" to be NULL bevor it get dereferenced
+
+Signed-off-by: Andrej Gelenberg <andrej.gelenberg@udo.edu>
 ---
- scripts/mod/modpost.c |   27 ++++++++++++++++++++++++++-
- 1 files changed, 26 insertions(+), 1 deletions(-)
+ scripts/kconfig/menu.c |   18 ++++++++++--------
+ 1 files changed, 10 insertions(+), 8 deletions(-)
 
-diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index 413c536..f41283c 100644
---- a/scripts/mod/modpost.c
-+++ b/scripts/mod/modpost.c
-@@ -254,6 +254,26 @@ static enum export export_no(const char *s)
- 	return export_unknown;
+diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
+index 5fdf10d..6a09cc4 100644
+--- a/scripts/kconfig/menu.c
++++ b/scripts/kconfig/menu.c
+@@ -425,7 +425,7 @@ void menu_finalize(struct menu *parent)
+ 
+ bool menu_has_prompt(struct menu *menu)
+ {
+-	if (!menu->prompt)
++	if ((!menu) || (!menu->prompt))
+ 		return false;
+ 	return true;
+ }
+@@ -436,7 +436,7 @@ bool menu_is_visible(struct menu *menu)
+ 	struct symbol *sym;
+ 	tristate visible;
+ 
+-	if (!menu->prompt)
++	if ((!menu) || !menu->prompt)
+ 		return false;
+ 
+ 	if (menu->visibility) {
+@@ -470,10 +470,12 @@ bool menu_is_visible(struct menu *menu)
+ 
+ const char *menu_get_prompt(struct menu *menu)
+ {
+-	if (menu->prompt)
+-		return menu->prompt->text;
+-	else if (menu->sym)
+-		return menu->sym->name;
++	if (menu) {
++		if (menu->prompt)
++			return menu->prompt->text;
++		else if (menu->sym)
++			return menu->sym->name;
++	}
+ 	return NULL;
  }
  
-+static const char *sec_name(struct elf_info *elf, int secindex);
-+
-+static enum export export_from_secname(struct elf_info *elf, unsigned int sec)
-+{
-+	const char *secname = sec_name(elf, sec);
-+
-+	if (strncmp(secname, "___ksymtab+", 11) == 0)
-+		return export_plain;
-+	else if (strncmp(secname, "___ksymtab_unused+", 18) == 0)
-+		return export_unused;
-+	else if (strncmp(secname, "___ksymtab_gpl+", 15) == 0)
-+		return export_gpl;
-+	else if (strncmp(secname, "___ksymtab_unused_gpl+", 22) == 0)
-+		return export_unused_gpl;
-+	else if (strncmp(secname, "___ksymtab_gpl_future+", 22) == 0)
-+		return export_gpl_future;
-+	else
-+		return export_unknown;
-+}
-+
- static enum export export_from_sec(struct elf_info *elf, unsigned int sec)
- {
- 	if (sec == elf->export_sec)
-@@ -563,7 +583,12 @@ static void handle_modversions(struct module *mod, struct elf_info *info,
- 			       Elf_Sym *sym, const char *symname)
- {
- 	unsigned int crc;
--	enum export export = export_from_sec(info, get_secindex(info, sym));
-+	enum export export;
-+
-+	if (!is_vmlinux(mod->name) && strncmp(symname, "__ksymtab", 9) == 0)
-+		export = export_from_secname(info, get_secindex(info, sym));
-+	else
-+		export = export_from_sec(info, get_secindex(info, sym));
+@@ -496,12 +498,12 @@ struct menu *menu_get_parent_menu(struct menu *menu)
  
- 	switch (sym->st_shndx) {
- 	case SHN_COMMON:
+ bool menu_has_help(struct menu *menu)
+ {
+-	return menu->help != NULL;
++	return menu && (menu->help != NULL);
+ }
+ 
+ const char *menu_get_help(struct menu *menu)
+ {
+-	if (menu->help)
++	if (menu && menu->help)
+ 		return menu->help;
+ 	else
+ 		return "";
 -- 
-1.7.4.1
+1.7.6
 
+
+--------------060504070000080006070802--
