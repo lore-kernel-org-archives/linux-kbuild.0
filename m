@@ -1,47 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp4.mundo-r.com ([212.51.32.151]:54307 "EHLO
-	smtp4.mundo-r.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753098Ab1GKKgc (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 11 Jul 2011 06:36:32 -0400
-From: =?UTF-8?q?V=C3=ADctor=20Manuel=20J=C3=A1quez=20Leal?=
-	<vjaquez@igalia.com>
-Subject: [PATCH] kbuild: incremental tags updating with GNU GLOBAL
-Date: Mon, 11 Jul 2011 12:26:30 +0200
-Message-Id: <1310379990-4367-1-git-send-email-vjaquez@igalia.com>
+Received: from cantor2.suse.de ([195.135.220.15]:33639 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1756285Ab1GKMRj (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 11 Jul 2011 08:17:39 -0400
+Message-ID: <4E1AE9E2.2000603@suse.cz>
+Date: Mon, 11 Jul 2011 14:17:38 +0200
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: [PATCH] kbuild: incremental tags updating with GNU GLOBAL
+References: <1310379990-4367-1-git-send-email-vjaquez@igalia.com>
+In-Reply-To: <1310379990-4367-1-git-send-email-vjaquez@igalia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
+To: =?UTF-8?B?VsOtY3RvciBNYW51ZWwgSsOhcXVleiBMZWFs?= <vjaquez@igalia.com>
 Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Jianbin Kang <kjbmail@gmail.com>, Sam Ravnborg <sam@ravnborg.org>
 
-Instead of generating the tag database each time the target is ran, is better
-just update incrementally the database. It will expend less time.
+On 11.7.2011 12:26, Víctor Manuel Jáquez Leal wrote:
+> Instead of generating the tag database each time the target is ran, is better
+> just update incrementally the database. It will expend less time.
+>
+> Signed-off-by: Víctor Manuel Jáquez Leal<vjaquez@igalia.com>
+> ---
+>   scripts/tags.sh |    6 +++++-
+>   1 files changed, 5 insertions(+), 1 deletions(-)
+>
+> diff --git a/scripts/tags.sh b/scripts/tags.sh
+> index 75c5d24..6a2fedc 100755
+> --- a/scripts/tags.sh
+> +++ b/scripts/tags.sh
+> @@ -116,7 +116,11 @@ docscope()
+>
+>   dogtags()
+>   {
+> -	all_sources | gtags -f -
+> +	if global -p; then
+> +		global -u
+> +	else
+> +		all_sources | gtags -f -
+> +	fi
 
-Signed-off-by: Víctor Manuel Jáquez Leal <vjaquez@igalia.com>
----
- scripts/tags.sh |    6 +++++-
- 1 files changed, 5 insertions(+), 1 deletions(-)
+Will this handle new source files properly?
 
-diff --git a/scripts/tags.sh b/scripts/tags.sh
-index 75c5d24..6a2fedc 100755
---- a/scripts/tags.sh
-+++ b/scripts/tags.sh
-@@ -116,7 +116,11 @@ docscope()
- 
- dogtags()
- {
--	all_sources | gtags -f -
-+	if global -p; then
-+		global -u
-+	else
-+		all_sources | gtags -f -
-+	fi
- }
- 
- exuberant()
--- 
-1.7.5.4
-
+Michal
