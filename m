@@ -1,52 +1,63 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp4.mundo-r.com ([212.51.32.151]:58905 "EHLO
-	smtp4.mundo-r.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756886Ab1GKNRa (ORCPT
+Received: from oproxy6-pub.bluehost.com ([67.222.54.6]:54455 "HELO
+	oproxy6-pub.bluehost.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with SMTP id S1758029Ab1GKRLh (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 11 Jul 2011 09:17:30 -0400
-Date: Mon, 11 Jul 2011 15:17:25 +0200
-From: =?iso-8859-1?Q?V=EDctor_M=2E_J=E1quez_L=2E?= <vjaquez@igalia.com>
-Subject: Re: [PATCH] kbuild: incremental tags updating with GNU GLOBAL
-Message-ID: <20110711131725.GA26907@lit.local.igalia.com>
-References: <1310379990-4367-1-git-send-email-vjaquez@igalia.com>
- <4E1AE9E2.2000603@suse.cz>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <4E1AE9E2.2000603@suse.cz>
+	Mon, 11 Jul 2011 13:11:37 -0400
+Date: Mon, 11 Jul 2011 10:11:34 -0700
+From: Randy Dunlap <rdunlap@xenotime.net>
+Subject: Re: [PATCH] Avoid Wunused-but-set warning
+Message-Id: <20110711101134.613d88ee.rdunlap@xenotime.net>
+In-Reply-To: <20110711050951.GA22699@sirena.org.uk>
+References: <da20dc5c4160ed9a3da52f60799a1e4369fe3f27.1310228130.git.rprabhu@wnohang.net>
+	<CAM_iQpXeqc01dyHpViyJCMSz6wz-1mWmGi=J0UynUG8tbd99kw@mail.gmail.com>
+	<CACqU3MUgVTpc6kBvBiw7rtyn_JTA-JPrbnvai3Vnq+UWk-jSbQ@mail.gmail.com>
+	<CAOJsxLF+4VOXJwRJL7npMngDTGztXk739_GcMLxsMzmsVcDCVw@mail.gmail.com>
+	<CACqU3MUFO9DGqnK99ApaKn00vzj5rCB5=kjuSZGZpPU8c_4G-A@mail.gmail.com>
+	<20110710110241.7650e03f.rdunlap@xenotime.net>
+	<alpine.LNX.2.00.1107110051420.2818@swampdragon.chaosbits.net>
+	<20110710160722.ae763029.rdunlap@xenotime.net>
+	<alpine.LNX.2.00.1107110117080.2818@swampdragon.chaosbits.net>
+	<20110710165333.8c7f9620.rdunlap@xenotime.net>
+	<20110711050951.GA22699@sirena.org.uk>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Jianbin Kang <kjbmail@gmail.com>, Sam Ravnborg <sam@ravnborg.org>
+To: Mark Brown <broonie@opensource.wolfsonmicro.com>
+Cc: Jesper Juhl <jj@chaosbits.net>, Arnaud Lacombe <lacombar@gmail.com>, Pekka Enberg <penberg@kernel.org>, Am?rico Wang <xiyou.wangcong@gmail.com>, Raghavendra D Prabhu <rprabhu@wnohang.net>, linux-kbuild@vger.kernel.org, Nir Tzachar <nir.tzachar@gmail.com>, linux-kernel@vger.kernel.org
 
-On Mon, Jul 11, 2011 at 02:17:38PM +0200, Michal Marek wrote:
-> On 11.7.2011 12:26, Víctor Manuel Jáquez Leal wrote:
-> >Instead of generating the tag database each time the target is ran, is better
-> >just update incrementally the database. It will expend less time.
-> >
-> >Signed-off-by: Víctor Manuel Jáquez Leal<vjaquez@igalia.com>
-> >---
-> >  scripts/tags.sh |    6 +++++-
-> >  1 files changed, 5 insertions(+), 1 deletions(-)
-> >
-> >diff --git a/scripts/tags.sh b/scripts/tags.sh
-> >index 75c5d24..6a2fedc 100755
-> >--- a/scripts/tags.sh
-> >+++ b/scripts/tags.sh
-> >@@ -116,7 +116,11 @@ docscope()
-> >
-> >  dogtags()
-> >  {
-> >-	all_sources | gtags -f -
-> >+	if global -p; then
-> >+		global -u
-> >+	else
-> >+		all_sources | gtags -f -
-> >+	fi
+On Mon, 11 Jul 2011 06:09:52 +0100 Mark Brown wrote:
+
+> On Sun, Jul 10, 2011 at 04:53:33PM -0700, Randy Dunlap wrote:
 > 
-> Will this handle new source files properly?
+> > But do as you like.  Which parts of SubmittingPatches do you think
+> > support your interpretation?
+> 
+> > and should we have this line:
+> > 	Acked-by: is not as formal as Signed-off-by:.
+> > changed to:
+> > 	Acked-by: is not as formal as Signed-off-by: or Reviewed-by:.
+> > e.g.?
+> 
+> Current practice seems to be that Acked-by is used instead of
+> Reviewed-by - the latter is comparatively rare.
 
-I ran a quick test and yes, it does.
 
-vmjl
+ISTM that more education and encouragement are needed about Reviewed-by:.
+(Patch Review is a possible kernel summit topic.)
+
+and that SubmittingPatches should be updated since we generally refer people
+to that file and not to Documentation/development-process/
+
+
+Samples from my partial mailing list archives:
+
+linux-pci mailing list:		Acked-by: 93	Reviewed-by: 81
+linux-mm mailing list:		Acked-by: 2104	Reviewed-by: 1344
+netdev mailing list:		Acked-by: 1366	Reviewed-by: 659
+
+---
+~Randy
+*** Remember to use Documentation/SubmitChecklist when testing your code ***
