@@ -1,72 +1,118 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-vx0-f174.google.com ([209.85.220.174]:60270 "EHLO
-	mail-vx0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756510Ab1GKFzU (ORCPT
+Received: from mail-ey0-f174.google.com ([209.85.215.174]:59209 "EHLO
+	mail-ey0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757141Ab1GKGTd convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 11 Jul 2011 01:55:20 -0400
+	Mon, 11 Jul 2011 02:19:33 -0400
 MIME-Version: 1.0
-In-Reply-To: <alpine.LNX.2.00.1107110117080.2818@swampdragon.chaosbits.net>
-References: <da20dc5c4160ed9a3da52f60799a1e4369fe3f27.1310228130.git.rprabhu@wnohang.net>
-	<CAM_iQpXeqc01dyHpViyJCMSz6wz-1mWmGi=J0UynUG8tbd99kw@mail.gmail.com>
-	<CACqU3MUgVTpc6kBvBiw7rtyn_JTA-JPrbnvai3Vnq+UWk-jSbQ@mail.gmail.com>
-	<CAOJsxLF+4VOXJwRJL7npMngDTGztXk739_GcMLxsMzmsVcDCVw@mail.gmail.com>
-	<CACqU3MUFO9DGqnK99ApaKn00vzj5rCB5=kjuSZGZpPU8c_4G-A@mail.gmail.com>
-	<20110710110241.7650e03f.rdunlap@xenotime.net>
-	<alpine.LNX.2.00.1107110051420.2818@swampdragon.chaosbits.net>
-	<20110710160722.ae763029.rdunlap@xenotime.net>
-	<alpine.LNX.2.00.1107110117080.2818@swampdragon.chaosbits.net>
-Date: Mon, 11 Jul 2011 08:55:19 +0300
-Message-ID: <CAOJsxLHzXV3MDHH+83iwxaUtO=931Bmq1JRzS=MQx=6wa-wi2w@mail.gmail.com>
-Subject: Re: [PATCH] Avoid Wunused-but-set warning
-From: Pekka Enberg <penberg@kernel.org>
+In-Reply-To: <CACqU3MUB=CUx+a=8bji5Rk7-KUiGEao8Lypar+7hrG-faH360A@mail.gmail.com>
+References: <CACqU3MXvHR0v4Hgn5UMwDtzaX5nWqmKEneN_s7r4PuEGzifauw@mail.gmail.com>
+	<1310282825-14509-1-git-send-email-lacombar@gmail.com>
+	<1310282825-14509-2-git-send-email-lacombar@gmail.com>
+	<CAMT+=WY84jaattF+9zYK7oiJLmn8_oGLB-mnGbOpK_4Rt0vRZg@mail.gmail.com>
+	<CACqU3MUB=CUx+a=8bji5Rk7-KUiGEao8Lypar+7hrG-faH360A@mail.gmail.com>
+Date: Mon, 11 Jul 2011 09:19:32 +0300
+Message-ID: <CAMT+=WZf89H764Z9rsJ4Bc3magtCjL_dhBM6j4X2jv0t0VisRA@mail.gmail.com>
+Subject: Re: [PATCH 2/2] kconfig/nconf: prevent segfault on empty menu
+From: Nir Tzachar <nir.tzachar@gmail.com>
 Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jesper Juhl <jj@chaosbits.net>
-Cc: Randy Dunlap <rdunlap@xenotime.net>, Arnaud Lacombe <lacombar@gmail.com>, =?ISO-8859-1?Q?Am=E9rico_Wang?= <xiyou.wangcong@gmail.com>, Raghavendra D Prabhu <rprabhu@wnohang.net>, linux-kbuild@vger.kernel.org, Nir Tzachar <nir.tzachar@gmail.com>, linux-kernel@vger.kernel.org
+To: Arnaud Lacombe <lacombar@gmail.com>
+Cc: linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>, linux-kernel@vger.kernel.org, Andrej Gelenberg <andrej.gelenberg@udo.edu>
 
-Hi Jesper,
+On Sun, Jul 10, 2011 at 7:18 PM, Arnaud Lacombe <lacombar@gmail.com> wrote:
+> Hi,
+>
+> On Sun, Jul 10, 2011 at 6:32 AM, Nir Tzachar <nir.tzachar@gmail.com> wrote:
+>> Hello.
+>>
+>> On Sun, Jul 10, 2011 at 10:27 AM, Arnaud Lacombe <lacombar@gmail.com> wrote:
+>>> nconf does not check the validity of the current menu when help is requested
+>>> (with either <F2>, '?' or 'h'). This leads to a NULL pointer dereference when an
+>>> empty menu is encountered.
+>>>
+>>> The following reduced testcase exposes the problem:
+>>>
+>>> config DEP
+>>>        bool
+>>>
+>>> menu "FOO"
+>>>
+>>> config BAR
+>>>        bool "BAR"
+>>>        depends on DEP
+>>>
+>>> endmenu
+>>>
+>>> Issue will happen when entering menu "FOO" and requesting help.
+>>>
+>>> nconf is the only front-end which do not filter the validity of the current
+>>> menu. Such filter can not really happen beforehand as other key which does not
+>>> deals with the current menu might be entered by the user, so just bails out
+>>> earlier if we encounter an invalid menu.
+>>
+>> I do not believe the correct solution is silently ignoring the user's
+>> key presses. I think the correct behavior would be to display a
+>> nohelp_text window.
+>>
+>> something like this (untested):
+>> show_scroll_win(main_window, nohelp_text);
+>>
+> This would be:
+>
+> show_scroll_win(main_window, _(menu_get_prompt(menu)), nohelp_text);
 
-On Mon, Jul 11, 2011 at 2:21 AM, Jesper Juhl <jj@chaosbits.net> wrote:
-> In any case, you can't expect people to base their Acked-by/Reviewed-by
-> replies on some conclusion in some email thread that happened years ago
-> but was never written down in some document in the repository.
-> It is only reasonable to expect people to behave according to the rules
-> laid out in SubmittingPatches and similar documents, and those rules
-> currently seem to support my interpretation, not yours.
+show_scroll_win(main_window, _("No help available"), nohelp_text);
 
-The definitions in SubmittingPatches are not hard rules and are, in
-fact, out of date. See Documentation/development-process/5.Posting for
-alternative definitions:
+would also work, and have none of the complications.
 
- - Acked-by: indicates an agreement by another developer (often a
-   maintainer of the relevant code) that the patch is appropriate for
-   inclusion into the kernel.
-
-and
-
- - Reviewed-by: the named developer has reviewed the patch for correctness;
-   see the reviewer's statement in Documentation/SubmittingPatches for more
-   detail.
-
-and then compare the dates for these definitions:
-
-0f44cd23 (Andrew Morton      2007-06-08 13:46:45 -0700 401) Acked-by:
-is often used by the maintainer of the affected code when that
-0f44cd23 (Andrew Morton      2007-06-08 13:46:45 -0700 402) maintainer
-neither contributed to nor forwarded the patch.
-
-75b02146 (Jonathan Corbet 2008-09-30 15:15:56 -0600 205)  - Acked-by:
-indicates an agreement by another developer (often a
-75b02146 (Jonathan Corbet 2008-09-30 15:15:56 -0600 206)    maintainer
-of the relevant code) that the patch is appropriate for
-75b02146 (Jonathan Corbet 2008-09-30 15:15:56 -0600 207)    inclusion
-into the kernel.
-
-So it is NOT reasonable 'to expect people to behave according to the
-rules laid out in SubmittingPatches and similar documents' because
-such documents have never had any hard rules! The documents are
-guidelines that attempt to document how things work here, not lay down
-the law.
-
-                                 Pekka
+> but we would fall back on the original issue as requesting the prompt
+> of an invalid menu does not make sense, so the menu_get_prompt(menu)
+> would still have to be replaced with something valid. It would be nice
+> to come up with a solution valid at least for nconf and mconf.
+> Currently mconf just silently discard the key pressed.
+>
+> To some extend I do not think any frontend should display a menu which
+> has no visible child, but that may require more changes and affect
+> performance...
+>
+>  - Arnaud
+>
+>> The other patches in the series seem gr8.
+>>
+>> Cheers.
+>>
+>>> Cc: Nir Tzachar <nir.tzachar@gmail.com>
+>>> Cc: Andrej Gelenberg <andrej.gelenberg@udo.edu>
+>>> Reported-by: Andrej Gelenberg <andrej.gelenberg@udo.edu>
+>>> Signed-off-by: Arnaud Lacombe <lacombar@gmail.com>
+>>> ---
+>>>  scripts/kconfig/nconf.c |    7 ++++++-
+>>>  1 files changed, 6 insertions(+), 1 deletions(-)
+>>>
+>>> diff --git a/scripts/kconfig/nconf.c b/scripts/kconfig/nconf.c
+>>> index 24fc79a..eb9e49d 100644
+>>> --- a/scripts/kconfig/nconf.c
+>>> +++ b/scripts/kconfig/nconf.c
+>>> @@ -1222,7 +1222,12 @@ static void conf_message_callback(const char *fmt, va_list ap)
+>>>
+>>>  static void show_help(struct menu *menu)
+>>>  {
+>>> -       struct gstr help = str_new();
+>>> +       struct gstr help;
+>>> +
+>>> +       if (!menu)
+>>> +               return;
+>>> +
+>>> +       help = str_new();
+>>>        menu_get_ext_help(menu, &help);
+>>>        show_scroll_win(main_window, _(menu_get_prompt(menu)), str_get(&help));
+>>>        str_free(&help);
+>>> --
+>>> 1.7.3.4.574.g608b.dirty
+>>>
+>>>
+>>
+>
