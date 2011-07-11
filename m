@@ -1,176 +1,83 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from swampdragon.chaosbits.net ([90.184.90.115]:27884 "EHLO
+Received: from swampdragon.chaosbits.net ([90.184.90.115]:27991 "EHLO
 	swampdragon.chaosbits.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751906Ab1GKUdA (ORCPT
+	with ESMTP id S1753920Ab1GKUhw (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 11 Jul 2011 16:33:00 -0400
-Date: Mon, 11 Jul 2011 22:32:58 +0200 (CEST)
+	Mon, 11 Jul 2011 16:37:52 -0400
+Date: Mon, 11 Jul 2011 22:37:50 +0200 (CEST)
 From: Jesper Juhl <jj@chaosbits.net>
 Subject: Re: [PATCH] Avoid Wunused-but-set warning
-In-Reply-To: <20110710165333.8c7f9620.rdunlap@xenotime.net>
-Message-ID: <alpine.LNX.2.00.1107112224080.10944@swampdragon.chaosbits.net>
+In-Reply-To: <CAOJsxLHzXV3MDHH+83iwxaUtO=931Bmq1JRzS=MQx=6wa-wi2w@mail.gmail.com>
+Message-ID: <alpine.LNX.2.00.1107112235020.10944@swampdragon.chaosbits.net>
 References: <da20dc5c4160ed9a3da52f60799a1e4369fe3f27.1310228130.git.rprabhu@wnohang.net> <CAM_iQpXeqc01dyHpViyJCMSz6wz-1mWmGi=J0UynUG8tbd99kw@mail.gmail.com> <CACqU3MUgVTpc6kBvBiw7rtyn_JTA-JPrbnvai3Vnq+UWk-jSbQ@mail.gmail.com>
  <CAOJsxLF+4VOXJwRJL7npMngDTGztXk739_GcMLxsMzmsVcDCVw@mail.gmail.com> <CACqU3MUFO9DGqnK99ApaKn00vzj5rCB5=kjuSZGZpPU8c_4G-A@mail.gmail.com> <20110710110241.7650e03f.rdunlap@xenotime.net> <alpine.LNX.2.00.1107110051420.2818@swampdragon.chaosbits.net>
- <20110710160722.ae763029.rdunlap@xenotime.net> <alpine.LNX.2.00.1107110117080.2818@swampdragon.chaosbits.net> <20110710165333.8c7f9620.rdunlap@xenotime.net>
+ <20110710160722.ae763029.rdunlap@xenotime.net> <alpine.LNX.2.00.1107110117080.2818@swampdragon.chaosbits.net> <CAOJsxLHzXV3MDHH+83iwxaUtO=931Bmq1JRzS=MQx=6wa-wi2w@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: MULTIPART/MIXED; BOUNDARY="8323328-660627870-1310416378=:10944"
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Randy Dunlap <rdunlap@xenotime.net>
-Cc: Arnaud Lacombe <lacombar@gmail.com>, Pekka Enberg <penberg@kernel.org>, =?ISO-8859-15?Q?Am=E9rico_Wang?= <xiyou.wangcong@gmail.com>, Raghavendra D Prabhu <rprabhu@wnohang.net>, linux-kbuild@vger.kernel.org, Nir Tzachar <nir.tzachar@gmail.com>, linux-kernel@vger.kernel.org
+To: Pekka Enberg <penberg@kernel.org>
+Cc: Randy Dunlap <rdunlap@xenotime.net>, Arnaud Lacombe <lacombar@gmail.com>, =?ISO-8859-15?Q?Am=E9rico_Wang?= <xiyou.wangcong@gmail.com>, Raghavendra D Prabhu <rprabhu@wnohang.net>, linux-kbuild@vger.kernel.org, Nir Tzachar <nir.tzachar@gmail.com>, linux-kernel@vger.kernel.org
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
+On Mon, 11 Jul 2011, Pekka Enberg wrote:
 
---8323328-660627870-1310416378=:10944
-Content-Type: TEXT/PLAIN; charset=ISO-8859-1
-Content-Transfer-Encoding: 8BIT
-
-On Sun, 10 Jul 2011, Randy Dunlap wrote:
-
-> On Mon, 11 Jul 2011 01:21:36 +0200 (CEST) Jesper Juhl wrote:
+> Hi Jesper,
 > 
-> > On Sun, 10 Jul 2011, Randy Dunlap wrote:
-> > 
-> > > On Mon, 11 Jul 2011 00:56:57 +0200 (CEST) Jesper Juhl wrote:
-> > > 
-> > > > On Sun, 10 Jul 2011, Randy Dunlap wrote:
-> > > > 
-> > > > > On Sun, 10 Jul 2011 12:49:20 -0400 Arnaud Lacombe wrote:
-> > > > > 
-> > > > > > Hi,
-> > > > > > 
-> > > > > > On Sun, Jul 10, 2011 at 12:28 PM, Pekka Enberg <penberg@kernel.org> wrote:
-> > > > > > > On Sun, Jul 10, 2011 at 7:24 PM, Arnaud Lacombe <lacombar@gmail.com> wrote:
-> > > > > > >> Hi,
-> > > > > > >>
-> > > > > > >> On Sun, Jul 10, 2011 at 12:16 PM, Américo Wang <xiyou.wangcong@gmail.com> wrote:
-> > > > > > >>> On Sun, Jul 10, 2011 at 12:24 AM, Raghavendra D Prabhu
-> > > > > > >>> <rprabhu@wnohang.net> wrote:
-> > > > > > >>>> Hi,
-> > > > > > >>>>    I am seeing Wunused-but-set warning while make nconfig.  Looks like
-> > > > > > >>>>    active_menu is not used. Removing it fixes the warning.
-> > > > > > >>>>
-> > > > > > >>>> Signed-off-by: Raghavendra D Prabhu <rprabhu@wnohang.net>
-> > > > > > >>>
-> > > > > > >>> Acked-by: WANG Cong <xiyou.wangcong@gmail.com>
-> > > > > > >>>
-> > > > > > >> Out of curiosity, what is your status to ACK such patch ?
-> > > > > > >
-> > > > > > > What kind of status do you need to ACK such a simple patch?
-> > > > > > >
-> > > > > > As per Documentation/SubmittingPatches:
-> > > > > > 
-> > > > > > <<
-> > > > > > 13) When to use Acked-by: and Cc:
-> > > > > > The Signed-off-by: tag indicates that the signer was involved in the
-> > > > > > development of the patch, or that he/she was in the patch's delivery path.
-> > > > > > 
-> > > > > > If a person was not directly involved in the preparation or handling of a
-> > > > > > patch but wishes to signify and record their approval of it then they can
-> > > > > > arrange to have an Acked-by: line added to the patch's changelog.
-> > > > > > 
-> > > > > > Acked-by: is often used by the maintainer of the affected code when that
-> > > > > > maintainer neither contributed to nor forwarded the patch.
-> > > > > > >>
-> > > > > > 
-> > > > > > That said, it is not a strong requirement... unfortunately. So, let's
-> > > > > > have some fun and go ACK thousand of trivial patch just to generate
-> > > > > > traffic on the LKML and give myself self-importance :-)
-> > > > > 
-> > > > > Acked-by: is mostly used as a weak version of Reviewed-by:
-> > > > > and the "definition" in SubmittingPatches is not accurate IMO.
-> > > > > I.e., it can be used by anyone.
-> > > > > 
-> > > > 
-> > > > Interesting. I was under the impression that Reviewed-by: was a weaker 
-> > > > thing than Acked-by: - I certainly have been using it as such.
-> > > > 
-> > > > I've always interpreted Acked-by: as being something you could apply if 
-> > > > you were the author, maintainer or other person with similar strong 
-> > > > background knowledge of the code. Where Reviewed-by: could be used by 
-> > > > anyone, as long as they had taken the time to read the patch and try and 
-> > > > understand what was going on and the result/conclusion looked good.
-> > > 
-> > > I don't see it in SubmittingPatches, but there was some discussion at the
-> > > time (IIRC!!) that Reviewed-by: indicates that you are willing to support/fix
-> > > the patch if the patch author(s) disappear.  I.e., you are willing to take
-> > > some ownership responsibility of the patch.
-> > > 
-> > > or I could be dreaming...
-> > > 
-> > I'm not going to claim that I recall all the discussion that went on at 
-> > the time, there was quite a bit IIRC (and I'm too lazy to read up on all 
-> > of it). But to me it seems to make sense that if you have strong knowledge 
-> > of/involvement with the code being patched then you can offer your 
-> > Acked-by: after reviewing the patch. If you don't have such 
-> > knowledge/involvement but have nevertheless reviewed the code and found it 
-> > to be OK, then you can signal that with a Reviewed-by:.
-> > 
-> > In any case, you can't expect people to base their Acked-by/Reviewed-by 
-> > replies on some conclusion in some email thread that happened years ago 
-> 
-> ack that.
-> 
-> > but was never written down in some document in the repository. 
-> > It is only reasonable to expect people to behave according to the rules 
-> > laid out in SubmittingPatches and similar documents, and those rules 
+> On Mon, Jul 11, 2011 at 2:21 AM, Jesper Juhl <jj@chaosbits.net> wrote:
+> > In any case, you can't expect people to base their Acked-by/Reviewed-by
+> > replies on some conclusion in some email thread that happened years ago
+> > but was never written down in some document in the repository.
+> > It is only reasonable to expect people to behave according to the rules
+> > laid out in SubmittingPatches and similar documents, and those rules
 > > currently seem to support my interpretation, not yours.
 > 
-> In Documentation/SubmittingPatches, Reviewed-by: contains a "Reviewer's
-> statment of oversight."  That alone is more formal than Acked-by: is.
+> The definitions in SubmittingPatches are not hard rules and are, in
+> fact, out of date. See Documentation/development-process/5.Posting for
+> alternative definitions:
 > 
-> Plus this paragraph acknowledges that "Review" can be a serious and
-> time-consuming task, not a simple "looks OK to me":
+Thank you for pointing me at that document. Was not aware of it (or I'd 
+forgotten if I ever did know of it).
+
+>  - Acked-by: indicates an agreement by another developer (often a
+>    maintainer of the relevant code) that the patch is appropriate for
+>    inclusion into the kernel.
 > 
-> "A Reviewed-by tag is a statement of opinion that the patch is an
-> appropriate modification of the kernel without any remaining serious
-> technical issues.  Any interested reviewer (who has done the work) can
-> offer a Reviewed-by tag for a patch.  This tag serves to give credit to
-> reviewers and to inform maintainers of the degree of review which has been
-> done on the patch.  Reviewed-by: tags, when supplied by reviewers known to
-> understand the subject area and to perform thorough reviews, will normally
-> increase the likelihood of your patch getting into the kernel."
+> and
 > 
-> I can see little about Acked-by: that is formal when it comes to patch review.
-> E.g.:
-> 'Acked-by: is not as formal as Signed-off-by:.  It is a record that the acker
-> has at least reviewed the patch and has indicated acceptance.  Hence patch
-> mergers will sometimes manually convert an acker's "yep, looks good to me"
-> into an Acked-by:.'
+>  - Reviewed-by: the named developer has reviewed the patch for correctness;
+>    see the reviewer's statement in Documentation/SubmittingPatches for more
+>    detail.
 > 
-
-I'll concede to those points. My original understanding/reading was 
-different but you make some good points.
- 
-
-> But do as you like.  Which parts of SubmittingPatches do you think
-> support your interpretation?
+> and then compare the dates for these definitions:
 > 
-
-Originally, text such as this:
-
-"Acked-by: is often used by the maintainer of the affected code..."
-
-"Reviewed-by:, instead, indicates that the patch has been reviewed and 
-found acceptable ... I do not (unless explicitly stated elsewhere) make 
-any warranties or guarantees that it will achieve its stated purpose ..."
-
-But I take that back. Your interpretation now seems like the more correct 
-one to me.
-
-> and should we have this line:
-> 	Acked-by: is not as formal as Signed-off-by:.
-> changed to:
-> 	Acked-by: is not as formal as Signed-off-by: or Reviewed-by:.
-> e.g.?
+> 0f44cd23 (Andrew Morton      2007-06-08 13:46:45 -0700 401) Acked-by:
+> is often used by the maintainer of the affected code when that
+> 0f44cd23 (Andrew Morton      2007-06-08 13:46:45 -0700 402) maintainer
+> neither contributed to nor forwarded the patch.
+> 
+> 75b02146 (Jonathan Corbet 2008-09-30 15:15:56 -0600 205)  - Acked-by:
+> indicates an agreement by another developer (often a
+> 75b02146 (Jonathan Corbet 2008-09-30 15:15:56 -0600 206)    maintainer
+> of the relevant code) that the patch is appropriate for
+> 75b02146 (Jonathan Corbet 2008-09-30 15:15:56 -0600 207)    inclusion
+> into the kernel.
+> 
+> So it is NOT reasonable 'to expect people to behave according to the
+> rules laid out in SubmittingPatches and similar documents' because
+> such documents have never had any hard rules! The documents are
+> guidelines that attempt to document how things work here, not lay down
+> the law.
 > 
 
-Might make sense.
+I know that. I was never trying to say that they were hard rules/law. 
+I was just trying to express my personal interpretation of those 
+guidelines and how I have been using them. If it came across as me saying 
+that they were set-in-stone rules then I guess I need to improve my 
+communication skills.
+
 
 -- 
 Jesper Juhl <jj@chaosbits.net>       http://www.chaosbits.net/
 Don't top-post http://www.catb.org/jargon/html/T/top-post.html
 Plain text mails only, please.
 
---8323328-660627870-1310416378=:10944--
