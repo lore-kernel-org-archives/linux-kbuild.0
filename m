@@ -1,86 +1,62 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.HRZ.Uni-Dortmund.DE ([129.217.128.51]:46206 "EHLO
-	unimail.uni-dortmund.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754042Ab1GLUUV (ORCPT
+Received: from mail-pv0-f174.google.com ([74.125.83.174]:56800 "EHLO
+	mail-pv0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754984Ab1GLUtc (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 12 Jul 2011 16:20:21 -0400
-Message-ID: <4E1CABBD.60901@udo.edu>
-Date: Tue, 12 Jul 2011 22:17:01 +0200
-From: Andrej Gelenberg <andrej.gelenberg@udo.edu>
+	Tue, 12 Jul 2011 16:49:32 -0400
 MIME-Version: 1.0
+In-Reply-To: <4E1CABBD.60901@udo.edu>
+References: <CACqU3MXvHR0v4Hgn5UMwDtzaX5nWqmKEneN_s7r4PuEGzifauw@mail.gmail.com>
+	<1310282825-14509-1-git-send-email-lacombar@gmail.com>
+	<1310282825-14509-2-git-send-email-lacombar@gmail.com>
+	<CAMT+=WY84jaattF+9zYK7oiJLmn8_oGLB-mnGbOpK_4Rt0vRZg@mail.gmail.com>
+	<4E1AB992.3040309@udo.edu>
+	<CAMT+=WZV4TGfXY0=BjYtNVRDuWw6r-facK=q2S6HVOUTB3KWEg@mail.gmail.com>
+	<4E1CABBD.60901@udo.edu>
+Date: Tue, 12 Jul 2011 16:49:31 -0400
+Message-ID: <CACqU3MV0MCxa8Kb9wzk-_obe=KssHGYbvc1Oa4uxoUeHiksfag@mail.gmail.com>
 Subject: Re: [PATCH 2/2] kconfig/nconf: prevent segfault on empty menu
-References: <CACqU3MXvHR0v4Hgn5UMwDtzaX5nWqmKEneN_s7r4PuEGzifauw@mail.gmail.com>	<1310282825-14509-1-git-send-email-lacombar@gmail.com>	<1310282825-14509-2-git-send-email-lacombar@gmail.com>	<CAMT+=WY84jaattF+9zYK7oiJLmn8_oGLB-mnGbOpK_4Rt0vRZg@mail.gmail.com>	<4E1AB992.3040309@udo.edu> <CAMT+=WZV4TGfXY0=BjYtNVRDuWw6r-facK=q2S6HVOUTB3KWEg@mail.gmail.com>
-In-Reply-To: <CAMT+=WZV4TGfXY0=BjYtNVRDuWw6r-facK=q2S6HVOUTB3KWEg@mail.gmail.com>
-Content-Type: multipart/mixed;
- boundary="------------090504070605030506030300"
+From: Arnaud Lacombe <lacombar@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nir Tzachar <nir.tzachar@gmail.com>
-Cc: linux-kbuild@vger.kernel.org, mmarek@suse.cz, linux-kernel@vger.kernel.org
-
-This is a multi-part message in MIME format.
---------------090504070605030506030300
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+To: Andrej Gelenberg <andrej.gelenberg@udo.edu>
+Cc: Nir Tzachar <nir.tzachar@gmail.com>, linux-kbuild@vger.kernel.org, mmarek@suse.cz, linux-kernel@vger.kernel.org
 
 Hi,
 
-here is one more patch, which make empty title instead of "(null)".
+On Tue, Jul 12, 2011 at 4:17 PM, Andrej Gelenberg
+<andrej.gelenberg@udo.edu> wrote:
+> Hi,
+>
+> here is one more patch, which make empty title instead of "(null)".
+>
+No. You are breaking front-ends which either properly use the API and
+make use menu_has_prompt() before getting the prompt with
+menu_get_prompt(), or test for NULL pointer and act accordingly. Btw,
+by doing this, you potentially breaking nconf too, and there is rarely
+any need to modify the back-end to fix display issue in the front-end.
 
-Regards,
-Andrej Gelenberg
+ - Arnaud
 
-On 07/11/2011 11:50 AM, Nir Tzachar wrote:
-> On Mon, Jul 11, 2011 at 11:51 AM, Andrej Gelenberg
-> <andrej.gelenberg@udo.edu> wrote:
->> Hello,
+ps: could you please send inlined patched, that a real pain to review. thanks.
+
+> Regards,
+> Andrej Gelenberg
+>
+> On 07/11/2011 11:50 AM, Nir Tzachar wrote:
+>> On Mon, Jul 11, 2011 at 11:51 AM, Andrej Gelenberg
+>> <andrej.gelenberg@udo.edu> wrote:
+>>> Hello,
+>>>
+>>> it show already "There is no help available for this option." message on
+>>> F2. Only caption could be better as just "(null)". Besides ignore the
+>>> key is much better as segfault.
 >>
->> it show already "There is no help available for this option." message on
->> F2. Only caption could be better as just "(null)". Besides ignore the
->> key is much better as segfault.
-> 
-> I agree. Then just add a proper caption and thats it.
-> 
-> Cheers.
-> 
->> Regards
->> Andrej Gelenberg
-
---------------090504070605030506030300
-Content-Type: text/plain;
- name="0001-nconfig-menu_get_prompt-return-if-no-promt.patch"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
- filename*0="0001-nconfig-menu_get_prompt-return-if-no-promt.patch"
-
-From e5fa0e9a705c2e2092ba9c2879e85f8bef12f7f8 Mon Sep 17 00:00:00 2001
-From: Andrej Gelenberg <andrej.gelenberg@udo.edu>
-Date: Tue, 12 Jul 2011 18:36:50 +0200
-Subject: [PATCH] nconfig: menu_get_prompt() return "", if no promt
-
-Help message box has "" as titled instead of "(null)" on empty menu in
-nconf.
-
-Signed-off-by: Andrej Gelenberg <andrej.gelenberg@udo.edu>
----
- scripts/kconfig/menu.c |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
-
-diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
-index 6a09cc4..0783d8e 100644
---- a/scripts/kconfig/menu.c
-+++ b/scripts/kconfig/menu.c
-@@ -476,7 +476,7 @@ const char *menu_get_prompt(struct menu *menu)
- 		else if (menu->sym)
- 			return menu->sym->name;
- 	}
--	return NULL;
-+	return "";
- }
- 
- struct menu *menu_get_root_menu(struct menu *menu)
--- 
-1.7.6
-
-
---------------090504070605030506030300--
+>> I agree. Then just add a proper caption and thats it.
+>>
+>> Cheers.
+>>
+>>> Regards
+>>> Andrej Gelenberg
+>
