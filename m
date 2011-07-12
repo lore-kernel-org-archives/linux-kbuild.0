@@ -1,54 +1,31 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:40465 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752964Ab1GLLjz (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 12 Jul 2011 07:39:55 -0400
-From: Michal Marek <mmarek@suse.cz>
-Subject: [PATCH] kbuild: Do not write to builddir in modules_install
-Date: Tue, 12 Jul 2011 13:39:40 +0200
-Message-Id: <1310470780-12330-1-git-send-email-mmarek@suse.cz>
-In-Reply-To: <alpine.DEB.2.01.1107040242180.9183@trent.utfs.org>
-References: <alpine.DEB.2.01.1107040242180.9183@trent.utfs.org>
+Received: from mail-vx0-f174.google.com ([209.85.220.174]:58117 "EHLO
+	mail-vx0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754405Ab1GLSCj (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 12 Jul 2011 14:02:39 -0400
+MIME-Version: 1.0
+In-Reply-To: <1310454020-15426-1-git-send-email-abogani@kernel.org>
+References: <CACqU3MW=VUn64nsSA2V_eXEfEjv6xmB9yBWL8rYynH1wkHcOgw@mail.gmail.com>
+	<1310454020-15426-1-git-send-email-abogani@kernel.org>
+Date: Tue, 12 Jul 2011 14:02:37 -0400
+Message-ID: <CAFziu1HvspbMj8LRLHd2w9vcVq_mGCL3pCOwLaduKQ4nt8+Utg@mail.gmail.com>
+Subject: Re: [PATCH] modpost: Fix modpost's license checking V2
+From: Anders Kaseorg <andersk@ksplice.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Christian Kujau <lists@nerdbynature.de>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: Alessio Igor Bogani <abogani@kernel.org>
+Cc: Rusty Russell <rusty@rustcorp.com.au>, Jan Beulich <jbeulich@novell.com>, Kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Tim Bird <tim.bird@am.sony.com>, Arnaud Lacombe <lacombar@gmail.com>
 
-Let depmod.sh create a temporary directory in /tmp instead of writing to
-the build directory as root. The mktemp utility should be available on
-any recent system (and there is already scripts/gen_initramfs_list.sh
-relying on it).
+On Tue, Jul 12, 2011 at 03:00, Alessio Igor Bogani <abogani@kernel.org> wrote:
+> +#define SEC_NAME_MATCH(name, str) (strncmp(name, str, strlen(str) - 1) == 0)
 
-Reported-by: Christian Kujau <lists@nerdbynature.de>
-Signed-off-by: Michal Marek <mmarek@suse.cz>
----
- scripts/depmod.sh |   10 ++++++----
- 1 files changed, 6 insertions(+), 4 deletions(-)
+Surely you meant strlen() or sizeof() - 1, not strlen() - 1?
 
-diff --git a/scripts/depmod.sh b/scripts/depmod.sh
-index 3b029cb..a272356 100755
---- a/scripts/depmod.sh
-+++ b/scripts/depmod.sh
-@@ -21,13 +21,15 @@ fi
- # older versions of depmod require the version string to start with three
- # numbers, so we cheat with a symlink here
- depmod_hack_needed=true
--mkdir -p .tmp_depmod/lib/modules/$KERNELRELEASE
--if "$DEPMOD" -b .tmp_depmod $KERNELRELEASE 2>/dev/null; then
--	if test -e .tmp_depmod/lib/modules/$KERNELRELEASE/modules.dep -o \
--		-e .tmp_depmod/lib/modules/$KERNELRELEASE/modules.dep.bin; then
-+tmp_dir=$(mktemp -d ${TMPDIR:-/tmp}/depmod.XXXXXX)
-+mkdir -p "$tmp_dir/lib/modules/$KERNELRELEASE"
-+if "$DEPMOD" -b "$tmp_dir" $KERNELRELEASE 2>/dev/null; then
-+	if test -e "$tmp_dir/lib/modules/$KERNELRELEASE/modules.dep" -o \
-+		-e "$tmp_dir/lib/modules/$KERNELRELEASE/modules.dep.bin"; then
- 		depmod_hack_needed=false
- 	fi
- fi
-+rm -rf "$tmp_dir"
- if $depmod_hack_needed; then
- 	symlink="$INSTALL_MOD_PATH/lib/modules/99.98.$KERNELRELEASE"
- 	ln -s "$KERNELRELEASE" "$symlink"
--- 
-1.7.5.4
+> +       if (!is_vmlinux(mod->name) && strncmp(symname, "__ksymtab", 9) == 0)
 
+Same strncmp pattern here.  BTW, your macro is the strstarts()
+function in include/linux/string.h.
+
+Anders
