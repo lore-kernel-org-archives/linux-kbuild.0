@@ -1,41 +1,86 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pv0-f174.google.com ([74.125.83.174]:39782 "EHLO
-	mail-pv0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754797Ab1GLStn convert rfc822-to-8bit (ORCPT
+Received: from mx1.HRZ.Uni-Dortmund.DE ([129.217.128.51]:46206 "EHLO
+	unimail.uni-dortmund.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754042Ab1GLUUV (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 12 Jul 2011 14:49:43 -0400
+	Tue, 12 Jul 2011 16:20:21 -0400
+Message-ID: <4E1CABBD.60901@udo.edu>
+Date: Tue, 12 Jul 2011 22:17:01 +0200
+From: Andrej Gelenberg <andrej.gelenberg@udo.edu>
 MIME-Version: 1.0
-In-Reply-To: <CAFziu1EYYN6imDijo7E_raOfdXfWAMzfJL5OursSBAYk8Wdywg@mail.gmail.com>
-References: <CACqU3MW=VUn64nsSA2V_eXEfEjv6xmB9yBWL8rYynH1wkHcOgw@mail.gmail.com>
-	<1310454020-15426-1-git-send-email-abogani@kernel.org>
-	<CAFziu1HvspbMj8LRLHd2w9vcVq_mGCL3pCOwLaduKQ4nt8+Utg@mail.gmail.com>
-	<CACqU3MVZ6UPZKSsSSjZosTYfbzuwj_dCumK-wcb_SWhs+8OgNQ@mail.gmail.com>
-	<CAFziu1EYYN6imDijo7E_raOfdXfWAMzfJL5OursSBAYk8Wdywg@mail.gmail.com>
-Date: Tue, 12 Jul 2011 14:49:42 -0400
-Message-ID: <CACqU3MUXAOMGQ1nzUrtYPEQAC3U-nuq3YurtNJJLS1hft4ROGA@mail.gmail.com>
-Subject: Re: [PATCH] modpost: Fix modpost's license checking V2
-From: Arnaud Lacombe <lacombar@gmail.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 8BIT
+Subject: Re: [PATCH 2/2] kconfig/nconf: prevent segfault on empty menu
+References: <CACqU3MXvHR0v4Hgn5UMwDtzaX5nWqmKEneN_s7r4PuEGzifauw@mail.gmail.com>	<1310282825-14509-1-git-send-email-lacombar@gmail.com>	<1310282825-14509-2-git-send-email-lacombar@gmail.com>	<CAMT+=WY84jaattF+9zYK7oiJLmn8_oGLB-mnGbOpK_4Rt0vRZg@mail.gmail.com>	<4E1AB992.3040309@udo.edu> <CAMT+=WZV4TGfXY0=BjYtNVRDuWw6r-facK=q2S6HVOUTB3KWEg@mail.gmail.com>
+In-Reply-To: <CAMT+=WZV4TGfXY0=BjYtNVRDuWw6r-facK=q2S6HVOUTB3KWEg@mail.gmail.com>
+Content-Type: multipart/mixed;
+ boundary="------------090504070605030506030300"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Anders Kaseorg <andersk@ksplice.com>
-Cc: Alessio Igor Bogani <abogani@kernel.org>, Rusty Russell <rusty@rustcorp.com.au>, Jan Beulich <jbeulich@novell.com>, Kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Tim Bird <tim.bird@am.sony.com>
+To: Nir Tzachar <nir.tzachar@gmail.com>
+Cc: linux-kbuild@vger.kernel.org, mmarek@suse.cz, linux-kernel@vger.kernel.org
+
+This is a multi-part message in MIME format.
+--------------090504070605030506030300
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 
 Hi,
 
-On Tue, Jul 12, 2011 at 2:35 PM, Anders Kaseorg <andersk@ksplice.com> wrote:
-> On Tue, Jul 12, 2011 at 14:15, Arnaud Lacombe <lacombar@gmail.com> wrote:
->> modpost is an host tool, it should not include kernel header. Content
->> of this file is not exported to userland anyway.
->
-> My point was more that you might as well reuse the same name and
-> probably the same code so that people don’t have to look carefully at
-> a new macro to decide whether it’s off-by-one from what they expect.
->
-Agree. I was not entirely sure of what you meant, ie. whether
-including "include/linux/string.h" or adjusting the name and
-definition to match the existing. So I thought it would just be better
-to clear any potential misunderstanding :)
+here is one more patch, which make empty title instead of "(null)".
 
- - Arnaud
+Regards,
+Andrej Gelenberg
+
+On 07/11/2011 11:50 AM, Nir Tzachar wrote:
+> On Mon, Jul 11, 2011 at 11:51 AM, Andrej Gelenberg
+> <andrej.gelenberg@udo.edu> wrote:
+>> Hello,
+>>
+>> it show already "There is no help available for this option." message on
+>> F2. Only caption could be better as just "(null)". Besides ignore the
+>> key is much better as segfault.
+> 
+> I agree. Then just add a proper caption and thats it.
+> 
+> Cheers.
+> 
+>> Regards
+>> Andrej Gelenberg
+
+--------------090504070605030506030300
+Content-Type: text/plain;
+ name="0001-nconfig-menu_get_prompt-return-if-no-promt.patch"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+ filename*0="0001-nconfig-menu_get_prompt-return-if-no-promt.patch"
+
+From e5fa0e9a705c2e2092ba9c2879e85f8bef12f7f8 Mon Sep 17 00:00:00 2001
+From: Andrej Gelenberg <andrej.gelenberg@udo.edu>
+Date: Tue, 12 Jul 2011 18:36:50 +0200
+Subject: [PATCH] nconfig: menu_get_prompt() return "", if no promt
+
+Help message box has "" as titled instead of "(null)" on empty menu in
+nconf.
+
+Signed-off-by: Andrej Gelenberg <andrej.gelenberg@udo.edu>
+---
+ scripts/kconfig/menu.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
+index 6a09cc4..0783d8e 100644
+--- a/scripts/kconfig/menu.c
++++ b/scripts/kconfig/menu.c
+@@ -476,7 +476,7 @@ const char *menu_get_prompt(struct menu *menu)
+ 		else if (menu->sym)
+ 			return menu->sym->name;
+ 	}
+-	return NULL;
++	return "";
+ }
+ 
+ struct menu *menu_get_root_menu(struct menu *menu)
+-- 
+1.7.6
+
+
+--------------090504070605030506030300--
