@@ -1,102 +1,110 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pz0-f46.google.com ([209.85.210.46]:38379 "EHLO
-	mail-pz0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753437Ab1GNClo (ORCPT
+Received: from oproxy3-pub.bluehost.com ([69.89.21.8]:37278 "HELO
+	oproxy3-pub.bluehost.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with SMTP id S1751546Ab1GMWR0 convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 13 Jul 2011 22:41:44 -0400
-MIME-Version: 1.0
-In-Reply-To: <1310604899.27864.4.camel@gandalf.stny.rr.com>
-References: <1309563076-5050-1-git-send-email-lacombar@gmail.com>
-	<CACqU3MUrCODMx=8Bu+YDxy2BJwjm-77PXFob5OwHn=fr5mTdkg@mail.gmail.com>
-	<1310170759.2780.37.camel@fedora>
-	<1310604899.27864.4.camel@gandalf.stny.rr.com>
-Date: Wed, 13 Jul 2011 22:41:44 -0400
-Message-ID: <CACqU3MX4=AQyH4TXi+LaHV6WWRsLZpGf7c=iwQHm6Mqsr6SgYA@mail.gmail.com>
-Subject: Re: [RFC 0/4] streamline_config clean-ups
-From: Arnaud Lacombe <lacombar@gmail.com>
-Content-Type: multipart/mixed; boundary=bcaec544eeec3a8c5004a7fe7916
+	Wed, 13 Jul 2011 18:17:26 -0400
+Date: Wed, 13 Jul 2011 15:17:24 -0700
+From: Randy Dunlap <rdunlap@xenotime.net>
+Subject: Re: [PATCH 1/9] stringify: add HEX_STRING()
+Message-Id: <20110713151724.3b16ce77.rdunlap@xenotime.net>
+In-Reply-To: <CACqU3MXSwJG14PwD0c6R7VZg9fO=XLj=-QDN5ntbQp+0xDn82A@mail.gmail.com>
+References: <20110710125109.c72f9c2d.rdunlap@xenotime.net>
+	<CACqU3MWBb4J8rmaRv23=-_=GXppGSUdqmOqeXoqWi4ZJ7ZYewg@mail.gmail.com>
+	<20110713150023.0dde9ef4.rdunlap@xenotime.net>
+	<CACqU3MVh+4JMX5ywPgWrrXXuAcAYtHJyumXGDcteageJAG12wA@mail.gmail.com>
+	<20110713150840.2fa8e2b3.rdunlap@xenotime.net>
+	<CACqU3MXSwJG14PwD0c6R7VZg9fO=XLj=-QDN5ntbQp+0xDn82A@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Steven Rostedt <rostedt@goodmis.org>
-Cc: Steven Rostedt <srostedt@redhat.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>
+To: Arnaud Lacombe <lacombar@gmail.com>
+Cc: lkml <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org, linux-media@vger.kernel.org, mchehab@infradead.org
 
---bcaec544eeec3a8c5004a7fe7916
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
+On Wed, 13 Jul 2011 18:13:31 -0400 Arnaud Lacombe wrote:
 
-Hi,
+> Hi,
+> 
+> On Wed, Jul 13, 2011 at 6:08 PM, Randy Dunlap <rdunlap@xenotime.net> wrote:
+> > On Wed, 13 Jul 2011 18:06:15 -0400 Arnaud Lacombe wrote:
+> >
+> >> Hi,
+> >>
+> >> On Wed, Jul 13, 2011 at 6:00 PM, Randy Dunlap <rdunlap@xenotime.net> wrote:
+> >> > On Wed, 13 Jul 2011 17:49:48 -0400 Arnaud Lacombe wrote:
+> >> >
+> >> >> Hi,
+> >> >>
+> >> >> On Sun, Jul 10, 2011 at 3:51 PM, Randy Dunlap <rdunlap@xenotime.net> wrote:
+> >> >> > From: Randy Dunlap <rdunlap@xenotime.net>
+> >> >> >
+> >> >> > Add HEX_STRING(value) to stringify.h so that drivers can
+> >> >> > convert kconfig hex values (without leading "0x") to useful
+> >> >> > hex constants.
+> >> >> >
+> >> >> > Several drivers/media/radio/ drivers need this.  I haven't
+> >> >> > checked if any other drivers need to do this.
+> >> >> >
+> >> >> > Alternatively, kconfig could produce hex config symbols with
+> >> >> > leading "0x".
+> >> >> >
+> >> >> Actually, I used to have a patch to make hex value have a mandatory
+> >> >> "0x" prefix, in the Kconfig. I even fixed all the issue in the tree,
+> >> >> it never make it to the tree (not sure why). Here's the relevant
+> >> >> thread:
+> >> >>
+> >> >> https://patchwork.kernel.org/patch/380591/
+> >> >> https://patchwork.kernel.org/patch/380621/
+> >> >> https://patchwork.kernel.org/patch/380601/
+> >> >>
+> >> >
+> >> > I prefer that this be fixed in kconfig, so long as it won't cause
+> >> > any other issues.  That's why I mentioned it.
+> >> >
+> >> >>
+> >> >> > Signed-off-by: Randy Dunlap <rdunlap@xenotime.net>
+> >> >> > ---
+> >> >> >  include/linux/stringify.h |    7 +++++++
+> >> >> >  1 file changed, 7 insertions(+)
+> >> >> >
+> >> >> > NOTE: The other 8 patches are on lkml and linux-media mailing lists.
+> >> >> >
+> >> >> > --- linux-next-20110707.orig/include/linux/stringify.h
+> >> >> > +++ linux-next-20110707/include/linux/stringify.h
+> >> >> > @@ -9,4 +9,11 @@
+> >> >> >  #define __stringify_1(x...)    #x
+> >> >> >  #define __stringify(x...)      __stringify_1(x)
+> >> >> >
+> >> >> > +/*
+> >> >> > + * HEX_STRING(value) is useful for CONFIG_ values that are in hex,
+> >> >> > + * but kconfig does not put a leading "0x" on them.
+> >> >> > + */
+> >> >> > +#define HEXSTRINGVALUE(h, value)       h##value
+> >> >> > +#define HEX_STRING(value)              HEXSTRINGVALUE(0x, value)
+> >> >> > +
+> >> >> that seems hackish...
+> >> >
+> >> > It's a common idiom for concatenating strings in the kernel.
+> >> >
+> >> I meant hackish not because *how* it is done, but because *why* it has
+> >> to be done, that is, because the Kconfig miss the prefix, which is
+> >> really no big deal.
+> >>
+> >> > How would you do it without (instead of) a kconfig fix/patch?
+> >> >
+> >> have the Kconfig use the "0x" prefix since the beginning.
+> >
+> > Sure, go for it.  I'll ack it.  ;)  [or Review it :]
+> > and test it.
+> >
+> it is already among the hunks in https://patchwork.kernel.org/patch/380601/
 
-On Wed, Jul 13, 2011 at 8:54 PM, Steven Rostedt <rostedt@goodmis.org> wrote=
-:
-> On Fri, 2011-07-08 at 20:19 -0400, Steven Rostedt wrote:
->> On Fri, 2011-07-08 at 17:47 -0400, Arnaud Lacombe wrote:
->> > Hi,
->> >
->> > On Fri, Jul 1, 2011 at 7:31 PM, Arnaud Lacombe <lacombar@gmail.com> wr=
-ote:
->> > > Hi,
->> > >
->> > > The following series attempts to merge some redundants stuff in the =
-kconfig
->> > > Makefile, namely how streamline_config learns about its environment,=
- avoids
->> > > multi-line shell command in kconfig's Makefile. Seconds commit also =
-removes the
->> > > non-portable usage of sed(1) as -i is not POSIX compliant.
->> > >
->> > > Comments appreciated!
->> > >
->> > > =A0- Arnaud
->> > >
->> > Ping ?
->
-> I just tried your patches out. It breaks when we compile for another
-> directory. I just tried:
->
-> $ make LSMOD=3D/tmp/lsmod O=3D../machine/build/ localmodconfig
->
-> and it it did not work.
->
-yes... it could not have. I missed a $(srctree), an export, and an
-error check. Attached patch should fix it, behavior (see below) with
-this patch is consistent between v3.0-rc6 and the tip of the patched
-branch.
+I realize that, but it looks like you may need to resubmit it.
 
-Btw, as of v3.0-rc6, localmodconfig does not produce a valid .config.
-Local kernel is a Fedora 14 kernel, based on
-config-2.6.35.13-91.fc14.x86_64. The perl script complete fine, but
-the config is then restarted, I'm not sure if it is the intended
-behavior.
+I'll dig it out and test it, maybe even reply to your old patch(es).
 
- - Arnaud
-
---bcaec544eeec3a8c5004a7fe7916
-Content-Type: text/x-patch; charset=US-ASCII; name="0001-fix.patch"
-Content-Disposition: attachment; filename="0001-fix.patch"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_gq341qi20
-
-RnJvbSBkNmU3Y2FmMTk3YzEwYjQ0OGRhODczYzI3Y2Y1ZWY4OWY5YmNmNGIyIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBBcm5hdWQgTGFjb21iZSA8bGFjb21iYXJAZ21haWwuY29tPgpE
-YXRlOiBXZWQsIDEzIEp1bCAyMDExIDIyOjI5OjI0IC0wNDAwClN1YmplY3Q6IFtQQVRDSF0gZml4
-CgotLS0KIHNjcmlwdHMva2NvbmZpZy9NYWtlZmlsZSAgICAgICB8ICAgIDQgKysrLQogc2NyaXB0
-cy9rY29uZmlnL2xvY2FsY29uZmlnLnNoIHwgICAgMiArKwogMiBmaWxlcyBjaGFuZ2VkLCA1IGlu
-c2VydGlvbnMoKyksIDEgZGVsZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvc2NyaXB0cy9rY29uZmln
-L01ha2VmaWxlIGIvc2NyaXB0cy9rY29uZmlnL01ha2VmaWxlCmluZGV4IGQ0OGRkYzkuLjFiZjQz
-NzUgMTAwNjQ0Ci0tLSBhL3NjcmlwdHMva2NvbmZpZy9NYWtlZmlsZQorKysgYi9zY3JpcHRzL2tj
-b25maWcvTWFrZWZpbGUKQEAgLTExLDYgKzExLDggQEAgZWxzZQogS2NvbmZpZyA6PSBLY29uZmln
-CiBlbmRpZgogCitleHBvcnQgS2NvbmZpZworCiB4Y29uZmlnOiAkKG9iaikvcWNvbmYKIAkkPCAk
-KEtjb25maWcpCiAKQEAgLTM0LDcgKzM2LDcgQEAgc2lsZW50b2xkY29uZmlnOiAkKG9iaikvY29u
-ZgogCSQ8IC0tJEAgJChLY29uZmlnKQogCiBsb2NhbHllc2NvbmZpZyBsb2NhbG1vZGNvbmZpZzog
-JChvYmopL3N0cmVhbWxpbmVfY29uZmlnLnBsICQob2JqKS9jb25mCi0JJChRKSQoc3JjKS9sb2Nh
-bGNvbmZpZy5zaAorCSQoUSkkKHNyY3RyZWUpLyQoc3JjKS9sb2NhbGNvbmZpZy5zaAogCiAjIENy
-ZWF0ZSBuZXcgbGludXgucG90IGZpbGUKICMgQWRqdXN0IGNoYXJzZXQgdG8gVVRGLTggaW4gLnBv
-IGZpbGUgdG8gYWNjZXB0IFVURi04IGluIEtjb25maWcgZmlsZXMKZGlmZiAtLWdpdCBhL3Njcmlw
-dHMva2NvbmZpZy9sb2NhbGNvbmZpZy5zaCBiL3NjcmlwdHMva2NvbmZpZy9sb2NhbGNvbmZpZy5z
-aAppbmRleCA2NGRkMjk1Li5mODE4NWZiIDEwMDc1NQotLS0gYS9zY3JpcHRzL2tjb25maWcvbG9j
-YWxjb25maWcuc2gKKysrIGIvc2NyaXB0cy9rY29uZmlnL2xvY2FsY29uZmlnLnNoCkBAIC0xLDYg
-KzEsOCBAQAogIyEvYmluL3NoCiAjCiAKK3NldCAtZQorCiBta2RpciAtcCBpbmNsdWRlL2dlbmVy
-YXRlZAogCiBwZXJsICIke3NyY3RyZWV9L3NjcmlwdHMva2NvbmZpZy9zdHJlYW1saW5lX2NvbmZp
-Zy5wbCIgJHtzcmN0cmVlfS8gJHtLY29uZmlnfSAkMSA+IC50bXAuY29uZmlnCi0tIAoxLjcuMy40
-LjU3NC5nNjA4Yi5kaXJ0eQoK
---bcaec544eeec3a8c5004a7fe7916--
+---
+~Randy
+*** Remember to use Documentation/SubmitChecklist when testing your code ***
