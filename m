@@ -1,62 +1,87 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pv0-f174.google.com ([74.125.83.174]:56800 "EHLO
-	mail-pv0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754984Ab1GLUtc (ORCPT
+Received: from lennier.cc.vt.edu ([198.82.162.213]:58289 "EHLO
+	lennier.cc.vt.edu" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753840Ab1GMAfV (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 12 Jul 2011 16:49:32 -0400
-MIME-Version: 1.0
-In-Reply-To: <4E1CABBD.60901@udo.edu>
-References: <CACqU3MXvHR0v4Hgn5UMwDtzaX5nWqmKEneN_s7r4PuEGzifauw@mail.gmail.com>
-	<1310282825-14509-1-git-send-email-lacombar@gmail.com>
-	<1310282825-14509-2-git-send-email-lacombar@gmail.com>
-	<CAMT+=WY84jaattF+9zYK7oiJLmn8_oGLB-mnGbOpK_4Rt0vRZg@mail.gmail.com>
-	<4E1AB992.3040309@udo.edu>
-	<CAMT+=WZV4TGfXY0=BjYtNVRDuWw6r-facK=q2S6HVOUTB3KWEg@mail.gmail.com>
-	<4E1CABBD.60901@udo.edu>
-Date: Tue, 12 Jul 2011 16:49:31 -0400
-Message-ID: <CACqU3MV0MCxa8Kb9wzk-_obe=KssHGYbvc1Oa4uxoUeHiksfag@mail.gmail.com>
-Subject: Re: [PATCH 2/2] kconfig/nconf: prevent segfault on empty menu
-From: Arnaud Lacombe <lacombar@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
+	Tue, 12 Jul 2011 20:35:21 -0400
+Subject: Re: [PATCH] Avoid Wunused-but-set warning
+In-Reply-To: Your message of "Mon, 11 Jul 2011 08:55:19 +0300."
+             <CAOJsxLHzXV3MDHH+83iwxaUtO=931Bmq1JRzS=MQx=6wa-wi2w@mail.gmail.com>
+From: Valdis.Kletnieks@vt.edu
+References: <da20dc5c4160ed9a3da52f60799a1e4369fe3f27.1310228130.git.rprabhu@wnohang.net> <CAM_iQpXeqc01dyHpViyJCMSz6wz-1mWmGi=J0UynUG8tbd99kw@mail.gmail.com> <CACqU3MUgVTpc6kBvBiw7rtyn_JTA-JPrbnvai3Vnq+UWk-jSbQ@mail.gmail.com> <CAOJsxLF+4VOXJwRJL7npMngDTGztXk739_GcMLxsMzmsVcDCVw@mail.gmail.com> <CACqU3MUFO9DGqnK99ApaKn00vzj5rCB5=kjuSZGZpPU8c_4G-A@mail.gmail.com> <20110710110241.7650e03f.rdunlap@xenotime.net> <alpine.LNX.2.00.1107110051420.2818@swampdragon.chaosbits.net> <20110710160722.ae763029.rdunlap@xenotime.net> <alpine.LNX.2.00.1107110117080.2818@swampdragon.chaosbits.net>
+            <CAOJsxLHzXV3MDHH+83iwxaUtO=931Bmq1JRzS=MQx=6wa-wi2w@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: multipart/signed; boundary="==_Exmh_1310517312_3427P";
+	 micalg=pgp-sha1; protocol="application/pgp-signature"
+Content-Transfer-Encoding: 7bit
+Date: Tue, 12 Jul 2011 20:35:12 -0400
+Message-ID: <32171.1310517312@turing-police.cc.vt.edu>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andrej Gelenberg <andrej.gelenberg@udo.edu>
-Cc: Nir Tzachar <nir.tzachar@gmail.com>, linux-kbuild@vger.kernel.org, mmarek@suse.cz, linux-kernel@vger.kernel.org
+To: Pekka Enberg <penberg@kernel.org>
+Cc: Jesper Juhl <jj@chaosbits.net>, Randy Dunlap <rdunlap@xenotime.net>, Arnaud Lacombe <lacombar@gmail.com>, =?ISO-8859-1?Q?Am=E9rico_Wang?= <xiyou.wangcong@gmail.com>, Raghavendra D Prabhu <rprabhu@wnohang.net>, linux-kbuild@vger.kernel.org, Nir Tzachar <nir.tzachar@gmail.com>, linux-kernel@vger.kernel.org
 
-Hi,
+--==_Exmh_1310517312_3427P
+Content-Type: text/plain; charset=us-ascii
 
-On Tue, Jul 12, 2011 at 4:17 PM, Andrej Gelenberg
-<andrej.gelenberg@udo.edu> wrote:
-> Hi,
->
-> here is one more patch, which make empty title instead of "(null)".
->
-No. You are breaking front-ends which either properly use the API and
-make use menu_has_prompt() before getting the prompt with
-menu_get_prompt(), or test for NULL pointer and act accordingly. Btw,
-by doing this, you potentially breaking nconf too, and there is rarely
-any need to modify the back-end to fix display issue in the front-end.
+On Mon, 11 Jul 2011 08:55:19 +0300, Pekka Enberg said:
 
- - Arnaud
+> The definitions in SubmittingPatches are not hard rules and are, in
+> fact, out of date. See Documentation/development-process/5.Posting for
+> alternative definitions:
+> 
+>  - Acked-by: indicates an agreement by another developer (often a
+>    maintainer of the relevant code) that the patch is appropriate for
+>    inclusion into the kernel.
+> 
+> and
+> 
+>  - Reviewed-by: the named developer has reviewed the patch for correctness;
+>    see the reviewer's statement in Documentation/SubmittingPatches for more
+>    detail.
 
-ps: could you please send inlined patched, that a real pain to review. thanks.
+Unfortunately, SubmittingPatches says:
 
-> Regards,
-> Andrej Gelenberg
->
-> On 07/11/2011 11:50 AM, Nir Tzachar wrote:
->> On Mon, Jul 11, 2011 at 11:51 AM, Andrej Gelenberg
->> <andrej.gelenberg@udo.edu> wrote:
->>> Hello,
->>>
->>> it show already "There is no help available for this option." message on
->>> F2. Only caption could be better as just "(null)". Besides ignore the
->>> key is much better as segfault.
->>
->> I agree. Then just add a proper caption and thats it.
->>
->> Cheers.
->>
->>> Regards
->>> Andrej Gelenberg
->
+        By offering my Reviewed-by: tag, I state that:
+
+         (a) I have carried out a technical review of this patch to
+             evaluate its appropriateness and readiness for inclusion into
+             the mainline kernel.
+
+         (b) Any problems, concerns, or questions relating to the patch
+             have been communicated back to the submitter.  I am satisfied
+             with the submitter's response to my comments.
+
+         (c) While there may be things that could be improved with this
+             submission, I believe that it is, at this time, (1) a
+             worthwhile modification to the kernel, and (2) free of known
+             issues which would argue against its inclusion.
+
+         (d) While I have reviewed the patch and believe it to be sound, I
+             do not (unless explicitly stated elsewhere) make any
+             warranties or guarantees that it will achieve its stated
+             purpose or function properly in any given situation.
+
+and often, I'm only comfortable stating (b) - often, I'd like to *disavow* both
+(a) and (c)(1) - I usually *don't* do a tech review, and may have no opinion as
+to whether it's "cooked" enough to be included.  Also, usually, the only "known
+issue" from (c)(2) is the one thing I commented on for part (b)...
+
+Comments-Addressed-Acked: anybody? :)
+
+
+
+--==_Exmh_1310517312_3427P
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+Comment: Exmh version 2.5 07/13/2001
+
+iD8DBQFOHOhAcC3lWbTT17ARAq1yAJ0bg/xKCh64BFW+q/WMuT9EKeCMqACg3T6f
+IC0t1yknxoP5hiVGpY15QQE=
+=EYwG
+-----END PGP SIGNATURE-----
+
+--==_Exmh_1310517312_3427P--
+
