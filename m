@@ -1,39 +1,54 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:46495 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:46983 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S964915Ab1GMLjc (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 13 Jul 2011 07:39:32 -0400
-Date: Wed, 13 Jul 2011 13:39:30 +0200
+	id S965051Ab1GMLtp (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 13 Jul 2011 07:49:45 -0400
+Date: Wed, 13 Jul 2011 13:49:43 +0200
 From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [PATCH] Avoid Wunused-but-set warning
-Message-ID: <20110713113930.GC25895@sepie.suse.cz>
-References: <da20dc5c4160ed9a3da52f60799a1e4369fe3f27.1310228130.git.rprabhu@wnohang.net>
- <CAM_iQpXeqc01dyHpViyJCMSz6wz-1mWmGi=J0UynUG8tbd99kw@mail.gmail.com>
+Subject: Re: [PATCH 2/2] kconfig/nconf: prevent segfault on empty menu
+Message-ID: <20110713114943.GD25895@sepie.suse.cz>
+References: <CACqU3MXvHR0v4Hgn5UMwDtzaX5nWqmKEneN_s7r4PuEGzifauw@mail.gmail.com>
+ <1310282825-14509-1-git-send-email-lacombar@gmail.com>
+ <1310282825-14509-2-git-send-email-lacombar@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAM_iQpXeqc01dyHpViyJCMSz6wz-1mWmGi=J0UynUG8tbd99kw@mail.gmail.com>
+In-Reply-To: <1310282825-14509-2-git-send-email-lacombar@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: =?iso-8859-1?Q?Am=E9rico?= Wang <xiyou.wangcong@gmail.com>
-Cc: Raghavendra D Prabhu <rprabhu@wnohang.net>, linux-kbuild@vger.kernel.org, Nir Tzachar <nir.tzachar@gmail.com>, linux-kernel@vger.kernel.org
+To: Arnaud Lacombe <lacombar@gmail.com>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Nir Tzachar <nir.tzachar@gmail.com>, Andrej Gelenberg <andrej.gelenberg@udo.edu>
 
-On Mon, Jul 11, 2011 at 12:16:11AM +0800, Américo Wang wrote:
-> On Sun, Jul 10, 2011 at 12:24 AM, Raghavendra D Prabhu
-> <rprabhu@wnohang.net> wrote:
-> > Hi,
-> >    I am seeing Wunused-but-set warning while make nconfig.  Looks like
-> >    active_menu is not used. Removing it fixes the warning.
-> >
-> > Signed-off-by: Raghavendra D Prabhu <rprabhu@wnohang.net>
+On Sun, Jul 10, 2011 at 03:27:05AM -0400, Arnaud Lacombe wrote:
+> nconf does not check the validity of the current menu when help is requested
+> (with either <F2>, '?' or 'h'). This leads to a NULL pointer dereference when an
+> empty menu is encountered.
 > 
-> Acked-by: WANG Cong <xiyou.wangcong@gmail.com>
+> The following reduced testcase exposes the problem:
+> 
+> config DEP
+>         bool
+> 
+> menu "FOO"
+> 
+> config BAR
+>         bool "BAR"
+>         depends on DEP
+> 
+> endmenu
+> 
+> Issue will happen when entering menu "FOO" and requesting help.
+> 
+> nconf is the only front-end which do not filter the validity of the current
+> menu. Such filter can not really happen beforehand as other key which does not
+> deals with the current menu might be entered by the user, so just bails out
+> earlier if we encounter an invalid menu.
+> 
+> Cc: Nir Tzachar <nir.tzachar@gmail.com>
+> Cc: Andrej Gelenberg <andrej.gelenberg@udo.edu>
+> Reported-by: Andrej Gelenberg <andrej.gelenberg@udo.edu>
+> Signed-off-by: Arnaud Lacombe <lacombar@gmail.com>
 
-Applied as "nconfig: Avoid Wunused-but-set warning" to
-kbuild-2.6.git#kconfig. Raghavendra, please use the "subsystem: Fix this
-and that" format of the subject line next time, thanks.
-
-Now continue your fruitful discussion.
+Thanks, applied both patches to kbuild-2.6.git#kconfig.
 
 Michal
