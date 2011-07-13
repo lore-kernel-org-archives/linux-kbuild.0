@@ -1,35 +1,39 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:46285 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:46495 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S964915Ab1GMLce (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 13 Jul 2011 07:32:34 -0400
-Date: Wed, 13 Jul 2011 13:32:32 +0200
+	id S964915Ab1GMLjc (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 13 Jul 2011 07:39:32 -0400
+Date: Wed, 13 Jul 2011 13:39:30 +0200
 From: Michal Marek <mmarek@suse.cz>
-Subject: [GIT] kbuild depmod fix
-Message-ID: <20110713113232.GA12386@sepie.suse.cz>
+Subject: Re: [PATCH] Avoid Wunused-but-set warning
+Message-ID: <20110713113930.GC25895@sepie.suse.cz>
+References: <da20dc5c4160ed9a3da52f60799a1e4369fe3f27.1310228130.git.rprabhu@wnohang.net>
+ <CAM_iQpXeqc01dyHpViyJCMSz6wz-1mWmGi=J0UynUG8tbd99kw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAM_iQpXeqc01dyHpViyJCMSz6wz-1mWmGi=J0UynUG8tbd99kw@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: mmarek@suse.cz, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: =?iso-8859-1?Q?Am=E9rico?= Wang <xiyou.wangcong@gmail.com>
+Cc: Raghavendra D Prabhu <rprabhu@wnohang.net>, linux-kbuild@vger.kernel.org, Nir Tzachar <nir.tzachar@gmail.com>, linux-kernel@vger.kernel.org
 
-Hi Linus,
+On Mon, Jul 11, 2011 at 12:16:11AM +0800, Américo Wang wrote:
+> On Sun, Jul 10, 2011 at 12:24 AM, Raghavendra D Prabhu
+> <rprabhu@wnohang.net> wrote:
+> > Hi,
+> >    I am seeing Wunused-but-set warning while make nconfig.  Looks like
+> >    active_menu is not used. Removing it fixes the warning.
+> >
+> > Signed-off-by: Raghavendra D Prabhu <rprabhu@wnohang.net>
+> 
+> Acked-by: WANG Cong <xiyou.wangcong@gmail.com>
 
-here is the fix for depmod.sh to use /tmp rather than the builddir.
+Applied as "nconfig: Avoid Wunused-but-set warning" to
+kbuild-2.6.git#kconfig. Raghavendra, please use the "subsystem: Fix this
+and that" format of the subject line next time, thanks.
+
+Now continue your fruitful discussion.
 
 Michal
-
-The following changes since commit 56299378726d5f2ba8d3c8cbbd13cb280ba45e4f:
-
-  Linux 3.0-rc4 (2011-06-20 20:25:46 -0700)
-
-are available in the git repository at:
-  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild-2.6.git rc-fixes
-
-Michal Marek (1):
-      kbuild: Do not write to builddir in modules_install
-
- scripts/depmod.sh |   10 ++++++----
- 1 files changed, 6 insertions(+), 4 deletions(-)
