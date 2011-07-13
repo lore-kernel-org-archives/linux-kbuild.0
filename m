@@ -1,105 +1,77 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-yw0-f46.google.com ([209.85.213.46]:42936 "EHLO
-	mail-yw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932139Ab1GNR0U (ORCPT
+Received: from casper.infradead.org ([85.118.1.10]:59530 "EHLO
+	casper.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751812Ab1GMVFu (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 14 Jul 2011 13:26:20 -0400
-Received: by ywe9 with SMTP id 9so196027ywe.19
-        for <linux-kbuild@vger.kernel.org>; Thu, 14 Jul 2011 10:26:20 -0700 (PDT)
-From: Arnaud Lacombe <lacombar@gmail.com>
-Subject: [PATCH] media/Kconfig: fix hexadecimal prefix for `hex' symbols
-Date: Thu, 14 Jul 2011 13:26:02 -0400
-Message-Id: <1310664362-28100-1-git-send-email-lacombar@gmail.com>
-In-Reply-To: <20110713151724.3b16ce77.rdunlap@xenotime.net>
-References: <20110713151724.3b16ce77.rdunlap@xenotime.net>
+	Wed, 13 Jul 2011 17:05:50 -0400
+Message-ID: <4E1E08A9.4030807@infradead.org>
+Date: Wed, 13 Jul 2011 18:05:45 -0300
+From: Mauro Carvalho Chehab <mchehab@infradead.org>
+MIME-Version: 1.0
+Subject: Re: [PATCH 1/9] stringify: add HEX_STRING()
+References: <20110710125109.c72f9c2d.rdunlap@xenotime.net>
+In-Reply-To: <20110710125109.c72f9c2d.rdunlap@xenotime.net>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Arnaud Lacombe <lacombar@gmail.com>, Mauro Carvalho Chehab <mchehab@infradead.org>, Randy Dunlap <rdunlap@xenotime.net>
+To: Randy Dunlap <rdunlap@xenotime.net>
+Cc: lkml <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org, linux-media@vger.kernel.org
 
-Cc: Mauro Carvalho Chehab <mchehab@infradead.org>
-Cc: Randy Dunlap <rdunlap@xenotime.net>
-Signed-off-by: Arnaud Lacombe <lacombar@gmail.com>
----
- drivers/media/radio/Kconfig |   16 ++++++++--------
- 1 files changed, 8 insertions(+), 8 deletions(-)
+Em 10-07-2011 16:51, Randy Dunlap escreveu:
+> From: Randy Dunlap <rdunlap@xenotime.net>
+> 
+> Add HEX_STRING(value) to stringify.h so that drivers can
+> convert kconfig hex values (without leading "0x") to useful
+> hex constants.
+> 
+> Several drivers/media/radio/ drivers need this.  I haven't
+> checked if any other drivers need to do this.
+> 
+> Alternatively, kconfig could produce hex config symbols with
+> leading "0x".
 
-diff --git a/drivers/media/radio/Kconfig b/drivers/media/radio/Kconfig
-index e4c97fd..9cab04d 100644
---- a/drivers/media/radio/Kconfig
-+++ b/drivers/media/radio/Kconfig
-@@ -58,7 +58,7 @@ config RADIO_RTRACK
- config RADIO_RTRACK_PORT
- 	hex "RadioTrack i/o port (0x20f or 0x30f)"
- 	depends on RADIO_RTRACK=y
--	default "20f"
-+	default "0x20f"
- 	help
- 	  Enter either 0x30f or 0x20f here.  The card default is 0x30f, if you
- 	  haven't changed the jumper setting on the card.
-@@ -81,7 +81,7 @@ config RADIO_RTRACK2
- config RADIO_RTRACK2_PORT
- 	hex "RadioTrack II i/o port (0x20c or 0x30c)"
- 	depends on RADIO_RTRACK2=y
--	default "30c"
-+	default "0x30c"
- 	help
- 	  Enter either 0x30c or 0x20c here.  The card default is 0x30c, if you
- 	  haven't changed the jumper setting on the card.
-@@ -104,7 +104,7 @@ config RADIO_AZTECH
- config RADIO_AZTECH_PORT
- 	hex "Aztech/Packard Bell I/O port (0x350 or 0x358)"
- 	depends on RADIO_AZTECH=y
--	default "350"
-+	default "0x350"
- 	help
- 	  Enter either 0x350 or 0x358 here.  The card default is 0x350, if you
- 	  haven't changed the setting of jumper JP3 on the card.  Removing the
-@@ -133,7 +133,7 @@ config RADIO_GEMTEK
- config RADIO_GEMTEK_PORT
- 	hex "Fixed I/O port (0x20c, 0x30c, 0x24c, 0x34c, 0c24c or 0x28c)"
- 	depends on RADIO_GEMTEK=y
--	default "34c"
-+	default "0x34c"
- 	help
- 	  Enter either 0x20c, 0x30c, 0x24c or 0x34c here. The card default is
- 	  0x34c, if you haven't changed the jumper setting on the card. On
-@@ -237,7 +237,7 @@ config RADIO_TERRATEC
- config RADIO_TERRATEC_PORT
- 	hex "Terratec i/o port (normally 0x590)"
- 	depends on RADIO_TERRATEC=y
--	default "590"
-+	default "0x590"
- 	help
- 	  Fill in the I/O port of your TerraTec FM radio card. If unsure, go
- 	  with the default.
-@@ -255,7 +255,7 @@ config RADIO_TRUST
- config RADIO_TRUST_PORT
- 	hex "Trust i/o port (usually 0x350 or 0x358)"
- 	depends on RADIO_TRUST=y
--	default "350"
-+	default "0x350"
- 	help
- 	  Enter the I/O port of your Trust FM radio card. If unsure, try the
- 	  values "0x350" or "0x358".
-@@ -278,7 +278,7 @@ config RADIO_TYPHOON
- config RADIO_TYPHOON_PORT
- 	hex "Typhoon I/O port (0x316 or 0x336)"
- 	depends on RADIO_TYPHOON=y
--	default "316"
-+	default "0x316"
- 	help
- 	  Enter the I/O port of your Typhoon or EcoRadio radio card.
- 
-@@ -312,7 +312,7 @@ config RADIO_ZOLTRIX
- config RADIO_ZOLTRIX_PORT
- 	hex "ZOLTRIX I/O port (0x20c or 0x30c)"
- 	depends on RADIO_ZOLTRIX=y
--	default "20c"
-+	default "0x20c"
- 	help
- 	  Enter the I/O port of your Zoltrix radio card.
- 
--- 
-1.7.3.4.574.g608b.dirty
+Hi Randy,
+
+After applying patch 1/9 and 2/9 over 3.0-rc7+media patches, I'm
+now getting this error:
+
+drivers/media/radio/radio-aimslab.c:52:1: error: invalid suffix "x20f" on integer constant
+
+$ grep 20f .config
+CONFIG_RADIO_RTRACK_PORT=20f
+
+$ gcc --version
+gcc (GCC) 4.4.5 20110214 (Red Hat 4.4.5-6)
+
+Before this patch, this were working (or, at least, weren't producing
+any error).
+
+Perhaps the breakage on your compilation happened due to another
+patch at the tree? If so, the better would be to apply this patch
+series together with the ones that caused the breakage, to avoid
+bisect troubles.
+
+> 
+> Signed-off-by: Randy Dunlap <rdunlap@xenotime.net>
+> ---
+>  include/linux/stringify.h |    7 +++++++
+>  1 file changed, 7 insertions(+)
+> 
+> NOTE: The other 8 patches are on lkml and linux-media mailing lists.
+> 
+> --- linux-next-20110707.orig/include/linux/stringify.h
+> +++ linux-next-20110707/include/linux/stringify.h
+> @@ -9,4 +9,11 @@
+>  #define __stringify_1(x...)	#x
+>  #define __stringify(x...)	__stringify_1(x)
+>  
+> +/*
+> + * HEX_STRING(value) is useful for CONFIG_ values that are in hex,
+> + * but kconfig does not put a leading "0x" on them.
+> + */
+> +#define HEXSTRINGVALUE(h, value)	h##value
+> +#define HEX_STRING(value)		HEXSTRINGVALUE(0x, value)
+> +
+>  #endif	/* !__LINUX_STRINGIFY_H */
 
