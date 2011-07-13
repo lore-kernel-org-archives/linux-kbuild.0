@@ -1,94 +1,98 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from oproxy1-pub.bluehost.com ([66.147.249.253]:58844 "HELO
-	oproxy1-pub.bluehost.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with SMTP id S1752031Ab1GMVZd (ORCPT
+Received: from mail-pv0-f174.google.com ([74.125.83.174]:32869 "EHLO
+	mail-pv0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752102Ab1GMWGP convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 13 Jul 2011 17:25:33 -0400
-Date: Wed, 13 Jul 2011 14:11:05 -0700
-From: Randy Dunlap <rdunlap@xenotime.net>
-Subject: Re: [PATCH 1/9] stringify: add HEX_STRING()
-Message-Id: <20110713141105.e5a3b00e.rdunlap@xenotime.net>
-In-Reply-To: <4E1E08A9.4030807@infradead.org>
+	Wed, 13 Jul 2011 18:06:15 -0400
+MIME-Version: 1.0
+In-Reply-To: <20110713150023.0dde9ef4.rdunlap@xenotime.net>
 References: <20110710125109.c72f9c2d.rdunlap@xenotime.net>
-	<4E1E08A9.4030807@infradead.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+	<CACqU3MWBb4J8rmaRv23=-_=GXppGSUdqmOqeXoqWi4ZJ7ZYewg@mail.gmail.com>
+	<20110713150023.0dde9ef4.rdunlap@xenotime.net>
+Date: Wed, 13 Jul 2011 18:06:15 -0400
+Message-ID: <CACqU3MVh+4JMX5ywPgWrrXXuAcAYtHJyumXGDcteageJAG12wA@mail.gmail.com>
+Subject: Re: [PATCH 1/9] stringify: add HEX_STRING()
+From: Arnaud Lacombe <lacombar@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Mauro Carvalho Chehab <mchehab@infradead.org>
-Cc: lkml <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org, linux-media@vger.kernel.org
+To: Randy Dunlap <rdunlap@xenotime.net>
+Cc: lkml <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org, linux-media@vger.kernel.org, mchehab@infradead.org
 
-On Wed, 13 Jul 2011 18:05:45 -0300 Mauro Carvalho Chehab wrote:
+Hi,
 
-> Em 10-07-2011 16:51, Randy Dunlap escreveu:
-> > From: Randy Dunlap <rdunlap@xenotime.net>
-> > 
-> > Add HEX_STRING(value) to stringify.h so that drivers can
-> > convert kconfig hex values (without leading "0x") to useful
-> > hex constants.
-> > 
-> > Several drivers/media/radio/ drivers need this.  I haven't
-> > checked if any other drivers need to do this.
-> > 
-> > Alternatively, kconfig could produce hex config symbols with
-> > leading "0x".
-> 
-> Hi Randy,
-> 
-> After applying patch 1/9 and 2/9 over 3.0-rc7+media patches, I'm
-> now getting this error:
-> 
-> drivers/media/radio/radio-aimslab.c:52:1: error: invalid suffix "x20f" on integer constant
+On Wed, Jul 13, 2011 at 6:00 PM, Randy Dunlap <rdunlap@xenotime.net> wrote:
+> On Wed, 13 Jul 2011 17:49:48 -0400 Arnaud Lacombe wrote:
+>
+>> Hi,
+>>
+>> On Sun, Jul 10, 2011 at 3:51 PM, Randy Dunlap <rdunlap@xenotime.net> wrote:
+>> > From: Randy Dunlap <rdunlap@xenotime.net>
+>> >
+>> > Add HEX_STRING(value) to stringify.h so that drivers can
+>> > convert kconfig hex values (without leading "0x") to useful
+>> > hex constants.
+>> >
+>> > Several drivers/media/radio/ drivers need this.  I haven't
+>> > checked if any other drivers need to do this.
+>> >
+>> > Alternatively, kconfig could produce hex config symbols with
+>> > leading "0x".
+>> >
+>> Actually, I used to have a patch to make hex value have a mandatory
+>> "0x" prefix, in the Kconfig. I even fixed all the issue in the tree,
+>> it never make it to the tree (not sure why). Here's the relevant
+>> thread:
+>>
+>> https://patchwork.kernel.org/patch/380591/
+>> https://patchwork.kernel.org/patch/380621/
+>> https://patchwork.kernel.org/patch/380601/
+>>
+>
+> I prefer that this be fixed in kconfig, so long as it won't cause
+> any other issues.  That's why I mentioned it.
+>
+>>
+>> > Signed-off-by: Randy Dunlap <rdunlap@xenotime.net>
+>> > ---
+>> >  include/linux/stringify.h |    7 +++++++
+>> >  1 file changed, 7 insertions(+)
+>> >
+>> > NOTE: The other 8 patches are on lkml and linux-media mailing lists.
+>> >
+>> > --- linux-next-20110707.orig/include/linux/stringify.h
+>> > +++ linux-next-20110707/include/linux/stringify.h
+>> > @@ -9,4 +9,11 @@
+>> >  #define __stringify_1(x...)    #x
+>> >  #define __stringify(x...)      __stringify_1(x)
+>> >
+>> > +/*
+>> > + * HEX_STRING(value) is useful for CONFIG_ values that are in hex,
+>> > + * but kconfig does not put a leading "0x" on them.
+>> > + */
+>> > +#define HEXSTRINGVALUE(h, value)       h##value
+>> > +#define HEX_STRING(value)              HEXSTRINGVALUE(0x, value)
+>> > +
+>> that seems hackish...
+>
+> It's a common idiom for concatenating strings in the kernel.
+>
+I meant hackish not because *how* it is done, but because *why* it has
+to be done, that is, because the Kconfig miss the prefix, which is
+really no big deal.
 
-Hi Mauro,
+> How would you do it without (instead of) a kconfig fix/patch?
+>
+have the Kconfig use the "0x" prefix since the beginning.
 
-I built all of these drivers with my patches applied,
-but I'll see if I can find where this error is coming from.
+ - Arnaud
 
-Thanks for checking & letting me know.
-
-
-> $ grep 20f .config
-> CONFIG_RADIO_RTRACK_PORT=20f
-> 
-> $ gcc --version
-> gcc (GCC) 4.4.5 20110214 (Red Hat 4.4.5-6)
-> 
-> Before this patch, this were working (or, at least, weren't producing
-> any error).
-> 
-> Perhaps the breakage on your compilation happened due to another
-> patch at the tree? If so, the better would be to apply this patch
-> series together with the ones that caused the breakage, to avoid
-> bisect troubles.
-> 
-> > 
-> > Signed-off-by: Randy Dunlap <rdunlap@xenotime.net>
-> > ---
-> >  include/linux/stringify.h |    7 +++++++
-> >  1 file changed, 7 insertions(+)
-> > 
-> > NOTE: The other 8 patches are on lkml and linux-media mailing lists.
-> > 
-> > --- linux-next-20110707.orig/include/linux/stringify.h
-> > +++ linux-next-20110707/include/linux/stringify.h
-> > @@ -9,4 +9,11 @@
-> >  #define __stringify_1(x...)	#x
-> >  #define __stringify(x...)	__stringify_1(x)
-> >  
-> > +/*
-> > + * HEX_STRING(value) is useful for CONFIG_ values that are in hex,
-> > + * but kconfig does not put a leading "0x" on them.
-> > + */
-> > +#define HEXSTRINGVALUE(h, value)	h##value
-> > +#define HEX_STRING(value)		HEXSTRINGVALUE(0x, value)
-> > +
-> >  #endif	/* !__LINUX_STRINGIFY_H */
-> 
-> --
-
-
----
-~Randy
-*** Remember to use Documentation/SubmitChecklist when testing your code ***
+>> >  #endif /* !__LINUX_STRINGIFY_H */
+>> > --
+>
+>
+> ---
+> ~Randy
+> *** Remember to use Documentation/SubmitChecklist when testing your code ***
+>
