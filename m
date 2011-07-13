@@ -1,34 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:40792 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S965108Ab1GMJV3 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 13 Jul 2011 05:21:29 -0400
-Message-ID: <4E1D6396.1070200@suse.cz>
-Date: Wed, 13 Jul 2011 11:21:26 +0200
-From: Michal Marek <mmarek@suse.cz>
+Received: from mail-iw0-f174.google.com ([209.85.214.174]:33944 "EHLO
+	mail-iw0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S964915Ab1GMLWT convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 13 Jul 2011 07:22:19 -0400
 MIME-Version: 1.0
+In-Reply-To: <4E1D6396.1070200@suse.cz>
+References: <alpine.DEB.2.01.1107040242180.9183@trent.utfs.org>
+	<1310470780-12330-1-git-send-email-mmarek@suse.cz>
+	<CAM_iQpWfSFPcvDJCDwS9ADCEvw-6A3wyUh+kkhgqHOi2Zx_eSg@mail.gmail.com>
+	<4E1D6396.1070200@suse.cz>
+Date: Wed, 13 Jul 2011 19:22:18 +0800
+Message-ID: <CAM_iQpUoLwar3wYUe-3i5tgSB4e9HF__QKSht2yxVYP_MmUqyQ@mail.gmail.com>
 Subject: Re: [PATCH] kbuild: Do not write to builddir in modules_install
-References: <alpine.DEB.2.01.1107040242180.9183@trent.utfs.org>	<1310470780-12330-1-git-send-email-mmarek@suse.cz> <CAM_iQpWfSFPcvDJCDwS9ADCEvw-6A3wyUh+kkhgqHOi2Zx_eSg@mail.gmail.com>
-In-Reply-To: <CAM_iQpWfSFPcvDJCDwS9ADCEvw-6A3wyUh+kkhgqHOi2Zx_eSg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+From: =?UTF-8?Q?Am=C3=A9rico_Wang?= <xiyou.wangcong@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: =?UTF-8?B?QW3DqXJpY28gV2FuZw==?= <xiyou.wangcong@gmail.com>
+To: Michal Marek <mmarek@suse.cz>
 Cc: Christian Kujau <lists@nerdbynature.de>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-On 13.7.2011 03:05, Américo Wang wrote:
-> On Tue, Jul 12, 2011 at 7:39 PM, Michal Marek<mmarek@suse.cz>  wrote:
->> Let depmod.sh create a temporary directory in /tmp instead of writing to
->> the build directory as root. The mktemp utility should be available on
->> any recent system (and there is already scripts/gen_initramfs_list.sh
->> relying on it).
+On Wed, Jul 13, 2011 at 5:21 PM, Michal Marek <mmarek@suse.cz> wrote:
+> On 13.7.2011 03:05, Américo Wang wrote:
 >>
+>> On Tue, Jul 12, 2011 at 7:39 PM, Michal Marek<mmarek@suse.cz>  wrote:
+>>>
+>>> Let depmod.sh create a temporary directory in /tmp instead of writing to
+>>> the build directory as root. The mktemp utility should be available on
+>>> any recent system (and there is already scripts/gen_initramfs_list.sh
+>>> relying on it).
+>>>
+>>
+>> Hmm, why not use $objtree/.tmp_depmod?
 >
-> Hmm, why not use $objtree/.tmp_depmod?
+> That's how it was done before and it's broken. make modules_install is
+> usually ran as root and there is no guarantee that root has write access to
+> the build directory (it can be on nfs).
 
-That's how it was done before and it's broken. make modules_install is 
-usually ran as root and there is no guarantee that root has write access 
-to the build directory (it can be on nfs).
+Hmm, this is reasonable. Then I am fine with this patch.
 
-Michal
+Thanks for explanation!
