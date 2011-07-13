@@ -1,46 +1,149 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-vw0-f46.google.com ([209.85.212.46]:58129 "EHLO
-	mail-vw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751625Ab1GMMQr (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 13 Jul 2011 08:16:47 -0400
+Received: from cantor2.suse.de ([195.135.220.15]:51430 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752244Ab1GMNWv (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 13 Jul 2011 09:22:51 -0400
+Message-ID: <4E1D9C25.8080300@suse.cz>
+Date: Wed, 13 Jul 2011 15:22:45 +0200
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-In-Reply-To: <CACqU3MXujqdjur3keSF78+5qKs-j7NN4iz_YMHgH7_8D=3EdLQ@mail.gmail.com>
-References: <da20dc5c4160ed9a3da52f60799a1e4369fe3f27.1310228130.git.rprabhu@wnohang.net>
-	<CAM_iQpXeqc01dyHpViyJCMSz6wz-1mWmGi=J0UynUG8tbd99kw@mail.gmail.com>
-	<CACqU3MUgVTpc6kBvBiw7rtyn_JTA-JPrbnvai3Vnq+UWk-jSbQ@mail.gmail.com>
-	<CAOJsxLF+4VOXJwRJL7npMngDTGztXk739_GcMLxsMzmsVcDCVw@mail.gmail.com>
-	<CACqU3MUFO9DGqnK99ApaKn00vzj5rCB5=kjuSZGZpPU8c_4G-A@mail.gmail.com>
-	<20110710110241.7650e03f.rdunlap@xenotime.net>
-	<alpine.LNX.2.00.1107110051420.2818@swampdragon.chaosbits.net>
-	<20110710160722.ae763029.rdunlap@xenotime.net>
-	<alpine.LNX.2.00.1107110117080.2818@swampdragon.chaosbits.net>
-	<20110710165333.8c7f9620.rdunlap@xenotime.net>
-	<20110711050951.GA22699@sirena.org.uk>
-	<20110711101134.613d88ee.rdunlap@xenotime.net>
-	<CAM_iQpUSj5rQgMds6LppD1fM=w3z=CZ9An1OVv__cTM5u+PB3Q@mail.gmail.com>
-	<CACqU3MXujqdjur3keSF78+5qKs-j7NN4iz_YMHgH7_8D=3EdLQ@mail.gmail.com>
-Date: Wed, 13 Jul 2011 15:16:46 +0300
-Message-ID: <CAOJsxLGfsdirEudJ=N9M0aTTqwN65UKcpQygin15ztHWR0qZdw@mail.gmail.com>
-Subject: Re: [PATCH] Avoid Wunused-but-set warning
-From: Pekka Enberg <penberg@kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [PATCH] kconfig: Only generate config_is_xxx for bool and tristate
+ options
+References: <1305646532-29114-1-git-send-email-mmarek@suse.cz>	<20110517195310.GA17003@merkur.ravnborg.org> <BANLkTikmO7D3kUgU62d4_VC2ZPZCnSEqKA@mail.gmail.com>
+In-Reply-To: <BANLkTikmO7D3kUgU62d4_VC2ZPZCnSEqKA@mail.gmail.com>
+Content-Type: multipart/mixed;
+ boundary="------------070700060301060108060305"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Arnaud Lacombe <lacombar@gmail.com>
-Cc: =?ISO-8859-1?Q?Am=E9rico_Wang?= <xiyou.wangcong@gmail.com>, Randy Dunlap <rdunlap@xenotime.net>, Mark Brown <broonie@opensource.wolfsonmicro.com>, Jesper Juhl <jj@chaosbits.net>, Raghavendra D Prabhu <rprabhu@wnohang.net>, linux-kbuild@vger.kernel.org, Nir Tzachar <nir.tzachar@gmail.com>, linux-kernel@vger.kernel.org
+Cc: Sam Ravnborg <sam@ravnborg.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Jean-Christophe PLAGNIOL-VILLARD <plagnioj@jcrosoft.com>, Valdis.Kletnieks@vt.edu
 
-On Wed, Jul 13, 2011 at 5:21 AM, Arnaud Lacombe <lacombar@gmail.com> wrote:
-> I have the feeling from this thread that "Acked-by:" does not need any
-> particular qualification, whereas Reviewed-by: "kinda" does. But I may
-> have understood that all wrong. Btw, I say "kinda" as I see nothing in
-> the Reviewed-by: or Acked-by: definition that require any
-> qualification on the involved subsystem to give an Acked-by: or a
-> Reviewed-by:. Maybe we [not?] need such some formal requirement.
+This is a multi-part message in MIME format.
+--------------070700060301060108060305
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
 
-The formal requirement for 'Reviewed-by' is that you're OK with Linus
-and the gang handing your ass to you on a plate when a patch you've
-blessed with your tag breaks the world. 'Acked-by' is similar in
-nature but the repercussions are less severe.
+On 18.5.2011 08:23, Arnaud Lacombe wrote:
+> Hi,
+>
+> [added Valdis.Kletnieks@vt.edu to CC:]
+>
+> On Tue, May 17, 2011 at 3:53 PM, Sam Ravnborg<sam@ravnborg.org>  wrote:
+>> On Tue, May 17, 2011 at 05:35:32PM +0200, Michal Marek wrote:
+>>> For strings and integers, the config_is_xxx macros are useless and
+>>> sometimes misleading:
+>>>
+>>>    #define CONFIG_INITRAMFS_SOURCE ""
+>>>    #define config_is_initramfs_source() 1
+>>
+>> I'm late with this comment....
+>> Could we introduce "config_is_foo" using a syntax that
+>> does not break grepability?
+>>
+>> Maybe a syntax like this?
+>>
+>>     #ifdef CONFIG_FOO
+>>
+>> and
+>>
+>>     if (KCONFIG_FOO())
+>>
+>> Grepping for the use of a symbol is a very typical thing,
+>> so we should try to keep this.
+>> And with the suggested syntax above I expect fixdep to
+>> catch up both usage types.
+>>
+> Actually, there is already an issue, on a much smaller scale, in the
+> current tree with NUMA_BUILD and COMPACTION_BUILD. The real way to fix
+> this would be to always defines CONFIG_FOO, its value being 1 or 0
+> depending on whether or not the symbol is selected. This is a
+> +35k/-35k change.
+>
+> Also, I find KCONFIG_FOO() is too specific to be in the kernel source,
+> and redundant with CONFIG_FOO.
+>
+> I've been playing a bit with the preprocessor, and reached that point:
+>
+> #define EXPAND(x)       __ ## x
+> #define CONFIGURED(x)   \
+>          ({  int __1 __maybe_unused = 1;         \
+>              int __ ## x __maybe_unused = 0;     \
+>              EXPAND(x); })
+>
+> I am not specifically proud of that, use case would be:
+>
+> extern func(void);
+> int fn()
+> {
+>          if(CONFIGURED(CONFIG_FOO))
+>                  func();
+> }
 
-                       Pekka
+I finally got round to revisit this. Your approach inspired me to a much 
+simpler scheme: Instead of generating the config_is_xxx macros for 
+direct use in the code, name them __enabled_CONFIG_XXX or similar and 
+have a macro that expands given CONFIG_XXX symbol to the other form:
+
+/*
+  * Usage: ENABLED(CONFIG_FOO)
+  * Please do not use the __enabled_CONFIG_FOO defines directly to not break
+  * grepability of the code.
+  */
+#define ENABLED(x) __enabled_ ## x
+
+plus a checkpatch.pl check so that people do not use the 
+__enabled_CONFIG_FOO macros in their code. git grep -w CONFIG_FOO 
+continues to work, fixdep continues to work, it works with -O0 because 
+it expands to a if(1) or if(0). Am I missing some obvious problem?
+
+Attached is my test program:
+$ gcc -Wall -O0 test.c
+$ ./a.out
+Foo1.0
+Foo1.1
+$ strings ./a.out | grep Foo
+Foo1.0
+Foo1.1
+
+Michal
+
+--------------070700060301060108060305
+Content-Type: text/plain;
+ name="test.c"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+ filename="test.c"
+
+#include <stdio.h>
+
+#define CONFIG_FOO1 1
+#undef CONFIG_FOO2
+#define __enabled_CONFIG_FOO1 1
+#define __enabled_CONFIG_FOO2 0
+
+/*
+ * Usage: ENABLED(CONFIG_FOO)
+ * Please do not use the __enabled_CONFIG_FOO defines directly to not break
+ * grepability of the code.
+ */
+#define ENABLED(x) __enabled_ ## x
+
+int main(void)
+{
+#ifdef CONFIG_FOO1
+	puts("Foo1.0");
+#endif
+#ifdef CONFIG_FOO2
+	puts("Foo2.0");
+#endif
+	if (ENABLED(CONFIG_FOO1)) {
+		puts("Foo1.1");
+	}
+	if (ENABLED(CONFIG_FOO2)) {
+		puts("Foo2.1");
+	}
+	return 0;
+}
+
+
+--------------070700060301060108060305--
