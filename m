@@ -1,149 +1,155 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pv0-f174.google.com ([74.125.83.174]:34783 "EHLO
-	mail-pv0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754652Ab1GNSrz convert rfc822-to-8bit (ORCPT
+Received: from smtp.snhosting.dk ([87.238.248.203]:54259 "EHLO
+	smtp.domainteam.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751177Ab1GMUIk (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 14 Jul 2011 14:47:55 -0400
-Received: by pvg12 with SMTP id 12so442729pvg.19
-        for <linux-kbuild@vger.kernel.org>; Thu, 14 Jul 2011 11:47:55 -0700 (PDT)
+	Wed, 13 Jul 2011 16:08:40 -0400
+Date: Wed, 13 Jul 2011 22:08:13 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: [PATCH] kconfig: Only generate config_is_xxx for bool and
+	tristate options
+Message-ID: <20110713200813.GA11538@merkur.ravnborg.org>
+References: <1305646532-29114-1-git-send-email-mmarek@suse.cz> <20110517195310.GA17003@merkur.ravnborg.org> <BANLkTikmO7D3kUgU62d4_VC2ZPZCnSEqKA@mail.gmail.com> <4E1D9C25.8080300@suse.cz>
 MIME-Version: 1.0
-In-Reply-To: <4E1F3296.5060000@infradead.org>
-References: <20110713151724.3b16ce77.rdunlap@xenotime.net>
-	<1310664362-28100-1-git-send-email-lacombar@gmail.com>
-	<4E1F3296.5060000@infradead.org>
-Date: Thu, 14 Jul 2011 14:47:54 -0400
-Message-ID: <CACqU3MUJ8stsVWbvzEdaUYn3qacc+pJWuFRMUW0KnDfUXUsQvg@mail.gmail.com>
-Subject: Re: [PATCH] media/Kconfig: fix hexadecimal prefix for `hex' symbols
-From: Arnaud Lacombe <lacombar@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4E1D9C25.8080300@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Mauro Carvalho Chehab <mchehab@infradead.org>
-Cc: linux-kbuild@vger.kernel.org, Randy Dunlap <rdunlap@xenotime.net>
+To: Michal Marek <mmarek@suse.cz>
+Cc: Arnaud Lacombe <lacombar@gmail.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Jean-Christophe PLAGNIOL-VILLARD <plagnioj@jcrosoft.com>, Valdis.Kletnieks@vt.edu
 
-Hi,
-
-On Thu, Jul 14, 2011 at 2:16 PM, Mauro Carvalho Chehab
-<mchehab@infradead.org> wrote:
-> Em 14-07-2011 14:26, Arnaud Lacombe escreveu:
->> Cc: Mauro Carvalho Chehab <mchehab@infradead.org>
->> Cc: Randy Dunlap <rdunlap@xenotime.net>
->> Signed-off-by: Arnaud Lacombe <lacombar@gmail.com>
->
-> Arnaud,
->
-> The patch is ok for me. You can add my acked-by, if you want.
->
-> However, with 3.0-rc7, this patch and/or Kconfig fixes don't seem to
-> be needed. Basically, include/generated/autoconf.h has "0x" on it:
->
-> $ grep CONFIG_RADIO_RTRACK_PORT */*/*
-> include/config/auto.conf:CONFIG_RADIO_RTRACK_PORT=20f
-> include/generated/autoconf.h:#define CONFIG_RADIO_RTRACK_PORT 0x20f
->
-> Maybe some patch applied at -next from another tree broke that behavior.
->
-he ... I (involuntarily) broke that behavior when reworking the way we
-generate autoconf.h :-)
-
-my bad.
-
- - Arnaud
-
-> IMHO, keeping those values without "0x" at Kconfig seems more intuitive
-> for the end-user, as otherwise a value like "200" would be confusing
-> if this means 200d or 200h.
->
-do you mean more intuitive *with* "0x", not *without* ? This is what
-I'm thinking too, and why I'd make the "0x" mandatory on HEX symbols.
-
-> Anyway, those drivers are very old, and very few people likely still
-> use those old hardware. So, I'm fine if you either want to preserve
-> the current way or to change it.
->
-> Cheers,
-> Mauro.
->
->> ---
->>  drivers/media/radio/Kconfig |   16 ++++++++--------
->>  1 files changed, 8 insertions(+), 8 deletions(-)
+On Wed, Jul 13, 2011 at 03:22:45PM +0200, Michal Marek wrote:
+> On 18.5.2011 08:23, Arnaud Lacombe wrote:
+>> Hi,
 >>
->> diff --git a/drivers/media/radio/Kconfig b/drivers/media/radio/Kconfig
->> index e4c97fd..9cab04d 100644
->> --- a/drivers/media/radio/Kconfig
->> +++ b/drivers/media/radio/Kconfig
->> @@ -58,7 +58,7 @@ config RADIO_RTRACK
->>  config RADIO_RTRACK_PORT
->>       hex "RadioTrack i/o port (0x20f or 0x30f)"
->>       depends on RADIO_RTRACK=y
->> -     default "20f"
->> +     default "0x20f"
->>       help
->>         Enter either 0x30f or 0x20f here.  The card default is 0x30f, if you
->>         haven't changed the jumper setting on the card.
->> @@ -81,7 +81,7 @@ config RADIO_RTRACK2
->>  config RADIO_RTRACK2_PORT
->>       hex "RadioTrack II i/o port (0x20c or 0x30c)"
->>       depends on RADIO_RTRACK2=y
->> -     default "30c"
->> +     default "0x30c"
->>       help
->>         Enter either 0x30c or 0x20c here.  The card default is 0x30c, if you
->>         haven't changed the jumper setting on the card.
->> @@ -104,7 +104,7 @@ config RADIO_AZTECH
->>  config RADIO_AZTECH_PORT
->>       hex "Aztech/Packard Bell I/O port (0x350 or 0x358)"
->>       depends on RADIO_AZTECH=y
->> -     default "350"
->> +     default "0x350"
->>       help
->>         Enter either 0x350 or 0x358 here.  The card default is 0x350, if you
->>         haven't changed the setting of jumper JP3 on the card.  Removing the
->> @@ -133,7 +133,7 @@ config RADIO_GEMTEK
->>  config RADIO_GEMTEK_PORT
->>       hex "Fixed I/O port (0x20c, 0x30c, 0x24c, 0x34c, 0c24c or 0x28c)"
->>       depends on RADIO_GEMTEK=y
->> -     default "34c"
->> +     default "0x34c"
->>       help
->>         Enter either 0x20c, 0x30c, 0x24c or 0x34c here. The card default is
->>         0x34c, if you haven't changed the jumper setting on the card. On
->> @@ -237,7 +237,7 @@ config RADIO_TERRATEC
->>  config RADIO_TERRATEC_PORT
->>       hex "Terratec i/o port (normally 0x590)"
->>       depends on RADIO_TERRATEC=y
->> -     default "590"
->> +     default "0x590"
->>       help
->>         Fill in the I/O port of your TerraTec FM radio card. If unsure, go
->>         with the default.
->> @@ -255,7 +255,7 @@ config RADIO_TRUST
->>  config RADIO_TRUST_PORT
->>       hex "Trust i/o port (usually 0x350 or 0x358)"
->>       depends on RADIO_TRUST=y
->> -     default "350"
->> +     default "0x350"
->>       help
->>         Enter the I/O port of your Trust FM radio card. If unsure, try the
->>         values "0x350" or "0x358".
->> @@ -278,7 +278,7 @@ config RADIO_TYPHOON
->>  config RADIO_TYPHOON_PORT
->>       hex "Typhoon I/O port (0x316 or 0x336)"
->>       depends on RADIO_TYPHOON=y
->> -     default "316"
->> +     default "0x316"
->>       help
->>         Enter the I/O port of your Typhoon or EcoRadio radio card.
+>> [added Valdis.Kletnieks@vt.edu to CC:]
 >>
->> @@ -312,7 +312,7 @@ config RADIO_ZOLTRIX
->>  config RADIO_ZOLTRIX_PORT
->>       hex "ZOLTRIX I/O port (0x20c or 0x30c)"
->>       depends on RADIO_ZOLTRIX=y
->> -     default "20c"
->> +     default "0x20c"
->>       help
->>         Enter the I/O port of your Zoltrix radio card.
+>> On Tue, May 17, 2011 at 3:53 PM, Sam Ravnborg<sam@ravnborg.org>  wrote:
+>>> On Tue, May 17, 2011 at 05:35:32PM +0200, Michal Marek wrote:
+>>>> For strings and integers, the config_is_xxx macros are useless and
+>>>> sometimes misleading:
+>>>>
+>>>>    #define CONFIG_INITRAMFS_SOURCE ""
+>>>>    #define config_is_initramfs_source() 1
+>>>
+>>> I'm late with this comment....
+>>> Could we introduce "config_is_foo" using a syntax that
+>>> does not break grepability?
+>>>
+>>> Maybe a syntax like this?
+>>>
+>>>     #ifdef CONFIG_FOO
+>>>
+>>> and
+>>>
+>>>     if (KCONFIG_FOO())
+>>>
+>>> Grepping for the use of a symbol is a very typical thing,
+>>> so we should try to keep this.
+>>> And with the suggested syntax above I expect fixdep to
+>>> catch up both usage types.
+>>>
+>> Actually, there is already an issue, on a much smaller scale, in the
+>> current tree with NUMA_BUILD and COMPACTION_BUILD. The real way to fix
+>> this would be to always defines CONFIG_FOO, its value being 1 or 0
+>> depending on whether or not the symbol is selected. This is a
+>> +35k/-35k change.
 >>
+>> Also, I find KCONFIG_FOO() is too specific to be in the kernel source,
+>> and redundant with CONFIG_FOO.
+>>
+>> I've been playing a bit with the preprocessor, and reached that point:
+>>
+>> #define EXPAND(x)       __ ## x
+>> #define CONFIGURED(x)   \
+>>          ({  int __1 __maybe_unused = 1;         \
+>>              int __ ## x __maybe_unused = 0;     \
+>>              EXPAND(x); })
+>>
+>> I am not specifically proud of that, use case would be:
+>>
+>> extern func(void);
+>> int fn()
+>> {
+>>          if(CONFIGURED(CONFIG_FOO))
+>>                  func();
+>> }
 >
->
+> I finally got round to revisit this. Your approach inspired me to a much  
+> simpler scheme: Instead of generating the config_is_xxx macros for  
+> direct use in the code, name them __enabled_CONFIG_XXX or similar and  
+> have a macro that expands given CONFIG_XXX symbol to the other form:
+
+But then we clutter the namesapce with another set of variables that will
+be misued. If not in the kernel then by other kconfig users.
+
+Arnaud approach is nice as it does not require any additional
+symbols to be generated.
+We can always discuss tha naming - but the approach looks good.
+
+To look at actual usage first:
+
+int foo()
+{
+	if (KCONFIG(CONFIG_FOO)) {
+		// this should be true for both module and non-module case
+	}
+
+	if (KCONFIG_NOT_MODULE(CONFIG_FOO)) {
+		// this should be true only if this is not a module
+	}
+
+
+
+	if (KCONFIG_MODULE(CONFIG_FOO)) {
+		// this should only be true for the module case
+	}
+
+}
+
+Using the above even the naive reader is aware this is a kconfig generate
+symbol.
+Using "KCONFIG" in the name gives a stong hint that this is a kconfig thing.
+
+We could stuff it all into a kconfig.h header like the attached (not tested)
+but based on Arnauds sketch above - so creadits goes to him.
+
+	Sam
+
+diff --git a/include/linux/kconfig.h b/include/linux/kconfig.h
+new file mode 100644
+index 0000000..3ccdd73
+--- /dev/null
++++ b/include/linux/kconfig.h
+@@ -0,0 +1,30 @@
++#ifndef _LINUX_KCONFIG_H
++#define _LINUX_KCONFIG_H
++
++/*
++ * Helper macros for dealing with kconfig symbols
++ */
++
++#include <linux/compiler.h>
++
++#define __symbol_value(sym)       __ ## x
++#define __symbol_module(sym)      __symbol_value(__ ## sym ## _MODULE)
++
++/* return 1 if x is defined and not a module */
++#define KCONFIG_NON_MODULE(sym)					\
++	({ int __1 __maybe_unused = 1;				\
++	   int __ ## sym __maybe_unused = 0;			\
++	   __symbol_value(sym); })
++
++/* return 1 if sym is a module symbol */
++#define KCONFIG_MODULE(sym)					\
++	({ int __1 __maybe_unused = 1;				\
++	   int __ ## sym ## _MODULE __maybe_unused = 0;	\
++	   __symbol_value(sym); })
++
++/* return 1 if sym is defined - module or not */
++#define KCONFIG(sym) (KCONFIG_NON_MODULE(sym) || KCONFIG_MODULE(sym))
++
++#undef __symbol_value
++#undef __symbol_module
++#endif
