@@ -1,137 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pz0-f46.google.com ([209.85.210.46]:42332 "EHLO
-	mail-pz0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755348Ab1GMPUP convert rfc822-to-8bit (ORCPT
+Received: from hrndva-omtalb.mail.rr.com ([71.74.56.122]:63208 "EHLO
+	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754564Ab1GNNJj (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 13 Jul 2011 11:20:15 -0400
-MIME-Version: 1.0
-In-Reply-To: <4E1D9C25.8080300@suse.cz>
-References: <1305646532-29114-1-git-send-email-mmarek@suse.cz>
-	<20110517195310.GA17003@merkur.ravnborg.org>
-	<BANLkTikmO7D3kUgU62d4_VC2ZPZCnSEqKA@mail.gmail.com>
-	<4E1D9C25.8080300@suse.cz>
-Date: Wed, 13 Jul 2011 11:20:13 -0400
-Message-ID: <CACqU3MXWH5mq1ycOoqH=1A_87Sn3tgOZU2om+0q=ZrEvnmKVrQ@mail.gmail.com>
-Subject: Re: [PATCH] kconfig: Only generate config_is_xxx for bool and
- tristate options
-From: Arnaud Lacombe <lacombar@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 8BIT
+	Thu, 14 Jul 2011 09:09:39 -0400
+Subject: Re: [RFC 0/4] streamline_config clean-ups
+From: Steven Rostedt <rostedt@goodmis.org>
+In-Reply-To: <CACqU3MX4=AQyH4TXi+LaHV6WWRsLZpGf7c=iwQHm6Mqsr6SgYA@mail.gmail.com>
+References: <1309563076-5050-1-git-send-email-lacombar@gmail.com>
+	 <CACqU3MUrCODMx=8Bu+YDxy2BJwjm-77PXFob5OwHn=fr5mTdkg@mail.gmail.com>
+	 <1310170759.2780.37.camel@fedora>
+	 <1310604899.27864.4.camel@gandalf.stny.rr.com>
+	 <CACqU3MX4=AQyH4TXi+LaHV6WWRsLZpGf7c=iwQHm6Mqsr6SgYA@mail.gmail.com>
+Content-Type: text/plain; charset="ISO-8859-15"
+Date: Thu, 14 Jul 2011 09:09:37 -0400
+Message-ID: <1310648977.27864.22.camel@gandalf.stny.rr.com>
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: Sam Ravnborg <sam@ravnborg.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Jean-Christophe PLAGNIOL-VILLARD <plagnioj@jcrosoft.com>, Valdis.Kletnieks@vt.edu
+To: Arnaud Lacombe <lacombar@gmail.com>
+Cc: Steven Rostedt <srostedt@redhat.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>
 
-Hi,
+On Wed, 2011-07-13 at 22:41 -0400, Arnaud Lacombe wrote:
 
-On Wed, Jul 13, 2011 at 9:22 AM, Michal Marek <mmarek@suse.cz> wrote:
-> On 18.5.2011 08:23, Arnaud Lacombe wrote:
->>
->> Hi,
->>
->> [added Valdis.Kletnieks@vt.edu to CC:]
->>
->> On Tue, May 17, 2011 at 3:53 PM, Sam Ravnborg<sam@ravnborg.org>  wrote:
->>>
->>> On Tue, May 17, 2011 at 05:35:32PM +0200, Michal Marek wrote:
->>>>
->>>> For strings and integers, the config_is_xxx macros are useless and
->>>> sometimes misleading:
->>>>
->>>>   #define CONFIG_INITRAMFS_SOURCE ""
->>>>   #define config_is_initramfs_source() 1
->>>
->>> I'm late with this comment....
->>> Could we introduce "config_is_foo" using a syntax that
->>> does not break grepability?
->>>
->>> Maybe a syntax like this?
->>>
->>>    #ifdef CONFIG_FOO
->>>
->>> and
->>>
->>>    if (KCONFIG_FOO())
->>>
->>> Grepping for the use of a symbol is a very typical thing,
->>> so we should try to keep this.
->>> And with the suggested syntax above I expect fixdep to
->>> catch up both usage types.
->>>
->> Actually, there is already an issue, on a much smaller scale, in the
->> current tree with NUMA_BUILD and COMPACTION_BUILD. The real way to fix
->> this would be to always defines CONFIG_FOO, its value being 1 or 0
->> depending on whether or not the symbol is selected. This is a
->> +35k/-35k change.
->>
->> Also, I find KCONFIG_FOO() is too specific to be in the kernel source,
->> and redundant with CONFIG_FOO.
->>
->> I've been playing a bit with the preprocessor, and reached that point:
->>
->> #define EXPAND(x)       __ ## x
->> #define CONFIGURED(x)   \
->>         ({  int __1 __maybe_unused = 1;         \
->>             int __ ## x __maybe_unused = 0;     \
->>             EXPAND(x); })
->>
->> I am not specifically proud of that, use case would be:
->>
->> extern func(void);
->> int fn()
->> {
->>         if(CONFIGURED(CONFIG_FOO))
->>                 func();
->> }
->
-> I finally got round to revisit this. Your approach inspired me to a much
-> simpler scheme: Instead of generating the config_is_xxx macros for direct
-> use in the code, name them __enabled_CONFIG_XXX or similar and have a macro
-> that expands given CONFIG_XXX symbol to the other form:
->
-> /*
->  * Usage: ENABLED(CONFIG_FOO)
->  * Please do not use the __enabled_CONFIG_FOO defines directly to not break
->  * grepability of the code.
->  */
-> #define ENABLED(x) __enabled_ ## x
->
-> plus a checkpatch.pl check so that people do not use the
-> __enabled_CONFIG_FOO macros in their code. git grep -w CONFIG_FOO continues
-> to work, fixdep continues to work, it works with -O0 because it expands to a
-> if(1) or if(0). Am I missing some obvious problem?
->
-not I see immediately. ENABLED() will conflict with existing keyword
-in the tree, so it might need tweaking.
+> yes... it could not have. I missed a $(srctree), an export, and an
+> error check. Attached patch should fix it, behavior (see below) with
+> this patch is consistent between v3.0-rc6 and the tip of the patched
+> branch.
 
-Basically, you are taking the approach of always defining CONFIG_FOO
-(to 0 or 1), but by introducing a new macro, you avoid to break #ifdef
-usage in the tree.
+That seems to work. Could you resend a fixed patchset?
 
-Actually, with this approach, we can even see forward and start replacing:
+> 
+> Btw, as of v3.0-rc6, localmodconfig does not produce a valid .config.
+> Local kernel is a Fedora 14 kernel, based on
+> config-2.6.35.13-91.fc14.x86_64. The perl script complete fine, but
+> the config is then restarted, I'm not sure if it is the intended
+> behavior.
 
-#ifdef CONFIG_FOO
+Hmm, not sure exactly what you mean. The script should run
+(silent)oldconfig after it does the localmodconfig to fill in the stuff
+that it caused to change. Did you notice something that broke?
 
-by
+-- Steve
 
-#if ENABLED(CONFIG_FOO)
 
-In a couple of release, we mark the old #ifdef syntax as deprecated,
-then after a couple of release, get rid of the duplicated macro
-altogether.
-
-You evil ! :-)
-
- - Arnaud
-
-> Attached is my test program:
-> $ gcc -Wall -O0 test.c
-> $ ./a.out
-> Foo1.0
-> Foo1.1
-> $ strings ./a.out | grep Foo
-> Foo1.0
-> Foo1.1
->
-> Michal
->
