@@ -1,110 +1,91 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from oproxy3-pub.bluehost.com ([69.89.21.8]:37278 "HELO
-	oproxy3-pub.bluehost.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with SMTP id S1751546Ab1GMWR0 convert rfc822-to-8bit (ORCPT
+Received: from mail-yi0-f46.google.com ([209.85.218.46]:61469 "EHLO
+	mail-yi0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752804Ab1GNTbV (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 13 Jul 2011 18:17:26 -0400
-Date: Wed, 13 Jul 2011 15:17:24 -0700
-From: Randy Dunlap <rdunlap@xenotime.net>
-Subject: Re: [PATCH 1/9] stringify: add HEX_STRING()
-Message-Id: <20110713151724.3b16ce77.rdunlap@xenotime.net>
-In-Reply-To: <CACqU3MXSwJG14PwD0c6R7VZg9fO=XLj=-QDN5ntbQp+0xDn82A@mail.gmail.com>
-References: <20110710125109.c72f9c2d.rdunlap@xenotime.net>
-	<CACqU3MWBb4J8rmaRv23=-_=GXppGSUdqmOqeXoqWi4ZJ7ZYewg@mail.gmail.com>
-	<20110713150023.0dde9ef4.rdunlap@xenotime.net>
-	<CACqU3MVh+4JMX5ywPgWrrXXuAcAYtHJyumXGDcteageJAG12wA@mail.gmail.com>
-	<20110713150840.2fa8e2b3.rdunlap@xenotime.net>
-	<CACqU3MXSwJG14PwD0c6R7VZg9fO=XLj=-QDN5ntbQp+0xDn82A@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 8BIT
+	Thu, 14 Jul 2011 15:31:21 -0400
+Received: by yia27 with SMTP id 27so255448yia.19
+        for <linux-kbuild@vger.kernel.org>; Thu, 14 Jul 2011 12:31:20 -0700 (PDT)
+From: Arnaud Lacombe <lacombar@gmail.com>
+Subject: [PATCH] kconfig: fix missing "0x" prefix from S_HEX symbol in autoconf.h
+Date: Thu, 14 Jul 2011 15:31:07 -0400
+Message-Id: <1310671867-5107-1-git-send-email-lacombar@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnaud Lacombe <lacombar@gmail.com>
-Cc: lkml <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org, linux-media@vger.kernel.org, mchehab@infradead.org
+To: linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>
+Cc: Arnaud Lacombe <lacombar@gmail.com>, Randy Dunlap <rdunlap@xenotime.net>, Mauro Carvalho Chehab <mchehab@infradead.org>
 
-On Wed, 13 Jul 2011 18:13:31 -0400 Arnaud Lacombe wrote:
+The specialized printer for headers (espectially autoconf.h) is missing fixup
+code for S_HEX symbol's "0x" prefix. As long as kconfig does not warn for such
+missing prefix, this code is needed. Fix this.
 
-> Hi,
-> 
-> On Wed, Jul 13, 2011 at 6:08 PM, Randy Dunlap <rdunlap@xenotime.net> wrote:
-> > On Wed, 13 Jul 2011 18:06:15 -0400 Arnaud Lacombe wrote:
-> >
-> >> Hi,
-> >>
-> >> On Wed, Jul 13, 2011 at 6:00 PM, Randy Dunlap <rdunlap@xenotime.net> wrote:
-> >> > On Wed, 13 Jul 2011 17:49:48 -0400 Arnaud Lacombe wrote:
-> >> >
-> >> >> Hi,
-> >> >>
-> >> >> On Sun, Jul 10, 2011 at 3:51 PM, Randy Dunlap <rdunlap@xenotime.net> wrote:
-> >> >> > From: Randy Dunlap <rdunlap@xenotime.net>
-> >> >> >
-> >> >> > Add HEX_STRING(value) to stringify.h so that drivers can
-> >> >> > convert kconfig hex values (without leading "0x") to useful
-> >> >> > hex constants.
-> >> >> >
-> >> >> > Several drivers/media/radio/ drivers need this.  I haven't
-> >> >> > checked if any other drivers need to do this.
-> >> >> >
-> >> >> > Alternatively, kconfig could produce hex config symbols with
-> >> >> > leading "0x".
-> >> >> >
-> >> >> Actually, I used to have a patch to make hex value have a mandatory
-> >> >> "0x" prefix, in the Kconfig. I even fixed all the issue in the tree,
-> >> >> it never make it to the tree (not sure why). Here's the relevant
-> >> >> thread:
-> >> >>
-> >> >> https://patchwork.kernel.org/patch/380591/
-> >> >> https://patchwork.kernel.org/patch/380621/
-> >> >> https://patchwork.kernel.org/patch/380601/
-> >> >>
-> >> >
-> >> > I prefer that this be fixed in kconfig, so long as it won't cause
-> >> > any other issues.  That's why I mentioned it.
-> >> >
-> >> >>
-> >> >> > Signed-off-by: Randy Dunlap <rdunlap@xenotime.net>
-> >> >> > ---
-> >> >> >  include/linux/stringify.h |    7 +++++++
-> >> >> >  1 file changed, 7 insertions(+)
-> >> >> >
-> >> >> > NOTE: The other 8 patches are on lkml and linux-media mailing lists.
-> >> >> >
-> >> >> > --- linux-next-20110707.orig/include/linux/stringify.h
-> >> >> > +++ linux-next-20110707/include/linux/stringify.h
-> >> >> > @@ -9,4 +9,11 @@
-> >> >> >  #define __stringify_1(x...)    #x
-> >> >> >  #define __stringify(x...)      __stringify_1(x)
-> >> >> >
-> >> >> > +/*
-> >> >> > + * HEX_STRING(value) is useful for CONFIG_ values that are in hex,
-> >> >> > + * but kconfig does not put a leading "0x" on them.
-> >> >> > + */
-> >> >> > +#define HEXSTRINGVALUE(h, value)       h##value
-> >> >> > +#define HEX_STRING(value)              HEXSTRINGVALUE(0x, value)
-> >> >> > +
-> >> >> that seems hackish...
-> >> >
-> >> > It's a common idiom for concatenating strings in the kernel.
-> >> >
-> >> I meant hackish not because *how* it is done, but because *why* it has
-> >> to be done, that is, because the Kconfig miss the prefix, which is
-> >> really no big deal.
-> >>
-> >> > How would you do it without (instead of) a kconfig fix/patch?
-> >> >
-> >> have the Kconfig use the "0x" prefix since the beginning.
-> >
-> > Sure, go for it.  I'll ack it.  ;)  [or Review it :]
-> > and test it.
-> >
-> it is already among the hunks in https://patchwork.kernel.org/patch/380601/
+In the same time, fix some nits in `header_print_symbol()'.
 
-I realize that, but it looks like you may need to resubmit it.
+Cc: Randy Dunlap <rdunlap@xenotime.net>
+Cc: Mauro Carvalho Chehab <mchehab@infradead.org>
 
-I'll dig it out and test it, maybe even reply to your old patch(es).
+Broken-by: Arnaud Lacombe <lacombar@gmail.com>
+(Somehow-)Reported-by: Randy Dunlap <rdunlap@xenotime.net>
+Reported-by: Mauro Carvalho Chehab <mchehab@infradead.org>
+Signed-off-by: Arnaud Lacombe <lacombar@gmail.com>
 
 ---
-~Randy
-*** Remember to use Documentation/SubmitChecklist when testing your code ***
+ scripts/kconfig/confdata.c |   26 +++++++++++++++++++++-----
+ 1 files changed, 21 insertions(+), 5 deletions(-)
+
+diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
+index be6952c..df629ec 100644
+--- a/scripts/kconfig/confdata.c
++++ b/scripts/kconfig/confdata.c
+@@ -487,27 +487,43 @@ static struct conf_printer kconfig_printer_cb =
+ static void
+ header_print_symbol(FILE *fp, struct symbol *sym, const char *value, void *arg)
+ {
+-	const char *suffix = "";
+ 
+ 	switch (sym->type) {
+ 	case S_BOOLEAN:
+-	case S_TRISTATE:
++	case S_TRISTATE: {
++		const char *suffix = "";
++
+ 		switch (*value) {
+ 		case 'n':
+ 			return;
+ 		case 'm':
+ 			suffix = "_MODULE";
+-			/* FALLTHROUGH */
++			/* fall through */
+ 		default:
+ 			value = "1";
+ 		}
++		fprintf(fp, "#define %s%s%s %s\n",
++		    CONFIG_, sym->name, suffix, value);
++		break;
++	}
++	case S_HEX: {
++		const char *prefix = "";
++
++		if (value[0] != '0' || (value[1] != 'x' && value[1] != 'X'))
++			prefix = "0x";
++		fprintf(fp, "#define %s%s %s%s\n",
++		    CONFIG_, sym->name, prefix, value);
++		break;
++	}
++	case S_STRING:
++	case S_INT:
++		fprintf(fp, "#define %s%s %s\n",
++		    CONFIG_, sym->name, value);
+ 		break;
+ 	default:
+ 		break;
+ 	}
+ 
+-	fprintf(fp, "#define %s%s%s %s\n",
+-	    CONFIG_, sym->name, suffix, value);
+ }
+ 
+ static void
+-- 
+1.7.3.4.574.g608b.dirty
+
