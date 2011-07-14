@@ -1,155 +1,102 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.snhosting.dk ([87.238.248.203]:54259 "EHLO
-	smtp.domainteam.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751177Ab1GMUIk (ORCPT
+Received: from mail-pz0-f46.google.com ([209.85.210.46]:38379 "EHLO
+	mail-pz0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753437Ab1GNClo (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 13 Jul 2011 16:08:40 -0400
-Date: Wed, 13 Jul 2011 22:08:13 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH] kconfig: Only generate config_is_xxx for bool and
-	tristate options
-Message-ID: <20110713200813.GA11538@merkur.ravnborg.org>
-References: <1305646532-29114-1-git-send-email-mmarek@suse.cz> <20110517195310.GA17003@merkur.ravnborg.org> <BANLkTikmO7D3kUgU62d4_VC2ZPZCnSEqKA@mail.gmail.com> <4E1D9C25.8080300@suse.cz>
+	Wed, 13 Jul 2011 22:41:44 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4E1D9C25.8080300@suse.cz>
+In-Reply-To: <1310604899.27864.4.camel@gandalf.stny.rr.com>
+References: <1309563076-5050-1-git-send-email-lacombar@gmail.com>
+	<CACqU3MUrCODMx=8Bu+YDxy2BJwjm-77PXFob5OwHn=fr5mTdkg@mail.gmail.com>
+	<1310170759.2780.37.camel@fedora>
+	<1310604899.27864.4.camel@gandalf.stny.rr.com>
+Date: Wed, 13 Jul 2011 22:41:44 -0400
+Message-ID: <CACqU3MX4=AQyH4TXi+LaHV6WWRsLZpGf7c=iwQHm6Mqsr6SgYA@mail.gmail.com>
+Subject: Re: [RFC 0/4] streamline_config clean-ups
+From: Arnaud Lacombe <lacombar@gmail.com>
+Content-Type: multipart/mixed; boundary=bcaec544eeec3a8c5004a7fe7916
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: Arnaud Lacombe <lacombar@gmail.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Jean-Christophe PLAGNIOL-VILLARD <plagnioj@jcrosoft.com>, Valdis.Kletnieks@vt.edu
+To: Steven Rostedt <rostedt@goodmis.org>
+Cc: Steven Rostedt <srostedt@redhat.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>
 
-On Wed, Jul 13, 2011 at 03:22:45PM +0200, Michal Marek wrote:
-> On 18.5.2011 08:23, Arnaud Lacombe wrote:
->> Hi,
->>
->> [added Valdis.Kletnieks@vt.edu to CC:]
->>
->> On Tue, May 17, 2011 at 3:53 PM, Sam Ravnborg<sam@ravnborg.org>  wrote:
->>> On Tue, May 17, 2011 at 05:35:32PM +0200, Michal Marek wrote:
->>>> For strings and integers, the config_is_xxx macros are useless and
->>>> sometimes misleading:
->>>>
->>>>    #define CONFIG_INITRAMFS_SOURCE ""
->>>>    #define config_is_initramfs_source() 1
->>>
->>> I'm late with this comment....
->>> Could we introduce "config_is_foo" using a syntax that
->>> does not break grepability?
->>>
->>> Maybe a syntax like this?
->>>
->>>     #ifdef CONFIG_FOO
->>>
->>> and
->>>
->>>     if (KCONFIG_FOO())
->>>
->>> Grepping for the use of a symbol is a very typical thing,
->>> so we should try to keep this.
->>> And with the suggested syntax above I expect fixdep to
->>> catch up both usage types.
->>>
->> Actually, there is already an issue, on a much smaller scale, in the
->> current tree with NUMA_BUILD and COMPACTION_BUILD. The real way to fix
->> this would be to always defines CONFIG_FOO, its value being 1 or 0
->> depending on whether or not the symbol is selected. This is a
->> +35k/-35k change.
->>
->> Also, I find KCONFIG_FOO() is too specific to be in the kernel source,
->> and redundant with CONFIG_FOO.
->>
->> I've been playing a bit with the preprocessor, and reached that point:
->>
->> #define EXPAND(x)       __ ## x
->> #define CONFIGURED(x)   \
->>          ({  int __1 __maybe_unused = 1;         \
->>              int __ ## x __maybe_unused = 0;     \
->>              EXPAND(x); })
->>
->> I am not specifically proud of that, use case would be:
->>
->> extern func(void);
->> int fn()
->> {
->>          if(CONFIGURED(CONFIG_FOO))
->>                  func();
->> }
+--bcaec544eeec3a8c5004a7fe7916
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+
+Hi,
+
+On Wed, Jul 13, 2011 at 8:54 PM, Steven Rostedt <rostedt@goodmis.org> wrote=
+:
+> On Fri, 2011-07-08 at 20:19 -0400, Steven Rostedt wrote:
+>> On Fri, 2011-07-08 at 17:47 -0400, Arnaud Lacombe wrote:
+>> > Hi,
+>> >
+>> > On Fri, Jul 1, 2011 at 7:31 PM, Arnaud Lacombe <lacombar@gmail.com> wr=
+ote:
+>> > > Hi,
+>> > >
+>> > > The following series attempts to merge some redundants stuff in the =
+kconfig
+>> > > Makefile, namely how streamline_config learns about its environment,=
+ avoids
+>> > > multi-line shell command in kconfig's Makefile. Seconds commit also =
+removes the
+>> > > non-portable usage of sed(1) as -i is not POSIX compliant.
+>> > >
+>> > > Comments appreciated!
+>> > >
+>> > > =A0- Arnaud
+>> > >
+>> > Ping ?
 >
-> I finally got round to revisit this. Your approach inspired me to a much  
-> simpler scheme: Instead of generating the config_is_xxx macros for  
-> direct use in the code, name them __enabled_CONFIG_XXX or similar and  
-> have a macro that expands given CONFIG_XXX symbol to the other form:
+> I just tried your patches out. It breaks when we compile for another
+> directory. I just tried:
+>
+> $ make LSMOD=3D/tmp/lsmod O=3D../machine/build/ localmodconfig
+>
+> and it it did not work.
+>
+yes... it could not have. I missed a $(srctree), an export, and an
+error check. Attached patch should fix it, behavior (see below) with
+this patch is consistent between v3.0-rc6 and the tip of the patched
+branch.
 
-But then we clutter the namesapce with another set of variables that will
-be misued. If not in the kernel then by other kconfig users.
+Btw, as of v3.0-rc6, localmodconfig does not produce a valid .config.
+Local kernel is a Fedora 14 kernel, based on
+config-2.6.35.13-91.fc14.x86_64. The perl script complete fine, but
+the config is then restarted, I'm not sure if it is the intended
+behavior.
 
-Arnaud approach is nice as it does not require any additional
-symbols to be generated.
-We can always discuss tha naming - but the approach looks good.
+ - Arnaud
 
-To look at actual usage first:
+--bcaec544eeec3a8c5004a7fe7916
+Content-Type: text/x-patch; charset=US-ASCII; name="0001-fix.patch"
+Content-Disposition: attachment; filename="0001-fix.patch"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_gq341qi20
 
-int foo()
-{
-	if (KCONFIG(CONFIG_FOO)) {
-		// this should be true for both module and non-module case
-	}
-
-	if (KCONFIG_NOT_MODULE(CONFIG_FOO)) {
-		// this should be true only if this is not a module
-	}
-
-
-
-	if (KCONFIG_MODULE(CONFIG_FOO)) {
-		// this should only be true for the module case
-	}
-
-}
-
-Using the above even the naive reader is aware this is a kconfig generate
-symbol.
-Using "KCONFIG" in the name gives a stong hint that this is a kconfig thing.
-
-We could stuff it all into a kconfig.h header like the attached (not tested)
-but based on Arnauds sketch above - so creadits goes to him.
-
-	Sam
-
-diff --git a/include/linux/kconfig.h b/include/linux/kconfig.h
-new file mode 100644
-index 0000000..3ccdd73
---- /dev/null
-+++ b/include/linux/kconfig.h
-@@ -0,0 +1,30 @@
-+#ifndef _LINUX_KCONFIG_H
-+#define _LINUX_KCONFIG_H
-+
-+/*
-+ * Helper macros for dealing with kconfig symbols
-+ */
-+
-+#include <linux/compiler.h>
-+
-+#define __symbol_value(sym)       __ ## x
-+#define __symbol_module(sym)      __symbol_value(__ ## sym ## _MODULE)
-+
-+/* return 1 if x is defined and not a module */
-+#define KCONFIG_NON_MODULE(sym)					\
-+	({ int __1 __maybe_unused = 1;				\
-+	   int __ ## sym __maybe_unused = 0;			\
-+	   __symbol_value(sym); })
-+
-+/* return 1 if sym is a module symbol */
-+#define KCONFIG_MODULE(sym)					\
-+	({ int __1 __maybe_unused = 1;				\
-+	   int __ ## sym ## _MODULE __maybe_unused = 0;	\
-+	   __symbol_value(sym); })
-+
-+/* return 1 if sym is defined - module or not */
-+#define KCONFIG(sym) (KCONFIG_NON_MODULE(sym) || KCONFIG_MODULE(sym))
-+
-+#undef __symbol_value
-+#undef __symbol_module
-+#endif
+RnJvbSBkNmU3Y2FmMTk3YzEwYjQ0OGRhODczYzI3Y2Y1ZWY4OWY5YmNmNGIyIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBBcm5hdWQgTGFjb21iZSA8bGFjb21iYXJAZ21haWwuY29tPgpE
+YXRlOiBXZWQsIDEzIEp1bCAyMDExIDIyOjI5OjI0IC0wNDAwClN1YmplY3Q6IFtQQVRDSF0gZml4
+CgotLS0KIHNjcmlwdHMva2NvbmZpZy9NYWtlZmlsZSAgICAgICB8ICAgIDQgKysrLQogc2NyaXB0
+cy9rY29uZmlnL2xvY2FsY29uZmlnLnNoIHwgICAgMiArKwogMiBmaWxlcyBjaGFuZ2VkLCA1IGlu
+c2VydGlvbnMoKyksIDEgZGVsZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvc2NyaXB0cy9rY29uZmln
+L01ha2VmaWxlIGIvc2NyaXB0cy9rY29uZmlnL01ha2VmaWxlCmluZGV4IGQ0OGRkYzkuLjFiZjQz
+NzUgMTAwNjQ0Ci0tLSBhL3NjcmlwdHMva2NvbmZpZy9NYWtlZmlsZQorKysgYi9zY3JpcHRzL2tj
+b25maWcvTWFrZWZpbGUKQEAgLTExLDYgKzExLDggQEAgZWxzZQogS2NvbmZpZyA6PSBLY29uZmln
+CiBlbmRpZgogCitleHBvcnQgS2NvbmZpZworCiB4Y29uZmlnOiAkKG9iaikvcWNvbmYKIAkkPCAk
+KEtjb25maWcpCiAKQEAgLTM0LDcgKzM2LDcgQEAgc2lsZW50b2xkY29uZmlnOiAkKG9iaikvY29u
+ZgogCSQ8IC0tJEAgJChLY29uZmlnKQogCiBsb2NhbHllc2NvbmZpZyBsb2NhbG1vZGNvbmZpZzog
+JChvYmopL3N0cmVhbWxpbmVfY29uZmlnLnBsICQob2JqKS9jb25mCi0JJChRKSQoc3JjKS9sb2Nh
+bGNvbmZpZy5zaAorCSQoUSkkKHNyY3RyZWUpLyQoc3JjKS9sb2NhbGNvbmZpZy5zaAogCiAjIENy
+ZWF0ZSBuZXcgbGludXgucG90IGZpbGUKICMgQWRqdXN0IGNoYXJzZXQgdG8gVVRGLTggaW4gLnBv
+IGZpbGUgdG8gYWNjZXB0IFVURi04IGluIEtjb25maWcgZmlsZXMKZGlmZiAtLWdpdCBhL3Njcmlw
+dHMva2NvbmZpZy9sb2NhbGNvbmZpZy5zaCBiL3NjcmlwdHMva2NvbmZpZy9sb2NhbGNvbmZpZy5z
+aAppbmRleCA2NGRkMjk1Li5mODE4NWZiIDEwMDc1NQotLS0gYS9zY3JpcHRzL2tjb25maWcvbG9j
+YWxjb25maWcuc2gKKysrIGIvc2NyaXB0cy9rY29uZmlnL2xvY2FsY29uZmlnLnNoCkBAIC0xLDYg
+KzEsOCBAQAogIyEvYmluL3NoCiAjCiAKK3NldCAtZQorCiBta2RpciAtcCBpbmNsdWRlL2dlbmVy
+YXRlZAogCiBwZXJsICIke3NyY3RyZWV9L3NjcmlwdHMva2NvbmZpZy9zdHJlYW1saW5lX2NvbmZp
+Zy5wbCIgJHtzcmN0cmVlfS8gJHtLY29uZmlnfSAkMSA+IC50bXAuY29uZmlnCi0tIAoxLjcuMy40
+LjU3NC5nNjA4Yi5kaXJ0eQoK
+--bcaec544eeec3a8c5004a7fe7916--
