@@ -1,100 +1,143 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from casper.infradead.org ([85.118.1.10]:58492 "EHLO
-	casper.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932456Ab1GNXUn (ORCPT
+Received: from mail-pv0-f174.google.com ([74.125.83.174]:45384 "EHLO
+	mail-pv0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932579Ab1GNXcN convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 14 Jul 2011 19:20:43 -0400
-Message-ID: <4E1F79C5.9080301@infradead.org>
-Date: Thu, 14 Jul 2011 20:20:37 -0300
-From: Mauro Carvalho Chehab <mchehab@infradead.org>
+	Thu, 14 Jul 2011 19:32:13 -0400
+Received: by pvg12 with SMTP id 12so612912pvg.19
+        for <linux-kbuild@vger.kernel.org>; Thu, 14 Jul 2011 16:32:13 -0700 (PDT)
 MIME-Version: 1.0
-Subject: Re: [PATCH] kconfig: fix missing "0x" prefix from S_HEX symbol in
- autoconf.h
-References: <1310671867-5107-1-git-send-email-lacombar@gmail.com>
-In-Reply-To: <1310671867-5107-1-git-send-email-lacombar@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <4E1F3296.5060000@infradead.org>
+References: <20110713151724.3b16ce77.rdunlap@xenotime.net>
+	<1310664362-28100-1-git-send-email-lacombar@gmail.com>
+	<4E1F3296.5060000@infradead.org>
+Date: Thu, 14 Jul 2011 19:32:13 -0400
+Message-ID: <CACqU3MXp+1WX52sWVz4iey88=PGiFL3bLbQnSOJXBzsneOu6yg@mail.gmail.com>
+Subject: Re: [PATCH] media/Kconfig: fix hexadecimal prefix for `hex' symbols
+From: Arnaud Lacombe <lacombar@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnaud Lacombe <lacombar@gmail.com>
-Cc: linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Randy Dunlap <rdunlap@xenotime.net>
+To: Mauro Carvalho Chehab <mchehab@infradead.org>
+Cc: linux-kbuild@vger.kernel.org, Randy Dunlap <rdunlap@xenotime.net>
 
-Em 14-07-2011 16:31, Arnaud Lacombe escreveu:
-> The specialized printer for headers (espectially autoconf.h) is missing fixup
-> code for S_HEX symbol's "0x" prefix. As long as kconfig does not warn for such
-> missing prefix, this code is needed. Fix this.
-> 
-> In the same time, fix some nits in `header_print_symbol()'.
-> 
-> Cc: Randy Dunlap <rdunlap@xenotime.net>
-> Cc: Mauro Carvalho Chehab <mchehab@infradead.org>
-> 
-> Broken-by: Arnaud Lacombe <lacombar@gmail.com>
-> (Somehow-)Reported-by: Randy Dunlap <rdunlap@xenotime.net>
-> Reported-by: Mauro Carvalho Chehab <mchehab@infradead.org>
-> Signed-off-by: Arnaud Lacombe <lacombar@gmail.com>
+Hi,
 
-Patch looks good for me.
+On Thu, Jul 14, 2011 at 2:16 PM, Mauro Carvalho Chehab
+<mchehab@infradead.org> wrote:
+> Em 14-07-2011 14:26, Arnaud Lacombe escreveu:
+>> Cc: Mauro Carvalho Chehab <mchehab@infradead.org>
+>> Cc: Randy Dunlap <rdunlap@xenotime.net>
+>> Signed-off-by: Arnaud Lacombe <lacombar@gmail.com>
+>
+> Arnaud,
+>
+> The patch is ok for me. You can add my acked-by, if you want.
+>
+don't you want to take in though the media/video tree for -next ?
 
-Feel free to add my ack, if you want.
+ - Arnaud
 
-Acked-by: Mauro Carvalho Chehab <mchehab@redhat.com>
-> 
-> ---
->  scripts/kconfig/confdata.c |   26 +++++++++++++++++++++-----
->  1 files changed, 21 insertions(+), 5 deletions(-)
-> 
-> diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
-> index be6952c..df629ec 100644
-> --- a/scripts/kconfig/confdata.c
-> +++ b/scripts/kconfig/confdata.c
-> @@ -487,27 +487,43 @@ static struct conf_printer kconfig_printer_cb =
->  static void
->  header_print_symbol(FILE *fp, struct symbol *sym, const char *value, void *arg)
->  {
-> -	const char *suffix = "";
->  
->  	switch (sym->type) {
->  	case S_BOOLEAN:
-> -	case S_TRISTATE:
-> +	case S_TRISTATE: {
-> +		const char *suffix = "";
-> +
->  		switch (*value) {
->  		case 'n':
->  			return;
->  		case 'm':
->  			suffix = "_MODULE";
-> -			/* FALLTHROUGH */
-> +			/* fall through */
->  		default:
->  			value = "1";
->  		}
-> +		fprintf(fp, "#define %s%s%s %s\n",
-> +		    CONFIG_, sym->name, suffix, value);
-> +		break;
-> +	}
-> +	case S_HEX: {
-> +		const char *prefix = "";
-> +
-> +		if (value[0] != '0' || (value[1] != 'x' && value[1] != 'X'))
-> +			prefix = "0x";
-> +		fprintf(fp, "#define %s%s %s%s\n",
-> +		    CONFIG_, sym->name, prefix, value);
-> +		break;
-> +	}
-> +	case S_STRING:
-> +	case S_INT:
-> +		fprintf(fp, "#define %s%s %s\n",
-> +		    CONFIG_, sym->name, value);
->  		break;
->  	default:
->  		break;
->  	}
->  
-> -	fprintf(fp, "#define %s%s%s %s\n",
-> -	    CONFIG_, sym->name, suffix, value);
->  }
->  
->  static void
-
+> However, with 3.0-rc7, this patch and/or Kconfig fixes don't seem to
+> be needed. Basically, include/generated/autoconf.h has "0x" on it:
+>
+> $ grep CONFIG_RADIO_RTRACK_PORT */*/*
+> include/config/auto.conf:CONFIG_RADIO_RTRACK_PORT=20f
+> include/generated/autoconf.h:#define CONFIG_RADIO_RTRACK_PORT 0x20f
+>
+> Maybe some patch applied at -next from another tree broke that behavior.
+>
+> IMHO, keeping those values without "0x" at Kconfig seems more intuitive
+> for the end-user, as otherwise a value like "200" would be confusing
+> if this means 200d or 200h.
+>
+> Anyway, those drivers are very old, and very few people likely still
+> use those old hardware. So, I'm fine if you either want to preserve
+> the current way or to change it.
+>
+> Cheers,
+> Mauro.
+>
+>> ---
+>>  drivers/media/radio/Kconfig |   16 ++++++++--------
+>>  1 files changed, 8 insertions(+), 8 deletions(-)
+>>
+>> diff --git a/drivers/media/radio/Kconfig b/drivers/media/radio/Kconfig
+>> index e4c97fd..9cab04d 100644
+>> --- a/drivers/media/radio/Kconfig
+>> +++ b/drivers/media/radio/Kconfig
+>> @@ -58,7 +58,7 @@ config RADIO_RTRACK
+>>  config RADIO_RTRACK_PORT
+>>       hex "RadioTrack i/o port (0x20f or 0x30f)"
+>>       depends on RADIO_RTRACK=y
+>> -     default "20f"
+>> +     default "0x20f"
+>>       help
+>>         Enter either 0x30f or 0x20f here.  The card default is 0x30f, if you
+>>         haven't changed the jumper setting on the card.
+>> @@ -81,7 +81,7 @@ config RADIO_RTRACK2
+>>  config RADIO_RTRACK2_PORT
+>>       hex "RadioTrack II i/o port (0x20c or 0x30c)"
+>>       depends on RADIO_RTRACK2=y
+>> -     default "30c"
+>> +     default "0x30c"
+>>       help
+>>         Enter either 0x30c or 0x20c here.  The card default is 0x30c, if you
+>>         haven't changed the jumper setting on the card.
+>> @@ -104,7 +104,7 @@ config RADIO_AZTECH
+>>  config RADIO_AZTECH_PORT
+>>       hex "Aztech/Packard Bell I/O port (0x350 or 0x358)"
+>>       depends on RADIO_AZTECH=y
+>> -     default "350"
+>> +     default "0x350"
+>>       help
+>>         Enter either 0x350 or 0x358 here.  The card default is 0x350, if you
+>>         haven't changed the setting of jumper JP3 on the card.  Removing the
+>> @@ -133,7 +133,7 @@ config RADIO_GEMTEK
+>>  config RADIO_GEMTEK_PORT
+>>       hex "Fixed I/O port (0x20c, 0x30c, 0x24c, 0x34c, 0c24c or 0x28c)"
+>>       depends on RADIO_GEMTEK=y
+>> -     default "34c"
+>> +     default "0x34c"
+>>       help
+>>         Enter either 0x20c, 0x30c, 0x24c or 0x34c here. The card default is
+>>         0x34c, if you haven't changed the jumper setting on the card. On
+>> @@ -237,7 +237,7 @@ config RADIO_TERRATEC
+>>  config RADIO_TERRATEC_PORT
+>>       hex "Terratec i/o port (normally 0x590)"
+>>       depends on RADIO_TERRATEC=y
+>> -     default "590"
+>> +     default "0x590"
+>>       help
+>>         Fill in the I/O port of your TerraTec FM radio card. If unsure, go
+>>         with the default.
+>> @@ -255,7 +255,7 @@ config RADIO_TRUST
+>>  config RADIO_TRUST_PORT
+>>       hex "Trust i/o port (usually 0x350 or 0x358)"
+>>       depends on RADIO_TRUST=y
+>> -     default "350"
+>> +     default "0x350"
+>>       help
+>>         Enter the I/O port of your Trust FM radio card. If unsure, try the
+>>         values "0x350" or "0x358".
+>> @@ -278,7 +278,7 @@ config RADIO_TYPHOON
+>>  config RADIO_TYPHOON_PORT
+>>       hex "Typhoon I/O port (0x316 or 0x336)"
+>>       depends on RADIO_TYPHOON=y
+>> -     default "316"
+>> +     default "0x316"
+>>       help
+>>         Enter the I/O port of your Typhoon or EcoRadio radio card.
+>>
+>> @@ -312,7 +312,7 @@ config RADIO_ZOLTRIX
+>>  config RADIO_ZOLTRIX_PORT
+>>       hex "ZOLTRIX I/O port (0x20c or 0x30c)"
+>>       depends on RADIO_ZOLTRIX=y
+>> -     default "20c"
+>> +     default "0x20c"
+>>       help
+>>         Enter the I/O port of your Zoltrix radio card.
+>>
+>
+>
