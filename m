@@ -1,63 +1,72 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pz0-f46.google.com ([209.85.210.46]:33684 "EHLO
-	mail-pz0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750803Ab1GSQ2x convert rfc822-to-8bit (ORCPT
+Received: from vms173007pub.verizon.net ([206.46.173.7]:46648 "EHLO
+	vms173007pub.verizon.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750980Ab1GTPJA (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 19 Jul 2011 12:28:53 -0400
-MIME-Version: 1.0
-In-Reply-To: <4E258FAE.6040807@suse.cz>
-References: <1309563076-5050-1-git-send-email-lacombar@gmail.com>
-	<1309563076-5050-2-git-send-email-lacombar@gmail.com>
-	<CACqU3MU1kFzn9916A8vq+jB+r=4iDmWp_kk=E+thPuojWwZA6g@mail.gmail.com>
-	<4E258FAE.6040807@suse.cz>
-Date: Tue, 19 Jul 2011 12:28:52 -0400
-Message-ID: <CACqU3MU7BxhZBU1_8Z_bQ2yb4fPHhYrAk2mMPSNSxPMWud=RvA@mail.gmail.com>
-Subject: Re: [RFC 1/4] kbuild: export MAKECMDGOALS
-From: Arnaud Lacombe <lacombar@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 8BIT
+	Wed, 20 Jul 2011 11:09:00 -0400
+Date: Wed, 20 Jul 2011 10:06:37 -0400 (EDT)
+From: Peter Foley <pefoley2@verizon.net>
+Subject: [PATCH V3] kbuild: silence generated makefile message
+In-reply-to: <alpine.LNX.2.00.1107041852390.20463@linux>
+Message-id: <alpine.LNX.2.00.1107201006120.64272@linux>
+References: <alpine.LNX.2.00.1106271619350.24034@linux>
+ <BANLkTimrUYk-8GSsf35mUmLVBAaO84R6dA@mail.gmail.com>
+ <alpine.LNX.2.00.1106271915160.38876@linux>
+ <alpine.LNX.2.00.1106271932480.13060@linux>
+ <20110701134733.GB25895@sepie.suse.cz>
+ <alpine.LNX.2.00.1107041852390.20463@linux>
+MIME-version: 1.0
+Content-type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Steven Rostedt <srostedt@redhat.com>
+To: Peter Foley <pefoley2@verizon.net>
+Cc: Michal Marek <mmarek@suse.cz>, Arnaud Lacombe <lacombar@gmail.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild Mailing List <linux-kbuild@vger.kernel.org>
 
-Hi,
+On Mon, 4 Jul 2011, Peter Foley wrote:
 
-On Tue, Jul 19, 2011 at 10:07 AM, Michal Marek <mmarek@suse.cz> wrote:
-> On 18.7.2011 21:05, Arnaud Lacombe wrote:
->>
->> Hi,
->>
->> On Fri, Jul 1, 2011 at 7:31 PM, Arnaud Lacombe<lacombar@gmail.com>  wrote:
->>>
->>> Cc: Steven Rostedt<srostedt@redhat.com>
->>> ---
->>>  Makefile |    3 +++
->>>  1 files changed, 3 insertions(+), 0 deletions(-)
->>>
->>> diff --git a/Makefile b/Makefile
->>> index afb8e0d..ea517fd 100644
->>> --- a/Makefile
->>> +++ b/Makefile
->>> @@ -22,6 +22,9 @@ LC_COLLATE=C
->>>  LC_NUMERIC=C
->>>  export LC_COLLATE LC_NUMERIC
->>>
->>> +# Export make goals
->>> +export MAKECMDGOALS
->>> +
->>>  # We are using a recursive build, so we need to do a little thinking
->>>  # to get the ordering right.
->>>  #
->>
->> Michal, before I send a new version of this serie, can you tell me
->> your point of view on the export of MAKECMDGOALS (or
->> KBUILD_MAKECMDGOALS) and Kconfig to the environment ?
->
-> A cleaner interface would IMO be to check the target in the makefile and
-> pass a commandline option to streamline_config.pl, so that it's easier to
-> run it manually.
->
-thanks, I'll do the same for $(Kconfig), ie. pass it on the command line.
+> This patch silences the "make -C /usr/src/git O=/usr/src/git/build/." 
+> message shown when using the generated makefile in KBUILD_OUTDIR.
+> 
+> Signed-off-by: Peter Foley <pefoley2@verizon.net>
+> ---
+> V2: Show message when V=1
+> V3: Check if V=1 comes from the commandline
+> 
+>  scripts/mkmakefile |    9 ++++++++-
+>  1 files changed, 8 insertions(+), 1 deletions(-)
+> 
+> diff --git a/scripts/mkmakefile b/scripts/mkmakefile
+> index 5325423..0cc0442 100644
+> --- a/scripts/mkmakefile
+> +++ b/scripts/mkmakefile
+> @@ -30,6 +30,13 @@ PATCHLEVEL = $4
+>  lastword = \$(word \$(words \$(1)),\$(1))
+>  makedir := \$(dir \$(call lastword,\$(MAKEFILE_LIST)))
+>  
+> +ifeq ("\$(origin V)", "command line")
+> +VERBOSE := \$(V)
+> +endif
+> +ifneq (\$(VERBOSE),1)
+> +Q := @
+> +endif
+> +
+>  MAKEARGS := -C $1
+>  MAKEARGS += O=\$(if \$(patsubst /%,,\$(makedir)),\$(CURDIR)/)\$(patsubst
+> %/,%,\$(makedir))
+>  
+> @@ -40,7 +47,7 @@ MAKEFLAGS += --no-print-directory
+>  all	:= \$(filter-out all Makefile,\$(MAKECMDGOALS))
+>  
+>  all:
+> -	\$(MAKE) \$(MAKEARGS) \$(all)
+> +	\$(Q)\$(MAKE) \$(MAKEARGS) \$(all)
+>  
+>  Makefile:;
+>  
+> -- 
+> 1.7.6
+> 
+> 
+> 
 
- - Arnaud
+Ping?
