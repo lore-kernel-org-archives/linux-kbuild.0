@@ -1,34 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-yi0-f46.google.com ([209.85.218.46]:49064 "EHLO
-	mail-yi0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750755Ab1GUFIn convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 21 Jul 2011 01:08:43 -0400
+Received: from ozlabs.org ([203.10.76.45]:59179 "EHLO ozlabs.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752278Ab1GUHiV (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 21 Jul 2011 03:38:21 -0400
+From: Rusty Russell <rusty@rustcorp.com.au>
+Subject: Re: [PATCH] modpost: Fix modpost's license checking V3
+In-Reply-To: <4E26F35E.7020700@suse.cz>
+References: <CACqU3MUXAOMGQ1nzUrtYPEQAC3U-nuq3YurtNJJLS1hft4ROGA@mail.gmail.com> <1310626276-4541-1-git-send-email-abogani@kernel.org> <4E26F35E.7020700@suse.cz>
+Date: Thu, 21 Jul 2011 16:16:51 +0930
+Message-ID: <87ei1k2kro.fsf@rustcorp.com.au>
 MIME-Version: 1.0
-In-Reply-To: <CACqU3MVjnD4pqfOuq-wgoLdpFdTK_rdfd2WZTZU_7WCJL+1Tvg@mail.gmail.com>
-References: <1310282853-14550-1-git-send-email-lacombar@gmail.com>
-	<CACqU3MVjnD4pqfOuq-wgoLdpFdTK_rdfd2WZTZU_7WCJL+1Tvg@mail.gmail.com>
-Date: Thu, 21 Jul 2011 13:08:42 +0800
-Message-ID: <CAM_iQpV2Y2bNJRvi0i_pfuHQDK6E92+ADzmwQgkc=+bifCL-OA@mail.gmail.com>
-Subject: Re: [PATCH] kconfig/nconf: remove useless conditionnal
-From: =?UTF-8?Q?Am=C3=A9rico_Wang?= <xiyou.wangcong@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset=us-ascii
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnaud Lacombe <lacombar@gmail.com>
-Cc: linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>, linux-kernel@vger.kernel.org, Nir Tzachar <nir.tzachar@gmail.com>
+To: Michal Marek <mmarek@suse.cz>
+Cc: Alessio Igor Bogani <abogani@kernel.org>, Jan Beulich <jbeulich@novell.com>, Kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Tim Bird <tim.bird@am.sony.com>, Anders Kaseorg <andersk@ksplice.com>, Arnaud Lacombe <lacombar@gmail.com>
 
-On Tue, Jul 19, 2011 at 2:11 AM, Arnaud Lacombe <lacombar@gmail.com> wrote:
-> Hi,
->
-> On Sun, Jul 10, 2011 at 3:27 AM, Arnaud Lacombe <lacombar@gmail.com> wrote:
->> After the test
->>
->>        if (!submenu || ...)
->>                continue;
->>
->> the variable `submenu' can _not_ be NULL, so do not test for this situation.
->>
+On Wed, 20 Jul 2011 17:25:18 +0200, Michal Marek <mmarek@suse.cz> wrote:
+> On 14.7.2011 08:51, Alessio Igor Bogani wrote:
+> > The commit f02e8a6 sorts symbols placing each of them in its own elf section.
+> > The sorting and merging into the canonical sections are done by the linker.
+> > Unfortunately modpost to generate Module.symvers file parses vmlinux
+> > (already linked) and all modules object files (which aren't linked yet).
+> > These aren't sanitized by the linker yet. That breaks modpost that can't
+> > detect license properly for modules. This patch makes modpost aware of
+> > the new exported symbols structure.
+> >
+> > Thanks to Arnaud Lacombe<lacombar@gmail.com>  and Anders Kaseorg
+> > <andersk@ksplice.com>  for providing useful suggestions about code.
+> >
+> > This work was supported by a hardware donation from the CE Linux Forum.
+> >
+> > Reported-by: Jan Beulich<jbeulich@novell.com>
+> > Signed-off-by: Alessio Igor Bogani<abogani@kernel.org>
+> > ---
+> >   scripts/mod/modpost.c |   29 ++++++++++++++++++++++++++++-
+> >   1 files changed, 28 insertions(+), 1 deletions(-)
+> 
+> Rusty, will you take this patch or should I apply it to kbuild-2.6.git?
 
-Yeah, looks good.
+I took it.
+
+Thanks,
+Rusty.
