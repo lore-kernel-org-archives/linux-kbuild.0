@@ -1,385 +1,120 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from flawless.hostnac.com ([67.23.244.186]:44341 "EHLO
-	flawless.hostnac.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752179Ab1GXLRn (ORCPT
+Received: from mail-pz0-f42.google.com ([209.85.210.42]:37788 "EHLO
+	mail-pz0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752200Ab1GXViz convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 24 Jul 2011 07:17:43 -0400
-From: =?UTF-8?q?Rados=C5=82aw=20Smogura?= <mail@smogura.eu>
-Subject: [PATCH 2/2] This patch gives ability for add some "-fno-..." options for GCC and to force -O1 optimization. Supporting files, like Kconfig, Makefile are auto-generated due to large amount of available options.
-Date: Sun, 24 Jul 2011 13:17:30 +0200
-Message-Id: <1311506250-20470-2-git-send-email-mail@smogura.eu>
-In-Reply-To: <20110723102335.7792b7c1.rdunlap@xenotime.net>
-References: <20110723102335.7792b7c1.rdunlap@xenotime.net>
+	Sun, 24 Jul 2011 17:38:55 -0400
+Received: by pzk37 with SMTP id 37so7290795pzk.1
+        for <linux-kbuild@vger.kernel.org>; Sun, 24 Jul 2011 14:38:54 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <1310664362-28100-1-git-send-email-lacombar@gmail.com>
+References: <20110713151724.3b16ce77.rdunlap@xenotime.net>
+	<1310664362-28100-1-git-send-email-lacombar@gmail.com>
+Date: Sun, 24 Jul 2011 17:38:54 -0400
+Message-ID: <CACqU3MV+27BjG0if0izStLLT4_yyfoYVsHAXuL6ucjpvZDdspg@mail.gmail.com>
+Subject: Re: [PATCH] media/Kconfig: fix hexadecimal prefix for `hex' symbols
+From: Arnaud Lacombe <lacombar@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Randy Dunlap <rdunlap@xenotime.net>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
+Cc: Arnaud Lacombe <lacombar@gmail.com>, Mauro Carvalho Chehab <mchehab@infradead.org>, Randy Dunlap <rdunlap@xenotime.net>
 
-Patch helps to debug kernel.
+Hi Mauro,
 
-Fixed some language mistakes and added few -f-no-... options.
+On Thu, Jul 14, 2011 at 1:26 PM, Arnaud Lacombe <lacombar@gmail.com> wrote:
+> Cc: Mauro Carvalho Chehab <mchehab@infradead.org>
+> Cc: Randy Dunlap <rdunlap@xenotime.net>
+> Signed-off-by: Arnaud Lacombe <lacombar@gmail.com>
+>
+AFAICS, as of -next-20110722, you never grabbed that patch, any
+specific reason ?
 
-Signed-off-by: Rados≈Çaw Smogura <mail@smogura.eu>
----
- lib/Kconfig.debug.optim            |  156 +++++++++++++++++++++++++++--------
- scripts/Makefile.optim.inc         |   24 ++++++
- scripts/debug/make_config_optim.sh |   66 ++++++++--------
- 3 files changed, 178 insertions(+), 68 deletions(-)
+Thanks,
+ - Arnaud
 
-diff --git a/lib/Kconfig.debug.optim b/lib/Kconfig.debug.optim
-index 09b1012..99dcde0 100644
---- a/lib/Kconfig.debug.optim
-+++ b/lib/Kconfig.debug.optim
-@@ -2,100 +2,184 @@
- # Distributed under GPL v2 License
- 
- menuconfig HACK_OPTIM
--	bool "Allows to override GCC optimization"
-+	bool "Allows overriding GCC optimizations"
- 	depends on DEBUG_KERNEL && EXPERIMENTAL
- 	help
- 	  If you say Y here you will be able to override
--	  how GCC optimize kernel code. This will create
--	  more debug friendly, but with not guarentee
--	  about same runi, like production, kernel.
-+	  how GCC optimizes kernel code. This creates
-+	  more debug-friendly code, but does not guarantee
-+	  the same running code like a production kernel.
- 
--	  If you say Y here probably You will want say
--	  for all suboptions
-+	  If you say Y here probably you will want to say
-+	  Y for all suboptions
- 
- if HACK_OPTIM
- 
- config HACK_OPTIM_FORCE_O1_LEVEL
- 	bool "Forces -O1 optimization level"
- 	---help---
--	  This will change how GCC optimize code. Code
-+	  This changes how GCC optimizes code. Code
- 	  may be slower and larger but will be more debug
- 	  "friendly".
- 
--	  In some cases there is low chance that kernel
--	  will run different then normal, reporting or not
--	  some bugs or errors. Refere to GCC manual for
--	  more details.
-+	  In some cases there is a low chance that the kernel
-+	  will run differently than normal, reporting or not
-+	  reporting some bugs or errors.
-+	  Refer to GCC manual for more details.
- 
- 	  You SHOULD say N here.
- 
- config HACK_OPTIM__fno_inline_functions_called_once
- 	bool "Adds -fno-inline-functions-called-once parameter to gcc invoke line."
- 	---help---
--	  This will change how GCC optimize code. Code
-+	  This changes how GCC optimizes code. Code
- 	  may be slower and larger but will be more debug
- 	  "friendly".
- 
--	  In some cases there is low chance that kernel
--	  will run different then normal, reporting or not
--	  some bugs or errors. Refere to GCC manual for
--	  more details.
-+	  In some cases there is a low chance that the kernel
-+	  will run differently than normal, reporting or not
-+	  reporting some bugs or errors.
-+	  Refer to GCC manual for more details.
- 
- 	  You SHOULD say N here.
- 
- config HACK_OPTIM__fno_combine_stack_adjustments
- 	bool "Adds -fno-combine-stack-adjustments parameter to gcc invoke line."
- 	---help---
--	  This will change how GCC optimize code. Code
-+	  This changes how GCC optimizes code. Code
- 	  may be slower and larger but will be more debug
- 	  "friendly".
- 
--	  In some cases there is low chance that kernel
--	  will run different then normal, reporting or not
--	  some bugs or errors. Refere to GCC manual for
--	  more details.
-+	  In some cases there is a low chance that the kernel
-+	  will run differently than normal, reporting or not
-+	  reporting some bugs or errors.
-+	  Refer to GCC manual for more details.
- 
- 	  You SHOULD say N here.
- 
- config HACK_OPTIM__fno_tree_dce
- 	bool "Adds -fno-tree-dce parameter to gcc invoke line."
- 	---help---
--	  This will change how GCC optimize code. Code
-+	  This changes how GCC optimizes code. Code
- 	  may be slower and larger but will be more debug
- 	  "friendly".
- 
--	  In some cases there is low chance that kernel
--	  will run different then normal, reporting or not
--	  some bugs or errors. Refere to GCC manual for
--	  more details.
-+	  In some cases there is a low chance that the kernel
-+	  will run differently than normal, reporting or not
-+	  reporting some bugs or errors.
-+	  Refer to GCC manual for more details.
- 
- 	  You SHOULD say N here.
- 
- config HACK_OPTIM__fno_tree_dominator_opts
- 	bool "Adds -fno-tree-dominator-opts parameter to gcc invoke line."
- 	---help---
--	  This will change how GCC optimize code. Code
-+	  This changes how GCC optimizes code. Code
- 	  may be slower and larger but will be more debug
- 	  "friendly".
- 
--	  In some cases there is low chance that kernel
--	  will run different then normal, reporting or not
--	  some bugs or errors. Refere to GCC manual for
--	  more details.
-+	  In some cases there is a low chance that the kernel
-+	  will run differently than normal, reporting or not
-+	  reporting some bugs or errors.
-+	  Refer to GCC manual for more details.
- 
- 	  You SHOULD say N here.
- 
- config HACK_OPTIM__fno_dse
- 	bool "Adds -fno-dse parameter to gcc invoke line."
- 	---help---
--	  This will change how GCC optimize code. Code
-+	  This changes how GCC optimizes code. Code
- 	  may be slower and larger but will be more debug
- 	  "friendly".
- 
--	  In some cases there is low chance that kernel
--	  will run different then normal, reporting or not
--	  some bugs or errors. Refere to GCC manual for
--	  more details.
-+	  In some cases there is a low chance that the kernel
-+	  will run differently than normal, reporting or not
-+	  reporting some bugs or errors.
-+	  Refer to GCC manual for more details.
-+
-+	  You SHOULD say N here.
-+
-+config HACK_OPTIM__fno_dce
-+	bool "Adds -fno-dce parameter to gcc invoke line."
-+	---help---
-+	  This changes how GCC optimizes code. Code
-+	  may be slower and larger but will be more debug
-+	  "friendly".
-+
-+	  In some cases there is a low chance that the kernel
-+	  will run differently than normal, reporting or not
-+	  reporting some bugs or errors.
-+	  Refer to GCC manual for more details.
-+
-+	  You SHOULD say N here.
-+
-+config HACK_OPTIM__fno_auto_inc_dec
-+	bool "Adds -fno-auto-inc-dec parameter to gcc invoke line."
-+	---help---
-+	  This changes how GCC optimizes code. Code
-+	  may be slower and larger but will be more debug
-+	  "friendly".
-+
-+	  In some cases there is a low chance that the kernel
-+	  will run differently than normal, reporting or not
-+	  reporting some bugs or errors.
-+	  Refer to GCC manual for more details.
-+
-+	  You SHOULD say N here.
-+
-+config HACK_OPTIM__fno_inline_small_functions
-+	bool "Adds -fno-inline-small-functions parameter to gcc invoke line."
-+	---help---
-+	  This changes how GCC optimizes code. Code
-+	  may be slower and larger but will be more debug
-+	  "friendly".
-+
-+	  In some cases there is a low chance that the kernel
-+	  will run differently than normal, reporting or not
-+	  reporting some bugs or errors.
-+	  Refer to GCC manual for more details.
-+
-+	  You SHOULD say N here.
-+
-+config HACK_OPTIM__fno_if_conversion
-+	bool "Adds -fno-if-conversion parameter to gcc invoke line."
-+	---help---
-+	  This changes how GCC optimizes code. Code
-+	  may be slower and larger but will be more debug
-+	  "friendly".
-+
-+	  In some cases there is a low chance that the kernel
-+	  will run differently than normal, reporting or not
-+	  reporting some bugs or errors.
-+	  Refer to GCC manual for more details.
-+
-+	  You SHOULD say N here.
-+
-+config HACK_OPTIM__fno_if_conversion2
-+	bool "Adds -fno-if-conversion2 parameter to gcc invoke line."
-+	---help---
-+	  This changes how GCC optimizes code. Code
-+	  may be slower and larger but will be more debug
-+	  "friendly".
-+
-+	  In some cases there is a low chance that the kernel
-+	  will run differently than normal, reporting or not
-+	  reporting some bugs or errors.
-+	  Refer to GCC manual for more details.
-+
-+	  You SHOULD say N here.
-+
-+config HACK_OPTIM__fno_tree_fre
-+	bool "Adds -fno-tree-fre parameter to gcc invoke line."
-+	---help---
-+	  This changes how GCC optimizes code. Code
-+	  may be slower and larger but will be more debug
-+	  "friendly".
-+
-+	  In some cases there is a low chance that the kernel
-+	  will run differently than normal, reporting or not
-+	  reporting some bugs or errors.
-+	  Refer to GCC manual for more details.
- 
- 	  You SHOULD say N here.
- 
-diff --git a/scripts/Makefile.optim.inc b/scripts/Makefile.optim.inc
-index e78cc92..1bd219d 100644
---- a/scripts/Makefile.optim.inc
-+++ b/scripts/Makefile.optim.inc
-@@ -21,3 +21,27 @@ ifdef CONFIG_HACK_OPTIM__fno_dse
- 	KBUILD_CFLAGS += -fno-dse
- endif
- 
-+ifdef CONFIG_HACK_OPTIM__fno_dce
-+	KBUILD_CFLAGS += -fno-dce
-+endif
-+
-+ifdef CONFIG_HACK_OPTIM__fno_auto_inc_dec
-+	KBUILD_CFLAGS += -fno-auto-inc-dec
-+endif
-+
-+ifdef CONFIG_HACK_OPTIM__fno_inline_small_functions
-+	KBUILD_CFLAGS += -fno-inline-small-functions
-+endif
-+
-+ifdef CONFIG_HACK_OPTIM__fno_if_conversion
-+	KBUILD_CFLAGS += -fno-if-conversion
-+endif
-+
-+ifdef CONFIG_HACK_OPTIM__fno_if_conversion2
-+	KBUILD_CFLAGS += -fno-if-conversion2
-+endif
-+
-+ifdef CONFIG_HACK_OPTIM__fno_tree_fre
-+	KBUILD_CFLAGS += -fno-tree-fre
-+endif
-+
-diff --git a/scripts/debug/make_config_optim.sh b/scripts/debug/make_config_optim.sh
-index 26865923..4db8419 100644
---- a/scripts/debug/make_config_optim.sh
-+++ b/scripts/debug/make_config_optim.sh
-@@ -16,22 +16,42 @@ OPTIMIZATIONS_PARAMS="-fno-inline-functions-called-once \
-  -fno-combine-stack-adjustments \
-  -fno-tree-dce \
-  -fno-tree-dominator-opts \
-- -fno-dse "
-+ -fno-dse \
-+ -fno-dce \
-+ -fno-auto-inc-dec \
-+ -fno-inline-small-functions \
-+ -fno-if-conversion \
-+ -fno-if-conversion2 \
-+ -fno-tree-fre
-+"
-+
-+function printStandardHelp() {
-+    echo -e "\t  This changes how GCC optimizes code. Code"           >> $KCFG
-+    echo -e "\t  may be slower and larger but will be more debug"     >> $KCFG
-+    echo -e "\t  \"friendly\"."                                       >> $KCFG
-+    echo                                                              >> $KCFG
-+    echo -e "\t  In some cases there is a low chance that the kernel" >> $KCFG
-+    echo -e "\t  will run differently than normal, reporting or not"  >> $KCFG
-+    echo -e "\t  reporting some bugs or errors."                      >> $KCFG
-+    echo -e "\t  Refer to GCC manual for more details."               >> $KCFG
-+    echo                                                              >> $KCFG
-+    echo -e "\t  You SHOULD say N here."                              >> $KCFG
-+}
- 
- echo "# This file was auto generated. It's utility configuration" > $KCFG
- echo "# Distributed under GPL v2 License" >> $KCFG
- echo >> $KCFG
--echo "menuconfig ${CFG_PREFIX}" >> $KCFG
--echo -e "\tbool \"Allows to override GCC optimization\"" >> $KCFG
--echo -e "\tdepends on DEBUG_KERNEL && EXPERIMENTAL" >> $KCFG
--echo -e "\thelp" >> $KCFG
--echo -e "\t  If you say Y here you will be able to override" >> $KCFG
--echo -e "\t  how GCC optimize kernel code. This will create" >> $KCFG
--echo -e "\t  more debug friendly, but with not guarentee"    >> $KCFG
--echo -e "\t  about same runi, like production, kernel."      >> $KCFG
--echo >> $KCFG
--echo -e "\t  If you say Y here probably You will want say"   >> $KCFG
--echo -e "\t  for all suboptions" >> $KCFG
-+echo "menuconfig ${CFG_PREFIX}"                                >> $KCFG
-+echo -e "\tbool \"Allows overriding GCC optimizations\""       >> $KCFG
-+echo -e "\tdepends on DEBUG_KERNEL && EXPERIMENTAL"            >> $KCFG
-+echo -e "\thelp"                                               >> $KCFG
-+echo -e "\t  If you say Y here you will be able to override"   >> $KCFG
-+echo -e "\t  how GCC optimizes kernel code. This creates"      >> $KCFG
-+echo -e "\t  more debug-friendly code, but does not guarantee" >> $KCFG
-+echo -e "\t  the same running code like a production kernel."  >> $KCFG
-+echo                                                           >> $KCFG
-+echo -e "\t  If you say Y here probably you will want to say"  >> $KCFG
-+echo -e "\t  Y for all suboptions"                             >> $KCFG
- echo >> $KCFG
- echo "if ${CFG_PREFIX}" >> $KCFG
- echo >> $KCFG
-@@ -47,16 +67,7 @@ echo >> $MKFI
- echo -e "config ${CFG_PREFIX}_FORCE_O1_LEVEL" >> $KCFG
- echo -e "\tbool \"Forces -O1 optimization level\"" >> $KCFG
- echo -e "\t---help---" >> $KCFG
--echo -e "\t  This will change how GCC optimize code. Code" >> $KCFG
--echo -e "\t  may be slower and larger but will be more debug" >> $KCFG
--echo -e "\t  \"friendly\"." >> $KCFG
--echo >> $KCFG
--echo -e "\t  In some cases there is low chance that kernel" >> $KCFG
--echo -e "\t  will run different then normal, reporting or not" >> $KCFG
--echo -e "\t  some bugs or errors. Refere to GCC manual for" >> $KCFG
--echo -e "\t  more details." >> $KCFG
--echo >> $KCFG
--echo -e "\t  You SHOULD say N here." >> $KCFG
-+printStandardHelp;
- echo >> $KCFG
- 
- for o in $OPTIMIZATIONS_PARAMS ; do
-@@ -67,16 +78,7 @@ for o in $OPTIMIZATIONS_PARAMS ; do
- 	echo -e "config ${cfg_o}" >> $KCFG
- 	echo -e "\tbool \"Adds $o parameter to gcc invoke line.\"" >> $KCFG
- 	echo -e "\t---help---" >> $KCFG
--	echo -e "\t  This will change how GCC optimize code. Code" >> $KCFG
--	echo -e "\t  may be slower and larger but will be more debug" >> $KCFG
--	echo -e "\t  \"friendly\"." >> $KCFG
--	echo >> $KCFG
--	echo -e "\t  In some cases there is low chance that kernel" >> $KCFG
--	echo -e "\t  will run different then normal, reporting or not" >> $KCFG
--	echo -e "\t  some bugs or errors. Refere to GCC manual for" >> $KCFG
--	echo -e "\t  more details." >> $KCFG
--	echo >> $KCFG
--	echo -e "\t  You SHOULD say N here." >> $KCFG
-+	printStandardHelp;
- 	echo >> $KCFG
- 
- 	#Generate Make for include
--- 
-1.7.3.4
-
+> ---
+> †drivers/media/radio/Kconfig | † 16 ++++++++--------
+> †1 files changed, 8 insertions(+), 8 deletions(-)
+>
+> diff --git a/drivers/media/radio/Kconfig b/drivers/media/radio/Kconfig
+> index e4c97fd..9cab04d 100644
+> --- a/drivers/media/radio/Kconfig
+> +++ b/drivers/media/radio/Kconfig
+> @@ -58,7 +58,7 @@ config RADIO_RTRACK
+> †config RADIO_RTRACK_PORT
+> † † † †hex "RadioTrack i/o port (0x20f or 0x30f)"
+> † † † †depends on RADIO_RTRACK=y
+> - † † † default "20f"
+> + † † † default "0x20f"
+> † † † †help
+> † † † † †Enter either 0x30f or 0x20f here. †The card default is 0x30f, if you
+> † † † † †haven't changed the jumper setting on the card.
+> @@ -81,7 +81,7 @@ config RADIO_RTRACK2
+> †config RADIO_RTRACK2_PORT
+> † † † †hex "RadioTrack II i/o port (0x20c or 0x30c)"
+> † † † †depends on RADIO_RTRACK2=y
+> - † † † default "30c"
+> + † † † default "0x30c"
+> † † † †help
+> † † † † †Enter either 0x30c or 0x20c here. †The card default is 0x30c, if you
+> † † † † †haven't changed the jumper setting on the card.
+> @@ -104,7 +104,7 @@ config RADIO_AZTECH
+> †config RADIO_AZTECH_PORT
+> † † † †hex "Aztech/Packard Bell I/O port (0x350 or 0x358)"
+> † † † †depends on RADIO_AZTECH=y
+> - † † † default "350"
+> + † † † default "0x350"
+> † † † †help
+> † † † † †Enter either 0x350 or 0x358 here. †The card default is 0x350, if you
+> † † † † †haven't changed the setting of jumper JP3 on the card. †Removing the
+> @@ -133,7 +133,7 @@ config RADIO_GEMTEK
+> †config RADIO_GEMTEK_PORT
+> † † † †hex "Fixed I/O port (0x20c, 0x30c, 0x24c, 0x34c, 0c24c or 0x28c)"
+> † † † †depends on RADIO_GEMTEK=y
+> - † † † default "34c"
+> + † † † default "0x34c"
+> † † † †help
+> † † † † †Enter either 0x20c, 0x30c, 0x24c or 0x34c here. The card default is
+> † † † † †0x34c, if you haven't changed the jumper setting on the card. On
+> @@ -237,7 +237,7 @@ config RADIO_TERRATEC
+> †config RADIO_TERRATEC_PORT
+> † † † †hex "Terratec i/o port (normally 0x590)"
+> † † † †depends on RADIO_TERRATEC=y
+> - † † † default "590"
+> + † † † default "0x590"
+> † † † †help
+> † † † † †Fill in the I/O port of your TerraTec FM radio card. If unsure, go
+> † † † † †with the default.
+> @@ -255,7 +255,7 @@ config RADIO_TRUST
+> †config RADIO_TRUST_PORT
+> † † † †hex "Trust i/o port (usually 0x350 or 0x358)"
+> † † † †depends on RADIO_TRUST=y
+> - † † † default "350"
+> + † † † default "0x350"
+> † † † †help
+> † † † † †Enter the I/O port of your Trust FM radio card. If unsure, try the
+> † † † † †values "0x350" or "0x358".
+> @@ -278,7 +278,7 @@ config RADIO_TYPHOON
+> †config RADIO_TYPHOON_PORT
+> † † † †hex "Typhoon I/O port (0x316 or 0x336)"
+> † † † †depends on RADIO_TYPHOON=y
+> - † † † default "316"
+> + † † † default "0x316"
+> † † † †help
+> † † † † †Enter the I/O port of your Typhoon or EcoRadio radio card.
+>
+> @@ -312,7 +312,7 @@ config RADIO_ZOLTRIX
+> †config RADIO_ZOLTRIX_PORT
+> † † † †hex "ZOLTRIX I/O port (0x20c or 0x30c)"
+> † † † †depends on RADIO_ZOLTRIX=y
+> - † † † default "20c"
+> + † † † default "0x20c"
+> † † † †help
+> † † † † †Enter the I/O port of your Zoltrix radio card.
+>
+> --
+> 1.7.3.4.574.g608b.dirty
+>
+>
