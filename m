@@ -1,47 +1,183 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:50379 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:53865 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751507Ab1GYVZD (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 25 Jul 2011 17:25:03 -0400
-Message-ID: <4E2DDF23.8050806@suse.cz>
-Date: Mon, 25 Jul 2011 23:24:51 +0200
+	id S1752003Ab1GYW6u (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 25 Jul 2011 18:58:50 -0400
 From: Michal Marek <mmarek@suse.cz>
-MIME-Version: 1.0
-Subject: Re: [PATCH] xconfig: merge code path to conf_write()
-References: <1306260978-29437-1-git-send-email-lacombar@gmail.com>	<20110525131854.GF2276@sepie.suse.cz>	<4E2D7571.8030108@suse.cz> <CACqU3MXmMejkTuUPqWQZH6BSXp6q_B5QuVNZbNjU=3s4sukagg@mail.gmail.com>
-In-Reply-To: <CACqU3MXmMejkTuUPqWQZH6BSXp6q_B5QuVNZbNjU=3s4sukagg@mail.gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+Subject: [RFC][PATCH 1/2] kconfig: Introduce KCONFIG(), KCONFIG_BUILTIN() and KCONFIG_MODULE()
+Date: Tue, 26 Jul 2011 00:58:37 +0200
+Message-Id: <1311634718-32588-1-git-send-email-mmarek@suse.cz>
+In-Reply-To: <4E1D9C25.8080300@suse.cz>
+References: <4E1D9C25.8080300@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnaud Lacombe <lacombar@gmail.com>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Hiromu Yakura <hiromu1996@gmail.com>
+To: linux-kbuild@vger.kernel.org
+Cc: lacombar@gmail.com, sam@ravnborg.org, linux-kernel@vger.kernel.org, plagnioj@jcrosoft.com
 
-On 25.7.2011 17:25, Arnaud Lacombe wrote:
-> Hi Michal,
-> 
-> On Mon, Jul 25, 2011 at 9:53 AM, Michal Marek <mmarek@suse.cz> wrote:
->> On 25.5.2011 15:18, Michal Marek wrote:
->>>
->>> The following patch avoids the data loss if the configuration cannot be
->>> saved.
->>>
->>> Michal
->>>
->>> Subject: [PATCH] xconfig: Abort close if configuration cannot be saved
->>>
->>> Give the user an opportunity to fix the error or save the configuration
->>> under a different path.
->>>
->>> Reported-by: Hiromu Yakura<hiromu1996@gmail.com>
->>> Signed-off-by: Michal Marek<mmarek@suse.cz>
->>
->> I completely forgot about this patch. It's applied now and will be in 3.1.
->>
-> gni ? isn't this issue already fixed by
-> https://patchwork.kernel.org/patch/812862/ which went in v3.0 ??
+Replace the config_is_*() macros with a variant that allows for grepping
+for usage of CONFIG_* options in the code. Usage:
 
-That's the prerequisite. This patch makes sure that xconfig does not
-exit if the save failed.
+  if (KCONFIG(CONFIG_NUMA))
 
-Michal
+or
+
+  #if KCONFIG(CONFIG_NUMA)
+
+The KCONFIG() macro evaluates to 1 if the argument is set (to either 'y'
+or 'm'), KCONFIG_BUILTIN() and KCONFIG_MODULE() test if the respective
+option is 'y' and 'm', respectively.
+
+Signed-off-by: Michal Marek <mmarek@suse.cz>
+---
+ Makefile                   |    2 +-
+ include/linux/kconfig.h    |   24 +++++++++++++++
+ scripts/kconfig/confdata.c |   70 ++++++++-----------------------------------
+ 3 files changed, 38 insertions(+), 58 deletions(-)
+ create mode 100644 include/linux/kconfig.h
+
+diff --git a/Makefile b/Makefile
+index afb8e0d..bd7629b 100644
+--- a/Makefile
++++ b/Makefile
+@@ -360,7 +360,7 @@ CFLAGS_GCOV	= -fprofile-arcs -ftest-coverage
+ LINUXINCLUDE    := -I$(srctree)/arch/$(hdr-arch)/include \
+                    -Iarch/$(hdr-arch)/include/generated -Iinclude \
+                    $(if $(KBUILD_SRC), -I$(srctree)/include) \
+-                   -include include/generated/autoconf.h
++                   -include $(srctree)/include/linux/kconfig.h
+ 
+ KBUILD_CPPFLAGS := -D__KERNEL__
+ 
+diff --git a/include/linux/kconfig.h b/include/linux/kconfig.h
+new file mode 100644
+index 0000000..fe80348
+--- /dev/null
++++ b/include/linux/kconfig.h
+@@ -0,0 +1,24 @@
++#ifndef __LINUX_KCONFIG_H
++#define __LINUX_KCONFIG_H
++
++#include <generated/autoconf.h>
++
++/*
++ * Evaluates to 1 if CONFIG_option is set to 'y', 0 otherwise
++ */
++#define KCONFIG_BUILTIN(option) __enabled_ ## option
++
++/*
++ * Evaluates to 1 if CONFIG_option is set to 'm', 0 otherwise
++ */
++#define KCONFIG_MODULE(option) __enabled_ ## option ## _MODULE
++
++/*
++ * Evaluates to 1 if CONFIG_option is set to 'y' or 'm', 0 otherwise
++ *
++ */
++#define KCONFIG(option) \
++	(__enabled_ ## option || __enabled_ ## option ## _MODULE)
++
++
++#endif /* __LINUX_KCONFIG_H */
+diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
+index df629ec..3bab40a 100644
+--- a/scripts/kconfig/confdata.c
++++ b/scripts/kconfig/confdata.c
+@@ -495,15 +495,24 @@ header_print_symbol(FILE *fp, struct symbol *sym, const char *value, void *arg)
+ 
+ 		switch (*value) {
+ 		case 'n':
+-			return;
++			break;
+ 		case 'm':
+ 			suffix = "_MODULE";
+ 			/* fall through */
+ 		default:
+-			value = "1";
++			fprintf(fp, "#define %s%s%s 1\n",
++			    CONFIG_, sym->name, suffix);
+ 		}
+-		fprintf(fp, "#define %s%s%s %s\n",
+-		    CONFIG_, sym->name, suffix, value);
++		/*
++		 * Generate the __enabled_CONFIG_* and
++		 * __enabled_CONFIG_*_MODULE macros for use by the KCONFIG*()
++		 * macros. The _MODULE variant is generated even for booleans
++		 * so that the KCONFIG() macro works.
++		 */
++		fprintf(fp, "#define __enabled_" CONFIG_ "%s %d\n",
++				sym->name, (*value == 'y'));
++		fprintf(fp, "#define __enabled_" CONFIG_ "%s_MODULE %d\n",
++				sym->name, (*value == 'm'));
+ 		break;
+ 	}
+ 	case S_HEX: {
+@@ -555,58 +564,6 @@ static struct conf_printer header_printer_cb =
+ };
+ 
+ /*
+- * Function-style header printer
+- *
+- * This printer is used to generate the config_is_xxx() function-style macros
+- * in `include/generated/autoconf.h' 
+- */
+-static void
+-header_function_print_symbol(FILE *fp, struct symbol *sym, const char *value, void *arg)
+-{
+-	int val = 0;
+-	char c;
+-	char *tmp, *d;
+-
+-	switch (sym->type) {
+-	case S_BOOLEAN:
+-	case S_TRISTATE:
+-		break;
+-	default:
+-		return;
+-	}
+-	if (*value == 'm')
+-		val = 2;
+-	else if (*value == 'y')
+-		val = 1;
+-
+-	d = strdup(CONFIG_);
+-	tmp = d;
+-	while ((c = *d)) {
+-		*d = tolower(c);
+-		d++;
+-	}
+-
+-	fprintf(fp, "#define %sis_", tmp);
+-	free(tmp);
+-
+-	d = strdup(sym->name);
+-	tmp = d;
+-	while ((c = *d)) {
+-		*d = tolower(c);
+-		d++;
+-	}
+-	fprintf(fp, "%s%s() %d\n", tmp, (val > 1) ? "_module" : "",
+-		      val ? 1 : 0);
+-	free(tmp);
+-}
+-
+-static struct conf_printer header_function_printer_cb =
+-{
+-	.print_symbol = header_function_print_symbol,
+-};
+-
+-
+-/*
+  * Tristate printer
+  *
+  * This printer is used when generating the `include/config/tristate.conf' file.
+@@ -997,7 +954,6 @@ int conf_write_autoconf(void)
+ 		conf_write_symbol(tristate, sym, &tristate_printer_cb, (void *)1);
+ 
+ 		conf_write_symbol(out_h, sym, &header_printer_cb, NULL);
+-		conf_write_symbol(out_h, sym, &header_function_printer_cb, NULL);
+ 	}
+ 	fclose(out);
+ 	fclose(tristate);
+-- 
+1.7.6
+
