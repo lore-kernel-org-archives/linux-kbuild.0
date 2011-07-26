@@ -1,63 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from oproxy1-pub.bluehost.com ([66.147.249.253]:59096 "HELO
-	oproxy1-pub.bluehost.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with SMTP id S1751877Ab1GZPEq convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 26 Jul 2011 11:04:46 -0400
-Date: Tue, 26 Jul 2011 08:04:43 -0700
-From: Randy Dunlap <rdunlap@xenotime.net>
-Subject: Re: [RFC][PATCH 1/2] kconfig: Introduce KCONFIG(),
- KCONFIG_BUILTIN() and KCONFIG_MODULE()
-Message-Id: <20110726080443.62196869.rdunlap@xenotime.net>
-In-Reply-To: <4E2EBF63.8050208@suse.cz>
+Received: from cantor2.suse.de ([195.135.220.15]:44593 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753333Ab1GZPTM (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 26 Jul 2011 11:19:12 -0400
+Date: Tue, 26 Jul 2011 17:19:08 +0200
+From: Michal Hocko <mhocko@suse.cz>
+Subject: Re: [RFC][PATCH 2/2] mm: Switch NUMA_BUILD and COMPACTION_BUILD to
+ new KCONFIG() syntax
+Message-ID: <20110726151908.GD17958@tiehlicka.suse.cz>
 References: <4E1D9C25.8080300@suse.cz>
-	<1311634718-32588-1-git-send-email-mmarek@suse.cz>
-	<CAM_iQpUEfYrrtpcRLTekSHMHrTTka6ir=z_GUUbnxuQKfY+OXA@mail.gmail.com>
-	<4E2EBF63.8050208@suse.cz>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 8BIT
+ <1311634718-32588-1-git-send-email-mmarek@suse.cz>
+ <1311634718-32588-2-git-send-email-mmarek@suse.cz>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1311634718-32588-2-git-send-email-mmarek@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Michal Marek <mmarek@suse.cz>
-Cc: =?ISO-8859-1?Q?Am=E9rico?= Wang <xiyou.wangcong@gmail.com>, linux-kbuild@vger.kernel.org, lacombar@gmail.com, sam@ravnborg.org, linux-kernel@vger.kernel.org, plagnioj@jcrosoft.com
+Cc: linux-kbuild@vger.kernel.org, lacombar@gmail.com, sam@ravnborg.org, linux-kernel@vger.kernel.org, plagnioj@jcrosoft.com, linux-mm@kvack.org
 
-On Tue, 26 Jul 2011 15:21:39 +0200 Michal Marek wrote:
+On Tue 26-07-11 00:58:38, Michal Marek wrote:
+> Cc: linux-mm@kvack.org
+> Signed-off-by: Michal Marek <mmarek@suse.cz>
 
-> On 26.7.2011 15:01, Américo Wang wrote:
-> > On Tue, Jul 26, 2011 at 6:58 AM, Michal Marek<mmarek@suse.cz>  wrote:
-> >> Replace the config_is_*() macros with a variant that allows for grepping
-> >> for usage of CONFIG_* options in the code. Usage:
-> >>
-> >>   if (KCONFIG(CONFIG_NUMA))
-> >>
-> >> or
-> >>
-> >>   #if KCONFIG(CONFIG_NUMA)
-> >>
-> >> The KCONFIG() macro evaluates to 1 if the argument is set (to either 'y'
-> >> or 'm'), KCONFIG_BUILTIN() and KCONFIG_MODULE() test if the respective
-> >> option is 'y' and 'm', respectively.
-> >
-> > I think it's better to let KCONFIG_MODULE() returns true only for =m, so that
-> > KCONFIG() will equal to KCONFIG_BUILTIN() || KCONFIG_MODULE().
-> 
-> This is how it's done.
-> 
-> 
-> > BTW, the name KCONFIG(CONFIG_NUMA) seems ugly.
-> 
-> Suggest a better one :). The proposals so far:
-> config_is_numa() (breaks grep)
+I assume that this is a cleanup. Without seeing the rest of the patch
+set (probably not in linux-mm missing in the CC) and the cover email it
+is hard to be sure. Could you add some description to the patch, please?
 
-explain, please.
+> ---
+>  include/linux/gfp.h    |    2 +-
+>  include/linux/kernel.h |   14 --------------
+>  mm/page_alloc.c        |   12 ++++++------
+>  mm/vmalloc.c           |    4 ++--
+>  mm/vmscan.c            |    2 +-
+>  5 files changed, 10 insertions(+), 24 deletions(-)
 
-> CONFIGURED(CONFIG_NUMA)
-> ENABLED(CONFIG_NUMA)
-> KCONFIG(CONFIG_NUMA)
-
-CONFIG(NUMA) || CONFIG(NUMA_BUILTIN) || CONFIG(NUMA_MODULE)
-
----
-~Randy
-*** Remember to use Documentation/SubmitChecklist when testing your code ***
+-- 
+Michal Hocko
+SUSE Labs
+SUSE LINUX s.r.o.
+Lihovarska 1060/12
+190 00 Praha 9    
+Czech Republic
