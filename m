@@ -1,39 +1,40 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:54695 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752439Ab1GYXgh (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 25 Jul 2011 19:36:37 -0400
-Date: Tue, 26 Jul 2011 01:36:35 +0200
-From: Michal Marek <mmarek@suse.cz>
-Subject: [GIT] kbuild misc for 3.1-rc1
-Message-ID: <20110725233635.GA2071@sepie.suse.cz>
+Received: from mail-iy0-f174.google.com ([209.85.210.174]:58502 "EHLO
+	mail-iy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750946Ab1GZNBv convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 26 Jul 2011 09:01:51 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+In-Reply-To: <1311634718-32588-1-git-send-email-mmarek@suse.cz>
+References: <4E1D9C25.8080300@suse.cz>
+	<1311634718-32588-1-git-send-email-mmarek@suse.cz>
+Date: Tue, 26 Jul 2011 21:01:50 +0800
+Message-ID: <CAM_iQpUEfYrrtpcRLTekSHMHrTTka6ir=z_GUUbnxuQKfY+OXA@mail.gmail.com>
+Subject: Re: [RFC][PATCH 1/2] kconfig: Introduce KCONFIG(), KCONFIG_BUILTIN()
+ and KCONFIG_MODULE()
+From: =?UTF-8?Q?Am=C3=A9rico_Wang?= <xiyou.wangcong@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Gregory.Dietsche@cuw.edu, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org, lacombar@gmail.com, sam@ravnborg.org, linux-kernel@vger.kernel.org, plagnioj@jcrosoft.com
 
-Hi Linus,
+On Tue, Jul 26, 2011 at 6:58 AM, Michal Marek <mmarek@suse.cz> wrote:
+> Replace the config_is_*() macros with a variant that allows for grepping
+> for usage of CONFIG_* options in the code. Usage:
+>
+>  if (KCONFIG(CONFIG_NUMA))
+>
+> or
+>
+>  #if KCONFIG(CONFIG_NUMA)
+>
+> The KCONFIG() macro evaluates to 1 if the argument is set (to either 'y'
+> or 'm'), KCONFIG_BUILTIN() and KCONFIG_MODULE() test if the respective
+> option is 'y' and 'm', respectively.
 
-please pull this .gitignore fix for 3.1-rc1.
+I think it's better to let KCONFIG_MODULE() returns true only for =m, so that
+KCONFIG() will equal to KCONFIG_BUILTIN() || KCONFIG_MODULE().
 
-Hm, the misc and packaging branches didn't really prove their purpose
-this time. I have a kconfig pull request in the works, I'll hopefully
-send it by Thursday/Friday.
-
-Michal
-
-The following changes since commit 55922c9d1b84b89cb946c777fddccb3247e7df2c:
-
-  Linux 3.0-rc1 (2011-05-29 17:43:36 -0700)
-
-are available in the git repository at:
-  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild-2.6.git misc
-
-Greg Dietsche (1):
-      gitignore: ignore debian build directory
-
- .gitignore |    5 +++++
- 1 files changed, 5 insertions(+), 0 deletions(-)
+BTW, the name KCONFIG(CONFIG_NUMA) seems ugly.
