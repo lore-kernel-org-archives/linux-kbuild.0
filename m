@@ -1,36 +1,63 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:53387 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751661Ab1GZSba (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 26 Jul 2011 14:31:30 -0400
-Message-ID: <4E2F08A0.5080704@suse.cz>
-Date: Tue, 26 Jul 2011 20:34:08 +0200
-From: Michal Marek <mmarek@suse.cz>
+Received: from mail-pz0-f42.google.com ([209.85.210.42]:34493 "EHLO
+	mail-pz0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753064Ab1GZSsv convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 26 Jul 2011 14:48:51 -0400
 MIME-Version: 1.0
-Subject: Re: [RFC][PATCH 2/2] mm: Switch NUMA_BUILD and COMPACTION_BUILD to
- new KCONFIG() syntax
-References: <4E1D9C25.8080300@suse.cz> <1311634718-32588-1-git-send-email-mmarek@suse.cz> <1311634718-32588-2-git-send-email-mmarek@suse.cz> <20110726151908.GD17958@tiehlicka.suse.cz>
-In-Reply-To: <20110726151908.GD17958@tiehlicka.suse.cz>
+In-Reply-To: <20110726112824.b357c756.rdunlap@xenotime.net>
+References: <4E1D9C25.8080300@suse.cz>
+	<1311634718-32588-1-git-send-email-mmarek@suse.cz>
+	<CAM_iQpUEfYrrtpcRLTekSHMHrTTka6ir=z_GUUbnxuQKfY+OXA@mail.gmail.com>
+	<4E2EBF63.8050208@suse.cz>
+	<20110726080443.62196869.rdunlap@xenotime.net>
+	<4E2F0735.1070403@suse.cz>
+	<20110726112824.b357c756.rdunlap@xenotime.net>
+Date: Tue, 26 Jul 2011 14:48:50 -0400
+Message-ID: <CACqU3MWOjjB0RiWLWS8yf0u0gRqOL3JP0StyrtP1kbA+i92SfA@mail.gmail.com>
+Subject: Re: [RFC][PATCH 1/2] kconfig: Introduce KCONFIG(), KCONFIG_BUILTIN()
+ and KCONFIG_MODULE()
+From: Arnaud Lacombe <lacombar@gmail.com>
 Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Hocko <mhocko@suse.cz>
-Cc: linux-kbuild@vger.kernel.org, lacombar@gmail.com, sam@ravnborg.org, linux-kernel@vger.kernel.org, plagnioj@jcrosoft.com, linux-mm@kvack.org
+To: Randy Dunlap <rdunlap@xenotime.net>
+Cc: Michal Marek <mmarek@suse.cz>, =?ISO-8859-1?Q?Am=E9rico_Wang?= <xiyou.wangcong@gmail.com>, linux-kbuild@vger.kernel.org, sam@ravnborg.org, linux-kernel@vger.kernel.org, plagnioj@jcrosoft.com
 
-Dne 26.7.2011 17:19, Michal Hocko napsal(a):
-> On Tue 26-07-11 00:58:38, Michal Marek wrote:
->> Cc: linux-mm@kvack.org
->> Signed-off-by: Michal Marek <mmarek@suse.cz>
-> 
-> I assume that this is a cleanup. Without seeing the rest of the patch
-> set (probably not in linux-mm missing in the CC) and the cover email it
-> is hard to be sure. Could you add some description to the patch, please?
+Hi,
 
-Sorry for the confusion. Patch 1/2 is here:
-https://lkml.org/lkml/2011/7/25/448 and provides a generic way to use
-CONFIG_* options in C expressions. This patch 2/2 for demonstration
-purposes only, if the first patch hits mainline, then I'll submit this
-one properly.
+On Tue, Jul 26, 2011 at 2:28 PM, Randy Dunlap <rdunlap@xenotime.net> wrote:
+> On Tue, 26 Jul 2011 20:28:05 +0200 Michal Marek wrote:
+>
+>> Dne 26.7.2011 17:04, Randy Dunlap napsal(a):
+>> > On Tue, 26 Jul 2011 15:21:39 +0200 Michal Marek wrote:
+>> >> On 26.7.2011 15:01, Américo Wang wrote:
+>> >>> BTW, the name KCONFIG(CONFIG_NUMA) seems ugly.
+>> >>
+>> >> Suggest a better one :). The proposals so far:
+>> >> config_is_numa() (breaks grep)
+>> >
+>> > explain, please.
+>>
+>> If you grep for CONFIG_FOO usage, you'll miss this alternate syntax.
+>>
+>
+> Ack.
+>
+>>
+>> >> CONFIGURED(CONFIG_NUMA)
+>> >> ENABLED(CONFIG_NUMA)
+>> >> KCONFIG(CONFIG_NUMA)
+>> >
+>> > CONFIG(NUMA) || CONFIG(NUMA_BUILTIN) || CONFIG(NUMA_MODULE)
+>>
+>> same problem.
+>
+> Yes, I sorta got that after I sent the email.
+>
+> I guess I prefer your ENABLED() syntax then.
+>
+we need to be careful about namespace pollution/collision.
 
-Michal
+ - Arnaud
