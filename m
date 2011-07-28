@@ -1,12 +1,12 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:54336 "EHLO mx1.redhat.com"
+Received: from mx1.redhat.com ([209.132.183.28]:48683 "EHLO mx1.redhat.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755248Ab1G1Pwm (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 28 Jul 2011 11:52:42 -0400
+	id S1755558Ab1G1PxN (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 28 Jul 2011 11:53:13 -0400
 From: David Howells <dhowells@redhat.com>
-Subject: [PATCH 17/40] UAPI: Fix E820_X_MAX ordering problem [ver #3]
-Date: Thu, 28 Jul 2011 16:52:07 +0100
-Message-ID: <20110728155206.16618.8462.stgit@warthog.procyon.org.uk>
+Subject: [PATCH 21/40] UAPI: Fix linux/auto_fs.h inclusion order [ver #3]
+Date: Thu, 28 Jul 2011 16:52:42 +0100
+Message-ID: <20110728155242.16618.87548.stgit@warthog.procyon.org.uk>
 In-Reply-To: <20110728154920.16618.89358.stgit@warthog.procyon.org.uk>
 References: <20110728154920.16618.89358.stgit@warthog.procyon.org.uk>
 MIME-Version: 1.0
@@ -17,10 +17,9 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: torvalds@osdl.org
 Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, David Howells <dhowells@redhat.com>
 
-There's an ordering problem around the definition of E820_X_MAX: the definition
-in the kernel-specific header is referred to in the user-specific header data
-structures, at least for x86.  When compiling userspace, the user-specific
-header provides an alternate version of E820_X_MAX.
+Fix linux/auto_fs.h inclusion order to make sure that the inclusion of the
+user-specific file happens after the inclusion of the header file that
+provides NAME_MAX.
 
 To get around this problem, place a marker specifically to indicate the point
 at which the UAPI header should be included in the kernel-specific file.  The
@@ -29,20 +28,20 @@ marker will be deleted later.
 Signed-off-by: David Howells <dhowells@redhat.com>
 ---
 
- arch/x86/include/asm/e820.h |    2 ++
+ include/linux/auto_fs.h |    2 ++
  1 files changed, 2 insertions(+), 0 deletions(-)
 
-diff --git a/arch/x86/include/asm/e820.h b/arch/x86/include/asm/e820.h
-index 908b969..e02512f 100644
---- a/arch/x86/include/asm/e820.h
-+++ b/arch/x86/include/asm/e820.h
-@@ -45,6 +45,8 @@
- #define E820_NVS	4
- #define E820_UNUSABLE	5
+diff --git a/include/linux/auto_fs.h b/include/linux/auto_fs.h
+index da64e15..f9ca4e6 100644
+--- a/include/linux/auto_fs.h
++++ b/include/linux/auto_fs.h
+@@ -23,6 +23,8 @@
+ #include <sys/ioctl.h>
+ #endif /* __KERNEL__ */
  
 +// DISINTEGRATE: INCLUDE UAPI HERE
 +
- /*
-  * reserved RAM used by kernel itself
-  * if CONFIG_INTEL_TXT is enabled, memory of this type will be
+ /* This file describes autofs v3 */
+ #define AUTOFS_PROTO_VERSION	3
+ 
 
