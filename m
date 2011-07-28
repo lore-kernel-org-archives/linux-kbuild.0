@@ -1,83 +1,220 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-gx0-f174.google.com ([209.85.161.174]:61489 "EHLO
-	mail-gx0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751007Ab1G1OBo convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 28 Jul 2011 10:01:44 -0400
-Received: by gxk21 with SMTP id 21so1809534gxk.19
-        for <linux-kbuild@vger.kernel.org>; Thu, 28 Jul 2011 07:01:43 -0700 (PDT)
+Received: from mx1.redhat.com ([209.132.183.28]:59811 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754496Ab1G1Ps4 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 28 Jul 2011 11:48:56 -0400
+From: David Howells <dhowells@redhat.com>
+Subject: [PATCH 01/40] UAPI: Add script to convert #include "..." to #include
+ <path/...> in sys headers
+Date: Thu, 28 Jul 2011 16:48:21 +0100
+Message-ID: <20110728154821.16519.38457.stgit@warthog.procyon.org.uk>
 MIME-Version: 1.0
-In-Reply-To: <25697.1311857663@redhat.com>
-References: <25697.1311857663@redhat.com>
-Date: Thu, 28 Jul 2011 10:01:42 -0400
-Message-ID: <CACqU3MW1x4CNJ+xuikKKhLz1Zd77JSXWLTKA8q7L=W6qUFMbUg@mail.gmail.com>
-Subject: Re: 'make distclean' silently removes empty files
-From: Arnaud Lacombe <lacombar@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: David Howells <dhowells@redhat.com>
-Cc: Michal Marek <mmarek@suse.cz>, arnd@arndb.de, linux-kbuild@vger.kernel.org
+To: torvalds@osdl.org
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, David Howells <dhowells@redhat.com>
 
-Hi,
+Add a script to convert #include "..." to #include <path/...> in kernel system
+headers.
 
-On Thu, Jul 28, 2011 at 8:54 AM, David Howells <dhowells@redhat.com> wrote:
->
-> Hi,
->
-> Can 'make distclean' please be altered to _not_ silently remove empty files,
-> especially ones that are checked into GIT and/or are mentioned in Makefiles as
-> being compilable.  By all means flag them as requiring removal, remove them
-> noisily or give an error.
->
-> A case in point is:
->
->        arch/arm/mach-zynq/board_dt.c
->
-> which is an empty file checked into GIT.
->
-For the record, it is deleted because of the zero size by:
+Observations:
 
-distclean: mrproper
-        @find $(srctree) $(RCS_FIND_IGNORE) \
-                \( -name '*.orig' -o -name '*.rej' -o -name '*~' \
-                -o -name '*.bak' -o -name '#*#' -o -name '.*.orig' \
-                -o -name '.*.rej' -o -size 0 \
-                -o -name '*%' -o -name '.*.cmd' -o -name 'core' \) \
-                -type f -print | xargs rm -f
+ (1) There are quite a lot of #includes of things like "linux/fs.h" which
+     should really use <...>.  These are changed within include/ dirs.
 
-in the main makefile.
+ (2) Some referenced header files are missing for no obvious reason - pm2fb.h
+     and via_drmclient.h for example.
 
-Could you try:
+ (3) The DRM video driving code uses -Iinclude/drm when it should probably
+     just preface its header file names with drm/ in #include.  These are
+     changed within include/drm/.
 
-commit a73f6c8638a75d1bf1bb8b0ace82ddd3b9f0291b
-Author: Arnaud Lacombe <lacombar@gmail.com>
-Date:   Thu Jul 28 10:00:33 2011 -0400
+ (4) Under arch/cris/include/ there are some directories (arch-v10 and
+     arch-v32) that should perhaps be renamed to arch/cris/arch-vXX/include.
 
-    Makefile: do not delete zero-sized C file
+     Similarly, under arch/sh/, arch/sh/include/mach-X/ should perhaps be
+     arch/sh/boards/mach-X/include/.
 
-diff --git a/Makefile b/Makefile
-index d018956..e9ca6ec 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1198,7 +1198,7 @@ distclean: mrproper
-        @find $(srctree) $(RCS_FIND_IGNORE) \
-                \( -name '*.orig' -o -name '*.rej' -o -name '*~' \
-                -o -name '*.bak' -o -name '#*#' -o -name '.*.orig' \
--               -o -name '.*.rej' -o -size 0 \
-+               -o -name '.*.rej' -o \( -size 0 -a ! -name '*.c' \) \
-                -o -name '*%' -o -name '.*.cmd' -o -name 'core' \) \
-                -type f -print | xargs rm -f
+     However, I've left these alone as they aren't really a problem.
 
-[space/tab mangled, but the change is obvious]
+Signed-off-by: David Howells <dhowells@redhat.com>
+---
 
- - Arnaud
+ scripts/uapi-disintegration/system-headers.pl |  165 +++++++++++++++++++++++++
+ 1 files changed, 165 insertions(+), 0 deletions(-)
+ create mode 100755 scripts/uapi-disintegration/system-headers.pl
 
-> Thanks,
-> David
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
+diff --git a/scripts/uapi-disintegration/system-headers.pl b/scripts/uapi-disintegration/system-headers.pl
+new file mode 100755
+index 0000000..c905568
+--- /dev/null
++++ b/scripts/uapi-disintegration/system-headers.pl
+@@ -0,0 +1,165 @@
++#!/usr/bin/perl -w
++
++use File::Find;
++
++my @sys_header_dirs = (
++    "include"
++    );
++
++#
++# Changes must be committed first
++#
++system("git diff --quiet") == 0 or die "Uncommitted changes; aborting\n";
++
++#
++# Delete the old patch under StGIT
++#
++system("stg delete uapi-convert-include-quote-to-angle.diff");
++
++#
++# Set up the patch under StGIT
++#
++system("stg new -m '" .
++       "UAPI: Convert #include \"...\" to #include <path/...> in kernel system headers\n" .
++       "\n" .
++       "Convert #include \"...\" to #include <path/...> in kernel system headers.\n" .
++       "\n" .
++       "scripts/uapi-disintegrate/system-headers.pl was used\n" .
++       "' --sign uapi-convert-include-quote-to-angle.diff"
++    ) == 0 or die;
++
++#
++# Find all the system header directories under arch
++#
++opendir DIR, "arch" or die;
++push @sys_header_dirs,
++    map { "arch/$_/include"; }
++sort grep { -d "arch/$_/include"; }
++grep { $_ !~ /^[.]/ }
++readdir DIR;
++closedir DIR;
++
++#
++# Find all the header files
++#
++%headers = ();
++sub find_header()
++{
++    $headers{$File::Find::name} = 1 if ($_ =~ /[.]h$/);
++}
++
++find(\&find_header, @sys_header_dirs);
++
++#print join("\n", sort keys %headers), "\n";
++
++foreach my $hdr (sort grep { $_ !~ m@arch/um/@} keys %headers) {
++    my $dir = $hdr;
++    $dir =~ m@(^.*/)@, $dir = $1;
++
++    open FD, '<', $hdr or die "open $hdr: $!\n";
++    my @lines = <FD>;
++    close FD or die;
++
++    my $printed_name = 0;
++    my $alter_header = 0;
++
++    for (my $l = 0; $l <= $#lines; $l++) {
++	my $line = $lines[$l];
++
++	if ($line =~ /^(#\s*include\s+)["]([^"]+)["](.*[\n])/) {
++	    #print $1, '@', $2, '@', $3;
++
++	    if (!$printed_name) {
++		#print "[[[ $hdr [\e[36m$dir\e[m] ]]]\n";
++		$printed_name = 1;
++	    }
++
++	    my $pre = $1;
++	    my $name = $2;
++	    my $post = $3;
++
++	    my $inc = undef;
++	    my $base = "??";
++	    my $path = "??";
++	    my $realpath = "??";
++	    my $do_existence_check = 1;
++
++	    if ($name eq "platform/acenv.h") {
++		# ACPI includes this relative to the current dir
++		$inc = $dir . $name;
++	    } elsif ($name =~ m@^[a-z].*/@) {
++		# We found something like "linux/foo.h" so just accept as is
++		$base = "";
++		$realpath = $path = $name;
++		$do_existence_check = 0;
++		goto no_disassemble;
++	    } elsif ($name =~ m@^[.][.]/@) {
++		# We found something like "../foo.h" so we jam the dir on the
++		# front and then remove "dir/.." pairs
++		$inc = $dir . $name;
++		while ($inc =~ m@[^/]*/[.][.]/@) {
++		    $inc =~ s@[^/]*/[.][.]/@@;
++		}
++	    } elsif ($name !~ m@/@) {
++		# We found something like "foo.h" so we again stick the dir on
++		# the front and then cut off the "include/" prefix.
++		if ($name =~ m@^drm_@) {
++		    # Unless it's a DRM header - the drm stuff adds
++		    # -Iinclude/drm to the build flags rather than use
++		    # <drm/foo.h> for some reason
++		    $inc = "include/drm/$name";
++		} else {
++		    $inc = $dir . $name;
++		}
++	    } else {
++		die "Don't handle \"$name\"\n";
++	    }
++
++	    $inc =~ m@(.*include/)(.*/[^/]*)@, $base = $1, $path = $2;
++
++	    $realpath = $path;
++	    if ($dir =~ m@^arch/cris/@ && $path =~ m@^arch-v[0-9]+/(arch/.*)@) {
++		$realpath = $1;
++	    } elsif ($dir =~ m@^arch/sh/@ && $path =~ m@^mach-[^/]+/(mach/.*)@) {
++		$realpath = $1;
++	    }
++
++	  no_disassemble:
++	    print $hdr, ": ", $name, " -> \e[36m", $base, "\e[m", $path;
++
++	    if ($do_existence_check && ! -f $inc) {
++		if (($hdr eq "arch/powerpc/include/asm/bootx.h" && $name eq "linux_type_defs.h") ||
++		    ($hdr eq "include/acpi/platform/acenv.h" && $name =~ /ac[a-z]*[0-9]*[.]h/) ||
++		    ($hdr eq "include/linux/jbd.h" && $name eq "jfs_compat.h") ||
++		    ($hdr eq "include/linux/jbd2.h" && $name eq "jfs_compat.h") ||
++		    ($hdr eq "include/video/cvisionppc.h" && $name eq "pm2fb.h") ||
++		    ($hdr eq "include/drm/via_drm.h" && $name eq "via_drmclient.h")
++		    ) {
++		    print " \e[33mnot present\e[m\n";
++		} else {
++		    print " \e[31mnot found\e[m\n";
++		    die;
++		}
++	    } else {
++		$lines[$l] = $pre . "<" . $realpath . ">" . $post;
++		$alter_header = 1;
++		print "\n";
++	    }
++	}
++    }
++
++    if ($alter_header) {
++	my $temp = $hdr . ".syshdr";
++	open FD, '>', $temp or die "create $temp: $!\n";
++	print FD @lines or die "write $temp: $!\n";
++	close FD or die "close $temp: $!\n";
++	rename $temp, $hdr or die "move $temp -> $hdr: $!\n";
++    }
++}
++
++#
++# Commit the changes
++#
++system("stg ref") == 0 or die;
++
++exit 0;
+
