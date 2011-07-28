@@ -1,12 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:14601 "EHLO mx1.redhat.com"
+Received: from mx1.redhat.com ([209.132.183.28]:21408 "EHLO mx1.redhat.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755855Ab1G1PxF (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 28 Jul 2011 11:53:05 -0400
+	id S1753537Ab1G1Pui (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 28 Jul 2011 11:50:38 -0400
 From: David Howells <dhowells@redhat.com>
-Subject: [PATCH 20/40] UAPI: Fix up linux/netfilter/xt_policy.h [ver #3]
-Date: Thu, 28 Jul 2011 16:52:32 +0100
-Message-ID: <20110728155232.16618.76970.stgit@warthog.procyon.org.uk>
+Subject: [PATCH 07/40] UAPI: Fix AHZ multiple inclusion when __KERNEL__ is
+ removed [ver #3]
+Date: Thu, 28 Jul 2011 16:50:31 +0100
+Message-ID: <20110728155031.16618.33620.stgit@warthog.procyon.org.uk>
 In-Reply-To: <20110728154920.16618.89358.stgit@warthog.procyon.org.uk>
 References: <20110728154920.16618.89358.stgit@warthog.procyon.org.uk>
 MIME-Version: 1.0
@@ -17,30 +18,24 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: torvalds@osdl.org
 Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, David Howells <dhowells@redhat.com>
 
-Fix up linux/netfilter/xt_policy.h to make it splittable.  This requires a
-mark to be placed on the #ifdef __KERNEL__ in struct xt_policy_elem to tell
-the splitter to ignore it.
-
-Would it be possible, I wonder, to rename union nf_inet_addr to xt_policy_addr
-instead?
-
 Signed-off-by: David Howells <dhowells@redhat.com>
 ---
 
- include/linux/netfilter/xt_policy.h |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+ include/linux/acct.h |    3 +++
+ 1 files changed, 3 insertions(+), 0 deletions(-)
 
-diff --git a/include/linux/netfilter/xt_policy.h b/include/linux/netfilter/xt_policy.h
-index be8ead0..573da52 100644
---- a/include/linux/netfilter/xt_policy.h
-+++ b/include/linux/netfilter/xt_policy.h
-@@ -35,7 +35,7 @@ union xt_policy_addr {
+diff --git a/include/linux/acct.h b/include/linux/acct.h
+index 3e4737f..d537aa0 100644
+--- a/include/linux/acct.h
++++ b/include/linux/acct.h
+@@ -146,6 +146,9 @@ extern void acct_exit_ns(struct pid_namespace *);
+  *
+  */
  
- struct xt_policy_elem {
- 	union {
--#ifdef __KERNEL__
-+#ifdef __KERNEL__ // DISINTEGRATE: RETAIN
- 		struct {
- 			union nf_inet_addr saddr;
- 			union nf_inet_addr smask;
++#undef ACCT_VERSION
++#undef AHZ
++
+ #ifdef CONFIG_BSD_PROCESS_ACCT_V3
+ #define ACCT_VERSION	3
+ #define AHZ		100
 
