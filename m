@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:59621 "EHLO mx1.redhat.com"
+Received: from mx1.redhat.com ([209.132.183.28]:56257 "EHLO mx1.redhat.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755791Ab1G1Pvx (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 28 Jul 2011 11:51:53 -0400
+	id S1755215Ab1G1PvD (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 28 Jul 2011 11:51:03 -0400
 From: David Howells <dhowells@redhat.com>
-Subject: [PATCH 15/40] UAPI: elf_read_implies_exec() is a kernel-only feature
- - so hide from userspace [ver #3]
-Date: Thu, 28 Jul 2011 16:51:47 +0100
-Message-ID: <20110728155146.16618.91167.stgit@warthog.procyon.org.uk>
+Subject: [PATCH 10/40] UAPI: Don't have a #elif clause in a __KERNEL__ guard
+ in linux/soundcard.h [ver #3]
+Date: Thu, 28 Jul 2011 16:50:58 +0100
+Message-ID: <20110728155058.16618.32513.stgit@warthog.procyon.org.uk>
 In-Reply-To: <20110728154920.16618.89358.stgit@warthog.procyon.org.uk>
 References: <20110728154920.16618.89358.stgit@warthog.procyon.org.uk>
 MIME-Version: 1.0
@@ -18,61 +18,35 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: torvalds@osdl.org
 Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, David Howells <dhowells@redhat.com>
 
-elf_read_implies_exec() is a kernel-only feature as the second parameter is a
-constant that isn't exported to userspace.  Not only that, but the
-arch-specific overrides are not exported either.
-
-So hide the macro from userspace.
-
-Similarly, struct file should not be predeclared in userspace.
+Don't have a #elif clause in a __KERNEL__ guard in linux/soundcard.h to make
+parsing easier.
 
 Signed-off-by: David Howells <dhowells@redhat.com>
 ---
 
- include/linux/elf.h |   18 +++++++++---------
- 1 files changed, 9 insertions(+), 9 deletions(-)
+ include/linux/soundcard.h |    4 +++-
+ 1 files changed, 3 insertions(+), 1 deletions(-)
 
-diff --git a/include/linux/elf.h b/include/linux/elf.h
-index 110821c..411d7b8 100644
---- a/include/linux/elf.h
-+++ b/include/linux/elf.h
-@@ -7,15 +7,6 @@
- #include <asm/elf.h>
+diff --git a/include/linux/soundcard.h b/include/linux/soundcard.h
+index fe204fe..dfcf86f 100644
+--- a/include/linux/soundcard.h
++++ b/include/linux/soundcard.h
+@@ -198,7 +198,8 @@ typedef struct seq_event_rec {
+ #  else
+ #    error "could not determine byte order"
+ #  endif
+-#elif defined(__BYTE_ORDER)
++#else
++# if defined(__BYTE_ORDER)
+ #  if __BYTE_ORDER == __BIG_ENDIAN
+ #    define AFMT_S16_NE AFMT_S16_BE
+ #  elif __BYTE_ORDER == __LITTLE_ENDIAN
+@@ -206,6 +207,7 @@ typedef struct seq_event_rec {
+ #  else
+ #    error "could not determine byte order"
+ #  endif
++# endif
  #endif
  
--struct file;
--
--#ifndef elf_read_implies_exec
--  /* Executables for which elf_read_implies_exec() returns TRUE will
--     have the READ_IMPLIES_EXEC personality flag set automatically.
--     Override in asm/elf.h as needed.  */
--# define elf_read_implies_exec(ex, have_pt_gnu_stack)	0
--#endif
--
- /* 32-bit ELF base types. */
- typedef __u32	Elf32_Addr;
- typedef __u16	Elf32_Half;
-@@ -413,6 +404,13 @@ typedef struct elf64_note {
- } Elf64_Nhdr;
- 
- #ifdef __KERNEL__
-+#ifndef elf_read_implies_exec
-+  /* Executables for which elf_read_implies_exec() returns TRUE will
-+     have the READ_IMPLIES_EXEC personality flag set automatically.
-+     Override in asm/elf.h as needed.  */
-+# define elf_read_implies_exec(ex, have_pt_gnu_stack)	0
-+#endif
-+
- #if ELF_CLASS == ELFCLASS32
- 
- extern Elf32_Dyn _DYNAMIC [];
-@@ -436,6 +434,8 @@ extern Elf64_Dyn _DYNAMIC [];
- #endif
- 
- /* Optional callbacks to write extra ELF notes. */
-+struct file;
-+
- #ifndef ARCH_HAVE_EXTRA_ELF_NOTES
- static inline int elf_coredump_extra_notes_size(void) { return 0; }
- static inline int elf_coredump_extra_notes_write(struct file *file,
+ /*
 
