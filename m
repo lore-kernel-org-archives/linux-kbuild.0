@@ -1,41 +1,151 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-yi0-f46.google.com ([209.85.218.46]:33768 "EHLO
-	mail-yi0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754910Ab1G0Qg7 (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 27 Jul 2011 12:36:59 -0400
-MIME-Version: 1.0
-In-Reply-To: <4E2FCE2A.3000909@suse.cz>
-References: <4E1D9C25.8080300@suse.cz>
-	<1311634718-32588-1-git-send-email-mmarek@suse.cz>
-	<CAM_iQpUEfYrrtpcRLTekSHMHrTTka6ir=z_GUUbnxuQKfY+OXA@mail.gmail.com>
-	<4E2EBF63.8050208@suse.cz>
-	<20110726080443.62196869.rdunlap@xenotime.net>
-	<4E2F0735.1070403@suse.cz>
-	<20110726112824.b357c756.rdunlap@xenotime.net>
-	<CACqU3MWOjjB0RiWLWS8yf0u0gRqOL3JP0StyrtP1kbA+i92SfA@mail.gmail.com>
-	<CACqU3MWopoJcd+5ELWEDp6_GvVpEjOHLnkcj4s_fHT5unp+MtA@mail.gmail.com>
-	<20110726213536.1f56f0e3.rdunlap@xenotime.net>
-	<4E2FCE2A.3000909@suse.cz>
-Date: Thu, 28 Jul 2011 00:36:57 +0800
-Message-ID: <CAM_iQpXE4vQNoS=_SEcPWObOcdNDbxpfy__YG=b7qAh2=9e3Vw@mail.gmail.com>
-Subject: Re: [RFC][PATCH 1/2] kconfig: Introduce KCONFIG(), KCONFIG_BUILTIN()
- and KCONFIG_MODULE()
-From: =?UTF-8?Q?Am=C3=A9rico_Wang?= <xiyou.wangcong@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Received: from chilli.pcug.org.au ([203.10.76.44]:50457 "EHLO smtps.tip.net.au"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752863Ab1G1BR0 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 27 Jul 2011 21:17:26 -0400
+Date: Thu, 28 Jul 2011 11:17:09 +1000
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+Subject: Re: Build regressions/improvements in v3.0-rc7 (sound/isa/)
+Message-Id: <20110728111709.8303f78c9b5f2b3aa3f391b0@canb.auug.org.au>
+In-Reply-To: <20110727121320.f50b1e6b.rdunlap@xenotime.net>
+References: <1310585610-434-1-git-send-email-geert@linux-m68k.org>
+	<20110724122624.324d10dc.rdunlap@xenotime.net>
+	<s5hy5zm3j5a.wl%tiwai@suse.de>
+	<20110725091003.c3453b8b.rdunlap@xenotime.net>
+	<20110727121320.f50b1e6b.rdunlap@xenotime.net>
+Mime-Version: 1.0
+Content-Type: multipart/signed; protocol="application/pgp-signature";
+ micalg="PGP-SHA1";
+ boundary="Signature=_Thu__28_Jul_2011_11_17_09_+1000_18mNXdozpR74Xn4Q"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: Randy Dunlap <rdunlap@xenotime.net>, Arnaud Lacombe <lacombar@gmail.com>, linux-kbuild@vger.kernel.org, sam@ravnborg.org, linux-kernel@vger.kernel.org, plagnioj@jcrosoft.com
+To: Randy Dunlap <rdunlap@xenotime.net>
+Cc: Takashi Iwai <tiwai@suse.de>, Geert Uytterhoeven <geert@linux-m68k.org>, linux-kernel@vger.kernel.org, alsa-devel@alsa-project.org, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
 
-On Wed, Jul 27, 2011 at 4:36 PM, Michal Marek <mmarek@suse.cz> wrote:
+--Signature=_Thu__28_Jul_2011_11_17_09_+1000_18mNXdozpR74Xn4Q
+Content-Type: text/plain; charset=US-ASCII
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+Hi Randy,
+
+On Wed, 27 Jul 2011 12:13:20 -0700 Randy Dunlap <rdunlap@xenotime.net> wrot=
+e:
 >
-> Good idea. Is anyone against
-> IS_ENABLED(CONFIG_FOO)
-> IS_ENABLED_BUILTIN(CONFIG_FOO)
-> IS_ENABLED_MODULE(CONFIG_FOO)
-> ?
+> On Mon, 25 Jul 2011 09:10:03 -0700 Randy Dunlap wrote:
+>=20
+> > On Mon, 25 Jul 2011 09:37:53 +0200 Takashi Iwai wrote:
+> >=20
+> > > At Sun, 24 Jul 2011 12:26:24 -0700,
+> > > Randy Dunlap wrote:
+> > > >=20
+> > > > On Wed, 13 Jul 2011 21:33:30 +0200 Geert Uytterhoeven wrote:
+> > > >=20
+> > > > >   + src/sound/isa/ad1816a/ad1816a_lib.c: error: implicit declarat=
+ion of function 'snd_dma_disable':  =3D> 544
+> > > > >   + src/sound/isa/ad1816a/ad1816a_lib.c: error: implicit declarat=
+ion of function 'snd_dma_pointer':  =3D> 302
+> > > > >   + src/sound/isa/ad1816a/ad1816a_lib.c: error: implicit declarat=
+ion of function 'snd_dma_program':  =3D> 244
+> > > > >   + src/sound/isa/es1688/es1688_lib.c: error: implicit declaratio=
+n of function 'snd_dma_pointer':  =3D> 509
+> > > > >   + src/sound/isa/es1688/es1688_lib.c: error: implicit declaratio=
+n of function 'snd_dma_program':  =3D> 417
+> > > > >   + src/sound/isa/gus/gus_dma.c: error: implicit declaration of f=
+unction 'snd_dma_disable':  =3D> 177
+> > > > >   + src/sound/isa/gus/gus_dma.c: error: implicit declaration of f=
+unction 'snd_dma_program':  =3D> 79
+> > > > >   + src/sound/isa/gus/gus_pcm.c: error: implicit declaration of f=
+unction 'snd_dma_pointer':  =3D> 619
+> > > > >   + src/sound/isa/gus/gus_pcm.c: error: implicit declaration of f=
+unction 'snd_dma_program':  =3D> 591
+> > > > >   + src/sound/isa/sb/sb16_main.c: error: implicit declaration of =
+function 'snd_dma_pointer':  =3D> 456
+> > > > >   + src/sound/isa/sb/sb16_main.c: error: implicit declaration of =
+function 'snd_dma_program':  =3D> 276
+> > > > >   + src/sound/isa/sb/sb8_main.c: error: implicit declaration of f=
+unction 'snd_dma_pointer':  =3D> 425
+> > > > >   + src/sound/isa/sb/sb8_main.c: error: implicit declaration of f=
+unction 'snd_dma_program':  =3D> 172
+> > > > >   + src/sound/isa/sscape.c: error: implicit declaration of functi=
+on 'snd_dma_program':  =3D> 481
+> > > > >   + src/sound/isa/wss/wss_lib.c: error: implicit declaration of f=
+unction 'snd_dma_disable':  =3D> 1695
+> > > > >   + src/sound/isa/wss/wss_lib.c: error: implicit declaration of f=
+unction 'snd_dma_pointer':  =3D> 1160
+> > > > >   + src/sound/isa/wss/wss_lib.c: error: implicit declaration of f=
+unction 'snd_dma_program':  =3D> 1025
+> > > >=20
+> > > > All of these source files do #include <sound/core.h>,
+> > > > but these missing/implicit functions are conditional:
+> > > >=20
+> > > > #ifdef CONFIG_ISA_DMA_API
+> > > > #define DMA_MODE_NO_ENABLE	0x0100
+> > > >=20
+> > > > void snd_dma_program(unsigned long dma, unsigned long addr, unsigne=
+d int size, unsigned short mode);
+> > > > void snd_dma_disable(unsigned long dma);
+> > > > unsigned int snd_dma_pointer(unsigned long dma, unsigned int size);
+> > > > #endif
+> > > >=20
+> > > > so should these drivers all depend on ISA_DMA_API ?
+> > >=20
+> > > Yes, these are ISA sound cards, so they must have CONFIG_ISA and
+> > > CONFIG_ISA_DMA.  Although CONFIG_SND_SB8_DSP, CONFIG_SND_SB16_DSP
+> > > and CONFIG_SND_WSS_LIB have no direct dependency, but the drivers
+> > > selecting these are all in "if SND_ISA" in sound/isa/Kconfig.
+> >=20
+> > Hm, yes, they are.
+> >=20
+> > > > or should only pieces of each driver depend on ISA_DMA_API ?
+> > >=20
+> > > I wonder which configuration makes it possible.
+> > > Did you see a similar problem with randconfig?
+> >=20
+> > No.  This parisc allmodconfig file from linux-next builds has
+> > CONFIG_SND_ISA=3Dy but it does not have CONFIG_ISA_DMA_API enabled.  We=
+ird.
+> >=20
+> > Geert, do you know how this happens?
+> >=20
+> > parisc config:  http://kisskb.ellerman.id.au/kisskb/buildresult/4323458=
+/config/
+> > from this failed build:  http://kisskb.ellerman.id.au/kisskb/buildresul=
+t/4323458/
+>=20
+> How is CONFIG_ISA_DMA_API enabled in parisc allmodconfig?
+> I don't see how that happens, and it's causing build errors...
 
-How about IS_ENABLED() IS_BUILTIN() IS_MODULE()?
+Sorry, but I don't understand the question.  The problam is that
+CONFIG_ISA_DMA_API is not enabled, right?  On parisc, it is just (from
+arch/parisc/Kconfig)
 
-Thanks.
+config ISA_DMA_API
+	bool
+
+and nothing selects it.  However, I would have expected an allmodconfig
+to set it to y.  Clearly I don't understan how allmodconfig works any
+more :-(
+
+Michal, is my understanding correct?  Is this a bug in allmodconfig?
+--=20
+Cheers,
+Stephen Rothwell                    sfr@canb.auug.org.au
+http://www.canb.auug.org.au/~sfr/
+
+--Signature=_Thu__28_Jul_2011_11_17_09_+1000_18mNXdozpR74Xn4Q
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iQEcBAEBAgAGBQJOMLiVAAoJEDMEi1NhKgbsJvQH/19hqB3HBqp9ks74jiuvNK7R
+ClA99qR6uCG0UH4bjJujn3R2XeXpGzrgt67+nBl4D7EJtPaZJVi474nSwrZjyWa3
+CstKqU2WT66fgOWezNV1ZjWsGy6gA7o1AQ1uz/mZegjSxweWc77pIhcQ+X3wCvQH
+uEOabmrNSviDidQPi2lt21d2r4noV7idngId/IstsKu5wtyMVDNN9hilRbOq3YuU
+dR3CoQpqqYfEIw2ORW9nSgZ1vTZOtb6Yd8pOXzLAzZT//lDDrr+TYEobDZg49GwN
+jectT/FONcUh2Y/sy9a907MGeD0f1m64KPEDWrVxBghBF8HLYaAt2m2AqlCWtCY=
+=jQ6m
+-----END PGP SIGNATURE-----
+
+--Signature=_Thu__28_Jul_2011_11_17_09_+1000_18mNXdozpR74Xn4Q--
