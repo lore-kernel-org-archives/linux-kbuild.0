@@ -1,99 +1,149 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:54499 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752493Ab1G2UXj (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 29 Jul 2011 16:23:39 -0400
-Date: Fri, 29 Jul 2011 22:23:36 +0200
-From: Michal Marek <mmarek@suse.cz>
-Subject: [GIT] kbuild/kconfig for 3.1-rc1
-Message-ID: <20110729202336.GA1162@sepie.suse.cz>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Received: from casper.infradead.org ([85.118.1.10]:42670 "EHLO
+	casper.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753058Ab1G2XdL (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 29 Jul 2011 19:33:11 -0400
+Subject: [PATCH v2] Enable 'make CONFIG_FOO=y oldconfig'
+From: David Woodhouse <dwmw2@infradead.org>
+Date: Sat, 30 Jul 2011 00:32:43 +0100
+In-Reply-To: <4E0495F4.7080300@suse.cz>
+References: <1306707270.2029.377.camel@i7.infradead.org>
+		<20110530072300.GA9802@elte.hu>
+		<1306745835.2029.389.camel@i7.infradead.org>
+		<20110530104231.GF17821@elte.hu>	<20110530104656.GA19532@elte.hu>
+		<E934876C-FABB-41F8-8C5E-469AA42DBE91@mit.edu>
+		<20110530105809.GA20133@elte.hu>
+		<1A4DB87D-9B32-44C0-B7C9-47A003CABD96@mit.edu>
+		<alpine.LFD.2.02.1105301955210.3164@localhost6.localdomain6>
+		<20110530195545.GG2890@dhcp-172-31-194-241.cam.corp.google.com>
+		<alpine.LFD.2.02.1105302103220.3164@localhost6.localdomain6>
+		<1306795186.2029.459.camel@i7.infradead.org>
+		<BANLkTik=uHr1eX44XV1pAHUfVQ-MorzOnw@mail.gmail.com>
+		<1306856937.27477.3.camel@i7.infradead.org>
+	 <BANLkTi=VoL8ze0AcdkG_QmEH5049X2K6Zw@mail.gmail.com>
+	 <4E0495F4.7080300@suse.cz>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Message-ID: <1311982365.20983.42.camel@i7.infradead.org>
+Mime-Version: 1.0
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: lacombar@gmail.com, mmarek@suse.cz, plagnioj@jcrosoft.com, rprabhu@wnohang.net, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>
+Cc: Arnaud Lacombe <lacombar@gmail.com>, Ted Ts'o <tytso@mit.edu>, Ingo Molnar <mingo@elte.hu>, x86@kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, hpa@zytor.com
 
-Hi Linus,
+This allows you to set (and clear) config options on the make command
+line, for all config targets. For example:
 
-here is the kconfig stuff for 3.1-rc1:
-* Lots of internal kconfig cleanup as well as bugfixes
-* New macros that allow to test CONFIG_ options in C expressions, this will
-  allow to convert some '#ifdef CONFIG_FOO' in the source to a more
-  readable variant 'if (IS_ENABLED(CONFIG_FOO))' in the future.
+   make CONFIG_64BIT=n randconfig
+   make CONFIG_64BIT=n allmodconfig
+   make CONFIG_64BIT=y CONFIG_SATA_MV=y oldconfig
 
-Thanks,
-Michal
+Signed-off-by: David Woodhouse <David.Woodhouse@intel.com>
+---
+v2: Add call to sym_calc_value() before sym_set_string_value(), to set
+    symbol visibility. 'make ARCH=arm CONFIG_ARCH_OMAP=y allnoconfig'
+    should work correctly now.
 
-The following changes since commit 55922c9d1b84b89cb946c777fddccb3247e7df2c:
+ scripts/kconfig/conf.c     |    7 ++++++-
+ scripts/kconfig/confdata.c |   42 ++++++++++++++++++++++++++++++++++++++++++
+ scripts/kconfig/lkc.h      |    1 +
+ 3 files changed, 49 insertions(+), 1 deletions(-)
 
-  Linux 3.0-rc1 (2011-05-29 17:43:36 -0700)
+diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
+index 006ad81..2b91e3b 100644
+--- a/scripts/kconfig/conf.c
++++ b/scripts/kconfig/conf.c
+@@ -456,7 +456,7 @@ static struct option long_opts[] = {
+ 	{NULL, 0, NULL, 0}
+ };
+ 
+-int main(int ac, char **av)
++int main(int ac, char **av, char **ep)
+ {
+ 	int opt;
+ 	const char *name;
+@@ -563,6 +563,11 @@ int main(int ac, char **av)
+ 		break;
+ 	}
+ 
++	for ( ; *ep;  ep++) {
++		if (!strncmp(*ep, CONFIG_, strlen(CONFIG_)))
++			conf_set_symbol_from_env(*ep);
++	}
++
+ 	if (sync_kconfig) {
+ 		if (conf_get_changed()) {
+ 			name = getenv("KCONFIG_NOSILENTUPDATE");
+diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
+index 2bafd9a..ada3c4b 100644
+--- a/scripts/kconfig/confdata.c
++++ b/scripts/kconfig/confdata.c
+@@ -338,6 +338,48 @@ setsym:
+ 	return 0;
+ }
+ 
++void conf_set_symbol_from_env(char *str)
++{
++	char *p = strchr(str, '=');
++	struct symbol *sym;
++	int def = S_DEF_USER;
++	int def_flags = SYMBOL_DEF << def;
++
++	if (!p)
++		return;
++
++	*p = 0;
++	sym = sym_find(str + strlen(CONFIG_));
++	*p++ = '=';
++
++	if (!sym)
++		return;
++
++	sym_calc_value(sym);
++	if (!sym_set_string_value(sym, p))
++		return;
++	conf_message("CONFIG_%s set to %s from environment", sym->name, p);
++	if (sym && sym_is_choice_value(sym)) {
++		struct symbol *cs = prop_get_symbol(sym_get_choice_prop(sym));
++		switch (sym->def[def].tri) {
++		case no:
++			break;
++		case mod:
++			if (cs->def[def].tri == yes) {
++				conf_warning("%s creates inconsistent choice state", sym->name);
++				cs->flags &= ~def_flags;
++			}
++			break;
++		case yes:
++			if (cs->def[def].tri != no)
++				conf_warning("override: %s changes choice state", sym->name);
++			cs->def[def].val = sym;
++			break;
++		}
++		cs->def[def].tri = EXPR_OR(cs->def[def].tri, sym->def[def].tri);
++	}
++}
++
+ int conf_read(const char *name)
+ {
+ 	struct symbol *sym, *choice_sym;
+diff --git a/scripts/kconfig/lkc.h b/scripts/kconfig/lkc.h
+index f34a0a9..fc2f3ad 100644
+--- a/scripts/kconfig/lkc.h
++++ b/scripts/kconfig/lkc.h
+@@ -89,6 +89,7 @@ char *conf_get_default_confname(void);
+ void sym_set_change_count(int count);
+ void sym_add_change_count(int count);
+ void conf_set_all_new_symbols(enum conf_def_mode mode);
++void conf_set_symbol_from_env(char *);
+ 
+ /* confdata.c and expr.c */
+ static inline void xfwrite(const void *str, size_t len, size_t count, FILE *out)
+-- 
+1.7.6
 
-are available in the git repository at:
-  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild-2.6.git kconfig
 
-Arnaud Lacombe (20):
-      kconfig: annotate non-trivial fall-trough
-      kconfig: fix return code for invalid boolean symbol in conf_set_sym_val()
-      kconfig: add missing <stdarg.h> inclusion
-      kconfig: add missing <ctype.h> inclusion
-      kconfig: add missing <stdlib.h> inclusion
-      kconfig: nuke reference to SWIG
-      kconfig: nuke LKC_DIRECT_LINK cruft
-      kconfig/gconf: kill deadcode
-      kconfig/gconf: silent missing prototype warnings
-      kconfig: do not overwrite symbol direct dependency in assignment
-      kconfig: introduce specialized printer
-      kconfig: use calloc() for expr allocation
-      kconfig/conf: reduce the scope of `defconfig_file'
-      kconfig/conf: add command line options' description
-      kconfig: remove pending prototypes for kconfig_load()
-      kconfig/conf: mark xfgets() private
-      kconfig/nconf: use the generic menu_get_ext_help()
-      kconfig/nconf: prevent segfault on empty menu
-      kconfig/nconf: remove useless conditionnal
-      kconfig: fix missing "0x" prefix from S_HEX symbol in autoconf.h
+-- 
+dwmw2
 
-Jean-Christophe PLAGNIOL-VILLARD (1):
-      kconfig: autogenerated config_is_xxx macro
-
-Michal Marek (8):
-      Merge branch 'kbuild/kconfig-for-40' into kbuild/kconfig
-      kconfig: Only generate config_is_xxx for bool and tristate options
-      Merge branch 'kbuild/kconfig-for-40' into kbuild/kconfig
-      Merge commit 'v3.0-rc1' into kbuild/kconfig
-      Merge branch 'kconfig-trivial' of git://github.com/lacombar/linux-2.6 into kbuild/kconfig
-      Merge branch 'kconfig-trivial' of git://github.com/lacombar/linux-2.6 into kbuild/kconfig
-      xconfig: Abort close if configuration cannot be saved
-      kconfig: Introduce IS_ENABLED(), IS_BUILTIN() and IS_MODULE()
-
-Raghavendra D Prabhu (1):
-      nconfig: Avoid Wunused-but-set warning
-
- Makefile                            |    2 +-
- include/linux/kconfig.h             |   32 ++++
- scripts/kconfig/Makefile            |   23 +--
- scripts/kconfig/conf.c              |   48 +++++-
- scripts/kconfig/confdata.c          |  295 +++++++++++++++++++++++------------
- scripts/kconfig/expr.c              |   13 +-
- scripts/kconfig/expr.h              |    3 -
- scripts/kconfig/gconf.c             |   38 +-----
- scripts/kconfig/kconfig_load.c      |   35 ----
- scripts/kconfig/kxgettext.c         |    1 -
- scripts/kconfig/lex.zconf.c_shipped |    1 -
- scripts/kconfig/lkc.h               |   16 +--
- scripts/kconfig/lkc_proto.h         |    1 +
- scripts/kconfig/mconf.c             |    2 +-
- scripts/kconfig/menu.c              |    5 +-
- scripts/kconfig/nconf.c             |   30 +---
- scripts/kconfig/qconf.cc            |   17 ++-
- scripts/kconfig/qconf.h             |    2 +-
- scripts/kconfig/symbol.c            |   47 ++++++-
- scripts/kconfig/util.c              |    2 +
- scripts/kconfig/zconf.l             |    1 -
- scripts/kconfig/zconf.tab.c_shipped |    1 -
- scripts/kconfig/zconf.y             |    1 -
- 23 files changed, 356 insertions(+), 260 deletions(-)
- create mode 100644 include/linux/kconfig.h
- delete mode 100644 scripts/kconfig/kconfig_load.c
