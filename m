@@ -1,73 +1,99 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pz0-f42.google.com ([209.85.210.42]:52644 "EHLO
-	mail-pz0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752580Ab1G2S6F convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 29 Jul 2011 14:58:05 -0400
+Received: from cantor2.suse.de ([195.135.220.15]:54499 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752493Ab1G2UXj (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 29 Jul 2011 16:23:39 -0400
+Date: Fri, 29 Jul 2011 22:23:36 +0200
+From: Michal Marek <mmarek@suse.cz>
+Subject: [GIT] kbuild/kconfig for 3.1-rc1
+Message-ID: <20110729202336.GA1162@sepie.suse.cz>
 MIME-Version: 1.0
-In-Reply-To: <20110729112526.db528361.rdunlap@xenotime.net>
-References: <1311634718-32588-1-git-send-email-mmarek@suse.cz>
-	<1311947497-4958-1-git-send-email-mmarek@suse.cz>
-	<20110729112526.db528361.rdunlap@xenotime.net>
-Date: Fri, 29 Jul 2011 14:58:03 -0400
-Message-ID: <CACqU3MXWpkbyn9D23pk7mB5M_NeC0zieWXAmN4Cz=_PTJOaRrg@mail.gmail.com>
-Subject: Re: [PATCH] kconfig: Introduce IS_ENABLED(), IS_BUILTIN() and IS_MODULE()
-From: Arnaud Lacombe <lacombar@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Randy Dunlap <rdunlap@xenotime.net>
-Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, xiyou.wangcong@gmail.com, sam@ravnborg.org, linux-kernel@vger.kernel.org, plagnioj@jcrosoft.com
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: lacombar@gmail.com, mmarek@suse.cz, plagnioj@jcrosoft.com, rprabhu@wnohang.net, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Hi,
+Hi Linus,
 
-On Fri, Jul 29, 2011 at 2:25 PM, Randy Dunlap <rdunlap@xenotime.net> wrote:
-> On Fri, 29 Jul 2011 15:51:37 +0200 Michal Marek wrote:
->
->> Replace the config_is_*() macros with a variant that allows for grepping
->> for usage of CONFIG_* options in the code. Usage:
->>
->>   if (IS_ENABLED(CONFIG_NUMA))
->>
->> or
->>
->>   #if IS_ENABLED(CONFIG_NUMA)
->>
->> The IS_ENABLED() macro evaluates to 1 if the argument is set (to either 'y'
->> or 'm'), IS_BUILTIN() tests if the option is 'y' and IS_MODULE() test if
->> the option is 'm'. Only boolean and tristate options are supported.
->>
->> Signed-off-by: Michal Marek <mmarek@suse.cz>
->> ---
->>
->> Everybody happy with the above naming?
->
-> Yes here.
->
-> Acked-by: Randy Dunlap <rdunlap@xenotime.net>
->
-> These strings are being written to the .config file, right?
->
-no, they are written to `include/generated/autoconf.h'
+here is the kconfig stuff for 3.1-rc1:
+* Lots of internal kconfig cleanup as well as bugfixes
+* New macros that allow to test CONFIG_ options in C expressions, this will
+  allow to convert some '#ifdef CONFIG_FOO' in the source to a more
+  readable variant 'if (IS_ENABLED(CONFIG_FOO))' in the future.
 
- - Arnaud
+Thanks,
+Michal
 
->> +             /*
->> +              * Generate the __enabled_CONFIG_* and
->> +              * __enabled_CONFIG_*_MODULE macros for use by the
->> +              * IS_{ENABLED,BUILTIN,MODULE} macros. The _MODULE variant is
->> +              * generated even for booleans so that the IS_ENABLED() macro
->> +              * works.
->> +              */
->> +             fprintf(fp, "#define __enabled_" CONFIG_ "%s %d\n",
->> +                             sym->name, (*value == 'y'));
->> +             fprintf(fp, "#define __enabled_" CONFIG_ "%s_MODULE %d\n",
->> +                             sym->name, (*value == 'm'));
->>               break;
->
->
-> ---
-> ~Randy
-> *** Remember to use Documentation/SubmitChecklist when testing your code ***
->
+The following changes since commit 55922c9d1b84b89cb946c777fddccb3247e7df2c:
+
+  Linux 3.0-rc1 (2011-05-29 17:43:36 -0700)
+
+are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild-2.6.git kconfig
+
+Arnaud Lacombe (20):
+      kconfig: annotate non-trivial fall-trough
+      kconfig: fix return code for invalid boolean symbol in conf_set_sym_val()
+      kconfig: add missing <stdarg.h> inclusion
+      kconfig: add missing <ctype.h> inclusion
+      kconfig: add missing <stdlib.h> inclusion
+      kconfig: nuke reference to SWIG
+      kconfig: nuke LKC_DIRECT_LINK cruft
+      kconfig/gconf: kill deadcode
+      kconfig/gconf: silent missing prototype warnings
+      kconfig: do not overwrite symbol direct dependency in assignment
+      kconfig: introduce specialized printer
+      kconfig: use calloc() for expr allocation
+      kconfig/conf: reduce the scope of `defconfig_file'
+      kconfig/conf: add command line options' description
+      kconfig: remove pending prototypes for kconfig_load()
+      kconfig/conf: mark xfgets() private
+      kconfig/nconf: use the generic menu_get_ext_help()
+      kconfig/nconf: prevent segfault on empty menu
+      kconfig/nconf: remove useless conditionnal
+      kconfig: fix missing "0x" prefix from S_HEX symbol in autoconf.h
+
+Jean-Christophe PLAGNIOL-VILLARD (1):
+      kconfig: autogenerated config_is_xxx macro
+
+Michal Marek (8):
+      Merge branch 'kbuild/kconfig-for-40' into kbuild/kconfig
+      kconfig: Only generate config_is_xxx for bool and tristate options
+      Merge branch 'kbuild/kconfig-for-40' into kbuild/kconfig
+      Merge commit 'v3.0-rc1' into kbuild/kconfig
+      Merge branch 'kconfig-trivial' of git://github.com/lacombar/linux-2.6 into kbuild/kconfig
+      Merge branch 'kconfig-trivial' of git://github.com/lacombar/linux-2.6 into kbuild/kconfig
+      xconfig: Abort close if configuration cannot be saved
+      kconfig: Introduce IS_ENABLED(), IS_BUILTIN() and IS_MODULE()
+
+Raghavendra D Prabhu (1):
+      nconfig: Avoid Wunused-but-set warning
+
+ Makefile                            |    2 +-
+ include/linux/kconfig.h             |   32 ++++
+ scripts/kconfig/Makefile            |   23 +--
+ scripts/kconfig/conf.c              |   48 +++++-
+ scripts/kconfig/confdata.c          |  295 +++++++++++++++++++++++------------
+ scripts/kconfig/expr.c              |   13 +-
+ scripts/kconfig/expr.h              |    3 -
+ scripts/kconfig/gconf.c             |   38 +-----
+ scripts/kconfig/kconfig_load.c      |   35 ----
+ scripts/kconfig/kxgettext.c         |    1 -
+ scripts/kconfig/lex.zconf.c_shipped |    1 -
+ scripts/kconfig/lkc.h               |   16 +--
+ scripts/kconfig/lkc_proto.h         |    1 +
+ scripts/kconfig/mconf.c             |    2 +-
+ scripts/kconfig/menu.c              |    5 +-
+ scripts/kconfig/nconf.c             |   30 +---
+ scripts/kconfig/qconf.cc            |   17 ++-
+ scripts/kconfig/qconf.h             |    2 +-
+ scripts/kconfig/symbol.c            |   47 ++++++-
+ scripts/kconfig/util.c              |    2 +
+ scripts/kconfig/zconf.l             |    1 -
+ scripts/kconfig/zconf.tab.c_shipped |    1 -
+ scripts/kconfig/zconf.y             |    1 -
+ 23 files changed, 356 insertions(+), 260 deletions(-)
+ create mode 100644 include/linux/kconfig.h
+ delete mode 100644 scripts/kconfig/kconfig_load.c
