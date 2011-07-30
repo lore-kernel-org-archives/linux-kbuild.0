@@ -1,14 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from casper.infradead.org ([85.118.1.10]:60268 "EHLO
+Received: from casper.infradead.org ([85.118.1.10]:42492 "EHLO
 	casper.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750901Ab1G3IiE (ORCPT
+	with ESMTP id S1751374Ab1G3JEc (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 30 Jul 2011 04:38:04 -0400
-Subject: Re: [PATCH v3] x86, kconfig: Default to ARCH=x86 to avoid
- overriding CONFIG_64BIT
+	Sat, 30 Jul 2011 05:04:32 -0400
+Subject: Re: [PATCH v2] Enable 'make CONFIG_FOO=y oldconfig'
 From: David Woodhouse <dwmw2@infradead.org>
-Date: Sat, 30 Jul 2011 09:37:40 +0100
-In-Reply-To: <CACqU3MUnUHafhHFye2x1gR_b4ebN1zUK7PfSiUp1j=24y07yuA@mail.gmail.com>
+Date: Sat, 30 Jul 2011 10:04:23 +0100
+In-Reply-To: <CACqU3MWhc6cGqyR8g73ZxMu3kYjufzHoEEWku6of+-1W1FO21Q@mail.gmail.com>
 References: <1306707270.2029.377.camel@i7.infradead.org>
 	 <20110530072300.GA9802@elte.hu>
 	 <1306745835.2029.389.camel@i7.infradead.org>
@@ -23,55 +22,110 @@ References: <1306707270.2029.377.camel@i7.infradead.org>
 	 <BANLkTik=uHr1eX44XV1pAHUfVQ-MorzOnw@mail.gmail.com>
 	 <1306856937.27477.3.camel@i7.infradead.org>
 	 <BANLkTi=VoL8ze0AcdkG_QmEH5049X2K6Zw@mail.gmail.com>
-	 <4E0495F4.7080300@suse.cz> <1311986969.20983.52.camel@i7.infradead.org>
-	 <CACqU3MUnUHafhHFye2x1gR_b4ebN1zUK7PfSiUp1j=24y07yuA@mail.gmail.com>
+	 <4E0495F4.7080300@suse.cz> <1311982365.20983.42.camel@i7.infradead.org>
+	 <CACqU3MWhc6cGqyR8g73ZxMu3kYjufzHoEEWku6of+-1W1FO21Q@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-Message-ID: <1312015064.20983.58.camel@i7.infradead.org>
+Message-ID: <1312016665.20983.75.camel@i7.infradead.org>
 Mime-Version: 1.0
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Arnaud Lacombe <lacombar@gmail.com>
 Cc: Michal Marek <mmarek@suse.cz>, Ted Ts'o <tytso@mit.edu>, Ingo Molnar <mingo@elte.hu>, x86@kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, hpa@zytor.com
 
-On Fri, 2011-07-29 at 21:26 -0400, Arnaud Lacombe wrote:
-> 
-> Should we not try to fix this rather than introduce a new interface ?
+On Fri, 2011-07-29 at 21:15 -0400, Arnaud Lacombe wrote:
+> Technically, kconfig already provides you all the interfaces to set
+> symbol to a given value, for `randconfig' via "rand.config", for
+> `all{yes,mod,no}config', via all.{yes,mod,no}config, for oldconfig via
+> .config. Why another interface ?
 
-This patch *does* fix it, without needing the new interface that I
-presented in a separate patch. The two patches I sent are not strictly
-dependent on one another.
+It's useful for some people to be able to do this as simply as possible
+from the command line, and they get very upset if you suggest that they
+might use those other methods instead.
 
-> From my point of view, we (ie. Kbuild) should be intelligent enough to
-> take the default from the .config, if one is present in the object
-> directory, rather than trying to impose it's own view on what the ARCH
-> should be.
-> 
-> Is there case where we would have a .config, but would not use its
-> content ?
+In particular, some people currently use the legacy 'ARCH=i386' and
+'ARCH=x86_64' settings on the command line in order to switch the value
+of CONFIG_64BIT on and off for various *config targets¹. In fact, I
+think that's the *only* thing that those legacy ARCH settings still do;
+they could (technically, at least) be killed off if we have an
+alternative way of doing it. This provides an alternative, more generic
+way of doing it for *all* config options; not just CONFIG_64BIT and not
+just for x86.
 
-Heh, I think you've missed some of the history here.
+(¹ Note: in fact, *many* people use 'ARCH=i386' and 'ARCH=x86_64', but
+not really for this purpose. Most people use it just to work around the
+bug I fixed in my other patch — that the value of CONFIG_64BIT is
+*always* overridden to match the build host, unless you do *something*
+on the command line to work around it. Just ARCH=x86 would suffice,
+since that makes CONFIG_64BIT work sanely again.)
 
-I originally, a year or two ago, posted a patch which took precisely the
-approach I think you're advocating. It basically made the ARCH=x86
-behaviour apply in all cases. It was reverted because it made 'make
-randconfig' actually *random* — *even* for the setting of CONFIG_64BIT,
-*even* when ARCH=i386 or ARCH=x86_64.
+> > +void conf_set_symbol_from_env(char *str)
+> > +{
+> > +       char *p = strchr(str, '=');
+> > +       struct symbol *sym;
+> > +       int def = S_DEF_USER;
+> > +       int def_flags = SYMBOL_DEF << def;
+> > +
+> > +       if (!p)
+> > +               return;
+> the environment should already gives you the guarantee that `p' won't
+> be NULL. If that's not the case, the environment is likely to be
+> broken.
 
-The fact that KCONFIG_ALLCONFIG allows you to override *all* config
-options and not just CONFIG_64BIT, and that using the legacy ARCH=
-settings wasn't really necessary, was evidently not sufficient. It
-apparently *had* to be possible to switch using the command line.
+Yes, that's true. Nevertheless, I've seen broken environments — there's
+no harm in being robust. We can't be robust in the face of *all* the
+ways the environment could screw up, of course, but this check doesn't
+really hurt. Especially given that the getenv() isn't even *in* this
+function, so this function is even more justified in checking its
+inputs.
 
-So I did two things — I fixed this patch so that it doesn't break that
-legacy use case of 'make ARCH=i386' or 'make ARCH=x86_64' to force the
-value of CONFIG_64BIT on or off, and I also posted a separate patch
-which gives a more *sensible* way to force *any* config options on or
-off from the 'make' command line, since the world is apparently going to
-end if we can't do that.
+> > +
+> > +       *p = 0;
+> > +       sym = sym_find(str + strlen(CONFIG_));
+> > +       *p++ = '=';
+> > +
+> > +       if (!sym)
+> > +               return;
+> > +
+> > +       sym_calc_value(sym);
+> > +       if (!sym_set_string_value(sym, p))
+> > +               return;
+> > +       conf_message("CONFIG_%s set to %s from environment", sym->name, p);
+> please do not hardcode the prefix.
 
-The two patches can be considered to be entirely independent.
+OK.
 
+> > +       if (sym && sym_is_choice_value(sym)) {
+> you do not need to test for the validity of a pointer you
+> unconditionally dereference right before :)
+
+That's a copy-and-paste from identical code in conf_read_simple(), which
+I suppose should be factored out into a separate function. if I really
+understood what it was doing I'd be able to suggest a sane name...
+sym_validate_choice_state() perhaps?
+
+I'll do that.
+
+> > +               struct symbol *cs = prop_get_symbol(sym_get_choice_prop(sym));
+> > +               switch (sym->def[def].tri) {
+> > +               case no:
+> > +                       break;
+> > +               case mod:
+> > +                       if (cs->def[def].tri == yes) {
+> > +                               conf_warning("%s creates inconsistent choice state", sym->name);
+> > +                               cs->flags &= ~def_flags;
+> > +                       }
+> > +                       break;
+> > +               case yes:
+> > +                       if (cs->def[def].tri != no)
+> > +                               conf_warning("override: %s changes choice state", sym->name);
+> > +                       cs->def[def].val = sym;
+> > +                       break;
+> > +               }
+> > +               cs->def[def].tri = EXPR_OR(cs->def[def].tri, sym->def[def].tri);
+> > +       }
+> > +}
+> > +
 -- 
 dwmw2
 
