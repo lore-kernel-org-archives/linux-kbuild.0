@@ -1,15 +1,15 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from flawless.hostnac.com ([67.23.244.186]:52460 "EHLO
+Received: from flawless.hostnac.com ([67.23.244.186]:42693 "EHLO
 	flawless.hostnac.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750870Ab1G3MJY (ORCPT
+	with ESMTP id S1751145Ab1G3MeM (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 30 Jul 2011 08:09:24 -0400
+	Sat, 30 Jul 2011 08:34:12 -0400
 From: =?UTF-8?q?Rados=C5=82aw=20Smogura?= <mail@smogura.eu>
 Subject: [PATCH] Allows Kernel developer to change optimization options making code more debug friendly.
-Date: Sat, 30 Jul 2011 14:09:09 +0200
-Message-Id: <1312027749-10520-1-git-send-email-mail@smogura.eu>
-In-Reply-To: <4E2D2689.6030500@suse.cz>
-References: <4E2D2689.6030500@suse.cz>
+Date: Sat, 30 Jul 2011 14:33:54 +0200
+Message-Id: <1312029234-14997-1-git-send-email-mail@smogura.eu>
+In-Reply-To: <1312027749-10520-1-git-send-email-mail@smogura.eu>
+References: <1312027749-10520-1-git-send-email-mail@smogura.eu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -35,11 +35,9 @@ Signed-off-by: Radosław Smogura <mail@smogura.eu>
  Makefile                           |   11 ++
  lib/Kconfig.debug                  |    2 +
  lib/Kconfig.debug.optim            |  214 ++++++++++++++++++++++++++++++++++++
- mm/Kconfig                         |    8 ++
- mm/Makefile                        |    1 +
  scripts/Makefile.optim.inc         |   55 +++++++++
  scripts/debug/make_config_optim.sh |   92 +++++++++++++++
- 7 files changed, 383 insertions(+), 0 deletions(-)
+ 5 files changed, 374 insertions(+), 0 deletions(-)
  create mode 100644 lib/Kconfig.debug.optim
  create mode 100644 scripts/Makefile.optim.inc
  create mode 100644 scripts/debug/make_config_optim.sh
@@ -304,34 +302,6 @@ index 0000000..b5c8795
 +	  You SHOULD say N here.
 +
 +endif #HACK_OPTIM
-diff --git a/mm/Kconfig b/mm/Kconfig
-index f2f1ca1..1d37e26 100644
---- a/mm/Kconfig
-+++ b/mm/Kconfig
-@@ -183,6 +183,14 @@ config COMPACTION
- 	help
- 	  Allows the compaction of memory for the allocation of huge pages.
- 
-+config DEFRAG_PAGECACHE
-+	bool "Allow defragmenting page cache to huge pages"
-+	select MIGRATION
-+	depends on MMU
-+	help
-+	  Allows migration of page cache to huge pages. Currently only supports
-+	  tmpfs (/dev/shm). Selecting this will allow to use huge pages when
-+	  mmaping POSIX shared memory.
- #
- # support for page migration
- #
-diff --git a/mm/Makefile b/mm/Makefile
-index 836e416..5736d2a 100644
---- a/mm/Makefile
-+++ b/mm/Makefile
-@@ -50,3 +50,4 @@ obj-$(CONFIG_HWPOISON_INJECT) += hwpoison-inject.o
- obj-$(CONFIG_DEBUG_KMEMLEAK) += kmemleak.o
- obj-$(CONFIG_DEBUG_KMEMLEAK_TEST) += kmemleak-test.o
- obj-$(CONFIG_CLEANCACHE) += cleancache.o
-+obj-$(CONFIG_DEFRAG_PAGECACHE) += defrag-pagecache.o
 diff --git a/scripts/Makefile.optim.inc b/scripts/Makefile.optim.inc
 new file mode 100644
 index 0000000..6e17d53
