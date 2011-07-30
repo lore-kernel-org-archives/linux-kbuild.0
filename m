@@ -1,11 +1,11 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pz0-f42.google.com ([209.85.210.42]:37782 "EHLO
+Received: from mail-pz0-f42.google.com ([209.85.210.42]:34715 "EHLO
 	mail-pz0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751491Ab1G3PVn convert rfc822-to-8bit (ORCPT
+	with ESMTP id S1752083Ab1G3PwP convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 30 Jul 2011 11:21:43 -0400
+	Sat, 30 Jul 2011 11:52:15 -0400
 MIME-Version: 1.0
-In-Reply-To: <1312015064.20983.58.camel@i7.infradead.org>
+In-Reply-To: <1311986969.20983.52.camel@i7.infradead.org>
 References: <1306707270.2029.377.camel@i7.infradead.org>
 	<20110530072300.GA9802@elte.hu>
 	<1306745835.2029.389.camel@i7.infradead.org>
@@ -23,85 +23,75 @@ References: <1306707270.2029.377.camel@i7.infradead.org>
 	<BANLkTi=VoL8ze0AcdkG_QmEH5049X2K6Zw@mail.gmail.com>
 	<4E0495F4.7080300@suse.cz>
 	<1311986969.20983.52.camel@i7.infradead.org>
-	<CACqU3MUnUHafhHFye2x1gR_b4ebN1zUK7PfSiUp1j=24y07yuA@mail.gmail.com>
-	<1312015064.20983.58.camel@i7.infradead.org>
-Date: Sat, 30 Jul 2011 11:21:42 -0400
-Message-ID: <CACqU3MVh7JYsO94UEcxOp+jx2PCO_J3o+5MyU-ivx1utP9aDnw@mail.gmail.com>
+Date: Sat, 30 Jul 2011 11:52:14 -0400
+Message-ID: <CACqU3MXeUiiQPc4t9bT7KuXuAjkN+t8eFn9SYOouPg-3hDgjWQ@mail.gmail.com>
 Subject: Re: [PATCH v3] x86, kconfig: Default to ARCH=x86 to avoid overriding CONFIG_64BIT
 From: Arnaud Lacombe <lacombar@gmail.com>
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: David Woodhouse <dwmw2@infradead.org>
 Cc: Michal Marek <mmarek@suse.cz>, Ted Ts'o <tytso@mit.edu>, Ingo Molnar <mingo@elte.hu>, x86@kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, hpa@zytor.com
 
-Hi
+Hi,
 
-On Sat, Jul 30, 2011 at 4:37 AM, David Woodhouse <dwmw2@infradead.org> wrote:
-> On Fri, 2011-07-29 at 21:26 -0400, Arnaud Lacombe wrote:
->>
->> Should we not try to fix this rather than introduce a new interface ?
+On Fri, Jul 29, 2011 at 8:49 PM, David Woodhouse <dwmw2@infradead.org> wrote:
+> I *frequently* waste a bunch of time when I take a 32-bit .config from a
+> test machine and try to build it on a faster 64-bit system, and its
+> existing setting of CONFIG_64BIT=n gets *changed* to match the build host.
 >
-> This patch *does* fix it, without needing the new interface that I
-> presented in a separate patch. The two patches I sent are not strictly
-> dependent on one another.
+> This is because the default setting for $ARCH when discovered from
+> 'uname' is one of the legacy pre-x86-merge values (i386 or x86_64),
+> which effectively force the setting of CONFIG_64BIT to match. We should
+> default to ARCH=x86 instead, finally completing the merge that we
+> started so long ago.
 >
->> From my point of view, we (ie. Kbuild) should be intelligent enough to
->> take the default from the .config, if one is present in the object
->> directory, rather than trying to impose it's own view on what the ARCH
->> should be.
->>
->> Is there case where we would have a .config, but would not use its
->> content ?
+> This patch preserves the behaviour of the legacy ARCH settings for commands
+> such as:
 >
-> Heh, I think you've missed some of the history here.
+>   make ARCH=x86_64 randconfig
+>   make ARCH=i386 randconfig
 >
-> I originally, a year or two ago, posted a patch which took precisely the
-> approach I think you're advocating.
-Just to make my point clearer, here is what I'd be advocating:
-
-diff --git a/Makefile b/Makefile
-index b927e75..a15b773 100644
---- a/Makefile
-+++ b/Makefile
-@@ -192,7 +192,11 @@ SUBARCH := $(shell uname -m | sed -e s/i.86/i386/
--e s/sun4u/sparc64/ \
- # Default value for CROSS_COMPILE is not to prefix executables
- # Note: Some architectures assign CROSS_COMPILE in their arch/*/Makefile
- export KBUILD_BUILDHOST := $(SUBARCH)
-+ifeq ($(shell test -e .config && echo n),n)
- ARCH           ?= $(SUBARCH)
-+else
-+ARCH           ?= $(shell sed '/^\# Linux\/\(.*\) .* Kernel
-Configuration/!d; s//\1/' .config)
-+endif
- CROSS_COMPILE  ?= $(CONFIG_CROSS_COMPILE:"%"=%)
-
-this work but smells hackish.
+> ... although since my commit "Enable 'make CONFIG_FOO=y oldconfig'" those
+> would be better expressed as:
+>
+>   make CONFIG_64BIT=y randconfig
+>   make CONFIG_64BIT=n randconfig
+>
+> ... since that is a more generic way to set *any* config option, and
+> there's no other technical reason to keep the legacy ARCH values around
+> any more just to achieve that purpose; they could be removed at any
+> time.
+>
+> Signed-off-by: David Woodhouse <David.Woodhouse@intel.com>
+> Link: http://lkml.kernel.org/r/1306707270.2029.377.camel@i7.infradead.org
+> ---
+> v2: Explicitly turn off CONFIG_64BIT in i386_defconfig. The default for
+>    CONFIG_64BIT has *changed* (from n to y) for ARCH=x86, so it needs to
+>    be explicitly turned off or 'make i386_defconfig' will give you 64-bit.
+> v3: Same patch as before; just updated changelog.
+>
+>  Makefile                        |    3 ++-
+>  arch/x86/Kconfig                |    2 +-
+>  arch/x86/Makefile               |    4 ++++
+>  arch/x86/configs/i386_defconfig |    1 +
+>  4 files changed, 8 insertions(+), 2 deletions(-)
+>
+> diff --git a/Makefile b/Makefile
+> index d018956..303df9b 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -165,7 +165,8 @@ export srctree objtree VPATH
+>  # then ARCH is assigned, getting whatever value it gets normally, and
+>  # SUBARCH is subsequently ignored.
+>
+> -SUBARCH := $(shell uname -m | sed -e s/i.86/i386/ -e s/sun4u/sparc64/ \
+> +SUBARCH := $(shell uname -m | sed -e s/i.86/x86/ -e s/x86_64/x86/ \
+> +                                 -e s/sun4u/sparc64/ \
+>                                  -e s/arm.*/arm/ -e s/sa110/arm/ \
+>                                  -e s/s390x/s390/ -e s/parisc64/parisc/ \
+>                                  -e s/ppc.*/powerpc/ -e s/mips.*/mips/ \
+this is breaking ARCH=um.
 
  - Arnaud
-
-> It basically made the ARCH=x86
-> behaviour apply in all cases. It was reverted because it made 'make
-> randconfig' actually *random* — *even* for the setting of CONFIG_64BIT,
-> *even* when ARCH=i386 or ARCH=x86_64.
->
-> The fact that KCONFIG_ALLCONFIG allows you to override *all* config
-> options and not just CONFIG_64BIT, and that using the legacy ARCH=
-> settings wasn't really necessary, was evidently not sufficient. It
-> apparently *had* to be possible to switch using the command line.
->
-> So I did two things — I fixed this patch so that it doesn't break that
-> legacy use case of 'make ARCH=i386' or 'make ARCH=x86_64' to force the
-> value of CONFIG_64BIT on or off, and I also posted a separate patch
-> which gives a more *sensible* way to force *any* config options on or
-> off from the 'make' command line, since the world is apparently going to
-> end if we can't do that.
->
-> The two patches can be considered to be entirely independent.
->
-> --
-> dwmw2
->
->
