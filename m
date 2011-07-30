@@ -1,131 +1,496 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from casper.infradead.org ([85.118.1.10]:42492 "EHLO
-	casper.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751374Ab1G3JEc (ORCPT
+Received: from flawless.hostnac.com ([67.23.244.186]:52460 "EHLO
+	flawless.hostnac.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750870Ab1G3MJY (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 30 Jul 2011 05:04:32 -0400
-Subject: Re: [PATCH v2] Enable 'make CONFIG_FOO=y oldconfig'
-From: David Woodhouse <dwmw2@infradead.org>
-Date: Sat, 30 Jul 2011 10:04:23 +0100
-In-Reply-To: <CACqU3MWhc6cGqyR8g73ZxMu3kYjufzHoEEWku6of+-1W1FO21Q@mail.gmail.com>
-References: <1306707270.2029.377.camel@i7.infradead.org>
-	 <20110530072300.GA9802@elte.hu>
-	 <1306745835.2029.389.camel@i7.infradead.org>
-	 <20110530104231.GF17821@elte.hu> <20110530104656.GA19532@elte.hu>
-	 <E934876C-FABB-41F8-8C5E-469AA42DBE91@mit.edu>
-	 <20110530105809.GA20133@elte.hu>
-	 <1A4DB87D-9B32-44C0-B7C9-47A003CABD96@mit.edu>
-	 <alpine.LFD.2.02.1105301955210.3164@localhost6.localdomain6>
-	 <20110530195545.GG2890@dhcp-172-31-194-241.cam.corp.google.com>
-	 <alpine.LFD.2.02.1105302103220.3164@localhost6.localdomain6>
-	 <1306795186.2029.459.camel@i7.infradead.org>
-	 <BANLkTik=uHr1eX44XV1pAHUfVQ-MorzOnw@mail.gmail.com>
-	 <1306856937.27477.3.camel@i7.infradead.org>
-	 <BANLkTi=VoL8ze0AcdkG_QmEH5049X2K6Zw@mail.gmail.com>
-	 <4E0495F4.7080300@suse.cz> <1311982365.20983.42.camel@i7.infradead.org>
-	 <CACqU3MWhc6cGqyR8g73ZxMu3kYjufzHoEEWku6of+-1W1FO21Q@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+	Sat, 30 Jul 2011 08:09:24 -0400
+From: =?UTF-8?q?Rados=C5=82aw=20Smogura?= <mail@smogura.eu>
+Subject: [PATCH] Allows Kernel developer to change optimization options making code more debug friendly.
+Date: Sat, 30 Jul 2011 14:09:09 +0200
+Message-Id: <1312027749-10520-1-git-send-email-mail@smogura.eu>
+In-Reply-To: <4E2D2689.6030500@suse.cz>
+References: <4E2D2689.6030500@suse.cz>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Message-ID: <1312016665.20983.75.camel@i7.infradead.org>
-Mime-Version: 1.0
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnaud Lacombe <lacombar@gmail.com>
-Cc: Michal Marek <mmarek@suse.cz>, Ted Ts'o <tytso@mit.edu>, Ingo Molnar <mingo@elte.hu>, x86@kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, hpa@zytor.com
+To: linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Randy Dunlap <rdunlap@xenotime.net>, linux-kbuild@vger.kernel.org
+Cc: =?UTF-8?q?Rados=C5=82aw=20Smogura?= <mail@smogura.eu>
 
-On Fri, 2011-07-29 at 21:15 -0400, Arnaud Lacombe wrote:
-> Technically, kconfig already provides you all the interfaces to set
-> symbol to a given value, for `randconfig' via "rand.config", for
-> `all{yes,mod,no}config', via all.{yes,mod,no}config, for oldconfig via
-> .config. Why another interface ?
+New menu under kernel hacking allows to force "-01" optimization
+and gives ability to discard additional optimizations (passed
+with -O1). Options are added as "-f-no-..." to GCC invoke line.
+This make cause to produce additional warnings, but makes compiled
+code more debug friendly.
 
-It's useful for some people to be able to do this as simply as possible
-from the command line, and they get very upset if you suggest that they
-might use those other methods instead.
+Included new Makefile and new KConfig has been automaticly generated
+by simple bash script scripts/debug/make_config_optim.sh, which
+is included to simple add or remove new options.
 
-In particular, some people currently use the legacy 'ARCH=i386' and
-'ARCH=x86_64' settings on the command line in order to switch the value
-of CONFIG_64BIT on and off for various *config targets¹. In fact, I
-think that's the *only* thing that those legacy ARCH settings still do;
-they could (technically, at least) be killed off if we have an
-alternative way of doing it. This provides an alternative, more generic
-way of doing it for *all* config options; not just CONFIG_64BIT and not
-just for x86.
+Some options are sepcific to GCC version.
 
-(¹ Note: in fact, *many* people use 'ARCH=i386' and 'ARCH=x86_64', but
-not really for this purpose. Most people use it just to work around the
-bug I fixed in my other patch — that the value of CONFIG_64BIT is
-*always* overridden to match the build host, unless you do *something*
-on the command line to work around it. Just ARCH=x86 would suffice,
-since that makes CONFIG_64BIT work sanely again.)
+Signed-off-by: Radosław Smogura <mail@smogura.eu>
+---
+ Makefile                           |   11 ++
+ lib/Kconfig.debug                  |    2 +
+ lib/Kconfig.debug.optim            |  214 ++++++++++++++++++++++++++++++++++++
+ mm/Kconfig                         |    8 ++
+ mm/Makefile                        |    1 +
+ scripts/Makefile.optim.inc         |   55 +++++++++
+ scripts/debug/make_config_optim.sh |   92 +++++++++++++++
+ 7 files changed, 383 insertions(+), 0 deletions(-)
+ create mode 100644 lib/Kconfig.debug.optim
+ create mode 100644 scripts/Makefile.optim.inc
+ create mode 100644 scripts/debug/make_config_optim.sh
 
-> > +void conf_set_symbol_from_env(char *str)
-> > +{
-> > +       char *p = strchr(str, '=');
-> > +       struct symbol *sym;
-> > +       int def = S_DEF_USER;
-> > +       int def_flags = SYMBOL_DEF << def;
-> > +
-> > +       if (!p)
-> > +               return;
-> the environment should already gives you the guarantee that `p' won't
-> be NULL. If that's not the case, the environment is likely to be
-> broken.
-
-Yes, that's true. Nevertheless, I've seen broken environments — there's
-no harm in being robust. We can't be robust in the face of *all* the
-ways the environment could screw up, of course, but this check doesn't
-really hurt. Especially given that the getenv() isn't even *in* this
-function, so this function is even more justified in checking its
-inputs.
-
-> > +
-> > +       *p = 0;
-> > +       sym = sym_find(str + strlen(CONFIG_));
-> > +       *p++ = '=';
-> > +
-> > +       if (!sym)
-> > +               return;
-> > +
-> > +       sym_calc_value(sym);
-> > +       if (!sym_set_string_value(sym, p))
-> > +               return;
-> > +       conf_message("CONFIG_%s set to %s from environment", sym->name, p);
-> please do not hardcode the prefix.
-
-OK.
-
-> > +       if (sym && sym_is_choice_value(sym)) {
-> you do not need to test for the validity of a pointer you
-> unconditionally dereference right before :)
-
-That's a copy-and-paste from identical code in conf_read_simple(), which
-I suppose should be factored out into a separate function. if I really
-understood what it was doing I'd be able to suggest a sane name...
-sym_validate_choice_state() perhaps?
-
-I'll do that.
-
-> > +               struct symbol *cs = prop_get_symbol(sym_get_choice_prop(sym));
-> > +               switch (sym->def[def].tri) {
-> > +               case no:
-> > +                       break;
-> > +               case mod:
-> > +                       if (cs->def[def].tri == yes) {
-> > +                               conf_warning("%s creates inconsistent choice state", sym->name);
-> > +                               cs->flags &= ~def_flags;
-> > +                       }
-> > +                       break;
-> > +               case yes:
-> > +                       if (cs->def[def].tri != no)
-> > +                               conf_warning("override: %s changes choice state", sym->name);
-> > +                       cs->def[def].val = sym;
-> > +                       break;
-> > +               }
-> > +               cs->def[def].tri = EXPR_OR(cs->def[def].tri, sym->def[def].tri);
-> > +       }
-> > +}
-> > +
+diff --git a/Makefile b/Makefile
+index f676d15..1de2a79 100644
+--- a/Makefile
++++ b/Makefile
+@@ -558,12 +558,23 @@ endif # $(dot-config)
+ # Defaults to vmlinux, but the arch makefile usually adds further targets
+ all: vmlinux
+ 
++ifdef CONFIG_HACK_OPTIM_FORCE_O1_LEVEL
++KBUILD_CFLAGS += -O1
++else
++
+ ifdef CONFIG_CC_OPTIMIZE_FOR_SIZE
+ KBUILD_CFLAGS	+= -Os
+ else
+ KBUILD_CFLAGS	+= -O2
+ endif
+ 
++endif
++
++# Include makefile for optimization override
++ifdef CONFIG_HACK_OPTIM
++include $(srctree)/scripts/Makefile.optim.inc
++endif
++
+ include $(srctree)/arch/$(SRCARCH)/Makefile
+ 
+ ifneq ($(CONFIG_FRAME_WARN),0)
+diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
+index c0cb9c4..37976e4 100644
+--- a/lib/Kconfig.debug
++++ b/lib/Kconfig.debug
+@@ -1262,5 +1262,7 @@ source "lib/Kconfig.kgdb"
+ 
+ source "lib/Kconfig.kmemcheck"
+ 
++source "lib/Kconfig.debug.optim"
++
+ config TEST_KSTRTOX
+ 	tristate "Test kstrto*() family of functions at runtime"
+diff --git a/lib/Kconfig.debug.optim b/lib/Kconfig.debug.optim
+new file mode 100644
+index 0000000..b5c8795
+--- /dev/null
++++ b/lib/Kconfig.debug.optim
+@@ -0,0 +1,214 @@
++# This file was auto generated. It's utility configuration
++# Distributed under GPL v2 License
++
++menuconfig HACK_OPTIM
++	bool "Allows overriding GCC optimizations"
++	depends on DEBUG_KERNEL && EXPERIMENTAL
++	help
++	  If you say Y here you will be able to override
++	  how GCC optimizes kernel code. This creates
++	  more debug-friendly code, but does not guarantee
++	  the same running code like a production kernel.
++
++	  If you say Y here probably you will want to say
++	  Y for all suboptions
++
++if HACK_OPTIM
++
++config HACK_OPTIM_FORCE_O1_LEVEL
++	bool "Forces -O1 optimization level"
++	---help---
++	  This changes how GCC optimizes code. Code
++	  may be slower and larger but will be more debug
++	  "friendly".
++
++	  In some cases there is a low chance that the kernel
++	  will run differently than normal, reporting or not
++	  reporting some bugs or errors.
++	  Refer to GCC manual for more details.
++
++	  You SHOULD say N here.
++
++config HACK_OPTIM__fno_inline_functions_called_once
++	bool "Adds -fno-inline-functions-called-once parameter to gcc invoke line."
++	---help---
++	  This changes how GCC optimizes code. Code
++	  may be slower and larger but will be more debug
++	  "friendly".
++
++	  In some cases there is a low chance that the kernel
++	  will run differently than normal, reporting or not
++	  reporting some bugs or errors.
++	  Refer to GCC manual for more details.
++
++	  You SHOULD say N here.
++
++config HACK_OPTIM__fno_combine_stack_adjustments
++	bool "Adds -fno-combine-stack-adjustments parameter to gcc invoke line."
++	---help---
++	  This changes how GCC optimizes code. Code
++	  may be slower and larger but will be more debug
++	  "friendly".
++
++	  In some cases there is a low chance that the kernel
++	  will run differently than normal, reporting or not
++	  reporting some bugs or errors.
++	  Refer to GCC manual for more details.
++
++	  You SHOULD say N here.
++
++config HACK_OPTIM__fno_tree_dce
++	bool "Adds -fno-tree-dce parameter to gcc invoke line."
++	---help---
++	  This changes how GCC optimizes code. Code
++	  may be slower and larger but will be more debug
++	  "friendly".
++
++	  In some cases there is a low chance that the kernel
++	  will run differently than normal, reporting or not
++	  reporting some bugs or errors.
++	  Refer to GCC manual for more details.
++
++	  You SHOULD say N here.
++
++config HACK_OPTIM__fno_tree_dominator_opts
++	bool "Adds -fno-tree-dominator-opts parameter to gcc invoke line."
++	---help---
++	  This changes how GCC optimizes code. Code
++	  may be slower and larger but will be more debug
++	  "friendly".
++
++	  In some cases there is a low chance that the kernel
++	  will run differently than normal, reporting or not
++	  reporting some bugs or errors.
++	  Refer to GCC manual for more details.
++
++	  You SHOULD say N here.
++
++config HACK_OPTIM__fno_dse
++	bool "Adds -fno-dse parameter to gcc invoke line."
++	---help---
++	  This changes how GCC optimizes code. Code
++	  may be slower and larger but will be more debug
++	  "friendly".
++
++	  In some cases there is a low chance that the kernel
++	  will run differently than normal, reporting or not
++	  reporting some bugs or errors.
++	  Refer to GCC manual for more details.
++
++	  You SHOULD say N here.
++
++config HACK_OPTIM__fno_dce
++	bool "Adds -fno-dce parameter to gcc invoke line."
++	---help---
++	  This changes how GCC optimizes code. Code
++	  may be slower and larger but will be more debug
++	  "friendly".
++
++	  In some cases there is a low chance that the kernel
++	  will run differently than normal, reporting or not
++	  reporting some bugs or errors.
++	  Refer to GCC manual for more details.
++
++	  You SHOULD say N here.
++
++config HACK_OPTIM__fno_auto_inc_dec
++	bool "Adds -fno-auto-inc-dec parameter to gcc invoke line."
++	---help---
++	  This changes how GCC optimizes code. Code
++	  may be slower and larger but will be more debug
++	  "friendly".
++
++	  In some cases there is a low chance that the kernel
++	  will run differently than normal, reporting or not
++	  reporting some bugs or errors.
++	  Refer to GCC manual for more details.
++
++	  You SHOULD say N here.
++
++config HACK_OPTIM__fno_inline_small_functions
++	bool "Adds -fno-inline-small-functions parameter to gcc invoke line."
++	---help---
++	  This changes how GCC optimizes code. Code
++	  may be slower and larger but will be more debug
++	  "friendly".
++
++	  In some cases there is a low chance that the kernel
++	  will run differently than normal, reporting or not
++	  reporting some bugs or errors.
++	  Refer to GCC manual for more details.
++
++	  You SHOULD say N here.
++
++config HACK_OPTIM__fno_if_conversion
++	bool "Adds -fno-if-conversion parameter to gcc invoke line."
++	---help---
++	  This changes how GCC optimizes code. Code
++	  may be slower and larger but will be more debug
++	  "friendly".
++
++	  In some cases there is a low chance that the kernel
++	  will run differently than normal, reporting or not
++	  reporting some bugs or errors.
++	  Refer to GCC manual for more details.
++
++	  You SHOULD say N here.
++
++config HACK_OPTIM__fno_if_conversion2
++	bool "Adds -fno-if-conversion2 parameter to gcc invoke line."
++	---help---
++	  This changes how GCC optimizes code. Code
++	  may be slower and larger but will be more debug
++	  "friendly".
++
++	  In some cases there is a low chance that the kernel
++	  will run differently than normal, reporting or not
++	  reporting some bugs or errors.
++	  Refer to GCC manual for more details.
++
++	  You SHOULD say N here.
++
++config HACK_OPTIM__fno_tree_fre
++	bool "Adds -fno-tree-fre parameter to gcc invoke line."
++	---help---
++	  This changes how GCC optimizes code. Code
++	  may be slower and larger but will be more debug
++	  "friendly".
++
++	  In some cases there is a low chance that the kernel
++	  will run differently than normal, reporting or not
++	  reporting some bugs or errors.
++	  Refer to GCC manual for more details.
++
++	  You SHOULD say N here.
++
++config HACK_OPTIM__fno_tree_dse
++	bool "Adds -fno-tree-dse parameter to gcc invoke line."
++	---help---
++	  This changes how GCC optimizes code. Code
++	  may be slower and larger but will be more debug
++	  "friendly".
++
++	  In some cases there is a low chance that the kernel
++	  will run differently than normal, reporting or not
++	  reporting some bugs or errors.
++	  Refer to GCC manual for more details.
++
++	  You SHOULD say N here.
++
++config HACK_OPTIM__fno_tree_sra
++	bool "Adds -fno-tree-sra parameter to gcc invoke line."
++	---help---
++	  This changes how GCC optimizes code. Code
++	  may be slower and larger but will be more debug
++	  "friendly".
++
++	  In some cases there is a low chance that the kernel
++	  will run differently than normal, reporting or not
++	  reporting some bugs or errors.
++	  Refer to GCC manual for more details.
++
++	  You SHOULD say N here.
++
++endif #HACK_OPTIM
+diff --git a/mm/Kconfig b/mm/Kconfig
+index f2f1ca1..1d37e26 100644
+--- a/mm/Kconfig
++++ b/mm/Kconfig
+@@ -183,6 +183,14 @@ config COMPACTION
+ 	help
+ 	  Allows the compaction of memory for the allocation of huge pages.
+ 
++config DEFRAG_PAGECACHE
++	bool "Allow defragmenting page cache to huge pages"
++	select MIGRATION
++	depends on MMU
++	help
++	  Allows migration of page cache to huge pages. Currently only supports
++	  tmpfs (/dev/shm). Selecting this will allow to use huge pages when
++	  mmaping POSIX shared memory.
+ #
+ # support for page migration
+ #
+diff --git a/mm/Makefile b/mm/Makefile
+index 836e416..5736d2a 100644
+--- a/mm/Makefile
++++ b/mm/Makefile
+@@ -50,3 +50,4 @@ obj-$(CONFIG_HWPOISON_INJECT) += hwpoison-inject.o
+ obj-$(CONFIG_DEBUG_KMEMLEAK) += kmemleak.o
+ obj-$(CONFIG_DEBUG_KMEMLEAK_TEST) += kmemleak-test.o
+ obj-$(CONFIG_CLEANCACHE) += cleancache.o
++obj-$(CONFIG_DEFRAG_PAGECACHE) += defrag-pagecache.o
+diff --git a/scripts/Makefile.optim.inc b/scripts/Makefile.optim.inc
+new file mode 100644
+index 0000000..6e17d53
+--- /dev/null
++++ b/scripts/Makefile.optim.inc
+@@ -0,0 +1,55 @@
++# This file was auto generated. It's utility configuration
++# Distributed under GPL v2 License
++
++ifdef CONFIG_HACK_OPTIM__fno_inline_functions_called_once
++	KBUILD_CFLAGS += -fno-inline-functions-called-once
++endif
++
++ifdef CONFIG_HACK_OPTIM__fno_combine_stack_adjustments
++	KBUILD_CFLAGS += -fno-combine-stack-adjustments
++endif
++
++ifdef CONFIG_HACK_OPTIM__fno_tree_dce
++	KBUILD_CFLAGS += -fno-tree-dce
++endif
++
++ifdef CONFIG_HACK_OPTIM__fno_tree_dominator_opts
++	KBUILD_CFLAGS += -fno-tree-dominator-opts
++endif
++
++ifdef CONFIG_HACK_OPTIM__fno_dse
++	KBUILD_CFLAGS += -fno-dse
++endif
++
++ifdef CONFIG_HACK_OPTIM__fno_dce
++	KBUILD_CFLAGS += -fno-dce
++endif
++
++ifdef CONFIG_HACK_OPTIM__fno_auto_inc_dec
++	KBUILD_CFLAGS += -fno-auto-inc-dec
++endif
++
++ifdef CONFIG_HACK_OPTIM__fno_inline_small_functions
++	KBUILD_CFLAGS += -fno-inline-small-functions
++endif
++
++ifdef CONFIG_HACK_OPTIM__fno_if_conversion
++	KBUILD_CFLAGS += -fno-if-conversion
++endif
++
++ifdef CONFIG_HACK_OPTIM__fno_if_conversion2
++	KBUILD_CFLAGS += -fno-if-conversion2
++endif
++
++ifdef CONFIG_HACK_OPTIM__fno_tree_fre
++	KBUILD_CFLAGS += -fno-tree-fre
++endif
++
++ifdef CONFIG_HACK_OPTIM__fno_tree_dse
++	KBUILD_CFLAGS += -fno-tree-dse
++endif
++
++ifdef CONFIG_HACK_OPTIM__fno_tree_sra
++	KBUILD_CFLAGS += -fno-tree-sra
++endif
++
+diff --git a/scripts/debug/make_config_optim.sh b/scripts/debug/make_config_optim.sh
+new file mode 100644
+index 0000000..44736d7
+--- /dev/null
++++ b/scripts/debug/make_config_optim.sh
+@@ -0,0 +1,92 @@
++#!/bin/sh
++
++## Utility script for generating optimization override options
++## for kernel compilation.
++##
++## Distributed under GPL v2 license
++## (c) Radosław Smogura, 2011
++
++# Prefix added for variable
++CFG_PREFIX="HACK_OPTIM"
++
++KCFG="Kconfig.debug.optim"
++MKFI="Makefile.optim.inc"
++
++OPTIMIZATIONS_PARAMS="-fno-inline-functions-called-once \
++ -fno-combine-stack-adjustments \
++ -fno-tree-dce \
++ -fno-tree-dominator-opts \
++ -fno-dse \
++ -fno-dce \
++ -fno-auto-inc-dec \
++ -fno-inline-small-functions \
++ -fno-if-conversion \
++ -fno-if-conversion2 \
++ -fno-tree-fre \
++ -fno-tree-dse \
++ -fno-tree-sra
++"
++
++function printStandardHelp() {
++    echo -e "\t  This changes how GCC optimizes code. Code"           >> $KCFG
++    echo -e "\t  may be slower and larger but will be more debug"     >> $KCFG
++    echo -e "\t  \"friendly\"."                                       >> $KCFG
++    echo                                                              >> $KCFG
++    echo -e "\t  In some cases there is a low chance that the kernel" >> $KCFG
++    echo -e "\t  will run differently than normal, reporting or not"  >> $KCFG
++    echo -e "\t  reporting some bugs or errors."                      >> $KCFG
++    echo -e "\t  Refer to GCC manual for more details."               >> $KCFG
++    echo                                                              >> $KCFG
++    echo -e "\t  You SHOULD say N here."                              >> $KCFG
++}
++
++echo "# This file was auto generated. It's utility configuration" > $KCFG
++echo "# Distributed under GPL v2 License" >> $KCFG
++echo >> $KCFG
++echo "menuconfig ${CFG_PREFIX}"                                >> $KCFG
++echo -e "\tbool \"Allows overriding GCC optimizations\""       >> $KCFG
++echo -e "\tdepends on DEBUG_KERNEL && EXPERIMENTAL"            >> $KCFG
++echo -e "\thelp"                                               >> $KCFG
++echo -e "\t  If you say Y here you will be able to override"   >> $KCFG
++echo -e "\t  how GCC optimizes kernel code. This creates"      >> $KCFG
++echo -e "\t  more debug-friendly code, but does not guarantee" >> $KCFG
++echo -e "\t  the same running code like a production kernel."  >> $KCFG
++echo                                                           >> $KCFG
++echo -e "\t  If you say Y here probably you will want to say"  >> $KCFG
++echo -e "\t  Y for all suboptions"                             >> $KCFG
++echo >> $KCFG
++echo "if ${CFG_PREFIX}" >> $KCFG
++echo >> $KCFG
++
++echo "# This file was auto generated. It's utility configuration" > $MKFI
++echo "# Distributed under GPL v2 License" >> $MKFI
++echo >> $MKFI
++
++# Insert standard override optimization level
++# This is exception, and this value will not be included
++# in auto generated makefile. Support for this value
++# is hard coded in main Makefile.
++echo -e "config ${CFG_PREFIX}_FORCE_O1_LEVEL" >> $KCFG
++echo -e "\tbool \"Forces -O1 optimization level\"" >> $KCFG
++echo -e "\t---help---" >> $KCFG
++printStandardHelp;
++echo >> $KCFG
++
++for o in $OPTIMIZATIONS_PARAMS ; do
++	cfg_o="${CFG_PREFIX}_${o//-/_}";
++	echo "Processing param ${o} config variable will be $cfg_o";
++
++	# Generate kconfig entry
++	echo -e "config ${cfg_o}" >> $KCFG
++	echo -e "\tbool \"Adds $o parameter to gcc invoke line.\"" >> $KCFG
++	echo -e "\t---help---" >> $KCFG
++	printStandardHelp;
++	echo >> $KCFG
++
++	#Generate Make for include
++	echo "ifdef CONFIG_${cfg_o}" >> $MKFI
++	echo -e "\tKBUILD_CFLAGS += $o" >> $MKFI
++	echo "endif" >> $MKFI
++	echo  >> $MKFI
++done;
++echo "endif #${CFG_PREFIX}" >> $KCFG
 -- 
-dwmw2
+1.7.3.4
 
