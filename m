@@ -1,45 +1,73 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-iy0-f174.google.com ([209.85.210.174]:50327 "EHLO
-	mail-iy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751212Ab1GaTpG (ORCPT
+Received: from vms173001pub.verizon.net ([206.46.173.1]:56841 "EHLO
+	vms173001pub.verizon.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752063Ab1GaTsM (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 31 Jul 2011 15:45:06 -0400
-From: Aunt Tillie <lacombar@gmail.com>
-Subject: [PATCH] kbuild: honor the ARCH setting of the existing configuration
-Date: Sun, 31 Jul 2011 15:44:57 -0400
-Message-Id: <1312141497-13854-1-git-send-email-lacombar@gmail.com>
+	Sun, 31 Jul 2011 15:48:12 -0400
+Date: Sun, 31 Jul 2011 14:45:40 -0400 (EDT)
+From: Peter Foley <pefoley2@verizon.net>
+Subject: [PATCH v2] kbuild: prevent make from deleting _shipped files
+In-reply-to: <CACqU3MWHRJXRu5sOvyGhyiqV94=UmDfCxixf-okkGuphxUFRTQ@mail.gmail.com>
+Message-id: <alpine.LNX.2.00.1107311437460.28279@linux>
+References: <alpine.LNX.2.00.1107311134490.30666@linux>
+ <CACqU3MX7f2oNpDf6W124tfROfKq4PFsyvxiq=VtPJfv-gqUrww@mail.gmail.com>
+ <CACqU3MU9BBsXjevz617v7YOBm+9RR1Wm49gi0jvs95yneQ2Yrg@mail.gmail.com>
+ <alpine.LNX.2.00.1107311300190.16802@linux>
+ <CACqU3MX=MVd8v2wKaFsNuXB2WsWq2jLsGfAdDEW9atoWbWE7Mg@mail.gmail.com>
+ <alpine.LNX.2.00.1107311333320.53256@linux>
+ <CACqU3MWHRJXRu5sOvyGhyiqV94=UmDfCxixf-okkGuphxUFRTQ@mail.gmail.com>
+MIME-version: 1.0
+Content-type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, David Woodhouse <dwmw2@infradead.org>, Aunt Tillie <lacombar@gmail.com>
+To: Arnaud Lacombe <lacombar@gmail.com>
+Cc: Peter Foley <pefoley2@verizon.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild Mailing List <linux-kbuild@vger.kernel.org>, mmarek@suse.cz
 
-This change make Kbuild honor the ARCH setting of the existing configuration, if
-any .config is present so that it does not get reset if there is a conflict
-with the default ARCH for the platform and the current setting.
+commit 7373f4f (kbuild: add implicit rules for parser generation)
+created a implicit rule chain (%.c: %.c_shipped: %.y).
+Make considers the _shipped files to be intermediate files which 
+causes them to be deleted if they didn't exist before make was run.
+Mark the _shipped files PRECIOUS to prevent make from deleting them.
 
-Signed-off-by: Arnaud Lacombe aka. Aunt Tillie <lacombar@gmail.com>
+Signed-off-by: Peter Foley <pefoley2@verizon.net>
 ---
- Makefile |    7 ++++++-
- 1 files changed, 6 insertions(+), 1 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index f676d15..bb2f1fc 100644
---- a/Makefile
-+++ b/Makefile
-@@ -192,7 +192,12 @@ SUBARCH := $(shell uname -m | sed -e s/i.86/i386/ -e s/sun4u/sparc64/ \
- # Default value for CROSS_COMPILE is not to prefix executables
- # Note: Some architectures assign CROSS_COMPILE in their arch/*/Makefile
- export KBUILD_BUILDHOST := $(SUBARCH)
--ARCH		?= $(SUBARCH)
-+ifeq ($(shell test -e .config && echo y),y)
-+ARCH		?= $(shell sed '/^\# Linux\/\(.*\) .* Kernel Configuration/!d; s//\1/' .config)
-+endif
-+ifeq ($(ARCH),)
-+ARCH		:= $(SUBARCH)
-+endif
- CROSS_COMPILE	?= $(CONFIG_CROSS_COMPILE:"%"=%)
+V2: update changelog to specify files are only deleted when they did not 
+already exist
+
+diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+index aeea84a..5d986d9 100644
+--- a/scripts/Makefile.lib
++++ b/scripts/Makefile.lib
+@@ -167,6 +167,7 @@ ifdef REGENERATE_PARSERS
+ quiet_cmd_gperf = GPERF $@
+       cmd_gperf = gperf -t --output-file $@ -a -C -E -g -k 1,3,$$ -p -t $<
  
- # Architecture as present in compile.h
--- 
-1.7.6.153.g78432
++.PRECIOUS: $(src)/%.hash.c_shipped
+ $(src)/%.hash.c_shipped: $(src)/%.gperf
+ 	$(call cmd,gperf)
+ 
+@@ -177,6 +178,7 @@ LEX_PREFIX = $(if $(LEX_PREFIX_${baseprereq}),$(LEX_PREFIX_${baseprereq}),yy)
+ quiet_cmd_flex = LEX     $@
+       cmd_flex = flex -o$@ -L -P $(LEX_PREFIX) $<
+ 
++.PRECIOUS: $(src)/%.lex.c_shipped
+ $(src)/%.lex.c_shipped: $(src)/%.l
+ 	$(call cmd,flex)
+ 
+@@ -187,12 +189,14 @@ YACC_PREFIX = $(if $(YACC_PREFIX_${baseprereq}),$(YACC_PREFIX_${baseprereq}),yy)
+ quiet_cmd_bison = YACC    $@
+       cmd_bison = bison -o$@ -t -l -p $(YACC_PREFIX) $<
+ 
++.PRECIOUS: $(src)/%.tab.c_shipped
+ $(src)/%.tab.c_shipped: $(src)/%.y
+ 	$(call cmd,bison)
+ 
+ quiet_cmd_bison_h = YACC    $@
+       cmd_bison_h = bison -o/dev/null --defines=$@ -t -l -p $(YACC_PREFIX) $<
+ 
++.PRECIOUS: $(src)/%.tab.h_shipped
+ $(src)/%.tab.h_shipped: $(src)/%.y
+ 	$(call cmd,bison_h)
+ 
 
