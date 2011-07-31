@@ -1,70 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pz0-f42.google.com ([209.85.210.42]:42532 "EHLO
-	mail-pz0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751034Ab1GaFV1 (ORCPT
+Received: from casper.infradead.org ([85.118.1.10]:33423 "EHLO
+	casper.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751680Ab1GaHdr (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 31 Jul 2011 01:21:27 -0400
-MIME-Version: 1.0
-In-Reply-To: <CACqU3MUJ=B-VszESWcFXbW=TLRxz5HrAaUn3nkyydX-xBBTXhg@mail.gmail.com>
-References: <1312067499.22074.59.camel@i7.infradead.org>
-	<1312067670.22074.61.camel@i7.infradead.org>
-	<CACqU3MV460WGjmQdOOmhk3ZJT1FNjEjfuHqx8mYcgun9+7SfjA@mail.gmail.com>
-	<4E34998D.8060806@zytor.com>
-	<CACqU3MWn-OQVfLH96E+AeTCEjUw5+girXbuNgmUvXrEQuBe4vg@mail.gmail.com>
-	<4E34A1E4.8040103@zytor.com>
-	<CACqU3MVkLXoBq7KP2Jff=p7EiKR7DkPa4z7y0Rdah-dGzRvj4g@mail.gmail.com>
-	<4E34AFAD.90008@zytor.com>
-	<CACqU3MUJ=B-VszESWcFXbW=TLRxz5HrAaUn3nkyydX-xBBTXhg@mail.gmail.com>
-Date: Sun, 31 Jul 2011 01:21:27 -0400
-Message-ID: <CACqU3MXjBsJ=nWL8ue6JGGVQTej8f3CcUvFtS3n6K+henHzvuQ@mail.gmail.com>
+	Sun, 31 Jul 2011 03:33:47 -0400
 Subject: Re: [PATCH 2/2] Enable 'make CONFIG_FOO=y oldconfig'
-From: Arnaud Lacombe <lacombar@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
+From: David Woodhouse <dwmw2@infradead.org>
+Date: Sun, 31 Jul 2011 08:33:39 +0100
+In-Reply-To: <CACqU3MVkLXoBq7KP2Jff=p7EiKR7DkPa4z7y0Rdah-dGzRvj4g@mail.gmail.com>
+References: <1312067499.22074.59.camel@i7.infradead.org>
+	 <1312067670.22074.61.camel@i7.infradead.org>
+	 <CACqU3MV460WGjmQdOOmhk3ZJT1FNjEjfuHqx8mYcgun9+7SfjA@mail.gmail.com>
+	 <4E34998D.8060806@zytor.com>
+	 <CACqU3MWn-OQVfLH96E+AeTCEjUw5+girXbuNgmUvXrEQuBe4vg@mail.gmail.com>
+	 <4E34A1E4.8040103@zytor.com>
+	 <CACqU3MVkLXoBq7KP2Jff=p7EiKR7DkPa4z7y0Rdah-dGzRvj4g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Message-ID: <1312097621.22074.71.camel@i7.infradead.org>
+Mime-Version: 1.0
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "H. Peter Anvin" <hpa@zytor.com>
-Cc: David Woodhouse <dwmw2@infradead.org>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Roman Zippel <zippel@linux-m68k.org>
+To: Arnaud Lacombe <lacombar@gmail.com>
+Cc: "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Roman Zippel <zippel@linux-m68k.org>
 
-Hi,
+On Sat, 2011-07-30 at 21:06 -0400, Arnaud Lacombe wrote:
+> The principle of least surprise is broken anyway as the proposed patch
+> has absolutely no dependency checking and verification. You can `make
+> CONFIG_SATA_MV=y allnoconfig', you will _not_ get it set.
 
-On Sat, Jul 30, 2011 at 10:09 PM, Arnaud Lacombe <lacombar@gmail.com> wrote:
-> Hi,
->
-> On Sat, Jul 30, 2011 at 9:28 PM, H. Peter Anvin <hpa@zytor.com> wrote:
->> On 07/30/2011 06:06 PM, Arnaud Lacombe wrote:
->>>>
->>> The principle of least surprise is broken anyway as the proposed patch
->>> has absolutely no dependency checking and verification. You can `make
->>> CONFIG_SATA_MV=y allnoconfig', you will _not_ get it set.
->>>
->> This gives you exactly the same way as a .config file or a ALLCONFIG
->> file with the same options, which is what one realistically should expect.
->>
-> no, I would expect it to have the same effect as a `select
-> CONFIG_SATA_MV', have it forcibly set to the given value, and be
-> warned if there was any problem.
->
-> Btw, `make CONFIG_GENERIC_BUG=n oldconfig' or `make CONFIG_64BIT=n
-> oldconfig'[0] does not even work, and I'm getting no error. So either
-> you make it work for all possible uses, or you warn the user he tried
-> something illegal, but you don't just fail silently.
->
-ok, the issue is that you will only be allowed to change visible
-symbols. CONFIG_64BIT is conditionally visible (when ARCH=x86), so
-right now, you can not do on x86-64:
+That's always true in kconfig *anyway*. We've *never* really had an
+option for "do whatever you need to enable this option". We've even
+hard-coded this failure in our language, by introducing this horrible
+'select' thing to work around it.
 
-% make ARCH=i386 defconfig
-% make CONFIG_64BIT=n oldconfig # [0]
+I'd no more expect that, than I would for it to write the code for me if
+I type 'make CONFIG_BTRFSv2=y oldconfig'.
 
-and expect it to work.
+So no, it doesn't violate the principle of least surprise.
 
-Instead of allowing explicitly a symbol to be overridden, the behavior
-is to implicitly, silently and un-deterministicaly[1] deny an
-override. Strange ...
+> ok, the issue is that you will only be allowed to change visible
+> symbols. CONFIG_64BIT is conditionally visible (when ARCH=x86), so
+> right now, you can not do on x86-64:
+> 
+> % make ARCH=i386 defconfig
+> % make CONFIG_64BIT=n oldconfig # [0]
 
- - Arnaud
+That works fine here. What was ARCH set to in your second test? If it's
+ARCH=x86_64 then that's expected. That's the whole point of my *other*
+patch to make 'ARCH=x86' be the default, so that the value of
+CONFIG_64BIT in your .config is *not* forcibly overridden to match the
+build host. That's a *separate* bug, which I also have a patch for.
 
-[0]: this match David's use-case described in
-<1311986969.20983.52.camel@i7.infradead.org>
+-- 
+dwmw2
 
-[1]: ie. it depends on the state of the tree when ran
