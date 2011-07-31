@@ -1,34 +1,52 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from casper.infradead.org ([85.118.1.10]:43126 "EHLO
+Received: from casper.infradead.org ([85.118.1.10]:33777 "EHLO
 	casper.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752931Ab1GaWY1 (ORCPT
+	with ESMTP id S1751344Ab1GaWeu (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 31 Jul 2011 18:24:27 -0400
-Subject: Re: [PATCH 1/5] um: Use __i386__ in ifdef for vsyscall exports, not
- SUBARCH_i386
+	Sun, 31 Jul 2011 18:34:50 -0400
+Subject: Re: [PATCH] kbuild: honor the ARCH setting of the existing
+ configuration
 From: David Woodhouse <dwmw2@infradead.org>
-Date: Sun, 31 Jul 2011 23:24:21 +0100
-In-Reply-To: <CAFLxGvy0QqoySDFwZpygHeXvQ7hG-B7z5iZq8qx3GUkFX8w2RQ@mail.gmail.com>
-References: <1312066693.22074.50.camel@i7.infradead.org>
-	 <1312066923.22074.53.camel@i7.infradead.org>
-	 <CAFLxGvy0QqoySDFwZpygHeXvQ7hG-B7z5iZq8qx3GUkFX8w2RQ@mail.gmail.com>
+Date: Sun, 31 Jul 2011 23:34:45 +0100
+In-Reply-To: <CACqU3MXak0Yo+VDQNEqT9rTJ5CjdU6jJ-C1Km7GauMQ+qGW+vg@mail.gmail.com>
+References: <1312141497-13854-1-git-send-email-lacombar@gmail.com>
+	 <1312143643.12369.32.camel@i7.infradead.org>
+	 <CACqU3MXak0Yo+VDQNEqT9rTJ5CjdU6jJ-C1Km7GauMQ+qGW+vg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
-Message-ID: <1312151063.18010.25.camel@i7.infradead.org>
+Message-ID: <1312151687.18010.31.camel@i7.infradead.org>
 Mime-Version: 1.0
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: richard -rw- weinberger <richard.weinberger@gmail.com>
-Cc: Arnaud Lacombe <lacombar@gmail.com>, "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, user-mode-linux-devel@lists.sourceforge.net
+To: Arnaud Lacombe <lacombar@gmail.com>
+Cc: Michal Marek <mmarek@suse.cz>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-On Mon, 2011-08-01 at 00:11 +0200, richard -rw- weinberger wrote:
-> 
-> Why do we need this? 
+On Sun, 2011-07-31 at 18:07 -0400, Arnaud Lacombe wrote:
+> I think you totally miss the point of the patch as you keep being
+> self-centered on x86.
 
-The arch/x86_64 and arch/i386 directories were removed from the kernel
-four years ago, and replaced by the 'x86' arch. UML is still dependent
-on the legacy SUBARCH=i386 and SUBARCH=x86_64 settings, and the patch
-sequence I just posted makes it cope with SUBARCH=x86.
+I'm focusing on x86 at the moment because x86 is the only architecture
+that's *broken* in this respect. The other architectures that you
+mention below, where they support 64-bit kernels, all work fine with
+only *one* ARCH= setting covering all configurations. It's only x86
+where we haven't actually *finished* the merge.
+
+> I am working with configuration for mips, sh, powerpc, arm and x86.
+> Some of them are for real board, some of them are to regress-test
+> compilers, binutils and kernel builds. Each of those config hardcode
+> the CROSS_COMPILER string and have their own build directory. In each
+> case, I want to be able to just run "make O=/src/obj/v3.0-arm
+> oldnoconfig all" without having to worry about anything else.
+
+Yes, that's a valid but *separate* problem. FWIW I usually solve this
+problem with a two-line GNUmakefile:
+	ARCH := arm
+	include Makefile
+
+I haven't checked whether it works for out-of-source-tree builds; I bet
+it could be made to.
+
+I would love to see $ARCH turned into a proper configuration option. 
 
 -- 
 dwmw2
