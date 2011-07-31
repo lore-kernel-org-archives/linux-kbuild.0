@@ -1,43 +1,100 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from casper.infradead.org ([85.118.1.10]:42886 "EHLO
-	casper.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752228Ab1GaRlE (ORCPT
+Received: from mail-pz0-f42.google.com ([209.85.210.42]:47017 "EHLO
+	mail-pz0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751790Ab1GaShk convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 31 Jul 2011 13:41:04 -0400
-Subject: Re: [PATCH 2/2] Enable 'make CONFIG_FOO=y oldconfig'
-From: David Woodhouse <dwmw2@infradead.org>
-Date: Sun, 31 Jul 2011 18:40:58 +0100
-In-Reply-To: <20110731100856.780d71de.rdunlap@xenotime.net>
-References: <1312067499.22074.59.camel@i7.infradead.org>
-	 <1312067670.22074.61.camel@i7.infradead.org>
-	 <CACqU3MV460WGjmQdOOmhk3ZJT1FNjEjfuHqx8mYcgun9+7SfjA@mail.gmail.com>
-	 <4E34998D.8060806@zytor.com>
-	 <CACqU3MWn-OQVfLH96E+AeTCEjUw5+girXbuNgmUvXrEQuBe4vg@mail.gmail.com>
-	 <4E34A1E4.8040103@zytor.com>
-	 <CACqU3MVkLXoBq7KP2Jff=p7EiKR7DkPa4z7y0Rdah-dGzRvj4g@mail.gmail.com>
-	 <1312097621.22074.71.camel@i7.infradead.org>
-	 <20110731093740.39f7fbc3.rdunlap@xenotime.net>
-	 <1312131467.22074.95.camel@i7.infradead.org>
-	 <20110731100856.780d71de.rdunlap@xenotime.net>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Message-ID: <1312134060.22074.99.camel@i7.infradead.org>
-Mime-Version: 1.0
+	Sun, 31 Jul 2011 14:37:40 -0400
+MIME-Version: 1.0
+In-Reply-To: <alpine.LNX.2.00.1107311333320.53256@linux>
+References: <alpine.LNX.2.00.1107311134490.30666@linux>
+	<CACqU3MX7f2oNpDf6W124tfROfKq4PFsyvxiq=VtPJfv-gqUrww@mail.gmail.com>
+	<CACqU3MU9BBsXjevz617v7YOBm+9RR1Wm49gi0jvs95yneQ2Yrg@mail.gmail.com>
+	<alpine.LNX.2.00.1107311300190.16802@linux>
+	<CACqU3MX=MVd8v2wKaFsNuXB2WsWq2jLsGfAdDEW9atoWbWE7Mg@mail.gmail.com>
+	<alpine.LNX.2.00.1107311333320.53256@linux>
+Date: Sun, 31 Jul 2011 14:37:39 -0400
+Message-ID: <CACqU3MWHRJXRu5sOvyGhyiqV94=UmDfCxixf-okkGuphxUFRTQ@mail.gmail.com>
+Subject: Re: kbuild: prevent make from deleting _shipped files
+From: Arnaud Lacombe <lacombar@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Randy Dunlap <rdunlap@xenotime.net>
-Cc: Arnaud Lacombe <lacombar@gmail.com>, "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Roman Zippel <zippel@linux-m68k.org>
+To: Peter Foley <pefoley2@verizon.net>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild Mailing List <linux-kbuild@vger.kernel.org>, mmarek@suse.cz
 
-On Sun, 2011-07-31 at 10:08 -0700, Randy Dunlap wrote:
-> 
-> OK, it seems that we agree that ARCH=x86 is an incomplete
-> specification.
-> Thanks. 
+Hi,
 
-Of course it's incomplete, just as the legacy ARCH=i386 was incomplete.
-Even an allnoconfig still had over a hundred lines more configuration
-before it was a complete description of what gets built.
+On Sun, Jul 31, 2011 at 1:37 PM, Peter Foley <pefoley2@verizon.net> wrote:
+> On Sun, 31 Jul 2011, Arnaud Lacombe wrote:
+>
+>> Hi,
+>>
+>> On Sun, Jul 31, 2011 at 1:08 PM, Peter Foley <pefoley2@verizon.net> wrote:
+>> > On Sun, 31 Jul 2011, Arnaud Lacombe wrote:
+>> >
+>> >> Hi,
+>> >>
+>> >> On Sun, Jul 31, 2011 at 12:21 PM, Arnaud Lacombe <lacombar@gmail.com> wrote:
+>> >> > Hi,
+>> >> >
+>> >> > On Sun, Jul 31, 2011 at 11:37 AM, Peter Foley <pefoley2@verizon.net> wrote:
+>> >> >> commit 7373f4f (kbuild: add implicit rules for parser generation)
+>> >> >> created a implicit rule chain (%.c: %.c_shipped: %.y). This causes make to delete the _shipped files
+>> >> >> because it considers them intermediate files. Mark the _shipped files PRECIOUS
+>> >> >> to prevent make from deleting them.
+>> >> >>
+>> >> >> Signed-off-by: Peter Foley <pefoley2@verizon.net>
+>> >> > What make are you using, and what command triggers the issue ?
+>> >> >
+>> >> > Those rules should only be visible on parser regeneration (ie.
+>> >> > REGENERATE_PARSERS defined). make 3.82 does not seem to trigger the
+>> >> > issue:
+>> >> >
+>> >> > % make -v
+>> >> > GNU Make 3.82
+>> >> >
+>> >> > % make REGENERATE_PARSERS=y defconfig
+>> >> >  HOSTCC  scripts/basic/fixdep
+>> >> >  HOSTCC  scripts/kconfig/conf.o
+>> >> >  SHIPPED scripts/kconfig/zconf.tab.c
+>> >> >  SHIPPED scripts/kconfig/zconf.lex.c
+>> >> >  SHIPPED scripts/kconfig/zconf.hash.c
+>> >> >  HOSTCC  scripts/kconfig/zconf.tab.o
+>> >> >  HOSTLD  scripts/kconfig/conf
+>> >> > *** Default configuration is based on 'x86_64_defconfig'
+>> >> > [...]
+>> >> >
+>> >> > The shipped file are still there:
+>> >> >
+>> >> > % ls scripts/kconfig/*_shipped
+>> >> > scripts/kconfig/zconf.hash.c_shipped
+>> >> > scripts/kconfig/zconf.lex.c_shipped
+>> >> > scripts/kconfig/zconf.tab.c_shipped
+>> >> >
+>> >> a bare make-3.81 from ftp.gnu.org built on a Fedora 14 behave the same.
+>> >>
+>> >> I definitively needs enlightenment on this one :)
+>> >>
+>> >> Thanks,
+>> >>  - Arnaud
+>> >
+>> > The problem only appears when the parsers are actually rebuilt.
+>> > rm scripts/kconfig/*_shipped
+>> ^^^^^
+>>
+>> This is why. You do not (or at least no longer) need to remove the
+>> *_shipped files before regenerating them.
+>>
+>>  - Arnaud
+>
+> Ok, I deleted the _shipped files as a easy way to force regeneration but
+> touching the source files works just as well.
+> Please disregard this patch.
+>
+I think it is still valuable, especially when _shipped files are
+created, we want make to keep them. Could you update the changelog to
+mention in which case this is happening and re-send ?
 
--- 
-dwmw2
-
+Thanks,
+ - Arnaud
