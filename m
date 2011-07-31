@@ -1,59 +1,55 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from vms173005pub.verizon.net ([206.46.173.5]:55184 "EHLO
-	vms173005pub.verizon.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751299Ab1GaQjj (ORCPT
+Received: from casper.infradead.org ([85.118.1.10]:40226 "EHLO
+	casper.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751833Ab1GaQ5x (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 31 Jul 2011 12:39:39 -0400
-Date: Sun, 31 Jul 2011 11:37:08 -0400 (EDT)
-From: Peter Foley <pefoley2@verizon.net>
-Subject: kbuild: prevent make from deleting _shipped files
-Message-id: <alpine.LNX.2.00.1107311134490.30666@linux>
-MIME-version: 1.0
-Content-type: TEXT/PLAIN; charset=US-ASCII
+	Sun, 31 Jul 2011 12:57:53 -0400
+Subject: Re: [PATCH 2/2] Enable 'make CONFIG_FOO=y oldconfig'
+From: David Woodhouse <dwmw2@infradead.org>
+Date: Sun, 31 Jul 2011 17:57:46 +0100
+In-Reply-To: <20110731093740.39f7fbc3.rdunlap@xenotime.net>
+References: <1312067499.22074.59.camel@i7.infradead.org>
+	 <1312067670.22074.61.camel@i7.infradead.org>
+	 <CACqU3MV460WGjmQdOOmhk3ZJT1FNjEjfuHqx8mYcgun9+7SfjA@mail.gmail.com>
+	 <4E34998D.8060806@zytor.com>
+	 <CACqU3MWn-OQVfLH96E+AeTCEjUw5+girXbuNgmUvXrEQuBe4vg@mail.gmail.com>
+	 <4E34A1E4.8040103@zytor.com>
+	 <CACqU3MVkLXoBq7KP2Jff=p7EiKR7DkPa4z7y0Rdah-dGzRvj4g@mail.gmail.com>
+	 <1312097621.22074.71.camel@i7.infradead.org>
+	 <20110731093740.39f7fbc3.rdunlap@xenotime.net>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Message-ID: <1312131467.22074.95.camel@i7.infradead.org>
+Mime-Version: 1.0
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild Mailing List <linux-kbuild@vger.kernel.org>, mmarek@suse.cz, lacombar@gmail.com
+To: Randy Dunlap <rdunlap@xenotime.net>
+Cc: Arnaud Lacombe <lacombar@gmail.com>, "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Roman Zippel <zippel@linux-m68k.org>
 
-commit 7373f4f (kbuild: add implicit rules for parser generation)
-created a implicit rule chain (%.c: %.c_shipped: %.y). This causes make to delete the _shipped files
-because it considers them intermediate files. Mark the _shipped files PRECIOUS
-to prevent make from deleting them.
+On Sun, 2011-07-31 at 09:37 -0700, Randy Dunlap wrote:
+> Simple question:  what does "ARCH=x86" mean?
+> 
+> It doesn't mean anything to me without SUBARCH or nnBIT specified.
 
-Signed-off-by: Peter Foley <pefoley2@verizon.net>
----
+SUBARCH is meaningless for a native build; it's only for ARCH=um. So I
+don't know why that would make anything more meaningful to you.
 
-diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-index aeea84a..5d986d9 100644
---- a/scripts/Makefile.lib
-+++ b/scripts/Makefile.lib
-@@ -167,6 +167,7 @@ ifdef REGENERATE_PARSERS
- quiet_cmd_gperf = GPERF $@
-       cmd_gperf = gperf -t --output-file $@ -a -C -E -g -k 1,3,$$ -p -t $<
- 
-+.PRECIOUS: $(src)/%.hash.c_shipped
- $(src)/%.hash.c_shipped: $(src)/%.gperf
- 	$(call cmd,gperf)
- 
-@@ -177,6 +178,7 @@ LEX_PREFIX = $(if $(LEX_PREFIX_${baseprereq}),$(LEX_PREFIX_${baseprereq}),yy)
- quiet_cmd_flex = LEX     $@
-       cmd_flex = flex -o$@ -L -P $(LEX_PREFIX) $<
- 
-+.PRECIOUS: $(src)/%.lex.c_shipped
- $(src)/%.lex.c_shipped: $(src)/%.l
- 	$(call cmd,flex)
- 
-@@ -187,12 +189,14 @@ YACC_PREFIX = $(if $(YACC_PREFIX_${baseprereq}),$(YACC_PREFIX_${baseprereq}),yy)
- quiet_cmd_bison = YACC    $@
-       cmd_bison = bison -o$@ -t -l -p $(YACC_PREFIX) $<
- 
-+.PRECIOUS: $(src)/%.tab.c_shipped
- $(src)/%.tab.c_shipped: $(src)/%.y
- 	$(call cmd,bison)
- 
- quiet_cmd_bison_h = YACC    $@
-       cmd_bison_h = bison -o/dev/null --defines=$@ -t -l -p $(YACC_PREFIX) $<
- 
-+.PRECIOUS: $(src)/%.tab.h_shipped
- $(src)/%.tab.h_shipped: $(src)/%.y
- 	$(call cmd,bison_h)
- 
+And why would CONFIG_64BIT make a difference either? Or conversely: why
+do CONFIG_PAE, CONFIG_LITTLE_ENDIAN, etc. *not* make a difference to
+your understanding?
+
+ARCH=x86 means exactly what it says: "build a kernel for the x86
+architecture".
+
+Just like ARCH=mips means "build a kernel for MIPS" and ARCH=sparc means
+"build a kernel for SPARC", and ARCH=parisc means "build a kernel for
+PARISC", and ARCH=powerpc means "build a kernel for PowerPC". and
+ARCH=s390 means "build a kernel for S390".
+
+In *all* of those cases, CONFIG_64BIT is just one more configuration
+option; one of *many* that define what actual hardware the kernel
+supports.
+
+-- 
+dwmw2
+
