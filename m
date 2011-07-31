@@ -1,97 +1,65 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pz0-f42.google.com ([209.85.210.42]:45507 "EHLO
-	mail-pz0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752208Ab1GaQVi convert rfc822-to-8bit (ORCPT
+Received: from oproxy7-pub.bluehost.com ([67.222.55.9]:59662 "HELO
+	oproxy7-pub.bluehost.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with SMTP id S1751299Ab1GaQhn (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 31 Jul 2011 12:21:38 -0400
-MIME-Version: 1.0
-In-Reply-To: <alpine.LNX.2.00.1107311134490.30666@linux>
-References: <alpine.LNX.2.00.1107311134490.30666@linux>
-Date: Sun, 31 Jul 2011 12:21:37 -0400
-Message-ID: <CACqU3MX7f2oNpDf6W124tfROfKq4PFsyvxiq=VtPJfv-gqUrww@mail.gmail.com>
-Subject: Re: kbuild: prevent make from deleting _shipped files
-From: Arnaud Lacombe <lacombar@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 8BIT
+	Sun, 31 Jul 2011 12:37:43 -0400
+Date: Sun, 31 Jul 2011 09:37:40 -0700
+From: Randy Dunlap <rdunlap@xenotime.net>
+Subject: Re: [PATCH 2/2] Enable 'make CONFIG_FOO=y oldconfig'
+Message-Id: <20110731093740.39f7fbc3.rdunlap@xenotime.net>
+In-Reply-To: <1312097621.22074.71.camel@i7.infradead.org>
+References: <1312067499.22074.59.camel@i7.infradead.org>
+	<1312067670.22074.61.camel@i7.infradead.org>
+	<CACqU3MV460WGjmQdOOmhk3ZJT1FNjEjfuHqx8mYcgun9+7SfjA@mail.gmail.com>
+	<4E34998D.8060806@zytor.com>
+	<CACqU3MWn-OQVfLH96E+AeTCEjUw5+girXbuNgmUvXrEQuBe4vg@mail.gmail.com>
+	<4E34A1E4.8040103@zytor.com>
+	<CACqU3MVkLXoBq7KP2Jff=p7EiKR7DkPa4z7y0Rdah-dGzRvj4g@mail.gmail.com>
+	<1312097621.22074.71.camel@i7.infradead.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Peter Foley <pefoley2@verizon.net>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild Mailing List <linux-kbuild@vger.kernel.org>, mmarek@suse.cz
+To: David Woodhouse <dwmw2@infradead.org>
+Cc: Arnaud Lacombe <lacombar@gmail.com>, "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Roman Zippel <zippel@linux-m68k.org>
 
-Hi,
+On Sun, 31 Jul 2011 08:33:39 +0100 David Woodhouse wrote:
 
-On Sun, Jul 31, 2011 at 11:37 AM, Peter Foley <pefoley2@verizon.net> wrote:
-> commit 7373f4f (kbuild: add implicit rules for parser generation)
-> created a implicit rule chain (%.c: %.c_shipped: %.y). This causes make to delete the _shipped files
-> because it considers them intermediate files. Mark the _shipped files PRECIOUS
-> to prevent make from deleting them.
->
-> Signed-off-by: Peter Foley <pefoley2@verizon.net>
-What make are you using, and what command triggers the issue ?
+> On Sat, 2011-07-30 at 21:06 -0400, Arnaud Lacombe wrote:
+> > The principle of least surprise is broken anyway as the proposed patch
+> > has absolutely no dependency checking and verification. You can `make
+> > CONFIG_SATA_MV=y allnoconfig', you will _not_ get it set.
+> 
+> That's always true in kconfig *anyway*. We've *never* really had an
+> option for "do whatever you need to enable this option". We've even
+> hard-coded this failure in our language, by introducing this horrible
+> 'select' thing to work around it.
+> 
+> I'd no more expect that, than I would for it to write the code for me if
+> I type 'make CONFIG_BTRFSv2=y oldconfig'.
+> 
+> So no, it doesn't violate the principle of least surprise.
+> 
+> > ok, the issue is that you will only be allowed to change visible
+> > symbols. CONFIG_64BIT is conditionally visible (when ARCH=x86), so
+> > right now, you can not do on x86-64:
+> > 
+> > % make ARCH=i386 defconfig
+> > % make CONFIG_64BIT=n oldconfig # [0]
+> 
+> That works fine here. What was ARCH set to in your second test? If it's
+> ARCH=x86_64 then that's expected. That's the whole point of my *other*
+> patch to make 'ARCH=x86' be the default, so that the value of
+> CONFIG_64BIT in your .config is *not* forcibly overridden to match the
+> build host. That's a *separate* bug, which I also have a patch for.
 
-Those rules should only be visible on parser regeneration (ie.
-REGENERATE_PARSERS defined). make 3.82 does not seem to trigger the
-issue:
+Simple question:  what does "ARCH=x86" mean?
 
-% make -v
-GNU Make 3.82
+It doesn't mean anything to me without SUBARCH or nnBIT specified.
 
-% make REGENERATE_PARSERS=y defconfig
-  HOSTCC  scripts/basic/fixdep
-  HOSTCC  scripts/kconfig/conf.o
-  SHIPPED scripts/kconfig/zconf.tab.c
-  SHIPPED scripts/kconfig/zconf.lex.c
-  SHIPPED scripts/kconfig/zconf.hash.c
-  HOSTCC  scripts/kconfig/zconf.tab.o
-  HOSTLD  scripts/kconfig/conf
-*** Default configuration is based on 'x86_64_defconfig'
-[...]
 
-The shipped file are still there:
-
-% ls scripts/kconfig/*_shipped
-scripts/kconfig/zconf.hash.c_shipped
-scripts/kconfig/zconf.lex.c_shipped
-scripts/kconfig/zconf.tab.c_shipped
-
-Thanks,
- - Arnaud
-
-> ---
->
-> diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-> index aeea84a..5d986d9 100644
-> --- a/scripts/Makefile.lib
-> +++ b/scripts/Makefile.lib
-> @@ -167,6 +167,7 @@ ifdef REGENERATE_PARSERS
->  quiet_cmd_gperf = GPERF $@
->       cmd_gperf = gperf -t --output-file $@ -a -C -E -g -k 1,3,$$ -p -t $<
->
-> +.PRECIOUS: $(src)/%.hash.c_shipped
->  $(src)/%.hash.c_shipped: $(src)/%.gperf
->        $(call cmd,gperf)
->
-> @@ -177,6 +178,7 @@ LEX_PREFIX = $(if $(LEX_PREFIX_${baseprereq}),$(LEX_PREFIX_${baseprereq}),yy)
->  quiet_cmd_flex = LEX     $@
->       cmd_flex = flex -o$@ -L -P $(LEX_PREFIX) $<
->
-> +.PRECIOUS: $(src)/%.lex.c_shipped
->  $(src)/%.lex.c_shipped: $(src)/%.l
->        $(call cmd,flex)
->
-> @@ -187,12 +189,14 @@ YACC_PREFIX = $(if $(YACC_PREFIX_${baseprereq}),$(YACC_PREFIX_${baseprereq}),yy)
->  quiet_cmd_bison = YACC    $@
->       cmd_bison = bison -o$@ -t -l -p $(YACC_PREFIX) $<
->
-> +.PRECIOUS: $(src)/%.tab.c_shipped
->  $(src)/%.tab.c_shipped: $(src)/%.y
->        $(call cmd,bison)
->
->  quiet_cmd_bison_h = YACC    $@
->       cmd_bison_h = bison -o/dev/null --defines=$@ -t -l -p $(YACC_PREFIX) $<
->
-> +.PRECIOUS: $(src)/%.tab.h_shipped
->  $(src)/%.tab.h_shipped: $(src)/%.y
->        $(call cmd,bison_h)
->
->
+---
+~Randy
+*** Remember to use Documentation/SubmitChecklist when testing your code ***
