@@ -1,56 +1,54 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from casper.infradead.org ([85.118.1.10]:33423 "EHLO
+Received: from casper.infradead.org ([85.118.1.10]:53198 "EHLO
 	casper.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751680Ab1GaHdr (ORCPT
+	with ESMTP id S1752458Ab1GaIN0 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 31 Jul 2011 03:33:47 -0400
-Subject: Re: [PATCH 2/2] Enable 'make CONFIG_FOO=y oldconfig'
+	Sun, 31 Jul 2011 04:13:26 -0400
+Subject: Re: [PATCH v3] x86, kconfig: Default to ARCH=x86 to avoid
+ overriding CONFIG_64BIT
 From: David Woodhouse <dwmw2@infradead.org>
-Date: Sun, 31 Jul 2011 08:33:39 +0100
-In-Reply-To: <CACqU3MVkLXoBq7KP2Jff=p7EiKR7DkPa4z7y0Rdah-dGzRvj4g@mail.gmail.com>
-References: <1312067499.22074.59.camel@i7.infradead.org>
-	 <1312067670.22074.61.camel@i7.infradead.org>
-	 <CACqU3MV460WGjmQdOOmhk3ZJT1FNjEjfuHqx8mYcgun9+7SfjA@mail.gmail.com>
-	 <4E34998D.8060806@zytor.com>
-	 <CACqU3MWn-OQVfLH96E+AeTCEjUw5+girXbuNgmUvXrEQuBe4vg@mail.gmail.com>
-	 <4E34A1E4.8040103@zytor.com>
-	 <CACqU3MVkLXoBq7KP2Jff=p7EiKR7DkPa4z7y0Rdah-dGzRvj4g@mail.gmail.com>
+Date: Sun, 31 Jul 2011 09:13:00 +0100
+In-Reply-To: <CACqU3MUMj4PzOzyHUXwQKu5LqNZzY+W9amPPiw555Ae9QKqpng@mail.gmail.com>
+References: <1306707270.2029.377.camel@i7.infradead.org>
+	 <20110530072300.GA9802@elte.hu>
+	 <1306745835.2029.389.camel@i7.infradead.org>
+	 <20110530104231.GF17821@elte.hu> <20110530104656.GA19532@elte.hu>
+	 <E934876C-FABB-41F8-8C5E-469AA42DBE91@mit.edu>
+	 <20110530105809.GA20133@elte.hu>
+	 <1A4DB87D-9B32-44C0-B7C9-47A003CABD96@mit.edu>
+	 <alpine.LFD.2.02.1105301955210.3164@localhost6.localdomain6>
+	 <20110530195545.GG2890@dhcp-172-31-194-241.cam.corp.google.com>
+	 <alpine.LFD.2.02.1105302103220.3164@localhost6.localdomain6>
+	 <1306795186.2029.459.camel@i7.infradead.org>
+	 <BANLkTik=uHr1eX44XV1pAHUfVQ-MorzOnw@mail.gmail.com>
+	 <1306856937.27477.3.camel@i7.infradead.org>
+	 <BANLkTi=VoL8ze0AcdkG_QmEH5049X2K6Zw@mail.gmail.com>
+	 <4E0495F4.7080300@suse.cz> <1311986969.20983.52.camel@i7.infradead.org>
+	 <CACqU3MUMj4PzOzyHUXwQKu5LqNZzY+W9amPPiw555Ae9QKqpng@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
-Message-ID: <1312097621.22074.71.camel@i7.infradead.org>
+Message-ID: <1312099981.22074.73.camel@i7.infradead.org>
 Mime-Version: 1.0
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Arnaud Lacombe <lacombar@gmail.com>
-Cc: "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Roman Zippel <zippel@linux-m68k.org>
+Cc: Michal Marek <mmarek@suse.cz>, Ted Ts'o <tytso@mit.edu>, Ingo Molnar <mingo@elte.hu>, x86@kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, hpa@zytor.com
 
-On Sat, 2011-07-30 at 21:06 -0400, Arnaud Lacombe wrote:
-> The principle of least surprise is broken anyway as the proposed patch
-> has absolutely no dependency checking and verification. You can `make
-> CONFIG_SATA_MV=y allnoconfig', you will _not_ get it set.
+On Sun, 2011-07-31 at 01:18 -0400, Arnaud Lacombe wrote:
+> If I'm reading this correctly, does this mean that someone doing an
+> 'allyesconfig' on an i386 machine will get a configuration for a
+> 64bits kernel[0] ? With your logic, you would require the user to
+> manually specify CONFIG_64BIT=n, which should be automatic on such a
+> system... 
 
-That's always true in kconfig *anyway*. We've *never* really had an
-option for "do whatever you need to enable this option". We've even
-hard-coded this failure in our language, by introducing this horrible
-'select' thing to work around it.
+Yes, that is entirely correct, and intentional. If the user asks for
+'all yes', then the user gets 'all yes'.
 
-I'd no more expect that, than I would for it to write the code for me if
-I type 'make CONFIG_BTRFSv2=y oldconfig'.
+We do not attempt some kind of half-baked Aunt Tillie mode where we
+guess certain settings from the build host.
 
-So no, it doesn't violate the principle of least surprise.
-
-> ok, the issue is that you will only be allowed to change visible
-> symbols. CONFIG_64BIT is conditionally visible (when ARCH=x86), so
-> right now, you can not do on x86-64:
-> 
-> % make ARCH=i386 defconfig
-> % make CONFIG_64BIT=n oldconfig # [0]
-
-That works fine here. What was ARCH set to in your second test? If it's
-ARCH=x86_64 then that's expected. That's the whole point of my *other*
-patch to make 'ARCH=x86' be the default, so that the value of
-CONFIG_64BIT in your .config is *not* forcibly overridden to match the
-build host. That's a *separate* bug, which I also have a patch for.
+It's not as if people often use 'allyesconfig' to build kernels they're
+actually going to *run*.
 
 -- 
 dwmw2
