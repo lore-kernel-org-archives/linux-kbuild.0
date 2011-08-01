@@ -1,55 +1,52 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pz0-f42.google.com ([209.85.210.42]:52907 "EHLO
-	mail-pz0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753683Ab1HARdP convert rfc822-to-8bit (ORCPT
+Received: from mail-vx0-f174.google.com ([209.85.220.174]:35451 "EHLO
+	mail-vx0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753925Ab1HARwg convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 1 Aug 2011 13:33:15 -0400
+	Mon, 1 Aug 2011 13:52:36 -0400
 MIME-Version: 1.0
-In-Reply-To: <1312188139.18010.104.camel@i7.infradead.org>
-References: <1312141497-13854-1-git-send-email-lacombar@gmail.com>
-	<1312143643.12369.32.camel@i7.infradead.org>
-	<CACqU3MXak0Yo+VDQNEqT9rTJ5CjdU6jJ-C1Km7GauMQ+qGW+vg@mail.gmail.com>
-	<1312151687.18010.31.camel@i7.infradead.org>
-	<317e3210947c039a33b970300e62d53d.squirrel@xenotime.net>
-	<1312188139.18010.104.camel@i7.infradead.org>
-Date: Mon, 1 Aug 2011 13:33:14 -0400
-Message-ID: <CACqU3MU1yS73++j3H00fbfeBpmKZJ=S93SObnccsw+Bto4V_8w@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: honor the ARCH setting of the existing configuration
-From: Arnaud Lacombe <lacombar@gmail.com>
+In-Reply-To: <20110801043207.GE2203@ZenIV.linux.org.uk>
+References: <1312066693.22074.50.camel@i7.infradead.org>
+	<1312066923.22074.53.camel@i7.infradead.org>
+	<CAFLxGvy0QqoySDFwZpygHeXvQ7hG-B7z5iZq8qx3GUkFX8w2RQ@mail.gmail.com>
+	<1312151063.18010.25.camel@i7.infradead.org>
+	<20110731224834.GC2203@ZenIV.linux.org.uk>
+	<20110731225801.GD2203@ZenIV.linux.org.uk>
+	<1312153988.18010.39.camel@i7.infradead.org>
+	<CAFLxGvyewG70ZgU41Kmu_eOYpjZ0TVXYwYq1AfS1sXONAM6G_w@mail.gmail.com>
+	<20110801043207.GE2203@ZenIV.linux.org.uk>
+Date: Mon, 1 Aug 2011 19:52:35 +0200
+Message-ID: <CAFLxGvwxQ2VeqkDpkiVks35DHxZFvAP5nKUtD7i4Z32291otOg@mail.gmail.com>
+Subject: Re: [PATCH 1/5] um: Use __i386__ in ifdef for vsyscall exports, not SUBARCH_i386
+From: richard -rw- weinberger <richard.weinberger@gmail.com>
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: David Woodhouse <dwmw2@infradead.org>
-Cc: Randy Dunlap <rdunlap@xenotime.net>, Michal Marek <mmarek@suse.cz>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: Al Viro <viro@zeniv.linux.org.uk>
+Cc: David Woodhouse <dwmw2@infradead.org>, Arnaud Lacombe <lacombar@gmail.com>, "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, user-mode-linux-devel@lists.sourceforge.net
 
-Hi,
+On Mon, Aug 1, 2011 at 6:32 AM, Al Viro <viro@zeniv.linux.org.uk> wrote:
+> Anyway, could you take a look at the git tree at
+> git://git.kernel.org/pub/scm/linux/kernel/git/viro/um-header.git/,
+> branch x86_merge and comment?  It doesn't include stuff from this
+> thread (yet); what it does is
+>        * further headers cleanups
+>        * sys-{i386,x86_64} merged; all[1] x86-specific code taken first
+> to arch/um/sys-x86 and then (by final commit) to arch/x86/um.  IMO that's
+> the right place for it - target-dependent code is better off not hidden
+> from maintainers of the target arch.  When we get other ports to working
+> shape, their target-specific parts ought to go into arch/<target>/um.
+>        * hopefully saner treatment of sigcontext; should make life easier
+> for other ports.
+>
+> [1] theoretically - in reality we still have more than a few x86-isms in
+> "generic" um headers in arch/um/include/asm.
+>
 
-On Mon, Aug 1, 2011 at 4:42 AM, David Woodhouse <dwmw2@infradead.org> wrote:
-> On Sun, 2011-07-31 at 19:05 -0700, Randy Dunlap wrote:
->>
->> > I would love to see $ARCH turned into a proper configuration option.
->>
->> I don't object in principle, but I'm expecting to have to modify/update
->> multiple *working* scripts as a result.  But of course this won't be
->> the first time and I don't expect it to be the last time either.
->> [signed:  eeyore]
->
-> :)
->
-> Yeah, that's why I'd kind of like to see it done *once*, *properly*.
->
-> Arnaud's hack to read it from .config is cute, but might give behaviour
-> that people will come to depend on in their scripts and then we take it
-> away again.
->
-Instead of talking of irrelevant implementation details, what
-_behavior_ do you expect ?
+Ok, will look at it in the next few days.
+"sys-{i386,x86_64} merged" sounds great!
 
-The priority I expect is (from most to least):
- 1. command line
- 2. existing configuration (.config)
- 3. Makefile's default
- 4. Kconfig default
-
- - Arnaud
+-- 
+Thanks,
+//richard
