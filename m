@@ -1,40 +1,74 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from casper.infradead.org ([85.118.1.10]:53745 "EHLO
-	casper.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752991Ab1GaXYP (ORCPT
+Received: from vms173017pub.verizon.net ([206.46.173.17]:45883 "EHLO
+	vms173017pub.verizon.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752831Ab1HAAia (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 31 Jul 2011 19:24:15 -0400
-Subject: Re: [PATCH 1/5] um: Use __i386__ in ifdef for vsyscall exports, not
- SUBARCH_i386
-From: David Woodhouse <dwmw2@infradead.org>
-Date: Mon, 01 Aug 2011 00:24:10 +0100
-In-Reply-To: <CAFLxGvyewG70ZgU41Kmu_eOYpjZ0TVXYwYq1AfS1sXONAM6G_w@mail.gmail.com>
-References: <1312066693.22074.50.camel@i7.infradead.org>
-	 <1312066923.22074.53.camel@i7.infradead.org>
-	 <CAFLxGvy0QqoySDFwZpygHeXvQ7hG-B7z5iZq8qx3GUkFX8w2RQ@mail.gmail.com>
-	 <1312151063.18010.25.camel@i7.infradead.org>
-	 <20110731224834.GC2203@ZenIV.linux.org.uk>
-	 <20110731225801.GD2203@ZenIV.linux.org.uk>
-	 <1312153988.18010.39.camel@i7.infradead.org>
-	 <CAFLxGvyewG70ZgU41Kmu_eOYpjZ0TVXYwYq1AfS1sXONAM6G_w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Message-ID: <1312154652.18010.41.camel@i7.infradead.org>
-Mime-Version: 1.0
+	Sun, 31 Jul 2011 20:38:30 -0400
+Date: Sun, 31 Jul 2011 20:36:03 -0400 (EDT)
+From: Peter Foley <pefoley2@verizon.net>
+Subject: [PATCH RFC] kconfig.h fix extraneous dependencies
+Message-id: <alpine.LNX.2.00.1107311812460.62769@linux>
+MIME-version: 1.0
+Content-type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: richard -rw- weinberger <richard.weinberger@gmail.com>
-Cc: Al Viro <viro@zeniv.linux.org.uk>, Arnaud Lacombe <lacombar@gmail.com>, "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, user-mode-linux-devel@lists.sourceforge.net
+To: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild Mailing List <linux-kbuild@vger.kernel.org>, mmarek@suse.cz, rdunlap@xenotime.net, lacombar@gmail.com
 
-On Mon, 2011-08-01 at 01:17 +0200, richard -rw- weinberger wrote:
-> Isn't UML on ppc broken since ages?
+The introduction of kconfig.h caused fixdep to create three extraneous 
+dependencies.
+include/config/.h
+include/config/h.h
+include/config/foo.h
 
-Since before the ppc{,64} -> powerpc merge, by the looks of it.
+Remove them by eliminating instances of CONFIG_
 
-> As I don't have a ppc box I could never test it... 
+Signed-off-by: Peter Foley <pefoley2@verizon.net>
+---
 
-Give SSH public key and preferred username...
+Suggestions for a better replacement for CONFIG_FOO would be appreciated.
 
--- 
-dwmw2
-
+diff --git a/include/linux/kconfig.h b/include/linux/kconfig.h
+index 067eda0..66a0659 100644
+--- a/include/linux/kconfig.h
++++ b/include/linux/kconfig.h
+@@ -1,15 +1,15 @@
+-#ifndef __LINUX_KCONFIG_H
+-#define __LINUX_KCONFIG_H
++#ifndef __LINUX_KCONFIG
++#define __LINUX_KCONFIG
+ 
+ #include <generated/autoconf.h>
+ 
+ /*
+- * Helper macros to use CONFIG_ options in C expressions. Note that
++ * Helper macros to use CONFIG options in C expressions. Note that
+  * these only work with boolean and tristate options.
+  */
+ 
+ /*
+- * IS_ENABLED(CONFIG_FOO) evaluates to 1 if CONFIG_FOO is set to 'y' or 'm',
++ * IS_ENABLED(CONFIG _FOO) evaluates to 1 if CONFIG _FOO is set to 'y' or 'm',
+  * 0 otherwise.
+  *
+  */
+@@ -17,16 +17,16 @@
+ 	(__enabled_ ## option || __enabled_ ## option ## _MODULE)
+ 
+ /*
+- * IS_BUILTIN(CONFIG_FOO) evaluates to 1 if CONFIG_FOO is set to 'y', 0
++ * IS_BUILTIN(CONFIG _FOO) evaluates to 1 if CONFIG _FOO is set to 'y', 0
+  * otherwise. For boolean options, this is equivalent to
+- * IS_ENABLED(CONFIG_FOO).
++ * IS_ENABLED(CONFIG _FOO).
+  */
+ #define IS_BUILTIN(option) __enabled_ ## option
+ 
+ /*
+- * IS_MODULE(CONFIG_FOO) evaluates to 1 if CONFIG_FOO is set to 'm', 0
++ * IS_MODULE(CONFIG _FOO) evaluates to 1 if CONFIG _FOO is set to 'm', 0
+  * otherwise.
+  */
+ #define IS_MODULE(option) __enabled_ ## option ## _MODULE
+ 
+-#endif /* __LINUX_KCONFIG_H */
++#endif /* __LINUX_KCONFIG */
