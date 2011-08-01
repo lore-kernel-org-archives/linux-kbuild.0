@@ -1,61 +1,59 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from oproxy1-pub.bluehost.com ([66.147.249.253]:39976 "HELO
-	oproxy1-pub.bluehost.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with SMTP id S1753402Ab1HACFK (ORCPT
+Received: from zeniv.linux.org.uk ([195.92.253.2]:53820 "EHLO
+	ZenIV.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751025Ab1HAEcM (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 31 Jul 2011 22:05:10 -0400
-Message-ID: <317e3210947c039a33b970300e62d53d.squirrel@xenotime.net>
-In-Reply-To: <1312151687.18010.31.camel@i7.infradead.org>
-References: <1312141497-13854-1-git-send-email-lacombar@gmail.com>
-    <1312143643.12369.32.camel@i7.infradead.org>
-    <CACqU3MXak0Yo+VDQNEqT9rTJ5CjdU6jJ-C1Km7GauMQ+qGW+vg@mail.gmail.com>
-    <1312151687.18010.31.camel@i7.infradead.org>
-Date: Sun, 31 Jul 2011 19:05:08 -0700
-Subject: Re: [PATCH] kbuild: honor the ARCH setting of the existing
- configuration
-From: "Randy Dunlap" <rdunlap@xenotime.net>
+	Mon, 1 Aug 2011 00:32:12 -0400
+Date: Mon, 1 Aug 2011 05:32:08 +0100
+From: Al Viro <viro@ZenIV.linux.org.uk>
+Subject: Re: [PATCH 1/5] um: Use __i386__ in ifdef for vsyscall exports, not
+ SUBARCH_i386
+Message-ID: <20110801043207.GE2203@ZenIV.linux.org.uk>
+References: <1312066693.22074.50.camel@i7.infradead.org>
+ <1312066923.22074.53.camel@i7.infradead.org>
+ <CAFLxGvy0QqoySDFwZpygHeXvQ7hG-B7z5iZq8qx3GUkFX8w2RQ@mail.gmail.com>
+ <1312151063.18010.25.camel@i7.infradead.org>
+ <20110731224834.GC2203@ZenIV.linux.org.uk>
+ <20110731225801.GD2203@ZenIV.linux.org.uk>
+ <1312153988.18010.39.camel@i7.infradead.org>
+ <CAFLxGvyewG70ZgU41Kmu_eOYpjZ0TVXYwYq1AfS1sXONAM6G_w@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7BIT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFLxGvyewG70ZgU41Kmu_eOYpjZ0TVXYwYq1AfS1sXONAM6G_w@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: David Woodhouse <dwmw2@infradead.org>
-Cc: Arnaud Lacombe <lacombar@gmail.com>, Michal Marek <mmarek@suse.cz>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: richard -rw- weinberger <richard.weinberger@gmail.com>
+Cc: David Woodhouse <dwmw2@infradead.org>, Arnaud Lacombe <lacombar@gmail.com>, "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, user-mode-linux-devel@lists.sourceforge.net
 
-On Sun, July 31, 2011 3:34 pm, David Woodhouse wrote:
-> On Sun, 2011-07-31 at 18:07 -0400, Arnaud Lacombe wrote:
->> I think you totally miss the point of the patch as you keep being
->> self-centered on x86.
->
-> I'm focusing on x86 at the moment because x86 is the only architecture
-> that's *broken* in this respect. The other architectures that you
-> mention below, where they support 64-bit kernels, all work fine with
-> only *one* ARCH= setting covering all configurations. It's only x86
-> where we haven't actually *finished* the merge.
->
->> I am working with configuration for mips, sh, powerpc, arm and x86.
->> Some of them are for real board, some of them are to regress-test
->> compilers, binutils and kernel builds. Each of those config hardcode
->> the CROSS_COMPILER string and have their own build directory. In each
->> case, I want to be able to just run "make O=/src/obj/v3.0-arm
->> oldnoconfig all" without having to worry about anything else.
->
-> Yes, that's a valid but *separate* problem. FWIW I usually solve this
-> problem with a two-line GNUmakefile:
-> 	ARCH := arm
-> 	include Makefile
->
-> I haven't checked whether it works for out-of-source-tree builds; I bet
-> it could be made to.
->
-> I would love to see $ARCH turned into a proper configuration option.
+On Mon, Aug 01, 2011 at 01:17:17AM +0200, richard -rw- weinberger wrote:
+> On Mon, Aug 1, 2011 at 1:13 AM, David Woodhouse <dwmw2@infradead.org> wrote:
+> > On Sun, 2011-07-31 at 23:58 +0100, Al Viro wrote:
+> >> FWIW, the next step (still not pushed there) is to move arch/um/sys-x86 to
+> >> arch/x86/um, with arch/um/os-Linux/sys-x86 becoming arch/x86/um/os-Linux,
+> >> Kconfig.x86 moving to arch/x86/um/Kconfig and Makefile-x86 - to
+> >> arch/x86/um/Makefile.defs. ?Next after that - arch/powerpc/um (and yes,
+> >> it means resurrected uml/ppc port; for now - only ppc32, since I have no
+> >> ppc64 boxen to test on).
+> >
+> > I can give you an account on a ppc64 box if that would help...
+> 
+> Isn't UML on ppc broken since ages?
 
-I don't object in principle, but I'm expecting to have to modify/update
-multiple *working* scripts as a result.  But of course this won't be
-the first time and I don't expect it to be the last time either.
-[signed:  eeyore]
+Yes.  Resurrected is not the right word here, sorry...
 
-
--- 
-
-
+Anyway, could you take a look at the git tree at
+git://git.kernel.org/pub/scm/linux/kernel/git/viro/um-header.git/,
+branch x86_merge and comment?  It doesn't include stuff from this
+thread (yet); what it does is
+	* further headers cleanups
+	* sys-{i386,x86_64} merged; all[1] x86-specific code taken first
+to arch/um/sys-x86 and then (by final commit) to arch/x86/um.  IMO that's
+the right place for it - target-dependent code is better off not hidden
+from maintainers of the target arch.  When we get other ports to working
+shape, their target-specific parts ought to go into arch/<target>/um.
+	* hopefully saner treatment of sigcontext; should make life easier
+for other ports.
+	
+[1] theoretically - in reality we still have more than a few x86-isms in
+"generic" um headers in arch/um/include/asm.
