@@ -1,66 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-fx0-f46.google.com ([209.85.161.46]:42384 "EHLO
-	mail-fx0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751758Ab1HAL1y convert rfc822-to-8bit (ORCPT
+Received: from vms173001pub.verizon.net ([206.46.173.1]:53063 "EHLO
+	vms173001pub.verizon.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750703Ab1HANxt (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 1 Aug 2011 07:27:54 -0400
-MIME-Version: 1.0
-In-Reply-To: <20110801101410.GE15578@n2100.arm.linux.org.uk>
-References: <1312042478-26012-1-git-send-email-zdevai@gmail.com>
-	<20110801083614.GC15578@n2100.arm.linux.org.uk>
-	<CAMuHMdUpTDSRP_JmWqcCBtYwzna0hwmaBshpiF8kgvqoNcqYZA@mail.gmail.com>
-	<20110801101410.GE15578@n2100.arm.linux.org.uk>
-Date: Mon, 1 Aug 2011 13:27:52 +0200
-Message-ID: <CAMuHMdUiLjMVwOqKPF6tHLpPxROrx=rRf3ednfTLrwGuZ2VF7A@mail.gmail.com>
-Subject: Re: [PATCH] Remove remaining references of CONFIG_GENERIC_TIME
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+	Mon, 1 Aug 2011 09:53:49 -0400
+Date: Mon, 01 Aug 2011 09:51:24 -0400 (EDT)
+From: Peter Foley <pefoley2@verizon.net>
+Subject: [PATCH v2] kconfig.h fix extraneous dependencies
+In-reply-to: <4E3670BF.6000709@suse.cz>
+Message-id: <alpine.LNX.2.00.1108010945280.3043@linux>
+References: <alpine.LNX.2.00.1107311812460.62769@linux>
+ <CACqU3MWfOg+ZhUGAovWsds48Y37i7GRk7qSxWvt7-JmLMBcmgg@mail.gmail.com>
+ <alpine.LNX.2.00.1107312055360.20006@linux> <4E3670BF.6000709@suse.cz>
+MIME-version: 1.0
+Content-type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Russell King - ARM Linux <linux@arm.linux.org.uk>
-Cc: Zoltan Devai <zdevai@gmail.com>, linux-kernel@vger.kernel.org, chris@zankel.net, linux-am33-list@redhat.com, trivial@kernel.org, user-mode-linux-devel@lists.sourceforge.net, cmetcalf@tilera.com, linux-arm-kernel@lists.infradead.org, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: Michal Marek <mmarek@suse.cz>
+Cc: Peter Foley <pefoley2@verizon.net>, Arnaud Lacombe <lacombar@gmail.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild Mailing List <linux-kbuild@vger.kernel.org>, rdunlap@xenotime.net
 
-On Mon, Aug 1, 2011 at 12:14, Russell King - ARM Linux
-<linux@arm.linux.org.uk> wrote:
-> On Mon, Aug 01, 2011 at 12:09:02PM +0200, Geert Uytterhoeven wrote:
->> On Mon, Aug 1, 2011 at 10:36, Russell King - ARM Linux
->> <linux@arm.linux.org.uk> wrote:
->> > On Sat, Jul 30, 2011 at 06:14:38PM +0200, Zoltan Devai wrote:
->> >> Commit 592913ecb87a9e06f98ddb55b298f1a66bf94c6b has killed off any
->> >> use of this config option long ago.
->> >
->> > I don't see the point of this - we were free of GENERIC_TIME on ARM
->> > shortly after it was originally killed off.  The problem is you can't
->> > stop people introducing new uses of this - because it existed once and
->> > there's nothing which errors out on its presence, people are going to
->> > continue submitting patches with it in.  And it's going to continue
->> > being missed at the review stage.
->> >
->> > I've a similar problem with folk on ARM including mach/gpio.h as their
->> > sole gpio header file rather than linux/gpio.h - I've been trying for
->> > the last 1-2 years to educate people to use linux/ in preference.  You
->> > can't do it, and I'm still just about the only one who picks up on that.
->> > (SoC maintainers don't care.)  They will end up caring when I push a
->> > change during the next merge window though, so I'll eventually stop
->> > mach/gpio.h being included.  (Instead, it'll be asm/gpio.h).
->> >
->> > GENERIC_TIME though... I don't think you'll ever stop new uses of it
->> > creeping in unless you can arrange for something to error out.
->>
->> Doesn't kconf error out when trying to select a non-existent symbol?
->
-> Nope.
+The introduction of include/linux/kconfig.h created 3 extraneous 
+dependencies:
+include/config/.h 
+include/config/h.h 
+include/config/foo.h 
 
-You're right. So that's a bug.
+Fix this by excluding kconfig.h from fixdep calculations.
 
-Gr{oetje,eeting}s,
-
-                        Geert
-
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+Signed-off-by: Peter Foley <pefoley2@verizon.net>
+---
+diff --git a/scripts/basic/fixdep.c b/scripts/basic/fixdep.c
+index 291228e..4789a6b 100644
+--- a/scripts/basic/fixdep.c
++++ b/scripts/basic/fixdep.c
+@@ -345,6 +345,7 @@ static void parse_dep_file(void *map, size_t len)
+ 		memcpy(s, m, p-m); s[p-m] = 0;
+ 		if (strrcmp(s, "include/generated/autoconf.h") &&
+ 		    strrcmp(s, "arch/um/include/uml-config.h") &&
++                    strrcmp(s, "include/linux/kconfig.h") &&
+ 		    strrcmp(s, ".ver")) {
+ 			/*
+ 			 * Do not list the source file as dependency, so that
