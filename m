@@ -1,108 +1,37 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pz0-f42.google.com ([209.85.210.42]:44209 "EHLO
-	mail-pz0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754803Ab1HBTac convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 2 Aug 2011 15:30:32 -0400
-Received: by pzk37 with SMTP id 37so158171pzk.1
-        for <linux-kbuild@vger.kernel.org>; Tue, 02 Aug 2011 12:30:31 -0700 (PDT)
+Received: from cantor2.suse.de ([195.135.220.15]:43116 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754153Ab1HBTaq (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 2 Aug 2011 15:30:46 -0400
+Message-ID: <4E38510B.6090001@suse.cz>
+Date: Tue, 02 Aug 2011 21:33:31 +0200
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-In-Reply-To: <1312311798-27851-1-git-send-email-srinivas.kandagatla@st.com>
-References: <1312311798-27851-1-git-send-email-srinivas.kandagatla@st.com>
-Date: Tue, 2 Aug 2011 15:30:31 -0400
-Message-ID: <CACqU3MXuNqO4rfXwQYm_L200_htgYhRG1E5zrJkt9wDPOpfzBw@mail.gmail.com>
-Subject: Re: [PATCH kernel-3.0] kbuild: Fix help text not displayed in choice option.
-From: Arnaud Lacombe <lacombar@gmail.com>
+Subject: Re: [PATCH] kconfig: Introduce IS_ENABLED(), IS_BUILTIN() and	IS_MODULE()
+References: <1311634718-32588-1-git-send-email-mmarek@suse.cz> <1311947497-4958-1-git-send-email-mmarek@suse.cz> <20110802173343.GA5251@merkur.ravnborg.org> <CACqU3MUy_EBaVB_VHW0EcbMcV9Qn_H=oh4ZKkCaUuPtbezpC4A@mail.gmail.com> <20110802192610.GA5338@merkur.ravnborg.org>
+In-Reply-To: <20110802192610.GA5338@merkur.ravnborg.org>
 Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 8BIT
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Srinivas KANDAGATLA <srinivas.kandagatla@st.com>
-Cc: linux-kbuild@vger.kernel.org, stuart.menefy@st.com
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: Arnaud Lacombe <lacombar@gmail.com>, linux-kbuild@vger.kernel.org, xiyou.wangcong@gmail.com, rdunlap@xenotime.net, linux-kernel@vger.kernel.org, plagnioj@jcrosoft.com
 
-Hi,
+Dne 2.8.2011 21:26, Sam Ravnborg napsal(a):
+>>>
+>>> If we do it like this then how about adding this to autoconf.h and avoid the extra file,
+>>> and the extra flag to gcc?
+>>>
+>> That would be intrusive for non-Linux users of kconfig. You would have
+>> to hardcode a <linux/kconfig.h> in autoconf.h, which mean other
+>> project would have to either mirror the Linux include tree structure,
+>> or modify kconfig for the desired include path, if the feature is
+>> desired at all. As I see it, Linux, through Kbuild, is a user of
+>> kconfig.
+> The idea was to entirely skip kconfig.h - and include the code in
+> autoconf.h verbatim - so no extra file.
 
-On Tue, Aug 2, 2011 at 3:03 PM, Srinivas KANDAGATLA
-<srinivas.kandagatla@st.com> wrote:
-> From: Srinivas Kandagatla <srinivas.kandagatla@st.com>
->
-> Help text under choice menu is never displayed because it does not have
-> symbol name associated with it, however many kconfigs have help text
-> under choice, assuming that it will be displayed when user selects help.
->
-> This patch changes the logic in menu_get_ext_help to display help for
-> cases which dont have symbol names like choice..
->
-> Signed-off-by: Srinivas Kandagatla <srinivas.kandagatla@st.com>
-> Reviewed-by: Stuart Menefy <stuart.menefy@st.com>
->
-could you please provide a reduced testcase included in the changelog
-? That will avoid people looking at the bug later on to figure out
-what caused the issue. The following snippet :
+We could do that. I went for the extra file because it was easier to
+edit a .h file than to edit a .c file that generates a .h file :).
 
-choice
-        prompt "Choice"
-        ---help---
-           HELP TEXT ...
-
-config A
-        bool "A"
-
-config B
-        bool "B"
-
-endchoice
-
-should be enough, as the problem is caused by "anonymous" choice.
-
-> ---
->
-> To see this bug in action, go to "PCI access mode" under PCI support, and hit the
-> help button. You will see no help text displayed. However in  arch/x86/Kconfig under
-> "PCI access mode" there is help section.
->
-> Help text under choice menu is never displayed because it does not have symbol name
-> associated with it, however many kconfigs have help text under choice, assuming
-> that it will be displayed when user selects help.
->
-> This patch changes the logic in menu_get_ext_help to display help for cases which
-> dont have symbol names like choice.
->
-that look good to me.
-
-Thanks,
- - Arnaud
-
-ps: do you consider Cc: for stable@ ?
-
->
->  scripts/kconfig/menu.c |    7 +++----
->  1 files changed, 3 insertions(+), 4 deletions(-)
->
-> diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
-> index d660086..beeb92e 100644
-> --- a/scripts/kconfig/menu.c
-> +++ b/scripts/kconfig/menu.c
-> @@ -597,11 +597,10 @@ void menu_get_ext_help(struct menu *menu, struct gstr *help)
->        struct symbol *sym = menu->sym;
->
->        if (menu_has_help(menu)) {
-> -               if (sym->name) {
-> +               if (sym->name)
->                        str_printf(help, "%s%s:\n\n", CONFIG_, sym->name);
-> -                       str_append(help, _(menu_get_help(menu)));
-> -                       str_append(help, "\n");
-> -               }
-> +               str_append(help, _(menu_get_help(menu)));
-> +               str_append(help, "\n");
->        } else {
->                str_append(help, nohelp_text);
->        }
-> --
-> 1.6.3.3
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
+Michal
