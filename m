@@ -1,80 +1,71 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pz0-f42.google.com ([209.85.210.42]:41345 "EHLO
-	mail-pz0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754330Ab1HBRuz convert rfc822-to-8bit (ORCPT
+Received: from eu1sys200aog115.obsmtp.com ([207.126.144.139]:37777 "EHLO
+	eu1sys200aog115.obsmtp.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1755040Ab1HBTER (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 2 Aug 2011 13:50:55 -0400
-MIME-Version: 1.0
-In-Reply-To: <20110802173343.GA5251@merkur.ravnborg.org>
-References: <1311634718-32588-1-git-send-email-mmarek@suse.cz>
-	<1311947497-4958-1-git-send-email-mmarek@suse.cz>
-	<20110802173343.GA5251@merkur.ravnborg.org>
-Date: Tue, 2 Aug 2011 13:50:53 -0400
-Message-ID: <CACqU3MUy_EBaVB_VHW0EcbMcV9Qn_H=oh4ZKkCaUuPtbezpC4A@mail.gmail.com>
-Subject: Re: [PATCH] kconfig: Introduce IS_ENABLED(), IS_BUILTIN() and IS_MODULE()
-From: Arnaud Lacombe <lacombar@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 8BIT
+	Tue, 2 Aug 2011 15:04:17 -0400
+Received: from zeta.dmz-eu.st.com (zeta.dmz-eu.st.com [164.129.230.9])
+	by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id 52FCBBD
+	for <linux-kbuild@vger.kernel.org>; Tue,  2 Aug 2011 19:04:15 +0000 (GMT)
+Received: from mail7.sgp.st.com (mail7.sgp.st.com [164.129.223.81])
+	by zeta.dmz-eu.st.com (STMicroelectronics) with ESMTP id E311C272B
+	for <linux-kbuild@vger.kernel.org>; Tue,  2 Aug 2011 19:04:14 +0000 (GMT)
+From: Srinivas KANDAGATLA <srinivas.kandagatla@st.com>
+Subject: [PATCH kernel-3.0] kbuild: Fix help text not displayed in choice option.
+Date: Tue,  2 Aug 2011 20:03:18 +0100
+Message-Id: <1312311798-27851-1-git-send-email-srinivas.kandagatla@st.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, xiyou.wangcong@gmail.com, rdunlap@xenotime.net, linux-kernel@vger.kernel.org, plagnioj@jcrosoft.com
+To: linux-kbuild@vger.kernel.org
+Cc: stuart.menefy@st.com, Srinivas Kandagatla <srinivas.kandagatla@st.com>
 
-Hi,
+From: Srinivas Kandagatla <srinivas.kandagatla@st.com>
 
-On Tue, Aug 2, 2011 at 1:33 PM, Sam Ravnborg <sam@ravnborg.org> wrote:
-> On Fri, Jul 29, 2011 at 03:51:37PM +0200, Michal Marek wrote:
->> Replace the config_is_*() macros with a variant that allows for grepping
->> for usage of CONFIG_* options in the code. Usage:
->>
->>   if (IS_ENABLED(CONFIG_NUMA))
->>
->> or
->>
->>   #if IS_ENABLED(CONFIG_NUMA)
->>
->> The IS_ENABLED() macro evaluates to 1 if the argument is set (to either 'y'
->> or 'm'), IS_BUILTIN() tests if the option is 'y' and IS_MODULE() test if
->> the option is 'm'. Only boolean and tristate options are supported.
->>
->> Signed-off-by: Michal Marek <mmarek@suse.cz>
->> ---
->>
->> Everybody happy with the above naming?
-> Naming is good - has my ack.
->
->
->>
->> ---
->>  Makefile                   |    2 +-
->>  include/linux/kconfig.h    |   32 ++++++++++++++++++++
->>  scripts/kconfig/confdata.c |   71 ++++++++-----------------------------------
->>  3 files changed, 47 insertions(+), 58 deletions(-)
->>  create mode 100644 include/linux/kconfig.h
->>
->> diff --git a/Makefile b/Makefile
->> index afb8e0d..bd7629b 100644
->> --- a/Makefile
->> +++ b/Makefile
->> @@ -360,7 +360,7 @@ CFLAGS_GCOV       = -fprofile-arcs -ftest-coverage
->>  LINUXINCLUDE    := -I$(srctree)/arch/$(hdr-arch)/include \
->>                     -Iarch/$(hdr-arch)/include/generated -Iinclude \
->>                     $(if $(KBUILD_SRC), -I$(srctree)/include) \
->> -                   -include include/generated/autoconf.h
->> +                   -include $(srctree)/include/linux/kconfig.h
->
-> If we do it like this then how about adding this to autoconf.h and avoid the extra file,
-> and the extra flag to gcc?
->
-That would be intrusive for non-Linux users of kconfig. You would have
-to hardcode a <linux/kconfig.h> in autoconf.h, which mean other
-project would have to either mirror the Linux include tree structure,
-or modify kconfig for the desired include path, if the feature is
-desired at all. As I see it, Linux, through Kbuild, is a user of
-kconfig.
+Help text under choice menu is never displayed because it does not have
+symbol name associated with it, however many kconfigs have help text
+under choice, assuming that it will be displayed when user selects help.
 
-I might send a patch to conditionally generate the __enable_<FOO>
-stuff so that other project have the choice to use this feature or not
-(and avoid namespace utilization if not), but that's low priority.
+This patch changes the logic in menu_get_ext_help to display help for
+cases which dont have symbol names like choice..
 
- - Arnaud
+Signed-off-by: Srinivas Kandagatla <srinivas.kandagatla@st.com>
+Reviewed-by: Stuart Menefy <stuart.menefy@st.com>
+---
+
+To see this bug in action, go to "PCI access mode" under PCI support, and hit the
+help button. You will see no help text displayed. However in  arch/x86/Kconfig under 
+"PCI access mode" there is help section.
+
+Help text under choice menu is never displayed because it does not have symbol name 
+associated with it, however many kconfigs have help text under choice, assuming 
+that it will be displayed when user selects help.
+
+This patch changes the logic in menu_get_ext_help to display help for cases which 
+dont have symbol names like choice.
+
+
+ scripts/kconfig/menu.c |    7 +++----
+ 1 files changed, 3 insertions(+), 4 deletions(-)
+
+diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
+index d660086..beeb92e 100644
+--- a/scripts/kconfig/menu.c
++++ b/scripts/kconfig/menu.c
+@@ -597,11 +597,10 @@ void menu_get_ext_help(struct menu *menu, struct gstr *help)
+ 	struct symbol *sym = menu->sym;
+ 
+ 	if (menu_has_help(menu)) {
+-		if (sym->name) {
++		if (sym->name)
+ 			str_printf(help, "%s%s:\n\n", CONFIG_, sym->name);
+-			str_append(help, _(menu_get_help(menu)));
+-			str_append(help, "\n");
+-		}
++		str_append(help, _(menu_get_help(menu)));
++		str_append(help, "\n");
+ 	} else {
+ 		str_append(help, nohelp_text);
+ 	}
+-- 
+1.6.3.3
+
