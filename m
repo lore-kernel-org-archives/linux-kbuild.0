@@ -1,52 +1,65 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-vx0-f174.google.com ([209.85.220.174]:35451 "EHLO
-	mail-vx0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753925Ab1HARwg convert rfc822-to-8bit (ORCPT
+Received: from smtp.snhosting.dk ([87.238.248.203]:48848 "EHLO
+	smtp.domainteam.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754488Ab1HBRdp (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 1 Aug 2011 13:52:36 -0400
+	Tue, 2 Aug 2011 13:33:45 -0400
+Date: Tue, 2 Aug 2011 19:33:43 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: [PATCH] kconfig: Introduce IS_ENABLED(), IS_BUILTIN() and
+	IS_MODULE()
+Message-ID: <20110802173343.GA5251@merkur.ravnborg.org>
+References: <1311634718-32588-1-git-send-email-mmarek@suse.cz> <1311947497-4958-1-git-send-email-mmarek@suse.cz>
 MIME-Version: 1.0
-In-Reply-To: <20110801043207.GE2203@ZenIV.linux.org.uk>
-References: <1312066693.22074.50.camel@i7.infradead.org>
-	<1312066923.22074.53.camel@i7.infradead.org>
-	<CAFLxGvy0QqoySDFwZpygHeXvQ7hG-B7z5iZq8qx3GUkFX8w2RQ@mail.gmail.com>
-	<1312151063.18010.25.camel@i7.infradead.org>
-	<20110731224834.GC2203@ZenIV.linux.org.uk>
-	<20110731225801.GD2203@ZenIV.linux.org.uk>
-	<1312153988.18010.39.camel@i7.infradead.org>
-	<CAFLxGvyewG70ZgU41Kmu_eOYpjZ0TVXYwYq1AfS1sXONAM6G_w@mail.gmail.com>
-	<20110801043207.GE2203@ZenIV.linux.org.uk>
-Date: Mon, 1 Aug 2011 19:52:35 +0200
-Message-ID: <CAFLxGvwxQ2VeqkDpkiVks35DHxZFvAP5nKUtD7i4Z32291otOg@mail.gmail.com>
-Subject: Re: [PATCH 1/5] um: Use __i386__ in ifdef for vsyscall exports, not SUBARCH_i386
-From: richard -rw- weinberger <richard.weinberger@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1311947497-4958-1-git-send-email-mmarek@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Al Viro <viro@zeniv.linux.org.uk>
-Cc: David Woodhouse <dwmw2@infradead.org>, Arnaud Lacombe <lacombar@gmail.com>, "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, user-mode-linux-devel@lists.sourceforge.net
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org, xiyou.wangcong@gmail.com, rdunlap@xenotime.net, lacombar@gmail.com, linux-kernel@vger.kernel.org, plagnioj@jcrosoft.com
 
-On Mon, Aug 1, 2011 at 6:32 AM, Al Viro <viro@zeniv.linux.org.uk> wrote:
-> Anyway, could you take a look at the git tree at
-> git://git.kernel.org/pub/scm/linux/kernel/git/viro/um-header.git/,
-> branch x86_merge and comment?  It doesn't include stuff from this
-> thread (yet); what it does is
->        * further headers cleanups
->        * sys-{i386,x86_64} merged; all[1] x86-specific code taken first
-> to arch/um/sys-x86 and then (by final commit) to arch/x86/um.  IMO that's
-> the right place for it - target-dependent code is better off not hidden
-> from maintainers of the target arch.  When we get other ports to working
-> shape, their target-specific parts ought to go into arch/<target>/um.
->        * hopefully saner treatment of sigcontext; should make life easier
-> for other ports.
->
-> [1] theoretically - in reality we still have more than a few x86-isms in
-> "generic" um headers in arch/um/include/asm.
->
+On Fri, Jul 29, 2011 at 03:51:37PM +0200, Michal Marek wrote:
+> Replace the config_is_*() macros with a variant that allows for grepping
+> for usage of CONFIG_* options in the code. Usage:
+> 
+>   if (IS_ENABLED(CONFIG_NUMA))
+> 
+> or
+> 
+>   #if IS_ENABLED(CONFIG_NUMA)
+> 
+> The IS_ENABLED() macro evaluates to 1 if the argument is set (to either 'y'
+> or 'm'), IS_BUILTIN() tests if the option is 'y' and IS_MODULE() test if
+> the option is 'm'. Only boolean and tristate options are supported.
+> 
+> Signed-off-by: Michal Marek <mmarek@suse.cz>
+> ---
+> 
+> Everybody happy with the above naming?
+Naming is good - has my ack.
 
-Ok, will look at it in the next few days.
-"sys-{i386,x86_64} merged" sounds great!
 
--- 
-Thanks,
-//richard
+> 
+> ---
+>  Makefile                   |    2 +-
+>  include/linux/kconfig.h    |   32 ++++++++++++++++++++
+>  scripts/kconfig/confdata.c |   71 ++++++++-----------------------------------
+>  3 files changed, 47 insertions(+), 58 deletions(-)
+>  create mode 100644 include/linux/kconfig.h
+> 
+> diff --git a/Makefile b/Makefile
+> index afb8e0d..bd7629b 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -360,7 +360,7 @@ CFLAGS_GCOV	= -fprofile-arcs -ftest-coverage
+>  LINUXINCLUDE    := -I$(srctree)/arch/$(hdr-arch)/include \
+>                     -Iarch/$(hdr-arch)/include/generated -Iinclude \
+>                     $(if $(KBUILD_SRC), -I$(srctree)/include) \
+> -                   -include include/generated/autoconf.h
+> +                   -include $(srctree)/include/linux/kconfig.h
+
+If we do it like this then how about adding this to autoconf.h and avoid the extra file,
+and the extra flag to gcc?
+
+	Sam
