@@ -1,39 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-iy0-f170.google.com ([209.85.210.170]:56678 "EHLO
+Received: from mail-iy0-f170.google.com ([209.85.210.170]:33577 "EHLO
 	mail-iy0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932189Ab1HDB76 (ORCPT
+	with ESMTP id S1753021Ab1HDNqI (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 3 Aug 2011 21:59:58 -0400
-From: Arnaud Lacombe <lacombar@gmail.com>
-Subject: [PATCH 1/2] kconfig/nconf: nuke unreferenced `nohelp_text'
-Date: Wed,  3 Aug 2011 21:52:06 -0400
-Message-Id: <1312422727-9740-1-git-send-email-lacombar@gmail.com>
+	Thu, 4 Aug 2011 09:46:08 -0400
+Received: by iye16 with SMTP id 16so1734661iye.1
+        for <linux-kbuild@vger.kernel.org>; Thu, 04 Aug 2011 06:46:08 -0700 (PDT)
+MIME-Version: 1.0
+Date: Thu, 4 Aug 2011 16:46:08 +0300
+Message-ID: <CAHpdbYGXQ-gpeyyo06AvTqhAmrOV3TbxjbJX3FR9JHPAWGsCbQ@mail.gmail.com>
+Subject: recordmcount.pl fails the build for ppc machines
+From: Ciprian Barbu <ciprian.barbu@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Arnaud Lacombe <lacombar@gmail.com>
+To: linux-kbuild@vger.kernel.org
 
-After commit 5416857867c9cc94aba641898c567d9707de30f1, 1nohelp_text' is no
-longer referenced, nuke it.
+Hello,
 
-Signed-off-by: Arnaud Lacombe <lacombar@gmail.com>
----
- scripts/kconfig/nconf.c |    2 --
- 1 files changed, 0 insertions(+), 2 deletions(-)
+I encountered a problem on a ppc machine when trying to build the
+kernel modules for the LINX ipc framework. The output of make is:
 
-diff --git a/scripts/kconfig/nconf.c b/scripts/kconfig/nconf.c
-index 39ca1f1..b113c50 100644
---- a/scripts/kconfig/nconf.c
-+++ b/scripts/kconfig/nconf.c
-@@ -182,8 +182,6 @@ setmod_text[] = N_(
- "This feature depends on another which\n"
- "has been configured as a module.\n"
- "As a result, this feature will be built as a module."),
--nohelp_text[] = N_(
--"There is no help available for this option.\n"),
- load_config_text[] = N_(
- "Enter the name of the configuration file you wish to load.\n"
- "Accept the name shown to restore the configuration you\n"
--- 
-1.7.6.153.g78432
+% make
+# ARCH=ppc
+# KERNEL=/lib/modules/2.6.32-28-powerpc/build
+# VERBOSE=no
+make[1]: Entering directory `/usr/src/linux-headers-2.6.32-28-powerpc'
+  CC [M] /home/poly/tpjb/linx-2.5.0/net/linx/af_linx.o
+Arch ppc is not supported with CONFIG_FTRACE_MCOUNT_RECORD at
+/usr/src/linux-hea
+ders-2.6.32-28-powerpc/scripts/recordmcount.pl line 249.
+make[2]: *** [/home/poly/tpjb/linx-2.5.0/net/linx/af_linx.o] Error 255
+make[1]: *** [_module_/home/poly/tpjb/linx-2.5.0/net/linx] Error 2
+make[1]: Leaving directory `/usr/src/linux-headers-2.6.32-28-powerpc'
+make: *** [modules] Error 2
 
+As you can see the ARCH variable is set to ppc, but the
+recordmcount.pl script only treats the case when "uname -m" return
+powerpc.
+
+When the script was modified to accept the "ppc" variant as well the
+build was successful.
+
+Regards,
+
+Ciprian Barbu
