@@ -1,60 +1,89 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-yx0-f174.google.com ([209.85.213.174]:60127 "EHLO
+Received: from mail-yx0-f174.google.com ([209.85.213.174]:34520 "EHLO
 	mail-yx0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750883Ab1HIP0v convert rfc822-to-8bit (ORCPT
+	with ESMTP id S1753028Ab1HIPwB convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 9 Aug 2011 11:26:51 -0400
+	Tue, 9 Aug 2011 11:52:01 -0400
 MIME-Version: 1.0
-In-Reply-To: <4E4140B3.7090802@suse.cz>
-References: <1312067499.22074.59.camel@i7.infradead.org>
-	<1312067670.22074.61.camel@i7.infradead.org>
-	<CACqU3MV460WGjmQdOOmhk3ZJT1FNjEjfuHqx8mYcgun9+7SfjA@mail.gmail.com>
-	<4E34998D.8060806@zytor.com>
-	<CACqU3MWn-OQVfLH96E+AeTCEjUw5+girXbuNgmUvXrEQuBe4vg@mail.gmail.com>
-	<4E4140B3.7090802@suse.cz>
-Date: Tue, 9 Aug 2011 11:26:50 -0400
-Message-ID: <CACqU3MU4wJb3ij6skod-ZiM+Q0OMTXNdbJ+qWjJW8VZNEP+x1g@mail.gmail.com>
-Subject: Re: [PATCH 2/2] Enable 'make CONFIG_FOO=y oldconfig'
+In-Reply-To: <CAG1a4rtHedO66ot4B7TWmKG5_mrnSS78O74_xxmgXk7UeoX_gA@mail.gmail.com>
+References: <CAG1a4rtHedO66ot4B7TWmKG5_mrnSS78O74_xxmgXk7UeoX_gA@mail.gmail.com>
+Date: Tue, 9 Aug 2011 11:52:00 -0400
+Message-ID: <CACqU3MWU-Mas_c814EcMjSgAh5dbOmDDrLzbtCFaf3wpMEHexA@mail.gmail.com>
+Subject: Re: Cannot easily set CONFIG_WIRELESS_EXT in kernel 3.0 build
 From: Arnaud Lacombe <lacombar@gmail.com>
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: "H. Peter Anvin" <hpa@zytor.com>, David Woodhouse <dwmw2@infradead.org>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: Pavel Ivanov <paivanof@gmail.com>
+Cc: linux-kbuild@vger.kernel.org, linux-wireless@vger.kernel.org
 
 Hi,
 
-On Tue, Aug 9, 2011 at 10:14 AM, Michal Marek <mmarek@suse.cz> wrote:
-> On 31.7.2011 02:05, Arnaud Lacombe wrote:
->>
->> Hi,
->>
->> On Sat, Jul 30, 2011 at 7:53 PM, H. Peter Anvin<hpa@zytor.com>  wrote:
->>>
->>> On 07/30/2011 04:44 PM, Arnaud Lacombe wrote:
->>>>
->>>> Beside that, the one thing I dislike with your patch is that it is
->>>> unconditional and global to all symbols, and you have no way to forbid
->>>> the environment to override a value.
->>>>
->>>
->>> Why????
->>>
->> Because kconfig might not be ran exclusively from a fully controlled
->> and restricted environment ? Not to mention that it is used by other
->> people than the linux kernel folks.
+On Tue, Aug 9, 2011 at 11:04 AM, Pavel Ivanov <paivanof@gmail.com> wrote:
+> Hi,
 >
-> Well, it has always been possible to trick kbuild (not kconfig) into
-> accepting CONFIG_* options from environment, because unset kconfig options
-> in auto.conf are not seen by make. Of course this is completely fragile,
-> because there is no dependency checking and such variables are only seen by
-> make and do not appear in autoconf.h. So a patch that teaches kconfig to
-> read options from the environment would actually make some (albeit currently
-> "illegal") use cases work correctly :).
->
-kconfig can already set symbol value from the environment. The only
-limitation I can see is that it is not optional and require an
-explicit environment variable name.
+> I've tried to build and install kernel 3.0. The standard Ubuntu
+> configuration worked very well. But after I ran 'make localmodconfig',
+> rebuilt and rebooted my wireless didn't work. After some investigation
+> I've found that option CONFIG_WIRELESS_EXT is no longer set in .config
+> file.
+what is the ubuntu kernel version ?
 
+> But no matter how I tried to include it in .config file it was
+> automatically deleted by 'make oldconfig' and again kernel compiled
+> without it.
+well, .config is not meant to be edited manually. It is written at the
+top of the file:
+
+# Automatically generated file; DO NOT EDIT.
+
+> Then I've found that if I include in the build some
+> (completely unnecessary to me) wireless module which has 'select
+> WIRELESS_EXT' in its Kconfig then it stays in .config file and
+> resulting kernel works very well with my WiFi network.
+>
+expected behavior.
+
+> In fact even if
+> I add 'select WIRELESS_EXT' to Kconfig of the driver for my wireless
+> card (ath9k) everything works as well.
+>
+did you look at ubuntu kernel sources to see if the Kconfig entry
+ath9k driver had been changed to 'select WIRELESS_EXT' ? What may be
+more likely is that ubuntu is building a bundle of driver, and one of
+them include WIRELESS_EXT.
+
+> I'd think that such behavior is a bug, although I don't know on which
+> side. Either on the side of wireless drivers which all have to have
+> 'select WIRELESS_EXT' in their Kconfig files
+From what you describe, I'd say yes.
+
+> or on the side of kbuild
+> system which doesn't allow me to set CONFIG_WIRELESS_EXT unless some
+> driver requires it. Interestingly enough requiring WIRELESS_EXT works
+> only with drivers, because I've tried to add CONFIG_LIBIPW (it
+> requires WIRELESS_EXT too) but it was automatically deleted from
+> .config file along with CONFIG_WIRELESS_EXT. So I couldn't include
+> only this library.
+>
+as Michal pointed out, that's the intended behavior.
+
+Could you generate a patch for the change you made to make your
+adapter works and send them to the wireless folks ? They are likely to
+be more aware of the various requirement and inter-dependency of the
+subsystem.
+
+Thanks,
  - Arnaud
+
+> Could you tell me if this is indeed a bug or am I missing something here?
+> I'm not subscribed to the lists so please add me in CC.
+>
+>
+> Pavel
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
