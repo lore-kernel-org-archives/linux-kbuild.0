@@ -1,46 +1,33 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-gy0-f174.google.com ([209.85.160.174]:34967 "EHLO
-	mail-gy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753075Ab1HIPEg (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 9 Aug 2011 11:04:36 -0400
+Received: from cantor2.suse.de ([195.135.220.15]:60423 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753155Ab1HIPJ3 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 9 Aug 2011 11:09:29 -0400
+Message-ID: <4E414DA7.7020406@suse.cz>
+Date: Tue, 09 Aug 2011 17:09:27 +0200
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-From: Pavel Ivanov <paivanof@gmail.com>
-Date: Tue, 9 Aug 2011 11:04:05 -0400
-Message-ID: <CAG1a4rtHedO66ot4B7TWmKG5_mrnSS78O74_xxmgXk7UeoX_gA@mail.gmail.com>
-Subject: Cannot easily set CONFIG_WIRELESS_EXT in kernel 3.0 build
+Subject: Re: Cannot easily set CONFIG_WIRELESS_EXT in kernel 3.0 build
+References: <CAG1a4rtHedO66ot4B7TWmKG5_mrnSS78O74_xxmgXk7UeoX_gA@mail.gmail.com>
+In-Reply-To: <CAG1a4rtHedO66ot4B7TWmKG5_mrnSS78O74_xxmgXk7UeoX_gA@mail.gmail.com>
 Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org, linux-wireless@vger.kernel.org
+To: Pavel Ivanov <paivanof@gmail.com>
+Cc: linux-kbuild@vger.kernel.org, linux-wireless@vger.kernel.org
 
-Hi,
+On 9.8.2011 17:04, Pavel Ivanov wrote:
+> I'd think that such behavior is a bug, although I don't know on which
+> side. Either on the side of wireless drivers which all have to have
+> 'select WIRELESS_EXT' in their Kconfig files or on the side of kbuild
+> system which doesn't allow me to set CONFIG_WIRELESS_EXT unless some
+> driver requires it. Interestingly enough requiring WIRELESS_EXT works
+> only with drivers, because I've tried to add CONFIG_LIBIPW (it
+> requires WIRELESS_EXT too)
 
-I've tried to build and install kernel 3.0. The standard Ubuntu
-configuration worked very well. But after I ran 'make localmodconfig',
-rebuilt and rebooted my wireless didn't work. After some investigation
-I've found that option CONFIG_WIRELESS_EXT is no longer set in .config
-file. But no matter how I tried to include it in .config file it was
-automatically deleted by 'make oldconfig' and again kernel compiled
-without it. Then I've found that if I include in the build some
-(completely unnecessary to me) wireless module which has 'select
-WIRELESS_EXT' in its Kconfig then it stays in .config file and
-resulting kernel works very well with my WiFi network. In fact even if
-I add 'select WIRELESS_EXT' to Kconfig of the driver for my wireless
-card (ath9k) everything works as well.
+Both WIRELESS_EXT and LIBIPW are symbols without prompt, so they cannot
+be selected by the user directly. Drivers that need CONFIG_WIRELESS_EXT
+have to select it.
 
-I'd think that such behavior is a bug, although I don't know on which
-side. Either on the side of wireless drivers which all have to have
-'select WIRELESS_EXT' in their Kconfig files or on the side of kbuild
-system which doesn't allow me to set CONFIG_WIRELESS_EXT unless some
-driver requires it. Interestingly enough requiring WIRELESS_EXT works
-only with drivers, because I've tried to add CONFIG_LIBIPW (it
-requires WIRELESS_EXT too) but it was automatically deleted from
-.config file along with CONFIG_WIRELESS_EXT. So I couldn't include
-only this library.
-
-Could you tell me if this is indeed a bug or am I missing something here?
-I'm not subscribed to the lists so please add me in CC.
-
-
-Pavel
+Michal
