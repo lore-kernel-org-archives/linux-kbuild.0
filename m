@@ -1,45 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:56363 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751315Ab1HIOOM (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 9 Aug 2011 10:14:12 -0400
-Message-ID: <4E4140B3.7090802@suse.cz>
-Date: Tue, 09 Aug 2011 16:14:11 +0200
-From: Michal Marek <mmarek@suse.cz>
+Received: from mail-gy0-f174.google.com ([209.85.160.174]:34967 "EHLO
+	mail-gy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753075Ab1HIPEg (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 9 Aug 2011 11:04:36 -0400
 MIME-Version: 1.0
-Subject: Re: [PATCH 2/2] Enable 'make CONFIG_FOO=y oldconfig'
-References: <1312067499.22074.59.camel@i7.infradead.org> <1312067670.22074.61.camel@i7.infradead.org> <CACqU3MV460WGjmQdOOmhk3ZJT1FNjEjfuHqx8mYcgun9+7SfjA@mail.gmail.com> <4E34998D.8060806@zytor.com> <CACqU3MWn-OQVfLH96E+AeTCEjUw5+girXbuNgmUvXrEQuBe4vg@mail.gmail.com>
-In-Reply-To: <CACqU3MWn-OQVfLH96E+AeTCEjUw5+girXbuNgmUvXrEQuBe4vg@mail.gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
+From: Pavel Ivanov <paivanof@gmail.com>
+Date: Tue, 9 Aug 2011 11:04:05 -0400
+Message-ID: <CAG1a4rtHedO66ot4B7TWmKG5_mrnSS78O74_xxmgXk7UeoX_gA@mail.gmail.com>
+Subject: Cannot easily set CONFIG_WIRELESS_EXT in kernel 3.0 build
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnaud Lacombe <lacombar@gmail.com>
-Cc: "H. Peter Anvin" <hpa@zytor.com>, David Woodhouse <dwmw2@infradead.org>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: linux-kbuild@vger.kernel.org, linux-wireless@vger.kernel.org
 
-On 31.7.2011 02:05, Arnaud Lacombe wrote:
-> Hi,
->
-> On Sat, Jul 30, 2011 at 7:53 PM, H. Peter Anvin<hpa@zytor.com>  wrote:
->> On 07/30/2011 04:44 PM, Arnaud Lacombe wrote:
->>>
->>> Beside that, the one thing I dislike with your patch is that it is
->>> unconditional and global to all symbols, and you have no way to forbid
->>> the environment to override a value.
->>>
->>
->> Why????
->>
-> Because kconfig might not be ran exclusively from a fully controlled
-> and restricted environment ? Not to mention that it is used by other
-> people than the linux kernel folks.
+Hi,
 
-Well, it has always been possible to trick kbuild (not kconfig) into 
-accepting CONFIG_* options from environment, because unset kconfig 
-options in auto.conf are not seen by make. Of course this is completely 
-fragile, because there is no dependency checking and such variables are 
-only seen by make and do not appear in autoconf.h. So a patch that 
-teaches kconfig to read options from the environment would actually make 
-some (albeit currently "illegal") use cases work correctly :).
+I've tried to build and install kernel 3.0. The standard Ubuntu
+configuration worked very well. But after I ran 'make localmodconfig',
+rebuilt and rebooted my wireless didn't work. After some investigation
+I've found that option CONFIG_WIRELESS_EXT is no longer set in .config
+file. But no matter how I tried to include it in .config file it was
+automatically deleted by 'make oldconfig' and again kernel compiled
+without it. Then I've found that if I include in the build some
+(completely unnecessary to me) wireless module which has 'select
+WIRELESS_EXT' in its Kconfig then it stays in .config file and
+resulting kernel works very well with my WiFi network. In fact even if
+I add 'select WIRELESS_EXT' to Kconfig of the driver for my wireless
+card (ath9k) everything works as well.
 
-Michal
+I'd think that such behavior is a bug, although I don't know on which
+side. Either on the side of wireless drivers which all have to have
+'select WIRELESS_EXT' in their Kconfig files or on the side of kbuild
+system which doesn't allow me to set CONFIG_WIRELESS_EXT unless some
+driver requires it. Interestingly enough requiring WIRELESS_EXT works
+only with drivers, because I've tried to add CONFIG_LIBIPW (it
+requires WIRELESS_EXT too) but it was automatically deleted from
+.config file along with CONFIG_WIRELESS_EXT. So I couldn't include
+only this library.
+
+Could you tell me if this is indeed a bug or am I missing something here?
+I'm not subscribed to the lists so please add me in CC.
+
+
+Pavel
