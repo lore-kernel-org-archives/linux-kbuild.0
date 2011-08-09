@@ -1,65 +1,51 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-gw0-f46.google.com ([74.125.83.46]:47211 "EHLO
-	mail-gw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753356Ab1HIQOw (ORCPT
+Received: from zeniv.linux.org.uk ([195.92.253.2]:55729 "EHLO
+	ZenIV.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751256Ab1HIXif (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 9 Aug 2011 12:14:52 -0400
+	Tue, 9 Aug 2011 19:38:35 -0400
+Date: Wed, 10 Aug 2011 00:38:17 +0100
+From: Al Viro <viro@ZenIV.linux.org.uk>
+Subject: Re: [PATCH 1/5] um: Use __i386__ in ifdef for vsyscall exports, not
+ SUBARCH_i386
+Message-ID: <20110809233817.GL2203@ZenIV.linux.org.uk>
+References: <1312066693.22074.50.camel@i7.infradead.org>
+ <1312066923.22074.53.camel@i7.infradead.org>
+ <CAFLxGvy0QqoySDFwZpygHeXvQ7hG-B7z5iZq8qx3GUkFX8w2RQ@mail.gmail.com>
+ <1312151063.18010.25.camel@i7.infradead.org>
+ <20110731224834.GC2203@ZenIV.linux.org.uk>
+ <20110731225801.GD2203@ZenIV.linux.org.uk>
+ <1312153988.18010.39.camel@i7.infradead.org>
+ <CAFLxGvyewG70ZgU41Kmu_eOYpjZ0TVXYwYq1AfS1sXONAM6G_w@mail.gmail.com>
+ <20110801043207.GE2203@ZenIV.linux.org.uk>
+ <CAFLxGvwxQ2VeqkDpkiVks35DHxZFvAP5nKUtD7i4Z32291otOg@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <CACqU3MWU-Mas_c814EcMjSgAh5dbOmDDrLzbtCFaf3wpMEHexA@mail.gmail.com>
-References: <CAG1a4rtHedO66ot4B7TWmKG5_mrnSS78O74_xxmgXk7UeoX_gA@mail.gmail.com>
- <CACqU3MWU-Mas_c814EcMjSgAh5dbOmDDrLzbtCFaf3wpMEHexA@mail.gmail.com>
-From: Pavel Ivanov <paivanof@gmail.com>
-Date: Tue, 9 Aug 2011 12:14:22 -0400
-Message-ID: <CAG1a4rtd6UoD1r2crLhkbvViSL9q8b_Zw+afGj4HFSbwzKiUEA@mail.gmail.com>
-Subject: Re: Cannot easily set CONFIG_WIRELESS_EXT in kernel 3.0 build
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFLxGvwxQ2VeqkDpkiVks35DHxZFvAP5nKUtD7i4Z32291otOg@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnaud Lacombe <lacombar@gmail.com>
-Cc: linux-kbuild@vger.kernel.org, linux-wireless@vger.kernel.org
+To: richard -rw- weinberger <richard.weinberger@gmail.com>
+Cc: David Woodhouse <dwmw2@infradead.org>, Arnaud Lacombe <lacombar@gmail.com>, "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, user-mode-linux-devel@lists.sourceforge.net
 
-Hi, Arnaud.
+On Mon, Aug 01, 2011 at 07:52:35PM +0200, richard -rw- weinberger wrote:
 
->> I've tried to build and install kernel 3.0. The standard Ubuntu
->> configuration worked very well. But after I ran 'make localmodconfig',
->> rebuilt and rebooted my wireless didn't work. After some investigation
->> I've found that option CONFIG_WIRELESS_EXT is no longer set in .config
->> file.
-> what is the ubuntu kernel version ?
+> Ok, will look at it in the next few days.
+> "sys-{i386,x86_64} merged" sounds great!
 
-Ubuntu's version is 2.6.38.11-generic.
+	Update pushed; x86-specific stuff moved to arch/x86/um, more things
+merged/cleaned up.  Works here, both for 32bit and 64bit builds...  At least
+as well as the mainline one does, that is - there still are two very annoying
+issues, shared with mainline at least as far back as 2.6.36:
+	* dancing close to OOM sometimes ends up with reserved pages showing
+up in pagetables.  Code in mm/* is Not Happy(tm)...
+	* tty-on-xterm sometimes crashes on the first keysyms reaching it;
+as far as I can tell, it's something related to SIGWINCH handling - whether
+it happens or not depends on the way xterm windows are laid out and flipping
+between them first seems to prevent that shit.  If it hasn't happened at once,
+it won't happen at all...  Something in drivers/chan or drivers/line, most
+likely...
 
->> But no matter how I tried to include it in .config file it was
->> automatically deleted by 'make oldconfig' and again kernel compiled
->> without it.
-> well, .config is not meant to be edited manually. It is written at the
-> top of the file:
->
-> # Automatically generated file; DO NOT EDIT.
-
-Well, then how am I expected to manually change configuration
-parameters without running any automated program? Manual editing of
-.config worked (well, except some automatic changes which I've already
-got used to). Should I edit some other file instead?
-
->> In fact even if
->> I add 'select WIRELESS_EXT' to Kconfig of the driver for my wireless
->> card (ath9k) everything works as well.
->>
-> did you look at ubuntu kernel sources to see if the Kconfig entry
-> ath9k driver had been changed to 'select WIRELESS_EXT' ? What may be
-> more likely is that ubuntu is building a bundle of driver, and one of
-> them include WIRELESS_EXT.
-
-I didn't look at Ubuntu sources yet but I've just assumed the same -
-as some of compiled drivers include WIRELESS_EXT everything works with
-any driver.
-
-> Could you generate a patch for the change you made to make your
-> adapter works and send them to the wireless folks ? They are likely to
-> be more aware of the various requirement and inter-dependency of the
-> subsystem.
-
-Will do, thanks.
-
-Pavel
+	I can post the damn thing as patch series, but it's about 380Mb
+even with git format-patch -M and 78-posting mailbomb is a bit over the top
+anyway...
