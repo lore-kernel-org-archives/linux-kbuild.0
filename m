@@ -1,40 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:50736 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:56363 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754161Ab1HHODu (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 8 Aug 2011 10:03:50 -0400
-Date: Mon, 8 Aug 2011 16:03:49 +0200
+	id S1751315Ab1HIOOM (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 9 Aug 2011 10:14:12 -0400
+Message-ID: <4E4140B3.7090802@suse.cz>
+Date: Tue, 09 Aug 2011 16:14:11 +0200
 From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [PATCH kernel-3.0] kbuild: Fix help text not displayed in choice
- option.
-Message-ID: <20110808140349.GC11427@sepie.suse.cz>
-References: <1312311798-27851-1-git-send-email-srinivas.kandagatla@st.com>
- <CACqU3MXuNqO4rfXwQYm_L200_htgYhRG1E5zrJkt9wDPOpfzBw@mail.gmail.com>
- <4E3916B8.10301@st.com>
- <CACqU3MVE7DoUkfynzKr_QbmKHB34DF6Q=o4EMF9Y=YCp3Dh3hw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CACqU3MVE7DoUkfynzKr_QbmKHB34DF6Q=o4EMF9Y=YCp3Dh3hw@mail.gmail.com>
+Subject: Re: [PATCH 2/2] Enable 'make CONFIG_FOO=y oldconfig'
+References: <1312067499.22074.59.camel@i7.infradead.org> <1312067670.22074.61.camel@i7.infradead.org> <CACqU3MV460WGjmQdOOmhk3ZJT1FNjEjfuHqx8mYcgun9+7SfjA@mail.gmail.com> <4E34998D.8060806@zytor.com> <CACqU3MWn-OQVfLH96E+AeTCEjUw5+girXbuNgmUvXrEQuBe4vg@mail.gmail.com>
+In-Reply-To: <CACqU3MWn-OQVfLH96E+AeTCEjUw5+girXbuNgmUvXrEQuBe4vg@mail.gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Arnaud Lacombe <lacombar@gmail.com>
-Cc: srinivas.kandagatla@st.com, linux-kbuild@vger.kernel.org, stuart.menefy@st.com
+Cc: "H. Peter Anvin" <hpa@zytor.com>, David Woodhouse <dwmw2@infradead.org>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-On Wed, Aug 03, 2011 at 09:37:08PM -0400, Arnaud Lacombe wrote:
+On 31.7.2011 02:05, Arnaud Lacombe wrote:
 > Hi,
-> 
-> On Wed, Aug 3, 2011 at 5:36 AM, Srinivas KANDAGATLA
-> <srinivas.kandagatla@st.com> wrote:
-> >
-> > Hi Arnaud,
-> > Thankyou for the comments,
-> > Here is the new patch with comments included.
-> >
-> Reviewed-by: Arnaud Lacombe <lacombar@gmail.com>
-> 
-> Michal, can you pick that for 3.1-rc1 or 3.1-rc2 ?
+>
+> On Sat, Jul 30, 2011 at 7:53 PM, H. Peter Anvin<hpa@zytor.com>  wrote:
+>> On 07/30/2011 04:44 PM, Arnaud Lacombe wrote:
+>>>
+>>> Beside that, the one thing I dislike with your patch is that it is
+>>> unconditional and global to all symbols, and you have no way to forbid
+>>> the environment to override a value.
+>>>
+>>
+>> Why????
+>>
+> Because kconfig might not be ran exclusively from a fully controlled
+> and restricted environment ? Not to mention that it is used by other
+> people than the linux kernel folks.
 
-I applied it with a Cc: stable@kernel.org.
+Well, it has always been possible to trick kbuild (not kconfig) into 
+accepting CONFIG_* options from environment, because unset kconfig 
+options in auto.conf are not seen by make. Of course this is completely 
+fragile, because there is no dependency checking and such variables are 
+only seen by make and do not appear in autoconf.h. So a patch that 
+teaches kconfig to read options from the environment would actually make 
+some (albeit currently "illegal") use cases work correctly :).
 
 Michal
