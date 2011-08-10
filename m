@@ -1,49 +1,80 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from casper.infradead.org ([85.118.1.10]:50448 "EHLO
-	casper.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752361Ab1HJRZk (ORCPT
+Received: from mail-gy0-f174.google.com ([209.85.160.174]:52336 "EHLO
+	mail-gy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753542Ab1HJRod (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 10 Aug 2011 13:25:40 -0400
-Subject: Re: [PATCH 2/2] Enable 'make CONFIG_FOO=y oldconfig'
-From: David Woodhouse <dwmw2@infradead.org>
-Date: Wed, 10 Aug 2011 18:25:33 +0100
-In-Reply-To: <20110810100130.6adc6c99.rdunlap@xenotime.net>
+	Wed, 10 Aug 2011 13:44:33 -0400
+MIME-Version: 1.0
+In-Reply-To: <1312993987.2989.53.camel@i7.infradead.org>
 References: <1312067499.22074.59.camel@i7.infradead.org>
-	 <1312067670.22074.61.camel@i7.infradead.org>
-	 <CACqU3MV460WGjmQdOOmhk3ZJT1FNjEjfuHqx8mYcgun9+7SfjA@mail.gmail.com>
-	 <4E34998D.8060806@zytor.com>
-	 <CACqU3MWn-OQVfLH96E+AeTCEjUw5+girXbuNgmUvXrEQuBe4vg@mail.gmail.com>
-	 <4E4140B3.7090802@suse.cz>
-	 <CACqU3MU4wJb3ij6skod-ZiM+Q0OMTXNdbJ+qWjJW8VZNEP+x1g@mail.gmail.com>
-	 <4E4280BA.9050109@suse.cz> <1312981658.2989.39.camel@i7.infradead.org>
-	 <CACqU3MUJkM3Y2o2Jx1eQxZkW2T-Dby1JCaks6SqTz_FB17hSvw@mail.gmail.com>
-	 <20110810100130.6adc6c99.rdunlap@xenotime.net>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Message-ID: <1312997135.2989.54.camel@i7.infradead.org>
-Mime-Version: 1.0
+	<1312067670.22074.61.camel@i7.infradead.org>
+	<CACqU3MV460WGjmQdOOmhk3ZJT1FNjEjfuHqx8mYcgun9+7SfjA@mail.gmail.com>
+	<4E34998D.8060806@zytor.com>
+	<CACqU3MWn-OQVfLH96E+AeTCEjUw5+girXbuNgmUvXrEQuBe4vg@mail.gmail.com>
+	<4E4140B3.7090802@suse.cz>
+	<CACqU3MU4wJb3ij6skod-ZiM+Q0OMTXNdbJ+qWjJW8VZNEP+x1g@mail.gmail.com>
+	<4E4280BA.9050109@suse.cz>
+	<1312981658.2989.39.camel@i7.infradead.org>
+	<CACqU3MUJkM3Y2o2Jx1eQxZkW2T-Dby1JCaks6SqTz_FB17hSvw@mail.gmail.com>
+	<1312985888.2989.46.camel@i7.infradead.org>
+	<CACqU3MXozgu0kr-4w=bGejcEi8MrxH-PhKa0Ji0zrLu7ZEFomg@mail.gmail.com>
+	<1312993987.2989.53.camel@i7.infradead.org>
+Date: Wed, 10 Aug 2011 13:44:32 -0400
+Message-ID: <CACqU3MXC_eDqgWDwnVe8KsqoAMTPQNiP6YMHD5G+1sMBhMwXzA@mail.gmail.com>
+Subject: Re: [PATCH 2/2] Enable 'make CONFIG_FOO=y oldconfig'
+From: Arnaud Lacombe <lacombar@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Randy Dunlap <rdunlap@xenotime.net>
-Cc: Arnaud Lacombe <lacombar@gmail.com>, Michal Marek <mmarek@suse.cz>, "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: David Woodhouse <dwmw2@infradead.org>
+Cc: Michal Marek <mmarek@suse.cz>, "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-On Wed, 2011-08-10 at 10:01 -0700, Randy Dunlap wrote:
-> On Wed, 10 Aug 2011 10:15:55 -0400 Arnaud Lacombe wrote:
-> 
-> > Btw, warning about potential missing dependencies are useless[0],
-> > user, even kernel hacker do _not_ read them. We spent a few day
-> > tracking down a build failure on powerpc triggered because SND_ISA was
-> > selected without ISA_DMA_API, a warning was present, but nobody cared
-> > about it.
-> 
-> That one was an anomaly.  I usually see them and often send patches
-> for them.  But granted, most developers just pass over them. 
+Hi,
 
-I see that kind of thing as a natural consequence of the whole 'select'
-abomination. But that's even *further* off-topic from the original topic
-of this thread than Arnaud has already dragged us.
+On Wed, Aug 10, 2011 at 12:33 PM, David Woodhouse <dwmw2@infradead.org> wrote:
+> On Wed, 2011-08-10 at 10:34 -0400, Arnaud Lacombe wrote:
+>> your point being ? I might as well tell you that I find the current
+>> behavior of 'all*.config' just as broken wrt. to dependency
+>> management.
+>
+> You might indeed. And I would find that commentary just as irrelevant
+> and unhelpful.
+>
+you are free to do so.
 
--- 
-David Woodhouse                            Open Source Technology Centre
-David.Woodhouse@intel.com                              Intel Corporation
+>> > If you have nothing relevant to say, just don't say anything.
+>> >
+>> maybe you can come with a detailed description of your proposal's
+>> behavior, including how to manage case like this, instead of just
+>> throwing patch around ?
+>
+> How's this for a definition:
+>
+> "The behaviour for unsettable (or unclearable) options shall be exactly
+> like it already is if you put them in all*.config, or if you manually
+> edit the .config file and run 'make oldconfig', as people have been
+> doing for years. There is nothing new to see here."
+>
+Then I would say it is plain broken, especially if widespread.
 
+>> If I do:
+>>
+>> # make CONFIG_WIRELESS_EXT=y allnoconfig
+>>
+>> I expect either a success or an error, not a silent discard. And
+>> *yes*, the problem already exists with "all*.config".
+>
+> [dwmw2@i7 linux-2.6]$ make CONFIG_WIRELESS_EXT=y allnoconfig
+> scripts/kconfig/conf --allnoconfig Kconfig
+> #
+> # Could not set CONFIG_WIRELESS_EXT=y; perhaps it has unmet dependencies?
+> #
+> #
+> # configuration written to .config
+> #
+Exactly my point, you just successfully created an half-backed config
+which is different than what Aunt Tillie wanted you to generate. This
+should be an hard error, same for "all*.config", not to mention that
+the error message is far from being helpful.
+
+ - Arnaud
