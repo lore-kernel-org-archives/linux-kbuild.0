@@ -1,73 +1,52 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from moutng.kundenserver.de ([212.227.126.171]:64474 "EHLO
-	moutng.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753947Ab1HJMUr (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 10 Aug 2011 08:20:47 -0400
-From: Arnd Bergmann <arnd@arndb.de>
-Subject: Re: [RFC] possible killing of boilerplate headers by asm-generic reorg
-Date: Wed, 10 Aug 2011 14:20:03 +0200
-References: <20110807204118.GA2203@ZenIV.linux.org.uk> <CA+55aFxSOio5efktO+fQOL6qEaE2KBFyCcOcvNMOvWGpY-ktiQ@mail.gmail.com> <4E4254E1.5070909@suse.cz>
-In-Reply-To: <4E4254E1.5070909@suse.cz>
+Received: from cantor2.suse.de ([195.135.220.15]:39216 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753075Ab1HJM7k (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 10 Aug 2011 08:59:40 -0400
+Message-ID: <4E4280BA.9050109@suse.cz>
+Date: Wed, 10 Aug 2011 14:59:38 +0200
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-1"
+Subject: Re: [PATCH 2/2] Enable 'make CONFIG_FOO=y oldconfig'
+References: <1312067499.22074.59.camel@i7.infradead.org> <1312067670.22074.61.camel@i7.infradead.org> <CACqU3MV460WGjmQdOOmhk3ZJT1FNjEjfuHqx8mYcgun9+7SfjA@mail.gmail.com> <4E34998D.8060806@zytor.com> <CACqU3MWn-OQVfLH96E+AeTCEjUw5+girXbuNgmUvXrEQuBe4vg@mail.gmail.com> <4E4140B3.7090802@suse.cz> <CACqU3MU4wJb3ij6skod-ZiM+Q0OMTXNdbJ+qWjJW8VZNEP+x1g@mail.gmail.com>
+In-Reply-To: <CACqU3MU4wJb3ij6skod-ZiM+Q0OMTXNdbJ+qWjJW8VZNEP+x1g@mail.gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
-Message-Id: <201108101420.03789.arnd@arndb.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, Al Viro <viro@zeniv.linux.org.uk>, linux-kbuild@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>, David Howells <dhowells@redhat.com>
+To: Arnaud Lacombe <lacombar@gmail.com>
+Cc: "H. Peter Anvin" <hpa@zytor.com>, David Woodhouse <dwmw2@infradead.org>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-On Wednesday 10 August 2011, Michal Marek wrote:
-> On 7.8.2011 23:00, Linus Torvalds wrote:
-> > There is value in having <asm-generic/xyz.h> for helper headers that
-> > are not complete in themselves. And for that case, we really do want
-> > to have the ability for header files to just do
-> > 
-> >  #include <asm-generic/bitops/le.h>
+On 9.8.2011 17:26, Arnaud Lacombe wrote:
+> On Tue, Aug 9, 2011 at 10:14 AM, Michal Marek <mmarek@suse.cz> wrote:
+>> On 31.7.2011 02:05, Arnaud Lacombe wrote:
+>>> Because kconfig might not be ran exclusively from a fully controlled
+>>> and restricted environment ? Not to mention that it is used by other
+>>> people than the linux kernel folks.
+>>
+>> Well, it has always been possible to trick kbuild (not kconfig) into
+>> accepting CONFIG_* options from environment, because unset kconfig options
+>> in auto.conf are not seen by make. Of course this is completely fragile,
+>> because there is no dependency checking and such variables are only seen by
+>> make and do not appear in autoconf.h. So a patch that teaches kconfig to
+>> read options from the environment would actually make some (albeit currently
+>> "illegal") use cases work correctly :).
+>>
+> kconfig can already set symbol value from the environment. The only
+> limitation I can see is that it is not optional and require an
+> explicit environment variable name.
 
-There are very few of these files, and there is no reason for them to
-be named asm/* or arm-generic/*. How about moving those incomplete
-files into a different directory to separate the problem space?
+I wasn't talking about the env= syntax, but about
 
-We can e.g. move asm-generic/bitops/ to linux/bitops/
+make CONFIG_EXT2_FS=m all
+which makes kbuild visit fs/ext2 even if CONFIG_EXT2_FS is disabled in
+.config. With no update of the configuration or checking the dependencies.
 
-> > So I would suggest we just start a new directory, something like
-> > include/default, and add it as the last entry to the search path. Then
-> > we start populating it with <asm/xyz.h> files, and start removing the
-> > silly 'generic-y' workaround. Let's just use the search-path instead.
-> 
-> But we would still have to generate the wrapper for userspace headers,
-> we can't rely on any -I/usr/include/default in userspace. So
-> Makefile.headersinst would still need some special handling for these
-> headers.
+Hm, actually this would be a problem even if kconfig does read the
+CONFIG_* variables from the environment, because it could result in a
+mismatch if kconfig determines that the variable cannot be set, but make
+still sees it in the environment. So we would have to use 'undefine
+CONFIG_FOO' instead of '# CONFIG_FOO is not set' in
+include/config/auto.conf, to be able to properly support make CONFIG_FOO=y.
 
-Right. We have to deal with at least three cases here:
-
-1. An architecture does not provide its own asm/foo.h, and we want the
-   generic version to transparently be used.
-2. Another architecture has an asm/foo.h that contains a few arch specific
-   definitions plus an include of the generic file.
-3. There is a generic file that is used as a helper from a file with a
-   different name (e.g. bitops/find.h, libata-portmap.h, atomic-long.h, ...).
-
-Simply renaming "asm-generic" to "asm" or "default/asm" with an appropriate
-include path would take care of the first kind, but not of the second.
-This is also easy to handle for headers exported to user space, where we
-can simply copy the generic header instead of an arch specific one when
-that does not exist.
-
-The second case is still easily handled in many cases, except for the 34
-generic header files that do get exported to user space (see
-include/asm-generic/Kbuild). The best I can think of is to move them to
-linux/include/asm-generic/asm/ and install them to
-/usr/include/asm-generic/asm/ to avoid opening up another namespace
-for user space headers. Any file including them would then have to be
-changed to "#include <asm-generic/asm/foo.h>".
-
-I hope that the work that David Howells is trying to push for the
-separation between internal and ABI headers will help a bit to
-simplify this.
-
-	Arnd
+Michal
