@@ -1,91 +1,86 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pz0-f42.google.com ([209.85.210.42]:56199 "EHLO
-	mail-pz0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755216Ab1HJWdn (ORCPT
+Received: from casper.infradead.org ([85.118.1.10]:36407 "EHLO
+	casper.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755292Ab1HJXRa (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 10 Aug 2011 18:33:43 -0400
-MIME-Version: 1.0
-In-Reply-To: <1313002322.2989.88.camel@i7.infradead.org>
-References: <1312067499.22074.59.camel@i7.infradead.org>
-	<1312067670.22074.61.camel@i7.infradead.org>
-	<CACqU3MV460WGjmQdOOmhk3ZJT1FNjEjfuHqx8mYcgun9+7SfjA@mail.gmail.com>
-	<4E34998D.8060806@zytor.com>
-	<CACqU3MWn-OQVfLH96E+AeTCEjUw5+girXbuNgmUvXrEQuBe4vg@mail.gmail.com>
-	<4E4140B3.7090802@suse.cz>
-	<CACqU3MU4wJb3ij6skod-ZiM+Q0OMTXNdbJ+qWjJW8VZNEP+x1g@mail.gmail.com>
-	<4E4280BA.9050109@suse.cz>
-	<1312981658.2989.39.camel@i7.infradead.org>
-	<CACqU3MUJkM3Y2o2Jx1eQxZkW2T-Dby1JCaks6SqTz_FB17hSvw@mail.gmail.com>
-	<1312985888.2989.46.camel@i7.infradead.org>
-	<CACqU3MXozgu0kr-4w=bGejcEi8MrxH-PhKa0Ji0zrLu7ZEFomg@mail.gmail.com>
-	<1312993987.2989.53.camel@i7.infradead.org>
-	<CACqU3MXC_eDqgWDwnVe8KsqoAMTPQNiP6YMHD5G+1sMBhMwXzA@mail.gmail.com>
-	<1312999168.2989.61.camel@i7.infradead.org>
-	<CACqU3MWB+4n5Acd-GboH5WbCzfZFiAc0wNvOkn_5O+--7jLE8A@mail.gmail.com>
-	<1313002322.2989.88.camel@i7.infradead.org>
-Date: Wed, 10 Aug 2011 18:33:42 -0400
-Message-ID: <CACqU3MU2J25q-wWJ8LNcMkwi3uMigz_+0=XcrNiPC0TGiJHZqA@mail.gmail.com>
+	Wed, 10 Aug 2011 19:17:30 -0400
 Subject: Re: [PATCH 2/2] Enable 'make CONFIG_FOO=y oldconfig'
-From: Arnaud Lacombe <lacombar@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
+From: David Woodhouse <dwmw2@infradead.org>
+Date: Thu, 11 Aug 2011 00:16:49 +0100
+In-Reply-To: <CACqU3MU2J25q-wWJ8LNcMkwi3uMigz_+0=XcrNiPC0TGiJHZqA@mail.gmail.com>
+References: <1312067499.22074.59.camel@i7.infradead.org>
+	 <1312067670.22074.61.camel@i7.infradead.org>
+	 <CACqU3MV460WGjmQdOOmhk3ZJT1FNjEjfuHqx8mYcgun9+7SfjA@mail.gmail.com>
+	 <4E34998D.8060806@zytor.com>
+	 <CACqU3MWn-OQVfLH96E+AeTCEjUw5+girXbuNgmUvXrEQuBe4vg@mail.gmail.com>
+	 <4E4140B3.7090802@suse.cz>
+	 <CACqU3MU4wJb3ij6skod-ZiM+Q0OMTXNdbJ+qWjJW8VZNEP+x1g@mail.gmail.com>
+	 <4E4280BA.9050109@suse.cz> <1312981658.2989.39.camel@i7.infradead.org>
+	 <CACqU3MUJkM3Y2o2Jx1eQxZkW2T-Dby1JCaks6SqTz_FB17hSvw@mail.gmail.com>
+	 <1312985888.2989.46.camel@i7.infradead.org>
+	 <CACqU3MXozgu0kr-4w=bGejcEi8MrxH-PhKa0Ji0zrLu7ZEFomg@mail.gmail.com>
+	 <1312993987.2989.53.camel@i7.infradead.org>
+	 <CACqU3MXC_eDqgWDwnVe8KsqoAMTPQNiP6YMHD5G+1sMBhMwXzA@mail.gmail.com>
+	 <1312999168.2989.61.camel@i7.infradead.org>
+	 <CACqU3MWB+4n5Acd-GboH5WbCzfZFiAc0wNvOkn_5O+--7jLE8A@mail.gmail.com>
+	 <1313002322.2989.88.camel@i7.infradead.org>
+	 <CACqU3MU2J25q-wWJ8LNcMkwi3uMigz_+0=XcrNiPC0TGiJHZqA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Message-ID: <1313018232.2989.114.camel@i7.infradead.org>
+Mime-Version: 1.0
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: David Woodhouse <dwmw2@infradead.org>
+To: Arnaud Lacombe <lacombar@gmail.com>
 Cc: Michal Marek <mmarek@suse.cz>, "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-Hi,
+On Wed, 2011-08-10 at 18:33 -0400, Arnaud Lacombe wrote:
+> > We're not enabling anything that we're later going to break. I can't see
+> > many people *depending* on the fact that 'make CONFIG_SATA_MV=y
+> > oldconfig' actually does *nothing* in some cases.
+> >
+> you are wrong, you ends up with half-baked compile-time dependency,
+> which break the build:
 
-On Wed, Aug 10, 2011 at 2:52 PM, David Woodhouse <dwmw2@infradead.org> wrote:
-> On Wed, 2011-08-10 at 14:40 -0400, Arnaud Lacombe wrote:
->> so, at best, this buggy behavior is ~ 6 years old. Before that, I'd
->> assume that the internal namespace was not accessible by any other
->> mean than the front-ends.
->
-> I've been editing .config or doing 's/.*CONFIG_FOO[= ].*/CONFIG_FOO=y/'
-> on it for a decade before that. With all the same limitations as
-> all.config, and my new CONFIG_FOO=y command line support.
->
-> How do *you* quickly, from the command line, enable or disable a single
-> option in an existing config?
->
->> > Please, if this offends you then by all means go and fix it. A sane way
->> > of handling dependencies would give a way to say "do what you need to do
->> > in order to enable CONFIG_SATA_MV", and should remove the abomination of
->> > 'select', which was introduced purely to work around that lack.
->> >
->> > But none of that is directly relevant in *this* thread.
->> >
->> to paraphrase you, I'd say, this might looks "cute but might give
->> behavior that people will come to depend on in their scripts and then
->> we take it away again", "that's why I'd kind of like to see it done
->> *once*, *properly*".
->
-> That's a reasonable concern, but I think it's misplaced in this case.
-> We're not enabling anything that we're later going to break. I can't see
-> many people *depending* on the fact that 'make CONFIG_SATA_MV=y
-> oldconfig' actually does *nothing* in some cases.
->
-you are wrong, you ends up with half-baked compile-time dependency,
-which break the build:
+s/*nothing*/nothing useful/, for crying out loud.
 
-% make allnoconfig drivers/ata/
+The point remains that we're not enabling anything which we're later
+going to break. Nobody is going to come to *depend* on this behaviour.
 
-do nothing, but works.
+And anyway, this behaviour exists even *before* my patches, as Michal
+pointed out in a far more helpful and constructive fashion in 
+<CACqU3MU4wJb3ij6skod-ZiM+Q0OMTXNdbJ+qWjJW8VZNEP+x1g@mail.gmail.com>
+earlier today.
 
-% make CONFIG_SATA_MV=y allnoconfig drivers/ata/
+It's simple enough to fix, too:
 
-tries to build `drivers/ata/sata_mv.o' and miserably fails.
+diff --git a/Makefile b/Makefile
+index 1fc5172..6cc7f7b 100644
+--- a/Makefile
++++ b/Makefile
+@@ -474,6 +474,9 @@ ifeq ($(KBUILD_EXTMOD),)
+         endif
+ endif
+ 
++# This could probably be simpler?
++CONFIG_OVERRIDES := $(patsubst line:%,%,$(filter line:%,$(foreach var, $(filter CONFIG_%,$(.VARIABLES)), $(origin $(var)):$(var))))
++
+ ifeq ($(mixed-targets),1)
+ # ===========================================================================
+ # We're called with mixed targets (*config and build targets).
+@@ -507,6 +510,10 @@ else
+ # Build targets only - this includes vmlinux, arch specific targets, clean
+ # targets and others. In general all targets except *config targets.
+ 
++ifneq ($(CONFIG_OVERRIDES),)
++$(error Cannot perform build targets with CONFIG symbols overridden)
++endif
++
+ ifeq ($(KBUILD_EXTMOD),)
+ # Additional helpers built in scripts/
+ # Carefully list dependencies so we do not try to build scripts twice
 
-[tested on top of your patches]
 
- - Arnaud
+-- 
+dwmw2
 
-> When we later, hopefully, get proper dependency resolution, that will
-> take something that *wasn't* working and make it work. For all.config
-> and for the command line overrides (and in other places) at the same
-> time.
->
-> --
-> dwmw2
->
->
