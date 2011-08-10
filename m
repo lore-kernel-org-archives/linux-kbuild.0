@@ -1,50 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from zeniv.linux.org.uk ([195.92.253.2]:38723 "EHLO
-	ZenIV.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750737Ab1HJEEt (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 10 Aug 2011 00:04:49 -0400
-Date: Wed, 10 Aug 2011 05:04:45 +0100
-From: Al Viro <viro@ZenIV.linux.org.uk>
-Subject: Re: [PATCH 1/5] um: Use __i386__ in ifdef for vsyscall exports, not
- SUBARCH_i386
-Message-ID: <20110810040445.GM2203@ZenIV.linux.org.uk>
-References: <1312066923.22074.53.camel@i7.infradead.org>
- <CAFLxGvy0QqoySDFwZpygHeXvQ7hG-B7z5iZq8qx3GUkFX8w2RQ@mail.gmail.com>
- <1312151063.18010.25.camel@i7.infradead.org>
- <20110731224834.GC2203@ZenIV.linux.org.uk>
- <20110731225801.GD2203@ZenIV.linux.org.uk>
- <1312153988.18010.39.camel@i7.infradead.org>
- <CAFLxGvyewG70ZgU41Kmu_eOYpjZ0TVXYwYq1AfS1sXONAM6G_w@mail.gmail.com>
- <20110801043207.GE2203@ZenIV.linux.org.uk>
- <CAFLxGvwxQ2VeqkDpkiVks35DHxZFvAP5nKUtD7i4Z32291otOg@mail.gmail.com>
- <20110809233817.GL2203@ZenIV.linux.org.uk>
+Received: from cantor2.suse.de ([195.135.220.15]:54340 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753046Ab1HJJwf (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 10 Aug 2011 05:52:35 -0400
+Message-ID: <4E4254E1.5070909@suse.cz>
+Date: Wed, 10 Aug 2011 11:52:33 +0200
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20110809233817.GL2203@ZenIV.linux.org.uk>
+Subject: Re: [RFC] possible killing of boilerplate headers by asm-generic
+ reorg
+References: <20110807204118.GA2203@ZenIV.linux.org.uk> <CA+55aFxSOio5efktO+fQOL6qEaE2KBFyCcOcvNMOvWGpY-ktiQ@mail.gmail.com>
+In-Reply-To: <CA+55aFxSOio5efktO+fQOL6qEaE2KBFyCcOcvNMOvWGpY-ktiQ@mail.gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: richard -rw- weinberger <richard.weinberger@gmail.com>
-Cc: David Woodhouse <dwmw2@infradead.org>, Arnaud Lacombe <lacombar@gmail.com>, "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, user-mode-linux-devel@lists.sourceforge.net
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Al Viro <viro@zeniv.linux.org.uk>, linux-kbuild@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>, Sam Ravnborg <sam@ravnborg.org>
 
-On Wed, Aug 10, 2011 at 12:38:17AM +0100, Al Viro wrote:
+On 7.8.2011 23:00, Linus Torvalds wrote:
+> However, having it for the default case for those full header files is
+> just annoying - as you say, those idiotic one-liner <asm/bar.h> files
+> that just include the asm-generic one are annoying, and quite frankly,
+> the current work-around for them (that "generic-y" thing) is not
+> really any better. It's just another way to do the same broken thing.
 
-> 	* tty-on-xterm sometimes crashes on the first keysyms reaching it;
-> as far as I can tell, it's something related to SIGWINCH handling - whether
-> it happens or not depends on the way xterm windows are laid out and flipping
-> between them first seems to prevent that shit.  If it hasn't happened at once,
-> it won't happen at all...  Something in drivers/chan or drivers/line, most
-> likely...
+It replaces oneline files with a multiline list in a single file, so it
+makes no difference linewise, but at least one arch has it all in a
+single place.
 
-FWIW, what I'm seeing there is chan_interrupt() with tty that has definitely
-been kfree'd.  What happens is that we have several opened files for
-given tty and they all get closed in parallel.  Now, ->release() of
-tty calls ->close() of driver (line_close() in this case) and then
-gets around to decrementing tty->count.  As the result, *all* callers
-of line_close() see line->tty->count > 1 and leave line->tty not reset to
-NULL.  Oops...
 
-Moral: do not use the counters on upper layer objects unless you know
-what you are doing *and* know what will happen to that upper layer in
-years to come...
+> So I would suggest we just start a new directory, something like
+> include/default, and add it as the last entry to the search path. Then
+> we start populating it with <asm/xyz.h> files, and start removing the
+> silly 'generic-y' workaround. Let's just use the search-path instead.
+
+But we would still have to generate the wrapper for userspace headers,
+we can't rely on any -I/usr/include/default in userspace. So
+Makefile.headersinst would still need some special handling for these
+headers.
+
+Michal
