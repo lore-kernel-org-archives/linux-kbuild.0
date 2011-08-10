@@ -1,49 +1,33 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from zeniv.linux.org.uk ([195.92.253.2]:56621 "EHLO
-	ZenIV.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753542Ab1HJRog (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 10 Aug 2011 13:44:36 -0400
-Date: Wed, 10 Aug 2011 18:44:32 +0100
-From: Al Viro <viro@ZenIV.linux.org.uk>
-Subject: Re: [PATCH 1/5] um: Use __i386__ in ifdef for vsyscall exports, not
- SUBARCH_i386
-Message-ID: <20110810174432.GN2203@ZenIV.linux.org.uk>
-References: <CAFLxGvy0QqoySDFwZpygHeXvQ7hG-B7z5iZq8qx3GUkFX8w2RQ@mail.gmail.com>
- <1312151063.18010.25.camel@i7.infradead.org>
- <20110731224834.GC2203@ZenIV.linux.org.uk>
- <20110731225801.GD2203@ZenIV.linux.org.uk>
- <1312153988.18010.39.camel@i7.infradead.org>
- <CAFLxGvyewG70ZgU41Kmu_eOYpjZ0TVXYwYq1AfS1sXONAM6G_w@mail.gmail.com>
- <20110801043207.GE2203@ZenIV.linux.org.uk>
- <CAFLxGvwxQ2VeqkDpkiVks35DHxZFvAP5nKUtD7i4Z32291otOg@mail.gmail.com>
- <20110809233817.GL2203@ZenIV.linux.org.uk>
- <20110810040445.GM2203@ZenIV.linux.org.uk>
+Received: from terminus.zytor.com ([198.137.202.10]:35899 "EHLO mail.zytor.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753664Ab1HJR5u (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 10 Aug 2011 13:57:50 -0400
+Message-ID: <4E42C5B8.3060709@zytor.com>
+Date: Wed, 10 Aug 2011 12:54:00 -0500
+From: "H. Peter Anvin" <hpa@zytor.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20110810040445.GM2203@ZenIV.linux.org.uk>
+Subject: Re: [PATCH 2/2] Enable 'make CONFIG_FOO=y oldconfig'
+References: <1312067499.22074.59.camel@i7.infradead.org> <1312067670.22074.61.camel@i7.infradead.org> <CACqU3MV460WGjmQdOOmhk3ZJT1FNjEjfuHqx8mYcgun9+7SfjA@mail.gmail.com> <4E34998D.8060806@zytor.com> <CACqU3MWn-OQVfLH96E+AeTCEjUw5+girXbuNgmUvXrEQuBe4vg@mail.gmail.com> <4E4140B3.7090802@suse.cz> <CACqU3MU4wJb3ij6skod-ZiM+Q0OMTXNdbJ+qWjJW8VZNEP+x1g@mail.gmail.com> <4E4280BA.9050109@suse.cz> <1312981658.2989.39.camel@i7.infradead.org> <CACqU3MUJkM3Y2o2Jx1eQxZkW2T-Dby1JCaks6SqTz_FB17hSvw@mail.gmail.com> <1312985888.2989.46.camel@i7.infradead.org> <CACqU3MXozgu0kr-4w=bGejcEi8MrxH-PhKa0Ji0zrLu7ZEFomg@mail.gmail.com> <1312993987.2989.53.camel@i7.infradead.org> <CACqU3MXC_eDqgWDwnVe8KsqoAMTPQNiP6YMHD5G+1sMBhMwXzA@mail.gmail.com>
+In-Reply-To: <CACqU3MXC_eDqgWDwnVe8KsqoAMTPQNiP6YMHD5G+1sMBhMwXzA@mail.gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: richard -rw- weinberger <richard.weinberger@gmail.com>
-Cc: David Woodhouse <dwmw2@infradead.org>, Arnaud Lacombe <lacombar@gmail.com>, "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, user-mode-linux-devel@lists.sourceforge.net
+To: Arnaud Lacombe <lacombar@gmail.com>
+Cc: David Woodhouse <dwmw2@infradead.org>, Michal Marek <mmarek@suse.cz>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
+On 08/10/2011 12:44 PM, Arnaud Lacombe wrote:
+> Exactly my point, you just successfully created an half-backed config
+> which is different than what Aunt Tillie wanted you to generate. This
+> should be an hard error, same for "all*.config", not to mention that
+> the error message is far from being helpful.
 
-> FWIW, what I'm seeing there is chan_interrupt() with tty that has definitely
-> been kfree'd.  What happens is that we have several opened files for
-> given tty and they all get closed in parallel.  Now, ->release() of
-> tty calls ->close() of driver (line_close() in this case) and then
-> gets around to decrementing tty->count.  As the result, *all* callers
-> of line_close() see line->tty->count > 1 and leave line->tty not reset to
-> NULL.  Oops...
-> 
-> Moral: do not use the counters on upper layer objects unless you know
-> what you are doing *and* know what will happen to that upper layer in
-> years to come...
+Arnaud,
 
-Fixed and pushed (um-header.git #master); however, looking around that area
-shows more races ;-/  Incidentally, why the hell is ->chan_list a cyclic list?
-Holding at most two elements...  Why not an array of two possibly NULL
-pointers?  And what is chan->primary?  Unless I'm seriously misreading that
-code, it's always 1; moreover, all instances of the method that gets ->primary
-value as argument ignore that argument completely...
+This is arguably a bug in how config fragments are injected via any
+mechanism, but that is completely orthogonal to us wanting another
+injection mechanism.
+
+	-hpa
+
