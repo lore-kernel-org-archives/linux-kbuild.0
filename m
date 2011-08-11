@@ -1,46 +1,61 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:43784 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751864Ab1HKL4V (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 11 Aug 2011 07:56:21 -0400
-Message-ID: <4E43C363.3000103@suse.cz>
-Date: Thu, 11 Aug 2011 13:56:19 +0200
-From: Michal Marek <mmarek@suse.cz>
+Received: from mail-vw0-f46.google.com ([209.85.212.46]:62518 "EHLO
+	mail-vw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754007Ab1HKMNX convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 11 Aug 2011 08:13:23 -0400
 MIME-Version: 1.0
-Subject: Re: [PATCH 2/2] Enable 'make CONFIG_FOO=y oldconfig'
-References: <1312067499.22074.59.camel@i7.infradead.org>  <4E4280BA.9050109@suse.cz> <1312981658.2989.39.camel@i7.infradead.org>  <CACqU3MUJkM3Y2o2Jx1eQxZkW2T-Dby1JCaks6SqTz_FB17hSvw@mail.gmail.com>  <1312985888.2989.46.camel@i7.infradead.org>  <CACqU3MXozgu0kr-4w=bGejcEi8MrxH-PhKa0Ji0zrLu7ZEFomg@mail.gmail.com>  <1312993987.2989.53.camel@i7.infradead.org>  <CACqU3MXC_eDqgWDwnVe8KsqoAMTPQNiP6YMHD5G+1sMBhMwXzA@mail.gmail.com>  <1312999168.2989.61.camel@i7.infradead.org>  <CACqU3MWB+4n5Acd-GboH5WbCzfZFiAc0wNvOkn_5O+--7jLE8A@mail.gmail.com>  <1313002322.2989.88.camel@i7.infradead.org>  <CACqU3MU2J25q-wWJ8LNcMkwi3uMigz_+0=XcrNiPC0TGiJHZqA@mail.gmail.com>  <1313018232.2989.114.camel@i7.infradead.org>  <CACqU3MVyjzr47N9v23SGaSjiEOGoEaP1-TZ4Z_RyVNgVXgPEwg@mail.gmail.com>  <1313052168.18037.9.camel@i7.infradead.org> <4E4399B3.3020909@suse.cz>  <1313061012.18037.17.camel@i7.infradead.org> <m3r54std0x.fsf@hase.home> <1313062813.18037.24.camel@i7.infradead.org>
-In-Reply-To: <1313062813.18037.24.camel@i7.infradead.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20110811042319.GP2203@ZenIV.linux.org.uk>
+References: <1312151063.18010.25.camel@i7.infradead.org>
+	<20110731224834.GC2203@ZenIV.linux.org.uk>
+	<20110731225801.GD2203@ZenIV.linux.org.uk>
+	<1312153988.18010.39.camel@i7.infradead.org>
+	<CAFLxGvyewG70ZgU41Kmu_eOYpjZ0TVXYwYq1AfS1sXONAM6G_w@mail.gmail.com>
+	<20110801043207.GE2203@ZenIV.linux.org.uk>
+	<CAFLxGvwxQ2VeqkDpkiVks35DHxZFvAP5nKUtD7i4Z32291otOg@mail.gmail.com>
+	<20110809233817.GL2203@ZenIV.linux.org.uk>
+	<20110810040445.GM2203@ZenIV.linux.org.uk>
+	<20110810174432.GN2203@ZenIV.linux.org.uk>
+	<20110811042319.GP2203@ZenIV.linux.org.uk>
+Date: Thu, 11 Aug 2011 14:13:22 +0200
+Message-ID: <CAFLxGvwE8FGcRtY6v=6jqatZEUwvbBc0ki43jiTYsUp9e_uiAQ@mail.gmail.com>
+Subject: Re: [PATCH 1/5] um: Use __i386__ in ifdef for vsyscall exports, not SUBARCH_i386
+From: richard -rw- weinberger <richard.weinberger@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: David Woodhouse <dwmw2@infradead.org>
-Cc: Andreas Schwab <schwab@redhat.com>, Arnaud Lacombe <lacombar@gmail.com>, "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: Al Viro <viro@zeniv.linux.org.uk>
+Cc: David Woodhouse <dwmw2@infradead.org>, Arnaud Lacombe <lacombar@gmail.com>, "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, user-mode-linux-devel@lists.sourceforge.net
 
-On 11.8.2011 13:40, David Woodhouse wrote:
-> On Thu, 2011-08-11 at 13:15 +0200, Andreas Schwab wrote:
->>> That would be cute, but I'm not sure how to undefine something set on
->>> the command line:
->>>
->>> $ cat > Makefile <<EOF
->>> undefine BAR
->>
->> override undefine BAR
-> 
-> Thanks. So we don't really need to change the auto.conf syntax; we could
-> just do:
-> 
-> $(foreach var, $(filter CONFIG_%,$(.VARIABLES)), $(eval override undefine $(var)))
-> 
-> But still I suspect we might *not* want that for options set on the
-> command line. We *don't* want 'make CONFIG_FOO=y oldconfig bzImage' to
-> say 'you can't enable CONFIG_FOO' and then build the bzImage anyway.
+On Thu, Aug 11, 2011 at 6:23 AM, Al Viro <viro@zeniv.linux.org.uk> wrote:
+> On Wed, Aug 10, 2011 at 06:44:32PM +0100, Al Viro wrote:
+>
+>> Fixed and pushed (um-header.git #master); however, looking around that area
+>> shows more races ;-/
+>
+> Such as, for example, seriously broken handling of free_winch(): delaying
+> free_irq() until after return from IRQ handler is nice, but not enough -
+> freeing struct winch itself (or winch->stack, for that matter) is also best
+> left until after free_irq().  Normal way to do that is schedule_work()...
+> Fixed and pushed...
+>
+> Folks, I don't know what to do with all that stuff; as far as I'm concerned
+> the ideal variant would be to have functioning git tree maintained by Richard.
+> Is that possible?  I can ask to start pulling um-header.git into linux-next,
+> but I would very much prefer to avoid that, TYVM...  If nothing else, ACK/NAK
+> on the stuff in there should be done by architecture maintainer(s).
+>
 
-If you do
-$ echo 'CONFIG_FOO=y' >all.config
-$ make allnoconfig bzImage
-then it will also build bzImage even if kconfig wasn't able to set
-CONFIG_FOO=y. IMO printing a warning that CONFIG_FOO could not be set is
-sufficient, as long as CONFIG_FOO is consistently unset.
+Sorry for the delay.
+Writing my theses consumes a lot of my time...
 
-Michal
+I've already started reviewing and testing your changes.
+Currently they life in my local git repo.
+But a git.kernel.org repo is on the way!
+
+Later I'll submit all changes to akpm.
+
+-- 
+Thanks,
+//richard
