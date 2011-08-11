@@ -1,43 +1,66 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:33826 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754238Ab1HKI63 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 11 Aug 2011 04:58:29 -0400
-Message-ID: <4E4399B3.3020909@suse.cz>
-Date: Thu, 11 Aug 2011 10:58:27 +0200
-From: Michal Marek <mmarek@suse.cz>
-MIME-Version: 1.0
+Received: from casper.infradead.org ([85.118.1.10]:47344 "EHLO
+	casper.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751253Ab1HKLKO (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 11 Aug 2011 07:10:14 -0400
 Subject: Re: [PATCH 2/2] Enable 'make CONFIG_FOO=y oldconfig'
-References: <1312067499.22074.59.camel@i7.infradead.org>  <CACqU3MWn-OQVfLH96E+AeTCEjUw5+girXbuNgmUvXrEQuBe4vg@mail.gmail.com>  <4E4140B3.7090802@suse.cz>  <CACqU3MU4wJb3ij6skod-ZiM+Q0OMTXNdbJ+qWjJW8VZNEP+x1g@mail.gmail.com>  <4E4280BA.9050109@suse.cz> <1312981658.2989.39.camel@i7.infradead.org>  <CACqU3MUJkM3Y2o2Jx1eQxZkW2T-Dby1JCaks6SqTz_FB17hSvw@mail.gmail.com>  <1312985888.2989.46.camel@i7.infradead.org>  <CACqU3MXozgu0kr-4w=bGejcEi8MrxH-PhKa0Ji0zrLu7ZEFomg@mail.gmail.com>  <1312993987.2989.53.camel@i7.infradead.org>  <CACqU3MXC_eDqgWDwnVe8KsqoAMTPQNiP6YMHD5G+1sMBhMwXzA@mail.gmail.com>  <1312999168.2989.61.camel@i7.infradead.org>  <CACqU3MWB+4n5Acd-GboH5WbCzfZFiAc0wNvOkn_5O+--7jLE8A@mail.gmail.com>  <1313002322.2989.88.camel@i7.infradead.org>  <CACqU3MU2J25q-wWJ8LNcMkwi3uMigz_+0=XcrNiPC0TGiJHZqA@mail.gmail.com>  <1313018232.2989.114.camel@i7.infradead.org>  <CACqU3MVyjzr47N9v23SGaSjiEOGoEaP1-TZ4Z_RyVNgVXgPEwg@mail.gmail.com> <1313052168.18037.9.camel@i7.infradead.org>
-In-Reply-To: <1313052168.18037.9.camel@i7.infradead.org>
-Content-Type: text/plain; charset=UTF-8
+From: David Woodhouse <dwmw2@infradead.org>
+Date: Thu, 11 Aug 2011 12:10:10 +0100
+In-Reply-To: <4E4399B3.3020909@suse.cz>
+References: <1312067499.22074.59.camel@i7.infradead.org>
+	  <CACqU3MWn-OQVfLH96E+AeTCEjUw5+girXbuNgmUvXrEQuBe4vg@mail.gmail.com>
+	  <4E4140B3.7090802@suse.cz>
+	  <CACqU3MU4wJb3ij6skod-ZiM+Q0OMTXNdbJ+qWjJW8VZNEP+x1g@mail.gmail.com>
+	  <4E4280BA.9050109@suse.cz> <1312981658.2989.39.camel@i7.infradead.org>
+	  <CACqU3MUJkM3Y2o2Jx1eQxZkW2T-Dby1JCaks6SqTz_FB17hSvw@mail.gmail.com>
+	  <1312985888.2989.46.camel@i7.infradead.org>
+	  <CACqU3MXozgu0kr-4w=bGejcEi8MrxH-PhKa0Ji0zrLu7ZEFomg@mail.gmail.com>
+	  <1312993987.2989.53.camel@i7.infradead.org>
+	  <CACqU3MXC_eDqgWDwnVe8KsqoAMTPQNiP6YMHD5G+1sMBhMwXzA@mail.gmail.com>
+	  <1312999168.2989.61.camel@i7.infradead.org>
+	  <CACqU3MWB+4n5Acd-GboH5WbCzfZFiAc0wNvOkn_5O+--7jLE8A@mail.gmail.com>
+	  <1313002322.2989.88.camel@i7.infradead.org>
+	  <CACqU3MU2J25q-wWJ8LNcMkwi3uMigz_+0=XcrNiPC0TGiJHZqA@mail.gmail.com>
+	  <1313018232.2989.114.camel@i7.infradead.org>
+	  <CACqU3MVyjzr47N9v23SGaSjiEOGoEaP1-TZ4Z_RyVNgVXgPEwg@mail.gmail.com>
+	 <1313052168.18037.9.camel@i7.infradead.org> <4E4399B3.3020909@suse.cz>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
+Message-ID: <1313061012.18037.17.camel@i7.infradead.org>
+Mime-Version: 1.0
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: David Woodhouse <dwmw2@infradead.org>
+To: Michal Marek <mmarek@suse.cz>
 Cc: Arnaud Lacombe <lacombar@gmail.com>, "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-On 11.8.2011 10:42, David Woodhouse wrote:
-> On Wed, 2011-08-10 at 23:29 -0400, Arnaud Lacombe wrote:
->> how is that supposed to work with your other patches ?
-> 
-> You cannot perform build targets with CONFIG symbols overridden.
-> 
->> % make CONFIG_NET=y allyesconfig drivers/ata/ 
->         ^^^^^^^ override           ^^^^^^^^^^ build target
-> 
->> Makefile:504: *** Cannot perform build targets with CONFIG symbols
->> overridden.  Stop.
-> 
->  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ error message which
-> told you that, if you'd been paying the slightest bit of attention
-> rather than just making pointless noise.
+On Thu, 2011-08-11 at 10:58 +0200, Michal Marek wrote:
+> I would much rather see include/config/auto.conf reset all configuration
+> variables to match what kconfig computed. I.e. use 'undefine CONFIG_FOO'
+> instead of '# CONFIG_FOO is not set'. 
 
-I would much rather see include/config/auto.conf reset all configuration
-variables to match what kconfig computed. I.e. use 'undefine CONFIG_FOO'
-instead of '# CONFIG_FOO is not set'. Additionally print this for any
-CONFIG_* variable found in the environment, even if the symbol is not
-visible in the current configuration. The include/config/auto.conf file
-is only used internally, so it should be safe to change the format.
+That would be cute, but I'm not sure how to undefine something set on
+the command line:
 
-Michal
+$ cat > Makefile <<EOF
+undefine BAR
+
+foo:
+	echo $(BAR)
+EOF
+$ make foo BAR=hh
+echo hh
+hh
+
+Arguably, if someone *does* try something like Arnaud's 
+ "make CONFIG_FOO_BAR=y oldconfig bzImage"
+.. and it *wasn't* able to set CONFIG_FOO_BAR, then the nicest behaviour
+would be to fail, rather than to attempt to build it.
+
+So perhaps we should clean up only those settings inherited from the
+environment, and still (as in the patch I sent earlier) refuse to allow
+build targets in conjunction with CONFIG overrides on the command line?
+
+-- 
+dwmw2
+
