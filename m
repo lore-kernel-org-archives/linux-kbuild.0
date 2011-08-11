@@ -1,52 +1,56 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:58882 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752597Ab1HKPYG (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 11 Aug 2011 11:24:06 -0400
-Message-ID: <4E43F413.5000104@suse.cz>
-Date: Thu, 11 Aug 2011 17:24:03 +0200
-From: Michal Marek <mmarek@suse.cz>
-MIME-Version: 1.0
+Received: from casper.infradead.org ([85.118.1.10]:55805 "EHLO
+	casper.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750738Ab1HKPvA (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 11 Aug 2011 11:51:00 -0400
 Subject: Re: [PATCH 2/2] Enable 'make CONFIG_FOO=y oldconfig'
-References: <1312067499.22074.59.camel@i7.infradead.org>  <1312985888.2989.46.camel@i7.infradead.org>  <CACqU3MXozgu0kr-4w=bGejcEi8MrxH-PhKa0Ji0zrLu7ZEFomg@mail.gmail.com>  <1312993987.2989.53.camel@i7.infradead.org>  <CACqU3MXC_eDqgWDwnVe8KsqoAMTPQNiP6YMHD5G+1sMBhMwXzA@mail.gmail.com>  <1312999168.2989.61.camel@i7.infradead.org>  <CACqU3MWB+4n5Acd-GboH5WbCzfZFiAc0wNvOkn_5O+--7jLE8A@mail.gmail.com>  <1313002322.2989.88.camel@i7.infradead.org>  <CACqU3MU2J25q-wWJ8LNcMkwi3uMigz_+0=XcrNiPC0TGiJHZqA@mail.gmail.com>  <1313018232.2989.114.camel@i7.infradead.org>  <CACqU3MVyjzr47N9v23SGaSjiEOGoEaP1-TZ4Z_RyVNgVXgPEwg@mail.gmail.com>  <1313052168.18037.9.camel@i7.infradead.org> <4E4399B3.3020909@suse.cz>  <1313061012.18037.17.camel@i7.infradead.org> <m3r54std0x.fsf@hase.home>  <1313062813.18037.24.camel@i7.infradead.org> <4E43C363.3000103@suse.cz>  <CACqU3MVUeHTZ+cQYucYd8TvGoUOrwVhpxVpho-fqz3MkBTCTMQ@mail.gmail.com> <1313075243.5632.6.camel@macbook.infradead.org>
-In-Reply-To: <1313075243.5632.6.camel@macbook.infradead.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+From: David Woodhouse <dwmw2@infradead.org>
+Date: Thu, 11 Aug 2011 16:50:34 +0100
+In-Reply-To: <4E43F413.5000104@suse.cz>
+References: <1312067499.22074.59.camel@i7.infradead.org>
+	  <1312985888.2989.46.camel@i7.infradead.org>
+	  <CACqU3MXozgu0kr-4w=bGejcEi8MrxH-PhKa0Ji0zrLu7ZEFomg@mail.gmail.com>
+	  <1312993987.2989.53.camel@i7.infradead.org>
+	  <CACqU3MXC_eDqgWDwnVe8KsqoAMTPQNiP6YMHD5G+1sMBhMwXzA@mail.gmail.com>
+	  <1312999168.2989.61.camel@i7.infradead.org>
+	  <CACqU3MWB+4n5Acd-GboH5WbCzfZFiAc0wNvOkn_5O+--7jLE8A@mail.gmail.com>
+	  <1313002322.2989.88.camel@i7.infradead.org>
+	  <CACqU3MU2J25q-wWJ8LNcMkwi3uMigz_+0=XcrNiPC0TGiJHZqA@mail.gmail.com>
+	  <1313018232.2989.114.camel@i7.infradead.org>
+	  <CACqU3MVyjzr47N9v23SGaSjiEOGoEaP1-TZ4Z_RyVNgVXgPEwg@mail.gmail.com>
+	  <1313052168.18037.9.camel@i7.infradead.org> <4E4399B3.3020909@suse.cz>
+	  <1313061012.18037.17.camel@i7.infradead.org> <m3r54std0x.fsf@hase.home>
+	  <1313062813.18037.24.camel@i7.infradead.org> <4E43C363.3000103@suse.cz>
+	  <CACqU3MVUeHTZ+cQYucYd8TvGoUOrwVhpxVpho-fqz3MkBTCTMQ@mail.gmail.com>
+	 <1313075243.5632.6.camel@macbook.infradead.org> <4E43F413.5000104@suse.cz>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Message-ID: <1313077836.18037.34.camel@i7.infradead.org>
+Mime-Version: 1.0
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: David Woodhouse <dwmw2@infradead.org>
+To: Michal Marek <mmarek@suse.cz>
 Cc: Arnaud Lacombe <lacombar@gmail.com>, Andreas Schwab <schwab@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-On 11.8.2011 17:07, David Woodhouse wrote:
-> On Thu, 2011-08-11 at 10:57 -0400, Arnaud Lacombe wrote:
->>
->> FWIW, this is the broken behavior I have been pointing all along...
->>
->> If kconfig hard failed on such case, we would not need such Kbuild
->> black-magic.
->>
->> From my point of view, if environment override there should be, it
->> should behave the same as the all.config logic and hard fail when an
->> override has not been met. 
->> Code wise, this would translate as backend code path being the same. 
->  
+On Thu, 2011-08-11 at 17:24 +0200, Michal Marek wrote:
 > 
-> The patches I have so far *do* behave the same as the all.config logic,
-> because the back end code *is* fairly much the same. I was looking at
-> the all.config logic when I wrote the patch to kconfig.
+> One of my use cases for all.config is
 > 
-> It *doesn't* currently hard fail. But I'm more than happy to make it do
-> so. I think you're right; that makes most sense.
+> $ cp .../older-working-config all.config
+> $ make KCONFIG_ALLCONFIG=1 allmodconfig
+> 
+> i.e. reuse what is possible from an older config and enable all new
+> options. Surely it sometimes results in suboptimal configuration with
+> unwanted debug options enabled, but most of the time it works. I won't
+> be happy if you make it hard fail because of renamed or removed config
+> options. 
 
-One of my use cases for all.config is
+On the other hand, 'make CONFIG_FOO=y oldconfig' probably *should* fail.
+Perhaps it should set what it *can*, if you try to set multiple options
+at once — but if it can't set all of them, it should exit with failure
+status... which will mean that no subsequent build target will happen.
 
-$ cp .../older-working-config all.config
-$ make KCONFIG_ALLCONFIG=1 allmodconfig
+-- 
+dwmw2
 
-i.e. reuse what is possible from an older config and enable all new
-options. Surely it sometimes results in suboptimal configuration with
-unwanted debug options enabled, but most of the time it works. I won't
-be happy if you make it hard fail because of renamed or removed config
-options.
-
-Michal
