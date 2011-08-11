@@ -1,46 +1,56 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from zeniv.linux.org.uk ([195.92.253.2]:49452 "EHLO
-	ZenIV.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751301Ab1HKEX0 (ORCPT
+Received: from casper.infradead.org ([85.118.1.10]:35804 "EHLO
+	casper.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751253Ab1HKInH (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 11 Aug 2011 00:23:26 -0400
-Date: Thu, 11 Aug 2011 05:23:19 +0100
-From: Al Viro <viro@ZenIV.linux.org.uk>
-Subject: Re: [PATCH 1/5] um: Use __i386__ in ifdef for vsyscall exports, not
- SUBARCH_i386
-Message-ID: <20110811042319.GP2203@ZenIV.linux.org.uk>
-References: <1312151063.18010.25.camel@i7.infradead.org>
- <20110731224834.GC2203@ZenIV.linux.org.uk>
- <20110731225801.GD2203@ZenIV.linux.org.uk>
- <1312153988.18010.39.camel@i7.infradead.org>
- <CAFLxGvyewG70ZgU41Kmu_eOYpjZ0TVXYwYq1AfS1sXONAM6G_w@mail.gmail.com>
- <20110801043207.GE2203@ZenIV.linux.org.uk>
- <CAFLxGvwxQ2VeqkDpkiVks35DHxZFvAP5nKUtD7i4Z32291otOg@mail.gmail.com>
- <20110809233817.GL2203@ZenIV.linux.org.uk>
- <20110810040445.GM2203@ZenIV.linux.org.uk>
- <20110810174432.GN2203@ZenIV.linux.org.uk>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20110810174432.GN2203@ZenIV.linux.org.uk>
+	Thu, 11 Aug 2011 04:43:07 -0400
+Subject: Re: [PATCH 2/2] Enable 'make CONFIG_FOO=y oldconfig'
+From: David Woodhouse <dwmw2@infradead.org>
+Date: Thu, 11 Aug 2011 09:42:46 +0100
+In-Reply-To: <CACqU3MVyjzr47N9v23SGaSjiEOGoEaP1-TZ4Z_RyVNgVXgPEwg@mail.gmail.com>
+References: <1312067499.22074.59.camel@i7.infradead.org>
+	 <1312067670.22074.61.camel@i7.infradead.org>
+	 <CACqU3MV460WGjmQdOOmhk3ZJT1FNjEjfuHqx8mYcgun9+7SfjA@mail.gmail.com>
+	 <4E34998D.8060806@zytor.com>
+	 <CACqU3MWn-OQVfLH96E+AeTCEjUw5+girXbuNgmUvXrEQuBe4vg@mail.gmail.com>
+	 <4E4140B3.7090802@suse.cz>
+	 <CACqU3MU4wJb3ij6skod-ZiM+Q0OMTXNdbJ+qWjJW8VZNEP+x1g@mail.gmail.com>
+	 <4E4280BA.9050109@suse.cz> <1312981658.2989.39.camel@i7.infradead.org>
+	 <CACqU3MUJkM3Y2o2Jx1eQxZkW2T-Dby1JCaks6SqTz_FB17hSvw@mail.gmail.com>
+	 <1312985888.2989.46.camel@i7.infradead.org>
+	 <CACqU3MXozgu0kr-4w=bGejcEi8MrxH-PhKa0Ji0zrLu7ZEFomg@mail.gmail.com>
+	 <1312993987.2989.53.camel@i7.infradead.org>
+	 <CACqU3MXC_eDqgWDwnVe8KsqoAMTPQNiP6YMHD5G+1sMBhMwXzA@mail.gmail.com>
+	 <1312999168.2989.61.camel@i7.infradead.org>
+	 <CACqU3MWB+4n5Acd-GboH5WbCzfZFiAc0wNvOkn_5O+--7jLE8A@mail.gmail.com>
+	 <1313002322.2989.88.camel@i7.infradead.org>
+	 <CACqU3MU2J25q-wWJ8LNcMkwi3uMigz_+0=XcrNiPC0TGiJHZqA@mail.gmail.com>
+	 <1313018232.2989.114.camel@i7.infradead.org>
+	 <CACqU3MVyjzr47N9v23SGaSjiEOGoEaP1-TZ4Z_RyVNgVXgPEwg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Message-ID: <1313052168.18037.9.camel@i7.infradead.org>
+Mime-Version: 1.0
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: richard -rw- weinberger <richard.weinberger@gmail.com>
-Cc: David Woodhouse <dwmw2@infradead.org>, Arnaud Lacombe <lacombar@gmail.com>, "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, user-mode-linux-devel@lists.sourceforge.net
+To: Arnaud Lacombe <lacombar@gmail.com>
+Cc: Michal Marek <mmarek@suse.cz>, "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-On Wed, Aug 10, 2011 at 06:44:32PM +0100, Al Viro wrote:
+On Wed, 2011-08-10 at 23:29 -0400, Arnaud Lacombe wrote:
+> how is that supposed to work with your other patches ?
 
-> Fixed and pushed (um-header.git #master); however, looking around that area
-> shows more races ;-/
+You cannot perform build targets with CONFIG symbols overridden.
 
-Such as, for example, seriously broken handling of free_winch(): delaying
-free_irq() until after return from IRQ handler is nice, but not enough -
-freeing struct winch itself (or winch->stack, for that matter) is also best
-left until after free_irq().  Normal way to do that is schedule_work()...
-Fixed and pushed...
+> % make CONFIG_NET=y allyesconfig drivers/ata/ 
+        ^^^^^^^ override           ^^^^^^^^^^ build target
 
-Folks, I don't know what to do with all that stuff; as far as I'm concerned
-the ideal variant would be to have functioning git tree maintained by Richard.
-Is that possible?  I can ask to start pulling um-header.git into linux-next,
-but I would very much prefer to avoid that, TYVM...  If nothing else, ACK/NAK
-on the stuff in there should be done by architecture maintainer(s).
+> Makefile:504: *** Cannot perform build targets with CONFIG symbols
+> overridden.  Stop.
+
+ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ error message which
+told you that, if you'd been paying the slightest bit of attention
+rather than just making pointless noise.
+
+-- 
+dwmw2
+
