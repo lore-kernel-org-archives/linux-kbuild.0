@@ -1,56 +1,36 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from casper.infradead.org ([85.118.1.10]:55805 "EHLO
-	casper.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750738Ab1HKPvA (ORCPT
+Received: from smtp.snhosting.dk ([87.238.248.203]:33497 "EHLO
+	smtp.domainteam.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753799Ab1HKUoc (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 11 Aug 2011 11:51:00 -0400
-Subject: Re: [PATCH 2/2] Enable 'make CONFIG_FOO=y oldconfig'
-From: David Woodhouse <dwmw2@infradead.org>
-Date: Thu, 11 Aug 2011 16:50:34 +0100
-In-Reply-To: <4E43F413.5000104@suse.cz>
-References: <1312067499.22074.59.camel@i7.infradead.org>
-	  <1312985888.2989.46.camel@i7.infradead.org>
-	  <CACqU3MXozgu0kr-4w=bGejcEi8MrxH-PhKa0Ji0zrLu7ZEFomg@mail.gmail.com>
-	  <1312993987.2989.53.camel@i7.infradead.org>
-	  <CACqU3MXC_eDqgWDwnVe8KsqoAMTPQNiP6YMHD5G+1sMBhMwXzA@mail.gmail.com>
-	  <1312999168.2989.61.camel@i7.infradead.org>
-	  <CACqU3MWB+4n5Acd-GboH5WbCzfZFiAc0wNvOkn_5O+--7jLE8A@mail.gmail.com>
-	  <1313002322.2989.88.camel@i7.infradead.org>
-	  <CACqU3MU2J25q-wWJ8LNcMkwi3uMigz_+0=XcrNiPC0TGiJHZqA@mail.gmail.com>
-	  <1313018232.2989.114.camel@i7.infradead.org>
-	  <CACqU3MVyjzr47N9v23SGaSjiEOGoEaP1-TZ4Z_RyVNgVXgPEwg@mail.gmail.com>
-	  <1313052168.18037.9.camel@i7.infradead.org> <4E4399B3.3020909@suse.cz>
-	  <1313061012.18037.17.camel@i7.infradead.org> <m3r54std0x.fsf@hase.home>
-	  <1313062813.18037.24.camel@i7.infradead.org> <4E43C363.3000103@suse.cz>
-	  <CACqU3MVUeHTZ+cQYucYd8TvGoUOrwVhpxVpho-fqz3MkBTCTMQ@mail.gmail.com>
-	 <1313075243.5632.6.camel@macbook.infradead.org> <4E43F413.5000104@suse.cz>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-Message-ID: <1313077836.18037.34.camel@i7.infradead.org>
-Mime-Version: 1.0
+	Thu, 11 Aug 2011 16:44:32 -0400
+Date: Thu, 11 Aug 2011 22:44:30 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: [RFC] possible killing of boilerplate headers by asm-generic
+	reorg
+Message-ID: <20110811204430.GA22891@merkur.ravnborg.org>
+References: <20110811132516.GQ2203@ZenIV.linux.org.uk> <20110807204118.GA2203@ZenIV.linux.org.uk> <4E4254E1.5070909@suse.cz> <CA+55aFy9_menekFnwEPFVYb493m-_77HibPL4VXfd6-Jh4rzLA@mail.gmail.com> <201108111516.44243.arnd@arndb.de> <18536.1313072440@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <18536.1313072440@redhat.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: Arnaud Lacombe <lacombar@gmail.com>, Andreas Schwab <schwab@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: David Howells <dhowells@redhat.com>
+Cc: Al Viro <viro@ZenIV.linux.org.uk>, Linus Torvalds <torvalds@linux-foundation.org>, Arnd Bergmann <arnd@arndb.de>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
 
-On Thu, 2011-08-11 at 17:24 +0200, Michal Marek wrote:
 > 
-> One of my use cases for all.config is
+>  (*) I'd also prefer to use #include_next and move the uapi/ directories out of
+>      the include/ directories:
 > 
-> $ cp .../older-working-config all.config
-> $ make KCONFIG_ALLCONFIG=1 allmodconfig
+> 	include/uapi/ -> uapi/
+> 	arch/foo/include/uapi/ -> arch/foo/uapi/
 > 
-> i.e. reuse what is possible from an older config and enable all new
-> options. Surely it sometimes results in suboptimal configuration with
-> unwanted debug options enabled, but most of the time it works. I won't
-> be happy if you make it hard fail because of renamed or removed config
-> options. 
+>      as it seems cleaner, especially as there's then no need to #include
+>      <uapi/...> anywhere - but various people object to the use of
+>      #include_next, though the kernel does already use it.
 
-On the other hand, 'make CONFIG_FOO=y oldconfig' probably *should* fail.
-Perhaps it should set what it *can*, if you try to set multiple options
-at once — but if it can't set all of them, it should exit with failure
-status... which will mean that no subsequent build target will happen.
+#include_next is only used by mips. This has no relevance for a "do use",
+or "do not use" decision.
 
--- 
-dwmw2
-
+	Sam
