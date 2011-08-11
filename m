@@ -1,40 +1,54 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from moutng.kundenserver.de ([212.227.17.8]:59201 "EHLO
-	moutng.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755847Ab1HKNQv (ORCPT
+Received: from casper.infradead.org ([85.118.1.10]:48954 "EHLO
+	casper.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755578Ab1HKNUw (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 11 Aug 2011 09:16:51 -0400
-From: Arnd Bergmann <arnd@arndb.de>
-Subject: Re: [RFC] possible killing of boilerplate headers by asm-generic reorg
-Date: Thu, 11 Aug 2011 15:16:43 +0200
-References: <20110807204118.GA2203@ZenIV.linux.org.uk> <4E4254E1.5070909@suse.cz> <CA+55aFy9_menekFnwEPFVYb493m-_77HibPL4VXfd6-Jh4rzLA@mail.gmail.com>
-In-Reply-To: <CA+55aFy9_menekFnwEPFVYb493m-_77HibPL4VXfd6-Jh4rzLA@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-1"
+	Thu, 11 Aug 2011 09:20:52 -0400
+Subject: Re: [PATCH 2/2] Enable 'make CONFIG_FOO=y oldconfig'
+From: David Woodhouse <dwmw2@infradead.org>
+Date: Thu, 11 Aug 2011 14:20:41 +0100
+In-Reply-To: <4E43C363.3000103@suse.cz>
+References: <1312067499.22074.59.camel@i7.infradead.org>
+	  <4E4280BA.9050109@suse.cz> <1312981658.2989.39.camel@i7.infradead.org>
+	  <CACqU3MUJkM3Y2o2Jx1eQxZkW2T-Dby1JCaks6SqTz_FB17hSvw@mail.gmail.com>
+	  <1312985888.2989.46.camel@i7.infradead.org>
+	  <CACqU3MXozgu0kr-4w=bGejcEi8MrxH-PhKa0Ji0zrLu7ZEFomg@mail.gmail.com>
+	  <1312993987.2989.53.camel@i7.infradead.org>
+	  <CACqU3MXC_eDqgWDwnVe8KsqoAMTPQNiP6YMHD5G+1sMBhMwXzA@mail.gmail.com>
+	  <1312999168.2989.61.camel@i7.infradead.org>
+	  <CACqU3MWB+4n5Acd-GboH5WbCzfZFiAc0wNvOkn_5O+--7jLE8A@mail.gmail.com>
+	  <1313002322.2989.88.camel@i7.infradead.org>
+	  <CACqU3MU2J25q-wWJ8LNcMkwi3uMigz_+0=XcrNiPC0TGiJHZqA@mail.gmail.com>
+	  <1313018232.2989.114.camel@i7.infradead.org>
+	  <CACqU3MVyjzr47N9v23SGaSjiEOGoEaP1-TZ4Z_RyVNgVXgPEwg@mail.gmail.com>
+	  <1313052168.18037.9.camel@i7.infradead.org> <4E4399B3.3020909@suse.cz>
+	  <1313061012.18037.17.camel@i7.infradead.org> <m3r54std0x.fsf@hase.home>
+	 <1313062813.18037.24.camel@i7.infradead.org> <4E43C363.3000103@suse.cz>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <201108111516.44243.arnd@arndb.de>
+Message-ID: <1313068845.18037.29.camel@i7.infradead.org>
+Mime-Version: 1.0
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Michal Marek <mmarek@suse.cz>, Al Viro <viro@zeniv.linux.org.uk>, linux-kbuild@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>, David Howells <dhowells@redhat.com>
+To: Michal Marek <mmarek@suse.cz>
+Cc: Andreas Schwab <schwab@redhat.com>, Arnaud Lacombe <lacombar@gmail.com>, "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-On Wednesday 10 August 2011, Linus Torvalds wrote:
-> Or you can do it by creating the default file, and then editing EVERY
-> SINGLE ARCHITECTURE. Which just sucks.
+On Thu, 2011-08-11 at 13:56 +0200, Michal Marek wrote:
 > 
-> This has come up before, for similar situations - wanting to implement
-> optional architecture capabilities without having to worry about
-> architectures that don't support it.
+> If you do
+> $ echo 'CONFIG_FOO=y' >all.config
+> $ make allnoconfig bzImage
+> then it will also build bzImage even if kconfig wasn't able to set
+> CONFIG_FOO=y. IMO printing a warning that CONFIG_FOO could not be set is
+> sufficient, as long as CONFIG_FOO is consistently unset. 
 
-If you mostly care about new extensions, we can ignore all the
-user ABI headers for now and find a solution that just deals with
-the kernel internal ones.
+The thing is, such a warning is likely to be lost in the scrollback.
 
-I think the easiest way to do that would be to move all non-exported
-headers from include/asm-generic to include/asm. Since it's only about
-internel users then, we can simply use "#include_next <asm/foo.h>"
-to refer to them from arch-specific files that want to reuse them
-only partially and also add some of their own definitions.
+There's definitely something to be said for:
 
-	Arnd
+[dwmw2@i7 linux-2.6]$ make CONFIG_SATA_MV=y bzImage
+Makefile:572: *** CONFIG_SATA_MV could not be set to "y" as requested.  Stop.
+
+-- 
+dwmw2
+
