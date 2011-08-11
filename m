@@ -1,59 +1,77 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.snhosting.dk ([87.238.248.203]:18724 "EHLO
-	smtp.domainteam.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750741Ab1HKOZJ (ORCPT
+Received: from mail-pz0-f42.google.com ([209.85.210.42]:38074 "EHLO
+	mail-pz0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751067Ab1HKO5V (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 11 Aug 2011 10:25:09 -0400
-Date: Thu, 11 Aug 2011 16:25:07 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [RFC] possible killing of boilerplate headers by asm-generic
-	reorg
-Message-ID: <20110811142507.GA22394@merkur.ravnborg.org>
-References: <20110807204118.GA2203@ZenIV.linux.org.uk> <4E4254E1.5070909@suse.cz> <CA+55aFy9_menekFnwEPFVYb493m-_77HibPL4VXfd6-Jh4rzLA@mail.gmail.com> <201108111516.44243.arnd@arndb.de>
+	Thu, 11 Aug 2011 10:57:21 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <201108111516.44243.arnd@arndb.de>
+In-Reply-To: <4E43C363.3000103@suse.cz>
+References: <1312067499.22074.59.camel@i7.infradead.org>
+	<4E4280BA.9050109@suse.cz>
+	<1312981658.2989.39.camel@i7.infradead.org>
+	<CACqU3MUJkM3Y2o2Jx1eQxZkW2T-Dby1JCaks6SqTz_FB17hSvw@mail.gmail.com>
+	<1312985888.2989.46.camel@i7.infradead.org>
+	<CACqU3MXozgu0kr-4w=bGejcEi8MrxH-PhKa0Ji0zrLu7ZEFomg@mail.gmail.com>
+	<1312993987.2989.53.camel@i7.infradead.org>
+	<CACqU3MXC_eDqgWDwnVe8KsqoAMTPQNiP6YMHD5G+1sMBhMwXzA@mail.gmail.com>
+	<1312999168.2989.61.camel@i7.infradead.org>
+	<CACqU3MWB+4n5Acd-GboH5WbCzfZFiAc0wNvOkn_5O+--7jLE8A@mail.gmail.com>
+	<1313002322.2989.88.camel@i7.infradead.org>
+	<CACqU3MU2J25q-wWJ8LNcMkwi3uMigz_+0=XcrNiPC0TGiJHZqA@mail.gmail.com>
+	<1313018232.2989.114.camel@i7.infradead.org>
+	<CACqU3MVyjzr47N9v23SGaSjiEOGoEaP1-TZ4Z_RyVNgVXgPEwg@mail.gmail.com>
+	<1313052168.18037.9.camel@i7.infradead.org>
+	<4E4399B3.3020909@suse.cz>
+	<1313061012.18037.17.camel@i7.infradead.org>
+	<m3r54std0x.fsf@hase.home>
+	<1313062813.18037.24.camel@i7.infradead.org>
+	<4E43C363.3000103@suse.cz>
+Date: Thu, 11 Aug 2011 10:57:21 -0400
+Message-ID: <CACqU3MVUeHTZ+cQYucYd8TvGoUOrwVhpxVpho-fqz3MkBTCTMQ@mail.gmail.com>
+Subject: Re: [PATCH 2/2] Enable 'make CONFIG_FOO=y oldconfig'
+From: Arnaud Lacombe <lacombar@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, Michal Marek <mmarek@suse.cz>, Al Viro <viro@zeniv.linux.org.uk>, linux-kbuild@vger.kernel.org, David Howells <dhowells@redhat.com>
+To: Michal Marek <mmarek@suse.cz>
+Cc: David Woodhouse <dwmw2@infradead.org>, Andreas Schwab <schwab@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-On Thu, Aug 11, 2011 at 03:16:43PM +0200, Arnd Bergmann wrote:
-> On Wednesday 10 August 2011, Linus Torvalds wrote:
-> > Or you can do it by creating the default file, and then editing EVERY
-> > SINGLE ARCHITECTURE. Which just sucks.
-> > 
-> > This has come up before, for similar situations - wanting to implement
-> > optional architecture capabilities without having to worry about
-> > architectures that don't support it.
-> 
-> If you mostly care about new extensions, we can ignore all the
-> user ABI headers for now and find a solution that just deals with
-> the kernel internal ones.
-> 
-> I think the easiest way to do that would be to move all non-exported
-> headers from include/asm-generic to include/asm. Since it's only about
-> internel users then, we can simply use "#include_next <asm/foo.h>"
-> to refer to them from arch-specific files that want to reuse them
-> only partially and also add some of their own definitions.
+Hi,
 
-We could also create:
+On Thu, Aug 11, 2011 at 7:56 AM, Michal Marek <mmarek@suse.cz> wrote:
+> On 11.8.2011 13:40, David Woodhouse wrote:
+>> On Thu, 2011-08-11 at 13:15 +0200, Andreas Schwab wrote:
+>>>> That would be cute, but I'm not sure how to undefine something set on
+>>>> the command line:
+>>>>
+>>>> $ cat > Makefile <<EOF
+>>>> undefine BAR
+>>>
+>>> override undefine BAR
+>>
+>> Thanks. So we don't really need to change the auto.conf syntax; we could
+>> just do:
+>>
+>> $(foreach var, $(filter CONFIG_%,$(.VARIABLES)), $(eval override undefine $(var)))
+>>
+>> But still I suspect we might *not* want that for options set on the
+>> command line. We *don't* want 'make CONFIG_FOO=y oldconfig bzImage' to
+>> say 'you can't enable CONFIG_FOO' and then build the bzImage anyway.
+>
+> If you do
+> $ echo 'CONFIG_FOO=y' >all.config
+> $ make allnoconfig bzImage
+> then it will also build bzImage even if kconfig wasn't able to set
+> CONFIG_FOO=y. IMO printing a warning that CONFIG_FOO could not be set is
+> sufficient, as long as CONFIG_FOO is consistently unset.
+>
+FWIW, this is the broken behavior I have been pointing all along...
 
-    arch/$ARCH/include/arch/
-    include/default/arch
+If kconfig hard failed on such case, we would not need such Kbuild black-magic.
 
-"-I include/default" should then be added last in the search path.
+From my point of view, if environment override there should be, it
+should behave the same as the all.config logic and hard fail when an
+override has not been met. Code wise, this would translate as backend
+code path being the same.
 
-An arch generic file could be dropepd in include/default/arch
-and be available for everyone.
-And an arch specific file could then include the arch generic
-file using: 
-
-    #include <default/arch/foo.h>
-
-This is only a slight variant of what has already been suggested,
-but it avoids include_next - in favour of an additional
-directory that is searched.
-
-	Sam
+ - Arnaud
