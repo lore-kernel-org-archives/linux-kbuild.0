@@ -1,36 +1,40 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.snhosting.dk ([87.238.248.203]:33497 "EHLO
-	smtp.domainteam.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753799Ab1HKUoc (ORCPT
+Received: from wolverine02.qualcomm.com ([199.106.114.251]:11567 "EHLO
+	wolverine02.qualcomm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752478Ab1HLRqZ (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 11 Aug 2011 16:44:32 -0400
-Date: Thu, 11 Aug 2011 22:44:30 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [RFC] possible killing of boilerplate headers by asm-generic
-	reorg
-Message-ID: <20110811204430.GA22891@merkur.ravnborg.org>
-References: <20110811132516.GQ2203@ZenIV.linux.org.uk> <20110807204118.GA2203@ZenIV.linux.org.uk> <4E4254E1.5070909@suse.cz> <CA+55aFy9_menekFnwEPFVYb493m-_77HibPL4VXfd6-Jh4rzLA@mail.gmail.com> <201108111516.44243.arnd@arndb.de> <18536.1313072440@redhat.com>
+	Fri, 12 Aug 2011 13:46:25 -0400
+Message-ID: <4E4566F0.4020001@codeaurora.org>
+Date: Fri, 12 Aug 2011 10:46:24 -0700
+From: Stephen Boyd <sboyd@codeaurora.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <18536.1313072440@redhat.com>
+Subject: Relinking zImage when nothing changes
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: David Howells <dhowells@redhat.com>
-Cc: Al Viro <viro@ZenIV.linux.org.uk>, Linus Torvalds <torvalds@linux-foundation.org>, Arnd Bergmann <arnd@arndb.de>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
+To: "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+Cc: linux-kbuild@vger.kernel.org, Peter Foley <pefoley2@verizon.net>
 
-> 
->  (*) I'd also prefer to use #include_next and move the uapi/ directories out of
->      the include/ directories:
-> 
-> 	include/uapi/ -> uapi/
-> 	arch/foo/include/uapi/ -> arch/foo/uapi/
-> 
->      as it seems cleaner, especially as there's then no need to #include
->      <uapi/...> anywhere - but various people object to the use of
->      #include_next, though the kernel does already use it.
+I was hoping with the recent patch e78e8f2 (kernel: prevent unnecessary
+rebuilding due to config_data.gz, 2011-07-05) compiling ARM linux a
+second time would amount to no more linking. This doesn't seem to be the
+case though. Doing a make V=2 I see that lib1funcs.S is shipped and thus
+we have to recompile it although nothing actually changed. This in turn
+requires us to relink the compressed vmlinux and then recreate the zImage.
 
-#include_next is only used by mips. This has no relevance for a "do use",
-or "do not use" decision.
+  Kernel: arch/arm/boot/Image is ready
+  SHIPPED arch/arm/boot/compressed/lib1funcs.S - due to missing .cmd file
+  AS      arch/arm/boot/compressed/lib1funcs.o - due to: arch/arm/boot/compressed/lib1funcs.S
+  LD      arch/arm/boot/compressed/vmlinux - due to: arch/arm/boot/compressed/lib1funcs.o
+  OBJCOPY arch/arm/boot/zImage - due to: arch/arm/boot/compressed/vmlinux
+  Kernel: arch/arm/boot/zImage is ready
 
-	Sam
+
+Is there any way to avoid this? Perhaps the shipped command could become
+a bit wiser?
+
+-- 
+Sent by an employee of the Qualcomm Innovation Center, Inc.
+The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum.
+
