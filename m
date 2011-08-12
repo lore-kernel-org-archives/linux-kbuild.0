@@ -1,77 +1,86 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from wolverine02.qualcomm.com ([199.106.114.251]:9353 "EHLO
-	wolverine02.qualcomm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753734Ab1HLTAH (ORCPT
+Received: from mail-yi0-f46.google.com ([209.85.218.46]:65487 "EHLO
+	mail-yi0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751786Ab1HLUUR convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 12 Aug 2011 15:00:07 -0400
-From: Stephen Boyd <sboyd@codeaurora.org>
-Subject: [PATCH] ARM: zImage: Skip relinking if nothing changes
-Date: Fri, 12 Aug 2011 12:00:02 -0700
-Message-Id: <1313175602-21834-1-git-send-email-sboyd@codeaurora.org>
-In-Reply-To: <4E457682.5020107@codeaurora.org>
+	Fri, 12 Aug 2011 16:20:17 -0400
+Received: by yie30 with SMTP id 30so2217397yie.19
+        for <linux-kbuild@vger.kernel.org>; Fri, 12 Aug 2011 13:20:16 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <20110812180209.GA28520@merkur.ravnborg.org>
+References: <4E4566F0.4020001@codeaurora.org>
+	<20110812180209.GA28520@merkur.ravnborg.org>
+Date: Fri, 12 Aug 2011 16:20:15 -0400
+Message-ID: <CACqU3MUkZBEs=v9181bixR37R4DxmkykiH5fU8PVUTd0c2a_ZA@mail.gmail.com>
+Subject: Re: Relinking zImage when nothing changes
+From: Arnaud Lacombe <lacombar@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Sam Ravnborg <sam@ravnborg.org>
-Cc: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org
+Cc: Stephen Boyd <sboyd@codeaurora.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, linux-kbuild@vger.kernel.org, Peter Foley <pefoley2@verizon.net>
 
-lib1funcs.S is reshipped even though the file hasn't changed
-because the make rule is marked with FORCE. According to Sam
-Ravnborg:
+Hi,
 
-	The FORCE prerequisite will tell make to always execute
-	the command.
-	But we only want to execute the command if:
-	1) $(obj)/lib1funcs.S is missing
-	2) or $(srctree)/arch/$(SRCARCH)/lib/lib1funcs.S is not
-	older then $(obj)/lib1funcs.S
+On Fri, Aug 12, 2011 at 2:02 PM, Sam Ravnborg <sam@ravnborg.org> wrote:
+> On Fri, Aug 12, 2011 at 10:46:24AM -0700, Stephen Boyd wrote:
+>> I was hoping with the recent patch e78e8f2 (kernel: prevent unnecessary
+>> rebuilding due to config_data.gz, 2011-07-05) compiling ARM linux a
+>> second time would amount to no more linking. This doesn't seem to be the
+>> case though. Doing a make V=2 I see that lib1funcs.S is shipped and thus
+>> we have to recompile it although nothing actually changed. This in turn
+>> requires us to relink the compressed vmlinux and then recreate the zImage.
+>>
+>>   Kernel: arch/arm/boot/Image is ready
+>>   SHIPPED arch/arm/boot/compressed/lib1funcs.S - due to missing .cmd file
+>>   AS      arch/arm/boot/compressed/lib1funcs.o - due to: arch/arm/boot/compressed/lib1funcs.S
+>>   LD      arch/arm/boot/compressed/vmlinux - due to: arch/arm/boot/compressed/lib1funcs.o
+>>   OBJCOPY arch/arm/boot/zImage - due to: arch/arm/boot/compressed/vmlinux
+>>   Kernel: arch/arm/boot/zImage is ready
+>>
+>>
+>> Is there any way to avoid this? Perhaps the shipped command could become
+>> a bit wiser?
+>
+> Following patch will likely fix it:
+> diff --git a/arch/arm/boot/compressed/Makefile b/arch/arm/boot/compressed/Makefile
+> index 0c74a6f..80b6b6e 100644
+> --- a/arch/arm/boot/compressed/Makefile
+> +++ b/arch/arm/boot/compressed/Makefile
+> @@ -123,7 +123,7 @@ LDFLAGS_vmlinux += -T
+>  # For __aeabi_uidivmod
+>  lib1funcs = $(obj)/lib1funcs.o
+>
+> -$(obj)/lib1funcs.S: $(srctree)/arch/$(SRCARCH)/lib/lib1funcs.S FORCE
+> +$(obj)/lib1funcs.S: $(srctree)/arch/$(SRCARCH)/lib/lib1funcs.S
+>        $(call cmd,shipped)
+>
+AFAIK, we have a generic rule to handle shipped files:
 
-	So dropping FORCE should be a safe thing to do.
+from scripts/Makefile.lib:
 
-This fixes the shipped problem, but we still have to reassemble
-lib1funcs.S because it isn't part of $targets. Add
-lib1funcs.{S,o} to $targets to avoid relinking the compressed
-vmlinux if nothing changes.
+$(obj)/%: $(src)/%_shipped
+        $(call cmd,shipped)
 
-Signed-off-by: Stephen Boyd <sboyd@codeaurora.org>
-Acked-by: Sam Ravnborg <sam@ravnborg.org>
----
- arch/arm/boot/compressed/Makefile |    8 +++-----
- 1 files changed, 3 insertions(+), 5 deletions(-)
+so, that rule should not be needed at all.
 
-diff --git a/arch/arm/boot/compressed/Makefile b/arch/arm/boot/compressed/Makefile
-index 0c74a6f..937fd26 100644
---- a/arch/arm/boot/compressed/Makefile
-+++ b/arch/arm/boot/compressed/Makefile
-@@ -91,7 +91,7 @@ suffix_$(CONFIG_KERNEL_LZMA) = lzma
- 
- targets       := vmlinux vmlinux.lds \
- 		 piggy.$(suffix_y) piggy.$(suffix_y).o \
--		 font.o font.c head.o misc.o $(OBJS)
-+		 font.o font.c head.o misc.o lib1funcs.o lib1funcs.S $(OBJS)
- 
- # Make sure files are removed during clean
- extra-y       += piggy.gzip piggy.lzo piggy.lzma lib1funcs.S
-@@ -121,9 +121,7 @@ LDFLAGS_vmlinux += -X
- LDFLAGS_vmlinux += -T
- 
- # For __aeabi_uidivmod
--lib1funcs = $(obj)/lib1funcs.o
--
--$(obj)/lib1funcs.S: $(srctree)/arch/$(SRCARCH)/lib/lib1funcs.S FORCE
-+$(obj)/lib1funcs.S: $(srctree)/arch/$(SRCARCH)/lib/lib1funcs.S
- 	$(call cmd,shipped)
- 
- # We need to prevent any GOTOFF relocs being used with references
-@@ -140,7 +138,7 @@ bad_syms=$$($(CROSS_COMPILE)nm $@ | sed -n 's/^.\{8\} [bc] \(.*\)/\1/p') && \
-     echo "$$bad_syms" >&2; rm -f $@; false )
- 
- $(obj)/vmlinux: $(obj)/vmlinux.lds $(obj)/$(HEAD) $(obj)/piggy.$(suffix_y).o \
--	 	$(addprefix $(obj)/, $(OBJS)) $(lib1funcs) FORCE
-+		$(addprefix $(obj)/, $(OBJS)) $(obj)/lib1funcs.o FORCE
- 	$(call if_changed,ld)
- 	@$(check_for_bad_syms)
- 
--- 
-Sent by an employee of the Qualcomm Innovation Center, Inc.
-The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum.
+ - Arnaud
 
+>  # We need to prevent any GOTOFF relocs being used with references
+>
+> (cut'n'pasted ...)
+>
+> The FORCE prerequisite will tell make to always execute the command.
+> But we only want to execute the command if:
+> 1) $(obj)/lib1funcs.S is missing
+> 2) or $(srctree)/arch/$(SRCARCH)/lib/lib1funcs.S is not older then $(obj)/lib1funcs.S
+>
+> So dropping FORCE should be a safe thing to do.
+>
+>        Sam
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
