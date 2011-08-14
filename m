@@ -1,62 +1,56 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-gw0-f46.google.com ([74.125.83.46]:53233 "EHLO
-	mail-gw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750956Ab1HMQCd convert rfc822-to-8bit (ORCPT
+Received: from mail-bw0-f46.google.com ([209.85.214.46]:48929 "EHLO
+	mail-bw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753047Ab1HNK5S (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 13 Aug 2011 12:02:33 -0400
+	Sun, 14 Aug 2011 06:57:18 -0400
 MIME-Version: 1.0
-In-Reply-To: <20110813063409.GA29111@merkur.ravnborg.org>
-References: <4E457682.5020107@codeaurora.org>
-	<1313175602-21834-1-git-send-email-sboyd@codeaurora.org>
-	<CACqU3MUq5M-XPOxV=8GKyEzjEzpmdeaF+mGrXJrK+ZZxa4SdeQ@mail.gmail.com>
-	<20110812205520.GL4775@n2100.arm.linux.org.uk>
-	<CACqU3MX=-10ouxCqWcBP7MW3_O4_RSLG9wRY8X4iEh5ydQa1AQ@mail.gmail.com>
-	<20110812220316.GA28845@merkur.ravnborg.org>
-	<CACqU3MUVir_hfAtVz24Y7NrQOHAa=WyyHnCN4M6BHLQ294Tdww@mail.gmail.com>
-	<20110813063409.GA29111@merkur.ravnborg.org>
-Date: Sat, 13 Aug 2011 12:02:32 -0400
-Message-ID: <CACqU3MVHgF276SmQFWMcMRL470wz5F4=t0ZmKQ3YoK6Gy9=ETA@mail.gmail.com>
-Subject: Re: [PATCH] ARM: zImage: Skip relinking if nothing changes
-From: Arnaud Lacombe <lacombar@gmail.com>
+From: Rabin Vincent <rabin@rab.in>
+Date: Sun, 14 Aug 2011 16:26:34 +0530
+Message-ID: <CAH+eYFD61keboBWfcnxEAwW-4PmoLpofZh08k606OkALg_VFuQ@mail.gmail.com>
+Subject: IS_ENABLED() and non-available symbols
 Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: Russell King - ARM Linux <linux@arm.linux.org.uk>, Stephen Boyd <sboyd@codeaurora.org>, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>
 
-Hi,
+I'm trying to use the new IS_ENABLED() stuff, but it appears that it
+only works if the symbol being tested has its dependencies met, and
+results in compiler errors if that is not the case.
 
-On Sat, Aug 13, 2011 at 2:34 AM, Sam Ravnborg <sam@ravnborg.org> wrote:
-> On Fri, Aug 12, 2011 at 06:17:25PM -0400, Arnaud Lacombe wrote:
->> Hi,
->>
->> On Fri, Aug 12, 2011 at 6:03 PM, Sam Ravnborg <sam@ravnborg.org> wrote:
->> >>
->> >> I suspect this would have done the job:
->> >>
->> >> $(obj)/font.o: $(srctree)/drivers/video/console/font_acorn_8x8.c
->> >>         $(cmd,cc_o_c)'
->> >
->> > I prefer using $(call,shipped) and let kbuild figure out how
->> > build an .o file from a .c file.
->> >
->> > In other words - avoiding use of the internal to Makefile.build
->> > variables in various places.
->> >
->> indeed, but I'd argue that 1) this would not be the first Makefile
->> using these internal macros (alpha and ia64 are using such construct
->> for aliasing) and 2) the `cmd_shipped' stuff is as internal than other
->> functions :-)
-> A quick grep in Documentation/kbuild will show that only the shipped
-> variant is documented.
->
-> We could implement a general copy command - this is needed in some places
-> like this.
->
-I was more thinking of a way to use a single source file, for multiple
-target, built in different location, without having to make useless
-copy or cross-subdirectory target dependencies, and removing all
-non-internal use of cc_c_o, and friends.
+For example, I've added code using IS_ENABLED(CONFIG_THUMB2_KERNEL) as
+in the below patch.  My config is arch/arm/configs/omap2plus_defconfig
+which doesn't satisfy the dependencies for CONFIG_THUMB2_KERNEL (defined
+in arch/arm/Kconfig).
 
- - Arnaud
+Compiling results in the following errors (and indeed the macro hasn't
+been generated in include/generated/autoconfg.h).  If I modify my config
+to satisfy the dependencies for CONFIG_THUMB2_KERNEL so that it is
+selectable, the __enabled_CONFIG_THUMB2_KERNEL macro gets generated.
+
+arch/arm/kernel/setup.c: In function 'c_show':
+arch/arm/kernel/setup.c:1056: error: '__enabled_CONFIG_THUMB2_KERNEL'
+undeclared (first use in this function)
+arch/arm/kernel/setup.c:1056: error: (Each undeclared identifier is
+reported only once
+arch/arm/kernel/setup.c:1056: error: for each function it appears in.)
+arch/arm/kernel/setup.c:1056: error:
+'__enabled_CONFIG_THUMB2_KERNEL_MODULE' undeclared (first use in this
+function)
+
+Kernel is latest linus (v3.1-rc1-272-g73e0881).
+
+diff --git a/arch/arm/kernel/setup.c b/arch/arm/kernel/setup.c
+index 70bca64..59aa480 100644
+--- a/arch/arm/kernel/setup.c
++++ b/arch/arm/kernel/setup.c
+@@ -1053,6 +1053,9 @@ static int c_show(struct seq_file *m, void *v)
+        seq_printf(m, "Serial\t\t: %08x%08x\n",
+                   system_serial_high, system_serial_low);
+
++       if (IS_ENABLED(CONFIG_THUMB2_KERNEL))
++               printk("Thumb-2\n");
++
+        return 0;
+ }
