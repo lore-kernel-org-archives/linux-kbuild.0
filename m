@@ -1,40 +1,52 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pz0-f42.google.com ([209.85.210.42]:55516 "EHLO
-	mail-pz0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751302Ab1HOSLZ (ORCPT
+Received: from smtp.snhosting.dk ([87.238.248.203]:56074 "EHLO
+	smtp.domainteam.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750790Ab1HOSeB (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 15 Aug 2011 14:11:25 -0400
-Received: by pzk37 with SMTP id 37so3286193pzk.1
-        for <linux-kbuild@vger.kernel.org>; Mon, 15 Aug 2011 11:11:25 -0700 (PDT)
+	Mon, 15 Aug 2011 14:34:01 -0400
+Date: Mon, 15 Aug 2011 20:33:59 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: [PATCH] sparse: always enable endian checks
+Message-ID: <20110815183358.GA31530@merkur.ravnborg.org>
+References: <20110815160440.6296.95762.stgit@mj>
 MIME-Version: 1.0
-Date: Mon, 15 Aug 2011 14:11:25 -0400
-Message-ID: <CACqU3MWSh0sXSs-s_DGyYzLHT_Fbv_Wu-twV-+Ws0p_48FiE9w@mail.gmail.com>
-Subject: Mixed target breakage ?
-From: Arnaud Lacombe <lacombar@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20110815160440.6296.95762.stgit@mj>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
+To: Pavel Roskin <proski@gnu.org>, Michal Marek <mmarek@suse.cz>, linux-kbuild <linux-kbuild@vger.kernel.org>
+Cc: linux-kernel@vger.kernel.org
 
-Hi,
+On Mon, Aug 15, 2011 at 12:04:41PM -0400, Pavel Roskin wrote:
+> Checks enabled by __CHECK_ENDIAN__ produce less than a half of the
+> sparse warnings.  For instance, the allyesconfig configuration on
+> linux-next (tag next-20110812) produces on x86_64:
+> 
+>                  no __CHECK_ENDIAN__   with __CHECK_ENDIAN__
+> stderr bytes:    1155037               1992954 (73% increase)
+> stderr lines:    10716                 18657   (74% increase)
+> affected files:  1191                  1458    (22% increase)
+> 
+> It is no longer true that __CHECK_ENDIAN__ produces so many warnings
+> that other sparse warnings drown in the noise.
+> 
+> Janitors going through the whole tree are already prepared to search for
+> the warnings they want to fix.
+> 
+> The main point of this patch is to make sure that developers of a
+> particular driver who use sparse rarely get all the warnings for their
+> code even if they forget to specify __CHECK_ENDIAN__ or mistype it.
+> 
+> Some developers actually added __CHECK_ENDIAN__ to the driver makefiles
+> so they don't forget to use it.  Remove them now.
+> 
+> Remove all references to __CHECK_ENDIAN__ from the documentation except
+> the Chinese version, which would need to be updated separately.
+> 
+> Signed-off-by: Pavel Roskin <proski@gnu.org>
+Acked-by: Sam Ravnborg <sam@ravnborg.org>
 
-Kbuild does not seem to support building a PHONY target, mixed by a
-direct object target; ie.:
+Maybe ask Michal to merge it?
 
-% make defconfig
-% make init/main.o
-
-works, as does:
-
-% make defconfig
-% make init/main.o init/calibrate.o
-
-but,
-
-% make defconfig init/main.o
-
-do not.
-
-Am I missing something ?
-
- - Arnaud
+	Sam
