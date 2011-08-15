@@ -1,104 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-gx0-f174.google.com ([209.85.161.174]:57874 "EHLO
-	mail-gx0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753651Ab1HNRCe (ORCPT
+Received: from mail-yi0-f46.google.com ([209.85.218.46]:44899 "EHLO
+	mail-yi0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752197Ab1HOFIM (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 14 Aug 2011 13:02:34 -0400
+	Mon, 15 Aug 2011 01:08:12 -0400
 From: Arnaud Lacombe <lacombar@gmail.com>
-Subject: Re: IS_ENABLED() and non-available symbols
-Date: Sun, 14 Aug 2011 13:02:26 -0400
-Message-Id: <1313341346-15605-1-git-send-email-lacombar@gmail.com>
-In-Reply-To: <CACqU3MU2pjcqgYDjn=S2asdLamU0mity+kLizH_mbTtJU5Fh2A@mail.gmail.com>
-References: <CACqU3MU2pjcqgYDjn=S2asdLamU0mity+kLizH_mbTtJU5Fh2A@mail.gmail.com>
+Subject: [PATCH 10/11] scripts/Makefile.build: do not reference EXTRA_CFLAGS as CFLAGS replacement
+Date: Mon, 15 Aug 2011 01:07:13 -0400
+Message-Id: <1313384834-24433-11-git-send-email-lacombar@gmail.com>
+In-Reply-To: <1313384834-24433-1-git-send-email-lacombar@gmail.com>
+References: <1313384834-24433-1-git-send-email-lacombar@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Rabin Vincent <rabin@rab.in>
-Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Arnaud Lacombe <lacombar@gmail.com>
+To: linux-kernel@vger.kernel.org
+Cc: Arnaud Lacombe <lacombar@gmail.com>, Sam Ravnborg <sam@ravnborg.org>, linux-kbuild@vger.kernel.org
 
-Hi,
+Usage of these flags has been deprecated for nearly 4 years by:
 
-On Sun, Aug 14, 2011 at 12:55 PM, Arnaud Lacombe <lacombar@gmail.com> wrote:
-> The solution is trivial, but I am not sure we want to go that way: we
-> need to generated a __enabled_ entry for symbols for _all_ symbols in
-> the configuration, even internal one
->
-That should do the job...
+    commit f77bf01425b11947eeb3b5b54685212c302741b8
+    Author: Sam Ravnborg <sam@neptun.(none)>
+    Date:   Mon Oct 15 22:25:06 2007 +0200
 
- -= NOT FOR MERGE =-
+        kbuild: introduce ccflags-y, asflags-y and ldflags-y
 
-Not-Signed-off-by: Arnaud Lacombe <lacombar@gmail.com>
+Moreover, these flags (at least EXTRA_CFLAGS) have been documented for command
+line use. By default, gmake(1) do not override command line setting, so this is
+likely to result in build failure or unexpected behavior.
 
+Do not advertise for its usage.
+
+Cc: Sam Ravnborg <sam@ravnborg.org>
+Cc: linux-kbuild@vger.kernel.org
 ---
- scripts/kconfig/confdata.c |   42 +++++++++++++++++++++++++++++++-----------
- 1 files changed, 31 insertions(+), 11 deletions(-)
+ scripts/Makefile.build |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
-index 59b667c..e976ccb 100644
---- a/scripts/kconfig/confdata.c
-+++ b/scripts/kconfig/confdata.c
-@@ -503,17 +503,6 @@ header_print_symbol(FILE *fp, struct symbol *sym, const char *value, void *arg)
- 			fprintf(fp, "#define %s%s%s 1\n",
- 			    CONFIG_, sym->name, suffix);
- 		}
--		/*
--		 * Generate the __enabled_CONFIG_* and
--		 * __enabled_CONFIG_*_MODULE macros for use by the
--		 * IS_{ENABLED,BUILTIN,MODULE} macros. The _MODULE variant is
--		 * generated even for booleans so that the IS_ENABLED() macro
--		 * works.
--		 */
--		fprintf(fp, "#define __enabled_" CONFIG_ "%s %d\n",
--				sym->name, (*value == 'y'));
--		fprintf(fp, "#define __enabled_" CONFIG_ "%s_MODULE %d\n",
--				sym->name, (*value == 'm'));
- 		break;
- 	}
- 	case S_HEX: {
-@@ -565,6 +554,35 @@ static struct conf_printer header_printer_cb =
- };
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index a0fd502..d2b366c 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -46,7 +46,7 @@ include $(kbuild-file)
+ # If the save-* variables changed error out
+ ifeq ($(KBUILD_NOPEDANTIC),)
+         ifneq ("$(save-cflags)","$(CFLAGS)")
+-                $(error CFLAGS was changed in "$(kbuild-file)". Fix it to use EXTRA_CFLAGS)
++                $(error CFLAGS was changed in "$(kbuild-file)". Fix it to use ccflags-y)
+         endif
+ endif
  
- /*
-+ * Generate the __enabled_CONFIG_* and __enabled_CONFIG_*_MODULE macros for
-+ * use by the IS_{ENABLED,BUILTIN,MODULE} macros. The _MODULE variant is
-+ * generated even for booleans so that the IS_ENABLED() macro works.
-+ */
-+static void
-+header_print__enabled_symbol(FILE *fp, struct symbol *sym, const char *value, void *arg)
-+{
-+
-+	switch (sym->type) {
-+	case S_BOOLEAN:
-+	case S_TRISTATE: {
-+		fprintf(fp, "#define __enabled_" CONFIG_ "%s %d\n",
-+		    sym->name, (*value == 'y'));
-+		fprintf(fp, "#define __enabled_" CONFIG_ "%s_MODULE %d\n",
-+		    sym->name, (*value == 'm'));
-+		break;
-+	}
-+	default:
-+		break;
-+	}
-+}
-+
-+static struct conf_printer header__enabled_printer_cb =
-+{
-+	.print_symbol = header_print__enabled_symbol,
-+	.print_comment = header_print_comment,
-+};
-+
-+/*
-  * Tristate printer
-  *
-  * This printer is used when generating the `include/config/tristate.conf' file.
-@@ -945,6 +963,8 @@ int conf_write_autoconf(void)
- 	conf_write_heading(out_h, &header_printer_cb, NULL);
- 
- 	for_all_symbols(i, sym) {
-+		conf_write_symbol(out_h, sym, &header__enabled_printer_cb, NULL);
-+
- 		sym_calc_value(sym);
- 		if (!(sym->flags & SYMBOL_WRITE) || !sym->name)
- 			continue;
 -- 
 1.7.6.153.g78432
 
