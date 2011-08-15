@@ -1,52 +1,74 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.snhosting.dk ([87.238.248.203]:56074 "EHLO
-	smtp.domainteam.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750790Ab1HOSeB (ORCPT
+Received: from mail-ew0-f46.google.com ([209.85.215.46]:46249 "EHLO
+	mail-ew0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750790Ab1HOTEm (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 15 Aug 2011 14:34:01 -0400
-Date: Mon, 15 Aug 2011 20:33:59 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH] sparse: always enable endian checks
-Message-ID: <20110815183358.GA31530@merkur.ravnborg.org>
-References: <20110815160440.6296.95762.stgit@mj>
+	Mon, 15 Aug 2011 15:04:42 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20110815160440.6296.95762.stgit@mj>
+In-Reply-To: <CACqU3MWsHKnEwstzc-QQNXZZfFKR31RP0sdQmHmhgvdfrWXP-Q@mail.gmail.com>
+References: <CACqU3MU2pjcqgYDjn=S2asdLamU0mity+kLizH_mbTtJU5Fh2A@mail.gmail.com>
+	<1313341346-15605-1-git-send-email-lacombar@gmail.com>
+	<4E48FB04.9010903@suse.cz>
+	<CACqU3MWsHKnEwstzc-QQNXZZfFKR31RP0sdQmHmhgvdfrWXP-Q@mail.gmail.com>
+Date: Mon, 15 Aug 2011 15:04:40 -0400
+Message-ID: <CACqU3MUDe7kcRx-N8ZPiPU6fcFEYDA1zECgUZxCneLE71fGPzg@mail.gmail.com>
+Subject: Re: IS_ENABLED() and non-available symbols
+From: Arnaud Lacombe <lacombar@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Pavel Roskin <proski@gnu.org>, Michal Marek <mmarek@suse.cz>, linux-kbuild <linux-kbuild@vger.kernel.org>
-Cc: linux-kernel@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>
+Cc: Rabin Vincent <rabin@rab.in>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Mon, Aug 15, 2011 at 12:04:41PM -0400, Pavel Roskin wrote:
-> Checks enabled by __CHECK_ENDIAN__ produce less than a half of the
-> sparse warnings.  For instance, the allyesconfig configuration on
-> linux-next (tag next-20110812) produces on x86_64:
-> 
->                  no __CHECK_ENDIAN__   with __CHECK_ENDIAN__
-> stderr bytes:    1155037               1992954 (73% increase)
-> stderr lines:    10716                 18657   (74% increase)
-> affected files:  1191                  1458    (22% increase)
-> 
-> It is no longer true that __CHECK_ENDIAN__ produces so many warnings
-> that other sparse warnings drown in the noise.
-> 
-> Janitors going through the whole tree are already prepared to search for
-> the warnings they want to fix.
-> 
-> The main point of this patch is to make sure that developers of a
-> particular driver who use sparse rarely get all the warnings for their
-> code even if they forget to specify __CHECK_ENDIAN__ or mistype it.
-> 
-> Some developers actually added __CHECK_ENDIAN__ to the driver makefiles
-> so they don't forget to use it.  Remove them now.
-> 
-> Remove all references to __CHECK_ENDIAN__ from the documentation except
-> the Chinese version, which would need to be updated separately.
-> 
-> Signed-off-by: Pavel Roskin <proski@gnu.org>
-Acked-by: Sam Ravnborg <sam@ravnborg.org>
+Hi,
 
-Maybe ask Michal to merge it?
+On Mon, Aug 15, 2011 at 10:52 AM, Arnaud Lacombe <lacombar@gmail.com> wrote:
+> [...]
+> I'd be interested to also know the cost of all those new symbols on
+> build time...
+>
+here it is; on the parsing itself:
 
-	Sam
+After 1000 iteration of:
+% /usr/libexec/gcc/x86_64-redhat-linux/4.5.1/cc1 -E -quiet -v -include
+include/generated/autoconf.h /dev/null -o /dev/null -mtune=generic
+-march=x86-64 2>/dev/null
+
+x include.before
++ include.after
++--------------------------------------------------------------------------+
+| x  x x  x  x x                                  +  + +  +  + +  +  +    +|
+||MA_|                                             |_A_|                   |
++--------------------------------------------------------------------------+
+    N           Min           Max        Median           Avg        Stddev
+x 1000         0.016         0.021         0.016       0.01637 0.00077310911
++ 1000         0.034         0.043         0.035      0.035227 0.00076161083
+Difference at 95.0% confidence
+        0.018857 +/- 6.7264e-05
+        115.192% +/- 0.410898%
+        (Student's t, pooled s = 0.000767382)
+
+After 1000 successive build of `init/main.o' (directly calling gcc):
+
+x include.before
++ include.after
++--------------------------------------------------------------------------+
+|     xxxxx**++++++                +              +                        |
+|     xxxxx***+++++        x      ++       x      +            +           |
+|     xxxxx***++*+++ +x+   x  x  x++ x   + x+   ++*  x     x   *           |
+|     xxxxx****+*++**+**+*+*x x*xx*++*x++*+**x+ *+* +x *++x*  x*++ +      +|
+||____|_A___M_A|_____|                                                     |
++--------------------------------------------------------------------------+
+    N           Min           Max        Median           Avg        Stddev
+x 1000         0.628         0.835         0.631      0.636217   0.024724466
++ 1000         0.648         0.873         0.651      0.657341   0.026185882
+Difference at 95.0% confidence
+        0.021124 +/- 0.00223216
+        3.32025% +/- 0.350849%
+        (Student's t, pooled s = 0.0254657)
+
+Now, an `allyesconfig' take about 5h30 hours to complete on my  Core2
+T5670 (capped at 1.2GHz), so this patch would cost an extra 10min.
+Still significant, but not too much :-)
+
+ - Arnaud
