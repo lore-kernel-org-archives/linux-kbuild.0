@@ -1,53 +1,55 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-yi0-f46.google.com ([209.85.218.46]:44899 "EHLO
-	mail-yi0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752197Ab1HOFIM (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 15 Aug 2011 01:08:12 -0400
-From: Arnaud Lacombe <lacombar@gmail.com>
-Subject: [PATCH 10/11] scripts/Makefile.build: do not reference EXTRA_CFLAGS as CFLAGS replacement
-Date: Mon, 15 Aug 2011 01:07:13 -0400
-Message-Id: <1313384834-24433-11-git-send-email-lacombar@gmail.com>
-In-Reply-To: <1313384834-24433-1-git-send-email-lacombar@gmail.com>
-References: <1313384834-24433-1-git-send-email-lacombar@gmail.com>
+Received: from cantor2.suse.de ([195.135.220.15]:43749 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751736Ab1HOKzB (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 15 Aug 2011 06:55:01 -0400
+Message-ID: <4E48FB04.9010903@suse.cz>
+Date: Mon, 15 Aug 2011 12:55:00 +0200
+From: Michal Marek <mmarek@suse.cz>
+MIME-Version: 1.0
+Subject: Re: IS_ENABLED() and non-available symbols
+References: <CACqU3MU2pjcqgYDjn=S2asdLamU0mity+kLizH_mbTtJU5Fh2A@mail.gmail.com> <1313341346-15605-1-git-send-email-lacombar@gmail.com>
+In-Reply-To: <1313341346-15605-1-git-send-email-lacombar@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-2
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: Arnaud Lacombe <lacombar@gmail.com>, Sam Ravnborg <sam@ravnborg.org>, linux-kbuild@vger.kernel.org
+To: Arnaud Lacombe <lacombar@gmail.com>
+Cc: Rabin Vincent <rabin@rab.in>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Usage of these flags has been deprecated for nearly 4 years by:
+On 14.8.2011 19:02, Arnaud Lacombe wrote:
+> Hi,
+> 
+> On Sun, Aug 14, 2011 at 12:55 PM, Arnaud Lacombe <lacombar@gmail.com> wrote:
+>> The solution is trivial, but I am not sure we want to go that way: we
+>> need to generated a __enabled_ entry for symbols for _all_ symbols in
+>> the configuration, even internal one
+>>
+> That should do the job...
+> 
+>  -= NOT FOR MERGE =-
+> 
+> Not-Signed-off-by: Arnaud Lacombe <lacombar@gmail.com>
+> 
+> ---
+>  scripts/kconfig/confdata.c |   42 +++++++++++++++++++++++++++++++-----------
+>  1 files changed, 31 insertions(+), 11 deletions(-)
+> 
+>  	for_all_symbols(i, sym) {
+> +		conf_write_symbol(out_h, sym, &header__enabled_printer_cb, NULL);
+> +
+>  		sym_calc_value(sym);
+>  		if (!(sym->flags & SYMBOL_WRITE) || !sym->name)
+>  			continue;
 
-    commit f77bf01425b11947eeb3b5b54685212c302741b8
-    Author: Sam Ravnborg <sam@neptun.(none)>
-    Date:   Mon Oct 15 22:25:06 2007 +0200
+I like the approach, it will work even with not visible symbols and
+still catch typos (which #ifdef does not protect against). But with the
+patch as-is, the generated autoconf.h starts with lots of
 
-        kbuild: introduce ccflags-y, asflags-y and ldflags-y
+#define __enabled_CONFIG_(null) 1
+#define __enabled_CONFIG_(null)_MODULE 0
+#define __enabled_CONFIG_(null) 1
+#define __enabled_CONFIG_(null)_MODULE 0
+#define __enabled_CONFIG_(null) 0
 
-Moreover, these flags (at least EXTRA_CFLAGS) have been documented for command
-line use. By default, gmake(1) do not override command line setting, so this is
-likely to result in build failure or unexpected behavior.
-
-Do not advertise for its usage.
-
-Cc: Sam Ravnborg <sam@ravnborg.org>
-Cc: linux-kbuild@vger.kernel.org
----
- scripts/Makefile.build |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
-
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index a0fd502..d2b366c 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -46,7 +46,7 @@ include $(kbuild-file)
- # If the save-* variables changed error out
- ifeq ($(KBUILD_NOPEDANTIC),)
-         ifneq ("$(save-cflags)","$(CFLAGS)")
--                $(error CFLAGS was changed in "$(kbuild-file)". Fix it to use EXTRA_CFLAGS)
-+                $(error CFLAGS was changed in "$(kbuild-file)". Fix it to use ccflags-y)
-         endif
- endif
- 
--- 
-1.7.6.153.g78432
-
+Michal
