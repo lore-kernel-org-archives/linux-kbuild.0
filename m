@@ -1,71 +1,40 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ew0-f46.google.com ([209.85.215.46]:37621 "EHLO
-	mail-ew0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754248Ab1HOOwd convert rfc822-to-8bit (ORCPT
+Received: from mail-pz0-f42.google.com ([209.85.210.42]:55516 "EHLO
+	mail-pz0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751302Ab1HOSLZ (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 15 Aug 2011 10:52:33 -0400
+	Mon, 15 Aug 2011 14:11:25 -0400
+Received: by pzk37 with SMTP id 37so3286193pzk.1
+        for <linux-kbuild@vger.kernel.org>; Mon, 15 Aug 2011 11:11:25 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <4E48FB04.9010903@suse.cz>
-References: <CACqU3MU2pjcqgYDjn=S2asdLamU0mity+kLizH_mbTtJU5Fh2A@mail.gmail.com>
-	<1313341346-15605-1-git-send-email-lacombar@gmail.com>
-	<4E48FB04.9010903@suse.cz>
-Date: Mon, 15 Aug 2011 10:52:31 -0400
-Message-ID: <CACqU3MWsHKnEwstzc-QQNXZZfFKR31RP0sdQmHmhgvdfrWXP-Q@mail.gmail.com>
-Subject: Re: IS_ENABLED() and non-available symbols
+Date: Mon, 15 Aug 2011 14:11:25 -0400
+Message-ID: <CACqU3MWSh0sXSs-s_DGyYzLHT_Fbv_Wu-twV-+Ws0p_48FiE9w@mail.gmail.com>
+Subject: Mixed target breakage ?
 From: Arnaud Lacombe <lacombar@gmail.com>
 Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: Rabin Vincent <rabin@rab.in>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
 
 Hi,
 
-2011/8/15 Michal Marek <mmarek@suse.cz>:
-> On 14.8.2011 19:02, Arnaud Lacombe wrote:
->> Hi,
->>
->> On Sun, Aug 14, 2011 at 12:55 PM, Arnaud Lacombe <lacombar@gmail.com> wrote:
->>> The solution is trivial, but I am not sure we want to go that way: we
->>> need to generated a __enabled_ entry for symbols for _all_ symbols in
->>> the configuration, even internal one
->>>
->> That should do the job...
->>
->>  -= NOT FOR MERGE =-
->>
->> Not-Signed-off-by: Arnaud Lacombe <lacombar@gmail.com>
->>
->> ---
->>  scripts/kconfig/confdata.c |   42 +++++++++++++++++++++++++++++++-----------
->>  1 files changed, 31 insertions(+), 11 deletions(-)
->>
->>       for_all_symbols(i, sym) {
->> +             conf_write_symbol(out_h, sym, &header__enabled_printer_cb, NULL);
->> +
->>               sym_calc_value(sym);
->>               if (!(sym->flags & SYMBOL_WRITE) || !sym->name)
->>                       continue;
->
-> I like the approach, it will work even with not visible symbols and
-> still catch typos (which #ifdef does not protect against).
->
-actually, the print should be after `sym_calc_value(sym)' to get the
-value right..
+Kbuild does not seem to support building a PHONY target, mixed by a
+direct object target; ie.:
 
-> But with the
-> patch as-is, the generated autoconf.h starts with lots of
->
-> #define __enabled_CONFIG_(null) 1
-> #define __enabled_CONFIG_(null)_MODULE 0
-> #define __enabled_CONFIG_(null) 1
-> #define __enabled_CONFIG_(null)_MODULE 0
-> #define __enabled_CONFIG_(null) 0
->
-that should be trivial to fix. Sunday morning patches...
+% make defconfig
+% make init/main.o
 
-I'd be interested to also know the cost of all those new symbols on
-build time...
+works, as does:
+
+% make defconfig
+% make init/main.o init/calibrate.o
+
+but,
+
+% make defconfig init/main.o
+
+do not.
+
+Am I missing something ?
 
  - Arnaud
