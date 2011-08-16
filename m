@@ -1,152 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-fx0-f46.google.com ([209.85.161.46]:43495 "EHLO
-	mail-fx0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753654Ab1HPGPS convert rfc822-to-8bit (ORCPT
+Received: from hrndva-omtalb.mail.rr.com ([71.74.56.123]:64232 "EHLO
+	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751337Ab1HPPbH (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 16 Aug 2011 02:15:18 -0400
-Received: by fxh19 with SMTP id 19so4005639fxh.19
-        for <linux-kbuild@vger.kernel.org>; Mon, 15 Aug 2011 23:15:17 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <CACqU3MUSji7z507EhpeWgHkqGfJVVXWWbY4Hi15H8LDz3phjZw@mail.gmail.com>
-References: <CAKxaRTKtCOR7WHcpaTaVj8wqGoLpO04Vt3_aJ-Qfk=4X6CW0NQ@mail.gmail.com>
-	<CACqU3MXNjTTqHs22GNLWS1mrTi5=EQcMYbbStHsuOk9Msd838A@mail.gmail.com>
-	<CAKxaRT+hCXu-921RoNw0aiiffZzNGQNgQX0FGfsfdSOP95DzBQ@mail.gmail.com>
-	<CACqU3MUSji7z507EhpeWgHkqGfJVVXWWbY4Hi15H8LDz3phjZw@mail.gmail.com>
-Date: Tue, 16 Aug 2011 09:15:17 +0300
-Message-ID: <CAKxaRTKutHK+bsgQ6aHhaJ9d3UJ75uDeDNLOtptRgnRKzp968A@mail.gmail.com>
-Subject: Re: Linux 3.0.1 compile problem on different locales..
-From: =?ISO-8859-1?B?U2VyZGFyIEvWWUzc?= <s.koylux@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 8BIT
+	Tue, 16 Aug 2011 11:31:07 -0400
+Subject: Re: [PATCH 1/3] kconfig/streamline_config.pl: directly access
+ LSMOD from the environment
+From: Steven Rostedt <rostedt@goodmis.org>
+In-Reply-To: <1313472233-14094-1-git-send-email-lacombar@gmail.com>
+References: <1313472233-14094-1-git-send-email-lacombar@gmail.com>
+Content-Type: text/plain; charset="ISO-8859-15"
+Date: Tue, 16 Aug 2011 11:31:04 -0400
+Message-ID: <1313508664.15704.28.camel@gandalf.stny.rr.com>
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
+To: Arnaud Lacombe <lacombar@gmail.com>
+Cc: linux-kbuild@vger.kernel.org
 
-Damn gmail ! It's send to your personal mail, not to list :(
+On Tue, 2011-08-16 at 01:23 -0400, Arnaud Lacombe wrote:
+> Cc: Steven Rostedt <rostedt@goodmis.org>
+> Signed-off-by: Arnaud Lacombe <lacombar@gmail.com>
+> ---
+>  scripts/kconfig/Makefile             |   12 ++----------
+>  scripts/kconfig/streamline_config.pl |    8 ++++++--
+>  2 files changed, 8 insertions(+), 12 deletions(-)
 
-This is a common problem and too many programs effected in
-historically. Many smb, kde, evolution, apache etc. setups failed with
-this reason.
+Hi Arnaud,
 
-In Turkish locale,
+I like these versions better. Yeah, using the LSMOD environment is the
+better way to go.
 
-tolower('I') -> ascii(141) // in old IBM PC Charset. Other charsets
-can be differ.
-toupper('i') -> ascii(152)
+I'll do some tests on them and then push them up.
 
-Rarely i do a manually patch libc for strcasecmp(). Generally, if a
-program uses strcasecmp or toupper/lower for internal strings, this
-program can be broken in turkish locale.
+Thanks!
 
-For my personel know-how, patch kernel Makefile to change build env.
-locale to "C" best solution. This problem can be occurred for other
-langs. in different parts of kernel. Internatinoal linux developers
-cannot be know all trics of other locales, naturally.
+-- Steve
 
-Thanks.
 
-2011/8/16 Arnaud Lacombe <lacombar@gmail.com>:
-> Hi,
->
-> [Please do not reply only to me, it's considered rude for people on
-> the public mailing list.]
->
-> 2011/8/15 Serdar KÖYLÜ <s.koylux@gmail.com>:
->> Dist: MDV 2010.1, but very tweaked manually..
->>
->> bash-3.2$ set |grep LC
->> LC_ADDRESS=tr_TR.UTF-8
->> LC_COLLATE=tr_TR.UTF-8
->> LC_CTYPE=tr_TR.UTF-8
->> LC_IDENTIFICATION=tr_TR.UTF-8
->> LC_MEASUREMENT=tr_TR.UTF-8
->> LC_MESSAGES=tr_TR.UTF-8
->> LC_MONETARY=tr_TR.UTF-8
->> LC_NAME=tr_TR.UTF-8
->> LC_NUMERIC=tr_TR.UTF-8
->> LC_PAPER=tr_TR.UTF-8
->> LC_SOURCED=1
->> LC_TELEPHONE=tr_TR.UTF-8
->> LC_TIME=tr_TR.UTF-8
->> MAILCHECK=60
->>
->>
-> he... obvious:
->
-> SYNOPSIS
->       #include <ctype.h>
->
->       int toupper(int c);
->       int tolower(int c);
->
-> BUGS
->       The details of what constitutes an uppercase or lowercase
-> letter depend on the current locale.  For example, the default "C"
-> locale does not know about umlauts, so no conversion is done for them.
->
->       In some non-English locales, there are lowercase letters with
-> no corresponding uppercase equivalent; the German sharp s is one
-> example.
->
->
-> Is Turkish such a corner case where the capital I has no lowercase equivalent ?
->
-> I guess we should reset the locale to C when generating
-> include/config/ files, it'd be better than re-inventing our special
-> case wheel.
->
-> Thanks,
->  - Arnaud
->
->> 2011/8/16 Arnaud Lacombe <lacombar@gmail.com>:
->>> Hi,
->>>
->>> [Added linux-kbuild@ to the CC list.]
->>>
->>> 2011/8/15 Serdar KÖYLÜ <s.koylux@gmail.com>:
->>>> FYI.
->>>>
->>>> I download latest stable version and try compile it. But process
->>>> terminated with an error message, such as:
->>>>
->>>> error config/modversions.h, file or directory not found (Message is my
->>>> original language, in Turkish).
->>>>
->>>> I check manually this file, found it as:
->>>>
->>>> foo/linux-3.0.1/include/config/modversIons.h
->>>>
->>>> And all other "i" chars, translated into "I" chars. I run a grep, find this:
->>>>
->>>> [root@localhost kconfig]# grep -in tolower *.c
->>>> confdata.c:730:                 c = tolower(c);
->>>>
->>>> I set env. vars such as "LC_CTYPE=C" manually, retry compile kernel,
->>>> yes, it's compiled now.
->>>>
->>>> I don't know best solutions for this problem. A solutions can be write
->>>> some warnings in related documents. An other solution, make a patch,
->>>> such as:
->>>>
->>>> - confdata.c:730:                 c = tolower(c);
->>>> +#define TOLOWER(x) ((x) | 0x20)
->>>> +confdata.c:730:                 c = TOLOWER(c);
->>>>
->>>> or makefiles set locale to "C". I don't sure best solution. But this
->>>> problem occured in turkish and can be occurred other langs.
->>>>
->>> What is the Turkish locale you were using originally ?
->>>
->>> Thanks,
->>>  - Arnaud
->>>
->>>> Thanks, best regards..
->>>> --
->>>> To unsubscribe from this list: send the line "unsubscribe linux-kernel" in
->>>> the body of a message to majordomo@vger.kernel.org
->>>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->>>> Please read the FAQ at  http://www.tux.org/lkml/
->>>>
->>>
->>
->
