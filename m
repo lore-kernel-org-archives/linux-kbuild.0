@@ -1,69 +1,90 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-gx0-f174.google.com ([209.85.161.174]:43613 "EHLO
-	mail-gx0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751840Ab1HPFYE (ORCPT
+Received: from mail-pz0-f42.google.com ([209.85.210.42]:59225 "EHLO
+	mail-pz0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751559Ab1HPF3n convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 16 Aug 2011 01:24:04 -0400
-Received: by gxk21 with SMTP id 21so3604014gxk.19
-        for <linux-kbuild@vger.kernel.org>; Mon, 15 Aug 2011 22:24:03 -0700 (PDT)
+	Tue, 16 Aug 2011 01:29:43 -0400
+MIME-Version: 1.0
+In-Reply-To: <4E25813D.9020600@suse.cz>
+References: <1307387767-9237-1-git-send-email-lacombar@gmail.com>
+	<1309571259-15241-1-git-send-email-lacombar@gmail.com>
+	<CACqU3MVxiwmRQ9MQFAB9ymnTt3pEG+ZTAS5seQ7bgpetuafcMQ@mail.gmail.com>
+	<4E25813D.9020600@suse.cz>
+Date: Tue, 16 Aug 2011 01:29:43 -0400
+Message-ID: <CACqU3MWL5fueoZzH8yJ7V3jgDhpLy+CgU7qDyDRXXdOAGUO8tQ@mail.gmail.com>
+Subject: Re: [RFC 0/7] Kconfig library check merge
 From: Arnaud Lacombe <lacombar@gmail.com>
-Subject: [PATCH 3/3] kconfig/streamline_config.pl: merge local{mod,yes}config
-Date: Tue, 16 Aug 2011 01:23:53 -0400
-Message-Id: <1313472233-14094-3-git-send-email-lacombar@gmail.com>
-In-Reply-To: <1313472233-14094-1-git-send-email-lacombar@gmail.com>
-References: <1313472233-14094-1-git-send-email-lacombar@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Arnaud Lacombe <lacombar@gmail.com>, Steven Rostedt <rostedt@goodmis.org>
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-The two targets `localmodconfig' and `localyesconfig' only differs from the
-sed(1) ran on the result of `streamline_config.pl' to convert symbols set to
-`modules' to `yes'. This conversion can be made directly from the perl script,
-and thus avoid duplicating the command to generate the configuration.
+Hi Michal,
 
-Cc: Steven Rostedt <rostedt@goodmis.org>
-Signed-off-by: Arnaud Lacombe <lacombar@gmail.com>
----
- scripts/kconfig/Makefile |   18 +-----------------
- 1 files changed, 1 insertions(+), 17 deletions(-)
+On Tue, Jul 19, 2011 at 9:06 AM, Michal Marek <mmarek@suse.cz> wrote:
+> On 18.7.2011 21:03, Arnaud Lacombe wrote:
+>>
+>> Hi,
+>>
+>> On Fri, Jul 1, 2011 at 9:47 PM, Arnaud Lacombe<lacombar@gmail.com>  wrote:
+>>>
+>>> Hi Michal,
+>>>
+>>> You'll find hereafter a splitted-down version of my previous preliminary
+>>> patch. I will eventually need to complete the second commit message, it
+>>> is
+>>> missing the purpose of the change, which AFAIR was a failure of
+>>> something.
+>>>
+>>> Comments welcome!
+>>>
+>>>  - Arnaud
+>>>
+>>> Arnaud Lacombe (7):
+>>>  kconfig/Makefile: add pretty printer for moc(1)
+>>>  kconfig/Makefile: ensure `conf' appears last in `hostprogs-y'
+>>>  kconfig/check.sh: prepare for generic check
+>>>  kconfig: move QT checks to `scripts/kconfig/check.sh'
+>>>  kconfig: move GTK checks to `scripts/kconfig/check.sh'
+>>>  kconfig: move ncurses checks to `scripts/kconfig/check.sh'
+>>>  kconfig: add stub for nconf checks
+>>>
+>>>  scripts/kconfig/Makefile                   |  155 +++++-----------------
+>>>  scripts/kconfig/check.sh                   |  199
+>>> ++++++++++++++++++++++++++--
+>>>  scripts/kconfig/lxdialog/check-lxdialog.sh |   84 ------------
+>>>  3 files changed, 223 insertions(+), 215 deletions(-)
+>>>
+>> ping ?
+>
+> Pong. The series looks fine to me. I have no strong opinion about the name
+> of the check script, pick whatever you like and send a series with your
+> signoff.
+>
+The following changes since commit 322a8b034003c0d46d39af85bf24fee27b902f48:
 
-diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
-index 4de8973..ba573fe 100644
---- a/scripts/kconfig/Makefile
-+++ b/scripts/kconfig/Makefile
-@@ -33,7 +33,7 @@ silentoldconfig: $(obj)/conf
- 	$(Q)mkdir -p include/generated
- 	$< --$@ $(Kconfig)
- 
--localmodconfig: $(obj)/streamline_config.pl $(obj)/conf
-+localyesconfig localmodconfig: $(obj)/streamline_config.pl $(obj)/conf
- 	$(Q)mkdir -p include/generated
- 	$(Q)perl $< --$@ $(srctree) $(Kconfig) > .tmp.config
- 	$(Q)if [ -f .config ]; then 					\
-@@ -48,22 +48,6 @@ localmodconfig: $(obj)/streamline_config.pl $(obj)/conf
- 	fi
- 	$(Q)rm -f .tmp.config
- 
--localyesconfig: $(obj)/streamline_config.pl $(obj)/conf
--	$(Q)mkdir -p include/generated
--	$(Q)perl $< --$@ $(srctree) $(Kconfig) > .tmp.config
--	$(Q)sed -i s/=m/=y/ .tmp.config
--	$(Q)if [ -f .config ]; then					\
--			cmp -s .tmp.config .config ||			\
--			(mv -f .config .config.old.1;			\
--			 mv -f .tmp.config .config;			\
--			 $(obj)/conf --silentoldconfig $(Kconfig);	\
--			 mv -f .config.old.1 .config.old)		\
--	else								\
--			mv -f .tmp.config .config;			\
--			$(obj)/conf --silentoldconfig $(Kconfig);	\
--	fi
--	$(Q)rm -f .tmp.config
--
- # Create new linux.pot file
- # Adjust charset to UTF-8 in .po file to accept UTF-8 in Kconfig files
- # The symlink is used to repair a deficiency in arch/um
--- 
-1.7.6.153.g78432
+  Linux 3.1-rc1 (2011-08-07 18:23:30 -0700)
 
+are available in the git repository at:
+  git@github.com:lacombar/linux-2.6.git master/kconfig-generic-checks
+
+Arnaud Lacombe (6):
+      kconfig/Makefile: add pretty printer for moc(1)
+      kconfig/check.sh: prepare for generic check
+      kconfig: move QT checks to `scripts/kconfig/check.sh'
+      kconfig: move GTK checks to `scripts/kconfig/check.sh'
+      kconfig: move ncurses checks to `scripts/kconfig/check.sh'
+      kconfig: add stub for nconf checks
+
+ scripts/kconfig/Makefile                   |  149 ++++-----------------
+ scripts/kconfig/check.sh                   |  199 ++++++++++++++++++++++++++--
+ scripts/kconfig/lxdialog/check-lxdialog.sh |   84 ------------
+ 3 files changed, 218 insertions(+), 214 deletions(-)
+
+I dropped the `conf' ordering patch, I could not reproduce the issue I
+once had. Beside that, the main diff is a rebase on top of -rc1.
+
+Thanks,
+ - Arnaud
