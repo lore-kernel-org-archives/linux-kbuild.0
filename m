@@ -1,90 +1,85 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pz0-f42.google.com ([209.85.210.42]:59275 "EHLO
-	mail-pz0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751456Ab1HPFVr convert rfc822-to-8bit (ORCPT
+Received: from mail-yi0-f46.google.com ([209.85.218.46]:64716 "EHLO
+	mail-yi0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751559Ab1HPFYA (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 16 Aug 2011 01:21:47 -0400
-Received: by pzk37 with SMTP id 37so4053060pzk.1
-        for <linux-kbuild@vger.kernel.org>; Mon, 15 Aug 2011 22:21:47 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <1313471973-13966-1-git-send-email-lacombar@gmail.com>
-References: <1313471973-13966-1-git-send-email-lacombar@gmail.com>
-Date: Tue, 16 Aug 2011 01:21:47 -0400
-Message-ID: <CACqU3MVtsN64K0Hhwv_ky_f1BBuEnTWphXSRYC3ZgteSpF_zVQ@mail.gmail.com>
-Subject: Re: [PATCH] kconfig: protect locale-unsafe calls
+	Tue, 16 Aug 2011 01:24:00 -0400
+Received: by yie30 with SMTP id 30so3593933yie.19
+        for <linux-kbuild@vger.kernel.org>; Mon, 15 Aug 2011 22:24:00 -0700 (PDT)
 From: Arnaud Lacombe <lacombar@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 8BIT
+Subject: [PATCH 1/3] kconfig/streamline_config.pl: directly access LSMOD from the environment
+Date: Tue, 16 Aug 2011 01:23:51 -0400
+Message-Id: <1313472233-14094-1-git-send-email-lacombar@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: s.koylux@gmail.com, Arnaud Lacombe <lacombar@gmail.com>
+Cc: Arnaud Lacombe <lacombar@gmail.com>, Steven Rostedt <rostedt@goodmis.org>
 
-Hi,
+Cc: Steven Rostedt <rostedt@goodmis.org>
+Signed-off-by: Arnaud Lacombe <lacombar@gmail.com>
+---
+ scripts/kconfig/Makefile             |   12 ++----------
+ scripts/kconfig/streamline_config.pl |    8 ++++++--
+ 2 files changed, 8 insertions(+), 12 deletions(-)
 
-On Tue, Aug 16, 2011 at 1:19 AM, Arnaud Lacombe <lacombar@gmail.com> wrote:
-> There is a few calls in kconfig where we end-up using tolower(3) or toupper(3)
-> in an unsafe manner. As highlighted by Serdar, it would seem that Turkish's
-> locale do not have representable lowercase for the Engligh capital-dotless-i.
->
-> Introduces locale-safe portion in the backend where we reset the local to the
-> default "C".
->
-> Reported-by: Serdar KÖYLÜ <s.koylux@gmail.com>
-> Signed-off-by: Arnaud Lacombe <lacombar@gmail.com>
->
-This is not a perfect solution as we might writing stuff on the
-console on those protected range, but that's a start.
+diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
+index 82d2eb2..bd41ab2 100644
+--- a/scripts/kconfig/Makefile
++++ b/scripts/kconfig/Makefile
+@@ -33,17 +33,9 @@ silentoldconfig: $(obj)/conf
+ 	$(Q)mkdir -p include/generated
+ 	$< --$@ $(Kconfig)
+ 
+-# if no path is given, then use src directory to find file
+-ifdef LSMOD
+-LSMOD_F := $(LSMOD)
+-ifeq ($(findstring /,$(LSMOD)),)
+-  LSMOD_F := $(objtree)/$(LSMOD)
+-endif
+-endif
+-
+ localmodconfig: $(obj)/streamline_config.pl $(obj)/conf
+ 	$(Q)mkdir -p include/generated
+-	$(Q)perl $< $(srctree) $(Kconfig) $(LSMOD_F) > .tmp.config
++	$(Q)perl $< $(srctree) $(Kconfig) > .tmp.config
+ 	$(Q)if [ -f .config ]; then 					\
+ 			cmp -s .tmp.config .config ||			\
+ 			(mv -f .config .config.old.1;			\
+@@ -58,7 +50,7 @@ localmodconfig: $(obj)/streamline_config.pl $(obj)/conf
+ 
+ localyesconfig: $(obj)/streamline_config.pl $(obj)/conf
+ 	$(Q)mkdir -p include/generated
+-	$(Q)perl $< $(srctree) $(Kconfig) $(LSMOD_F) > .tmp.config
++	$(Q)perl $< $(srctree) $(Kconfig) > .tmp.config
+ 	$(Q)sed -i s/=m/=y/ .tmp.config
+ 	$(Q)if [ -f .config ]; then					\
+ 			cmp -s .tmp.config .config ||			\
+diff --git a/scripts/kconfig/streamline_config.pl b/scripts/kconfig/streamline_config.pl
+index a4fe923..ae34d20 100644
+--- a/scripts/kconfig/streamline_config.pl
++++ b/scripts/kconfig/streamline_config.pl
+@@ -115,7 +115,7 @@ find_config;
+ # Get the build source and top level Kconfig file (passed in)
+ my $ksource = $ARGV[0];
+ my $kconfig = $ARGV[1];
+-my $lsmod_file = $ARGV[2];
++my $lsmod_file = $ENV{'LSMOD'};
+ 
+ my @makefiles = `find $ksource -name Makefile 2>/dev/null`;
+ chomp @makefiles;
+@@ -296,7 +296,11 @@ my %modules;
+ 
+ if (defined($lsmod_file)) {
+     if ( ! -f $lsmod_file) {
+-	die "$lsmod_file not found";
++	if ( -f $ENV{'objtree'}."/".$lsmod_file) {
++	    $lsmod_file = $ENV{'objtree'}."/".$lsmod_file;
++	} else {
++		die "$lsmod_file not found";
++	}
+     }
+     if ( -x $lsmod_file) {
+ 	# the file is executable, run it
+-- 
+1.7.6.153.g78432
 
- - Arnaud
-
-> ---
->  scripts/kconfig/confdata.c |   10 ++++++++++
->  1 files changed, 10 insertions(+), 0 deletions(-)
->
-> diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
-> index 5a58965..7b1bbb8 100644
-> --- a/scripts/kconfig/confdata.c
-> +++ b/scripts/kconfig/confdata.c
-> @@ -828,6 +828,8 @@ static int conf_split_config(void)
->        if (chdir("include/config"))
->                return 1;
->
-> +       setlocale(LC_ALL, "C");
-> +
->        res = 0;
->        for_all_symbols(i, sym) {
->                sym_calc_value(sym);
-> @@ -918,6 +920,9 @@ static int conf_split_config(void)
->                }
->                close(fd);
->        }
-> +
-> +       setlocale(LC_ALL, "");
-> +
->  out:
->        if (chdir("../.."))
->                return 1;
-> @@ -956,6 +961,8 @@ int conf_write_autoconf(void)
->                return 1;
->        }
->
-> +       setlocale(LC_ALL, "C");
-> +
->        conf_write_heading(out, &kconfig_printer_cb, NULL);
->
->        conf_write_heading(tristate, &tristate_printer_cb, NULL);
-> @@ -979,6 +986,9 @@ int conf_write_autoconf(void)
->
->                conf_write_symbol(out_h, sym, &header_printer_cb, NULL);
->        }
-> +
-> +       setlocale(LC_ALL, "");
-> +
->        fclose(out);
->        fclose(tristate);
->        fclose(out_h);
-> --
-> 1.7.6.153.g78432
->
->
