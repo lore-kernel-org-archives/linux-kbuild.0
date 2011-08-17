@@ -1,55 +1,68 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from hrndva-omtalb.mail.rr.com ([71.74.56.122]:48438 "EHLO
-	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751500Ab1HPUQn (ORCPT
+Received: from e23smtp03.au.ibm.com ([202.81.31.145]:49705 "EHLO
+	e23smtp03.au.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752167Ab1HQG0H (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 16 Aug 2011 16:16:43 -0400
-Subject: Re: [PATCH 1/3] kconfig/streamline_config.pl: directly access
- LSMOD from the environment
-From: Steven Rostedt <rostedt@goodmis.org>
-In-Reply-To: <CACqU3MXuF8J7088XpfMu4gBeBgSKqrKLz-1pVKA295UidKfDNQ@mail.gmail.com>
-References: <1313472233-14094-1-git-send-email-lacombar@gmail.com>
-	 <1313508664.15704.28.camel@gandalf.stny.rr.com>
-	 <CACqU3MXuF8J7088XpfMu4gBeBgSKqrKLz-1pVKA295UidKfDNQ@mail.gmail.com>
-Content-Type: text/plain; charset="ISO-8859-15"
-Date: Tue, 16 Aug 2011 16:16:40 -0400
-Message-ID: <1313525801.15704.29.camel@gandalf.stny.rr.com>
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+	Wed, 17 Aug 2011 02:26:07 -0400
+Received: from d23relay03.au.ibm.com (d23relay03.au.ibm.com [202.81.31.245])
+	by e23smtp03.au.ibm.com (8.14.4/8.13.1) with ESMTP id p7H6Kc6m025795
+	for <linux-kbuild@vger.kernel.org>; Wed, 17 Aug 2011 16:20:38 +1000
+Received: from d23av03.au.ibm.com (d23av03.au.ibm.com [9.190.234.97])
+	by d23relay03.au.ibm.com (8.13.8/8.13.8/NCO v10.0) with ESMTP id p7H6Pwmo1278022
+	for <linux-kbuild@vger.kernel.org>; Wed, 17 Aug 2011 16:25:58 +1000
+Received: from d23av03.au.ibm.com (loopback [127.0.0.1])
+	by d23av03.au.ibm.com (8.14.4/8.13.1/NCO v10.0 AVout) with ESMTP id p7H6Pvmh018699
+	for <linux-kbuild@vger.kernel.org>; Wed, 17 Aug 2011 16:25:57 +1000
+From: "Ian Munsie" <imunsie@au1.ibm.com>
+Subject: [PATCH] tags, powerpc: Update tags.sh to support _GLOBAL symbols
+Date: Wed, 17 Aug 2011 16:25:47 +1000
+Message-Id: <1313562347-20099-1-git-send-email-imunsie@au1.ibm.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnaud Lacombe <lacombar@gmail.com>
-Cc: linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>
+To: Benjamin Herrenschmidt <benh@kernel.crashing.org>, linuxppc-dev@lists.ozlabs.org, Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org, Ian Munsie <imunsie@au1.ibm.com>
 
-On Tue, 2011-08-16 at 11:44 -0400, Arnaud Lacombe wrote:
-> Hi,
-> 
-> On Tue, Aug 16, 2011 at 11:31 AM, Steven Rostedt <rostedt@goodmis.org> wrote:
-> > On Tue, 2011-08-16 at 01:23 -0400, Arnaud Lacombe wrote:
-> >> Cc: Steven Rostedt <rostedt@goodmis.org>
-> >> Signed-off-by: Arnaud Lacombe <lacombar@gmail.com>
-> >> ---
-> >>  scripts/kconfig/Makefile             |   12 ++----------
-> >>  scripts/kconfig/streamline_config.pl |    8 ++++++--
-> >>  2 files changed, 8 insertions(+), 12 deletions(-)
-> >
-> > Hi Arnaud,
-> >
-> > I like these versions better. Yeah, using the LSMOD environment is the
-> > better way to go.
-> >
-> > I'll do some tests on them and then push them up.
-> >
-> If you ACK them, I think this would be better if they go through the
-> kconfig tree. I have other patches pending touching
-> `scripts/kconfig/Makefile' which might create conflicts.
+From: Ian Munsie <imunsie@au1.ibm.com>
 
-Fine with me. You can add my:
+On PowerPC we use _GLOBAL throughout the assembly to define symbols, but
+currently these symbols are missing from the tags generated with
+ARCH=powerpc make tags. This patch modifies the tags.sh script to
+recognise _GLOBAL(.*) so that these symbols will be in the tags.
 
-Acked-by: Steven Rostedt <rostedt@goodmis.org>
+This is almost (but not quite) PowerPC specific and this change should
+not affect anyone else:
 
-on all three patches.
+$ git grep -E '^_GLOBAL\(([^)]*)\).*' |sed 's/^\([^/]*\/[^/]*\)\/.*$/\1/'|uniq -c
+    627 arch/powerpc
+      2 arch/um
 
--- Steve
+Signed-off-by: Ian Munsie <imunsie@au1.ibm.com>
+---
+ scripts/tags.sh |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
 
+diff --git a/scripts/tags.sh b/scripts/tags.sh
+index 75c5d24f1..38f6617 100755
+--- a/scripts/tags.sh
++++ b/scripts/tags.sh
+@@ -129,7 +129,7 @@ exuberant()
+ 	-I EXPORT_SYMBOL,EXPORT_SYMBOL_GPL                      \
+ 	-I DEFINE_TRACE,EXPORT_TRACEPOINT_SYMBOL,EXPORT_TRACEPOINT_SYMBOL_GPL \
+ 	--extra=+f --c-kinds=+px                                \
+-	--regex-asm='/^ENTRY\(([^)]*)\).*/\1/'                  \
++	--regex-asm='/^(ENTRY|_GLOBAL)\(([^)]*)\).*/\2/'        \
+ 	--regex-c='/^SYSCALL_DEFINE[[:digit:]]?\(([^,)]*).*/sys_\1/' \
+ 	--regex-c++='/^TRACE_EVENT\(([^,)]*).*/trace_\1/'		\
+ 	--regex-c++='/^DEFINE_EVENT\([^,)]*, *([^,)]*).*/trace_\1/'
+@@ -151,7 +151,7 @@ exuberant()
+ emacs()
+ {
+ 	all_sources | xargs $1 -a                               \
+-	--regex='/^ENTRY(\([^)]*\)).*/\1/'                      \
++	--regex='/^(ENTRY|_GLOBAL)(\([^)]*\)).*/\2/'            \
+ 	--regex='/^SYSCALL_DEFINE[0-9]?(\([^,)]*\).*/sys_\1/'   \
+ 	--regex='/^TRACE_EVENT(\([^,)]*\).*/trace_\1/'		\
+ 	--regex='/^DEFINE_EVENT([^,)]*, *\([^,)]*\).*/trace_\1/'
+-- 
+1.7.2.5
 
