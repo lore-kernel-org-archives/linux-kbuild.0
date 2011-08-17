@@ -1,68 +1,32 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from e23smtp03.au.ibm.com ([202.81.31.145]:49705 "EHLO
-	e23smtp03.au.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752167Ab1HQG0H (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 17 Aug 2011 02:26:07 -0400
-Received: from d23relay03.au.ibm.com (d23relay03.au.ibm.com [202.81.31.245])
-	by e23smtp03.au.ibm.com (8.14.4/8.13.1) with ESMTP id p7H6Kc6m025795
-	for <linux-kbuild@vger.kernel.org>; Wed, 17 Aug 2011 16:20:38 +1000
-Received: from d23av03.au.ibm.com (d23av03.au.ibm.com [9.190.234.97])
-	by d23relay03.au.ibm.com (8.13.8/8.13.8/NCO v10.0) with ESMTP id p7H6Pwmo1278022
-	for <linux-kbuild@vger.kernel.org>; Wed, 17 Aug 2011 16:25:58 +1000
-Received: from d23av03.au.ibm.com (loopback [127.0.0.1])
-	by d23av03.au.ibm.com (8.14.4/8.13.1/NCO v10.0 AVout) with ESMTP id p7H6Pvmh018699
-	for <linux-kbuild@vger.kernel.org>; Wed, 17 Aug 2011 16:25:57 +1000
-From: "Ian Munsie" <imunsie@au1.ibm.com>
-Subject: [PATCH] tags, powerpc: Update tags.sh to support _GLOBAL symbols
-Date: Wed, 17 Aug 2011 16:25:47 +1000
-Message-Id: <1313562347-20099-1-git-send-email-imunsie@au1.ibm.com>
+Received: from mx1.redhat.com ([209.132.183.28]:1397 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751363Ab1HQHLm (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 17 Aug 2011 03:11:42 -0400
+From: Amerigo Wang <amwang@redhat.com>
+Subject: [Patch] makefile: remove a duplicated line
+Date: Wed, 17 Aug 2011 15:10:52 +0800
+Message-Id: <1313565052-7293-1-git-send-email-amwang@redhat.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Benjamin Herrenschmidt <benh@kernel.crashing.org>, linuxppc-dev@lists.ozlabs.org, Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org, Ian Munsie <imunsie@au1.ibm.com>
+To: linux-kernel@vger.kernel.org
+Cc: akpm@linux-foundation.org, WANG Cong <xiyou.wangcong@gmail.com>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
 
-From: Ian Munsie <imunsie@au1.ibm.com>
+There are two duplicated lines for 'make RECORDMCOUNT_WARN=1 [targets]'
+in 'make help', remove the second one.
 
-On PowerPC we use _GLOBAL throughout the assembly to define symbols, but
-currently these symbols are missing from the tags generated with
-ARCH=powerpc make tags. This patch modifies the tags.sh script to
-recognise _GLOBAL(.*) so that these symbols will be in the tags.
+Signed-off-by: WANG Cong <xiyou.wangcong@gmail.com>
 
-This is almost (but not quite) PowerPC specific and this change should
-not affect anyone else:
-
-$ git grep -E '^_GLOBAL\(([^)]*)\).*' |sed 's/^\([^/]*\/[^/]*\)\/.*$/\1/'|uniq -c
-    627 arch/powerpc
-      2 arch/um
-
-Signed-off-by: Ian Munsie <imunsie@au1.ibm.com>
 ---
- scripts/tags.sh |    4 ++--
- 1 files changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/scripts/tags.sh b/scripts/tags.sh
-index 75c5d24f1..38f6617 100755
---- a/scripts/tags.sh
-+++ b/scripts/tags.sh
-@@ -129,7 +129,7 @@ exuberant()
- 	-I EXPORT_SYMBOL,EXPORT_SYMBOL_GPL                      \
- 	-I DEFINE_TRACE,EXPORT_TRACEPOINT_SYMBOL,EXPORT_TRACEPOINT_SYMBOL_GPL \
- 	--extra=+f --c-kinds=+px                                \
--	--regex-asm='/^ENTRY\(([^)]*)\).*/\1/'                  \
-+	--regex-asm='/^(ENTRY|_GLOBAL)\(([^)]*)\).*/\2/'        \
- 	--regex-c='/^SYSCALL_DEFINE[[:digit:]]?\(([^,)]*).*/sys_\1/' \
- 	--regex-c++='/^TRACE_EVENT\(([^,)]*).*/trace_\1/'		\
- 	--regex-c++='/^DEFINE_EVENT\([^,)]*, *([^,)]*).*/trace_\1/'
-@@ -151,7 +151,7 @@ exuberant()
- emacs()
- {
- 	all_sources | xargs $1 -a                               \
--	--regex='/^ENTRY(\([^)]*\)).*/\1/'                      \
-+	--regex='/^(ENTRY|_GLOBAL)(\([^)]*\)).*/\2/'            \
- 	--regex='/^SYSCALL_DEFINE[0-9]?(\([^,)]*\).*/sys_\1/'   \
- 	--regex='/^TRACE_EVENT(\([^,)]*\).*/trace_\1/'		\
- 	--regex='/^DEFINE_EVENT([^,)]*, *\([^,)]*\).*/trace_\1/'
--- 
-1.7.2.5
-
+diff --git a/Makefile b/Makefile
+index 3241d41..b7a08ae 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1296,7 +1296,6 @@ help:
+ 	@echo  '		2: warnings which occur quite often but may still be relevant'
+ 	@echo  '		3: more obscure warnings, can most likely be ignored'
+ 	@echo  '		Multiple levels can be combined with W=12 or W=123'
+-	@echo  '  make RECORDMCOUNT_WARN=1 [targets] Warn about ignored mcount sections'
+ 	@echo  ''
+ 	@echo  'Execute "make" or "make all" to build all targets marked with [*] '
+ 	@echo  'For further info see the ./README file'
