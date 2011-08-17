@@ -1,32 +1,64 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:1397 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751363Ab1HQHLm (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 17 Aug 2011 03:11:42 -0400
-From: Amerigo Wang <amwang@redhat.com>
-Subject: [Patch] makefile: remove a duplicated line
-Date: Wed, 17 Aug 2011 15:10:52 +0800
-Message-Id: <1313565052-7293-1-git-send-email-amwang@redhat.com>
+Received: from mail-pz0-f42.google.com ([209.85.210.42]:53837 "EHLO
+	mail-pz0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754334Ab1HQXsU convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 17 Aug 2011 19:48:20 -0400
+Received: by pzk37 with SMTP id 37so1940912pzk.1
+        for <linux-kbuild@vger.kernel.org>; Wed, 17 Aug 2011 16:48:19 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <1313525801.15704.29.camel@gandalf.stny.rr.com>
+References: <1313472233-14094-1-git-send-email-lacombar@gmail.com>
+	<1313508664.15704.28.camel@gandalf.stny.rr.com>
+	<CACqU3MXuF8J7088XpfMu4gBeBgSKqrKLz-1pVKA295UidKfDNQ@mail.gmail.com>
+	<1313525801.15704.29.camel@gandalf.stny.rr.com>
+Date: Wed, 17 Aug 2011 19:48:19 -0400
+Message-ID: <CACqU3MWTpwgjm0M0nRdkK0tAVQKrrtKv2Vh2GG71kKEVaWSWVQ@mail.gmail.com>
+Subject: Re: [PATCH 1/3] kconfig/streamline_config.pl: directly access LSMOD
+ from the environment
+From: Arnaud Lacombe <lacombar@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: akpm@linux-foundation.org, WANG Cong <xiyou.wangcong@gmail.com>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org, Steven Rostedt <rostedt@goodmis.org>
 
-There are two duplicated lines for 'make RECORDMCOUNT_WARN=1 [targets]'
-in 'make help', remove the second one.
+Hi Michal,
 
-Signed-off-by: WANG Cong <xiyou.wangcong@gmail.com>
+On Tue, Aug 16, 2011 at 4:16 PM, Steven Rostedt <rostedt@goodmis.org> wrote:
+> On Tue, 2011-08-16 at 11:44 -0400, Arnaud Lacombe wrote:
+>> Hi,
+>>
+>> On Tue, Aug 16, 2011 at 11:31 AM, Steven Rostedt <rostedt@goodmis.org> wrote:
+>> > On Tue, 2011-08-16 at 01:23 -0400, Arnaud Lacombe wrote:
+>> >> Cc: Steven Rostedt <rostedt@goodmis.org>
+>> >> Signed-off-by: Arnaud Lacombe <lacombar@gmail.com>
+>> >> ---
+>> >>  scripts/kconfig/Makefile             |   12 ++----------
+>> >>  scripts/kconfig/streamline_config.pl |    8 ++++++--
+>> >>  2 files changed, 8 insertions(+), 12 deletions(-)
+>> >
+>> > Hi Arnaud,
+>> >
+>> > I like these versions better. Yeah, using the LSMOD environment is the
+>> > better way to go.
+>> >
+>> > I'll do some tests on them and then push them up.
+>> >
+>> If you ACK them, I think this would be better if they go through the
+>> kconfig tree. I have other patches pending touching
+>> `scripts/kconfig/Makefile' which might create conflicts.
+>
+> Fine with me. You can add my:
+>
+> Acked-by: Steven Rostedt <rostedt@goodmis.org>
+>
+> on all three patches.
+>
+If you want, you can directly pull the patches from the git repository at:
 
----
-diff --git a/Makefile b/Makefile
-index 3241d41..b7a08ae 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1296,7 +1296,6 @@ help:
- 	@echo  '		2: warnings which occur quite often but may still be relevant'
- 	@echo  '		3: more obscure warnings, can most likely be ignored'
- 	@echo  '		Multiple levels can be combined with W=12 or W=123'
--	@echo  '  make RECORDMCOUNT_WARN=1 [targets] Warn about ignored mcount sections'
- 	@echo  ''
- 	@echo  'Execute "make" or "make all" to build all targets marked with [*] '
- 	@echo  'For further info see the ./README file'
+ git@github.com:lacombar/linux-2.6.git master/kconfig-localmodconfig
+
+Thanks
+ - Arnaud
