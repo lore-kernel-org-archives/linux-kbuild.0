@@ -1,76 +1,55 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from relais.videotron.ca ([24.201.245.36]:38645 "EHLO
-	relais.videotron.ca" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754918Ab1HRDoC (ORCPT
+Received: from mail-iy0-f170.google.com ([209.85.210.170]:35639 "EHLO
+	mail-iy0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755406Ab1HRKKk convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 17 Aug 2011 23:44:02 -0400
-MIME-version: 1.0
-Content-type: multipart/mixed; boundary="Boundary_(ID_SsnLIw92Rj/SQ+8jy81SMA)"
-Date: Wed, 17 Aug 2011 23:44:01 -0400 (EDT)
-From: Nicolas Pitre <nico@fluxnic.net>
-Subject: Re: [PATCH] ARM: zImage: Skip relinking if nothing changes
-In-reply-to: <CACqU3MXtcg_8si9WiuZngMB2C977PS4zen8_cQ9oyNtwTbt75Q@mail.gmail.com>
-Message-id: <alpine.LFD.2.00.1108172339270.20358@xanadu.home>
-References: <4E457682.5020107@codeaurora.org>
- <1313175602-21834-1-git-send-email-sboyd@codeaurora.org>
- <CACqU3MUq5M-XPOxV=8GKyEzjEzpmdeaF+mGrXJrK+ZZxa4SdeQ@mail.gmail.com>
- <CACqU3MXtcg_8si9WiuZngMB2C977PS4zen8_cQ9oyNtwTbt75Q@mail.gmail.com>
+	Thu, 18 Aug 2011 06:10:40 -0400
+MIME-Version: 1.0
+In-Reply-To: <20110815183358.GA31530@merkur.ravnborg.org>
+References: <20110815160440.6296.95762.stgit@mj>
+	<20110815183358.GA31530@merkur.ravnborg.org>
+Date: Thu, 18 Aug 2011 18:10:40 +0800
+Message-ID: <CAM_iQpVYiKYkNFLfL3r5S4PLKZsH2g=0rra-sxuQXSz+34CEag@mail.gmail.com>
+Subject: Re: [PATCH] sparse: always enable endian checks
+From: =?UTF-8?Q?Am=C3=A9rico_Wang?= <xiyou.wangcong@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnaud Lacombe <lacombar@gmail.com>
-Cc: Stephen Boyd <sboyd@codeaurora.org>, Sam Ravnborg <sam@ravnborg.org>, lkml <linux-kernel@vger.kernel.org>, linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: Pavel Roskin <proski@gnu.org>, Michal Marek <mmarek@suse.cz>, linux-kbuild <linux-kbuild@vger.kernel.org>, linux-kernel@vger.kernel.org
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
+On Tue, Aug 16, 2011 at 2:33 AM, Sam Ravnborg <sam@ravnborg.org> wrote:
+> On Mon, Aug 15, 2011 at 12:04:41PM -0400, Pavel Roskin wrote:
+>> Checks enabled by __CHECK_ENDIAN__ produce less than a half of the
+>> sparse warnings. Â For instance, the allyesconfig configuration on
+>> linux-next (tag next-20110812) produces on x86_64:
+>>
+>> Â  Â  Â  Â  Â  Â  Â  Â  Â no __CHECK_ENDIAN__ Â  with __CHECK_ENDIAN__
+>> stderr bytes: Â  Â 1155037 Â  Â  Â  Â  Â  Â  Â  1992954 (73% increase)
+>> stderr lines: Â  Â 10716 Â  Â  Â  Â  Â  Â  Â  Â  18657 Â  (74% increase)
+>> affected files: Â 1191 Â  Â  Â  Â  Â  Â  Â  Â  Â 1458 Â  Â (22% increase)
+>>
+>> It is no longer true that __CHECK_ENDIAN__ produces so many warnings
+>> that other sparse warnings drown in the noise.
+>>
+>> Janitors going through the whole tree are already prepared to search for
+>> the warnings they want to fix.
+>>
+>> The main point of this patch is to make sure that developers of a
+>> particular driver who use sparse rarely get all the warnings for their
+>> code even if they forget to specify __CHECK_ENDIAN__ or mistype it.
+>>
+>> Some developers actually added __CHECK_ENDIAN__ to the driver makefiles
+>> so they don't forget to use it. Â Remove them now.
+>>
+>> Remove all references to __CHECK_ENDIAN__ from the documentation except
+>> the Chinese version, which would need to be updated separately.
+>>
+>> Signed-off-by: Pavel Roskin <proski@gnu.org>
+> Acked-by: Sam Ravnborg <sam@ravnborg.org>
+>
+> Maybe ask Michal to merge it?
+>
 
---Boundary_(ID_SsnLIw92Rj/SQ+8jy81SMA)
-Content-type: TEXT/PLAIN; charset=ISO-8859-1
-Content-transfer-encoding: 8BIT
-
-On Fri, 12 Aug 2011, Arnaud Lacombe wrote:
-> On Fri, Aug 12, 2011 at 4:48 PM, Arnaud Lacombe <lacombar@gmail.com> wrote:
-> > On Fri, Aug 12, 2011 at 3:00 PM, Stephen Boyd <sboyd@codeaurora.org> wrote:
-> >> diff --git a/arch/arm/boot/compressed/Makefile b/arch/arm/boot/compressed/Makefile
-> >> index 0c74a6f..937fd26 100644
-> >> --- a/arch/arm/boot/compressed/Makefile
-> >> +++ b/arch/arm/boot/compressed/Makefile
-> >> @@ -91,7 +91,7 @@ suffix_$(CONFIG_KERNEL_LZMA) = lzma
-> >>
-> >>  targets       := vmlinux vmlinux.lds \
-> >>                 piggy.$(suffix_y) piggy.$(suffix_y).o \
-> >> -                font.o font.c head.o misc.o $(OBJS)
-> >> +                font.o font.c head.o misc.o lib1funcs.o lib1funcs.S $(OBJS)
-> >>
-> >>  # Make sure files are removed during clean
-> >>  extra-y       += piggy.gzip piggy.lzo piggy.lzma lib1funcs.S
-> >> @@ -121,9 +121,7 @@ LDFLAGS_vmlinux += -X
-> >>  LDFLAGS_vmlinux += -T
-> >>
-> >>  # For __aeabi_uidivmod
-> >> -lib1funcs = $(obj)/lib1funcs.o
-> >> -
-> >> -$(obj)/lib1funcs.S: $(srctree)/arch/$(SRCARCH)/lib/lib1funcs.S FORCE
-> >> +$(obj)/lib1funcs.S: $(srctree)/arch/$(SRCARCH)/lib/lib1funcs.S
-> >>        $(call cmd,shipped)
-> >>
-> > You should be able to avoid the extra copy altogether by doing something ala:
-> >
-> > $(obj)/lib1funcs.o: $(srctree)/arch/arm/lib/lib1funcs.S
-> >        $(call cmd,as_o_S)
-> >
-> > note that I also remove the $(SRCARCH), as there is no other
-> > `arch/*/lib/lib1funcs.S' than `arch/arm/lib/lib1funcs.S'
-> >
-> I withdraw this proposal and will hack around this to find a proper
-> solution from within kbuild, and eventually come back on these uses
-> :-)
-
-Any progress on this?
-
-I have a patch doing multiple similar $(call cmd,shipped) at the moment 
-and this is far from looking nice.
-
-
-Nicolas
-
---Boundary_(ID_SsnLIw92Rj/SQ+8jy81SMA)--
+ping Michal... :)
