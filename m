@@ -1,67 +1,67 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pz0-f42.google.com ([209.85.210.42]:37042 "EHLO
-	mail-pz0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751053Ab1HVPu6 convert rfc822-to-8bit (ORCPT
+Received: from oproxy7-pub.bluehost.com ([67.222.55.9]:56077 "HELO
+	oproxy7-pub.bluehost.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with SMTP id S1753334Ab1HVTx5 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 22 Aug 2011 11:50:58 -0400
-MIME-Version: 1.0
-In-Reply-To: <1313384834-24433-11-git-send-email-lacombar@gmail.com>
-References: <1313384834-24433-1-git-send-email-lacombar@gmail.com>
-	<1313384834-24433-11-git-send-email-lacombar@gmail.com>
-Date: Mon, 22 Aug 2011 11:50:57 -0400
-Message-ID: <CACqU3MWRz1oQgtpvnvYs-Ucy-=EKBOVaHam93+azFQzT68L1dw@mail.gmail.com>
-Subject: Re: [PATCH 10/11] scripts/Makefile.build: do not reference
- EXTRA_CFLAGS as CFLAGS replacement
-From: Arnaud Lacombe <lacombar@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 8BIT
+	Mon, 22 Aug 2011 15:53:57 -0400
+Date: Mon, 22 Aug 2011 12:53:55 -0700
+From: Randy Dunlap <rdunlap@xenotime.net>
+Subject: Re: linux-next: Tree for Aug 22 (evm)
+Message-Id: <20110822125355.bb01d76b.rdunlap@xenotime.net>
+In-Reply-To: <20110822145304.980529cb921e5f1321c622da@canb.auug.org.au>
+References: <20110822145304.980529cb921e5f1321c622da@canb.auug.org.au>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: Arnaud Lacombe <lacombar@gmail.com>, Sam Ravnborg <sam@ravnborg.org>, linux-kbuild@vger.kernel.org
+To: Stephen Rothwell <sfr@canb.auug.org.au>, Mimi Zohar <zohar@us.ibm.com>
+Cc: linux-next@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org
 
-Hi Michal,
+On Mon, 22 Aug 2011 14:53:04 +1000 Stephen Rothwell wrote:
 
-On Mon, Aug 15, 2011 at 1:07 AM, Arnaud Lacombe <lacombar@gmail.com> wrote:
-> Usage of these flags has been deprecated for nearly 4 years by:
->
->    commit f77bf01425b11947eeb3b5b54685212c302741b8
->    Author: Sam Ravnborg <sam@neptun.(none)>
->    Date:   Mon Oct 15 22:25:06 2007 +0200
->
->        kbuild: introduce ccflags-y, asflags-y and ldflags-y
->
-> Moreover, these flags (at least EXTRA_CFLAGS) have been documented for command
-> line use. By default, gmake(1) do not override command line setting, so this is
-> likely to result in build failure or unexpected behavior.
->
-> Do not advertise for its usage.
->
-> Cc: Sam Ravnborg <sam@ravnborg.org>
-> Cc: linux-kbuild@vger.kernel.org
->
-ping ?
+> Hi all,
+> 
+> [The kernel.org mirroring is a bit low today]
 
- - Arnaud
+(on x86_64:)
 
-> ---
->  scripts/Makefile.build |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
->
-> diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-> index a0fd502..d2b366c 100644
-> --- a/scripts/Makefile.build
-> +++ b/scripts/Makefile.build
-> @@ -46,7 +46,7 @@ include $(kbuild-file)
->  # If the save-* variables changed error out
->  ifeq ($(KBUILD_NOPEDANTIC),)
->         ifneq ("$(save-cflags)","$(CFLAGS)")
-> -                $(error CFLAGS was changed in "$(kbuild-file)". Fix it to use EXTRA_CFLAGS)
-> +                $(error CFLAGS was changed in "$(kbuild-file)". Fix it to use ccflags-y)
->         endif
->  endif
->
-> --
-> 1.7.6.153.g78432
->
->
+When CONFIG_EVM=y, CONFIG_CRYPTO_HASH2=m, CONFIG_TRUSTED_KEYS=m,
+CONFIG_ENCRYPTED_KEYS=m, the build fails with:
+
+(.text+0x378aa): undefined reference to `key_type_encrypted'
+evm_crypto.c:(.text+0x37992): undefined reference to `crypto_alloc_shash'
+evm_crypto.c:(.text+0x37a24): undefined reference to `crypto_shash_setkey'
+evm_crypto.c:(.text+0x37ad9): undefined reference to `crypto_shash_update'
+evm_crypto.c:(.text+0x37aeb): undefined reference to `crypto_shash_final'
+(.text+0x37b4b): undefined reference to `crypto_shash_update'
+(.text+0x37c61): undefined reference to `crypto_shash_update'
+(.text+0x37cb9): undefined reference to `crypto_shash_update'
+
+even though EVM (Kconfig) selects ENCRYPTED_KEYS and TRUSTED_KEYS..
+and even after I add "select CRYPTO_HASH2".
+
+Is this because EVM is bool and kconfig is confused about 'select's
+when a bool is selecting tristates?  Shouldn't the tristates become
+'y' instead of 'm' if they are selected by a bool that is 'y'?
+
+
+xconfig shows these symbol values:
+
+Symbol: EVM [=y]
+Type : boolean
+Prompt: EVM support
+Defined at security/integrity/evm/Kconfig:1
+Depends on: SECURITY [=y] && KEYS [=y] && TCG_TPM [=m]
+Location:
+-> Security options
+Selects: CRYPTO_HMAC [=m] && CRYPTO_MD5 [=m] && CRYPTO_SHA1 [=m] && CRYPTO_HASH2 [=m] && ENCRYPTED_KEYS [=m] && TRUSTED_KEYS [=m]
+
+
+Hm, changing TCG_TPM to =y also changes TRUSTED_KEYS and ENCRYPTED_KEYS and
+lots of CRYPTO_ symbols from =m to =y.  There must be some kind of min/max
+symbol checking that is confused?
+
+---
+~Randy
+*** Remember to use Documentation/SubmitChecklist when testing your code ***
