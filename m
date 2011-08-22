@@ -1,40 +1,54 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:55248 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754189Ab1HVIm4 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 22 Aug 2011 04:42:56 -0400
-Message-ID: <4E521688.1000701@redhat.com>
-Date: Mon, 22 Aug 2011 16:42:48 +0800
-From: Cong Wang <amwang@redhat.com>
+Received: from mail-gx0-f174.google.com ([209.85.161.174]:39491 "EHLO
+	mail-gx0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751056Ab1HVPtp convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 22 Aug 2011 11:49:45 -0400
 MIME-Version: 1.0
-Subject: Re: [RFC] Kbuild: allow code re-use across different directories
-References: <1313800642-32418-1-git-send-email-lacombar@gmail.com>
-In-Reply-To: <1313800642-32418-1-git-send-email-lacombar@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <1313472854-14426-1-git-send-email-lacombar@gmail.com>
+References: <1313472854-14426-1-git-send-email-lacombar@gmail.com>
+Date: Mon, 22 Aug 2011 11:49:44 -0400
+Message-ID: <CACqU3MWx9Z+2dWP4OjVO+1T+3EsAE0geZhdRM2_B9osKw-Mw2A@mail.gmail.com>
+Subject: Re: [PATCH 0/4] Kbuild/Kconfig
+From: Arnaud Lacombe <lacombar@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnaud Lacombe <lacombar@gmail.com>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Arnaud Lacombe <lacombar@gmail.com>
 
-äºŽ 2011å¹´08æœˆ20æ—¥ 08:37, Arnaud Lacombe å†™é“:
-> Hi folks,
->
-> The attached patch modify Kbuild to allow to directly re-use code in multiple
-> directory without having to go through a copy. Technically, it changes Kbuild to
-> use by default the VPATH feature of GNU make and provides accessors for Makefile
-> to change it indirectly.
-...
->
-> With the attached patch, we would do:
->
-> arch/foo/boot/Makefile:
-> LDFLAGS_fancy.o := -DPANTS=30
-> obj-y += fancy.o
-> vpath-y += $(srctree)/arch/foo/lib
->
-> and let GNU make do the job.
+Hi,
 
-Just note that don't forget to update Documentation/kbuild/makefiles.txt. ;)
+On Tue, Aug 16, 2011 at 1:34 AM, Arnaud Lacombe <lacombar@gmail.com> wrote:
+> Hi Michal,
+>
+> The following small serie unexpose a few Kconfig variable from Kbuild, and
+> vice-versa. The idea is that Kbuild is a user of Kconfig, not the other way
+> around.
+>
+> In the same time, fix a couple of place where we hardcode the `.config' string.
+>
+> Comments Welcome !
+>  - Arnaud
+>
+ping ?
 
-Thanks.
+ - Arnaud
+
+> Arnaud Lacombe (4):
+>  kbuild: introduce KBUILD_CONFIG; unexpose KCONFIG_CONFIG
+>  kbuild: reduce kbuild invasivity within kconfig
+>  kbuild: do not hardcode .config
+>  kconfig: do not hardcode .config
+>
+>  Makefile                                |   20 ++++++++++++++------
+>  arch/arm/boot/compressed/Makefile       |    2 +-
+>  arch/unicore32/boot/compressed/Makefile |    2 +-
+>  scripts/kconfig/Makefile                |   31 ++++++++++++++++---------------
+>  4 files changed, 32 insertions(+), 23 deletions(-)
+>
+> --
+> 1.7.6.153.g78432
+>
+>
