@@ -1,180 +1,40 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pz0-f42.google.com ([209.85.210.42]:41594 "EHLO
-	mail-pz0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753054Ab1HVGDh convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 22 Aug 2011 02:03:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55248 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754189Ab1HVIm4 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 22 Aug 2011 04:42:56 -0400
+Message-ID: <4E521688.1000701@redhat.com>
+Date: Mon, 22 Aug 2011 16:42:48 +0800
+From: Cong Wang <amwang@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <1313975049.2393.8.camel@offbook>
-References: <1313975049.2393.8.camel@offbook>
-Date: Mon, 22 Aug 2011 02:03:36 -0400
-Message-ID: <CACqU3MVMGSSK_h-epgwzEdmKPeQrrymLmT2gTr8VNZ5Wi9EQ7w@mail.gmail.com>
-Subject: Re: [PATCH v2] kconfig: handle SIGINT in menuconfig
-From: Arnaud Lacombe <lacombar@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 8BIT
+Subject: Re: [RFC] Kbuild: allow code re-use across different directories
+References: <1313800642-32418-1-git-send-email-lacombar@gmail.com>
+In-Reply-To: <1313800642-32418-1-git-send-email-lacombar@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: dave@gnu.org
-Cc: Michal Marek <mmarek@suse.cz>, lkml <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org
+To: Arnaud Lacombe <lacombar@gmail.com>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 
-Hi,
+äºŽ 2011å¹´08æœˆ20æ—¥ 08:37, Arnaud Lacombe å†™é“:
+> Hi folks,
+>
+> The attached patch modify Kbuild to allow to directly re-use code in multiple
+> directory without having to go through a copy. Technically, it changes Kbuild to
+> use by default the VPATH feature of GNU make and provides accessors for Makefile
+> to change it indirectly.
+...
+>
+> With the attached patch, we would do:
+>
+> arch/foo/boot/Makefile:
+> LDFLAGS_fancy.o := -DPANTS=30
+> obj-y += fancy.o
+> vpath-y += $(srctree)/arch/foo/lib
+>
+> and let GNU make do the job.
 
-On Sun, Aug 21, 2011 at 9:04 PM, Davidlohr Bueso <dave@gnu.org> wrote:
-> From: Davidlohr Bueso <dave@gnu.org>
->
-> I recently got bitten in the ass when pressing Ctrl-C and lost all my current configuration changes. This patch captures SIGINT and allows the user to save any changes.
-> Some code refactoring was made in order to handle the exit behavior.
->
-Looks mostly good, I'll give it a try to see if we did not miss corner-case.
+Just note that don't forget to update Documentation/kbuild/makefiles.txt. ;)
 
-> Signed-off-by: Davidlohr Bueso <dave@gnu.org>
-> Signed-off-by: Arnaud Lacombe <lacombar@gmail.com>
-I never S.O.B. anything explicitly, please do not add my signature
-without my consent. That said, here it is:
-
-Signed-off-by: Arnaud Lacombe <lacombar@gmail.com>
-
-:-)
-
-Thanks,
- - Arnaud
-
-> ---
->  scripts/kconfig/mconf.c |   86 ++++++++++++++++++++++++++++------------------
->  1 files changed, 52 insertions(+), 34 deletions(-)
->
-> diff --git a/scripts/kconfig/mconf.c b/scripts/kconfig/mconf.c
-> index 820d2b6..19e200d 100644
-> --- a/scripts/kconfig/mconf.c
-> +++ b/scripts/kconfig/mconf.c
-> @@ -15,6 +15,7 @@
->  #include <stdarg.h>
->  #include <stdlib.h>
->  #include <string.h>
-> +#include <signal.h>
->  #include <unistd.h>
->  #include <locale.h>
->
-> @@ -272,6 +273,7 @@ static struct menu *current_menu;
->  static int child_count;
->  static int single_menu_mode;
->  static int show_all_options;
-> +static int saved_x, saved_y;
->
->  static void conf(struct menu *menu);
->  static void conf_choice(struct menu *menu);
-> @@ -792,9 +794,54 @@ static void conf_save(void)
->        }
->  }
->
-> +static int handle_exit(void)
-> +{
-> +       int res;
-> +
-> +       dialog_clear();
-> +       if (conf_get_changed())
-> +               res = dialog_yesno(NULL,
-> +                                  _("Do you wish to save your new configuration ?\n"
-> +                                    "<ESC><ESC> to continue."),
-> +                                  6, 60);
-> +       else
-> +               res = -1;
-> +
-> +       end_dialog(saved_x, saved_y);
-> +
-> +       switch (res) {
-> +       case 0:
-> +               if (conf_write(filename)) {
-> +                       fprintf(stderr, _("\n\n"
-> +                                         "Error while writing of the configuration.\n"
-> +                                         "Your configuration changes were NOT saved."
-> +                                         "\n\n"));
-> +                       return 1;
-> +               }
-> +               /* fall through */
-> +       case -1:
-> +               printf(_("\n\n"
-> +                        "*** End of the configuration.\n"
-> +                        "*** Execute 'make' to start the build or try 'make help'."
-> +                        "\n\n"));
-> +               res = 0;
-> +               break;
-> +       default:
-> +               fprintf(stderr, _("\n\n"
-> +                                 "Your configuration changes were NOT saved."
-> +                                 "\n\n"));
-> +       }
-> +
-> +       return res;
-> +}
-> +
-> +static void sig_handler(int signo)
-> +{
-> +       exit(handle_exit());
-> +}
-> +
->  int main(int ac, char **av)
->  {
-> -       int saved_x, saved_y;
->        char *mode;
->        int res;
->
-> @@ -802,6 +849,8 @@ int main(int ac, char **av)
->        bindtextdomain(PACKAGE, LOCALEDIR);
->        textdomain(PACKAGE);
->
-> +       signal(SIGINT, sig_handler);
-> +
->        conf_parse(av[1]);
->        conf_read(NULL);
->
-> @@ -823,40 +872,9 @@ int main(int ac, char **av)
->        set_config_filename(conf_get_configname());
->        do {
->                conf(&rootmenu);
-> -               dialog_clear();
-> -               if (conf_get_changed())
-> -                       res = dialog_yesno(NULL,
-> -                                          _("Do you wish to save your "
-> -                                            "new configuration?\n"
-> -                                            "<ESC><ESC> to continue."),
-> -                                          6, 60);
-> -               else
-> -                       res = -1;
-> +               res = handle_exit();
->        } while (res == KEY_ESC);
-> -       end_dialog(saved_x, saved_y);
-> -
-> -       switch (res) {
-> -       case 0:
-> -               if (conf_write(filename)) {
-> -                       fprintf(stderr, _("\n\n"
-> -                               "Error while writing of the configuration.\n"
-> -                               "Your configuration changes were NOT saved."
-> -                               "\n\n"));
-> -                       return 1;
-> -               }
-> -               /* fall through */
-> -       case -1:
-> -               printf(_("\n\n"
-> -                       "*** End of the configuration.\n"
-> -                       "*** Execute 'make' to start the build or try 'make help'."
-> -                       "\n\n"));
-> -               break;
-> -       default:
-> -               fprintf(stderr, _("\n\n"
-> -                       "Your configuration changes were NOT saved."
-> -                       "\n\n"));
-> -       }
->
-> -       return 0;
-> +       return res;
->  }
->
-> --
-> 1.7.4.1
->
->
->
->
+Thanks.
