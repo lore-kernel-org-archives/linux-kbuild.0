@@ -1,15 +1,15 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pz0-f42.google.com ([209.85.210.42]:52602 "EHLO
-	mail-pz0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752588Ab1HVUSB convert rfc822-to-8bit (ORCPT
+Received: from mail-yw0-f46.google.com ([209.85.213.46]:55724 "EHLO
+	mail-yw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754567Ab1HWArC convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 22 Aug 2011 16:18:01 -0400
+	Mon, 22 Aug 2011 20:47:02 -0400
 MIME-Version: 1.0
 In-Reply-To: <20110822125355.bb01d76b.rdunlap@xenotime.net>
 References: <20110822145304.980529cb921e5f1321c622da@canb.auug.org.au>
 	<20110822125355.bb01d76b.rdunlap@xenotime.net>
-Date: Mon, 22 Aug 2011 16:18:00 -0400
-Message-ID: <CACqU3MVRvGJTRwSmvimGi-js=CvS9Uyq6K7cA8+6vfH1tdnS6Q@mail.gmail.com>
+Date: Mon, 22 Aug 2011 20:47:00 -0400
+Message-ID: <CACqU3MVjg60pTPyNWm+41w144QzPgtHQ4wZPUUV=vok8gGffuQ@mail.gmail.com>
 Subject: Re: linux-next: Tree for Aug 22 (evm)
 From: Arnaud Lacombe <lacombar@gmail.com>
 Content-Type: text/plain; charset=ISO-8859-1
@@ -33,6 +33,26 @@ On Mon, Aug 22, 2011 at 3:53 PM, Randy Dunlap <rdunlap@xenotime.net> wrote:
 > When CONFIG_EVM=y, CONFIG_CRYPTO_HASH2=m, CONFIG_TRUSTED_KEYS=m,
 > CONFIG_ENCRYPTED_KEYS=m, the build fails with:
 >
+You did not provide the value of CONFIG_TCG_TPM, I'll assume it was
+'m'. That said, correct me if I'm wrong, but we currently have:
+
+menuconfig TCG_TPM
+        tristate "TPM Hardware Support"
+
+[...]
+
+config EVM
+        boolean "EVM support"
+        depends on SECURITY && KEYS && TCG_TPM
+
+which seems terribly broken to me... How can you have a built-in
+feature, which depends on another potentially-not-built-in feature ?
+
+If you change EVM to 'tristate', you will see that you are not allowed
+to make it built-in if TCG_TPM is not built-in.
+
+ - Arnaud
+
 > (.text+0x378aa): undefined reference to `key_type_encrypted'
 > evm_crypto.c:(.text+0x37992): undefined reference to `crypto_alloc_shash'
 > evm_crypto.c:(.text+0x37a24): undefined reference to `crypto_shash_setkey'
@@ -49,54 +69,6 @@ On Mon, Aug 22, 2011 at 3:53 PM, Randy Dunlap <rdunlap@xenotime.net> wrote:
 > when a bool is selecting tristates?  Shouldn't the tristates become
 > 'y' instead of 'm' if they are selected by a bool that is 'y'?
 >
-hum, I'd say that it should:
-
-% cat Kconfig
-config MOD
-        bool
-        default y
-        option modules
-
-config B
-        tristate "B"
-        default m
-
-config A
-        tristate "A"
-        default y
-        select B
-
-% make alldefconfig
-scripts/kconfig/conf --alldefconfig Kconfig
-#
-# configuration written to .config
-#
-
-% cat .config
-#
-# Automatically generated file; DO NOT EDIT.
-# Linux Kernel Configuration
-#
-CONFIG_MOD=y
-CONFIG_B=y
-CONFIG_A=y
-
-now, if A defaults to 'm', we have:
-
-% cat .config
-#
-# Automatically generated file; DO NOT EDIT.
-# Linux Kernel Configuration
-#
-CONFIG_MOD=y
-CONFIG_B=m
-CONFIG_A=m
-
-Could you please produce a reduced testcase showing the problem ?
-
-Thanks,
- - Arnaud
-
 >
 > xconfig shows these symbol values:
 >
@@ -114,6 +86,9 @@ Thanks,
 > lots of CRYPTO_ symbols from =m to =y.  There must be some kind of min/max
 > symbol checking that is confused?
 >
+there is definitively an underlying min/max, but I would not point
+finger too fast.
+
 > ---
 > ~Randy
 > *** Remember to use Documentation/SubmitChecklist when testing your code ***
