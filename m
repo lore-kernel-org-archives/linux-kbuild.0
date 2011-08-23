@@ -1,9 +1,9 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-yw0-f46.google.com ([209.85.213.46]:37255 "EHLO
-	mail-yw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750863Ab1HWCYk convert rfc822-to-8bit (ORCPT
+Received: from mail-pz0-f42.google.com ([209.85.210.42]:36360 "EHLO
+	mail-pz0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751848Ab1HWCcl convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 22 Aug 2011 22:24:40 -0400
+	Mon, 22 Aug 2011 22:32:41 -0400
 MIME-Version: 1.0
 In-Reply-To: <1314065358.3225.44.camel@localhost.localdomain>
 References: <20110822145304.980529cb921e5f1321c622da@canb.auug.org.au>
@@ -11,8 +11,8 @@ References: <20110822145304.980529cb921e5f1321c622da@canb.auug.org.au>
 	<CACqU3MVjg60pTPyNWm+41w144QzPgtHQ4wZPUUV=vok8gGffuQ@mail.gmail.com>
 	<20110822174958.73dd96c7.rdunlap@xenotime.net>
 	<1314065358.3225.44.camel@localhost.localdomain>
-Date: Mon, 22 Aug 2011 22:24:38 -0400
-Message-ID: <CACqU3MV-MfWxvVebcxiJK8BmxHG8epf=0bpsL7qoska65aVzSw@mail.gmail.com>
+Date: Mon, 22 Aug 2011 22:32:39 -0400
+Message-ID: <CACqU3MVxmHJ6p8gvMWjoMbZddeuGEv7bazdg3MSH=RfM5jeHGQ@mail.gmail.com>
 Subject: Re: linux-next: Tree for Aug 22 (evm)
 From: Arnaud Lacombe <lacombar@gmail.com>
 Content-Type: text/plain; charset=ISO-8859-1
@@ -65,8 +65,12 @@ On Mon, Aug 22, 2011 at 10:09 PM, Mimi Zohar <zohar@linux.vnet.ibm.com> wrote:
 > not requiring it to be built-in.  EVM, a new use case, requires it to be
 > built-in.
 >
-What behavior is expected when TPM is built as a module ? Would you
-expect EVM to be accessible ?
+sorry, I think I misunderstood that last sentence. I assumed the 'it'
+was referring to EVM, while taken in context with the previous
+sentence, it might as well refers to TPM, in which case you want EVM
+to 'depends on TCG_TPM = y'.
+
+ - Arnaud
 
 >> > If you change EVM to 'tristate', you will see that you are not allowed
 >> > to make it built-in if TCG_TPM is not built-in.
@@ -78,18 +82,6 @@ expect EVM to be accessible ?
 > the tristates to built-in.  The tristate/boolean mismatches aren't
 > corrected, when .config is edited directly.
 >
-well, ... no. 'xconfig' would seem to let you think they have been
-changed to 'y', but they have not. I have been able to generate a bad
-configuration (TPM module, EVM built-in) using only {menu,x}config.
-
-btw, I never edit the configuration manually, there is a big fat "DO
-NOT EDIT" header in the beginning.
-
-Depending on what you expect, one way to fix that is to make EVM
-depends on TCG_TPM = y, not just TCG_TPM.
-
- - Arnaud
-
 > Mimi
 >
 >> >  - Arnaud
