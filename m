@@ -1,13 +1,12 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from merlin.infradead.org ([205.233.59.134]:48217 "EHLO
+Received: from merlin.infradead.org ([205.233.59.134]:44687 "EHLO
 	merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753760Ab1H2Rut convert rfc822-to-8bit (ORCPT
+	with ESMTP id S1753808Ab1H2SJo convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 29 Aug 2011 13:50:49 -0400
+	Mon, 29 Aug 2011 14:09:44 -0400
 Subject: Re: Kernel almost hangs when CONFIG_DRM_RADEON=y
 From: Peter Zijlstra <peterz@infradead.org>
-Date: Mon, 29 Aug 2011 19:50:34 +0200
-In-Reply-To: <20110829171750.GD2025@gere.osrc.amd.com>
+Date: Mon, 29 Aug 2011 20:09:32 +0200
 References: <20110829141612.GB2025@gere.osrc.amd.com>
 	 <1790021880.1347470.1314632844694.JavaMail.root@zmail02.collab.prod.int.phx2.redhat.com>
 	 <20110829155501.GC2025@gere.osrc.amd.com>
@@ -15,38 +14,44 @@ References: <20110829141612.GB2025@gere.osrc.amd.com>
 	 <20110829171750.GD2025@gere.osrc.amd.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8BIT
-Message-ID: <1314640234.2816.118.camel@twins>
+Message-ID: <1314641372.2816.131.camel@twins>
 Mime-Version: 1.0
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Borislav Petkov <bp@alien8.de>
 Cc: Arnaud Lacombe <lacombar@gmail.com>, David Airlie <airlied@redhat.com>, Michel =?ISO-8859-1?Q?D=E4nzer?= <michel@daenzer.net>, linux-kernel <linux-kernel@vger.kernel.org>, dri-devel@lists.freedesktop.org, Pavel Ivanov <paivanof@gmail.com>, Alex Deucher <alexdeucher@gmail.com>, Dave Airlie <airlied@gmail.com>, linux-kbuild@vger.kernel.org
 
-On Mon, 2011-08-29 at 19:17 +0200, Borislav Petkov wrote:
-> On Mon, Aug 29, 2011 at 12:10:45PM -0400, Arnaud Lacombe wrote:
-> > do you want something ala:
+On Mon, 2011-08-29 at 19:50 +0200, Peter Zijlstra wrote:
+> On Mon, 2011-08-29 at 19:17 +0200, Borislav Petkov wrote:
+> > On Mon, Aug 29, 2011 at 12:10:45PM -0400, Arnaud Lacombe wrote:
+> > > do you want something ala:
+> > > 
+> > > config EXTRA_FIRMWARE
+> > >     string
+> > >     default ""
+> > >     append "FOO" if BAR
+> > >     append "FOZ" if BAZ
+> > > 
+> > > or maybe a new type "list" which would behave as a comma/space separated value.
+> > > 
+> > > config EXTRA_FIRMWARE
+> > >     list "bla"
+> > >     append "FOO" if BAR
+> > >     append "FOZ" if BAZ
 > > 
-> > config EXTRA_FIRMWARE
-> >     string
-> >     default ""
-> >     append "FOO" if BAR
-> >     append "FOZ" if BAZ
-> > 
-> > or maybe a new type "list" which would behave as a comma/space separated value.
-> > 
-> > config EXTRA_FIRMWARE
-> >     list "bla"
-> >     append "FOO" if BAR
-> >     append "FOZ" if BAZ
+> > Yeah, actually Kyle's note (http://lkml.org/lkml/2011/8/29/289) makes
+> > much more sense for linux and the whole firmware in the kernel deal.
+> > So it looks like the drivers should be taught to wait for userspace to
+> > appear instead of Kconfig helping them build-in firmware. And then we
+> > should go ahead and remove CONFIG_EXTRA_FIRMWARE completely...
 > 
-> Yeah, actually Kyle's note (http://lkml.org/lkml/2011/8/29/289) makes
-> much more sense for linux and the whole firmware in the kernel deal.
-> So it looks like the drivers should be taught to wait for userspace to
-> appear instead of Kconfig helping them build-in firmware. And then we
-> should go ahead and remove CONFIG_EXTRA_FIRMWARE completely...
+> That would suck, suppose this radeon thing is the only console you've
+> got (ppc64/sparc64 don't have text mode iirc) and userspace doesn't come
+> up?
 
-That would suck, suppose this radeon thing is the only console you've
-got (ppc64/sparc64 don't have text mode iirc) and userspace doesn't come
-up?
+Same is true for NICs and netconsole of course. Not being able to stick
+blobs into the kernel image would so suck.
 
-
+Silently building a kernel without one and then getting stuck on boot,
+only to figure out after much pain that you need EXTRA_FIRMWARE and the
+more pain to figure out what blob to stick in is beyond crazy.
