@@ -1,69 +1,38 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from out3.smtp.messagingengine.com ([66.111.4.27]:33337 "EHLO
-	out3.smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1752092Ab1H3Oz3 (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 30 Aug 2011 10:55:29 -0400
-Date: Tue, 30 Aug 2011 11:55:25 -0300
-From: Henrique de Moraes Holschuh <hmh@hmh.eng.br>
-Subject: Re: Kernel almost hangs when CONFIG_DRM_RADEON=y
-Message-ID: <20110830145525.GB23963@khazad-dum.debian.net>
-References: <20110829141612.GB2025@gere.osrc.amd.com>
- <1790021880.1347470.1314632844694.JavaMail.root@zmail02.collab.prod.int.phx2.redhat.com>
- <20110829155501.GC2025@gere.osrc.amd.com>
- <CACqU3MVZek9TCcZEAbJXZqy9JZs3cbzNVJpwjOhS8OoKqH_YZQ@mail.gmail.com>
- <20110829171750.GD2025@gere.osrc.amd.com>
- <1314641813.2816.133.camel@twins>
- <20110829211439.GA4488@liondog.tnic>
- <20110830020828.GA14915@khazad-dum.debian.net>
- <1314693442.2054.2.camel@twins>
+Received: from terminus.zytor.com ([198.137.202.10]:52163 "EHLO mail.zytor.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1756554Ab1H3UQy (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 30 Aug 2011 16:16:54 -0400
+Message-ID: <4E5D4528.1070307@zytor.com>
+Date: Tue, 30 Aug 2011 13:16:40 -0700
+From: "H. Peter Anvin" <hpa@zytor.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1314693442.2054.2.camel@twins>
+Subject: Re: Generating unistd_*.h
+References: <4E583860.5080603@zytor.com> <20110827101820.GA2990@merkur.ravnborg.org> <4E58D99A.2050400@zytor.com>
+In-Reply-To: <4E58D99A.2050400@zytor.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Peter Zijlstra <peterz@infradead.org>
-Cc: Borislav Petkov <bp@alien8.de>, Arnaud Lacombe <lacombar@gmail.com>, David Airlie <airlied@redhat.com>, Michel =?iso-8859-1?Q?D=E4nzer?= <michel@daenzer.net>, linux-kernel <linux-kernel@vger.kernel.org>, dri-devel@lists.freedesktop.org, Pavel Ivanov <paivanof@gmail.com>, Alex Deucher <alexdeucher@gmail.com>, Dave Airlie <airlied@gmail.com>, linux-kbuild@vger.kernel.org
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: linux-kbuild@vger.kernel.org
 
-On Tue, 30 Aug 2011, Peter Zijlstra wrote:
-> On Mon, 2011-08-29 at 23:08 -0300, Henrique de Moraes Holschuh wrote:
-> > On Mon, 29 Aug 2011, Borislav Petkov wrote:
-> > > So, hypothetically speaking, hpa suggested then that we could pass
-> > > firmware blobs over the linked list setup_data thing in the real-mode
-> > > kernel header and parse_setup_data() can look at them and map them
-> > > somewhere later for the driver to find. This should be doable because
-> > > you're only gonna need a handful of blobs for CPU ucode, network and GPU
-> > > if the last is compiled in.
-> > > 
-> > > I wanted to take a serious look at that for the ucode loading, maybe I
-> > > should try to shuffle some time for it...
-> > 
-> > It would be very useful, yes.
-> > 
-> > Alternatively, you could extend the initrd format to have a firmware
-> > directory appended after the filesystem image.  ACPI is going to abuse
-> > the initrd in just that way to override ACPI tables very soon (patches
-> > have been already submitted to linux-acpi), so if a more structured and
-> > extensible way to piggy-back early-init data in the initrd is needed, it
-> > would be good to bring that to the table NOW.
-> 
-> Uhm,.. does that mean that soon we can't boot kernels without initrd?
-> That too is a massive regression in my eyes.
+On 08/27/2011 04:48 AM, H. Peter Anvin wrote:
+> On 08/27/2011 03:18 AM, Sam Ravnborg wrote:
+>>>
+>>> 1. Is there a better place than others to put these generated files
+>>>    (i.e. other than $(obj)/arch/x86/include/asm)?
+>> $(obj)/arch/x86/include/generated
+>>
+>> This is what generic-y supports uses.
+>>
 
-Well, if work starts soon enough on a bootloader extension to avoid messing
-with the initrd, we could refuse to set that initrd-based ACPI table
-override as ABI on the grounds that it is a debug thing, and later move it
-to the properly designed firmware bootloader extension.
+OK, got things mostly working, but I'm a bit stuck on how to make
+headers-install do the right thing.  objhdr-y doesn't seem to deal with
+the generated subdirectory very well, and we don't really want the files
+*installed* into the generated subdirectory for user space.
 
-Maybe the grub multiboot protocol[1] is worth looking at, assuming that
-thing is salvagable and would actually work for both 32bit and 64bit BIOS
-and UEFI bootstrapping?
+Any suggestions for how to best handle it?
 
-[1]http://www.gnu.org/software/grub/manual/multiboot/multiboot.html
+	-hpa
 
--- 
-  "One disk to rule them all, One disk to find them. One disk to bring
-  them all and in the darkness grind them. In the Land of Redmond
-  where the shadows lie." -- The Silicon Valley Tarot
-  Henrique Holschuh
