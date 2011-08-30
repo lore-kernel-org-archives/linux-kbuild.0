@@ -1,46 +1,60 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pz0-f42.google.com ([209.85.210.42]:64444 "EHLO
-	mail-pz0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751384Ab1H3Arn (ORCPT
+Received: from e23smtp06.au.ibm.com ([202.81.31.148]:41739 "EHLO
+	e23smtp06.au.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750778Ab1H3BsH (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 29 Aug 2011 20:47:43 -0400
-Received: by pzk37 with SMTP id 37so9357403pzk.1
-        for <linux-kbuild@vger.kernel.org>; Mon, 29 Aug 2011 17:47:43 -0700 (PDT)
-MIME-Version: 1.0
-Date: Mon, 29 Aug 2011 20:47:43 -0400
-Message-ID: <CACqU3MUEqL1=s29+ibH3CvVCvm8VDN4RM-8bd+dWxdmeF-d4gw@mail.gmail.com>
-Subject: Pending kconfig patches
-From: Arnaud Lacombe <lacombar@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
+	Mon, 29 Aug 2011 21:48:07 -0400
+Content-Type: text/plain; charset=UTF-8
+Subject: [PATCH][Resend][Trivial] tags, powerpc: Update tags.sh to support _GLOBAL symbols
+From: Ian Munsie <imunsie@au1.ibm.com>
+Date: Tue, 30 Aug 2011 11:47:58 +1000
+Message-Id: <1314668427-sup-1740@au1.ibm.com>
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org
+To: linux-kernel <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, trivial <trivial@kernel.org>, Andrew Morton <akpm@linux-foundation.org>
 
-Hi,
+On PowerPC we use _GLOBAL throughout the assembly to define symbols, but
+currently these symbols are missing from the tags generated with
+ARCH=powerpc make tags. This patch modifies the tags.sh script to
+recognise _GLOBAL(.*) so that these symbols will be in the tags.
 
-FYI, I've been picking a few patches on the list which have not yet
-reached your kbuild-2.6/kconfig branch. They are available in the git
-repository at:
+This is almost (but not quite) PowerPC specific and this change should
+not affect anyone else:
 
-git://github.com/lacombar/linux-2.6.git kconfig/for-next
+$ git grep -E '^_GLOBAL\(([^)]*)\).*' |sed 's/^\([^/]*\/[^/]*\)\/.*$/\1/'|uniq -c
+    627 arch/powerpc
+      2 arch/um
 
-and it currently contains:
+Signed-off-by: Ian Munsie <imunsie@au1.ibm.com>
+---
+I've had no (online) response to this so far - hoping that this can be
+picked up by someone.
 
-Arnaud Lacombe (1):
-      kconfig: fix __enabled_ macros definition for invisible and
-un-selected symbols
+ scripts/tags.sh |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
 
-Davidlohr Bueso (1):
-      kconfig: handle SIGINT in menuconfig
-
-Lucas De Marchi (1):
-      kconfig: fix set but not used variables
-
- scripts/kconfig/confdata.c         |   49 +++++++++++++++-----
- scripts/kconfig/lxdialog/textbox.c |    3 +-
- scripts/kconfig/mconf.c            |   86 ++++++++++++++++++++++--------------
- 3 files changed, 89 insertions(+), 49 deletions(-)
-
-Regards,
- - Arnaud
+diff --git a/scripts/tags.sh b/scripts/tags.sh
+index 75c5d24f1..38f6617 100755
+--- a/scripts/tags.sh
++++ b/scripts/tags.sh
+@@ -129,7 +129,7 @@ exuberant()
+ 	-I EXPORT_SYMBOL,EXPORT_SYMBOL_GPL                      \
+ 	-I DEFINE_TRACE,EXPORT_TRACEPOINT_SYMBOL,EXPORT_TRACEPOINT_SYMBOL_GPL \
+ 	--extra=+f --c-kinds=+px                                \
+-	--regex-asm='/^ENTRY\(([^)]*)\).*/\1/'                  \
++	--regex-asm='/^(ENTRY|_GLOBAL)\(([^)]*)\).*/\2/'        \
+ 	--regex-c='/^SYSCALL_DEFINE[[:digit:]]?\(([^,)]*).*/sys_\1/' \
+ 	--regex-c++='/^TRACE_EVENT\(([^,)]*).*/trace_\1/'		\
+ 	--regex-c++='/^DEFINE_EVENT\([^,)]*, *([^,)]*).*/trace_\1/'
+@@ -151,7 +151,7 @@ exuberant()
+ emacs()
+ {
+ 	all_sources | xargs $1 -a                               \
+-	--regex='/^ENTRY(\([^)]*\)).*/\1/'                      \
++	--regex='/^(ENTRY|_GLOBAL)(\([^)]*\)).*/\2/'            \
+ 	--regex='/^SYSCALL_DEFINE[0-9]?(\([^,)]*\).*/sys_\1/'   \
+ 	--regex='/^TRACE_EVENT(\([^,)]*\).*/trace_\1/'		\
+ 	--regex='/^DEFINE_EVENT([^,)]*, *\([^,)]*\).*/trace_\1/'
+-- 
+1.7.2.5
