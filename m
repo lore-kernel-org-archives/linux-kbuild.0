@@ -1,19 +1,19 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-gx0-f174.google.com ([209.85.161.174]:64991 "EHLO
-	mail-gx0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751036Ab1H3DZ1 convert rfc822-to-8bit (ORCPT
+Received: from mail-pz0-f42.google.com ([209.85.210.42]:38237 "EHLO
+	mail-pz0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750832Ab1H3EOt convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 29 Aug 2011 23:25:27 -0400
-Received: by gxk21 with SMTP id 21so5338564gxk.19
-        for <linux-kbuild@vger.kernel.org>; Mon, 29 Aug 2011 20:25:26 -0700 (PDT)
+	Tue, 30 Aug 2011 00:14:49 -0400
+Received: by pzk37 with SMTP id 37so9611251pzk.1
+        for <linux-kbuild@vger.kernel.org>; Mon, 29 Aug 2011 21:14:49 -0700 (PDT)
 MIME-Version: 1.0
 In-Reply-To: <1314662164-8565-3-git-send-email-crquan@gmail.com>
 References: <CAH5vBdKxbaKDrA2gAj5CoDYShN+5dnfu6Bmd=4+oV-XmnYQnFA@mail.gmail.com>
 	<1314662164-8565-1-git-send-email-crquan@gmail.com>
 	<1314662164-8565-2-git-send-email-crquan@gmail.com>
 	<1314662164-8565-3-git-send-email-crquan@gmail.com>
-Date: Mon, 29 Aug 2011 23:25:26 -0400
-Message-ID: <CACqU3MVpJ4FptompLXsKCt74_p7td9seLxUB=tQt=aeGSq=b2w@mail.gmail.com>
+Date: Tue, 30 Aug 2011 00:14:48 -0400
+Message-ID: <CACqU3MV+ONUEqyhumigkmpDLFbb9BXsuDKygoURwMjsHwcBXWg@mail.gmail.com>
 Subject: Re: [PATCH 3/5] scripts/kconfig/nconf: dynamically alloc dialog_input_result
 From: Arnaud Lacombe <lacombar@gmail.com>
 Content-Type: text/plain; charset=ISO-8859-1
@@ -23,207 +23,20 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: Cheng Renquan <crquan@gmail.com>
 Cc: linux-kbuild@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <mmarek@suse.cz>, Nir Tzachar <nir.tzachar@gmail.com>, Randy Dunlap <rdunlap@xenotime.net>, c.rq541@comcast.net
 
-hi,
+Hi,
 
 On Mon, Aug 29, 2011 at 7:56 PM, Cheng Renquan <crquan@gmail.com> wrote:
-> to support unlimited length string config items;
->
-> Signed-off-by: Cheng Renquan <crquan@gmail.com>
-> ---
->  scripts/kconfig/nconf.c     |   24 ++++++++++++++++--------
->  scripts/kconfig/nconf.gui.c |   25 ++++++++++++++++++++-----
->  scripts/kconfig/nconf.h     |    2 +-
->  3 files changed, 37 insertions(+), 14 deletions(-)
->
-> diff --git a/scripts/kconfig/nconf.c b/scripts/kconfig/nconf.c
-> index 39ca1f1..ee37358 100644
-> --- a/scripts/kconfig/nconf.c
-> +++ b/scripts/kconfig/nconf.c
-> @@ -280,6 +280,9 @@ static int global_exit;
->  /* the currently selected button */
->  const char *current_instructions = menu_instructions;
->
-> +static char *dialog_input_result;
-> +static int dialog_input_result_len;
-> +
->  static void conf(struct menu *menu);
->  static void conf_choice(struct menu *menu);
->  static void conf_string(struct menu *menu);
-> @@ -695,7 +698,6 @@ static void search_conf(void)
->  {
->        struct symbol **sym_arr;
->        struct gstr res;
-> -       char dialog_input_result[100];
->        char *dialog_input;
->        int dres;
->  again:
-> @@ -703,7 +705,7 @@ again:
->                        _("Search Configuration Parameter"),
->                        _("Enter " CONFIG_ " (sub)string to search for "
->                                "(with or without \"" CONFIG_ "\")"),
-> -                       "", dialog_input_result, 99);
-> +                       "", dialog_input_result, &dialog_input_result_len);
->        switch (dres) {
->        case 0:
->                break;
-> @@ -1348,7 +1350,6 @@ static void conf_choice(struct menu *menu)
->  static void conf_string(struct menu *menu)
->  {
->        const char *prompt = menu_get_prompt(menu);
-> -       char dialog_input_result[256];
->
->        while (1) {
->                int res;
-> @@ -1372,7 +1373,7 @@ static void conf_string(struct menu *menu)
->                                heading,
->                                sym_get_string_value(menu->sym),
->                                dialog_input_result,
-> -                               sizeof(dialog_input_result));
-> +                               &dialog_input_result_len);
->                switch (res) {
->                case 0:
->                        if (sym_set_string_value(menu->sym,
-> @@ -1392,14 +1393,13 @@ static void conf_string(struct menu *menu)
->
->  static void conf_load(void)
->  {
-> -       char dialog_input_result[256];
->        while (1) {
->                int res;
->                res = dialog_inputbox(main_window,
->                                NULL, load_config_text,
->                                filename,
->                                dialog_input_result,
-> -                               sizeof(dialog_input_result));
-> +                               &dialog_input_result_len);
->                switch (res) {
->                case 0:
->                        if (!dialog_input_result[0])
-> @@ -1424,14 +1424,13 @@ static void conf_load(void)
->
->  static void conf_save(void)
->  {
-> -       char dialog_input_result[256];
->        while (1) {
->                int res;
->                res = dialog_inputbox(main_window,
->                                NULL, save_config_text,
->                                filename,
->                                dialog_input_result,
-> -                               sizeof(dialog_input_result));
-> +                               &dialog_input_result_len);
->                switch (res) {
->                case 0:
->                        if (!dialog_input_result[0])
-> @@ -1488,6 +1487,15 @@ int main(int ac, char **av)
->                        single_menu_mode = 1;
->        }
->
-> +       /* initially alloc 2048 bytes for dialog_input_result */
-> +       dialog_input_result_len = 2048;
-> +       dialog_input_result = malloc(dialog_input_result_len);
-> +       if (!dialog_input_result) {
-> +               fprintf(stderr, "Not enough memory for dialog_input_result(%d)\n",
-> +                       dialog_input_result_len);
-> +               exit(1);
-> +       }
-> +
-I'm argue that we better have to be consistent with ourselves. If we
-do not care about realloc(3) failing, we do not care either for that
-one. There is already a whole bunch of unchecked malloc(3) calls in
-kconfig, so one more will not change much.
-
->        /* Initialize curses */
->        initscr();
->        /* set color theme */
-> diff --git a/scripts/kconfig/nconf.gui.c b/scripts/kconfig/nconf.gui.c
-> index 3ce2a7c..bc482ad 100644
-> --- a/scripts/kconfig/nconf.gui.c
-> +++ b/scripts/kconfig/nconf.gui.c
-> @@ -356,7 +356,7 @@ int btn_dialog(WINDOW *main_window, const char *msg, int btn_num, ...)
->
 >  int dialog_inputbox(WINDOW *main_window,
 >                const char *title, const char *prompt,
 > -               const char *init, char *result, int result_len)
 > +               const char *init, char *result, int *result_len)
 >  {
->        int prompt_lines = 0;
->        int prompt_width = 0;
-> @@ -368,6 +368,14 @@ int dialog_inputbox(WINDOW *main_window,
->        int res = -1;
->        int cursor_position = strlen(init);
->
-> +       if (strlen(init) > *result_len) {
-> +               do {
-> +                       *result_len *= 2;
-> +               } while (strlen(init) > *result_len);
-> +               result = realloc(result, *result_len);
-> +               /* here didn't check result, if it's NULL,
-> +                  just let it silently fail (SegFault) */
-> +       }
->
-I do not think it's even worse to have the comment>
+This all logic will not work, you need to have the following prototype:
 
->        /* find the widest line of msg: */
->        prompt_lines = get_line_no(prompt);
-> @@ -384,7 +392,7 @@ int dialog_inputbox(WINDOW *main_window,
->        y = (LINES-(prompt_lines+4))/2;
->        x = (COLS-(prompt_width+4))/2;
->
-> -       strncpy(result, init, result_len);
-> +       strncpy(result, init, *result_len);
->
->        /* create the windows */
->        win = newwin(prompt_lines+6, prompt_width+7, y, x);
-> @@ -443,7 +451,7 @@ int dialog_inputbox(WINDOW *main_window,
->                case KEY_UP:
->                case KEY_RIGHT:
->                        if (cursor_position < len &&
-> -                           cursor_position < min(result_len, prompt_width))
-> +                           cursor_position < min(*result_len, prompt_width))
->                                cursor_position++;
->                        break;
->                case KEY_DOWN:
-> @@ -452,8 +460,15 @@ int dialog_inputbox(WINDOW *main_window,
->                                cursor_position--;
->                        break;
->                default:
-> -                       if ((isgraph(res) || isspace(res)) &&
-> -                                       len-2 < result_len) {
-> +                       if ((isgraph(res) || isspace(res))) {
-> +                               /* one for new char, one for '\0' */
-> +                               if (len+2 > *result_len) {
-> +                                       do {
-> +                                               *result_len *= 2;
-> +                                       } while (len+2 > *result_len);
-> +                                       result = realloc(result, *result_len);
-> +                                       /* silently fail in the same way above */
-> +                               }
-likewise.
+int dialog_inputbox(WINDOW *main_window,
+               const char *title, const char *prompt,
+               const char *init, char **result, int *result_len)
+
+as realloc(3) will give you a new pointer.
 
  - Arnaud
-
->                                /* insert the char at the proper position */
->                                memmove(&result[cursor_position+1],
->                                                &result[cursor_position],
-> diff --git a/scripts/kconfig/nconf.h b/scripts/kconfig/nconf.h
-> index 58fbda8..98b2c23 100644
-> --- a/scripts/kconfig/nconf.h
-> +++ b/scripts/kconfig/nconf.h
-> @@ -89,7 +89,7 @@ void fill_window(WINDOW *win, const char *text);
->  int btn_dialog(WINDOW *main_window, const char *msg, int btn_num, ...);
->  int dialog_inputbox(WINDOW *main_window,
->                const char *title, const char *prompt,
-> -               const char *init, char *result, int result_len);
-> +               const char *init, char *result, int *result_len);
->  void refresh_all_windows(WINDOW *main_window);
->  void show_scroll_win(WINDOW *main_window,
->                const char *title,
-> --
-> 1.7.6
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
