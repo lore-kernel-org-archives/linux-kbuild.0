@@ -1,60 +1,176 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from e23smtp06.au.ibm.com ([202.81.31.148]:41739 "EHLO
-	e23smtp06.au.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750778Ab1H3BsH (ORCPT
+Received: from mail-pz0-f42.google.com ([209.85.210.42]:39755 "EHLO
+	mail-pz0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750884Ab1H3Bzr convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 29 Aug 2011 21:48:07 -0400
-Content-Type: text/plain; charset=UTF-8
-Subject: [PATCH][Resend][Trivial] tags, powerpc: Update tags.sh to support _GLOBAL symbols
-From: Ian Munsie <imunsie@au1.ibm.com>
-Date: Tue, 30 Aug 2011 11:47:58 +1000
-Message-Id: <1314668427-sup-1740@au1.ibm.com>
-Content-Transfer-Encoding: 8bit
+	Mon, 29 Aug 2011 21:55:47 -0400
+MIME-Version: 1.0
+In-Reply-To: <1313975049.2393.8.camel@offbook>
+References: <1313975049.2393.8.camel@offbook>
+Date: Mon, 29 Aug 2011 21:55:46 -0400
+Message-ID: <CACqU3MXup87LamKaNz1w8GXQdPvMedEjy_Y=TPsyLDYKQi4jwA@mail.gmail.com>
+Subject: Re: [PATCH v2] kconfig: handle SIGINT in menuconfig
+From: Arnaud Lacombe <lacombar@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, trivial <trivial@kernel.org>, Andrew Morton <akpm@linux-foundation.org>
+To: dave@gnu.org
+Cc: Michal Marek <mmarek@suse.cz>, lkml <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org
 
-On PowerPC we use _GLOBAL throughout the assembly to define symbols, but
-currently these symbols are missing from the tags generated with
-ARCH=powerpc make tags. This patch modifies the tags.sh script to
-recognise _GLOBAL(.*) so that these symbols will be in the tags.
+Hi,
 
-This is almost (but not quite) PowerPC specific and this change should
-not affect anyone else:
+On Sun, Aug 21, 2011 at 9:04 PM, Davidlohr Bueso <dave@gnu.org> wrote:
+> From: Davidlohr Bueso <dave@gnu.org>
+>
+> I recently got bitten in the ass when pressing Ctrl-C and lost all my current configuration changes. This patch captures SIGINT and allows the user to save any changes.
+> Some code refactoring was made in order to handle the exit behavior.
+>
+> Signed-off-by: Davidlohr Bueso <dave@gnu.org>
+> Signed-off-by: Arnaud Lacombe <lacombar@gmail.com>
+> ---
+>  scripts/kconfig/mconf.c |   86 ++++++++++++++++++++++++++++------------------
+>  1 files changed, 52 insertions(+), 34 deletions(-)
+>
+> diff --git a/scripts/kconfig/mconf.c b/scripts/kconfig/mconf.c
+> index 820d2b6..19e200d 100644
+> --- a/scripts/kconfig/mconf.c
+> +++ b/scripts/kconfig/mconf.c
+> @@ -15,6 +15,7 @@
+>  #include <stdarg.h>
+>  #include <stdlib.h>
+>  #include <string.h>
+> +#include <signal.h>
+>  #include <unistd.h>
+>  #include <locale.h>
+>
+> @@ -272,6 +273,7 @@ static struct menu *current_menu;
+>  static int child_count;
+>  static int single_menu_mode;
+>  static int show_all_options;
+> +static int saved_x, saved_y;
+>
+>  static void conf(struct menu *menu);
+>  static void conf_choice(struct menu *menu);
+> @@ -792,9 +794,54 @@ static void conf_save(void)
+>        }
+>  }
+>
+> +static int handle_exit(void)
+> +{
+> +       int res;
+> +
+> +       dialog_clear();
+> +       if (conf_get_changed())
+> +               res = dialog_yesno(NULL,
+> +                                  _("Do you wish to save your new configuration ?\n"
+> +                                    "<ESC><ESC> to continue."),
+> +                                  6, 60);
+> +       else
+> +               res = -1;
+> +
+> +       end_dialog(saved_x, saved_y);
+> +
+> +       switch (res) {
+> +       case 0:
+> +               if (conf_write(filename)) {
+> +                       fprintf(stderr, _("\n\n"
+> +                                         "Error while writing of the configuration.\n"
+> +                                         "Your configuration changes were NOT saved."
+> +                                         "\n\n"));
+> +                       return 1;
+> +               }
+> +               /* fall through */
+> +       case -1:
+> +               printf(_("\n\n"
+> +                        "*** End of the configuration.\n"
+> +                        "*** Execute 'make' to start the build or try 'make help'."
+> +                        "\n\n"));
+> +               res = 0;
+> +               break;
+> +       default:
+> +               fprintf(stderr, _("\n\n"
+> +                                 "Your configuration changes were NOT saved."
+> +                                 "\n\n"));
+> +       }
+> +
+> +       return res;
+> +}
+> +
+> +static void sig_handler(int signo)
+> +{
+> +       exit(handle_exit());
+> +}
+> +
+Actually, no matter what handle_exit() returns, the process will
+return error code 130 and make will abort. I'd suggest to get rid of
+the call to exit(), and only keep handle_exit().
 
-$ git grep -E '^_GLOBAL\(([^)]*)\).*' |sed 's/^\([^/]*\/[^/]*\)\/.*$/\1/'|uniq -c
-    627 arch/powerpc
-      2 arch/um
+any objection ?
 
-Signed-off-by: Ian Munsie <imunsie@au1.ibm.com>
----
-I've had no (online) response to this so far - hoping that this can be
-picked up by someone.
+ - Arnaud
 
- scripts/tags.sh |    4 ++--
- 1 files changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/scripts/tags.sh b/scripts/tags.sh
-index 75c5d24f1..38f6617 100755
---- a/scripts/tags.sh
-+++ b/scripts/tags.sh
-@@ -129,7 +129,7 @@ exuberant()
- 	-I EXPORT_SYMBOL,EXPORT_SYMBOL_GPL                      \
- 	-I DEFINE_TRACE,EXPORT_TRACEPOINT_SYMBOL,EXPORT_TRACEPOINT_SYMBOL_GPL \
- 	--extra=+f --c-kinds=+px                                \
--	--regex-asm='/^ENTRY\(([^)]*)\).*/\1/'                  \
-+	--regex-asm='/^(ENTRY|_GLOBAL)\(([^)]*)\).*/\2/'        \
- 	--regex-c='/^SYSCALL_DEFINE[[:digit:]]?\(([^,)]*).*/sys_\1/' \
- 	--regex-c++='/^TRACE_EVENT\(([^,)]*).*/trace_\1/'		\
- 	--regex-c++='/^DEFINE_EVENT\([^,)]*, *([^,)]*).*/trace_\1/'
-@@ -151,7 +151,7 @@ exuberant()
- emacs()
- {
- 	all_sources | xargs $1 -a                               \
--	--regex='/^ENTRY(\([^)]*\)).*/\1/'                      \
-+	--regex='/^(ENTRY|_GLOBAL)(\([^)]*\)).*/\2/'            \
- 	--regex='/^SYSCALL_DEFINE[0-9]?(\([^,)]*\).*/sys_\1/'   \
- 	--regex='/^TRACE_EVENT(\([^,)]*\).*/trace_\1/'		\
- 	--regex='/^DEFINE_EVENT([^,)]*, *\([^,)]*\).*/trace_\1/'
--- 
-1.7.2.5
+>  int main(int ac, char **av)
+>  {
+> -       int saved_x, saved_y;
+>        char *mode;
+>        int res;
+>
+> @@ -802,6 +849,8 @@ int main(int ac, char **av)
+>        bindtextdomain(PACKAGE, LOCALEDIR);
+>        textdomain(PACKAGE);
+>
+> +       signal(SIGINT, sig_handler);
+> +
+>        conf_parse(av[1]);
+>        conf_read(NULL);
+>
+> @@ -823,40 +872,9 @@ int main(int ac, char **av)
+>        set_config_filename(conf_get_configname());
+>        do {
+>                conf(&rootmenu);
+> -               dialog_clear();
+> -               if (conf_get_changed())
+> -                       res = dialog_yesno(NULL,
+> -                                          _("Do you wish to save your "
+> -                                            "new configuration?\n"
+> -                                            "<ESC><ESC> to continue."),
+> -                                          6, 60);
+> -               else
+> -                       res = -1;
+> +               res = handle_exit();
+>        } while (res == KEY_ESC);
+> -       end_dialog(saved_x, saved_y);
+> -
+> -       switch (res) {
+> -       case 0:
+> -               if (conf_write(filename)) {
+> -                       fprintf(stderr, _("\n\n"
+> -                               "Error while writing of the configuration.\n"
+> -                               "Your configuration changes were NOT saved."
+> -                               "\n\n"));
+> -                       return 1;
+> -               }
+> -               /* fall through */
+> -       case -1:
+> -               printf(_("\n\n"
+> -                       "*** End of the configuration.\n"
+> -                       "*** Execute 'make' to start the build or try 'make help'."
+> -                       "\n\n"));
+> -               break;
+> -       default:
+> -               fprintf(stderr, _("\n\n"
+> -                       "Your configuration changes were NOT saved."
+> -                       "\n\n"));
+> -       }
+>
+> -       return 0;
+> +       return res;
+>  }
+>
+> --
+> 1.7.4.1
+>
+>
+>
+>
