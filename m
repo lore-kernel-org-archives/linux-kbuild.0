@@ -1,173 +1,61 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pz0-f42.google.com ([209.85.210.42]:53386 "EHLO
-	mail-pz0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751085Ab1H3E7n convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 30 Aug 2011 00:59:43 -0400
-Received: by pzk37 with SMTP id 37so9663380pzk.1
-        for <linux-kbuild@vger.kernel.org>; Mon, 29 Aug 2011 21:59:43 -0700 (PDT)
+Received: from mail.skyhub.de ([78.46.96.112]:33377 "EHLO mail.skyhub.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752210Ab1H3HR7 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 30 Aug 2011 03:17:59 -0400
+Date: Tue, 30 Aug 2011 09:17:56 +0200
+From: Borislav Petkov <bp@alien8.de>
+Subject: Re: Kernel almost hangs when CONFIG_DRM_RADEON=y
+Message-ID: <20110830071755.GB15134@liondog.tnic>
+References: <20110829141612.GB2025@gere.osrc.amd.com>
+ <1790021880.1347470.1314632844694.JavaMail.root@zmail02.collab.prod.int.phx2.redhat.com>
+ <20110829155501.GC2025@gere.osrc.amd.com>
+ <CACqU3MVZek9TCcZEAbJXZqy9JZs3cbzNVJpwjOhS8OoKqH_YZQ@mail.gmail.com>
+ <20110829171750.GD2025@gere.osrc.amd.com>
+ <1314641813.2816.133.camel@twins>
+ <20110829211439.GA4488@liondog.tnic>
+ <20110830020828.GA14915@khazad-dum.debian.net>
 MIME-Version: 1.0
-In-Reply-To: <1314662164-8565-4-git-send-email-crquan@gmail.com>
-References: <CAH5vBdKxbaKDrA2gAj5CoDYShN+5dnfu6Bmd=4+oV-XmnYQnFA@mail.gmail.com>
-	<1314662164-8565-1-git-send-email-crquan@gmail.com>
-	<1314662164-8565-2-git-send-email-crquan@gmail.com>
-	<1314662164-8565-3-git-send-email-crquan@gmail.com>
-	<1314662164-8565-4-git-send-email-crquan@gmail.com>
-Date: Tue, 30 Aug 2011 00:59:43 -0400
-Message-ID: <CACqU3MX7=QmhQjq_6OeLGDfwSPLHzYYUg0wF3BY8iz17s2L0TA@mail.gmail.com>
-Subject: Re: [PATCH 4/5] scripts/kconfig/nconf: fix editing long strings
-From: Arnaud Lacombe <lacombar@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20110830020828.GA14915@khazad-dum.debian.net>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Cheng Renquan <crquan@gmail.com>
-Cc: linux-kbuild@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <mmarek@suse.cz>, Nir Tzachar <nir.tzachar@gmail.com>, Randy Dunlap <rdunlap@xenotime.net>, c.rq541@comcast.net
+To: Henrique de Moraes Holschuh <hmh@hmh.eng.br>
+Cc: Peter Zijlstra <peterz@infradead.org>, Arnaud Lacombe <lacombar@gmail.com>, David Airlie <airlied@redhat.com>, Michel =?utf-8?Q?D=C3=A4nzer?= <michel@daenzer.net>, linux-kernel <linux-kernel@vger.kernel.org>, dri-devel@lists.freedesktop.org, Pavel Ivanov <paivanof@gmail.com>, Alex Deucher <alexdeucher@gmail.com>, Dave Airlie <airlied@gmail.com>, linux-kbuild@vger.kernel.org
 
-Hi,
+On Mon, Aug 29, 2011 at 11:08:28PM -0300, Henrique de Moraes Holschuh wrote:
+> On Mon, 29 Aug 2011, Borislav Petkov wrote:
+> > So, hypothetically speaking, hpa suggested then that we could pass
+> > firmware blobs over the linked list setup_data thing in the real-mode
+> > kernel header and parse_setup_data() can look at them and map them
+> > somewhere later for the driver to find. This should be doable because
+> > you're only gonna need a handful of blobs for CPU ucode, network and GPU
+> > if the last is compiled in.
+> > 
+> > I wanted to take a serious look at that for the ucode loading, maybe I
+> > should try to shuffle some time for it...
+> 
+> It would be very useful, yes.
+> 
+> Alternatively, you could extend the initrd format to have a firmware
+> directory appended after the filesystem image.  ACPI is going to abuse
+> the initrd in just that way to override ACPI tables very soon (patches
+> have been already submitted to linux-acpi),
 
-On Mon, Aug 29, 2011 at 7:56 PM, Cheng Renquan <crquan@gmail.com> wrote:
-> The original dialog_inputbox doesn't work with longer than prompt_width
-> strings, here fixed it in this way:
->
-> 1) add variable cursor_form_win to record cursor of form_win,
->   keep its value always between [0, prompt_width-1];
->   keep the original cursor_position as cursor of the string result,
->   for short strings, cursor_form_win is identical to cursor_position;
->   for long strings, use (cursor_position-cursor_form_win) as begin offset
->   to show part of the string in form_win;
->
+.. lemme guess: they didn't put the correct tables in the BIOS in the
+first place and now it is too late for a BIOS fix and want to shuffle in
+all those "fixes" through initrd ontop of ACPI. Oh boy, do I love all
+the ACPI crap stories :).
 
-> 2) whenever cursor of form_win is near (by 3 chars) to left or right edge
->   of form_win, make a auto scroll by half prompt_width, to make this one
->   line string editor more fun to use;
->
-I am not a huge fan of this behavior, it seems a bit chaotic and
-unnatural to me.
+> so if a more structured and extensible way to piggy-back early-init
+> data in the initrd is needed, it would be good to bring that to the
+> table NOW.
 
-menuconfig's (partial) support of long string seem more stable. When
-you erase a long string, the cursor move left. When you end up on the
-edge, the window slide left fully, which let you see either a full
-window again, or the beginning of the string. Unfortunately, you
-cannot scroll within the string, but I would expect that when you
-reach the right of the window, and continue typing, to see the window
-moves right, without this "come back" effect.
+Yeah, that's not more than an idea right now, I haven't even started
+playing with it. If it turns out to be more superior, it could be reused
+for other things too but right now it's too early to tell.
 
-Beside that, I agree, it's a huge improvement :)
-
- - Arnaud
-
-> 3) update len for later cursor_form_win correct calculation;
->
-> Signed-off-by: Cheng Renquan <crquan@gmail.com>
-> ---
->  scripts/kconfig/nconf.gui.c |   43 +++++++++++++++++++++++++++++++++++++------
->  1 files changed, 37 insertions(+), 6 deletions(-)
->
-> diff --git a/scripts/kconfig/nconf.gui.c b/scripts/kconfig/nconf.gui.c
-> index bc482ad..62a41d1 100644
-> --- a/scripts/kconfig/nconf.gui.c
-> +++ b/scripts/kconfig/nconf.gui.c
-> @@ -367,6 +367,7 @@ int dialog_inputbox(WINDOW *main_window,
->        int i, x, y;
->        int res = -1;
->        int cursor_position = strlen(init);
-> +       int cursor_form_win;
->
->        if (strlen(init) > *result_len) {
->                do {
-> @@ -413,7 +414,9 @@ int dialog_inputbox(WINDOW *main_window,
->        fill_window(prompt_win, prompt);
->
->        mvwprintw(form_win, 0, 0, "%*s", prompt_width, " ");
-> -       mvwprintw(form_win, 0, 0, "%s", result);
-> +       cursor_form_win = min(cursor_position, prompt_width-1);
-> +       mvwprintw(form_win, 0, 0, "%s",
-> +                 result + cursor_position-cursor_form_win);
->
->        /* create panels */
->        panel = new_panel(win);
-> @@ -439,6 +442,8 @@ int dialog_inputbox(WINDOW *main_window,
->                                                &result[cursor_position],
->                                                len-cursor_position+1);
->                                cursor_position--;
-> +                               cursor_form_win--;
-> +                               len--;
->                        }
->                        break;
->                case KEY_DC:
-> @@ -446,18 +451,22 @@ int dialog_inputbox(WINDOW *main_window,
->                                memmove(&result[cursor_position],
->                                                &result[cursor_position+1],
->                                                len-cursor_position+1);
-> +                               len--;
->                        }
->                        break;
->                case KEY_UP:
->                case KEY_RIGHT:
-> -                       if (cursor_position < len &&
-> -                           cursor_position < min(*result_len, prompt_width))
-> +                       if (cursor_position < len) {
->                                cursor_position++;
-> +                               cursor_form_win++;
-> +                       }
->                        break;
->                case KEY_DOWN:
->                case KEY_LEFT:
-> -                       if (cursor_position > 0)
-> +                       if (cursor_position > 0) {
->                                cursor_position--;
-> +                               cursor_form_win--;
-> +                       }
->                        break;
->                default:
->                        if ((isgraph(res) || isspace(res))) {
-> @@ -475,16 +484,38 @@ int dialog_inputbox(WINDOW *main_window,
->                                                len-cursor_position+1);
->                                result[cursor_position] = res;
->                                cursor_position++;
-> +                               cursor_form_win++;
-> +                               len++;
->                        } else {
->                                mvprintw(0, 0, "unknown key: %d\n", res);
->                        }
->                        break;
->                }
-> +               if (len <= prompt_width-1)
-> +                       cursor_form_win = cursor_position;
-> +               else {
-> +                       if (cursor_form_win <= 3)
-> +                               cursor_form_win += prompt_width/2;
-> +                       else if (cursor_form_win >= prompt_width-3)
-> +                               cursor_form_win -= prompt_width/2;
-> +
-> +                       if (cursor_form_win < 0)
-> +                               cursor_form_win = 0;
-> +                       else if (cursor_form_win >= prompt_width-1)
-> +                               cursor_form_win = prompt_width-1;
-> +
-> +                       if (cursor_form_win > cursor_position)
-> +                               cursor_form_win = cursor_position;
-> +                       if (cursor_form_win < (prompt_width-1) - (len-cursor_position))
-> +                               cursor_form_win = (prompt_width-1) - (len-cursor_position);
-> +               }
-> +
->                wmove(form_win, 0, 0);
->                wclrtoeol(form_win);
->                mvwprintw(form_win, 0, 0, "%*s", prompt_width, " ");
-> -               mvwprintw(form_win, 0, 0, "%s", result);
-> -               wmove(form_win, 0, cursor_position);
-> +               mvwprintw(form_win, 0, 0, "%s",
-> +                       result + cursor_position-cursor_form_win);
-> +               wmove(form_win, 0, cursor_form_win);
->                touchwin(win);
->                refresh_all_windows(main_window);
->
-> --
-> 1.7.6
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
+-- 
+Regards/Gruss,
+    Boris.
