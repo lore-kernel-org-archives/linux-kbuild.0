@@ -1,42 +1,134 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pz0-f42.google.com ([209.85.210.42]:38237 "EHLO
+Received: from mail-pz0-f42.google.com ([209.85.210.42]:52736 "EHLO
 	mail-pz0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750832Ab1H3EOt convert rfc822-to-8bit (ORCPT
+	with ESMTP id S1752222Ab1H3E0P (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 30 Aug 2011 00:14:49 -0400
-Received: by pzk37 with SMTP id 37so9611251pzk.1
-        for <linux-kbuild@vger.kernel.org>; Mon, 29 Aug 2011 21:14:49 -0700 (PDT)
+	Tue, 30 Aug 2011 00:26:15 -0400
+Received: by pzk37 with SMTP id 37so9624538pzk.1
+        for <linux-kbuild@vger.kernel.org>; Mon, 29 Aug 2011 21:26:15 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1314662164-8565-3-git-send-email-crquan@gmail.com>
+In-Reply-To: <CACqU3MV+ONUEqyhumigkmpDLFbb9BXsuDKygoURwMjsHwcBXWg@mail.gmail.com>
 References: <CAH5vBdKxbaKDrA2gAj5CoDYShN+5dnfu6Bmd=4+oV-XmnYQnFA@mail.gmail.com>
 	<1314662164-8565-1-git-send-email-crquan@gmail.com>
 	<1314662164-8565-2-git-send-email-crquan@gmail.com>
 	<1314662164-8565-3-git-send-email-crquan@gmail.com>
-Date: Tue, 30 Aug 2011 00:14:48 -0400
-Message-ID: <CACqU3MV+ONUEqyhumigkmpDLFbb9BXsuDKygoURwMjsHwcBXWg@mail.gmail.com>
+	<CACqU3MV+ONUEqyhumigkmpDLFbb9BXsuDKygoURwMjsHwcBXWg@mail.gmail.com>
+Date: Tue, 30 Aug 2011 00:26:14 -0400
+Message-ID: <CACqU3MWiLBFBcm=bhGy8fJdZHT09khKC7u77HEwsY7QaSJ-RfQ@mail.gmail.com>
 Subject: Re: [PATCH 3/5] scripts/kconfig/nconf: dynamically alloc dialog_input_result
 From: Arnaud Lacombe <lacombar@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 8BIT
+Content-Type: multipart/mixed; boundary=000e0cd32e5a8683ce04abb1691b
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Cheng Renquan <crquan@gmail.com>
 Cc: linux-kbuild@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <mmarek@suse.cz>, Nir Tzachar <nir.tzachar@gmail.com>, Randy Dunlap <rdunlap@xenotime.net>, c.rq541@comcast.net
 
+--000e0cd32e5a8683ce04abb1691b
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+
 Hi,
 
-On Mon, Aug 29, 2011 at 7:56 PM, Cheng Renquan <crquan@gmail.com> wrote:
->  int dialog_inputbox(WINDOW *main_window,
->                const char *title, const char *prompt,
-> -               const char *init, char *result, int result_len)
-> +               const char *init, char *result, int *result_len)
->  {
-This all logic will not work, you need to have the following prototype:
-
-int dialog_inputbox(WINDOW *main_window,
-               const char *title, const char *prompt,
-               const char *init, char **result, int *result_len)
-
-as realloc(3) will give you a new pointer.
+On Tue, Aug 30, 2011 at 12:14 AM, Arnaud Lacombe <lacombar@gmail.com> wrote=
+:
+> Hi,
+>
+> On Mon, Aug 29, 2011 at 7:56 PM, Cheng Renquan <crquan@gmail.com> wrote:
+>> =A0int dialog_inputbox(WINDOW *main_window,
+>> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0const char *title, const char *prompt,
+>> - =A0 =A0 =A0 =A0 =A0 =A0 =A0 const char *init, char *result, int result=
+_len)
+>> + =A0 =A0 =A0 =A0 =A0 =A0 =A0 const char *init, char *result, int *resul=
+t_len)
+>> =A0{
+> This all logic will not work, you need to have the following prototype:
+>
+> int dialog_inputbox(WINDOW *main_window,
+> =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0const char *title, const char *prompt,
+> =A0=A0 =A0 =A0 =A0 =A0 =A0 =A0 const char *init, char **result, int *resu=
+lt_len)
+>
+> as realloc(3) will give you a new pointer.
+>
+Attached diff should do the job, this also avoid to have to deal with
+`dialog_input_result' initialization.
 
  - Arnaud
+
+> =A0- Arnaud
+>
+
+--000e0cd32e5a8683ce04abb1691b
+Content-Type: text/x-patch; charset=US-ASCII; name="dialog_inputbox.diff"
+Content-Disposition: attachment; filename="dialog_inputbox.diff"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_grydhktj0
+
+ZGlmZiAtLWdpdCBhL3NjcmlwdHMva2NvbmZpZy9uY29uZi5jIGIvc2NyaXB0cy9rY29uZmlnL25j
+b25mLmMKaW5kZXggMThiZmIzNC4uNTMyNTFmMCAxMDA2NDQKLS0tIGEvc2NyaXB0cy9rY29uZmln
+L25jb25mLmMKKysrIGIvc2NyaXB0cy9rY29uZmlnL25jb25mLmMKQEAgLTcxNyw3ICs3MTcsNyBA
+QCBzdGF0aWMgdm9pZCBzZWFyY2hfY29uZih2b2lkKQogCQkJXygiU2VhcmNoIENvbmZpZ3VyYXRp
+b24gUGFyYW1ldGVyIiksCiAJCQlfKCJFbnRlciAiIENPTkZJR18gIiAoc3ViKXN0cmluZyB0byBz
+ZWFyY2ggZm9yICIKIAkJCQkiKHdpdGggb3Igd2l0aG91dCBcIiIgQ09ORklHXyAiXCIpIiksCi0J
+CQkiIiwgZGlhbG9nX2lucHV0X3Jlc3VsdCwgJmRpYWxvZ19pbnB1dF9yZXN1bHRfbGVuKTsKKwkJ
+CSIiLCAmZGlhbG9nX2lucHV0X3Jlc3VsdCwgJmRpYWxvZ19pbnB1dF9yZXN1bHRfbGVuKTsKIAlz
+d2l0Y2ggKGRyZXMpIHsKIAljYXNlIDA6CiAJCWJyZWFrOwpAQCAtMTM4NCw3ICsxMzg0LDcgQEAg
+c3RhdGljIHZvaWQgY29uZl9zdHJpbmcoc3RydWN0IG1lbnUgKm1lbnUpCiAJCQkJcHJvbXB0ID8g
+Xyhwcm9tcHQpIDogXygiTWFpbiBNZW51IiksCiAJCQkJaGVhZGluZywKIAkJCQlzeW1fZ2V0X3N0
+cmluZ192YWx1ZShtZW51LT5zeW0pLAotCQkJCWRpYWxvZ19pbnB1dF9yZXN1bHQsCisJCQkJJmRp
+YWxvZ19pbnB1dF9yZXN1bHQsCiAJCQkJJmRpYWxvZ19pbnB1dF9yZXN1bHRfbGVuKTsKIAkJc3dp
+dGNoIChyZXMpIHsKIAkJY2FzZSAwOgpAQCAtMTQxMCw3ICsxNDEwLDcgQEAgc3RhdGljIHZvaWQg
+Y29uZl9sb2FkKHZvaWQpCiAJCXJlcyA9IGRpYWxvZ19pbnB1dGJveChtYWluX3dpbmRvdywKIAkJ
+CQlOVUxMLCBsb2FkX2NvbmZpZ190ZXh0LAogCQkJCWZpbGVuYW1lLAotCQkJCWRpYWxvZ19pbnB1
+dF9yZXN1bHQsCisJCQkJJmRpYWxvZ19pbnB1dF9yZXN1bHQsCiAJCQkJJmRpYWxvZ19pbnB1dF9y
+ZXN1bHRfbGVuKTsKIAkJc3dpdGNoIChyZXMpIHsKIAkJY2FzZSAwOgpAQCAtMTQ0MSw3ICsxNDQx
+LDcgQEAgc3RhdGljIHZvaWQgY29uZl9zYXZlKHZvaWQpCiAJCXJlcyA9IGRpYWxvZ19pbnB1dGJv
+eChtYWluX3dpbmRvdywKIAkJCQlOVUxMLCBzYXZlX2NvbmZpZ190ZXh0LAogCQkJCWZpbGVuYW1l
+LAotCQkJCWRpYWxvZ19pbnB1dF9yZXN1bHQsCisJCQkJJmRpYWxvZ19pbnB1dF9yZXN1bHQsCiAJ
+CQkJJmRpYWxvZ19pbnB1dF9yZXN1bHRfbGVuKTsKIAkJc3dpdGNoIChyZXMpIHsKIAkJY2FzZSAw
+OgpAQCAtMTUwOCwxNSArMTUwOCw2IEBAIGludCBtYWluKGludCBhYywgY2hhciAqKmF2KQogCQkJ
+c2luZ2xlX21lbnVfbW9kZSA9IDE7CiAJfQogCi0JLyogaW5pdGlhbGx5IGFsbG9jIDIwNDggYnl0
+ZXMgZm9yIGRpYWxvZ19pbnB1dF9yZXN1bHQgKi8KLQlkaWFsb2dfaW5wdXRfcmVzdWx0X2xlbiA9
+IDIwNDg7Ci0JZGlhbG9nX2lucHV0X3Jlc3VsdCA9IG1hbGxvYyhkaWFsb2dfaW5wdXRfcmVzdWx0
+X2xlbik7Ci0JaWYgKCFkaWFsb2dfaW5wdXRfcmVzdWx0KSB7Ci0JCWZwcmludGYoc3RkZXJyLCAi
+Tm90IGVub3VnaCBtZW1vcnkgZm9yIGRpYWxvZ19pbnB1dF9yZXN1bHQoJWQpXG4iLAotCQkJZGlh
+bG9nX2lucHV0X3Jlc3VsdF9sZW4pOwotCQlleGl0KDEpOwotCX0KLQogCS8qIEluaXRpYWxpemUg
+Y3Vyc2VzICovCiAJaW5pdHNjcigpOwogCS8qIHNldCBjb2xvciB0aGVtZSAqLwpkaWZmIC0tZ2l0
+IGEvc2NyaXB0cy9rY29uZmlnL25jb25mLmd1aS5jIGIvc2NyaXB0cy9rY29uZmlnL25jb25mLmd1
+aS5jCmluZGV4IDkwOWM4NWYuLjhhZThkNjIgMTAwNjQ0Ci0tLSBhL3NjcmlwdHMva2NvbmZpZy9u
+Y29uZi5ndWkuYworKysgYi9zY3JpcHRzL2tjb25maWcvbmNvbmYuZ3VpLmMKQEAgLTM1Niw3ICsz
+NTYsNyBAQCBpbnQgYnRuX2RpYWxvZyhXSU5ET1cgKm1haW5fd2luZG93LCBjb25zdCBjaGFyICpt
+c2csIGludCBidG5fbnVtLCAuLi4pCiAKIGludCBkaWFsb2dfaW5wdXRib3goV0lORE9XICptYWlu
+X3dpbmRvdywKIAkJY29uc3QgY2hhciAqdGl0bGUsIGNvbnN0IGNoYXIgKnByb21wdCwKLQkJY29u
+c3QgY2hhciAqaW5pdCwgY2hhciAqcmVzdWx0LCBpbnQgKnJlc3VsdF9sZW4pCisJCWNvbnN0IGNo
+YXIgKmluaXQsIGNoYXIgKipyZXN1bHRwLCBpbnQgKnJlc3VsdF9sZW4pCiB7CiAJaW50IHByb21w
+dF9saW5lcyA9IDA7CiAJaW50IHByb21wdF93aWR0aCA9IDA7CkBAIC0zNjgsMTYgKzM2OCwxNiBA
+QCBpbnQgZGlhbG9nX2lucHV0Ym94KFdJTkRPVyAqbWFpbl93aW5kb3csCiAJaW50IHJlcyA9IC0x
+OwogCWludCBjdXJzb3JfcG9zaXRpb24gPSBzdHJsZW4oaW5pdCk7CiAJaW50IGN1cnNvcl9mb3Jt
+X3dpbjsKKwljaGFyICpyZXN1bHQgPSAqcmVzdWx0cDsKIAotCWlmIChzdHJsZW4oaW5pdCkgPiAq
+cmVzdWx0X2xlbikgewotCQlkbyB7Ci0JCQkqcmVzdWx0X2xlbiAqPSAyOwotCQl9IHdoaWxlIChz
+dHJsZW4oaW5pdCkgPiAqcmVzdWx0X2xlbik7CisJaWYgKHN0cmxlbihpbml0KSArIDEgPiAqcmVz
+dWx0X2xlbikgeworCQkqcmVzdWx0X2xlbiA9IHN0cmxlbihpbml0KSArIDE7CiAJCXJlc3VsdCA9
+IHJlYWxsb2MocmVzdWx0LCAqcmVzdWx0X2xlbik7Ci0JCS8qIGhlcmUgZGlkbid0IGNoZWNrIHJl
+c3VsdCwgaWYgaXQncyBOVUxMLAotCQkgICBqdXN0IGxldCBpdCBzaWxlbnRseSBmYWlsIChTZWdG
+YXVsdCkgKi8KKwkJKnJlc3VsdHAgPSByZXN1bHQ7CiAJfQogCkBAIC00ODAsMTEgKzQ4MCw5IEBA
+IGludCBkaWFsb2dfaW5wdXRib3goV0lORE9XICptYWluX3dpbmRvdywKIAkJCWlmICgoaXNncmFw
+aChyZXMpIHx8IGlzc3BhY2UocmVzKSkpIHsKIAkJCQkvKiBvbmUgZm9yIG5ldyBjaGFyLCBvbmUg
+Zm9yICdcMCcgKi8KIAkJCQlpZiAobGVuKzIgPiAqcmVzdWx0X2xlbikgewotCQkJCQlkbyB7Ci0J
+CQkJCQkqcmVzdWx0X2xlbiAqPSAyOwotCQkJCQl9IHdoaWxlIChsZW4rMiA+ICpyZXN1bHRfbGVu
+KTsKKwkJCQkJKnJlc3VsdF9sZW4gPSBsZW4rMjsKIAkJCQkJcmVzdWx0ID0gcmVhbGxvYyhyZXN1
+bHQsICpyZXN1bHRfbGVuKTsKLQkJCQkJLyogc2lsZW50bHkgZmFpbCBpbiB0aGUgc2FtZSB3YXkg
+YWJvdmUgKi8KKwkJCQkJKnJlc3VsdHAgPSByZXN1bHQ7CiAJCQkJfQogCQkJCS8qIGluc2VydCB0
+aGUgY2hhciBhdCB0aGUgcHJvcGVyIHBvc2l0aW9uICovCiAJCQkJbWVtbW92ZSgmcmVzdWx0W2N1
+cnNvcl9wb3NpdGlvbisxXSwKZGlmZiAtLWdpdCBhL3NjcmlwdHMva2NvbmZpZy9uY29uZi5oIGIv
+c2NyaXB0cy9rY29uZmlnL25jb25mLmgKaW5kZXggOThiMmMyMy4uMGQ1MjYxNyAxMDA2NDQKLS0t
+IGEvc2NyaXB0cy9rY29uZmlnL25jb25mLmgKKysrIGIvc2NyaXB0cy9rY29uZmlnL25jb25mLmgK
+QEAgLTg5LDcgKzg5LDcgQEAgdm9pZCBmaWxsX3dpbmRvdyhXSU5ET1cgKndpbiwgY29uc3QgY2hh
+ciAqdGV4dCk7CiBpbnQgYnRuX2RpYWxvZyhXSU5ET1cgKm1haW5fd2luZG93LCBjb25zdCBjaGFy
+ICptc2csIGludCBidG5fbnVtLCAuLi4pOwogaW50IGRpYWxvZ19pbnB1dGJveChXSU5ET1cgKm1h
+aW5fd2luZG93LAogCQljb25zdCBjaGFyICp0aXRsZSwgY29uc3QgY2hhciAqcHJvbXB0LAotCQlj
+b25zdCBjaGFyICppbml0LCBjaGFyICpyZXN1bHQsIGludCAqcmVzdWx0X2xlbik7CisJCWNvbnN0
+IGNoYXIgKmluaXQsIGNoYXIgKipyZXN1bHRwLCBpbnQgKnJlc3VsdF9sZW4pOwogdm9pZCByZWZy
+ZXNoX2FsbF93aW5kb3dzKFdJTkRPVyAqbWFpbl93aW5kb3cpOwogdm9pZCBzaG93X3Njcm9sbF93
+aW4oV0lORE9XICptYWluX3dpbmRvdywKIAkJY29uc3QgY2hhciAqdGl0bGUsCg==
+--000e0cd32e5a8683ce04abb1691b--
