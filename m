@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from out3.smtp.messagingengine.com ([66.111.4.27]:48403 "EHLO
+Received: from out3.smtp.messagingengine.com ([66.111.4.27]:33337 "EHLO
 	out3.smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1753658Ab1H3Oo0 (ORCPT
+	by vger.kernel.org with ESMTP id S1752092Ab1H3Oz3 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 30 Aug 2011 10:44:26 -0400
-Date: Tue, 30 Aug 2011 11:44:21 -0300
+	Tue, 30 Aug 2011 10:55:29 -0400
+Date: Tue, 30 Aug 2011 11:55:25 -0300
 From: Henrique de Moraes Holschuh <hmh@hmh.eng.br>
 Subject: Re: Kernel almost hangs when CONFIG_DRM_RADEON=y
-Message-ID: <20110830144420.GA23963@khazad-dum.debian.net>
+Message-ID: <20110830145525.GB23963@khazad-dum.debian.net>
 References: <20110829141612.GB2025@gere.osrc.amd.com>
  <1790021880.1347470.1314632844694.JavaMail.root@zmail02.collab.prod.int.phx2.redhat.com>
  <20110829155501.GC2025@gere.osrc.amd.com>
@@ -16,17 +16,18 @@ References: <20110829141612.GB2025@gere.osrc.amd.com>
  <1314641813.2816.133.camel@twins>
  <20110829211439.GA4488@liondog.tnic>
  <20110830020828.GA14915@khazad-dum.debian.net>
- <20110830071755.GB15134@liondog.tnic>
+ <1314693442.2054.2.camel@twins>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20110830071755.GB15134@liondog.tnic>
+In-Reply-To: <1314693442.2054.2.camel@twins>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Borislav Petkov <bp@alien8.de>, Peter Zijlstra <peterz@infradead.org>, Arnaud Lacombe <lacombar@gmail.com>, David Airlie <airlied@redhat.com>, Michel =?iso-8859-1?Q?D=E4nzer?= <michel@daenzer.net>, linux-kernel <linux-kernel@vger.kernel.org>, dri-devel@lists.freedesktop.org, Pavel Ivanov <paivanof@gmail.com>, Alex Deucher <alexdeucher@gmail.com>, Dave Airlie <airlied@gmail.com>, linux-kbuild@vger.kernel.org
+To: Peter Zijlstra <peterz@infradead.org>
+Cc: Borislav Petkov <bp@alien8.de>, Arnaud Lacombe <lacombar@gmail.com>, David Airlie <airlied@redhat.com>, Michel =?iso-8859-1?Q?D=E4nzer?= <michel@daenzer.net>, linux-kernel <linux-kernel@vger.kernel.org>, dri-devel@lists.freedesktop.org, Pavel Ivanov <paivanof@gmail.com>, Alex Deucher <alexdeucher@gmail.com>, Dave Airlie <airlied@gmail.com>, linux-kbuild@vger.kernel.org
 
-On Tue, 30 Aug 2011, Borislav Petkov wrote:
-> On Mon, Aug 29, 2011 at 11:08:28PM -0300, Henrique de Moraes Holschuh wrote:
+On Tue, 30 Aug 2011, Peter Zijlstra wrote:
+> On Mon, 2011-08-29 at 23:08 -0300, Henrique de Moraes Holschuh wrote:
 > > On Mon, 29 Aug 2011, Borislav Petkov wrote:
 > > > So, hypothetically speaking, hpa suggested then that we could pass
 > > > firmware blobs over the linked list setup_data thing in the real-mode
@@ -43,19 +44,23 @@ On Tue, 30 Aug 2011, Borislav Petkov wrote:
 > > Alternatively, you could extend the initrd format to have a firmware
 > > directory appended after the filesystem image.  ACPI is going to abuse
 > > the initrd in just that way to override ACPI tables very soon (patches
-> > have been already submitted to linux-acpi),
+> > have been already submitted to linux-acpi), so if a more structured and
+> > extensible way to piggy-back early-init data in the initrd is needed, it
+> > would be good to bring that to the table NOW.
 > 
-> .. lemme guess: they didn't put the correct tables in the BIOS in the
-> first place and now it is too late for a BIOS fix and want to shuffle in
-> all those "fixes" through initrd ontop of ACPI. Oh boy, do I love all
-> the ACPI crap stories :).
+> Uhm,.. does that mean that soon we can't boot kernels without initrd?
+> That too is a massive regression in my eyes.
 
-Heh.
+Well, if work starts soon enough on a bootloader extension to avoid messing
+with the initrd, we could refuse to set that initrd-based ACPI table
+override as ABI on the grounds that it is a debug thing, and later move it
+to the properly designed firmware bootloader extension.
 
-Actually, the patches were created by a distro for debug purposes.  No
-vendor pushed for them.  But it is a safe bet that users will end up using
-them to work around ACPI vendor crap that will never get fixed properly
-through a BIOS update, etc.
+Maybe the grub multiboot protocol[1] is worth looking at, assuming that
+thing is salvagable and would actually work for both 32bit and 64bit BIOS
+and UEFI bootstrapping?
+
+[1]http://www.gnu.org/software/grub/manual/multiboot/multiboot.html
 
 -- 
   "One disk to rule them all, One disk to find them. One disk to bring
