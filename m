@@ -1,146 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
 Received: from mail-iy0-f174.google.com ([209.85.210.174]:63581 "EHLO
 	mail-iy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750998Ab1HaIDI (ORCPT
+	with ESMTP id S1751040Ab1HaIDK (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 31 Aug 2011 04:03:08 -0400
-Received: by iabu26 with SMTP id u26so511509iab.19
-        for <linux-kbuild@vger.kernel.org>; Wed, 31 Aug 2011 01:03:07 -0700 (PDT)
+	Wed, 31 Aug 2011 04:03:10 -0400
+Received: by mail-iy0-f174.google.com with SMTP id u26so511509iab.19
+        for <linux-kbuild@vger.kernel.org>; Wed, 31 Aug 2011 01:03:09 -0700 (PDT)
 From: Cheng Renquan <crquan@gmail.com>
-Subject: [PATCH V2 4/6] scripts/kconfig/nconf: fix editing long strings
-Date: Wed, 31 Aug 2011 00:46:11 -0700
-Message-Id: <1314776773-9560-5-git-send-email-crquan@gmail.com>
-In-Reply-To: <1314776773-9560-4-git-send-email-crquan@gmail.com>
+Subject: [PATCH V2 5/6] scripts/kconfig/nconf: add KEY_HOME / KEY_END for dialog_inputbox
+Date: Wed, 31 Aug 2011 00:46:12 -0700
+Message-Id: <1314776773-9560-6-git-send-email-crquan@gmail.com>
+In-Reply-To: <1314776773-9560-5-git-send-email-crquan@gmail.com>
 References: <CAH5vBdKxbaKDrA2gAj5CoDYShN+5dnfu6Bmd=4+oV-XmnYQnFA@mail.gmail.com>
  <1314776773-9560-1-git-send-email-crquan@gmail.com>
  <1314776773-9560-2-git-send-email-crquan@gmail.com>
  <1314776773-9560-3-git-send-email-crquan@gmail.com>
  <1314776773-9560-4-git-send-email-crquan@gmail.com>
+ <1314776773-9560-5-git-send-email-crquan@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org, Arnaud Lacombe <lacombar@gmail.com>
 Cc: Sam Ravnborg <sam@ravnborg.org>, Michal Marek <mmarek@suse.cz>, Nir Tzachar <nir.tzachar@gmail.com>, Randy Dunlap <rdunlap@xenotime.net>, c.rq541@comcast.net
 
-The original dialog_inputbox doesn't work with longer than prompt_width
-strings, here fixed it in this way:
-
-1) add variable cursor_form_win to record cursor of form_win,
-   keep its value always between [0, prompt_width-1];
-   keep the original cursor_position as cursor of the string result,
-   for short strings, cursor_form_win is identical to cursor_position;
-   for long strings, use (cursor_position-cursor_form_win) as begin offset
-   to show part of the string in form_win;
-
-2) whenever cursor of form_win is near (by 3 chars) to left or right edge
-   of form_win, make a auto scroll by half prompt_width, to make this one
-   line string editor more fun to use;
-
-3) update len for later cursor_form_win correct calculation;
+to make it easier to locate begin/end when editing long strings;
 
 Signed-off-by: Cheng Renquan <crquan@gmail.com>
 ---
- scripts/kconfig/nconf.gui.c |   43 +++++++++++++++++++++++++++++++++++++------
- 1 files changed, 37 insertions(+), 6 deletions(-)
+ scripts/kconfig/nconf.gui.c |    8 ++++++++
+ 1 files changed, 8 insertions(+), 0 deletions(-)
 
 diff --git a/scripts/kconfig/nconf.gui.c b/scripts/kconfig/nconf.gui.c
-index d64bc1c..a236ae7 100644
+index a236ae7..1d73897 100644
 --- a/scripts/kconfig/nconf.gui.c
 +++ b/scripts/kconfig/nconf.gui.c
-@@ -367,6 +367,7 @@ int dialog_inputbox(WINDOW *main_window,
- 	int i, x, y;
- 	int res = -1;
- 	int cursor_position = strlen(init);
-+	int cursor_form_win;
- 	char *result = *resultp;
- 
- 	if (strlen(init)+1 > *result_len) {
-@@ -410,7 +411,9 @@ int dialog_inputbox(WINDOW *main_window,
- 	fill_window(prompt_win, prompt);
- 
- 	mvwprintw(form_win, 0, 0, "%*s", prompt_width, " ");
--	mvwprintw(form_win, 0, 0, "%s", result);
-+	cursor_form_win = min(cursor_position, prompt_width-1);
-+	mvwprintw(form_win, 0, 0, "%s",
-+		  result + cursor_position-cursor_form_win);
- 
- 	/* create panels */
- 	panel = new_panel(win);
-@@ -436,6 +439,8 @@ int dialog_inputbox(WINDOW *main_window,
- 						&result[cursor_position],
- 						len-cursor_position+1);
- 				cursor_position--;
-+				cursor_form_win--;
-+				len--;
+@@ -465,6 +465,14 @@ int dialog_inputbox(WINDOW *main_window,
+ 				cursor_form_win--;
  			}
  			break;
- 		case KEY_DC:
-@@ -443,18 +448,22 @@ int dialog_inputbox(WINDOW *main_window,
- 				memmove(&result[cursor_position],
- 						&result[cursor_position+1],
- 						len-cursor_position+1);
-+				len--;
- 			}
- 			break;
- 		case KEY_UP:
- 		case KEY_RIGHT:
--			if (cursor_position < len &&
--			    cursor_position < min(*result_len, prompt_width))
-+			if (cursor_position < len) {
- 				cursor_position++;
-+				cursor_form_win++;
-+			}
- 			break;
- 		case KEY_DOWN:
- 		case KEY_LEFT:
--			if (cursor_position > 0)
-+			if (cursor_position > 0) {
- 				cursor_position--;
-+				cursor_form_win--;
-+			}
- 			break;
++		case KEY_HOME:
++			cursor_position = 0;
++			cursor_form_win = 0;
++			break;
++		case KEY_END:
++			cursor_position = len;
++			cursor_form_win = min(cursor_position, prompt_width-1);
++			break;
  		default:
  			if ((isgraph(res) || isspace(res))) {
-@@ -470,16 +479,38 @@ int dialog_inputbox(WINDOW *main_window,
- 						len-cursor_position+1);
- 				result[cursor_position] = res;
- 				cursor_position++;
-+				cursor_form_win++;
-+				len++;
- 			} else {
- 				mvprintw(0, 0, "unknown key: %d\n", res);
- 			}
- 			break;
- 		}
-+		if (len <= prompt_width-1)
-+			cursor_form_win = cursor_position;
-+		else {
-+			if (cursor_form_win <= 3)
-+				cursor_form_win += prompt_width/2;
-+			else if (cursor_form_win >= prompt_width-3)
-+				cursor_form_win -= prompt_width/2;
-+
-+			if (cursor_form_win < 0)
-+				cursor_form_win = 0;
-+			else if (cursor_form_win >= prompt_width-1)
-+				cursor_form_win = prompt_width-1;
-+
-+			if (cursor_form_win > cursor_position)
-+				cursor_form_win = cursor_position;
-+			if (cursor_form_win < (prompt_width-1) - (len-cursor_position))
-+				cursor_form_win = (prompt_width-1) - (len-cursor_position);
-+		}
-+
- 		wmove(form_win, 0, 0);
- 		wclrtoeol(form_win);
- 		mvwprintw(form_win, 0, 0, "%*s", prompt_width, " ");
--		mvwprintw(form_win, 0, 0, "%s", result);
--		wmove(form_win, 0, cursor_position);
-+		mvwprintw(form_win, 0, 0, "%s",
-+			result + cursor_position-cursor_form_win);
-+		wmove(form_win, 0, cursor_form_win);
- 		touchwin(win);
- 		refresh_all_windows(main_window);
- 
+ 				/* one for new char, one for '\0' */
 -- 
 1.7.6
 
