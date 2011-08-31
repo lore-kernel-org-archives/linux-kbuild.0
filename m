@@ -1,91 +1,120 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wy0-f174.google.com ([74.125.82.174]:59093 "EHLO
-	mail-wy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755544Ab1HaNEV (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 31 Aug 2011 09:04:21 -0400
-Received: by wyh22 with SMTP id 22so114045wyh.19
-        for <linux-kbuild@vger.kernel.org>; Wed, 31 Aug 2011 06:04:20 -0700 (PDT)
+Received: from cantor2.suse.de ([195.135.220.15]:46515 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1755548Ab1HaNba (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 31 Aug 2011 09:31:30 -0400
+From: Michal Marek <mmarek@suse.cz>
+Subject: [PATCH] staging/cxt1e1: Header cleanup
+Date: Wed, 31 Aug 2011 15:31:01 +0200
+Message-Id: <1314797461-29837-1-git-send-email-mmarek@suse.cz>
+In-Reply-To: <4E5E26B8.5030606@suse.cz>
+References: <4E5E26B8.5030606@suse.cz>
 MIME-Version: 1.0
-In-Reply-To: <CAMT+=WYdCTb5O5V0ny+VTe0wHS==irZ1jcY2DV1KaKyfayn4+w@mail.gmail.com>
-References: <CAH5vBdKxbaKDrA2gAj5CoDYShN+5dnfu6Bmd=4+oV-XmnYQnFA@mail.gmail.com>
- <1314776773-9560-1-git-send-email-crquan@gmail.com> <1314776773-9560-2-git-send-email-crquan@gmail.com>
- <1314776773-9560-3-git-send-email-crquan@gmail.com> <1314776773-9560-4-git-send-email-crquan@gmail.com>
- <1314776773-9560-5-git-send-email-crquan@gmail.com> <1314776773-9560-6-git-send-email-crquan@gmail.com>
- <1314776773-9560-7-git-send-email-crquan@gmail.com> <CAMT+=WYdCTb5O5V0ny+VTe0wHS==irZ1jcY2DV1KaKyfayn4+w@mail.gmail.com>
-From: Cheng Renquan <crquan@gmail.com>
-Date: Wed, 31 Aug 2011 06:04:00 -0700
-Message-ID: <CAH5vBdKBM6cc=1xnp-B7PFZfbxHQ+S_AFw7S2A=Gutc-SORkpQ@mail.gmail.com>
-Subject: Re: [PATCH V2 6/6] scripts/kconfig/nconf: trunc too long string
- display in menu
 Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-Content-Transfer-Encoding: 8bit
-To: Nir Tzachar <nir.tzachar@gmail.com>
-Cc: linux-kbuild@vger.kernel.org, Arnaud Lacombe <lacombar@gmail.com>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <mmarek@suse.cz>, Randy Dunlap <rdunlap@xenotime.net>, c.rq541@comcast.net
+To: Greg Kroah-Hartman <gregkh@suse.de>
+Cc: devel@driverdev.osuosl.org, Arnaud Lacombe <lacombar@gmail.com>, s.koylux@gmail.com, linux-kbuild@vger.kernel.org, Bob Beers <bob.beers@gmail.com>
 
-On Wed, Aug 31, 2011 at 1:53 AM, Nir Tzachar <nir.tzachar@gmail.com> wrote:
-> Hi.
->
-> On Wed, Aug 31, 2011 at 10:46 AM, Cheng Renquan <crquan@gmail.com> wrote:
->> When the string is too long, only show the first COLS/2 bytes wide,
->> to make sure there is some space to show the menu prompt.
->>
->> Signed-off-by: Cheng Renquan <crquan@gmail.com>
->> ---
->>  scripts/kconfig/nconf.c |    8 +++++++-
->>  1 files changed, 7 insertions(+), 1 deletions(-)
->>
->> diff --git a/scripts/kconfig/nconf.c b/scripts/kconfig/nconf.c
->> index 4248759..4997ebf 100644
->> --- a/scripts/kconfig/nconf.c
->> +++ b/scripts/kconfig/nconf.c
->> @@ -887,8 +887,14 @@ static void build_conf(struct menu *menu)
->>                                break;
->>                        default:
->>                                tmp = 2 + strlen(sym_get_string_value(sym));
->> -                               item_make(menu, 's', "    (%s)",
->> +                               if (tmp < COLS/2)
->> +                                       item_make(menu, 's', "    (%s)",
->>                                                sym_get_string_value(sym));
->> +                               else {
->> +                                       char *s = strndupa(sym_get_string_value(sym), COLS/2);
->> +                                       strcpy(s + COLS/2 - 5, " ...");
->> +                                       item_make(menu, 's', "    (%s)", s);
->> +                               }
->>                                tmp = indent - tmp + 4;
->>                                if (tmp < 0)
->>                                        tmp = 0;
->> --
->> 1.7.6
->>
->>
->
-> Nack.
->
-> I see several problems with this approach:
-> 1) I do not like the use of strdupa.
-Then strdup ? OK, strdupa may be glibc only but strdup should be generic,
+Remove dead and unused code in sbecom_inline_linux.h. This also fixes a
+build failure under Turkish locale, where include/config/modversions.h
+is incorrectly named as modversIons.h (an unrelated kbuild bug) and the
+driver tries to needlessly include the empty file.
 
-> 2) I think it would be better to put this behavior in item_make(), as
-> it will then be applied to all items, in all code paths. However, I a
-> not sure that using COLS/2 is the best approach. Moreover, I think
-> that this should be implemented inside the ncurses menu library and
-> not worked around. Care to create a patch for ncurses?
+Reported-by: Serdar KÖYLÜ <s.koylux@gmail.com>
+Cc: Bob Beers <bob.beers@gmail.com>
+Signed-off-by: Michal Marek <mmarek@suse.cz>
+---
+ drivers/staging/cxt1e1/sbecom_inline_linux.h |   64 --------------------------
+ 1 files changed, 0 insertions(+), 64 deletions(-)
 
-In item_make it doesn't know if it will be followed by item_add_str,
-but here our issue is sym value part too long, only in outside item_make
-(the build_conf) it is aware about subsequent item_add_str, only there
-we could reserve some space for menu prompt to pass to item_add_str;
+diff --git a/drivers/staging/cxt1e1/sbecom_inline_linux.h b/drivers/staging/cxt1e1/sbecom_inline_linux.h
+index c0563e6..9ea2c0c 100644
+--- a/drivers/staging/cxt1e1/sbecom_inline_linux.h
++++ b/drivers/staging/cxt1e1/sbecom_inline_linux.h
+@@ -43,81 +43,17 @@
+  */
+ 
+ 
+-#if defined (__FreeBSD__) || defined (__NetBSD__)
+-#include <sys/types.h>
+-#else
+ #include <linux/types.h>
+-#if defined(CONFIG_SMP) && ! defined(__SMP__)
+-#define __SMP__
+-#endif
+-#if defined(CONFIG_MODVERSIONS) && defined(MODULE) && ! defined(MODVERSIONS)
+-#define MODVERSIONS
+-#endif
+-
+-#ifdef MODULE
+-#ifdef MODVERSIONS
+-#include <config/modversions.h>
+-#endif
+ #include <linux/module.h>
+-#endif
+-#endif
+-
+ #include <linux/kernel.h>       /* resolves kmalloc references */
+ #include <linux/skbuff.h>       /* resolves skb references */
+ #include <linux/netdevice.h>    /* resolves dev_kree_skb_any */
+ #include <asm/byteorder.h>      /* resolves cpu_to_le32 */
+ 
+-#if 0
+-
+-/*** PORT POINT WARNING
+- ***
+- *** Under Linux 2.6 it has been found that compiler is re-ordering
+- *** in-lined pci_write_32() functions to the detrement of correct
+- *** hardware setup.  Therefore, inlining of PCI accesses has been
+- *** de-implemented, and subroutine calls have been implemented.
+- ***/
+-
+-static inline u_int32_t
+-pci_read_32 (u_int32_t *p)
+-{
+-#ifdef FLOW_DEBUG
+-    u_int32_t   v;
+-
+-    FLUSH_PCI_READ ();
+-    v = le32_to_cpu (*p);
+-    if (cxt1e1_log_level >= LOG_DEBUG)
+-        pr_info("pci_read : %x = %x\n", (u_int32_t) p, v);
+-    return v;
+-#else
+-                FLUSH_PCI_READ ();      /* */
+-    return le32_to_cpu (*p);
+-#endif
+-}
+-
+-static inline void
+-pci_write_32 (u_int32_t *p, u_int32_t v)
+-{
+-#ifdef FLOW_DEBUG
+-    if (cxt1e1_log_level >= LOG_DEBUG)
+-        pr_info("pci_write: %x = %x\n", (u_int32_t) p, v);
+-#endif
+-    *p = cpu_to_le32 (v);
+-    FLUSH_PCI_WRITE ();             /* This routine is called from routines
+-                                     * which do multiple register writes
+-                                     * which themselves need flushing between
+-                                     * writes in order to guarantee write
+-                                     * ordering.  It is less code-cumbersome
+-                                     * to flush here-in then to investigate
+-                                     * and code the many other register
+-                                     * writing routines. */
+-}
+-#else
+ /* forward reference */
+ u_int32_t   pci_read_32 (u_int32_t *p);
+ void        pci_write_32 (u_int32_t *p, u_int32_t v);
+ 
+-#endif
+-
+ 
+ /*
+  * system dependent callbacks
+-- 
+1.7.6
 
-but how much space do we better to reserve? the COLS/2 is just a
-guessed value by me,
-
-Even in patch for ncurses it can only truncate the string tail, no
-help for our issue;
-
->
-> Cheers,
-> Nir.
-���{.n�+�������+%�����ݶ��w��{.n�+����{��F�W��{ay�ʇڙ�,j��f���h��������z_�(�階�ݢj"���m������G������?����&���~��
