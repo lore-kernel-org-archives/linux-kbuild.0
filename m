@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ey0-f174.google.com ([209.85.215.174]:34325 "EHLO
+Received: from mail-ey0-f174.google.com ([209.85.215.174]:42718 "EHLO
 	mail-ey0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752764Ab1HaImS convert rfc822-to-8bit (ORCPT
+	with ESMTP id S1752489Ab1HaIxH convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 31 Aug 2011 04:42:18 -0400
-Received: by eyx24 with SMTP id 24so367448eyx.19
-        for <linux-kbuild@vger.kernel.org>; Wed, 31 Aug 2011 01:42:17 -0700 (PDT)
+	Wed, 31 Aug 2011 04:53:07 -0400
+Received: by eyx24 with SMTP id 24so374491eyx.19
+        for <linux-kbuild@vger.kernel.org>; Wed, 31 Aug 2011 01:53:06 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1314776773-9560-6-git-send-email-crquan@gmail.com>
+In-Reply-To: <1314776773-9560-7-git-send-email-crquan@gmail.com>
 References: <CAH5vBdKxbaKDrA2gAj5CoDYShN+5dnfu6Bmd=4+oV-XmnYQnFA@mail.gmail.com>
 	<1314776773-9560-1-git-send-email-crquan@gmail.com>
 	<1314776773-9560-2-git-send-email-crquan@gmail.com>
@@ -15,9 +15,11 @@ References: <CAH5vBdKxbaKDrA2gAj5CoDYShN+5dnfu6Bmd=4+oV-XmnYQnFA@mail.gmail.com>
 	<1314776773-9560-4-git-send-email-crquan@gmail.com>
 	<1314776773-9560-5-git-send-email-crquan@gmail.com>
 	<1314776773-9560-6-git-send-email-crquan@gmail.com>
-Date: Wed, 31 Aug 2011 11:42:17 +0300
-Message-ID: <CAMT+=WbqfGvAn4JmqcyKCCgH1dMkGexRSh551uDqXh=rdcjxpg@mail.gmail.com>
-Subject: Re: [PATCH V2 5/6] scripts/kconfig/nconf: add KEY_HOME / KEY_END for dialog_inputbox
+	<1314776773-9560-7-git-send-email-crquan@gmail.com>
+Date: Wed, 31 Aug 2011 11:53:06 +0300
+Message-ID: <CAMT+=WYdCTb5O5V0ny+VTe0wHS==irZ1jcY2DV1KaKyfayn4+w@mail.gmail.com>
+Subject: Re: [PATCH V2 6/6] scripts/kconfig/nconf: trunc too long string
+ display in menu
 From: Nir Tzachar <nir.tzachar@gmail.com>
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 8BIT
@@ -26,36 +28,51 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: Cheng Renquan <crquan@gmail.com>
 Cc: linux-kbuild@vger.kernel.org, Arnaud Lacombe <lacombar@gmail.com>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <mmarek@suse.cz>, Randy Dunlap <rdunlap@xenotime.net>, c.rq541@comcast.net
 
+Hi.
+
 On Wed, Aug 31, 2011 at 10:46 AM, Cheng Renquan <crquan@gmail.com> wrote:
-> to make it easier to locate begin/end when editing long strings;
+> When the string is too long, only show the first COLS/2 bytes wide,
+> to make sure there is some space to show the menu prompt.
 >
 > Signed-off-by: Cheng Renquan <crquan@gmail.com>
 > ---
->  scripts/kconfig/nconf.gui.c |    8 ++++++++
->  1 files changed, 8 insertions(+), 0 deletions(-)
+>  scripts/kconfig/nconf.c |    8 +++++++-
+>  1 files changed, 7 insertions(+), 1 deletions(-)
 >
-> diff --git a/scripts/kconfig/nconf.gui.c b/scripts/kconfig/nconf.gui.c
-> index a236ae7..1d73897 100644
-> --- a/scripts/kconfig/nconf.gui.c
-> +++ b/scripts/kconfig/nconf.gui.c
-> @@ -465,6 +465,14 @@ int dialog_inputbox(WINDOW *main_window,
->                                cursor_form_win--;
->                        }
->                        break;
-> +               case KEY_HOME:
-> +                       cursor_position = 0;
-> +                       cursor_form_win = 0;
-> +                       break;
-> +               case KEY_END:
-> +                       cursor_position = len;
-> +                       cursor_form_win = min(cursor_position, prompt_width-1);
-> +                       break;
->                default:
->                        if ((isgraph(res) || isspace(res))) {
->                                /* one for new char, one for '\0' */
+> diff --git a/scripts/kconfig/nconf.c b/scripts/kconfig/nconf.c
+> index 4248759..4997ebf 100644
+> --- a/scripts/kconfig/nconf.c
+> +++ b/scripts/kconfig/nconf.c
+> @@ -887,8 +887,14 @@ static void build_conf(struct menu *menu)
+>                                break;
+>                        default:
+>                                tmp = 2 + strlen(sym_get_string_value(sym));
+> -                               item_make(menu, 's', "    (%s)",
+> +                               if (tmp < COLS/2)
+> +                                       item_make(menu, 's', "    (%s)",
+>                                                sym_get_string_value(sym));
+> +                               else {
+> +                                       char *s = strndupa(sym_get_string_value(sym), COLS/2);
+> +                                       strcpy(s + COLS/2 - 5, " ...");
+> +                                       item_make(menu, 's', "    (%s)", s);
+> +                               }
+>                                tmp = indent - tmp + 4;
+>                                if (tmp < 0)
+>                                        tmp = 0;
 > --
 > 1.7.6
 >
 >
 
-Acked By: Nir Tzachar <nir.tzachar@gmail.com>
+Nack.
+
+I see several problems with this approach:
+1) I do not like the use of strdupa.
+2) I think it would be better to put this behavior in item_make(), as
+it will then be applied to all items, in all code paths. However, I a
+not sure that using COLS/2 is the best approach. Moreover, I think
+that this should be implemented inside the ncurses menu library and
+not worked around. Care to create a patch for ncurses?
+
+Cheers,
+Nir.
