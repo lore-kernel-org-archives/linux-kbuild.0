@@ -1,78 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ey0-f174.google.com ([209.85.215.174]:42718 "EHLO
-	mail-ey0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752489Ab1HaIxH convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 31 Aug 2011 04:53:07 -0400
-Received: by eyx24 with SMTP id 24so374491eyx.19
-        for <linux-kbuild@vger.kernel.org>; Wed, 31 Aug 2011 01:53:06 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <1314776773-9560-7-git-send-email-crquan@gmail.com>
-References: <CAH5vBdKxbaKDrA2gAj5CoDYShN+5dnfu6Bmd=4+oV-XmnYQnFA@mail.gmail.com>
-	<1314776773-9560-1-git-send-email-crquan@gmail.com>
-	<1314776773-9560-2-git-send-email-crquan@gmail.com>
-	<1314776773-9560-3-git-send-email-crquan@gmail.com>
-	<1314776773-9560-4-git-send-email-crquan@gmail.com>
-	<1314776773-9560-5-git-send-email-crquan@gmail.com>
-	<1314776773-9560-6-git-send-email-crquan@gmail.com>
-	<1314776773-9560-7-git-send-email-crquan@gmail.com>
-Date: Wed, 31 Aug 2011 11:53:06 +0300
-Message-ID: <CAMT+=WYdCTb5O5V0ny+VTe0wHS==irZ1jcY2DV1KaKyfayn4+w@mail.gmail.com>
-Subject: Re: [PATCH V2 6/6] scripts/kconfig/nconf: trunc too long string
- display in menu
-From: Nir Tzachar <nir.tzachar@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 8BIT
+Received: from cantor2.suse.de ([195.135.220.15]:58124 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754670Ab1HaJpt (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 31 Aug 2011 05:45:49 -0400
+Received: from relay2.suse.de (charybdis-ext.suse.de [195.135.221.2])
+	(using TLSv1 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mx2.suse.de (Postfix) with ESMTP id ED01D8D40D
+	for <linux-kbuild@vger.kernel.org>; Wed, 31 Aug 2011 11:45:48 +0200 (CEST)
+From: Jiaju Zhang <jjzhang@suse.de>
+Subject: [PATCH] Kconfig: Fix help message for DEFAULT_HUNG_TASK_TIMEOUT
+Date: Wed, 31 Aug 2011 17:43:29 +0800
+Message-Id: <1314783809-20903-1-git-send-email-jjzhang@suse.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Cheng Renquan <crquan@gmail.com>
-Cc: linux-kbuild@vger.kernel.org, Arnaud Lacombe <lacombar@gmail.com>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <mmarek@suse.cz>, Randy Dunlap <rdunlap@xenotime.net>, c.rq541@comcast.net
+To: linux-kbuild@vger.kernel.org
+Cc: jkosina@suse.cz, mmarek@suse.cz, Jiaju Zhang <jjzhang@suse.de>
 
-Hi.
+Added missing _secs in the help message of config DEFAULT_HUNG_TASK_TIMEOUT.
 
-On Wed, Aug 31, 2011 at 10:46 AM, Cheng Renquan <crquan@gmail.com> wrote:
-> When the string is too long, only show the first COLS/2 bytes wide,
-> to make sure there is some space to show the menu prompt.
->
-> Signed-off-by: Cheng Renquan <crquan@gmail.com>
-> ---
->  scripts/kconfig/nconf.c |    8 +++++++-
->  1 files changed, 7 insertions(+), 1 deletions(-)
->
-> diff --git a/scripts/kconfig/nconf.c b/scripts/kconfig/nconf.c
-> index 4248759..4997ebf 100644
-> --- a/scripts/kconfig/nconf.c
-> +++ b/scripts/kconfig/nconf.c
-> @@ -887,8 +887,14 @@ static void build_conf(struct menu *menu)
->                                break;
->                        default:
->                                tmp = 2 + strlen(sym_get_string_value(sym));
-> -                               item_make(menu, 's', "    (%s)",
-> +                               if (tmp < COLS/2)
-> +                                       item_make(menu, 's', "    (%s)",
->                                                sym_get_string_value(sym));
-> +                               else {
-> +                                       char *s = strndupa(sym_get_string_value(sym), COLS/2);
-> +                                       strcpy(s + COLS/2 - 5, " ...");
-> +                                       item_make(menu, 's', "    (%s)", s);
-> +                               }
->                                tmp = indent - tmp + 4;
->                                if (tmp < 0)
->                                        tmp = 0;
-> --
-> 1.7.6
->
->
+Signed-off-by: Jiaju Zhang <jjzhang@suse.de>
+---
+ lib/Kconfig.debug |    5 +++--
+ 1 files changed, 3 insertions(+), 2 deletions(-)
 
-Nack.
+diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
+index c0cb9c4..f285553 100644
+--- a/lib/Kconfig.debug
++++ b/lib/Kconfig.debug
+@@ -248,8 +248,9 @@ config DEFAULT_HUNG_TASK_TIMEOUT
+ 	  to determine when a task has become non-responsive and should
+ 	  be considered hung.
+ 
+-	  It can be adjusted at runtime via the kernel.hung_task_timeout
+-	  sysctl or by writing a value to /proc/sys/kernel/hung_task_timeout.
++	  It can be adjusted at runtime via the kernel.hung_task_timeout_secs
++	  sysctl or by writing a value to
++	  /proc/sys/kernel/hung_task_timeout_secs.
+ 
+ 	  A timeout of 0 disables the check.  The default is two minutes.
+ 	  Keeping the default should be fine in most cases.
+-- 
+1.6.0.2
 
-I see several problems with this approach:
-1) I do not like the use of strdupa.
-2) I think it would be better to put this behavior in item_make(), as
-it will then be applied to all items, in all code paths. However, I a
-not sure that using COLS/2 is the best approach. Moreover, I think
-that this should be implemented inside the ncurses menu library and
-not worked around. Care to create a patch for ncurses?
-
-Cheers,
-Nir.
