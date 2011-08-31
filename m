@@ -1,54 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from terminus.zytor.com ([198.137.202.10]:52409 "EHLO mail.zytor.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1756733Ab1H3VMa (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 30 Aug 2011 17:12:30 -0400
-Message-ID: <4E5D5224.5000400@zytor.com>
-Date: Tue, 30 Aug 2011 14:12:04 -0700
-From: "H. Peter Anvin" <hpa@zytor.com>
-MIME-Version: 1.0
-Subject: Re: Generating unistd_*.h
-References: <4E583860.5080603@zytor.com> <20110827101820.GA2990@merkur.ravnborg.org> <4E58D99A.2050400@zytor.com> <4E5D4528.1070307@zytor.com> <4E5D501D.9000604@zytor.com>
-In-Reply-To: <4E5D501D.9000604@zytor.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Received: from mail-iy0-f174.google.com ([209.85.210.174]:38180 "EHLO
+	mail-iy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754561Ab1HaHry (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 31 Aug 2011 03:47:54 -0400
+Received: by iabu26 with SMTP id u26so499798iab.19
+        for <linux-kbuild@vger.kernel.org>; Wed, 31 Aug 2011 00:47:54 -0700 (PDT)
+From: Cheng Renquan <crquan@gmail.com>
+Subject: [PATCH 0/6] nconf bug fixes and U/E improvements
+Date: Wed, 31 Aug 2011 00:46:07 -0700
+Message-Id: <1314776773-9560-1-git-send-email-crquan@gmail.com>
+In-Reply-To: <CAH5vBdKxbaKDrA2gAj5CoDYShN+5dnfu6Bmd=4+oV-XmnYQnFA@mail.gmail.com>
+References: <CAH5vBdKxbaKDrA2gAj5CoDYShN+5dnfu6Bmd=4+oV-XmnYQnFA@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: linux-kbuild@vger.kernel.org, David Woodhouse <dwmw2@infradead.org>
+To: linux-kbuild@vger.kernel.org, Arnaud Lacombe <lacombar@gmail.com>
+Cc: Sam Ravnborg <sam@ravnborg.org>, Michal Marek <mmarek@suse.cz>, Nir Tzachar <nir.tzachar@gmail.com>, Randy Dunlap <rdunlap@xenotime.net>, c.rq541@comcast.net
 
-[Cc: dwmw2]
+*** BLURB HERE ***
 
-On 08/30/2011 02:03 PM, H. Peter Anvin wrote:
-> On 08/30/2011 01:16 PM, H. Peter Anvin wrote:
->> On 08/27/2011 04:48 AM, H. Peter Anvin wrote:
->>> On 08/27/2011 03:18 AM, Sam Ravnborg wrote:
->>>>>
->>>>> 1. Is there a better place than others to put these generated files
->>>>>    (i.e. other than $(obj)/arch/x86/include/asm)?
->>>> $(obj)/arch/x86/include/generated
->>>>
->>>> This is what generic-y supports uses.
->>>>
->>
->> OK, got things mostly working, but I'm a bit stuck on how to make
->> headers-install do the right thing.  objhdr-y doesn't seem to deal with
->> the generated subdirectory very well, and we don't really want the files
->> *installed* into the generated subdirectory for user space.
->>
->> Any suggestions for how to best handle it?
->>
-> 
-> For reference, putting the following in arch/x86/include/asm/Kbuild does
-> *not* work, because $(objtree)/arch/x86/include/asm doesn't exist, and
-> so Kbuild generates an invalid path:
-> 
-> objhdr-y += ../generated/asm/unistd_32.h
-> objhdr-y += ../generated/asm/unistd_64.h
-> 
+Cheng Renquan (6):
+  scripts/kconfig/nconf: fix typo: unknow => unknown
+  scripts/kconfig/nconf: fix memmove's length arg
+  scripts/kconfig/nconf: dynamically alloc dialog_input_result
+Thanks Arnaud pointing out realloc issue in previous edition;
 
-Similarly, overriding obj in the same file does not work, because
-scripts/Makefile.headersinst uses $(srctree)/$(obj) not
-$(srctree)/$(src) ... is that normal/expected?
+  scripts/kconfig/nconf: fix editing long strings
 
-	-hpa
+  scripts/kconfig/nconf: add KEY_HOME / KEY_END for dialog_inputbox
+The nconfig even has KEY_UP as KEY_RIGHT and KEY_DOWN as KEY_LEFT,
+that I think more unnatural, better remove KEY_UP/KEY_DOWN in such
+a one line editor, or for future possible text area editor;
+
+  scripts/kconfig/nconf: trunc too long string display in menu
+
+ scripts/kconfig/nconf.c     |   29 ++++++++++-------
+ scripts/kconfig/nconf.gui.c |   73 ++++++++++++++++++++++++++++++++++++-------
+ scripts/kconfig/nconf.h     |    2 +-
+ 3 files changed, 79 insertions(+), 25 deletions(-)
+
+-- 
+1.7.6
+
+Cheng Renquan (???)
