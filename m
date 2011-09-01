@@ -1,30 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:41099 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1757552Ab1IAOXO (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 1 Sep 2011 10:23:14 -0400
-Message-ID: <4E5F9551.6090909@suse.cz>
-Date: Thu, 01 Sep 2011 16:23:13 +0200
-From: Michal Marek <mmarek@suse.cz>
-MIME-Version: 1.0
-Subject: Re: [PATCH] kconfig: protect locale-unsafe calls
-References: <1313471973-13966-1-git-send-email-lacombar@gmail.com> <4E5E26B8.5030606@suse.cz>
-In-Reply-To: <4E5E26B8.5030606@suse.cz>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Received: from mail-gw0-f46.google.com ([74.125.83.46]:50115 "EHLO
+	mail-gw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755244Ab1IARxP (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 1 Sep 2011 13:53:15 -0400
+From: crquan@gmail.com
+Subject: [PATCH V3 1/5] scripts/kconfig/nconf: fix typo: unknow => unknown
+Date: Thu,  1 Sep 2011 10:52:18 -0700
+Message-Id: <1314899542-5848-1-git-send-email-crquan@gmail.com>
+In-Reply-To: <CAH5vBdKxbaKDrA2gAj5CoDYShN+5dnfu6Bmd=4+oV-XmnYQnFA@mail.gmail.com>
+References: <CAH5vBdKxbaKDrA2gAj5CoDYShN+5dnfu6Bmd=4+oV-XmnYQnFA@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnaud Lacombe <lacombar@gmail.com>
-Cc: linux-kbuild@vger.kernel.org, s.koylux@gmail.com
+To: linux-kbuild@vger.kernel.org, Arnaud Lacombe <lacombar@gmail.com>
+Cc: Sam Ravnborg <sam@ravnborg.org>, Michal Marek <mmarek@suse.cz>, Nir Tzachar <nir.tzachar@gmail.com>, Randy Dunlap <rdunlap@xenotime.net>, linux-kernel@vger.kernel.org, c.rq541@comcast.net
 
-On 31.8.2011 14:19, Michal Marek wrote:
-> As for the tollower/toupper issue, I would propose a much simpler way:
-> Let's not try to be cute and simply use include/config/FOO_BAR.h for
-> each CONFIG_FOO_BAR. x86_64 allmodconfig results in some 5k symbols
-> enabled, I'm sure any filesystem will handle a directory with 5k files
-> in it.
+From: Cheng Renquan <crquan@gmail.com>
 
-Unfortunately, we can't do this, because updating from a tree that used
-include/config/foo/bar.h would result in missed rebuilds :-(.
+Signed-off-by: Cheng Renquan <crquan@gmail.com>
+Acked-by: Arnaud Lacombe <lacombar@gmail.com>
+---
+ scripts/kconfig/nconf.gui.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-Michal
+diff --git a/scripts/kconfig/nconf.gui.c b/scripts/kconfig/nconf.gui.c
+index f8137b3..d3af04e 100644
+--- a/scripts/kconfig/nconf.gui.c
++++ b/scripts/kconfig/nconf.gui.c
+@@ -461,7 +461,7 @@ int dialog_inputbox(WINDOW *main_window,
+ 				result[cursor_position] = res;
+ 				cursor_position++;
+ 			} else {
+-				mvprintw(0, 0, "unknow key: %d\n", res);
++				mvprintw(0, 0, "unknown key: %d\n", res);
+ 			}
+ 			break;
+ 		}
+-- 
+1.7.6
+
