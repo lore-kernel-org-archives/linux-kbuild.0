@@ -1,19 +1,16 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
 Received: from mail-pz0-f42.google.com ([209.85.210.42]:49118 "EHLO
 	mail-pz0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757144Ab1IARx0 (ORCPT
+	with ESMTP id S1755244Ab1IARxS (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 1 Sep 2011 13:53:26 -0400
+	Thu, 1 Sep 2011 13:53:18 -0400
 From: crquan@gmail.com
-Subject: [PATCH V3 5/5] scripts/kconfig/nconf: add KEY_HOME / KEY_END for dialog_inputbox
-Date: Thu,  1 Sep 2011 10:52:22 -0700
-Message-Id: <1314899542-5848-5-git-send-email-crquan@gmail.com>
-In-Reply-To: <1314899542-5848-4-git-send-email-crquan@gmail.com>
+Subject: [PATCH V3 2/5] scripts/kconfig/nconf: fix memmove's length arg
+Date: Thu,  1 Sep 2011 10:52:19 -0700
+Message-Id: <1314899542-5848-2-git-send-email-crquan@gmail.com>
+In-Reply-To: <1314899542-5848-1-git-send-email-crquan@gmail.com>
 References: <CAH5vBdKxbaKDrA2gAj5CoDYShN+5dnfu6Bmd=4+oV-XmnYQnFA@mail.gmail.com>
  <1314899542-5848-1-git-send-email-crquan@gmail.com>
- <1314899542-5848-2-git-send-email-crquan@gmail.com>
- <1314899542-5848-3-git-send-email-crquan@gmail.com>
- <1314899542-5848-4-git-send-email-crquan@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org, Arnaud Lacombe <lacombar@gmail.com>
@@ -21,33 +18,59 @@ Cc: Sam Ravnborg <sam@ravnborg.org>, Michal Marek <mmarek@suse.cz>, Nir Tzachar 
 
 From: Cheng Renquan <crquan@gmail.com>
 
-to make it easier to locate begin/end when editing long strings;
+In case KEY_BACKSPACE / KEY_DC to delete a char, it memmove only
+(len-cursor_position+1) bytes;
+the default case is to insert a char, it should also memmove exactly
+(len-cursor_position+1) bytes;
+
+the original use of (len+1) is wrong and may access following memory
+that doesn't belong to result, may cause SegFault in theory;
+
+	case KEY_BACKSPACE:
+		if (cursor_position > 0) {
+			memmove(&result[cursor_position-1],
+					&result[cursor_position],
+					len-cursor_position+1);
+			cursor_position--;
+		}
+		break;
+	case KEY_DC:
+		if (cursor_position >= 0 && cursor_position < len) {
+			memmove(&result[cursor_position],
+					&result[cursor_position+1],
+					len-cursor_position+1);
+		}
+		break;
+	default:
+		if ((isgraph(res) || isspace(res)) &&
+				len-2 < result_len) {
+			/* insert the char at the proper position */
+			memmove(&result[cursor_position+1],
+					&result[cursor_position],
+					len-cursor_position+1);
+			result[cursor_position] = res;
+			cursor_position++;
+		}
 
 Signed-off-by: Cheng Renquan <crquan@gmail.com>
-Acked By: Nir Tzachar <nir.tzachar@gmail.com>
+Acked-by: Nir Tzachar <nir.tzachar@gmail.com>
 ---
- scripts/kconfig/nconf.gui.c |    8 ++++++++
- 1 files changed, 8 insertions(+), 0 deletions(-)
+ scripts/kconfig/nconf.gui.c |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
 diff --git a/scripts/kconfig/nconf.gui.c b/scripts/kconfig/nconf.gui.c
-index 4b9d8b6..3b18dd8 100644
+index d3af04e..3ce2a7c 100644
 --- a/scripts/kconfig/nconf.gui.c
 +++ b/scripts/kconfig/nconf.gui.c
-@@ -465,6 +465,14 @@ int dialog_inputbox(WINDOW *main_window,
- 				cursor_form_win--;
- 			}
- 			break;
-+		case KEY_HOME:
-+			cursor_position = 0;
-+			cursor_form_win = 0;
-+			break;
-+		case KEY_END:
-+			cursor_position = len;
-+			cursor_form_win = min(cursor_position, prompt_width-1);
-+			break;
- 		default:
- 			if ((isgraph(res) || isspace(res))) {
- 				/* one for new char, one for '\0' */
+@@ -457,7 +457,7 @@ int dialog_inputbox(WINDOW *main_window,
+ 				/* insert the char at the proper position */
+ 				memmove(&result[cursor_position+1],
+ 						&result[cursor_position],
+-						len+1);
++						len-cursor_position+1);
+ 				result[cursor_position] = res;
+ 				cursor_position++;
+ 			} else {
 -- 
 1.7.6
 
