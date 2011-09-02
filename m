@@ -1,125 +1,153 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pz0-f42.google.com ([209.85.210.42]:49118 "EHLO
+Received: from mail-pz0-f42.google.com ([209.85.210.42]:38664 "EHLO
 	mail-pz0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757094Ab1IARxX (ORCPT
+	with ESMTP id S932659Ab1IBAcs convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 1 Sep 2011 13:53:23 -0400
-From: crquan@gmail.com
-Subject: [PATCH V3 4/5] scripts/kconfig/nconf: fix editing long strings
-Date: Thu,  1 Sep 2011 10:52:21 -0700
-Message-Id: <1314899542-5848-4-git-send-email-crquan@gmail.com>
-In-Reply-To: <1314899542-5848-3-git-send-email-crquan@gmail.com>
-References: <CAH5vBdKxbaKDrA2gAj5CoDYShN+5dnfu6Bmd=4+oV-XmnYQnFA@mail.gmail.com>
- <1314899542-5848-1-git-send-email-crquan@gmail.com>
- <1314899542-5848-2-git-send-email-crquan@gmail.com>
- <1314899542-5848-3-git-send-email-crquan@gmail.com>
+	Thu, 1 Sep 2011 20:32:48 -0400
+MIME-Version: 1.0
+In-Reply-To: <CACqU3MXBjHi9nOfxeQGJVtc7x33KbzK2Mi+_+A+jr+bPwqzY-Q@mail.gmail.com>
+References: <20110822145304.980529cb921e5f1321c622da@canb.auug.org.au>
+	<20110822125355.bb01d76b.rdunlap@xenotime.net>
+	<CACqU3MVjg60pTPyNWm+41w144QzPgtHQ4wZPUUV=vok8gGffuQ@mail.gmail.com>
+	<20110822174958.73dd96c7.rdunlap@xenotime.net>
+	<1314065358.3225.44.camel@localhost.localdomain>
+	<20110823164035.ca28fdc6.rdunlap@xenotime.net>
+	<CACqU3MWfKji5BcGRmwO_Y4_15oOq7Trw3u6j1g2meFAaG-s9-w@mail.gmail.com>
+	<1314362342.3224.19.camel@localhost.localdomain>
+	<20110826100011.9213d872.rdunlap@xenotime.net>
+	<CACqU3MXBjHi9nOfxeQGJVtc7x33KbzK2Mi+_+A+jr+bPwqzY-Q@mail.gmail.com>
+Date: Thu, 1 Sep 2011 20:32:47 -0400
+Message-ID: <CACqU3MWcBJuXA3n=ha_MNteM6MHfEWj8=42nZ_zvorvt6Pbq-w@mail.gmail.com>
+Subject: Re: linux-next: Tree for Aug 22 (evm)
+From: Arnaud Lacombe <lacombar@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org, Arnaud Lacombe <lacombar@gmail.com>
-Cc: Sam Ravnborg <sam@ravnborg.org>, Michal Marek <mmarek@suse.cz>, Nir Tzachar <nir.tzachar@gmail.com>, Randy Dunlap <rdunlap@xenotime.net>, linux-kernel@vger.kernel.org, c.rq541@comcast.net
+To: Randy Dunlap <rdunlap@xenotime.net>
+Cc: Mimi Zohar <zohar@linux.vnet.ibm.com>, Stephen Rothwell <sfr@canb.auug.org.au>, Mimi Zohar <zohar@us.ibm.com>, linux-next@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org
 
-From: Cheng Renquan <crquan@gmail.com>
+Hi,
 
-The original dialog_inputbox doesn't work with longer than prompt_width
-strings, here fixed it in this way:
-1) add variable cursor_form_win to record cursor of form_win,
-   keep its value always between [0, prompt_width-1];
-   reuse the original cursor_position as cursor of the string result,
-   use (cursor_position-cursor_form_win) as begin offset to show part of
-   the string in form_win;
+On Sat, Aug 27, 2011 at 2:06 AM, Arnaud Lacombe <lacombar@gmail.com> wrote:
+> Hi,
+>
+> On Fri, Aug 26, 2011 at 1:00 PM, Randy Dunlap <rdunlap@xenotime.net> wrote:
+>> On Fri, 26 Aug 2011 08:39:02 -0400 Mimi Zohar wrote:
+>>
+>>> On Tue, 2011-08-23 at 22:10 -0400, Arnaud Lacombe wrote:
+>>> > Hi,
+>>> >
+>>> > On Tue, Aug 23, 2011 at 7:40 PM, Randy Dunlap <rdunlap@xenotime.net> wrote:
+>>> > > I think that you are going to need to do something like Arnaud suggested
+>>> > > and use "depends on TCG_TPM=y" instead of just "depends on TCG_TPM",
+>>> > > unless you can convince someone that this is a kconfig bug.
+>>> > >
+>>> > dammit... I guess there is...
+>>> >
+>>> > If you consider the following Kconfig:
+>>> >
+>>> > config MOD
+>>> >         bool
+>>> >         default y
+>>> >         option modules
+>>> >
+>>> > config EXPERIMENTAL
+>>> >         bool
+>>> >         default y
+>>> >
+>>> > menuconfig A
+>>> >         tristate "A"
+>>> >         depends on EXPERIMENTAL
+>>> >
+>>> > config B
+>>> >         bool "B"
+>>> >
+>>> > config B0
+>>> >         bool
+>>> >
+>>> > config C
+>>> >         tristate "C"
+>>> >         depends on B
+>>> >
+>>> > config C0
+>>> >         tristate
+>>> >
+>>> > config D
+>>> >         boolean "D"
+>>> >         depends on A && B
+>>> >         select C
+>>> >         select C0
+>>> >
+>>> > config E
+>>> >         tristate "E"
+>>> >
+>>> > config F
+>>> >         tristate "F"
+>>> >         select E
+>>> >
+>>> > B (KEYS) allows to set C (TRUSTED_KEYS). Also, B (KEYS) and A
+>>> > (TCG_TPM) allows to set D (EVM), which will select (C). Now,
+>>> > menuconfig highlight the problem very well. Proceeding as following
+>>> > A=m, B=y, C=m, E=y, F=y, we ends up having:
+>>> >
+>>> >  <M> A  --->
+>>> >  [*] B
+>>> >  {M} C
+>>> >  [*] D
+>>> >  -*- E
+>>> >  <*> F
+>>> >
+>>> > which translate in the following config:
+>>> >
+>>> > CONFIG_MOD=y
+>>> > CONFIG_EXPERIMENTAL=y
+>>> > CONFIG_A=m
+>>> > CONFIG_B=y
+>>> > CONFIG_C=m
+>>> > CONFIG_C0=m
+>>> > CONFIG_D=y
+>>> > CONFIG_E=y
+>>> > CONFIG_F=y
+>>> >
+>>> > I would have expected CONFIG_C and CONFIG_C0 to be 'y', just as 'E'.
+>>> > If you remove D's dependency on 'A', everything works as expected. So
+>>> > it would seem direct dependency state influence the state of reverse
+>>> > dependencies...
+>>> >
+>>> > Will have a look...
+>>> >
+>>> >  - Arnaud
+>>>
+>>> Thanks for looking into this!  Instead of changing 'TCG_TPM' to
+>>> 'TCG_TPM=y', the dependency should be on 'TRUSTED_KEYS=y'.  Then when
+>>> I've refactored ENCRYPTED_KEYS, removing the ENCRYPTED_KEYS dependency
+>>> on TRUSTED_KEYS, the EVM dependency would be '(TRUSTED_KEYS=y ||
+>>> TRUSTED_KEYS=n)'.  Do you want a temporary fix for now?
+>>
+>> Yes, linux-next (randconfig) builds are still failing, so we need something
+>> to prevent that.
+>>
+> you may want to try:
+>
+> git://github.com/lacombar/linux-2.6.git master/kconfig/expr-woes
+>
+ping ?
 
-Signed-off-by: Cheng Renquan <crquan@gmail.com>
-Cc: Arnaud Lacombe <lacombar@gmail.com>
-Cc: Nir Tzachar <nir.tzachar@gmail.com>
----
- scripts/kconfig/nconf.gui.c |   29 +++++++++++++++++++++++------
- 1 files changed, 23 insertions(+), 6 deletions(-)
+ - Arnaud
 
-diff --git a/scripts/kconfig/nconf.gui.c b/scripts/kconfig/nconf.gui.c
-index d64bc1c..4b9d8b6 100644
---- a/scripts/kconfig/nconf.gui.c
-+++ b/scripts/kconfig/nconf.gui.c
-@@ -367,6 +367,7 @@ int dialog_inputbox(WINDOW *main_window,
- 	int i, x, y;
- 	int res = -1;
- 	int cursor_position = strlen(init);
-+	int cursor_form_win;
- 	char *result = *resultp;
- 
- 	if (strlen(init)+1 > *result_len) {
-@@ -410,7 +411,9 @@ int dialog_inputbox(WINDOW *main_window,
- 	fill_window(prompt_win, prompt);
- 
- 	mvwprintw(form_win, 0, 0, "%*s", prompt_width, " ");
--	mvwprintw(form_win, 0, 0, "%s", result);
-+	cursor_form_win = min(cursor_position, prompt_width-1);
-+	mvwprintw(form_win, 0, 0, "%s",
-+		  result + cursor_position-cursor_form_win);
- 
- 	/* create panels */
- 	panel = new_panel(win);
-@@ -436,6 +439,8 @@ int dialog_inputbox(WINDOW *main_window,
- 						&result[cursor_position],
- 						len-cursor_position+1);
- 				cursor_position--;
-+				cursor_form_win--;
-+				len--;
- 			}
- 			break;
- 		case KEY_DC:
-@@ -443,18 +448,22 @@ int dialog_inputbox(WINDOW *main_window,
- 				memmove(&result[cursor_position],
- 						&result[cursor_position+1],
- 						len-cursor_position+1);
-+				len--;
- 			}
- 			break;
- 		case KEY_UP:
- 		case KEY_RIGHT:
--			if (cursor_position < len &&
--			    cursor_position < min(*result_len, prompt_width))
-+			if (cursor_position < len) {
- 				cursor_position++;
-+				cursor_form_win++;
-+			}
- 			break;
- 		case KEY_DOWN:
- 		case KEY_LEFT:
--			if (cursor_position > 0)
-+			if (cursor_position > 0) {
- 				cursor_position--;
-+				cursor_form_win--;
-+			}
- 			break;
- 		default:
- 			if ((isgraph(res) || isspace(res))) {
-@@ -470,16 +479,24 @@ int dialog_inputbox(WINDOW *main_window,
- 						len-cursor_position+1);
- 				result[cursor_position] = res;
- 				cursor_position++;
-+				cursor_form_win++;
-+				len++;
- 			} else {
- 				mvprintw(0, 0, "unknown key: %d\n", res);
- 			}
- 			break;
- 		}
-+		if (cursor_form_win < 0)
-+			cursor_form_win = 0;
-+		else if (cursor_form_win > prompt_width-1)
-+			cursor_form_win = prompt_width-1;
-+
- 		wmove(form_win, 0, 0);
- 		wclrtoeol(form_win);
- 		mvwprintw(form_win, 0, 0, "%*s", prompt_width, " ");
--		mvwprintw(form_win, 0, 0, "%s", result);
--		wmove(form_win, 0, cursor_position);
-+		mvwprintw(form_win, 0, 0, "%s",
-+			result + cursor_position-cursor_form_win);
-+		wmove(form_win, 0, cursor_form_win);
- 		touchwin(win);
- 		refresh_all_windows(main_window);
- 
--- 
-1.7.6
-
+> only the last commit is relevant to the problem, but depend on one
+> another to get <assert.h>. The rest aims at tidying the expr stuff.
+> I'm looking for regression it may have introduced.
+>
+> Thanks,
+>  - Arnaud
+>
+> ps: I'll most likely be AFK until sunday evening (to be conservative).
+>
+>> thanks,
+>> ---
+>> ~Randy
+>> *** Remember to use Documentation/SubmitChecklist when testing your code ***
+>>
+>
