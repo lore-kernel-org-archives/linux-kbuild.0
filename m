@@ -1,47 +1,72 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-gy0-f174.google.com ([209.85.160.174]:39524 "EHLO
-	mail-gy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754257Ab1IFPEL (ORCPT
+Received: from mail-pz0-f42.google.com ([209.85.210.42]:63078 "EHLO
+	mail-pz0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754620Ab1IFPFZ convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 6 Sep 2011 11:04:11 -0400
+	Tue, 6 Sep 2011 11:05:25 -0400
 MIME-Version: 1.0
-In-Reply-To: <4E65DF36.6040507@parrot.com>
-References: <4E65DF36.6040507@parrot.com>
-Date: Tue, 6 Sep 2011 11:04:08 -0400
-Message-ID: <CACqU3MU9nuW+a3AJfY_PRqFH_tgaKtBJrp1pU2xpB_dHYANBXg@mail.gmail.com>
-Subject: Re: randconfig broken on choice
+In-Reply-To: <CACqU3MXJafAX4Wee8goNtrKF3L1JPCz7xPaQwcQ6nynX60Rrow@mail.gmail.com>
+References: <1313472854-14426-1-git-send-email-lacombar@gmail.com>
+	<CACqU3MWx9Z+2dWP4OjVO+1T+3EsAE0geZhdRM2_B9osKw-Mw2A@mail.gmail.com>
+	<CACqU3MXJafAX4Wee8goNtrKF3L1JPCz7xPaQwcQ6nynX60Rrow@mail.gmail.com>
+Date: Tue, 6 Sep 2011 11:05:25 -0400
+Message-ID: <CACqU3MUnYHB34rtdetYZinknSr3KOEwK0MUdxci7_QPgJ2tnsg@mail.gmail.com>
+Subject: Re: [PATCH 0/4] Kbuild/Kconfig
 From: Arnaud Lacombe <lacombar@gmail.com>
 Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Matthieu CASTET <matthieu.castet@parrot.com>
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Arnaud Lacombe <lacombar@gmail.com>
 
 Hi,
 
-On Tue, Sep 6, 2011 at 4:52 AM, Matthieu CASTET
-<matthieu.castet@parrot.com> wrote:
+On Mon, Aug 29, 2011 at 8:29 PM, Arnaud Lacombe <lacombar@gmail.com> wrote:
 > Hi,
 >
-> I am using v3.1-rc4 and make randconfig look broken for choice.
-> The choice config is always the same or choice entry can have more than one entry.
+> On Mon, Aug 22, 2011 at 11:49 AM, Arnaud Lacombe <lacombar@gmail.com> wrote:
+>> Hi,
+>>
+>> On Tue, Aug 16, 2011 at 1:34 AM, Arnaud Lacombe <lacombar@gmail.com> wrote:
+>>> Hi Michal,
+>>>
+>>> The following small serie unexpose a few Kconfig variable from Kbuild, and
+>>> vice-versa. The idea is that Kbuild is a user of Kconfig, not the other way
+>>> around.
+>>>
+>>> In the same time, fix a couple of place where we hardcode the `.config' string.
+>>>
+>>> Comments Welcome !
+>>>  - Arnaud
+>>>
+>> ping ?
+>>
+> ping^2 ?
 >
-Could you includes testcases showing that behavior, please ?
+ping^3 ?
 
-Btw, try also to include patch inlined, not multipart. That makes
-review easier. I know, gmail is not making that easy, but git
-send-email works just fine.
-
-Thanks,
  - Arnaud
 
+>  - Arnaud
 >
-> After some debugging, it seems in randomize_choice_values, we don't clean
-> SYMBOL_VALID for choice entry.
-> And we don't take "sym->def[S_DEF_USER].tri" but the "default sym->cur.tri".
->
-> The following patch seems to fix the problem.
->
->
-> Matthieu
+>>  - Arnaud
+>>
+>>> Arnaud Lacombe (4):
+>>>  kbuild: introduce KBUILD_CONFIG; unexpose KCONFIG_CONFIG
+>>>  kbuild: reduce kbuild invasivity within kconfig
+>>>  kbuild: do not hardcode .config
+>>>  kconfig: do not hardcode .config
+>>>
+>>>  Makefile                                |   20 ++++++++++++++------
+>>>  arch/arm/boot/compressed/Makefile       |    2 +-
+>>>  arch/unicore32/boot/compressed/Makefile |    2 +-
+>>>  scripts/kconfig/Makefile                |   31 ++++++++++++++++---------------
+>>>  4 files changed, 32 insertions(+), 23 deletions(-)
+>>>
+>>> --
+>>> 1.7.6.153.g78432
+>>>
+>>>
+>>
 >
