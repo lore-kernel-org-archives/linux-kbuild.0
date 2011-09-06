@@ -1,16 +1,17 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-yx0-f174.google.com ([209.85.213.174]:61775 "EHLO
-	mail-yx0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754950Ab1IFPcB convert rfc822-to-8bit (ORCPT
+Received: from mail-gy0-f174.google.com ([209.85.160.174]:59621 "EHLO
+	mail-gy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753427Ab1IFSzs convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 6 Sep 2011 11:32:01 -0400
+	Tue, 6 Sep 2011 14:55:48 -0400
 MIME-Version: 1.0
-In-Reply-To: <4E663882.4050404@parrot.com>
+In-Reply-To: <CACqU3MUC-m7AgEPG2C-V2SVKEhHxdYE8tOSFJvqO9Vq+JJEchw@mail.gmail.com>
 References: <4E65DF36.6040507@parrot.com>
 	<CACqU3MU9nuW+a3AJfY_PRqFH_tgaKtBJrp1pU2xpB_dHYANBXg@mail.gmail.com>
 	<4E663882.4050404@parrot.com>
-Date: Tue, 6 Sep 2011 11:32:00 -0400
-Message-ID: <CACqU3MUC-m7AgEPG2C-V2SVKEhHxdYE8tOSFJvqO9Vq+JJEchw@mail.gmail.com>
+	<CACqU3MUC-m7AgEPG2C-V2SVKEhHxdYE8tOSFJvqO9Vq+JJEchw@mail.gmail.com>
+Date: Tue, 6 Sep 2011 14:55:47 -0400
+Message-ID: <CACqU3MUL0t6RYDRDQuiyco-ME=ccW6p+_pEkuRm_e=VAZa5HzA@mail.gmail.com>
 Subject: Re: randconfig broken on choice
 From: Arnaud Lacombe <lacombar@gmail.com>
 Content-Type: text/plain; charset=ISO-8859-1
@@ -22,47 +23,82 @@ Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "linux-kbuild
 
 Hi,
 
-On Tue, Sep 6, 2011 at 11:13 AM, Matthieu CASTET
-<matthieu.castet@parrot.com> wrote:
+On Tue, Sep 6, 2011 at 11:32 AM, Arnaud Lacombe <lacombar@gmail.com> wrote:
 > Hi,
 >
-> Arnaud Lacombe a écrit :
+> On Tue, Sep 6, 2011 at 11:13 AM, Matthieu CASTET
+> <matthieu.castet@parrot.com> wrote:
 >> Hi,
 >>
->> On Tue, Sep 6, 2011 at 4:52 AM, Matthieu CASTET
->> <matthieu.castet@parrot.com> wrote:
+>> Arnaud Lacombe a écrit :
 >>> Hi,
 >>>
->>> I am using v3.1-rc4 and make randconfig look broken for choice.
->>> The choice config is always the same or choice entry can have more than one entry.
->>>
->> Could you includes testcases showing that behavior, please ?
-> $ make randconfig
+>>> On Tue, Sep 6, 2011 at 4:52 AM, Matthieu CASTET
+>>> <matthieu.castet@parrot.com> wrote:
+>>>> Hi,
+>>>>
+>>>> I am using v3.1-rc4 and make randconfig look broken for choice.
+>>>> The choice config is always the same or choice entry can have more than one entry.
+>>>>
+>>> Could you includes testcases showing that behavior, please ?
+>> $ make randconfig
+>>
+>> $ grep -e SLUB -e SLAB -e SLOB .config
+>> # CONFIG_SLAB is not set
+>> CONFIG_SLUB=y
+>> CONFIG_SLOB=y
+>> # CONFIG_FAILSLAB is not set
+>>
+>> We have 2 choice selected (SLUB and SLOB). You may run randconfig (more than one
+>> time to get this result).
+>>
+> ok, I reproduced it with:
 >
-> $ grep -e SLUB -e SLAB -e SLOB .config
-> # CONFIG_SLAB is not set
-> CONFIG_SLUB=y
-> CONFIG_SLOB=y
-> # CONFIG_FAILSLAB is not set
+> while true; do
+>    make randconfig
+>    CONFIG_SLAB=; CONFIG_SLOB=; CONFIG_SLUB=
+>    source .config
+>    if [ "${CONFIG_SLAB}${CONFIG_SLOB}${CONFIG_SLUB}" != "y" ]; then
+>        break
+>    fi
+>    sleep 1
+> done
 >
-> We have 2 choice selected (SLUB and SLOB). You may run randconfig (more than one
-> time to get this result).
+> I wonder what set the flags originally...
 >
-ok, I reproduced it with:
+This is interesting; I'm always getting the following:
 
-while true; do
-    make randconfig
-    CONFIG_SLAB=; CONFIG_SLOB=; CONFIG_SLUB=
-    source .config
-    if [ "${CONFIG_SLAB}${CONFIG_SLOB}${CONFIG_SLUB}" != "y" ]; then
-        break
-    fi
-    sleep 1
-done
+CONFIG_SLUB=y
+CONFIG_SLOB=y
 
-I wonder what set the flags originally...
+never CONFIG_SLAB and another one. Actually, the default of the choice
+ends up being selected along with the random one. Is this what you
+mean by "we don't take "sym->def[S_DEF_USER].tri" but the "default
+sym->cur.tri"" ? However, I do not see this behavior with the
+following reduced testcase:
 
- - Arnaud
+config EXPERT
+        bool
+        default y
 
-> Matthieu
->
+choice
+        prompt "Choose SLAB allocator"
+        default SLUB
+
+config SLAB
+        bool "SLAB"
+
+config SLUB
+        bool "SLUB (Unqueued Allocator)"
+
+config SLOB
+        depends on EXPERT
+        bool "SLOB (Simple Allocator)"
+
+endchoice
+
+Btw, you say that "we don't clean SYMBOL_VALID for choice entry", but
+AFAIU the code, we explicitly set the not-randomly-chosen choice value
+to 'no', so it's value should be valid.
+
+ - Arnaud
