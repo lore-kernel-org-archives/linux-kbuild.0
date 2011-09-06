@@ -1,127 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mailbigip.dreamhost.com ([208.97.132.5]:33480 "EHLO
-	homiemail-a4.g.dreamhost.com" rhost-flags-OK-OK-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1754191Ab1IFMdv (ORCPT
+Received: from mail-gy0-f174.google.com ([209.85.160.174]:39524 "EHLO
+	mail-gy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754257Ab1IFPEL (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 6 Sep 2011 08:33:51 -0400
-Subject: Re: [PATCH v2] kconfig: handle SIGINT in menuconfig
-From: Davidlohr Bueso <dave@gnu.org>
-Reply-To: dave@gnu.org
-In-Reply-To: <CACqU3MUOxLYEsuVv5d=LSjNio5ZHg3E8K+i2ztQshttUfemsdA@mail.gmail.com>
-References: <1313975049.2393.8.camel@offbook>
-	 <CACqU3MXup87LamKaNz1w8GXQdPvMedEjy_Y=TPsyLDYKQi4jwA@mail.gmail.com>
-	 <CACqU3MUOxLYEsuVv5d=LSjNio5ZHg3E8K+i2ztQshttUfemsdA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Date: Tue, 06 Sep 2011 09:33:37 -0300
-Message-ID: <1315312417.2532.1.camel@offbook>
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+	Tue, 6 Sep 2011 11:04:11 -0400
+MIME-Version: 1.0
+In-Reply-To: <4E65DF36.6040507@parrot.com>
+References: <4E65DF36.6040507@parrot.com>
+Date: Tue, 6 Sep 2011 11:04:08 -0400
+Message-ID: <CACqU3MU9nuW+a3AJfY_PRqFH_tgaKtBJrp1pU2xpB_dHYANBXg@mail.gmail.com>
+Subject: Re: randconfig broken on choice
+From: Arnaud Lacombe <lacombar@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnaud Lacombe <lacombar@gmail.com>
-Cc: Michal Marek <mmarek@suse.cz>, lkml <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org
+To: Matthieu CASTET <matthieu.castet@parrot.com>
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org
 
-On Mon, 2011-08-29 at 22:12 -0400, Arnaud Lacombe wrote:
+Hi,
+
+On Tue, Sep 6, 2011 at 4:52 AM, Matthieu CASTET
+<matthieu.castet@parrot.com> wrote:
 > Hi,
-> 
-> On Mon, Aug 29, 2011 at 9:55 PM, Arnaud Lacombe <lacombar@gmail.com> wrote:
-> > Hi,
-> >
-> > On Sun, Aug 21, 2011 at 9:04 PM, Davidlohr Bueso <dave@gnu.org> wrote:
-> >> From: Davidlohr Bueso <dave@gnu.org>
-> >>
-> >> I recently got bitten in the ass when pressing Ctrl-C and lost all my current configuration changes. This patch captures SIGINT and allows the user to save any changes.
-> >> Some code refactoring was made in order to handle the exit behavior.
-> >>
-> >> Signed-off-by: Davidlohr Bueso <dave@gnu.org>
-> >> Signed-off-by: Arnaud Lacombe <lacombar@gmail.com>
-> >> ---
-> >>  scripts/kconfig/mconf.c |   86 ++++++++++++++++++++++++++++------------------
-> >>  1 files changed, 52 insertions(+), 34 deletions(-)
-> >>
-> >> diff --git a/scripts/kconfig/mconf.c b/scripts/kconfig/mconf.c
-> >> index 820d2b6..19e200d 100644
-> >> --- a/scripts/kconfig/mconf.c
-> >> +++ b/scripts/kconfig/mconf.c
-> >> @@ -15,6 +15,7 @@
-> >>  #include <stdarg.h>
-> >>  #include <stdlib.h>
-> >>  #include <string.h>
-> >> +#include <signal.h>
-> >>  #include <unistd.h>
-> >>  #include <locale.h>
-> >>
-> >> @@ -272,6 +273,7 @@ static struct menu *current_menu;
-> >>  static int child_count;
-> >>  static int single_menu_mode;
-> >>  static int show_all_options;
-> >> +static int saved_x, saved_y;
-> >>
-> >>  static void conf(struct menu *menu);
-> >>  static void conf_choice(struct menu *menu);
-> >> @@ -792,9 +794,54 @@ static void conf_save(void)
-> >>        }
-> >>  }
-> >>
-> >> +static int handle_exit(void)
-> >> +{
-> >> +       int res;
-> >> +
-> >> +       dialog_clear();
-> >> +       if (conf_get_changed())
-> >> +               res = dialog_yesno(NULL,
-> >> +                                  _("Do you wish to save your new configuration ?\n"
-> >> +                                    "<ESC><ESC> to continue."),
-> >> +                                  6, 60);
-> >> +       else
-> >> +               res = -1;
-> >> +
-> >> +       end_dialog(saved_x, saved_y);
-> >> +
-> >> +       switch (res) {
-> >> +       case 0:
-> >> +               if (conf_write(filename)) {
-> >> +                       fprintf(stderr, _("\n\n"
-> >> +                                         "Error while writing of the configuration.\n"
-> >> +                                         "Your configuration changes were NOT saved."
-> >> +                                         "\n\n"));
-> >> +                       return 1;
-> >> +               }
-> >> +               /* fall through */
-> >> +       case -1:
-> >> +               printf(_("\n\n"
-> >> +                        "*** End of the configuration.\n"
-> >> +                        "*** Execute 'make' to start the build or try 'make help'."
-> >> +                        "\n\n"));
-> >> +               res = 0;
-> >> +               break;
-> >> +       default:
-> >> +               fprintf(stderr, _("\n\n"
-> >> +                                 "Your configuration changes were NOT saved."
-> >> +                                 "\n\n"));
-> >> +       }
-> >> +
-> >> +       return res;
-> >> +}
-> >> +
-> >> +static void sig_handler(int signo)
-> >> +{
-> >> +       exit(handle_exit());
-> >> +}
-> >> +
-> > Actually, no matter what handle_exit() returns, the process will
-> > return error code 130 and make will abort. I'd suggest to get rid of
-> > the call to exit(), and only keep handle_exit().
-> >
-> > any objection ?
-> >
-> stupid me... we need the call to exit(2), but its argument do not seem
-> to be used.
+>
+> I am using v3.1-rc4 and make randconfig look broken for choice.
+> The choice config is always the same or choice entry can have more than one entry.
+>
+Could you includes testcases showing that behavior, please ?
 
-Right otherwise we can't quit the program. The 130 exit code occurs
-because we're aborting the make process, nothing we can do about that, I
-think.
+Btw, try also to include patch inlined, not multipart. That makes
+review easier. I know, gmail is not making that easy, but git
+send-email works just fine.
 
 Thanks,
-Davidlohr
+ - Arnaud
 
+>
+> After some debugging, it seems in randomize_choice_values, we don't clean
+> SYMBOL_VALID for choice entry.
+> And we don't take "sym->def[S_DEF_USER].tri" but the "default sym->cur.tri".
+>
+> The following patch seems to fix the problem.
+>
+>
+> Matthieu
+>
