@@ -1,117 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from oproxy8-pub.bluehost.com ([69.89.22.20]:39589 "HELO
-	oproxy8-pub.bluehost.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with SMTP id S1752391Ab1IBPBi convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 2 Sep 2011 11:01:38 -0400
-Date: Fri, 2 Sep 2011 08:01:34 -0700
-From: Randy Dunlap <rdunlap@xenotime.net>
-Subject: Re: linux-next: Tree for Aug 22 (evm)
-Message-Id: <20110902080134.be3db10d.rdunlap@xenotime.net>
-In-Reply-To: <CACqU3MWf=4Lk1kji3T9V9TZL7p3FzFygTz-ZH3mcb6Y0SSFF0A@mail.gmail.com>
-References: <20110822145304.980529cb921e5f1321c622da@canb.auug.org.au>
-	<20110822125355.bb01d76b.rdunlap@xenotime.net>
-	<CACqU3MVjg60pTPyNWm+41w144QzPgtHQ4wZPUUV=vok8gGffuQ@mail.gmail.com>
-	<20110822174958.73dd96c7.rdunlap@xenotime.net>
-	<1314065358.3225.44.camel@localhost.localdomain>
-	<20110823164035.ca28fdc6.rdunlap@xenotime.net>
-	<CACqU3MWfKji5BcGRmwO_Y4_15oOq7Trw3u6j1g2meFAaG-s9-w@mail.gmail.com>
-	<1314362342.3224.19.camel@localhost.localdomain>
-	<20110826100011.9213d872.rdunlap@xenotime.net>
-	<CACqU3MXBjHi9nOfxeQGJVtc7x33KbzK2Mi+_+A+jr+bPwqzY-Q@mail.gmail.com>
-	<CACqU3MWcBJuXA3n=ha_MNteM6MHfEWj8=42nZ_zvorvt6Pbq-w@mail.gmail.com>
-	<1314927625.3058.53.camel@localhost.localdomain>
-	<CACqU3MWf=4Lk1kji3T9V9TZL7p3FzFygTz-ZH3mcb6Y0SSFF0A@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 8BIT
+Received: from co202.xi-lite.net ([149.6.83.202]:58562 "EHLO co202.xi-lite.net"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753296Ab1IFIwK (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 6 Sep 2011 04:52:10 -0400
+Message-ID: <4E65DF36.6040507@parrot.com>
+Date: Tue, 6 Sep 2011 10:52:06 +0200
+From: Matthieu CASTET <matthieu.castet@parrot.com>
+MIME-Version: 1.0
+Subject: randconfig broken on choice
+Content-Type: multipart/mixed;
+	boundary="------------050900080100090908010409"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnaud Lacombe <lacombar@gmail.com>
-Cc: Mimi Zohar <zohar@linux.vnet.ibm.com>, Stephen Rothwell <sfr@canb.auug.org.au>, Mimi Zohar <zohar@us.ibm.com>, linux-next@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org
+To: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org
 
-On Thu, 1 Sep 2011 22:21:16 -0400 Arnaud Lacombe wrote:
+--------------050900080100090908010409
+Content-Type: text/plain; charset="ISO-8859-1"
+Content-Transfer-Encoding: 7bit
 
-> Hi,
-> 
-> On Thu, Sep 1, 2011 at 9:40 PM, Mimi Zohar <zohar@linux.vnet.ibm.com> wrote:
-> > On Thu, 2011-09-01 at 20:32 -0400, Arnaud Lacombe wrote:
-> >> Hi,
-> >>
-> >> On Sat, Aug 27, 2011 at 2:06 AM, Arnaud Lacombe <lacombar@gmail.com> wrote:
-> >> > Hi,
-> >> >
-> >> > On Fri, Aug 26, 2011 at 1:00 PM, Randy Dunlap <rdunlap@xenotime.net> wrote:
-> >> >> On Fri, 26 Aug 2011 08:39:02 -0400 Mimi Zohar wrote:
-> >> >>
-> >> >>> On Tue, 2011-08-23 at 22:10 -0400, Arnaud Lacombe wrote:
-> >> >>> > Hi,
-> >> >>> >
-> >> >>> > On Tue, Aug 23, 2011 at 7:40 PM, Randy Dunlap <rdunlap@xenotime.net> wrote:
-> >> >>> > > I think that you are going to need to do something like Arnaud suggested
-> >> >>> > > and use "depends on TCG_TPM=y" instead of just "depends on TCG_TPM",
-> >> >>> > > unless you can convince someone that this is a kconfig bug.
-> >> >>> > >
-> >> >>> > dammit... I guess there is...
-> >> >>> >
-> >> >>> > If you consider the following Kconfig:
+Hi,
 
-[snip]
-
-> >> >>> > I would have expected CONFIG_C and CONFIG_C0 to be 'y', just as 'E'.
-> >> >>> > If you remove D's dependency on 'A', everything works as expected. So
-> >> >>> > it would seem direct dependency state influence the state of reverse
-> >> >>> > dependencies...
-> >> >>> >
-> >> >>> > Will have a look...
-> >> >>> >
-> >> >>> >  - Arnaud
-> >> >>>
-> >> >>> Thanks for looking into this!  Instead of changing 'TCG_TPM' to
-> >> >>> 'TCG_TPM=y', the dependency should be on 'TRUSTED_KEYS=y'.  Then when
-> >> >>> I've refactored ENCRYPTED_KEYS, removing the ENCRYPTED_KEYS dependency
-> >> >>> on TRUSTED_KEYS, the EVM dependency would be '(TRUSTED_KEYS=y ||
-> >> >>> TRUSTED_KEYS=n)'.  Do you want a temporary fix for now?
-> >> >>
-> >> >> Yes, linux-next (randconfig) builds are still failing, so we need something
-> >> >> to prevent that.
-> >> >>
-> >> > you may want to try:
-> >> >
-> >> > git://github.com/lacombar/linux-2.6.git master/kconfig/expr-woes
-> >> >
-> >> ping ?
-> >>
-> >>  - Arnaud
-> >
-> > I assume you want me to test using expr-woes, but I'm not how.  Could
-> > you help me here a bit.
-> >
-> > (Over the weekend I removed encrypted keys dependency on TCG_TPM.)
-> >
-> Well, at this point, this is not really related to the particular
-> issue, but to kconfig more generally. I guess I'll just post the
-> patches on LKML and see if they triggers non-wanted regression.
-
-Yes, please do that.
-
-> Thanks,
->  - Arnaud
-> 
-> > thanks,
-> >
-> > Mimi
-> >
-> >> > only the last commit is relevant to the problem, but depend on one
-> >> > another to get <assert.h>. The rest aims at tidying the expr stuff.
-> >> > I'm looking for regression it may have introduced.
-> >> >
-> >> > Thanks,
-> >> >  - Arnaud
-> >> >
-> >> > ps: I'll most likely be AFK until sunday evening (to be conservative).
+I am using v3.1-rc4 and make randconfig look broken for choice.
+The choice config is always the same or choice entry can have more than one entry.
 
 
----
-~Randy
-*** Remember to use Documentation/SubmitChecklist when testing your code ***
+After some debugging, it seems in randomize_choice_values, we don't clean
+SYMBOL_VALID for choice entry.
+And we don't take "sym->def[S_DEF_USER].tri" but the "default sym->cur.tri".
+
+The following patch seems to fix the problem.
+
+
+Matthieu
+
+--------------050900080100090908010409
+Content-Type: text/x-diff; name="randconfig.diff"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline; filename="randconfig.diff"
+
+diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
+index 59b667c..08331f8 100644
+--- a/scripts/kconfig/confdata.c
++++ b/scripts/kconfig/confdata.c
+@@ -1045,6 +1045,10 @@ static void randomize_choice_values(struct symbol *csym)
+ 		else {
+ 			sym->def[S_DEF_USER].tri = no;
+ 		}
++		sym->flags |= SYMBOL_DEF_USER;
++		/* clear VALID to get value calculated */
++		sym->flags &= ~(SYMBOL_VALID);
++
+ 	}
+ 	csym->flags |= SYMBOL_DEF_USER;
+ 	/* clear VALID to get value calculated */
+
+--------------050900080100090908010409--
