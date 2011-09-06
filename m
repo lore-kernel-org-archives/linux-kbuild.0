@@ -1,44 +1,68 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from co202.xi-lite.net ([149.6.83.202]:34216 "EHLO co202.xi-lite.net"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754280Ab1IFPNJ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 6 Sep 2011 11:13:09 -0400
-Message-ID: <4E663882.4050404@parrot.com>
-Date: Tue, 6 Sep 2011 17:13:06 +0200
-From: Matthieu CASTET <matthieu.castet@parrot.com>
+Received: from mail-yx0-f174.google.com ([209.85.213.174]:61775 "EHLO
+	mail-yx0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754950Ab1IFPcB convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 6 Sep 2011 11:32:01 -0400
 MIME-Version: 1.0
+In-Reply-To: <4E663882.4050404@parrot.com>
+References: <4E65DF36.6040507@parrot.com>
+	<CACqU3MU9nuW+a3AJfY_PRqFH_tgaKtBJrp1pU2xpB_dHYANBXg@mail.gmail.com>
+	<4E663882.4050404@parrot.com>
+Date: Tue, 6 Sep 2011 11:32:00 -0400
+Message-ID: <CACqU3MUC-m7AgEPG2C-V2SVKEhHxdYE8tOSFJvqO9Vq+JJEchw@mail.gmail.com>
 Subject: Re: randconfig broken on choice
-References: <4E65DF36.6040507@parrot.com> <CACqU3MU9nuW+a3AJfY_PRqFH_tgaKtBJrp1pU2xpB_dHYANBXg@mail.gmail.com>
-In-Reply-To: <CACqU3MU9nuW+a3AJfY_PRqFH_tgaKtBJrp1pU2xpB_dHYANBXg@mail.gmail.com>
-Content-Type: text/plain; charset="ISO-8859-1"
-Content-Transfer-Encoding: 8bit
+From: Arnaud Lacombe <lacombar@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnaud Lacombe <lacombar@gmail.com>
+To: Matthieu CASTET <matthieu.castet@parrot.com>
 Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>
 
 Hi,
 
-Arnaud Lacombe a écrit :
+On Tue, Sep 6, 2011 at 11:13 AM, Matthieu CASTET
+<matthieu.castet@parrot.com> wrote:
 > Hi,
-> 
-> On Tue, Sep 6, 2011 at 4:52 AM, Matthieu CASTET
-> <matthieu.castet@parrot.com> wrote:
+>
+> Arnaud Lacombe a écrit :
 >> Hi,
 >>
->> I am using v3.1-rc4 and make randconfig look broken for choice.
->> The choice config is always the same or choice entry can have more than one entry.
->>
-> Could you includes testcases showing that behavior, please ?
-$ make randconfig
+>> On Tue, Sep 6, 2011 at 4:52 AM, Matthieu CASTET
+>> <matthieu.castet@parrot.com> wrote:
+>>> Hi,
+>>>
+>>> I am using v3.1-rc4 and make randconfig look broken for choice.
+>>> The choice config is always the same or choice entry can have more than one entry.
+>>>
+>> Could you includes testcases showing that behavior, please ?
+> $ make randconfig
+>
+> $ grep -e SLUB -e SLAB -e SLOB .config
+> # CONFIG_SLAB is not set
+> CONFIG_SLUB=y
+> CONFIG_SLOB=y
+> # CONFIG_FAILSLAB is not set
+>
+> We have 2 choice selected (SLUB and SLOB). You may run randconfig (more than one
+> time to get this result).
+>
+ok, I reproduced it with:
 
-$ grep -e SLUB -e SLAB -e SLOB .config
-# CONFIG_SLAB is not set
-CONFIG_SLUB=y
-CONFIG_SLOB=y
-# CONFIG_FAILSLAB is not set
+while true; do
+    make randconfig
+    CONFIG_SLAB=; CONFIG_SLOB=; CONFIG_SLUB=
+    source .config
+    if [ "${CONFIG_SLAB}${CONFIG_SLOB}${CONFIG_SLUB}" != "y" ]; then
+        break
+    fi
+    sleep 1
+done
 
-We have 2 choice selected (SLUB and SLOB). You may run randconfig (more than one
-time to get this result).
+I wonder what set the flags originally...
 
-Matthieu
+ - Arnaud
+
+> Matthieu
+>
