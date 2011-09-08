@@ -1,17 +1,17 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-yx0-f174.google.com ([209.85.213.174]:63996 "EHLO
-	mail-yx0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755931Ab1IGUwQ convert rfc822-to-8bit (ORCPT
+Received: from mail-pz0-f42.google.com ([209.85.210.42]:37114 "EHLO
+	mail-pz0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751367Ab1IHEuX convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 7 Sep 2011 16:52:16 -0400
+	Thu, 8 Sep 2011 00:50:23 -0400
 MIME-Version: 1.0
 In-Reply-To: <alpine.LFD.2.00.1109071554480.20358@xanadu.home>
 References: <1313800642-32418-1-git-send-email-lacombar@gmail.com>
 	<alpine.LFD.2.00.1109071437400.20358@xanadu.home>
 	<CACqU3MVF8XSdKi0PeZF5SFaH9i2HPqCjkMqccyb83x4V_1Vs1g@mail.gmail.com>
 	<alpine.LFD.2.00.1109071554480.20358@xanadu.home>
-Date: Wed, 7 Sep 2011 16:52:15 -0400
-Message-ID: <CACqU3MUiie5Zv+FwFkXcY7yZ1-wgCB7xVpHn36WaV7EpecU4Cw@mail.gmail.com>
+Date: Thu, 8 Sep 2011 00:50:22 -0400
+Message-ID: <CACqU3MXcksYxdV_=OR40fPeZzu1ygr-Qs79TV6kfn0DpbXhjuA@mail.gmail.com>
 Subject: Re: [RFC] Kbuild: allow code re-use across different directories
 From: Arnaud Lacombe <lacombar@gmail.com>
 Content-Type: text/plain; charset=ISO-8859-1
@@ -123,38 +123,46 @@ On Wed, Sep 7, 2011 at 3:59 PM, Nicolas Pitre <nico@fluxnic.net> wrote:
 >  # to symbols in the .bss section since we cannot relocate them
 >  # independently from the rest at run time.  This can be achieved by
 >
-that look correct to me, however, the error you get:
+you missed:
 
-make[2]: *** No rule to make target
+ # Make sure files are removed during clean
+-extra-y       += piggy.gzip piggy.lzo piggy.lzma lib1funcs.S
++extra-y       += piggy.gzip piggy.lzo piggy.lzma
+
+This confused make.
+
+before:
+
+% rm -rf /linux/obj/vpath-arm/arch/arm/boot/compressed/
+% make ARCH=arm V=2                       \
+    CROSS_COMPILE=arm-none-linux-gnueabi- \
+    O=/linux/obj/vpath-arm
+[...]
+  CC      arch/arm/boot/compressed/decompress.o - due to target missing
+make[3]: *** No rule to make target
 `arch/arm/boot/compressed/lib1funcs.S', needed by
 `arch/arm/boot/compressed/lib1funcs.o'.  Stop.
+make[2]: *** [arch/arm/boot/compressed/vmlinux] Error 2
+make[1]: *** [zImage] Error 2
+make: *** [sub-make] Error 2
 
-seem odd to me.
+after:
 
-I just re-tried on x86 with:
-
-diff --git a/arch/x86/boot/compressed/Makefile
-b/arch/x86/boot/compressed/Makefile
-index 09664ef..65c89f7 100644
---- a/arch/x86/boot/compressed/Makefile
-+++ b/arch/x86/boot/compressed/Makefile
-@@ -23,7 +23,9 @@ LDFLAGS_vmlinux := -T
-
- hostprogs-y    := mkpiggy
-
--$(obj)/vmlinux: $(obj)/vmlinux.lds $(obj)/head_$(BITS).o
-$(obj)/misc.o $(obj)/string.o $(obj)/cmdline.o
-$(obj)/early_serial_console.o $(obj)/piggy.o FORCE
-+vpath-y += $(srctree)/arch/x86/lib
-+
-+$(obj)/vmlinux: $(obj)/vmlinux.lds $(obj)/checksum_32.o
-$(obj)/head_$(BITS).o $(obj)/misc.o $(obj)/string.o $(obj)/cmdline.o
-$(obj)/early_serial_console.o $(obj)/piggy.o FORCE
-        $(call if_changed,ld)
-        @:
-
-and `checksum_32.o' gets built just fine from
-`$(srctree)/arch/x86/lib/checksum_32.S'. I guess I'll ends up building
-an arm toolchain tonight and see closer.
+% rm -rf /linux/obj/vpath-arm/arch/arm/boot/compressed/
+% make ARCH=arm V=2                       \
+    CROSS_COMPILE=arm-none-linux-gnueabi- \
+    O=/linux/obj/vpath-arm
+[...]
+  CC      arch/arm/boot/compressed/decompress.o - due to target missing
+  AS      arch/arm/boot/compressed/lib1funcs.o - due to target missing
+  LD      arch/arm/boot/compressed/vmlinux - due to target missing
+  OBJCOPY arch/arm/boot/zImage - due to: arch/arm/boot/compressed/vmlinux
+  Kernel: arch/arm/boot/zImage is ready
+  Building modules, stage 2.
+  MODPOST 33 modules - due to target is PHONY
 
  - Arnaud
+
+>
+> Nicolas
+>
