@@ -1,56 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from oproxy5-pub.bluehost.com ([67.222.38.55]:35810 "HELO
-	oproxy5-pub.bluehost.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with SMTP id S1750902Ab1IHWzO (ORCPT
+Received: from relais.videotron.ca ([24.201.245.36]:49605 "EHLO
+	relais.videotron.ca" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755210Ab1IHXe4 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 8 Sep 2011 18:55:14 -0400
-Message-ID: <4E692ED0.5040906@xenotime.net>
-Date: Thu, 08 Sep 2011 14:08:32 -0700
-From: Randy Dunlap <rdunlap@xenotime.net>
-MIME-Version: 1.0
-Subject: Re: [PATCH] Kconfig: Fix help message for DEFAULT_HUNG_TASK_TIMEOUT
-References: <1314783809-20903-1-git-send-email-jjzhang@suse.de>
-In-Reply-To: <1314783809-20903-1-git-send-email-jjzhang@suse.de>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+	Thu, 8 Sep 2011 19:34:56 -0400
+MIME-version: 1.0
+Content-transfer-encoding: 7BIT
+Content-type: TEXT/PLAIN; CHARSET=US-ASCII
+Date: Thu, 08 Sep 2011 16:33:00 -0400 (EDT)
+From: Nicolas Pitre <nico@fluxnic.net>
+Subject: Re: [RFC] Kbuild: allow code re-use across different directories
+In-reply-to: <CACqU3MXcksYxdV_=OR40fPeZzu1ygr-Qs79TV6kfn0DpbXhjuA@mail.gmail.com>
+Message-id: <alpine.LFD.2.00.1109081617440.20358@xanadu.home>
+References: <1313800642-32418-1-git-send-email-lacombar@gmail.com>
+ <alpine.LFD.2.00.1109071437400.20358@xanadu.home>
+ <CACqU3MVF8XSdKi0PeZF5SFaH9i2HPqCjkMqccyb83x4V_1Vs1g@mail.gmail.com>
+ <alpine.LFD.2.00.1109071554480.20358@xanadu.home>
+ <CACqU3MXcksYxdV_=OR40fPeZzu1ygr-Qs79TV6kfn0DpbXhjuA@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jiaju Zhang <jjzhang@suse.de>
-Cc: linux-kbuild@vger.kernel.org, jkosina@suse.cz, mmarek@suse.cz
+To: Arnaud Lacombe <lacombar@gmail.com>
+Cc: linux-kbuild@vger.kernel.org, linux-arm-kernel@lists.infradead.org, lkml <linux-kernel@vger.kernel.org>
 
-On 08/31/11 02:43, Jiaju Zhang wrote:
-> Added missing _secs in the help message of config DEFAULT_HUNG_TASK_TIMEOUT.
+On Thu, 8 Sep 2011, Arnaud Lacombe wrote:
+
+> you missed:
 > 
-> Signed-off-by: Jiaju Zhang <jjzhang@suse.de>
-> ---
->  lib/Kconfig.debug |    5 +++--
->  1 files changed, 3 insertions(+), 2 deletions(-)
+>  # Make sure files are removed during clean
+> -extra-y       += piggy.gzip piggy.lzo piggy.lzma lib1funcs.S
+> +extra-y       += piggy.gzip piggy.lzo piggy.lzma
 > 
-> diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
-> index c0cb9c4..f285553 100644
-> --- a/lib/Kconfig.debug
-> +++ b/lib/Kconfig.debug
-> @@ -248,8 +248,9 @@ config DEFAULT_HUNG_TASK_TIMEOUT
->  	  to determine when a task has become non-responsive and should
->  	  be considered hung.
->  
-> -	  It can be adjusted at runtime via the kernel.hung_task_timeout
-> -	  sysctl or by writing a value to /proc/sys/kernel/hung_task_timeout.
-> +	  It can be adjusted at runtime via the kernel.hung_task_timeout_secs
-> +	  sysctl or by writing a value to
-> +	  /proc/sys/kernel/hung_task_timeout_secs.
->  
->  	  A timeout of 0 disables the check.  The default is two minutes.
->  	  Keeping the default should be fine in most cases.
+> This confused make.
 
-Acked-by: Randy Dunlap <rdunlap@xenotime.net>
+Well... that was suttle.
 
-Jiri, merge in trivial tree?
+So yes, your patch may certainly be useful to a couple cases, and it 
+works fine for this lib1func.S.
 
-Jiaju, would you also add 'hung_task_timeout_secs' to
-Documentation/sysctl/kernel.txt, please?
+It doesn't help me much in the following situation though.  What I 
+actually want to achieve is to compile arch/arm/boot/compressed/fdt_rw.o 
+from scripts/dtc/libfdt/fdt_rw.c, however I want it to include my local 
+version of libfdt_env.h rather than scripts/dtc/libfdt/libfdt_env.h.  I 
+still haven't found a way to convince gcc to do that.
 
 
--- 
-~Randy
-*** Remember to use Documentation/SubmitChecklist when testing your code ***
+Nicolas
