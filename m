@@ -1,168 +1,56 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pz0-f42.google.com ([209.85.210.42]:37114 "EHLO
-	mail-pz0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751367Ab1IHEuX convert rfc822-to-8bit (ORCPT
+Received: from oproxy5-pub.bluehost.com ([67.222.38.55]:35810 "HELO
+	oproxy5-pub.bluehost.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with SMTP id S1750902Ab1IHWzO (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 8 Sep 2011 00:50:23 -0400
+	Thu, 8 Sep 2011 18:55:14 -0400
+Message-ID: <4E692ED0.5040906@xenotime.net>
+Date: Thu, 08 Sep 2011 14:08:32 -0700
+From: Randy Dunlap <rdunlap@xenotime.net>
 MIME-Version: 1.0
-In-Reply-To: <alpine.LFD.2.00.1109071554480.20358@xanadu.home>
-References: <1313800642-32418-1-git-send-email-lacombar@gmail.com>
-	<alpine.LFD.2.00.1109071437400.20358@xanadu.home>
-	<CACqU3MVF8XSdKi0PeZF5SFaH9i2HPqCjkMqccyb83x4V_1Vs1g@mail.gmail.com>
-	<alpine.LFD.2.00.1109071554480.20358@xanadu.home>
-Date: Thu, 8 Sep 2011 00:50:22 -0400
-Message-ID: <CACqU3MXcksYxdV_=OR40fPeZzu1ygr-Qs79TV6kfn0DpbXhjuA@mail.gmail.com>
-Subject: Re: [RFC] Kbuild: allow code re-use across different directories
-From: Arnaud Lacombe <lacombar@gmail.com>
+Subject: Re: [PATCH] Kconfig: Fix help message for DEFAULT_HUNG_TASK_TIMEOUT
+References: <1314783809-20903-1-git-send-email-jjzhang@suse.de>
+In-Reply-To: <1314783809-20903-1-git-send-email-jjzhang@suse.de>
 Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 8BIT
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nicolas Pitre <nico@fluxnic.net>
-Cc: linux-kbuild@vger.kernel.org, linux-arm-kernel@lists.infradead.org, lkml <linux-kernel@vger.kernel.org>
+To: Jiaju Zhang <jjzhang@suse.de>
+Cc: linux-kbuild@vger.kernel.org, jkosina@suse.cz, mmarek@suse.cz
 
-Hi,
+On 08/31/11 02:43, Jiaju Zhang wrote:
+> Added missing _secs in the help message of config DEFAULT_HUNG_TASK_TIMEOUT.
+> 
+> Signed-off-by: Jiaju Zhang <jjzhang@suse.de>
+> ---
+>  lib/Kconfig.debug |    5 +++--
+>  1 files changed, 3 insertions(+), 2 deletions(-)
+> 
+> diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
+> index c0cb9c4..f285553 100644
+> --- a/lib/Kconfig.debug
+> +++ b/lib/Kconfig.debug
+> @@ -248,8 +248,9 @@ config DEFAULT_HUNG_TASK_TIMEOUT
+>  	  to determine when a task has become non-responsive and should
+>  	  be considered hung.
+>  
+> -	  It can be adjusted at runtime via the kernel.hung_task_timeout
+> -	  sysctl or by writing a value to /proc/sys/kernel/hung_task_timeout.
+> +	  It can be adjusted at runtime via the kernel.hung_task_timeout_secs
+> +	  sysctl or by writing a value to
+> +	  /proc/sys/kernel/hung_task_timeout_secs.
+>  
+>  	  A timeout of 0 disables the check.  The default is two minutes.
+>  	  Keeping the default should be fine in most cases.
 
-On Wed, Sep 7, 2011 at 3:59 PM, Nicolas Pitre <nico@fluxnic.net> wrote:
-> On Wed, 7 Sep 2011, Arnaud Lacombe wrote:
->
->> Hi,
->>
->> On Wed, Sep 7, 2011 at 3:07 PM, Nicolas Pitre <nico@fluxnic.net> wrote:
->> > On Fri, 19 Aug 2011, Arnaud Lacombe wrote:
->> >
->> >> Hi folks,
->> >>
->> >> The attached patch modify Kbuild to allow to directly re-use code in multiple
->> >> directory without having to go through a copy. Technically, it changes Kbuild to
->> >> use by default the VPATH feature of GNU make and provides accessors for Makefile
->> >> to change it indirectly.
->> >>
->> >> Considering:
->> >>
->> >> arch/foo/lib:
->> >> fancy.c
->> >>
->> >> We want to be able to build it with -DPANTS=32 in the kernel, but the
->> >> bootloader requires -DPANTS_SIZE=30.
->> >>
->> >> Currently we would do, either:
->> >>
->> >> arch/foo/lib/Makefile
->> >> LDFLAGS_fancy.o := -DPANTS=32
->> >> obj-y += fancy.o
->> >>
->> >> and, either:
->> >>
->> >> arch/foo/boot/Makefile:
->> >> LDFLAGS_fancy.o := -DPANTS=30
->> >> obj-y += fancy.o
->> >> $(obj)/fancy.c: $(srctree)/arch/foo/lib/fancy.c
->> >>       $(call cmd,shipped)
->> >>
->> >> or
->> >>
->> >> arch/foo/boot/Makefile:
->> >> LDFLAGS_fancy.o := -DPANTS=30
->> >> obj-y += fancy.o
->> >> $(obj)/fancy.o: $(srctree)/arch/foo/lib/fancy.c
->> >>       $(call cmd,cc_c_o)
->> >>
->> >> The former implies an extra copy of the source file, the latter expose Kbuild
->> >> internal function.
->> >>
->> >> With the attached patch, we would do:
->> >>
->> >> arch/foo/boot/Makefile:
->> >> LDFLAGS_fancy.o := -DPANTS=30
->> >> obj-y += fancy.o
->> >> vpath-y += $(srctree)/arch/foo/lib
->> >>
->> >> and let GNU make do the job.
->> >>
->> >> Comments welcome,
->> >
->> > It doesn't work.  Whatever I do to arch/arm/boot/compressed/Makefile
->> > (which admittedly looks a bit hairy and could benefit from a shave) in
->> > order to remove the $(call cmd,shipped) used with lib1funcs.S, I always
->> > end up with:
->> >
->> > make[2]: *** No rule to make target `arch/arm/boot/compressed/lib1funcs.S', needed by `arch/arm/boot/compressed/lib1funcs.o'.  Stop.
->> >
->> What was the exact change you made which triggered this ?
->
-> In its simplest expression (not caring about the now undefined lib1funcs
-> variable):
->
-> diff --git a/arch/arm/boot/compressed/Makefile b/arch/arm/boot/compressed/Makefile
-> index 0c74a6fab9..b34ed80977 100644
-> --- a/arch/arm/boot/compressed/Makefile
-> +++ b/arch/arm/boot/compressed/Makefile
-> @@ -70,6 +70,10 @@ ifeq ($(CONFIG_ARCH_SHMOBILE),y)
->  OBJS           += head-shmobile.o
->  endif
->
-> +# For __aeabi_uidivmod
-> +OBJS           += lib1funcs.o
-> +vpath-y                += $(srctree)/arch/arm/lib
-> +
->  #
->  # We now have a PIC decompressor implementation.  Decompressors running
->  # from RAM should not define ZTEXTADDR.  Decompressors running directly
-> @@ -120,12 +124,6 @@ LDFLAGS_vmlinux += -X
->  # Next argument is a linker script
->  LDFLAGS_vmlinux += -T
->
-> -# For __aeabi_uidivmod
-> -lib1funcs = $(obj)/lib1funcs.o
-> -
-> -$(obj)/lib1funcs.S: $(srctree)/arch/$(SRCARCH)/lib/lib1funcs.S FORCE
-> -       $(call cmd,shipped)
-> -
->  # We need to prevent any GOTOFF relocs being used with references
->  # to symbols in the .bss section since we cannot relocate them
->  # independently from the rest at run time.  This can be achieved by
->
-you missed:
+Acked-by: Randy Dunlap <rdunlap@xenotime.net>
 
- # Make sure files are removed during clean
--extra-y       += piggy.gzip piggy.lzo piggy.lzma lib1funcs.S
-+extra-y       += piggy.gzip piggy.lzo piggy.lzma
+Jiri, merge in trivial tree?
 
-This confused make.
+Jiaju, would you also add 'hung_task_timeout_secs' to
+Documentation/sysctl/kernel.txt, please?
 
-before:
 
-% rm -rf /linux/obj/vpath-arm/arch/arm/boot/compressed/
-% make ARCH=arm V=2                       \
-    CROSS_COMPILE=arm-none-linux-gnueabi- \
-    O=/linux/obj/vpath-arm
-[...]
-  CC      arch/arm/boot/compressed/decompress.o - due to target missing
-make[3]: *** No rule to make target
-`arch/arm/boot/compressed/lib1funcs.S', needed by
-`arch/arm/boot/compressed/lib1funcs.o'.  Stop.
-make[2]: *** [arch/arm/boot/compressed/vmlinux] Error 2
-make[1]: *** [zImage] Error 2
-make: *** [sub-make] Error 2
-
-after:
-
-% rm -rf /linux/obj/vpath-arm/arch/arm/boot/compressed/
-% make ARCH=arm V=2                       \
-    CROSS_COMPILE=arm-none-linux-gnueabi- \
-    O=/linux/obj/vpath-arm
-[...]
-  CC      arch/arm/boot/compressed/decompress.o - due to target missing
-  AS      arch/arm/boot/compressed/lib1funcs.o - due to target missing
-  LD      arch/arm/boot/compressed/vmlinux - due to target missing
-  OBJCOPY arch/arm/boot/zImage - due to: arch/arm/boot/compressed/vmlinux
-  Kernel: arch/arm/boot/zImage is ready
-  Building modules, stage 2.
-  MODPOST 33 modules - due to target is PHONY
-
- - Arnaud
-
->
-> Nicolas
->
+-- 
+~Randy
+*** Remember to use Documentation/SubmitChecklist when testing your code ***
