@@ -1,65 +1,63 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-yi0-f46.google.com ([209.85.218.46]:56250 "EHLO
-	mail-yi0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757512Ab1IIBWI convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 8 Sep 2011 21:22:08 -0400
-MIME-Version: 1.0
-In-Reply-To: <alpine.LFD.2.00.1109081617440.20358@xanadu.home>
-References: <1313800642-32418-1-git-send-email-lacombar@gmail.com>
-	<alpine.LFD.2.00.1109071437400.20358@xanadu.home>
-	<CACqU3MVF8XSdKi0PeZF5SFaH9i2HPqCjkMqccyb83x4V_1Vs1g@mail.gmail.com>
-	<alpine.LFD.2.00.1109071554480.20358@xanadu.home>
-	<CACqU3MXcksYxdV_=OR40fPeZzu1ygr-Qs79TV6kfn0DpbXhjuA@mail.gmail.com>
-	<alpine.LFD.2.00.1109081617440.20358@xanadu.home>
-Date: Thu, 8 Sep 2011 21:22:05 -0400
-Message-ID: <CACqU3MV0PW=Cp3Px2Jjs3SSOBbQSSA7P=a1RNy4x9jKEB-VEiA@mail.gmail.com>
-Subject: Re: [RFC] Kbuild: allow code re-use across different directories
-From: Arnaud Lacombe <lacombar@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 8BIT
+Received: from cantor2.suse.de ([195.135.220.15]:58697 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1756652Ab1IIHsC (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 9 Sep 2011 03:48:02 -0400
+Subject: Re: [PATCH] Kconfig: Fix help message for DEFAULT_HUNG_TASK_TIMEOUT
+From: Jiaju Zhang <jjzhang@suse.de>
+In-Reply-To: <4E692ED0.5040906@xenotime.net>
+References: <1314783809-20903-1-git-send-email-jjzhang@suse.de>
+	 <4E692ED0.5040906@xenotime.net>
+Content-Type: text/plain
+Date: Fri, 09 Sep 2011 15:46:08 +0800
+Message-Id: <1315554368.5428.24.camel@linux-jjzhang>
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nicolas Pitre <nico@fluxnic.net>
-Cc: linux-kbuild@vger.kernel.org, linux-arm-kernel@lists.infradead.org, lkml <linux-kernel@vger.kernel.org>
+To: Randy Dunlap <rdunlap@xenotime.net>
+Cc: linux-kbuild@vger.kernel.org, jkosina@suse.cz, mmarek@suse.cz
 
-Hi,
+On Thu, 2011-09-08 at 14:08 -0700, Randy Dunlap wrote:
+> On 08/31/11 02:43, Jiaju Zhang wrote:
+> > Added missing _secs in the help message of config DEFAULT_HUNG_TASK_TIMEOUT.
+> > 
+> > Signed-off-by: Jiaju Zhang <jjzhang@suse.de>
+> > ---
+> >  lib/Kconfig.debug |    5 +++--
+> >  1 files changed, 3 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
+> > index c0cb9c4..f285553 100644
+> > --- a/lib/Kconfig.debug
+> > +++ b/lib/Kconfig.debug
+> > @@ -248,8 +248,9 @@ config DEFAULT_HUNG_TASK_TIMEOUT
+> >  	  to determine when a task has become non-responsive and should
+> >  	  be considered hung.
+> >  
+> > -	  It can be adjusted at runtime via the kernel.hung_task_timeout
+> > -	  sysctl or by writing a value to /proc/sys/kernel/hung_task_timeout.
+> > +	  It can be adjusted at runtime via the kernel.hung_task_timeout_secs
+> > +	  sysctl or by writing a value to
+> > +	  /proc/sys/kernel/hung_task_timeout_secs.
+> >  
+> >  	  A timeout of 0 disables the check.  The default is two minutes.
+> >  	  Keeping the default should be fine in most cases.
+> 
+> Acked-by: Randy Dunlap <rdunlap@xenotime.net>
 
-On Thu, Sep 8, 2011 at 4:33 PM, Nicolas Pitre <nico@fluxnic.net> wrote:
-> On Thu, 8 Sep 2011, Arnaud Lacombe wrote:
->
->> you missed:
->>
->>  # Make sure files are removed during clean
->> -extra-y       += piggy.gzip piggy.lzo piggy.lzma lib1funcs.S
->> +extra-y       += piggy.gzip piggy.lzo piggy.lzma
->>
->> This confused make.
->
-> Well... that was suttle.
->
-he, welcome to make(1) world :)
+Many thanks for the ack;)
 
-> So yes, your patch may certainly be useful to a couple cases, and it
-> works fine for this lib1func.S.
->
-> It doesn't help me much in the following situation though.  What I
-> actually want to achieve is to compile arch/arm/boot/compressed/fdt_rw.o
-> from scripts/dtc/libfdt/fdt_rw.c, however I want it to include my local
-> version of libfdt_env.h rather than scripts/dtc/libfdt/libfdt_env.h.  I
-> still haven't found a way to convince gcc to do that.
->
-The only choice you have in gcc, is to use -I-, to construct:
+> 
+> Jiri, merge in trivial tree?
+> 
+> Jiaju, would you also add 'hung_task_timeout_secs' to
+> Documentation/sysctl/kernel.txt, please?
 
- $(CROSS_COMPILE)gcc -I$(srctree)/arch/arm/boot/compressed -I- [...]
+Yes. It seems Andrew Morton just added it in -mm tree. In order to avoid
+merge conflict, I'd like to write another patch to do this modification
+when I go back to office.
 
-however, it's been marked as deprecated, but still usable as of today
-snapshot of 4.7.0. Its replacement, -iquote, do not provide this
-functionnality, that is to override the source file origin directory
-as search directory for #include "...".
+Thanks,
+Jiaju
 
- - Arnaud
-
-
-> Nicolas
->
