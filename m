@@ -1,48 +1,75 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:52427 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:56696 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S933622Ab1IILzy (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 9 Sep 2011 07:55:54 -0400
-Message-ID: <4E69FEC9.2080204@suse.cz>
-Date: Fri, 09 Sep 2011 13:55:53 +0200
+	id S1757198Ab1IIMa6 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 9 Sep 2011 08:30:58 -0400
+Message-ID: <4E6A0700.9030401@suse.cz>
+Date: Fri, 09 Sep 2011 14:30:56 +0200
 From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Subject: Re: [PATCH] Kbuild: append missing-syscalls to the default target
- list
-References: <1314234210-11090-1-git-send-email-lacombar@gmail.com>
-In-Reply-To: <1314234210-11090-1-git-send-email-lacombar@gmail.com>
+Subject: Re: [RFC] Kbuild: allow code re-use across different directories
+References: <1313800642-32418-1-git-send-email-lacombar@gmail.com>
+In-Reply-To: <1313800642-32418-1-git-send-email-lacombar@gmail.com>
 Content-Type: text/plain; charset=ISO-8859-2
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Arnaud Lacombe <lacombar@gmail.com>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 
-On 25.8.2011 03:03, Arnaud Lacombe wrote:
-> This avoid an extra make invocation on `prepare0'.
+On 20.8.2011 02:37, Arnaud Lacombe wrote:
+> Hi folks,
 > 
-> Signed-off-by: Arnaud Lacombe <lacombar@gmail.com>
-> ---
->  Kbuild   |    4 +++-
->  Makefile |    1 -
->  2 files changed, 3 insertions(+), 2 deletions(-)
+> The attached patch modify Kbuild to allow to directly re-use code in multiple
+> directory without having to go through a copy. Technically, it changes Kbuild to
+> use by default the VPATH feature of GNU make and provides accessors for Makefile
+> to change it indirectly.
 > 
-> diff --git a/Kbuild b/Kbuild
-> index 2114113..1a2eb32 100644
-> --- a/Kbuild
-> +++ b/Kbuild
-> @@ -88,10 +88,12 @@ $(obj)/$(offsets-file): arch/$(SRCARCH)/kernel/asm-offsets.s Kbuild
->  # 3) Check for missing system calls
->  #
->  
-> +always += missing-syscalls
-> +targets += missing-syscalls
-> +
->  quiet_cmd_syscalls = CALL    $<
->        cmd_syscalls = $(CONFIG_SHELL) $< $(CC) $(c_flags)
+> Considering:
+> 
+> arch/foo/lib:
+> fancy.c
+> 
+> We want to be able to build it with -DPANTS=32 in the kernel, but the
+> bootloader requires -DPANTS_SIZE=30.
+> 
+> Currently we would do, either:
+> 
+> arch/foo/lib/Makefile
+> LDFLAGS_fancy.o := -DPANTS=32
+> obj-y += fancy.o
+> 
+> and, either:
+> 
+> arch/foo/boot/Makefile:
+> LDFLAGS_fancy.o := -DPANTS=30
+> obj-y += fancy.o
+> $(obj)/fancy.c: $(srctree)/arch/foo/lib/fancy.c
+> 	$(call cmd,shipped)
+> 
+> or
+> 
+> arch/foo/boot/Makefile:
+> LDFLAGS_fancy.o := -DPANTS=30
+> obj-y += fancy.o
+> $(obj)/fancy.o: $(srctree)/arch/foo/lib/fancy.c
+> 	$(call cmd,cc_c_o)
+> 
+> The former implies an extra copy of the source file, the latter expose Kbuild
+> internal function.
+> 
+> With the attached patch, we would do:
+> 
+> arch/foo/boot/Makefile:
+> LDFLAGS_fancy.o := -DPANTS=30
+> obj-y += fancy.o
+> vpath-y += $(srctree)/arch/foo/lib
+> 
+> and let GNU make do the job.
 
-checksyscalls.sh needs to depend on generated/asm-offsets.h, otherwise a
-parallel build will fail.
+I like this. The only issue I can think of right now, is that if you add
+a large directory to vpath-y, then it would be easy to accidentally
+reuse more files from that directory than intended. But that could be
+easily prevented by isolating those reusable source files.
 
 Michal
-
