@@ -1,58 +1,33 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:56757 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:58127 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S933544Ab1IIMca (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 9 Sep 2011 08:32:30 -0400
-Message-ID: <4E6A075C.1050102@suse.cz>
-Date: Fri, 09 Sep 2011 14:32:28 +0200
+	id S933950Ab1IIMqt (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 9 Sep 2011 08:46:49 -0400
+Message-ID: <4E6A0AB7.80800@suse.cz>
+Date: Fri, 09 Sep 2011 14:46:47 +0200
 From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Subject: Re: [RFC] Kbuild: allow code re-use across different directories
-References: <1313800642-32418-1-git-send-email-lacombar@gmail.com> <alpine.LFD.2.00.1109071437400.20358@xanadu.home> <CACqU3MVF8XSdKi0PeZF5SFaH9i2HPqCjkMqccyb83x4V_1Vs1g@mail.gmail.com> <alpine.LFD.2.00.1109071554480.20358@xanadu.home> <CACqU3MXcksYxdV_=OR40fPeZzu1ygr-Qs79TV6kfn0DpbXhjuA@mail.gmail.com> <alpine.LFD.2.00.1109081617440.20358@xanadu.home> <CACqU3MV0PW=Cp3Px2Jjs3SSOBbQSSA7P=a1RNy4x9jKEB-VEiA@mail.gmail.com>
-In-Reply-To: <CACqU3MV0PW=Cp3Px2Jjs3SSOBbQSSA7P=a1RNy4x9jKEB-VEiA@mail.gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [PATCH V3 5/5] scripts/kconfig/nconf: add KEY_HOME / KEY_END
+ for dialog_inputbox
+References: <CAH5vBdKxbaKDrA2gAj5CoDYShN+5dnfu6Bmd=4+oV-XmnYQnFA@mail.gmail.com> <1314899542-5848-1-git-send-email-crquan@gmail.com> <1314899542-5848-2-git-send-email-crquan@gmail.com> <1314899542-5848-3-git-send-email-crquan@gmail.com> <1314899542-5848-4-git-send-email-crquan@gmail.com> <1314899542-5848-5-git-send-email-crquan@gmail.com>
+In-Reply-To: <1314899542-5848-5-git-send-email-crquan@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-2
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnaud Lacombe <lacombar@gmail.com>
-Cc: Nicolas Pitre <nico@fluxnic.net>, linux-kbuild@vger.kernel.org, linux-arm-kernel@lists.infradead.org, lkml <linux-kernel@vger.kernel.org>
+To: crquan@gmail.com
+Cc: linux-kbuild@vger.kernel.org, Arnaud Lacombe <lacombar@gmail.com>, Sam Ravnborg <sam@ravnborg.org>, Nir Tzachar <nir.tzachar@gmail.com>, Randy Dunlap <rdunlap@xenotime.net>, linux-kernel@vger.kernel.org, c.rq541@comcast.net
 
-On 9.9.2011 03:22, Arnaud Lacombe wrote:
-> Hi,
+On 1.9.2011 19:52, crquan@gmail.com wrote:
+> From: Cheng Renquan <crquan@gmail.com>
 > 
-> On Thu, Sep 8, 2011 at 4:33 PM, Nicolas Pitre <nico@fluxnic.net> wrote:
->> On Thu, 8 Sep 2011, Arnaud Lacombe wrote:
->>
->>> you missed:
->>>
->>>  # Make sure files are removed during clean
->>> -extra-y       += piggy.gzip piggy.lzo piggy.lzma lib1funcs.S
->>> +extra-y       += piggy.gzip piggy.lzo piggy.lzma
->>>
->>> This confused make.
->>
->> Well... that was suttle.
->>
-> he, welcome to make(1) world :)
+> to make it easier to locate begin/end when editing long strings;
 > 
->> So yes, your patch may certainly be useful to a couple cases, and it
->> works fine for this lib1func.S.
->>
->> It doesn't help me much in the following situation though.  What I
->> actually want to achieve is to compile arch/arm/boot/compressed/fdt_rw.o
->> from scripts/dtc/libfdt/fdt_rw.c, however I want it to include my local
->> version of libfdt_env.h rather than scripts/dtc/libfdt/libfdt_env.h.  I
->> still haven't found a way to convince gcc to do that.
->>
-> The only choice you have in gcc, is to use -I-, to construct:
-> 
->  $(CROSS_COMPILE)gcc -I$(srctree)/arch/arm/boot/compressed -I- [...]
-> 
-> however, it's been marked as deprecated, but still usable as of today
-> snapshot of 4.7.0. Its replacement, -iquote, do not provide this
-> functionnality, that is to override the source file origin directory
-> as search directory for #include "...".
+> Signed-off-by: Cheng Renquan <crquan@gmail.com>
+> Acked By: Nir Tzachar <nir.tzachar@gmail.com>
+> --
 
-Or you modify libfdt to support -DLIBFDT_ENV=libfdt_arm.h or similar.
+Applied all five to kbuild-2.6.git#kconfig.
 
 Michal
+
