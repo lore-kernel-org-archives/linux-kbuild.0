@@ -1,21 +1,15 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-gw0-f42.google.com ([74.125.83.42]:40642 "EHLO
-	mail-gw0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1759386Ab1IIQQG convert rfc822-to-8bit (ORCPT
+Received: from mail-gx0-f170.google.com ([209.85.161.170]:49599 "EHLO
+	mail-gx0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756122Ab1IMVNa convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 9 Sep 2011 12:16:06 -0400
+	Tue, 13 Sep 2011 17:13:30 -0400
 MIME-Version: 1.0
-In-Reply-To: <4E6A075C.1050102@suse.cz>
+In-Reply-To: <4E6A0700.9030401@suse.cz>
 References: <1313800642-32418-1-git-send-email-lacombar@gmail.com>
-	<alpine.LFD.2.00.1109071437400.20358@xanadu.home>
-	<CACqU3MVF8XSdKi0PeZF5SFaH9i2HPqCjkMqccyb83x4V_1Vs1g@mail.gmail.com>
-	<alpine.LFD.2.00.1109071554480.20358@xanadu.home>
-	<CACqU3MXcksYxdV_=OR40fPeZzu1ygr-Qs79TV6kfn0DpbXhjuA@mail.gmail.com>
-	<alpine.LFD.2.00.1109081617440.20358@xanadu.home>
-	<CACqU3MV0PW=Cp3Px2Jjs3SSOBbQSSA7P=a1RNy4x9jKEB-VEiA@mail.gmail.com>
-	<4E6A075C.1050102@suse.cz>
-Date: Fri, 9 Sep 2011 12:16:03 -0400
-Message-ID: <CACqU3MVoQ_hkvEoOkyAd2Ceg9xt4M-=up-avzE2yDqp6ND5suw@mail.gmail.com>
+	<4E6A0700.9030401@suse.cz>
+Date: Tue, 13 Sep 2011 17:13:29 -0400
+Message-ID: <CACqU3MUfJAeur_65i5vDegu1d1VqAdq15EedfX9A3w52J23MPg@mail.gmail.com>
 Subject: Re: [RFC] Kbuild: allow code re-use across different directories
 From: Arnaud Lacombe <lacombar@gmail.com>
 Content-Type: text/plain; charset=ISO-8859-1
@@ -23,54 +17,71 @@ Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Michal Marek <mmarek@suse.cz>
-Cc: Nicolas Pitre <nico@fluxnic.net>, linux-kbuild@vger.kernel.org, linux-arm-kernel@lists.infradead.org, lkml <linux-kernel@vger.kernel.org>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 
 Hi,
 
-On Fri, Sep 9, 2011 at 8:32 AM, Michal Marek <mmarek@suse.cz> wrote:
-> On 9.9.2011 03:22, Arnaud Lacombe wrote:
->> Hi,
+2011/9/9 Michal Marek <mmarek@suse.cz>:
+> On 20.8.2011 02:37, Arnaud Lacombe wrote:
+>> Hi folks,
 >>
->> On Thu, Sep 8, 2011 at 4:33 PM, Nicolas Pitre <nico@fluxnic.net> wrote:
->>> On Thu, 8 Sep 2011, Arnaud Lacombe wrote:
->>>
->>>> you missed:
->>>>
->>>>  # Make sure files are removed during clean
->>>> -extra-y       += piggy.gzip piggy.lzo piggy.lzma lib1funcs.S
->>>> +extra-y       += piggy.gzip piggy.lzo piggy.lzma
->>>>
->>>> This confused make.
->>>
->>> Well... that was suttle.
->>>
->> he, welcome to make(1) world :)
+>> The attached patch modify Kbuild to allow to directly re-use code in multiple
+>> directory without having to go through a copy. Technically, it changes Kbuild to
+>> use by default the VPATH feature of GNU make and provides accessors for Makefile
+>> to change it indirectly.
 >>
->>> So yes, your patch may certainly be useful to a couple cases, and it
->>> works fine for this lib1func.S.
->>>
->>> It doesn't help me much in the following situation though.  What I
->>> actually want to achieve is to compile arch/arm/boot/compressed/fdt_rw.o
->>> from scripts/dtc/libfdt/fdt_rw.c, however I want it to include my local
->>> version of libfdt_env.h rather than scripts/dtc/libfdt/libfdt_env.h.  I
->>> still haven't found a way to convince gcc to do that.
->>>
->> The only choice you have in gcc, is to use -I-, to construct:
+>> Considering:
 >>
->>  $(CROSS_COMPILE)gcc -I$(srctree)/arch/arm/boot/compressed -I- [...]
+>> arch/foo/lib:
+>> fancy.c
 >>
->> however, it's been marked as deprecated, but still usable as of today
->> snapshot of 4.7.0. Its replacement, -iquote, do not provide this
->> functionnality, that is to override the source file origin directory
->> as search directory for #include "...".
+>> We want to be able to build it with -DPANTS=32 in the kernel, but the
+>> bootloader requires -DPANTS_SIZE=30.
+>>
+>> Currently we would do, either:
+>>
+>> arch/foo/lib/Makefile
+>> LDFLAGS_fancy.o := -DPANTS=32
+>> obj-y += fancy.o
+>>
+>> and, either:
+>>
+>> arch/foo/boot/Makefile:
+>> LDFLAGS_fancy.o := -DPANTS=30
+>> obj-y += fancy.o
+>> $(obj)/fancy.c: $(srctree)/arch/foo/lib/fancy.c
+>>       $(call cmd,shipped)
+>>
+>> or
+>>
+>> arch/foo/boot/Makefile:
+>> LDFLAGS_fancy.o := -DPANTS=30
+>> obj-y += fancy.o
+>> $(obj)/fancy.o: $(srctree)/arch/foo/lib/fancy.c
+>>       $(call cmd,cc_c_o)
+>>
+>> The former implies an extra copy of the source file, the latter expose Kbuild
+>> internal function.
+>>
+>> With the attached patch, we would do:
+>>
+>> arch/foo/boot/Makefile:
+>> LDFLAGS_fancy.o := -DPANTS=30
+>> obj-y += fancy.o
+>> vpath-y += $(srctree)/arch/foo/lib
+>>
+>> and let GNU make do the job.
 >
-> Or you modify libfdt to support -DLIBFDT_ENV=libfdt_arm.h or similar.
+> I like this. The only issue I can think of right now, is that if you add
+> a large directory to vpath-y, then it would be easy to accidentally
+> reuse more files from that directory than intended. But that could be
+> easily prevented by isolating those reusable source files.
 >
-If dtc has to be modified, let's just get rid of that #include "..."
-in favor of #include <...>. We will gain full control of search path,
-and it will be cleaner than this awful LIBFTD_ENV construct.
+I do not think it is that dangerous. We enforce unique access to VPATH
+and we still prioritize $(src) over any other specified path.
 
+That said, what would you want to pull the patch into -next, beside
+kernel.org being up ?
+
+Thanks,
  - Arnaud
-
-> Michal
->
