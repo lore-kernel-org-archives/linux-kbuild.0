@@ -1,72 +1,181 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-yi0-f46.google.com ([209.85.218.46]:38119 "EHLO
-	mail-yi0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750984Ab1INFXS convert rfc822-to-8bit (ORCPT
+Received: from wolverine02.qualcomm.com ([199.106.114.251]:5220 "EHLO
+	wolverine02.qualcomm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S934209Ab1IOSma (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 14 Sep 2011 01:23:18 -0400
+	Thu, 15 Sep 2011 14:42:30 -0400
+Message-ID: <4E724715.1030505@codeaurora.org>
+Date: Thu, 15 Sep 2011 11:42:29 -0700
+From: Stephen Boyd <sboyd@codeaurora.org>
 MIME-Version: 1.0
-In-Reply-To: <4E69FEC9.2080204@suse.cz>
-References: <1314234210-11090-1-git-send-email-lacombar@gmail.com>
-	<4E69FEC9.2080204@suse.cz>
-Date: Wed, 14 Sep 2011 01:17:10 -0400
-Message-ID: <CACqU3MUFyn_jh2pN4GLENqcGVUzAwcMJUR_WLY2EtqOhMheceQ@mail.gmail.com>
-Subject: Re: [PATCH] Kbuild: append missing-syscalls to the default target list
-From: Arnaud Lacombe <lacombar@gmail.com>
+Subject: Re: 3.1-rc1 link failure
+References: <4E402FBB.2070401@gmail.com> <20110808195804.GD19367@n2100.arm.linux.org.uk>
+In-Reply-To: <20110808195804.GD19367@n2100.arm.linux.org.uk>
 Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 8BIT
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Russell King - ARM Linux <linux@arm.linux.org.uk>
+Cc: Rob Herring <robherring2@gmail.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, linux-kbuild@vger.kernel.org, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-Hi,
+( Including full text for other lists)
 
-2011/9/9 Michal Marek <mmarek@suse.cz>:
-> On 25.8.2011 03:03, Arnaud Lacombe wrote:
->> This avoid an extra make invocation on `prepare0'.
+On 08/08/11 12:58, Russell King - ARM Linux wrote:
+> On Mon, Aug 08, 2011 at 01:49:31PM -0500, Rob Herring wrote:
+>> Russell,
 >>
->> Signed-off-by: Arnaud Lacombe <lacombar@gmail.com>
->> ---
->>  Kbuild   |    4 +++-
->>  Makefile |    1 -
->>  2 files changed, 3 insertions(+), 2 deletions(-)
+>> This commit is causing some link failures:
 >>
->> diff --git a/Kbuild b/Kbuild
->> index 2114113..1a2eb32 100644
->> --- a/Kbuild
->> +++ b/Kbuild
->> @@ -88,10 +88,12 @@ $(obj)/$(offsets-file): arch/$(SRCARCH)/kernel/asm-offsets.s Kbuild
->>  # 3) Check for missing system calls
->>  #
+>>     ARM: vmlinux.lds: move discarded sections to beginning
 >>
->> +always += missing-syscalls
->> +targets += missing-syscalls
->> +
->>  quiet_cmd_syscalls = CALL    $<
->>        cmd_syscalls = $(CONFIG_SHELL) $< $(CC) $(c_flags)
+>>     Rather than scattering the discarded sections throughout the linker
+>>     file, move them to the start.
+>>
+>>     Acked-by: Nicolas Pitre <nicolas.pitre@linaro.org>
+>>     Tested-by: Stephen Boyd <sboyd@codeaurora.org>
+>>     Signed-off-by: Russell King <rmk+kernel@arm.linux.org.uk>
+>>
+>> The error is this:
+>>
+>> `.exit.text' referenced in section `.alt.smp.init' of
+>> drivers/built-in.o: defined in discarded section `.exit.text' of
+>> drivers/built
+>> -in.o
+>> `.exit.text' referenced in section `.alt.smp.init' of net/built-in.o:
+>> defined in discarded section `.exit.text' of net/built-in.o
+>>
+>> I traced the one in net/ to CONFIG_SMP_ON_UP=y and CONFIG_DCB=y.
+>> dcbnl_exit calls dcb_flushapp which contains a spinlock. dcb_flushapp is
+>> getting inlined into dcbnl_exit.
+> Argh.  This is going to be an absolute _pig_ to fix.
 >
-> checksyscalls.sh needs to depend on generated/asm-offsets.h, otherwise a
-> parallel build will fail.
+> This is the relevent part of the linker script (reformatted to make it
+> clearer):
 >
-true.
+> | SECTIONS
+> | {
+> |  /*
+> |   * unwind exit sections must be discarded before the rest of the
+> |   * unwind sections get included.
+> |   */
+> |  /DISCARD/ : {
+> |   *(.ARM.exidx.exit.text)
+> |   *(.ARM.extab.exit.text)
+> |  }
+> | ...
+> |  .exit.text : {
+> |   *(.exit.text)
+> |   *(.memexit.text)
+> |  }
+> | ...
+> |  /DISCARD/ : {
+> |   *(.exit.text)
+> |   *(.memexit.text)
+> |   *(.exit.data)
+> |   *(.memexit.data)
+> |   *(.memexit.rodata)
+> |   *(.exitcall.exit)
+> |   *(.discard)
+> |   *(.discard.*)
+> |   }
+> | }
+>
+> Now, this is what the linker manual says about discarded output sections:
+>
+> |    The special output section name `/DISCARD/' may be used to discard
+> | input sections.  Any input sections which are assigned to an output
+> | section named `/DISCARD/' are not included in the output file.
+>
+> No questions, no exceptions.  It doesn't say "unless they are listed
+> before the /DISCARD/ section."  Now, this is what asn-generic/vmlinux.lds.S
+> says:
+>
+> | /*
+> |  * Default discarded sections.
+> |  *
+> |  * Some archs want to discard exit text/data at runtime rather than
+> |  * link time due to cross-section references such as alt instructions,
+> |  * bug table, eh_frame, etc.  DISCARDS must be the last of output
+> |  * section definitions so that such archs put those in earlier section
+> |  * definitions.
+> |  */
+>
+> And guess what - the list _always_ includes .exit.text etc.
+>
+> Now, what's actually happening is that the linker is reading the script,
+> and it finds the first /DISCARD/ output section at the beginning of the
+> script.  It continues reading the script, and finds the 'DISCARD' macro
+> at the end, which having been postprocessed results in another
+> /DISCARD/ output section.  As the linker already contains the earlier
+> /DISCARD/ output section, it adds it to that existing section, so it
+> effectively is placed at the start.  This can be seen by using the -M
+> option to ld:
+>
+> | Linker script and memory map
+> | 
+> |                 0xc037c080                jiffies = jiffies_64
+> | 
+> | /DISCARD/
+> |  *(.ARM.exidx.exit.text)
+> |  *(.ARM.extab.exit.text)
+> |  *(.exit.text)
+> |  *(.memexit.text)
+> |  *(.exit.data)
+> |  *(.memexit.data)
+> |  *(.memexit.rodata)
+> |  *(.exitcall.exit)
+> |  *(.discard)
+> |  *(.discard.*)
+> | 
+> |                 0xc0008000                . = 0xc0008000
+> | 
+> | .head.text      0xc0008000      0x1d0
+> |                 0xc0008000                _text = .
+> |  *(.head.text)
+> |  .head.text     0xc0008000      0x1d0 arch/arm/kernel/head.o
+> |                 0xc0008000                stext
+> | 
+> | .text           0xc0008200   0x2d78d0
+> |                 0xc0008200                _stext = .
+> |                 0xc0008200                __exception_text_start = .
+> |  *(.exception.text)
+> |  .exception.text
+> | ...
+>
+> As you can see, all the discarded sections are grouped together - and
+> as a result of it being the first output section, they all appear before
+> any other section.
+>
+> The result is that not only is the unwind information discarded (as
+> intended), but also the .exit.text, despite us wanting to have the
+> .exit.text preserved.
+>
+> We can't move the unwind information elsewhere, because it'll then be
+> included even when we do actually discard the .exit.text (and similar)
+> sections.
+>
+> The only solution that I can think of is to stop using this
+> asm-generic/vmlinux.lds.S and write our own fully conditionalized
+> linker script, ensuring that no input section is mentioned more than
+> once in the output sections.
+>
+> Or someone sorts out the asm-generic/vmlinux.lds.S stuff to actually
+> conform to the linker manual, and stop relying on implementation defined
+> behaviour of the linker - again by having it fully conditionalized.
+>
 
-This:
+Now that the generic bug patch has been merged to linux-next a lot of
+ARM builds are failing like so:
 
-diff --git a/Kbuild b/Kbuild
-index 1a2eb32..4caab4f 100644
---- a/Kbuild
-+++ b/Kbuild
-@@ -94,7 +94,7 @@ targets += missing-syscalls
- quiet_cmd_syscalls = CALL    $<
-       cmd_syscalls = $(CONFIG_SHELL) $< $(CC) $(c_flags)
-
--missing-syscalls: scripts/checksyscalls.sh FORCE
-+missing-syscalls: scripts/checksyscalls.sh $(offsets-file) FORCE
-        $(call cmd,syscalls)
-
- # Keep these two files during make clean
+`.exit.text' referenced in section `__bug_table' of net/built-in.o: defined in discarded section `.exit.text' of net/built-in.o
+`.exit.text' referenced in section `__bug_table' of net/built-in.o: defined in discarded section `.exit.text' of net/built-in.o
+`.exit.text' referenced in section `__bug_table' of net/built-in.o: defined in discarded section `.exit.text' of net/built-in.o
 
 
-should do the job.
+I'm not sure what the fix is here. Hopefully we can figure out how to
+keep using the asm-generic stuff.
 
- - Arnaud
+-- 
+Sent by an employee of the Qualcomm Innovation Center, Inc.
+The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum.
+
