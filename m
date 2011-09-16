@@ -1,180 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from caramon.arm.linux.org.uk ([78.32.30.218]:54898 "EHLO
-	caramon.arm.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S934209Ab1IOTUu (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 15 Sep 2011 15:20:50 -0400
-Date: Thu, 15 Sep 2011 20:20:35 +0100
-From: Russell King - ARM Linux <linux@arm.linux.org.uk>
-Subject: Re: 3.1-rc1 link failure
-Message-ID: <20110915192034.GM6267@n2100.arm.linux.org.uk>
-References: <4E402FBB.2070401@gmail.com> <20110808195804.GD19367@n2100.arm.linux.org.uk> <4E724715.1030505@codeaurora.org>
+Received: from cantor2.suse.de ([195.135.220.15]:38013 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753470Ab1IPMbI (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 16 Sep 2011 08:31:08 -0400
+Message-ID: <4E73418B.4050802@suse.cz>
+Date: Fri, 16 Sep 2011 14:31:07 +0200
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4E724715.1030505@codeaurora.org>
+Subject: Re: [PATCH 1/4] kbuild: introduce KBUILD_CONFIG; unexpose KCONFIG_CONFIG
+References: <1313472854-14426-1-git-send-email-lacombar@gmail.com> <1313472854-14426-2-git-send-email-lacombar@gmail.com>
+In-Reply-To: <1313472854-14426-2-git-send-email-lacombar@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-2
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Stephen Boyd <sboyd@codeaurora.org>
-Cc: Rob Herring <robherring2@gmail.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, linux-kbuild@vger.kernel.org, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Arnaud Lacombe <lacombar@gmail.com>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-On Thu, Sep 15, 2011 at 11:42:29AM -0700, Stephen Boyd wrote:
-> ( Including full text for other lists)
+On 16.8.2011 07:34, Arnaud Lacombe wrote:
+> Refine the Kbuild interface to expose it's own variable to architecture
+> Makefile's and prepare Kconfig environment prior to any %config invocation.
 > 
-> On 08/08/11 12:58, Russell King - ARM Linux wrote:
-> > On Mon, Aug 08, 2011 at 01:49:31PM -0500, Rob Herring wrote:
-> >> Russell,
-> >>
-> >> This commit is causing some link failures:
-> >>
-> >>     ARM: vmlinux.lds: move discarded sections to beginning
-> >>
-> >>     Rather than scattering the discarded sections throughout the linker
-> >>     file, move them to the start.
-> >>
-> >>     Acked-by: Nicolas Pitre <nicolas.pitre@linaro.org>
-> >>     Tested-by: Stephen Boyd <sboyd@codeaurora.org>
-> >>     Signed-off-by: Russell King <rmk+kernel@arm.linux.org.uk>
-> >>
-> >> The error is this:
-> >>
-> >> `.exit.text' referenced in section `.alt.smp.init' of
-> >> drivers/built-in.o: defined in discarded section `.exit.text' of
-> >> drivers/built
-> >> -in.o
-> >> `.exit.text' referenced in section `.alt.smp.init' of net/built-in.o:
-> >> defined in discarded section `.exit.text' of net/built-in.o
-> >>
-> >> I traced the one in net/ to CONFIG_SMP_ON_UP=y and CONFIG_DCB=y.
-> >> dcbnl_exit calls dcb_flushapp which contains a spinlock. dcb_flushapp is
-> >> getting inlined into dcbnl_exit.
-> > Argh.  This is going to be an absolute _pig_ to fix.
-> >
-> > This is the relevent part of the linker script (reformatted to make it
-> > clearer):
-> >
-> > | SECTIONS
-> > | {
-> > |  /*
-> > |   * unwind exit sections must be discarded before the rest of the
-> > |   * unwind sections get included.
-> > |   */
-> > |  /DISCARD/ : {
-> > |   *(.ARM.exidx.exit.text)
-> > |   *(.ARM.extab.exit.text)
-> > |  }
-> > | ...
-> > |  .exit.text : {
-> > |   *(.exit.text)
-> > |   *(.memexit.text)
-> > |  }
-> > | ...
-> > |  /DISCARD/ : {
-> > |   *(.exit.text)
-> > |   *(.memexit.text)
-> > |   *(.exit.data)
-> > |   *(.memexit.data)
-> > |   *(.memexit.rodata)
-> > |   *(.exitcall.exit)
-> > |   *(.discard)
-> > |   *(.discard.*)
-> > |   }
-> > | }
-> >
-> > Now, this is what the linker manual says about discarded output sections:
-> >
-> > |    The special output section name `/DISCARD/' may be used to discard
-> > | input sections.  Any input sections which are assigned to an output
-> > | section named `/DISCARD/' are not included in the output file.
-> >
-> > No questions, no exceptions.  It doesn't say "unless they are listed
-> > before the /DISCARD/ section."  Now, this is what asn-generic/vmlinux.lds.S
-> > says:
-> >
-> > | /*
-> > |  * Default discarded sections.
-> > |  *
-> > |  * Some archs want to discard exit text/data at runtime rather than
-> > |  * link time due to cross-section references such as alt instructions,
-> > |  * bug table, eh_frame, etc.  DISCARDS must be the last of output
-> > |  * section definitions so that such archs put those in earlier section
-> > |  * definitions.
-> > |  */
-> >
-> > And guess what - the list _always_ includes .exit.text etc.
-> >
-> > Now, what's actually happening is that the linker is reading the script,
-> > and it finds the first /DISCARD/ output section at the beginning of the
-> > script.  It continues reading the script, and finds the 'DISCARD' macro
-> > at the end, which having been postprocessed results in another
-> > /DISCARD/ output section.  As the linker already contains the earlier
-> > /DISCARD/ output section, it adds it to that existing section, so it
-> > effectively is placed at the start.  This can be seen by using the -M
-> > option to ld:
-> >
-> > | Linker script and memory map
-> > | 
-> > |                 0xc037c080                jiffies = jiffies_64
-> > | 
-> > | /DISCARD/
-> > |  *(.ARM.exidx.exit.text)
-> > |  *(.ARM.extab.exit.text)
-> > |  *(.exit.text)
-> > |  *(.memexit.text)
-> > |  *(.exit.data)
-> > |  *(.memexit.data)
-> > |  *(.memexit.rodata)
-> > |  *(.exitcall.exit)
-> > |  *(.discard)
-> > |  *(.discard.*)
-> > | 
-> > |                 0xc0008000                . = 0xc0008000
-> > | 
-> > | .head.text      0xc0008000      0x1d0
-> > |                 0xc0008000                _text = .
-> > |  *(.head.text)
-> > |  .head.text     0xc0008000      0x1d0 arch/arm/kernel/head.o
-> > |                 0xc0008000                stext
-> > | 
-> > | .text           0xc0008200   0x2d78d0
-> > |                 0xc0008200                _stext = .
-> > |                 0xc0008200                __exception_text_start = .
-> > |  *(.exception.text)
-> > |  .exception.text
-> > | ...
-> >
-> > As you can see, all the discarded sections are grouped together - and
-> > as a result of it being the first output section, they all appear before
-> > any other section.
-> >
-> > The result is that not only is the unwind information discarded (as
-> > intended), but also the .exit.text, despite us wanting to have the
-> > .exit.text preserved.
-> >
-> > We can't move the unwind information elsewhere, because it'll then be
-> > included even when we do actually discard the .exit.text (and similar)
-> > sections.
-> >
-> > The only solution that I can think of is to stop using this
-> > asm-generic/vmlinux.lds.S and write our own fully conditionalized
-> > linker script, ensuring that no input section is mentioned more than
-> > once in the output sections.
-> >
-> > Or someone sorts out the asm-generic/vmlinux.lds.S stuff to actually
-> > conform to the linker manual, and stop relying on implementation defined
-> > behaviour of the linker - again by having it fully conditionalized.
-> >
+> Signed-off-by: Arnaud Lacombe <lacombar@gmail.com>
+> ---
+>  Makefile                                |    8 ++++++--
+>  arch/arm/boot/compressed/Makefile       |    2 +-
+>  arch/unicore32/boot/compressed/Makefile |    2 +-
+>  scripts/kconfig/Makefile                |    3 +++
+>  4 files changed, 11 insertions(+), 4 deletions(-)
 > 
-> Now that the generic bug patch has been merged to linux-next a lot of
-> ARM builds are failing like so:
-> 
-> `.exit.text' referenced in section `__bug_table' of net/built-in.o: defined in discarded section `.exit.text' of net/built-in.o
-> `.exit.text' referenced in section `__bug_table' of net/built-in.o: defined in discarded section `.exit.text' of net/built-in.o
-> `.exit.text' referenced in section `__bug_table' of net/built-in.o: defined in discarded section `.exit.text' of net/built-in.o
-> 
-> 
-> I'm not sure what the fix is here. Hopefully we can figure out how to
-> keep using the asm-generic stuff.
+> diff --git a/Makefile b/Makefile
+> index b4ca4e1..26798a4 100644
+> --- a/Makefile
+> +++ b/Makefile
+[...]
+> +# Prepare Kconfig environment
+> +KCONFIG_CONFIG    = $(KBUILD_CONFIG)
+> +export KCONFIG_CONFIG
 
-At the moment, I still have no solution to this problem other than the
-undesirable one I mention in the quote.
+IMO we should preserve the semantics of KCONFIG_CONFIG as much as
+possible. make KCONFIG_CONFIG=blah works, but setting it in the
+environment does not, because the '=' assignment take precendence.
+
+Michal
