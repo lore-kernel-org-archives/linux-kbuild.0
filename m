@@ -1,50 +1,89 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:38263 "EHLO mx2.suse.de"
+Received: from e4.ny.us.ibm.com ([32.97.182.144]:39154 "EHLO e4.ny.us.ibm.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752670Ab1IPMdp (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 16 Sep 2011 08:33:45 -0400
-Message-ID: <4E734228.2080801@suse.cz>
-Date: Fri, 16 Sep 2011 14:33:44 +0200
-From: Michal Marek <mmarek@suse.cz>
-MIME-Version: 1.0
-Subject: Re: [PATCH 1/4] kbuild: introduce KBUILD_CONFIG; unexpose KCONFIG_CONFIG
-References: <1313472854-14426-1-git-send-email-lacombar@gmail.com> <1313472854-14426-2-git-send-email-lacombar@gmail.com> <4E73418B.4050802@suse.cz>
-In-Reply-To: <4E73418B.4050802@suse.cz>
-Content-Type: text/plain; charset=ISO-8859-2
-Content-Transfer-Encoding: 7bit
+	id S1755965Ab1IQBt3 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 16 Sep 2011 21:49:29 -0400
+From: John Stultz <john.stultz@linaro.org>
+Subject: [PATCH 1/2] kconfig: Add make olddefconfig
+Date: Fri, 16 Sep 2011 18:49:18 -0700
+Message-Id: <1316224159-3556-2-git-send-email-john.stultz@linaro.org>
+In-Reply-To: <1316224159-3556-1-git-send-email-john.stultz@linaro.org>
+References: <1316224159-3556-1-git-send-email-john.stultz@linaro.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnaud Lacombe <lacombar@gmail.com>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: lkml <linux-kernel@vger.kernel.org>
+Cc: John Stultz <john.stultz@linaro.org>, gthelen@google.com, tartler@cs.fau.de, Dmitry Fink <Dmitry.Fink@palm.com>, Darren Hart <dvhart@linux.intel.com>, Eric B Munson <ebmunson@us.ibm.com>, Bruce Ashfield <Bruce.Ashfield@windriver.com>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
 
-On 16.9.2011 14:31, Michal Marek wrote:
-> On 16.8.2011 07:34, Arnaud Lacombe wrote:
->> Refine the Kbuild interface to expose it's own variable to architecture
->> Makefile's and prepare Kconfig environment prior to any %config invocation.
->>
->> Signed-off-by: Arnaud Lacombe <lacombar@gmail.com>
->> ---
->>  Makefile                                |    8 ++++++--
->>  arch/arm/boot/compressed/Makefile       |    2 +-
->>  arch/unicore32/boot/compressed/Makefile |    2 +-
->>  scripts/kconfig/Makefile                |    3 +++
->>  4 files changed, 11 insertions(+), 4 deletions(-)
->>
->> diff --git a/Makefile b/Makefile
->> index b4ca4e1..26798a4 100644
->> --- a/Makefile
->> +++ b/Makefile
-> [...]
->> +# Prepare Kconfig environment
->> +KCONFIG_CONFIG    = $(KBUILD_CONFIG)
->> +export KCONFIG_CONFIG
-> 
-> IMO we should preserve the semantics of KCONFIG_CONFIG as much as
-> possible. make KCONFIG_CONFIG=blah works, but setting it in the
-> environment does not, because the '=' assignment take precendence.
+This adds an "olddefconfig" build target, which updates a .config file
+filling any any absent symbols with the Kconfig default value (note:
+not the architecture defconfig value).
 
-Also, please mention KBUILD_CONFIG variable in
-Documentation/kbuild/kconfig.txt. Or maybe
-Documentation/kbuild/kbuild.txt, I'm not sure what is the best fit now.
+Similar to oldnoconfig, this option is useful for build systems
+when dealing with config fragments.
 
-Michal
+CC: gthelen@google.com
+CC: tartler@cs.fau.de
+CC: Dmitry Fink <Dmitry.Fink@palm.com>
+CC: Darren Hart <dvhart@linux.intel.com>
+CC: Eric B Munson <ebmunson@us.ibm.com>
+CC: Bruce Ashfield <Bruce.Ashfield@windriver.com>
+CC: Michal Marek <mmarek@suse.cz>
+CC: linux-kbuild@vger.kernel.org
+Signed-off-by: John Stultz <john.stultz@linaro.org>
+---
+ scripts/kconfig/Makefile |    2 +-
+ scripts/kconfig/conf.c   |    4 ++++
+ 2 files changed, 5 insertions(+), 1 deletions(-)
+
+diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
+index 82d2eb2..c238f3e 100644
+--- a/scripts/kconfig/Makefile
++++ b/scripts/kconfig/Makefile
+@@ -103,7 +103,7 @@ allnoconfig allyesconfig allmodconfig alldefconfig randconfig: $(obj)/conf
+ 
+ PHONY += listnewconfig oldnoconfig savedefconfig defconfig
+ 
+-listnewconfig oldnoconfig: $(obj)/conf
++listnewconfig oldnoconfig olddefconfig: $(obj)/conf
+ 	$< --$@ $(Kconfig)
+ 
+ savedefconfig: $(obj)/conf
+diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
+index f208f90..ab7bc68 100644
+--- a/scripts/kconfig/conf.c
++++ b/scripts/kconfig/conf.c
+@@ -33,6 +33,7 @@ enum input_mode {
+ 	savedefconfig,
+ 	listnewconfig,
+ 	oldnoconfig,
++	olddefconfig,
+ } input_mode = oldaskconfig;
+ 
+ static int indent = 1;
+@@ -455,6 +456,7 @@ static struct option long_opts[] = {
+ 	{"randconfig",      no_argument,       NULL, randconfig},
+ 	{"listnewconfig",   no_argument,       NULL, listnewconfig},
+ 	{"oldnoconfig",     no_argument,       NULL, oldnoconfig},
++	{"olddefconfig",    no_argument,       NULL, olddefconfig},
+ 	{NULL, 0, NULL, 0}
+ };
+ 
+@@ -566,6 +568,7 @@ int main(int ac, char **av)
+ 	case oldconfig:
+ 	case listnewconfig:
+ 	case oldnoconfig:
++	case olddefconfig:
+ 		conf_read(NULL);
+ 		break;
+ 	case allnoconfig:
+@@ -624,6 +627,7 @@ int main(int ac, char **av)
+ 		conf_set_all_new_symbols(def_random);
+ 		break;
+ 	case defconfig:
++	case olddefconfig:
+ 		conf_set_all_new_symbols(def_default);
+ 		break;
+ 	case savedefconfig:
+-- 
+1.7.3.2.146.gca209
+
