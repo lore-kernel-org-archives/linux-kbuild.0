@@ -1,48 +1,174 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from e39.co.us.ibm.com ([32.97.110.160]:36132 "EHLO
-	e39.co.us.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752275Ab1IUPuc (ORCPT
+Received: from smtp-relay2.palm.com ([64.28.152.243]:5463 "EHLO
+	smtp-relay2.palm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750825Ab1IUVv7 convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 21 Sep 2011 11:50:32 -0400
+	Wed, 21 Sep 2011 17:51:59 -0400
+From: "Dmitry Fink (Palm GBU)" <Dmitry.Fink@palm.com>
+Date: Wed, 21 Sep 2011 14:42:13 -0700
 Subject: Re: [PATCH] kconfig: Add merge_config.sh script
-From: John Stultz <john.stultz@linaro.org>
-In-Reply-To: <20110921064423.GA4103@netboy.at.omicron.at>
-References: <1316582561-23066-1-git-send-email-john.stultz@linaro.org>
-	 <20110921064423.GA4103@netboy.at.omicron.at>
-Content-Type: text/plain; charset="UTF-8"
-Date: Wed, 21 Sep 2011 08:18:05 -0700
-Message-ID: <1316618285.3112.204.camel@work-vm>
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Message-ID: <CA9FA63D.25CAE%dmitry.fink@palm.com>
+In-Reply-To: <1316582561-23066-1-git-send-email-john.stultz@linaro.org>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+MIME-Version: 1.0
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Richard Cochran <richardcochran@gmail.com>
-Cc: lkml <linux-kernel@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, gthelen@google.com, tartler@cs.fau.de, Dmitry Fink <Dmitry.Fink@palm.com>, Darren Hart <dvhart@linux.intel.com>, Eric B Munson <ebmunson@us.ibm.com>, Bruce Ashfield <Bruce.Ashfield@windriver.com>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
+To: John Stultz <john.stultz@linaro.org>, lkml <linux-kernel@vger.kernel.org>
+Cc: Sam Ravnborg <sam@ravnborg.org>, "gthelen@google.com" <gthelen@google.com>, "tartler@cs.fau.de" <tartler@cs.fau.de>, Darren Hart <dvhart@linux.intel.com>, Eric B Munson <ebmunson@us.ibm.com>, Bruce Ashfield <Bruce.Ashfield@windriver.com>, Michal Marek <mmarek@suse.cz>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>
 
-On Wed, 2011-09-21 at 08:44 +0200, Richard Cochran wrote:
-> On Tue, Sep 20, 2011 at 10:22:41PM -0700, John Stultz wrote:
-> > After noticing almost every distro has their own method of managing
-> > config fragments, I went looking at some best practices, and wanted
-> > to try to consolidate some of the different approaches so this fairly
-> > simple infrastructure can be shared (and new distros/build systems
-> > don't have to implement yet another config fragment merge script).
-> 
-> John,
-> 
-> I have been wanting to make or find a way to start with an allnoconfig
-> and enable a short list of config options (and the options that are
-> needed to allow them). I don't want the other defaults at all.
+Hi John,
 
-"make oldnoconfig" provides something close to this, I think. 
+I think you may want to apply the following fix:
+--- a/scripts/kconfig/merge_config.sh
++++ b/scripts/kconfig/merge_config.sh
+@@ -32,7 +32,7 @@ for MERGE_FILE in $MERGE_LIST ; do
+          sed 's/^\(# \)\{0,1\}\(CONFIG_[a-zA-Z0-9_]*\)[= ].*/\2/'`
+        for CFG in $CFG_LIST ; do
+                grep -q -w $CFG $TMP_FILE
+-               if [ $? == 0 ] ; then
++               if [ $? -eq 0 ] ; then
 
-> Can I use your script for this? If not, is there another way to go
-> about it?
-
-I guess my script could take an option to use oldnoconfig instead of the
-alldefconfig method.
-
-thanks
--john
+or just change it single "=" sign, "==" seems to be a bashism and failed
+on ubuntu's /bin/sh.
 
 
+You also have a minor typo in the commit msg:)
+"I'm sure I'm sure this implementation won't work for everyone, and"
+ ^        ^
+
+Regards,
+Dmitry
+
+On 9/20/11 10:22 PM, "John Stultz" <john.stultz@linaro.org> wrote:
+
+>After noticing almost every distro has their own method of managing
+>config fragments, I went looking at some best practices, and wanted
+>to try to consolidate some of the different approaches so this fairly
+>simple infrastructure can be shared (and new distros/build systems
+>don't have to implement yet another config fragment merge script).
+>
+>This script is most influenced by the Windriver tools used in
+>the Yocto Project, reusing some portions found there.
+>
+>This script merges multiple config fragments, warning on any
+>overrided values. It then sets any unspecified values to their
+>default, then finally checks to make sure no specified value was
+>dropped due to unsatisfied dependencies.
+>
+>I'm sure I'm sure this implementation won't work for everyone, and
+>I expect it will need to evolve to adapt for various use cases.
+>But I think its a reasonable starting point.
+>
+>v2: Reworked to use alldefconfig instead of the proposed
+>olddefconfig as suggested by Sam Ravnborg.
+>
+>Thanks to Darren Hart for early review and feedback!
+>
+>Please let me know if you have any comments or thoughts!
+>
+>CC: Sam Ravnborg <sam@ravnborg.org>
+>CC: gthelen@google.com
+>CC: tartler@cs.fau.de
+>CC: Dmitry Fink <Dmitry.Fink@palm.com>
+>CC: Darren Hart <dvhart@linux.intel.com>
+>CC: Eric B Munson <ebmunson@us.ibm.com>
+>CC: Bruce Ashfield <Bruce.Ashfield@windriver.com>
+>CC: Michal Marek <mmarek@suse.cz>
+>CC: linux-kbuild@vger.kernel.org
+>Signed-off-by: John Stultz <john.stultz@linaro.org>
+>---
+> scripts/kconfig/merge_config.sh |   71
+>+++++++++++++++++++++++++++++++++++++++
+> 1 files changed, 71 insertions(+), 0 deletions(-)
+> create mode 100755 scripts/kconfig/merge_config.sh
+>
+>diff --git a/scripts/kconfig/merge_config.sh
+>b/scripts/kconfig/merge_config.sh
+>new file mode 100755
+>index 0000000..fda0139
+>--- /dev/null
+>+++ b/scripts/kconfig/merge_config.sh
+>@@ -0,0 +1,71 @@
+>+#!/bin/sh
+>+#  merge_config.sh - Takes a list of config fragment values, and merges
+>+#  them one by one. Provides warnings on overridden values, and specified
+>+#  values that did not make it to the resulting .config file (due to
+>missed
+>+#  dependencies or config symbol removal).
+>+#
+>+#  Portions reused from kconf_check and generate_cfg:
+>+#  
+>http://git.yoctoproject.org/cgit/cgit.cgi/yocto-kernel-tools/tree/tools/kc
+>onf_check
+>+#  
+>http://git.yoctoproject.org/cgit/cgit.cgi/yocto-kernel-tools/tree/tools/ge
+>nerate_cfg
+>+#
+>+#  Copyright (c) 2009-2010 Wind River Systems, Inc.
+>+#  Copyright 2011 Linaro
+>+#
+>+#  This program is free software; you can redistribute it and/or modify
+>+#  it under the terms of the GNU General Public License version 2 as
+>+#  published by the Free Software Foundation.
+>+#
+>+#  This program is distributed in the hope that it will be useful,
+>+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+>+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+>+#  See the GNU General Public License for more details.
+>+
+>+MERGE_LIST=$*
+>+
+>+
+>+TMP_FILE=$(mktemp ./.tmp.config.XXXXXXXXXX)
+>+
+>+# Merge files, printing warnings on overrided values
+>+for MERGE_FILE in $MERGE_LIST ; do
+>+	echo "Merging $MERGE_FILE"
+>+	CFG_LIST=`cat $MERGE_FILE | \
+>+	  sed 's/^\(# \)\{0,1\}\(CONFIG_[a-zA-Z0-9_]*\)[= ].*/\2/'`
+>+	for CFG in $CFG_LIST ; do
+>+		grep -q -w $CFG $TMP_FILE
+>+		if [ $? == 0 ] ; then
+>+			PREV_VAL=`grep -w $CFG $TMP_FILE`
+>+			NEW_VAL=`grep -w $CFG $MERGE_FILE`
+>+			if [ "x$PREV_VAL" != "x$NEW_VAL" ] ; then
+>+			echo Value of $CFG is redefined by fragment $MERGE_FILE:
+>+			echo Previous  value: `grep -w $CFG $TMP_FILE`
+>+			echo New value:       `grep -w $CFG $MERGE_FILE`
+>+			echo
+>+			fi
+>+			sed -i "/$CFG[ =]/d" $TMP_FILE
+>+		fi
+>+	done
+>+	cat $MERGE_FILE >> $TMP_FILE
+>+done
+>+
+>+
+>+# Use the merged file as the starting point for alldefconfig
+>+# (Fills in any missing symbols with Kconfig default)
+>+make KCONFIG_ALLCONFIG=$TMP_FILE alldefconfig
+>+
+>+# Check all specified config values took (might have missed-dependency
+>issues)
+>+cat $TMP_FILE | while read line; do
+>+	CFG=`echo $line | \
+>+		sed 's/^\(# \)\{0,1\}\(CONFIG_[a-zA-Z0-9_]*\)[= ].*/\2/'`
+>+
+>+	REQUESTED_VAL=`grep -w -e "$CFG" $TMP_FILE`
+>+	ACTUAL_VAL=`grep -w -e "$CFG" .config`
+>+	if [ "x$REQUESTED_VAL" != "x$ACTUAL_VAL" ] ; then
+>+		echo "Value requested for $CFG not in final .config"
+>+		echo "Requested value:  $REQUESTED_VAL"
+>+		echo "Actual value:     $ACTUAL_VAL"
+>+		echo ""
+>+	fi
+>+done
+>+
+>+# Cleanup
+>+rm $TMP_FILE
+>-- 
+>1.7.3.2.146.gca209
+>
 
