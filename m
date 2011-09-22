@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp-relay2.palm.com ([64.28.152.243]:5463 "EHLO
+Received: from smtp-relay2.palm.com ([64.28.152.243]:4666 "EHLO
 	smtp-relay2.palm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750825Ab1IUVv7 convert rfc822-to-8bit (ORCPT
+	with ESMTP id S1750826Ab1IVBaR convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 21 Sep 2011 17:51:59 -0400
+	Wed, 21 Sep 2011 21:30:17 -0400
 From: "Dmitry Fink (Palm GBU)" <Dmitry.Fink@palm.com>
-Date: Wed, 21 Sep 2011 14:42:13 -0700
+Date: Wed, 21 Sep 2011 18:20:38 -0700
 Subject: Re: [PATCH] kconfig: Add merge_config.sh script
-Message-ID: <CA9FA63D.25CAE%dmitry.fink@palm.com>
+Message-ID: <CA9FD86E.25CEB%dmitry.fink@palm.com>
 In-Reply-To: <1316582561-23066-1-git-send-email-john.stultz@linaro.org>
 Content-Language: en-US
 Content-Type: text/plain; charset="us-ascii"
@@ -18,28 +18,39 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: John Stultz <john.stultz@linaro.org>, lkml <linux-kernel@vger.kernel.org>
 Cc: Sam Ravnborg <sam@ravnborg.org>, "gthelen@google.com" <gthelen@google.com>, "tartler@cs.fau.de" <tartler@cs.fau.de>, Darren Hart <dvhart@linux.intel.com>, Eric B Munson <ebmunson@us.ibm.com>, Bruce Ashfield <Bruce.Ashfield@windriver.com>, Michal Marek <mmarek@suse.cz>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>
 
-Hi John,
+Hi, John
+Here is another suggestion:
 
-I think you may want to apply the following fix:
 --- a/scripts/kconfig/merge_config.sh
 +++ b/scripts/kconfig/merge_config.sh
-@@ -32,7 +32,7 @@ for MERGE_FILE in $MERGE_LIST ; do
-          sed 's/^\(# \)\{0,1\}\(CONFIG_[a-zA-Z0-9_]*\)[= ].*/\2/'`
-        for CFG in $CFG_LIST ; do
-                grep -q -w $CFG $TMP_FILE
--               if [ $? == 0 ] ; then
-+               if [ $? -eq 0 ] ; then
+@@ -28,11 +28,11 @@ TMP_FILE=$(mktemp ./.tmp.config.XXXXXXXXXX)
+ # Merge files, printing warnings on overrided values
+ for MERGE_FILE in $MERGE_LIST ; do
+ 	echo "Merging $MERGE_FILE"
+-	CFG_LIST=`cat $MERGE_FILE | \
++	CFG_LIST=`cat $MERGE_FILE | grep -e "CONFIG_[a-zA-Z0-9_]*" | \
+ 	  sed 's/^\(# \)\{0,1\}\(CONFIG_[a-zA-Z0-9_]*\)[= ].*/\2/'`
+ 	for CFG in $CFG_LIST ; do
+ 		grep -q -w $CFG $TMP_FILE
+@@ -53,7 +53,7 @@ done
+ make KCONFIG_ALLCONFIG=$TMP_FILE alldefconfig
+ 
+ # Check all specified config values took (might have missed-dependency
+issues)
+-cat $TMP_FILE | while read line; do
++cat $TMP_FILE | grep -e "CONFIG_[a-zA-Z0-9_]*" | while read line; do
+ 	CFG=`echo $line | \
+ 		sed 's/^\(# \)\{0,1\}\(CONFIG_[a-zA-Z0-9_]*\)[= ].*/\2/'`
 
-or just change it single "=" sign, "==" seems to be a bashism and failed
-on ubuntu's /bin/sh.
+The original script chokes on fragments that include empty lines or section
+comments (and think we do want them in fragments). There might be a nicer
+way to
+handle  it, this is the quickest fix I found, feel free to consider a
+different
+approach.
 
-
-You also have a minor typo in the commit msg:)
-"I'm sure I'm sure this implementation won't work for everyone, and"
- ^        ^
-
-Regards,
 Dmitry
+
 
 On 9/20/11 10:22 PM, "John Stultz" <john.stultz@linaro.org> wrote:
 
@@ -170,5 +181,4 @@ On 9/20/11 10:22 PM, "John Stultz" <john.stultz@linaro.org> wrote:
 >+rm $TMP_FILE
 >-- 
 >1.7.3.2.146.gca209
->
 
