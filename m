@@ -1,59 +1,203 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from calzone.tip.net.au ([203.10.76.15]:42551 "EHLO
-	calzone.tip.net.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753250Ab1IVOsa (ORCPT
+Received: from mail-ww0-f44.google.com ([74.125.82.44]:63769 "EHLO
+	mail-ww0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752021Ab1IVQSv convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 22 Sep 2011 10:48:30 -0400
-Date: Fri, 23 Sep 2011 00:48:23 +1000
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-Subject: Re: temporary kbuild git tree
-Message-Id: <20110923004823.d5f469b12241450d05cc8a12@canb.auug.org.au>
-In-Reply-To: <4E7AEDB8.7090006@suse.cz>
-References: <4E6A1044.5010206@suse.cz>
-	<4E7AEDB8.7090006@suse.cz>
-Mime-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pgp-signature";
- micalg="PGP-SHA1";
- boundary="Signature=_Fri__23_Sep_2011_00_48_23_+1000_7DxpgITqnyR0yue7"
+	Thu, 22 Sep 2011 12:18:51 -0400
+MIME-Version: 1.0
+In-Reply-To: <CA9FD86E.25CEB%dmitry.fink@palm.com>
+References: <1316582561-23066-1-git-send-email-john.stultz@linaro.org>
+	<CA9FD86E.25CEB%dmitry.fink@palm.com>
+Date: Thu, 22 Sep 2011 12:18:49 -0400
+Message-ID: <CACqU3MUM20b_KSZ=Ad1XtubaUSqLiMKNv44wWPpXsvVattRCwg@mail.gmail.com>
+Subject: Re: [PATCH] kconfig: Add merge_config.sh script
+From: Arnaud Lacombe <lacombar@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, lkml <linux-kernel@vger.kernel.org>
+To: "Dmitry Fink (Palm GBU)" <Dmitry.Fink@palm.com>
+Cc: John Stultz <john.stultz@linaro.org>, lkml <linux-kernel@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, "gthelen@google.com" <gthelen@google.com>, "tartler@cs.fau.de" <tartler@cs.fau.de>, Darren Hart <dvhart@linux.intel.com>, Eric B Munson <ebmunson@us.ibm.com>, Bruce Ashfield <Bruce.Ashfield@windriver.com>, Michal Marek <mmarek@suse.cz>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>
 
---Signature=_Fri__23_Sep_2011_00_48_23_+1000_7DxpgITqnyR0yue7
-Content-Type: text/plain; charset=US-ASCII
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Hi,
 
-Hi Michal,
-
-On Thu, 22 Sep 2011 10:11:36 +0200 Michal Marek <mmarek@suse.cz> wrote:
+On Wed, Sep 21, 2011 at 9:20 PM, Dmitry Fink (Palm GBU)
+<Dmitry.Fink@palm.com> wrote:
+> Hi, John
+> Here is another suggestion:
 >
-> Hi Stephen, I see linux-next has a temporary home as well, could you
-> please change the URLs for kbuild:
-> git://repo.or.cz/linux-kbuild.git#rc-fixes
-> git://repo.or.cz/linux-kbuild.git#for-next
+> --- a/scripts/kconfig/merge_config.sh
+> +++ b/scripts/kconfig/merge_config.sh
+> @@ -28,11 +28,11 @@ TMP_FILE=$(mktemp ./.tmp.config.XXXXXXXXXX)
+>  # Merge files, printing warnings on overrided values
+>  for MERGE_FILE in $MERGE_LIST ; do
+>        echo "Merging $MERGE_FILE"
+> -       CFG_LIST=`cat $MERGE_FILE | \
+> +       CFG_LIST=`cat $MERGE_FILE | grep -e "CONFIG_[a-zA-Z0-9_]*" | \
+>          sed 's/^\(# \)\{0,1\}\(CONFIG_[a-zA-Z0-9_]*\)[= ].*/\2/'`
+3 process, when only 1 is really needed, the following:
 
-I will switch to these starting tomorrow.
+CFG_LIST=`sed '/CONFIG_[a-zA-Z0-9_]*/!d; s/^\(#
+\)\{0,1\}\(CONFIG_[a-zA-Z0-9_]*\)[= ].*/\2/' $MERGE_FILE`
 
---=20
-Cheers,
-Stephen Rothwell                    sfr@canb.auug.org.au
-http://www.canb.auug.org.au/~sfr/
+should do the job; however, it's completely untested.
 
---Signature=_Fri__23_Sep_2011_00_48_23_+1000_7DxpgITqnyR0yue7
-Content-Type: application/pgp-signature
+ - Arnaud
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.11 (GNU/Linux)
-
-iQEcBAEBAgAGBQJOe0q3AAoJEDMEi1NhKgbsiZMH/2mDC+zTKPWVP3zsg+MfSrDj
-wMdQ4CvjE6REtuJ7jNlr10sAwXkl+98UZgvIy4CNu6mNlicy9ujj4Dqj3c3JiC8n
-W66GY/abrCGOSB3vmxECW+JCSTnGRKd1rYSaiqcw5Yeb3AVtuZkrL9afeu5Y/0IL
-GageXgYaWEWywiYoe16TyEyPEcqUssQYF3bgqkII6gcraO4uczROiJSaJp+t6nLp
-qcxv2S0ImaSaOAKYwbkGUsXWENlJ6G76ip5IbGoYx0PidusMw4boGXIoLJZE9ZdO
-vHv/Z7bJcoTgTwwnP1dm3OEf+HHEs1koM0qKCzpbP9R2svnYrDUhEU/Jow/3Zuk=
-=8W57
------END PGP SIGNATURE-----
-
---Signature=_Fri__23_Sep_2011_00_48_23_+1000_7DxpgITqnyR0yue7--
+>        for CFG in $CFG_LIST ; do
+>                grep -q -w $CFG $TMP_FILE
+> @@ -53,7 +53,7 @@ done
+>  make KCONFIG_ALLCONFIG=$TMP_FILE alldefconfig
+>
+>  # Check all specified config values took (might have missed-dependency
+> issues)
+> -cat $TMP_FILE | while read line; do
+> +cat $TMP_FILE | grep -e "CONFIG_[a-zA-Z0-9_]*" | while read line; do
+>        CFG=`echo $line | \
+>                sed 's/^\(# \)\{0,1\}\(CONFIG_[a-zA-Z0-9_]*\)[= ].*/\2/'`
+>
+> The original script chokes on fragments that include empty lines or section
+> comments (and think we do want them in fragments). There might be a nicer
+> way to
+> handle  it, this is the quickest fix I found, feel free to consider a
+> different
+> approach.
+>
+> Dmitry
+>
+>
+> On 9/20/11 10:22 PM, "John Stultz" <john.stultz@linaro.org> wrote:
+>
+>>After noticing almost every distro has their own method of managing
+>>config fragments, I went looking at some best practices, and wanted
+>>to try to consolidate some of the different approaches so this fairly
+>>simple infrastructure can be shared (and new distros/build systems
+>>don't have to implement yet another config fragment merge script).
+>>
+>>This script is most influenced by the Windriver tools used in
+>>the Yocto Project, reusing some portions found there.
+>>
+>>This script merges multiple config fragments, warning on any
+>>overrided values. It then sets any unspecified values to their
+>>default, then finally checks to make sure no specified value was
+>>dropped due to unsatisfied dependencies.
+>>
+>>I'm sure I'm sure this implementation won't work for everyone, and
+>>I expect it will need to evolve to adapt for various use cases.
+>>But I think its a reasonable starting point.
+>>
+>>v2: Reworked to use alldefconfig instead of the proposed
+>>olddefconfig as suggested by Sam Ravnborg.
+>>
+>>Thanks to Darren Hart for early review and feedback!
+>>
+>>Please let me know if you have any comments or thoughts!
+>>
+>>CC: Sam Ravnborg <sam@ravnborg.org>
+>>CC: gthelen@google.com
+>>CC: tartler@cs.fau.de
+>>CC: Dmitry Fink <Dmitry.Fink@palm.com>
+>>CC: Darren Hart <dvhart@linux.intel.com>
+>>CC: Eric B Munson <ebmunson@us.ibm.com>
+>>CC: Bruce Ashfield <Bruce.Ashfield@windriver.com>
+>>CC: Michal Marek <mmarek@suse.cz>
+>>CC: linux-kbuild@vger.kernel.org
+>>Signed-off-by: John Stultz <john.stultz@linaro.org>
+>>---
+>> scripts/kconfig/merge_config.sh |   71
+>>+++++++++++++++++++++++++++++++++++++++
+>> 1 files changed, 71 insertions(+), 0 deletions(-)
+>> create mode 100755 scripts/kconfig/merge_config.sh
+>>
+>>diff --git a/scripts/kconfig/merge_config.sh
+>>b/scripts/kconfig/merge_config.sh
+>>new file mode 100755
+>>index 0000000..fda0139
+>>--- /dev/null
+>>+++ b/scripts/kconfig/merge_config.sh
+>>@@ -0,0 +1,71 @@
+>>+#!/bin/sh
+>>+#  merge_config.sh - Takes a list of config fragment values, and merges
+>>+#  them one by one. Provides warnings on overridden values, and specified
+>>+#  values that did not make it to the resulting .config file (due to
+>>missed
+>>+#  dependencies or config symbol removal).
+>>+#
+>>+#  Portions reused from kconf_check and generate_cfg:
+>>+#
+>>http://git.yoctoproject.org/cgit/cgit.cgi/yocto-kernel-tools/tree/tools/kc
+>>onf_check
+>>+#
+>>http://git.yoctoproject.org/cgit/cgit.cgi/yocto-kernel-tools/tree/tools/ge
+>>nerate_cfg
+>>+#
+>>+#  Copyright (c) 2009-2010 Wind River Systems, Inc.
+>>+#  Copyright 2011 Linaro
+>>+#
+>>+#  This program is free software; you can redistribute it and/or modify
+>>+#  it under the terms of the GNU General Public License version 2 as
+>>+#  published by the Free Software Foundation.
+>>+#
+>>+#  This program is distributed in the hope that it will be useful,
+>>+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+>>+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+>>+#  See the GNU General Public License for more details.
+>>+
+>>+MERGE_LIST=$*
+>>+
+>>+
+>>+TMP_FILE=$(mktemp ./.tmp.config.XXXXXXXXXX)
+>>+
+>>+# Merge files, printing warnings on overrided values
+>>+for MERGE_FILE in $MERGE_LIST ; do
+>>+      echo "Merging $MERGE_FILE"
+>>+      CFG_LIST=`cat $MERGE_FILE | \
+>>+        sed 's/^\(# \)\{0,1\}\(CONFIG_[a-zA-Z0-9_]*\)[= ].*/\2/'`
+>>+      for CFG in $CFG_LIST ; do
+>>+              grep -q -w $CFG $TMP_FILE
+>>+              if [ $? == 0 ] ; then
+>>+                      PREV_VAL=`grep -w $CFG $TMP_FILE`
+>>+                      NEW_VAL=`grep -w $CFG $MERGE_FILE`
+>>+                      if [ "x$PREV_VAL" != "x$NEW_VAL" ] ; then
+>>+                      echo Value of $CFG is redefined by fragment $MERGE_FILE:
+>>+                      echo Previous  value: `grep -w $CFG $TMP_FILE`
+>>+                      echo New value:       `grep -w $CFG $MERGE_FILE`
+>>+                      echo
+>>+                      fi
+>>+                      sed -i "/$CFG[ =]/d" $TMP_FILE
+>>+              fi
+>>+      done
+>>+      cat $MERGE_FILE >> $TMP_FILE
+>>+done
+>>+
+>>+
+>>+# Use the merged file as the starting point for alldefconfig
+>>+# (Fills in any missing symbols with Kconfig default)
+>>+make KCONFIG_ALLCONFIG=$TMP_FILE alldefconfig
+>>+
+>>+# Check all specified config values took (might have missed-dependency
+>>issues)
+>>+cat $TMP_FILE | while read line; do
+>>+      CFG=`echo $line | \
+>>+              sed 's/^\(# \)\{0,1\}\(CONFIG_[a-zA-Z0-9_]*\)[= ].*/\2/'`
+>>+
+>>+      REQUESTED_VAL=`grep -w -e "$CFG" $TMP_FILE`
+>>+      ACTUAL_VAL=`grep -w -e "$CFG" .config`
+>>+      if [ "x$REQUESTED_VAL" != "x$ACTUAL_VAL" ] ; then
+>>+              echo "Value requested for $CFG not in final .config"
+>>+              echo "Requested value:  $REQUESTED_VAL"
+>>+              echo "Actual value:     $ACTUAL_VAL"
+>>+              echo ""
+>>+      fi
+>>+done
+>>+
+>>+# Cleanup
+>>+rm $TMP_FILE
+>>--
+>>1.7.3.2.146.gca209
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
