@@ -1,268 +1,83 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wy0-f174.google.com ([74.125.82.174]:40676 "EHLO
-	mail-wy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753084Ab1IYUN6 convert rfc822-to-8bit (ORCPT
+Received: from metis.ext.pengutronix.de ([92.198.50.35]:34222 "EHLO
+	metis.ext.pengutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751485Ab1I1GqZ (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 25 Sep 2011 16:13:58 -0400
+	Wed, 28 Sep 2011 02:46:25 -0400
+Date: Wed, 28 Sep 2011 08:46:14 +0200
+From: Uwe =?iso-8859-1?Q?Kleine-K=F6nig?=
+	<u.kleine-koenig@pengutronix.de>
+Subject: Re: [PATCH] dma/imx-sdma+imx-dma: explicitly #include
+ <linux/module.h>
+Message-ID: <20110928064614.GN20550@pengutronix.de>
+References: <1317018379-8897-1-git-send-email-u.kleine-koenig@pengutronix.de>
+ <4E824821.8040105@windriver.com>
 MIME-Version: 1.0
-In-Reply-To: <1315974254-17345-1-git-send-email-lacombar@gmail.com>
-References: <1315974254-17345-1-git-send-email-lacombar@gmail.com>
-Date: Sun, 25 Sep 2011 16:13:57 -0400
-Message-ID: <CACqU3MW-mOSaTDZxq8Z6LBa=GK6k1Z8X1PdfBDiwLMcqs5cHKg@mail.gmail.com>
-Subject: Re: [PATCH] Kbuild: allow code re-use across different directories
-From: Arnaud Lacombe <lacombar@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <4E824821.8040105@windriver.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Arnaud Lacombe <lacombar@gmail.com>
+To: Paul Gortmaker <paul.gortmaker@windriver.com>
+Cc: Vinod Koul <vinod.koul@intel.com>, Dan Williams <dan.j.williams@intel.com>, linux-kernel@vger.kernel.org, kernel@pengutronix.de, linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>
 
-Hi,
+[Cc: += linux-kbuild@v.k.o + Michal Marek]
 
-On Wed, Sep 14, 2011 at 12:24 AM, Arnaud Lacombe <lacombar@gmail.com> wrote:
-> Modify Kbuild to allow direct code re-use in multiple directory without having
-> to go through a copy. Technically, Kbuild would use by default the VPATH feature
-> of GNU make and provides accessors for Makefile to change it indirectly.
->
-> Considering:
->
-> arch/foo/lib:
-> fancy.c
->
-> We want to be able to build it with -DPANTS=32 in the kernel, but with
-> -DPANTS_SIZE=30 in the bootloader.
->
-> Currently we would do:
->
-> arch/foo/lib/Makefile
-> LDFLAGS_fancy.o := -DPANTS=32
-> obj-y += fancy.o
->
-> and, either:
->
-> arch/foo/boot/Makefile:
-> LDFLAGS_fancy.o := -DPANTS=30
-> obj-y += fancy.o
-> $(obj)/fancy.c: $(srctree)/arch/foo/lib/fancy.c
->        $(call cmd,shipped)
->
-> or
->
-> arch/foo/boot/Makefile:
-> LDFLAGS_fancy.o := -DPANTS=30
-> obj-y += fancy.o
-> $(obj)/fancy.o: $(srctree)/arch/foo/lib/fancy.c
->        $(call cmd,cc_c_o)
->
-> The former implies an extra copy of the source file, the latter expose Kbuild
-> internal function.
->
-> Now, we just would do:
->
-> arch/foo/boot/Makefile:
-> LDFLAGS_fancy.o := -DPANTS=30
-> obj-y += fancy.o
-> vpath-y += $(srctree)/arch/foo/lib
->
-> and let GNU make do the job.
->
-> Signed-off-by: Arnaud Lacombe <lacombar@gmail.com>
-> ---
->  Makefile               |    5 +++--
->  scripts/Makefile.build |   24 +++++++++++++++---------
->  scripts/Makefile.lib   |   17 ++++++++++++-----
->  3 files changed, 30 insertions(+), 16 deletions(-)
->
-ping ?
+Hello,
 
- - Arnaud
+On Tue, Sep 27, 2011 at 06:03:13PM -0400, Paul Gortmaker wrote:
+> On 11-09-26 02:26 AM, Uwe Kleine-König wrote:
+> > This is needed after commit
+> > 
+> > 	include: replace linux/module.h with "struct module" wherever possible
+> > 
+> > (currently 25215aa in next).
+> > 
+> > Cc: Paul Gortmaker <paul.gortmaker@windriver.com>
+> > Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
+> > ---
+> > Hello,
+> > 
+> > maybe it's sensible for Paul to take that before his commit?
+> 
+> Thanks, I'll blend it into the commit adding module.h to the other
+> drivers/dma files.  It seems the imx boards don't have a defconfig
+> in the arch/arm/configs that enables this (CONFIG_IMX_[S]DMA).
+> 
+> What is really interesting (at least to me anyway) is that I
+> didn't get one iMX build in some 6000+ ARM randconfig builds....
+> 
+> I would have thought it would have showed up at least a couple
+> times, given that number of builds.  Maybe randconfig doesn't
+> deal so well with "choice" Kconfig items?
+> 
+> ~/git/module.h/linux-2.6.git$ ls -1 ../build-10*arm |wc -l
+> 6399
+> ~/git/module.h/linux-2.6.git$ grep CONFIG_ARCH_[A-Z0-9]*=y ../build-10*arm*/.config | sed 's/.*CON/CON/'|sort |uniq
+> CONFIG_ARCH_EBSA110=y
+> CONFIG_ARCH_H7201=y
+> CONFIG_ARCH_H7202=y
+> CONFIG_ARCH_H720X=y
+> CONFIG_ARCH_VERSATILE=y
 
-> diff --git a/Makefile b/Makefile
-> index c3e90c5..663429b 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -154,9 +154,10 @@ objtree            := $(CURDIR)
->  src            := $(srctree)
->  obj            := $(objtree)
->
-> -VPATH          := $(srctree)$(if $(KBUILD_EXTMOD),:$(KBUILD_EXTMOD))
-> +KBUILD_VPATH   := $(srctree)$(if $(KBUILD_EXTMOD),:$(KBUILD_EXTMOD))
-> +VPATH          := $(KBUILD_VPATH)
->
-> -export srctree objtree VPATH
-> +export srctree objtree KBUILD_VPATH
->
->
->  # SUBARCH tells the usermode build what the underlying arch is.  That is set
-> diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-> index a0fd502..ac539d7 100644
-> --- a/scripts/Makefile.build
-> +++ b/scripts/Makefile.build
-> @@ -18,6 +18,8 @@ always :=
->  targets :=
->  subdir-y :=
->  subdir-m :=
-> +vpath-y :=
-> +vpath-m :=
->  EXTRA_AFLAGS   :=
->  EXTRA_CFLAGS   :=
->  EXTRA_CPPFLAGS :=
-> @@ -37,6 +39,7 @@ include scripts/Kbuild.include
->
->  # For backward compatibility check that these variables do not change
->  save-cflags := $(CFLAGS)
-> +save-vpath := $(VPATH)
->
->  # The filename Kbuild has precedence over Makefile
->  kbuild-dir := $(if $(filter /%,$(src)),$(src),$(srctree)/$(src))
-> @@ -48,6 +51,9 @@ ifeq ($(KBUILD_NOPEDANTIC),)
->         ifneq ("$(save-cflags)","$(CFLAGS)")
->                 $(error CFLAGS was changed in "$(kbuild-file)". Fix it to use EXTRA_CFLAGS)
->         endif
-> +        ifneq ("$(save-vpath)","$(VPATH)")
-> +                $(error VPATH was changed in "$(kbuild-file)". Please uses vpath-y)
-> +        endif
->  endif
->
->  #
-> @@ -198,13 +204,13 @@ $(multi-objs-y:.o=.lst) : modname = $(modname-multi)
->  quiet_cmd_cc_s_c = CC $(quiet_modtag)  $@
->  cmd_cc_s_c       = $(CC) $(c_flags) -fverbose-asm -S -o $@ $<
->
-> -$(obj)/%.s: $(src)/%.c FORCE
-> +$(obj)/%.s: %.c FORCE
->        $(call if_changed_dep,cc_s_c)
->
->  quiet_cmd_cc_i_c = CPP $(quiet_modtag) $@
->  cmd_cc_i_c       = $(CPP) $(c_flags)   -o $@ $<
->
-> -$(obj)/%.i: $(src)/%.c FORCE
-> +$(obj)/%.i: %.c FORCE
->        $(call if_changed_dep,cc_i_c)
->
->  cmd_gensymtypes =                                                           \
-> @@ -219,7 +225,7 @@ cmd_cc_symtypes_c =                                                         \
->     $(call cmd_gensymtypes,true,$@) >/dev/null;                             \
->     test -s $@ || rm -f $@
->
-> -$(obj)/%.symtypes : $(src)/%.c FORCE
-> +$(obj)/%.symtypes : %.c FORCE
->        $(call cmd,cc_symtypes_c)
->
->  # C (.c) files
-> @@ -301,13 +307,13 @@ define rule_cc_o_c
->  endef
->
->  # Built-in and composite module parts
-> -$(obj)/%.o: $(src)/%.c $(recordmcount_source) FORCE
-> +$(obj)/%.o: %.c $(recordmcount_source) FORCE
->        $(call cmd,force_checksrc)
->        $(call if_changed_rule,cc_o_c)
->
->  # Single-part modules are special since we need to mark them in $(MODVERDIR)
->
-> -$(single-used-m): $(obj)/%.o: $(src)/%.c $(recordmcount_source) FORCE
-> +$(single-used-m): %.o: %.c $(recordmcount_source) FORCE
->        $(call cmd,force_checksrc)
->        $(call if_changed_rule,cc_o_c)
->        @{ echo $(@:.o=.ko); echo $@; } > $(MODVERDIR)/$(@F:.o=.mod)
-> @@ -317,7 +323,7 @@ quiet_cmd_cc_lst_c = MKLST   $@
->                     $(CONFIG_SHELL) $(srctree)/scripts/makelst $*.o \
->                                     System.map $(OBJDUMP) > $@
->
-> -$(obj)/%.lst: $(src)/%.c FORCE
-> +$(obj)/%.lst: %.c FORCE
->        $(call if_changed_dep,cc_lst_c)
->
->  # Compile assembler sources (.S)
-> @@ -331,13 +337,13 @@ $(real-objs-m:.o=.s): modkern_aflags := $(KBUILD_AFLAGS_MODULE) $(AFLAGS_MODULE)
->  quiet_cmd_as_s_S = CPP $(quiet_modtag) $@
->  cmd_as_s_S       = $(CPP) $(a_flags)   -o $@ $<
->
-> -$(obj)/%.s: $(src)/%.S FORCE
-> +$(obj)/%.s: %.S FORCE
->        $(call if_changed_dep,as_s_S)
->
->  quiet_cmd_as_o_S = AS $(quiet_modtag)  $@
->  cmd_as_o_S       = $(CC) $(a_flags) -c -o $@ $<
->
-> -$(obj)/%.o: $(src)/%.S FORCE
-> +$(obj)/%.o: %.S FORCE
->        $(call if_changed_dep,as_o_S)
->
->  targets += $(real-objs-y) $(real-objs-m) $(lib-y)
-> @@ -349,7 +355,7 @@ quiet_cmd_cpp_lds_S = LDS     $@
->       cmd_cpp_lds_S = $(CPP) $(cpp_flags) -P -C -U$(ARCH) \
->                             -D__ASSEMBLY__ -DLINKER_SCRIPT -o $@ $<
->
-> -$(obj)/%.lds: $(src)/%.lds.S FORCE
-> +$(obj)/%.lds: %.lds.S FORCE
->        $(call if_changed_dep,cpp_lds_S)
->
->  # Build the compiled-in targets
-> diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-> index aeea84a..b57b621 100644
-> --- a/scripts/Makefile.lib
-> +++ b/scripts/Makefile.lib
-> @@ -46,6 +46,13 @@ obj-m                := $(filter-out %/, $(obj-m))
->
->  subdir-ym      := $(sort $(subdir-y) $(subdir-m))
->
-> +#
-> +vpath-ym       := $(vpath-y) $(vpath-m)
-> +VPATH          := $(KBUILD_VPATH)
-> +VPATH          += $(srctree)/$(src)
-> +VPATH          += $(obj)
-> +VPATH          += $(vpath-ym)
-> +
->  # if $(foo-objs) exists, foo.o is a composite object
->  multi-used-y := $(sort $(foreach m,$(obj-y), $(if $(strip $($(m:.o=-objs)) $($(m:.o=-y))), $(m))))
->  multi-used-m := $(sort $(foreach m,$(obj-m), $(if $(strip $($(m:.o=-objs)) $($(m:.o=-y))), $(m))))
-> @@ -167,7 +174,7 @@ ifdef REGENERATE_PARSERS
->  quiet_cmd_gperf = GPERF $@
->       cmd_gperf = gperf -t --output-file $@ -a -C -E -g -k 1,3,$$ -p -t $<
->
-> -$(src)/%.hash.c_shipped: $(src)/%.gperf
-> +$(src)/%.hash.c_shipped: %.gperf
->        $(call cmd,gperf)
->
->  # LEX
-> @@ -177,7 +184,7 @@ LEX_PREFIX = $(if $(LEX_PREFIX_${baseprereq}),$(LEX_PREFIX_${baseprereq}),yy)
->  quiet_cmd_flex = LEX     $@
->       cmd_flex = flex -o$@ -L -P $(LEX_PREFIX) $<
->
-> -$(src)/%.lex.c_shipped: $(src)/%.l
-> +$(src)/%.lex.c_shipped: %.l
->        $(call cmd,flex)
->
->  # YACC
-> @@ -187,13 +194,13 @@ YACC_PREFIX = $(if $(YACC_PREFIX_${baseprereq}),$(YACC_PREFIX_${baseprereq}),yy)
->  quiet_cmd_bison = YACC    $@
->       cmd_bison = bison -o$@ -t -l -p $(YACC_PREFIX) $<
->
-> -$(src)/%.tab.c_shipped: $(src)/%.y
-> +$(src)/%.tab.c_shipped: %.y
->        $(call cmd,bison)
->
->  quiet_cmd_bison_h = YACC    $@
->       cmd_bison_h = bison -o/dev/null --defines=$@ -t -l -p $(YACC_PREFIX) $<
->
-> -$(src)/%.tab.h_shipped: $(src)/%.y
-> +$(src)/%.tab.h_shipped: %.y
->        $(call cmd,bison_h)
->
->  endif
-> @@ -204,7 +211,7 @@ endif
->  quiet_cmd_shipped = SHIPPED $@
->  cmd_shipped = cat $< > $@
->
-> -$(obj)/%: $(src)/%_shipped
-> +$(obj)/%: %_shipped
->        $(call cmd,shipped)
->
->  # Commands useful for building a boot image
-> --
-> 1.7.6.153.g78432
->
->
+I don't understand why you did that sed, but AFAICT it doesn't hurt,
+too. Maybe adding -c to uniq in your command line is interesting for the
+kbuild people?!
+
+> ~/git/module.h/linux-2.6.git$ 
+> 
+> No ARCH_MXC, no ARCH_MXS, PXA, or any of the other 20+ variants.
+> Definitely not a random spread there, with all 6000 builds falling
+> in just 5 buckets.
+How did you test? Generate a .config, test without your change and if
+that succeeds test with it? If so, maybe the problem isn't that
+randconfig doesn't generate more random configs but that you got many
+failures in the first run?!
+
+Best regards
+Uwe
+
+-- 
+Pengutronix e.K.                           | Uwe Kleine-König            |
+Industrial Linux Solutions                 | http://www.pengutronix.de/  |
