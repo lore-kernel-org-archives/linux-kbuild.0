@@ -1,94 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.windriver.com ([147.11.1.11]:46381 "EHLO
-	mail.windriver.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752818Ab1I1Nhf (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 28 Sep 2011 09:37:35 -0400
-Message-ID: <4E8322F5.6010206@windriver.com>
-Date: Wed, 28 Sep 2011 09:36:53 -0400
-From: Paul Gortmaker <paul.gortmaker@windriver.com>
+Received: from cantor2.suse.de ([195.135.220.15]:51761 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751165Ab1I1Vm3 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 28 Sep 2011 17:42:29 -0400
+Date: Wed, 28 Sep 2011 23:42:27 +0200
+From: Michal Marek <mmarek@suse.cz>
+Subject: Re: [PATCH] Kbuild: allow code re-use across different directories
+Message-ID: <20110928214227.GA17628@sepie.suse.cz>
+References: <1315974254-17345-1-git-send-email-lacombar@gmail.com>
 MIME-Version: 1.0
-Subject: Re: [PATCH] dma/imx-sdma+imx-dma: explicitly #include <linux/module.h>
-References: <1317018379-8897-1-git-send-email-u.kleine-koenig@pengutronix.de> <4E824821.8040105@windriver.com> <20110928064614.GN20550@pengutronix.de>
-In-Reply-To: <20110928064614.GN20550@pengutronix.de>
-Content-Type: text/plain; charset="ISO-8859-1"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1315974254-17345-1-git-send-email-lacombar@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: =?ISO-8859-1?Q?Uwe_Kleine-K=F6nig?= <u.kleine-koenig@pengutronix.de>
-Cc: Vinod Koul <vinod.koul@intel.com>, Dan Williams <dan.j.williams@intel.com>, linux-kernel@vger.kernel.org, kernel@pengutronix.de, linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>
+To: Arnaud Lacombe <lacombar@gmail.com>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On 11-09-28 02:46 AM, Uwe Kleine-König wrote:
-> [Cc: += linux-kbuild@v.k.o + Michal Marek]
-> 
-> Hello,
-> 
-> On Tue, Sep 27, 2011 at 06:03:13PM -0400, Paul Gortmaker wrote:
->> On 11-09-26 02:26 AM, Uwe Kleine-König wrote:
->>> This is needed after commit
->>>
->>> 	include: replace linux/module.h with "struct module" wherever possible
->>>
->>> (currently 25215aa in next).
->>>
->>> Cc: Paul Gortmaker <paul.gortmaker@windriver.com>
->>> Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
->>> ---
->>> Hello,
->>>
->>> maybe it's sensible for Paul to take that before his commit?
->>
->> Thanks, I'll blend it into the commit adding module.h to the other
->> drivers/dma files.  It seems the imx boards don't have a defconfig
->> in the arch/arm/configs that enables this (CONFIG_IMX_[S]DMA).
->>
->> What is really interesting (at least to me anyway) is that I
->> didn't get one iMX build in some 6000+ ARM randconfig builds....
->>
->> I would have thought it would have showed up at least a couple
->> times, given that number of builds.  Maybe randconfig doesn't
->> deal so well with "choice" Kconfig items?
->>
->> ~/git/module.h/linux-2.6.git$ ls -1 ../build-10*arm |wc -l
->> 6399
->> ~/git/module.h/linux-2.6.git$ grep CONFIG_ARCH_[A-Z0-9]*=y ../build-10*arm*/.config | sed 's/.*CON/CON/'|sort |uniq
->> CONFIG_ARCH_EBSA110=y
->> CONFIG_ARCH_H7201=y
->> CONFIG_ARCH_H7202=y
->> CONFIG_ARCH_H720X=y
->> CONFIG_ARCH_VERSATILE=y
-> 
-> I don't understand why you did that sed, but AFAICT it doesn't hurt,
-> too. Maybe adding -c to uniq in your command line is interesting for the
-> kbuild people?!
+On Wed, Sep 14, 2011 at 12:24:14AM -0400, Arnaud Lacombe wrote:
+> Modify Kbuild to allow direct code re-use in multiple directory
+> without having to go through a copy. Technically, Kbuild would use by
+> default the VPATH feature
 
-The sed was to strip the build paths from the grep output.  I could
-have used "grep -h" instead.
+I now found that the patch breaks headers_install and firmware_install
+when using O=
 
-> 
->> ~/git/module.h/linux-2.6.git$ 
->>
->> No ARCH_MXC, no ARCH_MXS, PXA, or any of the other 20+ variants.
->> Definitely not a random spread there, with all 6000 builds falling
->> in just 5 buckets.
-> How did you test? Generate a .config, test without your change and if
-> that succeeds test with it? If so, maybe the problem isn't that
-> randconfig doesn't generate more random configs but that you got many
-> failures in the first run?!
+$ mkdir build
+$ make O=build defconfig
+...
+$ make O=build headers_install
+  CHK     include/linux/version.h
+  UPD     include/linux/version.h
+  HOSTCC  scripts/unifdef
+make[3]: *** No rule to make target `scripts/headers_install.pl', needed by `/labs/mmarek/linux-2.6/build/usr/include/asm-generic/.install'.  Stop.
+make[2]: *** [asm-generic] Error 2
+make[1]: *** [headers_install] Error 2
+make: *** [sub-make] Error 2
+$ make O=build firmware_install
+  GEN     /labs/mmarek/linux-2.6/build/Makefile
+scripts/kconfig/conf --silentoldconfig Kconfig
+make[2]: *** No rule to make target `firmware/e100/d101m_ucode.bin', needed by `/lib/firmware/e100/d101m_ucode.bin'.  Stop.
+make[1]: *** [firmware_install] Error 2
+make: *** [sub-make] Error 2
 
-Testing was with the following chunk out of my $0.02 script:
-
- i=10000 ; while [ 1 ] ; do D=../build-$i-$MYARCH ; mkdir $D ; echo xxxxxxx $D xxxxxx  ; make ARCH=$MYARCH O=$D randconfig > $D/cfg.log 2>&1 ; if [ $? != 0 ] ; then echo  cfg failed in $D ; break ; fi ; time make ARCH=$MYARCH O=$D -j16 > $D/build.log 2>&1 ; if [ $? != 0 ]; then echo  bld fail in $D ; fi ; i=$[$i+1] ; done
-
-Then I'd comb all the build logs looking for errors that were caused
-by changes that I made.  As you can see, it just calls randconfig, but
-the coverage never really "randomly" covered all arm platforms.
-
-Paul.
-
-
-
-> 
-> Best regards
-> Uwe
-> 
+Michal
