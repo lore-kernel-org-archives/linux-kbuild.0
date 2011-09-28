@@ -1,56 +1,52 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ww0-f44.google.com ([74.125.82.44]:48554 "EHLO
-	mail-ww0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751856Ab1I1Hen convert rfc822-to-8bit (ORCPT
+Received: from mail.windriver.com ([147.11.1.11]:46381 "EHLO
+	mail.windriver.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752818Ab1I1Nhf (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 28 Sep 2011 03:34:43 -0400
+	Wed, 28 Sep 2011 09:37:35 -0400
+Message-ID: <4E8322F5.6010206@windriver.com>
+Date: Wed, 28 Sep 2011 09:36:53 -0400
+From: Paul Gortmaker <paul.gortmaker@windriver.com>
 MIME-Version: 1.0
-In-Reply-To: <20110928064614.GN20550@pengutronix.de>
-References: <1317018379-8897-1-git-send-email-u.kleine-koenig@pengutronix.de>
-	<4E824821.8040105@windriver.com>
-	<20110928064614.GN20550@pengutronix.de>
-Date: Wed, 28 Sep 2011 03:34:41 -0400
-Message-ID: <CACqU3MXO_yQKJbafD8g+kBje4y+ZWcUMsXvk_2xddrTiumSBbQ@mail.gmail.com>
 Subject: Re: [PATCH] dma/imx-sdma+imx-dma: explicitly #include <linux/module.h>
-From: Arnaud Lacombe <lacombar@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 8BIT
+References: <1317018379-8897-1-git-send-email-u.kleine-koenig@pengutronix.de> <4E824821.8040105@windriver.com> <20110928064614.GN20550@pengutronix.de>
+In-Reply-To: <20110928064614.GN20550@pengutronix.de>
+Content-Type: text/plain; charset="ISO-8859-1"
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: =?ISO-8859-1?Q?Uwe_Kleine=2DK=F6nig?= <u.kleine-koenig@pengutronix.de>
-Cc: Paul Gortmaker <paul.gortmaker@windriver.com>, Vinod Koul <vinod.koul@intel.com>, Dan Williams <dan.j.williams@intel.com>, linux-kernel@vger.kernel.org, kernel@pengutronix.de, linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>
+To: =?ISO-8859-1?Q?Uwe_Kleine-K=F6nig?= <u.kleine-koenig@pengutronix.de>
+Cc: Vinod Koul <vinod.koul@intel.com>, Dan Williams <dan.j.williams@intel.com>, linux-kernel@vger.kernel.org, kernel@pengutronix.de, linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>
 
-Hi,
-
-2011/9/28 Uwe Kleine-König <u.kleine-koenig@pengutronix.de>:
+On 11-09-28 02:46 AM, Uwe Kleine-König wrote:
 > [Cc: += linux-kbuild@v.k.o + Michal Marek]
->
+> 
 > Hello,
->
+> 
 > On Tue, Sep 27, 2011 at 06:03:13PM -0400, Paul Gortmaker wrote:
 >> On 11-09-26 02:26 AM, Uwe Kleine-König wrote:
->> > This is needed after commit
->> >
->> >     include: replace linux/module.h with "struct module" wherever possible
->> >
->> > (currently 25215aa in next).
->> >
->> > Cc: Paul Gortmaker <paul.gortmaker@windriver.com>
->> > Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
->> > ---
->> > Hello,
->> >
->> > maybe it's sensible for Paul to take that before his commit?
+>>> This is needed after commit
+>>>
+>>> 	include: replace linux/module.h with "struct module" wherever possible
+>>>
+>>> (currently 25215aa in next).
+>>>
+>>> Cc: Paul Gortmaker <paul.gortmaker@windriver.com>
+>>> Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
+>>> ---
+>>> Hello,
+>>>
+>>> maybe it's sensible for Paul to take that before his commit?
 >>
 >> Thanks, I'll blend it into the commit adding module.h to the other
->> drivers/dma files.  It seems the imx boards don't have a defconfig
+>> drivers/dma files.  It seems the imx boards don't have a defconfig
 >> in the arch/arm/configs that enables this (CONFIG_IMX_[S]DMA).
 >>
 >> What is really interesting (at least to me anyway) is that I
 >> didn't get one iMX build in some 6000+ ARM randconfig builds....
 >>
 >> I would have thought it would have showed up at least a couple
->> times, given that number of builds.  Maybe randconfig doesn't
+>> times, given that number of builds.  Maybe randconfig doesn't
 >> deal so well with "choice" Kconfig items?
 >>
 >> ~/git/module.h/linux-2.6.git$ ls -1 ../build-10*arm |wc -l
@@ -61,46 +57,16 @@ Hi,
 >> CONFIG_ARCH_H7202=y
 >> CONFIG_ARCH_H720X=y
 >> CONFIG_ARCH_VERSATILE=y
->
+> 
 > I don't understand why you did that sed, but AFAICT it doesn't hurt,
 > too. Maybe adding -c to uniq in your command line is interesting for the
 > kbuild people?!
->
-this can be reproduced trivially:
 
-for i in $(seq 1 100); do
-    make ARCH=arm randconfig
-    sed -e '/CONFIG_ARCH_INTEGRATOR/,/CONFIG_ARCH_ZYNQ/!d;' \
-        -e '/=y/!d' .config >> arch_selected
-done
-sort arch_selected | uniq -c
+The sed was to strip the build paths from the grep output.  I could
+have used "grep -h" instead.
 
-I may have a trivial explanation for part of the symbol, which depends
-on MMU, so if these symbols are selected, but MMU is not, it will
-fall-back on the default, VERSATILE, which should happen 50% of the
-time. However, there is plenty of symbols which have no specific
-dependency, and are still not selected.
-
-On the other side, all the result of a randconfig, on the choice alone
-(ie. without any 'select' and any other symbols) is spread
-"correctly".
-
-Taken as a whole:
-
-% cat arch_selected | sort | uniq -c | wc -l
-     3
-
-% cat arch_selected | sort | uniq -c
-      2 CONFIG_ARCH_EBSA110=y
-      4 CONFIG_ARCH_H720X=y
-    100 CONFIG_ARCH_VERSATILE=y
-
-However, when the choice is alone:
-
-% cat arch_selected | sort | uniq -c | wc -l
-     39
-
->> ~/git/module.h/linux-2.6.git$
+> 
+>> ~/git/module.h/linux-2.6.git$ 
 >>
 >> No ARCH_MXC, no ARCH_MXS, PXA, or any of the other 20+ variants.
 >> Definitely not a random spread there, with all 6000 builds falling
@@ -109,28 +75,20 @@ However, when the choice is alone:
 > that succeeds test with it? If so, maybe the problem isn't that
 > randconfig doesn't generate more random configs but that you got many
 > failures in the first run?!
->
-it would seem that taken globally, the result of this particular
-choice is not random, but I'm not sure of the dynamic involved
-precisely.
 
-I'm not a huge fan of the way randconfig works presently, that it by
-just iterating over all symbols and setting a value . I'd prefer to
-keep traversing all the menu, picking a random value for
-user-changeable setting, over and over until all symbol have been
-chosen. However, this is a whole lots of change...
+Testing was with the following chunk out of my $0.02 script:
 
- - Arnaud
+ i=10000 ; while [ 1 ] ; do D=../build-$i-$MYARCH ; mkdir $D ; echo xxxxxxx $D xxxxxx  ; make ARCH=$MYARCH O=$D randconfig > $D/cfg.log 2>&1 ; if [ $? != 0 ] ; then echo  cfg failed in $D ; break ; fi ; time make ARCH=$MYARCH O=$D -j16 > $D/build.log 2>&1 ; if [ $? != 0 ]; then echo  bld fail in $D ; fi ; i=$[$i+1] ; done
 
+Then I'd comb all the build logs looking for errors that were caused
+by changes that I made.  As you can see, it just calls randconfig, but
+the coverage never really "randomly" covered all arm platforms.
+
+Paul.
+
+
+
+> 
 > Best regards
 > Uwe
->
-> --
-> Pengutronix e.K.                           | Uwe Kleine-König            |
-> Industrial Linux Solutions                 | http://www.pengutronix.de/  |
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kernel" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> Please read the FAQ at  http://www.tux.org/lkml/
->
+> 
