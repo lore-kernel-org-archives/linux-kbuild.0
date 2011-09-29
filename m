@@ -1,26 +1,30 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from relay6.ptmail.sapo.pt ([212.55.154.26]:44101 "HELO sapo.pt"
+Received: from relay4.ptmail.sapo.pt ([212.55.154.24]:52450 "HELO sapo.pt"
 	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with SMTP
-	id S1755190Ab1I2TN5 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 29 Sep 2011 15:13:57 -0400
+	id S1757014Ab1I2TQq (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 29 Sep 2011 15:16:46 -0400
 Received: from unknown (HELO serjux.com) (sergiomb@sapo.pt@[188.83.4.143])
           (envelope-sender <sergio@serjux.com>)
-          by mta13 (qmail-ptmail-1.0.0) with AES256-SHA encrypted SMTP
-          for <linux-kbuild@vger.kernel.org>; 29 Sep 2011 19:07:14 -0000
+          by mta12 (qmail-ptmail-1.0.0) with AES256-SHA encrypted SMTP
+          for <linux-kbuild@vger.kernel.org>; 29 Sep 2011 19:16:44 -0000
 Subject: kBuild-0.1.9998
 From: =?ISO-8859-1?Q?S=E9rgio?= Basto <sergio@serjux.com>
-Date: Thu, 29 Sep 2011 20:07:12 +0100
+Date: Thu, 29 Sep 2011 20:16:42 +0100
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-Message-ID: <1317323233.13830.10.camel@segulix>
+Message-ID: <1317323802.13830.12.camel@segulix>
 Mime-Version: 1.0
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 
 Hi,
-I need update kBuild for compile 
-the trunk still on sorceforge 
+
+Sorry I missed a few words. 
+I need update kBuild for compile VirtualBox 4.1.2
+
+
+
 I do this:
 svn co http://svn.netlabs.org/repos/kbuild/trunk/
 mv trunk kBuild-0.1.9998
@@ -41,5 +45,11 @@ Thanks,
 
 -- 
 Sérgio M. B.
+
+
+--
+To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
 
