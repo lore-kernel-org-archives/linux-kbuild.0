@@ -1,40 +1,33 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:56665 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755302Ab1I3IdY (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 30 Sep 2011 04:33:24 -0400
-Message-ID: <4E857ED3.9010803@suse.cz>
-Date: Fri, 30 Sep 2011 10:33:23 +0200
-From: Michal Marek <mmarek@suse.cz>
-MIME-Version: 1.0
+Received: from relay3.ptmail.sapo.pt ([212.55.154.23]:34959 "HELO sapo.pt"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with SMTP
+	id S1751841Ab1I3Qq1 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 30 Sep 2011 12:46:27 -0400
+Received: from unknown (HELO serjux.com) (sergiomb@sapo.pt@[188.83.4.143])
+          (envelope-sender <sergio@serjux.com>)
+          by mta14 (qmail-ptmail-1.0.0) with AES256-SHA encrypted SMTP
+          for <linux-kbuild@vger.kernel.org>; 30 Sep 2011 16:46:23 -0000
 Subject: Re: kBuild-0.1.9998
-References: <1317323802.13830.12.camel@segulix>
-In-Reply-To: <1317323802.13830.12.camel@segulix>
-Content-Type: text/plain; charset=UTF-8
+From: =?ISO-8859-1?Q?S=E9rgio?= Basto <sergio@serjux.com>
+Date: Fri, 30 Sep 2011 17:46:21 +0100
+In-Reply-To: <4E857ED3.9010803@suse.cz>
+References: <1317323802.13830.12.camel@segulix> <4E857ED3.9010803@suse.cz>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
+Message-ID: <1317401182.20769.1.camel@segulix>
+Mime-Version: 1.0
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: =?UTF-8?B?U8OpcmdpbyBCYXN0bw==?= <sergio@serjux.com>
+To: Michal Marek <mmarek@suse.cz>
 Cc: linux-kbuild@vger.kernel.org
 
-On 29.9.2011 21:16, Sérgio Basto wrote:
-> I need update kBuild for compile VirtualBox 4.1.2
+On Fri, 2011-09-30 at 10:33 +0200, Michal Marek wrote: 
 > 
-> I do this:
-> svn co http://svn.netlabs.org/repos/kbuild/trunk/
-> mv trunk kBuild-0.1.9998
-> tar cvzf kBuild-0.1.9998.tar.gz kBuild-0.1.9998/ --exclude=.svn
-> 
-> this is the right way ? 
+> This is the former home of the linux kernel build system, and it is
+> indeed out of date now. But you are looking for the Virtualbox kbuild.
 
-That's a different project that the linux kernel build system.
+yeah, thanks, for reply 
 
+-- 
+Sérgio M. B.
 
-> Any way http://kbuild.sourceforge.net/ is completely out-of-date 
-> The link of "The CML2 Resources Page" http://tuxedo.org/~esr/cml2/ is broken 
-> I found a note on  http://sourceforge.net/projects/kbuild/
-
-This is the former home of the linux kernel build system, and it is
-indeed out of date now. But you are looking for the Virtualbox kbuild.
-
-Michal
