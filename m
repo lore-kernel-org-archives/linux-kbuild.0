@@ -1,33 +1,61 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from relay3.ptmail.sapo.pt ([212.55.154.23]:34959 "HELO sapo.pt"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with SMTP
-	id S1751841Ab1I3Qq1 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 30 Sep 2011 12:46:27 -0400
-Received: from unknown (HELO serjux.com) (sergiomb@sapo.pt@[188.83.4.143])
-          (envelope-sender <sergio@serjux.com>)
-          by mta14 (qmail-ptmail-1.0.0) with AES256-SHA encrypted SMTP
-          for <linux-kbuild@vger.kernel.org>; 30 Sep 2011 16:46:23 -0000
-Subject: Re: kBuild-0.1.9998
-From: =?ISO-8859-1?Q?S=E9rgio?= Basto <sergio@serjux.com>
-Date: Fri, 30 Sep 2011 17:46:21 +0100
-In-Reply-To: <4E857ED3.9010803@suse.cz>
-References: <1317323802.13830.12.camel@segulix> <4E857ED3.9010803@suse.cz>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-Message-ID: <1317401182.20769.1.camel@segulix>
-Mime-Version: 1.0
+Received: from dd26914.kasserver.com ([85.13.145.202]:39657 "EHLO
+	dd26914.kasserver.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751456Ab1JBJhX (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 2 Oct 2011 05:37:23 -0400
+Received: from [192.168.178.20] (pD951936B.dip0.t-ipconnect.de [217.81.147.107])
+	by dd26914.kasserver.com (Postfix) with ESMTPSA id 2AE91276006C
+	for <linux-kbuild@vger.kernel.org>; Sun,  2 Oct 2011 11:29:47 +0200 (CEST)
+Message-ID: <4E882F41.6070603@Kriegisch.name>
+Date: Sun, 02 Oct 2011 11:30:41 +0200
+From: Alexander Kriegisch <Alexander@Kriegisch.name>
+MIME-Version: 1.0
+Subject: Re: kbuild/kconfig for non-Linux projects
+Content-Type: text/plain; charset=ISO-8859-15; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
 
-On Fri, 2011-09-30 at 10:33 +0200, Michal Marek wrote: 
-> 
-> This is the former home of the linux kernel build system, and it is
-> indeed out of date now. But you are looking for the Virtualbox kbuild.
+I am new to this list, but trying to reply to an older thread, re-using 
+its title/subject. I am going to quote Arnaud's message because my 
+question relates to it.
 
-yeah, thanks, for reply 
+@Arnaud: I have successfully downloaded, installed and built a tarball 
+from your 2.6.39 branch. So far, so good. What I am trying to do, 
+though, is to refresh an older kbuild version, taken from Buildroot some 
+about years ago. It works nicely and I especially like the warnings for 
+cyclic references and missing direct dependencies.
 
+There is one issue we are facing in our open source project 
+(http://freetz.org), though: Our previous kconfig version used symbols 
+which were identical in .config with the names in Config.in, i.e. they 
+had no "CONFIG_" prefixes. Now kconfig writes .config files with those 
+prefixes, so in order not to break our build system we had to add 
+scripts replacing names back and forth before we start conf/mconf and 
+after they terminate.
+
+Question: Is there a straightforward way to make kconfig read/write 
+symbols *without* "CONFIG_" prefixes? As I am not a C programmer, would 
+you mind providing a patch if necessary?
+
+Respectfully
 -- 
-Sérgio M. B.
+Alexander Kriegisch
 
+
+> using kconfig outside the linux kernel tree should be trivial,
+> normally, as you said, all the Linux "branding" should have been made
+> configurable. The trick might be to have the correct Makefile glue to
+> let it build. If you want some of the work pre-done, I just pushed an
+> old repository of mine on github. It should contains only what's
+> needed to build the various part of kconfig:
+>
+> https://github.com/lacombar/kconfig/
+>
+> I did not really touch it since October 2010, so it is certainly
+> missing parts (especially bug fixes). Moreover, it squashes commit to
+> keep the history clean, but I tried to keep the shortlog to have an
+> idea what has been going on. Last warning, I do not guarantee the tree
+> integrity (ie. I love rebasing :))
