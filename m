@@ -1,71 +1,91 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from metis.ext.pengutronix.de ([92.198.50.35]:43321 "EHLO
-	metis.ext.pengutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751107Ab1JGSEV (ORCPT
+Received: from hrndva-omtalb.mail.rr.com ([71.74.56.123]:63833 "EHLO
+	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753859Ab1JGSwq (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 7 Oct 2011 14:04:21 -0400
-Date: Fri, 7 Oct 2011 20:04:15 +0200
-From: Uwe =?iso-8859-1?Q?Kleine-K=F6nig?=
-	<u.kleine-koenig@pengutronix.de>
+	Fri, 7 Oct 2011 14:52:46 -0400
 Subject: Re: [PATCH] kbuild: let object files depend on recordmcount instead
  of its sources
-Message-ID: <20111007180415.GW6949@pengutronix.de>
+From: Steven Rostedt <rostedt@goodmis.org>
+Date: Fri, 07 Oct 2011 14:52:44 -0400
+In-Reply-To: <20111007180415.GW6949@pengutronix.de>
 References: <1317993561-16242-1-git-send-email-u.kleine-koenig@pengutronix.de>
- <1318005094.4729.40.camel@gandalf.stny.rr.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+	 <1318005094.4729.40.camel@gandalf.stny.rr.com>
+	 <20111007180415.GW6949@pengutronix.de>
+Content-Type: text/plain; charset="ISO-8859-15"
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <1318005094.4729.40.camel@gandalf.stny.rr.com>
+Message-ID: <1318013565.4729.61.camel@gandalf.stny.rr.com>
+Mime-Version: 1.0
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Steven Rostedt <rostedt@goodmis.org>
+To: Uwe =?ISO-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@pengutronix.de>
 Cc: Michal Marek <mmarek@suse.cz>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-On Fri, Oct 07, 2011 at 12:31:33PM -0400, Steven Rostedt wrote:
-> On Fri, 2011-10-07 at 15:19 +0200, Uwe Kleine-König wrote:
-> > This has the upside that distributions only have to ship the recordmcount
-> > binary to allow building modules instead of recordmcount and it's sources.
-> > 
-> > Make still notices that the object files need to be rebuilt when
-> > recordmcount's sources change.
+On Fri, 2011-10-07 at 20:04 +0200, Uwe Kleine-König wrote:
+
+> Works for me with 3ee72ca + my patch doing:
 > 
-> This doesn't work. Try it on a clean build:
+> 	make -C /path/to/my/linux/src/dir defconfig O=$(pwd)
+> 	make -j 6
 > 
->   HOSTCC  scripts/basic/fixdep
->   GEN     /home/rostedt/work/git/tmp/Makefile
->   HOSTCC  scripts/kconfig/conf.o
->   SHIPPED scripts/kconfig/zconf.tab.c
->   SHIPPED scripts/kconfig/lex.zconf.c
->   SHIPPED scripts/kconfig/zconf.hash.c
->   HOSTCC  scripts/kconfig/zconf.tab.o
->   HOSTLD  scripts/kconfig/conf
-> scripts/kconfig/conf --silentoldconfig Kconfig
->   Using /home/rostedt/work/git/linux-rt.git as source for kernel
->   GEN     /home/rostedt/work/git/tmp/Makefile
->   CHK     include/linux/version.h
->   UPD     include/linux/version.h
->   CHK     include/generated/utsrelease.h
->   UPD     include/generated/utsrelease.h
->   CC      kernel/bounds.s
->   GEN     include/generated/bounds.h
->   CC      arch/x86/kernel/asm-offsets.s
->   GEN     include/generated/asm-offsets.h
->   CALL    /home/rostedt/work/git/linux-rt.git/scripts/checksyscalls.sh
-> make[3]: *** No rule to make target `scripts/mod/empty.o', needed by `scripts/mod/elfconfig.h'.  Stop.
-> make[2]: *** [scripts/mod] Error 2
-> make[1]: *** [scripts] Error 2
-> make: *** [sub-make] Error 2
-Works for me with 3ee72ca + my patch doing:
+> If you tell me your exact setup I'll try to reproduce and fix.
 
-	make -C /path/to/my/linux/src/dir defconfig O=$(pwd)
-	make -j 6
+I just tried again with the same results. Here:
 
-If you tell me your exact setup I'll try to reproduce and fix.
+$ cd git
+$ git clone nobackup/linus.git -s -l tmp.git
+Cloning into tmp.git...
+done.
+$ cd tmp.git/
+$ mkdir /tmp/build
+$ patch -p1 < /tmp/rm.patch
+patching file scripts/Makefile.build
+$ make O=/tmp/build allyesconfig
+  HOSTCC  scripts/basic/fixdep
+  GEN     /tmp/build/Makefile
+  HOSTCC  scripts/kconfig/conf.o
+  SHIPPED scripts/kconfig/zconf.tab.c
+  SHIPPED scripts/kconfig/zconf.lex.c
+  SHIPPED scripts/kconfig/zconf.hash.c
+  HOSTCC  scripts/kconfig/zconf.tab.o
+  HOSTLD  scripts/kconfig/conf
+scripts/kconfig/conf --allyesconfig Kconfig
+#
+# configuration written to .config
+#
+$ make O=/tmp/build
+  GEN     /tmp/build/Makefile
+scripts/kconfig/conf --silentoldconfig Kconfig
+/home/pub/git/tmp.git/arch/x86/Makefile:81: stack protector enabled but
+no compiler support
+  Using /home/pub/git/tmp.git as source for kernel
+  GEN     /tmp/build/Makefile
+  CHK     include/linux/version.h
+  UPD     include/linux/version.h
+  CHK     include/generated/utsrelease.h
+  UPD     include/generated/utsrelease.h
+  CC      kernel/bounds.s
+  GEN     include/generated/bounds.h
+  CC      arch/x86/kernel/asm-offsets.s
+  GEN     include/generated/asm-offsets.h
+  CALL    /home/pub/git/tmp.git/scripts/checksyscalls.sh
+  HOSTCC  scripts/genksyms/genksyms.o
+  SHIPPED scripts/genksyms/lex.lex.c
+  SHIPPED scripts/genksyms/keywords.hash.c
+  SHIPPED scripts/genksyms/parse.tab.h
+  HOSTCC  scripts/genksyms/lex.lex.o
+  SHIPPED scripts/genksyms/parse.tab.c
+  HOSTCC  scripts/genksyms/parse.tab.o
+  HOSTLD  scripts/genksyms/genksyms
+make[3]: *** No rule to make target `scripts/mod/empty.o', needed by
+`scripts/mod/elfconfig.h'.  Stop.
+make[2]: *** [scripts/mod] Error 2
+make[1]: *** [scripts] Error 2
+make: *** [sub-make] Error 2
 
-Best regards
-Uwe
 
--- 
-Pengutronix e.K.                           | Uwe Kleine-König            |
-Industrial Linux Solutions                 | http://www.pengutronix.de/  |
+It needs to be a real clean repo, not a make clean.
+
+-- Steve
+
+
