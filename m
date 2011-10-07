@@ -1,42 +1,32 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from vamos2c.informatik.uni-erlangen.de ([131.188.42.15]:42229 "EHLO
-	vamos2c.informatik.uni-erlangen.de" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S935288Ab1JFL7n (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 6 Oct 2011 07:59:43 -0400
-From: Reinhard Tartler <Reinhard.Tartler@informatik.uni-erlangen.de>
-Subject: [PATCH] kconfig: Fix checking return value of 'fwrite'
-Date: Thu, 06 Oct 2011 13:14:36 +0200
-Message-ID: <87lisype1v.fsf@faui43f.informatik.uni-erlangen.de>
+Received: from mx1.redhat.com ([209.132.183.28]:63722 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1758258Ab1JGCfR (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 6 Oct 2011 22:35:17 -0400
+Message-ID: <4E8E6539.2030809@redhat.com>
+Date: Fri, 07 Oct 2011 10:34:33 +0800
+From: Cong Wang <amwang@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Subject: Re: [PATCH] kconfig: Fix checking return value of 'fwrite'
+References: <87lisype1v.fsf@faui43f.informatik.uni-erlangen.de>
+In-Reply-To: <87lisype1v.fsf@faui43f.informatik.uni-erlangen.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Jean Sacren <sakiwit@gmail.com>, Michal Marek <mmarek@suse.cz>, linux-kernel@vger.kernel.org, vamos-dev@lists.informatik.uni-erlangen.de
+To: Reinhard Tartler <Reinhard.Tartler@informatik.uni-erlangen.de>
+Cc: linux-kbuild@vger.kernel.org, Jean Sacren <sakiwit@gmail.com>, Michal Marek <mmarek@suse.cz>, linux-kernel@vger.kernel.org, vamos-dev@lists.informatik.uni-erlangen.de
 
-fwrite indicates '1' written member if a zero-length string is written.
----
- scripts/kconfig/lkc.h |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+于 2011年10月06日 19:14, Reinhard Tartler 写道:
+> fwrite indicates '1' written member if a zero-length string is written.
 
-diff --git a/scripts/kconfig/lkc.h b/scripts/kconfig/lkc.h
-index b633bdb..727d265 100644
---- a/scripts/kconfig/lkc.h
-+++ b/scripts/kconfig/lkc.h
-@@ -90,7 +90,7 @@ struct conf_printer {
- /* confdata.c and expr.c */
- static inline void xfwrite(const void *str, size_t len, size_t count, FILE *out)
- {
--	if (fwrite(str, len, count, out) < count)
-+	if (len > 0 && fwrite(str, len, count, out) < count)
- 		fprintf(stderr, "\nError in writing or end of file.\n");
- }
- 
--- 
-1.7.0.4
+For completeness, xfwrite() is called like this,
 
--- 
-Reinhard Tartler                     Department of Computer Science IV
-Martensstr 1, 91058 Erlangen Germany, University of Erlangen-Nuremberg
-            http://www4.informatik.uni-erlangen.de/~tartler
+         xfwrite(str, strlen(str), 1, data);
+
+so if strlen() returns 0, xfwrite() will print out the error message,
+which is wrong, no error in this case.
+
+Acked-by: WANG Cong <amwang@redhat.com>
+
+Thanks!
