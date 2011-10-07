@@ -1,32 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:63722 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1758258Ab1JGCfR (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 6 Oct 2011 22:35:17 -0400
-Message-ID: <4E8E6539.2030809@redhat.com>
-Date: Fri, 07 Oct 2011 10:34:33 +0800
-From: Cong Wang <amwang@redhat.com>
+Received: from mail-ww0-f44.google.com ([74.125.82.44]:46606 "EHLO
+	mail-ww0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750950Ab1JGD3y convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 6 Oct 2011 23:29:54 -0400
 MIME-Version: 1.0
-Subject: Re: [PATCH] kconfig: Fix checking return value of 'fwrite'
-References: <87lisype1v.fsf@faui43f.informatik.uni-erlangen.de>
 In-Reply-To: <87lisype1v.fsf@faui43f.informatik.uni-erlangen.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <87lisype1v.fsf@faui43f.informatik.uni-erlangen.de>
+Date: Thu, 6 Oct 2011 23:29:50 -0400
+Message-ID: <CACqU3MWZuqgpxG7FSvr2LkqTqwF-gQM8hQSnTTpHpcWT2LHGNA@mail.gmail.com>
+Subject: Re: [PATCH] kconfig: Fix checking return value of 'fwrite'
+From: Arnaud Lacombe <lacombar@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Reinhard Tartler <Reinhard.Tartler@informatik.uni-erlangen.de>
 Cc: linux-kbuild@vger.kernel.org, Jean Sacren <sakiwit@gmail.com>, Michal Marek <mmarek@suse.cz>, linux-kernel@vger.kernel.org, vamos-dev@lists.informatik.uni-erlangen.de
 
-‰∫é 2011Âπ¥10Êúà06Êó• 19:14, Reinhard Tartler ÂÜôÈÅì:
+Hi,
+
+2011/10/6 Reinhard Tartler <Reinhard.Tartler@informatik.uni-erlangen.de>:
 > fwrite indicates '1' written member if a zero-length string is written.
+you forgot the "Signed-off-by: " part :)
 
-For completeness, xfwrite() is called like this,
+ - Arnaud
 
-         xfwrite(str, strlen(str), 1, data);
-
-so if strlen() returns 0, xfwrite() will print out the error message,
-which is wrong, no error in this case.
-
-Acked-by: WANG Cong <amwang@redhat.com>
-
-Thanks!
+> ---
+> †scripts/kconfig/lkc.h | † †2 +-
+> †1 files changed, 1 insertions(+), 1 deletions(-)
+>
+> diff --git a/scripts/kconfig/lkc.h b/scripts/kconfig/lkc.h
+> index b633bdb..727d265 100644
+> --- a/scripts/kconfig/lkc.h
+> +++ b/scripts/kconfig/lkc.h
+> @@ -90,7 +90,7 @@ struct conf_printer {
+> †/* confdata.c and expr.c */
+> †static inline void xfwrite(const void *str, size_t len, size_t count, FILE *out)
+> †{
+> - † † † if (fwrite(str, len, count, out) < count)
+> + † † † if (len > 0 && fwrite(str, len, count, out) < count)
+> † † † † † † † †fprintf(stderr, "\nError in writing or end of file.\n");
+> †}
+>
+> --
+> 1.7.0.4
+>
+> --
+> Reinhard Tartler † † † † † † † † † † Department of Computer Science IV
+> Martensstr 1, 91058 Erlangen Germany, University of Erlangen-Nuremberg
+> † † † † † †http://www4.informatik.uni-erlangen.de/~tartler
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at †http://vger.kernel.org/majordomo-info.html
+>
