@@ -1,91 +1,80 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from hrndva-omtalb.mail.rr.com ([71.74.56.123]:63833 "EHLO
-	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753859Ab1JGSwq (ORCPT
+Received: from metis.ext.pengutronix.de ([92.198.50.35]:39927 "EHLO
+	metis.ext.pengutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754156Ab1JGTr4 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 7 Oct 2011 14:52:46 -0400
+	Fri, 7 Oct 2011 15:47:56 -0400
+Date: Fri, 7 Oct 2011 21:47:50 +0200
+From: Uwe =?iso-8859-1?Q?Kleine-K=F6nig?=
+	<u.kleine-koenig@pengutronix.de>
 Subject: Re: [PATCH] kbuild: let object files depend on recordmcount instead
  of its sources
-From: Steven Rostedt <rostedt@goodmis.org>
-Date: Fri, 07 Oct 2011 14:52:44 -0400
-In-Reply-To: <20111007180415.GW6949@pengutronix.de>
+Message-ID: <20111007194750.GX6949@pengutronix.de>
 References: <1317993561-16242-1-git-send-email-u.kleine-koenig@pengutronix.de>
-	 <1318005094.4729.40.camel@gandalf.stny.rr.com>
-	 <20111007180415.GW6949@pengutronix.de>
-Content-Type: text/plain; charset="ISO-8859-15"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Message-ID: <1318013565.4729.61.camel@gandalf.stny.rr.com>
-Mime-Version: 1.0
+In-Reply-To: <1317993561-16242-1-git-send-email-u.kleine-koenig@pengutronix.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Uwe =?ISO-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@pengutronix.de>
-Cc: Michal Marek <mmarek@suse.cz>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: Steven Rostedt <rostedt@goodmis.org>, Michal Marek <mmarek@suse.cz>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-On Fri, 2011-10-07 at 20:04 +0200, Uwe Kleine-König wrote:
+Hello,
 
-> Works for me with 3ee72ca + my patch doing:
+On Fri, Oct 07, 2011 at 03:19:21PM +0200, Uwe Kleine-König wrote:
+> This has the upside that distributions only have to ship the recordmcount
+> binary to allow building modules instead of recordmcount and it's sources.
 > 
-> 	make -C /path/to/my/linux/src/dir defconfig O=$(pwd)
-> 	make -j 6
+> Make still notices that the object files need to be rebuilt when
+> recordmcount's sources change.
 > 
-> If you tell me your exact setup I'll try to reproduce and fix.
+> Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
+> ---
+>  scripts/Makefile.build |    9 ++++-----
+>  1 files changed, 4 insertions(+), 5 deletions(-)
+> 
+> diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+> index a0fd502..bc83e94 100644
+> --- a/scripts/Makefile.build
+> +++ b/scripts/Makefile.build
+> @@ -271,8 +271,7 @@ sub_cmd_record_mcount =					\
+>  	if [ $(@) != "scripts/mod/empty.o" ]; then	\
+>  		$(objtree)/scripts/recordmcount $(RECORDMCOUNT_FLAGS) "$(@)";	\
+>  	fi;
+> -recordmcount_source := $(srctree)/scripts/recordmcount.c \
+> -		    $(srctree)/scripts/recordmcount.h
+> +recordmcount_exec := $(objtree)/scripts/recordmcount
+>  else
+>  sub_cmd_record_mcount = set -e ; perl $(srctree)/scripts/recordmcount.pl "$(ARCH)" \
+>  	"$(if $(CONFIG_CPU_BIG_ENDIAN),big,little)" \
+> @@ -280,7 +279,7 @@ sub_cmd_record_mcount = set -e ; perl $(srctree)/scripts/recordmcount.pl "$(ARCH
+>  	"$(OBJDUMP)" "$(OBJCOPY)" "$(CC) $(KBUILD_CFLAGS)" \
+>  	"$(LD)" "$(NM)" "$(RM)" "$(MV)" \
+>  	"$(if $(part-of-module),1,0)" "$(@)";
+> -recordmcount_source := $(srctree)/scripts/recordmcount.pl
+> +recordmcount_exec := $(srctree)/scripts/recordmcount.pl
+>  endif
+>  cmd_record_mcount = 						\
+>  	if [ "$(findstring -pg,$(_c_flags))" = "-pg" ]; then	\
+> @@ -301,13 +300,13 @@ define rule_cc_o_c
+>  endef
+>  
+>  # Built-in and composite module parts
+> -$(obj)/%.o: $(src)/%.c $(recordmcount_source) FORCE
+> +$(obj)/%.o: $(src)/%.c $(recordmcount_exec) FORCE
+>  	$(call cmd,force_checksrc)
+>  	$(call if_changed_rule,cc_o_c)
+I could reproduce the build failure Steve is seeing now (enabling
+CONFIG_FUNCTION_TRACER helps, stupid me). I think the problem is that
+with my change empty.o depends on recordmcount and in a way that I don't
+understand recordmcount depends on empty.o. I wonder if it's possible to
+get rid of the latter dependency?!
 
-I just tried again with the same results. Here:
+Best regards
+Uwe
 
-$ cd git
-$ git clone nobackup/linus.git -s -l tmp.git
-Cloning into tmp.git...
-done.
-$ cd tmp.git/
-$ mkdir /tmp/build
-$ patch -p1 < /tmp/rm.patch
-patching file scripts/Makefile.build
-$ make O=/tmp/build allyesconfig
-  HOSTCC  scripts/basic/fixdep
-  GEN     /tmp/build/Makefile
-  HOSTCC  scripts/kconfig/conf.o
-  SHIPPED scripts/kconfig/zconf.tab.c
-  SHIPPED scripts/kconfig/zconf.lex.c
-  SHIPPED scripts/kconfig/zconf.hash.c
-  HOSTCC  scripts/kconfig/zconf.tab.o
-  HOSTLD  scripts/kconfig/conf
-scripts/kconfig/conf --allyesconfig Kconfig
-#
-# configuration written to .config
-#
-$ make O=/tmp/build
-  GEN     /tmp/build/Makefile
-scripts/kconfig/conf --silentoldconfig Kconfig
-/home/pub/git/tmp.git/arch/x86/Makefile:81: stack protector enabled but
-no compiler support
-  Using /home/pub/git/tmp.git as source for kernel
-  GEN     /tmp/build/Makefile
-  CHK     include/linux/version.h
-  UPD     include/linux/version.h
-  CHK     include/generated/utsrelease.h
-  UPD     include/generated/utsrelease.h
-  CC      kernel/bounds.s
-  GEN     include/generated/bounds.h
-  CC      arch/x86/kernel/asm-offsets.s
-  GEN     include/generated/asm-offsets.h
-  CALL    /home/pub/git/tmp.git/scripts/checksyscalls.sh
-  HOSTCC  scripts/genksyms/genksyms.o
-  SHIPPED scripts/genksyms/lex.lex.c
-  SHIPPED scripts/genksyms/keywords.hash.c
-  SHIPPED scripts/genksyms/parse.tab.h
-  HOSTCC  scripts/genksyms/lex.lex.o
-  SHIPPED scripts/genksyms/parse.tab.c
-  HOSTCC  scripts/genksyms/parse.tab.o
-  HOSTLD  scripts/genksyms/genksyms
-make[3]: *** No rule to make target `scripts/mod/empty.o', needed by
-`scripts/mod/elfconfig.h'.  Stop.
-make[2]: *** [scripts/mod] Error 2
-make[1]: *** [scripts] Error 2
-make: *** [sub-make] Error 2
-
-
-It needs to be a real clean repo, not a make clean.
-
--- Steve
-
-
+-- 
+Pengutronix e.K.                           | Uwe Kleine-König            |
+Industrial Linux Solutions                 | http://www.pengutronix.de/  |
