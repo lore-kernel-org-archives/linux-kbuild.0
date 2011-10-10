@@ -1,37 +1,40 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from hrndva-omtalb.mail.rr.com ([71.74.56.123]:51884 "EHLO
-	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753134Ab1JGUA0 (ORCPT
+Received: from smtp-out3.tiscali.nl ([195.241.79.178]:38296 "EHLO
+	smtp-out3.tiscali.nl" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752343Ab1JJUTt (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 7 Oct 2011 16:00:26 -0400
-Subject: Re: [PATCH] kbuild: let object files depend on recordmcount instead
- of its sources
-From: Steven Rostedt <rostedt@goodmis.org>
-Date: Fri, 07 Oct 2011 16:00:25 -0400
-In-Reply-To: <20111007194750.GX6949@pengutronix.de>
-References: <1317993561-16242-1-git-send-email-u.kleine-koenig@pengutronix.de>
-	 <20111007194750.GX6949@pengutronix.de>
-Content-Type: text/plain; charset="ISO-8859-15"
-Content-Transfer-Encoding: 8bit
-Message-ID: <1318017625.4729.80.camel@gandalf.stny.rr.com>
+	Mon, 10 Oct 2011 16:19:49 -0400
+Received: from [212.123.169.34] (helo=[192.168.1.101])
+	by smtp-out3.tiscali.nl with esmtp (Exim)
+	(envelope-from <pebolle@tiscali.nl>)
+	id 1RDM3e-0006gp-7Q
+	for linux-kbuild@vger.kernel.org; Mon, 10 Oct 2011 22:02:42 +0200
+Subject: Kconfig: single-config-entry choice groups
+From: Paul Bolle <pebolle@tiscali.nl>
+Content-Type: text/plain; charset="UTF-8"
+Date: Mon, 10 Oct 2011 22:02:41 +0200
+Message-ID: <1318276961.18122.30.camel@x61.thuisdomein>
 Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Uwe =?ISO-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@pengutronix.de>
-Cc: Michal Marek <mmarek@suse.cz>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
 
-On Fri, 2011-10-07 at 21:47 +0200, Uwe Kleine-König wrote:
+0) There seem to be about two dozen single-config-entry choice groups in
+Kconfig files across the tree: choice groups that let one set exactly
+one CONFIG option. (Most of the time hat CONFIG option is also the
+choice group's default. That doesn't seem to matter, though. The default
+could as well be some bogus symbol.)
 
-> I could reproduce the build failure Steve is seeing now (enabling
-> CONFIG_FUNCTION_TRACER helps, stupid me). I think the problem is that
-> with my change empty.o depends on recordmcount and in a way that I don't
-> understand recordmcount depends on empty.o. I wonder if it's possible to
-> get rid of the latter dependency?!
+1) These choice groups are not optional, so there's nothing to actually
+choose. As far as I can see that single CONFIG option will always be
+set.
 
-It may be possible but probably not worth it. When I stumbled on empty.o
-I talked with some of the kbuild folks, and IIRC, it is pretty core to
-the dependency structure. Changing it may break other things easily.
+2) Are single-config-entry choice groups some special, but undocumented,
+idiom? Or are they perhaps the result of editing (ie, some of their
+config entries where removed until there was just one left)? Or
+something else?
 
--- Steve
 
+Paul Bolle
 
