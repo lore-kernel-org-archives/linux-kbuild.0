@@ -1,12 +1,12 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:57304 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:57306 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754220Ab1JKKNO (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 11 Oct 2011 06:13:14 -0400
+	id S1754466Ab1JKKNU (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 11 Oct 2011 06:13:20 -0400
 From: Michal Marek <mmarek@suse.cz>
-Subject: [PATCH 1/3] genksyms: Minor parser cleanup
-Date: Tue, 11 Oct 2011 12:12:47 +0200
-Message-Id: <1318327969-24807-2-git-send-email-mmarek@suse.cz>
+Subject: [PATCH 2/3] genksyms: Do not expand internal types
+Date: Tue, 11 Oct 2011 12:12:48 +0200
+Message-Id: <1318327969-24807-3-git-send-email-mmarek@suse.cz>
 In-Reply-To: <1318327969-24807-1-git-send-email-mmarek@suse.cz>
 References: <1318327969-24807-1-git-send-email-mmarek@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -14,65 +14,97 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org
 
-Move the identical logic for recording a struct/union/enum definition to
-a function.
+Consider structures, unions and enums defined in the source file as
+internal and do not expand them. This way, changes to e.g. struct
+serial_private in drivers/tty/serial/8250_pci.c will not affect the
+checksum of the pciserial_* exports.
 ---
- scripts/genksyms/parse.y |   33 +++++++++++++++------------------
- 1 files changed, 15 insertions(+), 18 deletions(-)
+ scripts/genksyms/genksyms.c |    3 ++-
+ scripts/genksyms/genksyms.h |    4 +++-
+ scripts/genksyms/lex.l      |    8 ++++++++
+ scripts/genksyms/parse.y    |    7 +++++++
+ 4 files changed, 20 insertions(+), 2 deletions(-)
 
+diff --git a/scripts/genksyms/genksyms.c b/scripts/genksyms/genksyms.c
+index 6d3fda0..8a10649 100644
+--- a/scripts/genksyms/genksyms.c
++++ b/scripts/genksyms/genksyms.c
+@@ -40,7 +40,8 @@ static struct symbol *symtab[HASH_BUCKETS];
+ static FILE *debugfile;
+ 
+ int cur_line = 1;
+-char *cur_filename;
++char *cur_filename, *source_file;
++int in_source_file;
+ 
+ static int flag_debug, flag_dump_defs, flag_reference, flag_dump_types,
+ 	   flag_preserve, flag_warnings;
+diff --git a/scripts/genksyms/genksyms.h b/scripts/genksyms/genksyms.h
+index 7ec52ae..3bffdca 100644
+--- a/scripts/genksyms/genksyms.h
++++ b/scripts/genksyms/genksyms.h
+@@ -37,6 +37,7 @@ enum symbol_status {
+ struct string_list {
+ 	struct string_list *next;
+ 	enum symbol_type tag;
++	int in_source_file;
+ 	char *string;
+ };
+ 
+@@ -57,7 +58,8 @@ typedef struct string_list **yystype;
+ #define YYSTYPE yystype
+ 
+ extern int cur_line;
+-extern char *cur_filename;
++extern char *cur_filename, *source_file;
++extern int in_source_file;
+ 
+ struct symbol *find_symbol(const char *name, enum symbol_type ns, int exact);
+ struct symbol *add_symbol(const char *name, enum symbol_type type,
+diff --git a/scripts/genksyms/lex.l b/scripts/genksyms/lex.l
+index 400ae06..f770071 100644
+--- a/scripts/genksyms/lex.l
++++ b/scripts/genksyms/lex.l
+@@ -116,6 +116,7 @@ MC_TOKEN		([~%^&*+=|<>/-]=)|(&&)|("||")|(->)|(<<)|(>>)
+ 			  cur_node->tag =				   \
+ 			    find_symbol(cur_node->string, SYM_ENUM_CONST, 1)?\
+ 			    SYM_ENUM_CONST : SYM_NORMAL ;		   \
++			  cur_node->in_source_file = in_source_file;       \
+ 			} while (0)
+ 
+ #define APP		_APP(yytext, yyleng)
+@@ -166,6 +167,13 @@ repeat:
+       cur_filename = memcpy(xmalloc(e-file+1), file, e-file+1);
+       cur_line = atoi(yytext+2);
+ 
++      if (!source_file) {
++        source_file = xstrdup(cur_filename);
++        in_source_file = 1;
++      } else {
++        in_source_file = (strcmp(cur_filename, source_file) == 0);
++      }
++
+       goto repeat;
+     }
+ 
 diff --git a/scripts/genksyms/parse.y b/scripts/genksyms/parse.y
-index ba5c242..a783ad4 100644
+index a783ad4..23c3999 100644
 --- a/scripts/genksyms/parse.y
 +++ b/scripts/genksyms/parse.y
-@@ -51,6 +51,18 @@ remove_list(struct string_list **pb, struct string_list **pe)
-   free_list(b, e);
- }
- 
-+/* Record definition of a struct/union/enum */
-+static void record_compound(struct string_list **keyw,
-+		       struct string_list **ident,
-+		       struct string_list **body,
-+		       enum symbol_type type)
-+{
-+	struct string_list *b = *body, *i = *ident, *r;
-+	r = copy_node(i); r->tag = type;
-+	r->next = (*keyw)->next; *body = r; (*keyw)->next = NULL;
-+	add_symbol(i->string, type, b, is_extern);
-+}
+@@ -58,6 +58,13 @@ static void record_compound(struct string_list **keyw,
+ 		       enum symbol_type type)
+ {
+ 	struct string_list *b = *body, *i = *ident, *r;
 +
- %}
- 
- %token ASM_KEYW
-@@ -215,26 +227,11 @@ type_specifier:
- 
- 	/* Full definitions of an s/u/e.  Record it.  */
- 	| STRUCT_KEYW IDENT class_body
--		{ struct string_list *s = *$3, *i = *$2, *r;
--		  r = copy_node(i); r->tag = SYM_STRUCT;
--		  r->next = (*$1)->next; *$3 = r; (*$1)->next = NULL;
--		  add_symbol(i->string, SYM_STRUCT, s, is_extern);
--		  $$ = $3;
--		}
-+		{ record_compound($1, $2, $3, SYM_STRUCT); $$ = $3; }
- 	| UNION_KEYW IDENT class_body
--		{ struct string_list *s = *$3, *i = *$2, *r;
--		  r = copy_node(i); r->tag = SYM_UNION;
--		  r->next = (*$1)->next; *$3 = r; (*$1)->next = NULL;
--		  add_symbol(i->string, SYM_UNION, s, is_extern);
--		  $$ = $3;
--		}
-+		{ record_compound($1, $2, $3, SYM_UNION); $$ = $3; }
- 	| ENUM_KEYW IDENT enum_body
--		{ struct string_list *s = *$3, *i = *$2, *r;
--		  r = copy_node(i); r->tag = SYM_ENUM;
--		  r->next = (*$1)->next; *$3 = r; (*$1)->next = NULL;
--		  add_symbol(i->string, SYM_ENUM, s, is_extern);
--		  $$ = $3;
--		}
-+		{ record_compound($1, $2, $3, SYM_ENUM); $$ = $3; }
- 	/*
- 	 * Anonymous enum definition. Tell add_symbol() to restart its counter.
- 	 */
++	if (i->in_source_file) {
++		remove_node(keyw);
++		(*ident)->tag = type;
++		remove_list(body, ident);
++		return;
++	}
+ 	r = copy_node(i); r->tag = type;
+ 	r->next = (*keyw)->next; *body = r; (*keyw)->next = NULL;
+ 	add_symbol(i->string, type, b, is_extern);
 -- 
 1.7.6.1
 
