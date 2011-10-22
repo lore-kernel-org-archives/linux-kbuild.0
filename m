@@ -1,37 +1,51 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from vms173019pub.verizon.net ([206.46.173.19]:58345 "EHLO
-	vms173019pub.verizon.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752449Ab1JVTmr (ORCPT
+Received: from vms173009pub.verizon.net ([206.46.173.9]:56632 "EHLO
+	vms173009pub.verizon.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751206Ab1JVUo3 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 22 Oct 2011 15:42:47 -0400
-Date: Sat, 22 Oct 2011 15:38:39 -0400 (EDT)
+	Sat, 22 Oct 2011 16:44:29 -0400
+Date: Sat, 22 Oct 2011 15:40:09 -0400 (EDT)
 From: Peter Foley <pefoley2@verizon.net>
-Subject: Re: [PATCH] kbuild: silence moc when V=0
-In-reply-to: <CACqU3MUmg6KN7MQe7T3j+D06m1R=4R+q6C5z-SCOnxCj=zZ5OA@mail.gmail.com>
-Message-id: <alpine.LNX.2.00.1110221537520.59156@linux>
-References: <alpine.LNX.2.00.1110221307010.59156@linux>
- <CACqU3MUmg6KN7MQe7T3j+D06m1R=4R+q6C5z-SCOnxCj=zZ5OA@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: fix set but not used warnings
+In-reply-to: <CACqU3MXS6-uE01EVAW1KdCViKioSz_F79YqzYwdTLrmc8hoMAw@mail.gmail.com>
+Message-id: <alpine.LNX.2.00.1110221538570.59156@linux>
+References: <alpine.LNX.2.00.1110221400040.59156@linux>
+ <CACqU3MXS6-uE01EVAW1KdCViKioSz_F79YqzYwdTLrmc8hoMAw@mail.gmail.com>
 MIME-version: 1.0
-Content-type: TEXT/PLAIN; charset=US-ASCII
+Content-type: MULTIPART/MIXED; BOUNDARY="0-802318585-1319312410=:59156"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Arnaud Lacombe <lacombar@gmail.com>
 Cc: Peter Foley <pefoley2@verizon.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild Mailing List <linux-kbuild@vger.kernel.org>, mmarek@suse.cz
 
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
+
+--0-802318585-1319312410=:59156
+Content-Type: TEXT/PLAIN; charset=ISO-8859-1
+Content-Transfer-Encoding: 8BIT
+
 On Sat, 22 Oct 2011, Arnaud Lacombe wrote:
 
 > Hi,
 > 
-> On Sat, Oct 22, 2011 at 1:10 PM, Peter Foley <pefoley2@verizon.net> wrote:
-> > Use quiet_cmd to silence moc when V=0
+> On Sat, Oct 22, 2011 at 2:01 PM, Peter Foley <pefoley2@verizon.net> wrote:
+> > Remove set but not used variables to fix warnings.
+> >
+> >  HOSTCC  scripts/kconfig/gconf.o
+> > /usr/src/lto/scripts/kconfig/gconf.c: In function 'change_sym_value':
+> > /usr/src/lto/scripts/kconfig/gconf.c:833:11: warning: variable 'oldval' set but not used [-Wunused-but-set-variable]
+> > /usr/src/lto/scripts/kconfig/gconf.c: In function 'update_tree':
+> > /usr/src/lto/scripts/kconfig/gconf.c:1281:19: warning: variable 'prop' set but not used [-Wunused-but-set-variable]
 > >
 > > Signed-off-by: Peter Foley <pefoley2@verizon.net>
 > >
-> This was included in my branch reworking the checking logic in the
-> Makefile, I still need to find some time to finish to polish it.
+> s/kbuild/kconfig/ in the subject, that help to know changes is only
+> limited to scripts/kconfig/
 > 
 >  - Arnaud
 
-Ok, feel free to drop this patch then.
+Noted. Should I resend this patch? 
 
 Peter
+--0-802318585-1319312410=:59156--
