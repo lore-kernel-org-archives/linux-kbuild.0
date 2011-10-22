@@ -1,72 +1,44 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from vms173007pub.verizon.net ([206.46.173.7]:34739 "EHLO
-	vms173007pub.verizon.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751043Ab1JVQXd (ORCPT
+Received: from vms173005pub.verizon.net ([206.46.173.5]:63687 "EHLO
+	vms173005pub.verizon.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751402Ab1JVROw (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 22 Oct 2011 12:23:33 -0400
-Date: Sat, 22 Oct 2011 11:19:22 -0400 (EDT)
+	Sat, 22 Oct 2011 13:14:52 -0400
+Date: Sat, 22 Oct 2011 13:10:48 -0400 (EDT)
 From: Peter Foley <pefoley2@verizon.net>
-Subject: [PATCH] kbuild: don't use a symlink for update-po-config
-Message-id: <alpine.LNX.2.00.1110221117380.59156@linux>
+Subject: [PATCH] kbuild: silence moc when V=0
+Message-id: <alpine.LNX.2.00.1110221307010.59156@linux>
 MIME-version: 1.0
 Content-type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild Mailing List <linux-kbuild@vger.kernel.org>, mmarek@suse.cz
 
-This patch changes update-po-config to not create a symlink in arch/um 
-because this fails with make O= builds.
-It also improves the V=0 output. 
-
-  GEN     /usr/src/lto/work/Makefile
-  GEN config
-ln: failed to create symbolic link `arch/um/Kconfig': No such file or directory
-make[3]: *** [update-po-config] Error 1
-make[2]: *** [update-po-config] Error 2
-make[1]: *** [sub-make] Error 2
-make: *** [all] Error 2
+Use quiet_cmd to silence moc when V=0
 
 Signed-off-by: Peter Foley <pefoley2@verizon.net>
 ---
- scripts/kconfig/Makefile |   11 +++++------
- 1 files changed, 5 insertions(+), 6 deletions(-)
+ scripts/kconfig/Makefile |    7 +++++--
+ 1 files changed, 5 insertions(+), 2 deletions(-)
 
 diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
-index 82d2eb2..1d99a08 100644
+index 1d99a08..7f1a6cd 100644
 --- a/scripts/kconfig/Makefile
 +++ b/scripts/kconfig/Makefile
-@@ -74,9 +74,8 @@ localyesconfig: $(obj)/streamline_config.pl $(obj)/conf
+@@ -322,8 +322,11 @@ $(obj)/zconf.tab.o: $(obj)/zconf.lex.c $(obj)/zconf.hash.c
  
- # Create new linux.pot file
- # Adjust charset to UTF-8 in .po file to accept UTF-8 in Kconfig files
--# The symlink is used to repair a deficiency in arch/um
- update-po-config: $(obj)/kxgettext $(obj)/gconf.glade.h
--	$(Q)echo "  GEN config"
-+	$(Q)echo "  GEN     config.pot"
- 	$(Q)xgettext --default-domain=linux                         \
- 	    --add-comments --keyword=_ --keyword=N_                 \
- 	    --from-code=UTF-8                                       \
-@@ -84,16 +83,16 @@ update-po-config: $(obj)/kxgettext $(obj)/gconf.glade.h
- 	    --directory=$(srctree) --directory=$(objtree)           \
- 	    --output $(obj)/config.pot
- 	$(Q)sed -i s/CHARSET/UTF-8/ $(obj)/config.pot
--	$(Q)ln -fs Kconfig.x86 arch/um/Kconfig
--	$(Q)(for i in `ls $(srctree)/arch/*/Kconfig`;    \
-+	$(Q)(for i in `ls $(srctree)/arch/*/Kconfig`     \
-+			$(srctree)/arch/um/Kconfig.x86;  \
- 	    do                                           \
--		echo "  GEN $$i";                        \
-+		echo "  GEN     $$i";                    \
- 		$(obj)/kxgettext $$i                     \
- 		     >> $(obj)/config.pot;               \
- 	    done )
-+	$(Q)echo "  GEN     linux.pot"
- 	$(Q)msguniq --sort-by-file --to-code=UTF-8 $(obj)/config.pot \
- 	    --output $(obj)/linux.pot
--	$(Q)rm -f $(srctree)/arch/um/Kconfig
- 	$(Q)rm -f $(obj)/config.pot
+ $(obj)/qconf.o: $(obj)/qconf.moc
  
- PHONY += allnoconfig allyesconfig allmodconfig alldefconfig randconfig
+-$(obj)/%.moc: $(src)/%.h
+-	$(KC_QT_MOC) -i $< -o $@
++quiet_cmd_moc = MOC     $@
++cmd_moc = $(KC_QT_MOC) -i $< -o $@
++
++$(obj)/qconf.moc: $(src)/qconf.h
++	$(call if_changed,moc)
+ 
+ # Extract gconf menu items for I18N support
+ $(obj)/gconf.glade.h: $(obj)/gconf.glade
 -- 
 1.7.7
 
