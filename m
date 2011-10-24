@@ -1,51 +1,51 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from vms173009pub.verizon.net ([206.46.173.9]:56632 "EHLO
-	vms173009pub.verizon.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751206Ab1JVUo3 (ORCPT
+Received: from lennier.cc.vt.edu ([198.82.162.213]:35313 "EHLO
+	lennier.cc.vt.edu" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932979Ab1JXQ4T (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 22 Oct 2011 16:44:29 -0400
-Date: Sat, 22 Oct 2011 15:40:09 -0400 (EDT)
-From: Peter Foley <pefoley2@verizon.net>
-Subject: Re: [PATCH] kbuild: fix set but not used warnings
-In-reply-to: <CACqU3MXS6-uE01EVAW1KdCViKioSz_F79YqzYwdTLrmc8hoMAw@mail.gmail.com>
-Message-id: <alpine.LNX.2.00.1110221538570.59156@linux>
-References: <alpine.LNX.2.00.1110221400040.59156@linux>
- <CACqU3MXS6-uE01EVAW1KdCViKioSz_F79YqzYwdTLrmc8hoMAw@mail.gmail.com>
-MIME-version: 1.0
-Content-type: MULTIPART/MIXED; BOUNDARY="0-802318585-1319312410=:59156"
+	Mon, 24 Oct 2011 12:56:19 -0400
+Subject: Re: [PATCH RFC] try to create KBUILD_OUTPUT automatically
+In-Reply-To: Your message of "Sat, 22 Oct 2011 11:12:29 EDT."
+             <alpine.LNX.2.00.1110221049460.59156@linux>
+From: Valdis.Kletnieks@vt.edu
+References: <alpine.LNX.2.00.1110221049460.59156@linux>
+Mime-Version: 1.0
+Content-Type: multipart/signed; boundary="==_Exmh_1319475304_2592P";
+	 micalg=pgp-sha1; protocol="application/pgp-signature"
+Content-Transfer-Encoding: 7bit
+Date: Mon, 24 Oct 2011 12:55:04 -0400
+Message-ID: <8033.1319475304@turing-police.cc.vt.edu>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnaud Lacombe <lacombar@gmail.com>
-Cc: Peter Foley <pefoley2@verizon.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild Mailing List <linux-kbuild@vger.kernel.org>, mmarek@suse.cz
+To: Peter Foley <pefoley2@verizon.net>
+Cc: Linux Kbuild Mailing List <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, mmarek@suse.cz
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
+--==_Exmh_1319475304_2592P
+Content-Type: text/plain; charset=us-ascii
 
---0-802318585-1319312410=:59156
-Content-Type: TEXT/PLAIN; charset=ISO-8859-1
-Content-Transfer-Encoding: 8BIT
+On Sat, 22 Oct 2011 11:12:29 EDT, Peter Foley said:
+> This patch makes it possible to execute make O=work instead of
+> mkdir work
+> make O=work
 
-On Sat, 22 Oct 2011, Arnaud Lacombe wrote:
+The case can be made that this is a Bad Idea, because it means you can't catch
+a typo in your O= setting.  This is particularly bad when it silently fails to
+update the stuff in out-dir because you did a 'make O=out-diir'.
 
-> Hi,
-> 
-> On Sat, Oct 22, 2011 at 2:01 PM, Peter Foley <pefoley2@verizon.net> wrote:
-> > Remove set but not used variables to fix warnings.
-> >
-> >  HOSTCC  scripts/kconfig/gconf.o
-> > /usr/src/lto/scripts/kconfig/gconf.c: In function 'change_sym_value':
-> > /usr/src/lto/scripts/kconfig/gconf.c:833:11: warning: variable 'oldval' set but not used [-Wunused-but-set-variable]
-> > /usr/src/lto/scripts/kconfig/gconf.c: In function 'update_tree':
-> > /usr/src/lto/scripts/kconfig/gconf.c:1281:19: warning: variable 'prop' set but not used [-Wunused-but-set-variable]
-> >
-> > Signed-off-by: Peter Foley <pefoley2@verizon.net>
-> >
-> s/kbuild/kconfig/ in the subject, that help to know changes is only
-> limited to scripts/kconfig/
-> 
->  - Arnaud
+So NACK on this, if anybody cares what I think... ;)
 
-Noted. Should I resend this patch? 
 
-Peter
---0-802318585-1319312410=:59156--
+--==_Exmh_1319475304_2592P
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+Comment: Exmh version 2.5 07/13/2001
+
+iD8DBQFOpZhocC3lWbTT17ARAl/eAJ97DHrnIkFcivMcLg/HgJbTA6pECwCfehy0
+HCq3iqgo/rN5u7o+XasDpvY=
+=XURA
+-----END PGP SIGNATURE-----
+
+--==_Exmh_1319475304_2592P--
+
