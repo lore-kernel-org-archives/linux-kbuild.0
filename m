@@ -1,205 +1,66 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:9708 "EHLO mga09.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754071Ab1JXXFJ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 24 Oct 2011 19:05:09 -0400
-Message-ID: <4EA5EF21.1080203@linux.intel.com>
-Date: Tue, 25 Oct 2011 01:05:05 +0200
-From: Darren Hart <dvhart@linux.intel.com>
+Received: from mail-vw0-f46.google.com ([209.85.212.46]:45179 "EHLO
+	mail-vw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754934Ab1JZJQT (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 26 Oct 2011 05:16:19 -0400
+Received: by vws1 with SMTP id 1so1241235vws.19
+        for <linux-kbuild@vger.kernel.org>; Wed, 26 Oct 2011 02:16:19 -0700 (PDT)
 MIME-Version: 1.0
-Subject: Re: [PATCH] kconfig: Add merge_config.sh script
-References: <1319496531-3234-1-git-send-email-john.stultz@linaro.org>
-In-Reply-To: <1319496531-3234-1-git-send-email-john.stultz@linaro.org>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+Date: Wed, 26 Oct 2011 11:16:18 +0200
+Message-ID: <CAH+fs=_Cb+m8DP2_cj=DAhVo4ygaQ4JFo8rfq9bOkydr_8UafQ@mail.gmail.com>
+Subject: [PATCH]: expose FORCE_MAX_ZONEORDER on x86
+From: Marc Leeman <marc.leeman@gmail.com>
+Content-Type: multipart/mixed; boundary=bcaec54858cad89a8e04b0301b23
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: John Stultz <john.stultz@linaro.org>
-Cc: LKML <linux-kernel@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, gthelen@google.com, tartler@cs.fau.de, Dmitry Fink <Dmitry.Fink@palm.com>, Eric B Munson <ebmunson@us.ibm.com>, Bruce Ashfield <Bruce.Ashfield@windriver.com>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
 
-On 10/25/2011 12:48 AM, John Stultz wrote:
-> No changes here from the last time, but since I didn't get any
-> feedback last time, I wanted to send this out for possible inclusion.
-> 
-> After noticing almost every distro has their own method of managing
-> config fragments, I went looking at some best practices, and wanted
-> to try to consolidate some of the different approaches so this fairly
-> simple infrastructure can be shared (and new distros/build systems
-> don't have to implement yet another config fragment merge script).
->
-> This script is most influenced by the Windriver tools used in
-> the Yocto Project, reusing some portions found there.
+--bcaec54858cad89a8e04b0301b23
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
 
-This adds some additional features to what we currently do in the Yocto
-Project now and we would like to just reuse what is upstream rather than
-rolling our own. This would be good to have upstream from our perspective.
+Larger blocks of memory are required for e.g. higher resolution
+capture card drivers; this patch just enables an already available
+configuration option on x86 (it was already exposed on other
+architectures).
 
---
-Darren
 
-> 
-> This script merges multiple config fragments, warning on any
-> overrided values. It then sets any unspecified values to their
-> default, then finally checks to make sure no specified value was
-> dropped due to unsatisfied dependencies.
-> 
-> I'm sure this implementation won't work for everyone, and I expect
-> it will need to evolve to adapt for various use cases. But I think
-> its a reasonable starting point.
-> 
-> v2:
->   * Reworked to use alldefconfig instead of the proposed
-> olddefconfig as suggested by Sam Ravnborg.
-> 
-> v3:
->   * Script improvements from Dmitri.
->   * allnoconfig option from Darren
->   * pre-make exit option from Darren
->   * lots of other fixes/cleanups from Darren.
->   * Fix final check to not compain about config values in comments
-> 
-> Please let me know if you have any comments or thoughts!
-> 
-> CC: Sam Ravnborg <sam@ravnborg.org>
-> CC: gthelen@google.com
-> CC: tartler@cs.fau.de
-> CC: Dmitry Fink <Dmitry.Fink@palm.com>
-> CC: Darren Hart <dvhart@linux.intel.com>
-> CC: Eric B Munson <ebmunson@us.ibm.com>
-> CC: Bruce Ashfield <Bruce.Ashfield@windriver.com>
-> CC: Michal Marek <mmarek@suse.cz>
-> CC: linux-kbuild@vger.kernel.org
-> Signed-off-by: John Stultz <john.stultz@linaro.org>
-> ---
->  scripts/kconfig/merge_config.sh |  117 +++++++++++++++++++++++++++++++++++++++
->  1 files changed, 117 insertions(+), 0 deletions(-)
->  create mode 100755 scripts/kconfig/merge_config.sh
-> 
-> diff --git a/scripts/kconfig/merge_config.sh b/scripts/kconfig/merge_config.sh
-> new file mode 100755
-> index 0000000..890276b
-> --- /dev/null
-> +++ b/scripts/kconfig/merge_config.sh
-> @@ -0,0 +1,117 @@
-> +#!/bin/sh
-> +#  merge_config.sh - Takes a list of config fragment values, and merges
-> +#  them one by one. Provides warnings on overridden values, and specified
-> +#  values that did not make it to the resulting .config file (due to missed
-> +#  dependencies or config symbol removal).
-> +#
-> +#  Portions reused from kconf_check and generate_cfg:
-> +#  http://git.yoctoproject.org/cgit/cgit.cgi/yocto-kernel-tools/tree/tools/kconf_check
-> +#  http://git.yoctoproject.org/cgit/cgit.cgi/yocto-kernel-tools/tree/tools/generate_cfg
-> +#
-> +#  Copyright (c) 2009-2010 Wind River Systems, Inc.
-> +#  Copyright 2011 Linaro
-> +#
-> +#  This program is free software; you can redistribute it and/or modify
-> +#  it under the terms of the GNU General Public License version 2 as
-> +#  published by the Free Software Foundation.
-> +#
-> +#  This program is distributed in the hope that it will be useful,
-> +#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-> +#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-> +#  See the GNU General Public License for more details.
-> +
-> +clean_up() {
-> +       rm -f $TMP_FILE
-> +       exit
-> +}
-> +trap clean_up SIGHUP SIGINT SIGTERM
-> +
-> +usage() {
-> +	echo "Usage: $0 [OPTIONS] [CONFIG [...]]"
-> +	echo "  -h    display this help text"
-> +	echo "  -m    only merge the fragments, do not execute the make command"
-> +	echo "  -n    use allnoconfig instead of alldefconfig"
-> +}
-> +
-> +MAKE=true
-> +ALLTARGET=alldefconfig
-> +
-> +while true; do
-> +	case $1 in
-> +	"-n")
-> +		ALLTARGET=allnoconfig
-> +		shift
-> +		continue
-> +		;;
-> +	"-m")
-> +		MAKE=false
-> +		shift
-> +		continue
-> +		;;
-> +	"-h")
-> +		usage
-> +		exit
-> +		;;
-> +	*)
-> +		break
-> +		;;
-> +	esac
-> +done
-> +
-> +
-> +
-> +MERGE_LIST=$*
-> +SED_CONFIG_EXP="s/^\(# \)\{0,1\}\(CONFIG_[a-zA-Z0-9_]*\)[= ].*/\2/p"
-> +TMP_FILE=$(mktemp ./.tmp.config.XXXXXXXXXX)
-> +
-> +# Merge files, printing warnings on overrided values
-> +for MERGE_FILE in $MERGE_LIST ; do
-> +	echo "Merging $MERGE_FILE"
-> +	CFG_LIST=$(sed -n "$SED_CONFIG_EXP" $MERGE_FILE)
-> +
-> +	for CFG in $CFG_LIST ; do
-> +		grep -q -w $CFG $TMP_FILE
-> +		if [ $? -eq 0 ] ; then
-> +			PREV_VAL=$(grep -w $CFG $TMP_FILE)
-> +			NEW_VAL=$(grep -w $CFG $MERGE_FILE)
-> +			if [ "x$PREV_VAL" != "x$NEW_VAL" ] ; then
-> +			echo Value of $CFG is redefined by fragment $MERGE_FILE:
-> +			echo Previous  value: $PREV_VAL
-> +			echo New value:       $NEW_VAL
-> +			echo
-> +			fi
-> +			sed -i "/$CFG[ =]/d" $TMP_FILE
-> +		fi
-> +	done
-> +	cat $MERGE_FILE >> $TMP_FILE
-> +done
-> +
-> +if [ "$MAKE" = "false" ]; then
-> +	cp $TMP_FILE .config
-> +	echo "#"
-> +	echo "# merged configuration written to .config (needs make)"
-> +	echo "#"
-> +	clean_up
-> +	exit
-> +fi
-> +
-> +# Use the merged file as the starting point for:
-> +# alldefconfig: Fills in any missing symbols with Kconfig default
-> +# allnoconfig: Fills in any missing symbols with # CONFIG_* is not set
-> +make KCONFIG_ALLCONFIG=$TMP_FILE $ALLTARGET
-> +
-> +
-> +# Check all specified config values took (might have missed-dependency issues)
-> +for CFG in $(sed -n "$SED_CONFIG_EXP" $TMP_FILE); do
-> +
-> +	REQUESTED_VAL=$(sed -n "$SED_CONFIG_EXP" $TMP_FILE | grep -w -e "$CFG")
-> +	ACTUAL_VAL=$(sed -n "$SED_CONFIG_EXP" .config | grep -w -e "$CFG")
-> +	if [ "x$REQUESTED_VAL" != "x$ACTUAL_VAL" ] ; then
-> +		echo "Value requested for $CFG not in final .config"
-> +		echo "Requested value:  $REQUESTED_VAL"
-> +		echo "Actual value:     $ACTUAL_VAL"
-> +		echo ""
-> +	fi
-> +done
-> +
-> +clean_up
+--=20
+br, marc
 
--- 
-Darren Hart
-Intel Open Source Technology Center
-Yocto Project - Linux Kernel
+The best approach for you requires two steps. The first step is
+reading the Manual.
+=A0 =A0 Wolfgang Denk - u-boot mailing list
+
+--bcaec54858cad89a8e04b0301b23
+Content-Type: text/x-patch; charset=US-ASCII;
+	name="0001-KConfig-x86-enable-FORCE_MAX_ZONEORDER.patch"
+Content-Disposition: attachment;
+	filename="0001-KConfig-x86-enable-FORCE_MAX_ZONEORDER.patch"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_gu83y4iw0
+
+RnJvbSA4YWQ2NGVkYmY5MmFjOGUwMjUzNjc3YmQzZjlhZDM3NmNlM2JlN2QxIE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBNYXJjIExlZW1hbiA8bWFyYy5sZWVtYW5AZ21haWwuY29tPgpE
+YXRlOiBXZWQsIDI2IE9jdCAyMDExIDEwOjM1OjI0ICswMjAwClN1YmplY3Q6IFtQQVRDSF0gS0Nv
+bmZpZyB4ODY6IGVuYWJsZSBGT1JDRV9NQVhfWk9ORU9SREVSCgotLS0KIGFyY2gveDg2L0tjb25m
+aWcgfCAgIDE2ICsrKysrKysrKysrKysrKysKIDEgZmlsZXMgY2hhbmdlZCwgMTYgaW5zZXJ0aW9u
+cygrKSwgMCBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS9hcmNoL3g4Ni9LY29uZmlnIGIvYXJj
+aC94ODYvS2NvbmZpZwppbmRleCA5YTRhMjY3Li42OGE5OGU4IDEwMDY0NAotLS0gYS9hcmNoL3g4
+Ni9LY29uZmlnCisrKyBiL2FyY2gveDg2L0tjb25maWcKQEAgLTEyNzMsNiArMTI3MywyMiBAQCBj
+b25maWcgSUxMRUdBTF9QT0lOVEVSX1ZBTFVFCiAKIHNvdXJjZSAibW0vS2NvbmZpZyIKIAorY29u
+ZmlnIEZPUkNFX01BWF9aT05FT1JERVIKKwlpbnQgIk1heGltdW0gem9uZSBvcmRlciIgCisJcmFu
+Z2UgMTEgNjQKKwlkZWZhdWx0ICIxMSIKKwloZWxwCisJICBUaGUga2VybmVsIG1lbW9yeSBhbGxv
+Y2F0b3IgZGl2aWRlcyBwaHlzaWNhbGx5IGNvbnRpZ3VvdXMgbWVtb3J5CisJICBibG9ja3MgaW50
+byAiem9uZXMiLCB3aGVyZSBlYWNoIHpvbmUgaXMgYSBwb3dlciBvZiB0d28gbnVtYmVyIG9mCisJ
+ICBwYWdlcy4gIFRoaXMgb3B0aW9uIHNlbGVjdHMgdGhlIGxhcmdlc3QgcG93ZXIgb2YgdHdvIHRo
+YXQgdGhlIGtlcm5lbAorCSAga2VlcHMgaW4gdGhlIG1lbW9yeSBhbGxvY2F0b3IuICBJZiB5b3Ug
+bmVlZCB0byBhbGxvY2F0ZSB2ZXJ5IGxhcmdlCisJICBibG9ja3Mgb2YgcGh5c2ljYWxseSBjb250
+aWd1b3VzIG1lbW9yeSwgdGhlbiB5b3UgbWF5IG5lZWQgdG8KKwkgIGluY3JlYXNlIHRoaXMgdmFs
+dWUuCisKKwkgIFRoaXMgY29uZmlnIG9wdGlvbiBpcyBhY3R1YWxseSBtYXhpbXVtIG9yZGVyIHBs
+dXMgb25lLiBGb3IgZXhhbXBsZSwKKwkgIGEgdmFsdWUgb2YgMTEgbWVhbnMgdGhhdCB0aGUgbGFy
+Z2VzdCBmcmVlIG1lbW9yeSBibG9jayBpcyAyXjEwIHBhZ2VzLgorCisKIGNvbmZpZyBISUdIUFRF
+CiAJYm9vbCAiQWxsb2NhdGUgM3JkLWxldmVsIHBhZ2V0YWJsZXMgZnJvbSBoaWdobWVtIgogCWRl
+cGVuZHMgb24gSElHSE1FTQotLSAKMS43LjIuNQoK
+--bcaec54858cad89a8e04b0301b23--
