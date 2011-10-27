@@ -1,58 +1,56 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ey0-f174.google.com ([209.85.215.174]:39620 "EHLO
-	mail-ey0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754416Ab1J0SLF convert rfc822-to-8bit (ORCPT
+Received: from smtp.snhosting.dk ([87.238.248.203]:42794 "EHLO
+	smtp.domainteam.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750993Ab1J0Tev (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 27 Oct 2011 14:11:05 -0400
-MIME-Version: 1.0
-In-Reply-To: <1319717234-20918-1-git-send-email-levinsasha928@gmail.com>
-References: <1319717234-20918-1-git-send-email-levinsasha928@gmail.com>
-From: Rabin Vincent <rabin@rab.in>
-Date: Thu, 27 Oct 2011 23:35:56 +0530
-Message-ID: <CAH+eYFBw99Yb-x+QEyZiXZ4yL3r=jr1Z+Gk95DG3hsYLkC_R_A@mail.gmail.com>
+	Thu, 27 Oct 2011 15:34:51 -0400
+Date: Thu, 27 Oct 2011 21:34:48 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
 Subject: Re: [PATCH] config: Add 'make kvmconfig'
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 8BIT
+Message-ID: <20111027193448.GA3514@merkur.ravnborg.org>
+References: <1319717234-20918-1-git-send-email-levinsasha928@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1319717234-20918-1-git-send-email-levinsasha928@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Sasha Levin <levinsasha928@gmail.com>
 Cc: linux-kernel@vger.kernel.org, Ingo Molnar <mingo@elte.hu>, Linus Torvalds <torvalds@linux-foundation.org>, Michal Marek <mmarek@suse.cz>, Pekka Enberg <penberg@cs.helsinki.fi>, linux-kbuild@vger.kernel.org
 
-On Thu, Oct 27, 2011 at 17:37, Sasha Levin <levinsasha928@gmail.com> wrote:
-> +config KVMTOOL_TEST_ENABLE
-> +       bool "Enable options to create a bootable tools/kvm/ kernel"
-> +       select NET
-> +       select NETDEVICES
-> +       select PCI
-> +       select BLK_DEV
-> +       select NETWORK_FILESYSTEMS
-> +       select INET
-> +       select EXPERIMENTAL
-> +       select SERIAL_8250
-> +       select SERIAL_8250_CONSOLE
-> +       select IP_PNP
-> +       select IP_PNP_DHCP
-> +       select BINFMT_ELF
-> +       select PCI_MSI
-> +       select KGDB
-> +       select KGDB_SERIAL_CONSOLE
-> +       select VIRTIO
-> +       select VIRTIO_RING
-> +       select VIRTIO_PCI
-> +       select VIRTIO_BLK
-> +       select VIRTIO_CONSOLE
-> +       select VIRTIO_NET
-> +       select 9P_FS
-> +       select NET_9P
-> +       select NET_9P_VIRTIO
+On Thu, Oct 27, 2011 at 02:07:14PM +0200, Sasha Levin wrote:
+> This patch adds 'make kvmconfig' which allows to add KVM guest support
+> to a config file.
+> 
+> This allows for easier testing of configurations under virtualized
+> environments.
+> 
+> Cc: Ingo Molnar <mingo@elte.hu>
+> Cc: Linus Torvalds <torvalds@linux-foundation.org>
+> Cc: Michal Marek <mmarek@suse.cz>
+> Cc: Pekka Enberg <penberg@cs.helsinki.fi>
+> Cc: linux-kbuild@vger.kernel.org
+> Cc: linux-kernel@vger.kernel.org
+> Suggested-by: Ingo Molnar <mingo@elte.hu>
+> Signed-off-by: Sasha Levin <levinsasha928@gmail.com>
 
-This lot doesn't seem to be enough for me on next-20111025.  I seem to
-have to also enable CONFIG_FB_VESA for the kernel to boot.
+Two points about the implmentation that I do not like...
 
-Without CONFIG_FB_VESA, I just get:
+The kvmconfig is an x86 specific thing - so it does not belong
+in the scripts/kconfig/Makefile
 
-$ tools/kvm/kvm run --debug arch/x86/boot/bzImage --disk
-~/kernel/linux-0.2.img
-  # kvm run -k arch/x86/boot/bzImage -m 448 -c 4 --name guest-11466
-PPrroobbiinngg  EEDDDD  ((eedddd==ooffff  ttoo  ddiissaabbllee))......  ookk
-<no more output>
+The *config namespace is general config targets.
+
+Suggestion:
+Move the implmentation to arch/x86/Makefile and name the target
+something that does not match the *config pattern.
+
+Suggestion:
+
+   make kvmbootable
+
+To tell that this convert the current config to a kvmbootable config.
+
+And then add the target to the x86 specific help too.
+
+	Sam
