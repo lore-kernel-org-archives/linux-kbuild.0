@@ -1,54 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-vx0-f174.google.com ([209.85.220.174]:52712 "EHLO
-	mail-vx0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752251Ab1J0Pak (ORCPT
+Received: from mail-ey0-f174.google.com ([209.85.215.174]:39620 "EHLO
+	mail-ey0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754416Ab1J0SLF convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 27 Oct 2011 11:30:40 -0400
+	Thu, 27 Oct 2011 14:11:05 -0400
 MIME-Version: 1.0
-In-Reply-To: <CACqU3MW0B4Ba_bo=yJF2MbYkkcDiAEDewnMrjDgCMKHRDnDDTg@mail.gmail.com>
+In-Reply-To: <1319717234-20918-1-git-send-email-levinsasha928@gmail.com>
 References: <1319717234-20918-1-git-send-email-levinsasha928@gmail.com>
-	<CAOJsxLH-O8+Fx=VLsoXhVLNtXWD_1eVrUMOgbk2DODbrwPAzhQ@mail.gmail.com>
-	<20111027123713.GB22032@elte.hu>
-	<4EA953E8.4020004@suse.cz>
-	<CAOJsxLHT9V-K26=Qt10sDVibRjoVgZBVULsVwYD5oqrM0bN+5Q@mail.gmail.com>
-	<CACqU3MW0B4Ba_bo=yJF2MbYkkcDiAEDewnMrjDgCMKHRDnDDTg@mail.gmail.com>
-Date: Thu, 27 Oct 2011 18:30:40 +0300
-Message-ID: <CAOJsxLGFOtQrzbNMLCRTdsF6XSc9Gg76C5ag1gFh2g+3mvHxZQ@mail.gmail.com>
+From: Rabin Vincent <rabin@rab.in>
+Date: Thu, 27 Oct 2011 23:35:56 +0530
+Message-ID: <CAH+eYFBw99Yb-x+QEyZiXZ4yL3r=jr1Z+Gk95DG3hsYLkC_R_A@mail.gmail.com>
 Subject: Re: [PATCH] config: Add 'make kvmconfig'
-From: Pekka Enberg <penberg@kernel.org>
 Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnaud Lacombe <lacombar@gmail.com>
-Cc: Michal Marek <mmarek@suse.cz>, Ingo Molnar <mingo@elte.hu>, Sasha Levin <levinsasha928@gmail.com>, linux-kernel@vger.kernel.org, Linus Torvalds <torvalds@linux-foundation.org>, linux-kbuild@vger.kernel.org
+To: Sasha Levin <levinsasha928@gmail.com>
+Cc: linux-kernel@vger.kernel.org, Ingo Molnar <mingo@elte.hu>, Linus Torvalds <torvalds@linux-foundation.org>, Michal Marek <mmarek@suse.cz>, Pekka Enberg <penberg@cs.helsinki.fi>, linux-kbuild@vger.kernel.org
 
-On Thu, Oct 27, 2011 at 6:19 PM, Arnaud Lacombe <lacombar@gmail.com> wrote:
->> The use case is to be able to take a .config posted in a bug report
->> and easily turn that into something that the KVM tool can boot.
->>
->> "kvmconfig" really represents a virtualized x86 architecture
->> configuration.
->>
-> How do you expect:
->
-> # make ARCH=hexagon kvmconfig
->
-> to behave ? If it is not meant to work outside the x86 world, it
-> should not be accessible outside the x86 world.
+On Thu, Oct 27, 2011 at 17:37, Sasha Levin <levinsasha928@gmail.com> wrote:
+> +config KVMTOOL_TEST_ENABLE
+> +       bool "Enable options to create a bootable tools/kvm/ kernel"
+> +       select NET
+> +       select NETDEVICES
+> +       select PCI
+> +       select BLK_DEV
+> +       select NETWORK_FILESYSTEMS
+> +       select INET
+> +       select EXPERIMENTAL
+> +       select SERIAL_8250
+> +       select SERIAL_8250_CONSOLE
+> +       select IP_PNP
+> +       select IP_PNP_DHCP
+> +       select BINFMT_ELF
+> +       select PCI_MSI
+> +       select KGDB
+> +       select KGDB_SERIAL_CONSOLE
+> +       select VIRTIO
+> +       select VIRTIO_RING
+> +       select VIRTIO_PCI
+> +       select VIRTIO_BLK
+> +       select VIRTIO_CONSOLE
+> +       select VIRTIO_NET
+> +       select 9P_FS
+> +       select NET_9P
+> +       select NET_9P_VIRTIO
 
-Right. Hexagon is not interesting but ARM and PowerPC will be if
-someone ports the KVM tool to the architectures.
+This lot doesn't seem to be enough for me on next-20111025.  I seem to
+have to also enable CONFIG_FB_VESA for the kernel to boot.
 
->> Maybe the naming is off because it's not about
->> individual features like paeconfig or nfsconfig would be but rather
->> about turning on all the required options for virtualized x86 for the
->> KVM tool.
->>
->> If you have better ideas how to do this, we're happy to change the
->> implementation.
->>
-> As I said, I'll have a look tonight to provide a better implementation.
+Without CONFIG_FB_VESA, I just get:
 
-Excellent, thanks!
-
-                        Pekka
+$ tools/kvm/kvm run --debug arch/x86/boot/bzImage --disk
+~/kernel/linux-0.2.img
+  # kvm run -k arch/x86/boot/bzImage -m 448 -c 4 --name guest-11466
+PPrroobbiinngg  EEDDDD  ((eedddd==ooffff  ttoo  ddiissaabbllee))......  ookk
+<no more output>
