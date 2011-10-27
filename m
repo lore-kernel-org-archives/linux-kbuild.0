@@ -1,70 +1,66 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wy0-f174.google.com ([74.125.82.174]:38987 "EHLO
+Received: from mail-wy0-f174.google.com ([74.125.82.174]:34982 "EHLO
 	mail-wy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750969Ab1J0PFG convert rfc822-to-8bit (ORCPT
+	with ESMTP id S1751158Ab1J0PT1 convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 27 Oct 2011 11:05:06 -0400
+	Thu, 27 Oct 2011 11:19:27 -0400
 MIME-Version: 1.0
-In-Reply-To: <4EA96B7E.5020809@suse.cz>
+In-Reply-To: <CAOJsxLHT9V-K26=Qt10sDVibRjoVgZBVULsVwYD5oqrM0bN+5Q@mail.gmail.com>
 References: <1319717234-20918-1-git-send-email-levinsasha928@gmail.com>
 	<CAOJsxLH-O8+Fx=VLsoXhVLNtXWD_1eVrUMOgbk2DODbrwPAzhQ@mail.gmail.com>
 	<20111027123713.GB22032@elte.hu>
 	<4EA953E8.4020004@suse.cz>
 	<CAOJsxLHT9V-K26=Qt10sDVibRjoVgZBVULsVwYD5oqrM0bN+5Q@mail.gmail.com>
-	<4EA96B7E.5020809@suse.cz>
-Date: Thu, 27 Oct 2011 11:05:04 -0400
-Message-ID: <CACqU3MWHzS-WwQFEbxb3YN93pCVqMFAZeVfJBKAuxs10J_UB+w@mail.gmail.com>
+Date: Thu, 27 Oct 2011 11:19:26 -0400
+Message-ID: <CACqU3MW0B4Ba_bo=yJF2MbYkkcDiAEDewnMrjDgCMKHRDnDDTg@mail.gmail.com>
 Subject: Re: [PATCH] config: Add 'make kvmconfig'
 From: Arnaud Lacombe <lacombar@gmail.com>
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: Pekka Enberg <penberg@kernel.org>, Ingo Molnar <mingo@elte.hu>, Sasha Levin <levinsasha928@gmail.com>, linux-kernel@vger.kernel.org, Linus Torvalds <torvalds@linux-foundation.org>, linux-kbuild@vger.kernel.org
+To: Pekka Enberg <penberg@kernel.org>
+Cc: Michal Marek <mmarek@suse.cz>, Ingo Molnar <mingo@elte.hu>, Sasha Levin <levinsasha928@gmail.com>, linux-kernel@vger.kernel.org, Linus Torvalds <torvalds@linux-foundation.org>, linux-kbuild@vger.kernel.org
 
 Hi,
 
-On Thu, Oct 27, 2011 at 10:32 AM, Michal Marek <mmarek@suse.cz> wrote:
-> On 27.10.2011 16:11, Pekka Enberg wrote:
->> On Thu, Oct 27, 2011 at 3:51 PM, Michal Marek <mmarek@suse.cz> wrote:
->>>> I like the feature - i hope it's expressed in the right Kbuild-ish
->>>> fashion.
->>>>
->>>> Acked-by: Ingo Molnar <mingo@elte.hu>
+On Thu, Oct 27, 2011 at 10:11 AM, Pekka Enberg <penberg@kernel.org> wrote:
+> On Thu, Oct 27, 2011 at 3:51 PM, Michal Marek <mmarek@suse.cz> wrote:
+>>> I like the feature - i hope it's expressed in the right Kbuild-ish
+>>> fashion.
 >>>
->>> I hope we won't now also be getting make nfsconfig, make paeconfig and
->>> whatnot :). Also, the lists of select statements might need updates from
->>> time to time, if new dependencies appear.
+>>> Acked-by: Ingo Molnar <mingo@elte.hu>
 >>
->> The use case is to be able to take a .config posted in a bug report
->> and easily turn that into something that the KVM tool can boot.
->>
->> "kvmconfig" really represents a virtualized x86 architecture
->> configuration. Maybe the naming is off because it's not about
->> individual features like paeconfig or nfsconfig would be but rather
->> about turning on all the required options for virtualized x86 for the
->> KVM tool.
+>> I hope we won't now also be getting make nfsconfig, make paeconfig and
+>> whatnot :). Also, the lists of select statements might need updates from
+>> time to time, if new dependencies appear.
 >
-> OK, if it's just this single use case, then why not.
+> The use case is to be able to take a .config posted in a bug report
+> and easily turn that into something that the KVM tool can boot.
 >
-Still, it should not be a pretext to open the Pendora's box and have
-15 different hack popping up in the future.
+> "kvmconfig" really represents a virtualized x86 architecture
+> configuration.
+>
+How do you expect:
 
->> If you have better ideas how to do this, we're happy to change the
->> implementation.
+# make ARCH=hexagon kvmconfig
+
+to behave ? If it is not meant to work outside the x86 world, it
+should not be accessible outside the x86 world.
+
+> Maybe the naming is off because it's not about
+> individual features like paeconfig or nfsconfig would be but rather
+> about turning on all the required options for virtualized x86 for the
+> KVM tool.
 >
-> The implementation is not as important as the new user interface that
-> people get used to. And I think the user interface is OK. Regarding
-> implementation, expect that you'll have to add more select statements
-> from time to time. But there is ATM no better solution to this.
+> If you have better ideas how to do this, we're happy to change the
+> implementation.
 >
-what about providing hook for sourcing a given Makefile ? I can have a
-look at that tonight.
+As I said, I'll have a look tonight to provide a better implementation.
 
  - Arnaud
 
-> Michal
+>                        Pekka
 > --
 > To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
 > the body of a message to majordomo@vger.kernel.org
