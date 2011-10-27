@@ -1,68 +1,54 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wy0-f174.google.com ([74.125.82.174]:34982 "EHLO
-	mail-wy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751158Ab1J0PT1 convert rfc822-to-8bit (ORCPT
+Received: from mail-vx0-f174.google.com ([209.85.220.174]:52712 "EHLO
+	mail-vx0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752251Ab1J0Pak (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 27 Oct 2011 11:19:27 -0400
+	Thu, 27 Oct 2011 11:30:40 -0400
 MIME-Version: 1.0
-In-Reply-To: <CAOJsxLHT9V-K26=Qt10sDVibRjoVgZBVULsVwYD5oqrM0bN+5Q@mail.gmail.com>
+In-Reply-To: <CACqU3MW0B4Ba_bo=yJF2MbYkkcDiAEDewnMrjDgCMKHRDnDDTg@mail.gmail.com>
 References: <1319717234-20918-1-git-send-email-levinsasha928@gmail.com>
 	<CAOJsxLH-O8+Fx=VLsoXhVLNtXWD_1eVrUMOgbk2DODbrwPAzhQ@mail.gmail.com>
 	<20111027123713.GB22032@elte.hu>
 	<4EA953E8.4020004@suse.cz>
 	<CAOJsxLHT9V-K26=Qt10sDVibRjoVgZBVULsVwYD5oqrM0bN+5Q@mail.gmail.com>
-Date: Thu, 27 Oct 2011 11:19:26 -0400
-Message-ID: <CACqU3MW0B4Ba_bo=yJF2MbYkkcDiAEDewnMrjDgCMKHRDnDDTg@mail.gmail.com>
+	<CACqU3MW0B4Ba_bo=yJF2MbYkkcDiAEDewnMrjDgCMKHRDnDDTg@mail.gmail.com>
+Date: Thu, 27 Oct 2011 18:30:40 +0300
+Message-ID: <CAOJsxLGFOtQrzbNMLCRTdsF6XSc9Gg76C5ag1gFh2g+3mvHxZQ@mail.gmail.com>
 Subject: Re: [PATCH] config: Add 'make kvmconfig'
-From: Arnaud Lacombe <lacombar@gmail.com>
+From: Pekka Enberg <penberg@kernel.org>
 Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Pekka Enberg <penberg@kernel.org>
+To: Arnaud Lacombe <lacombar@gmail.com>
 Cc: Michal Marek <mmarek@suse.cz>, Ingo Molnar <mingo@elte.hu>, Sasha Levin <levinsasha928@gmail.com>, linux-kernel@vger.kernel.org, Linus Torvalds <torvalds@linux-foundation.org>, linux-kbuild@vger.kernel.org
 
-Hi,
-
-On Thu, Oct 27, 2011 at 10:11 AM, Pekka Enberg <penberg@kernel.org> wrote:
-> On Thu, Oct 27, 2011 at 3:51 PM, Michal Marek <mmarek@suse.cz> wrote:
->>> I like the feature - i hope it's expressed in the right Kbuild-ish
->>> fashion.
->>>
->>> Acked-by: Ingo Molnar <mingo@elte.hu>
+On Thu, Oct 27, 2011 at 6:19 PM, Arnaud Lacombe <lacombar@gmail.com> wrote:
+>> The use case is to be able to take a .config posted in a bug report
+>> and easily turn that into something that the KVM tool can boot.
 >>
->> I hope we won't now also be getting make nfsconfig, make paeconfig and
->> whatnot :). Also, the lists of select statements might need updates from
->> time to time, if new dependencies appear.
+>> "kvmconfig" really represents a virtualized x86 architecture
+>> configuration.
+>>
+> How do you expect:
 >
-> The use case is to be able to take a .config posted in a bug report
-> and easily turn that into something that the KVM tool can boot.
+> # make ARCH=hexagon kvmconfig
 >
-> "kvmconfig" really represents a virtualized x86 architecture
-> configuration.
->
-How do you expect:
+> to behave ? If it is not meant to work outside the x86 world, it
+> should not be accessible outside the x86 world.
 
-# make ARCH=hexagon kvmconfig
+Right. Hexagon is not interesting but ARM and PowerPC will be if
+someone ports the KVM tool to the architectures.
 
-to behave ? If it is not meant to work outside the x86 world, it
-should not be accessible outside the x86 world.
+>> Maybe the naming is off because it's not about
+>> individual features like paeconfig or nfsconfig would be but rather
+>> about turning on all the required options for virtualized x86 for the
+>> KVM tool.
+>>
+>> If you have better ideas how to do this, we're happy to change the
+>> implementation.
+>>
+> As I said, I'll have a look tonight to provide a better implementation.
 
-> Maybe the naming is off because it's not about
-> individual features like paeconfig or nfsconfig would be but rather
-> about turning on all the required options for virtualized x86 for the
-> KVM tool.
->
-> If you have better ideas how to do this, we're happy to change the
-> implementation.
->
-As I said, I'll have a look tonight to provide a better implementation.
+Excellent, thanks!
 
- - Arnaud
-
->                        Pekka
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
+                        Pekka
