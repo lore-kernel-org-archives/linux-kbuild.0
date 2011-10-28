@@ -1,67 +1,82 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-bw0-f46.google.com ([209.85.214.46]:63672 "EHLO
-	mail-bw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751241Ab1J0Ts0 (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 27 Oct 2011 15:48:26 -0400
+Received: from mx2.mail.elte.hu ([157.181.151.9]:49030 "EHLO mx2.mail.elte.hu"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752307Ab1J1HIR (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 28 Oct 2011 03:08:17 -0400
+Date: Fri, 28 Oct 2011 09:03:36 +0200
+From: Ingo Molnar <mingo@elte.hu>
 Subject: Re: [PATCH] config: Add 'make kvmconfig'
-From: Sasha Levin <levinsasha928@gmail.com>
-In-Reply-To: <CAH+eYFBw99Yb-x+QEyZiXZ4yL3r=jr1Z+Gk95DG3hsYLkC_R_A@mail.gmail.com>
+Message-ID: <20111028070336.GF12995@elte.hu>
 References: <1319717234-20918-1-git-send-email-levinsasha928@gmail.com>
-	 <CAH+eYFBw99Yb-x+QEyZiXZ4yL3r=jr1Z+Gk95DG3hsYLkC_R_A@mail.gmail.com>
-Content-Type: text/plain; charset="us-ascii"
-Date: Thu, 27 Oct 2011 22:46:49 +0200
-Message-ID: <1319748409.3235.0.camel@lappy>
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+ <20111027193448.GA3514@merkur.ravnborg.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20111027193448.GA3514@merkur.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Rabin Vincent <rabin@rab.in>
-Cc: linux-kernel@vger.kernel.org, Ingo Molnar <mingo@elte.hu>, Linus Torvalds <torvalds@linux-foundation.org>, Michal Marek <mmarek@suse.cz>, Pekka Enberg <penberg@cs.helsinki.fi>, linux-kbuild@vger.kernel.org
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: Sasha Levin <levinsasha928@gmail.com>, linux-kernel@vger.kernel.org, Linus Torvalds <torvalds@linux-foundation.org>, Michal Marek <mmarek@suse.cz>, Pekka Enberg <penberg@cs.helsinki.fi>, linux-kbuild@vger.kernel.org
 
-On Thu, 2011-10-27 at 23:35 +0530, Rabin Vincent wrote:
-> On Thu, Oct 27, 2011 at 17:37, Sasha Levin <levinsasha928@gmail.com> wrote:
-> > +config KVMTOOL_TEST_ENABLE
-> > +       bool "Enable options to create a bootable tools/kvm/ kernel"
-> > +       select NET
-> > +       select NETDEVICES
-> > +       select PCI
-> > +       select BLK_DEV
-> > +       select NETWORK_FILESYSTEMS
-> > +       select INET
-> > +       select EXPERIMENTAL
-> > +       select SERIAL_8250
-> > +       select SERIAL_8250_CONSOLE
-> > +       select IP_PNP
-> > +       select IP_PNP_DHCP
-> > +       select BINFMT_ELF
-> > +       select PCI_MSI
-> > +       select KGDB
-> > +       select KGDB_SERIAL_CONSOLE
-> > +       select VIRTIO
-> > +       select VIRTIO_RING
-> > +       select VIRTIO_PCI
-> > +       select VIRTIO_BLK
-> > +       select VIRTIO_CONSOLE
-> > +       select VIRTIO_NET
-> > +       select 9P_FS
-> > +       select NET_9P
-> > +       select NET_9P_VIRTIO
+
+* Sam Ravnborg <sam@ravnborg.org> wrote:
+
+> On Thu, Oct 27, 2011 at 02:07:14PM +0200, Sasha Levin wrote:
+> > This patch adds 'make kvmconfig' which allows to add KVM guest support
+> > to a config file.
+> > 
+> > This allows for easier testing of configurations under virtualized
+> > environments.
+> > 
+> > Cc: Ingo Molnar <mingo@elte.hu>
+> > Cc: Linus Torvalds <torvalds@linux-foundation.org>
+> > Cc: Michal Marek <mmarek@suse.cz>
+> > Cc: Pekka Enberg <penberg@cs.helsinki.fi>
+> > Cc: linux-kbuild@vger.kernel.org
+> > Cc: linux-kernel@vger.kernel.org
+> > Suggested-by: Ingo Molnar <mingo@elte.hu>
+> > Signed-off-by: Sasha Levin <levinsasha928@gmail.com>
 > 
-> This lot doesn't seem to be enough for me on next-20111025.  I seem to
-> have to also enable CONFIG_FB_VESA for the kernel to boot.
+> Two points about the implmentation that I do not like...
 > 
-> Without CONFIG_FB_VESA, I just get:
+> The kvmconfig is an x86 specific thing - so it does not belong
+> in the scripts/kconfig/Makefile
 > 
-> $ tools/kvm/kvm run --debug arch/x86/boot/bzImage --disk
-> ~/kernel/linux-0.2.img
->   # kvm run -k arch/x86/boot/bzImage -m 448 -c 4 --name guest-11466
-> PPrroobbiinngg  EEDDDD  ((eedddd==ooffff  ttoo  ddiissaabbllee))......  ookk
-> <no more output>
+> The *config namespace is general config targets.
+> 
+> Suggestion:
+> Move the implmentation to arch/x86/Makefile and name the target
+> something that does not match the *config pattern.
+> 
+> Suggestion:
+> 
+>    make kvmbootable
+> 
+> To tell that this convert the current config to a kvmbootable config.
+> 
+> And then add the target to the x86 specific help too.
 
-This is a kvm tools issue and should be fixed within kvm tools.
+KVM itself is not x86 specific (although this patch obviously is), so 
+we'd like to keep at least the naming non-x86.
 
--- 
+Furthermore, the functionality generally fits into the pattern that 
+'oldconfig' does: it changes an existing config - so having 'config' 
+in the name somewhere makes quite a bit of sense. If i didn't know 
+what 'kvmbootable' does i couldnt guess that it touches the .config - 
+while the *config pattern makes that patently obvious.
 
-Sasha.
+Could we set aside some sort of name for such subsystem specific 
+purposes and be done with it? Could we reuse the 'defconfig' 
+naming perhaps and make it richer:
 
+	make defconfig kvm
+
+or:
+
+	make defconfig-kvm
+
+? It would be very obvious at a glance what it does.
+
+Thanks,
+
+	Ingo
