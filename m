@@ -1,18 +1,61 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from trx4.indiatimes.com ([223.165.24.215]:39765 "EHLO
-	trx4.indiatimes.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752678Ab1J1LPE (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 28 Oct 2011 07:15:04 -0400
-Date: Fri, 28 Oct 2011 16:45:07 +0530 (IST)
-From: lisa hedstrand <lisa_hedstrand@indiatimes.com>
-Reply-To: lisa hedstrand <lisahedstrand@yahoo.com>
-Message-ID: <1911073391.934781319800507106.JavaMail.root@tilmb17.indiatimes.com>
-Subject: Hi
+Received: from enyo.dsw2k3.info ([195.71.86.239]:36718 "EHLO enyo.dsw2k3.info"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S932443Ab1J1MSh (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 28 Oct 2011 08:18:37 -0400
+Date: Fri, 28 Oct 2011 14:08:56 +0200
+From: Matthias Schniedermeyer <ms@citd.de>
+Subject: Re: [PATCH] config: Add 'make kvmconfig'
+Message-ID: <20111028120856.GA29174@citd.de>
+References: <1319717234-20918-1-git-send-email-levinsasha928@gmail.com>
+ <20111027193448.GA3514@merkur.ravnborg.org>
+ <20111028070336.GF12995@elte.hu>
+ <CAMuHMdUSyNcbmmXjFqSVQmsSqGS5xKFt4DSnskkg80UyWoJjLQ@mail.gmail.com>
+ <20111028075432.GB8626@elte.hu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20111028075432.GB8626@elte.hu>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
+To: Ingo Molnar <mingo@elte.hu>
+Cc: Geert Uytterhoeven <geert@linux-m68k.org>, Sam Ravnborg <sam@ravnborg.org>, Sasha Levin <levinsasha928@gmail.com>, linux-kernel@vger.kernel.org, Linus Torvalds <torvalds@linux-foundation.org>, Michal Marek <mmarek@suse.cz>, Pekka Enberg <penberg@cs.helsinki.fi>, linux-kbuild@vger.kernel.org
 
-My name is Miss Lisa Please accept my apology if my mode of contacting you will in any way offend you. I am compelled to contact you via this medium because i needed a friend from that part of the world. We will get to know each other in details if my proposition accepted. l am a student in UK but originally from USA.
+On 28.10.2011 09:54, Ingo Molnar wrote:
+> 
+> * Geert Uytterhoeven <geert@linux-m68k.org> wrote:
+> 
+> > > ? It would be very obvious at a glance what it does.
+> > 
+> > This fits in the generic "I have a .config and I want to enable an 
+> > additional option" functionality:
+> > 
+> > make oldconfig CONFIG_KVMTOOL_TEST_ENABLE=y
+> > 
+> > Don't we already have that support? I seem to remember it flying 
+> > by. Or was it just a proposal that never got implemented?
+> 
+> Well, it would be nice to have something (much) shorter and more 
+> obvious, as we really expect to use this frequently.
+> 
+> Maybe:
+> 
+>   make oldconfig kvm
+
+Maybe something more obvious?:
+make modconfig kvm
+or
+make modconfig=kvm
+
+That would also fit nicely for future addition.
+
+
+
+Bis denn
+
+-- 
+Real Programmers consider "what you see is what you get" to be just as 
+bad a concept in Text Editors as it is in women. No, the Real Programmer
+wants a "you asked for it, you got it" text editor -- complicated, 
+cryptic, powerful, unforgiving, dangerous.
+
