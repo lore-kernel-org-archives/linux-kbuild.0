@@ -1,82 +1,91 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.mail.elte.hu ([157.181.151.9]:49030 "EHLO mx2.mail.elte.hu"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752307Ab1J1HIR (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 28 Oct 2011 03:08:17 -0400
-Date: Fri, 28 Oct 2011 09:03:36 +0200
-From: Ingo Molnar <mingo@elte.hu>
+Received: from mail-fx0-f46.google.com ([209.85.161.46]:40151 "EHLO
+	mail-fx0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754533Ab1J1HX7 (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 28 Oct 2011 03:23:59 -0400
 Subject: Re: [PATCH] config: Add 'make kvmconfig'
-Message-ID: <20111028070336.GF12995@elte.hu>
+From: Sasha Levin <levinsasha928@gmail.com>
+In-Reply-To: <20111028070336.GF12995@elte.hu>
 References: <1319717234-20918-1-git-send-email-levinsasha928@gmail.com>
- <20111027193448.GA3514@merkur.ravnborg.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20111027193448.GA3514@merkur.ravnborg.org>
+	 <20111027193448.GA3514@merkur.ravnborg.org>
+	 <20111028070336.GF12995@elte.hu>
+Content-Type: text/plain; charset="us-ascii"
+Date: Fri, 28 Oct 2011 09:23:55 +0200
+Message-ID: <1319786635.3235.11.camel@lappy>
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: Sasha Levin <levinsasha928@gmail.com>, linux-kernel@vger.kernel.org, Linus Torvalds <torvalds@linux-foundation.org>, Michal Marek <mmarek@suse.cz>, Pekka Enberg <penberg@cs.helsinki.fi>, linux-kbuild@vger.kernel.org
+To: Ingo Molnar <mingo@elte.hu>
+Cc: Sam Ravnborg <sam@ravnborg.org>, linux-kernel@vger.kernel.org, Linus Torvalds <torvalds@linux-foundation.org>, Michal Marek <mmarek@suse.cz>, Pekka Enberg <penberg@cs.helsinki.fi>, linux-kbuild@vger.kernel.org
 
-
-* Sam Ravnborg <sam@ravnborg.org> wrote:
-
-> On Thu, Oct 27, 2011 at 02:07:14PM +0200, Sasha Levin wrote:
-> > This patch adds 'make kvmconfig' which allows to add KVM guest support
-> > to a config file.
+On Fri, 2011-10-28 at 09:03 +0200, Ingo Molnar wrote:
+> * Sam Ravnborg <sam@ravnborg.org> wrote:
+> 
+> > On Thu, Oct 27, 2011 at 02:07:14PM +0200, Sasha Levin wrote:
+> > > This patch adds 'make kvmconfig' which allows to add KVM guest support
+> > > to a config file.
+> > > 
+> > > This allows for easier testing of configurations under virtualized
+> > > environments.
+> > > 
+> > > Cc: Ingo Molnar <mingo@elte.hu>
+> > > Cc: Linus Torvalds <torvalds@linux-foundation.org>
+> > > Cc: Michal Marek <mmarek@suse.cz>
+> > > Cc: Pekka Enberg <penberg@cs.helsinki.fi>
+> > > Cc: linux-kbuild@vger.kernel.org
+> > > Cc: linux-kernel@vger.kernel.org
+> > > Suggested-by: Ingo Molnar <mingo@elte.hu>
+> > > Signed-off-by: Sasha Levin <levinsasha928@gmail.com>
 > > 
-> > This allows for easier testing of configurations under virtualized
-> > environments.
+> > Two points about the implmentation that I do not like...
 > > 
-> > Cc: Ingo Molnar <mingo@elte.hu>
-> > Cc: Linus Torvalds <torvalds@linux-foundation.org>
-> > Cc: Michal Marek <mmarek@suse.cz>
-> > Cc: Pekka Enberg <penberg@cs.helsinki.fi>
-> > Cc: linux-kbuild@vger.kernel.org
-> > Cc: linux-kernel@vger.kernel.org
-> > Suggested-by: Ingo Molnar <mingo@elte.hu>
-> > Signed-off-by: Sasha Levin <levinsasha928@gmail.com>
+> > The kvmconfig is an x86 specific thing - so it does not belong
+> > in the scripts/kconfig/Makefile
+> > 
+> > The *config namespace is general config targets.
+> > 
+> > Suggestion:
+> > Move the implmentation to arch/x86/Makefile and name the target
+> > something that does not match the *config pattern.
+> > 
+> > Suggestion:
+> > 
+> >    make kvmbootable
+> > 
+> > To tell that this convert the current config to a kvmbootable config.
+> > 
+> > And then add the target to the x86 specific help too.
 > 
-> Two points about the implmentation that I do not like...
+> KVM itself is not x86 specific (although this patch obviously is), so 
+> we'd like to keep at least the naming non-x86.
 > 
-> The kvmconfig is an x86 specific thing - so it does not belong
-> in the scripts/kconfig/Makefile
+> Furthermore, the functionality generally fits into the pattern that 
+> 'oldconfig' does: it changes an existing config - so having 'config' 
+> in the name somewhere makes quite a bit of sense. If i didn't know 
+> what 'kvmbootable' does i couldnt guess that it touches the .config - 
+> while the *config pattern makes that patently obvious.
 > 
-> The *config namespace is general config targets.
+> Could we set aside some sort of name for such subsystem specific 
+> purposes and be done with it? Could we reuse the 'defconfig' 
+> naming perhaps and make it richer:
 > 
-> Suggestion:
-> Move the implmentation to arch/x86/Makefile and name the target
-> something that does not match the *config pattern.
+> 	make defconfig kvm
 > 
-> Suggestion:
+> or:
 > 
->    make kvmbootable
+> 	make defconfig-kvm
 > 
-> To tell that this convert the current config to a kvmbootable config.
-> 
-> And then add the target to the x86 specific help too.
+> ? It would be very obvious at a glance what it does.
 
-KVM itself is not x86 specific (although this patch obviously is), so 
-we'd like to keep at least the naming non-x86.
+We can possibly make 'make defconfig abc' run arch specific script
+located next to the defconfig files (arch/$(ARCH)/configs/).
 
-Furthermore, the functionality generally fits into the pattern that 
-'oldconfig' does: it changes an existing config - so having 'config' 
-in the name somewhere makes quite a bit of sense. If i didn't know 
-what 'kvmbootable' does i couldnt guess that it touches the .config - 
-while the *config pattern makes that patently obvious.
+It would both solve the problem with being arch specific, and would
+allow for future expansion of other 'kvm defconfig' options.
 
-Could we set aside some sort of name for such subsystem specific 
-purposes and be done with it? Could we reuse the 'defconfig' 
-naming perhaps and make it richer:
+-- 
 
-	make defconfig kvm
+Sasha.
 
-or:
-
-	make defconfig-kvm
-
-? It would be very obvious at a glance what it does.
-
-Thanks,
-
-	Ingo
