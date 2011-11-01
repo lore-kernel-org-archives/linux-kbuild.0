@@ -1,79 +1,54 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from enyo.dsw2k3.info ([195.71.86.239]:48798 "EHLO enyo.dsw2k3.info"
+Received: from cantor2.suse.de ([195.135.220.15]:44232 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752717Ab1J1NFu (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 28 Oct 2011 09:05:50 -0400
-Date: Fri, 28 Oct 2011 15:05:35 +0200
-From: Matthias Schniedermeyer <ms@citd.de>
-Subject: Re: [PATCH] config: Add 'make kvmconfig'
-Message-ID: <20111028130535.GA2752@citd.de>
-References: <1319717234-20918-1-git-send-email-levinsasha928@gmail.com>
- <20111027193448.GA3514@merkur.ravnborg.org>
- <20111028070336.GF12995@elte.hu>
- <CAMuHMdUSyNcbmmXjFqSVQmsSqGS5xKFt4DSnskkg80UyWoJjLQ@mail.gmail.com>
- <20111028075432.GB8626@elte.hu>
- <20111028120856.GA29174@citd.de>
- <20111028122902.GA25323@elte.hu>
+	id S1754400Ab1KAXWe (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 1 Nov 2011 19:22:34 -0400
+Date: Wed, 2 Nov 2011 00:22:33 +0100
+From: Michal Marek <mmarek@suse.cz>
+Subject: Re: [PATCH] Kbuild: append missing-syscalls to the default target
+ list
+Message-ID: <20111101232233.GA32441@sepie.suse.cz>
+References: <1314234210-11090-1-git-send-email-lacombar@gmail.com>
+ <4E69FEC9.2080204@suse.cz>
+ <CACqU3MUFyn_jh2pN4GLENqcGVUzAwcMJUR_WLY2EtqOhMheceQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20111028122902.GA25323@elte.hu>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CACqU3MUFyn_jh2pN4GLENqcGVUzAwcMJUR_WLY2EtqOhMheceQ@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ingo Molnar <mingo@elte.hu>
-Cc: Geert Uytterhoeven <geert@linux-m68k.org>, Sam Ravnborg <sam@ravnborg.org>, Sasha Levin <levinsasha928@gmail.com>, linux-kernel@vger.kernel.org, Linus Torvalds <torvalds@linux-foundation.org>, Michal Marek <mmarek@suse.cz>, Pekka Enberg <penberg@cs.helsinki.fi>, linux-kbuild@vger.kernel.org
+To: Arnaud Lacombe <lacombar@gmail.com>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On 28.10.2011 14:29, Ingo Molnar wrote:
+On Wed, Sep 14, 2011 at 01:17:10AM -0400, Arnaud Lacombe wrote:
+> 2011/9/9 Michal Marek <mmarek@suse.cz>:
+> > On 25.8.2011 03:03, Arnaud Lacombe wrote:
+> >> +always += missing-syscalls
+> >> +targets += missing-syscalls
+> >> +
+> >>  quiet_cmd_syscalls = CALL    $<
+> >>        cmd_syscalls = $(CONFIG_SHELL) $< $(CC) $(c_flags)
+> >
+> > checksyscalls.sh needs to depend on generated/asm-offsets.h, otherwise a
+> > parallel build will fail.
+> >
+> true.
 > 
-> * Matthias Schniedermeyer <ms@citd.de> wrote:
+> This:
 > 
-> > On 28.10.2011 09:54, Ingo Molnar wrote:
-> > > 
-> > > * Geert Uytterhoeven <geert@linux-m68k.org> wrote:
-> > > 
-> > > > > ? It would be very obvious at a glance what it does.
-> > > > 
-> > > > This fits in the generic "I have a .config and I want to enable an 
-> > > > additional option" functionality:
-> > > > 
-> > > > make oldconfig CONFIG_KVMTOOL_TEST_ENABLE=y
-> > > > 
-> > > > Don't we already have that support? I seem to remember it flying 
-> > > > by. Or was it just a proposal that never got implemented?
-> > > 
-> > > Well, it would be nice to have something (much) shorter and more 
-> > > obvious, as we really expect to use this frequently.
-> > > 
-> > > Maybe:
-> > > 
-> > >   make oldconfig kvm
-> > 
-> > Maybe something more obvious?:
-> > make modconfig kvm
-> > or
-> > make modconfig=kvm
+> diff --git a/Kbuild b/Kbuild
+> index 1a2eb32..4caab4f 100644
+> --- a/Kbuild
+> +++ b/Kbuild
+> @@ -94,7 +94,7 @@ targets += missing-syscalls
+>  quiet_cmd_syscalls = CALL    $<
+>        cmd_syscalls = $(CONFIG_SHELL) $< $(CC) $(c_flags)
 > 
-> Well, i run distinctly non-modular kernels so modconfig would not be 
-> particularly good. Also, many of the features enabled are non-modular 
-> core kernel features to begin with.
+> -missing-syscalls: scripts/checksyscalls.sh FORCE
+> +missing-syscalls: scripts/checksyscalls.sh $(offsets-file) FORCE
+>         $(call cmd,syscalls)
 
-I thougt about that just as i send the e-mail, to near to "mod"ular. 
-What i meant was "mod"ify.
+OK, applied to kbuild/kbuild with this fixup.
 
-And AFAICS there currently is no "modconfig", only an "allmodconfig" 
-(and "localmodconfig")
-
-With no letters dropped it would be less ambiguous.
-make modifyconfig=kvm
-
-
-
-
-Bis denn
-
--- 
-Real Programmers consider "what you see is what you get" to be just as 
-bad a concept in Text Editors as it is in women. No, the Real Programmer
-wants a "you asked for it, you got it" text editor -- complicated, 
-cryptic, powerful, unforgiving, dangerous.
-
+Michal
