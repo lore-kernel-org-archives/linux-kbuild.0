@@ -1,30 +1,60 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:44748 "EHLO mx2.suse.de"
+Received: from mx2.mail.elte.hu ([157.181.151.9]:39176 "EHLO mx2.mail.elte.hu"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755986Ab1KAXgu (ORCPT <rfc822;linux-kbuild@VGER.KERNEL.ORG>);
-	Tue, 1 Nov 2011 19:36:50 -0400
-Received: from relay2.suse.de (charybdis-ext.suse.de [195.135.221.2])
-	(using TLSv1 with cipher DHE-RSA-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mx2.suse.de (Postfix) with ESMTP id 0E0C78A908
-	for <linux-kbuild@VGER.KERNEL.ORG>; Wed,  2 Nov 2011 00:36:50 +0100 (CET)
-Message-ID: <4EB08293.70907@suse.cz>
-Date: Wed, 02 Nov 2011 00:36:51 +0100
-From: Michal Marek <mmarek@suse.cz>
+	id S1753277Ab1KBIqM (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 2 Nov 2011 04:46:12 -0400
+Date: Wed, 2 Nov 2011 09:41:24 +0100
+From: Ingo Molnar <mingo@elte.hu>
+Subject: Re: [PATCH] config: Add 'make kvmconfig'
+Message-ID: <20111102084124.GB18771@elte.hu>
+References: <1319717234-20918-1-git-send-email-levinsasha928@gmail.com>
+ <20111027193448.GA3514@merkur.ravnborg.org>
+ <20111028070336.GF12995@elte.hu>
+ <CAMuHMdUSyNcbmmXjFqSVQmsSqGS5xKFt4DSnskkg80UyWoJjLQ@mail.gmail.com>
+ <20111028075432.GB8626@elte.hu>
+ <20111028120856.GA29174@citd.de>
+ <20111028122902.GA25323@elte.hu>
+ <20111028130535.GA2752@citd.de>
 MIME-Version: 1.0
-Subject: missed kbuild/kconfig patches
-Content-Type: text/plain; charset=ISO-8859-2
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20111028130535.GA2752@citd.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@VGER.KERNEL.ORG
+To: Matthias Schniedermeyer <ms@citd.de>
+Cc: Geert Uytterhoeven <geert@linux-m68k.org>, Sam Ravnborg <sam@ravnborg.org>, Sasha Levin <levinsasha928@gmail.com>, linux-kernel@vger.kernel.org, Linus Torvalds <torvalds@linux-foundation.org>, Michal Marek <mmarek@suse.cz>, Pekka Enberg <penberg@cs.helsinki.fi>, linux-kbuild@vger.kernel.org
 
-Hi,
 
-I know there are some kbuild & kconfig patches to be processed. But the
-end of the merge window is approaching, so I chose to take what I have
-now and submit it to Linus on Wednesday, instead of risking being too
-late. I'll look at the remaining patches after rc1.
+* Matthias Schniedermeyer <ms@citd.de> wrote:
 
-Sorry,
-Michal
+> And AFAICS there currently is no "modconfig", only an 
+> "allmodconfig" (and "localmodconfig")
+> 
+> With no letters dropped it would be less ambiguous. make 
+> modifyconfig=kvm
+
+Yeah. Note that it's more like an 'add' operation, not a modify 
+operation, thus:
+
+	make addconfig=kvm
+
+or:
+
+	make addconfig kvm
+
+would be intuitive and would work well too.
+
+Sam, Michal, which one would you prefer? The latter might have the 
+advantage that it's additive, enabling future usages like:
+
+	make addconfig kvm debug
+
+as a quick shortcut to enable baseline KVM support and generic kernel 
+debugging features, without having to twiddle with the menuconfig.
+
+Hm? Would be nice to move on this issue, we've painted it to death 
+already ;-)
+
+Thanks,
+
+	Ingo
