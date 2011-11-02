@@ -1,76 +1,38 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.mail.elte.hu ([157.181.151.9]:59310 "EHLO mx2.mail.elte.hu"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752671Ab1KBJoZ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 2 Nov 2011 05:44:25 -0400
-Date: Wed, 2 Nov 2011 10:39:35 +0100
-From: Ingo Molnar <mingo@elte.hu>
-Subject: Re: [PATCH] config: Add 'make kvmconfig'
-Message-ID: <20111102093935.GB20916@elte.hu>
-References: <20111028070336.GF12995@elte.hu>
- <CAMuHMdUSyNcbmmXjFqSVQmsSqGS5xKFt4DSnskkg80UyWoJjLQ@mail.gmail.com>
- <20111028075432.GB8626@elte.hu>
- <20111028120856.GA29174@citd.de>
- <20111028122902.GA25323@elte.hu>
- <20111028130535.GA2752@citd.de>
- <20111102084124.GB18771@elte.hu>
- <4EB1084F.4020206@suse.cz>
- <20111102091747.GH18903@elte.hu>
- <4EB10C3D.6090906@suse.cz>
+Received: from mail-vx0-f174.google.com ([209.85.220.174]:40175 "EHLO
+	mail-vx0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753168Ab1KBKGj (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 2 Nov 2011 06:06:39 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4EB10C3D.6090906@suse.cz>
+In-Reply-To: <20111102093935.GB20916@elte.hu>
+References: <20111028070336.GF12995@elte.hu>
+	<CAMuHMdUSyNcbmmXjFqSVQmsSqGS5xKFt4DSnskkg80UyWoJjLQ@mail.gmail.com>
+	<20111028075432.GB8626@elte.hu>
+	<20111028120856.GA29174@citd.de>
+	<20111028122902.GA25323@elte.hu>
+	<20111028130535.GA2752@citd.de>
+	<20111102084124.GB18771@elte.hu>
+	<4EB1084F.4020206@suse.cz>
+	<20111102091747.GH18903@elte.hu>
+	<4EB10C3D.6090906@suse.cz>
+	<20111102093935.GB20916@elte.hu>
+Date: Wed, 2 Nov 2011 12:06:38 +0200
+Message-ID: <CAOJsxLFjZJKkjA9yTQ1T2YqAv_fzvWwWViyraAA9940cTKF2_w@mail.gmail.com>
+Subject: Re: [PATCH] config: Add 'make kvmconfig'
+From: Pekka Enberg <penberg@kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: Matthias Schniedermeyer <ms@citd.de>, Geert Uytterhoeven <geert@linux-m68k.org>, Sam Ravnborg <sam@ravnborg.org>, Sasha Levin <levinsasha928@gmail.com>, linux-kernel@vger.kernel.org, Linus Torvalds <torvalds@linux-foundation.org>, Pekka Enberg <penberg@cs.helsinki.fi>, linux-kbuild@vger.kernel.org
+To: Ingo Molnar <mingo@elte.hu>
+Cc: Michal Marek <mmarek@suse.cz>, Matthias Schniedermeyer <ms@citd.de>, Geert Uytterhoeven <geert@linux-m68k.org>, Sam Ravnborg <sam@ravnborg.org>, Sasha Levin <levinsasha928@gmail.com>, linux-kernel@vger.kernel.org, Linus Torvalds <torvalds@linux-foundation.org>, linux-kbuild@vger.kernel.org
 
+On Wed, Nov 2, 2011 at 11:39 AM, Ingo Molnar <mingo@elte.hu> wrote:
+>> As I said, make kvmconfig is fine with me, if it's just this single case.
+>
+> Great, thanks!
 
-* Michal Marek <mmarek@suse.cz> wrote:
+I applied Sasha's patch. We're happy to revisit the Kbuild changes if
+someone comes up with something more generic in the future.
 
-> On 2.11.2011 10:17, Ingo Molnar wrote:
-> > * Michal Marek <mmarek@suse.cz> wrote:
-> >> On 2.11.2011 09:41, Ingo Molnar wrote:
-> >>> Yeah. Note that it's more like an 'add' operation, not a modify 
-> >>> operation, thus:
-> >>>
-> >>> 	make addconfig=kvm
-> >>>
-> >>> or:
-> >>>
-> >>> 	make addconfig kvm
-> >>>
-> >>> would be intuitive and would work well too.
-> >>>
-> >>> Sam, Michal, which one would you prefer? The latter might have the 
-> >>> advantage that it's additive, enabling future usages like:
-> >>>
-> >>> 	make addconfig kvm debug
-> >>
-> >> The problem is that neither of these fit into the make command syntax:
-> >>
-> >>     make addconfig kvm debug
-> >>
-> >> tells make to build three different targets, and
-> >>
-> >>     make addconfig=kvm
-> >>
-> >> tells make to create a variable named addconfig with the value kvm 
-> >> and build the default target. And BTW, you or someone else 
-> >> reassured me earlier in the thread that this is going to be needed 
-> >> for the kvm case solely, so why are you inventing something generic 
-> >> now? :)
-> > 
-> > Because we are trying to find *something* that is both usable and 
-> > which you guys are willing to ack.
-> > 
-> > So what's your suggestion? Is 'make kvmconfig' OK?
-> 
-> As I said, make kvmconfig is fine with me, if it's just this single case.
-> 
-> Michal
-
-Great, thanks!
-
-	Ingo
+                        Pekka
