@@ -1,36 +1,64 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp-out3.tiscali.nl ([195.241.79.178]:60530 "EHLO
-	smtp-out3.tiscali.nl" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751172Ab1KCNhH (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 3 Nov 2011 09:37:07 -0400
-Subject: Re: [PATCH] kconfig: accept negative hexadecimals
-From: Paul Bolle <pebolle@tiscali.nl>
-In-Reply-To: <1320326160.14409.223.camel@x61.thuisdomein>
-References: <1320326160.14409.223.camel@x61.thuisdomein>
-Content-Type: text/plain; charset="UTF-8"
-Date: Thu, 03 Nov 2011 14:36:50 +0100
-Message-ID: <1320327410.14409.231.camel@x61.thuisdomein>
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Received: from cantor2.suse.de ([195.135.220.15]:37792 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S933689Ab1KCP6L (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 3 Nov 2011 11:58:11 -0400
+Date: Thu, 3 Nov 2011 16:58:09 +0100
+From: Michal Marek <mmarek@suse.cz>
+Subject: [GIT] kbuild updates for 3.2
+Message-ID: <20111103155809.GA7532@sepie.suse.cz>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: amwang@redhat.com, lacombar@gmail.com, mmarek@suse.cz, pefoley2@verizon.net, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Thu, 2011-11-03 at 14:16 +0100, Paul Bolle wrote:
-> But these will then show up as
-> (eg) "0x-ff" in the GUI. Should that be fixed in a separate commit or
-> should I update this patch?
+Hi Linus,
 
-Just a quick look into this showed that allowing negative hexadecimals
-triggers quite a bit of trouble. So this needs a rethink. I guess this
-all is only worthwhile if I can demonstrate a need for negative hex
-digits (ie, if I submit something that requires the config tools to
-actually allow those).
+this is the main part of kbuild for 3.2. It's rather boring this time:
+- Fix to keep _shipped files if the user removes them to force a rebuild
+- make distclean does not remove empty files, should someone create one
+  again :)
+- Save one make invocation in make prepare
+- genksyms won't checksum structs defined inside the current C file
+- a couple of minor fixes
 
-Anyhow, please forget this patch.
+The following changes since commit 322a8b034003c0d46d39af85bf24fee27b902f48:
 
+  Linux 3.1-rc1 (2011-08-07 18:23:30 -0700)
 
-Paul Bolle
+are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git kbuild
 
+Amerigo Wang (1):
+      Makefile: remove a duplicated line
+
+Arnaud Lacombe (2):
+      scripts/Makefile.build: do not reference EXTRA_CFLAGS as CFLAGS replacement
+      Kbuild: append missing-syscalls to the default target list
+
+Michal Marek (4):
+      kbuild: Do not delete empty files in make distclean
+      genksyms: Minor parser cleanup
+      genksyms: Do not expand internal types
+      genksyms: Regenerate lexer and parser
+
+Peter Foley (2):
+      kbuild: prevent make from deleting _shipped files
+      fixdep: fix extraneous dependencies
+
+ Kbuild                               |    6 +-
+ Makefile                             |    4 +-
+ scripts/Makefile.build               |    2 +-
+ scripts/Makefile.lib                 |    4 +
+ scripts/basic/fixdep.c               |    1 +
+ scripts/genksyms/genksyms.c          |    3 +-
+ scripts/genksyms/genksyms.h          |    4 +-
+ scripts/genksyms/lex.l               |    8 +
+ scripts/genksyms/lex.lex.c_shipped   |   12 +-
+ scripts/genksyms/parse.tab.c_shipped |  645 ++++++++++++++++++----------------
+ scripts/genksyms/parse.tab.h_shipped |    7 +-
+ scripts/genksyms/parse.y             |   40 ++-
+ 12 files changed, 404 insertions(+), 332 deletions(-)
