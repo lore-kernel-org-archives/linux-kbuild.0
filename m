@@ -1,38 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-vx0-f174.google.com ([209.85.220.174]:40175 "EHLO
-	mail-vx0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753168Ab1KBKGj (ORCPT
+Received: from smtp-out2.tiscali.nl ([195.241.79.177]:43004 "EHLO
+	smtp-out2.tiscali.nl" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S933183Ab1KCNQR (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 2 Nov 2011 06:06:39 -0400
-MIME-Version: 1.0
-In-Reply-To: <20111102093935.GB20916@elte.hu>
-References: <20111028070336.GF12995@elte.hu>
-	<CAMuHMdUSyNcbmmXjFqSVQmsSqGS5xKFt4DSnskkg80UyWoJjLQ@mail.gmail.com>
-	<20111028075432.GB8626@elte.hu>
-	<20111028120856.GA29174@citd.de>
-	<20111028122902.GA25323@elte.hu>
-	<20111028130535.GA2752@citd.de>
-	<20111102084124.GB18771@elte.hu>
-	<4EB1084F.4020206@suse.cz>
-	<20111102091747.GH18903@elte.hu>
-	<4EB10C3D.6090906@suse.cz>
-	<20111102093935.GB20916@elte.hu>
-Date: Wed, 2 Nov 2011 12:06:38 +0200
-Message-ID: <CAOJsxLFjZJKkjA9yTQ1T2YqAv_fzvWwWViyraAA9940cTKF2_w@mail.gmail.com>
-Subject: Re: [PATCH] config: Add 'make kvmconfig'
-From: Pekka Enberg <penberg@kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+	Thu, 3 Nov 2011 09:16:17 -0400
+Subject: [PATCH] kconfig: accept negative hexadecimals
+From: Paul Bolle <pebolle@tiscali.nl>
+Content-Type: text/plain; charset="UTF-8"
+Date: Thu, 03 Nov 2011 14:16:00 +0100
+Message-ID: <1320326160.14409.223.camel@x61.thuisdomein>
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ingo Molnar <mingo@elte.hu>
-Cc: Michal Marek <mmarek@suse.cz>, Matthias Schniedermeyer <ms@citd.de>, Geert Uytterhoeven <geert@linux-m68k.org>, Sam Ravnborg <sam@ravnborg.org>, Sasha Levin <levinsasha928@gmail.com>, linux-kernel@vger.kernel.org, Linus Torvalds <torvalds@linux-foundation.org>, linux-kbuild@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Wed, Nov 2, 2011 at 11:39 AM, Ingo Molnar <mingo@elte.hu> wrote:
->> As I said, make kvmconfig is fine with me, if it's just this single case.
->
-> Great, thanks!
+Kconfig will print a warning when confronted with a negative "hex"
+value:
+	'number is invalid'
 
-I applied Sasha's patch. We're happy to revisit the Kbuild changes if
-someone comes up with something more generic in the future.
+Make this warning disappear for valid negative hexadecimals (ie, valid
+hexadecimal numbers that start with a minus sign, optionally followed by
+"0x").
 
-                        Pekka
+Signed-off-by: Paul Bolle <pebolle@tiscali.nl>
+---
+I ran into this while trying some possible cleanups to various "hex"
+config entries, for which I needed to add a negative default. Currently
+there are no "hex" config entries with a negative default. (I don't know
+whether this warning can be triggered any other way.)
+
+This also allows to enter negative values for "hex" config entries.
+Apparently that's currently not needed. But these will then show up as
+(eg) "0x-ff" in the GUI. Should that be fixed in a separate commit or
+should I update this patch?
+
+ scripts/kconfig/symbol.c |    2 ++
+ 1 files changed, 2 insertions(+), 0 deletions(-)
+
+diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
+index 071f00c..2b33478 100644
+--- a/scripts/kconfig/symbol.c
++++ b/scripts/kconfig/symbol.c
+@@ -551,6 +551,8 @@ bool sym_string_valid(struct symbol *sym, const char *str)
+ 		}
+ 		return true;
+ 	case S_HEX:
++		if (str[0] == '-')
++			str++;
+ 		if (str[0] == '0' && (str[1] == 'x' || str[1] == 'X'))
+ 			str += 2;
+ 		ch = *str++;
+-- 
+1.7.4.4
+
