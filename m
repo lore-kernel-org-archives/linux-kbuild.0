@@ -1,64 +1,74 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:37792 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:38121 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S933689Ab1KCP6L (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 3 Nov 2011 11:58:11 -0400
-Date: Thu, 3 Nov 2011 16:58:09 +0100
+	id S933777Ab1KCQFF (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 3 Nov 2011 12:05:05 -0400
+Date: Thu, 3 Nov 2011 17:05:03 +0100
 From: Michal Marek <mmarek@suse.cz>
-Subject: [GIT] kbuild updates for 3.2
-Message-ID: <20111103155809.GA7532@sepie.suse.cz>
+Subject: [GIT] kconfig for 3.2
+Message-ID: <20111103160503.GA8008@sepie.suse.cz>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: amwang@redhat.com, lacombar@gmail.com, mmarek@suse.cz, pefoley2@verizon.net, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: crquan@gmail.com, dave@gnu.org, lacombar@gmail.com, lucas.demarchi@profusion.mobi, mmarek@suse.cz, srinivas.kandagatla@st.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
 Hi Linus,
 
-this is the main part of kbuild for 3.2. It's rather boring this time:
-- Fix to keep _shipped files if the user removes them to force a rebuild
-- make distclean does not remove empty files, should someone create one
-  again :)
-- Save one make invocation in make prepare
-- genksyms won't checksum structs defined inside the current C file
-- a couple of minor fixes
+please pull these kconfig bits for 3.2-rc1:
+- a couple of fixes for make nconfig
+- help text is displayed for choice menus if there is one
+- make localmodconfig/localyesconfig cleanups
+- make menuconfig handles sigint nicely
+- fix for the generated __enabled_* macros so that the IS_ENABLED macro
+  is actually usable
+
+Michal
 
 The following changes since commit 322a8b034003c0d46d39af85bf24fee27b902f48:
 
   Linux 3.1-rc1 (2011-08-07 18:23:30 -0700)
 
 are available in the git repository at:
-  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git kbuild
+  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git kconfig
 
-Amerigo Wang (1):
-      Makefile: remove a duplicated line
+Arnaud Lacombe (6):
+      kconfig/streamline_config.pl: directly access LSMOD from the environment
+      kconfig/streamline_config.pl: use options to determine operating mode
+      kconfig/streamline_config.pl: merge local{mod,yes}config
+      kconfig/nconf: nuke unreferenced `nohelp_text'
+      kconfig: factor code in menu_get_ext_help()
+      kconfig: fix __enabled_ macros definition for invisible and un-selected symbols
 
-Arnaud Lacombe (2):
-      scripts/Makefile.build: do not reference EXTRA_CFLAGS as CFLAGS replacement
-      Kbuild: append missing-syscalls to the default target list
+Cheng Renquan (5):
+      scripts/kconfig/nconf: fix typo: unknow => unknown
+      scripts/kconfig/nconf: fix memmove's length arg
+      scripts/kconfig/nconf: dynamically alloc dialog_input_result
+      scripts/kconfig/nconf: fix editing long strings
+      scripts/kconfig/nconf: add KEY_HOME / KEY_END for dialog_inputbox
 
-Michal Marek (4):
-      kbuild: Do not delete empty files in make distclean
-      genksyms: Minor parser cleanup
-      genksyms: Do not expand internal types
-      genksyms: Regenerate lexer and parser
+Davidlohr Bueso (1):
+      kconfig: handle SIGINT in menuconfig
 
-Peter Foley (2):
-      kbuild: prevent make from deleting _shipped files
-      fixdep: fix extraneous dependencies
+Lucas De Marchi (1):
+      kconfig: fix set but not used variables
 
- Kbuild                               |    6 +-
- Makefile                             |    4 +-
- scripts/Makefile.build               |    2 +-
- scripts/Makefile.lib                 |    4 +
- scripts/basic/fixdep.c               |    1 +
- scripts/genksyms/genksyms.c          |    3 +-
- scripts/genksyms/genksyms.h          |    4 +-
- scripts/genksyms/lex.l               |    8 +
- scripts/genksyms/lex.lex.c_shipped   |   12 +-
- scripts/genksyms/parse.tab.c_shipped |  645 ++++++++++++++++++----------------
- scripts/genksyms/parse.tab.h_shipped |    7 +-
- scripts/genksyms/parse.y             |   40 ++-
- 12 files changed, 404 insertions(+), 332 deletions(-)
+Michal Marek (2):
+      Merge branch 'master/kconfig-localmodconfig' of git://github.com/lacombar/linux-2.6 into kbuild/kconfig
+      Merge branch 'kconfig/for-next' of git://github.com/lacombar/linux-2.6 into kbuild/kconfig
+
+Srinivas Kandagatla (1):
+      kbuild: Fix help text not displayed in choice option.
+
+ scripts/kconfig/Makefile             |   28 +----------
+ scripts/kconfig/confdata.c           |   49 ++++++++++++++-----
+ scripts/kconfig/lxdialog/textbox.c   |    3 +-
+ scripts/kconfig/mconf.c              |   86 ++++++++++++++++++++-------------
+ scripts/kconfig/menu.c               |   13 ++---
+ scripts/kconfig/nconf.c              |   23 ++++-----
+ scripts/kconfig/nconf.gui.c          |   59 ++++++++++++++++++-----
+ scripts/kconfig/nconf.h              |    2 +-
+ scripts/kconfig/streamline_config.pl |   22 +++++++-
+ 9 files changed, 173 insertions(+), 112 deletions(-)
