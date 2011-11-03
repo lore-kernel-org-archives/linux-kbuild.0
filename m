@@ -1,75 +1,97 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:38535 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S933739Ab1KCQMB (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 3 Nov 2011 12:12:01 -0400
-Date: Thu, 3 Nov 2011 17:12:00 +0100
-From: Michal Marek <mmarek@suse.cz>
-Subject: [GIT] tree-wide kconfig cleanup
-Message-ID: <20111103161200.GA8303@sepie.suse.cz>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Received: from wolverine01.qualcomm.com ([199.106.114.254]:7251 "EHLO
+	wolverine01.qualcomm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S933120Ab1KCRJ7 (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 3 Nov 2011 13:09:59 -0400
+From: Stephen Boyd <sboyd@codeaurora.org>
+Subject: [PATCH] scripts/tags.sh: Add Page flag function magic
+Date: Thu,  3 Nov 2011 10:09:57 -0700
+Message-Id: <1320340197-9063-1-git-send-email-sboyd@codeaurora.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: pebolle@tiscali.nl, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-Hi Linus,
+It takes a while to find the macro-magically defined Page*()
+functions defined in include/linux/page-flags.h if you're new to
+the kernel. Add some magic to the tags script to transform these
+macros into the actual functions they are, so that tag jumping in
+the mm code is a bit easier.
 
-Paul Bolle went through our Kconfig files and deleted a lot of bitrot.
-You will get a conflict in the stmmac Kconfig, but the symbol is still
-unused and should be deleted. Also, the sh fix got merged twice, I
-didn't notice when I applied it to my tree.
+Signed-off-by: Stephen Boyd <sboyd@codeaurora.org>
+---
 
-Michal
+Tested-by welcome because I didn't actually test the emacs part.
 
-The following changes since commit 322a8b034003c0d46d39af85bf24fee27b902f48:
+ scripts/tags.sh |   46 ++++++++++++++++++++++++++++++++++++++++++++--
+ 1 files changed, 44 insertions(+), 2 deletions(-)
 
-  Linux 3.1-rc1 (2011-08-07 18:23:30 -0700)
+diff --git a/scripts/tags.sh b/scripts/tags.sh
+index 38f6617..028dc5c 100755
+--- a/scripts/tags.sh
++++ b/scripts/tags.sh
+@@ -132,7 +132,28 @@ exuberant()
+ 	--regex-asm='/^(ENTRY|_GLOBAL)\(([^)]*)\).*/\2/'        \
+ 	--regex-c='/^SYSCALL_DEFINE[[:digit:]]?\(([^,)]*).*/sys_\1/' \
+ 	--regex-c++='/^TRACE_EVENT\(([^,)]*).*/trace_\1/'		\
+-	--regex-c++='/^DEFINE_EVENT\([^,)]*, *([^,)]*).*/trace_\1/'
++	--regex-c++='/^DEFINE_EVENT\([^,)]*, *([^,)]*).*/trace_\1/'	\
++	--regex-c++='/PAGEFLAG\(([^,)]*).*/Page\1/'			\
++	--regex-c++='/PAGEFLAG\(([^,)]*).*/SetPage\1/'			\
++	--regex-c++='/PAGEFLAG\(([^,)]*).*/ClearPage\1/'		\
++	--regex-c++='/TESTSETFLAG\(([^,)]*).*/TestSetPage\1/'		\
++	--regex-c++='/TESTPAGEFLAG\(([^,)]*).*/Page\1/'			\
++	--regex-c++='/SETPAGEFLAG\(([^,)]*).*/SetPage\1/'		\
++	--regex-c++='/__SETPAGEFLAG\(([^,)]*).*/__SetPage\1/'		\
++	--regex-c++='/TESTCLEARFLAG\(([^,)]*).*/TestClearPage\1/'	\
++	--regex-c++='/__TESTCLEARFLAG\(([^,)]*).*/TestClearPage\1/'	\
++	--regex-c++='/CLEARPAGEFLAG\(([^,)]*).*/ClearPage\1/'		\
++	--regex-c++='/__CLEARPAGEFLAG\(([^,)]*).*/__ClearPage\1/'	\
++	--regex-c++='/__PAGEFLAG\(([^,)]*).*/__SetPage\1/'		\
++	--regex-c++='/__PAGEFLAG\(([^,)]*).*/__ClearPage\1/'		\
++	--regex-c++='/PAGEFLAG_FALSE\(([^,)]*).*/Page\1/'		\
++	--regex-c++='/TESTSCFLAG\(([^,)]*).*/TestSetPage\1/'		\
++	--regex-c++='/TESTSCFLAG\(([^,)]*).*/TestClearPage\1/'		\
++	--regex-c++='/SETPAGEFLAG_NOOP\(([^,)]*).*/SetPage\1/'		\
++	--regex-c++='/CLEARPAGEFLAG_NOOP\(([^,)]*).*/ClearPage\1/'	\
++	--regex-c++='/__CLEARPAGEFLAG_NOOP\(([^,)]*).*/__ClearPage\1/'	\
++	--regex-c++='/TESTCLEARFLAG_FALSE\(([^,)]*).*/TestClearPage\1/' \
++	--regex-c++='/__TESTCLEARFLAG_FALSE\(([^,)]*).*/__TestClearPage\1/'
+ 
+ 	all_kconfigs | xargs $1 -a                              \
+ 	--langdef=kconfig --language-force=kconfig              \
+@@ -154,7 +175,28 @@ emacs()
+ 	--regex='/^(ENTRY|_GLOBAL)(\([^)]*\)).*/\2/'            \
+ 	--regex='/^SYSCALL_DEFINE[0-9]?(\([^,)]*\).*/sys_\1/'   \
+ 	--regex='/^TRACE_EVENT(\([^,)]*\).*/trace_\1/'		\
+-	--regex='/^DEFINE_EVENT([^,)]*, *\([^,)]*\).*/trace_\1/'
++	--regex='/^DEFINE_EVENT([^,)]*, *\([^,)]*\).*/trace_\1/' \
++	--regex='/PAGEFLAG\(([^,)]*).*/Page\1/'			\
++	--regex='/PAGEFLAG\(([^,)]*).*/SetPage\1/'		\
++	--regex='/PAGEFLAG\(([^,)]*).*/ClearPage\1/'		\
++	--regex='/TESTSETFLAG\(([^,)]*).*/TestSetPage\1/'	\
++	--regex='/TESTPAGEFLAG\(([^,)]*).*/Page\1/'		\
++	--regex='/SETPAGEFLAG\(([^,)]*).*/SetPage\1/'		\
++	--regex='/__SETPAGEFLAG\(([^,)]*).*/__SetPage\1/'	\
++	--regex='/TESTCLEARFLAG\(([^,)]*).*/TestClearPage\1/'	\
++	--regex='/__TESTCLEARFLAG\(([^,)]*).*/TestClearPage\1/'	\
++	--regex='/CLEARPAGEFLAG\(([^,)]*).*/ClearPage\1/'	\
++	--regex='/__CLEARPAGEFLAG\(([^,)]*).*/__ClearPage\1/'	\
++	--regex='/__PAGEFLAG\(([^,)]*).*/__SetPage\1/'		\
++	--regex='/__PAGEFLAG\(([^,)]*).*/__ClearPage\1/'	\
++	--regex='/PAGEFLAG_FALSE\(([^,)]*).*/Page\1/'		\
++	--regex='/TESTSCFLAG\(([^,)]*).*/TestSetPage\1/'	\
++	--regex='/TESTSCFLAG\(([^,)]*).*/TestClearPage\1/'	\
++	--regex='/SETPAGEFLAG_NOOP\(([^,)]*).*/SetPage\1/'	\
++	--regex='/CLEARPAGEFLAG_NOOP\(([^,)]*).*/ClearPage\1/'	\
++	--regex='/__CLEARPAGEFLAG_NOOP\(([^,)]*).*/__ClearPage\1/' \
++	--regex='/TESTCLEARFLAG_FALSE\(([^,)]*).*/TestClearPage\1/' \
++	--regex='/__TESTCLEARFLAG_FALSE\(([^,)]*).*/__TestClearPage\1/'
+ 
+ 	all_kconfigs | xargs $1 -a                              \
+ 	--regex='/^[ \t]*\(\(menu\)*config\)[ \t]+\([a-zA-Z0-9_]+\)/\3/'
+-- 
+Sent by an employee of the Qualcomm Innovation Center, Inc.
+The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum.
 
-are available in the git repository at:
-  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git trivial
-
-Paul Bolle (16):
-      alpha: drop unused Kconfig symbol
-      sparc: drop unused Kconfig symbol
-      um: drop unused Kconfig symbol
-      sh: drop unused Kconfig symbol
-      score: drop unused Kconfig symbols
-      m32r: drop unused Kconfig symbol
-      samples: drop unused Kconfig symbol
-      arm: at91: drop unused Kconfig symbol
-      openrisc: drop unused Kconfig symbols
-      mips: drop unused Kconfig symbols
-      powerpc: 40x: drop unused Kconfig symbol
-      powerpc: drop unused Kconfig symbols
-      x86: drop unused Kconfig symbol
-      stmmac: drop unused Kconfig symbol
-      pci: drop unused Kconfig symbol
-      scsi: drop unused Kconfig symbol
-
- arch/alpha/Kconfig                         |    5 -----
- arch/arm/mach-at91/Kconfig                 |    6 ------
- arch/m32r/Kconfig                          |    7 -------
- arch/mips/Kconfig                          |   14 --------------
- arch/mips/powertv/Kconfig                  |    2 --
- arch/mips/powertv/asic/Kconfig             |   28 ----------------------------
- arch/openrisc/Kconfig                      |   12 ------------
- arch/powerpc/Kconfig                       |   22 ----------------------
- arch/powerpc/platforms/40x/Kconfig         |    5 -----
- arch/powerpc/platforms/Kconfig.cputype     |    8 --------
- arch/powerpc/platforms/embedded6xx/Kconfig |    4 ----
- arch/powerpc/platforms/prep/Kconfig        |    9 ---------
- arch/powerpc/platforms/wsp/Kconfig         |    5 -----
- arch/score/Kconfig                         |   19 -------------------
- arch/sh/Kconfig                            |    4 ----
- arch/sparc/Kconfig                         |    7 +------
- arch/um/Kconfig.x86                        |    3 ---
- arch/x86/Kconfig                           |    3 ---
- drivers/net/stmmac/Kconfig                 |    9 ---------
- drivers/pci/Kconfig                        |   11 -----------
- drivers/scsi/Kconfig                       |   14 --------------
- samples/Kconfig                            |    6 ------
- 22 files changed, 1 insertions(+), 202 deletions(-)
- delete mode 100644 arch/mips/powertv/asic/Kconfig
