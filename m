@@ -1,97 +1,48 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from wolverine01.qualcomm.com ([199.106.114.254]:7251 "EHLO
-	wolverine01.qualcomm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S933120Ab1KCRJ7 (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 3 Nov 2011 13:09:59 -0400
-From: Stephen Boyd <sboyd@codeaurora.org>
-Subject: [PATCH] scripts/tags.sh: Add Page flag function magic
-Date: Thu,  3 Nov 2011 10:09:57 -0700
-Message-Id: <1320340197-9063-1-git-send-email-sboyd@codeaurora.org>
+Received: from terminus.zytor.com ([198.137.202.10]:45266 "EHLO mail.zytor.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750813Ab1KDBAG (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 3 Nov 2011 21:00:06 -0400
+Message-ID: <4EB337DB.4010903@zytor.com>
+Date: Thu, 03 Nov 2011 17:54:51 -0700
+From: "H. Peter Anvin" <hpa@zytor.com>
+MIME-Version: 1.0
+Subject: Re: Generating unistd_*.h
+References: <4E583860.5080603@zytor.com> <20110827101820.GA2990@merkur.ravnborg.org> <4E58D99A.2050400@zytor.com> <4E5D4528.1070307@zytor.com> <4E5D501D.9000604@zytor.com> <4E5D5224.5000400@zytor.com> <4E5E3EA2.2080706@suse.cz> <4E5E6164.8050908@zytor.com>
+In-Reply-To: <4E5E6164.8050908@zytor.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+Cc: Sam Ravnborg <sam@ravnborg.org>, linux-kbuild@vger.kernel.org, David Woodhouse <dwmw2@infradead.org>
 
-It takes a while to find the macro-magically defined Page*()
-functions defined in include/linux/page-flags.h if you're new to
-the kernel. Add some magic to the tags script to transform these
-macros into the actual functions they are, so that tag jumping in
-the mm code is a bit easier.
+On 08/31/2011 09:29 AM, H. Peter Anvin wrote:
+> On 08/31/2011 07:01 AM, Michal Marek wrote:
+>>>>
+>>>> For reference, putting the following in arch/x86/include/asm/Kbuild does
+>>>> *not* work, because $(objtree)/arch/x86/include/asm doesn't exist, and
+>>>> so Kbuild generates an invalid path:
+>>>>
+>>>> objhdr-y += ../generated/asm/unistd_32.h
+>>>> objhdr-y += ../generated/asm/unistd_64.h
+>>>
+>>> Similarly, overriding obj in the same file does not work, because
+>>> scripts/Makefile.headersinst uses $(srctree)/$(obj) not
+>>> $(srctree)/$(src) ... is that normal/expected?
+>>
+>> Can you either post a patch or a link to a git tree with your current
+>> status?
+>>
+> 
+> git://git.zytor.com/users/hpa/kernel/autogen.git
+> 
+> Patch attached.
+> 
+> 	-hpa
 
-Signed-off-by: Stephen Boyd <sboyd@codeaurora.org>
----
+OK, trying to crawl back out of my exile into kernel.org cleanup land...
+this problem still remains!
 
-Tested-by welcome because I didn't actually test the emacs part.
-
- scripts/tags.sh |   46 ++++++++++++++++++++++++++++++++++++++++++++--
- 1 files changed, 44 insertions(+), 2 deletions(-)
-
-diff --git a/scripts/tags.sh b/scripts/tags.sh
-index 38f6617..028dc5c 100755
---- a/scripts/tags.sh
-+++ b/scripts/tags.sh
-@@ -132,7 +132,28 @@ exuberant()
- 	--regex-asm='/^(ENTRY|_GLOBAL)\(([^)]*)\).*/\2/'        \
- 	--regex-c='/^SYSCALL_DEFINE[[:digit:]]?\(([^,)]*).*/sys_\1/' \
- 	--regex-c++='/^TRACE_EVENT\(([^,)]*).*/trace_\1/'		\
--	--regex-c++='/^DEFINE_EVENT\([^,)]*, *([^,)]*).*/trace_\1/'
-+	--regex-c++='/^DEFINE_EVENT\([^,)]*, *([^,)]*).*/trace_\1/'	\
-+	--regex-c++='/PAGEFLAG\(([^,)]*).*/Page\1/'			\
-+	--regex-c++='/PAGEFLAG\(([^,)]*).*/SetPage\1/'			\
-+	--regex-c++='/PAGEFLAG\(([^,)]*).*/ClearPage\1/'		\
-+	--regex-c++='/TESTSETFLAG\(([^,)]*).*/TestSetPage\1/'		\
-+	--regex-c++='/TESTPAGEFLAG\(([^,)]*).*/Page\1/'			\
-+	--regex-c++='/SETPAGEFLAG\(([^,)]*).*/SetPage\1/'		\
-+	--regex-c++='/__SETPAGEFLAG\(([^,)]*).*/__SetPage\1/'		\
-+	--regex-c++='/TESTCLEARFLAG\(([^,)]*).*/TestClearPage\1/'	\
-+	--regex-c++='/__TESTCLEARFLAG\(([^,)]*).*/TestClearPage\1/'	\
-+	--regex-c++='/CLEARPAGEFLAG\(([^,)]*).*/ClearPage\1/'		\
-+	--regex-c++='/__CLEARPAGEFLAG\(([^,)]*).*/__ClearPage\1/'	\
-+	--regex-c++='/__PAGEFLAG\(([^,)]*).*/__SetPage\1/'		\
-+	--regex-c++='/__PAGEFLAG\(([^,)]*).*/__ClearPage\1/'		\
-+	--regex-c++='/PAGEFLAG_FALSE\(([^,)]*).*/Page\1/'		\
-+	--regex-c++='/TESTSCFLAG\(([^,)]*).*/TestSetPage\1/'		\
-+	--regex-c++='/TESTSCFLAG\(([^,)]*).*/TestClearPage\1/'		\
-+	--regex-c++='/SETPAGEFLAG_NOOP\(([^,)]*).*/SetPage\1/'		\
-+	--regex-c++='/CLEARPAGEFLAG_NOOP\(([^,)]*).*/ClearPage\1/'	\
-+	--regex-c++='/__CLEARPAGEFLAG_NOOP\(([^,)]*).*/__ClearPage\1/'	\
-+	--regex-c++='/TESTCLEARFLAG_FALSE\(([^,)]*).*/TestClearPage\1/' \
-+	--regex-c++='/__TESTCLEARFLAG_FALSE\(([^,)]*).*/__TestClearPage\1/'
- 
- 	all_kconfigs | xargs $1 -a                              \
- 	--langdef=kconfig --language-force=kconfig              \
-@@ -154,7 +175,28 @@ emacs()
- 	--regex='/^(ENTRY|_GLOBAL)(\([^)]*\)).*/\2/'            \
- 	--regex='/^SYSCALL_DEFINE[0-9]?(\([^,)]*\).*/sys_\1/'   \
- 	--regex='/^TRACE_EVENT(\([^,)]*\).*/trace_\1/'		\
--	--regex='/^DEFINE_EVENT([^,)]*, *\([^,)]*\).*/trace_\1/'
-+	--regex='/^DEFINE_EVENT([^,)]*, *\([^,)]*\).*/trace_\1/' \
-+	--regex='/PAGEFLAG\(([^,)]*).*/Page\1/'			\
-+	--regex='/PAGEFLAG\(([^,)]*).*/SetPage\1/'		\
-+	--regex='/PAGEFLAG\(([^,)]*).*/ClearPage\1/'		\
-+	--regex='/TESTSETFLAG\(([^,)]*).*/TestSetPage\1/'	\
-+	--regex='/TESTPAGEFLAG\(([^,)]*).*/Page\1/'		\
-+	--regex='/SETPAGEFLAG\(([^,)]*).*/SetPage\1/'		\
-+	--regex='/__SETPAGEFLAG\(([^,)]*).*/__SetPage\1/'	\
-+	--regex='/TESTCLEARFLAG\(([^,)]*).*/TestClearPage\1/'	\
-+	--regex='/__TESTCLEARFLAG\(([^,)]*).*/TestClearPage\1/'	\
-+	--regex='/CLEARPAGEFLAG\(([^,)]*).*/ClearPage\1/'	\
-+	--regex='/__CLEARPAGEFLAG\(([^,)]*).*/__ClearPage\1/'	\
-+	--regex='/__PAGEFLAG\(([^,)]*).*/__SetPage\1/'		\
-+	--regex='/__PAGEFLAG\(([^,)]*).*/__ClearPage\1/'	\
-+	--regex='/PAGEFLAG_FALSE\(([^,)]*).*/Page\1/'		\
-+	--regex='/TESTSCFLAG\(([^,)]*).*/TestSetPage\1/'	\
-+	--regex='/TESTSCFLAG\(([^,)]*).*/TestClearPage\1/'	\
-+	--regex='/SETPAGEFLAG_NOOP\(([^,)]*).*/SetPage\1/'	\
-+	--regex='/CLEARPAGEFLAG_NOOP\(([^,)]*).*/ClearPage\1/'	\
-+	--regex='/__CLEARPAGEFLAG_NOOP\(([^,)]*).*/__ClearPage\1/' \
-+	--regex='/TESTCLEARFLAG_FALSE\(([^,)]*).*/TestClearPage\1/' \
-+	--regex='/__TESTCLEARFLAG_FALSE\(([^,)]*).*/__TestClearPage\1/'
- 
- 	all_kconfigs | xargs $1 -a                              \
- 	--regex='/^[ \t]*\(\(menu\)*config\)[ \t]+\([a-zA-Z0-9_]+\)/\3/'
--- 
-Sent by an employee of the Qualcomm Innovation Center, Inc.
-The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum.
+	-hpa
 
