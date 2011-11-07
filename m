@@ -1,93 +1,118 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-vx0-f174.google.com ([209.85.220.174]:65228 "EHLO
-	mail-vx0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753970Ab1KGT6K (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 7 Nov 2011 14:58:10 -0500
+Received: from h5.dl5rb.org.uk ([81.2.74.5]:53700 "EHLO linux-mips.org"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1751814Ab1KGUpI (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 7 Nov 2011 15:45:08 -0500
+Date: Mon, 7 Nov 2011 20:44:49 +0000
+From: Ralf Baechle <ralf@linux-mips.org>
+Subject: Re: [PATCH] Kbuild: append missing-syscalls to the default target
+ list
+Message-ID: <20111107204448.GA9949@linux-mips.org>
+References: <1314234210-11090-1-git-send-email-lacombar@gmail.com>
+ <4E69FEC9.2080204@suse.cz>
+ <CACqU3MUFyn_jh2pN4GLENqcGVUzAwcMJUR_WLY2EtqOhMheceQ@mail.gmail.com>
+ <20111101232233.GA32441@sepie.suse.cz>
 MIME-Version: 1.0
-In-Reply-To: <874nygu3cd.fsf@rustcorp.com.au>
-References: <467be983bed865e1b772136ed488f9ff@localhost>
-	<874nygu3cd.fsf@rustcorp.com.au>
-Date: Mon, 7 Nov 2011 11:58:08 -0800
-Message-ID: <CAJiQ=7D4SSzzkPpPMGnaTq-wZXUGmXCRfKhYdPFg7APDu+VTwA@mail.gmail.com>
-Subject: Re: [PATCH] module: Fix performance regression on modules with large
- symbol tables
-From: Kevin Cernekee <cernekee@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20111101232233.GA32441@sepie.suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Rusty Russell <rusty@rustcorp.com.au>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Jan Beulich <JBeulich@novell.com>
+To: Michal Marek <mmarek@suse.cz>
+Cc: Arnaud Lacombe <lacombar@gmail.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-mips@linux-mips.org, David Daney <ddaney@caviumnetworks.com>
 
-On Sun, Nov 6, 2011 at 5:29 PM, Rusty Russell <rusty@rustcorp.com.au> wrote:
-> I see you honored Jan's original patch by leaving it mysterious and
-> undocumented.  I was totally confused by your patch.
+On Wed, Nov 02, 2011 at 12:22:33AM +0100, Michal Marek wrote:
 
-Sorry - was just trying to mimic the existing level of verbosity.
+> On Wed, Sep 14, 2011 at 01:17:10AM -0400, Arnaud Lacombe wrote:
+> > 2011/9/9 Michal Marek <mmarek@suse.cz>:
+> > > On 25.8.2011 03:03, Arnaud Lacombe wrote:
+> > >> +always += missing-syscalls
+> > >> +targets += missing-syscalls
+> > >> +
+> > >>  quiet_cmd_syscalls = CALL    $<
+> > >>        cmd_syscalls = $(CONFIG_SHELL) $< $(CC) $(c_flags)
+> > >
+> > > checksyscalls.sh needs to depend on generated/asm-offsets.h, otherwise a
+> > > parallel build will fail.
+> > >
+> > true.
+> > 
+> > This:
+> > 
+> > diff --git a/Kbuild b/Kbuild
+> > index 1a2eb32..4caab4f 100644
+> > --- a/Kbuild
+> > +++ b/Kbuild
+> > @@ -94,7 +94,7 @@ targets += missing-syscalls
+> >  quiet_cmd_syscalls = CALL    $<
+> >        cmd_syscalls = $(CONFIG_SHELL) $< $(CC) $(c_flags)
+> > 
+> > -missing-syscalls: scripts/checksyscalls.sh FORCE
+> > +missing-syscalls: scripts/checksyscalls.sh $(offsets-file) FORCE
+> >         $(call cmd,syscalls)
+> 
+> OK, applied to kbuild/kbuild with this fixup.
 
-> But I don't think it quite works in general.  gcc is allowed to
-> compact the strtab itself, eg with two names "foobar" and "bar", it
-> can reuse the tail of the first strtab entry.  It may not yet, but it
-> could.
+5f7efb4c6da9f90cb306923ced2a6494d065a595 breaks 64-bit MIPS builds that
+have 32-bit binary compatibility enabled, for example ip27_defconfig
+or cavium-octeon_defconfig:
 
-Well, sure enough, libbfd's elf-strtab.c is advertised as:
+  CC      arch/mips/kernel/asm-offsets.s
+In file included from include/linux/bitops.h:22:0,
+                 from include/linux/kernel.h:17,
+                 from include/linux/cache.h:4,
+                 from include/linux/time.h:7,
+                 from include/linux/stat.h:60,
+                 from include/linux/compat.h:10,
+                 from arch/mips/kernel/asm-offsets.c:11:
+/home/ralf/src/linux/linux-mips/arch/mips/include/asm/bitops.h: In function ‘__fls’:
+/home/ralf/src/linux/linux-mips/arch/mips/include/asm/bitops.h:570:2: warning: left shift count >= width of type [enabled by default]
+/home/ralf/src/linux/linux-mips/arch/mips/include/asm/bitops.h:572:3: warning: left shift count >= width of type [enabled by default]
+/home/ralf/src/linux/linux-mips/arch/mips/include/asm/bitops.h:575:2: warning: left shift count >= width of type [enabled by default]
+/home/ralf/src/linux/linux-mips/arch/mips/include/asm/bitops.h:579:2: warning: left shift count >= width of type [enabled by default]
+/home/ralf/src/linux/linux-mips/arch/mips/include/asm/bitops.h:583:2: warning: left shift count >= width of type [enabled by default]
+/home/ralf/src/linux/linux-mips/arch/mips/include/asm/bitops.h:587:2: warning: left shift count >= width of type [enabled by default]
+/home/ralf/src/linux/linux-mips/arch/mips/include/asm/bitops.h:591:2: warning: left shift count >= width of type [enabled by default]
+In file included from /home/ralf/src/linux/linux-mips/arch/mips/include/asm/page.h:46:0,
+                 from /home/ralf/src/linux/linux-mips/arch/mips/include/asm/compat.h:8,
+                 from include/linux/compat.h:18,
+                 from arch/mips/kernel/asm-offsets.c:11:
+/home/ralf/src/linux/linux-mips/arch/mips/include/asm/io.h: In function ‘phys_to_virt’:
+/home/ralf/src/linux/linux-mips/arch/mips/include/asm/io.h:136:9: warning: cast to pointer from integer of different size [-Wint-to-pointer-cast]
+/home/ralf/src/linux/linux-mips/arch/mips/include/asm/io.h: In function ‘isa_bus_to_virt’:
+/home/ralf/src/linux/linux-mips/arch/mips/include/asm/io.h:149:9: warning: cast to pointer from integer of different size [-Wint-to-pointer-cast]
+/home/ralf/src/linux/linux-mips/arch/mips/include/asm/io.h: In function ‘outq’:
+/home/ralf/src/linux/linux-mips/arch/mips/include/asm/io.h:444:1: error: size of unnamed array is negative
+/home/ralf/src/linux/linux-mips/arch/mips/include/asm/io.h: In function ‘inq’:
+/home/ralf/src/linux/linux-mips/arch/mips/include/asm/io.h:444:1: error: size of unnamed array is negative
+/home/ralf/src/linux/linux-mips/arch/mips/include/asm/io.h: In function ‘outq_p’:
+/home/ralf/src/linux/linux-mips/arch/mips/include/asm/io.h:444:1: error: size of unnamed array is negative
+/home/ralf/src/linux/linux-mips/arch/mips/include/asm/io.h: In function ‘inq_p’:
+/home/ralf/src/linux/linux-mips/arch/mips/include/asm/io.h:444:1: error: size of unnamed array is negative
+/home/ralf/src/linux/linux-mips/arch/mips/include/asm/io.h: In function ‘__mem_outq’:
+/home/ralf/src/linux/linux-mips/arch/mips/include/asm/io.h:444:1: error: size of unnamed array is negative
+/home/ralf/src/linux/linux-mips/arch/mips/include/asm/io.h: In function ‘__mem_inq’:
+/home/ralf/src/linux/linux-mips/arch/mips/include/asm/io.h:444:1: error: size of unnamed array is negative
+/home/ralf/src/linux/linux-mips/arch/mips/include/asm/io.h: In function ‘__mem_outq_p’:
+/home/ralf/src/linux/linux-mips/arch/mips/include/asm/io.h:444:1: error: size of unnamed array is negative
+/home/ralf/src/linux/linux-mips/arch/mips/include/asm/io.h: In function ‘__mem_inq_p’:
+/home/ralf/src/linux/linux-mips/arch/mips/include/asm/io.h:444:1: error: size of unnamed array is negative
+In file included from /home/ralf/src/linux/linux-mips/arch/mips/include/asm/pgtable.h:15:0,
+                 from include/linux/mm.h:42,
+                 from arch/mips/kernel/asm-offsets.c:14:
+/home/ralf/src/linux/linux-mips/arch/mips/include/asm/pgtable-64.h: In function ‘mk_swap_pte’:
+/home/ralf/src/linux/linux-mips/arch/mips/include/asm/pgtable-64.h:273:1: warning: left shift count >= width of type [enabled by default]
+/home/ralf/src/linux/linux-mips/arch/mips/include/asm/pgtable-64.h:273:1: warning: left shift count >= width of type [enabled by default]
+In file included from arch/mips/kernel/asm-offsets.c:14:0:
+include/linux/mm.h: In function ‘virt_to_head_page’:
+include/linux/mm.h:393:9: warning: right shift count >= width of type [enabled by default]
+In file included from arch/mips/kernel/asm-offsets.c:14:0:
+include/linux/mm.h: In function ‘lowmem_page_address’:
+include/linux/mm.h:723:9: warning: cast to pointer from integer of different size [-Wint-to-pointer-cast]
+make[1]: *** [arch/mips/kernel/asm-offsets.s] Error 1
+make: *** [archprepare] Error 2
 
-/* ELF strtab with GC and suffix merging support. */
+Not yet sure what the fix should be.
 
-The function that performs the suffix merging is
-_bfd_elf_strtab_finalize().  For some reason this only seems to get
-called for .shstrtab (or .dynstr), not for the larger .strtab .  And I'm
-not sure why this would be useful for .shstrtab, since the section names
-usually start with '.'.  I guess it might save a few dozen bytes for
-cases like .init.data or .exit.text .
-
-But as you said, there is nothing keeping the binutils maintainers from
-extending this to .strtab in the future.
-
-One thing I noticed when making a test case was that the earliest entry
-in the section table doesn't necessarily pick the longest substring:
-
-  [ 1] .text             PROGBITS         0000000000000000  00000040
-       0000000000000006  0000000000000000  AX       0     0     4
-  [ 2] .data             PROGBITS         0000000000000000  00000048
-       0000000000000000  0000000000000000  WA       0     0     4
-  [ 3] .bss              NOBITS           0000000000000000  00000048
-       0000000000000000  0000000000000000  WA       0     0     4
-  [ 4] a_                PROGBITS         0000000000000000  00000048
-       0000000000000006  0000000000000000  AX       0     0     1
-  [ 5] fedcba_           PROGBITS         0000000000000000  0000004e
-       0000000000000006  0000000000000000  AX       0     0     1
-  [ 6] cba_              PROGBITS         0000000000000000  00000054
-       0000000000000006  0000000000000000  AX       0     0     1
-
-Hex dump of section '.shstrtab':
-  0x00000000 002e7379 6d746162 002e7374 72746162 ..symtab..strtab
-  0x00000010 002e7368 73747274 6162002e 74657874 ..shstrtab..text
-  0x00000020 002e6461 7461002e 62737300 67666564 ..data..bss.gfed
-  0x00000030 6362615f 002e636f 6d6d656e 74002e6e cba_..comment..n
-  0x00000040 6f74652e 474e552d 73746163 6b002e72 ote.GNU-stack..r
-  0x00000050 656c612e 65685f66 72616d65 00       ela.eh_frame.
-
-So, the first entry referencing "gfedcba_" has sh_name 0x32 ("a_").
-
-The second entry referencing "gfedcba_" has sh_name 0x2d ("fedcba_").
-
-The third entry referencing "gfedcba_" has sh_name 0x30 ("cba_").
-
-If the same holds true for .symtab, this means we probably need to
-change the logic to "backtrack" to the beginning of the string before
-copying it into core_strtab, because a subsequent symtab entry could
-reference a larger chunk of the string.
-
-We will also want to check the strmap bits, since it's possible that
-"cba_" was a core symbol but "edcba_" is not.  In which case we did not
-allocate room for the "ed" part, back in layout_symtab().
-
-> I've started a separate patch to add comments to all this.
-
-Not sure how you want to handle combining these changes?
-
-I'll just send a V2 that rolls in all of the desired modifications, if
-there are no objections...
-
-Thanks.
+  Ralf
