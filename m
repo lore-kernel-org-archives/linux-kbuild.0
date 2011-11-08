@@ -1,30 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ozlabs.org ([203.10.76.45]:54119 "EHLO ozlabs.org"
+Received: from cantor2.suse.de ([195.135.220.15]:38293 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752250Ab1KHG0S (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 8 Nov 2011 01:26:18 -0500
-From: Rusty Russell <rusty@rustcorp.com.au>
-Subject: Re: [PATCH] module: Fix performance regression on modules with large symbol tables
-In-Reply-To: <CAJiQ=7D4SSzzkPpPMGnaTq-wZXUGmXCRfKhYdPFg7APDu+VTwA@mail.gmail.com>
-References: <467be983bed865e1b772136ed488f9ff@localhost> <874nygu3cd.fsf@rustcorp.com.au> <CAJiQ=7D4SSzzkPpPMGnaTq-wZXUGmXCRfKhYdPFg7APDu+VTwA@mail.gmail.com>
-Date: Tue, 08 Nov 2011 09:57:32 +1030
-Message-ID: <87d3d3secb.fsf@rustcorp.com.au>
+	id S1753144Ab1KHIZE (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 8 Nov 2011 03:25:04 -0500
+Message-ID: <4EB8E75D.1010706@suse.cz>
+Date: Tue, 08 Nov 2011 09:25:01 +0100
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Subject: Re: [PATCH] Kbuild: append missing-syscalls to the default target
+ list
+References: <1314234210-11090-1-git-send-email-lacombar@gmail.com> <4E69FEC9.2080204@suse.cz> <CACqU3MUFyn_jh2pN4GLENqcGVUzAwcMJUR_WLY2EtqOhMheceQ@mail.gmail.com> <20111101232233.GA32441@sepie.suse.cz> <20111107204448.GA9949@linux-mips.org> <20111107211900.GB6264@sepie.suse.cz> <20111107233330.GA26705@linux-mips.org>
+In-Reply-To: <20111107233330.GA26705@linux-mips.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Kevin Cernekee <cernekee@gmail.com>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Jan Beulich <JBeulich@novell.com>
+To: Ralf Baechle <ralf@linux-mips.org>
+Cc: Arnaud Lacombe <lacombar@gmail.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-mips@linux-mips.org, David Daney <ddaney@caviumnetworks.com>
 
-On Mon, 7 Nov 2011 11:58:08 -0800, Kevin Cernekee <cernekee@gmail.com> wrote:
-> > I've started a separate patch to add comments to all this.
+On 8.11.2011 00:33, Ralf Baechle wrote:
+> On Mon, Nov 07, 2011 at 10:19:00PM +0100, Michal Marek wrote:
 > 
-> Not sure how you want to handle combining these changes?
+>> Wild guess - does this patch help?
+>>
+>>
+>> diff --git a/Kbuild b/Kbuild
+>> index 4caab4f..77c191a 100644
+>> --- a/Kbuild
+>> +++ b/Kbuild
+>> @@ -94,7 +94,7 @@ targets += missing-syscalls
+>>  quiet_cmd_syscalls = CALL    $<
+>>        cmd_syscalls = $(CONFIG_SHELL) $< $(CC) $(c_flags)
+>>  
+>> -missing-syscalls: scripts/checksyscalls.sh $(offsets-file) FORCE
+>> +missing-syscalls: scripts/checksyscalls.sh $(offsets-file) $(bounds-file) FORCE
+>>  	$(call cmd,syscalls)
+>>  
+>>  # Keep these two files during make clean
 > 
-> I'll just send a V2 that rolls in all of the desired modifications, if
-> there are no objections...
+> No, it didn't.
+> 
+>> If not, please attach logs of make V=1 with clean Linus' tree and with
+>> 5f7efb4c6da9f90cb306923ced2a6494d065a595 reverted.
+> 
+> $ git checkout 31555213f03bca37d2c02e10946296052f4ecfcd
+> $ git revert 5f7efb4c6da9f90cb306923ced2a6494d065a595
+> $ make ARCH=mips ip27_defconfig
+> $ make ARCH=mips V=1 2>&1 | tee log
 
-Please do.  I'll write a comment patch on top of that, too.
+Thanks, can you also post a log without the revert?
 
-Thanks!
-Rusty.
+Michal
