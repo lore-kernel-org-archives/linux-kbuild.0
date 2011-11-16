@@ -1,36 +1,42 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:34950 "EHLO mx2.suse.de"
+Received: from ozlabs.org ([203.10.76.45]:37125 "EHLO ozlabs.org"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755321Ab1KNVag (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 14 Nov 2011 16:30:36 -0500
-Message-ID: <4EC188A5.4040005@suse.cz>
-Date: Mon, 14 Nov 2011 22:31:17 +0100
-From: Michal Marek <mmarek@suse.cz>
+	id S1755327Ab1KPCdH (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 15 Nov 2011 21:33:07 -0500
+From: Rusty Russell <rusty@rustcorp.com.au>
+Subject: Re: [PATCH V2 2/2] module: Fix performance regression on modules with large symbol tables
+In-Reply-To: <4EC0E4040200007800060B1C@nat28.tlf.novell.com>
+References: <73defb5e4bca04a6431392cc341112b1@localhost> <e80b536093214489c32ce319b54b0f80@localhost> <4EC0E4040200007800060B1C@nat28.tlf.novell.com>
+Date: Wed, 16 Nov 2011 10:54:27 +1030
+Message-ID: <87y5vgoqx0.fsf@rustcorp.com.au>
 MIME-Version: 1.0
-Subject: Re: [PATCH] scripts/tags.sh: Add Page flag function magic
-References: <1320340197-9063-1-git-send-email-sboyd@codeaurora.org> <4EC15B2D.5000407@codeaurora.org>
-In-Reply-To: <4EC15B2D.5000407@codeaurora.org>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Stephen Boyd <sboyd@codeaurora.org>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: Jan Beulich <JBeulich@suse.com>, Kevin Cernekee <cernekee@gmail.com>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Dne 14.11.2011 19:17, Stephen Boyd napsal(a):
-> On 11/03/11 10:09, Stephen Boyd wrote:
->> It takes a while to find the macro-magically defined Page*()
->> functions defined in include/linux/page-flags.h if you're new to
->> the kernel. Add some magic to the tags script to transform these
->> macros into the actual functions they are, so that tag jumping in
->> the mm code is a bit easier.
->>
->> Signed-off-by: Stephen Boyd<sboyd@codeaurora.org>
->> ---
->>
->
-> ping?
+On Mon, 14 Nov 2011 08:48:52 +0000, "Jan Beulich" <JBeulich@suse.com> wrote:
+> > +		name = &mod->strtab[src->st_name];
+> > +		if (unlikely(!test_bit(src->st_name, info->strmap))) {
+> > +			/* Symbol name has already been copied; find it. */
+> > +			char *dup;
+> > +
+> > +			for (dup = mod->core_strtab; strcmp(dup, name); dup++)
+> > +				BUG_ON(dup > s);
+> 
+> Aren't you concerned that this again will be rather slow? It would be
+> pretty easy to accelerate by comparing only with the tail of each string
+> (as nothing else can possibly match), moving from string to string instead
+> of from character to character.
 
-Applied to kbuild.git#misc.
+Kevin's central thesis is that this is actually really unusual.
 
-Michal
+I'm not sure how much faster a tail search would be in practice.  We're
+still scanning the string.  Perhaps a "dup[0] == name[0] &&" would
+optimize it almost as well, if gcc doesn't already?
+
+Kevin, you're probably in an optimal position to get numbers on this?
+
+Thanks,
+Rusty.
