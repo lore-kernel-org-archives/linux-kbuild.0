@@ -1,154 +1,98 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-yx0-f174.google.com ([209.85.213.174]:36362 "EHLO
-	mail-yx0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750905Ab1KSGvl (ORCPT
+Received: from mail175c2.megamailservers.com ([69.49.111.75]:47708 "EHLO
+	mail175c2.megamailservers.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751394Ab1KSHwH (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 19 Nov 2011 01:51:41 -0500
-Received: by yenq3 with SMTP id q3so3237041yen.19
-        for <linux-kbuild@vger.kernel.org>; Fri, 18 Nov 2011 22:51:40 -0800 (PST)
-From: Arnaud Lacombe <lacombar@gmail.com>
-Subject: Re: [PATCH] kconfig: Add merge_config.sh script
-Date: Sat, 19 Nov 2011 01:51:30 -0500
-Message-Id: <1321685490-11706-1-git-send-email-lacombar@gmail.com>
-In-Reply-To: <1321567131.25715.32.camel@work-vm>
-References: <1321567131.25715.32.camel@work-vm>
+	Sat, 19 Nov 2011 02:52:07 -0500
+Message-ID: <4EC76049.8020508@gaisler.com>
+Date: Sat, 19 Nov 2011 08:52:41 +0100
+From: "konrad.gaisler" <konrad@gaisler.com>
+MIME-Version: 1.0
+Subject: Re: [PATCH 1/1] kconfig: Add a configuration subtree command to kconfig
+References: <1321625774-12749-1-git-send-email-konrad@gaisler.com> <4EC69F65.20207@xenotime.net> <4EC6E179.1030703@gaisler.com> <CACqU3MV=XzNUv70vP7QtQwC2xgqnY0bX+orDA+aErmJGwdEA_w@mail.gmail.com>
+In-Reply-To: <CACqU3MV=XzNUv70vP7QtQwC2xgqnY0bX+orDA+aErmJGwdEA_w@mail.gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: John Stultz <johnstul@us.ibm.com>
-Cc: Arnaud Lacombe <lacombar@gmail.com>, Sam Ravnborg <sam@ravnborg.org>, gthelen@google.com, tartler@cs.fau.de, Dmitry Fink <Dmitry.Fink@palm.com>, Darren Hart <dvhart@linux.intel.com>, Eric B Munson <ebmunson@us.ibm.com>, Bruce Ashfield <Bruce.Ashfield@windriver.com>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
+To: Arnaud Lacombe <lacombar@gmail.com>
+Cc: Randy Dunlap <rdunlap@xenotime.net>, linux-kernel@vger.kernel.org, linux kbuild list <linux-kbuild@vger.kernel.org>, mmarek@suse.cz, pefoley2@verizon.net, yann.morin.1998@anciens.enib.fr, sam@ravnborg.org, zippel@linux-m68k.org
 
-Hi,
-
-On Thu, Nov 17, 2011 at 4:58 PM, john stultz <johnstul@us.ibm.com> wrote:
-> [...]
+On 11/19/2011 07:23 AM, Arnaud Lacombe wrote:
+> Hi,
 >
-> v2:
->  * Reworked to use alldefconfig instead of the proposed
-> olddefconfig as suggested by Sam Ravnborg.
+> On Fri, Nov 18, 2011 at 5:51 PM, konrad.gaisler<konrad@gaisler.com>  wrote:
+>> On 11/18/2011 07:09 PM, Randy Dunlap wrote:
+>>> (changed linux-config@ to linux-kbuild@vger.kernel.org)
+>>>
+>>> On 11/18/2011 06:16 AM, Konrad Eisele wrote:
+>>>> New kconfig command "subsource":
+>>>> subsource "<kconfig>""<cwd>""<.config>""<title>"<internal_prefix>
+>>>>   <.config_prefix>
+>>>> Allocates<kconfig>    as a configuration subtree using<.config>    as the
+>>>> configuration
+>>>> file to save and load from.<cwd>    is the directory path to switch to for
+>>>> "source" to
+>>>> work, "<title>" is the Menu tile of the subtree,<internal_prefix>    is a
+>>>> internal prefix,
+>>>> and<.config_prefix>    is the prefix to append/remove when
+>>>> saving/loading<.config>.
+>>> That explains what but not why.  You need some justification(s) for such
+>>> a large patch.  Maybe even some example usages.
+>> The patch originated from a buildsystem that uses buildroot and linux.
+>> Both use Kconfig and the buildsystem itself uses Kconfig. To configure
+>> a subproject you have to exit the toplevel Kconfig and restart to
+>> startup a subproject Kconfig, It is even more anoying when looking
+>> inside buildroot. It has in its turn subprojects uClibc, busybox,
+>> linux, crosstools-ng which all use Kconfig. The subtree patch
+>> does make it possible to unify all in one Kconfig.
+>>
+>> As an example, apply the patch, then add to<top>/Kconfig the lines:
+>>
+>> subsource "arch/sparc/Kconfig" "." ".config_sparc" "SPARC config" SPARC_
+>> CONFIG_
+>> subsource "arch/mips/Kconfig" "." ".config_mips" "MIPS config" MIPS_ CONFIG_
+>>
+> ETOOMUCHARGUMENT!
 >
-> v3:
->  * Script improvements from Dmitri.
->  * allnoconfig option from Darren
->  * pre-make exit option from Darren
->  * lots of other fixes/cleanups from Darren.
->  * Fix final check to not compain about config values in comments
+> I wonder if we could not get all these parameters specified
+> dynamically in the Kconfig. This would replace the `mainmenu' entry
+> ala:
 >
-If Dmitri and Darren have direct contribution to the script, shouldn't their
-Signed-off-by tag be present ?
+> config
+>      title "Linux ..."
+>      prefix "CONFIG_"
+>      file .config
+> endconfig
+Yes maybe it can be done that way. Personally I think it is
+more difficult.
 
-> Please let me know if you have any comments or thoughts!
 >
-> CC: Sam Ravnborg <sam@ravnborg.org>
-> CC: gthelen@google.com
-> CC: tartler@cs.fau.de
-> CC: Dmitry Fink <Dmitry.Fink@palm.com>
-> CC: Darren Hart <dvhart@linux.intel.com>
-> CC: Eric B Munson <ebmunson@us.ibm.com>
-> CC: Bruce Ashfield <Bruce.Ashfield@windriver.com>
-> CC: Michal Marek <mmarek@suse.cz>
-> CC: linux-kbuild@vger.kernel.org
-> Signed-off-by: John Stultz <john.stultz@linaro.org>
+> That way, everytime you parse a tree, you can generate the structure
+> on-the-fly in a non-intrusive manner.
+>
+> I have been thinking of doing something like that with a config file,
+> but doing it in the Kconfig would make much more sense.
+>
+> Btw, what are you calling "<internal_prefix>" ?
 
-You'll find below some more nits
+It is a left-over of a previous iteration where I was prefixing all
+symbols to avoid namespace clashes. Now I use the symbol->level
+field. It can be removed to:
 
-1) bail out early on error.
+subsource "<kconfig>""<cwd>""<.config>""<title>"<.config_prefix>
 
-This fixes handling of non-existant file:
 
-Before:
-    % sh scripts/kconfig/merge_config.sh non existant files
-    Merging non
-    sed: can't read non: No such file or directory
-    cat: non: No such file or directory
-    Merging existant
-    sed: can't read existant: No such file or directory
-    cat: existant: No such file or directory
-    Merging files
-    sed: can't read files: No such file or directory
-    cat: files: No such file or directory
-    scripts/kconfig/conf --alldefconfig Kconfig
-    #
-    # configuration written to .config
-    #
+-- Konrad
 
-After:
-
-    % sh scripts/kconfig/merge_config.sh non existant files
-    Merging non
-    sed: can't read non: No such file or directory
-
-2) re-implement argument parsing using sh(1) getopts builtin
-
-3) verify that the script was given enough argument to proceed. There isn't
-much point running the script with less than 2 arguments.
-
-CC: Sam Ravnborg <sam@ravnborg.org>
-CC: gthelen@google.com
-CC: tartler@cs.fau.de
-CC: Dmitry Fink <Dmitry.Fink@palm.com>
-CC: Darren Hart <dvhart@linux.intel.com>
-CC: Eric B Munson <ebmunson@us.ibm.com>
-CC: Bruce Ashfield <Bruce.Ashfield@windriver.com>
-CC: Michal Marek <mmarek@suse.cz>
-CC: linux-kbuild@vger.kernel.org
-Signed-off-by: Arnaud Lacombe <lacombar@gmail.com>
----
- scripts/kconfig/merge_config.sh |   24 ++++++++++++------------
- 1 files changed, 12 insertions(+), 12 deletions(-)
-
-diff --git a/scripts/kconfig/merge_config.sh b/scripts/kconfig/merge_config.sh
-index 890276b..abfd8b2 100755
---- a/scripts/kconfig/merge_config.sh
-+++ b/scripts/kconfig/merge_config.sh
-@@ -20,6 +20,8 @@
- #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- #  See the GNU General Public License for more details.
- 
-+set -e
-+
- clean_up() {
-        rm -f $TMP_FILE
-        exit
-@@ -36,29 +38,27 @@ usage() {
- MAKE=true
- ALLTARGET=alldefconfig
- 
--while true; do
--	case $1 in
--	"-n")
-+while getopts "nmh" opt; do
-+	case ${opt} in
-+	n)
- 		ALLTARGET=allnoconfig
--		shift
--		continue
- 		;;
--	"-m")
-+	m)
- 		MAKE=false
--		shift
--		continue
- 		;;
--	"-h")
-+	h)
- 		usage
- 		exit
- 		;;
--	*)
--		break
--		;;
- 	esac
- done
- 
-+shift $(expr $OPTIND - 1)
- 
-+if [ $# -lt 2 ]; then
-+	usage
-+	exit 1
-+fi
- 
- MERGE_LIST=$*
- SED_CONFIG_EXP="s/^\(# \)\{0,1\}\(CONFIG_[a-zA-Z0-9_]*\)[= ].*/\2/p"
--- 
-1.7.6.153.g78432
+>
+> Thanks,
+>   - Arnaud
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-kernel" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> Please read the FAQ at  http://www.tux.org/lkml/
+>
+>
 
