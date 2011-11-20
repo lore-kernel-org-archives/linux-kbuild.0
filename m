@@ -1,98 +1,33 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail175c2.megamailservers.com ([69.49.111.75]:47708 "EHLO
-	mail175c2.megamailservers.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751394Ab1KSHwH (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 19 Nov 2011 02:52:07 -0500
-Message-ID: <4EC76049.8020508@gaisler.com>
-Date: Sat, 19 Nov 2011 08:52:41 +0100
-From: "konrad.gaisler" <konrad@gaisler.com>
+Received: from cantor2.suse.de ([195.135.220.15]:33095 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751842Ab1KTM4u (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 20 Nov 2011 07:56:50 -0500
+Message-ID: <4EC8F907.4060906@suse.cz>
+Date: Sun, 20 Nov 2011 13:56:39 +0100
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Subject: Re: [PATCH 1/1] kconfig: Add a configuration subtree command to kconfig
-References: <1321625774-12749-1-git-send-email-konrad@gaisler.com> <4EC69F65.20207@xenotime.net> <4EC6E179.1030703@gaisler.com> <CACqU3MV=XzNUv70vP7QtQwC2xgqnY0bX+orDA+aErmJGwdEA_w@mail.gmail.com>
-In-Reply-To: <CACqU3MV=XzNUv70vP7QtQwC2xgqnY0bX+orDA+aErmJGwdEA_w@mail.gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: Re: [PATCH] kconfig: Add merge_config.sh script
+References: <1321567131.25715.32.camel@work-vm>
+In-Reply-To: <1321567131.25715.32.camel@work-vm>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnaud Lacombe <lacombar@gmail.com>
-Cc: Randy Dunlap <rdunlap@xenotime.net>, linux-kernel@vger.kernel.org, linux kbuild list <linux-kbuild@vger.kernel.org>, mmarek@suse.cz, pefoley2@verizon.net, yann.morin.1998@anciens.enib.fr, sam@ravnborg.org, zippel@linux-m68k.org
+To: john stultz <johnstul@us.ibm.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>, Sam Ravnborg <sam@ravnborg.org>, gthelen@google.com, tartler@cs.fau.de, Dmitry Fink <Dmitry.Fink@palm.com>, Darren Hart <dvhart@linux.intel.com>, Eric B Munson <ebmunson@us.ibm.com>, Bruce Ashfield <Bruce.Ashfield@windriver.com>, linux-kbuild@vger.kernel.org
 
-On 11/19/2011 07:23 AM, Arnaud Lacombe wrote:
-> Hi,
->
-> On Fri, Nov 18, 2011 at 5:51 PM, konrad.gaisler<konrad@gaisler.com>  wrote:
->> On 11/18/2011 07:09 PM, Randy Dunlap wrote:
->>> (changed linux-config@ to linux-kbuild@vger.kernel.org)
->>>
->>> On 11/18/2011 06:16 AM, Konrad Eisele wrote:
->>>> New kconfig command "subsource":
->>>> subsource "<kconfig>""<cwd>""<.config>""<title>"<internal_prefix>
->>>>   <.config_prefix>
->>>> Allocates<kconfig>    as a configuration subtree using<.config>    as the
->>>> configuration
->>>> file to save and load from.<cwd>    is the directory path to switch to for
->>>> "source" to
->>>> work, "<title>" is the Menu tile of the subtree,<internal_prefix>    is a
->>>> internal prefix,
->>>> and<.config_prefix>    is the prefix to append/remove when
->>>> saving/loading<.config>.
->>> That explains what but not why.  You need some justification(s) for such
->>> a large patch.  Maybe even some example usages.
->> The patch originated from a buildsystem that uses buildroot and linux.
->> Both use Kconfig and the buildsystem itself uses Kconfig. To configure
->> a subproject you have to exit the toplevel Kconfig and restart to
->> startup a subproject Kconfig, It is even more anoying when looking
->> inside buildroot. It has in its turn subprojects uClibc, busybox,
->> linux, crosstools-ng which all use Kconfig. The subtree patch
->> does make it possible to unify all in one Kconfig.
->>
->> As an example, apply the patch, then add to<top>/Kconfig the lines:
->>
->> subsource "arch/sparc/Kconfig" "." ".config_sparc" "SPARC config" SPARC_
->> CONFIG_
->> subsource "arch/mips/Kconfig" "." ".config_mips" "MIPS config" MIPS_ CONFIG_
->>
-> ETOOMUCHARGUMENT!
->
-> I wonder if we could not get all these parameters specified
-> dynamically in the Kconfig. This would replace the `mainmenu' entry
-> ala:
->
-> config
->      title "Linux ..."
->      prefix "CONFIG_"
->      file .config
-> endconfig
-Yes maybe it can be done that way. Personally I think it is
-more difficult.
+On 17.11.2011 22:58, john stultz wrote:
+> Hey Andrew, 
+> 	I've tried sending this via Michal a few times, but haven't heard much
+> back. So I wanted to check if you would consider merging it via your
+> tree, or if you had any suggestions of who would be better to
+> review/merge this.
 
->
-> That way, everytime you parse a tree, you can generate the structure
-> on-the-fly in a non-intrusive manner.
->
-> I have been thinking of doing something like that with a config file,
-> but doing it in the Kconfig would make much more sense.
->
-> Btw, what are you calling "<internal_prefix>" ?
+My concern was that the script works around missing features in kconfig,
+instead of fixing kconfig. Don't get me wrong, I do believe that the
+script is useful, but if you are submitting to mainline anyway, why
+don't you fix/enhance kconfig in mainline and have a much simpler script
+making use of the enhanced kconfig?
 
-It is a left-over of a previous iteration where I was prefixing all
-symbols to avoid namespace clashes. Now I use the symbol->level
-field. It can be removed to:
-
-subsource "<kconfig>""<cwd>""<.config>""<title>"<.config_prefix>
-
-
--- Konrad
-
->
-> Thanks,
->   - Arnaud
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kernel" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> Please read the FAQ at  http://www.tux.org/lkml/
->
->
-
+Michal
