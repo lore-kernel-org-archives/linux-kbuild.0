@@ -1,33 +1,34 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:33095 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:33955 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751842Ab1KTM4u (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 20 Nov 2011 07:56:50 -0500
-Message-ID: <4EC8F907.4060906@suse.cz>
-Date: Sun, 20 Nov 2011 13:56:39 +0100
+	id S1751447Ab1KTNYe (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 20 Nov 2011 08:24:34 -0500
+Message-ID: <4EC8FF93.7010706@suse.cz>
+Date: Sun, 20 Nov 2011 14:24:35 +0100
 From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Subject: Re: [PATCH] kconfig: Add merge_config.sh script
-References: <1321567131.25715.32.camel@work-vm>
-In-Reply-To: <1321567131.25715.32.camel@work-vm>
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: [PATCH] kconfig: Fix checking return value of 'fwrite'
+References: <87lisype1v.fsf@faui43f.informatik.uni-erlangen.de> <CACqU3MWZuqgpxG7FSvr2LkqTqwF-gQM8hQSnTTpHpcWT2LHGNA@mail.gmail.com>
+In-Reply-To: <CACqU3MWZuqgpxG7FSvr2LkqTqwF-gQM8hQSnTTpHpcWT2LHGNA@mail.gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: john stultz <johnstul@us.ibm.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>, Sam Ravnborg <sam@ravnborg.org>, gthelen@google.com, tartler@cs.fau.de, Dmitry Fink <Dmitry.Fink@palm.com>, Darren Hart <dvhart@linux.intel.com>, Eric B Munson <ebmunson@us.ibm.com>, Bruce Ashfield <Bruce.Ashfield@windriver.com>, linux-kbuild@vger.kernel.org
+To: Reinhard Tartler <Reinhard.Tartler@informatik.uni-erlangen.de>
+Cc: Arnaud Lacombe <lacombar@gmail.com>, linux-kbuild@vger.kernel.org, Jean Sacren <sakiwit@gmail.com>, linux-kernel@vger.kernel.org, vamos-dev@lists.informatik.uni-erlangen.de
 
-On 17.11.2011 22:58, john stultz wrote:
-> Hey Andrew, 
-> 	I've tried sending this via Michal a few times, but haven't heard much
-> back. So I wanted to check if you would consider merging it via your
-> tree, or if you had any suggestions of who would be better to
-> review/merge this.
+On 7.10.2011 05:29, Arnaud Lacombe wrote:
+> Hi,
+> 
+> 2011/10/6 Reinhard Tartler <Reinhard.Tartler@informatik.uni-erlangen.de>:
+>> fwrite indicates '1' written member if a zero-length string is written.
+> you forgot the "Signed-off-by: " part :)
 
-My concern was that the script works around missing features in kconfig,
-instead of fixing kconfig. Don't get me wrong, I do believe that the
-script is useful, but if you are submitting to mainline anyway, why
-don't you fix/enhance kconfig in mainline and have a much simpler script
-making use of the enhanced kconfig?
+Reinhard, can I assume
+
+Signed-off-by: Reinhard Tartler
+<Reinhard.Tartler@informatik.uni-erlangen.de>
+
+? The patch is otherwise correct.
 
 Michal
