@@ -1,104 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:41159 "EHLO mga09.intel.com"
+Received: from mga09.intel.com ([134.134.136.24]:28547 "EHLO mga09.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751748Ab1KUScZ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 21 Nov 2011 13:32:25 -0500
-Message-ID: <4ECA993B.2060407@linux.intel.com>
-Date: Mon, 21 Nov 2011 10:32:27 -0800
+	id S1752007Ab1KUSei (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 21 Nov 2011 13:34:38 -0500
+Message-ID: <4ECA99B2.6080800@linux.intel.com>
+Date: Mon, 21 Nov 2011 10:34:26 -0800
 From: Darren Hart <dvhart@linux.intel.com>
 MIME-Version: 1.0
 Subject: Re: [PATCH] kconfig: Add merge_config.sh script
-References: <1321567131.25715.32.camel@work-vm> <1321685490-11706-1-git-send-email-lacombar@gmail.com>
-In-Reply-To: <1321685490-11706-1-git-send-email-lacombar@gmail.com>
+References: <1321567131.25715.32.camel@work-vm> <4EC8F907.4060906@suse.cz> <CACqU3MUyHgLfLohLKQQV4+WKhpwW3xiS5hM51xtngs1pWUL9pg@mail.gmail.com>
+In-Reply-To: <CACqU3MUyHgLfLohLKQQV4+WKhpwW3xiS5hM51xtngs1pWUL9pg@mail.gmail.com>
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Arnaud Lacombe <lacombar@gmail.com>
-Cc: John Stultz <johnstul@us.ibm.com>, Sam Ravnborg <sam@ravnborg.org>, gthelen@google.com, tartler@cs.fau.de, Dmitry Fink <Dmitry.Fink@palm.com>, Eric B Munson <ebmunson@us.ibm.com>, Bruce Ashfield <Bruce.Ashfield@windriver.com>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
+Cc: Michal Marek <mmarek@suse.cz>, john stultz <johnstul@us.ibm.com>, Andrew Morton <akpm@linux-foundation.org>, Sam Ravnborg <sam@ravnborg.org>, gthelen@google.com, tartler@cs.fau.de, Dmitry Fink <Dmitry.Fink@palm.com>, Eric B Munson <ebmunson@us.ibm.com>, Bruce Ashfield <Bruce.Ashfield@windriver.com>, linux-kbuild@vger.kernel.org
 
-Hi Arnaud,
 
-On 11/18/2011 10:51 PM, Arnaud Lacombe wrote:
+
+On 11/20/2011 10:05 AM, Arnaud Lacombe wrote:
 > Hi,
 > 
-> On Thu, Nov 17, 2011 at 4:58 PM, john stultz <johnstul@us.ibm.com> wrote:
->> [...]
+> On Sun, Nov 20, 2011 at 7:56 AM, Michal Marek <mmarek@suse.cz> wrote:
+>> On 17.11.2011 22:58, john stultz wrote:
+>>> Hey Andrew,
+>>>       I've tried sending this via Michal a few times, but haven't heard much
+>>> back. So I wanted to check if you would consider merging it via your
+>>> tree, or if you had any suggestions of who would be better to
+>>> review/merge this.
 >>
->> v2:
->>  * Reworked to use alldefconfig instead of the proposed
->> olddefconfig as suggested by Sam Ravnborg.
+>> My concern was that the script works around missing features in kconfig,
+>> instead of fixing kconfig. Don't get me wrong, I do believe that the
+>> script is useful, but if you are submitting to mainline anyway, why
+>> don't you fix/enhance kconfig in mainline and have a much simpler script
+>> making use of the enhanced kconfig?
 >>
->> v3:
->>  * Script improvements from Dmitri.
->>  * allnoconfig option from Darren
->>  * pre-make exit option from Darren
->>  * lots of other fixes/cleanups from Darren.
->>  * Fix final check to not compain about config values in comments
->>
-> If Dmitri and Darren have direct contribution to the script, shouldn't their
-> Signed-off-by tag be present ?
+> FWIW, as much as I agree with you, kconfig is currently a bit too
+> static, with too much assumption, do any advanced stuff. I have WIP in
+> the area, but I prefer not giving ETA. In the mean time, I think
+> John's script could fill the gap.
 
-Yes, that would be more correct.
-
-> 
->> Please let me know if you have any comments or thoughts!
->>
->> CC: Sam Ravnborg <sam@ravnborg.org>
->> CC: gthelen@google.com
->> CC: tartler@cs.fau.de
->> CC: Dmitry Fink <Dmitry.Fink@palm.com>
->> CC: Darren Hart <dvhart@linux.intel.com>
->> CC: Eric B Munson <ebmunson@us.ibm.com>
->> CC: Bruce Ashfield <Bruce.Ashfield@windriver.com>
->> CC: Michal Marek <mmarek@suse.cz>
->> CC: linux-kbuild@vger.kernel.org
->> Signed-off-by: John Stultz <john.stultz@linaro.org>
-> 
-> You'll find below some more nits
-> 
-> 1) bail out early on error.
-> 
-> This fixes handling of non-existant file:
-> 
-> Before:
->     % sh scripts/kconfig/merge_config.sh non existant files
->     Merging non
->     sed: can't read non: No such file or directory
->     cat: non: No such file or directory
->     Merging existant
->     sed: can't read existant: No such file or directory
->     cat: existant: No such file or directory
->     Merging files
->     sed: can't read files: No such file or directory
->     cat: files: No such file or directory
->     scripts/kconfig/conf --alldefconfig Kconfig
->     #
->     # configuration written to .config
->     #
-> 
-> After:
-> 
->     % sh scripts/kconfig/merge_config.sh non existant files
->     Merging non
->     sed: can't read non: No such file or directory
-
-An early test (-f) of each non-option argument would be easy enough to
-add, and would provide better error handling/reporting.
-
-> 
-> 2) re-implement argument parsing using sh(1) getopts builtin
-
-I was trying to keep it simple - and I was also concerned about
-colliding with dash/bash inconsistencies. I have no objection to getopt
-if it works consistently in dash and bash. Did you test with dash as
-well as bash?
-
-> 
-> 3) verify that the script was given enough argument to proceed. There isn't
-> much point running the script with less than 2 arguments.
-
-Sure.
+The script is also at least partly usable in older kernel trees without
+having to modify Kconfig there. It has some value as a standalone
+script. Not to say that we shouldn't also see about updating Kconfig as
+well.
 
 -- 
 Darren Hart
