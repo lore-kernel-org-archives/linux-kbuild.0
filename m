@@ -1,23 +1,23 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from imr-db02.mx.aol.com ([205.188.91.96]:60539 "EHLO
-	imr-db02.mx.aol.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754184Ab1KTXKj (ORCPT
+Received: from ims-d14.mx.aol.com ([205.188.249.151]:29284 "EHLO
+	ims-d14.mx.aol.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755044Ab1KUC4j (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 20 Nov 2011 18:10:39 -0500
-Message-Id: <201111202310.pAKNA1VB004668@imr-db02.mx.aol.com>
+	Sun, 20 Nov 2011 21:56:39 -0500
+Message-Id: <201111210254.pAL2swos000758@ims-d14.mx.aol.com>
 Reply-To: <mcbryan@msl01.net-talk.net>
 From: "Microsoft" <Goalie95@aol.com>
-Subject: MSL WINNING NOTIFICATION 2011                                             HEZFNEFIJQ
-Date: Mon, 21 Nov 2011 07:09:16 +0800
+Subject: MSL WINNING NOTIFICATION 2011                                             DBUBXCJIDW
+Date: Mon, 21 Nov 2011 10:54:47 +0800
 MIME-Version: 1.0
 Content-Type: multipart/mixed;
-	boundary="----=_NextPart_000_00BB_01C2A75B.5C5F6F8A"
+	boundary="----=_NextPart_000_0076_01C2A9A6.17AE205E"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 
 This is a multi-part message in MIME format.
 
-------=_NextPart_000_00BB_01C2A75B.5C5F6F8A
+------=_NextPart_000_0076_01C2A9A6.17AE205E
 Content-Type: text/plain;
 	charset="Windows-1251"
 Content-Transfer-Encoding: 7bit
@@ -29,9 +29,9 @@ You have to urgently contact your claims agent to redeem your winning prize.
 Microsoft Lottery
 Managment Board
  
-JKWQPVVQLFBLEPHQDWICBMKPIQPEMKVGTYICGN
+VXICTSNCYHKLEUNXXIKFNFGMQIDODBGDTYXKTQ
 
-------=_NextPart_000_00BB_01C2A75B.5C5F6F8A
+------=_NextPart_000_0076_01C2A9A6.17AE205E
 Content-Type: application/msword;
 	name="MSL-WINNING NOTIFICATION 2011.doc"
 Content-Transfer-Encoding: base64
@@ -1667,4 +1667,4 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 AA==
 
-------=_NextPart_000_00BB_01C2A75B.5C5F6F8A--
+------=_NextPart_000_0076_01C2A9A6.17AE205E--
