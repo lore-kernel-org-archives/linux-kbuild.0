@@ -1,38 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pz0-f42.google.com ([209.85.210.42]:38381 "EHLO
-	mail-pz0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752431Ab1KUG34 convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 21 Nov 2011 01:29:56 -0500
-MIME-Version: 1.0
-In-Reply-To: <87ipme9i9o.fsf@rustcorp.com.au>
+Received: from nat28.tlf.novell.com ([130.57.49.28]:44295 "EHLO
+	nat28.tlf.novell.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754414Ab1KUIId convert rfc822-to-8bit (ORCPT
+	<rfc822;groupwise-linux-kbuild@vger.kernel.org:3:1>);
+	Mon, 21 Nov 2011 03:08:33 -0500
+Message-Id: <4ECA150C0200007800062072@nat28.tlf.novell.com>
+Date: Mon, 21 Nov 2011 08:08:28 +0000
+From: "Jan Beulich" <JBeulich@suse.com>
+Subject: Re: [PATCH V2 2/2] module: Fix performance regression on
+ modules with large symbol tables
 References: <4EC0E4040200007800060B1C@nat28.tlf.novell.com>
-	<63fcc782681c8b3bd330164871ad4785@localhost>
-	<87ipme9i9o.fsf@rustcorp.com.au>
-Date: Sun, 20 Nov 2011 22:29:55 -0800
-Message-ID: <CAJiQ=7CEg0g=By1bKab9A8n6yLqYVKKhAB0TRRczjU9M6vk=xg@mail.gmail.com>
-Subject: Re: [PATCH V2 2/2] module: Fix performance regression on modules with
- large symbol tables
-From: Kevin Cernekee <cernekee@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+ <63fcc782681c8b3bd330164871ad4785@localhost>
+ <87ipme9i9o.fsf@rustcorp.com.au>
+In-Reply-To: <87ipme9i9o.fsf@rustcorp.com.au>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8BIT
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Rusty Russell <rusty@rustcorp.com.au>
-Cc: Jan Beulich <JBeulich@suse.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Kevin Cernekee <cernekee@gmail.com>, Rusty Russell <rusty@rustcorp.com.au>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Sun, Nov 20, 2011 at 9:06 PM, Rusty Russell <rusty@rustcorp.com.au> wrote:
+>>> On 21.11.11 at 06:06, Rusty Russell <rusty@rustcorp.com.au> wrote:
 > On Thu, 17 Nov 2011 19:15:02 -0800, Kevin Cernekee <cernekee@gmail.com> wrote:
-> I'm deeply tempted.  It's very simple, 46 lines shorter, preserves exact
+>> Potential memory savings from reusing EXACT strtab matches: 36,475 bytes
+>> total; 35,432 from nvidia.ko.  For comparison, discarding non-core
+>> strtab entries saved about 91KB on my system.
+> ...
+>> Original scheme: 1.230s
+>> With patch V2: 0.280s
+>> With naive copying: 0.058s
+> 
+> I'm deeply tempted.  It's very simple, 46 lines shorter, preserves exact
 > matches, and doesn't have any strange slowdowns on corner cases.
+> 
+> But like Kevin, I could be convinced either way.  Jan?
 
-Unfortunately, the last patch I posted still makes duplicate copies of
-the exact matches.  And the copy of nvidia.ko I'm looking at right now
-does reuse strtab entries for the duplicated symbols.
+I'd be fine with the simpler solution, as long it is clearly understood
+(and marked as intended to be that was for the time being) that it
+has room for improvement, should it ever turn out to yield more
+significant savings in other contexts.
 
-FWIW, preserving exact matches would save about 35KB on a kernel
-module whose .text + .data + .rodata sections add up to ~9.5MB.
+Jan
 
-I'm sure there are more clever ways to do it, but a fast brute force
-approach could involve storing the core_strtab offsets in a temporary
-array indexed by the original strtab st_name values.
