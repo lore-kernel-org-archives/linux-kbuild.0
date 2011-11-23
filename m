@@ -1,65 +1,65 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from vamos2c.informatik.uni-erlangen.de ([131.188.42.15]:45166 "EHLO
-	vamos2c.informatik.uni-erlangen.de" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1756048Ab1KWGeL (ORCPT
+Received: from mail-ww0-f44.google.com ([74.125.82.44]:44394 "EHLO
+	mail-ww0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755721Ab1KWSFz (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 23 Nov 2011 01:34:11 -0500
-From: Reinhard Tartler <Reinhard.Tartler@informatik.uni-erlangen.de>
-Subject: Re: [PATCH] kconfig: Fix checking return value of 'fwrite'
+	Wed, 23 Nov 2011 13:05:55 -0500
+MIME-Version: 1.0
+In-Reply-To: <877h2r1hb3.fsf@faui43f.informatik.uni-erlangen.de>
 References: <87lisype1v.fsf@faui43f.informatik.uni-erlangen.de>
 	<CACqU3MWZuqgpxG7FSvr2LkqTqwF-gQM8hQSnTTpHpcWT2LHGNA@mail.gmail.com>
-	<4EC8FF93.7010706@suse.cz> <20111123055351.GB14454@mail.gmail.com>
-Date: Wed, 23 Nov 2011 07:30:56 +0100
-In-Reply-To: <20111123055351.GB14454@mail.gmail.com> (Jean Sacren's message of
-	"Tue, 22 Nov 2011 22:53:51 -0700")
-Message-ID: <877h2r1hb3.fsf@faui43f.informatik.uni-erlangen.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+	<4EC8FF93.7010706@suse.cz>
+	<20111123055351.GB14454@mail.gmail.com>
+	<877h2r1hb3.fsf@faui43f.informatik.uni-erlangen.de>
+Date: Wed, 23 Nov 2011 13:05:53 -0500
+Message-ID: <CACqU3MXe3vu8OmcTsU4u8h+zWfOyo455Q-RLAJrADJM4xoJnPg@mail.gmail.com>
+Subject: Re: [PATCH] kconfig: Fix checking return value of 'fwrite'
+From: Arnaud Lacombe <lacombar@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jean Sacren <sakiwit@gmail.com>
-Cc: Michal Marek <mmarek@suse.cz>, Arnaud Lacombe <lacombar@gmail.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, vamos-dev@lists.informatik.uni-erlangen.de, amwang@redhat.com
+To: Reinhard Tartler <Reinhard.Tartler@informatik.uni-erlangen.de>
+Cc: Jean Sacren <sakiwit@gmail.com>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, vamos-dev@lists.informatik.uni-erlangen.de, amwang@redhat.com
 
-On Mi, Nov 23, 2011 at 06:53:51 (CET), Jean Sacren wrote:
+Hi,
 
-> From: Michal Marek <mmarek@suse.cz>
-> Date: Sun, 20 Nov 2011 14:24:35 +0100
+2011/11/23 Reinhard Tartler <Reinhard.Tartler@informatik.uni-erlangen.de>:
+> On Mi, Nov 23, 2011 at 06:53:51 (CET), Jean Sacren wrote:
+>
+>> From: Michal Marek <mmarek@suse.cz>
+>> Date: Sun, 20 Nov 2011 14:24:35 +0100
+>>>
+>>> On 7.10.2011 05:29, Arnaud Lacombe wrote:
+>>> > Hi,
+>>> >
+>>> > 2011/10/6 Reinhard Tartler <Reinhard.Tartler@informatik.uni-erlangen.de>:
+>>> >> fwrite indicates '1' written member if a zero-length string is written.
+>>> > you forgot the "Signed-off-by: " part :)
+>>>
+>>> Reinhard, can I assume
+>>>
+>>> Signed-off-by: Reinhard Tartler
+>>> <Reinhard.Tartler@informatik.uni-erlangen.de>
+>>>
+>>> ? The patch is otherwise correct.
 >>
->> On 7.10.2011 05:29, Arnaud Lacombe wrote:
->> > Hi,
->> > 
->> > 2011/10/6 Reinhard Tartler <Reinhard.Tartler@informatik.uni-erlangen.de>:
->> >> fwrite indicates '1' written member if a zero-length string is written.
->> > you forgot the "Signed-off-by: " part :)
->> 
->> Reinhard, can I assume
->> 
->> Signed-off-by: Reinhard Tartler
->> <Reinhard.Tartler@informatik.uni-erlangen.de>
->> 
->> ? The patch is otherwise correct.
+>> I have two reasons to oppose this patch.
+>>
+>> 1. If 'len' value is zero, there is an issue already and it should be
+>> taken care of _before_ calling fwrite().
 >
-> I have two reasons to oppose this patch.
->
-> 1. If 'len' value is zero, there is an issue already and it should be
-> taken care of _before_ calling fwrite().
+> So you're saying the function assumes a non-empty string? Why?
+AFAIK, fwrite(3) is currently used:
+ 1) in comment printers. Empty comment are not allowed.
+ 2) in a callback passed to expr_print(), where the string printed is
+non-empty[0]
+ 2) in the lexer, auto-generated, and unused
 
-So you're saying the function assumes a non-empty string? Why? It is a
-simple "writing-helper" and this seems a perfectly valid corner case to
-me.  Can you perhaps elaborate why you consider this corner case invalid
-and require (possibly out-of-tree) callers to check this for themselves?
+So Jean's point is valid, but for this comment to be pedantic, I would
+not weakly test for `len > 0', but enforce assumptions above with an
+assertion, by both converting the existing direct call to xfwrite()
+and add `assert(len > 0)' before calling fwrite(3).
 
-> 2. xfwrite() doesn't fix anything except for the compiler warning. It
-> assumes this world is perfect and it's definitely not a place to take
-> care of the zero-length string.
+ - Arnaud
 
-It seems to me that you rather oppose to the introduction of xfwrite()
-than to the patch here at hand. Is that correct?
-
-Cheers,
-Reinhard
-
--- 
-Reinhard Tartler                     Department of Computer Science IV
-Martensstr 1, 91058 Erlangen Germany, University of Erlangen-Nuremberg
-            http://www4.informatik.uni-erlangen.de/~tartler
+[0]: symbol's name is either NULL or a non-empty string.
