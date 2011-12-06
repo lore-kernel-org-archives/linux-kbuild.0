@@ -1,58 +1,23 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga11.intel.com ([192.55.52.93]:18104 "EHLO mga11.intel.com"
+Received: from msgmmp-4.gci.net ([209.165.130.14]:48112 "EHLO msgmmp-4.gci.net"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S932716Ab1LFBGL (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 5 Dec 2011 20:06:11 -0500
-From: "H. Peter Anvin" <hpa@linux.intel.com>
-Subject: [PATCH 1/3] um: Run host archheaders, allow use of host generated headers
-Date: Mon,  5 Dec 2011 17:05:47 -0800
-Message-Id: <1323133549-13590-2-git-send-email-hpa@linux.intel.com>
-In-Reply-To: <1323133549-13590-1-git-send-email-hpa@linux.intel.com>
-References: <1323133549-13590-1-git-send-email-hpa@linux.intel.com>
+	id S932838Ab1LFBwB (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 5 Dec 2011 20:52:01 -0500
+Date: Tue, 06 Dec 2011 01:48:36 +0100
+From: EAGLE RIVER MOTEL <eaglerivermotel@gci.net>
+Reply-to: jingbo.yu009@w.cn
+Message-id: <fbcca6286ee5.4edd7474@gci.net>
+MIME-version: 1.0
+Content-type: text/plain; charset=us-ascii
+Content-language: en
+Content-transfer-encoding: 7BIT
+Content-disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jeff Dike <jdike@addtoit.com>, Richard Weinberger <richard@nod.at>
-Cc: Ingo Molnar <mingo@elte.hu>, Thomas Gleixner <tglx@linutronix.de>, user-mode-linux-devel@lists.sourceforge.net, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, "H. Peter Anvin" <hpa@linux.intel.com>
 
-From: "H. Peter Anvin" <hpa@linux.intel.com>
 
-Run the "archheaders" target for the host architecture, for
-architectures (like x86, now) that want to generate some of the
-necessary header files.
 
-Add $(HOST_DIR)/include/generated to the include path so we then pick
-them up.
-
-Signed-off-by: H. Peter Anvin <hpa@linux.intel.com>
----
- arch/um/Makefile |    7 ++++++-
- 1 files changed, 6 insertions(+), 1 deletions(-)
-
-diff --git a/arch/um/Makefile b/arch/um/Makefile
-index 7730af6..00210e9 100644
---- a/arch/um/Makefile
-+++ b/arch/um/Makefile
-@@ -64,7 +64,8 @@ USER_CFLAGS = $(patsubst $(KERNEL_DEFINES),,$(patsubst -D__KERNEL__,,\
- #This will adjust *FLAGS accordingly to the platform.
- include $(srctree)/$(ARCH_DIR)/Makefile-os-$(OS)
- 
--KBUILD_CPPFLAGS += -I$(srctree)/$(HOST_DIR)/include
-+KBUILD_CPPFLAGS += -I$(srctree)/$(HOST_DIR)/include \
-+		   -I$(HOST_DIR)/include/generated
- 
- # -Derrno=kernel_errno - This turns all kernel references to errno into
- # kernel_errno to separate them from the libc errno.  This allows -fno-common
-@@ -96,6 +97,10 @@ endef
- 
- KBUILD_KCONFIG := $(HOST_DIR)/um/Kconfig
- 
-+archheaders:
-+	$(Q)$(MAKE) -C '$(KBUILD_SRC)' KBUILD_SRC= \
-+		ARCH=$(SUBARCH) O='$(objtree)' archheaders
-+
- archprepare: include/generated/user_constants.h
- 
- LINK-$(CONFIG_LD_SCRIPT_STATIC) += -static
--- 
-1.7.6.4
+Hello,
+ I have a business for you to handle with me. Should you be interested, please contact me.
+Jingbo Yu.
 
