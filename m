@@ -1,194 +1,66 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from faui40.informatik.uni-erlangen.de ([131.188.34.40]:59257 "EHLO
-	faui40.informatik.uni-erlangen.de" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751395Ab1LGGdb (ORCPT
+Received: from mail-pz0-f46.google.com ([209.85.210.46]:58156 "EHLO
+	mail-pz0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751845Ab1LHWGX convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 7 Dec 2011 01:33:31 -0500
-Date: Wed, 7 Dec 2011 07:25:37 +0100
-From: Christian Dietrich <christian.dietrich@informatik.uni-erlangen.de>
-Subject: [PATCH] kbuild: add Makefile snippet to list compiled files
-Message-ID: <20111207062524.GA6570@faui49.informatik.uni-erlangen.de>
+	Thu, 8 Dec 2011 17:06:23 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+In-Reply-To: <1323133549-13590-2-git-send-email-hpa@linux.intel.com>
+References: <1323133549-13590-1-git-send-email-hpa@linux.intel.com>
+	<1323133549-13590-2-git-send-email-hpa@linux.intel.com>
+Date: Thu, 8 Dec 2011 23:06:22 +0100
+Message-ID: <CAFLxGvxuP64FzhKcL5bL2vv=sfQ0ZB2U_xXd4MkAF006RJfZrA@mail.gmail.com>
+Subject: Re: [PATCH 1/3] um: Run host archheaders, allow use of host generated headers
+From: richard -rw- weinberger <richard.weinberger@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: vamos-dev@i4.informatik.uni-erlangen.de
+To: "H. Peter Anvin" <hpa@linux.intel.com>
+Cc: Jeff Dike <jdike@addtoit.com>, Richard Weinberger <richard@nod.at>, Ingo Molnar <mingo@elte.hu>, Thomas Gleixner <tglx@linutronix.de>, user-mode-linux-devel@lists.sourceforge.net, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-To list the compilation units compiled by the current configuration the
-scripts/Makefile.list can be executed. It supports:
+On Tue, Dec 6, 2011 at 2:05 AM, H. Peter Anvin <hpa@linux.intel.com> wrote:
+> From: "H. Peter Anvin" <hpa@linux.intel.com>
+>
+> Run the "archheaders" target for the host architecture, for
+> architectures (like x86, now) that want to generate some of the
+> necessary header files.
+>
+> Add $(HOST_DIR)/include/generated to the include path so we then pick
+> them up.
+>
+> Signed-off-by: H. Peter Anvin <hpa@linux.intel.com>
+> ---
+>  arch/um/Makefile |    7 ++++++-
+>  1 files changed, 6 insertions(+), 1 deletions(-)
+>
+> diff --git a/arch/um/Makefile b/arch/um/Makefile
+> index 7730af6..00210e9 100644
+> --- a/arch/um/Makefile
+> +++ b/arch/um/Makefile
+> @@ -64,7 +64,8 @@ USER_CFLAGS = $(patsubst $(KERNEL_DEFINES),,$(patsubst -D__KERNEL__,,\
+>  #This will adjust *FLAGS accordingly to the platform.
+>  include $(srctree)/$(ARCH_DIR)/Makefile-os-$(OS)
+>
+> -KBUILD_CPPFLAGS += -I$(srctree)/$(HOST_DIR)/include
+> +KBUILD_CPPFLAGS += -I$(srctree)/$(HOST_DIR)/include \
+> +                  -I$(HOST_DIR)/include/generated
+>
+>  # -Derrno=kernel_errno - This turns all kernel references to errno into
+>  # kernel_errno to separate them from the libc errno.  This allows -fno-common
+> @@ -96,6 +97,10 @@ endef
+>
+>  KBUILD_KCONFIG := $(HOST_DIR)/um/Kconfig
+>
+> +archheaders:
+> +       $(Q)$(MAKE) -C '$(KBUILD_SRC)' KBUILD_SRC= \
+> +               ARCH=$(SUBARCH) O='$(objtree)' archheaders
+> +
 
-- printing of all compilation units
-- all directories considered for compilation units
-- test if a given file is compiled by the configuration
-- use a different auto.conf
+This does not work, KBUILD_SRC is empty.
+I'm not a kbuild expert, but I think the usage of KBUILD_SRC is in general
+not allowed.
 
-Signed-off-by: Christian Dietrich <christian.dietrich@informatik.uni-erlangen.de>
----
- Hi,
-
- the following patch is a result of our research work at VAMOS[1],
- where we try to examine the perconditions under which a file is
- compiled into the linux kernel.
-
- While working on this, we needed a way to get all compilation units,
- which are compiled with the current configuration. And since this
- might be useful for others, I think it would be great to have this
- possibility in the mainline kernel.
-
- chris
-
- [1] http://vamos.informatik.uni-erlangen.de
-
- scripts/Makefile.list           |   48 ++++++++++++++++++++++
- scripts/Makefile.list_recursion |   83 +++++++++++++++++++++++++++++++++++++++
- 2 files changed, 131 insertions(+), 0 deletions(-)
- create mode 100644 scripts/Makefile.list
- create mode 100644 scripts/Makefile.list_recursion
-
-diff --git a/scripts/Makefile.list b/scripts/Makefile.list
-new file mode 100644
-index 0000000..725500b
---- /dev/null
-+++ b/scripts/Makefile.list
-@@ -0,0 +1,48 @@
-+# -*- mode: makefile -*-#
-+#===============================================
-+# Listing files compiled by current configuration
-+#
-+# For retrieving a list of files compiled into the kernel with the current
-+# configuration use (in a kernel source tree)
-+# - make -f scripts/Makefile.list
-+#   options:
-+#     print_files - print all compiles files (default: "y")
-+#     print_dirs  - print all directories considered for compilation (default: "")
-+#
-+# If you want to check if a file is compiled by the current configuration
-+# - make -f scripts/Makefile.list compiled=kernel/sched.c
-+#
-+# You can also override, which auto.conf should be loaded, when the source
-+# tree is traversed
-+# - make -f scripts/Makefile.list auto_conf=another/path/to/auto.conf
-+
-+list:
-+
-+# We include the main Makefile to get a list of all considered
-+# directories.
-+include $(if $(KBUILD_SRC),$(srctree)/)Makefile
-+
-+list-dirs      := $(addprefix _list_, . $(vmlinux-alldirs))
-+
-+# Default value for print_files
-+print_files ?= y
-+
-+PHONY += $(list-dirs) list
-+$(list-dirs):
-+ifeq ($(compiled),)
-+	$(Q)$(MAKE) $(list) \
-+		auto_conf=$(auto_conf) \
-+		print_dirs=$(print_dirs) \
-+		print_files=$(print_files) \
-+		obj=$(patsubst _list_%,%,$@)
-+else
-+	$(Q)$(MAKE) $(list) \
-+		auto_conf=$(auto_conf) \
-+		compiled=$(patsubst %.c,%.o,$(compiled)) \
-+		obj=$(patsubst _list_%,%,$@)
-+endif
-+
-+list: $(list-dirs)
-+
-+list := -f $(if $(KBUILD_SRC),$(srctree)/)scripts/Makefile.list_recursion
-+
-diff --git a/scripts/Makefile.list_recursion b/scripts/Makefile.list_recursion
-new file mode 100644
-index 0000000..e448a06
---- /dev/null
-+++ b/scripts/Makefile.list_recursion
-@@ -0,0 +1,83 @@
-+# This is the recursive part of scripts/Makefile.list
-+# Have a look there if you are interested in modes of operation
-+#==============================================================
-+src := $(obj)
-+
-+PHONY := __list __find
-+
-+ifeq ($(compiled),)
-+__list:
-+else
-+__find:
-+endif
-+
-+# Read auto.conf if it exists, otherwise ignore
-+ifeq ($(auto_conf),)
-+-include include/config/auto.conf
-+else
-+include $(auto_conf)
-+endif
-+
-+# The filename Kbuild has precedence over Makefile
-+kbuild-dir := $(if $(filter /%,$(src)),$(src),$(srctree)/$(src))
-+include $(if $(wildcard $(kbuild-dir)/Kbuild), $(kbuild-dir)/Kbuild, $(kbuild-dir)/Makefile)
-+
-+# Figure out what we need to build from the various variables
-+# ==========================================================================
-+
-+__subdir-y	:= $(patsubst %/,%,$(filter %/, $(obj-y)))
-+subdir-y	+= $(__subdir-y)
-+__subdir-m	:= $(patsubst %/,%,$(filter %/, $(obj-m)))
-+subdir-m	+= $(__subdir-m)
-+__subdir-n	:= $(patsubst %/,%,$(filter %/, $(obj-n)))
-+subdir-n	+= $(__subdir-n)
-+__subdir-	:= $(patsubst %/,%,$(filter %/, $(obj-)))
-+subdir-		+= $(__subdir-)
-+
-+# Subdirectories we need to descend into
-+subdir-ym	:= $(sort $(subdir-y) $(subdir-m))
-+subdir-ymn      := $(sort $(subdir-ym) $(subdir-n) $(subdir-))
-+
-+include scripts/Makefile.lib
-+
-+__list: $(subdir-ym)
-+ifneq ($(print_dirs),)
-+	@echo $(obj)/
-+endif
-+ifneq ($(print_files),)
-+ifneq ($(strip $(real-objs-y)),)
-+	@for a in $(real-objs-y); do \
-+		echo $$a y; \
-+	done
-+endif
-+ifneq ($(strip $(real-objs-m)),)
-+	@for a in $(real-objs-m); do \
-+		echo $$a m; \
-+	done
-+endif
-+endif
-+	@:
-+
-+__find: $(foreach dir,$(subdir-ym),$(if $(filter $(dir)%,$(compiled)), $(dir)))
-+ifneq ($(filter $(compiled),$(real-objs-y)),)
-+	@echo $(compiled) y
-+endif
-+ifneq ($(filter $(compiled),$(real-objs-m)),)
-+	@echo $(compiled) m
-+endif
-+	@:
-+
-+
-+list := -f $(if $(KBUILD_SRC),$(srctree)/)scripts/Makefile.list_recursion
-+
-+PHONY += $(subdir-ym)
-+$(subdir-ym):
-+ifeq ($(compiled),)
-+	$(Q)$(MAKE) $(list) obj=$(patsubst _list_%,%,$@)
-+else
-+	$(Q)$(MAKE) $(list) compiled=$(compiled) obj=$(patsubst _list_%,%,$@)
-+endif
-+
-+# Declare the contents of the .PHONY variable as phony.  We keep that
-+# information in a variable se we can use it in if_changed and friends.
-+.PHONY: $(PHONY)
 -- 
-1.7.1
+Thanks,
+//richard
