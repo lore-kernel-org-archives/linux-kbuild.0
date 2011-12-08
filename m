@@ -1,66 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pz0-f46.google.com ([209.85.210.46]:58156 "EHLO
-	mail-pz0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751845Ab1LHWGX convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 8 Dec 2011 17:06:23 -0500
+Received: from pserver.infoseka.lt ([78.158.28.5]:56680 "EHLO infoseka.lt"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1751447Ab1LICGh (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 8 Dec 2011 21:06:37 -0500
+Message-ID: <36b01e96b9a62883bf3b7b92a74c358d.squirrel@webmail.infoseka.lt>
+Date: Thu, 8 Dec 2011 18:54:33 +0200 (EET)
+Subject: Final Notice
+From: "Y/Msn" <noreply@yahoo.com>
+Reply-To: barclays_transfer_group_dept@hotmail.com
 MIME-Version: 1.0
-In-Reply-To: <1323133549-13590-2-git-send-email-hpa@linux.intel.com>
-References: <1323133549-13590-1-git-send-email-hpa@linux.intel.com>
-	<1323133549-13590-2-git-send-email-hpa@linux.intel.com>
-Date: Thu, 8 Dec 2011 23:06:22 +0100
-Message-ID: <CAFLxGvxuP64FzhKcL5bL2vv=sfQ0ZB2U_xXd4MkAF006RJfZrA@mail.gmail.com>
-Subject: Re: [PATCH 1/3] um: Run host archheaders, allow use of host generated headers
-From: richard -rw- weinberger <richard.weinberger@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain;charset=lt_LT
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "H. Peter Anvin" <hpa@linux.intel.com>
-Cc: Jeff Dike <jdike@addtoit.com>, Richard Weinberger <richard@nod.at>, Ingo Molnar <mingo@elte.hu>, Thomas Gleixner <tglx@linutronix.de>, user-mode-linux-devel@lists.sourceforge.net, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Tue, Dec 6, 2011 at 2:05 AM, H. Peter Anvin <hpa@linux.intel.com> wrote:
-> From: "H. Peter Anvin" <hpa@linux.intel.com>
->
-> Run the "archheaders" target for the host architecture, for
-> architectures (like x86, now) that want to generate some of the
-> necessary header files.
->
-> Add $(HOST_DIR)/include/generated to the include path so we then pick
-> them up.
->
-> Signed-off-by: H. Peter Anvin <hpa@linux.intel.com>
-> ---
->  arch/um/Makefile |    7 ++++++-
->  1 files changed, 6 insertions(+), 1 deletions(-)
->
-> diff --git a/arch/um/Makefile b/arch/um/Makefile
-> index 7730af6..00210e9 100644
-> --- a/arch/um/Makefile
-> +++ b/arch/um/Makefile
-> @@ -64,7 +64,8 @@ USER_CFLAGS = $(patsubst $(KERNEL_DEFINES),,$(patsubst -D__KERNEL__,,\
->  #This will adjust *FLAGS accordingly to the platform.
->  include $(srctree)/$(ARCH_DIR)/Makefile-os-$(OS)
->
-> -KBUILD_CPPFLAGS += -I$(srctree)/$(HOST_DIR)/include
-> +KBUILD_CPPFLAGS += -I$(srctree)/$(HOST_DIR)/include \
-> +                  -I$(HOST_DIR)/include/generated
->
->  # -Derrno=kernel_errno - This turns all kernel references to errno into
->  # kernel_errno to separate them from the libc errno.  This allows -fno-common
-> @@ -96,6 +97,10 @@ endef
->
->  KBUILD_KCONFIG := $(HOST_DIR)/um/Kconfig
->
-> +archheaders:
-> +       $(Q)$(MAKE) -C '$(KBUILD_SRC)' KBUILD_SRC= \
-> +               ARCH=$(SUBARCH) O='$(objtree)' archheaders
-> +
+Dear Internet User!
 
-This does not work, KBUILD_SRC is empty.
-I'm not a kbuild expert, but I think the usage of KBUILD_SRC is in general
-not allowed.
+Congratulations! you and your family have won 500,000 GBP from the
+Microsoft Family Benefit 2011 for being a regular web user.Your winnings
+has been
+submitted to BARCLAYS BANK OF SCOTLAND. Contact the Bank with your full
+info for claims.:
 
--- 
-Thanks,
-//richard
+Send mail to the Transfer Manager:
+
+Transfer Manager: Robert Williams
+Email: barclays_transfer_group_dept@hotmail.com
+
+Bank Name: Barclays Bank Of Scotland
+
+1.Name:
+2.Address:
+3.Telephone Number:
+4.Sex:
+Account Name:
+Account Number:
+Bank Name:
+
+
+Please use this as a subject of contact : TRANSFER/NUM/1090.
+
+Congratulations!!!
+Microsoft Window
+
