@@ -1,45 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pserver.infoseka.lt ([78.158.28.5]:56680 "EHLO infoseka.lt"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1751447Ab1LICGh (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 8 Dec 2011 21:06:37 -0500
-Message-ID: <36b01e96b9a62883bf3b7b92a74c358d.squirrel@webmail.infoseka.lt>
-Date: Thu, 8 Dec 2011 18:54:33 +0200 (EET)
-Subject: Final Notice
-From: "Y/Msn" <noreply@yahoo.com>
-Reply-To: barclays_transfer_group_dept@hotmail.com
+Received: from makhamali.info.com.np ([203.78.160.38]:57248 "EHLO
+	ns1.info.com.np" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1751693Ab1LIPCp (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 9 Dec 2011 10:02:45 -0500
+Subject: =?UTF-8?B?UHJvZHVjdCBPcmRlcg==?=
+From: "=?UTF-8?B?IlNJTUtJTlMgTFREIg==?=" <simkinsltd@gmail.com>
+Date: Fri, 09 Dec 2011 18:31:55 +0545
+Reply-To: "=?UTF-8?B?IlNJTUtJTlMgTFREIg==?=" <simkinsltd@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain;charset=lt_LT
+Content-Type: text/plain;
+	charset="UTF-8"
 Content-Transfer-Encoding: 8bit
+Message-Id: <20111209124655.D2DE5343EF6@ns1.info.com.np>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-
-Dear Internet User!
-
-Congratulations! you and your family have won 500,000 GBP from the
-Microsoft Family Benefit 2011 for being a regular web user.Your winnings
-has been
-submitted to BARCLAYS BANK OF SCOTLAND. Contact the Bank with your full
-info for claims.:
-
-Send mail to the Transfer Manager:
-
-Transfer Manager: Robert Williams
-Email: barclays_transfer_group_dept@hotmail.com
-
-Bank Name: Barclays Bank Of Scotland
-
-1.Name:
-2.Address:
-3.Telephone Number:
-4.Sex:
-Account Name:
-Account Number:
-Bank Name:
+To: simkinsltd@gmail.com
 
 
-Please use this as a subject of contact : TRANSFER/NUM/1090.
 
-Congratulations!!!
-Microsoft Window
+Hello,
+
+I am Manager of SIMKINS LTD. USA, My company is interested in the
+purchase of your products.
+
+Kindly send me an email with details of:
+
+*Minimum Order Quantity
+*Your delivery time
+*Payment terms
+*And your products warranty
+
+I await to hear from you urgently
+Mr Stefan Al Simkins.
+Purchasing Manager.
+SIMKINS LTD
+
+___________________________________
+NOCC, http://nocc.sourceforge.net
+
+
+
+
 
