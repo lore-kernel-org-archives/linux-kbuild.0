@@ -1,49 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:35946 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:37677 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751157Ab1LJNy7 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 10 Dec 2011 08:54:59 -0500
-Date: Sat, 10 Dec 2011 14:54:56 +0100
+	id S1751346Ab1LJO1M (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 10 Dec 2011 09:27:12 -0500
+Message-ID: <4EE36C43.2040508@suse.cz>
+Date: Sat, 10 Dec 2011 15:27:15 +0100
 From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [PATCH] unifdef: drop unused errno.h include
-Message-ID: <20111210135456.GB22866@sepie.suse.cz>
-References: <1323210410-27111-1-git-send-email-vapier@gentoo.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1323210410-27111-1-git-send-email-vapier@gentoo.org>
+Subject: Re: Rewriting kernel config after generation
+References: <20111202053342.GA13877@p183.telecom.by> <CACVxJT94xTVO3i7tzLwrjTkFdr3+ve2e1VBg6UjzVfvthtgDfw@mail.gmail.com>
+In-Reply-To: <CACVxJT94xTVO3i7tzLwrjTkFdr3+ve2e1VBg6UjzVfvthtgDfw@mail.gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Mike Frysinger <vapier@gentoo.org>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Tony Finch <dot@dotat.at>
+To: Alexey Dobriyan <adobriyan@gmail.com>
+Cc: sam@ravnborg.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Tue, Dec 06, 2011 at 05:26:50PM -0500, Mike Frysinger wrote:
-> This is the only header on my system that ends up requiring kernel
-> headers, so if the kernel headers aren't available, we end up being
-> unable to install kernel headers :).
+On 6.12.2011 12:45, Alexey Dobriyan wrote:
+> On Fri, Dec 2, 2011 at 7:33 AM, Alexey Dobriyan <adobriyan@gmail.com> wrote:
+>> I'm trying to add compiling with -march=native to the kernel.
+>> The problem is that then some config options become discoverable at
+>> the beginning of the compilation. For example,
+>> CONFIG_X86_L1_CACHE_SHIFT=6 can be derived from "--param l1-cache-line-size=64".
+>> I suspect this is no-go, because all the dependency logic must be
+>> duplicated somewhere else (in the march=native script) for the above
+>> to work.
+>>
+>> Is there any cleaner way I'm missing?
+>>
+>> In theory, such script could even turn off CONFIG_CPU_SUP_AMD
+>> if it detects Intel CPU.
 > 
-> Since this file doesn't actually use anything from errno.h, drop
-> the include so it at least makes us a bit more robust on glibc.
-> 
-> Signed-off-by: Mike Frysinger <vapier@gentoo.org>
-> ---
->  scripts/unifdef.c |    1 -
->  1 files changed, 0 insertions(+), 1 deletions(-)
-> 
-> diff --git a/scripts/unifdef.c b/scripts/unifdef.c
-> index 7493c0e..c5dfae5 100644
-> --- a/scripts/unifdef.c
-> +++ b/scripts/unifdef.c
-> @@ -48,7 +48,6 @@
->  
->  #include <ctype.h>
->  #include <err.h>
-> -#include <errno.h>
->  #include <stdarg.h>
->  #include <stdbool.h>
->  #include <stdio.h>
+> Hrph, this is harder than it looks because "silentoldconfig" is done at
+> the beginning rewriting whatever changes done to .config by hand. :-(
 
-Adding unifdef upstream maintainer to Cc. I can apply the patch to the
-kernel copy if there is no objection from Tony.
+X86_L1_CACHE_SHIFT has no prompt, so it cannot be modified by the user.
+You would need to add a prompt if you want to modify it, e.g.
+
+config X86_L1_CACHE_SHIFT
+        int
+	prompt "..." if X86_MARCH_NATIVE
+
+But I wonder why is this needed. To build for the native cpu, you only
+need to detect what cpu you are running and select the matching
+processor family. The x86 Kconfig/Makefile will then take care of
+setting the right kconfig options and the right -march= parameter for gcc.
 
 Michal
