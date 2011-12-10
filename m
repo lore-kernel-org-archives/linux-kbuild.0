@@ -1,50 +1,56 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:37677 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:38693 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751346Ab1LJO1M (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 10 Dec 2011 09:27:12 -0500
-Message-ID: <4EE36C43.2040508@suse.cz>
-Date: Sat, 10 Dec 2011 15:27:15 +0100
+	id S1751190Ab1LJOnZ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 10 Dec 2011 09:43:25 -0500
+Message-ID: <4EE37010.6060207@suse.cz>
+Date: Sat, 10 Dec 2011 15:43:28 +0100
 From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Subject: Re: Rewriting kernel config after generation
-References: <20111202053342.GA13877@p183.telecom.by> <CACVxJT94xTVO3i7tzLwrjTkFdr3+ve2e1VBg6UjzVfvthtgDfw@mail.gmail.com>
-In-Reply-To: <CACVxJT94xTVO3i7tzLwrjTkFdr3+ve2e1VBg6UjzVfvthtgDfw@mail.gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [PATCH] headers_install: avoid those .install & ..install.cmd
+ unused files
+References: <CAH5vBdJ=Ws7FvO-KXUmOvg6jTuGCX9mZG77A8-38g1Lh=CchnA@mail.gmail.com>
+In-Reply-To: <CAH5vBdJ=Ws7FvO-KXUmOvg6jTuGCX9mZG77A8-38g1Lh=CchnA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Alexey Dobriyan <adobriyan@gmail.com>
-Cc: sam@ravnborg.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Cheng Renquan <crquan@gmail.com>
+Cc: linux-kbuild@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>
 
-On 6.12.2011 12:45, Alexey Dobriyan wrote:
-> On Fri, Dec 2, 2011 at 7:33 AM, Alexey Dobriyan <adobriyan@gmail.com> wrote:
->> I'm trying to add compiling with -march=native to the kernel.
->> The problem is that then some config options become discoverable at
->> the beginning of the compilation. For example,
->> CONFIG_X86_L1_CACHE_SHIFT=6 can be derived from "--param l1-cache-line-size=64".
->> I suspect this is no-go, because all the dependency logic must be
->> duplicated somewhere else (in the march=native script) for the above
->> to work.
->>
->> Is there any cleaner way I'm missing?
->>
->> In theory, such script could even turn off CONFIG_CPU_SUP_AMD
->> if it detects Intel CPU.
+On 3.12.2011 10:24, Cheng Renquan wrote:
+> The modules_install, firmware_install, all install commands
+> don't generate such hidden unused files under destination;
+> I think headers_install also should not to generate such .install
+> & ..install.cmd files;
+> Usually, we call "make headers_install INSTALL_HDR_PATH=/some/path"
+> expecting it install just the header files, not those dot files;
 > 
-> Hrph, this is harder than it looks because "silentoldconfig" is done at
-> the beginning rewriting whatever changes done to .config by hand. :-(
+> The original "call if_changed" could generate ..install.cmd and
+> together with "touch .install" could make the 2nd time headers_install
+> quite faster but it's not meaningful here, because we usually only install once;
 
-X86_L1_CACHE_SHIFT has no prompt, so it cannot be modified by the user.
-You would need to add a prompt if you want to modify it, e.g.
+I think it makes sense for any *_install target to run the whole install
+sequence. The slight problem is that headers_check has an explicit
+dependency on headers_install, so someone doing
+   make headers_install && make headers_check
+might not like the change.
 
-config X86_L1_CACHE_SHIFT
-        int
-	prompt "..." if X86_MARCH_NATIVE
 
-But I wonder why is this needed. To build for the native cpu, you only
-need to detect what cpu you are running and select the matching
-processor family. The x86 Kconfig/Makefile will then take care of
-setting the right kconfig options and the right -march= parameter for gcc.
+> diff --git a/scripts/Makefile.headersinst b/scripts/Makefile.headersinst
+> index a57f5bd..b3deff2 100644
+> --- a/scripts/Makefile.headersinst
+> +++ b/scripts/Makefile.headersinst
+> @@ -54,8 +54,7 @@ quiet_cmd_install = INSTALL $(printdir) ($(words
+> $(all-files))\
+>          $(PERL) $< $(objtree)/$(obj) $(install) $(SRCARCH) $(objhdr-y); \
+>          for F in $(wrapper-files); do                                   \
+>                  echo "\#include <asm-generic/$$F>" > $(install)/$$F;    \
+> -        done;                                                           \
+> -        touch $@
+> +        done
+
+If you are removing the .install marker, then please also remove any
+reference to it from the makefile.
 
 Michal
