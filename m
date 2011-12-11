@@ -1,56 +1,38 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:38693 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:59301 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751190Ab1LJOnZ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 10 Dec 2011 09:43:25 -0500
-Message-ID: <4EE37010.6060207@suse.cz>
-Date: Sat, 10 Dec 2011 15:43:28 +0100
+	id S1752349Ab1LKU10 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 11 Dec 2011 15:27:26 -0500
+Date: Sun, 11 Dec 2011 21:27:22 +0100
 From: Michal Marek <mmarek@suse.cz>
+Subject: Re: [PATCH] kbuild: fix warnings by specifing format arguments
+Message-ID: <20111211202722.GA21410@sepie.suse.cz>
+References: <alpine.LNX.2.00.1110221317230.59156@linux>
 MIME-Version: 1.0
-Subject: Re: [PATCH] headers_install: avoid those .install & ..install.cmd
- unused files
-References: <CAH5vBdJ=Ws7FvO-KXUmOvg6jTuGCX9mZG77A8-38g1Lh=CchnA@mail.gmail.com>
-In-Reply-To: <CAH5vBdJ=Ws7FvO-KXUmOvg6jTuGCX9mZG77A8-38g1Lh=CchnA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <alpine.LNX.2.00.1110221317230.59156@linux>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Cheng Renquan <crquan@gmail.com>
-Cc: linux-kbuild@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>
+To: Peter Foley <pefoley2@verizon.net>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild Mailing List <linux-kbuild@vger.kernel.org>
 
-On 3.12.2011 10:24, Cheng Renquan wrote:
-> The modules_install, firmware_install, all install commands
-> don't generate such hidden unused files under destination;
-> I think headers_install also should not to generate such .install
-> & ..install.cmd files;
-> Usually, we call "make headers_install INSTALL_HDR_PATH=/some/path"
-> expecting it install just the header files, not those dot files;
+On Sat, Oct 22, 2011 at 01:19:02PM -0400, Peter Foley wrote:
+> Specify format arguments to fix warnings.
 > 
-> The original "call if_changed" could generate ..install.cmd and
-> together with "touch .install" could make the 2nd time headers_install
-> quite faster but it's not meaningful here, because we usually only install once;
+>   HOSTCC  scripts/kconfig/gconf.o
+> /usr/src/lto/scripts/kconfig/gconf.c: In function 'on_introduction1_activate':
+> /usr/src/lto/scripts/kconfig/gconf.c:686:6: warning: format not a string literal and no format arguments
+> /usr/src/lto/scripts/kconfig/gconf.c: In function 'on_about1_activate':
+> /usr/src/lto/scripts/kconfig/gconf.c:704:6: warning: format not a string literal and no format arguments
+> /usr/src/lto/scripts/kconfig/gconf.c: In function 'on_license1_activate':
+> /usr/src/lto/scripts/kconfig/gconf.c:723:6: warning: format not a string literal and no format arguments
+> 
+> Signed-off-by: Peter Foley <pefoley2@verizon.net>
+> ---
+>  scripts/kconfig/gconf.c |    6 +++---
+>  1 files changed, 3 insertions(+), 3 deletions(-)
 
-I think it makes sense for any *_install target to run the whole install
-sequence. The slight problem is that headers_check has an explicit
-dependency on headers_install, so someone doing
-   make headers_install && make headers_check
-might not like the change.
-
-
-> diff --git a/scripts/Makefile.headersinst b/scripts/Makefile.headersinst
-> index a57f5bd..b3deff2 100644
-> --- a/scripts/Makefile.headersinst
-> +++ b/scripts/Makefile.headersinst
-> @@ -54,8 +54,7 @@ quiet_cmd_install = INSTALL $(printdir) ($(words
-> $(all-files))\
->          $(PERL) $< $(objtree)/$(obj) $(install) $(SRCARCH) $(objhdr-y); \
->          for F in $(wrapper-files); do                                   \
->                  echo "\#include <asm-generic/$$F>" > $(install)/$$F;    \
-> -        done;                                                           \
-> -        touch $@
-> +        done
-
-If you are removing the .install marker, then please also remove any
-reference to it from the makefile.
+Applied to kbuild.git#kconfig.
 
 Michal
