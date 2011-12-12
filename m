@@ -1,33 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from serv2.oss.ntt.co.jp ([222.151.198.100]:50650 "EHLO
-	serv2.oss.ntt.co.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752878Ab1LLDho (ORCPT
+Received: from ppsw-41.csi.cam.ac.uk ([131.111.8.141]:36041 "EHLO
+	ppsw-41.csi.cam.ac.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751726Ab1LLLGv (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 11 Dec 2011 22:37:44 -0500
-Message-ID: <4EE57241.90400@oss.ntt.co.jp>
-Date: Mon, 12 Dec 2011 12:17:21 +0900
-From: =?UTF-8?B?RmVybmFuZG8gTHVpcyBWw6F6cXVleiBDYW8=?=
-	<fernando@oss.ntt.co.jp>
+	Mon, 12 Dec 2011 06:06:51 -0500
+Date: Mon, 12 Dec 2011 11:06:44 +0000
+From: Tony Finch <dot@dotat.at>
+Subject: Re: [PATCH] unifdef: drop unused errno.h include
+In-Reply-To: <20111210135456.GB22866@sepie.suse.cz>
+Message-ID: <alpine.LSU.2.00.1112121040090.5322@hermes-2.csi.cam.ac.uk>
+References: <1323210410-27111-1-git-send-email-vapier@gentoo.org> <20111210135456.GB22866@sepie.suse.cz>
 MIME-Version: 1.0
-Subject: [PATCH] scripts/genksyms: clean lex/yacc generated files
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>
+Cc: Mike Frysinger <vapier@gentoo.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Add "keywords.hash.c", "lex.lex.c", "parse.tab.c" and "parse.tab.h" to clean-list
-so that they get automagically deleted at clean/mrproper time.
+On Tue, Dec 06, 2011 at 05:26:50PM -0500, Mike Frysinger wrote:
+>
+> This is the only header on my system that ends up requiring kernel
+> headers, so if the kernel headers aren't available, we end up being
+> unable to install kernel headers :).
 
-Signed-off-by: Fernando Luis Vazquez Cao<fernando@oss.ntt.co.jp>
----
+I have some sympathy for this problem but I tend to think that it's
+unreasonable to expect unifdef to work with an incomplete compiler
+installation.
 
-diff -urNp linux-3.2-rc4-orig/scripts/genksyms/Makefile linux-3.2-rc4/scripts/genksyms/Makefile
---- linux-3.2-rc4-orig/scripts/genksyms/Makefile	2011-10-24 16:10:05.000000000 +0900
-+++ linux-3.2-rc4/scripts/genksyms/Makefile	2011-12-12 11:37:29.159986580 +0900
-@@ -11,3 +11,4 @@ HOSTCFLAGS_lex.lex.o := -I$(src)
-  # dependencies on generated files need to be listed explicitly
-  $(obj)/lex.lex.o: $(obj)/keywords.hash.c $(obj)/parse.tab.h
+> Since this file doesn't actually use anything from errno.h, drop
+> the include so it at least makes us a bit more robust on glibc.
 
-+clean-files	:= keywords.hash.c lex.lex.c parse.tab.c parse.tab.h
+The Linux kernel currently has unifdef-2.5. Version 2.6 has better error
+handling so it uses the declaration of errno but not any of the E*
+values. I could perhaps rejig it to avoid this if it really is important
+to be able to bootsrap a system with incomplete headers.
 
+Tony.
+-- 
+f.anthony.n.finch  <dot@dotat.at>  http://dotat.at/
+Lundy, Fastnet, Irish Sea: West, backing south for a time, 5 or 6, increasing
+7 to severe gale 9. Moderate or rough, occasionally very rough or high. Rain
+or squally wintry showers. Good, occasionally poor.
