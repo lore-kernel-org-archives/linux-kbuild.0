@@ -1,51 +1,20 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from vms173011pub.verizon.net ([206.46.173.11]:45159 "EHLO
-	vms173011pub.verizon.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1758912Ab1LOOpt (ORCPT
+Received: from ironport2.ucc.vcu.edu ([128.172.8.176]:54785 "EHLO
+	ironport2.ucc.vcu.edu" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750900Ab1LPKAP convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 15 Dec 2011 09:45:49 -0500
-Date: Thu, 15 Dec 2011 08:40:36 -0500 (EST)
-From: Peter Foley <pefoley2@verizon.net>
-Subject: [PATCH V2] try to create KBUILD_OUTDIR automatically
-Message-id: <alpine.LNX.2.00.1112150832360.61146@linux>
-MIME-version: 1.0
-Content-type: TEXT/PLAIN; charset=US-ASCII
+	Fri, 16 Dec 2011 05:00:15 -0500
+MIME-Version: 1.0
+Subject: Re: Christmas Award
+From: Exxon-Mobil <Jenny.smith@exxon.fr>
+Date: Fri, 16 Dec 2011 01:50:38 -0800
+Reply-To: exxonmobil0012@wss-id.org
+Message-ID: <OFD12BCCF8.2BE84E8C-ON05257968.003618A2@vcu.edu>
+Content-Transfer-Encoding: 7BIT
+Content-Type: text/plain; charset=US-ASCII
+Content-Description: Mail message body
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild Mailing List <linux-kbuild@vger.kernel.org>, mmarek@suse.cz
+To: Recipients <Jenny.smith@exxon.fr>
 
-This patch makes it possible to execute make O=/path/to/work instead of
-mkdir -p /path/to/work
-make O=/path/to/work
-
-Signed-off-by: Peter Foley <pefoley2@verizon.net>
----
-
-V2:
-update error message
-
- Makefile |    6 +++---
- 1 files changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/Makefile b/Makefile
-index d1ea73f..5855399 100644
---- a/Makefile
-+++ b/Makefile
-@@ -115,11 +115,11 @@ $(CURDIR)/Makefile Makefile: ;
- 
- ifneq ($(KBUILD_OUTPUT),)
- # Invoke a second make in the output directory, passing relevant variables
--# check that the output directory actually exists
-+# check that the output directory exists or can be created
- saved-output := $(KBUILD_OUTPUT)
--KBUILD_OUTPUT := $(shell cd $(KBUILD_OUTPUT) && /bin/pwd)
-+KBUILD_OUTPUT := $(shell mkdir -p $(KBUILD_OUTPUT) && cd $(KBUILD_OUTPUT) && /bin/pwd)
- $(if $(KBUILD_OUTPUT),, \
--     $(error output directory "$(saved-output)" does not exist))
-+     $(error output directory "$(saved-output)" does not exist and cannot be created))
- 
- PHONY += $(MAKECMDGOALS) sub-make
- 
--- 
-1.7.8
-
+You have won 500,000.00Euro in the on-going EXXON-MOBIL Email Promotion Award 2011. Send your full names, address, Phone no. and verificationno.:EM-389-6373,FGN/P-073-92 to Mr Franklin Johnson, exxonmobil0012@wss-id.org or call the customer'sservice no. on +33-751-031-761 for more details
