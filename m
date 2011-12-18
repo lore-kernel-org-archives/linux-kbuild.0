@@ -1,20 +1,37 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ironport2.ucc.vcu.edu ([128.172.8.176]:54785 "EHLO
-	ironport2.ucc.vcu.edu" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750900Ab1LPKAP convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 16 Dec 2011 05:00:15 -0500
+Received: from cantor2.suse.de ([195.135.220.15]:36202 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751965Ab1LRUzJ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 18 Dec 2011 15:55:09 -0500
+Date: Sun, 18 Dec 2011 21:55:07 +0100
+From: Michal Marek <mmarek@suse.cz>
+Subject: Re: [PATCH] kbuild: use xfwrite wrapper function to silence warnings
+Message-ID: <20111218205507.GA25931@sepie.suse.cz>
+References: <alpine.LNX.2.00.1110221045310.59156@linux>
 MIME-Version: 1.0
-Subject: Re: Christmas Award
-From: Exxon-Mobil <Jenny.smith@exxon.fr>
-Date: Fri, 16 Dec 2011 01:50:38 -0800
-Reply-To: exxonmobil0012@wss-id.org
-Message-ID: <OFD12BCCF8.2BE84E8C-ON05257968.003618A2@vcu.edu>
-Content-Transfer-Encoding: 7BIT
-Content-Type: text/plain; charset=US-ASCII
-Content-Description: Mail message body
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <alpine.LNX.2.00.1110221045310.59156@linux>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Recipients <Jenny.smith@exxon.fr>
+To: Peter Foley <pefoley2@verizon.net>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild Mailing List <linux-kbuild@vger.kernel.org>
 
-You have won 500,000.00Euro in the on-going EXXON-MOBIL Email Promotion Award 2011. Send your full names, address, Phone no. and verificationno.:EM-389-6373,FGN/P-073-92 to Mr Franklin Johnson, exxonmobil0012@wss-id.org or call the customer'sservice no. on +33-751-031-761 for more details
+On Sat, Oct 22, 2011 at 10:48:49AM -0400, Peter Foley wrote:
+> Use the xfwrite wrapper function defined in lkc.h to check the return value of
+> fwrite and silence these warnings.
+> 
+>   HOSTCC  scripts/kconfig/zconf.tab.o
+> scripts/kconfig/zconf.tab.c: In function 'header_print_comment':
+> /usr/src/lto/scripts/kconfig/confdata.c:551:10: warning: ignoring return value of 'fwrite', declared with attribute warn_unused_result
+> scripts/kconfig/zconf.tab.c: In function 'kconfig_print_comment':
+> /usr/src/lto/scripts/kconfig/confdata.c:467:10: warning: ignoring return value of 'fwrite', declared with attribute warn_unused_result
+> 
+> Signed-off-by: Peter Foley <pefoley2@verizon.net>
+> ---
+>  scripts/kconfig/confdata.c |    4 ++--
+>  1 files changed, 2 insertions(+), 2 deletions(-)
+
+Applied to kbuild.git#kconfig, thanks.
+
+Michal
