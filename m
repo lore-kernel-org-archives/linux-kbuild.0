@@ -1,48 +1,34 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:36499 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:36650 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751876Ab1LRVFU (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 18 Dec 2011 16:05:20 -0500
-Date: Sun, 18 Dec 2011 22:05:18 +0100
+	id S1751968Ab1LRVN4 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 18 Dec 2011 16:13:56 -0500
+Date: Sun, 18 Dec 2011 22:13:52 +0100
 From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [PATCH] kbuild: don't use a symlink for update-po-config
-Message-ID: <20111218210518.GC25931@sepie.suse.cz>
-References: <alpine.LNX.2.00.1110221117380.59156@linux>
- <20111218205725.GB25931@sepie.suse.cz>
+Subject: Re: [PATCH] kconfig: adapt update-po-config to new UML layout
+Message-ID: <20111218211352.GD25931@sepie.suse.cz>
+References: <1320492090.14409.321.camel@x61.thuisdomein>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20111218205725.GB25931@sepie.suse.cz>
+In-Reply-To: <1320492090.14409.321.camel@x61.thuisdomein>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Peter Foley <pefoley2@verizon.net>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild Mailing List <linux-kbuild@vger.kernel.org>
+To: Paul Bolle <pebolle@tiscali.nl>
+Cc: Richard Weinberger <richard@nod.at>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Peter Foley <pefoley2@verizon.net>
 
-On Sun, Dec 18, 2011 at 09:57:25PM +0100, Michal Marek wrote:
-> On Sat, Oct 22, 2011 at 11:19:22AM -0400, Peter Foley wrote:
-> > This patch changes update-po-config to not create a symlink in arch/um 
-> > because this fails with make O= builds.
-> > It also improves the V=0 output. 
-> > 
-> >   GEN     /usr/src/lto/work/Makefile
-> >   GEN config
-> > ln: failed to create symbolic link `arch/um/Kconfig': No such file or directory
-> > make[3]: *** [update-po-config] Error 1
-> > make[2]: *** [update-po-config] Error 2
-> > make[1]: *** [sub-make] Error 2
-> > make: *** [all] Error 2
-> > 
-> > Signed-off-by: Peter Foley <pefoley2@verizon.net>
-> > ---
-> >  scripts/kconfig/Makefile |   11 +++++------
-> >  1 files changed, 5 insertions(+), 6 deletions(-)
+On Sat, Nov 05, 2011 at 12:21:30PM +0100, Paul Bolle wrote:
+> Commit 5c48b108 ("um: take arch/um/sys-x86 to arch/x86/um") broke the
+> make target update-po-config, as its symlink trick (again) fails.
+> (Previous breakage was fixed with commit bdc69ca4 ("kconfig: change
+> update-po-config to reflect new layout of arch/um").)
 > 
-> Applied to kbuild.git#kconfig, thanks.
+> The new UML layout allows to drop the symlick trick entirely. And if,
+> one day, another architecture supports UML too, that should now work
+> without again breaking this make target.
+> 
+> Signed-off-by: Paul Bolle <pebolle@tiscali.nl>
 
-After appying this, I noticed that UML changed once more in 3.2, so this
-fix is not sufficient. So I'll instead apply a fix from Paul Bolle to
-the rc-fixes branch and send it to Linus for 3.2. Please send a patch
-that only fixes the alignment issue in make output.
+Thanks, applied to kbuild.git#rc-fixes.
 
-Thanks,
 Michal
