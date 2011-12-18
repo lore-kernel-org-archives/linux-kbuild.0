@@ -1,96 +1,56 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:37986 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751222Ab1LRWUr (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 18 Dec 2011 17:20:47 -0500
-Date: Sun, 18 Dec 2011 23:20:45 +0100
-From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [PATCH] kbuild: add Makefile snippet to list compiled files
-Message-ID: <20111218222045.GF25931@sepie.suse.cz>
-References: <20111207062524.GA6570@faui49.informatik.uni-erlangen.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20111207062524.GA6570@faui49.informatik.uni-erlangen.de>
+Received: from vms173013pub.verizon.net ([206.46.173.13]:37808 "EHLO
+	vms173013pub.verizon.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751945Ab1LRXUW (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 18 Dec 2011 18:20:22 -0500
+Date: Sun, 18 Dec 2011 18:15:16 -0500 (EST)
+From: Peter Foley <pefoley2@verizon.net>
+Subject: [PATCH] Improve update-po-config output
+Message-id: <alpine.LNX.2.00.1112181809470.20582@linux>
+MIME-version: 1.0
+Content-type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Christian Dietrich <christian.dietrich@informatik.uni-erlangen.de>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, vamos-dev@i4.informatik.uni-erlangen.de
-
-On Wed, Dec 07, 2011 at 07:25:37AM +0100, Christian Dietrich wrote:
-> To list the compilation units compiled by the current configuration the
-> scripts/Makefile.list can be executed. It supports:
-> 
-> - printing of all compilation units
-> - all directories considered for compilation units
-> - test if a given file is compiled by the configuration
-> - use a different auto.conf
-> 
-> Signed-off-by: Christian Dietrich <christian.dietrich@informatik.uni-erlangen.de>
-> ---
->  Hi,
-> 
->  the following patch is a result of our research work at VAMOS[1],
->  where we try to examine the perconditions under which a file is
->  compiled into the linux kernel.
-> 
->  While working on this, we needed a way to get all compilation units,
->  which are compiled with the current configuration. And since this
->  might be useful for others, I think it would be great to have this
->  possibility in the mainline kernel.
-
-I agree it would be useful, I have just a couple of comments.
-
-- The user interface should either be a target of the main makefile or
-  a script. The make -f call seems a bit clumsy to me.
-- You should perhaps start with less features. E.g. overriding the
-  location of auto.conf is hardly needed, also the compiled= option adds
-  some code, while the goal could be achieved by simply grepping the full
-  output.
-- The deficiency of the approach is that it misses directories that are
-  only visited by an explicit make call in another makefile. An example
-  is the arch/x86/boot directory on x86. This should be at least
-  documented.
-- The output can contain duplicates, if a object file is listed twice in
-  a Makefile (e.g. arch/x86/kernel/apic/ipi.o with x86_64 defconfig)
-- lib-y is not considered.
-- In general, it would be good to do a comparison between the output of
-  your Makefile and find -name '*.o' after a build and either fix or
-  document the differences.
+To: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild Mailing List <linux-kbuild@vger.kernel.org>, mmarek@suse.cz
 
 
-> +# Read auto.conf if it exists, otherwise ignore
-> +ifeq ($(auto_conf),)
-> +-include include/config/auto.conf
-> +else
-> +include $(auto_conf)
-> +endif
+Make the V=0 output from update-po-config be aligned correctly.
+Also remove an outdated comment and add a "GEN" statement. 
 
-auto.conf missing should be considered fatal.
+Signed-off-by: Peter Foley <pefoley2@verizon.net>
+---
+ scripts/kconfig/Makefile |    6 +++---
+ 1 files changed, 3 insertions(+), 3 deletions(-)
 
+diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
+index 914833d..7966265 100644
+--- a/scripts/kconfig/Makefile
++++ b/scripts/kconfig/Makefile
+@@ -50,9 +50,8 @@ localyesconfig localmodconfig: $(obj)/streamline_config.pl $(obj)/conf
+ 
+ # Create new linux.pot file
+ # Adjust charset to UTF-8 in .po file to accept UTF-8 in Kconfig files
+-# The symlink is used to repair a deficiency in arch/um
+ update-po-config: $(obj)/kxgettext $(obj)/gconf.glade.h
+-	$(Q)echo "  GEN config"
++	$(Q)echo "  GEN     config.pot"
+ 	$(Q)xgettext --default-domain=linux                         \
+ 	    --add-comments --keyword=_ --keyword=N_                 \
+ 	    --from-code=UTF-8                                       \
+@@ -63,10 +62,11 @@ update-po-config: $(obj)/kxgettext $(obj)/gconf.glade.h
+ 	$(Q)(for i in `ls $(srctree)/arch/*/Kconfig      \
+ 	    $(srctree)/arch/*/um/Kconfig`;               \
+ 	    do                                           \
+-		echo "  GEN $$i";                        \
++		echo "  GEN     $$i";                    \
+ 		$(obj)/kxgettext $$i                     \
+ 		     >> $(obj)/config.pot;               \
+ 	    done )
++	$(Q)echo "  GEN     linux.pot"
+ 	$(Q)msguniq --sort-by-file --to-code=UTF-8 $(obj)/config.pot \
+ 	    --output $(obj)/linux.pot
+ 	$(Q)rm -f $(obj)/config.pot
+-- 
+1.7.8
 
-> +# The filename Kbuild has precedence over Makefile
-> +kbuild-dir := $(if $(filter /%,$(src)),$(src),$(srctree)/$(src))
-> +include $(if $(wildcard $(kbuild-dir)/Kbuild), $(kbuild-dir)/Kbuild, $(kbuild-dir)/Makefile)
-> +
-> +# Figure out what we need to build from the various variables
-> +# ==========================================================================
-> +
-> +__subdir-y	:= $(patsubst %/,%,$(filter %/, $(obj-y)))
-> +subdir-y	+= $(__subdir-y)
-> +__subdir-m	:= $(patsubst %/,%,$(filter %/, $(obj-m)))
-> +subdir-m	+= $(__subdir-m)
-> +__subdir-n	:= $(patsubst %/,%,$(filter %/, $(obj-n)))
-> +subdir-n	+= $(__subdir-n)
-> +__subdir-	:= $(patsubst %/,%,$(filter %/, $(obj-)))
-> +subdir-		+= $(__subdir-)
-> +
-> +# Subdirectories we need to descend into
-> +subdir-ym	:= $(sort $(subdir-y) $(subdir-m))
-> +subdir-ymn      := $(sort $(subdir-ym) $(subdir-n) $(subdir-))
-
-You are assiging variables that are immediatelly reassigned by
-Makefile.lib (if there is a special reason that I'm missing, please
-explain in a comment).
-
-Michal
