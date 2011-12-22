@@ -1,56 +1,74 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from vms173013pub.verizon.net ([206.46.173.13]:37808 "EHLO
-	vms173013pub.verizon.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751945Ab1LRXUW (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 18 Dec 2011 18:20:22 -0500
-Date: Sun, 18 Dec 2011 18:15:16 -0500 (EST)
-From: Peter Foley <pefoley2@verizon.net>
-Subject: [PATCH] Improve update-po-config output
-Message-id: <alpine.LNX.2.00.1112181809470.20582@linux>
-MIME-version: 1.0
-Content-type: TEXT/PLAIN; charset=US-ASCII
+Received: from nat28.tlf.novell.com ([130.57.49.28]:11720 "EHLO
+	nat28.tlf.novell.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753273Ab1LVPw5 convert rfc822-to-8bit (ORCPT
+	<rfc822;groupwise-linux-kbuild@vger.kernel.org:3:1>);
+	Thu, 22 Dec 2011 10:52:57 -0500
+Message-Id: <4EF3609D0200007800069A30@nat28.tlf.novell.com>
+Date: Thu, 22 Dec 2011 15:53:49 +0000
+From: "Jan Beulich" <JBeulich@suse.com>
+Subject: [PATCH] consolidate WARN_...ONCE() static variables
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8BIT
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild Mailing List <linux-kbuild@vger.kernel.org>, mmarek@suse.cz
+To: akpm@linux-foundation.org, Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org
 
+Due to the alignment of following variables, these typically consume
+more than just the single byte that 'bool' requires, and as there are
+a few hundred instances, the cache pollution (not so much the waste of
+memory) sums op. Put these variables into their own section, outside
+of half way frequently used memory range.
 
-Make the V=0 output from update-po-config be aligned correctly.
-Also remove an outdated comment and add a "GEN" statement. 
+Signed-off-by: Jan Beulich <jbeulich@suse.com>
 
-Signed-off-by: Peter Foley <pefoley2@verizon.net>
 ---
- scripts/kconfig/Makefile |    6 +++---
- 1 files changed, 3 insertions(+), 3 deletions(-)
+ include/asm-generic/bug.h         |    6 +++---
+ include/asm-generic/vmlinux.lds.h |    1 +
+ 2 files changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
-index 914833d..7966265 100644
---- a/scripts/kconfig/Makefile
-+++ b/scripts/kconfig/Makefile
-@@ -50,9 +50,8 @@ localyesconfig localmodconfig: $(obj)/streamline_config.pl $(obj)/conf
+--- 3.2-rc6/include/asm-generic/bug.h
++++ 3.2-rc6-warn-once-flag-cold/include/asm-generic/bug.h
+@@ -134,7 +134,7 @@ extern void warn_slowpath_null(const cha
+ #endif
  
- # Create new linux.pot file
- # Adjust charset to UTF-8 in .po file to accept UTF-8 in Kconfig files
--# The symlink is used to repair a deficiency in arch/um
- update-po-config: $(obj)/kxgettext $(obj)/gconf.glade.h
--	$(Q)echo "  GEN config"
-+	$(Q)echo "  GEN     config.pot"
- 	$(Q)xgettext --default-domain=linux                         \
- 	    --add-comments --keyword=_ --keyword=N_                 \
- 	    --from-code=UTF-8                                       \
-@@ -63,10 +62,11 @@ update-po-config: $(obj)/kxgettext $(obj)/gconf.glade.h
- 	$(Q)(for i in `ls $(srctree)/arch/*/Kconfig      \
- 	    $(srctree)/arch/*/um/Kconfig`;               \
- 	    do                                           \
--		echo "  GEN $$i";                        \
-+		echo "  GEN     $$i";                    \
- 		$(obj)/kxgettext $$i                     \
- 		     >> $(obj)/config.pot;               \
- 	    done )
-+	$(Q)echo "  GEN     linux.pot"
- 	$(Q)msguniq --sort-by-file --to-code=UTF-8 $(obj)/config.pot \
- 	    --output $(obj)/linux.pot
- 	$(Q)rm -f $(obj)/config.pot
--- 
-1.7.8
+ #define WARN_ON_ONCE(condition)	({				\
+-	static bool __warned;					\
++	static bool __section(.data.unlikely) __warned;		\
+ 	int __ret_warn_once = !!(condition);			\
+ 								\
+ 	if (unlikely(__ret_warn_once))				\
+@@ -144,7 +144,7 @@ extern void warn_slowpath_null(const cha
+ })
+ 
+ #define WARN_ONCE(condition, format...)	({			\
+-	static bool __warned;					\
++	static bool __section(.data.unlikely) __warned;		\
+ 	int __ret_warn_once = !!(condition);			\
+ 								\
+ 	if (unlikely(__ret_warn_once))				\
+@@ -154,7 +154,7 @@ extern void warn_slowpath_null(const cha
+ })
+ 
+ #define WARN_TAINT_ONCE(condition, taint, format...)	({	\
+-	static bool __warned;					\
++	static bool __section(.data.unlikely) __warned;		\
+ 	int __ret_warn_once = !!(condition);			\
+ 								\
+ 	if (unlikely(__ret_warn_once))				\
+--- 3.2-rc6/include/asm-generic/vmlinux.lds.h
++++ 3.2-rc6-warn-once-flag-cold/include/asm-generic/vmlinux.lds.h
+@@ -167,6 +167,7 @@
+ 	CPU_KEEP(exit.data)						\
+ 	MEM_KEEP(init.data)						\
+ 	MEM_KEEP(exit.data)						\
++	*(.data.unlikely)						\
+ 	STRUCT_ALIGN();							\
+ 	*(__tracepoints)						\
+ 	/* implement dynamic printk debug */				\
+
+
 
