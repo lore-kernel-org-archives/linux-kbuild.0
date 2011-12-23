@@ -1,18 +1,39 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from 79.49-183-91.adsl-static.isp.belgacom.be ([91.183.49.79]:55256
-	"HELO shazytlftqo77.net" rhost-flags-OK-FAIL-OK-FAIL)
-	by vger.kernel.org with SMTP id S1751913Ab1LWHzk (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 23 Dec 2011 02:55:40 -0500
-Message-ID: <201112230552.21CED388FFD85C3FB6A5BC@d73mn549>
-From: "Gene Lorette" <rozanneelda@wipro.com>
+Received: from cantor2.suse.de ([195.135.220.15]:36934 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754416Ab1LWVCq (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 23 Dec 2011 16:02:46 -0500
+Date: Fri, 23 Dec 2011 22:02:41 +0100
+From: Michal Marek <mmarek@suse.cz>
+Subject: [GIT] kconfig update-po-config fix
+Message-ID: <20111223210241.GA23076@sepie.suse.cz>
 MIME-Version: 1.0
-Subject: u4a1r
-Date: Fri, 23 Dec 2011 10:50:43 +0200
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: pebolle@tiscali.nl, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-t
+Hi Linus,
+
+here is a fix for 'make update-po-config', that broke after a UML
+change. I personally don't consider transation of kconfig files extra
+important and the project doing this seems dead, but it broke in 3.2, so
+let's fix it in 3.2.
+
+Thanks,
+Michal
+
+The following changes since commit cfcfc9eca2bcbd26a8e206baeb005b055dbf8e37:
+
+  Linux 3.2-rc2 (2011-11-15 15:02:59 -0200)
+
+are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git rc-fixes
+
+Paul Bolle (1):
+      kconfig: adapt update-po-config to new UML layout
+
+ scripts/kconfig/Makefile |    5 ++---
+ 1 files changed, 2 insertions(+), 3 deletions(-)
