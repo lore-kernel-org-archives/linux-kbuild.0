@@ -1,61 +1,87 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.snhosting.dk ([87.238.248.203]:30546 "EHLO
-	smtp.domainteam.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755234Ab2ADNf0 (ORCPT
+Received: from mail.linuxfoundation.org ([140.211.169.12]:59066 "EHLO
+	mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757163Ab2ADXDH (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 4 Jan 2012 08:35:26 -0500
-Date: Wed, 4 Jan 2012 14:35:22 +0100
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH] Use __unused0 instead of __unused for user visible
-	struct member names
-Message-ID: <20120104133522.GA7147@merkur.ravnborg.org>
-References: <20120102024418.GA10483@gaara.hadrons.org> <20120102202243.GA31103@elie.hsd1.il.comcast.net> <20120103065659.GA32216@merkur.ravnborg.org> <20120104081414.GA29745@gaara.hadrons.org> <4F0431F4.4050303@suse.cz>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4F0431F4.4050303@suse.cz>
+	Wed, 4 Jan 2012 18:03:07 -0500
+Date: Wed, 4 Jan 2012 15:03:05 -0800
+From: Andrew Morton <akpm@linux-foundation.org>
+Subject: Re: [PATCH] consolidate WARN_...ONCE() static variables
+Message-Id: <20120104150305.8b2ab00c.akpm@linux-foundation.org>
+In-Reply-To: <4EF3609D0200007800069A30@nat28.tlf.novell.com>
+References: <4EF3609D0200007800069A30@nat28.tlf.novell.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: Guillem Jover <guillem@hadrons.org>, Jonathan Nieder <jrnieder@gmail.com>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-api@vger.kernel.org
+To: Jan Beulich <JBeulich@suse.com>
+Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
 
-On Wed, Jan 04, 2012 at 12:03:16PM +0100, Michal Marek wrote:
-> On 4.1.2012 09:14, Guillem Jover wrote:
-> > On Tue, 2012-01-03 at 07:56:59 +0100, Sam Ravnborg wrote:
-> >> On Mon, Jan 02, 2012 at 02:22:43PM -0600, Jonathan Nieder wrote:
-> >>> Guillem Jover wrote:
-> >>>> On BSD systems __unused has traditionally been defined to mean the
-> >>>> equivalent of gcc's __attribute__((__unused__)), some parts of the
-> >>>> Linux tree use that convention too (e.g. perf). The problem comes when
-> >>>> defining such macro while trying to build unmodified source code with
-> >>>> BSD origins on systems with Linux headers.
-> >>>>
-> >>>> Rename the user visible struct members from __unused to __unused0 to
-> >>>> not cause compilation failures due to that macro, which should not be
-> >>>> a problem as those members are supposed to be private anyway.
-> >>
-> >> ^__ is reserved for libc internal stuff and there is no reason to
-> >> name the unused/padding members "__unused".
-> >> So one or a set of patches that rename them all to something more
-> >> sensible would be fine.
-> > 
-> > On a quick glance, I've found other functionally similar struct
-> > member names present on the tree:
-> > 
-> >   __unused __unusedN __reserved __reservedN __reserved_N __resN
-> >   __pad __padN __flr_pad __ifi_pad __tcpm_padN __tcpct_padN
-> > 
-> > Do you mean you'd like to see patch(es) to rename all those? I'd not
-> > mind providing them, although my immediate concern right now is just
-> > regarding __unused.
+On Thu, 22 Dec 2011 15:53:49 +0000
+"Jan Beulich" <JBeulich@suse.com> wrote:
+
+> Due to the alignment of following variables, these typically consume
+> more than just the single byte that 'bool' requires, and as there are
+> a few hundred instances, the cache pollution (not so much the waste of
+> memory) sums op. Put these variables into their own section, outside
+> of half way frequently used memory range.
 > 
-> __.* and _[A-Z].* are reserved for the implementation. Unfortunately,
-> both the kernel userspace headers and the libc are part of the
-> implementation, so there needs to be some common sense applied to avoid
-> clashes. IMO renaming __unused to __unused0 on the basis that some
-> headers define __unused to __attribute__((__unused__)) makes sense, but
-> blindly renaming any occurence of double underscore helps little.
+> Signed-off-by: Jan Beulich <jbeulich@suse.com>
+> 
+> ---
+>  include/asm-generic/bug.h         |    6 +++---
+>  include/asm-generic/vmlinux.lds.h |    1 +
+>  2 files changed, 4 insertions(+), 3 deletions(-)
+> 
+> --- 3.2-rc6/include/asm-generic/bug.h
+> +++ 3.2-rc6-warn-once-flag-cold/include/asm-generic/bug.h
+> @@ -134,7 +134,7 @@ extern void warn_slowpath_null(const cha
+>  #endif
+>  
+>  #define WARN_ON_ONCE(condition)	({				\
+> -	static bool __warned;					\
+> +	static bool __section(.data.unlikely) __warned;		\
+>  	int __ret_warn_once = !!(condition);			\
+>  								\
+>  	if (unlikely(__ret_warn_once))				\
+> @@ -144,7 +144,7 @@ extern void warn_slowpath_null(const cha
+>  })
+>  
+>  #define WARN_ONCE(condition, format...)	({			\
+> -	static bool __warned;					\
+> +	static bool __section(.data.unlikely) __warned;		\
+>  	int __ret_warn_once = !!(condition);			\
+>  								\
+>  	if (unlikely(__ret_warn_once))				\
+> @@ -154,7 +154,7 @@ extern void warn_slowpath_null(const cha
+>  })
+>  
+>  #define WARN_TAINT_ONCE(condition, taint, format...)	({	\
+> -	static bool __warned;					\
+> +	static bool __section(.data.unlikely) __warned;		\
+>  	int __ret_warn_once = !!(condition);			\
+>  								\
+>  	if (unlikely(__ret_warn_once))				\
+> --- 3.2-rc6/include/asm-generic/vmlinux.lds.h
+> +++ 3.2-rc6-warn-once-flag-cold/include/asm-generic/vmlinux.lds.h
+> @@ -167,6 +167,7 @@
+>  	CPU_KEEP(exit.data)						\
+>  	MEM_KEEP(init.data)						\
+>  	MEM_KEEP(exit.data)						\
+> +	*(.data.unlikely)						\
+>  	STRUCT_ALIGN();							\
+>  	*(__tracepoints)						\
+>  	/* implement dynamic printk debug */				\
 
-Agree on Michael on this.
+The patch seems reasonable.
 
-	Sam
+printk_once() should also be converted.  And ata_print_version_once(),
+if it insists on continuing to exist.  Also rcu_lockdep_assert().
+
+My MUA (sylpheed) is unable to generate a plain-text version of the
+patch for me, so much hand-editing will be needed.  It would be nice
+if the patch could be demangled at the sending end, please.
+
+I agree that linux-kernel should have been cc'ed on a change of this
+nature.
