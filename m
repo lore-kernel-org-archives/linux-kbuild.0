@@ -1,49 +1,59 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ee0-f46.google.com ([74.125.83.46]:49357 "EHLO
-	mail-ee0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932726Ab2AEQJB (ORCPT
+Received: from mail.linuxfoundation.org ([140.211.169.12]:42979 "EHLO
+	mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932736Ab2AEVD0 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 5 Jan 2012 11:09:01 -0500
-From: Paulius Zaleckas <paulius.zaleckas@gmail.com>
-Subject: [PATCH 2/2] menuconfig: add Home and End keys support for inputbox
-Date: Thu, 05 Jan 2012 18:08:59 +0200
-Message-ID: <20120105160859.7543.67706.stgit@localhost6.localdomain6>
-In-Reply-To: <20120105160852.7543.76603.stgit@localhost6.localdomain6>
-References: <20120105160852.7543.76603.stgit@localhost6.localdomain6>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+	Thu, 5 Jan 2012 16:03:26 -0500
+Date: Thu, 5 Jan 2012 13:03:24 -0800
+From: Andrew Morton <akpm@linux-foundation.org>
+Subject: Re: [PATCH] consolidate WARN_...ONCE() static variables
+Message-Id: <20120105130324.44949af9.akpm@linux-foundation.org>
+In-Reply-To: <4F059304020000780006A906@nat28.tlf.novell.com>
+References: <4EF3609D0200007800069A30@nat28.tlf.novell.com>
+	<20120104150305.8b2ab00c.akpm@linux-foundation.org>
+	<4F059304020000780006A906@nat28.tlf.novell.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: mmarek@suse.cz, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Jan Beulich <JBeulich@suse.com>
+Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
 
-Makes long string editing easier.
+On Thu, 05 Jan 2012 11:09:40 +0000
+"Jan Beulich" <JBeulich@suse.com> wrote:
 
-Signed-off-by: Paulius Zaleckas <paulius.zaleckas@gmail.com>
----
+> >>> On 05.01.12 at 00:03, Andrew Morton <akpm@linux-foundation.org> wrote:
+> > On Thu, 22 Dec 2011 15:53:49 +0000
+> > "Jan Beulich" <JBeulich@suse.com> wrote:
+> > 
+> >> Due to the alignment of following variables, these typically consume
+> >> more than just the single byte that 'bool' requires, and as there are
+> >> a few hundred instances, the cache pollution (not so much the waste of
+> >> memory) sums op. Put these variables into their own section, outside
+> >> of half way frequently used memory range.
+> >> 
+>
+> ...
+>
+> > printk_once() should also be converted.  And ata_print_version_once(),
+> > if it insists on continuing to exist.
+> 
+> I disagree for those (and intentionally didn't touch printk_once();
+> wasn't aware of the other) - at best this could get marked
+> __read_mostly, but that's not the subject of this patch.
 
- scripts/kconfig/lxdialog/inputbox.c |   10 ++++++++++
- 1 files changed, 10 insertions(+), 0 deletions(-)
+Confused.  It is exactly the subject of the patch?
 
-diff --git a/scripts/kconfig/lxdialog/inputbox.c b/scripts/kconfig/lxdialog/inputbox.c
-index 3bd7111..ad31bec 100644
---- a/scripts/kconfig/lxdialog/inputbox.c
-+++ b/scripts/kconfig/lxdialog/inputbox.c
-@@ -158,6 +158,16 @@ do_resize:
- 					goto redraw;
- 				}
- 				continue;
-+			case KEY_HOME:
-+				scroll = input_x = 0;
-+				goto redraw;
-+			case KEY_END:
-+				if (len >= box_width) {
-+					scroll = len - box_width + 1;
-+					input_x = box_width - 1;
-+				} else
-+					input_x = len;
-+				goto redraw;
- 			default:
- 				if (key < 0x100 && isprint(key)) {
- 					if (scroll + input_x < MAX_LEN) {
+> > Also rcu_lockdep_assert().
+> 
+> This one I mostly agree - the access is at least sitting past the
+> debug_lockdep_rcu_enabled() check, albeit not in an unlikely()
+> code path.
+
+What does "unlikely" have to do with any of this?
+
+I'm suspecting that there is some changelog crappiness going on here. 
+What didn't you tell us?
+
 
