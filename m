@@ -1,109 +1,169 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from nat28.tlf.novell.com ([130.57.49.28]:59046 "EHLO
-	nat28.tlf.novell.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754898Ab2AELIr convert rfc822-to-8bit (ORCPT
-	<rfc822;groupwise-linux-kbuild@vger.kernel.org:3:1>);
-	Thu, 5 Jan 2012 06:08:47 -0500
-Message-Id: <4F059304020000780006A906@nat28.tlf.novell.com>
-Date: Thu, 05 Jan 2012 11:09:40 +0000
-From: "Jan Beulich" <JBeulich@suse.com>
-Subject: Re: [PATCH] consolidate WARN_...ONCE() static variables
-References: <4EF3609D0200007800069A30@nat28.tlf.novell.com>
- <20120104150305.8b2ab00c.akpm@linux-foundation.org>
-In-Reply-To: <20120104150305.8b2ab00c.akpm@linux-foundation.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8BIT
-Content-Disposition: inline
+Received: from mail-ee0-f46.google.com ([74.125.83.46]:49357 "EHLO
+	mail-ee0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755839Ab2AEQIz (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 5 Jan 2012 11:08:55 -0500
+From: Paulius Zaleckas <paulius.zaleckas@gmail.com>
+Subject: [PATCH 1/2] menuconfig: basic string editing in inputbox support
+Date: Thu, 05 Jan 2012 18:08:52 +0200
+Message-ID: <20120105160852.7543.76603.stgit@localhost6.localdomain6>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andrew Morton <akpm@linux-foundation.org>
-Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
+To: mmarek@suse.cz, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
->>> On 05.01.12 at 00:03, Andrew Morton <akpm@linux-foundation.org> wrote:
-> On Thu, 22 Dec 2011 15:53:49 +0000
-> "Jan Beulich" <JBeulich@suse.com> wrote:
-> 
->> Due to the alignment of following variables, these typically consume
->> more than just the single byte that 'bool' requires, and as there are
->> a few hundred instances, the cache pollution (not so much the waste of
->> memory) sums op. Put these variables into their own section, outside
->> of half way frequently used memory range.
->> 
->> Signed-off-by: Jan Beulich <jbeulich@suse.com>
->> 
->> ---
->>  include/asm-generic/bug.h         |    6 +++---
->>  include/asm-generic/vmlinux.lds.h |    1 +
->>  2 files changed, 4 insertions(+), 3 deletions(-)
->> 
->> --- 3.2-rc6/include/asm-generic/bug.h
->> +++ 3.2-rc6-warn-once-flag-cold/include/asm-generic/bug.h
->> @@ -134,7 +134,7 @@ extern void warn_slowpath_null(const cha
->>  #endif
->>  
->>  #define WARN_ON_ONCE(condition)	({				\
->> -	static bool __warned;					\
->> +	static bool __section(.data.unlikely) __warned;		\
->>  	int __ret_warn_once = !!(condition);			\
->>  								\
->>  	if (unlikely(__ret_warn_once))				\
->> @@ -144,7 +144,7 @@ extern void warn_slowpath_null(const cha
->>  })
->>  
->>  #define WARN_ONCE(condition, format...)	({			\
->> -	static bool __warned;					\
->> +	static bool __section(.data.unlikely) __warned;		\
->>  	int __ret_warn_once = !!(condition);			\
->>  								\
->>  	if (unlikely(__ret_warn_once))				\
->> @@ -154,7 +154,7 @@ extern void warn_slowpath_null(const cha
->>  })
->>  
->>  #define WARN_TAINT_ONCE(condition, taint, format...)	({	\
->> -	static bool __warned;					\
->> +	static bool __section(.data.unlikely) __warned;		\
->>  	int __ret_warn_once = !!(condition);			\
->>  								\
->>  	if (unlikely(__ret_warn_once))				\
->> --- 3.2-rc6/include/asm-generic/vmlinux.lds.h
->> +++ 3.2-rc6-warn-once-flag-cold/include/asm-generic/vmlinux.lds.h
->> @@ -167,6 +167,7 @@
->>  	CPU_KEEP(exit.data)						\
->>  	MEM_KEEP(init.data)						\
->>  	MEM_KEEP(exit.data)						\
->> +	*(.data.unlikely)						\
->>  	STRUCT_ALIGN();							\
->>  	*(__tracepoints)						\
->>  	/* implement dynamic printk debug */				\
-> 
-> The patch seems reasonable.
-> 
-> printk_once() should also be converted.  And ata_print_version_once(),
-> if it insists on continuing to exist.
+For me the most irritating thing in linux kernel was absence
+of string editing in menuconfig's inputbox. If you wanted to
+change first symbol you had to delete all string and then type
+it all again.
+New implementation handles right/left cursor, backspace and
+delete keys. It does a little bit more terminal manipulations
+as string area is fully redrawn on each event.
 
-I disagree for those (and intentionally didn't touch printk_once();
-wasn't aware of the other) - at best this could get marked
-__read_mostly, but that's not the subject of this patch.
+Signed-off-by: Paulius Zaleckas <paulius.zaleckas@gmail.com>
+---
 
-> Also rcu_lockdep_assert().
+ scripts/kconfig/lxdialog/inputbox.c |   85 +++++++++++++++++++++--------------
+ 1 files changed, 52 insertions(+), 33 deletions(-)
 
-This one I mostly agree - the access is at least sitting past the
-debug_lockdep_rcu_enabled() check, albeit not in an unlikely()
-code path.
-
-> My MUA (sylpheed) is unable to generate a plain-text version of the
-> patch for me, so much hand-editing will be needed.  It would be nice
-> if the patch could be demangled at the sending end, please.
-
-Even the quoted text in your response appears to be intact, so it's
-not clear to me what the problem is. I'll try to remember to also
-attach the patch when I re-submit.
-
-> I agree that linux-kernel should have been cc'ed on a change of this
-> nature.
-
-Will do.
-
-Jan
+diff --git a/scripts/kconfig/lxdialog/inputbox.c b/scripts/kconfig/lxdialog/inputbox.c
+index dd8e587..3bd7111 100644
+--- a/scripts/kconfig/lxdialog/inputbox.c
++++ b/scripts/kconfig/lxdialog/inputbox.c
+@@ -44,7 +44,7 @@ static void print_buttons(WINDOW * dialog, int height, int width, int selected)
+ int dialog_inputbox(const char *title, const char *prompt, int height, int width,
+                     const char *init)
+ {
+-	int i, x, y, box_y, box_x, box_width;
++	int i, len, x, y, box_y, box_x, box_width;
+ 	int input_x = 0, scroll = 0, key = 0, button = -1;
+ 	char *instr = dialog_input_result;
+ 	WINDOW *dialog;
+@@ -54,6 +54,8 @@ int dialog_inputbox(const char *title, const char *prompt, int height, int width
+ 	else
+ 		strcpy(instr, init);
+ 
++	len = strlen(instr);
++
+ do_resize:
+ 	if (getmaxy(stdscr) <= (height - 2))
+ 		return -ERRDISPLAYTOOSMALL;
+@@ -97,14 +99,13 @@ do_resize:
+ 	wmove(dialog, box_y, box_x);
+ 	wattrset(dialog, dlg.inputbox.atr);
+ 
+-	input_x = strlen(instr);
+-
+-	if (input_x >= box_width) {
+-		scroll = input_x - box_width + 1;
++	if (len >= box_width) {
++		scroll = len - box_width + 1;
+ 		input_x = box_width - 1;
+ 		for (i = 0; i < box_width - 1; i++)
+ 			waddch(dialog, instr[scroll + i]);
+ 	} else {
++		input_x = len;
+ 		waddstr(dialog, instr);
+ 	}
+ 
+@@ -121,50 +122,68 @@ do_resize:
+ 			case KEY_UP:
+ 			case KEY_DOWN:
+ 				break;
+-			case KEY_LEFT:
+-				continue;
+ 			case KEY_RIGHT:
++				if (scroll + input_x < len) {
++					if (input_x == box_width - 1)
++						scroll++;
++					else
++						input_x++;
++					goto redraw;
++				}
+ 				continue;
++			case KEY_LEFT:
+ 			case KEY_BACKSPACE:
+ 			case 127:
+ 				if (input_x || scroll) {
+-					wattrset(dialog, dlg.inputbox.atr);
+-					if (!input_x) {
+-						scroll = scroll < box_width - 1 ? 0 : scroll - (box_width - 1);
+-						wmove(dialog, box_y, box_x);
+-						for (i = 0; i < box_width; i++)
+-							waddch(dialog,
+-							       instr[scroll + input_x + i] ?
+-							       instr[scroll + input_x + i] : ' ');
+-						input_x = strlen(instr) - scroll;
+-					} else
++					/* 
++					 * Some fancy scrolling, so you can see what
++					 * you will be deleting with backspace
++					 */
++					if (!input_x || (input_x < box_width / 4 && scroll))
++						scroll--;
++					else
+ 						input_x--;
+-					instr[scroll + input_x] = '\0';
+-					mvwaddch(dialog, box_y, input_x + box_x, ' ');
+-					wmove(dialog, box_y, input_x + box_x);
+-					wrefresh(dialog);
++
++					if (key != KEY_LEFT) {
++						int pos = scroll + input_x;
++						memmove(&instr[pos], &instr[pos + 1], len-- - pos + 1);
++					}
++					goto redraw;
++				}
++				continue;
++			case KEY_DC:
++				if (scroll + input_x < len) {
++					int pos = scroll + input_x;
++					memmove(&instr[pos], &instr[pos + 1], len-- - pos + 1);
++					goto redraw;
+ 				}
+ 				continue;
+ 			default:
+ 				if (key < 0x100 && isprint(key)) {
+ 					if (scroll + input_x < MAX_LEN) {
+-						wattrset(dialog, dlg.inputbox.atr);
+-						instr[scroll + input_x] = key;
+-						instr[scroll + input_x + 1] = '\0';
+-						if (input_x == box_width - 1) {
++						int pos = scroll + input_x;
++						memmove(&instr[pos + 1], &instr[pos], len++ - pos + 1);
++						instr[pos] = key;
++						if (input_x == box_width - 1)
+ 							scroll++;
+-							wmove(dialog, box_y, box_x);
+-							for (i = 0; i < box_width - 1; i++)
+-								waddch(dialog, instr [scroll + i]);
+-						} else {
+-							wmove(dialog, box_y, input_x++ + box_x);
+-							waddch(dialog, key);
+-						}
+-						wrefresh(dialog);
++						else
++							input_x++;
++						goto redraw;
+ 					} else
+ 						flash();	/* Alarm user about overflow */
+ 					continue;
+ 				}
++				break;
++			redraw:
++				wattrset(dialog, dlg.inputbox.atr);
++				wmove(dialog, box_y, box_x);
++				for (i = 0; i < box_width - 1; i++)
++					waddch(dialog,
++					       scroll + i < len ?
++					       instr[scroll + i] : ' ');
++				wmove(dialog, box_y, input_x + box_x);
++				wrefresh(dialog);
++				continue;
+ 			}
+ 		}
+ 		switch (key) {
 
