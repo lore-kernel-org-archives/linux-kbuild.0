@@ -1,121 +1,84 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.windriver.com ([147.11.1.11]:56104 "EHLO
-	mail.windriver.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932235Ab2AEWq7 (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 5 Jan 2012 17:46:59 -0500
-Message-ID: <4F062846.50804@windriver.com>
-Date: Thu, 5 Jan 2012 16:46:30 -0600
-From: Jason Wessel <jason.wessel@windriver.com>
-MIME-Version: 1.0
-Subject: Re: [PATCH] Correctly deal with make that has an argument which contains
- an "s"
-References: <1272315374-11951-1-git-send-email-jason.wessel@windriver.com> <4BD6CECC.9080507@suse.cz>
-In-Reply-To: <4BD6CECC.9080507@suse.cz>
-Content-Type: multipart/mixed;
-	boundary="------------010501000307000409010403"
+Received: from nat28.tlf.novell.com ([130.57.49.28]:51267 "EHLO
+	nat28.tlf.novell.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1030275Ab2AFKVz convert rfc822-to-8bit (ORCPT
+	<rfc822;groupwise-linux-kbuild@vger.kernel.org:3:1>);
+	Fri, 6 Jan 2012 05:21:55 -0500
+Message-Id: <4F06B37D020000780006AC1F@nat28.tlf.novell.com>
+Date: Fri, 06 Jan 2012 07:40:29 +0000
+From: "Jan Beulich" <JBeulich@suse.com>
+Subject: Re: [PATCH] consolidate WARN_...ONCE() static variables
+References: <4EF3609D0200007800069A30@nat28.tlf.novell.com>
+ <20120104150305.8b2ab00c.akpm@linux-foundation.org>
+ <4F059304020000780006A906@nat28.tlf.novell.com>
+ <20120105130324.44949af9.akpm@linux-foundation.org>
+In-Reply-To: <20120105130324.44949af9.akpm@linux-foundation.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8BIT
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: lkml <linux-kernel@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, =?ISO-8859-1?Q?Am=E9rico_?= =?ISO-8859-1?Q?Wang?= <xiyou.wangcong@gmail.com>
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
---------------010501000307000409010403
-Content-Type: text/plain; charset="ISO-8859-1"
-Content-Transfer-Encoding: 7bit
-
-On 04/27/2010 06:47 AM, Michal Marek wrote:
-> On 26.4.2010 22:56, Jason Wessel wrote:
->> When using remake, which is based on gnumake, if you invoke
->> an example build as shown below, the build will become silent
->> due to the top level make file incorrectly guessing that
->> the end user wants a silent build because an argument that
->> contained an "s" was used.
+>>> On 05.01.12 at 22:03, Andrew Morton <akpm@linux-foundation.org> wrote:
+> On Thu, 05 Jan 2012 11:09:40 +0000
+> "Jan Beulich" <JBeulich@suse.com> wrote:
+> 
+>> >>> On 05.01.12 at 00:03, Andrew Morton <akpm@linux-foundation.org> wrote:
+>> > On Thu, 22 Dec 2011 15:53:49 +0000
+>> > "Jan Beulich" <JBeulich@suse.com> wrote:
+>> > 
+>> >> Due to the alignment of following variables, these typically consume
+>> >> more than just the single byte that 'bool' requires, and as there are
+>> >> a few hundred instances, the cache pollution (not so much the waste of
+>> >> memory) sums op. Put these variables into their own section, outside
+>> >> of half way frequently used memory range.
+>> >> 
 >>
->> remake --no-extended-errors
+>> ...
+>>
+>> > printk_once() should also be converted.  And ata_print_version_once(),
+>> > if it insists on continuing to exist.
+>> 
+>> I disagree for those (and intentionally didn't touch printk_once();
+>> wasn't aware of the other) - at best this could get marked
+>> __read_mostly, but that's not the subject of this patch.
 > 
-> BTW, make --warn-undefined-variables also triggers this (although no one
-> will use this option on the kernel makefiles).
+> Confused.  It is exactly the subject of the patch?
+
+No - the goal here is to eliminate the wasteful alignment holes
+created by the __warned variables in the WARN_...ONCE()
+instances. These get accessed past and unlikely() condition,
+and hence get moved into a separate data section (so they
+would all end up together, with no holes in between).
+
+The printk_once() situation is quite different: The variables get
+accessed each time the code in question gets executed, and
+hence cannot be considered on an unlikely code path without
+additional knowledge of the surrounding code. Consequently
+they don't belong into the same data section as the ones that
+get moved here.
+
+>> > Also rcu_lockdep_assert().
+>> 
+>> This one I mostly agree - the access is at least sitting past the
+>> debug_lockdep_rcu_enabled() check, albeit not in an unlikely()
+>> code path.
 > 
+> What does "unlikely" have to do with any of this?
 
-Might as well add it to the commit header for clarity. 
+See above.
 
->>  
->> -ifneq ($(findstring s,$(MAKEFLAGS)),)
->> +ifneq ($(filter s% -s% --silent --quiet,$(MAKEFLAGS)),)
-> 
-> I played a bit with GNU make 3.81. Checking for --silent and --quiet is
-> not necessary, because make always stores the short option if available.
-> Now I was wondering if the 's' option is always at the beginning,
-> looking at make-3.81/main.c, it turns out that the order in which the
-> options appear in $(MAKEFLAGS) is the reverse order of the switches
-> array, where 's' is near the end of the array:
-> 
-[clip]
-> 
-> The only other single-letter options that come after 's' (before 's' in
-> the $(MAKEFLAGS) variable) are 't', which doesn't work with the kernel,
-> and 'w', which doesn't work either (the Makefile adds
-> --no-print-directory). So we can indeed get away with s% and -s% (until
-> the next make version changes the sort order, that is ;)).
-> 
+> I'm suspecting that there is some changelog crappiness going on here. 
+> What didn't you tell us?
 
-This might be nearly a whole year later, but the problem is still there so perhaps we can reach some closure and get it fixed since it is fairly minor in the first place.  :-)
+I think the original description says all that it has to. It doesn't
+care to say why others don't get converted, but I don't think
+that's to be expected of it either (imagine how patch descriptions
+would start looking like if everything that wasn't done in patch
+was also described).
 
-Version 2 of the original patch is attached.
+Jan
 
-Thanks,
-Jason.
-
---------------010501000307000409010403
-Content-Type: text/x-diff;
-	name="0001-Correctly-deal-with-make-that-has-an-argument-which-.patch"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
-	filename*0="0001-Correctly-deal-with-make-that-has-an-argument-which-.pa";
-	filename*1="tch"
-
-From: Jason Wessel <jason.wessel@windriver.com>
-Date: Thu, 5 Jan 2012 16:43:09 -0600
-Subject: [PATCH] Correctly deal with make that has an argument which contains
- an "s"
-
-When using remake, which is based on gnumake, if you invoke
-an example build as shown below, the build will become silent
-due to the top level make file incorrectly guessing that
-the end user wants a silent build because an argument that
-contained an "s" was used.  Here are two examples one with remake
-and one with straight gnumake.
-
-remake --no-extended-errors
-make --warn-undefined-variables
-
-Fix up the top level Makefile to use filter to parse the options
-that mean silent instead of findstring catching other random
-arguments containing an "s".
-
-Signed-off-by: Jason Wessel <jason.wessel@windriver.com>
-CC: Michal Marek <mmarek@suse.cz>
-CC: Andrew Morton <akpm@linux-foundation.org>
-CC: linux-kbuild@vger.kernel.org
----
- Makefile |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
-
-diff --git a/Makefile b/Makefile
-index adddd11..4b8ae04 100644
---- a/Makefile
-+++ b/Makefile
-@@ -312,7 +312,7 @@ endif
- # If the user is running make -s (silent mode), suppress echoing of
- # commands
- 
--ifneq ($(findstring s,$(MAKEFLAGS)),)
-+ifneq ($(filter s% -s%,$(MAKEFLAGS)),)
-   quiet=silent_
- endif
- 
--- 
-1.7.5.4
-
-
---------------010501000307000409010403--
