@@ -1,45 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:51666 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752650Ab2AHO7U (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 8 Jan 2012 09:59:20 -0500
-Message-ID: <4F09AFBD.60503@suse.cz>
-Date: Sun, 08 Jan 2012 16:01:17 +0100
+Received: from ip-213-220-200-171.net.upcbroadband.cz ([213.220.200.171]:61717
+	"EHLO emu.suse.cz" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1754492Ab2AHVQd (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 8 Jan 2012 16:16:33 -0500
 From: Michal Marek <mmarek@suse.cz>
-MIME-Version: 1.0
-Subject: Re: [PATCH] Makefiles: Disable unused-variable warning
-References: <1324695619-5537-1-git-send-email-kirill@shutemov.name> <20111227135752.GK5344@tiehlicka.suse.cz>
-In-Reply-To: <20111227135752.GK5344@tiehlicka.suse.cz>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Subject: [PATCH] kbuild: Fix comment in Makefile.lib
+Date: Sun,  8 Jan 2012 22:08:05 +0100
+Message-Id: <1326056885-6226-1-git-send-email-mmarek@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Hocko <mhocko@suse.cz>
-Cc: "Kirill A. Shutemov" <kirill@shutemov.name>, linux-mm@kvack.org, cgroups@vger.kernel.org, linux-kernel@vger.kernel.org, containers@lists.linux-foundation.org, KAMEZAWA Hiroyuki <kamezawa.hiroyu@jp.fujitsu.com>, Balbir Singh <bsingharora@gmail.com>, Johannes Weiner <hannes@cmpxchg.org>, linux-kbuild@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
 
-Dne 27.12.2011 14:57, Michal Hocko napsal(a):
-> Anyway, I am wondering why unused-but-set-variable is disabled while
-> unused-variable is enabled.
+KBUILD_MODNAME is not defined for files that are linked into multiple
+modules, and trying to change reality to match documentation would
+result in all sorts of trouble. E.g. options for built-in modules would
+be called either foo_bar.param, foo.param, or bar.param, depending on
+the configuration. So just change the comment.
 
-unused-but-set-variable was disabled, because it was a new warning in
-gcc 4.6 and produced too much noise relatively to its severity. A make
-W=1 build of x86_64_defconfig gives:
-$ grep -c 'Wunused-but-set-variable' log
-77
-$ grep -c 'Wunused-variable' log
-0
+Signed-off-by: Michal Marek <mmarek@suse.cz>
+---
+ scripts/Makefile.lib |    6 +++---
+ 1 files changed, 3 insertions(+), 3 deletions(-)
 
-More exotic configuration will probably result in a couple of unused
-variable warnings, but that IMO no reason to disable them globally.
+diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+index 5d986d9..2ce2e21 100644
+--- a/scripts/Makefile.lib
++++ b/scripts/Makefile.lib
+@@ -93,9 +93,9 @@ obj-dirs	:= $(addprefix $(obj)/,$(obj-dirs))
+ # already
+ # $(modname_flags) #defines KBUILD_MODNAME as the name of the module it will 
+ # end up in (or would, if it gets compiled in)
+-# Note: It's possible that one object gets potentially linked into more
+-#       than one module. In that case KBUILD_MODNAME will be set to foo_bar,
+-#       where foo and bar are the name of the modules.
++# Note: Files that end up in two or more modules are compiled without the
++#       KBUILD_MODNAME definition. The reason is that any made-up name would
++#       differ in different configs.
+ name-fix = $(subst $(comma),_,$(subst -,_,$1))
+ basename_flags = -D"KBUILD_BASENAME=KBUILD_STR($(call name-fix,$(basetarget)))"
+ modname_flags  = $(if $(filter 1,$(words $(modname))),\
+-- 
+1.7.7
 
-> Shouldn't we just disable it as well rather
-> than workaround this in the code? The warning is just pure noise in this
-> case.
-
-If it's noise in a particular case, there is always the option to add
-
-CFLAGS_memcontrol.o := $(call cc-disable-warning, unused-variable)
-
-to the respective Makefile.
-
-Michal
