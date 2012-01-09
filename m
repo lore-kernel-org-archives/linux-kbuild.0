@@ -1,127 +1,138 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from avon.wwwdotorg.org ([70.85.31.133]:53654 "EHLO
+Received: from avon.wwwdotorg.org ([70.85.31.133]:53194 "EHLO
 	avon.wwwdotorg.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932778Ab2AISrA (ORCPT
+	with ESMTP id S932779Ab2AISrA (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
 	Mon, 9 Jan 2012 13:47:00 -0500
 From: Stephen Warren <swarren@nvidia.com>
-Subject: [PATCH 2/2] Kbuild: Use dtc's -d (dependency) option
-Date: Mon,  9 Jan 2012 11:38:15 -0700
-Message-Id: <1326134295-15547-2-git-send-email-swarren@nvidia.com>
-In-Reply-To: <1326134295-15547-1-git-send-email-swarren@nvidia.com>
-References: <1326134295-15547-1-git-send-email-swarren@nvidia.com>
+Subject: [PATCH 1/2] dtc: Implement -d option to write out a dependency file
+Date: Mon,  9 Jan 2012 11:38:14 -0700
+Message-Id: <1326134295-15547-1-git-send-email-swarren@nvidia.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Michal Marek <mmarek@suse.cz>, Jon Loeliger <jdl@jdl.com>, David Gibson <david@gibson.dropbear.id.au>
 Cc: Russell King <linux@arm.linux.org.uk>, Mark Salter <msalter@redhat.com>, Aurelien Jacquiot <a-jacquiot@ti.com>, Michal Simek <monstr@monstr.eu>, Jonas Bonn <jonas@southpole.se>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Paul Mackerras <paulus@samba.org>, Grant Likely <grant.likely@secretlab.ca>, Rob Herring <rob.herring@calxeda.com>, Arnd Bergmann <arnd@arndb.de>, linux-kbuild@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-c6x-dev@linux-c6x.org, microblaze-uclinux@itee.uq.edu.au, linux@lists.openrisc.net, linuxppc-dev@lists.ozlabs.org, Devicetree Discuss <devicetree-discuss@lists.ozlabs.org>, Stephen Warren <swarren@nvidia.com>
 
-This hooks dtc into Kbuild's dependency system.
-
-Thus, for example, "make dtbs" will rebuild tegra-harmony.dtb if only
-tegra20.dtsi has changed yet tegra-harmony.dts has not. The previous
-lack of this feature recently caused me to have very confusing "git
-bisect" results.
-
-For ARM, it's obvious what to add to $(targets). I'm not familiar enough
-with other architectures to know what to add there. Powerpc appears to
-already add various .dtb files into $(targets), but the other archs may
-need something added to $(targets) to work.
+This will allow callers to rebuild .dtb files when any of the /include/d
+.dtsi files are modified, not just the top-level .dts file.
 
 Signed-off-by: Stephen Warren <swarren@nvidia.com>
 ---
+This patch is against the Linux kernel's copy of dtc, but it applies to
+upstream dtc with a couple of trivial conflicts. I can post a version for
+upstream dtc as well if desired.
+
 I have only tested this series for ARM.
 
- arch/arm/boot/Makefile        |    6 ++++--
- arch/c6x/boot/Makefile        |    2 +-
- arch/microblaze/boot/Makefile |    2 +-
- arch/openrisc/boot/Makefile   |    4 ++--
- arch/powerpc/boot/Makefile    |    4 ++--
- scripts/Makefile.lib          |    2 +-
- 6 files changed, 11 insertions(+), 9 deletions(-)
+ scripts/dtc/dtc.c    |   22 +++++++++++++++++++++-
+ scripts/dtc/srcpos.c |    6 ++++++
+ scripts/dtc/srcpos.h |    1 +
+ 3 files changed, 28 insertions(+), 1 deletions(-)
 
-diff --git a/arch/arm/boot/Makefile b/arch/arm/boot/Makefile
-index 1338cf0..c72730d 100644
---- a/arch/arm/boot/Makefile
-+++ b/arch/arm/boot/Makefile
-@@ -62,9 +62,11 @@ $(obj)/zImage-dtb.%:	$(obj)/%.dtb $(obj)/zImage
+diff --git a/scripts/dtc/dtc.c b/scripts/dtc/dtc.c
+index cbc0193..27ecf06 100644
+--- a/scripts/dtc/dtc.c
++++ b/scripts/dtc/dtc.c
+@@ -71,6 +71,7 @@ static void  __attribute__ ((noreturn)) usage(void)
+ 	fprintf(stderr, "\t\t\tasm - assembler source\n");
+ 	fprintf(stderr, "\t-V <output version>\n");
+ 	fprintf(stderr, "\t\tBlob version to produce, defaults to %d (relevant for dtb\n\t\tand asm output only)\n", DEFAULT_FDT_VERSION);
++	fprintf(stderr, "\t-d <output dependency file>\n");
+ 	fprintf(stderr, "\t-R <number>\n");
+ 	fprintf(stderr, "\t\tMake space for <number> reserve map entries (relevant for \n\t\tdtb and asm output only)\n");
+ 	fprintf(stderr, "\t-S <bytes>\n");
+@@ -99,6 +100,7 @@ int main(int argc, char *argv[])
+ 	const char *inform = "dts";
+ 	const char *outform = "dts";
+ 	const char *outname = "-";
++	const char *depname = NULL;
+ 	int force = 0, check = 0, sort = 0;
+ 	const char *arg;
+ 	int opt;
+@@ -111,7 +113,8 @@ int main(int argc, char *argv[])
+ 	minsize    = 0;
+ 	padsize    = 0;
  
- endif
+-	while ((opt = getopt(argc, argv, "hI:O:o:V:R:S:p:fcqb:vH:s")) != EOF) {
++	while ((opt = getopt(argc, argv, "hI:O:o:V:d:R:S:p:fcqb:vH:s"))
++			!= EOF) {
+ 		switch (opt) {
+ 		case 'I':
+ 			inform = optarg;
+@@ -125,6 +128,9 @@ int main(int argc, char *argv[])
+ 		case 'V':
+ 			outversion = strtol(optarg, NULL, 0);
+ 			break;
++		case 'd':
++			depname = optarg;
++			break;
+ 		case 'R':
+ 			reservenum = strtol(optarg, NULL, 0);
+ 			break;
+@@ -188,6 +194,15 @@ int main(int argc, char *argv[])
+ 	fprintf(stderr, "DTC: %s->%s  on file \"%s\"\n",
+ 		inform, outform, arg);
  
-+targets += $(dtb-y)
++	if (depname) {
++		depfile = fopen(depname, "w");
++		if (!depfile)
++			die("Couldn't open dependency file %s: %s\n", depname,
++			    strerror(errno));
++		fputs(outname, depfile);
++		fputc(':', depfile);
++	}
 +
- # Rule to build device tree blobs
--$(obj)/%.dtb: $(src)/dts/%.dts
--	$(call cmd,dtc)
-+$(obj)/%.dtb: $(src)/dts/%.dts FORCE
-+	$(call if_changed_dep,dtc)
+ 	if (streq(inform, "dts"))
+ 		bi = dt_from_source(arg);
+ 	else if (streq(inform, "fs"))
+@@ -197,6 +212,11 @@ int main(int argc, char *argv[])
+ 	else
+ 		die("Unknown input format \"%s\"\n", inform);
  
- $(obj)/dtbs: $(addprefix $(obj)/, $(dtb-y))
++	if (depfile) {
++		fputc('\n', depfile);
++		fclose(depfile);
++	}
++
+ 	if (cmdline_boot_cpuid != -1)
+ 		bi->boot_cpuid_phys = cmdline_boot_cpuid;
  
-diff --git a/arch/c6x/boot/Makefile b/arch/c6x/boot/Makefile
-index ecca820..6891257 100644
---- a/arch/c6x/boot/Makefile
-+++ b/arch/c6x/boot/Makefile
-@@ -13,7 +13,7 @@ obj-y += linked_dtb.o
- endif
+diff --git a/scripts/dtc/srcpos.c b/scripts/dtc/srcpos.c
+index 2dbc874..93b3533 100644
+--- a/scripts/dtc/srcpos.c
++++ b/scripts/dtc/srcpos.c
+@@ -40,6 +40,7 @@ static char *dirname(const char *path)
+ 	return NULL;
+ }
  
- $(obj)/%.dtb: $(src)/dts/%.dts FORCE
--	$(call cmd,dtc)
-+	$(call if_changed_dep,dtc)
++FILE *depfile; /* = NULL */
+ struct srcfile_state *current_srcfile; /* = NULL */
  
- quiet_cmd_cp = CP      $< $@$2
- 	cmd_cp = cat $< >$@$2 || (rm -f $@ && echo false)
-diff --git a/arch/microblaze/boot/Makefile b/arch/microblaze/boot/Makefile
-index 4c4e58e..0c796cf 100644
---- a/arch/microblaze/boot/Makefile
-+++ b/arch/microblaze/boot/Makefile
-@@ -53,6 +53,6 @@ $(obj)/simpleImage.%: vmlinux FORCE
- DTC_FLAGS := -p 1024
+ /* Detect infinite include recursion. */
+@@ -67,6 +68,11 @@ FILE *srcfile_relative_open(const char *fname, char **fullnamep)
+ 			    strerror(errno));
+ 	}
  
- $(obj)/%.dtb: $(src)/dts/%.dts FORCE
--	$(call cmd,dtc)
-+	$(call if_changed_dep,dtc)
++	if (depfile) {
++		fputc(' ', depfile);
++		fputs(fullname, depfile);
++	}
++
+ 	if (fullnamep)
+ 		*fullnamep = fullname;
+ 	else
+diff --git a/scripts/dtc/srcpos.h b/scripts/dtc/srcpos.h
+index bd7966e..ce980ca 100644
+--- a/scripts/dtc/srcpos.h
++++ b/scripts/dtc/srcpos.h
+@@ -30,6 +30,7 @@ struct srcfile_state {
+ 	struct srcfile_state *prev;
+ };
  
- clean-files += *.dtb simpleImage.*.unstrip linux.bin.ub
-diff --git a/arch/openrisc/boot/Makefile b/arch/openrisc/boot/Makefile
-index 98ca185..0995835 100644
---- a/arch/openrisc/boot/Makefile
-+++ b/arch/openrisc/boot/Makefile
-@@ -11,5 +11,5 @@ clean-files := *.dtb.S
++extern FILE *depfile; /* = NULL */
+ extern struct srcfile_state *current_srcfile; /* = NULL */
  
- #DTC_FLAGS ?= -p 1024
- 
--$(obj)/%.dtb: $(src)/dts/%.dts
--	$(call cmd,dtc)
-+$(obj)/%.dtb: $(src)/dts/%.dts FORCE
-+	$(call if_changed_dep,dtc)
-diff --git a/arch/powerpc/boot/Makefile b/arch/powerpc/boot/Makefile
-index 15986e7..8844a17 100644
---- a/arch/powerpc/boot/Makefile
-+++ b/arch/powerpc/boot/Makefile
-@@ -345,8 +345,8 @@ $(obj)/treeImage.%: vmlinux $(obj)/%.dtb $(wrapperbits)
- 	$(call if_changed,wrap,treeboot-$*,,$(obj)/$*.dtb)
- 
- # Rule to build device tree blobs
--$(obj)/%.dtb: $(src)/dts/%.dts
--	$(call cmd,dtc)
-+$(obj)/%.dtb: $(src)/dts/%.dts FORCE
-+	$(call if_changed_dep,dtc)
- 
- # If there isn't a platform selected then just strip the vmlinux.
- ifeq (,$(image-y))
-diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-index 5d986d9..7bae316 100644
---- a/scripts/Makefile.lib
-+++ b/scripts/Makefile.lib
-@@ -264,7 +264,7 @@ $(obj)/%.dtb.S: $(obj)/%.dtb
- 	$(call cmd,dt_S_dtb)
- 
- quiet_cmd_dtc = DTC     $@
--cmd_dtc = $(objtree)/scripts/dtc/dtc -O dtb -o $@ -b 0 $(DTC_FLAGS) $<
-+cmd_dtc = $(objtree)/scripts/dtc/dtc -O dtb -o $@ -b 0 $(DTC_FLAGS) -d $(depfile) $<
- 
- # Bzip2
- # ---------------------------------------------------------------------------
+ FILE *srcfile_relative_open(const char *fname, char **fullnamep);
 -- 
 1.7.0.4
 
