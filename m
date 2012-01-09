@@ -1,46 +1,170 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ip-213-220-200-171.net.upcbroadband.cz ([213.220.200.171]:61717
-	"EHLO emu.suse.cz" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1754492Ab2AHVQd (ORCPT
+Received: from mail-ee0-f46.google.com ([74.125.83.46]:56284 "EHLO
+	mail-ee0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752513Ab2AILgh (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 8 Jan 2012 16:16:33 -0500
-From: Michal Marek <mmarek@suse.cz>
-Subject: [PATCH] kbuild: Fix comment in Makefile.lib
-Date: Sun,  8 Jan 2012 22:08:05 +0100
-Message-Id: <1326056885-6226-1-git-send-email-mmarek@suse.cz>
+	Mon, 9 Jan 2012 06:36:37 -0500
+From: Paulius Zaleckas <paulius.zaleckas@gmail.com>
+Subject: [PATCH v2 1/2] menuconfig: basic string editing in inputbox support
+Date: Mon, 09 Jan 2012 13:36:33 +0200
+Message-ID: <20120109113633.24486.69758.stgit@localhost6.localdomain6>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
+To: mmarek@suse.cz, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-KBUILD_MODNAME is not defined for files that are linked into multiple
-modules, and trying to change reality to match documentation would
-result in all sorts of trouble. E.g. options for built-in modules would
-be called either foo_bar.param, foo.param, or bar.param, depending on
-the configuration. So just change the comment.
+For me the most irritating thing in linux kernel was absence
+of string editing in menuconfig's inputbox. If you wanted to
+change first symbol you had to delete all string and then type
+it all again.
+New implementation handles right/left cursor, backspace and
+delete keys. It does a little bit more terminal manipulations
+as string area is fully redrawn on each event.
 
-Signed-off-by: Michal Marek <mmarek@suse.cz>
+Signed-off-by: Paulius Zaleckas <paulius.zaleckas@gmail.com>
 ---
- scripts/Makefile.lib |    6 +++---
- 1 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-index 5d986d9..2ce2e21 100644
---- a/scripts/Makefile.lib
-+++ b/scripts/Makefile.lib
-@@ -93,9 +93,9 @@ obj-dirs	:= $(addprefix $(obj)/,$(obj-dirs))
- # already
- # $(modname_flags) #defines KBUILD_MODNAME as the name of the module it will 
- # end up in (or would, if it gets compiled in)
--# Note: It's possible that one object gets potentially linked into more
--#       than one module. In that case KBUILD_MODNAME will be set to foo_bar,
--#       where foo and bar are the name of the modules.
-+# Note: Files that end up in two or more modules are compiled without the
-+#       KBUILD_MODNAME definition. The reason is that any made-up name would
-+#       differ in different configs.
- name-fix = $(subst $(comma),_,$(subst -,_,$1))
- basename_flags = -D"KBUILD_BASENAME=KBUILD_STR($(call name-fix,$(basetarget)))"
- modname_flags  = $(if $(filter 1,$(words $(modname))),\
--- 
-1.7.7
+ scripts/kconfig/lxdialog/inputbox.c |   87 +++++++++++++++++++++--------------
+ 1 files changed, 53 insertions(+), 34 deletions(-)
+
+diff --git a/scripts/kconfig/lxdialog/inputbox.c b/scripts/kconfig/lxdialog/inputbox.c
+index dd8e587..834eee9 100644
+--- a/scripts/kconfig/lxdialog/inputbox.c
++++ b/scripts/kconfig/lxdialog/inputbox.c
+@@ -44,7 +44,7 @@ static void print_buttons(WINDOW * dialog, int height, int width, int selected)
+ int dialog_inputbox(const char *title, const char *prompt, int height, int width,
+                     const char *init)
+ {
+-	int i, x, y, box_y, box_x, box_width;
++	int i, len, x, y, box_y, box_x, box_width;
+ 	int input_x = 0, scroll = 0, key = 0, button = -1;
+ 	char *instr = dialog_input_result;
+ 	WINDOW *dialog;
+@@ -54,6 +54,8 @@ int dialog_inputbox(const char *title, const char *prompt, int height, int width
+ 	else
+ 		strcpy(instr, init);
+ 
++	len = strlen(instr);
++
+ do_resize:
+ 	if (getmaxy(stdscr) <= (height - 2))
+ 		return -ERRDISPLAYTOOSMALL;
+@@ -97,14 +99,13 @@ do_resize:
+ 	wmove(dialog, box_y, box_x);
+ 	wattrset(dialog, dlg.inputbox.atr);
+ 
+-	input_x = strlen(instr);
+-
+-	if (input_x >= box_width) {
+-		scroll = input_x - box_width + 1;
++	if (len >= box_width) {
++		scroll = len - box_width + 1;
+ 		input_x = box_width - 1;
+ 		for (i = 0; i < box_width - 1; i++)
+ 			waddch(dialog, instr[scroll + i]);
+ 	} else {
++		input_x = len;
+ 		waddstr(dialog, instr);
+ 	}
+ 
+@@ -121,50 +122,68 @@ do_resize:
+ 			case KEY_UP:
+ 			case KEY_DOWN:
+ 				break;
+-			case KEY_LEFT:
+-				continue;
+ 			case KEY_RIGHT:
++				if (scroll + input_x < len) {
++					if (input_x == box_width - 1)
++						scroll++;
++					else
++						input_x++;
++					goto redraw;
++				}
+ 				continue;
++			case KEY_LEFT:
+ 			case KEY_BACKSPACE:
+ 			case 127:
+ 				if (input_x || scroll) {
+-					wattrset(dialog, dlg.inputbox.atr);
+-					if (!input_x) {
+-						scroll = scroll < box_width - 1 ? 0 : scroll - (box_width - 1);
+-						wmove(dialog, box_y, box_x);
+-						for (i = 0; i < box_width; i++)
+-							waddch(dialog,
+-							       instr[scroll + input_x + i] ?
+-							       instr[scroll + input_x + i] : ' ');
+-						input_x = strlen(instr) - scroll;
+-					} else
++					/* 
++					 * Some fancy scrolling, so you can see what
++					 * you will be deleting with backspace
++					 */
++					if (!input_x || (input_x < box_width / 4 && scroll))
++						scroll--;
++					else
+ 						input_x--;
+-					instr[scroll + input_x] = '\0';
+-					mvwaddch(dialog, box_y, input_x + box_x, ' ');
+-					wmove(dialog, box_y, input_x + box_x);
+-					wrefresh(dialog);
++
++					if (key != KEY_LEFT) {
++						int pos = scroll + input_x;
++						memmove(&instr[pos], &instr[pos + 1], len-- - pos + 1);
++					}
++					goto redraw;
++				}
++				continue;
++			case KEY_DC:
++				if (scroll + input_x < len) {
++					int pos = scroll + input_x;
++					memmove(&instr[pos], &instr[pos + 1], len-- - pos + 1);
++					goto redraw;
+ 				}
+ 				continue;
+ 			default:
+ 				if (key < 0x100 && isprint(key)) {
+-					if (scroll + input_x < MAX_LEN) {
+-						wattrset(dialog, dlg.inputbox.atr);
+-						instr[scroll + input_x] = key;
+-						instr[scroll + input_x + 1] = '\0';
+-						if (input_x == box_width - 1) {
++					if (len < MAX_LEN) {
++						int pos = scroll + input_x;
++						memmove(&instr[pos + 1], &instr[pos], len++ - pos + 1);
++						instr[pos] = key;
++						if (input_x == box_width - 1)
+ 							scroll++;
+-							wmove(dialog, box_y, box_x);
+-							for (i = 0; i < box_width - 1; i++)
+-								waddch(dialog, instr [scroll + i]);
+-						} else {
+-							wmove(dialog, box_y, input_x++ + box_x);
+-							waddch(dialog, key);
+-						}
+-						wrefresh(dialog);
++						else
++							input_x++;
++						goto redraw;
+ 					} else
+ 						flash();	/* Alarm user about overflow */
+ 					continue;
+ 				}
++				break;
++			redraw:
++				wattrset(dialog, dlg.inputbox.atr);
++				wmove(dialog, box_y, box_x);
++				for (i = 0; i < box_width - 1; i++)
++					waddch(dialog,
++					       scroll + i < len ?
++					       instr[scroll + i] : ' ');
++				wmove(dialog, box_y, input_x + box_x);
++				wrefresh(dialog);
++				continue;
+ 			}
+ 		}
+ 		switch (key) {
 
