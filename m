@@ -1,68 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from oproxy8-pub.bluehost.com ([69.89.22.20]:44022 "HELO
-	oproxy8-pub.bluehost.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with SMTP id S1754932Ab2AIVWi (ORCPT
+Received: from mail-iy0-f174.google.com ([209.85.210.174]:48547 "EHLO
+	mail-iy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755843Ab2AJDBt (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 9 Jan 2012 16:22:38 -0500
-Message-ID: <4F0B6845.4080503@xenotime.net>
-Date: Mon, 09 Jan 2012 14:20:53 -0800
-From: Randy Dunlap <rdunlap@xenotime.net>
+	Mon, 9 Jan 2012 22:01:49 -0500
+Date: Tue, 10 Jan 2012 11:12:22 +0800
+From: Shawn Guo <shawn.guo@linaro.org>
+Subject: Re: [PATCH 2/2] Kbuild: Use dtc's -d (dependency) option
+Message-ID: <20120110031220.GC23362@S2101-09.ap.freescale.net>
+References: <1326134295-15547-1-git-send-email-swarren@nvidia.com>
+ <1326134295-15547-2-git-send-email-swarren@nvidia.com>
 MIME-Version: 1.0
-Subject: Re: [PATCH v2 2/2] menuconfig: add Home and End keys support for
- inputbox
-References: <20120109113633.24486.69758.stgit@localhost6.localdomain6> <20120109113641.24486.95511.stgit@localhost6.localdomain6>
-In-Reply-To: <20120109113641.24486.95511.stgit@localhost6.localdomain6>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1326134295-15547-2-git-send-email-swarren@nvidia.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Paulius Zaleckas <paulius.zaleckas@gmail.com>
-Cc: mmarek@suse.cz, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Stephen Warren <swarren@nvidia.com>
+Cc: Michal Marek <mmarek@suse.cz>, Jon Loeliger <jdl@jdl.com>, David Gibson <david@gibson.dropbear.id.au>, Russell King <linux@arm.linux.org.uk>, linux-c6x-dev@linux-c6x.org, Aurelien Jacquiot <a-jacquiot@ti.com>, Devicetree Discuss <devicetree-discuss@lists.ozlabs.org>, microblaze-uclinux@itee.uq.edu.au, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Rob Herring <rob.herring@calxeda.com>, linuxppc-dev@lists.ozlabs.org, linux@lists.openrisc.net, linux-arm-kernel@lists.infradead.org
 
-On 01/09/2012 03:36 AM, Paulius Zaleckas wrote:
-> Makes long string editing easier.
+On Mon, Jan 09, 2012 at 11:38:15AM -0700, Stephen Warren wrote:
+> This hooks dtc into Kbuild's dependency system.
 > 
-> Signed-off-by: Paulius Zaleckas <paulius.zaleckas@gmail.com>
-
-Hi,
-
-Does "default hostname" in the "General setup" menu use an inputbox?
-If so, I can't get Home and End keys to work for it.
-
-If not, please tell me a field that uses an inputbox so that I can test it.
-
-Thanks.
-
-> ---
+> Thus, for example, "make dtbs" will rebuild tegra-harmony.dtb if only
+> tegra20.dtsi has changed yet tegra-harmony.dts has not. The previous
+> lack of this feature recently caused me to have very confusing "git
+> bisect" results.
 > 
->  scripts/kconfig/lxdialog/inputbox.c |   10 ++++++++++
->  1 files changed, 10 insertions(+), 0 deletions(-)
+> For ARM, it's obvious what to add to $(targets). I'm not familiar enough
+> with other architectures to know what to add there. Powerpc appears to
+> already add various .dtb files into $(targets), but the other archs may
+> need something added to $(targets) to work.
 > 
-> diff --git a/scripts/kconfig/lxdialog/inputbox.c b/scripts/kconfig/lxdialog/inputbox.c
-> index 834eee9..0d9cacc 100644
-> --- a/scripts/kconfig/lxdialog/inputbox.c
-> +++ b/scripts/kconfig/lxdialog/inputbox.c
-> @@ -158,6 +158,16 @@ do_resize:
->  					goto redraw;
->  				}
->  				continue;
-> +			case KEY_HOME:
-> +				scroll = input_x = 0;
-> +				goto redraw;
-> +			case KEY_END:
-> +				if (len >= box_width) {
-> +					scroll = len - box_width + 1;
-> +					input_x = box_width - 1;
-> +				} else
-> +					input_x = len;
-> +				goto redraw;
->  			default:
->  				if (key < 0x100 && isprint(key)) {
->  					if (len < MAX_LEN) {
-> 
-> --
+> Signed-off-by: Stephen Warren <swarren@nvidia.com>
 
+Though I did not look into the patches deeply, I know the problem very
+well and it annoys me a lot.  It's great that we have patches to fix
+it, so
+
+Acked-by: Shawn Guo <shawn.guo@linaro.org>
 
 -- 
-~Randy
-*** Remember to use Documentation/SubmitChecklist when testing your code ***
+Regards,
+Shawn
