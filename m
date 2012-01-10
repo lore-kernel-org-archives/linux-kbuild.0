@@ -1,45 +1,64 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-iy0-f174.google.com ([209.85.210.174]:48547 "EHLO
-	mail-iy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755843Ab2AJDBt (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 9 Jan 2012 22:01:49 -0500
-Date: Tue, 10 Jan 2012 11:12:22 +0800
-From: Shawn Guo <shawn.guo@linaro.org>
-Subject: Re: [PATCH 2/2] Kbuild: Use dtc's -d (dependency) option
-Message-ID: <20120110031220.GC23362@S2101-09.ap.freescale.net>
-References: <1326134295-15547-1-git-send-email-swarren@nvidia.com>
- <1326134295-15547-2-git-send-email-swarren@nvidia.com>
+Received: from cantor2.suse.de ([195.135.220.15]:57634 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754069Ab2AJIw4 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 10 Jan 2012 03:52:56 -0500
+Date: Tue, 10 Jan 2012 09:52:53 +0100
+From: Michal Hocko <mhocko@suse.cz>
+Subject: Re: [PATCH] Makefiles: Disable unused-variable warning
+Message-ID: <20120110085253.GC5050@tiehlicka.suse.cz>
+References: <1324695619-5537-1-git-send-email-kirill@shutemov.name>
+ <20111227135752.GK5344@tiehlicka.suse.cz>
+ <4F09AFBD.60503@suse.cz>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1326134295-15547-2-git-send-email-swarren@nvidia.com>
+In-Reply-To: <4F09AFBD.60503@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Stephen Warren <swarren@nvidia.com>
-Cc: Michal Marek <mmarek@suse.cz>, Jon Loeliger <jdl@jdl.com>, David Gibson <david@gibson.dropbear.id.au>, Russell King <linux@arm.linux.org.uk>, linux-c6x-dev@linux-c6x.org, Aurelien Jacquiot <a-jacquiot@ti.com>, Devicetree Discuss <devicetree-discuss@lists.ozlabs.org>, microblaze-uclinux@itee.uq.edu.au, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Rob Herring <rob.herring@calxeda.com>, linuxppc-dev@lists.ozlabs.org, linux@lists.openrisc.net, linux-arm-kernel@lists.infradead.org
+To: Michal Marek <mmarek@suse.cz>
+Cc: "Kirill A. Shutemov" <kirill@shutemov.name>, linux-mm@kvack.org, cgroups@vger.kernel.org, linux-kernel@vger.kernel.org, containers@lists.linux-foundation.org, KAMEZAWA Hiroyuki <kamezawa.hiroyu@jp.fujitsu.com>, Balbir Singh <bsingharora@gmail.com>, Johannes Weiner <hannes@cmpxchg.org>, linux-kbuild@vger.kernel.org
 
-On Mon, Jan 09, 2012 at 11:38:15AM -0700, Stephen Warren wrote:
-> This hooks dtc into Kbuild's dependency system.
+On Sun 08-01-12 16:01:17, Michal Marek wrote:
+> Dne 27.12.2011 14:57, Michal Hocko napsal(a):
+> > Anyway, I am wondering why unused-but-set-variable is disabled while
+> > unused-variable is enabled.
 > 
-> Thus, for example, "make dtbs" will rebuild tegra-harmony.dtb if only
-> tegra20.dtsi has changed yet tegra-harmony.dts has not. The previous
-> lack of this feature recently caused me to have very confusing "git
-> bisect" results.
+> unused-but-set-variable was disabled, because it was a new warning in
+> gcc 4.6 and produced too much noise relatively to its severity. A make
+> W=1 build of x86_64_defconfig gives:
+> $ grep -c 'Wunused-but-set-variable' log
+> 77
+> $ grep -c 'Wunused-variable' log
+> 0
 > 
-> For ARM, it's obvious what to add to $(targets). I'm not familiar enough
-> with other architectures to know what to add there. Powerpc appears to
-> already add various .dtb files into $(targets), but the other archs may
-> need something added to $(targets) to work.
-> 
-> Signed-off-by: Stephen Warren <swarren@nvidia.com>
+> More exotic configuration will probably result in a couple of unused
+> variable warnings, but that IMO no reason to disable them globally.
 
-Though I did not look into the patches deeply, I know the problem very
-well and it annoys me a lot.  It's great that we have patches to fix
-it, so
+OK.
 
-Acked-by: Shawn Guo <shawn.guo@linaro.org>
+> > Shouldn't we just disable it as well rather
+> > than workaround this in the code? The warning is just pure noise in this
+> > case.
+> 
+> If it's noise in a particular case, there is always the option to add
+> 
+> CFLAGS_memcontrol.o := $(call cc-disable-warning, unused-variable)
+
+I would like to prevent from local cflags hacks. Moreover the code will
+go away so I guess it doesn't make much sense to play tricks here.
+
+> 
+> to the respective Makefile.
+> 
+> Michal
+
+Thanks
 
 -- 
-Regards,
-Shawn
+Michal Hocko
+SUSE Labs
+SUSE LINUX s.r.o.
+Lihovarska 1060/12
+190 00 Praha 9    
+Czech Republic
