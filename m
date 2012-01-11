@@ -1,141 +1,78 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from avon.wwwdotorg.org ([70.85.31.133]:50596 "EHLO
-	avon.wwwdotorg.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757098Ab2AKA2C (ORCPT
+Received: from mail-we0-f174.google.com ([74.125.82.174]:36522 "EHLO
+	mail-we0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756616Ab2AKJVP (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 10 Jan 2012 19:28:02 -0500
-From: Stephen Warren <swarren@nvidia.com>
-Subject: [PATCH V2] dtc: Implement -d option to write out a dependency file
-Date: Tue, 10 Jan 2012 17:27:52 -0700
-Message-Id: <1326241672-9168-1-git-send-email-swarren@nvidia.com>
+	Wed, 11 Jan 2012 04:21:15 -0500
+MIME-Version: 1.0
+In-Reply-To: <4F0C75A5.6000000@xenotime.net>
+References: <20120109113633.24486.69758.stgit@localhost6.localdomain6>
+	<20120109113641.24486.95511.stgit@localhost6.localdomain6>
+	<4F0B6845.4080503@xenotime.net>
+	<CAPiS6wCVo40tB40sXTzTt7RpVHJG_2wrYeP8L=ghin09WHftfg@mail.gmail.com>
+	<4F0C75A5.6000000@xenotime.net>
+Date: Wed, 11 Jan 2012 11:21:14 +0200
+Message-ID: <CAPiS6wDYrryyPimun2N0xFCY3xCTDAS+tKKAmuZGjbSUjWpZGw@mail.gmail.com>
+Subject: Re: [PATCH v2 2/2] menuconfig: add Home and End keys support for inputbox
+From: Paulius Zaleckas <paulius.zaleckas@gmail.com>
+Content-Type: multipart/mixed; boundary=0016e6d45feb40c0ee04b63d27a7
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: Jon Loeliger <jdl@jdl.com>, David Gibson <david@gibson.dropbear.id.au>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Devicetree Discuss <devicetree-discuss@lists.ozlabs.org>, Stephen Warren <swarren@nvidia.com>
+To: Randy Dunlap <rdunlap@xenotime.net>
+Cc: mmarek@suse.cz, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-This will allow callers to rebuild .dtb files when any of the /include/d
-.dtsi files are modified, not just the top-level .dts file.
+--0016e6d45feb40c0ee04b63d27a7
+Content-Type: text/plain; charset=UTF-8
 
-Signed-off-by: Stephen Warren <swarren@nvidia.com>
----
-Michal, this patch is a dependency for the kbuild changes that use it;
-http://www.spinics.net/lists/linux-kbuild/msg05883.html
-I think it makes sense to apply both this patch, and that patch, to the
-kbuild tree. Do you agree?
+On Tue, Jan 10, 2012 at 7:30 PM, Randy Dunlap <rdunlap@xenotime.net> wrote:
+> On 01/10/2012 03:50 AM, Paulius Zaleckas wrote:
+>> On Tue, Jan 10, 2012 at 12:20 AM, Randy Dunlap <rdunlap@xenotime.net> wrote:
+>>> On 01/09/2012 03:36 AM, Paulius Zaleckas wrote:
+>>>> Makes long string editing easier.
+>>>>
+>>>> Signed-off-by: Paulius Zaleckas <paulius.zaleckas@gmail.com>
+>>>
+>>> Hi,
+>>>
+>>> Does "default hostname" in the "General setup" menu use an inputbox?
+>>
+>> Yes, it does.
+>>
+>>> If so, I can't get Home and End keys to work for it.
+>>
+>> Strange. It works for me. Have you applied both patches?
+>
+> Yes, I have both patches applied.
 
-v2: Replace fputs/fputc with fprintf
+Ok this is really very strange, but I have made debug patch. See attachement.
+It will print octal pressed key value just below the text field.
 
-This patch has been blessed for application to upstream dtc. Here, I'm
-simply applying the same thing to the code in the Linux kernel tree,
-resolving some conflicts. See:
-http://lists.ozlabs.org/pipermail/devicetree-discuss/2012-January/011172.html
+From curses.h:
+#define KEY_HOME	0406		/* home key */
+#define KEY_END		0550		/* end key */
 
- scripts/dtc/dtc.c    |   21 ++++++++++++++++++++-
- scripts/dtc/srcpos.c |    4 ++++
- scripts/dtc/srcpos.h |    1 +
- 3 files changed, 25 insertions(+), 1 deletions(-)
+Do you get the same values for Home and End keys? I do.
 
-diff --git a/scripts/dtc/dtc.c b/scripts/dtc/dtc.c
-index cbc0193..451c92d 100644
---- a/scripts/dtc/dtc.c
-+++ b/scripts/dtc/dtc.c
-@@ -71,6 +71,7 @@ static void  __attribute__ ((noreturn)) usage(void)
- 	fprintf(stderr, "\t\t\tasm - assembler source\n");
- 	fprintf(stderr, "\t-V <output version>\n");
- 	fprintf(stderr, "\t\tBlob version to produce, defaults to %d (relevant for dtb\n\t\tand asm output only)\n", DEFAULT_FDT_VERSION);
-+	fprintf(stderr, "\t-d <output dependency file>\n");
- 	fprintf(stderr, "\t-R <number>\n");
- 	fprintf(stderr, "\t\tMake space for <number> reserve map entries (relevant for \n\t\tdtb and asm output only)\n");
- 	fprintf(stderr, "\t-S <bytes>\n");
-@@ -99,6 +100,7 @@ int main(int argc, char *argv[])
- 	const char *inform = "dts";
- 	const char *outform = "dts";
- 	const char *outname = "-";
-+	const char *depname = NULL;
- 	int force = 0, check = 0, sort = 0;
- 	const char *arg;
- 	int opt;
-@@ -111,7 +113,8 @@ int main(int argc, char *argv[])
- 	minsize    = 0;
- 	padsize    = 0;
- 
--	while ((opt = getopt(argc, argv, "hI:O:o:V:R:S:p:fcqb:vH:s")) != EOF) {
-+	while ((opt = getopt(argc, argv, "hI:O:o:V:d:R:S:p:fcqb:vH:s"))
-+			!= EOF) {
- 		switch (opt) {
- 		case 'I':
- 			inform = optarg;
-@@ -125,6 +128,9 @@ int main(int argc, char *argv[])
- 		case 'V':
- 			outversion = strtol(optarg, NULL, 0);
- 			break;
-+		case 'd':
-+			depname = optarg;
-+			break;
- 		case 'R':
- 			reservenum = strtol(optarg, NULL, 0);
- 			break;
-@@ -188,6 +194,14 @@ int main(int argc, char *argv[])
- 	fprintf(stderr, "DTC: %s->%s  on file \"%s\"\n",
- 		inform, outform, arg);
- 
-+	if (depname) {
-+		depfile = fopen(depname, "w");
-+		if (!depfile)
-+			die("Couldn't open dependency file %s: %s\n", depname,
-+			    strerror(errno));
-+		fprintf(depfile, "%s:", outname);
-+	}
-+
- 	if (streq(inform, "dts"))
- 		bi = dt_from_source(arg);
- 	else if (streq(inform, "fs"))
-@@ -197,6 +211,11 @@ int main(int argc, char *argv[])
- 	else
- 		die("Unknown input format \"%s\"\n", inform);
- 
-+	if (depfile) {
-+		fputc('\n', depfile);
-+		fclose(depfile);
-+	}
-+
- 	if (cmdline_boot_cpuid != -1)
- 		bi->boot_cpuid_phys = cmdline_boot_cpuid;
- 
-diff --git a/scripts/dtc/srcpos.c b/scripts/dtc/srcpos.c
-index 2dbc874..36a38e9 100644
---- a/scripts/dtc/srcpos.c
-+++ b/scripts/dtc/srcpos.c
-@@ -40,6 +40,7 @@ static char *dirname(const char *path)
- 	return NULL;
- }
- 
-+FILE *depfile; /* = NULL */
- struct srcfile_state *current_srcfile; /* = NULL */
- 
- /* Detect infinite include recursion. */
-@@ -67,6 +68,9 @@ FILE *srcfile_relative_open(const char *fname, char **fullnamep)
- 			    strerror(errno));
- 	}
- 
-+	if (depfile)
-+		fprintf(depfile, " %s", fullname);
-+
- 	if (fullnamep)
- 		*fullnamep = fullname;
- 	else
-diff --git a/scripts/dtc/srcpos.h b/scripts/dtc/srcpos.h
-index bd7966e..ce980ca 100644
---- a/scripts/dtc/srcpos.h
-+++ b/scripts/dtc/srcpos.h
-@@ -30,6 +30,7 @@ struct srcfile_state {
- 	struct srcfile_state *prev;
- };
- 
-+extern FILE *depfile; /* = NULL */
- extern struct srcfile_state *current_srcfile; /* = NULL */
- 
- FILE *srcfile_relative_open(const char *fname, char **fullnamep);
--- 
-1.7.0.4
+--0016e6d45feb40c0ee04b63d27a7
+Content-Type: text/x-diff; charset=US-ASCII; name="inputbox_debug.patch"
+Content-Disposition: attachment; filename="inputbox_debug.patch"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_gxa50c5m0
 
+RGVidWcgaW5wdXRib3ggYnkgcHJpbnRpbmcgb2N0YWwga2V5IHZhbHVlcy4KCkZyb206IFBhdWxp
+dXMgWmFsZWNrYXMgPHBhdWxpdXMuemFsZWNrYXNAZ21haWwuY29tPgoKCi0tLQoKIHNjcmlwdHMv
+a2NvbmZpZy9seGRpYWxvZy9pbnB1dGJveC5jIHwgICAxMCArKysrKysrKysrCiAxIGZpbGVzIGNo
+YW5nZWQsIDEwIGluc2VydGlvbnMoKyksIDAgZGVsZXRpb25zKC0pCgoKZGlmZiAtLWdpdCBhL3Nj
+cmlwdHMva2NvbmZpZy9seGRpYWxvZy9pbnB1dGJveC5jIGIvc2NyaXB0cy9rY29uZmlnL2x4ZGlh
+bG9nL2lucHV0Ym94LmMKaW5kZXggMGQ5Y2FjYy4uZWNiNzc4YyAxMDA2NDQKLS0tIGEvc2NyaXB0
+cy9rY29uZmlnL2x4ZGlhbG9nL2lucHV0Ym94LmMKKysrIGIvc2NyaXB0cy9rY29uZmlnL2x4ZGlh
+bG9nL2lucHV0Ym94LmMKQEAgLTExNCw3ICsxMTQsMTcgQEAgZG9fcmVzaXplOgogCXdyZWZyZXNo
+KGRpYWxvZyk7CiAKIAl3aGlsZSAoa2V5ICE9IEtFWV9FU0MpIHsKKwkJY2hhciBrZXlfbnVtWzRd
+OworCiAJCWtleSA9IHdnZXRjaChkaWFsb2cpOworCQlzbnByaW50ZihrZXlfbnVtLCA0LCAiJTAz
+byIsIGtleSk7CisJCXdhdHRyc2V0KGRpYWxvZywgZGxnLmlucHV0Ym94LmF0cik7CisJCXdtb3Zl
+KGRpYWxvZywgYm94X3kgKyAyLCBib3hfeCk7CisJCXdhZGRjaChkaWFsb2csIGtleV9udW1bMF0p
+OworCQl3YWRkY2goZGlhbG9nLCBrZXlfbnVtWzFdKTsKKwkJd2FkZGNoKGRpYWxvZywga2V5X251
+bVsyXSk7CisJCXdtb3ZlKGRpYWxvZywgYm94X3ksIGlucHV0X3ggKyBib3hfeCk7CisJCXdyZWZy
+ZXNoKGRpYWxvZyk7CiAKIAkJaWYgKGJ1dHRvbiA9PSAtMSkgewkvKiBJbnB1dCBib3ggc2VsZWN0
+ZWQgKi8KIAkJCXN3aXRjaCAoa2V5KSB7Cg==
+--0016e6d45feb40c0ee04b63d27a7--
