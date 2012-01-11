@@ -1,64 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from oproxy1-pub.bluehost.com ([66.147.249.253]:53814 "HELO
-	oproxy1-pub.bluehost.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with SMTP id S933507Ab2AKSOD (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 11 Jan 2012 13:14:03 -0500
-Message-ID: <4F0DDF08.1000005@xenotime.net>
-Date: Wed, 11 Jan 2012 11:12:08 -0800
-From: Randy Dunlap <rdunlap@xenotime.net>
-MIME-Version: 1.0
-Subject: Re: [PATCH v2 2/2] menuconfig: add Home and End keys support for
- inputbox
-References: <20120109113633.24486.69758.stgit@localhost6.localdomain6>	<20120109113641.24486.95511.stgit@localhost6.localdomain6>	<4F0B6845.4080503@xenotime.net>	<CAPiS6wCVo40tB40sXTzTt7RpVHJG_2wrYeP8L=ghin09WHftfg@mail.gmail.com>	<4F0C75A5.6000000@xenotime.net> <CAPiS6wDYrryyPimun2N0xFCY3xCTDAS+tKKAmuZGjbSUjWpZGw@mail.gmail.com>
-In-Reply-To: <CAPiS6wDYrryyPimun2N0xFCY3xCTDAS+tKKAmuZGjbSUjWpZGw@mail.gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
+Received: from mx1.redhat.com ([209.132.183.28]:62442 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1757719Ab2AKTiA (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 11 Jan 2012 14:38:00 -0500
+Subject: Re: [PATCH 2/2] Kbuild: Use dtc's -d (dependency) option
+From: Mark Salter <msalter@redhat.com>
+Date: Wed, 11 Jan 2012 14:36:21 -0500
+In-Reply-To: <1326134295-15547-2-git-send-email-swarren@nvidia.com>
+References: <1326134295-15547-1-git-send-email-swarren@nvidia.com>
+	 <1326134295-15547-2-git-send-email-swarren@nvidia.com>
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+Message-ID: <1326310587.2535.291.camel@deneb.redhat.com>
+Mime-Version: 1.0
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Paulius Zaleckas <paulius.zaleckas@gmail.com>
-Cc: mmarek@suse.cz, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Stephen Warren <swarren@nvidia.com>
+Cc: Michal Marek <mmarek@suse.cz>, Jon Loeliger <jdl@jdl.com>, David Gibson <david@gibson.dropbear.id.au>, Russell King <linux@arm.linux.org.uk>, Aurelien Jacquiot <a-jacquiot@ti.com>, Michal Simek <monstr@monstr.eu>, Jonas Bonn <jonas@southpole.se>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Paul Mackerras <paulus@samba.org>, Grant Likely <grant.likely@secretlab.ca>, Rob Herring <rob.herring@calxeda.com>, Arnd Bergmann <arnd@arndb.de>, linux-kbuild@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-c6x-dev@linux-c6x.org, microblaze-uclinux@itee.uq.edu.au, linux@openrisc.net, linuxppc-dev@lists.ozlabs.org, Devicetree Discuss <devicetree-discuss@lists.ozlabs.org>
 
-On 01/11/2012 01:21 AM, Paulius Zaleckas wrote:
-> On Tue, Jan 10, 2012 at 7:30 PM, Randy Dunlap <rdunlap@xenotime.net> wrote:
->> On 01/10/2012 03:50 AM, Paulius Zaleckas wrote:
->>> On Tue, Jan 10, 2012 at 12:20 AM, Randy Dunlap <rdunlap@xenotime.net> wrote:
->>>> On 01/09/2012 03:36 AM, Paulius Zaleckas wrote:
->>>>> Makes long string editing easier.
->>>>>
->>>>> Signed-off-by: Paulius Zaleckas <paulius.zaleckas@gmail.com>
->>>>
->>>> Hi,
->>>>
->>>> Does "default hostname" in the "General setup" menu use an inputbox?
->>>
->>> Yes, it does.
->>>
->>>> If so, I can't get Home and End keys to work for it.
->>>
->>> Strange. It works for me. Have you applied both patches?
->>
->> Yes, I have both patches applied.
+On Mon, 2012-01-09 at 11:38 -0700, Stephen Warren wrote:
+> This hooks dtc into Kbuild's dependency system.
 > 
-> Ok this is really very strange, but I have made debug patch. See attachement.
-> It will print octal pressed key value just below the text field.
+> Thus, for example, "make dtbs" will rebuild tegra-harmony.dtb if only
+> tegra20.dtsi has changed yet tegra-harmony.dts has not. The previous
+> lack of this feature recently caused me to have very confusing "git
+> bisect" results.
 > 
-> From curses.h:
-> #define KEY_HOME	0406		/* home key */
-> #define KEY_END		0550		/* end key */
+> For ARM, it's obvious what to add to $(targets). I'm not familiar enough
+> with other architectures to know what to add there. Powerpc appears to
+> already add various .dtb files into $(targets), but the other archs may
+> need something added to $(targets) to work.
 > 
-> Do you get the same values for Home and End keys? I do.
+> Signed-off-by: Stephen Warren <swarren@nvidia.com>
+> 
 
-All that I see in the inputbox when I use Home or End is:
+Acked-by: Mark Salter <msalter@redhat.com>
 
-033
-
-(ESCape key)
+For the arch/c6x bit.
 
 
-Could this have anything to do with me using xfce (xfce4)?
-
-thanks,
--- 
-~Randy
-*** Remember to use Documentation/SubmitChecklist when testing your code ***
