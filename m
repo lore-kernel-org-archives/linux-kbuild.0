@@ -1,23 +1,21 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-iy0-f174.google.com ([209.85.210.174]:45177 "EHLO
+Received: from mail-iy0-f174.google.com ([209.85.210.174]:45246 "EHLO
 	mail-iy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752496Ab2ALD0u (ORCPT
+	with ESMTP id S1752496Ab2ALDcM (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 11 Jan 2012 22:26:50 -0500
-Received: by iabz25 with SMTP id z25so2043117iab.19
-        for <linux-kbuild@vger.kernel.org>; Wed, 11 Jan 2012 19:26:50 -0800 (PST)
-Date: Thu, 12 Jan 2012 11:26:13 +0800
+	Wed, 11 Jan 2012 22:32:12 -0500
+Date: Thu, 12 Jan 2012 11:31:32 +0800
 From: Wang YanQing <udknight@gmail.com>
 Subject: [PATCH] scripts:kconfig:mconf.c: let make not report error when not
  save configuration
-Message-ID: <20120112032613.GA13695@udknight>
+Message-ID: <20120112033132.GA13752@udknight>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: mmarek@suse.cz
-Cc: linux-kernel@veger.kernel.org, linux-kbuild@vger.kernel.org, lacombar@gmail.com, dave@gnu.org
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, lacombar@gmail.com, dave@gnu.org
 
 I find every time when I choice the 'NO' button at the dialog
 which let me choice whether to save the configuration before exit
