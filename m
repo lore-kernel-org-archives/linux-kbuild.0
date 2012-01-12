@@ -1,41 +1,60 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:62442 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1757719Ab2AKTiA (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 11 Jan 2012 14:38:00 -0500
-Subject: Re: [PATCH 2/2] Kbuild: Use dtc's -d (dependency) option
-From: Mark Salter <msalter@redhat.com>
-Date: Wed, 11 Jan 2012 14:36:21 -0500
-In-Reply-To: <1326134295-15547-2-git-send-email-swarren@nvidia.com>
-References: <1326134295-15547-1-git-send-email-swarren@nvidia.com>
-	 <1326134295-15547-2-git-send-email-swarren@nvidia.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Message-ID: <1326310587.2535.291.camel@deneb.redhat.com>
-Mime-Version: 1.0
+Received: from mail-iy0-f174.google.com ([209.85.210.174]:45177 "EHLO
+	mail-iy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752496Ab2ALD0u (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 11 Jan 2012 22:26:50 -0500
+Received: by iabz25 with SMTP id z25so2043117iab.19
+        for <linux-kbuild@vger.kernel.org>; Wed, 11 Jan 2012 19:26:50 -0800 (PST)
+Date: Thu, 12 Jan 2012 11:26:13 +0800
+From: Wang YanQing <udknight@gmail.com>
+Subject: [PATCH] scripts:kconfig:mconf.c: let make not report error when not
+ save configuration
+Message-ID: <20120112032613.GA13695@udknight>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Stephen Warren <swarren@nvidia.com>
-Cc: Michal Marek <mmarek@suse.cz>, Jon Loeliger <jdl@jdl.com>, David Gibson <david@gibson.dropbear.id.au>, Russell King <linux@arm.linux.org.uk>, Aurelien Jacquiot <a-jacquiot@ti.com>, Michal Simek <monstr@monstr.eu>, Jonas Bonn <jonas@southpole.se>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Paul Mackerras <paulus@samba.org>, Grant Likely <grant.likely@secretlab.ca>, Rob Herring <rob.herring@calxeda.com>, Arnd Bergmann <arnd@arndb.de>, linux-kbuild@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-c6x-dev@linux-c6x.org, microblaze-uclinux@itee.uq.edu.au, linux@openrisc.net, linuxppc-dev@lists.ozlabs.org, Devicetree Discuss <devicetree-discuss@lists.ozlabs.org>
+To: mmarek@suse.cz
+Cc: linux-kernel@veger.kernel.org, linux-kbuild@vger.kernel.org, lacombar@gmail.com, dave@gnu.org
 
-On Mon, 2012-01-09 at 11:38 -0700, Stephen Warren wrote:
-> This hooks dtc into Kbuild's dependency system.
-> 
-> Thus, for example, "make dtbs" will rebuild tegra-harmony.dtb if only
-> tegra20.dtsi has changed yet tegra-harmony.dts has not. The previous
-> lack of this feature recently caused me to have very confusing "git
-> bisect" results.
-> 
-> For ARM, it's obvious what to add to $(targets). I'm not familiar enough
-> with other architectures to know what to add there. Powerpc appears to
-> already add various .dtb files into $(targets), but the other archs may
-> need something added to $(targets) to work.
-> 
-> Signed-off-by: Stephen Warren <swarren@nvidia.com>
-> 
+I find every time when I choice the 'NO' button at the dialog
+which let me choice whether to save the configuration before exit
+menuconfig, it always report the blow:
 
-Acked-by: Mark Salter <msalter@redhat.com>
+" GEN     /mnt/sda7/home/build/test/Makefile
+  HOSTCC  scripts/kconfig/mconf.o
+  HOSTLD  scripts/kconfig/mconf
+scripts/kconfig/mconf Kconfig
 
-For the arch/c6x bit.
+Your configuration changes were NOT saved.
 
+make[2]: *** [menuconfig] Error 1
+make[1]: *** [menuconfig] Error 2
+make: *** [sub-make] Error 2 "
+
+This patch repair it.
+
+Thanks!
+
+Signed-off-by: Wang YanQing <udknight@gmail.com>
+---
+ scripts/kconfig/mconf.c |    1 +
+ 1 files changed, 1 insertions(+), 0 deletions(-)
+
+diff --git a/scripts/kconfig/mconf.c b/scripts/kconfig/mconf.c
+index 19e200d..86cd1ea 100644
+--- a/scripts/kconfig/mconf.c
++++ b/scripts/kconfig/mconf.c
+@@ -830,6 +830,7 @@ static int handle_exit(void)
+ 		fprintf(stderr, _("\n\n"
+ 				  "Your configuration changes were NOT saved."
+ 				  "\n\n"));
++		res = 0;
+ 	}
+ 
+ 	return res;
+-- 
+1.7.3.4
 
