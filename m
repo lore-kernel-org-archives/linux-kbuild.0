@@ -1,58 +1,73 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-iy0-f174.google.com ([209.85.210.174]:45246 "EHLO
-	mail-iy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752496Ab2ALDcM (ORCPT
+Received: from mail-ww0-f44.google.com ([74.125.82.44]:40064 "EHLO
+	mail-ww0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753620Ab2ALOYF convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 11 Jan 2012 22:32:12 -0500
-Date: Thu, 12 Jan 2012 11:31:32 +0800
-From: Wang YanQing <udknight@gmail.com>
-Subject: [PATCH] scripts:kconfig:mconf.c: let make not report error when not
- save configuration
-Message-ID: <20120112033132.GA13752@udknight>
+	Thu, 12 Jan 2012 09:24:05 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+In-Reply-To: <4F0DDF08.1000005@xenotime.net>
+References: <20120109113633.24486.69758.stgit@localhost6.localdomain6>
+	<20120109113641.24486.95511.stgit@localhost6.localdomain6>
+	<4F0B6845.4080503@xenotime.net>
+	<CAPiS6wCVo40tB40sXTzTt7RpVHJG_2wrYeP8L=ghin09WHftfg@mail.gmail.com>
+	<4F0C75A5.6000000@xenotime.net>
+	<CAPiS6wDYrryyPimun2N0xFCY3xCTDAS+tKKAmuZGjbSUjWpZGw@mail.gmail.com>
+	<4F0DDF08.1000005@xenotime.net>
+Date: Thu, 12 Jan 2012 16:24:04 +0200
+Message-ID: <CAPiS6wCzm-ReJGLDcQN9vYEeVRVzcqSN_gfMHkjUqJ5x4WpnVA@mail.gmail.com>
+Subject: Re: [PATCH v2 2/2] menuconfig: add Home and End keys support for inputbox
+From: Paulius Zaleckas <paulius.zaleckas@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: mmarek@suse.cz
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, lacombar@gmail.com, dave@gnu.org
+To: Randy Dunlap <rdunlap@xenotime.net>
+Cc: mmarek@suse.cz, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-I find every time when I choice the 'NO' button at the dialog
-which let me choice whether to save the configuration before exit
-menuconfig, it always report the blow:
+On Wed, Jan 11, 2012 at 9:12 PM, Randy Dunlap <rdunlap@xenotime.net> wrote:
+> On 01/11/2012 01:21 AM, Paulius Zaleckas wrote:
+>> On Tue, Jan 10, 2012 at 7:30 PM, Randy Dunlap <rdunlap@xenotime.net> wrote:
+>>> On 01/10/2012 03:50 AM, Paulius Zaleckas wrote:
+>>>> On Tue, Jan 10, 2012 at 12:20 AM, Randy Dunlap <rdunlap@xenotime.net> wrote:
+>>>>> On 01/09/2012 03:36 AM, Paulius Zaleckas wrote:
+>>>>>> Makes long string editing easier.
+>>>>>>
+>>>>>> Signed-off-by: Paulius Zaleckas <paulius.zaleckas@gmail.com>
+>>>>>
+>>>>> Hi,
+>>>>>
+>>>>> Does "default hostname" in the "General setup" menu use an inputbox?
+>>>>
+>>>> Yes, it does.
+>>>>
+>>>>> If so, I can't get Home and End keys to work for it.
+>>>>
+>>>> Strange. It works for me. Have you applied both patches?
+>>>
+>>> Yes, I have both patches applied.
+>>
+>> Ok this is really very strange, but I have made debug patch. See attachement.
+>> It will print octal pressed key value just below the text field.
+>>
+>> From curses.h:
+>> #define KEY_HOME      0406            /* home key */
+>> #define KEY_END               0550            /* end key */
+>>
+>> Do you get the same values for Home and End keys? I do.
+>
+> All that I see in the inputbox when I use Home or End is:
+>
+> 033
+>
+> (ESCape key)
 
-" GEN     /mnt/sda7/home/build/test/Makefile
-  HOSTCC  scripts/kconfig/mconf.o
-  HOSTLD  scripts/kconfig/mconf
-scripts/kconfig/mconf Kconfig
+Is it working with nconfig?
 
-Your configuration changes were NOT saved.
+> Could this have anything to do with me using xfce (xfce4)?
 
-make[2]: *** [menuconfig] Error 1
-make[1]: *** [menuconfig] Error 2
-make: *** [sub-make] Error 2 "
+I have xfce at home. Will try it later today.
 
-This patch repair it.
-
-Thanks!
-
-Signed-off-by: Wang YanQing <udknight@gmail.com>
----
- scripts/kconfig/mconf.c |    1 +
- 1 files changed, 1 insertions(+), 0 deletions(-)
-
-diff --git a/scripts/kconfig/mconf.c b/scripts/kconfig/mconf.c
-index 19e200d..86cd1ea 100644
---- a/scripts/kconfig/mconf.c
-+++ b/scripts/kconfig/mconf.c
-@@ -830,6 +830,7 @@ static int handle_exit(void)
- 		fprintf(stderr, _("\n\n"
- 				  "Your configuration changes were NOT saved."
- 				  "\n\n"));
-+		res = 0;
- 	}
- 
- 	return res;
--- 
-1.7.3.4
-
+> thanks,
+> --
+> ~Randy
+> *** Remember to use Documentation/SubmitChecklist when testing your code ***
