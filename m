@@ -1,67 +1,81 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from hapkido.dreamhost.com ([66.33.216.122]:33979 "EHLO
-	hapkido.dreamhost.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755451Ab2ALUvp (ORCPT
+Received: from mail-wi0-f174.google.com ([209.85.212.174]:52330 "EHLO
+	mail-wi0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753019Ab2AMPfF convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 12 Jan 2012 15:51:45 -0500
-Received: from homiemail-a61.g.dreamhost.com (caiajhbdcagg.dreamhost.com [208.97.132.66])
-	by hapkido.dreamhost.com (Postfix) with ESMTP id 3B7FC1F6D41
-	for <linux-kbuild@vger.kernel.org>; Thu, 12 Jan 2012 12:51:42 -0800 (PST)
-Subject: Re: [PATCH] scripts:kconfig:mconf.c: let make not report error
- when not save configuration
-From: Davidlohr Bueso <dave@gnu.org>
-Reply-To: dave@gnu.org
-In-Reply-To: <20120112033132.GA13752@udknight>
-References: <20120112033132.GA13752@udknight>
-Content-Type: text/plain; charset="UTF-8"
-Date: Thu, 12 Jan 2012 21:50:37 +0100
-Message-ID: <1326401437.3416.0.camel@offbook>
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+	Fri, 13 Jan 2012 10:35:05 -0500
+MIME-Version: 1.0
+In-Reply-To: <4F0F1AFA.1080900@xenotime.net>
+References: <20120109113633.24486.69758.stgit@localhost6.localdomain6>
+	<20120109113641.24486.95511.stgit@localhost6.localdomain6>
+	<4F0B6845.4080503@xenotime.net>
+	<CAPiS6wCVo40tB40sXTzTt7RpVHJG_2wrYeP8L=ghin09WHftfg@mail.gmail.com>
+	<4F0C75A5.6000000@xenotime.net>
+	<CAPiS6wDYrryyPimun2N0xFCY3xCTDAS+tKKAmuZGjbSUjWpZGw@mail.gmail.com>
+	<4F0DDF08.1000005@xenotime.net>
+	<CAPiS6wCzm-ReJGLDcQN9vYEeVRVzcqSN_gfMHkjUqJ5x4WpnVA@mail.gmail.com>
+	<4F0F1AFA.1080900@xenotime.net>
+Date: Fri, 13 Jan 2012 17:35:04 +0200
+Message-ID: <CAPiS6wAvG3Rde98dVoD+9dUm5ZjY6NUkXQ_JjFKtL9kNp3te9A@mail.gmail.com>
+Subject: Re: [PATCH v2 2/2] menuconfig: add Home and End keys support for inputbox
+From: Paulius Zaleckas <paulius.zaleckas@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Wang YanQing <udknight@gmail.com>
-Cc: mmarek@suse.cz, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, lacombar@gmail.com
+To: Randy Dunlap <rdunlap@xenotime.net>
+Cc: mmarek@suse.cz, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Thu, 2012-01-12 at 11:31 +0800, Wang YanQing wrote:
-> I find every time when I choice the 'NO' button at the dialog
-> which let me choice whether to save the configuration before exit
-> menuconfig, it always report the blow:
-> 
-> " GEN     /mnt/sda7/home/build/test/Makefile
->   HOSTCC  scripts/kconfig/mconf.o
->   HOSTLD  scripts/kconfig/mconf
-> scripts/kconfig/mconf Kconfig
-> 
-> Your configuration changes were NOT saved.
-> 
-> make[2]: *** [menuconfig] Error 1
-> make[1]: *** [menuconfig] Error 2
-> make: *** [sub-make] Error 2 "
-> 
-> This patch repair it.
-> 
-> Thanks!
-> 
-> Signed-off-by: Wang YanQing <udknight@gmail.com>
+On Thu, Jan 12, 2012 at 7:40 PM, Randy Dunlap <rdunlap@xenotime.net> wrote:
+> On 01/12/2012 06:24 AM, Paulius Zaleckas wrote:
+>> On Wed, Jan 11, 2012 at 9:12 PM, Randy Dunlap <rdunlap@xenotime.net> wrote:
+>>> On 01/11/2012 01:21 AM, Paulius Zaleckas wrote:
+>>>> On Tue, Jan 10, 2012 at 7:30 PM, Randy Dunlap <rdunlap@xenotime.net> wrote:
+>>>>> On 01/10/2012 03:50 AM, Paulius Zaleckas wrote:
+>>>>>> On Tue, Jan 10, 2012 at 12:20 AM, Randy Dunlap <rdunlap@xenotime.net> wrote:
+>>>>>>> On 01/09/2012 03:36 AM, Paulius Zaleckas wrote:
+>>>>>>>> Makes long string editing easier.
+>>>>>>>>
+>>>>>>>> Signed-off-by: Paulius Zaleckas <paulius.zaleckas@gmail.com>
+>>>>>>>
+>>>>>>> Hi,
+>>>>>>>
+>>>>>>> Does "default hostname" in the "General setup" menu use an inputbox?
+>>>>>>
+>>>>>> Yes, it does.
+>>>>>>
+>>>>>>> If so, I can't get Home and End keys to work for it.
+>>>>>>
+>>>>>> Strange. It works for me. Have you applied both patches?
+>>>>>
+>>>>> Yes, I have both patches applied.
+>>>>
+>>>> Ok this is really very strange, but I have made debug patch. See attachement.
+>>>> It will print octal pressed key value just below the text field.
+>>>>
+>>>> From curses.h:
+>>>> #define KEY_HOME      0406            /* home key */
+>>>> #define KEY_END               0550            /* end key */
+>>>>
+>>>> Do you get the same values for Home and End keys? I do.
+>>>
+>>> All that I see in the inputbox when I use Home or End is:
+>>>
+>>> 033
+>>>
+>>> (ESCape key)
+>>
+>> Is it working with nconfig?
+>
+> When I try to edit "Default hostname" in nconfig and press Home or End keys,
+> nconfig acts like I just pressed F7 and it gives me the "what config file name do I
+> want to load" prompt.
+>
+>
+>>> Could this have anything to do with me using xfce (xfce4)?
+>>
+>> I have xfce at home. Will try it later today.
+>
+> Thanks.
 
-Acked-by: Davidlohr Bueso <dave@gnu.org>
-
-> ---
->  scripts/kconfig/mconf.c |    1 +
->  1 files changed, 1 insertions(+), 0 deletions(-)
-> 
-> diff --git a/scripts/kconfig/mconf.c b/scripts/kconfig/mconf.c
-> index 19e200d..86cd1ea 100644
-> --- a/scripts/kconfig/mconf.c
-> +++ b/scripts/kconfig/mconf.c
-> @@ -830,6 +830,7 @@ static int handle_exit(void)
->  		fprintf(stderr, _("\n\n"
->  				  "Your configuration changes were NOT saved."
->  				  "\n\n"));
-> +		res = 0;
->  	}
->  
->  	return res;
-
-
+I have just tried with xfce daefault terminal and had no problems.
