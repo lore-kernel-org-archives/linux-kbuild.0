@@ -1,84 +1,35 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from oproxy1-pub.bluehost.com ([66.147.249.253]:35627 "HELO
-	oproxy1-pub.bluehost.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with SMTP id S1758520Ab2AMQuj (ORCPT
+Received: from mail.redfish-solutions.com ([66.232.79.143]:50139 "EHLO
+	mail.redfish-solutions.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1754127Ab2AMWlQ (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 13 Jan 2012 11:50:39 -0500
-Message-ID: <4F106E7A.2010902@xenotime.net>
-Date: Fri, 13 Jan 2012 09:48:42 -0800
-From: Randy Dunlap <rdunlap@xenotime.net>
+	Fri, 13 Jan 2012 17:41:16 -0500
+Received: from macbook.redfish-solutions.com (macbook.redfish-solutions.com [192.168.1.17])
+	(authenticated bits=0)
+	by mail.redfish-solutions.com (8.14.5/8.14.5) with ESMTP id q0DMLcnU019681
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-CAMELLIA256-SHA bits=256 verify=NO)
+	for <linux-kbuild@vger.kernel.org>; Fri, 13 Jan 2012 15:21:38 -0700
+Message-ID: <4F10AE71.1060804@redfish-solutions.com>
+Date: Fri, 13 Jan 2012 15:21:37 -0700
+From: Philip Prindeville <philipp@redfish-solutions.com>
 MIME-Version: 1.0
-Subject: Re: [PATCH v2 2/2] menuconfig: add Home and End keys support for
- inputbox
-References: <20120109113633.24486.69758.stgit@localhost6.localdomain6>	<20120109113641.24486.95511.stgit@localhost6.localdomain6>	<4F0B6845.4080503@xenotime.net>	<CAPiS6wCVo40tB40sXTzTt7RpVHJG_2wrYeP8L=ghin09WHftfg@mail.gmail.com>	<4F0C75A5.6000000@xenotime.net>	<CAPiS6wDYrryyPimun2N0xFCY3xCTDAS+tKKAmuZGjbSUjWpZGw@mail.gmail.com>	<4F0DDF08.1000005@xenotime.net>	<CAPiS6wCzm-ReJGLDcQN9vYEeVRVzcqSN_gfMHkjUqJ5x4WpnVA@mail.gmail.com>	<4F0F1AFA.1080900@xenotime.net> <CAPiS6wAvG3Rde98dVoD+9dUm5ZjY6NUkXQ_JjFKtL9kNp3te9A@mail.gmail.com>
-In-Reply-To: <CAPiS6wAvG3Rde98dVoD+9dUm5ZjY6NUkXQ_JjFKtL9kNp3te9A@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Subject: Parsing kconfig files from scripts
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Paulius Zaleckas <paulius.zaleckas@gmail.com>
-Cc: mmarek@suse.cz, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
 
-On 01/13/2012 07:35 AM, Paulius Zaleckas wrote:
-> On Thu, Jan 12, 2012 at 7:40 PM, Randy Dunlap <rdunlap@xenotime.net> wrote:
->> On 01/12/2012 06:24 AM, Paulius Zaleckas wrote:
->>> On Wed, Jan 11, 2012 at 9:12 PM, Randy Dunlap <rdunlap@xenotime.net> wrote:
->>>> On 01/11/2012 01:21 AM, Paulius Zaleckas wrote:
->>>>> On Tue, Jan 10, 2012 at 7:30 PM, Randy Dunlap <rdunlap@xenotime.net> wrote:
->>>>>> On 01/10/2012 03:50 AM, Paulius Zaleckas wrote:
->>>>>>> On Tue, Jan 10, 2012 at 12:20 AM, Randy Dunlap <rdunlap@xenotime.net> wrote:
->>>>>>>> On 01/09/2012 03:36 AM, Paulius Zaleckas wrote:
->>>>>>>>> Makes long string editing easier.
->>>>>>>>>
->>>>>>>>> Signed-off-by: Paulius Zaleckas <paulius.zaleckas@gmail.com>
->>>>>>>>
->>>>>>>> Hi,
->>>>>>>>
->>>>>>>> Does "default hostname" in the "General setup" menu use an inputbox?
->>>>>>>
->>>>>>> Yes, it does.
->>>>>>>
->>>>>>>> If so, I can't get Home and End keys to work for it.
->>>>>>>
->>>>>>> Strange. It works for me. Have you applied both patches?
->>>>>>
->>>>>> Yes, I have both patches applied.
->>>>>
->>>>> Ok this is really very strange, but I have made debug patch. See attachement.
->>>>> It will print octal pressed key value just below the text field.
->>>>>
->>>>> From curses.h:
->>>>> #define KEY_HOME      0406            /* home key */
->>>>> #define KEY_END               0550            /* end key */
->>>>>
->>>>> Do you get the same values for Home and End keys? I do.
->>>>
->>>> All that I see in the inputbox when I use Home or End is:
->>>>
->>>> 033
->>>>
->>>> (ESCape key)
->>>
->>> Is it working with nconfig?
->>
->> When I try to edit "Default hostname" in nconfig and press Home or End keys,
->> nconfig acts like I just pressed F7 and it gives me the "what config file name do I
->> want to load" prompt.
->>
->>
->>>> Could this have anything to do with me using xfce (xfce4)?
->>>
->>> I have xfce at home. Will try it later today.
->>
->> Thanks.
-> 
-> I have just tried with xfce daefault terminal and had no problems.
+Hi,
 
+I'm working on several projects that are linux based and use Kconfig.
 
-Ah, you nailed it with that comment.  Yes, it works with "Terminal".
-I was using rxvt, not Terminal.  Sorry for the confusion.
+One of the tasks on my list is to build automation that detects what targets to build nightly after continuous integrations into SCM (including new platforms being added).
 
+A way to do this is to find in the Kconfig tree all possible values of a given symbol, such as CONFIG_CMDLINE for instance (ok, not a great example).
 
--- 
-~Randy
-*** Remember to use Documentation/SubmitChecklist when testing your code ***
+I was wondering if there was a command-line utility one could invoke to query the parse tree and dump values from it.
+
+Thanks,
+
+-Philip
