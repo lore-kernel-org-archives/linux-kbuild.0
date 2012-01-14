@@ -1,48 +1,34 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:49868 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:50047 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S932099Ab2ANUzn (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 14 Jan 2012 15:55:43 -0500
-Message-ID: <4F11EBD3.5080800@suse.cz>
-Date: Sat, 14 Jan 2012 21:55:47 +0100
+	id S932099Ab2ANU6g (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 14 Jan 2012 15:58:36 -0500
+Message-ID: <4F11EC7F.4060506@suse.cz>
+Date: Sat, 14 Jan 2012 21:58:39 +0100
 From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Subject: Re: [PATCH] scripts:kconfig:mconf.c: let make not report error when
- not save configuration
-References: <20120112033132.GA13752@udknight> <1326401437.3416.0.camel@offbook>
-In-Reply-To: <1326401437.3416.0.camel@offbook>
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: Parsing kconfig files from scripts
+References: <4F10AE71.1060804@redfish-solutions.com>
+In-Reply-To: <4F10AE71.1060804@redfish-solutions.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: dave@gnu.org
-Cc: Wang YanQing <udknight@gmail.com>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, lacombar@gmail.com
+To: Philip Prindeville <philipp@redfish-solutions.com>
+Cc: linux-kbuild@vger.kernel.org
 
-On 12.1.2012 21:50, Davidlohr Bueso wrote:
-> On Thu, 2012-01-12 at 11:31 +0800, Wang YanQing wrote:
->> I find every time when I choice the 'NO' button at the dialog
->> which let me choice whether to save the configuration before exit
->> menuconfig, it always report the blow:
->>
->> " GEN     /mnt/sda7/home/build/test/Makefile
->>   HOSTCC  scripts/kconfig/mconf.o
->>   HOSTLD  scripts/kconfig/mconf
->> scripts/kconfig/mconf Kconfig
->>
->> Your configuration changes were NOT saved.
->>
->> make[2]: *** [menuconfig] Error 1
->> make[1]: *** [menuconfig] Error 2
->> make: *** [sub-make] Error 2 "
->>
->> This patch repair it.
->>
->> Thanks!
->>
->> Signed-off-by: Wang YanQing <udknight@gmail.com>
+On 13.1.2012 23:21, Philip Prindeville wrote:
+> One of the tasks on my list is to build automation that detects what
+> targets to build nightly after continuous integrations into SCM
+> (including new platforms being added).
 > 
-> Acked-by: Davidlohr Bueso <dave@gnu.org>
+> A way to do this is to find in the Kconfig tree all possible values
+> of a given symbol, such as CONFIG_CMDLINE for instance (ok, not a
+> great example).
+> 
+> I was wondering if there was a command-line utility one could invoke
+> to query the parse tree and dump values from it.
 
-Applied to kbuild.git#kconfig.
+There is not, but a patch adding such tool would be welcome.
 
 Michal
