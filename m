@@ -1,37 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:52313 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:47923 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753921Ab2APNoY (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 16 Jan 2012 08:44:24 -0500
-Message-ID: <4F1429B6.9080104@suse.cz>
-Date: Mon, 16 Jan 2012 14:44:22 +0100
+	id S1755348Ab2APUs0 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 16 Jan 2012 15:48:26 -0500
+Date: Mon, 16 Jan 2012 21:48:20 +0100
 From: Michal Marek <mmarek@suse.cz>
+Subject: [GIT] kbuild changes for v3.3-rc1
+Message-ID: <20120116204819.GA4562@sepie.suse.cz>
 MIME-Version: 1.0
-Subject: Re: [PATCH] menuconfig: fix a regression when canceling the prompt
- dialog at exit
-References: <4F13CB49.8030004@cn.fujitsu.com> <1326698421.4151.4.camel@cr0> <4F13D216.3060705@cn.fujitsu.com> <4F13D873.4070808@cn.fujitsu.com>
-In-Reply-To: <4F13D873.4070808@cn.fujitsu.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Li Zefan <lizf@cn.fujitsu.com>
-Cc: Cong Wang <amwang@redhat.com>, Arnaud Lacombe <lacombar@gmail.com>, Davidlohr Bueso <dave@gnu.org>, LKML <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org, Wang YanQing <udknight@gmail.com>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: fernando@oss.ntt.co.jp, jason.wessel@windriver.com, mmarek@suse.cz, swarren@nvidia.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On 16.1.2012 08:57, Li Zefan wrote:
-> This commit fixes a bug, while introducing a new one..
-> 
-> commit 7203ddbd4be9720649e47d756a001e0c7d7f8ae2
-> Author: Wang YanQing <udknight@gmail.com>
-> Date:   Thu Jan 12 11:31:32 2012 +0800
-> 
->     menuconfig: let make not report error when not save configuration
-> 
-> Pressing ESC should cancel the yes/no dialog and return back to
-> the main menu, but not exit from menuconfig.
+Hi Linus,
 
-Thanks, applied. Note that in the Ctrl-C case, ESC still exits with an
-error. Changing sig_handler() to only exit if res != KEY_ESC is not
-sufficient, as the dialog is not redrawn. Hm.
+the main part of kbuild is a bit boring this time. The dtc tool got the
+ability to record dependency information and kbuild makes use of it,
+plus there are three minor fixes.
 
 Michal
+
+The following changes since commit 1ea6b8f48918282bdca0b32a34095504ee65bab5:
+
+  Linux 3.2-rc1 (2011-11-07 16:16:02 -0800)
+
+are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git kbuild
+
+Fernando Luis Vázquez Cao (1):
+      scripts/genksyms: clean lex/yacc generated files
+
+Jason Wessel (1):
+      kbuild: Correctly deal with make options which contain an "s"
+
+Michal Marek (1):
+      kbuild: Fix comment in Makefile.lib
+
+Stephen Warren (2):
+      dtc: Implement -d option to write out a dependency file
+      Kbuild: Use dtc's -d (dependency) option
+
+ Makefile                      |    2 +-
+ arch/arm/boot/Makefile        |    6 ++++--
+ arch/microblaze/boot/Makefile |    2 +-
+ arch/openrisc/boot/Makefile   |    4 ++--
+ arch/powerpc/boot/Makefile    |    4 ++--
+ scripts/Makefile.lib          |    8 ++++----
+ scripts/dtc/dtc.c             |   21 ++++++++++++++++++++-
+ scripts/dtc/srcpos.c          |    4 ++++
+ scripts/dtc/srcpos.h          |    1 +
+ scripts/genksyms/Makefile     |    1 +
+ 10 files changed, 40 insertions(+), 13 deletions(-)
