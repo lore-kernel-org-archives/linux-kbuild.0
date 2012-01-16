@@ -1,51 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:57514 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751506Ab2ANXTE (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 14 Jan 2012 18:19:04 -0500
-Date: Sun, 15 Jan 2012 00:19:03 +0100
-From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [PATCH] kbuild: Fix compiler warning with assertion when calling
- 'fwrite'
-Message-ID: <20120114231902.GB19267@sepie.suse.cz>
-References: <87lisype1v.fsf@faui43f.informatik.uni-erlangen.de>
- <CACqU3MWZuqgpxG7FSvr2LkqTqwF-gQM8hQSnTTpHpcWT2LHGNA@mail.gmail.com>
- <4EC8FF93.7010706@suse.cz>
- <20111123055351.GB14454@mail.gmail.com>
- <877h2r1hb3.fsf@faui43f.informatik.uni-erlangen.de>
- <CACqU3MXe3vu8OmcTsU4u8h+zWfOyo455Q-RLAJrADJM4xoJnPg@mail.gmail.com>
- <20111125234253.GD14454@mail.gmail.com>
+Received: from cn.fujitsu.com ([222.73.24.84]:55169 "EHLO song.cn.fujitsu.com"
+	rhost-flags-OK-FAIL-OK-OK) by vger.kernel.org with ESMTP
+	id S1750858Ab2APG7B (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 16 Jan 2012 01:59:01 -0500
+Message-ID: <4F13CB49.8030004@cn.fujitsu.com>
+Date: Mon, 16 Jan 2012 15:01:29 +0800
+From: Li Zefan <lizf@cn.fujitsu.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20111125234253.GD14454@mail.gmail.com>
+Subject: [PATCH] kconfig: fix a regression when exiting menuconfig without
+ saving
+Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jean Sacren <sakiwit@gmail.com>
-Cc: Arnaud Lacombe <lacombar@gmail.com>, Reinhard Tartler <Reinhard.Tartler@informatik.uni-erlangen.de>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, amwang@redhat.com
+To: Michal Marek <mmarek@suse.cz>
+Cc: Arnaud Lacombe <lacombar@gmail.com>, Davidlohr Bueso <dave@gnu.org>, LKML <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org
 
-On Fri, Nov 25, 2011 at 04:42:53PM -0700, Jean Sacren wrote:
-> Reinhard Tartler discovered a corner case of calling xfwrite() where the
-> length of the string is zero.
-> 
-> Arnaud Lacombe suggested to use assertion for the corner case, as
-> fwrite(3) is currently used:
-> 
->  1) in comment printers. Empty comment are not allowed.
->  2) in a callback passed to expr_print(), where the string printed is
->     either NULL OR non-empty.
->  3) in the lexer, auto-generated, and unused.
-> 
-> I feel using assertion is a good solution:
-> 
->  1) It cleanly takes care of the above-mentioned corner case.
->  2) It can be easily disabled by defining NDEBUG.
->  3) It asserts xfwrite() is simply a wrapper for fwrite().
-> 
-> Reported-by: Reinhard Tartler <Reinhard.Tartler@informatik.uni-erlangen.de>
-> Signed-off-by: Arnaud Lacombe <lacombar@gmail.com>
-> Signed-off-by: Jean Sacren <sakiwit@gmail.com>
+$ make menuconfig
+  HOSTCC  scripts/kconfig/mconf.o
+  HOSTLD  scripts/kconfig/mconf
+scripts/kconfig/mconf Kconfig
 
-Applied to kbuild.git#kconfig.
+Your configuration changes were NOT saved.
 
-Michal
+make[1]: *** [menuconfig] Error 1
+make: *** [menuconfig] Error 2
+
+Exiting menuconfig without saving, make will report error.
+This is a regression, and was introduced by
+
+	commit 564899f9f0a2df85fa367c8749a1fef323cb3215
+	Author: Davidlohr Bueso <dave@gnu.org>
+	Date:   Sun Aug 21 22:04:09 2011 -0300
+
+	    kconfig: handle SIGINT in menuconfig
+
+Signed-off-by: Li Zefan <lizf@cn.fujitsu.com>
+---
+ scripts/kconfig/mconf.c |    2 ++
+ 1 files changed, 2 insertions(+), 0 deletions(-)
+
+diff --git a/scripts/kconfig/mconf.c b/scripts/kconfig/mconf.c
+index 19e200d..2c6286c 100644
+--- a/scripts/kconfig/mconf.c
++++ b/scripts/kconfig/mconf.c
+@@ -830,6 +830,8 @@ static int handle_exit(void)
+ 		fprintf(stderr, _("\n\n"
+ 				  "Your configuration changes were NOT saved."
+ 				  "\n\n"));
++		if (res != KEY_ESC)
++			res = 0;
+ 	}
+ 
+ 	return res;
+-- 
+1.7.3.1
