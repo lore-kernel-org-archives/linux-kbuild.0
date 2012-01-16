@@ -1,28 +1,24 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-tul01m020-f174.google.com ([209.85.214.174]:64910 "EHLO
-	mail-tul01m020-f174.google.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1752977Ab2APIFy (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 16 Jan 2012 03:05:54 -0500
-Date: Mon, 16 Jan 2012 16:05:16 +0800
-From: Wang YanQing <udknight@gmail.com>
+Received: from cantor2.suse.de ([195.135.220.15]:52313 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753921Ab2APNoY (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 16 Jan 2012 08:44:24 -0500
+Message-ID: <4F1429B6.9080104@suse.cz>
+Date: Mon, 16 Jan 2012 14:44:22 +0100
+From: Michal Marek <mmarek@suse.cz>
+MIME-Version: 1.0
 Subject: Re: [PATCH] menuconfig: fix a regression when canceling the prompt
  dialog at exit
-Message-ID: <20120116080516.GA7447@udknight>
-References: <4F13CB49.8030004@cn.fujitsu.com>
- <1326698421.4151.4.camel@cr0>
- <4F13D216.3060705@cn.fujitsu.com>
- <4F13D873.4070808@cn.fujitsu.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+References: <4F13CB49.8030004@cn.fujitsu.com> <1326698421.4151.4.camel@cr0> <4F13D216.3060705@cn.fujitsu.com> <4F13D873.4070808@cn.fujitsu.com>
 In-Reply-To: <4F13D873.4070808@cn.fujitsu.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Li Zefan <lizf@cn.fujitsu.com>
-Cc: Michal Marek <mmarek@suse.cz>, Cong Wang <amwang@redhat.com>, Arnaud Lacombe <lacombar@gmail.com>, Davidlohr Bueso <dave@gnu.org>, LKML <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org
+Cc: Cong Wang <amwang@redhat.com>, Arnaud Lacombe <lacombar@gmail.com>, Davidlohr Bueso <dave@gnu.org>, LKML <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org, Wang YanQing <udknight@gmail.com>
 
-On Mon, Jan 16, 2012 at 03:57:39PM +0800, Li Zefan wrote:
+On 16.1.2012 08:57, Li Zefan wrote:
 > This commit fixes a bug, while introducing a new one..
 > 
 > commit 7203ddbd4be9720649e47d756a001e0c7d7f8ae2
@@ -33,28 +29,9 @@ On Mon, Jan 16, 2012 at 03:57:39PM +0800, Li Zefan wrote:
 > 
 > Pressing ESC should cancel the yes/no dialog and return back to
 > the main menu, but not exit from menuconfig.
-> 
-> Signed-off-by: Li Zefan <lizf@cn.fujitsu.com>
 
-Acked-by: Wang YanQing <udknight@gmail.com>
+Thanks, applied. Note that in the Ctrl-C case, ESC still exits with an
+error. Changing sig_handler() to only exit if res != KEY_ESC is not
+sufficient, as the dialog is not redrawn. Hm.
 
-> ---
->  scripts/kconfig/mconf.c |    3 ++-
->  1 files changed, 2 insertions(+), 1 deletions(-)
-> 
-> diff --git a/scripts/kconfig/mconf.c b/scripts/kconfig/mconf.c
-> index 86cd1ea..2c6286c 100644
-> --- a/scripts/kconfig/mconf.c
-> +++ b/scripts/kconfig/mconf.c
-> @@ -830,7 +830,8 @@ static int handle_exit(void)
->  		fprintf(stderr, _("\n\n"
->  				  "Your configuration changes were NOT saved."
->  				  "\n\n"));
-> -		res = 0;
-> +		if (res != KEY_ESC)
-> +			res = 0;
->  	}
->  
->  	return res;
-> -- 
-> 1.7.3.1
+Michal
