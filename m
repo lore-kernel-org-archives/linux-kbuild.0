@@ -1,37 +1,71 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:49289 "EHLO mx2.suse.de"
+Received: from smtp.gentoo.org ([140.211.166.183]:40623 "EHLO smtp.gentoo.org"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1757193Ab2ARKIJ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 18 Jan 2012 05:08:09 -0500
-Message-ID: <4F1699FE.5050005@suse.cz>
-Date: Wed, 18 Jan 2012 11:07:58 +0100
-From: Michal Marek <mmarek@suse.cz>
+	id S1751915Ab2ARMNg (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 18 Jan 2012 07:13:36 -0500
+From: Mike Frysinger <vapier@gentoo.org>
+Subject: details on internal kbuild magic
+Date: Wed, 18 Jan 2012 07:13:41 -0500
 MIME-Version: 1.0
-Subject: Re: [PATCH 2/2] Kbuild: Use dtc's -d (dependency) option
-References: <1326134295-15547-1-git-send-email-swarren@nvidia.com>  <1326134295-15547-2-git-send-email-swarren@nvidia.com> <1326310587.2535.291.camel@deneb.redhat.com> <4F1206F1.5090405@suse.cz> <74CDBE0F657A3D45AFBB94109FB122FF17801D2255@HQMAIL01.nvidia.com>
-In-Reply-To: <74CDBE0F657A3D45AFBB94109FB122FF17801D2255@HQMAIL01.nvidia.com>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: multipart/signed;
+  boundary="nextPart1379469.oCClb2cNcZ";
+  protocol="application/pgp-signature";
+  micalg=pgp-sha1
 Content-Transfer-Encoding: 7bit
+Message-Id: <201201180713.41922.vapier@gentoo.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Stephen Warren <swarren@nvidia.com>
-Cc: Mark Salter <msalter@redhat.com>, Jon Loeliger <jdl@jdl.com>, David Gibson <david@gibson.dropbear.id.au>, Russell King <linux@arm.linux.org.uk>, Aurelien Jacquiot <a-jacquiot@ti.com>, Michal Simek <monstr@monstr.eu>, Jonas Bonn <jonas@southpole.se>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, Paul Mackerras <paulus@samba.org>, Grant Likely <grant.likely@secretlab.ca>, Rob Herring <rob.herring@calxeda.com>, Arnd Bergmann <arnd@arndb.de>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "linux-c6x-dev@linux-c6x.org" <linux-c6x-dev@linux-c6x.org>, "microblaze-uclinux@itee.uq.edu.au" <microblaze-uclinux@itee.uq.edu.au>, "linux@openrisc.net" <linux@openrisc.net>, "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>, Devicetree Discuss <devicetree-discuss@lists.ozlabs.org>
+To: linux-kbuild@vger.kernel.org
+Cc: vapier@gentoo.org
 
-On 17.1.2012 18:20, Stephen Warren wrote:
-> Michal Marek wrote at Saturday, January 14, 2012 3:51 PM:
->> As the C6X port has been merged in this merge window, I can't easily
->> apply this patch to my kbuild branch and at the same time please Linus
->> by basing the pull request on a tagged release. So I'm going to drop the
->> arch/c6x part to keep the kbuild branch "pretty" and let either Mark or
->> Stephen send the patch to Linus directly, once he has merged the kbuild
->> branch. Would that work?
-> 
-> I was assuming my patches were for 3.4 rather than 3.3, since it's pretty
-> late for new features in 3.3. In that case, there wouldn't be an issue,
-> right?
+--nextPart1379469.oCClb2cNcZ
+Content-Type: Text/Plain;
+  charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 
-OK, that was a misunderstanding then. I applied it to the kbuild branch
-for 3.3 and Linus pulled it in the meantime. It's not a terribly
-intrusive change, after all.
+i've been flipping through the source but haven't made much headway.  the=20
+documentation doesn't really cover kbuild internals, so that didn't help. =
+=20
+hopefully someone here can point me in the right direction.
 
-Michal
+i'm interested in the exact make mechanics that kbuild utilizes to avoid ma=
+ke=20
+recursion (`make -C`) but while supporting its own include recursion.
+
+for example, fs/Makefile has lines like:
+	obj-y +=3D ramfs/
+where is the logic that parses $(obj-y) and knows that it needs to recursiv=
+ely=20
+include ramfs/Makefile ?
+
+also, how are collisions avoided in variable names ?  for example,=20
+kernel/Makefile has lines like:
+CFLAGS_REMOVE_irq_work.o =3D -pg
+how does kbuild know to apply this to building kernel/irq_work.o and not a=
+=20
+irq_work.o object in any other dir ?
+=2Dmike
+
+--nextPart1379469.oCClb2cNcZ
+Content-Type: application/pgp-signature; name=signature.asc 
+Content-Description: This is a digitally signed message part.
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.17 (GNU/Linux)
+
+iQIcBAABAgAGBQJPFrd1AAoJEEFjO5/oN/WBiqYQAIlzPypwevgiaYzjHfPHyf8n
+6gkEw2wmjheXpcPylqkGCE+Z7NRPhZqgz9b4uWl1u4dM+G8QF8IeKBlm6EsgbbOm
+Wq8p9SuMZZZCSQNwg+nM0ta8bx3KgePUoqwvSTrWpXXn4EkITOHbm5u/cgYqcnpm
+e4aah64zXjoYJbeYEEy4r/XQ0qn+ZcX/HVZ92ptPYrEvIX9XAFpXoCWgK8xPo+Ri
+JhhZvYDFsKPvlOp4HoMxl15ULPyoezRlJTqW6V5qp2/F3v/kJ1+tBE+PlMlp9Bng
+Gg+U0EqSwEd8m7VpeMRbC07mdRVv6i1IZDfIOK7d71huskm/M43Qz2Bmx3YFSUkv
+FKE77qFy3QNdSOMjUKK+EUNlsMcFDKZf/y4jbiM/4qoIb/r75yN9NDnIPU93/spM
++F3U4woZDTW/1llq76oAekLr6HL68O0YBeGeFuAgFuNjs8kqkMjJspxroMqzS6wo
+joSjg87mOxN6sua9sxY+a/Ubn5gIsADFqEve7tlYSgUnwJZgPxcJEW0J/gTpHjty
+LrUDbQJcdBWYopOyKzfesNjGob5l9CNItPvbUAoDKrshNKS8VKgoisVa+lXtbkF3
+P4AHSioroGcgkIIvZHGckScuoYB0mpamncadkN8MtkGwE5zhauILylWdnqn/HQXN
+Fh+ZY2ZSGuaEQWgNhGlR
+=vOqE
+-----END PGP SIGNATURE-----
+
+--nextPart1379469.oCClb2cNcZ--
