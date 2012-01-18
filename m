@@ -1,63 +1,37 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from nautica.notk.org ([91.121.71.147]:50146 "EHLO nautica.notk.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1757885Ab2ARP1I (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 18 Jan 2012 10:27:08 -0500
-Date: Wed, 18 Jan 2012 16:18:43 +0100
-From: Dominique Martinet <asmadeus@codewreck.org>
-Subject: Re: [PATCH v2] compat-wireless: build: Throw error if space in path
-Message-ID: <20120118151843.GA23506@nautica>
-References: <CAB=NE6WAhddiUuf4yOfNAgqMF7GxM--ksDwEmvwdJdFYSjLGzA@mail.gmail.com>
- <1326758892-32135-1-git-send-email-asmadeus@codewreck.org>
- <1326786261.3342.0.camel@jlt3.sipsolutions.net>
+Received: from glass04.physics.auth.gr ([155.207.123.174]:61014 "EHLO
+	glass01.physics.auth.gr" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1752638Ab2ARXY5 (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 18 Jan 2012 18:24:57 -0500
+Message-ID: <20120118181202.17234bwiz0tfkm04@mail.physics.auth.gr>
+Date: Wed, 18 Jan 2012 18:12:02 +0200
+From: "Mr.Vincent Cheng Hoi." <info@yahoo.com>
+Reply-to: choi_chu15@yahoo.co.jp
+Subject: 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain;
+	charset=ISO-8859-7;
+	DelSp="Yes";
+	format="flowed"
 Content-Disposition: inline
-In-Reply-To: <1326786261.3342.0.camel@jlt3.sipsolutions.net>
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Johannes Berg <johannes@sipsolutions.net>
-Cc: "Luis R. Rodriguez" <mcgrof@frijolero.org>, linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org, linux-kbuild@vger.kernel.org
-
-Hi,
-
-(I added linux-kbuild@ in Cc because it also concerns them. The idea is
-to fail cleanly if there is a space in the path to the directory from
-which we want to build some modules. We can't detect some from kbuild
-itself given how params are given, so it started as a patch for the
-modules' Makefile instead)
 
 
-Johannes Berg wrote on Tue, Jan 17, 2012 :
-> I think it also fails if there's a colon in the path -- does anyone know
-> what the "forbidden" characters would be?
+Good day,
 
-I can confirm that it fails with a colon in path, although it's not
-documented anywhere in Documentation/kbuild/.. (I guess I've just
-volunteered to fix that, too :))
+I am Mr.Vincent Cheng Hoi Chuen, GBS, JP Chairman of the Hong Kong and  
+Shanghai Banking Corporation Limited. I have a business proposal of  
+USD $22,500,000.00. Your earliest response to this letter will be  
+appreciated.
 
-I didn't find a proper list, but what I've seen fail is:
- - space " "
- - colon ":"
- - semicolon ";"
- - antislash "\"
- - dollar "$"
- - sharp "#" (although it fails later than the others)
- - ampersand "&"
- - parenthesis "(" and ")" - these fail somewhere else as well (even
- after fixing compat-wireless' Makefile with minor quoting)
- - backtick "`"
- - double quotes """ 
- - single quotes "'"
-
-what does work that's not necessarily obvious:
- - comma, brakets [], brakets {}
+Best Regards,
+Mr.Vincent Cheng Hoi.
 
 
-... There might be many more I didn't come up with, but that does look
-like a fair start!
-Does anyone know of a more complete list?
 
-Regards,
--- 
-Dominique Martinet | Asmadeus
+
+
+
