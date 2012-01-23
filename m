@@ -1,66 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from tx2ehsobe002.messaging.microsoft.com ([65.55.88.12]:11182 "EHLO
-	TX2EHSOBE004.bigfish.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751299Ab2AWLku (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 23 Jan 2012 06:40:50 -0500
-From: Joerg Roedel <joerg.roedel@amd.com>
-Subject: [PATCH] kbuild: Fix link to headers in 'make deb-pkg'
-Date: Mon, 23 Jan 2012 12:40:28 +0100
-Message-ID: <1327318828-12984-1-git-send-email-joerg.roedel@amd.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+Received: from mga14.intel.com ([143.182.124.37]:40314 "EHLO mga14.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752380Ab2AWLy0 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 23 Jan 2012 06:54:26 -0500
+From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: [PATCH] kbuild: disable -Wmissing-field-initializers for W=1
+Date: Mon, 23 Jan 2012 05:54:10 +0200
+Message-Id: <1327290850-5405-1-git-send-email-kirill.shutemov@linux.intel.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Joerg Roedel <joerg.roedel@amd.com>
+To: linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>
+Cc: Artem Bityutskiy <artem.bityutskiy@linux.intel.com>, Jacob Pan <jacob.jun.pan@linux.intel.com>, linux-kernel@vger.kernel.org, "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
 
-The Link to the kernel header files in the debian packages
-point to the original build directory. This is a bad choice
-if the packages were installed on a different machine. Fix
-this in by manually re-creating the link in the builddeb
-script.
-With this patch applied the lib/modules/$version dir always
-exists, so move the "$ARCH = um" check out of the modules
-check too.
+-Wmissing-field-initializers is too noisy to be useful on W=1. Let's
+move it to W=2.
 
-Signed-off-by: Joerg Roedel <joerg.roedel@amd.com>
+Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
 ---
- scripts/package/builddeb |   13 +++++++++----
- 1 files changed, 9 insertions(+), 4 deletions(-)
+ scripts/Makefile.build |    3 ++-
+ 1 files changed, 2 insertions(+), 1 deletions(-)
 
-diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-index f6cbc3d..46f63dc 100644
---- a/scripts/package/builddeb
-+++ b/scripts/package/builddeb
-@@ -91,6 +91,7 @@ fi
- rm -rf "$tmpdir" "$fwdir" "$kernel_headers_dir" "$libc_headers_dir"
- mkdir -m 755 -p "$tmpdir/DEBIAN"
- mkdir -p  "$tmpdir/lib" "$tmpdir/boot" "$tmpdir/usr/share/doc/$packagename"
-+mkdir -p  "$tmpdir/lib/modules/$version"
- mkdir -m 755 -p "$fwdir/DEBIAN"
- mkdir -p "$fwdir/lib" "$fwdir/usr/share/doc/$fwpackagename"
- mkdir -m 755 -p "$libc_headers_dir/DEBIAN"
-@@ -121,10 +122,14 @@ fi
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index d2b366c..1535a2f 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -62,7 +62,7 @@ endif
+ ifdef KBUILD_ENABLE_EXTRA_GCC_CHECKS
+ warning-  := $(empty)
  
- if grep -q '^CONFIG_MODULES=y' .config ; then
- 	INSTALL_MOD_PATH="$tmpdir" make KBUILD_SRC= modules_install
--	if [ "$ARCH" = "um" ] ; then
--		mv "$tmpdir/lib/modules/$version"/* "$tmpdir/usr/lib/uml/modules/$version/"
--		rmdir "$tmpdir/lib/modules/$version"
--	fi
-+fi
-+
-+# Make sure link to the headers is correct
-+ln -snf "/usr/src/$kernel_headers_packagename" "$tmpdir/lib/modules/$version/build"
-+
-+if [ "$ARCH" = "um" ] ; then
-+	mv "$tmpdir/lib/modules/$version"/* "$tmpdir/usr/lib/uml/modules/$version/"
-+	rmdir "$tmpdir/lib/modules/$version"
- fi
+-warning-1 := -Wextra -Wunused -Wno-unused-parameter
++warning-1 := -Wextra -Wunused -Wno-unused-parameter -Wno-missing-field-initializers
+ warning-1 += -Wmissing-declarations
+ warning-1 += -Wmissing-format-attribute
+ warning-1 += -Wmissing-prototypes
+@@ -75,6 +75,7 @@ warning-2 += -Wcast-align
+ warning-2 += -Wdisabled-optimization
+ warning-2 += -Wnested-externs
+ warning-2 += -Wshadow
++warning-2 += -Wmissing-field-initializers
+ warning-2 += $(call cc-option, -Wlogical-op)
  
- make headers_check
+ warning-3 := -Wbad-function-cast
 -- 
-1.7.5.4
-
+1.7.8.3
 
