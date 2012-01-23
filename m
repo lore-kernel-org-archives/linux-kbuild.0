@@ -1,84 +1,66 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.snhosting.dk ([87.238.248.203]:60187 "EHLO
-	smtp.domainteam.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751033Ab2AUMed (ORCPT
+Received: from tx2ehsobe002.messaging.microsoft.com ([65.55.88.12]:11182 "EHLO
+	TX2EHSOBE004.bigfish.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751299Ab2AWLku (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 21 Jan 2012 07:34:33 -0500
-Date: Sat, 21 Jan 2012 13:34:15 +0100
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: details on internal kbuild magic
-Message-ID: <20120121123415.GA22266@merkur.ravnborg.org>
-References: <201201180713.41922.vapier@gentoo.org>
+	Mon, 23 Jan 2012 06:40:50 -0500
+From: Joerg Roedel <joerg.roedel@amd.com>
+Subject: [PATCH] kbuild: Fix link to headers in 'make deb-pkg'
+Date: Mon, 23 Jan 2012 12:40:28 +0100
+Message-ID: <1327318828-12984-1-git-send-email-joerg.roedel@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <201201180713.41922.vapier@gentoo.org>
+Content-Type: text/plain
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Mike Frysinger <vapier@gentoo.org>
-Cc: linux-kbuild@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Joerg Roedel <joerg.roedel@amd.com>
 
-Hi Mike.
+The Link to the kernel header files in the debian packages
+point to the original build directory. This is a bad choice
+if the packages were installed on a different machine. Fix
+this in by manually re-creating the link in the builddeb
+script.
+With this patch applied the lib/modules/$version dir always
+exists, so move the "$ARCH = um" check out of the modules
+check too.
 
-On Wed, Jan 18, 2012 at 07:13:41AM -0500, Mike Frysinger wrote:
-> i've been flipping through the source but haven't made much headway.  the 
-> documentation doesn't really cover kbuild internals, so that didn't help.  
-> hopefully someone here can point me in the right direction.
-> 
-> i'm interested in the exact make mechanics that kbuild utilizes to avoid make 
-> recursion (`make -C`) but while supporting its own include recursion.
-> 
-> for example, fs/Makefile has lines like:
-> 	obj-y += ramfs/
-> where is the logic that parses $(obj-y) and knows that it needs to recursively 
-> include ramfs/Makefile ?
+Signed-off-by: Joerg Roedel <joerg.roedel@amd.com>
+---
+ scripts/package/builddeb |   13 +++++++++----
+ 1 files changed, 9 insertions(+), 4 deletions(-)
 
-When the 'core' part of kbuild is started then this is done using:
-
-	$(Q)$(MAKE) -f scripts/Makefile.build obj=$@
-
-Where obj is the directory which contains the files to be build.
-In your example obj=fs
-
-Makefile.build will include the following files:
--include include/config/auto.conf    <= The configuration (CONFIG_ symbols)
-include scripts/Kbuild.include       <= core Kbuild stuff
-include $(obj)/Makefile              <= the ramfs Makefile
-include scripts/Makefile.lib         <= additional kbuild stuff required after ramfs file include
-
-
-In Makefile.lib we append built-in.o to $(obj-y) and we prefix with $(obj)
-so we end up with:
-obj-y == fs/ramfs/built-in.o
-
-Later we add a dependency like this:
-
-    fs/built-in.o: fs/ramfs/built-in.o
-
-    It looks like this in Makefile.build:
-
-    $(builtin-target): $(obj-y) FORCE
-            $(call if_changed,link_o_target)
-
-
-So make knows it need to build fs/ramfs/built-in.o first.
-
-In Makefile.lib we build up a list of .o files which does not
-live in the current directory in $(subdir-obj-y)
-
-And in Makefile.build we tell make to visit the subdirs to build these files using:
-    # To build objects in subdirs, we need to descend into the directories
-    $(sort $(subdir-obj-y)): $(subdir-ym) ;
-
-    PHONY += $(subdir-ym)
-    $(subdir-ym):
-            $(Q)$(MAKE) $(build)=$@
+diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+index f6cbc3d..46f63dc 100644
+--- a/scripts/package/builddeb
++++ b/scripts/package/builddeb
+@@ -91,6 +91,7 @@ fi
+ rm -rf "$tmpdir" "$fwdir" "$kernel_headers_dir" "$libc_headers_dir"
+ mkdir -m 755 -p "$tmpdir/DEBIAN"
+ mkdir -p  "$tmpdir/lib" "$tmpdir/boot" "$tmpdir/usr/share/doc/$packagename"
++mkdir -p  "$tmpdir/lib/modules/$version"
+ mkdir -m 755 -p "$fwdir/DEBIAN"
+ mkdir -p "$fwdir/lib" "$fwdir/usr/share/doc/$fwpackagename"
+ mkdir -m 755 -p "$libc_headers_dir/DEBIAN"
+@@ -121,10 +122,14 @@ fi
+ 
+ if grep -q '^CONFIG_MODULES=y' .config ; then
+ 	INSTALL_MOD_PATH="$tmpdir" make KBUILD_SRC= modules_install
+-	if [ "$ARCH" = "um" ] ; then
+-		mv "$tmpdir/lib/modules/$version"/* "$tmpdir/usr/lib/uml/modules/$version/"
+-		rmdir "$tmpdir/lib/modules/$version"
+-	fi
++fi
++
++# Make sure link to the headers is correct
++ln -snf "/usr/src/$kernel_headers_packagename" "$tmpdir/lib/modules/$version/build"
++
++if [ "$ARCH" = "um" ] ; then
++	mv "$tmpdir/lib/modules/$version"/* "$tmpdir/usr/lib/uml/modules/$version/"
++	rmdir "$tmpdir/lib/modules/$version"
+ fi
+ 
+ make headers_check
+-- 
+1.7.5.4
 
 
-So make will visit fs/ and see that it needs to visit fs/ramfs/ before
-if can link fs/built-in.o
-
-Simple - no?
-Hope this helps.
-
-	Sam
