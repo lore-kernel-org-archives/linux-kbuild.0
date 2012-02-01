@@ -1,44 +1,34 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from tx2ehsobe002.messaging.microsoft.com ([65.55.88.12]:40545 "EHLO
-	TX2EHSOBE005.bigfish.com" rhost-flags-OK-OK-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1752695Ab2AaL17 (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 31 Jan 2012 06:27:59 -0500
-Date: Tue, 31 Jan 2012 12:27:52 +0100
-From: Joerg Roedel <joerg.roedel@amd.com>
-Subject: Re: [PATCH] kbuild: Fix link to headers in 'make deb-pkg'
-Message-ID: <20120131112752.GB2191@amd.com>
-References: <1327318828-12984-1-git-send-email-joerg.roedel@amd.com>
- <4F1D8810.1040501@suse.cz>
- <20120131110522.GA2191@amd.com>
- <4F27CC20.4020403@suse.cz>
+Received: from [210.1.20.41] ([210.1.20.41]:37817 "EHLO mail401.obec.go.th"
+	rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with ESMTP
+	id S1753244Ab2BAGFM (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 1 Feb 2012 01:05:12 -0500
+Date: Wed, 1 Feb 2012 13:30:24 +0700 (ICT)
+From: Sainsburys Finance <secondary21@obec.go.th>
+Reply-To: Sainsburys Finance <sainsburysfinance@zing.vn>
+Message-ID: <6542974.56131328077824478.JavaMail.root@mail402.obec.go.th>
+Subject: LOAN OFFER............AT  3% INTEREST RATE
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <4F27CC20.4020403@suse.cz>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, maximilian attems <max@stro.at>
 
-On Tue, Jan 31, 2012 at 12:10:24PM +0100, Michal Marek wrote:
-> On 31.1.2012 12:05, Joerg Roedel wrote:
-> > Hi,
-> > 
-> > any news on this?
-> 
-> I know nothing about deb packaging, so I was hoping Max would comment.
-> But I'll try the patch myself later this week (I'm quite busy atm).
+Attn,
 
-Okay, thanks.
+We give out loans within the range of $5,000 and above with an interest rate of 3%. Our loans are well insured for maximum security is our priority. Sainsburys Finance is a leading online provider of finance.
+
+Lender's Name: Mr.Kester Switch
+Tel Number:  +44 701 117 3877
+Fax Number:  +44 871 503 5094
+Lender's Email: sainsburysfinance@zing.vn
+
+Interested applicants are advice to get back to us via email for our application
+form.
+
+Regards
+Mrs Cherry Anderson
+Sainsburys Finance.
 
 
-	Joerg
-
--- 
-AMD Operating System Research Center
-
-Advanced Micro Devices GmbH Einsteinring 24 85609 Dornach
-General Managers: Alberto Bozzo
-Registration: Dornach, Landkr. Muenchen; Registerger. Muenchen, HRB Nr. 43632
 
