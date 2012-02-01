@@ -1,34 +1,18 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from [210.1.20.41] ([210.1.20.41]:37817 "EHLO mail401.obec.go.th"
-	rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with ESMTP
-	id S1753244Ab2BAGFM (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 1 Feb 2012 01:05:12 -0500
-Date: Wed, 1 Feb 2012 13:30:24 +0700 (ICT)
-From: Sainsburys Finance <secondary21@obec.go.th>
-Reply-To: Sainsburys Finance <sainsburysfinance@zing.vn>
-Message-ID: <6542974.56131328077824478.JavaMail.root@mail402.obec.go.th>
-Subject: LOAN OFFER............AT  3% INTEREST RATE
+Received: from mailout10.t-online.de ([194.25.134.21]:34586 "EHLO
+	mailout10.t-online.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753983Ab2BALy4 (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 1 Feb 2012 06:54:56 -0500
+Reply-To: <leemr.davidm@yahoo.com.ph>
+From: "Mr. David M Lee" <mrdavidmlee02@wf667v915.homepage.t-online.de>
+Subject: Hello  This is Mr. David M Lee from Bank of America I have by information you that we receiver an ATM card on your name so you have to get back to this office as soon as you receiver this mail today so that we will let you know what to do next okay?
+Date: Thu, 2 Feb 2012 00:51:31 +1300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain;
+	charset="Windows-1251"
 Content-Transfer-Encoding: 7bit
+Message-ID: <1RsYi1-1FKrnU0@fwd17.t-online.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-
-Attn,
-
-We give out loans within the range of $5,000 and above with an interest rate of 3%. Our loans are well insured for maximum security is our priority. Sainsburys Finance is a leading online provider of finance.
-
-Lender's Name: Mr.Kester Switch
-Tel Number:  +44 701 117 3877
-Fax Number:  +44 871 503 5094
-Lender's Email: sainsburysfinance@zing.vn
-
-Interested applicants are advice to get back to us via email for our application
-form.
-
-Regards
-Mrs Cherry Anderson
-Sainsburys Finance.
-
-
 
