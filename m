@@ -1,44 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from terminus.zytor.com ([198.137.202.10]:59707 "EHLO mail.zytor.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753032Ab2BCV3Z (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 3 Feb 2012 16:29:25 -0500
-Message-ID: <4F2C51A5.1040800@zytor.com>
-Date: Fri, 03 Feb 2012 13:29:09 -0800
-From: "H. Peter Anvin" <hpa@zytor.com>
-MIME-Version: 1.0
-Subject: Kconfig and toolchain dependencies
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Received: from mail-tul01m020-f174.google.com ([209.85.214.174]:41686 "EHLO
+	mail-tul01m020-f174.google.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751024Ab2BDJ4q (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 4 Feb 2012 04:56:46 -0500
+From: Gerard Snitselaar <dev@snitselaar.org>
+Subject: [PATCH] Kbuild: Makefile: clean up samples directory
+Date: Sat,  4 Feb 2012 02:55:59 -0700
+Message-Id: <1328349359-29524-1-git-send-email-dev@snitselaar.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Ingo Molnar <mingo@elte.hu>
+To: mmarek@suse.cz
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Right now, we don't have a good way to encode toolchain dependencies in
-Kconfig.  This makes it hard to add optional features which depend on
-newer toolchain features.
+Playing around with make randconfig I ended up with CONFIG_SAMPLES
+set. After cleaning up the build I noticed that git status was
+showing samples/hidraw/hid-example as an untracked file.
 
-If we just add them, then it breaks all*config and randconfig on
-platforms with the older toolchains unless the user manually adds
-exclusion rules.  This is bad for testing.
+Adding samples to clean-dirs seems to solve the problem, but
+I don't know if that is the correct way to solve the issue.
 
-It seems relatively straightforward to do if we were to manifest some
-CONFIG_ variables based on the target toolchain, e.g.
+Signed-off-by: Gerard Snitselaar <dev@snitselaar.org>
+---
+ Makefile |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-CONFIG_GCC=0x040601
-
-... and perhaps do other tests.  I suspect we would run the tests less
-frequently than what we do right now with the tests embedded in the
-Makefile.
-
-Does anyone have a feel for if this would be a good addition, and if so
-where it best fits into the chain?
-
-	-hpa
-
-
+diff --git a/Makefile b/Makefile
+index e3b23e8..0a83480 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1170,7 +1170,7 @@ MRPROPER_FILES += .config .config.old .version .old_version             \
+ #
+ clean: rm-dirs  := $(CLEAN_DIRS)
+ clean: rm-files := $(CLEAN_FILES)
+-clean-dirs      := $(addprefix _clean_, . $(vmlinux-alldirs) Documentation)
++clean-dirs      := $(addprefix _clean_, . $(vmlinux-alldirs) Documentation samples)
+ 
+ PHONY += $(clean-dirs) clean archclean
+ $(clean-dirs):
 -- 
-H. Peter Anvin, Intel Open Source Technology Center
-I work for Intel.  I don't speak on their behalf.
+1.7.7.6
 
