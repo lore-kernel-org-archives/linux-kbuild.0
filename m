@@ -1,43 +1,79 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-tul01m020-f174.google.com ([209.85.214.174]:41686 "EHLO
-	mail-tul01m020-f174.google.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751024Ab2BDJ4q (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 4 Feb 2012 04:56:46 -0500
-From: Gerard Snitselaar <dev@snitselaar.org>
-Subject: [PATCH] Kbuild: Makefile: clean up samples directory
-Date: Sat,  4 Feb 2012 02:55:59 -0700
-Message-Id: <1328349359-29524-1-git-send-email-dev@snitselaar.org>
+Received: from vostochny.stro.at ([78.47.22.85]:46157 "EHLO vostochny.stro.at"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750788Ab2BDOeu (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 4 Feb 2012 09:34:50 -0500
+Date: Sat, 4 Feb 2012 15:34:49 +0100
+From: maximilian attems <max@stro.at>
+Subject: Re: [PATCH] kbuild: Fix link to headers in 'make deb-pkg'
+Message-ID: <20120204143449.GA28068@stro.at>
+References: <1327318828-12984-1-git-send-email-joerg.roedel@amd.com>
+ <4F1D8810.1040501@suse.cz>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4F1D8810.1040501@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: mmarek@suse.cz
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Ben Hutchings <ben@decadent.org.uk>
+Cc: Michal Marek <mmarek@suse.cz>, Joerg Roedel <joerg.roedel@amd.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, debian-kernel@lists.debian.org
 
-Playing around with make randconfig I ended up with CONFIG_SAMPLES
-set. After cleaning up the build I noticed that git status was
-showing samples/hidraw/hid-example as an untracked file.
+adding bwh + debian-kernel
 
-Adding samples to clean-dirs seems to solve the problem, but
-I don't know if that is the correct way to solve the issue.
+On Mon, 23 Jan 2012, Michal Marek wrote:
 
-Signed-off-by: Gerard Snitselaar <dev@snitselaar.org>
----
- Makefile |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+> (adding max to CC)
+> 
+> On 23.1.2012 12:40, Joerg Roedel wrote:
+> > The Link to the kernel header files in the debian packages
+> > point to the original build directory. This is a bad choice
+> > if the packages were installed on a different machine. Fix
+> > this in by manually re-creating the link in the builddeb
+> > script.
+> > With this patch applied the lib/modules/$version dir always
+> > exists, so move the "$ARCH = um" check out of the modules
+> > check too.
+> > 
+> > Signed-off-by: Joerg Roedel <joerg.roedel@amd.com>
+> > ---
+> >  scripts/package/builddeb |   13 +++++++++----
+> >  1 files changed, 9 insertions(+), 4 deletions(-)
+> > 
+> > diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+> > index f6cbc3d..46f63dc 100644
+> > --- a/scripts/package/builddeb
+> > +++ b/scripts/package/builddeb
+> > @@ -91,6 +91,7 @@ fi
+> >  rm -rf "$tmpdir" "$fwdir" "$kernel_headers_dir" "$libc_headers_dir"
+> >  mkdir -m 755 -p "$tmpdir/DEBIAN"
+> >  mkdir -p  "$tmpdir/lib" "$tmpdir/boot" "$tmpdir/usr/share/doc/$packagename"
+> > +mkdir -p  "$tmpdir/lib/modules/$version"
+> >  mkdir -m 755 -p "$fwdir/DEBIAN"
+> >  mkdir -p "$fwdir/lib" "$fwdir/usr/share/doc/$fwpackagename"
+> >  mkdir -m 755 -p "$libc_headers_dir/DEBIAN"
+> > @@ -121,10 +122,14 @@ fi
+> >  
+> >  if grep -q '^CONFIG_MODULES=y' .config ; then
+> >  	INSTALL_MOD_PATH="$tmpdir" make KBUILD_SRC= modules_install
+> > -	if [ "$ARCH" = "um" ] ; then
+> > -		mv "$tmpdir/lib/modules/$version"/* "$tmpdir/usr/lib/uml/modules/$version/"
+> > -		rmdir "$tmpdir/lib/modules/$version"
+> > -	fi
+> > +fi
+> > +
+> > +# Make sure link to the headers is correct
+> > +ln -snf "/usr/src/$kernel_headers_packagename" "$tmpdir/lib/modules/$version/build"
+> > +
+> > +if [ "$ARCH" = "um" ] ; then
+> > +	mv "$tmpdir/lib/modules/$version"/* "$tmpdir/usr/lib/uml/modules/$version/"
+> > +	rmdir "$tmpdir/lib/modules/$version"
+> >  fi
+> >  
+> >  make headers_check
 
-diff --git a/Makefile b/Makefile
-index e3b23e8..0a83480 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1170,7 +1170,7 @@ MRPROPER_FILES += .config .config.old .version .old_version             \
- #
- clean: rm-dirs  := $(CLEAN_DIRS)
- clean: rm-files := $(CLEAN_FILES)
--clean-dirs      := $(addprefix _clean_, . $(vmlinux-alldirs) Documentation)
-+clean-dirs      := $(addprefix _clean_, . $(vmlinux-alldirs) Documentation samples)
- 
- PHONY += $(clean-dirs) clean archclean
- $(clean-dirs):
+I'm a bit sceptical that it is correct, but passing on to Ben Hutchings,
+as I never used external modules. He did quite some cleanup in this
+confusing area, lately for the upcoming debian release.
+
 -- 
-1.7.7.6
-
+maks
