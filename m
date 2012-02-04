@@ -1,79 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from vostochny.stro.at ([78.47.22.85]:46157 "EHLO vostochny.stro.at"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750788Ab2BDOeu (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 4 Feb 2012 09:34:50 -0500
-Date: Sat, 4 Feb 2012 15:34:49 +0100
-From: maximilian attems <max@stro.at>
-Subject: Re: [PATCH] kbuild: Fix link to headers in 'make deb-pkg'
-Message-ID: <20120204143449.GA28068@stro.at>
-References: <1327318828-12984-1-git-send-email-joerg.roedel@amd.com>
- <4F1D8810.1040501@suse.cz>
+Received: from relay4-d.mail.gandi.net ([217.70.183.196]:53950 "EHLO
+	relay4-d.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751405Ab2BDSdH (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 4 Feb 2012 13:33:07 -0500
+Date: Sat, 4 Feb 2012 10:32:59 -0800
+From: Josh Triplett <josh@joshtriplett.org>
+Subject: Re: Kconfig and toolchain dependencies
+Message-ID: <20120204183259.GA28208@leaf>
+References: <4F2C51A5.1040800@zytor.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <4F1D8810.1040501@suse.cz>
+In-Reply-To: <4F2C51A5.1040800@zytor.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ben Hutchings <ben@decadent.org.uk>
-Cc: Michal Marek <mmarek@suse.cz>, Joerg Roedel <joerg.roedel@amd.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, debian-kernel@lists.debian.org
+To: "H. Peter Anvin" <hpa@zytor.com>
+Cc: "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Ingo Molnar <mingo@elte.hu>
 
-adding bwh + debian-kernel
-
-On Mon, 23 Jan 2012, Michal Marek wrote:
-
-> (adding max to CC)
+On Fri, Feb 03, 2012 at 01:29:09PM -0800, H. Peter Anvin wrote:
+> It seems relatively straightforward to do if we were to manifest some
+> CONFIG_ variables based on the target toolchain, e.g.
 > 
-> On 23.1.2012 12:40, Joerg Roedel wrote:
-> > The Link to the kernel header files in the debian packages
-> > point to the original build directory. This is a bad choice
-> > if the packages were installed on a different machine. Fix
-> > this in by manually re-creating the link in the builddeb
-> > script.
-> > With this patch applied the lib/modules/$version dir always
-> > exists, so move the "$ARCH = um" check out of the modules
-> > check too.
-> > 
-> > Signed-off-by: Joerg Roedel <joerg.roedel@amd.com>
-> > ---
-> >  scripts/package/builddeb |   13 +++++++++----
-> >  1 files changed, 9 insertions(+), 4 deletions(-)
-> > 
-> > diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-> > index f6cbc3d..46f63dc 100644
-> > --- a/scripts/package/builddeb
-> > +++ b/scripts/package/builddeb
-> > @@ -91,6 +91,7 @@ fi
-> >  rm -rf "$tmpdir" "$fwdir" "$kernel_headers_dir" "$libc_headers_dir"
-> >  mkdir -m 755 -p "$tmpdir/DEBIAN"
-> >  mkdir -p  "$tmpdir/lib" "$tmpdir/boot" "$tmpdir/usr/share/doc/$packagename"
-> > +mkdir -p  "$tmpdir/lib/modules/$version"
-> >  mkdir -m 755 -p "$fwdir/DEBIAN"
-> >  mkdir -p "$fwdir/lib" "$fwdir/usr/share/doc/$fwpackagename"
-> >  mkdir -m 755 -p "$libc_headers_dir/DEBIAN"
-> > @@ -121,10 +122,14 @@ fi
-> >  
-> >  if grep -q '^CONFIG_MODULES=y' .config ; then
-> >  	INSTALL_MOD_PATH="$tmpdir" make KBUILD_SRC= modules_install
-> > -	if [ "$ARCH" = "um" ] ; then
-> > -		mv "$tmpdir/lib/modules/$version"/* "$tmpdir/usr/lib/uml/modules/$version/"
-> > -		rmdir "$tmpdir/lib/modules/$version"
-> > -	fi
-> > +fi
-> > +
-> > +# Make sure link to the headers is correct
-> > +ln -snf "/usr/src/$kernel_headers_packagename" "$tmpdir/lib/modules/$version/build"
-> > +
-> > +if [ "$ARCH" = "um" ] ; then
-> > +	mv "$tmpdir/lib/modules/$version"/* "$tmpdir/usr/lib/uml/modules/$version/"
-> > +	rmdir "$tmpdir/lib/modules/$version"
-> >  fi
-> >  
-> >  make headers_check
+> CONFIG_GCC=0x040601
+> 
+> ... and perhaps do other tests.  I suspect we would run the tests less
+> frequently than what we do right now with the tests embedded in the
+> Makefile.
+> 
+> Does anyone have a feel for if this would be a good addition, and if so
+> where it best fits into the chain?
 
-I'm a bit sceptical that it is correct, but passing on to Ben Hutchings,
-as I never used external modules. He did quite some cleanup in this
-confusing area, lately for the upcoming debian release.
+This seems like a *great* idea.  Unfortunately, a quick look at the
+implementation of kbuild suggests that it doesn't currently implement
+numeric comparisons (<, <=, >, >=), only equality (= and !=).  Most of
+the time, a Kconfig file will want to write "depends GCC >=
+some_version".
 
--- 
-maks
+Looking at scripts/kconfig/expr.c, it doesn't look that hard to add,
+though.
+
+- Josh Triplett
