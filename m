@@ -1,62 +1,38 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from shadbolt.e.decadent.org.uk ([88.96.1.126]:43489 "EHLO
-	shadbolt.e.decadent.org.uk" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1753700Ab2BGQhX (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 7 Feb 2012 11:37:23 -0500
-Date: Tue, 7 Feb 2012 16:37:16 +0000
-From: Ben Hutchings <ben@decadent.org.uk>
-Message-ID: <20120207163716.GA12704@decadent.org.uk>
-References: <1327318828-12984-1-git-send-email-joerg.roedel@amd.com>
- <4F1D8810.1040501@suse.cz>
- <20120204143449.GA28068@stro.at>
+Received: from terminus.zytor.com ([198.137.202.10]:41288 "EHLO mail.zytor.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1756300Ab2BGU0f (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 7 Feb 2012 15:26:35 -0500
+Message-ID: <4F3188E9.8000804@zytor.com>
+Date: Tue, 07 Feb 2012 12:26:17 -0800
+From: "H. Peter Anvin" <hpa@zytor.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20120204143449.GA28068@stro.at>
-Subject: Re: [PATCH] kbuild: Fix link to headers in 'make deb-pkg'
+Subject: Re: Kconfig and toolchain dependencies
+References: <4F2C51A5.1040800@zytor.com> <20120204183259.GA28208@leaf>
+In-Reply-To: <20120204183259.GA28208@leaf>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>, Joerg Roedel <joerg.roedel@amd.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, debian-kernel@lists.debian.org
+To: Josh Triplett <josh@joshtriplett.org>
+Cc: "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Ingo Molnar <mingo@elte.hu>
 
-On Sat, Feb 04, 2012 at 03:34:49PM +0100, maximilian attems wrote:
-> adding bwh + debian-kernel
+On 02/04/2012 10:32 AM, Josh Triplett wrote:
+>>
+>> Does anyone have a feel for if this would be a good addition, and if so
+>> where it best fits into the chain?
 > 
-> On Mon, 23 Jan 2012, Michal Marek wrote:
+> This seems like a *great* idea.  Unfortunately, a quick look at the
+> implementation of kbuild suggests that it doesn't currently implement
+> numeric comparisons (<, <=, >, >=), only equality (= and !=).  Most of
+> the time, a Kconfig file will want to write "depends GCC >=
+> some_version".
 > 
-> > (adding max to CC)
-> > 
-> > On 23.1.2012 12:40, Joerg Roedel wrote:
-> > > The Link to the kernel header files in the debian packages
-> > > point to the original build directory. This is a bad choice
-> > > if the packages were installed on a different machine. Fix
-> > > this in by manually re-creating the link in the builddeb
-> > > script.
+> Looking at scripts/kconfig/expr.c, it doesn't look that hard to add,
+> though.
+> 
 
-Right, but:
+Range dependencies are probably useful in their own right, too.
 
-[...]
-> > > @@ -121,10 +122,14 @@ fi
-> > >  
-> > >  if grep -q '^CONFIG_MODULES=y' .config ; then
-> > >  	INSTALL_MOD_PATH="$tmpdir" make KBUILD_SRC= modules_install
-> > > -	if [ "$ARCH" = "um" ] ; then
-> > > -		mv "$tmpdir/lib/modules/$version"/* "$tmpdir/usr/lib/uml/modules/$version/"
-> > > -		rmdir "$tmpdir/lib/modules/$version"
-> > > -	fi
-> > > +fi
-> > > +
-> > > +# Make sure link to the headers is correct
-> > > +ln -snf "/usr/src/$kernel_headers_packagename" "$tmpdir/lib/modules/$version/build"
-[...]
+	-hpa
 
-This should be removed from the kernel image package and created
-in the kernel headers package instead, otherwise it's potentially a
-broken link.
-
-Ben.
-
--- 
-Ben Hutchings
-We get into the habit of living before acquiring the habit of thinking.
-                                                              - Albert Camus
