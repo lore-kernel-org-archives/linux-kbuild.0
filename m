@@ -1,38 +1,26 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from terminus.zytor.com ([198.137.202.10]:41288 "EHLO mail.zytor.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1756300Ab2BGU0f (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 7 Feb 2012 15:26:35 -0500
-Message-ID: <4F3188E9.8000804@zytor.com>
-Date: Tue, 07 Feb 2012 12:26:17 -0800
-From: "H. Peter Anvin" <hpa@zytor.com>
+Received: from mail.padep.org.bo ([200.87.120.75]:38633 "EHLO
+	mail.padep.org.bo" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756873Ab2BIAnt convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 8 Feb 2012 19:43:49 -0500
+Content-Type: text/plain; charset=US-ASCII
 MIME-Version: 1.0
-Subject: Re: Kconfig and toolchain dependencies
-References: <4F2C51A5.1040800@zytor.com> <20120204183259.GA28208@leaf>
-In-Reply-To: <20120204183259.GA28208@leaf>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 7BIT
+Content-Description: Mail message body
+Subject: BUSINESS PROPOSAL
+From: Shoichi Ogawa <info@mail.com>
+Date: Wed, 08 Feb 2012 00:18:25 -0500
+Reply-To: sogawa@imail.com
+Message-Id: <20120208051836.3948611D0B9@mail.padep.org.bo>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Josh Triplett <josh@joshtriplett.org>
-Cc: "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Ingo Molnar <mingo@elte.hu>
+To: Recipients <info@mail.com>
 
-On 02/04/2012 10:32 AM, Josh Triplett wrote:
->>
->> Does anyone have a feel for if this would be a good addition, and if so
->> where it best fits into the chain?
-> 
-> This seems like a *great* idea.  Unfortunately, a quick look at the
-> implementation of kbuild suggests that it doesn't currently implement
-> numeric comparisons (<, <=, >, >=), only equality (= and !=).  Most of
-> the time, a Kconfig file will want to write "depends GCC >=
-> some_version".
-> 
-> Looking at scripts/kconfig/expr.c, it doesn't look that hard to add,
-> though.
-> 
+Hello Friend 
 
-Range dependencies are probably useful in their own right, too.
+I am sorry to encroach on your privacy. I have a business proposal foryou. Please contact me if you are interested to know more.
 
-	-hpa
+Best Regards 
 
+Shoichi Ogawa
