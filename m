@@ -1,81 +1,74 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wi0-f174.google.com ([209.85.212.174]:44372 "EHLO
-	mail-wi0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751605Ab2BIF01 convert rfc822-to-8bit (ORCPT
+Received: from defer-dn01.ocn.ad.jp ([125.170.100.155]:39547 "EHLO
+	defer-dn01.ocn.ad.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753372Ab2BIOb4 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 9 Feb 2012 00:26:27 -0500
-MIME-Version: 1.0
-In-Reply-To: <CACqU3MXdKti6J2ozx3mt3UHdhv1fyPredvT6zJGR+u_hNU70Cg@mail.gmail.com>
+	Thu, 9 Feb 2012 09:31:56 -0500
+Date: Thu, 09 Feb 2012 23:30:17 +0900 (JST)
+Message-Id: <20120209.233017.47225051.anemo@mba.ocn.ne.jp>
+Subject: Re: kconfig: tristate choice with depender choice
+From: Atsushi Nemoto <anemo@mba.ocn.ne.jp>
+In-Reply-To: <CACqU3MU6j0ed6C9QDfzuoH+2a-2hww2wrCsQXW-kUfK37iansQ@mail.gmail.com>
 References: <20120207.091612.181444339.anemo@mba.ocn.ne.jp>
 	<CACqU3MXdKti6J2ozx3mt3UHdhv1fyPredvT6zJGR+u_hNU70Cg@mail.gmail.com>
-Date: Thu, 9 Feb 2012 00:26:25 -0500
-Message-ID: <CACqU3MU6j0ed6C9QDfzuoH+2a-2hww2wrCsQXW-kUfK37iansQ@mail.gmail.com>
-Subject: Re: kconfig: tristate choice with depender choice
-From: Arnaud Lacombe <lacombar@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 8BIT
+	<CACqU3MU6j0ed6C9QDfzuoH+2a-2hww2wrCsQXW-kUfK37iansQ@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Atsushi Nemoto <anemo@mba.ocn.ne.jp>
-Cc: Michal Marek <mmarek@suse.cz>, Sam Ravnborg <sam@ravnborg.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: lacombar@gmail.com
+Cc: mmarek@suse.cz, sam@ravnborg.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Hi,
-
-On Thu, Feb 9, 2012 at 12:08 AM, Arnaud Lacombe <lacombar@gmail.com> wrote:
-> Hi,
->
-> On Mon, Feb 6, 2012 at 7:16 PM, Atsushi Nemoto <anemo@mba.ocn.ne.jp> wrote:
->> If a tristate choice has another choice dependers, kconfig produce
->> wrong value.
+On Thu, 9 Feb 2012 00:26:25 -0500, Arnaud Lacombe <lacombar@gmail.com> wrote:
+>> confirmed.
 >>
->> Example:
->>
->> choice
->>        prompt "choice list AB"
->> config A
->>        tristate "a"
->> config B
->>        tristate "b"
->> endchoice
->> choice
->>        prompt "choice list CD"
->>        depends on A
->> config C
->>        bool "c"
->> config D
->>        bool "d"
->> endchoice
->>
->> kconfig outputs CONFIG_A=m from defconfig with CONFIG_A=y.
->>
->> This happens if the choice list CD depends on A.
->> Also, if defconfig contains CONFIG_A=y and "# CONFIG_B is not set",
->> output is correct.
->>
-> confirmed.
->
-actually, not that much. Your reduced testcase is missing a MODULES
-symbol to have modules enabled and have them show up in the final
-`.config'. If you add:
+> actually, not that much. Your reduced testcase is missing a MODULES
+> symbol to have modules enabled and have them show up in the final
+> `.config'. If you add:
+> 
+> config MODULES
+>   boolean
+>   default y
+> 
+> then you end up with CONFIG_A=m in the `.config'.
 
-config MODULES
-  boolean
-  default y
+Yes, so it is the problem.  I got CONFIG_A=m in .config from
+CONFIG_A=y in defconfig.
 
-then you end up with CONFIG_A=m in the `.config'.
+> Now, I may have missed something.
+> 
+> Do you have a situation where a MODULES symbol is present, enabled,
+> but CONFIG_A=y still appear from CONFIG_A=m in the defconfig ?
 
-Now, I may have missed something.
+I tested in this way:
 
-Do you have a situation where a MODULES symbol is present, enabled,
-but CONFIG_A=y still appear from CONFIG_A=m in the defconfig ?
+1. Add this example to the end of drivers/char/Kconfig file.
+-------------------------------------
+choice
+	prompt "choice list AB"
+config A
+	tristate "a"
+config B
+	tristate "b"
+endchoice
+choice
+	prompt "choice list CD"
+	depends on A
+config C
+       	bool "c"
+config D
+       	bool "d"
+endchoice
+-------------------------------------
 
-Thanks,
- - Arnaud
+2. Then run commands:
 
->> I found commit a64b44ea ("kconfig: fix tristate choice with minimal
->> config"), but this problem still exists on v3.3-rc1.  More fix is
->> needed for choice with dependers?
->>
-> it would seem so.
->
->  - Arnaud
+$ cp arch/x86/configs/i386_defconfig arch/x86/configs/test_defconfig
+$ echo 'CONFIG_A=y' >> arch/x86/configs/test_defconfig 
+$ make O=../build test_defconfig
+$ grep CONFIG_A= ../build/.config
+CONFIG_A=m
+
+---
+Atsushi Nemoto
