@@ -1,26 +1,59 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.padep.org.bo ([200.87.120.75]:38633 "EHLO
-	mail.padep.org.bo" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756873Ab2BIAnt convert rfc822-to-8bit (ORCPT
+Received: from mail-ww0-f44.google.com ([74.125.82.44]:59326 "EHLO
+	mail-ww0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750838Ab2BIFIF convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 8 Feb 2012 19:43:49 -0500
-Content-Type: text/plain; charset=US-ASCII
+	Thu, 9 Feb 2012 00:08:05 -0500
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Description: Mail message body
-Subject: BUSINESS PROPOSAL
-From: Shoichi Ogawa <info@mail.com>
-Date: Wed, 08 Feb 2012 00:18:25 -0500
-Reply-To: sogawa@imail.com
-Message-Id: <20120208051836.3948611D0B9@mail.padep.org.bo>
+In-Reply-To: <20120207.091612.181444339.anemo@mba.ocn.ne.jp>
+References: <20120207.091612.181444339.anemo@mba.ocn.ne.jp>
+Date: Thu, 9 Feb 2012 00:08:03 -0500
+Message-ID: <CACqU3MXdKti6J2ozx3mt3UHdhv1fyPredvT6zJGR+u_hNU70Cg@mail.gmail.com>
+Subject: Re: kconfig: tristate choice with depender choice
+From: Arnaud Lacombe <lacombar@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Recipients <info@mail.com>
+To: Atsushi Nemoto <anemo@mba.ocn.ne.jp>
+Cc: Michal Marek <mmarek@suse.cz>, Sam Ravnborg <sam@ravnborg.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Hello Friend 
+Hi,
 
-I am sorry to encroach on your privacy. I have a business proposal foryou. Please contact me if you are interested to know more.
+On Mon, Feb 6, 2012 at 7:16 PM, Atsushi Nemoto <anemo@mba.ocn.ne.jp> wrote:
+> If a tristate choice has another choice dependers, kconfig produce
+> wrong value.
+>
+> Example:
+>
+> choice
+>        prompt "choice list AB"
+> config A
+>        tristate "a"
+> config B
+>        tristate "b"
+> endchoice
+> choice
+>        prompt "choice list CD"
+>        depends on A
+> config C
+>        bool "c"
+> config D
+>        bool "d"
+> endchoice
+>
+> kconfig outputs CONFIG_A=m from defconfig with CONFIG_A=y.
+>
+> This happens if the choice list CD depends on A.
+> Also, if defconfig contains CONFIG_A=y and "# CONFIG_B is not set",
+> output is correct.
+>
+confirmed.
 
-Best Regards 
+> I found commit a64b44ea ("kconfig: fix tristate choice with minimal
+> config"), but this problem still exists on v3.3-rc1.  More fix is
+> needed for choice with dependers?
+>
+it would seem so.
 
-Shoichi Ogawa
+ - Arnaud
