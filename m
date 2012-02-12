@@ -1,74 +1,21 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from defer-dn01.ocn.ad.jp ([125.170.100.155]:39547 "EHLO
-	defer-dn01.ocn.ad.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753372Ab2BIOb4 (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 9 Feb 2012 09:31:56 -0500
-Date: Thu, 09 Feb 2012 23:30:17 +0900 (JST)
-Message-Id: <20120209.233017.47225051.anemo@mba.ocn.ne.jp>
-Subject: Re: kconfig: tristate choice with depender choice
-From: Atsushi Nemoto <anemo@mba.ocn.ne.jp>
-In-Reply-To: <CACqU3MU6j0ed6C9QDfzuoH+2a-2hww2wrCsQXW-kUfK37iansQ@mail.gmail.com>
-References: <20120207.091612.181444339.anemo@mba.ocn.ne.jp>
-	<CACqU3MXdKti6J2ozx3mt3UHdhv1fyPredvT6zJGR+u_hNU70Cg@mail.gmail.com>
-	<CACqU3MU6j0ed6C9QDfzuoH+2a-2hww2wrCsQXW-kUfK37iansQ@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
+Received: from mx50.upm.edu.my ([119.40.119.60]:44734 "EHLO mx50.upm.edu.my"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753946Ab2BLN6h (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 12 Feb 2012 08:58:37 -0500
+Date: Sun, 12 Feb 2012 19:10:04 +0800 (MYT)
+From: Western Union? Global Payment Services <amirah@medic.upm.edu.my>
+Reply-To: Western Union? Global Payment Services
+	  <western_union20123ng3@my0511.com>
+Subject: Re: You have $250,000 lodged in Western Union to be transferred to you.
+Message-ID: <3e46a033-ae81-4517-9fbd-37f37142735b@mail>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: lacombar@gmail.com
-Cc: mmarek@suse.cz, sam@ravnborg.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Thu, 9 Feb 2012 00:26:25 -0500, Arnaud Lacombe <lacombar@gmail.com> wrote:
->> confirmed.
->>
-> actually, not that much. Your reduced testcase is missing a MODULES
-> symbol to have modules enabled and have them show up in the final
-> `.config'. If you add:
-> 
-> config MODULES
->   boolean
->   default y
-> 
-> then you end up with CONFIG_A=m in the `.config'.
 
-Yes, so it is the problem.  I got CONFIG_A=m in .config from
-CONFIG_A=y in defconfig.
 
-> Now, I may have missed something.
-> 
-> Do you have a situation where a MODULES symbol is present, enabled,
-> but CONFIG_A=y still appear from CONFIG_A=m in the defconfig ?
+RESPUESTA PARA LOS DETALLES. RESPOND FOR DETAILS.
 
-I tested in this way:
-
-1. Add this example to the end of drivers/char/Kconfig file.
--------------------------------------
-choice
-	prompt "choice list AB"
-config A
-	tristate "a"
-config B
-	tristate "b"
-endchoice
-choice
-	prompt "choice list CD"
-	depends on A
-config C
-       	bool "c"
-config D
-       	bool "d"
-endchoice
--------------------------------------
-
-2. Then run commands:
-
-$ cp arch/x86/configs/i386_defconfig arch/x86/configs/test_defconfig
-$ echo 'CONFIG_A=y' >> arch/x86/configs/test_defconfig 
-$ make O=../build test_defconfig
-$ grep CONFIG_A= ../build/.config
-CONFIG_A=m
-
----
-Atsushi Nemoto
