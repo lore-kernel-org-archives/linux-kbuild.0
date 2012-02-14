@@ -1,71 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from tx2ehsobe002.messaging.microsoft.com ([65.55.88.12]:11633 "EHLO
-	TX2EHSOBE001.bigfish.com" rhost-flags-OK-OK-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1752425Ab2BMPET (ORCPT
+Received: from smtp07.smtpout.orange.fr ([80.12.242.129]:18543 "EHLO
+	smtp.smtpout.orange.fr" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751540Ab2BNBP3 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 13 Feb 2012 10:04:19 -0500
-From: Joerg Roedel <joerg.roedel@amd.com>
-Subject: [PATCH v2] kbuild: Fix link to headers in 'make deb-pkg'
-Date: Mon, 13 Feb 2012 15:48:57 +0100
-Message-ID: <1329144538-21444-1-git-send-email-joerg.roedel@amd.com>
+	Mon, 13 Feb 2012 20:15:29 -0500
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Subject: Re: [RFC] A packaging of the kconfig frontends
+Date: Tue, 14 Feb 2012 02:15:26 +0100
+References: <201201252352.59925.yann.morin.1998@free.fr>
+In-Reply-To: <201201252352.59925.yann.morin.1998@free.fr>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: Text/Plain;
+  charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <201202140215.26759.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: Joerg Roedel <joerg.roedel@amd.com>, Michal Marek <mmarek@suse.cz>, maximilian attems <max@stro.at>, Ben Hutchings <ben@decadent.org.uk>, debian-kernel@lists.debian.org, linux-kbuild@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
 
-The Link to the kernel header files in the debian packages
-point to the original build directory. This is a bad choice
-if the packages were installed on a different machine. Fix
-this in by manually re-creating the link in the builddeb
-script.
+Hello All!
 
-Cc: Michal Marek <mmarek@suse.cz>
-Cc: maximilian attems <max@stro.at>
-Cc: Ben Hutchings <ben@decadent.org.uk>
-Cc: debian-kernel@lists.debian.org
-Cc: linux-kbuild@vger.kernel.org
-Signed-off-by: Joerg Roedel <joerg.roedel@amd.com>
----
- scripts/package/builddeb |    9 +++++++++
- 1 files changed, 9 insertions(+), 0 deletions(-)
+On Wednesday 25 January 2012 23:52:59 Yann E. MORIN wrote:
+> So I have taken the burden to package the kconfig frontends and parser into
+> a package. The Mercurial repository is there:
+>     hg clone http://ymorin.is-a-geek.org/hg/kconfig-frontends/
+> 
+> So, what do you get in this package ?
+>  - all 5 frontends, each individually selectable with configure flags
+>  - a static library with the parser (not installed, though)
+>  - a standard autotools-based build procedure
+>  - a simple kernel-to-package synchronisation
 
-diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-index f6cbc3d..fc3f76a 100644
---- a/scripts/package/builddeb
-+++ b/scripts/package/builddeb
-@@ -97,6 +97,7 @@ mkdir -m 755 -p "$libc_headers_dir/DEBIAN"
- mkdir -p "$libc_headers_dir/usr/share/doc/$libc_headers_packagename"
- mkdir -m 755 -p "$kernel_headers_dir/DEBIAN"
- mkdir -p "$kernel_headers_dir/usr/share/doc/$kernel_headers_packagename"
-+mkdir -p "$kernel_headers_dir/lib/modules/$version/"
- if [ "$ARCH" = "um" ] ; then
- 	mkdir -p "$tmpdir/usr/lib/uml/modules/$version" "$tmpdir/usr/bin"
- fi
-@@ -121,6 +122,8 @@ fi
- 
- if grep -q '^CONFIG_MODULES=y' .config ; then
- 	INSTALL_MOD_PATH="$tmpdir" make KBUILD_SRC= modules_install
-+	rm -f "$tmpdir/lib/modules/$version/build"
-+	rm -f "$tmpdir/lib/modules/$version/source"
- 	if [ "$ARCH" = "um" ] ; then
- 		mv "$tmpdir/lib/modules/$version"/* "$tmpdir/usr/lib/uml/modules/$version/"
- 		rmdir "$tmpdir/lib/modules/$version"
-@@ -245,6 +248,12 @@ destdir=$kernel_headers_dir/usr/src/linux-headers-$version
- mkdir -p "$destdir"
- (cd $srctree; tar -c -f - -T /tmp/files$$) | (cd $destdir; tar -xf -)
- (cd $objtree; tar -c -f - -T /tmp/objfiles$$) | (cd $destdir; tar -xf -)
-+ln -sf "/usr/src/linux-headers-$version" "$kernel_headers_dir/lib/modules/$version/build"
-+if [ "$ARCH" = "um" ] ; then
-+	mkdir -p "$kernel_headers_dir/usr/lib/uml/modules/$version/"
-+	mv "$kernel_headers_dir/lib/modules/$version"/* "$kernel_headers_dir/usr/lib/uml/modules/$version/"
-+	rmdir "$kernel_headers_dir/lib/modules/$version"
-+fi
- rm -f /tmp/files$$ /tmp/objfiles$$
- arch=$(dpkg --print-architecture)
- 
+I'm still playing around with this packaging, and now the parser can be
+built as
+ - a versioned shared library (the default)
+ - an un-versioned static library (optional)
+
+The frontends then properly link to the available library, preferably the
+shared one if both are built.
+
+There still are some issues wrt library dependencies (everything depends on
+the ncurses libs, because there is no clear seaparation in ./configure for
+now).
+
+I'm ready to read comments or suggestions. ;-)
+
+Regards,
+Yann E. MORIN.
+
 -- 
-1.7.5.4
-
-
+.-----------------.--------------------.------------------.--------------------.
+|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
+| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
+| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
+| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
+'------------------------------^-------^------------------^--------------------'
