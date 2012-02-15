@@ -1,15 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from am1ehsobe004.messaging.microsoft.com ([213.199.154.207]:21072
-	"EHLO AM1EHSOBE002.bigfish.com" rhost-flags-OK-OK-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1752980Ab2BOQiz (ORCPT
+Received: from db3ehsobe005.messaging.microsoft.com ([213.199.154.143]:23993
+	"EHLO DB3EHSOBE003.bigfish.com" rhost-flags-OK-OK-OK-FAIL)
+	by vger.kernel.org with ESMTP id S1750862Ab2BOQyJ (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 15 Feb 2012 11:38:55 -0500
+	Wed, 15 Feb 2012 11:54:09 -0500
 From: Joerg Roedel <joerg.roedel@amd.com>
-Subject: [PATCH 2/2] kbuild: Only build linux-image package for UML
-Date: Wed, 15 Feb 2012 17:38:27 +0100
-Message-ID: <1329323907-7696-2-git-send-email-joerg.roedel@amd.com>
-In-Reply-To: <1329323907-7696-1-git-send-email-joerg.roedel@amd.com>
-References: <1329323907-7696-1-git-send-email-joerg.roedel@amd.com>
+Subject: [PATCH 1/2] kbuild: Fix link to headers in 'make deb-pkg'
+Date: Wed, 15 Feb 2012 17:38:26 +0100
+Message-ID: <1329323907-7696-1-git-send-email-joerg.roedel@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -17,8 +15,11 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org
 Cc: Joerg Roedel <joerg.roedel@amd.com>, Michal Marek <mmarek@suse.cz>, maximilian attems <max@stro.at>, Ben Hutchings <ben@decadent.org.uk>, debian-kernel@lists.debian.org, linux-kbuild@vger.kernel.org
 
-For user-mode Linux the other packages are not required. So
-only build the package with the linux-image in it.
+The Link to the kernel header files in the debian packages
+point to the original build directory. This is a bad choice
+if the packages were installed on a different machine. Fix
+this in by manually re-creating the link in the builddeb
+script.
 
 Cc: Michal Marek <mmarek@suse.cz>
 Cc: maximilian attems <max@stro.at>
@@ -27,48 +28,38 @@ Cc: debian-kernel@lists.debian.org
 Cc: linux-kbuild@vger.kernel.org
 Signed-off-by: Joerg Roedel <joerg.roedel@amd.com>
 ---
- scripts/package/builddeb |   14 +++++++++-----
- 1 files changed, 9 insertions(+), 5 deletions(-)
+ scripts/package/builddeb |    4 ++++
+ 1 files changed, 4 insertions(+), 0 deletions(-)
 
 diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-index 39e3f30..0db889f 100644
+index 3c6c0b1..39e3f30 100644
 --- a/scripts/package/builddeb
 +++ b/scripts/package/builddeb
-@@ -130,8 +130,10 @@ if grep -q '^CONFIG_MODULES=y' .config ; then
- 	fi
+@@ -97,6 +97,7 @@ mkdir -m 755 -p "$libc_headers_dir/DEBIAN"
+ mkdir -p "$libc_headers_dir/usr/share/doc/$libc_headers_packagename"
+ mkdir -m 755 -p "$kernel_headers_dir/DEBIAN"
+ mkdir -p "$kernel_headers_dir/usr/share/doc/$kernel_headers_packagename"
++mkdir -p "$kernel_headers_dir/lib/modules/$version/"
+ if [ "$ARCH" = "um" ] ; then
+ 	mkdir -p "$tmpdir/usr/lib/uml/modules/$version" "$tmpdir/usr/bin"
  fi
+@@ -121,6 +122,8 @@ fi
  
--make headers_check
--make headers_install INSTALL_HDR_PATH="$libc_headers_dir/usr"
-+if [ "$ARCH" != "um" ]; then
-+	make headers_check
-+	make headers_install INSTALL_HDR_PATH="$libc_headers_dir/usr"
-+fi
+ if grep -q '^CONFIG_MODULES=y' .config ; then
+ 	INSTALL_MOD_PATH="$tmpdir" make KBUILD_SRC= modules_install
++	rm -f "$tmpdir/lib/modules/$version/build"
++	rm -f "$tmpdir/lib/modules/$version/source"
+ 	if [ "$ARCH" = "um" ] ; then
+ 		mv "$tmpdir/lib/modules/$version"/* "$tmpdir/usr/lib/uml/modules/$version/"
+ 		rmdir "$tmpdir/lib/modules/$version"
+@@ -245,6 +248,7 @@ destdir=$kernel_headers_dir/usr/src/linux-headers-$version
+ mkdir -p "$destdir"
+ (cd $srctree; tar -c -f - -T "$objtree/debian/hdrsrcfiles") | (cd $destdir; tar -xf -)
+ (cd $objtree; tar -c -f - -T "$objtree/debian/hdrobjfiles") | (cd $destdir; tar -xf -)
++ln -sf "/usr/src/linux-headers-$version" "$kernel_headers_dir/lib/modules/$version/build"
+ rm -f "$objtree/debian/hdrsrcfiles" "$objtree/debian/hdrobjfiles"
+ arch=$(dpkg --print-architecture)
  
- # Install the maintainer scripts
- # Note: hook scripts under /etc/kernel are also executed by official Debian
-@@ -263,8 +265,6 @@ Description: Linux kernel headers for $KERNELRELEASE on $arch
-  This is useful for people who need to build external modules
- EOF
- 
--create_package "$kernel_headers_packagename" "$kernel_headers_dir"
--
- # Do we have firmware? Move it out of the way and build it into a package.
- if [ -e "$tmpdir/lib/firmware" ]; then
- 	mv "$tmpdir/lib/firmware" "$fwdir/lib/"
-@@ -291,7 +291,11 @@ Description: Linux support headers for userspace development
-  are used by the installed headers for GNU glibc and other system libraries.
- EOF
- 
--create_package "$libc_headers_packagename" "$libc_headers_dir"
-+if [ "$ARCH" != "um" ]; then
-+	create_package "$kernel_headers_packagename" "$kernel_headers_dir"
-+	create_package "$libc_headers_packagename" "$libc_headers_dir"
-+fi
-+
- create_package "$packagename" "$tmpdir"
- 
- exit 0
 -- 
 1.7.5.4
 
