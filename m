@@ -1,124 +1,61 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from shadbolt.e.decadent.org.uk ([88.96.1.126]:40711 "EHLO
-	shadbolt.e.decadent.org.uk" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1754779Ab2BPEtr (ORCPT
+Received: from am1ehsobe003.messaging.microsoft.com ([213.199.154.206]:34187
+	"EHLO AM1EHSOBE003.bigfish.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751896Ab2BPS4v (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 15 Feb 2012 23:49:47 -0500
-Message-ID: <1329367790.3048.168.camel@deadeye>
-Subject: Re: [PATCH 2/2] kbuild: Only build linux-image package for UML
-From: Ben Hutchings <ben@decadent.org.uk>
-Date: Thu, 16 Feb 2012 04:49:50 +0000
-In-Reply-To: <1329323907-7696-2-git-send-email-joerg.roedel@amd.com>
-References: <1329323907-7696-1-git-send-email-joerg.roedel@amd.com>
-	 <1329323907-7696-2-git-send-email-joerg.roedel@amd.com>
-Content-Type: multipart/signed; micalg="pgp-sha512";
-	protocol="application/pgp-signature"; boundary="=-9l2lFovANsYBLa94WiBz"
-Mime-Version: 1.0
+	Thu, 16 Feb 2012 13:56:51 -0500
+From: Joerg Roedel <joerg.roedel@amd.com>
+Subject: [PATCH] kbuild: Fix out-of-tree build for 'make deb-pkg'
+Date: Thu, 16 Feb 2012 19:56:37 +0100
+Message-ID: <1329418597-1654-1-git-send-email-joerg.roedel@amd.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Joerg Roedel <joerg.roedel@amd.com>
-Cc: linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, maximilian attems <max@stro.at>, debian-kernel@lists.debian.org, linux-kbuild@vger.kernel.org, user-mode-linux-devel@lists.sourceforge.net
+To: linux-kernel@vger.kernel.org
+Cc: Joerg Roedel <joerg.roedel@amd.com>, Michal Marek <mmarek@suse.cz>, maximilian attems <max@stro.at>, Ben Hutchings <ben@decadent.org.uk>, debian-kernel@lists.debian.org, linux-kbuild@vger.kernel.org
+
+The out-of-tree build is broken in 'make deb-pkg'. The
+header checks and the header install works on the source and
+not on the object tree.
+While fixing this also replace the direct 'make' invocations
+with the $MAKE variable to be consistent within the script.
+
+Cc: Michal Marek <mmarek@suse.cz>
+Cc: maximilian attems <max@stro.at>
+Cc: Ben Hutchings <ben@decadent.org.uk>
+Cc: debian-kernel@lists.debian.org
+Cc: linux-kbuild@vger.kernel.org
+Signed-off-by: Joerg Roedel <joerg.roedel@amd.com>
+---
+ scripts/package/builddeb |    6 +++---
+ 1 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+index 0db889f..eee5f8e 100644
+--- a/scripts/package/builddeb
++++ b/scripts/package/builddeb
+@@ -121,7 +121,7 @@ else
+ fi
+ 
+ if grep -q '^CONFIG_MODULES=y' .config ; then
+-	INSTALL_MOD_PATH="$tmpdir" make KBUILD_SRC= modules_install
++	INSTALL_MOD_PATH="$tmpdir" $MAKE KBUILD_SRC= modules_install
+ 	rm -f "$tmpdir/lib/modules/$version/build"
+ 	rm -f "$tmpdir/lib/modules/$version/source"
+ 	if [ "$ARCH" = "um" ] ; then
+@@ -131,8 +131,8 @@ if grep -q '^CONFIG_MODULES=y' .config ; then
+ fi
+ 
+ if [ "$ARCH" != "um" ]; then
+-	make headers_check
+-	make headers_install INSTALL_HDR_PATH="$libc_headers_dir/usr"
++	$MAKE headers_check KBUILD_SRC=
++	$MAKE headers_install KBUILD_SRC= INSTALL_HDR_PATH="$libc_headers_dir/usr"
+ fi
+ 
+ # Install the maintainer scripts
+-- 
+1.7.5.4
 
 
---=-9l2lFovANsYBLa94WiBz
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, 2012-02-15 at 17:38 +0100, Joerg Roedel wrote:
-> For user-mode Linux the other packages are not required. So
-> only build the package with the linux-image in it.
->=20
-> Cc: Michal Marek <mmarek@suse.cz>
-> Cc: maximilian attems <max@stro.at>
-> Cc: Ben Hutchings <ben@decadent.org.uk>
-> Cc: debian-kernel@lists.debian.org
-> Cc: linux-kbuild@vger.kernel.org
-> Signed-off-by: Joerg Roedel <joerg.roedel@amd.com>
-Tested-by: Ben Hutchings <ben@decadent.org.uk>
-
-But I've never touched UML either so we should get confirmation that
-this really is the right thing to do.
-
-Ben.
-
-> ---
->  scripts/package/builddeb |   14 +++++++++-----
->  1 files changed, 9 insertions(+), 5 deletions(-)
->=20
-> diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-> index 39e3f30..0db889f 100644
-> --- a/scripts/package/builddeb
-> +++ b/scripts/package/builddeb
-> @@ -130,8 +130,10 @@ if grep -q '^CONFIG_MODULES=3Dy' .config ; then
->  	fi
->  fi
-> =20
-> -make headers_check
-> -make headers_install INSTALL_HDR_PATH=3D"$libc_headers_dir/usr"
-> +if [ "$ARCH" !=3D "um" ]; then
-> +	make headers_check
-> +	make headers_install INSTALL_HDR_PATH=3D"$libc_headers_dir/usr"
-> +fi
-> =20
->  # Install the maintainer scripts
->  # Note: hook scripts under /etc/kernel are also executed by official Deb=
-ian
-> @@ -263,8 +265,6 @@ Description: Linux kernel headers for $KERNELRELEASE =
-on $arch
->   This is useful for people who need to build external modules
->  EOF
-> =20
-> -create_package "$kernel_headers_packagename" "$kernel_headers_dir"
-> -
->  # Do we have firmware? Move it out of the way and build it into a packag=
-e.
->  if [ -e "$tmpdir/lib/firmware" ]; then
->  	mv "$tmpdir/lib/firmware" "$fwdir/lib/"
-> @@ -291,7 +291,11 @@ Description: Linux support headers for userspace dev=
-elopment
->   are used by the installed headers for GNU glibc and other system librar=
-ies.
->  EOF
-> =20
-> -create_package "$libc_headers_packagename" "$libc_headers_dir"
-> +if [ "$ARCH" !=3D "um" ]; then
-> +	create_package "$kernel_headers_packagename" "$kernel_headers_dir"
-> +	create_package "$libc_headers_packagename" "$libc_headers_dir"
-> +fi
-> +
->  create_package "$packagename" "$tmpdir"
-> =20
->  exit 0
-> --=20
-> 1.7.5.4
->=20
->=20
->=20
-
---=20
-Ben Hutchings
-Beware of programmers who carry screwdrivers. - Leonard Brandwein
-
---=-9l2lFovANsYBLa94WiBz
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.11 (GNU/Linux)
-
-iQIVAwUATzyK7ue/yOyVhhEJAQq+OxAAhOkl672K7dU+vvH9mn/DdLXW0uYoiClg
-NAX/rlJGzpRV+kxPy4OLXRWNMW2xNEEpj6r+n/8eMCNAikSDwC+6mRloLlT36Uku
-oqSQYMPZXZkjBBSmTDbzLug/FfKJRos18D26rX4gI5MpVoTlued7IGc4D0xwRWHg
-lERcEImz7tx6mTBYQKHN+ljF6YRsHD3/SK0Qk+UtEzRkwzKkG6VUqWgDPemDLBYY
-H41MIHdAtD5VZbngeTz/PTizb9po0LYD4F8ei3fKTijKUgCpctN1SydyqsKspvRu
-wNgmf+x3XW3zKcfohKrXxBj/Nyw9KvkTdi8fvtPZ3XzXfCe9vkkxP0Stet9kwNcM
-We58kyHNe8uP9k1h1kSoFor+Wkazt0d77QB2z0KCURFBKoMmtKPgTRD7mSet/7mE
-fGvDVh7PMeMhor+XwNavMPTgCFwZNwAn0Ilk7dthzDD+bWxCIKPv5mfjInDinU9x
-Tfi4/zDIKoA74hKSnV2SZdVQu2/+9/KuS6SaL6TfMB9LVBeMi6FSe2Bdk3rM28dm
-Xb972N+HEucPP6qRqIgYOXfy82z7Kv/VIjrWPzJbAnuQ6B5UBb0SvcedHkN+HabP
-x1pRwUhFYr9noVUJlug1w7jfBQ2jt8zFKNXYqQqgVg4cqwSujgezmirQe/1o9I4Q
-dYyrnyfQtV8=
-=FLAF
------END PGP SIGNATURE-----
-
---=-9l2lFovANsYBLa94WiBz--
