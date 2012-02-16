@@ -1,68 +1,75 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ac250205.ppp.asahi-net.or.jp ([183.77.250.205]:51375 "EHLO
-	smtp.kamineko.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753665Ab2BPVgI (ORCPT
+Received: from swampdragon.chaosbits.net ([90.184.90.115]:26437 "EHLO
+	swampdragon.chaosbits.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751834Ab2BPVsY (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 16 Feb 2012 16:36:08 -0500
-Date: Fri, 17 Feb 2012 06:29:27 +0900
-From: Mattia Dongili <malattia@linux.it>
-Subject: Re: [PATCH 2/2] kbuild: Only build linux-image package for UML
-Message-ID: <20120216212926.GA8970@kamineko.org>
-References: <1329323907-7696-1-git-send-email-joerg.roedel@amd.com>
- <1329323907-7696-2-git-send-email-joerg.roedel@amd.com>
- <1329367790.3048.168.camel@deadeye>
+	Thu, 16 Feb 2012 16:48:24 -0500
+Date: Thu, 16 Feb 2012 22:49:15 +0100 (CET)
+From: Jesper Juhl <jj@chaosbits.net>
+Subject: [PATCH][Trivial] Makefile: Break a few overlong lines and adjust
+ placement of a few line continuations
+Message-ID: <alpine.LNX.2.00.1202162247300.25384@swampdragon.chaosbits.net>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="pf9I7BMVVzbSWLtt"
-Content-Disposition: inline
-In-Reply-To: <1329367790.3048.168.camel@deadeye>
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ben Hutchings <ben@decadent.org.uk>
-Cc: Joerg Roedel <joerg.roedel@amd.com>, linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, maximilian attems <max@stro.at>, debian-kernel@lists.debian.org, linux-kbuild@vger.kernel.org, user-mode-linux-devel@lists.sourceforge.net
+To: linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, trivial@kernel.org
+
+Break a few lines that go way over the usual 80 column limit that we prefer.
+Also adjust the placement of a few line continuations.
+
+Signed-off-by: Jesper Juhl <jj@chaosbits.net>
+---
+ Makefile |   12 +++++++-----
+ 1 files changed, 7 insertions(+), 5 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 7c44b67..da01a71 100644
+--- a/Makefile
++++ b/Makefile
+@@ -400,8 +400,10 @@ export MODVERDIR := $(if $(KBUILD_EXTMOD),$(firstword $(KBUILD_EXTMOD))/).tmp_ve
+ 
+ # Files to ignore in find ... statements
+ 
+-RCS_FIND_IGNORE := \( -name SCCS -o -name BitKeeper -o -name .svn -o -name CVS -o -name .pc -o -name .hg -o -name .git \) -prune -o
+-export RCS_TAR_IGNORE := --exclude SCCS --exclude BitKeeper --exclude .svn --exclude CVS --exclude .pc --exclude .hg --exclude .git
++RCS_FIND_IGNORE := \( -name SCCS -o -name BitKeeper -o -name .svn -o -name CVS \
++		   -o -name .pc -o -name .hg -o -name .git \) -prune -o
++export RCS_TAR_IGNORE := --exclude SCCS --exclude BitKeeper --exclude .svn \
++			 --exclude CVS --exclude .pc --exclude .hg --exclude .git
+ 
+ # ===========================================================================
+ # Rules shared between *config targets and build targets
+@@ -966,7 +968,7 @@ prepare3: include/config/kernel.release
+ ifneq ($(KBUILD_SRC),)
+ 	@$(kecho) '  Using $(srctree) as source for kernel'
+ 	$(Q)if [ -f $(srctree)/.config -o -d $(srctree)/include/config ]; then \
+-		echo "  $(srctree) is not clean, please run 'make mrproper'";\
++		echo "  $(srctree) is not clean, please run 'make mrproper'"; \
+ 		echo "  in the '$(srctree)' directory.";\
+ 		/bin/false; \
+ 	fi;
+@@ -1003,8 +1005,8 @@ define filechk_utsrelease.h
+ endef
+ 
+ define filechk_version.h
+-	(echo \#define LINUX_VERSION_CODE $(shell                             \
+-	expr $(VERSION) \* 65536 + 0$(PATCHLEVEL) \* 256 + 0$(SUBLEVEL));    \
++	(echo \#define LINUX_VERSION_CODE $(shell                         \
++	expr $(VERSION) \* 65536 + 0$(PATCHLEVEL) \* 256 + 0$(SUBLEVEL)); \
+ 	echo '#define KERNEL_VERSION(a,b,c) (((a) << 16) + ((b) << 8) + (c))';)
+ endef
+ 
+-- 
+1.7.9.1
 
 
---pf9I7BMVVzbSWLtt
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Thu, Feb 16, 2012 at 04:49:50AM +0000, Ben Hutchings wrote:
-> On Wed, 2012-02-15 at 17:38 +0100, Joerg Roedel wrote:
-> > For user-mode Linux the other packages are not required. So
-> > only build the package with the linux-image in it.
-> >=20
-> > Cc: Michal Marek <mmarek@suse.cz>
-> > Cc: maximilian attems <max@stro.at>
-> > Cc: Ben Hutchings <ben@decadent.org.uk>
-> > Cc: debian-kernel@lists.debian.org
-> > Cc: linux-kbuild@vger.kernel.org
-> > Signed-off-by: Joerg Roedel <joerg.roedel@amd.com>
-> Tested-by: Ben Hutchings <ben@decadent.org.uk>
->=20
-> But I've never touched UML either so we should get confirmation that
-> this really is the right thing to do.
+PS. Please CC me on replies.
 
-there is a wishlist bug opened ages ago (and pinged not so long ago)
-requesting headers to be packaged in debian:
-http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=3D186930
-Just to say that there is some interest in having headers packaged
-somehow.
+-- 
+Jesper Juhl <jj@chaosbits.net>       http://www.chaosbits.net/
+Don't top-post http://www.catb.org/jargon/html/T/top-post.html
+Plain text mails only, please.
 
---=20
-mattia
-:wq!
-
---pf9I7BMVVzbSWLtt
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Digital signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.11 (GNU/Linux)
-
-iEYEARECAAYFAk89dTYACgkQgpRPaOotLEGmwwCeIOIw5eX2x+w2/QMPAnhLKEk/
-XRwAoODTPg/s5HZyRJRf8CUm/vNaJnOJ
-=LYHv
------END PGP SIGNATURE-----
-
---pf9I7BMVVzbSWLtt--
