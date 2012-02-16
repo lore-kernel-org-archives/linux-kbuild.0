@@ -1,34 +1,32 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from shadbolt.e.decadent.org.uk ([88.96.1.126]:40681 "EHLO
+Received: from shadbolt.e.decadent.org.uk ([88.96.1.126]:40711 "EHLO
 	shadbolt.e.decadent.org.uk" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1754803Ab2BPEp2 (ORCPT
+	by vger.kernel.org with ESMTP id S1754779Ab2BPEtr (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 15 Feb 2012 23:45:28 -0500
-Message-ID: <1329367521.3048.165.camel@deadeye>
-Subject: Re: [PATCH 1/2] kbuild: Fix link to headers in 'make deb-pkg'
+	Wed, 15 Feb 2012 23:49:47 -0500
+Message-ID: <1329367790.3048.168.camel@deadeye>
+Subject: Re: [PATCH 2/2] kbuild: Only build linux-image package for UML
 From: Ben Hutchings <ben@decadent.org.uk>
-Date: Thu, 16 Feb 2012 04:45:21 +0000
-In-Reply-To: <1329323907-7696-1-git-send-email-joerg.roedel@amd.com>
+Date: Thu, 16 Feb 2012 04:49:50 +0000
+In-Reply-To: <1329323907-7696-2-git-send-email-joerg.roedel@amd.com>
 References: <1329323907-7696-1-git-send-email-joerg.roedel@amd.com>
+	 <1329323907-7696-2-git-send-email-joerg.roedel@amd.com>
 Content-Type: multipart/signed; micalg="pgp-sha512";
-	protocol="application/pgp-signature"; boundary="=-U0D+VeLGdmT4foiX6BHD"
+	protocol="application/pgp-signature"; boundary="=-9l2lFovANsYBLa94WiBz"
 Mime-Version: 1.0
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Joerg Roedel <joerg.roedel@amd.com>
-Cc: linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, maximilian attems <max@stro.at>, debian-kernel@lists.debian.org, linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, maximilian attems <max@stro.at>, debian-kernel@lists.debian.org, linux-kbuild@vger.kernel.org, user-mode-linux-devel@lists.sourceforge.net
 
 
---=-U0D+VeLGdmT4foiX6BHD
+--=-9l2lFovANsYBLa94WiBz
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
 On Wed, 2012-02-15 at 17:38 +0100, Joerg Roedel wrote:
-> The Link to the kernel header files in the debian packages
-> point to the original build directory. This is a bad choice
-> if the packages were installed on a different machine. Fix
-> this in by manually re-creating the link in the builddeb
-> script.
+> For user-mode Linux the other packages are not required. So
+> only build the package with the linux-image in it.
 >=20
 > Cc: Michal Marek <mmarek@suse.cz>
 > Cc: maximilian attems <max@stro.at>
@@ -36,33 +34,91 @@ On Wed, 2012-02-15 at 17:38 +0100, Joerg Roedel wrote:
 > Cc: debian-kernel@lists.debian.org
 > Cc: linux-kbuild@vger.kernel.org
 > Signed-off-by: Joerg Roedel <joerg.roedel@amd.com>
-[...]
-Reviewed-by: Ben Hutchings <ben@decadent.org.uk>
+Tested-by: Ben Hutchings <ben@decadent.org.uk>
+
+But I've never touched UML either so we should get confirmation that
+this really is the right thing to do.
+
+Ben.
+
+> ---
+>  scripts/package/builddeb |   14 +++++++++-----
+>  1 files changed, 9 insertions(+), 5 deletions(-)
+>=20
+> diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+> index 39e3f30..0db889f 100644
+> --- a/scripts/package/builddeb
+> +++ b/scripts/package/builddeb
+> @@ -130,8 +130,10 @@ if grep -q '^CONFIG_MODULES=3Dy' .config ; then
+>  	fi
+>  fi
+> =20
+> -make headers_check
+> -make headers_install INSTALL_HDR_PATH=3D"$libc_headers_dir/usr"
+> +if [ "$ARCH" !=3D "um" ]; then
+> +	make headers_check
+> +	make headers_install INSTALL_HDR_PATH=3D"$libc_headers_dir/usr"
+> +fi
+> =20
+>  # Install the maintainer scripts
+>  # Note: hook scripts under /etc/kernel are also executed by official Deb=
+ian
+> @@ -263,8 +265,6 @@ Description: Linux kernel headers for $KERNELRELEASE =
+on $arch
+>   This is useful for people who need to build external modules
+>  EOF
+> =20
+> -create_package "$kernel_headers_packagename" "$kernel_headers_dir"
+> -
+>  # Do we have firmware? Move it out of the way and build it into a packag=
+e.
+>  if [ -e "$tmpdir/lib/firmware" ]; then
+>  	mv "$tmpdir/lib/firmware" "$fwdir/lib/"
+> @@ -291,7 +291,11 @@ Description: Linux support headers for userspace dev=
+elopment
+>   are used by the installed headers for GNU glibc and other system librar=
+ies.
+>  EOF
+> =20
+> -create_package "$libc_headers_packagename" "$libc_headers_dir"
+> +if [ "$ARCH" !=3D "um" ]; then
+> +	create_package "$kernel_headers_packagename" "$kernel_headers_dir"
+> +	create_package "$libc_headers_packagename" "$libc_headers_dir"
+> +fi
+> +
+>  create_package "$packagename" "$tmpdir"
+> =20
+>  exit 0
+> --=20
+> 1.7.5.4
+>=20
+>=20
+>=20
 
 --=20
 Ben Hutchings
 Beware of programmers who carry screwdrivers. - Leonard Brandwein
 
---=-U0D+VeLGdmT4foiX6BHD
+--=-9l2lFovANsYBLa94WiBz
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: This is a digitally signed message part
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1.4.11 (GNU/Linux)
 
-iQIVAwUATzyJ4ee/yOyVhhEJAQqjHhAAqhfG/G7p07aaNL2wNGqm4Aiv0mWY/Kpo
-cdoTRphuYl7+oRxGF6u6upvdGS8yDE55FngIt93F62eK9J4Z7OOkR4a6lgPj3UBo
-tfz4zII+pW08/8aFZcul+3naTa7yReLpHi2n4XviKMo89oa9rb/a81xL10R/vp2c
-uNPhfKPqupkvfMtrBQRoSgOGP9SDMKzB0rXY8m9sLULKcK0//jougVBioWnzblTL
-fZqbM9/3DscIzsCctG+ElJcHtLD3/eyCT0Zi1kW6wAUC6Esbu+NLfnBm12BjmQt6
-LoiwMoylAVFoZ11zHKBSEqvbiKg7jwMyPFi4tmMSdG4f1+O5dfDhMnfiOzFguiH6
-f/u669txOtIy1EmTk7p0djPT1+YJn5mNQSOJGFqeRWKxLgndvEKfG88t36OhJnvE
-vAVMR8XyHuP969ZB7xEzHyp72nVLU+2DRu5pJJqCp5FDNTqUFIjQfZVShPxr+HsH
-E+Eq1/Ph32fV/wi1cQmqcQaFHdr59w/dTmZ+b+Jbt7UMaR5gepUQxbimd9HFKWbp
-mFHszzap8bZ2I0z+68Bxu9pvHZKfXLcFUYnYFh139E1wcuVTI76B1S+UYHcOHQ9i
-2JlvT/sbPGbTZwtMBeaZ5k8BxOpNhRdBvTg14tHqYMt02wPP6BrwGa8AMsk5WygJ
-/9kENlERmBM=
-=h2GT
+iQIVAwUATzyK7ue/yOyVhhEJAQq+OxAAhOkl672K7dU+vvH9mn/DdLXW0uYoiClg
+NAX/rlJGzpRV+kxPy4OLXRWNMW2xNEEpj6r+n/8eMCNAikSDwC+6mRloLlT36Uku
+oqSQYMPZXZkjBBSmTDbzLug/FfKJRos18D26rX4gI5MpVoTlued7IGc4D0xwRWHg
+lERcEImz7tx6mTBYQKHN+ljF6YRsHD3/SK0Qk+UtEzRkwzKkG6VUqWgDPemDLBYY
+H41MIHdAtD5VZbngeTz/PTizb9po0LYD4F8ei3fKTijKUgCpctN1SydyqsKspvRu
+wNgmf+x3XW3zKcfohKrXxBj/Nyw9KvkTdi8fvtPZ3XzXfCe9vkkxP0Stet9kwNcM
+We58kyHNe8uP9k1h1kSoFor+Wkazt0d77QB2z0KCURFBKoMmtKPgTRD7mSet/7mE
+fGvDVh7PMeMhor+XwNavMPTgCFwZNwAn0Ilk7dthzDD+bWxCIKPv5mfjInDinU9x
+Tfi4/zDIKoA74hKSnV2SZdVQu2/+9/KuS6SaL6TfMB9LVBeMi6FSe2Bdk3rM28dm
+Xb972N+HEucPP6qRqIgYOXfy82z7Kv/VIjrWPzJbAnuQ6B5UBb0SvcedHkN+HabP
+x1pRwUhFYr9noVUJlug1w7jfBQ2jt8zFKNXYqQqgVg4cqwSujgezmirQe/1o9I4Q
+dYyrnyfQtV8=
+=FLAF
 -----END PGP SIGNATURE-----
 
---=-U0D+VeLGdmT4foiX6BHD--
+--=-9l2lFovANsYBLa94WiBz--
