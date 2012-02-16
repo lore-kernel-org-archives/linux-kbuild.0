@@ -1,28 +1,68 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mailout.smilebrands.com ([66.104.72.207]:22188 "EHLO
-	snaex01.bnd.corp" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1753700Ab2BORrt convert rfc822-to-8bit (ORCPT
+Received: from shadbolt.e.decadent.org.uk ([88.96.1.126]:40681 "EHLO
+	shadbolt.e.decadent.org.uk" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1754803Ab2BPEp2 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 15 Feb 2012 12:47:49 -0500
-From: Ann Adams <Ann.Adams@smilebrands.com>
-Date: Wed, 15 Feb 2012 09:47:44 -0800
-Subject: 
-Message-ID: <62F82CB44658DF47AFBF4FC7BF35DEFE355A31EE77@EXCMBX.bnd.corp>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
-MIME-Version: 1.0
+	Wed, 15 Feb 2012 23:45:28 -0500
+Message-ID: <1329367521.3048.165.camel@deadeye>
+Subject: Re: [PATCH 1/2] kbuild: Fix link to headers in 'make deb-pkg'
+From: Ben Hutchings <ben@decadent.org.uk>
+Date: Thu, 16 Feb 2012 04:45:21 +0000
+In-Reply-To: <1329323907-7696-1-git-send-email-joerg.roedel@amd.com>
+References: <1329323907-7696-1-git-send-email-joerg.roedel@amd.com>
+Content-Type: multipart/signed; micalg="pgp-sha512";
+	protocol="application/pgp-signature"; boundary="=-U0D+VeLGdmT4foiX6BHD"
+Mime-Version: 1.0
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
+To: Joerg Roedel <joerg.roedel@amd.com>
+Cc: linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, maximilian attems <max@stro.at>, debian-kernel@lists.debian.org, linux-kbuild@vger.kernel.org
 
 
+--=-U0D+VeLGdmT4foiX6BHD
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Wed, 2012-02-15 at 17:38 +0100, Joerg Roedel wrote:
+> The Link to the kernel header files in the debian packages
+> point to the original build directory. This is a bad choice
+> if the packages were installed on a different machine. Fix
+> this in by manually re-creating the link in the builddeb
+> script.
+>=20
+> Cc: Michal Marek <mmarek@suse.cz>
+> Cc: maximilian attems <max@stro.at>
+> Cc: Ben Hutchings <ben@decadent.org.uk>
+> Cc: debian-kernel@lists.debian.org
+> Cc: linux-kbuild@vger.kernel.org
+> Signed-off-by: Joerg Roedel <joerg.roedel@amd.com>
+[...]
+Reviewed-by: Ben Hutchings <ben@decadent.org.uk>
 
-Hi
-  Sorry for the sudden contact with you via email, but please i have looked
-  For you in the past few months now without any good result that is why i
-  am using this medium, i would appreciate if you did contact me for a brief
-  Discussion my Phone number is (+44) 703 595 6471 and email is michaelachambers@live.co.uk
-    Thanks In Advance
-    Michael Aiden
-Note: All corresponding email should be sent to michaelachambers@live.co.uk  for an immediate attention.
+--=20
+Ben Hutchings
+Beware of programmers who carry screwdrivers. - Leonard Brandwein
+
+--=-U0D+VeLGdmT4foiX6BHD
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iQIVAwUATzyJ4ee/yOyVhhEJAQqjHhAAqhfG/G7p07aaNL2wNGqm4Aiv0mWY/Kpo
+cdoTRphuYl7+oRxGF6u6upvdGS8yDE55FngIt93F62eK9J4Z7OOkR4a6lgPj3UBo
+tfz4zII+pW08/8aFZcul+3naTa7yReLpHi2n4XviKMo89oa9rb/a81xL10R/vp2c
+uNPhfKPqupkvfMtrBQRoSgOGP9SDMKzB0rXY8m9sLULKcK0//jougVBioWnzblTL
+fZqbM9/3DscIzsCctG+ElJcHtLD3/eyCT0Zi1kW6wAUC6Esbu+NLfnBm12BjmQt6
+LoiwMoylAVFoZ11zHKBSEqvbiKg7jwMyPFi4tmMSdG4f1+O5dfDhMnfiOzFguiH6
+f/u669txOtIy1EmTk7p0djPT1+YJn5mNQSOJGFqeRWKxLgndvEKfG88t36OhJnvE
+vAVMR8XyHuP969ZB7xEzHyp72nVLU+2DRu5pJJqCp5FDNTqUFIjQfZVShPxr+HsH
+E+Eq1/Ph32fV/wi1cQmqcQaFHdr59w/dTmZ+b+Jbt7UMaR5gepUQxbimd9HFKWbp
+mFHszzap8bZ2I0z+68Bxu9pvHZKfXLcFUYnYFh139E1wcuVTI76B1S+UYHcOHQ9i
+2JlvT/sbPGbTZwtMBeaZ5k8BxOpNhRdBvTg14tHqYMt02wPP6BrwGa8AMsk5WygJ
+/9kENlERmBM=
+=h2GT
+-----END PGP SIGNATURE-----
+
+--=-U0D+VeLGdmT4foiX6BHD--
