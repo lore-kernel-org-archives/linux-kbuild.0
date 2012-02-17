@@ -1,75 +1,126 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from swampdragon.chaosbits.net ([90.184.90.115]:26437 "EHLO
-	swampdragon.chaosbits.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751834Ab2BPVsY (ORCPT
+Received: from shadbolt.e.decadent.org.uk ([88.96.1.126]:49728 "EHLO
+	shadbolt.e.decadent.org.uk" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751356Ab2BQDQx (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 16 Feb 2012 16:48:24 -0500
-Date: Thu, 16 Feb 2012 22:49:15 +0100 (CET)
-From: Jesper Juhl <jj@chaosbits.net>
-Subject: [PATCH][Trivial] Makefile: Break a few overlong lines and adjust
- placement of a few line continuations
-Message-ID: <alpine.LNX.2.00.1202162247300.25384@swampdragon.chaosbits.net>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+	Thu, 16 Feb 2012 22:16:53 -0500
+Message-ID: <1329448597.3258.28.camel@deadeye>
+Subject: Re: [RFC PATCH] kbuild: Build linux-tools package with 'make
+ deb-pkg'
+From: Ben Hutchings <ben@decadent.org.uk>
+Date: Fri, 17 Feb 2012 03:16:37 +0000
+In-Reply-To: <1329418664-1750-1-git-send-email-joerg.roedel@amd.com>
+References: <1329418664-1750-1-git-send-email-joerg.roedel@amd.com>
+Content-Type: multipart/signed; micalg="pgp-sha512";
+	protocol="application/pgp-signature"; boundary="=-mlPPGaCA8kQTqq445apW"
+Mime-Version: 1.0
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, trivial@kernel.org
-
-Break a few lines that go way over the usual 80 column limit that we prefer.
-Also adjust the placement of a few line continuations.
-
-Signed-off-by: Jesper Juhl <jj@chaosbits.net>
----
- Makefile |   12 +++++++-----
- 1 files changed, 7 insertions(+), 5 deletions(-)
-
-diff --git a/Makefile b/Makefile
-index 7c44b67..da01a71 100644
---- a/Makefile
-+++ b/Makefile
-@@ -400,8 +400,10 @@ export MODVERDIR := $(if $(KBUILD_EXTMOD),$(firstword $(KBUILD_EXTMOD))/).tmp_ve
- 
- # Files to ignore in find ... statements
- 
--RCS_FIND_IGNORE := \( -name SCCS -o -name BitKeeper -o -name .svn -o -name CVS -o -name .pc -o -name .hg -o -name .git \) -prune -o
--export RCS_TAR_IGNORE := --exclude SCCS --exclude BitKeeper --exclude .svn --exclude CVS --exclude .pc --exclude .hg --exclude .git
-+RCS_FIND_IGNORE := \( -name SCCS -o -name BitKeeper -o -name .svn -o -name CVS \
-+		   -o -name .pc -o -name .hg -o -name .git \) -prune -o
-+export RCS_TAR_IGNORE := --exclude SCCS --exclude BitKeeper --exclude .svn \
-+			 --exclude CVS --exclude .pc --exclude .hg --exclude .git
- 
- # ===========================================================================
- # Rules shared between *config targets and build targets
-@@ -966,7 +968,7 @@ prepare3: include/config/kernel.release
- ifneq ($(KBUILD_SRC),)
- 	@$(kecho) '  Using $(srctree) as source for kernel'
- 	$(Q)if [ -f $(srctree)/.config -o -d $(srctree)/include/config ]; then \
--		echo "  $(srctree) is not clean, please run 'make mrproper'";\
-+		echo "  $(srctree) is not clean, please run 'make mrproper'"; \
- 		echo "  in the '$(srctree)' directory.";\
- 		/bin/false; \
- 	fi;
-@@ -1003,8 +1005,8 @@ define filechk_utsrelease.h
- endef
- 
- define filechk_version.h
--	(echo \#define LINUX_VERSION_CODE $(shell                             \
--	expr $(VERSION) \* 65536 + 0$(PATCHLEVEL) \* 256 + 0$(SUBLEVEL));    \
-+	(echo \#define LINUX_VERSION_CODE $(shell                         \
-+	expr $(VERSION) \* 65536 + 0$(PATCHLEVEL) \* 256 + 0$(SUBLEVEL)); \
- 	echo '#define KERNEL_VERSION(a,b,c) (((a) << 16) + ((b) << 8) + (c))';)
- endef
- 
--- 
-1.7.9.1
+To: Joerg Roedel <joerg.roedel@amd.com>
+Cc: linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, maximilian attems <max@stro.at>, debian-kernel@lists.debian.org, linux-kbuild@vger.kernel.org, Ubuntu kernel team <kernel-team@lists.ubuntu.com>
 
 
+--=-mlPPGaCA8kQTqq445apW
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-PS. Please CC me on replies.
+On Thu, 2012-02-16 at 19:57 +0100, Joerg Roedel wrote:
+> Also build a linux-tools package for installation so that
+> common tools run without issues (e.g. perf).
+>=20
+> [RFC note: This may break with x-compilation when the
+>            x-compilation environment is not set up to
+> 	   compile user-space programs. Is that acceptable?
+> 	   I also thought about a compile-time parameter
+> 	   such as 'make TOOLS=3D1 deb-pkg' or a special
+> 	   'make deb-tools-pkg' target.	Opinions? ]
+>=20
+> Cc: Michal Marek <mmarek@suse.cz>
+> Cc: maximilian attems <max@stro.at>
+> Cc: Ben Hutchings <ben@decadent.org.uk>
+> Cc: debian-kernel@lists.debian.org
+> Cc: linux-kbuild@vger.kernel.org
+> Signed-off-by: Joerg Roedel <joerg.roedel@amd.com>
+> ---
+>  scripts/package/builddeb |   55 ++++++++++++++++++++++++++++++++++++++++=
++++++-
+>  1 files changed, 54 insertions(+), 1 deletions(-)
+>=20
+> diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+> index eee5f8e..8466380 100644
+> --- a/scripts/package/builddeb
+> +++ b/scripts/package/builddeb
+> @@ -78,17 +78,19 @@ tmpdir=3D"$objtree/debian/tmp"
+>  fwdir=3D"$objtree/debian/fwtmp"
+>  kernel_headers_dir=3D"$objtree/debian/hdrtmp"
+>  libc_headers_dir=3D"$objtree/debian/headertmp"
+> +tools_dir=3D"$objtree/debian/toolstmp"
+>  packagename=3Dlinux-image-$version
+>  fwpackagename=3Dlinux-firmware-image
+>  kernel_headers_packagename=3Dlinux-headers-$version
+>  libc_headers_packagename=3Dlinux-libc-dev
+> +tools_packagename=3Dlinux-tools-$version
 
--- 
-Jesper Juhl <jj@chaosbits.net>       http://www.chaosbits.net/
-Don't top-post http://www.catb.org/jargon/html/T/top-post.html
-Plain text mails only, please.
+The advice I got from one of the perf developers - possibly Peter
+Zijlstra - was that changes to the perf kernel interface are backward-
+compatible but newer versions of the perf tool may depend on newer
+kernel features.  New features involve a bump to the 2nd (at the time,
+it was the 3rd) version component unless you're building from a perf
+development branch.
 
+So to avoid package proliferation the package name should be
+linux-tools-$VERSION.$PATCHLEVEL and the executable filenames should be
+something like perf_$VERSION.$PATCHLEVEL-$subcommand.  This is what we
+do in Debian.
+
+However, Ubuntu uses the full kernel release string (as do several
+RPM-based distributions).  So at the moment you can't build a versioned
+perf that's going to work in both.  But that is fixable if one of the
+perf wrappers is changed to fall back to the alternate naming scheme.
+
+[...]
+> +# Build the tools
+> +num_tools=3D"0"
+> +tools_flavour_abi=3D${version#*-}
+> +tools_flavour=3D${tools_flavour_abi#*-}
+> +tools_version=3D${version%-$tools_flavour}
+> +if grep -q '^CONFIG_PERF_EVENTS=3Dy' .config ; then
+> +	# Build perf
+> +	(
+> +	 mkdir -p $objtree/tools/perf
+> +	 cd "$srctree/tools/perf"
+> +	 $MAKE LDFLAGS=3D O=3D$O/tools/perf
+> +	 cp $objtree/tools/perf/perf "$tools_dir/usr/bin/perf_$tools_version"
+[...]
+
+What about the manual pages and scripting support?
+
+Ben.
+
+--=20
+Ben Hutchings
+Beware of programmers who carry screwdrivers. - Leonard Brandwein
+
+--=-mlPPGaCA8kQTqq445apW
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iQIVAwUATz3Glee/yOyVhhEJAQrNshAAsdBhGsk/fejROEveJIfJCZljdBIM8m0U
+Y+atVJNWMirPaYzbGK2hlssgZ75U0cvQEzeSM+fow8+7OrdRIOq2Y9S1wCENUoT+
+t/NIH6f8YwBzRPZp7AwHw1Ss8/Aw9UYvVOxCSU5CUqOKCLFL28uE1WkxU45OCwFS
+HoW8pWzF1VKL/owOCj74IjfxmJp3RuikqETywFU4tNYiNZbKX6U+f2BoUMwn/5vr
+XzFkdLkTJkTo8i0BEjDdWV6r54JMO4TpjI/BFad42bXm1oay64brfvKN+ZiX+dQc
+YCdnRuFlYFgJGzOPWC4eozY02KUfst6Iyo0pC8jNYTSEGcNFZI1kE9vcbGCJTGjN
+eFZxDMxZKZm+SUGNN17TPlXj7vWKfjO/Hws8QnGZ7kZEl1DA+Vgt43sbTWJl+nvR
+xfdmKqhIQzSWsP0BPZJF4vQnrCqF4fD+oFK6XsD8B+Mf3ZK49fUAhvSDxOZES0Zn
+OHw6vuXwXuFMQoCa/TM8DgmE0i7v2PwzdK94YRfwRn1QsVxddIuvB+Je7JfQKVIZ
+Q+9gm2KNc/dXNG2zh6szFyuWWeQK9cbmyyyHpTXmNjO9mOZ6jpONzy1MHL73IAwG
+vZXha/OWPBDoe+5p3lh+eaOg420EH3n4OItavP2qtVO6IEp43Q1g0rnvu87xIP7G
+f2HSqkV3s10=
+=tsV+
+-----END PGP SIGNATURE-----
+
+--=-mlPPGaCA8kQTqq445apW--
