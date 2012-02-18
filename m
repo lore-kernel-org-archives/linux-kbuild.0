@@ -1,77 +1,30 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from defer-dn03.ocn.ad.jp ([125.170.100.156]:48300 "EHLO
-	defer-dn03.ocn.ad.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751871Ab2BQPPo (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 17 Feb 2012 10:15:44 -0500
-Date: Sat, 18 Feb 2012 00:14:05 +0900 (JST)
-Message-Id: <20120218.001405.229654364.anemo@mba.ocn.ne.jp>
-Subject: Re: kconfig: tristate choice with depender choice
-From: Atsushi Nemoto <anemo@mba.ocn.ne.jp>
-In-Reply-To: <20120209.233017.47225051.anemo@mba.ocn.ne.jp>
-References: <CACqU3MXdKti6J2ozx3mt3UHdhv1fyPredvT6zJGR+u_hNU70Cg@mail.gmail.com>
-	<CACqU3MU6j0ed6C9QDfzuoH+2a-2hww2wrCsQXW-kUfK37iansQ@mail.gmail.com>
-	<20120209.233017.47225051.anemo@mba.ocn.ne.jp>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+Received: from cantor2.suse.de ([195.135.220.15]:53688 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752799Ab2BRVe7 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 18 Feb 2012 16:34:59 -0500
+Date: Sat, 18 Feb 2012 22:34:57 +0100
+From: Michal Marek <mmarek@suse.cz>
+Subject: Re: [PATCH] builddeb: Don't create files in /tmp with predictable
+ names
+Message-ID: <20120218213457.GA8332@sepie.suse.cz>
+References: <1329315449.3048.78.camel@deadeye>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1329315449.3048.78.camel@deadeye>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: lacombar@gmail.com
-Cc: mmarek@suse.cz, sam@ravnborg.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Ben Hutchings <ben@decadent.org.uk>
+Cc: linux-kbuild@vger.kernel.org, Debian kernel maintainers <debian-kernel@lists.debian.org>, Joerg Roedel <joerg.roedel@amd.com>, Maximilian Attems <max@stro.at>
 
-On Thu, 09 Feb 2012 23:30:17 +0900 (JST), Atsushi Nemoto <anemo@mba.ocn.ne.jp> wrote:
-> I tested in this way:
+On Wed, Feb 15, 2012 at 02:17:29PM +0000, Ben Hutchings wrote:
+> The current use of /tmp for file lists is insecure.  Put them under
+> $objtree/debian instead.
 > 
-> 1. Add this example to the end of drivers/char/Kconfig file.
-> -------------------------------------
-> choice
-> 	prompt "choice list AB"
-> config A
-> 	tristate "a"
-> config B
-> 	tristate "b"
-> endchoice
-> choice
-> 	prompt "choice list CD"
-> 	depends on A
-> config C
->        	bool "c"
-> config D
->        	bool "d"
-> endchoice
-> -------------------------------------
-> 
-> 2. Then run commands:
-> 
-> $ cp arch/x86/configs/i386_defconfig arch/x86/configs/test_defconfig
-> $ echo 'CONFIG_A=y' >> arch/x86/configs/test_defconfig 
-> $ make O=../build test_defconfig
-> $ grep CONFIG_A= ../build/.config
-> CONFIG_A=m
+> Signed-off-by: Ben Hutchings <ben@decadent.org.uk>
+> Cc: stable@vger.kernel.org
 
-I did some investigations.
-When this happens, sym_calc_value() was called recursively.
+Thanks, applied. How could I have missed that bug :-/.
 
-main
-  conf_set_all_new_symbols
-    sym_calc_value ("choice list CD")
-      sym_calc_visibility ("choice list CD")
-        expr_calc_value
-          sym_calc_value ("A")
-
-On this place in sym_calc_value(), sym->def[S_DEF_USER].tri was 'yes'
-and sym->visible was 'mod'.
-
-		newval.tri = EXPR_AND(sym->def[S_DEF_USER].tri,
-				      sym->visible);
-		goto calc_newval;
-
-Then new value of CONFIG_A will be 'mod'.
-
-I suppose sym->visible is 'mod' because default value of tristate
-choice is 'mod'.  Is this correct?
-Any suggestions for fixing or debugging?
-
----
-Atsushi Nemoto
+Michal
