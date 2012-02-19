@@ -1,46 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from oproxy9.bluehost.com ([69.89.24.6]:43467 "HELO
-	oproxy9.bluehost.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with SMTP id S1754596Ab2BSSMb (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 19 Feb 2012 13:12:31 -0500
-Message-ID: <4F413B8D.5080307@xenotime.net>
-Date: Sun, 19 Feb 2012 10:12:29 -0800
-From: Randy Dunlap <rdunlap@xenotime.net>
+Received: from mail01.solnet.ch ([212.101.4.135]:59637 "EHLO mail01.solnet.ch"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1755115Ab2BSVmE (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 19 Feb 2012 16:42:04 -0500
+Received: from mail01.solnet.ch (localhost.solnet.ch [127.0.0.1])
+	by mail01.solnet.ch (Postfix) with ESMTP id 5574FFFFE0
+	for <linux-kbuild@vger.kernel.org>; Sun, 19 Feb 2012 21:32:33 +0000 (UTC)
+Received: from mail01.solnet.ch ([127.0.0.1])
+	by mail01.solnet.ch (mail01.solnet.ch [127.0.0.1]) (SolNet-Check, port 10024)
+	with LMTP id KOxUDu3KGOBR for <linux-kbuild@vger.kernel.org>;
+	Sun, 19 Feb 2012 21:32:33 +0000 (UTC)
+Received: from x201.openelec.tv (65-60-239-77-pool.cable.fcom.ch [77.239.60.65])
+	(using TLSv1 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mail01.solnet.ch (Postfix) with ESMTPSA id 0A9FFFFFA9
+	for <linux-kbuild@vger.kernel.org>; Sun, 19 Feb 2012 21:32:33 +0000 (UTC)
+Message-ID: <4F416A6E.3020403@openelec.tv>
+Date: Sun, 19 Feb 2012 22:32:30 +0100
+From: Stephan Raue <mailinglists@openelec.tv>
 MIME-Version: 1.0
-Subject: Re: [PATCH] mm: add config NUMA stub to all architectures
-References: <4F3E42E0.4030108@openvz.org>	<20120217120815.25909.15632.stgit@zurg>	<20120217123037.ecfc5dd9.akpm@linux-foundation.org> <CAMuHMdUYCGoZoUHWMtMCwAJ2ofweaeLF3U89P5EvrNGcn=6apw@mail.gmail.com>
-In-Reply-To: <CAMuHMdUYCGoZoUHWMtMCwAJ2ofweaeLF3U89P5EvrNGcn=6apw@mail.gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: [BUG] make headers_install install system headers instead the ones
+ from kernel source
+Content-Type: text/plain; charset=ISO-8859-15; format=flowed
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Geert Uytterhoeven <geert@linux-m68k.org>
-Cc: Andrew Morton <akpm@linux-foundation.org>, Konstantin Khlebnikov <khlebnikov@openvz.org>, Stephen Rothwell <sfr@canb.auug.org.au>, linux-next@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
 
-On 02/19/2012 09:01 AM, Geert Uytterhoeven wrote:
-> On Fri, Feb 17, 2012 at 21:30, Andrew Morton<akpm@linux-foundation.org>  wrote:
->> On Fri, 17 Feb 2012 16:08:15 +0400
->> Konstantin Khlebnikov<khlebnikov@openvz.org>  wrote:
->>
->>> Config NUMA must be defined for all architectures,
->>> otherwise IS_ENABLED(CONFIG_NUMA) does not work.
->>> Some arch-specific Kconfig already has this stub.
->>> This patch adds it to all remaining.
->>
->> It would be better to teach IS_ENABLED() to handle this situation.  I
->> don't think there's a way of doing this with cpp :(
->>
->> This limitation makes IS_ENABLED pretty dangerous, doesn't it?  It
->> makes it very easy to introduce build breakage with unexpected Kconfig
->> combinations.
->
-> Indeed. Recently I discovered IS_ENABLED() and started recommending it
-> to people for new code. But now I've seen the CONFIG_NUMA breakage,
-> I no longer think this is a good recommendation.
+Hi all,
 
+"make headers_install INSTALL_HDR_PATH=<dest> ARCH=<arch>" should copy 
+the headers from kernel source to <dest> (the toolchain) but it copys 
+the headers from my system here.
+i have tested this command now with kernel 2.6.39 to 3.3-rc4 its same on 
+every tested kernel version.
 
-adding Michal & linux-kbuild to cc: list.
+i have compared the filesize, for example /usr/include/linux/types.h 
+with <dest>/include/linux/types.h and <kernel_src>/include/linux/types.h 
+and the destination file is the same as the one in /usr/include.
 
--- 
-~Randy
+I think its a big problem, because many embe
+
