@@ -1,30 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:53688 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752799Ab2BRVe7 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 18 Feb 2012 16:34:59 -0500
-Date: Sat, 18 Feb 2012 22:34:57 +0100
-From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [PATCH] builddeb: Don't create files in /tmp with predictable
- names
-Message-ID: <20120218213457.GA8332@sepie.suse.cz>
-References: <1329315449.3048.78.camel@deadeye>
+Received: from oproxy9.bluehost.com ([69.89.24.6]:43467 "HELO
+	oproxy9.bluehost.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with SMTP id S1754596Ab2BSSMb (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 19 Feb 2012 13:12:31 -0500
+Message-ID: <4F413B8D.5080307@xenotime.net>
+Date: Sun, 19 Feb 2012 10:12:29 -0800
+From: Randy Dunlap <rdunlap@xenotime.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1329315449.3048.78.camel@deadeye>
+Subject: Re: [PATCH] mm: add config NUMA stub to all architectures
+References: <4F3E42E0.4030108@openvz.org>	<20120217120815.25909.15632.stgit@zurg>	<20120217123037.ecfc5dd9.akpm@linux-foundation.org> <CAMuHMdUYCGoZoUHWMtMCwAJ2ofweaeLF3U89P5EvrNGcn=6apw@mail.gmail.com>
+In-Reply-To: <CAMuHMdUYCGoZoUHWMtMCwAJ2ofweaeLF3U89P5EvrNGcn=6apw@mail.gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ben Hutchings <ben@decadent.org.uk>
-Cc: linux-kbuild@vger.kernel.org, Debian kernel maintainers <debian-kernel@lists.debian.org>, Joerg Roedel <joerg.roedel@amd.com>, Maximilian Attems <max@stro.at>
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: Andrew Morton <akpm@linux-foundation.org>, Konstantin Khlebnikov <khlebnikov@openvz.org>, Stephen Rothwell <sfr@canb.auug.org.au>, linux-next@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
 
-On Wed, Feb 15, 2012 at 02:17:29PM +0000, Ben Hutchings wrote:
-> The current use of /tmp for file lists is insecure.  Put them under
-> $objtree/debian instead.
-> 
-> Signed-off-by: Ben Hutchings <ben@decadent.org.uk>
-> Cc: stable@vger.kernel.org
+On 02/19/2012 09:01 AM, Geert Uytterhoeven wrote:
+> On Fri, Feb 17, 2012 at 21:30, Andrew Morton<akpm@linux-foundation.org>  wrote:
+>> On Fri, 17 Feb 2012 16:08:15 +0400
+>> Konstantin Khlebnikov<khlebnikov@openvz.org>  wrote:
+>>
+>>> Config NUMA must be defined for all architectures,
+>>> otherwise IS_ENABLED(CONFIG_NUMA) does not work.
+>>> Some arch-specific Kconfig already has this stub.
+>>> This patch adds it to all remaining.
+>>
+>> It would be better to teach IS_ENABLED() to handle this situation.  I
+>> don't think there's a way of doing this with cpp :(
+>>
+>> This limitation makes IS_ENABLED pretty dangerous, doesn't it?  It
+>> makes it very easy to introduce build breakage with unexpected Kconfig
+>> combinations.
+>
+> Indeed. Recently I discovered IS_ENABLED() and started recommending it
+> to people for new code. But now I've seen the CONFIG_NUMA breakage,
+> I no longer think this is a good recommendation.
 
-Thanks, applied. How could I have missed that bug :-/.
 
-Michal
+adding Michal & linux-kbuild to cc: list.
+
+-- 
+~Randy
