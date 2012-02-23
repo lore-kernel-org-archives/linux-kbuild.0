@@ -1,47 +1,218 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:36271 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753190Ab2BTOYf (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 20 Feb 2012 09:24:35 -0500
-Message-ID: <4F42579F.5070701@suse.cz>
-Date: Mon, 20 Feb 2012 15:24:31 +0100
-From: Michal Marek <mmarek@suse.cz>
+Received: from db3ehsobe005.messaging.microsoft.com ([213.199.154.143]:55036
+	"EHLO DB3EHSOBE002.bigfish.com" rhost-flags-OK-OK-OK-FAIL)
+	by vger.kernel.org with ESMTP id S1755175Ab2BWLRX (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 23 Feb 2012 06:17:23 -0500
+Date: Thu, 23 Feb 2012 12:17:12 +0100
+From: Joerg Roedel <joerg.roedel@amd.com>
+Subject: Re: [RFC PATCH] kbuild: Build linux-tools package with 'make deb-pkg'
+Message-ID: <20120223111712.GA2454@amd.com>
+References: <1329418664-1750-1-git-send-email-joerg.roedel@amd.com>
+ <1329448597.3258.28.camel@deadeye>
+ <1329450390.3258.36.camel@deadeye>
 MIME-Version: 1.0
-Subject: Re: [PATCH] mm: add config NUMA stub to all architectures
-References: <4F3E42E0.4030108@openvz.org> <20120217120815.25909.15632.stgit@zurg> <20120217123037.ecfc5dd9.akpm@linux-foundation.org> <CAMuHMdUYCGoZoUHWMtMCwAJ2ofweaeLF3U89P5EvrNGcn=6apw@mail.gmail.com> <4F413B8D.5080307@xenotime.net> <CACqU3MUOojw0pwzOpPFB9YvA=BLODe+idWkqwA7NUAm-9114Rw@mail.gmail.com>
-In-Reply-To: <CACqU3MUOojw0pwzOpPFB9YvA=BLODe+idWkqwA7NUAm-9114Rw@mail.gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <1329450390.3258.36.camel@deadeye>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnaud Lacombe <lacombar@gmail.com>
-Cc: Randy Dunlap <rdunlap@xenotime.net>, Geert Uytterhoeven <geert@linux-m68k.org>, Andrew Morton <akpm@linux-foundation.org>, Konstantin Khlebnikov <khlebnikov@openvz.org>, Stephen Rothwell <sfr@canb.auug.org.au>, linux-next@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, linux-kbuild@vger.kernel.org
+To: Ben Hutchings <ben@decadent.org.uk>
+Cc: linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, maximilian attems <max@stro.at>, debian-kernel@lists.debian.org, linux-kbuild@vger.kernel.org, Ubuntu kernel team <kernel-team@lists.ubuntu.com>
 
-On 20.2.2012 00:21, Arnaud Lacombe wrote:
-> On Sun, Feb 19, 2012 at 1:12 PM, Randy Dunlap <rdunlap@xenotime.net> wrote:
->> On 02/19/2012 09:01 AM, Geert Uytterhoeven wrote:
->>>
->>> On Fri, Feb 17, 2012 at 21:30, Andrew Morton<akpm@linux-foundation.org>
->>>  wrote:
->>>> It would be better to teach IS_ENABLED() to handle this situation.  I
->>>> don't think there's a way of doing this with cpp :(
->>>>
->>>> This limitation makes IS_ENABLED pretty dangerous, doesn't it?  It
->>>> makes it very easy to introduce build breakage with unexpected Kconfig
->>>> combinations.
->>>
->>>
->>> Indeed. Recently I discovered IS_ENABLED() and started recommending it
->>> to people for new code. But now I've seen the CONFIG_NUMA breakage,
->>> I no longer think this is a good recommendation.
->>
->> adding Michal & linux-kbuild to cc: list.
->>
-> I do not really see any way to fix this, beside having a unique
-> architecture-wide configuration namespace :/
+On Fri, Feb 17, 2012 at 03:46:30AM +0000, Ben Hutchings wrote:
+> > The advice I got from one of the perf developers - possibly Peter
+> > Zijlstra - was that changes to the perf kernel interface are backward-
+> > compatible but newer versions of the perf tool may depend on newer
+> > kernel features.  New features involve a bump to the 2nd (at the time,
+> > it was the 3rd) version component unless you're building from a perf
+> > development branch.
+> > 
+> > So to avoid package proliferation the package name should be
+> > linux-tools-$VERSION.$PATCHLEVEL and the executable filenames should be
+> > something like perf_$VERSION.$PATCHLEVEL-$subcommand.
+> [...]
+> 
+> Sorry, the executable filename is just perf_$VERSION.$PATCHLEVEL.  Only
+> the manual pages for sub-commands are actually separate files.
 
-Having a single namespace, or less ambitiously, having less
-arch-specific config symbol definitions, would be a plus. IS_ENABLED
-requiring the symbol to be defined is not bad per se, it prevents typos.
+Okay, here is a new version. It fits the needs for Debian and Ubuntu
+now. I tested the patch on both distributions and with in-tree and
+out-of-tree build. The installed packages work fine.
 
-Michal
+From f17987587e188b34be57b7b20aee851de70a80d1 Mon Sep 17 00:00:00 2001
+From: Joerg Roedel <joerg.roedel@amd.com>
+Date: Thu, 16 Feb 2012 19:48:24 +0100
+Subject: [PATCH] RFC: kbuild: Build linux-tools package with 'make deb-pkg'
+
+Also build a linux-tools package for installation so that
+common tools run without issues (e.g. perf).
+
+[RFC note: This may break with x-compilation when the
+           x-compilation environment is not set up to
+	   compile user-space programs. Is that acceptable?
+	   I also thought about a compile-time parameter
+	   such as 'make TOOLS=1 deb-pkg' or a special
+	   'make deb-tools-pkg' target.	Opinions? ]
+
+Cc: Michal Marek <mmarek@suse.cz>
+Cc: maximilian attems <max@stro.at>
+Cc: Ben Hutchings <ben@decadent.org.uk>
+Cc: debian-kernel@lists.debian.org
+Cc: linux-kbuild@vger.kernel.org
+Signed-off-by: Joerg Roedel <joerg.roedel@amd.com>
+---
+ scripts/package/builddeb |   93 +++++++++++++++++++++++++++++++++++++++++++++-
+ 1 files changed, 92 insertions(+), 1 deletions(-)
+
+diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+index eee5f8e..d474736 100644
+--- a/scripts/package/builddeb
++++ b/scripts/package/builddeb
+@@ -78,17 +78,20 @@ tmpdir="$objtree/debian/tmp"
+ fwdir="$objtree/debian/fwtmp"
+ kernel_headers_dir="$objtree/debian/hdrtmp"
+ libc_headers_dir="$objtree/debian/headertmp"
++tools_dir="$objtree/debian/toolstmp"
++tmp_build_dir="$objtree/debian/toolsbuild"
+ packagename=linux-image-$version
+ fwpackagename=linux-firmware-image
+ kernel_headers_packagename=linux-headers-$version
+ libc_headers_packagename=linux-libc-dev
++tools_packagename=linux-tools-$version
+ 
+ if [ "$ARCH" = "um" ] ; then
+ 	packagename=user-mode-linux-$version
+ fi
+ 
+ # Setup the directory structure
+-rm -rf "$tmpdir" "$fwdir" "$kernel_headers_dir" "$libc_headers_dir"
++rm -rf "$tmpdir" "$fwdir" "$kernel_headers_dir" "$libc_headers_dir" "$tools_dir" "$tmp_build_dir"
+ mkdir -m 755 -p "$tmpdir/DEBIAN"
+ mkdir -p  "$tmpdir/lib" "$tmpdir/boot" "$tmpdir/usr/share/doc/$packagename"
+ mkdir -m 755 -p "$fwdir/DEBIAN"
+@@ -98,6 +101,10 @@ mkdir -p "$libc_headers_dir/usr/share/doc/$libc_headers_packagename"
+ mkdir -m 755 -p "$kernel_headers_dir/DEBIAN"
+ mkdir -p "$kernel_headers_dir/usr/share/doc/$kernel_headers_packagename"
+ mkdir -p "$kernel_headers_dir/lib/modules/$version/"
++mkdir -m 755 -p "$tools_dir/DEBIAN"
++mkdir -p "$tools_dir/usr/share/doc/$tools_packagename"
++mkdir -p "$tools_dir/usr/bin/"
++mkdir -p "$tmp_build_dir"
+ if [ "$ARCH" = "um" ] ; then
+ 	mkdir -p "$tmpdir/usr/lib/uml/modules/$version" "$tmpdir/usr/bin"
+ fi
+@@ -120,6 +127,75 @@ else
+ 	fi
+ fi
+ 
++# Build the tools
++num_tools="0"
++tools_flavour_abi=${version#*-}
++tools_flavour=${tools_flavour_abi#*-}
++tools_version=${version%-$tools_flavour}
++debian_tools_version="${version%%-*}"
++debian_tools_version="${version%.*}"
++if grep -q '^CONFIG_PERF_EVENTS=y' .config ; then
++	# Build and install perf
++	(
++	 unset MAKEFLAGS
++	 unset MFLAGS
++	 unset MAKEOVERRIDES
++
++	 mkdir -p $objtree/tools/perf
++	 cd "$srctree/tools/perf"
++	 $MAKE DESTDIR="$tools_dir/usr/" LDFLAGS= O=$objtree/tools/perf/ install
++	 mv "$tools_dir/usr/bin/perf" "$tools_dir/usr/bin/perf_$debian_tools_version"
++	 ln -s "/usr/bin/perf_$debian_tools_version" "$tools_dir/usr/bin/perf_$tools_version"
++	 mv "$tools_dir/usr/libexec/perf-core" "$tools_dir/usr/share/perf_$debian_tools_version-core"
++	 rmdir "$tools_dir/usr/libexec"
++	 
++	 # Documentation can't be built out-of-tree so copy source
++	 # over to objtree and build man pages there
++	 mkdir -p $tmp_build_dir/perf
++	 cp -a "$srctree/tools/perf/Documentation" "$tmp_build_dir/perf/"
++	 cd "$tmp_build_dir/perf/Documentation"
++	 $MAKE man
++	 $MAKE DESTDIR="$tools_dir/usr/" install
++	 for manpage in `find $tools_dir/usr/share/man/ -type f`; do
++	 	mv $manpage ${manpage/perf/perf_$debian_tools_version}
++		gzip -9 ${manpage/perf/perf_$debian_tools_version}
++	 done
++	)
++	num_tools=$(($num_tools+1))
++fi
++
++if [[ "$ARCH" = "i386" || "$ARCH" = "x86_64" ]]; then
++	# Build turbostat
++	(
++	 cp -a $srctree/tools/power/x86/turbostat "$tmp_build_dir"
++	 cd "$tmp_build_dir/turbostat/"
++	 unset MAKEFLAGS
++	 unset MFLAGS
++	 unset MAKEOVERRIDES
++	 $MAKE LDFLAGS=
++	 cp turbostat "$tools_dir/usr/bin/turbostat_$debian_tools_version"
++	 ln -s "/usr/bin/turbostat_$debian_tools_version" "$tools_dir/usr/bin/turbostat_$tools_version"
++	 mkdir -p "$tools_dir/usr/share/man/man8"
++	 cp turbostat.8 "$tools_dir/usr/share/man/man8/turbotstat_${debian_tools_version}.8"
++	 gzip -9 "$tools_dir/usr/share/man/man8/turbotstat_${debian_tools_version}.8"
++	)
++
++	# Build x86_energy_perf_policy
++	(
++	 cp -a $srctree/tools/power/x86/x86_energy_perf_policy "$tmp_build_dir"
++	 cd "$tmp_build_dir/x86_energy_perf_policy"
++	 unset MAKEFLAGS
++	 unset MFLAGS
++	 unset MAKEOVERRIDES
++	 $MAKE LDFLAGS=
++	 cp x86_energy_perf_policy "$tools_dir/usr/bin/x86_energy_perf_policy_$debian_tools_version"
++	 ln -s "/usr/bin/x86_energy_perf_policy_$debian_tools_version" "$tools_dir/usr/bin/x86_energy_perf_policy_$tools_version"
++	 cp x86_energy_perf_policy.8 "$tools_dir/usr/share/man/man8/x86_energy_perf_policy_${debian_tools_version}.8"
++	 gzip -9 "$tools_dir/usr/share/man/man8/x86_energy_perf_policy_${debian_tools_version}.8"
++	)
++	num_tools=$(($num_tools+2))
++fi
++
+ if grep -q '^CONFIG_MODULES=y' .config ; then
+ 	INSTALL_MOD_PATH="$tmpdir" $MAKE KBUILD_SRC= modules_install
+ 	rm -f "$tmpdir/lib/modules/$version/build"
+@@ -291,9 +367,24 @@ Description: Linux support headers for userspace development
+  are used by the installed headers for GNU glibc and other system libraries.
+ EOF
+ 
++cat <<EOF >> debian/control
++
++Package: $tools_packagename
++Section: devel
++Architecture: $arch
++Depends: \${shlibs:Depends}
++Description: Linux kernel tools for version $version
++ This package provides the architecture dependant parts for kernel
++ version locked tools for version $version
++EOF
++
+ if [ "$ARCH" != "um" ]; then
+ 	create_package "$kernel_headers_packagename" "$kernel_headers_dir"
+ 	create_package "$libc_headers_packagename" "$libc_headers_dir"
++	if [ "$num_tools" > "0" ]; then
++		dpkg-shlibdeps $tools_dir/usr/bin/*
++		create_package "$tools_packagename" "$tools_dir"
++	fi
+ fi
+ 
+ create_package "$packagename" "$tmpdir"
+-- 
+1.7.5.4
+
+
+
+
+-- 
+AMD Operating System Research Center
+
+Advanced Micro Devices GmbH Einsteinring 24 85609 Dornach
+General Managers: Alberto Bozzo
+Registration: Dornach, Landkr. Muenchen; Registerger. Muenchen, HRB Nr. 43632
+
