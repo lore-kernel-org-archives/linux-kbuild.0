@@ -1,49 +1,39 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:35346 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:35441 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1757094Ab2BXW5f (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 24 Feb 2012 17:57:35 -0500
-Date: Fri, 24 Feb 2012 23:56:29 +0100
+	id S932264Ab2BXXC0 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 24 Feb 2012 18:02:26 -0500
+Date: Sat, 25 Feb 2012 00:02:25 +0100
 From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [PATCH 2/2] kbuild: Only build linux-image package for UML
-Message-ID: <20120224225629.GB19992@sepie.suse.cz>
-References: <1329323907-7696-1-git-send-email-joerg.roedel@amd.com>
- <1329323907-7696-2-git-send-email-joerg.roedel@amd.com>
- <1329367790.3048.168.camel@deadeye>
- <20120216212926.GA8970@kamineko.org>
+Subject: Re: [PATCH] kbuild: Fix out-of-tree build for 'make deb-pkg'
+Message-ID: <20120224230225.GD19992@sepie.suse.cz>
+References: <1329418597-1654-1-git-send-email-joerg.roedel@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20120216212926.GA8970@kamineko.org>
+In-Reply-To: <1329418597-1654-1-git-send-email-joerg.roedel@amd.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Mattia Dongili <malattia@linux.it>
-Cc: Ben Hutchings <ben@decadent.org.uk>, Joerg Roedel <joerg.roedel@amd.com>, linux-kernel@vger.kernel.org, maximilian attems <max@stro.at>, debian-kernel@lists.debian.org, linux-kbuild@vger.kernel.org, user-mode-linux-devel@lists.sourceforge.net
+To: Joerg Roedel <joerg.roedel@amd.com>
+Cc: linux-kernel@vger.kernel.org, maximilian attems <max@stro.at>, Ben Hutchings <ben@decadent.org.uk>, debian-kernel@lists.debian.org, linux-kbuild@vger.kernel.org
 
-On Fri, Feb 17, 2012 at 06:29:27AM +0900, Mattia Dongili wrote:
-> On Thu, Feb 16, 2012 at 04:49:50AM +0000, Ben Hutchings wrote:
-> > On Wed, 2012-02-15 at 17:38 +0100, Joerg Roedel wrote:
-> > > For user-mode Linux the other packages are not required. So
-> > > only build the package with the linux-image in it.
-> > > 
-> > > Cc: Michal Marek <mmarek@suse.cz>
-> > > Cc: maximilian attems <max@stro.at>
-> > > Cc: Ben Hutchings <ben@decadent.org.uk>
-> > > Cc: debian-kernel@lists.debian.org
-> > > Cc: linux-kbuild@vger.kernel.org
-> > > Signed-off-by: Joerg Roedel <joerg.roedel@amd.com>
-> > Tested-by: Ben Hutchings <ben@decadent.org.uk>
-> > 
-> > But I've never touched UML either so we should get confirmation that
-> > this really is the right thing to do.
+On Thu, Feb 16, 2012 at 07:56:37PM +0100, Joerg Roedel wrote:
+> The out-of-tree build is broken in 'make deb-pkg'. The
+> header checks and the header install works on the source and
+> not on the object tree.
+> While fixing this also replace the direct 'make' invocations
+> with the $MAKE variable to be consistent within the script.
 > 
-> there is a wishlist bug opened ages ago (and pinged not so long ago)
-> requesting headers to be packaged in debian:
-> http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=186930
-> Just to say that there is some interest in having headers packaged
-> somehow.
+> Cc: Michal Marek <mmarek@suse.cz>
+> Cc: maximilian attems <max@stro.at>
+> Cc: Ben Hutchings <ben@decadent.org.uk>
+> Cc: debian-kernel@lists.debian.org
+> Cc: linux-kbuild@vger.kernel.org
+> Signed-off-by: Joerg Roedel <joerg.roedel@amd.com>
+> ---
+>  scripts/package/builddeb |    6 +++---
+>  1 files changed, 3 insertions(+), 3 deletions(-)
 
-As there was no further reaction, I applied the patch now to
-kbuild.git#misc.
+Applied to kbuild.git#misc, thanks.
 
 Michal
