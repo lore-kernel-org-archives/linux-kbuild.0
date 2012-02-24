@@ -1,41 +1,52 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:33708 "EHLO mx2.suse.de"
+Received: from terminus.zytor.com ([198.137.202.10]:34748 "EHLO mail.zytor.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751330Ab2BXWTP (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 24 Feb 2012 17:19:15 -0500
-Message-ID: <4F480CDE.8010605@suse.cz>
-Date: Fri, 24 Feb 2012 23:19:10 +0100
-From: Michal Marek <mmarek@suse.cz>
+	id S1756286Ab2BXWZE (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 24 Feb 2012 17:25:04 -0500
+Message-ID: <4F480DDF.2080000@zytor.com>
+Date: Fri, 24 Feb 2012 14:23:27 -0800
+From: "H. Peter Anvin" <hpa@zytor.com>
 MIME-Version: 1.0
 Subject: Re: Kconfig and toolchain dependencies
-References: <4F2C51A5.1040800@zytor.com>
-In-Reply-To: <4F2C51A5.1040800@zytor.com>
+References: <4F2C51A5.1040800@zytor.com> <4F480CDE.8010605@suse.cz>
+In-Reply-To: <4F480CDE.8010605@suse.cz>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "H. Peter Anvin" <hpa@zytor.com>
+To: Michal Marek <mmarek@suse.cz>
 Cc: "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Ingo Molnar <mingo@elte.hu>
 
-Dne 3.2.2012 22:29, H. Peter Anvin napsal(a):
-> Right now, we don't have a good way to encode toolchain dependencies in
-> Kconfig.  This makes it hard to add optional features which depend on
-> newer toolchain features.
+On 02/24/2012 02:19 PM, Michal Marek wrote:
+> Dne 3.2.2012 22:29, H. Peter Anvin napsal(a):
+>> Right now, we don't have a good way to encode toolchain dependencies in
+>> Kconfig.  This makes it hard to add optional features which depend on
+>> newer toolchain features.
+>>
+>> If we just add them, then it breaks all*config and randconfig on
+>> platforms with the older toolchains unless the user manually adds
+>> exclusion rules.  This is bad for testing.
+>>
+>> It seems relatively straightforward to do if we were to manifest some
+>> CONFIG_ variables based on the target toolchain, e.g.
+>>
+>> CONFIG_GCC=0x040601
 > 
-> If we just add them, then it breaks all*config and randconfig on
-> platforms with the older toolchains unless the user manually adds
-> exclusion rules.  This is bad for testing.
+> (sorry for the late reply)
 > 
-> It seems relatively straightforward to do if we were to manifest some
-> CONFIG_ variables based on the target toolchain, e.g.
+> It would be a bit tricky, because the toolchain version depends also on
+> CONFIG_CROSS_COMPILE. So Kconfig would need to know the semantics of
+> CONFIG_CROSS_COMPILE and CONFIG_GCC and the dependency of the latter on
+> the former.
 > 
-> CONFIG_GCC=0x040601
+> Michal
 
-(sorry for the late reply)
+Either way it would mean having to regenerate the config when the
+toolchain changes.
 
-It would be a bit tricky, because the toolchain version depends also on
-CONFIG_CROSS_COMPILE. So Kconfig would need to know the semantics of
-CONFIG_CROSS_COMPILE and CONFIG_GCC and the dependency of the latter on
-the former.
+	-hpa
 
-Michal
+-- 
+H. Peter Anvin, Intel Open Source Technology Center
+I work for Intel.  I don't speak on their behalf.
+
