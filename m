@@ -1,52 +1,40 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from terminus.zytor.com ([198.137.202.10]:34748 "EHLO mail.zytor.com"
+Received: from cantor2.suse.de ([195.135.220.15]:35345 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1756286Ab2BXWZE (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 24 Feb 2012 17:25:04 -0500
-Message-ID: <4F480DDF.2080000@zytor.com>
-Date: Fri, 24 Feb 2012 14:23:27 -0800
-From: "H. Peter Anvin" <hpa@zytor.com>
+	id S1757142Ab2BXW5f (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 24 Feb 2012 17:57:35 -0500
+Date: Fri, 24 Feb 2012 23:56:47 +0100
+From: Michal Marek <mmarek@suse.cz>
+Subject: Re: [PATCH 1/2] kbuild: Fix link to headers in 'make deb-pkg'
+Message-ID: <20120224225647.GC19992@sepie.suse.cz>
+References: <1329323907-7696-1-git-send-email-joerg.roedel@amd.com>
+ <1329367521.3048.165.camel@deadeye>
 MIME-Version: 1.0
-Subject: Re: Kconfig and toolchain dependencies
-References: <4F2C51A5.1040800@zytor.com> <4F480CDE.8010605@suse.cz>
-In-Reply-To: <4F480CDE.8010605@suse.cz>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1329367521.3048.165.camel@deadeye>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Ingo Molnar <mingo@elte.hu>
+To: Ben Hutchings <ben@decadent.org.uk>
+Cc: Joerg Roedel <joerg.roedel@amd.com>, linux-kernel@vger.kernel.org, maximilian attems <max@stro.at>, debian-kernel@lists.debian.org, linux-kbuild@vger.kernel.org
 
-On 02/24/2012 02:19 PM, Michal Marek wrote:
-> Dne 3.2.2012 22:29, H. Peter Anvin napsal(a):
->> Right now, we don't have a good way to encode toolchain dependencies in
->> Kconfig.  This makes it hard to add optional features which depend on
->> newer toolchain features.
->>
->> If we just add them, then it breaks all*config and randconfig on
->> platforms with the older toolchains unless the user manually adds
->> exclusion rules.  This is bad for testing.
->>
->> It seems relatively straightforward to do if we were to manifest some
->> CONFIG_ variables based on the target toolchain, e.g.
->>
->> CONFIG_GCC=0x040601
-> 
-> (sorry for the late reply)
-> 
-> It would be a bit tricky, because the toolchain version depends also on
-> CONFIG_CROSS_COMPILE. So Kconfig would need to know the semantics of
-> CONFIG_CROSS_COMPILE and CONFIG_GCC and the dependency of the latter on
-> the former.
-> 
-> Michal
+On Thu, Feb 16, 2012 at 04:45:21AM +0000, Ben Hutchings wrote:
+> On Wed, 2012-02-15 at 17:38 +0100, Joerg Roedel wrote:
+> > The Link to the kernel header files in the debian packages
+> > point to the original build directory. This is a bad choice
+> > if the packages were installed on a different machine. Fix
+> > this in by manually re-creating the link in the builddeb
+> > script.
+> > 
+> > Cc: Michal Marek <mmarek@suse.cz>
+> > Cc: maximilian attems <max@stro.at>
+> > Cc: Ben Hutchings <ben@decadent.org.uk>
+> > Cc: debian-kernel@lists.debian.org
+> > Cc: linux-kbuild@vger.kernel.org
+> > Signed-off-by: Joerg Roedel <joerg.roedel@amd.com>
+> [...]
+> Reviewed-by: Ben Hutchings <ben@decadent.org.uk>
 
-Either way it would mean having to regenerate the config when the
-toolchain changes.
+Applied to kbuild.git#misc.
 
-	-hpa
-
--- 
-H. Peter Anvin, Intel Open Source Technology Center
-I work for Intel.  I don't speak on their behalf.
-
+Michal
