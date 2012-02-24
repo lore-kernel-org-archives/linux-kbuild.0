@@ -1,218 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from db3ehsobe005.messaging.microsoft.com ([213.199.154.143]:55036
-	"EHLO DB3EHSOBE002.bigfish.com" rhost-flags-OK-OK-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1755175Ab2BWLRX (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 23 Feb 2012 06:17:23 -0500
-Date: Thu, 23 Feb 2012 12:17:12 +0100
-From: Joerg Roedel <joerg.roedel@amd.com>
-Subject: Re: [RFC PATCH] kbuild: Build linux-tools package with 'make deb-pkg'
-Message-ID: <20120223111712.GA2454@amd.com>
-References: <1329418664-1750-1-git-send-email-joerg.roedel@amd.com>
- <1329448597.3258.28.camel@deadeye>
- <1329450390.3258.36.camel@deadeye>
+Received: from cantor2.suse.de ([195.135.220.15]:33708 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751330Ab2BXWTP (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 24 Feb 2012 17:19:15 -0500
+Message-ID: <4F480CDE.8010605@suse.cz>
+Date: Fri, 24 Feb 2012 23:19:10 +0100
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <1329450390.3258.36.camel@deadeye>
+Subject: Re: Kconfig and toolchain dependencies
+References: <4F2C51A5.1040800@zytor.com>
+In-Reply-To: <4F2C51A5.1040800@zytor.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ben Hutchings <ben@decadent.org.uk>
-Cc: linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, maximilian attems <max@stro.at>, debian-kernel@lists.debian.org, linux-kbuild@vger.kernel.org, Ubuntu kernel team <kernel-team@lists.ubuntu.com>
+To: "H. Peter Anvin" <hpa@zytor.com>
+Cc: "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Ingo Molnar <mingo@elte.hu>
 
-On Fri, Feb 17, 2012 at 03:46:30AM +0000, Ben Hutchings wrote:
-> > The advice I got from one of the perf developers - possibly Peter
-> > Zijlstra - was that changes to the perf kernel interface are backward-
-> > compatible but newer versions of the perf tool may depend on newer
-> > kernel features.  New features involve a bump to the 2nd (at the time,
-> > it was the 3rd) version component unless you're building from a perf
-> > development branch.
-> > 
-> > So to avoid package proliferation the package name should be
-> > linux-tools-$VERSION.$PATCHLEVEL and the executable filenames should be
-> > something like perf_$VERSION.$PATCHLEVEL-$subcommand.
-> [...]
+Dne 3.2.2012 22:29, H. Peter Anvin napsal(a):
+> Right now, we don't have a good way to encode toolchain dependencies in
+> Kconfig.  This makes it hard to add optional features which depend on
+> newer toolchain features.
 > 
-> Sorry, the executable filename is just perf_$VERSION.$PATCHLEVEL.  Only
-> the manual pages for sub-commands are actually separate files.
+> If we just add them, then it breaks all*config and randconfig on
+> platforms with the older toolchains unless the user manually adds
+> exclusion rules.  This is bad for testing.
+> 
+> It seems relatively straightforward to do if we were to manifest some
+> CONFIG_ variables based on the target toolchain, e.g.
+> 
+> CONFIG_GCC=0x040601
 
-Okay, here is a new version. It fits the needs for Debian and Ubuntu
-now. I tested the patch on both distributions and with in-tree and
-out-of-tree build. The installed packages work fine.
+(sorry for the late reply)
 
-From f17987587e188b34be57b7b20aee851de70a80d1 Mon Sep 17 00:00:00 2001
-From: Joerg Roedel <joerg.roedel@amd.com>
-Date: Thu, 16 Feb 2012 19:48:24 +0100
-Subject: [PATCH] RFC: kbuild: Build linux-tools package with 'make deb-pkg'
+It would be a bit tricky, because the toolchain version depends also on
+CONFIG_CROSS_COMPILE. So Kconfig would need to know the semantics of
+CONFIG_CROSS_COMPILE and CONFIG_GCC and the dependency of the latter on
+the former.
 
-Also build a linux-tools package for installation so that
-common tools run without issues (e.g. perf).
-
-[RFC note: This may break with x-compilation when the
-           x-compilation environment is not set up to
-	   compile user-space programs. Is that acceptable?
-	   I also thought about a compile-time parameter
-	   such as 'make TOOLS=1 deb-pkg' or a special
-	   'make deb-tools-pkg' target.	Opinions? ]
-
-Cc: Michal Marek <mmarek@suse.cz>
-Cc: maximilian attems <max@stro.at>
-Cc: Ben Hutchings <ben@decadent.org.uk>
-Cc: debian-kernel@lists.debian.org
-Cc: linux-kbuild@vger.kernel.org
-Signed-off-by: Joerg Roedel <joerg.roedel@amd.com>
----
- scripts/package/builddeb |   93 +++++++++++++++++++++++++++++++++++++++++++++-
- 1 files changed, 92 insertions(+), 1 deletions(-)
-
-diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-index eee5f8e..d474736 100644
---- a/scripts/package/builddeb
-+++ b/scripts/package/builddeb
-@@ -78,17 +78,20 @@ tmpdir="$objtree/debian/tmp"
- fwdir="$objtree/debian/fwtmp"
- kernel_headers_dir="$objtree/debian/hdrtmp"
- libc_headers_dir="$objtree/debian/headertmp"
-+tools_dir="$objtree/debian/toolstmp"
-+tmp_build_dir="$objtree/debian/toolsbuild"
- packagename=linux-image-$version
- fwpackagename=linux-firmware-image
- kernel_headers_packagename=linux-headers-$version
- libc_headers_packagename=linux-libc-dev
-+tools_packagename=linux-tools-$version
- 
- if [ "$ARCH" = "um" ] ; then
- 	packagename=user-mode-linux-$version
- fi
- 
- # Setup the directory structure
--rm -rf "$tmpdir" "$fwdir" "$kernel_headers_dir" "$libc_headers_dir"
-+rm -rf "$tmpdir" "$fwdir" "$kernel_headers_dir" "$libc_headers_dir" "$tools_dir" "$tmp_build_dir"
- mkdir -m 755 -p "$tmpdir/DEBIAN"
- mkdir -p  "$tmpdir/lib" "$tmpdir/boot" "$tmpdir/usr/share/doc/$packagename"
- mkdir -m 755 -p "$fwdir/DEBIAN"
-@@ -98,6 +101,10 @@ mkdir -p "$libc_headers_dir/usr/share/doc/$libc_headers_packagename"
- mkdir -m 755 -p "$kernel_headers_dir/DEBIAN"
- mkdir -p "$kernel_headers_dir/usr/share/doc/$kernel_headers_packagename"
- mkdir -p "$kernel_headers_dir/lib/modules/$version/"
-+mkdir -m 755 -p "$tools_dir/DEBIAN"
-+mkdir -p "$tools_dir/usr/share/doc/$tools_packagename"
-+mkdir -p "$tools_dir/usr/bin/"
-+mkdir -p "$tmp_build_dir"
- if [ "$ARCH" = "um" ] ; then
- 	mkdir -p "$tmpdir/usr/lib/uml/modules/$version" "$tmpdir/usr/bin"
- fi
-@@ -120,6 +127,75 @@ else
- 	fi
- fi
- 
-+# Build the tools
-+num_tools="0"
-+tools_flavour_abi=${version#*-}
-+tools_flavour=${tools_flavour_abi#*-}
-+tools_version=${version%-$tools_flavour}
-+debian_tools_version="${version%%-*}"
-+debian_tools_version="${version%.*}"
-+if grep -q '^CONFIG_PERF_EVENTS=y' .config ; then
-+	# Build and install perf
-+	(
-+	 unset MAKEFLAGS
-+	 unset MFLAGS
-+	 unset MAKEOVERRIDES
-+
-+	 mkdir -p $objtree/tools/perf
-+	 cd "$srctree/tools/perf"
-+	 $MAKE DESTDIR="$tools_dir/usr/" LDFLAGS= O=$objtree/tools/perf/ install
-+	 mv "$tools_dir/usr/bin/perf" "$tools_dir/usr/bin/perf_$debian_tools_version"
-+	 ln -s "/usr/bin/perf_$debian_tools_version" "$tools_dir/usr/bin/perf_$tools_version"
-+	 mv "$tools_dir/usr/libexec/perf-core" "$tools_dir/usr/share/perf_$debian_tools_version-core"
-+	 rmdir "$tools_dir/usr/libexec"
-+	 
-+	 # Documentation can't be built out-of-tree so copy source
-+	 # over to objtree and build man pages there
-+	 mkdir -p $tmp_build_dir/perf
-+	 cp -a "$srctree/tools/perf/Documentation" "$tmp_build_dir/perf/"
-+	 cd "$tmp_build_dir/perf/Documentation"
-+	 $MAKE man
-+	 $MAKE DESTDIR="$tools_dir/usr/" install
-+	 for manpage in `find $tools_dir/usr/share/man/ -type f`; do
-+	 	mv $manpage ${manpage/perf/perf_$debian_tools_version}
-+		gzip -9 ${manpage/perf/perf_$debian_tools_version}
-+	 done
-+	)
-+	num_tools=$(($num_tools+1))
-+fi
-+
-+if [[ "$ARCH" = "i386" || "$ARCH" = "x86_64" ]]; then
-+	# Build turbostat
-+	(
-+	 cp -a $srctree/tools/power/x86/turbostat "$tmp_build_dir"
-+	 cd "$tmp_build_dir/turbostat/"
-+	 unset MAKEFLAGS
-+	 unset MFLAGS
-+	 unset MAKEOVERRIDES
-+	 $MAKE LDFLAGS=
-+	 cp turbostat "$tools_dir/usr/bin/turbostat_$debian_tools_version"
-+	 ln -s "/usr/bin/turbostat_$debian_tools_version" "$tools_dir/usr/bin/turbostat_$tools_version"
-+	 mkdir -p "$tools_dir/usr/share/man/man8"
-+	 cp turbostat.8 "$tools_dir/usr/share/man/man8/turbotstat_${debian_tools_version}.8"
-+	 gzip -9 "$tools_dir/usr/share/man/man8/turbotstat_${debian_tools_version}.8"
-+	)
-+
-+	# Build x86_energy_perf_policy
-+	(
-+	 cp -a $srctree/tools/power/x86/x86_energy_perf_policy "$tmp_build_dir"
-+	 cd "$tmp_build_dir/x86_energy_perf_policy"
-+	 unset MAKEFLAGS
-+	 unset MFLAGS
-+	 unset MAKEOVERRIDES
-+	 $MAKE LDFLAGS=
-+	 cp x86_energy_perf_policy "$tools_dir/usr/bin/x86_energy_perf_policy_$debian_tools_version"
-+	 ln -s "/usr/bin/x86_energy_perf_policy_$debian_tools_version" "$tools_dir/usr/bin/x86_energy_perf_policy_$tools_version"
-+	 cp x86_energy_perf_policy.8 "$tools_dir/usr/share/man/man8/x86_energy_perf_policy_${debian_tools_version}.8"
-+	 gzip -9 "$tools_dir/usr/share/man/man8/x86_energy_perf_policy_${debian_tools_version}.8"
-+	)
-+	num_tools=$(($num_tools+2))
-+fi
-+
- if grep -q '^CONFIG_MODULES=y' .config ; then
- 	INSTALL_MOD_PATH="$tmpdir" $MAKE KBUILD_SRC= modules_install
- 	rm -f "$tmpdir/lib/modules/$version/build"
-@@ -291,9 +367,24 @@ Description: Linux support headers for userspace development
-  are used by the installed headers for GNU glibc and other system libraries.
- EOF
- 
-+cat <<EOF >> debian/control
-+
-+Package: $tools_packagename
-+Section: devel
-+Architecture: $arch
-+Depends: \${shlibs:Depends}
-+Description: Linux kernel tools for version $version
-+ This package provides the architecture dependant parts for kernel
-+ version locked tools for version $version
-+EOF
-+
- if [ "$ARCH" != "um" ]; then
- 	create_package "$kernel_headers_packagename" "$kernel_headers_dir"
- 	create_package "$libc_headers_packagename" "$libc_headers_dir"
-+	if [ "$num_tools" > "0" ]; then
-+		dpkg-shlibdeps $tools_dir/usr/bin/*
-+		create_package "$tools_packagename" "$tools_dir"
-+	fi
- fi
- 
- create_package "$packagename" "$tmpdir"
--- 
-1.7.5.4
-
-
-
-
--- 
-AMD Operating System Research Center
-
-Advanced Micro Devices GmbH Einsteinring 24 85609 Dornach
-General Managers: Alberto Bozzo
-Registration: Dornach, Landkr. Muenchen; Registerger. Muenchen, HRB Nr. 43632
-
+Michal
