@@ -1,30 +1,48 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:37334 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:50458 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753449Ab2BYAR6 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 24 Feb 2012 19:17:58 -0500
-Date: Sat, 25 Feb 2012 01:17:56 +0100
+	id S1755396Ab2BYJkn (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 25 Feb 2012 04:40:43 -0500
+Date: Sat, 25 Feb 2012 10:40:41 +0100
 From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [PATCH] Kbuild: Makefile: clean up samples directory
-Message-ID: <20120225001756.GF19992@sepie.suse.cz>
-References: <1328349359-29524-1-git-send-email-dev@snitselaar.org>
+Subject: [GIT] kbuild rc fixes
+Message-ID: <20120225094041.GA13304@sepie.suse.cz>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1328349359-29524-1-git-send-email-dev@snitselaar.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Gerard Snitselaar <dev@snitselaar.org>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Gregory.Dietsche@cuw.edu, ben@decadent.org.uk, lucas.demarchi@profusion.mobi, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Sat, Feb 04, 2012 at 02:55:59AM -0700, Gerard Snitselaar wrote:
-> Playing around with make randconfig I ended up with CONFIG_SAMPLES
-> set. After cleaning up the build I noticed that git status was
-> showing samples/hidraw/hid-example as an untracked file.
-> 
-> Adding samples to clean-dirs seems to solve the problem, but
-> I don't know if that is the correct way to solve the issue.
+Hi Linus,
 
-It is. I applied your patch to kbuild.git#kbuild now.
+three kbuild fixes for 3.3:
+* make deb-pkg symlink race fix.
+* make coccicheck fix.
+* Dropping the check for modutils. This is not a regression, but allows
+  the module-init-tools replacement kmod work with the 3.3 kernel.
 
-Michal
+  Michal
+
+
+The following changes since commit dcd6c92267155e70a94b3927bce681ce74b80d1f:
+
+  Linux 3.3-rc1 (2012-01-19 15:04:48 -0800)
+
+are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git rc-fixes
+
+Ben Hutchings (1):
+      builddeb: Don't create files in /tmp with predictable names
+
+Greg Dietsche (1):
+      coccicheck: change handling of C={1,2} when M= is set
+
+Lucas De Marchi (1):
+      kbuild: do not check for ancient modutils tools
+
+ scripts/coccicheck       |   13 ++++---------
+ scripts/depmod.sh        |    6 ------
+ scripts/package/builddeb |   12 ++++++------
+ 3 files changed, 10 insertions(+), 21 deletions(-)
