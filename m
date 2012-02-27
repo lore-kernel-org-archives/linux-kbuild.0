@@ -1,48 +1,115 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.snhosting.dk ([87.238.248.203]:20646 "EHLO
-	smtp.domainteam.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753053Ab2BZVFx (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 26 Feb 2012 16:05:53 -0500
-Date: Sun, 26 Feb 2012 22:05:51 +0100
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH] scripts/Kbuild.include: Fix portability problem of
-	"echo -e"
-Message-ID: <20120226210551.GA659@merkur.ravnborg.org>
-References: <1330277718-2667-1-git-send-email-bernhard@bwalle.de> <20120226174805.GA562@merkur.ravnborg.org> <4F4A7126.6020009@bwalle.de>
+Received: from terminus.zytor.com ([198.137.202.10]:48750 "EHLO mail.zytor.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754292Ab2B0Wte (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 27 Feb 2012 17:49:34 -0500
+Message-ID: <4F4C0877.5000804@zytor.com>
+Date: Mon, 27 Feb 2012 14:49:27 -0800
+From: "H. Peter Anvin" <hpa@zytor.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4F4A7126.6020009@bwalle.de>
+Subject: Fwd: [tip:x86/x32] x32:  Warn and disable rather than error if binutils
+ too old
+References: <tip-0bf6276392e990dd0da0ccd8e10f42597d503f29@git.kernel.org>
+In-Reply-To: <tip-0bf6276392e990dd0da0ccd8e10f42597d503f29@git.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Bernhard Walle <bernhard@bwalle.de>
-Cc: mmarek@suse.cz, lacombar@gmail.com, linux-kernel@vger.kernel.org, linux-kbuild <linux-kbuild@vger.kernel.org>, zippel@linux-m68k.org
+To: "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>
 
-On Sun, Feb 26, 2012 at 06:51:34PM +0100, Bernhard Walle wrote:
-> Am 26.02.12 18:48, schrieb Sam Ravnborg:
-> >> > --- a/scripts/Kbuild.include
-> >> > +++ b/scripts/Kbuild.include
-> >> > @@ -104,7 +104,7 @@ as-option = $(call try-run,\
-> >> >  # Usage: cflags-y += $(call as-instr,instr,option1,option2)
-> >> >  
-> >> >  as-instr = $(call try-run,\
-> >> > -	/bin/echo -e "$(1)" | $(CC) $(KBUILD_AFLAGS) -c -xassembler -o "$$TMP" -,$(2),$(3))
-> >> > +	printf "%b\n" "$(1)" | $(CC) $(KBUILD_AFLAGS) -c -xassembler -o "$$TMP" -,$(2),$(3))
-> >> >  
-> >> >  # cc-option
-> >> >  # Usage: cflags-y += $(call cc-option,-march=winchip-c6,-march=i586)
-> > Roman Zippel removed use of printf in this patch: beda9f3a13bbb22cde92a45f230a02ef2afef6a9
-> > 
-> > I cannot remember why - but it would be good if you could dig up
-> > why - just so we do not hit an old issue again.
-> 
-> Well, he used printf "$(1)", that's different from printf "%b\n" "$(1)"
-> since format strings inside $(1) would be interpreted.
-Makes good sense.
+Kbuild people - for the lack of a way to doing toolchain dependencies in
+Kconfig I'm doing this right now for x32 support.  I am a little unclear
+if this is the right thing to do, especially if I should be using := or
+= here.
 
-> 
-> But maybe Roman can comment on that? Cc'ing him.
-Would be good to hear from Roman - but he has been MIA for some years now :-(
+	-hpa
 
-	Sam
+-------- Original Message --------
+Subject: [tip:x86/x32] x32:  Warn and disable rather than error if
+binutils too old
+Date: Mon, 27 Feb 2012 14:21:55 -0800
+From: tip-bot for H. Peter Anvin <hpa@linux.intel.com>
+Reply-To: mingo@redhat.com, hpa@zytor.com, linux-kernel@vger.kernel.org,
+       tglx@linutronix.de, hpa@linux.intel.com, mingo@elte.hu,
+hjl.tools@gmail.com
+To: linux-tip-commits@vger.kernel.org
+CC: linux-kernel@vger.kernel.org, hpa@zytor.com, mingo@redhat.com,
+  tglx@linutronix.de, hpa@linux.intel.com, hjl.tools@gmail.com,
+mingo@elte.hu
+
+Commit-ID:  0bf6276392e990dd0da0ccd8e10f42597d503f29
+Gitweb:
+http://git.kernel.org/tip/0bf6276392e990dd0da0ccd8e10f42597d503f29
+Author:     H. Peter Anvin <hpa@linux.intel.com>
+AuthorDate: Mon, 27 Feb 2012 14:09:10 -0800
+Committer:  H. Peter Anvin <hpa@linux.intel.com>
+CommitDate: Mon, 27 Feb 2012 14:09:10 -0800
+
+x32: Warn and disable rather than error if binutils too old
+
+If X32 is enabled in .config, but the binutils can't build it, issue a
+warning and disable the feature rather than erroring out.
+
+In order to support this, have CONFIG_X86_X32 be the option set in
+Kconfig, and CONFIG_X86_X32_ABI be the option set by the Makefile when
+it is enabled and binutils has been found to be functional.
+
+Requested-by: Ingo Molnar <mingo@elte.hu>
+Signed-off-by: H. Peter Anvin <hpa@linux.intel.com>
+Cc: H. J. Lu <hjl.tools@gmail.com>
+Link:
+http://lkml.kernel.org/r/1329696488-16970-1-git-send-email-hpa@zytor.com
+---
+ arch/x86/Kconfig  |    4 ++--
+ arch/x86/Makefile |   16 ++++++++++++++++
+ 2 files changed, 18 insertions(+), 2 deletions(-)
+
+diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
+index c9d6c9e..e2b38b4 100644
+--- a/arch/x86/Kconfig
++++ b/arch/x86/Kconfig
+@@ -2175,7 +2175,7 @@ config IA32_AOUT
+ 	---help---
+ 	  Support old a.out binaries in the 32bit emulation.
+
+-config X86_X32_ABI
++config X86_X32
+ 	bool "x32 ABI for 64-bit mode (EXPERIMENTAL)"
+ 	depends on X86_64 && IA32_EMULATION && EXPERIMENTAL
+ 	---help---
+@@ -2190,7 +2190,7 @@ config X86_X32_ABI
+
+ config COMPAT
+ 	def_bool y
+-	depends on IA32_EMULATION || X86_X32_ABI
++	depends on IA32_EMULATION || X86_X32
+
+ config COMPAT_FOR_U64_ALIGNMENT
+ 	def_bool COMPAT
+diff --git a/arch/x86/Makefile b/arch/x86/Makefile
+index 209ba12..31bb1eb 100644
+--- a/arch/x86/Makefile
++++ b/arch/x86/Makefile
+@@ -82,6 +82,22 @@ ifdef CONFIG_CC_STACKPROTECTOR
+         endif
+ endif
+
++ifdef CONFIG_X86_X32
++	x32_ld_ok := $(call try-run,\
++			/bin/echo -e '1: .quad 1b' | \
++			$(CC) $(KBUILD_AFLAGS) -c -xassembler -o "$$TMP" - && \
++			$(OBJCOPY) -O elf32-x86-64 "$$TMP" "$$TMPO" && \
++			$(LD) -m elf32_x86_64 "$$TMPO" -o "$$TMP",y,n)
++	ifeq ($(x32_ld_ok),y)
++		CONFIG_X86_X32_ABI := y
++		KBUILD_AFLAGS += -DCONFIG_X86_X32_ABI
++		KBUILD_CFLAGS += -DCONFIG_X86_X32_ABI
++	else
++		$(warning CONFIG_X86_X32 enabled but no binutils support)
++	endif
++endif
++export CONFIG_X86_X32_ABI
++
+ # Don't unroll struct assignments with kmemcheck enabled
+ ifeq ($(CONFIG_KMEMCHECK),y)
+ 	KBUILD_CFLAGS += $(call cc-option,-fno-builtin-memcpy)
