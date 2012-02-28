@@ -1,47 +1,59 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.snhosting.dk ([87.238.248.203]:56517 "EHLO
-	smtp.domainteam.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754368Ab2B1HVR (ORCPT
+Received: from mail-pz0-f46.google.com ([209.85.210.46]:35233 "EHLO
+	mail-pz0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755600Ab2B1IKm (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 28 Feb 2012 02:21:17 -0500
-Date: Tue, 28 Feb 2012 08:21:15 +0100
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: Fwd: [tip:x86/x32] x32:  Warn and disable rather than error if
-	binutils too old
-Message-ID: <20120228072115.GA2213@merkur.ravnborg.org>
-References: <tip-0bf6276392e990dd0da0ccd8e10f42597d503f29@git.kernel.org> <4F4C0877.5000804@zytor.com>
+	Tue, 28 Feb 2012 03:10:42 -0500
+Received: by daed14 with SMTP id d14so2073912dae.19
+        for <linux-kbuild@vger.kernel.org>; Tue, 28 Feb 2012 00:10:42 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4F4C0877.5000804@zytor.com>
+Date: Tue, 28 Feb 2012 16:10:42 +0800
+Message-ID: <CAF8raN5YcDy9o_C=Nki6QaYphKUWQnf0uZ-1rhmcFPu+tBm4cA@mail.gmail.com>
+Subject: [PATCH] kbuild: incremental tags update for GNU Global
+From: Jianbin Kang <kjbmail@gmail.com>
+Content-Type: multipart/mixed; boundary=e89a8ffba93f6043ed04ba01c3bb
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "H. Peter Anvin" <hpa@zytor.com>
-Cc: "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>
+To: linux-kbuild@vger.kernel.org
+Cc: Michal Marek <mmarek@suse.cz>
 
-On Mon, Feb 27, 2012 at 02:49:27PM -0800, H. Peter Anvin wrote:
-> Kbuild people - for the lack of a way to doing toolchain dependencies in
-> Kconfig I'm doing this right now for x32 support.  I am a little unclear
-> if this is the right thing to do, especially if I should be using := or
+--e89a8ffba93f6043ed04ba01c3bb
+Content-Type: text/plain; charset=ISO-8859-1
 
-Looks good at first look.
+GNU gtags support '-i' for updating tag files incrementally.
+It runs more quickly than generating new tags after kernel source update.
 
-":=" is almost always the right choice if this is not part of a rule somewhere.
-With ":=" the rhs is only evaluated once and the result stored in the
-variable on the lhs.
+Signed-off-by:  Jianbin Kang <kjbmail@gmail.com>
+---
+ scripts/tags.sh |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-In this particular case you only use the lhs once - so there is no
-real difference.
+diff --git a/scripts/tags.sh b/scripts/tags.sh
+index 833813a..0bc8588 100755
+--- a/scripts/tags.sh
++++ b/scripts/tags.sh
+@@ -116,7 +116,7 @@ docscope()
 
-Another important difference is that with ":=" the rhs is evaluated when
-make see it first time.
-With "=" make defer it until the lhs is used.
+ dogtags()
+ {
+-	all_sources | gtags -f -
++	all_sources | gtags -i -f -
+ }
 
-again in you case there is no difference as you use the lhs just after
-you have the assignment.
+ exuberant()
+-- 
+1.7.9.1
 
-[But I guess you already knew all this...]
+--e89a8ffba93f6043ed04ba01c3bb
+Content-Type: text/x-patch; charset=US-ASCII; name="gtags.patch"
+Content-Disposition: attachment; filename="gtags.patch"
+Content-Transfer-Encoding: base64
+X-Attachment-Id: f_gz6o2zsa0
 
-	Sam
-
-
+LS0tCiBzY3JpcHRzL3RhZ3Muc2ggfCAgICAyICstCiAxIGZpbGVzIGNoYW5nZWQsIDEgaW5zZXJ0
+aW9ucygrKSwgMSBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS9zY3JpcHRzL3RhZ3Muc2ggYi9z
+Y3JpcHRzL3RhZ3Muc2gKaW5kZXggODMzODEzYS4uMGJjODU4OCAxMDA3NTUKLS0tIGEvc2NyaXB0
+cy90YWdzLnNoCisrKyBiL3NjcmlwdHMvdGFncy5zaApAQCAtMTE2LDcgKzExNiw3IEBAIGRvY3Nj
+b3BlKCkKIAogZG9ndGFncygpCiB7Ci0JYWxsX3NvdXJjZXMgfCBndGFncyAtZiAtCisJYWxsX3Nv
+dXJjZXMgfCBndGFncyAtaSAtZiAtCiB9CiAKIGV4dWJlcmFudCgpCi0tIAoxLjcuOS4xCgo=
+--e89a8ffba93f6043ed04ba01c3bb--
