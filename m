@@ -1,67 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from e33.co.us.ibm.com ([32.97.110.151]:59314 "EHLO
-	e33.co.us.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1030677Ab2B2TFl (ORCPT
+Received: from mail-pz0-f52.google.com ([209.85.210.52]:46055 "EHLO
+	mail-pz0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755692Ab2CDWJX (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 29 Feb 2012 14:05:41 -0500
-Received: from /spool/local
-	by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-	for <linux-kbuild@vger.kernel.org> from <nacc@linux.vnet.ibm.com>;
-	Wed, 29 Feb 2012 12:05:39 -0700
-Date: Wed, 29 Feb 2012 11:01:38 -0800
-From: Nishanth Aravamudan <nacc@linux.vnet.ibm.com>
-Subject: `make dep' with clock skew detected loops forever
-Message-ID: <20120229190138.GG5136@linux.vnet.ibm.com>
+	Sun, 4 Mar 2012 17:09:23 -0500
+Received: by dadp12 with SMTP id p12so4191532dad.11
+        for <linux-kbuild@vger.kernel.org>; Sun, 04 Mar 2012 14:09:23 -0800 (PST)
+Date: Sun, 4 Mar 2012 14:09:20 -0800 (PST)
+From: David Rientjes <rientjes@google.com>
+Subject: randconfig chosing more than one slab allocator
+Message-ID: <alpine.DEB.2.00.1203041404590.18555@chino.kir.corp.google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: LKML <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org
+To: Sam Ravnborg <sam@ravnborg.org>, Michal Marek <mmarek@suse.cz>
+Cc: Arnaud Lacombe <lacombar@gmail.com>, Pekka Enberg <penberg@kernel.org>, Christoph Lameter <cl@linux.com>, linux-kbuild@vger.kernel.org
 
-Noticed something on a fresh FC16 based install on a test server in our
-lab.  Autotest by default runs `make dep` and it seems the clock is
-pretty badly skewed on this server, resulting in an infinite loop of:
+Hi folks,
 
-01:09:37 DEBUG| Running 'make dep'
-01:09:38 DEBUG| [stderr] make: Warning: File `/usr/local/autotest/tmp/build/linux/arch/powerpc/Makefile' has modification time 112143 s in the future
-01:09:38 DEBUG| [stderr] make[1]: Warning: File `/usr/local/autotest/tmp/build/linux/arch/powerpc/Makefile' has modification time 112143 s in the future
-01:09:38 DEBUG| [stderr] make[2]: Warning: File `scripts/Makefile.host' has modification time 112143 s in the future
-01:09:38 DEBUG| [stdout]   HOSTCC  scripts/basic/fixdep
-01:09:38 DEBUG| [stderr] make[2]: warning:  Clock skew detected.  Your build may be incomplete.
-01:09:38 DEBUG| [stderr] make[2]: Warning: File `scripts/Makefile.host' has modification time 112143 s in the future
-01:09:38 DEBUG| [stdout]   HOSTCC  scripts/kconfig/conf.o
-01:09:38 DEBUG| [stdout]   SHIPPED scripts/kconfig/zconf.tab.c
-01:09:38 DEBUG| [stdout]   SHIPPED scripts/kconfig/zconf.lex.c
-01:09:38 DEBUG| [stdout]   SHIPPED scripts/kconfig/zconf.hash.c
-01:09:39 DEBUG| [stdout]   HOSTCC  scripts/kconfig/zconf.tab.o
-01:09:39 DEBUG| [stdout]   HOSTLD  scripts/kconfig/conf
-01:09:39 DEBUG| [stdout] scripts/kconfig/conf --silentoldconfig Kconfig
-01:09:39 DEBUG| [stderr] make[2]: warning:  Clock skew detected.  Your build may be incomplete.
-01:09:39 DEBUG| [stderr] make[1]: warning:  Clock skew detected.  Your build may be incomplete.
-01:09:39 DEBUG| [stderr] make: Warning: File `/usr/local/autotest/tmp/build/linux/arch/powerpc/Makefile' has modification time 112142 s in the future
-01:09:39 DEBUG| [stderr] make[1]: Warning: File `/usr/local/autotest/tmp/build/linux/arch/powerpc/Makefile' has modification time 112142 s in the future
-01:09:39 DEBUG| [stderr] make[2]: Warning: File `scripts/Makefile.host' has modification time 112142 s in the future
-01:09:39 DEBUG| [stdout]   HOSTCC  scripts/basic/fixdep
-01:09:40 DEBUG| [stderr] make[2]: warning:  Clock skew detected.  Your build may be incomplete.
-01:09:40 DEBUG| [stderr] make[2]: Warning: File `scripts/Makefile.host' has modification time 112141 s in the future
-01:09:40 DEBUG| [stdout]   HOSTCC  scripts/kconfig/conf.o
-01:09:40 DEBUG| [stdout]   SHIPPED scripts/kconfig/zconf.tab.c
-01:09:40 DEBUG| [stdout]   SHIPPED scripts/kconfig/zconf.lex.c
-01:09:40 DEBUG| [stdout]   SHIPPED scripts/kconfig/zconf.hash.c
-01:09:40 DEBUG| [stdout]   HOSTCC  scripts/kconfig/zconf.tab.o
-01:09:40 DEBUG| [stdout]   HOSTLD  scripts/kconfig/conf
-01:09:40 DEBUG| [stdout] scripts/kconfig/conf --silentoldconfig Kconfig
+make randconfig seems to allow chosing more than one slab allocator 
+although they are all part of a choice,endchoice block (and none are 
+tristate).  The following quickly finds both CONFIG_SLUB and CONFIG_SLOB 
+enabled:
 
-Anyone know why that happens? Obvious fixes are to either not run `make
-dep` or to install an NTP client, and I can do that, but figured I'd
-report the above.
+$ while [ 1 ]; do make randconfig &> /dev/null; if [ $(grep "CONFIG_SL[OU]B=y" .config | wc -l) == 2 ]; then break; fi; done
+$ grep CONFIG_SL[OU]B=y .config
+CONFIG_SLUB=y
+CONFIG_SLOB=y
 
-Thanks,
-Nish
+whereas if I do this:
 
--- 
-Nishanth Aravamudan <nacc@us.ibm.com>
-IBM Linux Technology Center
+diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
+--- a/scripts/kconfig/confdata.c
++++ b/scripts/kconfig/confdata.c
+@@ -1063,7 +1063,7 @@ static void randomize_choice_values(struct symbol *csym)
+ 	expr_list_for_each_sym(prop->expr, e, sym) {
+ 		if (def == cnt++) {
+ 			sym->def[S_DEF_USER].tri = yes;
+-			csym->def[S_DEF_USER].val = sym;
++//			csym->def[S_DEF_USER].val = sym;
+ 		}
+ 		else {
+ 			sym->def[S_DEF_USER].tri = no;
 
+then it never happens and the "while [ 1 ]; done" loop above never 
+returns.
+
+I haven't investigated it yet, but thought I'd bring it up because it 
+often creates invalid configs.
+
+Thanks.
