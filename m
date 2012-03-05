@@ -1,66 +1,105 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from e7.ny.us.ibm.com ([32.97.182.137]:43760 "EHLO e7.ny.us.ibm.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750812Ab2CEPdg (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 5 Mar 2012 10:33:36 -0500
-Received: from /spool/local
-	by e7.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-	for <linux-kbuild@vger.kernel.org> from <nacc@linux.vnet.ibm.com>;
-	Mon, 5 Mar 2012 10:33:33 -0500
-Date: Mon, 5 Mar 2012 07:33:09 -0800
-From: Nishanth Aravamudan <nacc@linux.vnet.ibm.com>
-Subject: Re: `make dep' with clock skew detected loops forever
-Message-ID: <20120305153309.GA31864@linux.vnet.ibm.com>
-References: <20120229190138.GG5136@linux.vnet.ibm.com>
- <4F54D078.9050608@suse.cz>
+Received: from mail-ww0-f74.google.com ([74.125.82.74]:33259 "EHLO
+	mail-ww0-f74.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757401Ab2CEXIM (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 5 Mar 2012 18:08:12 -0500
+Received: by wgbdt11 with SMTP id dt11so164958wgb.1
+        for <linux-kbuild@vger.kernel.org>; Mon, 05 Mar 2012 15:08:11 -0800 (PST)
+Subject: [patch 1/1] headers_check: recursively search for linux/types.h inclusion
+From: akpm@linux-foundation.org
+Date: Mon, 05 Mar 2012 15:08:09 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4F54D078.9050608@suse.cz>
+Content-Type: text/plain; charset=ASCII
+Content-Transfer-Encoding: 8bit
+Message-Id: <20120305230810.26823A02EB@akpm.mtv.corp.google.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: LKML <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org
+To: mmarek@suse.cz
+Cc: linux-kbuild@vger.kernel.org, akpm@linux-foundation.org, bobbypowers@gmail.com, airlied@linux.ie, sam@ravnborg.org
 
-On 05.03.2012 [15:40:56 +0100], Michal Marek wrote:
-> On 29.2.2012 20:01, Nishanth Aravamudan wrote:
-> > Noticed something on a fresh FC16 based install on a test server in our
-> > lab.  Autotest by default runs `make dep` and it seems the clock is
-> > pretty badly skewed on this server, resulting in an infinite loop of:
-> > 
-> > 01:09:37 DEBUG| Running 'make dep'
-> > 01:09:38 DEBUG| [stderr] make: Warning: File `/usr/local/autotest/tmp/build/linux/arch/powerpc/Makefile' has modification time 112143 s in the future
-> > 01:09:38 DEBUG| [stderr] make[1]: Warning: File `/usr/local/autotest/tmp/build/linux/arch/powerpc/Makefile' has modification time 112143 s in the future
-> > 01:09:38 DEBUG| [stderr] make[2]: Warning: File `scripts/Makefile.host' has modification time 112143 s in the future
-> > 01:09:38 DEBUG| [stdout]   HOSTCC  scripts/basic/fixdep
-> > 01:09:38 DEBUG| [stderr] make[2]: warning:  Clock skew detected.  Your build may be incomplete.
-> > 01:09:38 DEBUG| [stderr] make[2]: Warning: File `scripts/Makefile.host' has modification time 112143 s in the future
-> [...]
-> 
-> > Anyone know why that happens?
-> 
-> Because the system time time is several hours, if not days, behind, so
-> generated files are older than source files and thus dependencies cannot
-> work. You need to fix the system time to be at least ahead of the mtime
-> of the sources.
+From: Bobby Powers <bobbypowers@gmail.com>
+Subject: headers_check: recursively search for linux/types.h inclusion
 
-That makes sense.
+headers_check.pl currently emits some spurious warnings, especially for
+the drm headers, about using __[us]{8,16,32,64} types without including
+linux/types.h.  Recursively search for types.h inclusion, avoiding
+circular references.
 
-> > Obvious fixes are to either not run `make dep`
-> 
-> I don't think this is limited to make dep.
+Signed-off-by: Bobby Powers <bobbypowers@gmail.com>
+Cc: Sam Ravnborg <sam@ravnborg.org>
+Cc: Dave Airlie <airlied@linux.ie>
+Cc: Michal Marek <mmarek@suse.cz>
+Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+---
 
-Well, killing `make dep`, which was just looping, and executing `make
--j16 vmlinux` did seem to complete. But it was a while ago and maybe I'm
-mis-remembering.
+ scripts/headers_check.pl |   38 ++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 37 insertions(+), 1 deletion(-)
 
-Ah well, I've fixed up my testing scripts to ensure an ntp run is
-performed before trying to build.
-
-Thanks,
-Nish
-
--- 
-Nishanth Aravamudan <nacc@us.ibm.com>
-IBM Linux Technology Center
-
+diff -puN scripts/headers_check.pl~headers_check-recursively-search-for-linux-typesh-inclusion scripts/headers_check.pl
+--- a/scripts/headers_check.pl~headers_check-recursively-search-for-linux-typesh-inclusion
++++ a/scripts/headers_check.pl
+@@ -19,6 +19,7 @@
+ # 3) Check for leaked CONFIG_ symbols
+ 
+ use strict;
++use File::Basename;
+ 
+ my ($dir, $arch, @files) = @ARGV;
+ 
+@@ -99,6 +100,39 @@ sub check_asm_types
+ }
+ 
+ my $linux_types;
++my %import_stack = ();
++sub check_include_typesh
++{
++	my $path = $_[0];
++	my $import_path;
++
++	my $fh;
++	my @file_paths = ($path, $dir . "/" .  $path, dirname($filename) . "/" . $path);
++	for my $possible ( @file_paths ) {
++	    if (not $import_stack{$possible} and open($fh, '<', $possible)) {
++		$import_path = $possible;
++		$import_stack{$import_path} = 1;
++		last;
++	    }
++	}
++	if (eof $fh) {
++	    return;
++	}
++
++	my $line;
++	while ($line = <$fh>) {
++		if ($line =~ m/^\s*#\s*include\s+<linux\/types.h>/) {
++			$linux_types = 1;
++			last;
++		}
++		if (my $included = ($line =~ /^\s*#\s*include\s+[<"](\S+)[>"]/)[0]) {
++			check_include_typesh($included);
++		}
++	}
++	close $fh;
++	delete $import_stack{$import_path};
++}
++
+ sub check_sizetypes
+ {
+ 	if ($filename =~ /types.h|int-l64.h|int-ll64.h/o) {
+@@ -113,6 +147,9 @@ sub check_sizetypes
+ 		$linux_types = 1;
+ 		return;
+ 	}
++	if (my $included = ($line =~ /^\s*#\s*include\s+[<"](\S+)[>"]/)[0]) {
++		check_include_typesh($included);
++	}
+ 	if ($line =~ m/__[us](8|16|32|64)\b/) {
+ 		printf STDERR "$filename:$lineno: " .
+ 		              "found __[us]{8,16,32,64} type " .
+@@ -122,4 +159,3 @@ sub check_sizetypes
+ 		#$ret = 1;
+ 	}
+ }
+-
+_
