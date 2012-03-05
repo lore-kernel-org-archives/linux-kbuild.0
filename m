@@ -1,46 +1,66 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:55177 "EHLO mx2.suse.de"
+Received: from e7.ny.us.ibm.com ([32.97.182.137]:43760 "EHLO e7.ny.us.ibm.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S932379Ab2CEOk7 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 5 Mar 2012 09:40:59 -0500
-Message-ID: <4F54D078.9050608@suse.cz>
-Date: Mon, 05 Mar 2012 15:40:56 +0100
-From: Michal Marek <mmarek@suse.cz>
-MIME-Version: 1.0
+	id S1750812Ab2CEPdg (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 5 Mar 2012 10:33:36 -0500
+Received: from /spool/local
+	by e7.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+	for <linux-kbuild@vger.kernel.org> from <nacc@linux.vnet.ibm.com>;
+	Mon, 5 Mar 2012 10:33:33 -0500
+Date: Mon, 5 Mar 2012 07:33:09 -0800
+From: Nishanth Aravamudan <nacc@linux.vnet.ibm.com>
 Subject: Re: `make dep' with clock skew detected loops forever
+Message-ID: <20120305153309.GA31864@linux.vnet.ibm.com>
 References: <20120229190138.GG5136@linux.vnet.ibm.com>
-In-Reply-To: <20120229190138.GG5136@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+ <4F54D078.9050608@suse.cz>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4F54D078.9050608@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nishanth Aravamudan <nacc@linux.vnet.ibm.com>
+To: Michal Marek <mmarek@suse.cz>
 Cc: LKML <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org
 
-On 29.2.2012 20:01, Nishanth Aravamudan wrote:
-> Noticed something on a fresh FC16 based install on a test server in our
-> lab.  Autotest by default runs `make dep` and it seems the clock is
-> pretty badly skewed on this server, resulting in an infinite loop of:
+On 05.03.2012 [15:40:56 +0100], Michal Marek wrote:
+> On 29.2.2012 20:01, Nishanth Aravamudan wrote:
+> > Noticed something on a fresh FC16 based install on a test server in our
+> > lab.  Autotest by default runs `make dep` and it seems the clock is
+> > pretty badly skewed on this server, resulting in an infinite loop of:
+> > 
+> > 01:09:37 DEBUG| Running 'make dep'
+> > 01:09:38 DEBUG| [stderr] make: Warning: File `/usr/local/autotest/tmp/build/linux/arch/powerpc/Makefile' has modification time 112143 s in the future
+> > 01:09:38 DEBUG| [stderr] make[1]: Warning: File `/usr/local/autotest/tmp/build/linux/arch/powerpc/Makefile' has modification time 112143 s in the future
+> > 01:09:38 DEBUG| [stderr] make[2]: Warning: File `scripts/Makefile.host' has modification time 112143 s in the future
+> > 01:09:38 DEBUG| [stdout]   HOSTCC  scripts/basic/fixdep
+> > 01:09:38 DEBUG| [stderr] make[2]: warning:  Clock skew detected.  Your build may be incomplete.
+> > 01:09:38 DEBUG| [stderr] make[2]: Warning: File `scripts/Makefile.host' has modification time 112143 s in the future
+> [...]
 > 
-> 01:09:37 DEBUG| Running 'make dep'
-> 01:09:38 DEBUG| [stderr] make: Warning: File `/usr/local/autotest/tmp/build/linux/arch/powerpc/Makefile' has modification time 112143 s in the future
-> 01:09:38 DEBUG| [stderr] make[1]: Warning: File `/usr/local/autotest/tmp/build/linux/arch/powerpc/Makefile' has modification time 112143 s in the future
-> 01:09:38 DEBUG| [stderr] make[2]: Warning: File `scripts/Makefile.host' has modification time 112143 s in the future
-> 01:09:38 DEBUG| [stdout]   HOSTCC  scripts/basic/fixdep
-> 01:09:38 DEBUG| [stderr] make[2]: warning:  Clock skew detected.  Your build may be incomplete.
-> 01:09:38 DEBUG| [stderr] make[2]: Warning: File `scripts/Makefile.host' has modification time 112143 s in the future
-[...]
+> > Anyone know why that happens?
+> 
+> Because the system time time is several hours, if not days, behind, so
+> generated files are older than source files and thus dependencies cannot
+> work. You need to fix the system time to be at least ahead of the mtime
+> of the sources.
 
-> Anyone know why that happens?
+That makes sense.
 
-Because the system time time is several hours, if not days, behind, so
-generated files are older than source files and thus dependencies cannot
-work. You need to fix the system time to be at least ahead of the mtime
-of the sources.
+> > Obvious fixes are to either not run `make dep`
+> 
+> I don't think this is limited to make dep.
 
+Well, killing `make dep`, which was just looping, and executing `make
+-j16 vmlinux` did seem to complete. But it was a while ago and maybe I'm
+mis-remembering.
 
-> Obvious fixes are to either not run `make dep`
+Ah well, I've fixed up my testing scripts to ensure an ntp run is
+performed before trying to build.
 
-I don't think this is limited to make dep.
+Thanks,
+Nish
 
-Michal
+-- 
+Nishanth Aravamudan <nacc@us.ibm.com>
+IBM Linux Technology Center
+
