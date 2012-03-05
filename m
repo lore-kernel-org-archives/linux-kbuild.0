@@ -1,53 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pz0-f52.google.com ([209.85.210.52]:46055 "EHLO
-	mail-pz0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755692Ab2CDWJX (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 4 Mar 2012 17:09:23 -0500
-Received: by dadp12 with SMTP id p12so4191532dad.11
-        for <linux-kbuild@vger.kernel.org>; Sun, 04 Mar 2012 14:09:23 -0800 (PST)
-Date: Sun, 4 Mar 2012 14:09:20 -0800 (PST)
-From: David Rientjes <rientjes@google.com>
-Subject: randconfig chosing more than one slab allocator
-Message-ID: <alpine.DEB.2.00.1203041404590.18555@chino.kir.corp.google.com>
+Received: from cantor2.suse.de ([195.135.220.15]:55177 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S932379Ab2CEOk7 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 5 Mar 2012 09:40:59 -0500
+Message-ID: <4F54D078.9050608@suse.cz>
+Date: Mon, 05 Mar 2012 15:40:56 +0100
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: Re: `make dep' with clock skew detected loops forever
+References: <20120229190138.GG5136@linux.vnet.ibm.com>
+In-Reply-To: <20120229190138.GG5136@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>, Michal Marek <mmarek@suse.cz>
-Cc: Arnaud Lacombe <lacombar@gmail.com>, Pekka Enberg <penberg@kernel.org>, Christoph Lameter <cl@linux.com>, linux-kbuild@vger.kernel.org
+To: Nishanth Aravamudan <nacc@linux.vnet.ibm.com>
+Cc: LKML <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org
 
-Hi folks,
+On 29.2.2012 20:01, Nishanth Aravamudan wrote:
+> Noticed something on a fresh FC16 based install on a test server in our
+> lab.  Autotest by default runs `make dep` and it seems the clock is
+> pretty badly skewed on this server, resulting in an infinite loop of:
+> 
+> 01:09:37 DEBUG| Running 'make dep'
+> 01:09:38 DEBUG| [stderr] make: Warning: File `/usr/local/autotest/tmp/build/linux/arch/powerpc/Makefile' has modification time 112143 s in the future
+> 01:09:38 DEBUG| [stderr] make[1]: Warning: File `/usr/local/autotest/tmp/build/linux/arch/powerpc/Makefile' has modification time 112143 s in the future
+> 01:09:38 DEBUG| [stderr] make[2]: Warning: File `scripts/Makefile.host' has modification time 112143 s in the future
+> 01:09:38 DEBUG| [stdout]   HOSTCC  scripts/basic/fixdep
+> 01:09:38 DEBUG| [stderr] make[2]: warning:  Clock skew detected.  Your build may be incomplete.
+> 01:09:38 DEBUG| [stderr] make[2]: Warning: File `scripts/Makefile.host' has modification time 112143 s in the future
+[...]
 
-make randconfig seems to allow chosing more than one slab allocator 
-although they are all part of a choice,endchoice block (and none are 
-tristate).  The following quickly finds both CONFIG_SLUB and CONFIG_SLOB 
-enabled:
+> Anyone know why that happens?
 
-$ while [ 1 ]; do make randconfig &> /dev/null; if [ $(grep "CONFIG_SL[OU]B=y" .config | wc -l) == 2 ]; then break; fi; done
-$ grep CONFIG_SL[OU]B=y .config
-CONFIG_SLUB=y
-CONFIG_SLOB=y
+Because the system time time is several hours, if not days, behind, so
+generated files are older than source files and thus dependencies cannot
+work. You need to fix the system time to be at least ahead of the mtime
+of the sources.
 
-whereas if I do this:
 
-diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
---- a/scripts/kconfig/confdata.c
-+++ b/scripts/kconfig/confdata.c
-@@ -1063,7 +1063,7 @@ static void randomize_choice_values(struct symbol *csym)
- 	expr_list_for_each_sym(prop->expr, e, sym) {
- 		if (def == cnt++) {
- 			sym->def[S_DEF_USER].tri = yes;
--			csym->def[S_DEF_USER].val = sym;
-+//			csym->def[S_DEF_USER].val = sym;
- 		}
- 		else {
- 			sym->def[S_DEF_USER].tri = no;
+> Obvious fixes are to either not run `make dep`
 
-then it never happens and the "while [ 1 ]; done" loop above never 
-returns.
+I don't think this is limited to make dep.
 
-I haven't investigated it yet, but thought I'd bring it up because it 
-often creates invalid configs.
-
-Thanks.
+Michal
