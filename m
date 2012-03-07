@@ -1,95 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mprc.pku.edu.cn ([162.105.203.9]:50148 "EHLO mprc.pku.edu.cn"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753269Ab2CGHlo (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 7 Mar 2012 02:41:44 -0500
-Message-ID: <1331103163.2048.33.camel@epip-laptop>
-Subject: Re: [PATCH 2/3] Kbuild: Implement CONFIG_UIMAGE_KERNEL_NOLOAD
-From: Guan Xuetao <gxt@mprc.pku.edu.cn>
-Reply-To: gxt@mprc.pku.edu.cn
-Date: Wed, 07 Mar 2012 14:52:43 +0800
-In-Reply-To: <1331080238-1524-2-git-send-email-swarren@wwwdotorg.org>
+Received: from cassarossa.samfundet.no ([129.241.93.19]:33448 "EHLO
+	cassarossa.samfundet.no" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753339Ab2CGJXR (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 7 Mar 2012 04:23:17 -0500
+Date: Wed, 7 Mar 2012 10:00:17 +0100
+From: Hans-Christian Egtvedt <egtvedt@samfundet.no>
+Subject: Re: [PATCH 1/3] Kbuild: centralize MKIMAGE and cmd_uimage
+ definitions
+Message-ID: <20120307090017.GB17076@samfundet.no>
 References: <1331080238-1524-1-git-send-email-swarren@wwwdotorg.org>
-	 <1331080238-1524-2-git-send-email-swarren@wwwdotorg.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Mime-Version: 1.0
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1331080238-1524-1-git-send-email-swarren@wwwdotorg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Stephen Warren <swarren@wwwdotorg.org>
-Cc: Michal Marek <mmarek@suse.cz>, Russell King <linux@arm.linux.org.uk>, nico@fluxnic.net, Haavard Skinnemoen <hskinnemoen@gmail.com>, Hans-Christian Egtvedt <egtvedt@samfundet.no>, Mike Frysinger <vapier@gentoo.org>, Michal Simek <monstr@monstr.eu>, Paul Mundt <lethal@linux-sh.org>, "David S. Miller" <davem@davemloft.net>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-arm-kernel@lists.infradead.org, uclinux-dist-devel@blackfin.uclinux.org, microblaze-uclinux@itee.uq.edu.au, linux-sh@vger.kernel.org, sparclinux@vger.kernel.org, linux-arch@vger.kernel.org
+Cc: Michal Marek <mmarek@suse.cz>, Russell King <linux@arm.linux.org.uk>, nico@fluxnic.net, Haavard Skinnemoen <hskinnemoen@gmail.com>, Mike Frysinger <vapier@gentoo.org>, Michal Simek <monstr@monstr.eu>, Paul Mundt <lethal@linux-sh.org>, "David S. Miller" <davem@davemloft.net>, Guan Xuetao <gxt@mprc.pku.edu.cn>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-arm-kernel@lists.infradead.org, uclinux-dist-devel@blackfin.uclinux.org, microblaze-uclinux@itee.uq.edu.au, linux-sh@vger.kernel.org, sparclinux@vger.kernel.org, linux-arch@vger.kernel.org
 
-On Tue, 2012-03-06 at 17:30 -0700, Stephen Warren wrote:
-> This allows the user to use U-Boot's mkimage's -T kernel_noload option
-> if their arch Kconfig allows it, and they desire.
+Around Tue 06 Mar 2012 17:30:36 -0700 or thereabout, Stephen Warren wrote:
+> All ARCHs have the same definition of MKIMAGE. Move it to Makefile.lib
+> to avoid duplication.
+> 
+> All ARCHs have similar definitions of cmd_uimage. Place a sufficiently
+> parameterized version in Makefile.lib to avoid duplication.
+> 
+> The centralized cmd_uimage definition will allow the future introduction
+> of a centralized Kconfig option to make cmd_uimage use -T kernel_noload
+> rather than -T kernel.
 > 
 > Signed-off-by: Stephen Warren <swarren@wwwdotorg.org>
 > ---
-> The next patch enables this new CONFIG_ALLOW_ option for ARM. I assume
-> that some other architectures will also be able to enable it, but I'm
-> not familiar enough with any to know which.
+> NOTE: I have not tested this patch in any way at all for architectures
+> other than ARM.
 > 
->  init/Kconfig         |   15 +++++++++++++++
->  scripts/Makefile.lib |   15 ++++++++++++---
->  2 files changed, 27 insertions(+), 3 deletions(-)
-> 
-> diff --git a/init/Kconfig b/init/Kconfig
-> index 6cfd71d..2035562 100644
-> --- a/init/Kconfig
-> +++ b/init/Kconfig
-> @@ -203,6 +203,21 @@ config KERNEL_LZO
->  
->  endchoice
->  
-> +config ALLOW_UIMAGE_KERNEL_NOLOAD
-> +	bool
-> +
-> +config UIMAGE_KERNEL_NOLOAD
-> +	bool "Use mkimage's -T kernel_noload instead of -T kernel"
-> +	depends on ALLOW_UIMAGE_KERNEL_NOLOAD
-> +	help
-> +	  uImage files of type "kernel" embed an absolute load and entry point
-> +	  address. If the uImage is loaded to a different address, then the
-> +	  image must be copied the uImage file to the specified load address.
-> +	  This copy is a waste of time if the uImage is in fact completely
-> +	  relocatable. If your kernel and bootloader support it, you can build
-> +	  a "kernel_noload" uImage rather than a "kernel" uImage, which
-> +	  prevents any such copying. If unsure say N.
-> +
->  config DEFAULT_HOSTNAME
->  	string "Default hostname"
->  	default "(none)"
-> diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-> index 7b0be18..d9c1c87 100644
-> --- a/scripts/Makefile.lib
-> +++ b/scripts/Makefile.lib
-> @@ -314,9 +314,18 @@ MKIMAGE := $(srctree)/scripts/mkuboot.sh
->  UIMAGE_ARCH = $(SRCARCH)
->  UIMAGE_COMPRESSION = $(if $(2),$(2),none)
->  UIMAGE_OPTS-y =
-> -UIMAGE_TYPE = kernel
-> -UIMAGE_LOADADDR=arch_must_set_this
-> -UIMAGE_ENTRYADDR=$(UIMAGE_LOADADDR)
-> +ifeq ($(CONFIG_UIMAGE_KERNEL_NOLOAD),y)
-> +  UIMAGE_TYPE = kernel_noload
-> +  # Unused by bootloader:
-> +  UIMAGE_LOADADDR=0
-> +  # Entry point relative to actual load address:
-> +  UIMAGE_ENTRYADDR=0
-> +else
-> +  UIMAGE_TYPE = kernel
-> +  # Absolute addresses:
-> +  UIMAGE_LOADADDR=arch_must_set_this
-> +  UIMAGE_ENTRYADDR=$(UIMAGE_LOADADDR)
-> +endif
->  UIMAGE_NAME = 'Linux-$(KERNELRELEASE)'
->  UIMAGE_IN = $<
->  UIMAGE_OUT = $@
-Hi, Stephen,
-It seems that UIMAGE_ARCH and UIMAGE_LOADADDR can't be modified from
-arch-Makefiles.
+>  arch/arm/boot/Makefile          |   23 +++++++++--------------
+>  arch/avr32/boot/images/Makefile |    9 +++------
 
-Regards,
+For the AVR32 related changes
 
-Guan Xuetao
+Acked-by: Hans-Christian Egtvedt <egtvedt@samfundet.no>
 
+-- 
+Best regards, Hans-Christian Egtvedt
