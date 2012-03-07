@@ -1,69 +1,61 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from avon.wwwdotorg.org ([70.85.31.133]:54387 "EHLO
-	avon.wwwdotorg.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752248Ab2CGSkY (ORCPT
+Received: from relais.videotron.ca ([24.201.245.36]:52685 "EHLO
+	relais.videotron.ca" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1759591Ab2CGSuX (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 7 Mar 2012 13:40:24 -0500
-Message-ID: <4F57AB92.6060907@wwwdotorg.org>
-Date: Wed, 07 Mar 2012 11:40:18 -0700
-From: Stephen Warren <swarren@wwwdotorg.org>
-MIME-Version: 1.0
+	Wed, 7 Mar 2012 13:50:23 -0500
+MIME-version: 1.0
+Content-transfer-encoding: 7BIT
+Content-type: TEXT/PLAIN; CHARSET=US-ASCII
+Date: Wed, 07 Mar 2012 13:50:22 -0500 (EST)
+From: Nicolas Pitre <nico@fluxnic.net>
 Subject: Re: [PATCH 2/3] Kbuild: Implement CONFIG_UIMAGE_KERNEL_NOLOAD
-References: <1331080238-1524-1-git-send-email-swarren@wwwdotorg.org> <1331080238-1524-2-git-send-email-swarren@wwwdotorg.org> <20120307180815.GA27213@game.jcrosoft.org>
-In-Reply-To: <20120307180815.GA27213@game.jcrosoft.org>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+In-reply-to: <20120307180815.GA27213@game.jcrosoft.org>
+Message-id: <alpine.LFD.2.02.1203071336210.24151@xanadu.home>
+References: <1331080238-1524-1-git-send-email-swarren@wwwdotorg.org>
+ <1331080238-1524-2-git-send-email-swarren@wwwdotorg.org>
+ <20120307180815.GA27213@game.jcrosoft.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Jean-Christophe PLAGNIOL-VILLARD <plagnioj@jcrosoft.com>
-Cc: Michal Marek <mmarek@suse.cz>, linux-arch@vger.kernel.org, Michal Simek <monstr@monstr.eu>, Guan Xuetao <gxt@mprc.pku.edu.cn>, Mike Frysinger <vapier@gentoo.org>, nico@fluxnic.net, linux-sh@vger.kernel.org, microblaze-uclinux@itee.uq.edu.au, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Paul Mundt <lethal@linux-sh.org>, uclinux-dist-devel@blackfin.uclinux.org, sparclinux@vger.kernel.org, Russell King <linux@arm.linux.org.uk>, Haavard Skinnemoen <hskinnemoen@gmail.com>, "David S. Miller" <davem@davemloft.net>, linux-arm-kernel@lists.infradead.org, Hans-Christian Egtvedt <egtvedt@samfundet.no>
+Cc: Stephen Warren <swarren@wwwdotorg.org>, Michal Marek <mmarek@suse.cz>, linux-arch@vger.kernel.org, Michal Simek <monstr@monstr.eu>, Guan Xuetao <gxt@mprc.pku.edu.cn>, Mike Frysinger <vapier@gentoo.org>, linux-sh@vger.kernel.org, microblaze-uclinux@itee.uq.edu.au, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Paul Mundt <lethal@linux-sh.org>, uclinux-dist-devel@blackfin.uclinux.org, sparclinux@vger.kernel.org, Russell King <linux@arm.linux.org.uk>, Haavard Skinnemoen <hskinnemoen@gmail.com>, "David S. Miller" <davem@davemloft.net>, linux-arm-kernel@lists.infradead.org, Hans-Christian Egtvedt <egtvedt@samfundet.no>
 
-On 03/07/2012 11:08 AM, Jean-Christophe PLAGNIOL-VILLARD wrote:
+On Wed, 7 Mar 2012, Jean-Christophe PLAGNIOL-VILLARD wrote:
+
 > On 17:30 Tue 06 Mar     , Stephen Warren wrote:
->> This allows the user to use U-Boot's mkimage's -T kernel_noload option
->> if their arch Kconfig allows it, and they desire.
->>
->> Signed-off-by: Stephen Warren <swarren@wwwdotorg.org>
->> ---
->> The next patch enables this new CONFIG_ALLOW_ option for ARM. I assume
->> that some other architectures will also be able to enable it, but I'm
->> not familiar enough with any to know which.
+> > This allows the user to use U-Boot's mkimage's -T kernel_noload option
+> > if their arch Kconfig allows it, and they desire.
+> > 
+> > Signed-off-by: Stephen Warren <swarren@wwwdotorg.org>
+> > ---
+> > The next patch enables this new CONFIG_ALLOW_ option for ARM. I assume
+> > that some other architectures will also be able to enable it, but I'm
+> > not familiar enough with any to know which.
 > I'm going to repeat. I don't think any impromevent here.
-> 
-> with no specific kernel load address the uImage for is useless/
 
-No, the whole point of this type of kernel image is that it doesn't need
-a specific load address; the kernel zImage can run from anywhere in RAM
-(provided AUTO_ZRELADDR is enabled, subject to some slight
-restrictions), and hence the uImage doesn't need to be loaded to or
-moved to any particular location.
+You know what?  I agree with you... on a conceptual level only though.
 
-The scripts that U-Boot runs determine where the image gets loaded into
-memory.
+In reality, some people are are just too used to it, either for 
+emotional reasons or simply because that's what was there before so they 
+simply perpetuated it without thinking further, or whatever.  REmoving 
+that support would just upset a lot of people.  And frankly we have 
+better things to do than starting a flamewar over this.
 
-> And this no the job of the kernel to build a boot loader specific boot image
-> format.
-
-Not everyone agrees with this.
+So the next best thing is to make this u-Boot stuff well contained in a 
+common place and make sure it doesn't spread incoherently over multiple 
+architecture's directories and makefiles.  This way the u-Boot cruft 
+won't be the ARM maintainer, or the PPC maintainer, or the SPARC 
+maintainer, or any other architecture maintainer's business, but the 
+responsibility of those who do care about it without affecting anyone 
+else.
 
 > And the uImage format here is called the legacy format where now U-Boot
 > support a new format based on DT format.
 > 
 > Will you plan to add it too?
 
-No. The last time I heard anyone talk about that, it sounded like the
-adoption was basically zero, so it seems pointless. Personally, I find
-creating that kind of image more complex, and don't see any benefits in
-that format either.
+Why not if someone cares?  At least this will be done only 
+once, centrally, without having to involve architecture maintainers.
 
-> no sorry I don't think it's the right way to go.
-> 
-> On X86 we boot zImage simply. The new uImage option to do not specify the load
-> address add nothing more than just boot a zImage for kernel point of view.
 
-U-Boot does not currently have the ability to boot zImage on ARM.
-
-> Further more on server the vendor will use grub mostly (even on ARM) and will
-> expect to boot a zImage.
-
-But that is irrelevant for the people who are using U-Boot not grub.
+Nicolas
