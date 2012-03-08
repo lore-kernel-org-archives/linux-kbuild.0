@@ -1,50 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lpp01m010-f46.google.com ([209.85.215.46]:42202 "EHLO
-	mail-lpp01m010-f46.google.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1754519Ab2CHIMx (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 8 Mar 2012 03:12:53 -0500
-From: Paulius Zaleckas <paulius.zaleckas@gmail.com>
-Subject: [PATCH RESEND 2/2] menuconfig: add Home and End keys support for
- inputbox
-Date: Thu, 08 Mar 2012 10:12:49 +0200
-Message-ID: <20120308081249.3221.25820.stgit@localhost.localdomain>
-In-Reply-To: <20120308081240.3221.39451.stgit@localhost.localdomain>
-References: <20120308081240.3221.39451.stgit@localhost.localdomain>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
+Received: from nat28.tlf.novell.com ([130.57.49.28]:33397 "EHLO
+	nat28.tlf.novell.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751248Ab2CHJki convert rfc822-to-8bit (ORCPT
+	<rfc822;groupwise-linux-kbuild@vger.kernel.org:3:1>);
+	Thu, 8 Mar 2012 04:40:38 -0500
+Message-Id: <4F588CD50200007800077112@nat28.tlf.novell.com>
+Date: Thu, 08 Mar 2012 09:41:25 +0000
+From: "Jan Beulich" <JBeulich@suse.com>
+Subject: [PATCH] modpost: fix ALL_INIT_DATA_SECTIONS
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8BIT
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: mmarek@suse.cz, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: rusty@rustcorp.com.au, Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Makes long string editing easier.
+This was lacking a comma between two supposed to be separate strings.
 
-Signed-off-by: Paulius Zaleckas <paulius.zaleckas@gmail.com>
+Signed-off-by: Jan Beulich <jbeulich@suse.com>
+
 ---
+ scripts/mod/modpost.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
- scripts/kconfig/lxdialog/inputbox.c |   10 ++++++++++
- 1 files changed, 10 insertions(+), 0 deletions(-)
+--- 3.3-rc6/scripts/mod/modpost.c
++++ 3.3-rc6-modpost-all-init-data/scripts/mod/modpost.c
+@@ -849,7 +849,7 @@ static void check_section(const char *mo
+ 
+ #define ALL_INIT_DATA_SECTIONS \
+ 	".init.setup$", ".init.rodata$", \
+-	".devinit.rodata$", ".cpuinit.rodata$", ".meminit.rodata$" \
++	".devinit.rodata$", ".cpuinit.rodata$", ".meminit.rodata$", \
+ 	".init.data$", ".devinit.data$", ".cpuinit.data$", ".meminit.data$"
+ #define ALL_EXIT_DATA_SECTIONS \
+ 	".exit.data$", ".devexit.data$", ".cpuexit.data$", ".memexit.data$"
 
-diff --git a/scripts/kconfig/lxdialog/inputbox.c b/scripts/kconfig/lxdialog/inputbox.c
-index 834eee9..0d9cacc 100644
---- a/scripts/kconfig/lxdialog/inputbox.c
-+++ b/scripts/kconfig/lxdialog/inputbox.c
-@@ -158,6 +158,16 @@ do_resize:
- 					goto redraw;
- 				}
- 				continue;
-+			case KEY_HOME:
-+				scroll = input_x = 0;
-+				goto redraw;
-+			case KEY_END:
-+				if (len >= box_width) {
-+					scroll = len - box_width + 1;
-+					input_x = box_width - 1;
-+				} else
-+					input_x = len;
-+				goto redraw;
- 			default:
- 				if (key < 0x100 && isprint(key)) {
- 					if (len < MAX_LEN) {
+
 
