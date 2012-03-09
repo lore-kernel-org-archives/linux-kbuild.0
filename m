@@ -1,41 +1,83 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from nat28.tlf.novell.com ([130.57.49.28]:33397 "EHLO
-	nat28.tlf.novell.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751248Ab2CHJki convert rfc822-to-8bit (ORCPT
-	<rfc822;groupwise-linux-kbuild@vger.kernel.org:3:1>);
-	Thu, 8 Mar 2012 04:40:38 -0500
-Message-Id: <4F588CD50200007800077112@nat28.tlf.novell.com>
-Date: Thu, 08 Mar 2012 09:41:25 +0000
-From: "Jan Beulich" <JBeulich@suse.com>
-Subject: [PATCH] modpost: fix ALL_INIT_DATA_SECTIONS
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8BIT
-Content-Disposition: inline
+Received: from mail-yw0-f46.google.com ([209.85.213.46]:60113 "EHLO
+	mail-yw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755764Ab2CIWCJ (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 9 Mar 2012 17:02:09 -0500
+Received: by yhmm54 with SMTP id m54so1226439yhm.19
+        for <linux-kbuild@vger.kernel.org>; Fri, 09 Mar 2012 14:02:09 -0800 (PST)
+From: Alan Ott <alan@signal11.us>
+Subject: [PATCH 1/2] Makefile: Add INSTALL_MOD_PATH to the environment used by depmod
+Date: Fri,  9 Mar 2012 17:02:02 -0500
+Message-Id: <1331330522-15129-1-git-send-email-alan@signal11.us>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: rusty@rustcorp.com.au, Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: Alan Ott <alan@signal11.us>
 
-This was lacking a comma between two supposed to be separate strings.
+Add INSTALL_MOD_PATH explicitly to the environment given to depmod.  This
+way putting an INSTALL_MOD_PATH line into a GNUmakefile (along with things
+like CROSS_COMPILE) will work properly.
 
-Signed-off-by: Jan Beulich <jbeulich@suse.com>
-
+Signed-off-by: Alan Ott <alan@signal11.us>
 ---
- scripts/mod/modpost.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
---- 3.3-rc6/scripts/mod/modpost.c
-+++ 3.3-rc6-modpost-all-init-data/scripts/mod/modpost.c
-@@ -849,7 +849,7 @@ static void check_section(const char *mo
+It seems to be a common practice to put make variables into a file named
+GNUmakefile in the top level of the kernel tree (and then include the normal
+Makefile[1] from GNUmakefile).  These are typically variables needed for a
+cross-compiling environment (such as ARCH and CROSS_COMPILE).  The idea
+is that when make is invoked, GNUmakefile will be read first and thus
+able to set up the environment without the user having to type:
+	make ARCH=arm CROSS_COMPILE=arm-linux-
+every single time they want to make a build.
+
+INSTALL_MOD_PATH doesn't work when put into a GNUmakefile like this. The
+difference is that when variables go on the command line like above, they
+get put into the environment of the make process as environment variables,
+which would then get passed to processes which make spawns (such as depmod),
+since they're part of make's environment.  When they're put into the
+GNUmakefile instead, they become make variables only, and not part of the
+environment, and thus not automatically passed to spawned processes such as
+depmod.
+
+In the current implementation, if INSTALL_MOD_PATH is put into a
+GNUmakefile, then when make modules_install is called, the modules are put
+into the right place (because this operation relies on the make variable),
+but depmod then can't find the modules (because it doesn't get
+INSTALL_MOD_PATH put into its environment).
+
+This patch explicitly adds INSTALL_MOD_PATH to the environment when the
+depmod script gets started.
+
+I fully realize that there may very well be a better way to fix this which
+I'm not aware of.
+
+Alan.
+
+[1] For example, here's my GNUmakefile, which I put in the root of the
+kernel tree:
+	ARCH=arm
+	INSTALL_MOD_PATH=/home/alan/work/rootfs
+	CROSS_COMPILE=arm-linux-
+	include Makefile
+---
+ Makefile |    3 ++-
+ 1 files changed, 2 insertions(+), 1 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 5f1739b..c9c9ac0 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1525,7 +1525,8 @@ quiet_cmd_rmfiles = $(if $(wildcard $(rm-files)),CLEAN   $(wildcard $(rm-files))
  
- #define ALL_INIT_DATA_SECTIONS \
- 	".init.setup$", ".init.rodata$", \
--	".devinit.rodata$", ".cpuinit.rodata$", ".meminit.rodata$" \
-+	".devinit.rodata$", ".cpuinit.rodata$", ".meminit.rodata$", \
- 	".init.data$", ".devinit.data$", ".cpuinit.data$", ".meminit.data$"
- #define ALL_EXIT_DATA_SECTIONS \
- 	".exit.data$", ".devexit.data$", ".cpuexit.data$", ".memexit.data$"
-
-
+ # Run depmod only if we have System.map and depmod is executable
+ quiet_cmd_depmod = DEPMOD  $(KERNELRELEASE)
+-      cmd_depmod = $(CONFIG_SHELL) $(srctree)/scripts/depmod.sh $(DEPMOD) \
++      cmd_depmod = INSTALL_MOD_PATH=$(INSTALL_MOD_PATH) $(CONFIG_SHELL) \
++                   $(srctree)/scripts/depmod.sh $(DEPMOD) \
+                    $(KERNELRELEASE)
+ 
+ # Create temporary dir for module support files
+-- 
+1.7.0.4
 
