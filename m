@@ -1,43 +1,67 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-gx0-f174.google.com ([209.85.161.174]:61032 "EHLO
-	mail-gx0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752423Ab2CJXmE (ORCPT
+Received: from stringer.orebokech.com ([88.190.240.207]:41103 "EHLO
+	stringer.orebokech.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751557Ab2CKUnB (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 10 Mar 2012 18:42:04 -0500
-Received: by gghe5 with SMTP id e5so1708632ggh.19
-        for <linux-kbuild@vger.kernel.org>; Sat, 10 Mar 2012 15:42:03 -0800 (PST)
-From: Alan Ott <alan@signal11.us>
-Subject: [PATCH v2] kbuild: export INSTALL_MOD_PATH to the environment used by depmod
-Date: Sat, 10 Mar 2012 18:41:46 -0500
-Message-Id: <1331422906-24503-1-git-send-email-alan@signal11.us>
-In-Reply-To: <1331330522-15129-1-git-send-email-alan@signal11.us>
-References: <1331330522-15129-1-git-send-email-alan@signal11.us>
+	Sun, 11 Mar 2012 16:43:01 -0400
+From: Romain Francoise <romain@orebokech.com>
+Subject: [PATCH] kbuild, deb-pkg: pass options to dpkg-deb via KBUILD_DEBOPTS
+Date: Sun, 11 Mar 2012 21:34:59 +0100
+Message-Id: <1331498099-23597-1-git-send-email-romain@orebokech.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: Alan Ott <alan@signal11.us>
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org, Ben Hutchings <ben@decadent.org.uk>, maximilian attems <max@stro.at>
 
-Export INSTALL_MOD_PATH explicitly to the environment given to depmod.  This
-way putting an INSTALL_MOD_PATH line into a GNUmakefile (with things
-like CROSS_COMPILE and ARCH) will work properly.
+Call dpkg-deb directly instead of using the dpkg front-end, and pass it
+any options found in the new KBUILD_DEBOPTS variable. With "-Zxz", this
+allows compressing packages with xz instead of gzip, which provides very
+significant space savings (x86-64 allmodconfig):
+                                gzip    xz
+    linux-firmware-image.deb    1.2M    903K
+    linux-headers.deb           7.3M    5.1M
+    linux-image.deb             197M    118M
+    linux-libc-dev.deb          855K    653K
 
-Signed-off-by: Alan Ott <alan@signal11.us>
+Signed-off-by: Romain Francoise <romain@orebokech.com>
 ---
- Makefile |    1 +
- 1 files changed, 1 insertions(+), 0 deletions(-)
+ Documentation/kbuild/kbuild.txt |    6 ++++++
+ scripts/package/builddeb        |    2 +-
+ 2 files changed, 7 insertions(+), 1 deletions(-)
+ mode change 100644 => 100755 scripts/package/builddeb
 
-diff --git a/Makefile b/Makefile
-index 5f1739b..c4a238a 100644
---- a/Makefile
-+++ b/Makefile
-@@ -385,6 +385,7 @@ export ARCH SRCARCH CONFIG_SHELL HOSTCC HOSTCFLAGS CROSS_COMPILE AS LD CC
- export CPP AR NM STRIP OBJCOPY OBJDUMP
- export MAKE AWK GENKSYMS INSTALLKERNEL PERL UTS_MACHINE
- export HOSTCXX HOSTCXXFLAGS LDFLAGS_MODULE CHECK CHECKFLAGS
-+export INSTALL_MOD_PATH
+diff --git a/Documentation/kbuild/kbuild.txt b/Documentation/kbuild/kbuild.txt
+index 68e32bb..63897fb 100644
+--- a/Documentation/kbuild/kbuild.txt
++++ b/Documentation/kbuild/kbuild.txt
+@@ -81,6 +81,12 @@ the UTS_MACHINE variable, and on some architectures also the kernel config.
+ The value of KBUILD_DEBARCH is assumed (not checked) to be a valid Debian
+ architecture.
  
- export KBUILD_CPPFLAGS NOSTDINC_FLAGS LINUXINCLUDE OBJCOPYFLAGS LDFLAGS
- export KBUILD_CFLAGS CFLAGS_KERNEL CFLAGS_MODULE CFLAGS_GCOV
++KBUILD_DEBOPTS
++--------------------------------------------------
++For the deb-pkg target, allows passing options to dpkg-deb. For example,
++setting this variable to "-Zxz" will result in xz-compressed packages
++(instead of the default gzip).
++
+ ARCH
+ --------------------------------------------------
+ Set ARCH to the architecture to be built.
+diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+old mode 100644
+new mode 100755
+index 3c6c0b1..f44f0a8
+--- a/scripts/package/builddeb
++++ b/scripts/package/builddeb
+@@ -63,7 +63,7 @@ create_package() {
+ 
+ 	# Create the package
+ 	dpkg-gencontrol -isp $forcearch -p$pname -P"$pdir"
+-	dpkg --build "$pdir" ..
++	dpkg-deb $KBUILD_DEBOPTS --build "$pdir" ..
+ }
+ 
+ # Some variables and settings used throughout the script
 -- 
-1.7.0.4
+1.7.9.1
 
