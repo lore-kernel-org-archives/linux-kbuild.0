@@ -1,52 +1,26 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from msa105.auone-net.jp ([61.117.18.165]:57138 "EHLO
-	msa105.auone-net.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756004Ab2CTKcI (ORCPT
+Received: from [189.30.18.26] ([189.30.18.26]:42351 "EHLO
+	servidor.alegrete.rs.gov.br" rhost-flags-FAIL-FAIL-OK-OK)
+	by vger.kernel.org with ESMTP id S1754159Ab2CUIhm (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 20 Mar 2012 06:32:08 -0400
-Date: Tue, 20 Mar 2012 19:26:27 +0900
-From: Kusanagi Kouichi <slash@ac.auone-net.jp>
-Subject: [PATCH] deb-pkg: Fix build error on read-only source
+	Wed, 21 Mar 2012 04:37:42 -0400
+Message-ID: <49911.216.172.135.175.1332131401.squirrel@www.alegrete.rs.gov.br>
+Date: Mon, 19 Mar 2012 01:30:01 -0300 (BRT)
+Subject: URGENT RESPONSE
+From: "Cheung Leung" <info@hangseng.com>
+Reply-To: hangsengbnk@alternativefuse.com
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Message-Id: <20120320102628.02DC16FC039@msa105.auone-net.jp>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
 
-$ make O=/tmp/a V=1 deb-pkg
-...
-make -C /usr/src/linux O=/tmp/a/. headers_check
-set -e; : '  CHK     include/linux/version.h'; mkdir -p include/linux/;         (echo \#define LINUX_VERSION_CODE 197376; echo '#define KERNEL_VERSION(a,b,c) (((a) << 16) + ((b) << 8) + (c))';) < /usr/src/linux/Makefile > include/linux/version.h.tmp; if [ -r include/linux/version.h ] && cmp -s include/linux/version.h include/linux/version.h.tmp; then rm -f include/linux/version.h.tmp; else : '  UPD     include/linux/version.h'; mv -f include/linux/version.h.tmp include/linux/version.h; fi
-/bin/sh: 1: cannot create include/linux/version.h.tmp: Read-only file system
-make[4]: *** [include/linux/version.h] Error 2
-make[3]: *** [all] Error 2
-make[2]: *** [deb-pkg] Error 2
-make[1]: *** [deb-pkg] Error 2
-make: *** [sub-make] Error 2
 
-Signed-off-by: Kusanagi Kouichi <slash@ac.auone-net.jp>
----
- scripts/package/builddeb |    4 ++--
- 1 files changed, 2 insertions(+), 2 deletions(-)
+DEAR SIR,
+   Your funds are ready to be transferred to you, please which account should
+we use to transfer the funds, reply me Immediately so that we can start
+the transfer process immediately.Thank you.
+ Best regards
+ CHEUNG LEUNG
 
-diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-index 3c6c0b1..ceb1de2 100644
---- a/scripts/package/builddeb
-+++ b/scripts/package/builddeb
-@@ -127,8 +127,8 @@ if grep -q '^CONFIG_MODULES=y' .config ; then
- 	fi
- fi
- 
--make headers_check
--make headers_install INSTALL_HDR_PATH="$libc_headers_dir/usr"
-+make KBUILD_SRC= headers_check
-+make KBUILD_SRC= headers_install INSTALL_HDR_PATH="$libc_headers_dir/usr"
- 
- # Install the maintainer scripts
- # Note: hook scripts under /etc/kernel are also executed by official Debian
--- 
-1.7.9.1
 
