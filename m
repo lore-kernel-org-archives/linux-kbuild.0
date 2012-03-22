@@ -1,26 +1,39 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from [189.30.18.26] ([189.30.18.26]:42351 "EHLO
-	servidor.alegrete.rs.gov.br" rhost-flags-FAIL-FAIL-OK-OK)
-	by vger.kernel.org with ESMTP id S1754159Ab2CUIhm (ORCPT
+Received: from msa101.auone-net.jp ([61.117.18.161]:59009 "EHLO
+	msa101.auone-net.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755447Ab2CVJxT (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 21 Mar 2012 04:37:42 -0400
-Message-ID: <49911.216.172.135.175.1332131401.squirrel@www.alegrete.rs.gov.br>
-Date: Mon, 19 Mar 2012 01:30:01 -0300 (BRT)
-Subject: URGENT RESPONSE
-From: "Cheung Leung" <info@hangseng.com>
-Reply-To: hangsengbnk@alternativefuse.com
+	Thu, 22 Mar 2012 05:53:19 -0400
+Date: Thu, 22 Mar 2012 18:53:17 +0900
+From: Kusanagi Kouichi <slash@ac.auone-net.jp>
+Subject: [PATCH] deb-pkg: Update git repository URL
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7BIT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Message-Id: <20120322095318.272823E403B@msa101.auone-net.jp>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
+To: linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
 
+Signed-off-by: Kusanagi Kouichi <slash@ac.auone-net.jp>
+---
+ scripts/package/builddeb |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-DEAR SIR,
-   Your funds are ready to be transferred to you, please which account should
-we use to transfer the funds, reply me Immediately so that we can start
-the transfer process immediately.Thank you.
- Best regards
- CHEUNG LEUNG
-
+diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+index 3c6c0b1..335ec15 100644
+--- a/scripts/package/builddeb
++++ b/scripts/package/builddeb
+@@ -186,7 +186,7 @@ ftp://ftp.kernel.org/pub/linux/kernel
+ Copyright: 1991 - 2009 Linus Torvalds and others.
+ 
+ The git repository for mainline kernel development is at:
+-git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux-2.6.git
++git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
+ 
+     This program is free software; you can redistribute it and/or modify
+     it under the terms of the GNU General Public License as published by
+-- 
+1.7.9.1
 
