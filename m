@@ -1,64 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.gentoo.org ([140.211.166.183]:48836 "EHLO smtp.gentoo.org"
+Received: from e3.ny.us.ibm.com ([32.97.182.143]:48667 "EHLO e3.ny.us.ibm.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1759880Ab2CVUxS (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 22 Mar 2012 16:53:18 -0400
-From: Mike Frysinger <vapier@gentoo.org>
-Subject: Re: [PATCH] Kbuild: centralize MKIMAGE and cmd_uimage definitions
-Date: Thu, 22 Mar 2012 16:53:13 -0400
-References: <1331931835-12346-1-git-send-email-swarren@wwwdotorg.org> <4F6B7226.8000102@wwwdotorg.org>
-In-Reply-To: <4F6B7226.8000102@wwwdotorg.org>
-MIME-Version: 1.0
-Content-Type: multipart/signed;
-  boundary="nextPart1752955.pLbPd6Gma6";
-  protocol="application/pgp-signature";
-  micalg=pgp-sha1
-Content-Transfer-Encoding: 7bit
-Message-Id: <201203221653.19268.vapier@gentoo.org>
+	id S1756718Ab2CVWF5 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 22 Mar 2012 18:05:57 -0400
+Received: from /spool/local
+	by e3.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+	for <linux-kbuild@vger.kernel.org> from <jstultz@us.ibm.com>;
+	Thu, 22 Mar 2012 18:05:56 -0400
+Received: from d01relay06.pok.ibm.com (d01relay06.pok.ibm.com [9.56.227.116])
+	by d01dlp02.pok.ibm.com (Postfix) with ESMTP id 013116E8053
+	for <linux-kbuild@vger.kernel.org>; Thu, 22 Mar 2012 18:05:54 -0400 (EDT)
+Received: from d01av04.pok.ibm.com (d01av04.pok.ibm.com [9.56.224.64])
+	by d01relay06.pok.ibm.com (8.13.8/8.13.8/NCO v10.0) with ESMTP id q2MM5rDk3014894
+	for <linux-kbuild@vger.kernel.org>; Thu, 22 Mar 2012 18:05:53 -0400
+Received: from d01av04.pok.ibm.com (loopback [127.0.0.1])
+	by d01av04.pok.ibm.com (8.14.4/8.13.1/NCO v10.0 AVout) with ESMTP id q2MM5rfL030560
+	for <linux-kbuild@vger.kernel.org>; Thu, 22 Mar 2012 18:05:53 -0400
+From: John Stultz <john.stultz@linaro.org>
+Subject: [PATCH 1/2] merge_config.sh: Set execute bit
+Date: Thu, 22 Mar 2012 15:05:48 -0700
+Message-Id: <1332453949-5872-2-git-send-email-john.stultz@linaro.org>
+In-Reply-To: <1332453949-5872-1-git-send-email-john.stultz@linaro.org>
+References: <1332453949-5872-1-git-send-email-john.stultz@linaro.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Stephen Warren <swarren@wwwdotorg.org>
-Cc: Michal Marek <mmarek@suse.cz>, Russell King <linux@arm.linux.org.uk>, nico@fluxnic.net, Haavard Skinnemoen <hskinnemoen@gmail.com>, Hans-Christian Egtvedt <egtvedt@samfundet.no>, Michal Simek <monstr@monstr.eu>, Paul Mundt <lethal@linux-sh.org>, "David S. Miller" <davem@davemloft.net>, Guan Xuetao <gxt@mprc.pku.edu.cn>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-arm-kernel@lists.infradead.org, uclinux-dist-devel@blackfin.uclinux.org, microblaze-uclinux@itee.uq.edu.au, linux-sh@vger.kernel.org, sparclinux@vger.kernel.org, linux-arch@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
+Cc: John Stultz <john.stultz@linaro.org>, Michal Marek <mmarek@suse.cz>, Bruce.Ashfield@windriver.com, Darren Hart <dvhart@linux.intel.com>
 
---nextPart1752955.pLbPd6Gma6
-Content-Type: Text/Plain;
-  charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+Somehow the merge_config.sh script didn't get its execute bit
+set when it was merged. Fix this.
 
-On Thursday 22 March 2012 14:40:38 Stephen Warren wrote:
-> On 03/16/2012 03:03 PM, Stephen Warren wrote:
-> > All ARCHs have the same definition of MKIMAGE. Move it to Makefile.lib
-> > to avoid duplication.
-> >=20
-> > All ARCHs have similar definitions of cmd_uimage. Place a sufficiently
-> > parameterized version in Makefile.lib to avoid duplication.
->=20
-> Does this change look reasonable? It has acks from people working on 4
-> of the 7 affected architectures; would you prefer acks from all?
+CC: Michal Marek <mmarek@suse.cz>
+CC: Bruce.Ashfield@windriver.com
+CC: Darren Hart <dvhart@linux.intel.com>
+Signed-off-by: John Stultz <john.stultz@linaro.org>
+---
+ 0 files changed, 0 insertions(+), 0 deletions(-)
+ mode change 100644 => 100755 scripts/kconfig/merge_config.sh
 
-isn't that what linux-next is for ? ;)
-=2Dmike
+diff --git a/scripts/kconfig/merge_config.sh b/scripts/kconfig/merge_config.sh
+old mode 100644
+new mode 100755
+-- 
+1.7.3.2.146.gca209
 
---nextPart1752955.pLbPd6Gma6
-Content-Type: application/pgp-signature; name=signature.asc 
-Content-Description: This is a digitally signed message part.
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.17 (GNU/Linux)
-
-iQIcBAABAgAGBQJPa5E/AAoJEEFjO5/oN/WBlkYQAJIXU15l2VlEyOx8RzoCS9jW
-Ki02NiRu2kwnisR+QR4/rQqemlL7tRSK5I2FX8CHnaUU7+RVubB72/gfgvZsNATW
-46cJA5mjcEzNHQanIkR/qGKYdDUKAlMhWvKojflEGer/ri935vxclxpJsUFPtaup
-0qYwdAzZRYiW6+NvZO38H8lUf5yx0hM7dBa6VRSaSxu/dk6B4WQfrvErq1FpYCZL
-5zaFNLSz5S6vszYKcIsAUIy6bnwjoCL7uQEoLVd7Y9eU6W+G4RJg1RsURYnX/YYZ
-qltVjIXkl+QHWddQZaausgxyZAAZCMvOEZ/stOquNUcp3UpCS2qmkJZXU9+GLjH2
-4eyScE6myq/IDGRdz67v9Lmw4iiyVVZF2LFatBs8fdlrS9+hkYBNqdv4tVEUC7gw
-SufZJ2nsnR73loViROh2hcvAz56/vRMWt7kASNQ8BM1APyOKpQ98LA6K1liu/MXy
-+ZR5+3SV7Rv/nMZ2CbSKslZCPcCDegwPLrKx6KvTG+XMHkh9AGsISnn/Q1vBr0t9
-6CXuN7iQBTwaeMXeP+o221fd+qgprWW8TB+cYL9VfT0gON7KowDupJJ3A4VOHH/B
-RGnbR+jZPdCn0dSa1qFmY/KgIwc6wnpqjJoQLhGlymJs+850KWWl4Eih+eOBqvOH
-RVn2rPjAGCnIKXc0NOe5
-=0sml
------END PGP SIGNATURE-----
-
---nextPart1752955.pLbPd6Gma6--
