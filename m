@@ -1,59 +1,84 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from 2481.rev.megiteam.pl ([91.227.36.129]:51225 "EHLO
-	vk1001.megiteam.com.pl" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1758442Ab2CWO7j (ORCPT
+Received: from e35.co.us.ibm.com ([32.97.110.153]:50954 "EHLO
+	e35.co.us.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755550Ab2CWTwt (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 23 Mar 2012 10:59:39 -0400
-Message-ID: <4F6C8FD7.70901@localdomain.pl>
-Date: Fri, 23 Mar 2012 15:59:35 +0100
-From: Grzegorz Nosek <root@localdomain.pl>
-MIME-Version: 1.0
-Subject: [PATCH v2] Don't force deb architecture on universal packages
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+	Fri, 23 Mar 2012 15:52:49 -0400
+Received: from /spool/local
+	by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+	for <linux-kbuild@vger.kernel.org> from <jstultz@us.ibm.com>;
+	Fri, 23 Mar 2012 13:52:46 -0600
+Received: from d01relay04.pok.ibm.com (d01relay04.pok.ibm.com [9.56.227.236])
+	by d01dlp03.pok.ibm.com (Postfix) with ESMTP id 53C4BC90057
+	for <linux-kbuild@vger.kernel.org>; Fri, 23 Mar 2012 15:52:17 -0400 (EDT)
+Received: from d03av02.boulder.ibm.com (d03av02.boulder.ibm.com [9.17.195.168])
+	by d01relay04.pok.ibm.com (8.13.8/8.13.8/NCO v10.0) with ESMTP id q2NJqHJS148416
+	for <linux-kbuild@vger.kernel.org>; Fri, 23 Mar 2012 15:52:17 -0400
+Received: from d03av02.boulder.ibm.com (loopback [127.0.0.1])
+	by d03av02.boulder.ibm.com (8.14.4/8.13.1/NCO v10.0 AVout) with ESMTP id q2NJqG16019946
+	for <linux-kbuild@vger.kernel.org>; Fri, 23 Mar 2012 13:52:17 -0600
+From: John Stultz <john.stultz@linaro.org>
+Subject: [PATCH 2/2] merge_config.sh: Add option to display redundant configs
+Date: Fri, 23 Mar 2012 12:52:08 -0700
+Message-Id: <1332532328-32529-1-git-send-email-john.stultz@linaro.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: Asbjoern Sloth Toennesen <asbjorn@asbjorn.biz>, maximilian attems <max@stro.at>, Michal Marek <mmarek@suse.cz>, root@localdomain.pl
+Cc: John Stultz <john.stultz@linaro.org>, Michal Marek <mmarek@suse.cz>, Bruce.Ashfield@windriver.com, Darren Hart <dvhart@linux.intel.com>
 
-$debarch is basically always set so the Architecture field from
-debian/control is ignored. While we don't really care for most packages
-(they have Architecture: any or some specific $arch), this breaks the
-firmware package as it becomes an arch-dependent .deb, ignoring its
-Architecture: all entry.
+Provide a -r option to display when fragments contain redundant
+options. This is really useful when breaking apart a config into
+fragments, as well as cleaning up older fragments.
 
-It's apparently broken by 10f26fa64200095af0e5d80a980e47877865e4b7.
+v2:
+Now w/ spelling fixes! Thanks Darren!
 
-Signed-off-by: Grzegorz Nosek <root@localdomain.pl>
+CC: Michal Marek <mmarek@suse.cz>
+CC: Bruce.Ashfield@windriver.com
+CC: Darren Hart <dvhart@linux.intel.com>
+Signed-off-by: John Stultz <john.stultz@linaro.org>
 ---
-Note: this is based on 3.2 as that's what I'm currently using. I'll
-rebase onto whatever is required when the general idea is accepted.
+ scripts/kconfig/merge_config.sh |    9 +++++++++
+ 1 files changed, 9 insertions(+), 0 deletions(-)
 
-(earlier version was completely bogus, sorry for that)
-
-Best regards,
- Grzegorz Nosek
-
- scripts/package/builddeb |    7 +++++--
- 1 files changed, 5 insertions(+), 2 deletions(-)
-
-diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-index 3c6c0b1..43476c5 100644
---- a/scripts/package/builddeb
-+++ b/scripts/package/builddeb
-@@ -57,8 +57,11 @@ create_package() {
- 	if [ -n "$KBUILD_DEBARCH" ] ; then
- 		debarch="$KBUILD_DEBARCH"
- 	fi
--	if [ -n "$debarch" ] ; then
--		forcearch="-DArchitecture=$debarch"
-+	if [ -n "$debarch" ]; then
-+		pkgarch=`sed -n "/^Package: $pname\$/,/^\$/s/^Architecture: //p" debian/control`
-+		if [ "$pkgarch" != "all" ]; then
-+			forcearch="-DArchitecture=$debarch"
-+		fi
- 	fi
-
- 	# Create the package
+diff --git a/scripts/kconfig/merge_config.sh b/scripts/kconfig/merge_config.sh
+index ceadf0e..ad8c76e 100755
+--- a/scripts/kconfig/merge_config.sh
++++ b/scripts/kconfig/merge_config.sh
+@@ -31,10 +31,12 @@ usage() {
+ 	echo "  -h    display this help text"
+ 	echo "  -m    only merge the fragments, do not execute the make command"
+ 	echo "  -n    use allnoconfig instead of alldefconfig"
++	echo "  -r    list redundant entries when merging fragments"
+ }
+ 
+ MAKE=true
+ ALLTARGET=alldefconfig
++WARNREDUN=false
+ 
+ while true; do
+ 	case $1 in
+@@ -52,6 +54,11 @@ while true; do
+ 		usage
+ 		exit
+ 		;;
++	"-r")
++		WARNREDUN=true
++		shift
++		continue
++		;;
+ 	*)
+ 		break
+ 		;;
+@@ -79,6 +86,8 @@ for MERGE_FILE in $MERGE_LIST ; do
+ 			echo Previous  value: $PREV_VAL
+ 			echo New value:       $NEW_VAL
+ 			echo
++			elif [ "$WARNREDUN" = "true" ]; then
++			echo Value of $CFG is redundant by fragment $MERGE_FILE:
+ 			fi
+ 			sed -i "/$CFG[ =]/d" $TMP_FILE
+ 		fi
 -- 
-1.7.2.3
+1.7.3.2.146.gca209
+
