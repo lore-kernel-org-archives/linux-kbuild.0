@@ -1,84 +1,55 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga01.intel.com ([192.55.52.88]:47110 "EHLO mga01.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1030231Ab2CWUZb (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 23 Mar 2012 16:25:31 -0400
-Message-ID: <4F6CDC0E.3050000@linux.intel.com>
-Date: Fri, 23 Mar 2012 13:24:46 -0700
-From: Darren Hart <dvhart@linux.intel.com>
+Received: from tx2ehsobe001.messaging.microsoft.com ([65.55.88.11]:37175 "EHLO
+	tx2outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1752454Ab2CXCFd (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 23 Mar 2012 22:05:33 -0400
+Message-ID: <4F6D2BC5.9070200@am.sony.com>
+Date: Fri, 23 Mar 2012 19:04:53 -0700
+From: Frank Rowand <frank.rowand@am.sony.com>
+Reply-To: <frank.rowand@am.sony.com>
 MIME-Version: 1.0
-Subject: Re: [PATCH 2/2] merge_config.sh: Add option to display redundant
- configs
-References: <1332532328-32529-1-git-send-email-john.stultz@linaro.org>
-In-Reply-To: <1332532328-32529-1-git-send-email-john.stultz@linaro.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [PATCH] modpost: Fix modpost's license checking V3
+References: <CACqU3MUXAOMGQ1nzUrtYPEQAC3U-nuq3YurtNJJLS1hft4ROGA@mail.gmail.com> <1310626276-4541-1-git-send-email-abogani@kernel.org>
+In-Reply-To: <1310626276-4541-1-git-send-email-abogani@kernel.org>
+Content-Type: text/plain; charset="ISO-8859-1"
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: John Stultz <john.stultz@linaro.org>
-Cc: linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Bruce.Ashfield@windriver.com
+To: Alessio Igor Bogani <abogani@kernel.org>
+Cc: Rusty Russell <rusty@rustcorp.com.au>, Jan Beulich <jbeulich@novell.com>, Kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, "Bird, Tim" <Tim.Bird@am.sony.com>, Anders Kaseorg <andersk@ksplice.com>, Arnaud Lacombe <lacombar@gmail.com>
+
+On 07/13/11 23:51, Alessio Igor Bogani wrote:
+> The commit f02e8a6 sorts symbols placing each of them in its own elf section.
+> The sorting and merging into the canonical sections are done by the linker.
+> Unfortunately modpost to generate Module.symvers file parses vmlinux
+
+Yet another unfortunately: modpost parses vmlinux.o instead of vmlinux (vmlinux
+does not yet exist at this point of the build).  vmlinux.o also does not have
+the many sections sorted and merged into the canonical sections.  As a result,
+the Module.symvers created my modpost incorrectly reports the license of all
+exports as "(unknown)".
+
+Can you fix this also please?
 
 
-
-On 03/23/2012 12:52 PM, John Stultz wrote:
-> Provide a -r option to display when fragments contain redundant
-> options. This is really useful when breaking apart a config into
-> fragments, as well as cleaning up older fragments.
+> (already linked) and all modules object files (which aren't linked yet).
+> These aren't sanitized by the linker yet. That breaks modpost that can't
+> detect license properly for modules. This patch makes modpost aware of
+> the new exported symbols structure.
 > 
-> v2:
-> Now w/ spelling fixes! Thanks Darren!
+> Thanks to Arnaud Lacombe <lacombar@gmail.com> and Anders Kaseorg
+> <andersk@ksplice.com> for providing useful suggestions about code.
 > 
-> CC: Michal Marek <mmarek@suse.cz>
-> CC: Bruce.Ashfield@windriver.com
-> CC: Darren Hart <dvhart@linux.intel.com>
-> Signed-off-by: John Stultz <john.stultz@linaro.org>
-
-Acked-by: Darren Hart <dvhart@linux.intel.com>
-
+> This work was supported by a hardware donation from the CE Linux Forum.
+> 
+> Reported-by: Jan Beulich <jbeulich@novell.com>
+> Signed-off-by: Alessio Igor Bogani <abogani@kernel.org>
 > ---
->  scripts/kconfig/merge_config.sh |    9 +++++++++
->  1 files changed, 9 insertions(+), 0 deletions(-)
-> 
-> diff --git a/scripts/kconfig/merge_config.sh b/scripts/kconfig/merge_config.sh
-> index ceadf0e..ad8c76e 100755
-> --- a/scripts/kconfig/merge_config.sh
-> +++ b/scripts/kconfig/merge_config.sh
-> @@ -31,10 +31,12 @@ usage() {
->  	echo "  -h    display this help text"
->  	echo "  -m    only merge the fragments, do not execute the make command"
->  	echo "  -n    use allnoconfig instead of alldefconfig"
-> +	echo "  -r    list redundant entries when merging fragments"
->  }
->  
->  MAKE=true
->  ALLTARGET=alldefconfig
-> +WARNREDUN=false
->  
->  while true; do
->  	case $1 in
-> @@ -52,6 +54,11 @@ while true; do
->  		usage
->  		exit
->  		;;
-> +	"-r")
-> +		WARNREDUN=true
-> +		shift
-> +		continue
-> +		;;
->  	*)
->  		break
->  		;;
-> @@ -79,6 +86,8 @@ for MERGE_FILE in $MERGE_LIST ; do
->  			echo Previous  value: $PREV_VAL
->  			echo New value:       $NEW_VAL
->  			echo
-> +			elif [ "$WARNREDUN" = "true" ]; then
-> +			echo Value of $CFG is redundant by fragment $MERGE_FILE:
->  			fi
->  			sed -i "/$CFG[ =]/d" $TMP_FILE
->  		fi
+>  scripts/mod/modpost.c |   29 ++++++++++++++++++++++++++++-
+>  1 files changed, 28 insertions(+), 1 deletions(-)
 
--- 
-Darren Hart
-Intel Open Source Technology Center
-Yocto Project - Linux Kernel
+< snip >
+
+-Frank Rowand
+
