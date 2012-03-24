@@ -1,61 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from am1ehsobe003.messaging.microsoft.com ([213.199.154.206]:32852
-	"EHLO am1outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1755509Ab2CXC0g (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 23 Mar 2012 22:26:36 -0400
-Message-ID: <4F6D30AF.8000204@am.sony.com>
-Date: Fri, 23 Mar 2012 19:25:51 -0700
-From: Frank Rowand <frank.rowand@am.sony.com>
-Reply-To: <frank.rowand@am.sony.com>
+Received: from cantor2.suse.de ([195.135.220.15]:55147 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753990Ab2CXWdJ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 24 Mar 2012 18:33:09 -0400
+Date: Sat, 24 Mar 2012 23:33:07 +0100
+From: Michal Marek <mmarek@suse.cz>
+Subject: Re: [PATCH] scripts/Kbuild.include: Fix portability problem of "echo
+ -e"
+Message-ID: <20120324223307.GC8947@sepie.suse.cz>
+References: <1330277718-2667-1-git-send-email-bernhard@bwalle.de>
+ <20120226174805.GA562@merkur.ravnborg.org>
+ <4F4A7126.6020009@bwalle.de>
+ <20120226210551.GA659@merkur.ravnborg.org>
+ <4F677074.90906@bwalle.de>
 MIME-Version: 1.0
-Subject: Re: [PATCH] modpost: Fix modpost's license checking V3
-References: <CACqU3MUXAOMGQ1nzUrtYPEQAC3U-nuq3YurtNJJLS1hft4ROGA@mail.gmail.com> <1310626276-4541-1-git-send-email-abogani@kernel.org> <4F6D2BC5.9070200@am.sony.com>
-In-Reply-To: <4F6D2BC5.9070200@am.sony.com>
-Content-Type: text/plain; charset="ISO-8859-1"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4F677074.90906@bwalle.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-Cc: "Rowand, Frank" <Frank_Rowand@sonyusa.com>, Alessio Igor Bogani <abogani@kernel.org>, Rusty Russell <rusty@rustcorp.com.au>, Jan Beulich <jbeulich@novell.com>, Kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, "Bird, Tim" <Tim.Bird@am.sony.com>, Anders Kaseorg <andersk@ksplice.com>, Arnaud Lacombe <lacombar@gmail.com>
+To: Bernhard Walle <bernhard@bwalle.de>
+Cc: Sam Ravnborg <sam@ravnborg.org>, lacombar@gmail.com, linux-kernel@vger.kernel.org, linux-kbuild <linux-kbuild@vger.kernel.org>, zippel@linux-m68k.org
 
-On 03/23/12 19:04, Frank Rowand wrote:
-> On 07/13/11 23:51, Alessio Igor Bogani wrote:
->> The commit f02e8a6 sorts symbols placing each of them in its own elf section.
->> The sorting and merging into the canonical sections are done by the linker.
->> Unfortunately modpost to generate Module.symvers file parses vmlinux
+On Mon, Mar 19, 2012 at 06:44:20PM +0100, Bernhard Walle wrote:
+> Am 26.02.12 22:05, schrieb Sam Ravnborg:
+> > On Sun, Feb 26, 2012 at 06:51:34PM +0100, Bernhard Walle wrote:
+> >> Am 26.02.12 18:48, schrieb Sam Ravnborg:
+> >>>>> --- a/scripts/Kbuild.include
+> >>>>> +++ b/scripts/Kbuild.include
+> >>>>> @@ -104,7 +104,7 @@ as-option = $(call try-run,\
+> >>>>>  # Usage: cflags-y += $(call as-instr,instr,option1,option2)
+> >>>>>  
+> >>>>>  as-instr = $(call try-run,\
+> >>>>> -	/bin/echo -e "$(1)" | $(CC) $(KBUILD_AFLAGS) -c -xassembler -o "$$TMP" -,$(2),$(3))
+> >>>>> +	printf "%b\n" "$(1)" | $(CC) $(KBUILD_AFLAGS) -c -xassembler -o "$$TMP" -,$(2),$(3))
+> >>>>>  
+> >>>>>  # cc-option
+> >>>>>  # Usage: cflags-y += $(call cc-option,-march=winchip-c6,-march=i586)
+> >>> Roman Zippel removed use of printf in this patch: beda9f3a13bbb22cde92a45f230a02ef2afef6a9
+> >>>
+> >>> I cannot remember why - but it would be good if you could dig up
+> >>> why - just so we do not hit an old issue again.
+> >>
+> >> Well, he used printf "$(1)", that's different from printf "%b\n" "$(1)"
+> >> since format strings inside $(1) would be interpreted.
+> > Makes good sense.
 > 
-> Yet another unfortunately: modpost parses vmlinux.o instead of vmlinux (vmlinux
-> does not yet exist at this point of the build).  vmlinux.o also does not have
-> the many sections sorted and merged into the canonical sections.  As a result,
-> the Module.symvers created my modpost incorrectly reports the license of all
+> Can we merge that for 3.4? Who is responsible, i.e. whose tree?
 
-                             ^^^ s/my/by/
+I merged it to kbuild.git#kbuild now.
 
-> exports as "(unknown)".
-> 
-> Can you fix this also please?
-> 
-> 
->> (already linked) and all modules object files (which aren't linked yet).
->> These aren't sanitized by the linker yet. That breaks modpost that can't
->> detect license properly for modules. This patch makes modpost aware of
->> the new exported symbols structure.
->>
->> Thanks to Arnaud Lacombe <lacombar@gmail.com> and Anders Kaseorg
->> <andersk@ksplice.com> for providing useful suggestions about code.
->>
->> This work was supported by a hardware donation from the CE Linux Forum.
->>
->> Reported-by: Jan Beulich <jbeulich@novell.com>
->> Signed-off-by: Alessio Igor Bogani <abogani@kernel.org>
->> ---
->>  scripts/mod/modpost.c |   29 ++++++++++++++++++++++++++++-
->>  1 files changed, 28 insertions(+), 1 deletions(-)
-> 
-> < snip >
-> 
-> -Frank Rowand
-> .
-> 
-
-
+Michal
