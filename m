@@ -1,39 +1,42 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:37887 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:38390 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755408Ab2CZUXI (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 26 Mar 2012 16:23:08 -0400
-Date: Mon, 26 Mar 2012 22:23:06 +0200
+	id S1756479Ab2CZUlp (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 26 Mar 2012 16:41:45 -0400
+Date: Mon, 26 Mar 2012 22:41:43 +0200
 From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [PATCH] scripts: refactor remove structure forward declarations
-Message-ID: <20120326202306.GA10259@sepie.suse.cz>
-References: <1331540451-2380-1-git-send-email-hamo.by@gmail.com>
- <4F5E32F2.5030000@codeaurora.org>
- <CAO_0yfMUA6zD4PkUVwdnfjNMXdz-=Fy1GQZjj2N83MKDKzRwiA@mail.gmail.com>
+Subject: Re: [PATCH] modpost: fix ALL_INIT_DATA_SECTIONS
+Message-ID: <20120326204143.GB10259@sepie.suse.cz>
+References: <4F588CD50200007800077112@nat28.tlf.novell.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAO_0yfMUA6zD4PkUVwdnfjNMXdz-=Fy1GQZjj2N83MKDKzRwiA@mail.gmail.com>
+In-Reply-To: <4F588CD50200007800077112@nat28.tlf.novell.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Yang Bai <hamo.by@gmail.com>
-Cc: Stephen Boyd <sboyd@codeaurora.org>, rostedt@goodmis.org, adobriyan@gmail.com, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: Jan Beulich <JBeulich@suse.com>
+Cc: rusty@rustcorp.com.au, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Tue, Mar 13, 2012 at 03:05:47PM +0800, Yang Bai wrote:
-> Ping.
+On Thu, Mar 08, 2012 at 09:41:25AM +0000, Jan Beulich wrote:
+> This was lacking a comma between two supposed to be separate strings.
 > 
-> cc linux-kbuild
+> Signed-off-by: Jan Beulich <jbeulich@suse.com>
 > 
-> On Tue, Mar 13, 2012 at 1:31 AM, Stephen Boyd <sboyd@codeaurora.org> wrote:
-> > On 03/12/12 01:20, Yang Bai wrote:
-> >> Since now it has some problems when generate TAGS,
-> >> refactor this code. Now it will not show the error
-> >> message and will remove declarations using emacs etags.
-> >>
-> >> Signed-off-by: Yang Bai <hamo.by@gmail.com>
-> >
-> > Reviewed-by: Stephen Boyd <sboyd@codeaurora.org>
+> ---
+>  scripts/mod/modpost.c |    2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> --- 3.3-rc6/scripts/mod/modpost.c
+> +++ 3.3-rc6-modpost-all-init-data/scripts/mod/modpost.c
+> @@ -849,7 +849,7 @@ static void check_section(const char *mo
+>  
+>  #define ALL_INIT_DATA_SECTIONS \
+>  	".init.setup$", ".init.rodata$", \
+> -	".devinit.rodata$", ".cpuinit.rodata$", ".meminit.rodata$" \
+> +	".devinit.rodata$", ".cpuinit.rodata$", ".meminit.rodata$", \
 
-Applied to kbuild.git#misc.
+Applied to kbuild.git#kbuild with a Cc: stable. BTW, was it causing actual
+false positives to be reported?
 
+Thanks,
 Michal
