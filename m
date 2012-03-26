@@ -1,42 +1,38 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:38390 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1756479Ab2CZUlp (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 26 Mar 2012 16:41:45 -0400
-Date: Mon, 26 Mar 2012 22:41:43 +0200
-From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [PATCH] modpost: fix ALL_INIT_DATA_SECTIONS
-Message-ID: <20120326204143.GB10259@sepie.suse.cz>
-References: <4F588CD50200007800077112@nat28.tlf.novell.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4F588CD50200007800077112@nat28.tlf.novell.com>
+Received: from 206.83.70.73.ptr.us.xo.net ([206.83.70.73]:59758 "EHLO
+	king.tilera.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754182Ab2CZVKG (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 26 Mar 2012 17:10:06 -0400
+Message-Id: <201203262055.q2QKtusJ010481@farm-0012.internal.tilera.com>
+From: Chris Metcalf <cmetcalf@tilera.com>
+Date: Mon, 26 Mar 2012 16:54:04 -0400
+Subject: [PATCH] mkmakefile: add export of $ARCH if specified on command-line
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jan Beulich <JBeulich@suse.com>
-Cc: rusty@rustcorp.com.au, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Thu, Mar 08, 2012 at 09:41:25AM +0000, Jan Beulich wrote:
-> This was lacking a comma between two supposed to be separate strings.
-> 
-> Signed-off-by: Jan Beulich <jbeulich@suse.com>
-> 
-> ---
->  scripts/mod/modpost.c |    2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> --- 3.3-rc6/scripts/mod/modpost.c
-> +++ 3.3-rc6-modpost-all-init-data/scripts/mod/modpost.c
-> @@ -849,7 +849,7 @@ static void check_section(const char *mo
->  
->  #define ALL_INIT_DATA_SECTIONS \
->  	".init.setup$", ".init.rodata$", \
-> -	".devinit.rodata$", ".cpuinit.rodata$", ".meminit.rodata$" \
-> +	".devinit.rodata$", ".cpuinit.rodata$", ".meminit.rodata$", \
+If you create a new build tree and set "ARCH=foo" on the command
+line, it makes sense for that build tree to remember the architecture
+that it's meant to be built for.
 
-Applied to kbuild.git#kbuild with a Cc: stable. BTW, was it causing actual
-false positives to be reported?
+Signed-off-by: Chris Metcalf <cmetcalf@tilera.com>
+---
+ scripts/mkmakefile |    4 ++++
+ 1 files changed, 4 insertions(+), 0 deletions(-)
 
-Thanks,
-Michal
+diff --git a/scripts/mkmakefile b/scripts/mkmakefile
+index 0cc0442..67682a8 100644
+--- a/scripts/mkmakefile
++++ b/scripts/mkmakefile
+@@ -57,3 +57,7 @@ Makefile:;
+ %/: all
+ 	@:
+ EOF
++
++if [ -n "$ARCH" ]; then
++	echo "export ARCH = $ARCH" >> $2/Makefile
++fi
+-- 
+1.6.5.2
+
