@@ -1,93 +1,32 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pb0-f46.google.com ([209.85.160.46]:35478 "EHLO
-	mail-pb0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754274Ab2CZGwX convert rfc822-to-8bit (ORCPT
+Received: from caramon.arm.linux.org.uk ([78.32.30.218]:52859 "EHLO
+	caramon.arm.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752725Ab2CZHhj (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 26 Mar 2012 02:52:23 -0400
+	Mon, 26 Mar 2012 03:37:39 -0400
+Date: Mon, 26 Mar 2012 08:37:04 +0100
+From: Russell King - ARM Linux <linux@arm.linux.org.uk>
+Subject: Re: Inconsistent kallsyms data on ARM.
+Message-ID: <20120326073704.GH5611@n2100.arm.linux.org.uk>
+References: <CAP=VYLoStscdVJretZ-Rkbp7V3Vsm8N0oWcjih7ruHFiDN7CiA@mail.gmail.com> <201203141321.47010.arnd@arndb.de> <20120325112035.GE5611@n2100.arm.linux.org.uk> <4F6FB170.1040109@jonmasters.org>
 MIME-Version: 1.0
-In-Reply-To: <4f66c337.473f440a.7ece.2904@mx.google.com>
-References: <4f66c337.473f440a.7ece.2904@mx.google.com>
-From: Yang Bai <hamo.by@gmail.com>
-Date: Mon, 26 Mar 2012 14:52:01 +0800
-Message-ID: <CAO_0yfMVQzrRcq99yOfh923+6KP5nvPt6z2E5vQWMAcbfRpN1g@mail.gmail.com>
-Subject: Re: [PATCH][RESEND] scripts: refactor remove structure forward declarations
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4F6FB170.1040109@jonmasters.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: mmarek@suse.cz, rostedt@goodmis.org, sboyd@codeaurora.org, adobriyan@gmail.com, imunsie@au1.ibm.com
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Yang Bai <hamo.by@gmail.com>
+To: Jon Masters <jonathan@jonmasters.org>
+Cc: Arnd Bergmann <arnd@arndb.de>, Paul Gortmaker <paul.gortmaker@windriver.com>, linux-next@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org
 
-ping.
+On Sun, Mar 25, 2012 at 07:59:44PM -0400, Jon Masters wrote:
+> As to longer term, I am happy to work up something that will spot this
+> particular kind of failure (symbol changes type) and output something
+> more useful during the kallsyms generation if you would like.
+> 
+> Are you planning to pull in either of the fixes you mention?
 
-Any comment?
+I'm not, because those are all sub-optimal - I don't see why we should
+bloat the kernel image just for the sake of working around kallsyms.
 
-On Mon, Mar 19, 2012 at 1:24 PM,  <hamo.by@gmail.com> wrote:
-> From: Yang Bai <hamo.by@gmail.com>
->
-> Since now it has some problems when generate TAGS,
-> refactor this code. Now it will not show the error
-> message and will remove declarations using emacs etags.
->
-> Signed-off-by: Yang Bai <hamo.by@gmail.com>
-> Reviewed-by: Stephen Boyd <sboyd@codeaurora.org>
-> ---
->  scripts/tags.sh |   11 ++++++++---
->  1 files changed, 8 insertions(+), 3 deletions(-)
->
-> diff --git a/scripts/tags.sh b/scripts/tags.sh
-> index 833813a..2b377fc 100755
-> --- a/scripts/tags.sh
-> +++ b/scripts/tags.sh
-> @@ -166,9 +166,6 @@ exuberant()
->        all_defconfigs | xargs -r $1 -a                         \
->        --langdef=dotconfig --language-force=dotconfig          \
->        --regex-dotconfig='/^#?[[:blank:]]*(CONFIG_[[:alnum:]_]+)/\1/'
-> -
-> -       # Remove structure forward declarations.
-> -       LANG=C sed -i -e '/^\([a-zA-Z_][a-zA-Z0-9_]*\)\t.*\t\/\^struct \1;.*\$\/;"\tx$/d' tags
->  }
->
->  emacs()
-> @@ -233,6 +230,7 @@ if [ "${ARCH}" = "um" ]; then
->        fi
->  fi
->
-> +remove_structs=
->  case "$1" in
->        "cscope")
->                docscope
-> @@ -245,10 +243,17 @@ case "$1" in
->        "tags")
->                rm -f tags
->                xtags ctags
-> +               remove_structs=y
->                ;;
->
->        "TAGS")
->                rm -f TAGS
->                xtags etags
-> +               remove_structs=y
->                ;;
->  esac
-> +
-> +# Remove structure forward declarations.
-> +if [ -n $remove_structs ]; then
-> +    LANG=C sed -i -e '/^\([a-zA-Z_][a-zA-Z0-9_]*\)\t.*\t\/\^struct \1;.*\$\/;"\tx$/d' $1
-> +fi
-> --
-> 1.7.9.1
->
-
-
-
--- 
-    """
-    Keep It Simple,Stupid.
-    """
-
-Chinese Name: 白杨
-Nick Name: Hamo
-Homepage: http://hamobai.com/
-GPG KEY ID: 0xA4691A33
-Key fingerprint = 09D5 2D78 8E2B 0995 CF8E  4331 33C4 3D24 A469 1A33
+The best I've come up with so far which avoids that is to force
+KALLSYMS_EXTRA_PASS to always be set on ARM.
