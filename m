@@ -1,83 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from va3ehsobe006.messaging.microsoft.com ([216.32.180.16]:15673
-	"EHLO va3outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1755771Ab2C0B7F (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 26 Mar 2012 21:59:05 -0400
-Message-ID: <4F711EC0.3080708@am.sony.com>
-Date: Mon, 26 Mar 2012 18:58:24 -0700
-From: Frank Rowand <frank.rowand@am.sony.com>
-Reply-To: <frank.rowand@am.sony.com>
-MIME-Version: 1.0
-Subject: Re: [PATCH] modpost: Fix modpost's license checking V3
-References: <CACqU3MUXAOMGQ1nzUrtYPEQAC3U-nuq3YurtNJJLS1hft4ROGA@mail.gmail.com> <1310626276-4541-1-git-send-email-abogani@kernel.org> <4F6D2BC5.9070200@am.sony.com>
-In-Reply-To: <4F6D2BC5.9070200@am.sony.com>
-Content-Type: text/plain; charset="ISO-8859-1"
-Content-Transfer-Encoding: 7bit
+Received: from nat28.tlf.novell.com ([130.57.49.28]:55059 "EHLO
+	nat28.tlf.novell.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751895Ab2C0GqF convert rfc822-to-8bit (ORCPT
+	<rfc822;groupwise-linux-kbuild@vger.kernel.org:3:1>);
+	Tue, 27 Mar 2012 02:46:05 -0400
+Message-Id: <4F717E7B020000780007B06E@nat28.tlf.novell.com>
+Date: Tue, 27 Mar 2012 07:46:51 +0100
+From: "Jan Beulich" <JBeulich@suse.com>
+Subject: Re: [PATCH] modpost: fix ALL_INIT_DATA_SECTIONS
+References: <4F588CD50200007800077112@nat28.tlf.novell.com>
+ <20120326204143.GB10259@sepie.suse.cz>
+In-Reply-To: <20120326204143.GB10259@sepie.suse.cz>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8BIT
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Alessio Igor Bogani <abogani@kernel.org>
-Cc: frank.rowand@am.sony.com, Rusty Russell <rusty@rustcorp.com.au>, Jan Beulich <jbeulich@novell.com>, Kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, "Bird, Tim" <Tim.Bird@am.sony.com>, Anders Kaseorg <andersk@ksplice.com>, Arnaud Lacombe <lacombar@gmail.com>
+To: Michal Marek <mmarek@suse.cz>
+Cc: rusty@rustcorp.com.au, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On 03/23/12 19:04, Frank Rowand wrote:
-> On 07/13/11 23:51, Alessio Igor Bogani wrote:
->> The commit f02e8a6 sorts symbols placing each of them in its own elf section.
->> The sorting and merging into the canonical sections are done by the linker.
->> Unfortunately modpost to generate Module.symvers file parses vmlinux
-> 
-> Yet another unfortunately: modpost parses vmlinux.o instead of vmlinux (vmlinux
-> does not yet exist at this point of the build).  vmlinux.o also does not have
-> the many sections sorted and merged into the canonical sections.  As a result,
-> the Module.symvers created my modpost incorrectly reports the license of all
-> exports as "(unknown)".
-> 
-> Can you fix this also please?
-
-The attached patch modifies your patch to also use export_from_secname()
-for vmlinux and vmlinux.o.
-
-This is a rather blind shot at fixing the problem, so please review
-carefully.  After applying the patch, Module.symvers reports the license
-correctly for exports from vmlinux.o.
-
-> 
-> 
->> (already linked) and all modules object files (which aren't linked yet).
->> These aren't sanitized by the linker yet. That breaks modpost that can't
->> detect license properly for modules. This patch makes modpost aware of
->> the new exported symbols structure.
->>
->> Thanks to Arnaud Lacombe <lacombar@gmail.com> and Anders Kaseorg
->> <andersk@ksplice.com> for providing useful suggestions about code.
->>
->> This work was supported by a hardware donation from the CE Linux Forum.
->>
->> Reported-by: Jan Beulich <jbeulich@novell.com>
->> Signed-off-by: Alessio Igor Bogani <abogani@kernel.org>
+>>> On 26.03.12 at 22:41, Michal Marek <mmarek@suse.cz> wrote:
+> On Thu, Mar 08, 2012 at 09:41:25AM +0000, Jan Beulich wrote:
+>> This was lacking a comma between two supposed to be separate strings.
+>> 
+>> Signed-off-by: Jan Beulich <jbeulich@suse.com>
+>> 
 >> ---
->>  scripts/mod/modpost.c |   29 ++++++++++++++++++++++++++++-
->>  1 files changed, 28 insertions(+), 1 deletions(-)
+>>  scripts/mod/modpost.c |    2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>> 
+>> --- 3.3-rc6/scripts/mod/modpost.c
+>> +++ 3.3-rc6-modpost-all-init-data/scripts/mod/modpost.c
+>> @@ -849,7 +849,7 @@ static void check_section(const char *mo
+>>  
+>>  #define ALL_INIT_DATA_SECTIONS \
+>>  	".init.setup$", ".init.rodata$", \
+>> -	".devinit.rodata$", ".cpuinit.rodata$", ".meminit.rodata$" \
+>> +	".devinit.rodata$", ".cpuinit.rodata$", ".meminit.rodata$", \
 > 
-> < snip >
-> 
-> -Frank Rowand
+> Applied to kbuild.git#kbuild with a Cc: stable. BTW, was it causing actual
+> false positives to be reported?
 
-Signed-off-by: Frank Rowand <frank.rowand@am.sony.com>
----
- scripts/mod/modpost.c |    2 	1 +	1 -	0 !
- 1 file changed, 1 insertion(+), 1 deletion(-)
+No, I just noticed this in the context of a bigger (PCI related) patch
+that so far I didn't get any reaction on from you (intending to resend
+at some point).
 
-Index: b/scripts/mod/modpost.c
-===================================================================
---- a/scripts/mod/modpost.c
-+++ b/scripts/mod/modpost.c
-@@ -589,7 +589,7 @@ static void handle_modversions(struct mo
- 	unsigned int crc;
- 	enum export export;
- 
--	if (!is_vmlinux(mod->name) && strncmp(symname, "__ksymtab", 9) == 0)
-+	if (strncmp(symname, "__ksymtab", 9) == 0)
- 		export = export_from_secname(info, get_secindex(info, sym));
- 	else
- 		export = export_from_sec(info, get_secindex(info, sym));
+Jan
 
