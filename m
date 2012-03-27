@@ -1,50 +1,56 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from nat28.tlf.novell.com ([130.57.49.28]:55059 "EHLO
-	nat28.tlf.novell.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751895Ab2C0GqF convert rfc822-to-8bit (ORCPT
-	<rfc822;groupwise-linux-kbuild@vger.kernel.org:3:1>);
-	Tue, 27 Mar 2012 02:46:05 -0400
-Message-Id: <4F717E7B020000780007B06E@nat28.tlf.novell.com>
-Date: Tue, 27 Mar 2012 07:46:51 +0100
-From: "Jan Beulich" <JBeulich@suse.com>
-Subject: Re: [PATCH] modpost: fix ALL_INIT_DATA_SECTIONS
-References: <4F588CD50200007800077112@nat28.tlf.novell.com>
- <20120326204143.GB10259@sepie.suse.cz>
-In-Reply-To: <20120326204143.GB10259@sepie.suse.cz>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Received: from mail-pb0-f46.google.com ([209.85.160.46]:43607 "EHLO
+	mail-pb0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755048Ab2C0HTC convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 27 Mar 2012 03:19:02 -0400
+MIME-Version: 1.0
+In-Reply-To: <4F711EC0.3080708@am.sony.com>
+References: <CACqU3MUXAOMGQ1nzUrtYPEQAC3U-nuq3YurtNJJLS1hft4ROGA@mail.gmail.com>
+	<1310626276-4541-1-git-send-email-abogani@kernel.org>
+	<4F6D2BC5.9070200@am.sony.com>
+	<4F711EC0.3080708@am.sony.com>
+Date: Tue, 27 Mar 2012 09:19:00 +0200
+Message-ID: <CAPk1OjELnXiZVreaEh94e3RT306mmkQxxyg2DH5aYy=rQ9yr1w@mail.gmail.com>
+Subject: Re: [PATCH] modpost: Fix modpost's license checking V3
+From: Alessio Igor Bogani <abogani@kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8BIT
-Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: rusty@rustcorp.com.au, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: frank.rowand@am.sony.com
+Cc: Rusty Russell <rusty@rustcorp.com.au>, Jan Beulich <jbeulich@novell.com>, Kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, "Bird, Tim" <Tim.Bird@am.sony.com>, Anders Kaseorg <andersk@ksplice.com>, Arnaud Lacombe <lacombar@gmail.com>
 
->>> On 26.03.12 at 22:41, Michal Marek <mmarek@suse.cz> wrote:
-> On Thu, Mar 08, 2012 at 09:41:25AM +0000, Jan Beulich wrote:
->> This was lacking a comma between two supposed to be separate strings.
->> 
->> Signed-off-by: Jan Beulich <jbeulich@suse.com>
->> 
->> ---
->>  scripts/mod/modpost.c |    2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->> 
->> --- 3.3-rc6/scripts/mod/modpost.c
->> +++ 3.3-rc6-modpost-all-init-data/scripts/mod/modpost.c
->> @@ -849,7 +849,7 @@ static void check_section(const char *mo
->>  
->>  #define ALL_INIT_DATA_SECTIONS \
->>  	".init.setup$", ".init.rodata$", \
->> -	".devinit.rodata$", ".cpuinit.rodata$", ".meminit.rodata$" \
->> +	".devinit.rodata$", ".cpuinit.rodata$", ".meminit.rodata$", \
-> 
-> Applied to kbuild.git#kbuild with a Cc: stable. BTW, was it causing actual
-> false positives to be reported?
+Dear Mr. Rowand,
 
-No, I just noticed this in the context of a bigger (PCI related) patch
-that so far I didn't get any reaction on from you (intending to resend
-at some point).
+Il 27 marzo 2012 03:58, Frank Rowand <frank.rowand@am.sony.com> ha scritto:
+> On 03/23/12 19:04, Frank Rowand wrote:
+>> On 07/13/11 23:51, Alessio Igor Bogani wrote:
+>>> The commit f02e8a6 sorts symbols placing each of them in its own elf section.
+>>> The sorting and merging into the canonical sections are done by the linker.
+>>> Unfortunately modpost to generate Module.symvers file parses vmlinux
+>>
+>> Yet another unfortunately: modpost parses vmlinux.o instead of vmlinux (vmlinux
+>> does not yet exist at this point of the build).  vmlinux.o also does not have
+>> the many sections sorted and merged into the canonical sections.  As a result,
+>> the Module.symvers created my modpost incorrectly reports the license of all
+>> exports as "(unknown)".
+>>
+>> Can you fix this also please?
+>
+> The attached patch modifies your patch to also use export_from_secname()
+> for vmlinux and vmlinux.o.
+>
+> This is a rather blind shot at fixing the problem, so please review
+> carefully.  After applying the patch, Module.symvers reports the license
+> correctly for exports from vmlinux.o.
 
-Jan
+Could you show me how reproduce that problem? Indeed on my system
+"unknown" is reported (erroneously) in the v3.0 series before the
+commit 62a2635610dbc83c5e8d724e00941eee4d18c186 (and obviously after
+my patchset which adds that bug).
 
+Thanks!
+
+Ciao,
+Alessio
