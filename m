@@ -1,38 +1,83 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from 206.83.70.73.ptr.us.xo.net ([206.83.70.73]:59758 "EHLO
-	king.tilera.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754182Ab2CZVKG (ORCPT
+Received: from va3ehsobe006.messaging.microsoft.com ([216.32.180.16]:15673
+	"EHLO va3outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1755771Ab2C0B7F (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 26 Mar 2012 17:10:06 -0400
-Message-Id: <201203262055.q2QKtusJ010481@farm-0012.internal.tilera.com>
-From: Chris Metcalf <cmetcalf@tilera.com>
-Date: Mon, 26 Mar 2012 16:54:04 -0400
-Subject: [PATCH] mkmakefile: add export of $ARCH if specified on command-line
+	Mon, 26 Mar 2012 21:59:05 -0400
+Message-ID: <4F711EC0.3080708@am.sony.com>
+Date: Mon, 26 Mar 2012 18:58:24 -0700
+From: Frank Rowand <frank.rowand@am.sony.com>
+Reply-To: <frank.rowand@am.sony.com>
+MIME-Version: 1.0
+Subject: Re: [PATCH] modpost: Fix modpost's license checking V3
+References: <CACqU3MUXAOMGQ1nzUrtYPEQAC3U-nuq3YurtNJJLS1hft4ROGA@mail.gmail.com> <1310626276-4541-1-git-send-email-abogani@kernel.org> <4F6D2BC5.9070200@am.sony.com>
+In-Reply-To: <4F6D2BC5.9070200@am.sony.com>
+Content-Type: text/plain; charset="ISO-8859-1"
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Alessio Igor Bogani <abogani@kernel.org>
+Cc: frank.rowand@am.sony.com, Rusty Russell <rusty@rustcorp.com.au>, Jan Beulich <jbeulich@novell.com>, Kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, "Bird, Tim" <Tim.Bird@am.sony.com>, Anders Kaseorg <andersk@ksplice.com>, Arnaud Lacombe <lacombar@gmail.com>
 
-If you create a new build tree and set "ARCH=foo" on the command
-line, it makes sense for that build tree to remember the architecture
-that it's meant to be built for.
+On 03/23/12 19:04, Frank Rowand wrote:
+> On 07/13/11 23:51, Alessio Igor Bogani wrote:
+>> The commit f02e8a6 sorts symbols placing each of them in its own elf section.
+>> The sorting and merging into the canonical sections are done by the linker.
+>> Unfortunately modpost to generate Module.symvers file parses vmlinux
+> 
+> Yet another unfortunately: modpost parses vmlinux.o instead of vmlinux (vmlinux
+> does not yet exist at this point of the build).  vmlinux.o also does not have
+> the many sections sorted and merged into the canonical sections.  As a result,
+> the Module.symvers created my modpost incorrectly reports the license of all
+> exports as "(unknown)".
+> 
+> Can you fix this also please?
 
-Signed-off-by: Chris Metcalf <cmetcalf@tilera.com>
+The attached patch modifies your patch to also use export_from_secname()
+for vmlinux and vmlinux.o.
+
+This is a rather blind shot at fixing the problem, so please review
+carefully.  After applying the patch, Module.symvers reports the license
+correctly for exports from vmlinux.o.
+
+> 
+> 
+>> (already linked) and all modules object files (which aren't linked yet).
+>> These aren't sanitized by the linker yet. That breaks modpost that can't
+>> detect license properly for modules. This patch makes modpost aware of
+>> the new exported symbols structure.
+>>
+>> Thanks to Arnaud Lacombe <lacombar@gmail.com> and Anders Kaseorg
+>> <andersk@ksplice.com> for providing useful suggestions about code.
+>>
+>> This work was supported by a hardware donation from the CE Linux Forum.
+>>
+>> Reported-by: Jan Beulich <jbeulich@novell.com>
+>> Signed-off-by: Alessio Igor Bogani <abogani@kernel.org>
+>> ---
+>>  scripts/mod/modpost.c |   29 ++++++++++++++++++++++++++++-
+>>  1 files changed, 28 insertions(+), 1 deletions(-)
+> 
+> < snip >
+> 
+> -Frank Rowand
+
+Signed-off-by: Frank Rowand <frank.rowand@am.sony.com>
 ---
- scripts/mkmakefile |    4 ++++
- 1 files changed, 4 insertions(+), 0 deletions(-)
+ scripts/mod/modpost.c |    2 	1 +	1 -	0 !
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/scripts/mkmakefile b/scripts/mkmakefile
-index 0cc0442..67682a8 100644
---- a/scripts/mkmakefile
-+++ b/scripts/mkmakefile
-@@ -57,3 +57,7 @@ Makefile:;
- %/: all
- 	@:
- EOF
-+
-+if [ -n "$ARCH" ]; then
-+	echo "export ARCH = $ARCH" >> $2/Makefile
-+fi
--- 
-1.6.5.2
+Index: b/scripts/mod/modpost.c
+===================================================================
+--- a/scripts/mod/modpost.c
++++ b/scripts/mod/modpost.c
+@@ -589,7 +589,7 @@ static void handle_modversions(struct mo
+ 	unsigned int crc;
+ 	enum export export;
+ 
+-	if (!is_vmlinux(mod->name) && strncmp(symname, "__ksymtab", 9) == 0)
++	if (strncmp(symname, "__ksymtab", 9) == 0)
+ 		export = export_from_secname(info, get_secindex(info, sym));
+ 	else
+ 		export = export_from_sec(info, get_secindex(info, sym));
 
