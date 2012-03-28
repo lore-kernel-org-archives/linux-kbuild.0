@@ -1,42 +1,38 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-gx0-f174.google.com ([209.85.161.174]:57344 "EHLO
-	mail-gx0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751592Ab2C1HEj (ORCPT
+Received: from mail-lpp01m010-f46.google.com ([209.85.215.46]:44876 "EHLO
+	mail-lpp01m010-f46.google.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1750740Ab2C1IEP (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 28 Mar 2012 03:04:39 -0400
-Received: by gghe5 with SMTP id e5so509315ggh.19
-        for <linux-kbuild@vger.kernel.org>; Wed, 28 Mar 2012 00:04:39 -0700 (PDT)
-Date: Wed, 28 Mar 2012 00:04:36 -0700 (PDT)
-From: David Rientjes <rientjes@google.com>
-Subject: Re: randconfig chosing more than one slab allocator
-In-Reply-To: <alpine.LFD.2.02.1203271323420.19093@tux.localdomain>
-Message-ID: <alpine.DEB.2.00.1203272359290.16201@chino.kir.corp.google.com>
-References: <alpine.DEB.2.00.1203041404590.18555@chino.kir.corp.google.com> <alpine.DEB.2.00.1203111432020.790@chino.kir.corp.google.com> <alpine.LFD.2.02.1203271323420.19093@tux.localdomain>
+	Wed, 28 Mar 2012 04:04:15 -0400
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+In-Reply-To: <4F724658.6010404@am.sony.com>
+References: <CACqU3MUXAOMGQ1nzUrtYPEQAC3U-nuq3YurtNJJLS1hft4ROGA@mail.gmail.com>
+	<1310626276-4541-1-git-send-email-abogani@kernel.org>
+	<4F6D2BC5.9070200@am.sony.com>
+	<4F711EC0.3080708@am.sony.com>
+	<CAPk1OjELnXiZVreaEh94e3RT306mmkQxxyg2DH5aYy=rQ9yr1w@mail.gmail.com>
+	<4F724658.6010404@am.sony.com>
+Date: Wed, 28 Mar 2012 10:04:13 +0200
+Message-ID: <CAPk1OjGB+Ah57xBh8VmD5WGUxP82FtS3kcyBXL3O3cK-EYjXfg@mail.gmail.com>
+Subject: Re: [PATCH] modpost: Fix modpost's license checking V3
+From: Alessio Igor Bogani <abogani@kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Pekka Enberg <penberg@kernel.org>
-Cc: Sam Ravnborg <sam@ravnborg.org>, Michal Marek <mmarek@suse.cz>, Arnaud Lacombe <lacombar@gmail.com>, Christoph Lameter <cl@linux.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: frank.rowand@am.sony.com
+Cc: "Rowand, Frank" <Frank_Rowand@sonyusa.com>, Rusty Russell <rusty@rustcorp.com.au>, Jan Beulich <jbeulich@novell.com>, Kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, "Bird, Tim" <Tim.Bird@am.sony.com>, Anders Kaseorg <andersk@ksplice.com>, Arnaud Lacombe <lacombar@gmail.com>
 
-On Tue, 27 Mar 2012, Pekka Enberg wrote:
+Dear Mr. Rowand,
 
-> > > make randconfig seems to allow chosing more than one slab allocator 
-> > > although they are all part of a choice,endchoice block (and none are 
-> > > tristate).  The following quickly finds both CONFIG_SLUB and CONFIG_SLOB 
-> > > enabled:
-> > > 
-> > > $ while [ 1 ]; do make randconfig &> /dev/null; if [ $(grep "CONFIG_SL[OU]B=y" .config | wc -l) == 2 ]; then break; fi; done
-> > > $ grep CONFIG_SL[OU]B=y .config
-> > > CONFIG_SLUB=y
-> > > CONFIG_SLOB=y
-> > 
-> > Ping on this?
-> 
-> I'm fairly sure this is a kbuild issue and that init/Kconfig is correct.
-> 
+Frank Rowand <frank.rowand@am.sony.com> wrote:
+[...]
+>> Could you show me how reproduce that problem?
+>
+> I'm not sure what you are asking here.
 
-Right, but it happens because SLOB is only available for CONFIG_EXPERT 
-(the CONFIG_EMBEDDED restriction dates back to 81819f0fc828 in May 2007) 
-so I was wondering if the kconfig folks would know what's going on without 
-having to investigate it myself.
+I meant the kernel version, the kernel configuration and so the
+Module.symvers file you obtain.
+Thanks!
+
+Ciao,
+Alessio
