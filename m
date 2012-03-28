@@ -1,21 +1,42 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from comms.econetmobile.co.zw ([217.74.236.106]:55914 "EHLO
-	econetmobile.co.zw" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757250Ab2C1Cef (ORCPT
+Received: from mail-gx0-f174.google.com ([209.85.161.174]:57344 "EHLO
+	mail-gx0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751592Ab2C1HEj (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 27 Mar 2012 22:34:35 -0400
-From: laurarey111@hotmail.com
-Reply-to: laurarey111@hotmail.com
-Subject: Hello
-Date: Tue, 27 Mar 2012 13:30:20 GMT
-Message-id: <4f71c0ec.15c.1230.17328@econetmobile.co.zw>
+	Wed, 28 Mar 2012 03:04:39 -0400
+Received: by gghe5 with SMTP id e5so509315ggh.19
+        for <linux-kbuild@vger.kernel.org>; Wed, 28 Mar 2012 00:04:39 -0700 (PDT)
+Date: Wed, 28 Mar 2012 00:04:36 -0700 (PDT)
+From: David Rientjes <rientjes@google.com>
+Subject: Re: randconfig chosing more than one slab allocator
+In-Reply-To: <alpine.LFD.2.02.1203271323420.19093@tux.localdomain>
+Message-ID: <alpine.DEB.2.00.1203272359290.16201@chino.kir.corp.google.com>
+References: <alpine.DEB.2.00.1203041404590.18555@chino.kir.corp.google.com> <alpine.DEB.2.00.1203111432020.790@chino.kir.corp.google.com> <alpine.LFD.2.02.1203271323420.19093@tux.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
+To: Pekka Enberg <penberg@kernel.org>
+Cc: Sam Ravnborg <sam@ravnborg.org>, Michal Marek <mmarek@suse.cz>, Arnaud Lacombe <lacombar@gmail.com>, Christoph Lameter <cl@linux.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Hello xxxxx,
- How are you doing over there? My name is Laura, Please let
-me know if i got the right address so we can open
-communication, here is my email address I am waiting for
-your confirmation with care Laura...
+On Tue, 27 Mar 2012, Pekka Enberg wrote:
+
+> > > make randconfig seems to allow chosing more than one slab allocator 
+> > > although they are all part of a choice,endchoice block (and none are 
+> > > tristate).  The following quickly finds both CONFIG_SLUB and CONFIG_SLOB 
+> > > enabled:
+> > > 
+> > > $ while [ 1 ]; do make randconfig &> /dev/null; if [ $(grep "CONFIG_SL[OU]B=y" .config | wc -l) == 2 ]; then break; fi; done
+> > > $ grep CONFIG_SL[OU]B=y .config
+> > > CONFIG_SLUB=y
+> > > CONFIG_SLOB=y
+> > 
+> > Ping on this?
+> 
+> I'm fairly sure this is a kbuild issue and that init/Kconfig is correct.
+> 
+
+Right, but it happens because SLOB is only available for CONFIG_EXPERT 
+(the CONFIG_EMBEDDED restriction dates back to 81819f0fc828 in May 2007) 
+so I was wondering if the kconfig folks would know what's going on without 
+having to investigate it myself.
