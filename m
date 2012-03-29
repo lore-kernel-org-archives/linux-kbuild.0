@@ -1,38 +1,31 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lpp01m010-f46.google.com ([209.85.215.46]:44876 "EHLO
-	mail-lpp01m010-f46.google.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1750740Ab2C1IEP (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 28 Mar 2012 04:04:15 -0400
-MIME-Version: 1.0
-In-Reply-To: <4F724658.6010404@am.sony.com>
-References: <CACqU3MUXAOMGQ1nzUrtYPEQAC3U-nuq3YurtNJJLS1hft4ROGA@mail.gmail.com>
-	<1310626276-4541-1-git-send-email-abogani@kernel.org>
-	<4F6D2BC5.9070200@am.sony.com>
-	<4F711EC0.3080708@am.sony.com>
-	<CAPk1OjELnXiZVreaEh94e3RT306mmkQxxyg2DH5aYy=rQ9yr1w@mail.gmail.com>
-	<4F724658.6010404@am.sony.com>
-Date: Wed, 28 Mar 2012 10:04:13 +0200
-Message-ID: <CAPk1OjGB+Ah57xBh8VmD5WGUxP82FtS3kcyBXL3O3cK-EYjXfg@mail.gmail.com>
+Received: from ozlabs.org ([203.10.76.45]:36883 "EHLO ozlabs.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751323Ab2C2FNN (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 29 Mar 2012 01:13:13 -0400
+From: Rusty Russell <rusty@rustcorp.com.au>
 Subject: Re: [PATCH] modpost: Fix modpost's license checking V3
-From: Alessio Igor Bogani <abogani@kernel.org>
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <4F711EC0.3080708@am.sony.com>
+References: <CACqU3MUXAOMGQ1nzUrtYPEQAC3U-nuq3YurtNJJLS1hft4ROGA@mail.gmail.com> <1310626276-4541-1-git-send-email-abogani@kernel.org> <4F6D2BC5.9070200@am.sony.com> <4F711EC0.3080708@am.sony.com>
+Date: Thu, 29 Mar 2012 15:07:32 +1030
+Message-ID: <87hax8yqcz.fsf@rustcorp.com.au>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: frank.rowand@am.sony.com
-Cc: "Rowand, Frank" <Frank_Rowand@sonyusa.com>, Rusty Russell <rusty@rustcorp.com.au>, Jan Beulich <jbeulich@novell.com>, Kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, "Bird, Tim" <Tim.Bird@am.sony.com>, Anders Kaseorg <andersk@ksplice.com>, Arnaud Lacombe <lacombar@gmail.com>
+To: Frank Rowand <frank.rowand@am.sony.com>, Alessio Igor Bogani <abogani@kernel.org>
+Cc: Jan Beulich <jbeulich@novell.com>, Kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, "Bird, Tim" <Tim.Bird@am.sony.com>, Anders Kaseorg <andersk@ksplice.com>, Arnaud Lacombe <lacombar@gmail.com>, Linus Torvalds <torvalds@linux-foundation.org>
 
-Dear Mr. Rowand,
+On Mon, 26 Mar 2012 18:58:24 -0700, Frank Rowand <frank.rowand@am.sony.com> wrote:
+> The attached patch modifies your patch to also use export_from_secname()
+> for vmlinux and vmlinux.o.
 
-Frank Rowand <frank.rowand@am.sony.com> wrote:
-[...]
->> Could you show me how reproduce that problem?
->
-> I'm not sure what you are asking here.
+OK, today is my last day online for six weeks, so Alessio, please come
+up with a fix and push straight to Linus once consensus is reached.
 
-I meant the kernel version, the kernel configuration and so the
-Module.symvers file you obtain.
-Thanks!
+If that's impossible, I'll review when I get back.
 
-Ciao,
-Alessio
+Thanks,
+Rusty.
+-- 
+  How could I marry someone with more hair than me?  http://baldalex.org
