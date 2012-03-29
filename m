@@ -1,47 +1,51 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.snhosting.dk ([87.238.248.203]:48238 "EHLO
-	smtp.domainteam.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1758862Ab2C2UXs (ORCPT
+Received: from am1ehsobe006.messaging.microsoft.com ([213.199.154.209]:58179
+	"EHLO am1outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1759415Ab2C2Vxy (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 29 Mar 2012 16:23:48 -0400
-Date: Thu, 29 Mar 2012 22:23:45 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH] Let modpost parses vmlinux instead of vmlinux.o
-Message-ID: <20120329202345.GA30158@merkur.ravnborg.org>
-References: <4F737193.4030709@am.sony.com> <1333032786-12457-1-git-send-email-abogani@kernel.org>
+	Thu, 29 Mar 2012 17:53:54 -0400
+Message-ID: <4F74D9C3.5010907@am.sony.com>
+Date: Thu, 29 Mar 2012 14:53:07 -0700
+From: Frank Rowand <frank.rowand@am.sony.com>
+Reply-To: <frank.rowand@am.sony.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Subject: Re: [PATCH] Let modpost parses vmlinux instead of vmlinux.o
+References: <4F737193.4030709@am.sony.com> <1333032786-12457-1-git-send-email-abogani@kernel.org>
 In-Reply-To: <1333032786-12457-1-git-send-email-abogani@kernel.org>
+Content-Type: text/plain; charset="ISO-8859-1"
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Alessio Igor Bogani <abogani@kernel.org>
-Cc: Frank Rowand <frank.rowand@am.sony.com>, Rowand Frank <Frank_Rowand@sonyusa.com>, Rusty Russell <rusty@rustcorp.com.au>, Jan Beulich <jbeulich@novell.com>, Kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Tim Bird <Tim.Bird@am.sony.com>, Anders Kaseorg <andersk@ksplice.com>, Arnaud Lacombe <lacombar@gmail.com>
+Cc: "Rowand, Frank" <Frank_Rowand@sonyusa.com>, Rusty Russell <rusty@rustcorp.com.au>, Jan Beulich <jbeulich@novell.com>, Kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, "Bird, Tim" <Tim.Bird@am.sony.com>, Anders Kaseorg <andersk@ksplice.com>, Arnaud Lacombe <lacombar@gmail.com>
 
-On Thu, Mar 29, 2012 at 04:53:06PM +0200, Alessio Igor Bogani wrote:
+On 03/29/12 07:53, Alessio Igor Bogani wrote:
 > Dear Mr. Rowand,
+
+No need to be formal, "Frank" is ok.
+
+
 > 
 > What do you think about this patch?
+
+It does not work for me.  The resulting Module.symvers is empty.
+
+Before applying the Makefile patch, "make V=1" shows the command
+to generate Module.symvers is:
+
+  scripts/mod/modpost   -o /a/home/frowand/me/src/linux/kernel-org/build/crest/Module.symvers    -S   vmlinux.o
+
+after applying the patch, the command becomes:
+
+  scripts/mod/modpost   -o /a/home/frowand/me/src/linux/kernel-org/build/crest/Module.symvers    -S   -s
+
+
+-Frank
+
 > Thanks!
 > 
 > Ciao,
 > Alessio
-
-Hi Alession.
-
-I am not Mr. Rowand - obviously...
-
-The title alone looks like you are doing something wrong.
-The difference between vmlinux.o and vmlinux is that the latter
-is linked using the linker scripts. So a lot of sections are merged.
-And modpost uses these section for the section mismatch analysis.
-
-Then your patch fails to describe why it is needed.
-And on top of this I do not understand the patch.
-
-So a lot of things looks bad :-(
-
-	Sam
 > 
 > ---
 >  Makefile                 |    2 +-
@@ -58,10 +62,6 @@ So a lot of things looks bad :-(
 >  	+$(call cmd,vmlinux-modpost)
 > -	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.modpost $@
 > +	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.modpost $*
-
-I do not see where the stem is coming from - and why this is needed.
-
-
 >  	$(Q)echo 'cmd_$@ := $(cmd_vmlinux-modpost)' > $(dot-target).cmd
 >  endef
 >  
@@ -76,4 +76,7 @@ I do not see where the stem is coming from - and why this is needed.
 > -vmlinux.o: FORCE
 > +vmlinux vmlinux.o: FORCE
 >  	$(call cmd,kernel-mod)
-It looks like you process both of vmlinux.o and vmlinux?!?!
+>  
+>  # Declare generated files as targets for modpost
+
+
