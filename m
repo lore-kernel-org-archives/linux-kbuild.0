@@ -1,87 +1,63 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ch1ehsobe004.messaging.microsoft.com ([216.32.181.184]:18647
-	"EHLO ch1outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1752705Ab2C2V6n (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 29 Mar 2012 17:58:43 -0400
-Message-ID: <4F74DAE6.9000001@am.sony.com>
-Date: Thu, 29 Mar 2012 14:57:58 -0700
-From: Frank Rowand <frank.rowand@am.sony.com>
-Reply-To: <frank.rowand@am.sony.com>
+Received: from cantor2.suse.de ([195.135.220.15]:37619 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S935794Ab2C3W1y (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 30 Mar 2012 18:27:54 -0400
+Date: Fri, 30 Mar 2012 15:14:24 +0200
+From: Michal Marek <mmarek@suse.cz>
+Subject: Re: [PATCH 2/2] merge_config.sh: Add option to display redundant
+ configs
+Message-ID: <20120330131424.GA11444@sepie.suse.cz>
+References: <1332532328-32529-1-git-send-email-john.stultz@linaro.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH] Let modpost parses vmlinux instead of vmlinux.o
-References: <4F737193.4030709@am.sony.com> <1333032786-12457-1-git-send-email-abogani@kernel.org> <4F74D9C3.5010907@am.sony.com>
-In-Reply-To: <4F74D9C3.5010907@am.sony.com>
-Content-Type: text/plain; charset="ISO-8859-1"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1332532328-32529-1-git-send-email-john.stultz@linaro.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Rowand, Frank" <Frank_Rowand@sonyusa.com>
-Cc: Alessio Igor Bogani <abogani@kernel.org>, Rusty Russell <rusty@rustcorp.com.au>, Jan Beulich <jbeulich@novell.com>, Kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, "Bird, Tim" <Tim.Bird@am.sony.com>, Anders Kaseorg <andersk@ksplice.com>, Arnaud Lacombe <lacombar@gmail.com>
+To: John Stultz <john.stultz@linaro.org>
+Cc: linux-kbuild@vger.kernel.org, Bruce.Ashfield@windriver.com, Darren Hart <dvhart@linux.intel.com>
 
-On 03/29/12 14:53, Frank Rowand wrote:
-> On 03/29/12 07:53, Alessio Igor Bogani wrote:
->> Dear Mr. Rowand,
+On Fri, Mar 23, 2012 at 12:52:08PM -0700, John Stultz wrote:
+> Provide a -r option to display when fragments contain redundant
+> options. This is really useful when breaking apart a config into
+> fragments, as well as cleaning up older fragments.
 > 
-> No need to be formal, "Frank" is ok.
+> v2:
+> Now w/ spelling fixes! Thanks Darren!
 > 
-> 
->>
->> What do you think about this patch?
-> 
-> It does not work for me.  The resulting Module.symvers is empty.
-> 
-> Before applying the Makefile patch, "make V=1" shows the command
-                                      ^^^ "make V=1 vmlinux"
-> to generate Module.symvers is:
-> 
->   scripts/mod/modpost   -o /a/home/frowand/me/src/linux/kernel-org/build/crest/Module.symvers    -S   vmlinux.o
-> 
-> after applying the patch, the command becomes:
-> 
->   scripts/mod/modpost   -o /a/home/frowand/me/src/linux/kernel-org/build/crest/Module.symvers    -S   -s
-> 
-> 
-> -Frank
-> 
->> Thanks!
->>
->> Ciao,
->> Alessio
->>
->> ---
->>  Makefile                 |    2 +-
->>  scripts/Makefile.modpost |    2 +-
->>  2 files changed, 2 insertions(+), 2 deletions(-)
->>
->> diff --git a/Makefile b/Makefile
->> index 123d858..b589d1f 100644
->> --- a/Makefile
->> +++ b/Makefile
->> @@ -876,7 +876,7 @@ quiet_cmd_vmlinux-modpost = LD      $@
->>  define rule_vmlinux-modpost
->>  	:
->>  	+$(call cmd,vmlinux-modpost)
->> -	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.modpost $@
->> +	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.modpost $*
->>  	$(Q)echo 'cmd_$@ := $(cmd_vmlinux-modpost)' > $(dot-target).cmd
->>  endef
->>  
->> diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
->> index 56dfafc..ca0db29 100644
->> --- a/scripts/Makefile.modpost
->> +++ b/scripts/Makefile.modpost
->> @@ -93,7 +93,7 @@ __modpost: $(modules:.ko=.o) FORCE
->>  quiet_cmd_kernel-mod = MODPOST $@
->>        cmd_kernel-mod = $(modpost) $@
->>  
->> -vmlinux.o: FORCE
->> +vmlinux vmlinux.o: FORCE
->>  	$(call cmd,kernel-mod)
->>  
->>  # Declare generated files as targets for modpost
-> 
-> .
-> 
+> CC: Michal Marek <mmarek@suse.cz>
+> CC: Bruce.Ashfield@windriver.com
+> CC: Darren Hart <dvhart@linux.intel.com>
+> Signed-off-by: John Stultz <john.stultz@linaro.org>
+
+Applied.
 
 
+> +WARNREDUN=false
+>  
+>  while true; do
+>  	case $1 in
+> @@ -52,6 +54,11 @@ while true; do
+>  		usage
+>  		exit
+>  		;;
+> +	"-r")
+> +		WARNREDUN=true
+> +		shift
+> +		continue
+> +		;;
+>  	*)
+>  		break
+>  		;;
+> @@ -79,6 +86,8 @@ for MERGE_FILE in $MERGE_LIST ; do
+>  			echo Previous  value: $PREV_VAL
+>  			echo New value:       $NEW_VAL
+>  			echo
+> +			elif [ "$WARNREDUN" = "true" ]; then
+
+If you are using true/false for flag variables, then you can simply say
+
+			elif $WARNREDUN; then
+
+Michal
