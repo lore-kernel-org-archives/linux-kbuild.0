@@ -1,38 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:53825 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751248Ab2DBM2D (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 2 Apr 2012 08:28:03 -0400
-Date: Mon, 2 Apr 2012 14:28:00 +0200
-From: Michal Marek <mmarek@suse.cz>
-Subject: [GIT] make cscope fix
-Message-ID: <20120402122800.GA7157@sepie.suse.cz>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Received: from mail-bk0-f46.google.com ([209.85.214.46]:51066 "EHLO
+	mail-bk0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751553Ab2DBOGN (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 2 Apr 2012 10:06:13 -0400
+Received: by bkcik5 with SMTP id ik5so2514445bkc.19
+        for <linux-kbuild@vger.kernel.org>; Mon, 02 Apr 2012 07:06:11 -0700 (PDT)
+From: Andrej Krutak <andree@andree.sk>
+Subject: [PATCH] Fix build failure on cygwin.
+Date: Mon,  2 Apr 2012 16:05:35 +0200
+Message-Id: <1333375535-6589-1-git-send-email-andree@andree.sk>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: sboyd@codeaurora.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org, Andrej Krutak <andree@andree.sk>
 
-Hi Linus,
+The _B macro is defined by cygwin in ctype.h.
+Move the inclusion to avoid build failure.
 
-the kbuild.git#misc pull request introduced a bug that broke make
-cscope. Apparently, both the original author and me only tested the use
-case that the commit was supposed to improve (make tags/TAGS), and not
-the use case that was not supposed (make cscope).
-
-Michal
-
-The following changes since commit dd775ae2549217d3ae09363e3edb305d0fa19928:
-
-  Linux 3.4-rc1 (2012-03-31 16:24:09 -0700)
-
-are available in the git repository at:
-  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git rc-fixes
-
-Stephen Boyd (1):
-      Subject: [PATCH] tags.sh: Add missing quotes
-
- scripts/tags.sh |    2 +-
+Signed-off-by: Andrej Krutak <andree@andree.sk>
+---
+ scripts/dtc/dtc.h |    2 +-
  1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/scripts/dtc/dtc.h b/scripts/dtc/dtc.h
+index f37c97e..7aa3cc6 100644
+--- a/scripts/dtc/dtc.h
++++ b/scripts/dtc/dtc.h
+@@ -27,13 +27,13 @@
+ #include <stdint.h>
+ #include <stdarg.h>
+ #include <assert.h>
+-#include <ctype.h>
+ #include <errno.h>
+ #include <unistd.h>
+ 
+ #include <libfdt_env.h>
+ #include <fdt.h>
+ 
++#include <ctype.h>
+ #include "util.h"
+ 
+ #ifdef DEBUG
+-- 
+1.7.4.1
+
