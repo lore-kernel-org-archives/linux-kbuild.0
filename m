@@ -1,44 +1,32 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from host227-54-98-165.movistar.com.ni ([165.98.54.227]:54892 "EHLO
-	server.fomav.gob.ni" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753312Ab2DGRFw (ORCPT
+Received: from host1.prepgenie.com ([209.236.66.27]:49564 "EHLO
+	dl-572-24.slc.westdc.net" rhost-flags-OK-FAIL-OK-OK)
+	by vger.kernel.org with ESMTP id S1753256Ab2DIHqb (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 7 Apr 2012 13:05:52 -0400
-Message-ID: <22e1019cf2cbedc5f09af194e910c2c2.squirrel@www.fomav.gob.ni>
-Date: Sat, 7 Apr 2012 11:36:45 +0500
-Subject: 
-From: "Dave and Angela Dawes" <info@cash4.com>
-Reply-To: angeladawesfoundation@yahoo.com.hk
+	Mon, 9 Apr 2012 03:46:31 -0400
+Received: from operatio by dl-572-24.slc.westdc.net with local (Exim 4.69)
+	(envelope-from <operatio@dl-572-24.slc.westdc.net>)
+	id 1SFTBR-00030H-AW
+	for linux-kbuild@vger.kernel.org; Wed, 04 Apr 2012 10:35:45 -0600
+Subject: HONG LEONG BANK (Malaysia)
+From: Edward Cheah <info_2@law.net>
+Reply-To: edwardcheah81@mail.mn
 MIME-Version: 1.0
-Content-Type: text/plain;charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7BIT
+Message-Id: <E1SFTBR-00030H-AW@dl-572-24.slc.westdc.net>
+Date: Wed, 04 Apr 2012 10:35:45 -0600
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
+To: linux-kbuild@vger.kernel.org
 
+Hello,
 
+I contacted you to assist in distributing the money left behind by my late
+client,
 
-
-Hello There!
-
-This is a personal email directed to you. My wife and I won an Euro
-Millions Jackpot Lottery of £101m million(Pounds) on October 11, 2011 and
-have
-voluntarily decided to donate the sum of £1,000,000.00 Pounds to you as
-part of our own charity project to improve the lot of 20 lucky
-individuals all over the world.
-
-If you have received this email then you are one of the lucky
-recipients and all you have to do is get back to us so that we can
-send your details to the payout bank.
-
-You can verify this by visiting the web page below;
-http://uk.news.yahoo.com/lucky-lottery-couple-reveals-what-they-will-buy-with-
-%C2%A3101m.html
-
-http://m.ibtimes.com/euromillions-euromillion-winners-euromillion-winners-
-revealed-101-million-winners-101m-euromillions-229012.html
-
-Dave and Angela Dawes
-Contact my private email only:angeladawesfoundation@yahoo.com.hk
+Edward Cheah,
+Tele:+60146308549
+Fax:+60(0)321784290
 
 
