@@ -1,75 +1,100 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp03.smtpout.orange.fr ([80.12.242.125]:31490 "EHLO
-	smtp.smtpout.orange.fr" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756945Ab2DIQCg (ORCPT
+Received: from ch1ehsobe003.messaging.microsoft.com ([216.32.181.183]:19930
+	"EHLO ch1outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S932102Ab2DJA7q (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 9 Apr 2012 12:02:36 -0400
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: Re: [PATCH] scripts/config: properly report and set string options
-Date: Mon, 9 Apr 2012 18:02:29 +0200
-References: <1333975750-12154-1-git-send-email-yann.morin.1998@free.fr> <20120409153006.GA28221@kroah.com>
-In-Reply-To: <20120409153006.GA28221@kroah.com>
+	Mon, 9 Apr 2012 20:59:46 -0400
+Message-ID: <4F8385D7.3060701@am.sony.com>
+Date: Mon, 9 Apr 2012 17:59:03 -0700
+From: Frank Rowand <frank.rowand@am.sony.com>
+Reply-To: <frank.rowand@am.sony.com>
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-1"
+Subject: Re: [PATCH] modpost: Fix modpost's license checking V3
+References: <CACqU3MUXAOMGQ1nzUrtYPEQAC3U-nuq3YurtNJJLS1hft4ROGA@mail.gmail.com> <1310626276-4541-1-git-send-email-abogani@kernel.org> <4F6D2BC5.9070200@am.sony.com> <4F711EC0.3080708@am.sony.com> <87hax8yqcz.fsf@rustcorp.com.au>
+In-Reply-To: <87hax8yqcz.fsf@rustcorp.com.au>
+Content-Type: text/plain; charset="ISO-8859-1"
 Content-Transfer-Encoding: 7bit
-Message-Id: <201204091802.29839.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Greg KH <gregkh@linuxfoundation.org>, stable@vger.kernel.org, Andi Kleen <andi@firstfloor.org>, Michal Marek <mmarek@suse.cz>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Rusty Russell <rusty@rustcorp.com.au>, "Rowand, Frank" <Frank_Rowand@sonyusa.com>, Alessio Igor Bogani <abogani@kernel.org>, Jan Beulich <jbeulich@novell.com>, Kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, "Bird, Tim" <Tim.Bird@am.sony.com>, Anders Kaseorg <andersk@ksplice.com>, Arnaud Lacombe <lacombar@gmail.com>, sam@ravnborg.org
 
-Greg, All,
-
-On Monday 09 April 2012 17:30:06 Greg KH wrote:
-> On Mon, Apr 09, 2012 at 02:49:10PM +0200, Yann E. MORIN wrote:
-> > Currently, scripts/config removes the leading double-quote from
-> > string options, but leaves the trailing double-quote.
-> > 
-> > Also, double-quotes in a string are escaped, but scripts/config
-> > does not unescape those when printing
-> > 
-> > Finally, scripts/config does not escape double-quotes when setting
-> > string options.
-[--SNIP--]
-> > Signed-off-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
-> > Cc: stable@vger.kernel.org
+On 03/28/12 21:37, Rusty Russell wrote:
+> On Mon, 26 Mar 2012 18:58:24 -0700, Frank Rowand <frank.rowand@am.sony.com> wrote:
+>> The attached patch modifies your patch to also use export_from_secname()
+>> for vmlinux and vmlinux.o.
 > 
-> How does this fit the Documentation/stable_kernel_rules.txt
+> OK, today is my last day online for six weeks, so Alessio, please come
+> up with a fix and push straight to Linus once consensus is reached.
+> 
+> If that's impossible, I'll review when I get back.
+> 
+> Thanks,
+> Rusty.
 
-Sorry, I was not aware of this list... My bad...
-I'll know for next time. Thanks!
+Linus,
 
-> qualification for a patch to be added to the stable releases?
+Alessio asked me to send this directly to you.
 
-I believe it qualifies because:
-  - it is rather trivial
-  - it breaks the build for users that tweak the kernel configuration from
-    an upper-layer (aka 'integrated') build-system, using this script which
-    is bundled with the kernel in the first place.
-  - I am a 'real people', and 'it bothers' me ;-)
+-Frank
 
-OTOH, it does not qualify because:
-  - there is no Tested-by:
-  - I forgot to specify which version it should be applied to
-  - obviously, this fix is not yet in Linus' tree
 
-So, please drop from -stable.
+The commit f02e8a6 sorts symbols placing each of them in its own elf section.
+The sorting and merging into the canonical sections are done by the linker.
+Unfortunately modpost to generate Module.symvers file parses vmlinux.o (which
+is not linked yet) and all modules object files (which aren't linked yet).
+These aren't sanitized by the linker yet. That breaks modpost that can't
+detect license properly for modules.
 
-If you think that the first item, above, warrants a -stable fix, then I'll
-properly re-submit once the patch is in Linus' tree.
+This patch makes modpost aware of the new exported symbols structure.
 
-Michal, should I re-send an updated patch whithout the CC:stable?
+The above is a slightly corrected version of the explanation of the problem,
+copied from commit 62a26356.  That commit fixed the problem for module object
+files, but not for vmlinux.o.  This patch fixes modpost for vmlinux.o.
 
-Sorry for the noise.
+Signed-off-by: Frank Rowand <frank.rowand@am.sony.com>
+Signed-off-by: Alessio Igor Bogani <abogani@kernel.org>
+---
+ scripts/mod/modpost.c |    7 	5 +	2 -	0 !
+ scripts/mod/modpost.h |    1 	1 +	0 -	0 !
+ 2 files changed, 6 insertions(+), 2 deletions(-)
 
-Regards,
-Yann E. MORIN.
+Index: b/scripts/mod/modpost.c
+===================================================================
+--- a/scripts/mod/modpost.c
++++ b/scripts/mod/modpost.c
+@@ -132,8 +132,10 @@ static struct module *new_module(char *m
+ 	/* strip trailing .o */
+ 	s = strrchr(p, '.');
+ 	if (s != NULL)
+-		if (strcmp(s, ".o") == 0)
++		if (strcmp(s, ".o") == 0) {
+ 			*s = '\0';
++			mod->is_dot_o = 1;
++		}
+ 
+ 	/* add to list */
+ 	mod->name = p;
+@@ -587,7 +589,8 @@ static void handle_modversions(struct mo
+ 	unsigned int crc;
+ 	enum export export;
+ 
+-	if (!is_vmlinux(mod->name) && strncmp(symname, "__ksymtab", 9) == 0)
++	if ((!is_vmlinux(mod->name) || mod->is_dot_o) &&
++	    strncmp(symname, "__ksymtab", 9) == 0)
+ 		export = export_from_secname(info, get_secindex(info, sym));
+ 	else
+ 		export = export_from_sec(info, get_secindex(info, sym));
+Index: b/scripts/mod/modpost.h
+===================================================================
+--- a/scripts/mod/modpost.h
++++ b/scripts/mod/modpost.h
+@@ -113,6 +113,7 @@ struct module {
+ 	int has_cleanup;
+ 	struct buffer dev_table_buf;
+ 	char	     srcversion[25];
++	int is_dot_o;
+ };
+ 
+ struct elf_info {
 
--- 
-.-----------------.--------------------.------------------.--------------------.
-|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
-| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
-| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
-| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
-'------------------------------^-------^------------------^--------------------'
