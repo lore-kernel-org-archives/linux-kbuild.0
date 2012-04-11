@@ -1,109 +1,80 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.windriver.com ([147.11.1.11]:39416 "EHLO
+Received: from mail.windriver.com ([147.11.1.11]:39417 "EHLO
 	mail.windriver.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S934056Ab2DKXvy (ORCPT
+	with ESMTP id S934062Ab2DKXvy (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
 	Wed, 11 Apr 2012 19:51:54 -0400
 From: Paul Gortmaker <paul.gortmaker@windriver.com>
-Subject: [PATCH 4/5] Revert "kconfig: fix __enabled_ macros definition for invisible and un-selected symbols"
-Date: Wed, 11 Apr 2012 19:50:56 -0400
-Message-Id: <1334188257-3449-5-git-send-email-paul.gortmaker@windriver.com>
-In-Reply-To: <1334188257-3449-1-git-send-email-paul.gortmaker@windriver.com>
-References: <1334188257-3449-1-git-send-email-paul.gortmaker@windriver.com>
+Subject: [PATCH 0/5] RFC: strip 15,000 lines from a typical autoconf.h
+Date: Wed, 11 Apr 2012 19:50:52 -0400
+Message-Id: <1334188257-3449-1-git-send-email-paul.gortmaker@windriver.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org, torvalds@linux-foundation.org, akpm@linux-foundation.org, davem@davemloft.net, tony@bakeyournoodle.com, mmarek@suse.cz, lacombar@gmail.com, Paul Gortmaker <paul.gortmaker@windriver.com>
 
-This reverts commit 953742c8fe8ac45be453fee959d7be40cd89f920.
+Some linux-next builds were showing thousands of repeated warnings like:
 
-Dumping two lines into autoconf.h for all existing Kconfig
-options results in a giant file (~16k lines) we have to process
-each time.  Instead, lets work to just ensure things we care
-about have definitions and we'll only have about 1k lines.
+ linux/netdevice.h:964:1: warning: "__enabled_CONFIG_FCOE" is not defined [-Wundef]
 
-Signed-off-by: Paul Gortmaker <paul.gortmaker@windriver.com>
+An example is at:  http://kisskb.ellerman.id.au/kisskb/buildresult/6091752/
+
+TonyB proposed a fix, and DaveM indicated IS_ENABLED should be fixed
+instead.  [ https://lkml.org/lkml/2012/3/15/612 ]
+
+This got me looking at IS_ENABLED, and I realized that to support using
+this thing in C code, it was bloating our autoconf.h header file by
+about 15,000 lines.  Ouch.  And it still doesn't have all the possible
+lines in it, otherwise we'd not see warnings like the above.
+
+If we limit its use to just CPP #if ... directives, we can unwind the
+bloat and get down to less than ~1k of lines.
+
+Fortunately IS_ENABLED is fairly new, and of the ~300 instances, only
+a handful are actually in C code, so it is easy to unwind those.
+
+The other downside of C users, I thought while unwinding the above users,
+is that the use of IS_ENABLED on Kconfig bools in C if (...) conditionals
+can give the misleading impression that the two code paths will exist in
+the binary, and that the path is chosen at runtime (which it is not).
+
+Commits 1 --> 4 are just largely unwind, so if you are going to just
+look at one, please skip to commit #5 and read the commit log there,
+as it has more details on how this bloat all came about.
+
+I want to test this more, but I also wanted to get some initial
+feedback in case I'm completely barking up the wrong tree here.
+
+Commit ce1744f4ed20ca8 seems to endorse C users of IS_ENABLED, and
+it went through Linus and Andrew, so I'm not sure scrapping C users
+as a solution will be universally agreeable...
+
+Thanks,
+Paul
 ---
- scripts/kconfig/confdata.c |   49 +++++++++++--------------------------------
- 1 files changed, 13 insertions(+), 36 deletions(-)
 
-diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
-index 0586085..9d06744 100644
---- a/scripts/kconfig/confdata.c
-+++ b/scripts/kconfig/confdata.c
-@@ -489,6 +489,17 @@ header_print_symbol(FILE *fp, struct symbol *sym, const char *value, void *arg)
- 			fprintf(fp, "#define %s%s%s 1\n",
- 			    CONFIG_, sym->name, suffix);
- 		}
-+		/*
-+		 * Generate the __enabled_CONFIG_* and
-+		 * __enabled_CONFIG_*_MODULE macros for use by the
-+		 * IS_{ENABLED,BUILTIN,MODULE} macros. The _MODULE variant is
-+		 * generated even for booleans so that the IS_ENABLED() macro
-+		 * works.
-+		 */
-+		fprintf(fp, "#define __enabled_" CONFIG_ "%s %d\n",
-+				sym->name, (*value == 'y'));
-+		fprintf(fp, "#define __enabled_" CONFIG_ "%s_MODULE %d\n",
-+				sym->name, (*value == 'm'));
- 		break;
- 	}
- 	case S_HEX: {
-@@ -540,35 +551,6 @@ static struct conf_printer header_printer_cb =
- };
- 
- /*
-- * Generate the __enabled_CONFIG_* and __enabled_CONFIG_*_MODULE macros for
-- * use by the IS_{ENABLED,BUILTIN,MODULE} macros. The _MODULE variant is
-- * generated even for booleans so that the IS_ENABLED() macro works.
-- */
--static void
--header_print__enabled_symbol(FILE *fp, struct symbol *sym, const char *value, void *arg)
--{
--
--	switch (sym->type) {
--	case S_BOOLEAN:
--	case S_TRISTATE: {
--		fprintf(fp, "#define __enabled_" CONFIG_ "%s %d\n",
--		    sym->name, (*value == 'y'));
--		fprintf(fp, "#define __enabled_" CONFIG_ "%s_MODULE %d\n",
--		    sym->name, (*value == 'm'));
--		break;
--	}
--	default:
--		break;
--	}
--}
--
--static struct conf_printer header__enabled_printer_cb =
--{
--	.print_symbol = header_print__enabled_symbol,
--	.print_comment = header_print_comment,
--};
--
--/*
-  * Tristate printer
-  *
-  * This printer is used when generating the `include/config/tristate.conf' file.
-@@ -949,16 +931,11 @@ int conf_write_autoconf(void)
- 	conf_write_heading(out_h, &header_printer_cb, NULL);
- 
- 	for_all_symbols(i, sym) {
--		if (!sym->name)
--			continue;
--
- 		sym_calc_value(sym);
--
--		conf_write_symbol(out_h, sym, &header__enabled_printer_cb, NULL);
--
--		if (!(sym->flags & SYMBOL_WRITE))
-+		if (!(sym->flags & SYMBOL_WRITE) || !sym->name)
- 			continue;
- 
-+		/* write symbol to auto.conf, tristate and header files */
- 		conf_write_symbol(out, sym, &kconfig_printer_cb, (void *)1);
- 
- 		conf_write_symbol(tristate, sym, &tristate_printer_cb, (void *)1);
+Paul Gortmaker (5):
+  Revert "mm: replace PAGE_MIGRATION with IS_ENABLED(CONFIG_MIGRATION)"
+  ARM: remove C users of IS_ENABLED on THUMB2_KERNEL
+  drivers/net: remove IS_ENABLED usage from wiznet drivers
+  Revert "kconfig: fix __enabled_ macros definition for invisible and
+    un-selected symbols"
+  kconfig: limit IS_ENABLED & similar to CPP usage
+
+ arch/arm/include/asm/opcodes.h      |    6 ++++
+ arch/arm/kernel/ftrace.c            |    9 +-----
+ arch/arm/kernel/insn.c              |    9 +++---
+ arch/arm/kernel/kprobes.c           |   34 ++++++++++++------------
+ arch/arm/kernel/patch.c             |   28 ++++++++++---------
+ drivers/net/ethernet/wiznet/w5100.c |    9 ++++--
+ drivers/net/ethernet/wiznet/w5300.c |   18 ++++++++----
+ include/linux/kconfig.h             |    8 +++---
+ include/linux/migrate.h             |    2 +
+ mm/mprotect.c                       |    2 +-
+ mm/rmap.c                           |    7 ++---
+ scripts/kconfig/confdata.c          |   49 +++++++++-------------------------
+ 12 files changed, 86 insertions(+), 95 deletions(-)
+
 -- 
 1.7.9.1
 
