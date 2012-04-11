@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.windriver.com ([147.11.1.11]:39414 "EHLO
+Received: from mail.windriver.com ([147.11.1.11]:39415 "EHLO
 	mail.windriver.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S934061Ab2DKXvy (ORCPT
+	with ESMTP id S934001Ab2DKXvy (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
 	Wed, 11 Apr 2012 19:51:54 -0400
 From: Paul Gortmaker <paul.gortmaker@windriver.com>
-Subject: [PATCH 1/5] Revert "mm: replace PAGE_MIGRATION with IS_ENABLED(CONFIG_MIGRATION)"
-Date: Wed, 11 Apr 2012 19:50:53 -0400
-Message-Id: <1334188257-3449-2-git-send-email-paul.gortmaker@windriver.com>
+Subject: [PATCH 3/5] drivers/net: remove IS_ENABLED usage from wiznet drivers
+Date: Wed, 11 Apr 2012 19:50:55 -0400
+Message-Id: <1334188257-3449-4-git-send-email-paul.gortmaker@windriver.com>
 In-Reply-To: <1334188257-3449-1-git-send-email-paul.gortmaker@windriver.com>
 References: <1334188257-3449-1-git-send-email-paul.gortmaker@windriver.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,90 +15,102 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org, torvalds@linux-foundation.org, akpm@linux-foundation.org, davem@davemloft.net, tony@bakeyournoodle.com, mmarek@suse.cz, lacombar@gmail.com, Paul Gortmaker <paul.gortmaker@windriver.com>
 
-This reverts commit ce1744f4ed20ca873360e54502f8a71564ef7cc6.
-
-Using IS_ENABLED() within C (vs. within CPP #if statements) requires
-us to actually define every possible bool/tristate Kconfig option
-twice (__enabled_* and __enabled_*_MODULE variants).
-
-That means we end up with about 16k lines of __enabled_ in autoconf.h,
-instead of only less than 1k, and we'll be processing that extra 15k
-lines for each and every C file. [x86_64 defconfig]
-
-Kill off the C users of IS_ENABLED so we can shrink autoconf.h
+The use of IS_ENABLED in C code (vs just in CPP #if directives)
+causes us to carry the burden of a huge autoconf.h file.  It is
+also misleading in that a casual inspection of the code would
+leave one thinking that the if statements were evaluated at
+runtime, when TX_FLOW is a Kconfig bool and hence evaluated
+at configure time as an either/or.
 
 Signed-off-by: Paul Gortmaker <paul.gortmaker@windriver.com>
 ---
- include/linux/migrate.h |    2 ++
- mm/mprotect.c           |    2 +-
- mm/rmap.c               |    7 +++----
- 3 files changed, 6 insertions(+), 5 deletions(-)
+ drivers/net/ethernet/wiznet/w5100.c |    9 ++++++---
+ drivers/net/ethernet/wiznet/w5300.c |   18 ++++++++++++------
+ 2 files changed, 18 insertions(+), 9 deletions(-)
 
-diff --git a/include/linux/migrate.h b/include/linux/migrate.h
-index 855c337..05ed282 100644
---- a/include/linux/migrate.h
-+++ b/include/linux/migrate.h
-@@ -8,6 +8,7 @@
- typedef struct page *new_page_t(struct page *, unsigned long private, int **);
+diff --git a/drivers/net/ethernet/wiznet/w5100.c b/drivers/net/ethernet/wiznet/w5100.c
+index c28e1d5..fdac57d 100644
+--- a/drivers/net/ethernet/wiznet/w5100.c
++++ b/drivers/net/ethernet/wiznet/w5100.c
+@@ -441,8 +441,9 @@ static int w5100_start_tx(struct sk_buff *skb, struct net_device *ndev)
+ 	struct w5100_priv *priv = netdev_priv(ndev);
+ 	u16 offset;
  
- #ifdef CONFIG_MIGRATION
-+#define PAGE_MIGRATION 1
+-	if (IS_ENABLED(CONFIG_WIZNET_TX_FLOW))
+-		netif_stop_queue(ndev);
++#ifdef CONFIG_WIZNET_TX_FLOW
++	netif_stop_queue(ndev);
++#endif
  
- extern void putback_lru_pages(struct list_head *l);
- extern int migrate_page(struct address_space *,
-@@ -31,6 +32,7 @@ extern void migrate_page_copy(struct page *newpage, struct page *page);
- extern int migrate_huge_page_move_mapping(struct address_space *mapping,
- 				  struct page *newpage, struct page *page);
- #else
-+#define PAGE_MIGRATION 0
+ 	offset = w5100_read16(priv, W5100_S0_TX_WR);
+ 	w5100_writebuf(priv, offset, skb->data, skb->len);
+@@ -517,10 +518,12 @@ static irqreturn_t w5100_interrupt(int irq, void *ndev_instance)
+ 	w5100_write(priv, W5100_S0_IR, ir);
+ 	mmiowb();
  
- static inline void putback_lru_pages(struct list_head *l) {}
- static inline int migrate_pages(struct list_head *l, new_page_t x,
-diff --git a/mm/mprotect.c b/mm/mprotect.c
-index a409926..142ef4a 100644
---- a/mm/mprotect.c
-+++ b/mm/mprotect.c
-@@ -60,7 +60,7 @@ static void change_pte_range(struct mm_struct *mm, pmd_t *pmd,
- 				ptent = pte_mkwrite(ptent);
+-	if (IS_ENABLED(CONFIG_WIZNET_TX_FLOW) && (ir & S0_IR_SENDOK)) {
++#ifdef CONFIG_WIZNET_TX_FLOW
++	if (ir & S0_IR_SENDOK) {
+ 		netif_dbg(priv, tx_done, ndev, "tx done\n");
+ 		netif_wake_queue(ndev);
+ 	}
++#endif
  
- 			ptep_modify_prot_commit(mm, addr, pte, ptent);
--		} else if (IS_ENABLED(CONFIG_MIGRATION) && !pte_file(oldpte)) {
-+		} else if (PAGE_MIGRATION && !pte_file(oldpte)) {
- 			swp_entry_t entry = pte_to_swp_entry(oldpte);
+ 	if (ir & S0_IR_RECV) {
+ 		if (napi_schedule_prep(&priv->napi)) {
+diff --git a/drivers/net/ethernet/wiznet/w5300.c b/drivers/net/ethernet/wiznet/w5300.c
+index 88afde9..294b3fd 100644
+--- a/drivers/net/ethernet/wiznet/w5300.c
++++ b/drivers/net/ethernet/wiznet/w5300.c
+@@ -73,6 +73,11 @@ MODULE_LICENSE("GPL");
+ #define W5300_S0_IR		0x0206	/* S0 Interrupt Register */
+ #define   S0_IR_RECV		  0x0004  /* Receive interrupt */
+ #define   S0_IR_SENDOK		  0x0010  /* Send OK interrupt */
++#ifdef CONFIG_WIZNET_TX_FLOW
++#define   S0_IR_FLAGS		  (S0_IR_RECV | S0_IR_SENDOK)
++#else
++#define   S0_IR_FLAGS		  S0_IR_RECV
++#endif
+ #define W5300_S0_SSR		0x0208	/* S0 Socket Status Register */
+ #define W5300_S0_TX_WRSR	0x0220	/* S0 TX Write Size Register */
+ #define W5300_S0_TX_FSR		0x0224	/* S0 TX Free Size Register */
+@@ -273,9 +278,7 @@ static void w5300_hw_start(struct w5300_priv *priv)
+ 			  S0_MR_MACRAW : S0_MR_MACRAW_MF);
+ 	mmiowb();
+ 	w5300_command(priv, S0_CR_OPEN);
+-	w5300_write(priv, W5300_S0_IMR, IS_ENABLED(CONFIG_WIZNET_TX_FLOW) ?
+-					S0_IR_RECV | S0_IR_SENDOK :
+-					S0_IR_RECV);
++	w5300_write(priv, W5300_S0_IMR, S0_IR_FLAGS);
+ 	w5300_write(priv, W5300_IMR, IR_S0);
+ 	mmiowb();
+ }
+@@ -371,8 +374,9 @@ static int w5300_start_tx(struct sk_buff *skb, struct net_device *ndev)
+ {
+ 	struct w5300_priv *priv = netdev_priv(ndev);
  
- 			if (is_write_migration_entry(entry)) {
-diff --git a/mm/rmap.c b/mm/rmap.c
-index 36d01a2..4720d3d 100644
---- a/mm/rmap.c
-+++ b/mm/rmap.c
-@@ -1298,7 +1298,7 @@ int try_to_unmap_one(struct page *page, struct vm_area_struct *vma,
- 			}
- 			dec_mm_counter(mm, MM_ANONPAGES);
- 			inc_mm_counter(mm, MM_SWAPENTS);
--		} else if (IS_ENABLED(CONFIG_MIGRATION)) {
-+		} else if (PAGE_MIGRATION) {
- 			/*
- 			 * Store the pfn of the page in a special migration
- 			 * pte. do_swap_page() will wait until the migration
-@@ -1309,8 +1309,7 @@ int try_to_unmap_one(struct page *page, struct vm_area_struct *vma,
- 		}
- 		set_pte_at(mm, address, pte, swp_entry_to_pte(entry));
- 		BUG_ON(pte_file(*pte));
--	} else if (IS_ENABLED(CONFIG_MIGRATION) &&
--		   (TTU_ACTION(flags) == TTU_MIGRATION)) {
-+	} else if (PAGE_MIGRATION && (TTU_ACTION(flags) == TTU_MIGRATION)) {
- 		/* Establish migration entry for a file page */
- 		swp_entry_t entry;
- 		entry = make_migration_entry(page, pte_write(pteval));
-@@ -1516,7 +1515,7 @@ static int try_to_unmap_anon(struct page *page, enum ttu_flags flags)
- 		 * locking requirements of exec(), migration skips
- 		 * temporary VMAs until after exec() completes.
- 		 */
--		if (IS_ENABLED(CONFIG_MIGRATION) && (flags & TTU_MIGRATION) &&
-+		if (PAGE_MIGRATION && (flags & TTU_MIGRATION) &&
- 				is_vma_temporary_stack(vma))
- 			continue;
+-	if (IS_ENABLED(CONFIG_WIZNET_TX_FLOW))
+-		netif_stop_queue(ndev);
++#ifdef CONFIG_WIZNET_TX_FLOW
++	netif_stop_queue(ndev);
++#endif
  
+ 	w5300_write_frame(priv, skb->data, skb->len);
+ 	mmiowb();
+@@ -439,10 +443,12 @@ static irqreturn_t w5300_interrupt(int irq, void *ndev_instance)
+ 	w5300_write(priv, W5300_S0_IR, ir);
+ 	mmiowb();
+ 
+-	if (IS_ENABLED(CONFIG_WIZNET_TX_FLOW) && (ir & S0_IR_SENDOK)) {
++#ifdef CONFIG_WIZNET_TX_FLOW
++	if (ir & S0_IR_SENDOK) {
+ 		netif_dbg(priv, tx_done, ndev, "tx done\n");
+ 		netif_wake_queue(ndev);
+ 	}
++#endif
+ 
+ 	if (ir & S0_IR_RECV) {
+ 		if (napi_schedule_prep(&priv->napi)) {
 -- 
 1.7.9.1
 
