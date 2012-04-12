@@ -1,30 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.linuxfoundation.org ([140.211.169.12]:34303 "EHLO
-	mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S933676Ab2DLAFO (ORCPT
+Received: from mail-we0-f174.google.com ([74.125.82.174]:63662 "EHLO
+	mail-we0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S933676Ab2DLAFH (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 11 Apr 2012 20:05:14 -0400
-Date: Wed, 11 Apr 2012 17:05:02 -0700
-From: Andrew Morton <akpm@linux-foundation.org>
-Subject: Re: [PATCH 1/5] Revert
- "mm: replace PAGE_MIGRATION with IS_ENABLED(CONFIG_MIGRATION)"
-Message-Id: <20120411170502.b80f1fc0.akpm@linux-foundation.org>
-In-Reply-To: <1334188257-3449-2-git-send-email-paul.gortmaker@windriver.com>
-References: <1334188257-3449-1-git-send-email-paul.gortmaker@windriver.com>
-	<1334188257-3449-2-git-send-email-paul.gortmaker@windriver.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+	Wed, 11 Apr 2012 20:05:07 -0400
+MIME-Version: 1.0
+In-Reply-To: <1334188257-3449-6-git-send-email-paul.gortmaker@windriver.com>
+References: <1334188257-3449-1-git-send-email-paul.gortmaker@windriver.com> <1334188257-3449-6-git-send-email-paul.gortmaker@windriver.com>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Wed, 11 Apr 2012 17:04:45 -0700
+Message-ID: <CA+55aFxmpotS+Yw0niuYRq4eqpYjx6=TAvoz8v=NxD3N_7u7qg@mail.gmail.com>
+Subject: Re: [PATCH 5/5] kconfig: limit IS_ENABLED & similar to CPP usage
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Paul Gortmaker <paul.gortmaker@windriver.com>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, torvalds@linux-foundation.org, davem@davemloft.net, tony@bakeyournoodle.com, mmarek@suse.cz, lacombar@gmail.com
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, akpm@linux-foundation.org, davem@davemloft.net, tony@bakeyournoodle.com, mmarek@suse.cz, lacombar@gmail.com
 
-On Wed, 11 Apr 2012 19:50:53 -0400
-Paul Gortmaker <paul.gortmaker@windriver.com> wrote:
+On Wed, Apr 11, 2012 at 4:50 PM, Paul Gortmaker
+<paul.gortmaker@windriver.com> wrote:
+> Using IS_ENABLED() within C (vs. within CPP #if statements) requires
+> us to actually define every possible bool/tristate Kconfig option
+> twice (__enabled_* and __enabled_*_MODULE variants).
 
-> This reverts commit ce1744f4ed20ca873360e54502f8a71564ef7cc6.
+Why do you keep the __enabled_*[_MODULE] things alive at all?
 
-Acked-by: Andrew Morton <akpm@linux-foundation.org>
+Why can't you just check the CONFIG_xyz[_MODULE] #defines directly?
 
-Please include it in linux-next and merge it up thyself.
+IOW, why isn't IS_ENABLED() just
+
+  #define IS_ENABLED(option) \
+    (defined(CONFIG_##option) || defined(CONFIG_##option##_MODULE))
+
+  #define IS_BUILTIN(option) \
+    (defined(CONFIG_##option))
+
+and we're done with it all? What's the advantage of the __enabled_
+thing again, when you depend on the preprocessor anyway?
+
+                      Linus
