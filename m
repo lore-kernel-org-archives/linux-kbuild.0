@@ -1,39 +1,38 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.linuxfoundation.org ([140.211.169.12]:35727 "EHLO
-	mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757044Ab2DLBpG (ORCPT
+Received: from mail-wi0-f170.google.com ([209.85.212.170]:40080 "EHLO
+	mail-wi0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S933584Ab2DLBzd (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 11 Apr 2012 21:45:06 -0400
-Date: Wed, 11 Apr 2012 18:45:38 -0700
-From: Andrew Morton <akpm@linux-foundation.org>
-Subject: Re: [PATCH 0/5] RFC: strip 15,000 lines from a typical autoconf.h
-Message-Id: <20120411184538.ec21844a.akpm@linux-foundation.org>
-In-Reply-To: <CA+55aFx6V_TpbghsG7xqoBree8ALAKWMA+qLeGg-8DNAno+peg@mail.gmail.com>
+	Wed, 11 Apr 2012 21:55:33 -0400
+MIME-Version: 1.0
+In-Reply-To: <20120411184538.ec21844a.akpm@linux-foundation.org>
 References: <1334188257-3449-1-git-send-email-paul.gortmaker@windriver.com>
-	<CA+55aFy-CeLXstbceP7+co3AXrEWtifKF+8NWzhC7B-A8xBd-w@mail.gmail.com>
-	<CA+55aFx6V_TpbghsG7xqoBree8ALAKWMA+qLeGg-8DNAno+peg@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+ <CA+55aFy-CeLXstbceP7+co3AXrEWtifKF+8NWzhC7B-A8xBd-w@mail.gmail.com>
+ <CA+55aFx6V_TpbghsG7xqoBree8ALAKWMA+qLeGg-8DNAno+peg@mail.gmail.com> <20120411184538.ec21844a.akpm@linux-foundation.org>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Wed, 11 Apr 2012 18:55:10 -0700
+Message-ID: <CA+55aFx9WXtF7LT9rHv0=e0jqAq+b1cDPcRzSGDKvy7+XjxxtA@mail.gmail.com>
+Subject: Re: [PATCH 0/5] RFC: strip 15,000 lines from a typical autoconf.h
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
+To: Andrew Morton <akpm@linux-foundation.org>
 Cc: Paul Gortmaker <paul.gortmaker@windriver.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, davem@davemloft.net, tony@bakeyournoodle.com, mmarek@suse.cz, lacombar@gmail.com
 
-On Wed, 11 Apr 2012 18:19:58 -0700 Linus Torvalds <torvalds@linux-foundation.org> wrote:
+On Wed, Apr 11, 2012 at 6:45 PM, Andrew Morton
+<akpm@linux-foundation.org> wrote:
+>
+> So we shouldn't call it IS_DEFINED() - that would cause confusion with
+> the old version.
 
->    #define IS_DEFINED(x) (__stringify(CONFIG_##x)[0]=='1')
-> 
-> That really is a piece of art. I'm expecting that the Guggenheim will
-> contact me any moment now about it.
+Yeah. Maybe we should call it "config_enabled()" - the lower-case
+hopefully makes it clear that it acts as a C function, not a
+preprocessor one.
 
-Several weeks ago I asked the assemblage if anyone could think of a way
-of doing this.  It seems that I failed to Cc sufficiently perverted
-parties.
+Code like "if (config_enabled(IPV6))" looks reasonably readable to me.
 
-> Of course, the above does *not* work for a pre-processor, but hey, you
-> can't have everything.  It literally is *only* valid in C code. You
-> can't have everything. 
+I asked G+ if they can come up with a better trick. They did well on
+the whole bitmask calculations, maybe somebody can figure out how to
+make the same macro work for both preprocessor and C code...
 
-So we shouldn't call it IS_DEFINED() - that would cause confusion with
-the old version.
+                       Linus
