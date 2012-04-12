@@ -1,53 +1,60 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail1.windriver.com ([147.11.146.13]:47398 "EHLO
-	mail1.windriver.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757847Ab2DLRrF (ORCPT
+Received: from mail-wg0-f44.google.com ([74.125.82.44]:61623 "EHLO
+	mail-wg0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752032Ab2DLTIi convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 12 Apr 2012 13:47:05 -0400
-Message-ID: <4F8714F5.1050605@windriver.com>
-Date: Thu, 12 Apr 2012 13:46:29 -0400
-From: Paul Gortmaker <paul.gortmaker@windriver.com>
+	Thu, 12 Apr 2012 15:08:38 -0400
 MIME-Version: 1.0
-Subject: Re: [PATCH 5/5] kconfig: limit IS_ENABLED & similar to CPP usage
-References: <1334188257-3449-1-git-send-email-paul.gortmaker@windriver.com> <1334188257-3449-6-git-send-email-paul.gortmaker@windriver.com> <CA+55aFxmpotS+Yw0niuYRq4eqpYjx6=TAvoz8v=NxD3N_7u7qg@mail.gmail.com>
-In-Reply-To: <CA+55aFxmpotS+Yw0niuYRq4eqpYjx6=TAvoz8v=NxD3N_7u7qg@mail.gmail.com>
-Content-Type: text/plain; charset="ISO-8859-1"
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <1332960678-11879-2-git-send-email-andi@firstfloor.org>
+References: <1332960678-11879-1-git-send-email-andi@firstfloor.org>
+	<1332960678-11879-2-git-send-email-andi@firstfloor.org>
+Date: Thu, 12 Apr 2012 21:08:36 +0200
+Message-ID: <CAMuHMdVX28zeebzN6277B5p2b=9s-Q06i01o5AHPyXAuKMigGQ@mail.gmail.com>
+Subject: Re: [PATCH 2/2] Add CONFIG_READABLE_ASM
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, akpm@linux-foundation.org, davem@davemloft.net, tony@bakeyournoodle.com, mmarek@suse.cz, lacombar@gmail.com
+To: Andi Kleen <andi@firstfloor.org>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, x86@kernel.org, Andi Kleen <ak@linux.intel.com>
 
-On 12-04-11 08:04 PM, Linus Torvalds wrote:
-> On Wed, Apr 11, 2012 at 4:50 PM, Paul Gortmaker
-> <paul.gortmaker@windriver.com> wrote:
->> Using IS_ENABLED() within C (vs. within CPP #if statements) requires
->> us to actually define every possible bool/tristate Kconfig option
->> twice (__enabled_* and __enabled_*_MODULE variants).
-> 
-> Why do you keep the __enabled_*[_MODULE] things alive at all?
+Hi Andi,
 
-Good point.  Clearly I wasn't aggressive enough in my shitectomy.
-Testing with no __enabled_* stuff now.  That reduces the line
-count even more, which is nice.
+On Wed, Mar 28, 2012 at 20:51, Andi Kleen <andi@firstfloor.org> wrote:
+> +ifdef CONFIG_READABLE_ASM
+> +# Disable optimizations that make assembler listings hard to read.
+> +# reorder blocks reorders the control in the function
+> +# ipa clone creates specialized cloned functions
+> +# partial inlining inlines only parts of functions
+> +KBUILD_CFLAGS += $(call cc-option,-fno-reorder-blocks,) \
+> +                 $(call cc-option,-fno-ipa-cp-clone,) \
+> +                 $(call cc-option,-fno-partial-inlining)
+> +endif
 
-I've not auto-prefixed the CONFIG_ though, since that seems to break
-the grep use case.
+This (now in linux-next) causes m68k/allmodconfig to fail for me:
 
-P.
+  CHK     include/linux/version.h
+  CHK     include/generated/utsrelease.h
+  CC      kernel/bounds.s
+cc1: error: unrecognized command line option "-fno-ipa-cp-clone"
 
-> 
-> Why can't you just check the CONFIG_xyz[_MODULE] #defines directly?
-> 
-> IOW, why isn't IS_ENABLED() just
-> 
->   #define IS_ENABLED(option) \
->     (defined(CONFIG_##option) || defined(CONFIG_##option##_MODULE))
-> 
->   #define IS_BUILTIN(option) \
->     (defined(CONFIG_##option))
-> 
-> and we're done with it all? What's the advantage of the __enabled_
-> thing again, when you depend on the preprocessor anyway?
-> 
->                       Linus
+Somehow, "$(call cc-option,-fno-ipa-cp-clone,)" doesn't detect that my
+toolchain (gcc version 4.1.2 20061115 (prerelease) (Ubuntu 4.1.1-21))
+doesn't support this option.
+
+I tried playing with the trailing comma (why do the first 2 tests have it,
+and the 3rd one doesn't?), but that didn't make a difference.
+
+linux-next builds (using a newer toolchain) don't show this.
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
