@@ -1,68 +1,52 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.snhosting.dk ([87.238.248.203]:26929 "EHLO
-	smtp.domainteam.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756068Ab2DLUfT (ORCPT
+Received: from mail.windriver.com ([147.11.1.11]:60694 "EHLO
+	mail.windriver.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S966245Ab2DLXrg (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 12 Apr 2012 16:35:19 -0400
-Date: Thu, 12 Apr 2012 22:35:17 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH 2/2] Add CONFIG_READABLE_ASM
-Message-ID: <20120412203517.GA30769@merkur.ravnborg.org>
-References: <1332960678-11879-1-git-send-email-andi@firstfloor.org> <1332960678-11879-2-git-send-email-andi@firstfloor.org> <CAMuHMdVX28zeebzN6277B5p2b=9s-Q06i01o5AHPyXAuKMigGQ@mail.gmail.com> <20120412194016.GA30558@merkur.ravnborg.org> <CAMuHMdXfpvprGD18_YYyctfrAk6iRJonWFGFRf9oSaH0u0zfhw@mail.gmail.com> <4F8733C5.5080609@linux.intel.com> <20120412200752.GA30685@merkur.ravnborg.org> <CAMuHMdXN0PcxZQb6=ReFrpG6U49tP8ujA+OKkeVGd_yeftaydw@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAMuHMdXN0PcxZQb6=ReFrpG6U49tP8ujA+OKkeVGd_yeftaydw@mail.gmail.com>
+	Thu, 12 Apr 2012 19:47:36 -0400
+From: Paul Gortmaker <paul.gortmaker@windriver.com>
+Subject: [PATCH 3/3] kconfig: delete last traces of __enabled_ from autoconf.h
+Date: Thu, 12 Apr 2012 19:46:34 -0400
+Message-Id: <1334274394-13466-4-git-send-email-paul.gortmaker@windriver.com>
+In-Reply-To: <1334274394-13466-1-git-send-email-paul.gortmaker@windriver.com>
+References: <CA+55aFx15+eHNA4LobwiFhe4k94XPTVTLdiBmuR4hDKR5HpWPg@mail.gmail.com>
+ <1334274394-13466-1-git-send-email-paul.gortmaker@windriver.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Geert Uytterhoeven <geert@linux-m68k.org>
-Cc: Andi Kleen <ak@linux.intel.com>, Andi Kleen <andi@firstfloor.org>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, x86@kernel.org
+To: linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, torvalds@linux-foundation.org, akpm@linux-foundation.org, davem@davemloft.net, tony@bakeyournoodle.com, mmarek@suse.cz, lacombar@gmail.com, sfr@canb.auug.org.au, Paul Gortmaker <paul.gortmaker@windriver.com>
 
-On Thu, Apr 12, 2012 at 10:17:07PM +0200, Geert Uytterhoeven wrote:
-> Hi Sam,
-> 
-> On Thu, Apr 12, 2012 at 22:07, Sam Ravnborg <sam@ravnborg.org> wrote:
-> > Could you try this:
-> >
-> > cc-disable-opt = $(call try-run,\
-> >        $(CC) $(KBUILD_CPPFLAGS) $(KBUILD_CFLAGS) -f$(strip $(1)) -c -xc /dev/null -o "$TMP",-fno-$(strip $(1)))
-> >
-> > KBUILD_CFLAGS += $(call cc-disable-opt, ipa-cp-clone)
-> >
-> >
-> > It will try if "gcc -fipa-cp-clone" is supported,
-> > and add -fno-ipa-cp-clone in that case.
-> 
-> Unfortunately not:
-> 
-> m68k-linux-gnu-gcc -Wp,-MD,kernel/.bounds.s.d  -nostdinc -isystem
-> /usr/lib/gcc/m68k-linux-gnu/4.1.2/include
-> -I/scratch/geert/linux/linux-next/arch/m68k/include
-> Iarch/m68k/include/generated -Iinclude  -include
-> /scratch/geert/linux/linux-next/include/linux/kconfig.h -D__KERNEL__
-> -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs -fno-strict-aliasing
-> -fno-common -Werror-implicit-function-declaration -Wno-format-security
-> -fno-delete-null-pointer-checks -Os -fno-reorder-blocks
-> -fno-ipa-cp-clone -pipe -fno-strength-reduce -ffixed-a2
-> -fno-omit-frame-pointer -fno-optimize-sibling-calls -g
-> -D"KBUILD_STR(s)=#s" -D"KBUILD_BASENAME=KBUILD_STR(bounds)"
-> -D"KBUILD_MODNAME=KBUILD_STR(bounds)" -fverbose-asm -S -o
-> kernel/bounds.s kernel/bounds.c
-> cc1: error: unrecognized command line option "-fno-ipa-cp-clone"
-> make[1]: *** [kernel/bounds.s] Error 1
-> make: *** [prepare0] Error 2
+We've now fixed IS_ENABLED() and friends to not require any
+special "__enabled_" prefixed versions of the normal Kconfig
+options, so delete the last traces of them being generated.
 
-So with the above command-line gcc fails with an exit code for -fno-ipa-cp-clone.
-But with cc-option it does not.
+Signed-off-by: Paul Gortmaker <paul.gortmaker@windriver.com>
+---
+ scripts/kconfig/confdata.c |   11 -----------
+ 1 files changed, 0 insertions(+), 11 deletions(-)
 
-Can you dig out the command-line used for cc-option?
-We may be able to analyze why it fails in the above case, but
-not with cc-option.
+diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
+index 9d06744..52577f0 100644
+--- a/scripts/kconfig/confdata.c
++++ b/scripts/kconfig/confdata.c
+@@ -489,17 +489,6 @@ header_print_symbol(FILE *fp, struct symbol *sym, const char *value, void *arg)
+ 			fprintf(fp, "#define %s%s%s 1\n",
+ 			    CONFIG_, sym->name, suffix);
+ 		}
+-		/*
+-		 * Generate the __enabled_CONFIG_* and
+-		 * __enabled_CONFIG_*_MODULE macros for use by the
+-		 * IS_{ENABLED,BUILTIN,MODULE} macros. The _MODULE variant is
+-		 * generated even for booleans so that the IS_ENABLED() macro
+-		 * works.
+-		 */
+-		fprintf(fp, "#define __enabled_" CONFIG_ "%s %d\n",
+-				sym->name, (*value == 'y'));
+-		fprintf(fp, "#define __enabled_" CONFIG_ "%s_MODULE %d\n",
+-				sym->name, (*value == 'm'));
+ 		break;
+ 	}
+ 	case S_HEX: {
+-- 
+1.7.9.1
 
-I wonder if we hit something strange due to the fact that we
-are assigning to KBUILD_CFLAGS and we reference the same variable.
-
-But that does not explain why the others work.
-
-	Sam
