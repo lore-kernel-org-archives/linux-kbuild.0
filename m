@@ -1,84 +1,59 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from haggis.pcug.org.au ([203.10.76.10]:47728 "EHLO
-	members.tip.net.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757306Ab2DLDKs (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 11 Apr 2012 23:10:48 -0400
-Date: Thu, 12 Apr 2012 13:10:37 +1000
-From: Stephen Rothwell <sfr@canb.auug.org.au>
+Received: from cantor2.suse.de ([195.135.220.15]:42528 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754955Ab2DLJ1F (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 12 Apr 2012 05:27:05 -0400
+Message-ID: <4F869FE6.6060400@suse.cz>
+Date: Thu, 12 Apr 2012 11:27:02 +0200
+From: Michal Marek <mmarek@suse.cz>
+MIME-Version: 1.0
 Subject: Re: [PATCH 0/5] RFC: strip 15,000 lines from a typical autoconf.h
-Message-Id: <20120412131037.5371c8b0d9e2dde32e06f8ce@canb.auug.org.au>
-In-Reply-To: <CA+55aFx9WXtF7LT9rHv0=e0jqAq+b1cDPcRzSGDKvy7+XjxxtA@mail.gmail.com>
-References: <1334188257-3449-1-git-send-email-paul.gortmaker@windriver.com>
-	<CA+55aFy-CeLXstbceP7+co3AXrEWtifKF+8NWzhC7B-A8xBd-w@mail.gmail.com>
-	<CA+55aFx6V_TpbghsG7xqoBree8ALAKWMA+qLeGg-8DNAno+peg@mail.gmail.com>
-	<20120411184538.ec21844a.akpm@linux-foundation.org>
-	<CA+55aFx9WXtF7LT9rHv0=e0jqAq+b1cDPcRzSGDKvy7+XjxxtA@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pgp-signature";
- micalg="PGP-SHA256";
- boundary="Signature=_Thu__12_Apr_2012_13_10_37_+1000_=N4Wa5JBQHw2Pbaw"
+References: <1334188257-3449-1-git-send-email-paul.gortmaker@windriver.com> <CA+55aFy-CeLXstbceP7+co3AXrEWtifKF+8NWzhC7B-A8xBd-w@mail.gmail.com> <CA+55aFx6V_TpbghsG7xqoBree8ALAKWMA+qLeGg-8DNAno+peg@mail.gmail.com>
+In-Reply-To: <CA+55aFx6V_TpbghsG7xqoBree8ALAKWMA+qLeGg-8DNAno+peg@mail.gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Andrew Morton <akpm@linux-foundation.org>, Paul Gortmaker <paul.gortmaker@windriver.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, davem@davemloft.net, tony@bakeyournoodle.com, mmarek@suse.cz, lacombar@gmail.com
+Cc: Paul Gortmaker <paul.gortmaker@windriver.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, akpm@linux-foundation.org, davem@davemloft.net, tony@bakeyournoodle.com, lacombar@gmail.com
 
---Signature=_Thu__12_Apr_2012_13_10_37_+1000_=N4Wa5JBQHw2Pbaw
-Content-Type: text/plain; charset=US-ASCII
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On 12.4.2012 03:19, Linus Torvalds wrote:
+> On Wed, Apr 11, 2012 at 4:58 PM, Linus Torvalds
+> <torvalds@linux-foundation.org> wrote:
+>>
+>> I think we can easily drop IS_ENABLED() if it has been causing
+>> problems. And it clearly is.
 
-Hi Linus,
+What is really causing problems is that kconfig has no view of the
+entire kernel configuration.
 
-On Wed, 11 Apr 2012 18:55:10 -0700 Linus Torvalds <torvalds@linux-foundatio=
-n.org> wrote:
->
-> On Wed, Apr 11, 2012 at 6:45 PM, Andrew Morton <akpm@linux-foundation.org=
-> wrote:
-> >
-> > So we shouldn't call it IS_DEFINED() - that would cause confusion with
-> > the old version.
->=20
-> Yeah. Maybe we should call it "config_enabled()" - the lower-case
-> hopefully makes it clear that it acts as a C function, not a
-> preprocessor one.
->=20
-> Code like "if (config_enabled(IPV6))" looks reasonably readable to me.
->=20
-> I asked G+ if they can come up with a better trick. They did well on
-> the whole bitmask calculations, maybe somebody can figure out how to
-> make the same macro work for both preprocessor and C code...
 
-Can we leave the CONFIG_ part in the caller, so they are still grepable, pl=
-ease?
+>> And I had never even looked at that generated file. It's disgusting.
+>> We need to stop doing that. It must be driving compile-times up too -
+>> just parsing that monster is RealWork(tm).
 
-So:
+You forgot that it also contributes to global warming.
 
-	#define	config_enabled(x)	(__stringify(x)[0] =3D=3D '1')
 
---=20
-Cheers,
-Stephen Rothwell                    sfr@canb.auug.org.au
+> Oh, but I have a sick and twisted mind. And I'm incredibly smart and
+> photogenic too.
+> 
+> Here's an implementation of IS_ENABLED() that works in C. Well,
+> "gcc-C". It depends on the optimizer DTRT, but gcc really does seem to
+> do it.
+> 
+> Ready? You *will* go blind - blinded by the pure beauty and intellect
+> in this thing:
+> 
+>     #define IS_DEFINED(x) (__stringify(CONFIG_##x)[0]=='1')
 
---Signature=_Thu__12_Apr_2012_13_10_37_+1000_=N4Wa5JBQHw2Pbaw
-Content-Type: application/pgp-signature
+Nice. Maybe we could make it simply
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.12 (GNU/Linux)
+#define IS_DEFINED(x) (__stringify(x)[0]=='1')
 
-iQIcBAEBCAAGBQJPhketAAoJEECxmPOUX5FEllAQAJJPAh7WMBihnfl/YnS9WftZ
-cOJlwsi7UVERU8LKuEcwz5/FdHRpr5NKMa2tmRvYq8F9J9K8BpYr4oe7rRM/Pbzg
-aOgVEQK/2u7ziC79TwI9mOPYvYYXHdloUNAz/H4M7y2Kq/Wc2FNWoY6MdG3DKe7+
-Rpp/5Q4jd2hblD2yqzRc9scVp0Pr1BJzac/6Qd3tm7pmp5B1SgGThjQNFxDU7KN8
-KpPOJtKEDjudrrtSfjI8zLLy0dQIn+FUvN0RAo4OuR1tx6jl+gJBJMpWgvzFOIuf
-Vh64rRLVm9UP5d+4UVh5K7y5T6fq3VaJRCvh2i2/grQvYtPBsuL9jzZ0cRgJvrko
-8w+BNPsxkKmJ6yRFS3FzeiFcKD/S9IKDBcY8fMCPTP+EKMz63SlvXTQ+rUKEZHow
-zuA3ZXCMV+csjusm8JU7eaMHCQT1zd0gZnhL2+m76ASJjmTqaiZO6tWgxOHcy8cx
-ktE253r4IsUkduuErfo5x2/OnEioVcPGUyzYCObYMqZT/uEhufahiRkcoyhDOyDJ
-z+AaCw5rTyWrkyHcteBUfTERgm6Q7psL19cv7U38LTo9lXZRMf79/sc71NqPjC2V
-1ACtuovi1GKEzbLwnSYbv/5N5Vv9+nxeOBz9nsa3/H/7NkIQTGg7TRQAS+euU2f8
-voQSs4JHAH1IP5hM6rXW
-=iJX2
------END PGP SIGNATURE-----
+so that the users are easily grepable and it is obvious that a config
+option is being tested, like in the current implementation. The only
+thing we lose is the check if 'x' is really a boolean or tristate
+option. But it turns out that even now this does not work in all cases.
 
---Signature=_Thu__12_Apr_2012_13_10_37_+1000_=N4Wa5JBQHw2Pbaw--
+Michal
