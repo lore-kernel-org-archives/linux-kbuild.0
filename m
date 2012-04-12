@@ -1,60 +1,62 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wg0-f44.google.com ([74.125.82.44]:61623 "EHLO
-	mail-wg0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752032Ab2DLTIi convert rfc822-to-8bit (ORCPT
+Received: from mail-we0-f174.google.com ([74.125.82.174]:43665 "EHLO
+	mail-we0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S934629Ab2DLT3c convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 12 Apr 2012 15:08:38 -0400
+	Thu, 12 Apr 2012 15:29:32 -0400
 MIME-Version: 1.0
-In-Reply-To: <1332960678-11879-2-git-send-email-andi@firstfloor.org>
-References: <1332960678-11879-1-git-send-email-andi@firstfloor.org>
-	<1332960678-11879-2-git-send-email-andi@firstfloor.org>
-Date: Thu, 12 Apr 2012 21:08:36 +0200
-Message-ID: <CAMuHMdVX28zeebzN6277B5p2b=9s-Q06i01o5AHPyXAuKMigGQ@mail.gmail.com>
-Subject: Re: [PATCH 2/2] Add CONFIG_READABLE_ASM
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <20120412131037.5371c8b0d9e2dde32e06f8ce@canb.auug.org.au>
+References: <1334188257-3449-1-git-send-email-paul.gortmaker@windriver.com>
+ <CA+55aFy-CeLXstbceP7+co3AXrEWtifKF+8NWzhC7B-A8xBd-w@mail.gmail.com>
+ <CA+55aFx6V_TpbghsG7xqoBree8ALAKWMA+qLeGg-8DNAno+peg@mail.gmail.com>
+ <20120411184538.ec21844a.akpm@linux-foundation.org> <CA+55aFx9WXtF7LT9rHv0=e0jqAq+b1cDPcRzSGDKvy7+XjxxtA@mail.gmail.com>
+ <20120412131037.5371c8b0d9e2dde32e06f8ce@canb.auug.org.au>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Thu, 12 Apr 2012 12:29:11 -0700
+Message-ID: <CA+55aFx15+eHNA4LobwiFhe4k94XPTVTLdiBmuR4hDKR5HpWPg@mail.gmail.com>
+Subject: Re: [PATCH 0/5] RFC: strip 15,000 lines from a typical autoconf.h
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andi Kleen <andi@firstfloor.org>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, x86@kernel.org, Andi Kleen <ak@linux.intel.com>
+To: Stephen Rothwell <sfr@canb.auug.org.au>
+Cc: Andrew Morton <akpm@linux-foundation.org>, Paul Gortmaker <paul.gortmaker@windriver.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, davem@davemloft.net, tony@bakeyournoodle.com, mmarek@suse.cz, lacombar@gmail.com
 
-Hi Andi,
+On Wed, Apr 11, 2012 at 8:10 PM, Stephen Rothwell <sfr@canb.auug.org.au> wrote:
+>
+> Can we leave the CONFIG_ part in the caller, so they are still grepable, please?
+>
+> So:
+>
+> � � � �#define config_enabled(x) � � � (__stringify(x)[0] == '1')
 
-On Wed, Mar 28, 2012 at 20:51, Andi Kleen <andi@firstfloor.org> wrote:
-> +ifdef CONFIG_READABLE_ASM
-> +# Disable optimizations that make assembler listings hard to read.
-> +# reorder blocks reorders the control in the function
-> +# ipa clone creates specialized cloned functions
-> +# partial inlining inlines only parts of functions
-> +KBUILD_CFLAGS += $(call cc-option,-fno-reorder-blocks,) \
-> +                 $(call cc-option,-fno-ipa-cp-clone,) \
-> +                 $(call cc-option,-fno-partial-inlining)
-> +endif
+Sure. Except G+ came through, and we now have an even better hack for
+this, that works entirely in the preprocessor.
 
-This (now in linux-next) causes m68k/allmodconfig to fail for me:
+That also means that you can use it for static initializers etc, so you can do
 
-  CHK     include/linux/version.h
-  CHK     include/generated/utsrelease.h
-  CC      kernel/bounds.s
-cc1: error: unrecognized command line option "-fno-ipa-cp-clone"
+   int some_value = config_enabled(CONFIG_ENABLE_XYZ_BY_DEFAULT);
 
-Somehow, "$(call cc-option,-fno-ipa-cp-clone,)" doesn't detect that my
-toolchain (gcc version 4.1.2 20061115 (prerelease) (Ubuntu 4.1.1-21))
-doesn't support this option.
+Paul, do you want to write the patch to change IS_ENABLED() to use this trick?
 
-I tried playing with the trailing comma (why do the first 2 tests have it,
-and the 3rd one doesn't?), but that didn't make a difference.
+Trick courtesy of "comex ." on G+ (please do give him credit even if
+he doesn't seem to use his real name):
 
-linux-next builds (using a newer toolchain) don't show this.
+  #define is_set(macro) is_set_(macro)
+  #define macrotest_1 ,
+  #define is_set_(value) is_set__(macrotest_##value)
+  #define is_set__(comma) is_set___(comma 1, 0)
+  #define is_set___(_, v, ...) v
 
-Gr{oetje,eeting}s,
+and now "is_set(CONFIG_xyzzy)" works, and gives either 1 or 0 directly
+in the preprocessor.
 
-                        Geert
+Obviously the names have to be changed here (let's not use
+"macrotest_1" - make it something more internal), but the concept is
+solid, and I would actually suggest having this as a generic "is this
+macro set to 1" helper first, and then implement IS_ENABLED() in terms
+of that.
 
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+My likee.
 
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+                       Linus
