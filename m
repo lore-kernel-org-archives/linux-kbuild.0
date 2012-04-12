@@ -1,65 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from haggis.pcug.org.au ([203.10.76.10]:35346 "EHLO
-	members.tip.net.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754218Ab2DLAWr (ORCPT
+Received: from mail-wi0-f172.google.com ([209.85.212.172]:40088 "EHLO
+	mail-wi0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S933524Ab2DLB0D (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 11 Apr 2012 20:22:47 -0400
-Date: Thu, 12 Apr 2012 10:22:36 +1000
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-Subject: Re: [PATCH 3/5] drivers/net: remove IS_ENABLED usage from wiznet
- drivers
-Message-Id: <20120412102236.14d10178523e8dc5096d2980@canb.auug.org.au>
-In-Reply-To: <20120412100619.9cbd13da03b2a7ecac143392@canb.auug.org.au>
-References: <1334188257-3449-1-git-send-email-paul.gortmaker@windriver.com>
-	<1334188257-3449-4-git-send-email-paul.gortmaker@windriver.com>
-	<20120411.195444.540814653660043985.davem@davemloft.net>
-	<20120412100619.9cbd13da03b2a7ecac143392@canb.auug.org.au>
-Mime-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pgp-signature";
- micalg="PGP-SHA256";
- boundary="Signature=_Thu__12_Apr_2012_10_22_36_+1000_vJX8_YKt3jlTmEmo"
+	Wed, 11 Apr 2012 21:26:03 -0400
+MIME-Version: 1.0
+In-Reply-To: <CA+55aFy-CeLXstbceP7+co3AXrEWtifKF+8NWzhC7B-A8xBd-w@mail.gmail.com>
+References: <1334188257-3449-1-git-send-email-paul.gortmaker@windriver.com> <CA+55aFy-CeLXstbceP7+co3AXrEWtifKF+8NWzhC7B-A8xBd-w@mail.gmail.com>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Wed, 11 Apr 2012 18:19:58 -0700
+Message-ID: <CA+55aFx6V_TpbghsG7xqoBree8ALAKWMA+qLeGg-8DNAno+peg@mail.gmail.com>
+Subject: Re: [PATCH 0/5] RFC: strip 15,000 lines from a typical autoconf.h
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: David Miller <davem@davemloft.net>
-Cc: paul.gortmaker@windriver.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, torvalds@linux-foundation.org, akpm@linux-foundation.org, tony@bakeyournoodle.com, mmarek@suse.cz, lacombar@gmail.com
+To: Paul Gortmaker <paul.gortmaker@windriver.com>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, akpm@linux-foundation.org, davem@davemloft.net, tony@bakeyournoodle.com, mmarek@suse.cz, lacombar@gmail.com
 
---Signature=_Thu__12_Apr_2012_10_22_36_+1000_vJX8_YKt3jlTmEmo
-Content-Type: text/plain; charset=US-ASCII
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-Hi Dave,
-
-On Thu, 12 Apr 2012 10:06:19 +1000 Stephen Rothwell <sfr@canb.auug.org.au> =
-wrote:
+On Wed, Apr 11, 2012 at 4:58 PM, Linus Torvalds
+<torvalds@linux-foundation.org> wrote:
 >
-> Sure - *after* it has been reviewed, and tested :-)
+> I think we can easily drop IS_ENABLED() if it has been causing
+> problems. And it clearly is.
+>
+> And I had never even looked at that generated file. It's disgusting.
+> We need to stop doing that. It must be driving compile-times up too -
+> just parsing that monster is RealWork(tm).
 
-Sorry, overreaction with limited context and less limited irritation  :-)
+Oh, but I have a sick and twisted mind. And I'm incredibly smart and
+photogenic too.
 
---=20
-Cheers,
-Stephen Rothwell                    sfr@canb.auug.org.au
+Here's an implementation of IS_ENABLED() that works in C. Well,
+"gcc-C". It depends on the optimizer DTRT, but gcc really does seem to
+do it.
 
---Signature=_Thu__12_Apr_2012_10_22_36_+1000_vJX8_YKt3jlTmEmo
-Content-Type: application/pgp-signature
+Ready? You *will* go blind - blinded by the pure beauty and intellect
+in this thing:
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.12 (GNU/Linux)
+    #define IS_DEFINED(x) (__stringify(CONFIG_##x)[0]=='1')
 
-iQIcBAEBCAAGBQJPhiBMAAoJEECxmPOUX5FEZWgP/ApM3xd11G0lK9tCLV1iDqcW
-wg4sqTxRBGQzMJFFKo5aTjDff1aZoxpv5OhxLmzeckqkmU+ScuyqIaFBKqOrgBqu
-vu0KTz+NZdXydm/QccaHf7wv5Efeknp7PCWBcgi+EFbM/S/D3qQ1XZW+rK97grSn
-EhhPZPRW262wEyw0gsAmiaCQBDauaCX2g+CRuhitpWviYJSxHgP9o101ojh5MvIb
-b7XNarvADtEXPTsw8yuAz8xY6iAppByBxeanVJnfjcTOCPVht1QYP5mMNT4CDczB
-nKyO96amWOvKHuk8Mqp2SVFlRQVVpriPpjLbsRVwreGE3bj3gv3Un32/mlc/nI9o
-YAnFKwIPPzKGQqXEYyVBZQp1VRYUsRybGmeTbBmbLOzKd1+Fa7/wG5Gy9PCXeBX6
-bo9AAvFsBXZtALty7HZ3zBWX2irneIHJwErxyhrMOuyI6eQG/oGxqE8TiWSBMTpq
-tzi3AJFbnAspkYxpOcXtn7ToU4Nuh4Vfb/M1ZbWdF0eMPx3iNOj+2iR3E/ms3lYm
-LXfOFWwSPx2UiueHU5B/lyZeIAxJctj6P0lab7Yo3hD708O2OVUEkv4T6sUIXvxl
-zebp03sjODJsMmTNoNFXufAISk285zhYRoj6KQN08HBjmE8dHIeVW5MkyQiu1gX2
-+q6kSX+Zb42hAggtJJa2
-=fxzB
------END PGP SIGNATURE-----
+That really is a piece of art. I'm expecting that the Guggenheim will
+contact me any moment now about it.
 
---Signature=_Thu__12_Apr_2012_10_22_36_+1000_vJX8_YKt3jlTmEmo--
+Of course, the above does *not* work for a pre-processor, but hey, you
+can't have everything. It literally is *only* valid in C code. You
+can't have everything. In the pre-processor, you can just use
+
+   #if CONFIG_OPTION
+
+like you always could, or use another helper macro for the "defined(x)" magic.
+
+                      Linus
