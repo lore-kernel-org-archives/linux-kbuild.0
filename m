@@ -1,59 +1,40 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:42528 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754955Ab2DLJ1F (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 12 Apr 2012 05:27:05 -0400
-Message-ID: <4F869FE6.6060400@suse.cz>
-Date: Thu, 12 Apr 2012 11:27:02 +0200
-From: Michal Marek <mmarek@suse.cz>
+Received: from mail.windriver.com ([147.11.1.11]:33026 "EHLO
+	mail.windriver.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756617Ab2DLRPu (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 12 Apr 2012 13:15:50 -0400
+Message-ID: <4F870DA0.4000807@windriver.com>
+Date: Thu, 12 Apr 2012 13:15:12 -0400
+From: Paul Gortmaker <paul.gortmaker@windriver.com>
 MIME-Version: 1.0
-Subject: Re: [PATCH 0/5] RFC: strip 15,000 lines from a typical autoconf.h
-References: <1334188257-3449-1-git-send-email-paul.gortmaker@windriver.com> <CA+55aFy-CeLXstbceP7+co3AXrEWtifKF+8NWzhC7B-A8xBd-w@mail.gmail.com> <CA+55aFx6V_TpbghsG7xqoBree8ALAKWMA+qLeGg-8DNAno+peg@mail.gmail.com>
-In-Reply-To: <CA+55aFx6V_TpbghsG7xqoBree8ALAKWMA+qLeGg-8DNAno+peg@mail.gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [PATCH 3/5] drivers/net: remove IS_ENABLED usage from wiznet
+ drivers
+References: <1334188257-3449-1-git-send-email-paul.gortmaker@windriver.com>	<1334188257-3449-4-git-send-email-paul.gortmaker@windriver.com> <20120411.195444.540814653660043985.davem@davemloft.net>
+In-Reply-To: <20120411.195444.540814653660043985.davem@davemloft.net>
+Content-Type: text/plain; charset="ISO-8859-1"
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Paul Gortmaker <paul.gortmaker@windriver.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, akpm@linux-foundation.org, davem@davemloft.net, tony@bakeyournoodle.com, lacombar@gmail.com
+To: David Miller <davem@davemloft.net>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, torvalds@linux-foundation.org, akpm@linux-foundation.org, tony@bakeyournoodle.com, mmarek@suse.cz, lacombar@gmail.com
 
-On 12.4.2012 03:19, Linus Torvalds wrote:
-> On Wed, Apr 11, 2012 at 4:58 PM, Linus Torvalds
-> <torvalds@linux-foundation.org> wrote:
+On 12-04-11 07:54 PM, David Miller wrote:
+> From: Paul Gortmaker <paul.gortmaker@windriver.com>
+> Date: Wed, 11 Apr 2012 19:50:55 -0400
+> 
+>> The use of IS_ENABLED in C code (vs just in CPP #if directives)
+>> causes us to carry the burden of a huge autoconf.h file.  It is
+>> also misleading in that a casual inspection of the code would
+>> leave one thinking that the if statements were evaluated at
+>> runtime, when TX_FLOW is a Kconfig bool and hence evaluated
+>> at configure time as an either/or.
 >>
->> I think we can easily drop IS_ENABLED() if it has been causing
->> problems. And it clearly is.
-
-What is really causing problems is that kconfig has no view of the
-entire kernel configuration.
-
-
->> And I had never even looked at that generated file. It's disgusting.
->> We need to stop doing that. It must be driving compile-times up too -
->> just parsing that monster is RealWork(tm).
-
-You forgot that it also contributes to global warming.
-
-
-> Oh, but I have a sick and twisted mind. And I'm incredibly smart and
-> photogenic too.
+>> Signed-off-by: Paul Gortmaker <paul.gortmaker@windriver.com>
 > 
-> Here's an implementation of IS_ENABLED() that works in C. Well,
-> "gcc-C". It depends on the optimizer DTRT, but gcc really does seem to
-> do it.
-> 
-> Ready? You *will* go blind - blinded by the pure beauty and intellect
-> in this thing:
-> 
->     #define IS_DEFINED(x) (__stringify(CONFIG_##x)[0]=='1')
+> Want me to toss this into net-next?
 
-Nice. Maybe we could make it simply
+Yes, that makes sense since wiznet only exists there currently.
 
-#define IS_DEFINED(x) (__stringify(x)[0]=='1')
-
-so that the users are easily grepable and it is obvious that a config
-option is being tested, like in the current implementation. The only
-thing we lose is the check if 'x' is really a boolean or tristate
-option. But it turns out that even now this does not work in all cases.
-
-Michal
+Thanks,
+Paul.
