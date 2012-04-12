@@ -1,76 +1,65 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from haggis.pcug.org.au ([203.10.76.10]:52007 "EHLO
+Received: from haggis.pcug.org.au ([203.10.76.10]:35346 "EHLO
 	members.tip.net.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S933639Ab2DLAGd (ORCPT
+	with ESMTP id S1754218Ab2DLAWr (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 11 Apr 2012 20:06:33 -0400
-Date: Thu, 12 Apr 2012 10:06:19 +1000
+	Wed, 11 Apr 2012 20:22:47 -0400
+Date: Thu, 12 Apr 2012 10:22:36 +1000
 From: Stephen Rothwell <sfr@canb.auug.org.au>
 Subject: Re: [PATCH 3/5] drivers/net: remove IS_ENABLED usage from wiznet
  drivers
-Message-Id: <20120412100619.9cbd13da03b2a7ecac143392@canb.auug.org.au>
-In-Reply-To: <20120411.195444.540814653660043985.davem@davemloft.net>
+Message-Id: <20120412102236.14d10178523e8dc5096d2980@canb.auug.org.au>
+In-Reply-To: <20120412100619.9cbd13da03b2a7ecac143392@canb.auug.org.au>
 References: <1334188257-3449-1-git-send-email-paul.gortmaker@windriver.com>
 	<1334188257-3449-4-git-send-email-paul.gortmaker@windriver.com>
 	<20120411.195444.540814653660043985.davem@davemloft.net>
+	<20120412100619.9cbd13da03b2a7ecac143392@canb.auug.org.au>
 Mime-Version: 1.0
 Content-Type: multipart/signed; protocol="application/pgp-signature";
  micalg="PGP-SHA256";
- boundary="Signature=_Thu__12_Apr_2012_10_06_19_+1000_TJV4j_z/.nl7lSo0"
+ boundary="Signature=_Thu__12_Apr_2012_10_22_36_+1000_vJX8_YKt3jlTmEmo"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: David Miller <davem@davemloft.net>
 Cc: paul.gortmaker@windriver.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, torvalds@linux-foundation.org, akpm@linux-foundation.org, tony@bakeyournoodle.com, mmarek@suse.cz, lacombar@gmail.com
 
---Signature=_Thu__12_Apr_2012_10_06_19_+1000_TJV4j_z/.nl7lSo0
+--Signature=_Thu__12_Apr_2012_10_22_36_+1000_vJX8_YKt3jlTmEmo
 Content-Type: text/plain; charset=US-ASCII
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
 Hi Dave,
 
-On Wed, 11 Apr 2012 19:54:44 -0400 (EDT) David Miller <davem@davemloft.net>=
- wrote:
+On Thu, 12 Apr 2012 10:06:19 +1000 Stephen Rothwell <sfr@canb.auug.org.au> =
+wrote:
 >
-> From: Paul Gortmaker <paul.gortmaker@windriver.com>
-> Date: Wed, 11 Apr 2012 19:50:55 -0400
->=20
-> > The use of IS_ENABLED in C code (vs just in CPP #if directives)
-> > causes us to carry the burden of a huge autoconf.h file.  It is
-> > also misleading in that a casual inspection of the code would
-> > leave one thinking that the if statements were evaluated at
-> > runtime, when TX_FLOW is a Kconfig bool and hence evaluated
-> > at configure time as an either/or.
-> >=20
-> > Signed-off-by: Paul Gortmaker <paul.gortmaker@windriver.com>
->=20
-> Want me to toss this into net-next?
+> Sure - *after* it has been reviewed, and tested :-)
 
-Sure - *after* it has been reviewed, and tested :-)
+Sorry, overreaction with limited context and less limited irritation  :-)
 
 --=20
 Cheers,
 Stephen Rothwell                    sfr@canb.auug.org.au
 
---Signature=_Thu__12_Apr_2012_10_06_19_+1000_TJV4j_z/.nl7lSo0
+--Signature=_Thu__12_Apr_2012_10_22_36_+1000_vJX8_YKt3jlTmEmo
 Content-Type: application/pgp-signature
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1.4.12 (GNU/Linux)
 
-iQIcBAEBCAAGBQJPhhx7AAoJEECxmPOUX5FEzagP/2YL8E0bmw9bF/0UYw7SprgL
-RYqJxlTiN+SnrhXIOijPaQG+4WEVraHXZ4f196/r5ZbE7dfhVNG05u0tfLc2a3tV
-m/ZwAZkFo49hModSicWVHY35buAdFI0cSoTbGS+hI8LpqV1fkVcXPX+cK7G4ugrG
-iDnCDo3uHaeenfGbm22YEP0rwC/jx1FxPwqkDaBG64SGIRVSt2hTzN3pRI5E8mQb
-cdp3ZR7exl82pJ2/7x3A4VoT3XP8U7u5+ryo48+ztdmnkZDUOjd4XrVR9kI8qGh2
-Ibfi5c4fxcx7Js1udUJbLSApnwfg9raFVVEyG0Zxgqdz/UX/z63x3v+5LptBhcc1
-XyHsR3QeWoE8u1YyBjP9iAEdi5w4La1U7fDRGxWTbQSElLWW8bFVjC6a+1LQicNL
-6HVvzmF+j04vWaQGuaI/r2cOeE7/UFYJLTobifxf5tQas8DZtEY2nq8HcnA7BtRj
-VdK8j172lgqFXCjRG5tJQ8eJsReCczgbhzugCFMtpi2yFht/omMnbjlGcszFZdbX
-JTGPrch2HH9bvaE4y0qhOpDVdNaLmcU/kkOxTq+b3DZeZJHQzD8Rmhoy7cPZwhsf
-+wwmBJGj2/20UDNFqKNwAPG/rdQ8NoPPE+fONpU/E2zUQknTUTTNAvUDYOIqUFQF
-q9hDKrBmwoVTsUBbUPe3
-=eZU4
+iQIcBAEBCAAGBQJPhiBMAAoJEECxmPOUX5FEZWgP/ApM3xd11G0lK9tCLV1iDqcW
+wg4sqTxRBGQzMJFFKo5aTjDff1aZoxpv5OhxLmzeckqkmU+ScuyqIaFBKqOrgBqu
+vu0KTz+NZdXydm/QccaHf7wv5Efeknp7PCWBcgi+EFbM/S/D3qQ1XZW+rK97grSn
+EhhPZPRW262wEyw0gsAmiaCQBDauaCX2g+CRuhitpWviYJSxHgP9o101ojh5MvIb
+b7XNarvADtEXPTsw8yuAz8xY6iAppByBxeanVJnfjcTOCPVht1QYP5mMNT4CDczB
+nKyO96amWOvKHuk8Mqp2SVFlRQVVpriPpjLbsRVwreGE3bj3gv3Un32/mlc/nI9o
+YAnFKwIPPzKGQqXEYyVBZQp1VRYUsRybGmeTbBmbLOzKd1+Fa7/wG5Gy9PCXeBX6
+bo9AAvFsBXZtALty7HZ3zBWX2irneIHJwErxyhrMOuyI6eQG/oGxqE8TiWSBMTpq
+tzi3AJFbnAspkYxpOcXtn7ToU4Nuh4Vfb/M1ZbWdF0eMPx3iNOj+2iR3E/ms3lYm
+LXfOFWwSPx2UiueHU5B/lyZeIAxJctj6P0lab7Yo3hD708O2OVUEkv4T6sUIXvxl
+zebp03sjODJsMmTNoNFXufAISk285zhYRoj6KQN08HBjmE8dHIeVW5MkyQiu1gX2
++q6kSX+Zb42hAggtJJa2
+=fxzB
 -----END PGP SIGNATURE-----
 
---Signature=_Thu__12_Apr_2012_10_06_19_+1000_TJV4j_z/.nl7lSo0--
+--Signature=_Thu__12_Apr_2012_10_22_36_+1000_vJX8_YKt3jlTmEmo--
