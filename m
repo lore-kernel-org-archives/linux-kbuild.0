@@ -1,83 +1,48 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.windriver.com ([147.11.1.11]:60696 "EHLO
-	mail.windriver.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S966259Ab2DLXrg (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 12 Apr 2012 19:47:36 -0400
-From: Paul Gortmaker <paul.gortmaker@windriver.com>
-Subject: [PATCH 0/3] RFC v2: strip 15,000 lines from a typical autoconf.h
-Date: Thu, 12 Apr 2012 19:46:31 -0400
-Message-Id: <1334274394-13466-1-git-send-email-paul.gortmaker@windriver.com>
-In-Reply-To: <CA+55aFx15+eHNA4LobwiFhe4k94XPTVTLdiBmuR4hDKR5HpWPg@mail.gmail.com>
-References: <CA+55aFx15+eHNA4LobwiFhe4k94XPTVTLdiBmuR4hDKR5HpWPg@mail.gmail.com>
+Received: from smtp5-g21.free.fr ([212.27.42.5]:39015 "EHLO smtp5-g21.free.fr"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752366Ab2DOK5o (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 15 Apr 2012 06:57:44 -0400
+Received: from [192.168.2.104] (unknown [82.235.130.199])
+	by smtp5-g21.free.fr (Postfix) with ESMTP id 0B34ED48047
+	for <linux-kbuild@vger.kernel.org>; Sun, 15 Apr 2012 12:57:36 +0200 (CEST)
+Message-ID: <4F8AABDB.2060608@fnac.net>
+Date: Sun, 15 Apr 2012 13:07:07 +0200
+From: Paul Chavent <paul.chavent@fnac.net>
+MIME-Version: 1.0
+Subject: REMAP_VECTORS_TO_RAM option in arch/arm/Kconfig-nommu hidden
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, torvalds@linux-foundation.org, akpm@linux-foundation.org, davem@davemloft.net, tony@bakeyournoodle.com, mmarek@suse.cz, lacombar@gmail.com, sfr@canb.auug.org.au, Paul Gortmaker <paul.gortmaker@windriver.com>
 
-[Re: [PATCH 0/5] RFC: strip 15,000 lines from a typical autoconf.h] On 12/04/2012 (Thu 12:29) Linus Torvalds wrote:
+Hi
 
-> On Wed, Apr 11, 2012 at 8:10 PM, Stephen Rothwell <sfr@canb.auug.org.au> wrote:
-> >
-> > Can we leave the CONFIG_ part in the caller, so they are still grepable, please?
-> >
-> > So:
-> >
-> >	#define config_enabled(x)	(__stringify(x)[0] == '1')
-> 
-> Sure. Except G+ came through, and we now have an even better hack for
-> this, that works entirely in the preprocessor.
-> 
-> That also means that you can use it for static initializers etc, so you can do
-> 
->    int some_value = config_enabled(CONFIG_ENABLE_XYZ_BY_DEFAULT);
-> 
-> Paul, do you want to write the patch to change IS_ENABLED() to use this trick?
+I don't see the REMAP_VECTORS_TO_RAM option in the menuconfig of the 3.2.14 kernel in nommu mode (even i had set the DRAM_BASE).
 
-Sure -- I've done this in patch #1 of the (now) three patches.
+Without this option, the CONFIG_VECTORS_BASE remain to zero.
 
-I've dropped all the patches relating to phasing out the users
-of IS_ENABLED within C code, since now they should just work.
+I had to do the following modifications to be ale to see the option.
 
-> 
-> Trick courtesy of "comex ." on G+ (please do give him credit even if
-> he doesn't seem to use his real name):
-> 
->   #define is_set(macro) is_set_(macro)
->   #define macrotest_1 ,
->   #define is_set_(value) is_set__(macrotest_##value)
->   #define is_set__(comma) is_set___(comma 1, 0)
->   #define is_set___(_, v, ...) v
-> 
-> and now "is_set(CONFIG_xyzzy)" works, and gives either 1 or 0 directly
-> in the preprocessor.
-> 
-> Obviously the names have to be changed here (let's not use
-> "macrotest_1" - make it something more internal), but the concept is
-> solid, and I would actually suggest having this as a generic "is this
-> macro set to 1" helper first, and then implement IS_ENABLED() in terms
-> of that.
+--- Kconfig-nommu.orig  2012-04-15 12:51:51.000000000 +0200
++++ Kconfig-nommu       2012-04-15 12:52:05.000000000 +0200
+@@ -34,8 +34,7 @@
+           used instead of the auto-probing which utilizes the register.
 
-Hopefully the names I've chosen are OK.  Please have a look.
+  config REMAP_VECTORS_TO_RAM
+-       bool 'Install vectors to the beginning of RAM' if DRAM_BASE
+-       depends on DRAM_BASE
++       bool 'Install vectors to the beginning of RAM'
+         help
+           The kernel needs to change the hardware exception vectors.
+           In nommu mode, the hardware exception vectors are normally
 
-Thanks,
+Even with only one of "if DRAM_BASE" or "depends on DRAM_BASE", it doesn't appear in the menu.
+
+Regards.
+
 Paul.
 
-> 
-> My likee.
-> 
->                        Linus
-
-Paul Gortmaker (3):
-  kconfig: fix IS_ENABLED to not require all options to be defined
-  Revert "kconfig: fix __enabled_ macros definition for invisible and
-    un-selected symbols"
-  kconfig: delete last traces of __enabled_ from autoconf.h
-
- include/linux/kconfig.h    |   22 ++++++++++++++++++----
- scripts/kconfig/confdata.c |   38 ++------------------------------------
- 2 files changed, 20 insertions(+), 40 deletions(-)
-
--- 
-1.7.9.1
+P.S : i'm not a list member, could you cc me you reply please ?
 
