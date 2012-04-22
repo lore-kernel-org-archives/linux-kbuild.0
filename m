@@ -1,35 +1,21 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.snhosting.dk ([87.238.248.203]:44200 "EHLO
-	smtp.domainteam.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751331Ab2DVGDO (ORCPT
+Received: from mail.owensperu.com ([190.222.232.168]:3732 "EHLO
+	mail.owensperu.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751298Ab2DVTIg convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 22 Apr 2012 02:03:14 -0400
-Date: Sun, 22 Apr 2012 08:03:12 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH] Fix modpost failures in fedora 17
-Message-ID: <20120422060312.GA5701@merkur.ravnborg.org>
-References: <20120412.143730.258982831585270742.davem@davemloft.net> <20120418.153132.547432135869114399.davem@davemloft.net> <20120422.001844.812968677385216602.davem@davemloft.net>
+	Sun, 22 Apr 2012 15:08:36 -0400
+From: ventas11 <oceanloans@blumail.org>
+Reply-to: oceandirect@blumail.org
+Subject: Contact me for a private and secured loan now!!
+Message-ID: <20120422061032.ed367780@mail.owensperu.com>
+Date: Sun, 22 Apr 2012 06:10:32 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20120422.001844.812968677385216602.davem@davemloft.net>
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: David Miller <davem@davemloft.net>, Michal Marek <mmarek@suse.cz>, linux-kbuild <linux-kbuild@vger.kernel.org>
-Cc: linux-kernel@vger.kernel.org
 
-On Sun, Apr 22, 2012 at 12:18:44AM -0400, David Miller wrote:
-> From: David Miller <davem@davemloft.net>
-> Date: Wed, 18 Apr 2012 15:31:32 -0400 (EDT)
-> 
-> > Ping?  Can we get this bug fixed merged some time soon?
-> 
-> Come on guys, this should be in Linus's tree and submitted to
-> all -stable branches by now.  Yet it hasn't been submitted to
-> any of those places.
-> 
-> What in the world could you possibly be waiting for?
-
-Added Michal + kbuild. I do nto handle kbuild patches these days.
-
-	Sam
+Esteemed reader,
+   Do you know that you don't have to work too hard to have a better lifestyle?, Get the loan you deserve from OCEAN FINANCE & MORTGAGES LIMITED.
+To Apply, send us your full names, country, needed loan sum via email To: ocendirect@blumail.org
