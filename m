@@ -1,46 +1,35 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp12.smtpout.orange.fr ([80.12.242.134]:34144 "EHLO
-	smtp.smtpout.orange.fr" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932763Ab2DSVHe (ORCPT
+Received: from smtp.snhosting.dk ([87.238.248.203]:44200 "EHLO
+	smtp.domainteam.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751331Ab2DVGDO (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 19 Apr 2012 17:07:34 -0400
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: Re: [PATCH] scripts/config: properly report and set string options
-Date: Thu, 19 Apr 2012 23:07:28 +0200
-References: <1333975750-12154-1-git-send-email-yann.morin.1998@free.fr>
-In-Reply-To: <1333975750-12154-1-git-send-email-yann.morin.1998@free.fr>
+	Sun, 22 Apr 2012 02:03:14 -0400
+Date: Sun, 22 Apr 2012 08:03:12 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: [PATCH] Fix modpost failures in fedora 17
+Message-ID: <20120422060312.GA5701@merkur.ravnborg.org>
+References: <20120412.143730.258982831585270742.davem@davemloft.net> <20120418.153132.547432135869114399.davem@davemloft.net> <20120422.001844.812968677385216602.davem@davemloft.net>
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-15"
-Content-Transfer-Encoding: 7bit
-Message-Id: <201204192307.28282.yann.morin.1998@free.fr>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20120422.001844.812968677385216602.davem@davemloft.net>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Michal Marek <mmarek@suse.cz>
+To: David Miller <davem@davemloft.net>, Michal Marek <mmarek@suse.cz>, linux-kbuild <linux-kbuild@vger.kernel.org>
+Cc: linux-kernel@vger.kernel.org
 
-Michal, All,
-
-On Monday 09 April 2012 14:49:10 Yann E. MORIN wrote:
-> Currently, scripts/config removes the leading double-quote from
-> string options, but leaves the trailing double-quote.
+On Sun, Apr 22, 2012 at 12:18:44AM -0400, David Miller wrote:
+> From: David Miller <davem@davemloft.net>
+> Date: Wed, 18 Apr 2012 15:31:32 -0400 (EDT)
 > 
-> Also, double-quotes in a string are escaped, but scripts/config
-> does not unescape those when printing
+> > Ping?  Can we get this bug fixed merged some time soon?
 > 
-> Finally, scripts/config does not escape double-quotes when setting
-> string options.
+> Come on guys, this should be in Linus's tree and submitted to
+> all -stable branches by now.  Yet it hasn't been submitted to
+> any of those places.
+> 
+> What in the world could you possibly be waiting for?
 
-Ping? I have not seen this be applied to your tree, neither in for-next,
-nor in rc-fixes.
+Added Michal + kbuild. I do nto handle kbuild patches these days.
 
-Regards,
-Yann E. MORIN.
-
--- 
-.-----------------.--------------------.------------------.--------------------.
-|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
-| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
-| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
-| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
-'------------------------------^-------^------------------^--------------------'
+	Sam
