@@ -1,81 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.snhosting.dk ([87.238.248.203]:40926 "EHLO
-	smtp.domainteam.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751819Ab2DWFKq (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 23 Apr 2012 01:10:46 -0400
-Date: Mon, 23 Apr 2012 07:10:41 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [RFC] move link of vmlinux to a script
-Message-ID: <20120423051041.GA6709@merkur.ravnborg.org>
-References: <20120422212220.GA6537@merkur.ravnborg.org> <CACqU3MU7MS7MjpyiSx-tUJ6c3rSexUB5=vTGy6gPv_OJevuOqw@mail.gmail.com>
+Received: from cantor2.suse.de ([195.135.220.15]:57548 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752577Ab2DWStV (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 23 Apr 2012 14:49:21 -0400
+Date: Mon, 23 Apr 2012 20:49:18 +0200
+From: Michal Marek <mmarek@suse.cz>
+Subject: [GIT] modpost fix for newer toolchain
+Message-ID: <20120423184918.GA27862@sepie.suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CACqU3MU7MS7MjpyiSx-tUJ6c3rSexUB5=vTGy6gPv_OJevuOqw@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnaud Lacombe <lacombar@gmail.com>
-Cc: linux arch <linux-arch@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, lkml <linux-kernel@vger.kernel.org>, Michal Marek <mmarek@suse.cz>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: davem@davemloft.net, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Hi Arnaud.
+Hi Linus,
 
-Thanks for the comments.
+Please pull this modpost patch. It fixes build failure with newer gcc that adds
+some internal symbols that end in "__mod_*_device_table", but are not
+actually the tables themselves.
 
-> > +# Link of vmlinux
-> > +# $1 - optional extra .o files
-> > +# $2 output file
-> > +vmlinux_link()
-> > +{
-> > +       local lds=${srctree}/arch/${SRCARCH}/kernel/vmlinux.lds
-> > +echo srcarch=${SRCARCH} CF=${CFLAGS_vmlinux}
-> debugging leftover ?
-yes - will be deleted.
+Michal
 
-> > +
-> > +       local aflags="${KBUILD_AFLAGS} ${AFLAGS_KERNEL} ${NOSTDINC_FLAGS} ${LINUXINCLUDE} ${KBUILD_CPPFLAGS} ${modkern_aflags}"
-> might be worse splitting that line.
+The following changes since commit 0eb043d0eec44cd083ea6910b1db2f77eb212ebd:
 
-I may be able to drop several of the variables,
-otherwise yes.
+  Subject: [PATCH] tags.sh: Add missing quotes (2012-04-02 11:28:17 +0200)
 
-> > +mksysmap()
-> > +{
-> > +       $NM -n $1 | \
-> > +               grep -v '\( [aNUw] \)\|\(__crc_\)\|\( \$[adt]\)' > $2
-> > +}
-> > +
-> you don't seem to consistently use #{FOO} vs. $FOO.
+are available in the git repository at:
 
-For arguments I use $FOO for the rest ${FOO}
-I will fix this up to be consistent.
+  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git rc-fixes
 
-> > +# Update version
-> > +info GEN .version
-> > +if [ ! -r .version ]; then
-> why '-r' specifically ? '-e' might be just enough.
+for you to fetch changes up to e88aa7bbbe3046a125ea1936b16bb921cc9c6349:
 
-I was so before - this part is a copy from the kernel.
-And there is already enough changes..
+  Fix modpost failures in fedora 17 (2012-04-18 21:42:07 +0200)
 
-> > +# final build of init/
-> > +${MAKE} -f ${srctree}/scripts/Makefile.build obj=init
-> > +
-> are spaces allowed in `srctree' ? if so, this will break here.
-Good catch.
-Sticking "" around should do the trick? I will try to do so.
-I should also try if it works with spaces - I think not.
+----------------------------------------------------------------
+David Miller (1):
+      Fix modpost failures in fedora 17
 
-
-> > +kallsymso=""
-> > +kallsyms_vmlinux=""
-> > +
-> > +if [ "${CONFIG_KALLSYMS}" != "" ]; then
-> > +
-> [ -n "${CONFIG_KALLSYMS}" ] would work too, as well as the other
-> places where you use the [ "${FOO}" != "" ] syntax.
-
-Much more readable - will change.
-
-	Sam
+ scripts/mod/file2alias.c |    4 ++++
+ 1 file changed, 4 insertions(+)
