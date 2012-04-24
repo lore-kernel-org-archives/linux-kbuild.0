@@ -1,42 +1,37 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kingswood-consulting.co.uk ([88.97.16.53]:36517 "EHLO
-	andromeda.kingswood-consulting.co.uk" rhost-flags-OK-OK-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1754985Ab2DXHdl (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 24 Apr 2012 03:33:41 -0400
-Message-ID: <4F965753.8070600@kingswood-consulting.co.uk>
-Date: Tue, 24 Apr 2012 08:33:39 +0100
-From: "Frank A. Kingswood" <frank@kingswood-consulting.co.uk>
+Received: from cantor2.suse.de ([195.135.220.15]:43983 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1756479Ab2DXJTu (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 24 Apr 2012 05:19:50 -0400
+Message-ID: <4F96705C.5030901@suse.cz>
+Date: Tue, 24 Apr 2012 11:20:28 +0200
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Subject: Re: [PATCH] user-specified temporary directory for deb-pkg
-References: <4F8C12FC.4010102@kingswood-consulting.co.uk> <4F95A67A.9060002@suse.cz>
-In-Reply-To: <4F95A67A.9060002@suse.cz>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: Re: [PATCH] kbuld: Implement oldmodconfig
+References: <m1aa22rllb.fsf@fess.ebiederm.org>
+In-Reply-To: <m1aa22rllb.fsf@fess.ebiederm.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
+To: "Eric W. Biederman" <ebiederm@xmission.com>
+Cc: linux-kernel@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>, Arnaud Lacombe <lacombar@gmail.com>, linux-kbuild@vger.kernel.org
 
-On 23/04/12 19:59, Michal Marek wrote:
-> Dne 16.4.2012 14:39, Frank Kingswood napsal(a):
->> The Debian package build can be very slow when running against a slow
->> NFS server. This patch allows the user to set the BUILDTMP environment
->> variable to move these temporaries somewhere local.
->>
->> The user can simply use make O=/some/directory .....
-Thanks for the follow-up.
+Dne 24.4.2012 02:59, Eric W. Biederman napsal(a):
+> 
+> While verifying that my user namespace patches are as complete as I
+> expect them to be I came a came across the need to build kernel
+> configurations with a few choice settings disabled and everything else
+> enabled.  Adding a make oldmodconfig made generating those
+> configurations straight forward, as now I can set the options I care
+> about and the oldmodconfig can answering everything else for me in a
+> consistent way.
 
-That's not the same thing. Building in-place is fine, I only want the 
-deb-pkg temporaries in RAM disk.
+Doesn't
 
-If I use "make O=/dev/shm/somewhere/" then the whole tree is re-built 
-into the new empty directory (as well as requiring me to copy over the 
-.config).
+KCONFIG_ALLCONFIG=base.config make allmodconfig
 
-Frank
+do the same thing? If not, the difference should be explained in the
+changelog.
 
--- 
-------------------------------------------------------------------------
-Frank A. Kingswood                      frank@kingswood-consulting.co.uk
-Cambridge, United Kingdom                               +44-7545-209 100
-
+Michal
