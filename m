@@ -1,18 +1,18 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from eastrmfepo101.cox.net ([68.230.241.213]:51062 "EHLO
-	eastrmfepo101.cox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751363Ab2DYQEt (ORCPT
+Received: from eastrmfepo201.cox.net ([68.230.241.216]:60341 "EHLO
+	eastrmfepo201.cox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755679Ab2DYQZd (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 25 Apr 2012 12:04:49 -0400
+	Wed, 25 Apr 2012 12:25:33 -0400
 Reply-To: <jclegalfirm001@yahoo.com>
 From: "Jonson Chong," <jclegalfirm001@gmail.com>
 Subject: Mutual Benefit
-Date: Wed, 25 Apr 2012 09:01:17 -0700
+Date: Wed, 25 Apr 2012 09:23:27 -0700
 MIME-Version: 1.0
 Content-Type: text/plain;
 	charset="Windows-1251"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20120425160323.KRUM18532.eastrmfepo203.cox.net@eastrmimpo110.cox.net>
+Message-Id: <20120425162533.FOWI5450.eastrmfepo201.cox.net@eastrmimpo110.cox.net>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 
