@@ -1,34 +1,31 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from eastrmfepo201.cox.net ([68.230.241.216]:60341 "EHLO
-	eastrmfepo201.cox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755679Ab2DYQZd (ORCPT
+Received: from smtp.snhosting.dk ([87.238.248.203]:52043 "EHLO
+	smtp.domainteam.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753892Ab2DYQ3d (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 25 Apr 2012 12:25:33 -0400
-Reply-To: <jclegalfirm001@yahoo.com>
-From: "Jonson Chong," <jclegalfirm001@gmail.com>
-Subject: Mutual Benefit
-Date: Wed, 25 Apr 2012 09:23:27 -0700
+	Wed, 25 Apr 2012 12:29:33 -0400
+Date: Wed, 25 Apr 2012 18:29:31 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: [PATCH 0/4] kbuild: Move vmlinux link out of top-level Makefile
+Message-ID: <20120425162931.GA3346@merkur.ravnborg.org>
+References: <20120424194148.GA2216@merkur.ravnborg.org> <m2haw8m8ng.fsf@firstfloor.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="Windows-1251"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20120425162533.FOWI5450.eastrmfepo201.cox.net@eastrmimpo110.cox.net>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <m2haw8m8ng.fsf@firstfloor.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
+To: Andi Kleen <andi@firstfloor.org>
+Cc: lkml <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.cz>
 
-                    62A-1 Jalan PJU 5/21,
-                    The Strand Kota Damansara,
-                    47801 Petaling Jaya, Malaysia
+On Wed, Apr 25, 2012 at 03:02:27AM -0700, Andi Kleen wrote:
+> Sam Ravnborg <sam@ravnborg.org> writes:
+> >
+> > What we loose by the conversion:
+> > - We no longer rebuild if options to ld changes.
+> 
+> I think that's a problem. Can that be fixed somehow?
 
-I am Jonson Chong,an attorney at law and i would love to share with you a very important business proposition that will be of mutual benefit to both of us.
- A deceased client of mine,that shares the same last name as yours,who after shall be referred to as my late client,died as the result of a heart-related condition on March 12th 2009.
-His heart condition was due to the death of all the members of his family in the tsunami disaster on the 26th December 2004 in Sumatra Indonesia .
+Thanks for the feedback, I will implement this and and repost.
 
-http://en.wikipedia.org/wiki/2004_Indian_Ocean_earthquake
-My late Client has a deposit of ( US$17.5 Million Dollars) left behind.
-I can be reached on (jclegalfirm001@gmail.com) for more information.
-
-Email: jclegalfirm001@gmail.com
-Best regards,
-Jonson Chong
-Attorney at Law
+	Sam
