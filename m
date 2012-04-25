@@ -1,58 +1,29 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.snhosting.dk ([87.238.248.203]:33506 "EHLO
-	smtp.domainteam.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757112Ab2DXTpT (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 24 Apr 2012 15:45:19 -0400
-Date: Tue, 24 Apr 2012 21:45:18 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: [PATCH 4/4] kbuild: document KBUILD_LDS, KBUILD_VMLINUX_INIT and
-	KBUILD_VMLINUX_MAIN
-Message-ID: <20120424194518.GD2311@merkur.ravnborg.org>
+Received: from mga14.intel.com ([143.182.124.37]:12137 "EHLO mga14.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1756861Ab2DYKBq (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 25 Apr 2012 06:01:46 -0400
+From: Andi Kleen <andi@firstfloor.org>
+Subject: Re: [PATCH 0/4] kbuild: Move vmlinux link out of top-level Makefile
 References: <20120424194148.GA2216@merkur.ravnborg.org>
+Date: Wed, 25 Apr 2012 03:01:45 -0700
+In-Reply-To: <20120424194148.GA2216@merkur.ravnborg.org> (Sam Ravnborg's
+	message of "Tue, 24 Apr 2012 21:41:48 +0200")
+Message-ID: <m2ipgom8om.fsf@firstfloor.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20120424194148.GA2216@merkur.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux arch <linux-arch@vger.kernel.org>, lkml <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.cz>
-Cc: Richard Weinberger <richard@nod.at>, "David S. Miller" <davem@davemloft.net>, Arnaud Lacombe <lacombar@gmail.com>, Linus Torvalds <torvalds@linux-foundation.org>
+Cc: linux arch <linux-arch@vger.kernel.org>, lkml <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.cz>, Richard Weinberger <richard@nod.at>, "David S. Miller" <davem@davemloft.net>, Arnaud Lacombe <lacombar@gmail.com>, Linus Torvalds <torvalds@linux-foundation.org>
 
-From 8e5298ec2fd86f90ce55503b02ccb67c30677611 Mon Sep 17 00:00:00 2001
-From: Sam Ravnborg <sam@ravnborg.org>
-Date: Mon, 23 Apr 2012 23:06:25 +0200
-Subject: [PATCH 4/4] kbuild: document KBUILD_LDS, KBUILD_VMLINUX_INIT and
- KBUILD_VMLINUX_MAIN
+Sam Ravnborg <sam@ravnborg.org> writes:
+>
+> What we loose by the conversion:
+> - We no longer rebuild if options to ld changes.
 
-Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
----
- Documentation/kbuild/kbuild.txt |   15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+I think that's a problem. Can that be fixed somehow?
 
-diff --git a/Documentation/kbuild/kbuild.txt b/Documentation/kbuild/kbuild.txt
-index 68e32bb..47038a2 100644
---- a/Documentation/kbuild/kbuild.txt
-+++ b/Documentation/kbuild/kbuild.txt
-@@ -214,3 +214,18 @@ KBUILD_BUILD_USER, KBUILD_BUILD_HOST
- These two variables allow to override the user@host string displayed during
- boot and in /proc/version. The default value is the output of the commands
- whoami and host, respectively.
-+
-+KBUILD_LDS
-+--------------------------------------------------
-+The linker script with full path. Assigned by the top-level Makefile.
-+
-+KBUILD_VMLINUX_INIT
-+--------------------------------------------------
-+All objects files for the init (first) part of vmlinux.
-+Files specified with KBUILD_VMLINUX_INIT are linked first.
-+
-+KBUILD_VMLINUX_MAIN
-+--------------------------------------------------
-+All objects files for the main part of vmlinux.
-+KBUILD_VMLINUX_INIT and KBUILD_VMLINUX_MAIN together specify
-+all the object files used to link vmlinux.
+-Andi
+
 -- 
-1.7.10
-
+ak@linux.intel.com -- Speaking for myself only
