@@ -1,56 +1,44 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.snhosting.dk ([87.238.248.203]:55921 "EHLO
-	smtp.domainteam.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1760531Ab2D0U1D (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 27 Apr 2012 16:27:03 -0400
-Date: Fri, 27 Apr 2012 22:27:01 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: RFC: How to handle function tracing, frame pointers and
-	-mfentry?
-Message-ID: <20120427202701.GA5949@merkur.ravnborg.org>
-References: <1335552399.28106.228.camel@gandalf.stny.rr.com>
+Received: from mga14.intel.com ([143.182.124.37]:32723 "EHLO mga14.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1760239Ab2D0UbJ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 27 Apr 2012 16:31:09 -0400
+Message-ID: <4F9B020B.9050205@linux.intel.com>
+Date: Fri, 27 Apr 2012 13:31:07 -0700
+From: "H. Peter Anvin" <hpa@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1335552399.28106.228.camel@gandalf.stny.rr.com>
+Subject: Re: RFC: How to handle function tracing, frame pointers and -mfentry?
+References: <1335552399.28106.228.camel@gandalf.stny.rr.com> <20120427202701.GA5949@merkur.ravnborg.org>
+In-Reply-To: <20120427202701.GA5949@merkur.ravnborg.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Steven Rostedt <rostedt@goodmis.org>
-Cc: LKML <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.cz>, "H. Peter Anvin" <hpa@linux.intel.com>, Andrew Morton <akpm@linux-foundation.org>, Andi Kleen <andi@firstfloor.org>, Ingo Molnar <mingo@elte.hu>, Frederic Weisbecker <fweisbec@gmail.com>
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: Steven Rostedt <rostedt@goodmis.org>, LKML <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.cz>, Andrew Morton <akpm@linux-foundation.org>, Andi Kleen <andi@firstfloor.org>, Ingo Molnar <mingo@elte.hu>, Frederic Weisbecker <fweisbec@gmail.com>
 
-On Fri, Apr 27, 2012 at 02:46:39PM -0400, Steven Rostedt wrote:
-> I have code that implements -mfentry for the function tracer.
+On 04/27/2012 01:27 PM, Sam Ravnborg wrote:
+>>
+>> My question is, how do I remove the dependency in kconfig based on the
+>> compiler?
 > 
-> For those that are unfamiliar with this, it was introduced into gcc in
-> 4.6.0 for x86 only. Used with the -pg option, it replaces mcount with
-> fentry, and is placed at the first instruction of a function (instead of
-> after the frame has been built, as mcount does).
+> Allow the user to select one of:
+> 1) function tracer
+> 2) frame pointer
+> 3) none of the above
 > 
-> So what's my problem?  With -mfentry, function tracer does not depend on
-> frame pointers. As frame pointers may add overhead, some distros
-> (Debian) has disabled frame pointers from their kernels and with that,
-> has also disabled function tracing.
+> This should be trivial to do in Kconfig language.
 > 
-> Currently, function tracing selects CONFIG_FRAME_POINTER for various
-> archs (including x86), as the kernel will not compile without it, if
-> function tracing is enabled. But if -mfentry is available with the
-> compiler, it does not have this dependency. The kernel will compile fine
-> with -pg -mfentry and without frame pointers.
+> If "function tracer" is selected then use -mfentry if supported,
+> with a fallback to frame pointers.
 > 
-> My question is, how do I remove the dependency in kconfig based on the
-> compiler?
+> This looks simple IMO and should be easy to implement too.
+> 
 
-Allow the user to select one of:
-1) function tracer
-2) frame pointer
-3) none of the above
+Except it is the wrong thing.  This is not the only user of frame
+pointer.  What I think you mean is remove the dependency in Kconfig, but
+force the frame pointer enabled if -mfentry is not supported.
 
-This should be trivial to do in Kconfig language.
+	-hpa
 
-If "function tracer" is selected then use -mfentry if supported,
-with a fallback to frame pointers.
 
-This looks simple IMO and should be easy to implement too.
-
-	Sam
