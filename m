@@ -1,87 +1,56 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from hrndva-omtalb.mail.rr.com ([71.74.56.122]:27427 "EHLO
-	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754305Ab2D0Tnj (ORCPT
+Received: from smtp.snhosting.dk ([87.238.248.203]:55921 "EHLO
+	smtp.domainteam.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1760531Ab2D0U1D (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 27 Apr 2012 15:43:39 -0400
-Message-ID: <1335555817.28106.232.camel@gandalf.stny.rr.com>
+	Fri, 27 Apr 2012 16:27:03 -0400
+Date: Fri, 27 Apr 2012 22:27:01 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
 Subject: Re: RFC: How to handle function tracing, frame pointers and
- -mfentry?
-From: Steven Rostedt <rostedt@goodmis.org>
-Date: Fri, 27 Apr 2012 15:43:37 -0400
-In-Reply-To: <1335552399.28106.228.camel@gandalf.stny.rr.com>
+	-mfentry?
+Message-ID: <20120427202701.GA5949@merkur.ravnborg.org>
 References: <1335552399.28106.228.camel@gandalf.stny.rr.com>
-Content-Type: text/plain; charset="ISO-8859-15"
-Content-Transfer-Encoding: 7bit
-Mime-Version: 1.0
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1335552399.28106.228.camel@gandalf.stny.rr.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: LKML <linux-kernel@vger.kernel.org>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.cz>, "H. Peter Anvin" <hpa@linux.intel.com>, Andrew Morton <akpm@linux-foundation.org>, Andi Kleen <andi@firstfloor.org>, Ingo Molnar <mingo@elte.hu>, Frederic Weisbecker <fweisbec@gmail.com>
+To: Steven Rostedt <rostedt@goodmis.org>
+Cc: LKML <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.cz>, "H. Peter Anvin" <hpa@linux.intel.com>, Andrew Morton <akpm@linux-foundation.org>, Andi Kleen <andi@firstfloor.org>, Ingo Molnar <mingo@elte.hu>, Frederic Weisbecker <fweisbec@gmail.com>
 
-On Fri, 2012-04-27 at 14:46 -0400, Steven Rostedt wrote:
-
+On Fri, Apr 27, 2012 at 02:46:39PM -0400, Steven Rostedt wrote:
+> I have code that implements -mfentry for the function tracer.
+> 
+> For those that are unfamiliar with this, it was introduced into gcc in
+> 4.6.0 for x86 only. Used with the -pg option, it replaces mcount with
+> fentry, and is placed at the first instruction of a function (instead of
+> after the frame has been built, as mcount does).
+> 
+> So what's my problem?  With -mfentry, function tracer does not depend on
+> frame pointers. As frame pointers may add overhead, some distros
+> (Debian) has disabled frame pointers from their kernels and with that,
+> has also disabled function tracing.
+> 
 > Currently, function tracing selects CONFIG_FRAME_POINTER for various
 > archs (including x86), as the kernel will not compile without it, if
 > function tracing is enabled. But if -mfentry is available with the
 > compiler, it does not have this dependency. The kernel will compile fine
 > with -pg -mfentry and without frame pointers.
+> 
+> My question is, how do I remove the dependency in kconfig based on the
+> compiler?
 
-Just to show the difference. I ran several iterations of hackbench, on
-an Intel Quad Core2 2.6GHz.
+Allow the user to select one of:
+1) function tracer
+2) frame pointer
+3) none of the above
 
-Here's the fentry code with frame pointers (tracing disabled):
+This should be trivial to do in Kconfig language.
 
-Time: 2.006
-Time: 2.028
-Time: 2.028
-Time: 1.999
-Time: 2.035
-Time: 2.037
-Time: 2.006
-Time: 1.996
-Time: 2.049
-Time: 1.991
-Time: 2.038
-Time: 2.047
-Time: 2.039
-Time: 2.000
-Time: 2.021
-Time: 2.011
-Time: 2.007
-Time: 2.024
-Time: 2.033
-Time: 2.027
-Time: 2.044
+If "function tracer" is selected then use -mfentry if supported,
+with a fallback to frame pointers.
 
+This looks simple IMO and should be easy to implement too.
 
-And the fentry code with frame pointers disabled:
-
-Time: 1.870
-Time: 1.861
-Time: 1.865
-Time: 1.884
-Time: 1.867
-Time: 1.867
-Time: 1.875
-Time: 1.883
-Time: 1.863
-Time: 1.877
-Time: 1.865
-Time: 1.885
-Time: 1.842
-Time: 1.863
-Time: 1.899
-Time: 1.877
-Time: 1.837
-Time: 1.900
-Time: 1.897
-Time: 1.877
-Time: 1.853
-Time: 1.856
-
-That's about a 8% difference.
-
--- Steve
-
-
+	Sam
