@@ -1,47 +1,74 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from terminus.zytor.com ([198.137.202.10]:46749 "EHLO mail.zytor.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752981Ab2D1Qfg (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 28 Apr 2012 12:35:36 -0400
-Message-ID: <4F9C1C31.7060507@zytor.com>
-Date: Sat, 28 Apr 2012 09:34:57 -0700
-From: "H. Peter Anvin" <hpa@zytor.com>
+Received: from smtp.snhosting.dk ([87.238.248.203]:17130 "EHLO
+	smtp.domainteam.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751480Ab2D1U4x (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 28 Apr 2012 16:56:53 -0400
+Date: Sat, 28 Apr 2012 22:56:51 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: [PATCH v2 0/4] kbuild: Move vmlinux link out of top-level Makefile
+Message-ID: <20120428205651.GA7426@merkur.ravnborg.org>
 MIME-Version: 1.0
-Subject: Re: RFC: How to handle function tracing, frame pointers and -mfentry?
-References: <1335552399.28106.228.camel@gandalf.stny.rr.com> <20120428083603.GJ27374@one.firstfloor.org>
-In-Reply-To: <20120428083603.GJ27374@one.firstfloor.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andi Kleen <andi@firstfloor.org>
-Cc: Steven Rostedt <rostedt@goodmis.org>, LKML <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.cz>, "H. Peter Anvin" <hpa@linux.intel.com>, Andrew Morton <akpm@linux-foundation.org>, Ingo Molnar <mingo@elte.hu>, Frederic Weisbecker <fweisbec@gmail.com>
+To: linux arch <linux-arch@vger.kernel.org>, lkml <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.cz>
+Cc: Richard Weinberger <richard@nod.at>, "David S. Miller" <davem@davemloft.net>, Arnaud Lacombe <lacombar@gmail.com>, Andi Kleen <andi@firstfloor.org>
 
-On 04/28/2012 01:36 AM, Andi Kleen wrote:
-> 
-> Kconfig just needs to learn how to run the target compiler
-> 
-> I think that's the right direction. Right now our main
-> Makefiles get polluted more and more with "test compiles", each
-> of which makes a "null make" slower and slower. 
-> 
-> I just measured and a null compile (nothing changes) of a current
-> tree calls "gcc" 141 times.
-> 
-> All this stuff should be cached in the Kconfig instead.
-> 
-> It may break some obscure setups (that can be probably fixed without
-> too much effort), but the development turnaround improvement
-> for everyone else would be worth it.
-> 
+The following patchset moves all the magic used
+to deal with the final link of vmlinux from the
+top-level Makefile to a shell script.
 
-I don't think it is a performance issue as much as a utility issue.
-When Kconfig can't actually reflect what is built into the resulting
-kernel, that is a problem.
+The main motivation was to convert the almost
+unreadable mess in the top-level Makefile to
+an easy to read/maintain shell script.
 
-	-hpa
+The final link stages are serialized
+anyway - so there where nothing gained by using
+the Makefile logic to handle this.
 
--- 
-H. Peter Anvin, Intel Open Source Technology Center
-I work for Intel.  I don't speak on their behalf.
+What we gain:
+- A readable final link of vmlinux
+- Less junk in the top-level Makefile
+
+What we loose by the conversion:
+- We no logner rebuild if one of the .tmp_kallsyms
+  files are deleted.
+- We no longer rebuild if vmlinux.o is deleted
+
+None of the above cases are hit by a typical
+kernel developer so the drawbacks are acceptable.
+
+I had to implement special handling of um in the
+link-vmlinux script. It is not pretty by any means,
+but I could not come up with something better.
+My previous attempts to use ld for um linking has failed,
+so this kludge was introduced.
+
+There is no outstanding issues to my knowledge,
+and the patchset is ready to be applied.
+I assume this should go in via the kbuild#misc tree.
+
+v2:
+- rebuild if options to ld changes (Andi Kleen)
+- shell script improvements from Nick Bowler
+- clean target calls script to clean up after link
+- include documentation of LDFLAGS_vmlinux
+
+	Sam
+
+ Documentation/kbuild/kbuild.txt |   19 +++++
+ Makefile                        |  217 ++++----------------------------------------------
+ arch/sparc/Makefile             |   11 ---
+ arch/sparc/boot/Makefile        |   14 ++--
+ arch/um/Makefile                |   11 +--
+ scripts/link-vmlinux.sh         |  211 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 6 files changed, 256 insertions(+), 227 deletions(-)
+
+Sam Ravnborg (4):
+      kbuild: drop unused KBUILD_VMLINUX_OBJS from top-level Makefile
+      kbuild: refactor final link of sparc32
+      kbuild: link of vmlinux moved to a script
+      kbuild: document KBUILD_LDS, KBUILD_VMLINUX_{INIT,MAIN} and LDFLAGS_vmlinux
 
