@@ -1,74 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from hrndva-omtalb.mail.rr.com ([71.74.56.122]:13710 "EHLO
-	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754242Ab2D0V1h (ORCPT
+Received: from one.firstfloor.org ([213.235.205.2]:53511 "EHLO
+	one.firstfloor.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751015Ab2D1IgI (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 27 Apr 2012 17:27:37 -0400
-Message-ID: <1335562054.28106.239.camel@gandalf.stny.rr.com>
-Subject: Re: RFC: How to handle function tracing, frame pointers and
- -mfentry?
-From: Steven Rostedt <rostedt@goodmis.org>
-Date: Fri, 27 Apr 2012 17:27:34 -0400
-In-Reply-To: <4F9B0B9B.9020909@linux.intel.com>
+	Sat, 28 Apr 2012 04:36:08 -0400
+Date: Sat, 28 Apr 2012 10:36:03 +0200
+From: Andi Kleen <andi@firstfloor.org>
+Subject: Re: RFC: How to handle function tracing, frame pointers and -mfentry?
+Message-ID: <20120428083603.GJ27374@one.firstfloor.org>
 References: <1335552399.28106.228.camel@gandalf.stny.rr.com>
-	  <20120427202701.GA5949@merkur.ravnborg.org>
-	  <4F9B020B.9050205@linux.intel.com>
-	 <1335560259.28106.234.camel@gandalf.stny.rr.com>
-	 <4F9B0B9B.9020909@linux.intel.com>
-Content-Type: text/plain; charset="ISO-8859-15"
-Content-Transfer-Encoding: 7bit
 Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1335552399.28106.228.camel@gandalf.stny.rr.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "H. Peter Anvin" <hpa@linux.intel.com>
-Cc: Sam Ravnborg <sam@ravnborg.org>, LKML <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.cz>, Andrew Morton <akpm@linux-foundation.org>, Andi Kleen <andi@firstfloor.org>, Ingo Molnar <mingo@elte.hu>, Frederic Weisbecker <fweisbec@gmail.com>
+To: Steven Rostedt <rostedt@goodmis.org>
+Cc: LKML <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.cz>, "H. Peter Anvin" <hpa@linux.intel.com>, Andrew Morton <akpm@linux-foundation.org>, Andi Kleen <andi@firstfloor.org>, Ingo Molnar <mingo@elte.hu>, Frederic Weisbecker <fweisbec@gmail.com>
 
-On Fri, 2012-04-27 at 14:11 -0700, H. Peter Anvin wrote:
-> On 04/27/2012 01:57 PM, Steven Rostedt wrote:
-> >>
-> >> Except it is the wrong thing.  This is not the only user of frame
-> >> pointer.  What I think you mean is remove the dependency in Kconfig, but
-> >> force the frame pointer enabled if -mfentry is not supported.
-> > 
-> > You mean option 3?
-> > 
-> > 3) Add frame pointers silently if gcc fails to build with gcc -pg.
-> > 
+> 1) Have kconfig detect if -mfentry is supported with the current
+> compiler. If it is, then enable a "auto" config called
+> CONFIG_CC_HAS_FENTRY, and allow function tracer be able to select
+> FRAME_POINTER if that's not defined.
 > 
-> Yes, your option 3.
-> 
+> I actually got this to work, but it only works if the host compiler is
+> the same as the compiler building the kernel. Which in lots of cases is
+> not (my default setup does not have this).
 
-Actually, I just noticed this in the Makefile:
+Kconfig just needs to learn how to run the target compiler
 
-ifdef CONFIG_FRAME_POINTER
-KBUILD_CFLAGS   += -fno-omit-frame-pointer -fno-optimize-sibling-calls
-else
-# Some targets (ARM with Thumb2, for example), can't be built with frame
-# pointers.  For those, we don't have FUNCTION_TRACER automatically
-# select FRAME_POINTER.  However, FUNCTION_TRACER adds -pg, and this is
-# incompatible with -fomit-frame-pointer with current GCC, so we don't use
-# -fomit-frame-pointer with FUNCTION_TRACER.
-ifndef CONFIG_FUNCTION_TRACER
-KBUILD_CFLAGS   += -fomit-frame-pointer
-endif
-endif
+I think that's the right direction. Right now our main
+Makefiles get polluted more and more with "test compiles", each
+of which makes a "null make" slower and slower. 
 
+I just measured and a null compile (nothing changes) of a current
+tree calls "gcc" 141 times.
 
-Because of ARM thumb2, -fomit-frame-pointer is not added if
-CONFIG_FRAME_POINTER is not set and FUNCTION_TRACER is. As it is fine to
-just use '-pg', which gcc will add frame pointers if needed, and it is
-only a problem if both -pg and -fomit-frame-pointer is set. We only need
-to remove the select without doing anything else.
+All this stuff should be cached in the Kconfig instead.
 
-If -mfentry is added with -pg, and -fno-omit-frame-pointer is not set,
-gcc will not add frame pointers by default.
+It may break some obscure setups (that can be probably fixed without
+too much effort), but the development turnaround improvement
+for everyone else would be worth it.
 
-So it seems that gcc took care of this problem for me :-)
-
-I'll go and make a patch that simply removes the select.
-
-Sorry for the noise ;-)
-
--- Steve
-
-
+-Andi
+-- 
+ak@linux.intel.com -- Speaking for myself only.
