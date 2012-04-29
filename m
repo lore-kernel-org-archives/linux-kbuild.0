@@ -1,76 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from sncsmrelay2.nai.com ([67.97.80.206]:60964 "EHLO
-	sncsmrelay2.nai.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752208Ab2D2LYj convert rfc822-to-8bit (ORCPT
+Received: from one.firstfloor.org ([213.235.205.2]:54067 "EHLO
+	one.firstfloor.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753465Ab2D2N3S (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 29 Apr 2012 07:24:39 -0400
-Message-ID: <4F9D2458.5040401@snapgear.com>
-Date: Sun, 29 Apr 2012 21:22:00 +1000
-From: Greg Ungerer <gerg@snapgear.com>
-MIME-Version: 1.0
-Subject: Re: [PATCH] kbuild: Makefile: remove unnecessary check for m68knommu
- ARCH
-References: <1335496484-3438-1-git-send-email-laface.tw@gmail.com> <CAMuHMdVYFvszp=5_ZG4ztpviTV_wj_+zSd=C3UAXk_YwR6GZ5A@mail.gmail.com>
-In-Reply-To: <CAMuHMdVYFvszp=5_ZG4ztpviTV_wj_+zSd=C3UAXk_YwR6GZ5A@mail.gmail.com>
-Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
-Content-Transfer-Encoding: 8BIT
+	Sun, 29 Apr 2012 09:29:18 -0400
+Date: Sun, 29 Apr 2012 15:29:16 +0200
+From: Andi Kleen <andi@firstfloor.org>
+Subject: Re: jobserver disabled for make tar*-pkg
+Message-ID: <20120429132916.GO27374@one.firstfloor.org>
+References: <20120429082542.GM27374@one.firstfloor.org> <20120429094426.GA7859@merkur.ravnborg.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20120429094426.GA7859@merkur.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Edward Shao <laface.tw@gmail.com>
-Cc: Geert Uytterhoeven <geert@linux-m68k.org>, linux-kbuild@vger.kernel.org, mmarek@suse.cz, sam@ravnborg.org, Greg Ungerer <gerg@uclinux.org>
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: Andi Kleen <andi@firstfloor.org>, linux-kbuild@vger.kernel.org
 
-On 04/27/2012 03:12 PM, Geert Uytterhoeven wrote:
-> On Fri, Apr 27, 2012 at 05:14, Edward Shao<laface.tw@gmail.com>  wrote:
->> ARCH is never set to m68knomm.
->> make ARCH=m68knomm is not supported anymore.
->>
->> Signed-off-by: Edward Shao<laface.tw@gmail.com>
->
-> Acked-by: Geert Uytterhoeven<geert@linux-m68k.org>
+> > iff --git a/scripts/package/Makefile b/scripts/package/Makefile
+> > index 87bf080..212ee19 100644
+> > --- a/scripts/package/Makefile
+> > +++ b/scripts/package/Makefile
+> > @@ -105,8 +105,8 @@ clean-dirs += $(objtree)/debian/
+> >  # tarball targets
+> >  # ---------------------------------------------------------------------------
+> >  tar%pkg: FORCE
+> > -       $(MAKE) KBUILD_SRC=
+> > -       $(CONFIG_SHELL) $(srctree)/scripts/package/buildtar $@
+> > +       +$(MAKE) KBUILD_SRC=
+> > +       +$(CONFIG_SHELL) $(srctree)/scripts/package/buildtar $@
+> >  
+> >  clean-dirs += $(objtree)/tar-install/
+> 
+> For the following comamnd:
+> 
+>     make O=o -j8 tar-pkg
+> 
+> your patch fixed the annoying warning?!?
 
-Acked-by: Greg Ungerer <gerg@uclinux.org>
+I still see the warning even with the patch :-(
 
+Hmm, I use a separate objdir. Could that be related?
 
->> ---
->> áMakefile | á á4 ----
->> á1 files changed, 0 insertions(+), 4 deletions(-)
->>
->> diff --git a/Makefile b/Makefile
->> index afc868e..6f46cf9 100644
->> --- a/Makefile
->> +++ b/Makefile
->> @@ -231,10 +231,6 @@ endif
->> á# Where to locate arch specific headers
->> áhdr-arch á:= $(SRCARCH)
->>
->> -ifeq ($(ARCH),m68knommu)
->> - á á á hdr-arch á:= m68k
->> -endif
->> -
->> áKCONFIG_CONFIG ?= .config
->> áexport KCONFIG_CONFIG
->>
->> --
->> 1.7.7.6
->
-> Gr{oetje,eeting}s,
->
-> á á á á á á á á á á á á Geert
->
-> --
-> Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
->
-> In personal conversations with technical people, I call myself a hacker. But
-> when I'm talking to journalists I just say "programmer" or something like that.
-> á á á á á á á á á á á á á áá áá -- Linus Torvalds
->
->
->
+-Andi
 
 
 -- 
-------------------------------------------------------------------------
-Greg Ungerer  --  Principal Engineer        EMAIL:     gerg@snapgear.com
-SnapGear Group, McAfee                      PHONE:       +61 7 3435 2888
-8 Gardner Close,                            FAX:         +61 7 3891 3630
-Milton, QLD, 4064, Australia                WEB: http://www.SnapGear.com
+ak@linux.intel.com -- Speaking for myself only.
