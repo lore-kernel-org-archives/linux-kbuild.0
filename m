@@ -1,38 +1,54 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-iy0-f174.google.com ([209.85.210.174]:36964 "EHLO
-	mail-iy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753225Ab2D2I3S convert rfc822-to-8bit (ORCPT
+Received: from smtp.snhosting.dk ([87.238.248.203]:36617 "EHLO
+	smtp.domainteam.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752658Ab2D2Jo2 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 29 Apr 2012 04:29:18 -0400
+	Sun, 29 Apr 2012 05:44:28 -0400
+Date: Sun, 29 Apr 2012 11:44:26 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: jobserver disabled for make tar*-pkg
+Message-ID: <20120429094426.GA7859@merkur.ravnborg.org>
+References: <20120429082542.GM27374@one.firstfloor.org>
 MIME-Version: 1.0
-In-Reply-To: <20120428210005.GD7442@merkur.ravnborg.org>
-References: <20120428205651.GA7426@merkur.ravnborg.org>
-	<20120428210005.GD7442@merkur.ravnborg.org>
-Date: Sun, 29 Apr 2012 10:29:17 +0200
-Message-ID: <CAMuHMdXLs3VvGc-=h03QgWBy0coEaiRZT-c+RvDZ3wekCkz=uA@mail.gmail.com>
-Subject: Re: [PATCH 4/4] kbuild: document KBUILD_LDS, KBUILD_VMLINUX_{INIT,MAIN}
- and LDFLAGS_vmlinux
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20120429082542.GM27374@one.firstfloor.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: linux arch <linux-arch@vger.kernel.org>, lkml <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.cz>, Richard Weinberger <richard@nod.at>, "David S. Miller" <davem@davemloft.net>, Arnaud Lacombe <lacombar@gmail.com>, Andi Kleen <andi@firstfloor.org>
+To: Andi Kleen <andi@firstfloor.org>
+Cc: linux-kbuild@vger.kernel.org
 
-On Sat, Apr 28, 2012 at 23:00, Sam Ravnborg <sam@ravnborg.org> wrote:
-> +All objects files for the init (first) part of vmlinux.
-> +All objects files for the main part of vmlinux.
+On Sun, Apr 29, 2012 at 10:25:42AM +0200, Andi Kleen wrote:
+> 
+> When I do make -jX tar*-pkg make complains that the job server 
+> disabled and I should add + to the target rule. I tried this patch,
+> but the message still happens. Anyone knows where the real target
+> rule is and can fix it please?
+> 
+> -Andi
+> 
+> (cut'n'pasted, just for illustration)
+> 
+> iff --git a/scripts/package/Makefile b/scripts/package/Makefile
+> index 87bf080..212ee19 100644
+> --- a/scripts/package/Makefile
+> +++ b/scripts/package/Makefile
+> @@ -105,8 +105,8 @@ clean-dirs += $(objtree)/debian/
+>  # tarball targets
+>  # ---------------------------------------------------------------------------
+>  tar%pkg: FORCE
+> -       $(MAKE) KBUILD_SRC=
+> -       $(CONFIG_SHELL) $(srctree)/scripts/package/buildtar $@
+> +       +$(MAKE) KBUILD_SRC=
+> +       +$(CONFIG_SHELL) $(srctree)/scripts/package/buildtar $@
+>  
+>  clean-dirs += $(objtree)/tar-install/
 
-... object ...
+For the following comamnd:
 
-Gr{oetje,eeting}s,
+    make O=o -j8 tar-pkg
 
-                        Geert
+your patch fixed the annoying warning?!?
+So it seems to work for me.
 
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+	Sam
