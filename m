@@ -1,44 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from one.firstfloor.org ([213.235.205.2]:53915 "EHLO
-	one.firstfloor.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752518Ab2D2IZo (ORCPT
+Received: from mail-iy0-f174.google.com ([209.85.210.174]:33691 "EHLO
+	mail-iy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752177Ab2D2I00 convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 29 Apr 2012 04:25:44 -0400
-Date: Sun, 29 Apr 2012 10:25:42 +0200
-From: Andi Kleen <andi@firstfloor.org>
-Subject: jobserver disabled for make tar*-pkg
-Message-ID: <20120429082542.GM27374@one.firstfloor.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+	Sun, 29 Apr 2012 04:26:26 -0400
+MIME-Version: 1.0
+In-Reply-To: <20120428205651.GA7426@merkur.ravnborg.org>
+References: <20120428205651.GA7426@merkur.ravnborg.org>
+Date: Sun, 29 Apr 2012 10:26:25 +0200
+Message-ID: <CAMuHMdXsSva4U+-dnyGYOEPGcFWaTSBwkfs_b9JNjW=gxUiQXQ@mail.gmail.com>
+Subject: Re: [PATCH v2 0/4] kbuild: Move vmlinux link out of top-level Makefile
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: linux arch <linux-arch@vger.kernel.org>, lkml <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.cz>, Richard Weinberger <richard@nod.at>, "David S. Miller" <davem@davemloft.net>, Arnaud Lacombe <lacombar@gmail.com>, Andi Kleen <andi@firstfloor.org>
 
+On Sat, Apr 28, 2012 at 22:56, Sam Ravnborg <sam@ravnborg.org> wrote:
+> anyway - so there where nothing gained by using
 
-When I do make -jX tar*-pkg make complains that the job server 
-disabled and I should add + to the target rule. I tried this patch,
-but the message still happens. Anyone knows where the real target
-rule is and can fix it please?
+... there was ...
 
--Andi
+> - We no logner rebuild if one of the .tmp_kallsyms
 
-(cut'n'pasted, just for illustration)
+longer
 
-iff --git a/scripts/package/Makefile b/scripts/package/Makefile
-index 87bf080..212ee19 100644
---- a/scripts/package/Makefile
-+++ b/scripts/package/Makefile
-@@ -105,8 +105,8 @@ clean-dirs += $(objtree)/debian/
- # tarball targets
- # ---------------------------------------------------------------------------
- tar%pkg: FORCE
--       $(MAKE) KBUILD_SRC=
--       $(CONFIG_SHELL) $(srctree)/scripts/package/buildtar $@
-+       +$(MAKE) KBUILD_SRC=
-+       +$(CONFIG_SHELL) $(srctree)/scripts/package/buildtar $@
- 
- clean-dirs += $(objtree)/tar-install/
+>  files are deleted.
 
--- 
-ak@linux.intel.com -- Speaking for myself only.
+... is deleted
+
+> - rebuild if options to ld changes (Andi Kleen)
+
+change
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
