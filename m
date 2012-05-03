@@ -1,64 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.ladresse.com ([62.23.106.22]:37103 "EHLO mail.ladresse.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750743Ab2EAMTi convert rfc822-to-8bit (ORCPT
+Received: from fed1rmfepi101.cox.net ([68.230.241.132]:58864 "EHLO
+	fed1rmfepi101.cox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753464Ab2ECDuG (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 1 May 2012 08:19:38 -0400
-Message-ID: <20120501144722.13953iilynf35c2s@webmail.ladresse.com>
-Date: Tue, 01 May 2012 14:47:22 +0200
-From: "Western Union" <w-online@wu.com>
-Reply-to: westernuniononlineservice@gmail.com
-Subject: $5000 AVAILABLE FOR PICK UP
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
-	DelSp=Yes	format=flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: 7BIT
+	Wed, 2 May 2012 23:50:06 -0400
+From: Eric Nelson <eric.nelson@boundarydevices.com>
+Subject: [PATCH] checkpatch: add check for whitespace before semicolon at end-of-line
+Date: Wed,  2 May 2012 20:32:18 -0700
+Message-Id: <1336015938-3174-1-git-send-email-eric.nelson@boundarydevices.com>
+In-Reply-To: <http://lists.denx.de/pipermail/u-boot/2012-May/123595.html>
+References: <http://lists.denx.de/pipermail/u-boot/2012-May/123595.html>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
+To: linux-kernel@vger.kernel.org
+Cc: linux-kbuild@vger.kernel.org, u-boot@lists.denx.de, rylv50@freescale.com, marex@denx.de, vapier@gentoo.org, Eric Nelson <eric.nelson@boundarydevices.com>
 
+This tests for a bad habits of mine like this:
 
+	return 0 ;
 
+Signed-off-by: Eric Nelson <eric.nelson@boundarydevices.com>
+---
+ scripts/checkpatch.pl |    6 ++++++
+ 1 files changed, 6 insertions(+), 0 deletions(-)
+
+diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
+index a3b9782..0e6977e 100755
+--- a/scripts/checkpatch.pl
++++ b/scripts/checkpatch.pl
+@@ -3227,6 +3227,12 @@ sub process {
+ 			 "Statements terminations use 1 semicolon\n" . $herecurr);
+ 		}
+ 
++# check for whitespace before semicolon - not allowed at end-of-line
++		if ($line =~ /\s+;$/) {
++		    WARN("SPACEBEFORE_SEMICOLON",
++			 "Whitespace before semicolon\n" . $herecurr);
++		}
++
+ # check for gcc specific __FUNCTION__
+ 		if ($line =~ /__FUNCTION__/) {
+ 			WARN("USE_FUNC",
 -- 
-
-Dear Beneficiary?
-This is to inform you that we have already sent
-you USD5000.00 dollars through Western union
-as we have been mandated by United Nations
-and ECOWAS which are supporting individual
-due to the worldwide economy meltdown, to
-transfer to you the full compensation sum
-payment of $1.800,000.00 USD via western
-union by this government.
-
-In this regards, We decided to email the
-relevant details for you to be able to pick up
-this USD5000.00 to enable us send another
-USD5000.00 by tomorrow as you know we will be
-sending you only $5000.00 per day.You can
-track at before going to pick it up the link
-
-https://wumt.westernunion.com/asp/orderStatus.asp?country=global
-
-Mr.John Balo.
-Chief Operating Officer,
-Western Union.
-Tell: +2348182570719
-Email: johnbalo33@w.cn
-call or email the above details once you picked
-up this USD5000.00
-
-Here is the western union information to pick up
-the compensation Pick Up Information
-
-Sender's first name:.........Godwin
-Sender's last name:..........Onyia
-MTCN.................... 6890479748
-
-Amount Sent: $5000USD
-I am waiting for your call once you pick up this transfer.
-Best Regards,
-Mrs.Sandra Morris.
-Co-Ordinator,
-WESTERN UNION.
+1.7.9
 
