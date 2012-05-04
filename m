@@ -1,43 +1,56 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from www.linutronix.de ([62.245.132.108]:52467 "EHLO
-	Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753863Ab2ECS32 (ORCPT
+Received: from smtp.snhosting.dk ([87.238.248.203]:52403 "EHLO
+	smtp.domainteam.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751928Ab2EDI4h (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 3 May 2012 14:29:28 -0400
-Message-ID: <4FA2CE85.8080006@linutronix.de>
-Date: Thu, 03 May 2012 20:29:25 +0200
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+	Fri, 4 May 2012 04:56:37 -0400
+Date: Fri, 4 May 2012 10:56:35 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: [PATCH 1/2] Makefile: make sure KCFLAGS options are at the end
+Message-ID: <20120504085635.GA13450@merkur.ravnborg.org>
+References: <1336117355-21348-1-git-send-email-dedekind1@gmail.com>
 MIME-Version: 1.0
-Subject: Re: [PATCH] scripts/modpost: check for bad refernces in .pci.fixups
- area
-References: <1336058590-18049-1-git-send-email-bigeasy@linutronix.de> <CAErSpo6kqfxvVU5JvS99-GCdeHHKceWcwnAjpd_gi=O34GCsfQ@mail.gmail.com>
-In-Reply-To: <CAErSpo6kqfxvVU5JvS99-GCdeHHKceWcwnAjpd_gi=O34GCsfQ@mail.gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1336117355-21348-1-git-send-email-dedekind1@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Bjorn Helgaas <bhelgaas@google.com>
-Cc: linux-pci@vger.kernel.org, Alessio Igor Bogani <abogani@kernel.org>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
+To: Artem Bityutskiy <dedekind1@gmail.com>, Michal Marek <mmarek@suse.cz>
+Cc: Linux Kernel Maling List <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-On 05/03/2012 08:12 PM, Bjorn Helgaas wrote:
-> Most of the things this finds are quirks for devices one could argue
-> are not hot-pluggable, like northbridges, I/O APICs, etc.  But some of
-> those are becoming hot-pluggable, and I think it's too easy to make
-> the wrong __init/__devinit decision, so I think the safest thing is to
-> make them all __devinit.
+On Fri, May 04, 2012 at 10:42:34AM +0300, Artem Bityutskiy wrote:
+> From: Artem Bityutskiy <artem.bityutskiy@linux.intel.com>
+> 
+> When I build the kernel like this:
+> 
+> $ make W=1 KCFLAGS="-Wno-sign-compare"
+> 
+> the "-Wno-sign-compare" option is ignore. The reason is that we append gcc
+> options associated with W=1 _after_ KCFLAGS, so W=1 overrides my KCFLAGS
+> options. This patch tries to fix the issue by moving the "W=[123]" stiff
+> from "scripts/Makefile.build" to the main Maikefile. This fixes the issue
+> as well as this should be a small improvent because "scripts/Makefile.build"
+> is parsed by make many times (I think for each file), bue we do not need
+> to re-assign all the warnings stuff so many times - it is enough to do it
+> only once.
 
-I got here via a PCIe-bridge quirk. The bridge itself is not removed
-but the quirk is executed after "echo 1 > remove" followed by rescan.
+Moving all the W=... support out of Makefile.build is a good thing,
+as we really should do the evaluation only once.
 
-> Acked-by: Bjorn Helgaas<bhelgaas@google.com>
->
-> I assume this will be merged via a kbuild tree; let me know if otherwise.
+But I detest that this is added to the top-level Makefile.
+The top-level Makefile is full of all sort of strange stuff
+already and very hard to navigate / update for this reason.
 
-I tried to figured who is in charge here. I guess either Marek or
-Alessio Bogani will take it. Atleast I have the PCI-ack here :)
+How about introducing a new file : scripts/Kbuild.config
+This file should be included only _once_ from the top-level Makefile.
+And it should contains all the trivial assignments to
+CC, CFLAGS, etc...
 
-> Will you post a follow-up patch to fix the PCI quirk annotations?
+Including exporting of variables so they a visible in sub-makes.
 
-Since you are fine with it, let me try to prepare some.
+First step could be to move the W=... support, and then it could be
+gradually extended.
 
-Sebastian
+Michal - any comments on this?
+
+	Sam
