@@ -1,56 +1,26 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.snhosting.dk ([87.238.248.203]:52403 "EHLO
-	smtp.domainteam.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751928Ab2EDI4h (ORCPT
+Received: from out-52.smtp.ucla.edu ([169.232.46.170]:41490 "EHLO
+	out-52.smtp.ucla.edu" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755701Ab2EDMtj convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 4 May 2012 04:56:37 -0400
-Date: Fri, 4 May 2012 10:56:35 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH 1/2] Makefile: make sure KCFLAGS options are at the end
-Message-ID: <20120504085635.GA13450@merkur.ravnborg.org>
-References: <1336117355-21348-1-git-send-email-dedekind1@gmail.com>
+	Fri, 4 May 2012 08:49:39 -0400
+Message-Id: <201205041214.q44AuTji032491@mail.ucla.edu>
+Content-Type: text/plain; charset=US-ASCII
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1336117355-21348-1-git-send-email-dedekind1@gmail.com>
+Content-Transfer-Encoding: 7BIT
+Content-Description: Mail message body
+Subject: Dear Beloved
+From: "Mrs. Mary Parker" <parker@googlemail.com>
+Date: Fri, 04 May 2012 07:14:26 -0500
+Reply-To: maryparker01@rogers.com
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Artem Bityutskiy <dedekind1@gmail.com>, Michal Marek <mmarek@suse.cz>
-Cc: Linux Kernel Maling List <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: Recipients <parker@googlemail.com>
 
-On Fri, May 04, 2012 at 10:42:34AM +0300, Artem Bityutskiy wrote:
-> From: Artem Bityutskiy <artem.bityutskiy@linux.intel.com>
-> 
-> When I build the kernel like this:
-> 
-> $ make W=1 KCFLAGS="-Wno-sign-compare"
-> 
-> the "-Wno-sign-compare" option is ignore. The reason is that we append gcc
-> options associated with W=1 _after_ KCFLAGS, so W=1 overrides my KCFLAGS
-> options. This patch tries to fix the issue by moving the "W=[123]" stiff
-> from "scripts/Makefile.build" to the main Maikefile. This fixes the issue
-> as well as this should be a small improvent because "scripts/Makefile.build"
-> is parsed by make many times (I think for each file), bue we do not need
-> to re-assign all the warnings stuff so many times - it is enough to do it
-> only once.
+Dear Beloved in Christ,
 
-Moving all the W=... support out of Makefile.build is a good thing,
-as we really should do the evaluation only once.
+I am Mrs.Mary Parker an aging widow suffering from long time illness. I have some funds I inherited from my late husband, the sum of 7.5 Million Pounds and I needed a very honest and God fearing Christian that will use the fund for God's work, I found your email address from the internet and decided to contact you. Please if you would be able to use the funds for the Lord's work, kindly reply me back.
 
-But I detest that this is added to the top-level Makefile.
-The top-level Makefile is full of all sort of strange stuff
-already and very hard to navigate / update for this reason.
+Yours in the Lord, 
 
-How about introducing a new file : scripts/Kbuild.config
-This file should be included only _once_ from the top-level Makefile.
-And it should contains all the trivial assignments to
-CC, CFLAGS, etc...
-
-Including exporting of variables so they a visible in sub-makes.
-
-First step could be to move the W=... support, and then it could be
-gradually extended.
-
-Michal - any comments on this?
-
-	Sam
+Mrs. Mary Parker
