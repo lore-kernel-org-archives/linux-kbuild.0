@@ -1,103 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from perches-mx.perches.com ([206.117.179.246]:41140 "EHLO
-	labridge.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1751134Ab2EDQp0 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 4 May 2012 12:45:26 -0400
-Message-ID: <1336149924.7920.14.camel@joe2Laptop>
-Subject: Re: [PATCH V2] checkpatch: add check for whitespace before
- semicolon at end-of-line
-From: Joe Perches <joe@perches.com>
-Date: Fri, 04 May 2012 09:45:24 -0700
-In-Reply-To: <1336147186-27853-1-git-send-email-eric.nelson@boundarydevices.com>
-References: <1336147186-27853-1-git-send-email-eric.nelson@boundarydevices.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Mime-Version: 1.0
+Received: from cantor2.suse.de ([195.135.220.15]:59142 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1757796Ab2EDW1Q (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 4 May 2012 18:27:16 -0400
+Date: Sat, 5 May 2012 00:24:42 +0200
+From: Michal Marek <mmarek@suse.cz>
+Subject: Re: [PATCH] kbuild: Add error handling to KCONFIG_ALL_CONFIG
+Message-ID: <20120504222442.GB13701@sepie.suse.cz>
+References: <m1aa22rllb.fsf@fess.ebiederm.org>
+ <4F96705C.5030901@suse.cz>
+ <m1aa21nxzg.fsf_-_@fess.ebiederm.org>
+ <20120424123305.GA30068@sepie.suse.cz>
+ <m1k415mgrv.fsf@fess.ebiederm.org>
+ <4F96AC7F.6080603@suse.cz>
+ <m1wr52dgff.fsf@fess.ebiederm.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <m1wr52dgff.fsf@fess.ebiederm.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Eric Nelson <eric.nelson@boundarydevices.com>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, u-boot@lists.denx.de, rylv50@freescale.com, marex@denx.de, vapier@gentoo.org
+To: "Eric W. Biederman" <ebiederm@xmission.com>
+Cc: linux-kernel@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>, Arnaud Lacombe <lacombar@gmail.com>, linux-kbuild@vger.kernel.org
 
-On Fri, 2012-05-04 at 08:59 -0700, Eric Nelson wrote:
-> Requires --strict option during invocation:
-> 	~/linux$ scripts/checkpatch --strict foo.patch
+On Thu, Apr 26, 2012 at 01:51:32AM -0700, Eric W. Biederman wrote:
 > 
-> This tests for a bad habits of mine like this:
+> - Only try to read the file specified if KCONFIG_ALL_CONFIG is set to
+>   something other than the empty string or "1".
 > 
-> 	return 0 ;
+> - Don't use stat to check the name passed to conf_read_simple so that
+>   zconf_fopen can find the file in the current directory or in SRCTREE
+>   removing a extremely source of confusing failure, where KCONFIG_ALL_CONFIG
+>   was not interpreted with respect to the directory make was called in.
 > 
-> Note that it does allow a special case of a bare semicolon
-> for empty loops:
+> - If conf_read_simple fails complain clearly and stop processing.
+>   Allowing the simple debugging of typos.
 > 
-> 	while (foo())
-> 		;
-> 
-> ---
-> V2 adds the special case and requirement for --strict based on
-> recommendations of Joe Perches.
-> 
->  scripts/checkpatch.pl |    6 ++++++
->  1 files changed, 6 insertions(+), 0 deletions(-)
-> 
-> diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
-> index a3b9782..e711122 100755
-> --- a/scripts/checkpatch.pl
-> +++ b/scripts/checkpatch.pl
-> @@ -3227,6 +3227,12 @@ sub process {
->  			 "Statements terminations use 1 semicolon\n" . $herecurr);
->  		}
->  
-> +# check for whitespace before semicolon - not allowed at end-of-line
-> +		if ($line =~ /\S+\s+;$/) {
-> +		    CHK("SPACING",
-> +			 "Whitespace before semicolon\n" . $herecurr);
+> - Clearly document the behavior so it is clear to users which
+>   values are treated as flags and which values are treated as
+>   filenames.
 
-Hey Eric.
+Thanks, applied to kbuild.git#kconfig.
 
-This is still a suboptimal test because it should
-allow optional spacing after the semicolon before
-the EOL.
-
-	if ($line =~ /\S\s+;\s*$/)
-
-I still think it's not really necessary to
-check for end of line.  It'd also be OK to
-report spacing issues on code like:
-
-	for (i = 0 ; i < 100 ; i++)
-and
-	case foo: x = 1 ; break;
-
-So maybe the test should be
-
-	if ($line =~ /\S\s+;/)
-
-But this test emits a CHK on lines
-that add a line with just a ; so that
-needs a small update to
-
-	if ($line =~ /^\+.*\S\s+;/)
-
-Also the test should probably be adjacent
-to all the other "SPACING" tests so maybe:
-
-diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
-index cb08290..aadcfba 100755
---- a/scripts/checkpatch.pl
-+++ b/scripts/checkpatch.pl
-@@ -2461,6 +2461,13 @@ sub process {
- 				     "space prohibited between function name and open parenthesis '('\n" . $herecurr);
- 			}
- 		}
-+
-+# check for whitespace before a non-naked semicolon
-+		if ($line =~ /^\+.*\S\s+;/) {
-+			CHK("SPACING",
-+			    "space prohibited before semicolon\n" . $herecurr);
-+		}
-+
- # Check operator spacing.
- 		if (!($line=~/\#\s*include/)) {
- 			my $ops = qr{
-
-
+Michal
