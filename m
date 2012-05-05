@@ -1,163 +1,198 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.snhosting.dk ([87.238.248.203]:29979 "EHLO
+Received: from smtp.snhosting.dk ([87.238.248.203]:49731 "EHLO
 	smtp.domainteam.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753573Ab2EEISu (ORCPT
+	with ESMTP id S1753558Ab2EEISt (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 5 May 2012 04:18:50 -0400
+	Sat, 5 May 2012 04:18:49 -0400
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: [PATCH 7/8] kbuild: move W=... stuff to Kbuild.arch
-Date: Sat,  5 May 2012 10:18:45 +0200
-Message-Id: <1336205926-13946-7-git-send-email-sam@ravnborg.org>
+Subject: [PATCH 5/8] kbuild: move definitions from top-level Makefile to scripts/Kbuild.config
+Date: Sat,  5 May 2012 10:18:43 +0200
+Message-Id: <1336205926-13946-5-git-send-email-sam@ravnborg.org>
 In-Reply-To: <20120505080640.GA13773@merkur.ravnborg.org>
 References: <20120505080640.GA13773@merkur.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, lkml <linux-kernel@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, Artem Bityutskiy <dedekind1@gmail.com>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, lkml <linux-kernel@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>
 
-Prevent that we eveluate cc-option multiple times for the same
-option by moving the definitions to Kbuild.arch.
-The file is included once only, thus gcc is not invoked once per directory.
-
-Another side-effect of this patch is that KCFLAGS are appended last
-to the list of options. This allows us to better control the options.
-Artem Bityutskiy <dedekind1@gmail.com> noticed this.
+Move some of the trivial definitions to a dedicated Kbuild.config file.
+This brings down the noise level in the top-level Makefile.
 
 Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
-Cc: Artem Bityutskiy <dedekind1@gmail.com>
 ---
- scripts/Kbuild.arch    |   51 +++++++++++++++++++++++++++++++++++++++++++++++-
- scripts/Makefile.build |   51 ------------------------------------------------
- 2 files changed, 50 insertions(+), 52 deletions(-)
+ Makefile              |   68 ++----------------------------------------------
+ scripts/Kbuild.config |   68 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 71 insertions(+), 65 deletions(-)
+ create mode 100644 scripts/Kbuild.config
 
-diff --git a/scripts/Kbuild.arch b/scripts/Kbuild.arch
-index 230050f..6ff27c6 100644
---- a/scripts/Kbuild.arch
-+++ b/scripts/Kbuild.arch
-@@ -76,6 +76,56 @@ ifeq ($(shell $(CONFIG_SHELL) $(srctree)/scripts/gcc-goto.sh $(CC)), y)
-         KBUILD_CFLAGS += -DCC_HAVE_ASM_GOTO
- endif
+diff --git a/Makefile b/Makefile
+index 41bc36e..aee40e2 100644
+--- a/Makefile
++++ b/Makefile
+@@ -243,11 +243,6 @@ CONFIG_SHELL := $(shell if [ -x "$$BASH" ]; then echo $$BASH; \
+ 	  else if [ -x /bin/bash ]; then echo /bin/bash; \
+ 	  else echo sh; fi ; fi)
  
-+# make W=... settings
-+#
-+# W=1 - warnings that may be relevant and does not occur too often
-+# W=2 - warnings that occur quite often but may still be relevant
-+# W=3 - the more obscure warnings, can most likely be ignored
-+#
-+# $(call cc-option, -W...) handles gcc -W.. options which
-+# are not supported by all versions of the compiler
-+ifdef KBUILD_ENABLE_EXTRA_GCC_CHECKS
-+warning-  := $(empty)
+-HOSTCC       = gcc
+-HOSTCXX      = g++
+-HOSTCFLAGS   = -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer
+-HOSTCXXFLAGS = -O2
+-
+ # Decide whether to build built-in, modular, or both.
+ # Normally, just do built-in.
+ 
+@@ -323,74 +318,17 @@ export quiet Q KBUILD_VERBOSE
+ MAKEFLAGS += --include-dir=$(srctree)
+ 
+ # We need some generic definitions (do not try to remake the file).
++$(srctree)/scripts/Kbuild.config: ;
+ $(srctree)/scripts/Kbuild.include: ;
++include $(srctree)/scripts/Kbuild.config
+ include $(srctree)/scripts/Kbuild.include
+ 
+-# Make variables (CC, etc...)
+-
+-AS		= $(CROSS_COMPILE)as
+-LD		= $(CROSS_COMPILE)ld
+-CC		= $(CROSS_COMPILE)gcc
+-CPP		= $(CC) -E
+-AR		= $(CROSS_COMPILE)ar
+-NM		= $(CROSS_COMPILE)nm
+-STRIP		= $(CROSS_COMPILE)strip
+-OBJCOPY		= $(CROSS_COMPILE)objcopy
+-OBJDUMP		= $(CROSS_COMPILE)objdump
+-AWK		= awk
+-GENKSYMS	= scripts/genksyms/genksyms
+-INSTALLKERNEL  := installkernel
+-DEPMOD		= /sbin/depmod
+-PERL		= perl
+-CHECK		= sparse
+-
+-CHECKFLAGS     := -D__linux__ -Dlinux -D__STDC__ -Dunix -D__unix__ \
+-		  -Wbitwise -Wno-return-void $(CF)
+-CFLAGS_MODULE   =
+-AFLAGS_MODULE   =
+-LDFLAGS_MODULE  =
+-CFLAGS_KERNEL	=
+-AFLAGS_KERNEL	=
+-CFLAGS_GCOV	= -fprofile-arcs -ftest-coverage
+-
+-
+-# Use LINUXINCLUDE when you must reference the include/ directory.
+-# Needed to be compatible with the O= option
+-LINUXINCLUDE    := -I$(srctree)/arch/$(hdr-arch)/include \
+-                   -Iarch/$(hdr-arch)/include/generated -Iinclude \
+-                   $(if $(KBUILD_SRC), -I$(srctree)/include) \
+-                   -include $(srctree)/include/linux/kconfig.h
+-
+-KBUILD_CPPFLAGS := -D__KERNEL__
+-
+-KBUILD_CFLAGS   := -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs \
+-		   -fno-strict-aliasing -fno-common \
+-		   -Werror-implicit-function-declaration \
+-		   -Wno-format-security \
+-		   -fno-delete-null-pointer-checks
+-KBUILD_AFLAGS_KERNEL :=
+-KBUILD_CFLAGS_KERNEL :=
+-KBUILD_AFLAGS   := -D__ASSEMBLY__
+-KBUILD_AFLAGS_MODULE  := -DMODULE
+-KBUILD_CFLAGS_MODULE  := -DMODULE
+-KBUILD_LDFLAGS_MODULE := -T $(srctree)/scripts/module-common.lds
+-
+ # Read KERNELRELEASE from include/config/kernel.release (if it exists)
+ KERNELRELEASE = $(shell cat include/config/kernel.release 2> /dev/null)
+ KERNELVERSION = $(VERSION)$(if $(PATCHLEVEL),.$(PATCHLEVEL)$(if $(SUBLEVEL),.$(SUBLEVEL)))$(EXTRAVERSION)
+ 
+ export VERSION PATCHLEVEL SUBLEVEL KERNELRELEASE KERNELVERSION
+-export ARCH SRCARCH CONFIG_SHELL HOSTCC HOSTCFLAGS CROSS_COMPILE AS LD CC
+-export CPP AR NM STRIP OBJCOPY OBJDUMP
+-export MAKE AWK GENKSYMS INSTALLKERNEL PERL UTS_MACHINE
+-export HOSTCXX HOSTCXXFLAGS LDFLAGS_MODULE CHECK CHECKFLAGS
+-
+-export KBUILD_CPPFLAGS NOSTDINC_FLAGS LINUXINCLUDE OBJCOPYFLAGS LDFLAGS
+-export KBUILD_CFLAGS CFLAGS_KERNEL CFLAGS_MODULE CFLAGS_GCOV
+-export KBUILD_AFLAGS AFLAGS_KERNEL AFLAGS_MODULE
+-export KBUILD_AFLAGS_MODULE KBUILD_CFLAGS_MODULE KBUILD_LDFLAGS_MODULE
+-export KBUILD_AFLAGS_KERNEL KBUILD_CFLAGS_KERNEL
+-export KBUILD_ARFLAGS
++export CROSS_COMPILE ARCH SRCARCH CONFIG_SHELL UTS_MACHINE
+ 
+ # When compiling out-of-tree modules, put MODVERDIR in the module
+ # tree rather than in the kernel tree. The kernel tree might
+diff --git a/scripts/Kbuild.config b/scripts/Kbuild.config
+new file mode 100644
+index 0000000..15d5b1e
+--- /dev/null
++++ b/scripts/Kbuild.config
+@@ -0,0 +1,68 @@
++# Build on the host
++export HOSTCC       := gcc
++export HOSTCXX      := g++
++export HOSTCFLAGS   := -Wall -Wmissing-prototypes -Wstrict-prototypes
++       HOSTCFLAGS   += -O2 -fomit-frame-pointer
++export HOSTCXXFLAGS := -O2
 +
-+warning-1 := -Wextra -Wunused -Wno-unused-parameter
-+warning-1 += -Wmissing-declarations
-+warning-1 += -Wmissing-format-attribute
-+warning-1 += -Wmissing-prototypes
-+warning-1 += -Wold-style-definition
-+warning-1 += $(call cc-option, -Wmissing-include-dirs)
-+warning-1 += $(call cc-option, -Wunused-but-set-variable)
-+warning-1 += $(call cc-disable-warning, missing-field-initializers)
++# Tools to build for the target
++export AS       := $(CROSS_COMPILE)as
++export LD       := $(CROSS_COMPILE)ld
++export CC       := $(CROSS_COMPILE)gcc
++export CPP      := $(CC) -E
++export AR       := $(CROSS_COMPILE)ar
++export NM       := $(CROSS_COMPILE)nm
++export STRIP    := $(CROSS_COMPILE)strip
++export OBJCOPY  := $(CROSS_COMPILE)objcopy
++export OBJDUMP  := $(CROSS_COMPILE)objdump
 +
-+warning-2 := -Waggregate-return
-+warning-2 += -Wcast-align
-+warning-2 += -Wdisabled-optimization
-+warning-2 += -Wnested-externs
-+warning-2 += -Wshadow
-+warning-2 += $(call cc-option, -Wlogical-op)
-+warning-2 += $(call cc-option, -Wmissing-field-initializers)
++# Diverse tools
++export AWK      := awk
++export CHECK    := sparse
++export DEPMOD   := /sbin/depmod
++export GENKSYMS := scripts/genksyms/genksyms
++export KALLSYMS := scripts/kallsyms
++export MAKE
++export PERL     := perl
 +
-+warning-3 := -Wbad-function-cast
-+warning-3 += -Wcast-qual
-+warning-3 += -Wconversion
-+warning-3 += -Wpacked
-+warning-3 += -Wpadded
-+warning-3 += -Wpointer-arith
-+warning-3 += -Wredundant-decls
-+warning-3 += -Wswitch-default
-+warning-3 += $(call cc-option, -Wpacked-bitfield-compat)
-+warning-3 += $(call cc-option, -Wvla)
++# Tools for kernel installation
++export INSTALLKERNEL := installkernel
 +
-+warning := $(warning-$(findstring 1, $(KBUILD_ENABLE_EXTRA_GCC_CHECKS)))
-+warning += $(warning-$(findstring 2, $(KBUILD_ENABLE_EXTRA_GCC_CHECKS)))
-+warning += $(warning-$(findstring 3, $(KBUILD_ENABLE_EXTRA_GCC_CHECKS)))
++# Options for various tools
++export CHECKFLAGS     := -D__linux__ -Dlinux -D__STDC__
++       CHECKFLAGS     += -Dunix -D__unix__
++       CHECKFLAGS     += -Wbitwise -Wno-return-void $(CF)
++export CFLAGS_MODULE  :=
++export AFLAGS_MODULE  :=
++export LDFLAGS_MODULE :=
++export CFLAGS_KERNEL  :=
++export AFLAGS_KERNEL  :=
++export CFLAGS_GCOV    := -fprofile-arcs -ftest-coverage
 +
-+ifeq ("$(strip $(warning))","")
-+        $(error W=$(KBUILD_ENABLE_EXTRA_GCC_CHECKS) is unknown)
++# Use LINUXINCLUDE when you must reference the include/ directory.
++# Needed to be compatible with the O= option
++export LINUXINCLUDE := -I$(srctree)/arch/$(hdr-arch)/include
++       LINUXINCLUDE += -Iarch/$(hdr-arch)/include/generated -Iinclude
++       LINUXINCLUDE += $(if $(KBUILD_SRC), -I$(srctree)/include)
++       LINUXINCLUDE += -include $(srctree)/include/linux/kconfig.h
++
++export KBUILD_CPPFLAGS := -D__KERNEL__
++export KBUILD_AFLAGS   := -D__ASSEMBLY__
++export KBUILD_CFLAGS   := -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs
++       KBUILD_CFLAGS   += -fno-strict-aliasing -fno-common
++       KBUILD_CFLAGS   += -Werror-implicit-function-declaration
++       KBUILD_CFLAGS   += -Wno-format-security
++       KBUILD_CFLAGS   += -fno-delete-null-pointer-checks
++
++export KBUILD_AFLAGS_KERNEL  :=
++export KBUILD_CFLAGS_KERNEL  :=
++
++export KBUILD_AFLAGS_MODULE  := -DMODULE
++export KBUILD_CFLAGS_MODULE  := -DMODULE
++export KBUILD_LDFLAGS_MODULE := -T $(srctree)/scripts/module-common.lds
++
++ifdef CONFIG_CC_OPTIMIZE_FOR_SIZE
++KBUILD_CFLAGS += -Os
++else
++KBUILD_CFLAGS += -O2
 +endif
-+
-+KBUILD_CFLAGS += $(warning)
-+endif
-+
- # Add user supplied CPPFLAGS, AFLAGS and CFLAGS as the last assignments
- # But warn user when we do so
- warn-assign = \
-@@ -103,4 +153,3 @@ LDFLAGS_vmlinux += $(LDFLAGS_BUILD_ID)
- ifeq ($(CONFIG_STRIP_ASM_SYMS),y)
-         LDFLAGS_vmlinux += $(call ld-option, -X,)
- endif
--
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index ff1720d..f8681cc 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -50,57 +50,6 @@ ifeq ($(KBUILD_NOPEDANTIC),)
-         endif
- endif
- 
--#
--# make W=... settings
--#
--# W=1 - warnings that may be relevant and does not occur too often
--# W=2 - warnings that occur quite often but may still be relevant
--# W=3 - the more obscure warnings, can most likely be ignored
--#
--# $(call cc-option, -W...) handles gcc -W.. options which
--# are not supported by all versions of the compiler
--ifdef KBUILD_ENABLE_EXTRA_GCC_CHECKS
--warning-  := $(empty)
--
--warning-1 := -Wextra -Wunused -Wno-unused-parameter
--warning-1 += -Wmissing-declarations
--warning-1 += -Wmissing-format-attribute
--warning-1 += -Wmissing-prototypes
--warning-1 += -Wold-style-definition
--warning-1 += $(call cc-option, -Wmissing-include-dirs)
--warning-1 += $(call cc-option, -Wunused-but-set-variable)
--warning-1 += $(call cc-disable-warning, missing-field-initializers)
--
--warning-2 := -Waggregate-return
--warning-2 += -Wcast-align
--warning-2 += -Wdisabled-optimization
--warning-2 += -Wnested-externs
--warning-2 += -Wshadow
--warning-2 += $(call cc-option, -Wlogical-op)
--warning-2 += $(call cc-option, -Wmissing-field-initializers)
--
--warning-3 := -Wbad-function-cast
--warning-3 += -Wcast-qual
--warning-3 += -Wconversion
--warning-3 += -Wpacked
--warning-3 += -Wpadded
--warning-3 += -Wpointer-arith
--warning-3 += -Wredundant-decls
--warning-3 += -Wswitch-default
--warning-3 += $(call cc-option, -Wpacked-bitfield-compat)
--warning-3 += $(call cc-option, -Wvla)
--
--warning := $(warning-$(findstring 1, $(KBUILD_ENABLE_EXTRA_GCC_CHECKS)))
--warning += $(warning-$(findstring 2, $(KBUILD_ENABLE_EXTRA_GCC_CHECKS)))
--warning += $(warning-$(findstring 3, $(KBUILD_ENABLE_EXTRA_GCC_CHECKS)))
--
--ifeq ("$(strip $(warning))","")
--        $(error W=$(KBUILD_ENABLE_EXTRA_GCC_CHECKS) is unknown)
--endif
--
--KBUILD_CFLAGS += $(warning)
--endif
--
- include scripts/Makefile.lib
- 
- ifdef host-progs
 -- 
 1.6.0.6
 
