@@ -1,63 +1,37 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.snhosting.dk ([87.238.248.203]:63636 "EHLO
+Received: from smtp.snhosting.dk ([87.238.248.203]:44833 "EHLO
 	smtp.domainteam.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752798Ab2EEIGm (ORCPT
+	with ESMTP id S1753457Ab2EEISs (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 5 May 2012 04:06:42 -0400
-Date: Sat, 5 May 2012 10:06:40 +0200
+	Sat, 5 May 2012 04:18:48 -0400
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: [PATCH 0/8] kbuild: use script for final link, move definitions
-	out of top-level Makefile
-Message-ID: <20120505080640.GA13773@merkur.ravnborg.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Subject: [PATCH 1/8] kbuild: drop unused KBUILD_VMLINUX_OBJS from top-level Makefile
+Date: Sat,  5 May 2012 10:18:39 +0200
+Message-Id: <1336205926-13946-1-git-send-email-sam@ravnborg.org>
+In-Reply-To: <20120505080640.GA13773@merkur.ravnborg.org>
+References: <20120505080640.GA13773@merkur.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>, linux-kbuild <linux-kbuild@vger.kernel.org>, lkml <linux-kernel@vger.kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>, Arnaud Lacombe <lacombar@gmail.com>, Nick Bowler <nbowler@elliptictech.com>, Richard Weinberger <richard@nod.at>
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, lkml <linux-kernel@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>
 
-Hi Michal, all.
+Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
+---
+ Makefile |    1 -
+ 1 files changed, 0 insertions(+), 1 deletions(-)
 
-o Move the link of vmlinux from top-level Makefile to a script.
-  This increased the readability a lot.
-  They have had a few rounds of reviews and are ready.
-
-o Move a lot of definitions from top-level Makefile to
-  two new files located in scripts/
-
-o Fix so we do not call CC too often when using W=...
-
-o Fix so KCFLAGS (and friends) are added last to the
-  command lines.
-
-Patches 1-4 are ready to be applied.
-Patches 5-8 are new and may raise a few comments.
-
-All patches are on top of 3.4-rc5.
-
-	Sam
-
- Documentation/kbuild/kbuild.txt |   19 ++
- Makefile                        |  389 ++------------------------------------
- arch/sparc/Makefile             |   11 -
- arch/sparc/boot/Makefile        |   14 +-
- arch/um/Makefile                |   11 +-
- scripts/Kbuild.arch             |  148 +++++++++++++++
- scripts/Kbuild.config           |   68 +++++++
- scripts/Makefile.build          |   51 -----
- scripts/link-vmlinux.sh         |  211 +++++++++++++++++++++
- 9 files changed, 478 insertions(+), 444 deletions(-)
-
-Artem Bityutskiy (1):
-      kbuild: remove useless warning
-
-Sam Ravnborg (7):
-      kbuild: drop unused KBUILD_VMLINUX_OBJS from top-level Makefile
-      kbuild: refactor final link of sparc32
-      kbuild: link of vmlinux moved to a script
-      kbuild: document KBUILD_LDS, KBUILD_VMLINUX_{INIT,MAIN} and LDFLAGS_vmlinux
-      kbuild: move definitions from top-level Makefile to scripts/Kbuild.config
-      kbuild: move arch definitions from top-level Makefile to scripts/Kbuild.arch
-      kbuild: move W=... stuff to Kbuild.arch
+diff --git a/Makefile b/Makefile
+index a06ee9f..1af1b7a 100644
+--- a/Makefile
++++ b/Makefile
+@@ -758,7 +758,6 @@ vmlinux-init := $(head-y) $(init-y)
+ vmlinux-main := $(core-y) $(libs-y) $(drivers-y) $(net-y)
+ vmlinux-all  := $(vmlinux-init) $(vmlinux-main)
+ vmlinux-lds  := arch/$(SRCARCH)/kernel/vmlinux.lds
+-export KBUILD_VMLINUX_OBJS := $(vmlinux-all)
+ 
+ # Rule to link vmlinux - also used during CONFIG_KALLSYMS
+ # May be overridden by arch/$(ARCH)/Makefile
+-- 
+1.6.0.6
 
