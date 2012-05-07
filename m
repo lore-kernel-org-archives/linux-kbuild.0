@@ -1,22 +1,36 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from [203.70.230.100] ([203.70.230.100]:39629 "EHLO familyglove.com"
-	rhost-flags-FAIL-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
-	id S932217Ab2EGUfR (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 7 May 2012 16:35:17 -0400
+Received: from mail-gg0-f174.google.com ([209.85.161.174]:40647 "EHLO
+	mail-gg0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757019Ab2EGXPp (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 7 May 2012 19:15:45 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date: Mon, 07 May 2012 13:13:43 -0700
-From: sabah halif <info@mailme.dk>
-Subject: (no subject)
-Reply-To: <sabah.halif12@9.cn>
-Message-ID: <147d4ab52c5234ef23ad0ae235dc175d@familyglove.com>
+In-Reply-To: <20120505082916.GA14006@merkur.ravnborg.org>
+References: <20120428205651.GA7426@merkur.ravnborg.org>
+	<20120428205919.GC7442@merkur.ravnborg.org>
+	<4FA460AB.6060309@suse.cz>
+	<20120505082916.GA14006@merkur.ravnborg.org>
+Date: Mon, 7 May 2012 16:15:44 -0700
+Message-ID: <CA+8MBbKd9zAouJy5JvUnLwUHMJ65HsYgCTfBgv42nm32EnMPFA@mail.gmail.com>
+Subject: Re: [PATCH 3/4] kbuild: link of vmlinux moved to a script
+From: Tony Luck <tony.luck@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: Michal Marek <mmarek@suse.cz>, linux arch <linux-arch@vger.kernel.org>, lkml <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Richard Weinberger <richard@nod.at>, "David S. Miller" <davem@davemloft.net>, Arnaud Lacombe <lacombar@gmail.com>, Andi Kleen <andi@firstfloor.org>
 
+This patch is now in linux-next (tag next-20120507). But it looks to have
+broken the ia64 build. I see this error:
 
+  CC      init/version.o
+  LD      init/built-in.o
+  KSYM    .tmp_kallsyms1.o
+ld: .tmp_kallsyms1.o: linking constant-gp files with non-constant-gp files
+ld: failed to merge target specific data of file .tmp_kallsyms1.o
+make: *** [vmlinux] Error 1
 
--- 
-Good day,my name is Mrs Sabah Halif  i have a proposal please contact 
-me for details.
+which looks like we used the wrong compile options when building
+.tmp_kallsyms1.o
+
+-Tony
