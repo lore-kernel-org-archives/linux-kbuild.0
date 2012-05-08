@@ -1,50 +1,134 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:1073 "EHLO mga09.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754835Ab2EHTPD (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 8 May 2012 15:15:03 -0400
-Message-ID: <4FA9709F.6020700@linux.intel.com>
-Date: Tue, 08 May 2012 12:14:39 -0700
-From: "H. Peter Anvin" <hpa@linux.intel.com>
+Received: from mail-yw0-f46.google.com ([209.85.213.46]:60907 "EHLO
+	mail-yw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756555Ab2EHTgO convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 8 May 2012 15:36:14 -0400
 MIME-Version: 1.0
-Subject: Re: [PATCH 02/23] x86, realmode: realmode.bin infrastructure
-References: <1336501366-28617-1-git-send-email-jarkko.sakkinen@intel.com> <1336501366-28617-3-git-send-email-jarkko.sakkinen@intel.com> <20120508185349.GA12013@merkur.ravnborg.org>
-In-Reply-To: <20120508185349.GA12013@merkur.ravnborg.org>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20120412203517.GA30769@merkur.ravnborg.org>
+References: <1332960678-11879-1-git-send-email-andi@firstfloor.org>
+	<1332960678-11879-2-git-send-email-andi@firstfloor.org>
+	<CAMuHMdVX28zeebzN6277B5p2b=9s-Q06i01o5AHPyXAuKMigGQ@mail.gmail.com>
+	<20120412194016.GA30558@merkur.ravnborg.org>
+	<CAMuHMdXfpvprGD18_YYyctfrAk6iRJonWFGFRf9oSaH0u0zfhw@mail.gmail.com>
+	<4F8733C5.5080609@linux.intel.com>
+	<20120412200752.GA30685@merkur.ravnborg.org>
+	<CAMuHMdXN0PcxZQb6=ReFrpG6U49tP8ujA+OKkeVGd_yeftaydw@mail.gmail.com>
+	<20120412203517.GA30769@merkur.ravnborg.org>
+Date: Tue, 8 May 2012 21:36:12 +0200
+Message-ID: <CAMuHMdViZUB1812w3RnVysX6ESZuKAVtP8yyqPv25FJyzHbzCQ@mail.gmail.com>
+Subject: Re: [PATCH 2/2] Add CONFIG_READABLE_ASM
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Sam Ravnborg <sam@ravnborg.org>
-Cc: Jarkko Sakkinen <jarkko.sakkinen@intel.com>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Joseph Cihula <joseph.cihula@intel.com>, Shane Wang <shane.wang@intel.com>
+Cc: Andi Kleen <ak@linux.intel.com>, Andi Kleen <andi@firstfloor.org>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, x86@kernel.org
 
-On 05/08/2012 11:53 AM, Sam Ravnborg wrote:
-+# How to compile the 16-bit code.  Note we always compile for -march=i386,
-+# that way we can complain to the user if the CPU is insufficient.
-+KBUILD_CFLAGS	:= $(LINUXINCLUDE) -m32 -g -Os -D_SETUP -D__KERNEL__ \
-+		   -DDISABLE_BRANCH_PROFILING \
-+		   -Wall -Wstrict-prototypes \
-+		   -march=i386 -mregparm=3 \
-+		   -include $(srctree)/$(src)/../../boot/code16gcc.h \
-+		   -fno-strict-aliasing -fomit-frame-pointer \
-+		   $(call cc-option, -ffreestanding) \
-+		   $(call cc-option, -fno-toplevel-reorder,\
-+			$(call cc-option, -fno-unit-at-a-time)) \
-+		   $(call cc-option, -fno-stack-protector) \
-+		   $(call cc-option, -mpreferred-stack-boundary=2)
-+KBUILD_AFLAGS	:= $(KBUILD_CFLAGS) -D__ASSEMBLY__
+On Thu, Apr 12, 2012 at 10:35 PM, Sam Ravnborg <sam@ravnborg.org> wrote:
+> On Thu, Apr 12, 2012 at 10:17:07PM +0200, Geert Uytterhoeven wrote:
+>> On Thu, Apr 12, 2012 at 22:07, Sam Ravnborg <sam@ravnborg.org> wrote:
+>> > Could you try this:
+>> >
+>> > cc-disable-opt = $(call try-run,\
+>> >        $(CC) $(KBUILD_CPPFLAGS) $(KBUILD_CFLAGS) -f$(strip $(1)) -c -xc /dev/null -o "$TMP",-fno-$(strip $(1)))
+>> >
+>> > KBUILD_CFLAGS += $(call cc-disable-opt, ipa-cp-clone)
+>> >
+>> >
+>> > It will try if "gcc -fipa-cp-clone" is supported,
+>> > and add -fno-ipa-cp-clone in that case.
+>>
+>> Unfortunately not:
+>>
+>> m68k-linux-gnu-gcc -Wp,-MD,kernel/.bounds.s.d  -nostdinc -isystem
+>> /usr/lib/gcc/m68k-linux-gnu/4.1.2/include
+>> -I/scratch/geert/linux/linux-next/arch/m68k/include
+>> Iarch/m68k/include/generated -Iinclude  -include
+>> /scratch/geert/linux/linux-next/include/linux/kconfig.h -D__KERNEL__
+>> -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs -fno-strict-aliasing
+>> -fno-common -Werror-implicit-function-declaration -Wno-format-security
+>> -fno-delete-null-pointer-checks -Os -fno-reorder-blocks
+>> -fno-ipa-cp-clone -pipe -fno-strength-reduce -ffixed-a2
+>> -fno-omit-frame-pointer -fno-optimize-sibling-calls -g
+>> -D"KBUILD_STR(s)=#s" -D"KBUILD_BASENAME=KBUILD_STR(bounds)"
+>> -D"KBUILD_MODNAME=KBUILD_STR(bounds)" -fverbose-asm -S -o
+>> kernel/bounds.s kernel/bounds.c
+>> cc1: error: unrecognized command line option "-fno-ipa-cp-clone"
+>> make[1]: *** [kernel/bounds.s] Error 1
+>> make: *** [prepare0] Error 2
+>
+> So with the above command-line gcc fails with an exit code for -fno-ipa-cp-clone.
+> But with cc-option it does not.
+>
+> Can you dig out the command-line used for cc-option?
+> We may be able to analyze why it fails in the above case, but
+> not with cc-option.
 
+gcc -D__KERNEL__ -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs
+-fno-strict-aliasing -fno-common -Werror-implicit-function-declaration
+-Wno-format-security -fno-delete-null-pointer-checks -Os
+-fno-ipa-cp-clone -c -xc /dev/null -o .6376.tmp
 
-> 
-> How much is needed to avoid this misuse of kernel-internal build rules?
-> This was and is an ugly hack.
-> 
+So it's running "gcc" instead of "m68k-linux-gnu-gcc".
 
-It is more or less the same as for arch/x86/boot and other things.  If
-there are better ways to do it suggestions are very much appreciated.
+I used the gmail-damaged patch below to get the command in /tmp/x.
 
-However, it is a bit of a tricky bit because we need *some* of the bits
-of the target compiler configuration and some not (this is the same as
-arch/x86/boot etc.)  It is not "pure target" but it's also most
-definitely not host.
+diff --git a/Makefile b/Makefile
+index d17a616..0e0cbb9 100644
+--- a/Makefile
++++ b/Makefile
+@@ -567,7 +567,7 @@ ifdef CONFIG_READABLE_ASM
+ # ipa clone creates specialized cloned functions
+ # partial inlining inlines only parts of functions
+ KBUILD_CFLAGS += $(call cc-option,-fno-reorder-blocks,) \
+-                 $(call cc-option,-fno-ipa-cp-clone,) \
++                 $(call cc-option2,-fno-ipa-cp-clone,) \
+                  $(call cc-option,-fno-partial-inlining)
+ endif
 
-	-hpa
+diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
+index 6a3ee98..41c80bf 100644
+--- a/scripts/Kbuild.include
++++ b/scripts/Kbuild.include
+@@ -94,6 +94,16 @@ try-run = $(shell set -e;            \
+        fi;                             \
+        rm -f "$$TMP" "$$TMPO")
+
++try-run2 = $(shell set -e;             \
++       TMP="$(TMPOUT).$$$$.tmp";       \
++       TMPO="$(TMPOUT).$$$$.o";        \
++       echo "$(1)" > /tmp/x;           \
++       if ($(1)) >/dev/null 2>&1;      \
++       then echo "$(2)";               \
++       else echo "$(3)";               \
++       fi;                             \
++       rm -f "$$TMP" "$$TMPO")
++
+ # as-option
+ # Usage: cflags-y += $(call as-option,-Wa$(comma)-isa=foo,)
+
+@@ -112,6 +122,9 @@ as-instr = $(call try-run,\
+ cc-option = $(call try-run,\
+        $(CC) $(KBUILD_CPPFLAGS) $(KBUILD_CFLAGS) $(1) -c -xc
+/dev/null -o "$$TMP",$(1),$(2))
+
++cc-option2 = $(call try-run2,\
++       $(CC) $(KBUILD_CPPFLAGS) $(KBUILD_CFLAGS) $(1) -c -xc
+/dev/null -o "$$TMP",$(1),$(2))
++
+ # cc-option-yn
+ # Usage: flag := $(call cc-option-yn,-march=winchip-c6)
+ cc-option-yn = $(call try-run,\
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
