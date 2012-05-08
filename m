@@ -1,12 +1,12 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
 Received: from mga01.intel.com ([192.55.52.88]:11241 "EHLO mga01.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755495Ab2EHSXs (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 8 May 2012 14:23:48 -0400
+	id S1755508Ab2EHSXt (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 8 May 2012 14:23:49 -0400
 From: Jarkko Sakkinen <jarkko.sakkinen@intel.com>
-Subject: [PATCH 09/23] x86, realmode: Add .text64 section, make barrier symbols absolute
-Date: Tue,  8 May 2012 21:22:32 +0300
-Message-Id: <1336501366-28617-10-git-send-email-jarkko.sakkinen@intel.com>
+Subject: [PATCH 10/23] x86, realmode: Move bits to the proper sections in trampoline_64.S
+Date: Tue,  8 May 2012 21:22:33 +0300
+Message-Id: <1336501366-28617-11-git-send-email-jarkko.sakkinen@intel.com>
 In-Reply-To: <1336501366-28617-1-git-send-email-jarkko.sakkinen@intel.com>
 References: <1336501366-28617-1-git-send-email-jarkko.sakkinen@intel.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -16,58 +16,66 @@ Cc: linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Sam Ravnborg <s
 
 From: "H. Peter Anvin" <hpa@linux.intel.com>
 
-Add a .text64 section.  The purpose of this is to keep 16-, 32- and
-64-bit code segregated into separate sections, mainly to keep
-disassembly sane.
-
-Move barrier symbols out of sections to avoid the "symbol in empty
-section" problem in some versions of GNU ld.
+Move various bits to the sections they really belong in in
+trampoline_64.S.  Use GLOBAL() rather than ENTRY() for data objects:
+ENTRY() should only be used with code and forces alignment to 16
+bytes.
 
 Signed-off-by: H. Peter Anvin <hpa@linux.intel.com>
 ---
- arch/x86/realmode/rm/realmode.lds.S |   11 ++++++++---
- 1 file changed, 8 insertions(+), 3 deletions(-)
+ arch/x86/realmode/rm/trampoline_64.S |   10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-diff --git a/arch/x86/realmode/rm/realmode.lds.S b/arch/x86/realmode/rm/realmode.lds.S
-index 91b83ea..4d4afca 100644
---- a/arch/x86/realmode/rm/realmode.lds.S
-+++ b/arch/x86/realmode/rm/realmode.lds.S
-@@ -32,8 +32,8 @@ SECTIONS
- 	}
+diff --git a/arch/x86/realmode/rm/trampoline_64.S b/arch/x86/realmode/rm/trampoline_64.S
+index 063da00..66c58cf 100644
+--- a/arch/x86/realmode/rm/trampoline_64.S
++++ b/arch/x86/realmode/rm/trampoline_64.S
+@@ -80,6 +80,7 @@ no_longmode:
+ 	jmp no_longmode
+ #include "../kernel/verify_cpu.S"
  
- 	. = ALIGN(PAGE_SIZE);
-+	pa_text_start = .;
- 	.text : {
--		pa_text_start = .;
- 		*(.text)
- 		*(.text.*)
- 	}
-@@ -41,9 +41,14 @@ SECTIONS
- 	.text32 : {
- 		*(.text32)
- 		*(.text32.*)
--		pa_ro_end = .;
- 	}
++	.section ".text32","ax"
+ 	.code32
+ 	.balign 4
+ ENTRY(startup_32)
+@@ -114,6 +115,7 @@ ENTRY(startup_32)
+ 	 */
+ 	ljmpl	*(pa_startup_64_vector)
  
-+	.text64 : {
-+		*(.text64)
-+		*(.text64.*)
-+	}
-+	pa_ro_end = .;
-+
- 	. = ALIGN(PAGE_SIZE);
- 	.data : {
- 		*(.data)
-@@ -59,8 +64,8 @@ SECTIONS
- 	. = ALIGN(4);
- 	.signature : {
- 		*(.signature)
--		pa_end = .;
- 	}
-+	pa_end = .;
++	.section ".text64","ax"
+ 	.code64
+ 	.balign 4
+ ENTRY(startup_64)
+@@ -123,7 +125,8 @@ ENTRY(startup_64)
+ 	addl	%esi, %eax
+ 	jmp	*%rax
  
- 	/DISCARD/ : {
- 		*(.note*)
+-	# Careful these need to be in the same 64K segment as the above;
++	.section ".rodata","a"
++	.balign	16
+ tidt:
+ 	.word	0			# idt limit = 0
+ 	.word	0, 0			# idt base = 0L
+@@ -153,9 +156,8 @@ startup_64_vector:
+ 	.word	__KERNEL_CS, 0
+ 
+ 	.data
+-
+ 	.balign 4
+-ENTRY(trampoline_status)
++GLOBAL(trampoline_status)
+ 	.long	0
+ 
+ trampoline_stack:
+@@ -164,7 +166,7 @@ trampoline_stack_end:
+ 
+ 	.globl	level3_ident_pgt
+ 	.globl	level3_kernel_pgt
+-ENTRY(trampoline_level4_pgt)
++GLOBAL(trampoline_level4_pgt)
+ 	level3_ident_pgt:	.quad	0
+ 	.fill 510,8,0
+ 	level3_kernel_pgt:	.quad	0
 -- 
 1.7.9.5
 
