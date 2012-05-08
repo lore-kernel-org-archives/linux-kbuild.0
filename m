@@ -1,123 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.snhosting.dk ([87.238.248.203]:53102 "EHLO
-	smtp.domainteam.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753252Ab2EHSxx (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 8 May 2012 14:53:53 -0400
-Date: Tue, 8 May 2012 20:53:49 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH 02/23] x86, realmode: realmode.bin infrastructure
-Message-ID: <20120508185349.GA12013@merkur.ravnborg.org>
-References: <1336501366-28617-1-git-send-email-jarkko.sakkinen@intel.com> <1336501366-28617-3-git-send-email-jarkko.sakkinen@intel.com>
+Received: from mga09.intel.com ([134.134.136.24]:1073 "EHLO mga09.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754835Ab2EHTPD (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 8 May 2012 15:15:03 -0400
+Message-ID: <4FA9709F.6020700@linux.intel.com>
+Date: Tue, 08 May 2012 12:14:39 -0700
+From: "H. Peter Anvin" <hpa@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1336501366-28617-3-git-send-email-jarkko.sakkinen@intel.com>
+Subject: Re: [PATCH 02/23] x86, realmode: realmode.bin infrastructure
+References: <1336501366-28617-1-git-send-email-jarkko.sakkinen@intel.com> <1336501366-28617-3-git-send-email-jarkko.sakkinen@intel.com> <20120508185349.GA12013@merkur.ravnborg.org>
+In-Reply-To: <20120508185349.GA12013@merkur.ravnborg.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jarkko Sakkinen <jarkko.sakkinen@intel.com>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Joseph Cihula <joseph.cihula@intel.com>, Shane Wang <shane.wang@intel.com>, hpa@linux.intel.com
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: Jarkko Sakkinen <jarkko.sakkinen@intel.com>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Joseph Cihula <joseph.cihula@intel.com>, Shane Wang <shane.wang@intel.com>
 
-> new file mode 100644
-> index 0000000..f22a4f8
-> --- /dev/null
-> +++ b/arch/x86/realmode/Makefile
-> @@ -0,0 +1,20 @@
-> +#
-> +# arch/x86/realmode/Makefile
-Drop filename inside files - they will get wrong.
+On 05/08/2012 11:53 AM, Sam Ravnborg wrote:
++# How to compile the 16-bit code.  Note we always compile for -march=i386,
++# that way we can complain to the user if the CPU is insufficient.
++KBUILD_CFLAGS	:= $(LINUXINCLUDE) -m32 -g -Os -D_SETUP -D__KERNEL__ \
++		   -DDISABLE_BRANCH_PROFILING \
++		   -Wall -Wstrict-prototypes \
++		   -march=i386 -mregparm=3 \
++		   -include $(srctree)/$(src)/../../boot/code16gcc.h \
++		   -fno-strict-aliasing -fomit-frame-pointer \
++		   $(call cc-option, -ffreestanding) \
++		   $(call cc-option, -fno-toplevel-reorder,\
++			$(call cc-option, -fno-unit-at-a-time)) \
++		   $(call cc-option, -fno-stack-protector) \
++		   $(call cc-option, -mpreferred-stack-boundary=2)
++KBUILD_AFLAGS	:= $(KBUILD_CFLAGS) -D__ASSEMBLY__
 
-> +#
-> +# This file is subject to the terms and conditions of the GNU General Public
-> +# License.  See the file "COPYING" in the main directory of this archive
-> +# for more details.
-This is useless boilerplate.
 
-> --- /dev/null
-> +++ b/arch/x86/realmode/rm/.gitignore
-> @@ -0,0 +1,3 @@
-> +pasyms.h
-> +realmode.lds
-> +realmode.relocs
-> diff --git a/arch/x86/realmode/rm/Makefile b/arch/x86/realmode/rm/Makefile
-> new file mode 100644
-> index 0000000..7c3f202
-> --- /dev/null
-> +++ b/arch/x86/realmode/rm/Makefile
-> @@ -0,0 +1,63 @@
-> +#
-> +# arch/x86/realmode/Makefile
+> 
+> How much is needed to avoid this misuse of kernel-internal build rules?
+> This was and is an ugly hack.
+> 
 
-And I think you proved my point concerning the filename here :-)
+It is more or less the same as for arch/x86/boot and other things.  If
+there are better ways to do it suggestions are very much appreciated.
 
-> +#
-> +# This file is subject to the terms and conditions of the GNU General Public
-> +# License.  See the file "COPYING" in the main directory of this archive
-> +# for more details.
-> +#
-> +#
-> +
-> +subdir- := wakeup
-> +
-> +always := realmode.bin
-> +
-> +realmode-y			+= header.o
-I see no reason to use the "-y" variant of the name here.
+However, it is a bit of a tricky bit because we need *some* of the bits
+of the target compiler configuration and some not (this is the same as
+arch/x86/boot etc.)  It is not "pure target" but it's also most
+definitely not host.
 
-> +
-> +targets	+= $(realmode-y)
-> +
-> +REALMODE_OBJS = $(addprefix $(obj)/,$(realmode-y))
-
-We try to avoid ALL_CAPS stuff in linux makefiles.
-It is unreadable.
-
-> +
-> +sed-pasyms := -n -r -e 's/^([0-9a-fA-F]+) [ABCDGRSTVW] (.+)$$/pa_\2 = \2;/p'
-> +
-> +quiet_cmd_pasyms = PASYMS  $@
-> +      cmd_pasyms = $(NM) $(filter-out FORCE,$^) | \
-> +		   sed $(sed-pasyms) | sort | uniq > $@
-> +
-> +$(obj)/pasyms.h: $(REALMODE_OBJS) FORCE
-> +	$(call if_changed,pasyms)
-> +
-> +$(obj)/realmode.lds: $(obj)/pasyms.h
-> +
-> +LDFLAGS_realmode.elf := --emit-relocs -T
-> +CPPFLAGS_realmode.lds += -P -C -I$(obj)
-> +
-> +$(obj)/realmode.elf: $(obj)/realmode.lds $(REALMODE_OBJS) FORCE
-> +	$(call if_changed,ld)
-> +
-> +OBJCOPYFLAGS_realmode.bin := -O binary
-> +
-> +$(obj)/realmode.bin: $(obj)/realmode.elf
-> +	$(call if_changed,objcopy)
-> +
-> +quiet_cmd_relocs = RELOCS  $@
-> +      cmd_relocs = scripts/x86-relocs --realmode $< > $@
-> +$(obj)/realmode.relocs: $(obj)/realmode.elf FORCE
-> +	$(call if_changed,relocs)
-> +
-> +# ---------------------------------------------------------------------------
-> +
-> +# How to compile the 16-bit code.  Note we always compile for -march=i386,
-> +# that way we can complain to the user if the CPU is insufficient.
-> +KBUILD_CFLAGS	:= $(LINUXINCLUDE) -m32 -g -Os -D_SETUP -D__KERNEL__ \
-> +		   -DDISABLE_BRANCH_PROFILING \
-> +		   -Wall -Wstrict-prototypes \
-> +		   -march=i386 -mregparm=3 \
-> +		   -include $(srctree)/$(src)/../../boot/code16gcc.h \
-> +		   -fno-strict-aliasing -fomit-frame-pointer \
-> +		   $(call cc-option, -ffreestanding) \
-> +		   $(call cc-option, -fno-toplevel-reorder,\
-> +			$(call cc-option, -fno-unit-at-a-time)) \
-> +		   $(call cc-option, -fno-stack-protector) \
-> +		   $(call cc-option, -mpreferred-stack-boundary=2)
-> +KBUILD_AFLAGS	:= $(KBUILD_CFLAGS) -D__ASSEMBLY__
-
-How much is needed to avoid this misuse of kernel-internal build rules?
-This was and is an ugly hack.
-
-	Sam
+	-hpa
