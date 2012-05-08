@@ -1,12 +1,12 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
 Received: from mga01.intel.com ([192.55.52.88]:11241 "EHLO mga01.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755586Ab2EHSXu (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 8 May 2012 14:23:50 -0400
+	id S1755495Ab2EHSXs (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 8 May 2012 14:23:48 -0400
 From: Jarkko Sakkinen <jarkko.sakkinen@intel.com>
-Subject: [PATCH 11/23] x86, realmode: Align .data section in trampoline_32.S
-Date: Tue,  8 May 2012 21:22:34 +0300
-Message-Id: <1336501366-28617-12-git-send-email-jarkko.sakkinen@intel.com>
+Subject: [PATCH 09/23] x86, realmode: Add .text64 section, make barrier symbols absolute
+Date: Tue,  8 May 2012 21:22:32 +0300
+Message-Id: <1336501366-28617-10-git-send-email-jarkko.sakkinen@intel.com>
 In-Reply-To: <1336501366-28617-1-git-send-email-jarkko.sakkinen@intel.com>
 References: <1336501366-28617-1-git-send-email-jarkko.sakkinen@intel.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -16,26 +16,58 @@ Cc: linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Sam Ravnborg <s
 
 From: "H. Peter Anvin" <hpa@linux.intel.com>
 
-Specify the alignment of the .data section in trampoline_32.S.
+Add a .text64 section.  The purpose of this is to keep 16-, 32- and
+64-bit code segregated into separate sections, mainly to keep
+disassembly sane.
+
+Move barrier symbols out of sections to avoid the "symbol in empty
+section" problem in some versions of GNU ld.
 
 Signed-off-by: H. Peter Anvin <hpa@linux.intel.com>
 ---
- arch/x86/realmode/rm/trampoline_32.S |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/x86/realmode/rm/realmode.lds.S |   11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
 
-diff --git a/arch/x86/realmode/rm/trampoline_32.S b/arch/x86/realmode/rm/trampoline_32.S
-index 18cb7fc..1f9e331 100644
---- a/arch/x86/realmode/rm/trampoline_32.S
-+++ b/arch/x86/realmode/rm/trampoline_32.S
-@@ -68,7 +68,7 @@ trampoline_data:
+diff --git a/arch/x86/realmode/rm/realmode.lds.S b/arch/x86/realmode/rm/realmode.lds.S
+index 91b83ea..4d4afca 100644
+--- a/arch/x86/realmode/rm/realmode.lds.S
++++ b/arch/x86/realmode/rm/realmode.lds.S
+@@ -32,8 +32,8 @@ SECTIONS
+ 	}
  
- 	.data
- 	.globl startup_32_smp, boot_gdt, trampoline_status
--
-+	.balign	4
- boot_gdt_descr:
- 	.word	__BOOT_DS + 7			# gdt limit
- boot_gdt:
+ 	. = ALIGN(PAGE_SIZE);
++	pa_text_start = .;
+ 	.text : {
+-		pa_text_start = .;
+ 		*(.text)
+ 		*(.text.*)
+ 	}
+@@ -41,9 +41,14 @@ SECTIONS
+ 	.text32 : {
+ 		*(.text32)
+ 		*(.text32.*)
+-		pa_ro_end = .;
+ 	}
+ 
++	.text64 : {
++		*(.text64)
++		*(.text64.*)
++	}
++	pa_ro_end = .;
++
+ 	. = ALIGN(PAGE_SIZE);
+ 	.data : {
+ 		*(.data)
+@@ -59,8 +64,8 @@ SECTIONS
+ 	. = ALIGN(4);
+ 	.signature : {
+ 		*(.signature)
+-		pa_end = .;
+ 	}
++	pa_end = .;
+ 
+ 	/DISCARD/ : {
+ 		*(.note*)
 -- 
 1.7.9.5
 
