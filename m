@@ -1,12 +1,12 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
 Received: from mga01.intel.com ([192.55.52.88]:1552 "EHLO mga01.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754960Ab2EHSXR (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 8 May 2012 14:23:17 -0400
+	id S1754113Ab2EHSXJ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 8 May 2012 14:23:09 -0400
 From: Jarkko Sakkinen <jarkko.sakkinen@intel.com>
-Subject: [PATCH 04/23] x86, realmode: Move reboot_32.S to unified realmode code
-Date: Tue,  8 May 2012 21:22:27 +0300
-Message-Id: <1336501366-28617-5-git-send-email-jarkko.sakkinen@intel.com>
+Subject: [PATCH 02/23] x86, realmode: realmode.bin infrastructure
+Date: Tue,  8 May 2012 21:22:25 +0300
+Message-Id: <1336501366-28617-3-git-send-email-jarkko.sakkinen@intel.com>
 In-Reply-To: <1336501366-28617-1-git-send-email-jarkko.sakkinen@intel.com>
 References: <1336501366-28617-1-git-send-email-jarkko.sakkinen@intel.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -14,406 +14,276 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org
 Cc: linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Sam Ravnborg <sam@ravnborg.org>, Joseph Cihula <joseph.cihula@intel.com>, Shane Wang <shane.wang@intel.com>, hpa@linux.intel.com, Jarkko Sakkinen <jarkko.sakkinen@intel.com>
 
-Migrated reboot_32.S from x86_trampoline to the real-mode
-blob.
+Create realmode.bin and realmode.relocs files. Piggy
+pack them into relocatable object that will be included
+into .init.data section of the main kernel image.
+
+The first file includes binary image of the real-mode code.
+The latter file includes all relocations. The layout of the
+binary image is specified in realmode.lds.S. The makefile
+generates pa_ prefixed symbols for each exported global.
+These are used in 32-bit code and in realmode header to
+define symbols that need to be relocated.
 
 Signed-off-by: Jarkko Sakkinen <jarkko.sakkinen@intel.com>
+Originally-by: H. Peter Anvin <hpa@linux.intel.com>
 ---
- arch/x86/include/asm/realmode.h  |    4 ++
- arch/x86/kernel/Makefile         |    1 -
- arch/x86/kernel/reboot.c         |   25 +------
- arch/x86/kernel/reboot_32.S      |  135 --------------------------------------
- arch/x86/realmode/rm/Makefile    |    1 +
- arch/x86/realmode/rm/header.S    |    3 +
- arch/x86/realmode/rm/reboot_32.S |  134 +++++++++++++++++++++++++++++++++++++
- 7 files changed, 145 insertions(+), 158 deletions(-)
- delete mode 100644 arch/x86/kernel/reboot_32.S
- create mode 100644 arch/x86/realmode/rm/reboot_32.S
+ arch/x86/Kbuild                     |    2 +-
+ arch/x86/realmode/Makefile          |   20 +++++++++++
+ arch/x86/realmode/rm/.gitignore     |    3 ++
+ arch/x86/realmode/rm/Makefile       |   63 ++++++++++++++++++++++++++++++++
+ arch/x86/realmode/rm/header.S       |   16 +++++++++
+ arch/x86/realmode/rm/realmode.lds.S |   68 +++++++++++++++++++++++++++++++++++
+ arch/x86/realmode/rmpiggy.S         |   18 ++++++++++
+ 7 files changed, 189 insertions(+), 1 deletion(-)
+ create mode 100644 arch/x86/realmode/Makefile
+ create mode 100644 arch/x86/realmode/rm/.gitignore
+ create mode 100644 arch/x86/realmode/rm/Makefile
+ create mode 100644 arch/x86/realmode/rm/header.S
+ create mode 100644 arch/x86/realmode/rm/realmode.lds.S
+ create mode 100644 arch/x86/realmode/rmpiggy.S
 
-diff --git a/arch/x86/include/asm/realmode.h b/arch/x86/include/asm/realmode.h
-index dc1bba5..bf26b06 100644
---- a/arch/x86/include/asm/realmode.h
-+++ b/arch/x86/include/asm/realmode.h
-@@ -9,6 +9,10 @@ struct real_mode_header {
- 	u32	text_start;
- 	u32	ro_end;
- 	u32	end;
-+	/* reboot */
-+#ifdef CONFIG_X86_32
-+	u32	machine_real_restart_asm;
-+#endif
- } __attribute__((__packed__));
+diff --git a/arch/x86/Kbuild b/arch/x86/Kbuild
+index 0e9dec6..e5287d8 100644
+--- a/arch/x86/Kbuild
++++ b/arch/x86/Kbuild
+@@ -1,4 +1,3 @@
+-
+ obj-$(CONFIG_KVM) += kvm/
  
- extern struct real_mode_header real_mode_header;
-diff --git a/arch/x86/kernel/Makefile b/arch/x86/kernel/Makefile
-index f9e19d4..b71ef35 100644
---- a/arch/x86/kernel/Makefile
-+++ b/arch/x86/kernel/Makefile
-@@ -49,7 +49,6 @@ obj-$(CONFIG_STACKTRACE)	+= stacktrace.o
- obj-y				+= cpu/
- obj-y				+= acpi/
- obj-y				+= reboot.o
--obj-$(CONFIG_X86_32)		+= reboot_32.o
- obj-$(CONFIG_MCA)		+= mca_32.o
- obj-$(CONFIG_X86_MSR)		+= msr.o
- obj-$(CONFIG_X86_CPUID)		+= cpuid.o
-diff --git a/arch/x86/kernel/reboot.c b/arch/x86/kernel/reboot.c
-index d840e69..050eff2 100644
---- a/arch/x86/kernel/reboot.c
-+++ b/arch/x86/kernel/reboot.c
-@@ -24,6 +24,7 @@
- #ifdef CONFIG_X86_32
- # include <linux/ctype.h>
- # include <linux/mc146818rtc.h>
-+# include <asm/realmode.h>
- #else
- # include <asm/x86_init.h>
- #endif
-@@ -332,15 +333,10 @@ static int __init reboot_init(void)
- }
- core_initcall(reboot_init);
+ # Xen paravirtualization support
+@@ -7,6 +6,7 @@ obj-$(CONFIG_XEN) += xen/
+ # lguest paravirtualization support
+ obj-$(CONFIG_LGUEST_GUEST) += lguest/
  
--extern const unsigned char machine_real_restart_asm[];
--extern const u64 machine_real_restart_gdt[3];
--
- void machine_real_restart(unsigned int type)
- {
--	void *restart_va;
--	unsigned long restart_pa;
--	void (*restart_lowmem)(unsigned int);
--	u64 *lowmem_gdt;
-+	void (*restart_lowmem)(unsigned int) = (void (*)(unsigned int))
-+		real_mode_header.machine_real_restart_asm;
++obj-y += realmode/
+ obj-y += kernel/
+ obj-y += mm/
  
- 	local_irq_disable();
- 
-@@ -369,21 +365,6 @@ void machine_real_restart(unsigned int type)
- 	   too. */
- 	*((unsigned short *)0x472) = reboot_mode;
- 
--	/* Patch the GDT in the low memory trampoline */
--	lowmem_gdt = TRAMPOLINE_SYM(machine_real_restart_gdt);
--
--	restart_va = TRAMPOLINE_SYM(machine_real_restart_asm);
--	restart_pa = virt_to_phys(restart_va);
--	restart_lowmem = (void (*)(unsigned int))restart_pa;
--
--	/* GDT[0]: GDT self-pointer */
--	lowmem_gdt[0] =
--		(u64)(sizeof(machine_real_restart_gdt) - 1) +
--		((u64)virt_to_phys(lowmem_gdt) << 16);
--	/* GDT[1]: 64K real mode code segment */
--	lowmem_gdt[1] =
--		GDT_ENTRY(0x009b, restart_pa, 0xffff);
--
- 	/* Jump to the identity-mapped low memory code */
- 	restart_lowmem(type);
- }
-diff --git a/arch/x86/kernel/reboot_32.S b/arch/x86/kernel/reboot_32.S
-deleted file mode 100644
-index 1d5c46d..0000000
---- a/arch/x86/kernel/reboot_32.S
-+++ /dev/null
-@@ -1,135 +0,0 @@
--#include <linux/linkage.h>
--#include <linux/init.h>
--#include <asm/segment.h>
--#include <asm/page_types.h>
--
--/*
-- * The following code and data reboots the machine by switching to real
-- * mode and jumping to the BIOS reset entry point, as if the CPU has
-- * really been reset.  The previous version asked the keyboard
-- * controller to pulse the CPU reset line, which is more thorough, but
-- * doesn't work with at least one type of 486 motherboard.  It is easy
-- * to stop this code working; hence the copious comments.
-- *
-- * This code is called with the restart type (0 = BIOS, 1 = APM) in %eax.
-- */
--	.section ".x86_trampoline","a"
--	.balign 16
--	.code32
--ENTRY(machine_real_restart_asm)
--r_base = .
--	/* Get our own relocated address */
--	call	1f
--1:	popl	%ebx
--	subl	$(1b - r_base), %ebx
--
--	/* Compute the equivalent real-mode segment */
--	movl	%ebx, %ecx
--	shrl	$4, %ecx
--	
--	/* Patch post-real-mode segment jump */
--	movw	(dispatch_table - r_base)(%ebx,%eax,2),%ax
--	movw	%ax, (101f - r_base)(%ebx)
--	movw	%cx, (102f - r_base)(%ebx)
--
--	/* Set up the IDT for real mode. */
--	lidtl	(machine_real_restart_idt - r_base)(%ebx)
--
--	/*
--	 * Set up a GDT from which we can load segment descriptors for real
--	 * mode.  The GDT is not used in real mode; it is just needed here to
--	 * prepare the descriptors.
--	 */
--	lgdtl	(machine_real_restart_gdt - r_base)(%ebx)
--
--	/*
--	 * Load the data segment registers with 16-bit compatible values
--	 */
--	movl	$16, %ecx
--	movl	%ecx, %ds
--	movl	%ecx, %es
--	movl	%ecx, %fs
--	movl	%ecx, %gs
--	movl	%ecx, %ss
--	ljmpl	$8, $1f - r_base
--
--/*
-- * This is 16-bit protected mode code to disable paging and the cache,
-- * switch to real mode and jump to the BIOS reset code.
-- *
-- * The instruction that switches to real mode by writing to CR0 must be
-- * followed immediately by a far jump instruction, which set CS to a
-- * valid value for real mode, and flushes the prefetch queue to avoid
-- * running instructions that have already been decoded in protected
-- * mode.
-- *
-- * Clears all the flags except ET, especially PG (paging), PE
-- * (protected-mode enable) and TS (task switch for coprocessor state
-- * save).  Flushes the TLB after paging has been disabled.  Sets CD and
-- * NW, to disable the cache on a 486, and invalidates the cache.  This
-- * is more like the state of a 486 after reset.  I don't know if
-- * something else should be done for other chips.
-- *
-- * More could be done here to set up the registers as if a CPU reset had
-- * occurred; hopefully real BIOSs don't assume much.  This is not the
-- * actual BIOS entry point, anyway (that is at 0xfffffff0).
-- *
-- * Most of this work is probably excessive, but it is what is tested.
-- */
--	.code16
--1:
--	xorl	%ecx, %ecx
--	movl	%cr0, %eax
--	andl	$0x00000011, %eax
--	orl	$0x60000000, %eax
--	movl	%eax, %cr0
--	movl	%ecx, %cr3
--	movl	%cr0, %edx
--	andl	$0x60000000, %edx	/* If no cache bits -> no wbinvd */
--	jz	2f
--	wbinvd
--2:
--	andb	$0x10, %al
--	movl	%eax, %cr0
--	.byte	0xea			/* ljmpw */
--101:	.word	0			/* Offset */
--102:	.word	0			/* Segment */
--
--bios:
--	ljmpw	$0xf000, $0xfff0
--
--apm:
--	movw	$0x1000, %ax
--	movw	%ax, %ss
--	movw	$0xf000, %sp
--	movw	$0x5307, %ax
--	movw	$0x0001, %bx
--	movw	$0x0003, %cx
--	int	$0x15
--
--END(machine_real_restart_asm)
--
--	.balign 16
--	/* These must match <asm/reboot.h */
--dispatch_table:
--	.word	bios - r_base
--	.word	apm - r_base
--END(dispatch_table)
--
--	.balign 16
--machine_real_restart_idt:
--	.word	0xffff		/* Length - real mode default value */
--	.long	0		/* Base - real mode default value */
--END(machine_real_restart_idt)
--
--	.balign 16
--ENTRY(machine_real_restart_gdt)
--	.quad	0		/* Self-pointer, filled in by PM code */
--	.quad	0		/* 16-bit code segment, filled in by PM code */
--	/*
--	 * 16-bit data segment with the selector value 16 = 0x10 and
--	 * base value 0x100; since this is consistent with real mode
--	 * semantics we don't have to reload the segments once CR0.PE = 0.
--	 */
--	.quad	GDT_ENTRY(0x0093, 0x100, 0xffff)
--END(machine_real_restart_gdt)
-diff --git a/arch/x86/realmode/rm/Makefile b/arch/x86/realmode/rm/Makefile
-index 7c3f202..3f851c4 100644
---- a/arch/x86/realmode/rm/Makefile
-+++ b/arch/x86/realmode/rm/Makefile
-@@ -12,6 +12,7 @@ subdir- := wakeup
- always := realmode.bin
- 
- realmode-y			+= header.o
-+realmode-$(CONFIG_X86_32)	+= reboot_32.o
- 
- targets	+= $(realmode-y)
- 
-diff --git a/arch/x86/realmode/rm/header.S b/arch/x86/realmode/rm/header.S
-index 7be17f2..db21401 100644
---- a/arch/x86/realmode/rm/header.S
-+++ b/arch/x86/realmode/rm/header.S
-@@ -13,4 +13,7 @@ ENTRY(real_mode_header)
- 		.long	pa_text_start
- 		.long	pa_ro_end
- 		.long	pa_end
-+#ifdef CONFIG_X86_32
-+		.long	pa_machine_real_restart_asm
-+#endif
- END(real_mode_header)
-diff --git a/arch/x86/realmode/rm/reboot_32.S b/arch/x86/realmode/rm/reboot_32.S
+diff --git a/arch/x86/realmode/Makefile b/arch/x86/realmode/Makefile
 new file mode 100644
-index 0000000..83803c2
+index 0000000..f22a4f8
 --- /dev/null
-+++ b/arch/x86/realmode/rm/reboot_32.S
-@@ -0,0 +1,134 @@
++++ b/arch/x86/realmode/Makefile
+@@ -0,0 +1,20 @@
++#
++# arch/x86/realmode/Makefile
++#
++# This file is subject to the terms and conditions of the GNU General Public
++# License.  See the file "COPYING" in the main directory of this archive
++# for more details.
++#
++#
++
++subdir- := rm
++
++obj-y += rmpiggy.o
++
++$(obj)/rmpiggy.o: $(obj)/rm/realmode.relocs $(obj)/rm/realmode.bin
++
++$(obj)/rm/realmode.bin: FORCE
++	$(Q)$(MAKE) $(build)=$(obj)/rm $@
++
++$(obj)/rm/realmode.relocs: FORCE
++	$(Q)$(MAKE) $(build)=$(obj)/rm $@
+diff --git a/arch/x86/realmode/rm/.gitignore b/arch/x86/realmode/rm/.gitignore
+new file mode 100644
+index 0000000..b6ed3a2
+--- /dev/null
++++ b/arch/x86/realmode/rm/.gitignore
+@@ -0,0 +1,3 @@
++pasyms.h
++realmode.lds
++realmode.relocs
+diff --git a/arch/x86/realmode/rm/Makefile b/arch/x86/realmode/rm/Makefile
+new file mode 100644
+index 0000000..7c3f202
+--- /dev/null
++++ b/arch/x86/realmode/rm/Makefile
+@@ -0,0 +1,63 @@
++#
++# arch/x86/realmode/Makefile
++#
++# This file is subject to the terms and conditions of the GNU General Public
++# License.  See the file "COPYING" in the main directory of this archive
++# for more details.
++#
++#
++
++subdir- := wakeup
++
++always := realmode.bin
++
++realmode-y			+= header.o
++
++targets	+= $(realmode-y)
++
++REALMODE_OBJS = $(addprefix $(obj)/,$(realmode-y))
++
++sed-pasyms := -n -r -e 's/^([0-9a-fA-F]+) [ABCDGRSTVW] (.+)$$/pa_\2 = \2;/p'
++
++quiet_cmd_pasyms = PASYMS  $@
++      cmd_pasyms = $(NM) $(filter-out FORCE,$^) | \
++		   sed $(sed-pasyms) | sort | uniq > $@
++
++$(obj)/pasyms.h: $(REALMODE_OBJS) FORCE
++	$(call if_changed,pasyms)
++
++$(obj)/realmode.lds: $(obj)/pasyms.h
++
++LDFLAGS_realmode.elf := --emit-relocs -T
++CPPFLAGS_realmode.lds += -P -C -I$(obj)
++
++$(obj)/realmode.elf: $(obj)/realmode.lds $(REALMODE_OBJS) FORCE
++	$(call if_changed,ld)
++
++OBJCOPYFLAGS_realmode.bin := -O binary
++
++$(obj)/realmode.bin: $(obj)/realmode.elf
++	$(call if_changed,objcopy)
++
++quiet_cmd_relocs = RELOCS  $@
++      cmd_relocs = scripts/x86-relocs --realmode $< > $@
++$(obj)/realmode.relocs: $(obj)/realmode.elf FORCE
++	$(call if_changed,relocs)
++
++# ---------------------------------------------------------------------------
++
++# How to compile the 16-bit code.  Note we always compile for -march=i386,
++# that way we can complain to the user if the CPU is insufficient.
++KBUILD_CFLAGS	:= $(LINUXINCLUDE) -m32 -g -Os -D_SETUP -D__KERNEL__ \
++		   -DDISABLE_BRANCH_PROFILING \
++		   -Wall -Wstrict-prototypes \
++		   -march=i386 -mregparm=3 \
++		   -include $(srctree)/$(src)/../../boot/code16gcc.h \
++		   -fno-strict-aliasing -fomit-frame-pointer \
++		   $(call cc-option, -ffreestanding) \
++		   $(call cc-option, -fno-toplevel-reorder,\
++			$(call cc-option, -fno-unit-at-a-time)) \
++		   $(call cc-option, -fno-stack-protector) \
++		   $(call cc-option, -mpreferred-stack-boundary=2)
++KBUILD_AFLAGS	:= $(KBUILD_CFLAGS) -D__ASSEMBLY__
++GCOV_PROFILE := n
+diff --git a/arch/x86/realmode/rm/header.S b/arch/x86/realmode/rm/header.S
+new file mode 100644
+index 0000000..7be17f2
+--- /dev/null
++++ b/arch/x86/realmode/rm/header.S
+@@ -0,0 +1,16 @@
++/*
++ * Real-mode blob header; this should match realmode.h and be
++ * readonly; for mutable data instead add pointers into the .data
++ * or .bss sections as appropriate.
++ */
++
 +#include <linux/linkage.h>
-+#include <linux/init.h>
-+#include <asm/segment.h>
 +#include <asm/page_types.h>
 +
++		.section ".header", "a"
++
++ENTRY(real_mode_header)
++		.long	pa_text_start
++		.long	pa_ro_end
++		.long	pa_end
++END(real_mode_header)
+diff --git a/arch/x86/realmode/rm/realmode.lds.S b/arch/x86/realmode/rm/realmode.lds.S
+new file mode 100644
+index 0000000..c5b8a4f
+--- /dev/null
++++ b/arch/x86/realmode/rm/realmode.lds.S
+@@ -0,0 +1,68 @@
 +/*
-+ * The following code and data reboots the machine by switching to real
-+ * mode and jumping to the BIOS reset entry point, as if the CPU has
-+ * really been reset.  The previous version asked the keyboard
-+ * controller to pulse the CPU reset line, which is more thorough, but
-+ * doesn't work with at least one type of 486 motherboard.  It is easy
-+ * to stop this code working; hence the copious comments.
++ * realmode.lds.S
 + *
-+ * This code is called with the restart type (0 = BIOS, 1 = APM) in %eax.
++ * Linker script for the real-mode code
 + */
-+	.section ".text32", "ax"
-+	.code32
-+	.globl machine_real_restart_asm
 +
-+	.balign 16
-+machine_real_restart_asm:
-+	/* Set up the IDT for real mode. */
-+	lidtl	pa_machine_real_restart_idt
++#include <asm/page_types.h>
 +
-+	/*
-+	 * Set up a GDT from which we can load segment descriptors for real
-+	 * mode.  The GDT is not used in real mode; it is just needed here to
-+	 * prepare the descriptors.
-+	 */
-+	lgdtl	pa_machine_real_restart_gdt
++#undef i386
 +
-+	/*
-+	 * Load the data segment registers with 16-bit compatible values
-+	 */
-+	movl	$16, %ecx
-+	movl	%ecx, %ds
-+	movl	%ecx, %es
-+	movl	%ecx, %fs
-+	movl	%ecx, %gs
-+	movl	%ecx, %ss
-+	ljmpw	$8, $1f
++OUTPUT_FORMAT("elf32-i386", "elf32-i386", "elf32-i386")
++OUTPUT_ARCH(i386)
 +
++SECTIONS
++{
++	real_mode_seg = 0;
++
++	. = 0;
++	.header : {
++		pa_real_mode_base = .;
++		*(.header)
++	}
++
++	. = ALIGN(4);
++	.rodata : {
++		*(.rodata)
++		*(.rodata.*)
++	}
++
++	. = ALIGN(PAGE_SIZE);
++	.text : {
++		pa_text_start = .;
++		*(.text)
++		*(.text.*)
++	}
++
++	.text32 : {
++		*(.text32)
++		*(.text32.*)
++		pa_ro_end = .;
++	}
++
++	. = ALIGN(PAGE_SIZE);
++	.data : {
++		*(.data)
++		*(.data.*)
++	}
++
++	. = ALIGN(128);
++	.bss : {
++		*(.bss*)
++	}
++
++	/* End signature for integrity checking */
++	. = ALIGN(4);
++	.signature : {
++		*(.signature)
++		pa_end = .;
++	}
++
++	/DISCARD/ : {
++		*(.note*)
++		*(.debug*)
++		*(.eh_frame*)
++	}
++
++#include "pasyms.h"
++}
+diff --git a/arch/x86/realmode/rmpiggy.S b/arch/x86/realmode/rmpiggy.S
+new file mode 100644
+index 0000000..6047d7f
+--- /dev/null
++++ b/arch/x86/realmode/rmpiggy.S
+@@ -0,0 +1,18 @@
 +/*
-+ * This is 16-bit protected mode code to disable paging and the cache,
-+ * switch to real mode and jump to the BIOS reset code.
-+ *
-+ * The instruction that switches to real mode by writing to CR0 must be
-+ * followed immediately by a far jump instruction, which set CS to a
-+ * valid value for real mode, and flushes the prefetch queue to avoid
-+ * running instructions that have already been decoded in protected
-+ * mode.
-+ *
-+ * Clears all the flags except ET, especially PG (paging), PE
-+ * (protected-mode enable) and TS (task switch for coprocessor state
-+ * save).  Flushes the TLB after paging has been disabled.  Sets CD and
-+ * NW, to disable the cache on a 486, and invalidates the cache.  This
-+ * is more like the state of a 486 after reset.  I don't know if
-+ * something else should be done for other chips.
-+ *
-+ * More could be done here to set up the registers as if a CPU reset had
-+ * occurred; hopefully real BIOSs don't assume much.  This is not the
-+ * actual BIOS entry point, anyway (that is at 0xfffffff0).
-+ *
-+ * Most of this work is probably excessive, but it is what is tested.
++ * Wrapper script for the realmode binary as a transport object
++ * before copying to low memory.
 + */
-+	.text
-+	.code16
++#include <linux/linkage.h>
++#include <asm/page_types.h>
 +
-+	.balign 16
-+machine_real_restart_asm16:
-+1:
-+	xorl	%ecx, %ecx
-+	movl	%cr0, %edx
-+	andl	$0x00000011, %edx
-+	orl	$0x60000000, %edx
-+	movl	%edx, %cr0
-+	movl	%ecx, %cr3
-+	movl	%cr0, %edx
-+	andl	$0x60000000, %edx	/* If no cache bits -> no wbinvd */
-+	jz	2f
-+	wbinvd
-+2:
-+	andb	$0x10, %dl
-+	movl	%edx, %cr0
-+	.byte	0xea			/* ljmpw */
-+	.word	3f			/* Offset */
-+	.word	real_mode_seg		/* Segment */
++	.section ".init.data","aw"
 +
-+3:
-+	testb	$0, %al
-+	jz	bios
++	.balign PAGE_SIZE
 +
-+apm:
-+	movw	$0x1000, %ax
-+	movw	%ax, %ss
-+	movw	$0xf000, %sp
-+	movw	$0x5307, %ax
-+	movw	$0x0001, %bx
-+	movw	$0x0003, %cx
-+	int	$0x15
-+	/* This should never return... */
++ENTRY(real_mode_blob)
++	.incbin	"arch/x86/realmode/rm/realmode.bin"
++END(real_mode_blob)
 +
-+bios:
-+	ljmpw	$0xf000, $0xfff0
-+
-+	.section ".rodata", "a"
-+	.globl	machine_real_restart_idt, machine_real_restart_gdt
-+
-+	.balign 16
-+machine_real_restart_idt:
-+	.word	0xffff		/* Length - real mode default value */
-+	.long	0		/* Base - real mode default value */
-+
-+	.balign 16
-+machine_real_restart_gdt:
-+	/* Self-pointer */
-+	.word	0xffff		/* Length - real mode default value */
-+	.long	pa_machine_real_restart_gdt
-+	.word	0
-+
-+	/*
-+	 * 16-bit code segment pointing to real_mode_seg
-+	 * Selector value 8
-+	 */
-+	.word	0xffff		/* Limit */
-+	.long	0x9b000000 + pa_real_mode_base
-+	.word	0
-+
-+	/*
-+	 * 16-bit data segment with the selector value 16 = 0x10 and
-+	 * base value 0x100; since this is consistent with real mode
-+	 * semantics we don't have to reload the segments once CR0.PE = 0.
-+	 */
-+	.quad	GDT_ENTRY(0x0093, 0x100, 0xffff)
++ENTRY(real_mode_relocs)
++	.incbin	"arch/x86/realmode/rm/realmode.relocs"
++END(real_mode_relocs)
 -- 
 1.7.9.5
 
