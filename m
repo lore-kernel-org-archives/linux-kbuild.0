@@ -1,12 +1,12 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga01.intel.com ([192.55.52.88]:1552 "EHLO mga01.intel.com"
+Received: from mga01.intel.com ([192.55.52.88]:48757 "EHLO mga01.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754113Ab2EHSXH (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 8 May 2012 14:23:07 -0400
+	id S1754835Ab2EHSXS (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 8 May 2012 14:23:18 -0400
 From: Jarkko Sakkinen <jarkko.sakkinen@intel.com>
-Subject: [PATCH 01/23] x86, realmode: 16-bit real-mode code support for relocs tool
-Date: Tue,  8 May 2012 21:22:24 +0300
-Message-Id: <1336501366-28617-2-git-send-email-jarkko.sakkinen@intel.com>
+Subject: [PATCH 05/23] x86, realmode: Move SMP trampoline to unified realmode code
+Date: Tue,  8 May 2012 21:22:28 +0300
+Message-Id: <1336501366-28617-6-git-send-email-jarkko.sakkinen@intel.com>
 In-Reply-To: <1336501366-28617-1-git-send-email-jarkko.sakkinen@intel.com>
 References: <1336501366-28617-1-git-send-email-jarkko.sakkinen@intel.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -14,1579 +14,501 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org
 Cc: linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Sam Ravnborg <sam@ravnborg.org>, Joseph Cihula <joseph.cihula@intel.com>, Shane Wang <shane.wang@intel.com>, hpa@linux.intel.com, Jarkko Sakkinen <jarkko.sakkinen@intel.com>
 
-From: "H. Peter Anvin" <hpa@linux.intel.com>
+Migrated SMP trampoline code to the real mode blob.
+SMP trampoline code is not yet removed from
+.x86_trampoline because it is needed by the wakeup
+code.
 
-A new option is added to the relocs tool called '--realmode'.
-This option causes the generation of 16-bit segment relocations
-and 32-bit linear relocations for the real-mode code. When
-the real-mode code is moved to the low-memory during kernel
-initialization, these relocation entries can be used to
-relocate the code properly.
+[ hpa: always enable compiling startup_32_smp in head_32.S... it is
+  only a few instructions which go into .init on UP builds, and it makes
+  the rest of the code less #ifdef ugly. ]
 
-In the assembly code 16-bit segment relocations must be relative
-to the 'real_mode_seg' absolute symbol. Linear relocations must be
-relative to a symbol prefixed with 'pa_'.
-
-16-bit segment relocation is used to load cs:ip in 16-bit code.
-Linear relocations are used in the 32-bit code for relocatable
-data references. They are declared in the linker script of the
-real-mode code.
-
-The relocs tool is moved to scripts/x86-relocs.c so it will
-be compiled before building the arch/x86 tree.
-
-Signed-off-by: H. Peter Anvin <hpa@linux.intel.com>
 Signed-off-by: Jarkko Sakkinen <jarkko.sakkinen@intel.com>
+Signed-off-by: H. Peter Anvin <hpa@linux.intel.com>
 ---
- arch/x86/boot/compressed/Makefile |   11 +-
- arch/x86/boot/compressed/relocs.c |  680 -------------------------------
- scripts/.gitignore                |    1 +
- scripts/Makefile                  |    3 +
- scripts/x86-relocs.c              |  797 +++++++++++++++++++++++++++++++++++++
- 5 files changed, 806 insertions(+), 686 deletions(-)
- delete mode 100644 arch/x86/boot/compressed/relocs.c
- create mode 100644 scripts/x86-relocs.c
+ arch/x86/include/asm/realmode.h      |   18 ++++
+ arch/x86/kernel/head_32.S            |    5 +-
+ arch/x86/kernel/head_64.S            |    4 -
+ arch/x86/kernel/realmode.c           |   14 +++
+ arch/x86/kernel/smpboot.c            |   18 ++--
+ arch/x86/realmode/rm/Makefile        |    1 +
+ arch/x86/realmode/rm/header.S        |   11 +++
+ arch/x86/realmode/rm/trampoline_32.S |   86 +++++++++++++++++
+ arch/x86/realmode/rm/trampoline_64.S |  175 ++++++++++++++++++++++++++++++++++
+ 9 files changed, 316 insertions(+), 16 deletions(-)
+ create mode 100644 arch/x86/realmode/rm/trampoline_32.S
+ create mode 100644 arch/x86/realmode/rm/trampoline_64.S
 
-diff --git a/arch/x86/boot/compressed/Makefile b/arch/x86/boot/compressed/Makefile
-index fd55a2f..0435e8a 100644
---- a/arch/x86/boot/compressed/Makefile
-+++ b/arch/x86/boot/compressed/Makefile
-@@ -40,13 +40,12 @@ OBJCOPYFLAGS_vmlinux.bin :=  -R .comment -S
- $(obj)/vmlinux.bin: vmlinux FORCE
- 	$(call if_changed,objcopy)
+diff --git a/arch/x86/include/asm/realmode.h b/arch/x86/include/asm/realmode.h
+index bf26b06..9b4a5da 100644
+--- a/arch/x86/include/asm/realmode.h
++++ b/arch/x86/include/asm/realmode.h
+@@ -13,6 +13,17 @@ struct real_mode_header {
+ #ifdef CONFIG_X86_32
+ 	u32	machine_real_restart_asm;
+ #endif
++	/* SMP trampoline */
++	u32	trampoline_data;
++	u32	trampoline_status;
++#ifdef CONFIG_X86_32
++	u32	startup_32_smp;
++	u32	boot_gdt;
++#else
++	u32	startup_64_smp;
++	u32	level3_ident_pgt;
++	u32	level3_kernel_pgt;
++#endif
+ } __attribute__((__packed__));
  
-+targets += vmlinux.bin.all vmlinux.relocs
+ extern struct real_mode_header real_mode_header;
+@@ -25,6 +36,13 @@ extern unsigned long initial_gs;
+ extern unsigned char real_mode_blob[];
+ extern unsigned char real_mode_relocs[];
  
--targets += vmlinux.bin.all vmlinux.relocs relocs
--hostprogs-$(CONFIG_X86_NEED_RELOCS) += relocs
--
--quiet_cmd_relocs = RELOCS  $@
--      cmd_relocs = $(obj)/relocs $< > $@;$(obj)/relocs --abs-relocs $<
--$(obj)/vmlinux.relocs: vmlinux $(obj)/relocs FORCE
-+CMD_RELOCS = scripts/x86-relocs
-+quiet_cmd_relocs = RELOCS $@
-+      cmd_relocs = $(CMD_RELOCS) $< > $@;$(CMD_RELOCS) --abs-relocs $<
-+$(obj)/vmlinux.relocs: vmlinux FORCE
- 	$(call if_changed,relocs)
- 
- vmlinux.bin.all-y := $(obj)/vmlinux.bin
-diff --git a/arch/x86/boot/compressed/relocs.c b/arch/x86/boot/compressed/relocs.c
-deleted file mode 100644
-index d3c0b02..0000000
---- a/arch/x86/boot/compressed/relocs.c
-+++ /dev/null
-@@ -1,680 +0,0 @@
--#include <stdio.h>
--#include <stdarg.h>
--#include <stdlib.h>
--#include <stdint.h>
--#include <string.h>
--#include <errno.h>
--#include <unistd.h>
--#include <elf.h>
--#include <byteswap.h>
--#define USE_BSD
--#include <endian.h>
--#include <regex.h>
--#include <tools/le_byteshift.h>
--
--static void die(char *fmt, ...);
--
--#define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
--static Elf32_Ehdr ehdr;
--static unsigned long reloc_count, reloc_idx;
--static unsigned long *relocs;
--
--struct section {
--	Elf32_Shdr     shdr;
--	struct section *link;
--	Elf32_Sym      *symtab;
--	Elf32_Rel      *reltab;
--	char           *strtab;
--};
--static struct section *secs;
--
--/*
-- * Following symbols have been audited. There values are constant and do
-- * not change if bzImage is loaded at a different physical address than
-- * the address for which it has been compiled. Don't warn user about
-- * absolute relocations present w.r.t these symbols.
-- */
--static const char abs_sym_regex[] =
--	"^(xen_irq_disable_direct_reloc$|"
--	"xen_save_fl_direct_reloc$|"
--	"VDSO|"
--	"__crc_)";
--static regex_t abs_sym_regex_c;
--static int is_abs_reloc(const char *sym_name)
--{
--	return !regexec(&abs_sym_regex_c, sym_name, 0, NULL, 0);
--}
--
--/*
-- * These symbols are known to be relative, even if the linker marks them
-- * as absolute (typically defined outside any section in the linker script.)
-- */
--static const char rel_sym_regex[] =
--	"^_end$";
--static regex_t rel_sym_regex_c;
--static int is_rel_reloc(const char *sym_name)
--{
--	return !regexec(&rel_sym_regex_c, sym_name, 0, NULL, 0);
--}
--
--static void regex_init(void)
--{
--        char errbuf[128];
--        int err;
--	
--        err = regcomp(&abs_sym_regex_c, abs_sym_regex,
--                      REG_EXTENDED|REG_NOSUB);
--        if (err) {
--                regerror(err, &abs_sym_regex_c, errbuf, sizeof errbuf);
--                die("%s", errbuf);
--        }
--
--        err = regcomp(&rel_sym_regex_c, rel_sym_regex,
--                      REG_EXTENDED|REG_NOSUB);
--        if (err) {
--                regerror(err, &rel_sym_regex_c, errbuf, sizeof errbuf);
--                die("%s", errbuf);
--        }
--}
--
--static void die(char *fmt, ...)
--{
--	va_list ap;
--	va_start(ap, fmt);
--	vfprintf(stderr, fmt, ap);
--	va_end(ap);
--	exit(1);
--}
--
--static const char *sym_type(unsigned type)
--{
--	static const char *type_name[] = {
--#define SYM_TYPE(X) [X] = #X
--		SYM_TYPE(STT_NOTYPE),
--		SYM_TYPE(STT_OBJECT),
--		SYM_TYPE(STT_FUNC),
--		SYM_TYPE(STT_SECTION),
--		SYM_TYPE(STT_FILE),
--		SYM_TYPE(STT_COMMON),
--		SYM_TYPE(STT_TLS),
--#undef SYM_TYPE
--	};
--	const char *name = "unknown sym type name";
--	if (type < ARRAY_SIZE(type_name)) {
--		name = type_name[type];
--	}
--	return name;
--}
--
--static const char *sym_bind(unsigned bind)
--{
--	static const char *bind_name[] = {
--#define SYM_BIND(X) [X] = #X
--		SYM_BIND(STB_LOCAL),
--		SYM_BIND(STB_GLOBAL),
--		SYM_BIND(STB_WEAK),
--#undef SYM_BIND
--	};
--	const char *name = "unknown sym bind name";
--	if (bind < ARRAY_SIZE(bind_name)) {
--		name = bind_name[bind];
--	}
--	return name;
--}
--
--static const char *sym_visibility(unsigned visibility)
--{
--	static const char *visibility_name[] = {
--#define SYM_VISIBILITY(X) [X] = #X
--		SYM_VISIBILITY(STV_DEFAULT),
--		SYM_VISIBILITY(STV_INTERNAL),
--		SYM_VISIBILITY(STV_HIDDEN),
--		SYM_VISIBILITY(STV_PROTECTED),
--#undef SYM_VISIBILITY
--	};
--	const char *name = "unknown sym visibility name";
--	if (visibility < ARRAY_SIZE(visibility_name)) {
--		name = visibility_name[visibility];
--	}
--	return name;
--}
--
--static const char *rel_type(unsigned type)
--{
--	static const char *type_name[] = {
--#define REL_TYPE(X) [X] = #X
--		REL_TYPE(R_386_NONE),
--		REL_TYPE(R_386_32),
--		REL_TYPE(R_386_PC32),
--		REL_TYPE(R_386_GOT32),
--		REL_TYPE(R_386_PLT32),
--		REL_TYPE(R_386_COPY),
--		REL_TYPE(R_386_GLOB_DAT),
--		REL_TYPE(R_386_JMP_SLOT),
--		REL_TYPE(R_386_RELATIVE),
--		REL_TYPE(R_386_GOTOFF),
--		REL_TYPE(R_386_GOTPC),
--#undef REL_TYPE
--	};
--	const char *name = "unknown type rel type name";
--	if (type < ARRAY_SIZE(type_name) && type_name[type]) {
--		name = type_name[type];
--	}
--	return name;
--}
--
--static const char *sec_name(unsigned shndx)
--{
--	const char *sec_strtab;
--	const char *name;
--	sec_strtab = secs[ehdr.e_shstrndx].strtab;
--	name = "<noname>";
--	if (shndx < ehdr.e_shnum) {
--		name = sec_strtab + secs[shndx].shdr.sh_name;
--	}
--	else if (shndx == SHN_ABS) {
--		name = "ABSOLUTE";
--	}
--	else if (shndx == SHN_COMMON) {
--		name = "COMMON";
--	}
--	return name;
--}
--
--static const char *sym_name(const char *sym_strtab, Elf32_Sym *sym)
--{
--	const char *name;
--	name = "<noname>";
--	if (sym->st_name) {
--		name = sym_strtab + sym->st_name;
--	}
--	else {
--		name = sec_name(secs[sym->st_shndx].shdr.sh_name);
--	}
--	return name;
--}
--
--
--
--#if BYTE_ORDER == LITTLE_ENDIAN
--#define le16_to_cpu(val) (val)
--#define le32_to_cpu(val) (val)
--#endif
--#if BYTE_ORDER == BIG_ENDIAN
--#define le16_to_cpu(val) bswap_16(val)
--#define le32_to_cpu(val) bswap_32(val)
--#endif
--
--static uint16_t elf16_to_cpu(uint16_t val)
--{
--	return le16_to_cpu(val);
--}
--
--static uint32_t elf32_to_cpu(uint32_t val)
--{
--	return le32_to_cpu(val);
--}
--
--static void read_ehdr(FILE *fp)
--{
--	if (fread(&ehdr, sizeof(ehdr), 1, fp) != 1) {
--		die("Cannot read ELF header: %s\n",
--			strerror(errno));
--	}
--	if (memcmp(ehdr.e_ident, ELFMAG, SELFMAG) != 0) {
--		die("No ELF magic\n");
--	}
--	if (ehdr.e_ident[EI_CLASS] != ELFCLASS32) {
--		die("Not a 32 bit executable\n");
--	}
--	if (ehdr.e_ident[EI_DATA] != ELFDATA2LSB) {
--		die("Not a LSB ELF executable\n");
--	}
--	if (ehdr.e_ident[EI_VERSION] != EV_CURRENT) {
--		die("Unknown ELF version\n");
--	}
--	/* Convert the fields to native endian */
--	ehdr.e_type      = elf16_to_cpu(ehdr.e_type);
--	ehdr.e_machine   = elf16_to_cpu(ehdr.e_machine);
--	ehdr.e_version   = elf32_to_cpu(ehdr.e_version);
--	ehdr.e_entry     = elf32_to_cpu(ehdr.e_entry);
--	ehdr.e_phoff     = elf32_to_cpu(ehdr.e_phoff);
--	ehdr.e_shoff     = elf32_to_cpu(ehdr.e_shoff);
--	ehdr.e_flags     = elf32_to_cpu(ehdr.e_flags);
--	ehdr.e_ehsize    = elf16_to_cpu(ehdr.e_ehsize);
--	ehdr.e_phentsize = elf16_to_cpu(ehdr.e_phentsize);
--	ehdr.e_phnum     = elf16_to_cpu(ehdr.e_phnum);
--	ehdr.e_shentsize = elf16_to_cpu(ehdr.e_shentsize);
--	ehdr.e_shnum     = elf16_to_cpu(ehdr.e_shnum);
--	ehdr.e_shstrndx  = elf16_to_cpu(ehdr.e_shstrndx);
--
--	if ((ehdr.e_type != ET_EXEC) && (ehdr.e_type != ET_DYN)) {
--		die("Unsupported ELF header type\n");
--	}
--	if (ehdr.e_machine != EM_386) {
--		die("Not for x86\n");
--	}
--	if (ehdr.e_version != EV_CURRENT) {
--		die("Unknown ELF version\n");
--	}
--	if (ehdr.e_ehsize != sizeof(Elf32_Ehdr)) {
--		die("Bad Elf header size\n");
--	}
--	if (ehdr.e_phentsize != sizeof(Elf32_Phdr)) {
--		die("Bad program header entry\n");
--	}
--	if (ehdr.e_shentsize != sizeof(Elf32_Shdr)) {
--		die("Bad section header entry\n");
--	}
--	if (ehdr.e_shstrndx >= ehdr.e_shnum) {
--		die("String table index out of bounds\n");
--	}
--}
--
--static void read_shdrs(FILE *fp)
--{
--	int i;
--	Elf32_Shdr shdr;
--
--	secs = calloc(ehdr.e_shnum, sizeof(struct section));
--	if (!secs) {
--		die("Unable to allocate %d section headers\n",
--		    ehdr.e_shnum);
--	}
--	if (fseek(fp, ehdr.e_shoff, SEEK_SET) < 0) {
--		die("Seek to %d failed: %s\n",
--			ehdr.e_shoff, strerror(errno));
--	}
--	for (i = 0; i < ehdr.e_shnum; i++) {
--		struct section *sec = &secs[i];
--		if (fread(&shdr, sizeof shdr, 1, fp) != 1)
--			die("Cannot read ELF section headers %d/%d: %s\n",
--			    i, ehdr.e_shnum, strerror(errno));
--		sec->shdr.sh_name      = elf32_to_cpu(shdr.sh_name);
--		sec->shdr.sh_type      = elf32_to_cpu(shdr.sh_type);
--		sec->shdr.sh_flags     = elf32_to_cpu(shdr.sh_flags);
--		sec->shdr.sh_addr      = elf32_to_cpu(shdr.sh_addr);
--		sec->shdr.sh_offset    = elf32_to_cpu(shdr.sh_offset);
--		sec->shdr.sh_size      = elf32_to_cpu(shdr.sh_size);
--		sec->shdr.sh_link      = elf32_to_cpu(shdr.sh_link);
--		sec->shdr.sh_info      = elf32_to_cpu(shdr.sh_info);
--		sec->shdr.sh_addralign = elf32_to_cpu(shdr.sh_addralign);
--		sec->shdr.sh_entsize   = elf32_to_cpu(shdr.sh_entsize);
--		if (sec->shdr.sh_link < ehdr.e_shnum)
--			sec->link = &secs[sec->shdr.sh_link];
--	}
--
--}
--
--static void read_strtabs(FILE *fp)
--{
--	int i;
--	for (i = 0; i < ehdr.e_shnum; i++) {
--		struct section *sec = &secs[i];
--		if (sec->shdr.sh_type != SHT_STRTAB) {
--			continue;
--		}
--		sec->strtab = malloc(sec->shdr.sh_size);
--		if (!sec->strtab) {
--			die("malloc of %d bytes for strtab failed\n",
--				sec->shdr.sh_size);
--		}
--		if (fseek(fp, sec->shdr.sh_offset, SEEK_SET) < 0) {
--			die("Seek to %d failed: %s\n",
--				sec->shdr.sh_offset, strerror(errno));
--		}
--		if (fread(sec->strtab, 1, sec->shdr.sh_size, fp)
--		    != sec->shdr.sh_size) {
--			die("Cannot read symbol table: %s\n",
--				strerror(errno));
--		}
--	}
--}
--
--static void read_symtabs(FILE *fp)
--{
--	int i,j;
--	for (i = 0; i < ehdr.e_shnum; i++) {
--		struct section *sec = &secs[i];
--		if (sec->shdr.sh_type != SHT_SYMTAB) {
--			continue;
--		}
--		sec->symtab = malloc(sec->shdr.sh_size);
--		if (!sec->symtab) {
--			die("malloc of %d bytes for symtab failed\n",
--				sec->shdr.sh_size);
--		}
--		if (fseek(fp, sec->shdr.sh_offset, SEEK_SET) < 0) {
--			die("Seek to %d failed: %s\n",
--				sec->shdr.sh_offset, strerror(errno));
--		}
--		if (fread(sec->symtab, 1, sec->shdr.sh_size, fp)
--		    != sec->shdr.sh_size) {
--			die("Cannot read symbol table: %s\n",
--				strerror(errno));
--		}
--		for (j = 0; j < sec->shdr.sh_size/sizeof(Elf32_Sym); j++) {
--			Elf32_Sym *sym = &sec->symtab[j];
--			sym->st_name  = elf32_to_cpu(sym->st_name);
--			sym->st_value = elf32_to_cpu(sym->st_value);
--			sym->st_size  = elf32_to_cpu(sym->st_size);
--			sym->st_shndx = elf16_to_cpu(sym->st_shndx);
--		}
--	}
--}
--
--
--static void read_relocs(FILE *fp)
--{
--	int i,j;
--	for (i = 0; i < ehdr.e_shnum; i++) {
--		struct section *sec = &secs[i];
--		if (sec->shdr.sh_type != SHT_REL) {
--			continue;
--		}
--		sec->reltab = malloc(sec->shdr.sh_size);
--		if (!sec->reltab) {
--			die("malloc of %d bytes for relocs failed\n",
--				sec->shdr.sh_size);
--		}
--		if (fseek(fp, sec->shdr.sh_offset, SEEK_SET) < 0) {
--			die("Seek to %d failed: %s\n",
--				sec->shdr.sh_offset, strerror(errno));
--		}
--		if (fread(sec->reltab, 1, sec->shdr.sh_size, fp)
--		    != sec->shdr.sh_size) {
--			die("Cannot read symbol table: %s\n",
--				strerror(errno));
--		}
--		for (j = 0; j < sec->shdr.sh_size/sizeof(Elf32_Rel); j++) {
--			Elf32_Rel *rel = &sec->reltab[j];
--			rel->r_offset = elf32_to_cpu(rel->r_offset);
--			rel->r_info   = elf32_to_cpu(rel->r_info);
--		}
--	}
--}
--
--
--static void print_absolute_symbols(void)
--{
--	int i;
--	printf("Absolute symbols\n");
--	printf(" Num:    Value Size  Type       Bind        Visibility  Name\n");
--	for (i = 0; i < ehdr.e_shnum; i++) {
--		struct section *sec = &secs[i];
--		char *sym_strtab;
--		Elf32_Sym *sh_symtab;
--		int j;
--
--		if (sec->shdr.sh_type != SHT_SYMTAB) {
--			continue;
--		}
--		sh_symtab = sec->symtab;
--		sym_strtab = sec->link->strtab;
--		for (j = 0; j < sec->shdr.sh_size/sizeof(Elf32_Sym); j++) {
--			Elf32_Sym *sym;
--			const char *name;
--			sym = &sec->symtab[j];
--			name = sym_name(sym_strtab, sym);
--			if (sym->st_shndx != SHN_ABS) {
--				continue;
--			}
--			printf("%5d %08x %5d %10s %10s %12s %s\n",
--				j, sym->st_value, sym->st_size,
--				sym_type(ELF32_ST_TYPE(sym->st_info)),
--				sym_bind(ELF32_ST_BIND(sym->st_info)),
--				sym_visibility(ELF32_ST_VISIBILITY(sym->st_other)),
--				name);
--		}
--	}
--	printf("\n");
--}
--
--static void print_absolute_relocs(void)
--{
--	int i, printed = 0;
--
--	for (i = 0; i < ehdr.e_shnum; i++) {
--		struct section *sec = &secs[i];
--		struct section *sec_applies, *sec_symtab;
--		char *sym_strtab;
--		Elf32_Sym *sh_symtab;
--		int j;
--		if (sec->shdr.sh_type != SHT_REL) {
--			continue;
--		}
--		sec_symtab  = sec->link;
--		sec_applies = &secs[sec->shdr.sh_info];
--		if (!(sec_applies->shdr.sh_flags & SHF_ALLOC)) {
--			continue;
--		}
--		sh_symtab  = sec_symtab->symtab;
--		sym_strtab = sec_symtab->link->strtab;
--		for (j = 0; j < sec->shdr.sh_size/sizeof(Elf32_Rel); j++) {
--			Elf32_Rel *rel;
--			Elf32_Sym *sym;
--			const char *name;
--			rel = &sec->reltab[j];
--			sym = &sh_symtab[ELF32_R_SYM(rel->r_info)];
--			name = sym_name(sym_strtab, sym);
--			if (sym->st_shndx != SHN_ABS) {
--				continue;
--			}
--
--			/* Absolute symbols are not relocated if bzImage is
--			 * loaded at a non-compiled address. Display a warning
--			 * to user at compile time about the absolute
--			 * relocations present.
--			 *
--			 * User need to audit the code to make sure
--			 * some symbols which should have been section
--			 * relative have not become absolute because of some
--			 * linker optimization or wrong programming usage.
--			 *
--			 * Before warning check if this absolute symbol
--			 * relocation is harmless.
--			 */
--			if (is_abs_reloc(name) || is_rel_reloc(name))
--				continue;
--
--			if (!printed) {
--				printf("WARNING: Absolute relocations"
--					" present\n");
--				printf("Offset     Info     Type     Sym.Value "
--					"Sym.Name\n");
--				printed = 1;
--			}
--
--			printf("%08x %08x %10s %08x  %s\n",
--				rel->r_offset,
--				rel->r_info,
--				rel_type(ELF32_R_TYPE(rel->r_info)),
--				sym->st_value,
--				name);
--		}
--	}
--
--	if (printed)
--		printf("\n");
--}
--
--static void walk_relocs(void (*visit)(Elf32_Rel *rel, Elf32_Sym *sym))
--{
--	int i;
--	/* Walk through the relocations */
--	for (i = 0; i < ehdr.e_shnum; i++) {
--		char *sym_strtab;
--		Elf32_Sym *sh_symtab;
--		struct section *sec_applies, *sec_symtab;
--		int j;
--		struct section *sec = &secs[i];
--
--		if (sec->shdr.sh_type != SHT_REL) {
--			continue;
--		}
--		sec_symtab  = sec->link;
--		sec_applies = &secs[sec->shdr.sh_info];
--		if (!(sec_applies->shdr.sh_flags & SHF_ALLOC)) {
--			continue;
--		}
--		sh_symtab = sec_symtab->symtab;
--		sym_strtab = sec_symtab->link->strtab;
--		for (j = 0; j < sec->shdr.sh_size/sizeof(Elf32_Rel); j++) {
--			Elf32_Rel *rel;
--			Elf32_Sym *sym;
--			unsigned r_type;
--			rel = &sec->reltab[j];
--			sym = &sh_symtab[ELF32_R_SYM(rel->r_info)];
--			r_type = ELF32_R_TYPE(rel->r_info);
--			/* Don't visit relocations to absolute symbols */
--			if (sym->st_shndx == SHN_ABS &&
--			    !is_rel_reloc(sym_name(sym_strtab, sym))) {
--				continue;
--			}
--			switch (r_type) {
--			case R_386_NONE:
--			case R_386_PC32:
--				/*
--				 * NONE can be ignored and and PC relative
--				 * relocations don't need to be adjusted.
--				 */
--				break;
--			case R_386_32:
--				/* Visit relocations that need to be adjusted */
--				visit(rel, sym);
--				break;
--			default:
--				die("Unsupported relocation type: %s (%d)\n",
--				    rel_type(r_type), r_type);
--				break;
--			}
--		}
--	}
--}
--
--static void count_reloc(Elf32_Rel *rel, Elf32_Sym *sym)
--{
--	reloc_count += 1;
--}
--
--static void collect_reloc(Elf32_Rel *rel, Elf32_Sym *sym)
--{
--	/* Remember the address that needs to be adjusted. */
--	relocs[reloc_idx++] = rel->r_offset;
--}
--
--static int cmp_relocs(const void *va, const void *vb)
--{
--	const unsigned long *a, *b;
--	a = va; b = vb;
--	return (*a == *b)? 0 : (*a > *b)? 1 : -1;
--}
--
--static void emit_relocs(int as_text)
--{
--	int i;
--	/* Count how many relocations I have and allocate space for them. */
--	reloc_count = 0;
--	walk_relocs(count_reloc);
--	relocs = malloc(reloc_count * sizeof(relocs[0]));
--	if (!relocs) {
--		die("malloc of %d entries for relocs failed\n",
--			reloc_count);
--	}
--	/* Collect up the relocations */
--	reloc_idx = 0;
--	walk_relocs(collect_reloc);
--
--	/* Order the relocations for more efficient processing */
--	qsort(relocs, reloc_count, sizeof(relocs[0]), cmp_relocs);
--
--	/* Print the relocations */
--	if (as_text) {
--		/* Print the relocations in a form suitable that
--		 * gas will like.
--		 */
--		printf(".section \".data.reloc\",\"a\"\n");
--		printf(".balign 4\n");
--		for (i = 0; i < reloc_count; i++) {
--			printf("\t .long 0x%08lx\n", relocs[i]);
--		}
--		printf("\n");
--	}
--	else {
--		unsigned char buf[4];
--		/* Print a stop */
--		fwrite("\0\0\0\0", 4, 1, stdout);
--		/* Now print each relocation */
--		for (i = 0; i < reloc_count; i++) {
--			put_unaligned_le32(relocs[i], buf);
--			fwrite(buf, 4, 1, stdout);
--		}
--	}
--}
--
--static void usage(void)
--{
--	die("relocs [--abs-syms |--abs-relocs | --text] vmlinux\n");
--}
--
--int main(int argc, char **argv)
--{
--	int show_absolute_syms, show_absolute_relocs;
--	int as_text;
--	const char *fname;
--	FILE *fp;
--	int i;
--
--	regex_init();
--
--	show_absolute_syms = 0;
--	show_absolute_relocs = 0;
--	as_text = 0;
--	fname = NULL;
--	for (i = 1; i < argc; i++) {
--		char *arg = argv[i];
--		if (*arg == '-') {
--			if (strcmp(argv[1], "--abs-syms") == 0) {
--				show_absolute_syms = 1;
--				continue;
--			}
--
--			if (strcmp(argv[1], "--abs-relocs") == 0) {
--				show_absolute_relocs = 1;
--				continue;
--			}
--			else if (strcmp(argv[1], "--text") == 0) {
--				as_text = 1;
--				continue;
--			}
--		}
--		else if (!fname) {
--			fname = arg;
--			continue;
--		}
--		usage();
--	}
--	if (!fname) {
--		usage();
--	}
--	fp = fopen(fname, "r");
--	if (!fp) {
--		die("Cannot open %s: %s\n",
--			fname, strerror(errno));
--	}
--	read_ehdr(fp);
--	read_shdrs(fp);
--	read_strtabs(fp);
--	read_symtabs(fp);
--	read_relocs(fp);
--	if (show_absolute_syms) {
--		print_absolute_symbols();
--		return 0;
--	}
--	if (show_absolute_relocs) {
--		print_absolute_relocs();
--		return 0;
--	}
--	emit_relocs(as_text);
--	return 0;
--}
-diff --git a/scripts/.gitignore b/scripts/.gitignore
-index 105b21f..68c0f32 100644
---- a/scripts/.gitignore
-+++ b/scripts/.gitignore
-@@ -9,3 +9,4 @@ unifdef
- ihex2fw
- recordmcount
- docproc
-+x86-relocs
-diff --git a/scripts/Makefile b/scripts/Makefile
-index df7678f..a241359d 100644
---- a/scripts/Makefile
-+++ b/scripts/Makefile
-@@ -8,11 +8,14 @@
- # conmakehash:	 Create arrays for initializing the kernel console tables
- # docproc:       Used in Documentation/DocBook
- 
-+HOST_EXTRACFLAGS += -I$(srctree)/tools/include
++#ifdef CONFIG_X86_32
++extern unsigned char startup_32_smp[];
++extern unsigned char boot_gdt[];
++#else
++extern unsigned char secondary_startup_64[];
++#endif
 +
- hostprogs-$(CONFIG_KALLSYMS)     += kallsyms
- hostprogs-$(CONFIG_LOGO)         += pnmtologo
- hostprogs-$(CONFIG_VT)           += conmakehash
- hostprogs-$(CONFIG_IKCONFIG)     += bin2c
- hostprogs-$(BUILD_C_RECORDMCOUNT) += recordmcount
-+hostprogs-$(CONFIG_X86)          += x86-relocs
+ extern void __init setup_real_mode(void);
  
- always		:= $(hostprogs-y) $(hostprogs-m)
+ #endif /* _ARCH_X86_REALMODE_H */
+diff --git a/arch/x86/kernel/head_32.S b/arch/x86/kernel/head_32.S
+index ce0be7c..a3c2b4f 100644
+--- a/arch/x86/kernel/head_32.S
++++ b/arch/x86/kernel/head_32.S
+@@ -273,10 +273,7 @@ num_subarch_entries = (. - subarch_entries) / 4
+  * If cpu hotplug is not supported then this code can go in init section
+  * which will be freed later
+  */
+-
+ __CPUINIT
+-
+-#ifdef CONFIG_SMP
+ ENTRY(startup_32_smp)
+ 	cld
+ 	movl $(__BOOT_DS),%eax
+@@ -287,7 +284,7 @@ ENTRY(startup_32_smp)
+ 	movl pa(stack_start),%ecx
+ 	movl %eax,%ss
+ 	leal -__PAGE_OFFSET(%ecx),%esp
+-#endif /* CONFIG_SMP */
++
+ default_entry:
  
-diff --git a/scripts/x86-relocs.c b/scripts/x86-relocs.c
+ /*
+diff --git a/arch/x86/kernel/head_64.S b/arch/x86/kernel/head_64.S
+index 40f4eb3..d70bc2e 100644
+--- a/arch/x86/kernel/head_64.S
++++ b/arch/x86/kernel/head_64.S
+@@ -136,10 +136,6 @@ ident_complete:
+ 	/* Fixup phys_base */
+ 	addq	%rbp, phys_base(%rip)
+ 
+-	/* Fixup trampoline */
+-	addq	%rbp, trampoline_level4_pgt + 0(%rip)
+-	addq	%rbp, trampoline_level4_pgt + (511*8)(%rip)
+-
+ 	/* Due to ENTRY(), sometimes the empty space gets filled with
+ 	 * zeros. Better take a jmp than relying on empty space being
+ 	 * filled with 0x90 (nop)
+diff --git a/arch/x86/kernel/realmode.c b/arch/x86/kernel/realmode.c
+index 7415c42..a465775 100644
+--- a/arch/x86/kernel/realmode.c
++++ b/arch/x86/kernel/realmode.c
+@@ -58,6 +58,20 @@ void __init setup_real_mode(void)
+ 	/* Copied header will contain relocated physical addresses. */
+ 	memcpy(&real_mode_header, real_mode_base,
+ 	       sizeof(struct real_mode_header));
++
++#ifdef CONFIG_X86_32
++	*((u32 *)__va(real_mode_header.startup_32_smp)) = __pa(startup_32_smp);
++	*((u32 *)__va(real_mode_header.boot_gdt)) = __pa(boot_gdt);
++#else
++	*((u64 *) __va(real_mode_header.startup_64_smp)) =
++		(u64) __pa(secondary_startup_64);
++
++	*((u64 *) __va(real_mode_header.level3_ident_pgt)) =
++		__pa(level3_ident_pgt) + _KERNPG_TABLE;
++
++	*((u64 *) __va(real_mode_header.level3_kernel_pgt)) =
++		__pa(level3_kernel_pgt) + _KERNPG_TABLE;
++#endif
+ }
+ 
+ /*
+diff --git a/arch/x86/kernel/smpboot.c b/arch/x86/kernel/smpboot.c
+index 6e1e406..c7971ea 100644
+--- a/arch/x86/kernel/smpboot.c
++++ b/arch/x86/kernel/smpboot.c
+@@ -57,7 +57,7 @@
+ #include <asm/nmi.h>
+ #include <asm/irq.h>
+ #include <asm/idle.h>
+-#include <asm/trampoline.h>
++#include <asm/realmode.h>
+ #include <asm/cpu.h>
+ #include <asm/numa.h>
+ #include <asm/pgtable.h>
+@@ -73,6 +73,8 @@
+ #include <asm/smpboot_hooks.h>
+ #include <asm/i8259.h>
+ 
++#include <asm/realmode.h>
++
+ /* State of each CPU */
+ DEFINE_PER_CPU(int, cpu_state) = { 0 };
+ 
+@@ -662,8 +664,12 @@ static void __cpuinit announce_cpu(int cpu, int apicid)
+  */
+ static int __cpuinit do_boot_cpu(int apicid, int cpu)
+ {
++	volatile u32 *trampoline_status =
++		(volatile u32 *) __va(real_mode_header.trampoline_status);
++	/* start_ip had better be page-aligned! */
++	unsigned long start_ip = real_mode_header.trampoline_data;
++
+ 	unsigned long boot_error = 0;
+-	unsigned long start_ip;
+ 	int timeout;
+ 	struct create_idle c_idle = {
+ 		.cpu	= cpu,
+@@ -713,9 +719,6 @@ do_rest:
+ 	initial_code = (unsigned long)start_secondary;
+ 	stack_start  = c_idle.idle->thread.sp;
+ 
+-	/* start_ip had better be page-aligned! */
+-	start_ip = trampoline_address();
+-
+ 	/* So we see what's up */
+ 	announce_cpu(cpu, apicid);
+ 
+@@ -778,8 +781,7 @@ do_rest:
+ 			pr_debug("CPU%d: has booted.\n", cpu);
+ 		} else {
+ 			boot_error = 1;
+-			if (*(volatile u32 *)TRAMPOLINE_SYM(trampoline_status)
+-			    == 0xA5A5A5A5)
++			if (*trampoline_status == 0xA5A5A5A5)
+ 				/* trampoline started but...? */
+ 				pr_err("CPU%d: Stuck ??\n", cpu);
+ 			else
+@@ -805,7 +807,7 @@ do_rest:
+ 	}
+ 
+ 	/* mark "stuck" area as not stuck */
+-	*(volatile u32 *)TRAMPOLINE_SYM(trampoline_status) = 0;
++	*trampoline_status = 0;
+ 
+ 	if (get_uv_system_type() != UV_NON_UNIQUE_APIC) {
+ 		/*
+diff --git a/arch/x86/realmode/rm/Makefile b/arch/x86/realmode/rm/Makefile
+index 3f851c4..56ec64f 100644
+--- a/arch/x86/realmode/rm/Makefile
++++ b/arch/x86/realmode/rm/Makefile
+@@ -13,6 +13,7 @@ always := realmode.bin
+ 
+ realmode-y			+= header.o
+ realmode-$(CONFIG_X86_32)	+= reboot_32.o
++realmode-y			+= trampoline_$(BITS).o
+ 
+ targets	+= $(realmode-y)
+ 
+diff --git a/arch/x86/realmode/rm/header.S b/arch/x86/realmode/rm/header.S
+index db21401..a979004 100644
+--- a/arch/x86/realmode/rm/header.S
++++ b/arch/x86/realmode/rm/header.S
+@@ -16,4 +16,15 @@ ENTRY(real_mode_header)
+ #ifdef CONFIG_X86_32
+ 		.long	pa_machine_real_restart_asm
+ #endif
++		/* SMP trampoline */
++		.long	pa_trampoline_data
++		.long	pa_trampoline_status
++#ifdef CONFIG_X86_32
++		.long	pa_startup_32_smp
++		.long	pa_boot_gdt
++#else
++		.long	pa_startup_64_smp
++		.long	pa_level3_ident_pgt
++		.long	pa_level3_kernel_pgt
++#endif
+ END(real_mode_header)
+diff --git a/arch/x86/realmode/rm/trampoline_32.S b/arch/x86/realmode/rm/trampoline_32.S
 new file mode 100644
-index 0000000..0291470
+index 0000000..18cb7fc
 --- /dev/null
-+++ b/scripts/x86-relocs.c
-@@ -0,0 +1,797 @@
-+#include <stdio.h>
-+#include <stdarg.h>
-+#include <stdlib.h>
-+#include <stdint.h>
-+#include <string.h>
-+#include <errno.h>
-+#include <unistd.h>
-+#include <elf.h>
-+#include <byteswap.h>
-+#define USE_BSD
-+#include <endian.h>
-+#include <regex.h>
-+#include <tools/le_byteshift.h>
-+
-+static void die(char *fmt, ...);
-+
-+#define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
-+static Elf32_Ehdr ehdr;
-+static unsigned long reloc_count, reloc_idx;
-+static unsigned long *relocs;
-+static unsigned long reloc16_count, reloc16_idx;
-+static unsigned long *relocs16;
-+
-+struct section {
-+	Elf32_Shdr     shdr;
-+	struct section *link;
-+	Elf32_Sym      *symtab;
-+	Elf32_Rel      *reltab;
-+	char           *strtab;
-+};
-+static struct section *secs;
-+
-+enum symtype {
-+	S_ABS,
-+	S_REL,
-+	S_SEG,
-+	S_LIN,
-+	S_NSYMTYPES
-+};
-+
-+static const char * const sym_regex_kernel[S_NSYMTYPES] = {
++++ b/arch/x86/realmode/rm/trampoline_32.S
+@@ -0,0 +1,86 @@
 +/*
-+ * Following symbols have been audited. There values are constant and do
-+ * not change if bzImage is loaded at a different physical address than
-+ * the address for which it has been compiled. Don't warn user about
-+ * absolute relocations present w.r.t these symbols.
++ *
++ *	Trampoline.S	Derived from Setup.S by Linus Torvalds
++ *
++ *	4 Jan 1997 Michael Chastain: changed to gnu as.
++ *
++ *	This is only used for booting secondary CPUs in SMP machine
++ *
++ *	Entry: CS:IP point to the start of our code, we are
++ *	in real mode with no stack, but the rest of the
++ *	trampoline page to make our stack and everything else
++ *	is a mystery.
++ *
++ *	We jump into arch/x86/kernel/head_32.S.
++ *
++ *	On entry to trampoline_data, the processor is in real mode
++ *	with 16-bit addressing and 16-bit data.  CS has some value
++ *	and IP is zero.  Thus, we load CS to the physical segment
++ *	of the real mode code before doing anything further.
++ *
++ *	The structure real_mode_header includes entries that need
++ *	to be set up before executing this code:
++ *
++ *	startup_32_smp
++ *	boot_gdt
 + */
-+	[S_ABS] =
-+	"^(xen_irq_disable_direct_reloc$|"
-+	"xen_save_fl_direct_reloc$|"
-+	"VDSO|"
-+	"__crc_)",
 +
++#include <linux/linkage.h>
++#include <linux/init.h>
++#include <asm/segment.h>
++#include <asm/page_types.h>
++
++	.text
++	.code16
++	.globl trampoline_data
++
++	.balign PAGE_SIZE
++trampoline_data:
++	wbinvd			# Needed for NUMA-Q should be harmless for others
++
++	.byte	0xea		# ljmpw
++	.word	1f		# Offset
++	.word	real_mode_seg	# Segment
++1:
++	mov	%cs, %ax	# Code and data in the same place
++	mov	%ax, %ds
++
++	cli			# We should be safe anyway
++
++	movl	$0xA5A5A5A5, trampoline_status
++				# write marker for master knows we're running
++
++	/* GDT tables in non default location kernel can be beyond 16MB and
++	 * lgdt will not be able to load the address as in real mode default
++	 * operand size is 16bit. Use lgdtl instead to force operand size
++	 * to 32 bit.
++	 */
++
++	lidtl	boot_idt_descr		# load idt with 0, 0
++	lgdtl	boot_gdt_descr		# load gdt with whatever is appropriate
++
++	xor	%ax, %ax
++	inc	%ax			# protected mode (PE) bit
++	lmsw	%ax			# into protected mode
++
++	# flush prefetch and jump to startup_32_smp in arch/i386/kernel/head.S
++	ljmpl	*(startup_32_smp)
++
++	.data
++	.globl startup_32_smp, boot_gdt, trampoline_status
++
++boot_gdt_descr:
++	.word	__BOOT_DS + 7			# gdt limit
++boot_gdt:
++	.long	0				# gdt base
++
++boot_idt_descr:
++	.word	0				# idt limit = 0
++	.long	0				# idt base = 0L
++
++trampoline_status:
++	.long	0
++
++startup_32_smp:
++	.long	0x00000000
++	.word	__BOOT_CS, 0
+diff --git a/arch/x86/realmode/rm/trampoline_64.S b/arch/x86/realmode/rm/trampoline_64.S
+new file mode 100644
+index 0000000..063da00
+--- /dev/null
++++ b/arch/x86/realmode/rm/trampoline_64.S
+@@ -0,0 +1,175 @@
 +/*
-+ * These symbols are known to be relative, even if the linker marks them
-+ * as absolute (typically defined outside any section in the linker script.)
++ *
++ *	Trampoline.S	Derived from Setup.S by Linus Torvalds
++ *
++ *	4 Jan 1997 Michael Chastain: changed to gnu as.
++ *	15 Sept 2005 Eric Biederman: 64bit PIC support
++ *
++ *	Entry: CS:IP point to the start of our code, we are
++ *	in real mode with no stack, but the rest of the
++ *	trampoline page to make our stack and everything else
++ *	is a mystery.
++ *
++ *	On entry to trampoline_data, the processor is in real mode
++ *	with 16-bit addressing and 16-bit data.  CS has some value
++ *	and IP is zero.  Thus, data addresses need to be absolute
++ *	(no relocation) and are taken with regard to r_base.
++ *
++ *	With the addition of trampoline_level4_pgt this code can
++ *	now enter a 64bit kernel that lives at arbitrary 64bit
++ *	physical addresses.
++ *
++ *	If you work on this file, check the object module with objdump
++ *	--full-contents --reloc to make sure there are no relocation
++ *	entries.
 + */
-+	[S_REL] =
-+	"^_end$",
-+};
 +
++#include <linux/linkage.h>
++#include <linux/init.h>
++#include <asm/pgtable_types.h>
++#include <asm/page_types.h>
++#include <asm/msr.h>
++#include <asm/segment.h>
++#include <asm/processor-flags.h>
 +
-+static const char * const sym_regex_realmode[S_NSYMTYPES] = {
-+/*
-+ * These are 16-bit segment symbols when compiling 16-bit code.
-+ */
-+	[S_SEG] =
-+	"^real_mode_seg$",
++	.text
++	.balign PAGE_SIZE
++	.code16
 +
-+/*
-+ * These are offsets belonging to segments, as opposed to linear addresses,
-+ * when compiling 16-bit code.
-+ */
-+	[S_LIN] =
-+	"^pa_",
-+};
++ENTRY(trampoline_data)
++	cli			# We should be safe anyway
++	wbinvd
 +
-+static const char * const *sym_regex;
++	.byte	0xea		# ljmpw
++	.word	1f		# Offset
++	.word	real_mode_seg	# Segment
++1:
++	mov	%cs, %ax	# Code and data in the same place
++	mov	%ax, %ds
++	mov	%ax, %es
++	mov	%ax, %ss
 +
-+static regex_t sym_regex_c[S_NSYMTYPES];
-+static int is_reloc(enum symtype type, const char *sym_name)
-+{
-+	return sym_regex[type] &&
-+		!regexec(&sym_regex_c[type], sym_name, 0, NULL, 0);
-+}
++	movl	$0xA5A5A5A5, trampoline_status
++	# write marker for master knows we're running
 +
-+static void regex_init(int use_real_mode)
-+{
-+        char errbuf[128];
-+        int err;
-+	int i;
++	# Setup stack
++	movw	$trampoline_stack_end, %sp
 +
-+	if (use_real_mode)
-+		sym_regex = sym_regex_realmode;
-+	else
-+		sym_regex = sym_regex_kernel;
++	call	verify_cpu		# Verify the cpu supports long mode
++	testl   %eax, %eax		# Check for return code
++	jnz	no_longmode
 +
-+	for (i = 0; i < S_NSYMTYPES; i++) {
-+		if (!sym_regex[i])
-+			continue;
++	/*
++	 * GDT tables in non default location kernel can be beyond 16MB and
++	 * lgdt will not be able to load the address as in real mode default
++	 * operand size is 16bit. Use lgdtl instead to force operand size
++	 * to 32 bit.
++	 */
 +
-+		err = regcomp(&sym_regex_c[i], sym_regex[i],
-+			      REG_EXTENDED|REG_NOSUB);
++	lidtl	tidt	# load idt with 0, 0
++	lgdtl	tgdt	# load gdt with whatever is appropriate
 +
-+		if (err) {
-+			regerror(err, &sym_regex_c[i], errbuf, sizeof errbuf);
-+			die("%s", errbuf);
-+		}
-+        }
-+}
++	mov	$X86_CR0_PE, %ax	# protected mode (PE) bit
++	lmsw	%ax			# into protected mode
 +
-+static void die(char *fmt, ...)
-+{
-+	va_list ap;
-+	va_start(ap, fmt);
-+	vfprintf(stderr, fmt, ap);
-+	va_end(ap);
-+	exit(1);
-+}
++	# flush prefetch and jump to startup_32
++	ljmpl	*(startup_32_vector)
 +
-+static const char *sym_type(unsigned type)
-+{
-+	static const char *type_name[] = {
-+#define SYM_TYPE(X) [X] = #X
-+		SYM_TYPE(STT_NOTYPE),
-+		SYM_TYPE(STT_OBJECT),
-+		SYM_TYPE(STT_FUNC),
-+		SYM_TYPE(STT_SECTION),
-+		SYM_TYPE(STT_FILE),
-+		SYM_TYPE(STT_COMMON),
-+		SYM_TYPE(STT_TLS),
-+#undef SYM_TYPE
-+	};
-+	const char *name = "unknown sym type name";
-+	if (type < ARRAY_SIZE(type_name)) {
-+		name = type_name[type];
-+	}
-+	return name;
-+}
++no_longmode:
++	hlt
++	jmp no_longmode
++#include "../kernel/verify_cpu.S"
 +
-+static const char *sym_bind(unsigned bind)
-+{
-+	static const char *bind_name[] = {
-+#define SYM_BIND(X) [X] = #X
-+		SYM_BIND(STB_LOCAL),
-+		SYM_BIND(STB_GLOBAL),
-+		SYM_BIND(STB_WEAK),
-+#undef SYM_BIND
-+	};
-+	const char *name = "unknown sym bind name";
-+	if (bind < ARRAY_SIZE(bind_name)) {
-+		name = bind_name[bind];
-+	}
-+	return name;
-+}
++	.code32
++	.balign 4
++ENTRY(startup_32)
++	movl	$__KERNEL_DS, %eax	# Initialize the %ds segment register
++	movl	%eax, %ds
 +
-+static const char *sym_visibility(unsigned visibility)
-+{
-+	static const char *visibility_name[] = {
-+#define SYM_VISIBILITY(X) [X] = #X
-+		SYM_VISIBILITY(STV_DEFAULT),
-+		SYM_VISIBILITY(STV_INTERNAL),
-+		SYM_VISIBILITY(STV_HIDDEN),
-+		SYM_VISIBILITY(STV_PROTECTED),
-+#undef SYM_VISIBILITY
-+	};
-+	const char *name = "unknown sym visibility name";
-+	if (visibility < ARRAY_SIZE(visibility_name)) {
-+		name = visibility_name[visibility];
-+	}
-+	return name;
-+}
++	movl	$X86_CR4_PAE, %eax
++	movl	%eax, %cr4		# Enable PAE mode
 +
-+static const char *rel_type(unsigned type)
-+{
-+	static const char *type_name[] = {
-+#define REL_TYPE(X) [X] = #X
-+		REL_TYPE(R_386_NONE),
-+		REL_TYPE(R_386_32),
-+		REL_TYPE(R_386_PC32),
-+		REL_TYPE(R_386_GOT32),
-+		REL_TYPE(R_386_PLT32),
-+		REL_TYPE(R_386_COPY),
-+		REL_TYPE(R_386_GLOB_DAT),
-+		REL_TYPE(R_386_JMP_SLOT),
-+		REL_TYPE(R_386_RELATIVE),
-+		REL_TYPE(R_386_GOTOFF),
-+		REL_TYPE(R_386_GOTPC),
-+		REL_TYPE(R_386_8),
-+		REL_TYPE(R_386_PC8),
-+		REL_TYPE(R_386_16),
-+		REL_TYPE(R_386_PC16),
-+#undef REL_TYPE
-+	};
-+	const char *name = "unknown type rel type name";
-+	if (type < ARRAY_SIZE(type_name) && type_name[type]) {
-+		name = type_name[type];
-+	}
-+	return name;
-+}
++	movl	pa_startup_64_smp, %esi
++	movl	pa_startup_64_smp_high, %edi
 +
-+static const char *sec_name(unsigned shndx)
-+{
-+	const char *sec_strtab;
-+	const char *name;
-+	sec_strtab = secs[ehdr.e_shstrndx].strtab;
-+	name = "<noname>";
-+	if (shndx < ehdr.e_shnum) {
-+		name = sec_strtab + secs[shndx].shdr.sh_name;
-+	}
-+	else if (shndx == SHN_ABS) {
-+		name = "ABSOLUTE";
-+	}
-+	else if (shndx == SHN_COMMON) {
-+		name = "COMMON";
-+	}
-+	return name;
-+}
++					# Setup trampoline 4 level pagetables
++	leal	pa_trampoline_level4_pgt, %eax
++	movl	%eax, %cr3
 +
-+static const char *sym_name(const char *sym_strtab, Elf32_Sym *sym)
-+{
-+	const char *name;
-+	name = "<noname>";
-+	if (sym->st_name) {
-+		name = sym_strtab + sym->st_name;
-+	}
-+	else {
-+		name = sec_name(sym->st_shndx);
-+	}
-+	return name;
-+}
++	movl	$MSR_EFER, %ecx
++	movl	$(1 << _EFER_LME), %eax	# Enable Long Mode
++	xorl	%edx, %edx
++	wrmsr
 +
++	# Enable paging and in turn activate Long Mode
++	# Enable protected mode
++	movl	$(X86_CR0_PG | X86_CR0_PE), %eax
++	movl	%eax, %cr0
 +
++	/*
++	 * At this point we're in long mode but in 32bit compatibility mode
++	 * with EFER.LME = 1, CS.L = 0, CS.D = 1 (and in turn
++	 * EFER.LMA = 1). Now we want to jump in 64bit mode, to do that we use
++	 * the new gdt/idt that has __KERNEL_CS with CS.L = 1.
++	 */
++	ljmpl	*(pa_startup_64_vector)
 +
-+#if BYTE_ORDER == LITTLE_ENDIAN
-+#define le16_to_cpu(val) (val)
-+#define le32_to_cpu(val) (val)
-+#endif
-+#if BYTE_ORDER == BIG_ENDIAN
-+#define le16_to_cpu(val) bswap_16(val)
-+#define le32_to_cpu(val) bswap_32(val)
-+#endif
++	.code64
++	.balign 4
++ENTRY(startup_64)
++	# Now jump into the kernel using virtual addresses
++	movl	%edi, %eax
++	shlq	$32, %rax
++	addl	%esi, %eax
++	jmp	*%rax
 +
-+static uint16_t elf16_to_cpu(uint16_t val)
-+{
-+	return le16_to_cpu(val);
-+}
++	# Careful these need to be in the same 64K segment as the above;
++tidt:
++	.word	0			# idt limit = 0
++	.word	0, 0			# idt base = 0L
 +
-+static uint32_t elf32_to_cpu(uint32_t val)
-+{
-+	return le32_to_cpu(val);
-+}
++	# Duplicate the global descriptor table
++	# so the kernel can live anywhere
++	.balign 4
++	.globl tgdt
++tgdt:
++	.short	tgdt_end - tgdt		# gdt limit
++	.long	pa_tgdt
++	.short	0
++	.quad	0x00cf9b000000ffff	# __KERNEL32_CS
++	.quad	0x00af9b000000ffff	# __KERNEL_CS
++	.quad	0x00cf93000000ffff	# __KERNEL_DS
++tgdt_end:
 +
-+static void read_ehdr(FILE *fp)
-+{
-+	if (fread(&ehdr, sizeof(ehdr), 1, fp) != 1) {
-+		die("Cannot read ELF header: %s\n",
-+			strerror(errno));
-+	}
-+	if (memcmp(ehdr.e_ident, ELFMAG, SELFMAG) != 0) {
-+		die("No ELF magic\n");
-+	}
-+	if (ehdr.e_ident[EI_CLASS] != ELFCLASS32) {
-+		die("Not a 32 bit executable\n");
-+	}
-+	if (ehdr.e_ident[EI_DATA] != ELFDATA2LSB) {
-+		die("Not a LSB ELF executable\n");
-+	}
-+	if (ehdr.e_ident[EI_VERSION] != EV_CURRENT) {
-+		die("Unknown ELF version\n");
-+	}
-+	/* Convert the fields to native endian */
-+	ehdr.e_type      = elf16_to_cpu(ehdr.e_type);
-+	ehdr.e_machine   = elf16_to_cpu(ehdr.e_machine);
-+	ehdr.e_version   = elf32_to_cpu(ehdr.e_version);
-+	ehdr.e_entry     = elf32_to_cpu(ehdr.e_entry);
-+	ehdr.e_phoff     = elf32_to_cpu(ehdr.e_phoff);
-+	ehdr.e_shoff     = elf32_to_cpu(ehdr.e_shoff);
-+	ehdr.e_flags     = elf32_to_cpu(ehdr.e_flags);
-+	ehdr.e_ehsize    = elf16_to_cpu(ehdr.e_ehsize);
-+	ehdr.e_phentsize = elf16_to_cpu(ehdr.e_phentsize);
-+	ehdr.e_phnum     = elf16_to_cpu(ehdr.e_phnum);
-+	ehdr.e_shentsize = elf16_to_cpu(ehdr.e_shentsize);
-+	ehdr.e_shnum     = elf16_to_cpu(ehdr.e_shnum);
-+	ehdr.e_shstrndx  = elf16_to_cpu(ehdr.e_shstrndx);
++	.balign 4
++startup_32_vector:
++	.long	pa_startup_32
++	.word	__KERNEL32_CS, 0
 +
-+	if ((ehdr.e_type != ET_EXEC) && (ehdr.e_type != ET_DYN)) {
-+		die("Unsupported ELF header type\n");
-+	}
-+	if (ehdr.e_machine != EM_386) {
-+		die("Not for x86\n");
-+	}
-+	if (ehdr.e_version != EV_CURRENT) {
-+		die("Unknown ELF version\n");
-+	}
-+	if (ehdr.e_ehsize != sizeof(Elf32_Ehdr)) {
-+		die("Bad Elf header size\n");
-+	}
-+	if (ehdr.e_phentsize != sizeof(Elf32_Phdr)) {
-+		die("Bad program header entry\n");
-+	}
-+	if (ehdr.e_shentsize != sizeof(Elf32_Shdr)) {
-+		die("Bad section header entry\n");
-+	}
-+	if (ehdr.e_shstrndx >= ehdr.e_shnum) {
-+		die("String table index out of bounds\n");
-+	}
-+}
++	.balign 4
++	.globl startup_64_vector
++startup_64_vector:
++	.long	pa_startup_64
++	.word	__KERNEL_CS, 0
 +
-+static void read_shdrs(FILE *fp)
-+{
-+	int i;
-+	Elf32_Shdr shdr;
++	.data
 +
-+	secs = calloc(ehdr.e_shnum, sizeof(struct section));
-+	if (!secs) {
-+		die("Unable to allocate %d section headers\n",
-+		    ehdr.e_shnum);
-+	}
-+	if (fseek(fp, ehdr.e_shoff, SEEK_SET) < 0) {
-+		die("Seek to %d failed: %s\n",
-+			ehdr.e_shoff, strerror(errno));
-+	}
-+	for (i = 0; i < ehdr.e_shnum; i++) {
-+		struct section *sec = &secs[i];
-+		if (fread(&shdr, sizeof shdr, 1, fp) != 1)
-+			die("Cannot read ELF section headers %d/%d: %s\n",
-+			    i, ehdr.e_shnum, strerror(errno));
-+		sec->shdr.sh_name      = elf32_to_cpu(shdr.sh_name);
-+		sec->shdr.sh_type      = elf32_to_cpu(shdr.sh_type);
-+		sec->shdr.sh_flags     = elf32_to_cpu(shdr.sh_flags);
-+		sec->shdr.sh_addr      = elf32_to_cpu(shdr.sh_addr);
-+		sec->shdr.sh_offset    = elf32_to_cpu(shdr.sh_offset);
-+		sec->shdr.sh_size      = elf32_to_cpu(shdr.sh_size);
-+		sec->shdr.sh_link      = elf32_to_cpu(shdr.sh_link);
-+		sec->shdr.sh_info      = elf32_to_cpu(shdr.sh_info);
-+		sec->shdr.sh_addralign = elf32_to_cpu(shdr.sh_addralign);
-+		sec->shdr.sh_entsize   = elf32_to_cpu(shdr.sh_entsize);
-+		if (sec->shdr.sh_link < ehdr.e_shnum)
-+			sec->link = &secs[sec->shdr.sh_link];
-+	}
++	.balign 4
++ENTRY(trampoline_status)
++	.long	0
 +
-+}
++trampoline_stack:
++	.org 0x1000
++trampoline_stack_end:
 +
-+static void read_strtabs(FILE *fp)
-+{
-+	int i;
-+	for (i = 0; i < ehdr.e_shnum; i++) {
-+		struct section *sec = &secs[i];
-+		if (sec->shdr.sh_type != SHT_STRTAB) {
-+			continue;
-+		}
-+		sec->strtab = malloc(sec->shdr.sh_size);
-+		if (!sec->strtab) {
-+			die("malloc of %d bytes for strtab failed\n",
-+				sec->shdr.sh_size);
-+		}
-+		if (fseek(fp, sec->shdr.sh_offset, SEEK_SET) < 0) {
-+			die("Seek to %d failed: %s\n",
-+				sec->shdr.sh_offset, strerror(errno));
-+		}
-+		if (fread(sec->strtab, 1, sec->shdr.sh_size, fp)
-+		    != sec->shdr.sh_size) {
-+			die("Cannot read symbol table: %s\n",
-+				strerror(errno));
-+		}
-+	}
-+}
++	.globl	level3_ident_pgt
++	.globl	level3_kernel_pgt
++ENTRY(trampoline_level4_pgt)
++	level3_ident_pgt:	.quad	0
++	.fill 510,8,0
++	level3_kernel_pgt:	.quad	0
 +
-+static void read_symtabs(FILE *fp)
-+{
-+	int i,j;
-+	for (i = 0; i < ehdr.e_shnum; i++) {
-+		struct section *sec = &secs[i];
-+		if (sec->shdr.sh_type != SHT_SYMTAB) {
-+			continue;
-+		}
-+		sec->symtab = malloc(sec->shdr.sh_size);
-+		if (!sec->symtab) {
-+			die("malloc of %d bytes for symtab failed\n",
-+				sec->shdr.sh_size);
-+		}
-+		if (fseek(fp, sec->shdr.sh_offset, SEEK_SET) < 0) {
-+			die("Seek to %d failed: %s\n",
-+				sec->shdr.sh_offset, strerror(errno));
-+		}
-+		if (fread(sec->symtab, 1, sec->shdr.sh_size, fp)
-+		    != sec->shdr.sh_size) {
-+			die("Cannot read symbol table: %s\n",
-+				strerror(errno));
-+		}
-+		for (j = 0; j < sec->shdr.sh_size/sizeof(Elf32_Sym); j++) {
-+			Elf32_Sym *sym = &sec->symtab[j];
-+			sym->st_name  = elf32_to_cpu(sym->st_name);
-+			sym->st_value = elf32_to_cpu(sym->st_value);
-+			sym->st_size  = elf32_to_cpu(sym->st_size);
-+			sym->st_shndx = elf16_to_cpu(sym->st_shndx);
-+		}
-+	}
-+}
-+
-+
-+static void read_relocs(FILE *fp)
-+{
-+	int i,j;
-+	for (i = 0; i < ehdr.e_shnum; i++) {
-+		struct section *sec = &secs[i];
-+		if (sec->shdr.sh_type != SHT_REL) {
-+			continue;
-+		}
-+		sec->reltab = malloc(sec->shdr.sh_size);
-+		if (!sec->reltab) {
-+			die("malloc of %d bytes for relocs failed\n",
-+				sec->shdr.sh_size);
-+		}
-+		if (fseek(fp, sec->shdr.sh_offset, SEEK_SET) < 0) {
-+			die("Seek to %d failed: %s\n",
-+				sec->shdr.sh_offset, strerror(errno));
-+		}
-+		if (fread(sec->reltab, 1, sec->shdr.sh_size, fp)
-+		    != sec->shdr.sh_size) {
-+			die("Cannot read symbol table: %s\n",
-+				strerror(errno));
-+		}
-+		for (j = 0; j < sec->shdr.sh_size/sizeof(Elf32_Rel); j++) {
-+			Elf32_Rel *rel = &sec->reltab[j];
-+			rel->r_offset = elf32_to_cpu(rel->r_offset);
-+			rel->r_info   = elf32_to_cpu(rel->r_info);
-+		}
-+	}
-+}
-+
-+
-+static void print_absolute_symbols(void)
-+{
-+	int i;
-+	printf("Absolute symbols\n");
-+	printf(" Num:    Value Size  Type       Bind        Visibility  Name\n");
-+	for (i = 0; i < ehdr.e_shnum; i++) {
-+		struct section *sec = &secs[i];
-+		char *sym_strtab;
-+		int j;
-+
-+		if (sec->shdr.sh_type != SHT_SYMTAB) {
-+			continue;
-+		}
-+		sym_strtab = sec->link->strtab;
-+		for (j = 0; j < sec->shdr.sh_size/sizeof(Elf32_Sym); j++) {
-+			Elf32_Sym *sym;
-+			const char *name;
-+			sym = &sec->symtab[j];
-+			name = sym_name(sym_strtab, sym);
-+			if (sym->st_shndx != SHN_ABS) {
-+				continue;
-+			}
-+			printf("%5d %08x %5d %10s %10s %12s %s\n",
-+				j, sym->st_value, sym->st_size,
-+				sym_type(ELF32_ST_TYPE(sym->st_info)),
-+				sym_bind(ELF32_ST_BIND(sym->st_info)),
-+				sym_visibility(ELF32_ST_VISIBILITY(sym->st_other)),
-+				name);
-+		}
-+	}
-+	printf("\n");
-+}
-+
-+static void print_absolute_relocs(void)
-+{
-+	int i, printed = 0;
-+
-+	for (i = 0; i < ehdr.e_shnum; i++) {
-+		struct section *sec = &secs[i];
-+		struct section *sec_applies, *sec_symtab;
-+		char *sym_strtab;
-+		Elf32_Sym *sh_symtab;
-+		int j;
-+		if (sec->shdr.sh_type != SHT_REL) {
-+			continue;
-+		}
-+		sec_symtab  = sec->link;
-+		sec_applies = &secs[sec->shdr.sh_info];
-+		if (!(sec_applies->shdr.sh_flags & SHF_ALLOC)) {
-+			continue;
-+		}
-+		sh_symtab  = sec_symtab->symtab;
-+		sym_strtab = sec_symtab->link->strtab;
-+		for (j = 0; j < sec->shdr.sh_size/sizeof(Elf32_Rel); j++) {
-+			Elf32_Rel *rel;
-+			Elf32_Sym *sym;
-+			const char *name;
-+			rel = &sec->reltab[j];
-+			sym = &sh_symtab[ELF32_R_SYM(rel->r_info)];
-+			name = sym_name(sym_strtab, sym);
-+			if (sym->st_shndx != SHN_ABS) {
-+				continue;
-+			}
-+
-+			/* Absolute symbols are not relocated if bzImage is
-+			 * loaded at a non-compiled address. Display a warning
-+			 * to user at compile time about the absolute
-+			 * relocations present.
-+			 *
-+			 * User need to audit the code to make sure
-+			 * some symbols which should have been section
-+			 * relative have not become absolute because of some
-+			 * linker optimization or wrong programming usage.
-+			 *
-+			 * Before warning check if this absolute symbol
-+			 * relocation is harmless.
-+			 */
-+			if (is_reloc(S_ABS, name) || is_reloc(S_REL, name))
-+				continue;
-+
-+			if (!printed) {
-+				printf("WARNING: Absolute relocations"
-+					" present\n");
-+				printf("Offset     Info     Type     Sym.Value "
-+					"Sym.Name\n");
-+				printed = 1;
-+			}
-+
-+			printf("%08x %08x %10s %08x  %s\n",
-+				rel->r_offset,
-+				rel->r_info,
-+				rel_type(ELF32_R_TYPE(rel->r_info)),
-+				sym->st_value,
-+				name);
-+		}
-+	}
-+
-+	if (printed)
-+		printf("\n");
-+}
-+
-+static void walk_relocs(void (*visit)(Elf32_Rel *rel, Elf32_Sym *sym),
-+			int use_real_mode)
-+{
-+	int i;
-+	/* Walk through the relocations */
-+	for (i = 0; i < ehdr.e_shnum; i++) {
-+		char *sym_strtab;
-+		Elf32_Sym *sh_symtab;
-+		struct section *sec_applies, *sec_symtab;
-+		int j;
-+		struct section *sec = &secs[i];
-+
-+		if (sec->shdr.sh_type != SHT_REL) {
-+			continue;
-+		}
-+		sec_symtab  = sec->link;
-+		sec_applies = &secs[sec->shdr.sh_info];
-+		if (!(sec_applies->shdr.sh_flags & SHF_ALLOC)) {
-+			continue;
-+		}
-+		sh_symtab = sec_symtab->symtab;
-+		sym_strtab = sec_symtab->link->strtab;
-+		for (j = 0; j < sec->shdr.sh_size/sizeof(Elf32_Rel); j++) {
-+			Elf32_Rel *rel;
-+			Elf32_Sym *sym;
-+			unsigned r_type;
-+			const char *symname;
-+			rel = &sec->reltab[j];
-+			sym = &sh_symtab[ELF32_R_SYM(rel->r_info)];
-+			r_type = ELF32_R_TYPE(rel->r_info);
-+
-+			switch (r_type) {
-+			case R_386_NONE:
-+			case R_386_PC32:
-+			case R_386_PC16:
-+			case R_386_PC8:
-+				/*
-+				 * NONE can be ignored and and PC relative
-+				 * relocations don't need to be adjusted.
-+				 */
-+				break;
-+
-+			case R_386_16:
-+				symname = sym_name(sym_strtab, sym);
-+				if (!use_real_mode)
-+					goto bad;
-+				if (sym->st_shndx == SHN_ABS) {
-+					if (is_reloc(S_ABS, symname))
-+						break;
-+					else if (!is_reloc(S_SEG, symname))
-+						goto bad;
-+				} else {
-+					if (is_reloc(S_LIN, symname))
-+						goto bad;
-+					else
-+						break;
-+				}
-+				visit(rel, sym);
-+				break;
-+
-+			case R_386_32:
-+				symname = sym_name(sym_strtab, sym);
-+				if (sym->st_shndx == SHN_ABS) {
-+					if (is_reloc(S_ABS, symname))
-+						break;
-+					else if (!is_reloc(S_REL, symname))
-+						goto bad;
-+				} else {
-+					if (use_real_mode &&
-+					    !is_reloc(S_LIN, symname))
-+						break;
-+				}
-+				visit(rel, sym);
-+				break;
-+			default:
-+				die("Unsupported relocation type: %s (%d)\n",
-+				    rel_type(r_type), r_type);
-+				break;
-+			bad:
-+				symname = sym_name(sym_strtab, sym);
-+				die("Invalid %s relocation: %s\n",
-+				    rel_type(r_type), symname);
-+			}
-+		}
-+	}
-+}
-+
-+static void count_reloc(Elf32_Rel *rel, Elf32_Sym *sym)
-+{
-+	if (ELF32_R_TYPE(rel->r_info) == R_386_16)
-+		reloc16_count++;
-+	else
-+		reloc_count++;
-+}
-+
-+static void collect_reloc(Elf32_Rel *rel, Elf32_Sym *sym)
-+{
-+	/* Remember the address that needs to be adjusted. */
-+	if (ELF32_R_TYPE(rel->r_info) == R_386_16)
-+		relocs16[reloc16_idx++] = rel->r_offset;
-+	else
-+		relocs[reloc_idx++] = rel->r_offset;
-+}
-+
-+static int cmp_relocs(const void *va, const void *vb)
-+{
-+	const unsigned long *a, *b;
-+	a = va; b = vb;
-+	return (*a == *b)? 0 : (*a > *b)? 1 : -1;
-+}
-+
-+static int write32(unsigned int v, FILE *f)
-+{
-+	unsigned char buf[4];
-+
-+	put_unaligned_le32(v, buf);
-+	return fwrite(buf, 1, 4, f) == 4 ? 0 : -1;
-+}
-+
-+static void emit_relocs(int as_text, int use_real_mode)
-+{
-+	int i;
-+	/* Count how many relocations I have and allocate space for them. */
-+	reloc_count = 0;
-+	walk_relocs(count_reloc, use_real_mode);
-+	relocs = malloc(reloc_count * sizeof(relocs[0]));
-+	if (!relocs) {
-+		die("malloc of %d entries for relocs failed\n",
-+			reloc_count);
-+	}
-+
-+	relocs16 = malloc(reloc16_count * sizeof(relocs[0]));
-+	if (!relocs16) {
-+		die("malloc of %d entries for relocs16 failed\n",
-+			reloc16_count);
-+	}
-+	/* Collect up the relocations */
-+	reloc_idx = 0;
-+	walk_relocs(collect_reloc, use_real_mode);
-+
-+	if (reloc16_count && !use_real_mode)
-+		die("Segment relocations found but --realmode not specified\n");
-+
-+	/* Order the relocations for more efficient processing */
-+	qsort(relocs, reloc_count, sizeof(relocs[0]), cmp_relocs);
-+	qsort(relocs16, reloc16_count, sizeof(relocs16[0]), cmp_relocs);
-+
-+	/* Print the relocations */
-+	if (as_text) {
-+		/* Print the relocations in a form suitable that
-+		 * gas will like.
-+		 */
-+		printf(".section \".data.reloc\",\"a\"\n");
-+		printf(".balign 4\n");
-+		if (use_real_mode) {
-+			printf("\t.long %lu\n", reloc16_count);
-+			for (i = 0; i < reloc16_count; i++)
-+				printf("\t.long 0x%08lx\n", relocs16[i]);
-+			printf("\t.long %lu\n", reloc_count);
-+			for (i = 0; i < reloc_count; i++) {
-+				printf("\t.long 0x%08lx\n", relocs[i]);
-+			}
-+		} else {
-+			/* Print a stop */
-+			printf("\t.long 0x%08lx\n", (unsigned long)0);
-+			for (i = 0; i < reloc_count; i++) {
-+				printf("\t.long 0x%08lx\n", relocs[i]);
-+			}
-+		}
-+
-+		printf("\n");
-+	}
-+	else {
-+		if (use_real_mode) {
-+			write32(reloc16_count, stdout);
-+			for (i = 0; i < reloc16_count; i++)
-+				write32(relocs16[i], stdout);
-+			write32(reloc_count, stdout);
-+
-+			/* Now print each relocation */
-+			for (i = 0; i < reloc_count; i++)
-+				write32(relocs[i], stdout);
-+		} else {
-+			/* Print a stop */
-+			write32(0, stdout);
-+
-+			/* Now print each relocation */
-+			for (i = 0; i < reloc_count; i++) {
-+				write32(relocs[i], stdout);
-+			}
-+		}
-+	}
-+}
-+
-+static void usage(void)
-+{
-+	die("relocs [--abs-syms|--abs-relocs|--text|--realmode] vmlinux\n");
-+}
-+
-+int main(int argc, char **argv)
-+{
-+	int show_absolute_syms, show_absolute_relocs;
-+	int as_text, use_real_mode;
-+	const char *fname;
-+	FILE *fp;
-+	int i;
-+
-+	show_absolute_syms = 0;
-+	show_absolute_relocs = 0;
-+	as_text = 0;
-+	use_real_mode = 0;
-+	fname = NULL;
-+	for (i = 1; i < argc; i++) {
-+		char *arg = argv[i];
-+		if (*arg == '-') {
-+			if (strcmp(arg, "--abs-syms") == 0) {
-+				show_absolute_syms = 1;
-+				continue;
-+			}
-+			if (strcmp(arg, "--abs-relocs") == 0) {
-+				show_absolute_relocs = 1;
-+				continue;
-+			}
-+			if (strcmp(arg, "--text") == 0) {
-+				as_text = 1;
-+				continue;
-+			}
-+			if (strcmp(arg, "--realmode") == 0) {
-+				use_real_mode = 1;
-+				continue;
-+			}
-+		}
-+		else if (!fname) {
-+			fname = arg;
-+			continue;
-+		}
-+		usage();
-+	}
-+	if (!fname) {
-+		usage();
-+	}
-+	regex_init(use_real_mode);
-+	fp = fopen(fname, "r");
-+	if (!fp) {
-+		die("Cannot open %s: %s\n",
-+			fname, strerror(errno));
-+	}
-+	read_ehdr(fp);
-+	read_shdrs(fp);
-+	read_strtabs(fp);
-+	read_symtabs(fp);
-+	read_relocs(fp);
-+	if (show_absolute_syms) {
-+		print_absolute_symbols();
-+		return 0;
-+	}
-+	if (show_absolute_relocs) {
-+		print_absolute_relocs();
-+		return 0;
-+	}
-+	emit_relocs(as_text, use_real_mode);
-+	return 0;
-+}
++	.globl	startup_64_smp
++	.globl	startup_64_smp_high
++startup_64_smp:		.long 0
++startup_64_smp_high:	.long 0
 -- 
 1.7.9.5
 
