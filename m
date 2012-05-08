@@ -1,81 +1,55 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
 Received: from mga01.intel.com ([192.55.52.88]:11241 "EHLO mga01.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755508Ab2EHSXt (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 8 May 2012 14:23:49 -0400
+	id S1754113Ab2EHSXr (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 8 May 2012 14:23:47 -0400
 From: Jarkko Sakkinen <jarkko.sakkinen@intel.com>
-Subject: [PATCH 10/23] x86, realmode: Move bits to the proper sections in trampoline_64.S
-Date: Tue,  8 May 2012 21:22:33 +0300
-Message-Id: <1336501366-28617-11-git-send-email-jarkko.sakkinen@intel.com>
+Subject: [PATCH 07/23] x86, realmode: Set permission for real mode pages
+Date: Tue,  8 May 2012 21:22:30 +0300
+Message-Id: <1336501366-28617-8-git-send-email-jarkko.sakkinen@intel.com>
 In-Reply-To: <1336501366-28617-1-git-send-email-jarkko.sakkinen@intel.com>
 References: <1336501366-28617-1-git-send-email-jarkko.sakkinen@intel.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org
-Cc: linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Sam Ravnborg <sam@ravnborg.org>, Joseph Cihula <joseph.cihula@intel.com>, Shane Wang <shane.wang@intel.com>, hpa@linux.intel.com
+Cc: linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Sam Ravnborg <sam@ravnborg.org>, Joseph Cihula <joseph.cihula@intel.com>, Shane Wang <shane.wang@intel.com>, hpa@linux.intel.com, Jarkko Sakkinen <jarkko.sakkinen@intel.com>
 
-From: "H. Peter Anvin" <hpa@linux.intel.com>
+Set proper permissions for rodata, text and data, removing the
+realmode trampoline area as a remaining RWX memory mapping in the
+kernel.
 
-Move various bits to the sections they really belong in in
-trampoline_64.S.  Use GLOBAL() rather than ENTRY() for data objects:
-ENTRY() should only be used with code and forces alignment to 16
-bytes.
-
-Signed-off-by: H. Peter Anvin <hpa@linux.intel.com>
+Signed-off-by: Jarkko Sakkinen <jarkko.sakkinen@intel.com>
 ---
- arch/x86/realmode/rm/trampoline_64.S |   10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+ arch/x86/kernel/realmode.c |   16 +++++++++++++++-
+ 1 file changed, 15 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/realmode/rm/trampoline_64.S b/arch/x86/realmode/rm/trampoline_64.S
-index 063da00..66c58cf 100644
---- a/arch/x86/realmode/rm/trampoline_64.S
-+++ b/arch/x86/realmode/rm/trampoline_64.S
-@@ -80,6 +80,7 @@ no_longmode:
- 	jmp no_longmode
- #include "../kernel/verify_cpu.S"
+diff --git a/arch/x86/kernel/realmode.c b/arch/x86/kernel/realmode.c
+index a465775..d85ac20 100644
+--- a/arch/x86/kernel/realmode.c
++++ b/arch/x86/kernel/realmode.c
+@@ -86,7 +86,21 @@ static int __init set_real_mode_permissions(void)
+ 		PAGE_ALIGN(real_mode_header.end) -
+ 		__pa(real_mode_base);
  
-+	.section ".text32","ax"
- 	.code32
- 	.balign 4
- ENTRY(startup_32)
-@@ -114,6 +115,7 @@ ENTRY(startup_32)
- 	 */
- 	ljmpl	*(pa_startup_64_vector)
+-	set_memory_x((unsigned long) real_mode_base, all_size >> PAGE_SHIFT);
++	size_t ro_size =
++		PAGE_ALIGN(real_mode_header.ro_end) -
++		__pa(real_mode_base);
++
++	size_t text_size =
++		PAGE_ALIGN(real_mode_header.ro_end) -
++		real_mode_header.text_start;
++
++	unsigned long text_start =
++		(unsigned long) __va(real_mode_header.text_start);
++
++	set_memory_nx((unsigned long) real_mode_base, all_size >> PAGE_SHIFT);
++	set_memory_ro((unsigned long) real_mode_base, ro_size >> PAGE_SHIFT);
++	set_memory_x((unsigned long) text_start, text_size >> PAGE_SHIFT);
++
+ 	return 0;
+ }
  
-+	.section ".text64","ax"
- 	.code64
- 	.balign 4
- ENTRY(startup_64)
-@@ -123,7 +125,8 @@ ENTRY(startup_64)
- 	addl	%esi, %eax
- 	jmp	*%rax
- 
--	# Careful these need to be in the same 64K segment as the above;
-+	.section ".rodata","a"
-+	.balign	16
- tidt:
- 	.word	0			# idt limit = 0
- 	.word	0, 0			# idt base = 0L
-@@ -153,9 +156,8 @@ startup_64_vector:
- 	.word	__KERNEL_CS, 0
- 
- 	.data
--
- 	.balign 4
--ENTRY(trampoline_status)
-+GLOBAL(trampoline_status)
- 	.long	0
- 
- trampoline_stack:
-@@ -164,7 +166,7 @@ trampoline_stack_end:
- 
- 	.globl	level3_ident_pgt
- 	.globl	level3_kernel_pgt
--ENTRY(trampoline_level4_pgt)
-+GLOBAL(trampoline_level4_pgt)
- 	level3_ident_pgt:	.quad	0
- 	.fill 510,8,0
- 	level3_kernel_pgt:	.quad	0
 -- 
 1.7.9.5
 
