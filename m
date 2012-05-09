@@ -1,54 +1,70 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from terminus.zytor.com ([198.137.202.10]:41884 "EHLO mail.zytor.com"
+Received: from mga14.intel.com ([143.182.124.37]:58847 "EHLO mga14.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1758008Ab2EIPvs (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 9 May 2012 11:51:48 -0400
-Message-ID: <4FAA9207.8070709@intel.com>
-Date: Wed, 09 May 2012 08:49:27 -0700
-From: "H. Peter Anvin" <h.peter.anvin@intel.com>
+	id S1760879Ab2EIUGP (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 9 May 2012 16:06:15 -0400
+Message-ID: <4FAACE2C.1050405@linux.intel.com>
+Date: Wed, 09 May 2012 13:06:04 -0700
+From: "H. Peter Anvin" <hpa@linux.intel.com>
 MIME-Version: 1.0
 Subject: Re: [PATCH 02/23] x86, realmode: realmode.bin infrastructure
-References: <1336501366-28617-1-git-send-email-jarkko.sakkinen@intel.com> <1336501366-28617-3-git-send-email-jarkko.sakkinen@intel.com>
-In-Reply-To: <1336501366-28617-3-git-send-email-jarkko.sakkinen@intel.com>
+References: <1336501366-28617-1-git-send-email-jarkko.sakkinen@intel.com> <1336501366-28617-3-git-send-email-jarkko.sakkinen@intel.com> <4FAA9207.8070709@intel.com> <alpine.DEB.2.02.1205092256240.31031@jsakkine-mobl1.(null)>
+In-Reply-To: <alpine.DEB.2.02.1205092256240.31031@jsakkine-mobl1.(null)>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Jarkko Sakkinen <jarkko.sakkinen@intel.com>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Sam Ravnborg <sam@ravnborg.org>, Joseph Cihula <joseph.cihula@intel.com>, Shane Wang <shane.wang@intel.com>, hpa@linux.intel.com
+Cc: "H. Peter Anvin" <h.peter.anvin@intel.com>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Sam Ravnborg <sam@ravnborg.org>, Joseph Cihula <joseph.cihula@intel.com>, Shane Wang <shane.wang@intel.com>
 
-On 05/08/2012 11:22 AM, Jarkko Sakkinen wrote:
+On 05/09/2012 12:57 PM, Jarkko Sakkinen wrote:
+> 
 > diff --git a/arch/x86/realmode/Makefile b/arch/x86/realmode/Makefile
-> new file mode 100644
-> index 0000000..f22a4f8
-> --- /dev/null
+> index f22a4f8..615878e 100644
+> --- a/arch/x86/realmode/Makefile
 > +++ b/arch/x86/realmode/Makefile
-> @@ -0,0 +1,20 @@
-> +#
-> +# arch/x86/realmode/Makefile
-> +#
-> +# This file is subject to the terms and conditions of the GNU General Public
-> +# License.  See the file "COPYING" in the main directory of this archive
-> +# for more details.
-> +#
-> +#
-> +
-> +subdir- := rm
-> +
-> +obj-y += rmpiggy.o
-> +
-> +$(obj)/rmpiggy.o: $(obj)/rm/realmode.relocs $(obj)/rm/realmode.bin
-> +
-> +$(obj)/rm/realmode.bin: FORCE
-> +	$(Q)$(MAKE) $(build)=$(obj)/rm $@
-> +
-> +$(obj)/rm/realmode.relocs: FORCE
-> +	$(Q)$(MAKE) $(build)=$(obj)/rm $@
+> @@ -15,6 +15,3 @@ $(obj)/rmpiggy.o: $(obj)/rm/realmode.relocs
+> $(obj)/rm/realmode.bin
+> 
+>  $(obj)/rm/realmode.bin: FORCE
+>         $(Q)$(MAKE) $(build)=$(obj)/rm $@
+> -
+> -$(obj)/rm/realmode.relocs: FORCE
+> -       $(Q)$(MAKE) $(build)=$(obj)/rm $@
+> diff --git a/arch/x86/realmode/rm/Makefile b/arch/x86/realmode/rm/Makefile
+> index de40bc4..1c1d3d3 100644
+> --- a/arch/x86/realmode/rm/Makefile
+> +++ b/arch/x86/realmode/rm/Makefile
+> @@ -48,7 +48,7 @@ $(obj)/realmode.elf: $(obj)/realmode.lds
+> $(REALMODE_OBJS) FORCE
+> 
+>  OBJCOPYFLAGS_realmode.bin := -O binary
+> 
+> -$(obj)/realmode.bin: $(obj)/realmode.elf
+> +$(obj)/realmode.bin: $(obj)/realmode.elf $(obj)/realmode.relocs
+>         $(call if_changed,objcopy)
+> 
+>  quiet_cmd_relocs = RELOCS  $@
+> 
+> Would this resolve the existing issues or not?
+> 
 
-OK, this bit seems to cause serious problems.  Specifically, this
-invokes the rm/ Makefile twice, and they end up doing two independent
-builds in parallel, stepping on each other in the process.
+That should would work, although it is definitely a hack.  It all really
+comes down to make not having a good way to deal with a single process
+generating more than one output.  I discussed this about a decade(!) ago
+with the GNU make maintainers, and they said that make *can* be made to
+do the right thing by doing a pattern rule:
 
-Sam, Michal: do you have any suggestions for how to do the above better?
+%.foo %.bar: %.baz
+
+... as pattern rules with multiple targets are handled differently than
+non-pattern rules with multiple targets.  They were -- and still are --
+reluctant to actually fix the problem since it wouldn't be backwards
+compatible, but of course that is true with any new Make feature.
+
+Not sure how to use the pattern rule in this case, so I guess we might
+as well go with the hack.  Can you send it as a proper patch (with a
+description and Signed-off-by:), please?
 
 	-hpa
+
