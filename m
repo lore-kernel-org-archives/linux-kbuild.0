@@ -1,51 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga03.intel.com ([143.182.124.21]:4526 "EHLO mga03.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1761025Ab2EIUZg (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 9 May 2012 16:25:36 -0400
-From: Jarkko Sakkinen <jarkko.sakkinen@intel.com>
-Subject: [PATCH] x86, realmode: build fix: remove duplicate build
-Date: Wed,  9 May 2012 23:25:06 +0300
-Message-Id: <1336595106-21135-1-git-send-email-jarkko.sakkinen@intel.com>
+Received: from smtp03.smtpout.orange.fr ([80.12.242.125]:41246 "EHLO
+	smtp.smtpout.orange.fr" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751720Ab2EIV2A (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 9 May 2012 17:28:00 -0400
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Subject: Re: [PATCH] scripts/config: properly report and set string options
+Date: Wed, 9 May 2012 23:27:55 +0200
+References: <1333975750-12154-1-git-send-email-yann.morin.1998@free.fr>
+In-Reply-To: <1333975750-12154-1-git-send-email-yann.morin.1998@free.fr>
+MIME-Version: 1.0
+Content-Type: Text/Plain;
+  charset="iso-8859-15"
+Content-Transfer-Encoding: 7bit
+Message-Id: <201205092327.55249.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: linux-kbuild@vger.kernel.org, hpa@linux.intel.com, Jarkko Sakkinen <jarkko.sakkinen@intel.com>
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org
 
-Real-mode binary was built twice. This patch fixes
-the issue by making realmode.relocs as target for
-realmode.bin.
+Michal, All,
 
-Signed-off-by: Jarkko Sakkinen <jarkko.sakkinen@intel.com>
----
- arch/x86/realmode/Makefile    |    3 ---
- arch/x86/realmode/rm/Makefile |    2 +-
- 2 files changed, 1 insertion(+), 4 deletions(-)
+On Monday 09 April 2012 14:49:10 Yann E. MORIN wrote:
+> Currently, scripts/config removes the leading double-quote from
+> string options, but leaves the trailing double-quote.
+> 
+> Also, double-quotes in a string are escaped, but scripts/config
+> does not unescape those when printing
+> 
+> Finally, scripts/config does not escape double-quotes when setting
+> string options.
 
-diff --git a/arch/x86/realmode/Makefile b/arch/x86/realmode/Makefile
-index f22a4f8..615878e 100644
---- a/arch/x86/realmode/Makefile
-+++ b/arch/x86/realmode/Makefile
-@@ -15,6 +15,3 @@ $(obj)/rmpiggy.o: $(obj)/rm/realmode.relocs $(obj)/rm/realmode.bin
- 
- $(obj)/rm/realmode.bin: FORCE
- 	$(Q)$(MAKE) $(build)=$(obj)/rm $@
--
--$(obj)/rm/realmode.relocs: FORCE
--	$(Q)$(MAKE) $(build)=$(obj)/rm $@
-diff --git a/arch/x86/realmode/rm/Makefile b/arch/x86/realmode/rm/Makefile
-index de40bc4..1c1d3d3 100644
---- a/arch/x86/realmode/rm/Makefile
-+++ b/arch/x86/realmode/rm/Makefile
-@@ -48,7 +48,7 @@ $(obj)/realmode.elf: $(obj)/realmode.lds $(REALMODE_OBJS) FORCE
- 
- OBJCOPYFLAGS_realmode.bin := -O binary
- 
--$(obj)/realmode.bin: $(obj)/realmode.elf
-+$(obj)/realmode.bin: $(obj)/realmode.elf $(obj)/realmode.relocs
- 	$(call if_changed,objcopy)
- 
- quiet_cmd_relocs = RELOCS  $@
+Ping? I have not seen this in your tree yet...
+
+Regards,
+Yann E. MORIN.
+
 -- 
-1.7.9.5
-
+.-----------------.--------------------.------------------.--------------------.
+|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
+| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
+| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
+| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
+'------------------------------^-------^------------------^--------------------'
