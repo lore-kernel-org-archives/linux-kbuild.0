@@ -1,45 +1,83 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp03.smtpout.orange.fr ([80.12.242.125]:41246 "EHLO
-	smtp.smtpout.orange.fr" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751720Ab2EIV2A (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 9 May 2012 17:28:00 -0400
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: Re: [PATCH] scripts/config: properly report and set string options
-Date: Wed, 9 May 2012 23:27:55 +0200
-References: <1333975750-12154-1-git-send-email-yann.morin.1998@free.fr>
-In-Reply-To: <1333975750-12154-1-git-send-email-yann.morin.1998@free.fr>
+Received: from mail-lpp01m010-f46.google.com ([209.85.215.46]:59396 "EHLO
+	mail-lpp01m010-f46.google.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1758466Ab2EIW6s convert rfc822-to-8bit
+	(ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 9 May 2012 18:58:48 -0400
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-15"
-Content-Transfer-Encoding: 7bit
-Message-Id: <201205092327.55249.yann.morin.1998@free.fr>
+In-Reply-To: <20120508165118.GA11750@merkur.ravnborg.org>
+References: <20120428205651.GA7426@merkur.ravnborg.org> <20120428205919.GC7442@merkur.ravnborg.org>
+ <4FA460AB.6060309@suse.cz> <20120505082916.GA14006@merkur.ravnborg.org>
+ <CA+8MBbKd9zAouJy5JvUnLwUHMJ65HsYgCTfBgv42nm32EnMPFA@mail.gmail.com> <20120508165118.GA11750@merkur.ravnborg.org>
+From: Paul Gortmaker <paul.gortmaker@windriver.com>
+Date: Wed, 9 May 2012 18:58:16 -0400
+Message-ID: <CAP=VYLobO--uwxv_hiMYBnjD-AU_0fqyQJD6argQygnkHnm5Vg@mail.gmail.com>
+Subject: Re: [PATCH 3/4] kbuild: link of vmlinux moved to a script
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: Tony Luck <tony.luck@gmail.com>, Michal Marek <mmarek@suse.cz>, linux arch <linux-arch@vger.kernel.org>, lkml <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Richard Weinberger <richard@nod.at>, "David S. Miller" <davem@davemloft.net>, Arnaud Lacombe <lacombar@gmail.com>, Andi Kleen <andi@firstfloor.org>, ralf@linux-mips.org, linux-mips@linux-mips.org
 
-Michal, All,
+On Tue, May 8, 2012 at 12:51 PM, Sam Ravnborg <sam@ravnborg.org> wrote:
+> Hi Tony.
+>
+> On Mon, May 07, 2012 at 04:15:44PM -0700, Tony Luck wrote:
+>> This patch is now in linux-next (tag next-20120507). But it looks to have
+>> broken the ia64 build. I see this error:
+>>
+>>   CC      init/version.o
+>>   LD      init/built-in.o
+>>   KSYM    .tmp_kallsyms1.o
+>> ld: .tmp_kallsyms1.o: linking constant-gp files with non-constant-gp files
+>> ld: failed to merge target specific data of file .tmp_kallsyms1.o
+>> make: *** [vmlinux] Error 1
+>>
+>> which looks like we used the wrong compile options when building
+>> .tmp_kallsyms1.o
+>
+> Thanks for testing!
+>
+> Could you try if this helps.
+>
+>        Sam
+>
+> diff --git a/scripts/link-vmlinux.sh b/scripts/link-vmlinux.sh
+> index 26c5b65..1f4c27b 100644
+> --- a/scripts/link-vmlinux.sh
+> +++ b/scripts/link-vmlinux.sh
+> @@ -78,8 +78,8 @@ kallsyms()
+>                kallsymopt=--all-symbols
+>        fi
+>
+> -       local aflags="${KBUILD_AFLAGS} ${NOSTDINC_FLAGS}                     \
+> -                     ${LINUXINCLUDE} ${KBUILD_CPPFLAGS}"
+> +       local aflags="${KBUILD_AFLAGS} ${KBUILD_AFLAGS_KERNEL}               \
+> +                     ${NOSTDINC_FLAGS} ${LINUXINCLUDE} ${KBUILD_CPPFLAGS}"
 
-On Monday 09 April 2012 14:49:10 Yann E. MORIN wrote:
-> Currently, scripts/config removes the leading double-quote from
-> string options, but leaves the trailing double-quote.
-> 
-> Also, double-quotes in a string are escaped, but scripts/config
-> does not unescape those when printing
-> 
-> Finally, scripts/config does not escape double-quotes when setting
-> string options.
+All the linux-next builds for mips are failing, which I tracked down to this.
+Applying the above update doesn't help.  What is happening is that MIPS
+gets KBUILD_CPPFLAGS double-quoted, and then you get:
 
-Ping? I have not seen this in your tree yet...
++ mips-wrs-linux-gnu-nm -n .tmp_vmlinux1
++ scripts/kallsyms
++ mips-wrs-linux-gnu-gcc -D__ASSEMBLY__ <..snip..>  -D__KERNEL__
+'-D"VMLINUX_LOAD_ADDRESS=0xffffffff81100000"' '-D"DATAOFFSET=0"' -c -o
+.tmp_kallsyms1.o -x assembler-with-cpp -
+<command-line>:0: error: macro names must be identifiers
+<command-line>:0: error: macro names must be identifiers
+make[1]: *** [vmlinux] Error 1
 
-Regards,
-Yann E. MORIN.
+Note the  '-D"VMLINUX_LOAD_ADDRESS=0xffffffff81100000"' '-D"DATAOFFSET=0"'
+part -- that is what triggers the two above errors.
 
--- 
-.-----------------.--------------------.------------------.--------------------.
-|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
-| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
-| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
-| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
-'------------------------------^-------^------------------^--------------------'
+Paul.
+
+>
+>        ${NM} -n ${1} | \
+>                scripts/kallsyms ${kallsymopt} | \
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-arch" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
