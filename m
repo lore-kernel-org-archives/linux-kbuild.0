@@ -1,45 +1,140 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pb0-f46.google.com ([209.85.160.46]:64156 "EHLO
-	mail-pb0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755393Ab2EIHM5 (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 9 May 2012 03:12:57 -0400
-Message-ID: <4FAA18F1.6080508@redhat.com>
-Date: Wed, 09 May 2012 09:12:49 +0200
-From: Paolo Bonzini <pbonzini@redhat.com>
-MIME-Version: 1.0
-Subject: Re: [PATCH 04/23] x86, realmode: Move reboot_32.S to unified realmode
- code
-References: <1336501366-28617-1-git-send-email-jarkko.sakkinen@intel.com> <1336501366-28617-5-git-send-email-jarkko.sakkinen@intel.com>
-In-Reply-To: <1336501366-28617-5-git-send-email-jarkko.sakkinen@intel.com>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+Received: from nat28.tlf.novell.com ([130.57.49.28]:40592 "EHLO
+	nat28.tlf.novell.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1758900Ab2EIJCB convert rfc822-to-8bit (ORCPT
+	<rfc822;groupwise-linux-kbuild@vger.kernel.org:2:1>);
+	Wed, 9 May 2012 05:02:01 -0400
+Message-Id: <4FAA4BBE020000780008270E@nat28.tlf.novell.com>
+Date: Wed, 09 May 2012 09:49:34 +0100
+From: "Jan Beulich" <JBeulich@suse.com>
+Subject: [PATCH 5/5, resend] kbuild: move some .pci_fixup_* sections
+ into .init
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8BIT
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jarkko Sakkinen <jarkko.sakkinen@intel.com>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Sam Ravnborg <sam@ravnborg.org>, Joseph Cihula <joseph.cihula@intel.com>, Shane Wang <shane.wang@intel.com>, hpa@linux.intel.com
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Il 08/05/2012 20:22, Jarkko Sakkinen ha scritto:
-> +	xorl	%ecx, %ecx
-> +	movl	%cr0, %edx
-> +	andl	$0x00000011, %edx
-> +	orl	$0x60000000, %edx
-> +	movl	%edx, %cr0
-> +	movl	%ecx, %cr3
-> +	movl	%cr0, %edx
-> +	andl	$0x60000000, %edx	/* If no cache bits -> no wbinvd */
+.pci_fixup_final is only used from .init.text, and hence can (along
+with the respective handler functions) reside in .init.*.
 
-Shouldn't this be a testl?
+Several other .pci_fixup_* sections are needed only during boot and
+suspend/resume, and can therefore be moved into .init.* if
+!CONFIG_PM.
 
-> +	jz	2f
-> +	wbinvd
-> +2:
-> +	andb	$0x10, %dl
+While generally section mismatch checking is being turned on by this
+patch for all of .pci_fixup_*, for .pci_fixup_header it is being
+suppressed for the moment as it caused way too much fallout.
+Theoretically all respective handlers must get their __init/__devinit
+removed, as this gets processed from a non-__init, non-__devinit
+function.
 
-... because otherwise this is really a mov $0, %edx and it sounds wrong.
- It doesn't really matter, nobody really uses bit 4 of CR0 anymore,
-still would be nice to fix it.
+Signed-off-by: Jan Beulich <jbeulich@suse.com>
 
-> +	movl	%edx, %cr0
+---
+ include/asm-generic/vmlinux.lds.h |   45 ++++++++++++++++++++------------------
+ scripts/mod/modpost.c             |   11 +++++----
+ 2 files changed, 31 insertions(+), 25 deletions(-)
 
-Paolo
+--- 3.4-rc6/include/asm-generic/vmlinux.lds.h
++++ 3.4-rc6-pci-fixup-sections/include/asm-generic/vmlinux.lds.h
+@@ -98,6 +98,19 @@
+ #define MEM_DISCARD(sec) *(.mem##sec)
+ #endif
+ 
++#define PCI_FIXUPS(what)				\
++	VMLINUX_SYMBOL(__start_pci_fixups_##what) = .;	\
++	*(.pci_fixup_##what)				\
++	VMLINUX_SYMBOL(__end_pci_fixups_##what) = .;
++
++#ifdef CONFIG_PM
++#define PCI_FIXUPS_PM_KEEP PCI_FIXUPS
++#define PCI_FIXUPS_PM_DISCARD(what)
++#else
++#define PCI_FIXUPS_PM_KEEP(what)
++#define PCI_FIXUPS_PM_DISCARD PCI_FIXUPS
++#endif
++
+ #ifdef CONFIG_FTRACE_MCOUNT_RECORD
+ #define MCOUNT_REC()	. = ALIGN(8);				\
+ 			VMLINUX_SYMBOL(__start_mcount_loc) = .; \
+@@ -234,27 +247,12 @@
+ 									\
+ 	/* PCI quirks */						\
+ 	.pci_fixup        : AT(ADDR(.pci_fixup) - LOAD_OFFSET) {	\
+-		VMLINUX_SYMBOL(__start_pci_fixups_early) = .;		\
+-		*(.pci_fixup_early)					\
+-		VMLINUX_SYMBOL(__end_pci_fixups_early) = .;		\
+-		VMLINUX_SYMBOL(__start_pci_fixups_header) = .;		\
+-		*(.pci_fixup_header)					\
+-		VMLINUX_SYMBOL(__end_pci_fixups_header) = .;		\
+-		VMLINUX_SYMBOL(__start_pci_fixups_final) = .;		\
+-		*(.pci_fixup_final)					\
+-		VMLINUX_SYMBOL(__end_pci_fixups_final) = .;		\
+-		VMLINUX_SYMBOL(__start_pci_fixups_enable) = .;		\
+-		*(.pci_fixup_enable)					\
+-		VMLINUX_SYMBOL(__end_pci_fixups_enable) = .;		\
+-		VMLINUX_SYMBOL(__start_pci_fixups_resume) = .;		\
+-		*(.pci_fixup_resume)					\
+-		VMLINUX_SYMBOL(__end_pci_fixups_resume) = .;		\
+-		VMLINUX_SYMBOL(__start_pci_fixups_resume_early) = .;	\
+-		*(.pci_fixup_resume_early)				\
+-		VMLINUX_SYMBOL(__end_pci_fixups_resume_early) = .;	\
+-		VMLINUX_SYMBOL(__start_pci_fixups_suspend) = .;		\
+-		*(.pci_fixup_suspend)					\
+-		VMLINUX_SYMBOL(__end_pci_fixups_suspend) = .;		\
++		PCI_FIXUPS(early)					\
++		PCI_FIXUPS(header)					\
++		PCI_FIXUPS(enable)					\
++		PCI_FIXUPS_PM_KEEP(resume)				\
++		PCI_FIXUPS_PM_KEEP(resume_early)			\
++		PCI_FIXUPS_PM_KEEP(suspend)				\
+ 	}								\
+ 									\
+ 	/* Built-in firmware blobs */					\
+@@ -486,6 +484,11 @@
+ 	CPU_DISCARD(init.data)						\
+ 	MEM_DISCARD(init.data)						\
+ 	KERNEL_CTORS()							\
++	. = ALIGN(16);							\
++	PCI_FIXUPS(final)						\
++	PCI_FIXUPS_PM_DISCARD(resume)					\
++	PCI_FIXUPS_PM_DISCARD(resume_early)				\
++	PCI_FIXUPS_PM_DISCARD(suspend)					\
+ 	*(.init.rodata)							\
+ 	MCOUNT_REC()							\
+ 	FTRACE_EVENTS()							\
+--- 3.4-rc6/scripts/mod/modpost.c
++++ 3.4-rc6-pci-fixup-sections/scripts/mod/modpost.c
+@@ -853,7 +853,8 @@ static void check_section(const char *mo
+ #define ALL_INIT_DATA_SECTIONS \
+ 	".init.setup$", ".init.rodata$", \
+ 	".devinit.rodata$", ".cpuinit.rodata$", ".meminit.rodata$", \
+-	".init.data$", ".devinit.data$", ".cpuinit.data$", ".meminit.data$"
++	".init.data$", ".devinit.data$", ".cpuinit.data$", ".meminit.data$", \
++	".pci_fixup_final$", ".pci_fixup_suspend*", ".pci_fixup_resume*"
+ #define ALL_EXIT_DATA_SECTIONS \
+ 	".exit.data$", ".devexit.data$", ".cpuexit.data$", ".memexit.data$"
+ 
+@@ -870,11 +871,13 @@ static void check_section(const char *mo
+ #define ALL_INIT_SECTIONS INIT_SECTIONS, ALL_XXXINIT_SECTIONS
+ #define ALL_EXIT_SECTIONS EXIT_SECTIONS, ALL_XXXEXIT_SECTIONS
+ 
+-#define DATA_SECTIONS ".data$", ".data.rel$"
++#define DATA_SECTIONS ".data$", ".data.rel$", ".pci_fixup$", \
++	".pci_fixup_early$", ".pci_fixup_enable$"/*, ".pci_fixup_header$"*/
+ #define TEXT_SECTIONS ".text$"
+ 
+-#define INIT_SECTIONS      ".init.*"
+-#define DEV_INIT_SECTIONS  ".devinit.*"
++#define INIT_SECTIONS      ".init.*", ".pci_fixup_final$"
++#define DEV_INIT_SECTIONS  ".devinit.*", \
++	".pci_fixup_suspend*", ".pci_fixup_resume*"
+ #define CPU_INIT_SECTIONS  ".cpuinit.*"
+ #define MEM_INIT_SECTIONS  ".meminit.*"
+ 
+
+
