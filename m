@@ -1,47 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pos.postmodernsublime.com ([174.121.243.129]:46662 "EHLO
-	pos.postmodernsublime.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755067Ab2ENH4L (ORCPT
+Received: from educacao.niteroi.urbi.com.br ([200.152.56.131]:38312 "EHLO
+	FMEmail.localdomain" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1751416Ab2EOFtx (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 14 May 2012 03:56:11 -0400
-Received: from imthelaw by pos.postmodernsublime.com with local (Exim 4.77)
-	(envelope-from <imthelaw@pos.postmodernsublime.com>)
-	id 1STnIT-0005Fv-Ey
-	for linux-kbuild@vger.kernel.org; Sun, 13 May 2012 23:54:13 -0500
-Subject: HP  TONERS  Cartridge
-From: dan rhodes <n0_reply@e-mailusa.us>
-Reply-To: danstationeryproductsupply@gmail.com
+	Tue, 15 May 2012 01:49:53 -0400
+Message-ID: <20120509022758.yrl0e5oxkwcswg4w@webmail.educacao.niteroi.rj.gov.br>
+Date: Wed, 09 May 2012 02:27:58 -0400
+From: "Mr.Saeed Ahmed." <seal@co.net>
+Reply-to: mr.saeed01@linuxmail.org
+Subject: Will You Be Trusted?
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7BIT
-Message-Id: <E1STnIT-0005Fv-Ey@pos.postmodernsublime.com>
-Date: Sun, 13 May 2012 23:54:13 -0500
+Content-Type: text/plain;
+	charset=ISO-8859-1;
+	DelSp="Yes";
+	format="flowed"
+Content-Disposition: inline
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-
-Can  you  send  me  the pricing  and  availablity  of this  product
-
- LASER JET PRINT CARTRIDGE, (OEM ONLY)
- HP LASER JET PRINT CARTRIDGE
- 1Q6000A (OEM ONLY)
- 2. HEWC9730A (30A) (OEM ONLY)
- 3. HEWC9731A (31A) (OEM ONLY)
- 4. Q5942A (42A)(OEM ONLY)
- 5. HP Q7551A (51A)(OEM ONLY)
- 6. HP Q3964A (64A) BLACK  COULOUR ONLY (OEM ONLY)
- 7  HP    Q7553A 53A)  OEM ONLY
- 8 NEW & USED, COMPUTERS  NOTEBOOK
-9 USB  FLASH  DRIVES
-
- The mode of our  payment  is   with  our visa, master
- cards
-
-
-Hope  to  read  from  you  asap
-DAN RHODES
-CA 90703
 
 
 
+Dear Friend,
+
+As you read this, I don't want you to feel sorry for me,because, I
+believe everyone will die someday,and am contacting you because
+I really do need your help and I want you to help me with all your
+effort and time for just seven to fourteen workings days of your time.I
+want you to be honest and truthful with me that you will help me
+with my last wish as a dying man.
+
+Please i need a reliable person who will usethe Money($18 milliondollars)to
+build orphanage home or charity organization.
+
+Please kindly reply to my most confidential email if you are really
+interested in helping me please: mr.saeed01@linuxmail.org
+
+
+God be with you.
+
+Mr.Saeed Ahmed.
+
+----------------------------------------------------------------
+FME Webmail
+www.educacao.niteroi.rj.gov.br
 
