@@ -1,21 +1,26 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from 9.subnet118-97-90.static.astinet.telkom.net.id ([118.97.90.9]:50304
-	"EHLO zm.dephut.go.id" rhost-flags-OK-FAIL-OK-OK) by vger.kernel.org
-	with ESMTP id S1758485Ab2EKCLP (ORCPT
+Received: from mail-ob0-f194.google.com ([209.85.214.194]:41859 "EHLO
+	mail-ob0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752956Ab2EKHNh (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 10 May 2012 22:11:15 -0400
-Date: Sun, 6 May 2012 01:59:22 +0700 (WIT)
-From: Mrs Sabah Halif <mangrove@dephut.go.id>
-Reply-To: Mrs Sabah Halif <sabah.halif12@hotmail.com>
-Message-ID: <6892760.345591336244362205.JavaMail.root@zm>
-Subject: 
+	Fri, 11 May 2012 03:13:37 -0400
+Received: by obbtb18 with SMTP id tb18so1339184obb.1
+        for <linux-kbuild@vger.kernel.org>; Fri, 11 May 2012 00:13:37 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Date: Fri, 11 May 2012 00:13:37 -0700
+Message-ID: <CAP1+q6g_jHRAi14NfVkFDWhbCOk8pbaof-_ZmpRrPXeCYtvntQ@mail.gmail.com>
+Subject: 
+From: rita clems <ritaclemsloancompany@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 
-
-
--- 
-Good day,my name is Mrs Sabah Halif  i have a business proposal please contact me for details.
+Hello,  Are You Financially Squeezed? Do You Seek A Loan To Clear Your
+Debts/Bills? Do You Seek Finance To Set Up Your  Own Business ? Do You
+Seek Funding For Various Other Processes? Apply for Loan offer ? Are
+you in search of a legit  loan?Tired of Seeking Loans and Mortgages?
+Have you been turned down by your banks ?Have you also been scammed
+once?Then your financial trauma is over We Offer LOANS from $3,000.00
+to $10,000,000..00 Max at 3% interest rate.We  are certified and
+trustworthy. we can help you with financial assistance. if interested
+contact us via email  ritaclemsloancompany@gmail.com
