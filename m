@@ -1,61 +1,38 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from gerard.telenet-ops.be ([195.130.132.48]:50579 "EHLO
-	gerard.telenet-ops.be" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756038Ab2ELUjR (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 12 May 2012 16:39:17 -0400
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Subject: [PATCH 1/4] [-next] Makefile: Do not call cc-option before including the arch's Makefile
-Date: Sat, 12 May 2012 22:39:05 +0200
-Message-Id: <1336855148-18817-1-git-send-email-geert@linux-m68k.org>
+Received: from mga01.intel.com ([192.55.52.88]:45571 "EHLO mga01.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1756544Ab2EMBBJ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 12 May 2012 21:01:09 -0400
+Date: Sat, 12 May 2012 18:01:08 -0700
+From: Andi Kleen <ak@linux.intel.com>
+Subject: Re: [PATCH 1/4] [-next] Makefile: Do not call cc-option before
+ including the arch's Makefile
+Message-ID: <20120513010108.GD27196@tassilo.jf.intel.com>
+References: <1336855148-18817-1-git-send-email-geert@linux-m68k.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1336855148-18817-1-git-send-email-geert@linux-m68k.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org
-Cc: Geert Uytterhoeven <geert@linux-m68k.org>, Andi Kleen <ak@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org, "H. Peter Anvin" <hpa@zytor.com>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
 
-On architectures that setup CROSS_COMPILE in their arch/*/Makefile
-(blackfin, h8300, m68k, mips, parisc, score, sh, tile, unicore32, xtensa),
-cc-option may check against the wrong compiler, causing errors like
+On Sat, May 12, 2012 at 10:39:05PM +0200, Geert Uytterhoeven wrote:
+> On architectures that setup CROSS_COMPILE in their arch/*/Makefile
+> (blackfin, h8300, m68k, mips, parisc, score, sh, tile, unicore32, xtensa),
+> cc-option may check against the wrong compiler, causing errors like
+> 
+> cc1: error: unrecognized command line option "-fno-ipa-cp-clone"
+> 
+> if the host gcc supports -fno-ipa-cp-clone, while the cross compiler
+> doesn't support that option.
+> 
+> Move the CONFIG_READABLE_ASM section below the inclusion of the arch's
+> Makefile to fix this.
 
-cc1: error: unrecognized command line option "-fno-ipa-cp-clone"
+Thanks Geert for tracking that down.
 
-if the host gcc supports -fno-ipa-cp-clone, while the cross compiler
-doesn't support that option.
+Michael, are the patches already in the queue or should I resubmit them?
 
-Move the CONFIG_READABLE_ASM section below the inclusion of the arch's
-Makefile to fix this.
-
-Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
-Cc: Andi Kleen <ak@linux.intel.com>
-Cc: H. Peter Anvin <hpa@zytor.com>
-Cc: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org
----
- Makefile |    4 ++--
- 1 files changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/Makefile b/Makefile
-index d17a616..77355ba 100644
---- a/Makefile
-+++ b/Makefile
-@@ -561,6 +561,8 @@ else
- KBUILD_CFLAGS	+= -O2
- endif
- 
-+include $(srctree)/arch/$(SRCARCH)/Makefile
-+
- ifdef CONFIG_READABLE_ASM
- # Disable optimizations that make assembler listings hard to read.
- # reorder blocks reorders the control in the function
-@@ -571,8 +573,6 @@ KBUILD_CFLAGS += $(call cc-option,-fno-reorder-blocks,) \
-                  $(call cc-option,-fno-partial-inlining)
- endif
- 
--include $(srctree)/arch/$(SRCARCH)/Makefile
--
- ifneq ($(CONFIG_FRAME_WARN),0)
- KBUILD_CFLAGS += $(call cc-option,-Wframe-larger-than=${CONFIG_FRAME_WARN})
- endif
--- 
-1.7.0.4
-
+-Andi
