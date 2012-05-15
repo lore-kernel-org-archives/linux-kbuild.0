@@ -1,30 +1,36 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from nat.scz.novell.com ([213.151.88.252]:37663 "EHLO pobox.suse.cz"
+Received: from nat.scz.novell.com ([213.151.88.252]:37683 "EHLO pobox.suse.cz"
 	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S965749Ab2EOWUN (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 15 May 2012 18:20:13 -0400
-Date: Wed, 16 May 2012 00:20:10 +0200
+	id S965749Ab2EOWUn (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 15 May 2012 18:20:43 -0400
+Date: Wed, 16 May 2012 00:14:27 +0200
 From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [PATCH 3/4] kbuild: link of vmlinux moved to a script
-Message-ID: <20120515222010.GB9277@pobox.suse.cz>
-References: <20120428205651.GA7426@merkur.ravnborg.org> <20120428205919.GC7442@merkur.ravnborg.org> <4FA460AB.6060309@suse.cz> <20120505082916.GA14006@merkur.ravnborg.org> <CA+8MBbKd9zAouJy5JvUnLwUHMJ65HsYgCTfBgv42nm32EnMPFA@mail.gmail.com> <20120508165118.GA11750@merkur.ravnborg.org> <CAP=VYLobO--uwxv_hiMYBnjD-AU_0fqyQJD6argQygnkHnm5Vg@mail.gmail.com> <20120510122210.GA17550@sepie.suse.cz> <4FABD436.7070402@windriver.com>
+Subject: Re: [PATCH] scripts/config: properly report and set string options
+Message-ID: <20120515221427.GA9277@pobox.suse.cz>
+References: <1333975750-12154-1-git-send-email-yann.morin.1998@free.fr> <201204192307.28282.yann.morin.1998@free.fr>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <4FABD436.7070402@windriver.com>
+In-Reply-To: <201204192307.28282.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Paul Gortmaker <paul.gortmaker@windriver.com>
-Cc: Sam Ravnborg <sam@ravnborg.org>, Tony Luck <tony.luck@gmail.com>, linux arch <linux-arch@vger.kernel.org>, lkml <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Richard Weinberger <richard@nod.at>, "David S. Miller" <davem@davemloft.net>, Arnaud Lacombe <lacombar@gmail.com>, Andi Kleen <andi@firstfloor.org>, ralf@linux-mips.org, linux-mips@linux-mips.org
+To: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Cc: linux-kbuild@vger.kernel.org
 
-On Thu, May 10, 2012 at 10:44:06AM -0400, Paul Gortmaker wrote:
-> On 12-05-10 08:22 AM, Michal Marek wrote:
-> > I think it should be as simple as the below patch. But I have no mips
-> > machine to verify myself.
+On Thu, Apr 19, 2012 at 11:07:28PM +0200, Yann E. MORIN wrote:
+> Michal, All,
 > 
-> Well I haven't boot tested it on anything either, but it does
-> seem to resolve the double quoting that caused the compile failure.
+> On Monday 09 April 2012 14:49:10 Yann E. MORIN wrote:
+> > Currently, scripts/config removes the leading double-quote from
+> > string options, but leaves the trailing double-quote.
+> > 
+> > Also, double-quotes in a string are escaped, but scripts/config
+> > does not unescape those when printing
+> > 
+> > Finally, scripts/config does not escape double-quotes when setting
+> > string options.
+> 
+> Ping? I have not seen this be applied to your tree, neither in for-next,
+> nor in rc-fixes.
 
-I applied it to kbuild.git#kbuild now.
-
-Michal
+I applied it to kbuild.git#kconfig now, sorry for the delay.
