@@ -1,36 +1,55 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from nat.scz.novell.com ([213.151.88.252]:37683 "EHLO pobox.suse.cz"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S965749Ab2EOWUn (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 15 May 2012 18:20:43 -0400
-Date: Wed, 16 May 2012 00:14:27 +0200
-From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [PATCH] scripts/config: properly report and set string options
-Message-ID: <20120515221427.GA9277@pobox.suse.cz>
-References: <1333975750-12154-1-git-send-email-yann.morin.1998@free.fr> <201204192307.28282.yann.morin.1998@free.fr>
+Received: from smtp.snhosting.dk ([87.238.248.203]:63296 "EHLO
+	smtp.domainteam.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752393Ab2EPEwJ (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 16 May 2012 00:52:09 -0400
+Date: Wed, 16 May 2012 06:52:08 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: [PATCH 0/8] kbuild: use script for final link, move
+	definitions out of top-level Makefile
+Message-ID: <20120516045208.GB340@merkur.ravnborg.org>
+References: <20120505080640.GA13773@merkur.ravnborg.org> <4FA57F52.5070808@suse.cz>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <201204192307.28282.yann.morin.1998@free.fr>
+In-Reply-To: <4FA57F52.5070808@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Cc: linux-kbuild@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, lkml <linux-kernel@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>, Arnaud Lacombe <lacombar@gmail.com>, Nick Bowler <nbowler@elliptictech.com>, Richard Weinberger <richard@nod.at>
 
-On Thu, Apr 19, 2012 at 11:07:28PM +0200, Yann E. MORIN wrote:
-> Michal, All,
-> 
-> On Monday 09 April 2012 14:49:10 Yann E. MORIN wrote:
-> > Currently, scripts/config removes the leading double-quote from
-> > string options, but leaves the trailing double-quote.
+On Sat, May 05, 2012 at 09:28:18PM +0200, Michal Marek wrote:
+> Dne 5.5.2012 10:06, Sam Ravnborg napsal(a):
+> > Hi Michal, all.
 > > 
-> > Also, double-quotes in a string are escaped, but scripts/config
-> > does not unescape those when printing
+> > o Move the link of vmlinux from top-level Makefile to a script.
+> >   This increased the readability a lot.
+> >   They have had a few rounds of reviews and are ready.
 > > 
-> > Finally, scripts/config does not escape double-quotes when setting
-> > string options.
+> > o Move a lot of definitions from top-level Makefile to
+> >   two new files located in scripts/
+> > 
+> > o Fix so we do not call CC too often when using W=...
+> > 
+> > o Fix so KCFLAGS (and friends) are added last to the
+> >   command lines.
+> > 
+> > Patches 1-4 are ready to be applied.
+> > Patches 5-8 are new and may raise a few comments.
 > 
-> Ping? I have not seen this be applied to your tree, neither in for-next,
-> nor in rc-fixes.
+> I merged 1-4 now, I'll look at the rest later.
 
-I applied it to kbuild.git#kconfig now, sorry for the delay.
+Hi Michal.
+
+We are too close to the merge window to
+apply patch 5-8.
+
+I plan to resubmit them around -rc2 time,
+then we should have time for review
+and test.
+
+Any comments until then are of course welcome,
+but I expect you to wait until next submission.
+
+	Sam
