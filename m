@@ -1,45 +1,21 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.snhosting.dk ([87.238.248.203]:60364 "EHLO
-	smtp.domainteam.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751609Ab2ETJ1q (ORCPT
+Received: from mailgw.rcc.edu ([204.69.1.15]:49900 "EHLO mailgw.rcc.edu"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754726Ab2ETN2G convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 20 May 2012 05:27:46 -0400
-Date: Sun, 20 May 2012 11:27:44 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH 1/4] [-next] Makefile: Do not call cc-option before
-	including the arch's Makefile
-Message-ID: <20120520092744.GA21341@merkur.ravnborg.org>
-References: <1336855148-18817-1-git-send-email-geert@linux-m68k.org>
+	Sun, 20 May 2012 09:28:06 -0400
+From: <Anthony.Escalera@rcc.edu>
+Date: Sun, 20 May 2012 06:16:07 -0700
+Subject: 
+Message-ID: <0F9C97E8E171FF4D81F6404D830BA1FBCD7767EE72@MBX01.rccd.net>
+Content-Language: en-US
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1336855148-18817-1-git-send-email-geert@linux-m68k.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Geert Uytterhoeven <geert@linux-m68k.org>, Michal Marek <mmarek@suse.cz>
-Cc: linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org, Andi Kleen <ak@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>, linux-kbuild@vger.kernel.org
+To: notice@database.com
 
-On Sat, May 12, 2012 at 10:39:05PM +0200, Geert Uytterhoeven wrote:
-> On architectures that setup CROSS_COMPILE in their arch/*/Makefile
-> (blackfin, h8300, m68k, mips, parisc, score, sh, tile, unicore32, xtensa),
-> cc-option may check against the wrong compiler, causing errors like
-> 
-> cc1: error: unrecognized command line option "-fno-ipa-cp-clone"
-> 
-> if the host gcc supports -fno-ipa-cp-clone, while the cross compiler
-> doesn't support that option.
-> 
-> Move the CONFIG_READABLE_ASM section below the inclusion of the arch's
-> Makefile to fix this.
-> 
-> Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
-> Cc: Andi Kleen <ak@linux.intel.com>
-> Cc: H. Peter Anvin <hpa@zytor.com>
-> Cc: Michal Marek <mmarek@suse.cz>
-> Cc: linux-kbuild@vger.kernel.org
 
-Michal - was this serie ever applied to kbuild?
 
-Acked-by: Sam Ravnborg <sam@ravnborg.org>
-
-	Sam
+Your e-mail won £1,000,000.00 in the BBC 2012 bonanza, For claims, Send your details to Mr.Roy Calton viaE-mail: mrcaltonclaimsunit1@9.cn PHONE:+447553197697
