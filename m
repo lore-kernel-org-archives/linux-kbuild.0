@@ -1,39 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from s15434952.onlinehome-server.info ([82.165.150.156]:50657 "EHLO
-	s15434952.onlinehome-server.info" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1753988Ab2ETRXL (ORCPT
+Received: from oproxy9.bluehost.com ([69.89.24.6]:51657 "HELO
+	oproxy9.bluehost.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with SMTP id S1756728Ab2EUCt2 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 20 May 2012 13:23:11 -0400
-Received: from s15434952.onlinehome-server.info (unknown [127.0.0.1])
-	by s15434952.onlinehome-server.info (Postfix) with ESMTP id 2B95A421B19
-	for <linux-kbuild@vger.kernel.org>; Sun, 20 May 2012 17:13:14 +0000 (UTC)
-Subject: Order Enquiry
-From: Mcckoy Robertson <nbmglobalsupply@gmail.com>
-Reply-To: nbmglobalsupply@gmail.com
+	Sun, 20 May 2012 22:49:28 -0400
+Message-ID: <4FB9AD3C.3040909@xenotime.net>
+Date: Sun, 20 May 2012 19:49:32 -0700
+From: Randy Dunlap <rdunlap@xenotime.net>
 MIME-Version: 1.0
-Content-Type: text/plain
-Content-Transfer-Encoding: 8bit
-Message-Id: <20120520165819.2A8E645AF2F@s15434952.onlinehome-server.info>
-Date: Sun, 20 May 2012 17:58:18 +0100 (BST)
+Subject: [PATCH 1/3] scripts/patch-kernel: fix typos and compression comment
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
+To: LKML <linux-kernel@vger.kernel.org>
+Cc: linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>
 
+From: Randy Dunlap <rdunlap@xenotime.net>
 
-Hello Sales
-     I went over your contact online and found some items which we have interest in purchasing to our store in Spain for urgent supply. I will like to know the prices per each items plus the shipping cost. I also want to know if Letter of Credit or T/T is acceptable for payment. I await your quick response asap so i can proceed with my needed items and quantity.
+Fix typo, drop trailing whitespace, and add "xz" to list of
+compression types supported.
 
-Thank you
-mcckoy robertson
+Signed-off-by: Randy Dunlap <rdunlap@xenotime.net>
+---
+ scripts/patch-kernel |    6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-
-N.B.M Global Supply Inc
-Address: Autovía A-5,
-salidas 22 y 26.
-Arroyomolinos,
-28939 Madrid Spain
-Tel: +34 902 26 77 26
-Email: nbmglobalsupply@gmail.com
-Website : http://www.brplastics.com
-
-
+--- lnx-34-rc7-pk.orig/scripts/patch-kernel
++++ lnx-34-rc7-pk/scripts/patch-kernel
+@@ -26,8 +26,8 @@
+ #
+ #       Nick Holloway <Nick.Holloway@alfie.demon.co.uk>, 2nd January 1995.
+ #
+-# Added support for handling multiple types of compression. What includes
+-# gzip, bzip, bzip2, zip, compress, and plaintext. 
++# Added support for handling multiple types of compression. That includes
++# gzip, bzip, bzip2, zip, compress, xz, and plaintext.
+ #
+ #       Adam Sulmicki <adam@cfar.umd.edu>, 1st January 1997.
+ #
+@@ -159,7 +159,7 @@ applyPatch () {
+   fi
+   # Remove backup files
+   find $sourcedir/ '(' -name '*.orig' -o -name '.*.orig' ')' -exec rm -f {} \;
+- 
++
+   return 0;
+ }
+ 
