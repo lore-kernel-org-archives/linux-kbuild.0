@@ -1,47 +1,77 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from hrndva-omtalb.mail.rr.com ([71.74.56.122]:15671 "EHLO
-	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932477Ab2EVVTo (ORCPT
+Received: from smtp03.smtpout.orange.fr ([80.12.242.125]:58056 "EHLO
+	smtp.smtpout.orange.fr" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1758200Ab2EVWLc (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 22 May 2012 17:19:44 -0400
-Date: Tue, 22 May 2012 17:19:41 -0400
-From: Steven Rostedt <rostedt@goodmis.org>
+	Tue, 22 May 2012 18:11:32 -0400
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
 Subject: Re: kconfig-frontends-3.4.0-0 released
-Message-ID: <20120522211941.GA30024@home.goodmis.org>
-References: <201205222221.05548.yann.morin.1998@free.fr>
+Date: Wed, 23 May 2012 00:11:28 +0200
+References: <201205222221.05548.yann.morin.1998@free.fr> <20120522211941.GA30024@home.goodmis.org>
+In-Reply-To: <20120522211941.GA30024@home.goodmis.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <201205222221.05548.yann.morin.1998@free.fr>
+Content-Type: Text/Plain;
+  charset="iso-8859-1"
+Content-Transfer-Encoding: 7bit
+Message-Id: <201205230011.29257.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Yann E. MORIN" <yann.morin.1998@free.fr>
+To: Steven Rostedt <rostedt@goodmis.org>
 Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Tue, May 22, 2012 at 10:21:05PM +0200, Yann E. MORIN wrote:
-> Hello All!
-> 
-> I'm pleased to announce the release of kconfig-frontends 3.4.0-0!
-> Go download it there:
->     http://ymorin.is-a-geek.org/download/kconfig-frontends/kconfig-frontends-3.4.0-0.tar.xz
->     http://ymorin.is-a-geek.org/download/kconfig-frontends/kconfig-frontends-3.4.0-0.tar.bz2
-> 
-> The kconfig-frontends package provides the kconfig parser, as well as all the
-> kconfig frontends and utilities, packaged using the traditional autotools, so
-> the kconfig infrastructure is easy to deploy, either locally or system-wide.
-> 
-> What's new since 3.3.0-0:
->   - all programs are intalled with the 'kconfig-' prefix by default
->   - the kconfig documentation has been added
->   - the parser's headers are isntalled into their own sub-dir
->   - some side utilities have been added from the Linux kernel tree:
->     - kconfig-diff      show differences between two .config files
+Steven, All,
 
-I'm curious, how is this different than scripts/diffconfig ?
-
--- Steve
-
->     - kconfig-gettext   prepare catalog of options strings for L10n
->     - kconfig-merge     merge .config fragments
->     - kconfig-tweak     get and set .config optiond from the command line
+On Tuesday 22 May 2012 23:19:41 Steven Rostedt wrote:
+> >   - some side utilities have been added from the Linux kernel tree:
+> >     - kconfig-diff      show differences between two .config files
 > 
+> I'm curious, how is this different than scripts/diffconfig ?
+
+It's exactly the same.
+
+The kconfig-frontends package is created by extracting the needed files from
+the linux kernel. So, kconfig-diff is exactly scripts/diffconfig. Also, it's
+what the line just above says: "added _from_ the Linux kernel tree" ;-)
+
+But the kconfig toolss in the linux tree are not using a common naming
+scheme. For example we have:
+    scripts/config
+    scripts/diffconfig
+    scripts/kconfig/merge_config.sh
+    scripts/kconfig/kxgettext
+    scripts/kconfig/conf
+    scripts/kconfig/mconf
+
+So, kconfig-frontends tries to use a meaningful naming scheme for all the
+programs it installs. Some are renamed, and they all get prefixed by default
+with 'kconfig-' (although that can be overriden at ./configure time with
+--program-prefix=...).
+
+In the package, the file scripts/kernel2kfrontends.list has the
+correspondence for what comes from the linux tree, and how it's named in
+the kconfig-frontends tree. For example, we have:
+    scripts/config                      -->  utils/tweak
+    scripts/diffconfig                  -->  utils/diff
+    scripts/kconfig/merge_config.sh     -->  utils/merge
+    scripts/kconfig/kxgettext.c         -->  utils/gettext.c
+
+The script scripts/ksync.sh (in kconfig-frontends) uses that file to
+automatically sync from a linux tree.
+
+There is virtually zero code written in the package (except for a few patches
+required for the packaging), so the behavior is exactly the same as if using
+the corresponding kconfig tools from the kernel.
+
+Please note, however, that this is only the second release of
+kconfig-frontends, and that things can still be improved upon! ;-)
+
+Regards,
+Yann E. MORIN.
+
+-- 
+.-----------------.--------------------.------------------.--------------------.
+|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
+| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
+| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
+| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
+'------------------------------^-------^------------------^--------------------'
