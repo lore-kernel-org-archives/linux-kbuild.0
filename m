@@ -1,67 +1,66 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from [121.101.215.35] ([121.101.215.35]:2915 "HELO traveler.com.cn"
-	rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with SMTP
-	id S1751055Ab2EUPrm (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 21 May 2012 11:47:42 -0400
-Message-ID: <20190520235437748723@traveler.com.cn>
-From: =?utf-8?B?5LuFMzAw5YWD77yM5pyJ5pWI5p6c5YaN5LuY5qy+?=
-	<admin@traveler.com.cn>
-Subject: =?utf-8?B?5pyA5paw5bm/5Lqk5Lya5Lmw5a625bqT77yMQjJC6K+i55uY5Lmw5a6244CBdGhv?=
-	=?utf-8?B?bWFzbmV0IOmHh+i0reWVhizmtbflhbPmlbDmja4s576k5Y+R6L2v5Lu2?=
-	=?utf-8?B?77yM5bGV5Lya5Lmw5a62IOS7hTMwMOWFgyE=?=
-Date: Mon, 20 May 2019 23:54:24 +0800
+Received: from smtp03.smtpout.orange.fr ([80.12.242.125]:54314 "EHLO
+	smtp.smtpout.orange.fr" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932296Ab2EVUVK (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 22 May 2012 16:21:10 -0400
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Subject: kconfig-frontends-3.4.0-0 released
+Date: Tue, 22 May 2012 22:21:05 +0200
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: Text/Plain;
+  charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <201205222221.05548.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linsz-78@163.com, linuaries@hotmail.com, linux_cd@163.net, linux_red@263.net, linux003@sina.com, linux24@ml.ascii.co.jp, linuxbird@telekbird.com.cn, linuxchina@263.net, linuxdocx@163.com, linux-kbuild@vger.kernel.org, linux-raid@vger.rutgers.edu
+To: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: "Yann E. MORIN" <yann.morin.1998@free.fr>
 
-MjAwOC0yMDEy5bm0OOWxiuW5v+S6pOS8muaVsOaNru+8jDIwMTDmtbflhbPmj5DljZVwaWVyc+eJ
-iDEwMDDkuIfmlbDmja7vvIzlhY3otLnmm7TmlrAyMDEy5bm05bm/5Lqk5Lya5Lmw5a625pWw5o2u
-44CCDQoNCuS4gOWFsTEw5Liq5YyFKOaVsOaNruaYr+WFqOihjOS4mueahO+8jOaMieeFp+ihjOS4
-muWIhuWlveexu++8jOW5tuS4lOWPr+S7peaMieeFp+WFs+mUruivjeaPkOWPluWHuuadpeeahCnv
-vJogDQox77yMMjAxMeeni+WtoyvmmKXlraPlub/kuqTkvJrkubDlrrbnjrDlnLror6Lnm5jmlbDm
-ja7lupPmlrDpspzlh7rngonvvIzotoXnuqfmlrDpspzkubDlrrbvvIzmlrDpspzmlbDmja7vvIzl
-rrnmmJPmiJDljZXvvIEgDQoy77yM6LSt5Lmw5ZCO5Y+v5Lul5YWN6LS55pu05pawMjAxMuaYpeWt
-o+W5v+S6pOS8misyMDEy56eL5a2j5bm/5Lqk5Lya5Lmw5a625pWw5o2u44CC5aSq6LaF5YC85LqG
-44CCDQoz77yMMjAxMuacgOaWsOWFqOeQg+WxleS8mueOsOWcuuS5sOWutuW6kyjkuI7otLjlj5Hl
-kIzmraUpLOWFsTQ25LiH5p2h5pWw5o2u44CCICjmjInnhafooYzkuJrliIbnsbspDQo077yMMjAx
-MOW5tCwyMDA55bm0LDIwMDjlubQg5pil5a2jK+eni+Wto+W5v+S6pOS8muS5sOWutuWQjeW9le+8
-jDEwMyAxMDQgMTA1IDEwNiAxMDcgMTA4IOWFseWFreWxiiDlhbExMjAuNuS4h+aVsOaNruOAgg0K
-Ne+8jDQ4LjY45LiH5p2h5pyA5paw5Lmw5a626K+i55uY77yM6YO95bim5pyJRW1haWzvvIzmnIDm
-nInku7flgLznmoTor6Lnm5jjgIINCjbvvIwyMDEx5pyA5pawIEIyQiDoi7Hmloflm73pmYXnq5k2
-MOS4h+W4puiBlOe7nOaWueW8j+ivouebmCDmnIDmnInku7flgLzor6Lnm5jkuYvkuIAuDQo377yM
-MjAxMOa1t+WFs+aPkOWNlXBpZXJz54mIMTAwMOS4h+aVsOaNri4NCjjvvIwyMDEx5bm05Yiw6aaZ
-5riv6YeH6LSt55qE5Zu95aSW5a6i5Lq65ZCN5b2VKOmmmea4r+i0uOWPkeWxgOaPkOS+mynvvIzo
-toXnuqfph43opoHnmoTkubDlrrbjgIINCjnvvIwyMDEx5bm05paw5aKe5Yqg55qELee+juWbvUIy
-QiB0aG9tYXNuZXQg6YeH6LSt5ZWG5ZCN5Y2V44CCDQoxMO+8jOe+pOWPkei9r+S7tuWuieijheS4
-jumDqOe9suacjeWKoeOAgg0KDQrov5nkupvlhajmnInvvIzlhbExMjgw5LiHIOaVsOaNruOAgg0K
-DQogDQropoHnmoTmipPntKfogZTns7tRUTogMTc2MDMwMTE4MyDmiJbogIXnq4vljbPlm57lpI3p
-gq7nrrE6IDE3NjAzMDExODNAcXEuY29tDQropoHnmoTmipPntKfogZTns7tRUTogMTc2MDMwMTE4
-MyDmiJbogIXnq4vljbPlm57lpI3pgq7nrrE6IDE3NjAzMDExODNAcXEuY29tDQropoHnmoTmipPn
-tKfogZTns7tRUTogMTc2MDMwMTE4MyDmiJbogIXnq4vljbPlm57lpI3pgq7nrrE6IDE3NjAzMDEx
-ODNAcXEuY29tDQoNCg0K6K+a5L+h5Li65pys77yM5aaC5p6c5LiN5L+h5Lu75pys5Lq6LOWPr+S7
-pei1sOa3mOWuneS6pOaYkyzmlLbliLDmlbDmja7pqozor4ExMOWkqeWQjuWGjeS7mOasvizov5nm
-mK/lr7nmgqjmnIDlpb3nmoTkv53pmpzkuobjgIIgDQoNCg0KDQrlsI/mioDlt6fvvJogDQrmioo1
-MDDkuIfkubDlrrbnvqTlj5Hku6XkuIDpgY3vvIzlnYfkvJrmnInmlbDljYPkuKrlm57lpI3nmoTv
-vIzov5nkupvlsLHmmK/pnZ7luLjpq5jotKjph4/nmoTkubDlrrbjgIIgDQrkvb/nlKjmiJHku6zp
-gIHnmoTnvqTlj5Hova/ku7bvvIwxLTLlkajlsLHlj6/lrozlhajlj5HlrozjgIINCg0KDQoNCg0K
-DQrlub/kuqTkvJrkubDlrrbmjInkuqflk4HnsbvliKvliIbnsbvvvIzliIbkuLrku6XkuIvlh6Dn
-sbvvvJoNCjEg5Yqe5YWs6K6+5aSHDQoyIOe8lue7h+WPiuiXpOmTgeW3peiJuuWTgQ0KMyDnjrvn
-koMNCjQg6aSQ5Y6o55So5YW3DQo1IOi9pui+hg0KNiDlpKflnovmnLrmorDlj4rorr7lpIcNCjcg
-55S15a2Q55S15rCUDQo4IOeUteWtkOa2iOi0ueWTgQ0KOSDnurrnu4cNCjEwIOacjeijhQ0KMTEg
-5Liq5Lq65oqk55CGDQoxMiDlt6XnqIvmnLrmorANCjEzIOW3peWFtw0KMTQg5YyW5belDQoxNSDo
-rqHnrpfmnLrlj4rpgJrorq8NCjE2IOWutuWxheeUqOWTgQ0KMTcg5a625bGF6KOF6aWwDQoxOCDl
-rrblhbcNCjE5IOWutueUqOeUteWZqA0KMjAg5bu6562R5Y+K6KOF6aWw5p2Q5paZDQoyMSDoioLm
-l6XnlKjlk4ENCjIyIOekvOWTgeWPiui1oOWTgQ0KMjMg5pGp5omY6L2mDQoyNCDmsb3ovabphY3k
-u7YNCjI1IOmjn+WTgQ0KMjYg6Zm255O3DQoyNyDpk4Hnn7MNCjI4IOeOqeWFtw0KMjkg5Y2r5rW0
-DQozMCDkupTph5ENCjMxIOWwj+Wei+acuuaisA0KMzIg6Z6LDQozMyDkvJHpl7LnlKjlk4ENCjM0
-IOWMu+eWlw0KMzUg5rW05a6k5Lqn5ZOBDQozNiDlm63mnpcNCjM3IOeFp+aYjuS6p+WTgQ0KMzgg
-6ZKf6KGo55y86ZWcDQozOSDoh6rooYzovaYNCjQwIOWMhQ0KDQoNCuaWsOmynOaVsOaNri3miJDl
-jZXnjofmnoHpq5gNCuaWsOmynOaVsOaNri3miJDljZXnjofmnoHpq5gNCuaWsOmynOaVsOaNri3m
-iJDljZXnjofmnoHpq5gNCuaWsOmynOaVsOaNri3miJDljZXnjofmnoHpq5gNCuaWsOmynOaVsOaN
-ri3miJDljZXnjofmnoHpq5gNCg==
+Hello All!
 
+I'm pleased to announce the release of kconfig-frontends 3.4.0-0!
+Go download it there:
+    http://ymorin.is-a-geek.org/download/kconfig-frontends/kconfig-frontends-3.4.0-0.tar.xz
+    http://ymorin.is-a-geek.org/download/kconfig-frontends/kconfig-frontends-3.4.0-0.tar.bz2
 
+The kconfig-frontends package provides the kconfig parser, as well as all the
+kconfig frontends and utilities, packaged using the traditional autotools, so
+the kconfig infrastructure is easy to deploy, either locally or system-wide.
+
+What's new since 3.3.0-0:
+  - all programs are intalled with the 'kconfig-' prefix by default
+  - the kconfig documentation has been added
+  - the parser's headers are isntalled into their own sub-dir
+  - some side utilities have been added from the Linux kernel tree:
+    - kconfig-diff      show differences between two .config files
+    - kconfig-gettext   prepare catalog of options strings for L10n
+    - kconfig-merge     merge .config fragments
+    - kconfig-tweak     get and set .config optiond from the command line
+
+Thank you to Arnout Vandecappelle and Peter Kjellerstedt for their patches in
+this release cycle. :-)
+
+As a reminder, the home for kconfig-frontends is:
+  http://ymorin.is-a-geek.org/projects/kconfig-frontends
+
+And the repository can be browsed or hg-cloned from:
+  http://ymorin.is-a-geek.org/hg/kconfig-frontends
+
+kconfig-frontends is not meant to replace the in-tree Linux kconfig, but
+really targets third-party projects that want an easy path to following the
+evolution of kconfig, without the burden to manually synchronise from the
+Linux kernel source tree.
+
+Any comment, any feedback, any patch is welcome! ;-)
+
+Regards,
+Yann E. MORIN.
+
+-- 
+.-----------------.--------------------.------------------.--------------------.
+|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
+| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
+| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
+| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
+'------------------------------^-------^------------------^--------------------'
