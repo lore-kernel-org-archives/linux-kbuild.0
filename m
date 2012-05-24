@@ -1,33 +1,54 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from hrndva-omtalb.mail.rr.com ([71.74.56.122]:27148 "EHLO
+Received: from hrndva-omtalb.mail.rr.com ([71.74.56.122]:26963 "EHLO
 	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753426Ab2EVWVm (ORCPT
+	with ESMTP id S933458Ab2EXUSM (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 22 May 2012 18:21:42 -0400
-Message-ID: <1337725300.13348.122.camel@gandalf.stny.rr.com>
-Subject: Re: kconfig-frontends-3.4.0-0 released
+	Thu, 24 May 2012 16:18:12 -0400
+Message-ID: <1337890690.13348.199.camel@gandalf.stny.rr.com>
+Subject: Re: tracing ring_buffer_resize oops.
 From: Steven Rostedt <rostedt@goodmis.org>
-Date: Tue, 22 May 2012 18:21:40 -0400
-In-Reply-To: <201205230011.29257.yann.morin.1998@free.fr>
-References: <201205222221.05548.yann.morin.1998@free.fr>
-	 <20120522211941.GA30024@home.goodmis.org>
-	 <201205230011.29257.yann.morin.1998@free.fr>
+Date: Thu, 24 May 2012 16:18:10 -0400
+In-Reply-To: <20120524200541.GA6552@redhat.com>
+References: <20120524160146.GA6226@redhat.com>
+	 <1337876398.13348.178.camel@gandalf.stny.rr.com>
+	 <20120524172223.GA10689@redhat.com>
+	 <1337880914.13348.189.camel@gandalf.stny.rr.com>
+	 <20120524184728.GA13201@redhat.com>
+	 <1337885672.13348.194.camel@gandalf.stny.rr.com>
+	 <20120524191147.GA13936@redhat.com>
+	 <1337887495.13348.195.camel@gandalf.stny.rr.com>
+	 <20120524200541.GA6552@redhat.com>
 Content-Type: text/plain; charset="ISO-8859-15"
 Content-Transfer-Encoding: 7bit
 Mime-Version: 1.0
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Dave Jones <davej@redhat.com>
+Cc: Linux Kernel <linux-kernel@vger.kernel.org>, Frederic Weisbecker <fweisbec@gmail.com>, Ingo Molnar <mingo@redhat.com>, linux-kbuild@vger.kernel.org
 
-On Wed, 2012-05-23 at 00:11 +0200, Yann E. MORIN wrote:
+On Thu, 2012-05-24 at 16:05 -0400, Dave Jones wrote:
+> On Thu, May 24, 2012 at 03:24:55PM -0400, Steven Rostedt wrote:
+>  > On Thu, 2012-05-24 at 15:11 -0400, Dave Jones wrote:
+>  > 
+>  > >  > Also, how reproducible is it? When it triggered for me, it was constant.
+>  > >  > Every boot and test failed. But after I did the make mrproper, I have
+>  > >  > not been able to trigger it again. This is why I put it down as a bad
+>  > >  > build.
+>  > > 
+>  > > happens every time for me so far.
+>  > 
+>  > Did you also do a make mrproper and try again?
+> 
+> ok, that's nasty.  Works fine after a make clean.
+> 
 
-> So, kconfig-frontends tries to use a meaningful naming scheme for all the
-> programs it installs. Some are renamed, and they all get prefixed by default
-> with 'kconfig-' (although that can be overriden at ./configure time with
-> --program-prefix=...).
+Thanks for verifying. I'm thinking this is a build bug. Something's not
+cleaning up properly. It may be with the recordmcount code. Perhaps
+objects needed to change where the mcount calls are and did not?
 
-OK, thanks for the clarification.
+I'll try other things to see if I can trigger this again. Then I'll save
+off the build tree, do a make clean, rebuild, and compare what's
+different.
 
 -- Steve
 
