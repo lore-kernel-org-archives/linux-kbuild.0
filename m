@@ -1,55 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from hrndva-omtalb.mail.rr.com ([71.74.56.122]:15113 "EHLO
-	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S965213Ab2EXVZQ (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 24 May 2012 17:25:16 -0400
-Message-ID: <1337894714.13348.206.camel@gandalf.stny.rr.com>
-Subject: Re: tracing ring_buffer_resize oops.
-From: Steven Rostedt <rostedt@goodmis.org>
-Date: Thu, 24 May 2012 17:25:14 -0400
-In-Reply-To: <20120524211520.GA2800@redhat.com>
-References: <1337876398.13348.178.camel@gandalf.stny.rr.com>
-	 <20120524172223.GA10689@redhat.com>
-	 <1337880914.13348.189.camel@gandalf.stny.rr.com>
-	 <20120524184728.GA13201@redhat.com>
-	 <1337885672.13348.194.camel@gandalf.stny.rr.com>
-	 <20120524191147.GA13936@redhat.com>
-	 <1337887495.13348.195.camel@gandalf.stny.rr.com>
-	 <20120524200541.GA6552@redhat.com>
-	 <1337890690.13348.199.camel@gandalf.stny.rr.com>
-	 <1337891586.13348.202.camel@gandalf.stny.rr.com>
-	 <20120524211520.GA2800@redhat.com>
-Content-Type: text/plain; charset="ISO-8859-15"
+Received: from cantor2.suse.de ([195.135.220.15]:44958 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751272Ab2EYMYP (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 25 May 2012 08:24:15 -0400
+Message-ID: <4FBF7B34.2080506@suse.cz>
+Date: Fri, 25 May 2012 14:29:40 +0200
+From: Michal Marek <mmarek@suse.cz>
+MIME-Version: 1.0
+Subject: Re: [PATCH 1/4] [-next] Makefile: Do not call cc-option before including
+ the arch's Makefile
+References: <1336855148-18817-1-git-send-email-geert@linux-m68k.org> <20120520092744.GA21341@merkur.ravnborg.org>
+In-Reply-To: <20120520092744.GA21341@merkur.ravnborg.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
-Mime-Version: 1.0
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Dave Jones <davej@redhat.com>
-Cc: Linux Kernel <linux-kernel@vger.kernel.org>, Frederic Weisbecker <fweisbec@gmail.com>, Ingo Molnar <mingo@redhat.com>, linux-kbuild@vger.kernel.org
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: Geert Uytterhoeven <geert@linux-m68k.org>, linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org, Andi Kleen <ak@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>, linux-kbuild@vger.kernel.org
 
-On Thu, 2012-05-24 at 17:15 -0400, Dave Jones wrote:
-> On Thu, May 24, 2012 at 04:33:06PM -0400, Steven Rostedt wrote:
+Dne 20.5.2012 11:27, Sam Ravnborg napsal(a):
+> On Sat, May 12, 2012 at 10:39:05PM +0200, Geert Uytterhoeven wrote:
+>> On architectures that setup CROSS_COMPILE in their arch/*/Makefile
+>> (blackfin, h8300, m68k, mips, parisc, score, sh, tile, unicore32, xtensa),
+>> cc-option may check against the wrong compiler, causing errors like
+>>
+>> cc1: error: unrecognized command line option "-fno-ipa-cp-clone"
+>>
+>> if the host gcc supports -fno-ipa-cp-clone, while the cross compiler
+>> doesn't support that option.
+>>
+>> Move the CONFIG_READABLE_ASM section below the inclusion of the arch's
+>> Makefile to fix this.
+>>
+>> Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
+>> Cc: Andi Kleen <ak@linux.intel.com>
+>> Cc: H. Peter Anvin <hpa@zytor.com>
+>> Cc: Michal Marek <mmarek@suse.cz>
+>> Cc: linux-kbuild@vger.kernel.org
 > 
->  > I'm kicking off the ktest that initially caused this issue hoping that
->  > it reproduces the bad tree again.
->  > 
->  > BTW, did you happen to upgrade gcc or anything? The ktest I run does
->  > test against different gcc's and I don't think I had it do a make clean
->  > between the switch. That may be the cause of this problem too :-?
-> 
-> No gcc updates. It's a Fedora 17 box, so there's been hardly any updates this
-> last week or so as things have been frozen leading into the release.
-> 
+> Michal - was this serie ever applied to kbuild?
 
-I'm currently running a ktest that is similar to what I think I ran when
-the bug hit (I didn't save off the config file :-(  )
+The first patch has to go to the tip tree, where the CONFIG_READABLE_ASM
+option is introduced. The remaining patches can go to the individual
+arch trees, I see Geert already pushed the m68k one.
 
-But it looks like it did do a mrproper between switching gcc's so I no
-longer think that was the issue.
-
-Thanks,
-
--- Steve
-
-
+Michal
