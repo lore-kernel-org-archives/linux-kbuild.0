@@ -1,33 +1,39 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from terminus.zytor.com ([198.137.202.10]:43449 "EHLO mail.zytor.com"
+Received: from cantor2.suse.de ([195.135.220.15]:33823 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754682Ab2EYUfS (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 25 May 2012 16:35:18 -0400
-Message-ID: <4FBFEC74.7090602@zytor.com>
-Date: Fri, 25 May 2012 13:32:52 -0700
-From: "H. Peter Anvin" <hpa@zytor.com>
+	id S1752440Ab2EZKly (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 26 May 2012 06:41:54 -0400
+References: <1336855148-18817-1-git-send-email-geert@linux-m68k.org> <20120520092744.GA21341@merkur.ravnborg.org> <4FBF7B34.2080506@suse.cz> <4FBFEC74.7090602@zytor.com>
+In-Reply-To: <4FBFEC74.7090602@zytor.com>
 MIME-Version: 1.0
-Subject: Re: [PATCH 1/4] [-next] Makefile: Do not call cc-option before including
- the arch's Makefile
-References: <1336855148-18817-1-git-send-email-geert@linux-m68k.org> <20120520092744.GA21341@merkur.ravnborg.org> <4FBF7B34.2080506@suse.cz>
-In-Reply-To: <4FBF7B34.2080506@suse.cz>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH 1/4] [-next] Makefile: Do not call cc-option before including the arch's Makefile
+From: Michal Marek <mmarek@suse.cz>
+Date: Sat, 26 May 2012 12:41:35 +0200
+Message-ID: <a62d9c3d-9792-443a-aab1-4e2af6604dbd@email.android.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
+To: "H. Peter Anvin" <hpa@zytor.com>
 Cc: Sam Ravnborg <sam@ravnborg.org>, Geert Uytterhoeven <geert@linux-m68k.org>, linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org, Andi Kleen <ak@linux.intel.com>, linux-kbuild@vger.kernel.org
 
-On 05/25/2012 05:29 AM, Michal Marek wrote:
->>
->> Michal - was this serie ever applied to kbuild?
-> 
-> The first patch has to go to the tip tree, where the CONFIG_READABLE_ASM
-> option is introduced. The remaining patches can go to the individual
-> arch trees, I see Geert already pushed the m68k one.
-> 
+"H. Peter Anvin" <hpa@zytor.com> wrote:
 
-OK, can you ack it, please?
+>On 05/25/2012 05:29 AM, Michal Marek wrote:
+>>>
+>>> Michal - was this serie ever applied to kbuild?
+>> 
+>> The first patch has to go to the tip tree, where the
+>CONFIG_READABLE_ASM
+>> option is introduced. The remaining patches can go to the individual
+>> arch trees, I see Geert already pushed the m68k one.
+>> 
+>
+>OK, can you ack it, please?
+>
+>	-hpa
 
-	-hpa
-
+Acked-by: Michal Marek <mmarek@suse.cz>
+-- 
+Sent from my phone. Please excuse my brevity.
