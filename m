@@ -1,47 +1,52 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:52416 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754576Ab2EZVAG (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 26 May 2012 17:00:06 -0400
-Date: Sat, 26 May 2012 23:00:05 +0200
-From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [PATCH] scripts/package/builddeb: include generated header files
-Message-ID: <20120526210005.GB32523@sepie.suse.cz>
-References: <4FC0F29C.9050508@afaics.de>
+Received: from out.selfhost.de ([82.98.82.95]:45541 "EHLO outgoing.selfhost.de"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1752404Ab2EZWDV (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 26 May 2012 18:03:21 -0400
+Message-ID: <4FC15323.1070206@afaics.de>
+Date: Sun, 27 May 2012 00:03:15 +0200
+From: Harald Dunkel <harri@afaics.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4FC0F29C.9050508@afaics.de>
+Subject: Re: [PATCH] scripts/package/builddeb: include generated header files
+References: <4FC0F29C.9050508@afaics.de> <20120526210005.GB32523@sepie.suse.cz>
+In-Reply-To: <20120526210005.GB32523@sepie.suse.cz>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Harald Dunkel <harri@afaics.de>
+To: Michal Marek <mmarek@suse.cz>
 Cc: linux-kbuild@vger.kernel.org
 
-On Sat, May 26, 2012 at 05:11:24PM +0200, Harald Dunkel wrote:
-> Building the linux-headers*.deb file on amd64 it seems that scripts/\
-> package/builddeb forgets to include some generated header files from
-> the build directory. It uses other header files generated in the
-> source directory instead.
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+On 05/26/12 23:00, Michal Marek wrote:
+> On Sat, May 26, 2012 at 05:11:24PM +0200, Harald Dunkel wrote:
+>> Below is a patch.
+:
 > 
-> 	arch/x86/include/generated/asm/unistd_32_ia32.h
-> 	arch/x86/include/generated/asm/unistd_64_x32.h
+> Thanks. There was already a patch fixing this by someone else: http://www.spinics.net/lists/linux-kbuild/msg06313.html, so I applied that one.
 > 
-> are lost. AFAICS this problem was introduced by
-> 9b4ce7bce5f30712fd926ab4599a803314a07719 .
+
+Thats fine with me. Peter's patch looks almost the same.
+
 > 
-> Below is a patch.
+> You make easier for the receiving party if you send patches using git send-email. And lkml should be always CCed in addition to the maintainer and/or subsystem mailing list. Otherwise, the patch itself was OK.
+> 
 
-Thanks. There was already a patch fixing this by someone else:
-http://www.spinics.net/lists/linux-kbuild/msg06313.html, so I applied
-that one.
+I tried to follow the doc on kernelnewbies, but I haven't seen
+the git command line. It would help very much if you could send
+me a pointer to some more up-to-date information, if you have
+it at hand.
 
 
-> This is the very first patch I am trying to get into the kernel source
-> tree. Please excuse and correct me if I don't follow the blessed
-> procedure.
+Many thanx anyway
 
-You make easier for the receiving party if you send patches using git
-send-email. And lkml should be always CCed in addition to the maintainer
-and/or subsystem mailing list. Otherwise, the patch itself was OK.
+Harri
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
 
-Michal
+iEYEARECAAYFAk/BUyMACgkQUTlbRTxpHjfLYACgkG1JzxpdO8rxRI46Di2f69Gi
+9+IAn0CqrwzqG/koBRtGiIpQCTZellAY
+=ieYU
+-----END PGP SIGNATURE-----
