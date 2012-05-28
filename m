@@ -1,54 +1,48 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from fed1rmfepo101.cox.net ([68.230.241.143]:51919 "EHLO
-	fed1rmfepo101.cox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751405Ab2E1AAu (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 27 May 2012 20:00:50 -0400
-From: Eric Nelson <eric.nelson@boundarydevices.com>
-Subject: [PATCH V3] checkpatch: check for whitespace before semicolon at EOL
-Date: Sun, 27 May 2012 17:00:46 -0700
-Message-Id: <1338163246-6727-1-git-send-email-eric.nelson@boundarydevices.com>
+Received: from cantor2.suse.de ([195.135.220.15]:38361 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751279Ab2E1JXf (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 28 May 2012 05:23:35 -0400
+Message-ID: <4FC34411.1070807@suse.cz>
+Date: Mon, 28 May 2012 11:23:29 +0200
+From: Michal Marek <mmarek@suse.cz>
+MIME-Version: 1.0
+Subject: Re: [PATCH] scripts/package/builddeb: include generated header files
+References: <4FC0F29C.9050508@afaics.de> <20120526210005.GB32523@sepie.suse.cz> <4FC15323.1070206@afaics.de>
+In-Reply-To: <4FC15323.1070206@afaics.de>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: apw@canonical.com, akpm@linux-foundation.org, linux-kernel@vger.kernel.org
-Cc: linux-kbuild@vger.kernel.org, joe@perches.com, Eric Nelson <eric.nelson@boundarydevices.com>
+To: Harald Dunkel <harri@afaics.de>
+Cc: linux-kbuild@vger.kernel.org
 
-Requires --strict option during invocation:
-	~/linux$ scripts/checkpatch --strict foo.patch
+On 27.5.2012 00:03, Harald Dunkel wrote:
+>> You make easier for the receiving party if you send patches using
+>> git send-email. And lkml should be always CCed in addition to the
+>> maintainer and/or subsystem mailing list. Otherwise, the patch
+>> itself was OK.
+>> 
+> 
+> I tried to follow the doc on kernelnewbies, but I haven't seen the
+> git command line. It would help very much if you could send me a
+> pointer to some more up-to-date information, if you have it at hand.
 
-This tests for a bad habits of mine like this:
+The commandline is
 
-	return 0 ;
+git send-email --to=... --cc=... --cc=... ... <base>
+or
+git send-email --to=... --cc=... --cc=... ... <base>..<end>
 
-Note that it does allow a special case of a bare semicolon
-for empty loops:
+<base> is the commit you based your changes on. So you usually do
 
-	while (foo())
-		;
+git checkout -b my-fix master
+<hack hack hack>
+git send-email ... master..my-fix
 
-Signed-off-by: Eric Nelson <eric.nelson@boundarydevices.com>
----
- scripts/checkpatch.pl |    7 +++++++
- 1 files changed, 7 insertions(+), 0 deletions(-)
+Then the receiver can simply pipe the email(s) to 'git am' to apply the
+changes. Of course git send-email is not mandatory, but if you use it,
+you can be sure that the patch will be applicable without further
+processing.
 
-diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
-index faea0ec..2262e1f 100755
---- a/scripts/checkpatch.pl
-+++ b/scripts/checkpatch.pl
-@@ -2448,6 +2448,13 @@ sub process {
- 				     "space prohibited between function name and open parenthesis '('\n" . $herecurr);
- 			}
- 		}
-+
-+# check for whitespace before a non-naked semicolon
-+		if ($line =~ /^\+.*\S\s+;/) {
-+			CHK("SPACING",
-+			    "space prohibited before semicolon\n" . $herecurr);
-+		}
-+
- # Check operator spacing.
- 		if (!($line=~/\#\s*include/)) {
- 			my $ops = qr{
--- 
-1.7.9
-
+Michal
