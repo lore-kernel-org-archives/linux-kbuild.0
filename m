@@ -1,66 +1,63 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from [203.88.192.206] ([203.88.192.206]:3604 "HELO mail.dreamsinn.cn"
-	rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with SMTP
-	id S1752105Ab2E1MvU (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 28 May 2012 08:51:20 -0400
-Reply-To: <1760301183@qq.com>
-Message-ID: <20180528203627404474@dreamsinn.cn>
-From: =?utf-8?B?5pyJ5pWI5p6c5YaN5LuY5qy+?= <test@dreamsinn.cn>
-Subject: =?utf-8?B?MjAxMuaYpeWtozExMeWxiuW5v+S6pOS8muS5sOWutu+8jEIyQuivog==?=
-	=?utf-8?B?55uY5Lmw5a6244CBdGhvbWFzbmV0IOmHh+i0reWVhizmtbflhbM=?=
-	=?utf-8?B?5pWw5o2uLOe+pOWPkei9r+S7tu+8jOWxleS8muS5sOWutiDku4UzMDDlhYMh?=
-Date: Mon, 28 May 2018 20:36:17 +0800
+Received: from youngberry.canonical.com ([91.189.89.112]:48439 "EHLO
+	youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753532Ab2E1OnE (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 28 May 2012 10:43:04 -0400
+Date: Mon, 28 May 2012 15:42:59 +0100
+From: Andy Whitcroft <apw@canonical.com>
+Subject: Re: [PATCH V3] checkpatch: check for whitespace before semicolon at
+ EOL
+Message-ID: <20120528144259.GA5878@dm>
+References: <1338163246-6727-1-git-send-email-eric.nelson@boundarydevices.com>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1338163246-6727-1-git-send-email-eric.nelson@boundarydevices.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: lintonlee@163.com, linuxext@126.com, linuxfana@telekbird.com.cn, linux-kbuild@vger.kernel.org, linuxlinux@163.net, linuxnews@pchome.com, linux-shop@163.net, Linuxsky@126.com, linuxteacher@hotmail.com, linuxxzwj1@yahoo.com, linuxyz@263.net
+To: Eric Nelson <eric.nelson@boundarydevices.com>
+Cc: akpm@linux-foundation.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, joe@perches.com
 
-MjAxMuaYpeWtozExMeWxiuW5v+S6pOS8muS5sOWutu+8jOa1t+WFs+aVsOaNruaPkOWNlXBpZXJz
-54mI77yMMjAwOC0yMDEy5bm0OeWxiuW5v+S6pOS8muaVsOaNruOAgg0KDQrkuIDlhbExMOS4quWM
-hSjmlbDmja7mmK/lhajooYzkuJrnmoTvvIzlj6/ku6XmjInnhaflhbPplK7or43mj5Dlj5blh7rm
-naXnmoQp77yaIA0KMe+8jDIwMTLmmKXlraMxMTHlsYrlub/kuqTkvJrkubDlrrbnjrDlnLror6Ln
-m5jmlbDmja7lupPmlrDpspzlh7rngonvvIzotoXnuqfmlrDpspzkubDlrrbvvIzmlrDpspzmlbDm
-ja7vvIzlrrnmmJPmiJDljZXvvIEgDQoy77yM6LSt5Lmw5ZCO5Y+v5Lul5YWN6LS55pu05pawMjAx
-Mueni+Wto+W5v+S6pOS8muS5sOWutuaVsOaNruOAguWkqui2heWAvOS6huOAgg0KM++8jDIwMTLm
-nIDmlrDlhajnkIPlsZXkvJrnjrDlnLrkubDlrrblupMo5LiO6LS45Y+R5ZCM5q2lKSzlhbE0NuS4
-h+adoeaVsOaNruOAgiAo5oyJ54Wn6KGM5Lia5YiG57G7KQ0KNO+8jDIwMTEsMjAxMOW5tCwyMDA5
-5bm0LDIwMDjlubQg5pil5a2jK+eni+Wto+W5v+S6pOS8muS5sOWutuWQjeW9le+8jDEwMyAxMDQg
-MTA1IDEwNiAxMDcgMTA4LDEwOSwxMTAg5YWx5YWt5bGKIOWFsTEyMC425LiH5pWw5o2u44CCDQo1
-77yMNDguNjjkuIfmnaHmnIDmlrDkubDlrrbor6Lnm5jvvIzpg73luKbmnIlFbWFpbO+8jOacgOac
-ieS7t+WAvOeahOivouebmOOAgg0KNu+8jDIwMTHmnIDmlrAgQjJCIOiLseaWh+WbvemZheermTYw
-5LiH5bim6IGU57uc5pa55byP6K+i55uYIOacgOacieS7t+WAvOivouebmOS5i+S4gC4NCjfvvIwy
-MDEw5rW35YWz5o+Q5Y2VcGllcnPniYgxMDAw5LiH5pWw5o2uLg0KOO+8jDIwMTHlubTliLDpppnm
-uK/ph4fotK3nmoTlm73lpJblrqLkurrlkI3lvZUo6aaZ5riv6LS45Y+R5bGA5o+Q5L6bKe+8jOi2
-hee6p+mHjeimgeeahOS5sOWutuOAgg0KOe+8jDIwMTHlubTmlrDlop7liqDnmoQt576O5Zu9QjJC
-IHRob21hc25ldCDph4fotK3llYblkI3ljZXjgIINCjEw77yM576k5Y+R6L2v5Lu25a6J6KOF5LiO
-6YOo572y5pyN5Yqh44CCDQoNCui/meS6m+WFqOacie+8jOWFsTEyODDkuIcg5pWw5o2u44CCDQoN
-CiANCuimgeeahOaKk+e0p+iBlOezu1FROiAxNzYwMzAxMTgzIOaIluiAheeri+WNs+WbnuWkjemC
-rueusTogMTc2MDMwMTE4M0BxcS5jb20NCuimgeeahOaKk+e0p+iBlOezu1FROiAxNzYwMzAxMTgz
-IOaIluiAheeri+WNs+WbnuWkjemCrueusTogMTc2MDMwMTE4M0BxcS5jb20NCuimgeeahOaKk+e0
-p+iBlOezu1FROiAxNzYwMzAxMTgzIOaIluiAheeri+WNs+WbnuWkjemCrueusTogMTc2MDMwMTE4
-M0BxcS5jb20NCg0KDQror5rkv6HkuLrmnKzvvIzlpoLmnpzkuI3kv6Hku7vmnKzkuros5Y+v5Lul
-6LWw5reY5a6d5Lqk5piTLOaUtuWIsOaVsOaNrumqjOivgTPlpKnlkI7lho3ku5jmrL4s6L+Z5piv
-5a+55oKo5pyA5aW955qE5L+d6Zqc5LqG44CCIA0KDQoNCg0K5bCP5oqA5ben77yaIA0K5oqKNTAw
-5LiH5Lmw5a62576k5Y+R5Lul5LiA6YGN77yM5Z2H5Lya5pyJ5pWw5Y2D5Liq5Zue5aSN55qE77yM
-6L+Z5Lqb5bCx5piv6Z2e5bi46auY6LSo6YeP55qE5Lmw5a6244CCIA0K5L2/55So5oiR5Lus6YCB
-55qE576k5Y+R6L2v5Lu277yMMS0y5ZGo5bCx5Y+v5a6M5YWo5Y+R5a6M44CCDQoNCg0KDQoNCg0K
-5bm/5Lqk5Lya5Lmw5a625oyJ5Lqn5ZOB57G75Yir5YiG57G777yM5YiG5Li65Lul5LiL5Yeg57G7
-77yaDQoxIOWKnuWFrOiuvuWkhw0KMiDnvJbnu4flj4rol6Tpk4Hlt6Xoibrlk4ENCjMg546755KD
-DQo0IOmkkOWOqOeUqOWFtw0KNSDovabovoYNCjYg5aSn5Z6L5py65qKw5Y+K6K6+5aSHDQo3IOeU
-teWtkOeUteawlA0KOCDnlLXlrZDmtojotLnlk4ENCjkg57q657uHDQoxMCDmnI3oo4UNCjExIOS4
-quS6uuaKpOeQhg0KMTIg5bel56iL5py65qKwDQoxMyDlt6XlhbcNCjE0IOWMluW3pQ0KMTUg6K6h
-566X5py65Y+K6YCa6K6vDQoxNiDlrrblsYXnlKjlk4ENCjE3IOWutuWxheijhemlsA0KMTgg5a62
-5YW3DQoxOSDlrrbnlKjnlLXlmagNCjIwIOW7uuetkeWPiuijhemlsOadkOaWmQ0KMjEg6IqC5pel
-55So5ZOBDQoyMiDnpLzlk4Hlj4rotaDlk4ENCjIzIOaRqeaJmOi9pg0KMjQg5rG96L2m6YWN5Lu2
-DQoyNSDpo5/lk4ENCjI2IOmZtueTtw0KMjcg6ZOB55+zDQoyOCDnjqnlhbcNCjI5IOWNq+a1tA0K
-MzAg5LqU6YeRDQozMSDlsI/lnovmnLrmorANCjMyIOmeiw0KMzMg5LyR6Zey55So5ZOBDQozNCDl
-jLvnlpcNCjM1IOa1tOWupOS6p+WTgQ0KMzYg5Zut5p6XDQozNyDnhafmmI7kuqflk4ENCjM4IOmS
-n+ihqOecvOmVnA0KMzkg6Ieq6KGM6L2mDQo0MCDljIUNCg0KDQrmlrDpspzmlbDmja4t5oiQ5Y2V
-546H5p6B6auYDQrmlrDpspzmlbDmja4t5oiQ5Y2V546H5p6B6auYDQrmlrDpspzmlbDmja4t5oiQ
-5Y2V546H5p6B6auYDQrmlrDpspzmlbDmja4t5oiQ5Y2V546H5p6B6auYDQrmlrDpspzmlbDmja4t
-5oiQ5Y2V546H5p6B6auYDQo=
+On Sun, May 27, 2012 at 05:00:46PM -0700, Eric Nelson wrote:
+> Requires --strict option during invocation:
+> 	~/linux$ scripts/checkpatch --strict foo.patch
+> 
+> This tests for a bad habits of mine like this:
+> 
+> 	return 0 ;
+> 
+> Note that it does allow a special case of a bare semicolon
+> for empty loops:
+> 
+> 	while (foo())
+> 		;
+> 
+> Signed-off-by: Eric Nelson <eric.nelson@boundarydevices.com>
+> ---
+>  scripts/checkpatch.pl |    7 +++++++
+>  1 files changed, 7 insertions(+), 0 deletions(-)
+> 
+> diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
+> index faea0ec..2262e1f 100755
+> --- a/scripts/checkpatch.pl
+> +++ b/scripts/checkpatch.pl
+> @@ -2448,6 +2448,13 @@ sub process {
+>  				     "space prohibited between function name and open parenthesis '('\n" . $herecurr);
+>  			}
+>  		}
+> +
+> +# check for whitespace before a non-naked semicolon
+> +		if ($line =~ /^\+.*\S\s+;/) {
+> +			CHK("SPACING",
+> +			    "space prohibited before semicolon\n" . $herecurr);
+> +		}
+> +
 
+Would this not also falsly trigger on 'for (foo = 10; foo; foo--) {' ?
 
+>  # Check operator spacing.
+>  		if (!($line=~/\#\s*include/)) {
+>  			my $ops = qr{
+
+-apw
