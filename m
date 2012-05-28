@@ -1,52 +1,54 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from out.selfhost.de ([82.98.82.95]:45541 "EHLO outgoing.selfhost.de"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1752404Ab2EZWDV (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 26 May 2012 18:03:21 -0400
-Message-ID: <4FC15323.1070206@afaics.de>
-Date: Sun, 27 May 2012 00:03:15 +0200
-From: Harald Dunkel <harri@afaics.de>
-MIME-Version: 1.0
-Subject: Re: [PATCH] scripts/package/builddeb: include generated header files
-References: <4FC0F29C.9050508@afaics.de> <20120526210005.GB32523@sepie.suse.cz>
-In-Reply-To: <20120526210005.GB32523@sepie.suse.cz>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+Received: from fed1rmfepo101.cox.net ([68.230.241.143]:51919 "EHLO
+	fed1rmfepo101.cox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751405Ab2E1AAu (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 27 May 2012 20:00:50 -0400
+From: Eric Nelson <eric.nelson@boundarydevices.com>
+Subject: [PATCH V3] checkpatch: check for whitespace before semicolon at EOL
+Date: Sun, 27 May 2012 17:00:46 -0700
+Message-Id: <1338163246-6727-1-git-send-email-eric.nelson@boundarydevices.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org
+To: apw@canonical.com, akpm@linux-foundation.org, linux-kernel@vger.kernel.org
+Cc: linux-kbuild@vger.kernel.org, joe@perches.com, Eric Nelson <eric.nelson@boundarydevices.com>
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Requires --strict option during invocation:
+	~/linux$ scripts/checkpatch --strict foo.patch
 
-On 05/26/12 23:00, Michal Marek wrote:
-> On Sat, May 26, 2012 at 05:11:24PM +0200, Harald Dunkel wrote:
->> Below is a patch.
-:
-> 
-> Thanks. There was already a patch fixing this by someone else: http://www.spinics.net/lists/linux-kbuild/msg06313.html, so I applied that one.
-> 
+This tests for a bad habits of mine like this:
 
-Thats fine with me. Peter's patch looks almost the same.
+	return 0 ;
 
-> 
-> You make easier for the receiving party if you send patches using git send-email. And lkml should be always CCed in addition to the maintainer and/or subsystem mailing list. Otherwise, the patch itself was OK.
-> 
+Note that it does allow a special case of a bare semicolon
+for empty loops:
 
-I tried to follow the doc on kernelnewbies, but I haven't seen
-the git command line. It would help very much if you could send
-me a pointer to some more up-to-date information, if you have
-it at hand.
+	while (foo())
+		;
 
+Signed-off-by: Eric Nelson <eric.nelson@boundarydevices.com>
+---
+ scripts/checkpatch.pl |    7 +++++++
+ 1 files changed, 7 insertions(+), 0 deletions(-)
 
-Many thanx anyway
+diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
+index faea0ec..2262e1f 100755
+--- a/scripts/checkpatch.pl
++++ b/scripts/checkpatch.pl
+@@ -2448,6 +2448,13 @@ sub process {
+ 				     "space prohibited between function name and open parenthesis '('\n" . $herecurr);
+ 			}
+ 		}
++
++# check for whitespace before a non-naked semicolon
++		if ($line =~ /^\+.*\S\s+;/) {
++			CHK("SPACING",
++			    "space prohibited before semicolon\n" . $herecurr);
++		}
++
+ # Check operator spacing.
+ 		if (!($line=~/\#\s*include/)) {
+ 			my $ops = qr{
+-- 
+1.7.9
 
-Harri
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.12 (GNU/Linux)
-
-iEYEARECAAYFAk/BUyMACgkQUTlbRTxpHjfLYACgkG1JzxpdO8rxRI46Di2f69Gi
-9+IAn0CqrwzqG/koBRtGiIpQCTZellAY
-=ieYU
------END PGP SIGNATURE-----
