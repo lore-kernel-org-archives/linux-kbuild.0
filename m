@@ -1,84 +1,94 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pb0-f46.google.com ([209.85.160.46]:43689 "EHLO
-	mail-pb0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752511Ab2E1PPS (ORCPT
+Received: from mail-gg0-f174.google.com ([209.85.161.174]:56566 "EHLO
+	mail-gg0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932264Ab2E3IwQ convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 28 May 2012 11:15:18 -0400
-Received: by pbbrp8 with SMTP id rp8so4763631pbb.19
-        for <linux-kbuild@vger.kernel.org>; Mon, 28 May 2012 08:15:17 -0700 (PDT)
-Message-ID: <4FC39683.5040600@boundarydevices.com>
-Date: Mon, 28 May 2012 08:15:15 -0700
-From: Eric Nelson <eric.nelson@boundarydevices.com>
+	Wed, 30 May 2012 04:52:16 -0400
 MIME-Version: 1.0
-Subject: Re: [PATCH V3] checkpatch: check for whitespace before semicolon
- at EOL
-References: <1338163246-6727-1-git-send-email-eric.nelson@boundarydevices.com> <20120528144259.GA5878@dm>
-In-Reply-To: <20120528144259.GA5878@dm>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <CAMuHMdXf6O249NttPgeQzWkGfLu_Ocod80ecXaaFy+SqZQNmcg@mail.gmail.com>
+References: <20120420020013.GA19964@windriver.com>
+	<CAMuHMdUUgysVqz226jhK42nvYNaX7yvexpqRjOPx0QpvzUwVXg@mail.gmail.com>
+	<4FC38DBD.4070406@redhat.com>
+	<CAMuHMdXf6O249NttPgeQzWkGfLu_Ocod80ecXaaFy+SqZQNmcg@mail.gmail.com>
+Date: Wed, 30 May 2012 10:52:14 +0200
+Message-ID: <CAMuHMdVOuUAnD5ygBNY-8GEQgX0FVhw3BX7XN7sKe1YVSCSLvw@mail.gmail.com>
+Subject: Re: linux-next: triage for April 19, 2012
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andy Whitcroft <apw@canonical.com>
-Cc: akpm@linux-foundation.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, joe@perches.com
+To: linux-kbuild <linux-kbuild@vger.kernel.org>, Avi Kivity <avi@redhat.com>
+Cc: Paul Gortmaker <paul.gortmaker@windriver.com>, linux-next@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On 05/28/2012 07:42 AM, Andy Whitcroft wrote:
-> On Sun, May 27, 2012 at 05:00:46PM -0700, Eric Nelson wrote:
->> Requires --strict option during invocation:
->> 	~/linux$ scripts/checkpatch --strict foo.patch
+Hi Kbuild people,
+
+On Mon, May 28, 2012 at 5:04 PM, Geert Uytterhoeven
+<geert@linux-m68k.org> wrote:
+> On Mon, May 28, 2012 at 4:37 PM, Avi Kivity <avi@redhat.com> wrote:
+>> On 05/25/2012 11:59 PM, Geert Uytterhoeven wrote:
+>>> On Fri, Apr 20, 2012 at 4:00 AM, Paul Gortmaker
+>>> <paul.gortmaker@windriver.com> wrote:
+>>>> The parisc got borked by some kvm header shuffle it seems?
+>>>> Now complaining about "file 'asm-generic/kvm_para.h' is not exported"
+>>>> [ http://kisskb.ellerman.id.au/kisskb/buildresult/6137786/ ]
+>>>
+>>> Not only parisc.
+>>>
+>>> This breakage has now entered mainline:
+>>>
+>>> parisc deconfig http://kisskb.ellerman.id.au/kisskb/buildresult/6365677/
+>>> m68k allmodconfig: http://kisskb.ellerman.id.au/kisskb/buildresult/6365681/
 >>
->> This tests for a bad habits of mine like this:
 >>
->> 	return 0 ;
+>> Does the following patch help?
+>
+> Thanks, that fixes it!
+>
+> Tested-by: Geert Uytterhoeven <geert@linux-m68k.org>
+>
+>> From: Avi Kivity <avi@redhat.com>
+>> Date: Mon, 28 May 2012 17:35:22 +0300
+>> Subject: [PATCH] KVM: Export asm-generic/kvm_para.h
 >>
->> Note that it does allow a special case of a bare semicolon
->> for empty loops:
+>> Prevents build failures on non-KVM archs.
 >>
->> 	while (foo())
->> 		;
->>
->> Signed-off-by: Eric Nelson<eric.nelson@boundarydevices.com>
+>> Signed-off-by: Avi Kivity <avi@redhat.com>
 >> ---
->>   scripts/checkpatch.pl |    7 +++++++
->>   1 files changed, 7 insertions(+), 0 deletions(-)
+>>  include/asm-generic/Kbuild |    1 +
+>>  1 file changed, 1 insertion(+)
 >>
->> diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
->> index faea0ec..2262e1f 100755
->> --- a/scripts/checkpatch.pl
->> +++ b/scripts/checkpatch.pl
->> @@ -2448,6 +2448,13 @@ sub process {
->>   				     "space prohibited between function name and open parenthesis '('\n" . $herecurr);
->>   			}
->>   		}
->> +
->> +# check for whitespace before a non-naked semicolon
->> +		if ($line =~ /^\+.*\S\s+;/) {
->> +			CHK("SPACING",
->> +			    "space prohibited before semicolon\n" . $herecurr);
->> +		}
->> +
->
-> Would this not also falsly trigger on 'for (foo = 10; foo; foo--) {' ?
->
+>> diff --git a/include/asm-generic/Kbuild b/include/asm-generic/Kbuild
+>> index 53f91b1..2c85a0f 100644
+>> --- a/include/asm-generic/Kbuild
+>> +++ b/include/asm-generic/Kbuild
+>> @@ -8,6 +8,7 @@ header-y += int-ll64.h
+>>  header-y += ioctl.h
+>>  header-y += ioctls.h
+>>  header-y += ipcbuf.h
+>> +header-y += kvm_para.h
+>>  header-y += mman-common.h
+>>  header-y += mman.h
+>>  header-y += msgbuf.h
 
-No, because there's no space before any of the semicolons.
+I just noticed include/asm-generic/Kbuild.asm already had
 
-I ran this against the last 1500 commits in the kernel and the
-only case I found which seemed questionable was a fragment
-like this:
-	for (foo=10; ; foo--) {
+ifneq ($(wildcard $(srctree)/arch/$(SRCARCH)/include/asm/kvm_para.h \
+                  $(srctree)/include/asm-$(SRCARCH)/kvm_para.h),)
+header-y  += kvm_para.h
+endif
 
-This points out that my commit message is wrong because it
-doesn't only check at EOL (V1 did).
+but this doesn't seem to work.
 
-My testing also generated a large number of warnings like this for
-patch 89812fc81f8d62d70433a8ff63d26819f372e8ec.
+Kbuild people: which one is correct?
 
-	CHECK: space prohibited before semicolon
-	#2459: FILE: tools/perf/util/parse-events-flex.c:439:
-	+    } ;
+Gr{oetje,eeting}s,
 
->>   # Check operator spacing.
->>   		if (!($line=~/\#\s*include/)) {
->>   			my $ops = qr{
->
-> -apw
+                        Geert
+
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
