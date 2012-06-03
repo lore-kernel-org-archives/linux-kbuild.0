@@ -1,26 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from unassigned.psychz.net ([74.117.62.59]:46182 "EHLO
-	gold.host786.com" rhost-flags-OK-FAIL-OK-OK) by vger.kernel.org
-	with ESMTP id S1751421Ab2EaFTp (ORCPT
+Received: from Chamillionaire.breakpoint.cc ([80.244.247.6]:47041 "EHLO
+	Chamillionaire.breakpoint.cc" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1754019Ab2FCT0l (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 31 May 2012 01:19:45 -0400
-Received: from nobody by gold.host786.com with local (Exim 4.77)
-	(envelope-from <nobody@gold.host786.com>)
-	id 1SZt9a-00076Q-2b
-	for linux-kbuild@vger.kernel.org; Wed, 30 May 2012 20:22:14 -0400
-Date: Wed, 30 May 2012 20:22:14 -0400
-From: Jhon Cole <colejhon1@gmail.com>
-Reply-To: colejhon1@gmail.com
-Subject: POSTING OFFER OF YOUR ADD.
-Message-ID: <7d554077c7afe364eb9478cb55d3e15c@www.waqarzaka.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type: text/plain; charset=US-ASCII
+	Sun, 3 Jun 2012 15:26:41 -0400
+From: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>
+Subject: [PATCH 9/9] sh: move PCI fixup hooks from __init to __devinit
+Date: Sun,  3 Jun 2012 20:48:25 +0200
+Message-Id: <1338749305-22558-10-git-send-email-sebastian@breakpoint.cc>
+In-Reply-To: <1338749305-22558-1-git-send-email-sebastian@breakpoint.cc>
+References: <1338749305-22558-1-git-send-email-sebastian@breakpoint.cc>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
+To: linux-pci@vger.kernel.org
+Cc: linux-kbuild@vger.kernel.org, Bjorn Helgaas <bhelgaas@google.com>, Michal Marek <mmarek@suse.cz>, Sebastian Andrzej Siewior <sebastian@breakpoint.cc>, Paul Mundt <lethal@linux-sh.org>
 
-Hello,
-Are you a good cleaner ( House cleaning) ,kindly reply if yes  cause i got an offer for you.
+The fixups are executed once the pci-device is found which is during
+boot process so __init seems fine as long as the platform does not
+support hotplug.
+However it is possible to remove the PCI bus at run time and have it
+rediscovered again via "echo 1 > /sys/bus/pci/rescan" and this will call
+the fixups again.
 
-Regards
+Cc: Paul Mundt <lethal@linux-sh.org>
+Signed-off-by: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>
+---
+ arch/sh/drivers/pci/fixups-dreamcast.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/sh/drivers/pci/fixups-dreamcast.c b/arch/sh/drivers/pci/fixups-dreamcast.c
+index edeea89..a5fe1b5 100644
+--- a/arch/sh/drivers/pci/fixups-dreamcast.c
++++ b/arch/sh/drivers/pci/fixups-dreamcast.c
+@@ -28,7 +28,7 @@
+ #include <asm/irq.h>
+ #include <mach/pci.h>
+ 
+-static void __init gapspci_fixup_resources(struct pci_dev *dev)
++static void __devinit gapspci_fixup_resources(struct pci_dev *dev)
+ {
+ 	struct pci_channel *p = dev->sysdata;
+ 
+-- 
+1.7.10
+
