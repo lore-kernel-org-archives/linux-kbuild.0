@@ -1,62 +1,73 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-bk0-f46.google.com ([209.85.214.46]:45884 "EHLO
-	mail-bk0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751833Ab2FFJtS (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 6 Jun 2012 05:49:18 -0400
-Date: Wed, 6 Jun 2012 11:49:12 +0200
-From: Ingo Molnar <mingo@kernel.org>
-Subject: Re: [PATCH 1/4] [-next] Makefile: Do not call cc-option before
- including the arch's Makefile
-Message-ID: <20120606094912.GG9495@gmail.com>
-References: <1336855148-18817-1-git-send-email-geert@linux-m68k.org>
- <20120520092744.GA21341@merkur.ravnborg.org>
- <4FBF7B34.2080506@suse.cz>
- <20120525202937.GA22903@merkur.ravnborg.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20120525202937.GA22903@merkur.ravnborg.org>
+Received: from mga02.intel.com ([134.134.136.20]:23871 "EHLO mga02.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751173Ab2FFKPA (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 6 Jun 2012 06:15:00 -0400
+Message-ID: <1338977927.6875.29.camel@sauron.fi.intel.com>
+Subject: Re: [PATCH 7/8] kbuild: move W=... stuff to Kbuild.arch
+From: Artem Bityutskiy <dedekind1@gmail.com>
+Reply-To: dedekind1@gmail.com
+Date: Wed, 06 Jun 2012 13:18:47 +0300
+In-Reply-To: <1336205926-13946-7-git-send-email-sam@ravnborg.org>
+References: <20120505080640.GA13773@merkur.ravnborg.org>
+	 <1336205926-13946-7-git-send-email-sam@ravnborg.org>
+Content-Type: multipart/signed; micalg="pgp-sha1"; protocol="application/pgp-signature";
+	boundary="=-DvzCN11APWpVJiWZoEP9"
+Mime-Version: 1.0
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: Michal Marek <mmarek@suse.cz>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, Thomas Gleixner <tglx@linutronix.de>, Geert Uytterhoeven <geert@linux-m68k.org>, linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org, Andi Kleen <ak@linux.intel.com>, linux-kbuild@vger.kernel.org
+To: Sam Ravnborg <sam@ravnborg.org>, Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, lkml <linux-kernel@vger.kernel.org>
 
 
-* Sam Ravnborg <sam@ravnborg.org> wrote:
+--=-DvzCN11APWpVJiWZoEP9
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> On Fri, May 25, 2012 at 02:29:40PM +0200, Michal Marek wrote:
-> > Dne 20.5.2012 11:27, Sam Ravnborg napsal(a):
-> > > On Sat, May 12, 2012 at 10:39:05PM +0200, Geert Uytterhoeven wrote:
-> > >> On architectures that setup CROSS_COMPILE in their arch/*/Makefile
-> > >> (blackfin, h8300, m68k, mips, parisc, score, sh, tile, unicore32, xtensa),
-> > >> cc-option may check against the wrong compiler, causing errors like
-> > >>
-> > >> cc1: error: unrecognized command line option "-fno-ipa-cp-clone"
-> > >>
-> > >> if the host gcc supports -fno-ipa-cp-clone, while the cross compiler
-> > >> doesn't support that option.
-> > >>
-> > >> Move the CONFIG_READABLE_ASM section below the inclusion of the arch's
-> > >> Makefile to fix this.
-> > >>
-> > >> Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
-> > >> Cc: Andi Kleen <ak@linux.intel.com>
-> > >> Cc: H. Peter Anvin <hpa@zytor.com>
-> > >> Cc: Michal Marek <mmarek@suse.cz>
-> > >> Cc: linux-kbuild@vger.kernel.org
-> > > 
-> > > Michal - was this serie ever applied to kbuild?
-> > 
-> > The first patch has to go to the tip tree, where the CONFIG_READABLE_ASM
-> > option is introduced.
-> OK - I had not seen this.
-> 
-> So tip-folks - please apply this.
+On Sat, 2012-05-05 at 10:18 +0200, Sam Ravnborg wrote:
+> Prevent that we eveluate cc-option multiple times for the same
+> option by moving the definitions to Kbuild.arch.
+> The file is included once only, thus gcc is not invoked once per director=
+y.
+>=20
+> Another side-effect of this patch is that KCFLAGS are appended last
+> to the list of options. This allows us to better control the options.
+> Artem Bityutskiy <dedekind1@gmail.com> noticed this.
+>=20
+> Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
+> Cc: Artem Bityutskiy <dedekind1@gmail.com>
 
-it's now all upstream so you can route it via the kbuild tree I 
-guess?
+Hi,
 
-Thanks,
+what happened to this patch? I was fixing the real issue I am
+encountering and I thought it'd be taken instead of my original patch.
 
-	Ingo
+--=20
+Best Regards,
+Artem Bityutskiy
+
+--=-DvzCN11APWpVJiWZoEP9
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part
+Content-Transfer-Encoding: 7bit
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iQIcBAABAgAGBQJPzy6IAAoJECmIfjd9wqK0PM4QAK2LJrVY2P8B62C+e4mgSCC6
+1ztY31Afx91SuVvrSvq0zOKAzO8Ao4rfcUceOFDksBeSeczRvTeHtqV36S8B2yyQ
+EwOneveIsJ8jP6o6wwwLT15EoGk3rbNERfhYSgkEn7pGqmZsU2vAihpPgw+E83/j
+MQ6nY5DZByapzWA+JN8JJXzXeX9PB+XMcTfikA0AQevk+kYgLedTIvsc/YpZMWLZ
+klgba7MCLMYBjEDISAvoxcoWSEG9qglUeU2AuFborBG+7TUGgNlxCWBjF1duFpne
+Vr2JSVich2922IXN6fJUDLBCo8ByAHyqdBA0ys9NvmyOa46h2KnztmFyBCiBaswE
+xXoecl0QhQ3xaVxMv9mUQmafj86eBY7QR9Cd75ZcvZWipzlWQDXQdwvpoHwaz/Jd
+pcvb57d0FKkR2zlxYxC33oXf9ExD1DVTmpYa+9LRu0UOBnI3tbrESYwB3JmtBU9x
+xm4QeIUgNWZXwdZfjxEEamTRhDJrkLwx6DPMrjyhyUkII5RGcXTIGwCxsX+N+S7P
+/7WHJPc3PBZ20xpc58UDBYrGut4OWsAn7Le7DEUyVMI70mHpLXIrkH9HnWGbfGWT
+YDNE0qBPZhsyFJ3WxrldG4HE/6RAfPLCLMzH9cHgMF6wd4CUcJY7s8wov0Qw9UST
+8YnzPZcijeJxDyrWXnST
+=/Kqe
+-----END PGP SIGNATURE-----
+
+--=-DvzCN11APWpVJiWZoEP9--
+
