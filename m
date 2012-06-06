@@ -1,128 +1,62 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from gate.crashing.org ([63.228.1.57]:48286 "EHLO gate.crashing.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754105Ab2FFF3w (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 6 Jun 2012 01:29:52 -0400
-Message-ID: <1338960480.7150.161.camel@pasglop>
-Subject: Re: [PATCH 8/9] powerpc: move PCI fixup hooks from __init to
- __devinit
-From: Benjamin Herrenschmidt <benh@kernel.crashing.org>
-Date: Wed, 06 Jun 2012 15:28:00 +1000
-In-Reply-To: <1338749305-22558-9-git-send-email-sebastian@breakpoint.cc>
-References: <1338749305-22558-1-git-send-email-sebastian@breakpoint.cc>
-	 <1338749305-22558-9-git-send-email-sebastian@breakpoint.cc>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Mime-Version: 1.0
+Received: from mail-bk0-f46.google.com ([209.85.214.46]:45884 "EHLO
+	mail-bk0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751833Ab2FFJtS (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 6 Jun 2012 05:49:18 -0400
+Date: Wed, 6 Jun 2012 11:49:12 +0200
+From: Ingo Molnar <mingo@kernel.org>
+Subject: Re: [PATCH 1/4] [-next] Makefile: Do not call cc-option before
+ including the arch's Makefile
+Message-ID: <20120606094912.GG9495@gmail.com>
+References: <1336855148-18817-1-git-send-email-geert@linux-m68k.org>
+ <20120520092744.GA21341@merkur.ravnborg.org>
+ <4FBF7B34.2080506@suse.cz>
+ <20120525202937.GA22903@merkur.ravnborg.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20120525202937.GA22903@merkur.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>
-Cc: linux-pci@vger.kernel.org, linux-kbuild@vger.kernel.org, Bjorn Helgaas <bhelgaas@google.com>, Michal Marek <mmarek@suse.cz>, Kumar Gala <galak@kernel.crashing.org>, Paul Mackerras <paulus@samba.org>
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: Michal Marek <mmarek@suse.cz>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, Thomas Gleixner <tglx@linutronix.de>, Geert Uytterhoeven <geert@linux-m68k.org>, linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org, Andi Kleen <ak@linux.intel.com>, linux-kbuild@vger.kernel.org
 
-On Sun, 2012-06-03 at 20:48 +0200, Sebastian Andrzej Siewior wrote:
-> The fixups are executed once the pci-device is found which is during
-> boot process so __init seems fine as long as the platform does not
-> support hotplug.
-> However it is possible to remove the PCI bus at run time and have it
-> rediscovered again via "echo 1 > /sys/bus/pci/rescan" and this will call
-> the fixups again.
+
+* Sam Ravnborg <sam@ravnborg.org> wrote:
+
+> On Fri, May 25, 2012 at 02:29:40PM +0200, Michal Marek wrote:
+> > Dne 20.5.2012 11:27, Sam Ravnborg napsal(a):
+> > > On Sat, May 12, 2012 at 10:39:05PM +0200, Geert Uytterhoeven wrote:
+> > >> On architectures that setup CROSS_COMPILE in their arch/*/Makefile
+> > >> (blackfin, h8300, m68k, mips, parisc, score, sh, tile, unicore32, xtensa),
+> > >> cc-option may check against the wrong compiler, causing errors like
+> > >>
+> > >> cc1: error: unrecognized command line option "-fno-ipa-cp-clone"
+> > >>
+> > >> if the host gcc supports -fno-ipa-cp-clone, while the cross compiler
+> > >> doesn't support that option.
+> > >>
+> > >> Move the CONFIG_READABLE_ASM section below the inclusion of the arch's
+> > >> Makefile to fix this.
+> > >>
+> > >> Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
+> > >> Cc: Andi Kleen <ak@linux.intel.com>
+> > >> Cc: H. Peter Anvin <hpa@zytor.com>
+> > >> Cc: Michal Marek <mmarek@suse.cz>
+> > >> Cc: linux-kbuild@vger.kernel.org
+> > > 
+> > > Michal - was this serie ever applied to kbuild?
+> > 
+> > The first patch has to go to the tip tree, where the CONFIG_READABLE_ASM
+> > option is introduced.
+> OK - I had not seen this.
 > 
-> Cc: Kumar Gala <galak@kernel.crashing.org>
+> So tip-folks - please apply this.
 
-Acked-by: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+it's now all upstream so you can route it via the kbuild tree I 
+guess?
 
-Thanks !
+Thanks,
 
-Ben.
-
-> Cc: Paul Mackerras <paulus@samba.org>
-> Signed-off-by: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>
-> ---
->  arch/powerpc/platforms/85xx/tqm85xx.c    |    2 +-
->  arch/powerpc/platforms/86xx/gef_ppc9a.c  |    2 +-
->  arch/powerpc/platforms/86xx/gef_sbc310.c |    2 +-
->  arch/powerpc/platforms/86xx/gef_sbc610.c |    2 +-
->  arch/powerpc/sysdev/fsl_pci.c            |    2 +-
->  arch/powerpc/sysdev/mv64x60_pci.c        |    2 +-
->  6 files changed, 6 insertions(+), 6 deletions(-)
-> 
-> diff --git a/arch/powerpc/platforms/85xx/tqm85xx.c b/arch/powerpc/platforms/85xx/tqm85xx.c
-> index 4d786c2..3e70a20 100644
-> --- a/arch/powerpc/platforms/85xx/tqm85xx.c
-> +++ b/arch/powerpc/platforms/85xx/tqm85xx.c
-> @@ -102,7 +102,7 @@ static void tqm85xx_show_cpuinfo(struct seq_file *m)
->  	seq_printf(m, "PLL setting\t: 0x%x\n", ((phid1 >> 24) & 0x3f));
->  }
->  
-> -static void __init tqm85xx_ti1520_fixup(struct pci_dev *pdev)
-> +static void __devinit tqm85xx_ti1520_fixup(struct pci_dev *pdev)
->  {
->  	unsigned int val;
->  
-> diff --git a/arch/powerpc/platforms/86xx/gef_ppc9a.c b/arch/powerpc/platforms/86xx/gef_ppc9a.c
-> index 1fca663..563aafa8 100644
-> --- a/arch/powerpc/platforms/86xx/gef_ppc9a.c
-> +++ b/arch/powerpc/platforms/86xx/gef_ppc9a.c
-> @@ -164,7 +164,7 @@ static void gef_ppc9a_show_cpuinfo(struct seq_file *m)
->  		gef_ppc9a_get_vme_is_syscon() ? "yes" : "no");
->  }
->  
-> -static void __init gef_ppc9a_nec_fixup(struct pci_dev *pdev)
-> +static void __devinit gef_ppc9a_nec_fixup(struct pci_dev *pdev)
->  {
->  	unsigned int val;
->  
-> diff --git a/arch/powerpc/platforms/86xx/gef_sbc310.c b/arch/powerpc/platforms/86xx/gef_sbc310.c
-> index 14e0e576..cc6a91a 100644
-> --- a/arch/powerpc/platforms/86xx/gef_sbc310.c
-> +++ b/arch/powerpc/platforms/86xx/gef_sbc310.c
-> @@ -152,7 +152,7 @@ static void gef_sbc310_show_cpuinfo(struct seq_file *m)
->  
->  }
->  
-> -static void __init gef_sbc310_nec_fixup(struct pci_dev *pdev)
-> +static void __devinit gef_sbc310_nec_fixup(struct pci_dev *pdev)
->  {
->  	unsigned int val;
->  
-> diff --git a/arch/powerpc/platforms/86xx/gef_sbc610.c b/arch/powerpc/platforms/86xx/gef_sbc610.c
-> index 1638f43..aead6b3 100644
-> --- a/arch/powerpc/platforms/86xx/gef_sbc610.c
-> +++ b/arch/powerpc/platforms/86xx/gef_sbc610.c
-> @@ -141,7 +141,7 @@ static void gef_sbc610_show_cpuinfo(struct seq_file *m)
->  	seq_printf(m, "SVR\t\t: 0x%x\n", svid);
->  }
->  
-> -static void __init gef_sbc610_nec_fixup(struct pci_dev *pdev)
-> +static void __devinit gef_sbc610_nec_fixup(struct pci_dev *pdev)
->  {
->  	unsigned int val;
->  
-> diff --git a/arch/powerpc/sysdev/fsl_pci.c b/arch/powerpc/sysdev/fsl_pci.c
-> index 6073288..edbf794 100644
-> --- a/arch/powerpc/sysdev/fsl_pci.c
-> +++ b/arch/powerpc/sysdev/fsl_pci.c
-> @@ -36,7 +36,7 @@
->  
->  static int fsl_pcie_bus_fixup, is_mpc83xx_pci;
->  
-> -static void __init quirk_fsl_pcie_header(struct pci_dev *dev)
-> +static void __devinit quirk_fsl_pcie_header(struct pci_dev *dev)
->  {
->  	u8 progif;
->  
-> diff --git a/arch/powerpc/sysdev/mv64x60_pci.c b/arch/powerpc/sysdev/mv64x60_pci.c
-> index b0037ce..364b14d 100644
-> --- a/arch/powerpc/sysdev/mv64x60_pci.c
-> +++ b/arch/powerpc/sysdev/mv64x60_pci.c
-> @@ -104,7 +104,7 @@ subsys_initcall(mv64x60_sysfs_init);
->  
->  #endif /* CONFIG_SYSFS */
->  
-> -static void __init mv64x60_pci_fixup_early(struct pci_dev *dev)
-> +static void __devinit mv64x60_pci_fixup_early(struct pci_dev *dev)
->  {
->  	/*
->  	 * Set the host bridge hdr_type to an invalid value so that
-
-
+	Ingo
