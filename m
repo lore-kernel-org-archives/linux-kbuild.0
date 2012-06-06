@@ -1,83 +1,125 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:11488 "EHLO mga02.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754073Ab2FFPnJ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 6 Jun 2012 11:43:09 -0400
-Message-ID: <1338997617.6875.73.camel@sauron.fi.intel.com>
-Subject: Re: [PATCH 7/8] kbuild: move W=... stuff to Kbuild.arch
-From: Artem Bityutskiy <dedekind1@gmail.com>
-Reply-To: dedekind1@gmail.com
-Date: Wed, 06 Jun 2012 18:46:57 +0300
-In-Reply-To: <20120606153521.GA30811@merkur.ravnborg.org>
-References: <20120505080640.GA13773@merkur.ravnborg.org>
-	 <1336205926-13946-7-git-send-email-sam@ravnborg.org>
-	 <1338977927.6875.29.camel@sauron.fi.intel.com>
-	 <20120606153521.GA30811@merkur.ravnborg.org>
-Content-Type: multipart/signed; micalg="pgp-sha1"; protocol="application/pgp-signature";
-	boundary="=-Pp5z9Bohj9mYUA8qyLWF"
-Mime-Version: 1.0
+Received: from smtp.snhosting.dk ([87.238.248.203]:15613 "EHLO
+	smtp.domainteam.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751326Ab2FFVa3 (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 6 Jun 2012 17:30:29 -0400
+Date: Wed, 6 Jun 2012 23:30:27 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: [PATCH] kbuild: always show verbose section mismatch warnings
+Message-ID: <20120606213026.GA17374@merkur.ravnborg.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild <linux-kbuild@vger.kernel.org>, lkml <linux-kernel@vger.kernel.org>
+To: Michal Marek <mmarek@suse.cz>, linux-kbuild <linux-kbuild@vger.kernel.org>, lkml <linux-kernel@vger.kernel.org>, Steven Rostedt <rostedt@goodmis.org>
 
+From 7a299bd90526f46c72620110ab04a116311dd141 Mon Sep 17 00:00:00 2001
+From: Sam Ravnborg <sam@ravnborg.org>
+Date: Wed, 6 Jun 2012 23:23:30 +0200
+Subject: [PATCH] kbuild: always show verbose section mismatch warnings
 
---=-Pp5z9Bohj9mYUA8qyLWF
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+The number of section mismatch warnings are down on an acceptable level.
+So lets always see the full warning - in the vain hope that
+users will recognize the function names and fix them.
 
-On Wed, 2012-06-06 at 17:35 +0200, Sam Ravnborg wrote:
-> On Wed, Jun 06, 2012 at 01:18:47PM +0300, Artem Bityutskiy wrote:
-> > On Sat, 2012-05-05 at 10:18 +0200, Sam Ravnborg wrote:
-> > > Prevent that we eveluate cc-option multiple times for the same
-> > > option by moving the definitions to Kbuild.arch.
-> > > The file is included once only, thus gcc is not invoked once per dire=
-ctory.
-> > >=20
-> > > Another side-effect of this patch is that KCFLAGS are appended last
-> > > to the list of options. This allows us to better control the options.
-> > > Artem Bityutskiy <dedekind1@gmail.com> noticed this.
-> > >=20
-> > > Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
-> > > Cc: Artem Bityutskiy <dedekind1@gmail.com>
-> >=20
-> > Hi,
-> >=20
-> > what happened to this patch? I was fixing the real issue I am
-> > encountering and I thought it'd be taken instead of my original patch.
-> We decided to move this to next merge release because is was not added
-> to kbuild thus not enough exposure in -next.
->=20
-> I am planning to resend the serie at around -rc2 time.
+This patch enable section mismatch analysis for each link,
+but you need to enable CONFIG_DEBUG_SECTION_MISMATCH to
+have vmlinux.o analyzed.
+This saves us from one time-consuming link step in the final
+link of the kernel (which we hit for all changes).
 
-OK, thanks for the update!
+Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
+Cc: Steven Rostedt <rostedt@goodmis.org>
+---
 
---=20
-Best Regards,
-Artem Bityutskiy
+Steven triggered this patch with a comment on G+:
+https://plus.google.com/116317370665849559569/posts/RvEpCqrWPLU
 
---=-Pp5z9Bohj9mYUA8qyLWF
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-Content-Transfer-Encoding: 7bit
+And I had in mind to do it anyway..
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.12 (GNU/Linux)
+ lib/Kconfig.debug        |   14 ++++----------
+ scripts/Makefile.build   |    4 +---
+ scripts/Makefile.modpost |    1 -
+ scripts/link-vmlinux.sh  |   12 ++++++------
+ 4 files changed, 11 insertions(+), 20 deletions(-)
 
-iQIcBAABAgAGBQJPz3txAAoJECmIfjd9wqK0sHcP/itabXIMVyq99cFNMX8dYOlD
-TNfbSGIr6dsQXyGOTeWqOcxzdHg/3BjvNN2vkPjevDhx/CzrixI8EkUXIdbmUKTV
-J3PrEzflTwk+42ESsWWiH5fN8pha71sj1dolEO8VfeK5mhXmlfKNcynjfi8ercGc
-GBVxbsB4uEOYSfYycj7Kw2aF4lK2SiW4q7KVYMKevdZrfpnfnKgReZo3wGGO/6gV
-WnkmZwpbX/Zd5PVADCiVqcPhyZ0+V7OoWsYGf0o3SVVT/p9BqJxxFJp/+XClAMMI
-RlvS0c+n3PFvJf8BilnK9+QA6GvlGld9d14BHAtIrysspISLPjCJtshkutQmVQV2
-rmFxEHqhhoErKMo9RMK+2gS3EfS/lf4Cyq9wg3BjEvvpdmnTE72687cmSzeHbQPy
-wCXczUKI8eE8ydA9iF/WYjp1lbH0sdBtQZDaH4L7oqQRByoBITNgLSx+c4PxVgQR
-YgUz+2cb/WE/djqzeuV09Qyylk9HZBg161rBqPsyA3ri5oVMUNo4+5rQNqb/vk1T
-oWPkfWFQ/WxWQAZ0Iap5myWZXmH4xxpl7MrObNsMWc6GzwrKCsTdFPZfQDf2g94l
-T6JhvHZp4o6hOBux6FhHZzOn6TDOGj2ATftodN67LvHwC2i5Zuiyx10CTiwqYaIT
-GiWLqt6+M9mgJCQTKXrH
-=tqHy
------END PGP SIGNATURE-----
-
---=-Pp5z9Bohj9mYUA8qyLWF--
+diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
+index a42d3ae..5b03f74 100644
+--- a/lib/Kconfig.debug
++++ b/lib/Kconfig.debug
+@@ -145,16 +145,10 @@ config DEBUG_SECTION_MISMATCH
+ 	    the analysis would not catch the illegal reference.
+ 	    This option tells gcc to inline less (but it does result in
+ 	    a larger kernel).
+-	  - Run the section mismatch analysis for each module/built-in.o file.
+-	    When we run the section mismatch analysis on vmlinux.o, we
+-	    lose valueble information about where the mismatch was
+-	    introduced.
+-	    Running the analysis for each module/built-in.o file
+-	    tells where the mismatch happens much closer to the
+-	    source. The drawback is that the same mismatch is
+-	    reported at least twice.
+-	  - Enable verbose reporting from modpost in order to help resolve
+-	    the section mismatches that are reported.
++	  - Run the section mismatch analysis on vmlinux.o.
++	    This will in most cases duplicate already reported warnings,
++	    but may catch section mismatchs involving diferent parts
++	    of the kernel.
+ 
+ config DEBUG_KERNEL
+ 	bool "Kernel debugging"
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index ff1720d..db81790 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -159,9 +159,7 @@ ifneq ($(KBUILD_CHECKSRC),0)
+ endif
+ 
+ # Do section mismatch analysis for each module/built-in.o
+-ifdef CONFIG_DEBUG_SECTION_MISMATCH
+-  cmd_secanalysis = ; scripts/mod/modpost $@
+-endif
++cmd_secanalysis = ; scripts/mod/modpost $@
+ 
+ # Compile C sources (.c)
+ # ---------------------------------------------------------------------------
+diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
+index 08dce14..5dc9086 100644
+--- a/scripts/Makefile.modpost
++++ b/scripts/Makefile.modpost
+@@ -79,7 +79,6 @@ modpost = scripts/mod/modpost                    \
+  $(if $(KBUILD_EXTMOD),-I $(modulesymfile))      \
+  $(if $(KBUILD_EXTRA_SYMBOLS), $(patsubst %, -e %,$(KBUILD_EXTRA_SYMBOLS))) \
+  $(if $(KBUILD_EXTMOD),-o $(modulesymfile))      \
+- $(if $(CONFIG_DEBUG_SECTION_MISMATCH),,-S)      \
+  $(if $(KBUILD_EXTMOD)$(KBUILD_MODPOST_WARN),-w) \
+  $(if $(cross_build),-c)
+ 
+diff --git a/scripts/link-vmlinux.sh b/scripts/link-vmlinux.sh
+index cd9c6c6..a2f89e6 100644
+--- a/scripts/link-vmlinux.sh
++++ b/scripts/link-vmlinux.sh
+@@ -129,12 +129,12 @@ fi
+ # We need access to CONFIG_ symbols
+ . ./.config
+ 
+-#link vmlinux.o
+-info LD vmlinux.o
+-modpost_link vmlinux.o
+-
+-# modpost vmlinux.o to check for section mismatches
+-${MAKE} -f "${srctree}/scripts/Makefile.modpost" vmlinux.o
++# Section mismatch check on vmlinux.o
++if [ ! -n "${CONFIG_DEBUG_SECTION_MISMATCH}" ]; then
++	info LD vmlinux.o
++	modpost_link vmlinux.o
++	${MAKE} -f "${srctree}/scripts/Makefile.modpost" vmlinux.o
++fi
+ 
+ # Update version
+ info GEN .version
+-- 
+1.6.0.6
 
