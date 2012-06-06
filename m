@@ -1,125 +1,66 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.snhosting.dk ([87.238.248.203]:15613 "EHLO
-	smtp.domainteam.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751326Ab2FFVa3 (ORCPT
+Received: from smtp06.smtpout.orange.fr ([80.12.242.128]:40339 "EHLO
+	smtp.smtpout.orange.fr" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757429Ab2FFW3R (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 6 Jun 2012 17:30:29 -0400
-Date: Wed, 6 Jun 2012 23:30:27 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: [PATCH] kbuild: always show verbose section mismatch warnings
-Message-ID: <20120606213026.GA17374@merkur.ravnborg.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+	Wed, 6 Jun 2012 18:29:17 -0400
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Subject: [PATCH 3/3] scripts/config: add option to undef a symbol
+Date: Thu,  7 Jun 2012 00:29:11 +0200
+Message-Id: <1339021751-26474-3-git-send-email-yann.morin.1998@free.fr>
+In-Reply-To: <1339021751-26474-1-git-send-email-yann.morin.1998@free.fr>
+References: <1339021751-26474-1-git-send-email-yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>, linux-kbuild <linux-kbuild@vger.kernel.org>, lkml <linux-kernel@vger.kernel.org>, Steven Rostedt <rostedt@goodmis.org>
+To: linux-kbuild@vger.kernel.org
+Cc: Andi Kleen <andi@firstfloor.org>, Michal Marek <mmarek@suse.cz>, "Yann E. MORIN" <yann.morin.1998@free.fr>
 
-From 7a299bd90526f46c72620110ab04a116311dd141 Mon Sep 17 00:00:00 2001
-From: Sam Ravnborg <sam@ravnborg.org>
-Date: Wed, 6 Jun 2012 23:23:30 +0200
-Subject: [PATCH] kbuild: always show verbose section mismatch warnings
+It is currently possible to enable, disable or modularise
+a symbol. Also, an undefined symbol is reported as such.
 
-The number of section mismatch warnings are down on an acceptable level.
-So lets always see the full warning - in the vain hope that
-users will recognize the function names and fix them.
+Add a new command to undefine a symbol, by removing the
+corresponding line from the .config file.
 
-This patch enable section mismatch analysis for each link,
-but you need to enable CONFIG_DEBUG_SECTION_MISMATCH to
-have vmlinux.o analyzed.
-This saves us from one time-consuming link step in the final
-link of the kernel (which we hit for all changes).
-
-Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
-Cc: Steven Rostedt <rostedt@goodmis.org>
+Signed-off-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
 ---
+ scripts/config |   10 ++++++++++
+ 1 files changed, 10 insertions(+), 0 deletions(-)
 
-Steven triggered this patch with a comment on G+:
-https://plus.google.com/116317370665849559569/posts/RvEpCqrWPLU
-
-And I had in mind to do it anyway..
-
- lib/Kconfig.debug        |   14 ++++----------
- scripts/Makefile.build   |    4 +---
- scripts/Makefile.modpost |    1 -
- scripts/link-vmlinux.sh  |   12 ++++++------
- 4 files changed, 11 insertions(+), 20 deletions(-)
-
-diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
-index a42d3ae..5b03f74 100644
---- a/lib/Kconfig.debug
-+++ b/lib/Kconfig.debug
-@@ -145,16 +145,10 @@ config DEBUG_SECTION_MISMATCH
- 	    the analysis would not catch the illegal reference.
- 	    This option tells gcc to inline less (but it does result in
- 	    a larger kernel).
--	  - Run the section mismatch analysis for each module/built-in.o file.
--	    When we run the section mismatch analysis on vmlinux.o, we
--	    lose valueble information about where the mismatch was
--	    introduced.
--	    Running the analysis for each module/built-in.o file
--	    tells where the mismatch happens much closer to the
--	    source. The drawback is that the same mismatch is
--	    reported at least twice.
--	  - Enable verbose reporting from modpost in order to help resolve
--	    the section mismatches that are reported.
-+	  - Run the section mismatch analysis on vmlinux.o.
-+	    This will in most cases duplicate already reported warnings,
-+	    but may catch section mismatchs involving diferent parts
-+	    of the kernel.
+diff --git a/scripts/config b/scripts/config
+index 09bd4ec..b75aea9 100755
+--- a/scripts/config
++++ b/scripts/config
+@@ -17,6 +17,7 @@ commands:
+ 	                     Set option to "string"
+ 	--set-val option value
+ 	                     Set option to value
++	--undefine|-u option Undefine option
+ 	--state|-s option    Print state of option (n,y,m,undef)
  
- config DEBUG_KERNEL
- 	bool "Kernel debugging"
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index ff1720d..db81790 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -159,9 +159,7 @@ ifneq ($(KBUILD_CHECKSRC),0)
- endif
+ 	--enable-after|-E beforeopt option
+@@ -75,6 +76,12 @@ set_var() {
+ 	fi
+ }
  
- # Do section mismatch analysis for each module/built-in.o
--ifdef CONFIG_DEBUG_SECTION_MISMATCH
--  cmd_secanalysis = ; scripts/mod/modpost $@
--endif
-+cmd_secanalysis = ; scripts/mod/modpost $@
++undef_var() {
++	local name=$1
++
++	sed -ri "/^($name=|# $name is not set)/d" "$FN"
++}
++
+ if [ "$1" = "--file" ]; then
+ 	FN="$2"
+ 	if [ "$FN" = "" ] ; then
+@@ -130,6 +137,9 @@ while [ "$1" != "" ] ; do
+ 		set_var "${CONFIG_}$ARG" "${CONFIG_}$ARG=$1"
+ 		shift
+ 		;;
++	--undefine|-u)
++		undef_var "${CONFIG_}$ARG"
++		;;
  
- # Compile C sources (.c)
- # ---------------------------------------------------------------------------
-diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
-index 08dce14..5dc9086 100644
---- a/scripts/Makefile.modpost
-+++ b/scripts/Makefile.modpost
-@@ -79,7 +79,6 @@ modpost = scripts/mod/modpost                    \
-  $(if $(KBUILD_EXTMOD),-I $(modulesymfile))      \
-  $(if $(KBUILD_EXTRA_SYMBOLS), $(patsubst %, -e %,$(KBUILD_EXTRA_SYMBOLS))) \
-  $(if $(KBUILD_EXTMOD),-o $(modulesymfile))      \
-- $(if $(CONFIG_DEBUG_SECTION_MISMATCH),,-S)      \
-  $(if $(KBUILD_EXTMOD)$(KBUILD_MODPOST_WARN),-w) \
-  $(if $(cross_build),-c)
- 
-diff --git a/scripts/link-vmlinux.sh b/scripts/link-vmlinux.sh
-index cd9c6c6..a2f89e6 100644
---- a/scripts/link-vmlinux.sh
-+++ b/scripts/link-vmlinux.sh
-@@ -129,12 +129,12 @@ fi
- # We need access to CONFIG_ symbols
- . ./.config
- 
--#link vmlinux.o
--info LD vmlinux.o
--modpost_link vmlinux.o
--
--# modpost vmlinux.o to check for section mismatches
--${MAKE} -f "${srctree}/scripts/Makefile.modpost" vmlinux.o
-+# Section mismatch check on vmlinux.o
-+if [ ! -n "${CONFIG_DEBUG_SECTION_MISMATCH}" ]; then
-+	info LD vmlinux.o
-+	modpost_link vmlinux.o
-+	${MAKE} -f "${srctree}/scripts/Makefile.modpost" vmlinux.o
-+fi
- 
- # Update version
- info GEN .version
+ 	--state|-s)
+ 		if grep -q "# ${CONFIG_}$ARG is not set" $FN ; then
 -- 
-1.6.0.6
+1.7.2.5
 
