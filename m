@@ -1,73 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:23871 "EHLO mga02.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751173Ab2FFKPA (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 6 Jun 2012 06:15:00 -0400
-Message-ID: <1338977927.6875.29.camel@sauron.fi.intel.com>
+Received: from smtp.snhosting.dk ([87.238.248.203]:16922 "EHLO
+	smtp.domainteam.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753788Ab2FFPf0 (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 6 Jun 2012 11:35:26 -0400
+Date: Wed, 6 Jun 2012 17:35:21 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
 Subject: Re: [PATCH 7/8] kbuild: move W=... stuff to Kbuild.arch
-From: Artem Bityutskiy <dedekind1@gmail.com>
-Reply-To: dedekind1@gmail.com
-Date: Wed, 06 Jun 2012 13:18:47 +0300
-In-Reply-To: <1336205926-13946-7-git-send-email-sam@ravnborg.org>
-References: <20120505080640.GA13773@merkur.ravnborg.org>
-	 <1336205926-13946-7-git-send-email-sam@ravnborg.org>
-Content-Type: multipart/signed; micalg="pgp-sha1"; protocol="application/pgp-signature";
-	boundary="=-DvzCN11APWpVJiWZoEP9"
-Mime-Version: 1.0
+Message-ID: <20120606153521.GA30811@merkur.ravnborg.org>
+References: <20120505080640.GA13773@merkur.ravnborg.org> <1336205926-13946-7-git-send-email-sam@ravnborg.org> <1338977927.6875.29.camel@sauron.fi.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1338977927.6875.29.camel@sauron.fi.intel.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>, Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, lkml <linux-kernel@vger.kernel.org>
+To: Artem Bityutskiy <dedekind1@gmail.com>
+Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild <linux-kbuild@vger.kernel.org>, lkml <linux-kernel@vger.kernel.org>
 
+On Wed, Jun 06, 2012 at 01:18:47PM +0300, Artem Bityutskiy wrote:
+> On Sat, 2012-05-05 at 10:18 +0200, Sam Ravnborg wrote:
+> > Prevent that we eveluate cc-option multiple times for the same
+> > option by moving the definitions to Kbuild.arch.
+> > The file is included once only, thus gcc is not invoked once per directory.
+> > 
+> > Another side-effect of this patch is that KCFLAGS are appended last
+> > to the list of options. This allows us to better control the options.
+> > Artem Bityutskiy <dedekind1@gmail.com> noticed this.
+> > 
+> > Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
+> > Cc: Artem Bityutskiy <dedekind1@gmail.com>
+> 
+> Hi,
+> 
+> what happened to this patch? I was fixing the real issue I am
+> encountering and I thought it'd be taken instead of my original patch.
+We decided to move this to next merge release because is was not added
+to kbuild thus not enough exposure in -next.
 
---=-DvzCN11APWpVJiWZoEP9
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+I am planning to resend the serie at around -rc2 time.
 
-On Sat, 2012-05-05 at 10:18 +0200, Sam Ravnborg wrote:
-> Prevent that we eveluate cc-option multiple times for the same
-> option by moving the definitions to Kbuild.arch.
-> The file is included once only, thus gcc is not invoked once per director=
-y.
->=20
-> Another side-effect of this patch is that KCFLAGS are appended last
-> to the list of options. This allows us to better control the options.
-> Artem Bityutskiy <dedekind1@gmail.com> noticed this.
->=20
-> Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
-> Cc: Artem Bityutskiy <dedekind1@gmail.com>
-
-Hi,
-
-what happened to this patch? I was fixing the real issue I am
-encountering and I thought it'd be taken instead of my original patch.
-
---=20
-Best Regards,
-Artem Bityutskiy
-
---=-DvzCN11APWpVJiWZoEP9
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-Content-Transfer-Encoding: 7bit
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.12 (GNU/Linux)
-
-iQIcBAABAgAGBQJPzy6IAAoJECmIfjd9wqK0PM4QAK2LJrVY2P8B62C+e4mgSCC6
-1ztY31Afx91SuVvrSvq0zOKAzO8Ao4rfcUceOFDksBeSeczRvTeHtqV36S8B2yyQ
-EwOneveIsJ8jP6o6wwwLT15EoGk3rbNERfhYSgkEn7pGqmZsU2vAihpPgw+E83/j
-MQ6nY5DZByapzWA+JN8JJXzXeX9PB+XMcTfikA0AQevk+kYgLedTIvsc/YpZMWLZ
-klgba7MCLMYBjEDISAvoxcoWSEG9qglUeU2AuFborBG+7TUGgNlxCWBjF1duFpne
-Vr2JSVich2922IXN6fJUDLBCo8ByAHyqdBA0ys9NvmyOa46h2KnztmFyBCiBaswE
-xXoecl0QhQ3xaVxMv9mUQmafj86eBY7QR9Cd75ZcvZWipzlWQDXQdwvpoHwaz/Jd
-pcvb57d0FKkR2zlxYxC33oXf9ExD1DVTmpYa+9LRu0UOBnI3tbrESYwB3JmtBU9x
-xm4QeIUgNWZXwdZfjxEEamTRhDJrkLwx6DPMrjyhyUkII5RGcXTIGwCxsX+N+S7P
-/7WHJPc3PBZ20xpc58UDBYrGut4OWsAn7Le7DEUyVMI70mHpLXIrkH9HnWGbfGWT
-YDNE0qBPZhsyFJ3WxrldG4HE/6RAfPLCLMzH9cHgMF6wd4CUcJY7s8wov0Qw9UST
-8YnzPZcijeJxDyrWXnST
-=/Kqe
------END PGP SIGNATURE-----
-
---=-DvzCN11APWpVJiWZoEP9--
-
+	Sam
