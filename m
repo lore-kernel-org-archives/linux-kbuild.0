@@ -1,45 +1,51 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp11.smtpout.orange.fr ([80.12.242.133]:20783 "EHLO
-	smtp.smtpout.orange.fr" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932934Ab2FGVuA (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 7 Jun 2012 17:50:00 -0400
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: Re: [PATCH 1/3] scripts/config: be case-sensitive on config option symbols
-Date: Thu, 7 Jun 2012 23:49:55 +0200
-References: <1339021751-26474-1-git-send-email-yann.morin.1998@free.fr> <201206072006.24915.yann.morin.1998@free.fr> <20120607181750.GO27374@one.firstfloor.org>
-In-Reply-To: <20120607181750.GO27374@one.firstfloor.org>
-MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-1"
-Content-Transfer-Encoding: 7bit
-Message-Id: <201206072349.56057.yann.morin.1998@free.fr>
+Received: from vostochny.stro.at ([78.47.22.85]:50139 "EHLO vostochny.stro.at"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S933184Ab2FGWVU (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 7 Jun 2012 18:21:20 -0400
+From: maximilian attems <max@stro.at>
+Subject: [PATCH] deb-pkg: Install linux-firmware-image in versioned dir
+Date: Fri,  8 Jun 2012 00:21:15 +0200
+Message-Id: <1339107675-7402-1-git-send-email-max@stro.at>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: Andi Kleen <andi@firstfloor.org>, Michal Marek <mmarek@suse.cz>
+Cc: Michal Marek <mmarek@suse.cz>, Michael Prokop <mika@debian.org>, maximilian attems <max@stro.at>
 
-Andi, All,
+That way they don't file conflict with official firmware package:
+ trying to overwrite '/lib/firmware/qlogic/1040.bin', which is
+               also in package firmware-qlogic 0.35
+..
 
-On Thursday 07 June 2012 20:17:50 Andi Kleen wrote:
-> > What about adding an option to keep the case as-is:
-> >     --keep-case|-k      Keep symbol's case (dont' upper-case it)
-> 
-> That's fine.
+Reported-by: Michael Prokop <mika@debian.org>
+Signed-off-by: maximilian attems <max@stro.at>
+---
+ scripts/package/builddeb |    5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-OK, good. I'll code this tonight, and post an updated series.
-Thank you!
-
-For my information, what was the requirement for mangling the symbol in the
-first place?
-
-Regards,
-Yann E. MORIN.
-
+diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+index c95fdda..6505ecd 100644
+--- a/scripts/package/builddeb
++++ b/scripts/package/builddeb
+@@ -92,7 +92,7 @@ rm -rf "$tmpdir" "$fwdir" "$kernel_headers_dir" "$libc_headers_dir"
+ mkdir -m 755 -p "$tmpdir/DEBIAN"
+ mkdir -p  "$tmpdir/lib" "$tmpdir/boot" "$tmpdir/usr/share/doc/$packagename"
+ mkdir -m 755 -p "$fwdir/DEBIAN"
+-mkdir -p "$fwdir/lib" "$fwdir/usr/share/doc/$fwpackagename"
++mkdir -p "$fwdir/lib/firmware/$version/" "$fwdir/usr/share/doc/$fwpackagename"
+ mkdir -m 755 -p "$libc_headers_dir/DEBIAN"
+ mkdir -p "$libc_headers_dir/usr/share/doc/$libc_headers_packagename"
+ mkdir -m 755 -p "$kernel_headers_dir/DEBIAN"
+@@ -267,7 +267,8 @@ EOF
+ 
+ # Do we have firmware? Move it out of the way and build it into a package.
+ if [ -e "$tmpdir/lib/firmware" ]; then
+-	mv "$tmpdir/lib/firmware" "$fwdir/lib/"
++	mv "$tmpdir/lib/firmware"/* "$fwdir/lib/firmware/$version/"
++	rmdir "$tmpdir/lib/firmware"
+ 
+ 	cat <<EOF >> debian/control
+ 
 -- 
-.-----------------.--------------------.------------------.--------------------.
-|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
-| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
-| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
-| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
-'------------------------------^-------^------------------^--------------------'
+1.7.10
+
