@@ -1,43 +1,42 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smp.if.uj.edu.pl ([149.156.82.206]:54761 "EHLO smp.if.uj.edu.pl"
+Received: from vostochny.stro.at ([78.47.22.85]:45720 "EHLO vostochny.stro.at"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1758108Ab2FHIGh (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 8 Jun 2012 04:06:37 -0400
-Date: Fri, 8 Jun 2012 10:01:30 +0200
-From: Witold Baryluk <baryluk@smp.if.uj.edu.pl>
-Subject: Please add arch/x86/Makefile_32.cpu to linux-headers when doing
- make deb-pkg on i386 Debian
-Message-ID: <20120608080130.GJ5511@smp.if.uj.edu.pl>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+	id S1759779Ab2FHJgk (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 8 Jun 2012 05:36:40 -0400
+From: maximilian attems <mattems@hep.itp.tuwien.ac.at>
+Subject: [PATCH] deb-pkg: Add all Makefiles to header package
+Date: Fri,  8 Jun 2012 11:36:26 +0200
+Message-Id: <1339148186-14123-1-git-send-email-mattems@hep.itp.tuwien.ac.at>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
+Cc: Michal Marek <mmarek@suse.cz>, Michael Prokop <mika@debian.org>, maximilian attems <max@stro.at>
 
-Hi kbuild maintainers,
+From: maximilian attems <max@stro.at>
 
-I discovered that make deb-pkg do not add Makefile_32.cpu from arch/x86
-directory when doing i386 kernel build and package build.
+I discovered that make deb-pkg does not add Makefile_32.cpu from
+arch/x86 directory when doing i386 kernel build and package build.
+Fix it by greedily adding all Makefiles.
 
-This file is needed for example when doing dkms modules build,
-because it is included by arch/x86/Makefile and contains cpu specific
-options to the compiler which is crucial for correct compilation.
+Reported-by: Witold Baryluk <baryluk@smp.if.uj.edu.pl>
+Signed-off-by: maximilian attems <max@stro.at>
+---
+ scripts/package/builddeb |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Normally dkms builds will fail with arch/x86/Makefile trying to include
-not-existing Makefile_32.cpu file. Simply copying Makefile_32.cpu to
-/usr/src/*header/arch/x86/ is fast but dirty workaround to make them
-build.
-
-Adding proper install/cp command to scripts/package/builddeb should be easy.
-
-UML kernel is probably also affected.
-
-
-Regards,
-Witek
-
+diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+index 6505ecd..acb8650 100644
+--- a/scripts/package/builddeb
++++ b/scripts/package/builddeb
+@@ -243,7 +243,7 @@ EOF
+ fi
+ 
+ # Build header package
+-(cd $srctree; find . -name Makefile -o -name Kconfig\* -o -name \*.pl > "$objtree/debian/hdrsrcfiles")
++(cd $srctree; find . -name Makefile\* -o -name Kconfig\* -o -name \*.pl > "$objtree/debian/hdrsrcfiles")
+ (cd $srctree; find arch/$SRCARCH/include include scripts -type f >> "$objtree/debian/hdrsrcfiles")
+ (cd $objtree; find arch/$SRCARCH/include .config Module.symvers include scripts -type f >> "$objtree/debian/hdrobjfiles")
+ destdir=$kernel_headers_dir/usr/src/linux-headers-$version
 -- 
-Witold Baryluk
+1.7.10
+
