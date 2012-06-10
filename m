@@ -1,42 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from vostochny.stro.at ([78.47.22.85]:45720 "EHLO vostochny.stro.at"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1759779Ab2FHJgk (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 8 Jun 2012 05:36:40 -0400
-From: maximilian attems <mattems@hep.itp.tuwien.ac.at>
-Subject: [PATCH] deb-pkg: Add all Makefiles to header package
-Date: Fri,  8 Jun 2012 11:36:26 +0200
-Message-Id: <1339148186-14123-1-git-send-email-mattems@hep.itp.tuwien.ac.at>
+Received: from jacques.telenet-ops.be ([195.130.132.50]:57753 "EHLO
+	jacques.telenet-ops.be" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755847Ab2FJOkG (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 10 Jun 2012 10:40:06 -0400
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Subject: [PATCH 2/3] xtensa: Use "test -e" instead of bashism "test -a"
+Date: Sun, 10 Jun 2012 16:39:57 +0200
+Message-Id: <1339339198-24789-2-git-send-email-geert@linux-m68k.org>
+In-Reply-To: <1339339198-24789-1-git-send-email-geert@linux-m68k.org>
+References: <1339339198-24789-1-git-send-email-geert@linux-m68k.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Michal Marek <mmarek@suse.cz>, Michael Prokop <mika@debian.org>, maximilian attems <max@stro.at>
+To: Chris Zankel <chris@zankel.net>, Andrew Morton <akpm@linux-foundation.org>
+Cc: linux-kernel@vger.kernel.org, Geert Uytterhoeven <geert@linux-m68k.org>, linux-kbuild@vger.kernel.org
 
-From: maximilian attems <max@stro.at>
+On Ubuntu, /bin/sh is a symlink to dash, which does not support "test -a".
+This causes messages like
 
-I discovered that make deb-pkg does not add Makefile_32.cpu from
-arch/x86 directory when doing i386 kernel build and package build.
-Fix it by greedily adding all Makefiles.
+    test: 1: -a: unexpected operator
+    test: 1: -a: unexpected operator
 
-Reported-by: Witold Baryluk <baryluk@smp.if.uj.edu.pl>
-Signed-off-by: maximilian attems <max@stro.at>
+and link failures like
+
+    (.init.text+0x132): undefined reference to `platform_init'
+
+due to the appropriate platform code not being compiled.
+
+Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: linux-kbuild@vger.kernel.org
 ---
- scripts/package/builddeb |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/xtensa/Makefile |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-index 6505ecd..acb8650 100644
---- a/scripts/package/builddeb
-+++ b/scripts/package/builddeb
-@@ -243,7 +243,7 @@ EOF
- fi
+diff --git a/arch/xtensa/Makefile b/arch/xtensa/Makefile
+index d41f9ed..1537a0a 100644
+--- a/arch/xtensa/Makefile
++++ b/arch/xtensa/Makefile
+@@ -68,8 +68,8 @@ core-$(CONFIG_EMBEDDED_RAMDISK)	+= arch/xtensa/boot/ramdisk/
  
- # Build header package
--(cd $srctree; find . -name Makefile -o -name Kconfig\* -o -name \*.pl > "$objtree/debian/hdrsrcfiles")
-+(cd $srctree; find . -name Makefile\* -o -name Kconfig\* -o -name \*.pl > "$objtree/debian/hdrsrcfiles")
- (cd $srctree; find arch/$SRCARCH/include include scripts -type f >> "$objtree/debian/hdrsrcfiles")
- (cd $objtree; find arch/$SRCARCH/include .config Module.symvers include scripts -type f >> "$objtree/debian/hdrobjfiles")
- destdir=$kernel_headers_dir/usr/src/linux-headers-$version
+ # Only build variant and/or platform if it includes a Makefile
+ 
+-buildvar := $(shell test -a $(srctree)/arch/xtensa/variants/$(VARIANT)/Makefile && echo arch/xtensa/variants/$(VARIANT)/)
+-buildplf := $(shell test -a $(srctree)/arch/xtensa/platforms/$(PLATFORM)/Makefile && echo arch/xtensa/platforms/$(PLATFORM)/)
++buildvar := $(shell test -e $(srctree)/arch/xtensa/variants/$(VARIANT)/Makefile && echo arch/xtensa/variants/$(VARIANT)/)
++buildplf := $(shell test -e $(srctree)/arch/xtensa/platforms/$(PLATFORM)/Makefile && echo arch/xtensa/platforms/$(PLATFORM)/)
+ 
+ # Find libgcc.a
+ 
 -- 
-1.7.10
+1.7.0.4
 
