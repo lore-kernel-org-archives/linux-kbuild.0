@@ -1,53 +1,48 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from jacques.telenet-ops.be ([195.130.132.50]:57753 "EHLO
-	jacques.telenet-ops.be" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755847Ab2FJOkG (ORCPT
+Received: from mail-vb0-f46.google.com ([209.85.212.46]:37878 "EHLO
+	mail-vb0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751035Ab2FKW4X (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 10 Jun 2012 10:40:06 -0400
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Subject: [PATCH 2/3] xtensa: Use "test -e" instead of bashism "test -a"
-Date: Sun, 10 Jun 2012 16:39:57 +0200
-Message-Id: <1339339198-24789-2-git-send-email-geert@linux-m68k.org>
-In-Reply-To: <1339339198-24789-1-git-send-email-geert@linux-m68k.org>
-References: <1339339198-24789-1-git-send-email-geert@linux-m68k.org>
+	Mon, 11 Jun 2012 18:56:23 -0400
+Received: by vbbff1 with SMTP id ff1so2590304vbb.19
+        for <linux-kbuild@vger.kernel.org>; Mon, 11 Jun 2012 15:56:23 -0700 (PDT)
+From: "Yaakov (Cygwin/X)" <yselkowitz@users.sourceforge.net>
+Subject: [PATCH] xconfig: use pkgconfig to find moc
+Date: Mon, 11 Jun 2012 17:56:08 -0500
+Message-Id: <1339455368-7620-1-git-send-email-yselkowitz@users.sourceforge.net>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Chris Zankel <chris@zankel.net>, Andrew Morton <akpm@linux-foundation.org>
-Cc: linux-kernel@vger.kernel.org, Geert Uytterhoeven <geert@linux-m68k.org>, linux-kbuild@vger.kernel.org
-
-On Ubuntu, /bin/sh is a symlink to dash, which does not support "test -a".
-This causes messages like
-
-    test: 1: -a: unexpected operator
-    test: 1: -a: unexpected operator
-
-and link failures like
-
-    (.init.text+0x132): undefined reference to `platform_init'
-
-due to the appropriate platform code not being compiled.
-
-Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
+To: Michal Marek <mmarek@suse.cz>
 Cc: linux-kbuild@vger.kernel.org
----
- arch/xtensa/Makefile |    4 ++--
- 1 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/arch/xtensa/Makefile b/arch/xtensa/Makefile
-index d41f9ed..1537a0a 100644
---- a/arch/xtensa/Makefile
-+++ b/arch/xtensa/Makefile
-@@ -68,8 +68,8 @@ core-$(CONFIG_EMBEDDED_RAMDISK)	+= arch/xtensa/boot/ramdisk/
- 
- # Only build variant and/or platform if it includes a Makefile
- 
--buildvar := $(shell test -a $(srctree)/arch/xtensa/variants/$(VARIANT)/Makefile && echo arch/xtensa/variants/$(VARIANT)/)
--buildplf := $(shell test -a $(srctree)/arch/xtensa/platforms/$(PLATFORM)/Makefile && echo arch/xtensa/platforms/$(PLATFORM)/)
-+buildvar := $(shell test -e $(srctree)/arch/xtensa/variants/$(VARIANT)/Makefile && echo arch/xtensa/variants/$(VARIANT)/)
-+buildplf := $(shell test -e $(srctree)/arch/xtensa/platforms/$(PLATFORM)/Makefile && echo arch/xtensa/platforms/$(PLATFORM)/)
- 
- # Find libgcc.a
- 
+From: Yaakov Selkowitz <yselkowitz@users.sourceforge.net>
+
+Various schemes exist to allow parallel installations of multiple major
+versions of Qt (4.x with the previous 3.x and/or the upcoming 5.x).
+QtCore.pc includes a moc_location variable which should be a more reliable
+way to find moc.
+
+Signed-off-by: Yaakov Selkowitz <yselkowitz@users.sourceforge.net>
+---
+Also applies to all 3.x stable branches
+
+ scripts/kconfig/Makefile |    3 +--
+ 1 files changed, 1 insertions(+), 2 deletions(-)
+
+diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
+index 7966265..059b5ca 100644
+--- a/scripts/kconfig/Makefile
++++ b/scripts/kconfig/Makefile
+@@ -260,8 +260,7 @@ $(obj)/.tmp_qtcheck:
+ 	else \
+ 	  cflags="\$$(shell pkg-config QtCore QtGui Qt3Support --cflags)"; \
+ 	  libs="\$$(shell pkg-config QtCore QtGui Qt3Support --libs)"; \
+-	  binpath="\$$(shell pkg-config QtCore --variable=prefix)"; \
+-	  moc="$$binpath/bin/moc"; \
++	  moc="\$$(shell pkg-config QtCore --variable=moc_location)"; \
+ 	fi; \
+ 	echo "KC_QT_CFLAGS=$$cflags" > $@; \
+ 	echo "KC_QT_LIBS=$$libs" >> $@; \
 -- 
-1.7.0.4
+1.7.9
 
