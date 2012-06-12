@@ -1,52 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-vc0-f174.google.com ([209.85.220.174]:43546 "EHLO
-	mail-vc0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752805Ab2FLA3r (ORCPT
+Received: from mail-lpp01m010-f46.google.com ([209.85.215.46]:42886 "EHLO
+	mail-lpp01m010-f46.google.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1752761Ab2FLB1m (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 11 Jun 2012 20:29:47 -0400
-Received: by vcbf11 with SMTP id f11so2491627vcb.19
-        for <linux-kbuild@vger.kernel.org>; Mon, 11 Jun 2012 17:29:46 -0700 (PDT)
-From: "Yaakov (Cygwin/X)" <yselkowitz@users.sourceforge.net>
-Subject: [PATCH] kconfig/nconf: fix compile with ncurses reentrant API
-Date: Mon, 11 Jun 2012 19:29:41 -0500
-Message-Id: <1339460981-7568-1-git-send-email-yselkowitz@users.sourceforge.net>
+	Mon, 11 Jun 2012 21:27:42 -0400
+Received: by lahd3 with SMTP id d3so3163452lah.19
+        for <linux-kbuild@vger.kernel.org>; Mon, 11 Jun 2012 18:27:40 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAErSpo6ybFiBDx6M69HqyPDkU6VQGRe=1yOhH4He5XRje5GBnw@mail.gmail.com>
+References: <1338749305-22558-1-git-send-email-sebastian@breakpoint.cc> <CAErSpo6ybFiBDx6M69HqyPDkU6VQGRe=1yOhH4He5XRje5GBnw@mail.gmail.com>
+From: Bjorn Helgaas <bhelgaas@google.com>
+Date: Mon, 11 Jun 2012 19:27:20 -0600
+Message-ID: <CAErSpo62mT5Ng-03G+-Gh1dBvvtdLLhK8EuzdN+UxjObQ=_cdA@mail.gmail.com>
+Subject: Re: Annotate PCI fixups with __devinit instead of __init
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org
+To: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>
+Cc: linux-pci@vger.kernel.org, linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>
 
-From: Yaakov Selkowitz <yselkowitz@users.sourceforge.net>
+On Sun, Jun 3, 2012 at 7:12 PM, Bjorn Helgaas <bhelgaas@google.com> wrote:
+> On Sun, Jun 3, 2012 at 11:48 AM, Sebastian Andrzej Siewior
+> <sebastian@breakpoint.cc> wrote:
+>> This patch series adds a section missmatch check to modpost which will
+>> splat a warning if a PCI fixup routine (declared via
+>> DECLARE_PCI_FIXUP_HEADER for instance) is defined in __init. Even if the
+>> platform does not support hot-plug, one could remove the PCI bus during
+>> run time (soft remove, now HW touching involved) and rediscover it again.
+>> The rediscover process will call the PCI-fixups again.
+>> This is patch #1. After posting it Bjorn ask for fixing the noisy warnings
+>> and this is done by patch #2 to #9.
+>
+> These all look good to me.
+>
+> There's not a real dependency between #1 and the rest of them, so I
+> propose that I feed #2-9 through the PCI tree and whoever normally
+> handles modpost can take #1.
 
-ESCDELAY is a global variable which is replaced by getter and setter
-functions with NCURSES_REENTRANT.  This fixes the following error:
+I put all these, including #1, in my "next" branch, which should
+appear in v3.6.  If somebody wants to push the modpost change
+separately, I'll remove it, but since nobody objected or stepped up to
+claim it, I just kept them all together.
 
-nconf.c: In function ‘main’:
-nconf.c:1506:2: error: lvalue required as left operand of assignment
+Thanks for doing this work!
 
-Signed-off-by: Yaakov Selkowitz <yselkowitz@users.sourceforge.net>
----
- scripts/kconfig/nconf.c |    4 ++++
- 1 files changed, 4 insertions(+), 0 deletions(-)
-
-diff --git a/scripts/kconfig/nconf.c b/scripts/kconfig/nconf.c
-index 73070cb..eb9b87a 100644
---- a/scripts/kconfig/nconf.c
-+++ b/scripts/kconfig/nconf.c
-@@ -1503,7 +1503,11 @@ int main(int ac, char **av)
- 	}
- 
- 	notimeout(stdscr, FALSE);
-+#if NCURSES_REENTRANT
-+	set_escdelay(1);
-+#else
- 	ESCDELAY = 1;
-+#endif
- 
- 	/* set btns menu */
- 	curses_menu = new_menu(curses_menu_items);
--- 
-1.7.9
-
+Bjorn
