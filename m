@@ -1,67 +1,143 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga11.intel.com ([192.55.52.93]:9675 "EHLO mga11.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751550Ab2FLPSU (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 12 Jun 2012 11:18:20 -0400
-Date: Tue, 12 Jun 2012 23:18:17 +0800
-From: Fengguang Wu <wfg@linux.intel.com>
-Subject: Re: WARNING: arch/x86/kernel/built-in.o(.pci_fixup_final+0x1c):
- Section mismatch in reference from the variable
- __pci_fixup_PCI_VENDOR_ID_AMDPCI_DEVICE_ID_AMD_15H_NB_F5quirk_amd_nb_node to
- the function .init.text:quirk_amd_nb_node()
-Message-ID: <20120612151817.GA20585@localhost>
-References: <20120612055154.GA12725@localhost>
- <20120612125016.GA4361@breakpoint.cc>
- <20120612125940.GA18853@localhost>
- <CAErSpo6_dRqrnCOJ3aykVXGQD6kBOXGk5PBAvFpHPKz0bnZXrg@mail.gmail.com>
+Received: from mail-yx0-f174.google.com ([209.85.213.174]:50906 "EHLO
+	mail-yx0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752179Ab2FLVHH convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 12 Jun 2012 17:07:07 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAErSpo6_dRqrnCOJ3aykVXGQD6kBOXGk5PBAvFpHPKz0bnZXrg@mail.gmail.com>
+Date: Tue, 12 Jun 2012 23:07:05 +0200
+Message-ID: <CAMuHMdW9D4FZSUibcd+qrtM+is75FyJXj+RxK+sb33XEjczdyg@mail.gmail.com>
+Subject: asm/kvm_para.h from asm-generic (was: Re: linux-next: triage for
+ April 19, 2012)
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Bjorn Helgaas <bhelgaas@google.com>
-Cc: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>, linux-kbuild@vger.kernel.org
+To: linux-kbuild <linux-kbuild@vger.kernel.org>, Avi Kivity <avi@redhat.com>
+Cc: Paul Gortmaker <paul.gortmaker@windriver.com>, linux-next@vger.kernel.org, linux-kernel@vger.kernel.org, Linux/m68k <linux-m68k@vger.kernel.org>
 
-On Tue, Jun 12, 2012 at 09:12:04AM -0600, Bjorn Helgaas wrote:
-> On Tue, Jun 12, 2012 at 6:59 AM, Fengguang Wu <wfg@linux.intel.com> wrote:
-> > On Tue, Jun 12, 2012 at 02:50:16PM +0200, Sebastian Andrzej Siewior wrote:
-> >> On Tue, Jun 12, 2012 at 01:51:54PM +0800, wfg@linux.intel.com wrote:
-> >> > FYI: there are new compile warnings show up in
-> >> >
-> >> > tree:   git://git.kernel.org/pub/scm/linux/kernel/git/helgaas/pci.git next
-> >> > head:   0c358c16f8154ef47df749e60186f3c835869b0b
-> >> > commit: d4974983cc76a0bff5e82987c761cda4ba08be66 [51/60] scripts/modpost: check for bad refernces in .pci.fixups area
-> >> > config: i386-allmodconfig (attached as .config)
-> >> >
-> >> > All related error/warning messages are:
-> >> >
-> >> >
-> >> >
-> >> > WARNING: arch/x86/kernel/built-in.o(.pci_fixup_final+0x1c): Section mismatch in reference from the variable __pci_fixup_PCI_VENDOR_ID_AMDPCI_DEVICE_ID_AMD_15H_NB_F5quirk_amd_nb_node to the function .init.text:quirk_amd_nb_node()
-> >> > The variable __pci_fixup_PCI_VENDOR_ID_AMDPCI_DEVICE_ID_AMD_15H_NB_F5quirk_amd_nb_node references
-> >> > a function __init quirk_amd_nb_node().
-> >> <snip>
-> >>
-> >> This should be fixed by
-> >>   http://git.kernel.org/?p=linux/kernel/git/helgaas/pci.git;a=commit;h=763268610f596d66686f8a13bc8f0c0504782dd1
-> >>
-> >> that means try the complete tree instead. The alternativ would to push this
-> >> patch as the last one in series. However there is no damage in bisect
-> >> except this splat so......
-> >
-> > Yeah I do commit-by-commit build tests to make the kernel more
-> > bisectable and complain if any step won't compile.
-> 
-> Wow, that's awesome :)
+On Wed, May 30, 2012 at 10:52 AM, Geert Uytterhoeven
+<geert@linux-m68k.org> wrote:
+> On Mon, May 28, 2012 at 5:04 PM, Geert Uytterhoeven
+> <geert@linux-m68k.org> wrote:
+>> On Mon, May 28, 2012 at 4:37 PM, Avi Kivity <avi@redhat.com> wrote:
+>>> On 05/25/2012 11:59 PM, Geert Uytterhoeven wrote:
+>>>> On Fri, Apr 20, 2012 at 4:00 AM, Paul Gortmaker
+>>>> <paul.gortmaker@windriver.com> wrote:
+>>>>> The parisc got borked by some kvm header shuffle it seems?
+>>>>> Now complaining about "file 'asm-generic/kvm_para.h' is not exported"
+>>>>> [ http://kisskb.ellerman.id.au/kisskb/buildresult/6137786/ ]
+>>>>
+>>>> Not only parisc.
+>>>>
+>>>> This breakage has now entered mainline:
+>>>>
+>>>> parisc deconfig http://kisskb.ellerman.id.au/kisskb/buildresult/6365677/
+>>>> m68k allmodconfig: http://kisskb.ellerman.id.au/kisskb/buildresult/6365681/
+>>>
+>>>
+>>> Does the following patch help?
+>>
+>> Thanks, that fixes it!
+>>
+>> Tested-by: Geert Uytterhoeven <geert@linux-m68k.org>
+>>
+>>> From: Avi Kivity <avi@redhat.com>
+>>> Date: Mon, 28 May 2012 17:35:22 +0300
+>>> Subject: [PATCH] KVM: Export asm-generic/kvm_para.h
+>>>
+>>> Prevents build failures on non-KVM archs.
+>>>
+>>> Signed-off-by: Avi Kivity <avi@redhat.com>
+>>> ---
+>>>  include/asm-generic/Kbuild |    1 +
+>>>  1 file changed, 1 insertion(+)
+>>>
+>>> diff --git a/include/asm-generic/Kbuild b/include/asm-generic/Kbuild
+>>> index 53f91b1..2c85a0f 100644
+>>> --- a/include/asm-generic/Kbuild
+>>> +++ b/include/asm-generic/Kbuild
+>>> @@ -8,6 +8,7 @@ header-y += int-ll64.h
+>>>  header-y += ioctl.h
+>>>  header-y += ioctls.h
+>>>  header-y += ipcbuf.h
+>>> +header-y += kvm_para.h
+>>>  header-y += mman-common.h
+>>>  header-y += mman.h
+>>>  header-y += msgbuf.h
+>
+> I just noticed include/asm-generic/Kbuild.asm already had
+>
+> ifneq ($(wildcard $(srctree)/arch/$(SRCARCH)/include/asm/kvm_para.h \
+>                  $(srctree)/include/asm-$(SRCARCH)/kvm_para.h),)
+> header-y  += kvm_para.h
+> endif
+>
+> but this doesn't seem to work.
+>
+> Kbuild people: which one is correct?
 
-Thanks! :-)
+Oops...
 
-> I reordered the patches in my topic branch, and I plan to rebase my
-> "next" branch today, so that should take care of this.
+After linux-next commit 2bbc89a8e9c652ee71c6c3b2e0679b7ecedb1a09
+("m68k: Use Kbuild logic to import asm-generic headers"), which does:
+  - remove arch/m68k/include/asm/kvm_para.h, which just included the
+    asm-generic version,
+  - add "generic-y += kvm_para.h" to arch/m68k/include/asm/Kbuild,
+it fails again:
 
-That's great, thank you very much!
+$ make ARCH=m68k headers_check
+  CHK     include/linux/version.h
+  INSTALL include/asm-generic (35 files)
+  INSTALL include/linux (372 files)
+  CHECK   include/asm-generic (35 files)
+  CHECK   include/linux (372 files)
+usr/include/linux/kexec.h:49: userspace cannot reference function or
+variable defined in the kernel
+usr/include/linux/kvm_para.h:26: included file 'asm-m68k/kvm_para.h'
+is not exported
+usr/include/linux/soundcard.h:1054: userspace cannot reference
+function or variable defined in the kernel
+make[2]: *** [usr/include/linux/.check] Error 123
+make[1]: *** [linux] Error 2
+make: *** [headers_check] Error 2
+$
 
-Thanks,
-Fengguang
+After reverting Avi's fix (commit
+7beb8e723c8d7da7decbbe217b79525aef73fccb. ("KVM:
+Export asm-generic/kvm_para.h")) it works again. Note that it now _removes_
+kvm_para.h:
+
+$ make ARCH=m68k headers_check
+  CHK     include/linux/version.h
+  REMOVE  kvm_para.h
+  INSTALL include/asm-generic (34 files)
+  REMOVE  kvm_para.h
+  INSTALL include/linux (371 files)
+  CHECK   include/asm-generic (34 files)
+  CHECK   include/linux (371 files)
+usr/include/linux/kexec.h:49: userspace cannot reference function or
+variable defined in the kernel
+usr/include/linux/soundcard.h:1054: userspace cannot reference
+function or variable defined in the kernel
+$
+
+What's the proper way to get this working in both cases??
+  1. arch has it's own asm/kvm_para.h (cfr. m68k and all other arches
+in mainline)
+  2. arch includes asm-generic/kvm_para.h via Kbuild logic (cfr.
+(only) m68k in -next)
+Or is this not possible, and should I create arch/m68k/include/asm/kvm_para.h
+again, like all other arches seem to do?
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
