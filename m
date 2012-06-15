@@ -1,113 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pb0-f46.google.com ([209.85.160.46]:38043 "EHLO
-	mail-pb0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757981Ab2FOXMY (ORCPT
+Received: from hrndva-omtalb.mail.rr.com ([71.74.56.122]:18091 "EHLO
+	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1758494Ab2FOXZB (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 15 Jun 2012 19:12:24 -0400
-Received: by pbbrp8 with SMTP id rp8so5868557pbb.19
-        for <linux-kbuild@vger.kernel.org>; Fri, 15 Jun 2012 16:12:24 -0700 (PDT)
-Date: Fri, 15 Jun 2012 16:12:20 -0700
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: Re: [-next] FATAL: drivers/gpu/drm/udl/udl: sizeof(struct
- usb_device_id)=24 is not a modulo of the size of section
- __mod_usb_device_table=44.
-Message-ID: <20120615231220.GC8205@kroah.com>
-References: <CAMuHMdXk6pByz14JcDgY+UE6QM0sHD8cbXye9CgOVSRRtr7J+Q@mail.gmail.com>
- <20120615201021.GB14544@kroah.com>
- <CAMuHMdUj6tAcWhkSkV43Kw3-2-3+JzgP6W=2w3fjL2KBfRh9ZQ@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAMuHMdUj6tAcWhkSkV43Kw3-2-3+JzgP6W=2w3fjL2KBfRh9ZQ@mail.gmail.com>
+	Fri, 15 Jun 2012 19:25:01 -0400
+Message-ID: <1339802699.25903.47.camel@gandalf.stny.rr.com>
+Subject: kbuild: Document oldnoconfig to what it really does
+From: Steven Rostedt <rostedt@goodmis.org>
+Date: Fri, 15 Jun 2012 19:24:59 -0400
+Content-Type: text/plain; charset="ISO-8859-15"
+Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Geert Uytterhoeven <geert@linux-m68k.org>
-Cc: =?iso-8859-1?Q?Bj=F8rn?= Mork <bjorn@mork.no>, USB list <linux-usb@vger.kernel.org>, linux-kernel@vger.kernel.org, Linux-Next <linux-next@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Linux/m68k <linux-m68k@vger.kernel.org>
+To: LKML <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
+Cc: Michal Marek <mmarek@suse.cz>
 
-On Fri, Jun 15, 2012 at 11:02:55PM +0200, Geert Uytterhoeven wrote:
-> Hi Greg,
-> 
-> On Fri, Jun 15, 2012 at 10:10 PM, Greg Kroah-Hartman
-> <gregkh@linuxfoundation.org> wrote:
-> > On Fri, Jun 15, 2012 at 07:42:08PM +0200, Geert Uytterhoeven wrote:
-> >> commit 81df2d594340dcb6d1a02191976be88a1ca8120c ("USB: allow match
-> >> on bInterfaceNumber") added a byte to the interior of struct usb_device_id,
-> >> enabling implicit padding:
-> >>
-> >> --- a/include/linux/mod_devicetable.h
-> >> +++ b/include/linux/mod_devicetable.h
-> >> @@ -115,6 +118,9 @@ struct usb_device_id {
-> >>         __u8            bInterfaceSubClass;
-> >>         __u8            bInterfaceProtocol;
-> >>
-> >> +       /* Used for vendor-specific interface matches */
-> >> +       __u8            bInterfaceNumber;
-> >> +
-> >>         /* not matched against */
-> >>         kernel_ulong_t  driver_info;
-> >>  };
-> >>
-> >> On m68k, this causes failures like:
-> >>
-> >> | FATAL: drivers/gpu/drm/udl/udl: sizeof(struct usb_device_id)=24 is
-> >> not a modulo of the size of section __mod_usb_device_table=44.
-> >> | Fix definition of struct usb_device_id in mod_devicetable.h
-> >>
-> >> M68k is special in that it uses 2 for the alignment of 32-bit entities, hence
-> >> sizeof(struct usb_device_id) = 22.
-> >>
-> >> However, when cross-compiling on amd64, sizeof(struct usb_device_id) = 24
-> >> in scripts/mod/file2alias.c.
-> >
-> > I don't really understand, what is the problem here?  The fact that we
-> > added one byte to the structure?  And now something breaks?  How?
-> >
-> > What can we do to resolve it?
-> 
-> As "kernel_ulong_t  driver_info" is no longer naturally aligned, the
-> compiler will
-> add implicit padding. But the padding depends on the architecture.
+The make target 'oldnoconfig' is a misnomer. It doesn't set new symbols
+to 'n', but instead sets it to their default values.
 
-Ah, so we were "lucky" before, nice.
+Unfortunately, assuming that it actually did this, broke ktest in some
+of its tests. For example, the tests to create a minimum config and even
+a config bisect, depends on removing various configs and using
+oldnoconfig to get rid of other configs that may have depended on it.
 
-> It can be fixed by adding explicit padding. Probably it should be padded by
-> 7 bytes (not 3), as kernel_ulong_t may require 8-byte alignment on some 64-bit
-> platforms. Or by an explicit alignment attribute.
-> 
-> See also
->   * commit 8175fe2dda1c93a9c596921c8ed4a0b4baccdefe ("HID: fix
-> hid_device_id for cross compiling")
->   * commit 7492d4a416d68ab4bd254b36ffcc4e0138daa8ff ("sdio: fix module
-> device table definition for m68k")
->   * commit 9e2d3cd34a159948dc753a14573e16bffc04dba8 ("[PATCH]
-> mod_devicetable.h fixes")
+But because some configs that it was trying to disable, were in fact
+default enabled, this caused those configs to re-enable and corrupt the
+test.
 
-So would the patch below fix this?  It should force alignment of the
-driver_data field, which is all you want here, right?
+I thought about fixing oldnoconfig, but I'm afraid that people are
+already dependent on its current behavior. Instead, I'm just updating
+the documentation to state that it sets the new symbols to their default
+values and not to 'n'.
 
-> Still, there's a bug in file2alias (which is compiled by the host
-> compiler), in that
-> it may use different padding than the target platform when cross-compiling.
+Ideally, this would be called, 'olddefconfig' and we have an
+'oldnoconfig' that actually disables the new symbols. But it's useless
+for me now. If it changed, ktest would need to be consistent between
+each version, and that would be to difficult to detect. I'll handle this
+issue with ktest with other means.
 
-That's not good, but outside of this specific issue, right?  Have we
-just been fortunate it hasn't really hit us yet?
+Signed-off-by: Steven Rostedt <rostedt@goodmis.org>
 
-thanks,
-
-greg k-h
-
-diff --git a/include/linux/mod_devicetable.h b/include/linux/mod_devicetable.h
-index 7771d45..6955045 100644
---- a/include/linux/mod_devicetable.h
-+++ b/include/linux/mod_devicetable.h
-@@ -122,7 +122,8 @@ struct usb_device_id {
- 	__u8		bInterfaceNumber;
+diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
+index 7966265..da36bde 100644
+--- a/scripts/kconfig/Makefile
++++ b/scripts/kconfig/Makefile
+@@ -114,7 +114,7 @@ help:
+ 	@echo  '  alldefconfig    - New config with all symbols set to default'
+ 	@echo  '  randconfig	  - New config with random answer to all options'
+ 	@echo  '  listnewconfig   - List new options'
+-	@echo  '  oldnoconfig     - Same as silentoldconfig but set new symbols to n (unset)'
++	@echo  '  oldnoconfig     - Same as silentoldconfig but sets new symbols to their default value'
  
- 	/* not matched against */
--	kernel_ulong_t	driver_info;
-+	kernel_ulong_t	driver_info
-+		__attribute__((aligned(sizeof(kernel_ulong_t))));
- };
- 
- /* Some useful macros to use to create struct usb_device_id */
+ # lxdialog stuff
+ check-lxdialog  := $(srctree)/$(src)/lxdialog/check-lxdialog.sh
+
+
