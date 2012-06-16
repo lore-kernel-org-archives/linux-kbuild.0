@@ -1,58 +1,74 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from hrndva-omtalb.mail.rr.com ([71.74.56.122]:18091 "EHLO
-	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1758494Ab2FOXZB (ORCPT
+Received: from Chamillionaire.breakpoint.cc ([80.244.247.6]:44344 "EHLO
+	Chamillionaire.breakpoint.cc" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1755961Ab2FPIv3 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 15 Jun 2012 19:25:01 -0400
-Message-ID: <1339802699.25903.47.camel@gandalf.stny.rr.com>
-Subject: kbuild: Document oldnoconfig to what it really does
-From: Steven Rostedt <rostedt@goodmis.org>
-Date: Fri, 15 Jun 2012 19:24:59 -0400
-Content-Type: text/plain; charset="ISO-8859-15"
-Content-Transfer-Encoding: 7bit
-Mime-Version: 1.0
+	Sat, 16 Jun 2012 04:51:29 -0400
+Date: Sat, 16 Jun 2012 10:50:49 +0200
+From: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>
+Subject: Re: [PATCH 7/9] mips: move PCI fixup hooks from __init to __devinit
+Message-ID: <20120616085049.GA2723@breakpoint.cc>
+References: <1338749305-22558-1-git-send-email-sebastian@breakpoint.cc>
+ <1338749305-22558-8-git-send-email-sebastian@breakpoint.cc>
+ <CAL-B5D1GEMd9TPMqbYBqDuzs5U2jo7ByRg73Z=dPsPcgTSyJJA@mail.gmail.com>
+ <CAErSpo77vyUaGTzVNwFGzTHsOapYNFRy_KOvNnXo=jdU2kYLbA@mail.gmail.com>
+ <20120615163823.GA14302@linux-mips.org>
+ <CAErSpo5kv_vE9D=AnyVdcXOAQpM6U3dyPpouE-NyNoU98R+syA@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8; x-action=pgp-signed
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAErSpo5kv_vE9D=AnyVdcXOAQpM6U3dyPpouE-NyNoU98R+syA@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: LKML <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
-Cc: Michal Marek <mmarek@suse.cz>
+To: Bjorn Helgaas <bhelgaas@google.com>
+Cc: Ralf Baechle <ralf@linux-mips.org>, Myron Stowe <myron.stowe@gmail.com>, linux-pci@vger.kernel.org, linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>
 
-The make target 'oldnoconfig' is a misnomer. It doesn't set new symbols
-to 'n', but instead sets it to their default values.
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
 
-Unfortunately, assuming that it actually did this, broke ktest in some
-of its tests. For example, the tests to create a minimum config and even
-a config bisect, depends on removing various configs and using
-oldnoconfig to get rid of other configs that may have depended on it.
+On Fri, Jun 15, 2012 at 03:13:26PM -0600, Bjorn Helgaas wrote:
+> On Fri, Jun 15, 2012 at 10:38 AM, Ralf Baechle <ralf@linux-mips.org> wrote:
+> > On Fri, Jun 15, 2012 at 10:33:15AM -0600, Bjorn Helgaas wrote:
+> >
+> >> > Doesn't the above line also need changed to __devinitdata if the
+> >> > function itself is being
+> >> > changed from __init to __devinit?
+> >>
+> >> I think so.  And pci_irq[] and piixirqmap[] also need to be moved,
+> >> since they're referenced by __devinit code.  I fixed these, audited
+> >> all the other patches, and updated the "next" branch.
+> >
+> > I'm going to patch that up.
+> 
+> Does this mean you're going to push it through your tree and I should
+> remove the mips patch from my "next" branch?  Either way is fine with
+> me; currently I'm planning to push all the other arch patches via my
+> tree.
 
-But because some configs that it was trying to disable, were in fact
-default enabled, this caused those configs to re-enable and corrupt the
-test.
+Ralf picked up my patch [0] and commited a few fixups on top [1] and a malta
+fixup [2].
 
-I thought about fixing oldnoconfig, but I'm afraid that people are
-already dependent on its current behavior. Instead, I'm just updating
-the documentation to state that it sets the new symbols to their default
-values and not to 'n'.
+[0] http://git.linux-mips.org/?p=ralf/linux.git;a=commitdiff;h=184170a613f4bccf4d58a4e73fa5d3a1ee839f38
+[1] http://git.linux-mips.org/?p=ralf/linux.git;a=commitdiff;h=f54d03696bdc1a9457c11ed6ae61e8f001217b25
+[2] http://git.linux-mips.org/?p=ralf/linux.git;a=commitdiff;h=2ec8663f9c03a96f2c328c7c483603c31d62ad37
 
-Ideally, this would be called, 'olddefconfig' and we have an
-'oldnoconfig' that actually disables the new symbols. But it's useless
-for me now. If it changed, ktest would need to be consistent between
-each version, and that would be to difficult to detect. I'll handle this
-issue with ktest with other means.
+> Bjorn
 
-Signed-off-by: Steven Rostedt <rostedt@goodmis.org>
+Sebastian
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
 
-diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
-index 7966265..da36bde 100644
---- a/scripts/kconfig/Makefile
-+++ b/scripts/kconfig/Makefile
-@@ -114,7 +114,7 @@ help:
- 	@echo  '  alldefconfig    - New config with all symbols set to default'
- 	@echo  '  randconfig	  - New config with random answer to all options'
- 	@echo  '  listnewconfig   - List new options'
--	@echo  '  oldnoconfig     - Same as silentoldconfig but set new symbols to n (unset)'
-+	@echo  '  oldnoconfig     - Same as silentoldconfig but sets new symbols to their default value'
- 
- # lxdialog stuff
- check-lxdialog  := $(srctree)/$(src)/lxdialog/check-lxdialog.sh
-
-
+iQIcBAEBCAAGBQJP3EjpAAoJEHuW6BYqjPXRNnQP/j6+Dt1fklG3wKYkU+svqhiE
+P7BeOQa4AK+8cPG7o5T1e+F3aNszSu8J/f7d0Y4qSy5u/b1kwNSgochU6fGSTeIt
+jFZM7Yevft4RUU76q5ga1CdRWEVVJ8aex0lbfQs2aEsASndXZNSCkm3KQOXGd+mj
+pwwe3rdiDxKBQJ0QeebpQRym0sUw9hsAaO4XXLJ8d2fVo+rIjJMSKM3bzMzb6GFh
+D3slYMCIYvIXg8+s6Hslv2Wc51oL+FkoASZXx1d7gCK/Utf+WLo30OyQdStC5rsq
+MqVy7+P4cZOKAAq181gX7Jx655ghVrnllJNjtMXgauCu8wjLE5FjIyh5DBz1VzDj
+w7rG7mbRMQz2P+CEmPNQwy6e4pspUh7GgKnc0duTQaPRderi3CN+rQRVdz9bBEDK
+Qtcf+vtReW8fRdcIAqgRcs/JmTgTZLyLeKf0Aa8s0h2SA9TRz/U7lqxf8Mq2zzyq
+TJXLtTtqXekTum11cuxbAUsbfuDCVtuHu648WJu0YS5J3mWEbIg94kULGLKclSy9
+aK3feDiS1kSWonKxr4LZ4pPh452dJl1+1Eq121rnK+IAG2qWSsda4ju8RVxxIHex
+hVhME1x8rkarBEUH2w4Y4aMKCgNbeHIVotnGhzwzYUQXXkZ+43RvQgPeCIkhwYx4
+1cx3lPomgGNN9JIETK6n
+=pKYs
+-----END PGP SIGNATURE-----
