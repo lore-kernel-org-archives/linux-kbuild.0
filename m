@@ -1,74 +1,118 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from Chamillionaire.breakpoint.cc ([80.244.247.6]:44344 "EHLO
-	Chamillionaire.breakpoint.cc" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1755961Ab2FPIv3 (ORCPT
+Received: from canardo.mork.no ([148.122.252.1]:35953 "EHLO canardo.mork.no"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1756798Ab2FPNXk convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 16 Jun 2012 04:51:29 -0400
-Date: Sat, 16 Jun 2012 10:50:49 +0200
-From: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>
-Subject: Re: [PATCH 7/9] mips: move PCI fixup hooks from __init to __devinit
-Message-ID: <20120616085049.GA2723@breakpoint.cc>
-References: <1338749305-22558-1-git-send-email-sebastian@breakpoint.cc>
- <1338749305-22558-8-git-send-email-sebastian@breakpoint.cc>
- <CAL-B5D1GEMd9TPMqbYBqDuzs5U2jo7ByRg73Z=dPsPcgTSyJJA@mail.gmail.com>
- <CAErSpo77vyUaGTzVNwFGzTHsOapYNFRy_KOvNnXo=jdU2kYLbA@mail.gmail.com>
- <20120615163823.GA14302@linux-mips.org>
- <CAErSpo5kv_vE9D=AnyVdcXOAQpM6U3dyPpouE-NyNoU98R+syA@mail.gmail.com>
+	Sat, 16 Jun 2012 09:23:40 -0400
+From: =?utf-8?Q?Bj=C3=B8rn_Mork?= <bjorn@mork.no>
+Subject: Re: [-next] FATAL: drivers/gpu/drm/udl/udl: sizeof(struct usb_device_id)=24 is not a modulo of the size of section __mod_usb_device_table=44.
+References: <CAMuHMdXk6pByz14JcDgY+UE6QM0sHD8cbXye9CgOVSRRtr7J+Q@mail.gmail.com>
+	<20120615201021.GB14544@kroah.com>
+	<CAMuHMdUj6tAcWhkSkV43Kw3-2-3+JzgP6W=2w3fjL2KBfRh9ZQ@mail.gmail.com>
+	<20120615231220.GC8205@kroah.com>
+Date: Sat, 16 Jun 2012 15:23:31 +0200
+In-Reply-To: <20120615231220.GC8205@kroah.com> (Greg Kroah-Hartman's message
+	of "Fri, 15 Jun 2012 16:12:20 -0700")
+Message-ID: <87lijns84s.fsf@nemi.mork.no>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; x-action=pgp-signed
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAErSpo5kv_vE9D=AnyVdcXOAQpM6U3dyPpouE-NyNoU98R+syA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Bjorn Helgaas <bhelgaas@google.com>
-Cc: Ralf Baechle <ralf@linux-mips.org>, Myron Stowe <myron.stowe@gmail.com>, linux-pci@vger.kernel.org, linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Geert Uytterhoeven <geert@linux-m68k.org>, USB list <linux-usb@vger.kernel.org>, linux-kernel@vger.kernel.org, Linux-Next <linux-next@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Linux/m68k <linux-m68k@vger.kernel.org>
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA256
+Greg Kroah-Hartman <gregkh@linuxfoundation.org> writes:
+> On Fri, Jun 15, 2012 at 11:02:55PM +0200, Geert Uytterhoeven wrote:
+>
+>> As "kernel_ulong_t  driver_info" is no longer naturally aligned, the
+>> compiler will
+>> add implicit padding. But the padding depends on the architecture.
+>
+> Ah, so we were "lucky" before, nice.
 
-On Fri, Jun 15, 2012 at 03:13:26PM -0600, Bjorn Helgaas wrote:
-> On Fri, Jun 15, 2012 at 10:38 AM, Ralf Baechle <ralf@linux-mips.org> wrote:
-> > On Fri, Jun 15, 2012 at 10:33:15AM -0600, Bjorn Helgaas wrote:
-> >
-> >> > Doesn't the above line also need changed to __devinitdata if the
-> >> > function itself is being
-> >> > changed from __init to __devinit?
-> >>
-> >> I think so.  And pci_irq[] and piixirqmap[] also need to be moved,
-> >> since they're referenced by __devinit code.  I fixed these, audited
-> >> all the other patches, and updated the "next" branch.
-> >
-> > I'm going to patch that up.
-> 
-> Does this mean you're going to push it through your tree and I should
-> remove the mips patch from my "next" branch?  Either way is fine with
-> me; currently I'm planning to push all the other arch patches via my
-> tree.
+I don't really believe in luck :-)  I think someone has been really
+smart here.  Maybe too smart...
 
-Ralf picked up my patch [0] and commited a few fixups on top [1] and a malta
-fixup [2].
 
-[0] http://git.linux-mips.org/?p=ralf/linux.git;a=commitdiff;h=184170a613f4bccf4d58a4e73fa5d3a1ee839f38
-[1] http://git.linux-mips.org/?p=ralf/linux.git;a=commitdiff;h=f54d03696bdc1a9457c11ed6ae61e8f001217b25
-[2] http://git.linux-mips.org/?p=ralf/linux.git;a=commitdiff;h=2ec8663f9c03a96f2c328c7c483603c31d62ad37
+>> It can be fixed by adding explicit padding. Probably it should be padded by
+>> 7 bytes (not 3), as kernel_ulong_t may require 8-byte alignment on some 64-bit
+>> platforms. Or by an explicit alignment attribute.
+>> 
+>> See also
+>>   * commit 8175fe2dda1c93a9c596921c8ed4a0b4baccdefe ("HID: fix
+>> hid_device_id for cross compiling")
+>>   * commit 7492d4a416d68ab4bd254b36ffcc4e0138daa8ff ("sdio: fix module
+>> device table definition for m68k")
+>>   * commit 9e2d3cd34a159948dc753a14573e16bffc04dba8 ("[PATCH]
+>> mod_devicetable.h fixes")
+>
+> So would the patch below fix this?  It should force alignment of the
+> driver_data field, which is all you want here, right?
+>
+>> Still, there's a bug in file2alias (which is compiled by the host
+>> compiler), in that
+>> it may use different padding than the target platform when cross-compiling.
+>
+> That's not good, but outside of this specific issue, right?  Have we
+> just been fortunate it hasn't really hit us yet?
+>
+> thanks,
+>
+> greg k-h
+>
+> diff --git a/include/linux/mod_devicetable.h b/include/linux/mod_devicetable.h
+> index 7771d45..6955045 100644
+> --- a/include/linux/mod_devicetable.h
+> +++ b/include/linux/mod_devicetable.h
+> @@ -122,7 +122,8 @@ struct usb_device_id {
+>  	__u8		bInterfaceNumber;
+>  
+>  	/* not matched against */
+> -	kernel_ulong_t	driver_info;
+> +	kernel_ulong_t	driver_info
+> +		__attribute__((aligned(sizeof(kernel_ulong_t))));
+>  };
 
-> Bjorn
 
-Sebastian
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.12 (GNU/Linux)
+This feels a lot like papering over the real problem.  It will solve
+this instance, but the list of such previous "paper work" that Geert
+provided should be enough evidence that this will happen again the next
+time someone modifies a device id struct for some subsystem.
 
-iQIcBAEBCAAGBQJP3EjpAAoJEHuW6BYqjPXRNnQP/j6+Dt1fklG3wKYkU+svqhiE
-P7BeOQa4AK+8cPG7o5T1e+F3aNszSu8J/f7d0Y4qSy5u/b1kwNSgochU6fGSTeIt
-jFZM7Yevft4RUU76q5ga1CdRWEVVJ8aex0lbfQs2aEsASndXZNSCkm3KQOXGd+mj
-pwwe3rdiDxKBQJ0QeebpQRym0sUw9hsAaO4XXLJ8d2fVo+rIjJMSKM3bzMzb6GFh
-D3slYMCIYvIXg8+s6Hslv2Wc51oL+FkoASZXx1d7gCK/Utf+WLo30OyQdStC5rsq
-MqVy7+P4cZOKAAq181gX7Jx655ghVrnllJNjtMXgauCu8wjLE5FjIyh5DBz1VzDj
-w7rG7mbRMQz2P+CEmPNQwy6e4pspUh7GgKnc0duTQaPRderi3CN+rQRVdz9bBEDK
-Qtcf+vtReW8fRdcIAqgRcs/JmTgTZLyLeKf0Aa8s0h2SA9TRz/U7lqxf8Mq2zzyq
-TJXLtTtqXekTum11cuxbAUsbfuDCVtuHu648WJu0YS5J3mWEbIg94kULGLKclSy9
-aK3feDiS1kSWonKxr4LZ4pPh452dJl1+1Eq121rnK+IAG2qWSsda4ju8RVxxIHex
-hVhME1x8rkarBEUH2w4Y4aMKCgNbeHIVotnGhzwzYUQXXkZ+43RvQgPeCIkhwYx4
-1cx3lPomgGNN9JIETK6n
-=pKYs
------END PGP SIGNATURE-----
+And adding forced aligment here feels wrong since there is no good
+reason why the (target) compiler shouldn't know the proper alignment for
+this structure, is there? OK, "feels wrong" is not a good argument. But
+it would be better to solve this problem once and for all.
+
+AFAIK (which admittedly is not much wrt cross building) there is no way
+we can make the host built file2alias know the proper aligment for the
+structure in the target built modules.  That's the background for this
+fix: 
+
+commit 4ce6efed48d736e3384c39ff87bda723e1f8e041
+Author: Sam Ravnborg <sam@uranus.ravnborg.org>
+Date:   Sun Mar 23 21:38:54 2008 +0100
+
+    kbuild: soften modpost checks when doing cross builds
+    
+    The module alias support in the kernel have a consistency
+    check where it is checked that the size of a structure
+    in the kernel and on the build host are the same.
+    For cross builds this check does not make sense so detect
+    when we do cross builds and silently skip the check in these
+    situations.
+    This fixes a build bug for a wireless driver when cross building
+    for arm.
+
+
+
+What I'm now wondering is why didn't this kick in?  I believe we should
+find and fix that instead of playing around with the in-kernel structure
+alignments.  If that's possible.
+
+BTW, thanks for finding and reporting this at such an early stage,
+Geert.
+
+
+Bjørn
