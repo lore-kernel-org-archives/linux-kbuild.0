@@ -1,34 +1,63 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mailrelay008.isp.belgacom.be ([195.238.6.174]:7701 "EHLO
-	mailrelay008.isp.belgacom.be" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1755789Ab2FPSdr (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 16 Jun 2012 14:33:47 -0400
-Date: Sat, 16 Jun 2012 20:33:42 +0200
-From: Philippe De Muyter <phdm@macqel.be>
-Subject: Re: [-next] FATAL: drivers/gpu/drm/udl/udl: sizeof(struct
-	usb_device_id)=24 is not a modulo of the size of section
-	__mod_usb_device_table=44.
-Message-ID: <20120616183342.GA6873@frolo.macqel>
-References: <CAMuHMdXk6pByz14JcDgY+UE6QM0sHD8cbXye9CgOVSRRtr7J+Q@mail.gmail.com> <20120615201021.GB14544@kroah.com> <CAMuHMdUj6tAcWhkSkV43Kw3-2-3+JzgP6W=2w3fjL2KBfRh9ZQ@mail.gmail.com> <20120615231220.GC8205@kroah.com> <87lijns84s.fsf@nemi.mork.no>
+Received: from mail-lpp01m010-f46.google.com ([209.85.215.46]:53887 "EHLO
+	mail-lpp01m010-f46.google.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1755964Ab2FPSp7 convert rfc822-to-8bit
+	(ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 16 Jun 2012 14:45:59 -0400
+Received: by lahd3 with SMTP id d3so2746141lah.19
+        for <linux-kbuild@vger.kernel.org>; Sat, 16 Jun 2012 11:45:57 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <87lijns84s.fsf@nemi.mork.no>
+In-Reply-To: <20120616085049.GA2723@breakpoint.cc>
+References: <1338749305-22558-1-git-send-email-sebastian@breakpoint.cc>
+ <1338749305-22558-8-git-send-email-sebastian@breakpoint.cc>
+ <CAL-B5D1GEMd9TPMqbYBqDuzs5U2jo7ByRg73Z=dPsPcgTSyJJA@mail.gmail.com>
+ <CAErSpo77vyUaGTzVNwFGzTHsOapYNFRy_KOvNnXo=jdU2kYLbA@mail.gmail.com>
+ <20120615163823.GA14302@linux-mips.org> <CAErSpo5kv_vE9D=AnyVdcXOAQpM6U3dyPpouE-NyNoU98R+syA@mail.gmail.com>
+ <20120616085049.GA2723@breakpoint.cc>
+From: Bjorn Helgaas <bhelgaas@google.com>
+Date: Sat, 16 Jun 2012 12:45:37 -0600
+Message-ID: <CAErSpo4o-Zh8-8Ut7Q3T3rtFRtetCu84RauVpoM_vSr0oS-ZdQ@mail.gmail.com>
+Subject: Re: [PATCH 7/9] mips: move PCI fixup hooks from __init to __devinit
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: =?iso-8859-1?Q?Bj=F8rn?= Mork <bjorn@mork.no>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Geert Uytterhoeven <geert@linux-m68k.org>, USB list <linux-usb@vger.kernel.org>, linux-kernel@vger.kernel.org, Linux-Next <linux-next@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Linux/m68k <linux-m68k@vger.kernel.org>
+To: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>
+Cc: Ralf Baechle <ralf@linux-mips.org>, Myron Stowe <myron.stowe@gmail.com>, linux-pci@vger.kernel.org, linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>
 
-On Sat, Jun 16, 2012 at 03:23:31PM +0200, Bjørn Mork wrote:
-> 
-> AFAIK (which admittedly is not much wrt cross building) there is no way
-> we can make the host built file2alias know the proper aligment for the
-> structure in the target built modules.  That's the background for this
-> fix: 
+On Sat, Jun 16, 2012 at 2:50 AM, Sebastian Andrzej Siewior
+<sebastian@breakpoint.cc> wrote:
+> -----BEGIN PGP SIGNED MESSAGE-----
+> Hash: SHA256
+>
+> On Fri, Jun 15, 2012 at 03:13:26PM -0600, Bjorn Helgaas wrote:
+>> On Fri, Jun 15, 2012 at 10:38 AM, Ralf Baechle <ralf@linux-mips.org> wrote:
+>> > On Fri, Jun 15, 2012 at 10:33:15AM -0600, Bjorn Helgaas wrote:
+>> >
+>> >> > Doesn't the above line also need changed to __devinitdata if the
+>> >> > function itself is being
+>> >> > changed from __init to __devinit?
+>> >>
+>> >> I think so.  And pci_irq[] and piixirqmap[] also need to be moved,
+>> >> since they're referenced by __devinit code.  I fixed these, audited
+>> >> all the other patches, and updated the "next" branch.
+>> >
+>> > I'm going to patch that up.
+>>
+>> Does this mean you're going to push it through your tree and I should
+>> remove the mips patch from my "next" branch?  Either way is fine with
+>> me; currently I'm planning to push all the other arch patches via my
+>> tree.
+>
+> Ralf picked up my patch [0] and commited a few fixups on top [1] and a malta
+> fixup [2].
+>
+> [0] http://git.linux-mips.org/?p=ralf/linux.git;a=commitdiff;h=184170a613f4bccf4d58a4e73fa5d3a1ee839f38
+> [1] http://git.linux-mips.org/?p=ralf/linux.git;a=commitdiff;h=f54d03696bdc1a9457c11ed6ae61e8f001217b25
+> [2] http://git.linux-mips.org/?p=ralf/linux.git;a=commitdiff;h=2ec8663f9c03a96f2c328c7c483603c31d62ad37
 
-autoconf has a lot of nice macros (using the cross-compiler) to solve
-that sort  of problems.
+OK, I'll drop the MIPS patch from my branch.  Note that the three
+patches you mention above don't yet include the pci_irq[] and
+piixirqmap[] fixes.  I assume you'll include those, too, Ralf.
 
-Philippe
+Bjorn
