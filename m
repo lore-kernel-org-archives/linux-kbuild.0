@@ -1,128 +1,74 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ob0-f174.google.com ([209.85.214.174]:57841 "EHLO
-	mail-ob0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755835Ab2FPTat convert rfc822-to-8bit (ORCPT
+Received: from canardo.mork.no ([148.122.252.1]:53701 "EHLO canardo.mork.no"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1757334Ab2FQOBG convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 16 Jun 2012 15:30:49 -0400
-MIME-Version: 1.0
-In-Reply-To: <20120616191114.GA10098@kroah.com>
+	Sun, 17 Jun 2012 10:01:06 -0400
+From: =?utf-8?Q?Bj=C3=B8rn_Mork?= <bjorn@mork.no>
+Subject: Re: [-next] FATAL: drivers/gpu/drm/udl/udl: sizeof(struct usb_device_id)=24 is not a modulo of the size of section __mod_usb_device_table=44.
 References: <CAMuHMdXk6pByz14JcDgY+UE6QM0sHD8cbXye9CgOVSRRtr7J+Q@mail.gmail.com>
 	<20120615201021.GB14544@kroah.com>
 	<CAMuHMdUj6tAcWhkSkV43Kw3-2-3+JzgP6W=2w3fjL2KBfRh9ZQ@mail.gmail.com>
-	<20120615231220.GC8205@kroah.com>
-	<87lijns84s.fsf@nemi.mork.no>
-	<20120616191114.GA10098@kroah.com>
-Date: Sat, 16 Jun 2012 21:30:48 +0200
-Message-ID: <CAMuHMdWobY63O6jSuET1MzuQ80N8xjJA7ny6n0tCdc29Z3vKpA@mail.gmail.com>
-Subject: Re: [-next] FATAL: drivers/gpu/drm/udl/udl: sizeof(struct
- usb_device_id)=24 is not a modulo of the size of section __mod_usb_device_table=44.
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Content-Type: text/plain; charset=UTF-8
+	<20120615231220.GC8205@kroah.com> <87lijns84s.fsf@nemi.mork.no>
+	<m2bokjb6tv.fsf@igel.home>
+Date: Sun, 17 Jun 2012 16:00:57 +0200
+In-Reply-To: <m2bokjb6tv.fsf@igel.home> (Andreas Schwab's message of "Sat, 16
+	Jun 2012 17:43:40 +0200")
+Message-ID: <87fw9urqau.fsf@nemi.mork.no>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: =?UTF-8?Q?Bj=C3=B8rn_Mork?= <bjorn@mork.no>, USB list <linux-usb@vger.kernel.org>, linux-kernel@vger.kernel.org, Linux-Next <linux-next@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Linux/m68k <linux-m68k@vger.kernel.org>
+To: Andreas Schwab <schwab@linux-m68k.org>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Geert Uytterhoeven <geert@linux-m68k.org>, USB list <linux-usb@vger.kernel.org>, linux-kernel@vger.kernel.org, Linux-Next <linux-next@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Linux/m68k <linux-m68k@vger.kernel.org>
 
-On Sat, Jun 16, 2012 at 9:11 PM, Greg Kroah-Hartman
-<gregkh@linuxfoundation.org> wrote:
-> On Sat, Jun 16, 2012 at 03:23:31PM +0200, Bjørn Mork wrote:
->> Greg Kroah-Hartman <gregkh@linuxfoundation.org> writes:
->> > On Fri, Jun 15, 2012 at 11:02:55PM +0200, Geert Uytterhoeven wrote:
->> >
->> >> As "kernel_ulong_t  driver_info" is no longer naturally aligned, the
->> >> compiler will
->> >> add implicit padding. But the padding depends on the architecture.
->> >
->> > Ah, so we were "lucky" before, nice.
->>
->> I don't really believe in luck :-)  I think someone has been really
->> smart here.  Maybe too smart...
+Andreas Schwab <schwab@linux-m68k.org> writes:
+> Bjørn Mork <bjorn@mork.no> writes:
 >
-> No, I think the previous structure was just "lucky" in that it just
-> happened to be the right alignment.  I say this as I think I was the one
-> who created that structure years ago.  Or maybe not, this was back in
-> the 2.3 kernel days, I can't remember what patches I wrote last week...
->
->> >> It can be fixed by adding explicit padding. Probably it should be padded by
->> >> 7 bytes (not 3), as kernel_ulong_t may require 8-byte alignment on some 64-bit
->> >> platforms. Or by an explicit alignment attribute.
->> >>
->> >> See also
->> >>   * commit 8175fe2dda1c93a9c596921c8ed4a0b4baccdefe ("HID: fix
->> >> hid_device_id for cross compiling")
->> >>   * commit 7492d4a416d68ab4bd254b36ffcc4e0138daa8ff ("sdio: fix module
->> >> device table definition for m68k")
->> >>   * commit 9e2d3cd34a159948dc753a14573e16bffc04dba8 ("[PATCH]
->> >> mod_devicetable.h fixes")
->> >
->> > So would the patch below fix this?  It should force alignment of the
->> > driver_data field, which is all you want here, right?
->> >
->> >> Still, there's a bug in file2alias (which is compiled by the host
->> >> compiler), in that
->> >> it may use different padding than the target platform when cross-compiling.
->> >
->> > That's not good, but outside of this specific issue, right?  Have we
->> > just been fortunate it hasn't really hit us yet?
->> >
->> > thanks,
->> >
->> > greg k-h
->> >
->> > diff --git a/include/linux/mod_devicetable.h b/include/linux/mod_devicetable.h
->> > index 7771d45..6955045 100644
->> > --- a/include/linux/mod_devicetable.h
->> > +++ b/include/linux/mod_devicetable.h
->> > @@ -122,7 +122,8 @@ struct usb_device_id {
->> >     __u8            bInterfaceNumber;
->> >
->> >     /* not matched against */
->> > -   kernel_ulong_t  driver_info;
->> > +   kernel_ulong_t  driver_info
->> > +           __attribute__((aligned(sizeof(kernel_ulong_t))));
->> >  };
+>> AFAIK (which admittedly is not much wrt cross building) there is no way
+>> we can make the host built file2alias know the proper aligment for the
+>> structure in the target built modules.  That's the background for this
+>> fix: 
 >>
+>> commit 4ce6efed48d736e3384c39ff87bda723e1f8e041
+>> Author: Sam Ravnborg <sam@uranus.ravnborg.org>
+>> Date:   Sun Mar 23 21:38:54 2008 +0100
 >>
->> This feels a lot like papering over the real problem.  It will solve
->> this instance, but the list of such previous "paper work" that Geert
->> provided should be enough evidence that this will happen again the next
->> time someone modifies a device id struct for some subsystem.
+>>     kbuild: soften modpost checks when doing cross builds
 >
-> Hopefully not, if you add another field here, the alignment force will
-> keep things lined up properly, from what I can tell.  Is that not true?
+> This is not a fix in any sense of the word.  modpost can only work
+> properly if its view of the device_id structures matches *exactly* that
+> of the target.
 
-... for struct usb_device_id.
-But not for all other existing and future device ID types.
+You are absolutely correct, of course.  I am starting to believe Greg is
+correct.  Cross building works mostly by pure luck :-)
 
-We have kernel_ulong_t to tell the host compiler what the target's
-unsigned long type (actually only its size, not alignment) is.
+I found that the reason the change I referred to above didn't kick in
+was because CONFIG_DEBUG_SECTION_MISMATCH was set, causing modpost to be
+called from scripts/Makefile.build without the "-c" option:
 
-scripts/mod/file2alias.c handles this with:
+ # Do section mismatch analysis for each module/built-in.o
+ ifdef CONFIG_DEBUG_SECTION_MISMATCH
+   cmd_secanalysis = ; scripts/mod/modpost $@
+ endif
 
-#if KERNEL_ELFCLASS == ELFCLASS32
-typedef Elf32_Addr      kernel_ulong_t;
-#define BITS_PER_LONG 32
-#else
-typedef Elf64_Addr      kernel_ulong_t;
-#define BITS_PER_LONG 64
-#endif
 
-To fix the misalignment issue, can't we add
-"__attribute__((aligned(2)))" to the typedef when cross-compiling for m68k?
+But as you point out: The whole "soften modpost check" concept is bogus.
+It just cannot work.  And I just verified it doing a m68k allmodconfig
+build without CONFIG_DEBUG_SECTION_MISMATCH.  modpost will bail out
+unless host and target aligment matches:
 
-Still, that only solves the problem for "kernel_ulong_t". Not for all other
-4 or 8 bytes types (in practice just "u32") that are used in
-include/linux/mod_devicetable.h. So we would also need "kernel_u32".
-And "kernel_u16" for consistency.
+  scripts/mod/modpost -m -a -o /usr/local/src/build-tmp/linux/Module.symvers    -S  -c -s
+drivers/media/video/gspca/gspca_sunplus: struct usb_device_id is 24 bytes.  The last of 55 is:
+0x04 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 
+FATAL: drivers/media/video/gspca/gspca_sunplus: struct usb_device_id is not terminated with a NULL entry!
+make[1]: *** [__modpost] Error 1
+make: *** [modules] Error 2
 
-Gr{oetje,eeting}s,
 
-                        Geert
+So the prosed fix from Greg is certainly the correct one, until someone
+rewrites modpost to be completely cross build safe.
 
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
 
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+Bjørn
