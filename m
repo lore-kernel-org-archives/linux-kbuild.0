@@ -1,74 +1,39 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from canardo.mork.no ([148.122.252.1]:53701 "EHLO canardo.mork.no"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1757334Ab2FQOBG convert rfc822-to-8bit (ORCPT
+Received: from mail-out.m-online.net ([212.18.0.9]:38550 "EHLO
+	mail-out.m-online.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754254Ab2FQPmc (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 17 Jun 2012 10:01:06 -0400
-From: =?utf-8?Q?Bj=C3=B8rn_Mork?= <bjorn@mork.no>
+	Sun, 17 Jun 2012 11:42:32 -0400
+From: Andreas Schwab <schwab@linux-m68k.org>
 Subject: Re: [-next] FATAL: drivers/gpu/drm/udl/udl: sizeof(struct usb_device_id)=24 is not a modulo of the size of section __mod_usb_device_table=44.
 References: <CAMuHMdXk6pByz14JcDgY+UE6QM0sHD8cbXye9CgOVSRRtr7J+Q@mail.gmail.com>
 	<20120615201021.GB14544@kroah.com>
 	<CAMuHMdUj6tAcWhkSkV43Kw3-2-3+JzgP6W=2w3fjL2KBfRh9ZQ@mail.gmail.com>
 	<20120615231220.GC8205@kroah.com> <87lijns84s.fsf@nemi.mork.no>
-	<m2bokjb6tv.fsf@igel.home>
-Date: Sun, 17 Jun 2012 16:00:57 +0200
-In-Reply-To: <m2bokjb6tv.fsf@igel.home> (Andreas Schwab's message of "Sat, 16
-	Jun 2012 17:43:40 +0200")
-Message-ID: <87fw9urqau.fsf@nemi.mork.no>
+	<m2bokjb6tv.fsf@igel.home> <87fw9urqau.fsf@nemi.mork.no>
+Date: Sun, 17 Jun 2012 17:42:22 +0200
+In-Reply-To: <87fw9urqau.fsf@nemi.mork.no> (=?utf-8?Q?=22Bj=C3=B8rn?=
+ Mork"'s message of "Sun, 17
+	Jun 2012 16:00:57 +0200")
+Message-ID: <m27gv654ip.fsf@igel.home>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andreas Schwab <schwab@linux-m68k.org>
+To: =?utf-8?Q?Bj=C3=B8rn?= Mork <bjorn@mork.no>
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Geert Uytterhoeven <geert@linux-m68k.org>, USB list <linux-usb@vger.kernel.org>, linux-kernel@vger.kernel.org, Linux-Next <linux-next@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Linux/m68k <linux-m68k@vger.kernel.org>
 
-Andreas Schwab <schwab@linux-m68k.org> writes:
-> Bjørn Mork <bjorn@mork.no> writes:
->
->> AFAIK (which admittedly is not much wrt cross building) there is no way
->> we can make the host built file2alias know the proper aligment for the
->> structure in the target built modules.  That's the background for this
->> fix: 
->>
->> commit 4ce6efed48d736e3384c39ff87bda723e1f8e041
->> Author: Sam Ravnborg <sam@uranus.ravnborg.org>
->> Date:   Sun Mar 23 21:38:54 2008 +0100
->>
->>     kbuild: soften modpost checks when doing cross builds
->
-> This is not a fix in any sense of the word.  modpost can only work
-> properly if its view of the device_id structures matches *exactly* that
-> of the target.
+Bjørn Mork <bjorn@mork.no> writes:
 
-You are absolutely correct, of course.  I am starting to believe Greg is
-correct.  Cross building works mostly by pure luck :-)
+> So the prosed fix from Greg is certainly the correct one, until someone
+> rewrites modpost to be completely cross build safe.
 
-I found that the reason the change I referred to above didn't kick in
-was because CONFIG_DEBUG_SECTION_MISMATCH was set, causing modpost to be
-called from scripts/Makefile.build without the "-c" option:
+I started working on that.  Then I saw do_input and barfed.
 
- # Do section mismatch analysis for each module/built-in.o
- ifdef CONFIG_DEBUG_SECTION_MISMATCH
-   cmd_secanalysis = ; scripts/mod/modpost $@
- endif
+Andreas.
 
-
-But as you point out: The whole "soften modpost check" concept is bogus.
-It just cannot work.  And I just verified it doing a m68k allmodconfig
-build without CONFIG_DEBUG_SECTION_MISMATCH.  modpost will bail out
-unless host and target aligment matches:
-
-  scripts/mod/modpost -m -a -o /usr/local/src/build-tmp/linux/Module.symvers    -S  -c -s
-drivers/media/video/gspca/gspca_sunplus: struct usb_device_id is 24 bytes.  The last of 55 is:
-0x04 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 
-FATAL: drivers/media/video/gspca/gspca_sunplus: struct usb_device_id is not terminated with a NULL entry!
-make[1]: *** [__modpost] Error 1
-make: *** [modules] Error 2
-
-
-So the prosed fix from Greg is certainly the correct one, until someone
-rewrites modpost to be completely cross build safe.
-
-
-Bjørn
+-- 
+Andreas Schwab, schwab@linux-m68k.org
+GPG Key fingerprint = 58CA 54C7 6D53 942B 1756  01D3 44D5 214B 8276 4ED5
+"And now for something completely different."
