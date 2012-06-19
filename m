@@ -1,79 +1,48 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from [112.65.243.170] ([112.65.243.170]:1710 "HELO shiwuyou.com"
-	rhost-flags-FAIL-FAIL-OK-FAIL) by vger.kernel.org with SMTP
-	id S1754520Ab2FSQXl (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 19 Jun 2012 12:23:41 -0400
-Message-ID: <1E79D063C881265CB7ACF41F72EDF7B1@jbzjda>
-From: =?utf-8?B?6LSn5Yiw5LuY5qy+77yM5LuFMjk45YWD44CCIA==?=
-	<admin@shiwuyou.com>
-Subject: =?utf-8?B?6LSn5Yiw5LuY5qy+77ya5Y+v5Lul5b2V5YOP55qE5omL6KGo5omL5py6LOS4jeWHhuWBt+aLje+8mw==?=
-	=?utf-8?B?LOS7hTI5OOWFg+OAgg==?=
-Date: Mon, 20 Jun 2016 00:15:44 +0800
+Received: from smtp.snhosting.dk ([87.238.248.203]:29445 "EHLO
+	smtp.domainteam.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753101Ab2FSSsF (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 19 Jun 2012 14:48:05 -0400
+Date: Tue, 19 Jun 2012 20:48:03 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: asm/kvm_para.h from asm-generic (was: Re: linux-next: triage
+	for April 19, 2012)
+Message-ID: <20120619184803.GA31656@merkur.ravnborg.org>
+References: <CAMuHMdW9D4FZSUibcd+qrtM+is75FyJXj+RxK+sb33XEjczdyg@mail.gmail.com> <CAMuHMdVM3zn_OUAtGTV_O0d3yFWBM5b_6ORHxaMLVE27Cf_XrQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAMuHMdVM3zn_OUAtGTV_O0d3yFWBM5b_6ORHxaMLVE27Cf_XrQ@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: lintywilliams@gmail.com, linux111@0451.com, linux-kbuild@vger.kernel.org, linvvv@126.com, lin-wanglin-wang@263.net, linwei@nenpub.szptt.net.cn, linweifiona@hotmail.com, linweit@cuhk.edu.hk, linwenjie@263.net, linwj@sti.gd.cn
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, Avi Kivity <avi@redhat.com>, Paul Gortmaker <paul.gortmaker@windriver.com>, linux-next@vger.kernel.org, linux-kernel@vger.kernel.org, Linux/m68k <linux-m68k@vger.kernel.org>, kvm@vger.kernel.org, Paul Mundt <lethal@linux-sh.org>
 
-6LSn5Yiw5LuY5qy+77ya5Y+v5Lul5b2V5YOP55qE5omL6KGo5omL5py6LOS4jeWHhuWBt+aLje+8
-m+eUteWtkOS5puiTneeJmU1ROTk46IWV6KGo5omL5py65ZCO5Y+wUVEgDQoNCuWPr+S7peW9leWD
-j+eahOaJi+ihqOaJi+acuizkuI3lh4bnlKjmnaXlgbfmi43vvJvnlLXlrZDkuabok53niZlNUTk5
-OOiFleihqOaJi+acuuWQjuWPsFFRICANCg0K54m56Imy77yaDQox77yMIOWPr+S7peW9leWDj+OA
-geato+WTgeaJi+ihqOaJi+acuiDnlLXlrZDkuaYg6JOd54mZIE1ROTk4IOiFleihqOaJi+acuiDl
-kI7lj7BRUSANCjLvvIwg5omL6KGo5omL5py65Li76KaB5piv5L6/5LqO5pC65bim77yM5LiN5piT
-5Lii5aSx77yM5q+U6L6D6ZqQ6JS977yM5oi05LiK5q+U6L6D5pe25bCa5ZKM5YmN5Y2r44CCDQoz
-77yMIOeOsOWcqOeUteaxoOWNh+e6p+S4uuWKoOW8uueJiDg4ME1B55qE77yb6LWg6YCBIOivu+WN
-oeWZqCAuDQogDQoNCuWFqOWbvei0p+WIsOS7mOasvi7ku4Xku4UyOTjlhYPjgIINCuWFqOWbvei0
-p+WIsOS7mOasvi7ku4Xku4UyOTjlhYPjgIINCuWFqOWbvei0p+WIsOS7mOasvi7ku4Xku4UyOTjl
-hYPjgIINCuWFqOWbvei0p+WIsOS7mOasvi7ku4Xku4UyOTjlhYPjgIINCg0K6ZyA6KaB55qE6K+3
-6IGU57O7UVE6IDYwMzQ1NzIzOA0K6ZyA6KaB55qE6K+36IGU57O7UVE6IDYwMzQ1NzIzOA0K6ZyA
-6KaB55qE6K+36IGU57O7UVE6IDYwMzQ1NzIzOA0KDQrnvZHlnYDvvJpodHRwOi8venp0LnNvL3Fx
-MmkNCue9keWdgO+8mmh0dHA6Ly96enQuc28vcXEyaQ0K572R5Z2A77yaaHR0cDovL3p6dC5zby9x
-cTJpDQrnvZHlnYDvvJpodHRwOi8venp0LnNvL3FxMmkNCg0K6LSt5Lmw5LmL5YmN6K+36K6k55yf
-6ZiF6K+777yaDQoNCjHvvIzkubDlrrbvvJror7fpl67ov5nmrL7miYvmnLrmgI7kuYjmjqXmiZPn
-lLXor53vvJ/lv4XpobvnlKjogLPmnLrlkJfvvJ8NCg0K562U77ya6L+Z5qy+5omL6KGo5omL5py6
-5o6l5omT55S16K+d5ZKM5pmu6YCa5omL5py65LiA5qC377yM5peg6ZyA6ICz5py65oiW6JOd54mZ
-55u05o6l5o6l5omT55S16K+d77yM5pyJ5aSW572u55qE5ZCs562S5ZKM6K+d562S77yM5Lmf5Y+v
-5Lul5YWN5o+Q77yM5b2T54S25Lmf5Y+v5Lul55So6ICz5py65oiW6ICF6JOd54mZ6ICz5py644CC
-DQoNCjLvvIzkubDlrrbvvJror7fpl67otKjph4/lj6/ku6XlkJfvvJ/mnInkv53or4HlkJfvvJ/k
-v6Hlj7fvvIzpn7PotKjmgI7kuYjmoLfvvJ/lvoXmnLrlpJrkuYXvvJ8NCg0K562U77ya5Y6C5a62
-55u06ZSA77yM5bel5Y6C5Y+R6LSn5Y6f6KOF5q2j5ZOB6LSo6YeP6Z2e5bi45aW9IOe7neWvueea
-hOaUvuW/g+OAguS/oeWPt+W8uu+8jOmfs+i0qOWlve+8jOWjsOmfs+Wkp+Wwj+WSjOS4gOiIrOaJ
-i+acuuS4gOagt++8jOaJi+ihqOaJi+acuueUseS6jueUteaxoOWwj++8jOWuuemHj+S5n+Wwsei3
-n+edgOWwj++8jOS4gOiIrOW+heacujPlpKnjgIINCg0KM++8jOS5sOWutu+8muaJi+acuuaJi+ac
-uuiDveijheeUteS/oeWNoeWQl++8nw0KDQrnrZTvvJrmnKzlupfmiYDmnInmiYvooajmiYvmnLrp
-g73lj6rmlK/mjIHnp7vliqjmiJbogZTpgJrljaHvvIzkuZ/lsLHmmK/lj6rmlK/mjIFH572R5LiN
-5pSv5oyBQ+e9keOAgg0KDQo077yM5Lmw5a6277ya5bGP5bmV6YKj5LmI5bCP77yM5oCO5LmI6Kem
-5pG477yf5pyJ6Kem5pG456yU5ZCX77yfDQoNCg0K562U77ya5pyJ55qE77yM5Zyo6KGo5bim5LiK
-44CB5pa55L6/5pC65bim77yM6ZqP5pe25Y+v5Lul5oq95Y+W5Ye65p2l44CCDQoNCjXvvIzkubDl
-rrbvvJrmiYvooajmiYvmnLrpmLLmsLTlkJfvvJ/lj6/ku6XpnZnpn7PvvJ8NCg0K562U77ya5omL
-6KGo5omL5py66YO95piv55Sf5rS76Ziy5rC077yM77yI5L6L5aaC77ya5rSX5omL77yM5rSX6KGj
-5pyN6L+Z57G777yJ5LiN6IO95aSn6Z2i56ev5o6l6Kem5rC077yM5LiN6IO95bim5Y675ri45rOz
-44CC5omA5pyJ5omL6KGo5omL5py66YO95Y+q5pyJ5LiA6Iis5qih5byP5ZKM6ZyH5Yqo5qih5byP
-77yM5aaC5p6c5Lmw5a625oOz6KaB5a6M5YWo6Z2Z6Z+z5Y+v5Lul5b2V5LiA5q615peg5aOw6Z+z
-6aKR6K6+572u6ZOD5aOwLg0KDQo277yM5Lmw5a6277ya5L+d5L+u5aSa6ZW/5pe26Ze077yf5aSa
-5LmF5YyF6YCA5o2i77yf6YCA5o2i6LSn6L+Q6LS55oCO5LmI566X77yfDQoNCuetlO+8muS/neS/
-rjPlubTvvIw35aSp5YyF6YCA5o2i44CC5L+d5L+u5pyf6Ze06LSo6YeP6Zeu6aKY5YWN6LS557u0
-5L+u44CB5Lq65Li65Zug57Sg6YCg5oiQ55qE5oyJ5a6e6ZmF5oOF5Ya15pS26LS544CC5Yeh6LSt
-5Lmw5pys5bqX5omA5pyJ5Lqn5ZOB5Z2H5Lqr5Y+XN+WkqeaXoOeQhueUsemAgOaNou+8jOWboOWV
-huWTgemXrumimOaNoui0p+aIkeS7rOaJv+aLheadpeWbnui/kOi0ue+8jOazqOaEj++8geS4jeaU
-tuWIsOS7mOS7tu+8geWFtuS7luWOn+WboOeUseS5sOWutuaJv+aLheadpeWbnui/kOi0ue+8jOmA
-gOi0p+S4gOW+i+S4jemAgOWbnuadpei/kOi0ueOAgg0KDQo377yM5Lmw5a6277ya5pyJ5LuA5LmI
-5LyY5oOg5ZCX77yf5L6/5a6c54K544CCDQoNCuetlO+8muW+iOaKseatieayoeacieWTpu+8geac
-rOW6l+aYr+eUn+S6p+WOguWVhuebtOaOpeWcqOa3mOWuneS4iuiuvueri+eahOS4k+WNluW6l++8
-jOWHuuWUrueahOS7t+agvOaYr+WSjOa3seWcs+WNjuW8uuWMl+aJueWPkeW4guWcuuWQjOatpeOA
-guavlOa3mOWuneWFtuS7luWVhuWutumDveS+v+WunOWRouOAgg0KDQo4LuS5sOWutu+8muaJi+ih
-qOaJi+acuumDveacieWTquS6m+WKn+iDve+8nyANCg0K562U77ya5LiA6Iis5omL5py65Z+65pys
-5Yqf6IO955qE55qE5omL6KGo5omL5py644CCIOaJi+ihqOaJi+acuuS4u+imgeaYr+S+v+S6juaQ
-uuW4pu+8jOS4jeaYk+S4ouWkse+8jOavlOi+g+makOiUve+8jOaItOS4iuavlOi+g+aXtuWwmuWS
-jOWJjeWNq+OAguebruWJjea3seW+l+W+iOWkmuWVhuWKoeS6uuWjq+OAgeWFrOWKoeS6uuWRmOOA
-geaZqOe7g+eIseWlveiAheOAgSoq5Lq65ZGY44CB6K6w6ICF44CB5a2m55Sf55qE5Zac54ix44CC
-55Sx5LqO5omL6KGo5omL5py65q+U6L6D5bCP77yM5YaN5Yqg5LiK5oqA5pyv55qE5Yi257qm77yM
-55uu5YmN5omL6KGo5omL5py66L+Y5LiN6IO95YGa5Yiw5YOP5pmu6YCa5omL5py65LiA5qC35YW3
-5pyJ5pm66IO95Yqf6IO977yM55qE56Gu5pyJ5Lqb5pa56Z2i6ZyA6KaB5a6M5ZaE77yM5oiR5Lus
-5Lya5bu66K6u5bel5Y6C6ZqP552A5omL5py65oqA5pyv55qE5LiN5pat5o+Q6auY77yM5Zyo5pm6
-6IO95pa56Z2i6YCQ5q2l5pS56L+b44CCDQoNCg==
+> >>
+> >> I just noticed include/asm-generic/Kbuild.asm already had
+> >>
+> >> ifneq ($(wildcard $(srctree)/arch/$(SRCARCH)/include/asm/kvm_para.h \
+> >>                  $(srctree)/include/asm-$(SRCARCH)/kvm_para.h),)
+> >> header-y  += kvm_para.h
+> >> endif
+> >>
+> >> but this doesn't seem to work.
+> >>
+> >> Kbuild people: which one is correct?
 
+Any use of wildcards in include/asm-generic/Kbuild.asm is bogus.
+We should:
+1) add explicit header-y for kvm.h + a.out.h to the relevant architectures.
+2) add explicit header-y for kvm_para.h for the archictectures that needs this file
+3) and drop header-y / dummy file fro the others.
 
+Anything else is just papering over the initial wrong doings.
+
+I actually coded up "header-n" support to explicitly say:
+do not include this file for this arch - but looking at the
+actual problem being solved this is just bogus so I killed
+it off again.
+
+	Sam
