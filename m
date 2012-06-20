@@ -1,13 +1,15 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from hrndva-omtalb.mail.rr.com ([71.74.56.122]:19187 "EHLO
+Received: from hrndva-omtalb.mail.rr.com ([71.74.56.122]:28792 "EHLO
 	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754454Ab2FTCuF (ORCPT
+	with ESMTP id S1754441Ab2FTCuH (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 19 Jun 2012 22:50:05 -0400
-Message-Id: <20120620020608.911616775@goodmis.org>
-Date: Tue, 19 Jun 2012 22:06:08 -0400
+	Tue, 19 Jun 2012 22:50:07 -0400
+Message-Id: <20120620025005.198307619@goodmis.org>
+Date: Tue, 19 Jun 2012 22:06:12 -0400
 From: Steven Rostedt <rostedt@goodmis.org>
-Subject: [PATCH 0/4] localmodconfig: Improve the number of modules removed
+Subject: [PATCH 4/4] localmodconfig: Add debug environment variable LOCALMODCONFIG_DEBUG
+References: <20120620020608.911616775@goodmis.org>
+Content-Disposition: inline; filename=0004-localmodconfig-Add-debug-environment-variable-LOCALM.patch
 Content-Type: multipart/signed; micalg="pgp-sha1"; protocol="application/pgp-signature"; boundary="00GvhwF7k39YY"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
@@ -18,74 +20,117 @@ Cc: John David Yost <johnyost@ptd.net>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-make localmodconfig was used to make a minimal config but still make
-sure that everything you enabled stays enabled. Thus, it took a
-conservative approach when it came to disabling configs. If there was a
-chance that disabling a config would cause a required module not to be
-built, it would keep that config set.
+From: Steven Rostedt <srostedt@redhat.com>
 
-There was a time it was discovered that a config without a prompt
-may be required to build a module, but it was only set if another
-config option was set, because that config option would select it.
-If the second config option was a tristate, but did not directly
-enable a module, localmodconfig would deselect it and cause the required
-module to be built.
+If the environment variable LOCALMODCONFIG_DEBUG is set, then debug output
+will appear in the make localmodconfig. This will simplify debugging what
+people get with their output, as I can just tell people to do:
 
-The simple and conservative way to handle this was to also enable all
-configs that select a required module config. But this caused those
-configs to include the configs that they depend on, as well as all
-the configs that select it. This increased the number of modules being
-kept much higher than what the minimal set that was needed.
+  LOCALMODCONFIG_DEBUG=3D1 make localmodconfig 2>out.txt
 
-One issue was that it would even include configs that were core and not
-even a module.
+and have them send me the out.txt. I'll be able to see why things are not
+working as they think it should be.
 
-Another issue is that there was no reason to enable all configs when just
-one select would do.
+Signed-off-by: Steven Rostedt <rostedt@goodmis.org>
+---
+ scripts/kconfig/streamline_config.pl |   21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
 
-The second and third patches fix this (the other two are clean ups
-and added debugging facility). The first of the fix reads the original
-.config file and only processes configs that are modules, and ignores
-configs that are set as core (localmodconfig will not touch them anyway).
+diff --git a/scripts/kconfig/streamline_config.pl b/scripts/kconfig/streaml=
+ine_config.pl
+index fcfcb30..2fbbbc1 100644
+--- a/scripts/kconfig/streamline_config.pl
++++ b/scripts/kconfig/streamline_config.pl
+@@ -45,6 +45,16 @@
+ use strict;
+ use Getopt::Long;
+=20
++# set the environment variable LOCALMODCONFIG_DEBUG to get
++# debug output.
++my $debugprint =3D 0;
++$debugprint =3D 1 if (defined($ENV{LOCALMODCONFIG_DEBUG}));
++
++sub dprint {
++    return if (!$debugprint);
++    print STDERR @_;
++}
++
+ my $config =3D ".config";
+=20
+ my $uname =3D `uname -r`;
+@@ -389,6 +399,7 @@ foreach my $module (keys(%modules)) {
+ 	my @arr =3D @{$objects{$module}};
+ 	foreach my $conf (@arr) {
+ 	    $configs{$conf} =3D $module;
++	    dprint "$conf added by direct ($module)\n";
+ 	}
+     } else {
+ 	# Most likely, someone has a custom (binary?) module loaded.
+@@ -412,6 +423,8 @@ foreach my $line (@config_file) {
+=20
+ my $repeat =3D 1;
+=20
++my $depconfig;
++
+ #
+ # Note, we do not care about operands (like: &&, ||, !) we want to add any
+ # config that is in the depend list of another config. This script does
+@@ -440,6 +453,7 @@ sub parse_config_depends
+ 		# We must make sure that this config has its
+ 		# dependencies met.
+ 		$repeat =3D 1; # do again
++		dprint "$conf selected by depend $depconfig\n";
+ 		$configs{$conf} =3D 1;
+ 	    }
+ 	} else {
+@@ -473,15 +487,18 @@ sub parse_config_selects
+=20
+ 	    # Make sure that this config exists in the current .config file
+ 	    if (!defined($orig_configs{$conf})) {
++		dprint "$conf not set for $config select\n";
+ 		next;
+ 	    }
+=20
+ 	    # Check if something other than a module selects this config
+ 	    if (defined($orig_configs{$conf}) && $orig_configs{$conf} ne "m") {
++		dprint "$conf (non module) selects config, we are good\n";
+ 		# we are good with this
+ 		return;
+ 	    }
+ 	    if (defined($configs{$conf})) {
++		dprint "$conf selects $config so we are good\n";
+ 		# A set config selects this config, we are good
+ 		return;
+ 	    }
+@@ -506,6 +523,7 @@ sub parse_config_selects
+     $repeat =3D 1;
+     # Make this config need to be selected
+     $configs{$next_config} =3D 1;
++    dprint "$next_config selected by select $config\n";
+ }
+=20
+ my %process_selects;
+@@ -526,6 +544,7 @@ sub loop_depend {
+ 	    }
+=20
+ 	    $config =3D~ s/^CONFIG_//;
++	    $depconfig =3D $config;
+=20
+ 	    if (defined($depends{$config})) {
+ 		# This config has dependencies. Make sure they are also included
+@@ -546,6 +565,8 @@ sub loop_select {
+     foreach my $config (keys %process_selects) {
+ 	$config =3D~ s/^CONFIG_//;
+=20
++	dprint "Process select $config\n";
++
+ 	# config has no prompt and must be selected.
+ 	parse_config_selects $config, $selects{$config};
+     }
+--=20
+1.7.10
 
-The second of the fixes was a bit of code change that would process
-the direct modules first (one to one relationship with configs to their
-modules in the Makefiles). Then it will include all the configs that
-those modules depend on. After that set is complete, it kept track
-of the configs without prompts (needing to enable the selects), it
-would look at those configs requiring selects, check to see if one
-of their selects is already selected by a set config (do nothing in
-that case), and if not, then pick only one config that selects it and
-set that.
 
-With these changes, the number of modules my test case had went from
-leaving 356 CONFIG_*=3Dm set, to just 67 of them set.
-
-A much smaller and quicker build.
-
-Thanks to John David Yost (AlleyTrotter) for testing his config and
-build as well.
-
-If you want this code, I've already sent it to my for-next branch.
-
--- Steve
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/rostedt/linux-kconfig.git
-for-next
-
-Head SHA1: 4503379cb811809470ebefb58c943fe605bc3e29
-
-
-Steven Rostedt (4):
-      localmodconfig: Comments and cleanup for streamline_config.pl
-      localmodconfig: Read in orig config file to avoid extra processing
-      localmodconfig: Check if configs are already set for selects
-      localmodconfig: Add debug environment variable LOCALMODCONFIG_DEBUG
-
-----
- scripts/kconfig/streamline_config.pl |  175 ++++++++++++++++++++++++++++++=
-----
- 1 file changed, 158 insertions(+), 17 deletions(-)
 
 --00GvhwF7k39YY
 Content-Type: application/pgp-signature; name="signature.asc"
@@ -94,19 +139,19 @@ Content-Description: This is a digitally signed message part
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1.4.12 (GNU/Linux)
 
-iQIcBAABAgAGBQJP4TpZAAoJEIy3vGnGbaoAVYYP/jONEU/2ffXun7Gbj5tuGOcf
-Y+2iPBnVPRZucWTNVLukdxcvfKekCrNL9f3EyWM0nReJCNwlq3rzKuESKUq6qYns
-V1iwFoC0yhmtdbyJyly1DyK2jhc0pEhamHPEs81A3jaH8v9C5aIfHtbZjKw5sD4l
-O8tzMswDt045QEr16L0oPpqDlAk8SSHAaakJnW1RCTz5ac8LJQNT6vrxlElMdMkT
-onUdvObo2q1ea+KyWqy/Jx6UqBwu5cEgMgTvFlRPcNy/kNDrq9b1FGc8X7GahczN
-hi5VietWF1OvikC3Ek9MqOuLtW6WbHwjpw2LJIFm9eMcqNOiB1VnPXAzG+5AnIqf
-75KMWJkZ/JneRHfMVPa8jCF6/FBToAWgXM54Zg0PfUgPs+dn1vhYgWCD/oTuDPTi
-UNS+e1r690K8Vn3YgnRv09xxIp3QZOPEYoF6T6C6BvaExfct0qqraOaf/g10bXIP
-mVirYZm31XgXynXHR6S9EoKTJv/IAQjnZQBlnKmXKiq/QhaFL5Nn6EpV6Fb6fHo7
-UZdR0Mkeh4WEHdZNtSHM9M/xmeusrtOkMtxq8hWFLOobdSHYLhVADX+iK8lOGHLD
-pAOYtoZwS/jpPA+dSKOEqwHO9+X2J2CSccqpVO33Tv9JOYt8UprF8wgwKHOZ0MhN
-fUoIBJfEJl96zoES5amb
-=90Tp
+iQIcBAABAgAGBQJP4TpdAAoJEIy3vGnGbaoAoIEP+gKFhMxNw3Vql4AMkBc9KuKy
+RF5n5ofKNm6cngs9XihX19Fr45sFpO6SyGMZNx8e4CsGQCVjVc0ttRk0ljXwflSa
+WCeW5kgl7V0RRqJOhr0/q6WRTib3364s6b3KrHDjiZ0u91PQqwows5TK8QWSpEY2
+nBL+2JWXfuklQ8mTnVkpS8vlKfMZZ2oQhrDnnsHjE33PZOU1XSnvOo+KutSUuW98
+q+XeQsKzSRzoDvKhabwLNIduzGalCjxcRznTgqLDUf18US86bJwLRmigzX21UZYO
+JCpojhKvlb/Vfat0aEVlJU19fVqpVNxBzVgcvd7kGkGPmqSYa0zOvm6nz4A0opZT
+y/u/yUWL5bq/4HQpHrA0iFij6O/1Iezz0kPdsgAFsi7+yT+1TzfdCrzm98T+aRN7
+aBapD/KxTaOUxyRPlJcqJ9EnT49MLF7G1pOthFEtDikdSgF/Qv9uMYVg3UO/TJv1
+dnk2sp2qNNqgdIre5OLI/Pnp2eTHEDhHQKQbP3KH3YdmhtfEVDYwVthyOeO2ehyD
+g7z6iOxSLHD65Q4IdK2+KkTjmZ5dXMhGkIGI1frQMtJrMMhC/qsKgH8wGCOV76SL
+606lCuJSln7GtbLR9WTnbyxnYIUwNSD9EIGoiC677hsWF/YocEnRgLU8L1tTggnq
+6MtjzPaXSN4wWQoL0Ifv
+=wpqc
 -----END PGP SIGNATURE-----
 
 --00GvhwF7k39YY--
