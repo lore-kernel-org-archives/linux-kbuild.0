@@ -1,72 +1,70 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
 Received: from cpsmtpb-ews07.kpnxchange.com ([213.75.39.10]:1979 "EHLO
 	cpsmtpb-ews07.kpnxchange.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1760131Ab2FUT0S (ORCPT
+	by vger.kernel.org with ESMTP id S1760007Ab2FUT0T (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 21 Jun 2012 15:26:18 -0400
-Message-ID: <1340306497.1773.61.camel@x61.thuisdomein>
-Subject: [PATCH 3/3] Remove useless wrappers of asm-generic/rmap.h
+	Thu, 21 Jun 2012 15:26:19 -0400
+Message-ID: <1340306466.1773.60.camel@x61.thuisdomein>
+Subject: [PATCH 2/3] Remove useless wrappers of asm-generic/ipc.h
 From: Paul Bolle <pebolle@tiscali.nl>
-Date: Thu, 21 Jun 2012 21:21:37 +0200
+Date: Thu, 21 Jun 2012 21:21:06 +0200
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
 Mime-Version: 1.0
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org, Jonas Bonn <jonas@southpole.se>, linux@lists.openrisc.net, Chris Zankel <chris@zankel.net>, linux-kernel@vger.kernel.org
+Cc: linux-kbuild@vger.kernel.org, Richard Kuo <rkuo@codeaurora.org>, linux-hexagon@vger.kernel.org, David Howells <dhowells@redhat.com>, linux-am33-list@redhat.com, Chris Metcalf <cmetcalf@tilera.com>, linux-kernel@vger.kernel.org
 
-xtensa has a header (in its include/asm directory) that is a thin
-wrapper around asm-generic/rmap.h. This wrapper is useless, since that
-header doesn't exist. It is also unused (no file includes asm/rmap.h).
+mn10300 has a header (in its include/asm directory) that is a thin
+wrapper around asm-generic/ipc.h. This wrapper is useless, since that
+header doesn't exist. It is also unused (no file includes asm/ipc.h).
 
-openrisc generates a similar header at build time (using a generic-y
-entry in include/asm/Kbuild). This generated header is useless and
-unused too.
+hexagon and tile generate similar headers at build time (using a
+generic-y entry in include/asm/Kbuild). These generated headers are
+useless and unused too.
 
-Remove this header and this generic-y entry.
+Remove this header and these generic-y entries.
 
 Signed-off-by: Paul Bolle <pebolle@tiscali.nl>
 ---
- arch/openrisc/include/asm/Kbuild |    1 -
- arch/xtensa/include/asm/rmap.h   |   16 ----------------
- 2 files changed, 0 insertions(+), 17 deletions(-)
- delete mode 100644 arch/xtensa/include/asm/rmap.h
+ arch/hexagon/include/asm/Kbuild |    1 -
+ arch/mn10300/include/asm/ipc.h  |    1 -
+ arch/tile/include/asm/Kbuild    |    1 -
+ 3 files changed, 0 insertions(+), 3 deletions(-)
+ delete mode 100644 arch/mn10300/include/asm/ipc.h
 
-diff --git a/arch/openrisc/include/asm/Kbuild b/arch/openrisc/include/asm/Kbuild
-index 08484f7..0922959 100644
---- a/arch/openrisc/include/asm/Kbuild
-+++ b/arch/openrisc/include/asm/Kbuild
-@@ -42,7 +42,6 @@ generic-y += percpu.h
- generic-y += poll.h
- generic-y += posix_types.h
- generic-y += resource.h
--generic-y += rmap.h
- generic-y += scatterlist.h
- generic-y += sections.h
- generic-y += segment.h
-diff --git a/arch/xtensa/include/asm/rmap.h b/arch/xtensa/include/asm/rmap.h
+diff --git a/arch/hexagon/include/asm/Kbuild b/arch/hexagon/include/asm/Kbuild
+index 8ecd202..0690642 100644
+--- a/arch/hexagon/include/asm/Kbuild
++++ b/arch/hexagon/include/asm/Kbuild
+@@ -22,7 +22,6 @@ generic-y += ioctl.h
+ generic-y += ioctls.h
+ generic-y += iomap.h
+ generic-y += ipcbuf.h
+-generic-y += ipc.h
+ generic-y += irq_regs.h
+ generic-y += kdebug.h
+ generic-y += kmap_types.h
+diff --git a/arch/mn10300/include/asm/ipc.h b/arch/mn10300/include/asm/ipc.h
 deleted file mode 100644
-index 649588b..0000000
---- a/arch/xtensa/include/asm/rmap.h
+index a46e3d9..0000000
+--- a/arch/mn10300/include/asm/ipc.h
 +++ /dev/null
-@@ -1,16 +0,0 @@
--/*
-- * include/asm-xtensa/rmap.h
-- *
-- * This file is subject to the terms and conditions of the GNU General Public
-- * License.  See the file "COPYING" in the main directory of this archive
-- * for more details.
-- *
-- * Copyright (C) 2001 - 2005 Tensilica Inc.
-- */
--
--#ifndef _XTENSA_RMAP_H
--#define _XTENSA_RMAP_H
--
--#include <asm-generic/rmap.h>
--
--#endif
+@@ -1 +0,0 @@
+-#include <asm-generic/ipc.h>
+diff --git a/arch/tile/include/asm/Kbuild b/arch/tile/include/asm/Kbuild
+index 143473e..ab7640a 100644
+--- a/arch/tile/include/asm/Kbuild
++++ b/arch/tile/include/asm/Kbuild
+@@ -17,7 +17,6 @@ generic-y += fb.h
+ generic-y += fcntl.h
+ generic-y += ioctl.h
+ generic-y += ioctls.h
+-generic-y += ipc.h
+ generic-y += ipcbuf.h
+ generic-y += irq_regs.h
+ generic-y += kdebug.h
 -- 
 1.7.7.6
 
