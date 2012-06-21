@@ -1,86 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cpsmtpb-ews02.kpnxchange.com ([213.75.39.5]:2787 "EHLO
-	cpsmtpb-ews02.kpnxchange.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1759939Ab2FUTZR (ORCPT
+Received: from cpsmtpb-ews07.kpnxchange.com ([213.75.39.10]:1979 "EHLO
+	cpsmtpb-ews07.kpnxchange.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1760131Ab2FUT0S (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 21 Jun 2012 15:25:17 -0400
-Message-ID: <1340306406.1773.59.camel@x61.thuisdomein>
-Subject: [PATCH 1/3] Remove useless wrappers of asm-generic/cpumask.h
+	Thu, 21 Jun 2012 15:26:18 -0400
+Message-ID: <1340306497.1773.61.camel@x61.thuisdomein>
+Subject: [PATCH 3/3] Remove useless wrappers of asm-generic/rmap.h
 From: Paul Bolle <pebolle@tiscali.nl>
-Date: Thu, 21 Jun 2012 21:20:06 +0200
+Date: Thu, 21 Jun 2012 21:21:37 +0200
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
 Mime-Version: 1.0
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org, David Howells <dhowells@redhat.com>, Richard Kuo <rkuo@codeaurora.org>, linux-hexagon@vger.kernel.org, Jonas Bonn <jonas@southpole.se>, linux@lists.openrisc.net, Chris Zankel <chris@zankel.net>, linux-kernel@vger.kernel.org
+Cc: linux-kbuild@vger.kernel.org, Jonas Bonn <jonas@southpole.se>, linux@lists.openrisc.net, Chris Zankel <chris@zankel.net>, linux-kernel@vger.kernel.org
 
-frv and xtensa both have a header (in their include/asm directories)
-that are thin wrappers around asm-generic/cpumask.h. These wrappers are
-useless, since that header doesn't exist. They are also unused (all
-files including asm/cpumask.h are x86 specific).
+xtensa has a header (in its include/asm directory) that is a thin
+wrapper around asm-generic/rmap.h. This wrapper is useless, since that
+header doesn't exist. It is also unused (no file includes asm/rmap.h).
 
-hexagon and openrisc generate similar headers at build time (using a
-generic-y entry in include/asm/Kbuild). These generated headers are
-useless and unused too.
+openrisc generates a similar header at build time (using a generic-y
+entry in include/asm/Kbuild). This generated header is useless and
+unused too.
 
-Remove these headers and generic-y entries.
+Remove this header and this generic-y entry.
 
 Signed-off-by: Paul Bolle <pebolle@tiscali.nl>
 ---
- arch/frv/include/asm/cpumask.h    |    6 ------
- arch/hexagon/include/asm/Kbuild   |    1 -
- arch/openrisc/include/asm/Kbuild  |    1 -
- arch/xtensa/include/asm/cpumask.h |   16 ----------------
- 4 files changed, 0 insertions(+), 24 deletions(-)
- delete mode 100644 arch/frv/include/asm/cpumask.h
- delete mode 100644 arch/xtensa/include/asm/cpumask.h
+ arch/openrisc/include/asm/Kbuild |    1 -
+ arch/xtensa/include/asm/rmap.h   |   16 ----------------
+ 2 files changed, 0 insertions(+), 17 deletions(-)
+ delete mode 100644 arch/xtensa/include/asm/rmap.h
 
-diff --git a/arch/frv/include/asm/cpumask.h b/arch/frv/include/asm/cpumask.h
-deleted file mode 100644
-index d999c20..0000000
---- a/arch/frv/include/asm/cpumask.h
-+++ /dev/null
-@@ -1,6 +0,0 @@
--#ifndef _ASM_CPUMASK_H
--#define _ASM_CPUMASK_H
--
--#include <asm-generic/cpumask.h>
--
--#endif /* _ASM_CPUMASK_H */
-diff --git a/arch/hexagon/include/asm/Kbuild b/arch/hexagon/include/asm/Kbuild
-index 9aa17f1..8ecd202 100644
---- a/arch/hexagon/include/asm/Kbuild
-+++ b/arch/hexagon/include/asm/Kbuild
-@@ -7,7 +7,6 @@ header-y += user.h
- generic-y += auxvec.h
- generic-y += bug.h
- generic-y += bugs.h
--generic-y += cpumask.h
- generic-y += cputime.h
- generic-y += current.h
- generic-y += device.h
 diff --git a/arch/openrisc/include/asm/Kbuild b/arch/openrisc/include/asm/Kbuild
-index 3f35c38..08484f7 100644
+index 08484f7..0922959 100644
 --- a/arch/openrisc/include/asm/Kbuild
 +++ b/arch/openrisc/include/asm/Kbuild
-@@ -13,7 +13,6 @@ generic-y += cacheflush.h
- generic-y += checksum.h
- generic-y += cmpxchg.h
- generic-y += cmpxchg-local.h
--generic-y += cpumask.h
- generic-y += cputime.h
- generic-y += current.h
- generic-y += device.h
-diff --git a/arch/xtensa/include/asm/cpumask.h b/arch/xtensa/include/asm/cpumask.h
+@@ -42,7 +42,6 @@ generic-y += percpu.h
+ generic-y += poll.h
+ generic-y += posix_types.h
+ generic-y += resource.h
+-generic-y += rmap.h
+ generic-y += scatterlist.h
+ generic-y += sections.h
+ generic-y += segment.h
+diff --git a/arch/xtensa/include/asm/rmap.h b/arch/xtensa/include/asm/rmap.h
 deleted file mode 100644
-index ebeede3..0000000
---- a/arch/xtensa/include/asm/cpumask.h
+index 649588b..0000000
+--- a/arch/xtensa/include/asm/rmap.h
 +++ /dev/null
 @@ -1,16 +0,0 @@
 -/*
-- * include/asm-xtensa/cpumask.h
+- * include/asm-xtensa/rmap.h
 - *
 - * This file is subject to the terms and conditions of the GNU General Public
 - * License.  See the file "COPYING" in the main directory of this archive
@@ -89,12 +61,12 @@ index ebeede3..0000000
 - * Copyright (C) 2001 - 2005 Tensilica Inc.
 - */
 -
--#ifndef _XTENSA_CPUMASK_H
--#define _XTENSA_CPUMASK_H
+-#ifndef _XTENSA_RMAP_H
+-#define _XTENSA_RMAP_H
 -
--#include <asm-generic/cpumask.h>
+-#include <asm-generic/rmap.h>
 -
--#endif /* _XTENSA_CPUMASK_H */
+-#endif
 -- 
 1.7.7.6
 
