@@ -1,10 +1,10 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:43941 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:47215 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751015Ab2FZJhO (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 26 Jun 2012 05:37:14 -0400
-Message-ID: <4FE982BD.1090004@suse.cz>
-Date: Tue, 26 Jun 2012 11:37:01 +0200
+	id S1755171Ab2FZKSl (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 26 Jun 2012 06:18:41 -0400
+Message-ID: <4FE98C7C.4030303@suse.cz>
+Date: Tue, 26 Jun 2012 12:18:36 +0200
 From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
 Subject: Re: [PATCH 5/8] kbuild: move definitions from top-level Makefile
@@ -18,23 +18,21 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: Sam Ravnborg <sam@ravnborg.org>
 Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, lkml <linux-kernel@vger.kernel.org>
 
-Hi Sam,
-
-Sorry for the delay. I hope you still remember what you submitted ;)
-
 On 5.5.2012 10:18, Sam Ravnborg wrote:
-> +# Tools to build for the target
-> +export AS       := $(CROSS_COMPILE)as
-> +export LD       := $(CROSS_COMPILE)ld
-> +export CC       := $(CROSS_COMPILE)gcc
-> +export CPP      := $(CC) -E
-> +export AR       := $(CROSS_COMPILE)ar
-> +export NM       := $(CROSS_COMPILE)nm
-> +export STRIP    := $(CROSS_COMPILE)strip
-> +export OBJCOPY  := $(CROSS_COMPILE)objcopy
-> +export OBJDUMP  := $(CROSS_COMPILE)objdump
+> diff --git a/scripts/Kbuild.config b/scripts/Kbuild.config
+> new file mode 100644
+> index 0000000..15d5b1e
+> --- /dev/null
+> +++ b/scripts/Kbuild.config
+> @@ -0,0 +1,68 @@
+[...]
+> +ifdef CONFIG_CC_OPTIMIZE_FOR_SIZE
+> +KBUILD_CFLAGS += -Os
+> +else
+> +KBUILD_CFLAGS += -O2
+> +endif
 
-The := assignments do not work if CROSS_COMPILE is set in .config or in
-the arch Makefile. You have to use the deferred from here.
+This duplicates the statement in the top-level Makefile and does not
+work in this context, because auto.conf is not included yet.
 
 Michal
