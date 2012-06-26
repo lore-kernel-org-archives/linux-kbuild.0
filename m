@@ -1,91 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-out.m-online.net ([212.18.0.9]:59626 "EHLO
-	mail-out.m-online.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756145Ab2FYVnV (ORCPT
+Received: from smtp.snhosting.dk ([87.238.248.203]:34975 "EHLO
+	smtp.domainteam.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752066Ab2FZFAw (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 25 Jun 2012 17:43:21 -0400
-From: Andreas Schwab <schwab@linux-m68k.org>
-Subject: Re: [PATCH] mod/file2alias: make modalias generation safe for cross compiling
-References: <CAMuHMdXk6pByz14JcDgY+UE6QM0sHD8cbXye9CgOVSRRtr7J+Q@mail.gmail.com>
-	<20120615201021.GB14544@kroah.com>
-	<CAMuHMdUj6tAcWhkSkV43Kw3-2-3+JzgP6W=2w3fjL2KBfRh9ZQ@mail.gmail.com>
-	<20120615231220.GC8205@kroah.com> <87lijns84s.fsf@nemi.mork.no>
-	<m2bokjb6tv.fsf@igel.home> <87fw9urqau.fsf@nemi.mork.no>
-	<m2d34n1sz9.fsf_-_@igel.home>
-	<alpine.DEB.2.00.1206252217580.21346@ayla.of.borg>
-Date: Mon, 25 Jun 2012 23:43:15 +0200
-In-Reply-To: <alpine.DEB.2.00.1206252217580.21346@ayla.of.borg> (Geert
-	Uytterhoeven's message of "Mon, 25 Jun 2012 22:32:53 +0200 (CEST)")
-Message-ID: <m28vfb130s.fsf@igel.home>
+	Tue, 26 Jun 2012 01:00:52 -0400
+Date: Tue, 26 Jun 2012 07:00:49 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: [PATCH] mod/file2alias: make modalias generation safe for
+	cross compiling
+Message-ID: <20120626050049.GA24503@merkur.ravnborg.org>
+References: <CAMuHMdXk6pByz14JcDgY+UE6QM0sHD8cbXye9CgOVSRRtr7J+Q@mail.gmail.com> <20120615201021.GB14544@kroah.com> <CAMuHMdUj6tAcWhkSkV43Kw3-2-3+JzgP6W=2w3fjL2KBfRh9ZQ@mail.gmail.com> <20120615231220.GC8205@kroah.com> <87lijns84s.fsf@nemi.mork.no> <m2bokjb6tv.fsf@igel.home> <87fw9urqau.fsf@nemi.mork.no> <m2d34n1sz9.fsf_-_@igel.home>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <m2d34n1sz9.fsf_-_@igel.home>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Geert Uytterhoeven <geert@linux-m68k.org>
-Cc: =?utf-8?Q?Bj=C3=B8rn?= Mork <bjorn@mork.no>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, USB list <linux-usb@vger.kernel.org>, linux-kernel@vger.kernel.org, Linux-Next <linux-next@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Linux/m68k <linux-m68k@vger.kernel.org>
+To: Andreas Schwab <schwab@linux-m68k.org>
+Cc: =?iso-8859-1?Q?Bj=F8rn?= Mork <bjorn@mork.no>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Geert Uytterhoeven <geert@linux-m68k.org>, USB list <linux-usb@vger.kernel.org>, linux-kernel@vger.kernel.org, Linux-Next <linux-next@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Linux/m68k <linux-m68k@vger.kernel.org>
 
-Geert Uytterhoeven <geert@linux-m68k.org> writes:
+Hi Andreas.
 
-> 	Hi Andreas,
->
-> On Mon, 25 Jun 2012, Andreas Schwab wrote:
->> --- /dev/null
->> +++ b/scripts/mod/devicetable-offsets.c
->> @@ -0,0 +1,171 @@
->> +#include <linux/kbuild.h>
->> +#include <linux/mod_devicetable.h>
->> +
->> +#define DEVID(devid) DEFINE(SIZE_##devid, sizeof(struct devid))
->> +#define DEVID_FIELD(devid, field) \
->> +	DEFINE(OFF_##devid##_##field, offsetof(struct devid, field))
->> +
->> +int main(void)
->> +{
->> +	DEVID(usb_device_id);
->> +	DEVID_FIELD(usb_device_id, match_flags);
->> +	DEVID_FIELD(usb_device_id, idVendor);
->> +	DEVID_FIELD(usb_device_id, idProduct);
->> +	DEVID_FIELD(usb_device_id, bcdDevice_lo);
->> +	DEVID_FIELD(usb_device_id, bcdDevice_hi);
->> +	DEVID_FIELD(usb_device_id, bDeviceClass);
->> +	DEVID_FIELD(usb_device_id, bDeviceSubClass);
->> +	DEVID_FIELD(usb_device_id, bDeviceProtocol);
->> +	DEVID_FIELD(usb_device_id, bInterfaceClass);
->> +	DEVID_FIELD(usb_device_id, bInterfaceSubClass);
->> +	DEVID_FIELD(usb_device_id, bInterfaceProtocol);
->
-> These are all duplicates of the structures in <linux/mod_devicetable.h>.
-> Can't you get rid of the duplication by putting e.g. the following
-> in <linux/mod_devicetable.h>:
->
->     DEVID_START(usb_device_id);
->     DEVID_FIELD(usb_device_id, __u16, match_flags);
->     DEVID_FIELD(usb_device_id, __u16, idVendor);
->     DEVID_FIELD(usb_device_id, __u16, idProduct);
->     DEVID_FIELD(usb_device_id, __u16, bcdDevice_lo);
->     DEVID_FIELD(usb_device_id, __u16, bcdDevice_hi);
->     DEVID_FIELD(usb_device_id, __u8, bDeviceClass);
->     DEVID_FIELD(usb_device_id, __u8, bDeviceSubClass);
->     DEVID_FIELD(usb_device_id, __u8, bDeviceProtocol);
->     DEVID_FIELD(usb_device_id, __u8, bInterfaceClass);
->     DEVID_FIELD(usb_device_id, __u8, bInterfaceSubClass);
->     DEVID_FIELD(usb_device_id, __u8, bInterfaceProtocol);
->     DEVID_END();
->
-> and redefining the DEVID_*() macros depending on
->   1. __KERNEL__, to generate the C struct definitions for kernel builds,
->   2. first inclusion by devicetable-offsets.c, also to generate C struct
->      definitions,
->   3. second inclusion by devicetable-offsets.c, to generate the sizes and
->      offset definitions for modalias?
+On Mon, Jun 25, 2012 at 02:22:34PM +0200, Andreas Schwab wrote:
+> Use the target compiler to compute the offsets of the fields of the
+> device_id structures, so that it won't be broken by different alignments
+> between the host and target ABIs.
+Looks good.
 
-That requires some reorganisation of the struct pnp_card_device_id which
-has a somewhat complicated structure (which also accounts for the
-ugliest part of the patch).
+> diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
+> index 08dce14..ff22206 100644
+> --- a/scripts/Makefile.modpost
+> +++ b/scripts/Makefile.modpost
+> @@ -80,8 +80,7 @@ modpost = scripts/mod/modpost                    \
+>   $(if $(KBUILD_EXTRA_SYMBOLS), $(patsubst %, -e %,$(KBUILD_EXTRA_SYMBOLS))) \
+>   $(if $(KBUILD_EXTMOD),-o $(modulesymfile))      \
+>   $(if $(CONFIG_DEBUG_SECTION_MISMATCH),,-S)      \
+> - $(if $(KBUILD_EXTMOD)$(KBUILD_MODPOST_WARN),-w) \
+> - $(if $(cross_build),-c)
+> + $(if $(KBUILD_EXTMOD)$(KBUILD_MODPOST_WARN),-w)
 
-Andreas.
+With this change we can kill cross_build, and thus we can
+drop KBUILD_BUILDHOST too (from top-level Makefile).
 
--- 
-Andreas Schwab, schwab@linux-m68k.org
-GPG Key fingerprint = 58CA 54C7 6D53 942B 1756  01D3 44D5 214B 8276 4ED5
-"And now for something completely different."
+	Sam
