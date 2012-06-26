@@ -1,45 +1,40 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.snhosting.dk ([87.238.248.203]:34975 "EHLO
-	smtp.domainteam.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752066Ab2FZFAw (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 26 Jun 2012 01:00:52 -0400
-Date: Tue, 26 Jun 2012 07:00:49 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH] mod/file2alias: make modalias generation safe for
-	cross compiling
-Message-ID: <20120626050049.GA24503@merkur.ravnborg.org>
-References: <CAMuHMdXk6pByz14JcDgY+UE6QM0sHD8cbXye9CgOVSRRtr7J+Q@mail.gmail.com> <20120615201021.GB14544@kroah.com> <CAMuHMdUj6tAcWhkSkV43Kw3-2-3+JzgP6W=2w3fjL2KBfRh9ZQ@mail.gmail.com> <20120615231220.GC8205@kroah.com> <87lijns84s.fsf@nemi.mork.no> <m2bokjb6tv.fsf@igel.home> <87fw9urqau.fsf@nemi.mork.no> <m2d34n1sz9.fsf_-_@igel.home>
+Received: from cantor2.suse.de ([195.135.220.15]:43941 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751015Ab2FZJhO (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 26 Jun 2012 05:37:14 -0400
+Message-ID: <4FE982BD.1090004@suse.cz>
+Date: Tue, 26 Jun 2012 11:37:01 +0200
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <m2d34n1sz9.fsf_-_@igel.home>
+Subject: Re: [PATCH 5/8] kbuild: move definitions from top-level Makefile
+ to scripts/Kbuild.config
+References: <20120505080640.GA13773@merkur.ravnborg.org> <1336205926-13946-5-git-send-email-sam@ravnborg.org>
+In-Reply-To: <1336205926-13946-5-git-send-email-sam@ravnborg.org>
+Content-Type: text/plain; charset=ISO-8859-2
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andreas Schwab <schwab@linux-m68k.org>
-Cc: =?iso-8859-1?Q?Bj=F8rn?= Mork <bjorn@mork.no>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Geert Uytterhoeven <geert@linux-m68k.org>, USB list <linux-usb@vger.kernel.org>, linux-kernel@vger.kernel.org, Linux-Next <linux-next@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Linux/m68k <linux-m68k@vger.kernel.org>
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, lkml <linux-kernel@vger.kernel.org>
 
-Hi Andreas.
+Hi Sam,
 
-On Mon, Jun 25, 2012 at 02:22:34PM +0200, Andreas Schwab wrote:
-> Use the target compiler to compute the offsets of the fields of the
-> device_id structures, so that it won't be broken by different alignments
-> between the host and target ABIs.
-Looks good.
+Sorry for the delay. I hope you still remember what you submitted ;)
 
-> diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
-> index 08dce14..ff22206 100644
-> --- a/scripts/Makefile.modpost
-> +++ b/scripts/Makefile.modpost
-> @@ -80,8 +80,7 @@ modpost = scripts/mod/modpost                    \
->   $(if $(KBUILD_EXTRA_SYMBOLS), $(patsubst %, -e %,$(KBUILD_EXTRA_SYMBOLS))) \
->   $(if $(KBUILD_EXTMOD),-o $(modulesymfile))      \
->   $(if $(CONFIG_DEBUG_SECTION_MISMATCH),,-S)      \
-> - $(if $(KBUILD_EXTMOD)$(KBUILD_MODPOST_WARN),-w) \
-> - $(if $(cross_build),-c)
-> + $(if $(KBUILD_EXTMOD)$(KBUILD_MODPOST_WARN),-w)
+On 5.5.2012 10:18, Sam Ravnborg wrote:
+> +# Tools to build for the target
+> +export AS       := $(CROSS_COMPILE)as
+> +export LD       := $(CROSS_COMPILE)ld
+> +export CC       := $(CROSS_COMPILE)gcc
+> +export CPP      := $(CC) -E
+> +export AR       := $(CROSS_COMPILE)ar
+> +export NM       := $(CROSS_COMPILE)nm
+> +export STRIP    := $(CROSS_COMPILE)strip
+> +export OBJCOPY  := $(CROSS_COMPILE)objcopy
+> +export OBJDUMP  := $(CROSS_COMPILE)objdump
 
-With this change we can kill cross_build, and thus we can
-drop KBUILD_BUILDHOST too (from top-level Makefile).
+The := assignments do not work if CROSS_COMPILE is set in .config or in
+the arch Makefile. You have to use the deferred from here.
 
-	Sam
+Michal
