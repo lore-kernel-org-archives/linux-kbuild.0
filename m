@@ -1,35 +1,62 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:55111 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753165Ab2F1Jb2 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 28 Jun 2012 05:31:28 -0400
-Message-ID: <4FEC246B.7070800@suse.cz>
-Date: Thu, 28 Jun 2012 11:31:23 +0200
-From: Michal Marek <mmarek@suse.cz>
+Received: from moutng.kundenserver.de ([212.227.17.10]:55858 "EHLO
+	moutng.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752604Ab2GCLQM (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 3 Jul 2012 07:16:12 -0400
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: Re: [PATCH] clkdev: Add default clkdev.h
+Date: Tue, 3 Jul 2012 11:16:05 +0000
+References: <1341252250-26476-1-git-send-email-broonie@opensource.wolfsonmicro.com> <20120703120059.f153bd696269528be2baa1bc@canb.auug.org.au> <20120703101209.GH29030@opensource.wolfsonmicro.com>
+In-Reply-To: <20120703101209.GH29030@opensource.wolfsonmicro.com>
 MIME-Version: 1.0
-Subject: Re: [PATCH 3/3] Remove useless wrappers of asm-generic/rmap.h
-References: <1340306497.1773.61.camel@x61.thuisdomein>
-In-Reply-To: <1340306497.1773.61.camel@x61.thuisdomein>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: Text/Plain;
+  charset="iso-8859-15"
 Content-Transfer-Encoding: 7bit
+Message-Id: <201207031116.05876.arnd@arndb.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Paul Bolle <pebolle@tiscali.nl>
-Cc: linux-kbuild@vger.kernel.org, Jonas Bonn <jonas@southpole.se>, linux@lists.openrisc.net, Chris Zankel <chris@zankel.net>, linux-kernel@vger.kernel.org
+To: Mark Brown <broonie@opensource.wolfsonmicro.com>
+Cc: Stephen Rothwell <sfr@canb.auug.org.au>, linux-arch@vger.kernel.org, mturquette@ti.com, Russell King <linux@arm.linux.org.uk>, linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>
 
-On 21.6.2012 21:21, Paul Bolle wrote:
-> xtensa has a header (in its include/asm directory) that is a thin
-> wrapper around asm-generic/rmap.h. This wrapper is useless, since that
-> header doesn't exist. It is also unused (no file includes asm/rmap.h).
+On Tuesday 03 July 2012, Mark Brown wrote:
+> On Tue, Jul 03, 2012 at 12:00:59PM +1000, Stephen Rothwell wrote:
+> > On Mon,  2 Jul 2012 19:04:10 +0100 Mark Brown <broonie@opensource.wolfsonmicro.com> wrote:
 > 
-> openrisc generates a similar header at build time (using a generic-y
-> entry in include/asm/Kbuild). This generated header is useless and
-> unused too.
+> > > +#define __clk_get(clk)     ({ 1; })
+> > > +#define __clk_put(clk)     do { } while (0)
 > 
-> Remove this header and this generic-y entry.
+> > So why not:
 > 
-> Signed-off-by: Paul Bolle <pebolle@tiscali.nl>
+> > struct clk;
+> 
+> > static inline int __clk_get(struct clk *clk) { return 1; }
+> > static inline void __clk_put(struct clk *clk) ( )
+> 
+> No idea, I'm just taking the existing default header and making it more
+> generally available.
 
-Applied to kbuild.git#trivial.
+I prefer Stephen's version because that maintains the type checking.
+However, that is not a controversial point at all IMHO. The question
+that we need to decide on is whether we want automatic "generic-y"
+statements in Kbuild.asm.
 
-Michal
+I'm not opposed to the idea, but I can imagine some arch maintainers
+fine it confusing. When you first posted the patch, I spent some
+time trying to get the wildcard logic moved to scripts/Makefile.asm-generic
+and scripts/Makefile.headersinst but couldn't figure it out in the end.
+
+I would definitely prefer being able to just write 
+
+generic-y += clkdev.h 
+
+in include/asm-generic/Kbuild.asm, rather than 
+
+ifeq ($(wildcard $(srctree)/arch/$(SRCARCH)/include/asm/clkdev.h),)
+generic-y += clkdev.h
+endif
+
+Maybe Michal Marek or someone on the kbuild mailing list can help
+out with a solution for that.
+
+	Arnd
