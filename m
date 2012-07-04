@@ -1,67 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from opensource.wolfsonmicro.com ([80.75.67.52]:50409 "EHLO
-	opensource.wolfsonmicro.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1756472Ab2GDJW7 (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 4 Jul 2012 05:22:59 -0400
-Date: Wed, 4 Jul 2012 10:22:56 +0100
-From: Mark Brown <broonie@opensource.wolfsonmicro.com>
-Subject: Re: [PATCH] clkdev: Add default clkdev.h
-Message-ID: <20120704092255.GA4111@opensource.wolfsonmicro.com>
-References: <1341329015-28207-1-git-send-email-broonie@opensource.wolfsonmicro.com>
- <CAMuHMdXzE48MCpQWjaxdrYMEwi-Cn5GR6NYrDAOAKwqiJ3m7Yg@mail.gmail.com>
+Received: from cantor2.suse.de ([195.135.220.15]:46557 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750986Ab2GDQcI (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 4 Jul 2012 12:32:08 -0400
+Date: Wed, 4 Jul 2012 18:32:06 +0200
+From: Michal Marek <mmarek@suse.cz>
+Subject: Re: [PATCH] kconfig/nconf: fix compile with ncurses reentrant API
+Message-ID: <20120704163206.GA12094@sepie.suse.cz>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="cNdxnHkX5QqsyA0e"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <CAMuHMdXzE48MCpQWjaxdrYMEwi-Cn5GR6NYrDAOAKwqiJ3m7Yg@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <1339545915-8892-1-git-send-email-yselkowitz@users.sourceforge.net>
+ <1339545902-8812-1-git-send-email-yselkowitz@users.sourceforge.net>
+ <1339460981-7568-1-git-send-email-yselkowitz@users.sourceforge.net>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Geert Uytterhoeven <geert@linux-m68k.org>
-Cc: Stephen Rothwell <sfr@canb.auug.org.au>, Russell King <linux@arm.linux.org.uk>, mturquette@ti.com, linux-arch@vger.kernel.org, linux-kernel@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: "Yaakov (Cygwin/X)" <yselkowitz@users.sourceforge.net>
+Cc: linux-kbuild@vger.kernel.org
 
+On Mon, Jun 11, 2012 at 07:29:41PM -0500, Yaakov (Cygwin/X) wrote:
+> ESCDELAY is a global variable which is replaced by getter and setter
+> functions with NCURSES_REENTRANT.  This fixes the following error:
+> 
+> nconf.c: In function ‘main’:
+> nconf.c:1506:2: error: lvalue required as left operand of assignment
 
---cNdxnHkX5QqsyA0e
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+On Tue, Jun 12, 2012 at 07:05:02PM -0500, Yaakov (Cygwin/X) wrote:
+> Commit 8c41e5e363db55d91aa3b1cdce4ab02ad9821de7 added a check for
+> ncursesw/curses.h for the case where ncurses and ncursesw are build
+> separately but only one is installed.  But if both are installed,
+> the headers ncurses/curses.h and ncursesw/curses.h differ, and since
+> libncursesw will be found first, so should ncursesw/curses.h.
 
-On Wed, Jul 04, 2012 at 10:00:50AM +0200, Geert Uytterhoeven wrote:
+On Tue, Jun 12, 2012 at 07:05:15PM -0500, Yaakov (Cygwin/X) wrote:
+> Import libraries on Cygwin and MinGW/MSYS use the .dll.a suffix, so
+> checking this suffix is necessary to make sure ncurses will still be
+> found when built without static libraries.
 
-> Quoting Sam:
-> "Any use of wildcards in include/asm-generic/Kbuild.asm is bogus."
+I applied these three to kbuild.git#kconfig. Sorry for the delay.
 
-> http://lkml.indiana.edu/hypermail/linux/kernel/1206.2/01507.html
-
-Without actually explaining why which isn't terribly helpful :/
-
-As far as I can tell it looks like this is for headers which may
-optionally be absent but clkdev.h is a header which should never be
-absent, either the architecture defines it or it uses the generic one.
-
-As I said further up the thread having to go round ever single
-architecture and get them to actually apply patches for stuff like this
-is needlessly painful.
-
---cNdxnHkX5QqsyA0e
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Digital signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.12 (GNU/Linux)
-
-iQIcBAEBAgAGBQJP9AsUAAoJEBus8iNuMP3dMOoP/07hHKd23hk+4gebt3Y82PdD
-TL0y8CZEWpF1qn10hpNaDmWwNagYg12zr/UZb08dzH0E8APGw+rxfnGQoY+4Uunj
-zL3SPUCQ9X9uGtkOfg8BDWXCjj5cYMUJ99RzGw22/4yFN3ofF3wc49Ws87vhjDH8
-W4qpzehu3hELmYSNvU6PGw9Q/YQAj/fn/oHpMZzw4t4FqyHigZs/hMzXeYh88ex/
-ZseXTXOaJzT4kHrLVtf22esZgumLJyZnoaFA8UkT1Lf95zEI2yv8Iofqw82lInQ4
-ps1ORjs4J0xHvv9qMklDn21Ct6UcdBCKyGCZ3zszxJJwpl4H/2Gu2roNLLxOMZgL
-+htnRe3rJC2xYUFGjwZsfHh32JCIHd2i9PflRxbRZ+fu87g+Xo0V6yPvwd+S9uat
-KBey7kOZK+QpwG0V4rSPvACy57BHy8VQyrnT6K7Fg9SMxKDthdlaxoUEhmPy0Uy/
-86k5cD6LLq/OzmEwD0IVFientTXJplQy4kcWuBQbOS3Ov7sLRJSZeQMdeRrUC76L
-jUUK+s6KpBZkmQewkstxLL8ct8s2RFyb9q+25OO5bpIQTvx7DIlFJMqqNkvoh6lJ
-o+1VmR1fx3LJOzEoVPvnblJiz9DEiuR9H0Jvt0rJuv+EoFqP3LM3tEMtghfBUEnd
-48CN7Tzw/r07sH+44ohv
-=Gp+d
------END PGP SIGNATURE-----
-
---cNdxnHkX5QqsyA0e--
+Michal
