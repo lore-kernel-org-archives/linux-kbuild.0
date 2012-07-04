@@ -1,63 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from opensource.wolfsonmicro.com ([80.75.67.52]:42014 "EHLO
-	opensource.wolfsonmicro.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S932781Ab2GCNrc (ORCPT
+Received: from mail-yx0-f174.google.com ([209.85.213.174]:52083 "EHLO
+	mail-yx0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751774Ab2GDIAv (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 3 Jul 2012 09:47:32 -0400
-Date: Tue, 3 Jul 2012 14:47:30 +0100
-From: Mark Brown <broonie@opensource.wolfsonmicro.com>
-Subject: Re: [PATCH] clkdev: Add default clkdev.h
-Message-ID: <20120703134729.GP29030@opensource.wolfsonmicro.com>
-References: <1341252250-26476-1-git-send-email-broonie@opensource.wolfsonmicro.com>
- <20120703114844.GJ29030@opensource.wolfsonmicro.com>
- <20120703220512.e03805948e31cfa90778d6c2@canb.auug.org.au>
- <201207031339.34369.arnd@arndb.de>
+	Wed, 4 Jul 2012 04:00:51 -0400
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="6iXXu7NwgEt9u5a7"
-Content-Disposition: inline
-In-Reply-To: <201207031339.34369.arnd@arndb.de>
+In-Reply-To: <1341329015-28207-1-git-send-email-broonie@opensource.wolfsonmicro.com>
+References: <1341329015-28207-1-git-send-email-broonie@opensource.wolfsonmicro.com>
+Date: Wed, 4 Jul 2012 10:00:50 +0200
+Message-ID: <CAMuHMdXzE48MCpQWjaxdrYMEwi-Cn5GR6NYrDAOAKwqiJ3m7Yg@mail.gmail.com>
+Subject: Re: [PATCH] clkdev: Add default clkdev.h
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: Stephen Rothwell <sfr@canb.auug.org.au>, linux-arch@vger.kernel.org, mturquette@ti.com, Russell King <linux@arm.linux.org.uk>, linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>
+To: Mark Brown <broonie@opensource.wolfsonmicro.com>
+Cc: Stephen Rothwell <sfr@canb.auug.org.au>, Russell King <linux@arm.linux.org.uk>, mturquette@ti.com, linux-arch@vger.kernel.org, linux-kernel@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
 
+On Tue, Jul 3, 2012 at 5:23 PM, Mark Brown
+<broonie@opensource.wolfsonmicro.com> wrote:
+> --- a/include/asm-generic/Kbuild.asm
+> +++ b/include/asm-generic/Kbuild.asm
+> @@ -13,6 +13,10 @@ ifneq ($(wildcard $(srctree)/arch/$(SRCARCH)/include/asm/a.out.h \
+>  header-y += a.out.h
+>  endif
+>
+> +ifeq ($(wildcard $(srctree)/arch/$(SRCARCH)/include/asm/clkdev.h),)
+> +generic-y += clkdev.h
+> +endif
 
---6iXXu7NwgEt9u5a7
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Quoting Sam:
+"Any use of wildcards in include/asm-generic/Kbuild.asm is bogus."
 
-On Tue, Jul 03, 2012 at 01:39:34PM +0000, Arnd Bergmann wrote:
+http://lkml.indiana.edu/hypermail/linux/kernel/1206.2/01507.html
 
-> Ok, let's do that then. What tree should we use for merging it?
+Gr{oetje,eeting}s,
 
-> In theory I should take it to some asm-generic tree, but since
-> I get very little traffic there, I'm usually happy to just provide
-> an Ack and let anyone who needs the patch merge it through their
-> trees.
+                        Geert
 
-I guess one of the clock trees which probably means Mike?
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
 
---6iXXu7NwgEt9u5a7
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Digital signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.12 (GNU/Linux)
-
-iQIcBAEBAgAGBQJP8vfFAAoJEBus8iNuMP3d6jYP/A2tuRA5AmjAepGUnjZA5DxD
-Ggs+awXgHYcwHs0XWGT3e1POt9b713yBGKNZ/FGPQHOmS8d+HebsjoPoKHznau1u
-LLlDt5mD2qg/ST/kNF7HtF4BtfPJy38h5CHRq5B8hbYu6zdpdayyZ3uE5vZp4Y4r
-pokeLvs4wuskGnIHmxHOJAJTHcNgeZqDhoZRwIr699L6iuzos0I6GQZhuOzurOFZ
-Unfgn3VAQ42ctKmuOj++RNbUweZPuJK7NbXd2Jm4EDSzeRAqbAB37Tc7nkVgo1eh
-lmvfWLID6YZRGEPsOAeP+zDD7WqejAg+n6XtNLKcblvPhMOD4jLMspAha1UBk8Aq
-5hqZ6kk3hCSV+/4+kncMTFjMAEz2yA88mvfaUA/ZwqR2N8npmB1QflWTHYpIIggL
-yAqiHptfXQKa5OmE0E1mDa7GF0Xizf1Y/GbeTR7tMl/V5p4d0RwbWHy0SZRoDupW
-42PPzucg5buH0B3rTQjQ8byW/rqxB0jKmFGOWGeQSB8XhlqOJ99XNVNMatPsyWb+
-SYik8VjYK6PHQj4vCfyVrR4Uog+AAdzKmY7AQnKD6PPF6y2LHJMZQ3Cgeu01yUPy
-x34743xPq1TEqzoqbLTS7xZMWzT3SSAGWKA3MADe//nsMNAmDD1JG9+lGQv6YRu3
-Cy5j4vZaSynwu8aX8Trm
-=LvgG
------END PGP SIGNATURE-----
-
---6iXXu7NwgEt9u5a7--
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
