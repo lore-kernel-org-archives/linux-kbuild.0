@@ -1,49 +1,71 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-gh0-f174.google.com ([209.85.160.174]:51750 "EHLO
-	mail-gh0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932431Ab2GDXbQ (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 4 Jul 2012 19:31:16 -0400
-Received: by ghrr11 with SMTP id r11so6890626ghr.19
-        for <linux-kbuild@vger.kernel.org>; Wed, 04 Jul 2012 16:31:15 -0700 (PDT)
-From: "Yaakov (Cygwin/X)" <yselkowitz@users.sourceforge.net>
-Subject: [PATCH] xconfig: add quiet rule for moc
-Date: Wed,  4 Jul 2012 18:31:11 -0500
-Message-Id: <1341444671-7528-1-git-send-email-yselkowitz@users.sourceforge.net>
+Received: from nat.scz.novell.com ([213.151.88.252]:45677 "EHLO linux.site"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1751725Ab2GGVxR (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 7 Jul 2012 17:53:17 -0400
+From: Michal Marek <mmarek@suse.cz>
+Subject: [PATCH] kconfig: Print errors to stderr in the Makefile
+Date: Sat,  7 Jul 2012 23:42:34 +0200
+Message-Id: <1341697354-36734-1-git-send-email-mmarek@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: mmarek@suse.cz
-Cc: linux-kbuild@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
 
-From: Yaakov Selkowitz <yselkowitz@users.sourceforge.net>
-
-Also add a dependency on .tmp_qtcheck for KC_QT_MOC.
-
-Signed-off-by: Yaakov Selkowitz <yselkowitz@users.sourceforge.net>
+Signed-off-by: Michal Marek <mmarek@suse.cz>
 ---
-Also applies to 3.x stable branches
-
- scripts/kconfig/Makefile |    7 +++++--
- 1 files changed, 5 insertions(+), 2 deletions(-)
+ scripts/kconfig/Makefile |   28 ++++++++++++++--------------
+ 1 files changed, 14 insertions(+), 14 deletions(-)
 
 diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
-index 5e2176c..cf1171f 100644
+index 7966265..b990e4f 100644
 --- a/scripts/kconfig/Makefile
 +++ b/scripts/kconfig/Makefile
-@@ -298,8 +298,11 @@ $(obj)/zconf.tab.o: $(obj)/zconf.lex.c $(obj)/zconf.hash.c
- 
- $(obj)/qconf.o: $(obj)/qconf.moc
- 
--$(obj)/%.moc: $(src)/%.h
--	$(KC_QT_MOC) -i $< -o $@
-+quiet_cmd_moc = MOC     $@
-+      cmd_moc = $(KC_QT_MOC) -i $< -o $@
-+
-+$(obj)/%.moc: $(src)/%.h $(obj)/.tmp_qtcheck
-+	$(call cmd,moc)
- 
- # Extract gconf menu items for I18N support
- $(obj)/gconf.glade.h: $(obj)/gconf.glade
+@@ -234,12 +234,12 @@ $(obj)/.tmp_qtcheck:
+ 	        if [ -f $$d/include/qconfig.h ]; then dir=$$d; break; fi; \
+ 	      done; \
+ 	      if [ -z "$$dir" ]; then \
+-	        echo "*"; \
+-	        echo "* Unable to find any QT installation. Please make sure that"; \
+-	        echo "* the QT4 or QT3 development package is correctly installed and"; \
+-	        echo "* either qmake can be found or install pkg-config or set"; \
+-	        echo "* the QTDIR environment variable to the correct location."; \
+-	        echo "*"; \
++	        echo >&2 "*"; \
++	        echo >&2 "* Unable to find any QT installation. Please make sure that"; \
++	        echo >&2 "* the QT4 or QT3 development package is correctly installed and"; \
++	        echo >&2 "* either qmake can be found or install pkg-config or set"; \
++	        echo >&2 "* the QTDIR environment variable to the correct location."; \
++	        echo >&2 "*"; \
+ 	        false; \
+ 	      fi; \
+ 	      libpath=$$dir/lib; lib=qt; osdir=""; \
+@@ -279,17 +279,17 @@ $(obj)/.tmp_gtkcheck:
+ 		if `pkg-config --atleast-version=2.0.0 gtk+-2.0`; then			\
+ 			touch $@;								\
+ 		else									\
+-			echo "*"; 							\
+-			echo "* GTK+ is present but version >= 2.0.0 is required.";	\
+-			echo "*";							\
++			echo >&2 "*"; 							\
++			echo >&2 "* GTK+ is present but version >= 2.0.0 is required.";	\
++			echo >&2 "*";							\
+ 			false;								\
+ 		fi									\
+ 	else										\
+-		echo "*"; 								\
+-		echo "* Unable to find the GTK+ installation. Please make sure that"; 	\
+-		echo "* the GTK+ 2.0 development package is correctly installed..."; 	\
+-		echo "* You need gtk+-2.0, glib-2.0 and libglade-2.0."; 		\
+-		echo "*"; 								\
++		echo >&2 "*"; 								\
++		echo >&2 "* Unable to find the GTK+ installation. Please make sure that"; 	\
++		echo >&2 "* the GTK+ 2.0 development package is correctly installed..."; 	\
++		echo >&2 "* You need gtk+-2.0, glib-2.0 and libglade-2.0."; 		\
++		echo >&2 "*"; 								\
+ 		false;									\
+ 	fi
+ endif
 -- 
-1.7.9
+1.7.8.3
 
