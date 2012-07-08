@@ -1,71 +1,94 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from nat.scz.novell.com ([213.151.88.252]:45677 "EHLO linux.site"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1751725Ab2GGVxR (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 7 Jul 2012 17:53:17 -0400
-From: Michal Marek <mmarek@suse.cz>
-Subject: [PATCH] kconfig: Print errors to stderr in the Makefile
-Date: Sat,  7 Jul 2012 23:42:34 +0200
-Message-Id: <1341697354-36734-1-git-send-email-mmarek@suse.cz>
+Received: from Chamillionaire.breakpoint.cc ([80.244.247.6]:33950 "EHLO
+	Chamillionaire.breakpoint.cc" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751211Ab2GHRf2 (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 8 Jul 2012 13:35:28 -0400
+Date: Sun, 8 Jul 2012 19:34:55 +0200
+From: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>
+Subject: [PATCH v2] kbuild: add a rule to just create one file for kernel doc
+Message-ID: <20120708173455.GC2872@breakpoint.cc>
+References: <1340732427-3747-1-git-send-email-sebastian@breakpoint.cc>
+ <4FEC1E92.5070005@suse.cz>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4FEC1E92.5070005@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Richard Weinberger <richard@nod.at>
 
-Signed-off-by: Michal Marek <mmarek@suse.cz>
+If you are chaning the file and you want to verify that it looks good it
+is helpfull to just re-run for the single file instead of running the
+complete htmldocs target.
+
+With this patch one can run
+|	make drivers/mtd/ubi/wl.html
+and create the output just for this file.
+
+Cc: Richard Weinberger <richard@nod.at>
+Signed-off-by: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>
 ---
- scripts/kconfig/Makefile |   28 ++++++++++++++--------------
- 1 files changed, 14 insertions(+), 14 deletions(-)
+v1..v2:
+	- rules moved to Documentation/DocBook/Makefile instead
+	  scripts/Makefile.build
+	- added html to clean target
 
-diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
-index 7966265..b990e4f 100644
---- a/scripts/kconfig/Makefile
-+++ b/scripts/kconfig/Makefile
-@@ -234,12 +234,12 @@ $(obj)/.tmp_qtcheck:
- 	        if [ -f $$d/include/qconfig.h ]; then dir=$$d; break; fi; \
- 	      done; \
- 	      if [ -z "$$dir" ]; then \
--	        echo "*"; \
--	        echo "* Unable to find any QT installation. Please make sure that"; \
--	        echo "* the QT4 or QT3 development package is correctly installed and"; \
--	        echo "* either qmake can be found or install pkg-config or set"; \
--	        echo "* the QTDIR environment variable to the correct location."; \
--	        echo "*"; \
-+	        echo >&2 "*"; \
-+	        echo >&2 "* Unable to find any QT installation. Please make sure that"; \
-+	        echo >&2 "* the QT4 or QT3 development package is correctly installed and"; \
-+	        echo >&2 "* either qmake can be found or install pkg-config or set"; \
-+	        echo >&2 "* the QTDIR environment variable to the correct location."; \
-+	        echo >&2 "*"; \
- 	        false; \
- 	      fi; \
- 	      libpath=$$dir/lib; lib=qt; osdir=""; \
-@@ -279,17 +279,17 @@ $(obj)/.tmp_gtkcheck:
- 		if `pkg-config --atleast-version=2.0.0 gtk+-2.0`; then			\
- 			touch $@;								\
- 		else									\
--			echo "*"; 							\
--			echo "* GTK+ is present but version >= 2.0.0 is required.";	\
--			echo "*";							\
-+			echo >&2 "*"; 							\
-+			echo >&2 "* GTK+ is present but version >= 2.0.0 is required.";	\
-+			echo >&2 "*";							\
- 			false;								\
- 		fi									\
- 	else										\
--		echo "*"; 								\
--		echo "* Unable to find the GTK+ installation. Please make sure that"; 	\
--		echo "* the GTK+ 2.0 development package is correctly installed..."; 	\
--		echo "* You need gtk+-2.0, glib-2.0 and libglade-2.0."; 		\
--		echo "*"; 								\
-+		echo >&2 "*"; 								\
-+		echo >&2 "* Unable to find the GTK+ installation. Please make sure that"; 	\
-+		echo >&2 "* the GTK+ 2.0 development package is correctly installed..."; 	\
-+		echo >&2 "* You need gtk+-2.0, glib-2.0 and libglade-2.0."; 		\
-+		echo >&2 "*"; 								\
- 		false;									\
- 	fi
- endif
+ Documentation/DocBook/Makefile |    8 ++++++++
+ Makefile                       |    6 +++++-
+ 2 files changed, 13 insertions(+), 1 deletion(-)
+
+diff --git a/Documentation/DocBook/Makefile b/Documentation/DocBook/Makefile
+index bc3d9f8..423adad 100644
+--- a/Documentation/DocBook/Makefile
++++ b/Documentation/DocBook/Makefile
+@@ -204,6 +204,14 @@ silent_gen_xml = :
+ 	   echo "</programlisting>")  > $@
+ 
+ ###
++# or HTML documentation
++quiet_cmd_doc_html_c	= HTML $@
++cmd_doc_html_c		= $(KERNELDOC) -html $< > $@
++
++%.html: %.c
++	$(call if_changed,doc_html_c)
++
++###
+ # Help targets as used by the top-level makefile
+ dochelp:
+ 	@echo  ' Linux kernel internal documentation in different formats:'
+diff --git a/Makefile b/Makefile
+index bf02707..96ac5d6 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1079,6 +1079,7 @@ help:
+ 	@echo  '  dir/file.lst    - Build specified mixed source/assembly target only'
+ 	@echo  '                    (requires a recent binutils and recent build (System.map))'
+ 	@echo  '  dir/file.ko     - Build module including final link'
++	@echo  '  dir/file.html   - Build kernel HTML-doc only for this file'
+ 	@echo  '  modules_prepare - Set up for building external modules'
+ 	@echo  '  tags/TAGS	  - Generate tags file for editors'
+ 	@echo  '  cscope	  - Generate cscope index'
+@@ -1154,6 +1155,9 @@ $(help-board-dirs): help-%:
+ 	$(Q)$(MAKE) $(build)=scripts build_docproc
+ 	$(Q)$(MAKE) $(build)=Documentation/DocBook $@
+ 
++%.html: %.c FORCE
++	$(Q)$(MAKE) $(build)=Documentation/DocBook $(target-dir)$(notdir $@)
++
+ else # KBUILD_EXTMOD
+ 
+ ###
+@@ -1240,7 +1244,7 @@ clean: $(clean-dirs)
+ 	@find $(if $(KBUILD_EXTMOD), $(KBUILD_EXTMOD), .) $(RCS_FIND_IGNORE) \
+ 		\( -name '*.[oas]' -o -name '*.ko' -o -name '.*.cmd' \
+ 		-o -name '.*.d' -o -name '.*.tmp' -o -name '*.mod.c' \
+-		-o -name '*.symtypes' -o -name 'modules.order' \
++		-o -name '*.symtypes' -o -name 'modules.order' -o -name *.html \
+ 		-o -name modules.builtin -o -name '.tmp_*.o.*' \
+ 		-o -name '*.gcno' \) -type f -print | xargs rm -f
+ 
 -- 
-1.7.8.3
+1.7.10.4
 
