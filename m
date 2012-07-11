@@ -1,65 +1,42 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from e37.co.us.ibm.com ([32.97.110.158]:45117 "EHLO
-	e37.co.us.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755411Ab2GJXsu (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 10 Jul 2012 19:48:50 -0400
-Received: from /spool/local
-	by e37.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-	for <linux-kbuild@vger.kernel.org> from <cody@linux.vnet.ibm.com>;
-	Tue, 10 Jul 2012 17:48:50 -0600
-From: cody@linux.vnet.ibm.com
-Subject: [PATCH] kconfig: allow long lines in config file
-Date: Tue, 10 Jul 2012 16:47:58 -0700
-Message-Id: <1341964078-22594-1-git-send-email-cody@linux.vnet.ibm.com>
+Received: from linux-sh.org ([111.68.239.195]:48615 "EHLO linux-sh.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752101Ab2GKCoy (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 10 Jul 2012 22:44:54 -0400
+Date: Wed, 11 Jul 2012 11:44:12 +0900
+From: Paul Mundt <lethal@linux-sh.org>
+Subject: Re: [PATCH] clkdev: Add default clkdev.h
+Message-ID: <20120711024411.GA11440@linux-sh.org>
+References: <1341252250-26476-1-git-send-email-broonie@opensource.wolfsonmicro.com>
+ <20120709233022.GO16319@n2100.arm.linux.org.uk>
+ <20120710172223.GM10022@opensource.wolfsonmicro.com>
+ <201207101807.28993.arnd@arndb.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <201207101807.28993.arnd@arndb.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: Cody Schafer <cody@linux.vnet.ibm.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: Mark Brown <broonie@opensource.wolfsonmicro.com>, Russell King - ARM Linux <linux@arm.linux.org.uk>, Mike Turquette <mturquette@ti.com>, Stephen Rothwell <sfr@canb.auug.org.au>, linux-arch@vger.kernel.org, linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>
 
-From: Cody Schafer <cody@linux.vnet.ibm.com>
-
-For some config options (CONFIG_EXTRA_FIRMWARE, for example), the length
-of a config file line can exceed the 1024 byte buffer.
-
-Switch from fgets to getline to fix.
-
-Signed-off-by: Cody Schafer <cody@linux.vnet.ibm.com>
----
- scripts/kconfig/confdata.c |    6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
-
-diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
-index 52577f0..175037f 100644
---- a/scripts/kconfig/confdata.c
-+++ b/scripts/kconfig/confdata.c
-@@ -185,7 +185,8 @@ static int conf_set_sym_val(struct symbol *sym, int def, int def_flags, char *p)
- int conf_read_simple(const char *name, int def)
- {
- 	FILE *in = NULL;
--	char line[1024];
-+	char   *line = NULL;
-+	size_t  line_asize = 0;
- 	char *p, *p2;
- 	struct symbol *sym;
- 	int i, def_flags;
-@@ -247,7 +248,7 @@ load:
- 		}
- 	}
- 
--	while (fgets(line, sizeof(line), in)) {
-+	while (getline(&line, &line_asize, in) != -1) {
- 		conf_lineno++;
- 		sym = NULL;
- 		if (line[0] == '#') {
-@@ -335,6 +336,7 @@ setsym:
- 			cs->def[def].tri = EXPR_OR(cs->def[def].tri, sym->def[def].tri);
- 		}
- 	}
-+	free(line);
- 	fclose(in);
- 
- 	if (modules_sym)
--- 
-1.7.9.5
-
+On Tue, Jul 10, 2012 at 06:07:28PM +0000, Arnd Bergmann wrote:
+> On Tuesday 10 July 2012, Mark Brown wrote:
+> > On Tue, Jul 10, 2012 at 12:30:22AM +0100, Russell King - ARM Linux wrote:
+> > > On Mon, Jul 09, 2012 at 03:23:32PM -0700, Mike Turquette wrote:
+> > 
+> > > > Russell owns clkdev so I'd prefer he take this patch.
+> > 
+> > > Note that I'm not going to be taking any further patches for at least
+> > > the next 16 days (as I'm away), and I'm not going to even guarantee
+> > > that I'll pick up on anything on the mailing lists during that period.
+> > 
+> > Oh dear, that's a bit sad - given that the merge window may well open
+> > it'll mean we'll end up with at least one additional release where we
+> > can't get the clock API available as standard :(
+> 
+> I can start an asm-generic branch in the arm-soc tree then (or maybe
+> a new tree) and apply the patch there.
+> 
+Given that this patch has nothing at all to do with ARM, why not just
+take it through the asm-generic tree?
