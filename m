@@ -1,37 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from moutng.kundenserver.de ([212.227.126.186]:50040 "EHLO
-	moutng.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755986Ab2GKGdA (ORCPT
+Received: from mail-gh0-f174.google.com ([209.85.160.174]:42891 "EHLO
+	mail-gh0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753625Ab2GKNOK convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 11 Jul 2012 02:33:00 -0400
-From: Arnd Bergmann <arnd@arndb.de>
-Subject: Re: [PATCH] clkdev: Add default clkdev.h
-Date: Wed, 11 Jul 2012 06:32:39 +0000
-References: <1341252250-26476-1-git-send-email-broonie@opensource.wolfsonmicro.com> <201207101807.28993.arnd@arndb.de> <20120711024411.GA11440@linux-sh.org>
-In-Reply-To: <20120711024411.GA11440@linux-sh.org>
+	Wed, 11 Jul 2012 09:14:10 -0400
+Received: by ghrr11 with SMTP id r11so1167865ghr.19
+        for <linux-kbuild@vger.kernel.org>; Wed, 11 Jul 2012 06:14:09 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-1"
-Content-Transfer-Encoding: 7bit
-Message-Id: <201207110632.39571.arnd@arndb.de>
+Reply-To: martin-eric.racine@iki.fi
+Date: Wed, 11 Jul 2012 16:14:08 +0300
+Message-ID: <CAPZXPQfE7M0Jzsns4zKrKu0x55_AWEUpzydm1dUOshhZo_ki=A@mail.gmail.com>
+Subject: 'make deb-pkg' generates a linux-headers-(version) that skips some files
+From: =?UTF-8?Q?Martin=2D=C3=89ric_Racine?= <martin-eric.racine@iki.fi>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Paul Mundt <lethal@linux-sh.org>
-Cc: Mark Brown <broonie@opensource.wolfsonmicro.com>, Russell King - ARM Linux <linux@arm.linux.org.uk>, Mike Turquette <mturquette@ti.com>, Stephen Rothwell <sfr@canb.auug.org.au>, linux-arch@vger.kernel.org, linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>
+To: linux-kbuild@vger.kernel.org
+Cc: debian-kernel@lists.debian.org
 
-On Wednesday 11 July 2012, Paul Mundt wrote:
-> > I can start an asm-generic branch in the arm-soc tree then (or maybe
-> > a new tree) and apply the patch there.
-> > 
-> Given that this patch has nothing at all to do with ARM, why not just
-> take it through the asm-generic tree?
+Greetings,
 
-Just my personal lazyness. I haven't had an asm-generic tree for a while,
-and my main working tree is a mirror of the arm-soc tree.
+As a part of the debugging process for (
+http://bugs.debian.org/677533/ ), I was asked to build myself a kernel
+from HEAD, followed by standalone modules from an external tree,
+following this procedure:
 
-On the other hand, I looked up the maintainers file and it points to
-git://git.kernel.org/pub/scm/linux/kernel/git/arnd/asm-generic.git
-so maybe I should restore that one after all or remove the reference
-if I don't.
+git clone git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
+cd linux
+git fetch origin
+git reset --hard origin/master
+cp /boot/config-$(uname -r) .config
+scripts/config --disable DEBUG_INFO
+make localmodconfig
+make deb-pkg
+sudo dpkg -i ../linux-image-3.5.0*.deb ../linux-headers-3.5.0*.deb
+cd ..
+wget http://moinejf.free.fr/gspca-2.15.18.tar.gz
+tar -zxf gspca-2.15.18.tar.gz
+cd gspca-2.15.18
+make
+sudo make install
 
-	Arnd
+Compilation of the standalone modules failed, because the
+linux-headers package produced by 'make deb-pkg' failed to include
+(arch/x86/Makefile_32.cpu), which had to be copied by hand to complete
+the build.
+
+I'm not sure whether this is due to an oversight or whether this is a
+regression, much even less whether this is an upstream LKML issue or a
+Debian issue, so I'm CC'ing both lists.
+
+Hopefully, someone can figure out what went wrong and fix it.
+
+Cheers!
+Martin-Éric
