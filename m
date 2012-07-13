@@ -1,32 +1,33 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:40537 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:41245 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752362Ab2GMUkb (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 13 Jul 2012 16:40:31 -0400
-Message-ID: <50008765.30905@suse.cz>
-Date: Fri, 13 Jul 2012 22:39:01 +0200
+	id S1754931Ab2GMUy4 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 13 Jul 2012 16:54:56 -0400
+Date: Fri, 13 Jul 2012 22:54:53 +0200
 From: Michal Marek <mmarek@suse.cz>
+Subject: Re: [PATCH v2] kconfig: allow long lines in config file
+Message-ID: <20120713205447.GA5160@pobox.suse.cz>
+References: <50001D87.1020708@suse.cz> <1342204033-24484-1-git-send-email-cody@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Subject: Re: [PATCH] kconfig: allow long lines in config file
-References: <1341964078-22594-1-git-send-email-cody@linux.vnet.ibm.com> <50001D87.1020708@suse.cz> <50006933.4000004@linux.vnet.ibm.com>
-In-Reply-To: <50006933.4000004@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1342204033-24484-1-git-send-email-cody@linux.vnet.ibm.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: cody <cody@linux.vnet.ibm.com>
+To: cody@linux.vnet.ibm.com
 Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Dne 13.7.2012 20:30, cody napsal(a):
-> Do we have any strict standards for what is and is not portable?
+On Fri, Jul 13, 2012 at 11:27:12AM -0700, cody@linux.vnet.ibm.com wrote:
+> From: Cody Schafer <cody@linux.vnet.ibm.com>
+> 
+> For some config options (CONFIG_EXTRA_FIRMWARE, for example), the length
+> of a config file line can exceed the 1024 byte buffer.
+> 
+> Switch from fgets to compat_getline to fix. compat_getline is an
+> internally implimented getline work-alike for portability purposes.
+> 
+> Signed-off-by: Cody Schafer <cody@linux.vnet.ibm.com>
 
-We don't. I only checked the existing userspace code and except for
-perf, there is no other usage of getline().
-
-
-> (I'm aware 'getline' was only added to posix ~4 years ago in 2008).
-
-Ah, good to know. Nevetheless, let's stay conservative for some more
-time. Thanks for sending the updated patch, btw.
+Applied to kbuild.git#kconfig, thanks.
 
 Michal
