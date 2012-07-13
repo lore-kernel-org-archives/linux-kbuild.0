@@ -1,39 +1,33 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-yw0-f52.google.com ([209.85.213.52]:57488 "EHLO
-	mail-yw0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757701Ab2GKOA7 convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 11 Jul 2012 10:00:59 -0400
-Received: by mail-yw0-f52.google.com with SMTP id p61so1427205yhp.11
-        for <linux-kbuild@vger.kernel.org>; Wed, 11 Jul 2012 07:00:59 -0700 (PDT)
+Received: from cantor2.suse.de ([195.135.220.15]:47754 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S933135Ab2GMMhb (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 13 Jul 2012 08:37:31 -0400
+Date: Fri, 13 Jul 2012 14:37:30 +0200
+From: Michal Marek <mmarek@suse.cz>
+Subject: Re: [PATCH] xconfig: use pkgconfig to find moc
+Message-ID: <20120713123730.GA18564@sepie.suse.cz>
+References: <20120704163351.GB12094@sepie.suse.cz>
+ <1341433409-5764-1-git-send-email-yselkowitz@users.sourceforge.net>
 MIME-Version: 1.0
-Reply-To: martin-eric.racine@iki.fi
-In-Reply-To: <20120711134621.GT28778@vostochny.stro.at>
-References: <CAPZXPQfE7M0Jzsns4zKrKu0x55_AWEUpzydm1dUOshhZo_ki=A@mail.gmail.com>
-	<20120711134621.GT28778@vostochny.stro.at>
-Date: Wed, 11 Jul 2012 17:00:58 +0300
-Message-ID: <CAPZXPQcRsTX7iKo=qUa5-XgrviqiknoC3Qe40=2AKE5R3epY6A@mail.gmail.com>
-Subject: Re: 'make deb-pkg' generates a linux-headers-(version) that skips
- some files
-From: =?UTF-8?Q?Martin=2D=C3=89ric_Racine?= <martin-eric.racine@iki.fi>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1341433409-5764-1-git-send-email-yselkowitz@users.sourceforge.net>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: maximilian attems <maks@stro.at>
-Cc: linux-kbuild@vger.kernel.org, debian-kernel@lists.debian.org
+To: "Yaakov (Cygwin/X)" <yselkowitz@users.sourceforge.net>
+Cc: linux-kbuild@vger.kernel.org
 
-2012/7/11 maximilian attems <maks@stro.at>:
-> On Wed, Jul 11, 2012 at 04:14:08PM +0300, Martin-Éric Racine wrote:
->>
->> Compilation of the standalone modules failed, because the
->> linux-headers package produced by 'make deb-pkg' failed to include
->> (arch/x86/Makefile_32.cpu), which had to be copied by hand to complete
->> the build.
->
-> It is already fixed in linux-next.
+On Wed, Jul 04, 2012 at 03:23:29PM -0500, Yaakov (Cygwin/X) wrote:
+> From: Yaakov Selkowitz <yselkowitz@users.sourceforge.net>
+> 
+> Various schemes exist to allow parallel installations of multiple major
+> versions of Qt (4.x with the previous 3.x and/or the upcoming 5.x).
+> QtCore.pc includes a moc_location variable which should be a more reliable
+> way to find moc.
+> 
+> Signed-off-by: Yaakov Selkowitz <yselkowitz@users.sourceforge.net>
 
-Excellent! Is there any particular reason not to merge this particular
-fix into HEAD immediately?
+Thanks, applied to kbuild.git#kconfig.
 
-Martin-Éric
+Michal
