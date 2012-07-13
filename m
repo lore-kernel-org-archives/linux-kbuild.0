@@ -1,33 +1,28 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:41245 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:42106 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754931Ab2GMUy4 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 13 Jul 2012 16:54:56 -0400
-Date: Fri, 13 Jul 2012 22:54:53 +0200
+	id S1756453Ab2GMVKM (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 13 Jul 2012 17:10:12 -0400
+Message-ID: <50008EB0.9090308@suse.cz>
+Date: Fri, 13 Jul 2012 23:10:08 +0200
 From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [PATCH v2] kconfig: allow long lines in config file
-Message-ID: <20120713205447.GA5160@pobox.suse.cz>
-References: <50001D87.1020708@suse.cz> <1342204033-24484-1-git-send-email-cody@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1342204033-24484-1-git-send-email-cody@linux.vnet.ibm.com>
+Subject: Re: [PATCH] kconfig: Print errors to stderr in the Makefile
+References: <1341697354-36734-1-git-send-email-mmarek@suse.cz>
+In-Reply-To: <1341697354-36734-1-git-send-email-mmarek@suse.cz>
+Content-Type: text/plain; charset=ISO-8859-2
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: cody@linux.vnet.ibm.com
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
 
-On Fri, Jul 13, 2012 at 11:27:12AM -0700, cody@linux.vnet.ibm.com wrote:
-> From: Cody Schafer <cody@linux.vnet.ibm.com>
-> 
-> For some config options (CONFIG_EXTRA_FIRMWARE, for example), the length
-> of a config file line can exceed the 1024 byte buffer.
-> 
-> Switch from fgets to compat_getline to fix. compat_getline is an
-> internally implimented getline work-alike for portability purposes.
-> 
-> Signed-off-by: Cody Schafer <cody@linux.vnet.ibm.com>
+Dne 7.7.2012 23:42, Michal Marek napsal(a):
+> Signed-off-by: Michal Marek <mmarek@suse.cz>
+> ---
+>  scripts/kconfig/Makefile |   28 ++++++++++++++--------------
+>  1 files changed, 14 insertions(+), 14 deletions(-)
 
-Applied to kbuild.git#kconfig, thanks.
+Pushed to kbuild.git#kconfig.
 
 Michal
