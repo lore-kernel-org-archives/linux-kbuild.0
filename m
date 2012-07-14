@@ -1,28 +1,51 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:42106 "EHLO mx2.suse.de"
+Received: from pop3.newage.com.br ([187.16.59.2]:39406 "EHLO dns.newage.com.br"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1756453Ab2GMVKM (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 13 Jul 2012 17:10:12 -0400
-Message-ID: <50008EB0.9090308@suse.cz>
-Date: Fri, 13 Jul 2012 23:10:08 +0200
-From: Michal Marek <mmarek@suse.cz>
+	id S1752170Ab2GNDOY (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 13 Jul 2012 23:14:24 -0400
+Date: Fri, 13 Jul 2012 21:29:11 -0300
+From: "Dear 'WEBMAIL ACCOUNT USER'," <upgraden_helpdesk@9.cn>
+Reply-to: "Dear 'WEBMAIL ACCOUNT USER'," <upgraden_helpdesk@9.cn>
+Subject: Account Notice
+Message-ID: <905895938ea0ff034a12d3a3da3721c8@209.73.132.156>
 MIME-Version: 1.0
-Subject: Re: [PATCH] kconfig: Print errors to stderr in the Makefile
-References: <1341697354-36734-1-git-send-email-mmarek@suse.cz>
-In-Reply-To: <1341697354-36734-1-git-send-email-mmarek@suse.cz>
-Content-Type: text/plain; charset=ISO-8859-2
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain;
+	charset="iso-8859-1"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
 
-Dne 7.7.2012 23:42, Michal Marek napsal(a):
-> Signed-off-by: Michal Marek <mmarek@suse.cz>
-> ---
->  scripts/kconfig/Makefile |   28 ++++++++++++++--------------
->  1 files changed, 14 insertions(+), 14 deletions(-)
 
-Pushed to kbuild.git#kconfig.
+--
+Dear 'WEBMAIL ACCOUNT USER',
 
-Michal
+We are currrently upgrading our database and all account need to be
+verified.
+To complete your account activation with us,you are required to reply to
+this
+message and enter correctly the information's that is required from you.
+
+Fill in your User Name and Password in the space provided (********)You are
+required to reply to this e-mail within the next 48 hours.
+
+Failure to get back to us, your Webmail account will be de-activated from
+our
+database.
+
+FULL NAME;
+USERNAME;
+PASSWORD;
+RE-TYPE PASSWORD;
+DATE OF BIRTH;
+
+
+Thank you for using Webmail Copyright 2012 © Web Team.
+
+19X45HANJ4453VXTM334M
+07-13-2012
+
+
+
+
+________________________________________________
+Seja também assinante da New Age Canoinhas - Fone 47 3622-0779
