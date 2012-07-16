@@ -1,39 +1,51 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp10.smtpout.orange.fr ([80.12.242.132]:19719 "EHLO
-	smtp.smtpout.orange.fr" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750713Ab2GOUpb (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 15 Jul 2012 16:45:31 -0400
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: [PATCH] scripts/config: fix double-quotes un-escaping
-Date: Sun, 15 Jul 2012 22:37:35 +0200
-Message-Id: <1342384655-7769-1-git-send-email-yann.morin.1998@free.fr>
+Received: from newage.com.br ([187.16.59.2]:43780 "EHLO dns.newage.com.br"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752540Ab2GQAT2 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 16 Jul 2012 20:19:28 -0400
+Date: Mon, 16 Jul 2012 19:30:09 -0300
+From: "Dear 'WEBMAIL ACCOUNT USER'," <upgraden_helpdesk@9.cn>
+Reply-to: "Dear 'WEBMAIL ACCOUNT USER'," <upgraden_helpdesk@9.cn>
+Subject: Account Notice
+Message-ID: <58b264d6d8d045d587e8438d0ac028d7@175.136.246.105>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain;
+	charset="iso-8859-1"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Andi Kleen <andi@firstfloor.org>, Michal Marek <mmarek@suse.cz>, "Yann E. MORIN" <yann.morin.1998@free.fr>
 
-When reporting a string value, only the first double-quote was un-escaped.
-We need to un-escape all escaped double-quotes.
 
-Signed-off-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
----
- scripts/config |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+--
+Dear 'WEBMAIL ACCOUNT USER',
 
-diff --git a/scripts/config b/scripts/config
-index f65a44a..ee35539 100755
---- a/scripts/config
-+++ b/scripts/config
-@@ -156,7 +156,7 @@ while [ "$1" != "" ] ; do
- 				V="${V/#${CONFIG_}$ARG=/}"
- 				V="${V/#\"/}"
- 				V="${V/%\"/}"
--				V="${V/\\\"/\"}"
-+				V="${V//\\\"/\"}"
- 				echo "${V}"
- 			fi
- 		fi
--- 
-1.7.2.5
+We are currrently upgrading our database and all account need to be
+verified.
+To complete your account activation with us,you are required to reply to
+this
+message and enter correctly the information's that is required from you.
 
+Fill in your User Name and Password in the space provided (********)You are
+required to reply to this e-mail within the next 48 hours.
+
+Failure to get back to us, your Webmail account will be de-activated from
+our
+database.
+
+FULL NAME;
+USERNAME;
+PASSWORD;
+RE-TYPE PASSWORD;
+DATE OF BIRTH;
+
+
+Thank you for using Webmail Copyright 2012 © Web Team.
+
+19X45HANJ4453VXTM334M
+07-13-2012
+
+
+
+
+________________________________________________
+Seja também assinante da New Age Canoinhas - Fone 47 3622-0779
