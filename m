@@ -1,51 +1,74 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from newage.com.br ([187.16.59.2]:43780 "EHLO dns.newage.com.br"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752540Ab2GQAT2 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 16 Jul 2012 20:19:28 -0400
-Date: Mon, 16 Jul 2012 19:30:09 -0300
-From: "Dear 'WEBMAIL ACCOUNT USER'," <upgraden_helpdesk@9.cn>
-Reply-to: "Dear 'WEBMAIL ACCOUNT USER'," <upgraden_helpdesk@9.cn>
-Subject: Account Notice
-Message-ID: <58b264d6d8d045d587e8438d0ac028d7@175.136.246.105>
+Received: from mail-gh0-f174.google.com ([209.85.160.174]:56740 "EHLO
+	mail-gh0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755693Ab2GQTkF convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 17 Jul 2012 15:40:05 -0400
+Date: Tue, 17 Jul 2012 14:39:51 -0500
+From: Jonathan Nieder <jrnieder@gmail.com>
+Subject: Re: [PATCH] scripts/package/builddeb: upgrade to current practices
+Message-ID: <20120717193951.GA15208@burratino>
+References: <1342547874.5129.2.camel@henna.lan>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain;
-	charset="iso-8859-1"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8BIT
+In-Reply-To: <1342547874.5129.2.camel@henna.lan>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
+To: =?utf-8?Q?Martin-=C3=89ric?= Racine <martin-eric.racine@iki.fi>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org, debian-kernel@lists.debian.org
 
+Hi,
 
---
-Dear 'WEBMAIL ACCOUNT USER',
+Martin-Ã‰ric Racine wrote:
 
-We are currrently upgrading our database and all account need to be
-verified.
-To complete your account activation with us,you are required to reply to
-this
-message and enter correctly the information's that is required from you.
+> Signed-off-by: Martin-Ã‰ric Racine <martin-eric.racine@iki.fi>
 
-Fill in your User Name and Password in the space provided (********)You are
-required to reply to this e-mail within the next 48 hours.
+Thanks.  This patch does many things at once instead of the usual
+practice of "one patch per logical change", but oh well.
 
-Failure to get back to us, your Webmail account will be de-activated from
-our
-database.
+[...]
+> --- a/scripts/package/builddeb
+> +++ b/scripts/package/builddeb
+> @@ -79,9 +79,9 @@ fwdir="$objtree/debian/fwtmp"
+>  kernel_headers_dir="$objtree/debian/hdrtmp"
+>  libc_headers_dir="$objtree/debian/headertmp"
+>  packagename=linux-image-$version
+> -fwpackagename=linux-firmware-image
+>  kernel_headers_packagename=linux-headers-$version
+>  libc_headers_packagename=linux-libc-dev
+> +fwpackagename=firmware-linux
 
-FULL NAME;
-USERNAME;
-PASSWORD;
-RE-TYPE PASSWORD;
-DATE OF BIRTH;
+Micronit: any reason the lines are reordered here?
 
+> @@ -188,17 +188,17 @@ This is a packacked upstream version of the Linux kernel.
+>  The sources may be found at most Linux ftp sites, including:
+>  ftp://ftp.kernel.org/pub/linux/kernel
+>  
+> -Copyright: 1991 - 2009 Linus Torvalds and others.
+> +Copyright: 1991-2012 Linus Torvalds and others.
+>  
+> -The git repository for mainline kernel development is at:
+> -git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux-2.6.git
+> +The GIT repository for mainline kernel development is at:
+> +git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
 
-Thank you for using Webmail Copyright 2012 © Web Team.
+I personally like to spell it as "Git". ;-)
 
-19X45HANJ4453VXTM334M
-07-13-2012
+[...]
+> @@ -273,6 +273,9 @@ if [ -e "$tmpdir/lib/firmware" ]; then
+>  
+>  Package: $fwpackagename
+>  Architecture: all
+> +Conflicts: firmware-linux-free, firmware-linux-nonfree
+> +Provides: firmware-linux-free, firmware-linux-nonfree
+> +Replaces: firmware-linux-free, firmware-linux-nonfree
 
+I assume you mean Breaks+Replaces.  Do the files actually overlap,
+or is this change being overly cautious?  I would expect the files
+not to overlap because the package build with deb-pkg puts firmware
+in a versioned subdirectory "/lib/firmware/<version>".
 
-
-
-________________________________________________
-Seja também assinante da New Age Canoinhas - Fone 47 3622-0779
+Hope that helps,
+Jonathan
