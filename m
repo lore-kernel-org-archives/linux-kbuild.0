@@ -1,74 +1,81 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-gh0-f174.google.com ([209.85.160.174]:56740 "EHLO
-	mail-gh0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755693Ab2GQTkF convert rfc822-to-8bit (ORCPT
+Received: from mail-yx0-f174.google.com ([209.85.213.174]:38960 "EHLO
+	mail-yx0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752110Ab2GQTqZ convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 17 Jul 2012 15:40:05 -0400
-Date: Tue, 17 Jul 2012 14:39:51 -0500
-From: Jonathan Nieder <jrnieder@gmail.com>
-Subject: Re: [PATCH] scripts/package/builddeb: upgrade to current practices
-Message-ID: <20120717193951.GA15208@burratino>
-References: <1342547874.5129.2.camel@henna.lan>
+	Tue, 17 Jul 2012 15:46:25 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+Reply-To: martin-eric.racine@iki.fi
+In-Reply-To: <20120717193951.GA15208@burratino>
+References: <1342547874.5129.2.camel@henna.lan>
+	<20120717193951.GA15208@burratino>
+Date: Tue, 17 Jul 2012 22:46:23 +0300
+Message-ID: <CAPZXPQc02=6FnTb_RmgfpW+A4=N_huZW1FUYdjJ=Nt0Y3pqZ+A@mail.gmail.com>
+Subject: Re: [PATCH] scripts/package/builddeb: upgrade to current practices
+From: =?UTF-8?Q?Martin=2D=C3=89ric_Racine?= <martin-eric.racine@iki.fi>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8BIT
-In-Reply-To: <1342547874.5129.2.camel@henna.lan>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: =?utf-8?Q?Martin-=C3=89ric?= Racine <martin-eric.racine@iki.fi>
+To: Jonathan Nieder <jrnieder@gmail.com>
 Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org, debian-kernel@lists.debian.org
 
-Hi,
+2012/7/17 Jonathan Nieder <jrnieder@gmail.com>:
+> Hi,
+>
+> Martin-Éric Racine wrote:
+>
+>> Signed-off-by: Martin-Éric Racine <martin-eric.racine@iki.fi>
+>
+> Thanks.  This patch does many things at once instead of the usual
+> practice of "one patch per logical change", but oh well.
+>
+> [...]
+>> --- a/scripts/package/builddeb
+>> +++ b/scripts/package/builddeb
+>> @@ -79,9 +79,9 @@ fwdir="$objtree/debian/fwtmp"
+>>  kernel_headers_dir="$objtree/debian/hdrtmp"
+>>  libc_headers_dir="$objtree/debian/headertmp"
+>>  packagename=linux-image-$version
+>> -fwpackagename=linux-firmware-image
+>>  kernel_headers_packagename=linux-headers-$version
+>>  libc_headers_packagename=linux-libc-dev
+>> +fwpackagename=firmware-linux
+>
+> Micronit: any reason the lines are reordered here?
 
-Martin-Éric Racine wrote:
+Mostly to differenciate between versioned and non-versioned package targets.
 
-> Signed-off-by: Martin-Éric Racine <martin-eric.racine@iki.fi>
+>> @@ -188,17 +188,17 @@ This is a packacked upstream version of the Linux kernel.
+>>  The sources may be found at most Linux ftp sites, including:
+>>  ftp://ftp.kernel.org/pub/linux/kernel
+>>
+>> -Copyright: 1991 - 2009 Linus Torvalds and others.
+>> +Copyright: 1991-2012 Linus Torvalds and others.
+>>
+>> -The git repository for mainline kernel development is at:
+>> -git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux-2.6.git
+>> +The GIT repository for mainline kernel development is at:
+>> +git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
+>
+> I personally like to spell it as "Git". ;-)
 
-Thanks.  This patch does many things at once instead of the usual
-practice of "one patch per logical change", but oh well.
+That works for me too. Actually, what's the official spelling for it?
 
-[...]
-> --- a/scripts/package/builddeb
-> +++ b/scripts/package/builddeb
-> @@ -79,9 +79,9 @@ fwdir="$objtree/debian/fwtmp"
->  kernel_headers_dir="$objtree/debian/hdrtmp"
->  libc_headers_dir="$objtree/debian/headertmp"
->  packagename=linux-image-$version
-> -fwpackagename=linux-firmware-image
->  kernel_headers_packagename=linux-headers-$version
->  libc_headers_packagename=linux-libc-dev
-> +fwpackagename=firmware-linux
+> [...]
+>> @@ -273,6 +273,9 @@ if [ -e "$tmpdir/lib/firmware" ]; then
+>>
+>>  Package: $fwpackagename
+>>  Architecture: all
+>> +Conflicts: firmware-linux-free, firmware-linux-nonfree
+>> +Provides: firmware-linux-free, firmware-linux-nonfree
+>> +Replaces: firmware-linux-free, firmware-linux-nonfree
+>
+> I assume you mean Breaks+Replaces.  Do the files actually overlap,
+> or is this change being overly cautious?  I would expect the files
+> not to overlap because the package build with deb-pkg puts firmware
+> in a versioned subdirectory "/lib/firmware/<version>".
 
-Micronit: any reason the lines are reordered here?
+AFAIK they would overlap, hence the Conflicts.
 
-> @@ -188,17 +188,17 @@ This is a packacked upstream version of the Linux kernel.
->  The sources may be found at most Linux ftp sites, including:
->  ftp://ftp.kernel.org/pub/linux/kernel
->  
-> -Copyright: 1991 - 2009 Linus Torvalds and others.
-> +Copyright: 1991-2012 Linus Torvalds and others.
->  
-> -The git repository for mainline kernel development is at:
-> -git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux-2.6.git
-> +The GIT repository for mainline kernel development is at:
-> +git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
-
-I personally like to spell it as "Git". ;-)
-
-[...]
-> @@ -273,6 +273,9 @@ if [ -e "$tmpdir/lib/firmware" ]; then
->  
->  Package: $fwpackagename
->  Architecture: all
-> +Conflicts: firmware-linux-free, firmware-linux-nonfree
-> +Provides: firmware-linux-free, firmware-linux-nonfree
-> +Replaces: firmware-linux-free, firmware-linux-nonfree
-
-I assume you mean Breaks+Replaces.  Do the files actually overlap,
-or is this change being overly cautious?  I would expect the files
-not to overlap because the package build with deb-pkg puts firmware
-in a versioned subdirectory "/lib/firmware/<version>".
-
-Hope that helps,
-Jonathan
+Martin-Éric
