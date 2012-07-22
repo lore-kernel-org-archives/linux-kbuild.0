@@ -1,44 +1,61 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from canardo.mork.no ([148.122.252.1]:57252 "EHLO canardo.mork.no"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752230Ab2GRIFz convert rfc822-to-8bit (ORCPT
+Received: from smtp07.smtpout.orange.fr ([80.12.242.129]:21707 "EHLO
+	smtp.smtpout.orange.fr" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751859Ab2GVN7g (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 18 Jul 2012 04:05:55 -0400
-From: =?utf-8?Q?Bj=C3=B8rn_Mork?= <bjorn@mork.no>
-Subject: Re: [PATCH] scripts/package/builddeb: upgrade to current practices
-References: <1342547874.5129.2.camel@henna.lan>
-	<20120717193951.GA15208@burratino>
-	<CAPZXPQc02=6FnTb_RmgfpW+A4=N_huZW1FUYdjJ=Nt0Y3pqZ+A@mail.gmail.com>
-	<20120717212305.GV28778@vostochny.stro.at>
-	<CAPZXPQfBPXaRtK3QdY_PA=3GRrUz9+y3aU-2AvedvTwn8tOnqg@mail.gmail.com>
-	<20120718065615.GW28778@vostochny.stro.at>
-	<CAPZXPQdKFW5uDaJ-ufqLXKqtrq+jvoFfoDU9CQ4WLyQ0ZHaVew@mail.gmail.com>
-Date: Wed, 18 Jul 2012 10:05:14 +0200
-In-Reply-To: <CAPZXPQdKFW5uDaJ-ufqLXKqtrq+jvoFfoDU9CQ4WLyQ0ZHaVew@mail.gmail.com>
-	(=?utf-8?Q?=22Martin-=C3=89ric?= Racine"'s message of "Wed, 18 Jul 2012
- 10:21:58 +0300")
-Message-ID: <871uk9bikl.fsf@nemi.mork.no>
+	Sun, 22 Jul 2012 09:59:36 -0400
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Subject: kconfig-frontends-3.5.0-0 released
+Date: Sun, 22 Jul 2012 15:59:31 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
+Content-Type: Text/Plain;
+  charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <201207221559.31897.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: martin-eric.racine@iki.fi
-Cc: maximilian attems <max@stro.at>, Jonathan Nieder <jrnieder@gmail.com>, linux-kbuild@vger.kernel.org, debian-kernel@lists.debian.org
+To: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: "Yann E. MORIN" <yann.morin.1998@free.fr>
 
-Martin-Éric Racine <martin-eric.racine@iki.fi> writes:
+Hello All!
 
-> Does the kernel look for modules in versioned, then non-versioned
-> directories, in that order? More importantly, does it even attempt
-> looking in the versioned directory at all?
+I'm pleased to announce the release of kconfig-frontends 3.5.0-0!
+Go download it there:
+    http://ymorin.is-a-geek.org/download/kconfig-frontends/kconfig-frontends-3.5.0-0.tar.xz
+    http://ymorin.is-a-geek.org/download/kconfig-frontends/kconfig-frontends-3.5.0-0.tar.bz2
 
-/lib/udev/firmware.agent does this:
+The kconfig-frontends package provides the kconfig parser, as well as all the
+kconfig frontends and utilities, packaged using the traditional autotools, so
+the kconfig infrastructure is easy to deploy, either locally or system-wide.
 
-FIRMWARE_DIRS="/lib/firmware/$(uname -r) /lib/firmware /usr/local/lib/firmware /usr/lib/hotplug/firmware"
+What's new since 3.4.0-0:
+  - compiling on L10n-deffective systems has been fixed
+  - compiling under Cygwin is mostly functional (except the nconf frontend)
+  - the packaging has been enhanced and cleaned up
+  - compilation logs are now more like the kernel's (using the autotools
+    silent rules)
+  - the streamline utility has been removed because it is too kernel-specific
 
-for DIR in $FIRMWARE_DIRS; do
-    [ -e "$DIR/$FIRMWARE" ] || continue
+As a reminder, the home for kconfig-frontends is:
+  http://ymorin.is-a-geek.org/projects/kconfig-frontends
 
+And the repository can be browsed or hg-cloned from:
+  http://ymorin.is-a-geek.org/hg/kconfig-frontends
 
+kconfig-frontends is not meant to replace the in-tree Linux kconfig, but
+really targets third-party projects that want an easy path to following
+the evolution of kconfig, without the burden to manually synchronise from
+the Linux kernel source tree.
 
-Bjørn
+Any comment, any feedback, any patch is welcome! ;-)
+
+Regards,
+Yann E. MORIN.
+
+-- 
+.-----------------.--------------------.------------------.--------------------.
+|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
+| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
+| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
+| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
+'------------------------------^-------^------------------^--------------------'
