@@ -1,74 +1,39 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-gg0-f174.google.com ([209.85.161.174]:46548 "EHLO
-	mail-gg0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932075Ab2GXUMU (ORCPT
+Received: from smtp09.smtpout.orange.fr ([80.12.242.131]:46324 "EHLO
+	smtp.smtpout.orange.fr" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932619Ab2GXVNH (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 24 Jul 2012 16:12:20 -0400
-From: Benjamin Poirier <bpoirier@suse.de>
-Subject: [PATCH v2 1/2] menuconfig: add u, d, q command keys in text boxes
-Date: Tue, 24 Jul 2012 16:12:02 -0400
-Message-Id: <1343160723-14308-1-git-send-email-bpoirier@suse.de>
-In-Reply-To: <500EDDAF.4040506@xenotime.net>
-References: <500EDDAF.4040506@xenotime.net>
+	Tue, 24 Jul 2012 17:13:07 -0400
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Subject: Re: [PATCH] scripts/config: fix double-quotes un-escaping
+Date: Tue, 24 Jul 2012 23:13:04 +0200
+References: <1342384655-7769-1-git-send-email-yann.morin.1998@free.fr>
+In-Reply-To: <1342384655-7769-1-git-send-email-yann.morin.1998@free.fr>
+MIME-Version: 1.0
+Content-Type: Text/Plain;
+  charset="iso-8859-15"
+Content-Transfer-Encoding: 7bit
+Message-Id: <201207242313.04493.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>, Arnaud Lacombe <lacombar@gmail.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Randy Dunlap <rdunlap@xenotime.net>
+To: linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>
 
-They function just like they do in less(1).
+Michal, All,
 
-Signed-off-by: Benjamin Poirier <bpoirier@suse.de>
----
- scripts/kconfig/lxdialog/textbox.c |    3 +++
- scripts/kconfig/mconf.c            |    6 +++---
- 2 files changed, 6 insertions(+), 3 deletions(-)
+On Sunday 15 July 2012 22:37:35 Yann E. MORIN wrote:
+> When reporting a string value, only the first double-quote was un-escaped.
+> We need to un-escape all escaped double-quotes.
 
-diff --git a/scripts/kconfig/lxdialog/textbox.c b/scripts/kconfig/lxdialog/textbox.c
-index 154c2dd..4e5de60 100644
---- a/scripts/kconfig/lxdialog/textbox.c
-+++ b/scripts/kconfig/lxdialog/textbox.c
-@@ -129,6 +129,7 @@ do_resize:
- 		case 'e':
- 		case 'X':
- 		case 'x':
-+		case 'q':
- 			delwin(box);
- 			delwin(dialog);
- 			return 0;
-@@ -190,6 +191,7 @@ do_resize:
- 			break;
- 		case 'B':	/* Previous page */
- 		case 'b':
-+		case 'u':
- 		case KEY_PPAGE:
- 			if (begin_reached)
- 				break;
-@@ -214,6 +216,7 @@ do_resize:
- 			break;
- 		case KEY_NPAGE:	/* Next page */
- 		case ' ':
-+		case 'd':
- 			if (end_reached)
- 				break;
- 
-diff --git a/scripts/kconfig/mconf.c b/scripts/kconfig/mconf.c
-index f606738..f584a28 100644
---- a/scripts/kconfig/mconf.c
-+++ b/scripts/kconfig/mconf.c
-@@ -105,10 +105,10 @@ static const char mconf_readme[] = N_(
- "Text Box    (Help Window)\n"
- "--------\n"
- "o  Use the cursor keys to scroll up/down/left/right.  The VI editor\n"
--"   keys h,j,k,l function here as do <SPACE BAR> and <B> for those\n"
--"   who are familiar with less and lynx.\n"
-+"   keys h,j,k,l function here as do <u>, <d>, <SPACE BAR> and <B> for \n"
-+"   those who are familiar with less and lynx.\n"
- "\n"
--"o  Press <E>, <X>, <Enter> or <Esc><Esc> to exit.\n"
-+"o  Press <E>, <X>, <q>, <Enter> or <Esc><Esc> to exit.\n"
- "\n"
- "\n"
- "Alternate Configuration Files\n"
+Ping? ;-)
+Do you plan to add this one to your tree before you ask Linus to pull?
+
+Regards,
+Yann E. MORIN.
+
 -- 
-1.7.7
-
+.-----------------.--------------------.------------------.--------------------.
+|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
+| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
+| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
+| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
+'------------------------------^-------^------------------^--------------------'
