@@ -1,39 +1,65 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp09.smtpout.orange.fr ([80.12.242.131]:46324 "EHLO
-	smtp.smtpout.orange.fr" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932619Ab2GXVNH (ORCPT
+Received: from mail-vc0-f174.google.com ([209.85.220.174]:63932 "EHLO
+	mail-vc0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752020Ab2GYW4c (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 24 Jul 2012 17:13:07 -0400
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: Re: [PATCH] scripts/config: fix double-quotes un-escaping
-Date: Tue, 24 Jul 2012 23:13:04 +0200
-References: <1342384655-7769-1-git-send-email-yann.morin.1998@free.fr>
-In-Reply-To: <1342384655-7769-1-git-send-email-yann.morin.1998@free.fr>
-MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-15"
-Content-Transfer-Encoding: 7bit
-Message-Id: <201207242313.04493.yann.morin.1998@free.fr>
+	Wed, 25 Jul 2012 18:56:32 -0400
+From: Salar Ali Mumtaz <salaarali@gmail.com>
+Subject: [PATCH] xconfig: Display dependency values in debug_info
+Date: Wed, 25 Jul 2012 18:56:22 -0400
+Message-Id: <1343256982-11421-1-git-send-email-salaarali@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Salar Ali Mumtaz <salaarali@gmail.com>
 
-Michal, All,
+Displays the current value of each of the dependencies of a menu item.
+Before, you needed to do tedious searching to find out the current values
+of the dependences. Now they all are included in the debug_info, making
+the task easier
 
-On Sunday 15 July 2012 22:37:35 Yann E. MORIN wrote:
-> When reporting a string value, only the first double-quote was un-escaped.
-> We need to un-escape all escaped double-quotes.
+Signed-off-by: Salar Ali Mumtaz <salaarali@gmail.com>
+---
+ scripts/kconfig/qconf.cc |   10 +++++++++-
+ 1 files changed, 9 insertions(+), 1 deletions(-)
 
-Ping? ;-)
-Do you plan to add this one to your tree before you ask Linus to pull?
-
-Regards,
-Yann E. MORIN.
-
+diff --git a/scripts/kconfig/qconf.cc b/scripts/kconfig/qconf.cc
+index df274fe..abd500f 100644
+--- a/scripts/kconfig/qconf.cc
++++ b/scripts/kconfig/qconf.cc
+@@ -1073,8 +1073,10 @@ QString ConfigInfoView::debug_info(struct symbol *sym)
+ 		debug += " (choice)";
+ 	debug += "<br>";
+ 	if (sym->rev_dep.expr) {
+-		debug += "reverse dep: ";
++		debug += "reverse dep: (";
+ 		expr_print(sym->rev_dep.expr, expr_print_help, &debug, E_NONE);
++		debug += " )  =";
++		debug += print_filter(sym_get_string_value(sym));
+ 		debug += "<br>";
+ 	}
+ 	for (struct property *prop = sym->prop; prop; prop = prop->next) {
+@@ -1108,7 +1110,10 @@ QString ConfigInfoView::debug_info(struct symbol *sym)
+ 		}
+ 		if (prop->visible.expr) {
+ 			debug += "&nbsp;&nbsp;&nbsp;&nbsp;dep: ";
++			debug += " ( ";
+ 			expr_print(prop->visible.expr, expr_print_help, &debug, E_NONE);
++			debug += " )  =";
++			debug += print_filter(sym_get_string_value(sym));
+ 			debug += "<br>";
+ 		}
+ 	}
+@@ -1157,6 +1162,9 @@ void ConfigInfoView::expr_print_help(void *data, struct symbol *sym, const char
+ 		*text += QString().sprintf("<a href=\"s%p\">", sym);
+ 		*text += str2;
+ 		*text += "</a>";
++		*text += "<b>   ";
++		*text += print_filter(sym_get_string_value(sym));
++		*text += "</b>";
+ 	} else
+ 		*text += str2;
+ }
 -- 
-.-----------------.--------------------.------------------.--------------------.
-|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
-| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
-| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
-| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
-'------------------------------^-------^------------------^--------------------'
+1.7.5.4
+
