@@ -1,46 +1,92 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp07.smtpout.orange.fr ([80.12.242.129]:19400 "EHLO
-	smtp.smtpout.orange.fr" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752341Ab2GZQyp (ORCPT
+Received: from oproxy10-pub.bluehost.com ([67.222.39.61]:37776 "HELO
+	oproxy10-pub.bluehost.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with SMTP id S1751877Ab2GZRDO (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 26 Jul 2012 12:54:45 -0400
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: Re: [PATCH] scripts/config: fix double-quotes un-escaping
-Date: Thu, 26 Jul 2012 18:54:41 +0200
-References: <1342384655-7769-1-git-send-email-yann.morin.1998@free.fr> <201207242313.04493.yann.morin.1998@free.fr> <20120726102035.GA25512@sepie.suse.cz>
-In-Reply-To: <20120726102035.GA25512@sepie.suse.cz>
+	Thu, 26 Jul 2012 13:03:14 -0400
+Message-ID: <50117812.5080302@xenotime.net>
+Date: Thu, 26 Jul 2012 10:02:10 -0700
+From: Randy Dunlap <rdunlap@xenotime.net>
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-1"
+Subject: Re: [PATCH] xconfig: Display dependency values in debug_info
+References: <1343256982-11421-1-git-send-email-salaarali@gmail.com> <50107EB7.8000009@xenotime.net> <CA+jpPM=nrbpDJpaka6xAp4dbEOQjJrtwQWtUXwi_gGS9b4yK-A@mail.gmail.com>
+In-Reply-To: <CA+jpPM=nrbpDJpaka6xAp4dbEOQjJrtwQWtUXwi_gGS9b4yK-A@mail.gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
-Message-Id: <201207261854.41661.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Michal Marek <mmarek@suse.cz>
+To: Salar Ali Mumtaz <salaarali@gmail.com>
+Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Michal, All,
+On 07/26/2012 09:19 AM, Salar Ali Mumtaz wrote:
 
-On Thursday 26 July 2012 12:20:35 Michal Marek wrote:
-> On Tue, Jul 24, 2012 at 11:13:04PM +0200, Yann E. MORIN wrote:
-> > On Sunday 15 July 2012 22:37:35 Yann E. MORIN wrote:
-> > > When reporting a string value, only the first double-quote was un-escaped.
-> > > We need to un-escape all escaped double-quotes.
-> > 
-> > Ping? ;-)
-> > Do you plan to add this one to your tree before you ask Linus to pull?
+> Hi.
 > 
-> Yes, I just did so.
+> Thanks for the quick reply.
+> 
+> This adds the current values to the dependencies in the debug_info, which you get when you select "Show debug info" 
+> from the popup you get after you right click. For some values, there is no help available. For those, there is usually 
+> information in the debug_info that is not displayed normally.
+> 
+> COMPAT_BINFMT_ELF
+> 
+> //This is added by debug_info
+> type: boolean
+> reverse dep: (IA32_EMULATION n && X86_64 n ) =n
+> unknown property: symbol
+>     dep: ( COMPAT n && BINFMT_ELF y ) =n
+> //This is added by debug_info
+> 
+> defined at fs/Kconfig.binfmt:26
+> 
+> There is no help available for this option.
+> Symbol: COMPAT_BINFMT_ELF [=n]
+> Type : boolean
+> Selected by: IA32_EMULATION [=n] && X86_64 [=n]
+> 
+> Hope this helps.
+> 
 
-Thank you! :-)
 
-Regards,
-Yann E. MORIN.
+Yes, it does help.  Thanks.
+
+
+For BINFMT_ELF (not your example of COMPAT_BINFMT_ELF)
+in Linux 3.5, I see this:
+
+
+BEFORE PATCH:
+
+type: boolean
+unknown property: symbol
+    dep: MMU && (BROKEN || !FRV)
+prompt: Kernel support for ELF binaries
+    dep: MMU && (BROKEN || !FRV)
+default: y
+    dep: MMU && (BROKEN || !FRV)
+
+defined at fs/Kconfig.binfmt:1
+
+
+
+AFTER PATCH:
+
+type: boolean
+unknown property: symbol
+    dep: ( MMU y && (BROKEN n || !FRV FRV) ) =y
+prompt: Kernel support for ELF binaries
+    dep: ( MMU y && (BROKEN n || !FRV FRV) ) =y
+default: y
+    dep: ( MMU y && (BROKEN n || !FRV FRV) ) =y
+
+defined at fs/Kconfig.binfmt:1
+
+
+
+
+The added y/n/m are clear, but the "!FRV FRV" is confusing,
+isn't it?
+
 
 -- 
-.-----------------.--------------------.------------------.--------------------.
-|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
-| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
-| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
-| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
-'------------------------------^-------^------------------^--------------------'
+~Randy
