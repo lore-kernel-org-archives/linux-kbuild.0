@@ -1,48 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:40403 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751418Ab2GZMaT (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 26 Jul 2012 08:30:19 -0400
-Date: Thu, 26 Jul 2012 14:30:17 +0200
-From: Michal Marek <mmarek@suse.cz>
-Subject: Re: kbuild: Document oldnoconfig to what it really does
-Message-ID: <20120726123017.GD25512@sepie.suse.cz>
-References: <1339802699.25903.47.camel@gandalf.stny.rr.com>
+Received: from smtp07.smtpout.orange.fr ([80.12.242.129]:19400 "EHLO
+	smtp.smtpout.orange.fr" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752341Ab2GZQyp (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 26 Jul 2012 12:54:45 -0400
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Subject: Re: [PATCH] scripts/config: fix double-quotes un-escaping
+Date: Thu, 26 Jul 2012 18:54:41 +0200
+References: <1342384655-7769-1-git-send-email-yann.morin.1998@free.fr> <201207242313.04493.yann.morin.1998@free.fr> <20120726102035.GA25512@sepie.suse.cz>
+In-Reply-To: <20120726102035.GA25512@sepie.suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1339802699.25903.47.camel@gandalf.stny.rr.com>
+Content-Type: Text/Plain;
+  charset="iso-8859-1"
+Content-Transfer-Encoding: 7bit
+Message-Id: <201207261854.41661.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Steven Rostedt <rostedt@goodmis.org>
-Cc: LKML <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: linux-kbuild@vger.kernel.org
+Cc: Michal Marek <mmarek@suse.cz>
 
-On Fri, Jun 15, 2012 at 07:24:59PM -0400, Steven Rostedt wrote:
-> The make target 'oldnoconfig' is a misnomer. It doesn't set new symbols
-> to 'n', but instead sets it to their default values.
-> 
-> Unfortunately, assuming that it actually did this, broke ktest in some
-> of its tests. For example, the tests to create a minimum config and even
-> a config bisect, depends on removing various configs and using
-> oldnoconfig to get rid of other configs that may have depended on it.
-> 
-> But because some configs that it was trying to disable, were in fact
-> default enabled, this caused those configs to re-enable and corrupt the
-> test.
-> 
-> I thought about fixing oldnoconfig, but I'm afraid that people are
-> already dependent on its current behavior. Instead, I'm just updating
-> the documentation to state that it sets the new symbols to their default
-> values and not to 'n'.
-> 
-> Ideally, this would be called, 'olddefconfig' and we have an
-> 'oldnoconfig' that actually disables the new symbols. But it's useless
-> for me now. If it changed, ktest would need to be consistent between
-> each version, and that would be to difficult to detect. I'll handle this
-> issue with ktest with other means.
-> 
-> Signed-off-by: Steven Rostedt <rostedt@goodmis.org>
+Michal, All,
 
-Applied to kbuild.git#kconfig, thanks.
+On Thursday 26 July 2012 12:20:35 Michal Marek wrote:
+> On Tue, Jul 24, 2012 at 11:13:04PM +0200, Yann E. MORIN wrote:
+> > On Sunday 15 July 2012 22:37:35 Yann E. MORIN wrote:
+> > > When reporting a string value, only the first double-quote was un-escaped.
+> > > We need to un-escape all escaped double-quotes.
+> > 
+> > Ping? ;-)
+> > Do you plan to add this one to your tree before you ask Linus to pull?
+> 
+> Yes, I just did so.
 
-Michal
+Thank you! :-)
+
+Regards,
+Yann E. MORIN.
+
+-- 
+.-----------------.--------------------.------------------.--------------------.
+|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
+| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
+| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
+| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
+'------------------------------^-------^------------------^--------------------'
