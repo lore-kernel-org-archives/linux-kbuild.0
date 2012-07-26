@@ -1,99 +1,34 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from oproxy5-pub.bluehost.com ([67.222.38.55]:60622 "HELO
-	oproxy5-pub.bluehost.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with SMTP id S1751643Ab2GYXTR (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 25 Jul 2012 19:19:17 -0400
-Message-ID: <50107EB7.8000009@xenotime.net>
-Date: Wed, 25 Jul 2012 16:18:15 -0700
-From: Randy Dunlap <rdunlap@xenotime.net>
+Received: from cantor2.suse.de ([195.135.220.15]:33049 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751341Ab2GZKUh (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 26 Jul 2012 06:20:37 -0400
+Date: Thu, 26 Jul 2012 12:20:35 +0200
+From: Michal Marek <mmarek@suse.cz>
+Subject: Re: [PATCH] scripts/config: fix double-quotes un-escaping
+Message-ID: <20120726102035.GA25512@sepie.suse.cz>
+References: <1342384655-7769-1-git-send-email-yann.morin.1998@free.fr>
+ <201207242313.04493.yann.morin.1998@free.fr>
 MIME-Version: 1.0
-Subject: Re: [PATCH] xconfig: Display dependency values in debug_info
-References: <1343256982-11421-1-git-send-email-salaarali@gmail.com>
-In-Reply-To: <1343256982-11421-1-git-send-email-salaarali@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <201207242313.04493.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Salar Ali Mumtaz <salaarali@gmail.com>
-Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Cc: linux-kbuild@vger.kernel.org
 
-On 07/25/2012 03:56 PM, Salar Ali Mumtaz wrote:
-
-> Displays the current value of each of the dependencies of a menu item.
-> Before, you needed to do tedious searching to find out the current values
-> of the dependences. Now they all are included in the debug_info, making
-> the task easier
-
-Hi,
-Would you please provide before and after examples?
-
-I use xconfig quite a lot and it already shows me, e.g., for
-CONFIG_DRM:
-
-
-Symbol: DRM [=y]
-Type : tristate
-Prompt: Direct Rendering Manager (XFree86 4.1.0 and higher DRI support)
-Defined at drivers/gpu/drm/Kconfig:7
-Depends on: HAS_IOMEM [=y] && (AGP [=y] || AGP [=y]=n) && !EMULATED_CMPXCHG && MMU [=y]
-Location:
--> Device Drivers
--> Graphics support
-Selects: I2C [=y] && I2C_ALGOBIT [=y] && DMA_SHARED_BUFFER [=y]
-
-
-
-
-so what and where does this patch add debug info?
-
-Thanks.
-
-
-> Signed-off-by: Salar Ali Mumtaz <salaarali@gmail.com>
-> ---
->  scripts/kconfig/qconf.cc |   10 +++++++++-
->  1 files changed, 9 insertions(+), 1 deletions(-)
+On Tue, Jul 24, 2012 at 11:13:04PM +0200, Yann E. MORIN wrote:
+> Michal, All,
 > 
-> diff --git a/scripts/kconfig/qconf.cc b/scripts/kconfig/qconf.cc
-> index df274fe..abd500f 100644
-> --- a/scripts/kconfig/qconf.cc
-> +++ b/scripts/kconfig/qconf.cc
-> @@ -1073,8 +1073,10 @@ QString ConfigInfoView::debug_info(struct symbol *sym)
->  		debug += " (choice)";
->  	debug += "<br>";
->  	if (sym->rev_dep.expr) {
-> -		debug += "reverse dep: ";
-> +		debug += "reverse dep: (";
->  		expr_print(sym->rev_dep.expr, expr_print_help, &debug, E_NONE);
-> +		debug += " )  =";
-> +		debug += print_filter(sym_get_string_value(sym));
->  		debug += "<br>";
->  	}
->  	for (struct property *prop = sym->prop; prop; prop = prop->next) {
-> @@ -1108,7 +1110,10 @@ QString ConfigInfoView::debug_info(struct symbol *sym)
->  		}
->  		if (prop->visible.expr) {
->  			debug += "&nbsp;&nbsp;&nbsp;&nbsp;dep: ";
-> +			debug += " ( ";
->  			expr_print(prop->visible.expr, expr_print_help, &debug, E_NONE);
-> +			debug += " )  =";
-> +			debug += print_filter(sym_get_string_value(sym));
->  			debug += "<br>";
->  		}
->  	}
-> @@ -1157,6 +1162,9 @@ void ConfigInfoView::expr_print_help(void *data, struct symbol *sym, const char
->  		*text += QString().sprintf("<a href=\"s%p\">", sym);
->  		*text += str2;
->  		*text += "</a>";
-> +		*text += "<b>   ";
-> +		*text += print_filter(sym_get_string_value(sym));
-> +		*text += "</b>";
->  	} else
->  		*text += str2;
->  }
+> On Sunday 15 July 2012 22:37:35 Yann E. MORIN wrote:
+> > When reporting a string value, only the first double-quote was un-escaped.
+> > We need to un-escape all escaped double-quotes.
+> 
+> Ping? ;-)
+> Do you plan to add this one to your tree before you ask Linus to pull?
 
+Yes, I just did so.
 
-
--- 
-~Randy
+Thanks,
+Michal
