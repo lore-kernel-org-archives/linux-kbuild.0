@@ -1,34 +1,31 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:33049 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:33484 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751341Ab2GZKUh (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 26 Jul 2012 06:20:37 -0400
-Date: Thu, 26 Jul 2012 12:20:35 +0200
+	id S1751481Ab2GZKa1 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 26 Jul 2012 06:30:27 -0400
+Date: Thu, 26 Jul 2012 12:30:25 +0200
 From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [PATCH] scripts/config: fix double-quotes un-escaping
-Message-ID: <20120726102035.GA25512@sepie.suse.cz>
-References: <1342384655-7769-1-git-send-email-yann.morin.1998@free.fr>
- <201207242313.04493.yann.morin.1998@free.fr>
+Subject: Re: [PATCH v2 2/2] nconf: add u, d command keys in scroll windows
+Message-ID: <20120726103025.GB25512@sepie.suse.cz>
+References: <500EDDAF.4040506@xenotime.net>
+ <1343160723-14308-1-git-send-email-bpoirier@suse.de>
+ <1343160723-14308-2-git-send-email-bpoirier@suse.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <201207242313.04493.yann.morin.1998@free.fr>
+In-Reply-To: <1343160723-14308-2-git-send-email-bpoirier@suse.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Cc: linux-kbuild@vger.kernel.org
+To: Benjamin Poirier <bpoirier@suse.de>
+Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>, Arnaud Lacombe <lacombar@gmail.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Randy Dunlap <rdunlap@xenotime.net>
 
-On Tue, Jul 24, 2012 at 11:13:04PM +0200, Yann E. MORIN wrote:
-> Michal, All,
+On Tue, Jul 24, 2012 at 04:12:03PM -0400, Benjamin Poirier wrote:
+> They function just like they do in less(1).
+> Also correct some discrepancy between the help text and the code wrt
+> function keys.
 > 
-> On Sunday 15 July 2012 22:37:35 Yann E. MORIN wrote:
-> > When reporting a string value, only the first double-quote was un-escaped.
-> > We need to un-escape all escaped double-quotes.
-> 
-> Ping? ;-)
-> Do you plan to add this one to your tree before you ask Linus to pull?
+> Signed-off-by: Benjamin Poirier <bpoirier@suse.de>
 
-Yes, I just did so.
+Applied to kbuild.git#kconfig, thanks.
 
-Thanks,
 Michal
