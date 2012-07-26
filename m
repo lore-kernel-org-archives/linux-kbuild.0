@@ -1,30 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:33484 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:40403 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751481Ab2GZKa1 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 26 Jul 2012 06:30:27 -0400
-Date: Thu, 26 Jul 2012 12:30:25 +0200
+	id S1751418Ab2GZMaT (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 26 Jul 2012 08:30:19 -0400
+Date: Thu, 26 Jul 2012 14:30:17 +0200
 From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [PATCH v2 2/2] nconf: add u, d command keys in scroll windows
-Message-ID: <20120726103025.GB25512@sepie.suse.cz>
-References: <500EDDAF.4040506@xenotime.net>
- <1343160723-14308-1-git-send-email-bpoirier@suse.de>
- <1343160723-14308-2-git-send-email-bpoirier@suse.de>
+Subject: Re: kbuild: Document oldnoconfig to what it really does
+Message-ID: <20120726123017.GD25512@sepie.suse.cz>
+References: <1339802699.25903.47.camel@gandalf.stny.rr.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1343160723-14308-2-git-send-email-bpoirier@suse.de>
+In-Reply-To: <1339802699.25903.47.camel@gandalf.stny.rr.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Benjamin Poirier <bpoirier@suse.de>
-Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>, Arnaud Lacombe <lacombar@gmail.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Randy Dunlap <rdunlap@xenotime.net>
+To: Steven Rostedt <rostedt@goodmis.org>
+Cc: LKML <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-On Tue, Jul 24, 2012 at 04:12:03PM -0400, Benjamin Poirier wrote:
-> They function just like they do in less(1).
-> Also correct some discrepancy between the help text and the code wrt
-> function keys.
+On Fri, Jun 15, 2012 at 07:24:59PM -0400, Steven Rostedt wrote:
+> The make target 'oldnoconfig' is a misnomer. It doesn't set new symbols
+> to 'n', but instead sets it to their default values.
 > 
-> Signed-off-by: Benjamin Poirier <bpoirier@suse.de>
+> Unfortunately, assuming that it actually did this, broke ktest in some
+> of its tests. For example, the tests to create a minimum config and even
+> a config bisect, depends on removing various configs and using
+> oldnoconfig to get rid of other configs that may have depended on it.
+> 
+> But because some configs that it was trying to disable, were in fact
+> default enabled, this caused those configs to re-enable and corrupt the
+> test.
+> 
+> I thought about fixing oldnoconfig, but I'm afraid that people are
+> already dependent on its current behavior. Instead, I'm just updating
+> the documentation to state that it sets the new symbols to their default
+> values and not to 'n'.
+> 
+> Ideally, this would be called, 'olddefconfig' and we have an
+> 'oldnoconfig' that actually disables the new symbols. But it's useless
+> for me now. If it changed, ktest would need to be consistent between
+> each version, and that would be to difficult to detect. I'll handle this
+> issue with ktest with other means.
+> 
+> Signed-off-by: Steven Rostedt <rostedt@goodmis.org>
 
 Applied to kbuild.git#kconfig, thanks.
 
