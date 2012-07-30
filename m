@@ -1,15 +1,15 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
 Received: from hrndva-omtalb.mail.rr.com ([71.74.56.122]:19735 "EHLO
 	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754668Ab2G3TpD (ORCPT
+	with ESMTP id S1754656Ab2G3TpE (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 30 Jul 2012 15:45:03 -0400
-Message-Id: <20120730194501.990401960@goodmis.org>
-Date: Mon, 30 Jul 2012 15:43:18 -0400
+	Mon, 30 Jul 2012 15:45:04 -0400
+Message-Id: <20120730194502.828052323@goodmis.org>
+Date: Mon, 30 Jul 2012 15:43:19 -0400
 From: Steven Rostedt <rostedt@goodmis.org>
-Subject: [PATCH 2/4] localmodconfig: Read in orig config file to avoid extra processing
+Subject: [PATCH 3/4] localmodconfig: Check if configs are already set for selects
 References: <20120730194316.768288008@goodmis.org>
-Content-Disposition: inline; filename=0002-localmodconfig-Read-in-orig-config-file-to-avoid-ext.patch
+Content-Disposition: inline; filename=0003-localmodconfig-Check-if-configs-are-already-set-for-.patch
 Content-Type: multipart/signed; micalg="pgp-sha1"; protocol="application/pgp-signature"; boundary="00GvhwF7k39YY"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
@@ -22,90 +22,185 @@ Content-Transfer-Encoding: quoted-printable
 
 From: Steven Rostedt <srostedt@redhat.com>
 
-Read in the entire config file. If there's a config that we depend on
-that happens to be in the core set (not a module) then we do not need
-to process it as a module.
+There are some cases that a required module does not have a prompt
+and needs to have another module enabled that selects it to be set.
+As localmodconfig is conservative and tries to make the minimum config
+without breaking the user's kernel, or keeping the user from using
+devices that were loaded when the lsmod was done, all modules that
+select this module will also be enabled.
 
-Currently, we follow the entire depend and selects even if they
-are enabled as core and not modules. By checking to make sure that we
-only look at modules we can drop the count a little.
+If you needed module A, but module A did not have a prompt but needed
+module B to be selected, localmodconfig would make sure B was still
+enabled. If not only B selected A, but C, D, E, F, and G also
+selected A, then all of those would also be included, as well as the
+modules they depend on. This ballooned the number of configs that
+localmodconfig would keep.
 
-From one of my tests, localmodconfig went from taking 3095 set modules
-down to 356 before this patch, and down to 290 modules after the change.
+The fix here is to process the depends first, and then record those
+configs that did not have a prompt and needed to be selected.
+After the depends are done, check what configs are needed to select
+the configs in the list, and if a config that selects it is already
+set, then we don't need to do anything else.
+
+If no config that selects the config is set, then just pick one and
+try again.
+
+This change brought down the number of selected modules from 290
+to 67! Both before and after were run against a config that had 3095
+modules enabled.
 
 Tested-by: John David Yost <johnyost@ptd.net> # AlleyTrotter
 Signed-off-by: Steven Rostedt <rostedt@goodmis.org>
 ---
- scripts/kconfig/streamline_config.pl |   26 ++++++++++++++++++++++++--
- 1 file changed, 24 insertions(+), 2 deletions(-)
+ scripts/kconfig/streamline_config.pl |  115 ++++++++++++++++++++++++++++++=
+----
+ 1 file changed, 104 insertions(+), 11 deletions(-)
 
 diff --git a/scripts/kconfig/streamline_config.pl b/scripts/kconfig/streaml=
 ine_config.pl
-index 5c1ce87..ab4985f 100644
+index ab4985f..fcfcb30 100644
 --- a/scripts/kconfig/streamline_config.pl
 +++ b/scripts/kconfig/streamline_config.pl
-@@ -113,6 +113,10 @@ sub find_config {
+@@ -420,7 +420,7 @@ my $repeat =3D 1;
+ # to keep on. If A was on in the original config, B would not have been
+ # and B would not be turned on by this script.
+ #
+-sub parse_config_dep_select
++sub parse_config_depends
+ {
+     my ($p) =3D @_;
 =20
- find_config;
-=20
-+# Read in the entire config file into config_file
-+my @config_file =3D <CIN>;
-+close CIN;
-+
- # Parse options
- my $localmodconfig =3D 0;
- my $localyesconfig =3D 0;
-@@ -392,7 +396,20 @@ foreach my $module (keys(%modules)) {
+@@ -448,26 +448,119 @@ sub parse_config_dep_select
      }
  }
 =20
-+# Read the current config, and see what is enabled. We want to
-+# ignore configs that we would not enable anyway.
-+
-+my %orig_configs;
- my $valid =3D "A-Za-z_0-9";
-+
-+foreach my $line (@config_file) {
-+    $_ =3D $line;
-+
-+    if (/(CONFIG_[$valid]*)=3D(m|y)/) {
-+	$orig_configs{$1} =3D $2;
-+    }
-+}
-+
- my $repeat =3D 1;
+-while ($repeat) {
+-    $repeat =3D 0;
++# Select is treated a bit differently than depends. We call this
++# when a config has no prompt and requires another config to be
++# selected. We use to just select all configs that selected this
++# config, but found that that can balloon into enabling hundreds
++# of configs that we do not care about.
++#
++# The idea is we look at all the configs that select it. If one
++# is already in our list of configs to enable, then there's nothing
++# else to do. If there isn't, we pick the first config that was
++# enabled in the orignal config and use that.
++sub parse_config_selects
++{
++    my ($config, $p) =3D @_;
 =20
- #
-@@ -414,6 +431,11 @@ sub parse_config_dep_select
+-    foreach my $config (keys %configs) {
+-	$config =3D~ s/^CONFIG_//;
++    my $next_config;
++
++    while ($p =3D~ /[$valid]/) {
++
++	if ($p =3D~ /^[^$valid]*([$valid]+)/) {
++	    my $conf =3D "CONFIG_" . $1;
++
++	    $p =3D~ s/^[^$valid]*[$valid]+//;
 =20
- 	    $p =3D~ s/^[^$valid]*[$valid]+//;
-=20
-+	    # We only need to process if the depend config is a module
-+	    if (!defined($orig_configs{$conf}) || !$orig_configs{conf} eq "m") {
+-	if (defined($depends{$config})) {
+-	    # This config has dependencies. Make sure they are also included
+-	    parse_config_dep_select $depends{$config};
++	    # Make sure that this config exists in the current .config file
++	    if (!defined($orig_configs{$conf})) {
 +		next;
 +	    }
 +
- 	    if (!defined($configs{$conf})) {
- 		# We must make sure that this config has its
- 		# dependencies met.
-@@ -450,7 +472,8 @@ my %setconfigs;
++	    # Check if something other than a module selects this config
++	    if (defined($orig_configs{$conf}) && $orig_configs{$conf} ne "m") {
++		# we are good with this
++		return;
++	    }
++	    if (defined($configs{$conf})) {
++		# A set config selects this config, we are good
++		return;
++	    }
++	    # Set this config to be selected
++	    if (!defined($next_config)) {
++		$next_config =3D $conf;
++	    }
++	} else {
++	    die "this should never happen";
+ 	}
++    }
+=20
+-	if (defined($prompts{$config}) || !defined($selects{$config})) {
+-	    next;
++    # If no possible config selected this, then something happened.
++    if (!defined($next_config)) {
++	print STDERR "WARNING: $config is required, but nothing in the\n";
++	print STDERR "  current config selects it.\n";
++	return;
++    }
++
++    # If we are here, then we found no config that is set and
++    # selects this config. Repeat.
++    $repeat =3D 1;
++    # Make this config need to be selected
++    $configs{$next_config} =3D 1;
++}
++
++my %process_selects;
++
++# loop through all configs, select their dependencies.
++sub loop_depend {
++    $repeat =3D 1;
++
++    while ($repeat) {
++	$repeat =3D 0;
++
++      forloop:
++	foreach my $config (keys %configs) {
++
++	    # If this config is not a module, we do not need to process it
++	    if (defined($orig_configs{$config}) && $orig_configs{$config} ne "m")=
+ {
++		next forloop;
++	    }
++
++	    $config =3D~ s/^CONFIG_//;
++
++	    if (defined($depends{$config})) {
++		# This config has dependencies. Make sure they are also included
++		parse_config_depends $depends{$config};
++	    }
++
++	    # If the config has no prompt, then we need to check if a config
++	    # that is enabled selected it. Or if we need to enable one.
++	    if (!defined($prompts{$config}) && defined($selects{$config})) {
++		$process_selects{$config} =3D 1;
++	    }
+ 	}
++    }
++}
++
++sub loop_select {
++
++    foreach my $config (keys %process_selects) {
++	$config =3D~ s/^CONFIG_//;
+=20
+ 	# config has no prompt and must be selected.
+-	parse_config_dep_select $selects{$config};
++	parse_config_selects $config, $selects{$config};
+     }
+ }
+=20
++while ($repeat) {
++    # Get the first set of configs and their dependencies.
++    loop_depend;
++
++    $repeat =3D 0;
++
++    # Now we need to see if we have to check selects;
++    loop_select;
++}=09=20=20=20=20
++
+ my %setconfigs;
 =20
  # Finally, read the .config file and turn off any module enabled that
- # we could not find a reason to keep enabled.
--while(<CIN>) {
-+foreach my $line (@config_file) {
-+    $_ =3D $line;
-=20
-     if (/CONFIG_IKCONFIG/) {
- 	if (/# CONFIG_IKCONFIG is not set/) {
-@@ -478,7 +501,6 @@ while(<CIN>) {
-     }
-     print;
- }
--close(CIN);
-=20
- # Integrity check, make sure all modules that we want enabled do
- # indeed have their configs set.
 --=20
 1.7.10.4
 
@@ -118,19 +213,19 @@ Content-Description: This is a digitally signed message part
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1.4.12 (GNU/Linux)
 
-iQIcBAABAgAGBQJQFuQ+AAoJEIy3vGnGbaoAxnkP/00C5+mfLZf7S631XoIzVDP9
-mh9YRBL8l3gBZGXFGfayTMfFkHt/E/JVy5m5I9h8xzYt4LTjw7o0TgnaUxz5nc8J
-CdUJESQ0mEGi+XNA2ML+YGNtfQJSvi8Gs1JNrSmk6Y8ek3fASx0JXNfHefgxPIwA
-Lqku1OHNvJtDwztO0+qVVK1nfyS2Pfp7E0nnUzHfCaEb0VY6kFtQg24wUfA878O8
-mxoQ1BH2Oau+eQWrM3agosSbeY1nLvL6UZQdzkV4SA/ltdgQPDZ4jO5p944ArngO
-P7xbEAZOnjK5AJtQ+Qcy5NXqAiA5Hl2NLGsRiPvkxIixeeJD1kx5F7hP+Qe8obyp
-5XQJIRyL+ATLQO2+pAE2OXQhnb3lMzGZzAw7qSZe5SMbJSYzW+NTneAviJOXL9DE
-c8VZbbzgO+xYnAB7Snpw5McQLirblGXfKyHvwLEfFA4ubFnu2e/VmFhRRk3XQ219
-C3HayzUgxvlpAbAwKLBwEqv/Jt/jm5On8gLsp+e6L3vGiieB34MZuvGQ+0jkOuGa
-PH1VrwIOhWPh+qIYak96WPWjWVdkgpSCpZQWjoxKYn25awun+/QQwTmNvfnxCyjm
-BEH4QzndqYbABDy9eU6G6jZ1uTRjGXI3hC26JNdL1uovNm1DCTzxFBDoF0nIYWZ7
-EUOzqLr2dr4yrhb1940N
-=3wF3
+iQIcBAABAgAGBQJQFuQ+AAoJEIy3vGnGbaoAdW8QALakAiQPPwhUeClbBCNwVa2P
+rpWpuz0BXPAHa4TxpQYIOp0wvimN9Mr8cG4FLEY6Kd+QES/xgn5aPsHCqYsiII3o
+DBDf8oEkDQBahOLrKfaFUu0KaNXBdGE23pj167bFlgw6Dniu0C8rRUmJoIFRqTOU
+7U/Xx1Pl5avKdeJlso0P4pNjbKD1mKu7Gfl0kYdSm1+9sG3oKekSdwHEJ2Db+Af+
+lJU7EXitf2S2Hc2nQn4LbBaz01lum2Aa/KSFwEsjC1TsJ/nbhCp2ffCQM3op8a6U
+qoMnwyD7URvjmn2LsbxZTYwe1OkGKAVqDV1gLI+k0lxlETDkY46/3bBvP/HdkwPj
+SwbRO0kvAMtDiCXfWLzd5Gd5e6tEXsPlkXjwEF/cOuMTXnAn3ULuw/Tv/6UJo0qz
+O2MCGMjKGPinVty50adzuq6dK36bDzAE5v7KHdRHs+tUddKQY6YCS0ZU95WS8MFg
+ilUl0FXOm3tTMfBzjXOfSpLxXSaQsXtu58Ew7COmbhap21MTyNUCjcbpMdCje7ft
+po8Ue+lf/6vB/8SP/Bwi9GoYtIj4WUbJc5JSCdoZG/OFrt3e0cdns2C1ue1pRfz4
+G80Vz87VyWCNNxC4JfzippEVqDnCmib4f/cxSx+oE7AUy43WtIqzM6XzT5j4uH8R
+frJwcBa1rWwHMyCNs1Ox
+=htMl
 -----END PGP SIGNATURE-----
 
 --00GvhwF7k39YY--
