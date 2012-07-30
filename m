@@ -1,13 +1,15 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from hrndva-omtalb.mail.rr.com ([71.74.56.122]:14463 "EHLO
+Received: from hrndva-omtalb.mail.rr.com ([71.74.56.122]:19735 "EHLO
 	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754475Ab2G3TpC (ORCPT
+	with ESMTP id S1754668Ab2G3TpD (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 30 Jul 2012 15:45:02 -0400
-Message-Id: <20120730194316.768288008@goodmis.org>
-Date: Mon, 30 Jul 2012 15:43:16 -0400
+	Mon, 30 Jul 2012 15:45:03 -0400
+Message-Id: <20120730194501.990401960@goodmis.org>
+Date: Mon, 30 Jul 2012 15:43:18 -0400
 From: Steven Rostedt <rostedt@goodmis.org>
-Subject: [PATCH 0/4] [GIT PULL] localmodconfig: Improve module config removal
+Subject: [PATCH 2/4] localmodconfig: Read in orig config file to avoid extra processing
+References: <20120730194316.768288008@goodmis.org>
+Content-Disposition: inline; filename=0002-localmodconfig-Read-in-orig-config-file-to-avoid-ext.patch
 Content-Type: multipart/signed; micalg="pgp-sha1"; protocol="application/pgp-signature"; boundary="00GvhwF7k39YY"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
@@ -18,31 +20,96 @@ Cc: Linus Torvalds <torvalds@linux-foundation.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
+From: Steven Rostedt <srostedt@redhat.com>
 
-Linus,
+Read in the entire config file. If there's a config that we depend on
+that happens to be in the core set (not a module) then we do not need
+to process it as a module.
 
-These changes drastically improve the amount of module configs removed
-from a config file. It also adds some debug that I can have users
-easily enable if things do not work for them.
+Currently, we follow the entire depend and selects even if they
+are enabled as core and not modules. By checking to make sure that we
+only look at modules we can drop the count a little.
 
-Please pull the latest localmodconfig-v3.6 tree, which can be found at:
+From one of my tests, localmodconfig went from taking 3095 set modules
+down to 356 before this patch, and down to 290 modules after the change.
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/rostedt/linux-kconfig.git
-localmodconfig-v3.6
+Tested-by: John David Yost <johnyost@ptd.net> # AlleyTrotter
+Signed-off-by: Steven Rostedt <rostedt@goodmis.org>
+---
+ scripts/kconfig/streamline_config.pl |   26 ++++++++++++++++++++++++--
+ 1 file changed, 24 insertions(+), 2 deletions(-)
 
-Head SHA1: d217733ba4a4b30e27a88753f9eeabd4464ddf19
+diff --git a/scripts/kconfig/streamline_config.pl b/scripts/kconfig/streaml=
+ine_config.pl
+index 5c1ce87..ab4985f 100644
+--- a/scripts/kconfig/streamline_config.pl
++++ b/scripts/kconfig/streamline_config.pl
+@@ -113,6 +113,10 @@ sub find_config {
+=20
+ find_config;
+=20
++# Read in the entire config file into config_file
++my @config_file =3D <CIN>;
++close CIN;
++
+ # Parse options
+ my $localmodconfig =3D 0;
+ my $localyesconfig =3D 0;
+@@ -392,7 +396,20 @@ foreach my $module (keys(%modules)) {
+     }
+ }
+=20
++# Read the current config, and see what is enabled. We want to
++# ignore configs that we would not enable anyway.
++
++my %orig_configs;
+ my $valid =3D "A-Za-z_0-9";
++
++foreach my $line (@config_file) {
++    $_ =3D $line;
++
++    if (/(CONFIG_[$valid]*)=3D(m|y)/) {
++	$orig_configs{$1} =3D $2;
++    }
++}
++
+ my $repeat =3D 1;
+=20
+ #
+@@ -414,6 +431,11 @@ sub parse_config_dep_select
+=20
+ 	    $p =3D~ s/^[^$valid]*[$valid]+//;
+=20
++	    # We only need to process if the depend config is a module
++	    if (!defined($orig_configs{$conf}) || !$orig_configs{conf} eq "m") {
++		next;
++	    }
++
+ 	    if (!defined($configs{$conf})) {
+ 		# We must make sure that this config has its
+ 		# dependencies met.
+@@ -450,7 +472,8 @@ my %setconfigs;
+=20
+ # Finally, read the .config file and turn off any module enabled that
+ # we could not find a reason to keep enabled.
+-while(<CIN>) {
++foreach my $line (@config_file) {
++    $_ =3D $line;
+=20
+     if (/CONFIG_IKCONFIG/) {
+ 	if (/# CONFIG_IKCONFIG is not set/) {
+@@ -478,7 +501,6 @@ while(<CIN>) {
+     }
+     print;
+ }
+-close(CIN);
+=20
+ # Integrity check, make sure all modules that we want enabled do
+ # indeed have their configs set.
+--=20
+1.7.10.4
 
 
-Steven Rostedt (4):
-      localmodconfig: Comments and cleanup for streamline_config.pl
-      localmodconfig: Read in orig config file to avoid extra processing
-      localmodconfig: Check if configs are already set for selects
-      localmodconfig: Add debug environment variable LOCALMODCONFIG_DEBUG
-
-----
- scripts/kconfig/streamline_config.pl |  175 ++++++++++++++++++++++++++++++=
-----
- 1 file changed, 158 insertions(+), 17 deletions(-)
 
 --00GvhwF7k39YY
 Content-Type: application/pgp-signature; name="signature.asc"
@@ -51,19 +118,19 @@ Content-Description: This is a digitally signed message part
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1.4.12 (GNU/Linux)
 
-iQIcBAABAgAGBQJQFuQ6AAoJEIy3vGnGbaoAiq8P/iKtIWWgk/cVlOOSzZMG6XpV
-uNi0zuBU5QBWqJkHhdy2+XJFj+D8LEwmrcYEfE3lv5LTsd9nBuMMQHchA2JDoBHC
-UhkuAXNQGDhd2XB0Vk08jn8ooGXg2JEOAKEtfYsjJZI+DHLhfseJSAHA/gntYYiF
-0YsoAa386BZ89qoHM6ZC5vWpYGUzXL1YVI/3Qqdppdvg4JYYH8SEn/uJ6GT92WuI
-FfLJ3J0GBk1VyuZQJp5UPSzPRRXf/oChHCHCEV/U8kDENq2RNhHsLTVFOAI8Y0VJ
-IncgWT/uk+zEcDR1Jq+41uLcMOMMcc1nroYNYOgHyHXKBPFPZzJr7qYahU6Eqr93
-0tQs4JCx2TNVeLglO1tGvM2gFYLUkDqAWtQtC6mteJ0pNibWSctz4dHu6F0x/c8h
-OeTqUm2h0H/r9syi7KnhkXRyJYisutJYMMBgsrrgQGncr2mQ1+0+7VFNrYTLp0YB
-wYUvnWp5YZFrpDRGkKC0nR4WAkAkrWPV3j+OiLn2H2PL9Cvw/M8w/Bq+/M3sXWJb
-S8rDHTwZBg7l7A70QWvQ8U+u7b5Mv7yWnDMPST1UtBAwReyYFZTrz8SV/6PNLpHv
-q56OjWp0CJAbsf1/S0gxdFLKie+cpmGLvB37iXxnh6Lbd82FwC4stFcvR5cjhS7v
-yaworKBzSUMQRsrf8P5T
-=dHX+
+iQIcBAABAgAGBQJQFuQ+AAoJEIy3vGnGbaoAxnkP/00C5+mfLZf7S631XoIzVDP9
+mh9YRBL8l3gBZGXFGfayTMfFkHt/E/JVy5m5I9h8xzYt4LTjw7o0TgnaUxz5nc8J
+CdUJESQ0mEGi+XNA2ML+YGNtfQJSvi8Gs1JNrSmk6Y8ek3fASx0JXNfHefgxPIwA
+Lqku1OHNvJtDwztO0+qVVK1nfyS2Pfp7E0nnUzHfCaEb0VY6kFtQg24wUfA878O8
+mxoQ1BH2Oau+eQWrM3agosSbeY1nLvL6UZQdzkV4SA/ltdgQPDZ4jO5p944ArngO
+P7xbEAZOnjK5AJtQ+Qcy5NXqAiA5Hl2NLGsRiPvkxIixeeJD1kx5F7hP+Qe8obyp
+5XQJIRyL+ATLQO2+pAE2OXQhnb3lMzGZzAw7qSZe5SMbJSYzW+NTneAviJOXL9DE
+c8VZbbzgO+xYnAB7Snpw5McQLirblGXfKyHvwLEfFA4ubFnu2e/VmFhRRk3XQ219
+C3HayzUgxvlpAbAwKLBwEqv/Jt/jm5On8gLsp+e6L3vGiieB34MZuvGQ+0jkOuGa
+PH1VrwIOhWPh+qIYak96WPWjWVdkgpSCpZQWjoxKYn25awun+/QQwTmNvfnxCyjm
+BEH4QzndqYbABDy9eU6G6jZ1uTRjGXI3hC26JNdL1uovNm1DCTzxFBDoF0nIYWZ7
+EUOzqLr2dr4yrhb1940N
+=3wF3
 -----END PGP SIGNATURE-----
 
 --00GvhwF7k39YY--
