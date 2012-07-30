@@ -1,57 +1,44 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.skyhub.de ([78.46.96.112]:34333 "EHLO mail.skyhub.de"
+Received: from cantor2.suse.de ([195.135.220.15]:42121 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754814Ab2G3T6a (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 30 Jul 2012 15:58:30 -0400
-Date: Mon, 30 Jul 2012 21:58:26 +0200
-From: Borislav Petkov <bp@alien8.de>
+	id S1754768Ab2G3UWV (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 30 Jul 2012 16:22:21 -0400
+Date: Mon, 30 Jul 2012 16:22:12 -0400
+From: Benjamin Poirier <bpoirier@suse.de>
 Subject: Re: [PATCH 0/6] menuconfig: jump to search results
-Message-ID: <20120730195826.GA8242@liondog.tnic>
+Message-ID: <20120730202212.GA31790@d2.synalogic.ca>
 References: <1343676130-29770-1-git-send-email-bpoirier@suse.de>
+ <20120730195826.GA8242@liondog.tnic>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1343676130-29770-1-git-send-email-bpoirier@suse.de>
+In-Reply-To: <20120730195826.GA8242@liondog.tnic>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Benjamin Poirier <bpoirier@suse.de>
-Cc: Michal Marek <mmarek@suse.cz>, Lucas De Marchi <lucas.demarchi@profusion.mobi>, Arnaud Lacombe <lacombar@gmail.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Randy Dunlap <rdunlap@xenotime.net>
+To: Borislav Petkov <bp@alien8.de>, Michal Marek <mmarek@suse.cz>, Lucas De Marchi <lucas.demarchi@profusion.mobi>, Arnaud Lacombe <lacombar@gmail.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Randy Dunlap <rdunlap@xenotime.net>
 
-On Mon, Jul 30, 2012 at 03:22:04PM -0400, Benjamin Poirier wrote:
-> Hello,
+On 2012/07/30 21:58, Borislav Petkov wrote:
+> On Mon, Jul 30, 2012 at 03:22:04PM -0400, Benjamin Poirier wrote:
+> > Hello,
+> > 
+> > This patch series adds "jump to" keys (similar to the cscope interface) to the
+> > search results of "make menuconfig" so that we can go directly to the menu
+> > entry for a config option after searching for it.
+> > 
+> > Patches 1-4 implement the basic functionnality.
+> > Patches 5-6 are an optionnal improvement.
 > 
-> This patch series adds "jump to" keys (similar to the cscope interface) to the
-> search results of "make menuconfig" so that we can go directly to the menu
-> entry for a config option after searching for it.
+> Generally,
 > 
-> Patches 1-4 implement the basic functionnality.
-> Patches 5-6 are an optionnal improvement.
+> a nice idea, I like it.
+> 
+> A couple of notes though:
+> 
+> * patches 2/6 and 3/6 don't have commit messages and it would be good if
+> they had, even though it is obvious what the changes in there do.
+> 
+> * this patchset must be against some kbuild tree because it doesn't
+> apply against 3.5:
 
-Generally,
-
-a nice idea, I like it.
-
-A couple of notes though:
-
-* patches 2/6 and 3/6 don't have commit messages and it would be good if
-they had, even though it is obvious what the changes in there do.
-
-* this patchset must be against some kbuild tree because it doesn't
-apply against 3.5:
-
-$ patch -p1 --dry-run -i ~/0001-menuconfig_extend_dialog_textbox_so_that_it_can_exit_on_arbitrary_keypresses.patch
-patching file scripts/kconfig/lxdialog/dialog.h
-patching file scripts/kconfig/lxdialog/textbox.c
-Hunk #3 FAILED at 132.
-Hunk #4 succeeded at 157 (offset -1 lines).
-Hunk #5 succeeded at 172 (offset -1 lines).
-Hunk #6 succeeded at 252 (offset -3 lines).
-Hunk #7 succeeded at 261 (offset -3 lines).
-1 out of 7 hunks FAILED -- saving rejects to file scripts/kconfig/lxdialog/textbox.c.rej
-patching file scripts/kconfig/mconf.c
-
-Thanks.
-
--- 
-Regards/Gruss,
-    Boris.
+It's against linux-next, which already contains some patches for
+menuconfig.
