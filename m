@@ -1,15 +1,15 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from hrndva-omtalb.mail.rr.com ([71.74.56.122]:19735 "EHLO
+Received: from hrndva-omtalb.mail.rr.com ([71.74.56.122]:27969 "EHLO
 	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754656Ab2G3TpE (ORCPT
+	with ESMTP id S1754857Ab2G3TpE (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
 	Mon, 30 Jul 2012 15:45:04 -0400
-Message-Id: <20120730194502.828052323@goodmis.org>
-Date: Mon, 30 Jul 2012 15:43:19 -0400
+Message-Id: <20120730194503.137910183@goodmis.org>
+Date: Mon, 30 Jul 2012 15:43:20 -0400
 From: Steven Rostedt <rostedt@goodmis.org>
-Subject: [PATCH 3/4] localmodconfig: Check if configs are already set for selects
+Subject: [PATCH 4/4] localmodconfig: Add debug environment variable LOCALMODCONFIG_DEBUG
 References: <20120730194316.768288008@goodmis.org>
-Content-Disposition: inline; filename=0003-localmodconfig-Check-if-configs-are-already-set-for-.patch
+Content-Disposition: inline; filename=0004-localmodconfig-Add-debug-environment-variable-LOCALM.patch
 Content-Type: multipart/signed; micalg="pgp-sha1"; protocol="application/pgp-signature"; boundary="00GvhwF7k39YY"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
@@ -22,185 +22,111 @@ Content-Transfer-Encoding: quoted-printable
 
 From: Steven Rostedt <srostedt@redhat.com>
 
-There are some cases that a required module does not have a prompt
-and needs to have another module enabled that selects it to be set.
-As localmodconfig is conservative and tries to make the minimum config
-without breaking the user's kernel, or keeping the user from using
-devices that were loaded when the lsmod was done, all modules that
-select this module will also be enabled.
+If the environment variable LOCALMODCONFIG_DEBUG is set, then debug output
+will appear in the make localmodconfig. This will simplify debugging what
+people get with their output, as I can just tell people to do:
 
-If you needed module A, but module A did not have a prompt but needed
-module B to be selected, localmodconfig would make sure B was still
-enabled. If not only B selected A, but C, D, E, F, and G also
-selected A, then all of those would also be included, as well as the
-modules they depend on. This ballooned the number of configs that
-localmodconfig would keep.
+  LOCALMODCONFIG_DEBUG=3D1 make localmodconfig 2>out.txt
 
-The fix here is to process the depends first, and then record those
-configs that did not have a prompt and needed to be selected.
-After the depends are done, check what configs are needed to select
-the configs in the list, and if a config that selects it is already
-set, then we don't need to do anything else.
+and have them send me the out.txt. I'll be able to see why things are not
+working as they think it should be.
 
-If no config that selects the config is set, then just pick one and
-try again.
-
-This change brought down the number of selected modules from 290
-to 67! Both before and after were run against a config that had 3095
-modules enabled.
-
-Tested-by: John David Yost <johnyost@ptd.net> # AlleyTrotter
 Signed-off-by: Steven Rostedt <rostedt@goodmis.org>
 ---
- scripts/kconfig/streamline_config.pl |  115 ++++++++++++++++++++++++++++++=
-----
- 1 file changed, 104 insertions(+), 11 deletions(-)
+ scripts/kconfig/streamline_config.pl |   21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
 
 diff --git a/scripts/kconfig/streamline_config.pl b/scripts/kconfig/streaml=
 ine_config.pl
-index ab4985f..fcfcb30 100644
+index fcfcb30..2fbbbc1 100644
 --- a/scripts/kconfig/streamline_config.pl
 +++ b/scripts/kconfig/streamline_config.pl
-@@ -420,7 +420,7 @@ my $repeat =3D 1;
- # to keep on. If A was on in the original config, B would not have been
- # and B would not be turned on by this script.
+@@ -45,6 +45,16 @@
+ use strict;
+ use Getopt::Long;
+=20
++# set the environment variable LOCALMODCONFIG_DEBUG to get
++# debug output.
++my $debugprint =3D 0;
++$debugprint =3D 1 if (defined($ENV{LOCALMODCONFIG_DEBUG}));
++
++sub dprint {
++    return if (!$debugprint);
++    print STDERR @_;
++}
++
+ my $config =3D ".config";
+=20
+ my $uname =3D `uname -r`;
+@@ -389,6 +399,7 @@ foreach my $module (keys(%modules)) {
+ 	my @arr =3D @{$objects{$module}};
+ 	foreach my $conf (@arr) {
+ 	    $configs{$conf} =3D $module;
++	    dprint "$conf added by direct ($module)\n";
+ 	}
+     } else {
+ 	# Most likely, someone has a custom (binary?) module loaded.
+@@ -412,6 +423,8 @@ foreach my $line (@config_file) {
+=20
+ my $repeat =3D 1;
+=20
++my $depconfig;
++
  #
--sub parse_config_dep_select
-+sub parse_config_depends
- {
-     my ($p) =3D @_;
+ # Note, we do not care about operands (like: &&, ||, !) we want to add any
+ # config that is in the depend list of another config. This script does
+@@ -440,6 +453,7 @@ sub parse_config_depends
+ 		# We must make sure that this config has its
+ 		# dependencies met.
+ 		$repeat =3D 1; # do again
++		dprint "$conf selected by depend $depconfig\n";
+ 		$configs{$conf} =3D 1;
+ 	    }
+ 	} else {
+@@ -473,15 +487,18 @@ sub parse_config_selects
 =20
-@@ -448,26 +448,119 @@ sub parse_config_dep_select
-     }
+ 	    # Make sure that this config exists in the current .config file
+ 	    if (!defined($orig_configs{$conf})) {
++		dprint "$conf not set for $config select\n";
+ 		next;
+ 	    }
+=20
+ 	    # Check if something other than a module selects this config
+ 	    if (defined($orig_configs{$conf}) && $orig_configs{$conf} ne "m") {
++		dprint "$conf (non module) selects config, we are good\n";
+ 		# we are good with this
+ 		return;
+ 	    }
+ 	    if (defined($configs{$conf})) {
++		dprint "$conf selects $config so we are good\n";
+ 		# A set config selects this config, we are good
+ 		return;
+ 	    }
+@@ -506,6 +523,7 @@ sub parse_config_selects
+     $repeat =3D 1;
+     # Make this config need to be selected
+     $configs{$next_config} =3D 1;
++    dprint "$next_config selected by select $config\n";
  }
 =20
--while ($repeat) {
--    $repeat =3D 0;
-+# Select is treated a bit differently than depends. We call this
-+# when a config has no prompt and requires another config to be
-+# selected. We use to just select all configs that selected this
-+# config, but found that that can balloon into enabling hundreds
-+# of configs that we do not care about.
-+#
-+# The idea is we look at all the configs that select it. If one
-+# is already in our list of configs to enable, then there's nothing
-+# else to do. If there isn't, we pick the first config that was
-+# enabled in the orignal config and use that.
-+sub parse_config_selects
-+{
-+    my ($config, $p) =3D @_;
+ my %process_selects;
+@@ -526,6 +544,7 @@ sub loop_depend {
+ 	    }
 =20
--    foreach my $config (keys %configs) {
--	$config =3D~ s/^CONFIG_//;
-+    my $next_config;
-+
-+    while ($p =3D~ /[$valid]/) {
-+
-+	if ($p =3D~ /^[^$valid]*([$valid]+)/) {
-+	    my $conf =3D "CONFIG_" . $1;
-+
-+	    $p =3D~ s/^[^$valid]*[$valid]+//;
+ 	    $config =3D~ s/^CONFIG_//;
++	    $depconfig =3D $config;
 =20
--	if (defined($depends{$config})) {
--	    # This config has dependencies. Make sure they are also included
--	    parse_config_dep_select $depends{$config};
-+	    # Make sure that this config exists in the current .config file
-+	    if (!defined($orig_configs{$conf})) {
-+		next;
-+	    }
-+
-+	    # Check if something other than a module selects this config
-+	    if (defined($orig_configs{$conf}) && $orig_configs{$conf} ne "m") {
-+		# we are good with this
-+		return;
-+	    }
-+	    if (defined($configs{$conf})) {
-+		# A set config selects this config, we are good
-+		return;
-+	    }
-+	    # Set this config to be selected
-+	    if (!defined($next_config)) {
-+		$next_config =3D $conf;
-+	    }
-+	} else {
-+	    die "this should never happen";
- 	}
-+    }
+ 	    if (defined($depends{$config})) {
+ 		# This config has dependencies. Make sure they are also included
+@@ -546,6 +565,8 @@ sub loop_select {
+     foreach my $config (keys %process_selects) {
+ 	$config =3D~ s/^CONFIG_//;
 =20
--	if (defined($prompts{$config}) || !defined($selects{$config})) {
--	    next;
-+    # If no possible config selected this, then something happened.
-+    if (!defined($next_config)) {
-+	print STDERR "WARNING: $config is required, but nothing in the\n";
-+	print STDERR "  current config selects it.\n";
-+	return;
-+    }
++	dprint "Process select $config\n";
 +
-+    # If we are here, then we found no config that is set and
-+    # selects this config. Repeat.
-+    $repeat =3D 1;
-+    # Make this config need to be selected
-+    $configs{$next_config} =3D 1;
-+}
-+
-+my %process_selects;
-+
-+# loop through all configs, select their dependencies.
-+sub loop_depend {
-+    $repeat =3D 1;
-+
-+    while ($repeat) {
-+	$repeat =3D 0;
-+
-+      forloop:
-+	foreach my $config (keys %configs) {
-+
-+	    # If this config is not a module, we do not need to process it
-+	    if (defined($orig_configs{$config}) && $orig_configs{$config} ne "m")=
- {
-+		next forloop;
-+	    }
-+
-+	    $config =3D~ s/^CONFIG_//;
-+
-+	    if (defined($depends{$config})) {
-+		# This config has dependencies. Make sure they are also included
-+		parse_config_depends $depends{$config};
-+	    }
-+
-+	    # If the config has no prompt, then we need to check if a config
-+	    # that is enabled selected it. Or if we need to enable one.
-+	    if (!defined($prompts{$config}) && defined($selects{$config})) {
-+		$process_selects{$config} =3D 1;
-+	    }
- 	}
-+    }
-+}
-+
-+sub loop_select {
-+
-+    foreach my $config (keys %process_selects) {
-+	$config =3D~ s/^CONFIG_//;
-=20
  	# config has no prompt and must be selected.
--	parse_config_dep_select $selects{$config};
-+	parse_config_selects $config, $selects{$config};
+ 	parse_config_selects $config, $selects{$config};
      }
- }
-=20
-+while ($repeat) {
-+    # Get the first set of configs and their dependencies.
-+    loop_depend;
-+
-+    $repeat =3D 0;
-+
-+    # Now we need to see if we have to check selects;
-+    loop_select;
-+}=09=20=20=20=20
-+
- my %setconfigs;
-=20
- # Finally, read the .config file and turn off any module enabled that
 --=20
 1.7.10.4
 
@@ -213,19 +139,19 @@ Content-Description: This is a digitally signed message part
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1.4.12 (GNU/Linux)
 
-iQIcBAABAgAGBQJQFuQ+AAoJEIy3vGnGbaoAdW8QALakAiQPPwhUeClbBCNwVa2P
-rpWpuz0BXPAHa4TxpQYIOp0wvimN9Mr8cG4FLEY6Kd+QES/xgn5aPsHCqYsiII3o
-DBDf8oEkDQBahOLrKfaFUu0KaNXBdGE23pj167bFlgw6Dniu0C8rRUmJoIFRqTOU
-7U/Xx1Pl5avKdeJlso0P4pNjbKD1mKu7Gfl0kYdSm1+9sG3oKekSdwHEJ2Db+Af+
-lJU7EXitf2S2Hc2nQn4LbBaz01lum2Aa/KSFwEsjC1TsJ/nbhCp2ffCQM3op8a6U
-qoMnwyD7URvjmn2LsbxZTYwe1OkGKAVqDV1gLI+k0lxlETDkY46/3bBvP/HdkwPj
-SwbRO0kvAMtDiCXfWLzd5Gd5e6tEXsPlkXjwEF/cOuMTXnAn3ULuw/Tv/6UJo0qz
-O2MCGMjKGPinVty50adzuq6dK36bDzAE5v7KHdRHs+tUddKQY6YCS0ZU95WS8MFg
-ilUl0FXOm3tTMfBzjXOfSpLxXSaQsXtu58Ew7COmbhap21MTyNUCjcbpMdCje7ft
-po8Ue+lf/6vB/8SP/Bwi9GoYtIj4WUbJc5JSCdoZG/OFrt3e0cdns2C1ue1pRfz4
-G80Vz87VyWCNNxC4JfzippEVqDnCmib4f/cxSx+oE7AUy43WtIqzM6XzT5j4uH8R
-frJwcBa1rWwHMyCNs1Ox
-=htMl
+iQIcBAABAgAGBQJQFuQ/AAoJEIy3vGnGbaoAKYkQANbEbmY+bIZFI5ywGlJ6mJqN
+M9t0pnoXsIxw7S36IwuJxE2o82avrGhOoI7mPRxmukhYD6LcS6aHJ2e5YdnGHeKq
+tnq8D1Kh7Vn85bLuzJN0sxvqCCgTKiX0SJhDhmi/mT2kDCdVeB2iO8jHwdJF+xGf
+uJE4+rqjxQ16T/s1WAxQCWFi0Q8icxfWhIxVpgwOyZwAzkOT3JdoxmEzSnzKaGi9
+YTbMiW5BVM6RXMm/8OO6Ulo0s4HqBZlOu0UbL80P3InpQS90b5/jTrnquEC7kyiA
+gM/0bLXZU7dAVm4syCvFqf2lhywwVDStHoBQSWxep28iawAgvSB3IqDqXYRjNt0a
+oXs/b4jDMj4hrdkkeKBjCD9GIvdwLiUsYGYioEyZnbdQwQWaNdDXRmL5mPoR1CCy
+lppEhzvL2jLO/HCVGHWOXsEJz7VUVY9SSuxVr0DNQfWzrmIWyqOgCCyoHaD7Ys6Z
+E2ihy/v2JwZHXibiEzTy/lki8vuLLlT4+dfl+g16CiGvKlyIostHe2uJ1mpnbTKl
+IOkpKmNEiodX/UYETplIuynqqLcQsigjPpfIvbxyZg1vO/9yRJp749M8odr3ATA4
+kNvSyCNCC/qBW8A1J2REQWe1/kG/baYKbqH7GHd6LvEMc0xV/ftOVPYUULY/8Vhy
+2CtlnV4sMzVvSGqpVi9J
+=u+f+
 -----END PGP SIGNATURE-----
 
 --00GvhwF7k39YY--
