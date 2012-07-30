@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-yx0-f174.google.com ([209.85.213.174]:62821 "EHLO
-	mail-yx0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754668Ab2G3TXE (ORCPT
+Received: from mail-yw0-f46.google.com ([209.85.213.46]:47581 "EHLO
+	mail-yw0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753487Ab2G3TXB (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 30 Jul 2012 15:23:04 -0400
+	Mon, 30 Jul 2012 15:23:01 -0400
 From: Benjamin Poirier <bpoirier@suse.de>
-Subject: [PATCH 3/6] menuconfig: Extend dialog_textbox so that it can return to a scrolled position
-Date: Mon, 30 Jul 2012 15:22:07 -0400
-Message-Id: <1343676130-29770-4-git-send-email-bpoirier@suse.de>
+Subject: [PATCH 2/6] menuconfig: Extend dialog_textbox so that it can exit on arbitrary keypresses
+Date: Mon, 30 Jul 2012 15:22:06 -0400
+Message-Id: <1343676130-29770-3-git-send-email-bpoirier@suse.de>
 In-Reply-To: <1343676130-29770-1-git-send-email-bpoirier@suse.de>
 References: <1343676130-29770-1-git-send-email-bpoirier@suse.de>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -17,102 +17,147 @@ Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>, Arnaud Lacombe <lacombar@gm
 
 Signed-off-by: Benjamin Poirier <bpoirier@suse.de>
 ---
- scripts/kconfig/lxdialog/dialog.h  |    2 +-
- scripts/kconfig/lxdialog/textbox.c |   24 +++++++++++++++++++++++-
- scripts/kconfig/mconf.c            |    8 ++++----
- 3 files changed, 28 insertions(+), 6 deletions(-)
+ scripts/kconfig/lxdialog/dialog.h  |    3 ++-
+ scripts/kconfig/lxdialog/textbox.c |   31 +++++++++++++++++++++----------
+ scripts/kconfig/mconf.c            |   12 ++++++++++--
+ 3 files changed, 33 insertions(+), 13 deletions(-)
 
 diff --git a/scripts/kconfig/lxdialog/dialog.h b/scripts/kconfig/lxdialog/dialog.h
-index 014c029..8e7f43b 100644
+index b5211fc..014c029 100644
 --- a/scripts/kconfig/lxdialog/dialog.h
 +++ b/scripts/kconfig/lxdialog/dialog.h
-@@ -210,7 +210,7 @@ int dialog_yesno(const char *title, const char *prompt, int height, int width);
+@@ -209,7 +209,8 @@ int first_alpha(const char *string, const char *exempt);
+ int dialog_yesno(const char *title, const char *prompt, int height, int width);
  int dialog_msgbox(const char *title, const char *prompt, int height,
  		  int width, int pause);
- int dialog_textbox(const char *title, const char *file, int height, int width,
--		   int *keys);
-+		   int *keys, int *_vscroll, int *_hscroll);
+-int dialog_textbox(const char *title, const char *file, int height, int width);
++int dialog_textbox(const char *title, const char *file, int height, int width,
++		   int *keys);
  int dialog_menu(const char *title, const char *prompt,
  		const void *selected, int *s_scroll);
  int dialog_checklist(const char *title, const char *prompt, int height,
 diff --git a/scripts/kconfig/lxdialog/textbox.c b/scripts/kconfig/lxdialog/textbox.c
-index eb4ee92..506a095 100644
+index 264a2b9..eb4ee92 100644
 --- a/scripts/kconfig/lxdialog/textbox.c
 +++ b/scripts/kconfig/lxdialog/textbox.c
-@@ -51,7 +51,7 @@ static void refresh_text_box(WINDOW *dialog, WINDOW *box, int boxh, int boxw,
-  * keys is a null-terminated array
+@@ -47,14 +47,16 @@ static void refresh_text_box(WINDOW *dialog, WINDOW *box, int boxh, int boxw,
+ 
+ /*
+  * Display text from a file in a dialog box.
++ *
++ * keys is a null-terminated array
   */
- int dialog_textbox(const char *title, const char *tbuf, int initial_height,
--		   int initial_width, int *keys)
-+		   int initial_width, int *keys, int *_vscroll, int *_hscroll)
+-int dialog_textbox(const char *title, const char *tbuf,
+-		   int initial_height, int initial_width)
++int dialog_textbox(const char *title, const char *tbuf, int initial_height,
++		   int initial_width, int *keys)
  {
  	int i, x, y, cur_x, cur_y, key = 0;
  	int height, width, boxh, boxw;
-@@ -65,6 +65,15 @@ int dialog_textbox(const char *title, const char *tbuf, int initial_height,
- 	buf = tbuf;
- 	page = buf;	/* page is pointer to start of page to be displayed */
+-	int passed_end;
+ 	WINDOW *dialog, *box;
++	bool done = false;
  
-+	if (_vscroll && *_vscroll) {
-+		begin_reached = 0;
+ 	begin_reached = 1;
+ 	end_reached = 0;
+@@ -122,7 +124,7 @@ do_resize:
+ 	attr_clear(box, boxh, boxw, dlg.dialog.atr);
+ 	refresh_text_box(dialog, box, boxh, boxw, cur_y, cur_x);
+ 
+-	while ((key != KEY_ESC) && (key != '\n')) {
++	while (!done) {
+ 		key = wgetch(dialog);
+ 		switch (key) {
+ 		case 'E':	/* Exit */
+@@ -130,9 +132,9 @@ do_resize:
+ 		case 'X':
+ 		case 'x':
+ 		case 'q':
+-			delwin(box);
+-			delwin(dialog);
+-			return 0;
++		case '\n':
++			done = true;
++			break;
+ 		case 'g':	/* First page */
+ 		case KEY_HOME:
+ 			if (!begin_reached) {
+@@ -156,6 +158,8 @@ do_resize:
+ 		case 'k':
+ 		case KEY_UP:
+ 			if (!begin_reached) {
++				int passed_end = 0;
 +
-+		for (i = 0; i < *_vscroll; i++)
-+			get_line();
-+	}
-+	if (_hscroll)
-+		hscroll = *_hscroll;
-+
- do_resize:
- 	getmaxyx(stdscr, height, width);
- 	if (height < 8 || width < 8)
-@@ -275,6 +284,19 @@ do_resize:
+ 				back_lines(page_length + 1);
+ 
+ 				/* We don't call print_page() here but use
+@@ -169,7 +173,6 @@ do_resize:
+ 				wscrl(box, -1);	/* Scroll box region down one line */
+ 				scrollok(box, FALSE);
+ 				page_length = 0;
+-				passed_end = 0;
+ 				for (i = 0; i < boxh; i++) {
+ 					if (!i) {
+ 						/* print first line of page */
+@@ -252,7 +255,8 @@ do_resize:
+ 					 cur_y, cur_x);
+ 			break;
+ 		case KEY_ESC:
+-			key = on_key_esc(dialog);
++			if (on_key_esc(dialog) == KEY_ESC)
++				done = true;
+ 			break;
+ 		case KEY_RESIZE:
+ 			back_lines(height);
+@@ -260,11 +264,18 @@ do_resize:
+ 			delwin(dialog);
+ 			on_key_resize();
+ 			goto do_resize;
++		default:
++			for (i = 0; keys[i]; i++) {
++				if (key == keys[i]) {
++					done = true;
++					break;
++				}
++			}
+ 		}
  	}
  	delwin(box);
  	delwin(dialog);
-+	if (_vscroll) {
-+		const char *s;
-+
-+		s = buf;
-+		*_vscroll = 0;
-+		back_lines(page_length);
-+		while (s < page && (s = strchr(s, '\n'))) {
-+			(*_vscroll)++;
-+			s++;
-+		}
-+	}
-+	if (_hscroll)
-+		*_hscroll = hscroll;
- 	return key;
+-	return key;		/* ESC pressed */
++	return key;
  }
  
+ /*
 diff --git a/scripts/kconfig/mconf.c b/scripts/kconfig/mconf.c
-index 116e5da..c57cc6a 100644
+index f584a28..116e5da 100644
 --- a/scripts/kconfig/mconf.c
 +++ b/scripts/kconfig/mconf.c
-@@ -281,7 +281,7 @@ static void conf_string(struct menu *menu);
+@@ -280,6 +280,8 @@ static void conf_choice(struct menu *menu);
+ static void conf_string(struct menu *menu);
  static void conf_load(void);
  static void conf_save(void);
- static int show_textbox_ext(const char *title, const char *text, int r, int c,
--			    int *keys);
-+			    int *keys, int *vscroll, int *hscroll);
++static int show_textbox_ext(const char *title, const char *text, int r, int c,
++			    int *keys);
  static void show_textbox(const char *title, const char *text, int r, int c);
  static void show_helptext(const char *title, const char *text);
  static void show_help(struct menu *menu);
-@@ -622,15 +622,15 @@ static void conf(struct menu *menu)
+@@ -619,10 +621,16 @@ static void conf(struct menu *menu)
+ 	}
  }
  
- static int show_textbox_ext(const char *title, const char *text, int r, int c,
--			    int *keys)
-+			    int *keys, int *vscroll, int *hscroll)
+-static void show_textbox(const char *title, const char *text, int r, int c)
++static int show_textbox_ext(const char *title, const char *text, int r, int c,
++			    int *keys)
  {
  	dialog_clear();
--	return dialog_textbox(title, text, r, c, keys);
-+	return dialog_textbox(title, text, r, c, keys, vscroll, hscroll);
- }
- 
- static void show_textbox(const char *title, const char *text, int r, int c)
- {
--	show_textbox_ext(title, text, r, c, (int []) {0});
-+	show_textbox_ext(title, text, r, c, (int []) {0}, NULL, NULL);
+-	dialog_textbox(title, text, r, c);
++	return dialog_textbox(title, text, r, c, keys);
++}
++
++static void show_textbox(const char *title, const char *text, int r, int c)
++{
++	show_textbox_ext(title, text, r, c, (int []) {0});
  }
  
  static void show_helptext(const char *title, const char *text)
