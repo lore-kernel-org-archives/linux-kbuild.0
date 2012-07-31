@@ -1,44 +1,64 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:42121 "EHLO mx2.suse.de"
+Received: from mail.skyhub.de ([78.46.96.112]:48470 "EHLO mail.skyhub.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754768Ab2G3UWV (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 30 Jul 2012 16:22:21 -0400
-Date: Mon, 30 Jul 2012 16:22:12 -0400
-From: Benjamin Poirier <bpoirier@suse.de>
+	id S1754623Ab2GaH5y (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 31 Jul 2012 03:57:54 -0400
+Date: Tue, 31 Jul 2012 09:57:51 +0200
+From: Borislav Petkov <bp@alien8.de>
 Subject: Re: [PATCH 0/6] menuconfig: jump to search results
-Message-ID: <20120730202212.GA31790@d2.synalogic.ca>
+Message-ID: <20120731075751.GB23595@liondog.tnic>
+Reply-To: Borislav Petkov <borislav.petkov@amd.com>
 References: <1343676130-29770-1-git-send-email-bpoirier@suse.de>
  <20120730195826.GA8242@liondog.tnic>
+ <20120730202212.GA31790@d2.synalogic.ca>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20120730195826.GA8242@liondog.tnic>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20120730202212.GA31790@d2.synalogic.ca>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Borislav Petkov <bp@alien8.de>, Michal Marek <mmarek@suse.cz>, Lucas De Marchi <lucas.demarchi@profusion.mobi>, Arnaud Lacombe <lacombar@gmail.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Randy Dunlap <rdunlap@xenotime.net>
+To: Benjamin Poirier <bpoirier@suse.de>
+Cc: Michal Marek <mmarek@suse.cz>, Lucas De Marchi <lucas.demarchi@profusion.mobi>, Arnaud Lacombe <lacombar@gmail.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Randy Dunlap <rdunlap@xenotime.net>
 
-On 2012/07/30 21:58, Borislav Petkov wrote:
-> On Mon, Jul 30, 2012 at 03:22:04PM -0400, Benjamin Poirier wrote:
-> > Hello,
-> > 
-> > This patch series adds "jump to" keys (similar to the cscope interface) to the
-> > search results of "make menuconfig" so that we can go directly to the menu
-> > entry for a config option after searching for it.
-> > 
-> > Patches 1-4 implement the basic functionnality.
-> > Patches 5-6 are an optionnal improvement.
-> 
-> Generally,
-> 
-> a nice idea, I like it.
-> 
-> A couple of notes though:
-> 
-> * patches 2/6 and 3/6 don't have commit messages and it would be good if
-> they had, even though it is obvious what the changes in there do.
-> 
-> * this patchset must be against some kbuild tree because it doesn't
-> apply against 3.5:
+On Mon, Jul 30, 2012 at 04:22:12PM -0400, Benjamin Poirier wrote:
+> It's against linux-next, which already contains some patches for
+> menuconfig.
 
-It's against linux-next, which already contains some patches for
-menuconfig.
+Ok, applying against the linux-next from today succeeds. And they seem
+to work, I can search for CONFIG_* stuff and then go straight to the
+results.
+
+A couple more observations:
+
+* The numbering in the search results looks kinda strange and
+non-intuitive IMHO. Would it be possible to use the ncurses cursor to
+iterate over the search results like one does in the normal menus? I.e.,
+the horizontal bar which highlights the item with the background color
+or whatever - can it be moved up and down with the arrow keys through
+the search results too?
+
+* when searching for "DELAY" for example, I get results without numbers
+to which I can't jump to:
+
+...
+  │ Symbol: DEFAULT_IO_DELAY_TYPE [=0]
+  │ Type  : integer
+  │
+  │
+  │ Symbol: IO_DELAY_TYPE_0X80 [=0]
+  │ Type  : integer
+...
+
+maybe because they don't have "---help---" section?
+
+In those cases, you probably want to hide those from the search results?
+
+Other than that it looks good and I'd say we need more menuconfig
+functionality like that which eases/speeds up working with that thing :).
+
+Thanks.
+
+-- 
+Regards/Gruss,
+    Boris.
