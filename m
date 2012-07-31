@@ -1,80 +1,29 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:54223 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750868Ab2GaNSB (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 31 Jul 2012 09:18:01 -0400
-Date: Tue, 31 Jul 2012 09:17:51 -0400
-From: Benjamin Poirier <bpoirier@suse.de>
-Subject: Re: [PATCH 0/6] menuconfig: jump to search results
-Message-ID: <20120731131751.GA10910@d2.synalogic.ca>
-References: <1343676130-29770-1-git-send-email-bpoirier@suse.de>
- <20120730195826.GA8242@liondog.tnic>
- <20120730202212.GA31790@d2.synalogic.ca>
- <20120731075751.GB23595@liondog.tnic>
+Received: from mail-gg0-f174.google.com ([209.85.161.174]:50364 "EHLO
+	mail-gg0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751628Ab2GaQvH (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 31 Jul 2012 12:51:07 -0400
+Message-ID: <50180CF5.7010509@gmail.com>
+Date: Tue, 31 Jul 2012 12:51:01 -0400
+From: Salar Ali Mumtaz <salaarali@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20120731075751.GB23595@liondog.tnic>
+Subject: Re: [PATCH] xconfig: Display dependency values in debug_info
+References: <1343256982-11421-1-git-send-email-salaarali@gmail.com> <50107EB7.8000009@xenotime.net> <CA+jpPM=nrbpDJpaka6xAp4dbEOQjJrtwQWtUXwi_gGS9b4yK-A@mail.gmail.com> <50117812.5080302@xenotime.net>
+In-Reply-To: <50117812.5080302@xenotime.net>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Borislav Petkov <borislav.petkov@amd.com>, Michal Marek <mmarek@suse.cz>, Lucas De Marchi <lucas.demarchi@profusion.mobi>, Arnaud Lacombe <lacombar@gmail.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Randy Dunlap <rdunlap@xenotime.net>
+To: Randy Dunlap <rdunlap@xenotime.net>
+Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On 2012/07/31 09:57, Borislav Petkov wrote:
-> On Mon, Jul 30, 2012 at 04:22:12PM -0400, Benjamin Poirier wrote:
-> > It's against linux-next, which already contains some patches for
-> > menuconfig.
-> 
-> Ok, applying against the linux-next from today succeeds. And they seem
-> to work, I can search for CONFIG_* stuff and then go straight to the
-> results.
-> 
-> A couple more observations:
-> 
-> * The numbering in the search results looks kinda strange and
-> non-intuitive IMHO. Would it be possible to use the ncurses cursor to
-> iterate over the search results like one does in the normal menus? I.e.,
-> the horizontal bar which highlights the item with the background color
-> or whatever - can it be moved up and down with the arrow keys through
-> the search results too?
-
-Further patches are welcome ;) It's not a trivial difference though.
-The "horizontal bar" is not a curses concept, it's implemented via the
-menubox lxdialog whereas search results are currently presented via a
-textbox lxdialog.
+On 12-07-26 01:02 PM, Randy Dunlap wrote:
 
 > 
-> * when searching for "DELAY" for example, I get results without numbers
-> to which I can't jump to:
+> The added y/n/m are clear, but the "!FRV FRV" is confusing,
+> isn't it?
 > 
-> ...
->   │ Symbol: DEFAULT_IO_DELAY_TYPE [=0]
->   │ Type  : integer
->   │
->   │
->   │ Symbol: IO_DELAY_TYPE_0X80 [=0]
->   │ Type  : integer
-> ...
 > 
-> maybe because they don't have "---help---" section?
 
-Because they don't have a prompt - they don't appear in any menu at all.
-In that case there's nowhere to jump to. That's why those symbols don't
-get a number.
-
-> 
-> In those cases, you probably want to hide those from the search results?
-> 
-> Other than that it looks good and I'd say we need more menuconfig
-> functionality like that which eases/speeds up working with that thing :).
-> 
-> Thanks.
-> 
-> -- 
-> Regards/Gruss,
->     Boris.
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kernel" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> Please read the FAQ at  http://www.tux.org/lkml/
+Yes. But that is easily fixable.
