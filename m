@@ -1,58 +1,48 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from oproxy5-pub.bluehost.com ([67.222.38.55]:43273 "HELO
-	oproxy5-pub.bluehost.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with SMTP id S1751993Ab2HBGKP (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 2 Aug 2012 02:10:15 -0400
-Message-ID: <501A067E.4070101@xenotime.net>
-Date: Wed, 01 Aug 2012 21:47:58 -0700
-From: Randy Dunlap <rdunlap@xenotime.net>
+Received: from mail.skyhub.de ([78.46.96.112]:44555 "EHLO mail.skyhub.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752154Ab2HBNcy (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 2 Aug 2012 09:32:54 -0400
+Date: Thu, 2 Aug 2012 15:32:54 +0200
+From: Borislav Petkov <bp@alien8.de>
+Subject: Re: [PATCH 0/6] menuconfig: jump to search results
+Message-ID: <20120802133252.GA3752@x1.osrc.amd.com>
+References: <1343676130-29770-1-git-send-email-bpoirier@suse.de>
+ <20120730195826.GA8242@liondog.tnic>
+ <20120730202212.GA31790@d2.synalogic.ca>
+ <20120731075751.GB23595@liondog.tnic>
+ <20120731131751.GA10910@d2.synalogic.ca>
 MIME-Version: 1.0
-Subject: Re: [PATCH v2] xconfig: Display dependency values in debug_info
-References: <1343256982-11421-1-git-send-email-salaarali@gmail.com> <50107EB7.8000009@xenotime.net> <CA+jpPM=nrbpDJpaka6xAp4dbEOQjJrtwQWtUXwi_gGS9b4yK-A@mail.gmail.com> <50117812.5080302@xenotime.net> <50182ACF.6070704@gmail.com> <50183E67.1060509@xenotime.net> <501A0012.2070508@gmail.com>
-In-Reply-To: <501A0012.2070508@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20120731131751.GA10910@d2.synalogic.ca>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Salar Ali Mumtaz <salaarali@gmail.com>
-Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Benjamin Poirier <bpoirier@suse.de>
+Cc: Borislav Petkov <borislav.petkov@amd.com>, Michal Marek <mmarek@suse.cz>, Lucas De Marchi <lucas.demarchi@profusion.mobi>, Arnaud Lacombe <lacombar@gmail.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Randy Dunlap <rdunlap@xenotime.net>
 
-On 08/01/2012 09:20 PM, Salar Ali Mumtaz wrote:
-
-> On 12-07-31 04:21 PM, Randy Dunlap wrote:
->> On 07/31/2012 11:58 AM, Salar Ali Mumtaz wrote:
->>
->>> Now the debug_info only shows y/n/m values.
->>>
->>
->>
->> or no value at all??
+On Tue, Jul 31, 2012 at 09:17:51AM -0400, Benjamin Poirier wrote:
+> > * when searching for "DELAY" for example, I get results without numbers
+> > to which I can't jump to:
+> > 
+> > ...
+> >   │ Symbol: DEFAULT_IO_DELAY_TYPE [=0]
+> >   │ Type  : integer
+> >   │
+> >   │
+> >   │ Symbol: IO_DELAY_TYPE_0X80 [=0]
+> >   │ Type  : integer
+> > ...
+> > 
+> > maybe because they don't have "---help---" section?
 > 
-> 
-> Yes.
-> 
-> y/n/m or no value at all.
-> 
+> Because they don't have a prompt - they don't appear in any menu at all.
+> In that case there's nowhere to jump to. That's why those symbols don't
+> get a number.
 
-
-so in:
-
-Kernel support for ELF binaries (BINFMT_ELF)
-
-type: boolean
-unknown property: symbol
-    dep: ( MMU y && (BROKEN n || !FRV ) ) =y
-prompt: Kernel support for ELF binaries
-    dep: ( MMU y && (BROKEN n || !FRV ) ) =y
-default: y
-    dep: ( MMU y && (BROKEN n || !FRV ) ) =y
-
-
-
-does that mean that FRV is n, so !FRV is y ??
-It's still confusing.
-
+Right, so how about you don't show them at all then?
 
 -- 
-~Randy
+Regards/Gruss,
+Boris.
