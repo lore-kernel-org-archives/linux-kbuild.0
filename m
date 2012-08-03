@@ -1,82 +1,80 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp09.smtpout.orange.fr ([80.12.242.131]:40873 "EHLO
-	smtp.smtpout.orange.fr" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753013Ab2HBViq convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 2 Aug 2012 17:38:46 -0400
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: Re: [PATCH 0/6] menuconfig: jump to search results
-Date: Thu, 2 Aug 2012 23:38:40 +0200
-References: <1343676130-29770-1-git-send-email-bpoirier@suse.de> <20120802133252.GA3752@x1.osrc.amd.com> <20120802141847.GB21766@d2.synalogic.ca>
-In-Reply-To: <20120802141847.GB21766@d2.synalogic.ca>
+Received: from mga01.intel.com ([192.55.52.88]:45204 "EHLO mga01.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753876Ab2HCMs2 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 3 Aug 2012 08:48:28 -0400
+Date: Fri, 3 Aug 2012 20:48:19 +0800
+From: Fengguang Wu <fengguang.wu@intel.com>
+Subject: Re: [ashishki:rtit-dummy 2/5] make[4]: *** No rule to make target
+ `../../include/asm/cpufeature.h', needed by
+ `arch/x86/kernel/cpu/capflags.c'.
+Message-ID: <20120803124819.GA19600@localhost>
+References: <20120803120119.GA18460@localhost>
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="utf-8"
-Content-Transfer-Encoding: 8BIT
-Message-Id: <201208022338.41040.yann.morin.1998@free.fr>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20120803120119.GA18460@localhost>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Benjamin Poirier <bpoirier@suse.de>, Borislav Petkov <bp@alien8.de>, Borislav Petkov <borislav.petkov@amd.com>, Michal Marek <mmarek@suse.cz>, Lucas De Marchi <lucas.demarchi@profusion.mobi>, Arnaud Lacombe <lacombar@gmail.com>, linux-kernel@vger.kernel.org, Randy Dunlap <rdunlap@xenotime.net>
+To: Alexander Shishkin <alexander.shishkin@linux.intel.com>
+Cc: kernel-janitors@vger.kernel.org, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-All,
-
-On Thursday 02 August 2012 16:18:47 Benjamin Poirier wrote:
-> On 2012/08/02 15:32, Borislav Petkov wrote:
-> > On Tue, Jul 31, 2012 at 09:17:51AM -0400, Benjamin Poirier wrote:
-> > > > * when searching for "DELAY" for example, I get results without numbers
-> > > > to which I can't jump to:
-> > > > 
-> > > > ...
-> > > >   │ Symbol: DEFAULT_IO_DELAY_TYPE [=0]
-> > > >   │ Type  : integer
-> > > >   │
-> > > >   │
-> > > >   │ Symbol: IO_DELAY_TYPE_0X80 [=0]
-> > > >   │ Type  : integer
-> > > > ...
-> > > > 
-> > > > maybe because they don't have "---help---" section?
-> > > 
-> > > Because they don't have a prompt - they don't appear in any menu at all.
-> > > In that case there's nowhere to jump to. That's why those symbols don't
-> > > get a number.
-> > 
-> > Right, so how about you don't show them at all then?
+On Fri, Aug 03, 2012 at 08:01:19PM +0800, Fengguang Wu wrote:
+> Hi Alexander,
 > 
-> It's a search for CONFIG_ symbols not "menus". Even though the user
-> doesn't have direct control over some symbols, it's still useful to know
-> they exist and (possibly) what enables them. For example, searching for
-> LOCKDEP tells me I can enable DEBUG_LOCK_ALLOC to get it.
+> Kernel build failed on
+> 
+> tree:   git://otcgit.jf.intel.com/ashishki/linux.git rtit-dummy
+> head:   b51a58282492b3739c667d673aacee9bc35c1e3f
+> commit: 57f5876423d5763a25e5a4333a3b3783c49e6628 [2/5] x86: first shot at RTIT driver
+> config: i386-randconfig-b031 (attached as .config)
+> 
+> Build errors:
+> 
+> make[4]: *** No rule to make target `../../include/asm/cpufeature.h', needed by `arch/x86/kernel/cpu/capflags.c'.
+> make[4]: *** No rule to make target `mkcapflags.pl', needed by `arch/x86/kernel/cpu/capflags.c'.
 
-Agreed.
+The patch manages to block the build system like this:
 
-Consider this (very simple) situation :
+/*
+ *  kbuild-i386 ashishki/rtit-dummy [4/5] be536bf (69 minutes ago)  2012-08-03 18:38  00:00:03 / 1 = 3s
+ */
+[3 weeks ago, Alexander Shishkin] interim
 
-    config A
-        bool "A"
-        select B
+2798 real  1343 user  1043 sys  85.29% cpu      i386-randconfig-k025
+3324 real  1524 user  1326 sys  85.74% cpu      i386-randconfig-k029
+6734 real  3087 user  2588 sys  84.26% cpu      i386-randconfig-k023
 
-    config B
-        bool
+^C%
+init-+-2*[make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---m+
+     |-2*[make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---m+
+     |-make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make+
+     |-make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make+
+     |-make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make+
+     |-make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make+
+     |-make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make+
+     |-2*[make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---m+
+     |-make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make+
+     |-make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make+
+     |-make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make+
+     |-2*[make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---m+
+     |-make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make+
+     |-make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make+
+     |-make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make+
+     |-2*[make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---m+
+     |-make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make+
+     |-2*[make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---m+
+     |-make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make+
+     |-make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make+
+     |-make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make+
+     |-make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make+
+     |-make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make+
+     |-2*[make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---m+
+     |-2*[make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---m+
+     |-make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make+
+     |-2*[make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---m+
+     |-make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make---make+
+[cut off hundreds of more lines]
 
-    config C
-        bool "C"
-        depends on B
-
-Returning the symbol B in the search results allows to:
-  - see its dependencies           -> to see why it is thus set
-  - see in what file it is defined -> to change the deps and/or selects
-
-So, yes, returning prompt-less symbols as search results is important.
-
-Regards,
-Yann E. MORIN.
-
--- 
-.-----------------.--------------------.------------------.--------------------.
-|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
-| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
-| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
-| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
-'------------------------------^-------^------------------^--------------------'
+Thanks,
+Fengguang
