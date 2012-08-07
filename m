@@ -1,56 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from oproxy9.bluehost.com ([69.89.24.6]:53587 "HELO
-	oproxy9.bluehost.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with SMTP id S1754725Ab2HGQ41 (ORCPT
+Received: from oproxy6-pub.bluehost.com ([67.222.54.6]:59526 "HELO
+	oproxy6-pub.bluehost.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with SMTP id S932967Ab2HGXAw (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 7 Aug 2012 12:56:27 -0400
-Message-ID: <5021486B.6020907@xenotime.net>
-Date: Tue, 07 Aug 2012 09:55:07 -0700
+	Tue, 7 Aug 2012 19:00:52 -0400
+Message-ID: <50219DD4.7020406@xenotime.net>
+Date: Tue, 07 Aug 2012 15:59:32 -0700
 From: Randy Dunlap <rdunlap@xenotime.net>
 MIME-Version: 1.0
-Subject: Re: [PATCH] xconfig: Display dependency values in debug_info
-References: <1343256982-11421-1-git-send-email-salaarali@gmail.com> <50107EB7.8000009@xenotime.net> <CA+jpPM=nrbpDJpaka6xAp4dbEOQjJrtwQWtUXwi_gGS9b4yK-A@mail.gmail.com> <50117812.5080302@xenotime.net> <50213D69.3060904@gmail.com>
-In-Reply-To: <50213D69.3060904@gmail.com>
+Subject: [PATCH] scripts/kernel-doc: drop maintainer
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Salar Ali Mumtaz <salaarali@gmail.com>
-Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: linux-kbuild@vger.kernel.org, "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>
+Cc: Michal Marek <mmarek@suse.cz>, Rob Landley <rob@landley.net>
 
-On 08/07/2012 09:08 AM, Salar Ali Mumtaz wrote:
+From: Randy Dunlap <rdunlap@xenotime.net>
 
-> On 12-07-26 01:02 PM, Randy Dunlap wrote:
-> 
->> The added y/n/m are clear, but the "!FRV FRV" is confusing,
->> isn't it?
->>
->>
-> 
-> Is this notation clear ?
-> 
-> Kernel support for ELF binaries (BINFMT_ELF)
-> 
-> type: boolean
-> unknown property: symbol
->     dep: ( MMU [=y] && (BROKEN [n] || !FRV [= ""]) ) [=y]
-> prompt: Kernel support for ELF binaries
->     dep: ( MMU [=y] && (BROKEN [n] || !FRV [= ""]) ) [=y]
-> default: y
->     dep: ( MMU [=y] && (BROKEN [n] || !FRV [= ""]) ) [=y]
+Drop maintainership of scripts/kernel-doc.
+Patches can go thru the kbuild tree.
+
+Signed-off-by: Randy Dunlap <rdunlap@xenotime.net>
+Cc:	Michal Marek <mmarek@suse.cz>
+Cc:	Rob Landley <rob@landley.net>
+---
+ MAINTAINERS |    5 -----
+ 1 file changed, 5 deletions(-)
 
 
-
-In Kconfig language, is "" the same as 'n' ?
-If so, I'm OK with your proposal above.
-
-
-> If not, could you suggest a better way to represent this information?
-> 
-> Thanks.
+Michal, is this OK with you?
+If so, please merge, and then I have 3 patches to
+scripts/kernel-doc for you (from someone else).
 
 
-
-thanks,
--- 
-~Randy
+--- lnx-36-rc1.orig/MAINTAINERS
++++ lnx-36-rc1/MAINTAINERS
+@@ -2373,11 +2373,6 @@ S:	Maintained
+ F:	Documentation/hwmon/dme1737
+ F:	drivers/hwmon/dme1737.c
+ 
+-DOCBOOK FOR DOCUMENTATION
+-M:	Randy Dunlap <rdunlap@xenotime.net>
+-S:	Maintained
+-F:	scripts/kernel-doc
+-
+ DOCKING STATION DRIVER
+ M:	Shaohua Li <shaohua.li@intel.com>
+ L:	linux-acpi@vger.kernel.org
