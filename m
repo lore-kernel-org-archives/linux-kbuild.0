@@ -1,50 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from oproxy6-pub.bluehost.com ([67.222.54.6]:59526 "HELO
-	oproxy6-pub.bluehost.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with SMTP id S932967Ab2HGXAw (ORCPT
+Received: from mail.windriver.com ([147.11.1.11]:34662 "EHLO
+	mail.windriver.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1030663Ab2HHROs (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 7 Aug 2012 19:00:52 -0400
-Message-ID: <50219DD4.7020406@xenotime.net>
-Date: Tue, 07 Aug 2012 15:59:32 -0700
-From: Randy Dunlap <rdunlap@xenotime.net>
+	Wed, 8 Aug 2012 13:14:48 -0400
+From: Mark Asselstine <mark.asselstine@windriver.com>
+Subject: [PATCH] firmware: fix directory creation rule matching with make 3.82
+Date: Wed, 8 Aug 2012 13:14:36 -0400
+Message-ID: <1344446076-9135-1-git-send-email-mark.asselstine@windriver.com>
 MIME-Version: 1.0
-Subject: [PATCH] scripts/kernel-doc: drop maintainer
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org, "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>
-Cc: Michal Marek <mmarek@suse.cz>, Rob Landley <rob@landley.net>
+To: mmarek@suse.cz
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, mark.asselstine@windriver.com
 
-From: Randy Dunlap <rdunlap@xenotime.net>
+Attempting to run 'firmware_install' with CONFIG_USB_SERIAL_TI=y when
+using make 3.82 results in an error
 
-Drop maintainership of scripts/kernel-doc.
-Patches can go thru the kbuild tree.
+make[2]: *** No rule to make target `/lib/firmware/./', needed by
+`/lib/firmware/ti_3410.fw'.  Stop.
 
-Signed-off-by: Randy Dunlap <rdunlap@xenotime.net>
-Cc:	Michal Marek <mmarek@suse.cz>
-Cc:	Rob Landley <rob@landley.net>
+It turns out make 3.82 is picky when matching directory names with
+trailing slashes as a result, where make 3.81 would handle this
+correctly make 3.82 does not find the rule needed to create the
+directory.
+
+The './' seen in the error is added by $(dir) for firmware which
+resides in the base firmware src directory, such as
+ti_3410.fw.ihex. By performing $(dir) after we prepend the
+$(INSTALL_FW_PATH) we can ensure we don't end up with a './' in the
+middle of the path and the directory will be properly created.
+
+This change works with make 3.81 and should work with previous
+versions as well.
+
+Signed-off-by: Mark Asselstine <mark.asselstine@windriver.com>
 ---
- MAINTAINERS |    5 -----
- 1 file changed, 5 deletions(-)
+ scripts/Makefile.fwinst |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-
-Michal, is this OK with you?
-If so, please merge, and then I have 3 patches to
-scripts/kernel-doc for you (from someone else).
-
-
---- lnx-36-rc1.orig/MAINTAINERS
-+++ lnx-36-rc1/MAINTAINERS
-@@ -2373,11 +2373,6 @@ S:	Maintained
- F:	Documentation/hwmon/dme1737
- F:	drivers/hwmon/dme1737.c
+diff --git a/scripts/Makefile.fwinst b/scripts/Makefile.fwinst
+index 6bf8e87..c3f69ae 100644
+--- a/scripts/Makefile.fwinst
++++ b/scripts/Makefile.fwinst
+@@ -42,7 +42,7 @@ quiet_cmd_install = INSTALL $(subst $(srctree)/,,$@)
+ $(installed-fw-dirs):
+ 	$(call cmd,mkdir)
  
--DOCBOOK FOR DOCUMENTATION
--M:	Randy Dunlap <rdunlap@xenotime.net>
--S:	Maintained
--F:	scripts/kernel-doc
--
- DOCKING STATION DRIVER
- M:	Shaohua Li <shaohua.li@intel.com>
- L:	linux-acpi@vger.kernel.org
+-$(installed-fw): $(INSTALL_FW_PATH)/%: $(obj)/% | $(INSTALL_FW_PATH)/$$(dir %)
++$(installed-fw): $(INSTALL_FW_PATH)/%: $(obj)/% | $$(dir $(INSTALL_FW_PATH)/%)
+ 	$(call cmd,install)
+ 
+ PHONY +=  __fw_install __fw_modinst FORCE
+-- 
+1.7.9.5
+
