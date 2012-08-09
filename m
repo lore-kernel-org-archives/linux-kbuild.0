@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from viridian.itc.Virginia.EDU ([128.143.12.139]:46825 "EHLO
+Received: from viridian.itc.Virginia.EDU ([128.143.12.139]:46826 "EHLO
 	viridian.itc.Virginia.EDU" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755460Ab2HINcY (ORCPT
+	with ESMTP id S1755467Ab2HINcY (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
 	Thu, 9 Aug 2012 09:32:24 -0400
 From: Bill Pemberton <wfp5p@virginia.edu>
-Subject: [PATCH 4/4] localmodconfig: use my variable for loop in streamline_config.pl
-Date: Thu,  9 Aug 2012 09:23:23 -0400
-Message-Id: <1344518603-19508-5-git-send-email-wfp5p@virginia.edu>
+Subject: [PATCH 2/4] localmodconfig: rework find_config in streamline_config.pl
+Date: Thu,  9 Aug 2012 09:23:21 -0400
+Message-Id: <1344518603-19508-3-git-send-email-wfp5p@virginia.edu>
 In-Reply-To: <1344518603-19508-1-git-send-email-wfp5p@virginia.edu>
 References: <1344518603-19508-1-git-send-email-wfp5p@virginia.edu>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,27 +15,51 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: rostedt@goodmis.org
 
-perlcritic complains about $kconfig being reused in the foreach loop
-at the end of read_kconfig.  Change it to a my variable.
+Change find_config function to read_config.  It now finds the config,
+reads the config into an array, and returns the array.  This makes it
+a little cleaner and changes the open to use perl's 3 option open.
 
 Signed-off-by: Bill Pemberton <wfp5p@virginia.edu>
 ---
- scripts/kconfig/streamline_config.pl | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ scripts/kconfig/streamline_config.pl | 14 ++++++--------
+ 1 file changed, 6 insertions(+), 8 deletions(-)
 
 diff --git a/scripts/kconfig/streamline_config.pl b/scripts/kconfig/streamline_config.pl
-index 22b66ca..39b6314 100644
+index e3687f9..62d64ce 100644
 --- a/scripts/kconfig/streamline_config.pl
 +++ b/scripts/kconfig/streamline_config.pl
-@@ -252,7 +252,7 @@ sub read_kconfig {
-     close($kinfile);
+@@ -100,7 +100,7 @@ my @searchconfigs = (
+ 	},
+ );
  
-     # read in any configs that were found.
--    foreach $kconfig (@kconfigs) {
-+    foreach my $kconfig (@kconfigs) {
- 	if (!defined($read_kconfigs{$kconfig})) {
- 	    $read_kconfigs{$kconfig} = 1;
- 	    read_kconfig($kconfig);
+-sub find_config {
++sub read_config {
+     foreach my $conf (@searchconfigs) {
+ 	my $file = $conf->{"file"};
+ 
+@@ -115,17 +115,15 @@ sub find_config {
+ 
+ 	print STDERR "using config: '$file'\n";
+ 
+-	open(CIN, "$exec $file |") || die "Failed to run $exec $file";
+-	return;
++	open(my $infile, '-|', "$exec $file") || die "Failed to run $exec $file";
++	my @x = <$infile>;
++	close $infile;
++	return @x;
+     }
+     die "No config file found";
+ }
+ 
+-find_config;
+-
+-# Read in the entire config file into config_file
+-my @config_file = <CIN>;
+-close CIN;
++my @config_file = read_config;
+ 
+ # Parse options
+ my $localmodconfig = 0;
 -- 
 1.7.11.3
 
