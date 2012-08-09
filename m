@@ -1,58 +1,114 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.windriver.com ([147.11.1.11]:34662 "EHLO
-	mail.windriver.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1030663Ab2HHROs (ORCPT
+Received: from viridian.itc.Virginia.EDU ([128.143.12.139]:46824 "EHLO
+	viridian.itc.Virginia.EDU" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755451Ab2HINcY (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 8 Aug 2012 13:14:48 -0400
-From: Mark Asselstine <mark.asselstine@windriver.com>
-Subject: [PATCH] firmware: fix directory creation rule matching with make 3.82
-Date: Wed, 8 Aug 2012 13:14:36 -0400
-Message-ID: <1344446076-9135-1-git-send-email-mark.asselstine@windriver.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+	Thu, 9 Aug 2012 09:32:24 -0400
+From: Bill Pemberton <wfp5p@virginia.edu>
+Subject: [PATCH 3/4] localmodconfig: use 3 parameter open in streamline_config.pl
+Date: Thu,  9 Aug 2012 09:23:22 -0400
+Message-Id: <1344518603-19508-4-git-send-email-wfp5p@virginia.edu>
+In-Reply-To: <1344518603-19508-1-git-send-email-wfp5p@virginia.edu>
+References: <1344518603-19508-1-git-send-email-wfp5p@virginia.edu>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: mmarek@suse.cz
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, mark.asselstine@windriver.com
+To: linux-kbuild@vger.kernel.org
+Cc: rostedt@goodmis.org
 
-Attempting to run 'firmware_install' with CONFIG_USB_SERIAL_TI=y when
-using make 3.82 results in an error
+Convert remaining open calls to use the perl's preferred 3 parameter
+open.
 
-make[2]: *** No rule to make target `/lib/firmware/./', needed by
-`/lib/firmware/ti_3410.fw'.  Stop.
-
-It turns out make 3.82 is picky when matching directory names with
-trailing slashes as a result, where make 3.81 would handle this
-correctly make 3.82 does not find the rule needed to create the
-directory.
-
-The './' seen in the error is added by $(dir) for firmware which
-resides in the base firmware src directory, such as
-ti_3410.fw.ihex. By performing $(dir) after we prepend the
-$(INSTALL_FW_PATH) we can ensure we don't end up with a './' in the
-middle of the path and the directory will be properly created.
-
-This change works with make 3.81 and should work with previous
-versions as well.
-
-Signed-off-by: Mark Asselstine <mark.asselstine@windriver.com>
+Signed-off-by: Bill Pemberton <wfp5p@virginia.edu>
 ---
- scripts/Makefile.fwinst |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ scripts/kconfig/streamline_config.pl | 30 ++++++++++++++----------------
+ 1 file changed, 14 insertions(+), 16 deletions(-)
 
-diff --git a/scripts/Makefile.fwinst b/scripts/Makefile.fwinst
-index 6bf8e87..c3f69ae 100644
---- a/scripts/Makefile.fwinst
-+++ b/scripts/Makefile.fwinst
-@@ -42,7 +42,7 @@ quiet_cmd_install = INSTALL $(subst $(srctree)/,,$@)
- $(installed-fw-dirs):
- 	$(call cmd,mkdir)
+diff --git a/scripts/kconfig/streamline_config.pl b/scripts/kconfig/streamline_config.pl
+index 62d64ce..22b66ca 100644
+--- a/scripts/kconfig/streamline_config.pl
++++ b/scripts/kconfig/streamline_config.pl
+@@ -171,8 +171,8 @@ sub read_kconfig {
+ 	$source =~ s/\$$env/$ENV{$env}/;
+     }
  
--$(installed-fw): $(INSTALL_FW_PATH)/%: $(obj)/% | $(INSTALL_FW_PATH)/$$(dir %)
-+$(installed-fw): $(INSTALL_FW_PATH)/%: $(obj)/% | $$(dir $(INSTALL_FW_PATH)/%)
- 	$(call cmd,install)
+-    open(KIN, "$source") || die "Can't open $kconfig";
+-    while (<KIN>) {
++    open(my $kinfile, '<', $source) || die "Can't open $kconfig";
++    while (<$kinfile>) {
+ 	chomp;
  
- PHONY +=  __fw_install __fw_modinst FORCE
+ 	# Make sure that lines ending with \ continue
+@@ -249,7 +249,7 @@ sub read_kconfig {
+ 	    $state = "NONE";
+ 	}
+     }
+-    close(KIN);
++    close($kinfile);
+ 
+     # read in any configs that were found.
+     foreach $kconfig (@kconfigs) {
+@@ -293,8 +293,8 @@ foreach my $makefile (@makefiles) {
+     my $line = "";
+     my %make_vars;
+ 
+-    open(MIN,$makefile) || die "Can't open $makefile";
+-    while (<MIN>) {
++    open(my $infile, '<', $makefile) || die "Can't open $makefile";
++    while (<$infile>) {
+ 	# if this line ends with a backslash, continue
+ 	chomp;
+ 	if (/^(.*)\\$/) {
+@@ -341,10 +341,11 @@ foreach my $makefile (@makefiles) {
+ 	    }
+ 	}
+     }
+-    close(MIN);
++    close($infile);
+ }
+ 
+ my %modules;
++my $linfile;
+ 
+ if (defined($lsmod_file)) {
+     if ( ! -f $lsmod_file) {
+@@ -354,13 +355,10 @@ if (defined($lsmod_file)) {
+ 		die "$lsmod_file not found";
+ 	}
+     }
+-    if ( -x $lsmod_file) {
+-	# the file is executable, run it
+-	open(LIN, "$lsmod_file|");
+-    } else {
+-	# Just read the contents
+-	open(LIN, "$lsmod_file");
+-    }
++
++    my $otype = ( -x $lsmod_file) ? '-|' : '<';
++    open($linfile, $otype, $lsmod_file);
++
+ } else {
+ 
+     # see what modules are loaded on this system
+@@ -377,16 +375,16 @@ if (defined($lsmod_file)) {
+ 	$lsmod = "lsmod";
+     }
+ 
+-    open(LIN,"$lsmod|") || die "Can not call lsmod with $lsmod";
++    open($linfile, '-|', $lsmod) || die "Can not call lsmod with $lsmod";
+ }
+ 
+-while (<LIN>) {
++while (<$linfile>) {
+ 	next if (/^Module/);  # Skip the first line.
+ 	if (/^(\S+)/) {
+ 		$modules{$1} = 1;
+ 	}
+ }
+-close (LIN);
++close ($linfile);
+ 
+ # add to the configs hash all configs that are needed to enable
+ # a loaded module. This is a direct obj-${CONFIG_FOO} += bar.o
 -- 
-1.7.9.5
+1.7.11.3
 
