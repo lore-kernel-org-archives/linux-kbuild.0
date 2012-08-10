@@ -1,29 +1,90 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-yx0-f174.google.com ([209.85.213.174]:48207 "EHLO
-	mail-yx0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932168Ab2HISys (ORCPT
+Received: from mail-lb0-f174.google.com ([209.85.217.174]:58014 "EHLO
+	mail-lb0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756370Ab2HJVuK (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 9 Aug 2012 14:54:48 -0400
-Message-ID: <50240770.6070207@gmail.com>
-Date: Thu, 09 Aug 2012 14:54:40 -0400
-From: Salar Ali Mumtaz <salaarali@gmail.com>
+	Fri, 10 Aug 2012 17:50:10 -0400
 MIME-Version: 1.0
-Subject: Re: [PATCH] xconfig: Display dependency values in debug_info
-References: <1343256982-11421-1-git-send-email-salaarali@gmail.com> <50107EB7.8000009@xenotime.net> <CA+jpPM=nrbpDJpaka6xAp4dbEOQjJrtwQWtUXwi_gGS9b4yK-A@mail.gmail.com> <50117812.5080302@xenotime.net> <50213D69.3060904@gmail.com> <5021486B.6020907@xenotime.net>
-In-Reply-To: <5021486B.6020907@xenotime.net>
+Date: Fri, 10 Aug 2012 23:50:07 +0200
+Message-ID: <CAPNxggbrC7cKXYTKk=ivDL2ZT2w+5G4PACH1YT7iK-ZNk7twRQ@mail.gmail.com>
+Subject: Failure while make modules_install if kmod was compiled with
+ --with-rootprefix set
+From: "Arokux B." <arokux@gmail.com>
 Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Randy Dunlap <rdunlap@xenotime.net>
-Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: mmarek@suse.cz
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On 12-08-07 12:55 PM, Randy Dunlap wrote:
+Dear Mr. Marek, dear all,
 
-> In Kconfig language, is "" the same as 'n' ?
-> If so, I'm OK with your proposal above.
-> 
+I have detected a hidden failure while building the kernel. If
+--with-rootprefix is set for kmod, then depmod will look for modules
+installed at the location $ROOTPREFIX/lib/modules/<version>. The
+kernel build system does not know anything about $ROOTPREFIX, and so
+the wrong directory is created for the test if the hack is needed for
+an older versin of depmod at scripts/depmod.sh:19 mkdir -p
+"$tmp_dir/lib/modules/$KERNELRELEASE". That is why "$DEPMOD" -b
+"$tmp_dir" $KERNELRELEASE will always fail and kernel build system
+will think that the hack is always needed and depmod_hack_needed will
+always be true. After that the created symlink is wrong since it also
+does not contain $ROOTPREFIX, which depmod will preprend. That is why
+depmod will fail.
+
+To cure the problem an additional variable $MOD_ROOT_PREFIX can be
+introduced. With the help of this variable the paths in the
+scripts/depmod.sh are parametrized. This variable should be set to the
+same value which was passed to --with-rootprefix while compilation of
+kmod. Example: if  --with-rootprefix is set to /usr and the modules
+should be installed at the location /home/john, then the the following
+make call should be issued: make INSTALL_MOD_PATH=/home/john
+$MOD_ROOT_PREFIX=/usr. After that the modules will be installed at
+/home/john/usr. However should be also added to other places where the
+actuall installing takes place, and so I do not this this solution is
+optimal, nevertheless, please find the patch for depmod.sh at the end
+of this e-mail.
+
+A more superior solution could be probably a new option for depmod
+which would allow an overwriting of the $ROOTPREFIX. This option can
+be used in depmod.sh then to overwrite $ROOTPREFIX with an empty
+string.
+
+I was unsure as of which solution is better if any at all and so such
+a lengthy e-mail...
+
+With kind regards,
+
+Arokux
 
 
-So a colleague of mine tested this and came up with a conclusion that expressions in Kconfig can only deal with boolean or tristate operands and no casting is made with strings. Using any string operand as part of a boolean expression is simply a type error and Kconfig probably marks such operand as 'n', regardless of its value.
-
+diff --git a/scripts/depmod.sh b/scripts/depmod.sh
+index 2ae4817..87a6e42 100755
+--- a/scripts/depmod.sh
++++ b/scripts/depmod.sh
+@@ -16,16 +16,18 @@ fi
+ # numbers, so we cheat with a symlink here
+ depmod_hack_needed=true
+ tmp_dir=$(mktemp -d ${TMPDIR:-/tmp}/depmod.XXXXXX)
+-mkdir -p "$tmp_dir/lib/modules/$KERNELRELEASE"
++mkdir -p "$tmp_dir/$MOD_ROOT_PREFIX/lib/modules/$KERNELRELEASE"
++"$DEPMOD" -b "$tmp_dir" $KERNELRELEASE
++echo hello
+ if "$DEPMOD" -b "$tmp_dir" $KERNELRELEASE 2>/dev/null; then
+-       if test -e "$tmp_dir/lib/modules/$KERNELRELEASE/modules.dep" -o \
+-               -e "$tmp_dir/lib/modules/$KERNELRELEASE/modules.dep.bin"; then
++       if test -e
+"$tmp_dir/$MOD_ROOT_PREFIX/lib/modules/$KERNELRELEASE/modules.dep" -o
+\
++               -e
+"$tmp_dir/$MOD_ROOT_PREFIX/lib/modules/$KERNELRELEASE/modules.dep.bin";
+then
+                depmod_hack_needed=false
+        fi
+ fi
+ rm -rf "$tmp_dir"
+ if $depmod_hack_needed; then
+-       symlink="$INSTALL_MOD_PATH/lib/modules/99.98.$KERNELRELEASE"
++       symlink="$INSTALL_MOD_PATH/$MOD_ROOT_PREFIX/lib/modules/99.98.$KERNELRELEASE"
+        ln -s "$KERNELRELEASE" "$symlink"
+        KERNELRELEASE=99.98.$KERNELRELEASE
+ fi
