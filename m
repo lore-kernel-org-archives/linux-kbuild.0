@@ -1,31 +1,423 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from exprod8ob101.obsmtp.com ([64.18.3.81]:44430 "HELO
-	exprod8ob101.obsmtp.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with SMTP id S1750889Ab2HLHGx convert rfc822-to-8bit (ORCPT
+Received: from mail.nonattached.net ([193.160.39.60]:59028 "EHLO
+	mail.nonattached.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750796Ab2HLI6h (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 12 Aug 2012 03:06:53 -0400
-Date: Sun, 12 Aug 2012 02:07:13 -0400 (EDT)
-From: Elliott Tammaro <etammaro@brynmawr.edu>
-Reply-To: nokiap@yahoo.cn
-Subject: Claim requirements
-Message-ID: <8cdaa0f4-81e7-44fe-acbe-d3c9698ea8a4@ganesh.brynmawr.edu>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
-MIME-Version: 1.0
+	Sun, 12 Aug 2012 04:58:37 -0400
+From: Dan Luedtke <mail@danrl.de>
+Subject: [PATCH] scripts/kernel-doc: added support for html5
+Date: Sun, 12 Aug 2012 10:46:15 +0200
+Message-Id: <1344761175-19370-1-git-send-email-mail@danrl.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
+To: mmarek@suse.cz
+Cc: linux-kbuild@vger.kernel.org, mail@danrl.de, rdunlap@xenotime.net
 
-You are receiving this message because you are a Winner of 300,000 Pounds from Nokia Online Lottery game 2012.
- 
-Claim requirements are as follows:
-(1) Your full names 
-(2) Contact Address 
-(3) Age 
-(4) Occupation 
-(5) Telephone 
-(6) Sex 
-(7) Nationality
+New output option html5 writes validating HTML5 and adds
+CSS classes ready to be selected by third-party stylesheets.
+HTML ids have been added to block-level elements "article" for
+direct reference of particular objects via URL.
 
-Contact Mr. Thomas Hillary on (nokiap@yahoo.cn) Tel: +447024081232
+Signed-off-by: Dan Luedtke <mail@danrl.de>
+Acked-by: Randy Dunlap <rdunlap@xenotime.net>
+---
+Patch got first submitted split up in multiple patches at
+Wed, 25 Jul 2012 15:38:08 +0200 on LKML. Due to bad timing
+(in the middle of Randy Dunlop dropping maintainership) and
+maybe all of us are going on vacation in different weeks, the
+patch had no chance to make it through. Randy suggested to
+resend the patch and kindly acked-by it already.
+Thank you for your patience and help.
+
+Examples of what the patch can be used for:
+
+DOC
+https://www.nonattached.net/lanyfs/doc-linux.php#icache.c
+
+struct
+https://www.nonattached.net/lanyfs/doc-linux.php#struct%3alanyfs_fsi
+
+function()
+https://www.nonattached.net/lanyfs/doc-linux.php#func%3alanyfs_release
+
+typedef
+https://www.nonattached.net/lanyfs/doc-linux.php#typedef%3alanyfs_blk_t
+
+enum
+https://www.nonattached.net/lanyfs/doc-fsutils.php#enum%3amklanyfs_time
+
+Examples use CSS like this:
+> article.doc,
+> article.enum,
+> [...]
+> article.function {
+>	margin-bottom: 50px;
+> }
+> /* markup */
+> span.keyword {
+>	font-weight: bold;
+>	color: #000;
+> }
+> span.type {
+> 	font-weight: normal;
+>	color: #284689;
+> }
+---
+ scripts/kernel-doc |  273 ++++++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 files changed, 266 insertions(+), 7 deletions(-)
+
+diff --git a/scripts/kernel-doc b/scripts/kernel-doc
+index 9b0c0b8..97e037a 100755
+--- a/scripts/kernel-doc
++++ b/scripts/kernel-doc
+@@ -6,6 +6,7 @@ use strict;
+ ## Copyright (C) 2000, 1  Tim Waugh <twaugh@redhat.com>          ##
+ ## Copyright (C) 2001  Simon Huggins                             ##
+ ## Copyright (C) 2005-2012  Randy Dunlap                         ##
++## Copyright (C) 2012  Dan Luedtke                               ##
+ ## 								 ##
+ ## #define enhancements by Armin Kuster <akuster@mvista.com>	 ##
+ ## Copyright (c) 2000 MontaVista Software, Inc.			 ##
+@@ -35,6 +36,8 @@ use strict;
+ #              Small fixes (like spaces vs. \s in regex)
+ # -- Tim Jansen <tim@tjansen.de>
  
-Copyright ©2012 Nokia. All rights reserved.
++# 25/07/2012 - Added support for HTML5
++# -- Dan Luedtke <mail@danrl.de>
+ 
+ #
+ # This will read a 'c' file and scan for embedded comments in the
+@@ -44,12 +47,16 @@ use strict;
+ # Note: This only supports 'c'.
+ 
+ # usage:
+-# kernel-doc [ -docbook | -html | -text | -man | -list ] [ -no-doc-sections ]
+-#           [ -function funcname [ -function funcname ...] ] c file(s)s > outputfile
++# kernel-doc [ -docbook | -html | -html5 | -text | -man | -list ]
++#            [ -no-doc-sections ]
++#            [ -function funcname [ -function funcname ...] ]
++#            c file(s)s > outputfile
+ # or
+-#           [ -nofunction funcname [ -function funcname ...] ] c file(s)s > outputfile
++#            [ -nofunction funcname [ -function funcname ...] ]
++#            c file(s)s > outputfile
+ #
+-#  Set output format using one of -docbook -html -text or -man.  Default is man.
++#  Set output format using one of -docbook -html -html5 -text or -man.
++#  Default is man.
+ #  The -list format is for internal use by docproc.
+ #
+ #  -no-doc-sections
+@@ -182,6 +189,14 @@ my $local_lt = "\\\\\\\\lt:";
+ my $local_gt = "\\\\\\\\gt:";
+ my $blankline_html = $local_lt . "p" . $local_gt;	# was "<p>"
+ 
++# html version 5
++my %highlights_html5 = ( $type_constant, "<span class=\"const\">\$1</span>",
++			$type_func, "<span class=\"func\">\$1</span>",
++			$type_struct_xml, "<span class=\"struct\">\$1</span>",
++			$type_env, "<span class=\"env\">\$1</span>",
++			$type_param, "<span class=\"param\">\$1</span>" );
++my $blankline_html5 = $local_lt . "br /" . $local_gt;
++
+ # XML, docbook format
+ my %highlights_xml = ( "([^=])\\\"([^\\\"<]+)\\\"", "\$1<quote>\$2</quote>",
+ 			$type_constant, "<constant>\$1</constant>",
+@@ -309,6 +324,10 @@ while ($ARGV[0] =~ m/^-(.*)/) {
+ 	$output_mode = "html";
+ 	%highlights = %highlights_html;
+ 	$blankline = $blankline_html;
++    } elsif ($cmd eq "-html5") {
++	$output_mode = "html5";
++	%highlights = %highlights_html5;
++	$blankline = $blankline_html5;
+     } elsif ($cmd eq "-man") {
+ 	$output_mode = "man";
+ 	%highlights = %highlights_man;
+@@ -351,10 +370,11 @@ while ($ARGV[0] =~ m/^-(.*)/) {
+ # continue execution near EOF;
+ 
+ sub usage {
+-    print "Usage: $0 [ -v ] [ -docbook | -html | -text | -man | -list ]\n";
++    print "Usage: $0 [ -docbook | -html | -html5 | -text | -man | -list ]\n";
+     print "         [ -no-doc-sections ]\n";
+     print "         [ -function funcname [ -function funcname ...] ]\n";
+     print "         [ -nofunction funcname [ -nofunction funcname ...] ]\n";
++    print "         [ -v ]\n";
+     print "         c source file(s) > outputfile\n";
+     print "         -v : verbose output, more warnings & other info listed\n";
+     exit 1;
+@@ -448,7 +468,8 @@ sub output_highlight {
+ #	confess "output_highlight got called with no args?\n";
+ #   }
+ 
+-    if ($output_mode eq "html" || $output_mode eq "xml") {
++    if ($output_mode eq "html" || $output_mode eq "html5" ||
++	$output_mode eq "xml") {
+ 	$contents = local_unescape($contents);
+ 	# convert data read & converted thru xml_escape() into &xyz; format:
+ 	$contents =~ s/\\\\\\/\&/g;
+@@ -458,6 +479,11 @@ sub output_highlight {
+     die $@ if $@;
+ #   print STDERR "contents af:$contents\n";
+ 
++#   strip whitespaces when generating html5
++    if ($output_mode eq "html5") {
++	$contents =~ s/^\s+//;
++	$contents =~ s/\s+$//;
++    }
+     foreach $line (split "\n", $contents) {
+ 	if ($line eq ""){
+ 	    print $lineprefix, local_unescape($blankline);
+@@ -473,7 +499,7 @@ sub output_highlight {
+     }
+ }
+ 
+-#output sections in html
++# output sections in html
+ sub output_section_html(%) {
+     my %args = %{$_[0]};
+     my $section;
+@@ -633,6 +659,239 @@ sub output_blockhead_html(%) {
+     print "<hr>\n";
+ }
+ 
++# output sections in html5
++sub output_section_html5(%) {
++    my %args = %{$_[0]};
++    my $section;
++
++    foreach $section (@{$args{'sectionlist'}}) {
++	print "<section>\n";
++	print "<h1>$section</h1>\n";
++	print "<p>\n";
++	output_highlight($args{'sections'}{$section});
++	print "</p>\n";
++	print "</section>\n";
++    }
++}
++
++# output enum in html5
++sub output_enum_html5(%) {
++    my %args = %{$_[0]};
++    my ($parameter);
++    my $count;
++    my $html5id;
++
++    $html5id = $args{'enum'};
++    $html5id =~ s/[^a-zA-Z0-9\-]+/_/g;
++    print "<article class=\"enum\" id=\"enum:". $html5id . "\">";
++    print "<h1>enum " . $args{'enum'} . "</h1>\n";
++    print "<ol class=\"code\">\n";
++    print "<li>";
++    print "<span class=\"keyword\">enum</span> ";
++    print "<span class=\"identifier\">" . $args{'enum'} . "</span> {";
++    print "</li>\n";
++    $count = 0;
++    foreach $parameter (@{$args{'parameterlist'}}) {
++	print "<li class=\"indent\">";
++	print "<span class=\"param\">" . $parameter . "</span>";
++	if ($count != $#{$args{'parameterlist'}}) {
++	    $count++;
++	    print ",";
++	}
++	print "</li>\n";
++    }
++    print "<li>};</li>\n";
++    print "</ol>\n";
++
++    print "<section>\n";
++    print "<h1>Constants</h1>\n";
++    print "<dl>\n";
++    foreach $parameter (@{$args{'parameterlist'}}) {
++	print "<dt>" . $parameter . "</dt>\n";
++	print "<dd>";
++	output_highlight($args{'parameterdescs'}{$parameter});
++	print "</dd>\n";
++    }
++    print "</dl>\n";
++    print "</section>\n";
++    output_section_html5(@_);
++    print "</article>\n";
++}
++
++# output typedef in html5
++sub output_typedef_html5(%) {
++    my %args = %{$_[0]};
++    my ($parameter);
++    my $count;
++    my $html5id;
++
++    $html5id = $args{'typedef'};
++    $html5id =~ s/[^a-zA-Z0-9\-]+/_/g;
++    print "<article class=\"typedef\" id=\"typedef:" . $html5id . "\">\n";
++    print "<h1>typedef " . $args{'typedef'} . "</h1>\n";
++
++    print "<ol class=\"code\">\n";
++    print "<li>";
++    print "<span class=\"keyword\">typedef</span> ";
++    print "<span class=\"identifier\">" . $args{'typedef'} . "</span>";
++    print "</li>\n";
++    print "</ol>\n";
++    output_section_html5(@_);
++    print "</article>\n";
++}
++
++# output struct in html5
++sub output_struct_html5(%) {
++    my %args = %{$_[0]};
++    my ($parameter);
++    my $html5id;
++
++    $html5id = $args{'struct'};
++    $html5id =~ s/[^a-zA-Z0-9\-]+/_/g;
++    print "<article class=\"struct\" id=\"struct:" . $html5id . "\">\n";
++    print "<hgroup>\n";
++    print "<h1>" . $args{'type'} . " " . $args{'struct'} . "</h1>";
++    print "<h2>". $args{'purpose'} . "</h2>\n";
++    print "</hgroup>\n";
++    print "<ol class=\"code\">\n";
++    print "<li>";
++    print "<span class=\"type\">" . $args{'type'} . "</span> ";
++    print "<span class=\"identifier\">" . $args{'struct'} . "</span> {";
++    print "</li>\n";
++    foreach $parameter (@{$args{'parameterlist'}}) {
++	print "<li class=\"indent\">";
++	if ($parameter =~ /^#/) {
++		print "<span class=\"param\">" . $parameter ."</span>\n";
++		print "</li>\n";
++		next;
++	}
++	my $parameter_name = $parameter;
++	$parameter_name =~ s/\[.*//;
++
++	($args{'parameterdescs'}{$parameter_name} ne $undescribed) || next;
++	$type = $args{'parametertypes'}{$parameter};
++	if ($type =~ m/([^\(]*\(\*)\s*\)\s*\(([^\)]*)\)/) {
++	    # pointer-to-function
++	    print "<span class=\"type\">$1</span> ";
++	    print "<span class=\"param\">$parameter</span>";
++	    print "<span class=\"type\">)</span> ";
++	    print "(<span class=\"args\">$2</span>);";
++	} elsif ($type =~ m/^(.*?)\s*(:.*)/) {
++	    # bitfield
++	    print "<span class=\"type\">$1</span> ";
++	    print "<span class=\"param\">$parameter</span>";
++	    print "<span class=\"bits\">$2</span>;";
++	} else {
++	    print "<span class=\"type\">$type</span> ";
++	    print "<span class=\"param\">$parameter</span>;";
++	}
++	print "</li>\n";
++    }
++    print "<li>};</li>\n";
++    print "</ol>\n";
++
++    print "<section>\n";
++    print "<h1>Members</h1>\n";
++    print "<dl>\n";
++    foreach $parameter (@{$args{'parameterlist'}}) {
++	($parameter =~ /^#/) && next;
++
++	my $parameter_name = $parameter;
++	$parameter_name =~ s/\[.*//;
++
++	($args{'parameterdescs'}{$parameter_name} ne $undescribed) || next;
++	print "<dt>" . $parameter . "</dt>\n";
++	print "<dd>";
++	output_highlight($args{'parameterdescs'}{$parameter_name});
++	print "</dd>\n";
++    }
++    print "</dl>\n";
++    print "</section>\n";
++    output_section_html5(@_);
++    print "</article>\n";
++}
++
++# output function in html5
++sub output_function_html5(%) {
++    my %args = %{$_[0]};
++    my ($parameter, $section);
++    my $count;
++    my $html5id;
++
++    $html5id = $args{'function'};
++    $html5id =~ s/[^a-zA-Z0-9\-]+/_/g;
++    print "<article class=\"function\" id=\"func:". $html5id . "\">\n";
++    print "<hgroup>\n";
++    print "<h1>" . $args{'function'} . "</h1>";
++    print "<h2>" . $args{'purpose'} . "</h2>\n";
++    print "</hgroup>\n";
++    print "<ol class=\"code\">\n";
++    print "<li>";
++    print "<span class=\"type\">" . $args{'functiontype'} . "</span> ";
++    print "<span class=\"identifier\">" . $args{'function'} . "</span> (";
++    print "</li>";
++    $count = 0;
++    foreach $parameter (@{$args{'parameterlist'}}) {
++	print "<li class=\"indent\">";
++	$type = $args{'parametertypes'}{$parameter};
++	if ($type =~ m/([^\(]*\(\*)\s*\)\s*\(([^\)]*)\)/) {
++	    # pointer-to-function
++	    print "<span class=\"type\">$1</span> ";
++	    print "<span class=\"param\">$parameter</span>";
++	    print "<span class=\"type\">)</span> ";
++	    print "(<span class=\"args\">$2</span>)";
++	} else {
++	    print "<span class=\"type\">$type</span> ";
++	    print "<span class=\"param\">$parameter</span>";
++	}
++	if ($count != $#{$args{'parameterlist'}}) {
++	    $count++;
++	    print ",";
++	}
++	print "</li>\n";
++    }
++    print "<li>)</li>\n";
++    print "</ol>\n";
++
++    print "<section>\n";
++    print "<h1>Arguments</h1>\n";
++    print "<p>\n";
++    print "<dl>\n";
++    foreach $parameter (@{$args{'parameterlist'}}) {
++	my $parameter_name = $parameter;
++	$parameter_name =~ s/\[.*//;
++
++	($args{'parameterdescs'}{$parameter_name} ne $undescribed) || next;
++	print "<dt>" . $parameter . "</dt>\n";
++	print "<dd>";
++	output_highlight($args{'parameterdescs'}{$parameter_name});
++	print "</dd>\n";
++    }
++    print "</dl>\n";
++    print "</section>\n";
++    output_section_html5(@_);
++    print "</article>\n";
++}
++
++# output DOC: block header in html5
++sub output_blockhead_html5(%) {
++    my %args = %{$_[0]};
++    my ($parameter, $section);
++    my $count;
++    my $html5id;
++
++    foreach $section (@{$args{'sectionlist'}}) {
++	$html5id = $section;
++	$html5id =~ s/[^a-zA-Z0-9\-]+/_/g;
++	print "<article class=\"doc\" id=\"doc:". $html5id . "\">\n";
++	print "<h1>$section</h1>\n";
++	print "<p>\n";
++	output_highlight($args{'sections'}{$section});
++	print "</p>\n";
++    }
++    print "</article>\n";
++}
++
+ sub output_section_xml(%) {
+     my %args = %{$_[0]};
+     my $section;
+-- 
+1.7.8.6
+
