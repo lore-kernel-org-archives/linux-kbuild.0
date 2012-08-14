@@ -1,41 +1,73 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from seven.medozas.de ([5.9.24.206]:50584 "EHLO seven.medozas.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751686Ab2HNPqT (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 14 Aug 2012 11:46:19 -0400
-Date: Tue, 14 Aug 2012 17:46:17 +0200 (CEST)
-From: Jan Engelhardt <jengelh@inai.de>
-Subject: Re: [PATCH] scripts/package/builddeb: upgrade to current practices
-In-Reply-To: <CAPZXPQc02=6FnTb_RmgfpW+A4=N_huZW1FUYdjJ=Nt0Y3pqZ+A@mail.gmail.com>
-Message-ID: <alpine.LNX.2.01.1208141710580.18667@frira.zrqbmnf.qr>
-References: <1342547874.5129.2.camel@henna.lan> <20120717193951.GA15208@burratino> <CAPZXPQc02=6FnTb_RmgfpW+A4=N_huZW1FUYdjJ=Nt0Y3pqZ+A@mail.gmail.com>
+Received: from mail-ee0-f46.google.com ([74.125.83.46]:36241 "EHLO
+	mail-ee0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750724Ab2HNQBC (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 14 Aug 2012 12:01:02 -0400
+From: =?UTF-8?q?Ozan=20=C3=87a=C4=9Flayan?= <ozancag@gmail.com>
+Subject: [PATCH] kbuild: Remove useless warning while appending KCFLAGS
+Date: Tue, 14 Aug 2012 19:00:54 +0300
+Message-Id: <1344960054-26557-1-git-send-email-ozancag@gmail.com>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: =?UTF-8?Q?Martin-=C3=89ric_Racine?= <martin-eric.racine@iki.fi>
-Cc: Jonathan Nieder <jrnieder@gmail.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org, debian-kernel@lists.debian.org
+To: linux-kernel@vger.kernel.org
+Cc: mmarek@suse.cz, linux-kbuild@vger.kernel.org, sam@ravnborg.org, artem.bityutskiy@linux.intel.com, =?UTF-8?q?Ozan=20=C3=87a=C4=9Flayan?= <ozancag@gmail.com>
 
+This is a respin of an older patch sent by Sam Ravnborg:
+  http://www.gossamer-threads.com/lists/linux/kernel/1530602
 
-On Tuesday 2012-07-17 21:46, Martin-Éric Racine wrote:
->>> @@ -188,17 +188,17 @@ This is a packacked upstream version of the Linux kernel.
->>>  The sources may be found at most Linux ftp sites, including:
->>>  ftp://ftp.kernel.org/pub/linux/kernel
->>>
->>> -Copyright: 1991 - 2009 Linus Torvalds and others.
->>> +Copyright: 1991-2012 Linus Torvalds and others.
->>>
->>> -The git repository for mainline kernel development is at:
->>> -git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux-2.6.git
->>> +The GIT repository for mainline kernel development is at:
->>> +git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
->>
->> I personally like to spell it as "Git". ;-)
->
->That works for me too. Actually, what's the official spelling for it?
+This patch removes the annoying warning:
 
-The acronymic usage of "GIT" to mean Global Information Tracker has
-not caught on. Therefore most likely "Git"; like "Linux", a noun, a
-name.
+Makefile:708: "WARNING: Appending $KCFLAGS (-Wno-sign-compare) from command
+line to kernel $CFLAGS"
+
+which is printed every time I use KCFLAFS. The commit which introduced the
+warning:
+
+69ee0b3 kbuild: do not pick up CFLAGS from the environment
+
+tells about the problems when people have CFLAGS in their environment,
+then switches to KCFLAFS which should be enough to solve the issue, but
+it anyway introduces a warning. Drop this warning.
+
+Signed-off-by: Ozan Çağlayan <ozancag@gmail.com>
+---
+ Makefile | 19 +++----------------
+ 1 file changed, 3 insertions(+), 16 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 0d718ed..34751eb 100644
+--- a/Makefile
++++ b/Makefile
+@@ -648,22 +648,9 @@ ifeq ($(shell $(CONFIG_SHELL) $(srctree)/scripts/gcc-goto.sh $(CC)), y)
+ endif
+ 
+ # Add user supplied CPPFLAGS, AFLAGS and CFLAGS as the last assignments
+-# But warn user when we do so
+-warn-assign = \
+-$(warning "WARNING: Appending $$K$(1) ($(K$(1))) from $(origin K$(1)) to kernel $$$(1)")
+-
+-ifneq ($(KCPPFLAGS),)
+-        $(call warn-assign,CPPFLAGS)
+-        KBUILD_CPPFLAGS += $(KCPPFLAGS)
+-endif
+-ifneq ($(KAFLAGS),)
+-        $(call warn-assign,AFLAGS)
+-        KBUILD_AFLAGS += $(KAFLAGS)
+-endif
+-ifneq ($(KCFLAGS),)
+-        $(call warn-assign,CFLAGS)
+-        KBUILD_CFLAGS += $(KCFLAGS)
+-endif
++KBUILD_CPPFLAGS += $(KCPPFLAGS)
++KBUILD_AFLAGS += $(KAFLAGS)
++KBUILD_CFLAGS += $(KCFLAGS)
+ 
+ # Use --build-id when available.
+ LDFLAGS_BUILD_ID = $(patsubst -Wl$(comma)%,%,\
+-- 
+1.7.11.2
 
