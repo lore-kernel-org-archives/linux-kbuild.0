@@ -1,58 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from oproxy9.bluehost.com ([69.89.24.6]:45156 "HELO
-	oproxy9.bluehost.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with SMTP id S1755954Ab2HORai (ORCPT
+Received: from mail-wg0-f44.google.com ([74.125.82.44]:46990 "EHLO
+	mail-wg0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932137Ab2HOUBn (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 15 Aug 2012 13:30:38 -0400
-Message-ID: <502BDC62.4090408@xenotime.net>
-Date: Wed, 15 Aug 2012 10:29:06 -0700
-From: Randy Dunlap <rdunlap@xenotime.net>
+	Wed, 15 Aug 2012 16:01:43 -0400
+Message-ID: <502C0022.2020106@suse.cz>
+Date: Wed, 15 Aug 2012 22:01:38 +0200
+From: Jiri Slaby <jslaby@suse.cz>
 MIME-Version: 1.0
-Subject: Re: [PATCH] xconfig: Display dependency values in debug_info
-References: <1343256982-11421-1-git-send-email-salaarali@gmail.com> <50107EB7.8000009@xenotime.net> <CA+jpPM=nrbpDJpaka6xAp4dbEOQjJrtwQWtUXwi_gGS9b4yK-A@mail.gmail.com> <50117812.5080302@xenotime.net> <50213D69.3060904@gmail.com> <5021486B.6020907@xenotime.net> <50240770.6070207@gmail.com> <5025A9C6.1080207@xenotime.net> <502BCF0B.3050401@gmail.com>
-In-Reply-To: <502BCF0B.3050401@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: i2c-designware-core: KBUILD_MODNAME undeclared [was: Build regressions/improvements
+ in v3.6-rc1]
+References: <1344072256-13170-1-git-send-email-geert@linux-m68k.org>
+In-Reply-To: <1344072256-13170-1-git-send-email-geert@linux-m68k.org>
+Content-Type: text/plain; charset=ISO-8859-2
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Salar Ali Mumtaz <salaarali@gmail.com>
-Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: linux-kernel@vger.kernel.org, dirk.brandewie@gmail.com, khali@linux-fr.org, linux-i2c@vger.kernel.org, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, jbaron@redhat.com, ben-linux@fluff.org, Jiri Slaby <jirislaby@gmail.com>
 
-On 08/15/2012 09:32 AM, Salar Ali Mumtaz wrote:
+On 08/04/2012 11:24 AM, Geert Uytterhoeven wrote:
+> Below is the list of build error/warning regressions/improvements in
+> v3.6-rc1[1] compared to v3.5[2].
+...
+>   + drivers/i2c/busses/i2c-designware-core.c: error: 'KBUILD_MODNAME' undeclared (first use in this function):
 
-> On 12-08-10 08:39 PM, Randy Dunlap wrote:
->> On 08/09/2012 11:54 AM, Salar Ali Mumtaz wrote:
->>
->>> On 12-08-07 12:55 PM, Randy Dunlap wrote:
->>>
->>>> In Kconfig language, is "" the same as 'n' ?
->>>> If so, I'm OK with your proposal above.
->>>>
->>>
->>>
->>> So a colleague of mine tested this and came up with a conclusion that expressions in Kconfig can only deal with boolean or tristate operands and no casting is made with strings. Using any string operand as part of a boolean expression is simply a type error and Kconfig probably marks such operand as 'n', regardless of its value.
->>>
->>
->>
->> My question was about FRV, which is a boolean,
->> but still did not display as 'n' in your example.
->>
->>
-> 
-> FRV is not a boolean.
+This is a real problem we are facing here. It happens on PPC when all
+I2C_DESIGNWARE_PLATFORM, I2C_DESIGNWARE_PCI and DYNAMIC_DEBUG are set.
 
+It's because i2c-designware-core.c is used in two modules
+(i2c-designware-platform and i2c-designware-pci) and KBUILD_MODNAME is
+not defined for those because (scripts/Makefile.lib):
+# $(modname_flags) #defines KBUILD_MODNAME as the name of the module
+# it will end up in (or would, if it gets compiled in)
+# Note: Files that end up in two or more modules are compiled
+#       without the KBUILD_MODNAME definition. The reason is
+#       that any made-up name would differ in different configs.
 
+But DYNAMIC_DEBUG needs KBUILD_MODNAME for dev_dbg used in that source.
 
-Hm, why do you say that?  Please explain.
+Any ideas? Why is it not a separate module for example?
 
-
-from arch/frv/Kconfig:
-
-config FRV
-	bool
-	default y
-
-
-
+thanks,
 -- 
-~Randy
+js
+suse labs
