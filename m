@@ -1,50 +1,59 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.snhosting.dk ([87.238.248.203]:14874 "EHLO
-	smtp.domainteam.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751549Ab2HOKRj (ORCPT
+Received: from eu1sys200aog115.obsmtp.com ([207.126.144.139]:54817 "EHLO
+	eu1sys200aog115.obsmtp.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751549Ab2HOKTF (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 15 Aug 2012 06:17:39 -0400
-Date: Wed, 15 Aug 2012 12:17:38 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH 7/8] kbuild: move W=... stuff to Kbuild.arch
-Message-ID: <20120815101737.GA6205@merkur.ravnborg.org>
-References: <20120505080640.GA13773@merkur.ravnborg.org> <1336205926-13946-7-git-send-email-sam@ravnborg.org> <1338977927.6875.29.camel@sauron.fi.intel.com> <20120606153521.GA30811@merkur.ravnborg.org> <1345023683.3393.116.camel@sauron.fi.intel.com>
+	Wed, 15 Aug 2012 06:19:05 -0400
+Message-ID: <502B70B8.1030709@st.com>
+Date: Wed, 15 Aug 2012 10:49:44 +0100
+From: Srinivas KANDAGATLA <srinivas.kandagatla@st.com>
+Reply-To: srinivas.kandagatla@st.com
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1345023683.3393.116.camel@sauron.fi.intel.com>
+Subject: Re: [RFC:PATCH 3.6.0-rc1] dtc: Add -P option to dtc for Pre-Processing.
+References: <1344844913-16938-1-git-send-email-srinivas.kandagatla@st.com> <20120815011149.GF8136@truffula.fritz.box> <CAOZdJXUxguEBJG44kyKH0NW1999a9OBj2M=DEhmf_uSYM6nGaQ@mail.gmail.com>
+In-Reply-To: <CAOZdJXUxguEBJG44kyKH0NW1999a9OBj2M=DEhmf_uSYM6nGaQ@mail.gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Artem Bityutskiy <dedekind1@gmail.com>
-Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild <linux-kbuild@vger.kernel.org>, lkml <linux-kernel@vger.kernel.org>
+To: Tabi Timur-B04825 <B04825@freescale.com>
+Cc: David Gibson <dwg@au1.ibm.com>, "mmarek@suse.cz" <mmarek@suse.cz>, "devicetree-discuss@lists.ozlabs.org" <devicetree-discuss@lists.ozlabs.org>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>
 
-On Wed, Aug 15, 2012 at 12:41:23PM +0300, Artem Bityutskiy wrote:
-> On Wed, 2012-06-06 at 17:35 +0200, Sam Ravnborg wrote:
-> > On Wed, Jun 06, 2012 at 01:18:47PM +0300, Artem Bityutskiy wrote:
-> > > On Sat, 2012-05-05 at 10:18 +0200, Sam Ravnborg wrote:
-> > > > Prevent that we eveluate cc-option multiple times for the same
-> > > > option by moving the definitions to Kbuild.arch.
-> > > > The file is included once only, thus gcc is not invoked once per directory.
-> > > > 
-> > > > Another side-effect of this patch is that KCFLAGS are appended last
-> > > > to the list of options. This allows us to better control the options.
-> > > > Artem Bityutskiy <dedekind1@gmail.com> noticed this.
-> > > > 
-> > > > Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
-> > > > Cc: Artem Bityutskiy <dedekind1@gmail.com>
-> > > 
-> > > Hi,
-> > > 
-> > > what happened to this patch? I was fixing the real issue I am
-> > > encountering and I thought it'd be taken instead of my original patch.
-> > We decided to move this to next merge release because is was not added
-> > to kbuild thus not enough exposure in -next.
-> > 
-> > I am planning to resend the serie at around -rc2 time.
-> 
-> Hi Sam, what happened to this patch-set? At least KCFLAGS patches I am
-> waiting for are still not merged.
-Vacation and then I have not yet gotten back to them.
-Will do soon - thanks for the reminder!
+On 15/08/12 03:12, Tabi Timur-B04825 wrote:
+> On Tue, Aug 14, 2012 at 8:11 PM, David Gibson <dwg@au1.ibm.com> wrote:
+>> On Mon, Aug 13, 2012 at 09:01:53AM +0100, Srinivas KANDAGATLA wrote:
+>>> From: Srinivas Kandagatla <srinivas.kandagatla@st.com>
+>>>
+>>> This patch add pre-processing capablity to dtc based on status property.
+>>> Now the dtc has additional option -P to enable Pre-processing based on
+>>> status property.
+>>>
+>>> The SOCS have lot of device tree infrastructure files which mark the
+>>> device nodes as disabled and the board level device tree enables them if
+>>> required. However while creating device tree blob, the compiler can
+>>> preprocess the nodes and exclude nodes marked as disabled, doing this
+>>> way will reduce the size of device tree blob.
+> IMHO, many devices that are marked as "disabled" in the DTS are
+> expecting to be enabled by the boot loader, so just because a node is
+> disabled in the DTS does not mean that it will be disabled when Linux
+> sees it.
+Good to know that,
+But some of the secured bootloaders like the one's we use don't even
+touch the dt blob.
+>
+>>> In our case this has reduced the blob size from 29K to 15K.
+> I don't see that as significant.
+>
+>>> Also nodes with status="disabled" is are never probed by dt platform bus
+>>> code.
+>>>
+>>> Again, Preprocessing is optional parameter to dtc.
+> Using this option would break a lot of our device trees.
+As this is optional parameter, I did not expect it to break the
+default/existing behavior.
+Correct me am missing anything?
+>   Perhaps it
+> should be given a better name, like --strip-disabled.
+Thanks for the advice. I agree, Will be reposting the patch making this
+option as --strip-disabled with CC to Jon Loeliger (dtc maintainer).
 
-	Sam
