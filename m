@@ -1,84 +1,63 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:55920 "EHLO mga02.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751684Ab2HOJgm (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 15 Aug 2012 05:36:42 -0400
-Message-ID: <1345023683.3393.116.camel@sauron.fi.intel.com>
-Subject: Re: [PATCH 7/8] kbuild: move W=... stuff to Kbuild.arch
-From: Artem Bityutskiy <dedekind1@gmail.com>
-Reply-To: dedekind1@gmail.com
-Date: Wed, 15 Aug 2012 12:41:23 +0300
-In-Reply-To: <20120606153521.GA30811@merkur.ravnborg.org>
-References: <20120505080640.GA13773@merkur.ravnborg.org>
-	 <1336205926-13946-7-git-send-email-sam@ravnborg.org>
-	 <1338977927.6875.29.camel@sauron.fi.intel.com>
-	 <20120606153521.GA30811@merkur.ravnborg.org>
-Content-Type: multipart/signed; micalg="pgp-sha1"; protocol="application/pgp-signature";
-	boundary="=-sCUg/H3SQY31auS5IMoL"
-Mime-Version: 1.0
+Received: from eu1sys200aog119.obsmtp.com ([207.126.144.147]:43225 "EHLO
+	eu1sys200aog119.obsmtp.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1753889Ab2HOJp0 (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 15 Aug 2012 05:45:26 -0400
+Message-ID: <502B6CD0.4060102@st.com>
+Date: Wed, 15 Aug 2012 10:33:04 +0100
+From: Srinivas KANDAGATLA <srinivas.kandagatla@st.com>
+Reply-To: srinivas.kandagatla@st.com
+MIME-Version: 1.0
+Subject: Re: [RFC:PATCH 3.6.0-rc1] dtc: Add -P option to dtc for Pre-Processing.
+References: <1344844913-16938-1-git-send-email-srinivas.kandagatla@st.com> <20120815011149.GF8136@truffula.fritz.box>
+In-Reply-To: <20120815011149.GF8136@truffula.fritz.box>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild <linux-kbuild@vger.kernel.org>, lkml <linux-kernel@vger.kernel.org>
+To: David Gibson <dwg@au1.ibm.com>
+Cc: linux-kbuild@vger.kernel.org, devicetree-discuss@lists.ozlabs.org, mmarek@suse.cz, B04825@freescale.com
 
-
---=-sCUg/H3SQY31auS5IMoL
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, 2012-06-06 at 17:35 +0200, Sam Ravnborg wrote:
-> On Wed, Jun 06, 2012 at 01:18:47PM +0300, Artem Bityutskiy wrote:
-> > On Sat, 2012-05-05 at 10:18 +0200, Sam Ravnborg wrote:
-> > > Prevent that we eveluate cc-option multiple times for the same
-> > > option by moving the definitions to Kbuild.arch.
-> > > The file is included once only, thus gcc is not invoked once per dire=
-ctory.
-> > >=20
-> > > Another side-effect of this patch is that KCFLAGS are appended last
-> > > to the list of options. This allows us to better control the options.
-> > > Artem Bityutskiy <dedekind1@gmail.com> noticed this.
-> > >=20
-> > > Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
-> > > Cc: Artem Bityutskiy <dedekind1@gmail.com>
-> >=20
-> > Hi,
-> >=20
-> > what happened to this patch? I was fixing the real issue I am
-> > encountering and I thought it'd be taken instead of my original patch.
-> We decided to move this to next merge release because is was not added
-> to kbuild thus not enough exposure in -next.
->=20
-> I am planning to resend the serie at around -rc2 time.
-
-Hi Sam, what happened to this patch-set? At least KCFLAGS patches I am
-waiting for are still not merged.
-
---=20
-Best Regards,
-Artem Bityutskiy
-
---=-sCUg/H3SQY31auS5IMoL
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-Content-Transfer-Encoding: 7bit
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.12 (GNU/Linux)
-
-iQIcBAABAgAGBQJQK27DAAoJECmIfjd9wqK0Tz8QAMhAV+/ERjYYvQqn9wWsqzBX
-DDZw3WIHAwgAesGeL5a62WtSXckSNpLqgUyK33seq/Bi1MzbDwhi+bkb76scE1Mu
-vjOdy5PQszkgtasnvn9AzGW0iZm5MpPSoGS3H8tMvxlwdpJTHTps0iH8Nm+bvfaU
-KaNSN+ZqJWrR4GGwSz5kz2P96Sm65EffRFtCF4NbrAzlEyH59rY04e+LX4qnYcEb
-ONgZh3CmTQp0pnhguDF675qdwgX6RmZKhyKQg+kOB/+Ic24IE/tzWJ1OvydA2SHJ
-lkQDOJJeryjrJqUpZADMiP89eI8qLajNGrVKWGwKdBNptqGvYmdkcjOeJNxard/1
-uK8ZiBEDy43WzJbrM2Z5/HrNdSlogCbOzpRI5WSDliZmBUg+5yjirtrefkvkcCiq
-st/HSlExxYCe9Dfqr94PKm+1JB4+/hVY4o4z17BKn1SSP3yjdwvZ66/4pWK/Ex/Q
-v49LzuV1bWAE5Y2EiSWS+yxcoeFeFW03Df6w+YWlfpyotXZf8gtqadQUs4LMKelZ
-t1cglzXJMqjhCEyc/gdnEWXNyv3U9rX0mkbmYprZ5ixtRxirrVoNJ8wj+SbbrpXm
-M6tLF2aQvn82KOtjThTOrIGcI0r8q05m5V1ZwxV+YbvJakj3LuUQ/n3lIETvetHs
-w1faaxe1xl6X5b0XuAWd
-=jmIV
------END PGP SIGNATURE-----
-
---=-sCUg/H3SQY31auS5IMoL--
+On 15/08/12 02:11, David Gibson wrote:
+> On Mon, Aug 13, 2012 at 09:01:53AM +0100, Srinivas KANDAGATLA wrote:
+>> From: Srinivas Kandagatla <srinivas.kandagatla@st.com>
+>>
+>> This patch add pre-processing capablity to dtc based on status property.
+>> Now the dtc has additional option -P to enable Pre-processing based on
+>> status property.
+>>
+>> The SOCS have lot of device tree infrastructure files which mark the
+>> device nodes as disabled and the board level device tree enables them if
+>> required. However while creating device tree blob, the compiler can
+>> preprocess the nodes and exclude nodes marked as disabled, doing this
+>> way will reduce the size of device tree blob.
+>>
+>> In our case this has reduced the blob size from 29K to 15K.
+>>
+>> Also nodes with status="disabled" is are never probed by dt platform bus
+>> code.
+>>
+>> Again, Preprocessing is optional parameter to dtc.
+> Hrm.
+>
+> 1) Changes to dtc should be made first against upstream dtc at
+> git://git.jdl.com/software/dtc.git.  The version in the kernel is just
+> a snapshot of the upstream tree which is updated periodically.
+I agree, will re-base the patch against
+git://git.jdl.com/software/dtc.git and add Jon Loeliger (dtc maintainer)
+to CC.
+> 2) I'm not convinced this filtering-by-status is something that
+> belongs in dtc, but I'm willing to be persuaded.
+As its not a default dtc behavior, Adding filtering-by-status as
+optional to dtc would a good addition towards reducing overall dtb sizes.
+>
+> 3) The name has to change.  "preprocess" is far to general a term for
+> the very specific function you're implementing here.  Especially when
+> there are serious discussions ongoing about having dtc use cpp or a
+> similar preprocessor in a general capacity.
+Yes, Pre-process looks very generic, As Tabi suggested --strip-disabled
+would be more appropriate.
+Will repost the patch with this change.
+>
 
