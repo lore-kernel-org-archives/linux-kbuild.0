@@ -1,35 +1,63 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-out.m-online.net ([212.18.0.9]:34364 "EHLO
-	mail-out.m-online.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S964797Ab2HPObl (ORCPT
+Received: from mail-vb0-f46.google.com ([209.85.212.46]:37529 "EHLO
+	mail-vb0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751026Ab2HPPDu (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 16 Aug 2012 10:31:41 -0400
-From: Andreas Schwab <schwab@linux-m68k.org>
-Subject: Re: Regression: Spurious "^A" in UML output
+	Thu, 16 Aug 2012 11:03:50 -0400
+MIME-Version: 1.0
+In-Reply-To: <1345125049.26882.16.camel@joe2Laptop>
 References: <CAMuHMdVEKpVYn+Yr5rzdOvV5zUWrD12Fas197Mn2oVDC5YgVgw@mail.gmail.com>
 	<1345125049.26882.16.camel@joe2Laptop>
-Date: Thu, 16 Aug 2012 16:31:37 +0200
-In-Reply-To: <1345125049.26882.16.camel@joe2Laptop> (Joe Perches's message of
-	"Thu, 16 Aug 2012 06:50:49 -0700")
-Message-ID: <m2393mhprq.fsf@igel.home>
-MIME-Version: 1.0
-Content-Type: text/plain
+Date: Thu, 16 Aug 2012 17:03:49 +0200
+Message-ID: <CAMuHMdVed0OU+D_tdrG-UtFiLzFp0KQKWVpY+OS9M1oCs_4SnQ@mail.gmail.com>
+Subject: Re: Regression: Spurious "^A" in UML output
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Joe Perches <joe@perches.com>
-Cc: Geert Uytterhoeven <geert@linux-m68k.org>, uml-devel <user-mode-linux-devel@lists.sourceforge.net>, linux-kbuild <linux-kbuild@vger.kernel.org>, linux-kernel@vger.kernel.org
+Cc: uml-devel <user-mode-linux-devel@lists.sourceforge.net>, linux-kbuild <linux-kbuild@vger.kernel.org>, linux-kernel@vger.kernel.org
 
-Joe Perches <joe@perches.com> writes:
+Hi Joe,
 
-> Perhaps it's better to change the um STR macro instead
+On Thu, Aug 16, 2012 at 3:50 PM, Joe Perches <joe@perches.com> wrote:
+> On Thu, 2012-08-16 at 15:17 +0200, Geert Uytterhoeven wrote:
+>> In v3.6-rc1 UML, I see spurious "^A" (ASCII 1, SOH) characters in some kernel
+>> messages:
+>>
+>> Calibrating delay loop... 4640.76 BogoMIPS (lpj=23203840)
+>> pid_max: default: 32768 minimum: 301
+>> Mount-cache hash table entries: 256
+>> ^AChecking that host ptys support output SIGIO...Yes
+>> ^AChecking that host ptys support SIGIO on close...No, enabling workaround
+>> ^AUsing 2.6 host AIO
+>> NET: Registered protocol family 16
+>> bio: create slab <bio-0> at 0
+>> Switching to clocksource itimer
+>>
+>> This happens for all output using the "printk(UM_KERN_XXX ...)" idiom.
+>
+> Were these emitted with "KERN_<LEVEL>" string constants
+> before this change (not <[0-7]>", but the string text
+> KERN_INFO, KERN_WARNING, etc...)?
 
-The STR macro is only used to turn the expansion into a C string to be
-parsed by the compiler.  The real problem is that the expansion now
-contains spaces, which makes the output ambigous.
+They were emitted with the "<x>" string constants.
 
-Andreas.
+This is used in the userspace part of UML, which runs as a userspace
+application on the host. Hence it cannot include kernel header files
+directly.
 
--- 
-Andreas Schwab, schwab@linux-m68k.org
-GPG Key fingerprint = 58CA 54C7 6D53 942B 1756  01D3 44D5 214B 8276 4ED5
-"And now for something completely different."
+However, now include/linux/kern_levels.h is fairly self-container, perhaps
+we should just include that file directly instead of, and get rid of all
+DEFINE_STR() users.
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
