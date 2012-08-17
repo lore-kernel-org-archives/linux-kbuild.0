@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pb0-f46.google.com ([209.85.160.46]:43159 "EHLO
+Received: from mail-pb0-f46.google.com ([209.85.160.46]:35966 "EHLO
 	mail-pb0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752243Ab2HQGpb (ORCPT
+	with ESMTP id S964832Ab2HQG5f (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 17 Aug 2012 02:45:31 -0400
+	Fri, 17 Aug 2012 02:57:35 -0400
 From: Adam Lee <adam8157@gmail.com>
-Subject: [PATCH] kconfig: document oldnoconfig to what it really does in conf.c
-Date: Fri, 17 Aug 2012 14:45:23 +0800
-Message-Id: <1345185924-16005-1-git-send-email-adam8157@gmail.com>
+Subject: [PATCH] [Signed-off] kconfig: document oldnoconfig to what it really does in conf.c
+Date: Fri, 17 Aug 2012 14:57:28 +0800
+Message-Id: <1345186649-17502-1-git-send-email-adam8157@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org
@@ -19,6 +19,8 @@ instead sets it to their default values.
 
 This patch fixes the document in conf.c, and will submit another patch
 to replace 'oldnoconfig' to 'olddefconfig'
+
+Signed-off-by: Adam Lee <adam8157@gmail.com>
 ---
  scripts/kconfig/conf.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
