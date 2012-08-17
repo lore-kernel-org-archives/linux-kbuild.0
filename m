@@ -1,83 +1,36 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ee0-f46.google.com ([74.125.83.46]:34597 "EHLO
-	mail-ee0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1030708Ab2HQHkJ (ORCPT
+Received: from smtp.snhosting.dk ([87.238.248.203]:29925 "EHLO
+	smtp.domainteam.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1758432Ab2HQQyO (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 17 Aug 2012 03:40:09 -0400
-From: Adam Lee <adam8157@gmail.com>
-Subject: [PATCH] kconfig: allow ARCH set to 'the machine hardware name', like 's390x' but not 's390'
-Date: Fri, 17 Aug 2012 15:39:59 +0800
-Message-Id: <1345189199-22145-1-git-send-email-adam8157@gmail.com>
+	Fri, 17 Aug 2012 12:54:14 -0400
+Date: Fri, 17 Aug 2012 18:54:11 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: [PATCH] kconfig: allow ARCH set to 'the machine hardware
+	name', like 's390x' but not 's390'
+Message-ID: <20120817165411.GA11373@merkur.ravnborg.org>
+References: <1345189199-22145-1-git-send-email-adam8157@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1345189199-22145-1-git-send-email-adam8157@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: Michal Marek <mmarek@suse.cz>, "open list:KERNEL BUILD + fi..." <linux-kbuild@vger.kernel.org>
+To: Adam Lee <adam8157@gmail.com>
+Cc: linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, "open list:KERNEL BUILD + fi..." <linux-kbuild@vger.kernel.org>
 
-This patch add support for setting ARCH to 'the machine hardware
-name'(`uname -m).
+On Fri, Aug 17, 2012 at 03:39:59PM +0800, Adam Lee wrote:
+> This patch add support for setting ARCH to 'the machine hardware
+> name'(`uname -m).
 
-UTS_MACHINE is not always the same as SRCARCH, for example, s390x, we
-should set UTS_MACHINE=s390x, and SRCARCH=s390. This patch makes that
-working when "make ARCH=s390x".
+Snip from s390 Makefile:
 
-And it avoid some error during invocation of make when ARCH set to
-s390x, ppc64 or some machine hardware name else. Lots of scripts will
-have no need to hack(like what we did in Red Hat), just use `uname -m`.
+ifeq ($(CONFIG_64BIT),y)
+        $(Q)$(MAKE) $(build)=arch/$(ARCH)/kernel/vdso64 $@
+endif
+        $(Q)$(MAKE) $(build)=arch/$(ARCH)/kernel/vdso32 $@
 
-Signed-off-by: Adam Lee <adam8157@gmail.com>
----
- Makefile | 37 ++++++++-----------------------------
- 1 file changed, 8 insertions(+), 29 deletions(-)
+You need more changes to support this.
+Check all arch Makefiles for similar uses.
 
-diff --git a/Makefile b/Makefile
-index 9cc77ac..4f06c64 100644
---- a/Makefile
-+++ b/Makefile
-@@ -197,36 +197,15 @@ CROSS_COMPILE	?= $(CONFIG_CROSS_COMPILE:"%"=%)
- 
- # Architecture as present in compile.h
- UTS_MACHINE 	:= $(ARCH)
--SRCARCH 	:= $(ARCH)
- 
--# Additional ARCH settings for x86
--ifeq ($(ARCH),i386)
--        SRCARCH := x86
--endif
--ifeq ($(ARCH),x86_64)
--        SRCARCH := x86
--endif
--
--# Additional ARCH settings for sparc
--ifeq ($(ARCH),sparc32)
--       SRCARCH := sparc
--endif
--ifeq ($(ARCH),sparc64)
--       SRCARCH := sparc
--endif
--
--# Additional ARCH settings for sh
--ifeq ($(ARCH),sh64)
--       SRCARCH := sh
--endif
--
--# Additional ARCH settings for tile
--ifeq ($(ARCH),tilepro)
--       SRCARCH := tile
--endif
--ifeq ($(ARCH),tilegx)
--       SRCARCH := tile
--endif
-+# Where arch specific source located
-+SRCARCH	:= $(shell echo $(ARCH) | \
-+	sed -e s/i.86/x86/ -e s/x86_64/x86/ \
-+	-e s/arm.*/arm/ -e s/sa110/arm/ \
-+	-e s/m68k.*/m68k/ -e s/mips.*/mips/ \
-+	-e s/parisc64/parisc/ -e s/ppc.*/powerpc/ \
-+	-e s/s390x/s390/ -e s/sh.*/sh/ -e s/sun4u/sparc/ \
-+	-e s/sparc.*/sparc/ -e s/tile.*/tile/ )
- 
- # Where to locate arch specific headers
- hdr-arch  := $(SRCARCH)
--- 
-1.7.11.2
-
+	Sam
