@@ -1,46 +1,75 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:36894 "EHLO mga02.intel.com"
+Received: from mga11.intel.com ([192.55.52.93]:1635 "EHLO mga11.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753560Ab2HSC5j (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 18 Aug 2012 22:57:39 -0400
+	id S1753596Ab2HSC5k (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 18 Aug 2012 22:57:40 -0400
 From: Andi Kleen <andi@firstfloor.org>
-Subject: [PATCH 08/74] sections: Add __visible to tile sections
-Date: Sat, 18 Aug 2012 19:56:04 -0700
-Message-Id: <1345345030-22211-9-git-send-email-andi@firstfloor.org>
+Subject: [PATCH 47/74] x86, lto: Fix kprobes for LTO
+Date: Sat, 18 Aug 2012 19:56:43 -0700
+Message-Id: <1345345030-22211-48-git-send-email-andi@firstfloor.org>
 In-Reply-To: <1345345030-22211-1-git-send-email-andi@firstfloor.org>
 References: <1345345030-22211-1-git-send-email-andi@firstfloor.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org
-Cc: x86@kernel.org, mmarek@suse.cz, linux-kbuild@vger.kernel.org, JBeulich@suse.com, akpm@linux-foundation.org, Andi Kleen <ak@linux.intel.com>
+Cc: x86@kernel.org, mmarek@suse.cz, linux-kbuild@vger.kernel.org, JBeulich@suse.com, akpm@linux-foundation.org, Andi Kleen <ak@linux.intel.com>, ananth@in.ibm.com
 
 From: Andi Kleen <ak@linux.intel.com>
 
+- Make all the external assembler template symbols __visible
+- Move the templates inline assembler code into a top level
+assembler statement, not inside a function. This avoids it being
+optimized away or cloned.
+
+Cc: ananth@in.ibm.com
 Signed-off-by: Andi Kleen <ak@linux.intel.com>
 ---
- arch/tile/include/asm/sections.h |    8 ++++----
- 1 files changed, 4 insertions(+), 4 deletions(-)
+ arch/x86/include/asm/kprobes.h |    8 ++++----
+ arch/x86/kernel/kprobes-opt.c  |    5 +----
+ 2 files changed, 5 insertions(+), 8 deletions(-)
 
-diff --git a/arch/tile/include/asm/sections.h b/arch/tile/include/asm/sections.h
-index d062d46..edee549 100644
---- a/arch/tile/include/asm/sections.h
-+++ b/arch/tile/include/asm/sections.h
-@@ -27,11 +27,11 @@ extern char __w1data_begin[], __w1data_end[];
+diff --git a/arch/x86/include/asm/kprobes.h b/arch/x86/include/asm/kprobes.h
+index a967173..fa2d12e 100644
+--- a/arch/x86/include/asm/kprobes.h
++++ b/arch/x86/include/asm/kprobes.h
+@@ -48,10 +48,10 @@ typedef u8 kprobe_opcode_t;
+ #define flush_insn_slot(p)	do { } while (0)
  
+ /* optinsn template addresses */
+-extern kprobe_opcode_t optprobe_template_entry;
+-extern kprobe_opcode_t optprobe_template_val;
+-extern kprobe_opcode_t optprobe_template_call;
+-extern kprobe_opcode_t optprobe_template_end;
++extern __visible kprobe_opcode_t optprobe_template_entry;
++extern __visible kprobe_opcode_t optprobe_template_val;
++extern __visible kprobe_opcode_t optprobe_template_call;
++extern __visible kprobe_opcode_t optprobe_template_end;
+ #define MAX_OPTIMIZED_LENGTH (MAX_INSN_SIZE + RELATIVE_ADDR_SIZE)
+ #define MAX_OPTINSN_SIZE 				\
+ 	(((unsigned long)&optprobe_template_end -	\
+diff --git a/arch/x86/kernel/kprobes-opt.c b/arch/x86/kernel/kprobes-opt.c
+index c5e410e..43c34e8 100644
+--- a/arch/x86/kernel/kprobes-opt.c
++++ b/arch/x86/kernel/kprobes-opt.c
+@@ -88,9 +88,7 @@ static void __kprobes synthesize_set_arg1(kprobe_opcode_t *addr, unsigned long v
+ 	*(unsigned long *)addr = val;
+ }
  
- /* Not exactly sections, but PC comparison points in the code. */
--extern char __rt_sigreturn[], __rt_sigreturn_end[];
-+extern __visible char __rt_sigreturn[], __rt_sigreturn_end[];
- #ifndef __tilegx__
--extern char sys_cmpxchg[], __sys_cmpxchg_end[];
--extern char __sys_cmpxchg_grab_lock[];
--extern char __start_atomic_asm_code[], __end_atomic_asm_code[];
-+extern __visible char sys_cmpxchg[], __sys_cmpxchg_end[];
-+extern __visible char __sys_cmpxchg_grab_lock[];
-+extern __visible char __start_atomic_asm_code[], __end_atomic_asm_code[];
+-static void __used __kprobes kprobes_optinsn_template_holder(void)
+-{
+-	asm volatile (
++asm (
+ 			".global optprobe_template_entry\n"
+ 			"optprobe_template_entry:\n"
+ #ifdef CONFIG_X86_64
+@@ -129,7 +127,6 @@ static void __used __kprobes kprobes_optinsn_template_holder(void)
  #endif
+ 			".global optprobe_template_end\n"
+ 			"optprobe_template_end:\n");
+-}
  
- /* Handle the discontiguity between _sdata and _stext. */
+ #define TMPL_MOVE_IDX \
+ 	((long)&optprobe_template_val - (long)&optprobe_template_entry)
 -- 
 1.7.7.6
 
