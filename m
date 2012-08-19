@@ -1,12 +1,12 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga14.intel.com ([143.182.124.37]:59858 "EHLO mga14.intel.com"
+Received: from mga11.intel.com ([192.55.52.93]:1635 "EHLO mga11.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753360Ab2HSC5f (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 18 Aug 2012 22:57:35 -0400
+	id S1753229Ab2HSC5c (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 18 Aug 2012 22:57:32 -0400
 From: Andi Kleen <andi@firstfloor.org>
-Subject: [PATCH 61/74] Kbuild, lto: Drop .number postfixes in modpost
-Date: Sat, 18 Aug 2012 19:56:57 -0700
-Message-Id: <1345345030-22211-62-git-send-email-andi@firstfloor.org>
+Subject: [PATCH 01/74] Add __visible
+Date: Sat, 18 Aug 2012 19:55:57 -0700
+Message-Id: <1345345030-22211-2-git-send-email-andi@firstfloor.org>
 In-Reply-To: <1345345030-22211-1-git-send-email-andi@firstfloor.org>
 References: <1345345030-22211-1-git-send-email-andi@firstfloor.org>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -16,63 +16,49 @@ Cc: x86@kernel.org, mmarek@suse.cz, linux-kbuild@vger.kernel.org, JBeulich@suse.
 
 From: Andi Kleen <ak@linux.intel.com>
 
-LTO turns all global symbols effectively into statics. This
-has the side effect that they all have a .NUMBER postfix to make
-them unique. In modpost drop this postfix because it confuses
-it.
+gcc 4.6+ has support for a externally_visible attribute, that prevents
+the optimizer from optimizing unused symbols away. Add a __visible macro
+to use it with that compiler version or later.
 
 Signed-off-by: Andi Kleen <ak@linux.intel.com>
 ---
- scripts/mod/modpost.c |   15 ++++++++++++++-
- scripts/mod/modpost.h |    2 +-
- 2 files changed, 15 insertions(+), 2 deletions(-)
+ include/linux/compiler-gcc4.h |    7 +++++++
+ include/linux/compiler.h      |    4 ++++
+ 2 files changed, 11 insertions(+), 0 deletions(-)
 
-diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index c797e95..ccd34ff 100644
---- a/scripts/mod/modpost.c
-+++ b/scripts/mod/modpost.c
-@@ -1696,6 +1696,19 @@ static void check_sec_ref(struct module *mod, const char *modname,
- 	}
- }
+diff --git a/include/linux/compiler-gcc4.h b/include/linux/compiler-gcc4.h
+index 2f40791..934bc34 100644
+--- a/include/linux/compiler-gcc4.h
++++ b/include/linux/compiler-gcc4.h
+@@ -49,6 +49,13 @@
+ #endif
+ #endif
  
-+static char *remove_dot(char *s)
-+{
-+	char *end;
-+	int n = strcspn(s, ".");
++#if __GNUC_MINOR__ >= 6
++/*
++ * Tell the optimizer that something else uses this function or variable.
++ */
++#define __visible __attribute__((externally_visible))
++#endif
 +
-+	if (n > 0 && s[n] != 0) {
-+		strtoul(s + n + 1, &end, 10);
-+		if  (end > s + n + 1 && (*end == '.' || *end == 0))
-+			s[n] = 0;
-+	}
-+	return s;
-+}
+ #if __GNUC_MINOR__ > 0
+ #define __compiletime_object_size(obj) __builtin_object_size(obj, 0)
+ #endif
+diff --git a/include/linux/compiler.h b/include/linux/compiler.h
+index 923d093..f430e41 100644
+--- a/include/linux/compiler.h
++++ b/include/linux/compiler.h
+@@ -278,6 +278,10 @@ void ftrace_likely_update(struct ftrace_branch_data *f, int val, int expect);
+ # define __section(S) __attribute__ ((__section__(#S)))
+ #endif
+ 
++#ifndef __visible
++#define __visible
++#endif
 +
- static void read_symbols(char *modname)
- {
- 	const char *symname;
-@@ -1734,7 +1747,7 @@ static void read_symbols(char *modname)
- 	}
- 
- 	for (sym = info.symtab_start; sym < info.symtab_stop; sym++) {
--		symname = info.strtab + sym->st_name;
-+		symname = remove_dot(info.strtab + sym->st_name);
- 
- 		handle_modversions(mod, &info, sym, symname);
- 		handle_moddevtable(mod, &info, sym, symname);
-diff --git a/scripts/mod/modpost.h b/scripts/mod/modpost.h
-index 51207e4..168b43d 100644
---- a/scripts/mod/modpost.h
-+++ b/scripts/mod/modpost.h
-@@ -127,7 +127,7 @@ struct elf_info {
- 	Elf_Section  export_gpl_sec;
- 	Elf_Section  export_unused_gpl_sec;
- 	Elf_Section  export_gpl_future_sec;
--	const char   *strtab;
-+	char         *strtab;
- 	char	     *modinfo;
- 	unsigned int modinfo_len;
- 
+ /* Are two types/vars the same type (ignoring qualifiers)? */
+ #ifndef __same_type
+ # define __same_type(a, b) __builtin_types_compatible_p(typeof(a), typeof(b))
 -- 
 1.7.7.6
 
