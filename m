@@ -1,12 +1,12 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga11.intel.com ([192.55.52.93]:60723 "EHLO mga11.intel.com"
+Received: from mga11.intel.com ([192.55.52.93]:44069 "EHLO mga11.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753977Ab2HSC5p (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	id S1753983Ab2HSC5p (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
 	Sat, 18 Aug 2012 22:57:45 -0400
 From: Andi Kleen <andi@firstfloor.org>
-Subject: [PATCH 65/74] Kbuild, lto: Disable LTO for asm-offsets.c
-Date: Sat, 18 Aug 2012 19:57:01 -0700
-Message-Id: <1345345030-22211-66-git-send-email-andi@firstfloor.org>
+Subject: [PATCH 74/74] lto, workaround: Mark do_futex noinline to prevent clobbering ebp
+Date: Sat, 18 Aug 2012 19:57:10 -0700
+Message-Id: <1345345030-22211-75-git-send-email-andi@firstfloor.org>
 In-Reply-To: <1345345030-22211-1-git-send-email-andi@firstfloor.org>
 References: <1345345030-22211-1-git-send-email-andi@firstfloor.org>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -16,27 +16,31 @@ Cc: x86@kernel.org, mmarek@suse.cz, linux-kbuild@vger.kernel.org, JBeulich@suse.
 
 From: Andi Kleen <ak@linux.intel.com>
 
-The asm-offset.c technique to fish data out of the assembler file
-does not work with LTO. Just disable for the asm-offset.c build.
+On a 32bit build gcc 4.7 with LTO decides to clobber the 6th argument on the
+stack.  Unfortunately this corrupts the user EBP and leads to later crashes.
+For now mark do_futex noinline to prevent this.
+
+I wish there was a generic way to handle this. Seems like a ticking time
+bomb problem.
 
 Signed-off-by: Andi Kleen <ak@linux.intel.com>
 ---
- scripts/Makefile.build |    2 +-
+ kernel/futex.c |    2 +-
  1 files changed, 1 insertions(+), 1 deletions(-)
 
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index ff1720d..11fa091 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -198,7 +198,7 @@ $(multi-objs-y:.o=.s)   : modname = $(modname-multi)
- $(multi-objs-y:.o=.lst) : modname = $(modname-multi)
+diff --git a/kernel/futex.c b/kernel/futex.c
+index 3717e7b..48b5a07 100644
+--- a/kernel/futex.c
++++ b/kernel/futex.c
+@@ -2620,7 +2620,7 @@ void exit_robust_list(struct task_struct *curr)
+ 				   curr, pip);
+ }
  
- quiet_cmd_cc_s_c = CC $(quiet_modtag)  $@
--cmd_cc_s_c       = $(CC) $(c_flags) -fverbose-asm -S -o $@ $<
-+cmd_cc_s_c       = $(CC) $(c_flags) $(DISABLE_LTO) -fverbose-asm -S -o $@ $<
- 
- $(obj)/%.s: $(src)/%.c FORCE
- 	$(call if_changed_dep,cc_s_c)
+-long do_futex(u32 __user *uaddr, int op, u32 val, ktime_t *timeout,
++noinline long do_futex(u32 __user *uaddr, int op, u32 val, ktime_t *timeout,
+ 		u32 __user *uaddr2, u32 val2, u32 val3)
+ {
+ 	int cmd = op & FUTEX_CMD_MASK;
 -- 
 1.7.7.6
 
