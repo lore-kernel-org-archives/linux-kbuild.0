@@ -1,12 +1,12 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:14941 "EHLO mga02.intel.com"
+Received: from mga11.intel.com ([192.55.52.93]:44069 "EHLO mga11.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754000Ab2HSC5q (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 18 Aug 2012 22:57:46 -0400
+	id S1753544Ab2HSC5i (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 18 Aug 2012 22:57:38 -0400
 From: Andi Kleen <andi@firstfloor.org>
-Subject: [PATCH 64/74] Kbuild, lto: Add a gcc-ld script to let run gcc as ld
-Date: Sat, 18 Aug 2012 19:57:00 -0700
-Message-Id: <1345345030-22211-65-git-send-email-andi@firstfloor.org>
+Subject: [PATCH 46/74] x86, lto: Disable fancy hweight optimizations for LTO
+Date: Sat, 18 Aug 2012 19:56:42 -0700
+Message-Id: <1345345030-22211-47-git-send-email-andi@firstfloor.org>
 In-Reply-To: <1345345030-22211-1-git-send-email-andi@firstfloor.org>
 References: <1345345030-22211-1-git-send-email-andi@firstfloor.org>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -16,51 +16,69 @@ Cc: x86@kernel.org, mmarek@suse.cz, linux-kbuild@vger.kernel.org, JBeulich@suse.
 
 From: Andi Kleen <ak@linux.intel.com>
 
-For LTO we need to run the link step with gcc, not ld.
-Since there are a lot of linker options passed to it, add a gcc-ld wrapper
-that wraps them as -Wl,
+The fancy x86 hweight uses different compiler options for the
+hweight file. This does not work with LTO. Just disable the optimization
+with LTO
 
 Signed-off-by: Andi Kleen <ak@linux.intel.com>
 ---
- scripts/gcc-ld |   29 +++++++++++++++++++++++++++++
- 1 files changed, 29 insertions(+), 0 deletions(-)
- create mode 100644 scripts/gcc-ld
+ arch/x86/Kconfig                    |    5 +++--
+ arch/x86/include/asm/arch_hweight.h |    9 +++++++++
+ 2 files changed, 12 insertions(+), 2 deletions(-)
 
-diff --git a/scripts/gcc-ld b/scripts/gcc-ld
-new file mode 100644
-index 0000000..cadab9a
---- /dev/null
-+++ b/scripts/gcc-ld
-@@ -0,0 +1,29 @@
-+#!/bin/sh
-+# run gcc with ld options
-+# used as a wrapper to execute link time optimizations
-+# yes virginia, this is not pretty
+diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
+index 8ec3a1a..9382b09 100644
+--- a/arch/x86/Kconfig
++++ b/arch/x86/Kconfig
+@@ -224,8 +224,9 @@ config X86_32_LAZY_GS
+ 
+ config ARCH_HWEIGHT_CFLAGS
+ 	string
+-	default "-fcall-saved-ecx -fcall-saved-edx" if X86_32
+-	default "-fcall-saved-rdi -fcall-saved-rsi -fcall-saved-rdx -fcall-saved-rcx -fcall-saved-r8 -fcall-saved-r9 -fcall-saved-r10 -fcall-saved-r11" if X86_64
++	default "-fcall-saved-ecx -fcall-saved-edx" if X86_32 && !LTO
++	default "-fcall-saved-rdi -fcall-saved-rsi -fcall-saved-rdx -fcall-saved-rcx -fcall-saved-r8 -fcall-saved-r9 -fcall-saved-r10 -fcall-saved-r11" if X86_64 && !LTO
++	default "" if LTO
+ 
+ config ARCH_CPU_PROBE_RELEASE
+ 	def_bool y
+diff --git a/arch/x86/include/asm/arch_hweight.h b/arch/x86/include/asm/arch_hweight.h
+index 9686c3d..ca80549 100644
+--- a/arch/x86/include/asm/arch_hweight.h
++++ b/arch/x86/include/asm/arch_hweight.h
+@@ -25,9 +25,14 @@ static inline unsigned int __arch_hweight32(unsigned int w)
+ {
+ 	unsigned int res = 0;
+ 
++#ifdef CONFIG_LTO
++	res  = __sw_hweight32(w);
++#else
 +
-+ARGS="-nostdlib"
-+
-+while [ "$1" != "" ] ; do
-+	case "$1" in
-+	-save-temps|-m32|-m64) N="$1" ;;
-+	-r) N="$1" ;;
-+	-[Wg]*) N="$1" ;;
-+	-[olv]|-[Ofd]*|-nostdlib) N="$1" ;;
-+	--end-group|--start-group)
-+		 N="-Wl,$1" ;;
-+	-[RTFGhIezcbyYu]*|\
-+--script|--defsym|-init|-Map|--oformat|-rpath|\
-+-rpath-link|--sort-section|--section-start|-Tbss|-Tdata|-Ttext|\
-+--version-script|--dynamic-list|--version-exports-symbol|--wrap|-m)
-+		A="$1" ; shift ; N="-Wl,$A,$1" ;;
-+	-[m]*) N="$1" ;;
-+	-*) N="-Wl,$1" ;;
-+	*)  N="$1" ;;
-+	esac
-+	ARGS="$ARGS $N"
-+	shift
-+done
-+
-+exec $CC $ARGS
+ 	asm (ALTERNATIVE("call __sw_hweight32", POPCNT32, X86_FEATURE_POPCNT)
+ 		     : "="REG_OUT (res)
+ 		     : REG_IN (w));
++#endif
+ 
+ 	return res;
+ }
+@@ -46,6 +51,9 @@ static inline unsigned long __arch_hweight64(__u64 w)
+ {
+ 	unsigned long res = 0;
+ 
++#ifdef CONFIG_LTO
++	res = __sw_hweight64(w);
++#else
+ #ifdef CONFIG_X86_32
+ 	return  __arch_hweight32((u32)w) +
+ 		__arch_hweight32((u32)(w >> 32));
+@@ -54,6 +62,7 @@ static inline unsigned long __arch_hweight64(__u64 w)
+ 		     : "="REG_OUT (res)
+ 		     : REG_IN (w));
+ #endif /* CONFIG_X86_32 */
++#endif
+ 
+ 	return res;
+ }
 -- 
 1.7.7.6
 
