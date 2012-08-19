@@ -1,81 +1,49 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from claw.goop.org ([74.207.240.146]:38760 "EHLO claw.goop.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751373Ab2HSIfY (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 19 Aug 2012 04:35:24 -0400
-Message-ID: <5030A31B.3060908@goop.org>
-Date: Sun, 19 Aug 2012 01:26:03 -0700
-From: Jeremy Fitzhardinge <jeremy@goop.org>
-MIME-Version: 1.0
-Subject: Re: [PATCH 52/74] x86, lto, paravirt: Don't rely on local assembler
- labels
-References: <1345345030-22211-1-git-send-email-andi@firstfloor.org> <1345345030-22211-53-git-send-email-andi@firstfloor.org>
-In-Reply-To: <1345345030-22211-53-git-send-email-andi@firstfloor.org>
-Content-Type: text/plain; charset=ISO-8859-15
-Content-Transfer-Encoding: 7bit
+Received: from nat28.tlf.novell.com ([130.57.49.28]:58946 "EHLO
+	nat28.tlf.novell.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751307Ab2HSIhb convert rfc822-to-8bit (ORCPT
+	<rfc822;groupwise-linux-kbuild@vger.kernel.org:6:1>);
+	Sun, 19 Aug 2012 04:37:31 -0400
+Message-Id: <5030B3D7020000780008A217@nat28.tlf.novell.com>
+Date: Sun, 19 Aug 2012 09:37:27 +0100
+From: "Jan Beulich" <jbeulich@suse.com>
+Subject: Re: [PATCH 48/74] x86, lto: Use inline assembler instead of
+ global register variable to get sp
+References: <1345345030-22211-1-git-send-email-andi@firstfloor.org>
+ <1345345030-22211-49-git-send-email-andi@firstfloor.org>
+In-Reply-To: <1345345030-22211-49-git-send-email-andi@firstfloor.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8BIT
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andi Kleen <andi@firstfloor.org>
-Cc: linux-kernel@vger.kernel.org, x86@kernel.org, mmarek@suse.cz, linux-kbuild@vger.kernel.org, JBeulich@suse.com, akpm@linux-foundation.org, Andi Kleen <ak@linux.intel.com>
+To: andi@firstfloor.org, ak@linux.intel.com, linux-kernel@vger.kernel.org
+Cc: x86@kernel.org, akpm@linux-foundation.org, mmarek@suse.cz, linux-kbuild@vger.kernel.org
 
-On 08/18/2012 07:56 PM, Andi Kleen wrote:
-> From: Andi Kleen <ak@linux.intel.com>
->
-> The paravirt patching code assumes that it can reference a
-> local assembler label between two different top level assembler
-> statements. This does not work with some experimental gcc builds,
-> where the assembler code may end up in different assembler files.
+>>> Andi Kleen <andi@firstfloor.org> 08/19/12 4:59 AM >>>
+>I verified this generates the same binary (on 64bit) as the original
+>register variable.
 
-Egad, what are those zany gcc chaps up to now?
+This isn't very surprising given that the modified code is inside a
+CONFIG_X86_32 conditional (as ought to be obvious from the code using
+%%esp). Given that it's being used as operand to a binary &, the resulting
+code - if the compiler handles this only half way sensibly - can hardly be
+expected to be identical.
 
-    J
+>-register unsigned long current_stack_pointer asm("esp") __used;
+>+#define current_stack_pointer ({         \
+>+    unsigned long sp;            \
+>+    asm("mov %%esp,%0" : "=r" (sp));    \
+>+    sp;                    \
+>+})
+ 
+It would get closer to the original if you used "=g" (I noticed in a few
+earlier patches already that you like to use "=r" in places where a register
+is not strictly required, thus reducing the flexibility the compiler has).
 
->
-> Replace it with extern / global /asm linkage labels.
->
-> This also removes one redundant copy of the macro.
->
-> Cc: jeremy@goop.org
-> Signed-off-by: Andi Kleen <ak@linux.intel.com>
-> ---
->  arch/x86/include/asm/paravirt_types.h |    9 +++++----
->  arch/x86/kernel/paravirt.c            |    5 -----
->  2 files changed, 5 insertions(+), 9 deletions(-)
->
-> diff --git a/arch/x86/include/asm/paravirt_types.h b/arch/x86/include/asm/paravirt_types.h
-> index 4f262bc..6a464ba 100644
-> --- a/arch/x86/include/asm/paravirt_types.h
-> +++ b/arch/x86/include/asm/paravirt_types.h
-> @@ -385,10 +385,11 @@ extern struct pv_lock_ops pv_lock_ops;
->  	_paravirt_alt(insn_string, "%c[paravirt_typenum]", "%c[paravirt_clobber]")
->  
->  /* Simple instruction patching code. */
-> -#define DEF_NATIVE(ops, name, code) 					\
-> -	extern const char start_##ops##_##name[] __visible, 		\
-> -			  end_##ops##_##name[] __visible;		\
-> -	asm("start_" #ops "_" #name ": " code "; end_" #ops "_" #name ":")
-> +#define NATIVE_LABEL(a,x,b) "\n\t.globl " a #x "_" #b "\n" a #x "_" #b ":\n\t"
-> +
-> +#define DEF_NATIVE(ops, name, code)					\
-> +	__visible extern const char start_##ops##_##name[], end_##ops##_##name[];	\
-> +	asm(NATIVE_LABEL("start_", ops, name) code NATIVE_LABEL("end_", ops, name))
->  
->  unsigned paravirt_patch_nop(void);
->  unsigned paravirt_patch_ident_32(void *insnbuf, unsigned len);
-> diff --git a/arch/x86/kernel/paravirt.c b/arch/x86/kernel/paravirt.c
-> index 17fff18..947255e 100644
-> --- a/arch/x86/kernel/paravirt.c
-> +++ b/arch/x86/kernel/paravirt.c
-> @@ -62,11 +62,6 @@ void __init default_banner(void)
->  	       pv_info.name);
->  }
->  
-> -/* Simple instruction patching code. */
-> -#define DEF_NATIVE(ops, name, code)					\
-> -	extern const char start_##ops##_##name[], end_##ops##_##name[];	\
-> -	asm("start_" #ops "_" #name ": " code "; end_" #ops "_" #name ":")
-> -
->  /* Undefined instruction for dealing with missing ops pointers. */
->  static const unsigned char ud2a[] = { 0x0f, 0x0b };
->  
+Also, given that this is more a workaround for a compiler deficiency,
+shouldn't this be conditional upon use of LTO?
+
+Jan
 
