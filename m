@@ -1,12 +1,12 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:48688 "EHLO mga02.intel.com"
+Received: from mga14.intel.com ([143.182.124.37]:59858 "EHLO mga14.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753461Ab2HSC5h (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 18 Aug 2012 22:57:37 -0400
+	id S1753360Ab2HSC5f (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 18 Aug 2012 22:57:35 -0400
 From: Andi Kleen <andi@firstfloor.org>
-Subject: [PATCH 07/74] sections: Add __visible to sh sections
-Date: Sat, 18 Aug 2012 19:56:03 -0700
-Message-Id: <1345345030-22211-8-git-send-email-andi@firstfloor.org>
+Subject: [PATCH 61/74] Kbuild, lto: Drop .number postfixes in modpost
+Date: Sat, 18 Aug 2012 19:56:57 -0700
+Message-Id: <1345345030-22211-62-git-send-email-andi@firstfloor.org>
 In-Reply-To: <1345345030-22211-1-git-send-email-andi@firstfloor.org>
 References: <1345345030-22211-1-git-send-email-andi@firstfloor.org>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -16,29 +16,62 @@ Cc: x86@kernel.org, mmarek@suse.cz, linux-kbuild@vger.kernel.org, JBeulich@suse.
 
 From: Andi Kleen <ak@linux.intel.com>
 
+LTO turns all global symbols effectively into statics. This
+has the side effect that they all have a .NUMBER postfix to make
+them unique. In modpost drop this postfix because it confuses
+it.
+
 Signed-off-by: Andi Kleen <ak@linux.intel.com>
 ---
- arch/sh/include/asm/sections.h |    8 ++++----
- 1 files changed, 4 insertions(+), 4 deletions(-)
+ scripts/mod/modpost.c |   15 ++++++++++++++-
+ scripts/mod/modpost.h |    2 +-
+ 2 files changed, 15 insertions(+), 2 deletions(-)
 
-diff --git a/arch/sh/include/asm/sections.h b/arch/sh/include/asm/sections.h
-index 1b61997..e18e132 100644
---- a/arch/sh/include/asm/sections.h
-+++ b/arch/sh/include/asm/sections.h
-@@ -3,10 +3,10 @@
+diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
+index c797e95..ccd34ff 100644
+--- a/scripts/mod/modpost.c
++++ b/scripts/mod/modpost.c
+@@ -1696,6 +1696,19 @@ static void check_sec_ref(struct module *mod, const char *modname,
+ 	}
+ }
  
- #include <asm-generic/sections.h>
++static char *remove_dot(char *s)
++{
++	char *end;
++	int n = strcspn(s, ".");
++
++	if (n > 0 && s[n] != 0) {
++		strtoul(s + n + 1, &end, 10);
++		if  (end > s + n + 1 && (*end == '.' || *end == 0))
++			s[n] = 0;
++	}
++	return s;
++}
++
+ static void read_symbols(char *modname)
+ {
+ 	const char *symname;
+@@ -1734,7 +1747,7 @@ static void read_symbols(char *modname)
+ 	}
  
--extern long __nosave_begin, __nosave_end;
--extern long __machvec_start, __machvec_end;
--extern char __uncached_start, __uncached_end;
--extern char __start_eh_frame[], __stop_eh_frame[];
-+extern __visible long __nosave_begin, __nosave_end;
-+extern __visible long __machvec_start, __machvec_end;
-+extern __visible char __uncached_start, __uncached_end;
-+extern __visible char __start_eh_frame[], __stop_eh_frame[];
+ 	for (sym = info.symtab_start; sym < info.symtab_stop; sym++) {
+-		symname = info.strtab + sym->st_name;
++		symname = remove_dot(info.strtab + sym->st_name);
  
- #endif /* __ASM_SH_SECTIONS_H */
+ 		handle_modversions(mod, &info, sym, symname);
+ 		handle_moddevtable(mod, &info, sym, symname);
+diff --git a/scripts/mod/modpost.h b/scripts/mod/modpost.h
+index 51207e4..168b43d 100644
+--- a/scripts/mod/modpost.h
++++ b/scripts/mod/modpost.h
+@@ -127,7 +127,7 @@ struct elf_info {
+ 	Elf_Section  export_gpl_sec;
+ 	Elf_Section  export_unused_gpl_sec;
+ 	Elf_Section  export_gpl_future_sec;
+-	const char   *strtab;
++	char         *strtab;
+ 	char	     *modinfo;
+ 	unsigned int modinfo_len;
  
 -- 
 1.7.7.6
