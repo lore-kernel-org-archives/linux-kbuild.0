@@ -1,12 +1,12 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga01.intel.com ([192.55.52.88]:3185 "EHLO mga01.intel.com"
+Received: from mga02.intel.com ([134.134.136.20]:64945 "EHLO mga02.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752917Ab2HSC50 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 18 Aug 2012 22:57:26 -0400
+	id S1753563Ab2HSC5j (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 18 Aug 2012 22:57:39 -0400
 From: Andi Kleen <andi@firstfloor.org>
-Subject: [PATCH 58/74] lto, workaround: Work around LTO compiler problem in atheros driver
-Date: Sat, 18 Aug 2012 19:56:54 -0700
-Message-Id: <1345345030-22211-59-git-send-email-andi@firstfloor.org>
+Subject: [PATCH 17/74] lto: Make asmlinkage __visible
+Date: Sat, 18 Aug 2012 19:56:13 -0700
+Message-Id: <1345345030-22211-18-git-send-email-andi@firstfloor.org>
 In-Reply-To: <1345345030-22211-1-git-send-email-andi@firstfloor.org>
 References: <1345345030-22211-1-git-send-email-andi@firstfloor.org>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -16,27 +16,27 @@ Cc: x86@kernel.org, mmarek@suse.cz, linux-kbuild@vger.kernel.org, JBeulich@suse.
 
 From: Andi Kleen <ak@linux.intel.com>
 
-Making these symbols visible works around a gcc 4.7 LTO compiler
-problem with missing symbols.
-
 Signed-off-by: Andi Kleen <ak@linux.intel.com>
 ---
- .../net/wireless/ath/ath9k/dfs_pattern_detector.c  |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+ include/linux/linkage.h |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/wireless/ath/ath9k/dfs_pattern_detector.c b/drivers/net/wireless/ath/ath9k/dfs_pattern_detector.c
-index ea2a6cf..83c579a 100644
---- a/drivers/net/wireless/ath/ath9k/dfs_pattern_detector.c
-+++ b/drivers/net/wireless/ath/ath9k/dfs_pattern_detector.c
-@@ -51,7 +51,7 @@ struct radar_types {
- }
+diff --git a/include/linux/linkage.h b/include/linux/linkage.h
+index 807f1e5..8d6ff27 100644
+--- a/include/linux/linkage.h
++++ b/include/linux/linkage.h
+@@ -5,9 +5,9 @@
+ #include <asm/linkage.h>
  
- /* radar types as defined by ETSI EN-301-893 v1.5.1 */
--static const struct radar_detector_specs etsi_radar_ref_types_v15[] = {
-+__visible const struct radar_detector_specs etsi_radar_ref_types_v15[] = {
- 	ETSI_PATTERN(0,  0,  1,  700,  700, 1, 18),
- 	ETSI_PATTERN(1,  0,  5,  200, 1000, 1, 10),
- 	ETSI_PATTERN(2,  0, 15,  200, 1600, 1, 15),
+ #ifdef __cplusplus
+-#define CPP_ASMLINKAGE extern "C"
++#define CPP_ASMLINKAGE extern "C" __visible
+ #else
+-#define CPP_ASMLINKAGE
++#define CPP_ASMLINKAGE __visible
+ #endif
+ 
+ #ifndef asmlinkage
 -- 
 1.7.7.6
 
