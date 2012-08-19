@@ -1,53 +1,71 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga11.intel.com ([192.55.52.93]:1635 "EHLO mga11.intel.com"
+Received: from mga11.intel.com ([192.55.52.93]:60723 "EHLO mga11.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753864Ab2HSC5n (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	id S1753884Ab2HSC5n (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
 	Sat, 18 Aug 2012 22:57:43 -0400
 From: Andi Kleen <andi@firstfloor.org>
-Subject: [PATCH 71/74] lto, kprobes: Use KSYM_NAME_LEN to size identifier buffers
-Date: Sat, 18 Aug 2012 19:57:07 -0700
-Message-Id: <1345345030-22211-72-git-send-email-andi@firstfloor.org>
+Subject: [PATCH 23/74] lto, mutex: Mark __visible
+Date: Sat, 18 Aug 2012 19:56:19 -0700
+Message-Id: <1345345030-22211-24-git-send-email-andi@firstfloor.org>
 In-Reply-To: <1345345030-22211-1-git-send-email-andi@firstfloor.org>
 References: <1345345030-22211-1-git-send-email-andi@firstfloor.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org
-Cc: x86@kernel.org, mmarek@suse.cz, linux-kbuild@vger.kernel.org, JBeulich@suse.com, akpm@linux-foundation.org, Joe Mario <jmario@redhat.com>, ananth@in.ibm.com, Andi Kleen <ak@linux.intel.com>
+Cc: x86@kernel.org, mmarek@suse.cz, linux-kbuild@vger.kernel.org, JBeulich@suse.com, akpm@linux-foundation.org, Andi Kleen <ak@linux.intel.com>
 
-From: Joe Mario <jmario@redhat.com>
+From: Andi Kleen <ak@linux.intel.com>
 
-Use KSYM_NAME_LEN to size identifier buffers, so that it can
-be easier increased.
+Various kernel/mutex.c functions can be called from
+inline assembler, so they should be all global and
+__visible
 
-Cc: ananth@in.ibm.com
-Signed-off-by: Joe Mario <jmario@redhat.com>
 Signed-off-by: Andi Kleen <ak@linux.intel.com>
 ---
- kernel/kprobes.c |    4 ++--
- 1 files changed, 2 insertions(+), 2 deletions(-)
+ kernel/mutex.c |    9 ++++-----
+ 1 files changed, 4 insertions(+), 5 deletions(-)
 
-diff --git a/kernel/kprobes.c b/kernel/kprobes.c
-index c62b854..b9bd2a8 100644
---- a/kernel/kprobes.c
-+++ b/kernel/kprobes.c
-@@ -1955,7 +1955,7 @@ static int __init init_kprobes(void)
- {
- 	int i, err = 0;
- 	unsigned long offset = 0, size = 0;
--	char *modname, namebuf[128];
-+	char *modname, namebuf[KSYM_NAME_LEN];
- 	const char *symbol_name;
- 	void *addr;
- 	struct kprobe_blackpoint *kb;
-@@ -2081,7 +2081,7 @@ static int __kprobes show_kprobe_addr(struct seq_file *pi, void *v)
- 	const char *sym = NULL;
- 	unsigned int i = *(loff_t *) v;
- 	unsigned long offset = 0;
--	char *modname, namebuf[128];
-+	char *modname, namebuf[KSYM_NAME_LEN];
+diff --git a/kernel/mutex.c b/kernel/mutex.c
+index a307cc9..fef1585 100644
+--- a/kernel/mutex.c
++++ b/kernel/mutex.c
+@@ -56,8 +56,7 @@ EXPORT_SYMBOL(__mutex_init);
+  * We also put the fastpath first in the kernel image, to make sure the
+  * branch is predicted by the CPU as default-untaken.
+  */
+-static __used noinline void __sched
+-__mutex_lock_slowpath(atomic_t *lock_count);
++__visible void __sched __mutex_lock_slowpath(atomic_t *lock_count);
  
- 	head = &kprobe_table[i];
- 	preempt_disable();
+ /**
+  * mutex_lock - acquire the mutex
+@@ -94,7 +93,7 @@ void __sched mutex_lock(struct mutex *lock)
+ EXPORT_SYMBOL(mutex_lock);
+ #endif
+ 
+-static __used noinline void __sched __mutex_unlock_slowpath(atomic_t *lock_count);
++__visible void __sched __mutex_unlock_slowpath(atomic_t *lock_count);
+ 
+ /**
+  * mutex_unlock - release the mutex
+@@ -338,7 +337,7 @@ __mutex_unlock_common_slowpath(atomic_t *lock_count, int nested)
+ /*
+  * Release the lock, slowpath:
+  */
+-static __used noinline void
++__visible void
+ __mutex_unlock_slowpath(atomic_t *lock_count)
+ {
+ 	__mutex_unlock_common_slowpath(lock_count, 1);
+@@ -395,7 +394,7 @@ int __sched mutex_lock_killable(struct mutex *lock)
+ }
+ EXPORT_SYMBOL(mutex_lock_killable);
+ 
+-static __used noinline void __sched
++__visible void __sched
+ __mutex_lock_slowpath(atomic_t *lock_count)
+ {
+ 	struct mutex *lock = container_of(lock_count, struct mutex, count);
 -- 
 1.7.7.6
 
