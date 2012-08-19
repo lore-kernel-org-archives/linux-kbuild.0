@@ -1,12 +1,12 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:36894 "EHLO mga02.intel.com"
+Received: from mga02.intel.com ([134.134.136.20]:48688 "EHLO mga02.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753988Ab2HSC5q (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 18 Aug 2012 22:57:46 -0400
+	id S1753986Ab2HSC5p (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 18 Aug 2012 22:57:45 -0400
 From: Andi Kleen <andi@firstfloor.org>
-Subject: [PATCH 62/74] Kbuild, lto: add ld-version and ld-ifversion macros
-Date: Sat, 18 Aug 2012 19:56:58 -0700
-Message-Id: <1345345030-22211-63-git-send-email-andi@firstfloor.org>
+Subject: [PATCH 57/74] lto, workaround: Add workaround for LTO build problem in pvrusb2-audio
+Date: Sat, 18 Aug 2012 19:56:53 -0700
+Message-Id: <1345345030-22211-58-git-send-email-andi@firstfloor.org>
 In-Reply-To: <1345345030-22211-1-git-send-email-andi@firstfloor.org>
 References: <1345345030-22211-1-git-send-email-andi@firstfloor.org>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -16,49 +16,38 @@ Cc: x86@kernel.org, mmarek@suse.cz, linux-kbuild@vger.kernel.org, JBeulich@suse.
 
 From: Andi Kleen <ak@linux.intel.com>
 
-To check the linker version. Used by the LTO makefile.
+Making this visible fixes some missing symbols with gcc 4.7 LTO.
+This is a workaround for a compiler problem.
 
 Signed-off-by: Andi Kleen <ak@linux.intel.com>
 ---
- scripts/Kbuild.include |    9 +++++++++
- scripts/ld-version.sh  |    8 ++++++++
- 2 files changed, 17 insertions(+), 0 deletions(-)
- create mode 100755 scripts/ld-version.sh
+ drivers/media/video/pvrusb2/pvrusb2-audio.c |    6 +++---
+ 1 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
-index 6a3ee98..bda5b20 100644
---- a/scripts/Kbuild.include
-+++ b/scripts/Kbuild.include
-@@ -155,6 +155,15 @@ ld-option = $(call try-run,\
- # Important: no spaces around options
- ar-option = $(call try-run, $(AR) rc$(1) "$$TMP",$(1),$(2))
+diff --git a/drivers/media/video/pvrusb2/pvrusb2-audio.c b/drivers/media/video/pvrusb2/pvrusb2-audio.c
+index cc06d5e..aaa6420 100644
+--- a/drivers/media/video/pvrusb2/pvrusb2-audio.c
++++ b/drivers/media/video/pvrusb2/pvrusb2-audio.c
+@@ -32,7 +32,7 @@ struct routing_scheme {
+ 	unsigned int cnt;
+ };
  
-+# ld-version
-+# Usage: $(call ld-version)
-+# Note this is mainly for HJ Lu's 3 number binutil versions
-+ld-version = $(shell $(LD) --version | $(srctree)/scripts/ld-version.sh)
-+
-+# ld-ifversion
-+# Usage:  $(call ld-ifversion, -ge, 22252, y)
-+ld-ifversion = $(shell [ $(call ld-version) $(1) $(2) ] && echo $(3))
-+
- ######
+-static const int routing_scheme0[] = {
++__visible const int pvrusb2_routing_scheme0[] = {
+ 	[PVR2_CVAL_INPUT_TV]        = MSP_INPUT_DEFAULT,
+ 	[PVR2_CVAL_INPUT_RADIO]     = MSP_INPUT(MSP_IN_SCART2,
+ 						MSP_IN_TUNER1,
+@@ -49,8 +49,8 @@ static const int routing_scheme0[] = {
+ };
  
- ###
-diff --git a/scripts/ld-version.sh b/scripts/ld-version.sh
-new file mode 100755
-index 0000000..7eb0b76
---- /dev/null
-+++ b/scripts/ld-version.sh
-@@ -0,0 +1,8 @@
-+#!/usr/bin/awk -f
-+# extra linker version number from stdin and turn into single number
-+	{ 
-+	gsub(".*)", ""); 
-+	split($1,a, "."); 
-+	print a[1]*10000000 + a[2]*100000 + a[3]*10000 + a[4]*100 + a[5]; 
-+	exit 
-+	}
+ static const struct routing_scheme routing_def0 = {
+-	.def = routing_scheme0,
+-	.cnt = ARRAY_SIZE(routing_scheme0),
++	.def = pvrusb2_routing_scheme0,
++	.cnt = ARRAY_SIZE(pvrusb2_routing_scheme0),
+ };
+ 
+ static const struct routing_scheme *routing_schemes[] = {
 -- 
 1.7.7.6
 
