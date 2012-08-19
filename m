@@ -1,12 +1,12 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga14.intel.com ([143.182.124.37]:30968 "EHLO mga14.intel.com"
+Received: from mga02.intel.com ([134.134.136.20]:48688 "EHLO mga02.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753218Ab2HSC5a (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 18 Aug 2012 22:57:30 -0400
+	id S1753278Ab2HSC5e (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 18 Aug 2012 22:57:34 -0400
 From: Andi Kleen <andi@firstfloor.org>
-Subject: [PATCH 48/74] x86, lto: Use inline assembler instead of global register variable to get sp
-Date: Sat, 18 Aug 2012 19:56:44 -0700
-Message-Id: <1345345030-22211-49-git-send-email-andi@firstfloor.org>
+Subject: [PATCH 02/74] sections: Make all standard section identifiers __visible
+Date: Sat, 18 Aug 2012 19:55:58 -0700
+Message-Id: <1345345030-22211-3-git-send-email-andi@firstfloor.org>
 In-Reply-To: <1345345030-22211-1-git-send-email-andi@firstfloor.org>
 References: <1345345030-22211-1-git-send-email-andi@firstfloor.org>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -16,36 +16,48 @@ Cc: x86@kernel.org, mmarek@suse.cz, linux-kbuild@vger.kernel.org, JBeulich@suse.
 
 From: Andi Kleen <ak@linux.intel.com>
 
-LTO in gcc 4.6/47. has trouble with global register variables. They were used
-to read the stack pointer. Use a simple inline assembler statement instead.
-
-I verified this generates the same binary (on 64bit) as the original
-register variable.
-
 Signed-off-by: Andi Kleen <ak@linux.intel.com>
 ---
- arch/x86/include/asm/thread_info.h |    8 +++++---
- 1 files changed, 5 insertions(+), 3 deletions(-)
+ include/asm-generic/sections.h |   24 ++++++++++++------------
+ 1 files changed, 12 insertions(+), 12 deletions(-)
 
-diff --git a/arch/x86/include/asm/thread_info.h b/arch/x86/include/asm/thread_info.h
-index 89f794f..d9fbfa1 100644
---- a/arch/x86/include/asm/thread_info.h
-+++ b/arch/x86/include/asm/thread_info.h
-@@ -167,9 +167,11 @@ struct thread_info {
-  */
- #ifndef __ASSEMBLY__
+diff --git a/include/asm-generic/sections.h b/include/asm-generic/sections.h
+index c1a1216..eab95aa 100644
+--- a/include/asm-generic/sections.h
++++ b/include/asm-generic/sections.h
+@@ -3,20 +3,20 @@
  
--
--/* how to get the current stack pointer from C */
--register unsigned long current_stack_pointer asm("esp") __used;
-+#define current_stack_pointer ({ 		\
-+	unsigned long sp;			\
-+	asm("mov %%esp,%0" : "=r" (sp));	\
-+	sp;					\
-+})
+ /* References to section boundaries */
  
- /* how to get the thread information struct from C */
- static inline struct thread_info *current_thread_info(void)
+-extern char _text[], _stext[], _etext[];
+-extern char _data[], _sdata[], _edata[];
+-extern char __bss_start[], __bss_stop[];
+-extern char __init_begin[], __init_end[];
+-extern char _sinittext[], _einittext[];
+-extern char _end[];
+-extern char __per_cpu_load[], __per_cpu_start[], __per_cpu_end[];
+-extern char __kprobes_text_start[], __kprobes_text_end[];
+-extern char __entry_text_start[], __entry_text_end[];
+-extern char __initdata_begin[], __initdata_end[];
+-extern char __start_rodata[], __end_rodata[];
++extern __visible char _text[], _stext[], _etext[];
++extern __visible char _data[], _sdata[], _edata[];
++extern __visible char __bss_start[], __bss_stop[];
++extern __visible char __init_begin[], __init_end[];
++extern __visible char _sinittext[], _einittext[];
++extern __visible char _end[];
++extern __visible char __per_cpu_load[], __per_cpu_start[], __per_cpu_end[];
++extern __visible char __kprobes_text_start[], __kprobes_text_end[];
++extern __visible char __entry_text_start[], __entry_text_end[];
++extern __visible char __initdata_begin[], __initdata_end[];
++extern __visible char __start_rodata[], __end_rodata[];
+ 
+ /* Start and end of .ctors section - used for constructor calls. */
+-extern char __ctors_start[], __ctors_end[];
++extern __visible char __ctors_start[], __ctors_end[];
+ 
+ /* function descriptor handling (if any).  Override
+  * in asm/sections.h */
 -- 
 1.7.7.6
 
