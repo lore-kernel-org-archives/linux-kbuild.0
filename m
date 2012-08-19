@@ -1,43 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from one.firstfloor.org ([213.235.205.2]:58315 "EHLO
-	one.firstfloor.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753519Ab2HSPJw (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 19 Aug 2012 11:09:52 -0400
-Date: Sun, 19 Aug 2012 17:09:52 +0200
-From: Andi Kleen <andi@firstfloor.org>
-Subject: Re: [PATCH 37/74] lto, KVM: Don't assume asm statements end up in the same assembler file
-Message-ID: <20120819150951.GR11413@one.firstfloor.org>
-References: <1345345030-22211-1-git-send-email-andi@firstfloor.org> <1345345030-22211-38-git-send-email-andi@firstfloor.org> <5030AB00.3090908@redhat.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5030AB00.3090908@redhat.com>
+Received: from mx1.redhat.com ([209.132.183.28]:55332 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753411Ab2HSPNs (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 19 Aug 2012 11:13:48 -0400
+Message-ID: <50310279.8070409@redhat.com>
+Date: Sun, 19 Aug 2012 18:12:57 +0300
+From: Avi Kivity <avi@redhat.com>
+MIME-Version: 1.0
+Subject: Re: [PATCH 37/74] lto, KVM: Don't assume asm statements end up in
+ the same assembler file
+References: <1345345030-22211-1-git-send-email-andi@firstfloor.org> <1345345030-22211-38-git-send-email-andi@firstfloor.org> <5030AB00.3090908@redhat.com> <20120819150951.GR11413@one.firstfloor.org>
+In-Reply-To: <20120819150951.GR11413@one.firstfloor.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Avi Kivity <avi@redhat.com>
-Cc: Andi Kleen <andi@firstfloor.org>, linux-kernel@vger.kernel.org, x86@kernel.org, mmarek@suse.cz, linux-kbuild@vger.kernel.org, JBeulich@suse.com, akpm@linux-foundation.org, Andi Kleen <ak@linux.intel.com>, Marcelo Tosatti <mtosatti@redhat.com>, KVM list <kvm@vger.kernel.org>
+To: Andi Kleen <andi@firstfloor.org>
+Cc: linux-kernel@vger.kernel.org, x86@kernel.org, mmarek@suse.cz, linux-kbuild@vger.kernel.org, JBeulich@suse.com, akpm@linux-foundation.org, Andi Kleen <ak@linux.intel.com>, Marcelo Tosatti <mtosatti@redhat.com>, KVM list <kvm@vger.kernel.org>
 
-> The reason we use a local label is so that we the function isn't split
-> into two from the profiler's point of view.  See cd2276a795b013d1.
+On 08/19/2012 06:09 PM, Andi Kleen wrote:
+>> The reason we use a local label is so that we the function isn't split
+>> into two from the profiler's point of view.  See cd2276a795b013d1.
+> 
+> Hmm that commit message is not very enlightening.
+> 
+> The goal was to force a compiler error?
 
-Hmm that commit message is not very enlightening.
-
-The goal was to force a compiler error?
-
-With LTO there is no way to force two functions be in the same assembler
-file. The partitioner is always allowed to split.
+No, the goal was to avoid a global label in the middle of a function.
+The profiler interprets it as a new function.  After your patch,
+profiles will show a function named kvm_vmx_return taking a few percent
+cpu, although there is no such function.
 
 > 
-> One way to fix this is to have a .data variable initialized to point to
-> .Lkvm_vmx_return (this can be done from the same asm statement in
-> vmx_vcpu_run), and reference that variable in
-> vmx_set_constant_host_state().  If no one comes up with a better idea,
-> I'll write a patch doing this.
+> With LTO there is no way to force two functions be in the same assembler
+> file. The partitioner is always allowed to split.
 
-I'm not clear how that is better than my patch.
+I'm not trying to force two functions to be in the same assembler file.
 
--andi
+> 
+>> 
+>> One way to fix this is to have a .data variable initialized to point to
+>> .Lkvm_vmx_return (this can be done from the same asm statement in
+>> vmx_vcpu_run), and reference that variable in
+>> vmx_set_constant_host_state().  If no one comes up with a better idea,
+>> I'll write a patch doing this.
+> 
+> I'm not clear how that is better than my patch.
+
+My patch will not generate the artifact with kvm_vmx_return.
 
 -- 
-ak@linux.intel.com -- Speaking for myself only.
+error compiling committee.c: too many arguments to function
