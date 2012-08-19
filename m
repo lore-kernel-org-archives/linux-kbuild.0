@@ -1,12 +1,12 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:52526 "EHLO mga09.intel.com"
+Received: from mga09.intel.com ([134.134.136.24]:45201 "EHLO mga09.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753086Ab2HSC52 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	id S1753119Ab2HSC52 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
 	Sat, 18 Aug 2012 22:57:28 -0400
 From: Andi Kleen <andi@firstfloor.org>
-Subject: [PATCH 63/74] Kbuild, lto: Print correct info messages for vmlinux link
-Date: Sat, 18 Aug 2012 19:56:59 -0700
-Message-Id: <1345345030-22211-64-git-send-email-andi@firstfloor.org>
+Subject: [PATCH 50/74] x86, lto: Make empty_zero_page __visible for LTO
+Date: Sat, 18 Aug 2012 19:56:46 -0700
+Message-Id: <1345345030-22211-51-git-send-email-andi@firstfloor.org>
 In-Reply-To: <1345345030-22211-1-git-send-email-andi@firstfloor.org>
 References: <1345345030-22211-1-git-send-email-andi@firstfloor.org>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -16,34 +16,25 @@ Cc: x86@kernel.org, mmarek@suse.cz, linux-kbuild@vger.kernel.org, JBeulich@suse.
 
 From: Andi Kleen <ak@linux.intel.com>
 
-With LTO the tmp_vmlinux builds can take very long. Have own messages
-to print so that it's clear what's going on. Previously the vmlinux
-link would really happen during "LD init/built-in.o"
-
-Also print separate messages for all the vmlinux link steps.
-
 Signed-off-by: Andi Kleen <ak@linux.intel.com>
 ---
- scripts/link-vmlinux.sh |    2 ++
- 1 files changed, 2 insertions(+), 0 deletions(-)
+ arch/x86/include/asm/pgtable.h |    3 ++-
+ 1 files changed, 2 insertions(+), 1 deletions(-)
 
-diff --git a/scripts/link-vmlinux.sh b/scripts/link-vmlinux.sh
-index 4629038..a05c49c 100644
---- a/scripts/link-vmlinux.sh
-+++ b/scripts/link-vmlinux.sh
-@@ -176,10 +176,12 @@ if [ -n "${CONFIG_KALLSYMS}" ]; then
- 	kallsyms_vmlinux=.tmp_vmlinux2
+diff --git a/arch/x86/include/asm/pgtable.h b/arch/x86/include/asm/pgtable.h
+index 49afb3f..72b24ab 100644
+--- a/arch/x86/include/asm/pgtable.h
++++ b/arch/x86/include/asm/pgtable.h
+@@ -22,7 +22,8 @@
+  * ZERO_PAGE is a global shared page that is always zero: used
+  * for zero-mapped memory areas etc..
+  */
+-extern unsigned long empty_zero_page[PAGE_SIZE / sizeof(unsigned long)];
++extern unsigned long empty_zero_page[PAGE_SIZE / sizeof(unsigned long)]
++	__visible;
+ #define ZERO_PAGE(vaddr) (virt_to_page(empty_zero_page))
  
- 	# step 1
-+	info LDFINAL .tmp_vmlinux1
- 	vmlinux_link "" .tmp_vmlinux1
- 	kallsyms .tmp_vmlinux1 .tmp_kallsyms1.o
- 
- 	# step 2
-+	info LDFINAL .tmp_vmlinux2
- 	vmlinux_link .tmp_kallsyms1.o .tmp_vmlinux2
- 	kallsyms .tmp_vmlinux2 .tmp_kallsyms2.o
- 
+ extern spinlock_t pgd_lock;
 -- 
 1.7.7.6
 
