@@ -1,55 +1,95 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga11.intel.com ([192.55.52.93]:1635 "EHLO mga11.intel.com"
+Received: from mga03.intel.com ([143.182.124.21]:42975 "EHLO mga03.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753516Ab2HSC5i (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 18 Aug 2012 22:57:38 -0400
+	id S1752511Ab2HSC50 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 18 Aug 2012 22:57:26 -0400
 From: Andi Kleen <andi@firstfloor.org>
-Subject: [PATCH 38/74] lto, watchdog/hpwdt.c: Make assembler label global
-Date: Sat, 18 Aug 2012 19:56:34 -0700
-Message-Id: <1345345030-22211-39-git-send-email-andi@firstfloor.org>
+Subject: [PATCH 10/74] sections: Add __visible to drivers/{base,pci} sections
+Date: Sat, 18 Aug 2012 19:56:06 -0700
+Message-Id: <1345345030-22211-11-git-send-email-andi@firstfloor.org>
 In-Reply-To: <1345345030-22211-1-git-send-email-andi@firstfloor.org>
 References: <1345345030-22211-1-git-send-email-andi@firstfloor.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org
-Cc: x86@kernel.org, mmarek@suse.cz, linux-kbuild@vger.kernel.org, JBeulich@suse.com, akpm@linux-foundation.org, Andi Kleen <ak@linux.intel.com>, wim@iguana.be
+Cc: x86@kernel.org, mmarek@suse.cz, linux-kbuild@vger.kernel.org, JBeulich@suse.com, akpm@linux-foundation.org, Andi Kleen <ak@linux.intel.com>
 
 From: Andi Kleen <ak@linux.intel.com>
 
-We cannot assume that the inline assembler code always ends up
-in the same file as the original C file. So make any assembler labels
-that are called with "extern" by C global
-
-Cc: wim@iguana.be
 Signed-off-by: Andi Kleen <ak@linux.intel.com>
 ---
- drivers/watchdog/hpwdt.c |    6 ++++--
- 1 files changed, 4 insertions(+), 2 deletions(-)
+ drivers/base/firmware_class.c |    4 ++--
+ drivers/base/power/trace.c    |    2 +-
+ drivers/pci/quirks.c          |   28 ++++++++++++++--------------
+ 3 files changed, 17 insertions(+), 17 deletions(-)
 
-diff --git a/drivers/watchdog/hpwdt.c b/drivers/watchdog/hpwdt.c
-index 1eff743..68bda60 100644
---- a/drivers/watchdog/hpwdt.c
-+++ b/drivers/watchdog/hpwdt.c
-@@ -161,7 +161,8 @@ extern asmlinkage void asminline_call(struct cmn_registers *pi86Regs,
- #define HPWDT_ARCH	32
+diff --git a/drivers/base/firmware_class.c b/drivers/base/firmware_class.c
+index 803cfc1..618ca735 100644
+--- a/drivers/base/firmware_class.c
++++ b/drivers/base/firmware_class.c
+@@ -30,8 +30,8 @@ MODULE_LICENSE("GPL");
  
- asm(".text                          \n\t"
--    ".align 4                       \n"
-+    ".align 4                       \n\t"
-+    ".globl asminline_call	    \n"
-     "asminline_call:                \n\t"
-     "pushl       %ebp               \n\t"
-     "movl        %esp, %ebp         \n\t"
-@@ -351,7 +352,8 @@ static int __devinit detect_cru_service(void)
- #define HPWDT_ARCH	64
+ #ifdef CONFIG_FW_LOADER
  
- asm(".text                      \n\t"
--    ".align 4                   \n"
-+    ".align 4                   \n\t"
-+    ".globl asminline_call	\n"
-     "asminline_call:            \n\t"
-     "pushq      %rbp            \n\t"
-     "movq       %rsp, %rbp      \n\t"
+-extern struct builtin_fw __start_builtin_fw[];
+-extern struct builtin_fw __end_builtin_fw[];
++extern __visible struct builtin_fw __start_builtin_fw[];
++extern __visible struct builtin_fw __end_builtin_fw[];
+ 
+ static bool fw_get_builtin_firmware(struct firmware *fw, const char *name)
+ {
+diff --git a/drivers/base/power/trace.c b/drivers/base/power/trace.c
+index d94a1f5..3048afa 100644
+--- a/drivers/base/power/trace.c
++++ b/drivers/base/power/trace.c
+@@ -166,7 +166,7 @@ void generate_resume_trace(const void *tracedata, unsigned int user)
+ }
+ EXPORT_SYMBOL(generate_resume_trace);
+ 
+-extern char __tracedata_start, __tracedata_end;
++extern __visible char __tracedata_start, __tracedata_end;
+ static int show_file_hash(unsigned int value)
+ {
+ 	int match;
+diff --git a/drivers/pci/quirks.c b/drivers/pci/quirks.c
+index 5155317..d18ea93 100644
+--- a/drivers/pci/quirks.c
++++ b/drivers/pci/quirks.c
+@@ -2941,20 +2941,20 @@ static void pci_do_fixups(struct pci_dev *dev, struct pci_fixup *f,
+ 		}
+ }
+ 
+-extern struct pci_fixup __start_pci_fixups_early[];
+-extern struct pci_fixup __end_pci_fixups_early[];
+-extern struct pci_fixup __start_pci_fixups_header[];
+-extern struct pci_fixup __end_pci_fixups_header[];
+-extern struct pci_fixup __start_pci_fixups_final[];
+-extern struct pci_fixup __end_pci_fixups_final[];
+-extern struct pci_fixup __start_pci_fixups_enable[];
+-extern struct pci_fixup __end_pci_fixups_enable[];
+-extern struct pci_fixup __start_pci_fixups_resume[];
+-extern struct pci_fixup __end_pci_fixups_resume[];
+-extern struct pci_fixup __start_pci_fixups_resume_early[];
+-extern struct pci_fixup __end_pci_fixups_resume_early[];
+-extern struct pci_fixup __start_pci_fixups_suspend[];
+-extern struct pci_fixup __end_pci_fixups_suspend[];
++extern __visible struct pci_fixup __start_pci_fixups_early[];
++extern __visible struct pci_fixup __end_pci_fixups_early[];
++extern __visible struct pci_fixup __start_pci_fixups_header[];
++extern __visible struct pci_fixup __end_pci_fixups_header[];
++extern __visible struct pci_fixup __start_pci_fixups_final[];
++extern __visible struct pci_fixup __end_pci_fixups_final[];
++extern __visible struct pci_fixup __start_pci_fixups_enable[];
++extern __visible struct pci_fixup __end_pci_fixups_enable[];
++extern __visible struct pci_fixup __start_pci_fixups_resume[];
++extern __visible struct pci_fixup __end_pci_fixups_resume[];
++extern __visible struct pci_fixup __start_pci_fixups_resume_early[];
++extern __visible struct pci_fixup __end_pci_fixups_resume_early[];
++extern __visible struct pci_fixup __start_pci_fixups_suspend[];
++extern __visible struct pci_fixup __end_pci_fixups_suspend[];
+ 
+ static bool pci_apply_fixup_final_quirks;
+ 
 -- 
 1.7.7.6
 
