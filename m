@@ -1,12 +1,12 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga14.intel.com ([143.182.124.37]:30968 "EHLO mga14.intel.com"
+Received: from mga02.intel.com ([134.134.136.20]:14941 "EHLO mga02.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752429Ab2HSC50 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 18 Aug 2012 22:57:26 -0400
+	id S1753349Ab2HSC5e (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 18 Aug 2012 22:57:34 -0400
 From: Andi Kleen <andi@firstfloor.org>
-Subject: [PATCH 13/74] sections: Add __visible to init/* sections
-Date: Sat, 18 Aug 2012 19:56:09 -0700
-Message-Id: <1345345030-22211-14-git-send-email-andi@firstfloor.org>
+Subject: [PATCH 03/74] sections: Make external kallsyms tables __visible
+Date: Sat, 18 Aug 2012 19:55:59 -0700
+Message-Id: <1345345030-22211-4-git-send-email-andi@firstfloor.org>
 In-Reply-To: <1345345030-22211-1-git-send-email-andi@firstfloor.org>
 References: <1345345030-22211-1-git-send-email-andi@firstfloor.org>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -18,52 +18,40 @@ From: Andi Kleen <ak@linux.intel.com>
 
 Signed-off-by: Andi Kleen <ak@linux.intel.com>
 ---
- init/do_mounts_initrd.c |    2 +-
- init/initramfs.c        |    4 ++--
- init/main.c             |    2 +-
- 3 files changed, 4 insertions(+), 4 deletions(-)
+ kernel/kallsyms.c |   12 ++++++------
+ 1 files changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/init/do_mounts_initrd.c b/init/do_mounts_initrd.c
-index 135959a2..71a625e 100644
---- a/init/do_mounts_initrd.c
-+++ b/init/do_mounts_initrd.c
-@@ -36,7 +36,7 @@ __setup("noinitrd", no_initrd);
- static int __init do_linuxrc(void *_shell)
+diff --git a/kernel/kallsyms.c b/kernel/kallsyms.c
+index 2169fee..1b40cb7 100644
+--- a/kernel/kallsyms.c
++++ b/kernel/kallsyms.c
+@@ -36,20 +36,20 @@
+  * These will be re-linked against their real values
+  * during the second link stage.
+  */
+-extern const unsigned long kallsyms_addresses[] __attribute__((weak));
+-extern const u8 kallsyms_names[] __attribute__((weak));
++extern __visible const unsigned long kallsyms_addresses[] __attribute__((weak));
++extern __visible const u8 kallsyms_names[] __attribute__((weak));
+ 
+ /*
+  * Tell the compiler that the count isn't in the small data section if the arch
+  * has one (eg: FRV).
+  */
+-extern const unsigned long kallsyms_num_syms
++extern __visible const unsigned long kallsyms_num_syms
+ __attribute__((weak, section(".rodata")));
+ 
+-extern const u8 kallsyms_token_table[] __attribute__((weak));
+-extern const u16 kallsyms_token_index[] __attribute__((weak));
++extern __visible const u8 kallsyms_token_table[] __attribute__((weak));
++extern __visible const u16 kallsyms_token_index[] __attribute__((weak));
+ 
+-extern const unsigned long kallsyms_markers[] __attribute__((weak));
++extern __visible const unsigned long kallsyms_markers[] __attribute__((weak));
+ 
+ static inline int is_kernel_inittext(unsigned long addr)
  {
- 	static const char *argv[] = { "linuxrc", NULL, };
--	extern const char *envp_init[];
-+	extern __visible const char *envp_init[];
- 	const char *shell = _shell;
- 
- 	sys_close(old_fd);sys_close(root_fd);
-diff --git a/init/initramfs.c b/init/initramfs.c
-index 84c6bf1..8a1fd07 100644
---- a/init/initramfs.c
-+++ b/init/initramfs.c
-@@ -493,8 +493,8 @@ static int __init retain_initrd_param(char *str)
- }
- __setup("retain_initrd", retain_initrd_param);
- 
--extern char __initramfs_start[];
--extern unsigned long __initramfs_size;
-+extern __visible char __initramfs_start[];
-+extern __visible unsigned long __initramfs_size;
- #include <linux/initrd.h>
- #include <linux/kexec.h>
- 
-diff --git a/init/main.c b/init/main.c
-index e60679d..6438ffd 100644
---- a/init/main.c
-+++ b/init/main.c
-@@ -470,7 +470,7 @@ static void __init mm_init(void)
- asmlinkage void __init start_kernel(void)
- {
- 	char * command_line;
--	extern const struct kernel_param __start___param[], __stop___param[];
-+	extern __visible const struct kernel_param __start___param[], __stop___param[];
- 
- 	/*
- 	 * Need to run as early as possible, to initialize the
 -- 
 1.7.7.6
 
