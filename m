@@ -1,17 +1,17 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from nat28.tlf.novell.com ([130.57.49.28]:44694 "EHLO
+Received: from nat28.tlf.novell.com ([130.57.49.28]:37268 "EHLO
 	nat28.tlf.novell.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752733Ab2HSIqH convert rfc822-to-8bit (ORCPT
-	<rfc822;groupwise-linux-kbuild@vger.kernel.org:6:1>);
-	Sun, 19 Aug 2012 04:46:07 -0400
-Message-Id: <5030B5DC020000780008A226@nat28.tlf.novell.com>
-Date: Sun, 19 Aug 2012 09:46:04 +0100
+	with ESMTP id S1753260Ab2HSIxG convert rfc822-to-8bit (ORCPT
+	<rfc822;groupwise-linux-kbuild@vger.kernel.org:8:1>);
+	Sun, 19 Aug 2012 04:53:06 -0400
+Message-Id: <5030B77E020000780008A233@nat28.tlf.novell.com>
+Date: Sun, 19 Aug 2012 09:53:02 +0100
 From: "Jan Beulich" <jbeulich@suse.com>
-Subject: Re: [PATCH 55/74] lto, workaround: Add workaround for initcall
- reordering
+Subject: Re: [PATCH 59/74] lto: Handle LTO common symbols in module
+ loader
 References: <1345345030-22211-1-git-send-email-andi@firstfloor.org>
- <1345345030-22211-56-git-send-email-andi@firstfloor.org>
-In-Reply-To: <1345345030-22211-56-git-send-email-andi@firstfloor.org>
+ <1345345030-22211-60-git-send-email-andi@firstfloor.org>
+In-Reply-To: <1345345030-22211-60-git-send-email-andi@firstfloor.org>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8BIT
@@ -19,31 +19,28 @@ Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: andi@firstfloor.org, ak@linux.intel.com, linux-kernel@vger.kernel.org
-Cc: x86@kernel.org, akpm@linux-foundation.org, mmarek@suse.cz, linux-kbuild@vger.kernel.org
+Cc: x86@kernel.org, akpm@linux-foundation.org, jmario@redhat.com, rusty@rustcorp.com.au, mmarek@suse.cz, linux-kbuild@vger.kernel.org
 
->>> Andi Kleen <andi@firstfloor.org> 08/19/12 5:05 AM >>>
->Work around a LTO gcc problem: when there is no reference to a variable
->in a module it will be moved to the end of the program. This causes
->reordering of initcalls which the kernel does not like.
->Add a dummy reference function to avoid this. The function is
->deleted by the linker.
+>>> Andi Kleen <andi@firstfloor.org> 08/19/12 4:59 AM >>>
+>@@ -1904,6 +1904,10 @@ static int simplify_symbols(struct module *mod, const struct load_info *info)
+ >
+>        switch (sym[i].st_shndx) {
+>        case SHN_COMMON:
+>+            /* Ignore common symbols */
+>+            if (!strncmp(name, "__gnu_lto", 9))
+>+                break;
+>+
+>            /* We compiled with -fno-common.  These are not
+>               supposed to happen.  */
+>            pr_debug("Common symbol: %s\n", name);
 
-This is not even true on x86, not to speak of generally.
+I think it is dangerous to just match the start of the symbol name here -
+this may in the future well lead to ignoring symbols we shouldn't be
+ignoring.
 
->+#ifdef CONFIG_LTO
->+/* Work around a LTO gcc problem: when there is no reference to a variable
->+ * in a module it will be moved to the end of the program. This causes
->+ * reordering of initcalls which the kernel does not like.
->+ * Add a dummy reference function to avoid this. The function is 
->+ * deleted by the linker.
->+ */
->+#define LTO_REFERENCE_INITCALL(x) \
->+    ; /* yes this is needed */            \
->+    static __used __exit void *reference_##x(void)     \
-
-Why not put it into e.g. section .discard.text? That could be expected to be
-discarded by the linker without being arch dependent, as long as all arches
-use DISCARDS in their linker script.
+Also I would think the added comment ought to say "Ignore LTO symbols."
+Otherwise its sort of contradicting the purpose of the case being handled
+here.
 
 Jan
 
