@@ -1,36 +1,65 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.snhosting.dk ([87.238.248.203]:29925 "EHLO
-	smtp.domainteam.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1758432Ab2HQQyO (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 17 Aug 2012 12:54:14 -0400
-Date: Fri, 17 Aug 2012 18:54:11 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH] kconfig: allow ARCH set to 'the machine hardware
-	name', like 's390x' but not 's390'
-Message-ID: <20120817165411.GA11373@merkur.ravnborg.org>
-References: <1345189199-22145-1-git-send-email-adam8157@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1345189199-22145-1-git-send-email-adam8157@gmail.com>
+Received: from mga09.intel.com ([134.134.136.24]:30195 "EHLO mga09.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751671Ab2HSC5Z (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 18 Aug 2012 22:57:25 -0400
+From: Andi Kleen <andi@firstfloor.org>
+Subject: [PATCH 04/74] sections: Add __visible to ia64 sections
+Date: Sat, 18 Aug 2012 19:56:00 -0700
+Message-Id: <1345345030-22211-5-git-send-email-andi@firstfloor.org>
+In-Reply-To: <1345345030-22211-1-git-send-email-andi@firstfloor.org>
+References: <1345345030-22211-1-git-send-email-andi@firstfloor.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Adam Lee <adam8157@gmail.com>
-Cc: linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, "open list:KERNEL BUILD + fi..." <linux-kbuild@vger.kernel.org>
+To: linux-kernel@vger.kernel.org
+Cc: x86@kernel.org, mmarek@suse.cz, linux-kbuild@vger.kernel.org, JBeulich@suse.com, akpm@linux-foundation.org, Andi Kleen <ak@linux.intel.com>
 
-On Fri, Aug 17, 2012 at 03:39:59PM +0800, Adam Lee wrote:
-> This patch add support for setting ARCH to 'the machine hardware
-> name'(`uname -m).
+From: Andi Kleen <ak@linux.intel.com>
 
-Snip from s390 Makefile:
+Signed-off-by: Andi Kleen <ak@linux.intel.com>
+---
+ arch/ia64/include/asm/sections.h |   26 +++++++++++++-------------
+ 1 files changed, 13 insertions(+), 13 deletions(-)
 
-ifeq ($(CONFIG_64BIT),y)
-        $(Q)$(MAKE) $(build)=arch/$(ARCH)/kernel/vdso64 $@
-endif
-        $(Q)$(MAKE) $(build)=arch/$(ARCH)/kernel/vdso32 $@
+diff --git a/arch/ia64/include/asm/sections.h b/arch/ia64/include/asm/sections.h
+index 1a873b3..68b8f3a 100644
+--- a/arch/ia64/include/asm/sections.h
++++ b/arch/ia64/include/asm/sections.h
+@@ -10,21 +10,21 @@
+ #include <linux/uaccess.h>
+ #include <asm-generic/sections.h>
+ 
+-extern char __per_cpu_start[], __per_cpu_end[], __phys_per_cpu_start[];
++extern __visible char __per_cpu_start[], __per_cpu_end[], __phys_per_cpu_start[];
+ #ifdef	CONFIG_SMP
+-extern char __cpu0_per_cpu[];
++extern __visible char __cpu0_per_cpu[];
+ #endif
+-extern char __start___vtop_patchlist[], __end___vtop_patchlist[];
+-extern char __start___rse_patchlist[], __end___rse_patchlist[];
+-extern char __start___mckinley_e9_bundles[], __end___mckinley_e9_bundles[];
+-extern char __start___phys_stack_reg_patchlist[], __end___phys_stack_reg_patchlist[];
+-extern char __start_gate_section[];
+-extern char __start_gate_mckinley_e9_patchlist[], __end_gate_mckinley_e9_patchlist[];
+-extern char __start_gate_vtop_patchlist[], __end_gate_vtop_patchlist[];
+-extern char __start_gate_fsyscall_patchlist[], __end_gate_fsyscall_patchlist[];
+-extern char __start_gate_brl_fsys_bubble_down_patchlist[], __end_gate_brl_fsys_bubble_down_patchlist[];
+-extern char __start_unwind[], __end_unwind[];
+-extern char __start_ivt_text[], __end_ivt_text[];
++extern __visible char __start___vtop_patchlist[], __end___vtop_patchlist[];
++extern __visible char __start___rse_patchlist[], __end___rse_patchlist[];
++extern __visible char __start___mckinley_e9_bundles[], __end___mckinley_e9_bundles[];
++extern __visible char __start___phys_stack_reg_patchlist[], __end___phys_stack_reg_patchlist[];
++extern __visible char __start_gate_section[];
++extern __visible char __start_gate_mckinley_e9_patchlist[], __end_gate_mckinley_e9_patchlist[];
++extern __visible char __start_gate_vtop_patchlist[], __end_gate_vtop_patchlist[];
++extern __visible char __start_gate_fsyscall_patchlist[], __end_gate_fsyscall_patchlist[];
++extern __visible char __start_gate_brl_fsys_bubble_down_patchlist[], __end_gate_brl_fsys_bubble_down_patchlist[];
++extern __visible char __start_unwind[], __end_unwind[];
++extern __visible char __start_ivt_text[], __end_ivt_text[];
+ 
+ #undef dereference_function_descriptor
+ static inline void *dereference_function_descriptor(void *ptr)
+-- 
+1.7.7.6
 
-You need more changes to support this.
-Check all arch Makefiles for similar uses.
-
-	Sam
