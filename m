@@ -1,62 +1,59 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:36894 "EHLO mga02.intel.com"
+Received: from mga02.intel.com ([134.134.136.20]:64945 "EHLO mga02.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753903Ab2HSC5n (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	id S1753912Ab2HSC5n (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
 	Sat, 18 Aug 2012 22:57:43 -0400
 From: Andi Kleen <andi@firstfloor.org>
-Subject: [PATCH 31/74] x86, lto: Make various variables used by assembler code __visible
-Date: Sat, 18 Aug 2012 19:56:27 -0700
-Message-Id: <1345345030-22211-32-git-send-email-andi@firstfloor.org>
+Subject: [PATCH 40/74] lto, powerpc: Disable LTO for the powerpc VDSO
+Date: Sat, 18 Aug 2012 19:56:36 -0700
+Message-Id: <1345345030-22211-41-git-send-email-andi@firstfloor.org>
 In-Reply-To: <1345345030-22211-1-git-send-email-andi@firstfloor.org>
 References: <1345345030-22211-1-git-send-email-andi@firstfloor.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org
-Cc: x86@kernel.org, mmarek@suse.cz, linux-kbuild@vger.kernel.org, JBeulich@suse.com, akpm@linux-foundation.org, Andi Kleen <ak@linux.intel.com>
+Cc: x86@kernel.org, mmarek@suse.cz, linux-kbuild@vger.kernel.org, JBeulich@suse.com, akpm@linux-foundation.org, Andi Kleen <ak@linux.intel.com>, benh@kernel.crashing.org
 
 From: Andi Kleen <ak@linux.intel.com>
 
+VDSO does not play well with LTO, so just disable it.
+
+(note that powerpc will likely need more changes for LTO, this was
+just from grep)
+
+Cc: benh@kernel.crashing.org
 Signed-off-by: Andi Kleen <ak@linux.intel.com>
 ---
- arch/x86/kernel/cpu/common.c |    4 ++--
- arch/x86/kernel/process_64.c |    2 +-
- 2 files changed, 3 insertions(+), 3 deletions(-)
+ arch/powerpc/kernel/vdso32/Makefile |    2 +-
+ arch/powerpc/kernel/vdso64/Makefile |    2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/kernel/cpu/common.c b/arch/x86/kernel/cpu/common.c
-index 46d8786..8f12e8c 100644
---- a/arch/x86/kernel/cpu/common.c
-+++ b/arch/x86/kernel/cpu/common.c
-@@ -1075,7 +1075,7 @@ EXPORT_PER_CPU_SYMBOL(kernel_stack);
- DEFINE_PER_CPU(char *, irq_stack_ptr) =
- 	init_per_cpu_var(irq_stack_union.irq_stack) + IRQ_STACK_SIZE - 64;
+diff --git a/arch/powerpc/kernel/vdso32/Makefile b/arch/powerpc/kernel/vdso32/Makefile
+index 53e6c9b..8cc88bf 100644
+--- a/arch/powerpc/kernel/vdso32/Makefile
++++ b/arch/powerpc/kernel/vdso32/Makefile
+@@ -16,7 +16,7 @@ obj-vdso32 := $(addprefix $(obj)/, $(obj-vdso32))
  
--DEFINE_PER_CPU(unsigned int, irq_count) = -1;
-+DEFINE_PER_CPU(unsigned int, irq_count) __visible = -1;
+ GCOV_PROFILE := n
  
- DEFINE_PER_CPU(struct task_struct *, fpu_owner_task);
+-ccflags-y := -shared -fno-common -fno-builtin
++ccflags-y := -shared -fno-common -fno-builtin $(DISABLE_LTO)
+ ccflags-y += -nostdlib -Wl,-soname=linux-vdso32.so.1 \
+ 		$(call cc-ldoption, -Wl$(comma)--hash-style=sysv)
+ asflags-y := -D__VDSO32__ -s
+diff --git a/arch/powerpc/kernel/vdso64/Makefile b/arch/powerpc/kernel/vdso64/Makefile
+index effca94..5bca644 100644
+--- a/arch/powerpc/kernel/vdso64/Makefile
++++ b/arch/powerpc/kernel/vdso64/Makefile
+@@ -9,7 +9,7 @@ obj-vdso64 := $(addprefix $(obj)/, $(obj-vdso64))
  
-@@ -1114,7 +1114,7 @@ void syscall_init(void)
- 	       X86_EFLAGS_TF|X86_EFLAGS_DF|X86_EFLAGS_IF|X86_EFLAGS_IOPL);
- }
+ GCOV_PROFILE := n
  
--unsigned long kernel_eflags;
-+unsigned long kernel_eflags __visible;
- 
- /*
-  * Copies of the original ist values from the tss are only accessed during
-diff --git a/arch/x86/kernel/process_64.c b/arch/x86/kernel/process_64.c
-index a5720ed..34435e2 100644
---- a/arch/x86/kernel/process_64.c
-+++ b/arch/x86/kernel/process_64.c
-@@ -52,7 +52,7 @@
- 
- asmlinkage extern void ret_from_fork(void);
- 
--DEFINE_PER_CPU(unsigned long, old_rsp);
-+asmlinkage DEFINE_PER_CPU(unsigned long, old_rsp);
- 
- /* Prints also some state that isn't saved in the pt_regs */
- void __show_regs(struct pt_regs *regs, int all)
+-ccflags-y := -shared -fno-common -fno-builtin
++ccflags-y := -shared -fno-common -fno-builtin $(DISABLE_LTO)
+ ccflags-y += -nostdlib -Wl,-soname=linux-vdso64.so.1 \
+ 		$(call cc-ldoption, -Wl$(comma)--hash-style=sysv)
+ asflags-y := -D__VDSO64__ -s
 -- 
 1.7.7.6
 
