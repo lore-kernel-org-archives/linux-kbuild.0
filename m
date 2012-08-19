@@ -1,284 +1,103 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga03.intel.com ([143.182.124.21]:51768 "EHLO mga03.intel.com"
+Received: from mga14.intel.com ([143.182.124.37]:42537 "EHLO mga14.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753217Ab2HSC5a (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	id S1752311Ab2HSC5a (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
 	Sat, 18 Aug 2012 22:57:30 -0400
 From: Andi Kleen <andi@firstfloor.org>
-Subject: [PATCH 72/74] lto: Mark spinlocks noinline when inline spinlocks are disabled
-Date: Sat, 18 Aug 2012 19:57:08 -0700
-Message-Id: <1345345030-22211-73-git-send-email-andi@firstfloor.org>
+Subject: [PATCH 36/74] lto, crypto, camelia: Make camelia tables used by assembler __visible
+Date: Sat, 18 Aug 2012 19:56:32 -0700
+Message-Id: <1345345030-22211-37-git-send-email-andi@firstfloor.org>
 In-Reply-To: <1345345030-22211-1-git-send-email-andi@firstfloor.org>
 References: <1345345030-22211-1-git-send-email-andi@firstfloor.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org
-Cc: x86@kernel.org, mmarek@suse.cz, linux-kbuild@vger.kernel.org, JBeulich@suse.com, akpm@linux-foundation.org, Andi Kleen <ak@linux.intel.com>
+Cc: x86@kernel.org, mmarek@suse.cz, linux-kbuild@vger.kernel.org, JBeulich@suse.com, akpm@linux-foundation.org, Andi Kleen <ak@linux.intel.com>, herbert@gondor.apana.org.au
 
 From: Andi Kleen <ak@linux.intel.com>
 
-Otherwise LTO will inline them anyways
-
+Cc: herbert@gondor.apana.org.au
 Signed-off-by: Andi Kleen <ak@linux.intel.com>
 ---
- kernel/spinlock.c |   56 ++++++++++++++++++++++++++--------------------------
- 1 files changed, 28 insertions(+), 28 deletions(-)
+ arch/x86/crypto/camellia_glue.c |   16 ++++++++--------
+ 1 files changed, 8 insertions(+), 8 deletions(-)
 
-diff --git a/kernel/spinlock.c b/kernel/spinlock.c
-index 75439be..e68917a 100644
---- a/kernel/spinlock.c
-+++ b/kernel/spinlock.c
-@@ -116,7 +116,7 @@ BUILD_LOCK_OPS(write, rwlock);
- #endif
- 
- #ifndef CONFIG_INLINE_SPIN_TRYLOCK
--int __lockfunc _raw_spin_trylock(raw_spinlock_t *lock)
-+noinline int __lockfunc _raw_spin_trylock(raw_spinlock_t *lock)
- {
- 	return __raw_spin_trylock(lock);
+diff --git a/arch/x86/crypto/camellia_glue.c b/arch/x86/crypto/camellia_glue.c
+index eeb2b3b..f290db7 100644
+--- a/arch/x86/crypto/camellia_glue.c
++++ b/arch/x86/crypto/camellia_glue.c
+@@ -91,7 +91,7 @@ static void camellia_decrypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
  }
-@@ -124,7 +124,7 @@ EXPORT_SYMBOL(_raw_spin_trylock);
- #endif
  
- #ifndef CONFIG_INLINE_SPIN_TRYLOCK_BH
--int __lockfunc _raw_spin_trylock_bh(raw_spinlock_t *lock)
-+noinline int __lockfunc _raw_spin_trylock_bh(raw_spinlock_t *lock)
- {
- 	return __raw_spin_trylock_bh(lock);
- }
-@@ -132,7 +132,7 @@ EXPORT_SYMBOL(_raw_spin_trylock_bh);
- #endif
+ /* camellia sboxes */
+-const u64 camellia_sp10011110[256] = {
++__visible const u64 camellia_sp10011110[256] = {
+ 	0x7000007070707000, 0x8200008282828200, 0x2c00002c2c2c2c00,
+ 	0xec0000ecececec00, 0xb30000b3b3b3b300, 0x2700002727272700,
+ 	0xc00000c0c0c0c000, 0xe50000e5e5e5e500, 0xe40000e4e4e4e400,
+@@ -180,7 +180,7 @@ const u64 camellia_sp10011110[256] = {
+ 	0x9e00009e9e9e9e00,
+ };
  
- #ifndef CONFIG_INLINE_SPIN_LOCK
--void __lockfunc _raw_spin_lock(raw_spinlock_t *lock)
-+noinline void __lockfunc _raw_spin_lock(raw_spinlock_t *lock)
- {
- 	__raw_spin_lock(lock);
- }
-@@ -140,7 +140,7 @@ EXPORT_SYMBOL(_raw_spin_lock);
- #endif
+-const u64 camellia_sp22000222[256] = {
++__visible const u64 camellia_sp22000222[256] = {
+ 	0xe0e0000000e0e0e0, 0x0505000000050505, 0x5858000000585858,
+ 	0xd9d9000000d9d9d9, 0x6767000000676767, 0x4e4e0000004e4e4e,
+ 	0x8181000000818181, 0xcbcb000000cbcbcb, 0xc9c9000000c9c9c9,
+@@ -269,7 +269,7 @@ const u64 camellia_sp22000222[256] = {
+ 	0x3d3d0000003d3d3d,
+ };
  
- #ifndef CONFIG_INLINE_SPIN_LOCK_IRQSAVE
--unsigned long __lockfunc _raw_spin_lock_irqsave(raw_spinlock_t *lock)
-+noinline unsigned long __lockfunc _raw_spin_lock_irqsave(raw_spinlock_t *lock)
- {
- 	return __raw_spin_lock_irqsave(lock);
- }
-@@ -148,7 +148,7 @@ EXPORT_SYMBOL(_raw_spin_lock_irqsave);
- #endif
+-const u64 camellia_sp03303033[256] = {
++__visible const u64 camellia_sp03303033[256] = {
+ 	0x0038380038003838, 0x0041410041004141, 0x0016160016001616,
+ 	0x0076760076007676, 0x00d9d900d900d9d9, 0x0093930093009393,
+ 	0x0060600060006060, 0x00f2f200f200f2f2, 0x0072720072007272,
+@@ -358,7 +358,7 @@ const u64 camellia_sp03303033[256] = {
+ 	0x004f4f004f004f4f,
+ };
  
- #ifndef CONFIG_INLINE_SPIN_LOCK_IRQ
--void __lockfunc _raw_spin_lock_irq(raw_spinlock_t *lock)
-+noinline void __lockfunc _raw_spin_lock_irq(raw_spinlock_t *lock)
- {
- 	__raw_spin_lock_irq(lock);
- }
-@@ -156,7 +156,7 @@ EXPORT_SYMBOL(_raw_spin_lock_irq);
- #endif
+-const u64 camellia_sp00444404[256] = {
++__visible const u64 camellia_sp00444404[256] = {
+ 	0x0000707070700070, 0x00002c2c2c2c002c, 0x0000b3b3b3b300b3,
+ 	0x0000c0c0c0c000c0, 0x0000e4e4e4e400e4, 0x0000575757570057,
+ 	0x0000eaeaeaea00ea, 0x0000aeaeaeae00ae, 0x0000232323230023,
+@@ -447,7 +447,7 @@ const u64 camellia_sp00444404[256] = {
+ 	0x00009e9e9e9e009e,
+ };
  
- #ifndef CONFIG_INLINE_SPIN_LOCK_BH
--void __lockfunc _raw_spin_lock_bh(raw_spinlock_t *lock)
-+noinline void __lockfunc _raw_spin_lock_bh(raw_spinlock_t *lock)
- {
- 	__raw_spin_lock_bh(lock);
- }
-@@ -164,7 +164,7 @@ EXPORT_SYMBOL(_raw_spin_lock_bh);
- #endif
+-const u64 camellia_sp02220222[256] = {
++__visible const u64 camellia_sp02220222[256] = {
+ 	0x00e0e0e000e0e0e0, 0x0005050500050505, 0x0058585800585858,
+ 	0x00d9d9d900d9d9d9, 0x0067676700676767, 0x004e4e4e004e4e4e,
+ 	0x0081818100818181, 0x00cbcbcb00cbcbcb, 0x00c9c9c900c9c9c9,
+@@ -536,7 +536,7 @@ const u64 camellia_sp02220222[256] = {
+ 	0x003d3d3d003d3d3d,
+ };
  
- #ifdef CONFIG_UNINLINE_SPIN_UNLOCK
--void __lockfunc _raw_spin_unlock(raw_spinlock_t *lock)
-+noinline void __lockfunc _raw_spin_unlock(raw_spinlock_t *lock)
- {
- 	__raw_spin_unlock(lock);
- }
-@@ -172,7 +172,7 @@ EXPORT_SYMBOL(_raw_spin_unlock);
- #endif
+-const u64 camellia_sp30333033[256] = {
++__visible const u64 camellia_sp30333033[256] = {
+ 	0x3800383838003838, 0x4100414141004141, 0x1600161616001616,
+ 	0x7600767676007676, 0xd900d9d9d900d9d9, 0x9300939393009393,
+ 	0x6000606060006060, 0xf200f2f2f200f2f2, 0x7200727272007272,
+@@ -625,7 +625,7 @@ const u64 camellia_sp30333033[256] = {
+ 	0x4f004f4f4f004f4f,
+ };
  
- #ifndef CONFIG_INLINE_SPIN_UNLOCK_IRQRESTORE
--void __lockfunc _raw_spin_unlock_irqrestore(raw_spinlock_t *lock, unsigned long flags)
-+noinline void __lockfunc _raw_spin_unlock_irqrestore(raw_spinlock_t *lock, unsigned long flags)
- {
- 	__raw_spin_unlock_irqrestore(lock, flags);
- }
-@@ -180,7 +180,7 @@ EXPORT_SYMBOL(_raw_spin_unlock_irqrestore);
- #endif
+-const u64 camellia_sp44044404[256] = {
++__visible const u64 camellia_sp44044404[256] = {
+ 	0x7070007070700070, 0x2c2c002c2c2c002c, 0xb3b300b3b3b300b3,
+ 	0xc0c000c0c0c000c0, 0xe4e400e4e4e400e4, 0x5757005757570057,
+ 	0xeaea00eaeaea00ea, 0xaeae00aeaeae00ae, 0x2323002323230023,
+@@ -714,7 +714,7 @@ const u64 camellia_sp44044404[256] = {
+ 	0x9e9e009e9e9e009e,
+ };
  
- #ifndef CONFIG_INLINE_SPIN_UNLOCK_IRQ
--void __lockfunc _raw_spin_unlock_irq(raw_spinlock_t *lock)
-+noinline void __lockfunc _raw_spin_unlock_irq(raw_spinlock_t *lock)
- {
- 	__raw_spin_unlock_irq(lock);
- }
-@@ -188,7 +188,7 @@ EXPORT_SYMBOL(_raw_spin_unlock_irq);
- #endif
- 
- #ifndef CONFIG_INLINE_SPIN_UNLOCK_BH
--void __lockfunc _raw_spin_unlock_bh(raw_spinlock_t *lock)
-+noinline void __lockfunc _raw_spin_unlock_bh(raw_spinlock_t *lock)
- {
- 	__raw_spin_unlock_bh(lock);
- }
-@@ -196,7 +196,7 @@ EXPORT_SYMBOL(_raw_spin_unlock_bh);
- #endif
- 
- #ifndef CONFIG_INLINE_READ_TRYLOCK
--int __lockfunc _raw_read_trylock(rwlock_t *lock)
-+noinline int __lockfunc _raw_read_trylock(rwlock_t *lock)
- {
- 	return __raw_read_trylock(lock);
- }
-@@ -204,7 +204,7 @@ EXPORT_SYMBOL(_raw_read_trylock);
- #endif
- 
- #ifndef CONFIG_INLINE_READ_LOCK
--void __lockfunc _raw_read_lock(rwlock_t *lock)
-+noinline void __lockfunc _raw_read_lock(rwlock_t *lock)
- {
- 	__raw_read_lock(lock);
- }
-@@ -212,7 +212,7 @@ EXPORT_SYMBOL(_raw_read_lock);
- #endif
- 
- #ifndef CONFIG_INLINE_READ_LOCK_IRQSAVE
--unsigned long __lockfunc _raw_read_lock_irqsave(rwlock_t *lock)
-+noinline unsigned long __lockfunc _raw_read_lock_irqsave(rwlock_t *lock)
- {
- 	return __raw_read_lock_irqsave(lock);
- }
-@@ -220,7 +220,7 @@ EXPORT_SYMBOL(_raw_read_lock_irqsave);
- #endif
- 
- #ifndef CONFIG_INLINE_READ_LOCK_IRQ
--void __lockfunc _raw_read_lock_irq(rwlock_t *lock)
-+noinline void __lockfunc _raw_read_lock_irq(rwlock_t *lock)
- {
- 	__raw_read_lock_irq(lock);
- }
-@@ -228,7 +228,7 @@ EXPORT_SYMBOL(_raw_read_lock_irq);
- #endif
- 
- #ifndef CONFIG_INLINE_READ_LOCK_BH
--void __lockfunc _raw_read_lock_bh(rwlock_t *lock)
-+noinline void __lockfunc _raw_read_lock_bh(rwlock_t *lock)
- {
- 	__raw_read_lock_bh(lock);
- }
-@@ -236,7 +236,7 @@ EXPORT_SYMBOL(_raw_read_lock_bh);
- #endif
- 
- #ifndef CONFIG_INLINE_READ_UNLOCK
--void __lockfunc _raw_read_unlock(rwlock_t *lock)
-+noinline void __lockfunc _raw_read_unlock(rwlock_t *lock)
- {
- 	__raw_read_unlock(lock);
- }
-@@ -244,7 +244,7 @@ EXPORT_SYMBOL(_raw_read_unlock);
- #endif
- 
- #ifndef CONFIG_INLINE_READ_UNLOCK_IRQRESTORE
--void __lockfunc _raw_read_unlock_irqrestore(rwlock_t *lock, unsigned long flags)
-+noinline void __lockfunc _raw_read_unlock_irqrestore(rwlock_t *lock, unsigned long flags)
- {
- 	__raw_read_unlock_irqrestore(lock, flags);
- }
-@@ -252,7 +252,7 @@ EXPORT_SYMBOL(_raw_read_unlock_irqrestore);
- #endif
- 
- #ifndef CONFIG_INLINE_READ_UNLOCK_IRQ
--void __lockfunc _raw_read_unlock_irq(rwlock_t *lock)
-+noinline void __lockfunc _raw_read_unlock_irq(rwlock_t *lock)
- {
- 	__raw_read_unlock_irq(lock);
- }
-@@ -260,7 +260,7 @@ EXPORT_SYMBOL(_raw_read_unlock_irq);
- #endif
- 
- #ifndef CONFIG_INLINE_READ_UNLOCK_BH
--void __lockfunc _raw_read_unlock_bh(rwlock_t *lock)
-+noinline void __lockfunc _raw_read_unlock_bh(rwlock_t *lock)
- {
- 	__raw_read_unlock_bh(lock);
- }
-@@ -268,7 +268,7 @@ EXPORT_SYMBOL(_raw_read_unlock_bh);
- #endif
- 
- #ifndef CONFIG_INLINE_WRITE_TRYLOCK
--int __lockfunc _raw_write_trylock(rwlock_t *lock)
-+noinline int __lockfunc _raw_write_trylock(rwlock_t *lock)
- {
- 	return __raw_write_trylock(lock);
- }
-@@ -276,7 +276,7 @@ EXPORT_SYMBOL(_raw_write_trylock);
- #endif
- 
- #ifndef CONFIG_INLINE_WRITE_LOCK
--void __lockfunc _raw_write_lock(rwlock_t *lock)
-+noinline void __lockfunc _raw_write_lock(rwlock_t *lock)
- {
- 	__raw_write_lock(lock);
- }
-@@ -284,7 +284,7 @@ EXPORT_SYMBOL(_raw_write_lock);
- #endif
- 
- #ifndef CONFIG_INLINE_WRITE_LOCK_IRQSAVE
--unsigned long __lockfunc _raw_write_lock_irqsave(rwlock_t *lock)
-+noinline unsigned long __lockfunc _raw_write_lock_irqsave(rwlock_t *lock)
- {
- 	return __raw_write_lock_irqsave(lock);
- }
-@@ -292,7 +292,7 @@ EXPORT_SYMBOL(_raw_write_lock_irqsave);
- #endif
- 
- #ifndef CONFIG_INLINE_WRITE_LOCK_IRQ
--void __lockfunc _raw_write_lock_irq(rwlock_t *lock)
-+noinline void __lockfunc _raw_write_lock_irq(rwlock_t *lock)
- {
- 	__raw_write_lock_irq(lock);
- }
-@@ -300,7 +300,7 @@ EXPORT_SYMBOL(_raw_write_lock_irq);
- #endif
- 
- #ifndef CONFIG_INLINE_WRITE_LOCK_BH
--void __lockfunc _raw_write_lock_bh(rwlock_t *lock)
-+noinline void __lockfunc _raw_write_lock_bh(rwlock_t *lock)
- {
- 	__raw_write_lock_bh(lock);
- }
-@@ -308,7 +308,7 @@ EXPORT_SYMBOL(_raw_write_lock_bh);
- #endif
- 
- #ifndef CONFIG_INLINE_WRITE_UNLOCK
--void __lockfunc _raw_write_unlock(rwlock_t *lock)
-+noinline void __lockfunc _raw_write_unlock(rwlock_t *lock)
- {
- 	__raw_write_unlock(lock);
- }
-@@ -316,7 +316,7 @@ EXPORT_SYMBOL(_raw_write_unlock);
- #endif
- 
- #ifndef CONFIG_INLINE_WRITE_UNLOCK_IRQRESTORE
--void __lockfunc _raw_write_unlock_irqrestore(rwlock_t *lock, unsigned long flags)
-+noinline void __lockfunc _raw_write_unlock_irqrestore(rwlock_t *lock, unsigned long flags)
- {
- 	__raw_write_unlock_irqrestore(lock, flags);
- }
-@@ -324,7 +324,7 @@ EXPORT_SYMBOL(_raw_write_unlock_irqrestore);
- #endif
- 
- #ifndef CONFIG_INLINE_WRITE_UNLOCK_IRQ
--void __lockfunc _raw_write_unlock_irq(rwlock_t *lock)
-+noinline void __lockfunc _raw_write_unlock_irq(rwlock_t *lock)
- {
- 	__raw_write_unlock_irq(lock);
- }
-@@ -332,7 +332,7 @@ EXPORT_SYMBOL(_raw_write_unlock_irq);
- #endif
- 
- #ifndef CONFIG_INLINE_WRITE_UNLOCK_BH
--void __lockfunc _raw_write_unlock_bh(rwlock_t *lock)
-+noinline void __lockfunc _raw_write_unlock_bh(rwlock_t *lock)
- {
- 	__raw_write_unlock_bh(lock);
- }
+-const u64 camellia_sp11101110[256] = {
++__visible const u64 camellia_sp11101110[256] = {
+ 	0x7070700070707000, 0x8282820082828200, 0x2c2c2c002c2c2c00,
+ 	0xececec00ececec00, 0xb3b3b300b3b3b300, 0x2727270027272700,
+ 	0xc0c0c000c0c0c000, 0xe5e5e500e5e5e500, 0xe4e4e400e4e4e400,
 -- 
 1.7.7.6
 
