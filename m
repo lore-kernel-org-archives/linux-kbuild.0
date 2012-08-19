@@ -1,73 +1,81 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga11.intel.com ([192.55.52.93]:60723 "EHLO mga11.intel.com"
+Received: from mga02.intel.com ([134.134.136.20]:36894 "EHLO mga02.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753600Ab2HSC5l (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	id S1753643Ab2HSC5l (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
 	Sat, 18 Aug 2012 22:57:41 -0400
 From: Andi Kleen <andi@firstfloor.org>
-Subject: [PATCH 52/74] x86, lto, paravirt: Don't rely on local assembler labels
-Date: Sat, 18 Aug 2012 19:56:48 -0700
-Message-Id: <1345345030-22211-53-git-send-email-andi@firstfloor.org>
+Subject: [PATCH 06/74] sections: Add __visible to powerpc sections
+Date: Sat, 18 Aug 2012 19:56:02 -0700
+Message-Id: <1345345030-22211-7-git-send-email-andi@firstfloor.org>
 In-Reply-To: <1345345030-22211-1-git-send-email-andi@firstfloor.org>
 References: <1345345030-22211-1-git-send-email-andi@firstfloor.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org
-Cc: x86@kernel.org, mmarek@suse.cz, linux-kbuild@vger.kernel.org, JBeulich@suse.com, akpm@linux-foundation.org, Andi Kleen <ak@linux.intel.com>, jeremy@goop.org
+Cc: x86@kernel.org, mmarek@suse.cz, linux-kbuild@vger.kernel.org, JBeulich@suse.com, akpm@linux-foundation.org, Andi Kleen <ak@linux.intel.com>
 
 From: Andi Kleen <ak@linux.intel.com>
 
-The paravirt patching code assumes that it can reference a
-local assembler label between two different top level assembler
-statements. This does not work with some experimental gcc builds,
-where the assembler code may end up in different assembler files.
-
-Replace it with extern / global /asm linkage labels.
-
-This also removes one redundant copy of the macro.
-
-Cc: jeremy@goop.org
 Signed-off-by: Andi Kleen <ak@linux.intel.com>
 ---
- arch/x86/include/asm/paravirt_types.h |    9 +++++----
- arch/x86/kernel/paravirt.c            |    5 -----
- 2 files changed, 5 insertions(+), 9 deletions(-)
+ arch/powerpc/include/asm/cputable.h |    2 +-
+ arch/powerpc/include/asm/firmware.h |    2 +-
+ arch/powerpc/include/asm/mmu.h      |    2 +-
+ arch/powerpc/include/asm/synch.h    |    2 +-
+ 4 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/arch/x86/include/asm/paravirt_types.h b/arch/x86/include/asm/paravirt_types.h
-index 4f262bc..6a464ba 100644
---- a/arch/x86/include/asm/paravirt_types.h
-+++ b/arch/x86/include/asm/paravirt_types.h
-@@ -385,10 +385,11 @@ extern struct pv_lock_ops pv_lock_ops;
- 	_paravirt_alt(insn_string, "%c[paravirt_typenum]", "%c[paravirt_clobber]")
+diff --git a/arch/powerpc/include/asm/cputable.h b/arch/powerpc/include/asm/cputable.h
+index 50d82c8..048f876 100644
+--- a/arch/powerpc/include/asm/cputable.h
++++ b/arch/powerpc/include/asm/cputable.h
+@@ -125,7 +125,7 @@ struct cpu_spec {
  
- /* Simple instruction patching code. */
--#define DEF_NATIVE(ops, name, code) 					\
--	extern const char start_##ops##_##name[] __visible, 		\
--			  end_##ops##_##name[] __visible;		\
--	asm("start_" #ops "_" #name ": " code "; end_" #ops "_" #name ":")
-+#define NATIVE_LABEL(a,x,b) "\n\t.globl " a #x "_" #b "\n" a #x "_" #b ":\n\t"
-+
-+#define DEF_NATIVE(ops, name, code)					\
-+	__visible extern const char start_##ops##_##name[], end_##ops##_##name[];	\
-+	asm(NATIVE_LABEL("start_", ops, name) code NATIVE_LABEL("end_", ops, name))
+ extern struct cpu_spec		*cur_cpu_spec;
  
- unsigned paravirt_patch_nop(void);
- unsigned paravirt_patch_ident_32(void *insnbuf, unsigned len);
-diff --git a/arch/x86/kernel/paravirt.c b/arch/x86/kernel/paravirt.c
-index 17fff18..947255e 100644
---- a/arch/x86/kernel/paravirt.c
-+++ b/arch/x86/kernel/paravirt.c
-@@ -62,11 +62,6 @@ void __init default_banner(void)
- 	       pv_info.name);
+-extern unsigned int __start___ftr_fixup, __stop___ftr_fixup;
++extern __visible unsigned int __start___ftr_fixup, __stop___ftr_fixup;
+ 
+ extern struct cpu_spec *identify_cpu(unsigned long offset, unsigned int pvr);
+ extern void do_feature_fixups(unsigned long value, void *fixup_start,
+diff --git a/arch/powerpc/include/asm/firmware.h b/arch/powerpc/include/asm/firmware.h
+index ad0b751..fbf4834 100644
+--- a/arch/powerpc/include/asm/firmware.h
++++ b/arch/powerpc/include/asm/firmware.h
+@@ -128,7 +128,7 @@ extern void machine_check_fwnmi(void);
+ /* This is true if we are using the firmware NMI handler (typically LPAR) */
+ extern int fwnmi_active;
+ 
+-extern unsigned int __start___fw_ftr_fixup, __stop___fw_ftr_fixup;
++extern __visible unsigned int __start___fw_ftr_fixup, __stop___fw_ftr_fixup;
+ 
+ #endif /* __ASSEMBLY__ */
+ #endif /* __KERNEL__ */
+diff --git a/arch/powerpc/include/asm/mmu.h b/arch/powerpc/include/asm/mmu.h
+index e8a26db..cb0a276 100644
+--- a/arch/powerpc/include/asm/mmu.h
++++ b/arch/powerpc/include/asm/mmu.h
+@@ -130,7 +130,7 @@ static inline void mmu_clear_feature(unsigned long feature)
+ 	cur_cpu_spec->mmu_features &= ~feature;
  }
  
--/* Simple instruction patching code. */
--#define DEF_NATIVE(ops, name, code)					\
--	extern const char start_##ops##_##name[], end_##ops##_##name[];	\
--	asm("start_" #ops "_" #name ": " code "; end_" #ops "_" #name ":")
--
- /* Undefined instruction for dealing with missing ops pointers. */
- static const unsigned char ud2a[] = { 0x0f, 0x0b };
+-extern unsigned int __start___mmu_ftr_fixup, __stop___mmu_ftr_fixup;
++extern __visible unsigned int __start___mmu_ftr_fixup, __stop___mmu_ftr_fixup;
  
+ /* MMU initialization */
+ extern void early_init_mmu(void);
+diff --git a/arch/powerpc/include/asm/synch.h b/arch/powerpc/include/asm/synch.h
+index e682a71..b13b5f7 100644
+--- a/arch/powerpc/include/asm/synch.h
++++ b/arch/powerpc/include/asm/synch.h
+@@ -10,7 +10,7 @@
+ #endif
+ 
+ #ifndef __ASSEMBLY__
+-extern unsigned int __start___lwsync_fixup, __stop___lwsync_fixup;
++extern __visible unsigned int __start___lwsync_fixup, __stop___lwsync_fixup;
+ extern void do_lwsync_fixups(unsigned long value, void *fixup_start,
+ 			     void *fixup_end);
+ extern void do_final_fixups(void);
 -- 
 1.7.7.6
 
