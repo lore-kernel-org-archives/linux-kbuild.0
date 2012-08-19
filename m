@@ -1,80 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:53015 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751242Ab2HSJBS (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 19 Aug 2012 05:01:18 -0400
-Message-ID: <5030AB00.3090908@redhat.com>
-Date: Sun, 19 Aug 2012 11:59:44 +0300
-From: Avi Kivity <avi@redhat.com>
-MIME-Version: 1.0
-Subject: Re: [PATCH 37/74] lto, KVM: Don't assume asm statements end up in
- the same assembler file
-References: <1345345030-22211-1-git-send-email-andi@firstfloor.org> <1345345030-22211-38-git-send-email-andi@firstfloor.org>
-In-Reply-To: <1345345030-22211-38-git-send-email-andi@firstfloor.org>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+Received: from one.firstfloor.org ([213.235.205.2]:58299 "EHLO
+	one.firstfloor.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752480Ab2HSPBr (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 19 Aug 2012 11:01:47 -0400
+Date: Sun, 19 Aug 2012 17:01:40 +0200
+From: Andi Kleen <andi@firstfloor.org>
+Subject: Re: [PATCH 55/74] lto, workaround: Add workaround for initcall reordering
+Message-ID: <20120819150140.GP11413@one.firstfloor.org>
+References: <1345345030-22211-1-git-send-email-andi@firstfloor.org> <1345345030-22211-56-git-send-email-andi@firstfloor.org> <5030B5DC020000780008A226@nat28.tlf.novell.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5030B5DC020000780008A226@nat28.tlf.novell.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andi Kleen <andi@firstfloor.org>
-Cc: linux-kernel@vger.kernel.org, x86@kernel.org, mmarek@suse.cz, linux-kbuild@vger.kernel.org, JBeulich@suse.com, akpm@linux-foundation.org, Andi Kleen <ak@linux.intel.com>, Marcelo Tosatti <mtosatti@redhat.com>, KVM list <kvm@vger.kernel.org>
+To: Jan Beulich <jbeulich@suse.com>
+Cc: andi@firstfloor.org, ak@linux.intel.com, linux-kernel@vger.kernel.org, x86@kernel.org, akpm@linux-foundation.org, mmarek@suse.cz, linux-kbuild@vger.kernel.org
 
-On 08/19/2012 05:56 AM, Andi Kleen wrote:
-> From: Andi Kleen <ak@linux.intel.com>
+On Sun, Aug 19, 2012 at 09:46:04AM +0100, Jan Beulich wrote:
+> >>> Andi Kleen <andi@firstfloor.org> 08/19/12 5:05 AM >>>
+> >Work around a LTO gcc problem: when there is no reference to a variable
+> >in a module it will be moved to the end of the program. This causes
+> >reordering of initcalls which the kernel does not like.
+> >Add a dummy reference function to avoid this. The function is
+> >deleted by the linker.
 > 
-> The VMX code references a local assembler label between two inline
-> assembler statements. This assumes they both end up in the same
-> assembler files. In some experimental builds of gcc this is not
-> necessarily true, causing linker failures.
+> This is not even true on x86, not to speak of generally.
+
+Why is it not true ? 
+
+__initcall is only defined for !MODULE and there __exit discards.
+
 > 
-> Replace the local label reference with a more traditional asmlinkage
-> extern.
+> >+#ifdef CONFIG_LTO
+> >+/* Work around a LTO gcc problem: when there is no reference to a variable
+> >+ * in a module it will be moved to the end of the program. This causes
+> >+ * reordering of initcalls which the kernel does not like.
+> >+ * Add a dummy reference function to avoid this. The function is 
+> >+ * deleted by the linker.
+> >+ */
+> >+#define LTO_REFERENCE_INITCALL(x) \
+> >+    ; /* yes this is needed */            \
+> >+    static __used __exit void *reference_##x(void)     \
 > 
-> This also eliminates one assembler statement and
-> generates a bit better code on 64bit: the compiler can
-> use a RIP relative LEA instead of a movabs, saving
-> a few bytes.
+> Why not put it into e.g. section .discard.text? That could be expected to be
+> discarded by the linker without being arch dependent, as long as all arches
+> use DISCARDS in their linker script.
 
-I'm happy to see work on lto-enabling the kernel.
 
->  
-> +extern __visible unsigned long kvm_vmx_return;
-> +
->  /*
->   * Set up the vmcs's constant host-state fields, i.e., host-state fields that
->   * will not change in the lifetime of the guest.
-> @@ -3753,8 +3755,7 @@ static void vmx_set_constant_host_state(void)
->  	native_store_idt(&dt);
->  	vmcs_writel(HOST_IDTR_BASE, dt.address);   /* 22.2.4 */
->  
-> -	asm("mov $.Lkvm_vmx_return, %0" : "=r"(tmpl));
-> -	vmcs_writel(HOST_RIP, tmpl); /* 22.2.5 */
-> +	vmcs_writel(HOST_RIP, (unsigned long)&kvm_vmx_return); /* 22.2.5 */
->  
->  	rdmsr(MSR_IA32_SYSENTER_CS, low32, high32);
->  	vmcs_write32(HOST_IA32_SYSENTER_CS, low32);
-> @@ -6305,9 +6306,10 @@ static void __noclone vmx_vcpu_run(struct kvm_vcpu *vcpu)
->  		/* Enter guest mode */
->  		"jne .Llaunched \n\t"
->  		__ex(ASM_VMX_VMLAUNCH) "\n\t"
-> -		"jmp .Lkvm_vmx_return \n\t"
-> +		"jmp kvm_vmx_return \n\t"
->  		".Llaunched: " __ex(ASM_VMX_VMRESUME) "\n\t"
-> -		".Lkvm_vmx_return: "
-> +	        ".globl kvm_vmx_return\n"
-> +		"kvm_vmx_return: "
->  		/* Save guest registers, load host registers, keep flags */
->  		"mov %0, %c[wordsize](%%"R"sp) \n\t"
->  		"pop %0 \n\t"
-> 
+That's what __exit does, doesn't it?
 
-The reason we use a local label is so that we the function isn't split
-into two from the profiler's point of view.  See cd2276a795b013d1.
-
-One way to fix this is to have a .data variable initialized to point to
-.Lkvm_vmx_return (this can be done from the same asm statement in
-vmx_vcpu_run), and reference that variable in
-vmx_set_constant_host_state().  If no one comes up with a better idea,
-I'll write a patch doing this.
+-Andi
 
 -- 
-error compiling committee.c: too many arguments to function
+ak@linux.intel.com -- Speaking for myself only.
