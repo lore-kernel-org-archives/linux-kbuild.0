@@ -1,95 +1,90 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga03.intel.com ([143.182.124.21]:42975 "EHLO mga03.intel.com"
+Received: from mga09.intel.com ([134.134.136.24]:30195 "EHLO mga09.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752511Ab2HSC50 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	id S1752358Ab2HSC50 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
 	Sat, 18 Aug 2012 22:57:26 -0400
 From: Andi Kleen <andi@firstfloor.org>
-Subject: [PATCH 10/74] sections: Add __visible to drivers/{base,pci} sections
-Date: Sat, 18 Aug 2012 19:56:06 -0700
-Message-Id: <1345345030-22211-11-git-send-email-andi@firstfloor.org>
+Subject: [PATCH 35/74] lto, crypto, aes: mark AES tables __visible
+Date: Sat, 18 Aug 2012 19:56:31 -0700
+Message-Id: <1345345030-22211-36-git-send-email-andi@firstfloor.org>
 In-Reply-To: <1345345030-22211-1-git-send-email-andi@firstfloor.org>
 References: <1345345030-22211-1-git-send-email-andi@firstfloor.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org
-Cc: x86@kernel.org, mmarek@suse.cz, linux-kbuild@vger.kernel.org, JBeulich@suse.com, akpm@linux-foundation.org, Andi Kleen <ak@linux.intel.com>
+Cc: x86@kernel.org, mmarek@suse.cz, linux-kbuild@vger.kernel.org, JBeulich@suse.com, akpm@linux-foundation.org, Andi Kleen <ak@linux.intel.com>, herbert@gondor.apana.org.au
 
 From: Andi Kleen <ak@linux.intel.com>
 
+Various tables in aes_generic are accessed by assembler code.
+Mark them __visible for LTO
+
+Cc: herbert@gondor.apana.org.au
 Signed-off-by: Andi Kleen <ak@linux.intel.com>
 ---
- drivers/base/firmware_class.c |    4 ++--
- drivers/base/power/trace.c    |    2 +-
- drivers/pci/quirks.c          |   28 ++++++++++++++--------------
- 3 files changed, 17 insertions(+), 17 deletions(-)
+ crypto/aes_generic.c |    8 ++++----
+ include/crypto/aes.h |    8 ++++----
+ 2 files changed, 8 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/base/firmware_class.c b/drivers/base/firmware_class.c
-index 803cfc1..618ca735 100644
---- a/drivers/base/firmware_class.c
-+++ b/drivers/base/firmware_class.c
-@@ -30,8 +30,8 @@ MODULE_LICENSE("GPL");
+diff --git a/crypto/aes_generic.c b/crypto/aes_generic.c
+index a68c73d..1cf1f89 100644
+--- a/crypto/aes_generic.c
++++ b/crypto/aes_generic.c
+@@ -62,7 +62,7 @@ static inline u8 byte(const u32 x, const unsigned n)
  
- #ifdef CONFIG_FW_LOADER
+ static const u32 rco_tab[10] = { 1, 2, 4, 8, 16, 32, 64, 128, 27, 54 };
  
--extern struct builtin_fw __start_builtin_fw[];
--extern struct builtin_fw __end_builtin_fw[];
-+extern __visible struct builtin_fw __start_builtin_fw[];
-+extern __visible struct builtin_fw __end_builtin_fw[];
+-const u32 crypto_ft_tab[4][256] = {
++__visible const u32 crypto_ft_tab[4][256] = {
+ 	{
+ 		0xa56363c6, 0x847c7cf8, 0x997777ee, 0x8d7b7bf6,
+ 		0x0df2f2ff, 0xbd6b6bd6, 0xb16f6fde, 0x54c5c591,
+@@ -326,7 +326,7 @@ const u32 crypto_ft_tab[4][256] = {
+ 	}
+ };
  
- static bool fw_get_builtin_firmware(struct firmware *fw, const char *name)
- {
-diff --git a/drivers/base/power/trace.c b/drivers/base/power/trace.c
-index d94a1f5..3048afa 100644
---- a/drivers/base/power/trace.c
-+++ b/drivers/base/power/trace.c
-@@ -166,7 +166,7 @@ void generate_resume_trace(const void *tracedata, unsigned int user)
- }
- EXPORT_SYMBOL(generate_resume_trace);
+-const u32 crypto_fl_tab[4][256] = {
++__visible const u32 crypto_fl_tab[4][256] = {
+ 	{
+ 		0x00000063, 0x0000007c, 0x00000077, 0x0000007b,
+ 		0x000000f2, 0x0000006b, 0x0000006f, 0x000000c5,
+@@ -590,7 +590,7 @@ const u32 crypto_fl_tab[4][256] = {
+ 	}
+ };
  
--extern char __tracedata_start, __tracedata_end;
-+extern __visible char __tracedata_start, __tracedata_end;
- static int show_file_hash(unsigned int value)
- {
- 	int match;
-diff --git a/drivers/pci/quirks.c b/drivers/pci/quirks.c
-index 5155317..d18ea93 100644
---- a/drivers/pci/quirks.c
-+++ b/drivers/pci/quirks.c
-@@ -2941,20 +2941,20 @@ static void pci_do_fixups(struct pci_dev *dev, struct pci_fixup *f,
- 		}
- }
+-const u32 crypto_it_tab[4][256] = {
++__visible const u32 crypto_it_tab[4][256] = {
+ 	{
+ 		0x50a7f451, 0x5365417e, 0xc3a4171a, 0x965e273a,
+ 		0xcb6bab3b, 0xf1459d1f, 0xab58faac, 0x9303e34b,
+@@ -854,7 +854,7 @@ const u32 crypto_it_tab[4][256] = {
+ 	}
+ };
  
--extern struct pci_fixup __start_pci_fixups_early[];
--extern struct pci_fixup __end_pci_fixups_early[];
--extern struct pci_fixup __start_pci_fixups_header[];
--extern struct pci_fixup __end_pci_fixups_header[];
--extern struct pci_fixup __start_pci_fixups_final[];
--extern struct pci_fixup __end_pci_fixups_final[];
--extern struct pci_fixup __start_pci_fixups_enable[];
--extern struct pci_fixup __end_pci_fixups_enable[];
--extern struct pci_fixup __start_pci_fixups_resume[];
--extern struct pci_fixup __end_pci_fixups_resume[];
--extern struct pci_fixup __start_pci_fixups_resume_early[];
--extern struct pci_fixup __end_pci_fixups_resume_early[];
--extern struct pci_fixup __start_pci_fixups_suspend[];
--extern struct pci_fixup __end_pci_fixups_suspend[];
-+extern __visible struct pci_fixup __start_pci_fixups_early[];
-+extern __visible struct pci_fixup __end_pci_fixups_early[];
-+extern __visible struct pci_fixup __start_pci_fixups_header[];
-+extern __visible struct pci_fixup __end_pci_fixups_header[];
-+extern __visible struct pci_fixup __start_pci_fixups_final[];
-+extern __visible struct pci_fixup __end_pci_fixups_final[];
-+extern __visible struct pci_fixup __start_pci_fixups_enable[];
-+extern __visible struct pci_fixup __end_pci_fixups_enable[];
-+extern __visible struct pci_fixup __start_pci_fixups_resume[];
-+extern __visible struct pci_fixup __end_pci_fixups_resume[];
-+extern __visible struct pci_fixup __start_pci_fixups_resume_early[];
-+extern __visible struct pci_fixup __end_pci_fixups_resume_early[];
-+extern __visible struct pci_fixup __start_pci_fixups_suspend[];
-+extern __visible struct pci_fixup __end_pci_fixups_suspend[];
+-const u32 crypto_il_tab[4][256] = {
++__visible const u32 crypto_il_tab[4][256] = {
+ 	{
+ 		0x00000052, 0x00000009, 0x0000006a, 0x000000d5,
+ 		0x00000030, 0x00000036, 0x000000a5, 0x00000038,
+diff --git a/include/crypto/aes.h b/include/crypto/aes.h
+index 7524ba3..f30d38d 100644
+--- a/include/crypto/aes.h
++++ b/include/crypto/aes.h
+@@ -27,10 +27,10 @@ struct crypto_aes_ctx {
+ 	u32 key_length;
+ };
  
- static bool pci_apply_fixup_final_quirks;
+-extern const u32 crypto_ft_tab[4][256];
+-extern const u32 crypto_fl_tab[4][256];
+-extern const u32 crypto_it_tab[4][256];
+-extern const u32 crypto_il_tab[4][256];
++extern __visible const u32 crypto_ft_tab[4][256];
++extern __visible const u32 crypto_fl_tab[4][256];
++extern __visible const u32 crypto_it_tab[4][256];
++extern __visible const u32 crypto_il_tab[4][256];
  
+ int crypto_aes_set_key(struct crypto_tfm *tfm, const u8 *in_key,
+ 		unsigned int key_len);
 -- 
 1.7.7.6
 
