@@ -1,45 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ozlabs.org ([203.10.76.45]:35767 "EHLO ozlabs.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755406Ab2HTHBi (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 20 Aug 2012 03:01:38 -0400
-From: Rusty Russell <rusty@ozlabs.org>
-Subject: Re: [PATCH 27/74] lto: Mark EXPORT_SYMBOL symbols __visible
-In-Reply-To: <1345345030-22211-28-git-send-email-andi@firstfloor.org>
-References: <1345345030-22211-1-git-send-email-andi@firstfloor.org> <1345345030-22211-28-git-send-email-andi@firstfloor.org>
-Date: Mon, 20 Aug 2012 16:24:04 +0930
-Message-ID: <87txvy3vg3.fsf@rustcorp.com.au>
+Received: from mail-wi0-f170.google.com ([209.85.212.170]:56618 "EHLO
+	mail-wi0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755622Ab2HTHsl (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 20 Aug 2012 03:48:41 -0400
+Date: Mon, 20 Aug 2012 09:48:35 +0200
+From: Ingo Molnar <mingo@kernel.org>
+Subject: Re: RFC: Link Time Optimization support for the kernel
+Message-ID: <20120820074835.GA6710@gmail.com>
+References: <1345345030-22211-1-git-send-email-andi@firstfloor.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1345345030-22211-1-git-send-email-andi@firstfloor.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andi Kleen <andi@firstfloor.org>, linux-kernel@vger.kernel.org
-Cc: x86@kernel.org, mmarek@suse.cz, linux-kbuild@vger.kernel.org, JBeulich@suse.com, akpm@linux-foundation.org, Andi Kleen <ak@linux.intel.com>
+To: Andi Kleen <andi@firstfloor.org>
+Cc: linux-kernel@vger.kernel.org, x86@kernel.org, mmarek@suse.cz, linux-kbuild@vger.kernel.org, JBeulich@suse.com, akpm@linux-foundation.org, Linus Torvalds <torvalds@linux-foundation.org>, "H. Peter Anvin" <hpa@zytor.com>, Thomas Gleixner <tglx@linutronix.de>
 
-On Sat, 18 Aug 2012 19:56:23 -0700, Andi Kleen <andi@firstfloor.org> wrote:
-> @@ -78,11 +78,13 @@ extern struct module __this_module;
->  
->  #else /* !CONFIG_MODULES... */
->  
-> -#define EXPORT_SYMBOL(sym)
-> -#define EXPORT_SYMBOL_GPL(sym)
-> -#define EXPORT_SYMBOL_GPL_FUTURE(sym)
-> -#define EXPORT_UNUSED_SYMBOL(sym)
-> -#define EXPORT_UNUSED_SYMBOL_GPL(sym)
-> +/* Even without modules keep the __visible side effect */
-> +
-> +#define EXPORT_SYMBOL(sym) extern typeof(sym) sym __visible
-> +#define EXPORT_SYMBOL_GPL(sym) extern typeof(sym) sym __visible
-> +#define EXPORT_SYMBOL_GPL_FUTURE(sym) extern typeof(sym) sym __visible
-> +#define EXPORT_UNUSED_SYMBOL(sym) extern typeof(sym) sym __visible
-> +#define EXPORT_UNUSED_SYMBOL_GPL(sym) extern typeof(sym) sym __visible
->  
->  #endif /* CONFIG_MODULES */
 
-Really, why?  Seems like a win to have them eliminated if unused.
+* Andi Kleen <andi@firstfloor.org> wrote:
 
-Naively, I would think many cases of __visible should be #ifdef
-CONFIG_MODULES.  What am I missing?
+> This rather large patchkit enables gcc Link Time Optimization (LTO) 
+> support for the kernel. 
+> 
+> With LTO gcc will do whole program optimizations for
+> the whole kernel and each module. This increases compile time,
+> but can generate faster code.
+
+By how much does it increase compile time?
+
+How much faster does kernel code get?
+
+Last time I checked LTO optimizations (half a year ago) it 
+resulted in significantly slower build times.
+
+I tried out and measured the LTO speedups and was less than 
+impressed by them - a lot of build time increase for not much 
+increase in performance. There was also visible, ongoing 
+maintenance cost.
+
+The combination of these seemed like a show-stopper.
+
+It's obviously an optimization feature we should consider, but 
+we really need hard numbers to make a cost/benefit analysis.
 
 Thanks,
-Rusty.
+
+	Ingo
