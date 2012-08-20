@@ -1,66 +1,34 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from nat28.tlf.novell.com ([130.57.49.28]:33196 "EHLO
-	nat28.tlf.novell.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753266Ab2HTLAt convert rfc822-to-8bit (ORCPT
-	<rfc822;groupwise-linux-kbuild@vger.kernel.org:6:1>);
-	Mon, 20 Aug 2012 07:00:49 -0400
-Message-Id: <503234FC0200007800096611@nat28.tlf.novell.com>
-Date: Mon, 20 Aug 2012 12:00:44 +0100
-From: "Jan Beulich" <JBeulich@suse.com>
-Subject: Re: [PATCH 55/74] lto, workaround: Add workaround for initcall
- reordering
+Received: from mga11.intel.com ([192.55.52.93]:36743 "EHLO mga11.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753412Ab2HTLSj (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 20 Aug 2012 07:18:39 -0400
+Date: Mon, 20 Aug 2012 04:18:38 -0700
+From: Andi Kleen <ak@linux.intel.com>
+Subject: Re: [PATCH 46/74] x86, lto: Disable fancy hweight optimizations for
+ LTO
+Message-ID: <20120820111838.GC4461@tassilo.jf.intel.com>
 References: <1345345030-22211-1-git-send-email-andi@firstfloor.org>
- <1345345030-22211-56-git-send-email-andi@firstfloor.org>
- <5030B5DC020000780008A226@nat28.tlf.novell.com>
- <20120819150140.GP11413@one.firstfloor.org>
-In-Reply-To: <20120819150140.GP11413@one.firstfloor.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8BIT
+ <1345345030-22211-47-git-send-email-andi@firstfloor.org>
+ <5030B1A5020000780008A200@nat28.tlf.novell.com>
+ <20120819151516.GS11413@one.firstfloor.org>
+ <50323427020000780009660E@nat28.tlf.novell.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <50323427020000780009660E@nat28.tlf.novell.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andi Kleen <andi@firstfloor.org>
-Cc: x86@kernel.org, akpm@linux-foundation.org, ak@linux.intel.com, mmarek@suse.cz, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Jan Beulich <JBeulich@suse.com>
+Cc: Andi Kleen <andi@firstfloor.org>, x86@kernel.org, akpm@linux-foundation.org, mmarek@suse.cz, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
->>> On 19.08.12 at 17:01, Andi Kleen <andi@firstfloor.org> wrote:
-> On Sun, Aug 19, 2012 at 09:46:04AM +0100, Jan Beulich wrote:
->> >>> Andi Kleen <andi@firstfloor.org> 08/19/12 5:05 AM >>>
->> >Work around a LTO gcc problem: when there is no reference to a variable
->> >in a module it will be moved to the end of the program. This causes
->> >reordering of initcalls which the kernel does not like.
->> >Add a dummy reference function to avoid this. The function is
->> >deleted by the linker.
->> 
->> This is not even true on x86, not to speak of generally.
-> 
-> Why is it not true ? 
-> 
-> __initcall is only defined for !MODULE and there __exit discards.
+> That's not the point: The point really is that you could allow the
+> alternative regardless of LTO, and just penalize the LTO case
+> by having even the asm clobber the registers that a function call
+> would not preserve.
 
-__exit, on x86 and perhaps other arches, causes the code
-to be discarded at runtime only.
+That's just what a normal call does, right?
 
->> >+#ifdef CONFIG_LTO
->> >+/* Work around a LTO gcc problem: when there is no reference to a variable
->> >+ * in a module it will be moved to the end of the program. This causes
->> >+ * reordering of initcalls which the kernel does not like.
->> >+ * Add a dummy reference function to avoid this. The function is 
->> >+ * deleted by the linker.
->> >+ */
->> >+#define LTO_REFERENCE_INITCALL(x) \
->> >+    ; /* yes this is needed */            \
->> >+    static __used __exit void *reference_##x(void)     \
->> 
->> Why not put it into e.g. section .discard.text? That could be expected to be
->> discarded by the linker without being arch dependent, as long as all arches
->> use DISCARDS in their linker script.
-> 
-> 
-> That's what __exit does, doesn't it?
-
-No - see above. Using .discard.* enforces the discarding at link
-time.
-
-Jan
-
+-Andi
+-- 
+ak@linux.intel.com -- Speaking for myself only
