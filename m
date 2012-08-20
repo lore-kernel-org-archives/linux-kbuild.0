@@ -1,34 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ob0-f174.google.com ([209.85.214.174]:43726 "EHLO
-	mail-ob0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751972Ab2HTDLR (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 19 Aug 2012 23:11:17 -0400
-Received: by obbuo13 with SMTP id uo13so8912458obb.19
-        for <linux-kbuild@vger.kernel.org>; Sun, 19 Aug 2012 20:11:17 -0700 (PDT)
-Message-ID: <5031AAD1.6090504@landley.net>
-Date: Sun, 19 Aug 2012 22:11:13 -0500
-From: Rob Landley <rob@landley.net>
+Received: from ozlabs.org ([203.10.76.45]:35767 "EHLO ozlabs.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1755406Ab2HTHBi (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 20 Aug 2012 03:01:38 -0400
+From: Rusty Russell <rusty@ozlabs.org>
+Subject: Re: [PATCH 27/74] lto: Mark EXPORT_SYMBOL symbols __visible
+In-Reply-To: <1345345030-22211-28-git-send-email-andi@firstfloor.org>
+References: <1345345030-22211-1-git-send-email-andi@firstfloor.org> <1345345030-22211-28-git-send-email-andi@firstfloor.org>
+Date: Mon, 20 Aug 2012 16:24:04 +0930
+Message-ID: <87txvy3vg3.fsf@rustcorp.com.au>
 MIME-Version: 1.0
-Subject: Re: [PATCH] scripts/kernel-doc: drop maintainer
-References: <50219DD4.7020406@xenotime.net>
-In-Reply-To: <50219DD4.7020406@xenotime.net>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Randy Dunlap <rdunlap@xenotime.net>
-Cc: linux-kbuild@vger.kernel.org, "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>, Michal Marek <mmarek@suse.cz>
+To: Andi Kleen <andi@firstfloor.org>, linux-kernel@vger.kernel.org
+Cc: x86@kernel.org, mmarek@suse.cz, linux-kbuild@vger.kernel.org, JBeulich@suse.com, akpm@linux-foundation.org, Andi Kleen <ak@linux.intel.com>
 
-On 08/07/2012 05:59 PM, Randy Dunlap wrote:
-> From: Randy Dunlap <rdunlap@xenotime.net>
-> 
-> Drop maintainership of scripts/kernel-doc.
-> Patches can go thru the kbuild tree.
+On Sat, 18 Aug 2012 19:56:23 -0700, Andi Kleen <andi@firstfloor.org> wrote:
+> @@ -78,11 +78,13 @@ extern struct module __this_module;
+>  
+>  #else /* !CONFIG_MODULES... */
+>  
+> -#define EXPORT_SYMBOL(sym)
+> -#define EXPORT_SYMBOL_GPL(sym)
+> -#define EXPORT_SYMBOL_GPL_FUTURE(sym)
+> -#define EXPORT_UNUSED_SYMBOL(sym)
+> -#define EXPORT_UNUSED_SYMBOL_GPL(sym)
+> +/* Even without modules keep the __visible side effect */
+> +
+> +#define EXPORT_SYMBOL(sym) extern typeof(sym) sym __visible
+> +#define EXPORT_SYMBOL_GPL(sym) extern typeof(sym) sym __visible
+> +#define EXPORT_SYMBOL_GPL_FUTURE(sym) extern typeof(sym) sym __visible
+> +#define EXPORT_UNUSED_SYMBOL(sym) extern typeof(sym) sym __visible
+> +#define EXPORT_UNUSED_SYMBOL_GPL(sym) extern typeof(sym) sym __visible
+>  
+>  #endif /* CONFIG_MODULES */
 
-If it wasn't perl I'd volunteer to take it over, but it's perl.
+Really, why?  Seems like a win to have them eliminated if unused.
 
-Rob
--- 
-GNU/Linux isn't: Linux=GPLv2, GNU=GPLv3+, they can't share code.
-Either it's "mere aggregation", or a license violation.  Pick one.
+Naively, I would think many cases of __visible should be #ifdef
+CONFIG_MODULES.  What am I missing?
+
+Thanks,
+Rusty.
