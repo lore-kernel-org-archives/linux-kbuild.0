@@ -1,44 +1,34 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from one.firstfloor.org ([213.235.205.2]:58400 "EHLO
-	one.firstfloor.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753727Ab2HSP3T (ORCPT
+Received: from mail-ob0-f174.google.com ([209.85.214.174]:43726 "EHLO
+	mail-ob0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751972Ab2HTDLR (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 19 Aug 2012 11:29:19 -0400
-Date: Sun, 19 Aug 2012 17:29:18 +0200
-From: Andi Kleen <andi@firstfloor.org>
-Subject: Re: [PATCH 03/74] sections: Make external kallsyms tables __visible
-Message-ID: <20120819152918.GX11413@one.firstfloor.org>
-References: <1345345030-22211-1-git-send-email-andi@firstfloor.org> <1345345030-22211-4-git-send-email-andi@firstfloor.org> <5030A96F020000780008A1F1@nat28.tlf.novell.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5030A96F020000780008A1F1@nat28.tlf.novell.com>
+	Sun, 19 Aug 2012 23:11:17 -0400
+Received: by obbuo13 with SMTP id uo13so8912458obb.19
+        for <linux-kbuild@vger.kernel.org>; Sun, 19 Aug 2012 20:11:17 -0700 (PDT)
+Message-ID: <5031AAD1.6090504@landley.net>
+Date: Sun, 19 Aug 2012 22:11:13 -0500
+From: Rob Landley <rob@landley.net>
+MIME-Version: 1.0
+Subject: Re: [PATCH] scripts/kernel-doc: drop maintainer
+References: <50219DD4.7020406@xenotime.net>
+In-Reply-To: <50219DD4.7020406@xenotime.net>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jan Beulich <jbeulich@suse.com>
-Cc: andi@firstfloor.org, ak@linux.intel.com, linux-kernel@vger.kernel.org, x86@kernel.org, akpm@linux-foundation.org, mmarek@suse.cz, linux-kbuild@vger.kernel.org
+To: Randy Dunlap <rdunlap@xenotime.net>
+Cc: linux-kbuild@vger.kernel.org, "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>, Michal Marek <mmarek@suse.cz>
 
-On Sun, Aug 19, 2012 at 08:53:03AM +0100, Jan Beulich wrote:
-> >>> Andi Kleen <andi@firstfloor.org> 08/19/12 5:02 AM >>>
-> >-extern const unsigned long kallsyms_addresses[] __attribute__((weak));
-> >-extern const u8 kallsyms_names[] __attribute__((weak));
-> >+extern __visible const unsigned long kallsyms_addresses[] __attribute__((weak));
-> >+extern __visible const u8 kallsyms_names[] __attribute__((weak));
->  
-> Shouldn't we minimally aim at consistency here:
-> - all attributes in a one place (I personally prefer the placement between type
->   and name, for compatibility with other compilers, but there are rare cases -
->   iirc not on declarations though - where gcc doesn't allow this)
+On 08/07/2012 05:59 PM, Randy Dunlap wrote:
+> From: Randy Dunlap <rdunlap@xenotime.net>
+> 
+> Drop maintainership of scripts/kernel-doc.
+> Patches can go thru the kbuild tree.
 
-Ok.
+If it wasn't perl I'd volunteer to take it over, but it's perl.
 
-> - not using open coded __attribute__(()) when a definition (here: __weak) is
->   available, or alternatively open coding all of them (__attribute__((weak, ...)))?
-
-I just kept the original code. But yes it should be using __weak.
-I can change that.
-
--Andi
-
+Rob
 -- 
-ak@linux.intel.com -- Speaking for myself only.
+GNU/Linux isn't: Linux=GPLv2, GNU=GPLv3+, they can't share code.
+Either it's "mere aggregation", or a license violation.  Pick one.
