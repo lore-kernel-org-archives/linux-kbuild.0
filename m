@@ -1,88 +1,62 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from one.firstfloor.org ([213.235.205.2]:59228 "EHLO
-	one.firstfloor.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751357Ab2HTKKq (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 20 Aug 2012 06:10:46 -0400
-Date: Mon, 20 Aug 2012 12:10:44 +0200
-From: Andi Kleen <andi@firstfloor.org>
-Subject: Re: RFC: Link Time Optimization support for the kernel
-Message-ID: <20120820101044.GE16230@one.firstfloor.org>
-References: <1345345030-22211-1-git-send-email-andi@firstfloor.org> <20120820074835.GA6710@gmail.com>
+Received: from nat28.tlf.novell.com ([130.57.49.28]:33083 "EHLO
+	nat28.tlf.novell.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751256Ab2HTK5S convert rfc822-to-8bit (ORCPT
+	<rfc822;groupwise-linux-kbuild@vger.kernel.org:6:1>);
+	Mon, 20 Aug 2012 06:57:18 -0400
+Message-Id: <50323427020000780009660E@nat28.tlf.novell.com>
+Date: Mon, 20 Aug 2012 11:57:11 +0100
+From: "Jan Beulich" <JBeulich@suse.com>
+Subject: Re: [PATCH 46/74] x86, lto: Disable fancy hweight
+ optimizations for LTO
+References: <1345345030-22211-1-git-send-email-andi@firstfloor.org>
+ <1345345030-22211-47-git-send-email-andi@firstfloor.org>
+ <5030B1A5020000780008A200@nat28.tlf.novell.com>
+ <20120819151516.GS11413@one.firstfloor.org>
+In-Reply-To: <20120819151516.GS11413@one.firstfloor.org>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8BIT
 Content-Disposition: inline
-In-Reply-To: <20120820074835.GA6710@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ingo Molnar <mingo@kernel.org>
-Cc: Andi Kleen <andi@firstfloor.org>, linux-kernel@vger.kernel.org, x86@kernel.org, mmarek@suse.cz, linux-kbuild@vger.kernel.org, JBeulich@suse.com, akpm@linux-foundation.org, Linus Torvalds <torvalds@linux-foundation.org>, "H. Peter Anvin" <hpa@zytor.com>, Thomas Gleixner <tglx@linutronix.de>
+To: Andi Kleen <andi@firstfloor.org>
+Cc: x86@kernel.org, akpm@linux-foundation.org, ak@linux.intel.com, mmarek@suse.cz, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Mon, Aug 20, 2012 at 09:48:35AM +0200, Ingo Molnar wrote:
+>>> On 19.08.12 at 17:15, Andi Kleen <andi@firstfloor.org> wrote:
+>> >--- a/arch/x86/include/asm/arch_hweight.h
+>> >+++ b/arch/x86/include/asm/arch_hweight.h
+>> >@@ -25,9 +25,14 @@ static inline unsigned int __arch_hweight32(unsigned int w)
+>> >{
+>> >    unsigned int res = 0;
+>>  >
+>> >+#ifdef CONFIG_LTO
+>> >+    res  = __sw_hweight32(w);
+>> >+#else
+>> >+
+>> >    asm (ALTERNATIVE("call __sw_hweight32", POPCNT32, X86_FEATURE_POPCNT)
+>> >             : "="REG_OUT (res)
+>> >             : REG_IN (w));
+>> >+#endif
+>>  
+>> Isn't this a little to harsh? Rather than not using popcnt at all, why don't 
+>> you just add the necessary clobbers to the asm() in the LTO case?
 > 
-> * Andi Kleen <andi@firstfloor.org> wrote:
-> 
-> > This rather large patchkit enables gcc Link Time Optimization (LTO) 
-> > support for the kernel. 
-> > 
-> > With LTO gcc will do whole program optimizations for
-> > the whole kernel and each module. This increases compile time,
-> > but can generate faster code.
-> 
-> By how much does it increase compile time?
+> gcc lacks the means to declare that a asm uses an external symbol
+> currently. Ok we could make it visible. But there's no way to make the
+> special calling convention work anyways, at least not without someone 
+> changing gcc to allow to declare this per function.
 
-All numbers are preliminary at this point. I miss both some code
-quality and compile time improvements that it could do, to work
-around some issues that are fixable.
+That's not the point: The point really is that you could allow the
+alternative regardless of LTO, and just penalize the LTO case
+by having even the asm clobber the registers that a function call
+would not preserve.
 
-Compile time:
+> I'm not sure the optimization is really worth it anyways, hweight should
+> be uncommon.
 
-Compilation slowdown depends on the largest binary size.  I see between 
-50% and 4x.  The 4x case is mainly for allyes (so unlikely); a normal
-distro build, which is mostly modular, or a defconfig like build is more
-towards the 50%. 
+That's a separate question (but I sort of agree - not sure whether
+CPU mask weights ever get calculated on hot paths).
 
-Currently I have to disable slim LTO, which essentially means everything
-is compiled twice. Once that's fixed it should compile faster for
-the normal case too (although it will be still slower than non LTO)
+Jan
 
-A lot of the overhead on the larger builds is also some specific 
-gcc code that I'm working with the gcc developers on to improve.
-So the 4x extreme case will hopefully go down.
-
-The large builds also currently suffer from too much memory
-consumption. That will hopefully improve too, as gcc improves.
-
-I wouldn't expect anyone using it for day to day kernel hacking
-(I understand that 50% are annoying for that). It's more like a
- "release build" mode.
-
-The performance is currently also missing some improvements due
-to workarounds.
-
-Performance:
-
-Hackbench goes about 5% faster, so the scheduler benefits. Kbuild
-is not changing much. Various network benchmarks over loopback
-go faster too (best case seen 18%+), so the network stack seems to 
-benefit. A lot of micro benchmarks go faster, sometimes larger numbers. 
-There are some minor regressions.
-
-A lot of benchmarking on larger workloads is still outstanding.
-But the existing numbers are promising I believe. Things will still
-change, it's still early. 
-
-I would welcome any benchmarking from other people.
-
-I also expect gcc to do more LTO optimizations in the future, so we'll
-hopefully see more gains over time. Essentially it gives more
-power to the compiler.
-
-Long term it would also help the kernel source organization. For example
-there's no reason with LTO to have gigantic includes with large inlines,
-because cross file inlining works in a efficient way without reparsing.
-
-In theory (but that's not realized today) the automatic repartitioning of
-compilation units could improve compile time with lots of small files
-
--Andi
