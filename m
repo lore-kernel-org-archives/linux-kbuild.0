@@ -1,38 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from one.firstfloor.org ([213.235.205.2]:59164 "EHLO
+Received: from one.firstfloor.org ([213.235.205.2]:59188 "EHLO
 	one.firstfloor.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756172Ab2HTJmf (ORCPT
+	with ESMTP id S1754116Ab2HTJpq (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 20 Aug 2012 05:42:35 -0400
-Date: Mon, 20 Aug 2012 11:42:34 +0200
+	Mon, 20 Aug 2012 05:45:46 -0400
+Date: Mon, 20 Aug 2012 11:45:45 +0200
 From: Andi Kleen <andi@firstfloor.org>
-Subject: Re: [PATCH 46/74] x86, lto: Disable fancy hweight optimizations for LTO
-Message-ID: <20120820094234.GB16230@one.firstfloor.org>
-References: <1345345030-22211-1-git-send-email-andi@firstfloor.org> <1345345030-22211-47-git-send-email-andi@firstfloor.org> <50320027.1010809@redhat.com>
+Subject: Re: [PATCH 26/74] lto, sound: Fix export symbols for !CONFIG_MODULES
+Message-ID: <20120820094545.GC16230@one.firstfloor.org>
+References: <1345345030-22211-1-git-send-email-andi@firstfloor.org> <1345345030-22211-27-git-send-email-andi@firstfloor.org> <s5hzk5qq82i.wl%tiwai@suse.de>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <50320027.1010809@redhat.com>
+In-Reply-To: <s5hzk5qq82i.wl%tiwai@suse.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Avi Kivity <avi@redhat.com>
+To: Takashi Iwai <tiwai@suse.de>
 Cc: Andi Kleen <andi@firstfloor.org>, linux-kernel@vger.kernel.org, x86@kernel.org, mmarek@suse.cz, linux-kbuild@vger.kernel.org, JBeulich@suse.com, akpm@linux-foundation.org, Andi Kleen <ak@linux.intel.com>
 
-> >  config ARCH_HWEIGHT_CFLAGS
-> >  	string
-> > -	default "-fcall-saved-ecx -fcall-saved-edx" if X86_32
-> > -	default "-fcall-saved-rdi -fcall-saved-rsi -fcall-saved-rdx -fcall-saved-rcx -fcall-saved-r8 -fcall-saved-r9 -fcall-saved-r10 -fcall-saved-r11" if X86_64
-> > +	default "-fcall-saved-ecx -fcall-saved-edx" if X86_32 && !LTO
-> > +	default "-fcall-saved-rdi -fcall-saved-rsi -fcall-saved-rdx -fcall-saved-rcx -fcall-saved-r8 -fcall-saved-r9 -fcall-saved-r10 -fcall-saved-r11" if X86_64 && !LTO
-> > +	default "" if LTO
-> >  
+On Mon, Aug 20, 2012 at 10:30:29AM +0200, Takashi Iwai wrote:
+> At Sat, 18 Aug 2012 19:56:22 -0700,
+> Andi Kleen wrote:
+> > 
+> > From: Andi Kleen <ak@linux.intel.com>
+> > 
+> > The new LTO EXPORT_SYMBOL references symbols even without CONFIG_MODULES.
+> > Since these functions are macros in this case this doesn't work.
+> > Add a ifdef to fix the build.
+> > 
+> > Cc: tiwai@suse.de
+> > Signed-off-by: Andi Kleen <ak@linux.intel.com>
 > 
-> Seems heavy handed.  How about using __attribute__((optimize(...))) instead?
+> Reviewed-by: Takashi Iwai <tiwai@suse.de>
+> 
+> I haven't seen the background, so let me ask a dumb question:
+> is it a 3.6 fix or for 3.7?
 
-Doesn't work for this. In fact according to the gcc developers that
-attribute is mostly broken.
+I don't strictly need it for 3.6, 3.7 is ok.
+
+> 
+> And shall I apply this one to sound git tree, or would you like to
+> apply all in a single tree?
+
+Please apply it in yours.
 
 -Andi
-
--- 
-ak@linux.intel.com -- Speaking for myself only.
