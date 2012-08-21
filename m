@@ -1,156 +1,67 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ob0-f174.google.com ([209.85.214.174]:49495 "EHLO
-	mail-ob0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750935Ab2HTRsO (ORCPT
+Received: from e35.co.us.ibm.com ([32.97.110.153]:50701 "EHLO
+	e35.co.us.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751045Ab2HUEop (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 20 Aug 2012 13:48:14 -0400
+	Tue, 21 Aug 2012 00:44:45 -0400
+Received: from /spool/local
+	by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+	for <linux-kbuild@vger.kernel.org> from <ananth@in.ibm.com>;
+	Mon, 20 Aug 2012 22:44:44 -0600
+Date: Tue, 21 Aug 2012 10:14:36 +0530
+From: Ananth N Mavinakayanahalli <ananth@in.ibm.com>
+Subject: Re: [PATCH 71/74] lto, kprobes: Use KSYM_NAME_LEN to size
+	identifier buffers
+Message-ID: <20120821044436.GA3519@in.ibm.com>
+Reply-To: ananth@in.ibm.com
+References: <1345345030-22211-1-git-send-email-andi@firstfloor.org> <1345345030-22211-72-git-send-email-andi@firstfloor.org>
 MIME-Version: 1.0
-In-Reply-To: <1345345030-22211-55-git-send-email-andi@firstfloor.org>
-References: <1345345030-22211-1-git-send-email-andi@firstfloor.org> <1345345030-22211-55-git-send-email-andi@firstfloor.org>
-From: Andrew Lutomirski <luto@mit.edu>
-Date: Mon, 20 Aug 2012 10:47:53 -0700
-Message-ID: <CAObL_7GdYZ=DePjZJc6Oz0Pt3Q5PawWByFnjSd+j4Cd3w-mfzg@mail.gmail.com>
-Subject: Re: [PATCH 54/74] x86, lto, vdso: Don't duplicate vvar address variables
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1345345030-22211-72-git-send-email-andi@firstfloor.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Andi Kleen <andi@firstfloor.org>
-Cc: linux-kernel@vger.kernel.org, x86@kernel.org, mmarek@suse.cz, linux-kbuild@vger.kernel.org, JBeulich@suse.com, akpm@linux-foundation.org, Andi Kleen <ak@linux.intel.com>
+Cc: linux-kernel@vger.kernel.org, x86@kernel.org, mmarek@suse.cz, linux-kbuild@vger.kernel.org, JBeulich@suse.com, akpm@linux-foundation.org, Joe Mario <jmario@redhat.com>, Andi Kleen <ak@linux.intel.com>
 
-On Sat, Aug 18, 2012 at 7:56 PM, Andi Kleen <andi@firstfloor.org> wrote:
-> From: Andi Kleen <ak@linux.intel.com>
->
-> Every includer of vvar.h currently gets own static variables
-> for all the vvar addresses. Generate just one set each for the
-> main kernel and for the vdso. This saves some data space.
->
-> Cc: Andy Lutomirski <luto@mit.edu>
+On Sat, Aug 18, 2012 at 07:57:07PM -0700, Andi Kleen wrote:
+> From: Joe Mario <jmario@redhat.com>
+> 
+> Use KSYM_NAME_LEN to size identifier buffers, so that it can
+> be easier increased.
+> 
+> Cc: ananth@in.ibm.com
+> Signed-off-by: Joe Mario <jmario@redhat.com>
 > Signed-off-by: Andi Kleen <ak@linux.intel.com>
 
-[This doesn't apply to -linus or to 3.5, so I haven't actually tested it.]
-
-NACK, without significant further evidence that this is a good idea.
-
-On input like this:
-
-static const int * const vvaraddr_test = 0xffffffffff601000;
-
-int func(void)
-{
-        return *vvaraddr_test;
-}
-
-gcc -O2 generates:
-
-	.file	"constptr.c"
-	.text
-	.p2align 4,,15
-	.globl	func
-	.type	func, @function
-func:
-.LFB0:
-	.cfi_startproc
-	movl	-10481664, %eax
-	ret
-	.cfi_endproc
-.LFE0:
-	.size	func, .-func
-	.ident	"GCC: (GNU) 4.6.3 20120306 (Red Hat 4.6.3-2)"
-	.section	.note.GNU-stack,"",@progbits
-
-Note, in particular, that (a) the load from the vvar uses an immediate
-memory operand (this avoids a cacheline access, which is a measureable
-speedup) and (b) vvaraddr_test was not emitted as data at all.
-
-Your code will force each vvar address to be emitted as data and will
-cause each reference to reference it as data.  Barring cleverness (and
-I don't remember whether the vdso build is currently clever), this
-could result in double-indirect access via the GOT from the vdso.
-
-This kind of change IMO needs actual size measurements, benchmarks,
-and some evidence that duplicate .data/.rodata things were emitted.
-
---Andy
+Acked-by: Ananth N Mavinakayanahalli <ananth@in.ibm.com>
 
 > ---
->  arch/x86/include/asm/vvar.h    |   27 +++++++++++++++++----------
->  arch/x86/vdso/vclock_gettime.c |    1 +
->  arch/x86/vdso/vma.c            |    1 +
->  3 files changed, 19 insertions(+), 10 deletions(-)
->
-> diff --git a/arch/x86/include/asm/vvar.h b/arch/x86/include/asm/vvar.h
-> index d76ac40..1fd06a8 100644
-> --- a/arch/x86/include/asm/vvar.h
-> +++ b/arch/x86/include/asm/vvar.h
-> @@ -24,27 +24,34 @@
->  /* The kernel linker script defines its own magic to put vvars in the
->   * right place.
->   */
-> -#define DECLARE_VVAR(offset, type, name) \
-> -       EMIT_VVAR(name, offset)
-> +#define DECLARE_VVAR(type, name) \
-> +       EMIT_VVAR(name, VVAR_OFFSET_ ## name)
-> +
-> +#elif defined(__VVAR_ADDR)
-> +
-> +#define DECLARE_VVAR(type, name)                                       \
-> +       type const * const vvaraddr_ ## name =                          \
-> +       (void *)(VVAR_ADDRESS + (VVAR_OFFSET_ ## name));
->
->  #else
->
-> -#define DECLARE_VVAR(offset, type, name)                               \
-> -       static type const * const vvaraddr_ ## name =                   \
-> -               (void *)(VVAR_ADDRESS + (offset));
-> +#define DECLARE_VVAR(type, name)                                       \
-> +       extern type const * const vvaraddr_ ## name;
->
->  #define DEFINE_VVAR(type, name)                                                \
->         type name                                                       \
->         __attribute__((section(".vvar_" #name), aligned(16))) __visible
-> +#endif
->
->  #define VVAR(name) (*vvaraddr_ ## name)
->
-> -#endif
-> -
->  /* DECLARE_VVAR(offset, type, name) */
->
-> -DECLARE_VVAR(0, volatile unsigned long, jiffies)
-> -DECLARE_VVAR(16, int, vgetcpu_mode)
-> -DECLARE_VVAR(128, struct vsyscall_gtod_data, vsyscall_gtod_data)
-> +#define VVAR_OFFSET_jiffies 0
-> +DECLARE_VVAR(volatile unsigned long, jiffies)
-> +#define VVAR_OFFSET_vgetcpu_mode 16
-> +DECLARE_VVAR(int, vgetcpu_mode)
-> +#define VVAR_OFFSET_vsyscall_gtod_data 128
-> +DECLARE_VVAR(struct vsyscall_gtod_data, vsyscall_gtod_data)
->
->  #undef DECLARE_VVAR
-> diff --git a/arch/x86/vdso/vclock_gettime.c b/arch/x86/vdso/vclock_gettime.c
-> index 885eff4..007eac4 100644
-> --- a/arch/x86/vdso/vclock_gettime.c
-> +++ b/arch/x86/vdso/vclock_gettime.c
-> @@ -10,6 +10,7 @@
->
->  /* Disable profiling for userspace code: */
->  #define DISABLE_BRANCH_PROFILING
-> +#define __VVAR_ADDR 1
->
->  #include <linux/kernel.h>
->  #include <linux/posix-timers.h>
-> diff --git a/arch/x86/vdso/vma.c b/arch/x86/vdso/vma.c
-> index fe08e2b..4432cfc 100644
-> --- a/arch/x86/vdso/vma.c
-> +++ b/arch/x86/vdso/vma.c
-> @@ -3,6 +3,7 @@
->   * Copyright 2007 Andi Kleen, SUSE Labs.
->   * Subject to the GPL, v.2
->   */
-> +#define __VVAR_ADDR 1
->  #include <linux/mm.h>
->  #include <linux/err.h>
->  #include <linux/sched.h>
-> --
+>  kernel/kprobes.c |    4 ++--
+>  1 files changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/kernel/kprobes.c b/kernel/kprobes.c
+> index c62b854..b9bd2a8 100644
+> --- a/kernel/kprobes.c
+> +++ b/kernel/kprobes.c
+> @@ -1955,7 +1955,7 @@ static int __init init_kprobes(void)
+>  {
+>  	int i, err = 0;
+>  	unsigned long offset = 0, size = 0;
+> -	char *modname, namebuf[128];
+> +	char *modname, namebuf[KSYM_NAME_LEN];
+>  	const char *symbol_name;
+>  	void *addr;
+>  	struct kprobe_blackpoint *kb;
+> @@ -2081,7 +2081,7 @@ static int __kprobes show_kprobe_addr(struct seq_file *pi, void *v)
+>  	const char *sym = NULL;
+>  	unsigned int i = *(loff_t *) v;
+>  	unsigned long offset = 0;
+> -	char *modname, namebuf[128];
+> +	char *modname, namebuf[KSYM_NAME_LEN];
+> 
+>  	head = &kprobe_table[i];
+>  	preempt_disable();
+> -- 
 > 1.7.7.6
->
+
