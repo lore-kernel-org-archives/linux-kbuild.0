@@ -1,22 +1,38 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ns1.pc-advies.be ([83.149.101.17]:53011 "EHLO
-	spo001.leaseweb.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1755450Ab2HVTvH (ORCPT
+Received: from g5t0009.atlanta.hp.com ([15.192.0.46]:5431 "EHLO
+	g5t0009.atlanta.hp.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751817Ab2HVUM5 convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 22 Aug 2012 15:51:07 -0400
-Date: Wed, 22 Aug 2012 21:25:25 +0200
-From: Wim Van Sebroeck <wim@iguana.be>
-Subject: Re: [PATCH 38/74] lto, watchdog/hpwdt.c: Make assembler label global
-Message-ID: <20120822192525.GE27604@spo001.leaseweb.com>
-References: <1345345030-22211-1-git-send-email-andi@firstfloor.org> <1345345030-22211-39-git-send-email-andi@firstfloor.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1345345030-22211-39-git-send-email-andi@firstfloor.org>
+	Wed, 22 Aug 2012 16:12:57 -0400
+From: "Mingarelli, Thomas" <Thomas.Mingarelli@hp.com>
+Subject: RE: [PATCH 38/74] lto, watchdog/hpwdt.c: Make assembler label global
+Date: Wed, 22 Aug 2012 20:11:08 +0000
+Message-ID: <9774516974AF5F4C8A2C3C69CD3412332334D412@G1W3651.americas.hpqcorp.net>
+References: <1345345030-22211-1-git-send-email-andi@firstfloor.org>
+ <1345345030-22211-39-git-send-email-andi@firstfloor.org>
+ <20120822192525.GE27604@spo001.leaseweb.com>
+In-Reply-To: <20120822192525.GE27604@spo001.leaseweb.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+MIME-Version: 1.0
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andi Kleen <andi@firstfloor.org>
-Cc: linux-kernel@vger.kernel.org, x86@kernel.org, mmarek@suse.cz, linux-kbuild@vger.kernel.org, JBeulich@suse.com, akpm@linux-foundation.org, Andi Kleen <ak@linux.intel.com>, Thomas Mingarelli <thomas.mingarelli@hp.com>
+To: Wim Van Sebroeck <wim@iguana.be>, Andi Kleen <andi@firstfloor.org>
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "x86@kernel.org" <x86@kernel.org>, "mmarek@suse.cz" <mmarek@suse.cz>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "JBeulich@suse.com" <JBeulich@suse.com>, "akpm@linux-foundation.org" <akpm@linux-foundation.org>, Andi Kleen <ak@linux.intel.com>
+
+I am OK with the changes. We have a few more coming soon to improve the kdump process when hpwdt is running. Just a heads up.
+
+
+Thanks,
+Tom
+
+-----Original Message-----
+From: wimvs@spo001.leaseweb.com [mailto:wimvs@spo001.leaseweb.com] On Behalf Of Wim Van Sebroeck
+Sent: Wednesday, August 22, 2012 2:25 PM
+To: Andi Kleen
+Cc: linux-kernel@vger.kernel.org; x86@kernel.org; mmarek@suse.cz; linux-kbuild@vger.kernel.org; JBeulich@suse.com; akpm@linux-foundation.org; Andi Kleen; Mingarelli, Thomas
+Subject: Re: [PATCH 38/74] lto, watchdog/hpwdt.c: Make assembler label global
 
 Hi andi,
 
