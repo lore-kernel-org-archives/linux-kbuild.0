@@ -1,35 +1,52 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from one.firstfloor.org ([213.235.205.2]:33028 "EHLO
-	one.firstfloor.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756801Ab2HVMg6 (ORCPT
+Received: from mail-pz0-f46.google.com ([209.85.210.46]:52721 "EHLO
+	mail-pz0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751275Ab2HVNpq (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 22 Aug 2012 08:36:58 -0400
-Date: Wed, 22 Aug 2012 14:36:57 +0200
-From: Andi Kleen <andi@firstfloor.org>
-Subject: Re: [PATCH 56/74] lto, workaround: Add workaround for missing LTO symbols in igb
-Message-ID: <20120822123657.GP16230@one.firstfloor.org>
-References: <1345345030-22211-1-git-send-email-andi@firstfloor.org> <1345345030-22211-57-git-send-email-andi@firstfloor.org> <201208220843.36047.arnd@arndb.de>
-Mime-Version: 1.0
+	Wed, 22 Aug 2012 09:45:46 -0400
+Date: Wed, 22 Aug 2012 21:45:19 +0800
+From: Adam Lee <adam8157@gmail.com>
+Subject: Re: [PATCH] [Signed-off] kconfig: document oldnoconfig to what it
+ really does in conf.c
+Message-ID: <20120822134519.GA5639@adam-laptop>
+References: <1345186649-17502-1-git-send-email-adam8157@gmail.com>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <201208220843.36047.arnd@arndb.de>
+In-Reply-To: <1345186649-17502-1-git-send-email-adam8157@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: Andi Kleen <andi@firstfloor.org>, linux-kernel@vger.kernel.org, x86@kernel.org, mmarek@suse.cz, linux-kbuild@vger.kernel.org, JBeulich@suse.com, akpm@linux-foundation.org, Andi Kleen <ak@linux.intel.com>
+To: linux-kernel@vger.kernel.org
+Cc: Michal Marek <mmarek@suse.cz>, Sam Ravnborg <sam@ravnborg.org>, "Eric W. Biederman" <ebiederm@xmission.com>, "open list:KCONFIG" <linux-kbuild@vger.kernel.org>
 
-On Wed, Aug 22, 2012 at 08:43:35AM +0000, Arnd Bergmann wrote:
-> On Sunday 19 August 2012, Andi Kleen wrote:
-> > -static struct e1000_mac_operations e1000_mac_ops_82575 = {
-> > +/* Workaround for LTO bug */
-> > +__visible struct e1000_mac_operations e1000_mac_ops_82575 = {
+On Fri, Aug 17, 2012 at 02:57:28PM +0800, Adam Lee wrote:
+> As 67d34a6a391369269a2e5dba8a5f42cc4cd50231 said, the make target
+> 'oldnoconfig' is a misnomer. It doesn't set new symbols to 'n', but
+> instead sets it to their default values.
 > 
-> The comment is not very clear outside the context of this patch.
-> Maybe change it to /* __visible added to work around an LTO but */.
+> This patch fixes the document in conf.c, and will submit another patch
+> to replace 'oldnoconfig' to 'olddefconfig'
+> 
+> Signed-off-by: Adam Lee <adam8157@gmail.com>
+> ---
+>  scripts/kconfig/conf.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-I hope to remove this soon, just needs another fix for initcalls
-first. 
+Hi,
 
--Andi
+I think we should apply this patch, any comment?
+
+I was confused by the different documents of `make help` and usage of
+"scripts/kconfig/conf.c" before I got through conf.c and checked the git
+log. Others maybe confused too. So I think we really should apply this
+patch at least.
+
+As regards whether that target should be renamed to 'olddefconfig', we
+can discuss it at another thread.
+
+Thank you.
+
 -- 
-ak@linux.intel.com -- Speaking for myself only.
+Regards,
+Adam Lee
+http://adam8157.info
