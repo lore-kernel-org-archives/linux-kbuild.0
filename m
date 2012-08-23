@@ -1,75 +1,31 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from nikam.ms.mff.cuni.cz ([195.113.20.16]:58533 "EHLO
-	nikam.ms.mff.cuni.cz" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754947Ab2HWPNE (ORCPT
+Received: from mail-iy0-f174.google.com ([209.85.210.174]:37344 "EHLO
+	mail-iy0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754566Ab2HWSzo (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 23 Aug 2012 11:13:04 -0400
-Date: Thu, 23 Aug 2012 17:02:17 +0200
-From: Jan Hubicka <hubicka@ucw.cz>
-Subject: Re: RFC: Link Time Optimization support for the kernel
-Message-ID: <20120823150217.GA29373@kam.mff.cuni.cz>
-References: <1345345030-22211-1-git-send-email-andi@firstfloor.org>
- <20120820074835.GA6710@gmail.com>
- <20120820101044.GE16230@one.firstfloor.org>
- <20120821074921.GA10809@gmail.com>
- <20120821170216.GM16230@one.firstfloor.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20120821170216.GM16230@one.firstfloor.org>
+	Thu, 23 Aug 2012 14:55:44 -0400
+From: Benjamin Poirier <bpoirier@suse.de>
+Subject: [PATCH v2 0/6] menuconfig: jump to search results
+Date: Thu, 23 Aug 2012 14:55:02 -0400
+Message-Id: <1345748108-12206-1-git-send-email-bpoirier@suse.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andi Kleen <andi@firstfloor.org>
-Cc: Ingo Molnar <mingo@kernel.org>, linux-kernel@vger.kernel.org, x86@kernel.org, mmarek@suse.cz, linux-kbuild@vger.kernel.org, JBeulich@suse.com, akpm@linux-foundation.org, Linus Torvalds <torvalds@linux-foundation.org>, "H. Peter Anvin" <hpa@zytor.com>, Thomas Gleixner <tglx@linutronix.de>, hubicka@ucw.cz
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Randy Dunlap <rdunlap@xenotime.net>, Borislav Petkov <bp@alien8.de>, "Yann E. MORIN" <yann.morin.1998@free.fr>, Jean Sacren <sakiwit@gmail.com>, Arnaud Lacombe <lacombar@gmail.com>, Lucas De Marchi <lucas.demarchi@profusion.mobi>, Davidlohr Bueso <dave@gnu.org>, Wang YanQing <udknight@gmail.com>, Paul Gortmaker <paul.gortmaker@windriver.com>, Cheng Renquan <crquan@gmail.com>
 
-> > If data structures could be encapsulated/internalized to 
-> > subsystems and only global functions are exposed to other 
-> > subsystems [which are then LTO optimized] then our include
-> > file dependencies could become a *lot* simpler.
-> 
-> Yes, long term we could have these benefits.
+This patch series adds "jump to" keys (similar to the cscope interface) to the
+search results of "make menuconfig" so that we can go directly to the menu
+entry for a config option after searching for it.
 
-Yes, LTO should make in long term life of developers easier, it is just not tool
-how to get few extra % of performance.
-There is a lot to do.
-> 
-> BTW I should add LTO does more than just inlining:
-> - Drop unused global functions and variables
->   (so may cut down on ifdefs)
-> - Detect type inconsistencies between files
-> - Partial inlining (inline only parts of a function like a test
->   at the beginning)
-> - Detect pure and const functions without side effects that can be more 
->   aggressively optimized in the caller.
-Also noreturn and nothorw are autodetected (the second is probably not big deal
-for kernel, but it makes some C++ codebases a lot smaller by elliminating EH
-and cleanps). We plan to add more in near future.
-> - Detect global clobbers globally. Normally any global call has to 
->   assume all global variables could be changed.  With LTO information some
->   of them can be cached in registers over calls.
-> - Detect read only variables and optimize them
-> - Optimize arguments to global functions (drop unnecessary arguments, 
->   optimize input/output etc.)
+Patches 1-4 implement the basic functionality.
+Patches 5-6 are an optional improvement.
 
-At this moment this really happen s within compilation units only.
-It is one of harder optimizations to get working over whole program,
-we are slowly getting infrasrtucture to make this possible.
+Changes v1-v2:
+* add a short description to patches 2 & 3
+* correct checkpatch style warnings on patch 6
 
-> - Replace indirect calls with direct calls, enabling other
->   optimizations.
-> - Do constant propagation and specialization for functions. So if a
->   function is called commonly with a constant it can generate a special 
->   variant of this function optimized for that.  This still needs more tuning (and
->   currently the code size impact is on the largish side), but I hope
->   to eventually have e.g. a special kmalloc optimized for GFP_KERNEL. 
->   It can also in principle inline callbacks.
+It should be targeted for v3.7
 
-Also profile propagation is done.  When function is called only on cold paths, it becomes
-cold.
+Enjoy,
+-Benjamin
 
-Thanks for all the hard work on LTO kernel, Andi!
-Honza
-> 
-> -Andi
-> -- 
-> ak@linux.intel.com -- Speaking for myself only.
