@@ -1,38 +1,25 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from terminus.zytor.com ([198.137.202.10]:48534 "EHLO mail.zytor.com"
+Received: from mga02.intel.com ([134.134.136.20]:40396 "EHLO mga02.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754717Ab2HWCOw (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 22 Aug 2012 22:14:52 -0400
-Message-ID: <503591F9.7050506@zytor.com>
-Date: Wed, 22 Aug 2012 19:14:17 -0700
-From: "H. Peter Anvin" <hpa@zytor.com>
-MIME-Version: 1.0
+	id S1754380Ab2HWC3M (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 22 Aug 2012 22:29:12 -0400
+Date: Wed, 22 Aug 2012 19:29:12 -0700
+From: Andi Kleen <ak@linux.intel.com>
 Subject: Re: [PATCH 74/74] lto, workaround: Mark do_futex noinline to prevent
  clobbering ebp
-References: <1345345030-22211-1-git-send-email-andi@firstfloor.org> <1345345030-22211-75-git-send-email-andi@firstfloor.org> <503576AB.5030208@zytor.com>
+Message-ID: <20120823022912.GC12707@tassilo.jf.intel.com>
+References: <1345345030-22211-1-git-send-email-andi@firstfloor.org>
+ <1345345030-22211-75-git-send-email-andi@firstfloor.org>
+ <503576AB.5030208@zytor.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 In-Reply-To: <503576AB.5030208@zytor.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andi Kleen <andi@firstfloor.org>
-Cc: linux-kernel@vger.kernel.org, x86@kernel.org, mmarek@suse.cz, linux-kbuild@vger.kernel.org, JBeulich@suse.com, akpm@linux-foundation.org, Andi Kleen <ak@linux.intel.com>
+To: "H. Peter Anvin" <hpa@zytor.com>
+Cc: Andi Kleen <andi@firstfloor.org>, linux-kernel@vger.kernel.org, x86@kernel.org, mmarek@suse.cz, linux-kbuild@vger.kernel.org, JBeulich@suse.com, akpm@linux-foundation.org
 
-On 08/22/2012 05:17 PM, H. Peter Anvin wrote:
-> On 08/18/2012 07:57 PM, Andi Kleen wrote:
->> From: Andi Kleen <ak@linux.intel.com>
->>
->> On a 32bit build gcc 4.7 with LTO decides to clobber the 6th argument on the
->> stack.  Unfortunately this corrupts the user EBP and leads to later crashes.
->> For now mark do_futex noinline to prevent this.
->>
->> I wish there was a generic way to handle this. Seems like a ticking time
->> bomb problem.
->>
->
-> There is a generic way to handle this.  This is actually a bug in Linux
-> that has been known for at least 15 years and which we keep hacking around.
->
 > The right thing to do is to change head_32.S to not violate the i386
 > ABI.  Arguments pushed (by value) on the stack are property of the
 > callee, that is, they are volatile, so the hack of making them do double
@@ -40,23 +27,23 @@ On 08/22/2012 05:17 PM, H. Peter Anvin wrote:
 > The problem is that it works "just well enough" that people (including
 > myself) keep hacking around it with hacks like this, with assembly
 > macros, and whatnot instead of fixing the root cause.
->
-> 	-hpa
->
 
-Just a clarification (Andi knows this, I'm sure, but others might not): 
-this wasn't done the way it is for no reason; back when Linus originally 
-wrote the code, i386 passed *all* arguments on the stack, and we still 
-do that for "asmlinkage" functions on i386.  Since gcc back then rarely 
-if ever mucked with the stack arguments, it made sense to make them 
-"double duty."  Fixing this really should entail changing the invocation 
-of system calls on i386 to use the regparm convention, which means we 
-only need to push three arguments twice, rather than six.
+How about just use register arguments for the first three arguments.
+This should work for the syscalls at least (may be too risky for all
+other asm entry points)
 
-	-hpa
+And for syscalls with more than three generate a stub that saves on the stack
+explicitely.  This could be done using the new fancy SYSCALL definition macros 
+(except that arch/x86 would need to start using them too in its own code)
 
+Or is there some subtle reason with syscall restart and updated args 
+that prevents it? 
+
+Perhaps newer gcc can do regparm(X), X > 3 too, may be worth trying.
+
+Don't have time to look into this currently though.
+
+-Andi
 
 -- 
-H. Peter Anvin, Intel Open Source Technology Center
-I work for Intel.  I don't speak on their behalf.
-
+ak@linux.intel.com -- Speaking for myself only
