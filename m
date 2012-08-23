@@ -1,52 +1,75 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from terminus.zytor.com ([198.137.202.10]:48981 "EHLO mail.zytor.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1757341Ab2HWDOO (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 22 Aug 2012 23:14:14 -0400
-Message-ID: <50359FF8.7090609@zytor.com>
-Date: Wed, 22 Aug 2012 20:14:00 -0700
-From: "H. Peter Anvin" <hpa@zytor.com>
+Received: from nikam.ms.mff.cuni.cz ([195.113.20.16]:58533 "EHLO
+	nikam.ms.mff.cuni.cz" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754947Ab2HWPNE (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 23 Aug 2012 11:13:04 -0400
+Date: Thu, 23 Aug 2012 17:02:17 +0200
+From: Jan Hubicka <hubicka@ucw.cz>
+Subject: Re: RFC: Link Time Optimization support for the kernel
+Message-ID: <20120823150217.GA29373@kam.mff.cuni.cz>
+References: <1345345030-22211-1-git-send-email-andi@firstfloor.org>
+ <20120820074835.GA6710@gmail.com>
+ <20120820101044.GE16230@one.firstfloor.org>
+ <20120821074921.GA10809@gmail.com>
+ <20120821170216.GM16230@one.firstfloor.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH 74/74] lto, workaround: Mark do_futex noinline to prevent
- clobbering ebp
-References: <1345345030-22211-1-git-send-email-andi@firstfloor.org> <1345345030-22211-75-git-send-email-andi@firstfloor.org> <503576AB.5030208@zytor.com> <20120823022912.GC12707@tassilo.jf.intel.com>
-In-Reply-To: <20120823022912.GC12707@tassilo.jf.intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20120821170216.GM16230@one.firstfloor.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andi Kleen <ak@linux.intel.com>
-Cc: Andi Kleen <andi@firstfloor.org>, linux-kernel@vger.kernel.org, x86@kernel.org, mmarek@suse.cz, linux-kbuild@vger.kernel.org, JBeulich@suse.com, akpm@linux-foundation.org
+To: Andi Kleen <andi@firstfloor.org>
+Cc: Ingo Molnar <mingo@kernel.org>, linux-kernel@vger.kernel.org, x86@kernel.org, mmarek@suse.cz, linux-kbuild@vger.kernel.org, JBeulich@suse.com, akpm@linux-foundation.org, Linus Torvalds <torvalds@linux-foundation.org>, "H. Peter Anvin" <hpa@zytor.com>, Thomas Gleixner <tglx@linutronix.de>, hubicka@ucw.cz
 
-On 08/22/2012 07:29 PM, Andi Kleen wrote:
-> How about just use register arguments for the first three arguments.
-> This should work for the syscalls at least (may be too risky for all
-> other asm entry points)
+> > If data structures could be encapsulated/internalized to 
+> > subsystems and only global functions are exposed to other 
+> > subsystems [which are then LTO optimized] then our include
+> > file dependencies could become a *lot* simpler.
+> 
+> Yes, long term we could have these benefits.
 
-Well, it's just an effort to convert each one in turn...
+Yes, LTO should make in long term life of developers easier, it is just not tool
+how to get few extra % of performance.
+There is a lot to do.
+> 
+> BTW I should add LTO does more than just inlining:
+> - Drop unused global functions and variables
+>   (so may cut down on ifdefs)
+> - Detect type inconsistencies between files
+> - Partial inlining (inline only parts of a function like a test
+>   at the beginning)
+> - Detect pure and const functions without side effects that can be more 
+>   aggressively optimized in the caller.
+Also noreturn and nothorw are autodetected (the second is probably not big deal
+for kernel, but it makes some C++ codebases a lot smaller by elliminating EH
+and cleanps). We plan to add more in near future.
+> - Detect global clobbers globally. Normally any global call has to 
+>   assume all global variables could be changed.  With LTO information some
+>   of them can be cached in registers over calls.
+> - Detect read only variables and optimize them
+> - Optimize arguments to global functions (drop unnecessary arguments, 
+>   optimize input/output etc.)
 
-> And for syscalls with more than three generate a stub that saves on the stack
-> explicitely.  This could be done using the new fancy SYSCALL definition macros
-> (except that arch/x86 would need to start using them too in its own code)
+At this moment this really happen s within compilation units only.
+It is one of harder optimizations to get working over whole program,
+we are slowly getting infrasrtucture to make this possible.
 
-I don't think there is any point.  Just push the six potential arguments 
-to the stack and be done with it.
+> - Replace indirect calls with direct calls, enabling other
+>   optimizations.
+> - Do constant propagation and specialization for functions. So if a
+>   function is called commonly with a constant it can generate a special 
+>   variant of this function optimized for that.  This still needs more tuning (and
+>   currently the code size impact is on the largish side), but I hope
+>   to eventually have e.g. a special kmalloc optimized for GFP_KERNEL. 
+>   It can also in principle inline callbacks.
 
-> Or is there some subtle reason with syscall restart and updated args
-> that prevents it?
->
-> Perhaps newer gcc can do regparm(X), X > 3 too, may be worth trying.
+Also profile propagation is done.  When function is called only on cold paths, it becomes
+cold.
 
-No, there is no such ABI defined.
-
-> Don't have time to look into this currently though.
-
-Always the problem.
-
-	-hpa
-
-
--- 
-H. Peter Anvin, Intel Open Source Technology Center
-I work for Intel.  I don't speak on their behalf.
-
+Thanks for all the hard work on LTO kernel, Andi!
+Honza
+> 
+> -Andi
+> -- 
+> ak@linux.intel.com -- Speaking for myself only.
