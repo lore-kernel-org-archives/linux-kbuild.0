@@ -1,54 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pb0-f46.google.com ([209.85.160.46]:51046 "EHLO
-	mail-pb0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750924Ab2HXDFW (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 23 Aug 2012 23:05:22 -0400
-Date: Fri, 24 Aug 2012 11:05:03 +0800
-From: Adam Lee <adam8157@gmail.com>
-Subject: Re: [PATCH] kconfig: replace 'oldnoconfig' with 'olddefconfig', what
- it really does
-Message-ID: <20120824030503.GB5323@adam-laptop>
-References: <1345187778-19678-1-git-send-email-adam8157@gmail.com>
- <1345752601.12440.3.camel@gandalf.local.home>
+Received: from mail.skyhub.de ([78.46.96.112]:45398 "EHLO mail.skyhub.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1759649Ab2HXPt7 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 24 Aug 2012 11:49:59 -0400
+Date: Fri, 24 Aug 2012 17:49:57 +0200
+From: Borislav Petkov <bp@alien8.de>
+Subject: Re: [PATCH v2 0/6] menuconfig: jump to search results
+Message-ID: <20120824154957.GA5738@x1.osrc.amd.com>
+References: <1345748108-12206-1-git-send-email-bpoirier@suse.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <1345752601.12440.3.camel@gandalf.local.home>
+In-Reply-To: <1345748108-12206-1-git-send-email-bpoirier@suse.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Steven Rostedt <rostedt@goodmis.org>
-Cc: linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Yaakov Selkowitz <yselkowitz@users.sourceforge.net>, Peter Foley <pefoley2@verizon.net>, Paul Bolle <pebolle@tiscali.nl>, "Eric W. Biederman" <ebiederm@xmission.com>, "open list:KCONFIG" <linux-kbuild@vger.kernel.org>
+To: Benjamin Poirier <bpoirier@suse.de>
+Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Randy Dunlap <rdunlap@xenotime.net>, "Yann E. MORIN" <yann.morin.1998@free.fr>, Jean Sacren <sakiwit@gmail.com>, Arnaud Lacombe <lacombar@gmail.com>, Lucas De Marchi <lucas.demarchi@profusion.mobi>, Davidlohr Bueso <dave@gnu.org>, Wang YanQing <udknight@gmail.com>, Paul Gortmaker <paul.gortmaker@windriver.com>, Cheng Renquan <crquan@gmail.com>
 
-On Thu, Aug 23, 2012 at 04:10:01PM -0400, Steven Rostedt wrote:
-> Sorry for the late reply.
+On Thu, Aug 23, 2012 at 02:55:02PM -0400, Benjamin Poirier wrote:
+> This patch series adds "jump to" keys (similar to the cscope interface) to the
+> search results of "make menuconfig" so that we can go directly to the menu
+> entry for a config option after searching for it.
 > 
-> On Fri, 2012-08-17 at 15:16 +0800, Adam Lee wrote:
-> > As 67d34a6a391369269a2e5dba8a5f42cc4cd50231 said, 'oldnoconfig' doesn't
-> > set new symbols to 'n', but instead sets it to their default values.
-> > 
-> > So, this patch replace 'oldnoconfig' with 'olddefconfig', stop making
-> > people confused.
-> > 
-> > PS: the document in conf.c fixed in another mail, "[PATCH] [Signed-off]
-> > kconfig: document oldnoconfig to what it really does in conf.c"
+> Patches 1-4 implement the basic functionality.
+> Patches 5-6 are an optional improvement.
 > 
-> The reason that I didn't make this change myself is that I'm afraid that
-> things depend on 'oldnoconfig' existing. For example, ktest.pl has it
-> hardcoded. That may not be the only script that uses it.
+> Changes v1-v2:
+> * add a short description to patches 2 & 3
+> * correct checkpatch style warnings on patch 6
+> 
+> It should be targeted for v3.7
 
-Yes, but I think very few scripts use it up to now, because it's
-"fresh".
+Ok, did a quick test on -rc3 here. Is it a feature that if I do a
+search, go to the result, then do a search again and go to another
+result from the second search... and do that a couple of times, clicking
+on Exit at the lower part of the menu returns me back to all the
+searches I had done? Much like a stack.
 
-> I think a better solution would be to make oldnoconfig do just that, set
-> everything to 'n' as the name implies, and we can create a olddefconfig
-> to do what it does now.
+I mean, I don't mind it that way, it is workable - I'm just asking :).
 
-Lots of configs can't be set to 'n', they expect digit or other string.
-
-Later we fix it, bigger the problem becomes.
+Thanks.
 
 -- 
-Regards,
-Adam Lee
-http://adam8157.info
+Regards/Gruss,
+Boris.
