@@ -1,36 +1,39 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from alice.et.bocholt.fh-gelsenkirchen.de ([193.175.197.63]:60055
-	"EHLO alice.et.bocholt.fh-gelsenkirchen.de" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751295Ab2H0Mh7 (ORCPT
+Received: from astoria.ccjclearline.com ([64.235.106.9]:39386 "EHLO
+	astoria.ccjclearline.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754482Ab2H0Uey (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 27 Aug 2012 08:37:59 -0400
-From: Dirk Gouders <gouders@et.bocholt.fh-gelsenkirchen.de>
-Subject: Re: [PATCH v2 4/6] menuconfig: Add jump keys to search results
-In-Reply-To: <1345748108-12206-5-git-send-email-bpoirier@suse.de> (Benjamin
-	Poirier's message of "Thu, 23 Aug 2012 14:55:06 -0400")
-References: <1345748108-12206-1-git-send-email-bpoirier@suse.de>
-	<1345748108-12206-5-git-send-email-bpoirier@suse.de>
-Date: Mon, 27 Aug 2012 14:37:11 +0200
-Message-ID: <gi7gska4ug.fsf@mx10.gouders.net>
+	Mon, 27 Aug 2012 16:34:54 -0400
+Received: from cpec03f0ed08c7f-cm001ac318e826.cpe.net.cable.rogers.com ([174.115.5.73]:42588 helo=crashcourse.ca)
+	by astoria.ccjclearline.com with esmtpsa (TLSv1:AES256-SHA:256)
+	(Exim 4.77)
+	(envelope-from <rpjday@crashcourse.ca>)
+	id 1T65Cy-0005rd-QN
+	for linux-kbuild@vger.kernel.org; Mon, 27 Aug 2012 15:42:49 -0400
+Date: Mon, 27 Aug 2012 15:42:42 -0400 (EDT)
+From: "Robert P. J. Day" <rpjday@crashcourse.ca>
+Subject: is there any value in exporting <linux/irqnr.h> to userspace?
+Message-ID: <alpine.DEB.2.02.1208271539040.10687@oneiric>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Benjamin Poirier <bpoirier@suse.de>
-Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Randy Dunlap <rdunlap@xenotime.net>, Borislav Petkov <bp@alien8.de>, "Yann E. MORIN" <yann.morin.1998@free.fr>, Jean Sacren <sakiwit@gmail.com>, Arnaud Lacombe <lacombar@gmail.com>, Lucas De Marchi <lucas.demarchi@profusion.mobi>, Davidlohr Bueso <dave@gnu.org>, Wang YanQing <udknight@gmail.com>, Paul Gortmaker <paul.gortmaker@windriver.com>, Cheng Renquan <crquan@gmail.com>
+To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-Benjamin Poirier <bpoirier@suse.de> writes:
 
-> makes it possible to jump directly to the menu for a configuration entry after
-> having searched for it with '/'. If this menu is not currently accessible we
-> jump to the nearest accessible parent instead. After exiting this menu, the
-> user is returned to the search results where he may jump further in or
-> elsewhere.
+  given that irqnr.h is completely wrapped in a __KERNEL__ test, it
+ends up in userspace with no actual content, and the only header file
+that includes it is random.h.  so would it not make sense to drop that
+#include from random.h, then drop irqnr.h from being exported?
 
-I applied your patches, played with menuconfig and did not notice any
-problems.  What I especially like is that if I am guided to a nearest
-accessible parent in cases where a menu is not currently accessible and
-do modifications there, these modifications are visible in the search
-results when I return to them.
+rday
 
-Dirk
+-- 
+
+========================================================================
+Robert P. J. Day                                 Ottawa, Ontario, CANADA
+                        http://crashcourse.ca
+
+Twitter:                                       http://twitter.com/rpjday
+LinkedIn:                               http://ca.linkedin.com/in/rpjday
+========================================================================
