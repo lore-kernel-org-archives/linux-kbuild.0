@@ -1,39 +1,72 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from astoria.ccjclearline.com ([64.235.106.9]:39386 "EHLO
-	astoria.ccjclearline.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754482Ab2H0Uey (ORCPT
+Received: from LGEMRELSE7Q.lge.com ([156.147.1.151]:64157 "EHLO
+	LGEMRELSE7Q.lge.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750850Ab2H2GXP (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 27 Aug 2012 16:34:54 -0400
-Received: from cpec03f0ed08c7f-cm001ac318e826.cpe.net.cable.rogers.com ([174.115.5.73]:42588 helo=crashcourse.ca)
-	by astoria.ccjclearline.com with esmtpsa (TLSv1:AES256-SHA:256)
-	(Exim 4.77)
-	(envelope-from <rpjday@crashcourse.ca>)
-	id 1T65Cy-0005rd-QN
-	for linux-kbuild@vger.kernel.org; Mon, 27 Aug 2012 15:42:49 -0400
-Date: Mon, 27 Aug 2012 15:42:42 -0400 (EDT)
-From: "Robert P. J. Day" <rpjday@crashcourse.ca>
-Subject: is there any value in exporting <linux/irqnr.h> to userspace?
-Message-ID: <alpine.DEB.2.02.1208271539040.10687@oneiric>
+	Wed, 29 Aug 2012 02:23:15 -0400
+From: =?ks_c_5601-1987?B?wMywx8ij?= <gunho.lee@lge.com>
+Subject: [PATCH] scripts/Makefile.modpost: error in finding modules from .mod files.
+Date: Wed, 29 Aug 2012 15:23:12 +0900
+Message-ID: <013701cd85ae$c46353e0$4d29fba0$@lge.com>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+Content-Type: text/plain;
+	charset="ks_c_5601-1987"
+Content-Transfer-Encoding: 7bit
+Content-Language: ko
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: 'Michal Marek' <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
+This error may happen when the user's id or path includes .ko string.
+For example, user's id is xxx.ko and building test.ko module,
+the test.mod file lists ko name and all object files.
+   /home/xxx.ko/kernel_dev/device/drivers/test.ko
+   /home/xxx.ko/kernel_dev/device/drivers/test_main.o
+/home/xxx.ko/kernel_dev/device/drivers/test_io.o ...
+Current Makefile.modpost and Makefile.modinst find and list up not only
+test.ko but also other object files.
+because all of object file's path includes .ko string.
+This is a patch to fix it.
 
-  given that irqnr.h is completely wrapped in a __KERNEL__ test, it
-ends up in userspace with no actual content, and the only header file
-that includes it is random.h.  so would it not make sense to drop that
-#include from random.h, then drop irqnr.h from being exported?
+Signed-off-by: gunho.lee@lge.com <gunho@swc-osl.(none)>
+---
+ scripts/Makefile.modinst |    2 +-
+ scripts/Makefile.modpost |    2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-rday
-
+diff --git a/scripts/Makefile.modinst b/scripts/Makefile.modinst
+index efa5d94..3d13d3a 100644
+--- a/scripts/Makefile.modinst
++++ b/scripts/Makefile.modinst
+@@ -9,7 +9,7 @@ include scripts/Kbuild.include
+ 
+ #
+ 
+-__modules := $(sort $(shell grep -h '\.ko' /dev/null $(wildcard
+$(MODVERDIR)/*.mod)))
++__modules := $(sort $(shell grep -h '\.ko$$' /dev/null $(wildcard
+$(MODVERDIR)/*.mod)))
+ modules := $(patsubst %.o,%.ko,$(wildcard $(__modules:.ko=.o)))
+ 
+ PHONY += $(modules)
+diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
+index 08dce14..a1cb022 100644
+--- a/scripts/Makefile.modpost
++++ b/scripts/Makefile.modpost
+@@ -60,7 +60,7 @@ kernelsymfile := $(objtree)/Module.symvers
+ modulesymfile := $(firstword $(KBUILD_EXTMOD))/Module.symvers
+ 
+ # Step 1), find all modules listed in $(MODVERDIR)/
+-__modules := $(sort $(shell grep -h '\.ko' /dev/null $(wildcard
+$(MODVERDIR)/*.mod)))
++__modules := $(sort $(shell grep -h '\.ko$$' /dev/null $(wildcard
+$(MODVERDIR)/*.mod)))
+ modules   := $(patsubst %.o,%.ko, $(wildcard $(__modules:.ko=.o)))
+ 
+ # Stop after building .o files if NOFINAL is set. Makes compile tests
+quicker
 -- 
+1.6.3.3
 
-========================================================================
-Robert P. J. Day                                 Ottawa, Ontario, CANADA
-                        http://crashcourse.ca
 
-Twitter:                                       http://twitter.com/rpjday
-LinkedIn:                               http://ca.linkedin.com/in/rpjday
-========================================================================
