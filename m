@@ -1,66 +1,29 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-vb0-f46.google.com ([209.85.212.46]:47225 "EHLO
-	mail-vb0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753686Ab2H2N6N (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 29 Aug 2012 09:58:13 -0400
+Received: from cantor2.suse.de ([195.135.220.15]:55396 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752445Ab2H2O1z (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 29 Aug 2012 10:27:55 -0400
+Message-ID: <503E26E7.7070208@suse.cz>
+Date: Wed, 29 Aug 2012 16:27:51 +0200
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Date: Wed, 29 Aug 2012 22:58:12 +0900
-Message-ID: <CAA5UCLK9Zssct_f_8sSm8bDGeMFaAv_kr2GTFFWSCcP=Xz9ikw@mail.gmail.com>
-Subject: [PATCH] scripts/Makefile.modpost: error in finding modules from .mod files.
-From: =?EUC-KR?B?wMywx8ij?= <urpapa@gmail.com>
+Subject: Re: is there any value in exporting <linux/irqnr.h> to userspace?
+References: <alpine.DEB.2.02.1208271539040.10687@oneiric>
+In-Reply-To: <alpine.DEB.2.02.1208271539040.10687@oneiric>
 Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: "Robert P. J. Day" <rpjday@crashcourse.ca>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-This error may happen when the user's id or path includes .ko string.
-For example, user's id is xxx.ko and building test.ko module,
-the test.mod file lists ko name and all object files.
-   /home/xxx.ko/kernel_dev/device/drivers/test.ko
-   /home/xxx.ko/kernel_dev/device/drivers/test_main.o
-/home/xxx.ko/kernel_dev/device/drivers/test_io.o ...
-Current Makefile.modpost and Makefile.modinst find and list up not
-only test.ko but also other object files.
-because all of object file's path includes .ko string.
-This is a patch to fix it.
+On 27.8.2012 21:42, Robert P. J. Day wrote:
+> 
+>   given that irqnr.h is completely wrapped in a __KERNEL__ test, it
+> ends up in userspace with no actual content, and the only header file
+> that includes it is random.h.  so would it not make sense to drop that
+> #include from random.h, then drop irqnr.h from being exported?
 
-Signed-off-by: Gunho Lee <gunho.lee@lge.com>
----
- scripts/Makefile.modinst |    2 +-
- scripts/Makefile.modpost |    2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+Yes. Please submit a patch and CC lkml.
 
-diff --git a/scripts/Makefile.modinst b/scripts/Makefile.modinst
-index efa5d94..3d13d3a 100644
---- a/scripts/Makefile.modinst
-+++ b/scripts/Makefile.modinst
-@@ -9,7 +9,7 @@ include scripts/Kbuild.include
-
- #
-
--__modules := $(sort $(shell grep -h '\.ko' /dev/null $(wildcard
-$(MODVERDIR)/*.mod)))
-+__modules := $(sort $(shell grep -h '\.ko$$' /dev/null $(wildcard
-$(MODVERDIR)/*.mod)))
- modules := $(patsubst %.o,%.ko,$(wildcard $(__modules:.ko=.o)))
-
- PHONY += $(modules)
-diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
-index 08dce14..a1cb022 100644
---- a/scripts/Makefile.modpost
-+++ b/scripts/Makefile.modpost
-@@ -60,7 +60,7 @@ kernelsymfile := $(objtree)/Module.symvers
- modulesymfile := $(firstword $(KBUILD_EXTMOD))/Module.symvers
-
- # Step 1), find all modules listed in $(MODVERDIR)/
--__modules := $(sort $(shell grep -h '\.ko' /dev/null $(wildcard
-$(MODVERDIR)/*.mod)))
-+__modules := $(sort $(shell grep -h '\.ko$$' /dev/null $(wildcard
-$(MODVERDIR)/*.mod)))
- modules   := $(patsubst %.o,%.ko, $(wildcard $(__modules:.ko=.o)))
-
- # Stop after building .o files if NOFINAL is set. Makes compile tests quicker
--- 
-1.6.3.3
+Michal
