@@ -1,47 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:36302 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:39179 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751590Ab2H3Na5 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 30 Aug 2012 09:30:57 -0400
-Message-ID: <503F6B08.3000007@suse.cz>
-Date: Thu, 30 Aug 2012 15:30:48 +0200
+	id S1752260Ab2H3O15 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 30 Aug 2012 10:27:57 -0400
+Date: Thu, 30 Aug 2012 16:27:54 +0200
 From: Michal Marek <mmarek@suse.cz>
+Subject: Re: [PATCH] firmware: fix directory creation rule matching with make
+ 3.82
+Message-ID: <20120830142754.GB14031@sepie.suse.cz>
+References: <1344446076-9135-1-git-send-email-mark.asselstine@windriver.com>
 MIME-Version: 1.0
-Subject: Re: [Patch] scripts: fix "make install" when a directory or file
- named install exists
-References: <CA+Y=x3k4eMMamEANrSFGcopAesMqrbQP-gcxvyXpV7SEee4hOw@mail.gmail.com>
-In-Reply-To: <CA+Y=x3k4eMMamEANrSFGcopAesMqrbQP-gcxvyXpV7SEee4hOw@mail.gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1344446076-9135-1-git-send-email-mark.asselstine@windriver.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andrew Worsley <amworsley@gmail.com>
-Cc: linux-kbuild@vger.kernel.org
+To: Mark Asselstine <mark.asselstine@windriver.com>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-On 7.8.2012 11:08, Andrew Worsley wrote:
-> diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-> index ff1720d..cf4b970 100644
-> --- a/scripts/Makefile.build
-> +++ b/scripts/Makefile.build
-> @@ -434,6 +434,7 @@ $(multi-used-m) : %.o: $(multi-objs-m) FORCE
+On Wed, Aug 08, 2012 at 01:14:36PM -0400, Mark Asselstine wrote:
+> Attempting to run 'firmware_install' with CONFIG_USB_SERIAL_TI=y when
+> using make 3.82 results in an error
 > 
->  targets += $(multi-used-y) $(multi-used-m)
+> make[2]: *** No rule to make target `/lib/firmware/./', needed by
+> `/lib/firmware/ti_3410.fw'.  Stop.
 > 
-> +PHONY += install
+> It turns out make 3.82 is picky when matching directory names with
+> trailing slashes as a result, where make 3.81 would handle this
+> correctly make 3.82 does not find the rule needed to create the
+> directory.
 > 
->  # Descending
->  # ---------------------------------------------------------------------------
+> The './' seen in the error is added by $(dir) for firmware which
+> resides in the base firmware src directory, such as
+> ti_3410.fw.ihex. By performing $(dir) after we prepend the
+> $(INSTALL_FW_PATH) we can ensure we don't end up with a './' in the
+> middle of the path and the directory will be properly created.
+> 
+> This change works with make 3.81 and should work with previous
+> versions as well.
+> 
+> Signed-off-by: Mark Asselstine <mark.asselstine@windriver.com>
 
-I don't think this is the right place to fix it (at least, it should be
-near the .PHONY target with an explanation why it is needed). First, the
-PHONY variable is usually assigned right before the target is defined.
-Second, the are usually two 'install' targets: One is in
-arch/$arch/Makefile, which usually invokes scripts/Makefile.build in
-arch/$arch/boot, where the actual install target is defined. So this
-patch only covers the arch/$arch/boot/Makefile case. It works on x86,
-because arch/x86/Makefile already has the PHONY assignment and only
-arch/x86/boot/Makefile is missing it. Also, not all architectures have
-install, while some have more *install variants. So I'm for fixing the
-Makefiles that do not yet have the PHONY += install or such.
+Thanks a lot and sorry for the delay. I applied the patch to
+kbuild.git#rc-fixes.
 
 Michal
