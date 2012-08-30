@@ -1,47 +1,39 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:39179 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:39855 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752260Ab2H3O15 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 30 Aug 2012 10:27:57 -0400
-Date: Thu, 30 Aug 2012 16:27:54 +0200
+	id S1752455Ab2H3OhH (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 30 Aug 2012 10:37:07 -0400
+Message-ID: <503F7A8F.5050001@suse.cz>
+Date: Thu, 30 Aug 2012 16:37:03 +0200
 From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [PATCH] firmware: fix directory creation rule matching with make
- 3.82
-Message-ID: <20120830142754.GB14031@sepie.suse.cz>
-References: <1344446076-9135-1-git-send-email-mark.asselstine@windriver.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1344446076-9135-1-git-send-email-mark.asselstine@windriver.com>
+Subject: Re: Failure while make modules_install if kmod was compiled with
+ --with-rootprefix set
+References: <CAPNxggbrC7cKXYTKk=ivDL2ZT2w+5G4PACH1YT7iK-ZNk7twRQ@mail.gmail.com>
+In-Reply-To: <CAPNxggbrC7cKXYTKk=ivDL2ZT2w+5G4PACH1YT7iK-ZNk7twRQ@mail.gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Mark Asselstine <mark.asselstine@windriver.com>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: "Arokux B." <arokux@gmail.com>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Wed, Aug 08, 2012 at 01:14:36PM -0400, Mark Asselstine wrote:
-> Attempting to run 'firmware_install' with CONFIG_USB_SERIAL_TI=y when
-> using make 3.82 results in an error
+On 10.8.2012 23:50, Arokux B. wrote:
+> Dear Mr. Marek, dear all,
 > 
-> make[2]: *** No rule to make target `/lib/firmware/./', needed by
-> `/lib/firmware/ti_3410.fw'.  Stop.
-> 
-> It turns out make 3.82 is picky when matching directory names with
-> trailing slashes as a result, where make 3.81 would handle this
-> correctly make 3.82 does not find the rule needed to create the
-> directory.
-> 
-> The './' seen in the error is added by $(dir) for firmware which
-> resides in the base firmware src directory, such as
-> ti_3410.fw.ihex. By performing $(dir) after we prepend the
-> $(INSTALL_FW_PATH) we can ensure we don't end up with a './' in the
-> middle of the path and the directory will be properly created.
-> 
-> This change works with make 3.81 and should work with previous
-> versions as well.
-> 
-> Signed-off-by: Mark Asselstine <mark.asselstine@windriver.com>
+> I have detected a hidden failure while building the kernel. If
+> --with-rootprefix is set for kmod, then depmod will look for modules
+> installed at the location $ROOTPREFIX/lib/modules/<version>. The
+> kernel build system does not know anything about $ROOTPREFIX, and so
+> the wrong directory is created for the test if the hack is needed for
+> an older versin of depmod at scripts/depmod.sh:19 mkdir -p
+> "$tmp_dir/lib/modules/$KERNELRELEASE". That is why "$DEPMOD" -b
+> "$tmp_dir" $KERNELRELEASE will always fail
 
-Thanks a lot and sorry for the delay. I applied the patch to
-kbuild.git#rc-fixes.
+I think we can revert the hack, because the three-digit version number
+will stay for foreseeable future and depmod is not the only tool that
+used to rely on this. However, what you describe looks like a bug in
+kmod's depmod. -b sets the basedir, depmod should not prepend it with
+any compiled-in string.
 
 Michal
