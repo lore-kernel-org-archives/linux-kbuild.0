@@ -1,49 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:34773 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:36302 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750864Ab2H3M7O (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 30 Aug 2012 08:59:14 -0400
-Date: Thu, 30 Aug 2012 14:59:12 +0200
+	id S1751590Ab2H3Na5 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 30 Aug 2012 09:30:57 -0400
+Message-ID: <503F6B08.3000007@suse.cz>
+Date: Thu, 30 Aug 2012 15:30:48 +0200
 From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [RFC] kconfig/mconf.c: revision of curses initialization.
-Message-ID: <20120830125912.GA14031@sepie.suse.cz>
-References: <gi628woxo0.fsf@mx10.gouders.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <gi628woxo0.fsf@mx10.gouders.net>
+Subject: Re: [Patch] scripts: fix "make install" when a directory or file
+ named install exists
+References: <CA+Y=x3k4eMMamEANrSFGcopAesMqrbQP-gcxvyXpV7SEee4hOw@mail.gmail.com>
+In-Reply-To: <CA+Y=x3k4eMMamEANrSFGcopAesMqrbQP-gcxvyXpV7SEee4hOw@mail.gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Dirk Gouders <gouders@et.bocholt.fh-gelsenkirchen.de>
-Cc: Arnaud Lacombe <lacombar@gmail.com>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: Andrew Worsley <amworsley@gmail.com>
+Cc: linux-kbuild@vger.kernel.org
 
-On Mon, Aug 06, 2012 at 05:19:43PM +0200, Dirk Gouders wrote:
-> Hello,
+On 7.8.2012 11:08, Andrew Worsley wrote:
+> diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+> index ff1720d..cf4b970 100644
+> --- a/scripts/Makefile.build
+> +++ b/scripts/Makefile.build
+> @@ -434,6 +434,7 @@ $(multi-used-m) : %.o: $(multi-objs-m) FORCE
 > 
-> I noticed that in mconf, initscr() is called twice -- as far as I found
-> out since commit d0e1e09568.
+>  targets += $(multi-used-y) $(multi-used-m)
 > 
-> In case you see a need to fix that:
+> +PHONY += install
 > 
-> I first thought about simply removing the call in init_dialog() in
-> util.c but then had the feeling that saving of initial cursor positions
-> also perhaps is better done in that function...
-> 
-> Dirk
-> 
-> ------------------------------------------------------------------------
-> From 1a4022eedbee6032dea16f67bbe4028a8d3d07a0 Mon Sep 17 00:00:00 2001
-> From: Dirk Gouders <gouders@et.bocholt.fh-gelsenkirchen.de>
-> Date: Mon, 6 Aug 2012 16:48:23 +0200
-> Subject: [PATCH] kconfig/mconf.c: revision of curses initialization.
-> 
-> Since commit d0e1e09568 initscr() is called twice in mconf.
-> 
-> Do it only in init_dialog() in util.c and there also save the
-> cursor position for the signal handler in mconf.c.
-> 
-> Signed-off-by: Dirk Gouders <gouders@et.bocholt.fh-gelsenkirchen.de>
+>  # Descending
+>  # ---------------------------------------------------------------------------
 
-Applied to kbuild.git#kconfig, thanks.
+I don't think this is the right place to fix it (at least, it should be
+near the .PHONY target with an explanation why it is needed). First, the
+PHONY variable is usually assigned right before the target is defined.
+Second, the are usually two 'install' targets: One is in
+arch/$arch/Makefile, which usually invokes scripts/Makefile.build in
+arch/$arch/boot, where the actual install target is defined. So this
+patch only covers the arch/$arch/boot/Makefile case. It works on x86,
+because arch/x86/Makefile already has the PHONY assignment and only
+arch/x86/boot/Makefile is missing it. Also, not all architectures have
+install, while some have more *install variants. So I'm for fixing the
+Makefiles that do not yet have the PHONY += install or such.
 
 Michal
