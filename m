@@ -1,15 +1,15 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pb0-f46.google.com ([209.85.160.46]:36755 "EHLO
+Received: from mail-pb0-f46.google.com ([209.85.160.46]:39332 "EHLO
 	mail-pb0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751614Ab2HaPy4 (ORCPT
+	with ESMTP id S1754286Ab2HaRFm (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 31 Aug 2012 11:54:56 -0400
+	Fri, 31 Aug 2012 13:05:42 -0400
 From: Adam Lee <adam8157@gmail.com>
-Subject: [PATCH v2] kconfig: replace 'oldnoconfig' with 'olddefconfig', and keep the old name as an alias
-Date: Fri, 31 Aug 2012 23:54:31 +0800
-Message-Id: <1346428476-12061-1-git-send-email-adam8157@gmail.com>
-In-Reply-To: <5040D021.50607@suse.cz>
-References: <5040D021.50607@suse.cz>
+Subject: [PATCH v3] kconfig: replace 'oldnoconfig' with 'olddefconfig', and keep the old name as an alias
+Date: Sat,  1 Sep 2012 01:05:17 +0800
+Message-Id: <1346432721-22521-1-git-send-email-adam8157@gmail.com>
+In-Reply-To: <1346428476-12061-1-git-send-email-adam8157@gmail.com>
+References: <1346428476-12061-1-git-send-email-adam8157@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org
@@ -23,12 +23,14 @@ people confused, and keep the old name 'oldnoconfig' as an alias,
 because people already are dependent on its behavior with the
 counter-intuitive name.
 
+v3: use a better way an add comments about alias in conf.c
+
 Signed-off-by: Adam Lee <adam8157@gmail.com>
 ---
  scripts/kconfig/Makefile     | 12 +++++++++---
- scripts/kconfig/conf.c       | 12 ++++++++++--
+ scripts/kconfig/conf.c       | 25 ++++++++++++++++---------
  tools/testing/ktest/ktest.pl | 15 +++++++--------
- 3 files changed, 26 insertions(+), 13 deletions(-)
+ 3 files changed, 32 insertions(+), 20 deletions(-)
 
 diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
 index 77d5399..3091794 100644
@@ -64,84 +66,97 @@ index 77d5399..3091794 100644
  # lxdialog stuff
  check-lxdialog  := $(srctree)/$(src)/lxdialog/check-lxdialog.sh
 diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
-index 6875680..46290d3 100644
+index 6875680..4da3b4a 100644
 --- a/scripts/kconfig/conf.c
 +++ b/scripts/kconfig/conf.c
-@@ -32,6 +32,7 @@ enum input_mode {
+@@ -32,7 +32,7 @@ enum input_mode {
  	defconfig,
  	savedefconfig,
  	listnewconfig,
+-	oldnoconfig,
 +	olddefconfig,
- 	oldnoconfig,
  } input_mode = oldaskconfig;
  
-@@ -365,6 +366,7 @@ static void conf(struct menu *menu)
+ static int indent = 1;
+@@ -365,7 +365,7 @@ static void conf(struct menu *menu)
  		case P_MENU:
  			if ((input_mode == silentoldconfig ||
  			     input_mode == listnewconfig ||
-+			     input_mode == olddefconfig ||
- 			     input_mode == oldnoconfig) &&
+-			     input_mode == oldnoconfig) &&
++			     input_mode == olddefconfig) &&
  			    rootEntry != menu) {
  				check_conf(menu);
-@@ -429,7 +431,8 @@ static void check_conf(struct menu *menu)
+ 				return;
+@@ -429,7 +429,7 @@ static void check_conf(struct menu *menu)
  				if (sym->name && !sym_is_choice_value(sym)) {
  					printf("%s%s\n", CONFIG_, sym->name);
  				}
 -			} else if (input_mode != oldnoconfig) {
-+			} else if ((input_mode != olddefconfig) &&
-+				   (input_mode != oldnoconfig)) {
++			} else if (input_mode != olddefconfig) {
  				if (!conf_cnt++)
  					printf(_("*\n* Restart config...\n*\n"));
  				rootEntry = menu_get_parent_menu(menu);
-@@ -454,6 +457,7 @@ static struct option long_opts[] = {
+@@ -454,7 +454,13 @@ static struct option long_opts[] = {
  	{"alldefconfig",    no_argument,       NULL, alldefconfig},
  	{"randconfig",      no_argument,       NULL, randconfig},
  	{"listnewconfig",   no_argument,       NULL, listnewconfig},
+-	{"oldnoconfig",     no_argument,       NULL, oldnoconfig},
 +	{"olddefconfig",    no_argument,       NULL, olddefconfig},
- 	{"oldnoconfig",     no_argument,       NULL, oldnoconfig},
++	/*
++	 * oldnoconfig is an alias of olddefconfig, because people already
++	 * are dependent on its behavior(sets new symbols to their default
++	 * value but not 'n') with the counter-intuitive name.
++	 */
++	{"oldnoconfig",     no_argument,       NULL, olddefconfig},
  	{NULL, 0, NULL, 0}
  };
-@@ -467,7 +471,7 @@ static void conf_usage(const char *progname)
+ 
+@@ -467,7 +473,8 @@ static void conf_usage(const char *progname)
  	printf("  --oldaskconfig          Start a new configuration using a line-oriented program\n");
  	printf("  --oldconfig             Update a configuration using a provided .config as base\n");
  	printf("  --silentoldconfig       Same as oldconfig, but quietly, additionally update deps\n");
 -	printf("  --oldnoconfig           Same as silentoldconfig but sets new symbols to their default value\n");
 +	printf("  --olddefconfig          Same as silentoldconfig but sets new symbols to their default value\n");
++	printf("  --oldnoconfig           An alias of olddefconfig\n");
  	printf("  --defconfig <file>      New config with default defined in <file>\n");
  	printf("  --savedefconfig <file>  Save the minimal current configuration to <file>\n");
  	printf("  --allnoconfig           New config where all options are answered with no\n");
-@@ -520,6 +524,7 @@ int main(int ac, char **av)
+@@ -520,7 +527,7 @@ int main(int ac, char **av)
  		case allmodconfig:
  		case alldefconfig:
  		case listnewconfig:
+-		case oldnoconfig:
 +		case olddefconfig:
- 		case oldnoconfig:
  			break;
  		case '?':
-@@ -565,6 +570,7 @@ int main(int ac, char **av)
+ 			conf_usage(progname);
+@@ -565,7 +572,7 @@ int main(int ac, char **av)
  	case oldaskconfig:
  	case oldconfig:
  	case listnewconfig:
+-	case oldnoconfig:
 +	case olddefconfig:
- 	case oldnoconfig:
  		conf_read(NULL);
  		break;
-@@ -645,6 +651,7 @@ int main(int ac, char **av)
+ 	case allnoconfig:
+@@ -645,7 +652,7 @@ int main(int ac, char **av)
  		/* fall through */
  	case oldconfig:
  	case listnewconfig:
+-	case oldnoconfig:
 +	case olddefconfig:
- 	case oldnoconfig:
  	case silentoldconfig:
  		/* Update until a loop caused no more changes */
-@@ -653,6 +660,7 @@ int main(int ac, char **av)
+ 		do {
+@@ -653,7 +660,7 @@ int main(int ac, char **av)
  			check_conf(&rootmenu);
  		} while (conf_cnt &&
  			 (input_mode != listnewconfig &&
-+			  input_mode != olddefconfig &&
- 			  input_mode != oldnoconfig));
+-			  input_mode != oldnoconfig));
++			  input_mode != olddefconfig));
  		break;
  	}
+ 
 diff --git a/tools/testing/ktest/ktest.pl b/tools/testing/ktest/ktest.pl
 index 52b7959..0ed73b5 100755
 --- a/tools/testing/ktest/ktest.pl
