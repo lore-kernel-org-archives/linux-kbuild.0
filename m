@@ -1,60 +1,39 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-bk0-f46.google.com ([209.85.214.46]:33402 "EHLO
-	mail-bk0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752641Ab2HaNSH (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 31 Aug 2012 09:18:07 -0400
-Message-ID: <5040B98A.8090304@suse.cz>
-Date: Fri, 31 Aug 2012 15:18:02 +0200
-From: Jiri Slaby <jslaby@suse.cz>
+Received: from cantor2.suse.de ([195.135.220.15]:39839 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751923Ab2HaNfE (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 31 Aug 2012 09:35:04 -0400
+Date: Fri, 31 Aug 2012 15:35:01 +0200
+From: Michal Marek <mmarek@suse.cz>
+Subject: Re: [PATCH] scripts/kernel-doc: added support for html5
+Message-ID: <20120831133501.GA11531@sepie.suse.cz>
+References: <1344761175-19370-1-git-send-email-mail@danrl.de>
 MIME-Version: 1.0
-Subject: Re: i2c-designware-core: KBUILD_MODNAME undeclared [was: Build regressions/improvements
-  in v3.6-rc1]
-References: <1344072256-13170-1-git-send-email-geert@linux-m68k.org> <502C0022.2020106@suse.cz> <20120831144429.554345d0@endymion.delvare>
-In-Reply-To: <20120831144429.554345d0@endymion.delvare>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1344761175-19370-1-git-send-email-mail@danrl.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jean Delvare <khali@linux-fr.org>
-Cc: Geert Uytterhoeven <geert@linux-m68k.org>, linux-kernel@vger.kernel.org, dirk.brandewie@gmail.com, linux-i2c@vger.kernel.org, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, jbaron@redhat.com, ben-linux@fluff.org, Jiri Slaby <jirislaby@gmail.com>
+To: Dan Luedtke <mail@danrl.de>
+Cc: linux-kbuild@vger.kernel.org, rdunlap@xenotime.net
 
-On 08/31/2012 02:44 PM, Jean Delvare wrote:
-> Hi Jiri, Geert,
+On Sun, Aug 12, 2012 at 10:46:15AM +0200, Dan Luedtke wrote:
+> New output option html5 writes validating HTML5 and adds
+> CSS classes ready to be selected by third-party stylesheets.
+> HTML ids have been added to block-level elements "article" for
+> direct reference of particular objects via URL.
 > 
-> On Wed, 15 Aug 2012 22:01:38 +0200, Jiri Slaby wrote:
->> On 08/04/2012 11:24 AM, Geert Uytterhoeven wrote:
->>> Below is the list of build error/warning regressions/improvements in
->>> v3.6-rc1[1] compared to v3.5[2].
->> ...
->>>   + drivers/i2c/busses/i2c-designware-core.c: error: 'KBUILD_MODNAME' undeclared (first use in this function):
->>
->> This is a real problem we are facing here. It happens on PPC when all
->> I2C_DESIGNWARE_PLATFORM, I2C_DESIGNWARE_PCI and DYNAMIC_DEBUG are set.
->>
->> It's because i2c-designware-core.c is used in two modules
->> (i2c-designware-platform and i2c-designware-pci) and KBUILD_MODNAME is
->> not defined for those because (scripts/Makefile.lib):
->> # $(modname_flags) #defines KBUILD_MODNAME as the name of the module
->> # it will end up in (or would, if it gets compiled in)
->> # Note: Files that end up in two or more modules are compiled
->> #       without the KBUILD_MODNAME definition. The reason is
->> #       that any made-up name would differ in different configs.
->>
->> But DYNAMIC_DEBUG needs KBUILD_MODNAME for dev_dbg used in that source.
->>
->> Any ideas? Why is it not a separate module for example?
-> 
-> It should be. Axel Lin has posted a patch which does that and it should
-> fix your problem:
-> https://lkml.org/lkml/2012/6/13/233
-> 
-> Please test and confirm it does the right thing. I'll push the patch
-> upstream if it does.
+> Signed-off-by: Dan Luedtke <mail@danrl.de>
+> Acked-by: Randy Dunlap <rdunlap@xenotime.net>
+> ---
+> Patch got first submitted split up in multiple patches at
+> Wed, 25 Jul 2012 15:38:08 +0200 on LKML. Due to bad timing
+> (in the middle of Randy Dunlop dropping maintainership) and
+> maybe all of us are going on vacation in different weeks, the
+> patch had no chance to make it through. Randy suggested to
+> resend the patch and kindly acked-by it already.
+> Thank you for your patience and help.
 
-Yes, it does.
+I applied it to kbuild.git#misc now, thanks.
 
-thanks,
--- 
-js
-suse labs
+Michal
