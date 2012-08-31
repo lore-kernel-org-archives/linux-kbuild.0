@@ -1,42 +1,42 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:46686 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:50051 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753901Ab2HaO50 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 31 Aug 2012 10:57:26 -0400
-Date: Fri, 31 Aug 2012 16:57:25 +0200
+	id S1754285Ab2HaPrr (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 31 Aug 2012 11:47:47 -0400
+Date: Fri, 31 Aug 2012 17:47:45 +0200
 From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [PATCH] [Signed-off] kconfig: document oldnoconfig to what it
- really does in conf.c
-Message-ID: <20120831145725.GE11531@sepie.suse.cz>
-References: <1345186649-17502-1-git-send-email-adam8157@gmail.com>
- <20120822134519.GA5639@adam-laptop>
+Subject: Re: [PATCH] scripts/Makefile.modpost: error in finding modules from
+ .mod files.
+Message-ID: <20120831154745.GG11531@sepie.suse.cz>
+References: <CAA5UCLK9Zssct_f_8sSm8bDGeMFaAv_kr2GTFFWSCcP=Xz9ikw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20120822134519.GA5639@adam-laptop>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAA5UCLK9Zssct_f_8sSm8bDGeMFaAv_kr2GTFFWSCcP=Xz9ikw@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Adam Lee <adam8157@gmail.com>
-Cc: linux-kernel@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>, "Eric W. Biederman" <ebiederm@xmission.com>, "open list:KCONFIG" <linux-kbuild@vger.kernel.org>
+To: =?utf-8?B?7J206rG07Zi4?= <urpapa@gmail.com>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Wed, Aug 22, 2012 at 09:45:19PM +0800, Adam Lee wrote:
-> On Fri, Aug 17, 2012 at 02:57:28PM +0800, Adam Lee wrote:
-> > As 67d34a6a391369269a2e5dba8a5f42cc4cd50231 said, the make target
-> > 'oldnoconfig' is a misnomer. It doesn't set new symbols to 'n', but
-> > instead sets it to their default values.
-> > 
-> > This patch fixes the document in conf.c, and will submit another patch
-> > to replace 'oldnoconfig' to 'olddefconfig'
-> > 
-> > Signed-off-by: Adam Lee <adam8157@gmail.com>
-> > ---
-> >  scripts/kconfig/conf.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
+On Wed, Aug 29, 2012 at 10:58:12PM +0900, 이건호 wrote:
+> This error may happen when the user's id or path includes .ko string.
+> For example, user's id is xxx.ko and building test.ko module,
+> the test.mod file lists ko name and all object files.
+>    /home/xxx.ko/kernel_dev/device/drivers/test.ko
+>    /home/xxx.ko/kernel_dev/device/drivers/test_main.o
+> /home/xxx.ko/kernel_dev/device/drivers/test_io.o ...
+> Current Makefile.modpost and Makefile.modinst find and list up not
+> only test.ko but also other object files.
+> because all of object file's path includes .ko string.
+> This is a patch to fix it.
 > 
-> Hi,
-> 
-> I think we should apply this patch, any comment?
+> Signed-off-by: Gunho Lee <gunho.lee@lge.com>
 
-Sorry for the delay. I applied it to kbuild.git#kconfig now.
+Good catch, applied to kbuild.git#kbuild. BTW, your mailer (gmail?)
+broke the log lines into two. I fixed it manually, but it makes the
+recipient's life easier if you send your patches either using
+git-send-email or a mailer that does not mangle the message (see
+Documentation/email-clients.txt).
 
 Michal
