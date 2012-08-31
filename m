@@ -1,39 +1,56 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:39855 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752455Ab2H3OhH (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 30 Aug 2012 10:37:07 -0400
-Message-ID: <503F7A8F.5050001@suse.cz>
-Date: Thu, 30 Aug 2012 16:37:03 +0200
-From: Michal Marek <mmarek@suse.cz>
-MIME-Version: 1.0
-Subject: Re: Failure while make modules_install if kmod was compiled with
- --with-rootprefix set
-References: <CAPNxggbrC7cKXYTKk=ivDL2ZT2w+5G4PACH1YT7iK-ZNk7twRQ@mail.gmail.com>
-In-Reply-To: <CAPNxggbrC7cKXYTKk=ivDL2ZT2w+5G4PACH1YT7iK-ZNk7twRQ@mail.gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
+Received: from zoneX.GCU-Squad.org ([194.213.125.0]:2953 "EHLO
+	services.gcu-squad.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751366Ab2HaMol (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 31 Aug 2012 08:44:41 -0400
+Date: Fri, 31 Aug 2012 14:44:29 +0200
+From: Jean Delvare <khali@linux-fr.org>
+Subject: Re: i2c-designware-core: KBUILD_MODNAME undeclared [was: Build
+ regressions/improvements  in v3.6-rc1]
+Message-ID: <20120831144429.554345d0@endymion.delvare>
+In-Reply-To: <502C0022.2020106@suse.cz>
+References: <1344072256-13170-1-git-send-email-geert@linux-m68k.org>
+	<502C0022.2020106@suse.cz>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Arokux B." <arokux@gmail.com>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Jiri Slaby <jslaby@suse.cz>
+Cc: Geert Uytterhoeven <geert@linux-m68k.org>, linux-kernel@vger.kernel.org, dirk.brandewie@gmail.com, linux-i2c@vger.kernel.org, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, jbaron@redhat.com, ben-linux@fluff.org, Jiri Slaby <jirislaby@gmail.com>
 
-On 10.8.2012 23:50, Arokux B. wrote:
-> Dear Mr. Marek, dear all,
+Hi Jiri, Geert,
+
+On Wed, 15 Aug 2012 22:01:38 +0200, Jiri Slaby wrote:
+> On 08/04/2012 11:24 AM, Geert Uytterhoeven wrote:
+> > Below is the list of build error/warning regressions/improvements in
+> > v3.6-rc1[1] compared to v3.5[2].
+> ...
+> >   + drivers/i2c/busses/i2c-designware-core.c: error: 'KBUILD_MODNAME' undeclared (first use in this function):
 > 
-> I have detected a hidden failure while building the kernel. If
-> --with-rootprefix is set for kmod, then depmod will look for modules
-> installed at the location $ROOTPREFIX/lib/modules/<version>. The
-> kernel build system does not know anything about $ROOTPREFIX, and so
-> the wrong directory is created for the test if the hack is needed for
-> an older versin of depmod at scripts/depmod.sh:19 mkdir -p
-> "$tmp_dir/lib/modules/$KERNELRELEASE". That is why "$DEPMOD" -b
-> "$tmp_dir" $KERNELRELEASE will always fail
+> This is a real problem we are facing here. It happens on PPC when all
+> I2C_DESIGNWARE_PLATFORM, I2C_DESIGNWARE_PCI and DYNAMIC_DEBUG are set.
+> 
+> It's because i2c-designware-core.c is used in two modules
+> (i2c-designware-platform and i2c-designware-pci) and KBUILD_MODNAME is
+> not defined for those because (scripts/Makefile.lib):
+> # $(modname_flags) #defines KBUILD_MODNAME as the name of the module
+> # it will end up in (or would, if it gets compiled in)
+> # Note: Files that end up in two or more modules are compiled
+> #       without the KBUILD_MODNAME definition. The reason is
+> #       that any made-up name would differ in different configs.
+> 
+> But DYNAMIC_DEBUG needs KBUILD_MODNAME for dev_dbg used in that source.
+> 
+> Any ideas? Why is it not a separate module for example?
 
-I think we can revert the hack, because the three-digit version number
-will stay for foreseeable future and depmod is not the only tool that
-used to rely on this. However, what you describe looks like a bug in
-kmod's depmod. -b sets the basedir, depmod should not prepend it with
-any compiled-in string.
+It should be. Axel Lin has posted a patch which does that and it should
+fix your problem:
+https://lkml.org/lkml/2012/6/13/233
 
-Michal
+Please test and confirm it does the right thing. I'll push the patch
+upstream if it does.
+
+-- 
+Jean Delvare
