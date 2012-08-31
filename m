@@ -1,61 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:40413 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:42623 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752162Ab2HaNuR (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 31 Aug 2012 09:50:17 -0400
-Message-ID: <5040C112.70501@suse.cz>
-Date: Fri, 31 Aug 2012 15:50:10 +0200
+	id S1751227Ab2HaOSC (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 31 Aug 2012 10:18:02 -0400
+Date: Fri, 31 Aug 2012 16:18:00 +0200
 From: Michal Marek <mmarek@suse.cz>
+Subject: Re: [PATCH] kbuild: Remove useless warning while appending KCFLAGS
+Message-ID: <20120831141800.GB11531@sepie.suse.cz>
+References: <1344960054-26557-1-git-send-email-ozancag@gmail.com>
 MIME-Version: 1.0
-Subject: Re: [PATCH] builddeb: remove unneeded explicit Architecture
-References: <1344941092-31312-1-git-send-email-tzafrir.cohen@xorcom.com>
-In-Reply-To: <1344941092-31312-1-git-send-email-tzafrir.cohen@xorcom.com>
-Content-Type: text/plain; charset=ISO-8859-2
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <1344960054-26557-1-git-send-email-ozancag@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Tzafrir Cohen <tzafrir.cohen@xorcom.com>
-Cc: Linux Kbuild <linux-kbuild@vger.kernel.org>, Linux Kernel <linux-kernel@vger.kernel.org>
+To: Ozan =?utf-8?B?w4dhxJ9sYXlhbg==?= <ozancag@gmail.com>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, sam@ravnborg.org, artem.bityutskiy@linux.intel.com
 
-Adding Max to CC.
+On Tue, Aug 14, 2012 at 07:00:54PM +0300, Ozan Çağlayan wrote:
+> This is a respin of an older patch sent by Sam Ravnborg:
+>   http://www.gossamer-threads.com/lists/linux/kernel/1530602
+> 
+> This patch removes the annoying warning:
+> 
+> Makefile:708: "WARNING: Appending $KCFLAGS (-Wno-sign-compare) from command
+> line to kernel $CFLAGS"
+> 
+> which is printed every time I use KCFLAFS. The commit which introduced the
+> warning:
+> 
+> 69ee0b3 kbuild: do not pick up CFLAGS from the environment
+> 
+> tells about the problems when people have CFLAGS in their environment,
+> then switches to KCFLAFS which should be enough to solve the issue, but
+> it anyway introduces a warning. Drop this warning.
+> 
+> Signed-off-by: Ozan Çağlayan <ozancag@gmail.com>
 
-On 14.8.2012 12:44, Tzafrir Cohen wrote:
-> Architecture was set explicitly in debian/control for one of the three
-> packages (linux-libc-dev) but not for the other two. When cross-building
-> it gives me an error:
-> 
->   dpkg-gencontrol: error: current host architecture 'armhf' does not
->   appear in package's architecture list (amd64)
-> 
-> Also note that if used, dpkg --print-architecture should have been
-> replaced with dpkg-architecture.
-> 
-> Signed-off-by: Tzafrir Cohen <tzafrir.cohen@xorcom.com>
-> ---
->  scripts/package/builddeb |    3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
-> 
-> diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-> index acb8650..d9c71a6 100644
-> --- a/scripts/package/builddeb
-> +++ b/scripts/package/builddeb
-> @@ -252,13 +252,12 @@ mkdir -p "$destdir"
->  (cd $objtree; tar -c -f - -T "$objtree/debian/hdrobjfiles") | (cd $destdir; tar -xf -)
->  ln -sf "/usr/src/linux-headers-$version" "$kernel_headers_dir/lib/modules/$version/build"
->  rm -f "$objtree/debian/hdrsrcfiles" "$objtree/debian/hdrobjfiles"
-> -arch=$(dpkg --print-architecture)
->  
->  cat <<EOF >> debian/control
->  
->  Package: $kernel_headers_packagename
->  Provides: linux-headers, linux-headers-2.6
-> -Architecture: $arch
-> +Architecture: any
->  Description: Linux kernel headers for $KERNELRELEASE on $arch
->   This package provides kernel header files for $KERNELRELEASE on $arch
->   .
-
-As the package contains files from arch/$SRCARCH/include, I doubt that
-this is a valid change.
+Thanks, applied to kbuild.git#kbuild.
 
 Michal
