@@ -1,43 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:42623 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:46102 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751227Ab2HaOSC (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 31 Aug 2012 10:18:02 -0400
-Date: Fri, 31 Aug 2012 16:18:00 +0200
+	id S1753445Ab2HaOq4 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 31 Aug 2012 10:46:56 -0400
+Date: Fri, 31 Aug 2012 16:46:54 +0200
 From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [PATCH] kbuild: Remove useless warning while appending KCFLAGS
-Message-ID: <20120831141800.GB11531@sepie.suse.cz>
-References: <1344960054-26557-1-git-send-email-ozancag@gmail.com>
+Subject: Re: [PATCH] scripts/kernel-doc: drop maintainer
+Message-ID: <20120831144654.GC11531@sepie.suse.cz>
+References: <50219DD4.7020406@xenotime.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <1344960054-26557-1-git-send-email-ozancag@gmail.com>
+In-Reply-To: <50219DD4.7020406@xenotime.net>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ozan =?utf-8?B?w4dhxJ9sYXlhbg==?= <ozancag@gmail.com>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, sam@ravnborg.org, artem.bityutskiy@linux.intel.com
+To: Randy Dunlap <rdunlap@xenotime.net>
+Cc: linux-kbuild@vger.kernel.org, "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>, Rob Landley <rob@landley.net>
 
-On Tue, Aug 14, 2012 at 07:00:54PM +0300, Ozan Çağlayan wrote:
-> This is a respin of an older patch sent by Sam Ravnborg:
->   http://www.gossamer-threads.com/lists/linux/kernel/1530602
+On Tue, Aug 07, 2012 at 03:59:32PM -0700, Randy Dunlap wrote:
+> From: Randy Dunlap <rdunlap@xenotime.net>
 > 
-> This patch removes the annoying warning:
+> Drop maintainership of scripts/kernel-doc.
+> Patches can go thru the kbuild tree.
 > 
-> Makefile:708: "WARNING: Appending $KCFLAGS (-Wno-sign-compare) from command
-> line to kernel $CFLAGS"
+> Signed-off-by: Randy Dunlap <rdunlap@xenotime.net>
+> Cc:	Michal Marek <mmarek@suse.cz>
+> Cc:	Rob Landley <rob@landley.net>
+> ---
+>  MAINTAINERS |    5 -----
+>  1 file changed, 5 deletions(-)
 > 
-> which is printed every time I use KCFLAFS. The commit which introduced the
-> warning:
 > 
-> 69ee0b3 kbuild: do not pick up CFLAGS from the environment
-> 
-> tells about the problems when people have CFLAGS in their environment,
-> then switches to KCFLAFS which should be enough to solve the issue, but
-> it anyway introduces a warning. Drop this warning.
-> 
-> Signed-off-by: Ozan Çağlayan <ozancag@gmail.com>
+> Michal, is this OK with you?
+> If so, please merge, and then I have 3 patches to
+> scripts/kernel-doc for you (from someone else).
 
-Thanks, applied to kbuild.git#kbuild.
+Sorry for the delay. Yes, it's OK with me, I can apply the patches to
+the kbuild.git tree. Your review is of course appreciated.
 
 Michal
