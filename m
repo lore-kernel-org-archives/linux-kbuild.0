@@ -1,41 +1,42 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:46102 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:46686 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753445Ab2HaOq4 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 31 Aug 2012 10:46:56 -0400
-Date: Fri, 31 Aug 2012 16:46:54 +0200
+	id S1753901Ab2HaO50 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 31 Aug 2012 10:57:26 -0400
+Date: Fri, 31 Aug 2012 16:57:25 +0200
 From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [PATCH] scripts/kernel-doc: drop maintainer
-Message-ID: <20120831144654.GC11531@sepie.suse.cz>
-References: <50219DD4.7020406@xenotime.net>
+Subject: Re: [PATCH] [Signed-off] kconfig: document oldnoconfig to what it
+ really does in conf.c
+Message-ID: <20120831145725.GE11531@sepie.suse.cz>
+References: <1345186649-17502-1-git-send-email-adam8157@gmail.com>
+ <20120822134519.GA5639@adam-laptop>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <50219DD4.7020406@xenotime.net>
+In-Reply-To: <20120822134519.GA5639@adam-laptop>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Randy Dunlap <rdunlap@xenotime.net>
-Cc: linux-kbuild@vger.kernel.org, "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>, Rob Landley <rob@landley.net>
+To: Adam Lee <adam8157@gmail.com>
+Cc: linux-kernel@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>, "Eric W. Biederman" <ebiederm@xmission.com>, "open list:KCONFIG" <linux-kbuild@vger.kernel.org>
 
-On Tue, Aug 07, 2012 at 03:59:32PM -0700, Randy Dunlap wrote:
-> From: Randy Dunlap <rdunlap@xenotime.net>
+On Wed, Aug 22, 2012 at 09:45:19PM +0800, Adam Lee wrote:
+> On Fri, Aug 17, 2012 at 02:57:28PM +0800, Adam Lee wrote:
+> > As 67d34a6a391369269a2e5dba8a5f42cc4cd50231 said, the make target
+> > 'oldnoconfig' is a misnomer. It doesn't set new symbols to 'n', but
+> > instead sets it to their default values.
+> > 
+> > This patch fixes the document in conf.c, and will submit another patch
+> > to replace 'oldnoconfig' to 'olddefconfig'
+> > 
+> > Signed-off-by: Adam Lee <adam8157@gmail.com>
+> > ---
+> >  scripts/kconfig/conf.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> Drop maintainership of scripts/kernel-doc.
-> Patches can go thru the kbuild tree.
+> Hi,
 > 
-> Signed-off-by: Randy Dunlap <rdunlap@xenotime.net>
-> Cc:	Michal Marek <mmarek@suse.cz>
-> Cc:	Rob Landley <rob@landley.net>
-> ---
->  MAINTAINERS |    5 -----
->  1 file changed, 5 deletions(-)
-> 
-> 
-> Michal, is this OK with you?
-> If so, please merge, and then I have 3 patches to
-> scripts/kernel-doc for you (from someone else).
+> I think we should apply this patch, any comment?
 
-Sorry for the delay. Yes, it's OK with me, I can apply the patches to
-the kbuild.git tree. Your review is of course appreciated.
+Sorry for the delay. I applied it to kbuild.git#kconfig now.
 
 Michal
