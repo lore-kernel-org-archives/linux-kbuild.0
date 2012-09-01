@@ -1,51 +1,29 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:40067 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752423Ab2IAP0a (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 1 Sep 2012 11:26:30 -0400
-Message-ID: <5042291E.6050602@suse.cz>
-Date: Sat, 01 Sep 2012 17:26:22 +0200
-From: Michal Marek <mmarek@suse.cz>
-MIME-Version: 1.0
-Subject: Re: [PATCH 44/74] lto: Mark functions used by the vsyscall init code
- visible
-References: <1345345030-22211-1-git-send-email-andi@firstfloor.org> <1345345030-22211-45-git-send-email-andi@firstfloor.org>
-In-Reply-To: <1345345030-22211-45-git-send-email-andi@firstfloor.org>
-Content-Type: text/plain; charset=ISO-8859-2
-Content-Transfer-Encoding: 7bit
+Received: from one.firstfloor.org ([213.235.205.2]:42291 "EHLO
+	one.firstfloor.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751761Ab2IARQv (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 1 Sep 2012 13:16:51 -0400
+Date: Sat, 1 Sep 2012 19:16:45 +0200
+From: Andi Kleen <andi@firstfloor.org>
+Subject: Re: [PATCH 44/74] lto: Mark functions used by the vsyscall init code visible
+Message-ID: <20120901171645.GN16230@one.firstfloor.org>
+References: <1345345030-22211-1-git-send-email-andi@firstfloor.org> <1345345030-22211-45-git-send-email-andi@firstfloor.org> <5042291E.6050602@suse.cz>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5042291E.6050602@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andi Kleen <andi@firstfloor.org>
-Cc: linux-kernel@vger.kernel.org, x86@kernel.org, linux-kbuild@vger.kernel.org, JBeulich@suse.com, akpm@linux-foundation.org, Andi Kleen <ak@linux.intel.com>
+To: Michal Marek <mmarek@suse.cz>
+Cc: Andi Kleen <andi@firstfloor.org>, linux-kernel@vger.kernel.org, x86@kernel.org, linux-kbuild@vger.kernel.org, JBeulich@suse.com, akpm@linux-foundation.org, Andi Kleen <ak@linux.intel.com>
 
-Dne 19.8.2012 04:56, Andi Kleen napsal(a):
-> From: Andi Kleen <ak@linux.intel.com>
-> 
-> The vsyscall code is compiled without LTO. This also includes
-> its init function. The function which are called by it have
-> to be visible, otherwise they could be optimized away
-> 
-> Signed-off-by: Andi Kleen <ak@linux.intel.com>
-> ---
->  drivers/char/random.c |    2 +-
->  include/linux/mm.h    |    1 +
->  mm/vmalloc.c          |    2 +-
->  3 files changed, 3 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/char/random.c b/drivers/char/random.c
-> index b86eae9..33c8fe5 100644
-> --- a/drivers/char/random.c
-> +++ b/drivers/char/random.c
-> @@ -1450,7 +1450,7 @@ late_initcall(random_int_secret_init);
->   * depleting entropy is too high
->   */
->  static DEFINE_PER_CPU(__u32 [MD5_DIGEST_WORDS], get_random_int_hash);
-> -unsigned int get_random_int(void)
-> +__visible unsigned int get_random_int(void)
+> I think that there should be a comment why the symbol needs to be
+> visible (just copy the reasoning from the changelog). Otherwise someone
+> might attempt to do a cleanup a few years later, noticing that there is
+> no assembler code calling get_random_int().
 
-I think that there should be a comment why the symbol needs to be
-visible (just copy the reasoning from the changelog). Otherwise someone
-might attempt to do a cleanup a few years later, noticing that there is
-no assembler code calling get_random_int().
+Ok. On hindsight maybe it's better to split vsyscall_64.c into two
+files, one only with the vsyscall code and another with the init code.
 
-Michal
+-Andi
