@@ -1,36 +1,44 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from one.firstfloor.org ([213.235.205.2]:42303 "EHLO
-	one.firstfloor.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751761Ab2IAR0Y (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 1 Sep 2012 13:26:24 -0400
-Date: Sat, 1 Sep 2012 19:26:23 +0200
-From: Andi Kleen <andi@firstfloor.org>
-Subject: Re: [PATCH 44/74] lto: Mark functions used by the vsyscall init code visible
-Message-ID: <20120901172623.GO16230@one.firstfloor.org>
-References: <1345345030-22211-1-git-send-email-andi@firstfloor.org> <1345345030-22211-45-git-send-email-andi@firstfloor.org> <5042291E.6050602@suse.cz> <20120901171645.GN16230@one.firstfloor.org>
-Mime-Version: 1.0
+Received: from cantor2.suse.de ([195.135.220.15]:49896 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754947Ab2ICTSI (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 3 Sep 2012 15:18:08 -0400
+Date: Mon, 3 Sep 2012 21:18:01 +0200
+From: Michal Marek <mmarek@suse.cz>
+Subject: [GIT] kbuild rc fixes for v3.6
+Message-ID: <20120903191801.GA23227@pobox.suse.cz>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20120901171645.GN16230@one.firstfloor.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andi Kleen <andi@firstfloor.org>
-Cc: Michal Marek <mmarek@suse.cz>, linux-kernel@vger.kernel.org, x86@kernel.org, linux-kbuild@vger.kernel.org, JBeulich@suse.com, akpm@linux-foundation.org, Andi Kleen <ak@linux.intel.com>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: mark.asselstine@windriver.com, mmarek@suse.cz, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Sat, Sep 01, 2012 at 07:16:45PM +0200, Andi Kleen wrote:
-> > I think that there should be a comment why the symbol needs to be
-> > visible (just copy the reasoning from the changelog). Otherwise someone
-> > might attempt to do a cleanup a few years later, noticing that there is
-> > no assembler code calling get_random_int().
-> 
-> Ok. On hindsight maybe it's better to split vsyscall_64.c into two
-> files, one only with the vsyscall code and another with the init code.
+Hi Linus,
 
-Or checking the code again it's already done because only the emulation
-is left and that is already a separate file. I'll drop those patches.
+there are two fixes that should go into 3.6. The link-vmlinux.sh one is
+obvious. The other one fixes make firmware_install with certain
+configurations, where a file in the toplevel firmware tree gets
+installed first, and $(INSTALL_FW_PATH)/$$(dir <file>) results in
+/lib/firmware/./, which confuses make 3.82 for some reason.
 
--Andi
+Thanks,
+Michal
 
--- 
-ak@linux.intel.com -- Speaking for myself only.
+The following changes since commit 0d7614f09c1ebdbaa1599a5aba7593f147bf96ee:
+
+  Linux 3.6-rc1 (2012-08-02 16:38:10 -0700)
+
+are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild-2.6.git ..BRANCH.NOT.VERIFIED..
+
+Mark Asselstine (1):
+      firmware: fix directory creation rule matching with make 3.82
+
+Michal Marek (1):
+      link-vmlinux.sh: Fix stray "echo" in error message
+
+ scripts/Makefile.fwinst |    2 +-
+ scripts/link-vmlinux.sh |    2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
