@@ -1,44 +1,75 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:49896 "EHLO mx2.suse.de"
+Received: from local.xorcom.com ([81.218.177.19]:50853 "EHLO local.xorcom.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754947Ab2ICTSI (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 3 Sep 2012 15:18:08 -0400
-Date: Mon, 3 Sep 2012 21:18:01 +0200
-From: Michal Marek <mmarek@suse.cz>
-Subject: [GIT] kbuild rc fixes for v3.6
-Message-ID: <20120903191801.GA23227@pobox.suse.cz>
+	id S1751229Ab2IENFa (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 5 Sep 2012 09:05:30 -0400
+Date: Wed, 5 Sep 2012 16:05:28 +0300
+From: Tzafrir Cohen <tzafrir.cohen@xorcom.com>
+Subject: Re: [PATCH] builddeb: remove unneeded explicit Architecture
+Message-ID: <20120905130528.GI18204@xorcom.com>
+References: <1344941092-31312-1-git-send-email-tzafrir.cohen@xorcom.com>
+ <5040C112.70501@suse.cz>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <5040C112.70501@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: mark.asselstine@windriver.com, mmarek@suse.cz, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>
+Cc: Linux Kbuild <linux-kbuild@vger.kernel.org>, Linux Kernel <linux-kernel@vger.kernel.org>
 
-Hi Linus,
+Hi,
 
-there are two fixes that should go into 3.6. The link-vmlinux.sh one is
-obvious. The other one fixes make firmware_install with certain
-configurations, where a file in the toplevel firmware tree gets
-installed first, and $(INSTALL_FW_PATH)/$$(dir <file>) results in
-/lib/firmware/./, which confuses make 3.82 for some reason.
+Thanks for your reply,
 
-Thanks,
-Michal
+On Fri, Aug 31, 2012 at 03:50:10PM +0200, Michal Marek wrote:
+> Adding Max to CC.
+> 
+> On 14.8.2012 12:44, Tzafrir Cohen wrote:
+> > Architecture was set explicitly in debian/control for one of the three
+> > packages (linux-libc-dev) but not for the other two. When cross-building
+> > it gives me an error:
+> > 
+> >   dpkg-gencontrol: error: current host architecture 'armhf' does not
+> >   appear in package's architecture list (amd64)
+> > 
+> > Also note that if used, dpkg --print-architecture should have been
+> > replaced with dpkg-architecture.
+> > 
+> > Signed-off-by: Tzafrir Cohen <tzafrir.cohen@xorcom.com>
+> > ---
+> >  scripts/package/builddeb |    3 +--
+> >  1 file changed, 1 insertion(+), 2 deletions(-)
+> > 
+> > diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+> > index acb8650..d9c71a6 100644
+> > --- a/scripts/package/builddeb
+> > +++ b/scripts/package/builddeb
+> > @@ -252,13 +252,12 @@ mkdir -p "$destdir"
+> >  (cd $objtree; tar -c -f - -T "$objtree/debian/hdrobjfiles") | (cd $destdir; tar -xf -)
+> >  ln -sf "/usr/src/linux-headers-$version" "$kernel_headers_dir/lib/modules/$version/build"
+> >  rm -f "$objtree/debian/hdrsrcfiles" "$objtree/debian/hdrobjfiles"
+> > -arch=$(dpkg --print-architecture)
+> >  
+> >  cat <<EOF >> debian/control
+> >  
+> >  Package: $kernel_headers_packagename
+> >  Provides: linux-headers, linux-headers-2.6
+> > -Architecture: $arch
+> > +Architecture: any
+> >  Description: Linux kernel headers for $KERNELRELEASE on $arch
+> >   This package provides kernel header files for $KERNELRELEASE on $arch
+> >   .
+> 
+> As the package contains files from arch/$SRCARCH/include, I doubt that
+> this is a valid change.
 
-The following changes since commit 0d7614f09c1ebdbaa1599a5aba7593f147bf96ee:
+But you optionally force the Architecture later on in build_package.
+"Arhcitecture: any" in the source package states that the binary package
+will be the one stated by the build system.
 
-  Linux 3.6-rc1 (2012-08-02 16:38:10 -0700)
-
-are available in the git repository at:
-  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild-2.6.git ..BRANCH.NOT.VERIFIED..
-
-Mark Asselstine (1):
-      firmware: fix directory creation rule matching with make 3.82
-
-Michal Marek (1):
-      link-vmlinux.sh: Fix stray "echo" in error message
-
- scripts/Makefile.fwinst |    2 +-
- scripts/link-vmlinux.sh |    2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+-- 
+               Tzafrir Cohen
+icq#16849755              jabber:tzafrir.cohen@xorcom.com
++972-50-7952406           mailto:tzafrir.cohen@xorcom.com
+http://www.xorcom.com  iax:guest@local.xorcom.com/tzafrir
