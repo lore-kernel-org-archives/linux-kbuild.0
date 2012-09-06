@@ -1,48 +1,199 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:55085 "EHLO mx2.suse.de"
+Received: from vostochny.stro.at ([78.47.22.85]:42948 "EHLO vostochny.stro.at"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1757783Ab2IFKdf (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 6 Sep 2012 06:33:35 -0400
-Message-ID: <50487BFA.2010105@suse.cz>
-Date: Thu, 06 Sep 2012 12:33:30 +0200
-From: Michal Marek <mmarek@suse.cz>
+	id S1753804Ab2IFOAG (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 6 Sep 2012 10:00:06 -0400
+Date: Thu, 6 Sep 2012 14:00:04 +0000
+From: maximilian attems <max@stro.at>
+Subject: Re: [PATCH] builddeb: remove unneeded explicit Architecture
+Message-ID: <20120906140004.GL19848@vostochny.stro.at>
+References: <1344941092-31312-1-git-send-email-tzafrir.cohen@xorcom.com>
+ <5040C112.70501@suse.cz>
+ <20120905130528.GI18204@xorcom.com>
+ <50475310.6000508@suse.cz>
+ <20120905151422.GD12713@stro.at>
+ <20120905164009.GM18204@xorcom.com>
+ <20120905202604.GF28778@vostochny.stro.at>
 MIME-Version: 1.0
-Subject: Re: [GIT] kbuild rc fixes for v3.6
-References: <20120903191801.GA23227@pobox.suse.cz> <CA+55aFzBsKBmVMRiJ8yuML_QVQbfa2ZqHU_fh3_wS3YhLTv9fw@mail.gmail.com> <20120906151951.8c30cb06fcb20412910006d2@canb.auug.org.au>
-In-Reply-To: <20120906151951.8c30cb06fcb20412910006d2@canb.auug.org.au>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20120905202604.GF28778@vostochny.stro.at>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Stephen Rothwell <sfr@canb.auug.org.au>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, mark.asselstine@windriver.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Tzafrir Cohen <tzafrir.cohen@xorcom.com>
+Cc: Michal Marek <mmarek@suse.cz>, Linux Kbuild <linux-kbuild@vger.kernel.org>, Linux Kernel <linux-kernel@vger.kernel.org>
 
-On 6.9.2012 07:19, Stephen Rothwell wrote:
-> On Wed, 5 Sep 2012 20:32:00 -0700 Linus Torvalds <torvalds@linux-foundation.org> wrote:
->>
->> On Mon, Sep 3, 2012 at 12:18 PM, Michal Marek <mmarek@suse.cz> wrote:
->>> are available in the git repository at:
->>>   git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild-2.6.git ..BRANCH.NOT.VERIFIED..
->>
->> There's something wrong with that repo
->>
->>  "fatal: Could not read from remote repository.
->>
->>   Please make sure you have the correct access rights
->>   and the repository exists."
->>
->> plus that BRANCH.NOT.VERIFIED thing looks bad too (and is probably related).
-
-Oops.
-
-
-> The kbuild-current tree in linux-next is
+On Wed, Sep 05, 2012 at 08:26:05PM +0000, maximilian attems wrote:
+> On Wed, Sep 05, 2012 at 07:40:09PM +0300, Tzafrir Cohen wrote:
+> > 
+> > $ grep CROSS_COMPILE .config
+> > CONFIG_CROSS_COMPILE="arm-linux-gnueabihf-"
+> > 
+> > Command:
+> > 
+> >   KBUILD_DEBARCH=armhf make ARCH=arm KBUILD_IMAGE=uImage deb-pkg
+> > 
+> > Error I get:
+> > 
+> >   dpkg-gencontrol: error: current host architecture 'armhf' does not
+> >   appear in package's architecture list (amd64)
+> > 
+> > It seems I have to use KBUILD_DEBARCH, as the kernel build system can't
+> > really tell if I want armel or armhf (If I built the same kernel for a
+> > Squeeze system I would have been forced to use armel).
 > 
-> git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git rc-fixes
+> well, obviously the dpkg call in
+>  -arch=$(dpkg --print-architecture)
+> is wrong please fix that.
 > 
-> and it has those 2 commits in it.  So script update needed, I guess.
 
-I did update my script, but the last pull request was sent from a
-machine that had the old copy :).
+care to test belows:
 
-Michal
+
+From e12defa4ad57cdb34c14031f1dddd04db6df8962 Mon Sep 17 00:00:00 2001
+From: maximilian attems <max@stro.at>
+Date: Thu, 6 Sep 2012 15:22:02 +0200
+Subject: [PATCH] deb-pkg: Simplify architecture matching for cross building
+
+No point in invoking dpkg to get the archticture of the host
+we build on. Instead directly use the logic implemented
+in create_package(). No need anymore to override arch.
+
+While at it fix the linux images to be for the specific
+built arch.
+
+Signed-off-by: maximilian attems <max@stro.at>
+---
+ scripts/package/builddeb |   82 ++++++++++++++++++++++------------------------
+ 1 file changed, 39 insertions(+), 43 deletions(-)
+
+diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+index acb8650..07792d6 100644
+--- a/scripts/package/builddeb
++++ b/scripts/package/builddeb
+@@ -14,6 +14,7 @@ set -e
+ 
+ create_package() {
+ 	local pname="$1" pdir="$2"
++	local forcearch=""
+ 
+ 	cp debian/copyright "$pdir/usr/share/doc/$pname/"
+ 	cp debian/changelog "$pdir/usr/share/doc/$pname/changelog.Debian"
+@@ -25,44 +26,8 @@ create_package() {
+ 	chown -R root:root "$pdir"
+ 	chmod -R go-w "$pdir"
+ 
+-	# Attempt to find the correct Debian architecture
+-	local forcearch="" debarch=""
+-	case "$UTS_MACHINE" in
+-	i386|ia64|alpha)
+-		debarch="$UTS_MACHINE" ;;
+-	x86_64)
+-		debarch=amd64 ;;
+-	sparc*)
+-		debarch=sparc ;;
+-	s390*)
+-		debarch=s390 ;;
+-	ppc*)
+-		debarch=powerpc ;;
+-	parisc*)
+-		debarch=hppa ;;
+-	mips*)
+-		debarch=mips$(grep -q CPU_LITTLE_ENDIAN=y .config && echo el) ;;
+-	arm*)
+-		debarch=arm$(grep -q CONFIG_AEABI=y .config && echo el) ;;
+-	*)
+-		echo "" >&2
+-		echo "** ** **  WARNING  ** ** **" >&2
+-		echo "" >&2
+-		echo "Your architecture doesn't have it's equivalent" >&2
+-		echo "Debian userspace architecture defined!" >&2
+-		echo "Falling back to using your current userspace instead!" >&2
+-		echo "Please add support for $UTS_MACHINE to ${0} ..." >&2
+-		echo "" >&2
+-	esac
+-	if [ -n "$KBUILD_DEBARCH" ] ; then
+-		debarch="$KBUILD_DEBARCH"
+-	fi
+-	if [ -n "$debarch" ] ; then
+-		forcearch="-DArchitecture=$debarch"
+-	fi
+-
+ 	# Create the package
+-	dpkg-gencontrol -isp $forcearch -p$pname -P"$pdir"
++	dpkg-gencontrol -p$pname -P"$pdir"
+ 	dpkg --build "$pdir" ..
+ }
+ 
+@@ -83,6 +48,38 @@ fwpackagename=linux-firmware-image
+ kernel_headers_packagename=linux-headers-$version
+ libc_headers_packagename=linux-libc-dev
+ 
++# Attempt to find the correct Debian architecture
++case "$UTS_MACHINE" in
++i386|ia64|alpha)
++	debarch="$UTS_MACHINE" ;;
++x86_64)
++	debarch=amd64 ;;
++sparc*)
++	debarch=sparc ;;
++s390*)
++	debarch=s390 ;;
++ppc*)
++	debarch=powerpc ;;
++parisc*)
++	debarch=hppa ;;
++mips*)
++	debarch=mips$(grep -q CPU_LITTLE_ENDIAN=y .config && echo el) ;;
++arm*)
++	debarch=arm$(grep -q CONFIG_AEABI=y .config && echo el) ;;
++*)
++	echo "" >&2
++	echo "** ** **  WARNING  ** ** **" >&2
++	echo "" >&2
++	echo "Your architecture doesn't have it's equivalent" >&2
++	echo "Debian userspace architecture defined!" >&2
++	echo "Falling back to using your current userspace instead!" >&2
++	echo "Please add support for $UTS_MACHINE to ${0} ..." >&2
++	echo "" >&2
++esac
++if [ -n "$KBUILD_DEBARCH" ] ; then
++	debarch="$KBUILD_DEBARCH"
++fi
++
+ if [ "$ARCH" = "um" ] ; then
+ 	packagename=user-mode-linux-$version
+ fi
+@@ -234,8 +231,8 @@ else
+ Package: $packagename
+ Provides: linux-image, linux-image-2.6, linux-modules-$version
+ Suggests: $fwpackagename
+-Architecture: any
+-Description: Linux kernel, version $version
++Architecture: $debarch
++Description: Linux kernel, version $version on $debarch
+  This package contains the Linux kernel, modules and corresponding other
+  files, version: $version.
+ EOF
+@@ -252,15 +249,14 @@ mkdir -p "$destdir"
+ (cd $objtree; tar -c -f - -T "$objtree/debian/hdrobjfiles") | (cd $destdir; tar -xf -)
+ ln -sf "/usr/src/linux-headers-$version" "$kernel_headers_dir/lib/modules/$version/build"
+ rm -f "$objtree/debian/hdrsrcfiles" "$objtree/debian/hdrobjfiles"
+-arch=$(dpkg --print-architecture)
+ 
+ cat <<EOF >> debian/control
+ 
+ Package: $kernel_headers_packagename
++Architecture: $debarch
+ Provides: linux-headers, linux-headers-2.6
+-Architecture: $arch
+-Description: Linux kernel headers for $KERNELRELEASE on $arch
+- This package provides kernel header files for $KERNELRELEASE on $arch
++Description: Linux kernel headers for $KERNELRELEASE on $debarch
++ This package provides kernel header files for $KERNELRELEASE on $debarch
+  .
+  This is useful for people who need to build external modules
+ EOF
+-- 
+1.7.10.4
+
