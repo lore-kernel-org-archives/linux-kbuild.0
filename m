@@ -1,84 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from haggis.pcug.org.au ([203.10.76.10]:47743 "EHLO
-	members.tip.net.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751223Ab2IFFTy (ORCPT
+Received: from mail-ie0-f174.google.com ([209.85.223.174]:37037 "EHLO
+	mail-ie0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751458Ab2IFIyp (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 6 Sep 2012 01:19:54 -0400
-Date: Thu, 6 Sep 2012 15:19:51 +1000
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-Subject: Re: [GIT] kbuild rc fixes for v3.6
-Message-Id: <20120906151951.8c30cb06fcb20412910006d2@canb.auug.org.au>
-In-Reply-To: <CA+55aFzBsKBmVMRiJ8yuML_QVQbfa2ZqHU_fh3_wS3YhLTv9fw@mail.gmail.com>
-References: <20120903191801.GA23227@pobox.suse.cz>
-	<CA+55aFzBsKBmVMRiJ8yuML_QVQbfa2ZqHU_fh3_wS3YhLTv9fw@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pgp-signature";
- micalg="PGP-SHA256";
- boundary="Signature=_Thu__6_Sep_2012_15_19_51_+1000_6jk4I.+/uZq.Ri5+"
+	Thu, 6 Sep 2012 04:54:45 -0400
+Date: Thu, 6 Sep 2012 16:54:17 +0800
+From: Adam Lee <adam8157@gmail.com>
+Subject: Re: [PATCH v3] kconfig: replace 'oldnoconfig' with 'olddefconfig',
+ and keep the old name as an alias
+Message-ID: <20120906085417.GA22428@adam-station.nay.redhat.com>
+References: <1346428476-12061-1-git-send-email-adam8157@gmail.com>
+ <1346432721-22521-1-git-send-email-adam8157@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1346432721-22521-1-git-send-email-adam8157@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Michal Marek <mmarek@suse.cz>, mark.asselstine@windriver.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: linux-kernel@vger.kernel.org
+Cc: Michal Marek <mmarek@suse.cz>, Steven Rostedt <rostedt@goodmis.org>, Yaakov Selkowitz <yselkowitz@users.sourceforge.net>, Peter Foley <pefoley2@verizon.net>, Paul Bolle <pebolle@tiscali.nl>, "Eric W. Biederman" <ebiederm@xmission.com>, "open list:KCONFIG" <linux-kbuild@vger.kernel.org>
 
---Signature=_Thu__6_Sep_2012_15_19_51_+1000_6jk4I.+/uZq.Ri5+
-Content-Type: text/plain; charset=US-ASCII
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On Sat, Sep 01, 2012 at 01:05:17AM +0800, Adam Lee wrote:
+> As 67d34a6a391369269a2e5dba8a5f42cc4cd50231 said, 'oldnoconfig' doesn't
+> set new symbols to 'n', but instead sets it to their default values.
+> 
+> So, this patch replaces 'oldnoconfig' with 'olddefconfig', stop making
+> people confused, and keep the old name 'oldnoconfig' as an alias,
+> because people already are dependent on its behavior with the
+> counter-intuitive name.
+> 
+> v3: use a better way an add comments about alias in conf.c
 
-Hi Linus,
+Hi, Michal
 
-On Wed, 5 Sep 2012 20:32:00 -0700 Linus Torvalds <torvalds@linux-foundation=
-.org> wrote:
->
-> On Mon, Sep 3, 2012 at 12:18 PM, Michal Marek <mmarek@suse.cz> wrote:
-> >
-> > The following changes since commit 0d7614f09c1ebdbaa1599a5aba7593f147bf=
-96ee:
-> >
-> >   Linux 3.6-rc1 (2012-08-02 16:38:10 -0700)
-> >
-> > are available in the git repository at:
-> >   git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild-2.6.git .=
-.BRANCH.NOT.VERIFIED..
->=20
-> There's something wrong with that repo
->=20
->  "fatal: Could not read from remote repository.
->=20
->   Please make sure you have the correct access rights
->   and the repository exists."
->=20
-> plus that BRANCH.NOT.VERIFIED thing looks bad too (and is probably relate=
-d).
+How about this version? I replace it and keep the old one as an alias,
+seems everyone will be happy, not have to stand the counter-intuitive
+name.
 
-The kbuild-current tree in linux-next is
-
-git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git rc-fixes
-
-and it has those 2 commits in it.  So script update needed, I guess.
---=20
-Cheers,
-Stephen Rothwell                    sfr@canb.auug.org.au
-
---Signature=_Thu__6_Sep_2012_15_19_51_+1000_6jk4I.+/uZq.Ri5+
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.12 (GNU/Linux)
-
-iQIcBAEBCAAGBQJQSDJ3AAoJEECxmPOUX5FEE1IP/0L8eED5IXFtDUUgtuDx2hDc
-Vvc0VDrDni5M1iYSQu53pG9DFjWzrvGZVElxZF4RSfV2kCe5QuxvVhe7ZfccG2d6
-ukLjiaxw3nUUv8XXfY+nh97Nl2dw7q6cYXJJI5ab/bLlvj07F9IErz8QHKdMDACt
-tAukfU8KaAEORUivzc1Vs4CZrWWFAQcudr/JE+kA8UV0216T0L2eVWYKqbUFFcKg
-YHbrPm/6S8R8WcFSu5y4wsp2XjeJEhO6edmVZmjDhxYMUK519A0/GaiqBPsE/Lph
-eil68oc/4UR/DzMhtGyxnOY8bHB8DDWxt6qG5Bmchf18GUUK+7Q65jz0ql9dgQai
-fPIqU3otLh7Xsk7i8HIB82Aavr9CREHPkOQTzT0B064p714x7BlKI8mqWPlF+XAy
-tC3FPF3o9RWpr4NsydwdKxXfsazedYl5Pif1yj70sS8TID2gh1VYMpT/yNdte1Gr
-UBrKF74Tiayso8CDEgbKTa7X9O6ODnnUqmXCMfEnZUBap/kVveQH7und+h7GCbwX
-Dc4a9eEy4gWMOQ2CefTa3ON7+l9TwpYd1guupadxqvxahG7gxh47nZ8IgZj0OdvG
-zoYzHAVKHoWvEqWvuBnILlDku4BtzNU5NO1Q3iPHCp7IXSPYYKSXcPq4R9SVltkw
-4rtyspCxSf4cRwPD7LUr
-=Wrpd
------END PGP SIGNATURE-----
-
---Signature=_Thu__6_Sep_2012_15_19_51_+1000_6jk4I.+/uZq.Ri5+--
+-- 
+Regards,
+Adam Lee
+http://adam8157.info
