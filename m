@@ -1,35 +1,61 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-out.m-online.net ([212.18.0.10]:44709 "EHLO
-	mail-out.m-online.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754320Ab2IHMAY (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 8 Sep 2012 08:00:24 -0400
-From: Andreas Schwab <schwab@linux-m68k.org>
-Subject: Re: [kbuild bug] /bin/sh: -c: line 0: syntax error near unexpected token `;'
-References: <20120908014208.GA19345@localhost>
-Date: Sat, 08 Sep 2012 14:00:13 +0200
-In-Reply-To: <20120908014208.GA19345@localhost> (Fengguang Wu's message of
-	"Sat, 8 Sep 2012 09:42:08 +0800")
-Message-ID: <m2bohgybaq.fsf@igel.home>
-MIME-Version: 1.0
-Content-Type: text/plain
+Received: from mga02.intel.com ([134.134.136.20]:13728 "EHLO mga02.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751397Ab2IHTsF (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 8 Sep 2012 15:48:05 -0400
+From: Andi Kleen <andi@firstfloor.org>
+Subject: [PATCH] Kbuild: use normal compression settings for tar*-pkg
+Date: Sat,  8 Sep 2012 12:47:59 -0700
+Message-Id: <1347133679-14641-1-git-send-email-andi@firstfloor.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Fengguang Wu <fengguang.wu@intel.com>
-Cc: Michal Marek <mmarek@suse.cz>, David Howells <dhowells@redhat.com>, LKML <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org
+To: mmarek@suse.cz
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Andi Kleen <ak@linux.intel.com>
 
-Fengguang Wu <fengguang.wu@intel.com> writes:
+From: Andi Kleen <ak@linux.intel.com>
 
-> /usr/bin/make -f /c/kernel-tests/src/next/scripts/Makefile.modbuiltin obj=arch/ia64/kvm
+For large kernel configurations (like a distribution kernel)
+targz-pkg takes a quite long time to just do the compression.
+I clocked it at 15+mins for a SUSE kernel like config on a fast
+system.  And tarxz and bzip2 are even slower.
 
-The problem is that Makefile.modbuiltin is executed before
-Makefile.build has been executed in arch/ia64/kvm, and the rule in
-arch/ia64/kvm/Makefile uses cmd_cc_s_c which is only defined in
-Makefile.build.
+The main reason is that the script that is doing the taring sets
+the highest compression level (-9).  When I change it to just
+use the defaults the gzip time for the same kernel goes down
+to ~3 mins. I haven't tested xz and bzip, but I expect those
+to be much faster too.
 
-Andreas.
+I'm not willing to wait that long for a small compression
+gain. So just change the script to use the defaults.
 
+Signed-off-by: Andi Kleen <ak@linux.intel.com>
+---
+ scripts/package/buildtar |    6 +++---
+ 1 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/scripts/package/buildtar b/scripts/package/buildtar
+index 8a7b155..632377f 100644
+--- a/scripts/package/buildtar
++++ b/scripts/package/buildtar
+@@ -28,15 +28,15 @@ case "${1}" in
+ 		file_ext=""
+ 		;;
+ 	targz-pkg)
+-		compress="gzip -c9"
++		compress="gzip"
+ 		file_ext=".gz"
+ 		;;
+ 	tarbz2-pkg)
+-		compress="bzip2 -c9"
++		compress="bzip2"
+ 		file_ext=".bz2"
+ 		;;
+ 	tarxz-pkg)
+-		compress="xz -c9"
++		compress="xz"
+ 		file_ext=".xz"
+ 		;;
+ 	*)
 -- 
-Andreas Schwab, schwab@linux-m68k.org
-GPG Key fingerprint = 58CA 54C7 6D53 942B 1756  01D3 44D5 214B 8276 4ED5
-"And now for something completely different."
+1.7.7.6
+
