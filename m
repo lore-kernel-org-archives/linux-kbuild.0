@@ -1,108 +1,56 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from local.xorcom.com ([81.218.177.19]:31366 "EHLO local.xorcom.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751065Ab2IILyr (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 9 Sep 2012 07:54:47 -0400
-Date: Sun, 9 Sep 2012 14:54:44 +0300
-From: Tzafrir Cohen <tzafrir.cohen@xorcom.com>
-Subject: Re: [PATCH] builddeb: remove unneeded explicit Architecture
-Message-ID: <20120909115444.GP18204@xorcom.com>
-References: <5040C112.70501@suse.cz>
- <20120905130528.GI18204@xorcom.com>
- <50475310.6000508@suse.cz>
- <20120905151422.GD12713@stro.at>
- <20120905164009.GM18204@xorcom.com>
- <20120905202604.GF28778@vostochny.stro.at>
- <20120906140004.GL19848@vostochny.stro.at>
- <20120906140416.GG28778@vostochny.stro.at>
- <20120906162143.GN18204@xorcom.com>
- <20120907000209.GA5993@stro.at>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20120907000209.GA5993@stro.at>
+Received: from perches-mx.perches.com ([206.117.179.246]:43374 "EHLO
+	labridge.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1752989Ab2IIPJ1 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 9 Sep 2012 11:09:27 -0400
+Message-ID: <1347203365.2050.3.camel@joe2Laptop>
+Subject: Re: [PATCH/RFC] um: Preinclude include/linux/kern_levels.h
+From: Joe Perches <joe@perches.com>
+Date: Sun, 09 Sep 2012 08:09:25 -0700
+In-Reply-To: <CAMuHMdVyWRGyTPbA9pL267XWnvBnbN77353WjF8Ovmd062NSwg@mail.gmail.com>
+References: <1345140905-10209-1-git-send-email-geert@linux-m68k.org>
+	 <CAMuHMdVyWRGyTPbA9pL267XWnvBnbN77353WjF8Ovmd062NSwg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: maximilian attems <max@stro.at>
-Cc: Michal Marek <mmarek@suse.cz>, Linux Kbuild <linux-kbuild@vger.kernel.org>, Linux Kernel <linux-kernel@vger.kernel.org>
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: Richard Weinberger <richard@nod.at>, user-mode-linux-devel@lists.sourceforge.net, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Fri, Sep 07, 2012 at 02:02:09AM +0200, maximilian attems wrote:
-> On Thu, 06 Sep 2012, Tzafrir Cohen wrote:
+On Sun, 2012-09-09 at 10:33 +0200, Geert Uytterhoeven wrote:
+> Ping?
+
+Richard?  Are you going to pick up this patch?
+It seems sensible.
+
+Geert, I suggest sending it directly to Linus as a fix
+if Richard doesn't respond in a few days.
+
+> On Thu, Aug 16, 2012 at 8:15 PM, Geert Uytterhoeven
+> <geert@linux-m68k.org> wrote:
+> > The userspace part of UML uses the asm-offsets.h generator mechanism to
+> > create definitions for UM_KERN_<LEVEL> that match the in-kernel
+> > KERN_<LEVEL> constant definitions.
 > >
-> > Works for the case I presented.
-> 
-> Michal please care to queue previous v2 patch with
-> Tested-by: Tzafrir Cohen <tzafrir.cohen@xorcom.com>
-> to kope with that cross building regression since
-> the linux headers got added to deb-pkg target.
-> 
-> > Now I remove the explicit setting of KBUILD_DEBRCH:
-> 
-> and here lies the error.
->  
-> >   $ rm -rf debian
-> >   $ make ARCH=arm KBUILD_IMAGE=uImage deb-pkg
-> > 
-> >   ...
-> > 
-> >   dpkg-gencontrol: error: current host architecture 'armhf' does not
-> >   appear in package's architecture list (armel)
-> > 
-> > My host architecture is amd64. This is actually the build architecture.
-> > dpkg-gencontrol uses Dpkg::Arch::get_host_arch().
-> > 
-> >   $ perl -MDpkg::Arch -e 'print Dpkg::Arch::get_host_arch()."\n"'
-> >   amd64
-> > 
-> >   $ CC=/usr/bi/narm-linux-gnueabi-gcc  perl -MDpkg::Arch -e 'print Dpkg::Arch::get_host_arch()."\n"'
-> >   armel
-> >   
-> >   $ CC=/usr/bin/arm-linux-gnueabihf-gcc  perl -MDpkg::Arch -e 'print Dpkg::Arch::get_host_arch()."\n"'
-> >   armhf
-> > 
-> >   $ DEB_HOST_ARCH=whatever perl -MDpkg::Arch -e 'print Dpkg::Arch::get_host_arch()."\n"'
-> >   whatever
-> > 
-> > Is it OK to use that perl one-liner as the default instead of the
-> > architecture guessing case?
-> 
-> In any case that would be a follow up, but I'm not fond of that perl/dpkg
-> magic plus supporting DEB_ variables. 
+> > As of commit 04d2c8c83d0e3ac5f78aeede51babb3236200112 ("printk: convert
+> > the format for KERN_<LEVEL> to a 2 byte pattern"), KERN_<LEVEL> is no
+> > longer expanded to the literal '"<LEVEL>"', but to '"\001" "LEVEL"', i.e.
+> > it contains two parts.
+> >
+> > However, the combo of DEFINE_STR() in
+> > arch/x86/um/shared/sysdep/kernel-offsets.h and sed-y in Kbuild doesn't
+> > support string literals consisting of multiple parts. Hence for all
+> > UM_KERN_<LEVEL> definitions, only the SOH character is retained in the actual
+> > definition, while the remainder ends up in the comment. E.g. in
+> > include/generated/asm-offsets.h we get
+> >
+> >     #define UM_KERN_INFO "\001" /* "6" KERN_INFO */
+> >
+> > instead of
+> >
+> >     #define UM_KERN_INFO "\001" "6" /* KERN_INFO */
+> >
+> > This causes spurious '^A' output in some kernel messages:
 
-This magic is lifted from current dpkg-gencontrol. Is there any better
-way to get it?
 
-> I think for linux it is preferable
-> to have it based on UTS_MACHINE. Thus I think your testcases aren't valid,
-
-Well, my current build script is:
-
-  #!/bin/sh
-  # YOu need to have one of the following unremmed to avoid a
-  # dpkg-gencontrol error:
-  export KBUILD_DEBARCH=armhf # Unrem this for armhf
-  #export DEB_HOST_ARCH=armel # Or this for armel
-  exec make ARCH=arm KBUILD_IMAGE=uImage deb-pkg "$@"
-
-Clearly on my build toolchain I must set DEB_HOST_ARCH in some cases. So
-DEB_ variables are already in there. Without it it will give me an error
-for trying to build 
-
-> and also you neglected the following one:
-> make KBUILD_DEBARCH=i386 deb-pkg # i386 userland with amd64 linux
-
-I'm not sure I follow. If the packagees are to be installed on a i386
-system, they are all to be considered i386, right? The linux-image
-package as well. The same as
-http://packages.debian.org/sid/linux-image-amd64 (the i386 variant).
-
-Setting KBUILD_DEBARCH does not change the building of the files in any
-way. It only changes the package's metadata.
-
-Maybe set DEB_HOST_ARCH from KBUILD_DEBARCH if the latter was set?
-
--- 
-               Tzafrir Cohen
-icq#16849755              jabber:tzafrir.cohen@xorcom.com
-+972-50-7952406           mailto:tzafrir.cohen@xorcom.com
-http://www.xorcom.com  iax:guest@local.xorcom.com/tzafrir
