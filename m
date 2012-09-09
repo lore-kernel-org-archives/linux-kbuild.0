@@ -1,159 +1,108 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-vc0-f174.google.com ([209.85.220.174]:43882 "EHLO
-	mail-vc0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751374Ab2IIIdD (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 9 Sep 2012 04:33:03 -0400
+Received: from local.xorcom.com ([81.218.177.19]:31366 "EHLO local.xorcom.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751065Ab2IILyr (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 9 Sep 2012 07:54:47 -0400
+Date: Sun, 9 Sep 2012 14:54:44 +0300
+From: Tzafrir Cohen <tzafrir.cohen@xorcom.com>
+Subject: Re: [PATCH] builddeb: remove unneeded explicit Architecture
+Message-ID: <20120909115444.GP18204@xorcom.com>
+References: <5040C112.70501@suse.cz>
+ <20120905130528.GI18204@xorcom.com>
+ <50475310.6000508@suse.cz>
+ <20120905151422.GD12713@stro.at>
+ <20120905164009.GM18204@xorcom.com>
+ <20120905202604.GF28778@vostochny.stro.at>
+ <20120906140004.GL19848@vostochny.stro.at>
+ <20120906140416.GG28778@vostochny.stro.at>
+ <20120906162143.GN18204@xorcom.com>
+ <20120907000209.GA5993@stro.at>
 MIME-Version: 1.0
-In-Reply-To: <1345140905-10209-1-git-send-email-geert@linux-m68k.org>
-References: <1345140905-10209-1-git-send-email-geert@linux-m68k.org>
-Date: Sun, 9 Sep 2012 10:33:01 +0200
-Message-ID: <CAMuHMdVyWRGyTPbA9pL267XWnvBnbN77353WjF8Ovmd062NSwg@mail.gmail.com>
-Subject: Re: [PATCH/RFC] um: Preinclude include/linux/kern_levels.h
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20120907000209.GA5993@stro.at>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Richard Weinberger <richard@nod.at>, Joe Perches <joe@perches.com>, user-mode-linux-devel@lists.sourceforge.net, linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, Geert Uytterhoeven <geert@linux-m68k.org>
+To: maximilian attems <max@stro.at>
+Cc: Michal Marek <mmarek@suse.cz>, Linux Kbuild <linux-kbuild@vger.kernel.org>, Linux Kernel <linux-kernel@vger.kernel.org>
 
-Ping?
+On Fri, Sep 07, 2012 at 02:02:09AM +0200, maximilian attems wrote:
+> On Thu, 06 Sep 2012, Tzafrir Cohen wrote:
+> >
+> > Works for the case I presented.
+> 
+> Michal please care to queue previous v2 patch with
+> Tested-by: Tzafrir Cohen <tzafrir.cohen@xorcom.com>
+> to kope with that cross building regression since
+> the linux headers got added to deb-pkg target.
+> 
+> > Now I remove the explicit setting of KBUILD_DEBRCH:
+> 
+> and here lies the error.
+>  
+> >   $ rm -rf debian
+> >   $ make ARCH=arm KBUILD_IMAGE=uImage deb-pkg
+> > 
+> >   ...
+> > 
+> >   dpkg-gencontrol: error: current host architecture 'armhf' does not
+> >   appear in package's architecture list (armel)
+> > 
+> > My host architecture is amd64. This is actually the build architecture.
+> > dpkg-gencontrol uses Dpkg::Arch::get_host_arch().
+> > 
+> >   $ perl -MDpkg::Arch -e 'print Dpkg::Arch::get_host_arch()."\n"'
+> >   amd64
+> > 
+> >   $ CC=/usr/bi/narm-linux-gnueabi-gcc  perl -MDpkg::Arch -e 'print Dpkg::Arch::get_host_arch()."\n"'
+> >   armel
+> >   
+> >   $ CC=/usr/bin/arm-linux-gnueabihf-gcc  perl -MDpkg::Arch -e 'print Dpkg::Arch::get_host_arch()."\n"'
+> >   armhf
+> > 
+> >   $ DEB_HOST_ARCH=whatever perl -MDpkg::Arch -e 'print Dpkg::Arch::get_host_arch()."\n"'
+> >   whatever
+> > 
+> > Is it OK to use that perl one-liner as the default instead of the
+> > architecture guessing case?
+> 
+> In any case that would be a follow up, but I'm not fond of that perl/dpkg
+> magic plus supporting DEB_ variables. 
 
-On Thu, Aug 16, 2012 at 8:15 PM, Geert Uytterhoeven
-<geert@linux-m68k.org> wrote:
-> The userspace part of UML uses the asm-offsets.h generator mechanism to
-> create definitions for UM_KERN_<LEVEL> that match the in-kernel
-> KERN_<LEVEL> constant definitions.
->
-> As of commit 04d2c8c83d0e3ac5f78aeede51babb3236200112 ("printk: convert
-> the format for KERN_<LEVEL> to a 2 byte pattern"), KERN_<LEVEL> is no
-> longer expanded to the literal '"<LEVEL>"', but to '"\001" "LEVEL"', i.e.
-> it contains two parts.
->
-> However, the combo of DEFINE_STR() in
-> arch/x86/um/shared/sysdep/kernel-offsets.h and sed-y in Kbuild doesn't
-> support string literals consisting of multiple parts. Hence for all
-> UM_KERN_<LEVEL> definitions, only the SOH character is retained in the actual
-> definition, while the remainder ends up in the comment. E.g. in
-> include/generated/asm-offsets.h we get
->
->     #define UM_KERN_INFO "\001" /* "6" KERN_INFO */
->
-> instead of
->
->     #define UM_KERN_INFO "\001" "6" /* KERN_INFO */
->
-> This causes spurious '^A' output in some kernel messages:
->
->     Calibrating delay loop... 4640.76 BogoMIPS (lpj=23203840)
->     pid_max: default: 32768 minimum: 301
->     Mount-cache hash table entries: 256
->     ^AChecking that host ptys support output SIGIO...Yes
->     ^AChecking that host ptys support SIGIO on close...No, enabling workaround
->     ^AUsing 2.6 host AIO
->     NET: Registered protocol family 16
->     bio: create slab <bio-0> at 0
->     Switching to clocksource itimer
->
-> To fix this:
->   - Move the mapping from UM_KERN_<LEVEL> to KERN_<LEVEL> from
->     arch/um/include/shared/common-offsets.h to
->     arch/um/include/shared/user.h, which is preincluded for all userspace
->     parts,
->   - Preinclude include/linux/kern_levels.h for all userspace parts, to
->     obtain the in-kernel KERN_<LEVEL> constant definitions. This doesn't
->     violate the kernel/userspace separation, as include/linux/kern_levels.h
->     is self-contained and doesn't expose any other kernel internals.
->   - Remove the now unused STR() and DEFINE_STR() macros.
->
-> Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
-> ---
-> We may convert all UM_KERN_* users to KERN_* and drop the extra defines?
-> ---
->  arch/um/include/shared/common-offsets.h    |   10 ----------
->  arch/um/include/shared/user.h              |   11 +++++++++++
->  arch/um/scripts/Makefile.rules             |    2 +-
->  arch/x86/um/shared/sysdep/kernel-offsets.h |    3 ---
->  4 files changed, 12 insertions(+), 14 deletions(-)
->
-> diff --git a/arch/um/include/shared/common-offsets.h b/arch/um/include/shared/common-offsets.h
-> index 40db8f7..2df313b 100644
-> --- a/arch/um/include/shared/common-offsets.h
-> +++ b/arch/um/include/shared/common-offsets.h
-> @@ -7,16 +7,6 @@ DEFINE(UM_KERN_PAGE_MASK, PAGE_MASK);
->  DEFINE(UM_KERN_PAGE_SHIFT, PAGE_SHIFT);
->  DEFINE(UM_NSEC_PER_SEC, NSEC_PER_SEC);
->
-> -DEFINE_STR(UM_KERN_EMERG, KERN_EMERG);
-> -DEFINE_STR(UM_KERN_ALERT, KERN_ALERT);
-> -DEFINE_STR(UM_KERN_CRIT, KERN_CRIT);
-> -DEFINE_STR(UM_KERN_ERR, KERN_ERR);
-> -DEFINE_STR(UM_KERN_WARNING, KERN_WARNING);
-> -DEFINE_STR(UM_KERN_NOTICE, KERN_NOTICE);
-> -DEFINE_STR(UM_KERN_INFO, KERN_INFO);
-> -DEFINE_STR(UM_KERN_DEBUG, KERN_DEBUG);
-> -DEFINE_STR(UM_KERN_CONT, KERN_CONT);
-> -
->  DEFINE(UM_ELF_CLASS, ELF_CLASS);
->  DEFINE(UM_ELFCLASS32, ELFCLASS32);
->  DEFINE(UM_ELFCLASS64, ELFCLASS64);
-> diff --git a/arch/um/include/shared/user.h b/arch/um/include/shared/user.h
-> index 4fa82c0..cef0685 100644
-> --- a/arch/um/include/shared/user.h
-> +++ b/arch/um/include/shared/user.h
-> @@ -26,6 +26,17 @@
->  extern void panic(const char *fmt, ...)
->         __attribute__ ((format (printf, 1, 2)));
->
-> +/* Requires preincluding include/linux/kern_levels.h */
-> +#define UM_KERN_EMERG  KERN_EMERG
-> +#define UM_KERN_ALERT  KERN_ALERT
-> +#define UM_KERN_CRIT   KERN_CRIT
-> +#define UM_KERN_ERR    KERN_ERR
-> +#define UM_KERN_WARNING        KERN_WARNING
-> +#define UM_KERN_NOTICE KERN_NOTICE
-> +#define UM_KERN_INFO   KERN_INFO
-> +#define UM_KERN_DEBUG  KERN_DEBUG
-> +#define UM_KERN_CONT   KERN_CONT
-> +
->  #ifdef UML_CONFIG_PRINTK
->  extern int printk(const char *fmt, ...)
->         __attribute__ ((format (printf, 1, 2)));
-> diff --git a/arch/um/scripts/Makefile.rules b/arch/um/scripts/Makefile.rules
-> index d50270d..15889df 100644
-> --- a/arch/um/scripts/Makefile.rules
-> +++ b/arch/um/scripts/Makefile.rules
-> @@ -8,7 +8,7 @@ USER_OBJS += $(filter %_user.o,$(obj-y) $(obj-m)  $(USER_SINGLE_OBJS))
->  USER_OBJS := $(foreach file,$(USER_OBJS),$(obj)/$(file))
->
->  $(USER_OBJS:.o=.%): \
-> -       c_flags = -Wp,-MD,$(depfile) $(USER_CFLAGS) -include user.h $(CFLAGS_$(basetarget).o)
-> +       c_flags = -Wp,-MD,$(depfile) $(USER_CFLAGS) -include $(srctree)/include/linux/kern_levels.h -include user.h $(CFLAGS_$(basetarget).o)
->
->  # These are like USER_OBJS but filter USER_CFLAGS through unprofile instead of
->  # using it directly.
-> diff --git a/arch/x86/um/shared/sysdep/kernel-offsets.h b/arch/x86/um/shared/sysdep/kernel-offsets.h
-> index 5868526..46a9df9 100644
-> --- a/arch/x86/um/shared/sysdep/kernel-offsets.h
-> +++ b/arch/x86/um/shared/sysdep/kernel-offsets.h
-> @@ -7,9 +7,6 @@
->  #define DEFINE(sym, val) \
->         asm volatile("\n->" #sym " %0 " #val : : "i" (val))
->
-> -#define STR(x) #x
-> -#define DEFINE_STR(sym, val) asm volatile("\n->" #sym " " STR(val) " " #val: : )
-> -
->  #define BLANK() asm volatile("\n->" : : )
->
->  #define OFFSET(sym, str, mem) \
+This magic is lifted from current dpkg-gencontrol. Is there any better
+way to get it?
 
-Gr{oetje,eeting}s,
+> I think for linux it is preferable
+> to have it based on UTS_MACHINE. Thus I think your testcases aren't valid,
 
-                        Geert
+Well, my current build script is:
 
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+  #!/bin/sh
+  # YOu need to have one of the following unremmed to avoid a
+  # dpkg-gencontrol error:
+  export KBUILD_DEBARCH=armhf # Unrem this for armhf
+  #export DEB_HOST_ARCH=armel # Or this for armel
+  exec make ARCH=arm KBUILD_IMAGE=uImage deb-pkg "$@"
 
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+Clearly on my build toolchain I must set DEB_HOST_ARCH in some cases. So
+DEB_ variables are already in there. Without it it will give me an error
+for trying to build 
+
+> and also you neglected the following one:
+> make KBUILD_DEBARCH=i386 deb-pkg # i386 userland with amd64 linux
+
+I'm not sure I follow. If the packagees are to be installed on a i386
+system, they are all to be considered i386, right? The linux-image
+package as well. The same as
+http://packages.debian.org/sid/linux-image-amd64 (the i386 variant).
+
+Setting KBUILD_DEBARCH does not change the building of the files in any
+way. It only changes the package's metadata.
+
+Maybe set DEB_HOST_ARCH from KBUILD_DEBARCH if the latter was set?
+
+-- 
+               Tzafrir Cohen
+icq#16849755              jabber:tzafrir.cohen@xorcom.com
++972-50-7952406           mailto:tzafrir.cohen@xorcom.com
+http://www.xorcom.com  iax:guest@local.xorcom.com/tzafrir
