@@ -1,60 +1,30 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from a.ns.miles-group.at ([95.130.255.143]:47835 "EHLO radon.swed.at"
+Received: from ares07.inai.de ([5.9.24.206]:49686 "EHLO seven.medozas.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753654Ab2IIQGg (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 9 Sep 2012 12:06:36 -0400
-Message-ID: <504CBE87.8010607@nod.at>
-Date: Sun, 09 Sep 2012 18:06:31 +0200
-From: Richard Weinberger <richard@nod.at>
+	id S1754782Ab2IIVz5 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 9 Sep 2012 17:55:57 -0400
+Date: Sun, 9 Sep 2012 23:55:55 +0200 (CEST)
+From: Jan Engelhardt <jengelh@inai.de>
+Subject: Re: [PATCH] Add mach-specific includes
+In-Reply-To: <5040BFF3.6050705@suse.cz>
+Message-ID: <alpine.LNX.2.01.1209092355160.22738@frira.zrqbmnf.qr>
+References: <1344764843-2179-1-git-send-email-tzafrir.cohen@xorcom.com> <5040BFF3.6050705@suse.cz>
 MIME-Version: 1.0
-Subject: Re: [uml-devel] [PATCH/RFC] um: Preinclude include/linux/kern_levels.h
-References: <1345140905-10209-1-git-send-email-geert@linux-m68k.org> <CAMuHMdVyWRGyTPbA9pL267XWnvBnbN77353WjF8Ovmd062NSwg@mail.gmail.com> <1347203365.2050.3.camel@joe2Laptop>
-In-Reply-To: <1347203365.2050.3.camel@joe2Laptop>
-Content-Type: multipart/signed; micalg=pgp-sha1;
- protocol="application/pgp-signature";
- boundary="------------enig64DBF06586464F5E7296D818"
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Joe Perches <joe@perches.com>
-Cc: Geert Uytterhoeven <geert@linux-m68k.org>, Richard Weinberger <richard@nod.at>, linux-kernel@vger.kernel.org, user-mode-linux-devel@lists.sourceforge.net, linux-kbuild@vger.kernel.org
-
-This is an OpenPGP/MIME signed message (RFC 2440 and 3156)
---------------enig64DBF06586464F5E7296D818
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-
-Am 09.09.2012 17:09, schrieb Joe Perches:
-> On Sun, 2012-09-09 at 10:33 +0200, Geert Uytterhoeven wrote:
->> Ping?
->=20
-> Richard?  Are you going to pick up this patch?
-> It seems sensible.
->=20
-> Geert, I suggest sending it directly to Linus as a fix
-> if Richard doesn't respond in a few days.
-
-I'll pick up.
-I'm still on vacation and therefore a bit slow. :)
-
-Thanks,
-//richard
+To: Michal Marek <mmarek@suse.cz>
+Cc: Tzafrir Cohen <tzafrir.cohen@xorcom.com>, Linux Kbuild <linux-kbuild@vger.kernel.org>, Linux Kernel <linux-kernel@vger.kernel.org>, maximilian attems <max@stro.at>
 
 
---------------enig64DBF06586464F5E7296D818
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+On Friday 2012-08-31 15:45, Michal Marek wrote:
+>>  # Build header package
+>>  (cd $srctree; find . -name Makefile\* -o -name Kconfig\* -o -name \*.pl > "$objtree/debian/hdrsrcfiles")
+>>  (cd $srctree; find arch/$SRCARCH/include include scripts -type f >> "$objtree/debian/hdrsrcfiles")
+>> +if echo arch/$SRCARCH/mach-*/include | grep q -v '*'; then
+>
+>This should probably be grep -q, but it's quite ugly anyway.
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.18 (GNU/Linux)
-
-iQEcBAEBAgAGBQJQTL6IAAoJEN9758yqZn9eFQoIAJn/9LWPPRIGNnmKte46phZn
-A6orLxdv4viC4mG9g4v4x/XM7hHubQzLG/YUu8f9H40J51nh7kDzuwz5oTXCZfXE
-kEuiIjfcWi7nTkJaRo/k6FZqwCDJFn4aFsitiJSM+eZ5IR8giXQTEn1vgbGvHk4K
-B0PUGLsQ2/vwX4vB0I/Zs5tcDdn5rOBgeemU8lf+U8QbKwFPt9p0Txa7TEbr2YGd
-+nWupFk6UL9XQxPjTvLpswN+AAEZ422Bi3zbJRsVtMfgNUVQv0uq3RlyGcigwcBd
-7pAhIOR/80hCN45Fod/EcOhYexDBksot2iBadUYy7Ae5T2DON0taKNKvKeHn8N4=
-=iHTU
------END PGP SIGNATURE-----
-
---------------enig64DBF06586464F5E7296D818--
+Use of -q should probably be preferred to >/dev/null,
+because with the latter, you will still pay the price
+of printf.
