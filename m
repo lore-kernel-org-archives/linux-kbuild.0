@@ -1,30 +1,122 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ares07.inai.de ([5.9.24.206]:49686 "EHLO seven.medozas.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754782Ab2IIVz5 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 9 Sep 2012 17:55:57 -0400
-Date: Sun, 9 Sep 2012 23:55:55 +0200 (CEST)
-From: Jan Engelhardt <jengelh@inai.de>
-Subject: Re: [PATCH] Add mach-specific includes
-In-Reply-To: <5040BFF3.6050705@suse.cz>
-Message-ID: <alpine.LNX.2.01.1209092355160.22738@frira.zrqbmnf.qr>
-References: <1344764843-2179-1-git-send-email-tzafrir.cohen@xorcom.com> <5040BFF3.6050705@suse.cz>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+Received: from mail-wg0-f44.google.com ([74.125.82.44]:42965 "EHLO
+	mail-wg0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751046Ab2IJNiq (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 10 Sep 2012 09:38:46 -0400
+Received: by wgbdr13 with SMTP id dr13so1985486wgb.1
+        for <linux-kbuild@vger.kernel.org>; Mon, 10 Sep 2012 06:38:45 -0700 (PDT)
+From: Richard Genoud <richard.genoud@gmail.com>
+Subject: [PATCH] ARM: add dtbImage.<dt> and dtbuImage.<dt> rules
+Date: Mon, 10 Sep 2012 15:38:33 +0200
+Message-Id: <1347284313-2857-1-git-send-email-richard.genoud@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: Tzafrir Cohen <tzafrir.cohen@xorcom.com>, Linux Kbuild <linux-kbuild@vger.kernel.org>, Linux Kernel <linux-kernel@vger.kernel.org>, maximilian attems <max@stro.at>
+To: Michal Marek <mmarek@suse.cz>, Russell King <linux@arm.linux.org.uk>
+Cc: linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org, Richard Genoud <richard.genoud@gmail.com>
 
+This rules are useful for appended device tree conforming to the
+CONFIG_ARM_APPENDED_DTB kernel option.
 
-On Friday 2012-08-31 15:45, Michal Marek wrote:
->>  # Build header package
->>  (cd $srctree; find . -name Makefile\* -o -name Kconfig\* -o -name \*.pl > "$objtree/debian/hdrsrcfiles")
->>  (cd $srctree; find arch/$SRCARCH/include include scripts -type f >> "$objtree/debian/hdrsrcfiles")
->> +if echo arch/$SRCARCH/mach-*/include | grep q -v '*'; then
->
->This should probably be grep -q, but it's quite ugly anyway.
+The rule dtbImage.<dt> is actually just a:
+cat zImage <dt>.dtb > dtbImage.<dt>
 
-Use of -q should probably be preferred to >/dev/null,
-because with the latter, you will still pay the price
-of printf.
+The dtbuImage.<dt> makes an uImage out of the dtbImage.<dt> file.
+
+KernelVersion: v3.6-rc5
+
+Signed-off-by: Richard Genoud <richard.genoud@gmail.com>
+---
+ arch/arm/Makefile      |   30 ++++++++++++++++--------------
+ arch/arm/boot/Makefile |   11 +++++++++++
+ scripts/Makefile.lib   |    6 ++++++
+ 3 files changed, 33 insertions(+), 14 deletions(-)
+
+diff --git a/arch/arm/Makefile b/arch/arm/Makefile
+index 30eae87..c5f2673 100644
+--- a/arch/arm/Makefile
++++ b/arch/arm/Makefile
+@@ -278,7 +278,7 @@ archprepare:
+ # Convert bzImage to zImage
+ bzImage: zImage
+ 
+-zImage Image xipImage bootpImage uImage: vmlinux
++zImage Image xipImage bootpImage uImage dtbImage.% dtbuImage.% : vmlinux
+ 	$(Q)$(MAKE) $(build)=$(boot) MACHINE=$(MACHINE) $(boot)/$@
+ 
+ zinstall uinstall install: vmlinux
+@@ -300,17 +300,19 @@ i zi:;	$(Q)$(MAKE) $(build)=$(boot) MACHINE=$(MACHINE) $@
+ 
+ 
+ define archhelp
+-  echo  '* zImage        - Compressed kernel image (arch/$(ARCH)/boot/zImage)'
+-  echo  '  Image         - Uncompressed kernel image (arch/$(ARCH)/boot/Image)'
+-  echo  '* xipImage      - XIP kernel image, if configured (arch/$(ARCH)/boot/xipImage)'
+-  echo  '  uImage        - U-Boot wrapped zImage'
+-  echo  '  bootpImage    - Combined zImage and initial RAM disk' 
+-  echo  '                  (supply initrd image via make variable INITRD=<path>)'
+-  echo  '  dtbs          - Build device tree blobs for enabled boards'
+-  echo  '  install       - Install uncompressed kernel'
+-  echo  '  zinstall      - Install compressed kernel'
+-  echo  '  uinstall      - Install U-Boot wrapped compressed kernel'
+-  echo  '                  Install using (your) ~/bin/$(INSTALLKERNEL) or'
+-  echo  '                  (distribution) /sbin/$(INSTALLKERNEL) or'
+-  echo  '                  install to $$(INSTALL_PATH) and run lilo'
++  echo  '* zImage         - Compressed kernel image (arch/$(ARCH)/boot/zImage)'
++  echo  '  Image          - Uncompressed kernel image (arch/$(ARCH)/boot/Image)'
++  echo  '* xipImage       - XIP kernel image, if configured (arch/$(ARCH)/boot/xipImage)'
++  echo  '  uImage         - U-Boot wrapped zImage'
++  echo  '  bootpImage     - Combined zImage and initial RAM disk'
++  echo  '                   (supply initrd image via make variable INITRD=<path>)'
++  echo  '  dtbs           - Build device tree blobs for enabled boards'
++  echo  '  dtbImage.<dt>  - zImage with an appended device tree blob'
++  echo  '  dtbuImage.<dt> - uImage with an embedded device tree blob'
++  echo  '  install        - Install uncompressed kernel'
++  echo  '  zinstall       - Install compressed kernel'
++  echo  '  uinstall       - Install U-Boot wrapped compressed kernel'
++  echo  '                   Install using (your) ~/bin/$(INSTALLKERNEL) or'
++  echo  '                   (distribution) /sbin/$(INSTALLKERNEL) or'
++  echo  '                   install to $$(INSTALL_PATH) and run lilo'
+ endef
+diff --git a/arch/arm/boot/Makefile b/arch/arm/boot/Makefile
+index c877087..35c01a8 100644
+--- a/arch/arm/boot/Makefile
++++ b/arch/arm/boot/Makefile
+@@ -98,6 +98,17 @@ $(obj)/bootpImage: $(obj)/bootp/bootp FORCE
+ 	$(call if_changed,objcopy)
+ 	@echo '  Kernel: $@ is ready'
+ 
++# dtbImage.% - a dtbImage is a zImage with an appended device tree blob
++$(obj)/dtbImage.%: $(obj)/zImage $(obj)/%.dtb FORCE
++	$(call if_changed,cat)
++	@echo '  Kernel: $@ is ready'
++
++# dtbuImage.% - a dtbuImage is a uImage with an embedded device tree blob
++$(obj)/dtbuImage.%: $(obj)/dtbImage.% FORCE
++	@$(check_for_multiple_loadaddr)
++	$(call if_changed,uimage)
++	@echo '  Image $@ is ready'
++
+ PHONY += initrd FORCE
+ initrd:
+ 	@test "$(INITRD_PHYS)" != "" || \
+diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+index 0be6f11..8550466 100644
+--- a/scripts/Makefile.lib
++++ b/scripts/Makefile.lib
+@@ -235,6 +235,12 @@ cmd_ld = $(LD) $(LDFLAGS) $(ldflags-y) $(LDFLAGS_$(@F)) \
+ quiet_cmd_objcopy = OBJCOPY $@
+ cmd_objcopy = $(OBJCOPY) $(OBJCOPYFLAGS) $(OBJCOPYFLAGS_$(@F)) $< $@
+ 
++# Cat
++# ---------------------------------------------------------------------------
++
++quiet_cmd_cat = CAT     $@
++cmd_cat = (cat $(filter-out FORCE,$^) > $@) || (rm -f $@ ; false)
++
+ # Gzip
+ # ---------------------------------------------------------------------------
+ 
+-- 
+1.7.2.5
+
