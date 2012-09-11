@@ -1,135 +1,85 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.free-electrons.com ([88.190.12.23]:46045 "EHLO
-	mail.free-electrons.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753650Ab2IJOkO (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 10 Sep 2012 10:40:14 -0400
-Message-ID: <504DFBBF.5010202@free-electrons.com>
-Date: Mon, 10 Sep 2012 16:39:59 +0200
-From: Gregory CLEMENT <gregory.clement@free-electrons.com>
+Received: from mga01.intel.com ([192.55.52.88]:17233 "EHLO mga01.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751901Ab2IKAqj (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 10 Sep 2012 20:46:39 -0400
+Date: Tue, 11 Sep 2012 08:46:33 +0800
+From: Fengguang Wu <fengguang.wu@intel.com>
+Subject: Re: [PATCH] Kbuild: use normal compression settings for tar*-pkg
+Message-ID: <20120911004633.GA21147@localhost>
+References: <1347133679-14641-1-git-send-email-andi@firstfloor.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH] ARM: add dtbImage.<dt> and dtbuImage.<dt> rules
-References: <1347284313-2857-1-git-send-email-richard.genoud@gmail.com>
-In-Reply-To: <1347284313-2857-1-git-send-email-richard.genoud@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1347133679-14641-1-git-send-email-andi@firstfloor.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Richard Genoud <richard.genoud@gmail.com>
-Cc: Michal Marek <mmarek@suse.cz>, Russell King <linux@arm.linux.org.uk>, linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org
+To: Andi Kleen <andi@firstfloor.org>
+Cc: mmarek@suse.cz, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Andi Kleen <ak@linux.intel.com>
 
-On 09/10/2012 03:38 PM, Richard Genoud wrote:
-> This rules are useful for appended device tree conforming to the
-> CONFIG_ARM_APPENDED_DTB kernel option.
+On Sat, Sep 08, 2012 at 12:47:59PM -0700, Andi Kleen wrote:
+> From: Andi Kleen <ak@linux.intel.com>
 > 
-> The rule dtbImage.<dt> is actually just a:
-> cat zImage <dt>.dtb > dtbImage.<dt>
+> For large kernel configurations (like a distribution kernel)
+> targz-pkg takes a quite long time to just do the compression.
+> I clocked it at 15+mins for a SUSE kernel like config on a fast
+> system.  And tarxz and bzip2 are even slower.
 > 
-> The dtbuImage.<dt> makes an uImage out of the dtbImage.<dt> file.
+> The main reason is that the script that is doing the taring sets
+> the highest compression level (-9).  When I change it to just
+> use the defaults the gzip time for the same kernel goes down
+> to ~3 mins. I haven't tested xz and bzip, but I expect those
+> to be much faster too.
+> 
+> I'm not willing to wait that long for a small compression
+> gain. So just change the script to use the defaults.
 
-Tested on my Armada XP board, it worked as expected.
-You can add my Tested-by.
+Makes sense to me.
 
-> 
-> KernelVersion: v3.6-rc5
-> 
-> Signed-off-by: Richard Genoud <richard.genoud@gmail.com>
+Reviewed-by: Fengguang Wu <fengguang.wu@intel.com>
+
+> Signed-off-by: Andi Kleen <ak@linux.intel.com>
 > ---
->  arch/arm/Makefile      |   30 ++++++++++++++++--------------
->  arch/arm/boot/Makefile |   11 +++++++++++
->  scripts/Makefile.lib   |    6 ++++++
->  3 files changed, 33 insertions(+), 14 deletions(-)
+>  scripts/package/buildtar |    6 +++---
+>  1 files changed, 3 insertions(+), 3 deletions(-)
 > 
-> diff --git a/arch/arm/Makefile b/arch/arm/Makefile
-> index 30eae87..c5f2673 100644
-> --- a/arch/arm/Makefile
-> +++ b/arch/arm/Makefile
-> @@ -278,7 +278,7 @@ archprepare:
->  # Convert bzImage to zImage
->  bzImage: zImage
->  
-> -zImage Image xipImage bootpImage uImage: vmlinux
-> +zImage Image xipImage bootpImage uImage dtbImage.% dtbuImage.% : vmlinux
->  	$(Q)$(MAKE) $(build)=$(boot) MACHINE=$(MACHINE) $(boot)/$@
->  
->  zinstall uinstall install: vmlinux
-> @@ -300,17 +300,19 @@ i zi:;	$(Q)$(MAKE) $(build)=$(boot) MACHINE=$(MACHINE) $@
->  
->  
->  define archhelp
-> -  echo  '* zImage        - Compressed kernel image (arch/$(ARCH)/boot/zImage)'
-> -  echo  '  Image         - Uncompressed kernel image (arch/$(ARCH)/boot/Image)'
-> -  echo  '* xipImage      - XIP kernel image, if configured (arch/$(ARCH)/boot/xipImage)'
-> -  echo  '  uImage        - U-Boot wrapped zImage'
-> -  echo  '  bootpImage    - Combined zImage and initial RAM disk' 
-> -  echo  '                  (supply initrd image via make variable INITRD=<path>)'
-> -  echo  '  dtbs          - Build device tree blobs for enabled boards'
-> -  echo  '  install       - Install uncompressed kernel'
-> -  echo  '  zinstall      - Install compressed kernel'
-> -  echo  '  uinstall      - Install U-Boot wrapped compressed kernel'
-> -  echo  '                  Install using (your) ~/bin/$(INSTALLKERNEL) or'
-> -  echo  '                  (distribution) /sbin/$(INSTALLKERNEL) or'
-> -  echo  '                  install to $$(INSTALL_PATH) and run lilo'
-> +  echo  '* zImage         - Compressed kernel image (arch/$(ARCH)/boot/zImage)'
-> +  echo  '  Image          - Uncompressed kernel image (arch/$(ARCH)/boot/Image)'
-> +  echo  '* xipImage       - XIP kernel image, if configured (arch/$(ARCH)/boot/xipImage)'
-> +  echo  '  uImage         - U-Boot wrapped zImage'
-> +  echo  '  bootpImage     - Combined zImage and initial RAM disk'
-> +  echo  '                   (supply initrd image via make variable INITRD=<path>)'
-> +  echo  '  dtbs           - Build device tree blobs for enabled boards'
-> +  echo  '  dtbImage.<dt>  - zImage with an appended device tree blob'
-> +  echo  '  dtbuImage.<dt> - uImage with an embedded device tree blob'
-> +  echo  '  install        - Install uncompressed kernel'
-> +  echo  '  zinstall       - Install compressed kernel'
-> +  echo  '  uinstall       - Install U-Boot wrapped compressed kernel'
-> +  echo  '                   Install using (your) ~/bin/$(INSTALLKERNEL) or'
-> +  echo  '                   (distribution) /sbin/$(INSTALLKERNEL) or'
-> +  echo  '                   install to $$(INSTALL_PATH) and run lilo'
->  endef
-> diff --git a/arch/arm/boot/Makefile b/arch/arm/boot/Makefile
-> index c877087..35c01a8 100644
-> --- a/arch/arm/boot/Makefile
-> +++ b/arch/arm/boot/Makefile
-> @@ -98,6 +98,17 @@ $(obj)/bootpImage: $(obj)/bootp/bootp FORCE
->  	$(call if_changed,objcopy)
->  	@echo '  Kernel: $@ is ready'
->  
-> +# dtbImage.% - a dtbImage is a zImage with an appended device tree blob
-> +$(obj)/dtbImage.%: $(obj)/zImage $(obj)/%.dtb FORCE
-> +	$(call if_changed,cat)
-> +	@echo '  Kernel: $@ is ready'
-> +
-> +# dtbuImage.% - a dtbuImage is a uImage with an embedded device tree blob
-> +$(obj)/dtbuImage.%: $(obj)/dtbImage.% FORCE
-> +	@$(check_for_multiple_loadaddr)
-> +	$(call if_changed,uimage)
-> +	@echo '  Image $@ is ready'
-> +
->  PHONY += initrd FORCE
->  initrd:
->  	@test "$(INITRD_PHYS)" != "" || \
-> diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-> index 0be6f11..8550466 100644
-> --- a/scripts/Makefile.lib
-> +++ b/scripts/Makefile.lib
-> @@ -235,6 +235,12 @@ cmd_ld = $(LD) $(LDFLAGS) $(ldflags-y) $(LDFLAGS_$(@F)) \
->  quiet_cmd_objcopy = OBJCOPY $@
->  cmd_objcopy = $(OBJCOPY) $(OBJCOPYFLAGS) $(OBJCOPYFLAGS_$(@F)) $< $@
->  
-> +# Cat
-> +# ---------------------------------------------------------------------------
-> +
-> +quiet_cmd_cat = CAT     $@
-> +cmd_cat = (cat $(filter-out FORCE,$^) > $@) || (rm -f $@ ; false)
-> +
->  # Gzip
->  # ---------------------------------------------------------------------------
->  
+> diff --git a/scripts/package/buildtar b/scripts/package/buildtar
+> index 8a7b155..632377f 100644
+> --- a/scripts/package/buildtar
+> +++ b/scripts/package/buildtar
+> @@ -28,15 +28,15 @@ case "${1}" in
+>  		file_ext=""
+>  		;;
+>  	targz-pkg)
+> -		compress="gzip -c9"
+> +		compress="gzip"
+
+-c should be kept because it means --stdout and --keep
+
+>  		file_ext=".gz"
+>  		;;
+>  	tarbz2-pkg)
+> -		compress="bzip2 -c9"
+> +		compress="bzip2"
+
+ditto
+
+>  		file_ext=".bz2"
+>  		;;
+>  	tarxz-pkg)
+> -		compress="xz -c9"
+> +		compress="xz"
+
+ditto
+
+>  		file_ext=".xz"
+>  		;;
+>  	*)
+> -- 
+> 1.7.7.6
 > 
-
-
--- 
-Gregory Clement, Free Electrons
-Kernel, drivers, real-time and embedded Linux
-development, consulting, training and support.
-http://free-electrons.com
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-kernel" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> Please read the FAQ at  http://www.tux.org/lkml/
