@@ -1,34 +1,42 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga11.intel.com ([192.55.52.93]:48154 "EHLO mga11.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751111Ab2IKEWD (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 11 Sep 2012 00:22:03 -0400
-Date: Tue, 11 Sep 2012 12:21:49 +0800
-From: Fengguang Wu <fengguang.wu@intel.com>
-Subject: Re: [PATCH] Kbuild: use normal compression settings for tar*-pkg
-Message-ID: <20120911042149.GA25359@localhost>
-References: <1347133679-14641-1-git-send-email-andi@firstfloor.org>
- <20120911004633.GA21147@localhost>
- <20120911030109.GU16230@one.firstfloor.org>
-MIME-Version: 1.0
+Received: from one.firstfloor.org ([213.235.205.2]:52091 "EHLO
+	one.firstfloor.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1759646Ab2ILDQx (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 11 Sep 2012 23:16:53 -0400
+Date: Wed, 12 Sep 2012 05:16:46 +0200
+From: Andi Kleen <andi@firstfloor.org>
+Subject: make tar*-pkg considered dangerous
+Message-ID: <20120912031646.GV16230@one.firstfloor.org>
+Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20120911030109.GU16230@one.firstfloor.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andi Kleen <andi@firstfloor.org>
-Cc: mmarek@suse.cz, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Andi Kleen <ak@linux.intel.com>
+To: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-On Tue, Sep 11, 2012 at 05:01:09AM +0200, Andi Kleen wrote:
-> > 
-> > -c should be kept because it means --stdout and --keep
-> 
-> It seems to work without it.
 
-Yeah I see: it's used in the pipe anyway:
+Hi,
 
-        tar cf - . $opts | ${compress} > "${tarball}${file_ext}"
+We've had some incidents with people destroying Fedore 17 installs
+(to the point of reinstall) by installing a kernel tarball generated with 
+make tar*-pkg
 
-Thanks,
-Fengguang
+The problem is that the tarball includes /lib/{modules,firmware},
+but on FC17 /lib is a symlink. tar when it unpacks the tarball
+replaces the symlink with the directory. So they end up
+with a /lib which only contains the new kernel files, but nothing else,
 
+And then the system doesn't boot anymore.
+
+I'm not sure there is a good fix for this. I don't know of a way to
+convince tar to not do that. And putting everything into /usr 
+would be very incompatible.
+
+Disable these make targets or add warnings?  If disabling people should
+use rpms or dpkgs instead?
+
+-Andi
+
+-- 
+ak@linux.intel.com -- Speaking for myself only.
