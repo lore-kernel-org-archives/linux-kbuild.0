@@ -1,42 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from one.firstfloor.org ([213.235.205.2]:52091 "EHLO
-	one.firstfloor.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1759646Ab2ILDQx (ORCPT
+Received: from mail-pb0-f46.google.com ([209.85.160.46]:59980 "EHLO
+	mail-pb0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751215Ab2ILEqV (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 11 Sep 2012 23:16:53 -0400
-Date: Wed, 12 Sep 2012 05:16:46 +0200
-From: Andi Kleen <andi@firstfloor.org>
-Subject: make tar*-pkg considered dangerous
-Message-ID: <20120912031646.GV16230@one.firstfloor.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+	Wed, 12 Sep 2012 00:46:21 -0400
+Received: by pbbrr13 with SMTP id rr13so1709781pbb.19
+        for <linux-kbuild@vger.kernel.org>; Tue, 11 Sep 2012 21:46:21 -0700 (PDT)
+From: Tushar Behera <tushar.behera@linaro.org>
+Subject: [PATCH] kbuild: setlocalversion: ignore private tags while reporting local version
+Date: Wed, 12 Sep 2012 10:13:16 +0530
+Message-Id: <1347424996-15569-1-git-send-email-tushar.behera@linaro.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: mmarek@suse.cz, patches@linaro.org
 
+The output 'git describe' is relative to the immediate preceding tag.
+When the immediate tag preceding the HEAD is a private tag,
+setlocalversion extracts information with respect to the private tag and
+wrongly reports them with respect to Linux tag.
 
-Hi,
+Fixing this to extract information with respect to Linux tags.
 
-We've had some incidents with people destroying Fedore 17 installs
-(to the point of reinstall) by installing a kernel tarball generated with 
-make tar*-pkg
+CC: Michal Marek <mmarek@suse.cz>
+Signed-off-by: Tushar Behera <tushar.behera@linaro.org>
+---
+ scripts/setlocalversion |    3 ++-
+ 1 files changed, 2 insertions(+), 1 deletions(-)
 
-The problem is that the tarball includes /lib/{modules,firmware},
-but on FC17 /lib is a symlink. tar when it unpacks the tarball
-replaces the symlink with the directory. So they end up
-with a /lib which only contains the new kernel files, but nothing else,
-
-And then the system doesn't boot anymore.
-
-I'm not sure there is a good fix for this. I don't know of a way to
-convince tar to not do that. And putting everything into /usr 
-would be very incompatible.
-
-Disable these make targets or add warnings?  If disabling people should
-use rpms or dpkgs instead?
-
--Andi
-
+diff --git a/scripts/setlocalversion b/scripts/setlocalversion
+index bd6dca8..d2c857c 100755
+--- a/scripts/setlocalversion
++++ b/scripts/setlocalversion
+@@ -57,7 +57,8 @@ scm_version()
+ 			fi
+ 			# If we are past a tagged commit (like
+ 			# "v2.6.30-rc5-302-g72357d5"), we pretty print it.
+-			if atag="`git describe 2>/dev/null`"; then
++			# Also match linux tags pattern to discard private tags
++			if atag="`git describe --match v[2-9].* 2>/dev/null`"; then
+ 				echo "$atag" | awk -F- '{printf("-%05d-%s", $(NF-1),$(NF))}'
+ 
+ 			# If we don't have a tag at all we print -g{commitish}.
 -- 
-ak@linux.intel.com -- Speaking for myself only.
+1.7.4.1
+
