@@ -1,70 +1,29 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ey0-f174.google.com ([209.85.215.174]:62950 "EHLO
-	mail-ey0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1758974Ab2ILQBT (ORCPT
+Received: from one.firstfloor.org ([213.235.205.2]:52764 "EHLO
+	one.firstfloor.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1759809Ab2ILQQO (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 12 Sep 2012 12:01:19 -0400
-Message-ID: <5050B1CA.7090208@gmail.com>
-Date: Wed, 12 Sep 2012 18:01:14 +0200
-From: Zdenek Kaspar <zkaspar82@gmail.com>
-MIME-Version: 1.0
+	Wed, 12 Sep 2012 12:16:14 -0400
+Date: Wed, 12 Sep 2012 18:16:09 +0200
+From: Andi Kleen <andi@firstfloor.org>
 Subject: Re: [PATCH] Kbuild: use normal compression settings for tar*-pkg
-References: <1347133679-14641-1-git-send-email-andi@firstfloor.org>
-In-Reply-To: <1347133679-14641-1-git-send-email-andi@firstfloor.org>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+Message-ID: <20120912161609.GX16230@one.firstfloor.org>
+References: <1347133679-14641-1-git-send-email-andi@firstfloor.org> <5050B1CA.7090208@gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5050B1CA.7090208@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andi Kleen <andi@firstfloor.org>
-Cc: mmarek@suse.cz, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Andi Kleen <ak@linux.intel.com>
+To: Zdenek Kaspar <zkaspar82@gmail.com>
+Cc: Andi Kleen <andi@firstfloor.org>, mmarek@suse.cz, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Andi Kleen <ak@linux.intel.com>
 
-On 09/08/2012 09:47 PM, Andi Kleen wrote:
-> From: Andi Kleen <ak@linux.intel.com>
-> 
-> For large kernel configurations (like a distribution kernel)
-> targz-pkg takes a quite long time to just do the compression.
-> I clocked it at 15+mins for a SUSE kernel like config on a fast
-> system.  And tarxz and bzip2 are even slower.
-> 
-> The main reason is that the script that is doing the taring sets
-> the highest compression level (-9).  When I change it to just
-> use the defaults the gzip time for the same kernel goes down
-> to ~3 mins. I haven't tested xz and bzip, but I expect those
-> to be much faster too.
-> 
-> I'm not willing to wait that long for a small compression
-> gain. So just change the script to use the defaults.
-> 
-> Signed-off-by: Andi Kleen <ak@linux.intel.com>
-> ---
->  scripts/package/buildtar |    6 +++---
->  1 files changed, 3 insertions(+), 3 deletions(-)
-> 
-> diff --git a/scripts/package/buildtar b/scripts/package/buildtar
-> index 8a7b155..632377f 100644
-> --- a/scripts/package/buildtar
-> +++ b/scripts/package/buildtar
-> @@ -28,15 +28,15 @@ case "${1}" in
->  		file_ext=""
->  		;;
->  	targz-pkg)
-> -		compress="gzip -c9"
-> +		compress="gzip"
->  		file_ext=".gz"
->  		;;
->  	tarbz2-pkg)
-> -		compress="bzip2 -c9"
-> +		compress="bzip2"
->  		file_ext=".bz2"
->  		;;
->  	tarxz-pkg)
-> -		compress="xz -c9"
-> +		compress="xz"
->  		file_ext=".xz"
->  		;;
->  	*)
+> Maybe add new default compression options or rename actual ones to -hc-
+> (high compression) if users dont like it much?
 
-Maybe add new default compression options or rename actual ones to -hc-
-(high compression) if users dont like it much?
+Doesn't sound useful to me. The normal ones are good enough.
 
-Z.
+-Andi
+
+-- 
+ak@linux.intel.com -- Speaking for myself only.
