@@ -1,66 +1,37 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from shadbolt.e.decadent.org.uk ([88.96.1.126]:50251 "EHLO
-	shadbolt.e.decadent.org.uk" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1752467Ab2ILUjd (ORCPT
+Received: from mail-ob0-f174.google.com ([209.85.214.174]:63682 "EHLO
+	mail-ob0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751079Ab2IMTxp (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 12 Sep 2012 16:39:33 -0400
-Date: Wed, 12 Sep 2012 21:39:21 +0100
-From: Ben Hutchings <ben@decadent.org.uk>
-Message-ID: <20120912203921.GY29217@decadent.org.uk>
-References: <20120912161154.GB3289@khazad-dum.debian.net>
+	Thu, 13 Sep 2012 15:53:45 -0400
+Received: by obbuo13 with SMTP id uo13so5143777obb.19
+        for <linux-kbuild@vger.kernel.org>; Thu, 13 Sep 2012 12:53:44 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20120912161154.GB3289@khazad-dum.debian.net>
-Subject: Re: (fwd) make tar*-pkg considered dangerous
+Date: Thu, 13 Sep 2012 12:53:44 -0700
+Message-ID: <CAO7V0xnj6CLixdDs5LvLiCphvGhj_aZC88-YaoE+BVt-Qu1Rkg@mail.gmail.com>
+Subject: =?UTF-8?B?S0JVSUxEX01PRE5BTUU9S0JVSUxEX1NUUigp4oCP?=
+From: Paolo Piacentini <paolopiace@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Henrique de Moraes Holschuh <hmh@hmh.eng.br>, Andi Kleen <andi@firstfloor.org>
-Cc: pkg-sysvinit-devel@lists.alioth.debian.org, debian-devel@lists.debian.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
 
-On Wed, Sep 12, 2012 at 01:11:54PM -0300, Henrique de Moraes Holschuh wrote:
-> I am forwarding this as a remider that, should we ever get to the point of
-> moving around /lib or /usr/lib, /sbin or /usr/sbin, and /bin or /usr/sbin,
-> as well as any other such trunks, we really ought to consider whether we
-> should be using symlinks or bind mounts [where possible] for such moves.
-> 
-> Also, just in case, Debian users are gently reminded that there are less
-> unsavory methods of packing custom kernel builds for later use in Debian
-> boxes, including the Linux upstream "deb-pkg" make target (dpkg is a lot
-> smarter than "tar"), and the make-kpkg command provided by the
-> kernel-package Debian package (which IMHO tends to produce better kernel
-> .deb packages than the upstream "deb-pkg" make target.
+Please bear with me as I'm new to kbuild. I'm compiling a driver for
+the kernel 2.6.18
 
-kernel-package is effectively unmaintained, so please don't recommend
-its use unless you intend to rectify that.
+The command 'make' reads the Makefile(s) and builds the .*.o.cmd files
+from the driver source code.
 
-> ----- Forwarded message from Andi Kleen <andi@firstfloor.org> -----
-> Date: Wed, 12 Sep 2012 05:16:46 +0200
-> From: Andi Kleen <andi@firstfloor.org>
-> To: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
-> Subject: make tar*-pkg considered dangerous
-> 
-> Hi,
-> 
-> We've had some incidents with people destroying Fedore 17 installs
-> (to the point of reinstall) by installing a kernel tarball generated with 
-> make tar*-pkg
-> 
-> The problem is that the tarball includes /lib/{modules,firmware},
-> but on FC17 /lib is a symlink. tar when it unpacks the tarball
-> replaces the symlink with the directory.
-[...]
+I see this string in the .*.o.cmd file as gcc parameter:
 
-Presumably the tarball also contains an entry for the directory lib,
-and that (not the subdirectory entries) triggers tar to replace the
-symlink.  So this can be fixed by only including
-lib/{modules,firmware} in the tarball, not lib.
+-D"KBUILD_MODNAME=KBUILD_STR(dma_module)"
 
-A quick experiment under F16 (tar 1.26) supports this.
- 
-Ben.
+My problem is that dma_module is a name that does neither exist in any
+source file of the driver nor in any Makefile.
 
--- 
-Ben Hutchings
-We get into the habit of living before acquiring the habit of thinking.
-                                                              - Albert Camus
+Question: how does 'make' detects/writes that name, dma_module ?
+
+Also, I cannot find any documentation for kbuild in this kernel
+version. Any hint about where I can find it?
+
+Thanks a lot and Regards
