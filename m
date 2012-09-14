@@ -1,37 +1,76 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ob0-f174.google.com ([209.85.214.174]:63682 "EHLO
-	mail-ob0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751079Ab2IMTxp (ORCPT
+Received: from haggis.pcug.org.au ([203.10.76.10]:51212 "EHLO
+	members.tip.net.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751333Ab2INAOZ (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 13 Sep 2012 15:53:45 -0400
-Received: by obbuo13 with SMTP id uo13so5143777obb.19
-        for <linux-kbuild@vger.kernel.org>; Thu, 13 Sep 2012 12:53:44 -0700 (PDT)
-MIME-Version: 1.0
-Date: Thu, 13 Sep 2012 12:53:44 -0700
-Message-ID: <CAO7V0xnj6CLixdDs5LvLiCphvGhj_aZC88-YaoE+BVt-Qu1Rkg@mail.gmail.com>
-Subject: =?UTF-8?B?S0JVSUxEX01PRE5BTUU9S0JVSUxEX1NUUigp4oCP?=
-From: Paolo Piacentini <paolopiace@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
+	Thu, 13 Sep 2012 20:14:25 -0400
+Date: Fri, 14 Sep 2012 10:14:14 +1000
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+Subject: [RFC] add "enable" to the kconfig language
+Message-Id: <20120914101414.1e24b28d2cfa8fc030952a58@canb.auug.org.au>
+Mime-Version: 1.0
+Content-Type: multipart/signed; protocol="application/pgp-signature";
+ micalg="PGP-SHA256";
+ boundary="Signature=_Fri__14_Sep_2012_10_14_14_+1000_L/+9UnCGuj90tlHI"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org, Steven Rostedt <rostedt@goodmis.org>, LKML <linux-kernel@vger.kernel.org>
 
-Please bear with me as I'm new to kbuild. I'm compiling a driver for
-the kernel 2.6.18
+--Signature=_Fri__14_Sep_2012_10_14_14_+1000_L/+9UnCGuj90tlHI
+Content-Type: text/plain; charset=US-ASCII
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-The command 'make' reads the Makefile(s) and builds the .*.o.cmd files
-from the driver source code.
+Hi all,
 
-I see this string in the .*.o.cmd file as gcc parameter:
+I have noticed that we use the following paradigm quite a bit theses days:
 
--D"KBUILD_MODNAME=KBUILD_STR(dma_module)"
+config <something
+	select HAVE_<config1>
 
-My problem is that dma_module is a name that does neither exist in any
-source file of the driver nor in any Makefile.
+config <config1>
+	depends on HAVE_<config1>
 
-Question: how does 'make' detects/writes that name, dma_module ?
+or similar
 
-Also, I cannot find any documentation for kbuild in this kernel
-version. Any hint about where I can find it?
+I was wondering if it would make sense to replace this with:
 
-Thanks a lot and Regards
+config <something
+	enable <config1>
+
+config <config1>
+	depends on enabled
+
+The advantage of this is that we would not have all the HAVE_ config
+names in our .config files and the generated include files.  Of course,
+if config1 does not depend on "enabled", then the "enable <config1>"
+would have no effect (we may want to warn about this).
+
+Comments?
+--=20
+Cheers,
+Stephen Rothwell                    sfr@canb.auug.org.au
+
+--Signature=_Fri__14_Sep_2012_10_14_14_+1000_L/+9UnCGuj90tlHI
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iQIcBAEBCAAGBQJQUnbWAAoJEECxmPOUX5FEsMEQAKOjYet7E4aCMzY2pDSPftQx
+hfKPrDIZRakarnZ4fGs8n0rLv9hdcY7BmYUNDZiKvMzHGbCOpVibi4eeeAGo8H71
+8TDH3or5J/gpPwqDJ/ICsH39V1hyRoi071mzFSOmt4qyTxocbkrk9xo/SO+jnKsV
+1e2es8cR5JsNEZUJ1ZjfkhI3j+mBa3JAH+3e6NpXuJ9NlNQ5ni3Vpu6Lutsb23PN
+cmiHu7ziURfVERJ23crMb0xzO+0R/2PeUYa/C5nARkL8L+rHCilupNYQPoGjv4tO
+yj4/U9yqUQ91OMjHchHjUue1Z3DteCjRZP9uyEOL0mYsrwVUDVBC9NZUyTKjgiLA
+309nVa0XSHprT8jXggyt1e8x67vL/D/KMCJP4B5dDvb19+URM1cUu368PatvObw3
+sxxSrvadkqtpKxrbPufB0qa2UhBYld/Kmf0qaTmL0yB1+tOgT54oZLZOJj0Yu/rm
+N7r63016jK50VWphlRp4kZ88i1sQBcejXWtkfPCLJxCoec9nSk3bcwTiMu4PLVp+
+FIh8FWaPD+SrZwVXScehDgKE/u73/UNRbWMYxEGim9gslVPwzSiDOJfyh7MK4J30
+d8ir0Sjxk6EEzpU9cYU83ML2XL+n05UdMxELJJlMFX+Yo0UOHrAsS+V3q0hfGiip
+jjinqmnH3d255gniNvBu
+=zslX
+-----END PGP SIGNATURE-----
+
+--Signature=_Fri__14_Sep_2012_10_14_14_+1000_L/+9UnCGuj90tlHI--
