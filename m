@@ -1,49 +1,96 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:50586 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755804Ab2IULuw (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 21 Sep 2012 07:50:52 -0400
-Date: Fri, 21 Sep 2012 13:50:51 +0200
-From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [PATCH] x86/kbuild: archscripts depends on scripts_basic
-Message-ID: <20120921115051.GB10385@sepie.suse.cz>
-References: <505A02F8.4040804@suse.de>
- <505A03EC.8090502@linux.intel.com>
- <505B281D.80405@suse.de>
+Received: from eddie.linux-mips.org ([78.24.191.182]:48692 "EHLO
+	cvs.linux-mips.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752087Ab2IWN4w (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 23 Sep 2012 09:56:52 -0400
+Date: Sun, 23 Sep 2012 15:56:35 +0200
+From: Ralf Baechle <ralf@linux-mips.org>
+Subject: Re: [PATCH v2 0/3] MIPS: JZ4740: Move PWM driver to PWM framework
+Message-ID: <20120923135635.GB13842@linux-mips.org>
+References: <1347278719-15276-1-git-send-email-thierry.reding@avionic-design.de>
+ <20120922074144.GC2538@avionic-0098.mockup.avionic-design.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <505B281D.80405@suse.de>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20120922074144.GC2538@avionic-0098.mockup.avionic-design.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jeff Mahoney <jeffm@suse.de>
-Cc: "H. Peter Anvin" <hpa@linux.intel.com>, linux-kbuild@vger.kernel.org, Linux Kernel Maling List <linux-kernel@vger.kernel.org>
+To: Thierry Reding <thierry.reding@avionic-design.de>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
+Cc: linux-mips@linux-mips.org, linux-kernel@vger.kernel.org, Antony Pavlov <antonynpavlov@gmail.com>, Lars-Peter Clausen <lars@metafoo.de>, Maarten ter Huurne <maarten@treewalker.org>
 
-On Thu, Sep 20, 2012 at 10:28:45AM -0400, Jeff Mahoney wrote:
-> While building the SUSE kernel packages, which build the scripts,
-> make clean, and then build everything, we have been running into spurious
-> build failures. We tracked them down to a simple dependency issue:
-> 
-> $ make mrproper
->   CLEAN   arch/x86/tools
->   CLEAN   scripts/basic
-> $ cp patches/config/x86_64/desktop .config
-> $ make archscripts
->   HOSTCC  arch/x86/tools/relocs
-> /bin/sh: scripts/basic/fixdep: No such file or directory
-> make[3]: *** [arch/x86/tools/relocs] Error 1
-> make[2]: *** [archscripts] Error 2
-> make[1]: *** [sub-make] Error 2
-> make: *** [all] Error 2
-> 
-> This was introduced by commit
-> 6520fe55 (x86, realmode: 16-bit real-mode code support for relocs),
-> which added the archscripts dependency to archprepare.
-> 
-> This patch adds the scripts_basic dependency to the x86 archscripts.
-> 
-> Signed-off-by: Jeff Mahoney <jeffm@suse.com>
+On Sat, Sep 22, 2012 at 09:41:45AM +0200, Thierry Reding wrote:
 
-Applied to kbuild.git#rc-fixes, thanks.
+> Have you had a chance to look at this? It is the last remaining PWM
+> driver that isn't moved to the PWM framework yet. All the others are
+> either in linux-next already and queued for 3.7 or have recently got
+> Acked-by the respective maintainers (Unicore32). Patches 2 and 3 were
+> already acked and tested by Lars-Peter who did the initial porting.
+> Patch 1 can probably be dropped since I seem to be the only one running
+> into that issue.
+> 
+> I really want to take this in for 3.7 so I can use the 3.7 cycle to
+> transition from the legacy API to the new API and possibly even get rid
+> of the legacy parts altogether. However I don't want to do this without
+> the Acked-by from the MIPS maintainer.
 
-Michal
+Acked-by: Ralf Baechle <ralf@linux-mips.org>
+
+for 2/3 and 3/3.
+
+I now can reproduce the build error that 1/3 is supposed to fix.  The issue
+is not as first suspected an odd bug in just your compiler.  The tree
+(I was testing on today's -next) is building fine when compiling in-tree
+but fails out of tree:
+
+  CC      arch/mips/jz4740/irq.o
+In file included from /home/ralf/src/linux/linux-jz4740/arch/mips/include/asm/irq.h:18:0,
+                 from /home/ralf/src/linux/linux-jz4740/include/linux/irq.h:27,
+                 from /home/ralf/src/linux/linux-jz4740/include/asm-generic/hardirq.h:12,
+                 from /home/ralf/src/linux/linux-jz4740/arch/mips/include/asm/hardirq.h:16,
+                 from /home/ralf/src/linux/linux-jz4740/include/linux/hardirq.h:7,
+                 from /home/ralf/src/linux/linux-jz4740/include/linux/interrupt.h:12,
+                 from /home/ralf/src/linux/linux-jz4740/arch/mips/jz4740/irq.c:19:
+/home/ralf/src/linux/linux-jz4740/arch/mips/jz4740/irq.h:20:39: error: ‘struct irq_data’ declared inside parameter list [-Werror]
+/home/ralf/src/linux/linux-jz4740/arch/mips/jz4740/irq.h:20:39: error: its scope is only this definition or declaration, which is probably not what you want [-Werror]
+/home/ralf/src/linux/linux-jz4740/arch/mips/jz4740/irq.h:21:38: error: ‘struct irq_data’ declared inside parameter list [-Werror]
+In file included from /home/ralf/src/linux/linux-jz4740/include/linux/irq.h:356:0,
+                 from /home/ralf/src/linux/linux-jz4740/include/asm-generic/hardirq.h:12,
+                 from /home/ralf/src/linux/linux-jz4740/arch/mips/include/asm/hardirq.h:16,
+                 from /home/ralf/src/linux/linux-jz4740/include/linux/hardirq.h:7,
+                 from /home/ralf/src/linux/linux-jz4740/include/linux/interrupt.h:12,
+                 from /home/ralf/src/linux/linux-jz4740/arch/mips/jz4740/irq.c:19:
+/home/ralf/src/linux/linux-jz4740/include/linux/irqdesc.h:73:33: error: ‘NR_IRQS’ undeclared here (not in a function)
+/home/ralf/src/linux/linux-jz4740/arch/mips/jz4740/irq.c: In function ‘jz4740_cascade’:
+/home/ralf/src/linux/linux-jz4740/arch/mips/jz4740/irq.c:49:39: error: ‘JZ4740_IRQ_BASE’ undeclared (first use in this function)
+/home/ralf/src/linux/linux-jz4740/arch/mips/jz4740/irq.c:49:39: note: each undeclared identifier is reported only once for each function it appears in
+/home/ralf/src/linux/linux-jz4740/arch/mips/jz4740/irq.c: At top level:
+/home/ralf/src/linux/linux-jz4740/arch/mips/jz4740/irq.c:62:6: error: conflicting types for ‘jz4740_irq_suspend’
+In file included from /home/ralf/src/linux/linux-jz4740/arch/mips/include/asm/irq.h:18:0,
+                 from /home/ralf/src/linux/linux-jz4740/include/linux/irq.h:27,
+                 from /home/ralf/src/linux/linux-jz4740/include/asm-generic/hardirq.h:12,
+                 from /home/ralf/src/linux/linux-jz4740/arch/mips/include/asm/hardirq.h:16,
+                 from /home/ralf/src/linux/linux-jz4740/include/linux/hardirq.h:7,
+                 from /home/ralf/src/linux/linux-jz4740/include/linux/interrupt.h:12,
+                 from /home/ralf/src/linux/linux-jz4740/arch/mips/jz4740/irq.c:19:
+/home/ralf/src/linux/linux-jz4740/arch/mips/jz4740/irq.h:20:13: note: previous declaration of ‘jz4740_irq_suspend’ was here
+/home/ralf/src/linux/linux-jz4740/arch/mips/jz4740/irq.c:68:6: error: conflicting types for ‘jz4740_irq_resume’
+In file included from /home/ralf/src/linux/linux-jz4740/arch/mips/include/asm/irq.h:18:0,
+                 from /home/ralf/src/linux/linux-jz4740/include/linux/irq.h:27,
+                 from /home/ralf/src/linux/linux-jz4740/include/asm-generic/hardirq.h:12,
+                 from /home/ralf/src/linux/linux-jz4740/arch/mips/include/asm/hardirq.h:16,
+                 from /home/ralf/src/linux/linux-jz4740/include/linux/hardirq.h:7,
+                 from /home/ralf/src/linux/linux-jz4740/include/linux/interrupt.h:12,
+                 from /home/ralf/src/linux/linux-jz4740/arch/mips/jz4740/irq.c:19:
+/home/ralf/src/linux/linux-jz4740/arch/mips/jz4740/irq.h:21:13: note: previous declaration of ‘jz4740_irq_resume’ was here
+/home/ralf/src/linux/linux-jz4740/arch/mips/jz4740/irq.c: In function ‘arch_init_irq’:
+/home/ralf/src/linux/linux-jz4740/arch/mips/jz4740/irq.c:91:41: error: ‘JZ4740_IRQ_BASE’ undeclared (first use in this function)
+
+Which (while your patch is probably fine, I haven't tested) this seems to
+be a build system issue, so should be preferably be fixed there.
+
+Marek, the whole email exchange is archived at
+http://www.linux-mips.org/archives/linux-mips/2012-09/threads.html
+
+  Ralf
