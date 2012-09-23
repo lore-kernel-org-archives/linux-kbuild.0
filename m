@@ -1,178 +1,49 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from moutng.kundenserver.de ([212.227.17.9]:58274 "EHLO
-	moutng.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752417Ab2IWRMp (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 23 Sep 2012 13:12:45 -0400
-Date: Sun, 23 Sep 2012 19:12:36 +0200
-From: Thierry Reding <thierry.reding@avionic-design.de>
-Subject: Re: [PATCH v2 0/3] MIPS: JZ4740: Move PWM driver to PWM framework
-Message-ID: <20120923171236.GA1219@avionic-0098.mockup.avionic-design.de>
-References: <1347278719-15276-1-git-send-email-thierry.reding@avionic-design.de>
- <20120922074144.GC2538@avionic-0098.mockup.avionic-design.de>
- <20120923135635.GB13842@linux-mips.org>
+Received: from cantor2.suse.de ([195.135.220.15]:56783 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754538Ab2IWWMk (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 23 Sep 2012 18:12:40 -0400
+Date: Mon, 24 Sep 2012 00:12:36 +0200
+From: Michal Marek <mmarek@suse.cz>
+Subject: [GIT] kbuild rc fixes
+Message-ID: <20120923221236.GA7412@sepie.suse.cz>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="BOKacYhQ+x31HxR3"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20120923135635.GB13842@linux-mips.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ralf Baechle <ralf@linux-mips.org>
-Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, linux-mips@linux-mips.org, linux-kernel@vger.kernel.org, Antony Pavlov <antonynpavlov@gmail.com>, Lars-Peter Clausen <lars@metafoo.de>, Maarten ter Huurne <maarten@treewalker.org>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: jeffm@suse.de, mark.asselstine@windriver.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
+Hi Linus,
 
---BOKacYhQ+x31HxR3
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+there are two more kbuild fixes for 3.6. One fixes a race between x86's
+archscripts target and the rule (re)building scripts/basic/fixdep. The
+second is a fix for the previous attempt at fixing make firmware_install
+with make 3.82. This new solution should work with any version of GNU make.
 
-On Sun, Sep 23, 2012 at 03:56:35PM +0200, Ralf Baechle wrote:
-> On Sat, Sep 22, 2012 at 09:41:45AM +0200, Thierry Reding wrote:
->=20
-> > Have you had a chance to look at this? It is the last remaining PWM
-> > driver that isn't moved to the PWM framework yet. All the others are
-> > either in linux-next already and queued for 3.7 or have recently got
-> > Acked-by the respective maintainers (Unicore32). Patches 2 and 3 were
-> > already acked and tested by Lars-Peter who did the initial porting.
-> > Patch 1 can probably be dropped since I seem to be the only one running
-> > into that issue.
-> >=20
-> > I really want to take this in for 3.7 so I can use the 3.7 cycle to
-> > transition from the legacy API to the new API and possibly even get rid
-> > of the legacy parts altogether. However I don't want to do this without
-> > the Acked-by from the MIPS maintainer.
->=20
-> Acked-by: Ralf Baechle <ralf@linux-mips.org>
->=20
-> for 2/3 and 3/3.
+Thanks,
+Michal
 
-Alright, thanks. I'll take those through the PWM tree.
+The following changes since commit 6c7080a61fc7b46b3ac8573952b5a3e9d5f68bc4:
 
-> I now can reproduce the build error that 1/3 is supposed to fix.  The iss=
-ue
-> is not as first suspected an odd bug in just your compiler.  The tree
-> (I was testing on today's -next) is building fine when compiling in-tree
-> but fails out of tree:
+  firmware: fix directory creation rule matching with make 3.82 (2012-08-30 16:27:13 +0200)
 
-Okay, that makes sense. I rarely if even build in-tree nowadays.
+are available in the git repository at:
 
->   CC      arch/mips/jz4740/irq.o
-> In file included from /home/ralf/src/linux/linux-jz4740/arch/mips/include=
-/asm/irq.h:18:0,
->                  from /home/ralf/src/linux/linux-jz4740/include/linux/irq=
-=2Eh:27,
->                  from /home/ralf/src/linux/linux-jz4740/include/asm-gener=
-ic/hardirq.h:12,
->                  from /home/ralf/src/linux/linux-jz4740/arch/mips/include=
-/asm/hardirq.h:16,
->                  from /home/ralf/src/linux/linux-jz4740/include/linux/har=
-dirq.h:7,
->                  from /home/ralf/src/linux/linux-jz4740/include/linux/int=
-errupt.h:12,
->                  from /home/ralf/src/linux/linux-jz4740/arch/mips/jz4740/=
-irq.c:19:
-> /home/ralf/src/linux/linux-jz4740/arch/mips/jz4740/irq.h:20:39: error: =
-=E2=80=98struct irq_data=E2=80=99 declared inside parameter list [-Werror]
-> /home/ralf/src/linux/linux-jz4740/arch/mips/jz4740/irq.h:20:39: error: it=
-s scope is only this definition or declaration, which is probably not what =
-you want [-Werror]
-> /home/ralf/src/linux/linux-jz4740/arch/mips/jz4740/irq.h:21:38: error: =
-=E2=80=98struct irq_data=E2=80=99 declared inside parameter list [-Werror]
-> In file included from /home/ralf/src/linux/linux-jz4740/include/linux/irq=
-=2Eh:356:0,
->                  from /home/ralf/src/linux/linux-jz4740/include/asm-gener=
-ic/hardirq.h:12,
->                  from /home/ralf/src/linux/linux-jz4740/arch/mips/include=
-/asm/hardirq.h:16,
->                  from /home/ralf/src/linux/linux-jz4740/include/linux/har=
-dirq.h:7,
->                  from /home/ralf/src/linux/linux-jz4740/include/linux/int=
-errupt.h:12,
->                  from /home/ralf/src/linux/linux-jz4740/arch/mips/jz4740/=
-irq.c:19:
-> /home/ralf/src/linux/linux-jz4740/include/linux/irqdesc.h:73:33: error: =
-=E2=80=98NR_IRQS=E2=80=99 undeclared here (not in a function)
-> /home/ralf/src/linux/linux-jz4740/arch/mips/jz4740/irq.c: In function =E2=
-=80=98jz4740_cascade=E2=80=99:
-> /home/ralf/src/linux/linux-jz4740/arch/mips/jz4740/irq.c:49:39: error: =
-=E2=80=98JZ4740_IRQ_BASE=E2=80=99 undeclared (first use in this function)
-> /home/ralf/src/linux/linux-jz4740/arch/mips/jz4740/irq.c:49:39: note: eac=
-h undeclared identifier is reported only once for each function it appears =
-in
-> /home/ralf/src/linux/linux-jz4740/arch/mips/jz4740/irq.c: At top level:
-> /home/ralf/src/linux/linux-jz4740/arch/mips/jz4740/irq.c:62:6: error: con=
-flicting types for =E2=80=98jz4740_irq_suspend=E2=80=99
-> In file included from /home/ralf/src/linux/linux-jz4740/arch/mips/include=
-/asm/irq.h:18:0,
->                  from /home/ralf/src/linux/linux-jz4740/include/linux/irq=
-=2Eh:27,
->                  from /home/ralf/src/linux/linux-jz4740/include/asm-gener=
-ic/hardirq.h:12,
->                  from /home/ralf/src/linux/linux-jz4740/arch/mips/include=
-/asm/hardirq.h:16,
->                  from /home/ralf/src/linux/linux-jz4740/include/linux/har=
-dirq.h:7,
->                  from /home/ralf/src/linux/linux-jz4740/include/linux/int=
-errupt.h:12,
->                  from /home/ralf/src/linux/linux-jz4740/arch/mips/jz4740/=
-irq.c:19:
-> /home/ralf/src/linux/linux-jz4740/arch/mips/jz4740/irq.h:20:13: note: pre=
-vious declaration of =E2=80=98jz4740_irq_suspend=E2=80=99 was here
-> /home/ralf/src/linux/linux-jz4740/arch/mips/jz4740/irq.c:68:6: error: con=
-flicting types for =E2=80=98jz4740_irq_resume=E2=80=99
-> In file included from /home/ralf/src/linux/linux-jz4740/arch/mips/include=
-/asm/irq.h:18:0,
->                  from /home/ralf/src/linux/linux-jz4740/include/linux/irq=
-=2Eh:27,
->                  from /home/ralf/src/linux/linux-jz4740/include/asm-gener=
-ic/hardirq.h:12,
->                  from /home/ralf/src/linux/linux-jz4740/arch/mips/include=
-/asm/hardirq.h:16,
->                  from /home/ralf/src/linux/linux-jz4740/include/linux/har=
-dirq.h:7,
->                  from /home/ralf/src/linux/linux-jz4740/include/linux/int=
-errupt.h:12,
->                  from /home/ralf/src/linux/linux-jz4740/arch/mips/jz4740/=
-irq.c:19:
-> /home/ralf/src/linux/linux-jz4740/arch/mips/jz4740/irq.h:21:13: note: pre=
-vious declaration of =E2=80=98jz4740_irq_resume=E2=80=99 was here
-> /home/ralf/src/linux/linux-jz4740/arch/mips/jz4740/irq.c: In function =E2=
-=80=98arch_init_irq=E2=80=99:
-> /home/ralf/src/linux/linux-jz4740/arch/mips/jz4740/irq.c:91:41: error: =
-=E2=80=98JZ4740_IRQ_BASE=E2=80=99 undeclared (first use in this function)
->=20
-> Which (while your patch is probably fine, I haven't tested) this seems to
-> be a build system issue, so should be preferably be fixed there.
->=20
-> Marek, the whole email exchange is archived at
-> http://www.linux-mips.org/archives/linux-mips/2012-09/threads.html
+  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git rc-fixes
 
-Okay. I think I mentioned in the commit message for patch 1 that the
-include order seems to cause this. Maybe it's just a matter of
-rearranging those.
+for you to fetch changes up to 24cc7fb69a5b5edfdff1d38c6a213d6a33648829:
 
-Thierry
+  x86/kbuild: archscripts depends on scripts_basic (2012-09-21 13:49:47 +0200)
 
---BOKacYhQ+x31HxR3
-Content-Type: application/pgp-signature
+----------------------------------------------------------------
+Jeff Mahoney (1):
+      x86/kbuild: archscripts depends on scripts_basic
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.19 (GNU/Linux)
+Mark Asselstine (1):
+      firmware: fix directory creation rule matching with make 3.80
 
-iQIcBAEBAgAGBQJQX0MEAAoJEN0jrNd/PrOh8QgP/085xg8zk4F13Gb9g4ur5lxY
-WkQmcdPjpdVbKAGsZIlNdM0gnONQlqeTX0DgqmKX1uqQBQRtaVHRDHIz6PnwnN8s
-NkBa1U63ffljEVfh4p05XXfTZUCRFUH2I24KTNZeirEIBwcsKictjALf0pJDLwtJ
-jlkcOk/P869DxQeQuGLrqBqb+RWAlCyGYAj/ZG0jUMLsD74yo8MZqMbGxV/hROGM
-ZfAB9TILAk9i46YAxrH+VdUxPcX+Piws01IcnV9jwcafg93gVA63XEua62oqLbw6
-S8hwqNq5VLwjSMLqYrUTmXtCRFhxClMLpyAZ6YuT6IAsFApTLhQWG2LfDEQ6Tlmn
-VBS35MWiV3QaIY30ze0JrCbJE0WaSu9TtoUrYN4AMR7syK7LTfaA99F78nXKiRaw
-pup6zSD1rpT76zSPBfqyLGrzDS9Ma0RTO2xsgID7l0T6F1P2yiApOdE8/iHQEARD
-dhUvebODim2iAaaJaEVwm+fFErhHLTDqoeEVxUCnkDv4fghvhkhGHblrXG0vxcoV
-xXYrDB4F5QFv00+5fx2BtA/UFCvrapFwvaxwAewgqD4fqDNfW9089AV5Yu7QgVii
-eljnNr3WQtj/Fac/DijBmhKpLCKjOoIjy5R4UsD5yTMjsLrUKmYW5AlAmay6JiWA
-hnyERLjdjWyRtznTwR1D
-=urqc
------END PGP SIGNATURE-----
-
---BOKacYhQ+x31HxR3--
+ arch/x86/Makefile       |    2 +-
+ scripts/Makefile.fwinst |    4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
