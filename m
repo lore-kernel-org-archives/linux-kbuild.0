@@ -1,46 +1,75 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from 7.mo5.mail-out.ovh.net ([178.32.124.100]:47492 "EHLO
-	mo5.mail-out.ovh.net" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751923Ab2I0TJh (ORCPT
+Received: from moutng.kundenserver.de ([212.227.126.171]:59398 "EHLO
+	moutng.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753287Ab2I0TtA (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 27 Sep 2012 15:09:37 -0400
-Received: from mail404.ha.ovh.net (b9.ovh.net [213.186.33.59])
-	by mo5.mail-out.ovh.net (Postfix) with SMTP id CEF1BFFACEE
-	for <linux-kbuild@vger.kernel.org>; Thu, 27 Sep 2012 10:38:28 +0200 (CEST)
-Date: Thu, 27 Sep 2012 10:29:55 +0200
-From: Jean-Christophe PLAGNIOL-VILLARD <plagnioj@jcrosoft.com>
-Subject: Re: [PATCH RESEND] ARM: add dtbImage.<dt> and dtbuImage.<dt> rules
-Message-ID: <20120927082955.GR17667@game.jcrosoft.org>
-References: <504DFBBF.5010202@free-electrons.com>
- <1348733441-11626-1-git-send-email-richard.genoud@gmail.com>
+	Thu, 27 Sep 2012 15:49:00 -0400
+Date: Thu, 27 Sep 2012 21:48:53 +0200
+From: Thierry Reding <thierry.reding@avionic-design.de>
+Subject: Re: [PATCH v2 0/3] MIPS: JZ4740: Move PWM driver to PWM framework
+Message-ID: <20120927194853.GC5483@avionic-0098.mockup.avionic-design.de>
+References: <1347278719-15276-1-git-send-email-thierry.reding@avionic-design.de>
+ <20120922074144.GC2538@avionic-0098.mockup.avionic-design.de>
+ <20120923135635.GB13842@linux-mips.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="5G06lTa6Jq83wMTw"
 Content-Disposition: inline
-In-Reply-To: <1348733441-11626-1-git-send-email-richard.genoud@gmail.com>
+In-Reply-To: <20120923135635.GB13842@linux-mips.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Richard Genoud <richard.genoud@gmail.com>
-Cc: Grant Likely <grant.likely@secretlab.ca>, Rob Herring <rob.herring@calxeda.com>, Michal Marek <mmarek@suse.cz>, devicetree-discuss@lists.ozlabs.org, Russell King <linux@arm.linux.org.uk>, linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org
+To: Ralf Baechle <ralf@linux-mips.org>
+Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, linux-mips@linux-mips.org, linux-kernel@vger.kernel.org, Antony Pavlov <antonynpavlov@gmail.com>, Lars-Peter Clausen <lars@metafoo.de>, Maarten ter Huurne <maarten@treewalker.org>
 
-On 10:10 Thu 27 Sep     , Richard Genoud wrote:
-> [add Grant Likely and Rob Herring in To: since this is maybe more OF
-> related than ARM related]
-> 
-> This rules are useful for appended device tree conforming to the
-> CONFIG_ARM_APPENDED_DTB kernel option.
-> 
-> The rule dtbImage.<dt> is actually just a:
-> cat zImage <dt>.dtb > dtbImage.<dt>
-> 
-> The dtbuImage.<dt> makes an uImage out of the dtbImage.<dt> file.
-> 
-> KernelVersion: v3.6-rc5
-> 
-> Signed-off-by: Richard Genoud <richard.genoud@gmail.com>
-> Tested-by: Gregory CLEMENT <gregory.clement@free-electrons.com>
-as discuss with Grant no this is a temporary solution so no Makefile Target
 
-so nack
+--5G06lTa6Jq83wMTw
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Best Regards,
-J.
+On Sun, Sep 23, 2012 at 03:56:35PM +0200, Ralf Baechle wrote:
+> On Sat, Sep 22, 2012 at 09:41:45AM +0200, Thierry Reding wrote:
+>=20
+> > Have you had a chance to look at this? It is the last remaining PWM
+> > driver that isn't moved to the PWM framework yet. All the others are
+> > either in linux-next already and queued for 3.7 or have recently got
+> > Acked-by the respective maintainers (Unicore32). Patches 2 and 3 were
+> > already acked and tested by Lars-Peter who did the initial porting.
+> > Patch 1 can probably be dropped since I seem to be the only one running
+> > into that issue.
+> >=20
+> > I really want to take this in for 3.7 so I can use the 3.7 cycle to
+> > transition from the legacy API to the new API and possibly even get rid
+> > of the legacy parts altogether. However I don't want to do this without
+> > the Acked-by from the MIPS maintainer.
+>=20
+> Acked-by: Ralf Baechle <ralf@linux-mips.org>
+>=20
+> for 2/3 and 3/3.
+
+Applied both patches, thanks.
+
+Thierry
+
+--5G06lTa6Jq83wMTw
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.19 (GNU/Linux)
+
+iQIcBAEBAgAGBQJQZK2lAAoJEN0jrNd/PrOhLiIP/1dTDMwqxiErExsuC1mtvG6N
+Pg8UOHukLOLJYJlAf46gCvLN9BOQFYwQQMgmfS25fnxvpEdNAZIPFZ3NwHAJ/gju
+vgxGeBPmDKyCaCeOXcZ/4SiS6R06C2CloTWqCZA3198ywbFEIPIwYk66qeF0CH4D
+J5rIhBXH08eQQqA6lgFSZbFQGnNr6jtk1G65CUVxwzXmEFJCd7UVGbORiqK0/oOg
+/Bvi+uhJbcZ2ZlZhPMyc3wVtCTyz3F7I1CARuyTGcjBwsxr4mXaqcf9d7Uln1wyU
+P5DZFAiO/sfH3hlrjjD8a+0+d8XsHbbaYpCIMv2XXpYZGOm1JruWD6LhENzT3iEm
+hssMgh0+TU1ARy2WuJhAc2izJPze5I09qGvXOwmtQvNf9JpqwqpeySS38wlEK+6h
+YZEtSFHj9aLdrMG45Y/rhrHsvjk9rZE8aTyGOHJzfQZjNLc/hsypc3W9sw8ZUdsT
+Ddmeydx/9/r04HXo4mc1DVioXLLWjc6XyASj32iwh8AWJ305lkr1uc9TXRZXuO04
+fBJXGZQ7L6X9wkkRVSP42KPmjguMEaJ/psMjWeYqjwUXhiBJ9U8EQ5h6+zj0r3Bm
+X5v3Ax6BOqUu/rOTcj5VeYSyLlzoDciyf/MvPEcS7Brmv2OW6AN2lcjyTKDnr0vk
+0xZJtrHR/Bnw18Lq06x9
+=X+hw
+-----END PGP SIGNATURE-----
+
+--5G06lTa6Jq83wMTw--
