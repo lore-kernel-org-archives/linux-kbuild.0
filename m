@@ -1,35 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-bk0-f46.google.com ([209.85.214.46]:63593 "EHLO
-	mail-bk0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754628Ab2I0JJB (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 27 Sep 2012 05:09:01 -0400
-Received: by bkcjk13 with SMTP id jk13so1383456bkc.19
-        for <linux-kbuild@vger.kernel.org>; Thu, 27 Sep 2012 02:09:00 -0700 (PDT)
+Received: from cantor2.suse.de ([195.135.220.15]:48032 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752533Ab2I0PGb (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 27 Sep 2012 11:06:31 -0400
+Message-ID: <50646B70.5010100@suse.cz>
+Date: Thu, 27 Sep 2012 17:06:24 +0200
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-In-Reply-To: <20120927082955.GR17667@game.jcrosoft.org>
-References: <504DFBBF.5010202@free-electrons.com> <1348733441-11626-1-git-send-email-richard.genoud@gmail.com>
- <20120927082955.GR17667@game.jcrosoft.org>
-From: Richard Genoud <richard.genoud@gmail.com>
-Date: Thu, 27 Sep 2012 11:08:39 +0200
-Message-ID: <CACQ1gAgwv4pBFZBrVZiWM2_=OneUO-s16LufSENx27gMC3DUig@mail.gmail.com>
-Subject: Re: [PATCH RESEND] ARM: add dtbImage.<dt> and dtbuImage.<dt> rules
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: [PATCH] Kbuild: use normal compression settings for tar*-pkg
+References: <1347133679-14641-1-git-send-email-andi@firstfloor.org> <20120911004633.GA21147@localhost>
+In-Reply-To: <20120911004633.GA21147@localhost>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jean-Christophe PLAGNIOL-VILLARD <plagnioj@jcrosoft.com>
-Cc: Grant Likely <grant.likely@secretlab.ca>, Rob Herring <rob.herring@calxeda.com>, Michal Marek <mmarek@suse.cz>, devicetree-discuss@lists.ozlabs.org, Russell King <linux@arm.linux.org.uk>, linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org, Gregory CLEMENT <gregory.clement@free-electrons.com>
+To: Fengguang Wu <fengguang.wu@intel.com>
+Cc: Andi Kleen <andi@firstfloor.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Andi Kleen <ak@linux.intel.com>
 
-2012/9/27 Jean-Christophe PLAGNIOL-VILLARD <plagnioj@jcrosoft.com>:
->> Signed-off-by: Richard Genoud <richard.genoud@gmail.com>
->> Tested-by: Gregory CLEMENT <gregory.clement@free-electrons.com>
-> as discuss with Grant no this is a temporary solution so no Makefile Target
->
-> so nack
+On 11.9.2012 02:46, Fengguang Wu wrote:
+> On Sat, Sep 08, 2012 at 12:47:59PM -0700, Andi Kleen wrote:
+>> From: Andi Kleen <ak@linux.intel.com>
+>>
+>> For large kernel configurations (like a distribution kernel)
+>> targz-pkg takes a quite long time to just do the compression.
+>> I clocked it at 15+mins for a SUSE kernel like config on a fast
+>> system.  And tarxz and bzip2 are even slower.
+>>
+>> The main reason is that the script that is doing the taring sets
+>> the highest compression level (-9).  When I change it to just
+>> use the defaults the gzip time for the same kernel goes down
+>> to ~3 mins. I haven't tested xz and bzip, but I expect those
+>> to be much faster too.
+>>
+>> I'm not willing to wait that long for a small compression
+>> gain. So just change the script to use the defaults.
+> 
+> Makes sense to me.
+> 
+> Reviewed-by: Fengguang Wu <fengguang.wu@intel.com>
 
-hum, it doesn't seems to be temporary on powerpc.
-cf 25431333813686654907ab987fb5de10c10a16db
-and
-ARCH=powerpc make help
+Applied to kbuild.git#kbuild.
 
-So what's the problem on arm ?
+Michal
+
