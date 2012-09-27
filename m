@@ -1,45 +1,31 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:48032 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:51597 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752533Ab2I0PGb (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 27 Sep 2012 11:06:31 -0400
-Message-ID: <50646B70.5010100@suse.cz>
-Date: Thu, 27 Sep 2012 17:06:24 +0200
+	id S1754148Ab2I0QOn (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 27 Sep 2012 12:14:43 -0400
+Message-ID: <50647B6D.8030106@suse.cz>
+Date: Thu, 27 Sep 2012 18:14:37 +0200
 From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Subject: Re: [PATCH] Kbuild: use normal compression settings for tar*-pkg
-References: <1347133679-14641-1-git-send-email-andi@firstfloor.org> <20120911004633.GA21147@localhost>
-In-Reply-To: <20120911004633.GA21147@localhost>
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [PATCH v2 0/6] menuconfig: jump to search results
+References: <1345748108-12206-1-git-send-email-bpoirier@suse.de>
+In-Reply-To: <1345748108-12206-1-git-send-email-bpoirier@suse.de>
+Content-Type: text/plain; charset=ISO-8859-2
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Fengguang Wu <fengguang.wu@intel.com>
-Cc: Andi Kleen <andi@firstfloor.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Andi Kleen <ak@linux.intel.com>
+To: Benjamin Poirier <bpoirier@suse.de>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Randy Dunlap <rdunlap@xenotime.net>, Borislav Petkov <bp@alien8.de>, "Yann E. MORIN" <yann.morin.1998@free.fr>, Jean Sacren <sakiwit@gmail.com>, Arnaud Lacombe <lacombar@gmail.com>, Lucas De Marchi <lucas.demarchi@profusion.mobi>, Davidlohr Bueso <dave@gnu.org>, Wang YanQing <udknight@gmail.com>, Paul Gortmaker <paul.gortmaker@windriver.com>, Cheng Renquan <crquan@gmail.com>
 
-On 11.9.2012 02:46, Fengguang Wu wrote:
-> On Sat, Sep 08, 2012 at 12:47:59PM -0700, Andi Kleen wrote:
->> From: Andi Kleen <ak@linux.intel.com>
->>
->> For large kernel configurations (like a distribution kernel)
->> targz-pkg takes a quite long time to just do the compression.
->> I clocked it at 15+mins for a SUSE kernel like config on a fast
->> system.  And tarxz and bzip2 are even slower.
->>
->> The main reason is that the script that is doing the taring sets
->> the highest compression level (-9).  When I change it to just
->> use the defaults the gzip time for the same kernel goes down
->> to ~3 mins. I haven't tested xz and bzip, but I expect those
->> to be much faster too.
->>
->> I'm not willing to wait that long for a small compression
->> gain. So just change the script to use the defaults.
+On 23.8.2012 20:55, Benjamin Poirier wrote:
+> This patch series adds "jump to" keys (similar to the cscope interface) to the
+> search results of "make menuconfig" so that we can go directly to the menu
+> entry for a config option after searching for it.
 > 
-> Makes sense to me.
-> 
-> Reviewed-by: Fengguang Wu <fengguang.wu@intel.com>
+> Patches 1-4 implement the basic functionality.
+> Patches 5-6 are an optional improvement.
 
-Applied to kbuild.git#kbuild.
+Applied to kbuild.git#kconfig, thanks a lot.
 
 Michal
 
