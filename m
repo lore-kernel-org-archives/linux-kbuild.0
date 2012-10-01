@@ -1,43 +1,36 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pa0-f46.google.com ([209.85.220.46]:47667 "EHLO
-	mail-pa0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751989Ab2JAOZ7 (ORCPT
+Received: from avon.wwwdotorg.org ([70.85.31.133]:36518 "EHLO
+	avon.wwwdotorg.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752253Ab2JAPp7 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 1 Oct 2012 10:25:59 -0400
-From: Yuta Ando <yuta.and@gmail.com>
-Subject: [PATCH] kconfig: Fix localyesconfig don't sets to 'yes'
-Date: Mon,  1 Oct 2012 23:24:30 +0900
-Message-Id: <1349101470-12243-1-git-send-email-yuta.and@gmail.com>
+	Mon, 1 Oct 2012 11:45:59 -0400
+From: Stephen Warren <swarren@wwwdotorg.org>
+Subject: [PATCH V3 0/2] dtc: enable use of pre-processor
+Date: Mon,  1 Oct 2012 09:45:49 -0600
+Message-Id: <1349106351-17714-1-git-send-email-swarren@wwwdotorg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: rostedt@goodmis.org, linux-kernel@vger.kernel.org, Yuta Ando <yuta.and@gmail.com>
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org, David Gibson <david@gibson.dropbear.id.au>, Jon Loeliger <jdl@jdl.com>, Grant Likely <grant.likely@secretlab.ca>, Rob Herring <rob.herring@calxeda.com>, Scott Wood <scottwood@freescale.com>, Mark Brown <broonie@opensource.wolfsonmicro.com>, Jean-Christophe PLAGNIOL-VILLARD <plagnioj@jcrosoft.com>, devicetree-discuss@lists.ozlabs.org, linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org, Stephen Warren <swarren@nvidia.com>
 
-The kbuild target 'localyesconfig' has been same as 'localmodconfig'
-since the commit 50bce3e "kconfig/streamline_config.pl: merge
-local{mod,yes}config". The commit expects this script generates
-different configure depending on target, but it was not yet implemented.
+From: Stephen Warren <swarren@nvidia.com>
 
-So I added code sets to 'yes' when target is 'localyesconfig'.
+This series adds a build rule to run cpp on *.dtsp prior to invoking dtc.
 
-Signed-off-by: Yuta Ando <yuta.and@gmail.com>
----
- scripts/kconfig/streamline_config.pl |    2 ++
- 1 files changed, 2 insertions(+), 0 deletions(-)
+This patch relies on the patch I recently posted to update the in-kernel
+copy of dtc to match the latest upstream version ("[PATCH] dtc: import
+latest upstream dtc"; http://www.spinics.net/lists/kernel/msg1410063.html.
 
-diff --git a/scripts/kconfig/streamline_config.pl b/scripts/kconfig/streamline_config.pl
-index 2fbbbc1..5eb3777 100644
---- a/scripts/kconfig/streamline_config.pl
-+++ b/scripts/kconfig/streamline_config.pl
-@@ -605,6 +605,8 @@ foreach my $line (@config_file) {
- 	if (defined($configs{$1})) {
- 	    if ($localyesconfig) {
- 	        $setconfigs{$1} = 'y';
-+		print "$1=y\n";
-+		next;
- 	    } else {
- 	        $setconfigs{$1} = $2;
- 	    }
--- 
-1.7.3.4
+Stephen Warren (2):
+  kbuild: centralize .dts->.dtb rule
+  kbuild: introduce cmd_dtc_cpp
+
+ arch/arm/boot/Makefile           |    4 ----
+ arch/arm/boot/dts/skeleton.dtsip |   13 +++++++++++++
+ arch/c6x/boot/Makefile           |    3 ---
+ arch/openrisc/boot/Makefile      |    3 ---
+ arch/powerpc/boot/Makefile       |    4 ----
+ scripts/Makefile.lib             |    9 +++++++++
+ 6 files changed, 22 insertions(+), 14 deletions(-)
+ create mode 100644 arch/arm/boot/dts/skeleton.dtsip
 
