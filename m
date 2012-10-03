@@ -1,46 +1,128 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-vb0-f46.google.com ([209.85.212.46]:61389 "EHLO
-	mail-vb0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754461Ab2JCHHS (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 3 Oct 2012 03:07:18 -0400
-MIME-Version: 1.0
-In-Reply-To: <20121003014416.GA10769@localhost>
-References: <20121003014416.GA10769@localhost>
-Date: Wed, 3 Oct 2012 09:07:17 +0200
-Message-ID: <CAMuHMdXZe+cESgU21uB5-QbJa62=Qt8Z7d67-B1-onmUoFAKTQ@mail.gmail.com>
-Subject: Re: usr/include/linux/kvm_para.h:26: included file
- 'asm-m68k/kvm_para.h' is not exported
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Content-Type: text/plain; charset=UTF-8
+Received: from mout.web.de ([212.227.15.3]:55188 "EHLO mout.web.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753646Ab2JCLWL (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 3 Oct 2012 07:22:11 -0400
+From: Jan Kiszka <jan.kiszka@web.de>
+Subject: [PATCH 01/13] scripts/gdb: Add infrastructure
+Date: Wed,  3 Oct 2012 13:21:32 +0200
+Message-Id: <2b3ac2a0c24a33d9b9d1ff66eb842c64d369afa5.1349263293.git.jan.kiszka@web.de>
+In-Reply-To: <cover.1349263293.git.jan.kiszka@web.de>
+References: <cover.1349263293.git.jan.kiszka@web.de>
+In-Reply-To: <cover.1349263293.git.jan.kiszka@web.de>
+References: <cover.1349263293.git.jan.kiszka@web.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Fengguang Wu <fengguang.wu@intel.com>
-Cc: kernel-janitors@vger.kernel.org, kvm@vger.kernel.org, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: linux-kernel@vger.kernel.org
+Cc: Jason Wessel <jason.wessel@windriver.com>, kgdb-bugreport@lists.sourceforge.net, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
 
-On Wed, Oct 3, 2012 at 3:44 AM, Fengguang Wu <fengguang.wu@intel.com> wrote:
-> FYI, something goes wrong since
->
-> commit: 2bbc89a8e9c652ee71c6c3b2e0679b7ecedb1a09  m68k: Use Kbuild logic to import asm-generic headers
-> config: m68k-allmodconfig
->
-> All error/warnings:
->
-> usr/include/linux/kexec.h:49: userspace cannot reference function or variable defined in the kernel
-> usr/include/linux/kvm_para.h:26: included file 'asm-m68k/kvm_para.h' is not exported
-> usr/include/linux/soundcard.h:1054: userspace cannot reference function or variable defined in the kernel
+From: Jan Kiszka <jan.kiszka@siemens.com>
 
-Yes, this is a known issue, cfr. e.g. https://lkml.org/lkml/2012/9/16/77
-The kvm and kbuild people have to get their act together and agree on
-a solution.
+This provides the basic infrastructure to load kernel-specific python
+helper scripts when debugging the kernel in gdb.
 
-Gr{oetje,eeting}s,
+The loading mechanism is based on gdb loading for <objfile>-gdb.py when
+opening <objfile>. Therefore, this places a corresponding link to the
+main helper script into the output directory that contains vmlinux.
 
-                        Geert
+The main scripts will pull in submodules containing Linux specific gdb
+commands and functions. To avoid polluting the source directory with
+compiled python modules, we link to them from the object directory.
 
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+Due to gdb.parse_and_eval, we depend on gdb >= 7.1.
 
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+This feature depends on CONFIG_DEBUG_INFO.
+
+CC: Michal Marek <mmarek@suse.cz>
+CC: linux-kbuild@vger.kernel.org
+Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
+---
+ Makefile                   |    6 +++++-
+ scripts/Makefile           |    3 ++-
+ scripts/gdb/Makefile       |    9 +++++++++
+ scripts/gdb/vmlinux-gdb.py |   20 ++++++++++++++++++++
+ 4 files changed, 36 insertions(+), 2 deletions(-)
+ create mode 100644 scripts/gdb/Makefile
+ create mode 100644 scripts/gdb/vmlinux-gdb.py
+
+diff --git a/Makefile b/Makefile
+index a3c11d5..a382927 100644
+--- a/Makefile
++++ b/Makefile
+@@ -758,6 +758,9 @@ endif
+ ifdef CONFIG_BUILD_DOCSRC
+ 	$(Q)$(MAKE) $(build)=Documentation
+ endif
++ifdef CONFIG_DEBUG_INFO
++	$(Q)ln -fsn $(srctree)/scripts/gdb/vmlinux-gdb.py
++endif
+ 	+$(call if_changed,link-vmlinux)
+ 
+ # The actual objects are generated when descending, 
+@@ -995,7 +998,8 @@ MRPROPER_DIRS  += include/config usr/include include/generated          \
+                   arch/*/include/generated
+ MRPROPER_FILES += .config .config.old .version .old_version             \
+                   include/linux/version.h                               \
+-		  Module.symvers tags TAGS cscope* GPATH GTAGS GRTAGS GSYMS
++		  Module.symvers tags TAGS cscope* GPATH GTAGS GRTAGS GSYMS \
++		  vmlinux-gdb.py
+ 
+ # clean - Delete most, but leave enough to build external modules
+ #
+diff --git a/scripts/Makefile b/scripts/Makefile
+index a55b006..47f3d51 100644
+--- a/scripts/Makefile
++++ b/scripts/Makefile
+@@ -35,6 +35,7 @@ subdir-$(CONFIG_MODVERSIONS) += genksyms
+ subdir-y                     += mod
+ subdir-$(CONFIG_SECURITY_SELINUX) += selinux
+ subdir-$(CONFIG_DTC)         += dtc
++subdir-$(CONFIG_DEBUG_INFO)  += gdb
+ 
+ # Let clean descend into subdirs
+-subdir-	+= basic kconfig package selinux
++subdir-	+= basic kconfig package selinux gdb
+diff --git a/scripts/gdb/Makefile b/scripts/gdb/Makefile
+new file mode 100644
+index 0000000..34ccd06
+--- /dev/null
++++ b/scripts/gdb/Makefile
+@@ -0,0 +1,9 @@
++always := gdb-scripts
++
++$(obj)/gdb-scripts:
++ifneq ($(KBUILD_SRC),)
++	$(Q)ln -fsn $(srctree)/$(obj)/*.py $(objtree)/$(obj)
++endif
++	@:
++
++clean-files := *.pyc $(if $(KBUILD_SRC),*.py)
+diff --git a/scripts/gdb/vmlinux-gdb.py b/scripts/gdb/vmlinux-gdb.py
+new file mode 100644
+index 0000000..00df617
+--- /dev/null
++++ b/scripts/gdb/vmlinux-gdb.py
+@@ -0,0 +1,20 @@
++#
++# gdb helper commands and functions for Linux kernel debugging
++#
++#  loader module
++#
++# Copyright (c) 2012 Siemens AG
++#
++# Authors:
++#  Jan Kiszka <jan.kiszka@siemens.com>
++#
++# This work is licensed under the terms of the GNU GPL version 2.
++#
++
++import os
++
++sys.path = [ os.path.dirname(__file__) + "/scripts/gdb" ] + sys.path
++
++if not gdb.VERSION >= "7.1":
++	print "NOTE: gdb 7.1 or later required for Linux helper scripts " \
++	      "to work."
+-- 
+1.7.3.4
+
