@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pa0-f46.google.com ([209.85.220.46]:43195 "EHLO
+Received: from mail-pa0-f46.google.com ([209.85.220.46]:58307 "EHLO
 	mail-pa0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751211Ab2JHCvb (ORCPT
+	with ESMTP id S1750917Ab2JHFE4 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 7 Oct 2012 22:51:31 -0400
-Date: Mon, 8 Oct 2012 10:50:26 +0800
+	Mon, 8 Oct 2012 01:04:56 -0400
+Date: Mon, 8 Oct 2012 13:05:14 +0800
 From: Wang YanQing <udknight@gmail.com>
-Subject: [PATCH v2]mconf: Add Save button
-Message-ID: <20121008025025.GA10093@udknight>
+Subject: [PATCH v3]mconf: Add Save button
+Message-ID: <20121008050513.GA22078@udknight>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
@@ -16,21 +16,21 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: mmarek@suse.cz
 Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, rdunlap@xenotime.net, bp@alien8.de, yann.morin.1998@free.fr, sakiwit@gmail.com, lacombar@gmail.com, lucas.demarchi@profusion.mobi, dave@gnu.org, paul.gortmaker@windriver.com, crquan@gmail.com, bpoirier@suse.de
 
-mconf make me annoying I have to make menuconfig && exit to
-save the config when I am tuning .config time by time, it
-is even worse I have to search down to my desire submenu
-time by time. So I add "Save" button to save our time. With
-"Save" button, I can use CRTL-Z after save config, and then
-use "%" or fg to resume menuconfig and go on tuning.
+mconf make me annoying I have to make menuconfig && exit to save
+the config when I am tuning .config time by time, it is even
+worse I have to search down to my desire submenu time by time.
+So I add "Save" button to save our time. With "Save" button,
+I can use CRTL-Z after save config, and then use "%" or fg to
+resume menuconfig and go on tuning.
 
-Changes v1-v2:
-* Rewrite the most code to make it more correct
+v2: Rewrite the most code to make it more correct
+v3: Fix the behavior of conf_message_callback when exit.
 
 Signed-off-by: Wang YanQing <udknight@gmail.com>
 ---
- scripts/kconfig/lxdialog/menubox.c | 17 ++++++++--------
- scripts/kconfig/mconf.c            | 40 ++++++++++++++++++++++++++++++++------
- 2 files changed, 43 insertions(+), 14 deletions(-)
+ scripts/kconfig/lxdialog/menubox.c | 17 +++++++-------
+ scripts/kconfig/mconf.c            | 47 ++++++++++++++++++++++++++++++++------
+ 2 files changed, 49 insertions(+), 15 deletions(-)
 
 diff --git a/scripts/kconfig/lxdialog/menubox.c b/scripts/kconfig/lxdialog/menubox.c
 index 1d60473..f71f112 100644
@@ -87,10 +87,18 @@ index 1d60473..f71f112 100644
  				return button;
  			}
 diff --git a/scripts/kconfig/mconf.c b/scripts/kconfig/mconf.c
-index f584a28..100b52a 100644
+index f584a28..72c4ae6 100644
 --- a/scripts/kconfig/mconf.c
 +++ b/scripts/kconfig/mconf.c
-@@ -521,6 +521,7 @@ static void conf(struct menu *menu)
+@@ -274,6 +274,7 @@ static int child_count;
+ static int single_menu_mode;
+ static int show_all_options;
+ static int saved_x, saved_y;
++static int save_and_exit;
+ 
+ static void conf(struct menu *menu);
+ static void conf_choice(struct menu *menu);
+@@ -521,6 +522,7 @@ static void conf(struct menu *menu)
  	struct symbol *sym;
  	struct menu *active_menu = NULL;
  	int res;
@@ -98,7 +106,7 @@ index f584a28..100b52a 100644
  	int s_scroll = 0;
  
  	while (1) {
-@@ -588,6 +589,25 @@ static void conf(struct menu *menu)
+@@ -588,6 +590,25 @@ static void conf(struct menu *menu)
  				show_helptext(_("README"), _(mconf_readme));
  			break;
  		case 3:
@@ -124,7 +132,7 @@ index f584a28..100b52a 100644
  			if (item_is_tag('t')) {
  				if (sym_set_tristate_value(sym, yes))
  					break;
-@@ -595,24 +615,24 @@ static void conf(struct menu *menu)
+@@ -595,24 +616,24 @@ static void conf(struct menu *menu)
  					show_textbox(NULL, setmod_text, 6, 74);
  			}
  			break;
@@ -154,7 +162,7 @@ index f584a28..100b52a 100644
  			show_all_options = !show_all_options;
  			break;
  		}
-@@ -630,6 +650,14 @@ static void show_helptext(const char *title, const char *text)
+@@ -630,6 +651,17 @@ static void show_helptext(const char *title, const char *text)
  	show_textbox(title, text, 0, 0);
  }
  
@@ -163,21 +171,34 @@ index f584a28..100b52a 100644
 +	char buf[1024];
 +
 +	vsnprintf(buf, sizeof(buf), fmt, ap);
-+	show_textbox(NULL, buf, 6, 60);
++	if (save_and_exit)
++		printf("%s", buf);
++	else
++		show_textbox(NULL, buf, 6, 60);
 +}
 +
  static void show_help(struct menu *menu)
  {
  	struct gstr help = str_new();
-@@ -872,6 +900,7 @@ int main(int ac, char **av)
+@@ -797,7 +829,7 @@ static void conf_save(void)
+ static int handle_exit(void)
+ {
+ 	int res;
+-
++	save_and_exit = 1;
+ 	dialog_clear();
+ 	if (conf_get_changed())
+ 		res = dialog_yesno(NULL,
+@@ -872,11 +904,12 @@ int main(int ac, char **av)
  	}
  
  	set_config_filename(conf_get_configname());
 +	conf_set_message_callback(conf_message_callback);
  	do {
++		save_and_exit = 0;
  		conf(&rootmenu);
  		res = handle_exit();
-@@ -879,4 +908,3 @@ int main(int ac, char **av)
+ 	} while (res == KEY_ESC);
  
  	return res;
  }
