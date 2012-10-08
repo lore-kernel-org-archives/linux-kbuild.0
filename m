@@ -1,39 +1,49 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.skyhub.de ([78.46.96.112]:51729 "EHLO mail.skyhub.de"
+Received: from cantor2.suse.de ([195.135.220.15]:60402 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750873Ab2JHKYs (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 8 Oct 2012 06:24:48 -0400
-Date: Mon, 8 Oct 2012 12:25:26 +0200
-From: Borislav Petkov <bp@alien8.de>
-Subject: Re: [PATCH v3]mconf: Add Save button
-Message-ID: <20121008102526.GA18308@x1.osrc.amd.com>
-References: <20121008050513.GA22078@udknight>
- <20121008060340.GB4148@liondog.tnic>
- <20121008072249.GA29113@udknight>
- <20121008082832.GB19783@liondog.tnic>
- <20121008084544.GA1695@udknight>
+	id S1753529Ab2JHPRC (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 8 Oct 2012 11:17:02 -0400
+Date: Mon, 8 Oct 2012 16:16:56 +0100
+From: Mel Gorman <mgorman@suse.de>
+Subject: Re: [PATCH] mm: memmap_init_zone() performance improvement
+Message-ID: <20121008151656.GM29125@suse.de>
+References: <1349276174-8398-1-git-send-email-mike.yoknis@hp.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-15
 Content-Disposition: inline
-In-Reply-To: <20121008084544.GA1695@udknight>
+In-Reply-To: <1349276174-8398-1-git-send-email-mike.yoknis@hp.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Wang YanQing <udknight@gmail.com>
-Cc: mmarek@suse.cz, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, rdunlap@xenotime.net, yann.morin.1998@free.fr, sakiwit@gmail.com, lacombar@gmail.com, lucas.demarchi@profusion.mobi, dave@gnu.org, paul.gortmaker@windriver.com, crquan@gmail.com, bpoirier@suse.de
+To: Mike Yoknis <mike.yoknis@hp.com>
+Cc: mingo@redhat.com, akpm@linux-foundation.org, linux-arch@vger.kernel.org, mmarek@suse.cz, tglx@linutronix.de, hpa@zytor.com, arnd@arndb.de, sam@ravnborg.org, minchan@kernel.org, kamezawa.hiroyu@jp.fujitsu.com, mhocko@suse.cz, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org
 
-On Mon, Oct 08, 2012 at 04:45:44PM +0800, Wang YanQing wrote:
-> By the way,just a quick test, qconfig, xconfig, nconfig all have the
-> Save button, why do them exist if we follow your opinion?
+On Wed, Oct 03, 2012 at 08:56:14AM -0600, Mike Yoknis wrote:
+> memmap_init_zone() loops through every Page Frame Number (pfn),
+> including pfn values that are within the gaps between existing
+> memory sections.  The unneeded looping will become a boot
+> performance issue when machines configure larger memory ranges
+> that will contain larger and more numerous gaps.
+> 
+> The code will skip across invalid sections to reduce the
+> number of loops executed.
+> 
+> Signed-off-by: Mike Yoknis <mike.yoknis@hp.com>
 
-Because someone added them thinking it would be cool to have them, what
-do I know...
+This only helps SPARSEMEM and changes more headers than should be
+necessary. It would have been easier to do something simple like
 
-In any case, I still fail to see a real value in this considering the
-use case, that's all. Unless someone proves me wrong with a better
-example that this...
+if (!early_pfn_valid(pfn)) {
+	pfn = ALIGN(pfn + MAX_ORDER_NR_PAGES, MAX_ORDER_NR_PAGES) - 1;
+	continue;
+}
 
-Thanks.
+because that would obey the expectation that pages within a
+MAX_ORDER_NR_PAGES-aligned range are all valid or all invalid (ARM is the
+exception that breaks this rule). It would be less efficient on
+SPARSEMEM than what you're trying to merge but I do not see the need for
+the additional complexity unless you can show it makes a big difference
+to boot times.
 
 -- 
-Regards/Gruss,
-Boris.
+Mel Gorman
+SUSE Labs
