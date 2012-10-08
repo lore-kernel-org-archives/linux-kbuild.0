@@ -1,57 +1,186 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:46536 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750858Ab2JGPxR (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 7 Oct 2012 11:53:17 -0400
-Date: Sun, 7 Oct 2012 17:53:10 +0200
-From: Michal Marek <mmarek@suse.cz>
-Subject: [GIT] kbuild fixes
-Message-ID: <20121007155310.GA25356@pobox.suse.cz>
+Received: from mail-pa0-f46.google.com ([209.85.220.46]:43195 "EHLO
+	mail-pa0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751211Ab2JHCvb (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 7 Oct 2012 22:51:31 -0400
+Date: Mon, 8 Oct 2012 10:50:26 +0800
+From: Wang YanQing <udknight@gmail.com>
+Subject: [PATCH v2]mconf: Add Save button
+Message-ID: <20121008025025.GA10093@udknight>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: jdelvare@suse.de, mmarek@suse.cz, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: mmarek@suse.cz
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, rdunlap@xenotime.net, bp@alien8.de, yann.morin.1998@free.fr, sakiwit@gmail.com, lacombar@gmail.com, lucas.demarchi@profusion.mobi, dave@gnu.org, paul.gortmaker@windriver.com, crquan@gmail.com, bpoirier@suse.de
 
-Hi Linus,
+mconf make me annoying I have to make menuconfig && exit to
+save the config when I am tuning .config time by time, it
+is even worse I have to search down to my desire submenu
+time by time. So I add "Save" button to save our time. With
+"Save" button, I can use CRTL-Z after save config, and then
+use "%" or fg to resume menuconfig and go on tuning.
 
-there are two fixes I intended to send after v3.6-rc7, but failed to do
-so. So please pull them for v3.7-rc1 and they will be picked up by
-stable. The first one fixes gcc -x <language> syntax in various
-build-time tests, which icecream and possible other gcc wrappers did not
-understand (and yes, icecream is going to be fixed as well). The second
-one fixes make tar-pkg so that unpacking the tarball does not replace
-the /lib -> /usr/lib symlink on recent Fedora releases.
+Changes v1-v2:
+* Rewrite the most code to make it more correct
 
-Thanks,
-Michal
+Signed-off-by: Wang YanQing <udknight@gmail.com>
+---
+ scripts/kconfig/lxdialog/menubox.c | 17 ++++++++--------
+ scripts/kconfig/mconf.c            | 40 ++++++++++++++++++++++++++++++++------
+ 2 files changed, 43 insertions(+), 14 deletions(-)
 
-The following changes since commit 979570e02981d4a8fc20b3cc8fd651856c98ee9d:
-
-  Linux 3.6-rc7 (2012-09-23 18:10:57 -0700)
-
-are available in the git repository at:
-  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git rc-fixes
-
-Jean Delvare (1):
-      kbuild: Fix gcc -x syntax
-
-Michal Marek (1):
-      kbuild: Do not package /boot and /lib in make tar-pkg
-
- arch/mips/Makefile                         |    2 +-
- arch/mips/kernel/Makefile                  |    2 +-
- arch/x86/Makefile                          |    4 ++--
- scripts/Kbuild.include                     |   12 ++++++------
- scripts/Makefile.fwinst                    |    4 ++--
- scripts/gcc-version.sh                     |    6 +++---
- scripts/gcc-x86_32-has-stack-protector.sh  |    2 +-
- scripts/gcc-x86_64-has-stack-protector.sh  |    2 +-
- scripts/kconfig/check.sh                   |    2 +-
- scripts/kconfig/lxdialog/check-lxdialog.sh |    2 +-
- scripts/package/buildtar                   |    2 +-
- tools/perf/Makefile                        |    2 +-
- tools/power/cpupower/Makefile              |    2 +-
- 13 files changed, 22 insertions(+), 22 deletions(-)
+diff --git a/scripts/kconfig/lxdialog/menubox.c b/scripts/kconfig/lxdialog/menubox.c
+index 1d60473..f71f112 100644
+--- a/scripts/kconfig/lxdialog/menubox.c
++++ b/scripts/kconfig/lxdialog/menubox.c
+@@ -26,7 +26,7 @@
+  *
+  *    *)  A bugfix for the Page-Down problem
+  *
+- *    *)  Formerly when I used Page Down and Page Up, the cursor would be set 
++ *    *)  Formerly when I used Page Down and Page Up, the cursor would be set
+  *        to the first position in the menu box.  Now lxdialog is a bit
+  *        smarter and works more like other menu systems (just have a look at
+  *        it).
+@@ -160,6 +160,7 @@ static void print_buttons(WINDOW * win, int height, int width, int selected)
+ 	print_button(win, gettext("Select"), y, x, selected == 0);
+ 	print_button(win, gettext(" Exit "), y, x + 12, selected == 1);
+ 	print_button(win, gettext(" Help "), y, x + 24, selected == 2);
++	print_button(win, gettext(" Save "), y, x + 36, selected == 3);
+ 
+ 	wmove(win, y, x + 1 + 12 * selected);
+ 	wrefresh(win);
+@@ -372,7 +373,7 @@ do_resize:
+ 		case TAB:
+ 		case KEY_RIGHT:
+ 			button = ((key == KEY_LEFT ? --button : ++button) < 0)
+-			    ? 2 : (button > 2 ? 0 : button);
++			    ? 3 : (button > 3 ? 0 : button);
+ 
+ 			print_buttons(dialog, height, width, button);
+ 			wrefresh(menu);
+@@ -399,17 +400,17 @@ do_resize:
+ 				return 2;
+ 			case 's':
+ 			case 'y':
+-				return 3;
+-			case 'n':
+ 				return 4;
+-			case 'm':
++			case 'n':
+ 				return 5;
+-			case ' ':
++			case 'm':
+ 				return 6;
+-			case '/':
++			case ' ':
+ 				return 7;
+-			case 'z':
++			case '/':
+ 				return 8;
++			case 'z':
++				return 9;
+ 			case '\n':
+ 				return button;
+ 			}
+diff --git a/scripts/kconfig/mconf.c b/scripts/kconfig/mconf.c
+index f584a28..100b52a 100644
+--- a/scripts/kconfig/mconf.c
++++ b/scripts/kconfig/mconf.c
+@@ -521,6 +521,7 @@ static void conf(struct menu *menu)
+ 	struct symbol *sym;
+ 	struct menu *active_menu = NULL;
+ 	int res;
++	int yesno;
+ 	int s_scroll = 0;
+ 
+ 	while (1) {
+@@ -588,6 +589,25 @@ static void conf(struct menu *menu)
+ 				show_helptext(_("README"), _(mconf_readme));
+ 			break;
+ 		case 3:
++			if (!conf_get_changed()) {
++				break;
++			}
++
++			yesno = dialog_yesno(NULL,
++					_("Do you wish to save your "
++						"new configuration?\n"
++						"<ESC><ESC> to continue."),
++					6, 60);
++			if (yesno == 0) {
++				if (conf_write(filename)) {
++					show_textbox(NULL,
++						_("Error while writing of the configuration.\n"
++							"Your configuration changes were NOT saved."),
++						6,60);
++				}
++			}
++			break;
++		case 4:
+ 			if (item_is_tag('t')) {
+ 				if (sym_set_tristate_value(sym, yes))
+ 					break;
+@@ -595,24 +615,24 @@ static void conf(struct menu *menu)
+ 					show_textbox(NULL, setmod_text, 6, 74);
+ 			}
+ 			break;
+-		case 4:
++		case 5:
+ 			if (item_is_tag('t'))
+ 				sym_set_tristate_value(sym, no);
+ 			break;
+-		case 5:
++		case 6:
+ 			if (item_is_tag('t'))
+ 				sym_set_tristate_value(sym, mod);
+ 			break;
+-		case 6:
++		case 7:
+ 			if (item_is_tag('t'))
+ 				sym_toggle_tristate_value(sym);
+ 			else if (item_is_tag('m'))
+ 				conf(submenu);
+ 			break;
+-		case 7:
++		case 8:
+ 			search_conf();
+ 			break;
+-		case 8:
++		case 9:
+ 			show_all_options = !show_all_options;
+ 			break;
+ 		}
+@@ -630,6 +650,14 @@ static void show_helptext(const char *title, const char *text)
+ 	show_textbox(title, text, 0, 0);
+ }
+ 
++static void conf_message_callback(const char *fmt, va_list ap)
++{
++	char buf[1024];
++
++	vsnprintf(buf, sizeof(buf), fmt, ap);
++	show_textbox(NULL, buf, 6, 60);
++}
++
+ static void show_help(struct menu *menu)
+ {
+ 	struct gstr help = str_new();
+@@ -872,6 +900,7 @@ int main(int ac, char **av)
+ 	}
+ 
+ 	set_config_filename(conf_get_configname());
++	conf_set_message_callback(conf_message_callback);
+ 	do {
+ 		conf(&rootmenu);
+ 		res = handle_exit();
+@@ -879,4 +908,3 @@ int main(int ac, char **av)
+ 
+ 	return res;
+ }
+-
+-- 
+1.7.11.1.116.g8228a23
