@@ -1,49 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:60402 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753529Ab2JHPRC (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 8 Oct 2012 11:17:02 -0400
-Date: Mon, 8 Oct 2012 16:16:56 +0100
-From: Mel Gorman <mgorman@suse.de>
-Subject: Re: [PATCH] mm: memmap_init_zone() performance improvement
-Message-ID: <20121008151656.GM29125@suse.de>
-References: <1349276174-8398-1-git-send-email-mike.yoknis@hp.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-15
-Content-Disposition: inline
-In-Reply-To: <1349276174-8398-1-git-send-email-mike.yoknis@hp.com>
+Received: from shrek-modem1.podlesie.net ([83.18.25.171]:41126 "EHLO
+	shrek.podlesie.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751200Ab2JHQZs (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 8 Oct 2012 12:25:48 -0400
+From: Krzysztof Mazur <krzysiek@podlesie.net>
+Subject: [PATCH] menuconfig: fix extended colors ncurses support
+Date: Mon,  8 Oct 2012 18:18:22 +0200
+Message-Id: <1349713102-3301-1-git-send-email-krzysiek@podlesie.net>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Mike Yoknis <mike.yoknis@hp.com>
-Cc: mingo@redhat.com, akpm@linux-foundation.org, linux-arch@vger.kernel.org, mmarek@suse.cz, tglx@linutronix.de, hpa@zytor.com, arnd@arndb.de, sam@ravnborg.org, minchan@kernel.org, kamezawa.hiroyu@jp.fujitsu.com, mhocko@suse.cz, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org
+To: mmarek@suse.cz
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Krzysztof Mazur <krzysiek@podlesie.net>
 
-On Wed, Oct 03, 2012 at 08:56:14AM -0600, Mike Yoknis wrote:
-> memmap_init_zone() loops through every Page Frame Number (pfn),
-> including pfn values that are within the gaps between existing
-> memory sections.  The unneeded looping will become a boot
-> performance issue when machines configure larger memory ranges
-> that will contain larger and more numerous gaps.
-> 
-> The code will skip across invalid sections to reduce the
-> number of loops executed.
-> 
-> Signed-off-by: Mike Yoknis <mike.yoknis@hp.com>
+The ncurses library allows for extended colors. The support for extended
+colors support depends on wide-character support. ncurses headers
+enable extended colors (NCURSES_EXT_COLORS) only when wide-character
+support is enabled (NCURSES_WIDECHAR).
 
-This only helps SPARSEMEM and changes more headers than should be
-necessary. It would have been easier to do something simple like
+The "make menuconfig" uses wide-character ncursesw library, which can be
+compiled with wide-character support, but does not define NCURSES_WIDECHAR
+and it's using headers without wide-character (and extended colors) support.
 
-if (!early_pfn_valid(pfn)) {
-	pfn = ALIGN(pfn + MAX_ORDER_NR_PAGES, MAX_ORDER_NR_PAGES) - 1;
-	continue;
-}
+This fixes problems with colors on systems with enabled extended colors
+(like PLD Linux). Without this patch "make menuconfig" is hard to use.
 
-because that would obey the expectation that pages within a
-MAX_ORDER_NR_PAGES-aligned range are all valid or all invalid (ARM is the
-exception that breaks this rule). It would be less efficient on
-SPARSEMEM than what you're trying to merge but I do not see the need for
-the additional complexity unless you can show it makes a big difference
-to boot times.
+Signed-off-by: Krzysztof Mazur <krzysiek@podlesie.net>
+---
+ scripts/kconfig/lxdialog/check-lxdialog.sh | 1 +
+ 1 file changed, 1 insertion(+)
 
+diff --git a/scripts/kconfig/lxdialog/check-lxdialog.sh b/scripts/kconfig/lxdialog/check-lxdialog.sh
+index e3b12c0..5a70e8b 100644
+--- a/scripts/kconfig/lxdialog/check-lxdialog.sh
++++ b/scripts/kconfig/lxdialog/check-lxdialog.sh
+@@ -21,6 +21,7 @@ ccflags()
+ {
+ 	if [ -f /usr/include/ncursesw/curses.h ]; then
+ 		echo '-I/usr/include/ncursesw -DCURSES_LOC="<ncursesw/curses.h>"'
++		echo ' -DNCURSES_WIDECHAR=1'
+ 	elif [ -f /usr/include/ncurses/ncurses.h ]; then
+ 		echo '-I/usr/include/ncurses -DCURSES_LOC="<ncurses.h>"'
+ 	elif [ -f /usr/include/ncurses/curses.h ]; then
 -- 
-Mel Gorman
-SUSE Labs
+1.7.12.2.2.g1c3c581
+
