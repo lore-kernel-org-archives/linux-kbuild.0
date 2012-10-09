@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp08.smtpout.orange.fr ([80.12.242.130]:32425 "EHLO
+Received: from smtp08.smtpout.orange.fr ([80.12.242.130]:60882 "EHLO
 	smtp.smtpout.orange.fr" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755638Ab2JIWqj (ORCPT
+	with ESMTP id S1755833Ab2JIWqj (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
 	Tue, 9 Oct 2012 18:46:39 -0400
 From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: [PATCH 3/3] kconfig: get CONFIG_ prefix from the environment
-Date: Wed, 10 Oct 2012 00:46:33 +0200
-Message-Id: <1349822793-1227-4-git-send-email-yann.morin.1998@free.fr>
+Subject: [PATCH 1/3] kconfig: remove CONFIG_ from string constants
+Date: Wed, 10 Oct 2012 00:46:31 +0200
+Message-Id: <1349822793-1227-2-git-send-email-yann.morin.1998@free.fr>
 In-Reply-To: <1349822793-1227-1-git-send-email-yann.morin.1998@free.fr>
 References: <1349822793-1227-1-git-send-email-yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,65 +15,101 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Michal Marek <mmarek@suse.cz>, "Yann E. MORIN" <yann.morin.1998@free.fr>
 
-Currently, the CONFIG_ prefix is hard-coded in the kconfig frontends
-executables. This means that two projects that use kconfig with
-different prefixes can not share the same kconfig frontends.
+Having the CONFIG_ prefix in string constants gets in the way of
+using a run-time-defined CONFIG_ prefix.
 
-Instead of hard-coding the prefix in the frontends, get it from the
-environment, and revert back to hard-coded value if not found.
+Fix that by using temp growable strings (gstr) in which we printf
+the text.
 
 Signed-off-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
 ---
- scripts/kconfig/gconf.c |    2 +-
- scripts/kconfig/lkc.h   |    2 ++
- scripts/kconfig/nconf.c |    1 +
- 3 files changed, 4 insertions(+), 1 deletions(-)
+ scripts/kconfig/mconf.c |   12 +++++++++---
+ scripts/kconfig/nconf.c |   11 +++++++++--
+ 2 files changed, 18 insertions(+), 5 deletions(-)
 
-diff --git a/scripts/kconfig/gconf.c b/scripts/kconfig/gconf.c
-index adc2306..f2bee70 100644
---- a/scripts/kconfig/gconf.c
-+++ b/scripts/kconfig/gconf.c
-@@ -10,6 +10,7 @@
- #  include <config.h>
- #endif
- 
-+#include <stdlib.h>
- #include "lkc.h"
- #include "images.c"
- 
-@@ -22,7 +23,6 @@
- #include <string.h>
- #include <unistd.h>
- #include <time.h>
--#include <stdlib.h>
- 
- //#define DEBUG
- 
-diff --git a/scripts/kconfig/lkc.h b/scripts/kconfig/lkc.h
-index 25862fd..afa592a 100644
---- a/scripts/kconfig/lkc.h
-+++ b/scripts/kconfig/lkc.h
-@@ -41,6 +41,8 @@ extern "C" {
- #define __stringify(x...)	__stringify_1(x)
- static inline const char *CONFIG_prefix(void)
+diff --git a/scripts/kconfig/mconf.c b/scripts/kconfig/mconf.c
+index f584a28..1f64cd1 100644
+--- a/scripts/kconfig/mconf.c
++++ b/scripts/kconfig/mconf.c
+@@ -306,14 +306,18 @@ static void search_conf(void)
  {
-+	if( getenv( "CONFIG_" ) )
-+		return getenv( "CONFIG_" );
- 	return __stringify(CONFIG_);
+ 	struct symbol **sym_arr;
+ 	struct gstr res;
++	struct gstr title;
+ 	char *dialog_input;
+ 	int dres;
++
++	title = str_new();
++	str_printf( &title, _("Enter %s (sub)string to search for "
++			      "(with or without \"%s\")"), CONFIG_, CONFIG_);
++
+ again:
+ 	dialog_clear();
+ 	dres = dialog_inputbox(_("Search Configuration Parameter"),
+-			      _("Enter " CONFIG_ " (sub)string to search for "
+-				"(with or without \"" CONFIG_ "\")"),
+-			      10, 75, "");
++			       str_get(&title), 10, 75, "");
+ 	switch (dres) {
+ 	case 0:
+ 		break;
+@@ -321,6 +325,7 @@ again:
+ 		show_helptext(_("Search Configuration"), search_help);
+ 		goto again;
+ 	default:
++		str_free(&title);
+ 		return;
+ 	}
+ 
+@@ -334,6 +339,7 @@ again:
+ 	free(sym_arr);
+ 	show_textbox(_("Search Results"), str_get(&res), 0, 0);
+ 	str_free(&res);
++	str_free(&title);
  }
- #ifdef CONFIG_
+ 
+ static void build_conf(struct menu *menu)
 diff --git a/scripts/kconfig/nconf.c b/scripts/kconfig/nconf.c
-index 8854fd1..1bb76f4 100644
+index 1704a85..8854fd1 100644
 --- a/scripts/kconfig/nconf.c
 +++ b/scripts/kconfig/nconf.c
-@@ -7,6 +7,7 @@
-  */
- #define _GNU_SOURCE
- #include <string.h>
-+#include <stdlib.h>
+@@ -696,13 +696,18 @@ static void search_conf(void)
+ {
+ 	struct symbol **sym_arr;
+ 	struct gstr res;
++	struct gstr title;
+ 	char *dialog_input;
+ 	int dres;
++
++	title = str_new();
++	str_printf( &title, _("Enter %s (sub)string to search for "
++			      "(with or without \"%s\")"), CONFIG_, CONFIG_);
++
+ again:
+ 	dres = dialog_inputbox(main_window,
+ 			_("Search Configuration Parameter"),
+-			_("Enter " CONFIG_ " (sub)string to search for "
+-				"(with or without \"" CONFIG_ "\")"),
++			str_get(&title),
+ 			"", &dialog_input_result, &dialog_input_result_len);
+ 	switch (dres) {
+ 	case 0:
+@@ -712,6 +717,7 @@ again:
+ 				_("Search Configuration"), search_help);
+ 		goto again;
+ 	default:
++		str_free(&title);
+ 		return;
+ 	}
  
- #include "lkc.h"
- #include "nconf.h"
+@@ -726,6 +732,7 @@ again:
+ 	show_scroll_win(main_window,
+ 			_("Search Results"), str_get(&res));
+ 	str_free(&res);
++	str_free(&title);
+ }
+ 
+ 
 -- 
 1.7.2.5
 
