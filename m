@@ -1,81 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from g6t0184.atlanta.hp.com ([15.193.32.61]:28168 "EHLO
-	g6t0184.atlanta.hp.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752114Ab2JIO4y (ORCPT
+Received: from smtp08.smtpout.orange.fr ([80.12.242.130]:32771 "EHLO
+	smtp.smtpout.orange.fr" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755771Ab2JIWqj (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 9 Oct 2012 10:56:54 -0400
-Message-ID: <1349794597.29752.10.camel@MikesLinux.fc.hp.com>
-Subject: Re: [PATCH] mm: memmap_init_zone() performance improvement
-From: Mike Yoknis <mike.yoknis@hp.com>
-Reply-To: mike.yoknis@hp.com
-Date: Tue, 09 Oct 2012 08:56:37 -0600
-In-Reply-To: <20121008151656.GM29125@suse.de>
-References: <1349276174-8398-1-git-send-email-mike.yoknis@hp.com>
-	 <20121008151656.GM29125@suse.de>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+	Tue, 9 Oct 2012 18:46:39 -0400
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Subject: [PATH 0/3] kcofnig: get the CONFIG_ prefix from the environment
+Date: Wed, 10 Oct 2012 00:46:30 +0200
+Message-Id: <1349822793-1227-1-git-send-email-yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Mel Gorman <mgorman@suse.de>
-Cc: mingo@redhat.com, akpm@linux-foundation.org, linux-arch@vger.kernel.org, mmarek@suse.cz, tglx@linutronix.de, hpa@zytor.com, arnd@arndb.de, sam@ravnborg.org, minchan@kernel.org, kamezawa.hiroyu@jp.fujitsu.com, mhocko@suse.cz, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org
+To: linux-kbuild@vger.kernel.org
+Cc: Michal Marek <mmarek@suse.cz>
 
-On Mon, 2012-10-08 at 16:16 +0100, Mel Gorman wrote:
-> On Wed, Oct 03, 2012 at 08:56:14AM -0600, Mike Yoknis wrote:
-> > memmap_init_zone() loops through every Page Frame Number (pfn),
-> > including pfn values that are within the gaps between existing
-> > memory sections.  The unneeded looping will become a boot
-> > performance issue when machines configure larger memory ranges
-> > that will contain larger and more numerous gaps.
-> > 
-> > The code will skip across invalid sections to reduce the
-> > number of loops executed.
-> > 
-> > Signed-off-by: Mike Yoknis <mike.yoknis@hp.com>
-> 
-> This only helps SPARSEMEM and changes more headers than should be
-> necessary. It would have been easier to do something simple like
-> 
-> if (!early_pfn_valid(pfn)) {
-> 	pfn = ALIGN(pfn + MAX_ORDER_NR_PAGES, MAX_ORDER_NR_PAGES) - 1;
-> 	continue;
-> }
-> 
-> because that would obey the expectation that pages within a
-> MAX_ORDER_NR_PAGES-aligned range are all valid or all invalid (ARM is the
-> exception that breaks this rule). It would be less efficient on
-> SPARSEMEM than what you're trying to merge but I do not see the need for
-> the additional complexity unless you can show it makes a big difference
-> to boot times.
-> 
+Hello All!
 
-Mel,
-I, too, was concerned that pfn_valid() was defined in so many header
-files.  But, I did not feel that it was appropriate for me to try to
-restructure things to consolidate those definitions just to add this one
-new function.  Being a kernel newbie I did not believe that I had a good
-enough understanding of what combinations and permutations of CONFIG and
-architecture may have made all of those different definitions necessary,
-so I left them in.
+This little patch series allows one to override the CONFIG_ prefix at 
+runtime, without the need to rebuild the frontends.
 
-Yes, indeed, this fix is targeted for systems that have holes in memory.
-That is where we see the problem.  We are creating large computer
-systems and we would like for those machines to perform well, including
-boot times.
+This will be useful to have, to share the same kconfig frontends between
+different projects that may use different prefix. For example:
+  - busybox and uClibc use the standard 'CONFIG_'
+  - crosstool-NG uses 'CT_'
+  - PTXdist uses 'PTXCONF_'
+  - buildroot does not use a prefix at all
+  - and so on...
 
-Let me pass along the numbers I have.  We have what we call an
-"architectural simulator".  It is a computer program that pretends that
-it is a computer system.  We use it to test the firmware before real
-hardware is available.  We have booted Linux on our simulator.  As you
-would expect it takes longer to boot on the simulator than it does on
-real hardware.
+    [PATCH 1/3] kconfig: remove CONFIG_ from string constants
+    [PATCH 2/3] kconfig: add a function to get the CONFIG_ prefix
+    [PATCH 3/3] kconfig: get CONFIG_ prefix from environment
 
-With my patch - boot time 41 minutes
-Without patch - boot time 94 minutes
+This is part of my efforts to get a generic package that encapsulates the
+kconfig frontends and parser into a standalone package, to make it easy
+for third-party projects to easily sync (and ultimately share) their
+kconfig infrastructure:
+    kconfig-frontends
+    http://ymorin.is-a-geek.org/projects/kconfig-frontends
 
-These numbers do not scale linearly to real hardware.  But indicate to
-me a place where Linux can be improved.
-
-Mike Yoknis
-
-
+Regards,
+Yann E. MORIN.
