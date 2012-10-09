@@ -1,47 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from shrek-modem1.podlesie.net ([83.18.25.171]:41126 "EHLO
-	shrek.podlesie.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751200Ab2JHQZs (ORCPT
+Received: from mail-ob0-f174.google.com ([209.85.214.174]:61399 "EHLO
+	mail-ob0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755174Ab2JIAmZ (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 8 Oct 2012 12:25:48 -0400
-From: Krzysztof Mazur <krzysiek@podlesie.net>
-Subject: [PATCH] menuconfig: fix extended colors ncurses support
-Date: Mon,  8 Oct 2012 18:18:22 +0200
-Message-Id: <1349713102-3301-1-git-send-email-krzysiek@podlesie.net>
+	Mon, 8 Oct 2012 20:42:25 -0400
+Message-ID: <507372E8.9090207@gmail.com>
+Date: Tue, 09 Oct 2012 08:42:16 +0800
+From: Ni zhan Chen <nizhan.chen@gmail.com>
+MIME-Version: 1.0
+Subject: Re: [PATCH] mm: memmap_init_zone() performance improvement
+References: <1349276174-8398-1-git-send-email-mike.yoknis@hp.com> <20121008151656.GM29125@suse.de>
+In-Reply-To: <20121008151656.GM29125@suse.de>
+Content-Type: text/plain; charset=ISO-8859-15; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: mmarek@suse.cz
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Krzysztof Mazur <krzysiek@podlesie.net>
+To: Mel Gorman <mgorman@suse.de>
+Cc: Mike Yoknis <mike.yoknis@hp.com>, mingo@redhat.com, akpm@linux-foundation.org, linux-arch@vger.kernel.org, mmarek@suse.cz, tglx@linutronix.de, hpa@zytor.com, arnd@arndb.de, sam@ravnborg.org, minchan@kernel.org, kamezawa.hiroyu@jp.fujitsu.com, mhocko@suse.cz, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org
 
-The ncurses library allows for extended colors. The support for extended
-colors support depends on wide-character support. ncurses headers
-enable extended colors (NCURSES_EXT_COLORS) only when wide-character
-support is enabled (NCURSES_WIDECHAR).
+On 10/08/2012 11:16 PM, Mel Gorman wrote:
+> On Wed, Oct 03, 2012 at 08:56:14AM -0600, Mike Yoknis wrote:
+>> memmap_init_zone() loops through every Page Frame Number (pfn),
+>> including pfn values that are within the gaps between existing
+>> memory sections.  The unneeded looping will become a boot
+>> performance issue when machines configure larger memory ranges
+>> that will contain larger and more numerous gaps.
+>>
+>> The code will skip across invalid sections to reduce the
+>> number of loops executed.
+>>
+>> Signed-off-by: Mike Yoknis <mike.yoknis@hp.com>
+> This only helps SPARSEMEM and changes more headers than should be
+> necessary. It would have been easier to do something simple like
+>
+> if (!early_pfn_valid(pfn)) {
+> 	pfn = ALIGN(pfn + MAX_ORDER_NR_PAGES, MAX_ORDER_NR_PAGES) - 1;
+> 	continue;
+> }
 
-The "make menuconfig" uses wide-character ncursesw library, which can be
-compiled with wide-character support, but does not define NCURSES_WIDECHAR
-and it's using headers without wide-character (and extended colors) support.
+So if present memoy section in sparsemem can have 
+MAX_ORDER_NR_PAGES-aligned range are all invalid?
+If the answer is yes, when this will happen?
 
-This fixes problems with colors on systems with enabled extended colors
-(like PLD Linux). Without this patch "make menuconfig" is hard to use.
-
-Signed-off-by: Krzysztof Mazur <krzysiek@podlesie.net>
----
- scripts/kconfig/lxdialog/check-lxdialog.sh | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/scripts/kconfig/lxdialog/check-lxdialog.sh b/scripts/kconfig/lxdialog/check-lxdialog.sh
-index e3b12c0..5a70e8b 100644
---- a/scripts/kconfig/lxdialog/check-lxdialog.sh
-+++ b/scripts/kconfig/lxdialog/check-lxdialog.sh
-@@ -21,6 +21,7 @@ ccflags()
- {
- 	if [ -f /usr/include/ncursesw/curses.h ]; then
- 		echo '-I/usr/include/ncursesw -DCURSES_LOC="<ncursesw/curses.h>"'
-+		echo ' -DNCURSES_WIDECHAR=1'
- 	elif [ -f /usr/include/ncurses/ncurses.h ]; then
- 		echo '-I/usr/include/ncurses -DCURSES_LOC="<ncurses.h>"'
- 	elif [ -f /usr/include/ncurses/curses.h ]; then
--- 
-1.7.12.2.2.g1c3c581
+>
+> because that would obey the expectation that pages within a
+> MAX_ORDER_NR_PAGES-aligned range are all valid or all invalid (ARM is the
+> exception that breaks this rule). It would be less efficient on
+> SPARSEMEM than what you're trying to merge but I do not see the need for
+> the additional complexity unless you can show it makes a big difference
+> to boot times.
+>
 
