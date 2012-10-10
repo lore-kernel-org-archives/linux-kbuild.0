@@ -1,107 +1,56 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mailout-de.gmx.net ([213.165.64.22]:46065 "HELO
-	mailout-de.gmx.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with SMTP id S1752745Ab2JJARW (ORCPT
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:52801 "EHLO
+	out1-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1758037Ab2JJXBs (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 9 Oct 2012 20:17:22 -0400
-From: Martin Walch <walch.martin@gmx.de>
-Subject: Documentation of kconfig language differs from implementation regarding existence of symbols
-Date: Wed, 10 Oct 2012 02:17:09 +0200
-Message-ID: <1940598.VZE8PFWQyj@tacticalops>
-MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="nextPart2030477.0BHNyd6LV1"; micalg="pgp-sha1"; protocol="application/pgp-signature"
-Content-Transfer-Encoding: 7Bit
+	Wed, 10 Oct 2012 19:01:48 -0400
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Subject: [ 031/122] localmodconfig: Fix localyesconfig to set to y not m
+Date: Thu, 11 Oct 2012 07:53:17 +0900
+Message-Id: <20121010225343.735598738@linuxfoundation.org>
+In-Reply-To: <20121010225337.989799482@linuxfoundation.org>
+References: <20121010225337.989799482@linuxfoundation.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org
+To: linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, alan@lxorguk.ukuu.org.uk, Yuta Ando <yuta.and@gmail.com>, Steven Rostedt <rostedt@rostedt.homelinux.com>, linux-kbuild@vger.kernel.org
+
+3.6-stable review patch.  If anyone has any objections, please let me know.
+
+------------------
+
+From: Yuta Ando <yuta.and@gmail.com>
+
+commit 4eae518d4b01b0cbf2f0d8edb5a6f3d6245ee8fb upstream.
+
+The kbuild target 'localyesconfig' has been same as 'localmodconfig'
+since the commit 50bce3e "kconfig/streamline_config.pl: merge
+local{mod,yes}config". The commit expects this script generates
+different configure depending on target, but it was not yet implemented.
+
+So I added code that sets to 'yes' when target is 'localyesconfig'.
+
+Link: http://lkml.kernel.org/r/1349101470-12243-1-git-send-email-yuta.and@gmail.com
+
+Signed-off-by: Yuta Ando <yuta.and@gmail.com>
 Cc: linux-kbuild@vger.kernel.org
+Signed-off-by: Steven Rostedt <rostedt@rostedt.homelinux.com>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 
+---
+ scripts/kconfig/streamline_config.pl |    2 ++
+ 1 file changed, 2 insertions(+)
 
---nextPart2030477.0BHNyd6LV1
-Content-Type: multipart/mixed; boundary="nextPart1389767.GSQefZBuOc"
-Content-Transfer-Encoding: 7Bit
+--- a/scripts/kconfig/streamline_config.pl
++++ b/scripts/kconfig/streamline_config.pl
+@@ -605,6 +605,8 @@ foreach my $line (@config_file) {
+ 	if (defined($configs{$1})) {
+ 	    if ($localyesconfig) {
+ 	        $setconfigs{$1} = 'y';
++		print "$1=y\n";
++		next;
+ 	    } else {
+ 	        $setconfigs{$1} = $2;
+ 	    }
 
-This is a multi-part message in MIME format.
-
---nextPart1389767.GSQefZBuOc
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="UTF-8"
-
-The file linux/Documentation/kbuild/kconfig-language.txt says:
-
-> The following two methods produce the same kconfig symbol dependencies
-> but differ greatly in kconfig symbol existence (production) in the
-> generated config file.
->
-> case 1:
->
-> config FOO
->         tristate "about foo"
->         depends on BAR
->
-> vs. case 2:
->
-> if BAR
-> config FOO
->         tristate "about foo"
-> endif
->
-> In case 1, the symbol FOO will always exist in the config file (given
-> no other dependencies).  In case 2, the symbol FOO will only exist in
-> the config file if BAR is enabled.
-
-However, I can not reproduce this. The attached file contains both cases. When 
-running make menuconfig, setting BAR0 and BAR1 both to n, and saving the 
-configuration, there is neither FOO0 nor FOO1 in the resulting configuration 
-file.
-
-According to the documentation, at least FOO0 should exist, even if BAR0 is 
-set to n. But this is not the case. AFAICS, both versions behave equivalently. 
-I suggest changing the documentation accordingly.
-
-Regards
-Martin Walch
--- 
-
---nextPart1389767.GSQefZBuOc
-Content-Disposition: attachment; filename="FOO.kconf"
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="UTF-8"; name="FOO.kconf"
-
-config FOO0
-        tristate "FOO0"
-        depends on BAR0
-
-config BAR0
-        tristate "BAR0"
-
-config BAR1
-        tristate "BAR1"
-
-if BAR1
-
-config FOO1
-        tristate "FOO1"
-
-endif
-
---nextPart1389767.GSQefZBuOc--
-
---nextPart2030477.0BHNyd6LV1
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part.
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.19 (GNU/Linux)
-
-iQEcBAABAgAGBQJQdL6PAAoJEIoBMSmVzyrzS7IIAKiTdRuZuLlK7J23+dDjvmpD
-/NnBXh2rLMspF9SkD9BMJQxl0rSKJyCJv1eS9WPANR1tx9KrA/IHqGeBgpSSnHrt
-MPVfVhlPtnTP5cq7cUlcbp3Vjr4TbGExByLJveYSuvr2+aXvHP4weEwLZf7FEMEa
-gNPMM+EUwjlQdAHdTZhwKImY1Vxv77FQzT3le/+KEQyIHeqhqDccx8mQcTbjWXT9
-N+26CHjZskw4xQ8hTU7r0H3uY6wVnYNP/98I/RzHtrlbm8qE6f/lb5lqsG99oOch
-xuobnFjU2j6vMjpWxZ0R232GitUZz79eAy9wCn7QqOZwN47jdxlj9rPqlgSrDtQ=
-=rYq1
------END PGP SIGNATURE-----
-
---nextPart2030477.0BHNyd6LV1--
 
