@@ -1,56 +1,107 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp08.smtpout.orange.fr ([80.12.242.130]:40977 "EHLO
-	smtp.smtpout.orange.fr" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755016Ab2JIWqj (ORCPT
+Received: from mailout-de.gmx.net ([213.165.64.22]:46065 "HELO
+	mailout-de.gmx.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with SMTP id S1752745Ab2JJARW (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 9 Oct 2012 18:46:39 -0400
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: [PATCH 2/3] kconfig: add a function to get the CONFIG_ prefix
-Date: Wed, 10 Oct 2012 00:46:32 +0200
-Message-Id: <1349822793-1227-3-git-send-email-yann.morin.1998@free.fr>
-In-Reply-To: <1349822793-1227-1-git-send-email-yann.morin.1998@free.fr>
-References: <1349822793-1227-1-git-send-email-yann.morin.1998@free.fr>
+	Tue, 9 Oct 2012 20:17:22 -0400
+From: Martin Walch <walch.martin@gmx.de>
+Subject: Documentation of kconfig language differs from implementation regarding existence of symbols
+Date: Wed, 10 Oct 2012 02:17:09 +0200
+Message-ID: <1940598.VZE8PFWQyj@tacticalops>
+MIME-Version: 1.0
+Content-Type: multipart/signed; boundary="nextPart2030477.0BHNyd6LV1"; micalg="pgp-sha1"; protocol="application/pgp-signature"
+Content-Transfer-Encoding: 7Bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Michal Marek <mmarek@suse.cz>, "Yann E. MORIN" <yann.morin.1998@free.fr>
+To: linux-kernel@vger.kernel.org
+Cc: linux-kbuild@vger.kernel.org
 
-Currently, we get the CONFIG_ prefix via the CONFIG_ macro, which means
-the CONFIG_ prefix is hard-coded at compile time. This goes against
-having a run-time defined CONFIG_ prefix.
 
-Add a function that returns the CONFIG_ prefix to use (but keep the
-current hard-coded behavior, to be changed in a later patch).
+--nextPart2030477.0BHNyd6LV1
+Content-Type: multipart/mixed; boundary="nextPart1389767.GSQefZBuOc"
+Content-Transfer-Encoding: 7Bit
 
-Signed-off-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
----
- scripts/kconfig/lkc.h |   12 ++++++++++--
- 1 files changed, 10 insertions(+), 2 deletions(-)
+This is a multi-part message in MIME format.
 
-diff --git a/scripts/kconfig/lkc.h b/scripts/kconfig/lkc.h
-index c18f2bd..25862fd 100644
---- a/scripts/kconfig/lkc.h
-+++ b/scripts/kconfig/lkc.h
-@@ -36,9 +36,17 @@ extern "C" {
- #define _(text) gettext(text)
- #define N_(text) (text)
- 
--#ifndef CONFIG_
--#define CONFIG_ "CONFIG_"
-+/* Those two defines copied from include/linux/stringify.h */
-+#define __stringify_1(x...)	#x
-+#define __stringify(x...)	__stringify_1(x)
-+static inline const char *CONFIG_prefix(void)
-+{
-+	return __stringify(CONFIG_);
-+}
-+#ifdef CONFIG_
-+#undef CONFIG_
- #endif
-+#define CONFIG_ CONFIG_prefix()
- 
- #define TF_COMMAND	0x0001
- #define TF_PARAM	0x0002
+--nextPart1389767.GSQefZBuOc
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="UTF-8"
+
+The file linux/Documentation/kbuild/kconfig-language.txt says:
+
+> The following two methods produce the same kconfig symbol dependencies
+> but differ greatly in kconfig symbol existence (production) in the
+> generated config file.
+>
+> case 1:
+>
+> config FOO
+>         tristate "about foo"
+>         depends on BAR
+>
+> vs. case 2:
+>
+> if BAR
+> config FOO
+>         tristate "about foo"
+> endif
+>
+> In case 1, the symbol FOO will always exist in the config file (given
+> no other dependencies).  In case 2, the symbol FOO will only exist in
+> the config file if BAR is enabled.
+
+However, I can not reproduce this. The attached file contains both cases. When 
+running make menuconfig, setting BAR0 and BAR1 both to n, and saving the 
+configuration, there is neither FOO0 nor FOO1 in the resulting configuration 
+file.
+
+According to the documentation, at least FOO0 should exist, even if BAR0 is 
+set to n. But this is not the case. AFAICS, both versions behave equivalently. 
+I suggest changing the documentation accordingly.
+
+Regards
+Martin Walch
 -- 
-1.7.2.5
+
+--nextPart1389767.GSQefZBuOc
+Content-Disposition: attachment; filename="FOO.kconf"
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="UTF-8"; name="FOO.kconf"
+
+config FOO0
+        tristate "FOO0"
+        depends on BAR0
+
+config BAR0
+        tristate "BAR0"
+
+config BAR1
+        tristate "BAR1"
+
+if BAR1
+
+config FOO1
+        tristate "FOO1"
+
+endif
+
+--nextPart1389767.GSQefZBuOc--
+
+--nextPart2030477.0BHNyd6LV1
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part.
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.19 (GNU/Linux)
+
+iQEcBAABAgAGBQJQdL6PAAoJEIoBMSmVzyrzS7IIAKiTdRuZuLlK7J23+dDjvmpD
+/NnBXh2rLMspF9SkD9BMJQxl0rSKJyCJv1eS9WPANR1tx9KrA/IHqGeBgpSSnHrt
+MPVfVhlPtnTP5cq7cUlcbp3Vjr4TbGExByLJveYSuvr2+aXvHP4weEwLZf7FEMEa
+gNPMM+EUwjlQdAHdTZhwKImY1Vxv77FQzT3le/+KEQyIHeqhqDccx8mQcTbjWXT9
+N+26CHjZskw4xQ8hTU7r0H3uY6wVnYNP/98I/RzHtrlbm8qE6f/lb5lqsG99oOch
+xuobnFjU2j6vMjpWxZ0R232GitUZz79eAy9wCn7QqOZwN47jdxlj9rPqlgSrDtQ=
+=rYq1
+-----END PGP SIGNATURE-----
+
+--nextPart2030477.0BHNyd6LV1--
 
