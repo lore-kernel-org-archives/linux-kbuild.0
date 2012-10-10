@@ -1,21 +1,21 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:52801 "EHLO
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:38192 "EHLO
 	out1-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1758037Ab2JJXBs (ORCPT
+	by vger.kernel.org with ESMTP id S1757532Ab2JJWxz (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 10 Oct 2012 19:01:48 -0400
+	Wed, 10 Oct 2012 18:53:55 -0400
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: [ 031/122] localmodconfig: Fix localyesconfig to set to y not m
-Date: Thu, 11 Oct 2012 07:53:17 +0900
-Message-Id: <20121010225343.735598738@linuxfoundation.org>
-In-Reply-To: <20121010225337.989799482@linuxfoundation.org>
-References: <20121010225337.989799482@linuxfoundation.org>
+Subject: [ 024/133] localmodconfig: Fix localyesconfig to set to y not m
+Date: Thu, 11 Oct 2012 07:50:50 +0900
+Message-Id: <20121010224858.802232588@linuxfoundation.org>
+In-Reply-To: <20121010224854.313159132@linuxfoundation.org>
+References: <20121010224854.313159132@linuxfoundation.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, alan@lxorguk.ukuu.org.uk, Yuta Ando <yuta.and@gmail.com>, Steven Rostedt <rostedt@rostedt.homelinux.com>, linux-kbuild@vger.kernel.org
 
-3.6-stable review patch.  If anyone has any objections, please let me know.
+3.5-stable review patch.  If anyone has any objections, please let me know.
 
 ------------------
 
@@ -43,7 +43,7 @@ Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 
 --- a/scripts/kconfig/streamline_config.pl
 +++ b/scripts/kconfig/streamline_config.pl
-@@ -605,6 +605,8 @@ foreach my $line (@config_file) {
+@@ -463,6 +463,8 @@ while(<CIN>) {
  	if (defined($configs{$1})) {
  	    if ($localyesconfig) {
  	        $setconfigs{$1} = 'y';
