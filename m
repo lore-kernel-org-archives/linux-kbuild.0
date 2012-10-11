@@ -1,36 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:44279 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:44943 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751668Ab2JKUKk (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 11 Oct 2012 16:10:40 -0400
-Message-ID: <507727BB.9070505@suse.cz>
-Date: Thu, 11 Oct 2012 22:10:35 +0200
+	id S1757283Ab2JKU1m (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 11 Oct 2012 16:27:42 -0400
+Message-ID: <50772BB8.6080404@suse.cz>
+Date: Thu, 11 Oct 2012 22:27:36 +0200
 From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Subject: Re: [PATCH][RESEND] ignore generated binary file scripts/basic/hash
-References: <1349975049-6317-1-git-send-email-hamo.by@gmail.com>
-In-Reply-To: <1349975049-6317-1-git-send-email-hamo.by@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-2
+Subject: Re: Documentation of kconfig language differs from implementation
+ regarding existence of symbols
+References: <1940598.VZE8PFWQyj@tacticalops>
+In-Reply-To: <1940598.VZE8PFWQyj@tacticalops>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Yang Bai <hamo.by@gmail.com>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Martin Walch <walch.martin@gmx.de>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Randy Dunlap <rdunlap@xenotime.net>, Arnaud Lacombe <lacombar@gmail.com>
 
-Dne 11.10.2012 19:04, Yang Bai napsal(a):
-> Signed-off-by: Yang Bai <hamo.by@gmail.com>
-> ---
->  scripts/basic/.gitignore |    1 +
->  1 file changed, 1 insertion(+)
+Dne 10.10.2012 02:17, Martin Walch napsal(a):
+> The file linux/Documentation/kbuild/kconfig-language.txt says:
 > 
-> diff --git a/scripts/basic/.gitignore b/scripts/basic/.gitignore
-> index a776371..b372870 100644
-> --- a/scripts/basic/.gitignore
-> +++ b/scripts/basic/.gitignore
-> @@ -1 +1,2 @@
->  fixdep
-> +hash
+>> The following two methods produce the same kconfig symbol
+>> dependencies but differ greatly in kconfig symbol existence
+>> (production) in the generated config file.
+>> 
+>> case 1:
+>> 
+>> config FOO tristate "about foo" depends on BAR
+>> 
+>> vs. case 2:
+>> 
+>> if BAR config FOO tristate "about foo" endif
+>> 
+>> In case 1, the symbol FOO will always exist in the config file
+>> (given no other dependencies).  In case 2, the symbol FOO will
+>> only exist in the config file if BAR is enabled.
+> 
+> However, I can not reproduce this. The attached file contains both
+> cases. When running make menuconfig, setting BAR0 and BAR1 both to
+> n, and saving the configuration, there is neither FOO0 nor FOO1 in
+> the resulting configuration file.
 
-scripts/basic/hash.c has been removed two years ago.
+Indeed, that paragraph seems wrong. I think we should revert commit
+64b81ed. Randy, Arnaud?
 
+Thanks,
 Michal
+
