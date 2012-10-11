@@ -1,29 +1,29 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:47893 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:48356 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752376Ab2JKWAm (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 11 Oct 2012 18:00:42 -0400
-Date: Fri, 12 Oct 2012 00:00:40 +0200
+	id S1752632Ab2JKWTA (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 11 Oct 2012 18:19:00 -0400
+Date: Fri, 12 Oct 2012 00:18:42 +0200
 From: Michal Marek <mmarek@suse.cz>
-Subject: [GIT] kconfig changes for v3.7
-Message-ID: <20121011220040.GA7568@sepie.suse.cz>
+Subject: [GIT] kbuild misc changes for v3.7
+Message-ID: <20121011221841.GA7717@sepie.suse.cz>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: adam8157@gmail.com, bpoirier@suse.de, gouders@et.bocholt.fh-gelsenkirchen.de, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: Julia.Lawall@lip6.fr, lars@metafoo.de, mail@danrl.de, nicolas.palix@imag.fr, rdunlap@xenotime.net, tkhai@yandex.ru, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
 Hi Linus,
 
-kconfig in v3.7 is going to
-* initialize ncurses only once in menuconfig
-* be able to jump to a search result in menuconfig
-* change the misnomer oldnoconfig to a more meaningful name
-  olddefconfig, keeping the old name as alias
+in the non-critical part of kbuild, I have
+* Some make coccicheck improvements and two new tests
+* Support for a cleaner html output in scripts/kernel-doc, named html5
+  (no, it does not play videos, yet)
 
-Please pull from the below branch.
+BTW, Randy wants to route further kernel-doc patches through the kbuild
+tree.
 
 Thanks,
 Michal
@@ -34,37 +34,37 @@ The following changes since commit 0d7614f09c1ebdbaa1599a5aba7593f147bf96ee:
 
 are available in the git repository at:
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git kconfig
+  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git misc
 
-for you to fetch changes up to fb16d8912db5268f29706010ecafff74b971c58d:
+for you to fetch changes up to 26de9c26bf8557584c1977da92f3ed1b752291cf:
 
-  kconfig: replace 'oldnoconfig' with 'olddefconfig', and keep the old name as an alias (2012-09-27 18:18:07 +0200)
+  Update SmPL/Coccinelle section of MAINTAINERS (2012-10-11 15:20:03 +0200)
 
 ----------------------------------------------------------------
-Adam Lee (2):
-      kconfig: document oldnoconfig to what it really does in conf.c
-      kconfig: replace 'oldnoconfig' with 'olddefconfig', and keep the old name as an alias
+Dan Luedtke (1):
+      scripts/kernel-doc: added support for html5
 
-Benjamin Poirier (6):
-      menuconfig: Remove superfluous conditionnal
-      menuconfig: Extend dialog_textbox so that it can exit on arbitrary keypresses
-      menuconfig: Extend dialog_textbox so that it can return to a scrolled position
-      menuconfig: Add jump keys to search results
-      menuconfig: Do not open code textbox scroll up/down
-      menuconfig: Assign jump keys per-page instead of globally
+Julia Lawall (1):
+      scripts/coccinelle/tests/odd_ptr_err.cocci: semantic patch for IS_ERR/PTR_ERR inconsistency
 
-Dirk Gouders (1):
-      kconfig/mconf.c: revision of curses initialization.
+Kirill Tkhai (1):
+      scripts/tags.sh: Add magic for pci access functions
 
- scripts/kconfig/Makefile           |   12 ++-
- scripts/kconfig/conf.c             |   25 ++++--
- scripts/kconfig/expr.h             |   11 +++
- scripts/kconfig/lkc_proto.h        |    6 +-
- scripts/kconfig/lxdialog/dialog.h  |    9 +-
- scripts/kconfig/lxdialog/textbox.c |  171 ++++++++++++++++++++----------------
- scripts/kconfig/lxdialog/util.c    |    7 ++
- scripts/kconfig/mconf.c            |  123 ++++++++++++++++++++------
- scripts/kconfig/menu.c             |   53 +++++++++--
- scripts/kconfig/nconf.c            |    2 +-
- tools/testing/ktest/ktest.pl       |   15 ++--
- 11 files changed, 296 insertions(+), 138 deletions(-)
+Lars-Peter Clausen (1):
+      scripts/coccinelle: ptr_ret: Add ternary operator version
+
+Nicolas Palix (2):
+      coccicheck: Add the rep+ctxt mode
+      Update SmPL/Coccinelle section of MAINTAINERS
+
+Randy Dunlap (1):
+      scripts/kernel-doc: drop maintainer
+
+ MAINTAINERS                                |   11 +-
+ scripts/coccicheck                         |    3 +
+ scripts/coccinelle/api/ptr_ret.cocci       |   26 +++
+ scripts/coccinelle/tests/odd_ptr_err.cocci |   65 +++++++
+ scripts/kernel-doc                         |  273 +++++++++++++++++++++++++++-
+ scripts/tags.sh                            |    8 +-
+ 6 files changed, 369 insertions(+), 17 deletions(-)
+ create mode 100644 scripts/coccinelle/tests/odd_ptr_err.cocci
