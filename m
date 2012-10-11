@@ -1,32 +1,31 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:47796 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:47893 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1759433Ab2JKV4H (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 11 Oct 2012 17:56:07 -0400
-Date: Thu, 11 Oct 2012 23:56:04 +0200
+	id S1752376Ab2JKWAm (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 11 Oct 2012 18:00:42 -0400
+Date: Fri, 12 Oct 2012 00:00:40 +0200
 From: Michal Marek <mmarek@suse.cz>
-Subject: [GIT] kbuild changes for v3.7
-Message-ID: <20121011215604.GA6652@sepie.suse.cz>
+Subject: [GIT] kconfig changes for v3.7
+Message-ID: <20121011220040.GA7568@sepie.suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: ak@linux.intel.com, daniel.santos@pobox.com, kliegs@chromium.org, ozancag@gmail.com, urpapa@gmail.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: adam8157@gmail.com, bpoirier@suse.de, gouders@et.bocholt.fh-gelsenkirchen.de, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
 Hi Linus,
 
-The main part of kbuild for v3.7 contains:
-* Fix for scripts/Makefile.modpost to not choke on a '.ko' substring in
-  the build directory path
-* Two warning fixes (modpost and main Makefile)
-* __compiletime_error works also with gcc 4.3
-* make tar{gz,bz2,xz}-pkg uses default compression settings instead of
-  saving as many bytes as possible (this should actually be in the misc
-  branch, I don't know why I applied it here).
+kconfig in v3.7 is going to
+* initialize ncurses only once in menuconfig
+* be able to jump to a search result in menuconfig
+* change the misnomer oldnoconfig to a more meaningful name
+  olddefconfig, keeping the old name as alias
 
+Please pull from the below branch.
+
+Thanks,
 Michal
 
 The following changes since commit 0d7614f09c1ebdbaa1599a5aba7593f147bf96ee:
@@ -35,32 +34,37 @@ The following changes since commit 0d7614f09c1ebdbaa1599a5aba7593f147bf96ee:
 
 are available in the git repository at:
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git kbuild
+  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git kconfig
 
-for you to fetch changes up to 415c2c525fab214ab75413aadbc67b4ee9cf212e:
+for you to fetch changes up to fb16d8912db5268f29706010ecafff74b971c58d:
 
-  compiler-gcc4.h: correct verion check for __compiletime_error (2012-10-11 22:51:41 +0200)
+  kconfig: replace 'oldnoconfig' with 'olddefconfig', and keep the old name as an alias (2012-09-27 18:18:07 +0200)
 
 ----------------------------------------------------------------
-Andi Kleen (1):
-      Kbuild: use normal compression settings for tar*-pkg
+Adam Lee (2):
+      kconfig: document oldnoconfig to what it really does in conf.c
+      kconfig: replace 'oldnoconfig' with 'olddefconfig', and keep the old name as an alias
 
-Daniel Santos (1):
-      compiler-gcc4.h: correct verion check for __compiletime_error
+Benjamin Poirier (6):
+      menuconfig: Remove superfluous conditionnal
+      menuconfig: Extend dialog_textbox so that it can exit on arbitrary keypresses
+      menuconfig: Extend dialog_textbox so that it can return to a scrolled position
+      menuconfig: Add jump keys to search results
+      menuconfig: Do not open code textbox scroll up/down
+      menuconfig: Assign jump keys per-page instead of globally
 
-Jonathan Kliegman (1):
-      modpost: Permit .GCC.command.line sections
+Dirk Gouders (1):
+      kconfig/mconf.c: revision of curses initialization.
 
-Ozan Çağlayan (1):
-      kbuild: Remove useless warning while appending KCFLAGS
-
-이건호 (1):
-      scripts/Makefile.modpost: error in finding modules from .mod files.
-
- Makefile                      |   19 +++----------------
- include/linux/compiler-gcc4.h |    2 +-
- scripts/Makefile.modinst      |    2 +-
- scripts/Makefile.modpost      |    2 +-
- scripts/mod/modpost.c         |    1 +
- scripts/package/buildtar      |    6 +++---
- 6 files changed, 10 insertions(+), 22 deletions(-)
+ scripts/kconfig/Makefile           |   12 ++-
+ scripts/kconfig/conf.c             |   25 ++++--
+ scripts/kconfig/expr.h             |   11 +++
+ scripts/kconfig/lkc_proto.h        |    6 +-
+ scripts/kconfig/lxdialog/dialog.h  |    9 +-
+ scripts/kconfig/lxdialog/textbox.c |  171 ++++++++++++++++++++----------------
+ scripts/kconfig/lxdialog/util.c    |    7 ++
+ scripts/kconfig/mconf.c            |  123 ++++++++++++++++++++------
+ scripts/kconfig/menu.c             |   53 +++++++++--
+ scripts/kconfig/nconf.c            |    2 +-
+ tools/testing/ktest/ktest.pl       |   15 ++--
+ 11 files changed, 296 insertions(+), 138 deletions(-)
