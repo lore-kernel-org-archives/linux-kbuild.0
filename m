@@ -1,31 +1,66 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:45396 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:47796 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754856Ab2JKUod (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 11 Oct 2012 16:44:33 -0400
-Date: Thu, 11 Oct 2012 22:44:32 +0200
+	id S1759433Ab2JKV4H (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 11 Oct 2012 17:56:07 -0400
+Date: Thu, 11 Oct 2012 23:56:04 +0200
 From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [PATCH] modpost: Permit .GCC.command.line sections
-Message-ID: <20121011204432.GE16465@sepie.suse.cz>
-References: <1349382739-24838-1-git-send-email-kliegs@chromium.org>
+Subject: [GIT] kbuild changes for v3.7
+Message-ID: <20121011215604.GA6652@sepie.suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <1349382739-24838-1-git-send-email-kliegs@chromium.org>
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jonathan Kliegman <kliegs@chromium.org>
-Cc: linux-kbuild@vger.kernel.org
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: ak@linux.intel.com, daniel.santos@pobox.com, kliegs@chromium.org, ozancag@gmail.com, urpapa@gmail.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Thu, Oct 04, 2012 at 04:32:19PM -0400, Jonathan Kliegman wrote:
-> Allow .GCC.command.line sections in modules to prevent modpost warnings:
-> WARNING: sound/usb/snd-usbmidi-lib.o (.GCC.command.line): unexpected non-allocatable section.
-> Did you forget to use "ax"/"aw" in a .S file?
-> Note that for example <linux/init.h> contains
-> section definitions for use in .S files.
-> 
-> Signed-off-by: Jonathan Kliegman <kliegs@chromium.org>
+Hi Linus,
 
-Applied to kbuild.git#kbuild, thanks.
+The main part of kbuild for v3.7 contains:
+* Fix for scripts/Makefile.modpost to not choke on a '.ko' substring in
+  the build directory path
+* Two warning fixes (modpost and main Makefile)
+* __compiletime_error works also with gcc 4.3
+* make tar{gz,bz2,xz}-pkg uses default compression settings instead of
+  saving as many bytes as possible (this should actually be in the misc
+  branch, I don't know why I applied it here).
 
 Michal
+
+The following changes since commit 0d7614f09c1ebdbaa1599a5aba7593f147bf96ee:
+
+  Linux 3.6-rc1 (2012-08-02 16:38:10 -0700)
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git kbuild
+
+for you to fetch changes up to 415c2c525fab214ab75413aadbc67b4ee9cf212e:
+
+  compiler-gcc4.h: correct verion check for __compiletime_error (2012-10-11 22:51:41 +0200)
+
+----------------------------------------------------------------
+Andi Kleen (1):
+      Kbuild: use normal compression settings for tar*-pkg
+
+Daniel Santos (1):
+      compiler-gcc4.h: correct verion check for __compiletime_error
+
+Jonathan Kliegman (1):
+      modpost: Permit .GCC.command.line sections
+
+Ozan Çağlayan (1):
+      kbuild: Remove useless warning while appending KCFLAGS
+
+이건호 (1):
+      scripts/Makefile.modpost: error in finding modules from .mod files.
+
+ Makefile                      |   19 +++----------------
+ include/linux/compiler-gcc4.h |    2 +-
+ scripts/Makefile.modinst      |    2 +-
+ scripts/Makefile.modpost      |    2 +-
+ scripts/mod/modpost.c         |    1 +
+ scripts/package/buildtar      |    6 +++---
+ 6 files changed, 10 insertions(+), 22 deletions(-)
