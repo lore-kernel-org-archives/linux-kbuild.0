@@ -1,70 +1,42 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:48356 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752632Ab2JKWTA (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 11 Oct 2012 18:19:00 -0400
-Date: Fri, 12 Oct 2012 00:18:42 +0200
-From: Michal Marek <mmarek@suse.cz>
-Subject: [GIT] kbuild misc changes for v3.7
-Message-ID: <20121011221841.GA7717@sepie.suse.cz>
+Received: from ezexch.ezchip.com ([212.179.42.101]:27456 "EHLO
+	ezexch.ezchip.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757330Ab2JLN3B convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 12 Oct 2012 09:29:01 -0400
+From: Noam Camus <noamc@ezchip.com>
+Date: Fri, 12 Oct 2012 15:22:54 +0200
+Subject: Makefile race betwwen jobs
+Message-ID: <264C179F799EF24AB26D5319053335E80CC30499A3@ezexch.ezchip.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Julia.Lawall@lip6.fr, lars@metafoo.de, mail@danrl.de, nicolas.palix@imag.fr, rdunlap@xenotime.net, tkhai@yandex.ru, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>
 
-Hi Linus,
+Hello
 
-in the non-critical part of kbuild, I have
-* Some make coccicheck improvements and two new tests
-* Support for a cleaner html output in scripts/kernel-doc, named html5
-  (no, it does not play videos, yet)
+I encountered a race between targets scripts_basic and asm-generic (due -j2 make flag).
 
-BTW, Randy wants to route further kernel-doc patches through the kbuild
-tree.
+It happens when source tree is distcleaned (mrproper).
 
-Thanks,
-Michal
+First job:
+	running target asm-generic to generate all wrappers in architecure include/generated.
+Second job:
+	trying to compile empty.c since it is under target "always" which is dependency for __build.
 
-The following changes since commit 0d7614f09c1ebdbaa1599a5aba7593f147bf96ee:
+The error is because empty.o depends on some headers from arch/<arch>/include/generated/asm/.
 
-  Linux 3.6-rc1 (2012-08-02 16:38:10 -0700)
+This race is rare and can be very annoying.
 
-are available in the git repository at:
+My naive patch for root Makefile is:
+ # Basic helpers built in scripts/
+ PHONY += scripts_basic
+-scripts_basic:
++scripts_basic: asm-generic
+        $(Q)$(MAKE) $(build)=scripts/basic
+        $(Q)rm -f .tmp_quiet_recordmcount
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git misc
-
-for you to fetch changes up to 26de9c26bf8557584c1977da92f3ed1b752291cf:
-
-  Update SmPL/Coccinelle section of MAINTAINERS (2012-10-11 15:20:03 +0200)
-
-----------------------------------------------------------------
-Dan Luedtke (1):
-      scripts/kernel-doc: added support for html5
-
-Julia Lawall (1):
-      scripts/coccinelle/tests/odd_ptr_err.cocci: semantic patch for IS_ERR/PTR_ERR inconsistency
-
-Kirill Tkhai (1):
-      scripts/tags.sh: Add magic for pci access functions
-
-Lars-Peter Clausen (1):
-      scripts/coccinelle: ptr_ret: Add ternary operator version
-
-Nicolas Palix (2):
-      coccicheck: Add the rep+ctxt mode
-      Update SmPL/Coccinelle section of MAINTAINERS
-
-Randy Dunlap (1):
-      scripts/kernel-doc: drop maintainer
-
- MAINTAINERS                                |   11 +-
- scripts/coccicheck                         |    3 +
- scripts/coccinelle/api/ptr_ret.cocci       |   26 +++
- scripts/coccinelle/tests/odd_ptr_err.cocci |   65 +++++++
- scripts/kernel-doc                         |  273 +++++++++++++++++++++++++++-
- scripts/tags.sh                            |    8 +-
- 6 files changed, 369 insertions(+), 17 deletions(-)
- create mode 100644 scripts/coccinelle/tests/odd_ptr_err.cocci
+Noam Camus
