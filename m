@@ -1,42 +1,19 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp11.smtpout.orange.fr ([80.12.242.133]:52381 "EHLO
-	smtp.smtpout.orange.fr" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932587Ab2JLRXJ (ORCPT
+Received: from mail-ob0-f174.google.com ([209.85.214.174]:38633 "EHLO
+	mail-ob0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752232Ab2JNKcr (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 12 Oct 2012 13:23:09 -0400
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: Re: [PATH 0/3] kcofnig: get the CONFIG_ prefix from the environment
-Date: Fri, 12 Oct 2012 19:23:03 +0200
-References: <1349822793-1227-1-git-send-email-yann.morin.1998@free.fr>
-In-Reply-To: <1349822793-1227-1-git-send-email-yann.morin.1998@free.fr>
+	Sun, 14 Oct 2012 06:32:47 -0400
+Received: by mail-ob0-f174.google.com with SMTP id uo13so4086443obb.19
+        for <linux-kbuild@vger.kernel.org>; Sun, 14 Oct 2012 03:32:46 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-15"
-Content-Transfer-Encoding: 7bit
-Message-Id: <201210121923.04146.yann.morin.1998@free.fr>
+Date: Sun, 14 Oct 2012 13:32:46 +0300
+Message-ID: <CACVxJT_Gt3Ez5Qmzy7HPppAX8KyCDRX=jOThNkWOh-6V663zsQ@mail.gmail.com>
+Subject: 
+From: Alexey Dobriyan <adobriyan@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Michal Marek <mmarek@suse.cz>
+To: axboe@kernel.dk, linux-kbuild@vger.kernel.org, jbarnes@virtuousgeek.org, link@miggy.org, the.aidar@gmail.com
 
-Michal, All,
-
-On Wednesday 10 October 2012 00:46:30 Yann E. MORIN wrote:
-> This little patch series allows one to override the CONFIG_ prefix at 
-> runtime, without the need to rebuild the frontends.
-
-I know these came a bit late, but is there the slightest chance they get
-in for 3.7?
-
-If not, I'll have no one but myself to blame! ;-)
-
-Regards,
-Yann E. MORIN.
-
--- 
-.-----------------.--------------------.------------------.--------------------.
-|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
-| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
-| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
-| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
-'------------------------------^-------^------------------^--------------------'
+  http://www.thegrapevineagency.com/blog/wp-content/plugins/akismet/news.html
