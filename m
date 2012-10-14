@@ -1,19 +1,48 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ob0-f174.google.com ([209.85.214.174]:38633 "EHLO
-	mail-ob0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752232Ab2JNKcr (ORCPT
+Received: from einhorn.in-berlin.de ([192.109.42.8]:33205 "EHLO
+	einhorn.in-berlin.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751590Ab2JNR5d (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 14 Oct 2012 06:32:47 -0400
-Received: by mail-ob0-f174.google.com with SMTP id uo13so4086443obb.19
-        for <linux-kbuild@vger.kernel.org>; Sun, 14 Oct 2012 03:32:46 -0700 (PDT)
-MIME-Version: 1.0
-Date: Sun, 14 Oct 2012 13:32:46 +0300
-Message-ID: <CACVxJT_Gt3Ez5Qmzy7HPppAX8KyCDRX=jOThNkWOh-6V663zsQ@mail.gmail.com>
-Subject: 
-From: Alexey Dobriyan <adobriyan@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+	Sun, 14 Oct 2012 13:57:33 -0400
+Date: Sun, 14 Oct 2012 19:57:28 +0200
+From: Stefan Richter <stefanr@s5r6.in-berlin.de>
+Subject: new "Cputime accounting" kconfig prompt not "make oldconfig"
+ friendly
+Message-ID: <20121014195728.2746c32b@stein>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: axboe@kernel.dk, linux-kbuild@vger.kernel.org, jbarnes@virtuousgeek.org, link@miggy.org, the.aidar@gmail.com
+To: Frederic Weisbecker <fweisbec@gmail.com>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-  http://www.thegrapevineagency.com/blog/wp-content/plugins/akismet/news.html
+Hi Frederic,
+
+commit fdf9c356502a "cputime: Make finegrained irqtime accounting
+generally available" introduced a new kconfig prompt.  From the diff
+I can see that you also added help texts for two new options (and an
+old option already had its own help text).  But alas "make oldconfig"
+is unable to show these texts.
+
+    $ make oldconfig
+    [...]
+    * Restart config...
+    *
+    *
+    * CPU/Task time and stats accounting
+    *
+    Cputime accounting
+    > 1. Simple tick based cputime accounting (TICK_CPU_ACCOUNTING) (NEW)
+      2. Fine granularity task level IRQ time accounting (IRQ_TIME_ACCOUNTING)
+    choice[1-2]: ?
+    
+    There is no help available for this option.
+
+I wonder if make oldconfig could be made smarter about presenting
+help for choice prompts.  As a complication, this particular
+prompt's set of items differs from architecture to architecture.
+-- 
+Stefan Richter
+-=====-===-- =-=- -===-
+http://arcgraph.de/sr/
