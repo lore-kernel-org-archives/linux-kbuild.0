@@ -1,48 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from einhorn.in-berlin.de ([192.109.42.8]:33205 "EHLO
-	einhorn.in-berlin.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751590Ab2JNR5d (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 14 Oct 2012 13:57:33 -0400
-Date: Sun, 14 Oct 2012 19:57:28 +0200
-From: Stefan Richter <stefanr@s5r6.in-berlin.de>
-Subject: new "Cputime accounting" kconfig prompt not "make oldconfig"
- friendly
-Message-ID: <20121014195728.2746c32b@stein>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Received: from mprc.pku.edu.cn ([162.105.203.9]:46018 "EHLO mprc.pku.edu.cn"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751526Ab2JOJZS (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 15 Oct 2012 05:25:18 -0400
+From: Guan Xuetao <gxt@mprc.pku.edu.cn>
+Subject: [PATCH] unicore32: Use Kbuild infrastructure for kvm_para.h
+Date: Mon, 15 Oct 2012 17:23:27 +0800
+Message-Id: <1350293007-10237-1-git-send-email-gxt@mprc.pku.edu.cn>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Frederic Weisbecker <fweisbec@gmail.com>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: linux-kernel@vger.kernel.org
+Cc: Guan Xuetao <gxt@mprc.pku.edu.cn>, linux-kbuild@vger.kernel.org, Steven Rostedt <rostedt@goodmis.org>
 
-Hi Frederic,
+All the headers but kvm_para.h use the Kbuild infrastructure to
+get to the asm-generic headers.
 
-commit fdf9c356502a "cputime: Make finegrained irqtime accounting
-generally available" introduced a new kconfig prompt.  From the diff
-I can see that you also added help texts for two new options (and an
-old option already had its own help text).  But alas "make oldconfig"
-is unable to show these texts.
+Cc: linux-kbuild@vger.kernel.org
+Signed-off-by: Steven Rostedt <rostedt@goodmis.org>
+Signed-off-by: Guan Xuetao <gxt@mprc.pku.edu.cn>
+---
+ arch/unicore32/include/uapi/asm/Kbuild     |    2 ++
+ arch/unicore32/include/uapi/asm/kvm_para.h |    1 -
+ 2 files changed, 2 insertions(+), 1 deletions(-)
+ delete mode 100644 arch/unicore32/include/uapi/asm/kvm_para.h
 
-    $ make oldconfig
-    [...]
-    * Restart config...
-    *
-    *
-    * CPU/Task time and stats accounting
-    *
-    Cputime accounting
-    > 1. Simple tick based cputime accounting (TICK_CPU_ACCOUNTING) (NEW)
-      2. Fine granularity task level IRQ time accounting (IRQ_TIME_ACCOUNTING)
-    choice[1-2]: ?
-    
-    There is no help available for this option.
-
-I wonder if make oldconfig could be made smarter about presenting
-help for choice prompts.  As a complication, this particular
-prompt's set of items differs from architecture to architecture.
+diff --git a/arch/unicore32/include/uapi/asm/Kbuild b/arch/unicore32/include/uapi/asm/Kbuild
+index a44b1c4..0514d7a 100644
+--- a/arch/unicore32/include/uapi/asm/Kbuild
++++ b/arch/unicore32/include/uapi/asm/Kbuild
+@@ -6,3 +6,5 @@ header-y += kvm_para.h
+ header-y += ptrace.h
+ header-y += sigcontext.h
+ header-y += unistd.h
++
++generic-y += kvm_para.h
+diff --git a/arch/unicore32/include/uapi/asm/kvm_para.h b/arch/unicore32/include/uapi/asm/kvm_para.h
+deleted file mode 100644
+index 14fab8f..0000000
+--- a/arch/unicore32/include/uapi/asm/kvm_para.h
++++ /dev/null
+@@ -1 +0,0 @@
+-#include <asm-generic/kvm_para.h>
 -- 
-Stefan Richter
--=====-===-- =-=- -===-
-http://arcgraph.de/sr/
+1.7.0.4
+
