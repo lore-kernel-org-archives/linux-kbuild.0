@@ -1,51 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:58017 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752255Ab2JPM63 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 16 Oct 2012 08:58:29 -0400
-Date: Tue, 16 Oct 2012 08:58:21 -0400
-From: Benjamin Poirier <bpoirier@suse.de>
-Subject: Re: [menuconfig] build failure.
-Message-ID: <20121016125821.GA997@d2.synalogic.ca>
-References: <201210162049.HIC43747.OOtOJHFFFQMVSL@I-love.SAKURA.ne.jp>
+Received: from ezexch.ezchip.com ([212.179.42.101]:55868 "EHLO
+	ezexch.ezchip.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756445Ab2JQJgV convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 17 Oct 2012 05:36:21 -0400
+From: Noam Camus <noamc@ezchip.com>
+Date: Wed, 17 Oct 2012 11:35:39 +0200
+Subject: Race betwwen make jobs
+Message-ID: <264C179F799EF24AB26D5319053335E80CC3001309@ezexch.ezchip.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <201210162049.HIC43747.OOtOJHFFFQMVSL@I-love.SAKURA.ne.jp>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-Cc: mmarek@suse.cz, linux-kbuild@vger.kernel.org
+To: "mmarek@suse.cz" <mmarek@suse.cz>
+Cc: "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>
 
-Michal, do you think we're better off:
-* copying the CIRCLEQ macros from sys/queue.h (about 30 lines needed,
-  bsd licenced)
-* switching over to kernel-style linked lists using:
-	* a copy of tools/firewire/list.h
-	* #include "../../../include/linux/list.h" like perf does in
-	  tools/perf/util/include/linux/list.h
+Hello,
 
--Benjamin
+Once in a while make fails when source tree is distcleaned (mrproper).
+Actually it is while trying to compile scripts/mod/empty.c.
 
-On 2012/10/16 20:49, Tetsuo Handa wrote:
-> Hello.
-> 
-> Commit 95ac9b3b "menuconfig: Assign jump keys per-page instead of globally"
-> broke menuconfig on legacy environment (Debian Sarge). oops...
-> 
-> # make menuconfig
->   HOSTCC  scripts/kconfig/mconf.o
-> scripts/kconfig/mconf.c: In function `update_text':
-> scripts/kconfig/mconf.c:326: warning: implicit declaration of function `CIRCLEQ_FOREACH'
-> scripts/kconfig/mconf.c:326: error: `entries' undeclared (first use in this function)
-> scripts/kconfig/mconf.c:326: error: (Each undeclared identifier is reported only once
-> scripts/kconfig/mconf.c:326: error: for each function it appears in.)
-> scripts/kconfig/mconf.c:326: error: syntax error before '{' token
-> scripts/kconfig/mconf.c:333: error: `header' undeclared (first use in this function)
-> scripts/kconfig/mconf.c: At top level:
-> scripts/kconfig/mconf.c:343: error: syntax error before '}' token
-> scripts/kconfig/mconf.c: In function `search_conf':
-> scripts/kconfig/mconf.c:378: warning: implicit declaration of function `CIRCLEQ_HEAD_INITIALIZER'
-> scripts/kconfig/mconf.c:378: error: invalid initializer
-> make[1]: *** [scripts/kconfig/mconf.o] Error 1
-> make: *** [menuconfig] Error 2
+The error is because empty.o depends on some headers from arch/<arch>/include/generated/asm/.
+
+From my analysis I see that there is a race between two targets one is scripts_basic and the other is asm-generic (both in main Makefile).
+
+First target in make job:
+	running target asm-generic to generate all wrappers in architecure include/generated.
+
+Second target in make job:
+	trying to compile scripts/mod/empty.c since it is under target "always" which is dependency for __build (see scripts/Makefile.build).
+
+
+My naive patch for main Makefile is:
+ # Basic helpers built in scripts/
+ PHONY += scripts_basic
+-scripts_basic:
++scripts_basic: asm-generic
+        $(Q)$(MAKE) $(build)=scripts/basic
+        $(Q)rm -f .tmp_quiet_recordmcount
+
+
+Please comment.
+
+Noam Camus
