@@ -1,46 +1,115 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp02.smtpout.orange.fr ([80.12.242.124]:22545 "EHLO
+Received: from smtp02.smtpout.orange.fr ([80.12.242.124]:43845 "EHLO
 	smtp.smtpout.orange.fr" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754015Ab2JRTuV (ORCPT
+	with ESMTP id S1753839Ab2JRTuW (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 18 Oct 2012 15:50:21 -0400
+	Thu, 18 Oct 2012 15:50:22 -0400
 From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: [PATCH 0/3 v2] kconfig: get the CONFIG_ prefix from the environment
-Date: Thu, 18 Oct 2012 21:50:13 +0200
-Message-Id: <1350589816-20447-1-git-send-email-yann.morin.1998@free.fr>
+Subject: [PATCH 1/3] kconfig: remove CONFIG_ from string constants
+Date: Thu, 18 Oct 2012 21:50:14 +0200
+Message-Id: <1350589816-20447-2-git-send-email-yann.morin.1998@free.fr>
+In-Reply-To: <1350589816-20447-1-git-send-email-yann.morin.1998@free.fr>
+References: <1350589816-20447-1-git-send-email-yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: Michal Marek <mmarek@suse.cz>, linux-kernel@vger.kernel.org
+Cc: Michal Marek <mmarek@suse.cz>, linux-kernel@vger.kernel.org, "Yann E. MORIN" <yann.morin.1998@free.fr>
 
-Hello All!
+Having the CONFIG_ prefix in string constants gets in the way of
+using a run-time-defined CONFIG_ prefix.
 
-This little patch series allows one to override the CONFIG_ prefix at 
-runtime, without the need to rebuild the frontends.
+Fix that by using temp growable strings (gstr) in which we printf
+the text.
 
-This will be useful to have, to share the same kconfig frontends between
-different projects that may use different prefix. For example:
-  - busybox and uClibc use the standard 'CONFIG_'
-  - crosstool-NG uses 'CT_'
-  - PTXdist uses 'PTXCONF_'
-  - buildroot does not use a prefix at all
-  - and so on...
+Signed-off-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
+---
+ scripts/kconfig/mconf.c |   10 ++++++++--
+ scripts/kconfig/nconf.c |   11 +++++++++--
+ 2 files changed, 17 insertions(+), 4 deletions(-)
 
-    [PATCH 1/3] kconfig: remove CONFIG_ from string constants
-    [PATCH 2/3] kconfig: add a function to get the CONFIG_ prefix
-    [PATCH 3/3] kconfig: get CONFIG_ prefix from environment
+diff --git a/scripts/kconfig/mconf.c b/scripts/kconfig/mconf.c
+index 48f6744..5f29618 100644
+--- a/scripts/kconfig/mconf.c
++++ b/scripts/kconfig/mconf.c
+@@ -348,15 +348,19 @@ static void search_conf(void)
+ {
+ 	struct symbol **sym_arr;
+ 	struct gstr res;
++	struct gstr title;
+ 	char *dialog_input;
+ 	int dres, vscroll = 0, hscroll = 0;
+ 	bool again;
+ 
++	title = str_new();
++	str_printf( &title, _("Enter %s (sub)string to search for "
++			      "(with or without \"%s\")"), CONFIG_, CONFIG_);
++
+ again:
+ 	dialog_clear();
+ 	dres = dialog_inputbox(_("Search Configuration Parameter"),
+-			      _("Enter " CONFIG_ " (sub)string to search for "
+-				"(with or without \"" CONFIG_ "\")"),
++			      str_get(&title),
+ 			      10, 75, "");
+ 	switch (dres) {
+ 	case 0:
+@@ -365,6 +369,7 @@ again:
+ 		show_helptext(_("Search Configuration"), search_help);
+ 		goto again;
+ 	default:
++		str_free(&title);
+ 		return;
+ 	}
+ 
+@@ -398,6 +403,7 @@ again:
+ 		str_free(&res);
+ 	} while (again);
+ 	free(sym_arr);
++	str_free(&title);
+ }
+ 
+ static void build_conf(struct menu *menu)
+diff --git a/scripts/kconfig/nconf.c b/scripts/kconfig/nconf.c
+index 87d4b15..261f926 100644
+--- a/scripts/kconfig/nconf.c
++++ b/scripts/kconfig/nconf.c
+@@ -696,13 +696,18 @@ static void search_conf(void)
+ {
+ 	struct symbol **sym_arr;
+ 	struct gstr res;
++	struct gstr title;
+ 	char *dialog_input;
+ 	int dres;
++
++	title = str_new();
++	str_printf( &title, _("Enter %s (sub)string to search for "
++			      "(with or without \"%s\")"), CONFIG_, CONFIG_);
++
+ again:
+ 	dres = dialog_inputbox(main_window,
+ 			_("Search Configuration Parameter"),
+-			_("Enter " CONFIG_ " (sub)string to search for "
+-				"(with or without \"" CONFIG_ "\")"),
++			str_get(&title),
+ 			"", &dialog_input_result, &dialog_input_result_len);
+ 	switch (dres) {
+ 	case 0:
+@@ -712,6 +717,7 @@ again:
+ 				_("Search Configuration"), search_help);
+ 		goto again;
+ 	default:
++		str_free(&title);
+ 		return;
+ 	}
+ 
+@@ -726,6 +732,7 @@ again:
+ 	show_scroll_win(main_window,
+ 			_("Search Results"), str_get(&res));
+ 	str_free(&res);
++	str_free(&title);
+ }
+ 
+ 
+-- 
+1.7.2.5
 
-This is part of my efforts to get a generic package that encapsulates the
-kconfig frontends and parser into a standalone package, to make it easy
-for third-party projects to easily sync (and ultimately share) their
-kconfig infrastructure:
-    kconfig-frontends
-    http://ymorin.is-a-geek.org/projects/kconfig-frontends
-
-Changes this v1:
-  - call getenv() only once
-  - don't touch code when not strictly neeeded (don't fold not-so-long lines)
-  - rebase on-top 3.7-rc1
-
-Regards,
-Yann E. MORIN.
