@@ -1,55 +1,101 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wi0-f194.google.com ([209.85.212.194]:32945 "EHLO
-	mail-wi0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752174Ab2JQWr6 (ORCPT
+Received: from smtp10.smtpout.orange.fr ([80.12.242.132]:39608 "EHLO
+	smtp.smtpout.orange.fr" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932630Ab2JRRdv (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 17 Oct 2012 18:47:58 -0400
-Received: by mail-wi0-f194.google.com with SMTP id hr7so499522wib.1
-        for <linux-kbuild@vger.kernel.org>; Wed, 17 Oct 2012 15:47:57 -0700 (PDT)
+	Thu, 18 Oct 2012 13:33:51 -0400
 From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: Re: [menuconfig] build failure.
-Date: Thu, 18 Oct 2012 00:47:54 +0200
-References: <201210162049.HIC43747.OOtOJHFFFQMVSL@I-love.SAKURA.ne.jp> <20121016125821.GA997@d2.synalogic.ca>
-In-Reply-To: <20121016125821.GA997@d2.synalogic.ca>
-MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-1"
-Content-Transfer-Encoding: 7bit
-Message-Id: <201210180047.55038.yann.morin.1998@free.fr>
+Subject: [PATCH] kconfig/menuconfig: use TAILQ instead of CIRCLEQ
+Date: Thu, 18 Oct 2012 19:33:45 +0200
+Message-Id: <1350581625-23153-1-git-send-email-yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Benjamin Poirier <bpoirier@suse.de>, Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>, mmarek@suse.cz
+To: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: Michal Marek <mmarek@suse.cz>, Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>, Benjamin Poirier <bpoirier@suse.de>, "Yann E. MORIN" <yann.morin.1998@free.fr>, Yaakov Selkowitz <yselkowitz@gmail.com>
 
-Michal, Tetsuo, Benjamin, All,
+Some systems (eg. Cygwin, FreeBSD) are missing the CIRCLEQ macros.
+They were removed in Y2000 from FreeBSD:
+    http://svnweb.freebsd.org/base?view=revision&revision=70469
 
-On Tuesday 16 October 2012 Benjamin Poirier wrote:
-> Michal, do you think we're better off:
-> * copying the CIRCLEQ macros from sys/queue.h (about 30 lines needed,
->   bsd licenced)
-> * switching over to kernel-style linked lists using:
-> 	* a copy of tools/firewire/list.h
-> 	* #include "../../../include/linux/list.h" like perf does in
-> 	  tools/perf/util/include/linux/list.h
-> 
-> -Benjamin
-> 
-> On 2012/10/16 20:49, Tetsuo Handa wrote:
-> > Hello.
-> > 
-> > Commit 95ac9b3b "menuconfig: Assign jump keys per-page instead of globally"
-> > broke menuconfig on legacy environment (Debian Sarge). oops...
+The reason was that TAILQ are perfectly capable of doing the exact
+same things:
+    http://www.mavetju.org/mail/view_thread.php?list=freebsd-arch&id=915145&thread=yes
 
-It also breaks building on Cygwin, because Cygwin does not have the
-CIRCLEQ macros in sys/queue.h (it does not even have it all).
+(Thank Yaakov for the pointers!)
 
-Regards,
-Yann E. MORIN.
+So, switch to using TAILQ instead, which are more portable.
 
+Reported-by: Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+Reported-by: Benjamin Poirier <bpoirier@suse.de>
+Signed-off-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Cc: Yaakov Selkowitz <yselkowitz@gmail.com>
+---
+ scripts/kconfig/expr.h  |    4 ++--
+ scripts/kconfig/mconf.c |    4 ++--
+ scripts/kconfig/menu.c  |    6 +++---
+ 3 files changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/scripts/kconfig/expr.h b/scripts/kconfig/expr.h
+index bd2e098..c6a8b99 100644
+--- a/scripts/kconfig/expr.h
++++ b/scripts/kconfig/expr.h
+@@ -175,12 +175,12 @@ struct menu {
+ #define MENU_ROOT		0x0002
+ 
+ struct jump_key {
+-	CIRCLEQ_ENTRY(jump_key) entries;
++	TAILQ_ENTRY(jump_key) entries;
+ 	size_t offset;
+ 	struct menu *target;
+ 	int index;
+ };
+-CIRCLEQ_HEAD(jk_head, jump_key);
++TAILQ_HEAD(jk_head, jump_key);
+ 
+ #define JUMP_NB			9
+ 
+diff --git a/scripts/kconfig/mconf.c b/scripts/kconfig/mconf.c
+index 48f6744..f1ee1c9 100644
+--- a/scripts/kconfig/mconf.c
++++ b/scripts/kconfig/mconf.c
+@@ -323,7 +323,7 @@ static void update_text(char *buf, size_t start, size_t end, void *_data)
+ 	struct jump_key *pos;
+ 	int k = 0;
+ 
+-	CIRCLEQ_FOREACH(pos, data->head, entries) {
++	TAILQ_FOREACH(pos, data->head, entries) {
+ 		if (pos->offset >= start && pos->offset < end) {
+ 			char header[4];
+ 
+@@ -375,7 +375,7 @@ again:
+ 
+ 	sym_arr = sym_re_search(dialog_input);
+ 	do {
+-		struct jk_head head = CIRCLEQ_HEAD_INITIALIZER(head);
++		struct jk_head head = TAILQ_HEAD_INITIALIZER(head);
+ 		struct menu *targets[JUMP_NB];
+ 		int keys[JUMP_NB + 1], i;
+ 		struct search_data data = {
+diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
+index a3cade6..9eff451 100644
+--- a/scripts/kconfig/menu.c
++++ b/scripts/kconfig/menu.c
+@@ -544,12 +544,12 @@ static void get_prompt_str(struct gstr *r, struct property *prop,
+ 		} else
+ 			jump->target = location;
+ 
+-		if (CIRCLEQ_EMPTY(head))
++		if (TAILQ_EMPTY(head))
+ 			jump->index = 0;
+ 		else
+-			jump->index = CIRCLEQ_LAST(head)->index + 1;
++			jump->index = TAILQ_LAST(head, jk_head)->index + 1;
+ 
+-		CIRCLEQ_INSERT_TAIL(head, jump, entries);
++		TAILQ_INSERT_TAIL(head, jump, entries);
+ 	}
+ 
+ 	if (i > 0) {
 -- 
-.-----------------.--------------------.------------------.--------------------.
-|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
-| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
-| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
-| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
-'------------------------------^-------^------------------^--------------------'
+1.7.2.5
+
