@@ -1,57 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wg0-f66.google.com ([74.125.82.66]:62541 "EHLO
-	mail-wg0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752842Ab2JRTMV (ORCPT
+Received: from smtp02.smtpout.orange.fr ([80.12.242.124]:22545 "EHLO
+	smtp.smtpout.orange.fr" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754015Ab2JRTuV (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 18 Oct 2012 15:12:21 -0400
+	Thu, 18 Oct 2012 15:50:21 -0400
 From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: Re: [PATCH] kconfig/menuconfig: use TAILQ instead of CIRCLEQ
-Date: Thu, 18 Oct 2012 20:59:11 +0200
-References: <1350581625-23153-1-git-send-email-yann.morin.1998@free.fr> <1350582958.3492.81.camel@YAAKOV04>
-In-Reply-To: <1350582958.3492.81.camel@YAAKOV04>
-MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <201210182059.11499.yann.morin.1998@free.fr>
+Subject: [PATCH 0/3 v2] kconfig: get the CONFIG_ prefix from the environment
+Date: Thu, 18 Oct 2012 21:50:13 +0200
+Message-Id: <1350589816-20447-1-git-send-email-yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: "Yaakov (Cygwin/X)" <yselkowitz@users.sourceforge.net>, linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>, Benjamin Poirier <bpoirier@suse.de>
+Cc: Michal Marek <mmarek@suse.cz>, linux-kernel@vger.kernel.org
 
-Yaakov, All,
+Hello All!
 
-On Thursday 18 October 2012 Yaakov (Cygwin/X) wrote:
-> On Thu, 2012-10-18 at 19:33 +0200, Yann E. MORIN wrote:
-> > Some systems (eg. Cygwin, FreeBSD) are missing the CIRCLEQ macros.
-> > They were removed in Y2000 from FreeBSD:
-> >     http://svnweb.freebsd.org/base?view=revision&revision=70469
-> > 
-> > The reason was that TAILQ are perfectly capable of doing the exact
-> > same things:
-> >     http://www.mavetju.org/mail/view_thread.php?list=freebsd-arch&id=915145&thread=yes
-> > 
-> > (Thank Yaakov for the pointers!)
-> 
-> And thank you again for the heads-up.
-> 
-> > So, switch to using TAILQ instead, which are more portable.
-> > 
-> > Reported-by: Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-> > Reported-by: Benjamin Poirier <bpoirier@suse.de>
-> > Signed-off-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
-> 
-> Tested-by: Yaakov Selkowitz <yselkowitz@users.sourceforge.net>
+This little patch series allows one to override the CONFIG_ prefix at 
+runtime, without the need to rebuild the frontends.
 
-Out of curiosity: did you test on Cygwin?
+This will be useful to have, to share the same kconfig frontends between
+different projects that may use different prefix. For example:
+  - busybox and uClibc use the standard 'CONFIG_'
+  - crosstool-NG uses 'CT_'
+  - PTXdist uses 'PTXCONF_'
+  - buildroot does not use a prefix at all
+  - and so on...
+
+    [PATCH 1/3] kconfig: remove CONFIG_ from string constants
+    [PATCH 2/3] kconfig: add a function to get the CONFIG_ prefix
+    [PATCH 3/3] kconfig: get CONFIG_ prefix from environment
+
+This is part of my efforts to get a generic package that encapsulates the
+kconfig frontends and parser into a standalone package, to make it easy
+for third-party projects to easily sync (and ultimately share) their
+kconfig infrastructure:
+    kconfig-frontends
+    http://ymorin.is-a-geek.org/projects/kconfig-frontends
+
+Changes this v1:
+  - call getenv() only once
+  - don't touch code when not strictly neeeded (don't fold not-so-long lines)
+  - rebase on-top 3.7-rc1
 
 Regards,
 Yann E. MORIN.
-
--- 
-.-----------------.--------------------.------------------.--------------------.
-|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
-| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
-| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
-| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
-'------------------------------^-------^------------------^--------------------'
