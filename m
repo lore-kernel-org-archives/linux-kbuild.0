@@ -1,50 +1,79 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wi0-f194.google.com ([209.85.212.194]:59013 "EHLO
-	mail-wi0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755395Ab2JSXGg (ORCPT
+Received: from mail-we0-f174.google.com ([74.125.82.174]:59616 "EHLO
+	mail-we0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1758501Ab2JSXGj (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 19 Oct 2012 19:06:36 -0400
+	Fri, 19 Oct 2012 19:06:39 -0400
 From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: [PATCH 0/3 v3] kconfig: get the CONFIG_ prefix from the environment
-Date: Sat, 20 Oct 2012 01:06:22 +0200
-Message-Id: <1350687985-21053-1-git-send-email-yann.morin.1998@free.fr>
+Subject: [PATCH 3/3] kconfig: get CONFIG_ prefix from the environment
+Date: Sat, 20 Oct 2012 01:06:25 +0200
+Message-Id: <1350687985-21053-4-git-send-email-yann.morin.1998@free.fr>
+In-Reply-To: <1350687985-21053-1-git-send-email-yann.morin.1998@free.fr>
+References: <1350687985-21053-1-git-send-email-yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: Michal Marek <mmarek@suse.cz>, linux-kernel@vger.kernel.org
+Cc: Michal Marek <mmarek@suse.cz>, linux-kernel@vger.kernel.org, "Yann E. MORIN" <yann.morin.1998@free.fr>
 
-Hello All!
+Currently, the CONFIG_ prefix is hard-coded in the kconfig frontends
+executables. This means that two projects that use kconfig with
+different prefixes can not share the same kconfig frontends.
 
-This little patch series allows one to override the CONFIG_ prefix at 
-runtime, without the need to rebuild the frontends.
+Instead of hard-coding the prefix in the frontends, get it from the
+environment, and revert back to hard-coded value if not found.
 
-This will be useful to have, to share the same kconfig frontends between
-different projects that may use different prefix. For example:
-  - busybox and uClibc use the standard 'CONFIG_'
-  - crosstool-NG uses 'CT_'
-  - PTXdist uses 'PTXCONF_'
-  - buildroot does not use a prefix at all
-  - and so on...
+Signed-off-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
+---
+ scripts/kconfig/gconf.c |    2 +-
+ scripts/kconfig/lkc.h   |    2 +-
+ scripts/kconfig/nconf.c |    1 +
+ 3 files changed, 3 insertions(+), 2 deletions(-)
 
-    [PATCH 1/3] kconfig: remove CONFIG_ from string constants
-    [PATCH 2/3] kconfig: add a function to get the CONFIG_ prefix
-    [PATCH 3/3] kconfig: get CONFIG_ prefix from environment
-
-This is part of my efforts to get a generic package that encapsulates the
-kconfig frontends and parser into a standalone package, to make it easy
-for third-party projects to easily sync (and ultimately share) their
-kconfig infrastructure:
-    kconfig-frontends
-    http://ymorin.is-a-geek.org/projects/kconfig-frontends
-
-Changes in v3:
-  - simplify the CONFIG_prefix() function (Michal)
-  - rebase on-top master to date
-Changes in v2:
-  - call getenv() only once
-  - don't touch code when not strictly neeeded (don't fold not-so-long lines)
-  - rebase on-top 3.7-rc1
-
-Regards,
-Yann E. MORIN.
+diff --git a/scripts/kconfig/gconf.c b/scripts/kconfig/gconf.c
+index adc2306..f2bee70 100644
+--- a/scripts/kconfig/gconf.c
++++ b/scripts/kconfig/gconf.c
+@@ -10,6 +10,7 @@
+ #  include <config.h>
+ #endif
+ 
++#include <stdlib.h>
+ #include "lkc.h"
+ #include "images.c"
+ 
+@@ -22,7 +23,6 @@
+ #include <string.h>
+ #include <unistd.h>
+ #include <time.h>
+-#include <stdlib.h>
+ 
+ //#define DEBUG
+ 
+diff --git a/scripts/kconfig/lkc.h b/scripts/kconfig/lkc.h
+index 7aa9db0..7577a7f 100644
+--- a/scripts/kconfig/lkc.h
++++ b/scripts/kconfig/lkc.h
+@@ -41,7 +41,7 @@ extern "C" {
+ #endif
+ static inline const char *CONFIG_prefix(void)
+ {
+-	return CONFIG_;
++	return getenv( "CONFIG_" ) ?: CONFIG_;
+ }
+ #undef CONFIG_
+ #define CONFIG_ CONFIG_prefix()
+diff --git a/scripts/kconfig/nconf.c b/scripts/kconfig/nconf.c
+index 261f926..ce93e87 100644
+--- a/scripts/kconfig/nconf.c
++++ b/scripts/kconfig/nconf.c
+@@ -7,6 +7,7 @@
+  */
+ #define _GNU_SOURCE
+ #include <string.h>
++#include <stdlib.h>
+ 
+ #include "lkc.h"
+ #include "nconf.h"
+-- 
+1.7.2.5
 
