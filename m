@@ -1,65 +1,44 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from www262.sakura.ne.jp ([202.181.97.72]:59385 "EHLO
-	www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751194Ab2JSOq1 (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 19 Oct 2012 10:46:27 -0400
-Subject: Re: [menuconfig] build failure.
-From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-References: <201210162049.HIC43747.OOtOJHFFFQMVSL@I-love.SAKURA.ne.jp>
-	<20121016125821.GA997@d2.synalogic.ca>
-In-Reply-To: <20121016125821.GA997@d2.synalogic.ca>
-Message-Id: <201210192346.CEF90655.tVFFSOOFOHQLMJ@I-love.SAKURA.ne.jp>
-Date: Fri, 19 Oct 2012 23:46:11 +0900
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Received: from cantor2.suse.de ([195.135.220.15]:57913 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1757599Ab2JSOyZ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 19 Oct 2012 10:54:25 -0400
+Message-ID: <5081699B.4020203@suse.cz>
+Date: Fri, 19 Oct 2012 16:54:19 +0200
+From: Michal Marek <mmarek@suse.cz>
+MIME-Version: 1.0
+Subject: Re: [PATCH] kconfig/menuconfig: use TAILQ instead of CIRCLEQ
+References: <1350581625-23153-1-git-send-email-yann.morin.1998@free.fr> <201210192110.CII57863.VOStFJQFMLHOFO@I-love.SAKURA.ne.jp>
+In-Reply-To: <201210192110.CII57863.VOStFJQFMLHOFO@I-love.SAKURA.ne.jp>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: bpoirier@suse.de
-Cc: mmarek@suse.cz, linux-kbuild@vger.kernel.org
+To: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+Cc: yann.morin.1998@free.fr, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, bpoirier@suse.de, yselkowitz@gmail.com
 
-Benjamin Poirier wrote:
-> Michal, do you think we're better off:
-> * copying the CIRCLEQ macros from sys/queue.h (about 30 lines needed,
->   bsd licenced)
+On 19.10.2012 14:10, Tetsuo Handa wrote:
+> Yann E. MORIN wrote:
+>> So, switch to using TAILQ instead, which are more portable.
+[...]
+> Excuse me, but your patch does not solve my problem because kconfig started
+> using macros which does not exist in "@(#)queue.h 8.3 (Berkeley) 12/13/93".
+> Kconfig still fails after applying your patch:
+> 
+>   HOSTCC  scripts/kconfig/mconf.o
+> scripts/kconfig/mconf.c: In function `update_text':
+> scripts/kconfig/mconf.c:326: warning: implicit declaration of function `TAILQ_FOREACH'
+[...]
+> scripts/kconfig/mconf.c:378: warning: implicit declaration of function `TAILQ_HEAD_INITIALIZER'
+> 
+> So, would you add something which looks like "sed -e 's/CIRCLEQ/TAILQ/g'" upon
+> https://lkml.org/lkml/2012/10/16/274 ?
 
-Oops, I didn't notice that sys/queue.h is bsd licenced.
-Then, how can we use missing CIRCLEQ macros (from gpl licenced
-scripts/kconfig/ files) which is not defined inside bsd licenced
-old sys/queue.h but is defined inside bsd licenced new sys/queue.h ?
-Is it OK to copy these missing CIRCLEQ macros from bsd licenced new
-sys/queue.h to gpl licenced scripts/kconfig/expr.h ?
-Or, create a separate file containing only missing CIRCLEQ macros
-and #include it (provided that userland tools included in linux's
-tarball accepts bsd licenced file)?
+Could you reduce that patch to not copy all of queue.h?
+TAILQ_HEAD_INITIALIZER can be replaced by a TAILQ_INIT() call after
+variable definitions, and we do not need stuff like
+TAILQ_FOREACH_REVERSE. The other option is to reimplement the needed
+operations under a different name, so that people don't accidentally use
+other macros that are missing in old queue.h revisions.
 
-> * switching over to kernel-style linked lists using:
-> 	* a copy of tools/firewire/list.h
-> 	* #include "../../../include/linux/list.h" like perf does in
-> 	  tools/perf/util/include/linux/list.h
-> 
-> -Benjamin
-> 
-> On 2012/10/16 20:49, Tetsuo Handa wrote:
-> > Hello.
-> > 
-> > Commit 95ac9b3b "menuconfig: Assign jump keys per-page instead of globally"
-> > broke menuconfig on legacy environment (Debian Sarge). oops...
-> > 
-> > # make menuconfig
-> >   HOSTCC  scripts/kconfig/mconf.o
-> > scripts/kconfig/mconf.c: In function `update_text':
-> > scripts/kconfig/mconf.c:326: warning: implicit declaration of function `CIRCLEQ_FOREACH'
-> > scripts/kconfig/mconf.c:326: error: `entries' undeclared (first use in this function)
-> > scripts/kconfig/mconf.c:326: error: (Each undeclared identifier is reported only once
-> > scripts/kconfig/mconf.c:326: error: for each function it appears in.)
-> > scripts/kconfig/mconf.c:326: error: syntax error before '{' token
-> > scripts/kconfig/mconf.c:333: error: `header' undeclared (first use in this function)
-> > scripts/kconfig/mconf.c: At top level:
-> > scripts/kconfig/mconf.c:343: error: syntax error before '}' token
-> > scripts/kconfig/mconf.c: In function `search_conf':
-> > scripts/kconfig/mconf.c:378: warning: implicit declaration of function `CIRCLEQ_HEAD_INITIALIZER'
-> > scripts/kconfig/mconf.c:378: error: invalid initializer
-> > make[1]: *** [scripts/kconfig/mconf.o] Error 1
-> > make: *** [menuconfig] Error 2
-> 
+Michal
