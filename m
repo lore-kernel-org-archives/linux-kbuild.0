@@ -1,38 +1,55 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:33507 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754060Ab2JSRBW (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 19 Oct 2012 13:01:22 -0400
-Message-ID: <5081875D.90105@suse.cz>
-Date: Fri, 19 Oct 2012 19:01:17 +0200
-From: Michal Marek <mmarek@suse.cz>
-MIME-Version: 1.0
+Received: from mail-wi0-f194.google.com ([209.85.212.194]:64420 "EHLO
+	mail-wi0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1759065Ab2JSR7r (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 19 Oct 2012 13:59:47 -0400
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
 Subject: Re: [PATCH 2/3] kconfig: add a function to get the CONFIG_ prefix
-References: <1350589816-20447-1-git-send-email-yann.morin.1998@free.fr> <1350589816-20447-3-git-send-email-yann.morin.1998@free.fr>
-In-Reply-To: <1350589816-20447-3-git-send-email-yann.morin.1998@free.fr>
-Content-Type: text/plain; charset=ISO-8859-2
+Date: Fri, 19 Oct 2012 19:59:40 +0200
+References: <1350589816-20447-1-git-send-email-yann.morin.1998@free.fr> <1350589816-20447-3-git-send-email-yann.morin.1998@free.fr> <5081875D.90105@suse.cz>
+In-Reply-To: <5081875D.90105@suse.cz>
+MIME-Version: 1.0
+Content-Type: Text/Plain;
+  charset="iso-8859-2"
 Content-Transfer-Encoding: 7bit
+Message-Id: <201210191959.40851.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Yann E. MORIN" <yann.morin.1998@free.fr>
+To: Michal Marek <mmarek@suse.cz>
 Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On 18.10.2012 21:50, Yann E. MORIN wrote:
-> -#ifndef CONFIG_
-> -#define CONFIG_ "CONFIG_"
-> +/* Those two defines copied from include/linux/stringify.h */
-> +#define __stringify_1(x...)	#x
-> +#define __stringify(x...)	__stringify_1(x)
-> +static inline const char *CONFIG_prefix(void)
-> +{
-> +	return __stringify(CONFIG_);
+Michal, All,
 
-This changes the semantics of the CONFIG_ macro. Previously, a
-double-quoted string was accepted, now you have to define it to a token
-that is turned into a string. Why don't you keep it as before and just do a
+On Friday 19 October 2012 Michal Marek wrote:
+> On 18.10.2012 21:50, Yann E. MORIN wrote:
+> > -#ifndef CONFIG_
+> > -#define CONFIG_ "CONFIG_"
+> > +/* Those two defines copied from include/linux/stringify.h */
+> > +#define __stringify_1(x...)	#x
+> > +#define __stringify(x...)	__stringify_1(x)
+> > +static inline const char *CONFIG_prefix(void)
+> > +{
+> > +	return __stringify(CONFIG_);
+> 
+> This changes the semantics of the CONFIG_ macro. Previously, a
+> double-quoted string was accepted, now you have to define it to a token
+> that is turned into a string. Why don't you keep it as before and just do a
+> 
+> return CONFIG_;
+> 
+> in the function?
 
-return CONFIG_;
+Yes, that's as simple as it looks, indeed. /me hides.
 
-in the function?
+Thank you!
+Regards,
+Yann E. MORIN.
 
-Michal
+-- 
+.-----------------.--------------------.------------------.--------------------.
+|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
+| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
+| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
+| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
+'------------------------------^-------^------------------^--------------------'
