@@ -1,55 +1,82 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wi0-f194.google.com ([209.85.212.194]:64420 "EHLO
-	mail-wi0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1759065Ab2JSR7r (ORCPT
+Received: from g4t0014.houston.hp.com ([15.201.24.17]:7250 "EHLO
+	g4t0014.houston.hp.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1758203Ab2JSTxZ (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 19 Oct 2012 13:59:47 -0400
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: Re: [PATCH 2/3] kconfig: add a function to get the CONFIG_ prefix
-Date: Fri, 19 Oct 2012 19:59:40 +0200
-References: <1350589816-20447-1-git-send-email-yann.morin.1998@free.fr> <1350589816-20447-3-git-send-email-yann.morin.1998@free.fr> <5081875D.90105@suse.cz>
-In-Reply-To: <5081875D.90105@suse.cz>
-MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-2"
+	Fri, 19 Oct 2012 15:53:25 -0400
+Message-ID: <1350676398.1169.6.camel@MikesLinux.fc.hp.com>
+Subject: Re: [PATCH] mm: memmap_init_zone() performance improvement
+From: Mike Yoknis <mike.yoknis@hp.com>
+Reply-To: mike.yoknis@hp.com
+Date: Fri, 19 Oct 2012 13:53:18 -0600
+In-Reply-To: <1349794597.29752.10.camel@MikesLinux.fc.hp.com>
+References: <1349276174-8398-1-git-send-email-mike.yoknis@hp.com>
+	 <20121008151656.GM29125@suse.de>
+	 <1349794597.29752.10.camel@MikesLinux.fc.hp.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
-Message-Id: <201210191959.40851.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Mel Gorman <mgorman@suse.de>
+Cc: mingo@redhat.com, akpm@linux-foundation.org, linux-arch@vger.kernel.org, mmarek@suse.cz, tglx@linutronix.de, hpa@zytor.com, arnd@arndb.de, sam@ravnborg.org, minchan@kernel.org, kamezawa.hiroyu@jp.fujitsu.com, mhocko@suse.cz, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org
 
-Michal, All,
-
-On Friday 19 October 2012 Michal Marek wrote:
-> On 18.10.2012 21:50, Yann E. MORIN wrote:
-> > -#ifndef CONFIG_
-> > -#define CONFIG_ "CONFIG_"
-> > +/* Those two defines copied from include/linux/stringify.h */
-> > +#define __stringify_1(x...)	#x
-> > +#define __stringify(x...)	__stringify_1(x)
-> > +static inline const char *CONFIG_prefix(void)
-> > +{
-> > +	return __stringify(CONFIG_);
+On Tue, 2012-10-09 at 08:56 -0600, Mike Yoknis wrote:
+> On Mon, 2012-10-08 at 16:16 +0100, Mel Gorman wrote:
+> > On Wed, Oct 03, 2012 at 08:56:14AM -0600, Mike Yoknis wrote:
+> > > memmap_init_zone() loops through every Page Frame Number (pfn),
+> > > including pfn values that are within the gaps between existing
+> > > memory sections.  The unneeded looping will become a boot
+> > > performance issue when machines configure larger memory ranges
+> > > that will contain larger and more numerous gaps.
+> > > 
+> > > The code will skip across invalid sections to reduce the
+> > > number of loops executed.
+> > > 
+> > > Signed-off-by: Mike Yoknis <mike.yoknis@hp.com>
+> > 
+> > I do not see the need for
+> > the additional complexity unless you can show it makes a big difference
+> > to boot times.
+> > 
 > 
-> This changes the semantics of the CONFIG_ macro. Previously, a
-> double-quoted string was accepted, now you have to define it to a token
-> that is turned into a string. Why don't you keep it as before and just do a
+> Mel,
 > 
-> return CONFIG_;
+> Let me pass along the numbers I have.  We have what we call an
+> "architectural simulator".  It is a computer program that pretends that
+> it is a computer system.  We use it to test the firmware before real
+> hardware is available.  We have booted Linux on our simulator.  As you
+> would expect it takes longer to boot on the simulator than it does on
+> real hardware.
 > 
-> in the function?
+> With my patch - boot time 41 minutes
+> Without patch - boot time 94 minutes
+> 
+> These numbers do not scale linearly to real hardware.  But indicate to
+> me a place where Linux can be improved.
+> 
+> Mike Yoknis
+> 
+Mel,
+I finally got access to prototype hardware.  
+It is a relatively small machine with only 64GB of RAM.
+ 
+I put in a time measurement by reading the TSC register.
+I booted both with and without my patch -
+ 
+Without patch -
+[    0.000000]   Normal zone: 13400064 pages, LIFO batch:31
+[    0.000000] memmap_init_zone() enter 1404184834218
+[    0.000000] memmap_init_zone() exit  1411174884438  diff = 6990050220
+ 
+With patch -
+[    0.000000]   Normal zone: 13400064 pages, LIFO batch:31
+[    0.000000] memmap_init_zone() enter 1555530050778
+[    0.000000] memmap_init_zone() exit  1559379204643  diff = 3849153865
+ 
+This shows that without the patch the routine spends 45% 
+of its time spinning unnecessarily.
+ 
+Mike Yoknis
 
-Yes, that's as simple as it looks, indeed. /me hides.
 
-Thank you!
-Regards,
-Yann E. MORIN.
-
--- 
-.-----------------.--------------------.------------------.--------------------.
-|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
-| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
-| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
-| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
-'------------------------------^-------^------------------^--------------------'
