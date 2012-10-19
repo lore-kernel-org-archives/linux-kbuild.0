@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-we0-f174.google.com ([74.125.82.174]:59616 "EHLO
-	mail-we0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1758501Ab2JSXGj (ORCPT
+Received: from mail-wg0-f44.google.com ([74.125.82.44]:45940 "EHLO
+	mail-wg0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757478Ab2JSXGi (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 19 Oct 2012 19:06:39 -0400
+	Fri, 19 Oct 2012 19:06:38 -0400
 From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: [PATCH 3/3] kconfig: get CONFIG_ prefix from the environment
-Date: Sat, 20 Oct 2012 01:06:25 +0200
-Message-Id: <1350687985-21053-4-git-send-email-yann.morin.1998@free.fr>
+Subject: [PATCH 2/3] kconfig: add a function to get the CONFIG_ prefix
+Date: Sat, 20 Oct 2012 01:06:24 +0200
+Message-Id: <1350687985-21053-3-git-send-email-yann.morin.1998@free.fr>
 In-Reply-To: <1350687985-21053-1-git-send-email-yann.morin.1998@free.fr>
 References: <1350687985-21053-1-git-send-email-yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,65 +15,38 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Michal Marek <mmarek@suse.cz>, linux-kernel@vger.kernel.org, "Yann E. MORIN" <yann.morin.1998@free.fr>
 
-Currently, the CONFIG_ prefix is hard-coded in the kconfig frontends
-executables. This means that two projects that use kconfig with
-different prefixes can not share the same kconfig frontends.
+Currently, we get the CONFIG_ prefix via the CONFIG_ macro, which means
+the CONFIG_ prefix is hard-coded at compile time. This goes against
+having a run-time defined CONFIG_ prefix.
 
-Instead of hard-coding the prefix in the frontends, get it from the
-environment, and revert back to hard-coded value if not found.
+Add a function that returns the CONFIG_ prefix to use (but keep the
+current hard-coded behavior, to be changed in a later patch).
+
+To avoid touching all the code that uses the CONFIG_ macro, we just
+undef it, and define it to be a call to the function.
 
 Signed-off-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
 ---
- scripts/kconfig/gconf.c |    2 +-
- scripts/kconfig/lkc.h   |    2 +-
- scripts/kconfig/nconf.c |    1 +
- 3 files changed, 3 insertions(+), 2 deletions(-)
+ scripts/kconfig/lkc.h |    6 ++++++
+ 1 files changed, 6 insertions(+), 0 deletions(-)
 
-diff --git a/scripts/kconfig/gconf.c b/scripts/kconfig/gconf.c
-index adc2306..f2bee70 100644
---- a/scripts/kconfig/gconf.c
-+++ b/scripts/kconfig/gconf.c
-@@ -10,6 +10,7 @@
- #  include <config.h>
- #endif
- 
-+#include <stdlib.h>
- #include "lkc.h"
- #include "images.c"
- 
-@@ -22,7 +23,6 @@
- #include <string.h>
- #include <unistd.h>
- #include <time.h>
--#include <stdlib.h>
- 
- //#define DEBUG
- 
 diff --git a/scripts/kconfig/lkc.h b/scripts/kconfig/lkc.h
-index 7aa9db0..7577a7f 100644
+index c18f2bd..7aa9db0 100644
 --- a/scripts/kconfig/lkc.h
 +++ b/scripts/kconfig/lkc.h
-@@ -41,7 +41,7 @@ extern "C" {
+@@ -39,6 +39,12 @@ extern "C" {
+ #ifndef CONFIG_
+ #define CONFIG_ "CONFIG_"
  #endif
- static inline const char *CONFIG_prefix(void)
- {
--	return CONFIG_;
-+	return getenv( "CONFIG_" ) ?: CONFIG_;
- }
- #undef CONFIG_
- #define CONFIG_ CONFIG_prefix()
-diff --git a/scripts/kconfig/nconf.c b/scripts/kconfig/nconf.c
-index 261f926..ce93e87 100644
---- a/scripts/kconfig/nconf.c
-+++ b/scripts/kconfig/nconf.c
-@@ -7,6 +7,7 @@
-  */
- #define _GNU_SOURCE
- #include <string.h>
-+#include <stdlib.h>
++static inline const char *CONFIG_prefix(void)
++{
++	return CONFIG_;
++}
++#undef CONFIG_
++#define CONFIG_ CONFIG_prefix()
  
- #include "lkc.h"
- #include "nconf.h"
+ #define TF_COMMAND	0x0001
+ #define TF_PARAM	0x0002
 -- 
 1.7.2.5
 
