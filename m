@@ -1,70 +1,255 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wi0-f178.google.com ([209.85.212.178]:34716 "EHLO
+Received: from mail-wi0-f178.google.com ([209.85.212.178]:37916 "EHLO
 	mail-wi0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755223Ab2JTQ6k (ORCPT
+	with ESMTP id S1756460Ab2JTR5A (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 20 Oct 2012 12:58:40 -0400
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: Re: [PATCH] kconfig/menuconfig: use TAILQ instead of CIRCLEQ
-Date: Sat, 20 Oct 2012 18:58:36 +0200
-References: <1350581625-23153-1-git-send-email-yann.morin.1998@free.fr> <5081699B.4020203@suse.cz> <201210202343.IED90702.SFHOJFOVMtQFLO@I-love.SAKURA.ne.jp>
-In-Reply-To: <201210202343.IED90702.SFHOJFOVMtQFLO@I-love.SAKURA.ne.jp>
-MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-1"
-Content-Transfer-Encoding: 7bit
-Message-Id: <201210201858.37169.yann.morin.1998@free.fr>
+	Sat, 20 Oct 2012 13:57:00 -0400
+From: Benjamin Poirier <benjamin.poirier@gmail.com>
+Subject: [PATCH] menuconfig: Replace CIRCLEQ by list_head-style lists.
+Date: Sat, 20 Oct 2012 13:56:32 -0400
+Message-Id: <1350755792-21217-1-git-send-email-benjamin.poirier@gmail.com>
+In-Reply-To: <1350581625-23153-1-git-send-email-yann.morin.1998@free.fr>
+References: <1350581625-23153-1-git-send-email-yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>, mmarek@suse.cz, linux-kernel@vger.kernel.org, bpoirier@suse.de, yselkowitz@gmail.com
+To: Michal Marek <mmarek@suse.cz>
+Cc: Jean Sacren <sakiwit@gmail.com>, Arnaud Lacombe <lacombar@gmail.com>, Wang YanQing <udknight@gmail.com>, Paul Gortmaker <paul.gortmaker@windriver.com>, Davidlohr Bueso <dave@gnu.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, "Yann E. MORIN" <yann.morin.1998@free.fr>, Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>, Yaakov Selkowitz <yselkowitz@gmail.com>
 
-Tetuso, All,
+From: Benjamin Poirier <bpoirier@suse.de>
 
-On Saturday 20 October 2012 Tetsuo Handa wrote:
-> Michal Marek wrote:
-> > On 19.10.2012 14:10, Tetsuo Handa wrote:
-> > > Yann E. MORIN wrote:
-> > >> So, switch to using TAILQ instead, which are more portable.
-> > [...]
-> > > Excuse me, but your patch does not solve my problem because kconfig started
-> > > using macros which does not exist in "@(#)queue.h 8.3 (Berkeley) 12/13/93".
-> > > Kconfig still fails after applying your patch:
-> > > 
-> > >   HOSTCC  scripts/kconfig/mconf.o
-> > > scripts/kconfig/mconf.c: In function `update_text':
-> > > scripts/kconfig/mconf.c:326: warning: implicit declaration of function `TAILQ_FOREACH'
-> > [...]
-> > > scripts/kconfig/mconf.c:378: warning: implicit declaration of function `TAILQ_HEAD_INITIALIZER'
-> > > 
-> > > So, would you add something which looks like "sed -e 's/CIRCLEQ/TAILQ/g'" upon
-> > > https://lkml.org/lkml/2012/10/16/274 ?
-> > 
-> > Could you reduce that patch to not copy all of queue.h?
-> > TAILQ_HEAD_INITIALIZER can be replaced by a TAILQ_INIT() call after
-> > variable definitions, and we do not need stuff like
-> > TAILQ_FOREACH_REVERSE. The other option is to reimplement the needed
-> > operations under a different name, so that people don't accidentally use
-> > other macros that are missing in old queue.h revisions.
-> > 
-> > Michal
-> > 
-> 
-> I'm fine to manually add missing macros to /usr/include/sys/queue.h of
-> "@(#)queue.h 8.3 (Berkeley) 12/13/93" in my environment instead of adding
-> define-as-needed lines to scripts/kconfig/expr.h, for missing macros are
-> available with that of "@(#)queue.h 8.5 (Berkeley) 8/20/94".
+sys/queue.h and CIRCLEQ in particular have proven to cause portability
+problems (reported on Debian Sarge, Cygwin and FreeBSD)
 
-Are you OK with this s/CIRCLEQ/TAILQ/ patch, then?
-    http://marc.info/?l=linux-kbuild&m=135058165015518&w=2
+Reported-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+Signed-off-by: Benjamin Poirier <bpoirier@suse.de>
+---
+ scripts/kconfig/expr.h      |    5 +--
+ scripts/kconfig/list.h      |   90 +++++++++++++++++++++++++++++++++++++++++++
+ scripts/kconfig/lkc_proto.h |    4 +-
+ scripts/kconfig/mconf.c     |    6 +--
+ scripts/kconfig/menu.c      |   14 ++++---
+ 5 files changed, 105 insertions(+), 14 deletions(-)
+ create mode 100644 scripts/kconfig/list.h
 
-Regards,
-Yann E. MORIN.
-
+diff --git a/scripts/kconfig/expr.h b/scripts/kconfig/expr.h
+index bd2e098..cdd4860 100644
+--- a/scripts/kconfig/expr.h
++++ b/scripts/kconfig/expr.h
+@@ -12,7 +12,7 @@ extern "C" {
+ 
+ #include <assert.h>
+ #include <stdio.h>
+-#include <sys/queue.h>
++#include "list.h"
+ #ifndef __cplusplus
+ #include <stdbool.h>
+ #endif
+@@ -175,12 +175,11 @@ struct menu {
+ #define MENU_ROOT		0x0002
+ 
+ struct jump_key {
+-	CIRCLEQ_ENTRY(jump_key) entries;
++	struct list_head entries;
+ 	size_t offset;
+ 	struct menu *target;
+ 	int index;
+ };
+-CIRCLEQ_HEAD(jk_head, jump_key);
+ 
+ #define JUMP_NB			9
+ 
+diff --git a/scripts/kconfig/list.h b/scripts/kconfig/list.h
+new file mode 100644
+index 0000000..934bdba
+--- /dev/null
++++ b/scripts/kconfig/list.h
+@@ -0,0 +1,90 @@
++#ifndef LIST_H
++#define LIST_H
++
++/*
++ * Copied from include/linux/...
++ */
++
++#define offsetof(TYPE, MEMBER) ((size_t) &((TYPE *)0)->MEMBER)
++
++/**
++ * container_of - cast a member of a structure out to the containing structure
++ * @ptr:        the pointer to the member.
++ * @type:       the type of the container struct this is embedded in.
++ * @member:     the name of the member within the struct.
++ *
++ */
++#define container_of(ptr, type, member) ({                      \
++	const typeof( ((type *)0)->member ) *__mptr = (ptr);    \
++	(type *)( (char *)__mptr - offsetof(type,member) );})
++
++
++struct list_head {
++	struct list_head *next, *prev;
++};
++
++
++#define LIST_HEAD_INIT(name) { &(name), &(name) }
++
++#define LIST_HEAD(name) \
++	struct list_head name = LIST_HEAD_INIT(name)
++
++/**
++ * list_entry - get the struct for this entry
++ * @ptr:	the &struct list_head pointer.
++ * @type:	the type of the struct this is embedded in.
++ * @member:	the name of the list_struct within the struct.
++ */
++#define list_entry(ptr, type, member) \
++	container_of(ptr, type, member)
++
++/**
++ * list_for_each_entry	-	iterate over list of given type
++ * @pos:	the type * to use as a loop cursor.
++ * @head:	the head for your list.
++ * @member:	the name of the list_struct within the struct.
++ */
++#define list_for_each_entry(pos, head, member)				\
++	for (pos = list_entry((head)->next, typeof(*pos), member);	\
++	     &pos->member != (head); 	\
++	     pos = list_entry(pos->member.next, typeof(*pos), member))
++
++#endif
++
++/**
++ * list_empty - tests whether a list is empty
++ * @head: the list to test.
++ */
++static inline int list_empty(const struct list_head *head)
++{
++	return head->next == head;
++}
++
++/*
++ * Insert a new entry between two known consecutive entries.
++ *
++ * This is only for internal list manipulation where we know
++ * the prev/next entries already!
++ */
++static inline void __list_add(struct list_head *new,
++			      struct list_head *prev,
++			      struct list_head *next)
++{
++	next->prev = new;
++	new->next = next;
++	new->prev = prev;
++	prev->next = new;
++}
++
++/**
++ * list_add_tail - add a new entry
++ * @new: new entry to be added
++ * @head: list head to add it before
++ *
++ * Insert a new entry before the specified head.
++ * This is useful for implementing queues.
++ */
++static inline void list_add_tail(struct list_head *new, struct list_head *head)
++{
++	__list_add(new, head->prev, head);
++}
+diff --git a/scripts/kconfig/lkc_proto.h b/scripts/kconfig/lkc_proto.h
+index 1d1c085..ef1a738 100644
+--- a/scripts/kconfig/lkc_proto.h
++++ b/scripts/kconfig/lkc_proto.h
+@@ -21,9 +21,9 @@ P(menu_get_root_menu,struct menu *,(struct menu *menu));
+ P(menu_get_parent_menu,struct menu *,(struct menu *menu));
+ P(menu_has_help,bool,(struct menu *menu));
+ P(menu_get_help,const char *,(struct menu *menu));
+-P(get_symbol_str, void, (struct gstr *r, struct symbol *sym, struct jk_head
++P(get_symbol_str, void, (struct gstr *r, struct symbol *sym, struct list_head
+ 			 *head));
+-P(get_relations_str, struct gstr, (struct symbol **sym_arr, struct jk_head
++P(get_relations_str, struct gstr, (struct symbol **sym_arr, struct list_head
+ 				   *head));
+ P(menu_get_ext_help,void,(struct menu *menu, struct gstr *help));
+ 
+diff --git a/scripts/kconfig/mconf.c b/scripts/kconfig/mconf.c
+index 48f6744..53975cf 100644
+--- a/scripts/kconfig/mconf.c
++++ b/scripts/kconfig/mconf.c
+@@ -312,7 +312,7 @@ static void set_config_filename(const char *config_filename)
+ 
+ 
+ struct search_data {
+-	struct jk_head *head;
++	struct list_head *head;
+ 	struct menu **targets;
+ 	int *keys;
+ };
+@@ -323,7 +323,7 @@ static void update_text(char *buf, size_t start, size_t end, void *_data)
+ 	struct jump_key *pos;
+ 	int k = 0;
+ 
+-	CIRCLEQ_FOREACH(pos, data->head, entries) {
++	list_for_each_entry(pos, data->head, entries) {
+ 		if (pos->offset >= start && pos->offset < end) {
+ 			char header[4];
+ 
+@@ -375,7 +375,7 @@ again:
+ 
+ 	sym_arr = sym_re_search(dialog_input);
+ 	do {
+-		struct jk_head head = CIRCLEQ_HEAD_INITIALIZER(head);
++		LIST_HEAD(head);
+ 		struct menu *targets[JUMP_NB];
+ 		int keys[JUMP_NB + 1], i;
+ 		struct search_data data = {
+diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
+index a3cade6..e98a05c 100644
+--- a/scripts/kconfig/menu.c
++++ b/scripts/kconfig/menu.c
+@@ -508,7 +508,7 @@ const char *menu_get_help(struct menu *menu)
+ }
+ 
+ static void get_prompt_str(struct gstr *r, struct property *prop,
+-			   struct jk_head *head)
++			   struct list_head *head)
+ {
+ 	int i, j;
+ 	struct menu *submenu[8], *menu, *location = NULL;
+@@ -544,12 +544,13 @@ static void get_prompt_str(struct gstr *r, struct property *prop,
+ 		} else
+ 			jump->target = location;
+ 
+-		if (CIRCLEQ_EMPTY(head))
++		if (list_empty(head))
+ 			jump->index = 0;
+ 		else
+-			jump->index = CIRCLEQ_LAST(head)->index + 1;
++			jump->index = list_entry(head->prev, struct jump_key,
++						 entries)->index + 1;
+ 
+-		CIRCLEQ_INSERT_TAIL(head, jump, entries);
++		list_add_tail(&jump->entries, head);
+ 	}
+ 
+ 	if (i > 0) {
+@@ -573,7 +574,8 @@ static void get_prompt_str(struct gstr *r, struct property *prop,
+ /*
+  * head is optional and may be NULL
+  */
+-void get_symbol_str(struct gstr *r, struct symbol *sym, struct jk_head *head)
++void get_symbol_str(struct gstr *r, struct symbol *sym,
++		    struct list_head *head)
+ {
+ 	bool hit;
+ 	struct property *prop;
+@@ -612,7 +614,7 @@ void get_symbol_str(struct gstr *r, struct symbol *sym, struct jk_head *head)
+ 	str_append(r, "\n\n");
+ }
+ 
+-struct gstr get_relations_str(struct symbol **sym_arr, struct jk_head *head)
++struct gstr get_relations_str(struct symbol **sym_arr, struct list_head *head)
+ {
+ 	struct symbol *sym;
+ 	struct gstr res = str_new();
 -- 
-.-----------------.--------------------.------------------.--------------------.
-|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
-| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
-| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
-| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
-'------------------------------^-------^------------------^--------------------'
+1.7.10.4
+
