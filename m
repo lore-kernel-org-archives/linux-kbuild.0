@@ -1,69 +1,269 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.wow.synacor.com ([64.8.70.55]:43769 "EHLO
-	smtp.mail.wowway.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751766Ab2JUHkS (ORCPT
+Received: from mail-wg0-f44.google.com ([74.125.82.44]:48940 "EHLO
+	mail-wg0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752175Ab2JUJ2e (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 21 Oct 2012 03:40:18 -0400
-Date: Sun, 21 Oct 2012 03:40:16 -0400
-From: Paul Thompson <set.mailinglist@gmail.com>
-Subject: IRQ subsystem menu
-Message-ID: <20121021074016.GA2604@squish.home.loc>
-MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="HcAYCG3uE/tztfnV"
-Content-Disposition: inline
+	Sun, 21 Oct 2012 05:28:34 -0400
+From: Benjamin Poirier <benjamin.poirier@gmail.com>
+Subject: [PATCH v2] menuconfig: Replace CIRCLEQ by list_head-style lists.
+Date: Sun, 21 Oct 2012 05:27:53 -0400
+Message-Id: <1350811673-26081-1-git-send-email-benjamin.poirier@gmail.com>
+In-Reply-To: <1350754935-20014-1-git-send-email-benjamin.poirier@gmail.com>
+References: <1350754935-20014-1-git-send-email-benjamin.poirier@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Michal Marek <mmarek@suse.cz>
+To: Michal Marek <mmarek@suse.cz>
+Cc: Jean Sacren <sakiwit@gmail.com>, Arnaud Lacombe <lacombar@gmail.com>, Wang YanQing <udknight@gmail.com>, Paul Gortmaker <paul.gortmaker@windriver.com>, Davidlohr Bueso <dave@gnu.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, "Yann E. MORIN" <yann.morin.1998@free.fr>, Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>, Yaakov Selkowitz <yselkowitz@users.sourceforge.net>
 
+From: Benjamin Poirier <bpoirier@suse.de>
 
---HcAYCG3uE/tztfnV
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+sys/queue.h and CIRCLEQ in particular have proven to cause portability
+problems (reported on Debian Sarge, Cygwin and FreeBSD)
 
-	Hi;
+Reported-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+Tested-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+Tested-by: Yaakov Selkowitz <yselkowitz@users.sourceforge.net>
+Signed-off-by: Benjamin Poirier <bpoirier@suse.de>
+Signed-off-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
+---
 
-	In menuconfig, General setup -> IRQ subsystem, there are two
-possible menu-items. One depends partly on IRQ_DOMAIN, and the other
-on MAY_HAVE_SPARSE_IRQ.
+Changes v1-v2:
+* integrate the patch/suggestion from Yann to fix problems related to the
+  usage of list.h with xconfig/c++
+	* "new" keyword
+	* offsetof redefinition
+* silly #endif placement mistake
 
-	On the x86-64 arch, neither of these seems to be set, so the
-menu entry is blank if entered (displaying an odd ^@ if you try to
-navigate up or down. And sometimes some screen garbage on the sides.)
+Thanks to Tetsuo, Yann and Yaakov for thorough testing.
 
-	Previously (in the 3.2 kernel at least) this menu used to be
-populated by the "Support sparse IRQ numbering" menu-item, which
-at that time depended on HAVE_SPARSE_IRQ, and was forced to YES.
+ scripts/kconfig/expr.h      |    5 +--
+ scripts/kconfig/list.h      |   91 +++++++++++++++++++++++++++++++++++++++++++
+ scripts/kconfig/lkc_proto.h |    4 +-
+ scripts/kconfig/mconf.c     |    6 +--
+ scripts/kconfig/menu.c      |   14 ++++---
+ 5 files changed, 106 insertions(+), 14 deletions(-)
+ create mode 100644 scripts/kconfig/list.h
 
-	I do not know if the current behaviour is intended, but it
-is ugly and confusing to be confronted with a blank menu page.
-
-	Ideally, the "IRQ subsystem" menu would not even show up
-if it would contain no menu-items, but I do not know enough to
-formulate that constraint.
-
-	A simple alternative is a comment section to reasure babes in
-the wood of kernel configuration that something is not amiss. I include
-a sample patch.
-
-Paul
-set.mailinglist@gmail.com
-
---HcAYCG3uE/tztfnV
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: attachment; filename="irq-kconfig.patch"
-
---- linux-3.7-rc2/kernel/irq/Kconfig.orig	2012-10-20 15:11:32.000000000 -0400
-+++ linux-3.7-rc2/kernel/irq/Kconfig	2012-10-21 03:14:56.272952813 -0400
-@@ -4,6 +4,9 @@ config HAVE_GENERIC_HARDIRQS
+diff --git a/scripts/kconfig/expr.h b/scripts/kconfig/expr.h
+index bd2e098..cdd4860 100644
+--- a/scripts/kconfig/expr.h
++++ b/scripts/kconfig/expr.h
+@@ -12,7 +12,7 @@ extern "C" {
  
- if HAVE_GENERIC_HARDIRQS
- menu "IRQ subsystem"
+ #include <assert.h>
+ #include <stdio.h>
+-#include <sys/queue.h>
++#include "list.h"
+ #ifndef __cplusplus
+ #include <stdbool.h>
+ #endif
+@@ -175,12 +175,11 @@ struct menu {
+ #define MENU_ROOT		0x0002
+ 
+ struct jump_key {
+-	CIRCLEQ_ENTRY(jump_key) entries;
++	struct list_head entries;
+ 	size_t offset;
+ 	struct menu *target;
+ 	int index;
+ };
+-CIRCLEQ_HEAD(jk_head, jump_key);
+ 
+ #define JUMP_NB			9
+ 
+diff --git a/scripts/kconfig/list.h b/scripts/kconfig/list.h
+new file mode 100644
+index 0000000..0ae730b
+--- /dev/null
++++ b/scripts/kconfig/list.h
+@@ -0,0 +1,91 @@
++#ifndef LIST_H
++#define LIST_H
 +
-+comment "Some configurations may have no available options here"
++/*
++ * Copied from include/linux/...
++ */
 +
- #
- # Interrupt subsystem related configuration options
- #
++#undef offsetof
++#define offsetof(TYPE, MEMBER) ((size_t) &((TYPE *)0)->MEMBER)
++
++/**
++ * container_of - cast a member of a structure out to the containing structure
++ * @ptr:        the pointer to the member.
++ * @type:       the type of the container struct this is embedded in.
++ * @member:     the name of the member within the struct.
++ *
++ */
++#define container_of(ptr, type, member) ({                      \
++	const typeof( ((type *)0)->member ) *__mptr = (ptr);    \
++	(type *)( (char *)__mptr - offsetof(type,member) );})
++
++
++struct list_head {
++	struct list_head *next, *prev;
++};
++
++
++#define LIST_HEAD_INIT(name) { &(name), &(name) }
++
++#define LIST_HEAD(name) \
++	struct list_head name = LIST_HEAD_INIT(name)
++
++/**
++ * list_entry - get the struct for this entry
++ * @ptr:	the &struct list_head pointer.
++ * @type:	the type of the struct this is embedded in.
++ * @member:	the name of the list_struct within the struct.
++ */
++#define list_entry(ptr, type, member) \
++	container_of(ptr, type, member)
++
++/**
++ * list_for_each_entry	-	iterate over list of given type
++ * @pos:	the type * to use as a loop cursor.
++ * @head:	the head for your list.
++ * @member:	the name of the list_struct within the struct.
++ */
++#define list_for_each_entry(pos, head, member)				\
++	for (pos = list_entry((head)->next, typeof(*pos), member);	\
++	     &pos->member != (head); 	\
++	     pos = list_entry(pos->member.next, typeof(*pos), member))
++
++/**
++ * list_empty - tests whether a list is empty
++ * @head: the list to test.
++ */
++static inline int list_empty(const struct list_head *head)
++{
++	return head->next == head;
++}
++
++/*
++ * Insert a new entry between two known consecutive entries.
++ *
++ * This is only for internal list manipulation where we know
++ * the prev/next entries already!
++ */
++static inline void __list_add(struct list_head *_new,
++			      struct list_head *prev,
++			      struct list_head *next)
++{
++	next->prev = _new;
++	_new->next = next;
++	_new->prev = prev;
++	prev->next = _new;
++}
++
++/**
++ * list_add_tail - add a new entry
++ * @new: new entry to be added
++ * @head: list head to add it before
++ *
++ * Insert a new entry before the specified head.
++ * This is useful for implementing queues.
++ */
++static inline void list_add_tail(struct list_head *_new, struct list_head *head)
++{
++	__list_add(_new, head->prev, head);
++}
++
++#endif
+diff --git a/scripts/kconfig/lkc_proto.h b/scripts/kconfig/lkc_proto.h
+index 1d1c085..ef1a738 100644
+--- a/scripts/kconfig/lkc_proto.h
++++ b/scripts/kconfig/lkc_proto.h
+@@ -21,9 +21,9 @@ P(menu_get_root_menu,struct menu *,(struct menu *menu));
+ P(menu_get_parent_menu,struct menu *,(struct menu *menu));
+ P(menu_has_help,bool,(struct menu *menu));
+ P(menu_get_help,const char *,(struct menu *menu));
+-P(get_symbol_str, void, (struct gstr *r, struct symbol *sym, struct jk_head
++P(get_symbol_str, void, (struct gstr *r, struct symbol *sym, struct list_head
+ 			 *head));
+-P(get_relations_str, struct gstr, (struct symbol **sym_arr, struct jk_head
++P(get_relations_str, struct gstr, (struct symbol **sym_arr, struct list_head
+ 				   *head));
+ P(menu_get_ext_help,void,(struct menu *menu, struct gstr *help));
+ 
+diff --git a/scripts/kconfig/mconf.c b/scripts/kconfig/mconf.c
+index 48f6744..53975cf 100644
+--- a/scripts/kconfig/mconf.c
++++ b/scripts/kconfig/mconf.c
+@@ -312,7 +312,7 @@ static void set_config_filename(const char *config_filename)
+ 
+ 
+ struct search_data {
+-	struct jk_head *head;
++	struct list_head *head;
+ 	struct menu **targets;
+ 	int *keys;
+ };
+@@ -323,7 +323,7 @@ static void update_text(char *buf, size_t start, size_t end, void *_data)
+ 	struct jump_key *pos;
+ 	int k = 0;
+ 
+-	CIRCLEQ_FOREACH(pos, data->head, entries) {
++	list_for_each_entry(pos, data->head, entries) {
+ 		if (pos->offset >= start && pos->offset < end) {
+ 			char header[4];
+ 
+@@ -375,7 +375,7 @@ again:
+ 
+ 	sym_arr = sym_re_search(dialog_input);
+ 	do {
+-		struct jk_head head = CIRCLEQ_HEAD_INITIALIZER(head);
++		LIST_HEAD(head);
+ 		struct menu *targets[JUMP_NB];
+ 		int keys[JUMP_NB + 1], i;
+ 		struct search_data data = {
+diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
+index a3cade6..e98a05c 100644
+--- a/scripts/kconfig/menu.c
++++ b/scripts/kconfig/menu.c
+@@ -508,7 +508,7 @@ const char *menu_get_help(struct menu *menu)
+ }
+ 
+ static void get_prompt_str(struct gstr *r, struct property *prop,
+-			   struct jk_head *head)
++			   struct list_head *head)
+ {
+ 	int i, j;
+ 	struct menu *submenu[8], *menu, *location = NULL;
+@@ -544,12 +544,13 @@ static void get_prompt_str(struct gstr *r, struct property *prop,
+ 		} else
+ 			jump->target = location;
+ 
+-		if (CIRCLEQ_EMPTY(head))
++		if (list_empty(head))
+ 			jump->index = 0;
+ 		else
+-			jump->index = CIRCLEQ_LAST(head)->index + 1;
++			jump->index = list_entry(head->prev, struct jump_key,
++						 entries)->index + 1;
+ 
+-		CIRCLEQ_INSERT_TAIL(head, jump, entries);
++		list_add_tail(&jump->entries, head);
+ 	}
+ 
+ 	if (i > 0) {
+@@ -573,7 +574,8 @@ static void get_prompt_str(struct gstr *r, struct property *prop,
+ /*
+  * head is optional and may be NULL
+  */
+-void get_symbol_str(struct gstr *r, struct symbol *sym, struct jk_head *head)
++void get_symbol_str(struct gstr *r, struct symbol *sym,
++		    struct list_head *head)
+ {
+ 	bool hit;
+ 	struct property *prop;
+@@ -612,7 +614,7 @@ void get_symbol_str(struct gstr *r, struct symbol *sym, struct jk_head *head)
+ 	str_append(r, "\n\n");
+ }
+ 
+-struct gstr get_relations_str(struct symbol **sym_arr, struct jk_head *head)
++struct gstr get_relations_str(struct symbol **sym_arr, struct list_head *head)
+ {
+ 	struct symbol *sym;
+ 	struct gstr res = str_new();
+-- 
+1.7.10.4
 
---HcAYCG3uE/tztfnV--
