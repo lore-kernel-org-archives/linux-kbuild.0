@@ -1,43 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from www262.sakura.ne.jp ([202.181.97.72]:55192 "EHLO
-	www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752082Ab2JUBWR (ORCPT
+Received: from mail-ie0-f174.google.com ([209.85.223.174]:57379 "EHLO
+	mail-ie0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753073Ab2JUByF (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 20 Oct 2012 21:22:17 -0400
+	Sat, 20 Oct 2012 21:54:05 -0400
+Message-ID: <1350784440.1244.6.camel@YAAKOV04>
 Subject: Re: [PATCH] menuconfig: Replace CIRCLEQ by list_head-style lists.
-From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+From: "Yaakov (Cygwin/X)" <yselkowitz@users.sourceforge.net>
+Date: Sat, 20 Oct 2012 20:54:00 -0500
+In-Reply-To: <1350755792-21217-1-git-send-email-benjamin.poirier@gmail.com>
 References: <1350581625-23153-1-git-send-email-yann.morin.1998@free.fr>
-	<1350755792-21217-1-git-send-email-benjamin.poirier@gmail.com>
-	<201210202322.07188.yann.morin.1998@free.fr>
-In-Reply-To: <201210202322.07188.yann.morin.1998@free.fr>
-Message-Id: <201210211021.CCC65894.VOJFFSHQMFOtOL@I-love.SAKURA.ne.jp>
-Date: Sun, 21 Oct 2012 10:21:51 +0900
+	 <1350755792-21217-1-git-send-email-benjamin.poirier@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: yann.morin.1998@free.fr, benjamin.poirier@gmail.com
-Cc: mmarek@suse.cz, sakiwit@gmail.com, lacombar@gmail.com, udknight@gmail.com, paul.gortmaker@windriver.com, dave@gnu.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, yselkowitz@gmail.com
+To: Benjamin Poirier <benjamin.poirier@gmail.com>, "Yann E. MORIN" <yann.morin.1998@free.fr>
+Cc: Michal Marek <mmarek@suse.cz>, Jean Sacren <sakiwit@gmail.com>, Arnaud Lacombe <lacombar@gmail.com>, Wang YanQing <udknight@gmail.com>, Paul Gortmaker <paul.gortmaker@windriver.com>, Davidlohr Bueso <dave@gnu.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
 
-Yann E. MORIN wrote:
-> Benjamin, All,
+On Sat, 2012-10-20 at 13:56 -0400, Benjamin Poirier wrote:
+> From: Benjamin Poirier <bpoirier@suse.de>
+> menuconfig: Replace CIRCLEQ by list_head-style lists
 > 
-> On Saturday 20 October 2012 Benjamin Poirier wrote:
-> > From: Benjamin Poirier <bpoirier@suse.de>
-> > 
-> > sys/queue.h and CIRCLEQ in particular have proven to cause portability
-> > problems (reported on Debian Sarge, Cygwin and FreeBSD)
-> > 
-> > Reported-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-> > Signed-off-by: Benjamin Poirier <bpoirier@suse.de>
+> sys/queue.h and CIRCLEQ in particular have proven to cause portability
+> problems (reported on Debian Sarge, Cygwin and FreeBSD)
 > 
-> Tested-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
-> 
-> Thank you for this patch! I guess it is the best solution we can get.
-> 
-> Regards,
-> Yann E. MORIN.
+> Reported-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+> Signed-off-by: Benjamin Poirier <bpoirier@suse.de>
 
-This patch solves my problem on Debian Sarge. Thank you.
 
-Tested-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+> From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+> kconfig: fix building the qconf frontend
+> 
+> Also, protect the whole file with the #ifdenf LIST_H, not only the
+> macros
+> defintions.
+> 
+> Signed-off-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
+
+Squash these two together and all frontends build again on Cygwin.
+
+Tested-by: Yaakov Selkowitz <yselkowitz@users.sourceforge.net>
+
