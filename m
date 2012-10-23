@@ -1,40 +1,35 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga14.intel.com ([143.182.124.37]:57649 "EHLO mga14.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1756320Ab2JWBdA (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 22 Oct 2012 21:33:00 -0400
-Date: Tue, 23 Oct 2012 09:32:57 +0800
-From: Fengguang Wu <fengguang.wu@intel.com>
-Subject: [PATCH] kbuild: fix xargs error on make distclean
-Message-ID: <20121023013257.GA21775@localhost>
+Received: from 173-166-109-252-newengland.hfc.comcastbusiness.net ([173.166.109.252]:49532
+	"EHLO bombadil.infradead.org" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1753273Ab2JWNMv (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 23 Oct 2012 09:12:51 -0400
+Date: Tue, 23 Oct 2012 09:12:48 -0400
+From: Christoph Hellwig <hch@infradead.org>
+Subject: Re: [PATCH] kconfig/menuconfig: use TAILQ instead of CIRCLEQ
+Message-ID: <20121023131248.GA4289@infradead.org>
+References: <1350581625-23153-1-git-send-email-yann.morin.1998@free.fr>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <1350581625-23153-1-git-send-email-yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild <linux-kbuild@vger.kernel.org>
-Cc: Michal Marek <mmarek@suse.cz>, LKML <linux-kernel@vger.kernel.org>
+To: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>, Benjamin Poirier <bpoirier@suse.de>, Yaakov Selkowitz <yselkowitz@gmail.com>
 
-/usr/bin/xargs: unmatched single quote; by default quotes are special to xargs unless you use the -0 option
+On Thu, Oct 18, 2012 at 07:33:45PM +0200, Yann E. MORIN wrote:
+> Some systems (eg. Cygwin, FreeBSD) are missing the CIRCLEQ macros.
+> They were removed in Y2000 from FreeBSD:
+>     http://svnweb.freebsd.org/base?view=revision&revision=70469
+> 
+> The reason was that TAILQ are perfectly capable of doing the exact
+> same things:
+>     http://www.mavetju.org/mail/view_thread.php?list=freebsd-arch&id=915145&thread=yes
+> 
+> (Thank Yaakov for the pointers!)
+> 
+> So, switch to using TAILQ instead, which are more portable.
 
-Signed-off-by: Fengguang Wu <fengguang.wu@intel.com>
----
- Makefile |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/Makefile b/Makefile
-index bb9fff2..e5a64cc 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1033,7 +1033,7 @@ distclean: mrproper
- 		-o -name '*.bak' -o -name '#*#' -o -name '.*.orig' \
- 		-o -name '.*.rej' \
- 		-o -name '*%' -o -name '.*.cmd' -o -name 'core' \) \
--		-type f -print | xargs rm -f
-+		-type f -print0 | xargs -0 rm -f
- 
- 
- # Packaging of the kernel to various formats
--- 
-1.7.10
+Why not use the kernels list.h?
 
