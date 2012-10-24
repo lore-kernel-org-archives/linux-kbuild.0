@@ -1,58 +1,116 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wi0-f170.google.com ([209.85.212.170]:41618 "EHLO
-	mail-wi0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757243Ab2JWREj (ORCPT
+Received: from g1t0029.austin.hp.com ([15.216.28.36]:12442 "EHLO
+	g1t0029.austin.hp.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751161Ab2JXPry (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 23 Oct 2012 13:04:39 -0400
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: Re: [PATCH] kconfig/menuconfig: use TAILQ instead of CIRCLEQ
-Date: Tue, 23 Oct 2012 19:04:30 +0200
-References: <1350581625-23153-1-git-send-email-yann.morin.1998@free.fr> <20121023131248.GA4289@infradead.org>
-In-Reply-To: <20121023131248.GA4289@infradead.org>
-MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-1"
+	Wed, 24 Oct 2012 11:47:54 -0400
+Message-ID: <1351093667.1205.11.camel@MikesLinux.fc.hp.com>
+Subject: Re: [PATCH] mm: memmap_init_zone() performance improvement
+From: Mike Yoknis <mike.yoknis@hp.com>
+Reply-To: mike.yoknis@hp.com
+Date: Wed, 24 Oct 2012 09:47:47 -0600
+In-Reply-To: <20121020082858.GA2698@suse.de>
+References: <1349276174-8398-1-git-send-email-mike.yoknis@hp.com>
+	 <20121008151656.GM29125@suse.de>
+	 <1349794597.29752.10.camel@MikesLinux.fc.hp.com>
+	 <1350676398.1169.6.camel@MikesLinux.fc.hp.com>
+	 <20121020082858.GA2698@suse.de>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
-Message-Id: <201210231904.31087.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Christoph Hellwig <hch@infradead.org>, linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>, Benjamin Poirier <bpoirier@suse.de>, Yaakov Selkowitz <yselkowitz@gmail.com>
+To: Mel Gorman <mgorman@suse.de>
+Cc: mingo@redhat.com, akpm@linux-foundation.org, linux-arch@vger.kernel.org, mmarek@suse.cz, tglx@linutronix.de, hpa@zytor.com, arnd@arndb.de, sam@ravnborg.org, minchan@kernel.org, kamezawa.hiroyu@jp.fujitsu.com, mhocko@suse.cz, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org
 
-Christoph, All,
-
-On Tuesday 23 October 2012 Christoph Hellwig wrote:
-> On Thu, Oct 18, 2012 at 07:33:45PM +0200, Yann E. MORIN wrote:
-> > Some systems (eg. Cygwin, FreeBSD) are missing the CIRCLEQ macros.
-> > They were removed in Y2000 from FreeBSD:
-> >     http://svnweb.freebsd.org/base?view=revision&revision=70469
-> > 
-> > The reason was that TAILQ are perfectly capable of doing the exact
-> > same things:
-> >     http://www.mavetju.org/mail/view_thread.php?list=freebsd-arch&id=915145&thread=yes
-> > 
-> > (Thank Yaakov for the pointers!)
-> > 
-> > So, switch to using TAILQ instead, which are more portable.
+On Sat, 2012-10-20 at 09:29 +0100, Mel Gorman wrote:
+> On Fri, Oct 19, 2012 at 01:53:18PM -0600, Mike Yoknis wrote:
+> > On Tue, 2012-10-09 at 08:56 -0600, Mike Yoknis wrote:
+> > > On Mon, 2012-10-08 at 16:16 +0100, Mel Gorman wrote:
+> > > > On Wed, Oct 03, 2012 at 08:56:14AM -0600, Mike Yoknis wrote:
+> > > > > memmap_init_zone() loops through every Page Frame Number (pfn),
+> > > > > including pfn values that are within the gaps between existing
+> > > > > memory sections.  The unneeded looping will become a boot
+> > > > > performance issue when machines configure larger memory ranges
+> > > > > that will contain larger and more numerous gaps.
+> > > > > 
+> > > > > The code will skip across invalid sections to reduce the
+> > > > > number of loops executed.
+> > > > > 
+> > > > > Signed-off-by: Mike Yoknis <mike.yoknis@hp.com>
+> > > > 
+> > > > I do not see the need for
+> > > > the additional complexity unless you can show it makes a big difference
+> > > > to boot times.
+> > > > 
+> > > 
+> > > Mel,
+> > > 
+> > > Let me pass along the numbers I have.  We have what we call an
+> > > "architectural simulator".  It is a computer program that pretends that
+> > > it is a computer system.  We use it to test the firmware before real
+> > > hardware is available.  We have booted Linux on our simulator.  As you
+> > > would expect it takes longer to boot on the simulator than it does on
+> > > real hardware.
+> > > 
+> > > With my patch - boot time 41 minutes
+> > > Without patch - boot time 94 minutes
+> > > 
+> > > These numbers do not scale linearly to real hardware.  But indicate to
+> > > me a place where Linux can be improved.
+> > > 
+> > > Mike Yoknis
+> > > 
+> > Mel,
+> > I finally got access to prototype hardware.  
+> > It is a relatively small machine with only 64GB of RAM.
+> >  
+> > I put in a time measurement by reading the TSC register.
+> > I booted both with and without my patch -
+> >  
+> > Without patch -
+> > [    0.000000]   Normal zone: 13400064 pages, LIFO batch:31
+> > [    0.000000] memmap_init_zone() enter 1404184834218
+> > [    0.000000] memmap_init_zone() exit  1411174884438  diff = 6990050220
+> >  
+> > With patch -
+> > [    0.000000]   Normal zone: 13400064 pages, LIFO batch:31
+> > [    0.000000] memmap_init_zone() enter 1555530050778
+> > [    0.000000] memmap_init_zone() exit  1559379204643  diff = 3849153865
+> >  
+> > This shows that without the patch the routine spends 45% 
+> > of its time spinning unnecessarily.
+> >  
 > 
-> Why not use the kernels list.h?
+> I'm travelling at the moment so apologies that I have not followed up on
+> this. My problem is still the same with the patch - it changes more
+> headers than is necessary and it is sparsemem specific. At minimum, try
+> the suggestion of 
+> 
+> if (!early_pfn_valid(pfn)) {
+>       pfn = ALIGN(pfn + MAX_ORDER_NR_PAGES, MAX_ORDER_NR_PAGES) - 1;
+>       continue;
+> }
+> 
+> and see how much it gains you as it should work on all memory models. If
+> it turns out that you really need to skip whole sections then the strice
+> could MAX_ORDER_NR_PAGES on all memory models except sparsemem where the
+> stride would be PAGES_PER_SECTION
+> 
+Mel,
+I tried your suggestion.  I re-ran all 3 methods on our latest firmware.
 
-First, we can't use linux/list.h because it can't be included from userspace.
-Second, it would not be convenient for those that use kconfig outside the
-Linux kernel (thiord-party projects, eg. buildroot, uClibc, busybox...):
-    http://marc.info/?l=linux-kbuild&m=135065985609068&w=2
+The following are TSC difference numbers (*10^6) to execute
+memmap_init_zone() -
 
-Also, this patch of mine is deprecated; Benjamin has posted another patch
-which makes use of a stripped-down list.h, partially copied from linux/list.h:
-    http://marc.info/?t=135081179500001&r=1&w=4
+No patch   - 7010
+Mel's patch- 3918
+My patch   - 3847
 
-Regards,
-Yann E. MORIN.
+The incremental improvement of my method is not significant vs. yours.
 
--- 
-.-----------------.--------------------.------------------.--------------------.
-|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
-| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
-| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
-| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
-'------------------------------^-------^------------------^--------------------'
+If you believe your suggested change is worthwhile I will create a v2
+patch.
+Mike Y
+
+
