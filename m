@@ -1,122 +1,54 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:34844 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:43492 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751754Ab2JYJvm (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 25 Oct 2012 05:51:42 -0400
-Date: Thu, 25 Oct 2012 10:44:10 +0100
-From: Mel Gorman <mgorman@suse.de>
-Subject: Re: [PATCH] mm: memmap_init_zone() performance improvement
-Message-ID: <20121025094410.GA2558@suse.de>
-References: <1349276174-8398-1-git-send-email-mike.yoknis@hp.com>
- <20121008151656.GM29125@suse.de>
- <1349794597.29752.10.camel@MikesLinux.fc.hp.com>
- <1350676398.1169.6.camel@MikesLinux.fc.hp.com>
- <20121020082858.GA2698@suse.de>
- <1351093667.1205.11.camel@MikesLinux.fc.hp.com>
+	id S1945936Ab2JYNeT (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 25 Oct 2012 09:34:19 -0400
+Message-ID: <50893FCF.5030800@suse.cz>
+Date: Thu, 25 Oct 2012 15:34:07 +0200
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-15
-Content-Disposition: inline
-In-Reply-To: <1351093667.1205.11.camel@MikesLinux.fc.hp.com>
+Subject: Re: [PATCH v2] menuconfig: Replace CIRCLEQ by list_head-style lists.
+References: <1350754935-20014-1-git-send-email-benjamin.poirier@gmail.com> <1350811673-26081-1-git-send-email-benjamin.poirier@gmail.com> <201210222138.25805.yann.morin.1998@free.fr>
+In-Reply-To: <201210222138.25805.yann.morin.1998@free.fr>
+Content-Type: text/plain; charset=ISO-8859-15
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Mike Yoknis <mike.yoknis@hp.com>
-Cc: mingo@redhat.com, akpm@linux-foundation.org, linux-arch@vger.kernel.org, mmarek@suse.cz, tglx@linutronix.de, hpa@zytor.com, arnd@arndb.de, sam@ravnborg.org, minchan@kernel.org, kamezawa.hiroyu@jp.fujitsu.com, mhocko@suse.cz, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org
+To: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Cc: linux-kbuild@vger.kernel.org, Benjamin Poirier <benjamin.poirier@gmail.com>, Jean Sacren <sakiwit@gmail.com>, Arnaud Lacombe <lacombar@gmail.com>, Wang YanQing <udknight@gmail.com>, Paul Gortmaker <paul.gortmaker@windriver.com>, Davidlohr Bueso <dave@gnu.org>, linux-kernel@vger.kernel.org, Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>, Yaakov Selkowitz <yselkowitz@users.sourceforge.net>
 
-On Wed, Oct 24, 2012 at 09:47:47AM -0600, Mike Yoknis wrote:
-> On Sat, 2012-10-20 at 09:29 +0100, Mel Gorman wrote:
-> > On Fri, Oct 19, 2012 at 01:53:18PM -0600, Mike Yoknis wrote:
-> > > On Tue, 2012-10-09 at 08:56 -0600, Mike Yoknis wrote:
-> > > > On Mon, 2012-10-08 at 16:16 +0100, Mel Gorman wrote:
-> > > > > On Wed, Oct 03, 2012 at 08:56:14AM -0600, Mike Yoknis wrote:
-> > > > > > memmap_init_zone() loops through every Page Frame Number (pfn),
-> > > > > > including pfn values that are within the gaps between existing
-> > > > > > memory sections.  The unneeded looping will become a boot
-> > > > > > performance issue when machines configure larger memory ranges
-> > > > > > that will contain larger and more numerous gaps.
-> > > > > > 
-> > > > > > The code will skip across invalid sections to reduce the
-> > > > > > number of loops executed.
-> > > > > > 
-> > > > > > Signed-off-by: Mike Yoknis <mike.yoknis@hp.com>
-> > > > > 
-> > > > > I do not see the need for
-> > > > > the additional complexity unless you can show it makes a big difference
-> > > > > to boot times.
-> > > > > 
-> > > > 
-> > > > Mel,
-> > > > 
-> > > > Let me pass along the numbers I have.  We have what we call an
-> > > > "architectural simulator".  It is a computer program that pretends that
-> > > > it is a computer system.  We use it to test the firmware before real
-> > > > hardware is available.  We have booted Linux on our simulator.  As you
-> > > > would expect it takes longer to boot on the simulator than it does on
-> > > > real hardware.
-> > > > 
-> > > > With my patch - boot time 41 minutes
-> > > > Without patch - boot time 94 minutes
-> > > > 
-> > > > These numbers do not scale linearly to real hardware.  But indicate to
-> > > > me a place where Linux can be improved.
-> > > > 
-> > > > Mike Yoknis
-> > > > 
-> > > Mel,
-> > > I finally got access to prototype hardware.  
-> > > It is a relatively small machine with only 64GB of RAM.
-> > >  
-> > > I put in a time measurement by reading the TSC register.
-> > > I booted both with and without my patch -
-> > >  
-> > > Without patch -
-> > > [    0.000000]   Normal zone: 13400064 pages, LIFO batch:31
-> > > [    0.000000] memmap_init_zone() enter 1404184834218
-> > > [    0.000000] memmap_init_zone() exit  1411174884438  diff = 6990050220
-> > >  
-> > > With patch -
-> > > [    0.000000]   Normal zone: 13400064 pages, LIFO batch:31
-> > > [    0.000000] memmap_init_zone() enter 1555530050778
-> > > [    0.000000] memmap_init_zone() exit  1559379204643  diff = 3849153865
-> > >  
-> > > This shows that without the patch the routine spends 45% 
-> > > of its time spinning unnecessarily.
-> > >  
-> > 
-> > I'm travelling at the moment so apologies that I have not followed up on
-> > this. My problem is still the same with the patch - it changes more
-> > headers than is necessary and it is sparsemem specific. At minimum, try
-> > the suggestion of 
-> > 
-> > if (!early_pfn_valid(pfn)) {
-> >       pfn = ALIGN(pfn + MAX_ORDER_NR_PAGES, MAX_ORDER_NR_PAGES) - 1;
-> >       continue;
-> > }
-> > 
-> > and see how much it gains you as it should work on all memory models. If
-> > it turns out that you really need to skip whole sections then the strice
-> > could MAX_ORDER_NR_PAGES on all memory models except sparsemem where the
-> > stride would be PAGES_PER_SECTION
-> > 
-> Mel,
-> I tried your suggestion.  I re-ran all 3 methods on our latest firmware.
+On 22.10.2012 21:38, Yann E. MORIN wrote:
+> Benjamin, Michal, All,
 > 
-> The following are TSC difference numbers (*10^6) to execute
-> memmap_init_zone() -
+> On Sunday 21 October 2012 Benjamin Poirier wrote:
+>> From: Benjamin Poirier <bpoirier@suse.de>
+>>
+>> sys/queue.h and CIRCLEQ in particular have proven to cause portability
+>> problems (reported on Debian Sarge, Cygwin and FreeBSD)
 > 
-> No patch   - 7010
-> Mel's patch- 3918
-> My patch   - 3847
+> Benjamin,
 > 
-> The incremental improvement of my method is not significant vs. yours.
-> 
-> If you believe your suggested change is worthwhile I will create a v2
-> patch.
+> Thank you for working on this! :-)
 
-I think it is a reasonable change and I prefer my suggestion because it
-should work for all memory models. Please do a V2 of the patch. I'm still
-travelling at the moment (writing this from an airport) but I'll be back
-online next Tuesday and will review it when I can.
+Yeah, thanks!
 
--- 
-Mel Gorman
-SUSE Labs
+
+>>
+>> Changes v1-v2:
+>> * integrate the patch/suggestion from Yann to fix problems related to the
+>>   usage of list.h with xconfig/c++
+>> 	* "new" keyword
+>> 	* offsetof redefinition
+>> * silly #endif placement mistake
+> 
+> Michal,
+> 
+> Any more comments on this patch?
+> 
+> If not, then I would suggest to push it for inclusion before 3.7 is released
+> (I believe it can go in, as it is a bugfix, not a new feature).
+
+I pushed it to kbuild.git#rc-fixes now and will send it to Linus for 3.7
+inclusion later.
+
+Michal
