@@ -1,42 +1,63 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:43778 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1759418Ab2JYNlj (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 25 Oct 2012 09:41:39 -0400
-Message-ID: <5089418C.1090802@suse.cz>
-Date: Thu, 25 Oct 2012 15:41:32 +0200
-From: Michal Marek <mmarek@suse.cz>
-MIME-Version: 1.0
-Subject: Re: [PATCH] kbuild: fix xargs error on make distclean
-References: <20121023013257.GA21775@localhost>
-In-Reply-To: <20121023013257.GA21775@localhost>
-Content-Type: text/plain; charset=ISO-8859-1
+Received: from g1t0029.austin.hp.com ([15.216.28.36]:12076 "EHLO
+	g1t0029.austin.hp.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S966838Ab2JZWrz (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 26 Oct 2012 18:47:55 -0400
+Message-ID: <1351291667.6504.13.camel@MikesLinux.fc.hp.com>
+Subject: [PATCH v2] mm: memmap_init_zone() performance improvement
+From: Mike Yoknis <mike.yoknis@hp.com>
+Reply-To: mike.yoknis@hp.com
+Date: Fri, 26 Oct 2012 16:47:47 -0600
+In-Reply-To: <20121025094410.GA2558@suse.de>
+References: <1349276174-8398-1-git-send-email-mike.yoknis@hp.com>
+	 <20121008151656.GM29125@suse.de>
+	 <1349794597.29752.10.camel@MikesLinux.fc.hp.com>
+	 <1350676398.1169.6.camel@MikesLinux.fc.hp.com>
+	 <20121020082858.GA2698@suse.de>
+	 <1351093667.1205.11.camel@MikesLinux.fc.hp.com>
+	 <20121025094410.GA2558@suse.de>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Fengguang Wu <fengguang.wu@intel.com>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
+To: Mel Gorman <mgorman@suse.de>
+Cc: mingo@redhat.com, akpm@linux-foundation.org, linux-arch@vger.kernel.org, mmarek@suse.cz, tglx@linutronix.de, hpa@zytor.com, arnd@arndb.de, sam@ravnborg.org, minchan@kernel.org, kamezawa.hiroyu@jp.fujitsu.com, mhocko@suse.cz, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org
 
-On 23.10.2012 03:32, Fengguang Wu wrote:
-> /usr/bin/xargs: unmatched single quote; by default quotes are special to xargs unless you use the -0 option
-> 
-> Signed-off-by: Fengguang Wu <fengguang.wu@intel.com>
-> ---
->  Makefile |    2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/Makefile b/Makefile
-> index bb9fff2..e5a64cc 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -1033,7 +1033,7 @@ distclean: mrproper
->  		-o -name '*.bak' -o -name '#*#' -o -name '.*.orig' \
->  		-o -name '.*.rej' \
->  		-o -name '*%' -o -name '.*.cmd' -o -name 'core' \) \
-> -		-type f -print | xargs rm -f
-> +		-type f -print0 | xargs -0 rm -f
+memmap_init_zone() loops through every Page Frame Number (pfn),
+including pfn values that are within the gaps between existing
+memory sections.  The unneeded looping will become a boot
+performance issue when machines configure larger memory ranges
+that will contain larger and more numerous gaps.
 
-As much as I like the find -print0 | xargs -0 construct, it is not
-portable unfortunately.
+The code will skip across invalid pfn values to reduce the
+number of loops executed.
 
-Michal
+Signed-off-by: Mike Yoknis <mike.yoknis@hp.com>
+---
+ mm/page_alloc.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/mm/page_alloc.c b/mm/page_alloc.c
+index 45c916b..9f9c1a6 100644
+--- a/mm/page_alloc.c
++++ b/mm/page_alloc.c
+@@ -3857,8 +3857,11 @@ void __meminit memmap_init_zone(unsigned long
+size, int nid, unsigned long zone,
+ 		 * exist on hotplugged memory.
+ 		 */
+ 		if (context == MEMMAP_EARLY) {
+-			if (!early_pfn_valid(pfn))
++			if (!early_pfn_valid(pfn)) {
++				pfn = ALIGN(pfn + MAX_ORDER_NR_PAGES,
++						MAX_ORDER_NR_PAGES) - 1;
+ 				continue;
++			}
+ 			if (!early_pfn_in_nid(pfn, nid))
+ 				continue;
+ 		}
+-- 
+1.7.11.3
+
+
