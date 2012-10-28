@@ -1,41 +1,69 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-we0-f174.google.com ([74.125.82.174]:42138 "EHLO
-	mail-we0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932633Ab2J3WgX (ORCPT
+Received: from host2.northwestnissans.com ([173.199.143.79]:56139 "EHLO
+	host.northwestnissans.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756830Ab2KACvO (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 30 Oct 2012 18:36:23 -0400
-Received: by mail-we0-f174.google.com with SMTP id t9so372908wey.19
-        for <linux-kbuild@vger.kernel.org>; Tue, 30 Oct 2012 15:36:22 -0700 (PDT)
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: Re: [PATCH 0/3 v3] kconfig: get the CONFIG_ prefix from the environment
-Date: Tue, 30 Oct 2012 23:36:15 +0100
-References: <1350687985-21053-1-git-send-email-yann.morin.1998@free.fr>
-In-Reply-To: <1350687985-21053-1-git-send-email-yann.morin.1998@free.fr>
+	Wed, 31 Oct 2012 22:51:14 -0400
+Received: from terra2 by host.northwestnissans.com with local (Exim 4.80)
+	(envelope-from <terra2@host.northwestnissans.com>)
+	id 1TSbXU-0002pg-IO
+	for linux-kbuild@vger.kernel.org; Sun, 28 Oct 2012 17:41:04 -0500
+Subject: How Are You Doing Today.
+From: Leung Andrew <captainan@email.org>
+Reply-To: captainan@e-mail.ua
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-15"
-Content-Transfer-Encoding: 7bit
-Message-Id: <201210302336.15882.yann.morin.1998@free.fr>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7BIT
+Message-Id: <E1TSbXU-0002pg-IO@host.northwestnissans.com>
+Date: Sun, 28 Oct 2012 17:41:04 -0500
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: Michal Marek <mmarek@suse.cz>
 
-Hello!
+I am a Canadian Army my name is Captain Andrew Leung. 090209-M-3450C-014
+II Marine Expeditionary of Multinational Division Center base in
+Kabul,Afghanistan, of the NATO Marine Force on Monitoring and Peace
+keeping mission in Afghanistan,On May 7,2012! we were alerted on the
+sudden presence of some Terrorists camping in Marzar Sharif . a suburb not
+too far from Kabul here in Afghanistan. After Immediate intervention, we
+captured three (3) of the Terrorists,(7) injured.In the process of torture
+they confessed being re! bels for Abu Baqir a Taliban sub-commander and
+al-Qaida group leader, and they took us to a cave in Marzar Sharif. which
+served as their camp.Here we recovered several guns and other Ammunitions
+including some boxes among which two contains nuclear weapons, and the
+other contains some millions of US Dollars and i have in my possession the
+sum of 9.7 million U.S. dollars as my share.
 
-On Saturday 20 October 2012 Yann E. MORIN wrote:
-> This little patch series allows one to override the CONFIG_ prefix at 
-> runtime, without the need to rebuild the frontends.
+I am in keen need of a Reliable and Trust worthy person like you who would
+receive the MONEY,secure and protect the box which contains the US Dollars
+for me because in 3 weeks time some U.S.Army will replace our UNIT in
+Afghanistan and i will soon come back and finish the deal and reloc! ate my
+family to your country. I assure and promise to give! you 30% of this fund
+and you keep 70%for me, however feel free to negotiate what you wish to
+have as your percentage in this business.
 
-Any status on this one? ;-)
+It is never a stolen money or illegal money but because were ! on duty to
+bring peace in Afghanistan many soldiers lost th! eir life and no amount of
+compensation that may bring back the life of dead soldier then consider
+how the family will feel,that is the reasons my unit decided to share the
+money among us but return all the guns and ammunition's to our Camp,it is
+official and that's the reason i need your assistance to ship the box to
+any save location of your choice.
+
+Please, i trust you to maintain absolute secrecy and confidentiality to
+protect my job,myself and the money. In less than 5 days the box should be
+in your possession and i will give you further instructions.But you must
+know that i have taken precautionary measures to secure the money.The box
+is coded with high secu! rity gadget so am the only one that has the right
+combination to unlock it.Please send the following information me so i can
+proceed.
+
+Your full name ............................
+Your full address ..........................
+Your direct phone number ................
+Your Age .......................
 
 Regards,
-Yann E. MORIN.
+Captain Andrew Leung
 
--- 
-.-----------------.--------------------.------------------.--------------------.
-|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
-| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
-| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
-| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
-'------------------------------^-------^------------------^--------------------'
+
