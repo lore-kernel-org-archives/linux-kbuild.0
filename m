@@ -1,66 +1,63 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from service87.mimecast.com ([91.220.42.44]:47319 "EHLO
-	service87.mimecast.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1758690Ab2J2LXT (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 29 Oct 2012 07:23:19 -0400
-From: Pawel Moll <pawel.moll@arm.com>
-Subject: [PATCH] kbuild: Do not remove vmlinux when cleaning external module
-Date: Mon, 29 Oct 2012 11:23:02 +0000
-Message-Id: <1351509782-12462-1-git-send-email-pawel.moll@arm.com>
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
+Received: from cantor2.suse.de ([195.135.220.15]:60713 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1755350Ab2J2ODK (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 29 Oct 2012 10:03:10 -0400
+Date: Mon, 29 Oct 2012 15:03:08 +0100
+From: Michal Marek <mmarek@suse.cz>
+Subject: Re: IRQ subsystem menu
+Message-ID: <20121029140308.GA19316@sepie.suse.cz>
+References: <20121021074016.GA2604@squish.home.loc>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20121021074016.GA2604@squish.home.loc>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Pawel Moll <pawel.moll@arm.com>
+To: Paul Thompson <set.mailinglist@gmail.com>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>
 
-Since commit 1f2bfbd00e466ff3489b2ca5cc75b1cccd14c123 "kbuild:
-link of vmlinux moved to a script" make clean with M=3D<dir>
-argument (so cleaning external module) removes vmlinux,
-System.map and couple of other files from the *main* kernel
-build directory! This not what was happening before and almost
-certainly not what one would expect.
+(Adding lkml and Thomas as IRQ subsystem maintainer to CC)
 
-This patch moves makes the clean target of the script called
-only when !KBUILD_EXTMOD.
+On Sun, Oct 21, 2012 at 03:40:16AM -0400, Paul Thompson wrote:
+> 	Hi;
+> 
+> 	In menuconfig, General setup -> IRQ subsystem, there are two
+> possible menu-items. One depends partly on IRQ_DOMAIN, and the other
+> on MAY_HAVE_SPARSE_IRQ.
+> 
+> 	On the x86-64 arch, neither of these seems to be set, so the
+> menu entry is blank if entered (displaying an odd ^@ if you try to
+> navigate up or down. And sometimes some screen garbage on the sides.)
+> 
+> 	Previously (in the 3.2 kernel at least) this menu used to be
+> populated by the "Support sparse IRQ numbering" menu-item, which
+> at that time depended on HAVE_SPARSE_IRQ, and was forced to YES.
+> 
+> 	I do not know if the current behaviour is intended, but it
+> is ugly and confusing to be confronted with a blank menu page.
+> 
+> 	Ideally, the "IRQ subsystem" menu would not even show up
+> if it would contain no menu-items, but I do not know enough to
+> formulate that constraint.
+> 
+> 	A simple alternative is a comment section to reasure babes in
+> the wood of kernel configuration that something is not amiss. I include
+> a sample patch.
+> 
+> Paul
+> set.mailinglist@gmail.com
 
-Signed-off-by: Pawel Moll <pawel.moll@arm.com>
----
- Makefile |    8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
-
-diff --git a/Makefile b/Makefile
-index 5be2ee8..fa16e12 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1008,11 +1008,14 @@ clean: rm-dirs  :=3D $(CLEAN_DIRS)
- clean: rm-files :=3D $(CLEAN_FILES)
- clean-dirs      :=3D $(addprefix _clean_, . $(vmlinux-alldirs) Documentati=
-on samples)
-=20
--PHONY +=3D $(clean-dirs) clean archclean
-+PHONY +=3D $(clean-dirs) clean archclean vmlinuxclean
- $(clean-dirs):
- =09$(Q)$(MAKE) $(clean)=3D$(patsubst _clean_%,%,$@)
-=20
--clean: archclean
-+vmlinuxclean:
-+=09$(Q)$(CONFIG_SHELL) $(srctree)/scripts/link-vmlinux.sh clean
-+
-+clean: archclean vmlinuxclean
-=20
- # mrproper - Delete all generated files, including .config
- #
-@@ -1239,7 +1242,6 @@ scripts: ;
- endif # KBUILD_EXTMOD
-=20
- clean: $(clean-dirs)
--=09$(Q)$(CONFIG_SHELL) $(srctree)/scripts/link-vmlinux.sh clean
- =09$(call cmd,rmdirs)
- =09$(call cmd,rmfiles)
- =09@find $(if $(KBUILD_EXTMOD), $(KBUILD_EXTMOD), .) $(RCS_FIND_IGNORE) \
---=20
-1.7.10.4
-
+> --- linux-3.7-rc2/kernel/irq/Kconfig.orig	2012-10-20 15:11:32.000000000 -0400
+> +++ linux-3.7-rc2/kernel/irq/Kconfig	2012-10-21 03:14:56.272952813 -0400
+> @@ -4,6 +4,9 @@ config HAVE_GENERIC_HARDIRQS
+>  
+>  if HAVE_GENERIC_HARDIRQS
+>  menu "IRQ subsystem"
+> +
+> +comment "Some configurations may have no available options here"
+> +
+>  #
+>  # Interrupt subsystem related configuration options
+>  #
 
