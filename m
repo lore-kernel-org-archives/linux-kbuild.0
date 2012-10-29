@@ -1,63 +1,66 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from g1t0029.austin.hp.com ([15.216.28.36]:12076 "EHLO
-	g1t0029.austin.hp.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S966838Ab2JZWrz (ORCPT
+Received: from service87.mimecast.com ([91.220.42.44]:47319 "EHLO
+	service87.mimecast.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1758690Ab2J2LXT (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 26 Oct 2012 18:47:55 -0400
-Message-ID: <1351291667.6504.13.camel@MikesLinux.fc.hp.com>
-Subject: [PATCH v2] mm: memmap_init_zone() performance improvement
-From: Mike Yoknis <mike.yoknis@hp.com>
-Reply-To: mike.yoknis@hp.com
-Date: Fri, 26 Oct 2012 16:47:47 -0600
-In-Reply-To: <20121025094410.GA2558@suse.de>
-References: <1349276174-8398-1-git-send-email-mike.yoknis@hp.com>
-	 <20121008151656.GM29125@suse.de>
-	 <1349794597.29752.10.camel@MikesLinux.fc.hp.com>
-	 <1350676398.1169.6.camel@MikesLinux.fc.hp.com>
-	 <20121020082858.GA2698@suse.de>
-	 <1351093667.1205.11.camel@MikesLinux.fc.hp.com>
-	 <20121025094410.GA2558@suse.de>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+	Mon, 29 Oct 2012 07:23:19 -0400
+From: Pawel Moll <pawel.moll@arm.com>
+Subject: [PATCH] kbuild: Do not remove vmlinux when cleaning external module
+Date: Mon, 29 Oct 2012 11:23:02 +0000
+Message-Id: <1351509782-12462-1-git-send-email-pawel.moll@arm.com>
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Mel Gorman <mgorman@suse.de>
-Cc: mingo@redhat.com, akpm@linux-foundation.org, linux-arch@vger.kernel.org, mmarek@suse.cz, tglx@linutronix.de, hpa@zytor.com, arnd@arndb.de, sam@ravnborg.org, minchan@kernel.org, kamezawa.hiroyu@jp.fujitsu.com, mhocko@suse.cz, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Pawel Moll <pawel.moll@arm.com>
 
-memmap_init_zone() loops through every Page Frame Number (pfn),
-including pfn values that are within the gaps between existing
-memory sections.  The unneeded looping will become a boot
-performance issue when machines configure larger memory ranges
-that will contain larger and more numerous gaps.
+Since commit 1f2bfbd00e466ff3489b2ca5cc75b1cccd14c123 "kbuild:
+link of vmlinux moved to a script" make clean with M=3D<dir>
+argument (so cleaning external module) removes vmlinux,
+System.map and couple of other files from the *main* kernel
+build directory! This not what was happening before and almost
+certainly not what one would expect.
 
-The code will skip across invalid pfn values to reduce the
-number of loops executed.
+This patch moves makes the clean target of the script called
+only when !KBUILD_EXTMOD.
 
-Signed-off-by: Mike Yoknis <mike.yoknis@hp.com>
+Signed-off-by: Pawel Moll <pawel.moll@arm.com>
 ---
- mm/page_alloc.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ Makefile |    8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-diff --git a/mm/page_alloc.c b/mm/page_alloc.c
-index 45c916b..9f9c1a6 100644
---- a/mm/page_alloc.c
-+++ b/mm/page_alloc.c
-@@ -3857,8 +3857,11 @@ void __meminit memmap_init_zone(unsigned long
-size, int nid, unsigned long zone,
- 		 * exist on hotplugged memory.
- 		 */
- 		if (context == MEMMAP_EARLY) {
--			if (!early_pfn_valid(pfn))
-+			if (!early_pfn_valid(pfn)) {
-+				pfn = ALIGN(pfn + MAX_ORDER_NR_PAGES,
-+						MAX_ORDER_NR_PAGES) - 1;
- 				continue;
-+			}
- 			if (!early_pfn_in_nid(pfn, nid))
- 				continue;
- 		}
--- 
-1.7.11.3
+diff --git a/Makefile b/Makefile
+index 5be2ee8..fa16e12 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1008,11 +1008,14 @@ clean: rm-dirs  :=3D $(CLEAN_DIRS)
+ clean: rm-files :=3D $(CLEAN_FILES)
+ clean-dirs      :=3D $(addprefix _clean_, . $(vmlinux-alldirs) Documentati=
+on samples)
+=20
+-PHONY +=3D $(clean-dirs) clean archclean
++PHONY +=3D $(clean-dirs) clean archclean vmlinuxclean
+ $(clean-dirs):
+ =09$(Q)$(MAKE) $(clean)=3D$(patsubst _clean_%,%,$@)
+=20
+-clean: archclean
++vmlinuxclean:
++=09$(Q)$(CONFIG_SHELL) $(srctree)/scripts/link-vmlinux.sh clean
++
++clean: archclean vmlinuxclean
+=20
+ # mrproper - Delete all generated files, including .config
+ #
+@@ -1239,7 +1242,6 @@ scripts: ;
+ endif # KBUILD_EXTMOD
+=20
+ clean: $(clean-dirs)
+-=09$(Q)$(CONFIG_SHELL) $(srctree)/scripts/link-vmlinux.sh clean
+ =09$(call cmd,rmdirs)
+ =09$(call cmd,rmfiles)
+ =09@find $(if $(KBUILD_EXTMOD), $(KBUILD_EXTMOD), .) $(RCS_FIND_IGNORE) \
+--=20
+1.7.10.4
 
 
