@@ -1,44 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from quartz.orcorp.ca ([184.70.90.242]:43083 "EHLO quartz.orcorp.ca"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751906Ab2J3PTO (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 30 Oct 2012 11:19:14 -0400
-Date: Tue, 30 Oct 2012 09:19:13 -0600
-From: Jason Gunthorpe <jgunthorpe@obsidianresearch.com>
-Subject: Re: [PATCH] [KBUILD] Put the CROSS_COMPILE and ARCH variables in
- the build directory makefile
-Message-ID: <20121030151913.GA13176@obsidianresearch.com>
-References: <20120930232005.GB30637@obsidianresearch.com>
- <508FDA2B.9000001@suse.cz>
+Received: from e31.co.us.ibm.com ([32.97.110.149]:33398 "EHLO
+	e31.co.us.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1758023Ab2J3PXV (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 30 Oct 2012 11:23:21 -0400
+Received: from /spool/local
+	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+	for <linux-kbuild@vger.kernel.org> from <dave@linux.vnet.ibm.com>;
+	Tue, 30 Oct 2012 09:23:16 -0600
+Message-ID: <508FEECE.2070402@linux.vnet.ibm.com>
+Date: Tue, 30 Oct 2012 08:14:22 -0700
+From: Dave Hansen <dave@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <508FDA2B.9000001@suse.cz>
+Subject: Re: [PATCH] mm: memmap_init_zone() performance improvement
+References: <1349276174-8398-1-git-send-email-mike.yoknis@hp.com> <20121008151656.GM29125@suse.de> <1349794597.29752.10.camel@MikesLinux.fc.hp.com> <1350676398.1169.6.camel@MikesLinux.fc.hp.com> <20121020082858.GA2698@suse.de>
+In-Reply-To: <20121020082858.GA2698@suse.de>
+Content-Type: text/plain; charset=ISO-8859-15
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org
+To: Mel Gorman <mgorman@suse.de>
+Cc: Mike Yoknis <mike.yoknis@hp.com>, mingo@redhat.com, akpm@linux-foundation.org, linux-arch@vger.kernel.org, mmarek@suse.cz, tglx@linutronix.de, hpa@zytor.com, arnd@arndb.de, sam@ravnborg.org, minchan@kernel.org, kamezawa.hiroyu@jp.fujitsu.com, mhocko@suse.cz, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org
 
-On Tue, Oct 30, 2012 at 02:46:19PM +0100, Michal Marek wrote:
-> On 1.10.2012 01:20, Jason Gunthorpe wrote:
-> > To make cross building a little simpler. The usage with mini-config would
-> > be something like:
-> > 
-> > $ mkdir build
-> > $ make ARCH=arm CROSS_COMPILE=arm-v5te-linux-gnueabi- \
-> >        KCONFIG_ALLCONFIG=mini.config O=build allnoconfig
-> > $ make -C build/
+On 10/20/2012 01:29 AM, Mel Gorman wrote:
+> I'm travelling at the moment so apologies that I have not followed up on
+> this. My problem is still the same with the patch - it changes more
+> headers than is necessary and it is sparsemem specific. At minimum, try
+> the suggestion of 
 > 
-> Are you sure this is not going to suffer from the same issues as
-> 5755433? See
+> if (!early_pfn_valid(pfn)) {
+>       pfn = ALIGN(pfn + MAX_ORDER_NR_PAGES, MAX_ORDER_NR_PAGES) - 1;
+>       continue;
+> }
 
-Thanks for this link, this is the first time I've seen that, so no :)
+Sorry I didn't catch this until v2...
 
-The approaches are different, my version that uses mkmakefile probably
-avoids some problems (like the quoting issue) but I'm not sure about
-mrproper. I've never seen mrproper complain, but I've always used this
-patch with O=..
+Is that ALIGN() correct?  If pfn=3, then it would expand to:
 
-Let me review this information and get back to you.
+(3+MAX_ORDER_NR_PAGES+MAX_ORDER_NR_PAGES-1) & ~(MAX_ORDER_NR_PAGES-1)
 
-Jason
+You would end up skipping the current MAX_ORDER_NR_PAGES area, and then
+one _extra_ because ALIGN() aligns up, and you're adding
+MAX_ORDER_NR_PAGES too.  It doesn't matter unless you run in to a
+!early_valid_pfn() in the middle of a MAX_ORDER area, I guess.
+
+I think this would work, plus be a bit smaller:
+
+	pfn = ALIGN(pfn + 1, MAX_ORDER_NR_PAGES) - 1;
+
