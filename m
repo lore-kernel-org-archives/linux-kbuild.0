@@ -1,80 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.linuxfoundation.org ([140.211.169.12]:49040 "EHLO
-	mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752463Ab2J3Wb7 (ORCPT
+Received: from mail-we0-f174.google.com ([74.125.82.174]:42138 "EHLO
+	mail-we0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932633Ab2J3WgX (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 30 Oct 2012 18:31:59 -0400
-Date: Tue, 30 Oct 2012 15:31:57 -0700
-From: Andrew Morton <akpm@linux-foundation.org>
-Subject: Re: [PATCH v2] mm: memmap_init_zone() performance improvement
-Message-Id: <20121030153157.70279408.akpm@linux-foundation.org>
-In-Reply-To: <1351291667.6504.13.camel@MikesLinux.fc.hp.com>
-References: <1349276174-8398-1-git-send-email-mike.yoknis@hp.com>
-	<20121008151656.GM29125@suse.de>
-	<1349794597.29752.10.camel@MikesLinux.fc.hp.com>
-	<1350676398.1169.6.camel@MikesLinux.fc.hp.com>
-	<20121020082858.GA2698@suse.de>
-	<1351093667.1205.11.camel@MikesLinux.fc.hp.com>
-	<20121025094410.GA2558@suse.de>
-	<1351291667.6504.13.camel@MikesLinux.fc.hp.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+	Tue, 30 Oct 2012 18:36:23 -0400
+Received: by mail-we0-f174.google.com with SMTP id t9so372908wey.19
+        for <linux-kbuild@vger.kernel.org>; Tue, 30 Oct 2012 15:36:22 -0700 (PDT)
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Subject: Re: [PATCH 0/3 v3] kconfig: get the CONFIG_ prefix from the environment
+Date: Tue, 30 Oct 2012 23:36:15 +0100
+References: <1350687985-21053-1-git-send-email-yann.morin.1998@free.fr>
+In-Reply-To: <1350687985-21053-1-git-send-email-yann.morin.1998@free.fr>
+MIME-Version: 1.0
+Content-Type: Text/Plain;
+  charset="iso-8859-15"
 Content-Transfer-Encoding: 7bit
+Message-Id: <201210302336.15882.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: mike.yoknis@hp.com
-Cc: Mel Gorman <mgorman@suse.de>, mingo@redhat.com, linux-arch@vger.kernel.org, mmarek@suse.cz, tglx@linutronix.de, hpa@zytor.com, arnd@arndb.de, sam@ravnborg.org, minchan@kernel.org, kamezawa.hiroyu@jp.fujitsu.com, mhocko@suse.cz, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org
+To: linux-kbuild@vger.kernel.org
+Cc: Michal Marek <mmarek@suse.cz>
 
-On Fri, 26 Oct 2012 16:47:47 -0600
-Mike Yoknis <mike.yoknis@hp.com> wrote:
+Hello!
 
-> memmap_init_zone() loops through every Page Frame Number (pfn),
-> including pfn values that are within the gaps between existing
-> memory sections.  The unneeded looping will become a boot
-> performance issue when machines configure larger memory ranges
-> that will contain larger and more numerous gaps.
-> 
-> The code will skip across invalid pfn values to reduce the
-> number of loops executed.
-> 
+On Saturday 20 October 2012 Yann E. MORIN wrote:
+> This little patch series allows one to override the CONFIG_ prefix at 
+> runtime, without the need to rebuild the frontends.
 
-So I was wondering how much difference this makes.  Then I see Mel
-already asked and was answered.  The lesson: please treat a reviewer
-question as a sign that the changelog needs more information!  I added
-this text to the changelog:
+Any status on this one? ;-)
 
-: We have what we call an "architectural simulator".  It is a computer
-: program that pretends that it is a computer system.  We use it to test the
-: firmware before real hardware is available.  We have booted Linux on our
-: simulator.  As you would expect it takes longer to boot on the simulator
-: than it does on real hardware.
-: 
-: With my patch - boot time 41 minutes
-: Without patch - boot time 94 minutes
-: 
-: These numbers do not scale linearly to real hardware.  But indicate to me
-: a place where Linux can be improved.
+Regards,
+Yann E. MORIN.
 
-> --- a/mm/page_alloc.c
-> +++ b/mm/page_alloc.c
-> @@ -3857,8 +3857,11 @@ void __meminit memmap_init_zone(unsigned long
-> size, int nid, unsigned long zone,
->  		 * exist on hotplugged memory.
->  		 */
->  		if (context == MEMMAP_EARLY) {
-> -			if (!early_pfn_valid(pfn))
-> +			if (!early_pfn_valid(pfn)) {
-> +				pfn = ALIGN(pfn + MAX_ORDER_NR_PAGES,
-> +						MAX_ORDER_NR_PAGES) - 1;
->  				continue;
-> +			}
->  			if (!early_pfn_in_nid(pfn, nid))
->  				continue;
->  		}
-
-So what is the assumption here?  That each zone's first page has a pfn
-which is a multiple of MAX_ORDER_NR_PAGES?
-
-That seems reasonable, but is it actually true, for all architectures
-and for all time?  Where did this come from?
-
+-- 
+.-----------------.--------------------.------------------.--------------------.
+|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
+| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
+| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
+| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
+'------------------------------^-------^------------------^--------------------'
