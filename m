@@ -1,58 +1,49 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-da0-f46.google.com ([209.85.210.46]:58494 "EHLO
-	mail-da0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752128Ab2KDHcv (ORCPT
+Received: from caramon.arm.linux.org.uk ([78.32.30.218]:36040 "EHLO
+	caramon.arm.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752313Ab2KDNeV (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 4 Nov 2012 02:32:51 -0500
-From: Adam Lee <adam8157@gmail.com>
-Subject: [PATCH] kconfig: fix the failure of `make rpm-pkg` after localversion file changed
-Date: Sun,  4 Nov 2012 15:32:41 +0800
-Message-Id: <1352014361-21159-1-git-send-email-adam8157@gmail.com>
+	Sun, 4 Nov 2012 08:34:21 -0500
+Date: Sun, 4 Nov 2012 13:34:13 +0000
+From: Russell King <rmk@arm.linux.org.uk>
+Subject: lzma targets always get rebuilt
+Message-ID: <20121104133412.GA19301@flint.arm.linux.org.uk>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: Michal Marek <mmarek@suse.cz>, "open list:KERNEL BUILD + fi..." <linux-kbuild@vger.kernel.org>
+To: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>
 
-`make rpm-pkg` and `make binrpm-pkg` will write $KERNELRELEASE into rpm
-spec files which don't depend on localversion file now. So, the
-unchanged spec files will cause failure after localversion file changed.
+$ emake -j2 O=../build/omap4/ uImage V=2
+...
+  CHK     include/generated/compile.h
+echo '  Kernel: arch/arm/boot/Image is ready'
+  Kernel: arch/arm/boot/Image is ready
+  LZMA    arch/arm/boot/compressed/piggy.lzma - due to command line change
+  AS      arch/arm/boot/compressed/piggy.lzma.o - due to: arch/arm/boot/compressed/piggy.lzma
+  LD      arch/arm/boot/compressed/vmlinux - due to: arch/arm/boot/compressed/piggy.lzma.o
+  OBJCOPY arch/arm/boot/zImage - due to: arch/arm/boot/compressed/vmlinux
+echo '  Kernel: arch/arm/boot/zImage is ready'
+  Kernel: arch/arm/boot/zImage is ready
+  UIMAGE  arch/arm/boot/uImage - due to: arch/arm/boot/zImage
+Image Name:   Linux-3.7.0-rc3+
+Created:      Sun Nov  4 13:31:13 2012
+Image Type:   ARM Linux Kernel Image (uncompressed)
+Data Size:    1756112 Bytes = 1714.95 kB = 1.67 MB
+Load Address: 0x80008000
+Entry Point:  0x80008000
+echo '  Image arch/arm/boot/uImage is ready'
+  Image arch/arm/boot/uImage is ready
 
-I added the localversion file into the dependencies of spec files.
-Because that file is not necessary, I made it a empty target, so its
-last-modification time will be checked by Make only when it exists.
+This happens every time - Kbuild always thinks that the LZMA command has
+changed.  Here's the .cmd file for this:
 
-Signed-off-by: Adam Lee <adam8157@gmail.com>
----
- scripts/package/Makefile |    7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+cmd_arch/arm/boot/compressed/piggy.lzma := (cat arch/arm/boot/compressed/../Image | lzma -9 && printf \\\\200\\\\111\\\\113\\\\000) > arch/arm/boot/compressed/piggy.lzma || (rm -f arch/arm/boot/compressed/piggy.lzma ; false)
 
-diff --git a/scripts/package/Makefile b/scripts/package/Makefile
-index 87bf080..a7c1f59 100644
---- a/scripts/package/Makefile
-+++ b/scripts/package/Makefile
-@@ -30,9 +30,12 @@ KERNELPATH := kernel-$(subst -,_,$(KERNELRELEASE))
- MKSPEC     := $(srctree)/scripts/package/mkspec
- PREV       := set -e; cd -P ..;
- 
-+# localversion, its last-modification time will be checked only when it exists
-+localversion:
-+
- # rpm-pkg
- # ---------------------------------------------------------------------------
--$(objtree)/kernel.spec: $(MKSPEC) $(srctree)/Makefile
-+$(objtree)/kernel.spec: $(MKSPEC) $(srctree)/Makefile localversion
- 	$(CONFIG_SHELL) $(MKSPEC) > $@
- 
- rpm-pkg rpm: $(objtree)/kernel.spec FORCE
-@@ -60,7 +63,7 @@ clean-files := $(objtree)/kernel.spec
- 
- # binrpm-pkg
- # ---------------------------------------------------------------------------
--$(objtree)/binkernel.spec: $(MKSPEC) $(srctree)/Makefile
-+$(objtree)/binkernel.spec: $(MKSPEC) $(srctree)/Makefile localversion
- 	$(CONFIG_SHELL) $(MKSPEC) prebuilt > $@
- 
- binrpm-pkg: $(objtree)/binkernel.spec FORCE
+I suspect it's those multiple \ which are causing problems...
+
 -- 
-1.7.10.4
-
+Russell King
+ Linux kernel    2.6 ARM Linux   - http://www.arm.linux.org.uk/
+ maintainer of:
