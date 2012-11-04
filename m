@@ -1,69 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from host2.northwestnissans.com ([173.199.143.79]:56139 "EHLO
-	host.northwestnissans.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756830Ab2KACvO (ORCPT
+Received: from mail-da0-f46.google.com ([209.85.210.46]:58494 "EHLO
+	mail-da0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752128Ab2KDHcv (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 31 Oct 2012 22:51:14 -0400
-Received: from terra2 by host.northwestnissans.com with local (Exim 4.80)
-	(envelope-from <terra2@host.northwestnissans.com>)
-	id 1TSbXU-0002pg-IO
-	for linux-kbuild@vger.kernel.org; Sun, 28 Oct 2012 17:41:04 -0500
-Subject: How Are You Doing Today.
-From: Leung Andrew <captainan@email.org>
-Reply-To: captainan@e-mail.ua
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7BIT
-Message-Id: <E1TSbXU-0002pg-IO@host.northwestnissans.com>
-Date: Sun, 28 Oct 2012 17:41:04 -0500
+	Sun, 4 Nov 2012 02:32:51 -0500
+From: Adam Lee <adam8157@gmail.com>
+Subject: [PATCH] kconfig: fix the failure of `make rpm-pkg` after localversion file changed
+Date: Sun,  4 Nov 2012 15:32:41 +0800
+Message-Id: <1352014361-21159-1-git-send-email-adam8157@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
+To: linux-kernel@vger.kernel.org
+Cc: Michal Marek <mmarek@suse.cz>, "open list:KERNEL BUILD + fi..." <linux-kbuild@vger.kernel.org>
 
-I am a Canadian Army my name is Captain Andrew Leung. 090209-M-3450C-014
-II Marine Expeditionary of Multinational Division Center base in
-Kabul,Afghanistan, of the NATO Marine Force on Monitoring and Peace
-keeping mission in Afghanistan,On May 7,2012! we were alerted on the
-sudden presence of some Terrorists camping in Marzar Sharif . a suburb not
-too far from Kabul here in Afghanistan. After Immediate intervention, we
-captured three (3) of the Terrorists,(7) injured.In the process of torture
-they confessed being re! bels for Abu Baqir a Taliban sub-commander and
-al-Qaida group leader, and they took us to a cave in Marzar Sharif. which
-served as their camp.Here we recovered several guns and other Ammunitions
-including some boxes among which two contains nuclear weapons, and the
-other contains some millions of US Dollars and i have in my possession the
-sum of 9.7 million U.S. dollars as my share.
+`make rpm-pkg` and `make binrpm-pkg` will write $KERNELRELEASE into rpm
+spec files which don't depend on localversion file now. So, the
+unchanged spec files will cause failure after localversion file changed.
 
-I am in keen need of a Reliable and Trust worthy person like you who would
-receive the MONEY,secure and protect the box which contains the US Dollars
-for me because in 3 weeks time some U.S.Army will replace our UNIT in
-Afghanistan and i will soon come back and finish the deal and reloc! ate my
-family to your country. I assure and promise to give! you 30% of this fund
-and you keep 70%for me, however feel free to negotiate what you wish to
-have as your percentage in this business.
+I added the localversion file into the dependencies of spec files.
+Because that file is not necessary, I made it a empty target, so its
+last-modification time will be checked by Make only when it exists.
 
-It is never a stolen money or illegal money but because were ! on duty to
-bring peace in Afghanistan many soldiers lost th! eir life and no amount of
-compensation that may bring back the life of dead soldier then consider
-how the family will feel,that is the reasons my unit decided to share the
-money among us but return all the guns and ammunition's to our Camp,it is
-official and that's the reason i need your assistance to ship the box to
-any save location of your choice.
+Signed-off-by: Adam Lee <adam8157@gmail.com>
+---
+ scripts/package/Makefile |    7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-Please, i trust you to maintain absolute secrecy and confidentiality to
-protect my job,myself and the money. In less than 5 days the box should be
-in your possession and i will give you further instructions.But you must
-know that i have taken precautionary measures to secure the money.The box
-is coded with high secu! rity gadget so am the only one that has the right
-combination to unlock it.Please send the following information me so i can
-proceed.
-
-Your full name ............................
-Your full address ..........................
-Your direct phone number ................
-Your Age .......................
-
-Regards,
-Captain Andrew Leung
-
+diff --git a/scripts/package/Makefile b/scripts/package/Makefile
+index 87bf080..a7c1f59 100644
+--- a/scripts/package/Makefile
++++ b/scripts/package/Makefile
+@@ -30,9 +30,12 @@ KERNELPATH := kernel-$(subst -,_,$(KERNELRELEASE))
+ MKSPEC     := $(srctree)/scripts/package/mkspec
+ PREV       := set -e; cd -P ..;
+ 
++# localversion, its last-modification time will be checked only when it exists
++localversion:
++
+ # rpm-pkg
+ # ---------------------------------------------------------------------------
+-$(objtree)/kernel.spec: $(MKSPEC) $(srctree)/Makefile
++$(objtree)/kernel.spec: $(MKSPEC) $(srctree)/Makefile localversion
+ 	$(CONFIG_SHELL) $(MKSPEC) > $@
+ 
+ rpm-pkg rpm: $(objtree)/kernel.spec FORCE
+@@ -60,7 +63,7 @@ clean-files := $(objtree)/kernel.spec
+ 
+ # binrpm-pkg
+ # ---------------------------------------------------------------------------
+-$(objtree)/binkernel.spec: $(MKSPEC) $(srctree)/Makefile
++$(objtree)/binkernel.spec: $(MKSPEC) $(srctree)/Makefile localversion
+ 	$(CONFIG_SHELL) $(MKSPEC) prebuilt > $@
+ 
+ binrpm-pkg: $(objtree)/binkernel.spec FORCE
+-- 
+1.7.10.4
 
