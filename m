@@ -1,126 +1,101 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from goliath.siemens.de ([192.35.17.28]:30507 "EHLO
-	goliath.siemens.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752520Ab2KEQP4 (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 5 Nov 2012 11:15:56 -0500
+Received: from thoth.sbs.de ([192.35.17.2]:26128 "EHLO thoth.sbs.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752932Ab2KEQvB (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 5 Nov 2012 11:51:01 -0500
 From: Jan Kiszka <jan.kiszka@siemens.com>
-Subject: [PATCH 01/13] scripts/gdb: Add infrastructure
-Date: Mon,  5 Nov 2012 17:08:54 +0100
-Message-Id: <7ea12a8041f05363ceb14fe61c1ec067be11eec3.1352131730.git.jan.kiszka@siemens.com>
-In-Reply-To: <cover.1352131729.git.jan.kiszka@siemens.com>
-References: <cover.1352131729.git.jan.kiszka@siemens.com>
-In-Reply-To: <cover.1352131729.git.jan.kiszka@siemens.com>
-References: <cover.1352131729.git.jan.kiszka@siemens.com>
+Subject: [PATCH 00/13] Add gdb python scripts as kernel debugging helpers
+Date: Mon,  5 Nov 2012 17:08:53 +0100
+Message-Id: <cover.1352131729.git.jan.kiszka@siemens.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org
-Cc: Jason Wessel <jason.wessel@windriver.com>, kgdb-bugreport@lists.sourceforge.net, Andi Kleen <andi@firstfloor.org>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
+Cc: Jason Wessel <jason.wessel@windriver.com>, kgdb-bugreport@lists.sourceforge.net, Andi Kleen <andi@firstfloor.org>, "David S. Miller" <davem@davemloft.net>, Fenghua Yu <fenghua.yu@intel.com>, Kay Sievers <kay@vrfy.org>, linux-ia64@vger.kernel.org, linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>, sparclinux@vger.kernel.org, Tony Luck <tony.luck@intel.com>
 
-This provides the basic infrastructure to load kernel-specific python
-helper scripts when debugging the kernel in gdb.
+Version 2 of this series is a rebase over 3.7-rc4 to resolve some minor
+collision in the top-level makefile. Moreover, this implements automatic
+symbol loading for kernel modules using silent breakpoints. See patch 3
+for details.
 
-The loading mechanism is based on gdb loading for <objfile>-gdb.py when
-opening <objfile>. Therefore, this places a corresponding link to the
-main helper script into the output directory that contains vmlinux.
+Unless someone complains over this series or suggests a better workflow,
+I'm planning to send a pull to Linus during the next merge window.
 
-The main scripts will pull in submodules containing Linux specific gdb
-commands and functions. To avoid polluting the source directory with
-compiled python modules, we link to them from the object directory.
 
-Due to gdb.parse_and_eval, we depend on gdb >= 7.1.
+Here is the original intro for reference:
 
-This feature depends on CONFIG_DEBUG_INFO.
+This adds the infrastructure and first tools that make kernel debugging
+through gdb more comfortable. Since 7.0, gdb supports python scripting.
+And this opens the doors to automate steps like the tedious loading of
+module symbols at the right address, resolving per-cpu variables or even
+retrieving the current kernel log without resuming an stopped target.
 
-CC: Michal Marek <mmarek@suse.cz>
+Many of the helpers naturally depend on the layout of structures or
+internal mechanics of the kernel. So the best place to maintain such
+things, keeping them consistent with the corresponding kernel is, well,
+the kernel itself.
+
+While these scripts have been originally developed for debugging via
+QEMU/KVM, I've now also added the required bits for KGDB. Works fine,
+but as QEMU/KVM tends to outperform KGDB it remains the recommendation
+- when available.
+
+There are two architecture dependencies so far, one regarding per-cpu,
+the other regarding thread_info calculation. None of them I was able to
+test on a target, so I'm counting on review/testing by the corresponding
+communities.
+
+This series should be considered the foundation of much more kernel
+state exploration helper, e.g. around tasks, timers, locks, sockets -
+I guess people will have even more ideas.
+
+Hope it's useful!
+
+PS: Also available via git://git.kiszka.org/linux.git queues/gdb-scripts
+
+CC: "David S. Miller" <davem@davemloft.net>
+CC: Fenghua Yu <fenghua.yu@intel.com>
+CC: Kay Sievers <kay@vrfy.org>
+CC: linux-ia64@vger.kernel.org
 CC: linux-kbuild@vger.kernel.org
-Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
----
- Makefile                   |    5 ++++-
- scripts/Makefile           |    3 ++-
- scripts/gdb/Makefile       |    9 +++++++++
- scripts/gdb/vmlinux-gdb.py |   20 ++++++++++++++++++++
- 4 files changed, 35 insertions(+), 2 deletions(-)
+CC: Michal Marek <mmarek@suse.cz>
+CC: sparclinux@vger.kernel.org
+CC: Tony Luck <tony.luck@intel.com>
+
+Jan Kiszka (13):
+  scripts/gdb: Add infrastructure
+  scripts/gdb: Add container_of helper and convenience function
+  scripts/gdb: Add lx-symbols command
+  scripts/gdb: Add get_target_endianness helper
+  scripts/gdb: Add read_u16/32/64 helpers
+  scripts/gdb: Add lx-dmesg command
+  scripts/gdb: Add task iteration helper
+  scripts/gdb: Add helper and convenience function to look up tasks
+  scripts/gdb: Add is_target_arch helper
+  scripts/gdb: Add internal helper and convenience function to retrieve
+    thread_info
+  scripts/gdb: Add get_gdbserver_type helper
+  scripts/gdb: Add internal helper and convenience function for per-cpu
+    lookup
+  scripts/gdb: Add lx_current convenience function
+
+ Makefile                   |    5 +-
+ scripts/Makefile           |    3 +-
+ scripts/gdb/Makefile       |    9 +++
+ scripts/gdb/dmesg.py       |   63 +++++++++++++++++++++
+ scripts/gdb/percpu.py      |   76 +++++++++++++++++++++++++
+ scripts/gdb/symbols.py     |  133 +++++++++++++++++++++++++++++++++++++++++++
+ scripts/gdb/task.py        |  108 +++++++++++++++++++++++++++++++++++
+ scripts/gdb/utils.py       |  134 ++++++++++++++++++++++++++++++++++++++++++++
+ scripts/gdb/vmlinux-gdb.py |   26 +++++++++
+ 9 files changed, 555 insertions(+), 2 deletions(-)
  create mode 100644 scripts/gdb/Makefile
+ create mode 100644 scripts/gdb/dmesg.py
+ create mode 100644 scripts/gdb/percpu.py
+ create mode 100644 scripts/gdb/symbols.py
+ create mode 100644 scripts/gdb/task.py
+ create mode 100644 scripts/gdb/utils.py
  create mode 100644 scripts/gdb/vmlinux-gdb.py
 
-diff --git a/Makefile b/Makefile
-index a1ccf22..6af7c03 100644
---- a/Makefile
-+++ b/Makefile
-@@ -774,6 +774,9 @@ endif
- ifdef CONFIG_BUILD_DOCSRC
- 	$(Q)$(MAKE) $(build)=Documentation
- endif
-+ifdef CONFIG_DEBUG_INFO
-+	$(Q)ln -fsn $(srctree)/scripts/gdb/vmlinux-gdb.py
-+endif
- 	+$(call if_changed,link-vmlinux)
- 
- # The actual objects are generated when descending, 
-@@ -1013,7 +1016,7 @@ MRPROPER_FILES += .config .config.old .version .old_version $(version_h) \
- 		  Module.symvers tags TAGS cscope* GPATH GTAGS GRTAGS GSYMS \
- 		  signing_key.priv signing_key.x509 x509.genkey		\
- 		  extra_certificates signing_key.x509.keyid		\
--		  signing_key.x509.signer
-+		  signing_key.x509.signer vmlinux-gdb.py
- 
- # clean - Delete most, but leave enough to build external modules
- #
-diff --git a/scripts/Makefile b/scripts/Makefile
-index 01e7adb..3204b91 100644
---- a/scripts/Makefile
-+++ b/scripts/Makefile
-@@ -37,6 +37,7 @@ subdir-$(CONFIG_MODVERSIONS) += genksyms
- subdir-y                     += mod
- subdir-$(CONFIG_SECURITY_SELINUX) += selinux
- subdir-$(CONFIG_DTC)         += dtc
-+subdir-$(CONFIG_DEBUG_INFO)  += gdb
- 
- # Let clean descend into subdirs
--subdir-	+= basic kconfig package selinux
-+subdir-	+= basic kconfig package selinux gdb
-diff --git a/scripts/gdb/Makefile b/scripts/gdb/Makefile
-new file mode 100644
-index 0000000..34ccd06
---- /dev/null
-+++ b/scripts/gdb/Makefile
-@@ -0,0 +1,9 @@
-+always := gdb-scripts
-+
-+$(obj)/gdb-scripts:
-+ifneq ($(KBUILD_SRC),)
-+	$(Q)ln -fsn $(srctree)/$(obj)/*.py $(objtree)/$(obj)
-+endif
-+	@:
-+
-+clean-files := *.pyc $(if $(KBUILD_SRC),*.py)
-diff --git a/scripts/gdb/vmlinux-gdb.py b/scripts/gdb/vmlinux-gdb.py
-new file mode 100644
-index 0000000..00df617
---- /dev/null
-+++ b/scripts/gdb/vmlinux-gdb.py
-@@ -0,0 +1,20 @@
-+#
-+# gdb helper commands and functions for Linux kernel debugging
-+#
-+#  loader module
-+#
-+# Copyright (c) 2012 Siemens AG
-+#
-+# Authors:
-+#  Jan Kiszka <jan.kiszka@siemens.com>
-+#
-+# This work is licensed under the terms of the GNU GPL version 2.
-+#
-+
-+import os
-+
-+sys.path = [ os.path.dirname(__file__) + "/scripts/gdb" ] + sys.path
-+
-+if not gdb.VERSION >= "7.1":
-+	print "NOTE: gdb 7.1 or later required for Linux helper scripts " \
-+	      "to work."
 -- 
 1.7.3.4
 
