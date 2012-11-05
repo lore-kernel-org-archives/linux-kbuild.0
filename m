@@ -1,101 +1,51 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from thoth.sbs.de ([192.35.17.2]:26128 "EHLO thoth.sbs.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752932Ab2KEQvB (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 5 Nov 2012 11:51:01 -0500
-From: Jan Kiszka <jan.kiszka@siemens.com>
-Subject: [PATCH 00/13] Add gdb python scripts as kernel debugging helpers
-Date: Mon,  5 Nov 2012 17:08:53 +0100
-Message-Id: <cover.1352131729.git.jan.kiszka@siemens.com>
+Received: from mail-wg0-f44.google.com ([74.125.82.44]:48193 "EHLO
+	mail-wg0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750706Ab2KEWnl (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 5 Nov 2012 17:43:41 -0500
+Received: by mail-wg0-f44.google.com with SMTP id dr13so4282184wgb.1
+        for <linux-kbuild@vger.kernel.org>; Mon, 05 Nov 2012 14:43:40 -0800 (PST)
+Message-ID: <50984118.2070204@gmail.com>
+Date: Mon, 05 Nov 2012 22:43:36 +0000
+From: Richard H Lee <ricardohenrylee@gmail.com>
+MIME-Version: 1.0
+Subject: Building linux headers in an non-linux environment
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: Jason Wessel <jason.wessel@windriver.com>, kgdb-bugreport@lists.sourceforge.net, Andi Kleen <andi@firstfloor.org>, "David S. Miller" <davem@davemloft.net>, Fenghua Yu <fenghua.yu@intel.com>, Kay Sievers <kay@vrfy.org>, linux-ia64@vger.kernel.org, linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>, sparclinux@vger.kernel.org, Tony Luck <tony.luck@intel.com>
+To: linux-kbuild@vger.kernel.org
 
-Version 2 of this series is a rebase over 3.7-rc4 to resolve some minor
-collision in the top-level makefile. Moreover, this implements automatic
-symbol loading for kernel modules using silent breakpoints. See patch 3
-for details.
+I'm trying to install linux headers for cygwin using crostool-ng.
 
-Unless someone complains over this series or suggests a better workflow,
-I'm planning to send a pull to Linus during the next merge window.
+ct-ng basically invokes the line:
+
+make -C /home/richard/scratch/x86linux/.build/src/linux-3.5 
+O=/home/richard/scratch/x86linux/.build/i386-unknown-linux-gnu/build/build-kernel-headers 
+ARCH=x86 
+INSTALL_HDR_PATH=/home/richard/x-tools/i386-unknown-linux-gnu/i386-unknown-linux-gnu/sysroot/usr 
+V=1 headers_install
+
+and it seems to have checked out v3.5 of the linux kernel.
+
+The problem is that making the headers seems to require an existing set 
+of headers already installed. The required headers seem to be in the 
+include/ and arch/[target]/ directories.
+
+What is the "correct" way to get the Makefile to use the source tree as 
+the source for the linux headers?
 
 
-Here is the original intro for reference:
+In the top-level Makefile, I can see the following variable
 
-This adds the infrastructure and first tools that make kernel debugging
-through gdb more comfortable. Since 7.0, gdb supports python scripting.
-And this opens the doors to automate steps like the tedious loading of
-module symbols at the right address, resolving per-cpu variables or even
-retrieving the current kernel log without resuming an stopped target.
+ >LINUXINCLUDE    := -I$(srctree)/arch/$(hdr-arch)/include \
+ >                   -Iarch/$(hdr-arch)/include/generated -Iinclude \
+ >                   $(if $(KBUILD_SRC), -I$(srctree)/include) \
+ >                   -include $(srctree)/include/linux/kconfig.h
 
-Many of the helpers naturally depend on the layout of structures or
-internal mechanics of the kernel. So the best place to maintain such
-things, keeping them consistent with the corresponding kernel is, well,
-the kernel itself.
+but I'm not sure how to get this variable picked up. And I don't exactly 
+know what to do with KBUILD_SRC.
 
-While these scripts have been originally developed for debugging via
-QEMU/KVM, I've now also added the required bits for KGDB. Works fine,
-but as QEMU/KVM tends to outperform KGDB it remains the recommendation
-- when available.
 
-There are two architecture dependencies so far, one regarding per-cpu,
-the other regarding thread_info calculation. None of them I was able to
-test on a target, so I'm counting on review/testing by the corresponding
-communities.
-
-This series should be considered the foundation of much more kernel
-state exploration helper, e.g. around tasks, timers, locks, sockets -
-I guess people will have even more ideas.
-
-Hope it's useful!
-
-PS: Also available via git://git.kiszka.org/linux.git queues/gdb-scripts
-
-CC: "David S. Miller" <davem@davemloft.net>
-CC: Fenghua Yu <fenghua.yu@intel.com>
-CC: Kay Sievers <kay@vrfy.org>
-CC: linux-ia64@vger.kernel.org
-CC: linux-kbuild@vger.kernel.org
-CC: Michal Marek <mmarek@suse.cz>
-CC: sparclinux@vger.kernel.org
-CC: Tony Luck <tony.luck@intel.com>
-
-Jan Kiszka (13):
-  scripts/gdb: Add infrastructure
-  scripts/gdb: Add container_of helper and convenience function
-  scripts/gdb: Add lx-symbols command
-  scripts/gdb: Add get_target_endianness helper
-  scripts/gdb: Add read_u16/32/64 helpers
-  scripts/gdb: Add lx-dmesg command
-  scripts/gdb: Add task iteration helper
-  scripts/gdb: Add helper and convenience function to look up tasks
-  scripts/gdb: Add is_target_arch helper
-  scripts/gdb: Add internal helper and convenience function to retrieve
-    thread_info
-  scripts/gdb: Add get_gdbserver_type helper
-  scripts/gdb: Add internal helper and convenience function for per-cpu
-    lookup
-  scripts/gdb: Add lx_current convenience function
-
- Makefile                   |    5 +-
- scripts/Makefile           |    3 +-
- scripts/gdb/Makefile       |    9 +++
- scripts/gdb/dmesg.py       |   63 +++++++++++++++++++++
- scripts/gdb/percpu.py      |   76 +++++++++++++++++++++++++
- scripts/gdb/symbols.py     |  133 +++++++++++++++++++++++++++++++++++++++++++
- scripts/gdb/task.py        |  108 +++++++++++++++++++++++++++++++++++
- scripts/gdb/utils.py       |  134 ++++++++++++++++++++++++++++++++++++++++++++
- scripts/gdb/vmlinux-gdb.py |   26 +++++++++
- 9 files changed, 555 insertions(+), 2 deletions(-)
- create mode 100644 scripts/gdb/Makefile
- create mode 100644 scripts/gdb/dmesg.py
- create mode 100644 scripts/gdb/percpu.py
- create mode 100644 scripts/gdb/symbols.py
- create mode 100644 scripts/gdb/task.py
- create mode 100644 scripts/gdb/utils.py
- create mode 100644 scripts/gdb/vmlinux-gdb.py
-
--- 
-1.7.3.4
-
+Richard
