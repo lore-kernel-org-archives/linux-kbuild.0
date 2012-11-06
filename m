@@ -1,51 +1,82 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wg0-f44.google.com ([74.125.82.44]:48193 "EHLO
-	mail-wg0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750706Ab2KEWnl (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 5 Nov 2012 17:43:41 -0500
-Received: by mail-wg0-f44.google.com with SMTP id dr13so4282184wgb.1
-        for <linux-kbuild@vger.kernel.org>; Mon, 05 Nov 2012 14:43:40 -0800 (PST)
-Message-ID: <50984118.2070204@gmail.com>
-Date: Mon, 05 Nov 2012 22:43:36 +0000
-From: Richard H Lee <ricardohenrylee@gmail.com>
+Received: from mga03.intel.com ([143.182.124.21]:22452 "EHLO mga03.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751197Ab2KFL5Y (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 6 Nov 2012 06:57:24 -0500
+Date: Tue, 6 Nov 2012 19:57:16 +0800
+From: Fengguang Wu <fengguang.wu@intel.com>
+Subject: Re: [digsig:dmi 20/35] WARNING:
+ security/integrity/built-in.o(.text+0x1d8): Section mismatch in reference
+ from the function integrity_inode_free() to the variable
+ .init.data:ima_use_tcb
+Message-ID: <20121106115716.GA21889@localhost>
+References: <50913fa5.uJnC6BQdkN/Xw1h0%fengguang.wu@intel.com>
+ <CALLzPKZdh9a0nT52GOZEO7dgxtLqU_VwD27Qs_gBe-bSk=J87g@mail.gmail.com>
+ <20121106114108.GB19965@localhost>
+ <CALLzPKb-9uHdbqUujbcQ2z38Lv5sqBKtmYmjYDdVhgVs4WF6cg@mail.gmail.com>
 MIME-Version: 1.0
-Subject: Building linux headers in an non-linux environment
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CALLzPKb-9uHdbqUujbcQ2z38Lv5sqBKtmYmjYDdVhgVs4WF6cg@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
+To: "Kasatkin, Dmitry" <dmitry.kasatkin@intel.com>
+Cc: Sam Ravnborg <sam@ravnborg.org>, Mimi Zohar <zohar@linux.vnet.ibm.com>, linux-security-module@vger.kernel.org, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
 
-I'm trying to install linux headers for cygwin using crostool-ng.
+Perhaps we should CC more people..
 
-ct-ng basically invokes the line:
+On Tue, Nov 06, 2012 at 01:47:18PM +0200, Kasatkin, Dmitry wrote:
+> On Tue, Nov 6, 2012 at 1:41 PM, Fengguang Wu <fengguang.wu@intel.com> wrote:
+> > On Tue, Nov 06, 2012 at 01:16:16PM +0200, Kasatkin, Dmitry wrote:
+> >> Hi,
+> >>
+> >> I do not see that integrity_inode_free() uses ima_use_tcb.
+> >>
+> >> I think it is false positive.
+> >
+> > Interestingly, when trying to reproduce the problem, I got this
+> > slightly different message:
 
-make -C /home/richard/scratch/x86linux/.build/src/linux-3.5 
-O=/home/richard/scratch/x86linux/.build/i386-unknown-linux-gnu/build/build-kernel-headers 
-ARCH=x86 
-INSTALL_HDR_PATH=/home/richard/x-tools/i386-unknown-linux-gnu/i386-unknown-linux-gnu/sysroot/usr 
-V=1 headers_install
+Now after make clean, I get both the warnings on ima_use_tcb and
+chosen_lsm.
 
-and it seems to have checked out v3.5 of the linux kernel.
-
-The problem is that making the headers seems to require an existing set 
-of headers already installed. The required headers seem to be in the 
-include/ and arch/[target]/ directories.
-
-What is the "correct" way to get the Makefile to use the source tree as 
-the source for the linux headers?
-
-
-In the top-level Makefile, I can see the following variable
-
- >LINUXINCLUDE    := -I$(srctree)/arch/$(hdr-arch)/include \
- >                   -Iarch/$(hdr-arch)/include/generated -Iinclude \
- >                   $(if $(KBUILD_SRC), -I$(srctree)/include) \
- >                   -include $(srctree)/include/linux/kconfig.h
-
-but I'm not sure how to get this variable picked up. And I don't exactly 
-know what to do with KBUILD_SRC.
-
-
-Richard
+> > WARNING: security/built-in.o(.text+0x2b68c): Section mismatch in reference from the function integrity_inode_free() to the variable .init.d
+> > ata:chosen_lsm
+> > The function integrity_inode_free() references
+> > the variable __initdata chosen_lsm.
+> > This is often because integrity_inode_free lacks a __initdata
+> > annotation or the annotation of chosen_lsm is wrong.
+> >
+> 
+> Hello,
+> 
+> chosen_lsm has nothing to do with integrity subsystem, though
+> integrity_inode_free() is called from security_inode_free(),
+> which is part of security subsystem files which uses chosen_lsm...
+> 
+> That is very strange.
+> 
+> - Dmitry
+> 
+> 
+> > Thanks,
+> > Fengguang
+> >
+> >> On Wed, Oct 31, 2012 at 5:11 PM, kbuild test robot
+> >> <fengguang.wu@intel.com> wrote:
+> >> > tree:   git://git.kernel.org/pub/scm/linux/kernel/git/kasatkin/linux-digsig.git dmi
+> >> > head:   2309bb884f94d84ecb1a6a176d3e8199de7d6dad
+> >> > commit: 13ba29dcf6f0021a14a04f6f3a4560a399c02b34 [20/35] integrity: create and inititialize a keyring with builtin public key
+> >> > config: make ARCH=xtensa allyesconfig
+> >> >
+> >> > All warnings:
+> >> >
+> >> > WARNING: security/integrity/built-in.o(.text+0x1d8): Section mismatch in reference from the function integrity_inode_free() to the variable .init.data:ima_use_tcb
+> >> > The function integrity_inode_free() references
+> >> > the variable __initdata ima_use_tcb.
+> >> > This is often because integrity_inode_free lacks a __initdata
+> >> > annotation or the annotation of ima_use_tcb is wrong.
+> >> >
+> >> > ---
+> >> > 0-DAY kernel build testing backend         Open Source Technology Center
+> >> > Fengguang Wu, Yuanhan Liu                              Intel Corporation
