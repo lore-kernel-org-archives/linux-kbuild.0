@@ -1,55 +1,35 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga14.intel.com ([143.182.124.37]:34033 "EHLO mga14.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751005Ab2KJC1C (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 9 Nov 2012 21:27:02 -0500
-Date: Sat, 10 Nov 2012 10:26:59 +0800
-From: Fengguang Wu <fengguang.wu@intel.com>
-Subject: Re: [digsig:dmi 20/39] WARNING: security/built-in.o(.text+0xb43ac):
- Section mismatch in reference from the function integrity_init_keyring() to
- the variable .init.data:chosen_lsm
-Message-ID: <20121110022659.GC6486@localhost>
-References: <509d3c29.gB8n+wTWMkx5wadt%fengguang.wu@intel.com>
+Received: from stringer.orebokech.com ([88.190.240.207]:35300 "EHLO
+	stringer.orebokech.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751220Ab2KJM7X (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 10 Nov 2012 07:59:23 -0500
+From: Romain Francoise <romain@orebokech.com>
+Subject: Re: [PATCH] kbuild: Do not remove vmlinux when cleaning external module
+References: <1351509782-12462-1-git-send-email-pawel.moll@arm.com>
+Date: Sat, 10 Nov 2012 13:59:21 +0100
+In-Reply-To: <1351509782-12462-1-git-send-email-pawel.moll@arm.com> (Pawel
+	Moll's message of "Mon, 29 Oct 2012 11:23:02 +0000")
+Message-ID: <87fw4hzk9i.fsf@silenus.orebokech.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <509d3c29.gB8n+wTWMkx5wadt%fengguang.wu@intel.com>
+Content-Type: text/plain
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Mimi Zohar <zohar@linux.vnet.ibm.com>
-Cc: Dmitry Kasatkin <dmitry.kasatkin@intel.com>, Chris Zankel <chris@zankel.net>, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: Pawel Moll <pawel.moll@arm.com>
+Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Hi Mimi, Dmitry,
+Pawel Moll <pawel.moll@arm.com> writes:
 
-Sorry please ignore this and the following Section mismatch warnings,
-they are likely false ones:
+> Since commit 1f2bfbd00e466ff3489b2ca5cc75b1cccd14c123 "kbuild:
+> link of vmlinux moved to a script" make clean with M=<dir>
+> argument (so cleaning external module) removes vmlinux,
+> System.map and couple of other files from the *main* kernel
+> build directory! This not what was happening before and almost
+> certainly not what one would expect.
 
-        On 11/07/2012 03:31 PM, Chris Zankel wrote:
-        >
-        > Looking a bit into it, I think modpost is broken. I'm working on a fix.
+> This patch moves makes the clean target of the script called
+> only when !KBUILD_EXTMOD.
 
-        This is specific to Xtensa. Symbols are stored in a separate '.lit'
-        section, but modpost doesn't seem to currently resolve it correctly.
+Thanks, I have the same problem and this patch fixes it.
 
-Chris: it also happens to ARCH=sh builds.
-
-Thanks,
-Fengguang
-
-On Sat, Nov 10, 2012 at 01:23:53AM +0800, kbuild test robot wrote:
-> tree:   git://git.kernel.org/pub/scm/linux/kernel/git/kasatkin/linux-digsig.git dmi
-> head:   62d02cdf591eea161bc78c2430ba08b6d138eae5
-> commit: 3868ad2d648d8abd7a645d101ff53e5b369c632b [20/39] integrity: create and inititialize a keyring with builtin public key
-> config: make ARCH=sh allyesconfig
-> 
-> All warnings:
-> 
-> WARNING: security/built-in.o(.text+0xb43ac): Section mismatch in reference from the function integrity_init_keyring() to the variable .init.data:chosen_lsm
-> The function integrity_init_keyring() references
-> the variable __initdata chosen_lsm.
-> This is often because integrity_init_keyring lacks a __initdata
-> annotation or the annotation of chosen_lsm is wrong.
-> 
-> ---
-> 0-DAY kernel build testing backend         Open Source Technology Center
-> Fengguang Wu, Yuanhan Liu                              Intel Corporation
+Michal, can you pick it up? It's not yet in kbuild.git, it seems.
