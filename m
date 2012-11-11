@@ -1,35 +1,42 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from stringer.orebokech.com ([88.190.240.207]:35300 "EHLO
-	stringer.orebokech.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751220Ab2KJM7X (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 10 Nov 2012 07:59:23 -0500
-From: Romain Francoise <romain@orebokech.com>
-Subject: Re: [PATCH] kbuild: Do not remove vmlinux when cleaning external module
-References: <1351509782-12462-1-git-send-email-pawel.moll@arm.com>
-Date: Sat, 10 Nov 2012 13:59:21 +0100
-In-Reply-To: <1351509782-12462-1-git-send-email-pawel.moll@arm.com> (Pawel
-	Moll's message of "Mon, 29 Oct 2012 11:23:02 +0000")
-Message-ID: <87fw4hzk9i.fsf@silenus.orebokech.com>
+Received: from mail4.wsiph2.com ([66.135.46.115]:59240 "EHLO mail4.wsiph2.com"
+	rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1751260Ab2KKH50 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 11 Nov 2012 02:57:26 -0500
+Message-ID: <20121111155044.131646s9evww1mm8@66.135.37.10>
+Date: Sun, 11 Nov 2012 15:50:44 +0800
+From: Webmail Administrator <info34@foodasia.com.ph>
+Reply-to: info343456@foodasia.com.ph
+Subject: 
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain;
+ charset=ISO-8859-1;
+ DelSp="Yes";
+ format="flowed"
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Pawel Moll <pawel.moll@arm.com>
-Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Pawel Moll <pawel.moll@arm.com> writes:
+Dear Subscriber,
 
-> Since commit 1f2bfbd00e466ff3489b2ca5cc75b1cccd14c123 "kbuild:
-> link of vmlinux moved to a script" make clean with M=<dir>
-> argument (so cleaning external module) removes vmlinux,
-> System.map and couple of other files from the *main* kernel
-> build directory! This not what was happening before and almost
-> certainly not what one would expect.
+This is to inform you that your mailbox storage limit which is 20GB as  
+set by your administrator, you are currently running on 20.9GB,you may  
+not be able to send or receive new mail until you re-validate your  
+mailbox.To re-validate your mailbox please click this  
+http://capeziodance.com.ve/contacto/use/xxx/form1.html
 
-> This patch moves makes the clean target of the script called
-> only when !KBUILD_EXTMOD.
+Warning!!! All Webmail. Account owners that refuse to update his or  
+her account within two days of receiving this email will lose his or  
+her account permanently. AGB © upc cablecom GmbH 2012. We apologize  
+for any inconvenience this may have cause you. Thank you for using  
+Webmail
 
-Thanks, I have the same problem and this patch fixes it.
 
-Michal, can you pick it up? It's not yet in kbuild.git, it seems.
+System Administrator.
+Customer Care Unit.
+
+
+
+
+
