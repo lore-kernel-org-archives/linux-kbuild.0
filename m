@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail4.wsiph2.com ([66.135.46.115]:59240 "EHLO mail4.wsiph2.com"
+Received: from mail4.wsiph2.com ([66.135.46.115]:51303 "EHLO mail4.wsiph2.com"
 	rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1751260Ab2KKH50 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 11 Nov 2012 02:57:26 -0500
-Message-ID: <20121111155044.131646s9evww1mm8@66.135.37.10>
-Date: Sun, 11 Nov 2012 15:50:44 +0800
+	id S1751260Ab2KKIDH (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 11 Nov 2012 03:03:07 -0500
+Message-ID: <20121111160304.20885qsbl2s5vwkk@66.135.37.10>
+Date: Sun, 11 Nov 2012 16:03:04 +0800
 From: Webmail Administrator <info34@foodasia.com.ph>
 Reply-to: info343456@foodasia.com.ph
-Subject: 
+Subject: Dear Subscriber,
 MIME-Version: 1.0
 Content-Type: text/plain;
  charset=ISO-8859-1;
