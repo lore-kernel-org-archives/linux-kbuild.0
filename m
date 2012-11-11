@@ -1,42 +1,49 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail4.wsiph2.com ([66.135.46.115]:51303 "EHLO mail4.wsiph2.com"
-	rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1751260Ab2KKIDH (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 11 Nov 2012 03:03:07 -0500
-Message-ID: <20121111160304.20885qsbl2s5vwkk@66.135.37.10>
-Date: Sun, 11 Nov 2012 16:03:04 +0800
-From: Webmail Administrator <info34@foodasia.com.ph>
-Reply-to: info343456@foodasia.com.ph
-Subject: Dear Subscriber,
+Received: from mail-wg0-f44.google.com ([74.125.82.44]:61235 "EHLO
+	mail-wg0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753160Ab2KKQCc (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 11 Nov 2012 11:02:32 -0500
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Subject: Re: [PATCH v2] menuconfig: Replace CIRCLEQ by list_head-style lists.
+Date: Sun, 11 Nov 2012 17:02:24 +0100
+References: <1350754935-20014-1-git-send-email-benjamin.poirier@gmail.com> <201210222138.25805.yann.morin.1998@free.fr> <50893FCF.5030800@suse.cz>
+In-Reply-To: <50893FCF.5030800@suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=ISO-8859-1;
- DelSp="Yes";
- format="flowed"
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
+Content-Type: Text/Plain;
+  charset="iso-8859-15"
+Content-Transfer-Encoding: 7bit
+Message-Id: <201211111702.24556.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
+To: linux-kbuild@vger.kernel.org
+Cc: Michal Marek <mmarek@suse.cz>, Benjamin Poirier <benjamin.poirier@gmail.com>, Jean Sacren <sakiwit@gmail.com>, Arnaud Lacombe <lacombar@gmail.com>, Wang YanQing <udknight@gmail.com>, Paul Gortmaker <paul.gortmaker@windriver.com>, Davidlohr Bueso <dave@gnu.org>, linux-kernel@vger.kernel.org, Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>, Yaakov Selkowitz <yselkowitz@users.sourceforge.net>
 
-Dear Subscriber,
+Michal, All,
 
-This is to inform you that your mailbox storage limit which is 20GB as  
-set by your administrator, you are currently running on 20.9GB,you may  
-not be able to send or receive new mail until you re-validate your  
-mailbox.To re-validate your mailbox please click this  
-http://capeziodance.com.ve/contacto/use/xxx/form1.html
+On Thursday 25 October 2012 Michal Marek wrote:
+> On 22.10.2012 21:38, Yann E. MORIN wrote:
+> > On Sunday 21 October 2012 Benjamin Poirier wrote:
+> >> Changes v1-v2:
+> >> * integrate the patch/suggestion from Yann to fix problems related to the
+> >>   usage of list.h with xconfig/c++
+> >> 	* "new" keyword
+> >> 	* offsetof redefinition
+> >> * silly #endif placement mistake
+[--SNIP--]
+> I pushed it to kbuild.git#rc-fixes now and will send it to Linus for 3.7
+> inclusion later.
 
-Warning!!! All Webmail. Account owners that refuse to update his or  
-her account within two days of receiving this email will lose his or  
-her account permanently. AGB © upc cablecom GmbH 2012. We apologize  
-for any inconvenience this may have cause you. Thank you for using  
-Webmail
+Not trying to sound like a nuisance, but this has still not been pushed
+to Linus yet... ;-)
 
+Regards,
+Yann E. MORIN.
 
-System Administrator.
-Customer Care Unit.
-
-
-
-
-
+-- 
+.-----------------.--------------------.------------------.--------------------.
+|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
+| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
+| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
+| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
+'------------------------------^-------^------------------^--------------------'
