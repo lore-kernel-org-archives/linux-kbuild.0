@@ -1,41 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail4.wsiph2.com ([66.135.46.115]:50166 "EHLO mail4.wsiph2.com"
-	rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1751398Ab2KLEJN (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 11 Nov 2012 23:09:13 -0500
-Message-ID: <20121112120145.116451wu9uk08sws@66.135.37.10>
-Date: Mon, 12 Nov 2012 12:01:45 +0800
-From: Webmail Administrator <webmaster23@foodasia.com.ph>
-Subject: 
-MIME-Version: 1.0
-Content-Type: text/plain;
- charset=ISO-8859-1;
- DelSp="Yes";
- format="flowed"
+Received: from 1wt.eu ([62.212.114.60]:35689 "EHLO 1wt.eu"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752462Ab2KLM10 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 12 Nov 2012 07:27:26 -0500
+Date: Mon, 12 Nov 2012 13:26:43 +0100
+From: Willy Tarreau <w@1wt.eu>
+Subject: Re: [PATCH v2] menuconfig: Replace CIRCLEQ by list_head-style lists.
+Message-ID: <20121112122643.GA9351@1wt.eu>
+References: <1350754935-20014-1-git-send-email-benjamin.poirier@gmail.com> <201210222138.25805.yann.morin.1998@free.fr> <50893FCF.5030800@suse.cz> <201211111702.24556.yann.morin.1998@free.fr>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <201211111702.24556.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
+To: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Cc: linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Benjamin Poirier <benjamin.poirier@gmail.com>, Jean Sacren <sakiwit@gmail.com>, Arnaud Lacombe <lacombar@gmail.com>, Wang YanQing <udknight@gmail.com>, Paul Gortmaker <paul.gortmaker@windriver.com>, Davidlohr Bueso <dave@gnu.org>, linux-kernel@vger.kernel.org, Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>, Yaakov Selkowitz <yselkowitz@users.sourceforge.net>
 
-Dear Subscriber,
+On Sun, Nov 11, 2012 at 05:02:24PM +0100, Yann E. MORIN wrote:
+> Michal, All,
+> 
+> On Thursday 25 October 2012 Michal Marek wrote:
+> > On 22.10.2012 21:38, Yann E. MORIN wrote:
+> > > On Sunday 21 October 2012 Benjamin Poirier wrote:
+> > >> Changes v1-v2:
+> > >> * integrate the patch/suggestion from Yann to fix problems related to the
+> > >>   usage of list.h with xconfig/c++
+> > >> 	* "new" keyword
+> > >> 	* offsetof redefinition
+> > >> * silly #endif placement mistake
+> [--SNIP--]
+> > I pushed it to kbuild.git#rc-fixes now and will send it to Linus for 3.7
+> > inclusion later.
+> 
+> Not trying to sound like a nuisance, but this has still not been pushed
+> to Linus yet... ;-)
 
-This is to inform you that your mailbox storage limit which is 20GB as  
-set by your administrator, you are currently running on 20.9GB,you may  
-not be able to send or receive new mail until you re-validate your  
-mailbox. To re-validate your mailbox please click this  
-http://capeziodance.com.ve/contacto/use/xxx/form1.html
+Would love the patch to be merged too, as I can't build Linux on my Linux
+laptop right now, very frustrating :-(
 
-Warning!!! All Webmail. Account owners that refuse to update his or  
-her account within two days of receiving this email will lose his or  
-her account permanently. AGB © upc cablecom GmbH 2012. We apologize  
-for any inconvenience this may have cause you. Thank you for using  
-Webmail
-
-
-System Administrator.
-Customer Care Unit.
-
-
-
-
+Willy
 
