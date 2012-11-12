@@ -1,47 +1,67 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:36512 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751555Ab2KLNfO (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 12 Nov 2012 08:35:14 -0500
-Message-ID: <50A0FB0B.4070400@suse.cz>
-Date: Mon, 12 Nov 2012 14:35:07 +0100
-From: Michal Marek <mmarek@suse.cz>
-MIME-Version: 1.0
-Subject: Re: [PATCH v2] menuconfig: Replace CIRCLEQ by list_head-style lists.
-References: <1350754935-20014-1-git-send-email-benjamin.poirier@gmail.com> <201210222138.25805.yann.morin.1998@free.fr> <50893FCF.5030800@suse.cz> <201211111702.24556.yann.morin.1998@free.fr> <20121112122643.GA9351@1wt.eu>
-In-Reply-To: <20121112122643.GA9351@1wt.eu>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+Received: from mail-wi0-f178.google.com ([209.85.212.178]:42977 "EHLO
+	mail-wi0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752547Ab2KLVJY (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 12 Nov 2012 16:09:24 -0500
+Received: by mail-wi0-f178.google.com with SMTP id hr7so2851463wib.1
+        for <linux-kbuild@vger.kernel.org>; Mon, 12 Nov 2012 13:09:23 -0800 (PST)
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Subject: [PATCH] Revert "kconfig-language: add to hints"
+Date: Mon, 12 Nov 2012 22:09:18 +0100
+Message-Id: <1352754558-11021-1-git-send-email-yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Willy Tarreau <w@1wt.eu>
-Cc: "Yann E. MORIN" <yann.morin.1998@free.fr>, linux-kbuild@vger.kernel.org, Benjamin Poirier <benjamin.poirier@gmail.com>, Jean Sacren <sakiwit@gmail.com>, Arnaud Lacombe <lacombar@gmail.com>, Wang YanQing <udknight@gmail.com>, Paul Gortmaker <paul.gortmaker@windriver.com>, Davidlohr Bueso <dave@gnu.org>, linux-kernel@vger.kernel.org, Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>, Yaakov Selkowitz <yselkowitz@users.sourceforge.net>
+To: linux-kbuild@vger.kernel.org
+Cc: Michal Marek <mmarek@suse.cz>, "Yann E. MORIN" <yann.morin.1998@free.fr>, Martin Walch <walch.martin@gmx.de>
 
-Dne 12.11.2012 13:26, Willy Tarreau napsal(a):
-> On Sun, Nov 11, 2012 at 05:02:24PM +0100, Yann E. MORIN wrote:
->> Michal, All,
->>
->> On Thursday 25 October 2012 Michal Marek wrote:
->>> On 22.10.2012 21:38, Yann E. MORIN wrote:
->>>> On Sunday 21 October 2012 Benjamin Poirier wrote:
->>>>> Changes v1-v2:
->>>>> * integrate the patch/suggestion from Yann to fix problems related to the
->>>>>   usage of list.h with xconfig/c++
->>>>> 	* "new" keyword
->>>>> 	* offsetof redefinition
->>>>> * silly #endif placement mistake
->> [--SNIP--]
->>> I pushed it to kbuild.git#rc-fixes now and will send it to Linus for 3.7
->>> inclusion later.
->>
->> Not trying to sound like a nuisance, but this has still not been pushed
->> to Linus yet... ;-)
-> 
-> Would love the patch to be merged too, as I can't build Linux on my Linux
-> laptop right now, very frustrating :-(
+This reverts commit 64b81ed7fb1e45c914317b20316f32827bc6444b.
 
-I just sent the pull request, sorry guys. I thought I had sent it
-earlier, but apparently I hadn't.
+As Martin says about this paragraph:
+    However, I can not reproduce this. The attached file contains both
+    cases. [...] AFAICS, both versions behave equivalently. I suggest
+    changing the documentation accordingly.
 
-Michal
+    [in http://marc.info/?l=linux-kbuild&m=134987006202410&w=2]
+
+Reported-by: Martin Walch <walch.martin@gmx.de>
+Cc: Martin Walch <walch.martin@gmx.de>
+Signed-off-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
+---
+ Documentation/kbuild/kconfig-language.txt |   23 -----------------------
+ 1 files changed, 0 insertions(+), 23 deletions(-)
+
+diff --git a/Documentation/kbuild/kconfig-language.txt b/Documentation/kbuild/kconfig-language.txt
+index a686f9c..c858f84 100644
+--- a/Documentation/kbuild/kconfig-language.txt
++++ b/Documentation/kbuild/kconfig-language.txt
+@@ -388,26 +388,3 @@ config FOO
+ 	depends on BAR && m
+ 
+ limits FOO to module (=m) or disabled (=n).
+-
+-Kconfig symbol existence
+-~~~~~~~~~~~~~~~~~~~~~~~~
+-The following two methods produce the same kconfig symbol dependencies
+-but differ greatly in kconfig symbol existence (production) in the
+-generated config file.
+-
+-case 1:
+-
+-config FOO
+-	tristate "about foo"
+-	depends on BAR
+-
+-vs. case 2:
+-
+-if BAR
+-config FOO
+-	tristate "about foo"
+-endif
+-
+-In case 1, the symbol FOO will always exist in the config file (given
+-no other dependencies).  In case 2, the symbol FOO will only exist in
+-the config file if BAR is enabled.
+-- 
+1.7.2.5
 
