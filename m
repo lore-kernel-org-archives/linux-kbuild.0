@@ -1,67 +1,44 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wi0-f178.google.com ([209.85.212.178]:42977 "EHLO
-	mail-wi0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752547Ab2KLVJY (ORCPT
+Received: from mail-da0-f46.google.com ([209.85.210.46]:45508 "EHLO
+	mail-da0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754540Ab2KMN5Y (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 12 Nov 2012 16:09:24 -0500
-Received: by mail-wi0-f178.google.com with SMTP id hr7so2851463wib.1
-        for <linux-kbuild@vger.kernel.org>; Mon, 12 Nov 2012 13:09:23 -0800 (PST)
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: [PATCH] Revert "kconfig-language: add to hints"
-Date: Mon, 12 Nov 2012 22:09:18 +0100
-Message-Id: <1352754558-11021-1-git-send-email-yann.morin.1998@free.fr>
+	Tue, 13 Nov 2012 08:57:24 -0500
+From: hc0606@gmail.com
+Subject: [PATCH 1/1] Documentation: Fix example directories arch problem
+Date: Tue, 13 Nov 2012 21:56:05 +0800
+Message-Id: <1352814965-28502-1-git-send-email-hc0606@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Michal Marek <mmarek@suse.cz>, "Yann E. MORIN" <yann.morin.1998@free.fr>, Martin Walch <walch.martin@gmx.de>
+To: mmarek@suse.cz, rob@landley.net
+Cc: linux-kbuild@vger.kernel.org, linux-doc@vger.kernel.org, hanc.fnst@cn.fujitsu.com, Han Cheng <hc0606@gmail.com>
 
-This reverts commit 64b81ed7fb1e45c914317b20316f32827bc6444b.
+From: Han Cheng <hc0606@gmail.com>
 
-As Martin says about this paragraph:
-    However, I can not reproduce this. The attached file contains both
-    cases. [...] AFAICS, both versions behave equivalently. I suggest
-    changing the documentation accordingly.
+The example directories arch is not consistent with the kbuild, fix it.
 
-    [in http://marc.info/?l=linux-kbuild&m=134987006202410&w=2]
-
-Reported-by: Martin Walch <walch.martin@gmx.de>
-Cc: Martin Walch <walch.martin@gmx.de>
-Signed-off-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Signed-off-by: Han Cheng <hc0606@gmail.com>
 ---
- Documentation/kbuild/kconfig-language.txt |   23 -----------------------
- 1 files changed, 0 insertions(+), 23 deletions(-)
+ Documentation/kbuild/modules.txt |    6 +++---
+ 1 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/Documentation/kbuild/kconfig-language.txt b/Documentation/kbuild/kconfig-language.txt
-index a686f9c..c858f84 100644
---- a/Documentation/kbuild/kconfig-language.txt
-+++ b/Documentation/kbuild/kconfig-language.txt
-@@ -388,26 +388,3 @@ config FOO
- 	depends on BAR && m
+diff --git a/Documentation/kbuild/modules.txt b/Documentation/kbuild/modules.txt
+index 3fb39e0..8312f07 100644
+--- a/Documentation/kbuild/modules.txt
++++ b/Documentation/kbuild/modules.txt
+@@ -355,9 +355,9 @@ according to the following rule:
+ 	|__ src
+ 	|   |__ complex_main.c
+ 	|   |__ hal
+-	|	|__ hardwareif.c
+-	|	|__ include
+-	|	    |__ hardwareif.h
++	|		|__ hardwareif.c
++	|		|__ include
++	|			|__ hardwareif.h
+ 	|__ include
+ 	    |__ complex.h
  
- limits FOO to module (=m) or disabled (=n).
--
--Kconfig symbol existence
--~~~~~~~~~~~~~~~~~~~~~~~~
--The following two methods produce the same kconfig symbol dependencies
--but differ greatly in kconfig symbol existence (production) in the
--generated config file.
--
--case 1:
--
--config FOO
--	tristate "about foo"
--	depends on BAR
--
--vs. case 2:
--
--if BAR
--config FOO
--	tristate "about foo"
--endif
--
--In case 1, the symbol FOO will always exist in the config file (given
--no other dependencies).  In case 2, the symbol FOO will only exist in
--the config file if BAR is enabled.
 -- 
-1.7.2.5
+1.7.1
 
