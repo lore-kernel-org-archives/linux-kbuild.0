@@ -1,52 +1,76 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from p-mail2.rd.francetelecom.com ([195.101.245.16]:39818 "EHLO
-	p-mail2.rd.francetelecom.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1754540Ab2KMOYl convert rfc822-to-8bit
-	(ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 13 Nov 2012 09:24:41 -0500
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: Re: [PATCH 1/1] Documentation: Fix example directories arch problem
-Date: Tue, 13 Nov 2012 15:24:38 +0100
-References: <1352814965-28502-1-git-send-email-hc0606@gmail.com> <201211131504.40007.yann.morin.1998@free.fr> <CAKEaXcAjzhzUizXnrYkw_51nDHtap8AiX77FHGttZ=KtXkyUuQ@mail.gmail.com>
-In-Reply-To: <CAKEaXcAjzhzUizXnrYkw_51nDHtap8AiX77FHGttZ=KtXkyUuQ@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="utf-8"
+Received: from ezexch.ezchip.com ([212.179.42.101]:16764 "EHLO
+	ezexch.ezchip.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751777Ab2KPNlA convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 16 Nov 2012 08:41:00 -0500
+From: Noam Camus <noamc@ezchip.com>
+Date: Fri, 16 Nov 2012 15:40:24 +0200
+Subject: Makefile race between jobs
+Message-ID: <264C179F799EF24AB26D5319053335E80CC3049A10@ezexch.ezchip.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: 8BIT
-Message-Id: <201211131524.38502.yann.morin.1998@free.fr>
+MIME-Version: 1.0
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: =?utf-8?q?=E9=9F=A9=E8=AF=9A?= <hc0606@gmail.com>
-Cc: mmarek@suse.cz, rob@landley.net, linux-kbuild@vger.kernel.org, linux-doc@vger.kernel.org, hanc.fnst@cn.fujitsu.com
+To: Noam Camus <noamc@ezchip.com>, "mmarek@suse.cz" <mmarek@suse.cz>
+Cc: "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>
 
-Han Cheng, All,
+Hello Michael,
 
-On Tuesday 13 November 2012 15:20:23 韩诚 wrote:
-> Shall we change the tab to 8 space?
+Here is my patch for dealing with race between 2 jobs of primary Makefile:
 
-Please, don't top-post.
+From 697f6ffa0d67b676fc2d75f65541c6e12108829d Mon Sep 17 00:00:00 2001
+From: Noam Camus <noamc@ezchip.com>
+Date: Fri, 16 Nov 2012 15:12:48 +0200
+Subject: [PATCH] Makefile: solve race between make jobs.
 
-It's something you configure in your editor, not in the file. The file
-already uses tabs, so you just have to tell your editor to use 8 'spaces'
-to represent tabs. In vim, you do it thus:
-  :set tabstop=8
+Fix occasionally compilation failures when source tree is distcleaned.
+The compilation is failing over file scripts/mod/empty.c
 
-I'll leave it to you as an exrecise on how to set in your favorite editor.
-;-)
+The error is because empty.o depends on some headers from:
+	 arch/<arch>/include/generated/asm/
 
-> 2012/11/13 Yann E. MORIN <yann.morin.1998@free.fr>:
-> > On Tuesday 13 November 2012 14:56:05 hc0606@gmail.com wrote:
-> >> The example directories arch is not consistent with the kbuild, fix it.
-> >
-> > It is if you set your tabstop=8 which is the rule for the Linux kernel.
+I see that there is a race between two targets in main Makefile (j=2):
+	1) asm-generic
+	2) scripts_basic
 
-Regards,
-Yann E. MORIN.
+asm-generic:
+	generates all wrappers in atch/<arch>/include/generated/asm/
 
+scripts_basic:
+	calls scripts/Makefile.build
+	--> performs target __build
+		--> depends on targets defined at variable $(always)
+			--> compile scripts/mod/empty.c
+
+Occasionally compilation of empty.c starts before all its required
+headers created by asm-generic are available.
+
+This dependency will make sure that this situation can not happen.
+
+Signed-off-by: Noam Camus <noamc@ezchip.com>
+---
+ Makefile |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 5be2ee8..00330a1 100644
+--- a/Makefile
++++ b/Makefile
+@@ -415,7 +415,7 @@ export RCS_TAR_IGNORE := --exclude SCCS --exclude BitKeeper --exclude .svn \
+ 
+ # Basic helpers built in scripts/
+ PHONY += scripts_basic
+-scripts_basic:
++scripts_basic: asm-generic
+ 	$(Q)$(MAKE) $(build)=scripts/basic
+ 	$(Q)rm -f .tmp_quiet_recordmcount
+ 
 -- 
-.-----------------.--------------------.------------------.--------------------.
-|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
-| +0/33 662376056 | Software  Designer | \ / CAMPAIGN     |   ^                |
-| --==< O_o >==-- '------------.-------:  X  AGAINST      |  /e\  There is no  |
-| http://ymorin.is-a-geek.org/ | (*_*) | / \ HTML MAIL    |  """  conspiracy.  |
-'------------------------------'-------'------------------'--------------------'
+1.7.1
+
+Please comment.
+
+Noam Camus
