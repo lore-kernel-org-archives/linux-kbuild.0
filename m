@@ -1,14 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
 Received: from vms173019pub.verizon.net ([206.46.173.19]:63407 "EHLO
 	vms173019pub.verizon.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752586Ab2KRVEu (ORCPT
+	with ESMTP id S1752502Ab2KRVEt (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 18 Nov 2012 16:04:50 -0500
+	Sun, 18 Nov 2012 16:04:49 -0500
 From: pefoley2@verizon.net
-Subject: [PATCH 4/5] silence 'arch/x86/realmode/rm/realmode.bin' is up to date
- message
-Date: Sun, 18 Nov 2012 15:05:16 -0500
-Message-id: <1353269117-39917-4-git-send-email-pefoley2@verizon.net>
+Subject: [PATCH 2/5] kbuild: silence rule for extra_certificates
+Date: Sun, 18 Nov 2012 15:05:14 -0500
+Message-id: <1353269117-39917-2-git-send-email-pefoley2@verizon.net>
 In-reply-to: <1353269117-39917-1-git-send-email-pefoley2@verizon.net>
 References: <1353269117-39917-1-git-send-email-pefoley2@verizon.net>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -18,26 +17,26 @@ Cc: Peter Foley <pefoley2@verizon.net>
 
 From: Peter Foley <pefoley2@verizon.net>
 
-Since realmode.bin is in $(always) the recursive make from the realmode
-directory does not need to specify a specific target.
-Remove the realmode.bin target to eliminate the 'up to date'
-message.
+Silence the touch extra_certificates command
 
 Signed-off-by: Peter Foley <pefoley2@verizon.net>
 ---
- arch/x86/realmode/Makefile | 2 +-
+ kernel/Makefile | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/x86/realmode/Makefile b/arch/x86/realmode/Makefile
-index 94f7fbe..08fe883 100644
---- a/arch/x86/realmode/Makefile
-+++ b/arch/x86/realmode/Makefile
-@@ -15,4 +15,4 @@ obj-y += rmpiggy.o
- $(obj)/rmpiggy.o: $(obj)/rm/realmode.bin
+diff --git a/kernel/Makefile b/kernel/Makefile
+index 86e3285..18a0b61 100644
+--- a/kernel/Makefile
++++ b/kernel/Makefile
+@@ -137,7 +137,7 @@ ifeq ($(CONFIG_MODULE_SIG),y)
+ # Pull the signing certificate and any extra certificates into the kernel
+ #
+ extra_certificates:
+-	touch $@
++	@touch $@
  
- $(obj)/rm/realmode.bin: FORCE
--	$(Q)$(MAKE) $(build)=$(obj)/rm $@
-+	$(Q)$(MAKE) $(build)=$(obj)/rm
+ kernel/modsign_pubkey.o: signing_key.x509 extra_certificates
+ 
 -- 
 1.8.0
 
