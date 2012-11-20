@@ -1,38 +1,33 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:39400 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:41046 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751901Ab2KTJxb (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 20 Nov 2012 04:53:31 -0500
-Date: Tue, 20 Nov 2012 10:53:28 +0100
+	id S1751937Ab2KTKWw (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 20 Nov 2012 05:22:52 -0500
+Date: Tue, 20 Nov 2012 11:22:51 +0100
 From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [PATCH] menuconfig: fix extended colors ncurses support
-Message-ID: <20121120095328.GA28431@sepie.suse.cz>
-References: <1349713102-3301-1-git-send-email-krzysiek@podlesie.net>
+Subject: Re: [PATCH 0/3 v3] kconfig: get the CONFIG_ prefix from the
+ environment
+Message-ID: <20121120102251.GA31243@sepie.suse.cz>
+References: <1350687985-21053-1-git-send-email-yann.morin.1998@free.fr>
+ <201210302336.15882.yann.morin.1998@free.fr>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1349713102-3301-1-git-send-email-krzysiek@podlesie.net>
+In-Reply-To: <201210302336.15882.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Krzysztof Mazur <krzysiek@podlesie.net>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Cc: linux-kbuild@vger.kernel.org
 
-On Mon, Oct 08, 2012 at 06:18:22PM +0200, Krzysztof Mazur wrote:
-> The ncurses library allows for extended colors. The support for extended
-> colors support depends on wide-character support. ncurses headers
-> enable extended colors (NCURSES_EXT_COLORS) only when wide-character
-> support is enabled (NCURSES_WIDECHAR).
+On Tue, Oct 30, 2012 at 11:36:15PM +0100, Yann E. MORIN wrote:
+> Hello!
 > 
-> The "make menuconfig" uses wide-character ncursesw library, which can be
-> compiled with wide-character support, but does not define NCURSES_WIDECHAR
-> and it's using headers without wide-character (and extended colors) support.
+> On Saturday 20 October 2012 Yann E. MORIN wrote:
+> > This little patch series allows one to override the CONFIG_ prefix at 
+> > runtime, without the need to rebuild the frontends.
 > 
-> This fixes problems with colors on systems with enabled extended colors
-> (like PLD Linux). Without this patch "make menuconfig" is hard to use.
-> 
-> Signed-off-by: Krzysztof Mazur <krzysiek@podlesie.net>
+> Any status on this one? ;-)
 
-
-Applied to kbuild.git#kconfig, thanks.
+Applied to kbuild.git#kconfig now, sorry for the delay.
 
 Michal
