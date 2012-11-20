@@ -1,42 +1,38 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from vms173019pub.verizon.net ([206.46.173.19]:63407 "EHLO
-	vms173019pub.verizon.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752502Ab2KRVEt (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 18 Nov 2012 16:04:49 -0500
-From: pefoley2@verizon.net
-Subject: [PATCH 2/5] kbuild: silence rule for extra_certificates
-Date: Sun, 18 Nov 2012 15:05:14 -0500
-Message-id: <1353269117-39917-2-git-send-email-pefoley2@verizon.net>
-In-reply-to: <1353269117-39917-1-git-send-email-pefoley2@verizon.net>
-References: <1353269117-39917-1-git-send-email-pefoley2@verizon.net>
+Received: from cantor2.suse.de ([195.135.220.15]:39400 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751901Ab2KTJxb (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 20 Nov 2012 04:53:31 -0500
+Date: Tue, 20 Nov 2012 10:53:28 +0100
+From: Michal Marek <mmarek@suse.cz>
+Subject: Re: [PATCH] menuconfig: fix extended colors ncurses support
+Message-ID: <20121120095328.GA28431@sepie.suse.cz>
+References: <1349713102-3301-1-git-send-email-krzysiek@podlesie.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1349713102-3301-1-git-send-email-krzysiek@podlesie.net>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, mmarek@suse.cz
-Cc: Peter Foley <pefoley2@verizon.net>
+To: Krzysztof Mazur <krzysiek@podlesie.net>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-From: Peter Foley <pefoley2@verizon.net>
+On Mon, Oct 08, 2012 at 06:18:22PM +0200, Krzysztof Mazur wrote:
+> The ncurses library allows for extended colors. The support for extended
+> colors support depends on wide-character support. ncurses headers
+> enable extended colors (NCURSES_EXT_COLORS) only when wide-character
+> support is enabled (NCURSES_WIDECHAR).
+> 
+> The "make menuconfig" uses wide-character ncursesw library, which can be
+> compiled with wide-character support, but does not define NCURSES_WIDECHAR
+> and it's using headers without wide-character (and extended colors) support.
+> 
+> This fixes problems with colors on systems with enabled extended colors
+> (like PLD Linux). Without this patch "make menuconfig" is hard to use.
+> 
+> Signed-off-by: Krzysztof Mazur <krzysiek@podlesie.net>
 
-Silence the touch extra_certificates command
 
-Signed-off-by: Peter Foley <pefoley2@verizon.net>
----
- kernel/Makefile | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Applied to kbuild.git#kconfig, thanks.
 
-diff --git a/kernel/Makefile b/kernel/Makefile
-index 86e3285..18a0b61 100644
---- a/kernel/Makefile
-+++ b/kernel/Makefile
-@@ -137,7 +137,7 @@ ifeq ($(CONFIG_MODULE_SIG),y)
- # Pull the signing certificate and any extra certificates into the kernel
- #
- extra_certificates:
--	touch $@
-+	@touch $@
- 
- kernel/modsign_pubkey.o: signing_key.x509 extra_certificates
- 
--- 
-1.8.0
-
+Michal
