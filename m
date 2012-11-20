@@ -1,30 +1,44 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:41188 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753040Ab2KTKZv (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 20 Nov 2012 05:25:51 -0500
-Date: Tue, 20 Nov 2012 11:25:50 +0100
-From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [PATCH] kbuild: Remove reference to uninitialised variable
-Message-ID: <20121120102550.GB31243@sepie.suse.cz>
-References: <20121015124912.GA32257@opensource.wolfsonmicro.com>
+Received: from [93.179.225.50] ([93.179.225.50]:53468 "EHLO shrek.podlesie.net"
+	rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with ESMTP
+	id S1752063Ab2KTMe4 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 20 Nov 2012 07:34:56 -0500
+Date: Tue, 20 Nov 2012 13:29:06 +0100
+From: Krzysztof Mazur <krzysiek@podlesie.net>
+Subject: Re: [PATCH] menuconfig: fix extended colors ncurses support
+Message-ID: <20121120122906.GA25677@shrek.podlesie.net>
+References: <1349713102-3301-1-git-send-email-krzysiek@podlesie.net>
+ <20121120095328.GA28431@sepie.suse.cz>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20121015124912.GA32257@opensource.wolfsonmicro.com>
+In-Reply-To: <20121120095328.GA28431@sepie.suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Charles Keepax <ckeepax@opensource.wolfsonmicro.com>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, patches@opensource.wolfsonmicro.com
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Mon, Oct 15, 2012 at 01:49:12PM +0100, Charles Keepax wrote:
-> Verbose output variable is unnecessary because the command's echo is
-> already surpressed. Additionally because the block defines skip-makefile
-> the variable Q is not defined within the makefile, which can cause
-> problems if Q is defined in the users environment.
+On Tue, Nov 20, 2012 at 10:53:28AM +0100, Michal Marek wrote:
+> On Mon, Oct 08, 2012 at 06:18:22PM +0200, Krzysztof Mazur wrote:
+> > The ncurses library allows for extended colors. The support for extended
+> > colors support depends on wide-character support. ncurses headers
+> > enable extended colors (NCURSES_EXT_COLORS) only when wide-character
+> > support is enabled (NCURSES_WIDECHAR).
+> > 
+> > The "make menuconfig" uses wide-character ncursesw library, which can be
+> > compiled with wide-character support, but does not define NCURSES_WIDECHAR
+> > and it's using headers without wide-character (and extended colors) support.
+> > 
+> > This fixes problems with colors on systems with enabled extended colors
+> > (like PLD Linux). Without this patch "make menuconfig" is hard to use.
+> > 
+> > Signed-off-by: Krzysztof Mazur <krzysiek@podlesie.net>
 > 
-> Signed-off-by: Charles Keepax <ckeepax@opensource.wolfsonmicro.com>
+> 
+> Applied to kbuild.git#kconfig, thanks.
+> 
+> Michal
 
-Applied to kbuild.git#kbuild, thanks.
+Thanks,
 
-Michal
+Krzysiek
