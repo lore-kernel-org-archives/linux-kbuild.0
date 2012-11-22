@@ -1,40 +1,26 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wg0-f44.google.com ([74.125.82.44]:33528 "EHLO
-	mail-wg0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753634Ab2KVSxw (ORCPT
+Received: from mail-we0-f174.google.com ([74.125.82.174]:62473 "EHLO
+	mail-we0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756235Ab2KVTDQ (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 22 Nov 2012 13:53:52 -0500
-Received: by mail-wg0-f44.google.com with SMTP id dr13so131807wgb.1
-        for <linux-kbuild@vger.kernel.org>; Thu, 22 Nov 2012 10:53:51 -0800 (PST)
+	Thu, 22 Nov 2012 14:03:16 -0500
+Received: by mail-we0-f174.google.com with SMTP id d7so2107231wer.19
+        for <linux-kbuild@vger.kernel.org>; Thu, 22 Nov 2012 11:03:15 -0800 (PST)
 From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: Re: [PATCH] Revert "kconfig-language: add to hints"
-Date: Thu, 22 Nov 2012 01:10:38 +0100
-References: <1352754558-11021-1-git-send-email-yann.morin.1998@free.fr>
-In-Reply-To: <1352754558-11021-1-git-send-email-yann.morin.1998@free.fr>
-MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-15"
-Content-Transfer-Encoding: 7bit
-Message-Id: <201211220110.39260.yann.morin.1998@free.fr>
+Subject: 
+Date: Thu, 22 Nov 2012 01:06:03 +0100
+Message-Id: <1353542766-24422-1-git-send-email-yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: Michal Marek <mmarek@suse.cz>, Martin Walch <walch.martin@gmx.de>
+Cc: Michal Marek <mmarek@suse.cz>
 
 Michal, All,
 
-On Monday 12 November 2012 Yann E. MORIN wrote:
-> This reverts commit 64b81ed7fb1e45c914317b20316f32827bc6444b.
-
-Ping? ;-)
+This patch series:
+  - includes a fix in case the user has CONFIG_ set in the environment
+  - allows one to set a custom root-menu label, the same way we handle
+    the CONFIG_ prefix
 
 Regards,
 Yann E. MORIN.
-
--- 
-.-----------------.--------------------.------------------.--------------------.
-|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
-| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
-| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
-| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
-'------------------------------^-------^------------------^--------------------'
