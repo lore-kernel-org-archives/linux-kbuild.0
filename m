@@ -1,44 +1,40 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from [93.179.225.50] ([93.179.225.50]:53468 "EHLO shrek.podlesie.net"
-	rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with ESMTP
-	id S1752063Ab2KTMe4 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 20 Nov 2012 07:34:56 -0500
-Date: Tue, 20 Nov 2012 13:29:06 +0100
-From: Krzysztof Mazur <krzysiek@podlesie.net>
-Subject: Re: [PATCH] menuconfig: fix extended colors ncurses support
-Message-ID: <20121120122906.GA25677@shrek.podlesie.net>
-References: <1349713102-3301-1-git-send-email-krzysiek@podlesie.net>
- <20121120095328.GA28431@sepie.suse.cz>
+Received: from mail-wg0-f44.google.com ([74.125.82.44]:33528 "EHLO
+	mail-wg0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753634Ab2KVSxw (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 22 Nov 2012 13:53:52 -0500
+Received: by mail-wg0-f44.google.com with SMTP id dr13so131807wgb.1
+        for <linux-kbuild@vger.kernel.org>; Thu, 22 Nov 2012 10:53:51 -0800 (PST)
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Subject: Re: [PATCH] Revert "kconfig-language: add to hints"
+Date: Thu, 22 Nov 2012 01:10:38 +0100
+References: <1352754558-11021-1-git-send-email-yann.morin.1998@free.fr>
+In-Reply-To: <1352754558-11021-1-git-send-email-yann.morin.1998@free.fr>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20121120095328.GA28431@sepie.suse.cz>
+Content-Type: Text/Plain;
+  charset="iso-8859-15"
+Content-Transfer-Encoding: 7bit
+Message-Id: <201211220110.39260.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
+Cc: Michal Marek <mmarek@suse.cz>, Martin Walch <walch.martin@gmx.de>
 
-On Tue, Nov 20, 2012 at 10:53:28AM +0100, Michal Marek wrote:
-> On Mon, Oct 08, 2012 at 06:18:22PM +0200, Krzysztof Mazur wrote:
-> > The ncurses library allows for extended colors. The support for extended
-> > colors support depends on wide-character support. ncurses headers
-> > enable extended colors (NCURSES_EXT_COLORS) only when wide-character
-> > support is enabled (NCURSES_WIDECHAR).
-> > 
-> > The "make menuconfig" uses wide-character ncursesw library, which can be
-> > compiled with wide-character support, but does not define NCURSES_WIDECHAR
-> > and it's using headers without wide-character (and extended colors) support.
-> > 
-> > This fixes problems with colors on systems with enabled extended colors
-> > (like PLD Linux). Without this patch "make menuconfig" is hard to use.
-> > 
-> > Signed-off-by: Krzysztof Mazur <krzysiek@podlesie.net>
-> 
-> 
-> Applied to kbuild.git#kconfig, thanks.
-> 
-> Michal
+Michal, All,
 
-Thanks,
+On Monday 12 November 2012 Yann E. MORIN wrote:
+> This reverts commit 64b81ed7fb1e45c914317b20316f32827bc6444b.
 
-Krzysiek
+Ping? ;-)
+
+Regards,
+Yann E. MORIN.
+
+-- 
+.-----------------.--------------------.------------------.--------------------.
+|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
+| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
+| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
+| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
+'------------------------------^-------^------------------^--------------------'
