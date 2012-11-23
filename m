@@ -1,95 +1,66 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cpsmtpb-ews02.kpnxchange.com ([213.75.39.5]:50387 "EHLO
-	cpsmtpb-ews02.kpnxchange.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1752537Ab2KWRyb (ORCPT
+Received: from smtp.snhosting.dk ([87.238.248.203]:54669 "EHLO
+	smtp.domainteam.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752291Ab2KWScN (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 23 Nov 2012 12:54:31 -0500
-Message-ID: <1353692960.1420.26.camel@x61.thuisdomein>
-Subject: Re: nouveau driver fails to build
-From: Paul Bolle <pebolle@tiscali.nl>
-Date: Fri, 23 Nov 2012 18:49:20 +0100
-In-Reply-To: <1353690805.30841.0@numa-i>
-References: <1353681769.29421.0@numa-i>
-	 <1353684679.1420.7.camel@x61.thuisdomein> <1353690805.30841.0@numa-i>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+	Fri, 23 Nov 2012 13:32:13 -0500
+Date: Fri, 23 Nov 2012 19:32:11 +0100
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: [PATCH 3/3] scripts/kconfig: allow setting the root-menu label
+	from environment
+Message-ID: <20121123183211.GB10586@merkur.ravnborg.org>
+References: <1353542766-24422-1-git-send-email-yann.morin.1998@free.fr> <1353542766-24422-4-git-send-email-yann.morin.1998@free.fr>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1353542766-24422-4-git-send-email-yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Helmut Jarausch <jarausch@igpm.rwth-aachen.de>
-Cc: linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
+To: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Cc: linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>
 
-On Fri, 2012-11-23 at 18:13 +0100, Helmut Jarausch wrote:
-> On 11/23/2012 04:31:19 PM, Paul Bolle wrote:
-> > On Fri, 2012-11-23 at 15:42 +0100, Helmut Jarausch wrote:
-> > > with 3.7_rc6 and
-> > >
-> > > CONFIG_ACPI_VIDEO=m
-> > > CONFIG_DRM=y
-> > > CONFIG_DRM_KMS_HELPER=y
-> > > CONFIG_DRM_TTM=y
-> > > CONFIG_DRM_NOUVEAU=y
-> > > CONFIG_NOUVEAU_DEBUG=5
-> > > CONFIG_NOUVEAU_DEBUG_DEFAULT=3
-> > > CONFIG_DRM_NOUVEAU_BACKLIGHT=y
-> > >
-> > > with/ without
-> > > CONFIG_DRM_LOAD_EDID_FIRMWARE=y
-> > >
-> > >
-> > > The kernel fails to build with
-> > > drivers/built-in.o: In function `nouveau_acpi_edid':
-> > > (.text+0x12bf21): undefined reference to `acpi_video_get_edid'
-> > >
-> > >
-> > > What am I missing?
-> > 
-> > I'd guess it should build (at least without this error) with
-> > CONFIG_ACPI_VIDEO=y. Is that correct?
+Hi Yann.
+
+On Thu, Nov 22, 2012 at 01:06:06AM +0100, Yann E. MORIN wrote:
+> Currently, the root-menu label is hard-coded in the kconfig frontends
+> executables. This means that two projects that use kconfig and want
+> to display different root-menu labels can not share the same kconfig
+> frontends.
 > 
-> Yes, but this is very unnatural.
-> 
-> To get CONFIG_ACPI_VIDEO=y  I need to have VIDEO_OUTPUT_CONTROL=y
-> for which I have to select the Intel GMA500 Stub Driver although I don't
-> have such a device and therefore don't need that driver.
-> Furthermore, I had to chase through quite some flags to find this.
-> 
-> If it's not a bug, it's surprising, at least.
+> Instead of hard-coding the label in the frontends, handle it the same
+> we handle the CONFIG_ prefix:
+>   - get the root-menu label from the environment if present
+>   - allow to set it at build time (eg. -DROOTMENU='"Root menu label"')
+>   - fallback to a hard-coded default
 
-0) It puzzles me too.
+I have note paid attention to these CONFIG_ patches - and only now
+I took a short look at this set and I am not soo hapy
+that we start to introduce a lot a environment variables for all this stuff.
 
-1) The problem is in Nouveau's Kconfig:
-    config DRM_NOUVEAU
-        tristate "Nouveau (nVidia) cards"
-        [...]
-        select ACPI_VIDEO if ACPI && X86 && BACKLIGHT_CLASS_DEVICE && VIDEO_OUTPUT_CONTROL && INPUT
-        [...]
+(A lot in this context is two).
 
-and its Makefile:
-    # other random bits
-    [...]
-    nouveau-$(CONFIG_ACPI) += nouveau_acpi.o
-    [...]
+Could we instead introduce two reserved symbols like this:
 
-    obj-$(CONFIG_DRM_NOUVEAU)+= nouveau.o
+config KCONFIG_ROOT_MENU
+	string
+	default "My own super duper root menu"
 
-2) Now, with DRM_NOUVEAU=y and ACPI_VIDEO=m nouveau_acpi.o will be made
-builtin (which fails with the error Helmut ran into). The puzzling part
-is that ACPI_VIDEO will only be selected (ie, made into a 'y') if all
-dependencies of that select statement are 'y' too. (Note that these
-dependencies are identical to the dependencies of ACPI_VIDEO's config
-entry. That can be no coincidence.)
+config KCONFIG_SYMBOL_PREFIX
+	string
+	default "SAM_"
 
-3) But I would expect ACPI_VIDEO to be selected if the dependencies of
-that select statement are either 'y' or 'm'. And then Helmut's .config
-should trigger some warning about selecting a symbol with unmet
-dependencies, or whatever, shouldn't it? (Because some of ACPI_VIDEO's
-dependencies are still 'm'.)
+the the configuration is included in the kconfig files,
+and not something you need to set in the environment.
 
-4) I'm CC-ing the Kconfig people to tell us whether the current behavior
-is as designed or a bug. If it's not a bug the DRM_NOUVEAU config entry
-might need to be changed.
+We already so something remotely like this for SYMBOLS
+where one can define:
 
+config MY_SYMBOLS
+	option modules
 
-Paul Bolle
+Then MY_SYMBOLS in used as replacement for SYMBOLS
 
+I did not implement this - but it looks sufficiently simple
+to warrant getting rid on the dependency on the enviromnet variables.
+
+	Sam
