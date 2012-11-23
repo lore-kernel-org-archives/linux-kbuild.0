@@ -1,43 +1,95 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-we0-f174.google.com ([74.125.82.174]:44105 "EHLO
-	mail-we0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756850Ab2KVWHY (ORCPT
+Received: from cpsmtpb-ews02.kpnxchange.com ([213.75.39.5]:50387 "EHLO
+	cpsmtpb-ews02.kpnxchange.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1752537Ab2KWRyb (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 22 Nov 2012 17:07:24 -0500
-Received: by mail-we0-f174.google.com with SMTP id d7so2167947wer.19
-        for <linux-kbuild@vger.kernel.org>; Thu, 22 Nov 2012 14:07:23 -0800 (PST)
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: Re: [PATCH 0/3 v3] kconfig: get the CONFIG_ prefix from the environment
-Date: Thu, 22 Nov 2012 01:08:54 +0100
-References: <1350687985-21053-1-git-send-email-yann.morin.1998@free.fr> <201210302336.15882.yann.morin.1998@free.fr> <20121120102251.GA31243@sepie.suse.cz>
-In-Reply-To: <20121120102251.GA31243@sepie.suse.cz>
-MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-1"
+	Fri, 23 Nov 2012 12:54:31 -0500
+Message-ID: <1353692960.1420.26.camel@x61.thuisdomein>
+Subject: Re: nouveau driver fails to build
+From: Paul Bolle <pebolle@tiscali.nl>
+Date: Fri, 23 Nov 2012 18:49:20 +0100
+In-Reply-To: <1353690805.30841.0@numa-i>
+References: <1353681769.29421.0@numa-i>
+	 <1353684679.1420.7.camel@x61.thuisdomein> <1353690805.30841.0@numa-i>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
-Message-Id: <201211220108.54985.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Michal Marek <mmarek@suse.cz>
+To: Helmut Jarausch <jarausch@igpm.rwth-aachen.de>
+Cc: linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
 
-Michal, All,
+On Fri, 2012-11-23 at 18:13 +0100, Helmut Jarausch wrote:
+> On 11/23/2012 04:31:19 PM, Paul Bolle wrote:
+> > On Fri, 2012-11-23 at 15:42 +0100, Helmut Jarausch wrote:
+> > > with 3.7_rc6 and
+> > >
+> > > CONFIG_ACPI_VIDEO=m
+> > > CONFIG_DRM=y
+> > > CONFIG_DRM_KMS_HELPER=y
+> > > CONFIG_DRM_TTM=y
+> > > CONFIG_DRM_NOUVEAU=y
+> > > CONFIG_NOUVEAU_DEBUG=5
+> > > CONFIG_NOUVEAU_DEBUG_DEFAULT=3
+> > > CONFIG_DRM_NOUVEAU_BACKLIGHT=y
+> > >
+> > > with/ without
+> > > CONFIG_DRM_LOAD_EDID_FIRMWARE=y
+> > >
+> > >
+> > > The kernel fails to build with
+> > > drivers/built-in.o: In function `nouveau_acpi_edid':
+> > > (.text+0x12bf21): undefined reference to `acpi_video_get_edid'
+> > >
+> > >
+> > > What am I missing?
+> > 
+> > I'd guess it should build (at least without this error) with
+> > CONFIG_ACPI_VIDEO=y. Is that correct?
+> 
+> Yes, but this is very unnatural.
+> 
+> To get CONFIG_ACPI_VIDEO=y  I need to have VIDEO_OUTPUT_CONTROL=y
+> for which I have to select the Intel GMA500 Stub Driver although I don't
+> have such a device and therefore don't need that driver.
+> Furthermore, I had to chase through quite some flags to find this.
+> 
+> If it's not a bug, it's surprising, at least.
 
-On Tuesday 20 November 2012 Michal Marek wrote:
-> > On Saturday 20 October 2012 Yann E. MORIN wrote:
-> > > This little patch series allows one to override the CONFIG_ prefix at 
-> > > runtime, without the need to rebuild the frontends.
-> Applied to kbuild.git#kconfig now, sorry for the delay.
+0) It puzzles me too.
 
-No problem! Thank you! :-)
+1) The problem is in Nouveau's Kconfig:
+    config DRM_NOUVEAU
+        tristate "Nouveau (nVidia) cards"
+        [...]
+        select ACPI_VIDEO if ACPI && X86 && BACKLIGHT_CLASS_DEVICE && VIDEO_OUTPUT_CONTROL && INPUT
+        [...]
 
-Regards,
-Yann E. MORIN.
+and its Makefile:
+    # other random bits
+    [...]
+    nouveau-$(CONFIG_ACPI) += nouveau_acpi.o
+    [...]
 
--- 
-.-----------------.--------------------.------------------.--------------------.
-|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
-| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
-| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
-| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
-'------------------------------^-------^------------------^--------------------'
+    obj-$(CONFIG_DRM_NOUVEAU)+= nouveau.o
+
+2) Now, with DRM_NOUVEAU=y and ACPI_VIDEO=m nouveau_acpi.o will be made
+builtin (which fails with the error Helmut ran into). The puzzling part
+is that ACPI_VIDEO will only be selected (ie, made into a 'y') if all
+dependencies of that select statement are 'y' too. (Note that these
+dependencies are identical to the dependencies of ACPI_VIDEO's config
+entry. That can be no coincidence.)
+
+3) But I would expect ACPI_VIDEO to be selected if the dependencies of
+that select statement are either 'y' or 'm'. And then Helmut's .config
+should trigger some warning about selecting a symbol with unmet
+dependencies, or whatever, shouldn't it? (Because some of ACPI_VIDEO's
+dependencies are still 'm'.)
+
+4) I'm CC-ing the Kconfig people to tell us whether the current behavior
+is as designed or a bug. If it's not a bug the DRM_NOUVEAU config entry
+might need to be changed.
+
+
+Paul Bolle
+
