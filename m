@@ -1,101 +1,111 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.snhosting.dk ([87.238.248.203]:55095 "EHLO
-	smtp.domainteam.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753387Ab2KYUkZ (ORCPT
+Received: from mail-wi0-f174.google.com ([209.85.212.174]:44585 "EHLO
+	mail-wi0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932087Ab2KZW14 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 25 Nov 2012 15:40:25 -0500
-Date: Sun, 25 Nov 2012 21:40:19 +0100
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH 3/3] scripts/kconfig: allow setting the root-menu label
-	from environment
-Message-ID: <20121125204019.GA11106@merkur.ravnborg.org>
-References: <1353542766-24422-1-git-send-email-yann.morin.1998@free.fr> <1353542766-24422-4-git-send-email-yann.morin.1998@free.fr> <20121123183211.GB10586@merkur.ravnborg.org> <201211232221.45291.yann.morin.1998@free.fr>
+	Mon, 26 Nov 2012 17:27:56 -0500
+Received: by mail-wi0-f174.google.com with SMTP id hm9so3931761wib.1
+        for <linux-kbuild@vger.kernel.org>; Mon, 26 Nov 2012 14:27:55 -0800 (PST)
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Subject: Re: [PATCH 3/3] scripts/kconfig: allow setting the root-menu label from environment
+Date: Mon, 26 Nov 2012 23:27:48 +0100
+References: <1353542766-24422-1-git-send-email-yann.morin.1998@free.fr> <201211232221.45291.yann.morin.1998@free.fr> <20121125204019.GA11106@merkur.ravnborg.org>
+In-Reply-To: <20121125204019.GA11106@merkur.ravnborg.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <201211232221.45291.yann.morin.1998@free.fr>
+Content-Type: Text/Plain;
+  charset="iso-8859-1"
+Content-Transfer-Encoding: 7bit
+Message-Id: <201211262327.49146.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Cc: linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>
+To: linux-kbuild@vger.kernel.org
+Cc: Sam Ravnborg <sam@ravnborg.org>, Michal Marek <mmarek@suse.cz>
 
-On Fri, Nov 23, 2012 at 10:21:44PM +0100, Yann E. MORIN wrote:
-> Sam, All,
-> 
-> On Friday 23 November 2012 Sam Ravnborg wrote:
-> > On Thu, Nov 22, 2012 at 01:06:06AM +0100, Yann E. MORIN wrote:
-> > > Currently, the root-menu label is hard-coded in the kconfig frontends
-> > > executables. This means that two projects that use kconfig and want
-> > > to display different root-menu labels can not share the same kconfig
-> > > frontends.
+Sam, Michal, All,
+
+Sam, see my comments in-lined below.
+Michal, there are a bunch of questions for you toward the end.
+Others: your feedback is also most welcome! ;-)
+
+On Sunday 25 November 2012 Sam Ravnborg wrote:
+> On Fri, Nov 23, 2012 at 10:21:44PM +0100, Yann E. MORIN wrote:
+> > On Friday 23 November 2012 Sam Ravnborg wrote:
+[--SNIP--]
+> > > Could we instead introduce two reserved symbols like this:
 > > > 
-> > > Instead of hard-coding the label in the frontends, handle it the same
-> > > we handle the CONFIG_ prefix:
-> > >   - get the root-menu label from the environment if present
-> > >   - allow to set it at build time (eg. -DROOTMENU='"Root menu label"')
-> > >   - fallback to a hard-coded default
+> > > config KCONFIG_ROOT_MENU
+> > > 	string
+> > > 	default "My own super duper root menu"
 > > 
-> > I have note paid attention to these CONFIG_ patches - and only now
-> > I took a short look at this set and I am not soo hapy
-> > that we start to introduce a lot a environment variables for all this stuff.
-> > 
-> > (A lot in this context is two).
+> > For the root-menu label, no need to add such a specific symbol, as
+> > we already have the 'mainmenu' directive that sets the root-menu
+> > label, eg.:
+> >     mainmenu "My own super duper root menu"
 > 
-> Note that we already make heavy use of environment variables in the kconfig
-> frontends; from Documentation/kbuild/kconfig.txt:
->     KCONFIG_ALLCONFIG
->     KCONFIG_AUTOHEADER
->     KCONFIG_NOSILENTUPDATE
->     KCONFIG_OVERWRITECONFIG
+> Had forgoten about this - why is it that we do not use this, but invent
+> an environment variable?
 
-Common for all of these is that they change the behaviour of the fronendts
-concerning their inputs etc.
-But none of them change the behaviour so the output become useless.
-Also common for these is that they are optional.
-If they are not specified kconfig will work as usual and the generated
-output will be just fine.
+Just the sake of homogeneity: as I already introduced environment
+variable to change the CONFIG_ prefix, then I also added an env var
+for the root-menu, too.
 
->     KCONFIG_CONFIG
->     KCONFIG_AUTOCONFIG
->     KCONFIG_TRISTATE
+But agreed, I'll drop the root-menu patches, since we already havea
+run-time solution to override it.
 
-These are used for non-default file loactions...
+> > > config KCONFIG_SYMBOL_PREFIX
+> > > 	string
+> > > 	default "SAM_"
 
-> > Could we instead introduce two reserved symbols like this:
-> > 
-> > config KCONFIG_ROOT_MENU
-> > 	string
-> > 	default "My own super duper root menu"
-> 
-> For the root-menu label, no need to add such a specific symbol, as
-> we already have the 'mainmenu' directive that sets the root-menu
-> label, eg.:
->     mainmenu "My own super duper root menu"
+OK, I'm tackling this, but my head is on the verge of exploding, trying
+to follow all those intricate calls in the kconfig parser/menu layout.
 
-Had forgoten about this - why is it that we do not use this, but invent
-an environment variable?
+/me goes and gets an aspirin. ;-)
 
+However, rather than hard-coding the symbol name, what about introducing
+a new 'option' keyword:
+    config BLABLA       # Name of symbol is not meaningful
+        string
+        default "SAM_"
+        option prefix
 
-> 
-> > config KCONFIG_SYMBOL_PREFIX
-> > 	string
-> > 	default "SAM_"
-> 
-> I am a bit uneasy adding magic in the kconfig language to drive the
-> behavior of the frontends.
-> 
-> To me, it makes more sense to drive the frontends using environment
-> variables.
+Currently, the only symbol (AFAIK) that is hard-coded is MODULES, which
+can be overloaded with 'option modules' to another symbol. I would not
+like to add any hard-coded symbol name.
 
-Using magic kconfig symbols to decide for core functionality is IMO
-a nice way to do so. I never liked (and still do not like) how environment
-variables are used to adjust the front-end behaviour.
-The real reason why we use environment variables is that we cannot
-specify options for kconfig when we invoke make.
+Michal, as maintainer for this, we need your input:
+  - do you want to keep the CONFIG_ environment variable, or do you
+    prefer the symbol trick?
 
-I long time ago played with the though that the kernel build should
-be started with a shell script named "kbuild" to give us this added flexibility.
-But I gave up as I back then did not have any real good reason to do so.
+If you prefer the env var:
+  - are you happy with the current naming?
+  - if not, what name do you prefer: KCONFIG_CONFIG_ or KCONFIG_PREFIX,
+    or anything else? Then, how do you want me to proceed: send a fix-up
+    patch, or re-submit the previous series with the rename?
 
-	Sam
+If you prefer the symbol trick:
+  - will just revert my previously applied CONFIG_ series, or should I
+    send a fix-up series that removes it before introducing the symbol
+    trick?
+  - do you prefer we hard-code the feature in the symbol name, or is the
+    'option prefix' better suited?
 
+> I never liked (and still do not like) how environment
+> variables are used to adjust the front-end behaviour.
+> The real reason why we use environment variables is that we cannot
+> specify options for kconfig when we invoke make.
+
+Yes, that's also on my todo-list: add a generic option-parsing function
+in a common file, and have all frontends call it.
+
+It's on the todo-list. so don't hold your breadth... ;-)
+
+Regards,
+Yann E. MORIN.
+
+-- 
+.-----------------.--------------------.------------------.--------------------.
+|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
+| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
+| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
+| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
+'------------------------------^-------^------------------^--------------------'
