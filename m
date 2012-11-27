@@ -1,111 +1,102 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wi0-f174.google.com ([209.85.212.174]:44585 "EHLO
-	mail-wi0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932087Ab2KZW14 (ORCPT
+Received: from goliath.siemens.de ([192.35.17.28]:24292 "EHLO
+	goliath.siemens.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S933401Ab2K0KMu (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 26 Nov 2012 17:27:56 -0500
-Received: by mail-wi0-f174.google.com with SMTP id hm9so3931761wib.1
-        for <linux-kbuild@vger.kernel.org>; Mon, 26 Nov 2012 14:27:55 -0800 (PST)
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: Re: [PATCH 3/3] scripts/kconfig: allow setting the root-menu label from environment
-Date: Mon, 26 Nov 2012 23:27:48 +0100
-References: <1353542766-24422-1-git-send-email-yann.morin.1998@free.fr> <201211232221.45291.yann.morin.1998@free.fr> <20121125204019.GA11106@merkur.ravnborg.org>
-In-Reply-To: <20121125204019.GA11106@merkur.ravnborg.org>
-MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-1"
-Content-Transfer-Encoding: 7bit
-Message-Id: <201211262327.49146.yann.morin.1998@free.fr>
+	Tue, 27 Nov 2012 05:12:50 -0500
+From: Jan Kiszka <jan.kiszka@siemens.com>
+Subject: [PATCH v3 00/13] Add gdb python scripts as kernel debugging helpers
+Date: Tue, 27 Nov 2012 11:11:31 +0100
+Message-Id: <cover.1354011091.git.jan.kiszka@siemens.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Sam Ravnborg <sam@ravnborg.org>, Michal Marek <mmarek@suse.cz>
+To: Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org
+Cc: Jason Wessel <jason.wessel@windriver.com>, kgdb-bugreport@lists.sourceforge.net, Andi Kleen <andi@firstfloor.org>, Tom Tromey <tromey@redhat.com>, "David S. Miller" <davem@davemloft.net>, Fenghua Yu <fenghua.yu@intel.com>, Kay Sievers <kay@vrfy.org>, linux-ia64@vger.kernel.org, linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>, sparclinux@vger.kernel.org, Tony Luck <tony.luck@intel.com>
 
-Sam, Michal, All,
+Here is version 3 of my gdb helper scripts. Changes in this release are
+related to improving compatibility with older gdb versions (down to 7.1)
+and the with latest one (7.5). Also, proper reloading of updated kernel
+and module symbols was implemented.
 
-Sam, see my comments in-lined below.
-Michal, there are a bunch of questions for you toward the end.
-Others: your feedback is also most welcome! ;-)
+Andrew, I got the suggestion to pass these patches through your hands.
+Could you take them?
 
-On Sunday 25 November 2012 Sam Ravnborg wrote:
-> On Fri, Nov 23, 2012 at 10:21:44PM +0100, Yann E. MORIN wrote:
-> > On Friday 23 November 2012 Sam Ravnborg wrote:
-[--SNIP--]
-> > > Could we instead introduce two reserved symbols like this:
-> > > 
-> > > config KCONFIG_ROOT_MENU
-> > > 	string
-> > > 	default "My own super duper root menu"
-> > 
-> > For the root-menu label, no need to add such a specific symbol, as
-> > we already have the 'mainmenu' directive that sets the root-menu
-> > label, eg.:
-> >     mainmenu "My own super duper root menu"
-> 
-> Had forgoten about this - why is it that we do not use this, but invent
-> an environment variable?
 
-Just the sake of homogeneity: as I already introduced environment
-variable to change the CONFIG_ prefix, then I also added an env var
-for the root-menu, too.
+Here is the original intro for reference:
 
-But agreed, I'll drop the root-menu patches, since we already havea
-run-time solution to override it.
+This adds the infrastructure and first tools that make kernel debugging
+through gdb more comfortable. Since 7.0, gdb supports python scripting.
+And this opens the doors to automate steps like the tedious loading of
+module symbols at the right address, resolving per-cpu variables or even
+retrieving the current kernel log without resuming an stopped target.
 
-> > > config KCONFIG_SYMBOL_PREFIX
-> > > 	string
-> > > 	default "SAM_"
+Many of the helpers naturally depend on the layout of structures or
+internal mechanics of the kernel. So the best place to maintain such
+things, keeping them consistent with the corresponding kernel is, well,
+the kernel itself.
 
-OK, I'm tackling this, but my head is on the verge of exploding, trying
-to follow all those intricate calls in the kconfig parser/menu layout.
+While these scripts have been originally developed for debugging via
+QEMU/KVM, I've now also added the required bits for KGDB. Works fine,
+but as QEMU/KVM tends to outperform KGDB it remains the recommendation
+- when available.
 
-/me goes and gets an aspirin. ;-)
+There are two architecture dependencies so far, one regarding per-cpu,
+the other regarding thread_info calculation. None of them I was able to
+test on a target, so I'm counting on review/testing by the corresponding
+communities.
 
-However, rather than hard-coding the symbol name, what about introducing
-a new 'option' keyword:
-    config BLABLA       # Name of symbol is not meaningful
-        string
-        default "SAM_"
-        option prefix
+This series should be considered the foundation of much more kernel
+state exploration helpers, e.g. around tasks, timers, locks, sockets -
+I guess people will have even more ideas.
 
-Currently, the only symbol (AFAIK) that is hard-coded is MODULES, which
-can be overloaded with 'option modules' to another symbol. I would not
-like to add any hard-coded symbol name.
+Hope it's useful!
 
-Michal, as maintainer for this, we need your input:
-  - do you want to keep the CONFIG_ environment variable, or do you
-    prefer the symbol trick?
+PS: Also available via git://git.kiszka.org/linux.git queues/gdb-scripts
 
-If you prefer the env var:
-  - are you happy with the current naming?
-  - if not, what name do you prefer: KCONFIG_CONFIG_ or KCONFIG_PREFIX,
-    or anything else? Then, how do you want me to proceed: send a fix-up
-    patch, or re-submit the previous series with the rename?
+CC: "David S. Miller" <davem@davemloft.net>
+CC: Fenghua Yu <fenghua.yu@intel.com>
+CC: Kay Sievers <kay@vrfy.org>
+CC: linux-ia64@vger.kernel.org
+CC: linux-kbuild@vger.kernel.org
+CC: Michal Marek <mmarek@suse.cz>
+CC: sparclinux@vger.kernel.org
+CC: Tony Luck <tony.luck@intel.com>
 
-If you prefer the symbol trick:
-  - will just revert my previously applied CONFIG_ series, or should I
-    send a fix-up series that removes it before introducing the symbol
-    trick?
-  - do you prefer we hard-code the feature in the symbol name, or is the
-    'option prefix' better suited?
+Jan Kiszka (13):
+  scripts/gdb: Add infrastructure
+  scripts/gdb: Add container_of helper and convenience function
+  scripts/gdb: Add lx-symbols command
+  scripts/gdb: Add get_target_endianness helper
+  scripts/gdb: Add read_u16/32/64 helpers
+  scripts/gdb: Add lx-dmesg command
+  scripts/gdb: Add task iteration helper
+  scripts/gdb: Add helper and convenience function to look up tasks
+  scripts/gdb: Add is_target_arch helper
+  scripts/gdb: Add internal helper and convenience function to retrieve
+    thread_info
+  scripts/gdb: Add get_gdbserver_type helper
+  scripts/gdb: Add internal helper and convenience function for per-cpu
+    lookup
+  scripts/gdb: Add lx_current convenience function
 
-> I never liked (and still do not like) how environment
-> variables are used to adjust the front-end behaviour.
-> The real reason why we use environment variables is that we cannot
-> specify options for kconfig when we invoke make.
-
-Yes, that's also on my todo-list: add a generic option-parsing function
-in a common file, and have all frontends call it.
-
-It's on the todo-list. so don't hold your breadth... ;-)
-
-Regards,
-Yann E. MORIN.
+ Makefile                   |    5 +-
+ scripts/Makefile           |    3 +-
+ scripts/gdb/Makefile       |    9 +++
+ scripts/gdb/dmesg.py       |   63 ++++++++++++++++++
+ scripts/gdb/percpu.py      |   76 +++++++++++++++++++++
+ scripts/gdb/symbols.py     |  155 ++++++++++++++++++++++++++++++++++++++++++++
+ scripts/gdb/task.py        |  108 ++++++++++++++++++++++++++++++
+ scripts/gdb/utils.py       |  137 ++++++++++++++++++++++++++++++++++++++
+ scripts/gdb/vmlinux-gdb.py |   28 ++++++++
+ 9 files changed, 582 insertions(+), 2 deletions(-)
+ create mode 100644 scripts/gdb/Makefile
+ create mode 100644 scripts/gdb/dmesg.py
+ create mode 100644 scripts/gdb/percpu.py
+ create mode 100644 scripts/gdb/symbols.py
+ create mode 100644 scripts/gdb/task.py
+ create mode 100644 scripts/gdb/utils.py
+ create mode 100644 scripts/gdb/vmlinux-gdb.py
 
 -- 
-.-----------------.--------------------.------------------.--------------------.
-|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
-| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
-| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
-| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
-'------------------------------^-------^------------------^--------------------'
+1.7.3.4
+
