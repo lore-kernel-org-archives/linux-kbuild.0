@@ -1,58 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.19.201]:41108 "EHLO mail.kernel.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751185Ab2K2Qj2 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 29 Nov 2012 11:39:28 -0500
-Date: Thu, 29 Nov 2012 08:39:22 -0800
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: Re: [driver-core:driver-core-next 65/93] WARNING:
- drivers/built-in.o(.text+0xe2399):
-Message-ID: <20121129163922.GA5872@kroah.com>
-References: <50B78237.9020005@suse.cz>
- <20121129155150.5B667801FC@viridian.itc.virginia.edu>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20121129155150.5B667801FC@viridian.itc.virginia.edu>
+Received: from mail-qa0-f46.google.com ([209.85.216.46]:35135 "EHLO
+	mail-qa0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753244Ab2K2RVk (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 29 Nov 2012 12:21:40 -0500
+From: Cong Ding <dinggnu@gmail.com>
+Subject: [PATCH 1/1] kbuild: solve the DSO link change issue
+Date: Thu, 29 Nov 2012 17:21:28 +0000
+Message-Id: <1354209688-16247-1-git-send-email-dinggnu@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Bill Pemberton <wfp5p@viridian.itc.virginia.edu>
-Cc: Michal Marek <mmarek@suse.cz>, Fengguang Wu <fengguang.wu@intel.com>, devel@driverdev.osuosl.org, Sam Ravnborg <sam@ravnborg.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: Michal Marek <mmarek@suse.cz>
+Cc: Yaakov Selkowitz <yselkowitz@users.sourceforge.net>, Peter Foley <pefoley2@verizon.net>, Adam Lee <adam8157@gmail.com>, Steven Rostedt <rostedt@goodmis.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Cong Ding <dinggnu@gmail.com>
 
-On Thu, Nov 29, 2012 at 10:51:50AM -0500, Bill Pemberton wrote:
-> Michal Marek writes:
-> > 
-> > On 29.11.2012 03:12, Fengguang Wu wrote:
-> > > On Wed, Nov 28, 2012 at 02:16:49PM -0800, Greg KH wrote:
-> > >> On Thu, Nov 29, 2012 at 05:38:31AM +0800, kbuild test robot wrote:
-> > >>> tree:   git://git.kernel.org/pub/scm/linux/kernel/git/gregkh/driver-core.git driver-core-next
-> > >>> head:   da095fd3d5063f2dd03468d71f7df39a0430d86f
-> > >>> commit: f791be492f76dea7b0641ed227a60eeb2fa7e255 [65/93] mfd: remove use of __devinit
-> > >>> config: x86_64-randconfig-s363 (attached as .config)
-> > >>>
-> > >>> All warnings:
-> > >>>
-> > >>> WARNING: drivers/built-in.o(.text+0xe2399): Section mismatch in reference from the function stmpe_i2c_probe() to the function .devinit.text:stmpe_probe()
-> > >>> The function stmpe_i2c_probe() references
-> > >>> the function __devinit stmpe_probe().
-> > >>> This is often because stmpe_i2c_probe lacks a __devinit
-> > >>> annotation or the annotation of stmpe_probe is wrong.
-> > >>
-> > >> Not an issue anymore as __devinit is always defined to nothing, so this
-> > >> check doesn't mean anything.
-> > 
-> > Really? If __devinit was defined to do nothing, then the function would
-> > not end up in .devinit.text.
-> > 
-> 
-> Yes, the __dev* #defines are still in init.h right now.  I've not
-> touched them yet on the thinking they can't be removed until all users
-> of them are gone.
-> 
-> Maybe it'd be a good idea to change them to nothing now.  That way
-> anything that's still using them won't have compile failures, but the
-> section mismatches would go away.
+when make menuconfig, it reports this error:
 
-Yes, I'll work on that later today.
+/usr/bin/ld: scripts/kconfig/lxdialog/checklist.o: undefined reference to symbol 'acs_map'
+/usr/bin/ld: note: 'acs_map' is defined in DSO /lib64/libtinfo.so.5 so try adding it to the linker command line
+/lib64/libtinfo.so.5: could not read symbols: Invalid operation
+collect2: ld returned 1 exit status
 
-greg k-h
+due to the DSO link change, we must explicitly link against every library needed.
+http://fedoraproject.org/wiki/UnderstandingDSOLinkChange
+
+Signed-off-by: Cong Ding <dinggnu@gmail.com>
+---
+ scripts/kconfig/Makefile |    1 +
+ 1 files changed, 1 insertions(+), 0 deletions(-)
+
+diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
+index 3091794..ae339a1 100644
+--- a/scripts/kconfig/Makefile
++++ b/scripts/kconfig/Makefile
+@@ -215,6 +215,7 @@ HOSTCFLAGS_gconf.o	= `pkg-config --cflags gtk+-2.0 gmodule-2.0 libglade-2.0` \
+                           -Wno-missing-prototypes
+ 
+ HOSTLOADLIBES_mconf   = $(shell $(CONFIG_SHELL) $(check-lxdialog) -ldflags $(HOSTCC))
++HOSTLOADLIBES_mconf += -ltinfo
+ 
+ HOSTLOADLIBES_nconf	= -lmenu -lpanel -lncurses
+ $(obj)/qconf.o: $(obj)/.tmp_qtcheck
+-- 
+1.7.4.5
+
