@@ -1,45 +1,111 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qa0-f46.google.com ([209.85.216.46]:35135 "EHLO
-	mail-qa0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753244Ab2K2RVk (ORCPT
+Received: from mail-da0-f46.google.com ([209.85.210.46]:36266 "EHLO
+	mail-da0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754755Ab2K2SpS (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 29 Nov 2012 12:21:40 -0500
-From: Cong Ding <dinggnu@gmail.com>
-Subject: [PATCH 1/1] kbuild: solve the DSO link change issue
-Date: Thu, 29 Nov 2012 17:21:28 +0000
-Message-Id: <1354209688-16247-1-git-send-email-dinggnu@gmail.com>
+	Thu, 29 Nov 2012 13:45:18 -0500
+Received: by mail-da0-f46.google.com with SMTP id p5so5379212dak.19
+        for <linux-kbuild@vger.kernel.org>; Thu, 29 Nov 2012 10:45:17 -0800 (PST)
+Date: Thu, 29 Nov 2012 10:45:02 -0800
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Subject: Re: [PATCH 1/2] modpost.c: Stop checking __dev* section mismatches
+Message-ID: <20121129184502.GC15110@kroah.com>
+References: <20121129184133.GA15110@kroah.com>
+ <20121129184328.GB15110@kroah.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20121129184328.GB15110@kroah.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: Yaakov Selkowitz <yselkowitz@users.sourceforge.net>, Peter Foley <pefoley2@verizon.net>, Adam Lee <adam8157@gmail.com>, Steven Rostedt <rostedt@goodmis.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Cong Ding <dinggnu@gmail.com>
+To: linux-kernel@vger.kernel.org, Rusty Russell <rusty@rustcorp.com.au>, Jim Cromie <jim.cromie@gmail.com>, Borislav Petkov <borislav.petkov@amd.com>, Andrew Morton <akpm@linux-foundation.org>, Andi Kleen <ak@linux.intel.com>, Michal Marek <mmarek@suse.cz>, Tony Lindgren <tony@atomide.com>, Jonathan Kliegman <kliegs@chromium.org>, Chris Zankel <chris@zankel.net>
+Cc: Bill Pemberton <wfp5p@viridian.itc.virginia.edu>, Fengguang Wu <fengguang.wu@intel.com>, Sam Ravnborg <sam@ravnborg.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-when make menuconfig, it reports this error:
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 
-/usr/bin/ld: scripts/kconfig/lxdialog/checklist.o: undefined reference to symbol 'acs_map'
-/usr/bin/ld: note: 'acs_map' is defined in DSO /lib64/libtinfo.so.5 so try adding it to the linker command line
-/lib64/libtinfo.so.5: could not read symbols: Invalid operation
-collect2: ld returned 1 exit status
+Now that the __dev* sections are not being generated, we don't need to
+check for them in modpost.c.
 
-due to the DSO link change, we must explicitly link against every library needed.
-http://fedoraproject.org/wiki/UnderstandingDSOLinkChange
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 
-Signed-off-by: Cong Ding <dinggnu@gmail.com>
 ---
- scripts/kconfig/Makefile |    1 +
- 1 files changed, 1 insertions(+), 0 deletions(-)
+ scripts/mod/modpost.c |   24 ++++++++++--------------
+ 1 file changed, 10 insertions(+), 14 deletions(-)
 
-diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
-index 3091794..ae339a1 100644
---- a/scripts/kconfig/Makefile
-+++ b/scripts/kconfig/Makefile
-@@ -215,6 +215,7 @@ HOSTCFLAGS_gconf.o	= `pkg-config --cflags gtk+-2.0 gmodule-2.0 libglade-2.0` \
-                           -Wno-missing-prototypes
+diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
+index 0d93856..ff36c50 100644
+--- a/scripts/mod/modpost.c
++++ b/scripts/mod/modpost.c
+@@ -858,25 +858,23 @@ static void check_section(const char *modname, struct elf_info *elf,
  
- HOSTLOADLIBES_mconf   = $(shell $(CONFIG_SHELL) $(check-lxdialog) -ldflags $(HOSTCC))
-+HOSTLOADLIBES_mconf += -ltinfo
+ #define ALL_INIT_DATA_SECTIONS \
+ 	".init.setup$", ".init.rodata$", \
+-	".devinit.rodata$", ".cpuinit.rodata$", ".meminit.rodata$", \
+-	".init.data$", ".devinit.data$", ".cpuinit.data$", ".meminit.data$"
++	".cpuinit.rodata$", ".meminit.rodata$", \
++	".init.data$", ".cpuinit.data$", ".meminit.data$"
+ #define ALL_EXIT_DATA_SECTIONS \
+-	".exit.data$", ".devexit.data$", ".cpuexit.data$", ".memexit.data$"
++	".exit.data$", ".cpuexit.data$", ".memexit.data$"
  
- HOSTLOADLIBES_nconf	= -lmenu -lpanel -lncurses
- $(obj)/qconf.o: $(obj)/.tmp_qtcheck
--- 
-1.7.4.5
-
+ #define ALL_INIT_TEXT_SECTIONS \
+-	".init.text$", ".devinit.text$", ".cpuinit.text$", ".meminit.text$"
++	".init.text$", ".cpuinit.text$", ".meminit.text$"
+ #define ALL_EXIT_TEXT_SECTIONS \
+-	".exit.text$", ".devexit.text$", ".cpuexit.text$", ".memexit.text$"
++	".exit.text$", ".cpuexit.text$", ".memexit.text$"
+ 
+ #define ALL_PCI_INIT_SECTIONS	\
+ 	".pci_fixup_early$", ".pci_fixup_header$", ".pci_fixup_final$", \
+ 	".pci_fixup_enable$", ".pci_fixup_resume$", \
+ 	".pci_fixup_resume_early$", ".pci_fixup_suspend$"
+ 
+-#define ALL_XXXINIT_SECTIONS DEV_INIT_SECTIONS, CPU_INIT_SECTIONS, \
+-	MEM_INIT_SECTIONS
+-#define ALL_XXXEXIT_SECTIONS DEV_EXIT_SECTIONS, CPU_EXIT_SECTIONS, \
+-	MEM_EXIT_SECTIONS
++#define ALL_XXXINIT_SECTIONS CPU_INIT_SECTIONS, MEM_INIT_SECTIONS
++#define ALL_XXXEXIT_SECTIONS CPU_EXIT_SECTIONS, MEM_EXIT_SECTIONS
+ 
+ #define ALL_INIT_SECTIONS INIT_SECTIONS, ALL_XXXINIT_SECTIONS
+ #define ALL_EXIT_SECTIONS EXIT_SECTIONS, ALL_XXXEXIT_SECTIONS
+@@ -885,12 +883,10 @@ static void check_section(const char *modname, struct elf_info *elf,
+ #define TEXT_SECTIONS ".text$"
+ 
+ #define INIT_SECTIONS      ".init.*"
+-#define DEV_INIT_SECTIONS  ".devinit.*"
+ #define CPU_INIT_SECTIONS  ".cpuinit.*"
+ #define MEM_INIT_SECTIONS  ".meminit.*"
+ 
+ #define EXIT_SECTIONS      ".exit.*"
+-#define DEV_EXIT_SECTIONS  ".devexit.*"
+ #define CPU_EXIT_SECTIONS  ".cpuexit.*"
+ #define MEM_EXIT_SECTIONS  ".memexit.*"
+ 
+@@ -979,7 +975,7 @@ const struct sectioncheck sectioncheck[] = {
+ 	.mismatch = DATA_TO_ANY_EXIT,
+ 	.symbol_white_list = { DEFAULT_SYMBOL_WHITE_LIST, NULL },
+ },
+-/* Do not reference init code/data from devinit/cpuinit/meminit code/data */
++/* Do not reference init code/data from cpuinit/meminit code/data */
+ {
+ 	.fromsec = { ALL_XXXINIT_SECTIONS, NULL },
+ 	.tosec   = { INIT_SECTIONS, NULL },
+@@ -1000,7 +996,7 @@ const struct sectioncheck sectioncheck[] = {
+ 	.mismatch = XXXINIT_TO_SOME_INIT,
+ 	.symbol_white_list = { DEFAULT_SYMBOL_WHITE_LIST, NULL },
+ },
+-/* Do not reference exit code/data from devexit/cpuexit/memexit code/data */
++/* Do not reference exit code/data from cpuexit/memexit code/data */
+ {
+ 	.fromsec = { ALL_XXXEXIT_SECTIONS, NULL },
+ 	.tosec   = { EXIT_SECTIONS, NULL },
+@@ -1089,7 +1085,7 @@ static const struct sectioncheck *section_mismatch(
+  * Pattern 2:
+  *   Many drivers utilise a *driver container with references to
+  *   add, remove, probe functions etc.
+- *   These functions may often be marked __devinit and we do not want to
++ *   These functions may often be marked __cpuinit and we do not want to
+  *   warn here.
+  *   the pattern is identified by:
+  *   tosec   = init or exit section
