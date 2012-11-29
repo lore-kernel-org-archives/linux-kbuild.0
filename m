@@ -1,39 +1,56 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pb0-f46.google.com ([209.85.160.46]:57592 "EHLO
-	mail-pb0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752747Ab2K2SpL (ORCPT
+Received: from mail-wg0-f44.google.com ([74.125.82.44]:65020 "EHLO
+	mail-wg0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753766Ab2K2WJk (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 29 Nov 2012 13:45:11 -0500
-Received: by mail-pb0-f46.google.com with SMTP id wy7so10753311pbc.19
-        for <linux-kbuild@vger.kernel.org>; Thu, 29 Nov 2012 10:45:10 -0800 (PST)
-Date: Thu, 29 Nov 2012 10:41:33 -0800
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: [PATCH 0/2] Remove __dev* sections from the kernel
-Message-ID: <20121129184133.GA15110@kroah.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+	Thu, 29 Nov 2012 17:09:40 -0500
+Received: by mail-wg0-f44.google.com with SMTP id dr13so4525060wgb.1
+        for <linux-kbuild@vger.kernel.org>; Thu, 29 Nov 2012 14:09:39 -0800 (PST)
+From: Grant Likely <grant.likely@secretlab.ca>
+Subject: Re: IRQ subsystem menu
+In-Reply-To: <20121029140308.GA19316@sepie.suse.cz>
+References: <20121021074016.GA2604@squish.home.loc> <20121029140308.GA19316@sepie.suse.cz>
+Date: Thu, 29 Nov 2012 20:32:42 +0000
+Message-Id: <20121129203242.6D6CD3E09C2@localhost>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org, Rusty Russell <rusty@rustcorp.com.au>, Jim Cromie <jim.cromie@gmail.com>, Borislav Petkov <borislav.petkov@amd.com>, Andrew Morton <akpm@linux-foundation.org>, Andi Kleen <ak@linux.intel.com>, Michal Marek <mmarek@suse.cz>, Tony Lindgren <tony@atomide.com>, Jonathan Kliegman <kliegs@chromium.org>, Chris Zankel <chris@zankel.net>
-Cc: Bill Pemberton <wfp5p@viridian.itc.virginia.edu>, Fengguang Wu <fengguang.wu@intel.com>, Sam Ravnborg <sam@ravnborg.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: Michal Marek <mmarek@suse.cz>, Paul Thompson <set.mailinglist@gmail.com>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>
 
-With the recent work to remove CONFIG_HOTPLUG, we are starting to get a
-bunch of __devinit section warnings, despite CONFIG_HOTPLUG always being
-enabled.  So lets remove these false warnings by removing the check for
-them in the modpost.c tool.  Also, lets stop marking the sections
-entirely, so define away the section markings in init.h
+On Mon, 29 Oct 2012 15:03:08 +0100, Michal Marek <mmarek@suse.cz> wrote:
+> (Adding lkml and Thomas as IRQ subsystem maintainer to CC)
+> 
+> On Sun, Oct 21, 2012 at 03:40:16AM -0400, Paul Thompson wrote:
+> > 	Hi;
+> > 
+> > 	In menuconfig, General setup -> IRQ subsystem, there are two
+> > possible menu-items. One depends partly on IRQ_DOMAIN, and the other
+> > on MAY_HAVE_SPARSE_IRQ.
+> > 
+> > 	On the x86-64 arch, neither of these seems to be set, so the
+> > menu entry is blank if entered (displaying an odd ^@ if you try to
+> > navigate up or down. And sometimes some screen garbage on the sides.)
+> > 
+> > 	Previously (in the 3.2 kernel at least) this menu used to be
+> > populated by the "Support sparse IRQ numbering" menu-item, which
+> > at that time depended on HAVE_SPARSE_IRQ, and was forced to YES.
+> > 
+> > 	I do not know if the current behaviour is intended, but it
+> > is ugly and confusing to be confronted with a blank menu page.
+> > 
+> > 	Ideally, the "IRQ subsystem" menu would not even show up
+> > if it would contain no menu-items, but I do not know enough to
+> > formulate that constraint.
 
-I'll queue these two patches up through my driver-core git tree, which
-has the bulk of the __dev* marking removal patches in it.  If anyone has
-any objections to this, please let me know.
+First, move the 'menu "IRQ subsystem"' line does to right before the
+IRQ_DOMAIN_DEBUG line so that it wraps the options that matter, then you
+can add a "depends on MAY_HAVE_SPARSE_IRQ || IRQ_DOMAIN" line right
+below the menu item.
 
-thanks,
+You'll also need to move the IRQ_FORCED_THREADING line out from inside
+the menu block.
 
-greg k-h
+Try it out and let me know how it goes.
 
----
- include/linux/init.h  |   18 +++++++-----------
- scripts/mod/modpost.c |   24 ++++++++++--------------
- 2 files changed, 17 insertions(+), 25 deletions(-)
+g.
 
