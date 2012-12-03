@@ -1,42 +1,78 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pb0-f46.google.com ([209.85.160.46]:51211 "EHLO
-	mail-pb0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754395Ab2LCErW (ORCPT
+Received: from mail-da0-f46.google.com ([209.85.210.46]:63002 "EHLO
+	mail-da0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750710Ab2LCFAo (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 2 Dec 2012 23:47:22 -0500
-Date: Mon, 3 Dec 2012 12:47:27 +0800
+	Mon, 3 Dec 2012 00:00:44 -0500
+Date: Mon, 3 Dec 2012 13:00:33 +0800
 From: Wang YanQing <udknight@gmail.com>
-Subject: Re: [PATCH] lxdialog:inputbox: Fix can't change selected button with
- Left/Right when input box selected
-Message-ID: <20121203044727.GA3856@udknight>
-References: <20121202163509.GB20796@udknight>
- <201212021832.44326.yann.morin.1998@free.fr>
+Subject: Re: [PATCH v4]menuconfig: Add Save button
+Message-ID: <20121203050033.GB3856@udknight>
+References: <20121201161316.GA15246@udknight>
+ <201212021852.51113.yann.morin.1998@free.fr>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <201212021832.44326.yann.morin.1998@free.fr>
+In-Reply-To: <201212021852.51113.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: "Yann E. MORIN" <yann.morin.1998@free.fr>
 Cc: linux-kbuild@vger.kernel.org, mmarek@suse.cz, linux-kernel@vger.kernel.org, rdunlap@xenotime.net, bp@alien8.de, sakiwit@gmail.com, lacombar@gmail.com, lucas.demarchi@profusion.mobi, dave@gnu.org, paul.gortmaker@windriver.com, crquan@gmail.com, bpoirier@suse.de
 
-On Sun, Dec 02, 2012 at 06:32:43PM +0100, Yann E. MORIN wrote:
-> Wang, All,
+Hi Yann, All,
+	
+On Sun, Dec 02, 2012 at 06:52:50PM +0100, Yann E. MORIN wrote:
+> To make the behavior consistent, may I suggest that you push the
+> concept even a bit further:
+>   - add a "Load" *and* a "Save" buttons
+>   - get rid of the top-level "Load an Alternate Configuration File"
+>     and "Save an Alternate Configuration File" entries
 > 
-> On Sunday 02 December 2012 Wang YanQing wrote:
-> > inputbox code don't support use Left/Right to change input
-> > position in the input box, so it use continue to skip them
-> > when input key is Left/Right, but use break for Up/Down, so
-> > we can change selected button with Up/Down but we can't do it
-> > with Left/Right key when input box selected.
-> > This patch fix it.
+> For the "Save" and "Load" buttons, please mimick how the nconf frontend
+> behaves: prompt for the file to save to/load from, and prefill it with
+> the last filename that was entered (".config" per default).
 > 
-> Although I do understand the motivation behind your change, may I suggest
-> that left/right are used to navigate *inside* the input field, so it is
-> possible to modify the text in place?
-Hi Yann,All,
-I understand what you say, and I also want inputbox support
-changing input position with Left/Right. But this patch is accepted 
-before somebody make it come true, right?
+> Of course, two patches for that: one for the "Save/Load" buttons, one
+> to get rid of the top-level entries afterward.
+Thanks, very good suggestion, I will jump in.
 
-Thanks
+> Note: I do not state that your use-case is valid or not. That's your
+> call how you configure and test your kernel. However, I think that
+> having a consistent behavior across the frontends is a very nice goal
+> to pursue.
+I understand, I make a mistake in the comment in previous Email.
+
+> See other comments in-lined, below.
+> 
+> > V1-V2: Rewrite the most code to make it more correct
+> > V2-V3: Fix the behavior of conf_message_callback when exit.
+> > V3-V4:
+> > 1: Move Buttons a little left to make them look like symmetrical.
+> > 2: Exchange the position between Save button and Exit button.
+> > 3: Use conf_save instead of conf_write to make we can save
+> > an alternate configuration file with Save button.
+> > 
+> > Signed-off-by: Wang YanQing <udknight@gmail.com>
+> > ---
+> >  scripts/kconfig/lxdialog/menubox.c | 21 +++++++++---------
+> >  scripts/kconfig/mconf.c            | 45 ++++++++++++++++++++++++++++++--------
+> >  2 files changed, 47 insertions(+), 19 deletions(-)
+> > 
+> > diff --git a/scripts/kconfig/lxdialog/menubox.c b/scripts/kconfig/lxdialog/menubox.c
+> > index 1d60473..b445bda 100644
+> > --- a/scripts/kconfig/lxdialog/menubox.c
+> > +++ b/scripts/kconfig/lxdialog/menubox.c
+> > @@ -26,7 +26,7 @@
+> >   *
+> >   *    *)  A bugfix for the Page-Down problem
+> >   *
+> > - *    *)  Formerly when I used Page Down and Page Up, the cursor would be set 
+> > + *    *)  Formerly when I used Page Down and Page Up, the cursor would be set
+> 
+> Space-damage. Don't send trailing-space fixes, or at least add a quick
+> note for it at the end of the commit log (eg.: "remove trailing space
+> while at it").
+Ok, it is right.
+
+Thanks Yann E. MORIN, and All
+
