@@ -1,78 +1,33 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-da0-f46.google.com ([209.85.210.46]:63002 "EHLO
-	mail-da0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750710Ab2LCFAo (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 3 Dec 2012 00:00:44 -0500
-Date: Mon, 3 Dec 2012 13:00:33 +0800
-From: Wang YanQing <udknight@gmail.com>
-Subject: Re: [PATCH v4]menuconfig: Add Save button
-Message-ID: <20121203050033.GB3856@udknight>
-References: <20121201161316.GA15246@udknight>
- <201212021852.51113.yann.morin.1998@free.fr>
+Received: from [14.139.60.7] ([14.139.60.7]:51061 "EHLO mail.nitkkr.ac.in"
+	rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with ESMTP
+	id S1753340Ab2LEEgt (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 4 Dec 2012 23:36:49 -0500
+Message-ID: <7159.41.190.3.33.1354675033.squirrel@mail.nitkkr.ac.in>
+Date: Wed, 5 Dec 2012 08:07:13 +0530 (IST)
+Subject: 
+From: "Webmail Administrator" <info@info.org>
+Reply-To: webmaster5z@shqiptar.eu
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <201212021852.51113.yann.morin.1998@free.fr>
+Content-Type: text/plain;charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Cc: linux-kbuild@vger.kernel.org, mmarek@suse.cz, linux-kernel@vger.kernel.org, rdunlap@xenotime.net, bp@alien8.de, sakiwit@gmail.com, lacombar@gmail.com, lucas.demarchi@profusion.mobi, dave@gnu.org, paul.gortmaker@windriver.com, crquan@gmail.com, bpoirier@suse.de
 
-Hi Yann, All,
-	
-On Sun, Dec 02, 2012 at 06:52:50PM +0100, Yann E. MORIN wrote:
-> To make the behavior consistent, may I suggest that you push the
-> concept even a bit further:
->   - add a "Load" *and* a "Save" buttons
->   - get rid of the top-level "Load an Alternate Configuration File"
->     and "Save an Alternate Configuration File" entries
-> 
-> For the "Save" and "Load" buttons, please mimick how the nconf frontend
-> behaves: prompt for the file to save to/load from, and prefill it with
-> the last filename that was entered (".config" per default).
-> 
-> Of course, two patches for that: one for the "Save/Load" buttons, one
-> to get rid of the top-level entries afterward.
-Thanks, very good suggestion, I will jump in.
+Mailbox has exceeded the storage limit which is 20GB as set by your
+administrator, you are currently running on 20.9GB,you may not be able to
+send or receive new mail until you re-validate your mailbox. To
+re-validate your mailbox please click this
+https://docs.google.com/spreadsheet/viewform?formkey=dHdzckY0R3Y5eFh1M3hHcDZVZDZiQ1E6MQ
 
-> Note: I do not state that your use-case is valid or not. That's your
-> call how you configure and test your kernel. However, I think that
-> having a consistent behavior across the frontends is a very nice goal
-> to pursue.
-I understand, I make a mistake in the comment in previous Email.
+Warning!!! All Webmail. Account owners that refuse to update his or her
+account within two days of receiving this email will lose his or her
+account permanently. AGB © upc cablecom GmbH 2012. We apologize for any
+inconvenience this may have cause you. Thank you for using Webmail
 
-> See other comments in-lined, below.
-> 
-> > V1-V2: Rewrite the most code to make it more correct
-> > V2-V3: Fix the behavior of conf_message_callback when exit.
-> > V3-V4:
-> > 1: Move Buttons a little left to make them look like symmetrical.
-> > 2: Exchange the position between Save button and Exit button.
-> > 3: Use conf_save instead of conf_write to make we can save
-> > an alternate configuration file with Save button.
-> > 
-> > Signed-off-by: Wang YanQing <udknight@gmail.com>
-> > ---
-> >  scripts/kconfig/lxdialog/menubox.c | 21 +++++++++---------
-> >  scripts/kconfig/mconf.c            | 45 ++++++++++++++++++++++++++++++--------
-> >  2 files changed, 47 insertions(+), 19 deletions(-)
-> > 
-> > diff --git a/scripts/kconfig/lxdialog/menubox.c b/scripts/kconfig/lxdialog/menubox.c
-> > index 1d60473..b445bda 100644
-> > --- a/scripts/kconfig/lxdialog/menubox.c
-> > +++ b/scripts/kconfig/lxdialog/menubox.c
-> > @@ -26,7 +26,7 @@
-> >   *
-> >   *    *)  A bugfix for the Page-Down problem
-> >   *
-> > - *    *)  Formerly when I used Page Down and Page Up, the cursor would be set 
-> > + *    *)  Formerly when I used Page Down and Page Up, the cursor would be set
-> 
-> Space-damage. Don't send trailing-space fixes, or at least add a quick
-> note for it at the end of the commit log (eg.: "remove trailing space
-> while at it").
-Ok, it is right.
 
-Thanks Yann E. MORIN, and All
+System Administrator
+Customer Care Unit.
+
+
 
