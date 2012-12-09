@@ -1,27 +1,30 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:44827 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:44995 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751840Ab2LIQ5S (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 9 Dec 2012 11:57:18 -0500
-Message-ID: <50C4C2EC.9090703@suse.cz>
-Date: Sun, 09 Dec 2012 17:57:16 +0100
+	id S1752904Ab2LIRFp (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 9 Dec 2012 12:05:45 -0500
+Message-ID: <50C4C4E5.5010100@suse.cz>
+Date: Sun, 09 Dec 2012 18:05:41 +0100
 From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Subject: Re: [PATCH 1/5] kbuild: remove deprecated use of defined in timeconst.pl
-References: <1353269117-39917-1-git-send-email-pefoley2@verizon.net>
-In-Reply-To: <1353269117-39917-1-git-send-email-pefoley2@verizon.net>
-Content-Type: text/plain; charset=ISO-8859-2
+Subject: Re: nouveau driver fails to build
+References: <1353681769.29421.0@numa-i>  <1353684679.1420.7.camel@x61.thuisdomein> <1353690805.30841.0@numa-i> <1353692960.1420.26.camel@x61.thuisdomein>
+In-Reply-To: <1353692960.1420.26.camel@x61.thuisdomein>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: pefoley2@verizon.net
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: Paul Bolle <pebolle@tiscali.nl>
+Cc: Helmut Jarausch <jarausch@igpm.rwth-aachen.de>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-On 18.11.2012 21:05, pefoley2@verizon.net wrote:
-> From: Peter Foley <pefoley2@verizon.net>
-> 
-> Fix this warning by removing a unneeded use of defined
+On 23.11.2012 18:49, Paul Bolle wrote:
+> The puzzling part
+> is that ACPI_VIDEO will only be selected (ie, made into a 'y') if all
+> dependencies of that select statement are 'y' too. (Note that these
+> dependencies are identical to the dependencies of ACPI_VIDEO's config
+> entry. That can be no coincidence.)
 
-An identical fix for this is in the -mm tree already.
+Well, you basically answered your question. If ACPI_VIDEO depends on
+anything that is 'm', then it cannot be set to 'y'.
 
 Michal
