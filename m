@@ -1,89 +1,71 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ozlabs.org ([203.10.76.45]:44790 "EHLO ozlabs.org"
+Received: from cantor2.suse.de ([195.135.220.15]:43217 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754305Ab2LJAKT (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 9 Dec 2012 19:10:19 -0500
-From: Rusty Russell <rusty@rustcorp.com.au>
-Subject: Re: [PATCH 2/5] kbuild: silence rule for extra_certificates
-In-Reply-To: <20121209165425.GA29331@pobox.suse.cz>
-References: <1353269117-39917-1-git-send-email-pefoley2@verizon.net> <1353269117-39917-2-git-send-email-pefoley2@verizon.net> <20121209165425.GA29331@pobox.suse.cz>
-Date: Mon, 10 Dec 2012 10:38:38 +1030
-Message-ID: <87d2yiepkp.fsf@rustcorp.com.au>
+	id S1753903Ab2LJJpS (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 10 Dec 2012 04:45:18 -0500
+Date: Mon, 10 Dec 2012 10:45:15 +0100
+From: Michal Marek <mmarek@suse.cz>
+Subject: Re: Makefile race between jobs
+Message-ID: <20121210094515.GA31121@sepie.suse.cz>
+References: <264C179F799EF24AB26D5319053335E80CC3049A10@ezexch.ezchip.com>
+ <50C4B8F3.6030704@suse.cz>
+ <264C179F799EF24AB26D5319053335E80CC31B9D41@ezexch.ezchip.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <264C179F799EF24AB26D5319053335E80CC31B9D41@ezexch.ezchip.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>, pefoley2@verizon.net, David Howells <dhowells@redhat.com>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: Noam Camus <noamc@ezchip.com>
+Cc: "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, linux-kernel@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>
 
-Michal Marek <mmarek@suse.cz> writes:
-> Added David and Rusty.
->
-> On Sun, Nov 18, 2012 at 03:05:14PM -0500, pefoley2@verizon.net wrote:
->> From: Peter Foley <pefoley2@verizon.net>
->> 
->> Silence the touch extra_certificates command
->> 
->> Signed-off-by: Peter Foley <pefoley2@verizon.net>
->
-> I think we should tell the user that the default empty extra
-> certificates list is being used, in case the user used a wrong filename
-> or similar. How about this?
+On Mon, Dec 10, 2012 at 11:02:25AM +0200, Noam Camus wrote:
+> Target "scripts_basic" by itself is indeed not creating the dependency issue.
+> The relevant target is "scripts".
+> Sorry for the confusion, thanks for the example.
+> So I call target "defconfig" and then I call target "vmlinux" which by dependency calls target "scripts", e.g.:
+> $ make ARCH=arc O=/dev/shm/_build/ defconfig scripts
+>   HOSTCC  scripts/basic/fixdep
+>   GEN     /dev/shm/_build/Makefile
+>   HOSTCC  scripts/kconfig/conf.o
+>   SHIPPED scripts/kconfig/zconf.tab.c
+>   SHIPPED scripts/kconfig/zconf.lex.c
+>   SHIPPED scripts/kconfig/zconf.hash.c
+>   HOSTCC  scripts/kconfig/zconf.tab.o
+>   HOSTLD  scripts/kconfig/conf
+> #
+> # configuration written to .config
+> #
+>   GEN     /dev/shm/_build/Makefile
+> scripts/kconfig/conf --silentoldconfig Kconfig
+>   CC      scripts/mod/empty.o
+> In file included from /tmp/linux/include/linux/thread_info.h:10,
+>                  from /tmp/linux/arch/arc/include/asm/current.h:24,
+>                  from <command-line>:0:
+> /tmp/linux/include/linux/types.h:4:23: error: asm/types.h: No such file or directory
+> 
+> The inclusion of asm/current.h comes from use of LINUXINCLUDE in my
+> architecture Makefile.
+> And asm/types.h is missing since it suppose to be created by target
+> "asm-generic".
 
-I prefer this one... Peter?
+OK, so there is a new architecture 'arc' that adds '-include asm/current.h'
+to global cflags in arch/arc/Makefile. Added Arnd to CC.
 
-Thanks,
-Rusty.
 
->
-> Subject: MODSIGN: Fix kbuild output when using default extra_certificates
->
-> Signed-off-by: Michal Marek <mmarek@suse.cz>
->
-> diff --git a/kernel/Makefile b/kernel/Makefile
-> index 0dfeca4..8c708e4 100644
-> --- a/kernel/Makefile
-> +++ b/kernel/Makefile
-> @@ -136,8 +136,12 @@ ifeq ($(CONFIG_MODULE_SIG),y)
->  #
->  # Pull the signing certificate and any extra certificates into the kernel
->  #
-> +
-> +quiet_cmd_touch = TOUCH   $@
-> +      cmd_touch = touch   $@
-> +
->  extra_certificates:
-> -	touch $@
-> +	$(call cmd,touch)
->  
->  kernel/modsign_pubkey.o: signing_key.x509 extra_certificates
->  
-> But I don't insist on the above, feel free to hide the command
-> completely.
->
-> Michal
->
->> ---
->>  kernel/Makefile | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->> 
->> diff --git a/kernel/Makefile b/kernel/Makefile
->> index 86e3285..18a0b61 100644
->> --- a/kernel/Makefile
->> +++ b/kernel/Makefile
->> @@ -137,7 +137,7 @@ ifeq ($(CONFIG_MODULE_SIG),y)
->>  # Pull the signing certificate and any extra certificates into the kernel
->>  #
->>  extra_certificates:
->> -	touch $@
->> +	@touch $@
->>  
->>  kernel/modsign_pubkey.o: signing_key.x509 extra_certificates
->>  
->> -- 
->> 1.8.0
->> 
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> I think the point here that I try to emphasize is that target
+> "asm-generic" should be completed before any non-host source is
+> compiled.
+> In our case scripts/mod/empty.c is the first non-host source to be
+> compiled and by bad coincidence it depends upon auto generated
+> headers.
+
+I see the problem now. However, so far, no other architecture has been
+doing this. 'grep -e -include arch/*/Makefile' shows only one instance
+in arch/arm, but that include is a static file with no dependencies. Is
+it really necessary to include asm/current.h when compiling _every_
+file? Sure, you get it via many common headers, but then you don't need
+to add it explicitly :). But if Arnd thinks this is OK, I will merge a
+patch that serializes scripts/mod/empty.o and asm-generic.
+
+Michal
