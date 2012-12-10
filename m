@@ -1,94 +1,63 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from us02smtp2.synopsys.com ([198.182.60.77]:35528 "EHLO
-	alvesta.synopsys.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750754Ab2LJLXl (ORCPT
+Received: from mail-wi0-f174.google.com ([209.85.212.174]:38702 "EHLO
+	mail-wi0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751310Ab2LJXUb (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 10 Dec 2012 06:23:41 -0500
-Message-ID: <50C5C62D.8080904@synopsys.com>
-Date: Mon, 10 Dec 2012 16:53:25 +0530
-From: Vineet Gupta <Vineet.Gupta1@synopsys.com>
-MIME-Version: 1.0
-Subject: Re: Makefile race between jobs
-References: <264C179F799EF24AB26D5319053335E80CC3049A10@ezexch.ezchip.com> <50C5B9D9.1080208@suse.cz> <50C5BB4A.9000403@synopsys.com> <201212101059.28161.arnd@arndb.de>
-In-Reply-To: <201212101059.28161.arnd@arndb.de>
-Content-Type: text/plain; charset="ISO-8859-1"
-Content-Transfer-Encoding: 7bit
+	Mon, 10 Dec 2012 18:20:31 -0500
+Received: by mail-wi0-f174.google.com with SMTP id hm9so1859466wib.1
+        for <linux-kbuild@vger.kernel.org>; Mon, 10 Dec 2012 15:20:30 -0800 (PST)
+From: Grant Likely <grant.likely@secretlab.ca>
+Subject: Re: IRQ subsystem menu
+In-Reply-To: <20121206021620.GB8989@squish.home.loc>
+References: <20121021074016.GA2604@squish.home.loc> <20121029140308.GA19316@sepie.suse.cz> <20121129203242.6D6CD3E09C2@localhost> <20121206021620.GB8989@squish.home.loc>
+Date: Mon, 10 Dec 2012 23:18:50 +0000
+Message-Id: <20121210231850.367713E081F@localhost>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: Michal Marek <mmarek@suse.cz>, Noam Camus <noamc@ezchip.com>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, linux-kernel@vger.kernel.org
+To: Paul Thompson <set48035@gmail.com>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>
 
-On Monday 10 December 2012 04:29 PM, Arnd Bergmann wrote:
-> On Monday 10 December 2012, Vineet Gupta wrote:
->>
->> On Monday 10 December 2012 04:00 PM, Michal Marek wrote:
->>> On 10.12.2012 11:11, Vineet Gupta wrote:
->>>> ARC Port caches current task pointer in a register - thus we have a
->>>> global asm register definition in current.h
->>>> In the past, a customer ran into issue when porting some "really
->>>> portable" code to kernel - such that asm/current.h didn't make it into
->>>> the build of their module - via normal header includes - strange but
->>>> true. Thus forcing current.h via way of -include seemed like a
->>>> safe/sensible way.
->>>
->>> To me that sounds like either an arc header is using the define but
->>> lacking an include of asm/current.h, or the code is lacking asm/current.h.
->>>
->>
->> It was latter - customer code was lacking include of asm/current.h
->> At any rate, independent of above, since we are dealing with a global
->> reg definition, IMHO, forcing the -include for each file built ensures
->> the generated code correctness (gcc reg allocator not fiddling with that
->> reg) - w/o "assuming" it would.
+On Wed, 5 Dec 2012 21:16:20 -0500, Paul Thompson <set48035@gmail.com> wrote:
+> Grant Likely <grant.likely@secretlab.ca>, on Thu  2012.11.29 said:
+> > On Mon, 29 Oct 2012 15:03:08 +0100, Michal Marek <mmarek@suse.cz> wrote:
+> > > (Adding lkml and Thomas as IRQ subsystem maintainer to CC)
+> > > 
+> > > On Sun, Oct 21, 2012 at 03:40:16AM -0400, Paul Thompson wrote:
+> > > > 	Hi;
+> > > > 
+> > > > 	In menuconfig, General setup -> IRQ subsystem, there are two
+> > > > possible menu-items. One depends partly on IRQ_DOMAIN, and the other
+> > > > on MAY_HAVE_SPARSE_IRQ.
+> > > > 
+> [...]
+> > > > 
+> > > > 	Ideally, the "IRQ subsystem" menu would not even show up
+> > > > if it would contain no menu-items, but I do not know enough to
+> > > > formulate that constraint.
+> > 
+> > First, move the 'menu "IRQ subsystem"' line does to right before the
+> > IRQ_DOMAIN_DEBUG line so that it wraps the options that matter, then you
+> > can add a "depends on MAY_HAVE_SPARSE_IRQ || IRQ_DOMAIN" line right
+> > below the menu item.
+> > 
+> > You'll also need to move the IRQ_FORCED_THREADING line out from inside
+> > the menu block.
+> > 
+> > Try it out and let me know how it goes.
+> > 
+> > g.
 > 
-> I'm not convinced that adding the -include to the kernel Makefile
-> actually helps here: If a third party module is built outside of
-> the kernel sources, it probably also does not use the kernel Makefile,
-> and it may not have access to the kernel header files at all.
-
-There might be NDA issues otherwise I would have uploaded the customer
-code. It was third party code alright - but built in tree - and
-interestingly not using any kernel headers - even linux/types.h. I was
-dazzled myself when I found the root cause (due to r25 getting clobbered
-mysteriously after some code from that driver had run).
-So seriously it was really portable code.
-
-
-> That aside, can't you just have an arch specific header file that
-> reservers the register but does not rely on asm-generic/types.h?
-> That would eliminate the need to serialize the build process.
-
-The code in asm/current.h is as follows:
-
-#ifdef CONFIG_ARC_CURR_IN_REG
-register struct task_struct *curr_arc asm("r25");
-#define current (curr_arc)
-#else
-#include <asm-generic/current.h>
-#endif
-
-The Makefile snippet in 3.2 (which Noam is using) is
-LINUXINCLUDE	+=  -include ${src}/arch/arc/include/asm/current.h
-
-I'm ready to change it to anything which helps alleviate the need for
-build system change - w/o terribly uglifying this code.
-
-However, in the 3.7 port which I posted to lists, the Makefile fragment
-has already been changed due to other reasons.
-
-ifdef CONFIG_ARC_CURR_IN_REG
-# Can't do unconditionally because of recursive include
-# issues due to <linux/thread_info.h>
-LINUXINCLUDE	+=  -include ${src}/arch/arc/include/asm/current.h
-endif
-
-Does that make the problem report moot already - since the issue only
-seems to happen for !CONFIG_ARC_CURR_IN_REG in which case the header
-won't be -include ed
-
--Vineet
-
+> 	Hi;
 > 
-> 	Arnd
+> 	The logic makes sense to me, and makes the menus appearance
+> dependent on if either option setting can exist. So, on my system,
+> the IRQ subsystem menu does not appear.
 > 
+> Paul
+
+Looks right to me. Please repost with a proper commit log and
+"Signed-off-by" line and I'll apply this patch.
+(See Documentation/SubmittingPatches)
+
+g.
 
