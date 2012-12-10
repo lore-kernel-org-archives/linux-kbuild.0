@@ -1,30 +1,89 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:44995 "EHLO mx2.suse.de"
+Received: from ozlabs.org ([203.10.76.45]:44790 "EHLO ozlabs.org"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752904Ab2LIRFp (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 9 Dec 2012 12:05:45 -0500
-Message-ID: <50C4C4E5.5010100@suse.cz>
-Date: Sun, 09 Dec 2012 18:05:41 +0100
-From: Michal Marek <mmarek@suse.cz>
+	id S1754305Ab2LJAKT (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 9 Dec 2012 19:10:19 -0500
+From: Rusty Russell <rusty@rustcorp.com.au>
+Subject: Re: [PATCH 2/5] kbuild: silence rule for extra_certificates
+In-Reply-To: <20121209165425.GA29331@pobox.suse.cz>
+References: <1353269117-39917-1-git-send-email-pefoley2@verizon.net> <1353269117-39917-2-git-send-email-pefoley2@verizon.net> <20121209165425.GA29331@pobox.suse.cz>
+Date: Mon, 10 Dec 2012 10:38:38 +1030
+Message-ID: <87d2yiepkp.fsf@rustcorp.com.au>
 MIME-Version: 1.0
-Subject: Re: nouveau driver fails to build
-References: <1353681769.29421.0@numa-i>  <1353684679.1420.7.camel@x61.thuisdomein> <1353690805.30841.0@numa-i> <1353692960.1420.26.camel@x61.thuisdomein>
-In-Reply-To: <1353692960.1420.26.camel@x61.thuisdomein>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Paul Bolle <pebolle@tiscali.nl>
-Cc: Helmut Jarausch <jarausch@igpm.rwth-aachen.de>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>, pefoley2@verizon.net, David Howells <dhowells@redhat.com>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-On 23.11.2012 18:49, Paul Bolle wrote:
-> The puzzling part
-> is that ACPI_VIDEO will only be selected (ie, made into a 'y') if all
-> dependencies of that select statement are 'y' too. (Note that these
-> dependencies are identical to the dependencies of ACPI_VIDEO's config
-> entry. That can be no coincidence.)
+Michal Marek <mmarek@suse.cz> writes:
+> Added David and Rusty.
+>
+> On Sun, Nov 18, 2012 at 03:05:14PM -0500, pefoley2@verizon.net wrote:
+>> From: Peter Foley <pefoley2@verizon.net>
+>> 
+>> Silence the touch extra_certificates command
+>> 
+>> Signed-off-by: Peter Foley <pefoley2@verizon.net>
+>
+> I think we should tell the user that the default empty extra
+> certificates list is being used, in case the user used a wrong filename
+> or similar. How about this?
 
-Well, you basically answered your question. If ACPI_VIDEO depends on
-anything that is 'm', then it cannot be set to 'y'.
+I prefer this one... Peter?
 
-Michal
+Thanks,
+Rusty.
+
+>
+> Subject: MODSIGN: Fix kbuild output when using default extra_certificates
+>
+> Signed-off-by: Michal Marek <mmarek@suse.cz>
+>
+> diff --git a/kernel/Makefile b/kernel/Makefile
+> index 0dfeca4..8c708e4 100644
+> --- a/kernel/Makefile
+> +++ b/kernel/Makefile
+> @@ -136,8 +136,12 @@ ifeq ($(CONFIG_MODULE_SIG),y)
+>  #
+>  # Pull the signing certificate and any extra certificates into the kernel
+>  #
+> +
+> +quiet_cmd_touch = TOUCH   $@
+> +      cmd_touch = touch   $@
+> +
+>  extra_certificates:
+> -	touch $@
+> +	$(call cmd,touch)
+>  
+>  kernel/modsign_pubkey.o: signing_key.x509 extra_certificates
+>  
+> But I don't insist on the above, feel free to hide the command
+> completely.
+>
+> Michal
+>
+>> ---
+>>  kernel/Makefile | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>> 
+>> diff --git a/kernel/Makefile b/kernel/Makefile
+>> index 86e3285..18a0b61 100644
+>> --- a/kernel/Makefile
+>> +++ b/kernel/Makefile
+>> @@ -137,7 +137,7 @@ ifeq ($(CONFIG_MODULE_SIG),y)
+>>  # Pull the signing certificate and any extra certificates into the kernel
+>>  #
+>>  extra_certificates:
+>> -	touch $@
+>> +	@touch $@
+>>  
+>>  kernel/modsign_pubkey.o: signing_key.x509 extra_certificates
+>>  
+>> -- 
+>> 1.8.0
+>> 
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
