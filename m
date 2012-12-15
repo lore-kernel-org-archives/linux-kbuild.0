@@ -1,88 +1,61 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp-03.mandic.com.br ([200.225.81.143]:55860 "EHLO
-	smtp-03.mandic.com.br" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756534Ab2LNW0g (ORCPT
+Received: from mail-wi0-f194.google.com ([209.85.212.194]:65268 "EHLO
+	mail-wi0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751503Ab2LOPns (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 14 Dec 2012 17:26:36 -0500
-From: Cesar Eduardo Barros <cesarb@cesarb.net>
-Subject: [PATCH] scripts: add checkmaintainers.py
-Date: Fri, 14 Dec 2012 20:19:36 -0200
-Message-Id: <1355523576-7596-1-git-send-email-cesarb@cesarb.net>
+	Sat, 15 Dec 2012 10:43:48 -0500
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Subject: kconfig-frontends-3.7.0.0 released
+Date: Sat, 15 Dec 2012 16:43:36 +0100
+MIME-Version: 1.0
+Content-Type: Text/Plain;
+  charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <201212151643.36850.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>, Cesar Eduardo Barros <cesarb@cesarb.net>, David Howells <dhowells@redhat.com>, Joe Perches <joe@perches.com>
+To: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: lwn@lwn.net, "Yann E. MORIN" <yann.morin.1998@free.fr>
 
-This small script checks the file patterns in the MAINTAINERS file.
+Hello All!
 
-For every file pattern, it checks if the pattern matches any file or
-directory in the kernel tree, printing the patterns which do not have a
-match.
+I'm pleased to announce the release of kconfig-frontends 3.7.0.0!
+Go download it there:
+    http://ymorin.is-a-geek.org/download/kconfig-frontends/kconfig-frontends-3.7.0.0.tar.xz
+    http://ymorin.is-a-geek.org/download/kconfig-frontends/kconfig-frontends-3.7.0.0.tar.bz2
 
-It also checks for any file pattern pointing to any of the include
-directories which does not have a corresponding UAPI file pattern, but
-only if the UAPI file pattern would have a match. It also does the same
-in the opposite direction.
+The kconfig-frontends package provides the kconfig parser, as well as all the
+kconfig frontends and utilities, packaged using the traditional autotools, so
+the kconfig infrastructure is easy to deploy, either locally or system-wide.
 
-The script is written in Python; I found its glob function more
-well-behaved than Perl's. It should work on both Python 2 and Python 3
-without any changes (not even 2to3 is needed); tested on 2.7, 3.2, and
-3.3.
+What's new since 3.6.0.0:
+  - updated from linux-3.7:
+    - kconfig: replace 'oldnoconfig' with 'olddefconfig', and keep the old name as an alias
+    - menuconfig: Assign jump keys per-page instead of globally
+    - kconfig: document oldnoconfig to what it really does in conf.c
+  - yet a bit more of Cygwin compatibility
 
-I do not think such a short script should have a copyright. But to avoid
-any problems, I arbitrarily used the "GNU All-Permissive License" (found
-in FSF's GPL-compatible list). If needed, feel free to relicense it as
-GPLv2+, 3-clause BSD, or even WTFPLv2 or CC0.
+As a reminder, the home for kconfig-frontends is:
+  http://ymorin.is-a-geek.org/projects/kconfig-frontends
 
-Cc: David Howells <dhowells@redhat.com>
-Cc: Joe Perches <joe@perches.com>
-Signed-off-by: Cesar Eduardo Barros <cesarb@cesarb.net>
----
- scripts/checkmaintainers.py | 35 +++++++++++++++++++++++++++++++++++
- 1 file changed, 35 insertions(+)
- create mode 100755 scripts/checkmaintainers.py
+And the repository can be browsed or hg-cloned from:
+  http://ymorin.is-a-geek.org/hg/kconfig-frontends
 
-diff --git a/scripts/checkmaintainers.py b/scripts/checkmaintainers.py
-new file mode 100755
-index 0000000..99740e3
---- /dev/null
-+++ b/scripts/checkmaintainers.py
-@@ -0,0 +1,35 @@
-+#!/usr/bin/python
-+# Quick check for missing file patterns in the MAINTAINERS file.
-+#
-+# Copyright (C) 2012 Cesar Eduardo Barros <cesarb@cesarb.net>
-+#
-+# Copying and distribution of this file, with or without modification,
-+# are permitted in any medium without royalty provided the copyright
-+# notice and this notice are preserved.  This file is offered as-is,
-+# without any warranty.
-+
-+from __future__ import print_function, unicode_literals, with_statement
-+from glob import glob
-+
-+seen = set()
-+
-+with open('MAINTAINERS', 'rb') as f:
-+    for line in f:
-+        line = line.decode('utf-8')
-+        if line.startswith('F:'):
-+            pattern = line.partition(':')[2].strip()
-+            seen.add(pattern)
-+
-+            if not glob(pattern):
-+                print('No match for F: {0}'.format(pattern))
-+
-+# Check for missing uapi/ pattern
-+for pattern in seen:
-+    if 'include/' in pattern:
-+        if 'include/uapi/' in pattern:
-+            other = pattern.replace('include/uapi/', 'include/')
-+        else:
-+            other = pattern.replace('include/', 'include/uapi/')
-+
-+        if other not in seen and glob(other):
-+            print('Missing {0} for {1}'.format(other, pattern))
+kconfig-frontends is not meant to replace the in-tree Linux kconfig, but
+really targets third-party projects that want an easy path to following
+the evolution of kconfig, without the burden to manually synchronise from
+the Linux kernel source tree.
+
+Any comment, any feedback, any patch is welcome! ;-)
+
+Regards,
+Yann E. MORIN.
+
 -- 
-1.7.11.7
+.-----------------.--------------------.------------------.--------------------.
+|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
+| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
+| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
+| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
+'------------------------------^-------^------------------^--------------------'
 
