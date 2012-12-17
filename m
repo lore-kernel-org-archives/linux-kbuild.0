@@ -1,58 +1,87 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from e8.ny.us.ibm.com ([32.97.182.138]:59485 "EHLO e8.ny.us.ibm.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752884Ab2LQSWO (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 17 Dec 2012 13:22:14 -0500
-Received: from /spool/local
-	by e8.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-	for <linux-kbuild@vger.kernel.org> from <dave@linux.vnet.ibm.com>;
-	Mon, 17 Dec 2012 13:22:13 -0500
-Subject: [PATCH 0/7] Put "Kernel hacking" Kconfig menu on a diet
-From: Dave Hansen <dave@linux.vnet.ibm.com>
-Date: Mon, 17 Dec 2012 13:22:06 -0500
-Message-Id: <20121217182206.91AA150A@kernel.stglabs.ibm.com>
+Received: from perches-mx.perches.com ([206.117.179.246]:48847 "EHLO
+	labridge.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1753476Ab2LQS4U (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 17 Dec 2012 13:56:20 -0500
+Message-ID: <1355770579.13361.41.camel@joe-AO722>
+Subject: Re: [PATCH] scripts: add checkmaintainers.py
+From: Joe Perches <joe@perches.com>
+Date: Mon, 17 Dec 2012 10:56:19 -0800
+In-Reply-To: <20121217170011.GC31866@liondog.tnic>
+References: <1355523576-7596-1-git-send-email-cesarb@cesarb.net>
+	 <50CEF080.8010208@suse.cz> <20121217102714.GB31947@liondog.tnic>
+	 <1355758544.13361.14.camel@joe-AO722> <20121217170011.GC31866@liondog.tnic>
+Content-Type: text/plain; charset="ISO-8859-1"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: torvalds@linux-foundation.org
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-arch@vger.kernel.org, Dave Hansen <dave@linux.vnet.ibm.com>
+To: Borislav Petkov <bp@alien8.de>
+Cc: Michal Marek <mmarek@suse.cz>, Cesar Eduardo Barros <cesarb@cesarb.net>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>, David Howells <dhowells@redhat.com>
 
-I think the "Kernel Hacking" menu has gotten a bit out of hand.  It
-is over 120 lines long on my system with everything enabled and
-options are scattered around it haphazardly.
+On Mon, 2012-12-17 at 18:00 +0100, Borislav Petkov wrote:
+> On Mon, Dec 17, 2012 at 07:35:44AM -0800, Joe Perches wrote:
+> > Perhaps Cesar can use his script as a starting point to find those
+> > pattern invalidating commits or maybe add the capability (or a
+> > --strict check) to checkpatch.
+> 
+> Or that, I don't have a strict preference.
+> 
+> So, yeah, I can see how checkpatch saying: "you've just renamed a
+> file and thusly invalidated a pattern in MAINTAINERS. Pls, consider
+> correcting the pattern" could make sense. And I would even add it to
+> default functionality since the MAINTAINERS patterns are something we
+> want to always have up-to-date, IMO.
 
-	http://sr71.net/~dave/linux/kconfig-horror.png
+Maybe something like this:
 
-Let's try to introduce some sanity.
+ scripts/checkpatch.pl |   20 ++++++++++++++++++--
+ 1 files changed, 18 insertions(+), 2 deletions(-)
 
-I believe the risk of a series like this is pretty low, so I'd like
-to see these make it in to 3.8 if there are no major objections.
+diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
+index 725c596..a7dddc1 100755
+--- a/scripts/checkpatch.pl
++++ b/scripts/checkpatch.pl
+@@ -1379,6 +1379,7 @@ sub process {
+ 	# Trace the real file/line as we go.
+ 	my $realfile = '';
+ 	my $realline = 0;
++	my $modifiedfile = '';
+ 	my $realcnt = 0;
+ 	my $here = '';
+ 	my $in_comment = 0;
+@@ -1536,8 +1537,10 @@ sub process {
+ 		$here = "#$realline: " if ($file);
+ 
+ 		# extract the filename as it passes
+-		if ($line =~ /^diff --git.*?(\S+)$/) {
+-			$realfile = $1;
++		if ($line =~ /^diff --git\s+(\S+)\s+(\S+)$/) {
++			$modifiedfile = $1;
++			$realfile = $2;
++			$modifiedfile =~ s@^([^/]*)/@@;
+ 			$realfile =~ s@^([^/]*)/@@;
+ 			$in_commit_log = 0;
+ 		} elsif ($line =~ /^\+\+\+\s+(\S+)/) {
+@@ -1556,6 +1559,19 @@ sub process {
+ 				ERROR("MODIFIED_INCLUDE_ASM",
+ 				      "do not modify files in include/asm, change architecture specific files in include/asm-<architecture>\n" . "$here$rawline\n");
+ 			}
++
++			my $action = "renames $modifiedfile to $realfile";
++			$action = "creates file $realfile" if ($modifiedfile =~ m@dev/null@);
++			$action = "deletes file $modifiedfile" if ($realfile =~ m@dev/null@);
++
++			CHK("MAINTAINERS",
++			    "Patch $action, update MAINTAINERS?\n");
++
++			next;
++		} elsif ($line =~ /^\-\-\-\s+(\S+)/) {
++			$modifiedfile = $1;
++			$modifiedfile =~ s@^([^/]*)/@@;
++			$in_commit_log = 0;
+ 			next;
+ 		}
+ 
 
-This set stands on its own, but there is plenty of room for follow-up
-patches.  The arch-specific debug options still end up getting stuck
-in the top-level "kernel hacking" menu.  OPTIMIZE_INLINING, for
-instance, could obviously go in to the "compiler options" menu, but
-the fact that it is defined in arch/ in a separate Kconfig file keeps
-it on its own.
-
-Any thoughts on how we could address this going forward?
-
-1. Define all arch-specific debugging options in lib/Kconfig.debug
-   Have the architectures 'select' them.
-
-2. Introduce some Kconfig language changes that allow menu
-   position to be specified independently of where the "config"
-   text occurs, like an "appears_in":
-
-config DEBUG_INFO
-	bool "Compile the kernel with debug info"
-	depends on DEBUG_KERNEL
-	appears_in "Kernel Hacking/Compiler Options"
-	...
-
-   or, perhaps have a directive that says "do not place the
-   menu item now, I will specify a place for it later"
-
-3. Stick all of the arch-specific kernel hacking options under
-   an arch-specific submenu, despite if they would fit better
-   in the "Memory Debugging" or compiler menu.
 
