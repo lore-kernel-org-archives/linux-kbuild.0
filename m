@@ -1,239 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from e9.ny.us.ibm.com ([32.97.182.139]:60499 "EHLO e9.ny.us.ibm.com"
+Received: from e8.ny.us.ibm.com ([32.97.182.138]:59485 "EHLO e8.ny.us.ibm.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753542Ab2LQSWU (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 17 Dec 2012 13:22:20 -0500
+	id S1752884Ab2LQSWO (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 17 Dec 2012 13:22:14 -0500
 Received: from /spool/local
-	by e9.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+	by e8.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
 	for <linux-kbuild@vger.kernel.org> from <dave@linux.vnet.ibm.com>;
-	Mon, 17 Dec 2012 13:22:18 -0500
-Subject: [PATCH 6/7] consolidate compilation option configs
+	Mon, 17 Dec 2012 13:22:13 -0500
+Subject: [PATCH 0/7] Put "Kernel hacking" Kconfig menu on a diet
 From: Dave Hansen <dave@linux.vnet.ibm.com>
-Date: Mon, 17 Dec 2012 13:22:13 -0500
-References: <20121217182206.91AA150A@kernel.stglabs.ibm.com>
-In-Reply-To: <20121217182206.91AA150A@kernel.stglabs.ibm.com>
-Message-Id: <20121217182213.4BCFD764@kernel.stglabs.ibm.com>
+Date: Mon, 17 Dec 2012 13:22:06 -0500
+Message-Id: <20121217182206.91AA150A@kernel.stglabs.ibm.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: torvalds@linux-foundation.org
 Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-arch@vger.kernel.org, Dave Hansen <dave@linux.vnet.ibm.com>
 
+I think the "Kernel Hacking" menu has gotten a bit out of hand.  It
+is over 120 lines long on my system with everything enabled and
+options are scattered around it haphazardly.
 
-Again, trying to come up with some common themes of the stuff in
-the kernel hacking menu...  There are quite a few options to
-tweak compilation in some way, or perform extra compile-time
-checks.  Give them their own menu.
+	http://sr71.net/~dave/linux/kconfig-horror.png
 
-The diff here looks a bit funny... makes it look like I'm
-moving debugfs even though I'm actually moving the options on
-either side of it.
+Let's try to introduce some sanity.
 
-Signed-off-by: Dave Hansen <dave@linux.vnet.ibm.com>
----
+I believe the risk of a series like this is pretty low, so I'd like
+to see these make it in to 3.8 if there are no major objections.
 
- linux-2.6.git-dave/lib/Kconfig.debug |  156 +++++++++++++++++------------------
- 1 file changed, 80 insertions(+), 76 deletions(-)
+This set stands on its own, but there is plenty of room for follow-up
+patches.  The arch-specific debug options still end up getting stuck
+in the top-level "kernel hacking" menu.  OPTIMIZE_INLINING, for
+instance, could obviously go in to the "compiler options" menu, but
+the fact that it is defined in arch/ in a separate Kconfig file keeps
+it on its own.
 
-diff -puN lib/Kconfig.debug~consolidate-compilation-configs lib/Kconfig.debug
---- linux-2.6.git/lib/Kconfig.debug~consolidate-compilation-configs	2012-12-17 12:17:38.603555173 -0500
-+++ linux-2.6.git-dave/lib/Kconfig.debug	2012-12-17 12:19:02.100263746 -0500
-@@ -25,6 +25,34 @@ config DEFAULT_MESSAGE_LOGLEVEL
- 	  that are auditing their logs closely may want to set it to a lower
- 	  priority.
- 
-+menu "Compile-time checks and compiler options"
-+
-+config DEBUG_INFO
-+	bool "Compile the kernel with debug info"
-+	depends on DEBUG_KERNEL
-+	help
-+          If you say Y here the resulting kernel image will include
-+	  debugging info resulting in a larger kernel image.
-+	  This adds debug symbols to the kernel and modules (gcc -g), and
-+	  is needed if you intend to use kernel crashdump or binary object
-+	  tools like crash, kgdb, LKCD, gdb, etc on the kernel.
-+	  Say Y here only if you plan to debug the kernel.
-+
-+	  If unsure, say N.
-+
-+config DEBUG_INFO_REDUCED
-+	bool "Reduce debugging information"
-+	depends on DEBUG_INFO
-+	help
-+	  If you say Y here gcc is instructed to generate less debugging
-+	  information for structure types. This means that tools that
-+	  need full debugging information (like kgdb or systemtap) won't
-+	  be happy. But if you merely need debugging information to
-+	  resolve line numbers there is no loss. Advantage is that
-+	  build directory object sizes shrink dramatically over a full
-+	  DEBUG_INFO build and compile times are reduced too.
-+	  Only works with newer gcc versions.
-+
- config ENABLE_WARN_DEPRECATED
- 	bool "Enable __deprecated logic"
- 	default y
-@@ -52,20 +80,6 @@ config FRAME_WARN
- 	  Setting it to 0 disables the warning.
- 	  Requires gcc 4.4
- 
--config MAGIC_SYSRQ
--	bool "Magic SysRq key"
--	depends on !UML
--	help
--	  If you say Y here, you will have some control over the system even
--	  if the system crashes for example during kernel debugging (e.g., you
--	  will be able to flush the buffer cache to disk, reboot the system
--	  immediately or dump some status information). This is accomplished
--	  by pressing various keys while holding SysRq (Alt+PrintScreen). It
--	  also works on a serial console (on PC hardware at least), if you
--	  send a BREAK and then within 5 seconds a command keypress. The
--	  keys are documented in <file:Documentation/sysrq.txt>. Don't say Y
--	  unless you really know what this hack does.
--
- config STRIP_ASM_SYMS
- 	bool "Strip assembler-generated symbols during link"
- 	default n
-@@ -144,6 +158,58 @@ config DEBUG_SECTION_MISMATCH
- 	  - Enable verbose reporting from modpost in order to help resolve
- 	    the section mismatches that are reported.
- 
-+#
-+# Select this config option from the architecture Kconfig, if it
-+# is preferred to always offer frame pointers as a config
-+# option on the architecture (regardless of KERNEL_DEBUG):
-+#
-+config ARCH_WANT_FRAME_POINTERS
-+	bool
-+	help
-+
-+config FRAME_POINTER
-+	bool "Compile the kernel with frame pointers"
-+	depends on DEBUG_KERNEL && \
-+		(CRIS || M68K || FRV || UML || \
-+		 AVR32 || SUPERH || BLACKFIN || MN10300) || \
-+		ARCH_WANT_FRAME_POINTERS
-+	default y if (DEBUG_INFO && UML) || ARCH_WANT_FRAME_POINTERS
-+	help
-+	  If you say Y here the resulting kernel image will be slightly
-+	  larger and slower, but it gives very useful debugging information
-+	  in case of kernel bugs. (precise oopses/stacktraces/warnings)
-+
-+	config DEBUG_FORCE_WEAK_PER_CPU
-+	bool "Force weak per-cpu definitions"
-+	depends on DEBUG_KERNEL
-+	help
-+	  s390 and alpha require percpu variables in modules to be
-+	  defined weak to work around addressing range issue which
-+	  puts the following two restrictions on percpu variable
-+	  definitions.
-+
-+	  1. percpu symbols must be unique whether static or not
-+	  2. percpu variables can't be defined inside a function
-+
-+	  To ensure that generic code follows the above rules, this
-+	  option forces all percpu variables to be defined as weak.
-+
-+endmenu # "Compiler options"
-+
-+config MAGIC_SYSRQ
-+	bool "Magic SysRq key"
-+	depends on !UML
-+	help
-+	  If you say Y here, you will have some control over the system even
-+	  if the system crashes for example during kernel debugging (e.g., you
-+	  will be able to flush the buffer cache to disk, reboot the system
-+	  immediately or dump some status information). This is accomplished
-+	  by pressing various keys while holding SysRq (Alt+PrintScreen). It
-+	  also works on a serial console (on PC hardware at least), if you
-+	  send a BREAK and then within 5 seconds a command keypress. The
-+	  keys are documented in <file:Documentation/sysrq.txt>. Don't say Y
-+	  unless you really know what this hack does.
-+
- config DEBUG_KERNEL
- 	bool "Kernel debugging"
- 	help
-@@ -944,32 +1010,6 @@ config DEBUG_BUGVERBOSE
- 	  of the BUG call as well as the EIP and oops trace.  This aids
- 	  debugging but costs about 70-100K of memory.
- 
--config DEBUG_INFO
--	bool "Compile the kernel with debug info"
--	depends on DEBUG_KERNEL
--	help
--          If you say Y here the resulting kernel image will include
--	  debugging info resulting in a larger kernel image.
--	  This adds debug symbols to the kernel and modules (gcc -g), and
--	  is needed if you intend to use kernel crashdump or binary object
--	  tools like crash, kgdb, LKCD, gdb, etc on the kernel.
--	  Say Y here only if you plan to debug the kernel.
--
--	  If unsure, say N.
--
--config DEBUG_INFO_REDUCED
--	bool "Reduce debugging information"
--	depends on DEBUG_INFO
--	help
--	  If you say Y here gcc is instructed to generate less debugging
--	  information for structure types. This means that tools that
--	  need full debugging information (like kgdb or systemtap) won't
--	  be happy. But if you merely need debugging information to
--	  resolve line numbers there is no loss. Advantage is that
--	  build directory object sizes shrink dramatically over a full
--	  DEBUG_INFO build and compile times are reduced too.
--	  Only works with newer gcc versions.
--
- config DEBUG_WRITECOUNT
- 	bool "Debug filesystem writers count"
- 	depends on DEBUG_KERNEL
-@@ -1024,27 +1064,6 @@ config DEBUG_CREDENTIALS
- 
- 	  If unsure, say N.
- 
--#
--# Select this config option from the architecture Kconfig, if it
--# is preferred to always offer frame pointers as a config
--# option on the architecture (regardless of KERNEL_DEBUG):
--#
--config ARCH_WANT_FRAME_POINTERS
--	bool
--	help
--
--config FRAME_POINTER
--	bool "Compile the kernel with frame pointers"
--	depends on DEBUG_KERNEL && \
--		(CRIS || M68K || FRV || UML || \
--		 AVR32 || SUPERH || BLACKFIN || MN10300) || \
--		ARCH_WANT_FRAME_POINTERS
--	default y if (DEBUG_INFO && UML) || ARCH_WANT_FRAME_POINTERS
--	help
--	  If you say Y here the resulting kernel image will be slightly
--	  larger and slower, but it gives very useful debugging information
--	  in case of kernel bugs. (precise oopses/stacktraces/warnings)
--
- config BOOT_PRINTK_DELAY
- 	bool "Delay each boot printk message by N milliseconds"
- 	depends on DEBUG_KERNEL && PRINTK && GENERIC_CALIBRATE_DELAY
-@@ -1090,21 +1109,6 @@ config DEBUG_BLOCK_EXT_DEVT
- 
- 	  Say N if you are unsure.
- 
--config DEBUG_FORCE_WEAK_PER_CPU
--	bool "Force weak per-cpu definitions"
--	depends on DEBUG_KERNEL
--	help
--	  s390 and alpha require percpu variables in modules to be
--	  defined weak to work around addressing range issue which
--	  puts the following two restrictions on percpu variable
--	  definitions.
--
--	  1. percpu symbols must be unique whether static or not
--	  2. percpu variables can't be defined inside a function
--
--	  To ensure that generic code follows the above rules, this
--	  option forces all percpu variables to be defined as weak.
--
- config NOTIFIER_ERROR_INJECTION
- 	tristate "Notifier error injection"
- 	depends on DEBUG_KERNEL
-_
+Any thoughts on how we could address this going forward?
+
+1. Define all arch-specific debugging options in lib/Kconfig.debug
+   Have the architectures 'select' them.
+
+2. Introduce some Kconfig language changes that allow menu
+   position to be specified independently of where the "config"
+   text occurs, like an "appears_in":
+
+config DEBUG_INFO
+	bool "Compile the kernel with debug info"
+	depends on DEBUG_KERNEL
+	appears_in "Kernel Hacking/Compiler Options"
+	...
+
+   or, perhaps have a directive that says "do not place the
+   menu item now, I will specify a place for it later"
+
+3. Stick all of the arch-specific kernel hacking options under
+   an arch-specific submenu, despite if they would fit better
+   in the "Memory Debugging" or compiler menu.
 
