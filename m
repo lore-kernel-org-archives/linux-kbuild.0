@@ -1,62 +1,55 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-da0-f46.google.com ([209.85.210.46]:45582 "EHLO
-	mail-da0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752605Ab2LQO4H (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 17 Dec 2012 09:56:07 -0500
-Date: Mon, 17 Dec 2012 22:56:14 +0800
-From: Wang YanQing <udknight@gmail.com>
-Subject: [PATCH 2/2] menuconfig: Get rid of the top-level entries for "Load
- an Alternate/Save an Alternate"
-Message-ID: <20121217145614.GC17427@udknight>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Received: from perches-mx.perches.com ([206.117.179.246]:52346 "EHLO
+	labridge.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1752175Ab2LQPfo (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 17 Dec 2012 10:35:44 -0500
+Message-ID: <1355758544.13361.14.camel@joe-AO722>
+Subject: Re: [PATCH] scripts: add checkmaintainers.py
+From: Joe Perches <joe@perches.com>
+Date: Mon, 17 Dec 2012 07:35:44 -0800
+In-Reply-To: <20121217102714.GB31947@liondog.tnic>
+References: <1355523576-7596-1-git-send-email-cesarb@cesarb.net>
+	 <50CEF080.8010208@suse.cz> <20121217102714.GB31947@liondog.tnic>
+Content-Type: text/plain; charset="ISO-8859-1"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: mmarek@suse.cz
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, rdunlap@xenotime.net, bp@alien8.de, yann.morin.1998@free.fr, sakiwit@gmail.com, lacombar@gmail.com, lucas.demarchi@profusion.mobi, dave@gnu.org, paul.gortmaker@windriver.com, crquan@gmail.com, bpoirier@suse.de
+To: Borislav Petkov <bp@alien8.de>
+Cc: Michal Marek <mmarek@suse.cz>, Cesar Eduardo Barros <cesarb@cesarb.net>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>, David Howells <dhowells@redhat.com>
 
-Now we have Load/Save buttons to do the Load/Save
-in the convenient place, so we can drop the
-top-level entries.
+On Mon, 2012-12-17 at 11:27 +0100, Borislav Petkov wrote:
+> On Mon, Dec 17, 2012 at 11:14:24AM +0100, Michal Marek wrote:
+> > On 14.12.2012 23:19, Cesar Eduardo Barros wrote:
+> > > This small script checks the file patterns in the MAINTAINERS file.
+> > > 
+> > > For every file pattern, it checks if the pattern matches any file or
+> > > directory in the kernel tree, printing the patterns which do not have a
+> > > match.
+> > 
+> > Can't this be added as a warning to scripts/get_maintainer.pl instead?
+> 
+> Yep, it definitely makes more sense than having a standalone script.
 
-Signed-off-by: Wang YanQing <udknight@gmail.com>
----
- scripts/kconfig/mconf.c | 14 --------------
- 1 file changed, 14 deletions(-)
+I'm not so sure of that myself.
 
-diff --git a/scripts/kconfig/mconf.c b/scripts/kconfig/mconf.c
-index c074f8a..0ac1524 100644
---- a/scripts/kconfig/mconf.c
-+++ b/scripts/kconfig/mconf.c
-@@ -593,14 +593,6 @@ static void conf(struct menu *menu, struct menu *active_menu)
- 		build_conf(menu);
- 		if (!child_count)
- 			break;
--		if (menu == &rootmenu) {
--			item_make("--- ");
--			item_set_tag(':');
--			item_make(_("    Load an Alternate Configuration File"));
--			item_set_tag('L');
--			item_make(_("    Save an Alternate Configuration File"));
--			item_set_tag('S');
--		}
- 		dialog_clear();
- 		res = dialog_menu(prompt ? _(prompt) : _("Main Menu"),
- 				  _(menu_instructions),
-@@ -637,12 +629,6 @@ static void conf(struct menu *menu, struct menu *active_menu)
- 			case 's':
- 				conf_string(submenu);
- 				break;
--			case 'L':
--				conf_load();
--				break;
--			case 'S':
--				conf_save();
--				break;
- 			}
- 			break;
- 		case 2:
--- 
-1.7.11.1.116.g8228a23
+I think maybe it should go into checkpatch.
+
+I do have a similar script as a get_maintainers variant.
+
+Adding a --verify-patterns option seems off-topic to
+the generic tool use of get_maintainers.
+
+There's a fair amount of tedium for people to do more
+than determine there is a pattern that doesn't match
+files in git.
+
+Doing the work that Cesar did to find the commit that
+makes a pattern valid/invalid when renames or deletions
+occur is the chore that could be automated.
+
+Perhaps Cesar can use his script as a starting point
+to find those pattern invalidating commits or maybe
+add the capability (or a --strict check) to checkpatch.
+
+
