@@ -1,62 +1,217 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wi0-f194.google.com ([209.85.212.194]:56165 "EHLO
-	mail-wi0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752179Ab2LQSTQ (ORCPT
+Received: from e32.co.us.ibm.com ([32.97.110.150]:45178 "EHLO
+	e32.co.us.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753592Ab2LQSWX (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 17 Dec 2012 13:19:16 -0500
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: Re: [PATCH] kconfig:lxdialog: remove duplicate code
-Date: Mon, 17 Dec 2012 19:19:07 +0100
-References: <20121217143751.GA16993@udknight>
-In-Reply-To: <20121217143751.GA16993@udknight>
-MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-1"
-Content-Transfer-Encoding: 7bit
-Message-Id: <201212171919.07368.yann.morin.1998@free.fr>
+	Mon, 17 Dec 2012 13:22:23 -0500
+Received: from /spool/local
+	by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+	for <linux-kbuild@vger.kernel.org> from <dave@linux.vnet.ibm.com>;
+	Mon, 17 Dec 2012 11:22:22 -0700
+Subject: [PATCH 4/7] consolidate RCU debugging Kconfig options
+From: Dave Hansen <dave@linux.vnet.ibm.com>
+Date: Mon, 17 Dec 2012 13:22:11 -0500
+References: <20121217182206.91AA150A@kernel.stglabs.ibm.com>
+In-Reply-To: <20121217182206.91AA150A@kernel.stglabs.ibm.com>
+Message-Id: <20121217182211.F300A6BF@kernel.stglabs.ibm.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Wang YanQing <udknight@gmail.com>
-Cc: mmarek@suse.cz, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, rdunlap@xenotime.net, bp@alien8.de, sakiwit@gmail.com, lacombar@gmail.com, lucas.demarchi@profusion.mobi, dave@gnu.org, paul.gortmaker@windriver.com, crquan@gmail.com, bpoirier@suse.de
+To: torvalds@linux-foundation.org
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-arch@vger.kernel.org, Dave Hansen <dave@linux.vnet.ibm.com>
 
-Wang, All,
 
-On Monday 17 December 2012 Wang YanQing wrote:
-> dialog.h has two line the same below:
-> extern char dialog_input_result[];
-> This patch remove one of them.
-> 
-> Signed-off-by: Wang YanQing <udknight@gmail.com>
+These were in two different places, and taking up too much of my
+valuable screen real-estate.  Banish them to their own menu.
 
-Reviewed-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Tested-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Signed-off-by: Dave Hansen <dave@linux.vnet.ibm.com>
+---
 
-> ---
->  scripts/kconfig/lxdialog/dialog.h | 1 -
->  1 file changed, 1 deletion(-)
-> 
-> diff --git a/scripts/kconfig/lxdialog/dialog.h b/scripts/kconfig/lxdialog/dialog.h
-> index ee17a52..307022a 100644
-> --- a/scripts/kconfig/lxdialog/dialog.h
-> +++ b/scripts/kconfig/lxdialog/dialog.h
-> @@ -221,7 +221,6 @@ int dialog_menu(const char *title, const char *prompt,
->  		const void *selected, int *s_scroll);
->  int dialog_checklist(const char *title, const char *prompt, int height,
->  		     int width, int list_height);
-> -extern char dialog_input_result[];
->  int dialog_inputbox(const char *title, const char *prompt, int height,
->  		    int width, const char *init);
->  
-> -- 
-> 1.7.11.1.116.g8228a23
-> 
-> 
+ linux-2.6.git-dave/lib/Kconfig.debug |  160 +++++++++++++++++------------------
+ 1 file changed, 82 insertions(+), 78 deletions(-)
 
--- 
-.-----------------.--------------------.------------------.--------------------.
-|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
-| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
-| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
-| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
-'------------------------------^-------^------------------^--------------------'
+diff -puN lib/Kconfig.debug~consolidat-rcu-debugging-configs lib/Kconfig.debug
+--- linux-2.6.git/lib/Kconfig.debug~consolidat-rcu-debugging-configs	2012-12-14 13:32:32.474878413 -0500
++++ linux-2.6.git-dave/lib/Kconfig.debug	2012-12-14 13:32:49.219018930 -0500
+@@ -720,6 +720,8 @@ config PROVE_LOCKING
+ 
+ 	 For more details, see Documentation/lockdep-design.txt.
+ 
++menu "RCU Debugging"
++
+ config PROVE_RCU
+ 	bool "RCU debugging: prove RCU correctness"
+ 	depends on PROVE_LOCKING
+@@ -775,6 +777,86 @@ config SPARSE_RCU_POINTER
+ 
+ 	 Say N if you are unsure.
+ 
++config RCU_TORTURE_TEST
++	tristate "torture tests for RCU"
++	depends on DEBUG_KERNEL
++	default n
++	help
++	  This option provides a kernel module that runs torture tests
++	  on the RCU infrastructure.  The kernel module may be built
++	  after the fact on the running kernel to be tested, if desired.
++
++	  Say Y here if you want RCU torture tests to be built into
++	  the kernel.
++	  Say M if you want the RCU torture tests to build as a module.
++	  Say N if you are unsure.
++
++config RCU_TORTURE_TEST_RUNNABLE
++	bool "torture tests for RCU runnable by default"
++	depends on RCU_TORTURE_TEST = y
++	default n
++	help
++	  This option provides a way to build the RCU torture tests
++	  directly into the kernel without them starting up at boot
++	  time.  You can use /proc/sys/kernel/rcutorture_runnable
++	  to manually override this setting.  This /proc file is
++	  available only when the RCU torture tests have been built
++	  into the kernel.
++
++	  Say Y here if you want the RCU torture tests to start during
++	  boot (you probably don't).
++	  Say N here if you want the RCU torture tests to start only
++	  after being manually enabled via /proc.
++
++config RCU_CPU_STALL_TIMEOUT
++	int "RCU CPU stall timeout in seconds"
++	depends on TREE_RCU || TREE_PREEMPT_RCU
++	range 3 300
++	default 60
++	help
++	  If a given RCU grace period extends more than the specified
++	  number of seconds, a CPU stall warning is printed.  If the
++	  RCU grace period persists, additional CPU stall warnings are
++	  printed at more widely spaced intervals.
++
++config RCU_CPU_STALL_VERBOSE
++	bool "Print additional per-task information for RCU_CPU_STALL_DETECTOR"
++	depends on TREE_PREEMPT_RCU
++	default y
++	help
++	  This option causes RCU to printk detailed per-task information
++	  for any tasks that are stalling the current RCU grace period.
++
++	  Say N if you are unsure.
++
++	  Say Y if you want to enable such checks.
++
++config RCU_CPU_STALL_INFO
++	bool "Print additional diagnostics on RCU CPU stall"
++	depends on (TREE_RCU || TREE_PREEMPT_RCU) && DEBUG_KERNEL
++	default n
++	help
++	  For each stalled CPU that is aware of the current RCU grace
++	  period, print out additional per-CPU diagnostic information
++	  regarding scheduling-clock ticks, idle state, and,
++	  for RCU_FAST_NO_HZ kernels, idle-entry state.
++
++	  Say N if you are unsure.
++
++	  Say Y if you want to enable such diagnostics.
++
++config RCU_TRACE
++	bool "Enable tracing for RCU"
++	depends on DEBUG_KERNEL
++	help
++	  This option provides tracing in RCU which presents stats
++	  in debugfs for debugging RCU implementation.
++
++	  Say Y here if you want to enable RCU tracing
++	  Say N if you are unsure.
++
++endmenu # RCU Debugging
++
+ config LOCKDEP
+ 	bool
+ 	depends on DEBUG_KERNEL && TRACE_IRQFLAGS_SUPPORT && STACKTRACE_SUPPORT && LOCKDEP_SUPPORT
+@@ -990,84 +1072,6 @@ config BOOT_PRINTK_DELAY
+ 	  BOOT_PRINTK_DELAY also may cause LOCKUP_DETECTOR to detect
+ 	  what it believes to be lockup conditions.
+ 
+-config RCU_TORTURE_TEST
+-	tristate "torture tests for RCU"
+-	depends on DEBUG_KERNEL
+-	default n
+-	help
+-	  This option provides a kernel module that runs torture tests
+-	  on the RCU infrastructure.  The kernel module may be built
+-	  after the fact on the running kernel to be tested, if desired.
+-
+-	  Say Y here if you want RCU torture tests to be built into
+-	  the kernel.
+-	  Say M if you want the RCU torture tests to build as a module.
+-	  Say N if you are unsure.
+-
+-config RCU_TORTURE_TEST_RUNNABLE
+-	bool "torture tests for RCU runnable by default"
+-	depends on RCU_TORTURE_TEST = y
+-	default n
+-	help
+-	  This option provides a way to build the RCU torture tests
+-	  directly into the kernel without them starting up at boot
+-	  time.  You can use /proc/sys/kernel/rcutorture_runnable
+-	  to manually override this setting.  This /proc file is
+-	  available only when the RCU torture tests have been built
+-	  into the kernel.
+-
+-	  Say Y here if you want the RCU torture tests to start during
+-	  boot (you probably don't).
+-	  Say N here if you want the RCU torture tests to start only
+-	  after being manually enabled via /proc.
+-
+-config RCU_CPU_STALL_TIMEOUT
+-	int "RCU CPU stall timeout in seconds"
+-	depends on TREE_RCU || TREE_PREEMPT_RCU
+-	range 3 300
+-	default 21
+-	help
+-	  If a given RCU grace period extends more than the specified
+-	  number of seconds, a CPU stall warning is printed.  If the
+-	  RCU grace period persists, additional CPU stall warnings are
+-	  printed at more widely spaced intervals.
+-
+-config RCU_CPU_STALL_VERBOSE
+-	bool "Print additional per-task information for RCU_CPU_STALL_DETECTOR"
+-	depends on TREE_PREEMPT_RCU
+-	default y
+-	help
+-	  This option causes RCU to printk detailed per-task information
+-	  for any tasks that are stalling the current RCU grace period.
+-
+-	  Say N if you are unsure.
+-
+-	  Say Y if you want to enable such checks.
+-
+-config RCU_CPU_STALL_INFO
+-	bool "Print additional diagnostics on RCU CPU stall"
+-	depends on (TREE_RCU || TREE_PREEMPT_RCU) && DEBUG_KERNEL
+-	default n
+-	help
+-	  For each stalled CPU that is aware of the current RCU grace
+-	  period, print out additional per-CPU diagnostic information
+-	  regarding scheduling-clock ticks, idle state, and,
+-	  for RCU_FAST_NO_HZ kernels, idle-entry state.
+-
+-	  Say N if you are unsure.
+-
+-	  Say Y if you want to enable such diagnostics.
+-
+-config RCU_TRACE
+-	bool "Enable tracing for RCU"
+-	depends on DEBUG_KERNEL
+-	help
+-	  This option provides tracing in RCU which presents stats
+-	  in debugfs for debugging RCU implementation.
+-
+-	  Say Y here if you want to enable RCU tracing
+-	  Say N if you are unsure.
+-
+ config KPROBES_SANITY_TEST
+ 	bool "Kprobes sanity tests"
+ 	depends on DEBUG_KERNEL
+_
 
