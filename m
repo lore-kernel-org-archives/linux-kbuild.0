@@ -1,43 +1,62 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.skyhub.de ([78.46.96.112]:44518 "EHLO mail.skyhub.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752646Ab2LQRAO (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 17 Dec 2012 12:00:14 -0500
-Date: Mon, 17 Dec 2012 18:00:11 +0100
-From: Borislav Petkov <bp@alien8.de>
-Subject: Re: [PATCH] scripts: add checkmaintainers.py
-Message-ID: <20121217170011.GC31866@liondog.tnic>
-References: <1355523576-7596-1-git-send-email-cesarb@cesarb.net>
- <50CEF080.8010208@suse.cz>
- <20121217102714.GB31947@liondog.tnic>
- <1355758544.13361.14.camel@joe-AO722>
+Received: from mail-wi0-f194.google.com ([209.85.212.194]:56165 "EHLO
+	mail-wi0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752179Ab2LQSTQ (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 17 Dec 2012 13:19:16 -0500
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Subject: Re: [PATCH] kconfig:lxdialog: remove duplicate code
+Date: Mon, 17 Dec 2012 19:19:07 +0100
+References: <20121217143751.GA16993@udknight>
+In-Reply-To: <20121217143751.GA16993@udknight>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1355758544.13361.14.camel@joe-AO722>
+Content-Type: Text/Plain;
+  charset="iso-8859-1"
+Content-Transfer-Encoding: 7bit
+Message-Id: <201212171919.07368.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Joe Perches <joe@perches.com>
-Cc: Michal Marek <mmarek@suse.cz>, Cesar Eduardo Barros <cesarb@cesarb.net>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>, David Howells <dhowells@redhat.com>
+To: Wang YanQing <udknight@gmail.com>
+Cc: mmarek@suse.cz, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, rdunlap@xenotime.net, bp@alien8.de, sakiwit@gmail.com, lacombar@gmail.com, lucas.demarchi@profusion.mobi, dave@gnu.org, paul.gortmaker@windriver.com, crquan@gmail.com, bpoirier@suse.de
 
-On Mon, Dec 17, 2012 at 07:35:44AM -0800, Joe Perches wrote:
-> Perhaps Cesar can use his script as a starting point to find those
-> pattern invalidating commits or maybe add the capability (or a
-> --strict check) to checkpatch.
+Wang, All,
 
-Or that, I don't have a strict preference.
+On Monday 17 December 2012 Wang YanQing wrote:
+> dialog.h has two line the same below:
+> extern char dialog_input_result[];
+> This patch remove one of them.
+> 
+> Signed-off-by: Wang YanQing <udknight@gmail.com>
 
-So, yeah, I can see how checkpatch saying: "you've just renamed a
-file and thusly invalidated a pattern in MAINTAINERS. Pls, consider
-correcting the pattern" could make sense. And I would even add it to
-default functionality since the MAINTAINERS patterns are something we
-want to always have up-to-date, IMO.
+Reviewed-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Tested-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
 
-Thanks.
+> ---
+>  scripts/kconfig/lxdialog/dialog.h | 1 -
+>  1 file changed, 1 deletion(-)
+> 
+> diff --git a/scripts/kconfig/lxdialog/dialog.h b/scripts/kconfig/lxdialog/dialog.h
+> index ee17a52..307022a 100644
+> --- a/scripts/kconfig/lxdialog/dialog.h
+> +++ b/scripts/kconfig/lxdialog/dialog.h
+> @@ -221,7 +221,6 @@ int dialog_menu(const char *title, const char *prompt,
+>  		const void *selected, int *s_scroll);
+>  int dialog_checklist(const char *title, const char *prompt, int height,
+>  		     int width, int list_height);
+> -extern char dialog_input_result[];
+>  int dialog_inputbox(const char *title, const char *prompt, int height,
+>  		    int width, const char *init);
+>  
+> -- 
+> 1.7.11.1.116.g8228a23
+> 
+> 
 
 -- 
-Regards/Gruss,
-    Boris.
+.-----------------.--------------------.------------------.--------------------.
+|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
+| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
+| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
+| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
+'------------------------------^-------^------------------^--------------------'
 
-Sent from a fat crate under my desk. Formatting is fine.
---
