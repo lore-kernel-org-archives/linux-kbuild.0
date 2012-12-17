@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-da0-f46.google.com ([209.85.210.46]:37253 "EHLO
-	mail-da0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753078Ab2LQOhs (ORCPT
+Received: from mail-pb0-f46.google.com ([209.85.160.46]:55624 "EHLO
+	mail-pb0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751822Ab2LQOzk (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 17 Dec 2012 09:37:48 -0500
-Date: Mon, 17 Dec 2012 22:37:51 +0800
+	Mon, 17 Dec 2012 09:55:40 -0500
+Date: Mon, 17 Dec 2012 22:55:46 +0800
 From: Wang YanQing <udknight@gmail.com>
-Subject: [PATCH] kconfig:lxdialog: remove duplicate code
-Message-ID: <20121217143751.GA16993@udknight>
+Subject: [PATCH 0/2] menuconfig: Add Save/Load buttons
+Message-ID: <20121217145546.GA17427@udknight>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
@@ -16,26 +16,17 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: mmarek@suse.cz
 Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, rdunlap@xenotime.net, bp@alien8.de, yann.morin.1998@free.fr, sakiwit@gmail.com, lacombar@gmail.com, lucas.demarchi@profusion.mobi, dave@gnu.org, paul.gortmaker@windriver.com, crquan@gmail.com, bpoirier@suse.de
 
-dialog.h has two line the same below:
-extern char dialog_input_result[];
-This patch remove one of them.
+Hi all.
 
-Signed-off-by: Wang YanQing <udknight@gmail.com>
----
- scripts/kconfig/lxdialog/dialog.h | 1 -
- 1 file changed, 1 deletion(-)
+If menuconfig have Save/Load button like alternative
+.config editors, xconfig, nconfig, etc.We will have
+a obvious benefit when use menuconfig just like
+when we use others, we can Save/Load our .config quickly
+and conveniently.
 
-diff --git a/scripts/kconfig/lxdialog/dialog.h b/scripts/kconfig/lxdialog/dialog.h
-index ee17a52..307022a 100644
---- a/scripts/kconfig/lxdialog/dialog.h
-+++ b/scripts/kconfig/lxdialog/dialog.h
-@@ -221,7 +221,6 @@ int dialog_menu(const char *title, const char *prompt,
- 		const void *selected, int *s_scroll);
- int dialog_checklist(const char *title, const char *prompt, int height,
- 		     int width, int list_height);
--extern char dialog_input_result[];
- int dialog_inputbox(const char *title, const char *prompt, int height,
- 		    int width, const char *init);
- 
--- 
-1.7.11.1.116.g8228a23
+This patch series add the Save/Load buttons for menuconfig.
+It include two patches:
+1/2: add Save/Load buttons
+2/2: get rid of the top-level entries for "Load an Alternate/Save an Alternate"
+
+Thanks
