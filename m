@@ -1,19 +1,19 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wg0-f66.google.com ([74.125.82.66]:54250 "EHLO
-	mail-wg0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753400Ab2LQUhd (ORCPT
+Received: from mail-wi0-f194.google.com ([209.85.212.194]:55591 "EHLO
+	mail-wi0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751831Ab2LQU74 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 17 Dec 2012 15:37:33 -0500
+	Mon, 17 Dec 2012 15:59:56 -0500
 From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: Re: [PATCH 1/2] menuconfig: Add Save/Load buttons
-Date: Mon, 17 Dec 2012 21:37:26 +0100
-References: <20121217145604.GB17427@udknight>
-In-Reply-To: <20121217145604.GB17427@udknight>
+Subject: Re: [PATCH 2/2] menuconfig: Get rid of the top-level entries for "Load an Alternate/Save an Alternate"
+Date: Mon, 17 Dec 2012 21:59:50 +0100
+References: <20121217145614.GC17427@udknight>
+In-Reply-To: <20121217145614.GC17427@udknight>
 MIME-Version: 1.0
 Content-Type: Text/Plain;
   charset="iso-8859-1"
 Content-Transfer-Encoding: 7bit
-Message-Id: <201212172137.27241.yann.morin.1998@free.fr>
+Message-Id: <201212172159.50940.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
@@ -22,47 +22,14 @@ Cc: Wang YanQing <udknight@gmail.com>, mmarek@suse.cz, linux-kernel@vger.kernel.
 Wang, All,
 
 On Monday 17 December 2012 Wang YanQing wrote:
-> If menuconfig have Save/Load button like alternative
-> .config editors, xconfig, nconfig, etc.We will have
-> a obvious benefit when use menuconfig just like
-> when we use others, we can Save/Load our .config quickly
-> and conveniently.
-> 
-> This patch add the Save/Load button for menuconfig.
-> 
-> [remove trailing space while at it for below line:
-> "*)  Formerly when I used Page Down and Page Up, the cursor would be set"
-> ]
+> Now we have Load/Save buttons to do the Load/Save
+> in the convenient place, so we can drop the
+> top-level entries.
 > 
 > Signed-off-by: Wang YanQing <udknight@gmail.com>
-[--SNIP--]
-> diff --git a/scripts/kconfig/mconf.c b/scripts/kconfig/mconf.c
-> index 53975cf..c074f8a 100644
-> --- a/scripts/kconfig/mconf.c
-> +++ b/scripts/kconfig/mconf.c
-[--SNIP--]
-> @@ -702,6 +709,17 @@ static void show_helptext(const char *title, const char *text)
->  	show_textbox(title, text, 0, 0);
->  }
->  
-> +static void conf_message_callback(const char *fmt, va_list ap)
-> +{
-> +	char buf[1024];
 
-char buf[PATH_MAX+1];
-
-[--SNIP--]
-> @@ -948,4 +968,3 @@ int main(int ac, char **av)
->  
->  	return res;
->  }
-> -
-
-Spurious empty-line removal. Don't.
-
-Otherwise, I've tested it, and it works great! :-)
-Care to repost with the changes above (wait a bit in case of more review
-by others), and you'll get my tst-by and rev'ed-by tags.
+Reviewed-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Tested-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
 
 Regards,
 Yann E. MORIN.
