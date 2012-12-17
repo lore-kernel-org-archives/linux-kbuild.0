@@ -1,63 +1,77 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from perches-mx.perches.com ([206.117.179.246]:46145 "EHLO
-	labridge.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1753597Ab2LQTJo (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 17 Dec 2012 14:09:44 -0500
-Message-ID: <1355771383.13361.44.camel@joe-AO722>
-Subject: Re: [PATCH] scripts: add checkmaintainers.py
-From: Joe Perches <joe@perches.com>
-Date: Mon, 17 Dec 2012 11:09:43 -0800
-In-Reply-To: <1355770579.13361.41.camel@joe-AO722>
-References: <1355523576-7596-1-git-send-email-cesarb@cesarb.net>
-	 <50CEF080.8010208@suse.cz> <20121217102714.GB31947@liondog.tnic>
-	 <1355758544.13361.14.camel@joe-AO722> <20121217170011.GC31866@liondog.tnic>
-	 <1355770579.13361.41.camel@joe-AO722>
-Content-Type: text/plain; charset="ISO-8859-1"
-Mime-Version: 1.0
+Received: from mail-wg0-f66.google.com ([74.125.82.66]:54250 "EHLO
+	mail-wg0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753400Ab2LQUhd (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 17 Dec 2012 15:37:33 -0500
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Subject: Re: [PATCH 1/2] menuconfig: Add Save/Load buttons
+Date: Mon, 17 Dec 2012 21:37:26 +0100
+References: <20121217145604.GB17427@udknight>
+In-Reply-To: <20121217145604.GB17427@udknight>
+MIME-Version: 1.0
+Content-Type: Text/Plain;
+  charset="iso-8859-1"
 Content-Transfer-Encoding: 7bit
+Message-Id: <201212172137.27241.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Borislav Petkov <bp@alien8.de>
-Cc: Michal Marek <mmarek@suse.cz>, Cesar Eduardo Barros <cesarb@cesarb.net>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>, David Howells <dhowells@redhat.com>
+To: linux-kbuild@vger.kernel.org
+Cc: Wang YanQing <udknight@gmail.com>, mmarek@suse.cz, linux-kernel@vger.kernel.org, rdunlap@xenotime.net, bp@alien8.de, sakiwit@gmail.com, lacombar@gmail.com, lucas.demarchi@profusion.mobi, dave@gnu.org, paul.gortmaker@windriver.com, crquan@gmail.com, bpoirier@suse.de
 
-On Mon, 2012-12-17 at 10:56 -0800, Joe Perches wrote:
-> On Mon, 2012-12-17 at 18:00 +0100, Borislav Petkov wrote:
-> > On Mon, Dec 17, 2012 at 07:35:44AM -0800, Joe Perches wrote:
-> > > Perhaps Cesar can use his script as a starting point to find those
-> > > pattern invalidating commits or maybe add the capability (or a
-> > > --strict check) to checkpatch.
+Wang, All,
 
-> > So, yeah, I can see how checkpatch saying: "you've just renamed a
-> > file and thusly invalidated a pattern in MAINTAINERS. Pls, consider
-> > correcting the pattern" could make sense. And I would even add it to
-> > default functionality since the MAINTAINERS patterns are something we
-> > want to always have up-to-date, IMO.
+On Monday 17 December 2012 Wang YanQing wrote:
+> If menuconfig have Save/Load button like alternative
+> .config editors, xconfig, nconfig, etc.We will have
+> a obvious benefit when use menuconfig just like
+> when we use others, we can Save/Load our .config quickly
+> and conveniently.
 > 
-> Maybe something like this:
-
-A trivial correction:
-
->  scripts/checkpatch.pl |   20 ++++++++++++++++++--
->  1 files changed, 18 insertions(+), 2 deletions(-)
+> This patch add the Save/Load button for menuconfig.
 > 
-> diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
-[]
-> @@ -1556,6 +1559,19 @@ sub process {
->  				ERROR("MODIFIED_INCLUDE_ASM",
->  				      "do not modify files in include/asm, change architecture specific files in include/asm-<architecture>\n" . "$here$rawline\n");
->  			}
+> [remove trailing space while at it for below line:
+> "*)  Formerly when I used Page Down and Page Up, the cursor would be set"
+> ]
+> 
+> Signed-off-by: Wang YanQing <udknight@gmail.com>
+[--SNIP--]
+> diff --git a/scripts/kconfig/mconf.c b/scripts/kconfig/mconf.c
+> index 53975cf..c074f8a 100644
+> --- a/scripts/kconfig/mconf.c
+> +++ b/scripts/kconfig/mconf.c
+[--SNIP--]
+> @@ -702,6 +709,17 @@ static void show_helptext(const char *title, const char *text)
+>  	show_textbox(title, text, 0, 0);
+>  }
+>  
+> +static void conf_message_callback(const char *fmt, va_list ap)
+> +{
+> +	char buf[1024];
 
-This needs a new test here to avoid chirping
-on files that aren't added, deleted or renamed.
+char buf[PATH_MAX+1];
 
-		next if ($realfile eq $modifiedfile);
+[--SNIP--]
+> @@ -948,4 +968,3 @@ int main(int ac, char **av)
+>  
+>  	return res;
+>  }
+> -
 
-> +
-> +			my $action = "renames $modifiedfile to $realfile";
-> +			$action = "creates file $realfile" if ($modifiedfile =~ m@dev/null@);
-> +			$action = "deletes file $modifiedfile" if ($realfile =~ m@dev/null@);
-> +
-> +			CHK("MAINTAINERS",
-> +			    "Patch $action, update MAINTAINERS?\n");
+Spurious empty-line removal. Don't.
 
+Otherwise, I've tested it, and it works great! :-)
+Care to repost with the changes above (wait a bit in case of more review
+by others), and you'll get my tst-by and rev'ed-by tags.
+
+Regards,
+Yann E. MORIN.
+
+-- 
+.-----------------.--------------------.------------------.--------------------.
+|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
+| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
+| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
+| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
+'------------------------------^-------^------------------^--------------------'
 
