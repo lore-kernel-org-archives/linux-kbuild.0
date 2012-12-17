@@ -1,61 +1,30 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wi0-f194.google.com ([209.85.212.194]:65268 "EHLO
-	mail-wi0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751503Ab2LOPns (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 15 Dec 2012 10:43:48 -0500
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: kconfig-frontends-3.7.0.0 released
-Date: Sat, 15 Dec 2012 16:43:36 +0100
+Received: from cantor2.suse.de ([195.135.220.15]:46669 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751581Ab2LQKOe (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 17 Dec 2012 05:14:34 -0500
+Message-ID: <50CEF080.8010208@suse.cz>
+Date: Mon, 17 Dec 2012 11:14:24 +0100
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="utf-8"
+Subject: Re: [PATCH] scripts: add checkmaintainers.py
+References: <1355523576-7596-1-git-send-email-cesarb@cesarb.net>
+In-Reply-To: <1355523576-7596-1-git-send-email-cesarb@cesarb.net>
+Content-Type: text/plain; charset=ISO-8859-2
 Content-Transfer-Encoding: 7bit
-Message-Id: <201212151643.36850.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: lwn@lwn.net, "Yann E. MORIN" <yann.morin.1998@free.fr>
+To: Cesar Eduardo Barros <cesarb@cesarb.net>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>, David Howells <dhowells@redhat.com>, Joe Perches <joe@perches.com>
 
-Hello All!
+On 14.12.2012 23:19, Cesar Eduardo Barros wrote:
+> This small script checks the file patterns in the MAINTAINERS file.
+> 
+> For every file pattern, it checks if the pattern matches any file or
+> directory in the kernel tree, printing the patterns which do not have a
+> match.
 
-I'm pleased to announce the release of kconfig-frontends 3.7.0.0!
-Go download it there:
-    http://ymorin.is-a-geek.org/download/kconfig-frontends/kconfig-frontends-3.7.0.0.tar.xz
-    http://ymorin.is-a-geek.org/download/kconfig-frontends/kconfig-frontends-3.7.0.0.tar.bz2
+Can't this be added as a warning to scripts/get_maintainer.pl instead?
 
-The kconfig-frontends package provides the kconfig parser, as well as all the
-kconfig frontends and utilities, packaged using the traditional autotools, so
-the kconfig infrastructure is easy to deploy, either locally or system-wide.
-
-What's new since 3.6.0.0:
-  - updated from linux-3.7:
-    - kconfig: replace 'oldnoconfig' with 'olddefconfig', and keep the old name as an alias
-    - menuconfig: Assign jump keys per-page instead of globally
-    - kconfig: document oldnoconfig to what it really does in conf.c
-  - yet a bit more of Cygwin compatibility
-
-As a reminder, the home for kconfig-frontends is:
-  http://ymorin.is-a-geek.org/projects/kconfig-frontends
-
-And the repository can be browsed or hg-cloned from:
-  http://ymorin.is-a-geek.org/hg/kconfig-frontends
-
-kconfig-frontends is not meant to replace the in-tree Linux kconfig, but
-really targets third-party projects that want an easy path to following
-the evolution of kconfig, without the burden to manually synchronise from
-the Linux kernel source tree.
-
-Any comment, any feedback, any patch is welcome! ;-)
-
-Regards,
-Yann E. MORIN.
-
--- 
-.-----------------.--------------------.------------------.--------------------.
-|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
-| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
-| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
-| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
-'------------------------------^-------^------------------^--------------------'
-
+Thanks,
+Michal
