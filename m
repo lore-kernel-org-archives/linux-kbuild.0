@@ -1,194 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pb0-f53.google.com ([209.85.160.53]:56780 "EHLO
-	mail-pb0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750858Ab2LRFEa (ORCPT
+Received: from mail-wi0-f180.google.com ([209.85.212.180]:63565 "EHLO
+	mail-wi0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932200Ab2LRQeo (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 18 Dec 2012 00:04:30 -0500
-Date: Tue, 18 Dec 2012 12:40:21 +0800
-From: Wang YanQing <udknight@gmail.com>
-Subject: [PATCH 1/2 v2] menuconfig: Add Save/Load buttons
-Message-ID: <20121218044021.GA7475@udknight>
+	Tue, 18 Dec 2012 11:34:44 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Date: Tue, 18 Dec 2012 17:08:49 +0100
+Message-ID: <CA+xc3O3TCCD4cabkoB2+yU-7Xe+VUzpOAyWPrhjZSXfecjxcOA@mail.gmail.com>
+Subject: [ANNOUNCE] Kconfiglib: a flexible Python Kconfig parser and library -
+ now on GitHub
+From: Ulf Magnusson <ulfalizer.lkml2@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: mmarek@suse.cz
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, rdunlap@xenotime.net, bp@alien8.de, yann.morin.1998@free.fr, sakiwit@gmail.com, lacombar@gmail.com, lucas.demarchi@profusion.mobi, dave@gnu.org, paul.gortmaker@windriver.com, crquan@gmail.com, bpoirier@suse.de
+To: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-If menuconfig have Save/Load button like alternative
-.config editors, xconfig, nconfig, etc.We will have
-a obvious benefit when use menuconfig just like
-when we use others, we can Save/Load our .config quickly
-and conveniently.
+Hi,
 
-This patch add the Save/Load button for menuconfig.
+Kconfiglib is a flexible Python Kconfig parser and library, first introduced in
+https://lkml.org/lkml/2011/2/1/439. I have updated it for Linux 3.7.0 and put
+it on GitHub at https://github.com/ulfalizer/Kconfiglib, making some
+improvements in the process:
 
-[remove trailing space while at it for below line:
-"*)  Formerly when I used Page Down and Page Up, the cursor would be set"
-]
+ - The installation has been simplified. No need to copy anything anywhere now,
+   and just a trivial single-block Makefile patch to apply. (The patch adds a
+   few convenient make targets that also help us pick up ARCH, SRCARCH, and
+   KERNELVERSION from the environment.)
 
-Changes:
-V1-V2:
-1:use PATH_MAX instead of hard code suggested by Yann E. MORIN
-2:drop the spurious empty-line removal suggested by Yann E. MORIN
+ - The API has been cleaned up and made more consistent by renaming a few
+   functions.
 
-Signed-off-by: Wang YanQing <udknight@gmail.com>
----
- scripts/kconfig/lxdialog/menubox.c | 20 +++++++++++---------
- scripts/kconfig/mconf.c            | 30 +++++++++++++++++++++++++-----
- 2 files changed, 36 insertions(+), 14 deletions(-)
+ - The entire API is now covered by an extensive suite of selftests in addition
+   to the automatic compatibility tests.
 
-diff --git a/scripts/kconfig/lxdialog/menubox.c b/scripts/kconfig/lxdialog/menubox.c
-index 1d60473..8b534d5 100644
---- a/scripts/kconfig/lxdialog/menubox.c
-+++ b/scripts/kconfig/lxdialog/menubox.c
-@@ -26,7 +26,7 @@
-  *
-  *    *)  A bugfix for the Page-Down problem
-  *
-- *    *)  Formerly when I used Page Down and Page Up, the cursor would be set 
-+ *    *)  Formerly when I used Page Down and Page Up, the cursor would be set
-  *        to the first position in the menu box.  Now lxdialog is a bit
-  *        smarter and works more like other menu systems (just have a look at
-  *        it).
-@@ -154,12 +154,14 @@ static void print_arrows(WINDOW * win, int item_no, int scroll, int y, int x,
-  */
- static void print_buttons(WINDOW * win, int height, int width, int selected)
- {
--	int x = width / 2 - 16;
-+	int x = width / 2 - 26;
- 	int y = height - 2;
- 
- 	print_button(win, gettext("Select"), y, x, selected == 0);
- 	print_button(win, gettext(" Exit "), y, x + 12, selected == 1);
- 	print_button(win, gettext(" Help "), y, x + 24, selected == 2);
-+	print_button(win, gettext(" Save "), y, x + 36, selected == 3);
-+	print_button(win, gettext(" Load "), y, x + 48, selected == 4);
- 
- 	wmove(win, y, x + 1 + 12 * selected);
- 	wrefresh(win);
-@@ -372,7 +374,7 @@ do_resize:
- 		case TAB:
- 		case KEY_RIGHT:
- 			button = ((key == KEY_LEFT ? --button : ++button) < 0)
--			    ? 2 : (button > 2 ? 0 : button);
-+			    ? 4 : (button > 4 ? 0 : button);
- 
- 			print_buttons(dialog, height, width, button);
- 			wrefresh(menu);
-@@ -399,17 +401,17 @@ do_resize:
- 				return 2;
- 			case 's':
- 			case 'y':
--				return 3;
-+				return 5;
- 			case 'n':
--				return 4;
-+				return 6;
- 			case 'm':
--				return 5;
-+				return 7;
- 			case ' ':
--				return 6;
-+				return 8;
- 			case '/':
--				return 7;
-+				return 9;
- 			case 'z':
--				return 8;
-+				return 10;
- 			case '\n':
- 				return button;
- 			}
-diff --git a/scripts/kconfig/mconf.c b/scripts/kconfig/mconf.c
-index 53975cf..9fb90f0 100644
---- a/scripts/kconfig/mconf.c
-+++ b/scripts/kconfig/mconf.c
-@@ -280,6 +280,7 @@ static struct menu *current_menu;
- static int child_count;
- static int single_menu_mode;
- static int show_all_options;
-+static int save_and_exit;
- 
- static void conf(struct menu *menu, struct menu *active_menu);
- static void conf_choice(struct menu *menu);
-@@ -651,6 +652,12 @@ static void conf(struct menu *menu, struct menu *active_menu)
- 				show_helptext(_("README"), _(mconf_readme));
- 			break;
- 		case 3:
-+			conf_save();
-+			break;
-+		case 4:
-+			conf_load();
-+			break;
-+		case 5:
- 			if (item_is_tag('t')) {
- 				if (sym_set_tristate_value(sym, yes))
- 					break;
-@@ -658,24 +665,24 @@ static void conf(struct menu *menu, struct menu *active_menu)
- 					show_textbox(NULL, setmod_text, 6, 74);
- 			}
- 			break;
--		case 4:
-+		case 6:
- 			if (item_is_tag('t'))
- 				sym_set_tristate_value(sym, no);
- 			break;
--		case 5:
-+		case 7:
- 			if (item_is_tag('t'))
- 				sym_set_tristate_value(sym, mod);
- 			break;
--		case 6:
-+		case 8:
- 			if (item_is_tag('t'))
- 				sym_toggle_tristate_value(sym);
- 			else if (item_is_tag('m'))
- 				conf(submenu, NULL);
- 			break;
--		case 7:
-+		case 9:
- 			search_conf();
- 			break;
--		case 8:
-+		case 10:
- 			show_all_options = !show_all_options;
- 			break;
- 		}
-@@ -702,6 +709,17 @@ static void show_helptext(const char *title, const char *text)
- 	show_textbox(title, text, 0, 0);
- }
- 
-+static void conf_message_callback(const char *fmt, va_list ap)
-+{
-+	char buf[PATH_MAX+1];
-+
-+	vsnprintf(buf, sizeof(buf), fmt, ap);
-+	if (save_and_exit)
-+		printf("%s", buf);
-+	else
-+		show_textbox(NULL, buf, 6, 60);
-+}
-+
- static void show_help(struct menu *menu)
- {
- 	struct gstr help = str_new();
-@@ -870,6 +888,7 @@ static int handle_exit(void)
- {
- 	int res;
- 
-+	save_and_exit = 1;
- 	dialog_clear();
- 	if (conf_get_changed())
- 		res = dialog_yesno(NULL,
-@@ -941,6 +960,7 @@ int main(int ac, char **av)
- 	}
- 
- 	set_config_filename(conf_get_configname());
-+	conf_set_message_callback(conf_message_callback);
- 	do {
- 		conf(&rootmenu, NULL);
- 		res = handle_exit();
--- 
-1.7.11.1.116.g8228a23
+The only failures in the test suite as of 3.7.0 (848b81415c42ff) are due to a
+bug that makes scripts/kconfig/conf generate an incorrect configuration for
+some Blackfin defconfigs (https://lkml.org/lkml/2012/12/5/458). This causes
+failures in the Kconfiglib test suite since it automatically compares the
+output from Kconfiglib with that from scripts/kconfig/conf and Kconfiglib does
+not have the same bug.
+
+Note: I do not have plans to get this into the kernel.
+
+Feedback welcome!
+/Ulf
