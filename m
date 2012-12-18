@@ -1,46 +1,93 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wi0-f180.google.com ([209.85.212.180]:63565 "EHLO
-	mail-wi0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932200Ab2LRQeo (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 18 Dec 2012 11:34:44 -0500
+Received: from mail.skyhub.de ([78.46.96.112]:49105 "EHLO mail.skyhub.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754793Ab2LRS2l (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 18 Dec 2012 13:28:41 -0500
+Date: Tue, 18 Dec 2012 19:28:38 +0100
+From: Borislav Petkov <bp@alien8.de>
+Subject: Re: [PATCH] scripts: add checkmaintainers.py
+Message-ID: <20121218182838.GF31255@liondog.tnic>
+References: <1355523576-7596-1-git-send-email-cesarb@cesarb.net>
+ <50CEF080.8010208@suse.cz>
+ <20121217102714.GB31947@liondog.tnic>
+ <1355758544.13361.14.camel@joe-AO722>
+ <20121217170011.GC31866@liondog.tnic>
+ <1355770579.13361.41.camel@joe-AO722>
+ <1355771383.13361.44.camel@joe-AO722>
 MIME-Version: 1.0
-Date: Tue, 18 Dec 2012 17:08:49 +0100
-Message-ID: <CA+xc3O3TCCD4cabkoB2+yU-7Xe+VUzpOAyWPrhjZSXfecjxcOA@mail.gmail.com>
-Subject: [ANNOUNCE] Kconfiglib: a flexible Python Kconfig parser and library -
- now on GitHub
-From: Ulf Magnusson <ulfalizer.lkml2@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1355771383.13361.44.camel@joe-AO722>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Joe Perches <joe@perches.com>
+Cc: Michal Marek <mmarek@suse.cz>, Cesar Eduardo Barros <cesarb@cesarb.net>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>, David Howells <dhowells@redhat.com>
 
-Hi,
+On Mon, Dec 17, 2012 at 11:09:43AM -0800, Joe Perches wrote:
+> This needs a new test here to avoid chirping
+> on files that aren't added, deleted or renamed.
+> 
+> 		next if ($realfile eq $modifiedfile);
 
-Kconfiglib is a flexible Python Kconfig parser and library, first introduced in
-https://lkml.org/lkml/2011/2/1/439. I have updated it for Linux 3.7.0 and put
-it on GitHub at https://github.com/ulfalizer/Kconfiglib, making some
-improvements in the process:
+Hmm, I don't think that catches file renames when using the normal 'git
+diff' output:
 
- - The installation has been simplified. No need to copy anything anywhere now,
-   and just a trivial single-block Makefile patch to apply. (The patch adds a
-   few convenient make targets that also help us pick up ARCH, SRCARCH, and
-   KERNELVERSION from the environment.)
+$ git mv README README.old
 
- - The API has been cleaned up and made more consistent by renaming a few
-   functions.
+And this detection should work in the default case with a pre-commit
+hook. For example, I have this in .git/hooks/pre-commit:
 
- - The entire API is now covered by an extensive suite of selftests in addition
-   to the automatic compatibility tests.
+if git rev-parse --verify HEAD >/dev/null 2>&1
+then
+        against=HEAD
+else
+        # Initial commit: diff against an empty tree object
+        against=4b825dc642cb6eb9a060e54bf8d69288fbee4904
+fi
 
-The only failures in the test suite as of 3.7.0 (848b81415c42ff) are due to a
-bug that makes scripts/kconfig/conf generate an incorrect configuration for
-some Blackfin defconfigs (https://lkml.org/lkml/2012/12/5/458). This causes
-failures in the Kconfiglib test suite since it automatically compares the
-output from Kconfiglib with that from scripts/kconfig/conf and Kconfiglib does
-not have the same bug.
+git diff --cached $against -- | ./scripts/checkpatch.pl --strict --no-signoff -
 
-Note: I do not have plans to get this into the kernel.
+and when I do this, I get the changes checked:
 
-Feedback welcome!
-/Ulf
+$ git commit -a
+README.old:5: trailing whitespace.
++kernel, and what to do if something goes wrong. 
+README.old:19: trailing whitespace.
++  accompanying COPYING file for more details. 
+README.old:47: trailing whitespace.
++   these typically contain kernel-specific installation notes for some 
+README.old:287: trailing whitespace.
++ - Keep a backup kernel handy in case something goes wrong.  This is 
+README.old:301: trailing whitespace.
++   to the place where your regular bootable kernel is found. 
+README.old:314: trailing whitespace.
++   Reinstalling LILO is usually a matter of running /sbin/lilo. 
+README.old:317: trailing whitespace.
++   work.  See the LILO docs for more information. 
+README.old:325: trailing whitespace.
++   recompile the kernel to change these parameters. 
+README.old:327: trailing whitespace.
++ - Reboot with the new kernel and enjoy. 
+README.old:394: trailing whitespace.
++   interesting one. 
+README.old:412: new blank line at EOF.
+
+but not the MAINTAINERS check.
+
+git diff --cached HEAD gives:
+
+diff --git a/README b/README.old
+similarity index 100%
+rename from README
+rename to README.old
+
+so I'd say we're almost there.
+
+Thanks.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+Sent from a fat crate under my desk. Formatting is fine.
+--
