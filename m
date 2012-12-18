@@ -1,87 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-we0-f176.google.com ([74.125.82.176]:45701 "EHLO
-	mail-we0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752100Ab2LRSmr (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 18 Dec 2012 13:42:47 -0500
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: Re: [PATCH 1/2 v2] menuconfig: Add Save/Load buttons
-Date: Tue, 18 Dec 2012 19:42:37 +0100
-References: <20121218044021.GA7475@udknight>
-In-Reply-To: <20121218044021.GA7475@udknight>
-MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-1"
+Received: from perches-mx.perches.com ([206.117.179.246]:56529 "EHLO
+	labridge.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1751096Ab2LRTel (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 18 Dec 2012 14:34:41 -0500
+Message-ID: <1355859281.30366.29.camel@joe-AO722>
+Subject: Re: [PATCH] scripts: add checkmaintainers.py
+From: Joe Perches <joe@perches.com>
+Date: Tue, 18 Dec 2012 11:34:41 -0800
+In-Reply-To: <20121218182838.GF31255@liondog.tnic>
+References: <1355523576-7596-1-git-send-email-cesarb@cesarb.net>
+	 <50CEF080.8010208@suse.cz> <20121217102714.GB31947@liondog.tnic>
+	 <1355758544.13361.14.camel@joe-AO722> <20121217170011.GC31866@liondog.tnic>
+	 <1355770579.13361.41.camel@joe-AO722> <1355771383.13361.44.camel@joe-AO722>
+	 <20121218182838.GF31255@liondog.tnic>
+Content-Type: text/plain; charset="ISO-8859-1"
+Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
-Message-Id: <201212181942.38037.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Wang YanQing <udknight@gmail.com>, mmarek@suse.cz, linux-kernel@vger.kernel.org, rdunlap@xenotime.net, bp@alien8.de, sakiwit@gmail.com, lacombar@gmail.com, lucas.demarchi@profusion.mobi, dave@gnu.org, paul.gortmaker@windriver.com, crquan@gmail.com, bpoirier@suse.de
+To: Borislav Petkov <bp@alien8.de>
+Cc: Michal Marek <mmarek@suse.cz>, Cesar Eduardo Barros <cesarb@cesarb.net>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>, David Howells <dhowells@redhat.com>
 
-Wang, All,
-
-On Tuesday 18 December 2012 Wang YanQing wrote:
-> If menuconfig have Save/Load button like alternative
-> .config editors, xconfig, nconfig, etc.We will have
-> a obvious benefit when use menuconfig just like
-> when we use others, we can Save/Load our .config quickly
-> and conveniently.
+On Tue, 2012-12-18 at 19:28 +0100, Borislav Petkov wrote:
+> On Mon, Dec 17, 2012 at 11:09:43AM -0800, Joe Perches wrote:
+> > This needs a new test here to avoid chirping
+> > on files that aren't added, deleted or renamed.
+> > 
+> > 		next if ($realfile eq $modifiedfile);
 > 
-> This patch add the Save/Load button for menuconfig.
-> 
-> [remove trailing space while at it for below line:
-> "*)  Formerly when I used Page Down and Page Up, the cursor would be set"
-> ]
-> 
-> Changes:
-> V1-V2:
-> 1:use PATH_MAX instead of hard code suggested by Yann E. MORIN
-> 2:drop the spurious empty-line removal suggested by Yann E. MORIN
+> Hmm, I don't think that catches file renames when using the normal 'git
+> diff' output:
 
-The "Changes" section should have been after the '---' mark, below, to
-avoid it being in the commit log.
+That depends on whether or not an actual patch follows.
 
-> Signed-off-by: Wang YanQing <udknight@gmail.com>
+This looks for the +++ and --- lines
+in a patch.
 
-Reviewed-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Tested-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
+If no patch is attached, you should get
 
-It works very well, and really mimicks the behavior we have in nconf! :-)
+ERROR: Does not appear to be a unified-diff format patch
 
-(But see a very minor comment below.)
 
-> ---
->  scripts/kconfig/lxdialog/menubox.c | 20 +++++++++++---------
->  scripts/kconfig/mconf.c            | 30 +++++++++++++++++++++++++-----
->  2 files changed, 36 insertions(+), 14 deletions(-)
-> 
-> diff --git a/scripts/kconfig/lxdialog/menubox.c b/scripts/kconfig/lxdialog/menubox.c
-> index 1d60473..8b534d5 100644
-> --- a/scripts/kconfig/lxdialog/menubox.c
-> +++ b/scripts/kconfig/lxdialog/menubox.c
-[--SNIP--]
-> @@ -154,12 +154,14 @@ static void print_arrows(WINDOW * win, int item_no, int scroll, int y, int x,
->   */
->  static void print_buttons(WINDOW * win, int height, int width, int selected)
->  {
-> -	int x = width / 2 - 16;
-> +	int x = width / 2 - 26;
-
-That's not well centered (sorry, I initially missed it), this should
-have been '28':
-( nb_buttons * button_size + (nb_buttons - 1) * button_separation ) / 2
-(      5     *      8      + (     5     - 1) *        4          ) / 2 = 28
-
-But that's just eye-candy, and only is only obvious on very small terminals.
-
-Regards,
-Yann E. MORIN.
-
--- 
-.-----------------.--------------------.------------------.--------------------.
-|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
-| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
-| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
-| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
-'------------------------------^-------^------------------^--------------------'
