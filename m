@@ -1,53 +1,167 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp-01.mandic.com.br ([200.225.81.132]:42404 "EHLO
-	smtp-01.mandic.com.br" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752768Ab2LQV7w (ORCPT
+Received: from mail-oa0-f41.google.com ([209.85.219.41]:44599 "EHLO
+	mail-oa0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753458Ab2LRBSE (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 17 Dec 2012 16:59:52 -0500
-Message-ID: <50CF95D2.3040900@cesarb.net>
-Date: Mon, 17 Dec 2012 19:59:46 -0200
-From: Cesar Eduardo Barros <cesarb@cesarb.net>
-MIME-Version: 1.0
-Subject: Re: [PATCH] scripts: add checkmaintainers.py
-References: <1355523576-7596-1-git-send-email-cesarb@cesarb.net> <50CEF080.8010208@suse.cz> <20121217102714.GB31947@liondog.tnic> <1355758544.13361.14.camel@joe-AO722> <20121217170011.GC31866@liondog.tnic>
-In-Reply-To: <20121217170011.GC31866@liondog.tnic>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+	Mon, 17 Dec 2012 20:18:04 -0500
+Received: by mail-oa0-f41.google.com with SMTP id k14so52611oag.0
+        for <linux-kbuild@vger.kernel.org>; Mon, 17 Dec 2012 17:18:02 -0800 (PST)
+Message-ID: <50cfc313.6831b60a.0bc4.0604@mx.google.com>
+Date: Mon, 17 Dec 2012 17:12:51 -0800 (PST)
+From: rob@landley.net
+Subject: [PATCH 3/3] convert headers_install.pl->headers_install.sh
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Borislav Petkov <bp@alien8.de>, Joe Perches <joe@perches.com>, Michal Marek <mmarek@suse.cz>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>, David Howells <dhowells@redhat.com>
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-Em 17-12-2012 15:00, Borislav Petkov escreveu:
-> On Mon, Dec 17, 2012 at 07:35:44AM -0800, Joe Perches wrote:
->> Perhaps Cesar can use his script as a starting point to find those
->> pattern invalidating commits or maybe add the capability (or a
->> --strict check) to checkpatch.
->
-> Or that, I don't have a strict preference.
->
-> So, yeah, I can see how checkpatch saying: "you've just renamed a
-> file and thusly invalidated a pattern in MAINTAINERS. Pls, consider
-> correcting the pattern" could make sense. And I would even add it to
-> default functionality since the MAINTAINERS patterns are something we
-> want to always have up-to-date, IMO.
+From: Rob Landley <rob@landley.net>
 
-Good idea, but a standalone MAINTAINERS checker is still useful, to 
-check for things checkpatch did not catch, either because it was not 
-run, or because it did not have enough information.
+Remove perl from make headers_install by replacing a perl script (doing
+a simple regex search and replace) with a smaller, faster, simpler,
+POSIX-2008 shell script implementation.  The new shell script is a single
+for loop calling sed and piping its output through unifdef to produce the
+target file.
 
-For instance, consider the case of a patch removing the last file in a 
-directory going in via one branch, while a patch adding a file pattern 
-for that same directory goes in via a separate branch. There is no way 
-checkpatch can catch that.
+Signed-off-by: Rob Landley <rob@landley.net>
+---
 
-As for finding the pattern invalidating commits, it is usually not that 
-hard, a simple "git log -- <pattern>" or similar usually does the trick, 
-except in the cases where the pattern addition itself was wrong. The 
-hard part can be interpreting it and the surrounding commits to find out 
-the committer's intention, how it should affect the MAINTAINERS entry, 
-and who should get a Cc: of the fix.
+ scripts/Makefile.headersinst |    4 +-
+ scripts/headers_install.pl   |   63 ---------------------------------
+ scripts/headers_install.sh   |   43 ++++++++++++++++++++++
+ 3 files changed, 45 insertions(+), 65 deletions(-)
 
--- 
-Cesar Eduardo Barros
-cesarb@cesarb.net
-cesar.barros@gmail.com
+diff -ruN linux-3.1/scripts/headers_install.sh linux-2.6.30/scripts/headers_install.sh
+--- linux-3.1/scripts/headers_install.sh
++++ linux/scripts/headers_install.sh
+@@ -0,0 +1,43 @@
++#!/bin/sh
++
++if [ $# -lt 1 ]
++then
++	echo "Usage: headers_install.sh OUTDIR [FILES...]
++	echo
++	echo "Prepares kernel header files for use by user space, by removing"
++	echo "all compiler.h definitions and #includes, removing any"
++	echo "#ifdef __KERNEL__ sections, and putting __underscores__ around"
++	echo "asm/inline/volatile keywords."
++	echo
++	echo "OUTDIR: directory to write each userspace header FILE to."
++	echo "FILES:  list of header files to operate on."
++
++	exit 1
++fi
++
++# Grab arguments
++
++OUTDIR="$1"
++shift
++
++# Iterate through files listed on command line
++
++FILE=
++trap 'rm -f "$OUTDIR/$FILE" "$OUTDIR/$FILE.sed"' EXIT
++for i in "$@"
++do
++	FILE="$(basename "$i")"
++	sed -r \
++		-e 's/([ \t(])(__user|__force|__iomem)[ \t]/\1/g' \
++		-e 's/__attribute_const__([ \t]|$)/\1/g' \
++		-e 's@^#include <linux/compiler.h>@@' \
++		-e 's/(^|[^a-zA-Z0-9])__packed([^a-zA-Z0-9_]|$)/\1__attribute__((packed))\2/g' \
++		-e 's/(^|[ \t])(inline|asm|volatile)([ \t(]|$)/\1__\2__\3/g' \
++		-e 's@#(ifndef|define|endif /[*]) _UAPI@#\1 @' \
++		"$i" > "$OUTDIR/$FILE.sed" || exit 1
++	scripts/unifdef -U__KERNEL__ -D__EXPORTED_HEADERS__ "$OUTDIR/$FILE.sed" \
++		> "$OUTDIR/$FILE"
++	[ $? -gt 1 ] && exit 1
++	rm -f "$OUTDIR/$FILE.sed"
++done
++trap - EXIT
+diff -ruN linux-3.1/scripts/Makefile.headersinst
+--- linux-3.1/scripts/Makefile.headersinst
++++ linux/scripts/Makefile.headersinst
+@@ -55,7 +55,7 @@
+ quiet_cmd_install = INSTALL $(printdir) ($(words $(all-files))\
+                             file$(if $(word 2, $(all-files)),s))
+       cmd_install = \
+-        $(PERL) $< $(installdir) $(SRCARCH) $(input-files); \
++        $(CONFIG_SHELL) $< $(installdir) $(input-files); \
+         for F in $(wrapper-files); do                                   \
+                 echo "\#include <asm-generic/$$F>" > $(installdir)/$$F;    \
+         done;                                                           \
+@@ -83,7 +83,7 @@
+ 	@:
+ 
+ targets += $(install-file)
+-$(install-file): scripts/headers_install.pl $(input-files) FORCE
++$(install-file): scripts/headers_install.sh $(input-files) FORCE
+ 	$(if $(unwanted),$(call cmd,remove),)
+ 	$(if $(wildcard $(dir $@)),,$(shell mkdir -p $(dir $@)))
+ 	$(call if_changed,install)
+--- a/scripts/headers_install.pl
++++ /dev/null
+@@ -1,63 +0,0 @@
+-#!/usr/bin/perl -w
+-#
+-# headers_install prepare the listed header files for use in
+-# user space and copy the files to their destination.
+-#
+-# Usage: headers_install.pl readdir installdir arch [files...]
+-# installdir: dir to install the files to
+-# arch:       current architecture
+-#             arch is used to force a reinstallation when the arch
+-#             changes because kbuild then detect a command line change.
+-# files:      list of files to check
+-#
+-# Step in preparation for users space:
+-# 1) Drop all use of compiler.h definitions
+-# 2) Drop include of compiler.h
+-# 3) Drop all sections defined out by __KERNEL__ (using unifdef)
+-
+-use strict;
+-
+-my ($installdir, $arch, @files) = @ARGV;
+-
+-my $unifdef = "scripts/unifdef -U__KERNEL__ -D__EXPORTED_HEADERS__";
+-
+-foreach my $filename (@files) {
+-	my $file = $filename;
+-	$file =~ s!^.*/!!;
+-
+-	my $tmpfile = "$installdir/$file.tmp";
+-
+-	open(my $in, '<', $filename)
+-	    or die "$filename: $!\n";
+-	open(my $out, '>', $tmpfile)
+-	    or die "$tmpfile: $!\n";
+-	while (my $line = <$in>) {
+-		$line =~ s/([\s(])__user\s/$1/g;
+-		$line =~ s/([\s(])__force\s/$1/g;
+-		$line =~ s/([\s(])__iomem\s/$1/g;
+-		$line =~ s/\s__attribute_const__\s/ /g;
+-		$line =~ s/\s__attribute_const__$//g;
+-		$line =~ s/\b__packed\b/__attribute__((packed))/g;
+-		$line =~ s/^#include <linux\/compiler.h>//;
+-		$line =~ s/(^|\s)(inline)\b/$1__$2__/g;
+-		$line =~ s/(^|\s)(asm)\b(\s|[(]|$)/$1__$2__$3/g;
+-		$line =~ s/(^|\s|[(])(volatile)\b(\s|[(]|$)/$1__$2__$3/g;
+-		$line =~ s/#ifndef _UAPI/#ifndef /;
+-		$line =~ s/#define _UAPI/#define /;
+-		$line =~ s!#endif /[*] _UAPI!#endif /* !;
+-		printf {$out} "%s", $line;
+-	}
+-	close $out;
+-	close $in;
+-
+-	system $unifdef . " $tmpfile > $installdir/$file";
+-	# unifdef will exit 0 on success, and will exit 1 when the
+-	# file was processed successfully but no changes were made,
+-	# so abort only when it's higher than that.
+-	my $e = $? >> 8;
+-	if ($e > 1) {
+-		die "$tmpfile: $!\n";
+-	}
+-	unlink $tmpfile;
+-}
+-exit 0;
