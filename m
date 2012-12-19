@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pb0-f46.google.com ([209.85.160.46]:44519 "EHLO
-	mail-pb0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755029Ab2LSBar (ORCPT
+Received: from mail-da0-f48.google.com ([209.85.210.48]:55882 "EHLO
+	mail-da0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754569Ab2LSB6l (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 18 Dec 2012 20:30:47 -0500
-Date: Wed, 19 Dec 2012 09:30:59 +0800
+	Tue, 18 Dec 2012 20:58:41 -0500
+Date: Wed, 19 Dec 2012 09:50:58 +0800
 From: Wang YanQing <udknight@gmail.com>
-Subject: [PATCH 1/2 v3] menuconfig: Add Save/Load buttons
-Message-ID: <20121219013059.GA5384@udknight>
+Subject: [PATCH RESEND 1/2 v3] menuconfig: Add Save/Load buttons
+Message-ID: <20121219015058.GA5488@udknight>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
@@ -37,7 +37,7 @@ V2-V3:
 
 Signed-off-by: Wang YanQing <udknight@gmail.com>
 ---
- Hi Yann E. MORIN, can you give your Rev'ed-by and Tested-by to his patch,
+ Hi Yann E. MORIN, can you give your Rev'ed-by and Tested-by to this patch,
  Thanks very much for your help, I just don't know how to computer out the
  right position :)
 
@@ -66,7 +66,7 @@ index 1d60473..8b534d5 100644
  static void print_buttons(WINDOW * win, int height, int width, int selected)
  {
 -	int x = width / 2 - 16;
-+	int x = width / 2 - 26;
++	int x = width / 2 - 28;
  	int y = height - 2;
  
  	print_button(win, gettext("Select"), y, x, selected == 0);
