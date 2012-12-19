@@ -1,150 +1,59 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from perches-mx.perches.com ([206.117.179.246]:51616 "EHLO
-	labridge.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1754569Ab2LSRnm (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 19 Dec 2012 12:43:42 -0500
-Message-ID: <1355939022.7430.4.camel@joe-AO722>
-Subject: Re: [PATCH] scripts: add checkmaintainers.py
-From: Joe Perches <joe@perches.com>
-Date: Wed, 19 Dec 2012 09:43:42 -0800
-In-Reply-To: <20121219150732.GD24895@liondog.tnic>
-References: <1355758544.13361.14.camel@joe-AO722>
-	 <20121217170011.GC31866@liondog.tnic> <1355770579.13361.41.camel@joe-AO722>
-	 <1355771383.13361.44.camel@joe-AO722> <20121218182838.GF31255@liondog.tnic>
-	 <1355859281.30366.29.camel@joe-AO722> <20121218203159.GI31255@liondog.tnic>
-	 <1355862997.30366.36.camel@joe-AO722> <20121218204716.GJ31255@liondog.tnic>
-	 <1355866399.3297.2.camel@joe-AO722> <20121219150732.GD24895@liondog.tnic>
-Content-Type: multipart/mixed; boundary="=-7hNZYUHMxRMwjEE3cXC2"
-Mime-Version: 1.0
+Received: from mail-wi0-f178.google.com ([209.85.212.178]:49152 "EHLO
+	mail-wi0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753364Ab2LSR7F (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 19 Dec 2012 12:59:05 -0500
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Subject: Re: [PATCH RESEND 1/2 v3] menuconfig: Add Save/Load buttons
+Date: Wed, 19 Dec 2012 18:58:54 +0100
+References: <20121219015058.GA5488@udknight>
+In-Reply-To: <20121219015058.GA5488@udknight>
+MIME-Version: 1.0
+Content-Type: Text/Plain;
+  charset="iso-8859-1"
+Content-Transfer-Encoding: 7bit
+Message-Id: <201212191858.54659.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Borislav Petkov <bp@alien8.de>
-Cc: Michal Marek <mmarek@suse.cz>, Cesar Eduardo Barros <cesarb@cesarb.net>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>, David Howells <dhowells@redhat.com>
+To: linux-kbuild@vger.kernel.org
+Cc: Wang YanQing <udknight@gmail.com>, mmarek@suse.cz, linux-kernel@vger.kernel.org, rdunlap@xenotime.net, bp@alien8.de, sakiwit@gmail.com, lacombar@gmail.com, lucas.demarchi@profusion.mobi, dave@gnu.org, paul.gortmaker@windriver.com, crquan@gmail.com, bpoirier@suse.de
 
+Wang, All,
 
---=-7hNZYUHMxRMwjEE3cXC2
-Content-Type: text/plain; charset="ISO-8859-1"
-Content-Transfer-Encoding: 7bit
-
-On Wed, 2012-12-19 at 16:07 +0100, Borislav Petkov wrote:
-> On Tue, Dec 18, 2012 at 01:33:19PM -0800, Joe Perches wrote:
-> > On Tue, 2012-12-18 at 21:47 +0100, Borislav Petkov wrote:
-> > > Oh well, enough games for today.
-> > 
-> > Maybe try this tomorrow?
+On Wednesday 19 December 2012 Wang YanQing wrote:
+> If menuconfig have Save/Load button like alternative
+> .config editors, xconfig, nconfig, etc.We will have
+> a obvious benefit when use menuconfig just like
+> when we use others, we can Save/Load our .config quickly
+> and conveniently.
 > 
-> $ git diff --cached HEAD -- | ./scripts/checkpatch.pl --strict -
-> Use of uninitialized value $herecurr in concatenation (.) or string at ./scripts/checkpatch.pl line 1333.
-> CHECK: Patch renames arch/x86/Kconfig to arch/x86/Kconfig.old, update MAINTAINERS?
+> This patch add the Save/Load button for menuconfig.
 > 
-> yes, except the warning.
+> [remove trailing space while at it for below line:
+> "*)  Formerly when I used Page Down and Page Up, the cursor would be set"
+> ]
 > 
-> $ git commit -a
-> arch/x86/Kconfig.old:451: trailing whitespace.
-> +         Internet Device(MID) platform.
+> Changes:
+> V1-V2:
+> 1:use PATH_MAX instead of hard code suggested by Yann E. MORIN
+> 2:drop the spurious empty-line removal suggested by Yann E. MORIN
+> V2-V3:
+> 1:ajust buttons position well centered reported by Yann E. MORIN
+> 
+> Signed-off-by: Wang YanQing <udknight@gmail.com>
 
-That's the output from a:
-$ git diff-index --check --cached HEAD --
+Reviewd-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Tested-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
 
-> This doesn't seem to work although I have the same pre-commit hook as
-> the above line: " git diff --cached HEAD -- | ./scripts/checkpatch.pl --strict -"
+Regards,
+Yann E. MORIN.
 
-perhaps you need an exec prefix
-
-When I use this file
-$ cat .git/hooks/pre-commit
-exec  git diff --cached HEAD -- | ./scripts/checkpatch.pl --strict -
-$
-
-it works fine.
-
-Here's the latest checkpatch diff without that
-concatenation warning for you to try.
-
-
-
---=-7hNZYUHMxRMwjEE3cXC2
-Content-Disposition: attachment; filename="cp_boris.diff"
-Content-Type: text/x-patch; name="cp_boris.diff"; charset="ISO-8859-1"
-Content-Transfer-Encoding: 7bit
-
- scripts/checkpatch.pl |   40 ++++++++++++++++++++++++++++++++++++++--
- 1 files changed, 38 insertions(+), 2 deletions(-)
-
-diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
-index 1d6e4c5..fe5750e 100755
---- a/scripts/checkpatch.pl
-+++ b/scripts/checkpatch.pl
-@@ -1321,6 +1321,19 @@ sub check_absolute_file {
- 	}
- }
- 
-+sub check_filenames_changed {
-+    my ($oldfile, $newfile) = @_;
-+
-+    return if ($oldfile eq $newfile);
-+
-+    my $action = "renames $oldfile to $newfile";
-+    $action = "creates file $newfile" if ($oldfile =~ m@dev/null@);
-+    $action = "deletes file $oldfile" if ($newfile =~ m@dev/null@);
-+
-+    CHK("MAINTAINERS",
-+	"Patch $action, update MAINTAINERS?\n");
-+}
-+
- sub pos_last_openparen {
- 	my ($line) = @_;
- 
-@@ -1383,6 +1396,9 @@ sub process {
- 	# Trace the real file/line as we go.
- 	my $realfile = '';
- 	my $realline = 0;
-+	my $modifiedfile = '';
-+	my $gitrealfile = '';
-+	my $gitmodifiedfile = '';
- 	my $realcnt = 0;
- 	my $here = '';
- 	my $in_comment = 0;
-@@ -1542,10 +1558,17 @@ sub process {
- 		$here = "#$realline: " if ($file);
- 
- 		# extract the filename as it passes
--		if ($line =~ /^diff --git.*?(\S+)$/) {
--			$realfile = $1;
-+		if ($line =~ /^diff --git\s+(\S+)\s+(\S+)$/) {
-+			$modifiedfile = $1;
-+			$realfile = $2;
-+			$modifiedfile =~ s@^([^/]*)/@@;
- 			$realfile =~ s@^([^/]*)/@@;
-+
-+			$gitmodifiedfile = $modifiedfile;
-+			$gitrealfile = $realfile;
- 			$in_commit_log = 0;
-+			check_filenames_changed($gitmodifiedfile, $gitrealfile);
-+
- 		} elsif ($line =~ /^\+\+\+\s+(\S+)/) {
- 			$realfile = $1;
- 			$realfile =~ s@^([^/]*)/@@;
-@@ -1562,6 +1585,19 @@ sub process {
- 				ERROR("MODIFIED_INCLUDE_ASM",
- 				      "do not modify files in include/asm, change architecture specific files in include/asm-<architecture>\n" . "$here$rawline\n");
- 			}
-+
-+			if ($modifiedfile ne $gitmodifiedfile ||
-+			    $realfile ne $gitrealfile) {
-+				check_filenames_changed($modifiedfile, $realfile);
-+				$gitmodifiedfile = '';
-+				$gitrealfile = '';
-+			}
-+
-+			next;
-+		} elsif ($line =~ /^\-\-\-\s+(\S+)/) {
-+			$modifiedfile = $1;
-+			$modifiedfile =~ s@^([^/]*)/@@;
-+			$in_commit_log = 0;
- 			next;
- 		}
- 
-
---=-7hNZYUHMxRMwjEE3cXC2--
+-- 
+.-----------------.--------------------.------------------.--------------------.
+|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
+| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
+| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
+| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
+'------------------------------^-------^------------------^--------------------'
 
