@@ -1,48 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:58597 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751567Ab2LTV7M (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 20 Dec 2012 16:59:12 -0500
-Date: Thu, 20 Dec 2012 22:59:09 +0100
-From: Michal Marek <mmarek@suse.cz>
-Subject: [GIT] kbuild changes for v3.8-rc1
-Message-ID: <20121220215909.GA24643@pobox.suse.cz>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
+Received: from mail-we0-f195.google.com ([74.125.82.195]:40379 "EHLO
+	mail-we0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751274Ab2LTWIz (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 20 Dec 2012 17:08:55 -0500
+Received: by mail-we0-f195.google.com with SMTP id u3so749189wey.2
+        for <linux-kbuild@vger.kernel.org>; Thu, 20 Dec 2012 14:08:54 -0800 (PST)
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Subject: [pull request] Pull request for branch yem-kconfig-rc-fixes
+Date: Thu, 20 Dec 2012 23:08:45 +0100
+Message-Id: <cover.1356041188.git.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: andreas@biessmann.de, ckeepax@opensource.wolfsonmicro.com, pawel.moll@arm.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
+Cc: Michal Marek <mmarek@suse.cz>, "Yann E. MORIN" <yann.morin.1998@free.fr>
 
-Hi Linus,
+Hello Michal, All!
 
-the kbuild changes are minimal this time:
-* scripts/pnmlogo fix for some newer format
-* minor top-level Makefile cleanup
-* fix for a v3.5 regression with make clean M=<directory>
+Here are two patches for kconfig since we now can get the CONFIG_ prefix
+form an environment variable:
+  - document the use of that variable
+  - ensure we use 'CONFIG_' even if $CONFIG_ is set
 
-Please pull for v3.8-rc1, thanks.
+Regards,
+Yann E. MORIN
 
-Michal
+The following changes since commit 409f117e2d6b38d714ab26def840801e33dfe115:
 
-The following changes since commit ddffeb8c4d0331609ef2581d84de4d763607bd37:
-
-  Linux 3.7-rc1 (2012-10-14 14:41:04 -0700)
+  merge_config.sh: Add option to specify output dir (2012-12-09 18:22:17 +0100)
 
 are available in the git repository at:
-  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git kbuild
+  git://gitorious.org/linux-kconfig/linux-kconfig.git yem-kconfig-rc-fixes
 
-Andreas Bieﬂmann (1):
-      scripts/pnmtologo: fix for plain PBM
+Yann E. MORIN (2):
+      kconfig: document use of CONFIG_ environement variable
+      kconfig: ensure we use proper CONFIG_ prefix
 
-Charles Keepax (1):
-      kbuild: Remove reference to uninitialised variable
+ Documentation/kbuild/kconfig.txt |    6 ++++++
+ Makefile                         |    1 +
+ 2 files changed, 7 insertions(+), 0 deletions(-)
 
-Pawel Moll (1):
-      kbuild: Do not remove vmlinux when cleaning external module
+-- 
+.-----------------.--------------------.------------------.--------------------.
+|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
+| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
+| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
+| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
+'------------------------------^-------^------------------^--------------------'
 
- Makefile            |   10 ++++++----
- scripts/pnmtologo.c |    7 +++++++
- 2 files changed, 13 insertions(+), 4 deletions(-)
