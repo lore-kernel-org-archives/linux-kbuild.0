@@ -1,53 +1,48 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.skyhub.de ([78.46.96.112]:51696 "EHLO mail.skyhub.de"
+Received: from cantor2.suse.de ([195.135.220.15]:58597 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751009Ab2LTTbl (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 20 Dec 2012 14:31:41 -0500
-Date: Thu, 20 Dec 2012 20:31:38 +0100
-From: Borislav Petkov <bp@alien8.de>
-Subject: Re: [PATCH] scripts: add checkmaintainers.py
-Message-ID: <20121220193138.GH26635@liondog.tnic>
-References: <1355770579.13361.41.camel@joe-AO722>
- <1355771383.13361.44.camel@joe-AO722>
- <20121218182838.GF31255@liondog.tnic>
- <1355859281.30366.29.camel@joe-AO722>
- <20121218203159.GI31255@liondog.tnic>
- <1355862997.30366.36.camel@joe-AO722>
- <20121218204716.GJ31255@liondog.tnic>
- <1355866399.3297.2.camel@joe-AO722>
- <20121219150732.GD24895@liondog.tnic>
- <1355939022.7430.4.camel@joe-AO722>
+	id S1751567Ab2LTV7M (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 20 Dec 2012 16:59:12 -0500
+Date: Thu, 20 Dec 2012 22:59:09 +0100
+From: Michal Marek <mmarek@suse.cz>
+Subject: [GIT] kbuild changes for v3.8-rc1
+Message-ID: <20121220215909.GA24643@pobox.suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <1355939022.7430.4.camel@joe-AO722>
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Joe Perches <joe@perches.com>
-Cc: Michal Marek <mmarek@suse.cz>, Cesar Eduardo Barros <cesarb@cesarb.net>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>, David Howells <dhowells@redhat.com>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: andreas@biessmann.de, ckeepax@opensource.wolfsonmicro.com, pawel.moll@arm.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Wed, Dec 19, 2012 at 09:43:42AM -0800, Joe Perches wrote:
-> When I use this file
-> $ cat .git/hooks/pre-commit
-> exec  git diff --cached HEAD -- | ./scripts/checkpatch.pl --strict -
-> $
-> 
-> it works fine.
-> ^
-> Here's the latest checkpatch diff without that
-> concatenation warning for you to try.
+Hi Linus,
 
-Yep, looks good. Add a proper commit message and ship it.
+the kbuild changes are minimal this time:
+* scripts/pnmlogo fix for some newer format
+* minor top-level Makefile cleanup
+* fix for a v3.5 regression with make clean M=<directory>
 
-Tested-by: Borislav Petkov <bp@alien8.de>
+Please pull for v3.8-rc1, thanks.
 
-Btw, you should credit Cesar in the commit message for the idea.
+Michal
 
-Thanks.
+The following changes since commit ddffeb8c4d0331609ef2581d84de4d763607bd37:
 
--- 
-Regards/Gruss,
-    Boris.
+  Linux 3.7-rc1 (2012-10-14 14:41:04 -0700)
 
-Sent from a fat crate under my desk. Formatting is fine.
---
+are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git kbuild
+
+Andreas Bieﬂmann (1):
+      scripts/pnmtologo: fix for plain PBM
+
+Charles Keepax (1):
+      kbuild: Remove reference to uninitialised variable
+
+Pawel Moll (1):
+      kbuild: Do not remove vmlinux when cleaning external module
+
+ Makefile            |   10 ++++++----
+ scripts/pnmtologo.c |    7 +++++++
+ 2 files changed, 13 insertions(+), 4 deletions(-)
