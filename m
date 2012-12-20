@@ -1,50 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-we0-f195.google.com ([74.125.82.195]:40379 "EHLO
-	mail-we0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751274Ab2LTWIz (ORCPT
+Received: from mail-wg0-f41.google.com ([74.125.82.41]:58834 "EHLO
+	mail-wg0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751745Ab2LTWI5 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 20 Dec 2012 17:08:55 -0500
-Received: by mail-we0-f195.google.com with SMTP id u3so749189wey.2
-        for <linux-kbuild@vger.kernel.org>; Thu, 20 Dec 2012 14:08:54 -0800 (PST)
+	Thu, 20 Dec 2012 17:08:57 -0500
+Received: by mail-wg0-f41.google.com with SMTP id ds1so1164409wgb.2
+        for <linux-kbuild@vger.kernel.org>; Thu, 20 Dec 2012 14:08:55 -0800 (PST)
 From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: [pull request] Pull request for branch yem-kconfig-rc-fixes
-Date: Thu, 20 Dec 2012 23:08:45 +0100
-Message-Id: <cover.1356041188.git.yann.morin.1998@free.fr>
+Subject: [PATCH 1/2] kconfig: document use of CONFIG_ environement variable
+Date: Thu, 20 Dec 2012 23:08:46 +0100
+Message-Id: <b008e630721656068f3e7e8f724a0b7e90116654.1356041188.git.yann.morin.1998@free.fr>
+In-Reply-To: <cover.1356041188.git.yann.morin.1998@free.fr>
+References: <cover.1356041188.git.yann.morin.1998@free.fr>
+In-Reply-To: <cover.1356041188.git.yann.morin.1998@free.fr>
+References: <cover.1356041188.git.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Michal Marek <mmarek@suse.cz>, "Yann E. MORIN" <yann.morin.1998@free.fr>
 
-Hello Michal, All!
-
-Here are two patches for kconfig since we now can get the CONFIG_ prefix
-form an environment variable:
-  - document the use of that variable
-  - ensure we use 'CONFIG_' even if $CONFIG_ is set
-
-Regards,
-Yann E. MORIN
-
-The following changes since commit 409f117e2d6b38d714ab26def840801e33dfe115:
-
-  merge_config.sh: Add option to specify output dir (2012-12-09 18:22:17 +0100)
-
-are available in the git repository at:
-  git://gitorious.org/linux-kconfig/linux-kconfig.git yem-kconfig-rc-fixes
-
-Yann E. MORIN (2):
-      kconfig: document use of CONFIG_ environement variable
-      kconfig: ensure we use proper CONFIG_ prefix
-
+Signed-off-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
+---
  Documentation/kbuild/kconfig.txt |    6 ++++++
- Makefile                         |    1 +
- 2 files changed, 7 insertions(+), 0 deletions(-)
+ 1 files changed, 6 insertions(+), 0 deletions(-)
 
+diff --git a/Documentation/kbuild/kconfig.txt b/Documentation/kbuild/kconfig.txt
+index a09f1a6..b8b77bb 100644
+--- a/Documentation/kbuild/kconfig.txt
++++ b/Documentation/kbuild/kconfig.txt
+@@ -46,6 +46,12 @@ KCONFIG_OVERWRITECONFIG
+ If you set KCONFIG_OVERWRITECONFIG in the environment, Kconfig will not
+ break symlinks when .config is a symlink to somewhere else.
+ 
++CONFIG_
++--------------------------------------------------
++If you set CONFIG_ in the environment, Kconfig will prefix all symbols
++with its value when saving the configuration, instead of using the default,
++"CONFIG_".
++
+ ______________________________________________________________________
+ Environment variables for '{allyes/allmod/allno/rand}config'
+ 
 -- 
-.-----------------.--------------------.------------------.--------------------.
-|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
-| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
-| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
-| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
-'------------------------------^-------^------------------^--------------------'
+1.7.2.5
 
