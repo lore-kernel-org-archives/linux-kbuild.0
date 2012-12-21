@@ -1,61 +1,59 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:59301 "EHLO mx2.suse.de"
+Received: from mta1.parkeon.com ([91.121.43.66]:36320 "EHLO mta1.parkeon.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752567Ab2LTW3n (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 20 Dec 2012 17:29:43 -0500
-Date: Thu, 20 Dec 2012 23:29:41 +0100
-From: Michal Marek <mmarek@suse.cz>
-Subject: [GIT] kbuild misc changes for v3.8-rc1
-Message-ID: <20121220222941.GA25393@pobox.suse.cz>
+	id S1751306Ab2LUS0Z (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 21 Dec 2012 13:26:25 -0500
+Received: from mta2.parkeon.com ([81.80.172.220])
+	by mta1.parkeon.com with esmtp (Exim 4.76)
+	(envelope-from <mfuzzey@parkeon.com>)
+	id 1Tm6yv-0002zu-Bc
+	for linux-kbuild@vger.kernel.org; Fri, 21 Dec 2012 19:06:01 +0100
+Received: from [10.32.16.23] (helo=mail.besancon.parkeon.com)
+	by mta2.parkeon.com with esmtp (Exim 4.77)
+	(envelope-from <mfuzzey@parkeon.com>)
+	id 1Tm6yr-0007Vw-W2
+	for linux-kbuild@vger.kernel.org; Fri, 21 Dec 2012 19:05:57 +0100
+Received: from [10.32.51.221] (port=41085 helo=[127.0.0.1])
+	by mail.besancon.parkeon.com with esmtp (Exim 4.71)
+	(envelope-from <mfuzzey@parkeon.com>)
+	id 1Tm6yv-0001Ms-5i
+	for linux-kbuild@vger.kernel.org; Fri, 21 Dec 2012 19:06:01 +0100
+Subject: [PATCH] firmware build: Fix build failure when using
+	CONFIG_EXTRA_FIRMWARE with seperate output dir.
+From: Martin Fuzzey <mfuzzey@parkeon.com>
+Date: Fri, 21 Dec 2012 19:06:01 +0100
+Message-ID: <20121221180601.3140.75121.stgit@localhost>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Julia.Lawall@lip6.fr, hdoyu@nvidia.com, js1304@gmail.com, yacine.belkadi.1@gmail.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
 
-Hi Linus,
+When building with a seperate output directory (O=) and
+CONFIG_EXTRA_FIRMWARE the build failed with
+	firmware/3com/typhoon.bin.gen.S: Assembler messages:
+	firmware/3com/typhoon.bin.gen.S:5: Error: file not found: /home/linux_src/firmware/3com/typhoon.bin
 
-this is the non-critical part of kbuild
+Because the generated binary is in the $(objdir) but the generated .S
+file tries to reference it in the $(srcdir)
 
-* scripts/kernel-doc requires a "Return:" section for non-void functions
-* ARCH=arm SUBARCH=... support for make tags
-* COMPILED_SOURCE=1 support for make tags (only indexes .c files for
-  which a .o exists)
-* New coccinelle check
-* Option parsing fix for scripts/config
+Signed-off-by: Martin Fuzzey <mfuzzey@parkeon.com>
+---
+ firmware/Makefile |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-Please pull for v3.8-rc1, thanks.
+diff --git a/firmware/Makefile b/firmware/Makefile
+index eeb1403..a47e499 100644
+--- a/firmware/Makefile
++++ b/firmware/Makefile
+@@ -5,7 +5,7 @@
+ # Create $(fwabs) from $(CONFIG_EXTRA_FIRMWARE_DIR) -- if it doesn't have a
+ # leading /, it's relative to $(srctree).
+ fwdir := $(subst ",,$(CONFIG_EXTRA_FIRMWARE_DIR))
+-fwabs := $(addprefix $(srctree)/,$(filter-out /%,$(fwdir)))$(filter /%,$(fwdir))
++fwabs := $(addprefix $(objtree)/,$(filter-out /%,$(fwdir)))$(filter /%,$(fwdir))
+ 
+ fw-external-y := $(subst ",,$(CONFIG_EXTRA_FIRMWARE))
+ 
 
-Michal
-
-
-The following changes since commit ddffeb8c4d0331609ef2581d84de4d763607bd37:
-
-  Linux 3.7-rc1 (2012-10-14 14:41:04 -0700)
-
-are available in the git repository at:
-  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git misc
-
-Hiroshi Doyu (1):
-      scripts/config: Fix wrong "shift" for --keep-case
-
-Joonsoo Kim (2):
-      scripts/tags.sh: Support subarch for ARM
-      scripts/tags.sh: Support compiled source
-
-Julia Lawall (1):
-      scripts/coccinelle/misc/warn.cocci: use WARN
-
-Yacine Belkadi (2):
-      Kernel-doc: Convention: Use a "Return" section to describe return values
-      scripts/kernel-doc: check that non-void fcts describe their return value
-
- Documentation/kernel-doc-nano-HOWTO.txt |   13 +++-
- scripts/coccinelle/misc/warn.cocci      |  109 +++++++++++++++++++++++++++++++
- scripts/config                          |    1 -
- scripts/kernel-doc                      |   34 ++++++++++
- scripts/tags.sh                         |   57 ++++++++++++++--
- 5 files changed, 202 insertions(+), 12 deletions(-)
- create mode 100644 scripts/coccinelle/misc/warn.cocci
