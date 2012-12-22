@@ -1,62 +1,22 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-we0-f176.google.com ([74.125.82.176]:57221 "EHLO
-	mail-we0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752618Ab2LZAJy (ORCPT
+Received: from mailudo.moph.go.th ([203.157.168.6]:55684 "EHLO
+	mailudo.moph.go.th" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751204Ab2L0SFS (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 25 Dec 2012 19:09:54 -0500
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: Re: [PATCH] kconfig:lxdialog: remove duplicate code
-Date: Wed, 26 Dec 2012 01:09:48 +0100
-References: <20121217143751.GA16993@udknight> <20121224044818.GA3863@udknight> <201212251921.52405.yann.morin.1998@free.fr>
-In-Reply-To: <201212251921.52405.yann.morin.1998@free.fr>
+	Thu, 27 Dec 2012 13:05:18 -0500
+From: "mrs philips Rita" <rtp234@live.com>
+Reply-To: philipsrita945@yahoo.com.hk
+Subject: N/A
+Date: Sun, 23 Dec 2012 05:09:11 +0700
+Message-Id: <20121222221114.M77589@live.com>
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-1"
-Content-Transfer-Encoding: 7bit
-Message-Id: <201212260109.49002.yann.morin.1998@free.fr>
+Content-Type: text/plain;
+	charset=tis-620
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Wang YanQing <udknight@gmail.com>, mmarek@suse.cz, linux-kernel@vger.kernel.org, rdunlap@xenotime.net, bp@alien8.de, sakiwit@gmail.com, lacombar@gmail.com, lucas.demarchi@profusion.mobi, dave@gnu.org, paul.gortmaker@windriver.com, crquan@gmail.com, bpoirier@suse.de
 
-Wang, All,
-
-On Tuesday 25 December 2012 Yann E. MORIN wrote:
-> On Monday 24 December 2012 Wang YanQing wrote:
-[--SNIP--]
-> > and consider others' three patch I sented one week
-> > ago? I just don't want delay them to 2013, and they can get
-> > more test when they appear in next tree.
-> > https://patchwork.kernel.org/patch/1887361/
-> > https://patchwork.kernel.org/patch/1894341/
-> > https://patchwork.kernel.org/patch/1887441/
-[--SNIP--]
-> Wang, I've queued them here, and will push them again to Michal, after
-> the holidays season is over.
-
-I've started gathering kconfig-related patches suitable for post-3.8 there:
-    git://gitorious.org/linux-kconfig/linux-kconfig.git yem-kconfig-for-next
-
-They are browseable there:
-    https://www.gitorious.org/linux-kconfig/linux-kconfig/commits/yem-kconfig-for-next
-
-I'll send a proper pull-request to Michal in a litle while.
-
-Note: the autoritative tree for kconfig is Michal's. I'm only doing this
-gathering of patches in an attempt to not forget any, and to make Michal's
-life easier, if he finds it usefull to pull from there.
-
-Branches in that tree are based off Michal's branches, and so will be
-rebased accordingly.
-
-Regards,
-Yann E. MORIN.
-
--- 
-.-----------------.--------------------.------------------.--------------------.
-|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
-| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
-| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
-| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
-'------------------------------^-------^------------------^--------------------'
-
+Dear
+friend please i need your quick reply do not ignore this email for no reason
+i am Mrs.Rita Philips
+Thanks and God Be with you
+Best Regards
