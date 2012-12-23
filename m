@@ -1,45 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from wolverine02.qualcomm.com ([199.106.114.251]:62932 "EHLO
-	wolverine02.qualcomm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752840Ab2LVB6s (ORCPT
+Received: from mail-ob0-f171.google.com ([209.85.214.171]:53059 "EHLO
+	mail-ob0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752417Ab2LWCjy (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 21 Dec 2012 20:58:48 -0500
-From: Stephen Boyd <sboyd@codeaurora.org>
-Subject: [PATCH] Makefile: Make checkstack work with O= builds
-Date: Fri, 21 Dec 2012 17:58:45 -0800
-Message-Id: <1356141525-25162-1-git-send-email-sboyd@codeaurora.org>
+	Sat, 22 Dec 2012 21:39:54 -0500
+Received: by mail-ob0-f171.google.com with SMTP id dn14so5783860obc.2
+        for <linux-kbuild@vger.kernel.org>; Sat, 22 Dec 2012 18:39:54 -0800 (PST)
+MIME-Version: 1.0
+From: Sunil Beta Baskar <betasam@gmail.com>
+Date: Sun, 23 Dec 2012 07:45:43 +0530
+Message-ID: <CAK2BWAp__KOnFPzgeynu+Zxb3kvjuEDTa5dPFzTECmqedp1S2g@mail.gmail.com>
+Subject: [BUG] Build whitespaces Ignored
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
 
-The vmlinux doesn't always live in the same directory as the
-source files and so 'make O=obj checkstack' fails with a missing
-vmlinux file. Fix checkstack so that this is possible.
+Here is the source path for the Kernel
+/home/betasam/Downloads/New Folder/linux-2.6.32.60
 
-Signed-off-by: Stephen Boyd <sboyd@codeaurora.org>
----
+(Notice the " " or New\ Folder in-between.)
 
-It would also be nice if this depended on vmlinux and modules being built
-already but I couldn't figure that part out.
+betasam@nadia ~/Downloads/New Folder/linux-2.6.32.60 $ make i386_defconfig
+Makefile:302: warning: overriding commands for target
+`/home/betasam/Downloads/New'
+Makefile:104: warning: ignoring old commands for target
+`/home/betasam/Downloads/New'
+Makefile:303: /home/betasam/Downloads/New: No such file or directory
+Makefile:303: Folder/linux-2.6.32.60/scripts/Kbuild.include: No such
+file or directory
+Makefile:446: /home/betasam/Downloads/New: No such file or directory
+Makefile:446: Folder/linux-2.6.32.60/arch/x86/Makefile: No such file
+or directory
+make: *** No rule to make target
+`Folder/linux-2.6.32.60/arch/x86/Makefile'.  Stop.
 
- Makefile | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/Makefile b/Makefile
-index 4fe0559..54a386b 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1318,7 +1318,7 @@ else
- CHECKSTACK_ARCH := $(ARCH)
- endif
- checkstack:
--	$(OBJDUMP) -d vmlinux $$(find . -name '*.ko') | \
-+	$(OBJDUMP) -d $(objtree)/vmlinux $$(find $(objtree) -name '*.ko') | \
- 	$(PERL) $(src)/scripts/checkstack.pl $(CHECKSTACK_ARCH)
- 
- kernelrelease:
--- 
-The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum,
-hosted by The Linux Foundation
+We had a linux kernel build workshop at Pune University, Pune India
+and at least three hit this bug.
 
+Is there a fix already that hasn't been backported or should we be
+submitting a patch that fixes issues when whitespaces are observed in
+the /path/to/kernel/src/
+
+Please advise,
+Sunil Beta Baskar
