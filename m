@@ -1,55 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.snhosting.dk ([87.238.248.203]:49970 "EHLO
-	smtp.domainteam.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751412Ab2LWSog (ORCPT
+Received: from mail-da0-f54.google.com ([209.85.210.54]:38011 "EHLO
+	mail-da0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752289Ab2LXEsA (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 23 Dec 2012 13:44:36 -0500
-Date: Sun, 23 Dec 2012 19:44:31 +0100
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH] fix: spaces in srctree and objtree paths no longer
-	break builds.
-Message-ID: <20121223184431.GA1685@merkur.ravnborg.org>
-References: <CAK2BWArN+HmtQMYJ8R_sBMQsahrR8TYeTTsyLUU9AvvFJFD=dQ@mail.gmail.com>
+	Sun, 23 Dec 2012 23:48:00 -0500
+Date: Mon, 24 Dec 2012 12:48:18 +0800
+From: Wang YanQing <udknight@gmail.com>
+Subject: Re: [PATCH] kconfig:lxdialog: remove duplicate code
+Message-ID: <20121224044818.GA3863@udknight>
+References: <20121217143751.GA16993@udknight>
+ <201212171919.07368.yann.morin.1998@free.fr>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAK2BWArN+HmtQMYJ8R_sBMQsahrR8TYeTTsyLUU9AvvFJFD=dQ@mail.gmail.com>
+In-Reply-To: <201212171919.07368.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sunil Beta Baskar <betasam@gmail.com>
-Cc: linux-kbuild@vger.kernel.org
+To: mmarek@suse.cz
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, rdunlap@xenotime.net, bp@alien8.de, sakiwit@gmail.com, lacombar@gmail.com, lucas.demarchi@profusion.mobi, dave@gnu.org, paul.gortmaker@windriver.com, crquan@gmail.com, bpoirier@suse.de, yann.morin.1998@free.fr
 
-On Sun, Dec 23, 2012 at 08:59:20PM +0530, Sunil Beta Baskar wrote:
-> Signed-off-by: Sunil Beta <betasam@gmail.com>
-> ---
->  Makefile |    7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
+On Mon, Dec 17, 2012 at 07:19:07PM +0100, Yann E. MORIN wrote:
+> Wang, All,
 > 
-> diff --git a/Makefile b/Makefile
-> index 07bc925..c2ae267 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -149,8 +149,13 @@ else
->  _all: modules
->  endif
+> On Monday 17 December 2012 Wang YanQing wrote:
+> > dialog.h has two line the same below:
+> > extern char dialog_input_result[];
+> > This patch remove one of them.
+> > 
+> > Signed-off-by: Wang YanQing <udknight@gmail.com>
 > 
-> -srctree        := $(if $(KBUILD_SRC),$(KBUILD_SRC),$(CURDIR))
-> +srctree            := $(if $(KBUILD_SRC),$(KBUILD_SRC),$(CURDIR))
->  objtree        := $(CURDIR)
-> +
-> +# FIX! spaces in path can break build
-> +srctree         := $(shell echo $(srctree) | sed "s/ /\\\ /g" )
-> +objtree         := $(shell echo $(objtree) | sed "s/ /\\\ /g" )
-> +
->  src        := $(srctree)
->  obj        := $(objtree)
+> Reviewed-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
+> Tested-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Michal, All.
 
-I applied your patch manually (the patch is broken).
-My build failed like this:
-  SYSHDR  arch/x86/syscalls/../include/generated/uapi/asm/unistd_32.h
-/bin/sh: /home/sam/kernel/my\ space.git/arch/x86/syscalls/syscallhdr.sh: No such file or directory
-make[1]: *** [arch/x86/syscalls/../include/generated/uapi/asm/unistd_32.h] Error 127
+Hi Michal, could you consider pick up this obvious right
+patch, and consider others' three patch I sented one week
+ago? I just don't want delay them to 2013, and they can get
+more test when they appear in next tree.
+https://patchwork.kernel.org/patch/1887361/
+https://patchwork.kernel.org/patch/1894341/
+https://patchwork.kernel.org/patch/1887441/
 
-This it in other words not enough.
+Happy christmas!
 
-	Sam
+Thanks.
