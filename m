@@ -1,73 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wg0-f42.google.com ([74.125.82.42]:46452 "EHLO
-	mail-wg0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754044Ab2LYS1m (ORCPT
+Received: from mail-wi0-f170.google.com ([209.85.212.170]:35363 "EHLO
+	mail-wi0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752125Ab2LYXKd (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 25 Dec 2012 13:27:42 -0500
+	Tue, 25 Dec 2012 18:10:33 -0500
+Received: by mail-wi0-f170.google.com with SMTP id hq7so3771866wib.3
+        for <linux-kbuild@vger.kernel.org>; Tue, 25 Dec 2012 15:10:32 -0800 (PST)
 From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: Re: [PATCH] kconfig:lxdialog: remove duplicate code
-Date: Tue, 25 Dec 2012 19:21:51 +0100
-References: <20121217143751.GA16993@udknight> <201212171919.07368.yann.morin.1998@free.fr> <20121224044818.GA3863@udknight>
-In-Reply-To: <20121224044818.GA3863@udknight>
-MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-1"
-Content-Transfer-Encoding: 7bit
-Message-Id: <201212251921.52405.yann.morin.1998@free.fr>
+Subject: [PATCH 1/1] kconfig:lxdialog: remove duplicate code
+Date: Wed, 26 Dec 2012 00:10:24 +0100
+Message-Id: <97c8392e4ab44e19954ce3d82cdd183759624984.1356476868.git.yann.morin.1998@free.fr>
+In-Reply-To: <cover.1356476868.git.yann.morin.1998@free.fr>
+References: <cover.1356476868.git.yann.morin.1998@free.fr>
+In-Reply-To: <cover.1356476868.git.yann.morin.1998@free.fr>
+References: <cover.1356476868.git.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Wang YanQing <udknight@gmail.com>
-Cc: mmarek@suse.cz, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, rdunlap@xenotime.net, bp@alien8.de, sakiwit@gmail.com, lacombar@gmail.com, lucas.demarchi@profusion.mobi, dave@gnu.org, paul.gortmaker@windriver.com, crquan@gmail.com, bpoirier@suse.de
+To: linux-kbuild@vger.kernel.org
+Cc: Michal Marek <mmarek@suse.cz>, Wang YanQing <udknight@gmail.com>, "Yann E. MORIN" <yann.morin.1998@free.fr>
 
-Wang, All,
+From: Wang YanQing <udknight@gmail.com>
 
-On Monday 24 December 2012 Wang YanQing wrote:
-> On Mon, Dec 17, 2012 at 07:19:07PM +0100, Yann E. MORIN wrote:
-> > Wang, All,
-> > 
-> > On Monday 17 December 2012 Wang YanQing wrote:
-> > > dialog.h has two line the same below:
-> > > extern char dialog_input_result[];
-> > > This patch remove one of them.
-> > > 
-> > > Signed-off-by: Wang YanQing <udknight@gmail.com>
-> > 
-> > Reviewed-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
-> > Tested-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
-> Michal, All.
-> 
-> Hi Michal, could you consider pick up this obvious right
-> patch,
+dialog.h has two line the same below:
+extern char dialog_input_result[];
+This patch remove one of them.
 
-This code-duplication-removal patch could qualify for post-rc1.
+Signed-off-by: Wang YanQing <udknight@gmail.com>
+Reviewed-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Tested-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Signed-off-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
+---
+ scripts/kconfig/lxdialog/dialog.h |    1 -
+ 1 files changed, 0 insertions(+), 1 deletions(-)
 
-> and consider others' three patch I sented one week
-> ago? I just don't want delay them to 2013, and they can get
-> more test when they appear in next tree.
-> https://patchwork.kernel.org/patch/1887361/
-> https://patchwork.kernel.org/patch/1894341/
-> https://patchwork.kernel.org/patch/1887441/
-
-It's too late for those: the merge window is closed, and they did not even
-went into Michal's tree, so they definitely do not qualify for post-rc1.
-We'll have to wait until the next merge window for inclusion.
-
-Michal probably got caught by this shorter-than-usual merge window, and
-missed the deadline. :-/
-
-Wang, I've queued them here, and will push them again to Michal, after
-the holidays season is over.
-
-Merry Chrtistmas, and a Happy New Year to all! :-)
-
-Regards,
-Yann E. MORIN.
-
+diff --git a/scripts/kconfig/lxdialog/dialog.h b/scripts/kconfig/lxdialog/dialog.h
+index ee17a52..307022a 100644
+--- a/scripts/kconfig/lxdialog/dialog.h
++++ b/scripts/kconfig/lxdialog/dialog.h
+@@ -221,7 +221,6 @@ int dialog_menu(const char *title, const char *prompt,
+ 		const void *selected, int *s_scroll);
+ int dialog_checklist(const char *title, const char *prompt, int height,
+ 		     int width, int list_height);
+-extern char dialog_input_result[];
+ int dialog_inputbox(const char *title, const char *prompt, int height,
+ 		    int width, const char *init);
+ 
 -- 
-.-----------------.--------------------.------------------.--------------------.
-|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
-| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
-| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
-| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
-'------------------------------^-------^------------------^--------------------'
+1.7.2.5
 
