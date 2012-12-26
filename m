@@ -1,46 +1,56 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-we0-f195.google.com ([74.125.82.195]:50949 "EHLO
-	mail-we0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752125Ab2LYXKe (ORCPT
+Received: from mail-we0-f176.google.com ([74.125.82.176]:57221 "EHLO
+	mail-we0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752618Ab2LZAJy (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 25 Dec 2012 18:10:34 -0500
-Received: by mail-we0-f195.google.com with SMTP id u3so1988909wey.6
-        for <linux-kbuild@vger.kernel.org>; Tue, 25 Dec 2012 15:10:32 -0800 (PST)
+	Tue, 25 Dec 2012 19:09:54 -0500
 From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: [pull request v2] Pull request for branch yem-kconfig-rc-fixes
-Date: Wed, 26 Dec 2012 00:10:23 +0100
-Message-Id: <cover.1356476868.git.yann.morin.1998@free.fr>
+Subject: Re: [PATCH] kconfig:lxdialog: remove duplicate code
+Date: Wed, 26 Dec 2012 01:09:48 +0100
+References: <20121217143751.GA16993@udknight> <20121224044818.GA3863@udknight> <201212251921.52405.yann.morin.1998@free.fr>
+In-Reply-To: <201212251921.52405.yann.morin.1998@free.fr>
+MIME-Version: 1.0
+Content-Type: Text/Plain;
+  charset="iso-8859-1"
+Content-Transfer-Encoding: 7bit
+Message-Id: <201212260109.49002.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: Michal Marek <mmarek@suse.cz>, "Yann E. MORIN" <yann.morin.1998@free.fr>
+Cc: Wang YanQing <udknight@gmail.com>, mmarek@suse.cz, linux-kernel@vger.kernel.org, rdunlap@xenotime.net, bp@alien8.de, sakiwit@gmail.com, lacombar@gmail.com, lucas.demarchi@profusion.mobi, dave@gnu.org, paul.gortmaker@windriver.com, crquan@gmail.com, bpoirier@suse.de
 
-Hello Michal, All!
+Wang, All,
 
-Here is a trivial patch suitable for post-rc1:
-  - remove duplicate variable declaration in kconfig/lxdialog
+On Tuesday 25 December 2012 Yann E. MORIN wrote:
+> On Monday 24 December 2012 Wang YanQing wrote:
+[--SNIP--]
+> > and consider others' three patch I sented one week
+> > ago? I just don't want delay them to 2013, and they can get
+> > more test when they appear in next tree.
+> > https://patchwork.kernel.org/patch/1887361/
+> > https://patchwork.kernel.org/patch/1894341/
+> > https://patchwork.kernel.org/patch/1887441/
+[--SNIP--]
+> Wang, I've queued them here, and will push them again to Michal, after
+> the holidays season is over.
 
-Changes v1..v2:
-  - since changes about use of ${CONFIG_} have not been pulled in Linus'
-    tree, I've dropped the previous two related patches from this branch.
-  - added Wang's cleanup
+I've started gathering kconfig-related patches suitable for post-3.8 there:
+    git://gitorious.org/linux-kconfig/linux-kconfig.git yem-kconfig-for-next
 
+They are browseable there:
+    https://www.gitorious.org/linux-kconfig/linux-kconfig/commits/yem-kconfig-for-next
 
-The following changes since commit bad9955db1b73d7286f74a8136a0628a9b1ac017:
+I'll send a proper pull-request to Michal in a litle while.
 
-  menuconfig: Replace CIRCLEQ by list_head-style lists. (2012-10-25 15:06:00 +0200)
+Note: the autoritative tree for kconfig is Michal's. I'm only doing this
+gathering of patches in an attempt to not forget any, and to make Michal's
+life easier, if he finds it usefull to pull from there.
 
-are available in the git repository at:
-  git://gitorious.org/linux-kconfig/linux-kconfig.git yem-kconfig-rc-fixes
-
-Wang YanQing (1):
-      kconfig:lxdialog: remove duplicate code
-
- scripts/kconfig/lxdialog/dialog.h |    1 -
- 1 files changed, 0 insertions(+), 1 deletions(-)
+Branches in that tree are based off Michal's branches, and so will be
+rebased accordingly.
 
 Regards,
-Yann E. MORIN
+Yann E. MORIN.
 
 -- 
 .-----------------.--------------------.------------------.--------------------.
