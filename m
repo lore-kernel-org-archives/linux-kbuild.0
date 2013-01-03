@@ -1,29 +1,35 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ozlabs.org ([203.10.76.45]:39337 "EHLO ozlabs.org"
+Received: from cantor2.suse.de ([195.135.220.15]:50123 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752745Ab3ACBQ6 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 2 Jan 2013 20:16:58 -0500
-From: Rusty Russell <rusty@rustcorp.com.au>
-Subject: Re: [PATCH] modpost: Add flag -f for making section mismatches fatal
-In-Reply-To: <1356029364-11346-1-git-send-email-kliegs@chromium.org>
-References: <1356029364-11346-1-git-send-email-kliegs@chromium.org>
-Date: Thu, 03 Jan 2013 10:26:01 +1030
-Message-ID: <87ip7f5ecu.fsf@rustcorp.com.au>
+	id S1752846Ab3ACJGf (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 3 Jan 2013 04:06:35 -0500
+Message-ID: <50E54A14.5010909@suse.cz>
+Date: Thu, 03 Jan 2013 10:06:28 +0100
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Subject: Re: [PATCH] modpost: Add flag -f for making section mismatches fatal
+References: <1356029364-11346-1-git-send-email-kliegs@chromium.org> <87ip7f5ecu.fsf@rustcorp.com.au>
+In-Reply-To: <87ip7f5ecu.fsf@rustcorp.com.au>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jonathan Kliegman <kliegs@chromium.org>, linux-kernel@vger.kernel.org
-Cc: Michal Marek <mmarek@suse.cz>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Tony Lindgren <tony@atomide.com>, linux-kbuild@vger.kernel.org
+To: Rusty Russell <rusty@rustcorp.com.au>
+Cc: Jonathan Kliegman <kliegs@chromium.org>, linux-kernel@vger.kernel.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Tony Lindgren <tony@atomide.com>, linux-kbuild@vger.kernel.org
 
-Jonathan Kliegman <kliegs@chromium.org> writes:
-> The section mismatch warning can be easy to miss during the kernel build
-> process.  Allow it to be marked as fatal to be easily caught and prevent
-> bugs from slipping in.
->
-> Signed-off-by: Jonathan Kliegman <kliegs@chromium.org>
+Dne 3.1.2013 00:56, Rusty Russell napsal(a):
+> Jonathan Kliegman <kliegs@chromium.org> writes:
+>> The section mismatch warning can be easy to miss during the kernel build
+>> process.  Allow it to be marked as fatal to be easily caught and prevent
+>> bugs from slipping in.
+>>
+>> Signed-off-by: Jonathan Kliegman <kliegs@chromium.org>
+> 
+> Hmm, a CONFIG option with no Kconfig entry?  That seems weird...
 
-Hmm, a CONFIG option with no Kconfig entry?  That seems weird...
+With a Kconfig entry, all{mod,yes}configs would start failing. It can be
+enabled with make CONFIG_SECTION_MISMATCH_FATAL=y for now. Maybe it
+could be added to Kconfig with 'depends on n', so that it is documented
+somewhere.
 
-Cheers,
-Rusty.
+Michal
