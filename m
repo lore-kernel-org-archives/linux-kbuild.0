@@ -1,52 +1,63 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ie0-f177.google.com ([209.85.223.177]:41943 "EHLO
-	mail-ie0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754190Ab3ACVkO (ORCPT
+Received: from shadbolt.e.decadent.org.uk ([88.96.1.126]:49038 "EHLO
+	shadbolt.e.decadent.org.uk" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1750734Ab3AFF0U (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 3 Jan 2013 16:40:14 -0500
-Received: by mail-ie0-f177.google.com with SMTP id k13so18339429iea.8
-        for <linux-kbuild@vger.kernel.org>; Thu, 03 Jan 2013 13:40:13 -0800 (PST)
-Received: by mail-ie0-f169.google.com with SMTP id c14so19197735ieb.28
-        for <linux-kbuild@vger.kernel.org>; Thu, 03 Jan 2013 13:40:12 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <50E54A14.5010909@suse.cz>
-References: <1356029364-11346-1-git-send-email-kliegs@chromium.org>
- <87ip7f5ecu.fsf@rustcorp.com.au> <50E54A14.5010909@suse.cz>
-From: Jonathan Kliegman <kliegs@chromium.org>
-Date: Thu, 3 Jan 2013 16:39:52 -0500
-Message-ID: <CAPQV+nOTEfeQVwqd8zAP37qS3PrdwFQv1c0AC=nAz3UCemXhSg@mail.gmail.com>
-Subject: Re: [PATCH] modpost: Add flag -f for making section mismatches fatal
-Content-Type: text/plain; charset=ISO-8859-1
+	Sun, 6 Jan 2013 00:26:20 -0500
+Message-ID: <1357449969.4324.25.camel@deadeye.wl.decadent.org.uk>
+Subject: Build failure with DMA_OMAP=m and a caller built-in
+From: Ben Hutchings <ben@decadent.org.uk>
+Date: Sun, 06 Jan 2013 05:26:09 +0000
+Content-Type: multipart/signed; micalg="pgp-sha512";
+	protocol="application/pgp-signature"; boundary="=-qVrB+pEIPUyWpn7qVQcR"
+Mime-Version: 1.0
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: Rusty Russell <rusty@rustcorp.com.au>, linux-kernel@vger.kernel.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Tony Lindgren <tony@atomide.com>, linux-kbuild@vger.kernel.org
+To: linux-kbuild@vger.kernel.org, linux-omap@vger.kernel.org
 
-On Thu, Jan 3, 2013 at 4:06 AM, Michal Marek <mmarek@suse.cz> wrote:
->
-> Dne 3.1.2013 00:56, Rusty Russell napsal(a):
-> > Jonathan Kliegman <kliegs@chromium.org> writes:
-> >> The section mismatch warning can be easy to miss during the kernel build
-> >> process.  Allow it to be marked as fatal to be easily caught and prevent
-> >> bugs from slipping in.
-> >>
-> >> Signed-off-by: Jonathan Kliegman <kliegs@chromium.org>
-> >
-> > Hmm, a CONFIG option with no Kconfig entry?  That seems weird...
->
-> With a Kconfig entry, all{mod,yes}configs would start failing. It can be
-> enabled with make CONFIG_SECTION_MISMATCH_FATAL=y for now. Maybe it
-> could be added to Kconfig with 'depends on n', so that it is documented
-> somewhere.
->
-Sorry for missing the Kconfig entry.  It looks like init/Kconfig in
-the "General setup" seems the best fit as that looks like where the
-other build options are.  If this is ok I'll upload a new version of
-the patch with the entry added.
 
-I'm not sure what you mean about configs failing.  After adding this
-option to init/Kconfig I was able to build fine using old and new
-configs with and without the option set.  Is there something specific
-you'd like me to test for?
+--=-qVrB+pEIPUyWpn7qVQcR
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> Michal
+Various drivers use omap_dma_filter_fn() but don't depend on DMA_OMAP.
+This is fine because there is a trivial inline definition in case
+DMA_OMAP is disabled... until the caller is built-in and DMA_OMAP=3Dm.
+
+I tried adding the rather weird 'select DMA_OMAP if DMA_OMAP!=3Dn' to
+these drivers' kconfig symbols to promote it to built-in if necessary.
+This sort of works but kconfig complains about the circular dependency
+and it becomes impossible to disable DMA_OMAP in the 'make nconfig'
+menu.  So that's not the right thing to do.
+
+Any ideas?
+
+Ben.
+
+--=20
+Ben Hutchings
+Sturgeon's Law: Ninety percent of everything is crap.
+
+--=-qVrB+pEIPUyWpn7qVQcR
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iQIVAwUAUOkK8ee/yOyVhhEJAQop9A/6AkRZR96GmK9wuyiLAFk6BAUVlVDHsWs1
+0H6eH7L400RFpFya/f7N9loGqYzNnaFdTXieO+HwJ/kxuEyE4+xtrsS4mVQeFydT
+tEj9NdrxrBa2adxgrWXlyBd6/otCJF2xhtaN6d2PbqocA9tB/Py+DculfyupEB7s
+ZLvpN5YUqBPiJ892heKJVhKJd71avWjvPOkFHEgxWDYoEj/3nrUqlsaJneCnk3L7
+cAneRxFclR90J1EfKrVfhQ0G+SRkd6xuQ+Ln5oMof8MNoXRGWSw9h8QeXE1rzTDK
+akZz5ngPT+ylpTGl5ly/mjL87SrXRbrEf8d+PMCe69U4NIeTlhhpW7Qd38knG3OI
+NaGYWTSKoXB5BkEMgnOotVchiU/5ZuSxokZELxbcgr1vimPRyt6fx6lTFZ9VBnW1
+/w/97QM20s39y5yesycKv/c5KmnTnnH7cf9+5vpw7J13oTB2uVDKhr5tFQ97HuKK
+h8y6BToQZSmJC6UcE9NYL5H+jxNUgNtc0E/Vd4aoj7hlbrzYvb3s97258p55PPCu
+HVTDULzQFn143j30sKaZm0S0IbPLN29FLq84OznQtj+L4yMa2oN056CSRpKSHuyV
+2wxGvQQKnQpfbamZ7961DHBDCKFzhKDBR60MjbtEC8fgGxSYg7Qj+BDeaNvmT7LW
+mFEVeCKgZiM=
+=YhF1
+-----END PGP SIGNATURE-----
+
+--=-qVrB+pEIPUyWpn7qVQcR--
