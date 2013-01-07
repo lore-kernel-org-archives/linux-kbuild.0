@@ -1,52 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-oa0-f53.google.com ([209.85.219.53]:56608 "EHLO
-	mail-oa0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752360Ab3AFUXC (ORCPT
+Received: from mho-04-ewr.mailhop.org ([204.13.248.74]:16194 "EHLO
+	mho-02-ewr.mailhop.org" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1751307Ab3AGUVL (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 6 Jan 2013 15:23:02 -0500
-Received: by mail-oa0-f53.google.com with SMTP id j6so16861263oag.26
-        for <linux-kbuild@vger.kernel.org>; Sun, 06 Jan 2013 12:23:01 -0800 (PST)
-Received: by mail-ob0-f179.google.com with SMTP id x4so16416487obh.24
-        for <linux-kbuild@vger.kernel.org>; Sun, 06 Jan 2013 12:22:59 -0800 (PST)
+	Mon, 7 Jan 2013 15:21:11 -0500
+Date: Mon, 7 Jan 2013 12:21:06 -0800
+From: Tony Lindgren <tony@atomide.com>
+Subject: Re: Build failure with DMA_OMAP=m and a caller built-in
+Message-ID: <20130107202106.GG14149@atomide.com>
+References: <1357449969.4324.25.camel@deadeye.wl.decadent.org.uk>
 MIME-Version: 1.0
-In-Reply-To: <20130106093649.GA17429@merkur.ravnborg.org>
-References: <1356029364-11346-1-git-send-email-kliegs@chromium.org> <20130106093649.GA17429@merkur.ravnborg.org>
-From: Jonathan Kliegman <kliegs@chromium.org>
-Date: Sun, 6 Jan 2013 15:22:39 -0500
-Message-ID: <CAPQV+nP1UJP4R8AmoUf4bt873Yz_D0ZR2msaCRx5eAc49QFodA@mail.gmail.com>
-Subject: Re: [PATCH] modpost: Add flag -f for making section mismatches fatal
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1357449969.4324.25.camel@deadeye.wl.decadent.org.uk>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Rusty Russell <rusty@rustcorp.com.au>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Tony Lindgren <tony@atomide.com>, linux-kbuild@vger.kernel.org
+To: Ben Hutchings <ben@decadent.org.uk>
+Cc: linux-kbuild@vger.kernel.org, linux-omap@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Russell King <rmk+kernel@arm.linux.org.uk>, Vinod Koul <vinod.koul@intel.com>
 
-On Sun, Jan 6, 2013 at 4:36 AM, Sam Ravnborg <sam@ravnborg.org> wrote:
-> Hi Jonathan.
->
->> The section mismatch warning can be easy to miss during the kernel build
->> process.  Allow it to be marked as fatal to be easily caught and prevent
->> bugs from slipping in.
->>
->> Signed-off-by: Jonathan Kliegman <kliegs@chromium.org>
->
-> Another way to make them much more visible would be to make
-> the warnings always be verbose.
+* Ben Hutchings <ben@decadent.org.uk> [130105 21:29]:
+> Various drivers use omap_dma_filter_fn() but don't depend on DMA_OMAP.
+> This is fine because there is a trivial inline definition in case
+> DMA_OMAP is disabled... until the caller is built-in and DMA_OMAP=m.
+> 
+> I tried adding the rather weird 'select DMA_OMAP if DMA_OMAP!=n' to
+> these drivers' kconfig symbols to promote it to built-in if necessary.
+> This sort of works but kconfig complains about the circular dependency
+> and it becomes impossible to disable DMA_OMAP in the 'make nconfig'
+> menu.  So that's not the right thing to do.
+> 
+> Any ideas?
 
-I'd like to keep the option for a hard fail if a mismatch is detected.
- This way automated build systems will detect the failed build and can
-reject a chan
+Hmm let's ask Russell and Vinod what they are envisioning. I believe
+there was some talk about removing the filter functions?
 
-> In other words drop support for the "-S" options used below:
->>   $(if $(CONFIG_DEBUG_SECTION_MISMATCH),,-S)
->
-> Previously the dev* stuff caused a lot of warnings, but
-> since we have HOTPLUG always enabled this is a non-issue.
-> So I think that this is a good time to enable the verboce
-> warnings.
-I can submit a second patch for this if you'd like, but I'm not
-familiar with all the previous decisions in this area.  If I
-understand correctly we'll still need the config option as it also
-changes compiler flags for inlining.
->
->         Sam
+For the short term fix, how about ifdef out the DMA usage in the
+client drivers:
+
+#if defined(CONFIG_DMA_OMAP_MODULE) && defined(CONFIG_MMC_OMAP_MODULE)
+	...
+#endif
+
+Regards,
+
+Tony
