@@ -1,134 +1,85 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wi0-f194.google.com ([209.85.212.194]:56531 "EHLO
-	mail-wi0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756962Ab3AHTEF (ORCPT
+Received: from smtp.snhosting.dk ([87.238.248.203]:13193 "EHLO
+	smtp.domainteam.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756871Ab3AHTQF (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 8 Jan 2013 14:04:05 -0500
-Received: by mail-wi0-f194.google.com with SMTP id hn17so14144wib.5
-        for <linux-kbuild@vger.kernel.org>; Tue, 08 Jan 2013 11:04:03 -0800 (PST)
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: Re: Readability of make menuconfig
-Date: Tue, 8 Jan 2013 19:49:04 +0100
-References: <CALZVapkvKeSbDdQruumGM-8RyVOnoNGD2Lm=7gZ+tEMcbXvnjw@mail.gmail.com>
-In-Reply-To: <CALZVapkvKeSbDdQruumGM-8RyVOnoNGD2Lm=7gZ+tEMcbXvnjw@mail.gmail.com>
+	Tue, 8 Jan 2013 14:16:05 -0500
+Date: Tue, 8 Jan 2013 20:16:01 +0100
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: [PATCH] modpost: Add flag -f for making section mismatches
+	fatal
+Message-ID: <20130108191600.GA12563@merkur.ravnborg.org>
+References: <1356029364-11346-1-git-send-email-kliegs@chromium.org> <20130106093649.GA17429@merkur.ravnborg.org> <CAPQV+nP1UJP4R8AmoUf4bt873Yz_D0ZR2msaCRx5eAc49QFodA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <201301081949.05366.yann.morin.1998@free.fr>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAPQV+nP1UJP4R8AmoUf4bt873Yz_D0ZR2msaCRx5eAc49QFodA@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Javier Domingo <javierdo1@gmail.com>
+To: Jonathan Kliegman <kliegs@chromium.org>
+Cc: linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Rusty Russell <rusty@rustcorp.com.au>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Tony Lindgren <tony@atomide.com>, linux-kbuild@vger.kernel.org
 
-Javier, All,
-
-On Tuesday 08 January 2013 Javier Domingo wrote:
-> 1.- Many times, althought you have the option to use sortcuts, they
-> are really not usable, just because there are lots of them that are
-> the same.
+On Sun, Jan 06, 2013 at 03:22:39PM -0500, Jonathan Kliegman wrote:
+> On Sun, Jan 6, 2013 at 4:36 AM, Sam Ravnborg <sam@ravnborg.org> wrote:
+> > Hi Jonathan.
+> >
+> >> The section mismatch warning can be easy to miss during the kernel build
+> >> process.  Allow it to be marked as fatal to be easily caught and prevent
+> >> bugs from slipping in.
+> >>
+> >> Signed-off-by: Jonathan Kliegman <kliegs@chromium.org>
+> >
+> > Another way to make them much more visible would be to make
+> > the warnings always be verbose.
 > 
-> So if there was any way to search for patterns within the same page,
-> will be great.
-
-I don't understand what you mean. Your first sentence hint at shortcuts,
-while the second deals with answers of searches.
-
-Did you mean: search for symbols, but only in the currently-displayed
-menu?
-
-> 2.- When you are looking for something, you search, and it tell you
-> where it is, but you will have to repeat the search if you didn't note
-> it down (if not too obvious) several times, the most of the times this
-> is the first thing a newbie suffers.
+> I'd like to keep the option for a hard fail if a mismatch is detected.
+>  This way automated build systems will detect the failed build and can
+> reject a chan
 > 
-> It would be great if appart from searching, you would put hiperlinks
-> or something to go to the entries.
+> > In other words drop support for the "-S" options used below:
+> >>   $(if $(CONFIG_DEBUG_SECTION_MISMATCH),,-S)
+> >
+> > Previously the dev* stuff caused a lot of warnings, but
+> > since we have HOTPLUG always enabled this is a non-issue.
+> > So I think that this is a good time to enable the verboce
+> > warnings.
+> I can submit a second patch for this if you'd like, but I'm not
+> familiar with all the previous decisions in this area.  If I
+> understand correctly we'll still need the config option as it also
+> changes compiler flags for inlining.
 
-linux-3.7 has seen the introduction of the 'jump-keys' in menuconfig.
-Shen you search for something by hitting '/' and entering a pattern,
-all the results are prefixed with a number (if it has a prompt).
-Pressing that number will jump you directly to that symbol.
-Then, when you exit, you get back to the serach results, so you can jump
-to another symbol.
+Correct.
+We need one config option that allows us to debug section mismatchs.
+This options adds another gcc option as you also points out.
+And this is the one that already exist.
 
-Jump-keys are nested, that is:
-    search for 'FOO'
-    jump to result '1', symbol FOO_ALPHA
-    search for 'BAR'
-    jump to result '3', symbol BAR_TOTO
-    exit, gets you back to results for 'BAR'
-    jump to result '5', symbol BAR_TITI
-    exit, gets you back to results for 'BAR'
-    exit, gets you back to symbol FOO_ALPHA
-    exit, gets you back to results for 'FOO'
-    exit, gets you back to initial position
+And then you suggest to add another options which makes section
+mismatch warnings fatal.
+This sounds like a good idea but reverse the logic.
+Something like:
 
-> 3.- When you finally get to the page where you have to change the
-> macro, apart from the disadvantages in points 1 and 2, you have to
-> search all around the page because they are not ordered in any way
-> (but the programmer's have specified).
-> 
-> I can understand that some are parts of different Kconfigs, and others
-> are there because a dev dropped it there, but it is horrible to find
-> something in there.
-> 
-> That is why I would please ask for, althought respecting the tree
-> levels, sort the menus alphabetically.
+   CONFIG_SECTION_MISMATCH_WARN
+	bool "Section mismatch warnings produced by modpost are non-fatal"
+	default y
+	help
+	  bla bla
 
-Well, that's arguable. I'll take it you are speaking about the layout
-of the menus in the kernel. If you're speaking about your own Kconfig
-content, then that's a policy that belongs to your project, nad that
-your project maintainers have to enforce. So I'll cover the kernel,
-case below:
+Because then you do not cause section mismatch to be fatal for allyesconfig and
+allmodconfig builds. We really do not want to go there yet (I think).
+I must admit I do not know how many section mismatch warnigns that are lingering
+for the different architectures.
+If the number is sufficiently low then we could consider go for fatal as default.
 
-First, symbols that depends on another are/should be placed after the
-dependent symbol, that's more logical, but it breaks the alpha-sorting,
-of course.
 
-Second, the menus do tend to be alpha-sorted, where it makes sense.
-On another hand, the menu do tend to be sorted in a logical layout, with
-most /important/ options first, and less /important/ ones next (with any
-meaning of /inportant/).
+And it would be good to have first patch that makes section mismatch warnings verbose,
+independent on any config options.
 
-The kconfig frontends (eg. menuconfig, nconf, et al.) are not responsible
-for the layout policy, only the Kconfig files content is. Again, if it's
-your own Kconfig files, then you are responisble for the layout policy.
-For example, Buildroot's coding style organises package alphabetically.
+This patch would have to do something like:
+- Makes it possible to set CONFIG_DEBUG_SECTION_MISMATCH using menuconfig (I recall there are
+  a dependency that avoids this today)
+- Drop support for the -S options and drop the bits that set it
+- Drop the reference to CONFIG_DEBUG_SECTION_MISMATCH in modpost error message
 
-> 4.- And last but not least, I would love to have menus in some sort of
-> sections/parts so that If I want to disable lapb protocol, I have a
-> section of link protocols, and if I want to enable debugging features,
-> I can go to a section inside the Kernel hacking menu (for example
-> debugging)
-> 
-> So a solution to this would be either do sections, or make maintainers
-> use a logical menu tree for clasifying the entries. The "section" I
-> propose is a little title on the head, like the one in Networking
-> support (1st line)
-> 
-> Hope you like this ideas and that some of them are really easier to do
-> than I think they are to,
+I would be happy if you could do this and test it.
 
-I am not sure I understand what you mean. The options are already sorted
-by categories (eg.: net -> ipv6, filesystems -> ext2, ...)
-
-You may also want to have a look at the other frontends:
-    mconf   (aka menuconfig) ncurses-based
-    nconf   ncurses-based
-    gconf   GTK+-based
-    qconf   Qt-based
-
-Hope that helps answer/address a few of your question/remarks.
-
-Regards,
-Yann E. MORIN.
-
--- 
-.-----------------.--------------------.------------------.--------------------.
-|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
-| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
-| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
-| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
-'------------------------------^-------^------------------^--------------------'
-
+	Sam
