@@ -1,47 +1,122 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from moutng.kundenserver.de ([212.227.17.8]:58283 "EHLO
-	moutng.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755175Ab3AHW4h (ORCPT
+Received: from mail-vb0-f53.google.com ([209.85.212.53]:61632 "EHLO
+	mail-vb0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932123Ab3AIRED (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 8 Jan 2013 17:56:37 -0500
-From: Arnd Bergmann <arnd@arndb.de>
-Subject: Re: Build failure with DMA_OMAP=m and a caller built-in
-Date: Tue, 8 Jan 2013 22:56:30 +0000
-References: <1357449969.4324.25.camel@deadeye.wl.decadent.org.uk> <20130107202106.GG14149@atomide.com> <20130107203834.GB2637@n2100.arm.linux.org.uk>
-In-Reply-To: <20130107203834.GB2637@n2100.arm.linux.org.uk>
+	Wed, 9 Jan 2013 12:04:03 -0500
+Received: by mail-vb0-f53.google.com with SMTP id b23so1786139vbz.12
+        for <linux-kbuild@vger.kernel.org>; Wed, 09 Jan 2013 09:04:01 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-1"
-Content-Transfer-Encoding: 7bit
-Message-Id: <201301082256.30639.arnd@arndb.de>
+In-Reply-To: <201301081949.05366.yann.morin.1998@free.fr>
+References: <CALZVapkvKeSbDdQruumGM-8RyVOnoNGD2Lm=7gZ+tEMcbXvnjw@mail.gmail.com>
+ <201301081949.05366.yann.morin.1998@free.fr>
+From: Javier Domingo <javierdo1@gmail.com>
+Date: Wed, 9 Jan 2013 18:03:41 +0100
+Message-ID: <CALZVapmdYn8gKNbmdNa3QrqutwV7Eca=_HjxUeEso1qDZNFukg@mail.gmail.com>
+Subject: Re: Readability of make menuconfig
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-arm-kernel@lists.infradead.org
-Cc: Russell King - ARM Linux <linux@arm.linux.org.uk>, Tony Lindgren <tony@atomide.com>, Vinod Koul <vinod.koul@intel.com>, linux-omap@vger.kernel.org, Ben Hutchings <ben@decadent.org.uk>, linux-kbuild@vger.kernel.org
+To: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Cc: linux-kbuild@vger.kernel.org
 
-On Monday 07 January 2013, Russell King - ARM Linux wrote:
-> The problem we have is that the way peripheral devices are connected to
-> their DMA engines can involve additional complexity, which if not handled
-> correctly results in some platforms being crippled by the API.
-> 
-> I think Vinod was working on something, however I've not heard anything on
-> that for a while now.
-> 
-> How we avoid this problem outside of OMAP is that the DMA filter function
-> gets passed from platform code, and we only ever allow the DMA engine
-> driver to be configured into the kernel (iow, non-modular).  This means
-> that the DMA users never directly reference the DMA engine driver itself.
-> However, as OMAP headed down the DT path, many drivers no longer make use
-> of platform data, which makes that approach impractical.
+2013/1/8 Yann E. MORIN <yann.morin.1998@free.fr>:
+> I don't understand what you mean. Your first sentence hint at shortcuts,
+> while the second deals with answers of searches.
+>
+> Did you mean: search for symbols, but only in the currently-displayed
+> menu?
 
-Hmm, it seems the generic DT binding for dmaengine missed the merge window
-again, Vinod's pull request came a bit too late for this[1].
+I meant that shortcuts are put there to increase the accessibility,
+but in the current way they don't.
 
-Anyway, once the binding and code from Jon Hunter is there, and the omap-dma
-converted over to use it, the problem should be gone, unless you see any
-other issues with it. Drivers no longer need to reference a filter function
-directly, since the dma channel can get described completely in the DT.
+> linux-3.7 has seen the introduction of the 'jump-keys' in menuconfig.
+> Shen you search for something by hitting '/' and entering a pattern,
+> all the results are prefixed with a number (if it has a prompt).
+> Pressing that number will jump you directly to that symbol.
+> Then, when you exit, you get back to the serach results, so you can jump
+> to another symbol.
+>
+> Jump-keys are nested, that is:
+>     search for 'FOO'
+>     jump to result '1', symbol FOO_ALPHA
+>     search for 'BAR'
+>     jump to result '3', symbol BAR_TOTO
+>     exit, gets you back to results for 'BAR'
+>     jump to result '5', symbol BAR_TITI
+>     exit, gets you back to results for 'BAR'
+>     exit, gets you back to symbol FOO_ALPHA
+>     exit, gets you back to results for 'FOO'
+>     exit, gets you back to initial position
+>
 
-	Arnd
+Would it be possible to do this just with arrows? I mean, something
+like lynx's interface
 
-[1] http://lkml.org/lkml/2012/12/21/466
+> Well, that's arguable. I'll take it you are speaking about the layout
+> of the menus in the kernel. If you're speaking about your own Kconfig
+> content, then that's a policy that belongs to your project, nad that
+> your project maintainers have to enforce. So I'll cover the kernel,
+> case below:
+
+I mean actual kernel case
+
+> First, symbols that depends on another are/should be placed after the
+> dependent symbol, that's more logical, but it breaks the alpha-sorting,
+> of course.
+
+I understand that if something depends other thing, it will be
+idented, not in the first level, so that first level can be ordered,
+and the others, respecting dependencies, too
+>
+> Second, the menus do tend to be alpha-sorted, where it makes sense.
+> On another hand, the menu do tend to be sorted in a logical layout, with
+> most /important/ options first, and less /important/ ones next (with any
+> meaning of /inportant/).
+
+This is not a good way to find things. Many times, you want to enable
+one parameter but you don't know how important is it considered
+
+> The kconfig frontends (eg. menuconfig, nconf, et al.) are not responsible
+> for the layout policy, only the Kconfig files content is. Again, if it's
+> your own Kconfig files, then you are responisble for the layout policy.
+> For example, Buildroot's coding style organises package alphabetically.
+
+Then, all this discussion is just out of the topic of this mailing
+list, because the responsible for the actual sorting are the
+maintainers?
+
+> I am not sure I understand what you mean. The options are already sorted
+> by categories (eg.: net -> ipv6, filesystems -> ext2, ...)
+>
+
+I mean that when you go to net, you don't have ipv6, you have
+networking options, and inside there, you have to be able to
+understand which are ipv6 relative. They are all messed up.
+
+> You may also want to have a look at the other frontends:
+>     mconf   (aka menuconfig) ncurses-based
+
+Actually using this one, and is the only one I use
+
+Regards,
+
+Javier Domingo
+
+>     nconf   ncurses-based
+>     gconf   GTK+-based
+>     qconf   Qt-based
+>
+> Hope that helps answer/address a few of your question/remarks.
+>
+> Regards,
+> Yann E. MORIN.
+>
+> --
+> .-----------------.--------------------.------------------.--------------------.
+> |  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
+> | +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
+> | +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
+> | http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
+> '------------------------------^-------^------------------^--------------------'
+>
