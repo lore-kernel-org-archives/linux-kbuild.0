@@ -1,28 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from www2605.sakura.ne.jp ([49.212.180.15]:60338 "EHLO
-	www2605.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753938Ab3AKRUJ (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 11 Jan 2013 12:20:09 -0500
-Received: from www2605.sakura.ne.jp (ksav21.sakura.ne.jp [210.224.165.143])
-	by www2605.sakura.ne.jp (8.14.4/8.14.4) with ESMTP id r0BFCeST090330
-	for <linux-kbuild@vger.kernel.org>; Sat, 12 Jan 2013 00:12:41 +0900 (JST)
-	(envelope-from fujita@bernese.co.jp)
-Received: from BWONG ([64.179.210.220])
-	(authenticated bits=0)
-	by www2605.sakura.ne.jp (8.14.4/8.14.4) with ESMTP id r0BF7IDP082510
-	for <linux-kbuild@vger.kernel.org>; Sat, 12 Jan 2013 00:12:40 +0900 (JST)
-	(envelope-from fujita@bernese.co.jp)
-Date: Sat, 12 Jan 2013 00:12:40 +0900 (JST)
-Message-Id: <201301111512.r0BF7IDP082510@www2605.sakura.ne.jp>
-From: Laree Blackman <fujita@bernese.co.jp>
-Subject: Fwd: Your NY Photos
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: base64
+Received: from cantor2.suse.de ([195.135.220.15]:46487 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753743Ab3ALO7t (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 12 Jan 2013 09:59:49 -0500
+Message-ID: <50F17A52.5050806@suse.cz>
+Date: Sat, 12 Jan 2013 15:59:30 +0100
+From: Michal Marek <mmarek@suse.cz>
+MIME-Version: 1.0
+Subject: Re: [PATCH] fix: spaces in srctree and objtree paths no longer break
+ builds.
+References: <CAK2BWArN+HmtQMYJ8R_sBMQsahrR8TYeTTsyLUU9AvvFJFD=dQ@mail.gmail.com> <20121223184431.GA1685@merkur.ravnborg.org>
+In-Reply-To: <20121223184431.GA1685@merkur.ravnborg.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>
+To: Sunil Beta Baskar <betasam@gmail.com>
+Cc: Sam Ravnborg <sam@ravnborg.org>, linux-kbuild@vger.kernel.org
 
-SGksDQp5b3VyIHBob3RvcyBhcyBwcm9taXNlZCAgIGh0dHA6Ly9wcm90ZWluZW50ZXJ0YWlubWVu
-dC5jb20vbWFpbC5odG0=
+On 23.12.2012 19:44, Sam Ravnborg wrote:
+> On Sun, Dec 23, 2012 at 08:59:20PM +0530, Sunil Beta Baskar wrote:
+>> Signed-off-by: Sunil Beta <betasam@gmail.com>
+>> ---
+>>  Makefile |    7 ++++++-
+>>  1 file changed, 6 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/Makefile b/Makefile
+>> index 07bc925..c2ae267 100644
+>> --- a/Makefile
+>> +++ b/Makefile
+>> @@ -149,8 +149,13 @@ else
+>>  _all: modules
+>>  endif
+>>
+>> -srctree        := $(if $(KBUILD_SRC),$(KBUILD_SRC),$(CURDIR))
+>> +srctree            := $(if $(KBUILD_SRC),$(KBUILD_SRC),$(CURDIR))
+>>  objtree        := $(CURDIR)
+>> +
+>> +# FIX! spaces in path can break build
+>> +srctree         := $(shell echo $(srctree) | sed "s/ /\\\ /g" )
+>> +objtree         := $(shell echo $(objtree) | sed "s/ /\\\ /g" )
+>> +
+>>  src        := $(srctree)
+>>  obj        := $(objtree)
+> 
+> I applied your patch manually (the patch is broken).
+> My build failed like this:
+>   SYSHDR  arch/x86/syscalls/../include/generated/uapi/asm/unistd_32.h
+> /bin/sh: /home/sam/kernel/my\ space.git/arch/x86/syscalls/syscallhdr.sh: No such file or directory
+> make[1]: *** [arch/x86/syscalls/../include/generated/uapi/asm/unistd_32.h] Error 127
+> 
+> This it in other words not enough.
 
+There will always be too many or too few backslashes. So just check for
+bad characters early and fail if there are any.
+
+Michal
