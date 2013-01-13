@@ -1,31 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:58559 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755491Ab3AMWCQ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 13 Jan 2013 17:02:16 -0500
-Message-ID: <50F32EE3.8010705@suse.cz>
-Date: Sun, 13 Jan 2013 23:02:11 +0100
-From: Michal Marek <mmarek@suse.cz>
+Received: from mail-wi0-f180.google.com ([209.85.212.180]:65501 "EHLO
+	mail-wi0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755387Ab3AMWhZ (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 13 Jan 2013 17:37:25 -0500
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Subject: Re: kconfig-frontends-3.6.0-0 released
+Date: Sun, 13 Jan 2013 23:37:20 +0100
+References: <201210061755.07330.yann.morin.1998@free.fr> <201301131959.15246.yann.morin.1998@free.fr> <alpine.LNX.2.01.1301132204090.9693@nerf07.vanv.qr>
+In-Reply-To: <alpine.LNX.2.01.1301132204090.9693@nerf07.vanv.qr>
 MIME-Version: 1.0
-Subject: Re: [PATCH] Makefile: Make checkstack work with O= builds
-References: <1356141525-25162-1-git-send-email-sboyd@codeaurora.org>
-In-Reply-To: <1356141525-25162-1-git-send-email-sboyd@codeaurora.org>
-Content-Type: text/plain; charset=ISO-8859-2
+Content-Type: Text/Plain;
+  charset="iso-8859-1"
 Content-Transfer-Encoding: 7bit
+Message-Id: <201301132337.20771.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Stephen Boyd <sboyd@codeaurora.org>
-Cc: linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: Jan Engelhardt <jengelh@inai.de>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On 22.12.2012 02:58, Stephen Boyd wrote:
-> The vmlinux doesn't always live in the same directory as the
-> source files and so 'make O=obj checkstack' fails with a missing
-> vmlinux file. Fix checkstack so that this is possible.
+Jan, All,
 
-It works for me even without your patch. With O=<dir>, a second make is
-run in <dir>, so $(objtree) is equivalent to . for the top-level
-Makefile. Can you post the exact command your run and the error message
-you get?
+On Sunday 13 January 2013 Jan Engelhardt wrote:
+> On Sunday 2013-01-13 19:59, Yann E. MORIN wrote:
+[--SNIP--]
+> >How does one autoreconf a 'foreign' package?
+> Surely, just that:
+> AM_INIT_AUTOMAKE([foreign])
 
-Thanks,
-Michal
+> >Sorry, did you mean: "-Wall should be the default" ?
+> Indeed.
+
+[--SNIP--]
+> >> All of this seems pointless because you never use the results
+> >> (HAVE_FCNTL_H, HAVE_LIMITS_H, etc.)
+
+> >As I see it, the only action we could take is to bail out if any is missing.
+> >Is this what you meant?
+> 
+> You could do that, though I would simply direct users to read the compiler
+> error message. That enhances (hopefully) both their knowledge on compiling,
+> and reduces the walltime configure runs.
+
+OK, I've pushed a few changes with your suggestions. Thanks again! :-)
+
+Regards,
+Yann E. MORIN.
+
+-- 
+.-----------------.--------------------.------------------.--------------------.
+|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
+| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
+| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
+| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
+'------------------------------^-------^------------------^--------------------'
+
