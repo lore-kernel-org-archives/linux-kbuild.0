@@ -1,36 +1,42 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:57341 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754275Ab3ALVsD (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 12 Jan 2013 16:48:03 -0500
-Message-ID: <50F1DA0F.9060607@suse.cz>
-Date: Sat, 12 Jan 2013 22:47:59 +0100
-From: Michal Marek <mmarek@suse.cz>
+Received: from mail-wi0-f170.google.com ([209.85.212.170]:34955 "EHLO
+	mail-wi0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753970Ab3AMCdI (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 12 Jan 2013 21:33:08 -0500
+From: Tiana Rakotovao Andriamahefa <rkmahefa@gmail.com>
+Subject: [PATCH] scripts: kconfig: qconf.cc: fix a compiliation error when using make xconfig
+Date: Sun, 13 Jan 2013 03:28:40 +0000
+Message-Id: <1358047720-10358-1-git-send-email-rkmahefa@gmail.com>
 MIME-Version: 1.0
-Subject: Re: [pull request v2] Pull request for branch yem-kconfig-rc-fixes
-References: <cover.1356476868.git.yann.morin.1998@free.fr>
-In-Reply-To: <cover.1356476868.git.yann.morin.1998@free.fr>
-Content-Type: text/plain; charset=ISO-8859-2
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Cc: linux-kbuild@vger.kernel.org
+To: mmarek@suse.cz
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Tiana Rakotovao Andriamahefa <rkmahefa@gmail.com>
 
-On 26.12.2012 00:10, Yann E. MORIN wrote:
-> Hello Michal, All!
-> 
-> Here is a trivial patch suitable for post-rc1:
->   - remove duplicate variable declaration in kconfig/lxdialog
-> 
-> Changes v1..v2:
->   - since changes about use of ${CONFIG_} have not been pulled in Linus'
->     tree, I've dropped the previous two related patches from this branch.
->   - added Wang's cleanup
+When using make xconfig, the following compilation error appears :
+   /usr/include/qt3/qvaluelist.h:427:13: error: ‘ptrdiff_t’ does not name a type
+Including stddef.h in scripts/kconfig/qconf.cc permits to avoid this error.
 
-Thanks, pulled into kbuild.git#rc-fixes. Sorry for the delay, family and
-work keep me busy :). I will look at the more exciting kconfig stuff
-tomorrow.
+Signed-off-by: Tiana Rakotovao Andriamahefa <rkmahefa@gmail.com>
+---
+ scripts/kconfig/qconf.cc |    1 +
+ 1 file changed, 1 insertion(+)
 
-Michal
+diff --git a/scripts/kconfig/qconf.cc b/scripts/kconfig/qconf.cc
+index df274fe..1500c38 100644
+--- a/scripts/kconfig/qconf.cc
++++ b/scripts/kconfig/qconf.cc
+@@ -6,6 +6,7 @@
+ #include <qglobal.h>
+ 
+ #if QT_VERSION < 0x040000
++#include <stddef.h>
+ #include <qmainwindow.h>
+ #include <qvbox.h>
+ #include <qvaluelist.h>
+-- 
+1.7.10.4
 
