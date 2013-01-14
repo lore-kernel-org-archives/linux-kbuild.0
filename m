@@ -1,46 +1,39 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wi0-f196.google.com ([209.85.212.196]:47355 "EHLO
-	mail-wi0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757614Ab3ANWUS convert rfc822-to-8bit (ORCPT
+Received: from mail-wg0-f54.google.com ([74.125.82.54]:59715 "EHLO
+	mail-wg0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757765Ab3ANW1C convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 14 Jan 2013 17:20:18 -0500
+	Mon, 14 Jan 2013 17:27:02 -0500
 From: "Yann E. MORIN" <yann.morin.1998@free.fr>
 Subject: Re: [PATCH 2/2] nconf:  function keys line, change background color for better readability
-Date: Mon, 14 Jan 2013 23:20:12 +0100
-References: <20121228185108.GA13644@voyt-hp> <1356723607-17027-1-git-send-email-dvv.kernel@gmail.com> <20121229223328.GA28355@mobil.systemanalysen.net>
-In-Reply-To: <20121229223328.GA28355@mobil.systemanalysen.net>
+Date: Mon, 14 Jan 2013 23:26:58 +0100
+References: <20121228185108.GA13644@voyt-hp> <20121229223328.GA28355@mobil.systemanalysen.net> <201301142320.13141.yann.morin.1998@free.fr>
+In-Reply-To: <201301142320.13141.yann.morin.1998@free.fr>
 MIME-Version: 1.0
 Content-Type: Text/Plain;
   charset="utf-8"
 Content-Transfer-Encoding: 8BIT
-Message-Id: <201301142320.13141.yann.morin.1998@free.fr>
+Message-Id: <201301142326.58199.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org, Roland Eggner <edvx1@systemanalysen.net>
-Cc: Dmitry Voytik <dvv.kernel@gmail.com>, Michal Marek <mmarek@suse.cz>, Stephen Boyd <sboyd@codeaurora.org>, linux-kernel@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
+Cc: Roland Eggner <edvx1@systemanalysen.net>, Dmitry Voytik <dvv.kernel@gmail.com>, Michal Marek <mmarek@suse.cz>, Stephen Boyd <sboyd@codeaurora.org>, linux-kernel@vger.kernel.org
 
 Roland, All,
 
-On Saturday 29 December 2012 Roland Eggner wrote:
-> >From: Roland Eggner <edvx1@systemanalysen.net>
-> 
-> •  In function keys line descriptions black on darkblue are almost impossible
->    to read.  Change colors to black on brown.
-> 
-> Signed-off-by: Roland Eggner <edvx1@systemanalysen.net>
-> ---
-> --- a/scripts/kconfig/nconf.gui.c	2012-11-16 17:47:22.000000000 +0100
-> +++ b/scripts/kconfig/nconf.gui.c	2012-12-23 23:51:40.929833170 +0100
-> @@ -48,7 +48,7 @@ static void set_normal_colors(void)
->  	init_pair(INPUT_FIELD, -1, -1);
->  
->  	init_pair(FUNCTION_HIGHLIGHT, -1, -1);
-> -	init_pair(FUNCTION_TEXT, COLOR_BLUE, -1);
-> +	init_pair(FUNCTION_TEXT, COLOR_YELLOW, -1);
+On Monday 14 January 2013 Yann E. MORIN wrote:
+> On Saturday 29 December 2012 Roland Eggner wrote:
+> > >From: Roland Eggner <edvx1@systemanalysen.net>
+> > 
+> > •  In function keys line descriptions black on darkblue are almost impossible
+> >    to read.  Change colors to black on brown.
+[--SNIP--]
+> Although I am not a fan of this color scheme, it is much more readable
+> than the previous black-on-blue. Tested in frame-buffer console, in konsole
+> and in xterm. And queued in my non-official for-next branch.
 
-Although I am not a fan of this color scheme, it is much more readable
-than the previous black-on-blue. Tested in frame-buffer console, in konsole
-and in xterm. And queued in my non-official for-next branch.
+Sorry, the branch is:
+  git@gitorious.org:linux-kconfig/linux-kconfig.git yem-kconfig-for-next
 
 Regards,
 Yann E. MORIN.
