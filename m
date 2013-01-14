@@ -1,57 +1,42 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wi0-f180.google.com ([209.85.212.180]:65501 "EHLO
-	mail-wi0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755387Ab3AMWhZ (ORCPT
+Received: from mail-we0-f174.google.com ([74.125.82.174]:53579 "EHLO
+	mail-we0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754722Ab3AMX4m (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 13 Jan 2013 17:37:25 -0500
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: Re: kconfig-frontends-3.6.0-0 released
-Date: Sun, 13 Jan 2013 23:37:20 +0100
-References: <201210061755.07330.yann.morin.1998@free.fr> <201301131959.15246.yann.morin.1998@free.fr> <alpine.LNX.2.01.1301132204090.9693@nerf07.vanv.qr>
-In-Reply-To: <alpine.LNX.2.01.1301132204090.9693@nerf07.vanv.qr>
+	Sun, 13 Jan 2013 18:56:42 -0500
+Date: Mon, 14 Jan 2013 00:54:49 +0000
+From: Tiana Rakotovao Andriamahefa <rkmahefa@gmail.com>
+Subject: Re: [PATCH] scripts: kconfig: qconf.cc: fix a compiliation error
+ when using make xconfig
+Message-ID: <20130114005449.GA5499@rak.local>
+References: <1358047720-10358-1-git-send-email-rkmahefa@gmail.com>
+ <50F31E2C.3050104@suse.cz>
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-1"
-Content-Transfer-Encoding: 7bit
-Message-Id: <201301132337.20771.yann.morin.1998@free.fr>
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <50F31E2C.3050104@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jan Engelhardt <jengelh@inai.de>
+To: Michal Marek <mmarek@suse.cz>
 Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Jan, All,
-
-On Sunday 13 January 2013 Jan Engelhardt wrote:
-> On Sunday 2013-01-13 19:59, Yann E. MORIN wrote:
-[--SNIP--]
-> >How does one autoreconf a 'foreign' package?
-> Surely, just that:
-> AM_INIT_AUTOMAKE([foreign])
-
-> >Sorry, did you mean: "-Wall should be the default" ?
-> Indeed.
-
-[--SNIP--]
-> >> All of this seems pointless because you never use the results
-> >> (HAVE_FCNTL_H, HAVE_LIMITS_H, etc.)
-
-> >As I see it, the only action we could take is to bail out if any is missing.
-> >Is this what you meant?
+Le dimanche 13 janvier 2013 à 09:50:52, Michal Marek a écrit :
+> On 13.1.2013 04:28, Tiana Rakotovao Andriamahefa wrote:
+> > When using make xconfig, the following compilation error appears :
+> >    /usr/include/qt3/qvaluelist.h:427:13: error: ‘ptrdiff_t’ does not name a type
+> > Including stddef.h in scripts/kconfig/qconf.cc permits to avoid this error.
 > 
-> You could do that, though I would simply direct users to read the compiler
-> error message. That enhances (hopefully) both their knowledge on compiling,
-> and reduces the walltime configure runs.
+> This is a bug in the Qt header. Is Qt3 still maintained?
 
-OK, I've pushed a few changes with your suggestions. Thanks again! :-)
+This seems to be a common c++ issue since the begining of 2011.
 
-Regards,
-Yann E. MORIN.
+Some Qt3 headers use ptrdiff_t which is defined in stddef.h. They also use some 
+c++ headers, and rely on them to include stddef.h. However, since GCC-4.6, 
+those c++ headers do not include stddef.h anymore. So, include <stddef.h> 
+fixes it.
+
+This issue is reported here:  http://gcc.gnu.org/gcc-4.6/porting_to.html?
 
 -- 
-.-----------------.--------------------.------------------.--------------------.
-|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
-| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
-| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
-| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
-'------------------------------^-------^------------------^--------------------'
-
+Tiana Rakotovao Andriamahefa
