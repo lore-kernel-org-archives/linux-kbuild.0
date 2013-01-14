@@ -1,42 +1,25 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-we0-f174.google.com ([74.125.82.174]:53579 "EHLO
-	mail-we0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754722Ab3AMX4m (ORCPT
+Received: from mail-pa0-f49.google.com ([209.85.220.49]:37572 "EHLO
+	mail-pa0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757087Ab3ANOP1 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 13 Jan 2013 18:56:42 -0500
-Date: Mon, 14 Jan 2013 00:54:49 +0000
-From: Tiana Rakotovao Andriamahefa <rkmahefa@gmail.com>
-Subject: Re: [PATCH] scripts: kconfig: qconf.cc: fix a compiliation error
- when using make xconfig
-Message-ID: <20130114005449.GA5499@rak.local>
-References: <1358047720-10358-1-git-send-email-rkmahefa@gmail.com>
- <50F31E2C.3050104@suse.cz>
+	Mon, 14 Jan 2013 09:15:27 -0500
+Received: by mail-pa0-f49.google.com with SMTP id bi1so2236079pad.22
+        for <linux-kbuild@vger.kernel.org>; Mon, 14 Jan 2013 06:15:27 -0800 (PST)
+Date: Mon, 14 Jan 2013 12:33:14 +0800
+From: horseriver <horserivers@gmail.com>
+Subject: where is the build rule for kernel's subdirs?
+Message-ID: <20130114043314.GA3968@debian.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <50F31E2C.3050104@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
 
-Le dimanche 13 janvier 2013 à 09:50:52, Michal Marek a écrit :
-> On 13.1.2013 04:28, Tiana Rakotovao Andriamahefa wrote:
-> > When using make xconfig, the following compilation error appears :
-> >    /usr/include/qt3/qvaluelist.h:427:13: error: ‘ptrdiff_t’ does not name a type
-> > Including stddef.h in scripts/kconfig/qconf.cc permits to avoid this error.
-> 
-> This is a bug in the Qt header. Is Qt3 still maintained?
+hi:
 
-This seems to be a common c++ issue since the begining of 2011.
+   How does   kbuild   build objects for subdirs of kernel source ? 
 
-Some Qt3 headers use ptrdiff_t which is defined in stddef.h. They also use some 
-c++ headers, and rely on them to include stddef.h. However, since GCC-4.6, 
-those c++ headers do not include stddef.h anymore. So, include <stddef.h> 
-fixes it.
 
-This issue is reported here:  http://gcc.gnu.org/gcc-4.6/porting_to.html?
-
--- 
-Tiana Rakotovao Andriamahefa
+thanks!
