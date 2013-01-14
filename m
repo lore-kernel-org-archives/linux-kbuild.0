@@ -1,42 +1,76 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from casper.infradead.org ([85.118.1.10]:59483 "EHLO
-	casper.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756750Ab3ANQbo (ORCPT
+Received: from mail-wg0-f54.google.com ([74.125.82.54]:44064 "EHLO
+	mail-wg0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756793Ab3ANSYm (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 14 Jan 2013 11:31:44 -0500
-Message-ID: <50F43339.4040701@infradead.org>
-Date: Mon, 14 Jan 2013 08:32:57 -0800
-From: Randy Dunlap <rdunlap@infradead.org>
+	Mon, 14 Jan 2013 13:24:42 -0500
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Subject: Re: [PATCH 1/2] nconf:  add keybindings for vi-style menu navigation, rewrite help texts
+Date: Mon, 14 Jan 2013 19:24:36 +0100
+References: <20121228185108.GA13644@voyt-hp> <1356723607-17027-1-git-send-email-dvv.kernel@gmail.com> <20121229223415.GB28355@mobil.systemanalysen.net>
+In-Reply-To: <20121229223415.GB28355@mobil.systemanalysen.net>
 MIME-Version: 1.0
-Subject: Re: where is the build rule for kernel's subdirs?
-References: <20130114043314.GA3968@debian.localdomain>
-In-Reply-To: <20130114043314.GA3968@debian.localdomain>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: Text/Plain;
+  charset="iso-8859-15"
 Content-Transfer-Encoding: 7bit
+Message-Id: <201301141924.37268.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: horseriver <horserivers@gmail.com>
-Cc: linux-kbuild@vger.kernel.org
+To: Roland Eggner <edvx1@systemanalysen.net>
+Cc: Dmitry Voytik <dvv.kernel@gmail.com>, Michal Marek <mmarek@suse.cz>, Stephen Boyd <sboyd@codeaurora.org>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-On 01/13/13 20:33, horseriver wrote:
-> hi:
+Roland, All,
+
+On Saturday 29 December 2012 Roland Eggner wrote:
+> On 2012-12-28 Friday at 23:40 +0400 Dmitry Voytik wrote:
+> > Add alternative vi-style keys for the menu navigation:
+> > <j>/<k> for down/up navigation, <C-f>/<C-b> for
+> > page down/up, <g>/<G> for first/last menu item selection
+> > and <l> for entering to a submenu.
 > 
->    How does   kbuild   build objects for subdirs of kernel source ? 
+> Good starting point, thanks for your initial work.
+> Here is completion of the work:
 
-It goes into subdirs recursively.
+I'm sorry, but this patch does not apply cleanly, neither on-top of
+Dmitry's patch, nor on-top of Michal's for-next branch:
 
+$ patch -p1 --dry-run <../roland-nconf-2.patch
+patching file scripts/kconfig/nconf.c
+Hunk #1 FAILED at 12.
+Hunk #2 FAILED at 229.
+Hunk #3 FAILED at 319.
+Hunk #4 FAILED at 355.
+Hunk #5 succeeded at 393 with fuzz 1 (offset 1 line).
+Hunk #6 succeeded at 408 (offset 1 line).
+Hunk #7 succeeded at 1116 (offset 8 lines).
+Hunk #8 FAILED at 1141.
+Hunk #9 succeeded at 1178 (offset 8 lines).
+Hunk #10 FAILED at 1302.
+Hunk #11 succeeded at 1348 with fuzz 1 (offset 8 lines).
+6 out of 11 hunks FAILED -- saving rejects to file scripts/kconfig/nconf.c.rej
 
-From top-level Makefile:
+git am does not like it either:
+$ git am ../roland-nconf-2.patch
+Applying: nconf: add keybindings for vi-style menu navigation, rewrite help texts
+error: patch failed: scripts/kconfig/nconf.c:12
+error: scripts/kconfig/nconf.c: patch does not apply
 
-# Objects we will link into vmlinux / subdirs we need to visit
-init-y		:= init/
-drivers-y	:= drivers/ sound/ firmware/
-net-y		:= net/
-libs-y		:= lib/
-core-y		:= usr/
+Also, the patch is line-mangled, with long lines being wrapped by your
+MUA. Could you use git send-email, next time, please?
 
+Care to resend your patch on-top of Michal's for-next branch (and on-top
+of Dmitry's patch if needed) ? Or tell me what branch to apply it onto.
 
-Then each subdir's Makefile has its own rules.
+Thank you.
+
+Regards,
+Yann E. MORIN.
 
 -- 
-~Randy
+.-----------------.--------------------.------------------.--------------------.
+|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
+| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
+| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
+| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
+'------------------------------^-------^------------------^--------------------'
+
