@@ -1,38 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wg0-f48.google.com ([74.125.82.48]:50165 "EHLO
-	mail-wg0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756536Ab3ANWKg (ORCPT
+Received: from mail-wi0-f196.google.com ([209.85.212.196]:47355 "EHLO
+	mail-wi0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757614Ab3ANWUS convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 14 Jan 2013 17:10:36 -0500
+	Mon, 14 Jan 2013 17:20:18 -0500
 From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: Re: [PATCH] nconf: add vi-style command keys for the menu navigation
-Date: Mon, 14 Jan 2013 23:10:31 +0100
-References: <20121228185108.GA13644@voyt-hp> <1356723607-17027-1-git-send-email-dvv.kernel@gmail.com>
-In-Reply-To: <1356723607-17027-1-git-send-email-dvv.kernel@gmail.com>
+Subject: Re: [PATCH 2/2] nconf:  function keys line, change background color for better readability
+Date: Mon, 14 Jan 2013 23:20:12 +0100
+References: <20121228185108.GA13644@voyt-hp> <1356723607-17027-1-git-send-email-dvv.kernel@gmail.com> <20121229223328.GA28355@mobil.systemanalysen.net>
+In-Reply-To: <20121229223328.GA28355@mobil.systemanalysen.net>
 MIME-Version: 1.0
 Content-Type: Text/Plain;
-  charset="iso-8859-15"
-Content-Transfer-Encoding: 7bit
-Message-Id: <201301142310.32044.yann.morin.1998@free.fr>
+  charset="utf-8"
+Content-Transfer-Encoding: 8BIT
+Message-Id: <201301142320.13141.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
+To: linux-kbuild@vger.kernel.org, Roland Eggner <edvx1@systemanalysen.net>
 Cc: Dmitry Voytik <dvv.kernel@gmail.com>, Michal Marek <mmarek@suse.cz>, Stephen Boyd <sboyd@codeaurora.org>, linux-kernel@vger.kernel.org
 
-Dmitry, All,
+Roland, All,
 
-On Friday 28 December 2012 Dmitry Voytik wrote:
-> Add alternative vi-style keys for the menu navigation:
-> <j>/<k> for down/up navigation, <C-f>/<C-b> for
-> page down/up, <g>/<G> for first/last menu item selection
-> and <l> for entering to a submenu.
+On Saturday 29 December 2012 Roland Eggner wrote:
+> >From: Roland Eggner <edvx1@systemanalysen.net>
+> 
+> •  In function keys line descriptions black on darkblue are almost impossible
+>    to read.  Change colors to black on brown.
+> 
+> Signed-off-by: Roland Eggner <edvx1@systemanalysen.net>
+> ---
+> --- a/scripts/kconfig/nconf.gui.c	2012-11-16 17:47:22.000000000 +0100
+> +++ b/scripts/kconfig/nconf.gui.c	2012-12-23 23:51:40.929833170 +0100
+> @@ -48,7 +48,7 @@ static void set_normal_colors(void)
+>  	init_pair(INPUT_FIELD, -1, -1);
+>  
+>  	init_pair(FUNCTION_HIGHLIGHT, -1, -1);
+> -	init_pair(FUNCTION_TEXT, COLOR_BLUE, -1);
+> +	init_pair(FUNCTION_TEXT, COLOR_YELLOW, -1);
 
-The <g>/<G> keys are not documented in the help text.
-<HOME>/<END> are not, either.
-
-Care to add those and resend, please?
-
-Otherwise, working OK here.
+Although I am not a fan of this color scheme, it is much more readable
+than the previous black-on-blue. Tested in frame-buffer console, in konsole
+and in xterm. And queued in my non-official for-next branch.
 
 Regards,
 Yann E. MORIN.
