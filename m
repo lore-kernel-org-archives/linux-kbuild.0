@@ -1,48 +1,49 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wg0-f54.google.com ([74.125.82.54]:59715 "EHLO
-	mail-wg0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757765Ab3ANW1C convert rfc822-to-8bit (ORCPT
+Received: from ngcobalt07.manitu.net ([217.11.48.107]:50966 "EHLO
+	ngcobalt07.manitu.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755864Ab3AOQLV (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 14 Jan 2013 17:27:02 -0500
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: Re: [PATCH 2/2] nconf:  function keys line, change background color for better readability
-Date: Mon, 14 Jan 2013 23:26:58 +0100
-References: <20121228185108.GA13644@voyt-hp> <20121229223328.GA28355@mobil.systemanalysen.net> <201301142320.13141.yann.morin.1998@free.fr>
-In-Reply-To: <201301142320.13141.yann.morin.1998@free.fr>
+	Tue, 15 Jan 2013 11:11:21 -0500
+Date: Tue, 15 Jan 2013 17:10:32 +0100
+From: Roland Eggner <edvx1@systemanalysen.net>
+Subject: Re: [PATCH 1/2] nconf:  add keybindings for vi-style menu
+ navigation, rewrite help texts
+Message-ID: <20130115161031.GA5513@mobil.systemanalysen.net>
+Reply-To: Roland Eggner <edvx1@systemanalysen.net>
+References: <20121228185108.GA13644@voyt-hp>
+ <1356723607-17027-1-git-send-email-dvv.kernel@gmail.com>
+ <20121229223415.GB28355@mobil.systemanalysen.net>
+ <201301141924.37268.yann.morin.1998@free.fr>
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="utf-8"
-Content-Transfer-Encoding: 8BIT
-Message-Id: <201301142326.58199.yann.morin.1998@free.fr>
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <201301141924.37268.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Roland Eggner <edvx1@systemanalysen.net>, Dmitry Voytik <dvv.kernel@gmail.com>, Michal Marek <mmarek@suse.cz>, Stephen Boyd <sboyd@codeaurora.org>, linux-kernel@vger.kernel.org
+To: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Cc: Dmitry Voytik <dvv.kernel@gmail.com>, Michal Marek <mmarek@suse.cz>, Stephen Boyd <sboyd@codeaurora.org>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-Roland, All,
-
-On Monday 14 January 2013 Yann E. MORIN wrote:
+On 2013-01-14 Monday at 19:24 +0100 Yann E. MORIN wrote:
+> Roland, All,
+> 
 > On Saturday 29 December 2012 Roland Eggner wrote:
-> > >From: Roland Eggner <edvx1@systemanalysen.net>
+> > On 2012-12-28 Friday at 23:40 +0400 Dmitry Voytik wrote:
+> > > Add alternative vi-style keys for the menu navigation:
+> > > <j>/<k> for down/up navigation, <C-f>/<C-b> for
+> > > page down/up, <g>/<G> for first/last menu item selection
+> > > and <l> for entering to a submenu.
 > > 
-> > •  In function keys line descriptions black on darkblue are almost impossible
-> >    to read.  Change colors to black on brown.
-[--SNIP--]
-> Although I am not a fan of this color scheme, it is much more readable
-> than the previous black-on-blue. Tested in frame-buffer console, in konsole
-> and in xterm. And queued in my non-official for-next branch.
+> > Good starting point, thanks for your initial work.
+> > Here is completion of the work:
+> 
+> I'm sorry, but this patch does not apply cleanly, neither on-top of
+> Dmitry's patch, nor on-top of Michal's for-next branch:
 
-Sorry, the branch is:
-  git@gitorious.org:linux-kconfig/linux-kconfig.git yem-kconfig-for-next
+Sorry.  Recreated patch versions will follow in replies to this message, the
+1st to be applied on vanilla 3.8-rc3, the 2nd to be applied on vanilla 3.2.35.
+Unfortunately the patch submitting rules do not allow me to mention this in
+subject lines.
 
-Regards,
-Yann E. MORIN.
-
+Thanks
 -- 
-.-----------------.--------------------.------------------.--------------------.
-|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
-| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
-| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
-| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
-'------------------------------^-------^------------------^--------------------'
-
+Roland Eggner
