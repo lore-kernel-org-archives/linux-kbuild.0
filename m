@@ -1,31 +1,32 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ngcobalt07.manitu.net ([217.11.48.107]:53240 "EHLO
+Received: from ngcobalt07.manitu.net ([217.11.48.107]:54918 "EHLO
 	ngcobalt07.manitu.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754772Ab3AOQ1X (ORCPT
+	with ESMTP id S1755118Ab3AOQjD (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 15 Jan 2013 11:27:23 -0500
-Date: Tue, 15 Jan 2013 17:26:32 +0100
+	Tue, 15 Jan 2013 11:39:03 -0500
+Date: Tue, 15 Jan 2013 17:36:08 +0100
 From: Roland Eggner <edvx1@systemanalysen.net>
-Subject: Re: [PATCH v2 1/2] nconf:  add keybindings for vi-style menu
+Subject: Re: [PATCH v2stable 1/2] nconf:  add keybindings for vi-style menu
  navigation, rewrite help texts
-Message-ID: <20130115162632.GB5513@mobil.systemanalysen.net>
+Message-ID: <20130115163608.GC5513@mobil.systemanalysen.net>
 Reply-To: Roland Eggner <edvx1@systemanalysen.net>
 References: <20121228185108.GA13644@voyt-hp>
  <1356723607-17027-1-git-send-email-dvv.kernel@gmail.com>
  <20121229223415.GB28355@mobil.systemanalysen.net>
  <201301141924.37268.yann.morin.1998@free.fr>
  <20130115161031.GA5513@mobil.systemanalysen.net>
+ <20130115162632.GB5513@mobil.systemanalysen.net>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="AhhlLboLdkugWU4S"
+	protocol="application/pgp-signature"; boundary="2B/JsCI69OhZNC5r"
 Content-Disposition: inline
-In-Reply-To: <20130115161031.GA5513@mobil.systemanalysen.net>
+In-Reply-To: <20130115162632.GB5513@mobil.systemanalysen.net>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: "Yann E. MORIN" <yann.morin.1998@free.fr>, Dmitry Voytik <dvv.kernel@gmail.com>, Michal Marek <mmarek@suse.cz>, Stephen Boyd <sboyd@codeaurora.org>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
 
---AhhlLboLdkugWU4S
+--2B/JsCI69OhZNC5r
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
@@ -69,12 +70,11 @@ tent
 Signed-off-by: Dmitry Voytik <dvv.kernel@gmail.com>
 Signed-off-by: Roland Eggner <edvx1@systemanalysen.net>
 ---
-To be applied on vanilla 3.8-rc3
+For stable users: to be applied on vanilla 3.2.37
 
---- linux-3.8-rc3.orig/scripts/kconfig/nconf.c	2013-01-15 13:49:24.00000000=
-0 +0100
-+++ linux-3.8-rc3/scripts/kconfig/nconf.c	2013-01-15 14:47:03.510334219 +01=
-00
+--- linux-3.2.37.orig/scripts/kconfig/nconf.c	2013-01-15 14:21:59.613437055=
+ +0100
++++ linux-3.2.37/scripts/kconfig/nconf.c	2013-01-15 14:47:03.207334239 +0100
 @@ -12,210 +12,204 @@
  #include "nconf.h"
  #include <ctype.h>
@@ -229,10 +229,10 @@ k.\n"
 -"Text Box    (Help Window)\n"
 -"--------\n"
 -"o  Use the cursor keys to scroll up/down/left/right.  The VI editor\n"
--"   keys h,j,k,l function here as do <u>, <d> and <SPACE BAR> for\n"
--"   those who are familiar with less and lynx.\n"
+-"   keys h,j,k,l function here as do <SPACE BAR> for those\n"
+-"   who are familiar with less and lynx.\n"
  "\n"
--"o  Press <Enter>, <F1>, <F5>, <F9>, <q> or <Esc> to exit.\n"
+-"o  Press <Enter>, <F1>, <F5>, <F7> or <Esc> to exit.\n"
 -"\n"
 -"\n"
 -"Alternate Configuration Files\n"
@@ -669,15 +669,15 @@ n"
 --=20
 Roland Eggner
 
---AhhlLboLdkugWU4S
+--2B/JsCI69OhZNC5r
 Content-Type: application/pgp-signature
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v2.0.19 (GNU/Linux)
 
-iEYEARECAAYFAlD1gzcACgkQdN/hKfT7G/I7YgCfUoPBLb6t60IpapwHtR9WNsog
-pU0AmwUsw3bqWRCzWiMPIq6hnQ4kD2sG
-=ODvM
+iEYEARECAAYFAlD1hXgACgkQdN/hKfT7G/Jm/QCgi/5C/ukZJKdg9LxghvvgCe2v
+unsAoJb46jP8UHef8q5M88bV6MIFnKLO
+=XOTZ
 -----END PGP SIGNATURE-----
 
---AhhlLboLdkugWU4S--
+--2B/JsCI69OhZNC5r--
