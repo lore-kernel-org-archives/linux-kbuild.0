@@ -1,39 +1,101 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:47902 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1757832Ab3AOW2x (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 15 Jan 2013 17:28:53 -0500
-Message-ID: <50F5D81C.1070702@suse.cz>
-Date: Tue, 15 Jan 2013 23:28:44 +0100
-From: Michal Marek <mmarek@suse.cz>
+Received: from mail-pa0-f48.google.com ([209.85.220.48]:50632 "EHLO
+	mail-pa0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757125Ab3AOW1z convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 15 Jan 2013 17:27:55 -0500
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Subject: Re: [PATCH v2 1/2] nconf:  add keybindings for vi-style menu navigation, rewrite help texts
+Date: Tue, 15 Jan 2013 23:27:48 +0100
+References: <20121228185108.GA13644@voyt-hp> <20130115161031.GA5513@mobil.systemanalysen.net> <20130115162632.GB5513@mobil.systemanalysen.net>
+In-Reply-To: <20130115162632.GB5513@mobil.systemanalysen.net>
 MIME-Version: 1.0
-Subject: Re: [PATCH] menuconfig:inputbox: support navigate input position
-References: <20121217143802.GB16993@udknight> <201212171922.59669.yann.morin.1998@free.fr>
-In-Reply-To: <201212171922.59669.yann.morin.1998@free.fr>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+Content-Type: Text/Plain;
+  charset="utf-8"
+Content-Transfer-Encoding: 8BIT
+Message-Id: <201301152327.49010.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Cc: Wang YanQing <udknight@gmail.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, rdunlap@xenotime.net, bp@alien8.de, sakiwit@gmail.com, lacombar@gmail.com, lucas.demarchi@profusion.mobi, dave@gnu.org, paul.gortmaker@windriver.com, crquan@gmail.com, bpoirier@suse.de
+To: Roland Eggner <edvx1@systemanalysen.net>
+Cc: linux-kbuild@vger.kernel.org, Dmitry Voytik <dvv.kernel@gmail.com>, Michal Marek <mmarek@suse.cz>, Stephen Boyd <sboyd@codeaurora.org>, linux-kernel@vger.kernel.org
 
-On 17.12.2012 19:22, Yann E. MORIN wrote:
-> Wang, All,
+Roland, All,
+
+On Tuesday 15 January 2013 Roland Eggner wrote:
+> >From: Roland Eggner <edvx1@systemanalysen.net>
+
+OK, now I've had time to test it. Works OK.
+
+However, this patch mixes different things: feature changes, help-texts
+rewrite...
+
+Could you split it into multiple patches, each do a single, well-defined
+change? See below.
+
+> •  Implemented vi-style navigation <k> <j> <l> <h>, based on initial work by
+>    Dmitry Voytik.  Using <?> <H> instead of <?> <h> for help related to current
+>    menu entry avoids conflict.
 > 
-> On Monday 17 December 2012 Wang YanQing wrote:
->> This patch add support navigate input position *inside* the input
->> field with LEFT/RIGHT, so it is possible to modify the text in place.
->>
->> Signed-off-by: Wang YanQing <udknight@gmail.com>
-> 
-> Tested-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
-> 
-> I am not knowledgeable enough in ncurses and the dialog code-base
-> to add any reviewed-by tag. All I can say, is that it works as
-> advertised.
+> •  Added keybindings <C-n> <C-p> additionally to <C-f> <C-b> for moving pagewise
+>    down and up.  <C-f> <C-b> is used for characterwise right and left movement
+>    by libreadline (bash, xfsprogs, bc, gdb, python, ruby, hunspell, mysql,
+>    sqlite, gnupg, xine-ui, parted …).  Thus pagewise movement by <C-n> <C-p> is
+>    less confusing than by <C-f> <C-b> for my fingers.
 
-I merged this into kbuild.git#kconfig.
+I think we should only retain the more "natural" key bindings: <C-f> and
+<C-b> for left/right. <C-p> and <C-n> are not for PAge-Up/Down, but for
+previous-in-history and next-in-history (which, IMHO, is not the same
+meaning).
 
-Thanks,
-Michal
+However, I wonder how many such *-like keys we should have.
 
+The up/down and Page-Up/Down keys are really trivially understood. It's
+been a long while ago they were introduced in vim (rather than using the
+oldish hjkl). Readline also understands those arrow-keys keys. So, really,
+I wonder what the point of having these new keys is.
+
+> •  Rewrote all help texts.  During several years lazy (incomplete) updates had
+>    left behind a rather thick layer of dust.  Intentions:
+>    (1)  Global help called by <F1> should document all  _currently_  implemented
+>         keybindings.
+>    (2)  Different help texts called by <F3> resp. <F8><F1> should be consistent
+>         with (1) and with implementation:
+>         •  on plain menu entry
+>         •  in radiolist window
+>         •  in input windows for text, decimal or hexadecimal values
+>         •  in filename selection windows <F6> <F7>
+>         •  SymSearch specific help called by <F8> followed by <F1>
+
+This one does indeed give an easier to read, more precise and more complete
+help. This should be a separate patch.
+
+> •  Function keys line:  “Help 2” instead of “Insts” and “ShowAll” instead of
+>    “Config” should be more intuitiv.
+
+Ditto, a separate patch.
+
+I'd suggest that you add the least controversial patches first, and submit
+them as four patches:
+  - help rewrite
+  - labels rewrite (update help accordingly)
+  - vi-like keys
+  - readline-like keys
+
+(Or the other way around for the last two patches.)
+
+With this patch ordering, each patch is easier to review, the fixes ones
+(help and labels rewrites) can be easily applied, and we can discuss the
+last two separately.
+
+Thank you!
+
+Regards,
+Yann E. MORIN.
+
+-- 
+.-----------------.--------------------.------------------.--------------------.
+|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
+| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
+| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
+| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
+'------------------------------^-------^------------------^--------------------'
