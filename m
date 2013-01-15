@@ -1,73 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ngcobalt07.manitu.net ([217.11.48.107]:60617 "EHLO
-	ngcobalt07.manitu.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756369Ab3AORNp (ORCPT
+Received: from mail-wi0-f172.google.com ([209.85.212.172]:41961 "EHLO
+	mail-wi0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754206Ab3AORix (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 15 Jan 2013 12:13:45 -0500
-Date: Tue, 15 Jan 2013 18:12:52 +0100
-From: Roland Eggner <edvx1@systemanalysen.net>
+	Tue, 15 Jan 2013 12:38:53 -0500
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
 Subject: Re: [PATCH] nconf: add vi-style command keys for the menu navigation
-Message-ID: <20130115171252.GD5513@mobil.systemanalysen.net>
-Reply-To: Roland Eggner <edvx1@systemanalysen.net>
-References: <20121228185108.GA13644@voyt-hp>
- <1356723607-17027-1-git-send-email-dvv.kernel@gmail.com>
- <201301142310.32044.yann.morin.1998@free.fr>
+Date: Tue, 15 Jan 2013 18:38:46 +0100
+References: <20121228185108.GA13644@voyt-hp> <201301142310.32044.yann.morin.1998@free.fr> <20130115171252.GD5513@mobil.systemanalysen.net>
+In-Reply-To: <20130115171252.GD5513@mobil.systemanalysen.net>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="OBd5C1Lgu00Gd/Tn"
-Content-Disposition: inline
-In-Reply-To: <201301142310.32044.yann.morin.1998@free.fr>
+Content-Type: Text/Plain;
+  charset="iso-8859-15"
+Content-Transfer-Encoding: 7bit
+Message-Id: <201301151838.47019.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Yann E. MORIN" <yann.morin.1998@free.fr>
+To: Roland Eggner <edvx1@systemanalysen.net>
 Cc: linux-kbuild@vger.kernel.org, Dmitry Voytik <dvv.kernel@gmail.com>, Michal Marek <mmarek@suse.cz>, Stephen Boyd <sboyd@codeaurora.org>, linux-kernel@vger.kernel.org
 
+Roland, All,
 
---OBd5C1Lgu00Gd/Tn
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On Tuesday 15 January 2013 Roland Eggner wrote:
+> On 2013-01-14 Monday at 23:10 +0100 Yann E. MORIN wrote:
+> > The <g>/<G> keys are not documented in the help text.
+> > <HOME>/<END> are not, either.
+> 
+> Already documented in previous version and in v2 posted half hour ago:
 
-On 2013-01-14 Monday at 23:10 +0100 Yann E. MORIN wrote:
-> Dmitry, All,
->=20
-> On Friday 28 December 2012 Dmitry Voytik wrote:
-> > Add alternative vi-style keys for the menu navigation:
-> > <j>/<k> for down/up navigation, <C-f>/<C-b> for
-> > page down/up, <g>/<G> for first/last menu item selection
-> > and <l> for entering to a submenu.
->=20
-> The <g>/<G> keys are not documented in the help text.
-> <HOME>/<END> are not, either.
+Ah, so your patch includes Dmitry's changes, right?
 
-Already documented in previous version and in v2 posted half hour ago:
+> > Care to add those and resend, please?
+> v2 based on 3.8-rc3 posted.
 
-User interface:
-<F1> =E2=80=9CGlobal help=E2=80=9C, table starting near line 36.
+OK, thank you! I'll handle the 3.8-rc3 one shortly.
 
-Source code:
-grep -E -n '(First|Last) entry' scripts/kconfig/nconf.c
+Thank you!
 
+Regards,
+Yann E. MORIN.
 
-> Care to add those and resend, please?
+-- 
+.-----------------.--------------------.------------------.--------------------.
+|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
+| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
+| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
+| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
+'------------------------------^-------^------------------^--------------------'
 
-v2 based on 3.8-rc3 posted.
-
-
-Thanks for review.
---=20
-Roland Eggner
-
-
---OBd5C1Lgu00Gd/Tn
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.19 (GNU/Linux)
-
-iEYEARECAAYFAlD1jhQACgkQdN/hKfT7G/Jw0ACfXqGGhSdVpAIOuHIISIkhNt5O
-FEUAoKkDUVc4Rex1J991g5qHOtItAgR4
-=UhxT
------END PGP SIGNATURE-----
-
---OBd5C1Lgu00Gd/Tn--
