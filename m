@@ -1,42 +1,55 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:46412 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751280Ab3AOVcu (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 15 Jan 2013 16:32:50 -0500
-Message-ID: <50F5CAF2.1050207@suse.cz>
-Date: Tue, 15 Jan 2013 22:32:34 +0100
-From: Michal Marek <mmarek@suse.cz>
-MIME-Version: 1.0
-Subject: Re: [PATCH] scripts: kconfig: qconf.cc: fix a compiliation error
- when using make xconfig
-References: <1358047720-10358-1-git-send-email-rkmahefa@gmail.com> <50F31E2C.3050104@suse.cz> <20130114005449.GA5499@rak.local>
-In-Reply-To: <20130114005449.GA5499@rak.local>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Received: from mail-pb0-f66.google.com ([209.85.160.66]:47133 "EHLO
+	mail-pb0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S934144Ab3AOXNE (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 15 Jan 2013 18:13:04 -0500
+Received: by mail-pb0-f66.google.com with SMTP id wz17so375840pbc.9
+        for <linux-kbuild@vger.kernel.org>; Tue, 15 Jan 2013 15:13:04 -0800 (PST)
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Subject: [pull request] Pull request for branch yem-kconfig-for-next
+Date: Wed, 16 Jan 2013 00:12:52 +0100
+Message-Id: <cover.1358291451.git.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Tiana Rakotovao Andriamahefa <rkmahefa@gmail.com>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
+Cc: Michal Marek <mmarek@suse.cz>, "Yann E. MORIN" <yann.morin.1998@free.fr>
 
-On 14.1.2013 01:54, Tiana Rakotovao Andriamahefa wrote:
-> Le dimanche 13 janvier 2013 à 09:50:52, Michal Marek a écrit :
->> On 13.1.2013 04:28, Tiana Rakotovao Andriamahefa wrote:
->>> When using make xconfig, the following compilation error appears :
->>>    /usr/include/qt3/qvaluelist.h:427:13: error: ‘ptrdiff_t’ does not name a type
->>> Including stddef.h in scripts/kconfig/qconf.cc permits to avoid this error.
->>
->> This is a bug in the Qt header. Is Qt3 still maintained?
-> 
-> This seems to be a common c++ issue since the begining of 2011.
-> 
-> Some Qt3 headers use ptrdiff_t which is defined in stddef.h. They also use some 
-> c++ headers, and rely on them to include stddef.h. However, since GCC-4.6, 
-> those c++ headers do not include stddef.h anymore. So, include <stddef.h> 
-> fixes it.
+Hello Michal, All!
 
-Right. My question is - is Qt3 still maintained somehow, so the includes
-can be added where they belong, or do we need to workaround in in the
-applications?
+These are the kconfig patches I've queued for 3.9.
 
-Michal
+There are a few more on the list, but they need rework first (the vi- and
+readline-like-keys series).
+
+
+The following changes since commit 87727d453b4677a21312712c8a4bb5dcd81a1ebe:
+
+  menuconfig:inputbox: support navigate input position (2012-12-25 23:42:37 +0100)
+
+are available in the git repository at:
+  git://gitorious.org/linux-kconfig/linux-kconfig.git yem-kconfig-for-next
+
+Roland Eggner (1):
+      nconf: function keys line, change background color for better readability
+
+Wang YanQing (2):
+      menuconfig: Add Save/Load buttons
+      menuconfig: Get rid of the top-level entries for "Load an Alternate/Save an Alternate"
+
+ scripts/kconfig/lxdialog/menubox.c |   20 +++++++++-------
+ scripts/kconfig/mconf.c            |   44 ++++++++++++++++++++---------------
+ scripts/kconfig/nconf.gui.c        |    2 +-
+ 3 files changed, 37 insertions(+), 29 deletions(-)
+
+Regards,
+Yann E. MORIN
+
+-- 
+.-----------------.--------------------.------------------.--------------------.
+|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
+| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
+| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
+| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
+'------------------------------^-------^------------------^--------------------'
 
