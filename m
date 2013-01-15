@@ -1,42 +1,60 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wg0-f53.google.com ([74.125.82.53]:45156 "EHLO
-	mail-wg0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753305Ab3AORkB (ORCPT
+Received: from ngcobalt07.manitu.net ([217.11.48.107]:40986 "EHLO
+	ngcobalt07.manitu.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757179Ab3AOR4F (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 15 Jan 2013 12:40:01 -0500
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: Re: [PATCH v2stable 1/2] nconf:  add keybindings for vi-style menu navigation, rewrite help texts
-Date: Tue, 15 Jan 2013 18:39:56 +0100
-References: <20121228185108.GA13644@voyt-hp> <20130115162632.GB5513@mobil.systemanalysen.net> <20130115163608.GC5513@mobil.systemanalysen.net>
-In-Reply-To: <20130115163608.GC5513@mobil.systemanalysen.net>
+	Tue, 15 Jan 2013 12:56:05 -0500
+Date: Tue, 15 Jan 2013 18:55:15 +0100
+From: Roland Eggner <edvx1@systemanalysen.net>
+Subject: Re: [PATCH] nconf: add vi-style command keys for the menu navigation
+Message-ID: <20130115175515.GA13577@mobil.systemanalysen.net>
+Reply-To: Roland Eggner <edvx1@systemanalysen.net>
+References: <20121228185108.GA13644@voyt-hp>
+ <201301142310.32044.yann.morin.1998@free.fr>
+ <20130115171252.GD5513@mobil.systemanalysen.net>
+ <201301151838.47019.yann.morin.1998@free.fr>
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-15"
-Content-Transfer-Encoding: 7bit
-Message-Id: <201301151839.56773.yann.morin.1998@free.fr>
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="ew6BAiZeqk4r7MaW"
+Content-Disposition: inline
+In-Reply-To: <201301151838.47019.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org, Roland Eggner <edvx1@systemanalysen.net>
-Cc: Dmitry Voytik <dvv.kernel@gmail.com>, Michal Marek <mmarek@suse.cz>, Stephen Boyd <sboyd@codeaurora.org>, linux-kernel@vger.kernel.org
+To: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Cc: linux-kbuild@vger.kernel.org, Dmitry Voytik <dvv.kernel@gmail.com>, Michal Marek <mmarek@suse.cz>, Stephen Boyd <sboyd@codeaurora.org>, linux-kernel@vger.kernel.org
 
-Roland, All,
 
-On Tuesday 15 January 2013 Roland Eggner wrote:
-> >From: Roland Eggner <edvx1@systemanalysen.net>
-[--SNIP--]
-> ---
-> For stable users: to be applied on vanilla 3.2.37
+--ew6BAiZeqk4r7MaW
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-I think feature-changes are not supposed to go into -stable.
+On 2013-01-15 Tuesday at 18:38 +0100 Yann E. MORIN wrote:
+> Roland, All,
+>=20
+> On Tuesday 15 January 2013 Roland Eggner wrote:
+> > On 2013-01-14 Monday at 23:10 +0100 Yann E. MORIN wrote:
+> > > The <g>/<G> keys are not documented in the help text.
+> > > <HOME>/<END> are not, either.
+> >=20
+> > Already documented in previous version and in v2 posted half hour ago:
+>=20
+> Ah, so your patch includes Dmitry's changes, right?
 
-Regards,
-Yann E. MORIN.
+Yes.
 
--- 
-.-----------------.--------------------.------------------.--------------------.
-|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
-| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
-| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
-| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
-'------------------------------^-------^------------------^--------------------'
+--=20
+Roland Eggner
 
+--ew6BAiZeqk4r7MaW
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.19 (GNU/Linux)
+
+iEYEARECAAYFAlD1mAMACgkQdN/hKfT7G/KehACfSW9RwoOMf7a4x8Rb5cS4RqrS
+ps4An3ZWkgcUX4coD6NNbkO26e3pKDhq
+=7aHZ
+-----END PGP SIGNATURE-----
+
+--ew6BAiZeqk4r7MaW--
