@@ -1,15 +1,15 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-da0-f50.google.com ([209.85.210.50]:49445 "EHLO
-	mail-da0-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S933061Ab3AOXNH (ORCPT
+Received: from mail-pa0-f52.google.com ([209.85.220.52]:37811 "EHLO
+	mail-pa0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S934126Ab3AOXNJ (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 15 Jan 2013 18:13:07 -0500
-Received: by mail-da0-f50.google.com with SMTP id h15so259084dan.37
-        for <linux-kbuild@vger.kernel.org>; Tue, 15 Jan 2013 15:13:06 -0800 (PST)
+	Tue, 15 Jan 2013 18:13:09 -0500
+Received: by mail-pa0-f52.google.com with SMTP id fb1so403123pad.39
+        for <linux-kbuild@vger.kernel.org>; Tue, 15 Jan 2013 15:13:09 -0800 (PST)
 From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: [PATCH 1/3] menuconfig: Add Save/Load buttons
-Date: Wed, 16 Jan 2013 00:12:53 +0100
-Message-Id: <6364fd0cb1e4c7f72b974613e0cf5744ae4d2cb2.1358291451.git.yann.morin.1998@free.fr>
+Subject: [PATCH 2/3] menuconfig: Get rid of the top-level entries for "Load an Alternate/Save an Alternate"
+Date: Wed, 16 Jan 2013 00:12:54 +0100
+Message-Id: <1bdbac478a858d2aa73a6784c7c2e09de0f6d06b.1358291451.git.yann.morin.1998@free.fr>
 In-Reply-To: <cover.1358291451.git.yann.morin.1998@free.fr>
 References: <cover.1358291451.git.yann.morin.1998@free.fr>
 In-Reply-To: <cover.1358291451.git.yann.morin.1998@free.fr>
@@ -21,185 +21,50 @@ Cc: Michal Marek <mmarek@suse.cz>, Wang YanQing <udknight@gmail.com>, "Yann E. M
 
 From: Wang YanQing <udknight@gmail.com>
 
-If menuconfig have Save/Load button like alternative
-.config editors, xconfig, nconfig, etc.We will have
-a obvious benefit when use menuconfig just like
-when we use others, we can Save/Load our .config quickly
-and conveniently.
-
-This patch add the Save/Load button for menuconfig.
-
-[remove trailing space while at it for below line:
-"*)  Formerly when I used Page Down and Page Up, the cursor would be set"
-]
-
-Changes:
-V1-V2:
-1:use PATH_MAX instead of hard code suggested by Yann E. MORIN
-2:drop the spurious empty-line removal suggested by Yann E. MORIN
-V2-V3:
-1:ajust buttons position well centered reported by Yann E. MORIN
+Now we have Load/Save buttons to do the Load/Save
+in the convenient place, so we can drop the
+top-level entries.
 
 Signed-off-by: Wang YanQing <udknight@gmail.com>
 Reviewed-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
 Tested-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
 Signed-off-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
 ---
- scripts/kconfig/lxdialog/menubox.c |   20 +++++++++++---------
- scripts/kconfig/mconf.c            |   30 +++++++++++++++++++++++++-----
- 2 files changed, 36 insertions(+), 14 deletions(-)
+ scripts/kconfig/mconf.c |   14 --------------
+ 1 files changed, 0 insertions(+), 14 deletions(-)
 
-diff --git a/scripts/kconfig/lxdialog/menubox.c b/scripts/kconfig/lxdialog/menubox.c
-index 1d60473..48d382e 100644
---- a/scripts/kconfig/lxdialog/menubox.c
-+++ b/scripts/kconfig/lxdialog/menubox.c
-@@ -26,7 +26,7 @@
-  *
-  *    *)  A bugfix for the Page-Down problem
-  *
-- *    *)  Formerly when I used Page Down and Page Up, the cursor would be set 
-+ *    *)  Formerly when I used Page Down and Page Up, the cursor would be set
-  *        to the first position in the menu box.  Now lxdialog is a bit
-  *        smarter and works more like other menu systems (just have a look at
-  *        it).
-@@ -154,12 +154,14 @@ static void print_arrows(WINDOW * win, int item_no, int scroll, int y, int x,
-  */
- static void print_buttons(WINDOW * win, int height, int width, int selected)
- {
--	int x = width / 2 - 16;
-+	int x = width / 2 - 28;
- 	int y = height - 2;
- 
- 	print_button(win, gettext("Select"), y, x, selected == 0);
- 	print_button(win, gettext(" Exit "), y, x + 12, selected == 1);
- 	print_button(win, gettext(" Help "), y, x + 24, selected == 2);
-+	print_button(win, gettext(" Save "), y, x + 36, selected == 3);
-+	print_button(win, gettext(" Load "), y, x + 48, selected == 4);
- 
- 	wmove(win, y, x + 1 + 12 * selected);
- 	wrefresh(win);
-@@ -372,7 +374,7 @@ do_resize:
- 		case TAB:
- 		case KEY_RIGHT:
- 			button = ((key == KEY_LEFT ? --button : ++button) < 0)
--			    ? 2 : (button > 2 ? 0 : button);
-+			    ? 4 : (button > 4 ? 0 : button);
- 
- 			print_buttons(dialog, height, width, button);
- 			wrefresh(menu);
-@@ -399,17 +401,17 @@ do_resize:
- 				return 2;
- 			case 's':
- 			case 'y':
--				return 3;
-+				return 5;
- 			case 'n':
--				return 4;
-+				return 6;
- 			case 'm':
--				return 5;
-+				return 7;
- 			case ' ':
--				return 6;
-+				return 8;
- 			case '/':
--				return 7;
-+				return 9;
- 			case 'z':
--				return 8;
-+				return 10;
- 			case '\n':
- 				return button;
- 			}
 diff --git a/scripts/kconfig/mconf.c b/scripts/kconfig/mconf.c
-index 5f29618..88e8068 100644
+index 88e8068..680135e 100644
 --- a/scripts/kconfig/mconf.c
 +++ b/scripts/kconfig/mconf.c
-@@ -280,6 +280,7 @@ static struct menu *current_menu;
- static int child_count;
- static int single_menu_mode;
- static int show_all_options;
-+static int save_and_exit;
- 
- static void conf(struct menu *menu, struct menu *active_menu);
- static void conf_choice(struct menu *menu);
-@@ -657,6 +658,12 @@ static void conf(struct menu *menu, struct menu *active_menu)
- 				show_helptext(_("README"), _(mconf_readme));
+@@ -599,14 +599,6 @@ static void conf(struct menu *menu, struct menu *active_menu)
+ 		build_conf(menu);
+ 		if (!child_count)
  			break;
- 		case 3:
-+			conf_save();
-+			break;
-+		case 4:
-+			conf_load();
-+			break;
-+		case 5:
- 			if (item_is_tag('t')) {
- 				if (sym_set_tristate_value(sym, yes))
- 					break;
-@@ -664,24 +671,24 @@ static void conf(struct menu *menu, struct menu *active_menu)
- 					show_textbox(NULL, setmod_text, 6, 74);
+-		if (menu == &rootmenu) {
+-			item_make("--- ");
+-			item_set_tag(':');
+-			item_make(_("    Load an Alternate Configuration File"));
+-			item_set_tag('L');
+-			item_make(_("    Save an Alternate Configuration File"));
+-			item_set_tag('S');
+-		}
+ 		dialog_clear();
+ 		res = dialog_menu(prompt ? _(prompt) : _("Main Menu"),
+ 				  _(menu_instructions),
+@@ -643,12 +635,6 @@ static void conf(struct menu *menu, struct menu *active_menu)
+ 			case 's':
+ 				conf_string(submenu);
+ 				break;
+-			case 'L':
+-				conf_load();
+-				break;
+-			case 'S':
+-				conf_save();
+-				break;
  			}
  			break;
--		case 4:
-+		case 6:
- 			if (item_is_tag('t'))
- 				sym_set_tristate_value(sym, no);
- 			break;
--		case 5:
-+		case 7:
- 			if (item_is_tag('t'))
- 				sym_set_tristate_value(sym, mod);
- 			break;
--		case 6:
-+		case 8:
- 			if (item_is_tag('t'))
- 				sym_toggle_tristate_value(sym);
- 			else if (item_is_tag('m'))
- 				conf(submenu, NULL);
- 			break;
--		case 7:
-+		case 9:
- 			search_conf();
- 			break;
--		case 8:
-+		case 10:
- 			show_all_options = !show_all_options;
- 			break;
- 		}
-@@ -708,6 +715,17 @@ static void show_helptext(const char *title, const char *text)
- 	show_textbox(title, text, 0, 0);
- }
- 
-+static void conf_message_callback(const char *fmt, va_list ap)
-+{
-+	char buf[PATH_MAX+1];
-+
-+	vsnprintf(buf, sizeof(buf), fmt, ap);
-+	if (save_and_exit)
-+		printf("%s", buf);
-+	else
-+		show_textbox(NULL, buf, 6, 60);
-+}
-+
- static void show_help(struct menu *menu)
- {
- 	struct gstr help = str_new();
-@@ -876,6 +894,7 @@ static int handle_exit(void)
- {
- 	int res;
- 
-+	save_and_exit = 1;
- 	dialog_clear();
- 	if (conf_get_changed())
- 		res = dialog_yesno(NULL,
-@@ -947,6 +966,7 @@ int main(int ac, char **av)
- 	}
- 
- 	set_config_filename(conf_get_configname());
-+	conf_set_message_callback(conf_message_callback);
- 	do {
- 		conf(&rootmenu, NULL);
- 		res = handle_exit();
+ 		case 2:
 -- 
 1.7.2.5
 
