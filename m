@@ -1,60 +1,42 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ngcobalt07.manitu.net ([217.11.48.107]:40986 "EHLO
-	ngcobalt07.manitu.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757179Ab3AOR4F (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 15 Jan 2013 12:56:05 -0500
-Date: Tue, 15 Jan 2013 18:55:15 +0100
-From: Roland Eggner <edvx1@systemanalysen.net>
-Subject: Re: [PATCH] nconf: add vi-style command keys for the menu navigation
-Message-ID: <20130115175515.GA13577@mobil.systemanalysen.net>
-Reply-To: Roland Eggner <edvx1@systemanalysen.net>
-References: <20121228185108.GA13644@voyt-hp>
- <201301142310.32044.yann.morin.1998@free.fr>
- <20130115171252.GD5513@mobil.systemanalysen.net>
- <201301151838.47019.yann.morin.1998@free.fr>
+Received: from cantor2.suse.de ([195.135.220.15]:46412 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751280Ab3AOVcu (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 15 Jan 2013 16:32:50 -0500
+Message-ID: <50F5CAF2.1050207@suse.cz>
+Date: Tue, 15 Jan 2013 22:32:34 +0100
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="ew6BAiZeqk4r7MaW"
-Content-Disposition: inline
-In-Reply-To: <201301151838.47019.yann.morin.1998@free.fr>
+Subject: Re: [PATCH] scripts: kconfig: qconf.cc: fix a compiliation error
+ when using make xconfig
+References: <1358047720-10358-1-git-send-email-rkmahefa@gmail.com> <50F31E2C.3050104@suse.cz> <20130114005449.GA5499@rak.local>
+In-Reply-To: <20130114005449.GA5499@rak.local>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Cc: linux-kbuild@vger.kernel.org, Dmitry Voytik <dvv.kernel@gmail.com>, Michal Marek <mmarek@suse.cz>, Stephen Boyd <sboyd@codeaurora.org>, linux-kernel@vger.kernel.org
+To: Tiana Rakotovao Andriamahefa <rkmahefa@gmail.com>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
+On 14.1.2013 01:54, Tiana Rakotovao Andriamahefa wrote:
+> Le dimanche 13 janvier 2013 à 09:50:52, Michal Marek a écrit :
+>> On 13.1.2013 04:28, Tiana Rakotovao Andriamahefa wrote:
+>>> When using make xconfig, the following compilation error appears :
+>>>    /usr/include/qt3/qvaluelist.h:427:13: error: ‘ptrdiff_t’ does not name a type
+>>> Including stddef.h in scripts/kconfig/qconf.cc permits to avoid this error.
+>>
+>> This is a bug in the Qt header. Is Qt3 still maintained?
+> 
+> This seems to be a common c++ issue since the begining of 2011.
+> 
+> Some Qt3 headers use ptrdiff_t which is defined in stddef.h. They also use some 
+> c++ headers, and rely on them to include stddef.h. However, since GCC-4.6, 
+> those c++ headers do not include stddef.h anymore. So, include <stddef.h> 
+> fixes it.
 
---ew6BAiZeqk4r7MaW
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Right. My question is - is Qt3 still maintained somehow, so the includes
+can be added where they belong, or do we need to workaround in in the
+applications?
 
-On 2013-01-15 Tuesday at 18:38 +0100 Yann E. MORIN wrote:
-> Roland, All,
->=20
-> On Tuesday 15 January 2013 Roland Eggner wrote:
-> > On 2013-01-14 Monday at 23:10 +0100 Yann E. MORIN wrote:
-> > > The <g>/<G> keys are not documented in the help text.
-> > > <HOME>/<END> are not, either.
-> >=20
-> > Already documented in previous version and in v2 posted half hour ago:
->=20
-> Ah, so your patch includes Dmitry's changes, right?
+Michal
 
-Yes.
-
---=20
-Roland Eggner
-
---ew6BAiZeqk4r7MaW
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.19 (GNU/Linux)
-
-iEYEARECAAYFAlD1mAMACgkQdN/hKfT7G/KehACfSW9RwoOMf7a4x8Rb5cS4RqrS
-ps4An3ZWkgcUX4coD6NNbkO26e3pKDhq
-=7aHZ
------END PGP SIGNATURE-----
-
---ew6BAiZeqk4r7MaW--
