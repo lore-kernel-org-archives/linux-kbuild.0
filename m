@@ -1,33 +1,64 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:49448 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753587Ab3APMsM (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 16 Jan 2013 07:48:12 -0500
-Message-ID: <50F6A187.7010101@suse.cz>
-Date: Wed, 16 Jan 2013 13:48:07 +0100
-From: Michal Marek <mmarek@suse.cz>
+Received: from ngcobalt07.manitu.net ([217.11.48.107]:55452 "EHLO
+	ngcobalt07.manitu.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756153Ab3APUUS (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 16 Jan 2013 15:20:18 -0500
+Date: Wed, 16 Jan 2013 21:19:29 +0100
+From: Roland Eggner <edvx1@systemanalysen.net>
+Subject: Re: [PATCH v2 1/2] nconf:  add keybindings for vi-style menu
+ navigation, rewrite help texts
+Message-ID: <20130116201928.GA18047@mobil.systemanalysen.net>
+Reply-To: Roland Eggner <edvx1@systemanalysen.net>
+References: <20121228185108.GA13644@voyt-hp>
+ <20130115161031.GA5513@mobil.systemanalysen.net>
+ <20130115162632.GB5513@mobil.systemanalysen.net>
+ <201301152327.49010.yann.morin.1998@free.fr>
 MIME-Version: 1.0
-Subject: Re: [PATCH v2 1/2] nconf:  add keybindings for vi-style menu navigation,
- rewrite help texts
-References: <20121228185108.GA13644@voyt-hp> <1356723607-17027-1-git-send-email-dvv.kernel@gmail.com> <20121229223415.GB28355@mobil.systemanalysen.net> <201301141924.37268.yann.morin.1998@free.fr> <20130115161031.GA5513@mobil.systemanalysen.net> <20130115162632.GB5513@mobil.systemanalysen.net>
-In-Reply-To: <20130115162632.GB5513@mobil.systemanalysen.net>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="vkogqOf2sHV7VnPd"
+Content-Disposition: inline
+In-Reply-To: <201301152327.49010.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Roland Eggner <edvx1@systemanalysen.net>
-Cc: "Yann E. MORIN" <yann.morin.1998@free.fr>, Dmitry Voytik <dvv.kernel@gmail.com>, Stephen Boyd <sboyd@codeaurora.org>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Cc: linux-kbuild@vger.kernel.org, Dmitry Voytik <dvv.kernel@gmail.com>, Michal Marek <mmarek@suse.cz>, Stephen Boyd <sboyd@codeaurora.org>, linux-kernel@vger.kernel.org
 
-On 15.1.2013 17:26, Roland Eggner wrote:
->> From: Roland Eggner <edvx1@systemanalysen.net>
-> 
-> •  Implemented vi-style navigation <k> <j> <l> <h>, based on initial work by
->    Dmitry Voytik.  Using <?> <H> instead of <?> <h> for help related to current
->    menu entry avoids conflict.
 
-It conflicts with previous behavior that people got used to, though.
+--vkogqOf2sHV7VnPd
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Also, please split the patch at least into one part adding the new key
-binding and a second part rewriting the help texts.
+On 2013-01-15 Tuesday at 23:27 +0100 Yann E. MORIN wrote:
+> Roland, All,
+>=20
+> On Tuesday 15 January 2013 Roland Eggner wrote:
+> > >From: Roland Eggner <edvx1@systemanalysen.net>
+>=20
+> OK, now I've had time to test it. Works OK.
+>=20
+> However, this patch mixes different things: feature changes, help-texts
+> rewrite...
+>=20
+> Could you split it into multiple patches, each do a single, well-defined
+> change? See below.
+> =E2=80=A6 =E2=80=A6
 
-Michal
+Will do, but has to wait until weekend.
+
+--=20
+Roland Eggner
+
+--vkogqOf2sHV7VnPd
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.19 (GNU/Linux)
+
+iEYEARECAAYFAlD3C1AACgkQdN/hKfT7G/ISaQCbB8JiOT2P6gMMCO1K5rJXxWYq
++30AoJ4a7qr7yo/RbKbBxct/DBHgY4uc
+=GiqV
+-----END PGP SIGNATURE-----
+
+--vkogqOf2sHV7VnPd--
