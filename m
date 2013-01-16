@@ -1,101 +1,62 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pa0-f48.google.com ([209.85.220.48]:50632 "EHLO
-	mail-pa0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757125Ab3AOW1z convert rfc822-to-8bit (ORCPT
+Received: from mail-wi0-f177.google.com ([209.85.212.177]:46843 "EHLO
+	mail-wi0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752370Ab3APL2r (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 15 Jan 2013 17:27:55 -0500
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: Re: [PATCH v2 1/2] nconf:  add keybindings for vi-style menu navigation, rewrite help texts
-Date: Tue, 15 Jan 2013 23:27:48 +0100
-References: <20121228185108.GA13644@voyt-hp> <20130115161031.GA5513@mobil.systemanalysen.net> <20130115162632.GB5513@mobil.systemanalysen.net>
-In-Reply-To: <20130115162632.GB5513@mobil.systemanalysen.net>
+	Wed, 16 Jan 2013 06:28:47 -0500
+Date: Wed, 16 Jan 2013 12:26:10 +0000
+From: Tiana Rakotovao Andriamahefa <rkmahefa@gmail.com>
+Subject: Re: qt3 and ptrdiff_t build error
+Message-ID: <20130116122610.GA7613@rak.local>
+References: <20130115231251.GA6100@rak.local>
+ <20130116063156.GA28910@pryan.ekaia.org>
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="utf-8"
-Content-Transfer-Encoding: 8BIT
-Message-Id: <201301152327.49010.yann.morin.1998@free.fr>
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20130116063156.GA28910@pryan.ekaia.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Roland Eggner <edvx1@systemanalysen.net>
-Cc: linux-kbuild@vger.kernel.org, Dmitry Voytik <dvv.kernel@gmail.com>, Michal Marek <mmarek@suse.cz>, Stephen Boyd <sboyd@codeaurora.org>, linux-kernel@vger.kernel.org
+To: mmarek@suse.cz
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Roland, All,
-
-On Tuesday 15 January 2013 Roland Eggner wrote:
-> >From: Roland Eggner <edvx1@systemanalysen.net>
-
-OK, now I've had time to test it. Works OK.
-
-However, this patch mixes different things: feature changes, help-texts
-rewrite...
-
-Could you split it into multiple patches, each do a single, well-defined
-change? See below.
-
-> •  Implemented vi-style navigation <k> <j> <l> <h>, based on initial work by
->    Dmitry Voytik.  Using <?> <H> instead of <?> <h> for help related to current
->    menu entry avoids conflict.
+Le mercredi 16 janvier 2013 à 07:31:56, Ana Guerrero a écrit :
+> On Tue, Jan 15, 2013 at 11:12:51PM +0000, Tiana Rakotovao Andriamahefa wrote:
+> > Hi all,
+> > 
+> > The build of an application using qt3 always fails into this
+> > kind of error (with GCC-4.6) :
+> > 
+> > In file included from /usr/include/qt3/qmime.h:46:0,
+> >                  from /usr/include/qt3/qevent.h:48,
+> >                  from /usr/include/qt3/qobject.h:48,
+> >                  from /usr/include/qt3/qwidget.h:46,
+> >                  from /usr/include/qt3/qmainwindow.h:45,
+> >                  from main.cc:9:
+> > /usr/include/qt3/qmap.h:607:13: error: ‘ptrdiff_t’ does not name a type
+> > make[1]: *** [scripts/kconfig/qconf.o] Erreur 1
+> > make: *** [xconfig] Erreur 2
+> > 
+> > 
+> > And including <stddef.h> resolves well this problem.
+> > 
+> > So, I would like to ask you if qt3 is still maintained so that it is
+> > for example possible to add " include <stddef.h> " in some qt3 headers?
+> > Or should stddef.h always be included by our program.
 > 
-> •  Added keybindings <C-n> <C-p> additionally to <C-f> <C-b> for moving pagewise
->    down and up.  <C-f> <C-b> is used for characterwise right and left movement
->    by libreadline (bash, xfsprogs, bc, gdb, python, ruby, hunspell, mysql,
->    sqlite, gnupg, xine-ui, parted …).  Thus pagewise movement by <C-n> <C-p> is
->    less confusing than by <C-f> <C-b> for my fingers.
+> Hi Tiana,
+> 
+> Qt3 is not maintained anymore in Debian. Last stable version of Debian
+> shipping Qt3 is Squeeze with GCC 4.4.
+> IIRC the problem you reported was fixed in one of the uploads of Qt3 made
+> after the release of Squeeze, if you grab the latest upload of Qt3 from
+> http://snapshot.debian.org it is possible this problem is fixed there.
 
-I think we should only retain the more "natural" key bindings: <C-f> and
-<C-b> for left/right. <C-p> and <C-n> are not for PAge-Up/Down, but for
-previous-in-history and next-in-history (which, IMHO, is not the same
-meaning).
-
-However, I wonder how many such *-like keys we should have.
-
-The up/down and Page-Up/Down keys are really trivially understood. It's
-been a long while ago they were introduced in vim (rather than using the
-oldish hjkl). Readline also understands those arrow-keys keys. So, really,
-I wonder what the point of having these new keys is.
-
-> •  Rewrote all help texts.  During several years lazy (incomplete) updates had
->    left behind a rather thick layer of dust.  Intentions:
->    (1)  Global help called by <F1> should document all  _currently_  implemented
->         keybindings.
->    (2)  Different help texts called by <F3> resp. <F8><F1> should be consistent
->         with (1) and with implementation:
->         •  on plain menu entry
->         •  in radiolist window
->         •  in input windows for text, decimal or hexadecimal values
->         •  in filename selection windows <F6> <F7>
->         •  SymSearch specific help called by <F8> followed by <F1>
-
-This one does indeed give an easier to read, more precise and more complete
-help. This should be a separate patch.
-
-> •  Function keys line:  “Help 2” instead of “Insts” and “ShowAll” instead of
->    “Config” should be more intuitiv.
-
-Ditto, a separate patch.
-
-I'd suggest that you add the least controversial patches first, and submit
-them as four patches:
-  - help rewrite
-  - labels rewrite (update help accordingly)
-  - vi-like keys
-  - readline-like keys
-
-(Or the other way around for the last two patches.)
-
-With this patch ordering, each patch is easier to review, the fixes ones
-(help and labels rewrites) can be easily applied, and we can discuss the
-last two separately.
-
-Thank you!
-
-Regards,
-Yann E. MORIN.
+I have checked it and found that the error was effectively fixed in the last
+maintained upload of Qt3 in 2011. However, the correction is not yet in Wheezy
+(Debian testing) which I have used for more than a year. It might be
+included there one day!
+This is the case of Debian, but not all distros.
 
 -- 
-.-----------------.--------------------.------------------.--------------------.
-|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
-| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
-| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
-| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
-'------------------------------^-------^------------------^--------------------'
+Tiana Rakotovao Andriamahefa
