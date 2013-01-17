@@ -1,20 +1,25 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from relay.aragon.es ([195.55.229.47]:37974 "EHLO relay.aragon.es"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755275Ab3APXam convert rfc822-to-8bit (ORCPT
+Received: from outrelay03.libero.it ([212.52.84.103]:60459 "EHLO
+	outrelay03.libero.it" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752791Ab3AQTMp (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 16 Jan 2013 18:30:42 -0500
-Message-Id: <201301162320.r0GNGnre026390@relay.aragon.es>
-Content-Type: text/plain; charset=US-ASCII
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Description: Mail message body
+	Thu, 17 Jan 2013 14:12:45 -0500
+Message-ID: <2387509.2618041358449884044.JavaMail.defaultUser@defaultHost>
+Date: Thu, 17 Jan 2013 20:11:24 +0100 (CET)
+From: juliet dosi <juliet_dosi@yahoo.co.uk>
+Reply-To: juliet dosi <juliet_dosi@yahoo.co.uk>
 Subject: Hello
-From: "DAWES FOUNDATION,UK" <dawes-foundation@ARAGON.ES>
-Date: Thu, 17 Jan 2013 01:20:03 -0800
-Reply-To: dawes-foundation2013@gmx.co.uk
+MIME-Version: 1.0
+Content-Type: text/plain;charset="UTF-8"
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Recipients <dawes-foundation@ARAGON.ES>
+To: juliet_dosi@yahoo.co.uk
 
-<<< No Message Collected >>>
+Hello
+from Juliet,
+i looking for relationship
+please contact me back,
+then i will tell you more about myself.
+And i give you picture too.
+
