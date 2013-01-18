@@ -1,25 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from outrelay03.libero.it ([212.52.84.103]:60459 "EHLO
-	outrelay03.libero.it" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752791Ab3AQTMp (ORCPT
+Received: from mail-pa0-f49.google.com ([209.85.220.49]:42630 "EHLO
+	mail-pa0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751187Ab3AROd6 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 17 Jan 2013 14:12:45 -0500
-Message-ID: <2387509.2618041358449884044.JavaMail.defaultUser@defaultHost>
-Date: Thu, 17 Jan 2013 20:11:24 +0100 (CET)
-From: juliet dosi <juliet_dosi@yahoo.co.uk>
-Reply-To: juliet dosi <juliet_dosi@yahoo.co.uk>
-Subject: Hello
+	Fri, 18 Jan 2013 09:33:58 -0500
 MIME-Version: 1.0
-Content-Type: text/plain;charset="UTF-8"
-Content-Transfer-Encoding: 7bit
+From: Sunil Beta Baskar <betasam@gmail.com>
+Date: Fri, 18 Jan 2013 20:03:42 +0530
+Message-ID: <CAK2BWApu9PjkmDdV4HoFXcq9KTh4e57iEdwYn9muVmYRwRNXgw@mail.gmail.com>
+Subject: [PATCH] fix: build aborts if SPACE characters are found in path.
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: juliet_dosi@yahoo.co.uk
+To: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Hello
-from Juliet,
-i looking for relationship
-please contact me back,
-then i will tell you more about myself.
-And i give you picture too.
+Signed-off-by: Sunil Beta <betasam@gmail.com>
+---
+ Makefile |    4 ++++
+ 1 file changed, 4 insertions(+)
 
+diff --git a/Makefile b/Makefile
+index 07bc925..48bfd8e 100644
+--- a/Makefile
++++ b/Makefile
+@@ -10,6 +10,8 @@ NAME = "Divemaster Edition"
+ # Comments in this file are targeted only to the developer, do not
+ # expect to learn how to build the kernel reading this file.
+
++CURDIRSPC := $(echo $(CURDIR) | sed "s/ /\\\ /g" )
++$(ifneq $(CURDIR),$(CURDIRSPC), $(error directory $(CURDIR) contains spaces.))
+ # Do not:
+ # o  use make's built-in rules and variables
+ #    (this increases performance and avoids hard-to-debug behaviour);
+@@ -118,6 +120,8 @@ ifneq ($(KBUILD_OUTPUT),)
+ # check that the output directory actually exists
+ saved-output := $(KBUILD_OUTPUT)
+ KBUILD_OUTPUT := $(shell cd $(KBUILD_OUTPUT) && /bin/pwd)
++KBUILD_OUTPUT_SPC := $(shell echo $(KBUILD_OUTPUT) | sed "s/ /\\\ /g")
++$(ifneq $(KBUILD_OUTPUT),$(KBUILD_OUTPUT_SPC), $(error output
+directory $(KBUILD_OUTPUT) contains spaces.))
+ $(if $(KBUILD_OUTPUT),, \
+      $(error output directory "$(saved-output)" does not exist))
+
+--
+1.7.10.4
+-----
+This resolves issues with multiple spaces in the source or target path
+of the kernel. Fixing this completely would require changes to
+mkmakefile among several other files. This is just to leave newbies
+comfortable with an error message as to the reason the build failed.
+
+Sunil Beta Baskar
