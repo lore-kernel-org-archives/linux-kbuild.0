@@ -1,42 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-da0-f48.google.com ([209.85.210.48]:49991 "EHLO
-	mail-da0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751792Ab3AUGfH (ORCPT
+Received: from mail-da0-f43.google.com ([209.85.210.43]:55727 "EHLO
+	mail-da0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752176Ab3AUH2U (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 21 Jan 2013 01:35:07 -0500
-Message-ID: <50FCE196.1070702@gmail.com>
-Date: Mon, 21 Jan 2013 14:35:02 +0800
+	Mon, 21 Jan 2013 02:28:20 -0500
 From: Bin Wang <wbin00@gmail.com>
-MIME-Version: 1.0
-Subject: scripts/package/Makefile: KBUILD_OUTPUT is useless in rpm build
-Content-Type: text/plain; charset=GB2312
-Content-Transfer-Encoding: 7bit
+Subject: [PATCH 1/1] scripts/package/Makefile: remove useless KBUILD_OUTPUT test
+Date: Mon, 21 Jan 2013 15:28:05 +0800
+Message-Id: <1358753285-11812-1-git-send-email-wbin00@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc: Bin Wang <wbin00@gmail.com>
 
-I found KBUILD_OUTPUT variable is useless in the rpm-pkg and rpm target.
+The test of KBUILD_OUTPUT in "rpm-pkg rpm" target is useless.
+KBUILD_OUTPUT is always empty here.
 
-Yes there is a comment said:
+Signed-off-by: Bin Wang <wbin00@gmail.com>
+---
+ scripts/package/Makefile | 6 ------
+ 1 file changed, 6 deletions(-)
 
-# Note that the rpm-pkg target cannot be used with KBUILD_OUTPUT,
-# but the binrpm-pkg target can; for some reason O= gets ignored.
-
-It does not say for what reason. Also, the code under rpm-pkg checks if
-KBUILD_OUTPUT is defined.
-
-> @if test -n "$(KBUILD_OUTPUT)"; then \
-> echo "Building source + binary RPM is not possible outside the"; \
-> echo "kernel source tree. Don't set KBUILD_OUTPUT, or use the"; \
-> echo "binrpm-pkg target instead."; \
-> false; \
-> fi
-
-But the fact is, whether or not the user use "O=" option, KBUILD_OUTPUT
-is always empty. I try to figure out why but the big Makefile drives me
-crazy. I'm thinking if the "O=" option really don't effect KBUILD_OUTPUT
-here, at least remove these code.
-
+diff --git a/scripts/package/Makefile b/scripts/package/Makefile
+index 87bf080..ba073a6 100644
+--- a/scripts/package/Makefile
++++ b/scripts/package/Makefile
+@@ -36,12 +36,6 @@ $(objtree)/kernel.spec: $(MKSPEC) $(srctree)/Makefile
+ 	$(CONFIG_SHELL) $(MKSPEC) > $@
+ 
+ rpm-pkg rpm: $(objtree)/kernel.spec FORCE
+-	@if test -n "$(KBUILD_OUTPUT)"; then \
+-		echo "Building source + binary RPM is not possible outside the"; \
+-		echo "kernel source tree. Don't set KBUILD_OUTPUT, or use the"; \
+-		echo "binrpm-pkg target instead."; \
+-		false; \
+-	fi
+ 	$(MAKE) clean
+ 	$(PREV) ln -sf $(srctree) $(KERNELPATH)
+ 	$(CONFIG_SHELL) $(srctree)/scripts/setlocalversion --save-scmversion
 -- 
-Bin Wang
+1.7.11.7
+
