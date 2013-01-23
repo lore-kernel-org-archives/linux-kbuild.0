@@ -1,85 +1,81 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.skyhub.de ([78.46.96.112]:57252 "EHLO mail.skyhub.de"
+Received: from mail.skyhub.de ([78.46.96.112]:33214 "EHLO mail.skyhub.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754737Ab3AWL33 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 23 Jan 2013 06:29:29 -0500
-Date: Wed, 23 Jan 2013 12:32:21 +0100
+	id S1755091Ab3AWLjF (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 23 Jan 2013 06:39:05 -0500
+Date: Wed, 23 Jan 2013 12:41:57 +0100
 From: Borislav Petkov <bp@alien8.de>
-Subject: Re: [PATCH v4 00/13] Add gdb python scripts as kernel debugging
- helpers
-Message-ID: <20130123113221.GA4256@pd.tnic>
+Subject: Re: [PATCH v4 01/13] scripts/gdb: Add infrastructure
+Message-ID: <20130123114157.GB4256@pd.tnic>
 References: <cover.1358787929.git.jan.kiszka@siemens.com>
+ <1e49f090f16f3e22711a27f473e2ed604f6a249f.1358787929.git.jan.kiszka@siemens.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <cover.1358787929.git.jan.kiszka@siemens.com>
+In-Reply-To: <1e49f090f16f3e22711a27f473e2ed604f6a249f.1358787929.git.jan.kiszka@siemens.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Jan Kiszka <jan.kiszka@siemens.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org, Jason Wessel <jason.wessel@windriver.com>, kgdb-bugreport@lists.sourceforge.net, Andi Kleen <andi@firstfloor.org>, Tom Tromey <tromey@redhat.com>, Ben Widawsky <ben@bwidawsk.net>, "David S. Miller" <davem@davemloft.net>, Fenghua Yu <fenghua.yu@intel.com>, Kay Sievers <kay@vrfy.org>, linux-ia64@vger.kernel.org, linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>, sparclinux@vger.kernel.org, Tony Luck <tony.luck@intel.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org, Jason Wessel <jason.wessel@windriver.com>, kgdb-bugreport@lists.sourceforge.net, Andi Kleen <andi@firstfloor.org>, Tom Tromey <tromey@redhat.com>, Ben Widawsky <ben@bwidawsk.net>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
 
-Ok, first of all, I gotta say, this is very cool stuff, thanks for doing
-this. I'm playing with your tutorial and I'm having some trouble, see
-below:
+On Mon, Jan 21, 2013 at 06:06:08PM +0100, Jan Kiszka wrote:
+> This provides the basic infrastructure to load kernel-specific python
+> helper scripts when debugging the kernel in gdb.
+> 
+> The loading mechanism is based on gdb loading for <objfile>-gdb.py when
+> opening <objfile>. Therefore, this places a corresponding link to the
+> main helper script into the output directory that contains vmlinux.
+> 
+> The main scripts will pull in submodules containing Linux specific gdb
+> commands and functions. To avoid polluting the source directory with
+> compiled python modules, we link to them from the object directory.
+> 
+> Due to gdb.parse_and_eval, we depend on gdb >= 7.1. We need to
+> pre-process the version string returned by gdb as some distros tend to
+> prefix it with their name.
+> 
+> This feature depends on CONFIG_DEBUG_INFO.
+> 
+> CC: Michal Marek <mmarek@suse.cz>
+> CC: linux-kbuild@vger.kernel.org
+> Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
+> ---
+>  Makefile                   |    5 ++++-
+>  scripts/Makefile           |    3 ++-
+>  scripts/gdb/Makefile       |    9 +++++++++
+>  scripts/gdb/utils.py       |   17 +++++++++++++++++
+>  scripts/gdb/vmlinux-gdb.py |   22 ++++++++++++++++++++++
+>  5 files changed, 54 insertions(+), 2 deletions(-)
+>  create mode 100644 scripts/gdb/Makefile
+>  create mode 100644 scripts/gdb/utils.py
+>  create mode 100644 scripts/gdb/vmlinux-gdb.py
+> 
+> diff --git a/Makefile b/Makefile
+> index 253a455..fb18794 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -774,6 +774,9 @@ endif
+>  ifdef CONFIG_BUILD_DOCSRC
+>  	$(Q)$(MAKE) $(build)=Documentation
+>  endif
+> +ifdef CONFIG_DEBUG_INFO
+> +	$(Q)ln -fsn $(srctree)/scripts/gdb/vmlinux-gdb.py
+> +endif
 
-On Mon, Jan 21, 2013 at 06:06:07PM +0100, Jan Kiszka wrote:
->  o Let's examine the current task a bit:
->     (gdb) p ().pid
+I'm wondering whether it won't be a better idea to make this symlink
+creation in the toplevel directory only when a user requires it.. I.e.,
+not simply when CONFIG_DEBUG_INFO is enabled (it could be enabled for a
+lot and different reasons) but only when user wants to really debug the
+kernel with gdb.
 
-when I do that, it says:
+Then, having a specific make target could arrange for all the setup like
+the symlink, gdb version checking, etc, maybe something like this:
 
-(gdb) p ().pid
-A syntax error in expression, near `).pid'
+$ make gdb
 
-Here's what I do:
+and all is prepared (or errored out with a sensible message).
 
-$ gdb --data-directory $(pwd)/scripts/gdb/ ./vmlinux
-GNU gdb (GDB) 7.4.1-debian
-Copyright (C) 2012 Free Software Foundation, Inc.
-License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
-This is free software: you are free to change and redistribute it.
-There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
-and "show warranty" for details.
-This GDB was configured as "x86_64-linux-gnu".
-For bug reporting instructions, please see:
-<http://www.gnu.org/software/gdb/bugs/>...
-Reading symbols from /w/kernel/linux-2.6/vmlinux...done.
-(gdb) target remote :1234
-Remote debugging using :1234
-[New Thread 2]
-[Switching to Thread 2]
-default_idle () at arch/x86/kernel/process.c:391
-391             current_thread_info()->status |= TS_POLLING;
-(gdb) p ().pid
-A syntax error in expression, near `).pid'.
-(gdb) show data-directory
-GDB's data directory is "/w/kernel/linux-2.6/scripts/gdb/".
-(gdb) lx-symbols
-loading vmlinux
-no modules found
-(gdb) p ().pid
-A syntax error in expression, near `).pid'.
-(gdb)
-
-So, I thought I should point it explicitly to the python scripts with
---data-directory but it still doesn't fly. And gdb is 7.4.1 so it should
-be recent enough.
-
-lx-dmesg works, for example:
-
-(gdb) lx-dmesg
-[     0.000000] Linux version 3.8.0-rc4+ (boris@pd) (gcc version 4.7.2 (Debian 4.7.2-5) ) #2 SMP PREEMPT Wed Jan 23 11:59:58 CET 2013
-[     0.000000] Command line: vga=0 root=/dev/sda1 debug ignore_loglevel console=ttyS0,115200 console=tty0
-[     0.000000] e820: BIOS-provided physical RAM map:
-[     0.000000] BIOS-e820: [mem 0x0000000000000000-0x000000000009f3ff] usable
-[     0.000000] BIOS-e820: [mem 0x000000000009f400-0x000000000009ffff] reserved
-[     0.000000] BIOS-e820: [mem 0x00000000000f0000-0x00000000000fffff] reserved
-[     0.000000] BIOS-e820: [mem 0x0000000000100000-0x000000007fffdfff] usable
-...
-
-So what am I missing?
-
-Thanks.
+Hmm....
 
 -- 
 Regards/Gruss,
