@@ -1,39 +1,99 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from david.siemens.de ([192.35.17.14]:21339 "EHLO david.siemens.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754707Ab3AWMFK (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 23 Jan 2013 07:05:10 -0500
-Message-ID: <50FFD1B8.8050002@siemens.com>
-Date: Wed, 23 Jan 2013 13:04:08 +0100
-From: Jan Kiszka <jan.kiszka@siemens.com>
+Received: from mail-pb0-f41.google.com ([209.85.160.41]:47998 "EHLO
+	mail-pb0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753599Ab3AWN2x (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 23 Jan 2013 08:28:53 -0500
+Message-ID: <50FFE587.4020801@gmail.com>
+Date: Wed, 23 Jan 2013 21:28:39 +0800
+From: winton <newtonliuwen@gmail.com>
 MIME-Version: 1.0
-Subject: Re: [PATCH v4 01/13] scripts/gdb: Add infrastructure
-References: <cover.1358787929.git.jan.kiszka@siemens.com> <1e49f090f16f3e22711a27f473e2ed604f6a249f.1358787929.git.jan.kiszka@siemens.com> <20130123114157.GB4256@pd.tnic> <50FFCD04.2030207@siemens.com> <20130123120116.GC4256@pd.tnic>
-In-Reply-To: <20130123120116.GC4256@pd.tnic>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Subject: Security Kconfig is not common
+Content-Type: multipart/mixed;
+ boundary="------------040402040902090208050805"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Borislav Petkov <bp@alien8.de>, Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org, Jason Wessel <jason.wessel@windriver.com>, kgdb-bugreport@lists.sourceforge.net, Andi Kleen <andi@firstfloor.org>, Tom Tromey <tromey@redhat.com>, Ben Widawsky <ben@bwidawsk.net>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
+To: james.l.morris@oracle.com
+Cc: linux-security-module@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-On 2013-01-23 13:01, Borislav Petkov wrote:
-> On Wed, Jan 23, 2013 at 12:44:04PM +0100, Jan Kiszka wrote:
->> I wonder why we should do this, remove the convenience of the
->> automatic script setup, but I'm open for arguments.
-> 
-> Only one: you get the symlink
-> 
-> vmlinux-gdb.py -> /..../scripts/gdb/vmlinux-gdb.py
-> 
-> created automatically when CONFIG_DEBUG_INFO is enabled and people who
-> enable CONFIG_DEBUG_INFO for other reasons and don't want to use gdb to
-> debug the kernel don't need it but will get it anyway.
+This is a multi-part message in MIME format.
+--------------040402040902090208050805
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
 
-A lot of stuff is generated in the output directories during the kernel
-build, so I wonder if this one really matters.
+Hi James,
 
-Jan
+     Please help to review this patch.
+     When I analysis Kconfig files, I searched the keywork "source" and 
+then follow double quotations. The Kconfig in security is missing. 
+That's because security/Kconfig source keyword didn't using double 
+quotations.
+     Although that's may be not necessary. But I think the same as other 
+Kconfig files will be better.
 
+Best regards,
+Winton.Liu
+
+--------------040402040902090208050805
+Content-Type: text/x-patch;
+ name="0001-Security-Kconfig-not-common.patch"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+ filename="0001-Security-Kconfig-not-common.patch"
+
+From ccd2d4ddc01076570f23d3f4bfa5b3845a71524e Mon Sep 17 00:00:00 2001
+From: "winton.liu" <newtonliuwen@gmail.com>
+Date: Wed, 23 Jan 2013 21:08:33 +0800
+Subject: [PATCH] Security Kconfig not common
+
+Add dobule quotations in Kconfig source keyword.
+That makes Kconfig files the same as other Kconfig.
+It's more common.
+
+Signed-off-by: winton.liu <newtonliuwen@gmail.com>
+---
+ security/Kconfig           |   12 ++++++------
+ security/integrity/Kconfig |    4 ++--
+ 2 files changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/security/Kconfig b/security/Kconfig
+index ccc61f8..e6936f2 100644
+--- a/security/Kconfig
++++ b/security/Kconfig
+@@ -183,13 +183,13 @@ config LSM_MMAP_MIN_ADDR
+ 	  this low address space will need the permission specific to the
+ 	  systems running LSM.
+ 
+-source security/selinux/Kconfig
+-source security/smack/Kconfig
+-source security/tomoyo/Kconfig
+-source security/apparmor/Kconfig
+-source security/yama/Kconfig
++source "security/selinux/Kconfig"
++source "security/smack/Kconfig"
++source "security/tomoyo/Kconfig"
++source "security/apparmor/Kconfig"
++source "security/yama/Kconfig"
+ 
+-source security/integrity/Kconfig
++source "security/integrity/Kconfig"
+ 
+ choice
+ 	prompt "Default security module"
+diff --git a/security/integrity/Kconfig b/security/integrity/Kconfig
+index 5bd1cc1..ba9147d 100644
+--- a/security/integrity/Kconfig
++++ b/security/integrity/Kconfig
+@@ -17,5 +17,5 @@ config INTEGRITY_SIGNATURE
+ 	  This is useful for evm and module keyrings, when keys are
+ 	  usually only added from initramfs.
+ 
+-source security/integrity/ima/Kconfig
+-source security/integrity/evm/Kconfig
++source "security/integrity/ima/Kconfig"
++source "security/integrity/evm/Kconfig"
 -- 
-Siemens AG, Corporate Technology, CT RTC ITP SDP-DE
-Corporate Competence Center Embedded Linux
+1.7.9.5
+
+
+--------------040402040902090208050805--
