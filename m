@@ -1,55 +1,70 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wi0-f171.google.com ([209.85.212.171]:55356 "EHLO
-	mail-wi0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753220Ab3AXPXR (ORCPT
+Received: from smtp.snhosting.dk ([87.238.248.203]:34999 "EHLO
+	smtp.domainteam.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751902Ab3AXRlv (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 24 Jan 2013 10:23:17 -0500
-From: Tiana Rakotovao Andriamahefa <rkmahefa@gmail.com>
-Subject: [PATCH] scripts: kconfig: qconf.cc: fix a compiliation error when using make xconfig
-Date: Thu, 24 Jan 2013 16:20:39 +0000
-Message-Id: <1359044439-13647-1-git-send-email-rkmahefa@gmail.com>
+	Thu, 24 Jan 2013 12:41:51 -0500
+Date: Thu, 24 Jan 2013 18:41:48 +0100
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: [PATCH] Add Intel Ivy bridge CPU flags
+Message-ID: <20130124174148.GA15499@merkur.ravnborg.org>
+References: <51002135.2060302@theangrymob.co.uk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <51002135.2060302@theangrymob.co.uk>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: mmarek@suse.cz
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, rkmahefa@gmail.com
+To: Alec Bickerton <alec@theangrymob.co.uk>
+Cc: linux-kbuild@vger.kernel.org
 
-Le jeudi 24 janvier 2013 à 11:36:31, Michal Marek a écrit :
-> On 16.1.2013 13:26, Tiana Rakotovao Andriamahefa wrote:
-> > I have checked it and found that the error was effectively fixed in the last
-> > maintained upload of Qt3 in 2011. However, the correction is not yet in Wheezy
-> > (Debian testing) which I have used for more than a year. It might be
-> > included there one day!
-> > This is the case of Debian, but not all distros.
+On Wed, Jan 23, 2013 at 06:43:17PM +0100, Alec Bickerton wrote:
+> Hi,
 > 
-> OK. And it is dead upstream. So I'll apply your patch. Could you please
-> resend it? I deleted the email already.
+> I'd like to submit the attached patch to add Ivy Bridge processor support to the
+> processor type menu in menuconfig. Setting this configures the appropriate
+> CFLAGS (core-avx-i) for ivy bridge.
+> 
+> As this is my first kbuild patch, could somebody review it and let me know what
+> I've done wrong. ;-)
 
-Here is the patch.
+Like Michal I do not know about x86 - but a few things I noticed.
 
-When using make xconfig, the following compilation error appears :
-   /usr/include/qt3/qvaluelist.h:427:13: error: ‘ptrdiff_t’ does not name a type
-Including stddef.h in scripts/kconfig/qconf.cc permits to avoid this error.
+> 
+> Thanks
+> Alec.
 
-Signed-off-by: Tiana Rakotovao Andriamahefa <rkmahefa@gmail.com>
----
- scripts/kconfig/qconf.cc |    1 +
- 1 file changed, 1 insertion(+)
+> >From 2eaf7717da5b7f753c66e2158d29744aafbc2a0c Mon Sep 17 00:00:00 2001
+> From: Alec Bickerton <alec.bickerton@gmail.com>
+> Date: Mon, 1 Oct 2012 21:12:55 +0200
+> Subject: [PATCH] Added Ivy bridge to menu
+> 
+Signed-off-by: ... missing.
+See Documentation/SubmittingPatches (somethign like that)
 
-diff --git a/scripts/kconfig/qconf.cc b/scripts/kconfig/qconf.cc
-index df274fe..1500c38 100644
---- a/scripts/kconfig/qconf.cc
-+++ b/scripts/kconfig/qconf.cc
-@@ -6,6 +6,7 @@
- #include <qglobal.h>
- 
- #if QT_VERSION < 0x040000
-+#include <stddef.h>
- #include <qmainwindow.h>
- #include <qvbox.h>
- #include <qvaluelist.h>
--- 
-1.7.10.4
+> +config MIVYBRIDGE
+> +    bool "Intel Ivy Bridge"
+> +    --help--
+> +    
+> +      Select this foe Intel 3770K family processors.
+Use "  help" - in new stuff we try to avoid --help--
+Drop empty line between help and help text.
+Fix your spelling foe => for
+
+
+> --- a/arch/x86/Makefile_32.cpu
+> +++ b/arch/x86/Makefile_32.cpu
+> @@ -33,6 +33,7 @@ cflags-$(CONFIG_MCYRIXIII)	+= $(call cc-option,-march=c3,-march=i486) $(align)-f
+>  cflags-$(CONFIG_MVIAC3_2)	+= $(call cc-option,-march=c3-2,-march=i686)
+>  cflags-$(CONFIG_MVIAC7)		+= -march=i686
+>  cflags-$(CONFIG_MCORE2)		+= -march=i686 $(call tune,core2)
+> +cflags-$(CONFIG_MIVYBRIDGE)		+= -march=i686 $(call tune,core-avx-i)
+>  cflags-$(CONFIG_MATOM)		+= $(call cc-option,-march=atom,$(call cc-option,-march=core2,-march=i686)) \
+>  	$(call cc-option,-mtune=atom,$(call cc-option,-mtune=generic))
+
+Not a fault in your patch - but the x86 guys should learn to use the
+X86_ prefix on x86 specific config symbols :-(
+For consistency do not add it.
+
+	Sam
 
