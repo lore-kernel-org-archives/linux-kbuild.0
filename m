@@ -1,53 +1,55 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:35384 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754412Ab3AXLK7 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 24 Jan 2013 06:10:59 -0500
-Date: Thu, 24 Jan 2013 12:13:40 +0100
-From: Borislav Petkov <bp@suse.de>
-Subject: Re: [PATCH] Add Intel Ivy bridge CPU flags
-Message-ID: <20130124111340.GB13471@pd.tnic>
-References: <51002135.2060302@theangrymob.co.uk>
- <20130124105343.GA30701@sepie.suse.cz>
+Received: from mail-wi0-f171.google.com ([209.85.212.171]:55356 "EHLO
+	mail-wi0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753220Ab3AXPXR (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 24 Jan 2013 10:23:17 -0500
+From: Tiana Rakotovao Andriamahefa <rkmahefa@gmail.com>
+Subject: [PATCH] scripts: kconfig: qconf.cc: fix a compiliation error when using make xconfig
+Date: Thu, 24 Jan 2013 16:20:39 +0000
+Message-Id: <1359044439-13647-1-git-send-email-rkmahefa@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20130124105343.GA30701@sepie.suse.cz>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: Alec Bickerton <alec@theangrymob.co.uk>, linux-kbuild@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org
+To: mmarek@suse.cz
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, rkmahefa@gmail.com
 
-On Thu, Jan 24, 2013 at 11:53:43AM +0100, Michal Marek wrote:
-> On Wed, Jan 23, 2013 at 06:43:17PM +0100, Alec Bickerton wrote:
-> > Hi,
-> > 
-> > I'd like to submit the attached patch to add Ivy Bridge processor support to the
-> > processor type menu in menuconfig. Setting this configures the appropriate
-> > CFLAGS (core-avx-i) for ivy bridge.
-> > 
-> > As this is my first kbuild patch, could somebody review it and let me know what
-> > I've done wrong. ;-)
+Le jeudi 24 janvier 2013 à 11:36:31, Michal Marek a écrit :
+> On 16.1.2013 13:26, Tiana Rakotovao Andriamahefa wrote:
+> > I have checked it and found that the error was effectively fixed in the last
+> > maintained upload of Qt3 in 2011. However, the correction is not yet in Wheezy
+> > (Debian testing) which I have used for more than a year. It might be
+> > included there one day!
+> > This is the case of Debian, but not all distros.
 > 
-> You sent it to linux-kbuild instead of x86@kernel.org. The kbuild
-> maintainer is not really knowledgeable about gcc optimisation options ;).
-> Nevertheless, some random comments are below. Note that I am not
-> saying if the config option is useful or not.
+> OK. And it is dead upstream. So I'll apply your patch. Could you please
+> resend it? I deleted the email already.
 
-Normally, such optimizations have a little effect on the kernel because
-it doesn't normally use fpu stuff and the rest of the instructions
-we need, we add ourselves (see arch/x86/include/asm/archrandom.h for
-RDRAND, for example).
+Here is the patch.
 
-So, first we'd need persuasive benchmark numbers which show that a
-kernel built with core-avx-i is faster at some representative workload
-than mtune=generic one...
+When using make xconfig, the following compilation error appears :
+   /usr/include/qt3/qvaluelist.h:427:13: error: ‘ptrdiff_t’ does not name a type
+Including stddef.h in scripts/kconfig/qconf.cc permits to avoid this error.
 
-Thanks.
+Signed-off-by: Tiana Rakotovao Andriamahefa <rkmahefa@gmail.com>
+---
+ scripts/kconfig/qconf.cc |    1 +
+ 1 file changed, 1 insertion(+)
 
+diff --git a/scripts/kconfig/qconf.cc b/scripts/kconfig/qconf.cc
+index df274fe..1500c38 100644
+--- a/scripts/kconfig/qconf.cc
++++ b/scripts/kconfig/qconf.cc
+@@ -6,6 +6,7 @@
+ #include <qglobal.h>
+ 
+ #if QT_VERSION < 0x040000
++#include <stddef.h>
+ #include <qmainwindow.h>
+ #include <qvbox.h>
+ #include <qvaluelist.h>
 -- 
-Regards/Gruss,
-    Boris.
+1.7.10.4
 
-Sent from a fat crate under my desk. Formatting is fine.
---
