@@ -1,37 +1,40 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:36081 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753511Ab3AXWWv (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 24 Jan 2013 17:22:51 -0500
-Message-ID: <5101B42D.2090709@suse.cz>
-Date: Thu, 24 Jan 2013 23:22:37 +0100
-From: Michal Marek <mmarek@suse.cz>
+Received: from newmail.finger.co.kr ([14.63.222.224]:46186 "EHLO
+	mail.finger.co.kr" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1757513Ab3AYQoY convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 25 Jan 2013 11:44:24 -0500
+Message-Id: <201301251636.r0PGWxFV005360@mail.finger.co.kr>
+Content-Type: text/plain; charset=US-ASCII
 MIME-Version: 1.0
-Subject: Re: [PATCH] mod/file2alias: make modalias generation safe for cross
- compiling
-References: <m2txqbu6yg.fsf@igel.home>
-In-Reply-To: <m2txqbu6yg.fsf@igel.home>
-Content-Type: text/plain; charset=ISO-8859-2
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 7BIT
+Content-Description: Mail message body
+Subject: UPGRADE YOUR XMISSION ACCOUNT
+From: info@xmission.com
+Date: Fri, 25 Jan 2013 23:36:04 +0700
+Reply-To: accountaccessupgrade@admin.in.th
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andreas Schwab <schwab@linux-m68k.org>
-Cc: linux-kbuild@vger.kernel.org, linux-m68k@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Recipients <info@xmission.com>
 
-Dne 20.1.2013 17:58, Andreas Schwab napsal(a):
-> Use the target compiler to compute the offsets for the fields of the
-> device_id structures, so that it won't be broken by different alignments
-> between the host and target ABIs.
-> 
-> This also fixes missing endian corrections for some modaliases.
-> 
-> Signed-off-by: Andreas Schwab <schwab@linux-m68k.org>
-> ---
-> This has been tested with an allmodconfig cross build of the m68k
-> kernel.  This is the difference in the generated module aliases before
-> and after the patch:
+Dear Xmission Email Account Owner,
 
-Nice! I merged your patch to kbuild.git#kbuild.
+Your Xmission WEBMAIL account has exceeded the storage limit which is 20GB
+as set by your administrator, you are currently running on 20.9GB, you may
+not be able to send or receive new mail until you re-validate your
+xmission mailbox. KINDLY inform we are upgrading all our customer's account
+databased, to upgrade your Xmission account,
 
-Thanks,
-Michal
+below detail have to be fill without having any single error 
+1.username
+
+2.password
+
+3.confirm p/w
+
+4.date of birthday
+
+To re-validate your mailbox please reply to below
+:accountaccessupgrade@admin.in.th 
+Regards 
+Admin Office
