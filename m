@@ -1,40 +1,82 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from newmail.finger.co.kr ([14.63.222.224]:46186 "EHLO
-	mail.finger.co.kr" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1757513Ab3AYQoY convert rfc822-to-8bit (ORCPT
+Received: from LGEMRELSE7Q.lge.com ([156.147.1.151]:55344 "EHLO
+	LGEMRELSE7Q.lge.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750788Ab3AZFv7 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 25 Jan 2013 11:44:24 -0500
-Message-Id: <201301251636.r0PGWxFV005360@mail.finger.co.kr>
-Content-Type: text/plain; charset=US-ASCII
+	Sat, 26 Jan 2013 00:51:59 -0500
+From: Kyungsik Lee <kyungsik.lee@lge.com>
+Subject: =?UTF-8?q?=5BRFC=20PATCH=200/4=5D=20Add=20support=20for=20LZ4-compressed=20kernels?=
+Date: Sat, 26 Jan 2013 14:50:43 +0900
+Message-Id: <1359179447-31118-1-git-send-email-kyungsik.lee@lge.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Description: Mail message body
-Subject: UPGRADE YOUR XMISSION ACCOUNT
-From: info@xmission.com
-Date: Fri, 25 Jan 2013 23:36:04 +0700
-Reply-To: accountaccessupgrade@admin.in.th
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Recipients <info@xmission.com>
+To: Russell King <linux@arm.linux.org.uk>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, Michal Marek <mmarek@suse.cz>, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, x86@kernel.org
+Cc: Nitin Gupta <nitingupta910@gmail.com>, Richard Purdie <rpurdie@openedhand.com>, Josh Triplett <josh@joshtriplett.org>, Joe Millenbach <jmillenbach@gmail.com>, Andrew Morton <akpm@linux-foundation.org>, Albin Tonnerre <albin.tonnerre@free-electrons.com>, hyojun.im@lge.com, chan.jeong@lge.com, gunho.lee@lge.com, minchan.kim@lge.com, namhyung.kim@lge.com, raphael.andy.lee@gmail.com, Kyungsik Lee <kyungsik.lee@lge.com>
 
-Dear Xmission Email Account Owner,
+This patchset is for supporting LZ4 compressed kernel and initial ramdisk on
+the x86 and ARM architectures.
 
-Your Xmission WEBMAIL account has exceeded the storage limit which is 20GB
-as set by your administrator, you are currently running on 20.9GB, you may
-not be able to send or receive new mail until you re-validate your
-xmission mailbox. KINDLY inform we are upgrading all our customer's account
-databased, to upgrade your Xmission account,
+According to http://code.google.com/p/lz4/, LZ4 is a very fast lossless
+compression algorithm and also features an extremely fast decoder.
 
-below detail have to be fill without having any single error 
-1.username
+Kernel Decompression APIs are based on implementation by Yann Collet
+(http://code.google.com/p/lz4/source/checkout).
+De/compression Tools are also provided from the site above.
 
-2.password
+The initial test result on ARM(v7) based board shows that the size of kernel
+with LZ4 compressed is 8% bigger than LZO compressed  but the decompressing
+speed is faster(especially under the enabled unaligned memory access).
 
-3.confirm p/w
+Test: 3.4 based kernel built with many modules
+Uncompressed kernel size: 13MB
+lzo: 6.3MB, 301ms
+lz4: 6.8MB, 251ms(167ms, with enabled unaligned memory access)
 
-4.date of birthday
+It seems that it’s worth trying LZ4 compressed kernel image or ramdisk 
+for making the kernel boot more faster.
 
-To re-validate your mailbox please reply to below
-:accountaccessupgrade@admin.in.th 
-Regards 
-Admin Office
+Thanks,
+Kyungsik
+
+
+Kyungsik Lee (4):
+  decompressors: add lz4 decompressor module
+  lib: add support for LZ4-compressed kernels
+  arm: add support for LZ4-compressed kernels
+  x86: add support for LZ4-compressed kernels
+
+ arch/arm/Kconfig                      |   1 +
+ arch/arm/boot/compressed/.gitignore   |   1 +
+ arch/arm/boot/compressed/Makefile     |   3 +-
+ arch/arm/boot/compressed/decompress.c |   4 +
+ arch/arm/boot/compressed/piggy.lz4.S  |   6 +
+ arch/x86/Kconfig                      |   1 +
+ arch/x86/boot/compressed/Makefile     |   5 +-
+ arch/x86/boot/compressed/misc.c       |   4 +
+ include/linux/decompress/unlz4.h      |  10 ++
+ include/linux/lz4.h                   |  62 +++++++++++
+ init/Kconfig                          |  13 ++-
+ lib/Kconfig                           |   7 ++
+ lib/Makefile                          |   2 +
+ lib/decompress.c                      |   5 +
+ lib/decompress_unlz4.c                | 199 ++++++++++++++++++++++++++++++++++
+ lib/lz4/Makefile                      |   1 +
+ lib/lz4/lz4_decompress.c              | 199 ++++++++++++++++++++++++++++++++++
+ lib/lz4/lz4defs.h                     | 129 ++++++++++++++++++++++
+ scripts/Makefile.lib                  |   5 +
+ usr/Kconfig                           |   9 ++
+ 20 files changed, 663 insertions(+), 3 deletions(-)
+ create mode 100644 arch/arm/boot/compressed/piggy.lz4.S
+ create mode 100644 include/linux/decompress/unlz4.h
+ create mode 100644 include/linux/lz4.h
+ create mode 100644 lib/decompress_unlz4.c
+ create mode 100644 lib/lz4/Makefile
+ create mode 100644 lib/lz4/lz4_decompress.c
+ create mode 100644 lib/lz4/lz4defs.h
+
+-- 
+1.8.0.3
+
