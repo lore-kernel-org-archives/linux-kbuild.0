@@ -1,53 +1,85 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.skyhub.de ([78.46.96.112]:59270 "EHLO mail.skyhub.de"
+Received: from cantor2.suse.de ([195.135.220.15]:49281 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1756258Ab3A2OPU (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 29 Jan 2013 09:15:20 -0500
-Date: Tue, 29 Jan 2013 15:15:18 +0100
-From: Borislav Petkov <bp@alien8.de>
-Subject: Re: [PATCH v5 00/20] Add gdb python scripts as kernel debugging
- helpers
-Message-ID: <20130129141518.GI14302@pd.tnic>
-References: <cover.1359463075.git.jan.kiszka@siemens.com>
+	id S1751326Ab3A2WzT (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 29 Jan 2013 17:55:19 -0500
+Date: Tue, 29 Jan 2013 23:55:14 +0100
+From: David Sterba <dsterba@suse.cz>
+Subject: Re: [RFC PATCH 0/4] Add support for LZ4-compressed kernels
+Message-ID: <20130129225508.GC30535@twin.jikos.cz>
+Reply-To: dsterba@suse.cz
+References: <1359179447-31118-1-git-send-email-kyungsik.lee@lge.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <cover.1359463075.git.jan.kiszka@siemens.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <1359179447-31118-1-git-send-email-kyungsik.lee@lge.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jan Kiszka <jan.kiszka@siemens.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org, Jason Wessel <jason.wessel@windriver.com>, kgdb-bugreport@lists.sourceforge.net, Andi Kleen <andi@firstfloor.org>, Tom Tromey <tromey@redhat.com>, Ben Widawsky <ben@bwidawsk.net>, "David S. Miller" <davem@davemloft.net>, Fenghua Yu <fenghua.yu@intel.com>, Kay Sievers <kay@vrfy.org>, linux-doc@vger.kernel.org, linux-ia64@vger.kernel.org, linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Rob Landley <rob@landley.net>, sparclinux@vger.kernel.org, Tony Luck <tony.luck@intel.com>
+To: Kyungsik Lee <kyungsik.lee@lge.com>
+Cc: Russell King <linux@arm.linux.org.uk>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, Michal Marek <mmarek@suse.cz>, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, x86@kernel.org, Nitin Gupta <nitingupta910@gmail.com>, Richard Purdie <rpurdie@openedhand.com>, Josh Triplett <josh@joshtriplett.org>, Joe Millenbach <jmillenbach@gmail.com>, Andrew Morton <akpm@linux-foundation.org>, Albin Tonnerre <albin.tonnerre@free-electrons.com>, hyojun.im@lge.com, chan.jeong@lge.com, gunho.lee@lge.com, minchan.kim@lge.com, namhyung.kim@lge.com, raphael.andy.lee@gmail.com
 
-On Tue, Jan 29, 2013 at 01:37:43PM +0100, Jan Kiszka wrote:
-> Version 5 comes with the following changes:
->  - moved tutorial into Documentation/gdb-kernel-debugging.txt
->  - improved caching of gdb.Type objects, ensure they are in sync with
->    currently loaded symbols
->  - added new functions and commands
->     - lx_module -- Find module by name and return the module variable
->     - lx_modvar -- Return global variable of a module
->     - lx-lsmod -- List currently loaded modules
-> 
-> See http://lkml.indiana.edu/hypermail/linux/kernel/1210.0/01598.html for
-> the original description and
-> 
->     git://git.kiszka.org/linux.git queues/gdb-scripts
-> 
-> for the latest version.
+On Sat, Jan 26, 2013 at 02:50:43PM +0900, Kyungsik Lee wrote:
+> This patchset is for supporting LZ4 compressed kernel and initial ramdisk on
+> the x86 and ARM architectures.
 
-Ok, I've seldomly shown any feelings when acking a patch{,set} besides
-maybe "hm, ok, fine" but this patchset is very very cool and it is an
-enormous fun playing with it.
+Have you considered the 'high compression' mode of lz4?
+http://code.google.com/p/lz4/source/browse/trunk/lz4hc.c
 
-So maybe this is the most enthusiasm I've shown sofar:
+The compression format remains the same, the compressor tries harder
+(but is slower), resulting compression ratio is better.
 
-Emphatically-acked-by: Borislav Petkov <bp@suse.de>
+an examle compression for vmlinux.bin of x86_64 build:
 
-Thanks Jan, very good work!
+input size: 16509520 bytes
 
--- 
-Regards/Gruss,
-    Boris.
+lz4 (svn 88):
+output size:        6393684    (38.7%)
+compression time:      41.7 ms (395 MB/s)
+decompression time:    13.7 ms (1204 MB/s)
 
-Sent from a fat crate under my desk. Formatting is fine.
---
+lz4hc (svn 88):
+output size:        5319137    (32.2%)
+compression time:       683 ms (24 MB/s)
+decompression time:    13.1 ms (1259 MB/s)
+
+compressed file delta: 6393684 - 5319137 = 1074547 ~ 1MB
+
+tested on a Nehalem box; same test on my slow desktop gives
+
+lz4:
+compression time:      97   ms (169 MB/s)
+decompression time:    25.7 ms (643 MB/s)
+
+lz4hc:
+compression time:    1386 ms (11 MB/s)
+decompression time:    26 ms (619 MB/s)
+
+While the decompression time is almost the same, image size is smaller.
+The kernel image compression is run in userspace and the low speed is
+not much of concern for a one-time operation.
+
+For the reference, lzo (current kernel version) run on the destktop:
+
+output size:         6026256 (36.5%)
+decompression time:     79.6 ms (207 MB/s)
+
+> It seems that it’s worth trying LZ4 compressed kernel image or ramdisk 
+> for making the kernel boot more faster.
+
+There's another potential user of lz4: btrfs. I've submitted a feature
+preview integrating lz4 compression
+http://thread.gmane.org/gmane.comp.file-systems.btrfs/15744
+and we have tried to integrate the HC mode as well
+http://thread.gmane.org/gmane.comp.file-systems.btrfs/18165
+.
+So far it's on a slow track, conceptually it works, but I the code needs
+some work so it could live under lib/* (we've used the svn sources
+with minor changes, no kernel coding style). It would be easier for me
+to enhance the existing lib/lz4/* codebase.
+
+Also zram could consider lz4, I'm not sure if there are other potential
+users.
+
+
+david
