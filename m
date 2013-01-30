@@ -1,44 +1,70 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:37118 "EHLO mx2.suse.de"
+Received: from bar.sig21.net ([80.81.252.164]:53328 "EHLO bar.sig21.net"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751303Ab3A3JR7 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 30 Jan 2013 04:17:59 -0500
-Date: Wed, 30 Jan 2013 10:17:57 +0100
-From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [PATCH] scripts: kconfig: qconf.cc: fix a compiliation error
- when using make xconfig
-Message-ID: <20130130091757.GA3275@sepie.suse.cz>
-References: <1359044439-13647-1-git-send-email-rkmahefa@gmail.com>
+	id S1754449Ab3A3LJK (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 30 Jan 2013 06:09:10 -0500
+Date: Wed, 30 Jan 2013 11:23:53 +0100
+From: Johannes Stezenbach <js@sig21.net>
+Subject: Re: [RFC PATCH 0/4] Add support for LZ4-compressed kernels
+Message-ID: <20130130102353.GA8925@sig21.net>
+References: <1359179447-31118-1-git-send-email-kyungsik.lee@lge.com>
+ <20130128142510.68092e10.akpm@linux-foundation.org>
+ <alpine.LFD.2.02.1301282320430.6300@xanadu.home>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <1359044439-13647-1-git-send-email-rkmahefa@gmail.com>
+In-Reply-To: <alpine.LFD.2.02.1301282320430.6300@xanadu.home>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Tiana Rakotovao Andriamahefa <rkmahefa@gmail.com>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Nicolas Pitre <nico@fluxnic.net>
+Cc: Andrew Morton <akpm@linux-foundation.org>, Kyungsik Lee <kyungsik.lee@lge.com>, Russell King <linux@arm.linux.org.uk>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, Michal Marek <mmarek@suse.cz>, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, x86@kernel.org, Nitin Gupta <nitingupta910@gmail.com>, Richard Purdie <rpurdie@openedhand.com>, Josh Triplett <josh@joshtriplett.org>, Joe Millenbach <jmillenbach@gmail.com>, Albin Tonnerre <albin.tonnerre@free-electrons.com>, hyojun.im@lge.com, chan.jeong@lge.com, gunho.lee@lge.com, minchan.kim@lge.com, namhyung.kim@lge.com, raphael.andy.lee@gmail.com, CE Linux Developers List <celinux-dev@lists.celinuxforum.org>, "Markus F.X.J. Oberhumer" <markus@oberhumer.com>
 
-On Thu, Jan 24, 2013 at 04:20:39PM +0000, Tiana Rakotovao Andriamahefa wrote:
-> Le jeudi 24 janvier 2013 à 11:36:31, Michal Marek a écrit :
-> > On 16.1.2013 13:26, Tiana Rakotovao Andriamahefa wrote:
-> > > I have checked it and found that the error was effectively fixed in the last
-> > > maintained upload of Qt3 in 2011. However, the correction is not yet in Wheezy
-> > > (Debian testing) which I have used for more than a year. It might be
-> > > included there one day!
-> > > This is the case of Debian, but not all distros.
+On Mon, Jan 28, 2013 at 11:29:14PM -0500, Nicolas Pitre wrote:
+> On Mon, 28 Jan 2013, Andrew Morton wrote:
+> 
+> > On Sat, 26 Jan 2013 14:50:43 +0900
+> > Kyungsik Lee <kyungsik.lee@lge.com> wrote:
 > > 
-> > OK. And it is dead upstream. So I'll apply your patch. Could you please
-> > resend it? I deleted the email already.
+> > > This patchset is for supporting LZ4 compressed kernel and initial ramdisk on
+> > > the x86 and ARM architectures.
+> > > 
+> > > According to http://code.google.com/p/lz4/, LZ4 is a very fast lossless
+> > > compression algorithm and also features an extremely fast decoder.
+> > > 
+> > > Kernel Decompression APIs are based on implementation by Yann Collet
+> > > (http://code.google.com/p/lz4/source/checkout).
+> > > De/compression Tools are also provided from the site above.
+> > > 
+> > > The initial test result on ARM(v7) based board shows that the size of kernel
+> > > with LZ4 compressed is 8% bigger than LZO compressed  but the decompressing
+> > > speed is faster(especially under the enabled unaligned memory access).
+> > > 
+> > > Test: 3.4 based kernel built with many modules
+> > > Uncompressed kernel size: 13MB
+> > > lzo: 6.3MB, 301ms
+> > > lz4: 6.8MB, 251ms(167ms, with enabled unaligned memory access)
+> > 
+> > What's this "with enabled unaligned memory access" thing?  You mean "if
+> > the arch supports CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS"?  If so,
+> > that's only x86, which isn't really in the target market for this
+> > patch, yes?
 > 
-> Here is the patch.
+> I'm guessing this is referring to commit 5010192d5a.
 > 
-> When using make xconfig, the following compilation error appears :
->    /usr/include/qt3/qvaluelist.h:427:13: error: ‘ptrdiff_t’ does not name a type
-> Including stddef.h in scripts/kconfig/qconf.cc permits to avoid this error.
+> > It's a lot of code for a 50ms boot-time improvement.  Does anyone have
+> > any opinions on whether or not the benefits are worth the cost?
 > 
-> Signed-off-by: Tiana Rakotovao Andriamahefa <rkmahefa@gmail.com>
+> Well, we used to have only one compressed format.  Now we have nearly 
+> half a dozen, with the same worthiness issue between themselves.  
+> Either we keep it very simple, or we make it very flexible.  The former 
+> would argue in favor of removing some of the existing formats, the later 
+> would let this new format in.
 
-Thanks, applied to kbuild.git#kconfig.
+This reminded me to check the status of the lzo update and it
+seems it got lost?
+http://lkml.org/lkml/2012/10/3/144
 
-Michal
+(Cc: added, I hope Markus still cares and someone could
+eventually take his patch once he resends it.)
+
+Johannes
