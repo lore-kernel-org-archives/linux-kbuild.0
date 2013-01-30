@@ -1,85 +1,44 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:49281 "EHLO mx2.suse.de"
+Received: from terminus.zytor.com ([198.137.202.10]:44715 "EHLO mail.zytor.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751326Ab3A2WzT (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 29 Jan 2013 17:55:19 -0500
-Date: Tue, 29 Jan 2013 23:55:14 +0100
-From: David Sterba <dsterba@suse.cz>
-Subject: Re: [RFC PATCH 0/4] Add support for LZ4-compressed kernels
-Message-ID: <20130129225508.GC30535@twin.jikos.cz>
-Reply-To: dsterba@suse.cz
-References: <1359179447-31118-1-git-send-email-kyungsik.lee@lge.com>
+	id S1752434Ab3A3Deo (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 29 Jan 2013 22:34:44 -0500
+Message-ID: <510894C3.1020605@zytor.com>
+Date: Tue, 29 Jan 2013 19:34:27 -0800
+From: "H. Peter Anvin" <hpa@zytor.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <1359179447-31118-1-git-send-email-kyungsik.lee@lge.com>
+Subject: Re: [PATCH] Add Intel Ivy bridge CPU flags
+References: <51002135.2060302@theangrymob.co.uk> <20130124174148.GA15499@merkur.ravnborg.org>
+In-Reply-To: <20130124174148.GA15499@merkur.ravnborg.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Kyungsik Lee <kyungsik.lee@lge.com>
-Cc: Russell King <linux@arm.linux.org.uk>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, Michal Marek <mmarek@suse.cz>, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, x86@kernel.org, Nitin Gupta <nitingupta910@gmail.com>, Richard Purdie <rpurdie@openedhand.com>, Josh Triplett <josh@joshtriplett.org>, Joe Millenbach <jmillenbach@gmail.com>, Andrew Morton <akpm@linux-foundation.org>, Albin Tonnerre <albin.tonnerre@free-electrons.com>, hyojun.im@lge.com, chan.jeong@lge.com, gunho.lee@lge.com, minchan.kim@lge.com, namhyung.kim@lge.com, raphael.andy.lee@gmail.com
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: Alec Bickerton <alec@theangrymob.co.uk>, linux-kbuild@vger.kernel.org
 
-On Sat, Jan 26, 2013 at 02:50:43PM +0900, Kyungsik Lee wrote:
-> This patchset is for supporting LZ4 compressed kernel and initial ramdisk on
-> the x86 and ARM architectures.
+On 01/24/2013 09:41 AM, Sam Ravnborg wrote:
+>
+>> --- a/arch/x86/Makefile_32.cpu
+>> +++ b/arch/x86/Makefile_32.cpu
+>> @@ -33,6 +33,7 @@ cflags-$(CONFIG_MCYRIXIII)	+= $(call cc-option,-march=c3,-march=i486) $(align)-f
+>>   cflags-$(CONFIG_MVIAC3_2)	+= $(call cc-option,-march=c3-2,-march=i686)
+>>   cflags-$(CONFIG_MVIAC7)		+= -march=i686
+>>   cflags-$(CONFIG_MCORE2)		+= -march=i686 $(call tune,core2)
+>> +cflags-$(CONFIG_MIVYBRIDGE)		+= -march=i686 $(call tune,core-avx-i)
+>>   cflags-$(CONFIG_MATOM)		+= $(call cc-option,-march=atom,$(call cc-option,-march=core2,-march=i686)) \
+>>   	$(call cc-option,-mtune=atom,$(call cc-option,-mtune=generic))
+>
+> Not a fault in your patch - but the x86 guys should learn to use the
+> X86_ prefix on x86 specific config symbols :-(
+> For consistency do not add it.
+>
 
-Have you considered the 'high compression' mode of lz4?
-http://code.google.com/p/lz4/source/browse/trunk/lz4hc.c
+These are some of the oldest config symbols in the entire kernel.
 
-The compression format remains the same, the compressor tries harder
-(but is slower), resulting compression ratio is better.
+	-hpa
 
-an examle compression for vmlinux.bin of x86_64 build:
+-- 
+H. Peter Anvin, Intel Open Source Technology Center
+I work for Intel.  I don't speak on their behalf.
 
-input size: 16509520 bytes
-
-lz4 (svn 88):
-output size:        6393684    (38.7%)
-compression time:      41.7 ms (395 MB/s)
-decompression time:    13.7 ms (1204 MB/s)
-
-lz4hc (svn 88):
-output size:        5319137    (32.2%)
-compression time:       683 ms (24 MB/s)
-decompression time:    13.1 ms (1259 MB/s)
-
-compressed file delta: 6393684 - 5319137 = 1074547 ~ 1MB
-
-tested on a Nehalem box; same test on my slow desktop gives
-
-lz4:
-compression time:      97   ms (169 MB/s)
-decompression time:    25.7 ms (643 MB/s)
-
-lz4hc:
-compression time:    1386 ms (11 MB/s)
-decompression time:    26 ms (619 MB/s)
-
-While the decompression time is almost the same, image size is smaller.
-The kernel image compression is run in userspace and the low speed is
-not much of concern for a one-time operation.
-
-For the reference, lzo (current kernel version) run on the destktop:
-
-output size:         6026256 (36.5%)
-decompression time:     79.6 ms (207 MB/s)
-
-> It seems that it’s worth trying LZ4 compressed kernel image or ramdisk 
-> for making the kernel boot more faster.
-
-There's another potential user of lz4: btrfs. I've submitted a feature
-preview integrating lz4 compression
-http://thread.gmane.org/gmane.comp.file-systems.btrfs/15744
-and we have tried to integrate the HC mode as well
-http://thread.gmane.org/gmane.comp.file-systems.btrfs/18165
-.
-So far it's on a slow track, conceptually it works, but I the code needs
-some work so it could live under lib/* (we've used the svn sources
-with minor changes, no kernel coding style). It would be easier for me
-to enhance the existing lib/lz4/* codebase.
-
-Also zram could consider lz4, I'm not sure if there are other potential
-users.
-
-
-david
