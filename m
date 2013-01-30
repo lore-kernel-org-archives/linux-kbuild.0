@@ -1,59 +1,44 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from terminus.zytor.com ([198.137.202.10]:44767 "EHLO mail.zytor.com"
+Received: from cantor2.suse.de ([195.135.220.15]:37118 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752434Ab3A3Djx (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 29 Jan 2013 22:39:53 -0500
-Message-ID: <51089523.3080804@zytor.com>
-Date: Tue, 29 Jan 2013 19:36:03 -0800
-From: "H. Peter Anvin" <hpa@zytor.com>
+	id S1751303Ab3A3JR7 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 30 Jan 2013 04:17:59 -0500
+Date: Wed, 30 Jan 2013 10:17:57 +0100
+From: Michal Marek <mmarek@suse.cz>
+Subject: Re: [PATCH] scripts: kconfig: qconf.cc: fix a compiliation error
+ when using make xconfig
+Message-ID: <20130130091757.GA3275@sepie.suse.cz>
+References: <1359044439-13647-1-git-send-email-rkmahefa@gmail.com>
 MIME-Version: 1.0
-Subject: Re: [RFC PATCH 0/4] Add support for LZ4-compressed kernels
-References: <1359179447-31118-1-git-send-email-kyungsik.lee@lge.com> <20130128142510.68092e10.akpm@linux-foundation.org> <20130129101549.GP23505@n2100.arm.linux.org.uk>
-In-Reply-To: <20130129101549.GP23505@n2100.arm.linux.org.uk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <1359044439-13647-1-git-send-email-rkmahefa@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Russell King - ARM Linux <linux@arm.linux.org.uk>
-Cc: Andrew Morton <akpm@linux-foundation.org>, Kyungsik Lee <kyungsik.lee@lge.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Michal Marek <mmarek@suse.cz>, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, x86@kernel.org, Nitin Gupta <nitingupta910@gmail.com>, Richard Purdie <rpurdie@openedhand.com>, Josh Triplett <josh@joshtriplett.org>, Joe Millenbach <jmillenbach@gmail.com>, Albin Tonnerre <albin.tonnerre@free-electrons.com>, hyojun.im@lge.com, chan.jeong@lge.com, gunho.lee@lge.com, minchan.kim@lge.com, namhyung.kim@lge.com, raphael.andy.lee@gmail.com, CE Linux Developers List <celinux-dev@lists.celinuxforum.org>
+To: Tiana Rakotovao Andriamahefa <rkmahefa@gmail.com>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On 01/29/2013 02:15 AM, Russell King - ARM Linux wrote:
-> On Mon, Jan 28, 2013 at 02:25:10PM -0800, Andrew Morton wrote:
->> What's this "with enabled unaligned memory access" thing?  You mean "if
->> the arch supports CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS"?  If so,
->> that's only x86, which isn't really in the target market for this
->> patch, yes?
->>
->> It's a lot of code for a 50ms boot-time improvement.  Does anyone have
->> any opinions on whether or not the benefits are worth the cost?
->
-> Well... when I saw this my immediate reaction was "oh no, yet another
-> decompressor for the kernel".  We have five of these things already.
-> Do we really need a sixth?
->
-> My feeling is that we should have:
-> - one decompressor which is the fastest
-> - one decompressor for the highest compression ratio
-> - one popular decompressor (eg conventional gzip)
->
-> And if we have a replacement one for one of these, then it should do
-> exactly that: replace it.  I realise that various architectures will
-> behave differently, so we should really be looking at numbers across
-> several arches.
->
-> Otherwise, where do we stop adding new ones?  After we have 6 of these
-> (which is after this one).  After 12?  After the 20th?
->
+On Thu, Jan 24, 2013 at 04:20:39PM +0000, Tiana Rakotovao Andriamahefa wrote:
+> Le jeudi 24 janvier 2013 à 11:36:31, Michal Marek a écrit :
+> > On 16.1.2013 13:26, Tiana Rakotovao Andriamahefa wrote:
+> > > I have checked it and found that the error was effectively fixed in the last
+> > > maintained upload of Qt3 in 2011. However, the correction is not yet in Wheezy
+> > > (Debian testing) which I have used for more than a year. It might be
+> > > included there one day!
+> > > This is the case of Debian, but not all distros.
+> > 
+> > OK. And it is dead upstream. So I'll apply your patch. Could you please
+> > resend it? I deleted the email already.
+> 
+> Here is the patch.
+> 
+> When using make xconfig, the following compilation error appears :
+>    /usr/include/qt3/qvaluelist.h:427:13: error: ‘ptrdiff_t’ does not name a type
+> Including stddef.h in scripts/kconfig/qconf.cc permits to avoid this error.
+> 
+> Signed-off-by: Tiana Rakotovao Andriamahefa <rkmahefa@gmail.com>
 
-The only concern I have with that is if someone paints themselves into a 
-corner and absolutely wants, say, LZO.
+Thanks, applied to kbuild.git#kconfig.
 
-Otherwise, per your list it pretty much sounds like we should have lz4, 
-gzip, and xz.
-
-	-hpa
-
--- 
-H. Peter Anvin, Intel Open Source Technology Center
-I work for Intel.  I don't speak on their behalf.
-
+Michal
