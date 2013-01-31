@@ -1,67 +1,122 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from relais.videotron.ca ([24.201.245.36]:14718 "EHLO
-	relais.videotron.ca" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756098Ab3A3Sdt (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 30 Jan 2013 13:33:49 -0500
-MIME-version: 1.0
-Content-transfer-encoding: 7BIT
-Content-type: TEXT/PLAIN; CHARSET=US-ASCII
-Date: Wed, 30 Jan 2013 13:33:47 -0500 (EST)
-From: Nicolas Pitre <nico@fluxnic.net>
-Subject: Re: [RFC PATCH 0/4] Add support for LZ4-compressed kernels
-In-reply-to: <51089523.3080804@zytor.com>
-Message-id: <alpine.LFD.2.02.1301301326530.6300@xanadu.home>
-References: <1359179447-31118-1-git-send-email-kyungsik.lee@lge.com>
- <20130128142510.68092e10.akpm@linux-foundation.org>
- <20130129101549.GP23505@n2100.arm.linux.org.uk> <51089523.3080804@zytor.com>
+Received: from multi.imgtec.com ([194.200.65.239]:53440 "EHLO multi.imgtec.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752950Ab3AaJms (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 31 Jan 2013 04:42:48 -0500
+From: James Hogan <james.hogan@imgtec.com>
+Subject: [PATCH 1/1] depmod: pass -P $CONFIG_SYMBOL_PREFIX
+Date: Thu, 31 Jan 2013 09:41:43 +0000
+Message-ID: <1359625303-11842-1-git-send-email-james.hogan@imgtec.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "H. Peter Anvin" <hpa@zytor.com>
-Cc: Russell King - ARM Linux <linux@arm.linux.org.uk>, Michal Marek <mmarek@suse.cz>, hyojun.im@lge.com, raphael.andy.lee@gmail.com, linux-kbuild@vger.kernel.org, gunho.lee@lge.com, namhyung.kim@lge.com, x86@kernel.org, minchan.kim@lge.com, linux-kernel@vger.kernel.org, Josh Triplett <josh@joshtriplett.org>, Nitin Gupta <nitingupta910@gmail.com>, Richard Purdie <rpurdie@openedhand.com>, Ingo Molnar <mingo@redhat.com>, Joe Millenbach <jmillenbach@gmail.com>, chan.jeong@lge.com, Kyungsik Lee <kyungsik.lee@lge.com>, Andrew Morton <akpm@linux-foundation.org>, Albin Tonnerre <albin.tonnerre@free-electrons.com>, CE Linux Developers List <celinux-dev@lists.celinuxforum.org>, Thomas Gleixner <tglx@linutronix.de>, linux-arm-kernel@lists.infradead.org
+To: linux-kernel@vger.kernel.org
+Cc: James Hogan <james.hogan@imgtec.com>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, Mike Frysinger <vapier@gentoo.org>, Yoshinori Sato <ysato@users.sourceforge.jp>, uclinux-dist-devel@blackfin.uclinux.org
 
-On Tue, 29 Jan 2013, H. Peter Anvin wrote:
+On architectures which have symbol prefixes, depmod emits lots of false
+warnings like this:
 
-> On 01/29/2013 02:15 AM, Russell King - ARM Linux wrote:
-> > On Mon, Jan 28, 2013 at 02:25:10PM -0800, Andrew Morton wrote:
-> > > What's this "with enabled unaligned memory access" thing?  You mean "if
-> > > the arch supports CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS"?  If so,
-> > > that's only x86, which isn't really in the target market for this
-> > > patch, yes?
-> > > 
-> > > It's a lot of code for a 50ms boot-time improvement.  Does anyone have
-> > > any opinions on whether or not the benefits are worth the cost?
-> > 
-> > Well... when I saw this my immediate reaction was "oh no, yet another
-> > decompressor for the kernel".  We have five of these things already.
-> > Do we really need a sixth?
-> > 
-> > My feeling is that we should have:
-> > - one decompressor which is the fastest
-> > - one decompressor for the highest compression ratio
-> > - one popular decompressor (eg conventional gzip)
-> > 
-> > And if we have a replacement one for one of these, then it should do
-> > exactly that: replace it.  I realise that various architectures will
-> > behave differently, so we should really be looking at numbers across
-> > several arches.
-> > 
-> > Otherwise, where do we stop adding new ones?  After we have 6 of these
-> > (which is after this one).  After 12?  After the 20th?
-> > 
-> 
-> The only concern I have with that is if someone paints themselves into a
-> corner and absolutely wants, say, LZO.
+WARNING: $module.ko needs unknown symbol $symbol
 
-That would be hard to justify given that the kernel provides its own 
-decompressor code, making the compression format transparent to 
-bootloaders, etc.  And no one should be poking into the compressed 
-zImage.
+This is because depmod isn't being passed the -P <symbol_prefix>
+arguments to specify the symbol prefix to ignore. This option is
+included since the 3.13 release of module-init-tools.
 
-> Otherwise, per your list it pretty much sounds like we should have lz4, gzip,
-> and xz.
+Update scripts/depmod.sh to take extra arguments which are passed
+through directly to depmod, and update the main Makefile to pass
+-P $(CONFIG_SYMBOL_PREFIX to scripts/depmod.sh, but only if
+CONFIG_SYMBOL_PREFIX is set and non-empty.
 
-I do agree with that.
+scripts/depmod.sh also drops the -P arguments if depmod --version
+reports module-init-tools with a version number < 3.13.
+
+Signed-off-by: James Hogan <james.hogan@imgtec.com>
+Cc: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org
+Cc: Mike Frysinger <vapier@gentoo.org>
+Cc: Yoshinori Sato <ysato@users.sourceforge.jp>
+Cc: uclinux-dist-devel@blackfin.uclinux.org
+---
+My shell-fu isn't great, so all comments for improvements appreciated.
+
+ Makefile          |    6 +++++-
+ scripts/depmod.sh |   27 +++++++++++++++++++++++----
+ 2 files changed, 28 insertions(+), 5 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 2d3c92c..89e41d4 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1394,10 +1394,14 @@ quiet_cmd_rmdirs = $(if $(wildcard $(rm-dirs)),CLEAN   $(wildcard $(rm-dirs)))
+ quiet_cmd_rmfiles = $(if $(wildcard $(rm-files)),CLEAN   $(wildcard $(rm-files)))
+       cmd_rmfiles = rm -f $(rm-files)
+ 
++ifneq ($(patsubst "%",%,$(CONFIG_SYMBOL_PREFIX)),)
++  depmod_args = -P $(patsubst "%",%,$(CONFIG_SYMBOL_PREFIX))
++endif
++
+ # Run depmod only if we have System.map and depmod is executable
+ quiet_cmd_depmod = DEPMOD  $(KERNELRELEASE)
+       cmd_depmod = $(CONFIG_SHELL) $(srctree)/scripts/depmod.sh $(DEPMOD) \
+-                   $(KERNELRELEASE)
++                   $(KERNELRELEASE) $(depmod_args)
+ 
+ # Create temporary dir for module support files
+ # clean it up only when building all modules
+diff --git a/scripts/depmod.sh b/scripts/depmod.sh
+index 2ae4817..4f3747f 100755
+--- a/scripts/depmod.sh
++++ b/scripts/depmod.sh
+@@ -2,16 +2,35 @@
+ #
+ # A depmod wrapper used by the toplevel Makefile
+ 
+-if test $# -ne 2; then
+-	echo "Usage: $0 /sbin/depmod <kernelrelease>" >&2
++if test $# -lt 2; then
++	echo "Usage: $0 /sbin/depmod <kernelrelease> [args]" >&2
+ 	exit 1
+ fi
+ DEPMOD=$1
+-KERNELRELEASE=$2
++shift
++KERNELRELEASE=$1
++shift
+ 
+ if ! test -r System.map -a -x "$DEPMOD"; then
+ 	exit 0
+ fi
++
++# older versions of depmod don't support -P <symbol-prefix>
++# support was added in module-init-tools 3.13
++if test "$1" = "-P"; then
++	release=$("$DEPMOD" --version)
++	package=$(echo "$release" | cut -d' ' -f 1)
++	if test "$package" = "module-init-tools"; then
++		version=$(echo "$release" | cut -d' ' -f 2)
++		later=$({ echo "$version"; echo "3.13"; } | sort -V | tail -n 1)
++		if test "$later" != "$version"; then
++			# module-init-tools < 3.13, drop the next 2 args
++			shift
++			shift
++		fi
++	fi
++fi
++
+ # older versions of depmod require the version string to start with three
+ # numbers, so we cheat with a symlink here
+ depmod_hack_needed=true
+@@ -30,7 +49,7 @@ if $depmod_hack_needed; then
+ 	KERNELRELEASE=99.98.$KERNELRELEASE
+ fi
+ 
+-set -- -ae -F System.map
++set -- -ae -F System.map "$@"
+ if test -n "$INSTALL_MOD_PATH"; then
+ 	set -- "$@" -b "$INSTALL_MOD_PATH"
+ fi
+-- 
+1.7.7.6
 
 
-Nicolas
