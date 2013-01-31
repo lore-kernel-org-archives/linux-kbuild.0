@@ -1,57 +1,54 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:33488 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752016Ab3AaLLj (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 31 Jan 2013 06:11:39 -0500
-Message-ID: <510A5161.7060903@suse.cz>
-Date: Thu, 31 Jan 2013 12:11:29 +0100
-From: Michal Marek <mmarek@suse.cz>
+Received: from [212.203.95.146] ([212.203.95.146]:35558 "EHLO
+	srv01.theangrymob.co.uk" rhost-flags-FAIL-FAIL-OK-FAIL)
+	by vger.kernel.org with ESMTP id S1756165Ab3AaSpe (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 31 Jan 2013 13:45:34 -0500
+Received: from [192.168.150.5] (217-162-209-89.dynamic.hispeed.ch [217.162.209.89])
+	by srv01.theangrymob.co.uk (Postfix) with ESMTPSA id 00C92800003
+	for <linux-kbuild@vger.kernel.org>; Thu, 31 Jan 2013 19:45:31 +0100 (CET)
+Message-ID: <510ABBCA.5090007@theangrymob.co.uk>
+Date: Thu, 31 Jan 2013 19:45:30 +0100
+From: Alec Bickerton <alec@theangrymob.co.uk>
+Reply-To: alec@theangrymob.co.uk
 MIME-Version: 1.0
-Subject: Re: [PATCH 1/1] depmod: pass -P $CONFIG_SYMBOL_PREFIX
-References: <1359625303-11842-1-git-send-email-james.hogan@imgtec.com> <510A4967.5070009@suse.cz> <510A4C82.8090806@imgtec.com>
-In-Reply-To: <510A4C82.8090806@imgtec.com>
-Content-Type: text/plain; charset=ISO-8859-2
+Subject: Re: [PATCH] Add Intel Ivy bridge CPU flags
+References: <51002135.2060302@theangrymob.co.uk> <20130124174148.GA15499@merkur.ravnborg.org> <510894C3.1020605@zytor.com>
+In-Reply-To: <510894C3.1020605@zytor.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: James Hogan <james.hogan@imgtec.com>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Mike Frysinger <vapier@gentoo.org>, Yoshinori Sato <ysato@users.sourceforge.jp>, uclinux-dist-devel@blackfin.uclinux.org
+Cc: linux-kbuild@vger.kernel.org
 
-On 31.1.2013 11:50, James Hogan wrote:
-> Hi Michal,
+on 30/01/13 04:34 H. Peter Anvin gazed into the seeing stone and said...:
+> On 01/24/2013 09:41 AM, Sam Ravnborg wrote:
+>>
+>>> --- a/arch/x86/Makefile_32.cpu
+>>> +++ b/arch/x86/Makefile_32.cpu
+>>> @@ -33,6 +33,7 @@ cflags-$(CONFIG_MCYRIXIII)    += $(call
+>>> cc-option,-march=c3,-march=i486) $(align)-f
+>>>   cflags-$(CONFIG_MVIAC3_2)    += $(call cc-option,-march=c3-2,-march=i686)
+>>>   cflags-$(CONFIG_MVIAC7)        += -march=i686
+>>>   cflags-$(CONFIG_MCORE2)        += -march=i686 $(call tune,core2)
+>>> +cflags-$(CONFIG_MIVYBRIDGE)        += -march=i686 $(call tune,core-avx-i)
+>>>   cflags-$(CONFIG_MATOM)        += $(call cc-option,-march=atom,$(call
+>>> cc-option,-march=core2,-march=i686)) \
+>>>       $(call cc-option,-mtune=atom,$(call cc-option,-mtune=generic))
+>>
+>> Not a fault in your patch - but the x86 guys should learn to use the
+>> X86_ prefix on x86 specific config symbols :-(
+>> For consistency do not add it.
+>>
 > 
-> On 31/01/13 10:37, Michal Marek wrote:
->> On 31.1.2013 10:41, James Hogan wrote:
->>> On architectures which have symbol prefixes, depmod emits lots of false
->>> warnings like this:
->>>
->>> WARNING: $module.ko needs unknown symbol $symbol
->>>
->>> This is because depmod isn't being passed the -P <symbol_prefix>
->>> arguments to specify the symbol prefix to ignore. This option is
->>> included since the 3.13 release of module-init-tools.
->>>
->>> Update scripts/depmod.sh to take extra arguments which are passed
->>> through directly to depmod, and update the main Makefile to pass
->>> -P $(CONFIG_SYMBOL_PREFIX to scripts/depmod.sh, but only if
->>> CONFIG_SYMBOL_PREFIX is set and non-empty.
->>
->> OK.
->>
->>
->>> scripts/depmod.sh also drops the -P arguments if depmod --version
->>> reports module-init-tools with a version number < 3.13.
->>
->> You can replace the test with a simple
->>
->> "$DEPMOD" -P _ --help 2>/dev/null >/dev/null
+> These are some of the oldest config symbols in the entire kernel.
 > 
-> Thanks for the suggestion. It would be much cleaner, but unfortunately I
-> tried this on module-init-tools 3.3-pre2 and module-init-tools 3.9 and
-> both still return success.
+>     -hpa
+> 
 
-Indeed, depmod had the modutils fallback, so it did not fail on unknown
-options immediately. So the version parsing is inevitable. Thanks for
-checking.
+That maybe so, I just want to be able to build an ivy bridge optimised kernel
+without having to think about it too much. While I don't know how much it'd
+bring, this is more of a convenience than anything else.
 
-Michal
+Alec
+
