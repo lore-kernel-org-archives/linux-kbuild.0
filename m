@@ -1,62 +1,56 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout.gmx.net ([212.227.15.19]:55341 "EHLO mout.gmx.net"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754476Ab3B1Vut (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 28 Feb 2013 16:50:49 -0500
-Received: from mailout-de.gmx.net ([10.1.76.29]) by mrigmx.server.lan
- (mrigmx001) with ESMTP (Nemesis) id 0MHuVv-1U7cTK2Jqv-003Zvk for
- <linux-kbuild@vger.kernel.org>; Thu, 28 Feb 2013 22:50:47 +0100
-From: Sven Joachim <svenjoac@gmx.de>
-Subject: Re: [PATCH 2/2] kconfig: use config scripts to detect ncurses libs
-References: <jlec@gentoo.org>
-	<1362045557-9123-1-git-send-email-jlec@gentoo.org>
-Date: Thu, 28 Feb 2013 22:50:45 +0100
-In-Reply-To: <1362045557-9123-1-git-send-email-jlec@gentoo.org>
-	(jlec@gentoo.org's message of "Thu, 28 Feb 2013 10:59:17 +0100")
-Message-ID: <874ngwhzuy.fsf@turtle.gmx.de>
-MIME-Version: 1.0
-Content-Type: text/plain
+Received: from relais.videotron.ca ([24.201.245.36]:11550 "EHLO
+	relais.videotron.ca" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752237Ab3BAC2c (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 31 Jan 2013 21:28:32 -0500
+MIME-version: 1.0
+Content-transfer-encoding: 7BIT
+Content-type: TEXT/PLAIN; CHARSET=US-ASCII
+Date: Thu, 31 Jan 2013 21:28:30 -0500 (EST)
+From: Nicolas Pitre <nico@fluxnic.net>
+Subject: Re: [RFC PATCH 0/4] Add support for LZ4-compressed kernels
+In-reply-to: <510AEDC2.80107@zytor.com>
+Message-id: <alpine.LFD.2.02.1301312117240.6300@xanadu.home>
+References: <1359179447-31118-1-git-send-email-kyungsik.lee@lge.com>
+ <20130128142510.68092e10.akpm@linux-foundation.org>
+ <20130129101549.GP23505@n2100.arm.linux.org.uk> <51089523.3080804@zytor.com>
+ <alpine.LFD.2.02.1301301326530.6300@xanadu.home> <510AE6BF.4080303@zytor.com>
+ <alpine.LFD.2.02.1301311700470.6300@xanadu.home> <510AEDC2.80107@zytor.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: jlec@gentoo.org
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: "H. Peter Anvin" <hpa@zytor.com>
+Cc: Russell King - ARM Linux <linux@arm.linux.org.uk>, Michal Marek <mmarek@suse.cz>, hyojun.im@lge.com, raphael.andy.lee@gmail.com, linux-kbuild@vger.kernel.org, gunho.lee@lge.com, namhyung.kim@lge.com, x86@kernel.org, minchan.kim@lge.com, linux-kernel@vger.kernel.org, Josh Triplett <josh@joshtriplett.org>, Nitin Gupta <nitingupta910@gmail.com>, Richard Purdie <rpurdie@openedhand.com>, Ingo Molnar <mingo@redhat.com>, Joe Millenbach <jmillenbach@gmail.com>, chan.jeong@lge.com, Kyungsik Lee <kyungsik.lee@lge.com>, Andrew Morton <akpm@linux-foundation.org>, Albin Tonnerre <albin.tonnerre@free-electrons.com>, CE Linux Developers List <celinux-dev@lists.celinuxforum.org>, Thomas Gleixner <tglx@linutronix.de>, linux-arm-kernel@lists.infradead.org
 
-On 2013-02-28 10:59 +0100, jlec@gentoo.org wrote:
+On Thu, 31 Jan 2013, H. Peter Anvin wrote:
 
-> Ncurses provides a config script (ncurses5-config) to assist finding ncurses.
-> This patch makes use of it to detect the necessary libs for linking of the
-> ncurses nconfig dialog.
+> On 01/31/2013 02:16 PM, Nicolas Pitre wrote:
+> >>
+> >> Some utterly weird things like the Xen domain builder do that, because
+> >> they have to.  That is why we explicitly document that the payload is
+> >> ELF and how to access it in the bzImage spec.
+> > 
+> > Are you kidding?
+> > 
+> > And what format do they expect?
+> > 
+> 
+> I think they can be fairly flexible.  Obviously gzip is always
+> supported.  I don't know the details.
+> 
+> > If people are doing weird things with formats we're about to remove then 
+> > it's their fault if they didn't make upstream developers aware of it.  
+> > And if the reason they didn't tell anyone is because it is too nasty for 
+> > public confession then they simply deserve to be broken and come up with 
+> > a more sustainable solution.
+> 
+> Well, it is too nasty for public confession, but it's called
+> "paravirtualization".
 
-That script is not necessarily called ncurses5-config, it might also be
-called ncurses6-config is ncurses is configured for a different ABI
-(--enable-ext-colors, --enable-ext-mouse).  Although I would suspect
-that any distribution who does that provides a compatibility symlink.
+The fact that you are aware of it means we're not going to break them.  
 
->  scripts/kconfig/Makefile | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
->
-> diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
-> index 3091794..c372976 100644
-> --- a/scripts/kconfig/Makefile
-> +++ b/scripts/kconfig/Makefile
-> @@ -216,7 +216,9 @@ HOSTCFLAGS_gconf.o	= `pkg-config --cflags gtk+-2.0 gmodule-2.0 libglade-2.0` \
->  
->  HOSTLOADLIBES_mconf   = $(shell $(CONFIG_SHELL) $(check-lxdialog) -ldflags $(HOSTCC))
->  
-> -HOSTLOADLIBES_nconf	= -lmenu -lpanel -lncurses
-> +HOSTLOADLIBES_nconf	= -lmenu -lpanel
-> +HOSTLOADLIBES_nconf	+= $(shell    ncursesw5-config --libs 2>/dev/null \
-> +				   || ncurses5-config --libs 2>/dev/null  )
+But my point is that we must not be held back just in case someone out 
+there might have painted himself in a corner without telling anyone.
 
-This will link with ncursesw, not ncurses.  Probably not what you want,
-since nconf.h does not #include the right headers for that.
 
-On Debian/Ubuntu, there's also the problem that ncursesw5-config exists
-even if the libncursesw5-dev package is not installed, so this patch
-makes the build fail in such cases.
-
-Can we just call ncurses5-config and not ncursesw5-config, or are there
-any distros who ship the latter and not the former?
-
-Cheers,
-       Sven
+Nicolas
