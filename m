@@ -1,37 +1,88 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from terminus.zytor.com ([198.137.202.10]:50029 "EHLO mail.zytor.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752222Ab3BAGmI (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 1 Feb 2013 01:42:08 -0500
-Message-ID: <510B629C.1010605@zytor.com>
-Date: Thu, 31 Jan 2013 22:37:16 -0800
-From: "H. Peter Anvin" <hpa@zytor.com>
+Received: from LGEMRELSE1Q.lge.com ([156.147.1.111]:62830 "EHLO
+	LGEMRELSE1Q.lge.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751098Ab3BAHNo (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 1 Feb 2013 02:13:44 -0500
+Message-ID: <510B6B24.8040000@lge.com>
+Date: Fri, 01 Feb 2013 16:13:40 +0900
+From: "kyungsik.lee" <kyungsik.lee@lge.com>
 MIME-Version: 1.0
 Subject: Re: [RFC PATCH 0/4] Add support for LZ4-compressed kernels
-References: <1359179447-31118-1-git-send-email-kyungsik.lee@lge.com> <20130128142510.68092e10.akpm@linux-foundation.org> <20130129101549.GP23505@n2100.arm.linux.org.uk> <51089523.3080804@zytor.com> <alpine.LFD.2.02.1301301326530.6300@xanadu.home> <510AE6BF.4080303@zytor.com> <alpine.LFD.2.02.1301311700470.6300@xanadu.home> <510AEDC2.80107@zytor.com> <alpine.LFD.2.02.1301312117240.6300@xanadu.home>
-In-Reply-To: <alpine.LFD.2.02.1301312117240.6300@xanadu.home>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+References: <1359179447-31118-1-git-send-email-kyungsik.lee@lge.com> <20130129225508.GC30535@twin.jikos.cz>
+In-Reply-To: <20130129225508.GC30535@twin.jikos.cz>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nicolas Pitre <nico@fluxnic.net>
-Cc: Russell King - ARM Linux <linux@arm.linux.org.uk>, Michal Marek <mmarek@suse.cz>, hyojun.im@lge.com, raphael.andy.lee@gmail.com, linux-kbuild@vger.kernel.org, gunho.lee@lge.com, namhyung.kim@lge.com, x86@kernel.org, minchan.kim@lge.com, linux-kernel@vger.kernel.org, Josh Triplett <josh@joshtriplett.org>, Nitin Gupta <nitingupta910@gmail.com>, Richard Purdie <rpurdie@openedhand.com>, Ingo Molnar <mingo@redhat.com>, Joe Millenbach <jmillenbach@gmail.com>, chan.jeong@lge.com, Kyungsik Lee <kyungsik.lee@lge.com>, Andrew Morton <akpm@linux-foundation.org>, Albin Tonnerre <albin.tonnerre@free-electrons.com>, CE Linux Developers List <celinux-dev@lists.celinuxforum.org>, Thomas Gleixner <tglx@linutronix.de>, linux-arm-kernel@lists.infradead.org
+To: dsterba@suse.cz
+Cc: Russell King <linux@arm.linux.org.uk>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, Michal Marek <mmarek@suse.cz>, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, x86@kernel.org, Nitin Gupta <nitingupta910@gmail.com>, Richard Purdie <rpurdie@openedhand.com>, Josh Triplett <josh@joshtriplett.org>, Joe Millenbach <jmillenbach@gmail.com>, Andrew Morton <akpm@linux-foundation.org>, Albin Tonnerre <albin.tonnerre@free-electrons.com>, hyojun.im@lge.com, chan.jeong@lge.com, gunho.lee@lge.com, minchan.kim@lge.com, namhyung.kim@lge.com, raphael.andy.lee@gmail.com
 
-On 01/31/2013 06:28 PM, Nicolas Pitre wrote:
->>
->> Well, it is too nasty for public confession, but it's called
->> "paravirtualization".
-> 
-> The fact that you are aware of it means we're not going to break them.  
-> 
-> But my point is that we must not be held back just in case someone out 
-> there might have painted himself in a corner without telling anyone.
-> 
+On 2013-01-30 오전 7:55, David Sterba wrote:
+> On Sat, Jan 26, 2013 at 02:50:43PM +0900, Kyungsik Lee wrote:
+>> This patchset is for supporting LZ4 compressed kernel and initial ramdisk on
+>> the x86 and ARM architectures.
+> Have you considered the 'high compression' mode of lz4?
+> http://code.google.com/p/lz4/source/browse/trunk/lz4hc.c
+>
+> The compression format remains the same, the compressor tries harder
+> (but is slower), resulting compression ratio is better.
+>
+> an examle compression for vmlinux.bin of x86_64 build:
+>
+> input size: 16509520 bytes
+>
+> lz4 (svn 88):
+> output size:        6393684    (38.7%)
+> compression time:      41.7 ms (395 MB/s)
+> decompression time:    13.7 ms (1204 MB/s)
+>
+> lz4hc (svn 88):
+> output size:        5319137    (32.2%)
+> compression time:       683 ms (24 MB/s)
+> decompression time:    13.1 ms (1259 MB/s)
+>
+> compressed file delta: 6393684 - 5319137 = 1074547 ~ 1MB
+>
+> tested on a Nehalem box; same test on my slow desktop gives
+>
+> lz4:
+> compression time:      97   ms (169 MB/s)
+> decompression time:    25.7 ms (643 MB/s)
+>
+> lz4hc:
+> compression time:    1386 ms (11 MB/s)
+> decompression time:    26 ms (619 MB/s)
+>
+> While the decompression time is almost the same, image size is smaller.
+> The kernel image compression is run in userspace and the low speed is
+> not much of concern for a one-time operation.
+>
+> For the reference, lzo (current kernel version) run on the destktop:
+>
+> output size:         6026256 (36.5%)
+> decompression time:     79.6 ms (207 MB/s)
+>
+>> It seems that it’s worth trying LZ4 compressed kernel image or ramdisk
+>> for making the kernel boot more faster.
+> There's another potential user of lz4: btrfs. I've submitted a feature
+> preview integrating lz4 compression
+> http://thread.gmane.org/gmane.comp.file-systems.btrfs/15744
+> and we have tried to integrate the HC mode as well
+> http://thread.gmane.org/gmane.comp.file-systems.btrfs/18165
+> .
+> So far it's on a slow track, conceptually it works, but I the code needs
+> some work so it could live under lib/* (we've used the svn sources
+> with minor changes, no kernel coding style). It would be easier for me
+> to enhance the existing lib/lz4/* codebase.
+>
+> Also zram could consider lz4, I'm not sure if there are other potential
+> users.
+Yes, I guess squash fs and crypto would also benefit from lz4.
 
-Yes.  However, it makes it more questionable to simply rip out
-compression methods without warning.  Not that warnings help, as we have
-learned.
 
-	-hpa
+Thanks,
+Kyungsik
+
 
 
