@@ -1,41 +1,25 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp3-g21.free.fr ([212.27.42.3]:55032 "EHLO smtp3-g21.free.fr"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752960Ab3BCKQt (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 3 Feb 2013 05:16:49 -0500
-Message-ID: <1359886593.510e3901cb3fa@imp.free.fr>
-Date: Sun, 03 Feb 2013 11:16:33 +0100
-From: yann.morin.1998@free.fr
-Subject: Re: [PATCH resend v3 0/3] kconfig: nconf:  rewrite help texts, add vi-style navigation keys
-References: <20130201182237.GA11098@mobil.systemanalysen.net>
-In-Reply-To: <20130201182237.GA11098@mobil.systemanalysen.net>
-MIME-Version: 1.0
+Received: from mail.une.net.co ([200.13.249.231]:46439 "EHLO
+	une-avas-int03.une.net.co" rhost-flags-OK-OK-OK-FAIL)
+	by vger.kernel.org with ESMTP id S1753550Ab3BCUxH convert rfc822-to-8bit
+	(ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 3 Feb 2013 15:53:07 -0500
 Content-Type: text/plain; charset=US-ASCII
+MIME-Version: 1.0
 Content-Transfer-Encoding: 7BIT
+Content-Description: Mail message body
+Subject: Great Proposal!!
+From: "Song Chen" <info@song.com>
+Date: Mon, 04 Feb 2013 03:39:38 +0700
+Reply-To: mrsongchen12@yahoo.cn
+Message-Id: <20130203203817.2267E5C00D4@unevm-pmta14.une.net.co>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Roland Eggner <edvx1@systemanalysen.net>
-Cc: "Yann E. MORIN" <yann.morin.1998@free.fr>, Dmitry Voytik <dvv.kernel@gmail.com>, Michal Marek <mmarek@suse.cz>, Stephen Boyd <sboyd@codeaurora.org>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: Recipients <info@song.com>
 
-Rolland, All,
+Hello,
 
-Quoting Roland Eggner <edvx1@systemanalysen.net>:
-> Yann, Michal,
->
-> thanks for advice and comments to v2, I tried to address all and posted v3
-> a week ago.  Got no reply and resent now.
+Proposal of ($12.8mUSD)for you, reply for details.I await to hear from you on my private email (mrsongchen12@yahoo.cn)
 
-I'm on the move (at FOSDEM). I will look at this when I'm
-back home (wednesday).
-
-> I would like to see this in 3.9.
-> How to proceed?
-
-Given the current state of the -rc series, I think we still
-have a bit of time before the merge window opens again.
-
-Regards,
-Yann E. MORIN.
-
-
-
+Regards
+Song.
