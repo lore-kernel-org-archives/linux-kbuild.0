@@ -1,55 +1,94 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bar.sig21.net ([80.81.252.164]:38407 "EHLO bar.sig21.net"
+Received: from smtp.gentoo.org ([140.211.166.183]:52452 "EHLO smtp.gentoo.org"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751146Ab3BELl0 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 5 Feb 2013 06:41:26 -0500
-Date: Tue, 5 Feb 2013 12:39:29 +0100
-From: Johannes Stezenbach <js@sig21.net>
-Subject: Re: [RFC PATCH 0/4] Add support for LZ4-compressed kernels
-Message-ID: <20130205113929.GA18049@sig21.net>
-References: <1359179447-31118-1-git-send-email-kyungsik.lee@lge.com>
- <20130128142510.68092e10.akpm@linux-foundation.org>
- <alpine.LFD.2.02.1301282320430.6300@xanadu.home>
- <20130130102353.GA8925@sig21.net>
- <510F16C9.2060901@oberhumer.com>
- <20130204105052.GA17786@n2100.arm.linux.org.uk>
+	id S1756400Ab3BEXSe (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 5 Feb 2013 18:18:34 -0500
+From: Mike Frysinger <vapier@gentoo.org>
+Subject: Re: [PATCH 1/1] depmod: pass -P $CONFIG_SYMBOL_PREFIX
+Date: Tue, 5 Feb 2013 18:18:28 -0500
+References: <1359625303-11842-1-git-send-email-james.hogan@imgtec.com> <201302030117.26295.vapier@gentoo.org> <5110DFEF.8000505@imgtec.com>
+In-Reply-To: <5110DFEF.8000505@imgtec.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20130204105052.GA17786@n2100.arm.linux.org.uk>
+Content-Type: multipart/signed;
+  boundary="nextPart1870282.lNtgSctV19";
+  protocol="application/pgp-signature";
+  micalg=pgp-sha1
+Content-Transfer-Encoding: 7bit
+Message-Id: <201302051818.30349.vapier@gentoo.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Russell King - ARM Linux <linux@arm.linux.org.uk>
-Cc: "Markus F.X.J. Oberhumer" <markus@oberhumer.com>, Nicolas Pitre <nico@fluxnic.net>, Andrew Morton <akpm@linux-foundation.org>, Kyungsik Lee <kyungsik.lee@lge.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, Michal Marek <mmarek@suse.cz>, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, x86@kernel.org, Nitin Gupta <nitingupta910@gmail.com>, Richard Purdie <rpurdie@openedhand.com>, Josh Triplett <josh@joshtriplett.org>, Joe Millenbach <jmillenbach@gmail.com>, Albin Tonnerre <albin.tonnerre@free-electrons.com>, hyojun.im@lge.com, chan.jeong@lge.com, gunho.lee@lge.com, minchan.kim@lge.com, namhyung.kim@lge.com, raphael.andy.lee@gmail.com, CE Linux Developers List <celinux-dev@lists.celinuxforum.org>
+To: James Hogan <james.hogan@imgtec.com>
+Cc: linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, Yoshinori Sato <ysato@users.sourceforge.jp>, uclinux-dist-devel@blackfin.uclinux.org, Jonas <jonas.bonn@gmail.com>
 
-On Mon, Feb 04, 2013 at 10:50:52AM +0000, Russell King - ARM Linux wrote:
-> On Mon, Feb 04, 2013 at 03:02:49AM +0100, Markus F.X.J. Oberhumer wrote:
-> > At least akpm did approve the LZO update for inclusion into 3.7, but the code
-> > still has not been merged into the main tree.
-> >   > On 2012-10-09 21:26, Andrew Morton wrote:
-> >   > [...]
-> >   > The changes look OK to me.  Please ask Stephen to include the tree in
-> >   > linux-next, for a 3.7 merge.
-> > 
-> > Well, this probably means I have done a rather poor marketing.
-> 
-> I assume this code is sitting in *your* tree?  How do you think it gets
-> into mainline?
-> 
-> There is no automatic way that code from linux-next gets merged into
-> mainline.  That is up to the tree owner to make happen, either by getting
-> their tree into a parent maintainers tree, or if there is none, asking
-> Linus to pull your tree at the appropriate time.
+--nextPart1870282.lNtgSctV19
+Content-Type: Text/Plain;
+  charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-My feeling is that in this case it is unneccessarily hard
-for an outside contributor to get a patch accepted, all
-because get_maintainer.pl doesn't put someone in charge.
+On Tuesday 05 February 2013 05:33:19 James Hogan wrote:
+> On 03/02/13 06:17, Mike Frysinger wrote:
+> > On Thursday 31 January 2013 04:41:43 James Hogan wrote:
+> >> --- a/Makefile
+> >> +++ b/Makefile
+> >>=20
+> >> +ifneq ($(patsubst "%",%,$(CONFIG_SYMBOL_PREFIX)),)
+> >> +  depmod_args =3D -P $(patsubst "%",%,$(CONFIG_SYMBOL_PREFIX))
+> >> +endif
+> >> ...
+> >>  # Run depmod only if we have System.map and depmod is executable
+> >>  quiet_cmd_depmod =3D DEPMOD  $(KERNELRELEASE)
+> >>        cmd_depmod =3D $(CONFIG_SHELL) $(srctree)/scripts/depmod.sh
+> >>        $(DEPMOD) \
+> >> -                   $(KERNELRELEASE)
+> >> +                   $(KERNELRELEASE) $(depmod_args)
+> >=20
+> > scripts/Makefile.lib just does:
+> > 	ifdef CONFIG_SYMBOL_PREFIX
+> >=20
+> > so you should do the same
+>=20
+> arch/openrisc/Kconfig now defines SYMBOL_PREFIX as "", so this isn't
+> sufficient (arguably it probably shouldn't be defined empty like that?)
 
-Apparently it doesn't work to put all the usual maintainer
-responsibilities onto the shoulders of a Linux development novice.
-Thus it would be nice if some maintainer would come
-forward and offer to handle the patches for Markus.
+yes, that should simply be deleted
 
+> > that said, cmd_depmod is just a shell command.  and you're running
+> > another script helper (depmod.sh).  how about passing it unconditionally
+> > ?
+> >=20
+> > 	cmd_depmod =3D ... -P "$(CONFIG_SYMBOL_PREFIX)"
+> >=20
+> > since the default will be "no prefix", using -P "" is the same thing.
+>=20
+> Yep, I could do this, but depmod.sh would need modifying to drop it if
+> the prefix is empty, otherwise you get the following from depmod:
+> FATAL: -P only takes a single char
+>=20
+> I don't mind adding that, but what do you think?
 
-Thanks,
-Johannes
+i mean depmod.sh should only pass -P to depmod if the arg is non-empty
+=2Dmike
+
+--nextPart1870282.lNtgSctV19
+Content-Type: application/pgp-signature; name=signature.asc 
+Content-Description: This is a digitally signed message part.
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.17 (GNU/Linux)
+
+iQIcBAABAgAGBQJREZNGAAoJEEFjO5/oN/WBlpkQAK1bun7GNczz/+siKuXIs4+k
+eVBvUmRJYxpa30mhBhY9R5QrbQjkGm5bTAzSHRwjI6lBO5/ADD6Jh3/6QeNrDii7
+MPkB9Pk9Q8sr1NkQcjwir2yhF1WGsVn5pJd2eRHvFGiMHLzaKEcZfKilY33ThMpG
+PGLxnUdw7bgXBmse4pDl8LqDD47ICv8r5S1LAY76a6420VCnZHZzD25OMpvRA7SH
+aQME6nOZJukTeDKRuQQLr2opxpy+0lE49jx9ZN0jcwlLPXKLXpH7zf4+TIwFy6Dj
+e0cPe64DCGFWcArPRYFGW3bzeUdXhD5QdehtEjP4w66YGZwqOik6MXM1+HuQizLt
+uGu8NsyJBlrojByY4KGHlaIRiVvBrtw8XVThyCgD2lEhMTKrrf4THHhTUkrqXyyc
+XpLZxWQ7vsfMmspiufnhb5pkbSj2oMHCpoYngi/eCc5Uh6FIaPPMLBX/EMH/HNdL
+MkdkIM8vDvE0hfSfxPioRDdlY5p2xxcMn6f3tEXD+ZAKxeim8o9qC/Zs2bwzP9JX
+8zAouKKHBvGcdCrF9pjtZ4hqosgr5eEl+9R/IN7vtFUXpRUnG5Gr+WAMAb3FpbHB
+MGXTdgHc4EN/WpDpfe0qIWWAZxytOz8rW1OhejYLtP4+3rOXiPDOLWSO73bcxMRM
+serlIwgb9E2lmYoYMn9v
+=Xrt7
+-----END PGP SIGNATURE-----
+
+--nextPart1870282.lNtgSctV19--
