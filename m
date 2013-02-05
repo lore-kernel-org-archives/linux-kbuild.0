@@ -1,37 +1,137 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from caramon.arm.linux.org.uk ([78.32.30.218]:34607 "EHLO
-	caramon.arm.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753271Ab3BDK5n (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 4 Feb 2013 05:57:43 -0500
-Date: Mon, 4 Feb 2013 10:50:52 +0000
-From: Russell King - ARM Linux <linux@arm.linux.org.uk>
-Subject: Re: [RFC PATCH 0/4] Add support for LZ4-compressed kernels
-Message-ID: <20130204105052.GA17786@n2100.arm.linux.org.uk>
-References: <1359179447-31118-1-git-send-email-kyungsik.lee@lge.com> <20130128142510.68092e10.akpm@linux-foundation.org> <alpine.LFD.2.02.1301282320430.6300@xanadu.home> <20130130102353.GA8925@sig21.net> <510F16C9.2060901@oberhumer.com>
+Received: from multi.imgtec.com ([194.200.65.239]:30661 "EHLO multi.imgtec.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754282Ab3BEKdj (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 5 Feb 2013 05:33:39 -0500
+Message-ID: <5110DFEF.8000505@imgtec.com>
+Date: Tue, 5 Feb 2013 10:33:19 +0000
+From: James Hogan <james.hogan@imgtec.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <510F16C9.2060901@oberhumer.com>
+Subject: Re: [PATCH 1/1] depmod: pass -P $CONFIG_SYMBOL_PREFIX
+References: <1359625303-11842-1-git-send-email-james.hogan@imgtec.com> <201302030117.26295.vapier@gentoo.org>
+In-Reply-To: <201302030117.26295.vapier@gentoo.org>
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature";
+	boundary="------------enig8AF80F9161654CFAD145A4B6"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Markus F.X.J. Oberhumer" <markus@oberhumer.com>
-Cc: Johannes Stezenbach <js@sig21.net>, Nicolas Pitre <nico@fluxnic.net>, Andrew Morton <akpm@linux-foundation.org>, Kyungsik Lee <kyungsik.lee@lge.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, Michal Marek <mmarek@suse.cz>, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, x86@kernel.org, Nitin Gupta <nitingupta910@gmail.com>, Richard Purdie <rpurdie@openedhand.com>, Josh Triplett <josh@joshtriplett.org>, Joe Millenbach <jmillenbach@gmail.com>, Albin Tonnerre <albin.tonnerre@free-electrons.com>, hyojun.im@lge.com, chan.jeong@lge.com, gunho.lee@lge.com, minchan.kim@lge.com, namhyung.kim@lge.com, raphael.andy.lee@gmail.com, CE Linux Developers List <celinux-dev@lists.celinuxforum.org>
+To: Mike Frysinger <vapier@gentoo.org>
+Cc: linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, Yoshinori Sato <ysato@users.sourceforge.jp>, uclinux-dist-devel@blackfin.uclinux.org, Jonas <jonas.bonn@gmail.com>
 
-On Mon, Feb 04, 2013 at 03:02:49AM +0100, Markus F.X.J. Oberhumer wrote:
-> At least akpm did approve the LZO update for inclusion into 3.7, but the code
-> still has not been merged into the main tree.
->   > On 2012-10-09 21:26, Andrew Morton wrote:
->   > [...]
->   > The changes look OK to me.  Please ask Stephen to include the tree in
->   > linux-next, for a 3.7 merge.
-> 
-> Well, this probably means I have done a rather poor marketing.
+--------------enig8AF80F9161654CFAD145A4B6
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-I assume this code is sitting in *your* tree?  How do you think it gets
-into mainline?
+Hi Mike,
 
-There is no automatic way that code from linux-next gets merged into
-mainline.  That is up to the tree owner to make happen, either by getting
-their tree into a parent maintainers tree, or if there is none, asking
-Linus to pull your tree at the appropriate time.
+On 03/02/13 06:17, Mike Frysinger wrote:
+> On Thursday 31 January 2013 04:41:43 James Hogan wrote:
+>> --- a/Makefile
+>> +++ b/Makefile
+>>
+>> +ifneq ($(patsubst "%",%,$(CONFIG_SYMBOL_PREFIX)),)
+>> +  depmod_args =3D -P $(patsubst "%",%,$(CONFIG_SYMBOL_PREFIX))
+>> +endif
+>> ...
+>>  # Run depmod only if we have System.map and depmod is executable
+>>  quiet_cmd_depmod =3D DEPMOD  $(KERNELRELEASE)
+>>        cmd_depmod =3D $(CONFIG_SHELL) $(srctree)/scripts/depmod.sh $(D=
+EPMOD) \
+>> -                   $(KERNELRELEASE)
+>> +                   $(KERNELRELEASE) $(depmod_args)
+>=20
+> scripts/Makefile.lib just does:
+> 	ifdef CONFIG_SYMBOL_PREFIX
+> so you should do the same
+
+arch/openrisc/Kconfig now defines SYMBOL_PREFIX as "", so this isn't
+sufficient (arguably it probably shouldn't be defined empty like that?)
+
+>=20
+> that said, cmd_depmod is just a shell command.  and you're running anot=
+her=20
+> script helper (depmod.sh).  how about passing it unconditionally ?
+> 	cmd_depmod =3D ... -P "$(CONFIG_SYMBOL_PREFIX)"
+>=20
+> since the default will be "no prefix", using -P "" is the same thing.
+
+Yep, I could do this, but depmod.sh would need modifying to drop it if
+the prefix is empty, otherwise you get the following from depmod:
+FATAL: -P only takes a single char
+
+I don't mind adding that, but what do you think?
+
+>=20
+>> --- a/scripts/depmod.sh
+>> +++ b/scripts/depmod.sh
+>>
+>>  DEPMOD=3D$1
+>> -KERNELRELEASE=3D$2
+>> +shift
+>> +KERNELRELEASE=3D$1
+>> +shift
+>=20
+> you can do:
+> 	DEPMOD=3D$1
+> 	KERNELRELEASE=3D$2
+> 	shift 2
+
+neat, thanks
+
+>=20
+>> +# older versions of depmod don't support -P <symbol-prefix>
+>> +# support was added in module-init-tools 3.13
+>> +if test "$1" =3D "-P"; then
+>> +	release=3D$("$DEPMOD" --version)
+>> +	package=3D$(echo "$release" | cut -d' ' -f 1)
+>> +	if test "$package" =3D "module-init-tools"; then
+>> +		version=3D$(echo "$release" | cut -d' ' -f 2)
+>> +		later=3D$({ echo "$version"; echo "3.13"; } | sort -V | tail -n 1)
+>=20
+> you could do instead:
+> 	later=3D$(printf '%s\n' "$version" "3.13" | sort -V | tail -n 1)
+
+yep, definitely better, thanks
+
+>=20
+>> +		if test "$later" !=3D "$version"; then
+>> +			# module-init-tools < 3.13, drop the next 2 args
+>> +			shift
+>> +			shift
+>> +		fi
+>=20
+> shift 2
+
+ok
+
+Thanks for the suggestions
+
+Cheers
+James
+
+
+--------------enig8AF80F9161654CFAD145A4B6
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.13 (GNU/Linux)
+
+iQIcBAEBAgAGBQJREN/2AAoJEKHZs+irPybfpVAQAJPWZzwxyhC9iNkpqkDmp4hB
+hzWv8c2Bxe2C6cp3fhipwCTJ+tkdYVvSE+JcBM1P7uO5PIvdpo1U4P7+CgKIZn3K
+tRHbZZv3lEeU/gZr1kb7x7Urue1kU3dQk1AZegIPEXwbLZHdpKiT17TXKzuf8XzE
+Z2IrJfV/pN8QFScN2mbCq/ZuP8nC+R3YoD5vrP+seaeR/+z5h9L9Zkzk9ywkV/bN
+hlC/6cTf5yOrvB3aHJL6XpZt6K+MPFT/TdLlaKC4PZAdYLinu3m8rUfC0nqSUvY8
+NHK9GKgV75Or+PUBBliUmOYH0pGZ12rhHS+iVrSgO9Dv7sRbJ7d6eBD8GT0012vm
+lglI0OBc3bdsUKu7KU/8p27KmYJt4KjezwafqcJRBjOO3WONCyLNog9s3ykmHD18
+lZWLiu10MWZCz6ETxBFheibB8qwxTaX2OyLkIa21vpKiWeZsk52kB/PwQCsiZuTW
+U9MfQTPQ9BoeShETv7TzM0Ui5Bcix0wUqKr6AtDOV0aRYJEfumkbVjDKv0Tur0Z5
+qrs89ixyDn6HAzejMUDR/9j/fjQAJh9m2rRlygXw5zpprsv36xV3GMr+APTut4Up
+5mjBv5C9zWguDfgWxh3EG/67GpKWsJB0R8nIStJMNFpHMIX2W+VF388atcqlS4dQ
+z1ArrM8MIPTdGaguBjy5
+=aE8K
+-----END PGP SIGNATURE-----
+
+--------------enig8AF80F9161654CFAD145A4B6--
+
