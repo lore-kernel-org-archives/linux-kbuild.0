@@ -1,94 +1,117 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.gentoo.org ([140.211.166.183]:52452 "EHLO smtp.gentoo.org"
+Received: from multi.imgtec.com ([194.200.65.239]:18336 "EHLO multi.imgtec.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1756400Ab3BEXSe (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 5 Feb 2013 18:18:34 -0500
-From: Mike Frysinger <vapier@gentoo.org>
-Subject: Re: [PATCH 1/1] depmod: pass -P $CONFIG_SYMBOL_PREFIX
-Date: Tue, 5 Feb 2013 18:18:28 -0500
-References: <1359625303-11842-1-git-send-email-james.hogan@imgtec.com> <201302030117.26295.vapier@gentoo.org> <5110DFEF.8000505@imgtec.com>
-In-Reply-To: <5110DFEF.8000505@imgtec.com>
+	id S1751075Ab3BFM6D (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 6 Feb 2013 07:58:03 -0500
+From: James Hogan <james.hogan@imgtec.com>
+Subject: [PATCH v2 1/1] depmod: pass -P $CONFIG_SYMBOL_PREFIX
+Date: Wed, 6 Feb 2013 12:56:59 +0000
+Message-ID: <1360155419-12349-1-git-send-email-james.hogan@imgtec.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed;
-  boundary="nextPart1870282.lNtgSctV19";
-  protocol="application/pgp-signature";
-  micalg=pgp-sha1
-Content-Transfer-Encoding: 7bit
-Message-Id: <201302051818.30349.vapier@gentoo.org>
+Content-Type: text/plain
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: James Hogan <james.hogan@imgtec.com>
-Cc: linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, Yoshinori Sato <ysato@users.sourceforge.jp>, uclinux-dist-devel@blackfin.uclinux.org, Jonas <jonas.bonn@gmail.com>
+To: linux-kernel@vger.kernel.org
+Cc: James Hogan <james.hogan@imgtec.com>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, Mike Frysinger <vapier@gentoo.org>, Yoshinori Sato <ysato@users.sourceforge.jp>, uclinux-dist-devel@blackfin.uclinux.org
 
---nextPart1870282.lNtgSctV19
-Content-Type: Text/Plain;
-  charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+On architectures which have symbol prefixes, depmod emits lots of
+warnings like this:
 
-On Tuesday 05 February 2013 05:33:19 James Hogan wrote:
-> On 03/02/13 06:17, Mike Frysinger wrote:
-> > On Thursday 31 January 2013 04:41:43 James Hogan wrote:
-> >> --- a/Makefile
-> >> +++ b/Makefile
-> >>=20
-> >> +ifneq ($(patsubst "%",%,$(CONFIG_SYMBOL_PREFIX)),)
-> >> +  depmod_args =3D -P $(patsubst "%",%,$(CONFIG_SYMBOL_PREFIX))
-> >> +endif
-> >> ...
-> >>  # Run depmod only if we have System.map and depmod is executable
-> >>  quiet_cmd_depmod =3D DEPMOD  $(KERNELRELEASE)
-> >>        cmd_depmod =3D $(CONFIG_SHELL) $(srctree)/scripts/depmod.sh
-> >>        $(DEPMOD) \
-> >> -                   $(KERNELRELEASE)
-> >> +                   $(KERNELRELEASE) $(depmod_args)
-> >=20
-> > scripts/Makefile.lib just does:
-> > 	ifdef CONFIG_SYMBOL_PREFIX
-> >=20
-> > so you should do the same
->=20
-> arch/openrisc/Kconfig now defines SYMBOL_PREFIX as "", so this isn't
-> sufficient (arguably it probably shouldn't be defined empty like that?)
+WARNING: $module.ko needs unknown symbol $symbol
 
-yes, that should simply be deleted
+This is because depmod isn't being passed the -P <symbol_prefix>
+arguments to specify the symbol prefix to ignore. This option is
+included since the 3.13 release of module-init-tools.
 
-> > that said, cmd_depmod is just a shell command.  and you're running
-> > another script helper (depmod.sh).  how about passing it unconditionally
-> > ?
-> >=20
-> > 	cmd_depmod =3D ... -P "$(CONFIG_SYMBOL_PREFIX)"
-> >=20
-> > since the default will be "no prefix", using -P "" is the same thing.
->=20
-> Yep, I could do this, but depmod.sh would need modifying to drop it if
-> the prefix is empty, otherwise you get the following from depmod:
-> FATAL: -P only takes a single char
->=20
-> I don't mind adding that, but what do you think?
+Update scripts/depmod.sh to take extra arguments for the symbol prefix
+(required but may be empty), and update the main Makefile to always pass
+"$(CONFIG_SYMBOL_PREFIX)" to scripts/depmod.sh.
 
-i mean depmod.sh should only pass -P to depmod if the arg is non-empty
-=2Dmike
+If the provided symbol prefix is non-empty, scripts/depmod.sh checks if
+depmod --version reports module-init-tools with a version number < 3.13
+otherwise it appends -P $SYMBOL_PREFIX to the depmod command line.
 
---nextPart1870282.lNtgSctV19
-Content-Type: application/pgp-signature; name=signature.asc 
-Content-Description: This is a digitally signed message part.
+Signed-off-by: James Hogan <james.hogan@imgtec.com>
+Cc: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org
+Cc: Mike Frysinger <vapier@gentoo.org>
+Cc: Yoshinori Sato <ysato@users.sourceforge.jp>
+Cc: uclinux-dist-devel@blackfin.uclinux.org
+---
+changes since v1: clean up with assistance from Mike Frysinger (thanks!)
+* always pass prefix to depmod.sh to simplify the logic
+* use printf instead of ugly echos in version check
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.17 (GNU/Linux)
+ Makefile          |    2 +-
+ scripts/depmod.sh |   26 +++++++++++++++++++++++---
+ 2 files changed, 24 insertions(+), 4 deletions(-)
 
-iQIcBAABAgAGBQJREZNGAAoJEEFjO5/oN/WBlpkQAK1bun7GNczz/+siKuXIs4+k
-eVBvUmRJYxpa30mhBhY9R5QrbQjkGm5bTAzSHRwjI6lBO5/ADD6Jh3/6QeNrDii7
-MPkB9Pk9Q8sr1NkQcjwir2yhF1WGsVn5pJd2eRHvFGiMHLzaKEcZfKilY33ThMpG
-PGLxnUdw7bgXBmse4pDl8LqDD47ICv8r5S1LAY76a6420VCnZHZzD25OMpvRA7SH
-aQME6nOZJukTeDKRuQQLr2opxpy+0lE49jx9ZN0jcwlLPXKLXpH7zf4+TIwFy6Dj
-e0cPe64DCGFWcArPRYFGW3bzeUdXhD5QdehtEjP4w66YGZwqOik6MXM1+HuQizLt
-uGu8NsyJBlrojByY4KGHlaIRiVvBrtw8XVThyCgD2lEhMTKrrf4THHhTUkrqXyyc
-XpLZxWQ7vsfMmspiufnhb5pkbSj2oMHCpoYngi/eCc5Uh6FIaPPMLBX/EMH/HNdL
-MkdkIM8vDvE0hfSfxPioRDdlY5p2xxcMn6f3tEXD+ZAKxeim8o9qC/Zs2bwzP9JX
-8zAouKKHBvGcdCrF9pjtZ4hqosgr5eEl+9R/IN7vtFUXpRUnG5Gr+WAMAb3FpbHB
-MGXTdgHc4EN/WpDpfe0qIWWAZxytOz8rW1OhejYLtP4+3rOXiPDOLWSO73bcxMRM
-serlIwgb9E2lmYoYMn9v
-=Xrt7
------END PGP SIGNATURE-----
+diff --git a/Makefile b/Makefile
+index 54dfde5..6cb7fdb 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1397,7 +1397,7 @@ quiet_cmd_rmfiles = $(if $(wildcard $(rm-files)),CLEAN   $(wildcard $(rm-files))
+ # Run depmod only if we have System.map and depmod is executable
+ quiet_cmd_depmod = DEPMOD  $(KERNELRELEASE)
+       cmd_depmod = $(CONFIG_SHELL) $(srctree)/scripts/depmod.sh $(DEPMOD) \
+-                   $(KERNELRELEASE)
++                   $(KERNELRELEASE) "$(patsubst "%",%,$(CONFIG_SYMBOL_PREFIX))"
+ 
+ # Create temporary dir for module support files
+ # clean it up only when building all modules
+diff --git a/scripts/depmod.sh b/scripts/depmod.sh
+index 2ae4817..122599b 100755
+--- a/scripts/depmod.sh
++++ b/scripts/depmod.sh
+@@ -2,16 +2,36 @@
+ #
+ # A depmod wrapper used by the toplevel Makefile
+ 
+-if test $# -ne 2; then
+-	echo "Usage: $0 /sbin/depmod <kernelrelease>" >&2
++if test $# -ne 3; then
++	echo "Usage: $0 /sbin/depmod <kernelrelease> <symbolprefix>" >&2
+ 	exit 1
+ fi
+ DEPMOD=$1
+ KERNELRELEASE=$2
++SYMBOL_PREFIX=$3
+ 
+ if ! test -r System.map -a -x "$DEPMOD"; then
+ 	exit 0
+ fi
++
++# older versions of depmod don't support -P <symbol-prefix>
++# support was added in module-init-tools 3.13
++if test -n "$SYMBOL_PREFIX"; then
++	release=$("$DEPMOD" --version)
++	package=$(echo "$release" | cut -d' ' -f 1)
++	if test "$package" = "module-init-tools"; then
++		version=$(echo "$release" | cut -d' ' -f 2)
++		later=$(printf '%s\n' "$version" "3.13" | sort -V | tail -n 1)
++		if test "$later" != "$version"; then
++			# module-init-tools < 3.13, drop the symbol prefix
++			SYMBOL_PREFIX=""
++		fi
++	fi
++	if test -n "$SYMBOL_PREFIX"; then
++		SYMBOL_PREFIX="-P $SYMBOL_PREFIX"
++	fi
++fi
++
+ # older versions of depmod require the version string to start with three
+ # numbers, so we cheat with a symlink here
+ depmod_hack_needed=true
+@@ -34,7 +54,7 @@ set -- -ae -F System.map
+ if test -n "$INSTALL_MOD_PATH"; then
+ 	set -- "$@" -b "$INSTALL_MOD_PATH"
+ fi
+-"$DEPMOD" "$@" "$KERNELRELEASE"
++"$DEPMOD" "$@" "$KERNELRELEASE" $SYMBOL_PREFIX
+ ret=$?
+ 
+ if $depmod_hack_needed; then
+-- 
+1.7.7.6
 
---nextPart1870282.lNtgSctV19--
+
