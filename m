@@ -1,117 +1,54 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from multi.imgtec.com ([194.200.65.239]:18336 "EHLO multi.imgtec.com"
+Received: from mga01.intel.com ([192.55.52.88]:52856 "EHLO mga01.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751075Ab3BFM6D (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 6 Feb 2013 07:58:03 -0500
-From: James Hogan <james.hogan@imgtec.com>
-Subject: [PATCH v2 1/1] depmod: pass -P $CONFIG_SYMBOL_PREFIX
-Date: Wed, 6 Feb 2013 12:56:59 +0000
-Message-ID: <1360155419-12349-1-git-send-email-james.hogan@imgtec.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+	id S1030217Ab3BGV6u (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 7 Feb 2013 16:58:50 -0500
+From: Andi Kleen <andi@firstfloor.org>
+Subject: [PATCH] Kbuild: Disable var tracking with CONFIG_DEBUG_INFO_REDUCED
+Date: Thu,  7 Feb 2013 13:58:40 -0800
+Message-Id: <1360274320-26833-1-git-send-email-andi@firstfloor.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: James Hogan <james.hogan@imgtec.com>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, Mike Frysinger <vapier@gentoo.org>, Yoshinori Sato <ysato@users.sourceforge.jp>, uclinux-dist-devel@blackfin.uclinux.org
+To: mmarek@suse.cz
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Andi Kleen <ak@linux.intel.com>
 
-On architectures which have symbol prefixes, depmod emits lots of
-warnings like this:
+From: Andi Kleen <ak@linux.intel.com>
 
-WARNING: $module.ko needs unknown symbol $symbol
+Newer gcc enables the var-tracking pass with -g to keep track which
+registers contain which variables. This is one of the slower passes in gcc.
 
-This is because depmod isn't being passed the -P <symbol_prefix>
-arguments to specify the symbol prefix to ignore. This option is
-included since the 3.13 release of module-init-tools.
+With reduced debug info (aimed at objdump -S, but not using a full debugger)
+we don't need this fine grained tracking. But it was still enabled
+because -g was enabled. Disable it explicitely for DEBUG_INFO_REDUCED.
 
-Update scripts/depmod.sh to take extra arguments for the symbol prefix
-(required but may be empty), and update the main Makefile to always pass
-"$(CONFIG_SYMBOL_PREFIX)" to scripts/depmod.sh.
+On my 8T workstation this gives me about a 12 second gain in building
+a reasonable kernel config (2min16 vs 2min28) with DEBUG_INFO_REDUCED.
+With full DEBUG_INFO it takes 2min46
 
-If the provided symbol prefix is non-empty, scripts/depmod.sh checks if
-depmod --version reports module-init-tools with a version number < 3.13
-otherwise it appends -P $SYMBOL_PREFIX to the depmod command line.
+The actual improvement in user time taken by the compiler is much higher
+(all CPU combined user time 15min5s vs 16m30 before)
+but the usual amdahl bottleneck on the linker prevents more speedup.
+It still saves some more energy and keeps cycles for other things.
 
-Signed-off-by: James Hogan <james.hogan@imgtec.com>
-Cc: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org
-Cc: Mike Frysinger <vapier@gentoo.org>
-Cc: Yoshinori Sato <ysato@users.sourceforge.jp>
-Cc: uclinux-dist-devel@blackfin.uclinux.org
+Signed-off-by: Andi Kleen <ak@linux.intel.com>
 ---
-changes since v1: clean up with assistance from Mike Frysinger (thanks!)
-* always pass prefix to depmod.sh to simplify the logic
-* use printf instead of ugly echos in version check
-
- Makefile          |    2 +-
- scripts/depmod.sh |   26 +++++++++++++++++++++++---
- 2 files changed, 24 insertions(+), 4 deletions(-)
+ Makefile |    3 ++-
+ 1 files changed, 2 insertions(+), 1 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index 54dfde5..6cb7fdb 100644
+index 54dfde5..7e423df 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -1397,7 +1397,7 @@ quiet_cmd_rmfiles = $(if $(wildcard $(rm-files)),CLEAN   $(wildcard $(rm-files))
- # Run depmod only if we have System.map and depmod is executable
- quiet_cmd_depmod = DEPMOD  $(KERNELRELEASE)
-       cmd_depmod = $(CONFIG_SHELL) $(srctree)/scripts/depmod.sh $(DEPMOD) \
--                   $(KERNELRELEASE)
-+                   $(KERNELRELEASE) "$(patsubst "%",%,$(CONFIG_SYMBOL_PREFIX))"
+@@ -619,7 +619,8 @@ KBUILD_AFLAGS	+= -gdwarf-2
+ endif
  
- # Create temporary dir for module support files
- # clean it up only when building all modules
-diff --git a/scripts/depmod.sh b/scripts/depmod.sh
-index 2ae4817..122599b 100755
---- a/scripts/depmod.sh
-+++ b/scripts/depmod.sh
-@@ -2,16 +2,36 @@
- #
- # A depmod wrapper used by the toplevel Makefile
+ ifdef CONFIG_DEBUG_INFO_REDUCED
+-KBUILD_CFLAGS 	+= $(call cc-option, -femit-struct-debug-baseonly)
++KBUILD_CFLAGS 	+= $(call cc-option, -femit-struct-debug-baseonly) \
++		   $(call cc-option,-fno-var-tracking)
+ endif
  
--if test $# -ne 2; then
--	echo "Usage: $0 /sbin/depmod <kernelrelease>" >&2
-+if test $# -ne 3; then
-+	echo "Usage: $0 /sbin/depmod <kernelrelease> <symbolprefix>" >&2
- 	exit 1
- fi
- DEPMOD=$1
- KERNELRELEASE=$2
-+SYMBOL_PREFIX=$3
- 
- if ! test -r System.map -a -x "$DEPMOD"; then
- 	exit 0
- fi
-+
-+# older versions of depmod don't support -P <symbol-prefix>
-+# support was added in module-init-tools 3.13
-+if test -n "$SYMBOL_PREFIX"; then
-+	release=$("$DEPMOD" --version)
-+	package=$(echo "$release" | cut -d' ' -f 1)
-+	if test "$package" = "module-init-tools"; then
-+		version=$(echo "$release" | cut -d' ' -f 2)
-+		later=$(printf '%s\n' "$version" "3.13" | sort -V | tail -n 1)
-+		if test "$later" != "$version"; then
-+			# module-init-tools < 3.13, drop the symbol prefix
-+			SYMBOL_PREFIX=""
-+		fi
-+	fi
-+	if test -n "$SYMBOL_PREFIX"; then
-+		SYMBOL_PREFIX="-P $SYMBOL_PREFIX"
-+	fi
-+fi
-+
- # older versions of depmod require the version string to start with three
- # numbers, so we cheat with a symlink here
- depmod_hack_needed=true
-@@ -34,7 +54,7 @@ set -- -ae -F System.map
- if test -n "$INSTALL_MOD_PATH"; then
- 	set -- "$@" -b "$INSTALL_MOD_PATH"
- fi
--"$DEPMOD" "$@" "$KERNELRELEASE"
-+"$DEPMOD" "$@" "$KERNELRELEASE" $SYMBOL_PREFIX
- ret=$?
- 
- if $depmod_hack_needed; then
+ ifdef CONFIG_FUNCTION_TRACER
 -- 
 1.7.7.6
-
 
