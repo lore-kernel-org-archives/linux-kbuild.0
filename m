@@ -1,19 +1,19 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-we0-f175.google.com ([74.125.82.175]:65205 "EHLO
-	mail-we0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753901Ab3BILXm (ORCPT
+Received: from mail-we0-f182.google.com ([74.125.82.182]:45639 "EHLO
+	mail-we0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752981Ab3BILg2 convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 9 Feb 2013 06:23:42 -0500
+	Sat, 9 Feb 2013 06:36:28 -0500
 From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: Re: [PATCH resend v3 1/3] kconfig: nconf:  rewrite help texts
-Date: Sat, 9 Feb 2013 12:23:36 +0100
-References: <20130201182237.GA11098@mobil.systemanalysen.net> <201302090130.07194.yann.morin.1998@free.fr> <20130209034609.GA8891@mobil.systemanalysen.net>
-In-Reply-To: <20130209034609.GA8891@mobil.systemanalysen.net>
+Subject: Re: [PATCH resend v3 3/3] kconfig: nconf:  add vi-style navigation keys
+Date: Sat, 9 Feb 2013 12:36:23 +0100
+References: <20130201182237.GA11098@mobil.systemanalysen.net> <201302090203.04055.yann.morin.1998@free.fr> <20130209050748.GB8891@mobil.systemanalysen.net>
+In-Reply-To: <20130209050748.GB8891@mobil.systemanalysen.net>
 MIME-Version: 1.0
 Content-Type: Text/Plain;
-  charset="iso-8859-15"
-Content-Transfer-Encoding: 7bit
-Message-Id: <201302091223.36881.yann.morin.1998@free.fr>
+  charset="utf-8"
+Content-Transfer-Encoding: 8BIT
+Message-Id: <201302091236.23641.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Roland Eggner <edvx1@systemanalysen.net>
@@ -22,28 +22,35 @@ Cc: linux-kbuild@vger.kernel.org, Dmitry Voytik <dvv.kernel@gmail.com>, Michal M
 Rolland, All,
 
 On Saturday 09 February 2013 Roland Eggner wrote:
-> On 2013-02-09 Saturday at 01:30 +0100 Yann E. MORIN wrote:
-[--SNIP--]
-> > > +"Text Box (Help Window)\n"
-> > > +"----------------------\n"
-> > > +"Use movement keys <Down> <Up> <PageDown> <PageUp> <End> <Home> as listed in\n"
-> > > +"table above.\n"
+> On 2013-02-09 Saturday at 02:03 +0100 Yann E. MORIN wrote:
+> > On Friday 01 February 2013 Roland Eggner wrote:
+> > > Add vi-style navigation keys, based on initial work by Dmitry Voytik.
 > > 
-> > ... keys [elided] as listed ...
+> > As much I am a unconditional vim user, I doubt this is a sane idea to
+> > include this, as it conflicts with the established UI that people expect,
+> > especially since <h> is remapped and people already rely on <h> to provide
+> > help, not do any other weird thing (like exiting the current submenu).
 > 
-> Ok, because you are dropping patch 3/3.
+> Having the most frequently used keys in the middle of the keyboard is 
+> a professional computer usage pattern, not an anachronistic one.
 
-If that was related to patch 3/3, that should have been in that patch,
-not this one.
+I never said it was anachronistic. I just oppose this change as it conflicts
+with a fundamental existing behavior (getting help) that people have come to
+rely on.
 
-[--SNIP--]
-> > Any reason for the re-indent with one more space?
-> 
-> Intention is optimization for fast reading, as usual in professional text 
-> processing:  seperate words by single space;  separate sentences, half-sentences 
-> and listing symbols by two spaces.
+> Regarding the <h>/<H> conflict:  My vision is to eliminate the need for help 
+> keybindings <h> <?> at all by displaying the related help text beside the menu 
+> permanently, similar to some graphical backends.  For terminals with 
+> COLUMNS>=160 this should be rather easy to implement.  nouveaufb gives me by 
+> default terminal with 274 columns, “retina” displays are entering the market 
+> … the frequency of COLUMNS>=160 terminals probably will continue to grow.  While 
+> staying compatible with COLUMNS=80, it seems reasonable to use the capabilities 
+> of wider terminals, or what would you say?
 
-OK, I kept it.
+How do you navigate up/down in the help text (when the terminal is not
+high enought to display the entire help) if it is displayed at the same
+time the menu entries are, yet without breaking the UI behavior people
+expect?
 
 Regards,
 Yann E. MORIN.
@@ -55,4 +62,3 @@ Yann E. MORIN.
 | +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
 | http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
 '------------------------------^-------^------------------^--------------------'
-
