@@ -1,76 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ngcobalt07.manitu.net ([217.11.48.107]:43446 "EHLO
-	ngcobalt07.manitu.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750711Ab3BIFIi (ORCPT
+Received: from mail-we0-f175.google.com ([74.125.82.175]:65205 "EHLO
+	mail-we0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753901Ab3BILXm (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 9 Feb 2013 00:08:38 -0500
-Date: Sat, 9 Feb 2013 06:07:48 +0100
-From: Roland Eggner <edvx1@systemanalysen.net>
-Subject: Re: [PATCH resend v3 3/3] kconfig: nconf:  add vi-style navigation
- keys
-Message-ID: <20130209050748.GB8891@mobil.systemanalysen.net>
-Reply-To: Roland Eggner <edvx1@systemanalysen.net>
-References: <20130201182237.GA11098@mobil.systemanalysen.net>
- <20130201183357.GD11098@mobil.systemanalysen.net>
- <201302090203.04055.yann.morin.1998@free.fr>
+	Sat, 9 Feb 2013 06:23:42 -0500
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Subject: Re: [PATCH resend v3 1/3] kconfig: nconf:  rewrite help texts
+Date: Sat, 9 Feb 2013 12:23:36 +0100
+References: <20130201182237.GA11098@mobil.systemanalysen.net> <201302090130.07194.yann.morin.1998@free.fr> <20130209034609.GA8891@mobil.systemanalysen.net>
+In-Reply-To: <20130209034609.GA8891@mobil.systemanalysen.net>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="ftEhullJWpWg/VHq"
-Content-Disposition: inline
-In-Reply-To: <201302090203.04055.yann.morin.1998@free.fr>
+Content-Type: Text/Plain;
+  charset="iso-8859-15"
+Content-Transfer-Encoding: 7bit
+Message-Id: <201302091223.36881.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Yann E. MORIN" <yann.morin.1998@free.fr>
+To: Roland Eggner <edvx1@systemanalysen.net>
 Cc: linux-kbuild@vger.kernel.org, Dmitry Voytik <dvv.kernel@gmail.com>, Michal Marek <mmarek@suse.cz>, Stephen Boyd <sboyd@codeaurora.org>, linux-kernel@vger.kernel.org
 
+Rolland, All,
 
---ftEhullJWpWg/VHq
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On Saturday 09 February 2013 Roland Eggner wrote:
+> On 2013-02-09 Saturday at 01:30 +0100 Yann E. MORIN wrote:
+[--SNIP--]
+> > > +"Text Box (Help Window)\n"
+> > > +"----------------------\n"
+> > > +"Use movement keys <Down> <Up> <PageDown> <PageUp> <End> <Home> as listed in\n"
+> > > +"table above.\n"
+> > 
+> > ... keys [elided] as listed ...
+> 
+> Ok, because you are dropping patch 3/3.
 
-On 2013-02-09 Saturday at 02:03 +0100 Yann E. MORIN wrote:
-> On Friday 01 February 2013 Roland Eggner wrote:
-> > Add vi-style navigation keys, based on initial work by Dmitry Voytik.
->=20
-> As much I am a unconditional vim user, I doubt this is a sane idea to
-> include this, as it conflicts with the established UI that people expect,
-> especially since <h> is remapped and people already rely on <h> to provide
-> help, not do any other weird thing (like exiting the current submenu).
+If that was related to patch 3/3, that should have been in that patch,
+not this one.
 
-Having the most frequently used keys in the middle of the keyboard is=20
-a professional computer usage pattern, not an anachronistic one.
+[--SNIP--]
+> > Any reason for the re-indent with one more space?
+> 
+> Intention is optimization for fast reading, as usual in professional text 
+> processing:  seperate words by single space;  separate sentences, half-sentences 
+> and listing symbols by two spaces.
 
-Regarding the <h>/<H> conflict:  My vision is to eliminate the need for hel=
-p=20
-keybindings <h> <?> at all by displaying the related help text beside the m=
-enu=20
-permanently, similar to some graphical backends.  For terminals with=20
-COLUMNS>=3D160 this should be rather easy to implement.  nouveaufb gives me=
- by=20
-default terminal with 274 columns, =E2=80=9Cretina=E2=80=9D displays are en=
-tering the market=20
-=E2=80=A6 the frequency of COLUMNS>=3D160 terminals probably will continue =
-to grow.  While=20
-staying compatible with COLUMNS=3D80, it seems reasonable to use the capabi=
-lities=20
-of wider terminals, or what would you say?
+OK, I kept it.
 
-Cannot promise when I will find the time to prepare a patch.
+Regards,
+Yann E. MORIN.
 
---=20
-Regards
-Roland Eggner
+-- 
+.-----------------.--------------------.------------------.--------------------.
+|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
+| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
+| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
+| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
+'------------------------------^-------^------------------^--------------------'
 
---ftEhullJWpWg/VHq
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.19 (GNU/Linux)
-
-iEYEARECAAYFAlEV2aQACgkQdN/hKfT7G/Li8wCghN4v8W1fFkkA6heKgTxh0KsG
-K/8AoK2Vi8LJWQ04tnXVjMNBXH5eTkuB
-=1bVV
------END PGP SIGNATURE-----
-
---ftEhullJWpWg/VHq--
