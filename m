@@ -1,79 +1,42 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wi0-f178.google.com ([209.85.212.178]:55019 "EHLO
-	mail-wi0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932299Ab3BIA6R (ORCPT
+Received: from mail-wi0-f182.google.com ([209.85.212.182]:63154 "EHLO
+	mail-wi0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932276Ab3BIBDI (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 8 Feb 2013 19:58:17 -0500
-Received: by mail-wi0-f178.google.com with SMTP id o1so1480362wic.5
-        for <linux-kbuild@vger.kernel.org>; Fri, 08 Feb 2013 16:58:16 -0800 (PST)
+	Fri, 8 Feb 2013 20:03:08 -0500
 From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: [PATCH 2/2] kconfig: nconf: rewrite labels of function keys line
-Date: Sat,  9 Feb 2013 01:58:07 +0100
-Message-Id: <2c68115cb3d2863004f1dd5c01e3adbd54facd4c.1360371247.git.yann.morin.1998@free.fr>
-In-Reply-To: <cover.1360371247.git.yann.morin.1998@free.fr>
-References: <cover.1360371247.git.yann.morin.1998@free.fr>
-In-Reply-To: <cover.1360371247.git.yann.morin.1998@free.fr>
-References: <cover.1360371247.git.yann.morin.1998@free.fr>
+Subject: Re: [PATCH resend v3 3/3] kconfig: nconf:  add vi-style navigation keys
+Date: Sat, 9 Feb 2013 02:03:03 +0100
+References: <20130201182237.GA11098@mobil.systemanalysen.net> <20130201183357.GD11098@mobil.systemanalysen.net>
+In-Reply-To: <20130201183357.GD11098@mobil.systemanalysen.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: Text/Plain;
+  charset="iso-8859-15"
+Content-Transfer-Encoding: 7bit
+Message-Id: <201302090203.04055.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Michal Marek <mmarek@suse.cz>, Roland Eggner <edvx1@systemanalysen.net>, Dmitry Voytik <dvv.kernel@gmail.com>, "Yann E. MORIN" <yann.morin.1998@free.fr>
+To: linux-kbuild@vger.kernel.org, Roland Eggner <edvx1@systemanalysen.net>
+Cc: Dmitry Voytik <dvv.kernel@gmail.com>, Michal Marek <mmarek@suse.cz>, Stephen Boyd <sboyd@codeaurora.org>, linux-kernel@vger.kernel.org
 
-From: Roland Eggner <edvx1@systemanalysen.net>
+Roland, All,
 
->From: Roland Eggner <edvx1@systemanalysen.net>
+On Friday 01 February 2013 Roland Eggner wrote:
+> Add vi-style navigation keys, based on initial work by Dmitry Voytik.
 
-More reasonable labels of function keys line.  Rename labels and keep menu
-width, as required for fitting on COLUMNS=80 terminals:
-•  s/Insts/Help 2/
-•  s/Config/ShowAll/
+As much I am a unconditional vim user, I doubt this is a sane idea to
+include this, as it conflicts with the established UI that people expect,
+especially since <h> is remapped and people already rely on <h> to provide
+help, not do any other weird thing (like exiting the current submenu).
 
-Signed-off-by: Roland Eggner <edvx1@systemanalysen.net>
-Reviewed-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Signed-off-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
----
- scripts/kconfig/nconf.c |    8 ++++----
- 1 files changed, 4 insertions(+), 4 deletions(-)
+Regards,
+Yann E. MORIN.
 
-diff --git a/scripts/kconfig/nconf.c b/scripts/kconfig/nconf.c
-index 65c672c..dbf31ed 100644
---- a/scripts/kconfig/nconf.c
-+++ b/scripts/kconfig/nconf.c
-@@ -312,19 +312,19 @@ struct function_keys function_keys[] = {
- 	},
- 	{
- 		.key_str = "F2",
--		.func = "Sym Info",
-+		.func = "SymInfo",
- 		.key = F_SYMBOL,
- 		.handler = handle_f2,
- 	},
- 	{
- 		.key_str = "F3",
--		.func = "Insts",
-+		.func = "Help 2",
- 		.key = F_INSTS,
- 		.handler = handle_f3,
- 	},
- 	{
- 		.key_str = "F4",
--		.func = "Config",
-+		.func = "ShowAll",
- 		.key = F_CONF,
- 		.handler = handle_f4,
- 	},
-@@ -348,7 +348,7 @@ struct function_keys function_keys[] = {
- 	},
- 	{
- 		.key_str = "F8",
--		.func = "Sym Search",
-+		.func = "SymSearch",
- 		.key = F_SEARCH,
- 		.handler = handle_f8,
- 	},
 -- 
-1.7.2.5
+.-----------------.--------------------.------------------.--------------------.
+|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
+| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
+| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
+| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
+'------------------------------^-------^------------------^--------------------'
 
