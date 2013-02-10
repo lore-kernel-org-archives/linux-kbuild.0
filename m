@@ -1,54 +1,85 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ob0-f174.google.com ([209.85.214.174]:60529 "EHLO
-	mail-ob0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1760758Ab3BIQmM (ORCPT
+Received: from ngcobalt07.manitu.net ([217.11.48.107]:41845 "EHLO
+	ngcobalt07.manitu.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756944Ab3BJDBW (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 9 Feb 2013 11:42:12 -0500
-Received: by mail-ob0-f174.google.com with SMTP id 16so4904432obc.33
-        for <linux-kbuild@vger.kernel.org>; Sat, 09 Feb 2013 08:42:11 -0800 (PST)
+	Sat, 9 Feb 2013 22:01:22 -0500
+Date: Sun, 10 Feb 2013 04:00:30 +0100
+From: Roland Eggner <edvx1@systemanalysen.net>
+Subject: Re: [PATCH resend v3 1/3] kconfig: nconf:  rewrite help texts
+Message-ID: <20130210030030.GA20308@mobil.systemanalysen.net>
+Reply-To: Roland Eggner <edvx1@systemanalysen.net>
+References: <20130201182237.GA11098@mobil.systemanalysen.net>
+ <201302090130.07194.yann.morin.1998@free.fr>
+ <20130209034609.GA8891@mobil.systemanalysen.net>
+ <201302091223.36881.yann.morin.1998@free.fr>
 MIME-Version: 1.0
-In-Reply-To: <CAD=GYpa5OTy8Jd4Pevgabvc0J+mx6Ba+_K8iAsGPwD3Bc7hknw@mail.gmail.com>
-References: <CAD=GYpa5OTy8Jd4Pevgabvc0J+mx6Ba+_K8iAsGPwD3Bc7hknw@mail.gmail.com>
-Date: Sat, 9 Feb 2013 10:42:11 -0600
-Message-ID: <CAD=GYpaRRUS5wH9HssVoNH=Ctxd9+ov6VAhxGhA57Q71C9zA2Q@mail.gmail.com>
-Subject: Re: How to share variables with a sub-make command in a Kbuild Makefile?
-From: Joel A Fernandes <agnel.joel@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="opJtzjQTFsWo+cga"
+Content-Disposition: inline
+In-Reply-To: <201302091223.36881.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
+To: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Cc: linux-kbuild@vger.kernel.org, Dmitry Voytik <dvv.kernel@gmail.com>, Michal Marek <mmarek@suse.cz>, Stephen Boyd <sboyd@codeaurora.org>, linux-kernel@vger.kernel.org
 
-Per the Mailing list FAQ, I would like to indicate that I prefer to be
-CC'd on replies, thanks.
 
-Thanks,
-  Joel Fernandes
+--opJtzjQTFsWo+cga
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On Sat, Feb 9, 2013 at 10:34 AM, Joel A Fernandes <agnel.joel@gmail.com> wrote:
-> Hi,
-> I am trying to create a patch that involves a call to a submake and
-> sharing a variable with it.
->
-> The the top level Makefile is arch/arm/Makefile and has something like:
-> dtbs: scripts
->    $(Q)$(MAKE) -e $(build)=$(boot)/dts MACHINE=$(MACHINE) dtbs
->    # Make use of share-var modified by the submake
->    echo $(share-var)
->
-> In the sub-make Makefile, I want to modify a variable and have it
-> reflect in the top Makefile
-> dtbs: $(addprefix $(obj)/, $(dtb-y))
->    $(Q)rm -f $(obj)/../*.dtb
->    share-var += "new stuff"
->
-> I tried exporting share-var from the top-level Makefile but it doesn't work.
-> Is there an easy way to do this?
-> How does the kernel do it with obj-y variables where it recursively
-> has the variable updated?
->
-> The reason I need this variable in the top-level Makefile is because
-> there are other targets in the top-level Makefile (arch/arm/Makefile)
-> that need access to this variable for its purpose.
->
-> Thanks in advance,
->   Joel Fernandes
+On 2013-02-09 Saturday at 12:23 +0100 Yann E. MORIN wrote:
+> Rolland, All,
+>=20
+> On Saturday 09 February 2013 Roland Eggner wrote:
+> > On 2013-02-09 Saturday at 01:30 +0100 Yann E. MORIN wrote:
+> [--SNIP--]
+> > > > +"Text Box (Help Window)\n"
+> > > > +"----------------------\n"
+> > > > +"Use movement keys <Down> <Up> <PageDown> <PageUp> <End> <Home> as=
+ listed in\n"
+> > > > +"table above.\n"
+> > >=20
+> > > ... keys [elided] as listed ...
+> >=20
+> > Ok, because you are dropping patch 3/3.
+>=20
+> If that was related to patch 3/3, that should have been in that patch,
+> not this one.
+
+My =E2=80=9COk, because =E2=80=A6=E2=80=9D referred to your =E2=80=9Ckeys [=
+elided] as listed =E2=80=A6=E2=80=9D in that=20
+particular hunk, whereas my =E2=80=9CYou performed a nice polish =E2=80=A6=
+=E2=80=9D several hunks later=20
+referred to the whole patch.  Just to avoid misunderstanding.
+
+>=20
+> [--SNIP--]
+> > > Any reason for the re-indent with one more space?
+> >=20
+> > Intention is optimization for fast reading, as usual in professional te=
+xt=20
+> > processing:  seperate words by single space;  separate sentences, half-=
+sentences=20
+> > and listing symbols by two spaces.
+>=20
+> OK, I kept it.
+
+Thank you.
+--=20
+Regards
+Roland Eggner
+
+--opJtzjQTFsWo+cga
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.19 (GNU/Linux)
+
+iEYEARECAAYFAlEXDU4ACgkQdN/hKfT7G/JPXACcDPvQnO7eHUg8rBxewWidqslX
++tIAniiJjXQkdCmdYyHOaUst2W0o2h1E
+=NQB0
+-----END PGP SIGNATURE-----
+
+--opJtzjQTFsWo+cga--
