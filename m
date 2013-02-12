@@ -1,39 +1,73 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-vc0-f169.google.com ([209.85.220.169]:52131 "EHLO
-	mail-vc0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1760763Ab3BLA3c (ORCPT
+Received: from avon.wwwdotorg.org ([70.85.31.133]:34439 "EHLO
+	avon.wwwdotorg.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752278Ab3BLWDt (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 11 Feb 2013 19:29:32 -0500
-Received: by mail-vc0-f169.google.com with SMTP id n10so4299132vcn.0
-        for <linux-kbuild@vger.kernel.org>; Mon, 11 Feb 2013 16:29:32 -0800 (PST)
-MIME-Version: 1.0
-From: Javier Domingo <javierdo1@gmail.com>
-Date: Tue, 12 Feb 2013 01:29:11 +0100
-Message-ID: <CALZVapk=-8t8BihTSoTJ=Fh3C9xBtDc9ETpmGpjNBrTYiJLF7g@mail.gmail.com>
-Subject: Size of images in make-kpkg and make deb-pkg
-Content-Type: text/plain; charset=UTF-8
+	Tue, 12 Feb 2013 17:03:49 -0500
+From: Stephen Warren <swarren@wwwdotorg.org>
+Subject: [PATCH] kbuild: limit dtc+cpp include path
+Date: Tue, 12 Feb 2013 15:03:37 -0700
+Message-Id: <1360706617-20276-1-git-send-email-swarren@wwwdotorg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
+To: Grant Likely <grant.likely@secretlab.ca>, Rob Herring <rob.herring@calxeda.com>
+Cc: devicetree-discuss@lists.ozlabs.org, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Stephen Warren <swarren@nvidia.com>
 
-Hello,
+From: Stephen Warren <swarren@nvidia.com>
 
-I don't know if this belongs here, but I just wanted to came across a
-strange thing I am experiencing. I am currently working on v3.6, and I
-have just discovered that generated kernel images have a totally
-unrelated size.
+Device tree source files may now include header files. The intent is
+that those header files define/name constants used as part of the DT
+bindings. Currently this feature is open to abuse, since any kernel
+header file at all can be included, This could allow device tree files
+to become dependant on kernel headers files, and thus make them no
+longer OS-independent. This would also prevent separating the device
+tree source files from the kernel repository.
 
-When I compile with something like make-kpkg --initrd kernel_image
-kernel_headers, the generated image is 7.7MB, and when I then run make
-deb-pkg, the generated deb package is 33MB.
+Solve this by limiting the cpp include path for device tree files to
+separate directories.
 
-Other sizes are:
-6.5M <-> 24M
-38M <-> 484M (!!!)
+Signed-off-by: Stephen Warren <swarren@nvidia.com>
+---
+Here, I allow header files in the .dts source directory, or in a per-arch
+include directory. Perhaps rather than:
 
-Can anyone explain me this? I can't understand the difference, appart
-from the obvious (that are different tools).
+-I$(srctree)/arch/$(SRCARCH)/include/dts
 
-Thank you for your attention,
+The following might be better?:
 
-Javier Domingo
+-I$(srctree)/Documentation/devicetree/bindings
+
+i.e. is there a need to separate binding-related headers per arch?
+
+ scripts/Makefile.lib |    8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+index 7910229..07125e6 100644
+--- a/scripts/Makefile.lib
++++ b/scripts/Makefile.lib
+@@ -156,6 +156,11 @@ cpp_flags      = -Wp,-MD,$(depfile) $(NOSTDINC_FLAGS) $(LINUXINCLUDE)     \
+ 
+ ld_flags       = $(LDFLAGS) $(ldflags-y)
+ 
++dtc_cpp_flags  = -Wp,-MD,$(depfile) -nostdinc                            \
++		 -I$(srctree)/arch/$(SRCARCH)/boot/dts                   \
++		 -I$(srctree)/arch/$(SRCARCH)/include/dts                \
++		 -undef -D__DTS__
++
+ # Finds the multi-part object the current object will be linked into
+ modname-multi = $(sort $(foreach m,$(multi-used),\
+ 		$(if $(filter $(subst $(obj)/,,$*.o), $($(m:.o=-objs)) $($(m:.o=-y))),$(m:.o=))))
+@@ -272,8 +277,7 @@ $(obj)/%.dtb: $(src)/%.dts FORCE
+ dtc-tmp = $(subst $(comma),_,$(dot-target).dts)
+ 
+ quiet_cmd_dtc_cpp = DTC+CPP $@
+-cmd_dtc_cpp = $(CPP) $(cpp_flags) -x assembler-with-cpp -undef -D__DTS__  \
+-			-o $(dtc-tmp) $< ; \
++cmd_dtc_cpp = $(CPP) $(dtc_cpp_flags) -x assembler-with-cpp -o $(dtc-tmp) $< ; \
+ 	$(objtree)/scripts/dtc/dtc -O dtb -o $@ -b 0 $(DTC_FLAGS) $(dtc-tmp)
+ 
+ $(obj)/%.dtb: $(src)/%.dtsp FORCE
+-- 
+1.7.10.4
+
