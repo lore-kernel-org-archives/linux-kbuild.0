@@ -1,36 +1,35 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from hqemgate03.nvidia.com ([216.228.121.140]:15333 "EHLO
-	hqemgate03.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756892Ab3BMNWS (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 13 Feb 2013 08:22:18 -0500
-Message-ID: <511B9335.1020107@nvidia.com>
-Date: Wed, 13 Feb 2013 07:20:53 -0600
-From: Daniel Dadap <ddadap@nvidia.com>
+Received: from mx1.redhat.com ([209.132.183.28]:15655 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752080Ab3BMVop (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 13 Feb 2013 16:44:45 -0500
+From: Tom Tromey <tromey@redhat.com>
+Subject: Re: [PATCH v5 01/20] scripts/gdb: Add infrastructure
+References: <cover.1359463075.git.jan.kiszka@siemens.com>
+	<cover.1359463075.git.jan.kiszka@siemens.com>
+	<99da3a9930c678555d260206688158441d2bab05.1359463075.git.jan.kiszka@siemens.com>
+Date: Wed, 13 Feb 2013 14:43:37 -0700
+In-Reply-To: <99da3a9930c678555d260206688158441d2bab05.1359463075.git.jan.kiszka@siemens.com>
+	(Jan Kiszka's message of "Tue, 29 Jan 2013 13:37:44 +0100")
+Message-ID: <87liarkhyu.fsf@fleche.redhat.com>
 MIME-Version: 1.0
-Subject: Re: what is $(Q) ?
-References: <20130212211449.GA2533@debian.localdomain>
-In-Reply-To: <20130212211449.GA2533@debian.localdomain>
-Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: horseriver <horserivers@gmail.com>
-Cc: "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>
+To: Jan Kiszka <jan.kiszka@siemens.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org, Jason Wessel <jason.wessel@windriver.com>, kgdb-bugreport@lists.sourceforge.net, Andi Kleen <andi@firstfloor.org>, Ben Widawsky <ben@bwidawsk.net>, Borislav Petkov <bp@alien8.de>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
 
-On 02/12/2013 03:14 PM, horseriver wrote:
-> hi;)
->
->    In kernel makefile,there is a $(Q) ,what does it mean?
+>>>>> "Jan" == Jan Kiszka <jan.kiszka@siemens.com> writes:
 
-It expands out to nothing if KBUILD_VERBOSE is set to 1, or @ otherwise; 
-i.e., it suppresses command output from being printed unless building 
-verbose.
+Jan> +if gdb_version < "7.1":
+Jan> +	print "NOTE: gdb 7.1 or later required for Linux helper scripts " \
+Jan> +	      "to work."
 
->
-> thanks!
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+FWIW you can just directly feature-test for the things you know you need.
+Like:  if not hasattr(gdb, 'parse_and_eval'): ...
+In this case, 7.1 is old enough that it probably doesn't matter.
+For newer things, though, it is better to feature-test because distros
+sometimes forward-port patches, so the version number isn't a reliable
+indicator.
 
+Tom
