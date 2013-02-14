@@ -1,35 +1,79 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:15655 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752080Ab3BMVop (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 13 Feb 2013 16:44:45 -0500
-From: Tom Tromey <tromey@redhat.com>
-Subject: Re: [PATCH v5 01/20] scripts/gdb: Add infrastructure
-References: <cover.1359463075.git.jan.kiszka@siemens.com>
-	<cover.1359463075.git.jan.kiszka@siemens.com>
-	<99da3a9930c678555d260206688158441d2bab05.1359463075.git.jan.kiszka@siemens.com>
-Date: Wed, 13 Feb 2013 14:43:37 -0700
-In-Reply-To: <99da3a9930c678555d260206688158441d2bab05.1359463075.git.jan.kiszka@siemens.com>
-	(Jan Kiszka's message of "Tue, 29 Jan 2013 13:37:44 +0100")
-Message-ID: <87liarkhyu.fsf@fleche.redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+Received: from haggis.pcug.org.au ([203.10.76.10]:43480 "EHLO
+	members.tip.net.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755737Ab3BNHHF (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 14 Feb 2013 02:07:05 -0500
+Date: Thu, 14 Feb 2013 18:06:51 +1100
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+Subject: Re: linux-next: Tree for Feb 13 (virtio_console)
+Message-Id: <20130214180651.900763c3986c94531bb01ecf@canb.auug.org.au>
+In-Reply-To: <87sj4zk3ai.fsf@rustcorp.com.au>
+References: <20130213193532.162080d7c0557a307ab451ac@canb.auug.org.au>
+	<511BEC55.5090801@infradead.org>
+	<87sj4zk3ai.fsf@rustcorp.com.au>
+Mime-Version: 1.0
+Content-Type: multipart/signed; protocol="application/pgp-signature";
+ micalg="PGP-SHA256";
+ boundary="Signature=_Thu__14_Feb_2013_18_06_51_+1100_u37bEWmP1NatTBF8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jan Kiszka <jan.kiszka@siemens.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org, Jason Wessel <jason.wessel@windriver.com>, kgdb-bugreport@lists.sourceforge.net, Andi Kleen <andi@firstfloor.org>, Ben Widawsky <ben@bwidawsk.net>, Borislav Petkov <bp@alien8.de>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
+To: Rusty Russell <rusty@rustcorp.com.au>
+Cc: Randy Dunlap <rdunlap@infradead.org>, linux-next@vger.kernel.org, linux-kernel@vger.kernel.org, Amit Shah <amit.shah@redhat.com>, virtualization@lists.linux-foundation.org, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, Steven Rostedt <rostedt@goodmis.org>
 
->>>>> "Jan" == Jan Kiszka <jan.kiszka@siemens.com> writes:
+--Signature=_Thu__14_Feb_2013_18_06_51_+1100_u37bEWmP1NatTBF8
+Content-Type: text/plain; charset=US-ASCII
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Jan> +if gdb_version < "7.1":
-Jan> +	print "NOTE: gdb 7.1 or later required for Linux helper scripts " \
-Jan> +	      "to work."
+Hi Rusty,
 
-FWIW you can just directly feature-test for the things you know you need.
-Like:  if not hasattr(gdb, 'parse_and_eval'): ...
-In this case, 7.1 is old enough that it probably doesn't matter.
-For newer things, though, it is better to feature-test because distros
-sometimes forward-port patches, so the version number isn't a reliable
-indicator.
+On Thu, 14 Feb 2013 13:30:37 +1030 Rusty Russell <rusty@rustcorp.com.au> wr=
+ote:
+>
+> This looks like an impossible config.  CONFIG_VIRTIO_CONSOLE=3Dy, but
+> CONFIG_HVC_DRIVER isn't set.
+>=20
+> From drivers/char/Kconfig:
+>=20
+>         config VIRTIO_CONSOLE
+>         	tristate "Virtio console"
+>         	depends on VIRTIO
 
-Tom
+This also has "&& TTY" in -next (not actually relevant)
+
+>         	select HVC_DRIVER
+
+Its weird, but since CONFIG_TTY is not set (see the config), the
+HVC_DRIVER symbol is not even visible, so I suspect that the above select
+does nothing :-(  But also, I can't see how VIRTIO_CONSOLE could be set
+in the first place since TTY is not set.
+
+(cc'ing some more people) (this is a randconfig that has TTY=3Dn,
+HVC_DRIVER=3Dn, but VIRTIO_CONSOLE=3Dy)
+--=20
+Cheers,
+Stephen Rothwell                    sfr@canb.auug.org.au
+
+--Signature=_Thu__14_Feb_2013_18_06_51_+1100_u37bEWmP1NatTBF8
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iQIcBAEBCAAGBQJRHI0LAAoJEECxmPOUX5FE8+MP/ib5sE7Yvv9ID+XwokXNu5QK
+e+u14VmFjKY/G1VR7mOFsv6fgfegsG03Fsbjo94RESSxfLhcUDKbVecbJmOmusW+
+PdR4kqOXZAOWPZ7y9PvrRLrAQVA198YDfO+xSso/gkEH6v5coTHYS6GLcqic/zHA
+d+r1GvMHMqDL8uwbynuqugR9W5Uc35LigV3aH2YvWywkcBnmTRIaXASURPBUJZfU
+LkSCoqKsPjhoCNOMhdSPmlXY16qPh5gFEYnhBclQbMotY5WqBocY/+NYHvr0y42W
+bsAawM3ze3lyYgevXlnjaKhMuzDo6jPmZRpTe85rLE1hS6MKUPtU8v7nZ694pCaX
+34bDczgmwCYaM4QQnI7Sgp9fhOKzF8nQVlkxyd3Z9C/LgMInuyj1dviD4xVFQ8Hn
+4vLN5cRja3VGJTgNBaa61/eyGkKJovf3cQWfF75g/itYHEbtpqwIXF5AnBkzXkNS
+l5SV5QuWZOYHjZTbsFKpwlHgNWuiRP64Abx7f/cLcQBQ44fBnZyA/Zj8jKo8Egr1
+CqQhUfol9PPxChMtTg/Unio4grKH3/LyB9CBEXAq5xhpCu41933YyE8KGs8Ys44u
+4qzVYv6NNyDOU/NvcsLUyoFWJpZgHQyaYPJ422CiX66d8tBTeDB3JoDoT5/N77Bp
+oO+S6H5ehq7w+GxVG0Cz
+=iKqk
+-----END PGP SIGNATURE-----
+
+--Signature=_Thu__14_Feb_2013_18_06_51_+1100_u37bEWmP1NatTBF8--
