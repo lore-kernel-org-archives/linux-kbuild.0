@@ -1,47 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.snhosting.dk ([87.238.248.203]:50477 "EHLO
-	smtp.domainteam.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750767Ab3BOMBm (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 15 Feb 2013 07:01:42 -0500
-Date: Fri, 15 Feb 2013 13:01:37 +0100
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [RFC][PATCH] kernel: Replace timeconst.pl with a bc script
-Message-ID: <20130215120137.GA16769@merkur.ravnborg.org>
-References: <1360883635-25268-1-git-send-email-hpa@zytor.com>
+Received: from cantor2.suse.de ([195.135.220.15]:60178 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S935780Ab3BOPbK (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 15 Feb 2013 10:31:10 -0500
+Message-ID: <511E54B7.2080709@suse.cz>
+Date: Fri, 15 Feb 2013 16:31:03 +0100
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1360883635-25268-1-git-send-email-hpa@zytor.com>
+Subject: Re: [PATCH] fix: build aborts if SPACE characters are found in path.
+References: <CAK2BWApu9PjkmDdV4HoFXcq9KTh4e57iEdwYn9muVmYRwRNXgw@mail.gmail.com>
+In-Reply-To: <CAK2BWApu9PjkmDdV4HoFXcq9KTh4e57iEdwYn9muVmYRwRNXgw@mail.gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "H. Peter Anvin" <hpa@zytor.com>
-Cc: linux-kbuild@vger.kernel.org, mingo@kernel.org, tglx@linutronix.de, Andrew Morton <akpm@linux-foundation.org>, Michal Marek <mmarek@suse.cz>
+To: Sunil Beta Baskar <betasam@gmail.com>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Thu, Feb 14, 2013 at 03:13:55PM -0800, H. Peter Anvin wrote:
-> From: "H. Peter Anvin" <hpa@zytor.com>
+On 18.1.2013 15:33, Sunil Beta Baskar wrote:
+> Signed-off-by: Sunil Beta <betasam@gmail.com>
+> ---
+>  Makefile |    4 ++++
+>  1 file changed, 4 insertions(+)
 > 
-> bc is the standard tool for multi-precision arithmetic.  We switched
-> to Perl because akpm reported a hard-to-reproduce build hang, which
-> was very odd because affected and unaffected machines were all running
-> the same version of GNU bc.
+> diff --git a/Makefile b/Makefile
+> index 07bc925..48bfd8e 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -10,6 +10,8 @@ NAME = "Divemaster Edition"
+>  # Comments in this file are targeted only to the developer, do not
+>  # expect to learn how to build the kernel reading this file.
 > 
-> Unfortunately switching to Perl required a really ugly "canning"
-> mechanism to support Perl < 5.8 installations lacking the Math::BigInt
-> module.
-> 
-> It was recently pointed out to me that some very old versions of GNU
-> make had problems with pipes in subshells, which was indeed the
-> construct used in the Makefile rules in that version of the patch;
-> Perl didn't need it so switching to Perl fixed the problem for
-> unrelated reasons.  With the problem (hopefully) root-caused, we can
-> switch back to bc and do the arbitrary-precision arithmetic naturally.
-> 
-> Signed-off-by: H. Peter Anvin <hpa@zytor.com>
-> Cc: Andrew Morton <akpm@linux-foundation.org>
-> Cc: Michal Marek <mmarek@suse.cz>
-> Cc: Sam Ravnborg <sam@ravnborg.org>
+> +CURDIRSPC := $(echo $(CURDIR) | sed "s/ /\\\ /g" )
+> +$(ifneq $(CURDIR),$(CURDIRSPC), $(error directory $(CURDIR) contains spaces.))
 
-The kbuild stuff looks fine. The bc stuff I do not know about.
+You do not need to call shell and sed here. Use the findstring make
+function and the $(space) variable from scripts/Kbuild.include. Also,
+while at it, could you also add a check for colon? This breaks the build
+in similar way.
 
-Acked-by: Sam Ravnborg <sam@ravnborg.org>
+Thanks,
+Michal
