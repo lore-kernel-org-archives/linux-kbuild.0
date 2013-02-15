@@ -1,43 +1,54 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:60178 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S935780Ab3BOPbK (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 15 Feb 2013 10:31:10 -0500
-Message-ID: <511E54B7.2080709@suse.cz>
-Date: Fri, 15 Feb 2013 16:31:03 +0100
-From: Michal Marek <mmarek@suse.cz>
+Received: from avon.wwwdotorg.org ([70.85.31.133]:37221 "EHLO
+	avon.wwwdotorg.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S936065Ab3BOQZl (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 15 Feb 2013 11:25:41 -0500
+Message-ID: <511E617E.6080206@wwwdotorg.org>
+Date: Fri, 15 Feb 2013 09:25:34 -0700
+From: Stephen Warren <swarren@wwwdotorg.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH] fix: build aborts if SPACE characters are found in path.
-References: <CAK2BWApu9PjkmDdV4HoFXcq9KTh4e57iEdwYn9muVmYRwRNXgw@mail.gmail.com>
-In-Reply-To: <CAK2BWApu9PjkmDdV4HoFXcq9KTh4e57iEdwYn9muVmYRwRNXgw@mail.gmail.com>
+Subject: Re: [RFC 1/2] Makefile: Add arch/arch/$(hdr-arch)/boot in header
+ include path
+References: <1360918364-27960-1-git-send-email-hdoyu@nvidia.com>
+In-Reply-To: <1360918364-27960-1-git-send-email-hdoyu@nvidia.com>
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sunil Beta Baskar <betasam@gmail.com>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Hiroshi Doyu <hdoyu@nvidia.com>
+Cc: linux-arm-kernel@lists.infradead.org, linux-tegra@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Stephen Warren <swarren@nvidia.com>, Mike Turquette <mturquette@linaro.org>, Peter De Schrijver <pdeschrijver@nvidia.com>, Prashant Gaikwad <pgaikwad@nvidia.com>, Joseph Lo <josephl@nvidia.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Grant Likely <grant.likely@secretlab.ca>, Rob Herring <rob.herring@calxeda.com>, devicetree-discuss <devicetree-discuss@lists.ozlabs.org>
 
-On 18.1.2013 15:33, Sunil Beta Baskar wrote:
-> Signed-off-by: Sunil Beta <betasam@gmail.com>
+On 02/15/2013 01:52 AM, Hiroshi Doyu wrote:
+> With a new feature dtc+cpp, DT can introduces some definitions in its
+> header files for their own. Some of those DT info can be used in
+> kernel source as well, instead of having the duplicate info in kernel
+> headers. This patch allows kernel source to include those DT
+> headers. For example:
+> 
+> + #include <dts/tegra20-car.h>
+
+Since this is devicetree-related, the DT maintainers should also be
+CC'd. I've added them on this email, hence quoting the entire patch.
+
+> 
+> Signed-off-by: Hiroshi Doyu <hdoyu@nvidia.com>
 > ---
->  Makefile |    4 ++++
->  1 file changed, 4 insertions(+)
+>  Makefile |    2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
 > diff --git a/Makefile b/Makefile
-> index 07bc925..48bfd8e 100644
+> index 0b4bf62..7f54cdb 100644
 > --- a/Makefile
 > +++ b/Makefile
-> @@ -10,6 +10,8 @@ NAME = "Divemaster Edition"
->  # Comments in this file are targeted only to the developer, do not
->  # expect to learn how to build the kernel reading this file.
+> @@ -364,7 +364,7 @@ LINUXINCLUDE    := \
+>  		-I$(srctree)/arch/$(hdr-arch)/include \
+>  		-Iarch/$(hdr-arch)/include/generated \
+>  		$(if $(KBUILD_SRC), -I$(srctree)/include) \
+> -		-Iinclude \
+> +		-Iinclude -Iarch/$(hdr-arch)/boot \
+>  		$(USERINCLUDE)
+>  
+>  KBUILD_CPPFLAGS := -D__KERNEL__
 > 
-> +CURDIRSPC := $(echo $(CURDIR) | sed "s/ /\\\ /g" )
-> +$(ifneq $(CURDIR),$(CURDIRSPC), $(error directory $(CURDIR) contains spaces.))
 
-You do not need to call shell and sed here. Use the findstring make
-function and the $(space) variable from scripts/Kbuild.include. Also,
-while at it, could you also add a check for colon? This breaks the build
-in similar way.
-
-Thanks,
-Michal
