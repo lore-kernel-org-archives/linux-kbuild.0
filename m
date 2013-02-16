@@ -1,58 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-we0-f180.google.com ([74.125.82.180]:64154 "EHLO
-	mail-we0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752660Ab3BPLSh (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 16 Feb 2013 06:18:37 -0500
-Received: by mail-we0-f180.google.com with SMTP id k14so3452687wer.39
-        for <linux-kbuild@vger.kernel.org>; Sat, 16 Feb 2013 03:18:36 -0800 (PST)
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: Re: [pull request] Pull request for branch yem-kconfig-for-next
-Date: Sat, 16 Feb 2013 12:18:32 +0100
-References: <cover.1360371247.git.yann.morin.1998@free.fr>
-In-Reply-To: <cover.1360371247.git.yann.morin.1998@free.fr>
+Received: from cantor2.suse.de ([195.135.220.15]:50664 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754576Ab3BPWEL (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 16 Feb 2013 17:04:11 -0500
+Message-ID: <5120024B.7070800@suse.cz>
+Date: Sat, 16 Feb 2013 23:03:55 +0100
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-15"
+Subject: Re: [RFC][PATCH] kernel: Replace timeconst.pl with a bc script
+References: <1360883635-25268-1-git-send-email-hpa@zytor.com> <511EC7AA.1040606@suse.cz> <511EC849.6030400@zytor.com>
+In-Reply-To: <511EC849.6030400@zytor.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-Message-Id: <201302161218.32204.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Michal Marek <mmarek@suse.cz>, Roland Eggner <edvx1@systemanalysen.net>, Dmitry Voytik <dvv.kernel@gmail.com>
+To: "H. Peter Anvin" <hpa@zytor.com>
+Cc: linux-kbuild@vger.kernel.org, mingo@kernel.org, tglx@linutronix.de, Andrew Morton <akpm@linux-foundation.org>, Sam Ravnborg <sam@ravnborg.org>
 
-Michal, All,
+Dne 16.2.2013 00:44, H. Peter Anvin napsal(a):
+> On 02/15/2013 03:41 PM, Michal Marek wrote:
+>> I can merge it into the kbuild tree if wanted. I only have one nipick:
+>>
+>>> +/* Division by reciprocal multiplication. */
+>>> +define fmul(b,n,d) {
+>>> +       return (2^b*n+d-1)/d;
+>>> +}
+>>
+>> For readability reasons, I suggest to use the same formatting of
+>> expressions and argument lists like in C:
+>>
+>> define fmul(b, n, d) {
+>>         return (2^b * n + d - 1) / d;
+>> }
+>>
+>> Otherwise, you can add
+>>
+> 
+> Do you actually think that is more readable?  Personally, I think it
+> made it harder to read just because it takes up more space than one can
+> quickly glance at.
 
-On Saturday 09 February 2013 Yann E. MORIN wrote:
-> This series by Roland, updates the help texts for the nconf frontends, and
-> brings it from its lingering state to (to my knowledge) an up-to-date and
-> complete coverage of nconf.
-> 
-> Please apply for 3.9.
-> 
-> The following changes since commit aed9934bf182c049d966bd106ad7e2b43c46c718:
-> 
->   kconfig: fix a compiliation error when using make xconfig (2013-01-30 10:16:43 +0100)
-> 
-> are available in the git repository at:
->   git://gitorious.org/linux-kconfig/linux-kconfig.git yem-kconfig-for-next
-> 
-> Roland Eggner (2):
->       kconfig: nconf: rewrite help texts
->       kconfig: nconf: rewrite labels of function keys line
-> 
->  scripts/kconfig/nconf.c |  356 +++++++++++++++++++++++------------------------
->  1 files changed, 174 insertions(+), 182 deletions(-)
+I personally find the wider version more readable, but I don't care that
+much.
 
-Ping? ;-)
-
-Regards,
-Yann E. MORIN.
-
--- 
-.-----------------.--------------------.------------------.--------------------.
-|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
-| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
-| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
-| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
-'------------------------------^-------^------------------^--------------------'
+Michal
