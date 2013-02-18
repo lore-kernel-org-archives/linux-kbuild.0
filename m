@@ -1,38 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:51860 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754897Ab3BPWub (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 16 Feb 2013 17:50:31 -0500
-Message-ID: <51200D2B.1030806@suse.cz>
-Date: Sat, 16 Feb 2013 23:50:19 +0100
-From: Michal Marek <mmarek@suse.cz>
+Received: from mail-pa0-f42.google.com ([209.85.220.42]:64319 "EHLO
+	mail-pa0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754047Ab3BRDIi (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 17 Feb 2013 22:08:38 -0500
+Received: by mail-pa0-f42.google.com with SMTP id kq12so2609839pab.15
+        for <linux-kbuild@vger.kernel.org>; Sun, 17 Feb 2013 19:08:38 -0800 (PST)
+Date: Mon, 18 Feb 2013 11:08:29 +0800
+From: Adam Lee <adam8157@gmail.com>
+Subject: Re: [PATCH] kconfig: fix the failure of `make rpm-pkg` after
+ localversion file changed
+Message-ID: <20130218030829.GA6690@adam-laptop>
+References: <1352014361-21159-1-git-send-email-adam8157@gmail.com>
 MIME-Version: 1.0
-Subject: Re: [RFC][PATCH] kernel: Replace timeconst.pl with a bc script
-References: <1360883635-25268-1-git-send-email-hpa@zytor.com> <511EC7AA.1040606@suse.cz> <511EC849.6030400@zytor.com> <5120024B.7070800@suse.cz> <512003C9.8040305@zytor.com>
-In-Reply-To: <512003C9.8040305@zytor.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1352014361-21159-1-git-send-email-adam8157@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "H. Peter Anvin" <hpa@zytor.com>
-Cc: linux-kbuild@vger.kernel.org, mingo@kernel.org, tglx@linutronix.de, Andrew Morton <akpm@linux-foundation.org>, Sam Ravnborg <sam@ravnborg.org>
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org
 
-Dne 16.2.2013 23:10, H. Peter Anvin napsal(a):
-> On 02/16/2013 02:03 PM, Michal Marek wrote:
->>>
->>> Do you actually think that is more readable?  Personally, I think it
->>> made it harder to read just because it takes up more space than one can
->>> quickly glance at.
->>
->> I personally find the wider version more readable, but I don't care that
->> much.
->>
+On Sun, Nov 04, 2012 at 03:32:41PM +0800, Adam Lee wrote:
+> `make rpm-pkg` and `make binrpm-pkg` will write $KERNELRELEASE into rpm
+> spec files which don't depend on localversion file now. So, the
+> unchanged spec files will cause failure after localversion file changed.
 > 
-> Either way... if you could pick the patch up with or without extra space
-> that would be great.
+> I added the localversion file into the dependencies of spec files.
+> Because that file is not necessary, I made it a empty target, so its
+> last-modification time will be checked by Make only when it exists.
+> 
+> Signed-off-by: Adam Lee <adam8157@gmail.com>
+> ---
+>  scripts/package/Makefile |    7 +++++--
+>  1 file changed, 5 insertions(+), 2 deletions(-)
 
-Done.
+Hi, Michal
 
-Michal
+Any comment about my fix?
 
+reproduce steps:
+1, make rpm-pkg
+2, change localversion
+3, make rpm-pkg
 
+-- 
+Regards,
+Adam Lee
+http://adam8157.info
