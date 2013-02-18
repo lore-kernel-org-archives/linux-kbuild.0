@@ -1,50 +1,48 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pa0-f42.google.com ([209.85.220.42]:64319 "EHLO
-	mail-pa0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754047Ab3BRDIi (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 17 Feb 2013 22:08:38 -0500
-Received: by mail-pa0-f42.google.com with SMTP id kq12so2609839pab.15
-        for <linux-kbuild@vger.kernel.org>; Sun, 17 Feb 2013 19:08:38 -0800 (PST)
-Date: Mon, 18 Feb 2013 11:08:29 +0800
-From: Adam Lee <adam8157@gmail.com>
-Subject: Re: [PATCH] kconfig: fix the failure of `make rpm-pkg` after
- localversion file changed
-Message-ID: <20130218030829.GA6690@adam-laptop>
-References: <1352014361-21159-1-git-send-email-adam8157@gmail.com>
+Received: from cantor2.suse.de ([195.135.220.15]:57656 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754791Ab3BRN02 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 18 Feb 2013 08:26:28 -0500
+Message-ID: <51222BF9.3040802@suse.cz>
+Date: Mon, 18 Feb 2013 14:26:17 +0100
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1352014361-21159-1-git-send-email-adam8157@gmail.com>
+Subject: Re: [RFC 1/2] Makefile: Add arch/arch/$(hdr-arch)/boot in header
+ include path
+References: <1360918364-27960-1-git-send-email-hdoyu@nvidia.com> <511E617E.6080206@wwwdotorg.org>
+In-Reply-To: <511E617E.6080206@wwwdotorg.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org
+To: Stephen Warren <swarren@wwwdotorg.org>
+Cc: Hiroshi Doyu <hdoyu@nvidia.com>, linux-arm-kernel@lists.infradead.org, linux-tegra@vger.kernel.org, Stephen Warren <swarren@nvidia.com>, Mike Turquette <mturquette@linaro.org>, Peter De Schrijver <pdeschrijver@nvidia.com>, Prashant Gaikwad <pgaikwad@nvidia.com>, Joseph Lo <josephl@nvidia.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Grant Likely <grant.likely@secretlab.ca>, Rob Herring <rob.herring@calxeda.com>, devicetree-discuss <devicetree-discuss@lists.ozlabs.org>
 
-On Sun, Nov 04, 2012 at 03:32:41PM +0800, Adam Lee wrote:
-> `make rpm-pkg` and `make binrpm-pkg` will write $KERNELRELEASE into rpm
-> spec files which don't depend on localversion file now. So, the
-> unchanged spec files will cause failure after localversion file changed.
-> 
-> I added the localversion file into the dependencies of spec files.
-> Because that file is not necessary, I made it a empty target, so its
-> last-modification time will be checked by Make only when it exists.
-> 
-> Signed-off-by: Adam Lee <adam8157@gmail.com>
-> ---
->  scripts/package/Makefile |    7 +++++--
->  1 file changed, 5 insertions(+), 2 deletions(-)
+On 15.2.2013 17:25, Stephen Warren wrote:
+> On 02/15/2013 01:52 AM, Hiroshi Doyu wrote:
+>> This patch allows kernel source to include those DT
+>> headers. For example:
+>>
+>> + #include <dts/tegra20-car.h>
+>>
+>> Signed-off-by: Hiroshi Doyu <hdoyu@nvidia.com>
+>> ---
+>>  Makefile |    2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/Makefile b/Makefile
+>> index 0b4bf62..7f54cdb 100644
+>> --- a/Makefile
+>> +++ b/Makefile
+>> @@ -364,7 +364,7 @@ LINUXINCLUDE    := \
+>>  		-I$(srctree)/arch/$(hdr-arch)/include \
+>>  		-Iarch/$(hdr-arch)/include/generated \
+>>  		$(if $(KBUILD_SRC), -I$(srctree)/include) \
+>> -		-Iinclude \
+>> +		-Iinclude -Iarch/$(hdr-arch)/boot \
 
-Hi, Michal
+Would it be possible to use a new directory for this? At least POWER and
+x86 have several unrelated headers in their arch/*/boot that are only
+meant for the bootstrap code.
 
-Any comment about my fix?
-
-reproduce steps:
-1, make rpm-pkg
-2, change localversion
-3, make rpm-pkg
-
--- 
-Regards,
-Adam Lee
-http://adam8157.info
+Michal
