@@ -1,66 +1,31 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-we0-f182.google.com ([74.125.82.182]:35709 "EHLO
-	mail-we0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S933422Ab3BSXVg (ORCPT
+Received: from mail-wi0-f179.google.com ([209.85.212.179]:47281 "EHLO
+	mail-wi0-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1758164Ab3BSXkj (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 19 Feb 2013 18:21:36 -0500
+	Tue, 19 Feb 2013 18:40:39 -0500
 From: "Yann E. MORIN" <yann.morin.1998@free.fr>
 Subject: Re: kconfig-frontends-3.8.0.0 release
-Date: Wed, 20 Feb 2013 00:21:30 +0100
-References: <201302192314.15995.yann.morin.1998@free.fr> <alpine.LNX.2.01.1302192328280.5517@nerf07.vanv.qr>
-In-Reply-To: <alpine.LNX.2.01.1302192328280.5517@nerf07.vanv.qr>
+Date: Wed, 20 Feb 2013 00:40:35 +0100
+References: <201302192314.15995.yann.morin.1998@free.fr> <alpine.LNX.2.01.1302192328280.5517@nerf07.vanv.qr> <201302200021.31123.yann.morin.1998@free.fr>
+In-Reply-To: <201302200021.31123.yann.morin.1998@free.fr>
 MIME-Version: 1.0
 Content-Type: Text/Plain;
   charset="iso-8859-1"
 Content-Transfer-Encoding: 7bit
-Message-Id: <201302200021.31123.yann.morin.1998@free.fr>
+Message-Id: <201302200040.35272.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jan Engelhardt <jengelh@inai.de>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
+Cc: Jan Engelhardt <jengelh@inai.de>, linux-kernel@vger.kernel.org
 
 Jan, All,
 
-On Tuesday 19 February 2013 Jan Engelhardt wrote:
-> On Tuesday 2013-02-19 23:14, Yann E. MORIN wrote:
-> >I'm pleased to announce the release of kconfig-frontends 3.8.0.0!
-> >Go download it there:
-> >    http://ymorin.is-a-geek.org/download/kconfig-frontends/kconfig-frontends-3.8.0.0.tar.xz
-> >    http://ymorin.is-a-geek.org/download/kconfig-frontends/kconfig-frontends-3.8.0.0.tar.bz2
-> 
-> This seems to install
-> 	/usr/bin/conf   
-> 	/usr/bin/diff   
-> 	/usr/bin/gettext
-> 	/usr/bin/merge
-> 	/usr/bin/tweak
+On Wednesday 20 February 2013 Yann E. MORIN wrote:
+> $ ls -lrt /usr/bin/*{conf,gettext,diff}
 
-By default, the binaries should all ne prefixed with 'kconfig-' to avoid
-such name-clashing (as root, in a fresh debootstrap of squeeze here):
-
----8<---
-$ ./configure --prefix=/usr && make && make install
-[--SNIP--]
-Making install in frontends
-Making install in conf
-  /bin/bash ../../libtool   --mode=install /usr/bin/install -c conf '/usr/bin/./kconfig-conf'
-libtool: install: /usr/bin/install -c .libs/conf /usr/bin/./kconfig-conf
-Making install in mconf
-  /bin/bash ../../libtool   --mode=install /usr/bin/install -c mconf '/usr/bin/./kconfig-mconf'
-libtool: install: /usr/bin/install -c .libs/mconf /usr/bin/./kconfig-mconf
-Making install in nconf
-  /bin/bash ../../libtool   --mode=install /usr/bin/install -c nconf '/usr/bin/./kconfig-nconf'
-libtool: install: /usr/bin/install -c .libs/nconf /usr/bin/./kconfig-nconf
-Making install in scripts
-Making install in utils
-  /bin/bash ../libtool   --mode=install /usr/bin/install -c gettext '/usr/bin/./kconfig-gettext'
-libtool: install: /usr/bin/install -c .libs/gettext /usr/bin/./kconfig-gettext
- /usr/bin/install -c tweak '/usr/bin/./kconfig-tweak'
- /usr/bin/install -c diff '/usr/bin/./kconfig-diff'
- /usr/bin/install -c merge '/usr/bin/./kconfig-merge'
-
-$ ls -lrt /usr/bin/*{conf,gettext,diff}
-[--SNIP--]
+Obviously, that line above should have been (with the same result):
+$ ls -lrt /usr/bin/
 lrwxrwxrwx 1 root root         26 Feb 19 23:11 fakeroot -> /etc/alternatives/fakeroot
 lrwxrwxrwx 1 root root         24 Feb 19 23:11 rename -> /etc/alternatives/rename
 lrwxrwxrwx 1 root root         21 Feb 19 23:11 c++ -> /etc/alternatives/c++
@@ -71,18 +36,9 @@ lrwxrwxrwx 1 root root         21 Feb 19 23:11 c++ -> /etc/alternatives/c++
 -rwxr-xr-x 1 root root       3725 Feb 19 23:13 kconfig-tweak
 -rwxr-xr-x 1 root root       3642 Feb 19 23:13 kconfig-diff
 -rwxr-xr-x 1 root root       3378 Feb 19 23:13 kconfig-merge
----8<---
 
-(Not all frontends are installed, because that minimal debootstrap is
-lacking Qt and GTK+.)
-
-Note, it is possible to override that default tools prefix with any of:
-    --program-prefix=PREFIX
-    --program-suffix=SUFFIX
-    --program-transform-name=PROGRAM
-The default is PREFIX='kconfig-' (contrary to the traditional empty prefix).
-
-(I hope that did not trash your system...)
+I just tested in a new clean wheezy debootstrap, and it behaves as
+expected, too. What is your distro, so I can try to reproduce it here?
 
 Regards,
 Yann E. MORIN.
