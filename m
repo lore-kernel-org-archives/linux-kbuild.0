@@ -1,48 +1,54 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:51899 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:52329 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S932649Ab3BSMnf (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 19 Feb 2013 07:43:35 -0500
-Message-ID: <5123736B.1080501@suse.cz>
-Date: Tue, 19 Feb 2013 13:43:23 +0100
+	id S1754764Ab3BSMtg (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 19 Feb 2013 07:49:36 -0500
+Message-ID: <512374CF.2000302@suse.cz>
+Date: Tue, 19 Feb 2013 13:49:19 +0100
 From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Subject: Re: [pull request] Pull request for branch yem-kconfig-for-next
-References: <cover.1360371247.git.yann.morin.1998@free.fr> <201302161218.32204.yann.morin.1998@free.fr>
-In-Reply-To: <201302161218.32204.yann.morin.1998@free.fr>
-Content-Type: text/plain; charset=ISO-8859-15
+Subject: Re: Bug#636029: [PATCH] kbuild: Fix missing '\n' for NEW symbols
+ in yes "" | make oldconfig >conf.new
+References: <20130219002426.GA19381@nt1.in> <1361252386.5374.564.camel@deadeye.wl.decadent.org.uk>
+In-Reply-To: <1361252386.5374.564.camel@deadeye.wl.decadent.org.uk>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Cc: linux-kbuild@vger.kernel.org, Roland Eggner <edvx1@systemanalysen.net>, Dmitry Voytik <dvv.kernel@gmail.com>
+To: Ben Hutchings <ben@decadent.org.uk>
+Cc: Regid Ichira <regid23@nt1.in>, 636029@bugs.debian.org, linux-kbuild@vger.kernel.org, Jonathan Nieder <jrnieder@gmail.com>
 
-On 16.2.2013 12:18, Yann E. MORIN wrote:
-> Michal, All,
+On 19.2.2013 06:39, Ben Hutchings wrote:
+> On Tue, 2013-02-19 at 02:24 +0200, Regid Ichira wrote:
+>> From: Ben Hutchings <ben@decadent.org.uk>
+>>
+>> According to Documentation/kbuild/kconfig.txt, the commands:
+>>
+>>     yes "" | make oldconfig >conf.new
+>>     grep "(NEW)" conf.new
+>>
+>> should list the new config symbols with their default values.
+>> However, currently there is no line break after each new symbol.  When
+>> kconfig is interactive the user will type a new-line at this point,
+>> but when non-interactive kconfig must print it.
+>>
+>> Signed-off-by: Ben Hutchings <ben@decadent.org.uk>
+>> ---
 > 
-> On Saturday 09 February 2013 Yann E. MORIN wrote:
->> This series by Roland, updates the help texts for the nconf frontends, and
->> brings it from its lingering state to (to my knowledge) an up-to-date and
->> complete coverage of nconf.
->>
->> Please apply for 3.9.
->>
->> The following changes since commit aed9934bf182c049d966bd106ad7e2b43c46c718:
->>
->>   kconfig: fix a compiliation error when using make xconfig (2013-01-30 10:16:43 +0100)
->>
->> are available in the git repository at:
->>   git://gitorious.org/linux-kconfig/linux-kconfig.git yem-kconfig-for-next
->>
->> Roland Eggner (2):
->>       kconfig: nconf: rewrite help texts
->>       kconfig: nconf: rewrite labels of function keys line
->>
->>  scripts/kconfig/nconf.c |  356 +++++++++++++++++++++++------------------------
->>  1 files changed, 174 insertions(+), 182 deletions(-)
+> Don't put a '---' here, as the following pseudo-headers should go into
+> the commit message.
 > 
-> Ping? ;-)
+>> Reference: http://bugs.debian.org/636029
+>> Reported-by: 636029-submitter@bugs.debian.org
+> 
+> Well that's you, isn't it?
+> 
+>> [regid23@nt1.in: Adjusted Ben's work to apply cleanly to this tree]
+>> Tested-by: Regid Ichira <regid23@nt1.in>
+> [...]
+> 
+> So it should be Reported-and-tested-by: Regid Ichira <regid23@nt1.in>
 
-Pulled now, sorry for the delay.
+I applied the patch with this tag to kbuild.git#kconfig.
 
 Michal
