@@ -1,54 +1,62 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:52329 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754764Ab3BSMtg (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 19 Feb 2013 07:49:36 -0500
-Message-ID: <512374CF.2000302@suse.cz>
-Date: Tue, 19 Feb 2013 13:49:19 +0100
-From: Michal Marek <mmarek@suse.cz>
+Received: from avon.wwwdotorg.org ([70.85.31.133]:54445 "EHLO
+	avon.wwwdotorg.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S933005Ab3BSRSS (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 19 Feb 2013 12:18:18 -0500
+Message-ID: <5123B3D5.1000405@wwwdotorg.org>
+Date: Tue, 19 Feb 2013 10:18:13 -0700
+From: Stephen Warren <swarren@wwwdotorg.org>
 MIME-Version: 1.0
-Subject: Re: Bug#636029: [PATCH] kbuild: Fix missing '\n' for NEW symbols
- in yes "" | make oldconfig >conf.new
-References: <20130219002426.GA19381@nt1.in> <1361252386.5374.564.camel@deadeye.wl.decadent.org.uk>
-In-Reply-To: <1361252386.5374.564.camel@deadeye.wl.decadent.org.uk>
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: [RFC 1/2] Makefile: Add arch/arch/$(hdr-arch)/boot in header
+ include path
+References: <1360918364-27960-1-git-send-email-hdoyu@nvidia.com> <511E617E.6080206@wwwdotorg.org> <51222BF9.3040802@suse.cz>
+In-Reply-To: <51222BF9.3040802@suse.cz>
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ben Hutchings <ben@decadent.org.uk>
-Cc: Regid Ichira <regid23@nt1.in>, 636029@bugs.debian.org, linux-kbuild@vger.kernel.org, Jonathan Nieder <jrnieder@gmail.com>
+To: Michal Marek <mmarek@suse.cz>
+Cc: Hiroshi Doyu <hdoyu@nvidia.com>, linux-arm-kernel@lists.infradead.org, linux-tegra@vger.kernel.org, Stephen Warren <swarren@nvidia.com>, Mike Turquette <mturquette@linaro.org>, Peter De Schrijver <pdeschrijver@nvidia.com>, Prashant Gaikwad <pgaikwad@nvidia.com>, Joseph Lo <josephl@nvidia.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Grant Likely <grant.likely@secretlab.ca>, Rob Herring <rob.herring@calxeda.com>, devicetree-discuss <devicetree-discuss@lists.ozlabs.org>
 
-On 19.2.2013 06:39, Ben Hutchings wrote:
-> On Tue, 2013-02-19 at 02:24 +0200, Regid Ichira wrote:
->> From: Ben Hutchings <ben@decadent.org.uk>
->>
->> According to Documentation/kbuild/kconfig.txt, the commands:
->>
->>     yes "" | make oldconfig >conf.new
->>     grep "(NEW)" conf.new
->>
->> should list the new config symbols with their default values.
->> However, currently there is no line break after each new symbol.  When
->> kconfig is interactive the user will type a new-line at this point,
->> but when non-interactive kconfig must print it.
->>
->> Signed-off-by: Ben Hutchings <ben@decadent.org.uk>
->> ---
+On 02/18/2013 06:26 AM, Michal Marek wrote:
+> On 15.2.2013 17:25, Stephen Warren wrote:
+>> On 02/15/2013 01:52 AM, Hiroshi Doyu wrote:
+>>> This patch allows kernel source to include those DT
+>>> headers. For example:
+>>>
+>>> + #include <dts/tegra20-car.h>
+>>>
+>>> Signed-off-by: Hiroshi Doyu <hdoyu@nvidia.com>
+>>> ---
+>>>  Makefile |    2 +-
+>>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>>
+>>> diff --git a/Makefile b/Makefile
+>>> index 0b4bf62..7f54cdb 100644
+>>> --- a/Makefile
+>>> +++ b/Makefile
+>>> @@ -364,7 +364,7 @@ LINUXINCLUDE    := \
+>>>  		-I$(srctree)/arch/$(hdr-arch)/include \
+>>>  		-Iarch/$(hdr-arch)/include/generated \
+>>>  		$(if $(KBUILD_SRC), -I$(srctree)/include) \
+>>> -		-Iinclude \
+>>> +		-Iinclude -Iarch/$(hdr-arch)/boot \
 > 
-> Don't put a '---' here, as the following pseudo-headers should go into
-> the commit message.
-> 
->> Reference: http://bugs.debian.org/636029
->> Reported-by: 636029-submitter@bugs.debian.org
-> 
-> Well that's you, isn't it?
-> 
->> [regid23@nt1.in: Adjusted Ben's work to apply cleanly to this tree]
->> Tested-by: Regid Ichira <regid23@nt1.in>
-> [...]
-> 
-> So it should be Reported-and-tested-by: Regid Ichira <regid23@nt1.in>
+> Would it be possible to use a new directory for this? At least POWER and
+> x86 have several unrelated headers in their arch/*/boot that are only
+> meant for the bootstrap code.
 
-I applied the patch with this tag to kbuild.git#kconfig.
+The need here is to allow access to headers in
+arch/$(hdr-arch)/boot/dts, but passing the directory above that allows
+including files as <dts/foo.h> which is nice. That's the rationale for
+this patch.
 
-Michal
+But as I mentioned in other threads, I wonder if we should put the
+header files in arch/$(hdr-arch)/boot/dts at all;
+Documentation/devicetree/bindings/... would keep the headers adjacent to
+the documentation for the bindings themselves, and the headers really
+are part of the binding definitions... That would avoid the issue Michal
+pointed out, and I think clean up the dtc+cpp include path usage too.
+
+Grant, what are your thoughts?
