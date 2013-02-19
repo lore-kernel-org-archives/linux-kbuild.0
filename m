@@ -1,38 +1,81 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wg0-f44.google.com ([74.125.82.44]:61164 "EHLO
-	mail-wg0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757977Ab3BSSQg (ORCPT
+Received: from mail-we0-f174.google.com ([74.125.82.174]:36933 "EHLO
+	mail-we0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S933538Ab3BSWOV (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 19 Feb 2013 13:16:36 -0500
-Received: by mail-wg0-f44.google.com with SMTP id dr12so5767438wgb.35
-        for <linux-kbuild@vger.kernel.org>; Tue, 19 Feb 2013 10:16:35 -0800 (PST)
+	Tue, 19 Feb 2013 17:14:21 -0500
 From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: Re: [pull request] Pull request for branch yem-kconfig-for-next
-Date: Tue, 19 Feb 2013 19:16:32 +0100
-References: <cover.1360371247.git.yann.morin.1998@free.fr> <201302161218.32204.yann.morin.1998@free.fr> <5123736B.1080501@suse.cz>
-In-Reply-To: <5123736B.1080501@suse.cz>
+Subject: kconfig-frontends-3.8.0.0 release
+Date: Tue, 19 Feb 2013 23:14:15 +0100
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-15"
+Content-Type: text/plain;
+  charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <201302191916.32691.yann.morin.1998@free.fr>
+Message-Id: <201302192314.15995.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Michal Marek <mmarek@suse.cz>, Roland Eggner <edvx1@systemanalysen.net>, Dmitry Voytik <dvv.kernel@gmail.com>
+To: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: Jan Engelhardt <jengelh@inai.de>, lwn@lwn.net, "Yann E. MORIN" <yann.morin.1998@free.fr>
 
-Michal, All,
+Hello All!
 
-On Tuesday 19 February 2013 Michal Marek wrote:
-> > On Saturday 09 February 2013 Yann E. MORIN wrote:
-> >> This series by Roland, updates the help texts for the nconf frontends, and
-> >> brings it from its lingering state to (to my knowledge) an up-to-date and
-> >> complete coverage of nconf.
-> Pulled now, sorry for the delay.
+I'm pleased to announce the release of kconfig-frontends 3.8.0.0!
+Go download it there:
+    http://ymorin.is-a-geek.org/download/kconfig-frontends/kconfig-frontends-3.8.0.0.tar.xz
+    http://ymorin.is-a-geek.org/download/kconfig-frontends/kconfig-frontends-3.8.0.0.tar.bz2
 
-No problem, thank you!
+The kconfig-frontends package provides the kconfig parser, as well as all the
+kconfig frontends and utilities, packaged using the traditional autotools, so
+the kconfig infrastructure is easy to deploy, either locally or system-wide.
 
-Shall I continue gathering kconfig changes there for you to pull?
+What's new since 3.7.0.0:
+  - some huge cleanups to the auto-tools infrastructure, kindly
+    suggested and mentored by Jan Engelhardt
+  - there was no kconfig changes in 3.8
+
+This release marks the first anniversary at maintaining this project. It
+has been fun, and I learnt quite a bit since the first announcement here,
+roughly one year ago [0].
+
+The first release, 3.3.0-0, has been covered [1] by LWN.net (Hello! :-) ),
+and I'm quite proud of such an achievement!
+
+Work on kconfig-frontends would not have been so easy without the works of
+the many kernel contributors, and I'd like to take the opportunity to thank
+you all for your amazing work!
+
+So, time has come to lay out the plans for the future:
+  - continue to release as soon as possible after each kernel release:
+    this has proved to be challenging at times, when there are agenda
+    conflicts (kernel release during holidays, or just before a conference)
+    but is globally manageable;
+
+  - migrate the repository from Hg to git (on-going) ;-)
+    being a noob at git at the time I spawned kconfig-frontends, I used
+    the tools I knew how to use at the time, in order not to bust the
+    repository. Hg has proved to do the job well for me, but now that I'm
+    up to speed with git, time has come for a switch;
+
+  - present (lightning-talk-like) the project at a conference
+    I'm self-funded, so will concentrate on Europe (and specifically,
+    France and neighbouring countries). Not too sure which conference
+    for now. Any help chosing? ;-)
+
+As a reminder, the home for kconfig-frontends is:
+  http://ymorin.is-a-geek.org/projects/kconfig-frontends
+
+And the repository can be browsed or hg-cloned from:
+  http://ymorin.is-a-geek.org/hg/kconfig-frontends
+
+kconfig-frontends is not meant to replace the in-tree Linux kconfig, but
+really targets third-party projects that want an easy path to following
+the evolution of kconfig, without the burden to manually synchronise from
+the Linux kernel source tree.
+
+Any comment, any feedback, any patch is welcome! ;-)
+
+[0] http://marc.info/?l=linux-kbuild&m=132753216310722
+[1] https://lwn.net/Articles/487487/
 
 Regards,
 Yann E. MORIN.
