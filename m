@@ -1,52 +1,35 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wi0-f179.google.com ([209.85.212.179]:47281 "EHLO
-	mail-wi0-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1758164Ab3BSXkj (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 19 Feb 2013 18:40:39 -0500
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Received: from ares07.inai.de ([5.9.24.206]:56125 "EHLO ares07.inai.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S934593Ab3BTHxc (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 20 Feb 2013 02:53:32 -0500
+Date: Wed, 20 Feb 2013 08:53:29 +0100 (CET)
+From: Jan Engelhardt <jengelh@inai.de>
 Subject: Re: kconfig-frontends-3.8.0.0 release
-Date: Wed, 20 Feb 2013 00:40:35 +0100
-References: <201302192314.15995.yann.morin.1998@free.fr> <alpine.LNX.2.01.1302192328280.5517@nerf07.vanv.qr> <201302200021.31123.yann.morin.1998@free.fr>
 In-Reply-To: <201302200021.31123.yann.morin.1998@free.fr>
+Message-ID: <alpine.LNX.2.01.1302200847290.12390@nerf07.vanv.qr>
+References: <201302192314.15995.yann.morin.1998@free.fr> <alpine.LNX.2.01.1302192328280.5517@nerf07.vanv.qr> <201302200021.31123.yann.morin.1998@free.fr>
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-1"
-Content-Transfer-Encoding: 7bit
-Message-Id: <201302200040.35272.yann.morin.1998@free.fr>
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Jan Engelhardt <jengelh@inai.de>, linux-kernel@vger.kernel.org
+To: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Jan, All,
 
-On Wednesday 20 February 2013 Yann E. MORIN wrote:
-> $ ls -lrt /usr/bin/*{conf,gettext,diff}
+On Wednesday 2013-02-20 00:21, Yann E. MORIN wrote:
+>> This seems to install
+>> 	/usr/bin/diff    [...]
+>
+>By default, the binaries should all ne prefixed with 'kconfig-' to avoid
+>such name-clashing (as root, in a fresh debootstrap of squeeze here):
 
-Obviously, that line above should have been (with the same result):
-$ ls -lrt /usr/bin/
-lrwxrwxrwx 1 root root         26 Feb 19 23:11 fakeroot -> /etc/alternatives/fakeroot
-lrwxrwxrwx 1 root root         24 Feb 19 23:11 rename -> /etc/alternatives/rename
-lrwxrwxrwx 1 root root         21 Feb 19 23:11 c++ -> /etc/alternatives/c++
--rwxr-xr-x 1 root root      37440 Feb 19 23:13 kconfig-conf
--rwxr-xr-x 1 root root     135583 Feb 19 23:13 kconfig-mconf
--rwxr-xr-x 1 root root      95724 Feb 19 23:13 kconfig-nconf
--rwxr-xr-x 1 root root      18748 Feb 19 23:13 kconfig-gettext
--rwxr-xr-x 1 root root       3725 Feb 19 23:13 kconfig-tweak
--rwxr-xr-x 1 root root       3642 Feb 19 23:13 kconfig-diff
--rwxr-xr-x 1 root root       3378 Feb 19 23:13 kconfig-merge
+Aha. Seems I hit a peculiarity in rpmbuild. Problem solved, nothing to see. :)
 
-I just tested in a new clean wheezy debootstrap, and it behaves as
-expected, too. What is your distro, so I can try to reproduce it here?
-
-Regards,
-Yann E. MORIN.
-
--- 
-.-----------------.--------------------.------------------.--------------------.
-|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
-| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
-| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
-| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
-'------------------------------^-------^------------------^--------------------'
+$ grep -A5 -e '^%configure' /usr/lib/rpm/macros
+%configure \
+  CFLAGS="${CFLAGS:-%optflags}" ; export CFLAGS ; \
+  CXXFLAGS="${CXXFLAGS:-%optflags}" ; export CXXFLAGS ; \
+  FFLAGS="${FFLAGS:-%optflags}" ; export FFLAGS ; \
+  %{_configure} --host=%{_host} --build=%{_build} \\\
+        --program-prefix=%{?_program_prefix} \\\
