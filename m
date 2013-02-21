@@ -1,63 +1,35 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wi0-f176.google.com ([209.85.212.176]:36235 "EHLO
-	mail-wi0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751689Ab3BUHP0 (ORCPT
+Received: from caramon.arm.linux.org.uk ([78.32.30.218]:47503 "EHLO
+	caramon.arm.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753255Ab3BUKh0 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 21 Feb 2013 02:15:26 -0500
-MIME-Version: 1.0
-In-Reply-To: <5125A1FE.5000604@wwwdotorg.org>
-References: <CAD=GYpbF_3uRzhUnV=MwDiy-ekvZKJztJbkhNM0u_pvG-UCw4w@mail.gmail.com>
-	<5125A1FE.5000604@wwwdotorg.org>
-Date: Thu, 21 Feb 2013 01:15:25 -0600
-Message-ID: <CAD=GYpZM7uOHqhwhxzokV161WFZ2azh1VpSBn498PmPZm+bYbQ@mail.gmail.com>
+	Thu, 21 Feb 2013 05:37:26 -0500
+Date: Thu, 21 Feb 2013 10:37:06 +0000
+From: Russell King - ARM Linux <linux@arm.linux.org.uk>
 Subject: Re: [RFC] Kbuild support for ARM FIT images
-From: Joel A Fernandes <agnel.joel@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
+Message-ID: <20130221103705.GB17852@n2100.arm.linux.org.uk>
+References: <CAD=GYpbF_3uRzhUnV=MwDiy-ekvZKJztJbkhNM0u_pvG-UCw4w@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAD=GYpbF_3uRzhUnV=MwDiy-ekvZKJztJbkhNM0u_pvG-UCw4w@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Stephen Warren <swarren@wwwdotorg.org>
+To: Joel A Fernandes <agnel.joel@gmail.com>
 Cc: u-boot@lists.denx.de, Linux OMAP List <linux-omap@vger.kernel.org>, linux-kbuild@vger.kernel.org, Linux ARM Kernel List <linux-arm-kernel@lists.infradead.org>, tony@atomide.com, "Fernandes, Joel A" <joelagnel@ti.com>, "Rini, Tom" <trini@ti.com>, Grant Likely <glikely@secretlab.ca>, Grant Likely <grant.likely@secretlab.ca>
 
-On Wed, Feb 20, 2013 at 10:26 PM, Stephen Warren <swarren@wwwdotorg.org> wrote:
-> On 02/20/2013 06:37 PM, Joel A Fernandes wrote:
->> Hello,
->> I've been spinning some work-in-progress patches for FIT build support
->> in the kernel.
->> With the move to multiplatform support on OMAP, I feel it is a good
->> time to add  FIT support, also looking at the proliferating number of
->> dtbs, as it is a nice way
->
-> To my mind, FIT is pointless. And forcing the kernel build process to
+On Wed, Feb 20, 2013 at 07:37:10PM -0600, Joel A Fernandes wrote:
+> Hello,
+> I've been spinning some work-in-progress patches for FIT build support
+> in the kernel.
+> With the move to multiplatform support on OMAP, I feel it is a good
+> time to add  FIT support, also looking at the proliferating number of
+> dtbs, as it is a nice way
 
-I don't think so, there are many usecases for FIT and cleanly
-embedding DTBs is a common usecase, (along with stronger checksums,
-compression). That is also the basis of my ELC talk tomorrow morning
-;-)
-You could peruse the slides at, http://wwwelinux.org/Fit-boot to get a
-better understanding of what FIT solves. With the move to
-multiplatform kernels, it is quite a logical next step to add this
-support to the kernel build.
+I'm not looking to add yet another crappy uboot image format to the kernel
+just for the hell of uboot.
 
-> create bootloader-specific files doesn't seem like a good idea. Doing so
-> would require pulling in even more outside tools into the kernel build flow.
-
-As for pulling additional tools, dtc is already a part of the kernel
-so the idea is to use existing tools.
-
-> All you need is to copy the zImage and any relevant .dtb files into
-> /boot, and have U-Boot load the relevant .dtb file by constructing the
-> filename as roughly ${soc}-${board}.dtb, then use the bootz command to
-> boot it. You can have a completely generic boot.scr (or built-in script).
-
-FIT doesnt need any such bootloader variables and thus benefits from
-the simplicity.
-
-> Note: Not all (many?) U-Boot support FIT anyway, so you'd need to flash
-
-For these boards, we can special case to doing a non-fit boot to keep
-them backward-compatibility. I don't think maintaining
-backward-compatibility requires any additional work, but just building
-the kernel with a different make target.
-
-Regards,
-Joel
+And don't think that the dtbs in the kernel are going to stay there.  The
+longer term plan is for them to end up in an external git tree, entirely
+separate from the kernel source.  So anything that ties them with the
+kernel build process will ultimately have to be removed again.
