@@ -1,40 +1,49 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:33439 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755040Ab3BUXOS (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 21 Feb 2013 18:14:18 -0500
-Message-ID: <5126AA4B.2080600@suse.cz>
-Date: Fri, 22 Feb 2013 00:14:19 +0100
-From: Michal Marek <mmarek@suse.cz>
+Received: from mail-out.m-online.net ([212.18.0.9]:53780 "EHLO
+	mail-out.m-online.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753006Ab3BUXSx (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 21 Feb 2013 18:18:53 -0500
+From: Wolfgang Denk <wd@denx.de>
+Subject: Re: [U-Boot] [RFC] Kbuild support for ARM FIT images
 MIME-Version: 1.0
-Subject: Re: Size of images in make-kpkg and make deb-pkg
-References: <CALZVapk=-8t8BihTSoTJ=Fh3C9xBtDc9ETpmGpjNBrTYiJLF7g@mail.gmail.com>
-In-Reply-To: <CALZVapk=-8t8BihTSoTJ=Fh3C9xBtDc9ETpmGpjNBrTYiJLF7g@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-type: text/plain; charset=UTF-8
+Content-transfer-encoding: 8bit
+In-reply-to: <alpine.LFD.2.03.1302211624561.6419@syhkavp.arg>
+References: <CAD=GYpbF_3uRzhUnV=MwDiy-ekvZKJztJbkhNM0u_pvG-UCw4w@mail.gmail.com> <20130221103705.GB17852@n2100.arm.linux.org.uk> <51261F38.2030902@ti.com> <20130221134656.GC17852@n2100.arm.linux.org.uk> <51262A7A.8040103@ti.com> <alpine.LFD.2.03.1302211144240.6419@syhkavp.arg> <20130221182724.GA14329@obsidianresearch.com> <alpine.LFD.2.03.1302211423190.6419@syhkavp.arg> <20130221211444.GB20114@obsidianresearch.com> <alpine.LFD.2.03.1302211624561.6419@syhkavp.arg>
+Date: Fri, 22 Feb 2013 00:18:48 +0100
+Message-Id: <20130221231848.880DE200552@gemini.denx.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Javier Domingo <javierdo1@gmail.com>
-Cc: linux-kbuild@vger.kernel.org
+To: Nicolas Pitre <nico@fluxnic.net>
+Cc: Jason Gunthorpe <jgunthorpe@obsidianresearch.com>, "Fernandes, Joel A" <joelagnel@ti.com>, Russell King - ARM Linux <linux@arm.linux.org.uk>, linux-kbuild@vger.kernel.org, tony@atomide.com, Grant Likely <grant.likely@secretlab.ca>, u-boot@lists.denx.de, Tom Rini <trini@ti.com>, Grant Likely <glikely@secretlab.ca>, OMAP List <linux-omap@vger.kernel.org>, ARM Kernel List <linux-arm-kernel@lists.infradead.org>
 
-On 12.2.2013 01:29, Javier Domingo wrote:
-> Hello,
+Dear Nicolas,
+
+In message <alpine.LFD.2.03.1302211624561.6419@syhkavp.arg> you wrote:
 > 
-> I don't know if this belongs here, but I just wanted to came across a
-> strange thing I am experiencing. I am currently working on v3.6, and I
-> have just discovered that generated kernel images have a totally
-> unrelated size.
-> 
-> When I compile with something like make-kpkg --initrd kernel_image
-> kernel_headers, the generated image is 7.7MB, and when I then run make
-> deb-pkg, the generated deb package is 33MB.
-> 
-> Other sizes are:
-> 6.5M <-> 24M
-> 38M <-> 484M (!!!)
+> No it is not.  FIT is about bundling a multi-platform kernel with a 
+> bunch of DTBs together in a single file.  I don't think you need that 
 
-My guess is that the big one includes full debuginfo, while the other
-one is stripped.
+Actually this is neither the only, nor even the primary purpose of FIT
+images; these have a much wider scope of usage scenarios.
 
-Michal
+> The DT is meant to describe hardware.  As far as I know, the hardware I 
+> own seems to be rather static and stable, and unlike software there is 
+> no way I can change it (soldering irons don't count).
 
+There is other hardware available (for example FPGA based) where this
+does not apply.
+
+Best regards,
+
+Wolfgang Denk
+
+-- 
+DENX Software Engineering GmbH,     MD: Wolfgang Denk & Detlev Zundel
+HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
+Phone: (+49)-8142-66989-10 Fax: (+49)-8142-66989-80 Email: wd@denx.de
+GUIs  are  virtually  useless.  Learn  tools.  They're  configurable,
+scriptable, automatable, cron-able, interoperable, etc. We don't need
+no brain-dead winslurping monolithic claptrap.
+                               -- Tom Christiansen in 371140df@csnews
