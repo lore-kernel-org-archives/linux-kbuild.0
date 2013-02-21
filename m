@@ -1,154 +1,134 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from relais.videotron.ca ([24.201.245.36]:9937 "EHLO
+Received: from relais.videotron.ca ([24.201.245.36]:54876 "EHLO
 	relais.videotron.ca" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753022Ab3BUVSQ (ORCPT
+	with ESMTP id S1753022Ab3BUWFz (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 21 Feb 2013 16:18:16 -0500
+	Thu, 21 Feb 2013 17:05:55 -0500
 MIME-version: 1.0
 Content-transfer-encoding: 7BIT
 Content-type: TEXT/PLAIN; CHARSET=US-ASCII
-Date: Thu, 21 Feb 2013 16:18:14 -0500 (EST)
+Date: Thu, 21 Feb 2013 17:05:54 -0500 (EST)
 From: Nicolas Pitre <nico@fluxnic.net>
 Subject: Re: [U-Boot] [RFC] Kbuild support for ARM FIT images
-In-reply-to: <5126778A.4040705@wwwdotorg.org>
-Message-id: <alpine.LFD.2.03.1302211505560.6419@syhkavp.arg>
+In-reply-to: <20130221211444.GB20114@obsidianresearch.com>
+Message-id: <alpine.LFD.2.03.1302211624561.6419@syhkavp.arg>
 References: <CAD=GYpbF_3uRzhUnV=MwDiy-ekvZKJztJbkhNM0u_pvG-UCw4w@mail.gmail.com>
  <20130221103705.GB17852@n2100.arm.linux.org.uk> <51261F38.2030902@ti.com>
  <20130221134656.GC17852@n2100.arm.linux.org.uk> <51262A7A.8040103@ti.com>
- <alpine.LFD.2.03.1302211144240.6419@syhkavp.arg> <51265BF1.5000302@ti.com>
- <alpine.LFD.2.03.1302211358070.6419@syhkavp.arg>
- <5126778A.4040705@wwwdotorg.org>
+ <alpine.LFD.2.03.1302211144240.6419@syhkavp.arg>
+ <20130221182724.GA14329@obsidianresearch.com>
+ <alpine.LFD.2.03.1302211423190.6419@syhkavp.arg>
+ <20130221211444.GB20114@obsidianresearch.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Stephen Warren <swarren@wwwdotorg.org>
+To: Jason Gunthorpe <jgunthorpe@obsidianresearch.com>
 Cc: Tom Rini <trini@ti.com>, "Fernandes, Joel A" <joelagnel@ti.com>, Russell King - ARM Linux <linux@arm.linux.org.uk>, linux-kbuild@vger.kernel.org, tony@atomide.com, Linux@theia.denx.de, Grant Likely <grant.likely@secretlab.ca>, u-boot@lists.denx.de, Grant Likely <glikely@secretlab.ca>, OMAP List <linux-omap@vger.kernel.org>, ARM Kernel List <linux-arm-kernel@lists.infradead.org>
 
-On Thu, 21 Feb 2013, Stephen Warren wrote:
+On Thu, 21 Feb 2013, Jason Gunthorpe wrote:
 
-> On 02/21/2013 12:21 PM, Nicolas Pitre wrote:
-> > DT installation must be outside of the distribution's responsibilities.  
-> > It should be the OEM's responsibility, just like BIOS updates for PCs 
-> > which don't come from Fedora/Debian/Ubuntu.  Obviously, having the dts 
-> > files in the kernel tree does confuse people in that regard, but that 
-> > must not deter people from doing the right thing.
+> On Thu, Feb 21, 2013 at 02:57:46PM -0500, Nicolas Pitre wrote:
+> > For embedded appliance product you may do as you wish.  Nobody will 
+> > interfere in the way you develop and support your own products (as long 
+> > as you honor the applicable licenses of course).
 > 
-> The guidance that has been given in the past is that the kernel zImage
-> and DTB /must/ be stored "in the same location", whether that means the
-> /boot filesystem, flash partitions, or whatever, so that if required,
-> the kernel and DTB can be updated at the same time, and using the same
-> process, so it's guaranteed to be easy enough to update the DTB if you
-> already know how to update the kernel.
+> I was specifically responding to your statement that 'a hybrid mixed
+> solution like FIT is IMHO the worst of both worlds and sending a wrong
+> message.'
+> 
+> We have been making good use of such an arrangement, and it is
+> defintely not 'the wrong message' for certain applications. In fact,
+> as I said, it is probably the *right* message for embedded users.
 
-Where were such guidance given?
+No it is not.  FIT is about bundling a multi-platform kernel with a 
+bunch of DTBs together in a single file.  I don't think you need that 
+for your embedded system.  The "wrong message" here is to distribute 
+multiple DTBs around, whether it is with FIT or on a distro install 
+media.
 
-I don't think this is wise anyway.  The DT content for a given piece of 
-hardware should stabilize quickly, while the kernel can be updated for 
-years.  So there is no need for making the DTB update into the same 
-process as the kernel.
+> Even if I was a distro user, the idea that my dt and kernel would be 
+> decoupled is very scary.
 
-And as I stated earlier, the distros will care about kernel updates, but 
-they shouldn't have to care about DTB updates.
+That was still the design goal for DT.
 
-The only reason why we do have to update DTBs frequently is because the 
-whole thing is still being developed and established.  But frequent DTB 
-updates are not the end goal, and therefore we shouldn't design 
-installation and update mechanisms around the current state of affairs 
-which is not meant to persist.
+> Realize that today, my Kirkwood systems require a different DT for at 
+> least 3.7 and 3.8 kernels, and quite possibly different again for 
+> 3.9!!
 
-> Has that guidance changed?
+Understandable, given that Kirkwood is being ported to DT right now.  
+But if DT had been used from the start when we introduced Kirkwood 
+support to Linux back in 2008 you most likely wouldn't have to change 
+the DTB on your board at all today.
 
-Consider this as my plea to have it changed.
+> This will eventually settle on kirkwood, but I bet the same pattern
+> will repeat on the next new SOC.
 
-> Also, how can the OEM provide a DTB? The distro is responsible for
-> installing all the filesystem content.
+Possible, although new SOCs do start with DT from the start which is 
+much easier than trying to retrofit it to existing code without breaking 
+things.  And given that patterns emerge, there is no need to redesign 
+new bindings for every new SOC.
 
-And that's probably not a good idea either.
+> I would have thought keeping the device tree data and kernel together
+> is preferred for most cases as it is more inline with
+> Documentation/stable_api_nonsense.txt. Making the DT a strong stable
+> API boundary sounds really hard to me, and if the churn on ARM so far
+> is indication, it may not be realistic..
 
-> There's no defined way of passing
-> a DTB from some pre-bootloader firmware into the bootloader and through
-> to the kernel;
+The DT is meant to describe hardware.  As far as I know, the hardware I 
+own seems to be rather static and stable, and unlike software there is 
+no way I can change it (soldering irons don't count).
 
-That doesn't have to stay that way, does it?  Maybe those efforts put on 
-things like FIT or the like could be applied to this problem instead?
+> Distros already ship huge kernels with modules for every hardware out
+> there. Shipping all the DTs as well doesn't seem like a problem.
 
-Yet that depends how you define a pre-bootloader and a bootloader.  
-Some people call UEFI the bootloader and grub or u-boot running on top 
-as the "second stage" bootloader.  I've heard people talking about 
-making u-boot into a _user_ of the DTB in addition to the kernel, which 
-would make some sense.  In that case, the second stage bootloader could 
-be somewhat generic as well.  But if that layer is generic, then there 
-must be some kind of standard adaptation layer or API provided by the 
-first stage bootloader to the second stage bootloader.  Passing on 
-some hardware configuration payload would be part of that API.  
+But it is!  Even shipping multiple kernels _is_ a problem for them.  
+Hence this multi-platform kernel effort.  Otherwise why would we bother?
 
-Sidenote: there is noise about using ACPI instead of DT on ARM servers 
-for example, so that's another reason why distributions should not 
-engage into this responsibility too much.
+According to your logic, distros could package and distribute BIOS 
+updates for all the X86 systems out there.  After all, if they did, they 
+would guarantee even better support on the hardware they target and not 
+have to carry those ACPI quirks in the kernel, no?
 
-And obviously the DTB has to be tied to the machine specific boot layer.  
-And the method to retrieve it would, obviously, be machine specific at 
-that point.  This doesn't have to come frfom the filesystem used by the 
-final operating system.
+Ask them if they find this idea rejoicing.  You might be surprised.
 
-> the only way to get a DTB to the kernel right now is for
-> the bootloader to load it itself (either as part of a single file, or as
-> a separate file) and pass it to the kernel. So, there's really no way
-> for an OEM to provide a DTB in a BIOS-like fashion.
+> I am thinking something like /lib/device-tree/`uname -r`/...
+> 
+> Where (taking a PC analog) the bootloader is told to grab:
+>  /boot/vmlinuz-3.9
+>  /boot/initrd.img-3.9
+>  /lib/device-tree/3.9/ti/omap/foo-bar-board
 
-That will have to change.
+And what is the advantage over not having to carry all those files at 
+all on your filesystem?
 
-> Why shouldn't the OEM just provide their *.dts files, and people can
-> either compile them and put them into /boot, or distros can package them
-> and the package will install them into /boot. That's extremely simple
-> and while each distro will have to create their own packaging script,
-> that's something they already know how to do, and a package that just
-> dumps a file onto a disk is extremely simple, so people wouldn't have to
-> go inventing distro-specific solutions.
+> The kernel build can be nice and uniform, while the distro can provide
+> scripts/tools to bundle the kernel zimage, kernel modules, initramfs
+> stuff and dtb into something bootable - be it FIT, uimage, bootz
+> script, grub script or whatever.
 
-Because that shouldn't be the distro's business.  Because the distros 
-shouldn't have to be aware of all possible DTBs around and gather them 
-on their install media and figure out during installation which one to 
-use, or configure the bootloader so it knows which one to pass back to 
-the kernel, when the OEMs may as well just ship the right one with their 
-hardware without the distro to care at all.  Because a distro should be 
-installable on some future hardware that didn't exist when that distro 
-was put together.  Because, ideally, you should be able to pop out the 
-disk (or SD card) from device X and put it into device Y and just boot 
-without changing anything.
+Or they may simply not bother if the bootloader that comes with the 
+hardware already does the right thing which is even better.
 
-The device tree data is describing hardware, it should be tied to the 
-hardware, not to the distribution.  Hardware doesn't change, kernels and 
-distros do.
+> > > Embedding this stuff into the bootloader is *not* desirable for my
+> > > embedded scenarios. We don't use FIT (or uboot) but we do the same
+> > > thing: a single image is constructed with the proper dtb, kernel and
+> > > initrd, and that is what the bootloader boots.
+> > 
+> > No one is advocating to embed the DT stuff in the bootloader.  The DTB 
+> > may be buggy and/or incomplete and being able to update it safely i.e. 
+> > independently from the bootloader is necessary.
+> 
+> Sorry, what did you mean by:
+> 'the DT should ideally come preinstalled with the bootloader on a given
+>  board/device'
+> 
+> ?
 
-> If U-Boot always searched a disk for e.g. /boot/boot.scr or similar and
-> just executed that, and there was a standard boot.scr that worked on all
-> boards by use of e.g. bootz, ${soc}, ${board}, then that could be
-> distro-agnostic too. And life would be simple, without the need for any
-> extra build tools at all.
-
-No, life isn't that simple.  First, not everyone wants to use U-Boot. 
-And even if U-Boot was universally used/loved, there is no way you could 
-have a boot.scr that would work for every board.  In some cases there 
-might not even a usable device or filesystem for U-Boot to find the 
-/boot directory.  Alternate bootloaders might not have a btrfs driver 
-for digging into the installed distro filesystem.  Etc.
-
-Whereas, if the bootloader simply provides a DTB using any method deemed 
-appropriate by the OEM, then the kernel and therefore the distros are 
-freed from this extra and avoidable maintenance cost.  The _only_ 
-contract between the bootloader and the kernel/distro should be this 
-passing of a DTB (and initrd) in a standardized way.
-
-Extending this contract to include a given /boot directory on a specific 
-filesystem type, a preformatted boot.scr with predetermined variables, 
-and other similar high-level requirements is going to make a system with 
-zero flexibility and susceptible to boot failure as soon as one little 
-detail gets messed up. Such system would simplify some people's life of 
-course, but is going to signify hell for others.
-
-Then, some distros will support a certain list of hardware devices while 
-other distros won't because of different release schedule, etc.  That 
-issue is no more if the DTB comes with the hardware.
+When you acquire some hardware, it should come with a DTB and bootloader 
+pre-installed, ready to boot any distribution (as long as its kernel 
+supports the SoC of course). Your hardware vendor should offer DTB 
+updates on its website.  The DTB should not be compiled into the 
+bootloader so DTB updates can be done independently from risky 
+bootloader updates.
 
 
 Nicolas
