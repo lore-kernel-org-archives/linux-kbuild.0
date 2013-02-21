@@ -1,49 +1,48 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-out.m-online.net ([212.18.0.9]:53780 "EHLO
-	mail-out.m-online.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753006Ab3BUXSx (ORCPT
+Received: from mail-vc0-f171.google.com ([209.85.220.171]:45317 "EHLO
+	mail-vc0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753475Ab3BUXWs (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 21 Feb 2013 18:18:53 -0500
-From: Wolfgang Denk <wd@denx.de>
-Subject: Re: [U-Boot] [RFC] Kbuild support for ARM FIT images
+	Thu, 21 Feb 2013 18:22:48 -0500
+Received: by mail-vc0-f171.google.com with SMTP id p1so52319vcq.30
+        for <linux-kbuild@vger.kernel.org>; Thu, 21 Feb 2013 15:22:47 -0800 (PST)
 MIME-Version: 1.0
-Content-type: text/plain; charset=UTF-8
-Content-transfer-encoding: 8bit
-In-reply-to: <alpine.LFD.2.03.1302211624561.6419@syhkavp.arg>
-References: <CAD=GYpbF_3uRzhUnV=MwDiy-ekvZKJztJbkhNM0u_pvG-UCw4w@mail.gmail.com> <20130221103705.GB17852@n2100.arm.linux.org.uk> <51261F38.2030902@ti.com> <20130221134656.GC17852@n2100.arm.linux.org.uk> <51262A7A.8040103@ti.com> <alpine.LFD.2.03.1302211144240.6419@syhkavp.arg> <20130221182724.GA14329@obsidianresearch.com> <alpine.LFD.2.03.1302211423190.6419@syhkavp.arg> <20130221211444.GB20114@obsidianresearch.com> <alpine.LFD.2.03.1302211624561.6419@syhkavp.arg>
-Date: Fri, 22 Feb 2013 00:18:48 +0100
-Message-Id: <20130221231848.880DE200552@gemini.denx.de>
+In-Reply-To: <5126AA4B.2080600@suse.cz>
+References: <CALZVapk=-8t8BihTSoTJ=Fh3C9xBtDc9ETpmGpjNBrTYiJLF7g@mail.gmail.com>
+ <5126AA4B.2080600@suse.cz>
+From: Javier Domingo <javierdo1@gmail.com>
+Date: Fri, 22 Feb 2013 00:22:27 +0100
+Message-ID: <CALZVapn9TZNqeWXQry2_Zw9okOFKspeNRpeQJjENuHddx2aX+g@mail.gmail.com>
+Subject: Re: Size of images in make-kpkg and make deb-pkg
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nicolas Pitre <nico@fluxnic.net>
-Cc: Jason Gunthorpe <jgunthorpe@obsidianresearch.com>, "Fernandes, Joel A" <joelagnel@ti.com>, Russell King - ARM Linux <linux@arm.linux.org.uk>, linux-kbuild@vger.kernel.org, tony@atomide.com, Grant Likely <grant.likely@secretlab.ca>, u-boot@lists.denx.de, Tom Rini <trini@ti.com>, Grant Likely <glikely@secretlab.ca>, OMAP List <linux-omap@vger.kernel.org>, ARM Kernel List <linux-arm-kernel@lists.infradead.org>
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org
 
-Dear Nicolas,
+Is there any way to get rid of the full debuginfo?
+Javier Domingo
 
-In message <alpine.LFD.2.03.1302211624561.6419@syhkavp.arg> you wrote:
-> 
-> No it is not.  FIT is about bundling a multi-platform kernel with a 
-> bunch of DTBs together in a single file.  I don't think you need that 
 
-Actually this is neither the only, nor even the primary purpose of FIT
-images; these have a much wider scope of usage scenarios.
-
-> The DT is meant to describe hardware.  As far as I know, the hardware I 
-> own seems to be rather static and stable, and unlike software there is 
-> no way I can change it (soldering irons don't count).
-
-There is other hardware available (for example FPGA based) where this
-does not apply.
-
-Best regards,
-
-Wolfgang Denk
-
--- 
-DENX Software Engineering GmbH,     MD: Wolfgang Denk & Detlev Zundel
-HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
-Phone: (+49)-8142-66989-10 Fax: (+49)-8142-66989-80 Email: wd@denx.de
-GUIs  are  virtually  useless.  Learn  tools.  They're  configurable,
-scriptable, automatable, cron-able, interoperable, etc. We don't need
-no brain-dead winslurping monolithic claptrap.
-                               -- Tom Christiansen in 371140df@csnews
+2013/2/22 Michal Marek <mmarek@suse.cz>:
+> On 12.2.2013 01:29, Javier Domingo wrote:
+>> Hello,
+>>
+>> I don't know if this belongs here, but I just wanted to came across a
+>> strange thing I am experiencing. I am currently working on v3.6, and I
+>> have just discovered that generated kernel images have a totally
+>> unrelated size.
+>>
+>> When I compile with something like make-kpkg --initrd kernel_image
+>> kernel_headers, the generated image is 7.7MB, and when I then run make
+>> deb-pkg, the generated deb package is 33MB.
+>>
+>> Other sizes are:
+>> 6.5M <-> 24M
+>> 38M <-> 484M (!!!)
+>
+> My guess is that the big one includes full debuginfo, while the other
+> one is stripped.
+>
+> Michal
+>
