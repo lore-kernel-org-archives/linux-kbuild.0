@@ -1,98 +1,63 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from db3ehsobe004.messaging.microsoft.com ([213.199.154.142]:7768
-	"EHLO db3outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751328Ab3BUEhl (ORCPT
+Received: from mail-wi0-f176.google.com ([209.85.212.176]:36235 "EHLO
+	mail-wi0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751689Ab3BUHP0 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 20 Feb 2013 23:37:41 -0500
-Date: Thu, 21 Feb 2013 12:37:55 +0800
-From: Shawn Guo <shawn.guo@linaro.org>
-Subject: Re: [PATCH] kbuild: create an "include chroot" for DT bindings
-Message-ID: <20130221043751.GB17738@S2101-09.ap.freescale.net>
-References: <1361394356-19385-1-git-send-email-swarren@wwwdotorg.org>
+	Thu, 21 Feb 2013 02:15:26 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <1361394356-19385-1-git-send-email-swarren@wwwdotorg.org>
+In-Reply-To: <5125A1FE.5000604@wwwdotorg.org>
+References: <CAD=GYpbF_3uRzhUnV=MwDiy-ekvZKJztJbkhNM0u_pvG-UCw4w@mail.gmail.com>
+	<5125A1FE.5000604@wwwdotorg.org>
+Date: Thu, 21 Feb 2013 01:15:25 -0600
+Message-ID: <CAD=GYpZM7uOHqhwhxzokV161WFZ2azh1VpSBn498PmPZm+bYbQ@mail.gmail.com>
+Subject: Re: [RFC] Kbuild support for ARM FIT images
+From: Joel A Fernandes <agnel.joel@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Stephen Warren <swarren@wwwdotorg.org>
-Cc: Grant Likely <grant.likely@secretlab.ca>, Rob Herring <rob.herring@calxeda.com>, Michal Marek <mmarek@suse.cz>, devicetree-discuss@lists.ozlabs.org, linux-kbuild@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Stephen Warren <swarren@nvidia.com>, Hiroshi Doyu <hdoyu@nvidia.com>
+Cc: u-boot@lists.denx.de, Linux OMAP List <linux-omap@vger.kernel.org>, linux-kbuild@vger.kernel.org, Linux ARM Kernel List <linux-arm-kernel@lists.infradead.org>, tony@atomide.com, "Fernandes, Joel A" <joelagnel@ti.com>, "Rini, Tom" <trini@ti.com>, Grant Likely <glikely@secretlab.ca>, Grant Likely <grant.likely@secretlab.ca>
 
-On Wed, Feb 20, 2013 at 02:05:56PM -0700, Stephen Warren wrote:
-> From: Stephen Warren <swarren@nvidia.com>
-> 
-> The recent dtc+cpp support allows header files and C pre-processor
-> defines/macros to be used when compiling device tree files. These
-> headers will typically define various constants that are part of the
-> device tree bindings.
-> 
-> The original patch which set up the dtc+cpp include path only considered
-> using those headers from device tree files. However, they are also
-> useful for kernel code which needs to interpret the device tree.
-> 
-> In both the DT files and the kernel, I'd like to include the DT-related
-> headers in the same way, for example, <dt-bindings/gpio/tegra-gpio.h>.
-> That will simplify any text which discusses the DT header locations.
-> 
-> Creating a <dt-bindings/> for kernel source to use is as simple as
-> placing files into include/dt-bindings/.
-> 
-> However, when compiling DT files, the include path should be restricted
-> so that only the dt-bindings path is available; arbitrary kernel headers
-> shouldn't be exposed. For this reason, create a specific include
-> directory for use by dtc+cpp, and symlink dt-bindings from there to the
-> actual location of include/dt-bindings/. For want of a better location,
-> place this "include chroot" into the existing dts/ directory.
-> 
-> arch/*/boot/dts/include/dt-bindings -> ../../../../../dt-bindings
+On Wed, Feb 20, 2013 at 10:26 PM, Stephen Warren <swarren@wwwdotorg.org> wrote:
+> On 02/20/2013 06:37 PM, Joel A Fernandes wrote:
+>> Hello,
+>> I've been spinning some work-in-progress patches for FIT build support
+>> in the kernel.
+>> With the move to multiplatform support on OMAP, I feel it is a good
+>> time to add  FIT support, also looking at the proliferating number of
+>> dtbs, as it is a nice way
+>
+> To my mind, FIT is pointless. And forcing the kernel build process to
 
-../../../../../include/dt-bindings
+I don't think so, there are many usecases for FIT and cleanly
+embedding DTBs is a common usecase, (along with stronger checksums,
+compression). That is also the basis of my ELC talk tomorrow morning
+;-)
+You could peruse the slides at, http://wwwelinux.org/Fit-boot to get a
+better understanding of what FIT solves. With the move to
+multiplatform kernels, it is quite a logical next step to add this
+support to the kernel build.
 
-And, I would expect only the headers that will actually be referenced
-by kernel should go into include/dt-bindings.  There is no point to
-put headers that will not be included by kernel but only by dts files
-into there, and instead arch/arm/boot/dts/include should just be good
-enough for them.  With this agreed ...
+> create bootloader-specific files doesn't seem like a good idea. Doing so
+> would require pulling in even more outside tools into the kernel build flow.
 
-> Cc: Shawn Guo <shawn.guo@linaro.org>
+As for pulling additional tools, dtc is already a part of the kernel
+so the idea is to use existing tools.
 
-Acked-by: Shawn Guo <shawn.guo@linaro.org>
+> All you need is to copy the zImage and any relevant .dtb files into
+> /boot, and have U-Boot load the relevant .dtb file by constructing the
+> filename as roughly ${soc}-${board}.dtb, then use the bootz command to
+> boot it. You can have a completely generic boot.scr (or built-in script).
 
-> Cc: Hiroshi Doyu <hdoyu@nvidia.com>
-> Signed-off-by: Stephen Warren <swarren@nvidia.com>
-> ---
-> You can find an example of how this would be used at
-> git://nv-tegra.nvidia.com/user/swarren/linux-2.6 linux-next_common
-> (note: there's a bunch of other cruft in that branch too)
-> 
->  arch/arm/boot/dts/include/dt-bindings |    1 +
->  scripts/Makefile.lib                  |    3 +--
->  2 files changed, 2 insertions(+), 2 deletions(-)
->  create mode 120000 arch/arm/boot/dts/include/dt-bindings
-> 
-> diff --git a/arch/arm/boot/dts/include/dt-bindings b/arch/arm/boot/dts/include/dt-bindings
-> new file mode 120000
-> index 0000000..08c00e4
-> --- /dev/null
-> +++ b/arch/arm/boot/dts/include/dt-bindings
-> @@ -0,0 +1 @@
-> +../../../../../include/dt-bindings
-> \ No newline at end of file
-> diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-> index 07125e6..d6c5036 100644
-> --- a/scripts/Makefile.lib
-> +++ b/scripts/Makefile.lib
-> @@ -157,8 +157,7 @@ cpp_flags      = -Wp,-MD,$(depfile) $(NOSTDINC_FLAGS) $(LINUXINCLUDE)     \
->  ld_flags       = $(LDFLAGS) $(ldflags-y)
->  
->  dtc_cpp_flags  = -Wp,-MD,$(depfile) -nostdinc                            \
-> -		 -I$(srctree)/arch/$(SRCARCH)/boot/dts                   \
-> -		 -I$(srctree)/arch/$(SRCARCH)/include/dts                \
-> +		 -I$(srctree)/arch/$(SRCARCH)/boot/dts/include           \
->  		 -undef -D__DTS__
->  
->  # Finds the multi-part object the current object will be linked into
-> -- 
-> 1.7.10.4
-> 
+FIT doesnt need any such bootloader variables and thus benefits from
+the simplicity.
 
+> Note: Not all (many?) U-Boot support FIT anyway, so you'd need to flash
+
+For these boards, we can special case to doing a non-fit boot to keep
+them backward-compatibility. I don't think maintaining
+backward-compatibility requires any additional work, but just building
+the kernel with a different make target.
+
+Regards,
+Joel
