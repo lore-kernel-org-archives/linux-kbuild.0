@@ -1,33 +1,84 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pegase1.c-s.fr ([93.17.236.30]:20865 "EHLO mailhub1.si.c-s.fr"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752297Ab3BUOce (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 21 Feb 2013 09:32:34 -0500
-Date: Thu, 21 Feb 2013 13:49:50 +0100
-Message-Id: <201302211249.r1LCno6O024776@localhost.localdomain>
-From: Christophe Leroy <christophe.leroy@c-s.fr>
-Subject: [PATCH] Unset LANG in setlocalversion script
+Received: from caramon.arm.linux.org.uk ([78.32.30.218]:47673 "EHLO
+	caramon.arm.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752665Ab3BUOhl (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 21 Feb 2013 09:37:41 -0500
+Date: Thu, 21 Feb 2013 14:37:16 +0000
+From: Russell King - ARM Linux <linux@arm.linux.org.uk>
+Subject: Re: [RFC] Kbuild support for ARM FIT images
+Message-ID: <20130221143716.GD17852@n2100.arm.linux.org.uk>
+References: <CAD=GYpbF_3uRzhUnV=MwDiy-ekvZKJztJbkhNM0u_pvG-UCw4w@mail.gmail.com> <20130221103705.GB17852@n2100.arm.linux.org.uk> <51261F38.2030902@ti.com> <20130221134656.GC17852@n2100.arm.linux.org.uk> <51262A7A.8040103@ti.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <51262A7A.8040103@ti.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: Tom Rini <trini@ti.com>
+Cc: Joel A Fernandes <agnel.joel@gmail.com>, Linux OMAP List <linux-omap@vger.kernel.org>, linux-kbuild@vger.kernel.org, Linux ARM Kernel List <linux-arm-kernel@lists.infradead.org>, tony@atomide.com, "Fernandes, Joel A" <joelagnel@ti.com>, Grant Likely <glikely@secretlab.ca>, Grant Likely <grant.likely@secretlab.ca>
 
-This patch allows the use of setlocalversion script regardless of the LANG
-parameter. Otherwise, the `svn info 2>/dev/null | grep '^Last Changed Rev'`
-returns nothing because for instance, in French the text 'Last Changed Rev'
-is replaced by 'Révision de la dernière modification'
+(Dropped uboot mailing list because it constantly holds my mails for
+moderation.)
 
-Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
+On Thu, Feb 21, 2013 at 09:08:58AM -0500, Tom Rini wrote:
+> On 02/21/2013 08:46 AM, Russell King - ARM Linux wrote:
+> > We're about to make it harder how?  By forcing them to use DT
+> > blobs? Or by forcing them to have to use the combined zImage + DT
+> > format because their boot loaders are soo broken that they can't
+> > deal with multiple images?
+> 
+> None of that.  We're making it harder since most folks don't have a
+> board with 'bootz' built-in and the 'uImage' target doesn't build now
+> (unless, yes, you pass LOADADDR to make) so they either format it by
+> hand (/ adjust their local scripting) or do what you're doing.
 
-diff -ur linux-3.7.9/scripts/setlocalversion linux/scripts/setlocalversion
---- linux-3.7.9/scripts/setlocalversion	2013-02-17 19:53:32.000000000 +0100
-+++ linux/scripts/setlocalversion	2012-11-03 03:15:32.000000000 +0100
-@@ -9,6 +9,8 @@
- #
- #
- 
-+unset LANG
-+
- usage() {
- 	echo "Usage: $0 [--save-scmversion] [srctree]" >&2
- 	exit 1
+And adjusting their process to pass an additional argument to the
+kernel make is too difficult?
+
+So instead we have to change the kernel makefiles and scripting to
+create yet another uboot specific format, which is going to need
+them to edit their scripts in a much more invasive way _anyway_?
+
+"or do what you're doing" - oh you mean, adding an additional column
+to the database configuration, digging out from the kernel git
+history what the load addresses should be, updating the database tables
+with that, editing the build system scripts to extract this new column
+from the database, and pass it into make... yes, complicated isn't it.
+Didn't take long to sort out though, and didn't require a load of new
+file formats to fix.
+
+> > Yes, things have become a _little_ harder since OMAP has switched
+> > to multiplatform, but it really isn't that bad.  My build and boot
+> > test system still works, and it uses uImage for all the OMAP
+> > platforms. You just have to give the right LOADADDR= argument to
+> > the kernel to make the uImage generation work again.  Sure, the
+> > resulting uImage can't be loaded at a different address, but you if
+> > you need to change that, you can quite easily move the existing
+> > uImage out and re-run make ARCH=arm uImage LOADADDR=<something
+> > else> and hey presto, you end up with the uImage generated for a
+> > different address.
+> > 
+> > But: we wouldn't be in this situation if it weren't for these
+> > absurd uboot uImage formats in the first place.  Or even be needing
+> > this FIT stuff if zImage was just used directly.
+> 
+> FIT isn't required.  FIT is just trying to offer a nice usability
+> thing to folks.  A point of device trees is a single image works in a
+> lot of places.  FIT gives you a single file works in a lot of places.
+
+Well, FIT isn't everywhere either.  So really that argument doesn't
+stand for the same reasons that bootz support isn't everywhere either.
+
+My SDP4430's uboot provided by TI uses uboot 1.1.4.  Therefore, it
+doesn't support FIT, nor bootz - only uImage.
+
+> > uboot dug _itself_ into this hole.  It's uboot's problem.
+> 
+> A whole lot  of people dug this particular hole.  Joel is trying to
+> offer up a solution that maybe makes things easier for everyone.  Or
+> it gets rejected here too and distros will come up with their N
+> different ways to try and provide easier experiences to the end user.
+
+FIT just propagates the "boot loader specific file format" absurdity
+which was a mistake when uImage came along...
