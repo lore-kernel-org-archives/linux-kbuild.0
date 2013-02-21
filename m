@@ -1,56 +1,31 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wi0-f182.google.com ([209.85.212.182]:37371 "EHLO
-	mail-wi0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753104Ab3BUU4L (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 21 Feb 2013 15:56:11 -0500
-From: Peter Korsgaard <jacmet@sunsite.dk>
-Subject: Re: [U-Boot] [RFC] Kbuild support for ARM FIT images
-References: <CAD=GYpbF_3uRzhUnV=MwDiy-ekvZKJztJbkhNM0u_pvG-UCw4w@mail.gmail.com>
-	<20130221103705.GB17852@n2100.arm.linux.org.uk>
-	<51261F38.2030902@ti.com>
-	<20130221134656.GC17852@n2100.arm.linux.org.uk>
-	<51262A7A.8040103@ti.com>
-	<alpine.LFD.2.03.1302211144240.6419@syhkavp.arg>
-	<20130221182724.GA14329@obsidianresearch.com>
-Date: Thu, 21 Feb 2013 21:56:05 +0100
-In-Reply-To: <20130221182724.GA14329@obsidianresearch.com> (Jason Gunthorpe's
-	message of "Thu, 21 Feb 2013 11:27:24 -0700")
-Message-ID: <878v6hfkt6.fsf@dell.be.48ers.dk>
+Received: from cantor2.suse.de ([195.135.220.15]:58676 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1756425Ab3BUVOV (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 21 Feb 2013 16:14:21 -0500
+Message-ID: <51268E25.6070104@suse.cz>
+Date: Thu, 21 Feb 2013 22:14:13 +0100
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Subject: Re: [PATCH] Unset LANG in setlocalversion script
+References: <201302211249.r1LCno6O024776@localhost.localdomain>
+In-Reply-To: <201302211249.r1LCno6O024776@localhost.localdomain>
+Content-Type: text/plain; charset=ISO-8859-2
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jason Gunthorpe <jgunthorpe@obsidianresearch.com>
-Cc: Nicolas Pitre <nico@fluxnic.net>, Tom Rini <trini@ti.com>, "Fernandes, Joel A" <joelagnel@ti.com>, Russell King - ARM Linux <linux@arm.linux.org.uk>, linux-kbuild@vger.kernel.org, tony@atomide.com, Linux@theia.denx.de, Grant Likely <grant.likely@secretlab.ca>, u-boot@lists.denx.de, Grant Likely <glikely@secretlab.ca>, OMAP List <linux-omap@vger.kernel.org>, ARM Kernel List <linux-arm-kernel@lists.infradead.org>
+To: Christophe Leroy <christophe.leroy@c-s.fr>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
->>>>> "Jason" == Jason Gunthorpe <jgunthorpe@obsidianresearch.com> writes:
+Dne 21.2.2013 13:49, Christophe Leroy napsal(a):
+> This patch allows the use of setlocalversion script regardless of the LANG
+> parameter. Otherwise, the `svn info 2>/dev/null | grep '^Last Changed Rev'`
+> returns nothing because for instance, in French the text 'Last Changed Rev'
+> is replaced by 'Révision de la dernière modification'
 
-Hi,
+Unsetting LANG might not be enough. You should unset LC_ALL and set
+LC_MESSAGES=C. But - is this a problem for other commands in the script?
+From a quick look, we only parse English output of svn, so I suggest to
+only set the env var for the svn command.
 
- Jason> We've been using DT on production embedded stuff sice about 2.6.20ish
- Jason> on PPC and now ARM. We treat the dtb as a kernel version specific
- Jason> file, much like an initrd and ensure that the kernel only ever boots
- Jason> with its proper dtb. This is based on experience that the dtbs change
- Jason> depending on the state of the drivers in the kernel, what gets
- Jason> mainlined and when, etc.
-
- Jason> Embedding this stuff into the bootloader is *not* desirable for my
- Jason> embedded scenarios. We don't use FIT (or uboot) but we do the same
- Jason> thing: a single image is constructed with the proper dtb, kernel and
- Jason> initrd, and that is what the bootloader boots.
-
- Jason> Why? This is an embedded appliance product. We need to be able to
- Jason> deliver firmware upgrades that *work*. We can't brick the board
- Jason> because the bootloader and kernel get out of sync. The boot loader has
- Jason> to be *simple*, it has to boot every past, present and future kernel
- Jason> or we start taking risks that a firmware flash will end up bricking
- Jason> it.
-
-I'm having the exact same experience (and handle it in the same way).
-
-I know this was not the intention of DT, but unfortunately this is how
-things have turned out so far.
-
--- 
-Bye, Peter Korsgaard
+Michal
