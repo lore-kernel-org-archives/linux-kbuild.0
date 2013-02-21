@@ -1,49 +1,71 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-out.m-online.net ([212.18.0.9]:54992 "EHLO
-	mail-out.m-online.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753852Ab3BURhQ (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 21 Feb 2013 12:37:16 -0500
-From: Wolfgang Denk <wd@denx.de>
-Subject: Re: [RFC] Kbuild support for ARM FIT images
+Received: from arroyo.ext.ti.com ([192.94.94.40]:59069 "EHLO arroyo.ext.ti.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753816Ab3BURju (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 21 Feb 2013 12:39:50 -0500
+Message-ID: <51265BF1.5000302@ti.com>
+Date: Thu, 21 Feb 2013 12:40:01 -0500
+From: Tom Rini <trini@ti.com>
 MIME-Version: 1.0
-Content-type: text/plain; charset=UTF-8
-Content-transfer-encoding: 8bit
-In-reply-to: <20130221134656.GC17852@n2100.arm.linux.org.uk>
-References: <CAD=GYpbF_3uRzhUnV=MwDiy-ekvZKJztJbkhNM0u_pvG-UCw4w@mail.gmail.com> <20130221103705.GB17852@n2100.arm.linux.org.uk> <51261F38.2030902@ti.com> <20130221134656.GC17852@n2100.arm.linux.org.uk>
-Date: Thu, 21 Feb 2013 18:37:07 +0100
-Message-Id: <20130221173707.76A7D200671@gemini.denx.de>
+Subject: Re: [U-Boot] [RFC] Kbuild support for ARM FIT images
+References: <CAD=GYpbF_3uRzhUnV=MwDiy-ekvZKJztJbkhNM0u_pvG-UCw4w@mail.gmail.com> <20130221103705.GB17852@n2100.arm.linux.org.uk> <51261F38.2030902@ti.com> <20130221134656.GC17852@n2100.arm.linux.org.uk> <51262A7A.8040103@ti.com> <alpine.LFD.2.03.1302211144240.6419@syhkavp.arg>
+In-Reply-To: <alpine.LFD.2.03.1302211144240.6419@syhkavp.arg>
+Content-Type: text/plain; charset="ISO-8859-1"
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Russell King - ARM Linux <linux@arm.linux.org.uk>
-Cc: Tom Rini <trini@ti.com>, "Fernandes, Joel A" <joelagnel@ti.com>, Grant Likely <glikely@secretlab.ca>, linux-kbuild@vger.kernel.org, tony@atomide.com, Grant Likely <grant.likely@secretlab.ca>, u-boot@lists.denx.de, Joel A Fernandes <agnel.joel@gmail.com>, Linux OMAP List <linux-omap@vger.kernel.org>, Linux ARM Kernel List <linux-arm-kernel@lists.infradead.org>
+To: Nicolas Pitre <nico@fluxnic.net>
+Cc: Russell King - ARM Linux <linux@arm.linux.org.uk>, "Fernandes, Joel A" <joelagnel@ti.com>, Grant Likely <glikely@secretlab.ca>, linux-kbuild@vger.kernel.org, tony@atomide.com, Grant Likely <grant.likely@secretlab.ca>, u-boot@lists.denx.de, Linux@theia.denx.de, OMAP List <linux-omap@vger.kernel.org>, ARM Kernel List <linux-arm-kernel@lists.infradead.org>
 
-Dear Russell,
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
 
-In message <20130221134656.GC17852@n2100.arm.linux.org.uk> you wrote:
->
-> > Note that FIT images are relatively old (docs date back to March
-> > 2008).  This is more of another effort to try and update what the
-> > kernel uses.
+On 02/21/2013 12:25 PM, Nicolas Pitre wrote:
+> On Thu, 21 Feb 2013, Tom Rini wrote:
+[snip]
+>>> uboot dug _itself_ into this hole.  It's uboot's problem.
+>> 
+>> A whole lot  of people dug this particular hole.  Joel is trying
+>> to offer up a solution that maybe makes things easier for
+>> everyone.  Or it gets rejected here too and distros will come up
+>> with their N different ways to try and provide easier experiences
+>> to the end user.
 > 
-> So it's five years old and people haven't been that interested in it so
-> far.  That speaks volumes...
+> Nothing being perfect, it is probably unreasonable to think that
+> every board will start shipping with complete and correct DT
+> description, etc. But so is the state of FIT support right now.
+> That solution to make things easier for everyone should actually
+> make that DT vs kernel separation more effective and provide better
+> mechanisms for gluing the various DTBs to their respective boards,
+> and not to glue them to the kernel to populate a distro filesystem
+> with them.
 
-Well, your attitude to (not) accept anything like that is well known;
-there have been few previews attempts, which have all been rejected in
-basicly the same way.
+I very much agree here.  And in the end, what I really really want to
+avoid is every distribution (or similar grouping of stuff) coming up
+with N different ways to solve the problem of "how do I get the user
+the right device tree to go with $whatever board they happen to be
+running".  If the clever solution everyone comes up with is some other
+container that's not FIT, that's fine, patches welcome and happily
+reviewed for whatever the solution is.  I just don't want people
+thinking this is a problem that hasn't been thought of before.
 
-But now the situation has changed - multiplatform support adds a
-number of use cases where this feature comes in handy, so it pops up
-again.
+- -- 
+Tom
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-Best regards,
-
-Wolfgang Denk
-
--- 
-DENX Software Engineering GmbH,     MD: Wolfgang Denk & Detlev Zundel
-HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
-Phone: (+49)-8142-66989-10 Fax: (+49)-8142-66989-80 Email: wd@denx.de
-The aim of science is not to open the door to everlasting wisdom  but
-to set a limit on everlasting error.                 - Bertolt Brecht
+iQIcBAEBAgAGBQJRJlvxAAoJENk4IS6UOR1W92YQAJZkRAllCkYqUr9sopAxElwV
+lyuv7GJ2NHT9E39jS0muWk9+t104a0iIQY71Va0UgxFt2lATW9HwffHG3nORK/qF
+H7lgzfRGgHUjxkZk5D1jlJI6B6mdWtGcC3aN8f6NVZ2wVH7jxDWoi2hxiP68P/in
+xBNNpHmhwuBwUZ9o1A1W+0rGP8/qOIW/q8GVRLtO2Dw94fEKiWUF6V5VBsIFdeuO
+Vg3p4vuuvaaF0i1cPlZQAvfykvPoGF6UB1s5MdsuHxTEuRoQa5UdakcwFRnN5I/C
+pXdK8m4JtJQt4cDj4Jq4FogPzkdbI8VkJ1/8fYpjWnhn1DSawsMinVODRQ+9cy4u
+aR0t901gQPu13HKqlTZ4kViAhSCGcoVxzzDCpQm3P2YuaLvJJX/uS4eFo8HAX+Jl
+KfGsf4EXFtRygJtCng4TDdS4WYp6L0VtJVzx4cEzO6syEO5Kz7KgC6SRcfI1pNfm
+u5RQarknuSJBTW7x5yBYpMu1Zypl3wEqQxaroF8MtQV3qE4bQpwhtljc8h4huVZ0
+sMdyAeS9T4gkVp4+H553n8nHrbDCcIdutaCRrcIVDY0dldE/CITpagthK6znMCoP
+YHHzCkoG+M+9wSueE5GNWvxmWwL3dUYBest/rfa/Eqx5H0o1aSyGyjZeSM9IgnZo
+YCtEaoq6gT2VDTIl7tCK
+=vnlO
+-----END PGP SIGNATURE-----
