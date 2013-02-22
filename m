@@ -1,54 +1,76 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from quartz.orcorp.ca ([184.70.90.242]:51301 "EHLO quartz.orcorp.ca"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1758368Ab3BVRoF (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 22 Feb 2013 12:44:05 -0500
-Date: Fri, 22 Feb 2013 10:43:47 -0700
-From: Jason Gunthorpe <jgunthorpe@obsidianresearch.com>
-Subject: Re: [U-Boot] [RFC] Kbuild support for ARM FIT images
-Message-ID: <20130222174347.GA10206@obsidianresearch.com>
-References: <alpine.LFD.2.03.1302211144240.6419@syhkavp.arg>
- <20130221182724.GA14329@obsidianresearch.com>
- <alpine.LFD.2.03.1302211423190.6419@syhkavp.arg>
- <20130221211444.GB20114@obsidianresearch.com>
- <alpine.LFD.2.03.1302211624561.6419@syhkavp.arg>
- <20130221231848.880DE200552@gemini.denx.de>
- <20130221232821.GA2823@obsidianresearch.com>
- <5126B979.5000205@gmail.com>
- <20130222022212.GB11169@obsidianresearch.com>
- <CA+T6QP=gHtOuZbjsbv5_GswZu7FUXW+9KVw6K06+5X_PNzqODw@mail.gmail.com>
+Received: from avon.wwwdotorg.org ([70.85.31.133]:49033 "EHLO
+	avon.wwwdotorg.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1759314Ab3BVSLT (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 22 Feb 2013 13:11:19 -0500
+Message-ID: <5127B4C3.8070001@wwwdotorg.org>
+Date: Fri, 22 Feb 2013 11:11:15 -0700
+From: Stephen Warren <swarren@wwwdotorg.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CA+T6QP=gHtOuZbjsbv5_GswZu7FUXW+9KVw6K06+5X_PNzqODw@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: create an "include chroot" for DT bindings
+References: <1361394356-19385-1-git-send-email-swarren@wwwdotorg.org> <20130221043751.GB17738@S2101-09.ap.freescale.net> <51266AC1.8040507@wwwdotorg.org> <20130222023526.GA27371@S2101-09.ap.freescale.net>
+In-Reply-To: <20130222023526.GA27371@S2101-09.ap.freescale.net>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jason Kridner <jkridner@beagleboard.org>
-Cc: Rob Herring <robherring2@gmail.com>, "Fernandes, Joel A" <joelagnel@ti.com>, Russell King - ARM Linux <linux@arm.linux.org.uk>, Tony Lindgren <tony@atomide.com>, linux-kbuild@vger.kernel.org, Grant Likely <grant.likely@secretlab.ca>, "u-boot@lists.denx.de" <u-boot@lists.denx.de>, Tom Rini <trini@ti.com>, Grant Likely <glikely@secretlab.ca>, OMAP List <linux-omap@vger.kernel.org>, ARM Kernel List <linux-arm-kernel@lists.infradead.org>
+To: Shawn Guo <shawn.guo@linaro.org>
+Cc: Grant Likely <grant.likely@secretlab.ca>, Rob Herring <rob.herring@calxeda.com>, Michal Marek <mmarek@suse.cz>, devicetree-discuss@lists.ozlabs.org, linux-kbuild@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Stephen Warren <swarren@nvidia.com>, Hiroshi Doyu <hdoyu@nvidia.com>
 
-On Fri, Feb 22, 2013 at 02:56:33AM -0500, Jason Kridner wrote:
-> >> The desired FPGA use case is DT updates after booting the kernel. This
-> >> has nothing to do with FIT images. And if the FPGA tools generate the
-> >> DTB, then it is certainly not tied to the kernel.
-> >
-> > Completely unrelated, but do you have any pointer for how to do this?
-> > Hot plugging a 'dtb fragment' into the kernel would be really handy..
+On 02/21/2013 07:35 PM, Shawn Guo wrote:
+> On Thu, Feb 21, 2013 at 11:43:13AM -0700, Stephen Warren wrote:
+>> There are two things that include DT-related headers:
+>>
+>> a) Device trees (*.dts, *.dtsi)
+>> b) The kernel
+>>
+>> All the headers relevant here fall into category (a) by definition. I'd
+>> actually expect most to also fall into category (b), although I can see
+>> that category (b) might be a strict subset of category (a).
+>>
+>> I believe you're proposing only storing category (b) headers in
+>> include/dt-bindings/, and storing any others I suppose in arch/*/boot/dts/.
+>>
+>> But, my thoughts are that /all/ these headers (both categories) should
+>> be stored in one place for consistency.
+>>
+>> That way, if/when the DT binding docs, these headers, and the DT files
+>> themselves move out of the kernel, we'll end up with some other
+>> repository/repositories that might have the following top-level
+>> directories (or at least these sets of logical data):
+>>
+>> 1) DT binding documents
+>> 2) Headers that define constants for (1)
+>> 3) DT files (*.dts/*.dtsi)
+>>
+>> We need at least some of (2) in the kernel for drivers to share the
+>> constant definitions, so my proposal is to simply copy /all/ the headers
+>> from (2) into the kernel's include/dt-bindings/. That keeps things
+>> simple; simply copy everything and maintain the same hierarchy under
+>> that "root" directory. Otherwise, we'll be constantly wondering which
+>> headers to copy, perhaps moving things back/forth as people realize that
+>> the kernel needs them, etc.
 > 
-> This doesn't answer the full question on how FPGA tools generate DTB,
-> but it is a huge problem for BeagleBone add-on hardware that we have
+> You need to anyway identify the headers needed by a) but not b) and
+> remove them from linux/include/dt-bindings/, when all DTS gets moved
+> out of kernel tree.  Otherwise, you end up leaving those headers only
+> needed by DTS in the kernel tree.
 
-In all my cases I hand code the DT's for the FPGA IP, they get quite
-big, the one I'm looking at now has over 17 DT nodes inside the FPGA
-already. This is why we are re-using the DT framework to describe the
-chip, not building a C coded PCI driver to do the same work.
+Well that's really my point - do you actually /need/ to do that?
 
-> some mechanism to dynamically load DT fragments. Pantelis posted some
-> work in that direction[1] and has continued development of his patches
-> and we've been using those extensively with BeagleBone kernel
-> development[2].
+What headers would be in (b) but not (a)? We'd typically be defining
+headers for the purpose of defining constants that are part of the
+binding definitions. To keep the kernel and binding documents in sync,
+the kernel should have access to any such header. Hence, I think the set
+of headers only in (a) would be non-existent. Even if there are some,
+presumably there would be so few it wouldn't actually matter if we
+weeded them out.
 
-Yes, I saw this. They look really interesting, I think the notion of
-hot plugging a DT fragment into the main DT is useful for many
-applications..
-
-Jason
+The only exception I can think of right now is the header for the i.MX
+pinctrl bindings, since that's expanding the names into a set of values
+the kernel will use directly rather than as needing to use as table
+indices. I'm not sure if that's the right way to go on the bindings; I
+see you're getting some pushback. But, I guess "pinctrl-simple" would
+end up in the same boat, so perhaps there's some argument for not
+removing boot/dts/ itself from the include path.
