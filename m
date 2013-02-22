@@ -1,50 +1,32 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:50610 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:55631 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1756137Ab3BVK4Y (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 22 Feb 2013 05:56:24 -0500
-Date: Fri, 22 Feb 2013 11:56:21 +0100
+	id S1755873Ab3BVMre (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 22 Feb 2013 07:47:34 -0500
+Date: Fri, 22 Feb 2013 13:47:31 +0100
 From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [PATCH v2 1/1] depmod: pass -P $CONFIG_SYMBOL_PREFIX
-Message-ID: <20130222105621.GH12402@pobox.suse.cz>
-References: <1360155419-12349-1-git-send-email-james.hogan@imgtec.com>
+Subject: Re: [PATCH] Kbuild: Disable var tracking with
+	CONFIG_DEBUG_INFO_REDUCED
+Message-ID: <20130222124730.GI12402@pobox.suse.cz>
+References: <1360274320-26833-1-git-send-email-andi@firstfloor.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1360155419-12349-1-git-send-email-james.hogan@imgtec.com>
+In-Reply-To: <1360274320-26833-1-git-send-email-andi@firstfloor.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: James Hogan <james.hogan@imgtec.com>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Mike Frysinger <vapier@gentoo.org>, Yoshinori Sato <ysato@users.sourceforge.jp>, uclinux-dist-devel@blackfin.uclinux.org
+To: Andi Kleen <andi@firstfloor.org>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Andi Kleen <ak@linux.intel.com>
 
-On Wed, Feb 06, 2013 at 12:56:59PM +0000, James Hogan wrote:
-> On architectures which have symbol prefixes, depmod emits lots of
-> warnings like this:
+On Thu, Feb 07, 2013 at 01:58:40PM -0800, Andi Kleen wrote:
+> From: Andi Kleen <ak@linux.intel.com>
 > 
-> WARNING: $module.ko needs unknown symbol $symbol
+> Newer gcc enables the var-tracking pass with -g to keep track which
+> registers contain which variables. This is one of the slower passes in gcc.
 > 
-> This is because depmod isn't being passed the -P <symbol_prefix>
-> arguments to specify the symbol prefix to ignore. This option is
-> included since the 3.13 release of module-init-tools.
-> 
-> Update scripts/depmod.sh to take extra arguments for the symbol prefix
-> (required but may be empty), and update the main Makefile to always pass
-> "$(CONFIG_SYMBOL_PREFIX)" to scripts/depmod.sh.
-> 
-> If the provided symbol prefix is non-empty, scripts/depmod.sh checks if
-> depmod --version reports module-init-tools with a version number < 3.13
-> otherwise it appends -P $SYMBOL_PREFIX to the depmod command line.
-> 
-> Signed-off-by: James Hogan <james.hogan@imgtec.com>
-> Cc: Michal Marek <mmarek@suse.cz>
-> Cc: linux-kbuild@vger.kernel.org
-> Cc: Mike Frysinger <vapier@gentoo.org>
-> Cc: Yoshinori Sato <ysato@users.sourceforge.jp>
-> Cc: uclinux-dist-devel@blackfin.uclinux.org
-> ---
-> changes since v1: clean up with assistance from Mike Frysinger (thanks!)
-> * always pass prefix to depmod.sh to simplify the logic
-> * use printf instead of ugly echos in version check
+> With reduced debug info (aimed at objdump -S, but not using a full debugger)
+> we don't need this fine grained tracking. But it was still enabled
+> because -g was enabled. Disable it explicitely for DEBUG_INFO_REDUCED.
 
 Applied to kbuild.git#kbuild, thanks.
 
