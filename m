@@ -1,62 +1,42 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from am1ehsobe001.messaging.microsoft.com ([213.199.154.204]:31223
-	"EHLO am1outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1756449Ab3BVCfP (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 21 Feb 2013 21:35:15 -0500
-Date: Fri, 22 Feb 2013 10:35:28 +0800
-From: Shawn Guo <shawn.guo@linaro.org>
-Subject: Re: [PATCH] kbuild: create an "include chroot" for DT bindings
-Message-ID: <20130222023526.GA27371@S2101-09.ap.freescale.net>
-References: <1361394356-19385-1-git-send-email-swarren@wwwdotorg.org>
- <20130221043751.GB17738@S2101-09.ap.freescale.net>
- <51266AC1.8040507@wwwdotorg.org>
+Received: from quartz.orcorp.ca ([184.70.90.242]:55795 "EHLO quartz.orcorp.ca"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1755219Ab3BVCjM (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 21 Feb 2013 21:39:12 -0500
+Date: Thu, 21 Feb 2013 19:39:02 -0700
+From: Jason Gunthorpe <jgunthorpe@obsidianresearch.com>
+Subject: Re: [U-Boot] [RFC] Kbuild support for ARM FIT images
+Message-ID: <20130222023902.GC11169@obsidianresearch.com>
+References: <20130221231106.GA24426@obsidianresearch.com>
+ <1361492355.1574.7@snotra>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <51266AC1.8040507@wwwdotorg.org>
+In-Reply-To: <1361492355.1574.7@snotra>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Stephen Warren <swarren@wwwdotorg.org>
-Cc: Grant Likely <grant.likely@secretlab.ca>, Rob Herring <rob.herring@calxeda.com>, Michal Marek <mmarek@suse.cz>, devicetree-discuss@lists.ozlabs.org, linux-kbuild@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Stephen Warren <swarren@nvidia.com>, Hiroshi Doyu <hdoyu@nvidia.com>
+To: Scott Wood <scottwood@freescale.com>
+Cc: Nicolas Pitre <nico@fluxnic.net>, "Fernandes, Joel A" <joelagnel@ti.com>, Russell King - ARM Linux <linux@arm.linux.org.uk>, linux-kbuild@vger.kernel.org, tony@atomide.com, Grant Likely <grant.likely@secretlab.ca>, Tom Rini <trini@ti.com>, Grant Likely <glikely@secretlab.ca>, OMAP List <linux-omap@vger.kernel.org>, ARM Kernel List <linux-arm-kernel@lists.infradead.org>
 
-On Thu, Feb 21, 2013 at 11:43:13AM -0700, Stephen Warren wrote:
-> There are two things that include DT-related headers:
-> 
-> a) Device trees (*.dts, *.dtsi)
-> b) The kernel
-> 
-> All the headers relevant here fall into category (a) by definition. I'd
-> actually expect most to also fall into category (b), although I can see
-> that category (b) might be a strict subset of category (a).
-> 
-> I believe you're proposing only storing category (b) headers in
-> include/dt-bindings/, and storing any others I suppose in arch/*/boot/dts/.
-> 
-> But, my thoughts are that /all/ these headers (both categories) should
-> be stored in one place for consistency.
-> 
-> That way, if/when the DT binding docs, these headers, and the DT files
-> themselves move out of the kernel, we'll end up with some other
-> repository/repositories that might have the following top-level
-> directories (or at least these sets of logical data):
-> 
-> 1) DT binding documents
-> 2) Headers that define constants for (1)
-> 3) DT files (*.dts/*.dtsi)
-> 
-> We need at least some of (2) in the kernel for drivers to share the
-> constant definitions, so my proposal is to simply copy /all/ the headers
-> from (2) into the kernel's include/dt-bindings/. That keeps things
-> simple; simply copy everything and maintain the same hierarchy under
-> that "root" directory. Otherwise, we'll be constantly wondering which
-> headers to copy, perhaps moving things back/forth as people realize that
-> the kernel needs them, etc.
+On Thu, Feb 21, 2013 at 06:19:15PM -0600, Scott Wood wrote:
 
-You need to anyway identify the headers needed by a) but not b) and
-remove them from linux/include/dt-bindings/, when all DTS gets moved
-out of kernel tree.  Otherwise, you end up leaving those headers only
-needed by DTS in the kernel tree.
+> >While embedded focused PPC stuff seems to tend to keep the kernel and
+> >DT together.
+> 
+> At least on the Freescale side of "embedded focused PPC stuff", we
+> have not kept the kernel and DT together.  It's actually U-Boot that
+> the dts files in the kernel tree are tied to, since they contain
 
-Shawn
+Sorry to be unclear, I only ment that the dt sources themselves are in
+the kernel, not say, in the uboot repository or otherwise.
 
+> out where to make the modification.  Usually U-Boot is the only
+> relevant loader for a particular board, but not always -- hence
+> "adder875-redboot.dts" and "adder875-uboot.dts".  Even when U-Boot
+
+At least on ARM Kirkwood these sorts of differences are minimized by
+having Linux know how to reprogram the SOC's address map registers
+when it starts up .. Although that is helped by having all the boot
+loaders put the address map control registers at the same address ;)
+
+Jason
