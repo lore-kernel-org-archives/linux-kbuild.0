@@ -1,29 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:49501 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:50422 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753557Ab3BVKUk (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 22 Feb 2013 05:20:40 -0500
-Date: Fri, 22 Feb 2013 11:20:38 +0100
+	id S1755658Ab3BVKua (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 22 Feb 2013 05:50:30 -0500
+Date: Fri, 22 Feb 2013 11:50:26 +0100
 From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [PATCH 1/1] scripts/package/Makefile: remove useless
-	KBUILD_OUTPUT test
-Message-ID: <20130222102038.GC12402@pobox.suse.cz>
-References: <1358753285-11812-1-git-send-email-wbin00@gmail.com>
+Subject: Re: [PATCH] kbuild: Fix destination-y for installed headers
+Message-ID: <20130222105026.GG12402@pobox.suse.cz>
+References: <20130202101835.GY23529@axis.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1358753285-11812-1-git-send-email-wbin00@gmail.com>
+In-Reply-To: <20130202101835.GY23529@axis.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Bin Wang <wbin00@gmail.com>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Jesper Nilsson <jesper.nilsson@axis.com>
+Cc: David Howells <dhowells@redhat.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, jespern@axis.com
 
-On Mon, Jan 21, 2013 at 03:28:05PM +0800, Bin Wang wrote:
-> The test of KBUILD_OUTPUT in "rpm-pkg rpm" target is useless.
-> KBUILD_OUTPUT is always empty here.
+On Sat, Feb 02, 2013 at 11:18:35AM +0100, Jesper Nilsson wrote:
+> Commit 10b63956fce7f369cc37fd4d994f09bd5203efe4 which plumbed in UAPI
+> broke the destination-y functionality of scripts/Makefile.headersinst.
+> 
+> The variable destination-y is used in a := assignment and so is expanded at
+> declaration time, and the include of the Kbuild fragments that set
+> destination-y to something is after this time, so it now always expands empty.
+> 
+> There are no in-tree users of destination-y, but it allows any
+> Kbuild-fragment to redirect where headers are installed.
+> 
+> Just move the assignment of the variable that uses it below the include
+> of the Kbuild fragment.
+> 
+> Signed-off-by: Jesper Nilsson <jesper.nilsson@axis.com>
+> Cc: Michal Marek <mmarek@suse.cz>
+> Cc: David Howells <dhowells@redhat.com>
+> ---
+>  Makefile.headersinst |    6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git scripts/Makefile.headersinst scripts/Makefile.headersinst
 
-Right, but the error message is valid, make rpm-pkg does not work with
-O=. So I suggest to either fix make O=... rpm-pkg, or fix the test to
-compare $(srctree) and $(objtree) instead.
+I applied your patch to kbuild.git#kbuild, but please send -p1 patches
+next time.
 
 Michal
