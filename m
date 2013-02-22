@@ -1,37 +1,33 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pegase1.c-s.fr ([93.17.236.30]:35907 "EHLO mailhub1.si.c-s.fr"
+Received: from pegase1.c-s.fr ([93.17.236.30]:35948 "EHLO mailhub1.si.c-s.fr"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753653Ab3BVI4c (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 22 Feb 2013 03:56:32 -0500
-Message-ID: <512732BE.60503@c-s.fr>
-Date: Fri, 22 Feb 2013 09:56:30 +0100
-From: leroy christophe <christophe.leroy@c-s.fr>
-MIME-Version: 1.0
-Subject: Re: [PATCH] Unset LANG in setlocalversion script
-References: <201302211249.r1LCno6O024776@localhost.localdomain> <51268E25.6070104@suse.cz>
-In-Reply-To: <51268E25.6070104@suse.cz>
-Content-Type: text/plain; charset=ISO-8859-2; format=flowed
-Content-Transfer-Encoding: 8bit
+	id S1751055Ab3BVJAM (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 22 Feb 2013 04:00:12 -0500
+Date: Fri, 22 Feb 2013 09:59:18 +0100
+Message-Id: <201302220859.r1M8xIKl029662@localhost.localdomain>
+From: Christophe Leroy <christophe.leroy@c-s.fr>
+Subject: [PATCH v2] Unset langage specific variables in setlocalversion script
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Michal Marek <mmarek@suse.cz>
 Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-Le 21/02/2013 22:14, Michal Marek a écrit :
-> Dne 21.2.2013 13:49, Christophe Leroy napsal(a):
->> This patch allows the use of setlocalversion script regardless of the LANG
->> parameter. Otherwise, the `svn info 2>/dev/null | grep '^Last Changed Rev'`
->> returns nothing because for instance, in French the text 'Last Changed Rev'
->> is replaced by 'Révision de la dernière modification'
-> Unsetting LANG might not be enough. You should unset LC_ALL and set
-> LC_MESSAGES=C. But - is this a problem for other commands in the script?
->  From a quick look, we only parse English output of svn, so I suggest to
-> only set the env var for the svn command.
->
-> Michal
->
+This patch allows the use of setlocalversion script regardless of the language
+parameters. Otherwise, the `svn info 2>/dev/null | grep '^Last Changed Rev'`
+returns nothing because for instance, in French the text 'Last Changed Rev'
+is replaced by 'Révision de la dernière modification'
 
-Ok, I will propose a new patch.
-I confirm my only issue at the time being is with the svn command.
+Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
 
-Christophe
+diff -ur linux-3.7.9/scripts/setlocalversion linux/scripts/setlocalversion
+--- linux-3.7.9/scripts/setlocalversion	2013-02-17 19:53:32.000000000 +0100
++++ linux/scripts/setlocalversion	2013-02-22 03:37:31.000000000 +0100
+@@ -108,7 +108,7 @@
+ 	fi
+ 
+ 	# Check for svn and a svn repo.
+-	if rev=`svn info 2>/dev/null | grep '^Last Changed Rev'`; then
++	if rev=`LANG= LC_ALL= LC_MESSAGES=C svn info 2>/dev/null | grep '^Last Changed Rev'`; then
+ 		rev=`echo $rev | awk '{print $NF}'`
+ 		printf -- '-svn%s' "$rev"
+ 
