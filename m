@@ -1,63 +1,63 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ee0-f48.google.com ([74.125.83.48]:49323 "EHLO
-	mail-ee0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753894Ab3BVDli (ORCPT
+Received: from mail-out.m-online.net ([212.18.0.9]:53382 "EHLO
+	mail-out.m-online.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752020Ab3BVGzw (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 21 Feb 2013 22:41:38 -0500
-Received: by mail-ee0-f48.google.com with SMTP id t10so90016eei.21
-        for <linux-kbuild@vger.kernel.org>; Thu, 21 Feb 2013 19:41:37 -0800 (PST)
+	Fri, 22 Feb 2013 01:55:52 -0500
+From: Wolfgang Denk <wd@denx.de>
+Subject: Re: [U-Boot] [RFC] Kbuild support for ARM FIT images
 MIME-Version: 1.0
-From: Ajith Adapa <adapa.ajith@gmail.com>
-Date: Fri, 22 Feb 2013 09:11:06 +0530
-Message-ID: <CADAe=+LzQWQs87h+Nvn9xarW5iUuGd+4zC1-Mdh-2TjH++LU5Q@mail.gmail.com>
-Subject: Regarding issue using manual steps in using KBUILD
-Content-Type: text/plain; charset=UTF-8
+Content-type: text/plain; charset=UTF-8
+Content-transfer-encoding: 8bit
+In-reply-to: <20130221232821.GA2823@obsidianresearch.com>
+References: <20130221103705.GB17852@n2100.arm.linux.org.uk> <51261F38.2030902@ti.com> <20130221134656.GC17852@n2100.arm.linux.org.uk> <51262A7A.8040103@ti.com> <alpine.LFD.2.03.1302211144240.6419@syhkavp.arg> <20130221182724.GA14329@obsidianresearch.com> <alpine.LFD.2.03.1302211423190.6419@syhkavp.arg> <20130221211444.GB20114@obsidianresearch.com> <alpine.LFD.2.03.1302211624561.6419@syhkavp.arg> <20130221231848.880DE200552@gemini.denx.de> <20130221232821.GA2823@obsidianresearch.com>
+Date: Fri, 22 Feb 2013 07:55:46 +0100
+Message-Id: <20130222065546.F1609200550@gemini.denx.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
+To: Jason Gunthorpe <jgunthorpe@obsidianresearch.com>
+Cc: Nicolas Pitre <nico@fluxnic.net>, "Fernandes, Joel A" <joelagnel@ti.com>, Russell King - ARM Linux <linux@arm.linux.org.uk>, linux-kbuild@vger.kernel.org, tony@atomide.com, Grant Likely <grant.likely@secretlab.ca>, u-boot@lists.denx.de, Tom Rini <trini@ti.com>, Grant Likely <glikely@secretlab.ca>, OMAP List <linux-omap@vger.kernel.org>, ARM Kernel List <linux-arm-kernel@lists.infradead.org>
 
-Hi,
+Dear Jason,
 
-Currently one of our client is using a customized Make script so that
-they can build the kernel module in their buildsystem. Make script
-follows following steps
+In message <20130221232821.GA2823@obsidianresearch.com> you wrote:
+> 
+> > > own seems to be rather static and stable, and unlike software there is 
+> > > no way I can change it (soldering irons don't count).
+> > 
+> > There is other hardware available (for example FPGA based) where this
+> > does not apply.
+> 
+> Agreed.. We do that here as well, the DT is also used to describe the
+> functionality inside FPGA(s). We do things like declare a GPIO
+> controller inside the FPGA, then stack the bitbang MDIO/I2C on top of
+> that, then declare a bunch of devices on those busses. DT makes this
+> extremely straightforward.
+> 
+> However, it is critical that the DT, kernel and FPGA are matched
+> together - we always arrange things so that the DTB, kernel and FPGA
+> config are bundled together and update atomically during firmware
+> upgrade.
 
-1. Create .o for all .c files
+Agreed.
 
-2. Creates final module.o with all the above .o files
+> Xilinx's Zynq is a great example of this kind of stuff, FWIW. IIRC
 
-3. Using modpost creates Module.markers (Below is the command I see
-getting executed when using 2.6.32 kernel)
+Indeed - Xilinx's Zynq, Altera's SoC FPGA, and others.
 
-/lib/modules/2.6.32.58/source/scripts/mod/modpost  -i
-/lib/modules/2.6.32.58/source/Module.symvers -S -K
-/lib/modules/2.6.32.58/source/Module.markers -M  ../l2/Module.markers
-../l2/l2_module.o
+Such highly flexible hardware configurations require a new level of
+software support that by far exceeds the classic static setups of more
+"PC-like" systems where the only change you would expect is adding or
+removing some PCI cards or the like.
 
-I guess this step creates modulename.mod.c file once successful.
 
-4. Now create modulename.mod.o file.
+Best regards,
 
-5. Finally link up everything creating .ko file.
+Wolfgang Denk
 
-Above steps works great with 2.6.32 kernel but When I am trying the
-same on 3.6 kernel Step-3 doesn't return anything other than Error 1
-at the end.
-
-Seems Modpost is one tough nut to crack as it has doesn't have any
-options or debug logs to display its output status. So I built modpost
-with -g option.
-In modpost main function read_symbols function is called with input as
-"/lib/modules/3.6.10/source/Module.symvers" which in turn calls
-read_elf function which is failing currently.
-
-I know its the dirty way where we need to fix makefile for every
-kernel version. I would like to know is there something which got
-changed after 2.6.32 kernel which is causing the MODPOST to fail.
-
-Any inputs would be of great help. Thanks in advance.
-
-Regards,
-Ajith
---------------------------------------------
-codingfreak.blogspot.com
+-- 
+DENX Software Engineering GmbH,     MD: Wolfgang Denk & Detlev Zundel
+HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
+Phone: (+49)-8142-66989-10 Fax: (+49)-8142-66989-80 Email: wd@denx.de
+Don't tell me how hard you work.  Tell me how much you get done.
+                                                     -- James J. Ling
