@@ -1,33 +1,32 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:55631 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:55951 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755873Ab3BVMre (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 22 Feb 2013 07:47:34 -0500
-Date: Fri, 22 Feb 2013 13:47:31 +0100
+	id S1756353Ab3BVM5K (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 22 Feb 2013 07:57:10 -0500
+Date: Fri, 22 Feb 2013 13:57:09 +0100
 From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [PATCH] Kbuild: Disable var tracking with
-	CONFIG_DEBUG_INFO_REDUCED
-Message-ID: <20130222124730.GI12402@pobox.suse.cz>
-References: <1360274320-26833-1-git-send-email-andi@firstfloor.org>
+Subject: Re: [PATCH v2] Unset langage specific variables in setlocalversion
+	script
+Message-ID: <20130222125709.GJ12402@pobox.suse.cz>
+References: <201302220859.r1M8xIKl029662@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <1360274320-26833-1-git-send-email-andi@firstfloor.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <201302220859.r1M8xIKl029662@localhost.localdomain>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andi Kleen <andi@firstfloor.org>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Andi Kleen <ak@linux.intel.com>
+To: Christophe Leroy <christophe.leroy@c-s.fr>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-On Thu, Feb 07, 2013 at 01:58:40PM -0800, Andi Kleen wrote:
-> From: Andi Kleen <ak@linux.intel.com>
+On Fri, Feb 22, 2013 at 09:59:18AM +0100, Christophe Leroy wrote:
+> This patch allows the use of setlocalversion script regardless of the language
+> parameters. Otherwise, the `svn info 2>/dev/null | grep '^Last Changed Rev'`
+> returns nothing because for instance, in French the text 'Last Changed Rev'
+> is replaced by 'Révision de la dernière modification'
 > 
-> Newer gcc enables the var-tracking pass with -g to keep track which
-> registers contain which variables. This is one of the slower passes in gcc.
-> 
-> With reduced debug info (aimed at objdump -S, but not using a full debugger)
-> we don't need this fine grained tracking. But it was still enabled
-> because -g was enabled. Disable it explicitely for DEBUG_INFO_REDUCED.
+> Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
 
-Applied to kbuild.git#kbuild, thanks.
+Thanks, applied to kbuild.git#kbuild.
 
 Michal
