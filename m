@@ -1,68 +1,37 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ie0-f178.google.com ([209.85.223.178]:59313 "EHLO
-	mail-ie0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752808Ab3BVH4g (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 22 Feb 2013 02:56:36 -0500
-Received: by mail-ie0-f178.google.com with SMTP id c13so382754ieb.37
-        for <linux-kbuild@vger.kernel.org>; Thu, 21 Feb 2013 23:56:36 -0800 (PST)
+Received: from pegase1.c-s.fr ([93.17.236.30]:35907 "EHLO mailhub1.si.c-s.fr"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753653Ab3BVI4c (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 22 Feb 2013 03:56:32 -0500
+Message-ID: <512732BE.60503@c-s.fr>
+Date: Fri, 22 Feb 2013 09:56:30 +0100
+From: leroy christophe <christophe.leroy@c-s.fr>
 MIME-Version: 1.0
-In-Reply-To: <20130222022212.GB11169@obsidianresearch.com>
-References: <20130221134656.GC17852@n2100.arm.linux.org.uk>
-	<51262A7A.8040103@ti.com>
-	<alpine.LFD.2.03.1302211144240.6419@syhkavp.arg>
-	<20130221182724.GA14329@obsidianresearch.com>
-	<alpine.LFD.2.03.1302211423190.6419@syhkavp.arg>
-	<20130221211444.GB20114@obsidianresearch.com>
-	<alpine.LFD.2.03.1302211624561.6419@syhkavp.arg>
-	<20130221231848.880DE200552@gemini.denx.de>
-	<20130221232821.GA2823@obsidianresearch.com>
-	<5126B979.5000205@gmail.com>
-	<20130222022212.GB11169@obsidianresearch.com>
-Date: Fri, 22 Feb 2013 02:56:33 -0500
-Message-ID: <CA+T6QP=gHtOuZbjsbv5_GswZu7FUXW+9KVw6K06+5X_PNzqODw@mail.gmail.com>
-Subject: Re: [U-Boot] [RFC] Kbuild support for ARM FIT images
-From: Jason Kridner <jkridner@beagleboard.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [PATCH] Unset LANG in setlocalversion script
+References: <201302211249.r1LCno6O024776@localhost.localdomain> <51268E25.6070104@suse.cz>
+In-Reply-To: <51268E25.6070104@suse.cz>
+Content-Type: text/plain; charset=ISO-8859-2; format=flowed
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jason Gunthorpe <jgunthorpe@obsidianresearch.com>
-Cc: Rob Herring <robherring2@gmail.com>, "Fernandes, Joel A" <joelagnel@ti.com>, Russell King - ARM Linux <linux@arm.linux.org.uk>, Tony Lindgren <tony@atomide.com>, linux-kbuild@vger.kernel.org, Grant Likely <grant.likely@secretlab.ca>, "u-boot@lists.denx.de" <u-boot@lists.denx.de>, Tom Rini <trini@ti.com>, Grant Likely <glikely@secretlab.ca>, OMAP List <linux-omap@vger.kernel.org>, ARM Kernel List <linux-arm-kernel@lists.infradead.org>
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-On Thu, Feb 21, 2013 at 9:22 PM, Jason Gunthorpe
-<jgunthorpe@obsidianresearch.com> wrote:
-> On Thu, Feb 21, 2013 at 06:19:05PM -0600, Rob Herring wrote:
+Le 21/02/2013 22:14, Michal Marek a écrit :
+> Dne 21.2.2013 13:49, Christophe Leroy napsal(a):
+>> This patch allows the use of setlocalversion script regardless of the LANG
+>> parameter. Otherwise, the `svn info 2>/dev/null | grep '^Last Changed Rev'`
+>> returns nothing because for instance, in French the text 'Last Changed Rev'
+>> is replaced by 'Révision de la dernière modification'
+> Unsetting LANG might not be enough. You should unset LC_ALL and set
+> LC_MESSAGES=C. But - is this a problem for other commands in the script?
+>  From a quick look, we only parse English output of svn, so I suggest to
+> only set the env var for the svn command.
 >
->> The desired FPGA use case is DT updates after booting the kernel. This
->> has nothing to do with FIT images. And if the FPGA tools generate the
->> DTB, then it is certainly not tied to the kernel.
+> Michal
 >
-> Completely unrelated, but do you have any pointer for how to do this?
-> Hot plugging a 'dtb fragment' into the kernel would be really handy..
 
-This doesn't answer the full question on how FPGA tools generate DTB,
-but it is a huge problem for BeagleBone add-on hardware that we have
-some mechanism to dynamically load DT fragments. Pantelis posted some
-work in that direction[1] and has continued development of his patches
-and we've been using those extensively with BeagleBone kernel
-development[2].
+Ok, I will propose a new patch.
+I confirm my only issue at the time being is with the svn command.
 
-It would be great if the FPGA folks would get on-board in supporting
-the dynamically loadable DT overlay fragments by reviewing and
-supporting upstream acceptance of the code.
-
-[1] http://lwn.net/Articles/531569/
-[2] http://github.com/beagleboard/kernel/tree/3.8
-
->
-> I'm thinking something like adding a tree below a PCI controller
-> describing a PCI device and sub nodes, similar to what Thierry was
-> doing for his Avionics. How would interrupt maps and phandles be
-> managed across the main dtb and the 'hot plugged' dtb?
->
-> Regards,
-> Jason
-> _______________________________________________
-> U-Boot mailing list
-> U-Boot@lists.denx.de
-> http://lists.denx.de/mailman/listinfo/u-boot
+Christophe
