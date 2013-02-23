@@ -1,88 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from avon.wwwdotorg.org ([70.85.31.133]:50487 "EHLO
-	avon.wwwdotorg.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757790Ab3BVXQ6 (ORCPT
+Received: from mail-oa0-f53.google.com ([209.85.219.53]:46142 "EHLO
+	mail-oa0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751848Ab3BWIiC (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 22 Feb 2013 18:16:58 -0500
-From: Stephen Warren <swarren@wwwdotorg.org>
-Subject: [PATCH V2] kbuild: create an "include chroot" for DT bindings
-Date: Fri, 22 Feb 2013 16:16:49 -0700
-Message-Id: <1361575009-20090-1-git-send-email-swarren@wwwdotorg.org>
+	Sat, 23 Feb 2013 03:38:02 -0500
+MIME-Version: 1.0
+In-Reply-To: <20130221103705.GB17852@n2100.arm.linux.org.uk>
+References: <CAD=GYpbF_3uRzhUnV=MwDiy-ekvZKJztJbkhNM0u_pvG-UCw4w@mail.gmail.com>
+	<20130221103705.GB17852@n2100.arm.linux.org.uk>
+Date: Sat, 23 Feb 2013 02:38:01 -0600
+Message-ID: <CAD=GYpY4eTsRyYtbtoG-2TuSqOyXAANgjazpWDNE2B36Z6aokw@mail.gmail.com>
+Subject: Re: [RFC] Kbuild support for ARM FIT images
+From: Joel A Fernandes <agnel.joel@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Grant Likely <grant.likely@secretlab.ca>, Rob Herring <rob.herring@calxeda.com>
-Cc: Michal Marek <mmarek@suse.cz>, devicetree-discuss@lists.ozlabs.org, linux-kbuild@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Stephen Warren <swarren@nvidia.com>, Shawn Guo <shawn.guo@linaro.org>, Hiroshi Doyu <hdoyu@nvidia.com>
+To: Russell King - ARM Linux <linux@arm.linux.org.uk>
+Cc: u-boot@lists.denx.de, Linux OMAP List <linux-omap@vger.kernel.org>, linux-kbuild@vger.kernel.org, Linux ARM Kernel List <linux-arm-kernel@lists.infradead.org>, tony@atomide.com, "Fernandes, Joel A" <joelagnel@ti.com>, "Rini, Tom" <trini@ti.com>, Grant Likely <glikely@secretlab.ca>, Grant Likely <grant.likely@secretlab.ca>
 
-From: Stephen Warren <swarren@nvidia.com>
+On Thu, Feb 21, 2013 at 4:37 AM, Russell King - ARM Linux
+<linux@arm.linux.org.uk> wrote:
+> On Wed, Feb 20, 2013 at 07:37:10PM -0600, Joel A Fernandes wrote:
+>> Hello,
+>> I've been spinning some work-in-progress patches for FIT build support
+>> in the kernel.
+>> With the move to multiplatform support on OMAP, I feel it is a good
+>> time to add  FIT support, also looking at the proliferating number of
+>> dtbs, as it is a nice way
+>
+> I'm not looking to add yet another crappy uboot image format to the kernel
+> just for the hell of uboot.
+>
+> And don't think that the dtbs in the kernel are going to stay there.  The
+> longer term plan is for them to end up in an external git tree, entirely
+> separate from the kernel source.  So anything that ties them with the
+> kernel build process will ultimately have to be removed again.
 
-The recent dtc+cpp support allows header files and C pre-processor
-defines/macros to be used when compiling device tree files. These
-headers will typically define various constants that are part of the
-device tree bindings.
+Sorry for hopping in late as I have been travelling.
 
-The original patch which set up the dtc+cpp include path only considered
-using those headers from device tree files. However, most are also
-useful for kernel code which needs to interpret the device tree.
+Guess much has been said, but for courtesy sake till dts/u-boot build
+support is dropped, would you consider accepting a simple extension to
+mkuboot.sh with minimal Kbuild changes? I can promise there will be
+quite a few users.
 
-In both the DT files and the kernel, I'd like to include the DT-related
-headers in the same way, for example, <dt-bindings/gpio/tegra-gpio.h>.
-That will simplify any text which discusses the DT header locations.
+Lots of folks want embedded device trees and there are already out of
+tree hacks floating as you know that do this. FIT approach to this is
+more cleaner I feel.
 
-Creating a <dt-bindings/> for kernel source to use is as simple as
-placing files into include/dt-bindings/.
+Let me know what you can do.
 
-However, when compiling DT files, the include path should be restricted
-so that only the dt-bindings path is available; arbitrary kernel headers
-shouldn't be exposed. For this reason, create a specific include
-directory for use by dtc+cpp, and symlink dt-bindings from there to the
-actual location of include/dt-bindings/. For want of a better location,
-place this "include chroot" into the existing dts/ directory.
-
-arch/*/boot/dts/include/dt-bindings -> ../../../../../include/dt-bindings
-
-Some headers used by device tree files may not be useful to the kernel;
-they may be used simply to aid in constructing the DT file (e.g. macros
-to create a node), but not define any information that the kernel needs
-to share. These may be placed directly into arch/*/boot/dts/ along with
-the DT files themselves.
-
-Cc: Shawn Guo <shawn.guo@linaro.org>
-Cc: Hiroshi Doyu <hdoyu@nvidia.com>
-Acked-by: Michal Marek <mmarek@suse.cz>
-Acked-by: Shawn Guo <shawn.guo@linaro.org>
-Signed-off-by: Stephen Warren <swarren@nvidia.com>
----
-v2:
-* Leave arch/*/boot/dts in dtc include path, for any headers that are
-  only included by *.dts and don't need to be shared by the kernel.
-* Fix pathname in commit description.
----
- arch/arm/boot/dts/include/dt-bindings |    1 +
- scripts/Makefile.lib                  |    2 +-
- 2 files changed, 2 insertions(+), 1 deletion(-)
- create mode 120000 arch/arm/boot/dts/include/dt-bindings
-
-diff --git a/arch/arm/boot/dts/include/dt-bindings b/arch/arm/boot/dts/include/dt-bindings
-new file mode 120000
-index 0000000..08c00e4
---- /dev/null
-+++ b/arch/arm/boot/dts/include/dt-bindings
-@@ -0,0 +1 @@
-+../../../../../include/dt-bindings
-\ No newline at end of file
-diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-index 07125e6..af35521 100644
---- a/scripts/Makefile.lib
-+++ b/scripts/Makefile.lib
-@@ -158,7 +158,7 @@ ld_flags       = $(LDFLAGS) $(ldflags-y)
- 
- dtc_cpp_flags  = -Wp,-MD,$(depfile) -nostdinc                            \
- 		 -I$(srctree)/arch/$(SRCARCH)/boot/dts                   \
--		 -I$(srctree)/arch/$(SRCARCH)/include/dts                \
-+		 -I$(srctree)/arch/$(SRCARCH)/boot/dts/include           \
- 		 -undef -D__DTS__
- 
- # Finds the multi-part object the current object will be linked into
--- 
-1.7.10.4
-
+Thanks,
+Joel
