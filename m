@@ -1,193 +1,75 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.gentoo.org ([140.211.166.183]:52909 "EHLO smtp.gentoo.org"
+Received: from cantor2.suse.de ([195.135.220.15]:48019 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755670Ab3BXPuZ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 24 Feb 2013 10:50:25 -0500
-Message-ID: <512A36BB.9070309@gentoo.org>
-Date: Sun, 24 Feb 2013 16:50:19 +0100
-From: Justin <jlec@gentoo.org>
-Reply-To: jlec@gentoo.org
+	id S1758300Ab3BXUm7 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 24 Feb 2013 15:42:59 -0500
+Date: Sun, 24 Feb 2013 21:42:56 +0100
+From: Michal Marek <mmarek@suse.cz>
+Subject: Re: [PATCH 3/3] convert headers_install.pl->headers_install.sh
+Message-ID: <20130224204256.GK12402@pobox.suse.cz>
+References: <50cfc313.6831b60a.0bc4.0604@mx.google.com>
 MIME-Version: 1.0
-Subject: [PATCH] Use config scripts to detect ncurses libs for, menuconfig/nconfig
- dialogs
-Content-Type: multipart/signed; micalg=pgp-sha512;
- protocol="application/pgp-signature";
- boundary="----enig2PFGENJVPRCQRCDRRQKOG"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <50cfc313.6831b60a.0bc4.0604@mx.google.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: rob@landley.net
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
-------enig2PFGENJVPRCQRCDRRQKOG
-Content-Type: multipart/mixed;
- boundary="------------020007030509030600020302"
+On Mon, Dec 17, 2012 at 05:12:51PM -0800, rob@landley.net wrote:
+> From: Rob Landley <rob@landley.net>
+> 
+> Remove perl from make headers_install by replacing a perl script (doing
+> a simple regex search and replace) with a smaller, faster, simpler,
+> POSIX-2008 shell script implementation.  The new shell script is a single
+> for loop calling sed and piping its output through unifdef to produce the
+> target file.
+> 
+> Signed-off-by: Rob Landley <rob@landley.net>
+> ---
+> 
+>  scripts/Makefile.headersinst |    4 +-
+>  scripts/headers_install.pl   |   63 ---------------------------------
+>  scripts/headers_install.sh   |   43 ++++++++++++++++++++++
+>  3 files changed, 45 insertions(+), 65 deletions(-)
 
-This is a multi-part message in MIME format.
---------------020007030509030600020302
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
+Hi Rob,
 
-Hi,
-
-when ncurses is build with --with-termlib several symbols are moved to a
-seperate terminfo library (libtinfo.so). Current Kernel buildsystem
-results in a build error with menuconfig and nconfig dialogs.
-
-gcc  -o scripts/kconfig/mconf scripts/kconfig/mconf.o
-scripts/kconfig/zconf.tab.o scripts/kconfig/lxdialog/checklist.o
-scripts/kconfig/lxdialog/util.o scripts/kconfig/lxdialog/inputbox.o
-scripts/kconfig/lxdialog/textbox.o scripts/kconfig/lxdialog/yesno.o
-scripts/kconfig/lxdialog/menubox.o  -lncursesw
-scripts/kconfig/mconf.o:mconf.c:function show_help: error: undefined
-reference to 'stdscr'
-scripts/kconfig/lxdialog/checklist.o:checklist.c:function print_arrows:
-error: undefined reference to 'acs_map'
-scripts/kconfig/lxdialog/checklist.o:checklist.c:function print_arrows:
-error: undefined reference to 'acs_map'
-scripts/kconfig/lxdialog/checklist.o:checklist.c:function print_arrows:
-error: undefined reference to 'acs_map'
-scripts/kconfig/lxdialog/checklist.o:checklist.c:function print_arrows:
-error: undefined reference to 'acs_map'
-scripts/kconfig/lxdialog/checklist.o:checklist.c:function
-dialog_checklist: error: undefined reference to 'stdscr'
-scripts/kconfig/lxdialog/checklist.o:checklist.c:function
-dialog_checklist: error: undefined reference to 'COLS'
-scripts/kconfig/lxdialog/checklist.o:checklist.c:function
-dialog_checklist: error: undefined reference to 'stdscr'
-scripts/kconfig/lxdialog/checklist.o:checklist.c:function
-dialog_checklist: error: undefined reference to 'LINES'
-scripts/kconfig/lxdialog/checklist.o:checklist.c:function
-dialog_checklist: error: undefined reference to 'keypad'
-scripts/kconfig/lxdialog/checklist.o:checklist.c:function
-dialog_checklist: error: undefined reference to 'keypad'
-scripts/kconfig/lxdialog/util.o:util.c:function dialog_clear: error:
-undefined reference to 'COLS'
-scripts/kconfig/lxdialog/util.o:util.c:function dialog_clear: error:
-undefined reference to 'LINES'
-scripts/kconfig/lxdialog/util.o:util.c:function dialog_clear: error:
-undefined reference to 'stdscr'
-scripts/kconfig/lxdialog/util.o:util.c:function dialog_clear: error:
-undefined reference to 'COLS'
-scripts/kconfig/lxdialog/util.o:util.c:function dialog_clear: error:
-undefined reference to 'COLS'
-scripts/kconfig/lxdialog/util.o:util.c:function init_dialog: error:
-undefined reference to 'keypad'
-scripts/kconfig/lxdialog/util.o:util.c:function init_dialog: error:
-undefined reference to 'cbreak'
-scripts/kconfig/lxdialog/util.o:util.c:function on_key_esc: error:
-undefined reference to 'nodelay'
-scripts/kconfig/lxdialog/util.o:util.c:function on_key_esc: error:
-undefined reference to 'keypad'
-scripts/kconfig/lxdialog/util.o:util.c:function on_key_esc: error:
-undefined reference to 'nodelay'
-scripts/kconfig/lxdialog/inputbox.o:inputbox.c:function dialog_inputbox:
-error: undefined reference to 'LINES'
-scripts/kconfig/lxdialog/textbox.o:textbox.c:function dialog_textbox:
-error: undefined reference to 'LINES'
-collect2: error: ld returned 1 exit status
+sorry for the long delay. In general, the patch looks OK, I only have
+two remarks:
 
 
-Attached patch uses ncurses5-config and pkg-config to detect the libs to
-link with. Please include this to fix the build error.
+> +		-e 's/(^|[ \t])(inline|asm|volatile)([ \t(]|$)/\1__\2__\3/g' \
 
-justin
+This regexp does not match the 'volatile' in
 
---------------020007030509030600020302
-Content-Type: text/x-patch;
- name="0001-Use-config-scripts-to-detect-ncurses-libs-for-menuco.patch"
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: attachment;
- filename*0="0001-Use-config-scripts-to-detect-ncurses-libs-for-menuco.pa";
- filename*1="tch"
+#define XVMCLOCKPTR(saPriv,lockNo)					\
+	((volatile struct drm_hw_lock *)(((((unsigned long) (saPriv)->XvMCLockArea) + \
+				      (VIA_MAX_CACHELINE_SIZE - 1)) &	\
+				     ~(VIA_MAX_CACHELINE_SIZE - 1)) +	\
+				    VIA_MAX_CACHELINE_SIZE*(lockNo)))
 
-=46rom 5c3e9e44432697b9f638c5367e01bdde47adf0f2 Mon Sep 17 00:00:00 2001
-From: Justin Lecher <jlec@gentoo.org>
-Date: Sun, 24 Feb 2013 16:02:00 +0100
-Subject: [PATCH] Use config scripts to detect ncurses libs for
- menuconfig/nconfig dialogs
-
-When building ncurses with --with-termlib several symbols get moved from
-libncurses.so to libtinfo.so. Thus when linking with libncurses.so, one
-additionally needs to link with libtinfo.so.
-
-Ncurses provides a config script (ncurses5-config) and an interface with
-pkg-config. This patch makes use of those to detect the necessary libs
-for linking of the ncurses menuconfig and nconfig dialogs.
-
-Signed-off-by: Justin Lecher <jlec@gentoo.org>
----
- scripts/kconfig/Makefile                   |  2 +-
- scripts/kconfig/lxdialog/check-lxdialog.sh | 22 ++++++++++++++--------
- 2 files changed, 15 insertions(+), 9 deletions(-)
-
-diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
-index 3091794..7649047 100644
---- a/scripts/kconfig/Makefile
-+++ b/scripts/kconfig/Makefile
-@@ -216,7 +216,7 @@ HOSTCFLAGS_gconf.o	=3D `pkg-config --cflags gtk+-2.0 =
-gmodule-2.0 libglade-2.0` \
-=20
- HOSTLOADLIBES_mconf   =3D $(shell $(CONFIG_SHELL) $(check-lxdialog) -ldf=
-lags $(HOSTCC))
-=20
--HOSTLOADLIBES_nconf	=3D -lmenu -lpanel -lncurses
-+HOSTLOADLIBES_nconf	=3D `pkg-config --libs menu panel ncurses`
- $(obj)/qconf.o: $(obj)/.tmp_qtcheck
-=20
- ifeq ($(qconf-target),1)
-diff --git a/scripts/kconfig/lxdialog/check-lxdialog.sh b/scripts/kconfig=
-/lxdialog/check-lxdialog.sh
-index c8e8a71..4699c1b 100644
---- a/scripts/kconfig/lxdialog/check-lxdialog.sh
-+++ b/scripts/kconfig/lxdialog/check-lxdialog.sh
-@@ -4,15 +4,21 @@
- # What library to link
- ldflags()
- {
--	for ext in so a dll.a dylib ; do
--		for lib in ncursesw ncurses curses ; do
--			$cc -print-file-name=3Dlib${lib}.${ext} | grep -q /
--			if [ $? -eq 0 ]; then
--				echo "-l${lib}"
--				exit
--			fi
-+	if type -p ncurses5-config &> /dev/null ; then
-+		ncurses5-config --libs
-+		exit 0
-+	else
-+		for ext in so a dll.a dylib ; do
-+			for lib in ncursesw ncurses curses ; do
-+				$cc -print-file-name=3Dlib${lib}.${ext} | \
-+					grep -q /
-+				if [ $? -eq 0 ]; then
-+					echo "-l${lib}"
-+					exit
-+				fi
-+			done
- 		done
--	done
-+	fi
- 	exit 1
- }
-=20
---=20
-1.8.1.4
+in include/uapi/drm/via_drm.h.
 
 
---------------020007030509030600020302--
+> --- a/scripts/headers_install.pl
+> +++ /dev/null
+> @@ -1,63 +0,0 @@
+> -#!/usr/bin/perl -w
+> -#
+> -# headers_install prepare the listed header files for use in
+> -# user space and copy the files to their destination.
+> -#
+> -# Usage: headers_install.pl readdir installdir arch [files...]
+> -# installdir: dir to install the files to
+> -# arch:       current architecture
+> -#             arch is used to force a reinstallation when the arch
+> -#             changes because kbuild then detect a command line change.
 
-------enig2PFGENJVPRCQRCDRRQKOG
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+You are not passing $(SRCARCH) to the shell script. This seems OK, as
+the list of files changes if needed, but the change should be mentioned
+in the changelog.
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.19 (GNU/Linux)
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iEYEAREKAAYFAlEqNrsACgkQgAnW8HDreRY3jgCeOA8lnT+M26XzRVKyK/MLpnMt
-96EAnjFRmKqcWwb5rCB1JC09fkOcZGpx
-=iuB0
------END PGP SIGNATURE-----
-
-------enig2PFGENJVPRCQRCDRRQKOG--
+Thanks,
+Michal
