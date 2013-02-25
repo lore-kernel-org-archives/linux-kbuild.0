@@ -1,94 +1,56 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.gentoo.org ([140.211.166.183]:43329 "EHLO smtp.gentoo.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754761Ab3BYUc7 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 25 Feb 2013 15:32:59 -0500
-Message-ID: <512BCA76.6080601@gentoo.org>
-Date: Mon, 25 Feb 2013 21:32:54 +0100
-From: Justin <jlec@gentoo.org>
-Reply-To: jlec@gentoo.org
+Received: from mail-wi0-f169.google.com ([209.85.212.169]:49707 "EHLO
+	mail-wi0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1759762Ab3BYUxp (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 25 Feb 2013 15:53:45 -0500
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Subject: Re: [PATCH] Use config scripts to detect ncurses libs for, menuconfig/nconfig dialogs
+Date: Mon, 25 Feb 2013 21:53:39 +0100
+References: <512A36BB.9070309@gentoo.org> <201302251930.22293.yann.morin.1998@free.fr> <512BCA76.6080601@gentoo.org>
+In-Reply-To: <512BCA76.6080601@gentoo.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH] Use config scripts to detect ncurses libs for, menuconfig/nconfig
- dialogs
-References: <512A36BB.9070309@gentoo.org> <201302251930.22293.yann.morin.1998@free.fr>
-In-Reply-To: <201302251930.22293.yann.morin.1998@free.fr>
-Content-Type: multipart/signed; micalg=pgp-sha512;
- protocol="application/pgp-signature";
- boundary="----enig2XQANFQHVMBDXSMXSHCCS"
+Content-Type: Text/Plain;
+  charset="iso-8859-15"
+Content-Transfer-Encoding: 7bit
+Message-Id: <201302252153.39465.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Yann E. MORIN" <yann.morin.1998@free.fr>
+To: jlec@gentoo.org
 Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
-------enig2XQANFQHVMBDXSMXSHCCS
-Content-Type: text/plain; charset=ISO-8859-15
-Content-Transfer-Encoding: quoted-printable
+Justin, All,
 
-On 25.02.2013 19:30, Yann E. MORIN wrote:
-> Justin, All,
->=20
-> On Sunday 24 February 2013 Justin wrote:
->> when ncurses is build with --with-termlib several symbols are moved to=
- a
->> seperate terminfo library (libtinfo.so). Current Kernel buildsystem
->> results in a build error with menuconfig and nconfig dialogs.
->=20
-> Do you know of a distribution where this is the case, so I can test?
+On Monday 25 February 2013 Justin wrote:
+> On 25.02.2013 19:30, Yann E. MORIN wrote:
+> > On Sunday 24 February 2013 Justin wrote:
+> >> when ncurses is build with --with-termlib several symbols are moved to a
+> >> seperate terminfo library (libtinfo.so). Current Kernel buildsystem
+> >> results in a build error with menuconfig and nconfig dialogs.
+> > 
+> > Do you know of a distribution where this is the case, so I can test?
+> 
+> This is using Gentoo Linux testing with ld.gold. But I assume you will
+> get the same result using any distro with gold.
 
-This is using Gentoo Linux testing with ld.gold. But I assume you will
-get the same result using any distro with gold.
+No, I meant a distro where ncurses is built with --with-termlib.
+On my Debian stable (squeeze), libtinfo does not exist at all,
+so I can not test linking against it:
 
->=20
-> I think I would prefer spearate patches, one for mconf, one for nconf.
+    $ apt-file search libtinfo
+    (zilch)
 
-I will send new patches in a separate mail, so that we can do the review
-there.
+But I'll see at installing a Gentoo (if that's not too complex) in a
+VM to do the checks (can you confirm that Gentoo by default configures
+ncurses with --with-termlib ?).
 
->>
->> -HOSTLOADLIBES_nconf	=3D -lmenu -lpanel -lncurses
->> +HOSTLOADLIBES_nconf	=3D `pkg-config --libs menu panel ncurses`
->=20
-> On my distro (Debian stable) ncurses has no pkg-config file installed, =
-so
-> this fails.
+Regards,
+Yann E. MORIN.
 
-I already feared that. Will convert it to ncurses5-config which should
-be available on any recent distro.
-
-
->> -			fi
->> +	if type -p ncurses5-config &> /dev/null ; then
->                                    ^^
-> This is a bashism, and will not work on purely POSIX shells.
-> Please use: >/dev/null 2>&1
-
-Thanks for noting this.
-
->> +		exit 0
->=20
-> (nit-picking) I'd prefer you be consistent with existing code which jus=
-t
-> calls 'exit' without a number.
-
-I added it to be more precise on the return value. But I don't care as
-simple exit should result in the same.
-
-Thanks for the review.
-
-
-------enig2XQANFQHVMBDXSMXSHCCS
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.19 (GNU/Linux)
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iEYEAREKAAYFAlErynYACgkQgAnW8HDreRZ8eACeOfn6O+RVa/yp1uX7DrQRqKxj
-nCgAoInNT90cabzVndlNvP8fJf1tHP6K
-=fBvS
------END PGP SIGNATURE-----
-
-------enig2XQANFQHVMBDXSMXSHCCS--
+-- 
+.-----------------.--------------------.------------------.--------------------.
+|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
+| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
+| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
+| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
+'------------------------------^-------^------------------^--------------------'
