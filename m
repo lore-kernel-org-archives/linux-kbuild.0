@@ -1,28 +1,24 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from relais.videotron.ca ([24.201.245.36]:61878 "EHLO
-	relais.videotron.ca" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751503Ab3BZWJw (ORCPT
+Received: from caramon.arm.linux.org.uk ([78.32.30.218]:50648 "EHLO
+	caramon.arm.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754553Ab3BZWSn (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 26 Feb 2013 17:09:52 -0500
-MIME-version: 1.0
-Content-transfer-encoding: 7BIT
-Content-type: TEXT/PLAIN; CHARSET=US-ASCII
-Date: Tue, 26 Feb 2013 17:09:51 -0500 (EST)
-From: Nicolas Pitre <nico@fluxnic.net>
+	Tue, 26 Feb 2013 17:18:43 -0500
+Date: Tue, 26 Feb 2013 22:10:27 +0000
+From: Russell King - ARM Linux <linux@arm.linux.org.uk>
 Subject: Re: [RFC PATCH v2 0/4] Add support for LZ4-compressed kernel
-In-reply-to: <87fw0i7n6d.fsf@dell.be.48ers.dk>
-Message-id: <alpine.LFD.2.03.1302261708120.1254@syhkavp.arg>
-References: <1361859870-15751-1-git-send-email-kyungsik.lee@lge.com>
- <512D1C12.4080109@oberhumer.com>
- <alpine.LFD.2.03.1302261557220.1254@syhkavp.arg>
- <87fw0i7n6d.fsf@dell.be.48ers.dk>
+Message-ID: <20130226221027.GW17833@n2100.arm.linux.org.uk>
+References: <1361859870-15751-1-git-send-email-kyungsik.lee@lge.com> <512D1C12.4080109@oberhumer.com> <alpine.LFD.2.03.1302261557220.1254@syhkavp.arg> <87fw0i7n6d.fsf@dell.be.48ers.dk>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87fw0i7n6d.fsf@dell.be.48ers.dk>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Peter Korsgaard <jacmet@sunsite.dk>
-Cc: "Markus F.X.J. Oberhumer" <markus@oberhumer.com>, Kyungsik Lee <kyungsik.lee@lge.com>, Andrew Morton <akpm@linux-foundation.org>, Russell King <linux@arm.linux.org.uk>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, Michal Marek <mmarek@suse.cz>, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, x86@kernel.org, celinux-dev@lists.celinuxforum.org, Nitin Gupta <nitingupta910@gmail.com>, Richard Purdie <rpurdie@openedhand.com>, Josh Triplett <josh@joshtriplett.org>, Joe Millenbach <jmillenbach@gmail.com>, David Sterba <dsterba@suse.cz>, Richard Cochran <richardcochran@gmail.com>, Albin Tonnerre <albin.tonnerre@free-electrons.com>, Egon Alter <egon.alter@gmx.net>, hyojun.im@lge.com, chan.jeong@lge.com, raphael.andy.lee@gmail.com
+Cc: Nicolas Pitre <nico@fluxnic.net>, "Markus F.X.J. Oberhumer" <markus@oberhumer.com>, Kyungsik Lee <kyungsik.lee@lge.com>, Andrew Morton <akpm@linux-foundation.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, Michal Marek <mmarek@suse.cz>, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, x86@kernel.org, celinux-dev@lists.celinuxforum.org, Nitin Gupta <nitingupta910@gmail.com>, Richard Purdie <rpurdie@openedhand.com>, Josh Triplett <josh@joshtriplett.org>, Joe Millenbach <jmillenbach@gmail.com>, David Sterba <dsterba@suse.cz>, Richard Cochran <richardcochran@gmail.com>, Albin Tonnerre <albin.tonnerre@free-electrons.com>, Egon Alter <egon.alter@gmx.net>, hyojun.im@lge.com, chan.jeong@lge.com, raphael.andy.lee@gmail.com
 
-On Tue, 26 Feb 2013, Peter Korsgaard wrote:
-
+On Tue, Feb 26, 2013 at 10:58:02PM +0100, Peter Korsgaard wrote:
 > >>>>> "Nicolas" == Nicolas Pitre <nico@fluxnic.net> writes:
 > 
 > Hi,
@@ -57,8 +53,18 @@ On Tue, 26 Feb 2013, Peter Korsgaard wrote:
 >    LZO  6.7MB            21.1MB/s
 >    LZ4  7.3MB            29.1MB/s, 45.6MB/s(UA)
 
-OK.  If LZO is now faster than LZ4 while still compressing more then I 
-have no argument.
+Well, until someone can put all the pieces together so that a reasonably
+meaningful test between:
 
+- The new LZO code
+- The new LZ4 code
 
-Nicolas
+then you're all comparing different things.  TBH, I'm disappointed that
+all the comments about this from the previous posting of LZ4 have been
+totally ignored, and we _still_ don't really have this information.  It
+seems like replying to these threads is a waste of time.
+
+So... for a selected kernel version of a particular size, can we please
+have a comparison between the new LZO code and this LZ4 code, so that
+we can see whether it's worth updating the LZO code or replacing the
+LZO code with LZ4?
