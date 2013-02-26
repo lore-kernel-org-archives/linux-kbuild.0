@@ -1,105 +1,200 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-oa0-f47.google.com ([209.85.219.47]:60407 "EHLO
-	mail-oa0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756773Ab3BZPZg convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 26 Feb 2013 10:25:36 -0500
-Received: by mail-oa0-f47.google.com with SMTP id o17so5307841oag.20
-        for <linux-kbuild@vger.kernel.org>; Tue, 26 Feb 2013 07:25:36 -0800 (PST)
-Date: Tue, 26 Feb 2013 09:25:31 -0600
-From: Rob Landley <rob@landley.net>
-Subject: Re: [PATCH 3/3] convert headers_install.pl->headers_install.sh
-In-Reply-To: <20130224204256.GK12402@pobox.suse.cz> (from mmarek@suse.cz on
-	Sun Feb 24 14:42:56 2013)
-Message-Id: <1361892331.15497.1@driftwood>
+Received: from mail.servus.at ([193.170.194.20]:38752 "EHLO mail.servus.at"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752035Ab3BZUdl (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 26 Feb 2013 15:33:41 -0500
+Message-ID: <512D1C12.4080109@oberhumer.com>
+Date: Tue, 26 Feb 2013 21:33:22 +0100
+From: "Markus F.X.J. Oberhumer" <markus@oberhumer.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; DelSp=Yes; Format=Flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: 8BIT
+Subject: Re: [RFC PATCH v2 0/4] Add support for LZ4-compressed kernel
+References: <1361859870-15751-1-git-send-email-kyungsik.lee@lge.com>
+In-Reply-To: <1361859870-15751-1-git-send-email-kyungsik.lee@lge.com>
+Content-Type: multipart/mixed;
+ boundary="------------010100070101020909000305"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: Kyungsik Lee <kyungsik.lee@lge.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>, Russell King <linux@arm.linux.org.uk>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, Michal Marek <mmarek@suse.cz>, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, x86@kernel.org, celinux-dev@lists.celinuxforum.org, Nicolas Pitre <nico@fluxnic.net>, Nitin Gupta <nitingupta910@gmail.com>, Richard Purdie <rpurdie@openedhand.com>, Josh Triplett <josh@joshtriplett.org>, Joe Millenbach <jmillenbach@gmail.com>, David Sterba <dsterba@suse.cz>, Richard Cochran <richardcochran@gmail.com>, Albin Tonnerre <albin.tonnerre@free-electrons.com>, Egon Alter <egon.alter@gmx.net>, hyojun.im@lge.com, chan.jeong@lge.com, raphael.andy.lee@gmail.com
 
-On 02/24/2013 02:42:56 PM, Michal Marek wrote:
-> On Mon, Dec 17, 2012 at 05:12:51PM -0800, rob@landley.net wrote:
-> > From: Rob Landley <rob@landley.net>
-> >
-> > Remove perl from make headers_install by replacing a perl script  
-> (doing
-> > a simple regex search and replace) with a smaller, faster, simpler,
-> > POSIX-2008 shell script implementation.  The new shell script is a  
-> single
-> > for loop calling sed and piping its output through unifdef to  
-> produce the
-> > target file.
-> >
-> > Signed-off-by: Rob Landley <rob@landley.net>
-> > ---
-> >
-> >  scripts/Makefile.headersinst |    4 +-
-> >  scripts/headers_install.pl   |   63  
-> ---------------------------------
-> >  scripts/headers_install.sh   |   43 ++++++++++++++++++++++
-> >  3 files changed, 45 insertions(+), 65 deletions(-)
+This is a multi-part message in MIME format.
+--------------010100070101020909000305
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+
+On 2013-02-26 07:24, Kyungsik Lee wrote:
+> Hi,
 > 
-> Hi Rob,
+> [...]
 > 
-> sorry for the long delay. In general, the patch looks OK, I only have
-> two remarks:
-
-Thanks for the review.
-
-> > +		-e 's/(^|[ \t])(inline|asm|volatile)([  
-> \t(]|$)/\1__\2__\3/g' \
+> Through the benchmark, it was found that -Os Compiler flag for
+> decompress.o brought better decompression performance in most of cases
+> (ex, different compiler and hardware spec.) in ARM architecture.
 > 
-> This regexp does not match the 'volatile' in
+> Lastly, CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS is not always the best
+> option even though it is supported. The decompression speed can be
+> slightly slower in some cases.
 > 
-> #define XVMCLOCKPTR(saPriv,lockNo)					 
-> \
-> 	((volatile struct drm_hw_lock *)(((((unsigned long)  
-> (saPriv)->XvMCLockArea) + \
-> 				      (VIA_MAX_CACHELINE_SIZE - 1)) &	 
-> \
-> 				     ~(VIA_MAX_CACHELINE_SIZE - 1)) +	 
-> \
-> 				    VIA_MAX_CACHELINE_SIZE*(lockNo)))
+> This patchset is based on 3.8.
 > 
-> in include/uapi/drm/via_drm.h.
+> Any comments are appreciated.
 
-Looks like the first range needs to be [ \t(], same as the second one.  
-I'll redo the patches with that. (And rediff for offset noise.)
+Did you actually *try* the new LZO version and the patch (which is attached
+once again) as explained in https://lkml.org/lkml/2013/2/3/367 ?
 
-> > --- a/scripts/headers_install.pl
-> > +++ /dev/null
-> > @@ -1,63 +0,0 @@
-> > -#!/usr/bin/perl -w
-> > -#
-> > -# headers_install prepare the listed header files for use in
-> > -# user space and copy the files to their destination.
-> > -#
-> > -# Usage: headers_install.pl readdir installdir arch [files...]
-> > -# installdir: dir to install the files to
-> > -# arch:       current architecture
-> > -#             arch is used to force a reinstallation when the arch
-> > -#             changes because kbuild then detect a command line  
-> change.
+Because the new LZO version is faster than LZ4 in my testing, at least
+when comparing apples with apples and enabling unaligned access in
+BOTH versions:
+
+armv7 (Cortex-A9), Linaro gcc-4.6 -O3, Silesia test corpus, 256 kB block-size:
+
+                   compression speed   decompression speed
+
+  LZO-2012    :          44 MB/sec          117 MB/sec     no unaligned access
+  LZO-2013-UA :          47 MB/sec          167 MB/sec     Unaligned Access
+  LZ4 r88  UA :          46 MB/sec          154 MB/sec     Unaligned Access
+
+~Markus
+
+
 > 
-> You are not passing $(SRCARCH) to the shell script. This seems OK, as
-> the list of files changes if needed, but the change should be  
-> mentioned
-> in the changelog.
-
-Yup. The script wasn't using it, and to invoke it to do different  
-things the remaining command line arguments already had to change.
-
-I'll be sure to mention it in the respin, which should be sometime  
-after lunch.
-
 > Thanks,
-> Michal
+> Kyungsik
+> 
+> 
+> Benchmark Results(PATCH v2)
+> Compiler: Linaro ARM gcc 4.6.2
+> 1. ARMv7, 1.5GHz based board
+>    Kernel: linux 3.4
+>    Uncompressed Kernel Size: 14MB
+>         Compressed Size  Decompression Speed
+>    LZO  6.7MB            21.1MB/s
+>    LZ4  7.3MB            29.1MB/s, 45.6MB/s(UA)
+> 2. ARMv7, 1.7GHz based board
+>    Kernel: linux 3.7
+>    Uncompressed Kernel Size: 14MB
+>         Compressed Size  Decompression Speed
+>    LZO  6.0MB            34.1MB/s
+>    LZ4  6.5MB            86.7MB/s
+> UA: Unaligned memory Access support
+> 
+> 
+> Change log: v2
+> - Clean up code
+> - Enable unaligned access for ARM v6 and above with
+>   CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS
+> - Add lz4_decompress() for faster decompression with
+>   uncompressed output size
+> - Use lz4_decompress() for LZ4-compressed kernel during
+>   boot-process
+> - Apply -Os to decompress.o to improve decompress
+>   performance during boot-up process
+> 
+> 
+> Kyungsik Lee (4):
+>   decompressor: Add LZ4 decompressor module
+>   lib: Add support for LZ4-compressed kernel
+>   arm: Add support for LZ4-compressed kernel
+>   x86: Add support for LZ4-compressed kernel
+> 
+>  arch/arm/Kconfig                      |   1 +
+>  arch/arm/boot/compressed/.gitignore   |   1 +
+>  arch/arm/boot/compressed/Makefile     |   6 +-
+>  arch/arm/boot/compressed/decompress.c |   4 +
+>  arch/arm/boot/compressed/piggy.lz4.S  |   6 +
+>  arch/x86/Kconfig                      |   1 +
+>  arch/x86/boot/compressed/Makefile     |   5 +-
+>  arch/x86/boot/compressed/misc.c       |   4 +
+>  include/linux/decompress/unlz4.h      |  10 +
+>  include/linux/lz4.h                   |  48 +++++
+>  init/Kconfig                          |  13 +-
+>  lib/Kconfig                           |   7 +
+>  lib/Makefile                          |   2 +
+>  lib/decompress.c                      |   5 +
+>  lib/decompress_unlz4.c                | 190 +++++++++++++++++++
+>  lib/lz4/Makefile                      |   1 +
+>  lib/lz4/lz4_decompress.c              | 331 ++++++++++++++++++++++++++++++++++
+>  lib/lz4/lz4defs.h                     |  93 ++++++++++
+>  scripts/Makefile.lib                  |   5 +
+>  usr/Kconfig                           |   9 +
+>  20 files changed, 739 insertions(+), 3 deletions(-)
+>  create mode 100644 arch/arm/boot/compressed/piggy.lz4.S
+>  create mode 100644 include/linux/decompress/unlz4.h
+>  create mode 100644 include/linux/lz4.h
+>  create mode 100644 lib/decompress_unlz4.c
+>  create mode 100644 lib/lz4/Makefile
+>  create mode 100644 lib/lz4/lz4_decompress.c
+>  create mode 100644 lib/lz4/lz4defs.h
 > 
 
-Thanks,
 
-Rob
+-- 
+Markus Oberhumer, <markus@oberhumer.com>, http://www.oberhumer.com/
+
+--------------010100070101020909000305
+Content-Type: text/x-patch;
+ name="lib-lzo-huge-LZO-decompression-speedup-on-ARM.patch"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+ filename="lib-lzo-huge-LZO-decompression-speedup-on-ARM.patch"
+
+commit 8745b927fcfcd6953ada9bd1220a73083db5948a
+Author: Markus F.X.J. Oberhumer <markus@oberhumer.com>
+Date:   Mon Feb 4 02:26:14 2013 +0100
+
+    lib/lzo: huge LZO decompression speedup on ARM by using unaligned access
+    
+    Signed-off-by: Markus F.X.J. Oberhumer <markus@oberhumer.com>
+
+diff --git a/lib/lzo/lzo1x_decompress_safe.c b/lib/lzo/lzo1x_decompress_safe.c
+index 569985d..e3edc5f 100644
+--- a/lib/lzo/lzo1x_decompress_safe.c
++++ b/lib/lzo/lzo1x_decompress_safe.c
+@@ -72,9 +72,11 @@ copy_literal_run:
+ 						COPY8(op, ip);
+ 						op += 8;
+ 						ip += 8;
++#  if !defined(__arm__)
+ 						COPY8(op, ip);
+ 						op += 8;
+ 						ip += 8;
++#  endif
+ 					} while (ip < ie);
+ 					ip = ie;
+ 					op = oe;
+@@ -159,9 +161,11 @@ copy_literal_run:
+ 					COPY8(op, m_pos);
+ 					op += 8;
+ 					m_pos += 8;
++#  if !defined(__arm__)
+ 					COPY8(op, m_pos);
+ 					op += 8;
+ 					m_pos += 8;
++#  endif
+ 				} while (op < oe);
+ 				op = oe;
+ 				if (HAVE_IP(6)) {
+diff --git a/lib/lzo/lzodefs.h b/lib/lzo/lzodefs.h
+index 5a4beb2..b230601 100644
+--- a/lib/lzo/lzodefs.h
++++ b/lib/lzo/lzodefs.h
+@@ -12,8 +12,14 @@
+  */
+ 
+ 
++#if 1 && defined(__arm__) && ((__LINUX_ARM_ARCH__ >= 6) || defined(__ARM_FEATURE_UNALIGNED))
++#define CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS 1
++#define COPY4(dst, src)	\
++		* (u32 *) (void *) (dst) = * (const u32 *) (const void *) (src)
++#else
+ #define COPY4(dst, src)	\
+ 		put_unaligned(get_unaligned((const u32 *)(src)), (u32 *)(dst))
++#endif
+ #if defined(__x86_64__)
+ #define COPY8(dst, src)	\
+ 		put_unaligned(get_unaligned((const u64 *)(src)), (u64 *)(dst))
+
+
+
+
+--------------010100070101020909000305--
