@@ -1,176 +1,140 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:60068 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:41333 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755624Ab3BZJDo (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 26 Feb 2013 04:03:44 -0500
-Message-ID: <512C7A6C.4040103@suse.cz>
-Date: Tue, 26 Feb 2013 10:03:40 +0100
-From: Michal Marek <mmarek@suse.cz>
+	id S1757421Ab3BZNMN (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 26 Feb 2013 08:12:13 -0500
+Date: Tue, 26 Feb 2013 14:12:06 +0100
+From: David Sterba <dsterba@suse.cz>
+Subject: Re: [RFC PATCH v2 1/4] decompressor: Add LZ4 decompressor module
+Message-ID: <20130226131206.GW27541@twin.jikos.cz>
+Reply-To: dsterba@suse.cz
+References: <1361859870-15751-1-git-send-email-kyungsik.lee@lge.com>
+ <1361859870-15751-2-git-send-email-kyungsik.lee@lge.com>
 MIME-Version: 1.0
-Subject: Re: [PATCH 1/1] scripts/package/builddeb:  build perftools package.
-References: <1361842218-1768-1-git-send-email-gary.lowell@inktank.com>
-In-Reply-To: <1361842218-1768-1-git-send-email-gary.lowell@inktank.com>
-Content-Type: text/plain; charset=ISO-8859-2
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1361859870-15751-2-git-send-email-kyungsik.lee@lge.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Gary Lowell <gary.lowell@inktank.com>
-Cc: linux-kbuild@vger.kernel.org, Sage Weil <sage@inktank.com>, linux-kernel@vger.kernel.org, maximilian attems <max@stro.at>
+To: Kyungsik Lee <kyungsik.lee@lge.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>, Russell King <linux@arm.linux.org.uk>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, Michal Marek <mmarek@suse.cz>, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, x86@kernel.org, celinux-dev@lists.celinuxforum.org, Nicolas Pitre <nico@fluxnic.net>, Nitin Gupta <nitingupta910@gmail.com>, "Markus F.X.J. Oberhumer" <markus@oberhumer.com>, Richard Purdie <rpurdie@openedhand.com>, Josh Triplett <josh@joshtriplett.org>, Joe Millenbach <jmillenbach@gmail.com>, David Sterba <dsterba@suse.cz>, Richard Cochran <richardcochran@gmail.com>, Albin Tonnerre <albin.tonnerre@free-electrons.com>, Egon Alter <egon.alter@gmx.net>, hyojun.im@lge.com, chan.jeong@lge.com, raphael.andy.lee@gmail.com
 
-Added Maximilian to CC.
-
-Michal
-
-On 26.2.2013 02:30, Gary Lowell wrote:
-> This will build a linux-tools-$version package for each build that includes
-> perf.  We've been using this for internal builds and other folks might find
-> it helpful.
+On Tue, Feb 26, 2013 at 03:24:27PM +0900, Kyungsik Lee wrote:
+> This patch adds support for LZ4 decompression in the Linux Kernel.
+> LZ4 Decompression APIs for kernel are based on LZ4 implementation
+> by Yann Collet.
 > 
-> Signed-off-by: Gary Lowell <gary.lowell@inktank.com>
-> ---
->  scripts/package/builddeb |   95 +++++++++++++++++++++++++++++++++++++++++++++-
->  1 file changed, 94 insertions(+), 1 deletion(-)
-> 
-> diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-> index acb8650..f57d33c 100644
-> --- a/scripts/package/builddeb
-> +++ b/scripts/package/builddeb
-> @@ -78,17 +78,20 @@ tmpdir="$objtree/debian/tmp"
->  fwdir="$objtree/debian/fwtmp"
->  kernel_headers_dir="$objtree/debian/hdrtmp"
->  libc_headers_dir="$objtree/debian/headertmp"
-> +tools_dir="$objtree/debian/toolstmp"
-> +tmp_build_dir="$objtree/debian/toolsbuild"
->  packagename=linux-image-$version
->  fwpackagename=linux-firmware-image
->  kernel_headers_packagename=linux-headers-$version
->  libc_headers_packagename=linux-libc-dev
-> +tools_packagename=linux-tools-$version
->  
->  if [ "$ARCH" = "um" ] ; then
->  	packagename=user-mode-linux-$version
->  fi
->  
->  # Setup the directory structure
-> -rm -rf "$tmpdir" "$fwdir" "$kernel_headers_dir" "$libc_headers_dir"
-> +rm -rf "$tmpdir" "$fwdir" "$kernel_headers_dir" "$libc_headers_dir" "$tools_dir" "$tmp_build_dir"
->  mkdir -m 755 -p "$tmpdir/DEBIAN"
->  mkdir -p  "$tmpdir/lib" "$tmpdir/boot" "$tmpdir/usr/share/doc/$packagename"
->  mkdir -m 755 -p "$fwdir/DEBIAN"
-> @@ -98,6 +101,10 @@ mkdir -p "$libc_headers_dir/usr/share/doc/$libc_headers_packagename"
->  mkdir -m 755 -p "$kernel_headers_dir/DEBIAN"
->  mkdir -p "$kernel_headers_dir/usr/share/doc/$kernel_headers_packagename"
->  mkdir -p "$kernel_headers_dir/lib/modules/$version/"
-> +mkdir -m 755 -p "$tools_dir/DEBIAN"
-> +mkdir -p "$tools_dir/usr/share/doc/$tools_packagename"
-> +mkdir -p "$tools_dir/usr/bin/"
-> +mkdir -p "$tmp_build_dir"
->  if [ "$ARCH" = "um" ] ; then
->  	mkdir -p "$tmpdir/usr/lib/uml/modules/$version" "$tmpdir/usr/bin"
->  fi
-> @@ -120,6 +127,77 @@ else
->  	fi
->  fi
->  
-> +# Build the tools
-> +num_tools="0"
-> +tools_flavour_abi=${version#*-}
-> +tools_flavour=${tools_flavour_abi#*-}
-> +tools_version=${version%-$tools_flavour}
-> +debian_tools_version="${version%%-*}"
-> +debian_tools_version="${version%.*}"
-> +if grep -q '^CONFIG_PERF_EVENTS=y' .config ; then
-> +	# Build and install perf
-> +	(
-> +	 unset MAKEFLAGS
-> +	 unset MFLAGS
-> +	 unset MAKEOVERRIDES
-> +
-> +	 mkdir -p $objtree/tools/perf
-> +	 cd "$srctree/tools/perf"
-> +	 $MAKE DESTDIR="$tools_dir/usr/" LDFLAGS= O=$objtree/tools/perf/ install
-> +	 mv "$tools_dir/usr/bin/perf" "$tools_dir/usr/bin/perf_$debian_tools_version"
-> +	 ln -s "/usr/bin/perf_$debian_tools_version" "$tools_dir/usr/bin/perf_$tools_version"
-> +	 mv "$tools_dir/usr/libexec/perf-core" "$tools_dir/usr/share/perf_$debian_tools_version-core"
-> +	 rmdir "$tools_dir/usr/libexec"
-> +
-> +	 # Documentation can't be built out-of-tree so copy source
-> +	 # over to objtree and build man pages there
-> +	 mkdir -p $tmp_build_dir/perf
-> +	 cp -a "$srctree/tools/perf/Documentation" "$tmp_build_dir/perf/"
-> +	 cp -a "$srctree/tools/perf/config" "$tmp_build_dir/perf/"
-> +	 cd "$tmp_build_dir/perf/Documentation"
-> +	 $MAKE man
-> +	 $MAKE DESTDIR="$tools_dir/usr/" install
-> +	 for manpage in `find $tools_dir/usr/share/man/ -type f`; do
-> +		mv $manpage ${manpage/perf/perf_$debian_tools_version}
-> +		gzip -9 ${manpage/perf/perf_$debian_tools_version}
-> +	 done
-> +	)
-> +	num_tools=$(($num_tools+1))
-> +fi
-> +
-> +if [[ "$ARCH" = "i386" || "$ARCH" = "x86_64" ]]; then
-> +	# Build turbostat
-> +	(
-> +	 cp -a $srctree/tools/power/x86/turbostat "$tmp_build_dir"
-> +	 ln -s $srctree/arch "$tmp_build_dir/../../../arch"
-> +	 cd "$tmp_build_dir/turbostat/"
-> +	 unset MAKEFLAGS
-> +	 unset MFLAGS
-> +	 unset MAKEOVERRIDES
-> +	 $MAKE LDFLAGS=
-> +	 cp turbostat "$tools_dir/usr/bin/turbostat_$debian_tools_version"
-> +	 ln -s "/usr/bin/turbostat_$debian_tools_version" "$tools_dir/usr/bin/turbostat_$tools_version"
-> +	 mkdir -p "$tools_dir/usr/share/man/man8"
-> +	 cp turbostat.8 "$tools_dir/usr/share/man/man8/turbotstat_${debian_tools_version}.8"
-> +	 gzip -9 "$tools_dir/usr/share/man/man8/turbotstat_${debian_tools_version}.8"
-> +	)
-> +
-> +	# Build x86_energy_perf_policy
-> +	(
-> +	 cp -a $srctree/tools/power/x86/x86_energy_perf_policy "$tmp_build_dir"
-> +	 cd "$tmp_build_dir/x86_energy_perf_policy"
-> +	 unset MAKEFLAGS
-> +	 unset MFLAGS
-> +	 unset MAKEOVERRIDES
-> +	 $MAKE LDFLAGS=
-> +	 cp x86_energy_perf_policy "$tools_dir/usr/bin/x86_energy_perf_policy_$debian_tools_version"
-> +	 ln -s "/usr/bin/x86_energy_perf_policy_$debian_tools_version" "$tools_dir/usr/bin/x86_energy_perf_policy_$tools_version"
-> +	 cp x86_energy_perf_policy.8 "$tools_dir/usr/share/man/man8/x86_energy_perf_policy_${debian_tools_version}.8"
-> +	 gzip -9 "$tools_dir/usr/share/man/man8/x86_energy_perf_policy_${debian_tools_version}.8"
-> +	)
-> +	num_tools=$(($num_tools+2))
-> +fi
-> +
->  if grep -q '^CONFIG_MODULES=y' .config ; then
->  	INSTALL_MOD_PATH="$tmpdir" $MAKE KBUILD_SRC= modules_install
->  	rm -f "$tmpdir/lib/modules/$version/build"
-> @@ -292,9 +370,24 @@ Description: Linux support headers for userspace development
->   are used by the installed headers for GNU glibc and other system libraries.
->  EOF
->  
-> +cat <<EOF >> debian/control
-> +
-> +Package: $tools_packagename
-> +Section: devel
-> +Architecture: $arch
-> +Depends: \${shlibs:Depends}
-> +Description: Linux kernel tools for version $version
-> + This package provides the architecture dependant parts for kernel
-> + version locked tools for version $version
-> +EOF
-> +
->  if [ "$ARCH" != "um" ]; then
->  	create_package "$kernel_headers_packagename" "$kernel_headers_dir"
->  	create_package "$libc_headers_packagename" "$libc_headers_dir"
-> +	if [ "$num_tools" > "0" ]; then
-> +		dpkg-shlibdeps $tools_dir/usr/bin/*
-> +		create_package "$tools_packagename" "$tools_dir"
-> +	fi
->  fi
->  
->  create_package "$packagename" "$tmpdir"
-> 
+> LZ4 homepage : http://fastcompression.blogspot.com/p/lz4.html
+> LZ4 source repository : http://code.google.com/p/lz4/
 
+What SVN version did you use?
 
+> --- /dev/null
+> +++ b/include/linux/lz4.h
+> @@ -0,0 +1,48 @@
+> +#ifndef __LZ4_H__
+> +#define __LZ4_H__
+> +/*
+> + * LZ4 Kernel Interface
+> + *
+> + * Copyright (C) 2013, LG Electronics, Kyungsik Lee <kyungsik.lee@lge.com>
+> + *
+> + * This program is free software; you can redistribute it and/or modify
+> + * it under the terms of the GNU General Public License version 2 as
+> + * published by the Free Software Foundation.
+> + */
+> +
+> +/*
+> + * LZ4_COMPRESSBOUND()
+> + * Provides the maximum size that LZ4 may output in a "worst case" scenario
+> + * (input data not compressible)
+> + */
+> +#define LZ4_COMPRESSBOUND(isize) (isize + ((isize)/255) + 16)
+
+For safety reasons I suggest to add a temporary variable to avoid double
+evaluation of isize.
+
+> --- /dev/null
+> +++ b/lib/lz4/lz4_decompress.c
+> +	}
+> +	cpy = op + length - (STEPSIZE - 4);
+> +	if (cpy > oend - COPYLENGTH) {
+> +
+> +		/* Error: request to write beyond destination buffer */
+> +		if (cpy > oend)
+> +			goto _output_error;
+> +		LZ4_SECURECOPY(ref, op, (oend - COPYLENGTH));
+> +		while (op < cpy)
+> +			*op++ = *ref++;
+> +		op = cpy;
+> +		/*
+> +		 * Check EOF (should never happen, since last 5 bytes
+> +		 * are supposed to be literals)
+> +		 */
+> +		if (op == oend)
+> +			goto _output_error;
+> +		continue;
+> +	}
+> +		LZ4_SECURECOPY(ref, op, cpy);
+> +		op = cpy; /* correction */
+> +	}
+
+Does this compile? The } is an extra one, and does not match the
+original sources.
+
+> +	/* end of decoding */
+> +	return (int) (((char *)ip) - source);
+> +
+> +	/* write overflow error detected */
+> +_output_error:
+> +	return (int) (-(((char *)ip) - source));
+> +}
+> +
+> --- /dev/null
+> +++ b/lib/lz4/lz4defs.h
+> @@ -0,0 +1,93 @@
+> +#define LZ4_COPYSTEP(s, d)	\
+> +	do {	\
+> +		PUT8(s, d);	\
+> +		d += 8;	\
+> +		s += 8;	\
+> +	} while (0)
+> +
+> +#define LZ4_COPYPACKET(s, d)	LZ4_COPYSTEP(s, d)
+> +
+> +#define LZ4_SECURECOPY(s, d, e)	\
+> +	do {				\
+> +		if (d < e) {		\
+> +			LZ4_WILDCOPY(s, d, e);	\
+> +		}	\
+> +	} while (0)
+> +
+> +#else	/* 32-bit */
+> +#define STEPSIZE 4
+> +
+> +#define LZ4_COPYSTEP(s, d)	\
+> +	do {	\
+> +		PUT4(s, d);	\
+> +		d += 4;	\
+> +		s += 4;	\
+> +	} while (0)
+> +
+> +#define LZ4_COPYPACKET(s, d)	\
+> +	do {			\
+> +		LZ4_COPYSTEP(s, d);	\
+> +		LZ4_COPYSTEP(s, d);	\
+> +	} while (0)
+> +
+> +#define LZ4_SECURECOPY	LZ4_WILDCOPY
+> +#endif
+> +
+> +#define LZ4_READ_LITTLEENDIAN_16(d, s, p) \
+> +	(d = s - get_unaligned_le16(p))
+> +#define LZ4_WILDCOPY(s, d, e)	\
+> +	do {				\
+> +		LZ4_COPYPACKET(s, d);	\
+> +	} while (d < e)
+
+All the \ at the ends of lines would look better aligned in one column.
+
+david
