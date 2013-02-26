@@ -1,82 +1,176 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.not-your-server.de ([78.46.182.243]:49315 "EHLO
-	mail.not-your-server.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756077Ab3BZHHX (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 26 Feb 2013 02:07:23 -0500
-Message-ID: <512C5D6D.1040509@gentoo.org>
-Date: Tue, 26 Feb 2013 07:59:57 +0100
-From: justin <jlec@gentoo.org>
+Received: from cantor2.suse.de ([195.135.220.15]:60068 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1755624Ab3BZJDo (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 26 Feb 2013 04:03:44 -0500
+Message-ID: <512C7A6C.4040103@suse.cz>
+Date: Tue, 26 Feb 2013 10:03:40 +0100
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Subject: Re: [PATCH] Use config scripts to detect ncurses libs for, menuconfig/nconfig
- dialogs
-References: <512A36BB.9070309@gentoo.org> <201302251930.22293.yann.morin.1998@free.fr> <512BCA76.6080601@gentoo.org> <201302252153.39465.yann.morin.1998@free.fr>
-In-Reply-To: <201302252153.39465.yann.morin.1998@free.fr>
-Content-Type: multipart/signed; micalg=pgp-sha512;
- protocol="application/pgp-signature";
- boundary="----enig2GTTIMSATKCOVSELBJMUN"
+Subject: Re: [PATCH 1/1] scripts/package/builddeb:  build perftools package.
+References: <1361842218-1768-1-git-send-email-gary.lowell@inktank.com>
+In-Reply-To: <1361842218-1768-1-git-send-email-gary.lowell@inktank.com>
+Content-Type: text/plain; charset=ISO-8859-2
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Gary Lowell <gary.lowell@inktank.com>
+Cc: linux-kbuild@vger.kernel.org, Sage Weil <sage@inktank.com>, linux-kernel@vger.kernel.org, maximilian attems <max@stro.at>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
-------enig2GTTIMSATKCOVSELBJMUN
-Content-Type: text/plain; charset=ISO-8859-15
-Content-Transfer-Encoding: quoted-printable
+Added Maximilian to CC.
 
-On 25/02/13 21:53, Yann E. MORIN wrote:
-> Justin, All,
->=20
-> On Monday 25 February 2013 Justin wrote:
->> On 25.02.2013 19:30, Yann E. MORIN wrote:
->>> On Sunday 24 February 2013 Justin wrote:
->>>> when ncurses is build with --with-termlib several symbols are moved =
-to a
->>>> seperate terminfo library (libtinfo.so). Current Kernel buildsystem
->>>> results in a build error with menuconfig and nconfig dialogs.
->>>
->>> Do you know of a distribution where this is the case, so I can test?
->>
->> This is using Gentoo Linux testing with ld.gold. But I assume you will=
+Michal
 
->> get the same result using any distro with gold.
->=20
-> No, I meant a distro where ncurses is built with --with-termlib.
-> On my Debian stable (squeeze), libtinfo does not exist at all,
-> so I can not test linking against it:
->=20
->     $ apt-file search libtinfo
->     (zilch)
->=20
-> But I'll see at installing a Gentoo (if that's not too complex) in a
-> VM to do the checks (can you confirm that Gentoo by default configures
-> ncurses with --with-termlib ?).
->=20
-> Regards,
-> Yann E. MORIN.
->=20
+On 26.2.2013 02:30, Gary Lowell wrote:
+> This will build a linux-tools-$version package for each build that includes
+> perf.  We've been using this for internal builds and other folks might find
+> it helpful.
+> 
+> Signed-off-by: Gary Lowell <gary.lowell@inktank.com>
+> ---
+>  scripts/package/builddeb |   95 +++++++++++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 94 insertions(+), 1 deletion(-)
+> 
+> diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+> index acb8650..f57d33c 100644
+> --- a/scripts/package/builddeb
+> +++ b/scripts/package/builddeb
+> @@ -78,17 +78,20 @@ tmpdir="$objtree/debian/tmp"
+>  fwdir="$objtree/debian/fwtmp"
+>  kernel_headers_dir="$objtree/debian/hdrtmp"
+>  libc_headers_dir="$objtree/debian/headertmp"
+> +tools_dir="$objtree/debian/toolstmp"
+> +tmp_build_dir="$objtree/debian/toolsbuild"
+>  packagename=linux-image-$version
+>  fwpackagename=linux-firmware-image
+>  kernel_headers_packagename=linux-headers-$version
+>  libc_headers_packagename=linux-libc-dev
+> +tools_packagename=linux-tools-$version
+>  
+>  if [ "$ARCH" = "um" ] ; then
+>  	packagename=user-mode-linux-$version
+>  fi
+>  
+>  # Setup the directory structure
+> -rm -rf "$tmpdir" "$fwdir" "$kernel_headers_dir" "$libc_headers_dir"
+> +rm -rf "$tmpdir" "$fwdir" "$kernel_headers_dir" "$libc_headers_dir" "$tools_dir" "$tmp_build_dir"
+>  mkdir -m 755 -p "$tmpdir/DEBIAN"
+>  mkdir -p  "$tmpdir/lib" "$tmpdir/boot" "$tmpdir/usr/share/doc/$packagename"
+>  mkdir -m 755 -p "$fwdir/DEBIAN"
+> @@ -98,6 +101,10 @@ mkdir -p "$libc_headers_dir/usr/share/doc/$libc_headers_packagename"
+>  mkdir -m 755 -p "$kernel_headers_dir/DEBIAN"
+>  mkdir -p "$kernel_headers_dir/usr/share/doc/$kernel_headers_packagename"
+>  mkdir -p "$kernel_headers_dir/lib/modules/$version/"
+> +mkdir -m 755 -p "$tools_dir/DEBIAN"
+> +mkdir -p "$tools_dir/usr/share/doc/$tools_packagename"
+> +mkdir -p "$tools_dir/usr/bin/"
+> +mkdir -p "$tmp_build_dir"
+>  if [ "$ARCH" = "um" ] ; then
+>  	mkdir -p "$tmpdir/usr/lib/uml/modules/$version" "$tmpdir/usr/bin"
+>  fi
+> @@ -120,6 +127,77 @@ else
+>  	fi
+>  fi
+>  
+> +# Build the tools
+> +num_tools="0"
+> +tools_flavour_abi=${version#*-}
+> +tools_flavour=${tools_flavour_abi#*-}
+> +tools_version=${version%-$tools_flavour}
+> +debian_tools_version="${version%%-*}"
+> +debian_tools_version="${version%.*}"
+> +if grep -q '^CONFIG_PERF_EVENTS=y' .config ; then
+> +	# Build and install perf
+> +	(
+> +	 unset MAKEFLAGS
+> +	 unset MFLAGS
+> +	 unset MAKEOVERRIDES
+> +
+> +	 mkdir -p $objtree/tools/perf
+> +	 cd "$srctree/tools/perf"
+> +	 $MAKE DESTDIR="$tools_dir/usr/" LDFLAGS= O=$objtree/tools/perf/ install
+> +	 mv "$tools_dir/usr/bin/perf" "$tools_dir/usr/bin/perf_$debian_tools_version"
+> +	 ln -s "/usr/bin/perf_$debian_tools_version" "$tools_dir/usr/bin/perf_$tools_version"
+> +	 mv "$tools_dir/usr/libexec/perf-core" "$tools_dir/usr/share/perf_$debian_tools_version-core"
+> +	 rmdir "$tools_dir/usr/libexec"
+> +
+> +	 # Documentation can't be built out-of-tree so copy source
+> +	 # over to objtree and build man pages there
+> +	 mkdir -p $tmp_build_dir/perf
+> +	 cp -a "$srctree/tools/perf/Documentation" "$tmp_build_dir/perf/"
+> +	 cp -a "$srctree/tools/perf/config" "$tmp_build_dir/perf/"
+> +	 cd "$tmp_build_dir/perf/Documentation"
+> +	 $MAKE man
+> +	 $MAKE DESTDIR="$tools_dir/usr/" install
+> +	 for manpage in `find $tools_dir/usr/share/man/ -type f`; do
+> +		mv $manpage ${manpage/perf/perf_$debian_tools_version}
+> +		gzip -9 ${manpage/perf/perf_$debian_tools_version}
+> +	 done
+> +	)
+> +	num_tools=$(($num_tools+1))
+> +fi
+> +
+> +if [[ "$ARCH" = "i386" || "$ARCH" = "x86_64" ]]; then
+> +	# Build turbostat
+> +	(
+> +	 cp -a $srctree/tools/power/x86/turbostat "$tmp_build_dir"
+> +	 ln -s $srctree/arch "$tmp_build_dir/../../../arch"
+> +	 cd "$tmp_build_dir/turbostat/"
+> +	 unset MAKEFLAGS
+> +	 unset MFLAGS
+> +	 unset MAKEOVERRIDES
+> +	 $MAKE LDFLAGS=
+> +	 cp turbostat "$tools_dir/usr/bin/turbostat_$debian_tools_version"
+> +	 ln -s "/usr/bin/turbostat_$debian_tools_version" "$tools_dir/usr/bin/turbostat_$tools_version"
+> +	 mkdir -p "$tools_dir/usr/share/man/man8"
+> +	 cp turbostat.8 "$tools_dir/usr/share/man/man8/turbotstat_${debian_tools_version}.8"
+> +	 gzip -9 "$tools_dir/usr/share/man/man8/turbotstat_${debian_tools_version}.8"
+> +	)
+> +
+> +	# Build x86_energy_perf_policy
+> +	(
+> +	 cp -a $srctree/tools/power/x86/x86_energy_perf_policy "$tmp_build_dir"
+> +	 cd "$tmp_build_dir/x86_energy_perf_policy"
+> +	 unset MAKEFLAGS
+> +	 unset MFLAGS
+> +	 unset MAKEOVERRIDES
+> +	 $MAKE LDFLAGS=
+> +	 cp x86_energy_perf_policy "$tools_dir/usr/bin/x86_energy_perf_policy_$debian_tools_version"
+> +	 ln -s "/usr/bin/x86_energy_perf_policy_$debian_tools_version" "$tools_dir/usr/bin/x86_energy_perf_policy_$tools_version"
+> +	 cp x86_energy_perf_policy.8 "$tools_dir/usr/share/man/man8/x86_energy_perf_policy_${debian_tools_version}.8"
+> +	 gzip -9 "$tools_dir/usr/share/man/man8/x86_energy_perf_policy_${debian_tools_version}.8"
+> +	)
+> +	num_tools=$(($num_tools+2))
+> +fi
+> +
+>  if grep -q '^CONFIG_MODULES=y' .config ; then
+>  	INSTALL_MOD_PATH="$tmpdir" $MAKE KBUILD_SRC= modules_install
+>  	rm -f "$tmpdir/lib/modules/$version/build"
+> @@ -292,9 +370,24 @@ Description: Linux support headers for userspace development
+>   are used by the installed headers for GNU glibc and other system libraries.
+>  EOF
+>  
+> +cat <<EOF >> debian/control
+> +
+> +Package: $tools_packagename
+> +Section: devel
+> +Architecture: $arch
+> +Depends: \${shlibs:Depends}
+> +Description: Linux kernel tools for version $version
+> + This package provides the architecture dependant parts for kernel
+> + version locked tools for version $version
+> +EOF
+> +
+>  if [ "$ARCH" != "um" ]; then
+>  	create_package "$kernel_headers_packagename" "$kernel_headers_dir"
+>  	create_package "$libc_headers_packagename" "$libc_headers_dir"
+> +	if [ "$num_tools" > "0" ]; then
+> +		dpkg-shlibdeps $tools_dir/usr/bin/*
+> +		create_package "$tools_packagename" "$tools_dir"
+> +	fi
+>  fi
+>  
+>  create_package "$packagename" "$tmpdir"
+> 
 
-I can be build optionally (mostly for binary package compatibility
-reasons) with --with-termlib. I will send a step-by-step instruction how
-to test this with our live cd later today.
 
-Thanks,
-Justin
-
-
-------enig2GTTIMSATKCOVSELBJMUN
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.19 (GNU/Linux)
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iEYEAREKAAYFAlEsXW0ACgkQgAnW8HDreRZngQCgmKHuhD4uhyK8yNVeEF0aXB4M
-fhYAn1Db/a6XgMP2YLilQKWlLU8jWD3y
-=7FBe
------END PGP SIGNATURE-----
-
-------enig2GTTIMSATKCOVSELBJMUN--
