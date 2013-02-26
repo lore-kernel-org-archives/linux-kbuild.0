@@ -1,169 +1,107 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pb0-f54.google.com ([209.85.160.54]:47406 "EHLO
-	mail-pb0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752667Ab3BZB3M (ORCPT
+Received: from LGEMRELSE1Q.lge.com ([156.147.1.111]:59225 "EHLO
+	LGEMRELSE1Q.lge.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752458Ab3BZGYo (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 25 Feb 2013 20:29:12 -0500
-Received: by mail-pb0-f54.google.com with SMTP id rr4so2018964pbb.13
-        for <linux-kbuild@vger.kernel.org>; Mon, 25 Feb 2013 17:29:12 -0800 (PST)
-From: Gary Lowell <gary.lowell@inktank.com>
-Subject: [PATCH 1/1] scripts/package/builddeb:  build perftools package.
-Date: Mon, 25 Feb 2013 17:30:18 -0800
-Message-Id: <1361842218-1768-1-git-send-email-gary.lowell@inktank.com>
+	Tue, 26 Feb 2013 01:24:44 -0500
+From: Kyungsik Lee <kyungsik.lee@lge.com>
+Subject: [RFC PATCH v2 0/4] Add support for LZ4-compressed kernel
+Date: Tue, 26 Feb 2013 15:24:26 +0900
+Message-Id: <1361859870-15751-1-git-send-email-kyungsik.lee@lge.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
-Cc: Sage Weil <sage@inktank.com>, linux-kernel@vger.kernel.org, Gary Lowell <gary.lowell@inktank.com>
+To: Andrew Morton <akpm@linux-foundation.org>, Russell King <linux@arm.linux.org.uk>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, Michal Marek <mmarek@suse.cz>, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, x86@kernel.org, celinux-dev@lists.celinuxforum.org
+Cc: Nicolas Pitre <nico@fluxnic.net>, Nitin Gupta <nitingupta910@gmail.com>, "Markus F.X.J. Oberhumer" <markus@oberhumer.com>, Richard Purdie <rpurdie@openedhand.com>, Josh Triplett <josh@joshtriplett.org>, Joe Millenbach <jmillenbach@gmail.com>, David Sterba <dsterba@suse.cz>, Richard Cochran <richardcochran@gmail.com>, Albin Tonnerre <albin.tonnerre@free-electrons.com>, Egon Alter <egon.alter@gmx.net>, hyojun.im@lge.com, chan.jeong@lge.com, raphael.andy.lee@gmail.com, Kyungsik Lee <kyungsik.lee@lge.com>
 
-This will build a linux-tools-$version package for each build that includes
-perf.  We've been using this for internal builds and other folks might find
-it helpful.
+Hi,
 
-Signed-off-by: Gary Lowell <gary.lowell@inktank.com>
----
- scripts/package/builddeb |   95 +++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 94 insertions(+), 1 deletion(-)
+First of all, Thank you for the comments and emails from the community.
 
-diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-index acb8650..f57d33c 100644
---- a/scripts/package/builddeb
-+++ b/scripts/package/builddeb
-@@ -78,17 +78,20 @@ tmpdir="$objtree/debian/tmp"
- fwdir="$objtree/debian/fwtmp"
- kernel_headers_dir="$objtree/debian/hdrtmp"
- libc_headers_dir="$objtree/debian/headertmp"
-+tools_dir="$objtree/debian/toolstmp"
-+tmp_build_dir="$objtree/debian/toolsbuild"
- packagename=linux-image-$version
- fwpackagename=linux-firmware-image
- kernel_headers_packagename=linux-headers-$version
- libc_headers_packagename=linux-libc-dev
-+tools_packagename=linux-tools-$version
- 
- if [ "$ARCH" = "um" ] ; then
- 	packagename=user-mode-linux-$version
- fi
- 
- # Setup the directory structure
--rm -rf "$tmpdir" "$fwdir" "$kernel_headers_dir" "$libc_headers_dir"
-+rm -rf "$tmpdir" "$fwdir" "$kernel_headers_dir" "$libc_headers_dir" "$tools_dir" "$tmp_build_dir"
- mkdir -m 755 -p "$tmpdir/DEBIAN"
- mkdir -p  "$tmpdir/lib" "$tmpdir/boot" "$tmpdir/usr/share/doc/$packagename"
- mkdir -m 755 -p "$fwdir/DEBIAN"
-@@ -98,6 +101,10 @@ mkdir -p "$libc_headers_dir/usr/share/doc/$libc_headers_packagename"
- mkdir -m 755 -p "$kernel_headers_dir/DEBIAN"
- mkdir -p "$kernel_headers_dir/usr/share/doc/$kernel_headers_packagename"
- mkdir -p "$kernel_headers_dir/lib/modules/$version/"
-+mkdir -m 755 -p "$tools_dir/DEBIAN"
-+mkdir -p "$tools_dir/usr/share/doc/$tools_packagename"
-+mkdir -p "$tools_dir/usr/bin/"
-+mkdir -p "$tmp_build_dir"
- if [ "$ARCH" = "um" ] ; then
- 	mkdir -p "$tmpdir/usr/lib/uml/modules/$version" "$tmpdir/usr/bin"
- fi
-@@ -120,6 +127,77 @@ else
- 	fi
- fi
- 
-+# Build the tools
-+num_tools="0"
-+tools_flavour_abi=${version#*-}
-+tools_flavour=${tools_flavour_abi#*-}
-+tools_version=${version%-$tools_flavour}
-+debian_tools_version="${version%%-*}"
-+debian_tools_version="${version%.*}"
-+if grep -q '^CONFIG_PERF_EVENTS=y' .config ; then
-+	# Build and install perf
-+	(
-+	 unset MAKEFLAGS
-+	 unset MFLAGS
-+	 unset MAKEOVERRIDES
-+
-+	 mkdir -p $objtree/tools/perf
-+	 cd "$srctree/tools/perf"
-+	 $MAKE DESTDIR="$tools_dir/usr/" LDFLAGS= O=$objtree/tools/perf/ install
-+	 mv "$tools_dir/usr/bin/perf" "$tools_dir/usr/bin/perf_$debian_tools_version"
-+	 ln -s "/usr/bin/perf_$debian_tools_version" "$tools_dir/usr/bin/perf_$tools_version"
-+	 mv "$tools_dir/usr/libexec/perf-core" "$tools_dir/usr/share/perf_$debian_tools_version-core"
-+	 rmdir "$tools_dir/usr/libexec"
-+
-+	 # Documentation can't be built out-of-tree so copy source
-+	 # over to objtree and build man pages there
-+	 mkdir -p $tmp_build_dir/perf
-+	 cp -a "$srctree/tools/perf/Documentation" "$tmp_build_dir/perf/"
-+	 cp -a "$srctree/tools/perf/config" "$tmp_build_dir/perf/"
-+	 cd "$tmp_build_dir/perf/Documentation"
-+	 $MAKE man
-+	 $MAKE DESTDIR="$tools_dir/usr/" install
-+	 for manpage in `find $tools_dir/usr/share/man/ -type f`; do
-+		mv $manpage ${manpage/perf/perf_$debian_tools_version}
-+		gzip -9 ${manpage/perf/perf_$debian_tools_version}
-+	 done
-+	)
-+	num_tools=$(($num_tools+1))
-+fi
-+
-+if [[ "$ARCH" = "i386" || "$ARCH" = "x86_64" ]]; then
-+	# Build turbostat
-+	(
-+	 cp -a $srctree/tools/power/x86/turbostat "$tmp_build_dir"
-+	 ln -s $srctree/arch "$tmp_build_dir/../../../arch"
-+	 cd "$tmp_build_dir/turbostat/"
-+	 unset MAKEFLAGS
-+	 unset MFLAGS
-+	 unset MAKEOVERRIDES
-+	 $MAKE LDFLAGS=
-+	 cp turbostat "$tools_dir/usr/bin/turbostat_$debian_tools_version"
-+	 ln -s "/usr/bin/turbostat_$debian_tools_version" "$tools_dir/usr/bin/turbostat_$tools_version"
-+	 mkdir -p "$tools_dir/usr/share/man/man8"
-+	 cp turbostat.8 "$tools_dir/usr/share/man/man8/turbotstat_${debian_tools_version}.8"
-+	 gzip -9 "$tools_dir/usr/share/man/man8/turbotstat_${debian_tools_version}.8"
-+	)
-+
-+	# Build x86_energy_perf_policy
-+	(
-+	 cp -a $srctree/tools/power/x86/x86_energy_perf_policy "$tmp_build_dir"
-+	 cd "$tmp_build_dir/x86_energy_perf_policy"
-+	 unset MAKEFLAGS
-+	 unset MFLAGS
-+	 unset MAKEOVERRIDES
-+	 $MAKE LDFLAGS=
-+	 cp x86_energy_perf_policy "$tools_dir/usr/bin/x86_energy_perf_policy_$debian_tools_version"
-+	 ln -s "/usr/bin/x86_energy_perf_policy_$debian_tools_version" "$tools_dir/usr/bin/x86_energy_perf_policy_$tools_version"
-+	 cp x86_energy_perf_policy.8 "$tools_dir/usr/share/man/man8/x86_energy_perf_policy_${debian_tools_version}.8"
-+	 gzip -9 "$tools_dir/usr/share/man/man8/x86_energy_perf_policy_${debian_tools_version}.8"
-+	)
-+	num_tools=$(($num_tools+2))
-+fi
-+
- if grep -q '^CONFIG_MODULES=y' .config ; then
- 	INSTALL_MOD_PATH="$tmpdir" $MAKE KBUILD_SRC= modules_install
- 	rm -f "$tmpdir/lib/modules/$version/build"
-@@ -292,9 +370,24 @@ Description: Linux support headers for userspace development
-  are used by the installed headers for GNU glibc and other system libraries.
- EOF
- 
-+cat <<EOF >> debian/control
-+
-+Package: $tools_packagename
-+Section: devel
-+Architecture: $arch
-+Depends: \${shlibs:Depends}
-+Description: Linux kernel tools for version $version
-+ This package provides the architecture dependant parts for kernel
-+ version locked tools for version $version
-+EOF
-+
- if [ "$ARCH" != "um" ]; then
- 	create_package "$kernel_headers_packagename" "$kernel_headers_dir"
- 	create_package "$libc_headers_packagename" "$libc_headers_dir"
-+	if [ "$num_tools" > "0" ]; then
-+		dpkg-shlibdeps $tools_dir/usr/bin/*
-+		create_package "$tools_packagename" "$tools_dir"
-+	fi
- fi
- 
- create_package "$packagename" "$tmpdir"
+Here is the second version of support for LZ4-compressed kernel.
+In this version, lz4_decompress() has been added. In case of knowing
+the uncompressed data size, this function can be used to decompress
+more faster.
+
+Through the benchmark, it was found that -Os Compiler flag for
+decompress.o brought better decompression performance in most of cases
+(ex, different compiler and hardware spec.) in ARM architecture.
+
+Lastly, CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS is not always the best
+option even though it is supported. The decompression speed can be
+slightly slower in some cases.
+
+This patchset is based on 3.8.
+
+Any comments are appreciated.
+
+Thanks,
+Kyungsik
+
+
+Benchmark Results(PATCH v2)
+Compiler: Linaro ARM gcc 4.6.2
+1. ARMv7, 1.5GHz based board
+   Kernel: linux 3.4
+   Uncompressed Kernel Size: 14MB
+        Compressed Size  Decompression Speed
+   LZO  6.7MB            21.1MB/s
+   LZ4  7.3MB            29.1MB/s, 45.6MB/s(UA)
+2. ARMv7, 1.7GHz based board
+   Kernel: linux 3.7
+   Uncompressed Kernel Size: 14MB
+        Compressed Size  Decompression Speed
+   LZO  6.0MB            34.1MB/s
+   LZ4  6.5MB            86.7MB/s
+UA: Unaligned memory Access support
+
+
+Change log: v2
+- Clean up code
+- Enable unaligned access for ARM v6 and above with
+  CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS
+- Add lz4_decompress() for faster decompression with
+  uncompressed output size
+- Use lz4_decompress() for LZ4-compressed kernel during
+  boot-process
+- Apply -Os to decompress.o to improve decompress
+  performance during boot-up process
+
+
+Kyungsik Lee (4):
+  decompressor: Add LZ4 decompressor module
+  lib: Add support for LZ4-compressed kernel
+  arm: Add support for LZ4-compressed kernel
+  x86: Add support for LZ4-compressed kernel
+
+ arch/arm/Kconfig                      |   1 +
+ arch/arm/boot/compressed/.gitignore   |   1 +
+ arch/arm/boot/compressed/Makefile     |   6 +-
+ arch/arm/boot/compressed/decompress.c |   4 +
+ arch/arm/boot/compressed/piggy.lz4.S  |   6 +
+ arch/x86/Kconfig                      |   1 +
+ arch/x86/boot/compressed/Makefile     |   5 +-
+ arch/x86/boot/compressed/misc.c       |   4 +
+ include/linux/decompress/unlz4.h      |  10 +
+ include/linux/lz4.h                   |  48 +++++
+ init/Kconfig                          |  13 +-
+ lib/Kconfig                           |   7 +
+ lib/Makefile                          |   2 +
+ lib/decompress.c                      |   5 +
+ lib/decompress_unlz4.c                | 190 +++++++++++++++++++
+ lib/lz4/Makefile                      |   1 +
+ lib/lz4/lz4_decompress.c              | 331 ++++++++++++++++++++++++++++++++++
+ lib/lz4/lz4defs.h                     |  93 ++++++++++
+ scripts/Makefile.lib                  |   5 +
+ usr/Kconfig                           |   9 +
+ 20 files changed, 739 insertions(+), 3 deletions(-)
+ create mode 100644 arch/arm/boot/compressed/piggy.lz4.S
+ create mode 100644 include/linux/decompress/unlz4.h
+ create mode 100644 include/linux/lz4.h
+ create mode 100644 lib/decompress_unlz4.c
+ create mode 100644 lib/lz4/Makefile
+ create mode 100644 lib/lz4/lz4_decompress.c
+ create mode 100644 lib/lz4/lz4defs.h
+
 -- 
-1.7.9.5
+1.8.1.1
 
