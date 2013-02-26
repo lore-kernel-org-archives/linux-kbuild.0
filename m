@@ -1,140 +1,61 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:41333 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:43638 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1757421Ab3BZNMN (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 26 Feb 2013 08:12:13 -0500
-Date: Tue, 26 Feb 2013 14:12:06 +0100
+	id S1751503Ab3BZOA4 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 26 Feb 2013 09:00:56 -0500
+Date: Tue, 26 Feb 2013 15:00:51 +0100
 From: David Sterba <dsterba@suse.cz>
-Subject: Re: [RFC PATCH v2 1/4] decompressor: Add LZ4 decompressor module
-Message-ID: <20130226131206.GW27541@twin.jikos.cz>
+Subject: Re: [RFC PATCH v2 2/4] lib: Add support for LZ4-compressed kernel
+Message-ID: <20130226140051.GX27541@twin.jikos.cz>
 Reply-To: dsterba@suse.cz
 References: <1361859870-15751-1-git-send-email-kyungsik.lee@lge.com>
- <1361859870-15751-2-git-send-email-kyungsik.lee@lge.com>
+ <1361859870-15751-3-git-send-email-kyungsik.lee@lge.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1361859870-15751-2-git-send-email-kyungsik.lee@lge.com>
+In-Reply-To: <1361859870-15751-3-git-send-email-kyungsik.lee@lge.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Kyungsik Lee <kyungsik.lee@lge.com>
 Cc: Andrew Morton <akpm@linux-foundation.org>, Russell King <linux@arm.linux.org.uk>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, Michal Marek <mmarek@suse.cz>, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, x86@kernel.org, celinux-dev@lists.celinuxforum.org, Nicolas Pitre <nico@fluxnic.net>, Nitin Gupta <nitingupta910@gmail.com>, "Markus F.X.J. Oberhumer" <markus@oberhumer.com>, Richard Purdie <rpurdie@openedhand.com>, Josh Triplett <josh@joshtriplett.org>, Joe Millenbach <jmillenbach@gmail.com>, David Sterba <dsterba@suse.cz>, Richard Cochran <richardcochran@gmail.com>, Albin Tonnerre <albin.tonnerre@free-electrons.com>, Egon Alter <egon.alter@gmx.net>, hyojun.im@lge.com, chan.jeong@lge.com, raphael.andy.lee@gmail.com
 
-On Tue, Feb 26, 2013 at 03:24:27PM +0900, Kyungsik Lee wrote:
-> This patch adds support for LZ4 decompression in the Linux Kernel.
-> LZ4 Decompression APIs for kernel are based on LZ4 implementation
-> by Yann Collet.
-> 
-> LZ4 homepage : http://fastcompression.blogspot.com/p/lz4.html
-> LZ4 source repository : http://code.google.com/p/lz4/
-
-What SVN version did you use?
-
-> --- /dev/null
-> +++ b/include/linux/lz4.h
-> @@ -0,0 +1,48 @@
-> +#ifndef __LZ4_H__
-> +#define __LZ4_H__
-> +/*
-> + * LZ4 Kernel Interface
-> + *
-> + * Copyright (C) 2013, LG Electronics, Kyungsik Lee <kyungsik.lee@lge.com>
-> + *
-> + * This program is free software; you can redistribute it and/or modify
-> + * it under the terms of the GNU General Public License version 2 as
-> + * published by the Free Software Foundation.
-> + */
+On Tue, Feb 26, 2013 at 03:24:28PM +0900, Kyungsik Lee wrote:
+> +config KERNEL_LZ4
+> +	bool "LZ4"
+> +	depends on HAVE_KERNEL_LZ4
+> +	help
+> +	  Its compression ratio is worse than LZO. The size of the kernel
+> +	  is about 8% bigger than LZO. But the decompression speed is
+> +	  faster than LZO.
 > +
-> +/*
-> + * LZ4_COMPRESSBOUND()
-> + * Provides the maximum size that LZ4 may output in a "worst case" scenario
-> + * (input data not compressible)
-> + */
-> +#define LZ4_COMPRESSBOUND(isize) (isize + ((isize)/255) + 16)
 
-For safety reasons I suggest to add a temporary variable to avoid double
-evaluation of isize.
+Can you please add a sentence what lz4 actually is before you start
+comparing it with the current competitor(s)?
 
 > --- /dev/null
-> +++ b/lib/lz4/lz4_decompress.c
-> +	}
-> +	cpy = op + length - (STEPSIZE - 4);
-> +	if (cpy > oend - COPYLENGTH) {
-> +
-> +		/* Error: request to write beyond destination buffer */
-> +		if (cpy > oend)
-> +			goto _output_error;
-> +		LZ4_SECURECOPY(ref, op, (oend - COPYLENGTH));
-> +		while (op < cpy)
-> +			*op++ = *ref++;
-> +		op = cpy;
-> +		/*
-> +		 * Check EOF (should never happen, since last 5 bytes
-> +		 * are supposed to be literals)
-> +		 */
-> +		if (op == oend)
-> +			goto _output_error;
-> +		continue;
-> +	}
-> +		LZ4_SECURECOPY(ref, op, cpy);
-> +		op = cpy; /* correction */
-> +	}
+> +++ b/lib/decompress_unlz4.c
+> @@ -0,0 +1,190 @@
+> +#define LZ4_CHUNK_SIZE (8<<20)
 
-Does this compile? The } is an extra one, and does not match the
-original sources.
+Please use a less cryptic way of representing a value of 8 MB. Also,
+this is a hardcoded value that must be used on the compressor side. It's
+an upper limit, so anything below 8MB does not break decompresssion, but
+this must be somehow checked or saved along in the binary stream. You
+seem to use the lz4demo.c on the userspace side for compression, but
+this is not a standard tool nor the output format is well-defined or
+stabilized.
 
-> +	/* end of decoding */
-> +	return (int) (((char *)ip) - source);
-> +
-> +	/* write overflow error detected */
-> +_output_error:
-> +	return (int) (-(((char *)ip) - source));
-> +}
-> +
-> --- /dev/null
-> +++ b/lib/lz4/lz4defs.h
-> @@ -0,0 +1,93 @@
-> +#define LZ4_COPYSTEP(s, d)	\
-> +	do {	\
-> +		PUT8(s, d);	\
-> +		d += 8;	\
-> +		s += 8;	\
-> +	} while (0)
-> +
-> +#define LZ4_COPYPACKET(s, d)	LZ4_COPYSTEP(s, d)
-> +
-> +#define LZ4_SECURECOPY(s, d, e)	\
-> +	do {				\
-> +		if (d < e) {		\
-> +			LZ4_WILDCOPY(s, d, e);	\
-> +		}	\
-> +	} while (0)
-> +
-> +#else	/* 32-bit */
-> +#define STEPSIZE 4
-> +
-> +#define LZ4_COPYSTEP(s, d)	\
-> +	do {	\
-> +		PUT4(s, d);	\
-> +		d += 4;	\
-> +		s += 4;	\
-> +	} while (0)
-> +
-> +#define LZ4_COPYPACKET(s, d)	\
-> +	do {			\
-> +		LZ4_COPYSTEP(s, d);	\
-> +		LZ4_COPYSTEP(s, d);	\
-> +	} while (0)
-> +
-> +#define LZ4_SECURECOPY	LZ4_WILDCOPY
-> +#endif
-> +
-> +#define LZ4_READ_LITTLEENDIAN_16(d, s, p) \
-> +	(d = s - get_unaligned_le16(p))
-> +#define LZ4_WILDCOPY(s, d, e)	\
-> +	do {				\
-> +		LZ4_COPYPACKET(s, d);	\
-> +	} while (d < e)
+For proper use I would like to see a commandline tool similar to
+gzip/bzip2/lzop that can be packaged and shipped by distros, and the
+output format defintion.
 
-All the \ at the ends of lines would look better aligned in one column.
+Yann has some ideas for the format
+http://fastcompression.blogspot.cz/2012/04/file-container-format-for-lz4.html
+
+For kernel, the minimum of meta information is total compressed length,
+total uncompressed length and chunk size. I don't know if the first two
+aren't stored elsewhere in the generic kernel image headers, but chunk
+size must be specified.
+
 
 david
