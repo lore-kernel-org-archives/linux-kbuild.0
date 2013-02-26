@@ -1,56 +1,169 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wi0-f169.google.com ([209.85.212.169]:49707 "EHLO
-	mail-wi0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1759762Ab3BYUxp (ORCPT
+Received: from mail-pb0-f54.google.com ([209.85.160.54]:47406 "EHLO
+	mail-pb0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752667Ab3BZB3M (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 25 Feb 2013 15:53:45 -0500
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: Re: [PATCH] Use config scripts to detect ncurses libs for, menuconfig/nconfig dialogs
-Date: Mon, 25 Feb 2013 21:53:39 +0100
-References: <512A36BB.9070309@gentoo.org> <201302251930.22293.yann.morin.1998@free.fr> <512BCA76.6080601@gentoo.org>
-In-Reply-To: <512BCA76.6080601@gentoo.org>
-MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-15"
-Content-Transfer-Encoding: 7bit
-Message-Id: <201302252153.39465.yann.morin.1998@free.fr>
+	Mon, 25 Feb 2013 20:29:12 -0500
+Received: by mail-pb0-f54.google.com with SMTP id rr4so2018964pbb.13
+        for <linux-kbuild@vger.kernel.org>; Mon, 25 Feb 2013 17:29:12 -0800 (PST)
+From: Gary Lowell <gary.lowell@inktank.com>
+Subject: [PATCH 1/1] scripts/package/builddeb:  build perftools package.
+Date: Mon, 25 Feb 2013 17:30:18 -0800
+Message-Id: <1361842218-1768-1-git-send-email-gary.lowell@inktank.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: jlec@gentoo.org
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
+Cc: Sage Weil <sage@inktank.com>, linux-kernel@vger.kernel.org, Gary Lowell <gary.lowell@inktank.com>
 
-Justin, All,
+This will build a linux-tools-$version package for each build that includes
+perf.  We've been using this for internal builds and other folks might find
+it helpful.
 
-On Monday 25 February 2013 Justin wrote:
-> On 25.02.2013 19:30, Yann E. MORIN wrote:
-> > On Sunday 24 February 2013 Justin wrote:
-> >> when ncurses is build with --with-termlib several symbols are moved to a
-> >> seperate terminfo library (libtinfo.so). Current Kernel buildsystem
-> >> results in a build error with menuconfig and nconfig dialogs.
-> > 
-> > Do you know of a distribution where this is the case, so I can test?
-> 
-> This is using Gentoo Linux testing with ld.gold. But I assume you will
-> get the same result using any distro with gold.
+Signed-off-by: Gary Lowell <gary.lowell@inktank.com>
+---
+ scripts/package/builddeb |   95 +++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 94 insertions(+), 1 deletion(-)
 
-No, I meant a distro where ncurses is built with --with-termlib.
-On my Debian stable (squeeze), libtinfo does not exist at all,
-so I can not test linking against it:
-
-    $ apt-file search libtinfo
-    (zilch)
-
-But I'll see at installing a Gentoo (if that's not too complex) in a
-VM to do the checks (can you confirm that Gentoo by default configures
-ncurses with --with-termlib ?).
-
-Regards,
-Yann E. MORIN.
-
+diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+index acb8650..f57d33c 100644
+--- a/scripts/package/builddeb
++++ b/scripts/package/builddeb
+@@ -78,17 +78,20 @@ tmpdir="$objtree/debian/tmp"
+ fwdir="$objtree/debian/fwtmp"
+ kernel_headers_dir="$objtree/debian/hdrtmp"
+ libc_headers_dir="$objtree/debian/headertmp"
++tools_dir="$objtree/debian/toolstmp"
++tmp_build_dir="$objtree/debian/toolsbuild"
+ packagename=linux-image-$version
+ fwpackagename=linux-firmware-image
+ kernel_headers_packagename=linux-headers-$version
+ libc_headers_packagename=linux-libc-dev
++tools_packagename=linux-tools-$version
+ 
+ if [ "$ARCH" = "um" ] ; then
+ 	packagename=user-mode-linux-$version
+ fi
+ 
+ # Setup the directory structure
+-rm -rf "$tmpdir" "$fwdir" "$kernel_headers_dir" "$libc_headers_dir"
++rm -rf "$tmpdir" "$fwdir" "$kernel_headers_dir" "$libc_headers_dir" "$tools_dir" "$tmp_build_dir"
+ mkdir -m 755 -p "$tmpdir/DEBIAN"
+ mkdir -p  "$tmpdir/lib" "$tmpdir/boot" "$tmpdir/usr/share/doc/$packagename"
+ mkdir -m 755 -p "$fwdir/DEBIAN"
+@@ -98,6 +101,10 @@ mkdir -p "$libc_headers_dir/usr/share/doc/$libc_headers_packagename"
+ mkdir -m 755 -p "$kernel_headers_dir/DEBIAN"
+ mkdir -p "$kernel_headers_dir/usr/share/doc/$kernel_headers_packagename"
+ mkdir -p "$kernel_headers_dir/lib/modules/$version/"
++mkdir -m 755 -p "$tools_dir/DEBIAN"
++mkdir -p "$tools_dir/usr/share/doc/$tools_packagename"
++mkdir -p "$tools_dir/usr/bin/"
++mkdir -p "$tmp_build_dir"
+ if [ "$ARCH" = "um" ] ; then
+ 	mkdir -p "$tmpdir/usr/lib/uml/modules/$version" "$tmpdir/usr/bin"
+ fi
+@@ -120,6 +127,77 @@ else
+ 	fi
+ fi
+ 
++# Build the tools
++num_tools="0"
++tools_flavour_abi=${version#*-}
++tools_flavour=${tools_flavour_abi#*-}
++tools_version=${version%-$tools_flavour}
++debian_tools_version="${version%%-*}"
++debian_tools_version="${version%.*}"
++if grep -q '^CONFIG_PERF_EVENTS=y' .config ; then
++	# Build and install perf
++	(
++	 unset MAKEFLAGS
++	 unset MFLAGS
++	 unset MAKEOVERRIDES
++
++	 mkdir -p $objtree/tools/perf
++	 cd "$srctree/tools/perf"
++	 $MAKE DESTDIR="$tools_dir/usr/" LDFLAGS= O=$objtree/tools/perf/ install
++	 mv "$tools_dir/usr/bin/perf" "$tools_dir/usr/bin/perf_$debian_tools_version"
++	 ln -s "/usr/bin/perf_$debian_tools_version" "$tools_dir/usr/bin/perf_$tools_version"
++	 mv "$tools_dir/usr/libexec/perf-core" "$tools_dir/usr/share/perf_$debian_tools_version-core"
++	 rmdir "$tools_dir/usr/libexec"
++
++	 # Documentation can't be built out-of-tree so copy source
++	 # over to objtree and build man pages there
++	 mkdir -p $tmp_build_dir/perf
++	 cp -a "$srctree/tools/perf/Documentation" "$tmp_build_dir/perf/"
++	 cp -a "$srctree/tools/perf/config" "$tmp_build_dir/perf/"
++	 cd "$tmp_build_dir/perf/Documentation"
++	 $MAKE man
++	 $MAKE DESTDIR="$tools_dir/usr/" install
++	 for manpage in `find $tools_dir/usr/share/man/ -type f`; do
++		mv $manpage ${manpage/perf/perf_$debian_tools_version}
++		gzip -9 ${manpage/perf/perf_$debian_tools_version}
++	 done
++	)
++	num_tools=$(($num_tools+1))
++fi
++
++if [[ "$ARCH" = "i386" || "$ARCH" = "x86_64" ]]; then
++	# Build turbostat
++	(
++	 cp -a $srctree/tools/power/x86/turbostat "$tmp_build_dir"
++	 ln -s $srctree/arch "$tmp_build_dir/../../../arch"
++	 cd "$tmp_build_dir/turbostat/"
++	 unset MAKEFLAGS
++	 unset MFLAGS
++	 unset MAKEOVERRIDES
++	 $MAKE LDFLAGS=
++	 cp turbostat "$tools_dir/usr/bin/turbostat_$debian_tools_version"
++	 ln -s "/usr/bin/turbostat_$debian_tools_version" "$tools_dir/usr/bin/turbostat_$tools_version"
++	 mkdir -p "$tools_dir/usr/share/man/man8"
++	 cp turbostat.8 "$tools_dir/usr/share/man/man8/turbotstat_${debian_tools_version}.8"
++	 gzip -9 "$tools_dir/usr/share/man/man8/turbotstat_${debian_tools_version}.8"
++	)
++
++	# Build x86_energy_perf_policy
++	(
++	 cp -a $srctree/tools/power/x86/x86_energy_perf_policy "$tmp_build_dir"
++	 cd "$tmp_build_dir/x86_energy_perf_policy"
++	 unset MAKEFLAGS
++	 unset MFLAGS
++	 unset MAKEOVERRIDES
++	 $MAKE LDFLAGS=
++	 cp x86_energy_perf_policy "$tools_dir/usr/bin/x86_energy_perf_policy_$debian_tools_version"
++	 ln -s "/usr/bin/x86_energy_perf_policy_$debian_tools_version" "$tools_dir/usr/bin/x86_energy_perf_policy_$tools_version"
++	 cp x86_energy_perf_policy.8 "$tools_dir/usr/share/man/man8/x86_energy_perf_policy_${debian_tools_version}.8"
++	 gzip -9 "$tools_dir/usr/share/man/man8/x86_energy_perf_policy_${debian_tools_version}.8"
++	)
++	num_tools=$(($num_tools+2))
++fi
++
+ if grep -q '^CONFIG_MODULES=y' .config ; then
+ 	INSTALL_MOD_PATH="$tmpdir" $MAKE KBUILD_SRC= modules_install
+ 	rm -f "$tmpdir/lib/modules/$version/build"
+@@ -292,9 +370,24 @@ Description: Linux support headers for userspace development
+  are used by the installed headers for GNU glibc and other system libraries.
+ EOF
+ 
++cat <<EOF >> debian/control
++
++Package: $tools_packagename
++Section: devel
++Architecture: $arch
++Depends: \${shlibs:Depends}
++Description: Linux kernel tools for version $version
++ This package provides the architecture dependant parts for kernel
++ version locked tools for version $version
++EOF
++
+ if [ "$ARCH" != "um" ]; then
+ 	create_package "$kernel_headers_packagename" "$kernel_headers_dir"
+ 	create_package "$libc_headers_packagename" "$libc_headers_dir"
++	if [ "$num_tools" > "0" ]; then
++		dpkg-shlibdeps $tools_dir/usr/bin/*
++		create_package "$tools_packagename" "$tools_dir"
++	fi
+ fi
+ 
+ create_package "$packagename" "$tmpdir"
 -- 
-.-----------------.--------------------.------------------.--------------------.
-|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
-| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
-| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
-| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
-'------------------------------^-------^------------------^--------------------'
+1.7.9.5
+
