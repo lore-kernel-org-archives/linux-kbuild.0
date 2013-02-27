@@ -1,49 +1,88 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bar.sig21.net ([80.81.252.164]:43644 "EHLO bar.sig21.net"
+Received: from cantor2.suse.de ([195.135.220.15]:35902 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751213Ab3B0KWw (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 27 Feb 2013 05:22:52 -0500
-Date: Wed, 27 Feb 2013 11:20:53 +0100
-From: Johannes Stezenbach <js@sig21.net>
-Subject: Re: [RFC PATCH v2 0/4] Add support for LZ4-compressed kernel
-Message-ID: <20130227102053.GA24274@sig21.net>
-References: <1361859870-15751-1-git-send-email-kyungsik.lee@lge.com>
- <512D1C12.4080109@oberhumer.com>
- <20130227073646.GA22333@Corona>
- <20130227095139.GX17833@n2100.arm.linux.org.uk>
+	id S1759943Ab3B0NQL (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 27 Feb 2013 08:16:11 -0500
+Date: Wed, 27 Feb 2013 14:16:01 +0100
+From: Michal Marek <mmarek@suse.cz>
+Subject: [GIT] kbuild changes for v3.9-rc1
+Message-ID: <20130227131600.GA31783@sepie.suse.cz>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20130227095139.GX17833@n2100.arm.linux.org.uk>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Russell King - ARM Linux <linux@arm.linux.org.uk>
-Cc: Kyungsik Lee <kyungsik.lee@lge.com>, Andrew Morton <akpm@linux-foundation.org>, "Markus F.X.J. Oberhumer" <markus@oberhumer.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, Michal Marek <mmarek@suse.cz>, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, x86@kernel.org, celinux-dev@lists.celinuxforum.org, Nicolas Pitre <nico@fluxnic.net>, Nitin Gupta <nitingupta910@gmail.com>, Richard Purdie <rpurdie@openedhand.com>, Josh Triplett <josh@joshtriplett.org>, Joe Millenbach <jmillenbach@gmail.com>, David Sterba <dsterba@suse.cz>, Richard Cochran <richardcochran@gmail.com>, Albin Tonnerre <albin.tonnerre@free-electrons.com>, Egon Alter <egon.alter@gmx.net>, hyojun.im@lge.com, chan.jeong@lge.com, raphael.andy.lee@gmail.com
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: ak@linux.intel.com, christophe.leroy@c-s.fr, hpa@zytor.com, james.hogan@imgtec.com, jesper.nilsson@axis.com, m.grzeschik@pengutronix.de, mmarek@suse.cz, schwab@linux-m68k.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Wed, Feb 27, 2013 at 09:51:39AM +0000, Russell King - ARM Linux wrote:
-> On Wed, Feb 27, 2013 at 04:36:47PM +0900, Kyungsik Lee wrote:
-> > Compiler: Linaro ARM gcc 4.6.2
-> > 2. ARMv7, 1.7GHz based board
-> >    Kernel: linux 3.7
-> >    Uncompressed Kernel Size: 14MB
-> >          Compressed Size  Decompression Speed
-> >     LZO  6.0MB            34.1MB/s            Old
-> >          ----------------------------------------
-> >          6.0MB            34.7MB/s            New
-> >          6.0MB            52.2MB/s(UA)
-> >     =============================================
-> >     LZ4  6.5MB            86.7MB/s
-> > UA: Unaligned memory Access support
-> 
-> That is pretty conclusive - it shows an 8% increase in image size vs a
-> 66% increase in decompression speed.  It will take a _lot_ to offset
-> that increase in decompression speed.
-> 
-> So, what I think is that yes, we should accept LZ4 and drop LZO from
-> the kernel - the "fast but may not be small" compression title has
-> clearly been taken by LZ4.
+Hi Linus,
 
-I think LZO may be used by squashfs, jffs2 and btrfs, thus you
-cannot drop it without breaking on disk storage formats.
+please pull these kbuild changes for v3.9-rc1:
 
-Johannes
+* Alias generation in modpost is cross-compile safe.
+* kernel/timeconst.h is now generated using a bc script instead of perl.
+* scripts/link-vmlinux.sh now works with an alternative $KCONFIG_CONFIG.
+* destination-y for exported headers is supported in Kbuild files again.
+* depmod is called with -P $CONFIG_SYMBOL_PREFIX on architectures that
+  need it.
+* CONFIG_DEBUG_INFO_REDUCED disables var-tracking
+* scripts/setlocalversion works with too much translated locales ;)
+
+Michal
+
+The following changes since commit a49f0d1ea3ec94fc7cf33a7c36a16343b74bd565:
+
+  Linux 3.8-rc1 (2012-12-21 17:19:00 -0800)
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git kbuild
+
+for you to fetch changes up to 423a8155facf23719078ff63911c1e85ba40970b:
+
+  kbuild: Fix reading of .config in link-vmlinux.sh (2013-02-25 16:14:48 +0100)
+
+----------------------------------------------------------------
+Andi Kleen (1):
+      Kbuild: Disable var tracking with CONFIG_DEBUG_INFO_REDUCED
+
+Andreas Schwab (1):
+      mod/file2alias: make modalias generation safe for cross compiling
+
+Christophe Leroy (1):
+      kbuild: Unset language specific variables in setlocalversion script
+
+H. Peter Anvin (1):
+      kernel: Replace timeconst.pl with a bc script
+
+James Hogan (1):
+      depmod: pass -P $CONFIG_SYMBOL_PREFIX
+
+Jesper Nilsson (1):
+      kbuild: Fix destination-y for installed headers
+
+Michael Grzeschik (1):
+      scripts/link-vmlinux.sh: source variables from KCONFIG_CONFIG
+
+Michal Marek (1):
+      kbuild: Fix reading of .config in link-vmlinux.sh
+
+ Makefile                          |    6 +-
+ include/linux/mod_devicetable.h   |   58 +---
+ kernel/Makefile                   |   16 +-
+ kernel/timeconst.bc               |  108 ++++++
+ kernel/timeconst.pl               |  378 ---------------------
+ scripts/Makefile.headersinst      |    6 +-
+ scripts/Makefile.modpost          |    7 +-
+ scripts/depmod.sh                 |   26 +-
+ scripts/link-vmlinux.sh           |    9 +-
+ scripts/mod/.gitignore            |    1 +
+ scripts/mod/Makefile              |   35 ++
+ scripts/mod/devicetable-offsets.c |  178 ++++++++++
+ scripts/mod/file2alias.c          |  674 ++++++++++++++++++++-----------------
+ scripts/mod/modpost.c             |    5 +-
+ scripts/setlocalversion           |    2 +-
+ 15 files changed, 749 insertions(+), 760 deletions(-)
+ create mode 100644 kernel/timeconst.bc
+ delete mode 100644 kernel/timeconst.pl
+ create mode 100644 scripts/mod/devicetable-offsets.c
