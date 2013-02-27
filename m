@@ -1,70 +1,32 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:36419 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1756626Ab3B0N2L (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 27 Feb 2013 08:28:11 -0500
-Date: Wed, 27 Feb 2013 14:28:09 +0100
-From: Michal Marek <mmarek@suse.cz>
-Subject: [GIT] kbuild misc changes for v3.9-rc1
-Message-ID: <20130227132809.GA32484@sepie.suse.cz>
+Received: from mail-wi0-f176.google.com ([209.85.212.176]:36048 "EHLO
+	mail-wi0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751777Ab3B0NsJ (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 27 Feb 2013 08:48:09 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Reply-To: sedat.dilek@gmail.com
+Date: Wed, 27 Feb 2013 14:48:08 +0100
+Message-ID: <CA+icZUXEiRLJFke4S-M2wOr+Gxc4fnWSsT-OD=6kUR6LDQhARA@mail.gmail.com>
+Subject: Re: [GIT] kbuild changes for v3.9-rc1
+From: Sedat Dilek <sedat.dilek@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Julia.Lawall@lip6.fr, bernd.schubert@itwm.fraunhofer.de, drbild@umich.edu, peter.senna@gmail.com, schwab@linux-m68k.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>
 
-Hi Linus,
+Hi Marek,
 
-these are the non-critical kbuild changes for v3.9-rc1:
+as I see the today's git-pull-request for linux-kbuild... I and some
+other people (see 2/3 and 3/3) sent minor fixes to deb-pkg.
+Where they overseen?
+Anything wrong with them?
+( Sorry, didn't follow linux-kbuild ML for a while. )
 
-* Fix for make TAGS
-* Fix for make rpm
-* Some new coccinelle semantic patches
+Regards,
+- Sedat -
 
-Please pull, thanks.
-Michal
-
-
-The following changes since commit a49f0d1ea3ec94fc7cf33a7c36a16343b74bd565:
-
-  Linux 3.8-rc1 (2012-12-21 17:19:00 -0800)
-
-are available in the git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git misc
-
-for you to fetch changes up to 24f0c2d6ff859fbca45fd765f0d241528bdb4365:
-
-  scripts/coccinelle: find constant additions that could be bit ors (2013-02-22 14:26:00 +0100)
-
-----------------------------------------------------------------
-Andreas Schwab (1):
-      scripts/tags.sh: Fix regex syntax for etags
-
-Bernd Schubert (2):
-      coccicheck: Allow the user to give a V= (verbose) argument
-      coccicheck: Allow to show the executed command line
-
-David R. Bild (1):
-      kbuild: clear KBUILD_SRC when calling 'make' in RPM spec
-
-Julia Lawall (1):
-      scripts/coccinelle: find constant additions that could be bit ors
-
-Peter Senna Tschudin (2):
-      scripts/coccinelle/misc/semicolon.cocci: Add unneeded semicolon test
-      scripts/coccinelle/misc/memcpy-assign.cocci: Replace memcpy with struct assignment
-
- Documentation/coccinelle.txt                |    4 ++
- scripts/coccicheck                          |   39 +++++++---
- scripts/coccinelle/misc/memcpy-assign.cocci |  103 +++++++++++++++++++++++++++
- scripts/coccinelle/misc/orplus.cocci        |   55 ++++++++++++++
- scripts/coccinelle/misc/semicolon.cocci     |   83 +++++++++++++++++++++
- scripts/package/mkspec                      |    2 +-
- scripts/tags.sh                             |   50 ++++++-------
- 7 files changed, 302 insertions(+), 34 deletions(-)
- create mode 100644 scripts/coccinelle/misc/memcpy-assign.cocci
- create mode 100644 scripts/coccinelle/misc/orplus.cocci
- create mode 100644 scripts/coccinelle/misc/semicolon.cocci
+[PATCH 1/3] kbuild, deb-pkg: Try to determine distribution
+[PATCH 2/3] kbuild, deb-pkg: Bump year in debian/copyright file
+[PATCH 3/3] kbuild, deb-pkg: Update git repository URL in debian/copyright file
