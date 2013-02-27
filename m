@@ -1,31 +1,97 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from perches-mx.perches.com ([206.117.179.246]:56712 "EHLO
-	labridge.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1758646Ab3B0Bkl (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 26 Feb 2013 20:40:41 -0500
-Message-ID: <1361929234.1924.8.camel@joe-AO722>
-Subject: Re: [RFC PATCH v2 0/4] Add support for LZ4-compressed kernel
-From: Joe Perches <joe@perches.com>
-Date: Tue, 26 Feb 2013 17:40:34 -0800
-In-Reply-To: <20130226221027.GW17833@n2100.arm.linux.org.uk>
+Received: from LGEMRELSE6Q.lge.com ([156.147.1.121]:53091 "EHLO
+	LGEMRELSE6Q.lge.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752773Ab3B0Ei1 (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 26 Feb 2013 23:38:27 -0500
+Date: Wed, 27 Feb 2013 13:38:24 +0900
+From: Kyungsik Lee <kyungsik.lee@lge.com>
+Subject: Re: [RFC PATCH v2 1/4] decompressor: Add LZ4 decompressor module
+Message-ID: <20130227043824.GA5652@Corona>
 References: <1361859870-15751-1-git-send-email-kyungsik.lee@lge.com>
-	 <512D1C12.4080109@oberhumer.com>
-	 <alpine.LFD.2.03.1302261557220.1254@syhkavp.arg>
-	 <87fw0i7n6d.fsf@dell.be.48ers.dk>
-	 <20130226221027.GW17833@n2100.arm.linux.org.uk>
-Content-Type: text/plain; charset="ISO-8859-1"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+ <1361859870-15751-2-git-send-email-kyungsik.lee@lge.com>
+ <20130226131206.GW27541@twin.jikos.cz>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20130226131206.GW27541@twin.jikos.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Russell King - ARM Linux <linux@arm.linux.org.uk>
-Cc: Peter Korsgaard <jacmet@sunsite.dk>, Nicolas Pitre <nico@fluxnic.net>, "Markus F.X.J. Oberhumer" <markus@oberhumer.com>, Kyungsik Lee <kyungsik.lee@lge.com>, Andrew Morton <akpm@linux-foundation.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, Michal Marek <mmarek@suse.cz>, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, x86@kernel.org, celinux-dev@lists.celinuxforum.org, Nitin Gupta <nitingupta910@gmail.com>, Richard Purdie <rpurdie@openedhand.com>, Josh Triplett <josh@joshtriplett.org>, Joe Millenbach <jmillenbach@gmail.com>, David Sterba <dsterba@suse.cz>, Richard Cochran <richardcochran@gmail.com>, Albin Tonnerre <albin.tonnerre@free-electrons.com>, Egon Alter <egon.alter@gmx.net>, hyojun.im@lge.com, chan.jeong@lge.com, raphael.andy.lee@gmail.com
+To: David Sterba <dsterba@suse.cz>
+Cc: Andrew Morton <akpm@linux-foundation.org>, Russell King <linux@arm.linux.org.uk>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, Michal Marek <mmarek@suse.cz>, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, x86@kernel.org, celinux-dev@lists.celinuxforum.org, Nicolas Pitre <nico@fluxnic.net>, Nitin Gupta <nitingupta910@gmail.com>, "Markus F.X.J. Oberhumer" <markus@oberhumer.com>, Richard Purdie <rpurdie@openedhand.com>, Josh Triplett <josh@joshtriplett.org>, Joe Millenbach <jmillenbach@gmail.com>, Richard Cochran <richardcochran@gmail.com>, Albin Tonnerre <albin.tonnerre@free-electrons.com>, Egon Alter <egon.alter@gmx.net>, hyojun.im@lge.com, chan.jeong@lge.com, raphael.andy.lee@gmail.com
 
-On Tue, 2013-02-26 at 22:10 +0000, Russell King - ARM Linux wrote:
-> So... for a selected kernel version of a particular size, can we please
-> have a comparison between the new LZO code and this LZ4 code, so that
-> we can see whether it's worth updating the LZO code or replacing the
-> LZO code with LZ4?
+On Tue, Feb 26, 2013 at 02:12:06PM +0100, David Sterba wrote:
+> On Tue, Feb 26, 2013 at 03:24:27PM +0900, Kyungsik Lee wrote:
+> > This patch adds support for LZ4 decompression in the Linux Kernel.
+> > LZ4 Decompression APIs for kernel are based on LZ4 implementation
+> > by Yann Collet.
+> > 
+> > LZ4 homepage : http://fastcompression.blogspot.com/p/lz4.html
+> > LZ4 source repository : http://code.google.com/p/lz4/
+> 
+> What SVN version did you use?
+It's based on r88.
 
-How could it be questionable that it's worth updating the LZO code?
+> > +/*
+> > + * LZ4_COMPRESSBOUND()
+> > + * Provides the maximum size that LZ4 may output in a "worst case" scenario
+> > + * (input data not compressible)
+> > + */
+> > +#define LZ4_COMPRESSBOUND(isize) (isize + ((isize)/255) + 16)
+> 
+> For safety reasons I suggest to add a temporary variable to avoid double
+> evaluation of isize.
+Yes, Good point.
+> > --- /dev/null
+> > +++ b/lib/lz4/lz4_decompress.c
+> > +	}
+> > +	cpy = op + length - (STEPSIZE - 4);
+> > +	if (cpy > oend - COPYLENGTH) {
+> > +
+> > +		/* Error: request to write beyond destination buffer */
+> > +		if (cpy > oend)
+> > +			goto _output_error;
+> > +		LZ4_SECURECOPY(ref, op, (oend - COPYLENGTH));
+> > +		while (op < cpy)
+> > +			*op++ = *ref++;
+> > +		op = cpy;
+> > +		/*
+> > +		 * Check EOF (should never happen, since last 5 bytes
+> > +		 * are supposed to be literals)
+> > +		 */
+> > +		if (op == oend)
+> > +			goto _output_error;
+> > +		continue;
+> > +	}
+> > +		LZ4_SECURECOPY(ref, op, cpy);
+> > +		op = cpy; /* correction */
+> > +	}
+> 
+> Does this compile? The } is an extra one, and does not match the
+> original sources.
+>
+It's about indent errors. The } is a pair of braces regarding
+"while (1) {". However it compiled. It will be fixed.
+ 
+> > +#define LZ4_COPYPACKET(s, d)	\
+> > +	do {			\
+> > +		LZ4_COPYSTEP(s, d);	\
+> > +		LZ4_COPYSTEP(s, d);	\
+> > +	} while (0)
+> > +
+> > +#define LZ4_SECURECOPY	LZ4_WILDCOPY
+> > +#endif
+> > +
+> > +#define LZ4_READ_LITTLEENDIAN_16(d, s, p) \
+> > +	(d = s - get_unaligned_le16(p))
+> > +#define LZ4_WILDCOPY(s, d, e)	\
+> > +	do {				\
+> > +		LZ4_COPYPACKET(s, d);	\
+> > +	} while (d < e)
+> 
+> All the \ at the ends of lines would look better aligned in one column.
+>
+Yes, right. It looks better if it's aligned.
 
+Thanks,
+Kyungsik
