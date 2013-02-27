@@ -1,78 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.not-your-server.de ([78.46.182.243]:53005 "EHLO
-	mail.not-your-server.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1759975Ab3B0OaX (ORCPT
+Received: from relais.videotron.ca ([24.201.245.36]:41070 "EHLO
+	relais.videotron.ca" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1759785Ab3B0PfN (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 27 Feb 2013 09:30:23 -0500
-Message-ID: <512E186F.6090507@gentoo.org>
-Date: Wed, 27 Feb 2013 15:30:07 +0100
-From: justin <jlec@gentoo.org>
-MIME-Version: 1.0
-Subject: Re: [PATCH] Use config scripts to detect ncurses libs for, menuconfig/nconfig
- dialogs
-References: <512A36BB.9070309@gentoo.org> <201302251930.22293.yann.morin.1998@free.fr> <512BCA76.6080601@gentoo.org> <201302252153.39465.yann.morin.1998@free.fr>
-In-Reply-To: <201302252153.39465.yann.morin.1998@free.fr>
-Content-Type: multipart/signed; micalg=pgp-sha512;
- protocol="application/pgp-signature";
- boundary="----enig2IPNTDIXUNMBLPJERUVWT"
+	Wed, 27 Feb 2013 10:35:13 -0500
+MIME-version: 1.0
+Content-transfer-encoding: 7BIT
+Content-type: TEXT/PLAIN; CHARSET=US-ASCII
+Date: Wed, 27 Feb 2013 10:35:11 -0500 (EST)
+From: Nicolas Pitre <nico@fluxnic.net>
+Subject: Re: [RFC PATCH v2 0/4] Add support for LZ4-compressed kernel
+In-reply-to: <20130227102053.GA24274@sig21.net>
+Message-id: <alpine.LFD.2.03.1302271027251.1254@syhkavp.arg>
+References: <1361859870-15751-1-git-send-email-kyungsik.lee@lge.com>
+ <512D1C12.4080109@oberhumer.com> <20130227073646.GA22333@Corona>
+ <20130227095139.GX17833@n2100.arm.linux.org.uk>
+ <20130227102053.GA24274@sig21.net>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Johannes Stezenbach <js@sig21.net>
+Cc: Russell King - ARM Linux <linux@arm.linux.org.uk>, Kyungsik Lee <kyungsik.lee@lge.com>, Andrew Morton <akpm@linux-foundation.org>, "Markus F.X.J. Oberhumer" <markus@oberhumer.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, Michal Marek <mmarek@suse.cz>, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, x86@kernel.org, celinux-dev@lists.celinuxforum.org, Nitin Gupta <nitingupta910@gmail.com>, Richard Purdie <rpurdie@openedhand.com>, Josh Triplett <josh@joshtriplett.org>, Joe Millenbach <jmillenbach@gmail.com>, David Sterba <dsterba@suse.cz>, Richard Cochran <richardcochran@gmail.com>, Albin Tonnerre <albin.tonnerre@free-electrons.com>, Egon Alter <egon.alter@gmx.net>, hyojun.im@lge.com, chan.jeong@lge.com, raphael.andy.lee@gmail.com
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
-------enig2IPNTDIXUNMBLPJERUVWT
-Content-Type: text/plain; charset=ISO-8859-15
-Content-Transfer-Encoding: quoted-printable
+On Wed, 27 Feb 2013, Johannes Stezenbach wrote:
 
-On 25/02/13 21:53, Yann E. MORIN wrote:
->>> Do you know of a distribution where this is the case, so I can test?
+> On Wed, Feb 27, 2013 at 09:51:39AM +0000, Russell King - ARM Linux wrote:
+> > On Wed, Feb 27, 2013 at 04:36:47PM +0900, Kyungsik Lee wrote:
+> > > Compiler: Linaro ARM gcc 4.6.2
+> > > 2. ARMv7, 1.7GHz based board
+> > >    Kernel: linux 3.7
+> > >    Uncompressed Kernel Size: 14MB
+> > >          Compressed Size  Decompression Speed
+> > >     LZO  6.0MB            34.1MB/s            Old
+> > >          ----------------------------------------
+> > >          6.0MB            34.7MB/s            New
+> > >          6.0MB            52.2MB/s(UA)
+> > >     =============================================
+> > >     LZ4  6.5MB            86.7MB/s
+> > > UA: Unaligned memory Access support
+> > 
+> > That is pretty conclusive - it shows an 8% increase in image size vs a
+> > 66% increase in decompression speed.  It will take a _lot_ to offset
+> > that increase in decompression speed.
+> > 
+> > So, what I think is that yes, we should accept LZ4 and drop LZO from
+> > the kernel - the "fast but may not be small" compression title has
+> > clearly been taken by LZ4.
+> 
+> I think LZO may be used by squashfs, jffs2 and btrfs, thus you
+> cannot drop it without breaking on disk storage formats.
 
-Fedora is also building with --with-termlib but they are using a ld
-script to workaround the linking problem. I talked to our (Gentoo Linux)
-base-system maintainers but they refused to apply this, instead they
-said the consuming packages should be fixed. This is now an ongoing effor=
-t.
-
-> But I'll see at installing a Gentoo (if that's not too complex) in a
-> VM to do the checks (can you confirm that Gentoo by default configures
-> ncurses with --with-termlib ?).
->=20
-
-It is not the "default" configuration in a classic sense, because it
-will only build with that option if a consuming package requests this.
-
-Here the receipt for generic reproduction:
-
-* Get yourself a copy of our live dvd
-(http://gentoo.inode.at//releases/x86/20121221/)
-* Kick a vm or boot from the dvd (Make sure you have enough RAM, because
-you will compile ncurses on it and place the git checkout there.)
-* Get a terminal and switch to root
-* Update the package db by running: emerge --sync
-* Rebuild ncurses with:
-ACCEPT_KEYWORDS=3D"~x86" USE=3D"tinfo" emerge -va1 ncurses
-Important here that "tinfo" is marked as changing USE (colored green)
-* Switch to ld.gold with "binutils-config --linker ld.gold" (make sure
-that it worked out -> ld -v)
-* git clone the kernel and do your testing.
+It is not about dropping LZO from the kernel entirely.  It's about 
+removing support for compressing zImage using LZO (and some others).  
+There is no compatibility issue as zImage embeds its own decompression 
+code.
 
 
-Justin
-
-
-------enig2IPNTDIXUNMBLPJERUVWT
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.19 (GNU/Linux)
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iEYEAREKAAYFAlEuGG8ACgkQgAnW8HDreRZRAQCfXKHb4IHN5/vKMc6fFIbiZ7xT
-VZ4AnR4jdTHd0bn9KghYnK400AUHke0/
-=66a6
------END PGP SIGNATURE-----
-
-------enig2IPNTDIXUNMBLPJERUVWT--
+Nicolas
