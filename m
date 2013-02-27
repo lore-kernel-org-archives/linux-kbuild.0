@@ -1,70 +1,107 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wg0-f48.google.com ([74.125.82.48]:41672 "EHLO
-	mail-wg0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750805Ab3B0TDF (ORCPT
+Received: from mail.free-electrons.com ([94.23.35.102]:59124 "EHLO
+	mail.free-electrons.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753005Ab3B0UlH (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 27 Feb 2013 14:03:05 -0500
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: Re: [PATCH 2/2] Use config scripts to detect ncurses libs for nconfig
-Date: Wed, 27 Feb 2013 20:02:59 +0100
-References: <jlec@gentoo.org> <1361988458-18486-1-git-send-email-jlec@gentoo.org> <1361988458-18486-2-git-send-email-jlec@gentoo.org>
-In-Reply-To: <1361988458-18486-2-git-send-email-jlec@gentoo.org>
-MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-15"
+	Wed, 27 Feb 2013 15:41:07 -0500
+Date: Wed, 27 Feb 2013 21:41:02 +0100
+From: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
+Subject: randconfig bug when used with KCONFIG_ALLCONFIG
+Message-ID: <20130227214102.6d63544d@skate>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Message-Id: <201302272002.59833.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: jlec@gentoo.org, linux-kernel@vger.kernel.org
+To: linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>
 
-Justin, All,
+Hello,
 
-On Wednesday 27 February 2013 jlec@gentoo.org wrote:
-> From: Justin Lecher <jlec@gentoo.org>
-> 
-> When building ncurses with --with-termlib several symbols get moved from
-> libncurses.so to libtinfo.so. Thus when linking with libncurses.so, one
-> additionally needs to link with libtinfo.so.
-> 
-> Ncurses provides a config script (ncurses5-config) to assist finding ncurses.
-> This patch makes use of it to detect the necessary libs for linking of the
-> ncurses nconfig dialog.
-> 
-> Signed-off-by: Justin Lecher <jlec@gentoo.org>
+I'd like to report that the randconfig code seems to have a bug when it
+is given a set of fixed values using KCONFIG_ALLCONFIG: it forgets to
+randomize choice values.
 
-Ditto for the subject, as for your previous patch.
+Take the following Config.test.in:
 
-> ---
->  scripts/kconfig/Makefile | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
-> index 3091794..7ddbf98 100644
-> --- a/scripts/kconfig/Makefile
-> +++ b/scripts/kconfig/Makefile
-> @@ -216,7 +216,7 @@ HOSTCFLAGS_gconf.o	= `pkg-config --cflags gtk+-2.0 gmodule-2.0 libglade-2.0` \
->  
->  HOSTLOADLIBES_mconf   = $(shell $(CONFIG_SHELL) $(check-lxdialog) -ldflags $(HOSTCC))
->  
-> -HOSTLOADLIBES_nconf	= -lmenu -lpanel -lncurses
-> +HOSTLOADLIBES_nconf	= -lmenu -lpanel `ncursesw5-config --libs 2>/dev/null || ncurses5-config --libs 2>/dev/null`
+-----8<----------8<------------8<----------
+config OPTIONA
+       bool "Option A"
 
-Long-line. Also, this expands the `...` in the shell, not in the Makefile.
-I'd rather have the expansion be done by the Makefile:
+choice
+	prompt "This is a choice"
 
-HOSTLOADLIBES_nconf	= -lmenu -lpanel
-HOSTLOADLIBES_nconf	+= $(shell    ncursesw5-config --libs 2>/dev/null \
-				   || ncurses5-config --libs 2>/dev/null  )
+config CHOICE_OPTIONA
+	bool "Choice Option A"
 
-Regards,
-Yann E. MORIN.
+config CHOICE_OPTIONB
+	bool "Choice Option B"
 
+endchoice
+
+config OPTIONB
+       bool "Option B"
+-----8<----------8<------------8<----------
+
+If you do (using the kernel's kconfig):
+
+ ./scripts/kconfig/conf --randconfig Config.test.in
+
+you will see that the generated .config file properly randomizes all
+options, including CHOICE_OPTIONA and CHOICE_OPTIONB.
+
+Now, if we create a partial .config (named orig.config) file to set
+the value of some options:
+
+-----8<----------8<------------8<----------
+CONFIG_OPTIONA=y
+-----8<----------8<------------8<----------
+
+If you do:
+
+ KCONFIG_ALLCONFIG=orig.config ./scripts/kconfig/conf --randconfig Config.test.in
+
+and look at the resulting .config, you will see that:
+
+ * CONFIG_OPTIONA is always set to y, which is OK.
+
+ * CONFIG_OPTIONB is properly randomized
+
+ * But in the choice, it's always CONFIG_CHOICE_OPTIONA that will be
+   selected, and never CONFIG_CHOICE_OPTIONB. The randomization for
+   choices doesn't work as soon as a file is passed as
+   KCONFIG_ALLCONFIG.
+
+As you can see, the randomization of choices does not work properly
+when KCONFIG_ALLCONFIG is used.
+
+I've looked a little bit in the code, and in the following piece of
+code from confdata.c:
+
+	for_all_symbols(i, csym) {
+		if (sym_has_value(csym) || !sym_is_choice(csym))
+			continue;
+
+		sym_calc_value(csym);
+		if (mode == def_random)
+			randomize_choice_values(csym);
+		else
+			set_all_choice_values(csym);
+	}
+
+which is normally responsible for randomizing choice values,
+sym_has_value(csym) returns true for all choice options when
+KCONFIG_ALLCONFIG is used, which explains why the choices are not
+randomized. I haven't found out though why the kconfig code thinks that
+all choice values already have a value, even though no value has been
+passed through the KCONFIG_ALLCONFIG file.
+
+Any hints? Or patch to test?
+
+Thanks,
+
+Thomas Petazzoni
 -- 
-.-----------------.--------------------.------------------.--------------------.
-|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
-| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
-| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
-| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
-'------------------------------^-------^------------------^--------------------'
+Thomas Petazzoni, Free Electrons
+Kernel, drivers, real-time and embedded Linux
+development, consulting, training and support.
+http://free-electrons.com
