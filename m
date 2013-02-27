@@ -1,65 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from relais.videotron.ca ([24.201.245.36]:64256 "EHLO
-	relais.videotron.ca" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752265Ab3B0QI7 (ORCPT
+Received: from caramon.arm.linux.org.uk ([78.32.30.218]:51327 "EHLO
+	caramon.arm.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1758651Ab3B0Qd5 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 27 Feb 2013 11:08:59 -0500
-MIME-version: 1.0
-Content-transfer-encoding: 7BIT
-Content-type: TEXT/PLAIN; CHARSET=US-ASCII
-Date: Wed, 27 Feb 2013 11:08:53 -0500 (EST)
-From: Nicolas Pitre <nico@fluxnic.net>
+	Wed, 27 Feb 2013 11:33:57 -0500
+Date: Wed, 27 Feb 2013 16:31:18 +0000
+From: Russell King - ARM Linux <linux@arm.linux.org.uk>
 Subject: Re: [RFC PATCH v2 0/4] Add support for LZ4-compressed kernel
-In-reply-to: <1361980152.2035.13.camel@joe-AO722>
-Message-id: <alpine.LFD.2.03.1302271055430.1254@syhkavp.arg>
-References: <1361859870-15751-1-git-send-email-kyungsik.lee@lge.com>
- <512D1C12.4080109@oberhumer.com>
- <alpine.LFD.2.03.1302261557220.1254@syhkavp.arg>
- <87fw0i7n6d.fsf@dell.be.48ers.dk>
- <20130226221027.GW17833@n2100.arm.linux.org.uk>
- <1361929234.1924.8.camel@joe-AO722>
- <20130227095609.GY17833@n2100.arm.linux.org.uk>
- <1361980152.2035.13.camel@joe-AO722>
+Message-ID: <20130227163118.GB17833@n2100.arm.linux.org.uk>
+References: <1361859870-15751-1-git-send-email-kyungsik.lee@lge.com> <512D1C12.4080109@oberhumer.com> <alpine.LFD.2.03.1302261557220.1254@syhkavp.arg> <87fw0i7n6d.fsf@dell.be.48ers.dk> <20130226221027.GW17833@n2100.arm.linux.org.uk> <1361929234.1924.8.camel@joe-AO722> <20130227095609.GY17833@n2100.arm.linux.org.uk> <1361980152.2035.13.camel@joe-AO722>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1361980152.2035.13.camel@joe-AO722>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Joe Perches <joe@perches.com>
-Cc: Russell King - ARM Linux <linux@arm.linux.org.uk>, Peter Korsgaard <jacmet@sunsite.dk>, "Markus F.X.J. Oberhumer" <markus@oberhumer.com>, Kyungsik Lee <kyungsik.lee@lge.com>, Andrew Morton <akpm@linux-foundation.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, Michal Marek <mmarek@suse.cz>, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, x86@kernel.org, celinux-dev@lists.celinuxforum.org, Nitin Gupta <nitingupta910@gmail.com>, Richard Purdie <rpurdie@openedhand.com>, Josh Triplett <josh@joshtriplett.org>, Joe Millenbach <jmillenbach@gmail.com>, David Sterba <dsterba@suse.cz>, Richard Cochran <richardcochran@gmail.com>, Albin Tonnerre <albin.tonnerre@free-electrons.com>, Egon Alter <egon.alter@gmx.net>, hyojun.im@lge.com, chan.jeong@lge.com, raphael.andy.lee@gmail.com
+Cc: Peter Korsgaard <jacmet@sunsite.dk>, Nicolas Pitre <nico@fluxnic.net>, "Markus F.X.J. Oberhumer" <markus@oberhumer.com>, Kyungsik Lee <kyungsik.lee@lge.com>, Andrew Morton <akpm@linux-foundation.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, Michal Marek <mmarek@suse.cz>, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, x86@kernel.org, celinux-dev@lists.celinuxforum.org, Nitin Gupta <nitingupta910@gmail.com>, Richard Purdie <rpurdie@openedhand.com>, Josh Triplett <josh@joshtriplett.org>, Joe Millenbach <jmillenbach@gmail.com>, David Sterba <dsterba@suse.cz>, Richard Cochran <richardcochran@gmail.com>, Albin Tonnerre <albin.tonnerre@free-electrons.com>, Egon Alter <egon.alter@gmx.net>, hyojun.im@lge.com, chan.jeong@lge.com, raphael.andy.lee@gmail.com
 
-On Wed, 27 Feb 2013, Joe Perches wrote:
-
+On Wed, Feb 27, 2013 at 07:49:12AM -0800, Joe Perches wrote:
+> On Wed, 2013-02-27 at 09:56 +0000, Russell King - ARM Linux wrote:
+> > On Tue, Feb 26, 2013 at 05:40:34PM -0800, Joe Perches wrote:
+> > > On Tue, 2013-02-26 at 22:10 +0000, Russell King - ARM Linux wrote:
+> > > > So... for a selected kernel version of a particular size, can we please
+> > > > have a comparison between the new LZO code and this LZ4 code, so that
+> > > > we can see whether it's worth updating the LZO code or replacing the
+> > > > LZO code with LZ4?
+> > > 
+> > > How could it be questionable that it's worth updating the LZO code?
+> > 
+> > Please read the comments against the previous posting of these patches
+> > where I first stated this argument - and with agreement from those
+> > following the thread.  The thread started on 26 Jan 2013.  Thanks.
+> 
 > https://lkml.org/lkml/2013/1/29/145
-
-Connecting to lkml.org (lkml.org)|87.253.128.182|:443... connected.
-HTTP request sent, awaiting response... 500 Server Error
-
+> 
 > I did not and do not see significant value in
 > adding LZ4 given Markus' LZO improvements.
 
-Please someone post a comprehensive comparison with all the results in 
-the same email.
+Sorry, a 66% increase in decompression speed over the updated LZO code
+isn't "significant value" ?
 
-> The new LZO code is faster than ever and it's
-> a standalone improvement.
-> 
+I'm curious - what in your mind qualifies "significant value" ?
+
+Maybe "significant value" is a patch which buggily involves converting
+all those "<n>" printk format strings in assembly files to KERN_* macros,
+thereby breaking those strings because you've not paid attention to what
+.asciz means?  (Yes, I've just cleaned that crap up after you...)
+
 > Why would the LZO code not be updated?
 
-It is used by filesystems, etc.  So of course it needs to be updated to 
-faster code.
-
-> Markus has posted what seems a clean git pull
-> request.  It was not cc'd to arm or linux-arch.
-> 
-> http://linux-kernel.2935.n7.nabble.com/GIT-PULL-Update-LZO-compression-code-for-v3-9-td605184.html
-
-Maybe a reminder should be sent to Linus about this.
-
-From the above we can see this:
-
-   **LZO-2013-UA : updated LZO version available in linux-next plus 
-   experimental ARM Unaligned Access patch. This needs approval from 
-   some ARM maintainer ist NOT YET INCLUDED.
-
-What is that experimental patch in need of approval?
-
-
-Nicolas
+I'm not saying that the LZO code should not be updated.  I'm saying that
+the kernel boot time decompressor is not a play ground for an ever
+increasing number of "my favourite compression method" crap.  We don't
+need four, five or even six compression methods there.  We just need
+three - a "fast but large", "small but slow" and "all round popular
+medium".
