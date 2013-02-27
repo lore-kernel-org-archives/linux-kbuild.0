@@ -1,90 +1,78 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wg0-f49.google.com ([74.125.82.49]:48203 "EHLO
-	mail-wg0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752565Ab3B0OJ3 (ORCPT
+Received: from mail.not-your-server.de ([78.46.182.243]:53005 "EHLO
+	mail.not-your-server.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1759975Ab3B0OaX (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 27 Feb 2013 09:09:29 -0500
+	Wed, 27 Feb 2013 09:30:23 -0500
+Message-ID: <512E186F.6090507@gentoo.org>
+Date: Wed, 27 Feb 2013 15:30:07 +0100
+From: justin <jlec@gentoo.org>
 MIME-Version: 1.0
-Reply-To: sedat.dilek@gmail.com
-In-Reply-To: <512E1061.3030007@suse.cz>
-References: <1335219389-10887-1-git-send-email-sedat.dilek@gmail.com>
-	<512E1061.3030007@suse.cz>
-Date: Wed, 27 Feb 2013 15:09:28 +0100
-Message-ID: <CA+icZUV993buV4VYONW2xe=rkFYdnGUAKzOi9ftQfUHK4sFRjg@mail.gmail.com>
-Subject: Re: [PATCH 1/3] kbuild, deb-pkg: Try to determine distribution
-From: Sedat Dilek <sedat.dilek@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: [PATCH] Use config scripts to detect ncurses libs for, menuconfig/nconfig
+ dialogs
+References: <512A36BB.9070309@gentoo.org> <201302251930.22293.yann.morin.1998@free.fr> <512BCA76.6080601@gentoo.org> <201302252153.39465.yann.morin.1998@free.fr>
+In-Reply-To: <201302252153.39465.yann.morin.1998@free.fr>
+Content-Type: multipart/signed; micalg=pgp-sha512;
+ protocol="application/pgp-signature";
+ boundary="----enig2IPNTDIXUNMBLPJERUVWT"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: Sedat Dilek <sedat.dilek@googlemail.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, maximilian attems <max@stro.at>, Thorsten Glaser <tg@debian.org>, Alexander Wirt <formorer@debian.org>
+To: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Wed, Feb 27, 2013 at 2:55 PM, Michal Marek <mmarek@suse.cz> wrote:
-> Sorry I missed this series. Max, can you have a look? I don't know the
-> policies for debian package changelogs. The full series is at
-> http://lkml.indiana.edu/hypermail/linux/kernel/1204.2/index.html#04252,
-> but the remaining two patches are obvious.
->
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+------enig2IPNTDIXUNMBLPJERUVWT
+Content-Type: text/plain; charset=ISO-8859-15
+Content-Transfer-Encoding: quoted-printable
 
-[ CC mirabilos and formorer ]
+On 25/02/13 21:53, Yann E. MORIN wrote:
+>>> Do you know of a distribution where this is the case, so I can test?
 
-[PATCH 1/3] kbuild, deb-pkg: Try to determine distribution
+Fedora is also building with --with-termlib but they are using a ld
+script to workaround the linking problem. I talked to our (Gentoo Linux)
+base-system maintainers but they refused to apply this, instead they
+said the consuming packages should be fixed. This is now an ongoing effor=
+t.
 
-...was discussed in (hehe, so long ago) April 2012 on #grml IRC (a
-Linux live-system based on Debian) with Thorsten Glaser and Alexander
-Wirt.
-Both cool guys (longterm Debian maintainers and admins) gave me
-several good hints to make this a "proper" solution.
-Maybe, they won't remember :-).
+> But I'll see at installing a Gentoo (if that's not too complex) in a
+> VM to do the checks (can you confirm that Gentoo by default configures
+> ncurses with --with-termlib ?).
+>=20
 
-I switched from Debian/unstable to Ubuntu/precise these days and that
-was the reason I wanted the correct $distribution in my generated
-Debian kernel packages.
+It is not the "default" configuration in a classic sense, because it
+will only build with that option if a consuming package requests this.
 
-Might be I come back when Debian/wheezy is released... you never know :-).
-Or I get an Amiga-3000 with Debian/m68k running... with DirOpus and
-DPaint-IV, hahaha.
+Here the receipt for generic reproduction:
 
-I was simply too lazy to place a rock-solid changelog.
+* Get yourself a copy of our live dvd
+(http://gentoo.inode.at//releases/x86/20121221/)
+* Kick a vm or boot from the dvd (Make sure you have enough RAM, because
+you will compile ncurses on it and place the git checkout there.)
+* Get a terminal and switch to root
+* Update the package db by running: emerge --sync
+* Rebuild ncurses with:
+ACCEPT_KEYWORDS=3D"~x86" USE=3D"tinfo" emerge -va1 ncurses
+Important here that "tinfo" is marked as changing USE (colored green)
+* Switch to ld.gold with "binutils-config --linker ld.gold" (make sure
+that it worked out -> ld -v)
+* git clone the kernel and do your testing.
 
-- Sedat -
 
-> Michal
->
-> On 24.4.2012 00:16, Sedat Dilek wrote:
->> Signed-off-by: Sedat Dilek <sedat.dilek@gmail.com>
->> ---
->>  scripts/package/builddeb |   15 ++++++++++++++-
->>  1 file changed, 14 insertions(+), 1 deletion(-)
->>
->> diff --git a/scripts/package/builddeb b/scripts/package/builddeb
->> index eee5f8e..f5b56ac 100644
->> --- a/scripts/package/builddeb
->> +++ b/scripts/package/builddeb
->> @@ -172,9 +172,22 @@ else
->>  fi
->>  maintainer="$name <$email>"
->>
->> +# Try to determine distribution
->> +if [ -e $(which lsb_release) ]; then
->> +       codename=$(lsb_release --codename --short)
->> +       if [ "$codename" != "" ]; then
->> +             distribution=$codename
->> +       else
->> +             distribution="UNRELEASED"
->> +             echo "WARNING: The distribution could NOT be determined!"
->> +       fi
->> +else
->> +       echo "HINT: Install lsb_release binary, this helps to identify your distribution!"
->> +fi
->> +
->>  # Generate a simple changelog template
->>  cat <<EOF > debian/changelog
->> -linux-upstream ($packageversion) unstable; urgency=low
->> +linux-upstream ($packageversion) $distribution; urgency=low
->>
->>    * Custom built Linux kernel.
->>
->>
->
->
+Justin
+
+
+------enig2IPNTDIXUNMBLPJERUVWT
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.19 (GNU/Linux)
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iEYEAREKAAYFAlEuGG8ACgkQgAnW8HDreRZRAQCfXKHb4IHN5/vKMc6fFIbiZ7xT
+VZ4AnR4jdTHd0bn9KghYnK400AUHke0/
+=66a6
+-----END PGP SIGNATURE-----
+
+------enig2IPNTDIXUNMBLPJERUVWT--
