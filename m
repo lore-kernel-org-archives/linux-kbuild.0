@@ -1,174 +1,79 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-oa0-f45.google.com ([209.85.219.45]:63622 "EHLO
-	mail-oa0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752846Ab3B0F6H (ORCPT
+Received: from LGEMRELSE1Q.lge.com ([156.147.1.111]:63013 "EHLO
+	LGEMRELSE1Q.lge.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752348Ab3B0Hgu (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 27 Feb 2013 00:58:07 -0500
-Received: by mail-oa0-f45.google.com with SMTP id o6so420321oag.4
-        for <linux-kbuild@vger.kernel.org>; Tue, 26 Feb 2013 21:58:07 -0800 (PST)
-Date: Tue, 26 Feb 2013 21:58:06 -0800 (PST)
-From: Rob Landley <rob@landley.net>
-In-Reply-To: <1361944667.957820@landley.net>
-Message-Id: <1361944667.959170@landley.net>
-Subject: [PATCH 3/3] convert headers_install.pl to headers_install.sh
+	Wed, 27 Feb 2013 02:36:50 -0500
+Date: Wed, 27 Feb 2013 16:36:47 +0900
+From: Kyungsik Lee <kyungsik.lee@lge.com>
+Subject: Re: [RFC PATCH v2 0/4] Add support for LZ4-compressed kernel
+Message-ID: <20130227073646.GA22333@Corona>
+References: <1361859870-15751-1-git-send-email-kyungsik.lee@lge.com>
+ <512D1C12.4080109@oberhumer.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <512D1C12.4080109@oberhumer.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>, Josh Boyer <jwboyer@redhat.com>, "Paul E. McKenney" <paulmck@linux.vnet.ibm.com>, Andrew Morton <akpm@linux-foundation.org>, David Howells <dhowell@redhat.com>, Michal Marek <mmarek@suse.cz>, Sam Ravnborg <sam@ravnborg.org>
+To: "Markus F.X.J. Oberhumer" <markus@oberhumer.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>, Russell King <linux@arm.linux.org.uk>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, Michal Marek <mmarek@suse.cz>, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, x86@kernel.org, celinux-dev@lists.celinuxforum.org, Nicolas Pitre <nico@fluxnic.net>, Nitin Gupta <nitingupta910@gmail.com>, Richard Purdie <rpurdie@openedhand.com>, Josh Triplett <josh@joshtriplett.org>, Joe Millenbach <jmillenbach@gmail.com>, David Sterba <dsterba@suse.cz>, Richard Cochran <richardcochran@gmail.com>, Albin Tonnerre <albin.tonnerre@free-electrons.com>, Egon Alter <egon.alter@gmx.net>, hyojun.im@lge.com, chan.jeong@lge.com, raphael.andy.lee@gmail.com
 
-From: Rob Landley <rob@landley.net>
+On Tue, Feb 26, 2013 at 09:33:22PM +0100, Markus F.X.J. Oberhumer wrote:
+> On 2013-02-26 07:24, Kyungsik Lee wrote:
+> > Hi,
+> > 
+> > [...]
+> > 
+> > Through the benchmark, it was found that -Os Compiler flag for
+> > decompress.o brought better decompression performance in most of cases
+> > (ex, different compiler and hardware spec.) in ARM architecture.
+> > 
+> > Lastly, CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS is not always the best
+> > option even though it is supported. The decompression speed can be
+> > slightly slower in some cases.
+> > 
+> > This patchset is based on 3.8.
+> > 
+> > Any comments are appreciated.
+> 
+> Did you actually *try* the new LZO version and the patch (which is attached
+> once again) as explained in https://lkml.org/lkml/2013/2/3/367 ?
+> 
+> Because the new LZO version is faster than LZ4 in my testing, at least
+> when comparing apples with apples and enabling unaligned access in
+> BOTH versions:
+> 
+> armv7 (Cortex-A9), Linaro gcc-4.6 -O3, Silesia test corpus, 256 kB block-size:
+> 
+>                    compression speed   decompression speed
+> 
+>   LZO-2012    :          44 MB/sec          117 MB/sec     no unaligned access
+>   LZO-2013-UA :          47 MB/sec          167 MB/sec     Unaligned Access
+>   LZ4 r88  UA :          46 MB/sec          154 MB/sec     Unaligned Access
+>
 
-Remove perl from make headers_install by replacing a perl script (doing
-a simple regex search and replace) with a smaller, faster, simpler,
-POSIX-2008 shell script implementation.  The new shell script is a single
-for loop calling sed and piping its output through unifdef to produce the
-target file.
+I agree that the new LZO version provided shows better decompression
+speed than 3.7 based. It is much improved especially for UA.
 
-Same as last time except for minor tweak to deal with code review from here:
-http://lkml.indiana.edu/hypermail/linux/kernel/1302.3/00078.html
+Compiler: Linaro ARM gcc 4.6.2
+2. ARMv7, 1.7GHz based board
+   Kernel: linux 3.7
+   Uncompressed Kernel Size: 14MB
+         Compressed Size  Decompression Speed
+    LZO  6.0MB            34.1MB/s            Old
+         ----------------------------------------
+         6.0MB            34.7MB/s            New
+         6.0MB            52.2MB/s(UA)
+    =============================================
+    LZ4  6.5MB            86.7MB/s
+UA: Unaligned memory Access support
 
-(Note that this drops the "arch" argument, which isn't used. Kbuild
-already points to the right input files on the command line.)
+One thing I can say that the code you may have used, guessing
+"lz4demo" is not the same code provided in this patch.
+It has been ported for the kernel and uses different function
+not like the "lz4demo". 
 
-Signed-off-by: Rob Landley <rob@landley.net>
----
+Thanks,
+Kyungsik
 
- scripts/Makefile.headersinst |    4 +-
- scripts/headers_install.pl   |   63 ---------------------------------
- scripts/headers_install.sh   |   43 ++++++++++++++++++++++
- 3 files changed, 45 insertions(+), 65 deletions(-)
-
-diff -ruN linux-3.1/scripts/headers_install.sh linux-2.6.30/scripts/headers_install.sh
---- linux-3.1/scripts/headers_install.sh
-+++ linux/scripts/headers_install.sh
-@@ -0,0 +1,43 @@
-+#!/bin/sh
-+
-+if [ $# -lt 1 ]
-+then
-+	echo "Usage: headers_install.sh OUTDIR [FILES...]
-+	echo
-+	echo "Prepares kernel header files for use by user space, by removing"
-+	echo "all compiler.h definitions and #includes, removing any"
-+	echo "#ifdef __KERNEL__ sections, and putting __underscores__ around"
-+	echo "asm/inline/volatile keywords."
-+	echo
-+	echo "OUTDIR: directory to write each userspace header FILE to."
-+	echo "FILES:  list of header files to operate on."
-+
-+	exit 1
-+fi
-+
-+# Grab arguments
-+
-+OUTDIR="$1"
-+shift
-+
-+# Iterate through files listed on command line
-+
-+FILE=
-+trap 'rm -f "$OUTDIR/$FILE" "$OUTDIR/$FILE.sed"' EXIT
-+for i in "$@"
-+do
-+	FILE="$(basename "$i")"
-+	sed -r \
-+		-e 's/([ \t(])(__user|__force|__iomem)[ \t]/\1/g' \
-+		-e 's/__attribute_const__([ \t]|$)/\1/g' \
-+		-e 's@^#include <linux/compiler.h>@@' \
-+		-e 's/(^|[^a-zA-Z0-9])__packed([^a-zA-Z0-9_]|$)/\1__attribute__((packed))\2/g' \
-+		-e 's/(^|[ \t(])(inline|asm|volatile)([ \t(]|$)/\1__\2__\3/g' \
-+		-e 's@#(ifndef|define|endif[ \t]*/[*])[ \t]*_UAPI@#\1 @' \
-+		"$i" > "$OUTDIR/$FILE.sed" || exit 1
-+	scripts/unifdef -U__KERNEL__ -D__EXPORTED_HEADERS__ "$OUTDIR/$FILE.sed" \
-+		> "$OUTDIR/$FILE"
-+	[ $? -gt 1 ] && exit 1
-+	rm -f "$OUTDIR/$FILE.sed"
-+done
-+trap - EXIT
-diff -ruN linux-3.1/scripts/Makefile.headersinst
---- linux-3.1/scripts/Makefile.headersinst
-+++ linux/scripts/Makefile.headersinst
-@@ -71,7 +71,7 @@
- quiet_cmd_install = INSTALL $(printdir) ($(words $(all-files))\
-                             file$(if $(word 2, $(all-files)),s))
-       cmd_install = \
--        $(PERL) $< $(installdir) $(SRCARCH) $(input-files); \
-+        $(CONFIG_SHELL) $< $(installdir) $(input-files); \
-         for F in $(wrapper-files); do                                   \
-                 echo "\#include <asm-generic/$$F>" > $(installdir)/$$F;    \
-         done;                                                           \
-@@ -97,7 +97,7 @@
- 	@:
- 
- targets += $(install-file)
--$(install-file): scripts/headers_install.pl $(input-files) FORCE
-+$(install-file): scripts/headers_install.sh $(input-files) FORCE
- 	$(if $(unwanted),$(call cmd,remove),)
- 	$(if $(wildcard $(dir $@)),,$(shell mkdir -p $(dir $@)))
- 	$(call if_changed,install)
---- a/scripts/headers_install.pl
-+++ /dev/null
-@@ -1,63 +0,0 @@
--#!/usr/bin/perl -w
--#
--# headers_install prepare the listed header files for use in
--# user space and copy the files to their destination.
--#
--# Usage: headers_install.pl readdir installdir arch [files...]
--# installdir: dir to install the files to
--# arch:       current architecture
--#             arch is used to force a reinstallation when the arch
--#             changes because kbuild then detect a command line change.
--# files:      list of files to check
--#
--# Step in preparation for users space:
--# 1) Drop all use of compiler.h definitions
--# 2) Drop include of compiler.h
--# 3) Drop all sections defined out by __KERNEL__ (using unifdef)
--
--use strict;
--
--my ($installdir, $arch, @files) = @ARGV;
--
--my $unifdef = "scripts/unifdef -U__KERNEL__ -D__EXPORTED_HEADERS__";
--
--foreach my $filename (@files) {
--	my $file = $filename;
--	$file =~ s!^.*/!!;
--
--	my $tmpfile = "$installdir/$file.tmp";
--
--	open(my $in, '<', $filename)
--	    or die "$filename: $!\n";
--	open(my $out, '>', $tmpfile)
--	    or die "$tmpfile: $!\n";
--	while (my $line = <$in>) {
--		$line =~ s/([\s(])__user\s/$1/g;
--		$line =~ s/([\s(])__force\s/$1/g;
--		$line =~ s/([\s(])__iomem\s/$1/g;
--		$line =~ s/\s__attribute_const__\s/ /g;
--		$line =~ s/\s__attribute_const__$//g;
--		$line =~ s/\b__packed\b/__attribute__((packed))/g;
--		$line =~ s/^#include <linux\/compiler.h>//;
--		$line =~ s/(^|\s)(inline)\b/$1__$2__/g;
--		$line =~ s/(^|\s)(asm)\b(\s|[(]|$)/$1__$2__$3/g;
--		$line =~ s/(^|\s|[(])(volatile)\b(\s|[(]|$)/$1__$2__$3/g;
--		$line =~ s/#ifndef\s+_UAPI/#ifndef /;
--		$line =~ s/#define\s+_UAPI/#define /;
--		$line =~ s!#endif\s+/[*]\s*_UAPI!#endif /* !;
--		printf {$out} "%s", $line;
--	}
--	close $out;
--	close $in;
--
--	system $unifdef . " $tmpfile > $installdir/$file";
--	# unifdef will exit 0 on success, and will exit 1 when the
--	# file was processed successfully but no changes were made,
--	# so abort only when it's higher than that.
--	my $e = $? >> 8;
--	if ($e > 1) {
--		die "$tmpfile: $!\n";
--	}
--	unlink $tmpfile;
--}
--exit 0;
