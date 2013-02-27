@@ -1,109 +1,49 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from caramon.arm.linux.org.uk ([78.32.30.218]:51447 "EHLO
-	caramon.arm.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1760444Ab3B0R7p (ORCPT
+Received: from mail.not-your-server.de ([78.46.182.243]:53680 "EHLO
+	mail.not-your-server.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753303Ab3B0SHm (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 27 Feb 2013 12:59:45 -0500
-Date: Wed, 27 Feb 2013 17:57:50 +0000
-From: Russell King - ARM Linux <linux@arm.linux.org.uk>
-Subject: Re: [RFC PATCH v2 0/4] Add support for LZ4-compressed kernel
-Message-ID: <20130227175750.GD17833@n2100.arm.linux.org.uk>
-References: <alpine.LFD.2.03.1302261557220.1254@syhkavp.arg> <87fw0i7n6d.fsf@dell.be.48ers.dk> <20130226221027.GW17833@n2100.arm.linux.org.uk> <1361929234.1924.8.camel@joe-AO722> <20130227095609.GY17833@n2100.arm.linux.org.uk> <1361980152.2035.13.camel@joe-AO722> <20130227163118.GB17833@n2100.arm.linux.org.uk> <1361984688.2035.20.camel@joe-AO722> <alpine.LFD.2.03.1302271211360.1254@syhkavp.arg> <1361986787.20540.8.camel@joe-AO722>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1361986787.20540.8.camel@joe-AO722>
+	Wed, 27 Feb 2013 13:07:42 -0500
+From: jlec@gentoo.org
+Subject: [PATCH 2/2] Use config scripts to detect ncurses libs for nconfig
+Date: Wed, 27 Feb 2013 19:07:38 +0100
+Message-Id: <1361988458-18486-2-git-send-email-jlec@gentoo.org>
+In-Reply-To: <1361988458-18486-1-git-send-email-jlec@gentoo.org>
+References: <jlec@gentoo.org>
+ <1361988458-18486-1-git-send-email-jlec@gentoo.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Joe Perches <joe@perches.com>
-Cc: Nicolas Pitre <nico@fluxnic.net>, Peter Korsgaard <jacmet@sunsite.dk>, "Markus F.X.J. Oberhumer" <markus@oberhumer.com>, Kyungsik Lee <kyungsik.lee@lge.com>, Andrew Morton <akpm@linux-foundation.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, Michal Marek <mmarek@suse.cz>, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, x86@kernel.org, celinux-dev@lists.celinuxforum.org, Nitin Gupta <nitingupta910@gmail.com>, Richard Purdie <rpurdie@openedhand.com>, Josh Triplett <josh@joshtriplett.org>, Joe Millenbach <jmillenbach@gmail.com>, David Sterba <dsterba@suse.cz>, Richard Cochran <richardcochran@gmail.com>, Albin Tonnerre <albin.tonnerre@free-electrons.com>, Egon Alter <egon.alter@gmx.net>, hyojun.im@lge.com, chan.jeong@lge.com, raphael.andy.lee@gmail.com
+To: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: Justin Lecher <jlec@gentoo.org>
 
-On Wed, Feb 27, 2013 at 09:39:47AM -0800, Joe Perches wrote:
-> On Wed, 2013-02-27 at 12:16 -0500, Nicolas Pitre wrote:
-> > On Wed, 27 Feb 2013, Joe Perches wrote:
-> > > On Wed, 2013-02-27 at 16:31 +0000, Russell King - ARM Linux wrote:
-> > > > On Wed, Feb 27, 2013 at 07:49:12AM -0800, Joe Perches wrote:
-> > > > > On Wed, 2013-02-27 at 09:56 +0000, Russell King - ARM Linux wrote:
-> > > > > > On Tue, Feb 26, 2013 at 05:40:34PM -0800, Joe Perches wrote:
-> > > > > > > On Tue, 2013-02-26 at 22:10 +0000, Russell King - ARM Linux wrote:
-> > > > > > > > So... for a selected kernel version of a particular size, can we please
-> > > > > > > > have a comparison between the new LZO code and this LZ4 code, so that
-> > > > > > > > we can see whether it's worth updating the LZO code or replacing the
-> > > > > > > > LZO code with LZ4?
-> > > > > > > 
-> > > > > > > How could it be questionable that it's worth updating the LZO code?
-> > > > > > 
-> > > > > > Please read the comments against the previous posting of these patches
-> > > > > > where I first stated this argument - and with agreement from those
-> > > > > > following the thread.  The thread started on 26 Jan 2013.  Thanks.
-> > > > > 
-> > > > > https://lkml.org/lkml/2013/1/29/145
-> > > > > 
-> > > > > I did not and do not see significant value in
-> > > > > adding LZ4 given Markus' LZO improvements.
-> > > > 
-> > > > Sorry, a 66% increase in decompression speed over the updated LZO code
-> > > > isn't "significant value" ?
-> > > 
-> > > We disagree.
-> > > 
-> > > > I'm curious - what in your mind qualifies "significant value" ?
-> > > 
-> > > faster boot time. smaller, faster overall code.
-> > 
-> > Sorry, but you certainly successfully got me confused, and probably 
-> > others as well.
-> > 
-> > RMK says that "66% increase in decompression speed over LZO" is 
-> > significant.  You apparently disagree with that.
-> 
-> Yeah, I can see how that can be interpreted.
-> I'm referring only to the new LZO.
-> 
-> I guess Russell has not reviewed the new LZO.
-> 
-> There is apparently no speed increase for LZ4 over
-> the new LZO.
+From: Justin Lecher <jlec@gentoo.org>
 
-Total claptrap.  I've no idea where you're getting your data from, but
-it's franky wrong and you're now being totally misleading to anyone
-else reading this thread.
+When building ncurses with --with-termlib several symbols get moved from
+libncurses.so to libtinfo.so. Thus when linking with libncurses.so, one
+additionally needs to link with libtinfo.so.
 
-I explicitly asked for a comparison of the _new_ LZO vs the LZ4 code,
-and this is what I received from Kyungsik Lee in this thread:
+Ncurses provides a config script (ncurses5-config) to assist finding ncurses.
+This patch makes use of it to detect the necessary libs for linking of the
+ncurses nconfig dialog.
 
-	Compiler: Linaro ARM gcc 4.6.2
-	2. ARMv7, 1.7GHz based board
-	   Kernel: linux 3.7
-	   Uncompressed Kernel Size: 14MB
-	         Compressed Size  Decompression Speed
-	    LZO  6.0MB            34.1MB/s            Old
-	         ----------------------------------------
-	         6.0MB            34.7MB/s            New
-	         6.0MB            52.2MB/s(UA)
-	    =============================================
-	    LZ4  6.5MB            86.7MB/s
-	UA: Unaligned memory Access support
+Signed-off-by: Justin Lecher <jlec@gentoo.org>
+---
+ scripts/kconfig/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-And my statement of a "66% increase in speed" of LZ4 is comparing the
-_new_ LZO code with unaligned access with the LZ4 code.
+diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
+index 3091794..7ddbf98 100644
+--- a/scripts/kconfig/Makefile
++++ b/scripts/kconfig/Makefile
+@@ -216,7 +216,7 @@ HOSTCFLAGS_gconf.o	= `pkg-config --cflags gtk+-2.0 gmodule-2.0 libglade-2.0` \
+ 
+ HOSTLOADLIBES_mconf   = $(shell $(CONFIG_SHELL) $(check-lxdialog) -ldflags $(HOSTCC))
+ 
+-HOSTLOADLIBES_nconf	= -lmenu -lpanel -lncurses
++HOSTLOADLIBES_nconf	= -lmenu -lpanel `ncursesw5-config --libs 2>/dev/null || ncurses5-config --libs 2>/dev/null`
+ $(obj)/qconf.o: $(obj)/.tmp_qtcheck
+ 
+ ifeq ($(qconf-target),1)
+-- 
+1.8.1.4
 
-Now, you refer to Markus' results - but Markus' results do not say what
-they're comparing - they don't say what the size of the compressed image
-is, nor what the size of the uncompressed image was.
-
-Now, Markus' results show a 42% increase in speed between the LZO-2012
-and LZO-2013-UA versions (do the calculation yourself - I'm sure you're
-capable of that?  If not, we can turn this into a maths lesson too).
-The above shows a 53% increase in speed between the existing LZO code
-and the new LZO code with unaligned accesses.
-
-_But_ the above shows an additional 66% increase between the new LZO
-code with unaligned accesses and LZ4.  Or, a whopping 150% increase
-in speed over the _existing_ LZO code.
-
-So please, stop stating what I have and have not reviewed.  Unlike you,
-I _have_ been following everything that's been said in this thread, and
- - unlike you - I have analysed the figures put forward and drawn
-conclusions which are fully supported by the published data from them,
-and stated them - now many times.
