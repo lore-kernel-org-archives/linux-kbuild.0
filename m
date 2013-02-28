@@ -1,58 +1,40 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.not-your-server.de ([78.46.182.243]:56350 "EHLO
-	mail.not-your-server.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752040Ab3B1LwU (ORCPT
+Received: from mail-wi0-f181.google.com ([209.85.212.181]:40585 "EHLO
+	mail-wi0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1759839Ab3B1R6G (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 28 Feb 2013 06:52:20 -0500
-From: jlec@gentoo.org
-Subject: [PATCH] menuconfig: use config scripts to detect ncurses libs
-Date: Thu, 28 Feb 2013 12:52:15 +0100
-Message-Id: <1362052335-17913-1-git-send-email-jlec@gentoo.org>
-In-Reply-To: <jlec@gentoo.org>
-References: <jlec@gentoo.org>
+	Thu, 28 Feb 2013 12:58:06 -0500
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Subject: Re: [PATCH 2/2] Use config scripts to detect ncurses libs for nconfig
+Date: Thu, 28 Feb 2013 18:58:00 +0100
+References: <jlec@gentoo.org> <201302272002.59833.yann.morin.1998@free.fr> <512F27FD.6060907@gentoo.org>
+In-Reply-To: <512F27FD.6060907@gentoo.org>
+MIME-Version: 1.0
+Content-Type: Text/Plain;
+  charset="iso-8859-15"
+Content-Transfer-Encoding: 7bit
+Message-Id: <201302281858.00787.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: Justin Lecher <jlec@gentoo.org>
+To: linux-kbuild@vger.kernel.org
+Cc: justin <jlec@gentoo.org>, linux-kernel@vger.kernel.org
 
-From: Justin Lecher <jlec@gentoo.org>
+Justin, All,
 
-When building ncurses with --with-termlib several symbols get moved from
-libncurses.so to libtinfo.so. Thus when linking with libncurses.so, one
-additionally needs to link with libtinfo.so. Ncurses provides a config script
-(ncurses5-config) to assist finding ncurses.
+On Thursday 28 February 2013 justin wrote:
+> > Long-line. 
+> What is the rule for Makefiles? It seems that 80 columns doesn't apply here.
 
-This patch replaces the old heuristic for detection of ncurses libs for
-linking the ncurses menuconfig dialog by the use of the config scripts.
-This results in the requirement of ncurses version 5.6 or newer for menuconfig.
+If possible, I'd like to follow this rule, unless it proves too complex.
+In this case, I think it is possible and not too ugly. ;-)
 
-Signed-off-by: Justin Lecher <jlec@gentoo.org>
----
- scripts/kconfig/lxdialog/check-lxdialog.sh | 11 ++---------
- 1 file changed, 2 insertions(+), 9 deletions(-)
+Regards,
+Yann E. MORIN.
 
-diff --git a/scripts/kconfig/lxdialog/check-lxdialog.sh b/scripts/kconfig/lxdialog/check-lxdialog.sh
-index c8e8a71..10df55b 100644
---- a/scripts/kconfig/lxdialog/check-lxdialog.sh
-+++ b/scripts/kconfig/lxdialog/check-lxdialog.sh
-@@ -4,15 +4,8 @@
- # What library to link
- ldflags()
- {
--	for ext in so a dll.a dylib ; do
--		for lib in ncursesw ncurses curses ; do
--			$cc -print-file-name=lib${lib}.${ext} | grep -q /
--			if [ $? -eq 0 ]; then
--				echo "-l${lib}"
--				exit
--			fi
--		done
--	done
-+	ncursesw5-config --libs 2>/dev/null && exit
-+	ncurses5-config --libs 2>/dev/null && exit
- 	exit 1
- }
- 
 -- 
-1.8.1.4
-
+.-----------------.--------------------.------------------.--------------------.
+|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
+| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
+| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
+| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
+'------------------------------^-------^------------------^--------------------'
