@@ -1,53 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.not-your-server.de ([78.46.182.243]:55980 "EHLO
+Received: from mail.not-your-server.de ([78.46.182.243]:56010 "EHLO
 	mail.not-your-server.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750886Ab3B1Jsv (ORCPT
+	with ESMTP id S1751667Ab3B1J7X (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 28 Feb 2013 04:48:51 -0500
-Message-ID: <512F27FD.6060907@gentoo.org>
-Date: Thu, 28 Feb 2013 10:48:45 +0100
-From: justin <jlec@gentoo.org>
-MIME-Version: 1.0
-Subject: Re: [PATCH 2/2] Use config scripts to detect ncurses libs for nconfig
-References: <jlec@gentoo.org> <1361988458-18486-1-git-send-email-jlec@gentoo.org> <1361988458-18486-2-git-send-email-jlec@gentoo.org> <201302272002.59833.yann.morin.1998@free.fr>
-In-Reply-To: <201302272002.59833.yann.morin.1998@free.fr>
-Content-Type: multipart/signed; micalg=pgp-sha512;
- protocol="application/pgp-signature";
- boundary="----enig2IPQQJMVPUDHOOHTNCUGM"
+	Thu, 28 Feb 2013 04:59:23 -0500
+From: jlec@gentoo.org
+Subject: [PATCH 2/2] kconfig: use config scripts to detect ncurses libs
+Date: Thu, 28 Feb 2013 10:59:17 +0100
+Message-Id: <1362045557-9123-1-git-send-email-jlec@gentoo.org>
+In-Reply-To: <jlec@gentoo.org>
+References: <jlec@gentoo.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: Justin Lecher <jlec@gentoo.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
-------enig2IPQQJMVPUDHOOHTNCUGM
-Content-Type: text/plain; charset=ISO-8859-15
-Content-Transfer-Encoding: quoted-printable
+From: Justin Lecher <jlec@gentoo.org>
 
-Hello,
+When building ncurses with --with-termlib several symbols get moved from
+libncurses.so to libtinfo.so. Thus when linking with libncurses.so, one
+additionally needs to link with libtinfo.so.
 
->
-> Long-line.=20
+Ncurses provides a config script (ncurses5-config) to assist finding ncurses.
+This patch makes use of it to detect the necessary libs for linking of the
+ncurses nconfig dialog.
 
-What is the rule for Makefiles? It seems that 80 columns doesn't apply he=
-re.
+Signed-off-by: Justin Lecher <jlec@gentoo.org>
+---
+ scripts/kconfig/Makefile | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-Thanks,
-Justin
+diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
+index 3091794..c372976 100644
+--- a/scripts/kconfig/Makefile
++++ b/scripts/kconfig/Makefile
+@@ -216,7 +216,9 @@ HOSTCFLAGS_gconf.o	= `pkg-config --cflags gtk+-2.0 gmodule-2.0 libglade-2.0` \
+ 
+ HOSTLOADLIBES_mconf   = $(shell $(CONFIG_SHELL) $(check-lxdialog) -ldflags $(HOSTCC))
+ 
+-HOSTLOADLIBES_nconf	= -lmenu -lpanel -lncurses
++HOSTLOADLIBES_nconf	= -lmenu -lpanel
++HOSTLOADLIBES_nconf	+= $(shell    ncursesw5-config --libs 2>/dev/null \
++				   || ncurses5-config --libs 2>/dev/null  )
+ $(obj)/qconf.o: $(obj)/.tmp_qtcheck
+ 
+ ifeq ($(qconf-target),1)
+-- 
+1.8.1.4
 
-
-------enig2IPQQJMVPUDHOOHTNCUGM
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.19 (GNU/Linux)
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iEYEAREKAAYFAlEvJ/0ACgkQgAnW8HDreRYm/ACeL2CqsMSzU3ZljfBYMPAEGnDH
-Ol0AmgK2sm/4n+sTv1PX4mZUq78SttA8
-=RP5G
------END PGP SIGNATURE-----
-
-------enig2IPQQJMVPUDHOOHTNCUGM--
