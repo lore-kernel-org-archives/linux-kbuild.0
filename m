@@ -1,47 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.gentoo.org ([140.211.166.183]:44154 "EHLO smtp.gentoo.org"
+Received: from smtp.gentoo.org ([140.211.166.183]:44291 "EHLO smtp.gentoo.org"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755665Ab3B1Vfw (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 28 Feb 2013 16:35:52 -0500
-Message-ID: <512FCDBF.5050508@gentoo.org>
-Date: Thu, 28 Feb 2013 22:35:59 +0100
+	id S1754558Ab3B1ViA (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 28 Feb 2013 16:38:00 -0500
+Message-ID: <512FCE40.4040101@gentoo.org>
+Date: Thu, 28 Feb 2013 22:38:08 +0100
 From: justin <jlec@gentoo.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH] menuconfig: use config scripts to detect ncurses libs
-References: <jlec@gentoo.org> <1362052335-17913-1-git-send-email-jlec@gentoo.org> <201302281916.00257.yann.morin.1998@free.fr>
-In-Reply-To: <201302281916.00257.yann.morin.1998@free.fr>
+Subject: Re: [PATCH 1/2] Use config scripts to detect ncurses libs for menuconfig
+References: <jlec@gentoo.org> <201302281908.14787.yann.morin.1998@free.fr> <512FCCBA.7000404@gentoo.org> <201302282235.28016.yann.morin.1998@free.fr>
+In-Reply-To: <201302282235.28016.yann.morin.1998@free.fr>
 Content-Type: multipart/signed; micalg=pgp-sha512;
  protocol="application/pgp-signature";
- boundary="----enig2QVTTFDVTKFFOFVASVBGX"
+ boundary="----enig2EVIKPQAEEGNJLMQVIXLR"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: "Yann E. MORIN" <yann.morin.1998@free.fr>
 Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
-------enig2QVTTFDVTKFFOFVASVBGX
+------enig2EVIKPQAEEGNJLMQVIXLR
 Content-Type: text/plain; charset=ISO-8859-15
 Content-Transfer-Encoding: quoted-printable
 
-On 2/28/13 7:16 PM, Yann E. MORIN wrote:
-> And, sorry, I should have been more explicit in my previous mail that
-> the legacy drop should be in its own patch. I thought that was obvious,=
-
-> following the "one single change per patch" philosophy.
+On 2/28/13 10:35 PM, Yann E. MORIN wrote:
+> It's not that those systems will be updated to run the latest kernel, b=
+ut
+> rather that those systems can be used to build a newer kernel for anoth=
+er
+> system (think eg. cross-compilation and embedded).
 >=20
 
-Hi,
+That's true, I will split the patches as suggested.
 
-no worries. I will submit as you suggested. It's a learning experience
-for me and we will get this solved.
-
-The new patches will come tomorrow.
-
-Thanks,
-Justin
+Jusitn
 
 
-------enig2QVTTFDVTKFFOFVASVBGX
+
+------enig2EVIKPQAEEGNJLMQVIXLR
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -50,9 +46,9 @@ Content-Disposition: attachment; filename="signature.asc"
 Version: GnuPG/MacGPG2 v2.0.18 (Darwin)
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iEYEAREKAAYFAlEvzb8ACgkQgAnW8HDreRY2eACeIFtyB/a2TPNuWqkvwWkuBKTT
-JU4AoLloOJzQoNoSuHupkqsetj9y6RBw
-=HQ4C
+iEYEAREKAAYFAlEvzkAACgkQgAnW8HDreRbS6gCfZkss7EUHQ1AYFcTCfdHxjLxn
+PzEAoL4ziuKXlCiIJA18MmrEQVpcAtlz
+=95Dj
 -----END PGP SIGNATURE-----
 
-------enig2QVTTFDVTKFFOFVASVBGX--
+------enig2EVIKPQAEEGNJLMQVIXLR--
