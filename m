@@ -1,73 +1,74 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from LGEMRELSE6Q.lge.com ([156.147.1.121]:42044 "EHLO
-	LGEMRELSE6Q.lge.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751127Ab3B1FWw (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 28 Feb 2013 00:22:52 -0500
-Date: Thu, 28 Feb 2013 14:22:48 +0900
-From: Kyungsik Lee <kyungsik.lee@lge.com>
-Subject: Re: [RFC PATCH v2 2/4] lib: Add support for LZ4-compressed kernel
-Message-ID: <20130228052248.GA15148@Corona>
-References: <1361859870-15751-1-git-send-email-kyungsik.lee@lge.com>
- <1361859870-15751-3-git-send-email-kyungsik.lee@lge.com>
- <20130226140051.GX27541@twin.jikos.cz>
+Received: from vostochny.stro.at ([78.47.22.85]:59619 "EHLO vostochny.stro.at"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751548Ab3B1Hch (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 28 Feb 2013 02:32:37 -0500
+Date: Thu, 28 Feb 2013 07:32:35 +0000
+From: maximilian attems <max@stro.at>
+Subject: Re: [PATCH 1/3] kbuild, deb-pkg: Try to determine distribution
+Message-ID: <20130228073235.GP10026@vostochny.stro.at>
+References: <1335219389-10887-1-git-send-email-sedat.dilek@gmail.com>
+ <512E1061.3030007@suse.cz>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20130226140051.GX27541@twin.jikos.cz>
+In-Reply-To: <512E1061.3030007@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: David Sterba <dsterba@suse.cz>
-Cc: Andrew Morton <akpm@linux-foundation.org>, Russell King <linux@arm.linux.org.uk>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, Michal Marek <mmarek@suse.cz>, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, x86@kernel.org, celinux-dev@lists.celinuxforum.org, Nicolas Pitre <nico@fluxnic.net>, Nitin Gupta <nitingupta910@gmail.com>, "Markus F.X.J. Oberhumer" <markus@oberhumer.com>, Josh Triplett <josh@joshtriplett.org>, Joe Millenbach <jmillenbach@gmail.com>, Richard Cochran <richardcochran@gmail.com>, Egon Alter <egon.alter@gmx.net>, hyojun.im@lge.com, chan.jeong@lge.com, raphael.andy.lee@gmail.com
+To: Michal Marek <mmarek@suse.cz>
+Cc: Sedat Dilek <sedat.dilek@googlemail.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Sedat Dilek <sedat.dilek@gmail.com>
 
-On Tue, Feb 26, 2013 at 03:00:51PM +0100, David Sterba wrote:
-> On Tue, Feb 26, 2013 at 03:24:28PM +0900, Kyungsik Lee wrote:
-> > +config KERNEL_LZ4
-> > +	bool "LZ4"
-> > +	depends on HAVE_KERNEL_LZ4
-> > +	help
-> > +	  Its compression ratio is worse than LZO. The size of the kernel
-> > +	  is about 8% bigger than LZO. But the decompression speed is
-> > +	  faster than LZO.
+On Wed, Feb 27, 2013 at 02:55:45PM +0100, Michal Marek wrote:
+> Sorry I missed this series. Max, can you have a look? I don't know the
+> policies for debian package changelogs. The full series is at
+> http://lkml.indiana.edu/hypermail/linux/kernel/1204.2/index.html#04252,
+> but the remaining two patches are obvious.
+
+the two remaining ones are trivial, should have pushed them a long time
+ago and will do so this weekend in a combined version going up to 2013
+(sitting in my queue to send).
+ 
+> On 24.4.2012 00:16, Sedat Dilek wrote:
+> > Signed-off-by: Sedat Dilek <sedat.dilek@gmail.com>
+> > ---
+> >  scripts/package/builddeb |   15 ++++++++++++++-
+> >  1 file changed, 14 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+> > index eee5f8e..f5b56ac 100644
+> > --- a/scripts/package/builddeb
+> > +++ b/scripts/package/builddeb
+> > @@ -172,9 +172,22 @@ else
+> >  fi
+> >  maintainer="$name <$email>"
+> >  
+> > +# Try to determine distribution
+> > +if [ -e $(which lsb_release) ]; then
+> > +       codename=$(lsb_release --codename --short)
+> > +       if [ "$codename" != "" ]; then
+> > +		distribution=$codename
+> > +       else
+> > +		distribution="UNRELEASED"
+> > +		echo "WARNING: The distribution could NOT be determined!"
+> > +       fi
+> > +else
+> > +       echo "HINT: Install lsb_release binary, this helps to identify your distribution!"
+> > +fi
 > > +
-> 
-> Can you please add a sentence what lz4 actually is before you start
-> comparing it with the current competitor(s)?
-Yes, I will update it.
+> >  # Generate a simple changelog template
+> >  cat <<EOF > debian/changelog
+> > -linux-upstream ($packageversion) unstable; urgency=low
+> > +linux-upstream ($packageversion) $distribution; urgency=low
+> >  
+> >    * Custom built Linux kernel.
 
-> > --- /dev/null
-> > +++ b/lib/decompress_unlz4.c
-> > @@ -0,0 +1,190 @@
-> > +#define LZ4_CHUNK_SIZE (8<<20)
-> 
-> Please use a less cryptic way of representing a value of 8 MB. Also,
-> this is a hardcoded value that must be used on the compressor side. It's
-> an upper limit, so anything below 8MB does not break decompresssion, but
-> this must be somehow checked or saved along in the binary stream. You
-> seem to use the lz4demo.c on the userspace side for compression, but
-> this is not a standard tool nor the output format is well-defined or
-> stabilized.
-Yes, It will be easy to parse and extract the meta information required
-for the kernel decompressor if output format is well-defined and
-standardized.
+this is pretty useless. 
+Nack, in adding a this additional lsb dep.
+I know it should be installed by default, but in practise it is often not.
 
-> For proper use I would like to see a commandline tool similar to
-> gzip/bzip2/lzop that can be packaged and shipped by distros, and the
-> output format defintion.
-> 
-> Yann has some ideas for the format
-> http://fastcompression.blogspot.cz/2012/04/file-container-format-for-lz4.html
-Actually, I would like to use a packaged tool by distros too.
-lz4demo is what I use for compressing the kernel so far.
-I name it lz4 in the patch.
+If you'd really care about the changelog you'd generate it out of your
+git repo with Debian's git dch in order to have something meaningful.
 
-> For kernel, the minimum of meta information is total compressed length,
-> total uncompressed length and chunk size. I don't know if the first two
-> aren't stored elsewhere in the generic kernel image headers, but chunk
-> size must be specified.
-Right, Currently the chunk size used in the kernel decompressor is the same
-as defined in lz4demo but it should have been provided as meta
-information.
 
-Thanks,
-Kyungsik
+-- 
+maks
