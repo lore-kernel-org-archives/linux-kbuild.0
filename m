@@ -1,74 +1,39 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from vostochny.stro.at ([78.47.22.85]:59619 "EHLO vostochny.stro.at"
+Received: from cantor2.suse.de ([195.135.220.15]:42749 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751548Ab3B1Hch (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 28 Feb 2013 02:32:37 -0500
-Date: Thu, 28 Feb 2013 07:32:35 +0000
-From: maximilian attems <max@stro.at>
-Subject: Re: [PATCH 1/3] kbuild, deb-pkg: Try to determine distribution
-Message-ID: <20130228073235.GP10026@vostochny.stro.at>
-References: <1335219389-10887-1-git-send-email-sedat.dilek@gmail.com>
- <512E1061.3030007@suse.cz>
+	id S1751192Ab3B1IT3 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 28 Feb 2013 03:19:29 -0500
+Message-ID: <512F130C.5020002@suse.cz>
+Date: Thu, 28 Feb 2013 09:19:24 +0100
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <512E1061.3030007@suse.cz>
+Subject: Re: [PATCH 3/3] convert headers_install.pl to headers_install.sh
+References: <1361944667.959170@landley.net>
+In-Reply-To: <1361944667.959170@landley.net>
+Content-Type: text/plain; charset=ISO-8859-2
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: Sedat Dilek <sedat.dilek@googlemail.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Sedat Dilek <sedat.dilek@gmail.com>
+To: Rob Landley <rob@landley.net>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>, Josh Boyer <jwboyer@redhat.com>, "Paul E. McKenney" <paulmck@linux.vnet.ibm.com>, Andrew Morton <akpm@linux-foundation.org>, David Howells <dhowell@redhat.com>, Sam Ravnborg <sam@ravnborg.org>
 
-On Wed, Feb 27, 2013 at 02:55:45PM +0100, Michal Marek wrote:
-> Sorry I missed this series. Max, can you have a look? I don't know the
-> policies for debian package changelogs. The full series is at
-> http://lkml.indiana.edu/hypermail/linux/kernel/1204.2/index.html#04252,
-> but the remaining two patches are obvious.
+On 27.2.2013 06:58, Rob Landley wrote:
+> From: Rob Landley <rob@landley.net>
+> 
+> Remove perl from make headers_install by replacing a perl script (doing
+> a simple regex search and replace) with a smaller, faster, simpler,
+> POSIX-2008 shell script implementation.  The new shell script is a single
+> for loop calling sed and piping its output through unifdef to produce the
+> target file.
+> 
+> Same as last time except for minor tweak to deal with code review from here:
+> http://lkml.indiana.edu/hypermail/linux/kernel/1302.3/00078.html
+> 
+> (Note that this drops the "arch" argument, which isn't used. Kbuild
+> already points to the right input files on the command line.)
+> 
+> Signed-off-by: Rob Landley <rob@landley.net>
 
-the two remaining ones are trivial, should have pushed them a long time
-ago and will do so this weekend in a combined version going up to 2013
-(sitting in my queue to send).
- 
-> On 24.4.2012 00:16, Sedat Dilek wrote:
-> > Signed-off-by: Sedat Dilek <sedat.dilek@gmail.com>
-> > ---
-> >  scripts/package/builddeb |   15 ++++++++++++++-
-> >  1 file changed, 14 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-> > index eee5f8e..f5b56ac 100644
-> > --- a/scripts/package/builddeb
-> > +++ b/scripts/package/builddeb
-> > @@ -172,9 +172,22 @@ else
-> >  fi
-> >  maintainer="$name <$email>"
-> >  
-> > +# Try to determine distribution
-> > +if [ -e $(which lsb_release) ]; then
-> > +       codename=$(lsb_release --codename --short)
-> > +       if [ "$codename" != "" ]; then
-> > +		distribution=$codename
-> > +       else
-> > +		distribution="UNRELEASED"
-> > +		echo "WARNING: The distribution could NOT be determined!"
-> > +       fi
-> > +else
-> > +       echo "HINT: Install lsb_release binary, this helps to identify your distribution!"
-> > +fi
-> > +
-> >  # Generate a simple changelog template
-> >  cat <<EOF > debian/changelog
-> > -linux-upstream ($packageversion) unstable; urgency=low
-> > +linux-upstream ($packageversion) $distribution; urgency=low
-> >  
-> >    * Custom built Linux kernel.
+Looks good, I will apply it after v3.9-rc1 is out.
 
-this is pretty useless. 
-Nack, in adding a this additional lsb dep.
-I know it should be installed by default, but in practise it is often not.
-
-If you'd really care about the changelog you'd generate it out of your
-git repo with Debian's git dch in order to have something meaningful.
-
-
--- 
-maks
+Michal
