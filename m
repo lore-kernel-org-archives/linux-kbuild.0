@@ -1,54 +1,62 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.gentoo.org ([140.211.166.183]:44291 "EHLO smtp.gentoo.org"
+Received: from mout.gmx.net ([212.227.15.19]:55341 "EHLO mout.gmx.net"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754558Ab3B1ViA (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 28 Feb 2013 16:38:00 -0500
-Message-ID: <512FCE40.4040101@gentoo.org>
-Date: Thu, 28 Feb 2013 22:38:08 +0100
-From: justin <jlec@gentoo.org>
+	id S1754476Ab3B1Vut (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 28 Feb 2013 16:50:49 -0500
+Received: from mailout-de.gmx.net ([10.1.76.29]) by mrigmx.server.lan
+ (mrigmx001) with ESMTP (Nemesis) id 0MHuVv-1U7cTK2Jqv-003Zvk for
+ <linux-kbuild@vger.kernel.org>; Thu, 28 Feb 2013 22:50:47 +0100
+From: Sven Joachim <svenjoac@gmx.de>
+Subject: Re: [PATCH 2/2] kconfig: use config scripts to detect ncurses libs
+References: <jlec@gentoo.org>
+	<1362045557-9123-1-git-send-email-jlec@gentoo.org>
+Date: Thu, 28 Feb 2013 22:50:45 +0100
+In-Reply-To: <1362045557-9123-1-git-send-email-jlec@gentoo.org>
+	(jlec@gentoo.org's message of "Thu, 28 Feb 2013 10:59:17 +0100")
+Message-ID: <874ngwhzuy.fsf@turtle.gmx.de>
 MIME-Version: 1.0
-Subject: Re: [PATCH 1/2] Use config scripts to detect ncurses libs for menuconfig
-References: <jlec@gentoo.org> <201302281908.14787.yann.morin.1998@free.fr> <512FCCBA.7000404@gentoo.org> <201302282235.28016.yann.morin.1998@free.fr>
-In-Reply-To: <201302282235.28016.yann.morin.1998@free.fr>
-Content-Type: multipart/signed; micalg=pgp-sha512;
- protocol="application/pgp-signature";
- boundary="----enig2EVIKPQAEEGNJLMQVIXLR"
+Content-Type: text/plain
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Yann E. MORIN" <yann.morin.1998@free.fr>
+To: jlec@gentoo.org
 Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
-------enig2EVIKPQAEEGNJLMQVIXLR
-Content-Type: text/plain; charset=ISO-8859-15
-Content-Transfer-Encoding: quoted-printable
+On 2013-02-28 10:59 +0100, jlec@gentoo.org wrote:
 
-On 2/28/13 10:35 PM, Yann E. MORIN wrote:
-> It's not that those systems will be updated to run the latest kernel, b=
-ut
-> rather that those systems can be used to build a newer kernel for anoth=
-er
-> system (think eg. cross-compilation and embedded).
->=20
+> Ncurses provides a config script (ncurses5-config) to assist finding ncurses.
+> This patch makes use of it to detect the necessary libs for linking of the
+> ncurses nconfig dialog.
 
-That's true, I will split the patches as suggested.
+That script is not necessarily called ncurses5-config, it might also be
+called ncurses6-config is ncurses is configured for a different ABI
+(--enable-ext-colors, --enable-ext-mouse).  Although I would suspect
+that any distribution who does that provides a compatibility symlink.
 
-Jusitn
+>  scripts/kconfig/Makefile | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+>
+> diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
+> index 3091794..c372976 100644
+> --- a/scripts/kconfig/Makefile
+> +++ b/scripts/kconfig/Makefile
+> @@ -216,7 +216,9 @@ HOSTCFLAGS_gconf.o	= `pkg-config --cflags gtk+-2.0 gmodule-2.0 libglade-2.0` \
+>  
+>  HOSTLOADLIBES_mconf   = $(shell $(CONFIG_SHELL) $(check-lxdialog) -ldflags $(HOSTCC))
+>  
+> -HOSTLOADLIBES_nconf	= -lmenu -lpanel -lncurses
+> +HOSTLOADLIBES_nconf	= -lmenu -lpanel
+> +HOSTLOADLIBES_nconf	+= $(shell    ncursesw5-config --libs 2>/dev/null \
+> +				   || ncurses5-config --libs 2>/dev/null  )
 
+This will link with ncursesw, not ncurses.  Probably not what you want,
+since nconf.h does not #include the right headers for that.
 
+On Debian/Ubuntu, there's also the problem that ncursesw5-config exists
+even if the libncursesw5-dev package is not installed, so this patch
+makes the build fail in such cases.
 
-------enig2EVIKPQAEEGNJLMQVIXLR
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Can we just call ncurses5-config and not ncursesw5-config, or are there
+any distros who ship the latter and not the former?
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG/MacGPG2 v2.0.18 (Darwin)
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iEYEAREKAAYFAlEvzkAACgkQgAnW8HDreRbS6gCfZkss7EUHQ1AYFcTCfdHxjLxn
-PzEAoL4ziuKXlCiIJA18MmrEQVpcAtlz
-=95Dj
------END PGP SIGNATURE-----
-
-------enig2EVIKPQAEEGNJLMQVIXLR--
+Cheers,
+       Sven
