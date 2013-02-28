@@ -1,72 +1,73 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from perches-mx.perches.com ([206.117.179.246]:56263 "EHLO
-	labridge.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1750916Ab3B1EW4 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 27 Feb 2013 23:22:56 -0500
-Message-ID: <1362025374.1928.13.camel@joe-AO722>
-Subject: Re: [RFC PATCH v2 0/4] Add support for LZ4-compressed kernel
-From: Joe Perches <joe@perches.com>
-Date: Wed, 27 Feb 2013 20:22:54 -0800
-In-Reply-To: <20130227173644.GC17833@n2100.arm.linux.org.uk>
+Received: from LGEMRELSE6Q.lge.com ([156.147.1.121]:42044 "EHLO
+	LGEMRELSE6Q.lge.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751127Ab3B1FWw (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 28 Feb 2013 00:22:52 -0500
+Date: Thu, 28 Feb 2013 14:22:48 +0900
+From: Kyungsik Lee <kyungsik.lee@lge.com>
+Subject: Re: [RFC PATCH v2 2/4] lib: Add support for LZ4-compressed kernel
+Message-ID: <20130228052248.GA15148@Corona>
 References: <1361859870-15751-1-git-send-email-kyungsik.lee@lge.com>
-	 <512D1C12.4080109@oberhumer.com>
-	 <alpine.LFD.2.03.1302261557220.1254@syhkavp.arg>
-	 <87fw0i7n6d.fsf@dell.be.48ers.dk>
-	 <20130226221027.GW17833@n2100.arm.linux.org.uk>
-	 <1361929234.1924.8.camel@joe-AO722>
-	 <20130227095609.GY17833@n2100.arm.linux.org.uk>
-	 <1361980152.2035.13.camel@joe-AO722>
-	 <20130227163118.GB17833@n2100.arm.linux.org.uk>
-	 <1361984688.2035.20.camel@joe-AO722>
-	 <20130227173644.GC17833@n2100.arm.linux.org.uk>
-Content-Type: text/plain; charset="ISO-8859-1"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+ <1361859870-15751-3-git-send-email-kyungsik.lee@lge.com>
+ <20130226140051.GX27541@twin.jikos.cz>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20130226140051.GX27541@twin.jikos.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Russell King - ARM Linux <linux@arm.linux.org.uk>
-Cc: Peter Korsgaard <jacmet@sunsite.dk>, Nicolas Pitre <nico@fluxnic.net>, "Markus F.X.J. Oberhumer" <markus@oberhumer.com>, Kyungsik Lee <kyungsik.lee@lge.com>, Andrew Morton <akpm@linux-foundation.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, Michal Marek <mmarek@suse.cz>, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, x86@kernel.org, celinux-dev@lists.celinuxforum.org, Nitin Gupta <nitingupta910@gmail.com>, Josh Triplett <josh@joshtriplett.org>, Joe Millenbach <jmillenbach@gmail.com>, David Sterba <dsterba@suse.cz>, Richard Cochran <richardcochran@gmail.com>, Egon Alter <egon.alter@gmx.net>, hyojun.im@lge.com, chan.jeong@lge.com, raphael.andy.lee@gmail.com
+To: David Sterba <dsterba@suse.cz>
+Cc: Andrew Morton <akpm@linux-foundation.org>, Russell King <linux@arm.linux.org.uk>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, Michal Marek <mmarek@suse.cz>, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, x86@kernel.org, celinux-dev@lists.celinuxforum.org, Nicolas Pitre <nico@fluxnic.net>, Nitin Gupta <nitingupta910@gmail.com>, "Markus F.X.J. Oberhumer" <markus@oberhumer.com>, Josh Triplett <josh@joshtriplett.org>, Joe Millenbach <jmillenbach@gmail.com>, Richard Cochran <richardcochran@gmail.com>, Egon Alter <egon.alter@gmx.net>, hyojun.im@lge.com, chan.jeong@lge.com, raphael.andy.lee@gmail.com
 
-(removed Richard Purdie and Albin Tonnerre as their email addresses
- seem to be bounding)
-
-> While recently asking someone to enable VFP debugging, so I could help
-> sort out a problem they had reported, this is the debug output I was
-> greeted by thanks to your meddling:
-
-:) Meddling... You sound like one of those nameless
-villains on Scooby Doo.  If only I had a cool nickname
-like Dave "Shaggy" Kliekamp.  I guess you'd have to call
-me Velma.
-
-> [  927.235546] \x01\x01\x01\x01\x01\x01\x01\x01
-> ...
-> [  927.241505] \x01\x01\x01\x01\x01\x01\x01\x01\x01\x01\x01                     
+On Tue, Feb 26, 2013 at 03:00:51PM +0100, David Sterba wrote:
+> On Tue, Feb 26, 2013 at 03:24:28PM +0900, Kyungsik Lee wrote:
+> > +config KERNEL_LZ4
+> > +	bool "LZ4"
+> > +	depends on HAVE_KERNEL_LZ4
+> > +	help
+> > +	  Its compression ratio is worse than LZO. The size of the kernel
+> > +	  is about 8% bigger than LZO. But the decompression speed is
+> > +	  faster than LZO.
+> > +
 > 
-> 7.6 `.asciz "STRING"'...
-> ========================
+> Can you please add a sentence what lz4 actually is before you start
+> comparing it with the current competitor(s)?
+Yes, I will update it.
+
+> > --- /dev/null
+> > +++ b/lib/decompress_unlz4.c
+> > @@ -0,0 +1,190 @@
+> > +#define LZ4_CHUNK_SIZE (8<<20)
 > 
-> `.asciz' is just like `.ascii', but each string is followed by a zero
->                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-> byte.  The "z" in `.asciz' stands for "zero".
-> ^^^^^
+> Please use a less cryptic way of representing a value of 8 MB. Also,
+> this is a hardcoded value that must be used on the compressor side. It's
+> an upper limit, so anything below 8MB does not break decompresssion, but
+> this must be somehow checked or saved along in the binary stream. You
+> seem to use the lz4demo.c on the userspace side for compression, but
+> this is not a standard tool nor the output format is well-defined or
+> stabilized.
+Yes, It will be easy to parse and extract the meta information required
+for the kernel decompressor if output format is well-defined and
+standardized.
 
-Yeah, sorry.  I thought that the zero was after any
-concatenation like .c.  Learned something.  'preciate
-that.  Would have appreciated a polite "you broke it"
-email too.
+> For proper use I would like to see a commandline tool similar to
+> gzip/bzip2/lzop that can be packaged and shipped by distros, and the
+> output format defintion.
+> 
+> Yann has some ideas for the format
+> http://fastcompression.blogspot.cz/2012/04/file-container-format-for-lz4.html
+Actually, I would like to use a packaged tool by distros too.
+lz4demo is what I use for compressing the kernel so far.
+I name it lz4 in the patch.
 
-> ??? Yea, right, meanwhile breaking the ability of stuff to produce
-> kernel messages.
+> For kernel, the minimum of meta information is total compressed length,
+> total uncompressed length and chunk size. I don't know if the first two
+> aren't stored elsewhere in the generic kernel image headers, but chunk
+> size must be specified.
+Right, Currently the chunk size used in the kernel decompressor is the same
+as defined in lz4demo but it should have been provided as meta
+information.
 
-Fortunately, that's the only .S instance.
-
-> > > > > > > so that we can see whether it's worth updating the LZO code
-> > Sounded as if you were doubtful to me.
-> _In_ the decompressor.  We're talking about the _decompressor_ in
-> this thread.
-
-My opinion is it's useful to update LZO.
-
-cheers, Joe (aka: Velma)
-
+Thanks,
+Kyungsik
