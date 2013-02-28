@@ -1,39 +1,61 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:42749 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751192Ab3B1IT3 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 28 Feb 2013 03:19:29 -0500
-Message-ID: <512F130C.5020002@suse.cz>
-Date: Thu, 28 Feb 2013 09:19:24 +0100
-From: Michal Marek <mmarek@suse.cz>
+Received: from mail.not-your-server.de ([78.46.182.243]:55947 "EHLO
+	mail.not-your-server.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750768Ab3B1JfM (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 28 Feb 2013 04:35:12 -0500
+Message-ID: <512F24CC.2090906@gentoo.org>
+Date: Thu, 28 Feb 2013 10:35:08 +0100
+From: justin <jlec@gentoo.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH 3/3] convert headers_install.pl to headers_install.sh
-References: <1361944667.959170@landley.net>
-In-Reply-To: <1361944667.959170@landley.net>
-Content-Type: text/plain; charset=ISO-8859-2
-Content-Transfer-Encoding: 7bit
+Subject: Re: [PATCH 1/2] Use config scripts to detect ncurses libs for menuconfig
+References: <jlec@gentoo.org> <1361988458-18486-1-git-send-email-jlec@gentoo.org> <201302271937.49565.yann.morin.1998@free.fr>
+In-Reply-To: <201302271937.49565.yann.morin.1998@free.fr>
+Content-Type: multipart/signed; micalg=pgp-sha512;
+ protocol="application/pgp-signature";
+ boundary="----enig2BPDMVULWOJUFMMCCOQWG"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Rob Landley <rob@landley.net>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>, Josh Boyer <jwboyer@redhat.com>, "Paul E. McKenney" <paulmck@linux.vnet.ibm.com>, Andrew Morton <akpm@linux-foundation.org>, David Howells <dhowell@redhat.com>, Sam Ravnborg <sam@ravnborg.org>
+To: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On 27.2.2013 06:58, Rob Landley wrote:
-> From: Rob Landley <rob@landley.net>
-> 
-> Remove perl from make headers_install by replacing a perl script (doing
-> a simple regex search and replace) with a smaller, faster, simpler,
-> POSIX-2008 shell script implementation.  The new shell script is a single
-> for loop calling sed and piping its output through unifdef to produce the
-> target file.
-> 
-> Same as last time except for minor tweak to deal with code review from here:
-> http://lkml.indiana.edu/hypermail/linux/kernel/1302.3/00078.html
-> 
-> (Note that this drops the "arch" argument, which isn't used. Kbuild
-> already points to the right input files on the command line.)
-> 
-> Signed-off-by: Rob Landley <rob@landley.net>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+------enig2BPDMVULWOJUFMMCCOQWG
+Content-Type: text/plain; charset=ISO-8859-15
+Content-Transfer-Encoding: quoted-printable
 
-Looks good, I will apply it after v3.9-rc1 is out.
+Hello,
 
-Michal
+> On a side note: is the old code still useful, now we use the config
+> scripts? In other words: are there cases where a ncurses install would
+> not provide those scripts?
+>=20
+> If the answer is 'no', then just trash the old code away.
+>=20
+> I've just tested Debian Squeeze (stable for now), and Cygwin, and they
+> both do provide ncurses{,w}5-config.
+>=20
+
+I looked into the ncurses releases back to 5.0. The first release
+containing is version 5.6 released in 2006. So I would guess we can
+assume that every system will have it.
+
+
+justin
+
+
+------enig2BPDMVULWOJUFMMCCOQWG
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.19 (GNU/Linux)
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iEYEAREKAAYFAlEvJMwACgkQgAnW8HDreRZGSQCgupAxITEfKpOoZdOTAQ3hBe62
+KgYAoJ9oX1tScTPd87eD3A2a5humSQR6
+=g/v+
+-----END PGP SIGNATURE-----
+
+------enig2BPDMVULWOJUFMMCCOQWG--
