@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.not-your-server.de ([78.46.182.243]:56010 "EHLO
+Received: from mail.not-your-server.de ([78.46.182.243]:56350 "EHLO
 	mail.not-your-server.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751667Ab3B1J7X (ORCPT
+	with ESMTP id S1752040Ab3B1LwU (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 28 Feb 2013 04:59:23 -0500
+	Thu, 28 Feb 2013 06:52:20 -0500
 From: jlec@gentoo.org
-Subject: [PATCH 2/2] kconfig: use config scripts to detect ncurses libs
-Date: Thu, 28 Feb 2013 10:59:17 +0100
-Message-Id: <1362045557-9123-1-git-send-email-jlec@gentoo.org>
+Subject: [PATCH] menuconfig: use config scripts to detect ncurses libs
+Date: Thu, 28 Feb 2013 12:52:15 +0100
+Message-Id: <1362052335-17913-1-git-send-email-jlec@gentoo.org>
 In-Reply-To: <jlec@gentoo.org>
 References: <jlec@gentoo.org>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -19,32 +19,40 @@ From: Justin Lecher <jlec@gentoo.org>
 
 When building ncurses with --with-termlib several symbols get moved from
 libncurses.so to libtinfo.so. Thus when linking with libncurses.so, one
-additionally needs to link with libtinfo.so.
+additionally needs to link with libtinfo.so. Ncurses provides a config script
+(ncurses5-config) to assist finding ncurses.
 
-Ncurses provides a config script (ncurses5-config) to assist finding ncurses.
-This patch makes use of it to detect the necessary libs for linking of the
-ncurses nconfig dialog.
+This patch replaces the old heuristic for detection of ncurses libs for
+linking the ncurses menuconfig dialog by the use of the config scripts.
+This results in the requirement of ncurses version 5.6 or newer for menuconfig.
 
 Signed-off-by: Justin Lecher <jlec@gentoo.org>
 ---
- scripts/kconfig/Makefile | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ scripts/kconfig/lxdialog/check-lxdialog.sh | 11 ++---------
+ 1 file changed, 2 insertions(+), 9 deletions(-)
 
-diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
-index 3091794..c372976 100644
---- a/scripts/kconfig/Makefile
-+++ b/scripts/kconfig/Makefile
-@@ -216,7 +216,9 @@ HOSTCFLAGS_gconf.o	= `pkg-config --cflags gtk+-2.0 gmodule-2.0 libglade-2.0` \
+diff --git a/scripts/kconfig/lxdialog/check-lxdialog.sh b/scripts/kconfig/lxdialog/check-lxdialog.sh
+index c8e8a71..10df55b 100644
+--- a/scripts/kconfig/lxdialog/check-lxdialog.sh
++++ b/scripts/kconfig/lxdialog/check-lxdialog.sh
+@@ -4,15 +4,8 @@
+ # What library to link
+ ldflags()
+ {
+-	for ext in so a dll.a dylib ; do
+-		for lib in ncursesw ncurses curses ; do
+-			$cc -print-file-name=lib${lib}.${ext} | grep -q /
+-			if [ $? -eq 0 ]; then
+-				echo "-l${lib}"
+-				exit
+-			fi
+-		done
+-	done
++	ncursesw5-config --libs 2>/dev/null && exit
++	ncurses5-config --libs 2>/dev/null && exit
+ 	exit 1
+ }
  
- HOSTLOADLIBES_mconf   = $(shell $(CONFIG_SHELL) $(check-lxdialog) -ldflags $(HOSTCC))
- 
--HOSTLOADLIBES_nconf	= -lmenu -lpanel -lncurses
-+HOSTLOADLIBES_nconf	= -lmenu -lpanel
-+HOSTLOADLIBES_nconf	+= $(shell    ncursesw5-config --libs 2>/dev/null \
-+				   || ncurses5-config --libs 2>/dev/null  )
- $(obj)/qconf.o: $(obj)/.tmp_qtcheck
- 
- ifeq ($(qconf-target),1)
 -- 
 1.8.1.4
 
