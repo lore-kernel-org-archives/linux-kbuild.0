@@ -1,70 +1,54 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.not-your-server.de ([78.46.182.243]:59669 "EHLO
+Received: from mail.not-your-server.de ([78.46.182.243]:60169 "EHLO
 	mail.not-your-server.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750696Ab3CANrv (ORCPT
+	with ESMTP id S1751320Ab3CAPus (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 1 Mar 2013 08:47:51 -0500
-Message-ID: <5130B183.9080901@gentoo.org>
-Date: Fri, 01 Mar 2013 14:47:47 +0100
-From: justin <jlec@gentoo.org>
-MIME-Version: 1.0
-Subject: Re: [PATCH 2/2] kconfig: use config scripts to detect ncurses libs
-References: <jlec@gentoo.org> <1362045557-9123-1-git-send-email-jlec@gentoo.org> <874ngwhzuy.fsf@turtle.gmx.de> <51305AC4.2030008@gentoo.org> <87obf35xei.fsf@turtle.gmx.de>
-In-Reply-To: <87obf35xei.fsf@turtle.gmx.de>
-Content-Type: multipart/signed; micalg=pgp-sha512;
- protocol="application/pgp-signature";
- boundary="----enig2UEIMGWPEKLOOWIQRROKC"
+	Fri, 1 Mar 2013 10:50:48 -0500
+From: jlec@gentoo.org
+Subject: [PATCH 1/2] menuconfig: use config scripts to detect ncurses libs
+Date: Fri,  1 Mar 2013 16:50:43 +0100
+Message-Id: <1362153044-23611-2-git-send-email-jlec@gentoo.org>
+In-Reply-To: <1362153044-23611-1-git-send-email-jlec@gentoo.org>
+References: <jlec@gentoo.org>
+ <1362153044-23611-1-git-send-email-jlec@gentoo.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sven Joachim <svenjoac@gmx.de>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: Justin Lecher <jlec@gentoo.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
-------enig2UEIMGWPEKLOOWIQRROKC
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
+From: Justin Lecher <jlec@gentoo.org>
 
-On 01/03/13 09:36, Sven Joachim wrote:
-> Historically it seems to be an accident, and the ncurses{w,5}-config
-> scripts should have better been shipped in their development packages.
-> But nowadays we want to make the development packages multiarch-aware,
-> and since the scripts differ on architectures, moving them away from
-> ncurses-bin would mean adding two additional binary packages just for
-> these scripts.
->=20
-> See http://bugs.debian.org/480437 for a discussion on that topic.
->=20
+When building ncurses with --with-termlib several symbols get moved from
+libncurses.so to libtinfo.so. Thus when linking with libncurses.so, one
+additionally needs to link with libtinfo.so. Ncurses provides a config script
+(ncurses5-config) or in very recent version even a pkg-config module to assist
+finding ncurses.
 
-I just tested on an ubuntu installation what happens with the patches
-applied; you simply end up with the warning the you need to install the
-dev package. So I don't see any problem here.
+The old heuristic for detection of ncurses libs will be extended to the
+pkg-config and the config scripts.
 
-> Well, at least until nconf does not make any effort to explicitly detec=
-t
-> and use the wide API, trying ncurses5-config first should work.  If you=
+Signed-off-by: Justin Lecher <jlec@gentoo.org>
+---
+ scripts/kconfig/lxdialog/check-lxdialog.sh | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-> build ncurses yourself with --enable-widec, there is no -lmenu or -lpan=
-el
-> anyway, these libraries are called menuw and panelw then.
+diff --git a/scripts/kconfig/lxdialog/check-lxdialog.sh b/scripts/kconfig/lxdialog/check-lxdialog.sh
+index 8078813..8086874 100644
+--- a/scripts/kconfig/lxdialog/check-lxdialog.sh
++++ b/scripts/kconfig/lxdialog/check-lxdialog.sh
+@@ -4,6 +4,12 @@
+ # What library to link
+ ldflags()
+ {
++	pkg-config --libs ncursesw 2>/dev/null && exit
++	pkg-config --libs ncurses 2>/dev/null && exit
++	ncursesw5-config --libs 2>/dev/null && exit
++	ncurses5-config --libs 2>/dev/null && exit
++	ncursesw6-config --libs 2>/dev/null && exit
++	ncurses6-config --libs 2>/dev/null && exit
+ 	for ext in so a dll.a dylib ; do
+ 		for lib in ncursesw ncurses curses ; do
+ 			$cc -print-file-name=lib${lib}.${ext} | grep -q /
+-- 
+1.8.1.4
 
-You are right, we only should consider ncurses5-config right now.
-
-Regards,
-Justin
-
-
-------enig2UEIMGWPEKLOOWIQRROKC
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.19 (GNU/Linux)
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iEYEAREKAAYFAlEwsYMACgkQgAnW8HDreRZuVwCdGcFzxhBIz/0y9bCx6/lYAgQJ
-fhoAn0acvIiZBV6RKoLTe0BeFu89pcf/
-=c8jG
------END PGP SIGNATURE-----
-
-------enig2UEIMGWPEKLOOWIQRROKC--
