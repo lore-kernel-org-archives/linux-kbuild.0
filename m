@@ -1,54 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.not-your-server.de ([78.46.182.243]:60170 "EHLO
-	mail.not-your-server.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751436Ab3CAPus (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 1 Mar 2013 10:50:48 -0500
-From: jlec@gentoo.org
-Subject: [PATCH 2/2] kconfig: use config scripts to detect ncurses libs
-Date: Fri,  1 Mar 2013 16:50:44 +0100
-Message-Id: <1362153044-23611-3-git-send-email-jlec@gentoo.org>
-In-Reply-To: <1362153044-23611-1-git-send-email-jlec@gentoo.org>
+Received: from mout.gmx.net ([212.227.15.19]:62419 "EHLO mout.gmx.net"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751080Ab3CARE2 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 1 Mar 2013 12:04:28 -0500
+Received: from mailout-de.gmx.net ([10.1.76.28]) by mrigmx.server.lan
+ (mrigmx001) with ESMTP (Nemesis) id 0Lx1bL-1UrLWt1l5F-016jkV for
+ <linux-kbuild@vger.kernel.org>; Fri, 01 Mar 2013 18:04:26 +0100
+From: Sven Joachim <svenjoac@gmx.de>
+Subject: Re: [PATCH 2/2] kconfig: use config scripts to detect ncurses libs
 References: <jlec@gentoo.org>
- <1362153044-23611-1-git-send-email-jlec@gentoo.org>
+	<1362045557-9123-1-git-send-email-jlec@gentoo.org>
+	<874ngwhzuy.fsf@turtle.gmx.de> <51305AC4.2030008@gentoo.org>
+	<87obf35xei.fsf@turtle.gmx.de> <5130B183.9080901@gentoo.org>
+Date: Fri, 01 Mar 2013 18:04:25 +0100
+In-Reply-To: <5130B183.9080901@gentoo.org> (justin's message of "Fri, 01 Mar
+	2013 14:47:47 +0100")
+Message-ID: <87zjyn2grq.fsf@turtle.gmx.de>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: Justin Lecher <jlec@gentoo.org>
+To: justin <jlec@gentoo.org>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-From: Justin Lecher <jlec@gentoo.org>
+On 2013-03-01 14:47 +0100, justin wrote:
 
-When building ncurses with --with-termlib several symbols get moved from
-libncurses.so to libtinfo.so. Thus when linking with libncurses.so, one
-additionally needs to link with libtinfo.so. Ncurses provides a config script
-(ncurses5-config) or in very recent version even a pkg-config module to assist
-finding ncurses.
+> On 01/03/13 09:36, Sven Joachim wrote:
+>> Historically it seems to be an accident, and the ncurses{w,5}-config
+>> scripts should have better been shipped in their development packages.
+>> But nowadays we want to make the development packages multiarch-aware,
+>> and since the scripts differ on architectures, moving them away from
+>> ncurses-bin would mean adding two additional binary packages just for
+>> these scripts.
+>> 
+>> See http://bugs.debian.org/480437 for a discussion on that topic.
+>> 
+>
+> I just tested on an ubuntu installation what happens with the patches
+> applied; you simply end up with the warning the you need to install the
+> dev package. So I don't see any problem here.
 
-This patch makes use of it to detect the necessary libs for linking of the
-ncurses nconfig dialog
+Well, in Debian/Ubuntu are _two_ dev packages, one for the wide API
+(libncursesw5-dev), and on for the non-wide API (libncurses5-dev).  Only
+the latter should be necessary, but with your original patch people
+would need to install the former as well.
 
-Signed-off-by: Justin Lecher <jlec@gentoo.org>
----
- scripts/kconfig/Makefile | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+>> Well, at least until nconf does not make any effort to explicitly detect
+>> and use the wide API, trying ncurses5-config first should work.  If you
+>> build ncurses yourself with --enable-widec, there is no -lmenu or -lpanel
+>> anyway, these libraries are called menuw and panelw then.
+>
+> You are right, we only should consider ncurses5-config right now.
 
-diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
-index 231b475..cc81db5 100644
---- a/scripts/kconfig/Makefile
-+++ b/scripts/kconfig/Makefile
-@@ -219,7 +219,11 @@ HOSTCFLAGS_gconf.o	= `pkg-config --cflags gtk+-2.0 gmodule-2.0 libglade-2.0` \
- 
- HOSTLOADLIBES_mconf   = $(shell $(CONFIG_SHELL) $(check-lxdialog) -ldflags $(HOSTCC))
- 
--HOSTLOADLIBES_nconf	= -lmenu -lpanel -lncurses
-+HOSTLOADLIBES_nconf	= -lmenu -lpanel
-+HOSTLOADLIBES_nconf	+= $(shell \
-+				pkg-config --libs ncurses 2>/dev/null \
-+				|| ncurses5-config --libs 2>/dev/null \
-+				|| ncurses6-config --libs 2>/dev/null  )
- $(obj)/qconf.o: $(obj)/.tmp_qtcheck
- 
- ifeq ($(qconf-target),1)
--- 
-1.8.1.4
+That seems unlikely to cause regressions on its own.
 
+Cheers,
+       Sven
