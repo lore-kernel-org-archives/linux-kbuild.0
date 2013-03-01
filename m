@@ -1,105 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.not-your-server.de ([78.46.182.243]:58865 "EHLO
+Received: from mail.not-your-server.de ([78.46.182.243]:58909 "EHLO
 	mail.not-your-server.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750758Ab3CAHhp (ORCPT
+	with ESMTP id S1751256Ab3CAHsZ (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 1 Mar 2013 02:37:45 -0500
-Message-ID: <51305AC4.2030008@gentoo.org>
-Date: Fri, 01 Mar 2013 08:37:40 +0100
+	Fri, 1 Mar 2013 02:48:25 -0500
+Message-ID: <51305D44.3080601@gentoo.org>
+Date: Fri, 01 Mar 2013 08:48:20 +0100
 From: justin <jlec@gentoo.org>
 MIME-Version: 1.0
 Subject: Re: [PATCH 2/2] kconfig: use config scripts to detect ncurses libs
-References: <jlec@gentoo.org> <1362045557-9123-1-git-send-email-jlec@gentoo.org> <874ngwhzuy.fsf@turtle.gmx.de>
-In-Reply-To: <874ngwhzuy.fsf@turtle.gmx.de>
+References: <jlec@gentoo.org> <1362045557-9123-1-git-send-email-jlec@gentoo.org> <201302282159.20338.yann.morin.1998@free.fr>
+In-Reply-To: <201302282159.20338.yann.morin.1998@free.fr>
 Content-Type: multipart/signed; micalg=pgp-sha512;
  protocol="application/pgp-signature";
- boundary="----enig2FKVNXIUHVKBTRDNSLEMU"
+ boundary="----enig2QAGWVMQMXVLBDKLVHCQR"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sven Joachim <svenjoac@gmx.de>
+To: "Yann E. MORIN" <yann.morin.1998@free.fr>
 Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
-------enig2FKVNXIUHVKBTRDNSLEMU
-Content-Type: text/plain; charset=ISO-8859-1
+------enig2QAGWVMQMXVLBDKLVHCQR
+Content-Type: text/plain; charset=ISO-8859-15
 Content-Transfer-Encoding: quoted-printable
 
-On 28/02/13 22:50, Sven Joachim wrote:
-> On 2013-02-28 10:59 +0100, jlec@gentoo.org wrote:
->=20
->> Ncurses provides a config script (ncurses5-config) to assist finding n=
-curses.
->> This patch makes use of it to detect the necessary libs for linking of=
- the
->> ncurses nconfig dialog.
->=20
-> That script is not necessarily called ncurses5-config, it might also be=
-
-> called ncurses6-config is ncurses is configured for a different ABI
-> (--enable-ext-colors, --enable-ext-mouse).  Although I would suspect
-> that any distribution who does that provides a compatibility symlink.
->
-
-We don't do that, but I rechecked with building ncurses manually. You
-are right. How widely spread is the usage of this options? Or is it
-rather an experimental option?
-What we could do is simple extending the syntax to additionally check
-for the ABI version 6 config scripts. Is this an option to consider?
-
->>  scripts/kconfig/Makefile | 4 +++-
->>  1 file changed, 3 insertions(+), 1 deletion(-)
->>
->> diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
->> index 3091794..c372976 100644
->> --- a/scripts/kconfig/Makefile
->> +++ b/scripts/kconfig/Makefile
->> @@ -216,7 +216,9 @@ HOSTCFLAGS_gconf.o	=3D `pkg-config --cflags gtk+-2=
-=2E0 gmodule-2.0 libglade-2.0` \
->> =20
->>  HOSTLOADLIBES_mconf   =3D $(shell $(CONFIG_SHELL) $(check-lxdialog) -=
-ldflags $(HOSTCC))
->> =20
->> -HOSTLOADLIBES_nconf	=3D -lmenu -lpanel -lncurses
->> +HOSTLOADLIBES_nconf	=3D -lmenu -lpanel
->> +HOSTLOADLIBES_nconf	+=3D $(shell    ncursesw5-config --libs 2>/dev/nu=
-ll \
->> +				   || ncurses5-config --libs 2>/dev/null  )
->=20
-> This will link with ncursesw, not ncurses.  Probably not what you want,=
-
-> since nconf.h does not #include the right headers for that.
+On 28/02/13 21:59, Yann E. MORIN wrote:
+> I've queued that one in my tree, now, in branch yem-kconfig-for-next:
+>     https://www.gitorious.org/linux-kconfig/linux-kconfig
 >=20
 
-That's true, and again it would change two things at once. I will go
-back to simple -lncurses as it was before.
 
-> On Debian/Ubuntu, there's also the problem that ncursesw5-config exists=
+Thanks for queuing, but with the points which Sven mentioned we should
+first agree on a way to detect things.
 
-> even if the libncursesw5-dev package is not installed, so this patch
-> makes the build fail in such cases.
+The simplest option which might only be present at very recent distro
+versions is using pkg-config.
+Second best is ncurses*5-config. There we have the strange situation
+that "ncurses-bin" contains the config scripts although no build time
+dependencies are installed along.
+Third, we might only find either of nurses{,w}5-config.
+And at last we might face the situation where the new ABI is used and
+the script is named ncurses{,w}6-config.
 
-Will be solved when reverting as described above. But actually it smells
-like a bug in the package management, doesn't it? Why are build time
-config scripts shipped in runtime only packages? What is their purpose?
+Ugly but working would be a simple "||" chain. This would create
+problems on debian/ubuntu which needs to be solved.
 
->=20
-> Can we just call ncurses5-config and not ncursesw5-config, or are there=
-
-> any distros who ship the latter and not the former?
->=20
-
-I can't talk about distro wide situation, but manual building gives only
-one of the two. So there might be a situation where only one of the two
-is present.
-
-It seems we have a little dilemma here. Any suggestions how to solve it?
+Any other suggestions how we can solve the problem?
 
 
-Thanks,
-Justin
+Thanks
+justin
 
 
-------enig2FKVNXIUHVKBTRDNSLEMU
+------enig2QAGWVMQMXVLBDKLVHCQR
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
@@ -108,9 +61,9 @@ Content-Disposition: attachment; filename="signature.asc"
 Version: GnuPG v2.0.19 (GNU/Linux)
 Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
 
-iEYEAREKAAYFAlEwWsUACgkQgAnW8HDreRa6aQCfSV39rQoxH2h2AFLi6v5W4BVF
-WYAAnRBInUXexTBMRW5Zfo3FjAIP1daZ
-=nIB/
+iEYEAREKAAYFAlEwXUQACgkQgAnW8HDreRYZKQCfcA/llnOqq3tVV5Ld3F7P/XzA
+cJEAoJirfp8/RGcu5NFToPHTg6R2gbrc
+=Hjot
 -----END PGP SIGNATURE-----
 
-------enig2FKVNXIUHVKBTRDNSLEMU--
+------enig2QAGWVMQMXVLBDKLVHCQR--
