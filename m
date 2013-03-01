@@ -1,53 +1,116 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ie0-f179.google.com ([209.85.223.179]:55631 "EHLO
-	mail-ie0-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751770Ab3CAFHy convert rfc822-to-8bit (ORCPT
+Received: from mail.not-your-server.de ([78.46.182.243]:58865 "EHLO
+	mail.not-your-server.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750758Ab3CAHhp (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 1 Mar 2013 00:07:54 -0500
-Received: by mail-ie0-f179.google.com with SMTP id k11so3074329iea.38
-        for <linux-kbuild@vger.kernel.org>; Thu, 28 Feb 2013 21:07:54 -0800 (PST)
-Date: Thu, 28 Feb 2013 23:07:49 -0600
-From: Rob Landley <rob@landley.net>
-Subject: Re: [PATCH 3/3] convert headers_install.pl to headers_install.sh
-References: <1361944667.959170@landley.net> <512F130C.5020002@suse.cz>
-In-Reply-To: <512F130C.5020002@suse.cz> (from mmarek@suse.cz on Thu Feb 28
-	02:19:24 2013)
-Message-Id: <1362114469.21837.0@driftwood>
+	Fri, 1 Mar 2013 02:37:45 -0500
+Message-ID: <51305AC4.2030008@gentoo.org>
+Date: Fri, 01 Mar 2013 08:37:40 +0100
+From: justin <jlec@gentoo.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; DelSp=Yes; Format=Flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: 8BIT
+Subject: Re: [PATCH 2/2] kconfig: use config scripts to detect ncurses libs
+References: <jlec@gentoo.org> <1362045557-9123-1-git-send-email-jlec@gentoo.org> <874ngwhzuy.fsf@turtle.gmx.de>
+In-Reply-To: <874ngwhzuy.fsf@turtle.gmx.de>
+Content-Type: multipart/signed; micalg=pgp-sha512;
+ protocol="application/pgp-signature";
+ boundary="----enig2FKVNXIUHVKBTRDNSLEMU"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>, Josh Boyer <jwboyer@redhat.com>, "Paul E. McKenney" <paulmck@linux.vnet.ibm.com>, Andrew Morton <akpm@linux-foundation.org>, David Howells <dhowell@redhat.com>, Sam Ravnborg <sam@ravnborg.org>
+To: Sven Joachim <svenjoac@gmx.de>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On 02/28/2013 02:19:24 AM, Michal Marek wrote:
-> On 27.2.2013 06:58, Rob Landley wrote:
-> > From: Rob Landley <rob@landley.net>
-> >
-> > Remove perl from make headers_install by replacing a perl script  
-> (doing
-> > a simple regex search and replace) with a smaller, faster, simpler,
-> > POSIX-2008 shell script implementation.  The new shell script is a  
-> single
-> > for loop calling sed and piping its output through unifdef to  
-> produce the
-> > target file.
-> >
-> > Same as last time except for minor tweak to deal with code review  
-> from here:
-> > http://lkml.indiana.edu/hypermail/linux/kernel/1302.3/00078.html
-> >
-> > (Note that this drops the "arch" argument, which isn't used. Kbuild
-> > already points to the right input files on the command line.)
-> >
-> > Signed-off-by: Rob Landley <rob@landley.net>
-> 
-> Looks good, I will apply it after v3.9-rc1 is out.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+------enig2FKVNXIUHVKBTRDNSLEMU
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
 
-Yay! Thank you!
+On 28/02/13 22:50, Sven Joachim wrote:
+> On 2013-02-28 10:59 +0100, jlec@gentoo.org wrote:
+>=20
+>> Ncurses provides a config script (ncurses5-config) to assist finding n=
+curses.
+>> This patch makes use of it to detect the necessary libs for linking of=
+ the
+>> ncurses nconfig dialog.
+>=20
+> That script is not necessarily called ncurses5-config, it might also be=
 
-(Andrew took the other two! Thank you!)
+> called ncurses6-config is ncurses is configured for a different ABI
+> (--enable-ext-colors, --enable-ext-mouse).  Although I would suspect
+> that any distribution who does that provides a compatibility symlink.
+>
 
-Rob
+We don't do that, but I rechecked with building ncurses manually. You
+are right. How widely spread is the usage of this options? Or is it
+rather an experimental option?
+What we could do is simple extending the syntax to additionally check
+for the ABI version 6 config scripts. Is this an option to consider?
+
+>>  scripts/kconfig/Makefile | 4 +++-
+>>  1 file changed, 3 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
+>> index 3091794..c372976 100644
+>> --- a/scripts/kconfig/Makefile
+>> +++ b/scripts/kconfig/Makefile
+>> @@ -216,7 +216,9 @@ HOSTCFLAGS_gconf.o	=3D `pkg-config --cflags gtk+-2=
+=2E0 gmodule-2.0 libglade-2.0` \
+>> =20
+>>  HOSTLOADLIBES_mconf   =3D $(shell $(CONFIG_SHELL) $(check-lxdialog) -=
+ldflags $(HOSTCC))
+>> =20
+>> -HOSTLOADLIBES_nconf	=3D -lmenu -lpanel -lncurses
+>> +HOSTLOADLIBES_nconf	=3D -lmenu -lpanel
+>> +HOSTLOADLIBES_nconf	+=3D $(shell    ncursesw5-config --libs 2>/dev/nu=
+ll \
+>> +				   || ncurses5-config --libs 2>/dev/null  )
+>=20
+> This will link with ncursesw, not ncurses.  Probably not what you want,=
+
+> since nconf.h does not #include the right headers for that.
+>=20
+
+That's true, and again it would change two things at once. I will go
+back to simple -lncurses as it was before.
+
+> On Debian/Ubuntu, there's also the problem that ncursesw5-config exists=
+
+> even if the libncursesw5-dev package is not installed, so this patch
+> makes the build fail in such cases.
+
+Will be solved when reverting as described above. But actually it smells
+like a bug in the package management, doesn't it? Why are build time
+config scripts shipped in runtime only packages? What is their purpose?
+
+>=20
+> Can we just call ncurses5-config and not ncursesw5-config, or are there=
+
+> any distros who ship the latter and not the former?
+>=20
+
+I can't talk about distro wide situation, but manual building gives only
+one of the two. So there might be a situation where only one of the two
+is present.
+
+It seems we have a little dilemma here. Any suggestions how to solve it?
+
+
+Thanks,
+Justin
+
+
+------enig2FKVNXIUHVKBTRDNSLEMU
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.19 (GNU/Linux)
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iEYEAREKAAYFAlEwWsUACgkQgAnW8HDreRa6aQCfSV39rQoxH2h2AFLi6v5W4BVF
+WYAAnRBInUXexTBMRW5Zfo3FjAIP1daZ
+=nIB/
+-----END PGP SIGNATURE-----
+
+------enig2FKVNXIUHVKBTRDNSLEMU--
