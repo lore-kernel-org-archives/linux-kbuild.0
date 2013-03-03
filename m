@@ -1,58 +1,66 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout.gmx.net ([212.227.15.19]:62419 "EHLO mout.gmx.net"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751080Ab3CARE2 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 1 Mar 2013 12:04:28 -0500
-Received: from mailout-de.gmx.net ([10.1.76.28]) by mrigmx.server.lan
- (mrigmx001) with ESMTP (Nemesis) id 0Lx1bL-1UrLWt1l5F-016jkV for
- <linux-kbuild@vger.kernel.org>; Fri, 01 Mar 2013 18:04:26 +0100
-From: Sven Joachim <svenjoac@gmx.de>
-Subject: Re: [PATCH 2/2] kconfig: use config scripts to detect ncurses libs
-References: <jlec@gentoo.org>
-	<1362045557-9123-1-git-send-email-jlec@gentoo.org>
-	<874ngwhzuy.fsf@turtle.gmx.de> <51305AC4.2030008@gentoo.org>
-	<87obf35xei.fsf@turtle.gmx.de> <5130B183.9080901@gentoo.org>
-Date: Fri, 01 Mar 2013 18:04:25 +0100
-In-Reply-To: <5130B183.9080901@gentoo.org> (justin's message of "Fri, 01 Mar
-	2013 14:47:47 +0100")
-Message-ID: <87zjyn2grq.fsf@turtle.gmx.de>
+Received: from mail1.windriver.com ([147.11.146.13]:57745 "EHLO
+	mail1.windriver.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751115Ab3CCTto (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 3 Mar 2013 14:49:44 -0500
+From: Jason Wessel <jason.wessel@windriver.com>
+Subject: [PATCH] menuconfig,check-lxdiaglog.sh: Allow specification of ncurses location
+Date: Sun, 3 Mar 2013 13:48:44 -0600
+Message-ID: <1362340124-2768-1-git-send-email-jason.wessel@windriver.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: justin <jlec@gentoo.org>
+To: mmarek@suse.cz
 Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On 2013-03-01 14:47 +0100, justin wrote:
+In some cross build environments such as the Yocto Project build
+environment it provides an ncurses library that is compiled
+differently than the host's version.  This causes display corruption
+problems when the host's curses includes are used instead of the
+includes from the provided compiler are overridden.  There is a second
+case where there is no curses libraries at all on the host system and
+menuconfig will just fail entirely.
 
-> On 01/03/13 09:36, Sven Joachim wrote:
->> Historically it seems to be an accident, and the ncurses{w,5}-config
->> scripts should have better been shipped in their development packages.
->> But nowadays we want to make the development packages multiarch-aware,
->> and since the scripts differ on architectures, moving them away from
->> ncurses-bin would mean adding two additional binary packages just for
->> these scripts.
->> 
->> See http://bugs.debian.org/480437 for a discussion on that topic.
->> 
->
-> I just tested on an ubuntu installation what happens with the patches
-> applied; you simply end up with the warning the you need to install the
-> dev package. So I don't see any problem here.
+The solution is simply to allow an override variable in
+check-lxdialog.sh for environments such as the Yocto Project.  Adding
+a CROSS_CURSES_LIB and CROSS_CURSES_INC solves the issue and allowing
+compiling and linking against the right headers and libraries.
 
-Well, in Debian/Ubuntu are _two_ dev packages, one for the wide API
-(libncursesw5-dev), and on for the non-wide API (libncurses5-dev).  Only
-the latter should be necessary, but with your original patch people
-would need to install the former as well.
+Signed-off-by: Jason Wessel <jason.wessel@windriver.com>
+cc: Michal Marek <mmarek@suse.cz>
+cc: linux-kbuild@vger.kernel.org
+---
+ scripts/kconfig/lxdialog/check-lxdialog.sh |    8 ++++++++
+ 1 file changed, 8 insertions(+)
 
->> Well, at least until nconf does not make any effort to explicitly detect
->> and use the wide API, trying ncurses5-config first should work.  If you
->> build ncurses yourself with --enable-widec, there is no -lmenu or -lpanel
->> anyway, these libraries are called menuw and panelw then.
->
-> You are right, we only should consider ncurses5-config right now.
+diff --git a/scripts/kconfig/lxdialog/check-lxdialog.sh b/scripts/kconfig/lxdialog/check-lxdialog.sh
+index 8078813..99473e4 100644
+--- a/scripts/kconfig/lxdialog/check-lxdialog.sh
++++ b/scripts/kconfig/lxdialog/check-lxdialog.sh
+@@ -4,6 +4,10 @@
+ # What library to link
+ ldflags()
+ {
++	if [ x"$CROSS_CURSES_LIB" != x ]; then
++		echo "$CROSS_CURSES_LIB"
++		exit
++	fi
+ 	for ext in so a dll.a dylib ; do
+ 		for lib in ncursesw ncurses curses ; do
+ 			$cc -print-file-name=lib${lib}.${ext} | grep -q /
+@@ -19,6 +23,10 @@ ldflags()
+ # Where is ncurses.h?
+ ccflags()
+ {
++	if [ x"$CROSS_CURSES_INC" != x ]; then
++		echo "$CROSS_CURSES_INC"
++		exit
++	fi
+ 	if [ -f /usr/include/ncursesw/curses.h ]; then
+ 		echo '-I/usr/include/ncursesw -DCURSES_LOC="<ncursesw/curses.h>"'
+ 		echo ' -DNCURSES_WIDECHAR=1'
+-- 
+1.7.9.5
 
-That seems unlikely to cause regressions on its own.
-
-Cheers,
-       Sven
