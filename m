@@ -1,71 +1,69 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wg0-f50.google.com ([74.125.82.50]:64803 "EHLO
-	mail-wg0-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753417Ab3CCUid (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 3 Mar 2013 15:38:33 -0500
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: Re: [PATCH 2/2] kconfig: use config scripts to detect ncurses libs
-Date: Sun, 3 Mar 2013 21:38:29 +0100
-References: <jlec@gentoo.org> <1362153044-23611-1-git-send-email-jlec@gentoo.org> <1362153044-23611-3-git-send-email-jlec@gentoo.org>
-In-Reply-To: <1362153044-23611-3-git-send-email-jlec@gentoo.org>
+Received: from smtp.gentoo.org ([140.211.166.183]:47402 "EHLO smtp.gentoo.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754473Ab3CCVUz (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 3 Mar 2013 16:20:55 -0500
+Message-ID: <5133BEAC.8040304@gentoo.org>
+Date: Sun, 03 Mar 2013 22:20:44 +0100
+From: Justin <jlec@gentoo.org>
+Reply-To: jlec@gentoo.org
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-15"
-Content-Transfer-Encoding: 7bit
-Message-Id: <201303032138.29138.yann.morin.1998@free.fr>
+Subject: Re: [PATCH 1/2] menuconfig: use config scripts to detect ncurses
+ libs
+References: <jlec@gentoo.org> <1362153044-23611-1-git-send-email-jlec@gentoo.org> <1362153044-23611-2-git-send-email-jlec@gentoo.org> <201303032136.27096.yann.morin.1998@free.fr>
+In-Reply-To: <201303032136.27096.yann.morin.1998@free.fr>
+Content-Type: multipart/signed; micalg=pgp-sha512;
+ protocol="application/pgp-signature";
+ boundary="----enig2MFHWHRCLALJBAAOMOWBU"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: jlec@gentoo.org, linux-kernel@vger.kernel.org
+To: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Justin, All,
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+------enig2MFHWHRCLALJBAAOMOWBU
+Content-Type: text/plain; charset=ISO-8859-15
+Content-Transfer-Encoding: quoted-printable
 
-On Friday 01 March 2013 jlec@gentoo.org wrote:
-> When building ncurses with --with-termlib several symbols get moved from
-> libncurses.so to libtinfo.so. Thus when linking with libncurses.so, one
-> additionally needs to link with libtinfo.so. Ncurses provides a config script
-> (ncurses5-config) or in very recent version even a pkg-config module to assist
-> finding ncurses.
-> 
-> This patch makes use of it to detect the necessary libs for linking of the
-> ncurses nconfig dialog
-> 
-> Signed-off-by: Justin Lecher <jlec@gentoo.org>
-> ---
->  scripts/kconfig/Makefile | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
-> 
-> diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
-> index 231b475..cc81db5 100644
-> --- a/scripts/kconfig/Makefile
-> +++ b/scripts/kconfig/Makefile
-> @@ -219,7 +219,11 @@ HOSTCFLAGS_gconf.o	= `pkg-config --cflags gtk+-2.0 gmodule-2.0 libglade-2.0` \
->  
->  HOSTLOADLIBES_mconf   = $(shell $(CONFIG_SHELL) $(check-lxdialog) -ldflags $(HOSTCC))
->  
-> -HOSTLOADLIBES_nconf	= -lmenu -lpanel -lncurses
-> +HOSTLOADLIBES_nconf	= -lmenu -lpanel
-> +HOSTLOADLIBES_nconf	+= $(shell \
-> +				pkg-config --libs ncurses 2>/dev/null \
-> +				|| ncurses5-config --libs 2>/dev/null \
-> +				|| ncurses6-config --libs 2>/dev/null  )
+On 03.03.2013 21:36, Yann E. MORIN wrote:
+Hello,
+>=20
+> In the light of the different mails on the subject, it appears that the=
 
-Ditto as for menuconfig: drop the ncurses*-config scripts, and:
-  - try pkg-config;
-  - fallback to -lncurses.
+> ncurses*-config script are unreliable: at least one major distribution
+> (Debian) is broken and, for various reasons, is not gonna fix it, and
+> all its derivatives (eg. Ubuntu) do suffer from the same deficiency.
 
-HOSTLOADLIBES_nconf	+= $(shell \
-				pkg-config --libs ncurses 2>/dev/null \
-				|| echo -lncurses )
+Indeed the config scripts come without the necessary build time deps.
+But it ends in the same situation as current version of the Makefile.
+The user will be asked to install the devel package.
+So I don't see any problem here.
 
-Regards,
-Yann E. MORIN.
+>=20
+> I think we should stick to:
+>   - try with pkg-config;
+>   - fallback to the legacy heuristic.
+>=20
+> Does using pkg-config fix your use-case?
 
--- 
-.-----------------.--------------------.------------------.--------------------.
-|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
-| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
-| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
-| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
-'------------------------------^-------^------------------^--------------------'
+It does, nevertheless I would prefer to include the ncurses*-config
+script as well to cover most situation we will find on users system.
+
+Justin
+
+
+------enig2MFHWHRCLALJBAAOMOWBU
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.19 (GNU/Linux)
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iEYEAREKAAYFAlEzvqwACgkQgAnW8HDreRbShACfSxuPyszwKrOd4neMqQJ9KR28
+pogAn0Wsk8HNJ2bObBgTr0/yvGsMwXtQ
+=djrA
+-----END PGP SIGNATURE-----
+
+------enig2MFHWHRCLALJBAAOMOWBU--
