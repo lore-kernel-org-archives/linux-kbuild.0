@@ -1,19 +1,19 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-we0-f173.google.com ([74.125.82.173]:41178 "EHLO
-	mail-we0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753346Ab3CCUgb (ORCPT
+Received: from mail-wg0-f50.google.com ([74.125.82.50]:64803 "EHLO
+	mail-wg0-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753417Ab3CCUid (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 3 Mar 2013 15:36:31 -0500
+	Sun, 3 Mar 2013 15:38:33 -0500
 From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: Re: [PATCH 1/2] menuconfig: use config scripts to detect ncurses libs
-Date: Sun, 3 Mar 2013 21:36:26 +0100
-References: <jlec@gentoo.org> <1362153044-23611-1-git-send-email-jlec@gentoo.org> <1362153044-23611-2-git-send-email-jlec@gentoo.org>
-In-Reply-To: <1362153044-23611-2-git-send-email-jlec@gentoo.org>
+Subject: Re: [PATCH 2/2] kconfig: use config scripts to detect ncurses libs
+Date: Sun, 3 Mar 2013 21:38:29 +0100
+References: <jlec@gentoo.org> <1362153044-23611-1-git-send-email-jlec@gentoo.org> <1362153044-23611-3-git-send-email-jlec@gentoo.org>
+In-Reply-To: <1362153044-23611-3-git-send-email-jlec@gentoo.org>
 MIME-Version: 1.0
 Content-Type: Text/Plain;
   charset="iso-8859-15"
 Content-Transfer-Encoding: 7bit
-Message-Id: <201303032136.27096.yann.morin.1998@free.fr>
+Message-Id: <201303032138.29138.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
@@ -28,39 +28,36 @@ On Friday 01 March 2013 jlec@gentoo.org wrote:
 > (ncurses5-config) or in very recent version even a pkg-config module to assist
 > finding ncurses.
 > 
-> The old heuristic for detection of ncurses libs will be extended to the
-> pkg-config and the config scripts.
+> This patch makes use of it to detect the necessary libs for linking of the
+> ncurses nconfig dialog
 > 
 > Signed-off-by: Justin Lecher <jlec@gentoo.org>
 > ---
->  scripts/kconfig/lxdialog/check-lxdialog.sh | 6 ++++++
->  1 file changed, 6 insertions(+)
+>  scripts/kconfig/Makefile | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
 > 
-> diff --git a/scripts/kconfig/lxdialog/check-lxdialog.sh b/scripts/kconfig/lxdialog/check-lxdialog.sh
-> index 8078813..8086874 100644
-> --- a/scripts/kconfig/lxdialog/check-lxdialog.sh
-> +++ b/scripts/kconfig/lxdialog/check-lxdialog.sh
-> @@ -4,6 +4,12 @@
->  # What library to link
->  ldflags()
->  {
-> +	pkg-config --libs ncursesw 2>/dev/null && exit
-> +	pkg-config --libs ncurses 2>/dev/null && exit
-> +	ncursesw5-config --libs 2>/dev/null && exit
-> +	ncurses5-config --libs 2>/dev/null && exit
-> +	ncursesw6-config --libs 2>/dev/null && exit
-> +	ncurses6-config --libs 2>/dev/null && exit
+> diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
+> index 231b475..cc81db5 100644
+> --- a/scripts/kconfig/Makefile
+> +++ b/scripts/kconfig/Makefile
+> @@ -219,7 +219,11 @@ HOSTCFLAGS_gconf.o	= `pkg-config --cflags gtk+-2.0 gmodule-2.0 libglade-2.0` \
+>  
+>  HOSTLOADLIBES_mconf   = $(shell $(CONFIG_SHELL) $(check-lxdialog) -ldflags $(HOSTCC))
+>  
+> -HOSTLOADLIBES_nconf	= -lmenu -lpanel -lncurses
+> +HOSTLOADLIBES_nconf	= -lmenu -lpanel
+> +HOSTLOADLIBES_nconf	+= $(shell \
+> +				pkg-config --libs ncurses 2>/dev/null \
+> +				|| ncurses5-config --libs 2>/dev/null \
+> +				|| ncurses6-config --libs 2>/dev/null  )
 
-In the light of the different mails on the subject, it appears that the
-ncurses*-config script are unreliable: at least one major distribution
-(Debian) is broken and, for various reasons, is not gonna fix it, and
-all its derivatives (eg. Ubuntu) do suffer from the same deficiency.
+Ditto as for menuconfig: drop the ncurses*-config scripts, and:
+  - try pkg-config;
+  - fallback to -lncurses.
 
-I think we should stick to:
-  - try with pkg-config;
-  - fallback to the legacy heuristic.
-
-Does using pkg-config fix your use-case?
+HOSTLOADLIBES_nconf	+= $(shell \
+				pkg-config --libs ncurses 2>/dev/null \
+				|| echo -lncurses )
 
 Regards,
 Yann E. MORIN.
