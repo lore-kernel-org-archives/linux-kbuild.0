@@ -1,66 +1,38 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail1.windriver.com ([147.11.146.13]:57745 "EHLO
-	mail1.windriver.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751115Ab3CCTto (ORCPT
+Received: from mail.free-electrons.com ([94.23.35.102]:41606 "EHLO
+	mail.free-electrons.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751462Ab3CCUBo (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 3 Mar 2013 14:49:44 -0500
-From: Jason Wessel <jason.wessel@windriver.com>
-Subject: [PATCH] menuconfig,check-lxdiaglog.sh: Allow specification of ncurses location
-Date: Sun, 3 Mar 2013 13:48:44 -0600
-Message-ID: <1362340124-2768-1-git-send-email-jason.wessel@windriver.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+	Sun, 3 Mar 2013 15:01:44 -0500
+Date: Sun, 3 Mar 2013 21:01:40 +0100
+From: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
+Subject: Re: randconfig bug when used with KCONFIG_ALLCONFIG
+Message-ID: <20130303210140.6f1a93c8@skate>
+In-Reply-To: <20130227214102.6d63544d@skate>
+References: <20130227214102.6d63544d@skate>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: mmarek@suse.cz
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
+Cc: Michal Marek <mmarek@suse.cz>
 
-In some cross build environments such as the Yocto Project build
-environment it provides an ncurses library that is compiled
-differently than the host's version.  This causes display corruption
-problems when the host's curses includes are used instead of the
-includes from the provided compiler are overridden.  There is a second
-case where there is no curses libraries at all on the host system and
-menuconfig will just fail entirely.
+Hello,
 
-The solution is simply to allow an override variable in
-check-lxdialog.sh for environments such as the Yocto Project.  Adding
-a CROSS_CURSES_LIB and CROSS_CURSES_INC solves the issue and allowing
-compiling and linking against the right headers and libraries.
+On Wed, 27 Feb 2013 21:41:02 +0100, Thomas Petazzoni wrote:
 
-Signed-off-by: Jason Wessel <jason.wessel@windriver.com>
-cc: Michal Marek <mmarek@suse.cz>
-cc: linux-kbuild@vger.kernel.org
----
- scripts/kconfig/lxdialog/check-lxdialog.sh |    8 ++++++++
- 1 file changed, 8 insertions(+)
+> I'd like to report that the randconfig code seems to have a bug when it
+> is given a set of fixed values using KCONFIG_ALLCONFIG: it forgets to
+> randomize choice values.
 
-diff --git a/scripts/kconfig/lxdialog/check-lxdialog.sh b/scripts/kconfig/lxdialog/check-lxdialog.sh
-index 8078813..99473e4 100644
---- a/scripts/kconfig/lxdialog/check-lxdialog.sh
-+++ b/scripts/kconfig/lxdialog/check-lxdialog.sh
-@@ -4,6 +4,10 @@
- # What library to link
- ldflags()
- {
-+	if [ x"$CROSS_CURSES_LIB" != x ]; then
-+		echo "$CROSS_CURSES_LIB"
-+		exit
-+	fi
- 	for ext in so a dll.a dylib ; do
- 		for lib in ncursesw ncurses curses ; do
- 			$cc -print-file-name=lib${lib}.${ext} | grep -q /
-@@ -19,6 +23,10 @@ ldflags()
- # Where is ncurses.h?
- ccflags()
- {
-+	if [ x"$CROSS_CURSES_INC" != x ]; then
-+		echo "$CROSS_CURSES_INC"
-+		exit
-+	fi
- 	if [ -f /usr/include/ncursesw/curses.h ]; then
- 		echo '-I/usr/include/ncursesw -DCURSES_LOC="<ncursesw/curses.h>"'
- 		echo ' -DNCURSES_WIDECHAR=1'
+Any ideas about this bug?
+
+Thanks a lot for your attention,
+
+Thomas
 -- 
-1.7.9.5
-
+Thomas Petazzoni, Free Electrons
+Kernel, drivers, real-time and embedded Linux
+development, consulting, training and support.
+http://free-electrons.com
