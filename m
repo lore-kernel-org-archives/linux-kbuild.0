@@ -1,64 +1,31 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout.gmx.net ([212.227.15.19]:61069 "EHLO mout.gmx.net"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753475Ab3CCVhU (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 3 Mar 2013 16:37:20 -0500
-Received: from mailout-de.gmx.net ([10.1.76.34]) by mrigmx.server.lan
- (mrigmx001) with ESMTP (Nemesis) id 0Mdp4t-1USSAN0shR-00Pffm for
- <linux-kbuild@vger.kernel.org>; Sun, 03 Mar 2013 22:37:18 +0100
-From: Sven Joachim <svenjoac@gmx.de>
-Subject: Re: [PATCH 2/2] kconfig: use config scripts to detect ncurses libs
-References: <jlec@gentoo.org>
-	<1362045557-9123-1-git-send-email-jlec@gentoo.org>
-	<874ngwhzuy.fsf@turtle.gmx.de>
-	<201303032123.34125.yann.morin.1998@free.fr>
-Date: Sun, 03 Mar 2013 22:37:16 +0100
-In-Reply-To: <201303032123.34125.yann.morin.1998@free.fr> (Yann E. MORIN's
-	message of "Sun, 3 Mar 2013 21:23:33 +0100")
-Message-ID: <874ngsf9mb.fsf@turtle.gmx.de>
+Received: from two.firstfloor.org ([193.170.194.197]:37521 "EHLO
+	one.firstfloor.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1758558Ab3CDSKB (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 4 Mar 2013 13:10:01 -0500
+Date: Mon, 4 Mar 2013 19:02:16 +0100
+From: Andi Kleen <andi@firstfloor.org>
+Subject: make ctags with separate build dirs
+Message-ID: <20130304180216.GI3401@two.firstfloor.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Cc: linux-kbuild@vger.kernel.org, jlec@gentoo.org, linux-kernel@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
 
-On 2013-03-03 21:23 +0100, Yann E. MORIN wrote:
 
-> On Thursday 28 February 2013 Sven Joachim wrote:
->> On 2013-02-28 10:59 +0100, jlec@gentoo.org wrote:
->
->> >  scripts/kconfig/Makefile | 4 +++-
->> >  1 file changed, 3 insertions(+), 1 deletion(-)
->> >
->> > diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
->> > index 3091794..c372976 100644
->> > --- a/scripts/kconfig/Makefile
->> > +++ b/scripts/kconfig/Makefile
->> > @@ -216,7 +216,9 @@ HOSTCFLAGS_gconf.o	= `pkg-config --cflags gtk+-2.0 gmodule-2.0 libglade-2.0` \
->> >  
->> >  HOSTLOADLIBES_mconf   = $(shell $(CONFIG_SHELL) $(check-lxdialog) -ldflags $(HOSTCC))
->> >  
->> > -HOSTLOADLIBES_nconf	= -lmenu -lpanel -lncurses
->> > +HOSTLOADLIBES_nconf	= -lmenu -lpanel
->> > +HOSTLOADLIBES_nconf	+= $(shell    ncursesw5-config --libs 2>/dev/null \
->> > +				   || ncurses5-config --libs 2>/dev/null  )
->> 
->> This will link with ncursesw, not ncurses.  Probably not what you want,
->> since nconf.h does not #include the right headers for that.
->> 
->> On Debian/Ubuntu, there's also the problem that ncursesw5-config exists
->> even if the libncursesw5-dev package is not installed, so this patch
->> makes the build fail in such cases.
->
-> The same goes for ncurses5-config, which is provided by ncurses-bin, and
-> so is present even if the devel package is not installed, and the build
-> will break, too.
+I usually use separate build dirs. For make ctags in the main source
+directory the dependecies always want to create all kinds of
+infrastructure and set up up the config, polluting the source dir.
+For make cscope it doesn't do that.
 
-This is not the same: if libncurses5-dev is not installed, the build is
-going to fail anyway, since there is no -lmenu or -lpanel then.
+Could make ctags be fixed to not do that?
 
-I second the proposal to try pkg-config and fall back to -lncurses, BTW.
+Thanks,
 
-Cheers,
-       Sven
+-Andi
+
+-- 
+ak@linux.intel.com -- Speaking for myself only.
