@@ -1,35 +1,37 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ee0-f43.google.com ([74.125.83.43]:64854 "EHLO
-	mail-ee0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752622Ab3CEMHp (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 5 Mar 2013 07:07:45 -0500
-Message-ID: <5135DF44.2040806@openwrt.org>
-Date: Tue, 05 Mar 2013 13:04:20 +0100
-From: Florian Fainelli <florian@openwrt.org>
+Received: from cantor2.suse.de ([195.135.220.15]:43370 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1755450Ab3CEOqs (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 5 Mar 2013 09:46:48 -0500
+Message-ID: <51360554.10509@suse.cz>
+Date: Tue, 05 Mar 2013 15:46:44 +0100
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Subject: Re: [PATCH v3 -next 5/5] Kconfig: Make x86 and arm kernels default
- to the LZ4-compressed
-References: <1362484056-9778-1-git-send-email-kyungsik.lee@lge.com> <1362484056-9778-6-git-send-email-kyungsik.lee@lge.com>
-In-Reply-To: <1362484056-9778-6-git-send-email-kyungsik.lee@lge.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Subject: Re: [PATCH - Regression] kbuild: fix make headers_check with make
+ 3.80
+References: <20130304203624.GA10846@merkur.ravnborg.org>
+In-Reply-To: <20130304203624.GA10846@merkur.ravnborg.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Kyungsik Lee <kyungsik.lee@lge.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>, Russell King <linux@arm.linux.org.uk>, "H. Peter Anvin" <hpa@zytor.com>, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, x86@kernel.org, celinux-dev@lists.celinuxforum.org, Nicolas Pitre <nico@fluxnic.net>, David Sterba <dsterba@suse.cz>, Nitin Gupta <nitingupta910@gmail.com>, Joe Millenbach <jmillenbach@gmail.com>, Thomas Gleixner <tglx@linutronix.de>, Michal Marek <mmarek@suse.cz>, hyojun.im@lge.com, chan.jeong@lge.com, raphael.andy.lee@gmail.com
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>, David Howells <dhowells@redhat.com>, lkml <linux-kernel@vger.kernel.org>, arnd@arndb.de, tglx@linutronix.de, paulmck@linux.vnet.ibm.com, davej@redhat.com
 
-Hello,
+On 4.3.2013 21:36, Sam Ravnborg wrote:
+> Commit 10b63956 ("UAPI: Plumb the UAPI Kbuilds into the user header
+> installation and checking") introduced a dependency of make 3.81
+> due to use of $(or ...)
+> 
+> We do not want to lift the requirement to gmake 3.81 just yet...
+> Included are a straightforward conversion to $(if ...)
+> 
+> Bisected-and-tested-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+> Cc: David Howells <dhowells@redhat.com>
+> Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
+> ---
 
-On 03/05/2013 12:47 PM, Kyungsik Lee wrote:
-> This patch makes x86 and arm kernels default to the LZ4-compressed
-> to test new LZ4 code in the linux-next. This is requested by
-> Andrew Morton.
+Thanks, Sam. I applied the patch to kbuild.git#kbuild and will send it
+to Linus.
 
-I do not think making this the default is good idea, because the lz4demo 
-utility that you need to actually compress the kernel (used in patch 2) 
-is not installed nor available by default on most systems, while gzip 
-is. Considering that such a concern was already raised in your v2 
-patchset, I am surprised to see this.
---
-Florian
+Michal
