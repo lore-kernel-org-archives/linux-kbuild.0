@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from avon.wwwdotorg.org ([70.85.31.133]:51394 "EHLO
+Received: from avon.wwwdotorg.org ([70.85.31.133]:49987 "EHLO
 	avon.wwwdotorg.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754056Ab3CFSXS (ORCPT
+	with ESMTP id S1754156Ab3CFSXP (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 6 Mar 2013 13:23:18 -0500
+	Wed, 6 Mar 2013 13:23:15 -0500
 From: Stephen Warren <swarren@wwwdotorg.org>
-Subject: [PATCH 5/7] ARM: dt: add header to define GPIO flags
-Date: Wed,  6 Mar 2013 11:23:01 -0700
-Message-Id: <1362594183-21523-5-git-send-email-swarren@wwwdotorg.org>
+Subject: [PATCH 3/7] kbuild: cmd_dtc_cpp: extract deps from both gcc -E and dtc
+Date: Wed,  6 Mar 2013 11:22:59 -0700
+Message-Id: <1362594183-21523-3-git-send-email-swarren@wwwdotorg.org>
 In-Reply-To: <1362594183-21523-1-git-send-email-swarren@wwwdotorg.org>
 References: <1362594183-21523-1-git-send-email-swarren@wwwdotorg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -17,38 +17,46 @@ Cc: Michal Marek <mmarek@suse.cz>, Shawn Guo <shawn.guo@linaro.org>, linux-kbuil
 
 From: Stephen Warren <swarren@nvidia.com>
 
-Many GPIO device tree bindings use the same flags. Create a header to
-define those.
+Prior to this change, when compiling *.dts to *.dtb, the dependency
+output from dtc would be used, and when compiling *.dtsp to *.dtb, the
+dependency output from gcc -E alone would be used, despite dtc also
+being invoked (on a temporary file that was guaranteed to have no
+dependencies).
+
+With this change, when compiling *.dtsp to *.dtb, the dependency files
+from both gcc -E and dtc are used. This will allow cmd_dtc_cpp to
+replace cmd_dtc in a future change. In turn, that will allow the C pre-
+processor to be run transparently on *.dts, without the need to a
+separate rule or file extension to trigger it.
 
 Signed-off-by: Stephen Warren <swarren@nvidia.com>
 ---
-v2: Moved header. Added include guard.
----
- include/dt-bindings/gpio/gpio.h |   15 +++++++++++++++
- 1 file changed, 15 insertions(+)
- create mode 100644 include/dt-bindings/gpio/gpio.h
+ scripts/Makefile.lib |    5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/include/dt-bindings/gpio/gpio.h b/include/dt-bindings/gpio/gpio.h
-new file mode 100644
-index 0000000..e6b1e0a
---- /dev/null
-+++ b/include/dt-bindings/gpio/gpio.h
-@@ -0,0 +1,15 @@
-+/*
-+ * This header provides constants for most GPIO bindings.
-+ *
-+ * Most GPIO bindings include a flags cell as part of the GPIO specifier.
-+ * In most cases, the format of the flags cell uses the standard values
-+ * defined in this header.
-+ */
-+
-+#ifndef _DT_BINDINGS_GPIO_GPIO_H
-+#define _DT_BINDINGS_GPIO_GPIO_H
-+
-+#define GPIO_ACTIVE_HIGH 0
-+#define GPIO_ACTIVE_LOW 1
-+
-+#endif
+diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+index af35521..6104335 100644
+--- a/scripts/Makefile.lib
++++ b/scripts/Makefile.lib
+@@ -156,7 +156,7 @@ cpp_flags      = -Wp,-MD,$(depfile) $(NOSTDINC_FLAGS) $(LINUXINCLUDE)     \
+ 
+ ld_flags       = $(LDFLAGS) $(ldflags-y)
+ 
+-dtc_cpp_flags  = -Wp,-MD,$(depfile) -nostdinc                            \
++dtc_cpp_flags  = -Wp,-MD,$(depfile).pre -nostdinc                        \
+ 		 -I$(srctree)/arch/$(SRCARCH)/boot/dts                   \
+ 		 -I$(srctree)/arch/$(SRCARCH)/boot/dts/include           \
+ 		 -undef -D__DTS__
+@@ -278,7 +278,8 @@ dtc-tmp = $(subst $(comma),_,$(dot-target).dts)
+ 
+ quiet_cmd_dtc_cpp = DTC+CPP $@
+ cmd_dtc_cpp = $(CPP) $(dtc_cpp_flags) -x assembler-with-cpp -o $(dtc-tmp) $< ; \
+-	$(objtree)/scripts/dtc/dtc -O dtb -o $@ -b 0 $(DTC_FLAGS) $(dtc-tmp)
++	$(objtree)/scripts/dtc/dtc -O dtb -o $@ -b 0 $(DTC_FLAGS) -d $(depfile).dtc $(dtc-tmp) ; \
++	cat $(depfile).pre $(depfile).dtc > $(depfile)
+ 
+ $(obj)/%.dtb: $(src)/%.dtsp FORCE
+ 	$(call if_changed_dep,dtc_cpp)
 -- 
 1.7.10.4
 
