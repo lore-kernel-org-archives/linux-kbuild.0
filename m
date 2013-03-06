@@ -1,62 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from avon.wwwdotorg.org ([70.85.31.133]:49987 "EHLO
+Received: from avon.wwwdotorg.org ([70.85.31.133]:34843 "EHLO
 	avon.wwwdotorg.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754156Ab3CFSXP (ORCPT
+	with ESMTP id S1753567Ab3CFS2p (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 6 Mar 2013 13:23:15 -0500
+	Wed, 6 Mar 2013 13:28:45 -0500
 From: Stephen Warren <swarren@wwwdotorg.org>
-Subject: [PATCH 3/7] kbuild: cmd_dtc_cpp: extract deps from both gcc -E and dtc
-Date: Wed,  6 Mar 2013 11:22:59 -0700
-Message-Id: <1362594183-21523-3-git-send-email-swarren@wwwdotorg.org>
-In-Reply-To: <1362594183-21523-1-git-send-email-swarren@wwwdotorg.org>
-References: <1362594183-21523-1-git-send-email-swarren@wwwdotorg.org>
+Subject: [PATCH V2 1/6] ARM: tegra: device tree whitespace cleanup
+Date: Wed,  6 Mar 2013 11:28:32 -0700
+Message-Id: <1362594517-22099-1-git-send-email-swarren@wwwdotorg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: arm@kernel.org, Grant Likely <grant.likely@secretlab.ca>, Rob Herring <rob.herring@calxeda.com>
-Cc: Michal Marek <mmarek@suse.cz>, Shawn Guo <shawn.guo@linaro.org>, linux-kbuild@vger.kernel.org, devicetree-discuss@lists.ozlabs.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Stephen Warren <swarren@nvidia.com>
+To: Stephen Warren <swarren@wwwdotorg.org>
+Cc: Grant Likely <grant.likely@secretlab.ca>, Rob Herring <rob.herring@calxeda.com>, Michal Marek <mmarek@suse.cz>, Shawn Guo <shawn.guo@linaro.org>, linux-kbuild@vger.kernel.org, devicetree-discuss@lists.ozlabs.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-tegra@vger.kernel.org, Stephen Warren <swarren@nvidia.com>
 
 From: Stephen Warren <swarren@nvidia.com>
 
-Prior to this change, when compiling *.dts to *.dtb, the dependency
-output from dtc would be used, and when compiling *.dtsp to *.dtb, the
-dependency output from gcc -E alone would be used, despite dtc also
-being invoked (on a temporary file that was guaranteed to have no
-dependencies).
-
-With this change, when compiling *.dtsp to *.dtb, the dependency files
-from both gcc -E and dtc are used. This will allow cmd_dtc_cpp to
-replace cmd_dtc in a future change. In turn, that will allow the C pre-
-processor to be run transparently on *.dts, without the need to a
-separate rule or file extension to trigger it.
+Remove white-space from empty line; triggers checkpatch.
 
 Signed-off-by: Stephen Warren <swarren@nvidia.com>
 ---
- scripts/Makefile.lib |    5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+Patches 3 and later in his series depends on the kbuild-related series I
+just posted to rework the dtc+cpp logic. I hope to apply them to the Tegra
+tree after merging the previous series from the arm-soc topic branch.
+Patches 1 and 2 are just cleanup that the others depend on.
 
-diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-index af35521..6104335 100644
---- a/scripts/Makefile.lib
-+++ b/scripts/Makefile.lib
-@@ -156,7 +156,7 @@ cpp_flags      = -Wp,-MD,$(depfile) $(NOSTDINC_FLAGS) $(LINUXINCLUDE)     \
- 
- ld_flags       = $(LDFLAGS) $(ldflags-y)
- 
--dtc_cpp_flags  = -Wp,-MD,$(depfile) -nostdinc                            \
-+dtc_cpp_flags  = -Wp,-MD,$(depfile).pre -nostdinc                        \
- 		 -I$(srctree)/arch/$(SRCARCH)/boot/dts                   \
- 		 -I$(srctree)/arch/$(SRCARCH)/boot/dts/include           \
- 		 -undef -D__DTS__
-@@ -278,7 +278,8 @@ dtc-tmp = $(subst $(comma),_,$(dot-target).dts)
- 
- quiet_cmd_dtc_cpp = DTC+CPP $@
- cmd_dtc_cpp = $(CPP) $(dtc_cpp_flags) -x assembler-with-cpp -o $(dtc-tmp) $< ; \
--	$(objtree)/scripts/dtc/dtc -O dtb -o $@ -b 0 $(DTC_FLAGS) $(dtc-tmp)
-+	$(objtree)/scripts/dtc/dtc -O dtb -o $@ -b 0 $(DTC_FLAGS) -d $(depfile).dtc $(dtc-tmp) ; \
-+	cat $(depfile).pre $(depfile).dtc > $(depfile)
- 
- $(obj)/%.dtb: $(src)/%.dtsp FORCE
- 	$(call if_changed_dep,dtc_cpp)
+ arch/arm/boot/dts/tegra20.dtsi |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm/boot/dts/tegra20.dtsi b/arch/arm/boot/dts/tegra20.dtsi
+index 48d00a0..ab9402a 100644
+--- a/arch/arm/boot/dts/tegra20.dtsi
++++ b/arch/arm/boot/dts/tegra20.dtsi
+@@ -208,7 +208,7 @@
+ 		compatible = "nvidia,tegra20-das";
+ 		reg = <0x70000c00 0x80>;
+ 	};
+-	
++
+ 	tegra_ac97: ac97 {
+ 		compatible = "nvidia,tegra20-ac97";
+ 		reg = <0x70002000 0x200>;
 -- 
 1.7.10.4
 
