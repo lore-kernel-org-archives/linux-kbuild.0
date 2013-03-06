@@ -1,49 +1,38 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.not-your-server.de ([78.46.182.243]:46093 "EHLO
-	mail.not-your-server.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753362Ab3CFNCH (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 6 Mar 2013 08:02:07 -0500
-From: jlec@gentoo.org
-Subject: [PATCH 1/2] menuconfig: optionally use pkg-config to detect ncurses libs
-Date: Wed,  6 Mar 2013 14:02:01 +0100
-Message-Id: <1362574922-4799-2-git-send-email-jlec@gentoo.org>
-In-Reply-To: <1362574922-4799-1-git-send-email-jlec@gentoo.org>
-References: <Use config scripts to detect ncurses libs for, menuconfig/nconfig dialogs>
- <1362574922-4799-1-git-send-email-jlec@gentoo.org>
+Received: from cantor2.suse.de ([195.135.220.15]:39525 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754042Ab3CFNOU (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 6 Mar 2013 08:14:20 -0500
+Date: Wed, 6 Mar 2013 14:14:18 +0100
+From: Michal Marek <mmarek@suse.cz>
+Subject: [GIT] kbuild fix for v3.9-rc2
+Message-ID: <20130306131417.GA12905@pobox.suse.cz>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: Justin Lecher <jlec@gentoo.org>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: sam@ravnborg.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-From: Justin Lecher <jlec@gentoo.org>
+Hi Linus,
 
-When building ncurses with --with-termlib several symbols get moved from
-libncurses.so to libtinfo.so. Thus when linking with libncurses.so, one
-additionally needs to link with libtinfo.so.
+there is one for for make headers_install/headers_check to not require
+make 3.81. The requirement has been accidentally introduced in 3.7.
 
-The ncurses pkg-config module will be used to detect the necessary libs for
-linking. If not available the old heuristic for detection of the ncurses libs
-will be used.
+Thanks,
+Michal
 
-Signed-off-by: Justin Lecher <jlec@gentoo.org>
----
- scripts/kconfig/lxdialog/check-lxdialog.sh | 2 ++
- 1 file changed, 2 insertions(+)
+The following changes since commit 0ca7ffb356063c5ece847687da457dfe748612a2:
 
-diff --git a/scripts/kconfig/lxdialog/check-lxdialog.sh b/scripts/kconfig/lxdialog/check-lxdialog.sh
-index 8078813..782d200 100644
---- a/scripts/kconfig/lxdialog/check-lxdialog.sh
-+++ b/scripts/kconfig/lxdialog/check-lxdialog.sh
-@@ -4,6 +4,8 @@
- # What library to link
- ldflags()
- {
-+	pkg-config --libs ncursesw 2>/dev/null && exit
-+	pkg-config --libs ncurses 2>/dev/null && exit
- 	for ext in so a dll.a dylib ; do
- 		for lib in ncursesw ncurses curses ; do
- 			$cc -print-file-name=lib${lib}.${ext} | grep -q /
--- 
-1.8.1.5
+  Merge branch 'kbuild' of git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild (2013-02-27 12:25:47 -0800)
 
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git kbuild
+
+Sam Ravnborg (1):
+      kbuild: fix make headers_check with make 3.80
+
+ scripts/Makefile.headersinst |   11 ++++++-----
+ 1 files changed, 6 insertions(+), 5 deletions(-)
