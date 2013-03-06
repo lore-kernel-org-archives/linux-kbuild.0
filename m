@@ -1,57 +1,110 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from LGEMRELSE7Q.lge.com ([156.147.1.151]:54170 "EHLO
+Received: from LGEMRELSE7Q.lge.com ([156.147.1.151]:59265 "EHLO
 	LGEMRELSE7Q.lge.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750788Ab3CFGPI (ORCPT
+	with ESMTP id S1750753Ab3CFGhk (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 6 Mar 2013 01:15:08 -0500
-Date: Wed, 6 Mar 2013 15:15:05 +0900
+	Wed, 6 Mar 2013 01:37:40 -0500
+Date: Wed, 6 Mar 2013 15:37:38 +0900
 From: Kyungsik Lee <kyungsik.lee@lge.com>
-Subject: Re: [PATCH v3 -next 0/5] Add support for LZ4-compressed kernel
-Message-ID: <20130306061505.GA4979@Corona>
+Subject: Re: [PATCH v3 -next 4/5] x86: Add support for LZ4-compressed kernel
+Message-ID: <20130306063738.GB4979@Corona>
 References: <1362484056-9778-1-git-send-email-kyungsik.lee@lge.com>
- <20130305150616.cb737f9b217b8c82051b2ccb@linux-foundation.org>
+ <1362484056-9778-5-git-send-email-kyungsik.lee@lge.com>
+ <18eb6ca7-6993-40e9-a58d-116e1f6c37f6@email.android.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20130305150616.cb737f9b217b8c82051b2ccb@linux-foundation.org>
+In-Reply-To: <18eb6ca7-6993-40e9-a58d-116e1f6c37f6@email.android.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andrew Morton <akpm@linux-foundation.org>
-Cc: Russell King <linux@arm.linux.org.uk>, "H. Peter Anvin" <hpa@zytor.com>, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, x86@kernel.org, celinux-dev@lists.celinuxforum.org, Nicolas Pitre <nico@fluxnic.net>, David Sterba <dsterba@suse.cz>, Nitin Gupta <nitingupta910@gmail.com>, Joe Millenbach <jmillenbach@gmail.com>, Thomas Gleixner <tglx@linutronix.de>, Michal Marek <mmarek@suse.cz>, hyojun.im@lge.com, chan.jeong@lge.com, raphael.andy.lee@gmail.com
+To: "H. Peter Anvin" <hpa@zytor.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>, Russell King <linux@arm.linux.org.uk>, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, x86@kernel.org, celinux-dev@lists.celinuxforum.org, Nicolas Pitre <nico@fluxnic.net>, David Sterba <dsterba@suse.cz>, Nitin Gupta <nitingupta910@gmail.com>, Joe Millenbach <jmillenbach@gmail.com>, Thomas Gleixner <tglx@linutronix.de>, Michal Marek <mmarek@suse.cz>, hyojun.im@lge.com, chan.jeong@lge.com, raphael.andy.lee@gmail.com
 
-On Tue, Mar 05, 2013 at 03:06:16PM -0800, Andrew Morton wrote:
-> On Tue,  5 Mar 2013 20:47:31 +0900 Kyungsik Lee <kyungsik.lee@lge.com> wrote:
-> 
-> > This is the third version. In this version, Some codes are fixed
-> > and more description and note are added. I would like to thank David Sterba
-> > for his review.
-> > 
-> > The Last patch[5/5] of the patch set is for making x86 and arm default to
-> > LZ4-compressed for testing the LZ4 code in the linux-next.
-> > It was requested by Andrew Morton in the patch set v2.
-> > 
-> > Currently, A preliminary version of LZ4 de/compression tool is supported.
-> > However, It is expected that we will have a tool with more features
-> > once its format is finished.
-> 
-> What happened to the changelog?  The earlier version at least had some
-> rudimentary benchmarking results, but now we don't even have that. 
-> 
-> Someone should prepare the information explaining why we added this to
-> Linux, and I'd prefer that person be you rather than me!  Certainly it
-> should include performance measurements - both speed and space.  Also
-> it should capture our thinking regarding all the other decompressors,
-> explaining why we view it as acceptable to add yet another one.
-Sorry, It will have all the information you mentioned. I can reply to
-this thread if you want.
+On Tue, Mar 05, 2013 at 08:13:38AM -0800, H. Peter Anvin wrote:
+> Please add the new magic to Documentation/x86/boot.txt as well.
 
-Or I might need another patch(v4). I have one thing to be confirmed
-regarding LZ4 format. One of the patch set needs to be fixed
-if there is a change. After that I can include the information
-in the changelog.
-
-> Please, put yourself in the position of someone reading these commits
-> in 2017 wondering "why did they merge this".  We should tell them.
+Ok, I will update it as soon as the patch set is stabilized.
 
 Thanks,
 Kyungsik
+
+> >This patch integrates the LZ4 decompression code to the x86 pre-boot
+> >code.
+> >And it depends on two patchs below
+> >
+> >lib: Add support for LZ4-compressed kernel
+> >decompressor: Add LZ4 decompressor module
+> >
+> >Signed-off-by: Kyungsik Lee <kyungsik.lee@lge.com>
+> >---
+> > arch/x86/Kconfig                  | 1 +
+> > arch/x86/boot/compressed/Makefile | 5 ++++-
+> > arch/x86/boot/compressed/misc.c   | 4 ++++
+> > 3 files changed, 9 insertions(+), 1 deletion(-)
+> >
+> >diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
+> >index 225543b..ab916fd 100644
+> >--- a/arch/x86/Kconfig
+> >+++ b/arch/x86/Kconfig
+> >@@ -63,6 +63,7 @@ config X86
+> > 	select HAVE_KERNEL_LZMA
+> > 	select HAVE_KERNEL_XZ
+> > 	select HAVE_KERNEL_LZO
+> >+	select HAVE_KERNEL_LZ4
+> > 	select HAVE_HW_BREAKPOINT
+> > 	select HAVE_MIXED_BREAKPOINTS_REGS
+> > 	select PERF_EVENTS
+> >diff --git a/arch/x86/boot/compressed/Makefile
+> >b/arch/x86/boot/compressed/Makefile
+> >index 8a84501..c275db5 100644
+> >--- a/arch/x86/boot/compressed/Makefile
+> >+++ b/arch/x86/boot/compressed/Makefile
+> >@@ -4,7 +4,7 @@
+> > # create a compressed vmlinux image from the original vmlinux
+> > #
+> > 
+> >-targets := vmlinux.lds vmlinux vmlinux.bin vmlinux.bin.gz
+> >vmlinux.bin.bz2 vmlinux.bin.lzma vmlinux.bin.xz vmlinux.bin.lzo
+> >head_$(BITS).o misc.o string.o cmdline.o early_serial_console.o piggy.o
+> >+targets := vmlinux.lds vmlinux vmlinux.bin vmlinux.bin.gz
+> >vmlinux.bin.bz2 vmlinux.bin.lzma vmlinux.bin.xz vmlinux.bin.lzo
+> >vmlinux.bin.lz4 head_$(BITS).o misc.o string.o cmdline.o
+> >early_serial_console.o piggy.o
+> > 
+> > KBUILD_CFLAGS := -m$(BITS) -D__KERNEL__ $(LINUX_INCLUDE) -O2
+> > KBUILD_CFLAGS += -fno-strict-aliasing -fPIC
+> >@@ -64,12 +64,15 @@ $(obj)/vmlinux.bin.xz: $(vmlinux.bin.all-y) FORCE
+> > 	$(call if_changed,xzkern)
+> > $(obj)/vmlinux.bin.lzo: $(vmlinux.bin.all-y) FORCE
+> > 	$(call if_changed,lzo)
+> >+$(obj)/vmlinux.bin.lz4: $(vmlinux.bin.all-y) FORCE
+> >+	$(call if_changed,lz4)
+> > 
+> > suffix-$(CONFIG_KERNEL_GZIP)	:= gz
+> > suffix-$(CONFIG_KERNEL_BZIP2)	:= bz2
+> > suffix-$(CONFIG_KERNEL_LZMA)	:= lzma
+> > suffix-$(CONFIG_KERNEL_XZ)	:= xz
+> > suffix-$(CONFIG_KERNEL_LZO) 	:= lzo
+> >+suffix-$(CONFIG_KERNEL_LZ4) 	:= lz4
+> > 
+> > quiet_cmd_mkpiggy = MKPIGGY $@
+> >       cmd_mkpiggy = $(obj)/mkpiggy $< > $@ || ( rm -f $@ ; false )
+> >diff --git a/arch/x86/boot/compressed/misc.c
+> >b/arch/x86/boot/compressed/misc.c
+> >index 88f7ff6..166a0a8 100644
+> >--- a/arch/x86/boot/compressed/misc.c
+> >+++ b/arch/x86/boot/compressed/misc.c
+> >@@ -145,6 +145,10 @@ static int lines, cols;
+> > #include "../../../../lib/decompress_unlzo.c"
+> > #endif
+> > 
+> >+#ifdef CONFIG_KERNEL_LZ4
+> >+#include "../../../../lib/decompress_unlz4.c"
+> >+#endif
+> >+
+> > static void scroll(void)
+> > {
+> > 	int i;
+> 
+> -- 
+> Sent from my mobile phone. Please excuse brevity and lack of formatting.
