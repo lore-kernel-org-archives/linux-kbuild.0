@@ -1,78 +1,33 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from avon.wwwdotorg.org ([70.85.31.133]:44776 "EHLO
-	avon.wwwdotorg.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751452Ab3CFQOn (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 6 Mar 2013 11:14:43 -0500
-Message-ID: <51376B6E.2060806@wwwdotorg.org>
-Date: Wed, 06 Mar 2013 09:14:38 -0700
-From: Stephen Warren <swarren@wwwdotorg.org>
+Received: from cantor2.suse.de ([195.135.220.15]:48438 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750716Ab3CFQYK (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 6 Mar 2013 11:24:10 -0500
+Message-ID: <51376DA9.3010807@suse.cz>
+Date: Wed, 06 Mar 2013 17:24:09 +0100
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Subject: Re: [PATCH V2 REPOST] kbuild: create an "include chroot" for DT bindings
-References: <1362506797-21905-1-git-send-email-swarren@wwwdotorg.org> <5136E866.20008@gmail.com>
-In-Reply-To: <5136E866.20008@gmail.com>
+Subject: Re: make headers_install fail when path is too long
+References: <51372591.1090606@6wind.com> <20130306161026.GA13449@merkur.ravnborg.org>
+In-Reply-To: <20130306161026.GA13449@merkur.ravnborg.org>
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Rob Herring <robherring2@gmail.com>
-Cc: Grant Likely <grant.likely@secretlab.ca>, Michal Marek <mmarek@suse.cz>, Stephen Warren <swarren@nvidia.com>, linux-kbuild@vger.kernel.org, devicetree-discuss@lists.ozlabs.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Hiroshi Doyu <hdoyu@nvidia.com>, "arm@kernel.org" <arm@kernel.org>
+To: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Cc: Sam Ravnborg <sam@ravnborg.org>, linux-kbuild@vger.kernel.org
 
-On 03/05/2013 11:55 PM, Rob Herring wrote:
-> On 03/05/2013 12:06 PM, Stephen Warren wrote:
->> From: Stephen Warren <swarren@nvidia.com>
->>
->> The recent dtc+cpp support allows header files and C pre-processor
->> defines/macros to be used when compiling device tree files. These
->> headers will typically define various constants that are part of the
->> device tree bindings.
->>
->> The original patch which set up the dtc+cpp include path only considered
->> using those headers from device tree files. However, most are also
->> useful for kernel code which needs to interpret the device tree.
->>
->> In both the DT files and the kernel, I'd like to include the DT-related
->> headers in the same way, for example, <dt-bindings/gpio/tegra-gpio.h>.
->> That will simplify any text which discusses the DT header locations.
->>
->> Creating a <dt-bindings/> for kernel source to use is as simple as
->> placing files into include/dt-bindings/.
->>
->> However, when compiling DT files, the include path should be restricted
->> so that only the dt-bindings path is available; arbitrary kernel headers
->> shouldn't be exposed. For this reason, create a specific include
->> directory for use by dtc+cpp, and symlink dt-bindings from there to the
->> actual location of include/dt-bindings/. For want of a better location,
->> place this "include chroot" into the existing dts/ directory.
->>
->> arch/*/boot/dts/include/dt-bindings -> ../../../../../include/dt-bindings
->>
->> Some headers used by device tree files may not be useful to the kernel;
->> they may be used simply to aid in constructing the DT file (e.g. macros
->> to create a node), but not define any information that the kernel needs
->> to share. These may be placed directly into arch/*/boot/dts/ along with
->> the DT files themselves.
->>
->> Cc: Hiroshi Doyu <hdoyu@nvidia.com>
->> Acked-by: Michal Marek <mmarek@suse.cz>
->> Acked-by: Shawn Guo <shawn.guo@linaro.org>
->> Signed-off-by: Stephen Warren <swarren@nvidia.com>
->> ---
->> Grant, Rob,
->>
->> This is a pre-requisite for people to convert their *.dts files to use
->> cpp, and hence is likely to be useful for a number of ARM subarch trees.
->> Perhaps this patch can be placed into a standalone topic branch in the
->> DT repo so we can all merge it. Assuming this patch is OK, I would also
->> repost the patches that create common headers defining IRQ, and GPIO
->> flags, which would place files into the new include/dt-bindings
->> directory.
+Dne 6.3.2013 17:10, Sam Ravnborg napsal(a):
+> On Wed, Mar 06, 2013 at 12:16:33PM +0100, Nicolas Dichtel wrote:
+>> This problem has probably already been reported, but I don't find the fix 
+>> in a kernel.org tree and I don't understand why.
 > 
-> This looks fine to me. As all these will all be arm-soc branches with
-> the dependency, it probably makes more sense for Arnd/Olof to apply this
-> and create the branch for this single patch.
+> First time I see this bug described - but I may missed it here at kbuild.
+> If a patch exists then please include the patch in your mail so we can
+> see it and comment on it.
 
-OK, that'd work fine for me too. I expect that arm-soc branch would also
-include the few patches to create some common headers, once I repost.
+Yes. If it's an obvious bug fix like this, simply send it to lkml and
+linux-kbuild.
 
+Michal
 
