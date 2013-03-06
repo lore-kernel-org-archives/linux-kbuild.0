@@ -1,19 +1,19 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wg0-f51.google.com ([74.125.82.51]:42207 "EHLO
-	mail-wg0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753554Ab3CFUrf (ORCPT
+Received: from mail-we0-f180.google.com ([74.125.82.180]:33603 "EHLO
+	mail-we0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750716Ab3CFVX3 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 6 Mar 2013 15:47:35 -0500
+	Wed, 6 Mar 2013 16:23:29 -0500
 From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: Re: [PATCH 2/2] kconfig: optionally use pkg-config to detect ncurses libs
-Date: Wed, 6 Mar 2013 21:47:29 +0100
-References: <Use config scripts to detect ncurses libs for, menuconfig/nconfig dialogs> <1362574922-4799-1-git-send-email-jlec@gentoo.org> <1362574922-4799-3-git-send-email-jlec@gentoo.org>
-In-Reply-To: <1362574922-4799-3-git-send-email-jlec@gentoo.org>
+Subject: Re: Final versions of ncurses libs detection patches
+Date: Wed, 6 Mar 2013 22:23:24 +0100
+References: <Use config scripts to detect ncurses libs for, menuconfig/nconfig dialogs> <1362574922-4799-1-git-send-email-jlec@gentoo.org>
+In-Reply-To: <1362574922-4799-1-git-send-email-jlec@gentoo.org>
 MIME-Version: 1.0
 Content-Type: Text/Plain;
   charset="iso-8859-15"
 Content-Transfer-Encoding: 7bit
-Message-Id: <201303062147.29918.yann.morin.1998@free.fr>
+Message-Id: <201303062223.24541.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
@@ -22,37 +22,32 @@ Cc: jlec@gentoo.org, linux-kernel@vger.kernel.org
 Justin, All,
 
 On Wednesday 06 March 2013 jlec@gentoo.org wrote:
-> From: Justin Lecher <jlec@gentoo.org>
-> 
-> When building ncurses with --with-termlib several symbols get moved from
-> libncurses.so to libtinfo.so. Thus when linking with libncurses.so, one
-> additionally needs to link with libtinfo.so.
-> 
-> The ncurses pkg-config module will be used to detect the necessary libs for
-> linking. If not available the old way of directly specifying libs will be
-> used.
-> 
-> Signed-off-by: Justin Lecher <jlec@gentoo.org>
-> ---
->  scripts/kconfig/Makefile | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
-> index 231b475..e76ae5d 100644
-> --- a/scripts/kconfig/Makefile
-> +++ b/scripts/kconfig/Makefile
-> @@ -219,7 +219,9 @@ HOSTCFLAGS_gconf.o	= `pkg-config --cflags gtk+-2.0 gmodule-2.0 libglade-2.0` \
->  
->  HOSTLOADLIBES_mconf   = $(shell $(CONFIG_SHELL) $(check-lxdialog) -ldflags $(HOSTCC))
->  
-> -HOSTLOADLIBES_nconf	= -lmenu -lpanel -lncurses
-> +HOSTLOADLIBES_nconf	= $(shell \
-> +				pkg-config --libs menu panel ncurses 2>/dev/null \
-> +				|| echo "-lmenu -lpanel -ncurses"  )
+> I am sorry for the long delay.
+> Final versions of the patches which are reduced to the usage of pkg-config. And
+> if unavailable we use the old code.
 
-Typo: this should be:  "-lncurses"  and not:  "-ncurses"
+On Ubuntu Quantal, ncurses is indeed compiled with tinfo as a separate
+lib, but these two patches are not needed, because libncurses has proper
+(NEEDED) on libtinfo:
 
-I'll fix it here before queuing, no need to resend.
+  $ readelf -d /lib/x86_64-linux-gnu/libncurses.so.5.9 |grep tinfo
+  0x0000000000000001 (NEEDED)             Shared library: [libtinfo.so.5]
+
+If I just configure ncurses with:
+  $ ./configure --with-termlib --with-shared --without-normal && make
+  $ readelf -d lib/libncurses.so.5.9 |grep tinfo
+  0x0000000000000001 (NEEDED)             Shared library: [libtinfo.so.5]
+
+I wonder how you configured your ncurses.
+
+But anyway, even in that cse, using pkg-config when available is better
+than using our previous legacy checks.
+
+I'm still doing a few more tests on my side before queuing.
+
+> Thanks for all suggestions,
+
+Thanks for staying around during the iterations.
 
 Regards,
 Yann E. MORIN.
