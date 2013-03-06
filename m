@@ -1,44 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.linuxfoundation.org ([140.211.169.12]:60636 "EHLO
-	mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751886Ab3CEXIs (ORCPT
+Received: from LGEMRELSE7Q.lge.com ([156.147.1.151]:54170 "EHLO
+	LGEMRELSE7Q.lge.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750788Ab3CFGPI (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 5 Mar 2013 18:08:48 -0500
-Date: Tue, 5 Mar 2013 15:08:45 -0800
-From: Andrew Morton <akpm@linux-foundation.org>
-Subject: Re: [PATCH v3 -next 5/5] Kconfig: Make x86 and arm kernels default
- to the LZ4-compressed
-Message-Id: <20130305150845.0d19a2875d39dac5d03b4b62@linux-foundation.org>
-In-Reply-To: <5135DF44.2040806@openwrt.org>
+	Wed, 6 Mar 2013 01:15:08 -0500
+Date: Wed, 6 Mar 2013 15:15:05 +0900
+From: Kyungsik Lee <kyungsik.lee@lge.com>
+Subject: Re: [PATCH v3 -next 0/5] Add support for LZ4-compressed kernel
+Message-ID: <20130306061505.GA4979@Corona>
 References: <1362484056-9778-1-git-send-email-kyungsik.lee@lge.com>
-	<1362484056-9778-6-git-send-email-kyungsik.lee@lge.com>
-	<5135DF44.2040806@openwrt.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+ <20130305150616.cb737f9b217b8c82051b2ccb@linux-foundation.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20130305150616.cb737f9b217b8c82051b2ccb@linux-foundation.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Florian Fainelli <florian@openwrt.org>
-Cc: Kyungsik Lee <kyungsik.lee@lge.com>, Russell King <linux@arm.linux.org.uk>, "H. Peter Anvin" <hpa@zytor.com>, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, x86@kernel.org, celinux-dev@lists.celinuxforum.org, Nicolas Pitre <nico@fluxnic.net>, David Sterba <dsterba@suse.cz>, Nitin Gupta <nitingupta910@gmail.com>, Joe Millenbach <jmillenbach@gmail.com>, Thomas Gleixner <tglx@linutronix.de>, Michal Marek <mmarek@suse.cz>, hyojun.im@lge.com, chan.jeong@lge.com, raphael.andy.lee@gmail.com
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: Russell King <linux@arm.linux.org.uk>, "H. Peter Anvin" <hpa@zytor.com>, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, x86@kernel.org, celinux-dev@lists.celinuxforum.org, Nicolas Pitre <nico@fluxnic.net>, David Sterba <dsterba@suse.cz>, Nitin Gupta <nitingupta910@gmail.com>, Joe Millenbach <jmillenbach@gmail.com>, Thomas Gleixner <tglx@linutronix.de>, Michal Marek <mmarek@suse.cz>, hyojun.im@lge.com, chan.jeong@lge.com, raphael.andy.lee@gmail.com
 
-On Tue, 05 Mar 2013 13:04:20 +0100 Florian Fainelli <florian@openwrt.org> wrote:
-
-> Hello,
+On Tue, Mar 05, 2013 at 03:06:16PM -0800, Andrew Morton wrote:
+> On Tue,  5 Mar 2013 20:47:31 +0900 Kyungsik Lee <kyungsik.lee@lge.com> wrote:
 > 
-> On 03/05/2013 12:47 PM, Kyungsik Lee wrote:
-> > This patch makes x86 and arm kernels default to the LZ4-compressed
-> > to test new LZ4 code in the linux-next. This is requested by
-> > Andrew Morton.
+> > This is the third version. In this version, Some codes are fixed
+> > and more description and note are added. I would like to thank David Sterba
+> > for his review.
+> > 
+> > The Last patch[5/5] of the patch set is for making x86 and arm default to
+> > LZ4-compressed for testing the LZ4 code in the linux-next.
+> > It was requested by Andrew Morton in the patch set v2.
+> > 
+> > Currently, A preliminary version of LZ4 de/compression tool is supported.
+> > However, It is expected that we will have a tool with more features
+> > once its format is finished.
 > 
-> I do not think making this the default is good idea, because the lz4demo 
-> utility that you need to actually compress the kernel (used in patch 2) 
-> is not installed nor available by default on most systems, while gzip 
-> is.
+> What happened to the changelog?  The earlier version at least had some
+> rudimentary benchmarking results, but now we don't even have that. 
+> 
+> Someone should prepare the information explaining why we added this to
+> Linux, and I'd prefer that person be you rather than me!  Certainly it
+> should include performance measurements - both speed and space.  Also
+> it should capture our thinking regarding all the other decompressors,
+> explaining why we view it as acceptable to add yet another one.
+Sorry, It will have all the information you mentioned. I can reply to
+this thread if you want.
 
-Yes, that's a showstopper even for linux-next.  What a shame.
+Or I might need another patch(v4). I have one thing to be confirmed
+regarding LZ4 format. One of the patch set needs to be fixed
+if there is a change. After that I can include the information
+in the changelog.
 
-It means this code will walk into mainline with practically zero
-third-party testing.  Oh well, the risk is minor.  If it breaks, people
-can switch back to gzip easily enough.
+> Please, put yourself in the position of someone reading these commits
+> in 2017 wondering "why did they merge this".  We should tell them.
 
-
+Thanks,
+Kyungsik
