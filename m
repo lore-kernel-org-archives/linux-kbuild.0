@@ -1,108 +1,88 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.windriver.com ([147.11.1.11]:49995 "EHLO
-	mail.windriver.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751027Ab3CFQvO (ORCPT
+Received: from avon.wwwdotorg.org ([70.85.31.133]:34116 "EHLO
+	avon.wwwdotorg.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753567Ab3CFSXL (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 6 Mar 2013 11:51:14 -0500
-Message-ID: <513773C0.5010309@windriver.com>
-Date: Wed, 6 Mar 2013 11:50:08 -0500
-From: Bruce Ashfield <bruce.ashfield@windriver.com>
-MIME-Version: 1.0
-Subject: Re: make headers_install fail when path is too long
-References: <51372591.1090606@6wind.com> <20130306161026.GA13449@merkur.ravnborg.org> <51376E6C.4040903@6wind.com>
-In-Reply-To: <51376E6C.4040903@6wind.com>
-Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
-Content-Transfer-Encoding: 8bit
+	Wed, 6 Mar 2013 13:23:11 -0500
+From: Stephen Warren <swarren@wwwdotorg.org>
+Subject: [PATCH 1/7] kbuild: create an "include chroot" for DT bindings
+Date: Wed,  6 Mar 2013 11:22:57 -0700
+Message-Id: <1362594183-21523-1-git-send-email-swarren@wwwdotorg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: nicolas.dichtel@6wind.com
-Cc: Sam Ravnborg <sam@ravnborg.org>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
+To: arm@kernel.org, Grant Likely <grant.likely@secretlab.ca>, Rob Herring <rob.herring@calxeda.com>
+Cc: Michal Marek <mmarek@suse.cz>, Shawn Guo <shawn.guo@linaro.org>, linux-kbuild@vger.kernel.org, devicetree-discuss@lists.ozlabs.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Stephen Warren <swarren@nvidia.com>, Hiroshi Doyu <hdoyu@nvidia.com>
 
-On 13-03-06 11:27 AM, Nicolas Dichtel wrote:
-> Le 06/03/2013 17:10, Sam Ravnborg a écrit :
->> On Wed, Mar 06, 2013 at 12:16:33PM +0100, Nicolas Dichtel wrote:
->>> This problem has probably already been reported, but I don't find the
->>> fix
->>> in a kernel.org tree and I don't understand why.
->>
->> First time I see this bug described - but I may missed it here at kbuild.
-> It's probably why I didn't find this on a linux kernel mailing list ;-)
+From: Stephen Warren <swarren@nvidia.com>
 
-And it's been on my TODO list to float this as a RFC to the kbuild lists
-before 3.9 arrived .. a goal that I managed to miss (again).
+The recent dtc+cpp support allows header files and C pre-processor
+defines/macros to be used when compiling device tree files. These
+headers will typically define various constants that are part of the
+device tree bindings.
 
-The patch in question has us up and installing headers on Yocto kernel/
-kernel header packages greater than 3.7, so it has received a decent
-amount of testing.
+The original patch which set up the dtc+cpp include path only considered
+using those headers from device tree files. However, most are also
+useful for kernel code which needs to interpret the device tree.
 
-As for it being the perfect approach, I only claim that it works in
-the environment that I've been using and it is functional.
+In both the DT files and the kernel, I'd like to include the DT-related
+headers in the same way, for example, <dt-bindings/gpio/tegra-gpio.h>.
+That will simplify any text which discusses the DT header locations.
 
-If this change turns out to be acceptable, that's great. I can also
-spend time re-working as appropriate .. or someone else's solution
-can be adopted.
+Creating a <dt-bindings/> for kernel source to use is as simple as
+placing files into include/dt-bindings/.
 
-In the end it's a win and a fix, and the thread has prompted me to
-get the change floated :)
+However, when compiling DT files, the include path should be restricted
+so that only the dt-bindings path is available; arbitrary kernel headers
+shouldn't be exposed. For this reason, create a specific include
+directory for use by dtc+cpp, and symlink dt-bindings from there to the
+actual location of include/dt-bindings/. For want of a better location,
+place this "include chroot" into the existing dts/ directory.
 
-Cheers,
+arch/*/boot/dts/include/dt-bindings -> ../../../../../include/dt-bindings
 
-Bruce
+Some headers used by device tree files may not be useful to the kernel;
+they may be used simply to aid in constructing the DT file (e.g. macros
+to create a node), but not define any information that the kernel needs
+to share. These may be placed directly into arch/*/boot/dts/ along with
+the DT files themselves.
 
->
->> If a patch exists then please include the patch in your mail so we can
->> see it and comment on it.
->>
->> And make sure to have the attribution correct if you consider it to
->> be applied.
-> I'm not the author of the patch, I've found it on the web. Here it is:
->
->  From cb9c811b8f23277de95dc687e87c6859308e68e6 Mon Sep 17 00:00:00 2001
-> From: Bruce Ashfield <bruce.ashfield@windriver.com>
-> Date: Wed, 6 Mar 2013 17:23:51 +0100
-> Subject: [PATCH] scripts/Makefile.headersinst: install headers from scratch
->   file
->
-> If headers_install is executed from a deep/long directory structure, the
-> shell's maximum argument length can be execeeded, which breaks the
-> operation
-> with:
->
-> | make[2]: execvp: /bin/sh: Argument list too long
-> | make[2]: ***
->
-> By dumping the input files to a scratch file and using xargs to read the
-> input list from the scratch file, we can avoid blowing out the maximum
-> argument size and install headers in a long path name environment.
->
-> Signed-off-by: Bruce Ashfield <bruce.ashfield@windriver.com>
-> ---
->   scripts/Makefile.headersinst | 4 +++-
->   1 file changed, 3 insertions(+), 1 deletion(-)
->
-> diff --git a/scripts/Makefile.headersinst b/scripts/Makefile.headersinst
-> index 25f216a..c481986 100644
-> --- a/scripts/Makefile.headersinst
-> +++ b/scripts/Makefile.headersinst
-> @@ -71,7 +71,7 @@ printdir = $(patsubst $(INSTALL_HDR_PATH)/%/,%,$(dir $@))
->   quiet_cmd_install = INSTALL $(printdir) ($(words $(all-files))\
->                               file$(if $(word 2, $(all-files)),s))
->         cmd_install = \
-> -        $(PERL) $< $(installdir) $(SRCARCH) $(input-files); \
-> +        xargs $(PERL) $< $(installdir) $(SRCARCH) <
-> $(INSTALL_HDR_PATH)/.input-files; \
->           for F in $(wrapper-files); do                                   \
->                   echo "\#include <asm-generic/$$F>" >
-> $(installdir)/$$F;    \
->           done;                                                           \
-> @@ -100,7 +100,9 @@ targets += $(install-file)
->   $(install-file): scripts/headers_install.pl $(input-files) FORCE
->       $(if $(unwanted),$(call cmd,remove),)
->       $(if $(wildcard $(dir $@)),,$(shell mkdir -p $(dir $@)))
-> +    @echo $(input-files) > $(INSTALL_HDR_PATH)/.input-files
->       $(call if_changed,install)
-> +    @rm $(INSTALL_HDR_PATH)/.input-files
->
->   else
->   __headerscheck: $(subdirs) $(check-file)
+Cc: Shawn Guo <shawn.guo@linaro.org>
+Cc: Hiroshi Doyu <hdoyu@nvidia.com>
+Acked-by: Michal Marek <mmarek@suse.cz>
+Acked-by: Shawn Guo <shawn.guo@linaro.org>
+Acked-by: Rob Herring <rob.herring@calxeda.com>
+Signed-off-by: Stephen Warren <swarren@nvidia.com>
+---
+This first patch was previously posted separately as V2. I'm including
+it here to keep it with the whole series. I hope this series can be
+applied as a topic branch in arm-soc.
+---
+ arch/arm/boot/dts/include/dt-bindings |    1 +
+ scripts/Makefile.lib                  |    2 +-
+ 2 files changed, 2 insertions(+), 1 deletion(-)
+ create mode 120000 arch/arm/boot/dts/include/dt-bindings
+
+diff --git a/arch/arm/boot/dts/include/dt-bindings b/arch/arm/boot/dts/include/dt-bindings
+new file mode 120000
+index 0000000..08c00e4
+--- /dev/null
++++ b/arch/arm/boot/dts/include/dt-bindings
+@@ -0,0 +1 @@
++../../../../../include/dt-bindings
+\ No newline at end of file
+diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+index 07125e6..af35521 100644
+--- a/scripts/Makefile.lib
++++ b/scripts/Makefile.lib
+@@ -158,7 +158,7 @@ ld_flags       = $(LDFLAGS) $(ldflags-y)
+ 
+ dtc_cpp_flags  = -Wp,-MD,$(depfile) -nostdinc                            \
+ 		 -I$(srctree)/arch/$(SRCARCH)/boot/dts                   \
+-		 -I$(srctree)/arch/$(SRCARCH)/include/dts                \
++		 -I$(srctree)/arch/$(SRCARCH)/boot/dts/include           \
+ 		 -undef -D__DTS__
+ 
+ # Finds the multi-part object the current object will be linked into
+-- 
+1.7.10.4
 
