@@ -1,38 +1,33 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:39525 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754042Ab3CFNOU (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 6 Mar 2013 08:14:20 -0500
-Date: Wed, 6 Mar 2013 14:14:18 +0100
-From: Michal Marek <mmarek@suse.cz>
-Subject: [GIT] kbuild fix for v3.9-rc2
-Message-ID: <20130306131417.GA12905@pobox.suse.cz>
+Received: from smtp.snhosting.dk ([87.238.248.203]:58331 "EHLO
+	smtp.domainteam.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752256Ab3CFQKb (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 6 Mar 2013 11:10:31 -0500
+Date: Wed, 6 Mar 2013 17:10:26 +0100
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: make headers_install fail when path is too long
+Message-ID: <20130306161026.GA13449@merkur.ravnborg.org>
+References: <51372591.1090606@6wind.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <51372591.1090606@6wind.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: sam@ravnborg.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
 
-Hi Linus,
+On Wed, Mar 06, 2013 at 12:16:33PM +0100, Nicolas Dichtel wrote:
+> This problem has probably already been reported, but I don't find the fix 
+> in a kernel.org tree and I don't understand why.
 
-there is one for for make headers_install/headers_check to not require
-make 3.81. The requirement has been accidentally introduced in 3.7.
+First time I see this bug described - but I may missed it here at kbuild.
+If a patch exists then please include the patch in your mail so we can
+see it and comment on it.
+
+And make sure to have the attribution correct if you consider it to
+be applied.
 
 Thanks,
-Michal
-
-The following changes since commit 0ca7ffb356063c5ece847687da457dfe748612a2:
-
-  Merge branch 'kbuild' of git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild (2013-02-27 12:25:47 -0800)
-
-are available in the git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git kbuild
-
-Sam Ravnborg (1):
-      kbuild: fix make headers_check with make 3.80
-
- scripts/Makefile.headersinst |   11 ++++++-----
- 1 files changed, 6 insertions(+), 5 deletions(-)
+	Sam
