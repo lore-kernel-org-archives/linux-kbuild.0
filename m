@@ -1,44 +1,72 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from terminus.zytor.com ([198.137.202.10]:56116 "EHLO mail.zytor.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754907Ab3CGPGT (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 7 Mar 2013 10:06:19 -0500
-Message-ID: <5138ACE2.9030105@zytor.com>
-Date: Thu, 07 Mar 2013 07:06:10 -0800
-From: "H. Peter Anvin" <hpa@zytor.com>
+Received: from mail.free-electrons.com ([94.23.35.102]:60082 "EHLO
+	mail.free-electrons.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753478Ab3CGPzL (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 7 Mar 2013 10:55:11 -0500
+Message-ID: <5138B85C.5010501@free-electrons.com>
+Date: Thu, 07 Mar 2013 16:55:08 +0100
+From: Maxime Ripard <maxime.ripard@free-electrons.com>
 MIME-Version: 1.0
 Subject: Re: 3.9-rc1: hz.bc compilation breakage
-References: <5137546B.2090801@free-electrons.com> <51380C65.50202@zytor.com> <51386F0D.8060105@free-electrons.com>
-In-Reply-To: <51386F0D.8060105@free-electrons.com>
+References: <5137546B.2090801@free-electrons.com> <51380C65.50202@zytor.com> <51386F0D.8060105@free-electrons.com> <5138ACE2.9030105@zytor.com>
+In-Reply-To: <5138ACE2.9030105@zytor.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Maxime Ripard <maxime.ripard@free-electrons.com>
+To: "H. Peter Anvin" <hpa@zytor.com>
 Cc: linux-kernel@vger.kernel.org, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-On 03/07/2013 02:42 AM, Maxime Ripard wrote:
+Le 07/03/2013 16:06, H. Peter Anvin a écrit :
+> On 03/07/2013 02:42 AM, Maxime Ripard wrote:
+>>
+>> I triggered this issue when switching to 3.9-rc1, and oldconfig runs at
+>> that time, and now, running menuconfig doesn't generates it either.
+>>
+>>> I am not sure what you mean with "clean out-of-tree", however.
+>>
+>> make O=$(pwd) -C /path/to/linux/source some_configs
+>> make
+>>
 > 
-> I triggered this issue when switching to 3.9-rc1, and oldconfig runs at
-> that time, and now, running menuconfig doesn't generates it either.
+> Can you give the exact set of commands you are running when you see
+> this?  I cannot reproduce this no matter what I do, and it doesn't seem
+> like it is being a common problem.
 > 
->> I am not sure what you mean with "clean out-of-tree", however.
-> 
-> make O=$(pwd) -C /path/to/linux/source some_configs
-> make
-> 
+> In the example above the first "make" command does indeed not create any
+> files in include/config, but they get created immediately on the second
+> "make"...
 
-Can you give the exact set of commands you are running when you see
-this?  I cannot reproduce this no matter what I do, and it doesn't seem
-like it is being a common problem.
+Hmmm, It looks indeed that it can happen only on already existing
+directories, I can't reproduce neither with a new build, and not
+everyone seems to be impacted by that bug neither, since some colleagues
+did the same thing without any trouble (with a completely different
+architecture though).
 
-In the example above the first "make" command does indeed not create any
-files in include/config, but they get created immediately on the second
-"make"...
+So it's not that bad.
 
-	-hpa
+However, when I do:
+
+In my source dir
+git checkout v3.9-rc1
+
+In my build dir
+ARCH=arm make clean
+ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- make zImage
+
+And then it breaks.
+
+So I suspect it's something not cleaned properly, or not generated
+properly. Here is what's left after the make clean
+
+http://code.bulix.org/eh1e6c-83108?raw
+
+Thanks,
+Maxime
 
 -- 
-H. Peter Anvin, Intel Open Source Technology Center
-I work for Intel.  I don't speak on their behalf.
-
+Maxime Ripard, Free Electrons
+Kernel, drivers, real-time and embedded Linux
+development, consulting, training and support.
+http://free-electrons.com
