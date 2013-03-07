@@ -1,72 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.free-electrons.com ([94.23.35.102]:60082 "EHLO
-	mail.free-electrons.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753478Ab3CGPzL (ORCPT
+Received: from mail-wg0-f44.google.com ([74.125.82.44]:52314 "EHLO
+	mail-wg0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932333Ab3CGSUs (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 7 Mar 2013 10:55:11 -0500
-Message-ID: <5138B85C.5010501@free-electrons.com>
-Date: Thu, 07 Mar 2013 16:55:08 +0100
-From: Maxime Ripard <maxime.ripard@free-electrons.com>
-MIME-Version: 1.0
-Subject: Re: 3.9-rc1: hz.bc compilation breakage
-References: <5137546B.2090801@free-electrons.com> <51380C65.50202@zytor.com> <51386F0D.8060105@free-electrons.com> <5138ACE2.9030105@zytor.com>
-In-Reply-To: <5138ACE2.9030105@zytor.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+	Thu, 7 Mar 2013 13:20:48 -0500
+Received: by mail-wg0-f44.google.com with SMTP id dr12so1418815wgb.35
+        for <linux-kbuild@vger.kernel.org>; Thu, 07 Mar 2013 10:20:46 -0800 (PST)
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Subject: [pull request] Pull request for branch yem-kconfig-rc-fixes
+Date: Thu,  7 Mar 2013 19:20:38 +0100
+Message-Id: <cover.1362679061.git.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "H. Peter Anvin" <hpa@zytor.com>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
+Cc: Justin Lecher <jlec@gentoo.org>, "Yann E. MORIN" <yann.morin.1998@free.fr>
 
-Le 07/03/2013 16:06, H. Peter Anvin a écrit :
-> On 03/07/2013 02:42 AM, Maxime Ripard wrote:
->>
->> I triggered this issue when switching to 3.9-rc1, and oldconfig runs at
->> that time, and now, running menuconfig doesn't generates it either.
->>
->>> I am not sure what you mean with "clean out-of-tree", however.
->>
->> make O=$(pwd) -C /path/to/linux/source some_configs
->> make
->>
-> 
-> Can you give the exact set of commands you are running when you see
-> this?  I cannot reproduce this no matter what I do, and it doesn't seem
-> like it is being a common problem.
-> 
-> In the example above the first "make" command does indeed not create any
-> files in include/config, but they get created immediately on the second
-> "make"...
+Hello Michal, All!
 
-Hmmm, It looks indeed that it can happen only on already existing
-directories, I can't reproduce neither with a new build, and not
-everyone seems to be impacted by that bug neither, since some colleagues
-did the same thing without any trouble (with a completely different
-architecture though).
+Michal, please, pull to -rc-fixes, these two changes by Justin to fix
+ncurses-based kconfig frontends (mconf & nconf) compilation on systems
+where ncurses was built with a separate terminfo library.
 
-So it's not that bad.
 
-However, when I do:
+The following changes since commit e3900e74f26fc924c8e9e2a922bd40369b0bb517:
 
-In my source dir
-git checkout v3.9-rc1
+  Merge branch 'kbuild/rc-fixes' into kbuild/kconfig (2013-02-25 21:51:57 +0100)
 
-In my build dir
-ARCH=arm make clean
-ARCH=arm CROSS_COMPILE=arm-linux-gnueabi- make zImage
+are available in the git repository at:
 
-And then it breaks.
+  git://gitorious.org/linux-kconfig/linux-kconfig.git yem-kconfig-rc-fixes
 
-So I suspect it's something not cleaned properly, or not generated
-properly. Here is what's left after the make clean
+Justin Lecher (2):
+      menuconfig: optionally use pkg-config to detect ncurses libs
+      kconfig: optionally use pkg-config to detect ncurses libs
 
-http://code.bulix.org/eh1e6c-83108?raw
+ scripts/kconfig/Makefile                   |    4 +++-
+ scripts/kconfig/lxdialog/check-lxdialog.sh |    2 ++
+ 2 files changed, 5 insertions(+), 1 deletions(-)
 
-Thanks,
-Maxime
+Regards,
+Yann E. MORIN
 
 -- 
-Maxime Ripard, Free Electrons
-Kernel, drivers, real-time and embedded Linux
-development, consulting, training and support.
-http://free-electrons.com
+.-----------------.--------------------.------------------.--------------------.
+|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
+| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
+| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
+| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
+'------------------------------^-------^------------------^--------------------'
