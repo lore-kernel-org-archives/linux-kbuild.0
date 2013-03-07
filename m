@@ -1,61 +1,48 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-we0-f180.google.com ([74.125.82.180]:33603 "EHLO
-	mail-we0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750716Ab3CFVX3 (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 6 Mar 2013 16:23:29 -0500
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: Re: Final versions of ncurses libs detection patches
-Date: Wed, 6 Mar 2013 22:23:24 +0100
-References: <Use config scripts to detect ncurses libs for, menuconfig/nconfig dialogs> <1362574922-4799-1-git-send-email-jlec@gentoo.org>
-In-Reply-To: <1362574922-4799-1-git-send-email-jlec@gentoo.org>
+Received: from terminus.zytor.com ([198.137.202.10]:49793 "EHLO mail.zytor.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754489Ab3CGDlr (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 6 Mar 2013 22:41:47 -0500
+Message-ID: <51380C65.50202@zytor.com>
+Date: Wed, 06 Mar 2013 19:41:25 -0800
+From: "H. Peter Anvin" <hpa@zytor.com>
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-15"
+Subject: Re: 3.9-rc1: hz.bc compilation breakage
+References: <5137546B.2090801@free-electrons.com>
+In-Reply-To: <5137546B.2090801@free-electrons.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
-Message-Id: <201303062223.24541.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: jlec@gentoo.org, linux-kernel@vger.kernel.org
+To: Maxime Ripard <maxime.ripard@free-electrons.com>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-Justin, All,
+On 03/06/2013 06:36 AM, Maxime Ripard wrote:
+> Hi,
+> 
+> I'm compiling the kernel for an iMX28(ARM) board, and since 3.9-rc1, I
+> get the following error at compilation time:
+> 
+> make[3]: *** No rule to make target
+> `/home/max/Work/2012/crystalfontz/rewrite/linux-dt/include/config/hz.h',
+> needed by `kernel/hz.bc'.  Stop.
+> 
+> I'm doing a clean out-of-tree build, with the following configuration
+> file: http://code.bulix.org/m4y7se-83102?raw
+> 
+> Reverting commit 1b66e0fd ("kernel: Replace timeconst.pl with a bc
+> script") make the compilation go on as usual.
+> 
 
-On Wednesday 06 March 2013 jlec@gentoo.org wrote:
-> I am sorry for the long delay.
-> Final versions of the patches which are reduced to the usage of pkg-config. And
-> if unavailable we use the old code.
+That file should have been created by "make *config", and I just
+verified that it does indeed do so.  That file is a sentinel for
+configuration changes; the entire build system depends on it.
 
-On Ubuntu Quantal, ncurses is indeed compiled with tinfo as a separate
-lib, but these two patches are not needed, because libncurses has proper
-(NEEDED) on libtinfo:
+I am not sure what you mean with "clean out-of-tree", however.
 
-  $ readelf -d /lib/x86_64-linux-gnu/libncurses.so.5.9 |grep tinfo
-  0x0000000000000001 (NEEDED)             Shared library: [libtinfo.so.5]
+kbuild people: is there anything wrong with how this dependency is
+specified?
 
-If I just configure ncurses with:
-  $ ./configure --with-termlib --with-shared --without-normal && make
-  $ readelf -d lib/libncurses.so.5.9 |grep tinfo
-  0x0000000000000001 (NEEDED)             Shared library: [libtinfo.so.5]
+	-hpa
 
-I wonder how you configured your ncurses.
 
-But anyway, even in that cse, using pkg-config when available is better
-than using our previous legacy checks.
-
-I'm still doing a few more tests on my side before queuing.
-
-> Thanks for all suggestions,
-
-Thanks for staying around during the iterations.
-
-Regards,
-Yann E. MORIN.
-
--- 
-.-----------------.--------------------.------------------.--------------------.
-|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
-| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
-| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
-| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
-'------------------------------^-------^------------------^--------------------'
