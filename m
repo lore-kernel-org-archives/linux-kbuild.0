@@ -1,116 +1,55 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from multi.imgtec.com ([194.200.65.239]:27822 "EHLO multi.imgtec.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1756704Ab3CGLp4 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 7 Mar 2013 06:45:56 -0500
-From: James Hogan <james.hogan@imgtec.com>
-Subject: [RFC -next] linux/linkage.h: fix symbol prefix handling
-Date: Thu, 7 Mar 2013 11:44:02 +0000
-Message-ID: <1362656642-2693-1-git-send-email-james.hogan@imgtec.com>
+Received: from mail1.windriver.com ([147.11.146.13]:49708 "EHLO
+	mail1.windriver.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753177Ab3CGN3c (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 7 Mar 2013 08:29:32 -0500
+Message-ID: <513895F9.2050900@windriver.com>
+Date: Thu, 7 Mar 2013 08:28:25 -0500
+From: Bruce Ashfield <bruce.ashfield@windriver.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Subject: Re: make headers_install fail when path is too long
+References: <51372591.1090606@6wind.com> <20130306161026.GA13449@merkur.ravnborg.org> <51376E6C.4040903@6wind.com> <51384F21.9070800@suse.cz>
+In-Reply-To: <51384F21.9070800@suse.cz>
+Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Al Viro <viro@zeniv.linux.org.uk>
-Cc: Michal Marek <mmarek@suse.cz>, Andrew Morton <akpm@linux-foundation.org>, Guenter Roeck <linux@roeck-us.net>, Jean Delvare <khali@linux-fr.org>, Rusty Russell <rusty@rustcorp.com.au>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Mike Frysinger <vapier@gentoo.org>, uclinux-dist-devel@blackfin.uclinux.org, linux-next@vger.kernel.org, James Hogan <james.hogan@imgtec.com>
+To: Michal Marek <mmarek@suse.cz>
+Cc: nicolas.dichtel@6wind.com, Sam Ravnborg <sam@ravnborg.org>, linux-kbuild@vger.kernel.org
 
-The commit "consolidate cond_syscall and SYSCALL_ALIAS declarations"
-broke the build on blackfin and metag due to the following code:
+On 13-03-07 03:26 AM, Michal Marek wrote:
+> Dne 6.3.2013 17:27, Nicolas Dichtel napsal(a):
+>> -        $(PERL) $< $(installdir) $(SRCARCH) $(input-files); \
+> [...]
+>> +    @echo $(input-files) > $(INSTALL_HDR_PATH)/.input-files
+>
+> Are you sure this is a reliable fix? What make does is to spawn
+>
+> /bin/sh -c 'echo <long list of files> > usr/include/.input-files'
 
-  #ifndef SYMBOL_NAME
-  #ifdef CONFIG_SYMBOL_PREFIX
-  #define SYMBOL_NAME(x) CONFIG_SYMBOL_PREFIX ## x
-  #else
-  #define SYMBOL_NAME(x) x
-  #endif
-  #endif
-  #define __SYMBOL_NAME(x) __stringify(SYMBOL_NAME(x))
+It's what I was referencing in my original email. It works here,
+and fixes our install of headers in previously failing environments.
+But yes, it does shuffle the args enough to get around the limit, but
+there's still a way to have even deeper and longer path names that
+could cause failures.
 
-__stringify literally stringifies CONFIG_SYMBOL_PREFIX ##x, so you get
-lines like this in the assembly output:
+I experimented with loops, and other options as well. But any
+construct like "for f in $(input-files)", is both slow and explodes
+on the argument length limits just like the original.
 
-  .weak CONFIG_SYMBOL_PREFIXsys_quotactl
-  .set
-  CONFIG_SYMBOL_PREFIXsys_quotactl,CONFIG_SYMBOL_PREFIXsys_ni_syscall
+>
+> here. So I guess that it works for you just because "sh -c" is shorter
+> than "sh -c 'perl scripts/headers_install.pl...'".
 
-This is fixed by defining SYMBOL_PREFIX from the command line for c
-files in addition to assembly for architectures that set
-CONFIG_SYMBOL_PREFIX (scripts/Makefile.lib), and defining __SYMBOL_NAME
-as:
+Partly, yes, but we are more than a few characters over the limit
+in my testing. So it shouldn't be the whole story.
 
-  #define __SYMBOL_NAME(x) __stringify(SYMBOL_PREFIX) #x
+Cheers,
 
-We first have to ensure SYMBOL_PREFIX is defined (which avoids polluting
-the command lines for architectures that don't use symbol prefixes).
-Also the definition of SYMBOL_PREFIX in <linux/kernel.h> is removed as
-it conflicts, isn't used anywhere, and is defined as a string so differs
-from the assembly definition.
+Bruce
 
-Signed-off-by: James Hogan <james.hogan@imgtec.com>
----
-This is just one possible way of fixing it. It felt the cleanest out of
-the ways I tried, but feel free to suggest something better!
-
- include/linux/kernel.h  |  7 -------
- include/linux/linkage.h | 12 +++++-------
- scripts/Makefile.lib    |  1 +
- 3 files changed, 6 insertions(+), 14 deletions(-)
-
-diff --git a/include/linux/kernel.h b/include/linux/kernel.h
-index 80d3687..e13e992 100644
---- a/include/linux/kernel.h
-+++ b/include/linux/kernel.h
-@@ -723,13 +723,6 @@ static inline void ftrace_dump(enum ftrace_dump_mode oops_dump_mode) { }
- /* Trap pasters of __FUNCTION__ at compile-time */
- #define __FUNCTION__ (__func__)
- 
--/* This helps us to avoid #ifdef CONFIG_SYMBOL_PREFIX */
--#ifdef CONFIG_SYMBOL_PREFIX
--#define SYMBOL_PREFIX CONFIG_SYMBOL_PREFIX
--#else
--#define SYMBOL_PREFIX ""
--#endif
--
- /* Rebuild everything on CONFIG_FTRACE_MCOUNT_RECORD */
- #ifdef CONFIG_FTRACE_MCOUNT_RECORD
- # define REBUILD_DUE_TO_FTRACE_MCOUNT_RECORD
-diff --git a/include/linux/linkage.h b/include/linux/linkage.h
-index 829d66c..acb869b 100644
---- a/include/linux/linkage.h
-+++ b/include/linux/linkage.h
-@@ -15,14 +15,12 @@
- #define asmlinkage CPP_ASMLINKAGE
- #endif
- 
--#ifndef SYMBOL_NAME
--#ifdef CONFIG_SYMBOL_PREFIX
--#define SYMBOL_NAME(x) CONFIG_SYMBOL_PREFIX ## x
--#else
--#define SYMBOL_NAME(x) x
--#endif
-+/* This helps us to avoid #ifdef SYMBOL_PREFIX */
-+#ifndef SYMBOL_PREFIX
-+#define SYMBOL_PREFIX
- #endif
--#define __SYMBOL_NAME(x) __stringify(SYMBOL_NAME(x))
-+
-+#define __SYMBOL_NAME(x) __stringify(SYMBOL_PREFIX) #x
- 
- #ifndef cond_syscall
- #define cond_syscall(x) asm(".weak\t" __SYMBOL_NAME(x) \
-diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-index 07125e6..f1cce6a 100644
---- a/scripts/Makefile.lib
-+++ b/scripts/Makefile.lib
-@@ -123,6 +123,7 @@ ifdef CONFIG_SYMBOL_PREFIX
- _sym_flags = -DSYMBOL_PREFIX=$(patsubst "%",%,$(CONFIG_SYMBOL_PREFIX))
- _cpp_flags += $(_sym_flags)
- _a_flags += $(_sym_flags)
-+_c_flags += $(_sym_flags)
- endif
- 
- 
--- 
-1.8.1.2
-
+>
+> Michal
+>
 
