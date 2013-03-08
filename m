@@ -1,57 +1,79 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wg0-f48.google.com ([74.125.82.48]:54589 "EHLO
-	mail-wg0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932333Ab3CGSUv (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 7 Mar 2013 13:20:51 -0500
-Received: by mail-wg0-f48.google.com with SMTP id 16so1378698wgi.3
-        for <linux-kbuild@vger.kernel.org>; Thu, 07 Mar 2013 10:20:50 -0800 (PST)
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: [PATCH 2/2] kconfig: optionally use pkg-config to detect ncurses libs
-Date: Thu,  7 Mar 2013 19:20:40 +0100
-Message-Id: <544e7e548fbe75cb93784cc02fc01ce1501286b6.1362679061.git.yann.morin.1998@free.fr>
-In-Reply-To: <cover.1362679061.git.yann.morin.1998@free.fr>
-References: <cover.1362679061.git.yann.morin.1998@free.fr>
-In-Reply-To: <cover.1362679061.git.yann.morin.1998@free.fr>
-References: <cover.1362679061.git.yann.morin.1998@free.fr>
+Received: from ozlabs.org ([203.10.76.45]:60939 "EHLO ozlabs.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1758166Ab3CHAdo (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 7 Mar 2013 19:33:44 -0500
+From: Rusty Russell <rusty@rustcorp.com.au>
+Subject: Re: [RFC -next] linux/linkage.h: fix symbol prefix handling
+In-Reply-To: <1362656642-2693-1-git-send-email-james.hogan@imgtec.com>
+References: <1362656642-2693-1-git-send-email-james.hogan@imgtec.com>
+Date: Fri, 08 Mar 2013 11:03:13 +1100
+Message-ID: <87sj46wyf2.fsf@rustcorp.com.au>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
-Cc: Justin Lecher <jlec@gentoo.org>, "Yann E. MORIN" <yann.morin.1998@free.fr>
+To: James Hogan <james.hogan@imgtec.com>, Al Viro <viro@zeniv.linux.org.uk>
+Cc: Michal Marek <mmarek@suse.cz>, Andrew Morton <akpm@linux-foundation.org>, Guenter Roeck <linux@roeck-us.net>, Jean Delvare <khali@linux-fr.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Mike Frysinger <vapier@gentoo.org>, uclinux-dist-devel@blackfin.uclinux.org, linux-next@vger.kernel.org
 
-From: Justin Lecher <jlec@gentoo.org>
+James Hogan <james.hogan@imgtec.com> writes:
+> The commit "consolidate cond_syscall and SYSCALL_ALIAS declarations"
+> broke the build on blackfin and metag due to the following code:
+>
+>   #ifndef SYMBOL_NAME
+>   #ifdef CONFIG_SYMBOL_PREFIX
+>   #define SYMBOL_NAME(x) CONFIG_SYMBOL_PREFIX ## x
+>   #else
+>   #define SYMBOL_NAME(x) x
+>   #endif
+>   #endif
+>   #define __SYMBOL_NAME(x) __stringify(SYMBOL_NAME(x))
+>
+> __stringify literally stringifies CONFIG_SYMBOL_PREFIX ##x, so you get
+> lines like this in the assembly output:
+>
+>   .weak CONFIG_SYMBOL_PREFIXsys_quotactl
+>   .set
+>   CONFIG_SYMBOL_PREFIXsys_quotactl,CONFIG_SYMBOL_PREFIXsys_ni_syscall
+>
+> This is fixed by defining SYMBOL_PREFIX from the command line for c
+> files in addition to assembly for architectures that set
+> CONFIG_SYMBOL_PREFIX (scripts/Makefile.lib), and defining __SYMBOL_NAME
+> as:
+>
+>   #define __SYMBOL_NAME(x) __stringify(SYMBOL_PREFIX) #x
+>
+> We first have to ensure SYMBOL_PREFIX is defined (which avoids polluting
+> the command lines for architectures that don't use symbol prefixes).
+> Also the definition of SYMBOL_PREFIX in <linux/kernel.h> is removed as
+> it conflicts, isn't used anywhere, and is defined as a string so differs
+> from the assembly definition.
 
-When building ncurses with --with-termlib several symbols get moved from
-libncurses.so to libtinfo.so. Thus when linking with libncurses.so, one
-additionally needs to link with libtinfo.so.
+So now, if CONFIG_SYMBOL_PREFIX, SYMBOL_PREFIX is defined on the cmdline
+as a string.  Otherwise it's empty (not the empty string?):
 
-The ncurses pkg-config module will be used to detect the necessary libs for
-linking. If not available the old way of directly specifying libs will be
-used.
+> +/* This helps us to avoid #ifdef SYMBOL_PREFIX */
+> +#ifndef SYMBOL_PREFIX
+> +#define SYMBOL_PREFIX
+>  #endif
+> -#define __SYMBOL_NAME(x) __stringify(SYMBOL_NAME(x))
+> +
+> +#define __SYMBOL_NAME(x) __stringify(SYMBOL_PREFIX) #x
 
-Signed-off-by: Justin Lecher <jlec@gentoo.org>
-[yann.morin.1998@free.fr: fix typo: '-ncurses' --> '-lncurses']
-Tested-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Signed-off-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
----
- scripts/kconfig/Makefile |    4 +++-
- 1 files changed, 3 insertions(+), 1 deletions(-)
+And why are you __stringify()ing a string?
 
-diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
-index 231b475..844bc9d 100644
---- a/scripts/kconfig/Makefile
-+++ b/scripts/kconfig/Makefile
-@@ -219,7 +219,9 @@ HOSTCFLAGS_gconf.o	= `pkg-config --cflags gtk+-2.0 gmodule-2.0 libglade-2.0` \
- 
- HOSTLOADLIBES_mconf   = $(shell $(CONFIG_SHELL) $(check-lxdialog) -ldflags $(HOSTCC))
- 
--HOSTLOADLIBES_nconf	= -lmenu -lpanel -lncurses
-+HOSTLOADLIBES_nconf	= $(shell \
-+				pkg-config --libs menu panel ncurses 2>/dev/null \
-+				|| echo "-lmenu -lpanel -lncurses"  )
- $(obj)/qconf.o: $(obj)/.tmp_qtcheck
- 
- ifeq ($(qconf-target),1)
--- 
-1.7.2.5
+>  #ifndef cond_syscall
+>  #define cond_syscall(x) asm(".weak\t" __SYMBOL_NAME(x) \
+> diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+> index 07125e6..f1cce6a 100644
+> --- a/scripts/Makefile.lib
+> +++ b/scripts/Makefile.lib
+> @@ -123,6 +123,7 @@ ifdef CONFIG_SYMBOL_PREFIX
+>  _sym_flags = -DSYMBOL_PREFIX=$(patsubst "%",%,$(CONFIG_SYMBOL_PREFIX))
+>  _cpp_flags += $(_sym_flags)
+>  _a_flags += $(_sym_flags)
+> +_c_flags += $(_sym_flags)
+>  endif
 
+Confused,
+Rusty.
