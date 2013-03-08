@@ -1,79 +1,103 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ozlabs.org ([203.10.76.45]:60939 "EHLO ozlabs.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1758166Ab3CHAdo (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 7 Mar 2013 19:33:44 -0500
-From: Rusty Russell <rusty@rustcorp.com.au>
-Subject: Re: [RFC -next] linux/linkage.h: fix symbol prefix handling
-In-Reply-To: <1362656642-2693-1-git-send-email-james.hogan@imgtec.com>
-References: <1362656642-2693-1-git-send-email-james.hogan@imgtec.com>
-Date: Fri, 08 Mar 2013 11:03:13 +1100
-Message-ID: <87sj46wyf2.fsf@rustcorp.com.au>
+Received: from LGEMRELSE1Q.lge.com ([156.147.1.111]:58491 "EHLO
+	LGEMRELSE1Q.lge.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751282Ab3CHGjD (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 8 Mar 2013 01:39:03 -0500
+Date: Fri, 8 Mar 2013 15:39:01 +0900
+From: Kyungsik Lee <kyungsik.lee@lge.com>
+Subject: Re: [PATCH v3 -next 0/5] Add support for LZ4-compressed kernel
+Message-ID: <20130308063901.GB4779@Corona>
+References: <1362484056-9778-1-git-send-email-kyungsik.lee@lge.com>
+ <20130305150616.cb737f9b217b8c82051b2ccb@linux-foundation.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20130305150616.cb737f9b217b8c82051b2ccb@linux-foundation.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: James Hogan <james.hogan@imgtec.com>, Al Viro <viro@zeniv.linux.org.uk>
-Cc: Michal Marek <mmarek@suse.cz>, Andrew Morton <akpm@linux-foundation.org>, Guenter Roeck <linux@roeck-us.net>, Jean Delvare <khali@linux-fr.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Mike Frysinger <vapier@gentoo.org>, uclinux-dist-devel@blackfin.uclinux.org, linux-next@vger.kernel.org
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: Russell King <linux@arm.linux.org.uk>, "H. Peter Anvin" <hpa@zytor.com>, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, x86@kernel.org, celinux-dev@lists.celinuxforum.org, Nicolas Pitre <nico@fluxnic.net>, David Sterba <dsterba@suse.cz>, Nitin Gupta <nitingupta910@gmail.com>, Joe Millenbach <jmillenbach@gmail.com>, Thomas Gleixner <tglx@linutronix.de>, Michal Marek <mmarek@suse.cz>, hyojun.im@lge.com, chan.jeong@lge.com, raphael.andy.lee@gmail.com
 
-James Hogan <james.hogan@imgtec.com> writes:
-> The commit "consolidate cond_syscall and SYSCALL_ALIAS declarations"
-> broke the build on blackfin and metag due to the following code:
->
->   #ifndef SYMBOL_NAME
->   #ifdef CONFIG_SYMBOL_PREFIX
->   #define SYMBOL_NAME(x) CONFIG_SYMBOL_PREFIX ## x
->   #else
->   #define SYMBOL_NAME(x) x
->   #endif
->   #endif
->   #define __SYMBOL_NAME(x) __stringify(SYMBOL_NAME(x))
->
-> __stringify literally stringifies CONFIG_SYMBOL_PREFIX ##x, so you get
-> lines like this in the assembly output:
->
->   .weak CONFIG_SYMBOL_PREFIXsys_quotactl
->   .set
->   CONFIG_SYMBOL_PREFIXsys_quotactl,CONFIG_SYMBOL_PREFIXsys_ni_syscall
->
-> This is fixed by defining SYMBOL_PREFIX from the command line for c
-> files in addition to assembly for architectures that set
-> CONFIG_SYMBOL_PREFIX (scripts/Makefile.lib), and defining __SYMBOL_NAME
-> as:
->
->   #define __SYMBOL_NAME(x) __stringify(SYMBOL_PREFIX) #x
->
-> We first have to ensure SYMBOL_PREFIX is defined (which avoids polluting
-> the command lines for architectures that don't use symbol prefixes).
-> Also the definition of SYMBOL_PREFIX in <linux/kernel.h> is removed as
-> it conflicts, isn't used anywhere, and is defined as a string so differs
-> from the assembly definition.
+Hello,
 
-So now, if CONFIG_SYMBOL_PREFIX, SYMBOL_PREFIX is defined on the cmdline
-as a string.  Otherwise it's empty (not the empty string?):
+On Tue, Mar 05, 2013 at 03:06:16PM -0800, Andrew Morton wrote:
+> On Tue,  5 Mar 2013 20:47:31 +0900 Kyungsik Lee <kyungsik.lee@lge.com> wrote:
+> 
+> > This is the third version. In this version, Some codes are fixed
+> > and more description and note are added. I would like to thank David Sterba
+> > for his review.
+> > 
+> > The Last patch[5/5] of the patch set is for making x86 and arm default to
+> > LZ4-compressed for testing the LZ4 code in the linux-next.
+> > It was requested by Andrew Morton in the patch set v2.
+> > 
+> > Currently, A preliminary version of LZ4 de/compression tool is supported.
+> > However, It is expected that we will have a tool with more features
+> > once its format is finished.
+> 
+> What happened to the changelog?  The earlier version at least had some
+> rudimentary benchmarking results, but now we don't even have that. 
+> 
+> Someone should prepare the information explaining why we added this to
+> Linux, and I'd prefer that person be you rather than me!  Certainly it
+> should include performance measurements - both speed and space.  Also
+> it should capture our thinking regarding all the other decompressors,
+> explaining why we view it as acceptable to add yet another one.
+> 
+> Please, put yourself in the position of someone reading these commits
+> in 2017 wondering "why did they merge this".  We should tell them.
 
-> +/* This helps us to avoid #ifdef SYMBOL_PREFIX */
-> +#ifndef SYMBOL_PREFIX
-> +#define SYMBOL_PREFIX
->  #endif
-> -#define __SYMBOL_NAME(x) __stringify(SYMBOL_NAME(x))
-> +
-> +#define __SYMBOL_NAME(x) __stringify(SYMBOL_PREFIX) #x
+Sorry for the inconvenience regarding changelog. Another patch(v4)
+is not required so this is the information you mentioned.
+I'm not sure that I captured what we had discussed regarding all the other
+decompressors properly.
 
-And why are you __stringify()ing a string?
 
->  #ifndef cond_syscall
->  #define cond_syscall(x) asm(".weak\t" __SYMBOL_NAME(x) \
-> diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-> index 07125e6..f1cce6a 100644
-> --- a/scripts/Makefile.lib
-> +++ b/scripts/Makefile.lib
-> @@ -123,6 +123,7 @@ ifdef CONFIG_SYMBOL_PREFIX
->  _sym_flags = -DSYMBOL_PREFIX=$(patsubst "%",%,$(CONFIG_SYMBOL_PREFIX))
->  _cpp_flags += $(_sym_flags)
->  _a_flags += $(_sym_flags)
-> +_c_flags += $(_sym_flags)
->  endif
+Benchmark Results(PATCH v3)
+Compiler: Linaro ARM gcc 4.6.2
 
-Confused,
-Rusty.
+1. ARMv7, 1.5GHz based board
+   Kernel: linux 3.4
+   Uncompressed Kernel Size: 14MB
+        Compressed Size  Decompression Speed
+   LZO  6.7MB            20.1MB/s, 25.2MB/s(UA)
+   LZ4  7.3MB            29.1MB/s, 45.6MB/s(UA)
+
+2. ARMv7, 1.7GHz based board
+   Kernel: linux 3.7
+   Uncompressed Kernel Size: 14MB
+        Compressed Size  Decompression Speed
+   LZO  6.0MB            34.1MB/s, 52.2MB/s(UA)
+   LZ4  6.5MB            86.7MB/s
+- UA: Unaligned memory Access support
+- Latest patch set for LZO applied
+
+
+This patch set is for adding support for LZ4-compressed Kernel.
+LZ4 is a very fast lossless compression algorithm and it also features
+an extremely fast decoder [1].
+
+But we have five of decompressors already and one question which does arise,
+however, is that of where do we stop adding new ones? This issue had been
+discussed and came to the conclusion [2].
+Russell King said that
+we should have:
+- one decompressor which is the fastest
+- one decompressor for the highest compression ratio
+- one popular decompressor (eg conventional gzip)
+If we have a replacement one for one of these, then it should do exactly that:
+replace it.
+
+The benchmark shows that an 8% increase in image size vs a 66% increase
+in decompression speed compared to LZO(which has been known as the fastest
+decompressor in the Kernel). Therefore the "fast but may not be small"
+compression title has clearly been taken by LZ4 [3].
+
+[1] http://code.google.com/p/lz4/
+[2] http://thread.gmane.org/gmane.linux.kbuild.devel/9157
+[3] http://thread.gmane.org/gmane.linux.kbuild.devel/9347
+
+
+Thanks,
+Kyungsik
