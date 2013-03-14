@@ -1,45 +1,49 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-we0-f176.google.com ([74.125.82.176]:48694 "EHLO
-	mail-we0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932346Ab3CMS1t (ORCPT
+Received: from mail-oa0-f44.google.com ([209.85.219.44]:57178 "EHLO
+	mail-oa0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755679Ab3CNBac (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 13 Mar 2013 14:27:49 -0400
-Received: by mail-we0-f176.google.com with SMTP id s43so1283043wey.7
-        for <linux-kbuild@vger.kernel.org>; Wed, 13 Mar 2013 11:27:48 -0700 (PDT)
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: Re: [PATCH] kconfig: do randomise choice entries in presence of KCONFIG_ALLCONFIG
-Date: Wed, 13 Mar 2013 19:27:44 +0100
-References: <20130227214102.6d63544d@skate> <1362931313-31829-1-git-send-email-yann.morin.1998@free.fr>
-In-Reply-To: <1362931313-31829-1-git-send-email-yann.morin.1998@free.fr>
+	Wed, 13 Mar 2013 21:30:32 -0400
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-15"
-Content-Transfer-Encoding: 7bit
-Message-Id: <201303131927.45170.yann.morin.1998@free.fr>
+In-Reply-To: <1361761524-9495-1-git-send-email-wbin00@gmail.com>
+References: <1361761524-9495-1-git-send-email-wbin00@gmail.com>
+Date: Thu, 14 Mar 2013 09:30:32 +0800
+Message-ID: <CAD_32VUREUgiBt2ScK31ig-p8282g7VZta+Q6Fq0pkEaDGxm+A@mail.gmail.com>
+Subject: Re: [PATCH 1/1] scripts/package/Makefile: compare objtree with
+ srctree instead of test KBUILD_OUTPUT
+From: Bin Wang <wbin00@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Michal Marek <mmarek@suse.cz>, Sam Ravnborg <sam@ravnborg.org>, Arnaud Lacombe <lacombar@gmail.com>, Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
+To: mmarek@suse.cz, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Hello All!
+Hi, Michal
 
-On Sunday 10 March 2013 Yann E. MORIN wrote:
-> Currently, randconfig does randomise choice entries, unless KCONFIG_ALLCONFIG
-> is specified.
-[--SNIP--]
-> This patch defers setting that a choice has a value until a symbol for
-> that choice is indeed set, so that choices are properly randomised when
-> KCONFIG_ALLCONFIG is set, but not if a symbol for that choice is set.
+Is there any comments on this?
 
-Ping? Any more comments on that patch? :-)
-
-Regards,
-Yann E. MORIN.
-
--- 
-.-----------------.--------------------.------------------.--------------------.
-|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
-| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
-| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
-| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
-'------------------------------^-------^------------------^--------------------'
+2013/2/25 Bin Wang <wbin00@gmail.com>:
+> KBUILD_OUTPUT is always empty here, so it is useless to test it. But
+> while use O=.., objtree and srctree will be different. I compare them
+> instead.
+>
+> Signed-off-by: Bin Wang <wbin00@gmail.com>
+> ---
+>  scripts/package/Makefile | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/scripts/package/Makefile b/scripts/package/Makefile
+> index 87bf080..d7b3285 100644
+> --- a/scripts/package/Makefile
+> +++ b/scripts/package/Makefile
+> @@ -36,7 +36,7 @@ $(objtree)/kernel.spec: $(MKSPEC) $(srctree)/Makefile
+>         $(CONFIG_SHELL) $(MKSPEC) > $@
+>
+>  rpm-pkg rpm: $(objtree)/kernel.spec FORCE
+> -       @if test -n "$(KBUILD_OUTPUT)"; then \
+> +       @if test "$(objtree)" != "$(srctree)"; then \
+>                 echo "Building source + binary RPM is not possible outside the"; \
+>                 echo "kernel source tree. Don't set KBUILD_OUTPUT, or use the"; \
+>                 echo "binrpm-pkg target instead."; \
+> --
+> 1.8.1.4
+>
