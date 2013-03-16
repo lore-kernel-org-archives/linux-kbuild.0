@@ -1,56 +1,63 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from casper.infradead.org ([85.118.1.10]:50397 "EHLO
-	casper.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751134Ab3CPEyd (ORCPT
+Received: from bedivere.hansenpartnership.com ([66.63.167.143]:59905 "EHLO
+	bedivere.hansenpartnership.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1752358Ab3CPI4X (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 16 Mar 2013 00:54:33 -0400
-Message-ID: <5143FB1F.9010509@infradead.org>
-Date: Fri, 15 Mar 2013 21:54:55 -0700
-From: Randy Dunlap <rdunlap@infradead.org>
-MIME-Version: 1.0
-Subject: Re: PROBLEM: CONFIG_DEFAULT_MESSAGE_LOGLEVEL option seems not to
- work
-References: <20130315225636.2baf75ae@gmail.com>
-In-Reply-To: <20130315225636.2baf75ae@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+	Sat, 16 Mar 2013 04:56:23 -0400
+Message-ID: <1363424174.2459.15.camel@dabdike>
+Subject: Re: Fwd: [PATCH] Turn off -Wmaybe-uninitialized when building with
+ -Os
+From: James Bottomley <James.Bottomley@HansenPartnership.com>
+Date: Sat, 16 Mar 2013 08:56:14 +0000
+In-Reply-To: <201303151943.45980.arnd@arndb.de>
+References: <201303151455.38917.arnd@arndb.de>
+	 <20130315181246.GW4977@n2100.arm.linux.org.uk>
+	 <201303151943.45980.arnd@arndb.de>
+Content-Type: text/plain; charset="ISO-8859-15"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: =?UTF-8?B?TWFub2xvIETDrWF6?= <diaz.manolo@gmail.com>
-Cc: linux-kbuild@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: Russell King - ARM Linux <linux@arm.linux.org.uk>, linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>, linux-arch@vger.kernel.org, inux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 
-On 03/15/13 14:56, Manolo Díaz wrote:
-> Hi,
+On Fri, 2013-03-15 at 19:43 +0000, Arnd Bergmann wrote:
+> On Friday 15 March 2013, Russell King - ARM Linux wrote:
+> > On Fri, Mar 15, 2013 at 02:55:38PM +0000, Arnd Bergmann wrote:
 > 
-> It seems that the kernel loglevel is set to 7 ignoring the
-> CONFIG_DEFAULT_MESSAGE_LOGLEVEL option (set to 4 in my config file)
+> > > I'd like to merge this for 3.9 and also for the stable kernels,
+> > > if people agree this is a good idea.
+> > 
+> > I think I replied to your previous version recently asking whether
+> > this affects real uninitialized variables too.
 > 
-> The /proc/sys/kernel/printk output is 
+> If gcc can prove that there is a code path in which the variable is
+> used uninitialized, it will still warn with this patch, since we are
+> leaving -Wuninitialized enabled but only disable -Wmaybe-uninitilized.
+> There are obviously some cases where gcc correctly warns today but
+> cannot prove whether or not this is actually possible. I don't have
+> any data about how often we'd see one or the other, but I would expect
+> the first one to be more common.
 > 
-> 7	4	1	7
+> We'd also still see all valid warnings with the Kconfig default of
+> building with -O2 rather than -Os, and as gcc gets smarter over time,
+> it should show more of the real bugs with -Wuninitialized.
 > 
-> Passing the boot parameter "loglevel=4" or echoing "4 4 1 7"
-> to /proc/sys/kernel/printk solves my problem and then this proc file
-> contains
-> 
-> 4	4	1	7
-> 
-> as expected.
-> 
-> kernel version:
-> Linux version 3.8.3 (root@alcyone) (gcc version 4.7.2 (Debian 4.7.2-5)
-> ) #2 SMP Fri Mar 15 08:23:50 CET 2013
-> 
-> config file is gziped and attached.
+> I think the real trade-off is that not applying this patch will cause
+> more patches to get merged that add bogus initializations, which
+> definitely prevent gcc from warning about a real uninitialized
+> variable bug in that function again. I have done some of those
+> patches myself in the past, but it always feels really wrong to
+> do those.
+
+I always reject any set variable to zero (or mark it uninitialised) just
+because gcc warns patches precisely because they would hide future
+errors; all the checkers we care about have a false positive matching
+system now.  The thing this would cut down on is the number of newbie "I
+compiled the kernel myself and this fixes the warning I found" type
+patches, which I do see as a net benefit.
+
+James
 
 
-Hi,
 
-CONFIG_DEFAULT_MESSAGE_LOGLEVEL modifies the second field (value) in /proc/sys/kernel/printk,
-not the first value.  OTOH, the "loglevel" kernel parameter modifies the first value in
-that /proc file, not the second value.
-
-Does that clarify/help?
-
--- 
-~Randy
