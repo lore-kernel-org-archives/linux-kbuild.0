@@ -1,48 +1,59 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from atrey.karlin.mff.cuni.cz ([195.113.26.193]:54603 "EHLO
-	atrey.karlin.mff.cuni.cz" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752766Ab3CRQg4 (ORCPT
+Received: from caramon.arm.linux.org.uk ([78.32.30.218]:38474 "EHLO
+	caramon.arm.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751149Ab3CRQo7 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 18 Mar 2013 12:36:56 -0400
-Date: Mon, 18 Mar 2013 17:36:53 +0100
-From: Pavel Machek <pavel@denx.de>
+	Mon, 18 Mar 2013 12:44:59 -0400
+Date: Mon, 18 Mar 2013 16:44:26 +0000
+From: Russell King - ARM Linux <linux@arm.linux.org.uk>
 Subject: Re: [RFC] Kbuild support for ARM FIT images
-Message-ID: <20130318163648.GA3722@amd.pavel.ucw.cz>
-References: <CAD=GYpbF_3uRzhUnV=MwDiy-ekvZKJztJbkhNM0u_pvG-UCw4w@mail.gmail.com>
- <20130222160044.GA16357@quad.lixom.net>
+Message-ID: <20130318164426.GI30923@n2100.arm.linux.org.uk>
+References: <CAD=GYpbF_3uRzhUnV=MwDiy-ekvZKJztJbkhNM0u_pvG-UCw4w@mail.gmail.com> <20130222160044.GA16357@quad.lixom.net> <20130318163648.GA3722@amd.pavel.ucw.cz>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20130222160044.GA16357@quad.lixom.net>
+In-Reply-To: <20130318163648.GA3722@amd.pavel.ucw.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Olof Johansson <olof@lixom.net>
-Cc: Joel A Fernandes <agnel.joel@gmail.com>, "Fernandes, Joel A" <joelagnel@ti.com>, Grant Likely <glikely@secretlab.ca>, linux-kbuild@vger.kernel.org, tony@atomide.com, Grant Likely <grant.likely@secretlab.ca>, u-boot@lists.denx.de, "Rini, Tom" <trini@ti.com>, Linux OMAP List <linux-omap@vger.kernel.org>, Linux ARM Kernel List <linux-arm-kernel@lists.infradead.org>
+To: Pavel Machek <pavel@denx.de>
+Cc: Olof Johansson <olof@lixom.net>, "Fernandes, Joel A" <joelagnel@ti.com>, Grant Likely <glikely@secretlab.ca>, linux-kbuild@vger.kernel.org, tony@atomide.com, Grant Likely <grant.likely@secretlab.ca>, u-boot@lists.denx.de, Joel A Fernandes <agnel.joel@gmail.com>, "Rini, Tom" <trini@ti.com>, Linux OMAP List <linux-omap@vger.kernel.org>, Linux ARM Kernel List <linux-arm-kernel@lists.infradead.org>
 
-On Fri 2013-02-22 08:00:44, Olof Johansson wrote:
-> On Wed, Feb 20, 2013 at 07:37:10PM -0600, Joel A Fernandes wrote:
-> > Any comments on this approach? Is it better to merge mkfitsrc.sh with
-> > mkuboot.sh?
+On Mon, Mar 18, 2013 at 05:36:53PM +0100, Pavel Machek wrote:
+> On Fri 2013-02-22 08:00:44, Olof Johansson wrote:
+> > On Wed, Feb 20, 2013 at 07:37:10PM -0600, Joel A Fernandes wrote:
+> > > Any comments on this approach? Is it better to merge mkfitsrc.sh with
+> > > mkuboot.sh?
+> > 
+> > I know this was discussed quite extensively yesterday, but here is my take on
+> > it:
+> > 
+> > Given the recent complications from multiplatform, we really saw a strong
+> > reason to _not_ do the final boot wrapping in the kernel build system.
+> > Produce the zImage and the DTB files, and have a surrounding script that
+> > bundles the two in a format that your particular device needs.
+> > 
+> > Most distros have scripts to handle the "make install" step of a kernel build.
+> > That's where this belongs, not in the actual build step.
 > 
-> I know this was discussed quite extensively yesterday, but here is my take on
-> it:
+> Not sure I agree here:
 > 
-> Given the recent complications from multiplatform, we really saw a strong
-> reason to _not_ do the final boot wrapping in the kernel build system.
-> Produce the zImage and the DTB files, and have a surrounding script that
-> bundles the two in a format that your particular device needs.
-> 
-> Most distros have scripts to handle the "make install" step of a kernel build.
-> That's where this belongs, not in the actual build step.
+> 1) zImage was designed to boot from floppy, without any kind of
+> bootloader on i386
 
-Not sure I agree here:
+zImage on x86 != zImage on ARM.
 
-1) zImage was designed to boot from floppy, without any kind of
-bootloader on i386
+They only share the fact that they're both compressed and self-extracting.
 
-2) There are no distributions on many embedded systems. And no good
-place where to store the scripts.
-									Pavel
--- 
-(english) http://www.livejournal.com/~pavelmachek
-(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blog.html
+ARM has never supported any kind of floppy based boot - mainly because
+floppies have never been "executable" like they are on x86; all that
+previous boot loaders ever did was load the kernel into RAM using some
+method and call address 0, with a data structure (formerly struct
+params, later atags) at a fixed address, later passing that address to
+the kernel.
+
+The best floppies got was being able to run a script or load an executable
+off the floppy under the ROM'd OS, and our zImage itself doesn't fit the
+format required for that.
+
+Our zImage has always been just a pure straight binary compressed kernel
+format.  Nothing more.
