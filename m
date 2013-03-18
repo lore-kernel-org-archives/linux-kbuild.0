@@ -1,59 +1,75 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from caramon.arm.linux.org.uk ([78.32.30.218]:38474 "EHLO
-	caramon.arm.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751149Ab3CRQo7 (ORCPT
+Received: from mail-vc0-f176.google.com ([209.85.220.176]:38972 "EHLO
+	mail-vc0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752148Ab3CRRmq (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 18 Mar 2013 12:44:59 -0400
-Date: Mon, 18 Mar 2013 16:44:26 +0000
-From: Russell King - ARM Linux <linux@arm.linux.org.uk>
-Subject: Re: [RFC] Kbuild support for ARM FIT images
-Message-ID: <20130318164426.GI30923@n2100.arm.linux.org.uk>
-References: <CAD=GYpbF_3uRzhUnV=MwDiy-ekvZKJztJbkhNM0u_pvG-UCw4w@mail.gmail.com> <20130222160044.GA16357@quad.lixom.net> <20130318163648.GA3722@amd.pavel.ucw.cz>
+	Mon, 18 Mar 2013 13:42:46 -0400
+Received: by mail-vc0-f176.google.com with SMTP id ib11so3163899vcb.35
+        for <linux-kbuild@vger.kernel.org>; Mon, 18 Mar 2013 10:42:45 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20130318163648.GA3722@amd.pavel.ucw.cz>
+In-Reply-To: <87sj3tsawh.fsf@rustcorp.com.au>
+References: <b6b1676fd5bcd6b0ef47b0e0a1c26b1c05684135.1363291511.git.luto@amacapital.net>
+ <87ehfhtftn.fsf@rustcorp.com.au> <CALCETrU+rehQzy4vVg589CGi561X_s73Xgsfp43pYZOoKvNDXQ@mail.gmail.com>
+ <87sj3tsawh.fsf@rustcorp.com.au>
+From: Andy Lutomirski <luto@amacapital.net>
+Date: Mon, 18 Mar 2013 13:42:23 -0400
+Message-ID: <CALCETrUK54KViGex=V2pG8kAttsxOiDkeJUL48pk1NAhH-SdAA@mail.gmail.com>
+Subject: Re: [RFC PATCH] Allow optional module parameters
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Pavel Machek <pavel@denx.de>
-Cc: Olof Johansson <olof@lixom.net>, "Fernandes, Joel A" <joelagnel@ti.com>, Grant Likely <glikely@secretlab.ca>, linux-kbuild@vger.kernel.org, tony@atomide.com, Grant Likely <grant.likely@secretlab.ca>, u-boot@lists.denx.de, Joel A Fernandes <agnel.joel@gmail.com>, "Rini, Tom" <trini@ti.com>, Linux OMAP List <linux-omap@vger.kernel.org>, Linux ARM Kernel List <linux-arm-kernel@lists.infradead.org>
+To: Rusty Russell <rusty@rustcorp.com.au>
+Cc: linux-kernel@vger.kernel.org, Ben Hutchings <bhutchings@solarflare.com>, linux-kbuild@vger.kernel.org
 
-On Mon, Mar 18, 2013 at 05:36:53PM +0100, Pavel Machek wrote:
-> On Fri 2013-02-22 08:00:44, Olof Johansson wrote:
-> > On Wed, Feb 20, 2013 at 07:37:10PM -0600, Joel A Fernandes wrote:
-> > > Any comments on this approach? Is it better to merge mkfitsrc.sh with
-> > > mkuboot.sh?
-> > 
-> > I know this was discussed quite extensively yesterday, but here is my take on
-> > it:
-> > 
-> > Given the recent complications from multiplatform, we really saw a strong
-> > reason to _not_ do the final boot wrapping in the kernel build system.
-> > Produce the zImage and the DTB files, and have a surrounding script that
-> > bundles the two in a format that your particular device needs.
-> > 
-> > Most distros have scripts to handle the "make install" step of a kernel build.
-> > That's where this belongs, not in the actual build step.
-> 
-> Not sure I agree here:
-> 
-> 1) zImage was designed to boot from floppy, without any kind of
-> bootloader on i386
+On Sun, Mar 17, 2013 at 7:24 PM, Rusty Russell <rusty@rustcorp.com.au> wrote:
+> Andy Lutomirski <luto@amacapital.net> writes:
+>> On Thu, Mar 14, 2013 at 10:03 PM, Rusty Russell <rusty@rustcorp.com.au> wrote:
+>>> Andy Lutomirski <luto@amacapital.net> writes:
+>>>> Current parameter behavior is odd.  Boot parameters that have values
+>>>> and don't match anything become environment variables, with no
+>>>> warning.  Boot parameters without values that don't match anything
+>>>> go into argv_init.  Everything goes into /proc/cmdline.
+>>>>
+>>>> The init_module and finit_module syscalls, however, are strict:
+>>>> parameters that don't match result in -ENOENT.
+>>>>
+>>>> kmod (and hence modprobe), when loading a module called foo, look in
+>>>> /proc/cmdline for foo.x or foo.x=y, strip off the foo., and pass the
+>>>> rest to init_module.
+>>>>
+>>>> The upshot is that booting with module.nonexistent_parameter=1 is
+>>>> okay if module is built in or missing entirely but prevents module
+>>>> from loading if it's an actual module.  Similarly, option module
+>>>> nonexistent_parameter=1 in /etc/modprobe.d prevents the module from
+>>>> loading the parameter goes away.  This means that removing module
+>>>> parameters unnecessarily breaks things.
+>>>
+>>> Err, yes.  Don't remove module parameters, they're part of the API.  Do
+>>> you have a particular example?
+>>
+>> So things like i915.i915_enable_ppgtt, which is there to enable
+>> something experimental, needs to stay forever once the relevant
+>> feature becomes non-experimental and non-optional?  This seems silly.
+>
+> Well, it's either experimental, in which case you're happy to break
+> users who use it, or it's not, in which case, don't.
 
-zImage on x86 != zImage on ARM.
+Sure.  The main issue for me annoyance.  Install kernel with
+experimental option.  Set that option in grub's config.  Boot another
+kernel.  Grr, the option got propagated there and now I have no
+graphics.
 
-They only share the fact that they're both compressed and self-extracting.
+>
+>> Having the module parameter go away while still allowing the module to
+>> load seems like a good solution (possibly with a warning in the logs
+>> so the user can eventually delete the parameter).
+>
+> Why not do that for *every* missing parameter then?  Why have this weird
+> notation where the user must know that the parameter might one day go
+> away?
 
-ARM has never supported any kind of floppy based boot - mainly because
-floppies have never been "executable" like they are on x86; all that
-previous boot loaders ever did was load the kernel into RAM using some
-method and call address 0, with a data structure (formerly struct
-params, later atags) at a fixed address, later passing that address to
-the kernel.
+Fair enough.  What about the other approach, then?  Always warn if an
+option doesn't match (built-in or otherwise) but load the module
+anyways.
 
-The best floppies got was being able to run a script or load an executable
-off the floppy under the ROM'd OS, and our zImage itself doesn't fit the
-format required for that.
-
-Our zImage has always been just a pure straight binary compressed kernel
-format.  Nothing more.
+--Andy
