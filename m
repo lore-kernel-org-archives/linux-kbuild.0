@@ -1,204 +1,70 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ozlabs.org ([203.10.76.45]:40532 "EHLO ozlabs.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750939Ab3CRCpU (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 17 Mar 2013 22:45:20 -0400
-From: Rusty Russell <rusty@rustcorp.com.au>
-Subject: Re: [RFC PATCH] Allow optional module parameters
-In-Reply-To: <CALCETrU+rehQzy4vVg589CGi561X_s73Xgsfp43pYZOoKvNDXQ@mail.gmail.com>
-References: <b6b1676fd5bcd6b0ef47b0e0a1c26b1c05684135.1363291511.git.luto@amacapital.net> <87ehfhtftn.fsf@rustcorp.com.au> <CALCETrU+rehQzy4vVg589CGi561X_s73Xgsfp43pYZOoKvNDXQ@mail.gmail.com>
-Date: Mon, 18 Mar 2013 12:54:14 +1030
-Message-ID: <87sj3tsawh.fsf@rustcorp.com.au>
+Received: from am1ehsobe004.messaging.microsoft.com ([213.199.154.207]:47789
+	"EHLO am1outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751613Ab3CRPN5 (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 18 Mar 2013 11:13:57 -0400
+Date: Mon, 18 Mar 2013 23:13:50 +0800
+From: Shawn Guo <shawn.guo@linaro.org>
+Subject: Re: [PATCH 1/7] kbuild: create an "include chroot" for DT bindings
+Message-ID: <20130318151348.GB4713@S2101-09.ap.freescale.net>
+References: <1362594183-21523-1-git-send-email-swarren@wwwdotorg.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <1362594183-21523-1-git-send-email-swarren@wwwdotorg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andy Lutomirski <luto@amacapital.net>
-Cc: linux-kernel@vger.kernel.org, Ben Hutchings <bhutchings@solarflare.com>, linux-kbuild@vger.kernel.org
+To: Stephen Warren <swarren@wwwdotorg.org>
+Cc: arm@kernel.org, Grant Likely <grant.likely@secretlab.ca>, Rob Herring <rob.herring@calxeda.com>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, devicetree-discuss@lists.ozlabs.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Stephen Warren <swarren@nvidia.com>, Hiroshi Doyu <hdoyu@nvidia.com>
 
-Andy Lutomirski <luto@amacapital.net> writes:
-> On Thu, Mar 14, 2013 at 10:03 PM, Rusty Russell <rusty@rustcorp.com.au> wrote:
->> Andy Lutomirski <luto@amacapital.net> writes:
->>> Current parameter behavior is odd.  Boot parameters that have values
->>> and don't match anything become environment variables, with no
->>> warning.  Boot parameters without values that don't match anything
->>> go into argv_init.  Everything goes into /proc/cmdline.
->>>
->>> The init_module and finit_module syscalls, however, are strict:
->>> parameters that don't match result in -ENOENT.
->>>
->>> kmod (and hence modprobe), when loading a module called foo, look in
->>> /proc/cmdline for foo.x or foo.x=y, strip off the foo., and pass the
->>> rest to init_module.
->>>
->>> The upshot is that booting with module.nonexistent_parameter=1 is
->>> okay if module is built in or missing entirely but prevents module
->>> from loading if it's an actual module.  Similarly, option module
->>> nonexistent_parameter=1 in /etc/modprobe.d prevents the module from
->>> loading the parameter goes away.  This means that removing module
->>> parameters unnecessarily breaks things.
->>
->> Err, yes.  Don't remove module parameters, they're part of the API.  Do
->> you have a particular example?
->
-> So things like i915.i915_enable_ppgtt, which is there to enable
-> something experimental, needs to stay forever once the relevant
-> feature becomes non-experimental and non-optional?  This seems silly.
+On Wed, Mar 06, 2013 at 11:22:57AM -0700, Stephen Warren wrote:
+> From: Stephen Warren <swarren@nvidia.com>
+> 
+> The recent dtc+cpp support allows header files and C pre-processor
+> defines/macros to be used when compiling device tree files. These
+> headers will typically define various constants that are part of the
+> device tree bindings.
+> 
+> The original patch which set up the dtc+cpp include path only considered
+> using those headers from device tree files. However, most are also
+> useful for kernel code which needs to interpret the device tree.
+> 
+> In both the DT files and the kernel, I'd like to include the DT-related
+> headers in the same way, for example, <dt-bindings/gpio/tegra-gpio.h>.
+> That will simplify any text which discusses the DT header locations.
+> 
+> Creating a <dt-bindings/> for kernel source to use is as simple as
+> placing files into include/dt-bindings/.
+> 
+> However, when compiling DT files, the include path should be restricted
+> so that only the dt-bindings path is available; arbitrary kernel headers
+> shouldn't be exposed. For this reason, create a specific include
+> directory for use by dtc+cpp, and symlink dt-bindings from there to the
+> actual location of include/dt-bindings/. For want of a better location,
+> place this "include chroot" into the existing dts/ directory.
+> 
+> arch/*/boot/dts/include/dt-bindings -> ../../../../../include/dt-bindings
+> 
+> Some headers used by device tree files may not be useful to the kernel;
+> they may be used simply to aid in constructing the DT file (e.g. macros
+> to create a node), but not define any information that the kernel needs
+> to share. These may be placed directly into arch/*/boot/dts/ along with
+> the DT files themselves.
+> 
+> Cc: Shawn Guo <shawn.guo@linaro.org>
+> Cc: Hiroshi Doyu <hdoyu@nvidia.com>
+> Acked-by: Michal Marek <mmarek@suse.cz>
+> Acked-by: Shawn Guo <shawn.guo@linaro.org>
+> Acked-by: Rob Herring <rob.herring@calxeda.com>
+> Signed-off-by: Stephen Warren <swarren@nvidia.com>
+> ---
+> This first patch was previously posted separately as V2. I'm including
+> it here to keep it with the whole series. I hope this series can be
+> applied as a topic branch in arm-soc.
 
-Well, it's either experimental, in which case you're happy to break
-users who use it, or it's not, in which case, don't.
+So no comments on the series means that we can start maintain it on
+a topic branch, so that people can base their works on it?
 
-> Having the module parameter go away while still allowing the module to
-> load seems like a good solution (possibly with a warning in the logs
-> so the user can eventually delete the parameter).
+Shawn
 
-Why not do that for *every* missing parameter then?  Why have this weird
-notation where the user must know that the parameter might one day go
-away?
-
-> In any case, I find it odd that the only parameters you can set that
-> cause errors when the parameter is deleted are parameters for modules
-> that are built as modules.
-
-We could definitely expand the check: we should check for unknown
-parameters to builtin modules.
-
-This refers back to my question on lkml 'Re: No sysfs directory for
-openvswitch module when built-in' as the kernel doesn't currently know
-what modules are builtin.  We intuit it from parameter names, which is
-sloppy.
-
-Here's a rough patch.  Maybe someone on linux-kbuild can tell me why it
-fails?
-
-DOESNT_WORK: kernel: generate list of builtin modnames.
-
-For some reason, the only contents of modules.builtin when this runs is
-one line "kernel/kernel/configs.ko"?
-
-This lets us emit an error when invalid boot parameters are used, since
-we know what names can never be external modules.
-
-diff --git a/include/linux/module.h b/include/linux/module.h
-index 46f1ea0..3433f6b 100644
---- a/include/linux/module.h
-+++ b/include/linux/module.h
-@@ -186,6 +186,9 @@ struct notifier_block;
- 
- #ifdef CONFIG_MODULES
- 
-+/* In generated file kernel/modnamelist.c */
-+extern const char *builtin_modnames[];
-+
- extern int modules_disabled; /* for sysctl */
- /* Get/put a kernel symbol (calls must be symmetric) */
- void *__symbol_get(const char *symbol);
-diff --git a/init/main.c b/init/main.c
-index 63534a1..e4dec79 100644
---- a/init/main.c
-+++ b/init/main.c
-@@ -245,12 +245,25 @@ static int __init repair_env_string(char *param, char *val, const char *unused)
- 	return 0;
- }
- 
-+static bool builtin_modname(const char *name, size_t len)
-+{
-+	const char **n;
-+
-+	for (n = builtin_modnames; *n; n++) {
-+		if (strncmp(name, *n, len) == 0 && !(*n)[len])
-+			return true;
-+	}
-+	return false;
-+}
-+
- /*
-  * Unknown boot options get handed to init, unless they look like
-  * unused parameters (modprobe will find them in /proc/cmdline).
-  */
- static int __init unknown_bootoption(char *param, char *val, const char *unused)
- {
-+	size_t modname_len = strcspn(param, ".");
-+
- 	repair_env_string(param, val, unused);
- 
- 	/* Handle obsolete-style parameters */
-@@ -258,8 +271,13 @@ static int __init unknown_bootoption(char *param, char *val, const char *unused)
- 		return 0;
- 
- 	/* Unused module parameter. */
--	if (strchr(param, '.') && (!val || strchr(param, '.') < val))
-+	if (param[modname_len] == '.') {
-+		if (builtin_modname(param, modname_len)) {
-+			printk(KERN_ERR "Unknown kernel parameter %s\n", param);
-+			return -EINVAL;
-+		}
- 		return 0;
-+	}
- 
- 	if (panic_later)
- 		return 0;
-diff --git a/kernel/.gitignore b/kernel/.gitignore
-index ab4f109..df5b7c7 100644
---- a/kernel/.gitignore
-+++ b/kernel/.gitignore
-@@ -4,3 +4,4 @@
- config_data.h
- config_data.gz
- timeconst.h
-+modnamelist.c
-diff --git a/kernel/Makefile b/kernel/Makefile
-index bbde5f1..3f3dad7 100644
---- a/kernel/Makefile
-+++ b/kernel/Makefile
-@@ -10,7 +10,7 @@ obj-y     = fork.o exec_domain.o panic.o printk.o \
- 	    kthread.o wait.o sys_ni.o posix-cpu-timers.o mutex.o \
- 	    hrtimer.o rwsem.o nsproxy.o srcu.o semaphore.o \
- 	    notifier.o ksysfs.o cred.o \
--	    async.o range.o groups.o lglock.o smpboot.o
-+	    async.o range.o groups.o lglock.o smpboot.o modnamelist.o
- 
- ifdef CONFIG_FUNCTION_TRACER
- # Do not trace debug files and internal ftrace files
-@@ -139,6 +139,13 @@ targets += timeconst.h
- $(obj)/timeconst.h: $(obj)/hz.bc $(src)/timeconst.bc FORCE
- 	$(call if_changed,bc)
- 
-+quiet_cmd_modnamelist  = MODNAMELIST      $@
-+      cmd_modnamelist  = sh scripts/modnamelist.sh $@ $(src)/modules.builtin
-+
-+# Must match name-fix in scripts/Makefile.lib!
-+kernel/modnamelist.c: modules.builtin FORCE
-+	$(call if_changed,modnamelist)
-+
- ifeq ($(CONFIG_MODULE_SIG),y)
- #
- # Pull the signing certificate and any extra certificates into the kernel
-diff --git a/scripts/modnamelist.sh b/scripts/modnamelist.sh
-new file mode 100755
-index 0000000..5d06820
---- /dev/null
-+++ b/scripts/modnamelist.sh
-@@ -0,0 +1,22 @@
-+#! /bin/sh
-+set -e
-+
-+OUT="$1"
-+LIST="$2"
-+
-+trap "rm -f $OUT.tmp" 0
-+
-+cat > $OUT.tmp <<EOF
-+/* Autogenerated list of builtin modules. */
-+#include <linux/module.h>
-+
-+const char *builtin_modnames[] = {
-+EOF
-+
-+sed -e 's@.*/\(.*\)\.ko@\t"\1"@' -e 's@[,-]@_@g' -e 's@$@,@' < $LIST >> $OUT.tmp
-+cat >> $OUT.tmp <<EOF
-+	NULL
-+};
-+EOF
-+
-+mv $OUT.tmp $OUT
