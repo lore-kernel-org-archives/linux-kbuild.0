@@ -1,53 +1,89 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-out.m-online.net ([212.18.0.9]:54386 "EHLO
-	mail-out.m-online.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753170Ab3CRT5f (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 18 Mar 2013 15:57:35 -0400
-From: Wolfgang Denk <wd@denx.de>
-Subject: Re: [U-Boot] [RFC] Kbuild support for ARM FIT images
+Received: from ozlabs.org ([203.10.76.45]:56746 "EHLO ozlabs.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752399Ab3CSEzt (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 19 Mar 2013 00:55:49 -0400
+From: Rusty Russell <rusty@rustcorp.com.au>
+Subject: Re: [RFC PATCH] Allow optional module parameters
+In-Reply-To: <CALCETrUK54KViGex=V2pG8kAttsxOiDkeJUL48pk1NAhH-SdAA@mail.gmail.com>
+References: <b6b1676fd5bcd6b0ef47b0e0a1c26b1c05684135.1363291511.git.luto@amacapital.net> <87ehfhtftn.fsf@rustcorp.com.au> <CALCETrU+rehQzy4vVg589CGi561X_s73Xgsfp43pYZOoKvNDXQ@mail.gmail.com> <87sj3tsawh.fsf@rustcorp.com.au> <CALCETrUK54KViGex=V2pG8kAttsxOiDkeJUL48pk1NAhH-SdAA@mail.gmail.com>
+Date: Tue, 19 Mar 2013 13:02:50 +1030
+Message-ID: <87hak8qfu5.fsf@rustcorp.com.au>
 MIME-Version: 1.0
-Content-type: text/plain; charset=UTF-8
-Content-transfer-encoding: 8bit
-In-reply-to: <51475997.2060008@wwwdotorg.org>
-References: <CAD=GYpbF_3uRzhUnV=MwDiy-ekvZKJztJbkhNM0u_pvG-UCw4w@mail.gmail.com> <20130222160044.GA16357@quad.lixom.net> <20130318163648.GA3722@amd.pavel.ucw.cz> <20130318164426.GI30923@n2100.arm.linux.org.uk> <20130318174931.GB4230@amd.pavel.ucw.cz> <20130318175746.GJ30923@n2100.arm.linux.org.uk> <20130318180458.GC4230@amd.pavel.ucw.cz> <51475997.2060008@wwwdotorg.org>
-Date: Mon, 18 Mar 2013 20:57:25 +0100
-Message-Id: <20130318195725.CA8132014B1@gemini.denx.de>
+Content-Type: text/plain; charset=us-ascii
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Stephen Warren <swarren@wwwdotorg.org>
-Cc: Pavel Machek <pavel@denx.de>, "Fernandes, Joel A" <joelagnel@ti.com>, Russell King - ARM Linux <linux@arm.linux.org.uk>, linux-kbuild@vger.kernel.org, tony@atomide.com, Grant Likely <grant.likely@secretlab.ca>, u-boot@lists.denx.de, "Rini, Tom" <trini@ti.com>, Grant Likely <glikely@secretlab.ca>, Linux OMAP List <linux-omap@vger.kernel.org>, Linux ARM Kernel List <linux-arm-kernel@lists.infradead.org>
+To: Andy Lutomirski <luto@amacapital.net>
+Cc: linux-kernel@vger.kernel.org, Ben Hutchings <bhutchings@solarflare.com>, linux-kbuild@vger.kernel.org, Jon Masters <jcm@redhat.com>, Lucas De Marchi <lucas.demarchi@profusion.mobi>
 
-Dear Stephen,
-
-In message <51475997.2060008@wwwdotorg.org> you wrote:
+Andy Lutomirski <luto@amacapital.net> writes:
+> On Sun, Mar 17, 2013 at 7:24 PM, Rusty Russell <rusty@rustcorp.com.au> wrote:
+>> Andy Lutomirski <luto@amacapital.net> writes:
+>>> On Thu, Mar 14, 2013 at 10:03 PM, Rusty Russell <rusty@rustcorp.com.au> wrote:
+>>>> Err, yes.  Don't remove module parameters, they're part of the API.  Do
+>>>> you have a particular example?
+>>>
+>>> So things like i915.i915_enable_ppgtt, which is there to enable
+>>> something experimental, needs to stay forever once the relevant
+>>> feature becomes non-experimental and non-optional?  This seems silly.
+...
+>>> Having the module parameter go away while still allowing the module to
+>>> load seems like a good solution (possibly with a warning in the logs
+>>> so the user can eventually delete the parameter).
+>>
+>> Why not do that for *every* missing parameter then?  Why have this weird
+>> notation where the user must know that the parameter might one day go
+>> away?
 >
-> Raw zImage /is/ the useful format that should be adopted.
+> Fair enough.  What about the other approach, then?  Always warn if an
+> option doesn't match (built-in or otherwise) but load the module
+> anyways.
 
-This "one size fits all" approch does fit everywhere.  There are a
-number of users (including _big_ commercial ones, with _large_ numebrs
-of systems in the field) that have simple requirements like:
+What does everyone think of this?  Jon, Lucas, does this match your
+experience?
 
-- how can I find out if the image I just loaded to RAM in OK (OK
-  maning some checksum is correct, or some crypto-key could be
-  verified, or ...) ?
+Thanks,
+Rusty.
 
-- how can I find out which version of image is installed on this
-  device in the flash?  Can I print something like an ID string, or a
-  build timestamp, etc?
+Subject: modules: don't fail to load on unknown parameters.
 
-etc. etc.
+Although parameters are supposed to be part of the kernel API, experimental
+parameters are often removed.  In addition, downgrading a kernel might cause
+previously-working modules to fail to load.
 
-zImage may work well in many cases, but there are also many cases
-where in image format that allows for additional meta-data is
-mandatory.
+On balance, it's probably better to warn, and load the module anyway.
 
-Best regards,
+Reported-by: Andy Lutomirski <luto@amacapital.net>
+Signed-off-by: Rusty Russell <rusty@rustcorp.com.au>
 
-Wolfgang Denk
-
--- 
-DENX Software Engineering GmbH,     MD: Wolfgang Denk & Detlev Zundel
-HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
-Phone: (+49)-8142-66989-10 Fax: (+49)-8142-66989-80 Email: wd@denx.de
-Minds are like parachutes - they only function when open.
+diff --git a/kernel/module.c b/kernel/module.c
+index 3c2c72d..46db10a 100644
+--- a/kernel/module.c
++++ b/kernel/module.c
+@@ -3206,6 +3206,17 @@ out:
+ 	return err;
+ }
+ 
++static int unknown_module_param_cb(char *param, char *val, const char *modname)
++{
++	/* Check for magic 'dyndbg' arg */ 
++	int ret = ddebug_dyndbg_module_param_cb(param, val, modname);
++	if (ret != 0) {
++		printk(KERN_WARNING "%s: unknown parameter '%s' ignored\n",
++		       modname, param);
++	}
++	return 0;
++}
++
+ /* Allocate and load the module: note that size of section 0 is always
+    zero, and we rely on this for optional sections. */
+ static int load_module(struct load_info *info, const char __user *uargs,
+@@ -3292,7 +3303,7 @@ static int load_module(struct load_info *info, const char __user *uargs,
+ 
+ 	/* Module is ready to execute: parsing args may do that. */
+ 	err = parse_args(mod->name, mod->args, mod->kp, mod->num_kp,
+-			 -32768, 32767, &ddebug_dyndbg_module_param_cb);
++			 -32768, 32767, unknown_module_param_cb);
+ 	if (err < 0)
+ 		goto bug_cleanup;
+ 
