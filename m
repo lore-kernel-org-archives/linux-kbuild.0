@@ -1,86 +1,36 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-vc0-f181.google.com ([209.85.220.181]:42908 "EHLO
-	mail-vc0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S933713Ab3CTAgh (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 19 Mar 2013 20:36:37 -0400
-Received: by mail-vc0-f181.google.com with SMTP id hv10so896972vcb.26
-        for <linux-kbuild@vger.kernel.org>; Tue, 19 Mar 2013 17:36:36 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <CALCETrVuoa32dx0ppvwQd+gty6WTVUzDU3f7Rwuge7GArDNU9Q@mail.gmail.com>
-References: <b6b1676fd5bcd6b0ef47b0e0a1c26b1c05684135.1363291511.git.luto@amacapital.net>
- <87ehfhtftn.fsf@rustcorp.com.au> <CALCETrU+rehQzy4vVg589CGi561X_s73Xgsfp43pYZOoKvNDXQ@mail.gmail.com>
- <87sj3tsawh.fsf@rustcorp.com.au> <CALCETrUK54KViGex=V2pG8kAttsxOiDkeJUL48pk1NAhH-SdAA@mail.gmail.com>
- <87hak8qfu5.fsf@rustcorp.com.au> <CAMOw1v5AOmy38KNVfxj6OO-U0UCXST50vD0g0W5fEpNfKCpGvg@mail.gmail.com>
- <CALCETrVuoa32dx0ppvwQd+gty6WTVUzDU3f7Rwuge7GArDNU9Q@mail.gmail.com>
-From: Andy Lutomirski <luto@amacapital.net>
-Date: Tue, 19 Mar 2013 20:36:16 -0400
-Message-ID: <CALCETrWLc2b+M7CP7oQVh3a03C2UqM4-MmXCN_Lcrm=QPzBwDA@mail.gmail.com>
+Received: from ozlabs.org ([203.10.76.45]:47604 "EHLO ozlabs.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S933340Ab3CTDNp (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 19 Mar 2013 23:13:45 -0400
+From: Rusty Russell <rusty@rustcorp.com.au>
 Subject: Re: [RFC PATCH] Allow optional module parameters
-Content-Type: text/plain; charset=ISO-8859-1
+In-Reply-To: <1363722051.3491.29.camel@bwh-desktop.uk.solarflarecom.com>
+References: <b6b1676fd5bcd6b0ef47b0e0a1c26b1c05684135.1363291511.git.luto@amacapital.net> <87ehfhtftn.fsf@rustcorp.com.au> <CALCETrU+rehQzy4vVg589CGi561X_s73Xgsfp43pYZOoKvNDXQ@mail.gmail.com> <87sj3tsawh.fsf@rustcorp.com.au> <CALCETrUK54KViGex=V2pG8kAttsxOiDkeJUL48pk1NAhH-SdAA@mail.gmail.com> <87hak8qfu5.fsf@rustcorp.com.au> <1363722051.3491.29.camel@bwh-desktop.uk.solarflarecom.com>
+Date: Wed, 20 Mar 2013 13:01:01 +1030
+Message-ID: <87zjxypztm.fsf@rustcorp.com.au>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Cc: Rusty Russell <rusty@rustcorp.com.au>, linux-kernel@vger.kernel.org, Ben Hutchings <bhutchings@solarflare.com>, linux-kbuild@vger.kernel.org, Jon Masters <jcm@redhat.com>
+To: Ben Hutchings <bhutchings@solarflare.com>
+Cc: Andy Lutomirski <luto@amacapital.net>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Jon Masters <jcm@redhat.com>, Lucas De Marchi <lucas.demarchi@profusion.mobi>
 
-On Tue, Mar 19, 2013 at 8:32 PM, Andy Lutomirski <luto@amacapital.net> wrote:
-> On Tue, Mar 19, 2013 at 8:26 PM, Lucas De Marchi
-> <lucas.demarchi@profusion.mobi> wrote:
->> Hi Rusty,
->>
->> On Mon, Mar 18, 2013 at 11:32 PM, Rusty Russell <rusty@rustcorp.com.au> wrote:
->>> Andy Lutomirski <luto@amacapital.net> writes:
->>>> On Sun, Mar 17, 2013 at 7:24 PM, Rusty Russell <rusty@rustcorp.com.au> wrote:
->>>>> Andy Lutomirski <luto@amacapital.net> writes:
->>>>>> On Thu, Mar 14, 2013 at 10:03 PM, Rusty Russell <rusty@rustcorp.com.au> wrote:
->>>>>>> Err, yes.  Don't remove module parameters, they're part of the API.  Do
->>>>>>> you have a particular example?
->>>>>>
->>>>>> So things like i915.i915_enable_ppgtt, which is there to enable
->>>>>> something experimental, needs to stay forever once the relevant
->>>>>> feature becomes non-experimental and non-optional?  This seems silly.
->>> ...
->>>>>> Having the module parameter go away while still allowing the module to
->>>>>> load seems like a good solution (possibly with a warning in the logs
->>>>>> so the user can eventually delete the parameter).
->>>>>
->>>>> Why not do that for *every* missing parameter then?  Why have this weird
->>>>> notation where the user must know that the parameter might one day go
->>>>> away?
->>>>
->>>> Fair enough.  What about the other approach, then?  Always warn if an
->>>> option doesn't match (built-in or otherwise) but load the module
->>>> anyways.
->>>
->>> What does everyone think of this?  Jon, Lucas, does this match your
->>> experience?
->>>
->>> Thanks,
->>> Rusty.
->>>
->>> Subject: modules: don't fail to load on unknown parameters.
->>>
->>> Although parameters are supposed to be part of the kernel API, experimental
->>> parameters are often removed.  In addition, downgrading a kernel might cause
->>> previously-working modules to fail to load.
->>
->> I agree with this reasoning
->>
->>>
->>> On balance, it's probably better to warn, and load the module anyway.
->>
->> However loading the module anyway would bring at least one drawback:
->> if the user made a typo when passing the option the module would load
->> anyway and he will probably not even look in the log, since there's
->> was no errors from modprobe.
->>
->> For finit_module we could put a flag to trigger this behavior and
->> propagate it to modprobe, but this is not possible with init_module().
->> I can't think in any other option right now... do you have any?
->
-> Have a different finit_module return value for "successfully loaded,
-> but there were warnings" perhaps?
+Ben Hutchings <bhutchings@solarflare.com> writes:
+> This should also go to stable, so the downgrading issue doesn't continue
+> to bite people.
 
-Never mind.  I was thinking that finit_module was new in 3.9.
+Andy was complaining about experimental params going away: I haven't
+heard a single complaint about the downgrading issue.  I think it's a
+nice to have, which is why I mentioned it.  I also CC'd the two
+maintainers most likely to know if it *is* a current problem.  And note
+that this code has been this way for over ten years!
 
---Andy
+No bug report, no cc:stable.
+
+What if people were relying on detecting module parameters by the load
+failing?  I'd rather find out when they upgrade to a new kernel instead
+of poisoning the old ones, too.
+
+Cheers,
+Rusty.
