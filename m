@@ -1,154 +1,85 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.linuxfoundation.org ([140.211.169.12]:35136 "EHLO
-	mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750758Ab3CTDmE (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 19 Mar 2013 23:42:04 -0400
-Date: Tue, 19 Mar 2013 20:43:13 -0700
-From: Andrew Morton <akpm@linux-foundation.org>
-Subject: Re: make[2]: execvp: /bin/bash: Argument list too long
-Message-Id: <20130319204313.041b6c71.akpm@linux-foundation.org>
-In-Reply-To: <87vc8mpxys.fsf@rustcorp.com.au>
-References: <5148064c.NHUmXnvVxwyYN+nc%fengguang.wu@intel.com>
-	<20130318235058.8c3c78ec.akpm@linux-foundation.org>
-	<20130319131025.GC2706@phenom.dumpdata.com>
-	<20130319150204.GA11928@localhost>
-	<87vc8mpxys.fsf@rustcorp.com.au>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Received: from ozlabs.org ([203.10.76.45]:57381 "EHLO ozlabs.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754854Ab3CTF1N (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 20 Mar 2013 01:27:13 -0400
+From: Rusty Russell <rusty@rustcorp.com.au>
+Subject: Re: [RFC PATCH] Allow optional module parameters
+In-Reply-To: <CAMOw1v5AOmy38KNVfxj6OO-U0UCXST50vD0g0W5fEpNfKCpGvg@mail.gmail.com>
+References: <b6b1676fd5bcd6b0ef47b0e0a1c26b1c05684135.1363291511.git.luto@amacapital.net> <87ehfhtftn.fsf@rustcorp.com.au> <CALCETrU+rehQzy4vVg589CGi561X_s73Xgsfp43pYZOoKvNDXQ@mail.gmail.com> <87sj3tsawh.fsf@rustcorp.com.au> <CALCETrUK54KViGex=V2pG8kAttsxOiDkeJUL48pk1NAhH-SdAA@mail.gmail.com> <87hak8qfu5.fsf@rustcorp.com.au> <CAMOw1v5AOmy38KNVfxj6OO-U0UCXST50vD0g0W5fEpNfKCpGvg@mail.gmail.com>
+Date: Wed, 20 Mar 2013 14:15:12 +1030
+Message-ID: <87sj3qpwdz.fsf@rustcorp.com.au>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Rusty Russell <rusty@rustcorp.com.au>
-Cc: Fengguang Wu <fengguang.wu@intel.com>, Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>, Dan Magenheimer <dan.magenheimer@oracle.com>, Bob Liu <lliubbo@gmail.com>, LKML <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, David Howells <dhowells@redhat.com>
+To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Cc: Andy Lutomirski <luto@amacapital.net>, linux-kernel@vger.kernel.org, Ben Hutchings <bhutchings@solarflare.com>, linux-kbuild@vger.kernel.org, Jon Masters <jcm@redhat.com>
 
-On Wed, 20 Mar 2013 13:41:07 +1030 Rusty Russell <rusty@rustcorp.com.au> wrote:
+Lucas De Marchi <lucas.demarchi@profusion.mobi> writes:
+> Hi Rusty,
+>
+> On Mon, Mar 18, 2013 at 11:32 PM, Rusty Russell <rusty@rustcorp.com.au> wrote:
+>> Andy Lutomirski <luto@amacapital.net> writes:
+>>> On Sun, Mar 17, 2013 at 7:24 PM, Rusty Russell <rusty@rustcorp.com.au> wrote:
+>>>> Andy Lutomirski <luto@amacapital.net> writes:
+>>>>> On Thu, Mar 14, 2013 at 10:03 PM, Rusty Russell <rusty@rustcorp.com.au> wrote:
+>>>>>> Err, yes.  Don't remove module parameters, they're part of the API.  Do
+>>>>>> you have a particular example?
+>>>>>
+>>>>> So things like i915.i915_enable_ppgtt, which is there to enable
+>>>>> something experimental, needs to stay forever once the relevant
+>>>>> feature becomes non-experimental and non-optional?  This seems silly.
+>> ...
+>>>>> Having the module parameter go away while still allowing the module to
+>>>>> load seems like a good solution (possibly with a warning in the logs
+>>>>> so the user can eventually delete the parameter).
+>>>>
+>>>> Why not do that for *every* missing parameter then?  Why have this weird
+>>>> notation where the user must know that the parameter might one day go
+>>>> away?
+>>>
+>>> Fair enough.  What about the other approach, then?  Always warn if an
+>>> option doesn't match (built-in or otherwise) but load the module
+>>> anyways.
+>>
+>> What does everyone think of this?  Jon, Lucas, does this match your
+>> experience?
+>>
+>> Thanks,
+>> Rusty.
+>>
+>> Subject: modules: don't fail to load on unknown parameters.
+>>
+>> Although parameters are supposed to be part of the kernel API, experimental
+>> parameters are often removed.  In addition, downgrading a kernel might cause
+>> previously-working modules to fail to load.
+>
+> I agree with this reasoning
+>
+>>
+>> On balance, it's probably better to warn, and load the module anyway.
+>
+> However loading the module anyway would bring at least one drawback:
+> if the user made a typo when passing the option the module would load
+> anyway and he will probably not even look in the log, since there's
+> was no errors from modprobe.
+>
+> For finit_module we could put a flag to trigger this behavior and
+> propagate it to modprobe, but this is not possible with init_module().
+> I can't think in any other option right now... do you have any?
 
-> Fengguang Wu <fengguang.wu@intel.com> writes:
-> > On Tue, Mar 19, 2013 at 09:10:25AM -0400, Konrad Rzeszutek Wilk wrote:
-> >> On Mon, Mar 18, 2013 at 11:50:58PM -0700, Andrew Morton wrote:
-> >> > On Tue, 19 Mar 2013 14:31:40 +0800 kbuild test robot <fengguang.wu@intel.com> wrote:
-> >> > 
-> >> > > tree:   git://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next master
-> >> > > head:   0e78c0989334e9c1d578ba25621de14e8441d8b4
-> >> > > commit: 7cac5501aa2bd4777906fa0cdccc1b1ce18b3166 staging: zcache: enable zcache to be built/loaded as a module
-> >> > > date:   26 hours ago
-> >> > > config: make ARCH=i386 allmodconfig
-> >> > > 
-> >> > > All error/warnings:
-> >> > > 
-> >> > > >> make[2]: execvp: /bin/bash: Argument list too long
-> >> > >    make[2]: *** [__modpost] Error 127
-> >> > >    make[2]: Target `_modpost' not remade because of errors.
-> >> > > 
-> >> > 
-> >> > Hey, I see that very occasionally, but it goes away all by itself.  Are
-> >> > you sure that
-> >> > staging-zcache-enable-ramster-to-be-built-loaded-as-a-module.patch
-> >> > causes it?
-> >
-> > Sorry, I confirmed that it's a wrong bisect..
-> >
-> >> Is there a way to print out what the argument list is?
-> >
-> > Good idea! I managed to catch the error command with
-> >
-> >         strace -e trace=process -s 4096 -f -o argtoolong make -j1 --debug=j V=1 ARCH=i386 modules
-> 
-> Wow, nice!
+No good ones :(
 
-That's what I thought.  A better approach would be to delete a few
-thousand drivers ;)
+MODULE_PARM_DESC isn't compulsory, so you can't rely on that to tell you
+about option names.  
 
-I worry that we'll also explode some internal limit in make(1) when
-preparing that list.  We'll see.
+Even if we had a flag, how would you know to set it?  I guess you could
+try without then try with, and if it works the second time print a
+warning about typos.  But it's still pretty ugly.
 
-> modpost really does want all the modules at once, so it can check for
-> unresolved symbols.  So xargs is out, we need to implement stdin-reading
-> directly.
-> 
-> Bikeshedding on the option name reveals no established standard:
-> -S/--stdin-file-list in shar, -T/--files-from=i in tar, --files-from=-
-> in rsync.
+We could implement such a flag with a fake "IGNORE_BAD_PARAMS"
+parameter, for example.  That would fail nicely on older kernels, too.
 
-Could just read the filenames from stdin if none were provided on the
-command line, but whatever.
-
-> Now, if someone can find a better way of getting the module list into a
-> file/stdin, I'm all ears.  I'm not sure the find works in all cases...
-
-How is that list generated at present?
-
-So we have a vast string within make(1) and need to get it into a temp
-file without using shell commands?  Tricky.
-
-> diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
-> index cf82c83..421e14f 100644
-> --- a/scripts/Makefile.modpost
-> +++ b/scripts/Makefile.modpost
-> @@ -78,12 +78,13 @@ modpost = scripts/mod/modpost                    \
->   $(if $(CONFIG_DEBUG_SECTION_MISMATCH),,-S)      \
->   $(if $(KBUILD_EXTMOD)$(KBUILD_MODPOST_WARN),-w)
->  
-> -quiet_cmd_modpost = MODPOST $(words $(filter-out vmlinux FORCE, $^)) modules
-> -      cmd_modpost = $(modpost) -s
-> +# We can go over command line length here, so be careful.
-> +quiet_cmd_modpost = MODPOST modules
-> +      cmd_modpost = find * -name '*.ko' | $(modpost) -s -T -
-
-I guess that's OK, as long as modpost handles non-object files
-gracefully.
-
-What's the risk that the find stumbles across random .ko files from
-last month?  Pretty small, I guess - a `make clean' appears to rubs out
-all .o files, even for different architectures.
-
->  PHONY += __modpost
->  __modpost: $(modules:.ko=.o) FORCE
-> -	$(call cmd,modpost) $(wildcard vmlinux) $(filter-out FORCE,$^)
-> +	$(call cmd,modpost) $(wildcard vmlinux)
->  
->  quiet_cmd_kernel-mod = MODPOST $@
->        cmd_kernel-mod = $(modpost) $@
-> diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-> index 282decf..ff6b40b 100644
-> --- a/scripts/mod/modpost.c
-> +++ b/scripts/mod/modpost.c
-> @@ -15,6 +15,7 @@
->  #include <stdio.h>
->  #include <ctype.h>
->  #include <string.h>
-> +#include <limits.h>
->  #include "modpost.h"
->  #include "../../include/generated/autoconf.h"
->  #include "../../include/linux/license.h"
-> @@ -1756,6 +1757,28 @@ static void read_symbols(char *modname)
->  		mod->unres = alloc_symbol("module_layout", 0, mod->unres);
->  }
->  
-> +static void read_symbols_from_files(const char *filename)
-> +{
-> +	FILE *in = stdin;
-> +	char fname[PATH_MAX];
-> +
-> +	if (strcmp(filename, "-") != 0) {
-> +		in = fopen(filename, "r");
-> +		if (!in)
-> +			fatal("Can't open filenames file %s: %m", filename);
-> +	}
-> +
-> +	while (fgets(fname, PATH_MAX, in) != NULL) {
-> +		/* Strip \n */
-> +		if (strlen(fname))
-> +			fname[strlen(fname)-1] = '\0';
-
-That'll screw up if the file doesn't end in \n?
-
-> +		read_symbols(fname);
-> +	}
-> +
-> +	if (in != stdin)
-> +		fclose(in);
-> +}
-> +
-
+Hmmm....
+Rusty.
