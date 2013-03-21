@@ -1,53 +1,92 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ea0-f178.google.com ([209.85.215.178]:60487 "EHLO
-	mail-ea0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932344Ab3CULnP (ORCPT
+Received: from avon.wwwdotorg.org ([70.85.31.133]:47094 "EHLO
+	avon.wwwdotorg.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751787Ab3CUSXV (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 21 Mar 2013 07:43:15 -0400
-Date: Thu, 21 Mar 2013 12:43:08 +0100
-From: Richard Cochran <richardcochran@gmail.com>
-Subject: Re: [PATCH RFC 1/5] kconfig: implement weak reverse-dependencies
-Message-ID: <20130321114307.GA6716@netboy.at.omicron.at>
-References: <20130321082256.21557.68351.stgit@zurg>
- <20130321102200.GB2341@netboy.at.omicron.at>
- <514AE9A3.5090209@openvz.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <514AE9A3.5090209@openvz.org>
+	Thu, 21 Mar 2013 14:23:21 -0400
+From: Stephen Warren <swarren@wwwdotorg.org>
+Subject: [PATCH REPOST 1/7] kbuild: create an "include chroot" for DT bindings
+Date: Thu, 21 Mar 2013 12:23:08 -0600
+Message-Id: <1363890194-31538-1-git-send-email-swarren@wwwdotorg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Konstantin Khlebnikov <khlebnikov@openvz.org>
-Cc: Michal Marek <mmarek@suse.cz>, Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Tejun Heo <tj@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, netdev@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>, Grant Likely <glikely@secretlab.ca>, Rob Herring <robherring2@gmail.com>
+Cc: arm@kernel.org, Shawn Guo <shawn.guo@linaro.org>, Hiroshi Doyu <hdoyu@nvidia.com>, linux-kbuild@vger.kernel.org, devicetree-discuss@lists.ozlabs.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Stephen Warren <swarren@nvidia.com>
 
-On Thu, Mar 21, 2013 at 03:06:11PM +0400, Konstantin Khlebnikov wrote:
-> 
-> As I see this technology requires special dedicated server in the local
-> network, thus it's unusable in most situations. But it starts working
-> without any actions from the user (please fix me if I'm wrong).
+From: Stephen Warren <swarren@nvidia.com>
 
-Perhaps you don't have a very clear picture of how this PTP stuff
-works. Even when the PHC and time stamping code is compiled in, it
-does *not* start working unless the end user turns it on, via the
-SIOCSHWTSTAMP and SO_TIMESTAMPING options.
+The recent dtc+cpp support allows header files and C pre-processor
+defines/macros to be used when compiling device tree files. These
+headers will typically define various constants that are part of the
+device tree bindings.
 
-See: Documentation/networking/timestamping.txt
-     Documentation/ptp/ptp.txt
+The original patch which set up the dtc+cpp include path only considered
+using those headers from device tree files. However, most are also
+useful for kernel code which needs to interpret the device tree.
+
+In both the DT files and the kernel, I'd like to include the DT-related
+headers in the same way, for example, <dt-bindings/gpio/tegra-gpio.h>.
+That will simplify any text which discusses the DT header locations.
+
+Creating a <dt-bindings/> for kernel source to use is as simple as
+placing files into include/dt-bindings/.
+
+However, when compiling DT files, the include path should be restricted
+so that only the dt-bindings path is available; arbitrary kernel headers
+shouldn't be exposed. For this reason, create a specific include
+directory for use by dtc+cpp, and symlink dt-bindings from there to the
+actual location of include/dt-bindings/. For want of a better location,
+place this "include chroot" into the existing dts/ directory.
+
+arch/*/boot/dts/include/dt-bindings -> ../../../../../include/dt-bindings
+
+Some headers used by device tree files may not be useful to the kernel;
+they may be used simply to aid in constructing the DT file (e.g. macros
+to create a node), but not define any information that the kernel needs
+to share. These may be placed directly into arch/*/boot/dts/ along with
+the DT files themselves.
+
+Cc: Shawn Guo <shawn.guo@linaro.org>
+Cc: Hiroshi Doyu <hdoyu@nvidia.com>
+Acked-by: Michal Marek <mmarek@suse.cz>
+Acked-by: Shawn Guo <shawn.guo@linaro.org>
+Acked-by: Rob Herring <rob.herring@calxeda.com>
+Signed-off-by: Stephen Warren <swarren@nvidia.com>
+---
+Grant, Rob, Michal, I'm hoping for acks or comments from you so this
+series can be placed into a topic branch in the arm-soc repo, for others
+to build on during the 3.10 kernel cycle. Thanks.
+
+This first patch was previously posted separately as V2. I'm including
+it here to keep it with the whole series. I hope this series can be
+applied as a topic branch in arm-soc.
+
+ arch/arm/boot/dts/include/dt-bindings |    1 +
+ scripts/Makefile.lib                  |    2 +-
+ 2 files changed, 2 insertions(+), 1 deletion(-)
+ create mode 120000 arch/arm/boot/dts/include/dt-bindings
+
+diff --git a/arch/arm/boot/dts/include/dt-bindings b/arch/arm/boot/dts/include/dt-bindings
+new file mode 120000
+index 0000000..08c00e4
+--- /dev/null
++++ b/arch/arm/boot/dts/include/dt-bindings
+@@ -0,0 +1 @@
++../../../../../include/dt-bindings
+\ No newline at end of file
+diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+index 07125e6..af35521 100644
+--- a/scripts/Makefile.lib
++++ b/scripts/Makefile.lib
+@@ -158,7 +158,7 @@ ld_flags       = $(LDFLAGS) $(ldflags-y)
  
-> Thus this code enables some rarely used parts of hardware.
-> After seeing several weird bugs in ethernet devices I prefer to
-> keep unused/unwanted features off.
-
-Just compiling drivers into kernel does not really change the behavior
-of the hardware. The only drawback I know of is that it adds (minimal)
-overhead into the packet processing paths, but that is a software
-issue.
-
-I don't mean to start a big discussion here. The question of whether
-to have PHC support a compile time option should be discussed on the
-netdev list (added on CC just in case).
-
-Thanks,
-Richard
-
+ dtc_cpp_flags  = -Wp,-MD,$(depfile) -nostdinc                            \
+ 		 -I$(srctree)/arch/$(SRCARCH)/boot/dts                   \
+-		 -I$(srctree)/arch/$(SRCARCH)/include/dts                \
++		 -I$(srctree)/arch/$(SRCARCH)/boot/dts/include           \
+ 		 -undef -D__DTS__
+ 
+ # Finds the multi-part object the current object will be linked into
+-- 
+1.7.10.4
 
