@@ -1,57 +1,63 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from vaxjo.synopsys.com ([198.182.60.75]:36985 "EHLO
-	vaxjo.synopsys.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752245Ab3CUGwy (ORCPT
+Received: from mail-la0-f54.google.com ([209.85.215.54]:40981 "EHLO
+	mail-la0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757858Ab3CUIKt (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 21 Mar 2013 02:52:54 -0400
-Message-ID: <514AADAD.1060503@synopsys.com>
-Date: Thu, 21 Mar 2013 12:20:21 +0530
-From: Vineet Gupta <Vineet.Gupta1@synopsys.com>
+	Thu, 21 Mar 2013 04:10:49 -0400
+Subject: [PATCH] kconfig: print each first level disjunction block from a new
+ line
+From: Konstantin Khlebnikov <khlebnikov@openvz.org>
+Date: Thu, 21 Mar 2013 12:10:44 +0400
+Message-ID: <20130321081043.21073.38947.stgit@zurg>
 MIME-Version: 1.0
-Subject: host gcc 4.7 warning when generating defconfig
-Content-Type: text/plain; charset="ISO-8859-1"
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, Alexey Brodkin <Alexey.Brodkin@synopsys.com>
+To: linux-kernel@vger.kernel.org
+Cc: Michal Marek <mmarek@suse.cz>, Andrew Morton <akpm@linux-foundation.org>, linux-kbuild@vger.kernel.org
 
-Hi,
+This patch improves readability of complicated expressions.
 
-We do cross compile builds for ARC Linux. To avoid the env var set, we have a
-defconfig entry for CONFIG_CROSS_COMPILE.
-This worked fine so far (host gcc 4.4 i.e.). When switched to a new host distro
-(gcc 4.7), a defconfig build spews out the warning.
+before:
+   Selected by: A && AA && AAA || B && BB && (BBB || BBBB) || C && CC && CCC
 
-------------------->8--------------------------
-mymake defconfig
-gcc: error: unrecognized command line option '-marc600'
-gcc: error: unrecognized command line option '-mA7'
-gcc: error: unrecognized command line option '-mno-sdata'
-gcc: error: unrecognized command line option '-mno-mpy'
-*** Default configuration is based on 'fpga_defconfig'
-#
-# configuration written to .config
-------------------->8--------------------------
+after:
+   Selected by: A && AA && AAA
+ || B && BB && (BBB || BBBB)
+ || C && CC && CCC
 
-While the following trivial fix seems to fix this, it seems that the spew is
-coming due to LIBGCC definition line, which is strange to be called for defconfig
-generation. Any thoughts ?
+Modules' config options usually comes first in these blocks.
 
----------------->
-diff --git a/arch/arc/Makefile b/arch/arc/Makefile
-index 4232d4e..97e6c20 100644
---- a/arch/arc/Makefile
-+++ b/arch/arc/Makefile
-@@ -8,6 +8,10 @@
- 
- UTS_MACHINE := arc
- 
-+ifeq ($(CROSS_COMPILE),)
-+#CROSS_COMPILE := arc-elf32-
-+endif
-+
- KBUILD_DEFCONFIG := fpga_defconfig
+Signed-off-by: Konstantin Khlebnikov <khlebnikov@openvz.org>
+Cc: Andrew Morton <akpm@linux-foundation.org>
+Cc: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org
+---
+ scripts/kconfig/expr.c |   12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
 
-Thx,
--Vineet
+diff --git a/scripts/kconfig/expr.c b/scripts/kconfig/expr.c
+index d662652..e47eb28 100644
+--- a/scripts/kconfig/expr.c
++++ b/scripts/kconfig/expr.c
+@@ -1087,9 +1087,15 @@ void expr_print(struct expr *e, void (*fn)(void *, struct symbol *, const char *
+ 		fn(data, e->right.sym, e->right.sym->name);
+ 		break;
+ 	case E_OR:
+-		expr_print(e->left.expr, fn, data, E_OR);
+-		fn(data, NULL, " || ");
+-		expr_print(e->right.expr, fn, data, E_OR);
++		if (prevtoken == E_NONE) {
++			expr_print(e->left.expr, fn, data, E_NONE);
++			fn(data, NULL, "\n|| ");
++			expr_print(e->right.expr, fn, data, E_NONE);
++		} else {
++			expr_print(e->left.expr, fn, data, E_OR);
++			fn(data, NULL, " || ");
++			expr_print(e->right.expr, fn, data, E_OR);
++		}
+ 		break;
+ 	case E_AND:
+ 		expr_print(e->left.expr, fn, data, E_AND);
+
