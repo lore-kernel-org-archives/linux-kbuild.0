@@ -1,61 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-la0-f42.google.com ([209.85.215.42]:42300 "EHLO
-	mail-la0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755358Ab3CULGR (ORCPT
+Received: from mail-ea0-f178.google.com ([209.85.215.178]:60487 "EHLO
+	mail-ea0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932344Ab3CULnP (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 21 Mar 2013 07:06:17 -0400
-Message-ID: <514AE9A3.5090209@openvz.org>
-Date: Thu, 21 Mar 2013 15:06:11 +0400
-From: Konstantin Khlebnikov <khlebnikov@openvz.org>
-MIME-Version: 1.0
+	Thu, 21 Mar 2013 07:43:15 -0400
+Date: Thu, 21 Mar 2013 12:43:08 +0100
+From: Richard Cochran <richardcochran@gmail.com>
 Subject: Re: [PATCH RFC 1/5] kconfig: implement weak reverse-dependencies
-References: <20130321082256.21557.68351.stgit@zurg> <20130321102200.GB2341@netboy.at.omicron.at>
-In-Reply-To: <20130321102200.GB2341@netboy.at.omicron.at>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
+Message-ID: <20130321114307.GA6716@netboy.at.omicron.at>
+References: <20130321082256.21557.68351.stgit@zurg>
+ <20130321102200.GB2341@netboy.at.omicron.at>
+ <514AE9A3.5090209@openvz.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <514AE9A3.5090209@openvz.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Richard Cochran <richardcochran@gmail.com>
-Cc: Michal Marek <mmarek@suse.cz>, Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Tejun Heo <tj@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Konstantin Khlebnikov <khlebnikov@openvz.org>
+Cc: Michal Marek <mmarek@suse.cz>, Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Tejun Heo <tj@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, netdev@vger.kernel.org
 
-Richard Cochran wrote:
-> On Thu, Mar 21, 2013 at 12:22:57PM +0400, Konstantin Khlebnikov wrote:
->> This patch adds new kind of dependencies between kconfig symbols,
->> and new kconfig keyword 'apply' for them.
->>
->> 'apply' works mostly like 'select', but it allows to disable target symbol.
->> Thus target symbol will be either disabled or reachable from current symbol.
->>
->> This method allows to implement optional dependencies without introducing new
->> kconfig symbol for each pair of connected kconfig options.
->
-> I don't really understand what the point of this new keyword is, but I
-> wonder why you chose PTP Hardware Clocks as your Guinea pig.
->
-> As discussed on the netdev list [1][2], the consensus was that if a
-> MAC driver has a PHC, then it should always be compiled in.
+On Thu, Mar 21, 2013 at 03:06:11PM +0400, Konstantin Khlebnikov wrote:
+> 
+> As I see this technology requires special dedicated server in the local
+> network, thus it's unusable in most situations. But it starts working
+> without any actions from the user (please fix me if I'm wrong).
 
-I don't like situations when really optional code becomes mandatory.
+Perhaps you don't have a very clear picture of how this PTP stuff
+works. Even when the PHC and time stamping code is compiled in, it
+does *not* start working unless the end user turns it on, via the
+SIOCSHWTSTAMP and SO_TIMESTAMPING options.
 
-As I see this technology requires special dedicated server in the local
-network, thus it's unusable in most situations. But it starts working
-without any actions from the user (please fix me if I'm wrong).
+See: Documentation/networking/timestamping.txt
+     Documentation/ptp/ptp.txt
+ 
+> Thus this code enables some rarely used parts of hardware.
+> After seeing several weird bugs in ethernet devices I prefer to
+> keep unused/unwanted features off.
 
-Thus this code enables some rarely used parts of hardware.
-After seeing several weird bugs in ethernet devices I prefer to
-keep unused/unwanted features off.
+Just compiling drivers into kernel does not really change the behavior
+of the hardware. The only drawback I know of is that it adds (minimal)
+overhead into the packet processing paths, but that is a software
+issue.
 
->
-> And BTW, please CC netdev for PHC patches.
+I don't mean to start a big discussion here. The question of whether
+to have PHC support a compile time option should be discussed on the
+netdev list (added on CC just in case).
 
-Of course, if basic logic of this RFC patchset will be approved I'll resend
-PTP part to netdev. I don't want to bother netdev guys because PTP and e1000e
-are used here just as Guinea pigs.
+Thanks,
+Richard
 
->
-> Thanks,
-> Richard
->
-> 1. http://marc.info/?l=linux-netdev&m=135173341101960
-> 2. http://www.spinics.net/lists/netdev/msg215379.html
 
