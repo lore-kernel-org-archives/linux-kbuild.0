@@ -1,64 +1,76 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-we0-f171.google.com ([74.125.82.171]:45303 "EHLO
-	mail-we0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1422786Ab3CVSa7 (ORCPT
+Received: from moutng.kundenserver.de ([212.227.17.8]:59255 "EHLO
+	moutng.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1758502Ab3CYPqA (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 22 Mar 2013 14:30:59 -0400
-Received: by mail-we0-f171.google.com with SMTP id d46so1664979wer.30
-        for <linux-kbuild@vger.kernel.org>; Fri, 22 Mar 2013 11:30:58 -0700 (PDT)
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: Re: [PATCH 1/2] menuconfig: optionally use pkg-config to detect ncurses libs
-Date: Fri, 22 Mar 2013 19:30:53 +0100
-References: <cover.1362679061.git.yann.morin.1998@free.fr> <fc9c6e000f62c2eeda426d4d5f022b3d57729bb0.1362679061.git.yann.morin.1998@free.fr> <514B851F.4010500@suse.cz>
-In-Reply-To: <514B851F.4010500@suse.cz>
+	Mon, 25 Mar 2013 11:46:00 -0400
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: [PATCH] Turn off -Wmaybe-uninitialized when building with -Os
+Date: Mon, 25 Mar 2013 15:44:55 +0000
 MIME-Version: 1.0
 Content-Type: Text/Plain;
-  charset="iso-8859-2"
+  charset="iso-8859-1"
 Content-Transfer-Encoding: 7bit
-Message-Id: <201303221930.54381.yann.morin.1998@free.fr>
+Message-Id: <201303251544.55765.arnd@arndb.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Michal Marek <mmarek@suse.cz>, Justin Lecher <jlec@gentoo.org>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org, linux-kbuild@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>, Michal Marek <mmarek@suse.cz>, "James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, Russell King - ARM Linux <linux@arm.linux.org.uk>
 
-Michal, All,
+gcc-4.7 and higher add a lot of false positive warnings about
+potential uses of uninitialized warnings, but only when optimizing
+for size (-Os). This is the default when building allyesconfig,
+which turns on CONFIG_CC_OPTIMIZE_FOR_SIZE.
 
-On Thursday 21 March 2013 Michal Marek wrote:
-> Dne 7.3.2013 19:20, Yann E. MORIN napsal(a):
-> > From: Justin Lecher <jlec@gentoo.org>
-[--SNIP--]
-> > diff --git a/scripts/kconfig/lxdialog/check-lxdialog.sh b/scripts/kconfig/lxdialog/check-lxdialog.sh
-> > index 8078813..782d200 100644
-> > --- a/scripts/kconfig/lxdialog/check-lxdialog.sh
-> > +++ b/scripts/kconfig/lxdialog/check-lxdialog.sh
-> > @@ -4,6 +4,8 @@
-> >  # What library to link
-> >  ldflags()
-> >  {
-> > +	pkg-config --libs ncursesw 2>/dev/null && exit
-> > +	pkg-config --libs ncurses 2>/dev/null && exit
-> >  	for ext in so a dll.a dylib ; do
-> >  		for lib in ncursesw ncurses curses ; do
-> 
-> Do you also plan to use pkg-config in the ccflags function?
+In order to avoid getting a lot of patches that initialize such
+variables and accidentally hide real errors along the way, let's
+just turn off this warning on the respective gcc versions
+when building with size optimizations. The -Wmaybe-uninitialized
+option was introduced in the same gcc version (4.7) that is now
+causing the false positives, so there is no effect on older compilers.
 
-That was my intention to pursue Justin's work to the CFLAGS, but that is
-not so simple for menuconfig as it is for the libs, as:
+A side effect is that when building with CONFIG_CC_OPTIMIZE_FOR_SIZE,
+we might now see /fewer/ warnings about possibly uninitialized
+warnings than with -O2, but that is still much better than seeing
+warnings known to be bogus.
 
-  - we need the name of the header to include: '-DCURSES_LOC="<path/ncurses.h>"'
-    (where 'path' is a relative path) which we use as: #include CURSES_LOC
-  - there is no way to get this info from pkg-config
+Building v3.9-rc3 allmodconfig shows how the number of false
+positives is reduced:
 
-So, I'll be working a bit more on this this WE, and see if I can come with
-something meaningful and not too ugly. ;-)
+74	x86-linux-gcc-4.7 -Os
+12	x86-linux-gcc-4.7 -O2
+ 1	x86-linux-gcc-4.7 -Os -Wno-maybe-uninitialized
+ 8	arm-linux-gcc-4.6 -Os
+ 8	arm-linux-gcc-4.6 -Os
+50	arm-linux-gcc-4.7 -Os
+ 8	arm-linux-gcc-4.7 -O2
+ 0	arm-linux-gcc-4.7 -Os -Wno-maybe-uninitialized
+33	arm-linux-gcc-4.8 -Os
+13	arm-linux-gcc-4.8 -O2
+ 0	arm-linux-gcc-4.8 -Os -Wno-maybe-uninitialized
 
-Regards,
-Yann E. MORIN.
+The 8 to 13 warnings that are now hidden compared to the -O2 output
+seem to all be false positives as well. The total number of
+all other warnings I see is (independent of optimization level)
 
--- 
-.-----------------.--------------------.------------------.--------------------.
-|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
-| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
-| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
-| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
-'------------------------------^-------^------------------^--------------------'
+24	x86-linux-gcc-4.7
+19	arm-linux-gcc-4.6
+17	arm-linux-gcc-4.7
+16	arm-linux-gcc-4.8
+
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+---
+diff --git a/Makefile b/Makefile
+index 22113a7..d8e3f36 100644
+--- a/Makefile
++++ b/Makefile
+@@ -570,7 +570,7 @@ endif # $(dot-config)
+ all: vmlinux
+ 
+ ifdef CONFIG_CC_OPTIMIZE_FOR_SIZE
+-KBUILD_CFLAGS	+= -Os
++KBUILD_CFLAGS	+= -Os $(call cc-disable-warning,maybe-uninitialized,)
+ else
+ KBUILD_CFLAGS	+= -O2
+ endif
+
