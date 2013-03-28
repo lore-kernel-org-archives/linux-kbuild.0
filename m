@@ -1,65 +1,54 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cn.fujitsu.com ([222.73.24.84]:64029 "EHLO song.cn.fujitsu.com"
-	rhost-flags-OK-FAIL-OK-OK) by vger.kernel.org with ESMTP
-	id S1754507Ab3C1Ha1 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 28 Mar 2013 03:30:27 -0400
-From: liguang <lig.fnst@cn.fujitsu.com>
-Subject: [PATCH] Makefile: allow no update .config build
-Date: Thu, 28 Mar 2013 15:28:06 +0800
-Message-Id: <1364455686-18930-1-git-send-email-lig.fnst@cn.fujitsu.com>
+Received: from avon.wwwdotorg.org ([70.85.31.133]:35615 "EHLO
+	avon.wwwdotorg.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752276Ab3C1SBB (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 28 Mar 2013 14:01:01 -0400
+Message-ID: <51548559.6030605@wwwdotorg.org>
+Date: Thu, 28 Mar 2013 12:00:57 -0600
+From: Stephen Warren <swarren@wwwdotorg.org>
+MIME-Version: 1.0
+Subject: Re: [PATCH REPOST 2/7] kbuild: fixdep: support concatenated dep files
+References: <1363890194-31538-1-git-send-email-swarren@wwwdotorg.org> <1363890194-31538-2-git-send-email-swarren@wwwdotorg.org>
+In-Reply-To: <1363890194-31538-2-git-send-email-swarren@wwwdotorg.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: mmarek@suse.cz, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: liguang <lig.fnst@cn.fujitsu.com>
+To: Michal Marek <mmarek@suse.cz>, Grant Likely <glikely@secretlab.ca>, Rob Herring <robherring2@gmail.com>
+Cc: arm@kernel.org, Shawn Guo <shawn.guo@linaro.org>, Hiroshi Doyu <hdoyu@nvidia.com>, linux-kbuild@vger.kernel.org, devicetree-discuss@lists.ozlabs.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Stephen Warren <swarren@nvidia.com>
 
-if we pull some commits from other git repo
-which bring in a few CONFIG_* options, then
-we have to build all again, but we do assure
-these options are not interesting for us,
-so the long waiting build will be offending.
-this change help us to avoid all-build.
+On 03/21/2013 12:23 PM, Stephen Warren wrote:
+> From: Stephen Warren <swarren@nvidia.com>
+> 
+> The current use-case for fixdep is: a source file is run through a single
+> processing step, which creates a single dependency file as a side-effect,
+> which fixdep transforms into the file used by the kernel build process.
+> 
+> In order to transparently run the C pre-processor on device-tree files,
+> we wish to run both gcc -E and dtc on a source file in a single rule.
+> This generates two dependency files, which must be transformed together
+> into the file used by the kernel build process. This change modifies
+> fixdep so it can process the concatenation of multiple separate input
+> dependency files, and produce a correct unified output.
+> 
+> The code changes have the slight benefit of transforming the loop in
+> parse_dep_file() into more of a lexer/tokenizer, with the loop body being
+> more of a parser. Previously, some of this logic was mixed together
+> before the loop. I also added some comments, which I hope are useful.
+> 
+> Benchmarking shows that on a cross-compiled ARM tegra_defconfig build,
+> there is less than 0.5 seconds speed decrease with this change, on top
+> of a build time of ~2m24s. This is probably within the noise.
 
-Signed-off-by: liguang <lig.fnst@cn.fujitsu.com>
----
- Makefile |    9 +++++++++
- 1 files changed, 9 insertions(+), 0 deletions(-)
+Marek, do patches 2, 3, and 4 in this series look good to you from a
+kbuild perspective?
 
-diff --git a/Makefile b/Makefile
-index 54d2b2a..d10e505 100644
---- a/Makefile
-+++ b/Makefile
-@@ -106,6 +106,12 @@ ifeq ("$(origin W)", "command line")
-   export KBUILD_ENABLE_EXTRA_GCC_CHECKS := $(W)
- endif
- 
-+# KBUILD_NCU is set to do not update .config even
-+# a few new CONFIG_* options appeared
-+ifeq ("$(origin NCU)", "command line")
-+  KBUILD_NCU := $(NCU)
-+endif
-+
- # That's our default target when none is given on the command line
- PHONY := _all
- _all:
-@@ -540,8 +546,10 @@ $(KCONFIG_CONFIG) include/config/auto.conf.cmd: ;
- # with it and forgot to run make oldconfig.
- # if auto.conf.cmd is missing then we are probably in a cleaned tree so
- # we execute the config step to be sure to catch updated Kconfig files
-+ifneq ($(KBUILD_NCU), 1)
- include/config/%.conf: $(KCONFIG_CONFIG) include/config/auto.conf.cmd
- 	$(Q)$(MAKE) -f $(srctree)/Makefile silentoldconfig
-+endif # $(KBUILD_NCU)
- else
- # external modules needs include/generated/autoconf.h and include/config/auto.conf
- # but do not care if they are up-to-date. Use auto.conf to trigger the test
-@@ -1157,6 +1165,7 @@ help:
- 	@echo  '		2: warnings which occur quite often but may still be relevant'
- 	@echo  '		3: more obscure warnings, can most likely be ignored'
- 	@echo  '		Multiple levels can be combined with W=12 or W=123'
-+	@echo  '  make NCU=1 [targets] no .config udate'
- 	@echo  ''
- 	@echo  'Execute "make" or "make all" to build all targets marked with [*] '
- 	@echo  'For further info see the ./README file'
--- 
-1.7.2.5
+I'm hoping that you can review/ack those 3 patches for kbuild, and that
+Grant will review/ack the whole series, and then the series can be
+merged via arm-soc for 3.10.
 
+Let me know if you need me to repost the series again in case it's
+fallen out of your inbox.
+
+Thanks.
