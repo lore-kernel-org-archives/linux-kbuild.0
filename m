@@ -1,36 +1,65 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from vm0854.cs10.seeweb.it ([95.174.23.70]:55134 "EHLO
-	smtpserver01.ergonet.it" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756934Ab3C0ISs (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 27 Mar 2013 04:18:48 -0400
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
-Content-Transfer-Encoding: 8bit
-Date: Wed, 27 Mar 2013 09:10:09 +0100
-From: Michele Roca <michele.rocca@cacciatoritrentini.it>
-Subject: MY GOOD FRIEND!
-Reply-To: <wernererichzeller@yahoo.com>
-Message-ID: <858397a3c3e05f3d5407156d0b746379@cacciatoritrentini.it>
+Received: from cn.fujitsu.com ([222.73.24.84]:64029 "EHLO song.cn.fujitsu.com"
+	rhost-flags-OK-FAIL-OK-OK) by vger.kernel.org with ESMTP
+	id S1754507Ab3C1Ha1 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 28 Mar 2013 03:30:27 -0400
+From: liguang <lig.fnst@cn.fujitsu.com>
+Subject: [PATCH] Makefile: allow no update .config build
+Date: Thu, 28 Mar 2013 15:28:06 +0800
+Message-Id: <1364455686-18930-1-git-send-email-lig.fnst@cn.fujitsu.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
+To: mmarek@suse.cz, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: liguang <lig.fnst@cn.fujitsu.com>
 
+if we pull some commits from other git repo
+which bring in a few CONFIG_* options, then
+we have to build all again, but we do assure
+these options are not interesting for us,
+so the long waiting build will be offending.
+this change help us to avoid all-build.
 
+Signed-off-by: liguang <lig.fnst@cn.fujitsu.com>
+---
+ Makefile |    9 +++++++++
+ 1 files changed, 9 insertions(+), 0 deletions(-)
 
-
-I am Barrister Werner Erich Zeller; I need your sincere partnership in
-transferring the sum of 15,000,000.00 EUR The details await you as you 
-reply!
-
-please! Call +44 702 409 0820 (office)
-
+diff --git a/Makefile b/Makefile
+index 54d2b2a..d10e505 100644
+--- a/Makefile
++++ b/Makefile
+@@ -106,6 +106,12 @@ ifeq ("$(origin W)", "command line")
+   export KBUILD_ENABLE_EXTRA_GCC_CHECKS := $(W)
+ endif
+ 
++# KBUILD_NCU is set to do not update .config even
++# a few new CONFIG_* options appeared
++ifeq ("$(origin NCU)", "command line")
++  KBUILD_NCU := $(NCU)
++endif
++
+ # That's our default target when none is given on the command line
+ PHONY := _all
+ _all:
+@@ -540,8 +546,10 @@ $(KCONFIG_CONFIG) include/config/auto.conf.cmd: ;
+ # with it and forgot to run make oldconfig.
+ # if auto.conf.cmd is missing then we are probably in a cleaned tree so
+ # we execute the config step to be sure to catch updated Kconfig files
++ifneq ($(KBUILD_NCU), 1)
+ include/config/%.conf: $(KCONFIG_CONFIG) include/config/auto.conf.cmd
+ 	$(Q)$(MAKE) -f $(srctree)/Makefile silentoldconfig
++endif # $(KBUILD_NCU)
+ else
+ # external modules needs include/generated/autoconf.h and include/config/auto.conf
+ # but do not care if they are up-to-date. Use auto.conf to trigger the test
+@@ -1157,6 +1165,7 @@ help:
+ 	@echo  '		2: warnings which occur quite often but may still be relevant'
+ 	@echo  '		3: more obscure warnings, can most likely be ignored'
+ 	@echo  '		Multiple levels can be combined with W=12 or W=123'
++	@echo  '  make NCU=1 [targets] no .config udate'
+ 	@echo  ''
+ 	@echo  'Execute "make" or "make all" to build all targets marked with [*] '
+ 	@echo  'For further info see the ./README file'
 -- 
-Ich bin Barrister Werner Erich Zeller, ich brauche eure aufrichtige
-Partnerschaft intransferring die Summe von 15.000.000,00 EUR auf Ihr
-Bankkonto in dieser Woche für den Nutzen der beiden von uns 50% each.It
-ist 100% legal, legitim und sicher! für Details, schreiben Sie mir auf
-dieser meiner privaten E-Mail statt: Dies ist dringende und ernste Sie
-müssen bereit sein und bereit, bevor Sie mich kontaktieren.
+1.7.2.5
 
-bitte! Rufen Sie +44 702 409 0820 (Büro)
