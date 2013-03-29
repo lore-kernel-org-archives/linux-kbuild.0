@@ -1,65 +1,35 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cn.fujitsu.com ([222.73.24.84]:1119 "EHLO song.cn.fujitsu.com"
-	rhost-flags-OK-FAIL-OK-OK) by vger.kernel.org with ESMTP
-	id S1753570Ab3C2As5 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 28 Mar 2013 20:48:57 -0400
-From: liguang <lig.fnst@cn.fujitsu.com>
-Subject: [PATCH][update] Makefile: allow no update .config build
-Date: Fri, 29 Mar 2013 08:46:37 +0800
-Message-Id: <1364517997-24067-1-git-send-email-lig.fnst@cn.fujitsu.com>
+Received: from cantor2.suse.de ([195.135.220.15]:48442 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754069Ab3C2JM1 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 29 Mar 2013 05:12:27 -0400
+Message-ID: <51555AF9.4020009@suse.cz>
+Date: Fri, 29 Mar 2013 10:12:25 +0100
+From: Michal Marek <mmarek@suse.cz>
+MIME-Version: 1.0
+Subject: Re: [PATCH][update] Makefile: allow no update .config build
+References: <1364517997-24067-1-git-send-email-lig.fnst@cn.fujitsu.com>
+In-Reply-To: <1364517997-24067-1-git-send-email-lig.fnst@cn.fujitsu.com>
+Content-Type: text/plain; charset=ISO-8859-2
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: mmarek@suse.cz, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: liguang <lig.fnst@cn.fujitsu.com>
+To: liguang <lig.fnst@cn.fujitsu.com>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-if we pull some commits from other git repo
-which bring in a few CONFIG_* options, then
-we have to build all again, but we do assure
-these options are not interesting for us,
-so the long waiting build will be offending.
-this change help us to avoid all-build.
+On 29.3.2013 01:46, liguang wrote:
+> if we pull some commits from other git repo
+> which bring in a few CONFIG_* options, then
+> we have to build all again, but we do assure
+> these options are not interesting for us,
+> so the long waiting build will be offending.
+> this change help us to avoid all-build.
 
-Signed-off-by: liguang <lig.fnst@cn.fujitsu.com>
----
- Makefile |    9 +++++++++
- 1 files changed, 9 insertions(+), 0 deletions(-)
+scripts/basic/fixdep makes sure that only the affected parts are rebuild
+when the config changes. Obviously, if a CONFIG_ option appears in a
+widely used header file, the whole kernel is rebuilt. Otherwise object
+files would be built with different versions of the header file. If you
+want to shoot yourself in the foot and override this, then do a 'touch
+include/config/*.conf', but please do not add such a hack to the Makefile.
 
-diff --git a/Makefile b/Makefile
-index 54d2b2a..d10e505 100644
---- a/Makefile
-+++ b/Makefile
-@@ -106,6 +106,12 @@ ifeq ("$(origin W)", "command line")
-   export KBUILD_ENABLE_EXTRA_GCC_CHECKS := $(W)
- endif
- 
-+# KBUILD_NCU is set to do not update .config even
-+# a few new CONFIG_* options appeared
-+ifeq ("$(origin NCU)", "command line")
-+  KBUILD_NCU := $(NCU)
-+endif
-+
- # That's our default target when none is given on the command line
- PHONY := _all
- _all:
-@@ -540,8 +546,10 @@ $(KCONFIG_CONFIG) include/config/auto.conf.cmd: ;
- # with it and forgot to run make oldconfig.
- # if auto.conf.cmd is missing then we are probably in a cleaned tree so
- # we execute the config step to be sure to catch updated Kconfig files
-+ifneq ($(KBUILD_NCU), 1)
- include/config/%.conf: $(KCONFIG_CONFIG) include/config/auto.conf.cmd
- 	$(Q)$(MAKE) -f $(srctree)/Makefile silentoldconfig
-+endif # $(KBUILD_NCU)
- else
- # external modules needs include/generated/autoconf.h and include/config/auto.conf
- # but do not care if they are up-to-date. Use auto.conf to trigger the test
-@@ -1157,6 +1165,7 @@ help:
- 	@echo  '		2: warnings which occur quite often but may still be relevant'
- 	@echo  '		3: more obscure warnings, can most likely be ignored'
- 	@echo  '		Multiple levels can be combined with W=12 or W=123'
-+	@echo  '  make NCU=1 [targets] no .config update'
- 	@echo  ''
- 	@echo  'Execute "make" or "make all" to build all targets marked with [*] '
- 	@echo  'For further info see the ./README file'
--- 
-1.7.2.5
-
+Michal
