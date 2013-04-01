@@ -1,32 +1,110 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.snhosting.dk ([87.238.248.203]:24127 "EHLO
-	smtp.domainteam.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1759696Ab3DAUDn (ORCPT
+Received: from mail-pa0-f50.google.com ([209.85.220.50]:58075 "EHLO
+	mail-pa0-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757566Ab3DAUpO (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 1 Apr 2013 16:03:43 -0400
-Date: Mon, 1 Apr 2013 22:03:42 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH 27/27] perf tools: Add kbuild support into
-	Makefile.kbuild
-Message-ID: <20130401200342.GD5744@merkur.ravnborg.org>
-References: <1364843930-17974-1-git-send-email-jolsa@redhat.com> <1364843930-17974-28-git-send-email-jolsa@redhat.com>
+	Mon, 1 Apr 2013 16:45:14 -0400
+Message-ID: <5159F1D5.2040601@gmail.com>
+Date: Mon, 01 Apr 2013 14:45:09 -0600
+From: David Ahern <dsahern@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1364843930-17974-28-git-send-email-jolsa@redhat.com>
+Subject: Re: [RFC 00/27] perf tools: Build changes and kbuild support
+References: <1364843930-17974-1-git-send-email-jolsa@redhat.com>
+In-Reply-To: <1364843930-17974-1-git-send-email-jolsa@redhat.com>
+Content-Type: multipart/mixed;
+ boundary="------------000400000801090103090401"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Jiri Olsa <jolsa@redhat.com>
 Cc: linux-kernel@vger.kernel.org, Arnaldo Carvalho de Melo <acme@ghostprotocols.net>, Peter Zijlstra <a.p.zijlstra@chello.nl>, Ingo Molnar <mingo@elte.hu>, Paul Mackerras <paulus@samba.org>, Corey Ashford <cjashfor@linux.vnet.ibm.com>, Frederic Weisbecker <fweisbec@gmail.com>, Namhyung Kim <namhyung@kernel.org>, Borislav Petkov <bp@alien8.de>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, Stephane Eranian <eranian@google.com>
 
-On Mon, Apr 01, 2013 at 09:18:50PM +0200, Jiri Olsa wrote:
-> Adding kbuild support into Makefile.kbuild. The 'legacy'
-> Makefile still stays untouched as it was.
+This is a multi-part message in MIME format.
+--------------000400000801090103090401
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
 
-When readign the Kbuild file I get confused.
-the obj-y syntax is used for kernel built-in stuff,
-and obj-m for modules.
-I had expected either a perf specific syntax or something like the
-syntax used for host programs.
+Hi Jiri:
 
-	Sam
+On 4/1/13 1:18 PM, Jiri Olsa wrote:
+> hi,
+> sending RFC for build changes and kbuild support.
+
+Have you seen this patch set:
+https://lkml.org/lkml/2012/8/20/59
+
+It hooks into the conf commands to generate a .config file. 
+Coincidentally I updated and expanded the patch series this morning to 
+include dependencies and such. Latest Pconfig attached to give you an 
+idea. I need to collapse a few patches and send them out tonight.
+
+David
+
+--------------000400000801090103090401
+Content-Type: text/plain; charset=UTF-8; x-mac-type="0"; x-mac-creator="0";
+ name="Pconfig"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+ filename="Pconfig"
+
+config ARCH
+    string
+    option env="ARCH"
+
+config X86
+    def_bool y if ARCH = "x86"
+    select HAVE_CFI_UNWIND_SUPPORT 
+
+config HAVE_CFI_UNWIND_SUPPORT
+    bool
+
+config BIONIC
+    bool "Enable support for Bionic (e.g., Android platform)"
+    default n
+    select LIBC
+
+config NEWT
+    bool "Enable newt-based TUI"
+
+config GTK2
+    bool "Enable GTK-based UI"
+
+config LIBC
+    bool "Development support for libc is available - glibc or bionic"
+
+config LIBELF
+    bool "Enable support for libelf"
+    depends on !BIONIC && LIBC
+
+config LIBUNWIND
+    bool "Enable support for libunwind"
+    depends on HAVE_CFI_UNWIND_SUPPORT
+    depends on LIBELF
+
+config DEMANGLE
+    bool "Enable support for demangle"
+    depends on LIBELF
+
+config DWARF
+    bool "Enable support for dwarf"
+    depends on LIBELF
+
+config LIBAUDIT
+    bool "Enable support for libaudit"
+    help
+        Used for perf trace tool.
+
+config LIBNUMA
+    bool "Enable support for libnuma"
+    help
+        Used for 'perf bench numa mem' benchmark
+
+config BACKTRACE
+    bool "Enable support for stack backtrace debugging"
+
+config LIBPERL
+    bool "Enable support for perl scripting engine"
+
+config LIBPYTHON
+    bool "Enable support for python scripting engine"
+
+--------------000400000801090103090401--
