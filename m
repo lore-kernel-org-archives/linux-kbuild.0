@@ -1,64 +1,73 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wi0-f174.google.com ([209.85.212.174]:35923 "EHLO
-	mail-wi0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757948Ab3DAJ2m (ORCPT
+Received: from smtp.snhosting.dk ([87.238.248.203]:43188 "EHLO
+	smtp.domainteam.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752656Ab3DAMMU (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 1 Apr 2013 05:28:42 -0400
-Message-ID: <5159534A.1070500@googlemail.com>
-Date: Mon, 01 Apr 2013 10:28:42 +0100
-From: Chris Clayton <chris2553@googlemail.com>
+	Mon, 1 Apr 2013 08:12:20 -0400
+Date: Mon, 1 Apr 2013 14:12:18 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: host gcc 4.7 warning when generating defconfig
+Message-ID: <20130401121218.GA4409@merkur.ravnborg.org>
+References: <514AADAD.1060503@synopsys.com>
 MIME-Version: 1.0
-Subject: Re: linux-3.9.0-rc1+: Output from "make kernelrelease"contains incorrect
- data
-References: <513B8FA7.9040200@googlemail.com>
-In-Reply-To: <513B8FA7.9040200@googlemail.com>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <514AADAD.1060503@synopsys.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: LKML <linux-kernel@vger.kernel.org>, mmarek@suse.cz
+To: Vineet Gupta <Vineet.Gupta1@synopsys.com>
+Cc: "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>, Alexey Brodkin <Alexey.Brodkin@synopsys.com>
 
-Ping!
+On Thu, Mar 21, 2013 at 12:20:21PM +0530, Vineet Gupta wrote:
+> Hi,
+> 
+> We do cross compile builds for ARC Linux. To avoid the env var set, we have a
+> defconfig entry for CONFIG_CROSS_COMPILE.
+> This worked fine so far (host gcc 4.4 i.e.). When switched to a new host distro
+> (gcc 4.7), a defconfig build spews out the warning.
+> 
+> ------------------->8--------------------------
+> mymake defconfig
+> gcc: error: unrecognized command line option '-marc600'
+> gcc: error: unrecognized command line option '-mA7'
+> gcc: error: unrecognized command line option '-mno-sdata'
+> gcc: error: unrecognized command line option '-mno-mpy'
+> *** Default configuration is based on 'fpga_defconfig'
+> #
+> # configuration written to .config
+> ------------------->8--------------------------
+> 
+> While the following trivial fix seems to fix this, it seems that the spew is
+> coming due to LIBGCC definition line, which is strange to be called for defconfig
+> generation. Any thoughts ?
+> 
+> ---------------->
+> diff --git a/arch/arc/Makefile b/arch/arc/Makefile
+> index 4232d4e..97e6c20 100644
+> --- a/arch/arc/Makefile
+> +++ b/arch/arc/Makefile
+> @@ -8,6 +8,10 @@
+>  
+>  UTS_MACHINE := arc
+>  
+> +ifeq ($(CROSS_COMPILE),)
+> +#CROSS_COMPILE := arc-elf32-
+> +endif
+> +
+>  KBUILD_DEFCONFIG := fpga_defconfig
 
-This is still happening with 3.9-rc5.
 
-[chris:~/kernel/linux]$ make bzImage
-...
-Kernel: arch/x86/boot/bzImage is ready  (#14)
-[chris:~/kernel/linux]$ make kernelrelease
-scripts/kconfig/conf --silentoldconfig Kconfig
-3.9.0-rc5
-[chris:~/kernel/linux]$ make kernelrelease
-3.9.0-rc5
+You could try to use LIBGCC = $(shell ... for assignment.
+Use "=" and not ":=".
 
-I'm assuming that the output from 'make kernelrelease' should be the 
-string that represents the kernel release and only that string.
+Like this:
 
-Chris
+-LIBGCC := $(shell $(CC) $(ARC_LIBGCC) $(cflags-y) --print-libgcc-file-name)
++LIBGCC = $(shell $(CC) $(ARC_LIBGCC) $(cflags-y) --print-libgcc-file-name)
 
+This would defer the evaluation until we actually reference the variable,
+and thus I think it will not trigger for a defconfig build.
 
-On 03/09/13 19:38, Chris Clayton wrote:
-> In Linus' current tree, the first time the command "make kernelrelease"
-> is run after building a kernel, the output contains some unwanted text.
-> Subsequent uses of the command produce the expected output. This appears
-> to be a regression - 3.8.2 does not have this problem.
->
-> This is easily demonstrated from the command line by the following:
->
-> <build the kernel>
-> ...
-> System is 2311 kB
-> CRC a4e38b86
-> Kernel: arch/x86/boot/bzImage is ready  (#186)
-> $ make kernelrelease
-> scripts/kconfig/conf --silentoldconfig Kconfig 3.9.0-rc1+
-> $ make kernelrelease
-> 3.9.0-rc1+
->
-> Happy to test the fix.
->
-> Chris
->
->
->
+I could not reproduce the problem here so I am not sure this has any effect though...
+
+	Sam
