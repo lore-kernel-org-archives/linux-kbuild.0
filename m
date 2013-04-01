@@ -1,48 +1,64 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.snhosting.dk ([87.238.248.203]:57081 "EHLO
-	smtp.domainteam.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755639Ab3CaVnq (ORCPT
+Received: from mail-wi0-f174.google.com ([209.85.212.174]:35923 "EHLO
+	mail-wi0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757948Ab3DAJ2m (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 31 Mar 2013 17:43:46 -0400
-Date: Sun, 31 Mar 2013 23:43:43 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: [PATCH] kbuild: avoid rebuild of file2alias for each build
-Message-ID: <20130331214343.GA11285@merkur.ravnborg.org>
+	Mon, 1 Apr 2013 05:28:42 -0400
+Message-ID: <5159534A.1070500@googlemail.com>
+Date: Mon, 01 Apr 2013 10:28:42 +0100
+From: Chris Clayton <chris2553@googlemail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Subject: Re: linux-3.9.0-rc1+: Output from "make kernelrelease"contains incorrect
+ data
+References: <513B8FA7.9040200@googlemail.com>
+In-Reply-To: <513B8FA7.9040200@googlemail.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>, Andreas Schwab <schwab@linux-m68k.org>
-Cc: lkml <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: linux-kbuild@vger.kernel.org
+Cc: LKML <linux-kernel@vger.kernel.org>, mmarek@suse.cz
 
-When introducing devicetable-offsets generation this
-had the side-effect that file2alias (and thus modpost)
-were build for each kernel build.
+Ping!
 
-devicetable-offsets were introduced in 6543becf26fff612cdadeed7250ccc8d49f67f27
-("mod/file2alias: make modalias generation safe for cross compiling")
+This is still happening with 3.9-rc5.
 
-"make V=2" said this was due to target not included in targets.
-So add devicetable-offsets to targets.
+[chris:~/kernel/linux]$ make bzImage
+...
+Kernel: arch/x86/boot/bzImage is ready  (#14)
+[chris:~/kernel/linux]$ make kernelrelease
+scripts/kconfig/conf --silentoldconfig Kconfig
+3.9.0-rc5
+[chris:~/kernel/linux]$ make kernelrelease
+3.9.0-rc5
 
-Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
----
-diff --git a/scripts/mod/Makefile b/scripts/mod/Makefile
-index 9415b56..c8e04e9 100644
---- a/scripts/mod/Makefile
-+++ b/scripts/mod/Makefile
-@@ -30,10 +30,12 @@ define cmd_offsets
- endef
- 
- # We use internal kbuild rules to avoid the "is up to date" message from make
-+targets += devicetable-offsets.s
- scripts/mod/devicetable-offsets.s: scripts/mod/devicetable-offsets.c FORCE
- 	$(Q)mkdir -p $(dir $@)
- 	$(call if_changed_dep,cc_s_c)
- 
-+targets += $(devicetable-offsets-file)
- $(obj)/$(devicetable-offsets-file): scripts/mod/devicetable-offsets.s
- 	$(call cmd,offsets)
- 
+I'm assuming that the output from 'make kernelrelease' should be the 
+string that represents the kernel release and only that string.
 
+Chris
+
+
+On 03/09/13 19:38, Chris Clayton wrote:
+> In Linus' current tree, the first time the command "make kernelrelease"
+> is run after building a kernel, the output contains some unwanted text.
+> Subsequent uses of the command produce the expected output. This appears
+> to be a regression - 3.8.2 does not have this problem.
+>
+> This is easily demonstrated from the command line by the following:
+>
+> <build the kernel>
+> ...
+> System is 2311 kB
+> CRC a4e38b86
+> Kernel: arch/x86/boot/bzImage is ready  (#186)
+> $ make kernelrelease
+> scripts/kconfig/conf --silentoldconfig Kconfig 3.9.0-rc1+
+> $ make kernelrelease
+> 3.9.0-rc1+
+>
+> Happy to test the fix.
+>
+> Chris
+>
+>
+>
