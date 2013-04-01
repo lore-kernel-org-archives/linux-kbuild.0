@@ -1,45 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:54631 "EHLO mx1.redhat.com"
+Received: from mx1.redhat.com ([209.132.183.28]:27933 "EHLO mx1.redhat.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1757941Ab3DAVH7 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 1 Apr 2013 17:07:59 -0400
-Date: Mon, 1 Apr 2013 23:05:51 +0200
+	id S1758537Ab3DAVTJ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 1 Apr 2013 17:19:09 -0400
+Date: Mon, 1 Apr 2013 23:18:00 +0200
 From: Jiri Olsa <jolsa@redhat.com>
-Subject: Re: [PATCH 27/27] perf tools: Add kbuild support into Makefile.kbuild
-Message-ID: <20130401210550.GA20670@krava.redhat.com>
+Subject: Re: [RFC 00/27] perf tools: Build changes and kbuild support
+Message-ID: <20130401211800.GE20670@krava.redhat.com>
 References: <1364843930-17974-1-git-send-email-jolsa@redhat.com>
- <1364843930-17974-28-git-send-email-jolsa@redhat.com>
- <20130401200342.GD5744@merkur.ravnborg.org>
+ <5159F1D5.2040601@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20130401200342.GD5744@merkur.ravnborg.org>
+In-Reply-To: <5159F1D5.2040601@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
+To: David Ahern <dsahern@gmail.com>
 Cc: linux-kernel@vger.kernel.org, Arnaldo Carvalho de Melo <acme@ghostprotocols.net>, Peter Zijlstra <a.p.zijlstra@chello.nl>, Ingo Molnar <mingo@elte.hu>, Paul Mackerras <paulus@samba.org>, Corey Ashford <cjashfor@linux.vnet.ibm.com>, Frederic Weisbecker <fweisbec@gmail.com>, Namhyung Kim <namhyung@kernel.org>, Borislav Petkov <bp@alien8.de>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, Stephane Eranian <eranian@google.com>
 
-On Mon, Apr 01, 2013 at 10:03:42PM +0200, Sam Ravnborg wrote:
-> On Mon, Apr 01, 2013 at 09:18:50PM +0200, Jiri Olsa wrote:
-> > Adding kbuild support into Makefile.kbuild. The 'legacy'
-> > Makefile still stays untouched as it was.
+On Mon, Apr 01, 2013 at 02:45:09PM -0600, David Ahern wrote:
+> Hi Jiri:
 > 
-> When readign the Kbuild file I get confused.
-> the obj-y syntax is used for kernel built-in stuff,
-> and obj-m for modules.
-> I had expected either a perf specific syntax or something like the
-> syntax used for host programs.
+> On 4/1/13 1:18 PM, Jiri Olsa wrote:
+> >hi,
+> >sending RFC for build changes and kbuild support.
+> 
+> Have you seen this patch set:
+> https://lkml.org/lkml/2012/8/20/59
 
-While building kernel you need to have separate flags
-for internal objects and for host programs.
+yep, I remember checking it.. but I decided to start over
+because I wanted to use kbuild build support as well
 
-First, I thought I need to separate it as you say, but
-perf build is separated from kernel built process, so
-AFAICS we can use obj-y with no harm in perf.
+Now when I'm checking that I see you made also some source
+changes to make the build separation possible. I haven't done
+much on this part and some of the libraries/features/builtins
+could not be disabled at the moment, because the code
+is not properly separated.
 
-It's quite possible I missed something and kbuild folks
-prove me wrong ;-)
+> 
+> It hooks into the conf commands to generate a .config file.
+> Coincidentally I updated and expanded the patch series this morning
+> to include dependencies and such. Latest Pconfig attached to give
+> you an idea. I need to collapse a few patches and send them out
+> tonight.
 
-The Makefile.kbuild defines flags to be used for obj-y.
+I'll check your repost
 
+thanks,
 jirka
