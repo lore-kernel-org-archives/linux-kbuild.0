@@ -1,12 +1,12 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:48216 "EHLO mx1.redhat.com"
+Received: from mx1.redhat.com ([209.132.183.28]:45033 "EHLO mx1.redhat.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1759567Ab3DATVh (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 1 Apr 2013 15:21:37 -0400
+	id S1759370Ab3DATVg (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 1 Apr 2013 15:21:36 -0400
 From: Jiri Olsa <jolsa@redhat.com>
-Subject: [PATCH 23/27] kbuild: Introduce KBUILD_AUTOCONF variable for auto.conf include
-Date: Mon,  1 Apr 2013 21:18:46 +0200
-Message-Id: <1364843930-17974-24-git-send-email-jolsa@redhat.com>
+Subject: [PATCH 24/27] kbuild: Introduce KCONFIG_AUTOCONFIGDEP variable for conf tool
+Date: Mon,  1 Apr 2013 21:18:47 +0200
+Message-Id: <1364843930-17974-25-git-send-email-jolsa@redhat.com>
 In-Reply-To: <1364843930-17974-1-git-send-email-jolsa@redhat.com>
 References: <1364843930-17974-1-git-send-email-jolsa@redhat.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -14,8 +14,8 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org
 Cc: Jiri Olsa <jolsa@redhat.com>, Arnaldo Carvalho de Melo <acme@ghostprotocols.net>, Peter Zijlstra <a.p.zijlstra@chello.nl>, Ingo Molnar <mingo@elte.hu>, Paul Mackerras <paulus@samba.org>, Corey Ashford <cjashfor@linux.vnet.ibm.com>, Frederic Weisbecker <fweisbec@gmail.com>, Namhyung Kim <namhyung@kernel.org>, Borislav Petkov <bp@alien8.de>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, Stephane Eranian <eranian@google.com>
 
-Introducing KBUILD_AUTOCONF variable for auto.conf include
-allowing to specify custom auto.conf file.
+Introducing KCONFIG_AUTOCONFIGDEP variable for conf tool
+allowing to specify custom auto.conf.cmd file.
 
 Signed-off-by: Jiri Olsa <jolsa@redhat.com>
 Cc: Arnaldo Carvalho de Melo <acme@ghostprotocols.net>
@@ -30,23 +30,51 @@ Cc: Michal Marek <mmarek@suse.cz>
 Cc: linux-kbuild@vger.kernel.org
 Cc: Stephane Eranian <eranian@google.com>
 ---
- scripts/Makefile.build | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ scripts/kconfig/confdata.c | 11 ++++++++++-
+ scripts/kconfig/lkc.h      |  1 +
+ 2 files changed, 11 insertions(+), 1 deletion(-)
 
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index 0e801c3..a3254a1 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -31,7 +31,8 @@ subdir-asflags-y :=
- subdir-ccflags-y :=
+diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
+index 13ddf11..435c361 100644
+--- a/scripts/kconfig/confdata.c
++++ b/scripts/kconfig/confdata.c
+@@ -75,6 +75,14 @@ const char *conf_get_autoconfig_name(void)
+ 	return name ? name : "include/config/auto.conf";
+ }
  
- # Read auto.conf if it exists, otherwise ignore
---include include/config/auto.conf
-+kbuild-autoconf := $(if $(KBUILD_AUTOCONF),$(KBUILD_AUTOCONF),include/config/auto.conf)
-+-include $(kbuild-autoconf)
++const char *conf_get_autoconfigdep_name(void)
++{
++	char *name = getenv("KCONFIG_AUTOCONFIGDEP");
++
++	return name ? name : "include/config/auto.conf.cmd";
++}
++
++
+ static char *conf_expand_value(const char *in)
+ {
+ 	struct symbol *sym;
+@@ -948,7 +956,8 @@ int conf_write_autoconf(void)
  
- include scripts/Kbuild.include
+ 	sym_clear_all_valid();
  
+-	file_write_dep("include/config/auto.conf.cmd");
++	name = conf_get_autoconfigdep_name();
++	file_write_dep(name);
+ 
+ 	if (conf_split_config())
+ 		return 1;
+diff --git a/scripts/kconfig/lkc.h b/scripts/kconfig/lkc.h
+index f8aee5f..5e370b1 100644
+--- a/scripts/kconfig/lkc.h
++++ b/scripts/kconfig/lkc.h
+@@ -83,6 +83,7 @@ const char *zconf_curname(void);
+ /* confdata.c */
+ const char *conf_get_configname(void);
+ const char *conf_get_autoconfig_name(void);
++const char *conf_get_autoconfigdep_name(void);
+ char *conf_get_default_confname(void);
+ void sym_set_change_count(int count);
+ void sym_add_change_count(int count);
 -- 
 1.7.11.7
 
