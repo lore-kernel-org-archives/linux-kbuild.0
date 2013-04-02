@@ -1,50 +1,71 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:27933 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1758537Ab3DAVTJ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 1 Apr 2013 17:19:09 -0400
-Date: Mon, 1 Apr 2013 23:18:00 +0200
-From: Jiri Olsa <jolsa@redhat.com>
-Subject: Re: [RFC 00/27] perf tools: Build changes and kbuild support
-Message-ID: <20130401211800.GE20670@krava.redhat.com>
-References: <1364843930-17974-1-git-send-email-jolsa@redhat.com>
- <5159F1D5.2040601@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5159F1D5.2040601@gmail.com>
+Received: from mail-pb0-f54.google.com ([209.85.160.54]:43863 "EHLO
+	mail-pb0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1758699Ab3DBDxk (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 1 Apr 2013 23:53:40 -0400
+From: David Ahern <dsahern@gmail.com>
+Subject: [PATCH 01/23] perf: initial infrasructure for kconfig
+Date: Mon,  1 Apr 2013 21:53:07 -0600
+Message-Id: <1364874809-5575-2-git-send-email-dsahern@gmail.com>
+In-Reply-To: <1364874809-5575-1-git-send-email-dsahern@gmail.com>
+References: <1364874809-5575-1-git-send-email-dsahern@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: David Ahern <dsahern@gmail.com>
-Cc: linux-kernel@vger.kernel.org, Arnaldo Carvalho de Melo <acme@ghostprotocols.net>, Peter Zijlstra <a.p.zijlstra@chello.nl>, Ingo Molnar <mingo@elte.hu>, Paul Mackerras <paulus@samba.org>, Corey Ashford <cjashfor@linux.vnet.ibm.com>, Frederic Weisbecker <fweisbec@gmail.com>, Namhyung Kim <namhyung@kernel.org>, Borislav Petkov <bp@alien8.de>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, Stephane Eranian <eranian@google.com>
+To: acme@ghostprotocols.net, linux-kernel@vger.kernel.org
+Cc: David Ahern <dsahern@gmail.com>, Borislav Petkov <bp@alien8.de>, Frederic Weisbecker <fweisbec@gmail.com>, Ingo Molnar <mingo@kernel.org>, Jiri Olsa <jolsa@redhat.com>, Namhyung Kim <namhyung@kernel.org>, Peter Zijlstra <a.p.zijlstra@chello.nl>, Stephane Eranian <eranian@google.com>, linux-kbuild@vger.kernel.org
 
-On Mon, Apr 01, 2013 at 02:45:09PM -0600, David Ahern wrote:
-> Hi Jiri:
-> 
-> On 4/1/13 1:18 PM, Jiri Olsa wrote:
-> >hi,
-> >sending RFC for build changes and kbuild support.
-> 
-> Have you seen this patch set:
-> https://lkml.org/lkml/2012/8/20/59
+Add Pconfig file which will hold the build options.
+Update Makefile with new config files.
 
-yep, I remember checking it.. but I decided to start over
-because I wanted to use kbuild build support as well
+Signed-off-by: David Ahern <dsahern@gmail.com>
+Cc: Arnaldo Carvalho de Melo <acme@ghostprotocols.net>
+Cc: Borislav Petkov <bp@alien8.de>
+Cc: Frederic Weisbecker <fweisbec@gmail.com>
+Cc: Ingo Molnar <mingo@kernel.org>
+Cc: Jiri Olsa <jolsa@redhat.com>
+Cc: Namhyung Kim <namhyung@kernel.org>
+Cc: Peter Zijlstra <a.p.zijlstra@chello.nl>
+Cc: Stephane Eranian <eranian@google.com>
+Cc: linux-kbuild@vger.kernel.org
+---
+ tools/perf/Makefile |    5 +++++
+ 1 file changed, 5 insertions(+)
+ create mode 100644 tools/perf/Pconfig
 
-Now when I'm checking that I see you made also some source
-changes to make the build separation possible. I haven't done
-much on this part and some of the libraries/features/builtins
-could not be disabled at the moment, because the code
-is not properly separated.
+diff --git a/tools/perf/Makefile b/tools/perf/Makefile
+index bb74c79..4e54d05 100644
+--- a/tools/perf/Makefile
++++ b/tools/perf/Makefile
+@@ -5,6 +5,9 @@ all:
+ 
+ include config/utilities.mak
+ 
++# Read in config if it exists
++-include $(OUTPUT)include/config/auto.conf
++
+ # Define V to have a more verbose compile.
+ #
+ # Define O to save output files in a separate directory.
+@@ -203,6 +206,7 @@ ifneq ($(OUTPUT),)
+ endif
+ 
+ BASIC_CFLAGS = \
++	-I$(OUTPUT)include \
+ 	-Iutil/include \
+ 	-Iarch/$(ARCH)/include \
+ 	$(if $(objtree),-I$(objtree)/arch/$(ARCH)/include/generated/uapi) \
+@@ -409,6 +413,7 @@ LIB_H += ui/helpline.h
+ LIB_H += ui/progress.h
+ LIB_H += ui/util.h
+ LIB_H += ui/ui.h
++LIB_H += $(OUTPUT)include/generated/autoconf.h
+ 
+ LIB_OBJS += $(OUTPUT)util/abspath.o
+ LIB_OBJS += $(OUTPUT)util/alias.o
+diff --git a/tools/perf/Pconfig b/tools/perf/Pconfig
+new file mode 100644
+index 0000000..e69de29
+-- 
+1.7.10.1
 
-> 
-> It hooks into the conf commands to generate a .config file.
-> Coincidentally I updated and expanded the patch series this morning
-> to include dependencies and such. Latest Pconfig attached to give
-> you an idea. I need to collapse a few patches and send them out
-> tonight.
-
-I'll check your repost
-
-thanks,
-jirka
