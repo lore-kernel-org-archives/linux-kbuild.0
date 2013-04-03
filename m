@@ -1,38 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-la0-f47.google.com ([209.85.215.47]:57315 "EHLO
-	mail-la0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1760406Ab3DBT26 (ORCPT
+Received: from vaxjo.synopsys.com ([198.182.60.75]:46161 "EHLO
+	vaxjo.synopsys.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1762662Ab3DCHNQ (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 2 Apr 2013 15:28:58 -0400
-Received: by mail-la0-f47.google.com with SMTP id fj20so724895lab.6
-        for <linux-kbuild@vger.kernel.org>; Tue, 02 Apr 2013 12:28:56 -0700 (PDT)
-From: Antony Pavlov <antonynpavlov@gmail.com>
-Subject: [PATCH] kbuild: doc: fix wrong ld-option example
-Date: Tue,  2 Apr 2013 23:30:31 +0400
-Message-Id: <1364931031-7573-1-git-send-email-antonynpavlov@gmail.com>
+	Wed, 3 Apr 2013 03:13:16 -0400
+From: Vineet Gupta <Vineet.Gupta1@synopsys.com>
+Subject: [PATCH] Kbuild: Avoid DTB rebuilds if source files are untouched
+Date: Wed, 3 Apr 2013 12:42:21 +0530
+Message-ID: <1364973141-16354-1-git-send-email-vgupta@synopsys.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Antony Pavlov <antonynpavlov@gmail.com>
+To: linux-kernel@vger.kernel.org
+Cc: Vineet Gupta <Vineet.Gupta1@synopsys.com>, Michal Marek <mmarek@suse.cz>, Stephen Warren <swarren@nvidia.com>, Grant Likely <grant.likely@secretlab.ca>, linux-kbuild@vger.kernel.org
 
-Signed-off-by: Antony Pavlov <antonynpavlov@gmail.com>
+Currently, for every ARC kernel build I see the following:
+
+--------------->8-----------------
+  DTB    arch/arc/boot/dts/angel4.dtb.S
+  AS      arch/arc/boot/dts/angel4.dtb.o
+  LD      arch/arc/boot/dts/built-in.o
+rm arch/arc/boot/dts/angel4.dtb.S        <-- forces rebuild next iter
+  CHK     kernel/config_data.h
+--------------->8-----------------
+
+Signed-off-by: Vineet Gupta <vgupta@synopsys.com>
+Cc: Michal Marek <mmarek@suse.cz>
+Cc: Stephen Warren <swarren@nvidia.com>
+Cc: Grant Likely <grant.likely@secretlab.ca>
+Cc: linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
 ---
- Documentation/kbuild/makefiles.txt |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ scripts/Makefile.lib |    2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/Documentation/kbuild/makefiles.txt b/Documentation/kbuild/makefiles.txt
-index 5198b74..5836294 100644
---- a/Documentation/kbuild/makefiles.txt
-+++ b/Documentation/kbuild/makefiles.txt
-@@ -593,7 +593,7 @@ more details, with real examples.
+diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+index 07125e6..17f96f4 100644
+--- a/scripts/Makefile.lib
++++ b/scripts/Makefile.lib
+@@ -265,6 +265,8 @@ cmd_dt_S_dtb=						\
+ 	echo '.balign STRUCT_ALIGNMENT'; 		\
+ ) > $@
  
- 	Example:
- 		#Makefile
--		LDFLAGS_vmlinux += $(call really-ld-option, -X)
-+		LDFLAGS_vmlinux += $(call ld-option, -X)
++.PRECIOUS: $(obj)/%.dtb.S
++
+ $(obj)/%.dtb.S: $(obj)/%.dtb
+ 	$(call cmd,dt_S_dtb)
  
- 
- === 4 Host Program support
 -- 
 1.7.10.4
 
