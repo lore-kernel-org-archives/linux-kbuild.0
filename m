@@ -1,50 +1,54 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ea0-f172.google.com ([209.85.215.172]:42609 "EHLO
-	mail-ea0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1760450Ab3DCPlm (ORCPT
+Received: from avon.wwwdotorg.org ([70.85.31.133]:48928 "EHLO
+	avon.wwwdotorg.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1758798Ab3DCQSa (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 3 Apr 2013 11:41:42 -0400
-Message-ID: <515C4DB6.3060004@googlemail.com>
-Date: Wed, 03 Apr 2013 16:41:42 +0100
-From: Chris Clayton <chris2553@googlemail.com>
+	Wed, 3 Apr 2013 12:18:30 -0400
+Message-ID: <515C5652.8070705@wwwdotorg.org>
+Date: Wed, 03 Apr 2013 10:18:26 -0600
+From: Stephen Warren <swarren@wwwdotorg.org>
 MIME-Version: 1.0
-Subject: Re: linux-3.9.0-rc1+: Output from "make kernelrelease"contains incorrect
- data
-References: <513B8FA7.9040200@googlemail.com> <5159534A.1070500@googlemail.com> <515C3D98.7080203@suse.cz>
-In-Reply-To: <515C3D98.7080203@suse.cz>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: Re: [PATCH] Kbuild: Avoid DTB rebuilds if source files are untouched
+References: <1364973141-16354-1-git-send-email-vgupta@synopsys.com> <515BD6B8.1020607@synopsys.com>
+In-Reply-To: <515BD6B8.1020607@synopsys.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>
+To: Vineet Gupta <Vineet.Gupta1@synopsys.com>
+Cc: "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>, linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Stephen Warren <swarren@nvidia.com>, Grant Likely <grant.likely@secretlab.ca>, linux-kbuild@vger.kernel.org
 
-
-
-On 04/03/13 15:32, Michal Marek wrote:
-> On 1.4.2013 11:28, Chris Clayton wrote:
->> Ping!
+On 04/03/2013 01:14 AM, Vineet Gupta wrote:
+> forgot to CC linux-arch
+> 
+> On 04/03/2013 12:42 PM, Vineet Gupta wrote:
+>> Currently, for every ARC kernel build I see the following:
 >>
->> This is still happening with 3.9-rc5.
->>
->> [chris:~/kernel/linux]$ make bzImage
->> ...
->> Kernel: arch/x86/boot/bzImage is ready  (#14)
->> [chris:~/kernel/linux]$ make kernelrelease
->> scripts/kconfig/conf --silentoldconfig Kconfig
->> 3.9.0-rc5
->> [chris:~/kernel/linux]$ make kernelrelease
->> 3.9.0-rc5
->
-> You need to run make -s kernelrelease.
->
+>> --------------->8-----------------
+>>   DTB    arch/arc/boot/dts/angel4.dtb.S
+>>   AS      arch/arc/boot/dts/angel4.dtb.o
+>>   LD      arch/arc/boot/dts/built-in.o
+>> rm arch/arc/boot/dts/angel4.dtb.S        <-- forces rebuild next iter
+>>   CHK     kernel/config_data.h
+>> --------------->8-----------------
 
-Ah, right. I didn't see that announcement. The -s argument was not 
-necessary with earlier releases.
+I assume that's because the file is an intermediate file, and only built
+due to a chain of build rules, and hence make clean it up itself after
+the build?
 
-Sorry for the noise.
+>> diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
 
-Chris
+>> +.PRECIOUS: $(obj)/%.dtb.S
+>> +
+>>  $(obj)/%.dtb.S: $(obj)/%.dtb
+>>  	$(call cmd,dt_S_dtb)
 
-> Michal
->
+I'm not sure if .PRECIOUS is correct here. That prevents make from
+deleting the file if make is CTRL-C'd in the middle of generating it.
+Couldn't that leave a stale/corrupt file around that'd break the build.
+Judging by:
+
+http://www.gnu.org/software/make/manual/html_node/Special-Targets.html
+
+I think .SECONDARY might be a better choice? Does that solve the problem
+you're seeing?
