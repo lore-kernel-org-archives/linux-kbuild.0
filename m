@@ -1,70 +1,92 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pd0-f178.google.com ([209.85.192.178]:32983 "EHLO
-	mail-pd0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1761971Ab3DCXep (ORCPT
+Received: from avon.wwwdotorg.org ([70.85.31.133]:35679 "EHLO
+	avon.wwwdotorg.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1761367Ab3DCXfF (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 3 Apr 2013 19:34:45 -0400
-Received: by mail-pd0-f178.google.com with SMTP id w11so1114242pde.37
-        for <linux-kbuild@vger.kernel.org>; Wed, 03 Apr 2013 16:34:45 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <1365031688.24496.19.camel@smoke>
-References: <1365031688.24496.19.camel@smoke>
-Date: Wed, 3 Apr 2013 16:34:45 -0700
-Message-ID: <CAEDV+gJog=7dyq=uMf69dAchbdP2boaqXs9ydWmiq-XN+yJ66Q@mail.gmail.com>
-Subject: Re: kbuild not creating output dirs
-From: Christoffer Dall <cdall@cs.columbia.edu>
-Content-Type: text/plain; charset=ISO-8859-1
+	Wed, 3 Apr 2013 19:35:05 -0400
+From: Stephen Warren <swarren@wwwdotorg.org>
+Subject: [PATCH V2 1/7] kbuild: create an "include chroot" for DT bindings
+Date: Wed,  3 Apr 2013 17:34:52 -0600
+Message-Id: <1365032098-22825-1-git-send-email-swarren@wwwdotorg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Geoff Levand <geoff@infradead.org>
-Cc: Michal Marek <mmarek@suse.cz>, kvmarm@lists.cs.columbia.edu, linux-kbuild@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>, Grant Likely <glikely@secretlab.ca>, Rob Herring <robherring2@gmail.com>
+Cc: arm@kernel.org, Shawn Guo <shawn.guo@linaro.org>, Hiroshi Doyu <hdoyu@nvidia.com>, linux-kbuild@vger.kernel.org, devicetree-discuss@lists.ozlabs.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Stephen Warren <swarren@nvidia.com>
 
-there was a similar problem with the kvm 32-bit makefile at some
-point, the fix looks ok to me.
+From: Stephen Warren <swarren@nvidia.com>
 
--Christoffer
+The recent dtc+cpp support allows header files and C pre-processor
+defines/macros to be used when compiling device tree files. These
+headers will typically define various constants that are part of the
+device tree bindings.
 
-On Wed, Apr 3, 2013 at 4:28 PM, Geoff Levand <geoff@infradead.org> wrote:
-> Hi Michal,
->
-> I was building Marc's kvm development kernel outside of the
-> sources (make O=), and I got the following build error:
->
->   arch/arm64/kvm/../../../arch/arm/kvm/mmio.c: fatal error: opening dependency file arch/arm64/kvm/../../../arch/arm/kvm/.mmio.o.d: No such file or directory
->
-> The cause was that kbuild did not create the output directory
-> arch/arm64/kvm/../../../arch/arm/kvm, and so gcc failed.
->
-> Here is what was in his makefile:
->
->   obj-$(CONFIG_KVM_ARM_HOST) += $(addprefix ../../../virt/kvm/, kvm_main.o coalesced_mmio.o)
->
-> I changed this to build a composite and kbuild then created
-> the output directories:
->
->   obj-$(CONFIG_KVM_ARM_HOST) += kvm.o
->   kvm-$(CONFIG_KVM_ARM_HOST) += $(addprefix ../../../virt/kvm/, kvm_main.o coalesced_mmio.o)
->
-> I guess kbuild used some other rules and saw the dependency on
-> the output directory.
->
-> So, my questions are:
->
-> Is it expected that the original rule should fail?
-> Is my fix the correct way?
-> Can I use some other way to get those output directories created?
->
-> Just FYI, the original source is here:
->
->   https://git.kernel.org/cgit/linux/kernel/git/maz/arm-platforms.git/tree/arch/arm64/kvm/Makefile?h=kvm-arm64/kvm-for-next
->
-> Thanks for your help.
->
-> -Geoff
->
->
->
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/cucslists/listinfo/kvmarm
+The original patch which set up the dtc+cpp include path only considered
+using those headers from device tree files. However, most are also
+useful for kernel code which needs to interpret the device tree.
+
+In both the DT files and the kernel, I'd like to include the DT-related
+headers in the same way, for example, <dt-bindings/gpio/tegra-gpio.h>.
+That will simplify any text which discusses the DT header locations.
+
+Creating a <dt-bindings/> for kernel source to use is as simple as
+placing files into include/dt-bindings/.
+
+However, when compiling DT files, the include path should be restricted
+so that only the dt-bindings path is available; arbitrary kernel headers
+shouldn't be exposed. For this reason, create a specific include
+directory for use by dtc+cpp, and symlink dt-bindings from there to the
+actual location of include/dt-bindings/. For want of a better location,
+place this "include chroot" into the existing dts/ directory.
+
+arch/*/boot/dts/include/dt-bindings -> ../../../../../include/dt-bindings
+
+Some headers used by device tree files may not be useful to the kernel;
+they may be used simply to aid in constructing the DT file (e.g. macros
+to create a node), but not define any information that the kernel needs
+to share. These may be placed directly into arch/*/boot/dts/ along with
+the DT files themselves.
+
+Cc: Shawn Guo <shawn.guo@linaro.org>
+Cc: Hiroshi Doyu <hdoyu@nvidia.com>
+Acked-by: Michal Marek <mmarek@suse.cz>
+Acked-by: Shawn Guo <shawn.guo@linaro.org>
+Acked-by: Rob Herring <rob.herring@calxeda.com>
+Signed-off-by: Stephen Warren <swarren@nvidia.com>
+---
+Grant, Rob, Michal, I'm hoping for acks or comments from you so this
+series can be placed into a topic branch in the arm-soc repo, for others
+to build on during the 3.10 kernel cycle. Thanks.
+
+This first patch was previously posted separately as V2. I'm including
+it here to keep it with the whole series. I hope this series can be
+applied as a topic branch in arm-soc.
+---
+ arch/arm/boot/dts/include/dt-bindings |    1 +
+ scripts/Makefile.lib                  |    2 +-
+ 2 files changed, 2 insertions(+), 1 deletion(-)
+ create mode 120000 arch/arm/boot/dts/include/dt-bindings
+
+diff --git a/arch/arm/boot/dts/include/dt-bindings b/arch/arm/boot/dts/include/dt-bindings
+new file mode 120000
+index 0000000..08c00e4
+--- /dev/null
++++ b/arch/arm/boot/dts/include/dt-bindings
+@@ -0,0 +1 @@
++../../../../../include/dt-bindings
+\ No newline at end of file
+diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+index 07125e6..af35521 100644
+--- a/scripts/Makefile.lib
++++ b/scripts/Makefile.lib
+@@ -158,7 +158,7 @@ ld_flags       = $(LDFLAGS) $(ldflags-y)
+ 
+ dtc_cpp_flags  = -Wp,-MD,$(depfile) -nostdinc                            \
+ 		 -I$(srctree)/arch/$(SRCARCH)/boot/dts                   \
+-		 -I$(srctree)/arch/$(SRCARCH)/include/dts                \
++		 -I$(srctree)/arch/$(SRCARCH)/boot/dts/include           \
+ 		 -undef -D__DTS__
+ 
+ # Finds the multi-part object the current object will be linked into
+-- 
+1.7.10.4
+
