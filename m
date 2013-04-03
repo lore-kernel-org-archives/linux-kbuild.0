@@ -1,54 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from avon.wwwdotorg.org ([70.85.31.133]:48928 "EHLO
-	avon.wwwdotorg.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1758798Ab3DCQSa (ORCPT
+Received: from merlin.infradead.org ([205.233.59.134]:41085 "EHLO
+	merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1760953Ab3DCX2L (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 3 Apr 2013 12:18:30 -0400
-Message-ID: <515C5652.8070705@wwwdotorg.org>
-Date: Wed, 03 Apr 2013 10:18:26 -0600
-From: Stephen Warren <swarren@wwwdotorg.org>
-MIME-Version: 1.0
-Subject: Re: [PATCH] Kbuild: Avoid DTB rebuilds if source files are untouched
-References: <1364973141-16354-1-git-send-email-vgupta@synopsys.com> <515BD6B8.1020607@synopsys.com>
-In-Reply-To: <515BD6B8.1020607@synopsys.com>
-Content-Type: text/plain; charset=ISO-8859-1
+	Wed, 3 Apr 2013 19:28:11 -0400
+Message-ID: <1365031688.24496.19.camel@smoke>
+Subject: kbuild not creating output dirs
+From: Geoff Levand <geoff@infradead.org>
+Date: Wed, 03 Apr 2013 16:28:08 -0700
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Vineet Gupta <Vineet.Gupta1@synopsys.com>
-Cc: "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>, linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Stephen Warren <swarren@nvidia.com>, Grant Likely <grant.likely@secretlab.ca>, linux-kbuild@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org, Marc Zyngier <marc.zyngier@arm.com>, kvmarm@lists.cs.columbia.edu
 
-On 04/03/2013 01:14 AM, Vineet Gupta wrote:
-> forgot to CC linux-arch
-> 
-> On 04/03/2013 12:42 PM, Vineet Gupta wrote:
->> Currently, for every ARC kernel build I see the following:
->>
->> --------------->8-----------------
->>   DTB    arch/arc/boot/dts/angel4.dtb.S
->>   AS      arch/arc/boot/dts/angel4.dtb.o
->>   LD      arch/arc/boot/dts/built-in.o
->> rm arch/arc/boot/dts/angel4.dtb.S        <-- forces rebuild next iter
->>   CHK     kernel/config_data.h
->> --------------->8-----------------
+Hi Michal,
 
-I assume that's because the file is an intermediate file, and only built
-due to a chain of build rules, and hence make clean it up itself after
-the build?
+I was building Marc's kvm development kernel outside of the
+sources (make O=), and I got the following build error:
 
->> diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+  arch/arm64/kvm/../../../arch/arm/kvm/mmio.c: fatal error: opening dependency file arch/arm64/kvm/../../../arch/arm/kvm/.mmio.o.d: No such file or directory
 
->> +.PRECIOUS: $(obj)/%.dtb.S
->> +
->>  $(obj)/%.dtb.S: $(obj)/%.dtb
->>  	$(call cmd,dt_S_dtb)
+The cause was that kbuild did not create the output directory
+arch/arm64/kvm/../../../arch/arm/kvm, and so gcc failed.
 
-I'm not sure if .PRECIOUS is correct here. That prevents make from
-deleting the file if make is CTRL-C'd in the middle of generating it.
-Couldn't that leave a stale/corrupt file around that'd break the build.
-Judging by:
+Here is what was in his makefile:
 
-http://www.gnu.org/software/make/manual/html_node/Special-Targets.html
+  obj-$(CONFIG_KVM_ARM_HOST) += $(addprefix ../../../virt/kvm/, kvm_main.o coalesced_mmio.o)
 
-I think .SECONDARY might be a better choice? Does that solve the problem
-you're seeing?
+I changed this to build a composite and kbuild then created
+the output directories:
+
+  obj-$(CONFIG_KVM_ARM_HOST) += kvm.o
+  kvm-$(CONFIG_KVM_ARM_HOST) += $(addprefix ../../../virt/kvm/, kvm_main.o coalesced_mmio.o)
+
+I guess kbuild used some other rules and saw the dependency on
+the output directory.
+
+So, my questions are:
+
+Is it expected that the original rule should fail?
+Is my fix the correct way?
+Can I use some other way to get those output directories created?
+
+Just FYI, the original source is here:
+
+  https://git.kernel.org/cgit/linux/kernel/git/maz/arm-platforms.git/tree/arch/arm64/kvm/Makefile?h=kvm-arm64/kvm-for-next
+
+Thanks for your help.
+
+-Geoff
+
+
+
