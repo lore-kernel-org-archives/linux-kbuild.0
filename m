@@ -1,203 +1,118 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ozlabs.org ([203.10.76.45]:56545 "EHLO ozlabs.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1763745Ab3DDHv1 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 4 Apr 2013 03:51:27 -0400
-From: Rusty Russell <rusty@rustcorp.com.au>
-Subject: Re: make[2]: execvp: /bin/bash: Argument list too long
-In-Reply-To: <87boadpluf.fsf@rustcorp.com.au>
-References: <5148064c.NHUmXnvVxwyYN+nc%fengguang.wu@intel.com> <20130318235058.8c3c78ec.akpm@linux-foundation.org> <20130319131025.GC2706@phenom.dumpdata.com> <20130319150204.GA11928@localhost> <87vc8mpxys.fsf@rustcorp.com.au> <20130319204313.041b6c71.akpm@linux-foundation.org> <87boadpluf.fsf@rustcorp.com.au>
-Date: Thu, 04 Apr 2013 17:35:41 +1030
-Message-ID: <87li8y3hdm.fsf@rustcorp.com.au>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Received: from mail-we0-f169.google.com ([74.125.82.169]:51043 "EHLO
+	mail-we0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S933419Ab3DDIEw (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 4 Apr 2013 04:04:52 -0400
+Received: by mail-we0-f169.google.com with SMTP id x43so1891240wey.28
+        for <linux-kbuild@vger.kernel.org>; Thu, 04 Apr 2013 01:04:51 -0700 (PDT)
+Date: Thu, 4 Apr 2013 10:04:55 +0200
+From: Anisse Astier <anisse@astier.eu>
+Subject: Re: [PATCH 1/2] deb-pkg: split debug symbols in their own package
+Message-ID: <20130404100455.64367233@serenity>
+In-Reply-To: <1363946761-7449-1-git-send-email-anisse@astier.eu>
+References: <1363946761-7449-1-git-send-email-anisse@astier.eu>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andrew Morton <akpm@linux-foundation.org>
-Cc: Fengguang Wu <fengguang.wu@intel.com>, Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>, Dan Magenheimer <dan.magenheimer@oracle.com>, Bob Liu <lliubbo@gmail.com>, LKML <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, David Howells <dhowells@redhat.com>
+To: linux-kbuild@vger.kernel.org
+Cc: Anisse Astier <anisse@astier.eu>, linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, maximilian attems <max@stro.at>
 
-Rusty Russell <rusty@rustcorp.com.au> writes:
-> If this passes review, I'll split properly into three patches.
->
-> Thanks,
-> Rusty.
+Any comments ?
 
-Noone commented, so split into 3 and into modules-next it goes...
+Anisse
 
-Cheers,
-Rusty.
+On Fri, 22 Mar 2013 11:06:00 +0100, Anisse Astier <anisse@astier.eu> wrote :
 
-> modpost: handle huge numbers of modules.
->
-> (FIXME: Split into multiple patches).
->
-> strace shows:
-> 72102 execve("/bin/sh", ["/bin/sh", "-c", "echo '  scripts/mod/modpost -m -a
-> -o /cc/wfg/sound-compiletest/Module.symvers      -s'; scripts/
-> mod/modpost -m -a -o /cc/wfg/sound-compiletest/Module.symvers      -s vmlinux
-> arch/x86/crypto/ablk_helper.o arch/x86/crypto/aes-i586.o arch
-> /x86/crypto/aesni-intel.o arch/x86/crypto/crc32-pclmul.o
-> ...
-> drivers/ata/sata_promise.o "...], [/* 119 vars */] <unfinished ...>
-> 71827 wait4(-1,  <unfinished ...>
-> 72102 <... execve resumed> )            = -1 E2BIG (Argument list too long)
->
-> Reported-by: Fengguang Wu <fengguang.wu@intel.com>
-> Signed-off-by: Rusty Russell <rusty@rustcorp.com.au>
->
-> diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
-> index cf82c83..8dcdca2 100644
-> --- a/scripts/Makefile.modpost
-> +++ b/scripts/Makefile.modpost
-> @@ -60,7 +60,8 @@ kernelsymfile := $(objtree)/Module.symvers
->  modulesymfile := $(firstword $(KBUILD_EXTMOD))/Module.symvers
+> This can reduce almost 3 times the size of the linux-image package,
+> while keeping the debug symbols available for this particular build, in
+> their own package.
+> 
+> This mimics the way kernels are built in debian, ubuntu, or with
+> make-kpkg, and comes at the price of a small slowdown in the building of
+> packages.
+> 
+> Signed-off-by: Anisse Astier <anisse@astier.eu>
+> ---
+>  scripts/package/builddeb | 33 ++++++++++++++++++++++++++++++++-
+>  1 file changed, 32 insertions(+), 1 deletion(-)
+> 
+> diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+> index acb8650..7f7a7fd 100644
+> --- a/scripts/package/builddeb
+> +++ b/scripts/package/builddeb
+> @@ -78,17 +78,19 @@ tmpdir="$objtree/debian/tmp"
+>  fwdir="$objtree/debian/fwtmp"
+>  kernel_headers_dir="$objtree/debian/hdrtmp"
+>  libc_headers_dir="$objtree/debian/headertmp"
+> +dbg_dir="$objtree/debian/dbgtmp"
+>  packagename=linux-image-$version
+>  fwpackagename=linux-firmware-image
+>  kernel_headers_packagename=linux-headers-$version
+>  libc_headers_packagename=linux-libc-dev
+> +dbg_packagename=$packagename-dbg
 >  
->  # Step 1), find all modules listed in $(MODVERDIR)/
-> -__modules := $(sort $(shell grep -h '\.ko$$' /dev/null $(wildcard $(MODVERDIR)/*.mod)))
-> +MODLISTCMD := find $(MODVERDIR) -name '*.mod' | xargs -r grep -h '\.ko$$' | sort -u
-> +__modules := $(shell $(MODLISTCMD))
->  modules   := $(patsubst %.o,%.ko, $(wildcard $(__modules:.ko=.o)))
+>  if [ "$ARCH" = "um" ] ; then
+>  	packagename=user-mode-linux-$version
+>  fi
 >  
->  # Stop after building .o files if NOFINAL is set. Makes compile tests quicker
-> @@ -78,12 +79,13 @@ modpost = scripts/mod/modpost                    \
->   $(if $(CONFIG_DEBUG_SECTION_MISMATCH),,-S)      \
->   $(if $(KBUILD_EXTMOD)$(KBUILD_MODPOST_WARN),-w)
+>  # Setup the directory structure
+> -rm -rf "$tmpdir" "$fwdir" "$kernel_headers_dir" "$libc_headers_dir"
+> +rm -rf "$tmpdir" "$fwdir" "$kernel_headers_dir" "$libc_headers_dir" "$dbg_dir"
+>  mkdir -m 755 -p "$tmpdir/DEBIAN"
+>  mkdir -p  "$tmpdir/lib" "$tmpdir/boot" "$tmpdir/usr/share/doc/$packagename"
+>  mkdir -m 755 -p "$fwdir/DEBIAN"
+> @@ -98,6 +100,8 @@ mkdir -p "$libc_headers_dir/usr/share/doc/$libc_headers_packagename"
+>  mkdir -m 755 -p "$kernel_headers_dir/DEBIAN"
+>  mkdir -p "$kernel_headers_dir/usr/share/doc/$kernel_headers_packagename"
+>  mkdir -p "$kernel_headers_dir/lib/modules/$version/"
+> +mkdir -p "$dbg_dir/usr/share/doc/$dbg_packagename"
+> +mkdir -m 755 -p "$dbg_dir/DEBIAN"
+>  if [ "$ARCH" = "um" ] ; then
+>  	mkdir -p "$tmpdir/usr/lib/uml/modules/$version" "$tmpdir/usr/bin"
+>  fi
+> @@ -128,8 +132,24 @@ if grep -q '^CONFIG_MODULES=y' .config ; then
+>  		mv "$tmpdir/lib/modules/$version"/* "$tmpdir/usr/lib/uml/modules/$version/"
+>  		rmdir "$tmpdir/lib/modules/$version"
+>  	fi
+> +	# Build debug package
+> +	(
+> +		cd $tmpdir
+> +		for module in $(find lib/modules/ -name *.ko); do
+> +			mkdir -p $(dirname $dbg_dir/usr/lib/debug/$module)
+> +			# only keep debug symbols in the debug file
+> +			objcopy --only-keep-debug $module $dbg_dir/usr/lib/debug/$module
+> +			# strip original module from debug symbols
+> +			objcopy --strip-debug $module
+> +			# then add a link to those
+> +			objcopy --add-gnu-debuglink=$dbg_dir/usr/lib/debug/$module $module
+> +		done
+> +	)
+>  fi
 >  
-> +# We can go over command line length here, so be careful.
->  quiet_cmd_modpost = MODPOST $(words $(filter-out vmlinux FORCE, $^)) modules
-> -      cmd_modpost = $(modpost) -s
-> +      cmd_modpost = $(MODLISTCMD) | sed 's/\.ko$$/.o/' | $(modpost) -s -T -
->  
->  PHONY += __modpost
->  __modpost: $(modules:.ko=.o) FORCE
-> -	$(call cmd,modpost) $(wildcard vmlinux) $(filter-out FORCE,$^)
-> +	$(call cmd,modpost) $(wildcard vmlinux)
->  
->  quiet_cmd_kernel-mod = MODPOST $@
->        cmd_kernel-mod = $(modpost) $@
-> diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-> index f6913db..1f90961 100644
-> --- a/scripts/mod/modpost.c
-> +++ b/scripts/mod/modpost.c
-> @@ -15,6 +15,8 @@
->  #include <stdio.h>
->  #include <ctype.h>
->  #include <string.h>
-> +#include <limits.h>
-> +#include <stdbool.h>
->  #include "modpost.h"
->  #include "../../include/generated/autoconf.h"
->  #include "../../include/linux/license.h"
-> @@ -78,6 +80,14 @@ PRINTF void merror(const char *fmt, ...)
->  	va_end(arglist);
->  }
->  
-> +static inline bool strends(const char *str, const char *postfix)
-> +{
-> +	if (strlen(str) < strlen(postfix))
-> +		return false;
+> +mkdir -p $dbg_dir/usr/lib/debug/lib/modules/$version/
+> +cp vmlinux $dbg_dir/usr/lib/debug/lib/modules/$version/
 > +
-> +	return strcmp(str + strlen(str) - strlen(postfix), postfix) == 0;
-> +}
+>  if [ "$ARCH" != "um" ]; then
+>  	$MAKE headers_check KBUILD_SRC=
+>  	$MAKE headers_install KBUILD_SRC= INSTALL_HDR_PATH="$libc_headers_dir/usr"
+> @@ -297,6 +317,17 @@ if [ "$ARCH" != "um" ]; then
+>  	create_package "$libc_headers_packagename" "$libc_headers_dir"
+>  fi
+>  
+> +cat <<EOF >> debian/control
 > +
->  static int is_vmlinux(const char *modname)
->  {
->  	const char *myname;
-> @@ -113,22 +123,20 @@ static struct module *find_module(char *modname)
->  	return mod;
->  }
->  
-> -static struct module *new_module(char *modname)
-> +static struct module *new_module(const char *modname)
->  {
->  	struct module *mod;
-> -	char *p, *s;
-> +	char *p;
->  
->  	mod = NOFAIL(malloc(sizeof(*mod)));
->  	memset(mod, 0, sizeof(*mod));
->  	p = NOFAIL(strdup(modname));
->  
->  	/* strip trailing .o */
-> -	s = strrchr(p, '.');
-> -	if (s != NULL)
-> -		if (strcmp(s, ".o") == 0) {
-> -			*s = '\0';
-> -			mod->is_dot_o = 1;
-> -		}
-> +	if (strends(p, ".o")) {
-> +		p[strlen(p) - 2] = '\0';
-> +		mod->is_dot_o = 1;
-> +	}
->  
->  	/* add to list */
->  	mod->name = p;
-> @@ -1756,6 +1764,27 @@ static void read_symbols(char *modname)
->  		mod->unres = alloc_symbol("module_layout", 0, mod->unres);
->  }
->  
-> +static void read_symbols_from_files(const char *filename)
-> +{
-> +	FILE *in = stdin;
-> +	char fname[PATH_MAX];
+> +Package: $dbg_packagename
+> +Section: devel
+> +Provides: linux-debug, linux-debug-$version
+> +Architecture: any
+> +Description: Linux kernel debugging symbols for $version
+> + This package will come in handy if you need to debug the kernel.
+> +EOF
 > +
-> +	if (strcmp(filename, "-") != 0) {
-> +		in = fopen(filename, "r");
-> +		if (!in)
-> +			fatal("Can't open filenames file %s: %m", filename);
-> +	}
-> +
-> +	while (fgets(fname, PATH_MAX, in) != NULL) {
-> +		if (strends(fname, "\n"))
-> +			fname[strlen(fname)-1] = '\0';
-> +		read_symbols(fname);
-> +	}
-> +
-> +	if (in != stdin)
-> +		fclose(in);
-> +}
-> +
->  #define SZ 500
+> +create_package "$dbg_packagename" "$dbg_dir"
+>  create_package "$packagename" "$tmpdir"
 >  
->  /* We first write the generated file into memory using the
-> @@ -2117,13 +2146,13 @@ int main(int argc, char **argv)
->  	struct module *mod;
->  	struct buffer buf = { };
->  	char *kernel_read = NULL, *module_read = NULL;
-> -	char *dump_write = NULL;
-> +	char *dump_write = NULL, *files_source = NULL;
->  	int opt;
->  	int err;
->  	struct ext_sym_list *extsym_iter;
->  	struct ext_sym_list *extsym_start = NULL;
->  
-> -	while ((opt = getopt(argc, argv, "i:I:e:msSo:awM:K:")) != -1) {
-> +	while ((opt = getopt(argc, argv, "i:I:e:msST:o:awM:K:")) != -1) {
->  		switch (opt) {
->  		case 'i':
->  			kernel_read = optarg;
-> @@ -2155,6 +2184,9 @@ int main(int argc, char **argv)
->  		case 'S':
->  			sec_mismatch_verbose = 0;
->  			break;
-> +		case 'T':
-> +			files_source = optarg;
-> +			break;
->  		case 'w':
->  			warn_unresolved = 1;
->  			break;
-> @@ -2177,6 +2209,9 @@ int main(int argc, char **argv)
->  	while (optind < argc)
->  		read_symbols(argv[optind++]);
->  
-> +	if (files_source)
-> +		read_symbols_from_files(files_source);
-> +
->  	for (mod = modules; mod; mod = mod->next) {
->  		if (mod->skip)
->  			continue;
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kernel" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> Please read the FAQ at  http://www.tux.org/lkml/
+>  exit 0
