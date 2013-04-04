@@ -1,71 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from inca-roads.misterjones.org ([213.251.177.50]:47793 "EHLO
-	inca-roads.misterjones.org" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1758007Ab3DDLXz (ORCPT
+Received: from avon.wwwdotorg.org ([70.85.31.133]:45261 "EHLO
+	avon.wwwdotorg.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1763296Ab3DDQly (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 4 Apr 2013 07:23:55 -0400
-Subject: Re: kbuild not creating output dirs
+	Thu, 4 Apr 2013 12:41:54 -0400
+Message-ID: <515DAD4D.9020100@wwwdotorg.org>
+Date: Thu, 04 Apr 2013 10:41:49 -0600
+From: Stephen Warren <swarren@wwwdotorg.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: [PATCH V2 4/7] kbuild: always run gcc -E on *.dts, remove cmd_dtc_cpp
+References: <1365032098-22825-1-git-send-email-swarren@wwwdotorg.org> <1365032098-22825-4-git-send-email-swarren@wwwdotorg.org> <515CC317.2000703@elopez.com.ar>
+In-Reply-To: <515CC317.2000703@elopez.com.ar>
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 8bit
-Date: Thu, 04 Apr 2013 13:05:13 +0200
-From: Marc Zyngier <marc.zyngier@arm.com>
-In-Reply-To: <CAEDV+gJog=7dyq=uMf69dAchbdP2boaqXs9ydWmiq-XN+yJ66Q@mail.gmail.com>
-References: <1365031688.24496.19.camel@smoke> <CAEDV+gJog=7dyq=uMf69dAchbdP2boaqXs9ydWmiq-XN+yJ66Q@mail.gmail.com>
-Message-ID: <7122dbf190b8fbc7b734ac0956a9df89@localhost>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Christoffer Dall <cdall@cs.columbia.edu>, Geoff Levand <geoff@infradead.org>
-Cc: Michal Marek <mmarek@suse.cz>, kvmarm@lists.cs.columbia.edu, linux-kbuild@vger.kernel.org
+To: =?ISO-8859-1?Q?Emilio_L=F3pez?= <emilio@elopez.com.ar>
+Cc: Michal Marek <mmarek@suse.cz>, Grant Likely <glikely@secretlab.ca>, Rob Herring <robherring2@gmail.com>, Stephen Warren <swarren@nvidia.com>, linux-kbuild@vger.kernel.org, devicetree-discuss@lists.ozlabs.org, linux-kernel@vger.kernel.org, arm@kernel.org, Shawn Guo <shawn.guo@linaro.org>, linux-arm-kernel@lists.infradead.org, Hiroshi Doyu <hdoyu@nvidia.com>
 
-On Wed, 3 Apr 2013 16:34:45 -0700, Christoffer Dall
-<cdall@cs.columbia.edu>
-wrote:
-> there was a similar problem with the kvm 32-bit makefile at some
-> point, the fix looks ok to me.
+On 04/03/2013 06:02 PM, Emilio López wrote:
+> Hi Stephen,
 > 
-> -Christoffer
+> El 03/04/13 20:34, Stephen Warren escribió:
+>> From: Stephen Warren <swarren@nvidia.com>
+>>
+>> Replace cmd_dtc with cmd_dtc_cpp, and delete the latter.
+>>
+>> Previously, a special file extension (.dtsp) was required to trigger
+>> the C pre-processor to run on device tree files. This was ugly. Now that
+>> previous changes have enhanced cmd_dtc_cpp to collect dependency
+>> information from both gcc -E and dtc, we can transparently run the pre-
+>> processor on all device tree files, irrespective of whether they
+>>
 > 
-> On Wed, Apr 3, 2013 at 4:28 PM, Geoff Levand <geoff@infradead.org>
-wrote:
->> Hi Michal,
->>
->> I was building Marc's kvm development kernel outside of the
->> sources (make O=), and I got the following build error:
->>
->>   arch/arm64/kvm/../../../arch/arm/kvm/mmio.c: fatal error: opening
->>   dependency file arch/arm64/kvm/../../../arch/arm/kvm/.mmio.o.d: No
-such
->>   file or directory
->>
->> The cause was that kbuild did not create the output directory
->> arch/arm64/kvm/../../../arch/arm/kvm, and so gcc failed.
->>
->> Here is what was in his makefile:
->>
->>   obj-$(CONFIG_KVM_ARM_HOST) += $(addprefix ../../../virt/kvm/,
->>   kvm_main.o coalesced_mmio.o)
->>
->> I changed this to build a composite and kbuild then created
->> the output directories:
->>
->>   obj-$(CONFIG_KVM_ARM_HOST) += kvm.o
->>   kvm-$(CONFIG_KVM_ARM_HOST) += $(addprefix ../../../virt/kvm/,
->>   kvm_main.o coalesced_mmio.o)
->>
->> I guess kbuild used some other rules and saw the dependency on
->> the output directory.
->>
->> So, my questions are:
->>
->> Is it expected that the original rule should fail?
->> Is my fix the correct way?
->> Can I use some other way to get those output directories created?
+> I think a line got dropped on the commit description by mistake.
 
-Yeah, this looks like the thing to do. I'll fix the KVM/arm64 makefile.
+Thanks for noticing. I've locally added the following line to the end of
+the description, but won't repost unless there's some other reason, or
+the series is ack'd enough to actually be applied:
 
-Thanks for investigating.
+use /include/ or #include syntax to include *.dtsi.
 
-        M.
--- 
-Fast, cheap, reliable. Pick two.
