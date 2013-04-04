@@ -1,39 +1,65 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from zetta.elopez.com.ar ([199.30.59.35]:48242 "EHLO
-	zetta.elopez.com.ar" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932525Ab3DDApI (ORCPT
+Received: from kiruna.synopsys.com ([198.182.44.80]:33596 "EHLO
+	kiruna.synopsys.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752840Ab3DDFax (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 3 Apr 2013 20:45:08 -0400
-Message-ID: <515CC317.2000703@elopez.com.ar>
-Date: Wed, 03 Apr 2013 21:02:31 -0300
-From: =?ISO-8859-1?Q?Emilio_L=F3pez?= <emilio@elopez.com.ar>
+	Thu, 4 Apr 2013 01:30:53 -0400
+Message-ID: <515D0FFB.4030803@synopsys.com>
+Date: Thu, 4 Apr 2013 11:00:35 +0530
+From: Vineet Gupta <Vineet.Gupta1@synopsys.com>
 MIME-Version: 1.0
-Subject: Re: [PATCH V2 4/7] kbuild: always run gcc -E on *.dts, remove cmd_dtc_cpp
-References: <1365032098-22825-1-git-send-email-swarren@wwwdotorg.org> <1365032098-22825-4-git-send-email-swarren@wwwdotorg.org>
-In-Reply-To: <1365032098-22825-4-git-send-email-swarren@wwwdotorg.org>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] Kbuild: Avoid DTB rebuilds if source files are untouched
+References: <1364973141-16354-1-git-send-email-vgupta@synopsys.com> <515BD6B8.1020607@synopsys.com> <515C5652.8070705@wwwdotorg.org>
+In-Reply-To: <515C5652.8070705@wwwdotorg.org>
+Content-Type: text/plain; charset="ISO-8859-1"
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Stephen Warren <swarren@wwwdotorg.org>
-Cc: Michal Marek <mmarek@suse.cz>, Grant Likely <glikely@secretlab.ca>, Rob Herring <robherring2@gmail.com>, Stephen Warren <swarren@nvidia.com>, linux-kbuild@vger.kernel.org, devicetree-discuss@lists.ozlabs.org, linux-kernel@vger.kernel.org, arm@kernel.org, Shawn Guo <shawn.guo@linaro.org>, linux-arm-kernel@lists.infradead.org, Hiroshi Doyu <hdoyu@nvidia.com>
+Cc: "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>, linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Stephen Warren <swarren@nvidia.com>, Grant Likely <grant.likely@secretlab.ca>, linux-kbuild@vger.kernel.org
 
-Hi Stephen,
+On 04/03/2013 09:48 PM, Stephen Warren wrote:
+> On 04/03/2013 01:14 AM, Vineet Gupta wrote:
+>> forgot to CC linux-arch
+>>
+>> On 04/03/2013 12:42 PM, Vineet Gupta wrote:
+>>> Currently, for every ARC kernel build I see the following:
+>>>
+>>> --------------->8-----------------
+>>>   DTB    arch/arc/boot/dts/angel4.dtb.S
+>>>   AS      arch/arc/boot/dts/angel4.dtb.o
+>>>   LD      arch/arc/boot/dts/built-in.o
+>>> rm arch/arc/boot/dts/angel4.dtb.S        <-- forces rebuild next iter
+>>>   CHK     kernel/config_data.h
+>>> --------------->8-----------------
+> I assume that's because the file is an intermediate file, and only built
+> due to a chain of build rules, and hence make clean it up itself after
+> the build?
 
-El 03/04/13 20:34, Stephen Warren escribió:
-> From: Stephen Warren <swarren@nvidia.com>
-> 
-> Replace cmd_dtc with cmd_dtc_cpp, and delete the latter.
-> 
-> Previously, a special file extension (.dtsp) was required to trigger
-> the C pre-processor to run on device tree files. This was ugly. Now that
-> previous changes have enhanced cmd_dtc_cpp to collect dependency
-> information from both gcc -E and dtc, we can transparently run the pre-
-> processor on all device tree files, irrespective of whether they
-> 
+Indeed - I should have made that explicit in the Changelog.
 
-I think a line got dropped on the commit description by mistake.
+>>> +.PRECIOUS: $(obj)/%.dtb.S
+>>> +
+>>>  $(obj)/%.dtb.S: $(obj)/%.dtb
+>>>  	$(call cmd,dt_S_dtb)
+> I'm not sure if .PRECIOUS is correct here. That prevents make from
+> deleting the file if make is CTRL-C'd in the middle of generating it.
+> Couldn't that leave a stale/corrupt file around that'd break the build.
+> Judging by:
+>
+> http://www.gnu.org/software/make/manual/html_node/Special-Targets.html
+>
+> I think .SECONDARY might be a better choice? Does that solve the problem
+> you're seeing?
 
-Regards,
+Technically .SECONDARY is better - however it doesn't seem to work.
+Running make with various debug toggles doesn't seem to be helping with why
+.PRECIOUS works but not this.
+That is also likely reason for a bunch of other .PRECIOUS entries in the same file
+but no .SECONDARY.
 
-Emilio
+I presume this is something not specific to ARC kernel or my host.
+Can you try the .SECONDARY locally to see if it works for you.
+
+Thx,
+-Vineet
