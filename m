@@ -1,84 +1,73 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ob0-f170.google.com ([209.85.214.170]:58281 "EHLO
-	mail-ob0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1161930Ab3DEQGg (ORCPT
+Received: from avon.wwwdotorg.org ([70.85.31.133]:60767 "EHLO
+	avon.wwwdotorg.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1162471Ab3DESq6 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 5 Apr 2013 12:06:36 -0400
-Message-ID: <515EF68A.3020505@gmail.com>
-Date: Fri, 05 Apr 2013 11:06:34 -0500
-From: Rob Herring <robherring2@gmail.com>
-MIME-Version: 1.0
-Subject: Re: [PATCH V2 1/7] kbuild: create an "include chroot" for DT bindings
-References: <1365032098-22825-1-git-send-email-swarren@wwwdotorg.org> <515E09FA.1090408@gmail.com> <515E2257.4030607@wwwdotorg.org>
-In-Reply-To: <515E2257.4030607@wwwdotorg.org>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+	Fri, 5 Apr 2013 14:46:58 -0400
+From: Stephen Warren <swarren@wwwdotorg.org>
+Subject: [GIT PULL] dt: run C pre-processor on *.dts, create some standard headers
+Date: Fri,  5 Apr 2013 12:46:50 -0600
+Message-Id: <1365187610-29422-1-git-send-email-swarren@wwwdotorg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Stephen Warren <swarren@wwwdotorg.org>
-Cc: Michal Marek <mmarek@suse.cz>, Grant Likely <glikely@secretlab.ca>, arm@kernel.org, Shawn Guo <shawn.guo@linaro.org>, Hiroshi Doyu <hdoyu@nvidia.com>, linux-kbuild@vger.kernel.org, devicetree-discuss@lists.ozlabs.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Stephen Warren <swarren@nvidia.com>
+To: Rob Herring <rob.herring@calxeda.com>
+Cc: Grant Likely <glikely@secretlab.ca>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, devicetree-discuss@lists.ozlabs.org, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, Stephen Warren <swarren@wwwdotorg.org>
 
-On 04/04/2013 08:01 PM, Stephen Warren wrote:
-> On 04/04/2013 05:17 PM, Rob Herring wrote:
->> On 04/03/2013 06:34 PM, Stephen Warren wrote:
->>> From: Stephen Warren <swarren@nvidia.com>
->>>
->>> The recent dtc+cpp support allows header files and C pre-processor
->>> defines/macros to be used when compiling device tree files. These
->>> headers will typically define various constants that are part of the
->>> device tree bindings.
->>>
->>> The original patch which set up the dtc+cpp include path only considered
->>> using those headers from device tree files. However, most are also
->>> useful for kernel code which needs to interpret the device tree.
->>>
->>> In both the DT files and the kernel, I'd like to include the DT-related
->>> headers in the same way, for example, <dt-bindings/gpio/tegra-gpio.h>.
->>> That will simplify any text which discusses the DT header locations.
->>>
->>> Creating a <dt-bindings/> for kernel source to use is as simple as
->>> placing files into include/dt-bindings/.
->>>
->>> However, when compiling DT files, the include path should be restricted
->>> so that only the dt-bindings path is available; arbitrary kernel headers
->>> shouldn't be exposed. For this reason, create a specific include
->>> directory for use by dtc+cpp, and symlink dt-bindings from there to the
->>> actual location of include/dt-bindings/. For want of a better location,
->>> place this "include chroot" into the existing dts/ directory.
->>>
->>> arch/*/boot/dts/include/dt-bindings -> ../../../../../include/dt-bindings
->>>
->>> Some headers used by device tree files may not be useful to the kernel;
->>> they may be used simply to aid in constructing the DT file (e.g. macros
->>> to create a node), but not define any information that the kernel needs
->>> to share. These may be placed directly into arch/*/boot/dts/ along with
->>> the DT files themselves.
->>>
->>> Cc: Shawn Guo <shawn.guo@linaro.org>
->>> Cc: Hiroshi Doyu <hdoyu@nvidia.com>
->>> Acked-by: Michal Marek <mmarek@suse.cz>
->>> Acked-by: Shawn Guo <shawn.guo@linaro.org>
->>> Acked-by: Rob Herring <rob.herring@calxeda.com>
->>> Signed-off-by: Stephen Warren <swarren@nvidia.com>
->>> ---
->>> Grant, Rob, Michal, I'm hoping for acks or comments from you so this
->>> series can be placed into a topic branch in the arm-soc repo, for others
->>> to build on during the 3.10 kernel cycle. Thanks.
->>
->> Well, you have mine here and the rest looks fine, so add it to the others.
-> 
-> Rob,
-> 
-> I had originally hoped for this to go into an arm-soc branch so that a
-> number of SoCs could convert to use the feature in the same release,
-> hence I was looking for acks to let that happen.
-> 
-> However, it's too late in the 3.10 cycle now for that to happen. Can the
-> series be applied to the DT tree instead; people can convert during the
-> 3.11 cycle.
+Rob, it might be worth keeping this in a separate branch in linux-next
+so you can pull it out if it causes any issues. I've been using these
+patches for quite a while now, but there's always opportunity for
+surprises on architectures I don't use. I did just fix a bug when
+building with O= a few days back, hence the V2 that I posted as patches.
 
-That is fine. Can you send me a pull request.
+----------------------------------------------------------------
 
-Rob
+This branch enhances the support for running dtc on device tree files.
 
+A dedicated directory is created for header files that provide constants
+for device-tree bindings.
 
+The kbuild dependency script processor is enhanced to support processing
+the dependency outputs from multiple separate commands at once.
+
+The kbuild dtc rule is modified so that the C pre-processor is always
+applied when compiling any device tree.
+
+Some standard headers are created which define common constants for GPIO,
+IRQ, and ARM GIC device tree bindings.
+
+----------------------------------------------------------------
+
+The following changes since commit 6dbe51c251a327e012439c4772097a13df43c5b8:
+
+  Linux 3.9-rc1
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/swarren/linux-tegra.git tegra-for-3.10-dtc-cpp-chroot-std-headers
+
+for you to fetch changes up to 4be505d4fc7a07371a2b658469ca1dda99993ca3:
+
+  ARM: dt: create a DT header for the GIC
+
+----------------------------------------------------------------
+
+Stephen Warren (7):
+      kbuild: create an "include chroot" for DT bindings
+      kbuild: fixdep: support concatenated dep files
+      kbuild: cmd_dtc_cpp: extract deps from both gcc -E and dtc
+      kbuild: always run gcc -E on *.dts, remove cmd_dtc_cpp
+      ARM: dt: add header to define GPIO flags
+      ARM: dt: add header to define IRQ flags
+      ARM: dt: create a DT header for the GIC
+
+ arch/arm/boot/dts/include/dt-bindings           |    1 +
+ include/dt-bindings/gpio/gpio.h                 |   15 +++
+ .../dt-bindings/interrupt-controller/arm-gic.h  |   22 +++++
+ include/dt-bindings/interrupt-controller/irq.h  |   19 ++++
+ scripts/Makefile.lib                            |   17 ++--
+ scripts/basic/fixdep.c                          |   93 ++++++++++++------
+ 6 files changed, 125 insertions(+), 42 deletions(-)
+ create mode 120000 arch/arm/boot/dts/include/dt-bindings
+ create mode 100644 include/dt-bindings/gpio/gpio.h
+ create mode 100644 include/dt-bindings/interrupt-controller/arm-gic.h
+ create mode 100644 include/dt-bindings/interrupt-controller/irq.h
