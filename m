@@ -1,38 +1,31 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-oa0-f42.google.com ([209.85.219.42]:58495 "EHLO
-	mail-oa0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1162477Ab3DESys (ORCPT
+Received: from co9ehsobe002.messaging.microsoft.com ([207.46.163.25]:38607
+	"EHLO co9outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1757035Ab3DGHPp (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 5 Apr 2013 14:54:48 -0400
-Message-ID: <515F1DF5.3070601@gmail.com>
-Date: Fri, 05 Apr 2013 13:54:45 -0500
-From: Rob Herring <robherring2@gmail.com>
-MIME-Version: 1.0
-Subject: Re: [GIT PULL] dt: run C pre-processor on *.dts, create some standard
- headers
+	Sun, 7 Apr 2013 03:15:45 -0400
+Date: Sun, 7 Apr 2013 15:15:45 +0800
+From: Shawn Guo <shawn.guo@linaro.org>
+Subject: Re: [GIT PULL] dt: run C pre-processor on *.dts, create some
+ standard headers
+Message-ID: <20130407071542.GA4214@S2101-09.ap.freescale.net>
 References: <1365187610-29422-1-git-send-email-swarren@wwwdotorg.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
 In-Reply-To: <1365187610-29422-1-git-send-email-swarren@wwwdotorg.org>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Stephen Warren <swarren@wwwdotorg.org>
-Cc: Grant Likely <glikely@secretlab.ca>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, devicetree-discuss@lists.ozlabs.org, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Cc: Rob Herring <rob.herring@calxeda.com>, Michal Marek <mmarek@suse.cz>, Grant Likely <glikely@secretlab.ca>, linux-kbuild@vger.kernel.org, devicetree-discuss@lists.ozlabs.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, arm@kernel.org
 
-On 04/05/2013 01:46 PM, Stephen Warren wrote:
+On Fri, Apr 05, 2013 at 12:46:50PM -0600, Stephen Warren wrote:
 > Rob, it might be worth keeping this in a separate branch in linux-next
 > so you can pull it out if it causes any issues. I've been using these
 > patches for quite a while now, but there's always opportunity for
 > surprises on architectures I don't use. I did just fix a bug when
 > building with O= a few days back, hence the V2 that I posted as patches.
 > 
-
-No, you're on the hook to fix anything. :) My next branch is pulled by
-Grant and is not rebased. Perhaps we should change that, but it's not
-going to happen right away.
-
-Rob
-
 > ----------------------------------------------------------------
 > 
 > This branch enhances the support for running dtc on device tree files.
@@ -59,6 +52,12 @@ Rob
 > 
 >   git://git.kernel.org/pub/scm/linux/kernel/git/swarren/linux-tegra.git tegra-for-3.10-dtc-cpp-chroot-std-headers
 > 
+I just rebuilt my imx/dt branch based on this to avoid all those dts
+files renaming.  So regardless of the path it goes to mainline, I will
+need it as a dependency in arm-soc tree.
+
+Shawn
+
 > for you to fetch changes up to 4be505d4fc7a07371a2b658469ca1dda99993ca3:
 > 
 >   ARM: dt: create a DT header for the GIC
@@ -85,5 +84,8 @@ Rob
 >  create mode 100644 include/dt-bindings/gpio/gpio.h
 >  create mode 100644 include/dt-bindings/interrupt-controller/arm-gic.h
 >  create mode 100644 include/dt-bindings/interrupt-controller/irq.h
-> 
+> _______________________________________________
+> devicetree-discuss mailing list
+> devicetree-discuss@lists.ozlabs.org
+> https://lists.ozlabs.org/listinfo/devicetree-discuss
 
