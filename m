@@ -1,48 +1,28 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cpsmtpb-ews05.kpnxchange.com ([213.75.39.8]:57603 "EHLO
-	cpsmtpb-ews05.kpnxchange.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1761729Ab3DHKv1 (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 8 Apr 2013 06:51:27 -0400
-Message-ID: <1365418285.1830.90.camel@x61.thuisdomein>
-Subject: [PATCH v2] doc: change example to existing Makefile fragment
-From: Paul Bolle <pebolle@tiscali.nl>
-Date: Mon, 08 Apr 2013 12:51:25 +0200
-In-Reply-To: <51629F0F.6070501@suse.cz>
-References: <1364206584.1390.268.camel@x61.thuisdomein>
-	 <1364258406.15703.70@driftwood> <51629F0F.6070501@suse.cz>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Received: from cantor2.suse.de ([195.135.220.15]:50738 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S935282Ab3DHLBS (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 8 Apr 2013 07:01:18 -0400
+Message-ID: <5162A37C.4090409@suse.cz>
+Date: Mon, 08 Apr 2013 13:01:16 +0200
+From: Michal Marek <mmarek@suse.cz>
+MIME-Version: 1.0
+Subject: Re: [PATCH v2] doc: change example to existing Makefile fragment
+References: <1364206584.1390.268.camel@x61.thuisdomein>  <1364258406.15703.70@driftwood> <51629F0F.6070501@suse.cz> <1365418285.1830.90.camel@x61.thuisdomein>
+In-Reply-To: <1365418285.1830.90.camel@x61.thuisdomein>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
+To: Paul Bolle <pebolle@tiscali.nl>
 Cc: Rob Landley <rob@landley.net>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Signed-off-by: Paul Bolle <pebolle@tiscali.nl>
-Acked-by: Rob Landley <rob@landley.net>
----
-v2: added Rob's ACK and send to Michal e.a., for the kbuild tree.
+On 8.4.2013 12:51, Paul Bolle wrote:
+> Signed-off-by: Paul Bolle <pebolle@tiscali.nl>
+> Acked-by: Rob Landley <rob@landley.net>
+> ---
+> v2: added Rob's ACK and send to Michal e.a., for the kbuild tree.
 
- Documentation/kbuild/makefiles.txt | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+Thanks, applied to kbuild.git#misc.
 
-diff --git a/Documentation/kbuild/makefiles.txt b/Documentation/kbuild/makefiles.txt
-index 5198b74..020bb67 100644
---- a/Documentation/kbuild/makefiles.txt
-+++ b/Documentation/kbuild/makefiles.txt
-@@ -921,8 +921,9 @@ When kbuild executes, the following steps are followed (roughly):
- 	Often, the KBUILD_CFLAGS variable depends on the configuration.
- 
- 	Example:
--		#arch/x86/Makefile
--		cflags-$(CONFIG_M386) += -march=i386
-+		#arch/x86/boot/compressed/Makefile
-+		cflags-$(CONFIG_X86_32) := -march=i386
-+		cflags-$(CONFIG_X86_64) := -mcmodel=small
- 		KBUILD_CFLAGS += $(cflags-y)
- 
- 	Many arch Makefiles dynamically run the target C compiler to
--- 
-1.7.11.7
-
+Michal
