@@ -1,91 +1,56 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from co9ehsobe002.messaging.microsoft.com ([207.46.163.25]:38607
-	"EHLO co9outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1757035Ab3DGHPp (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 7 Apr 2013 03:15:45 -0400
-Date: Sun, 7 Apr 2013 15:15:45 +0800
-From: Shawn Guo <shawn.guo@linaro.org>
-Subject: Re: [GIT PULL] dt: run C pre-processor on *.dts, create some
- standard headers
-Message-ID: <20130407071542.GA4214@S2101-09.ap.freescale.net>
-References: <1365187610-29422-1-git-send-email-swarren@wwwdotorg.org>
+Received: from cantor2.suse.de ([195.135.220.15]:47167 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S964863Ab3DHJ7v (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 8 Apr 2013 05:59:51 -0400
+Message-ID: <51629515.4000702@suse.cz>
+Date: Mon, 08 Apr 2013 11:59:49 +0200
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <1365187610-29422-1-git-send-email-swarren@wwwdotorg.org>
+Subject: Re: [PATCH v2] kbuild: fix ld-option function
+References: <1365000153-8318-1-git-send-email-antonynpavlov@gmail.com>
+In-Reply-To: <1365000153-8318-1-git-send-email-antonynpavlov@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-2
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Stephen Warren <swarren@wwwdotorg.org>
-Cc: Rob Herring <rob.herring@calxeda.com>, Michal Marek <mmarek@suse.cz>, Grant Likely <glikely@secretlab.ca>, linux-kbuild@vger.kernel.org, devicetree-discuss@lists.ozlabs.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, arm@kernel.org
+To: Antony Pavlov <antonynpavlov@gmail.com>
+Cc: Sascha Hauer <s.hauer@pengutronix.de>, linux-kbuild@vger.kernel.org
 
-On Fri, Apr 05, 2013 at 12:46:50PM -0600, Stephen Warren wrote:
-> Rob, it might be worth keeping this in a separate branch in linux-next
-> so you can pull it out if it causes any issues. I've been using these
-> patches for quite a while now, but there's always opportunity for
-> surprises on architectures I don't use. I did just fix a bug when
-> building with O= a few days back, hence the V2 that I posted as patches.
+On 3.4.2013 16:42, Antony Pavlov wrote:
+> The kbuild's ld-option function is broken because
+> the command
+>   $(CC) /dev/null -c -o "$$TMPO"
+> does not create object file!
 > 
-> ----------------------------------------------------------------
+> I have used a relatively old mips gcc 3.4.6 cross-compiler
+> and a relatively new gcc 4.7.2 to check this fact
+> but the results are the same.
 > 
-> This branch enhances the support for running dtc on device tree files.
+> EXAMPLE:
+>   $ rm /tmp/1.o
+>   $ mips-linux-gcc /dev/null -c -o /tmp/1.o
+>   mips-linux-gcc: /dev/null: linker input file unused because linking not done
+>   $ ls -la /tmp/1.o
+>   ls: cannot access /tmp/1.o: No such file or directory
 > 
-> A dedicated directory is created for header files that provide constants
-> for device-tree bindings.
+> We can easily fix the problem by adding
+> the '-x c' compiler option.
 > 
-> The kbuild dependency script processor is enhanced to support processing
-> the dependency outputs from multiple separate commands at once.
+> EXAMPLE:
+>   $ rm /tmp/1.o
+>   $ mips-linux-gcc -x c /dev/null -c -o /tmp/1.o
+>   $ ls -la /tmp/1.o
+>   -rw-r--r-- 1 antony antony 778 Apr  2 20:40 /tmp/1.o
 > 
-> The kbuild dtc rule is modified so that the C pre-processor is always
-> applied when compiling any device tree.
+> Also fix wrong ld-option example.
 > 
-> Some standard headers are created which define common constants for GPIO,
-> IRQ, and ARM GIC device tree bindings.
-> 
-> ----------------------------------------------------------------
-> 
-> The following changes since commit 6dbe51c251a327e012439c4772097a13df43c5b8:
-> 
->   Linux 3.9-rc1
-> 
-> are available in the git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/swarren/linux-tegra.git tegra-for-3.10-dtc-cpp-chroot-std-headers
-> 
-I just rebuilt my imx/dt branch based on this to avoid all those dts
-files renaming.  So regardless of the path it goes to mainline, I will
-need it as a dependency in arm-soc tree.
+> Signed-off-by: Antony Pavlov <antonynpavlov@gmail.com>
+> ---
+>  Documentation/kbuild/makefiles.txt |    2 +-
+>  scripts/Kbuild.include             |    2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
 
-Shawn
+Applied to kbuild.git#kbuild, thanks.
 
-> for you to fetch changes up to 4be505d4fc7a07371a2b658469ca1dda99993ca3:
-> 
->   ARM: dt: create a DT header for the GIC
-> 
-> ----------------------------------------------------------------
-> 
-> Stephen Warren (7):
->       kbuild: create an "include chroot" for DT bindings
->       kbuild: fixdep: support concatenated dep files
->       kbuild: cmd_dtc_cpp: extract deps from both gcc -E and dtc
->       kbuild: always run gcc -E on *.dts, remove cmd_dtc_cpp
->       ARM: dt: add header to define GPIO flags
->       ARM: dt: add header to define IRQ flags
->       ARM: dt: create a DT header for the GIC
-> 
->  arch/arm/boot/dts/include/dt-bindings           |    1 +
->  include/dt-bindings/gpio/gpio.h                 |   15 +++
->  .../dt-bindings/interrupt-controller/arm-gic.h  |   22 +++++
->  include/dt-bindings/interrupt-controller/irq.h  |   19 ++++
->  scripts/Makefile.lib                            |   17 ++--
->  scripts/basic/fixdep.c                          |   93 ++++++++++++------
->  6 files changed, 125 insertions(+), 42 deletions(-)
->  create mode 120000 arch/arm/boot/dts/include/dt-bindings
->  create mode 100644 include/dt-bindings/gpio/gpio.h
->  create mode 100644 include/dt-bindings/interrupt-controller/arm-gic.h
->  create mode 100644 include/dt-bindings/interrupt-controller/irq.h
-> _______________________________________________
-> devicetree-discuss mailing list
-> devicetree-discuss@lists.ozlabs.org
-> https://lists.ozlabs.org/listinfo/devicetree-discuss
-
+Michal
