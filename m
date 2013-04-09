@@ -1,46 +1,31 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-we0-f177.google.com ([74.125.82.177]:45219 "EHLO
-	mail-we0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S935556Ab3DHRHR convert rfc822-to-8bit (ORCPT
+Received: from mail-wg0-f53.google.com ([74.125.82.53]:45104 "EHLO
+	mail-wg0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S936498Ab3DIKGN (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 8 Apr 2013 13:07:17 -0400
-Received: by mail-we0-f177.google.com with SMTP id o45so4641829wer.36
-        for <linux-kbuild@vger.kernel.org>; Mon, 08 Apr 2013 10:07:16 -0700 (PDT)
-Date: Mon, 8 Apr 2013 19:06:45 +0200
+	Tue, 9 Apr 2013 06:06:13 -0400
+Received: by mail-wg0-f53.google.com with SMTP id c11so6608053wgh.8
+        for <linux-kbuild@vger.kernel.org>; Tue, 09 Apr 2013 03:06:11 -0700 (PDT)
+Date: Tue, 9 Apr 2013 12:05:47 +0200
 From: Anisse Astier <anisse@astier.eu>
 Subject: Re: [PATCH 1/2] deb-pkg: split debug symbols in their own package
-Message-ID: <20130408190645.29570fe5@serenity>
-In-Reply-To: <51629BFF.1080204@suse.cz>
+Message-ID: <20130409120547.64ad0d50@serenity>
+In-Reply-To: <20130408190645.29570fe5@serenity>
 References: <1363946761-7449-1-git-send-email-anisse@astier.eu>
 	<51629BFF.1080204@suse.cz>
+	<20130408190645.29570fe5@serenity>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8BIT
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Michal Marek <mmarek@suse.cz>
 Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, maximilian attems <max@stro.at>
 
-On Mon, 08 Apr 2013 12:29:19 +0200, Michal Marek <mmarek@suse.cz> wrote :
 
-> On 22.3.2013 11:06, Anisse Astier wrote:
-> > This can reduce almost 3 times the size of the linux-image package,
-> > while keeping the debug symbols available for this particular build, in
-> > their own package.
-> > 
-> > This mimics the way kernels are built in debian, ubuntu, or with
-> > make-kpkg, and comes at the price of a small slowdown in the building of
-> > packages.
-> 
-> Shouldn't the debug subpackage only be created if CONFIG_DEBUG_INFO=y?
-> 
 
-Indeed. V2 below.
-
-From f1720076261a35ff82f2635979d15e5ec572356c Mon Sep 17 00:00:00 2001
 From: Anisse Astier <anisse@astier.eu>
-Date: Thu, 21 Mar 2013 14:01:25 +0100
-Subject: [PATCH v2] deb-pkg: split debug symbols in their own package
+Subject: [PATCH v3] deb-pkg: split debug symbols in their own package
 
 This can reduce almost 3 times the size of the linux-image package,
 while keeping the debug symbols available for this particular build, in
@@ -55,14 +40,22 @@ v2:
  - build debug package last.
  - more verbose package description
  - put package in section debug
+v3:
+ - remove duplicate code from v2
 
 Signed-off-by: Anisse Astier <anisse@astier.eu>
 ---
- scripts/package/builddeb | 46 +++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 45 insertions(+), 1 deletion(-)
+
+Sorry for the mixup, there were duplicate mkdir declaration due to moving
+code around.
+
+
+---
+ scripts/package/builddeb | 43 ++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 42 insertions(+), 1 deletion(-)
 
 diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-index acb8650..3e11ad2 100644
+index acb8650..65ff0a4 100644
 --- a/scripts/package/builddeb
 +++ b/scripts/package/builddeb
 @@ -78,17 +78,21 @@ tmpdir="$objtree/debian/tmp"
@@ -120,15 +113,12 @@ index acb8650..3e11ad2 100644
  fi
  
  if [ "$ARCH" != "um" ]; then
-@@ -299,4 +321,26 @@ fi
+@@ -299,4 +321,23 @@ fi
  
  create_package "$packagename" "$tmpdir"
  
 +if [ -n "$BUILD_DEBUG" ] ; then
 +	# Build debug package
-+	mkdir -p "$dbg_dir/usr/share/doc/$dbg_packagename"
-+	mkdir -m 755 -p "$dbg_dir/DEBIAN"
-+
 +	mkdir -p $dbg_dir/usr/lib/debug/lib/modules/$version/
 +	cp vmlinux $dbg_dir/usr/lib/debug/lib/modules/$version/
 +
@@ -149,4 +139,5 @@ index acb8650..3e11ad2 100644
  exit 0
 -- 
 1.8.1.4
+
 
