@@ -1,143 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wg0-f53.google.com ([74.125.82.53]:45104 "EHLO
-	mail-wg0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S936498Ab3DIKGN (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 9 Apr 2013 06:06:13 -0400
-Received: by mail-wg0-f53.google.com with SMTP id c11so6608053wgh.8
-        for <linux-kbuild@vger.kernel.org>; Tue, 09 Apr 2013 03:06:11 -0700 (PDT)
-Date: Tue, 9 Apr 2013 12:05:47 +0200
-From: Anisse Astier <anisse@astier.eu>
-Subject: Re: [PATCH 1/2] deb-pkg: split debug symbols in their own package
-Message-ID: <20130409120547.64ad0d50@serenity>
-In-Reply-To: <20130408190645.29570fe5@serenity>
-References: <1363946761-7449-1-git-send-email-anisse@astier.eu>
-	<51629BFF.1080204@suse.cz>
-	<20130408190645.29570fe5@serenity>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Received: from cantor2.suse.de ([195.135.220.15]:49547 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1761639Ab3DIKwh (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 9 Apr 2013 06:52:37 -0400
+Message-ID: <5163F2F0.1070405@suse.cz>
+Date: Tue, 09 Apr 2013 12:52:32 +0200
+From: Michal Marek <mmarek@suse.cz>
+MIME-Version: 1.0
+Subject: Re: [PATCH 3/3] convert headers_install.pl to headers_install.sh
+References: <1361944667.959170@landley.net> <512F130C.5020002@suse.cz>
+In-Reply-To: <512F130C.5020002@suse.cz>
+Content-Type: text/plain; charset=ISO-8859-2
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, maximilian attems <max@stro.at>
+To: Rob Landley <rob@landley.net>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>, Josh Boyer <jwboyer@redhat.com>, "Paul E. McKenney" <paulmck@linux.vnet.ibm.com>, Andrew Morton <akpm@linux-foundation.org>, David Howells <dhowell@redhat.com>, Sam Ravnborg <sam@ravnborg.org>
 
+On 28.2.2013 09:19, Michal Marek wrote:
+> On 27.2.2013 06:58, Rob Landley wrote:
+>> From: Rob Landley <rob@landley.net>
+>>
+>> Remove perl from make headers_install by replacing a perl script (doing
+>> a simple regex search and replace) with a smaller, faster, simpler,
+>> POSIX-2008 shell script implementation.  The new shell script is a single
+>> for loop calling sed and piping its output through unifdef to produce the
+>> target file.
+>>
+>> Same as last time except for minor tweak to deal with code review from here:
+>> http://lkml.indiana.edu/hypermail/linux/kernel/1302.3/00078.html
+>>
+>> (Note that this drops the "arch" argument, which isn't used. Kbuild
+>> already points to the right input files on the command line.)
+>>
+>> Signed-off-by: Rob Landley <rob@landley.net>
+> 
+> Looks good, I will apply it after v3.9-rc1 is out.
 
+I forgot to do it right after rc1, but I took the patch from the mm tree
+now. I also added Sam's Ack from the earlier submission.
 
-From: Anisse Astier <anisse@astier.eu>
-Subject: [PATCH v3] deb-pkg: split debug symbols in their own package
-
-This can reduce almost 3 times the size of the linux-image package,
-while keeping the debug symbols available for this particular build, in
-their own package.
-
-This mimics the way kernels are built in debian, ubuntu, or with
-make-kpkg, and comes at the price of a small slowdown in the building of
-packages.
-
-v2:
- - only build when CONFIG_DEBUG_INFO=y
- - build debug package last.
- - more verbose package description
- - put package in section debug
-v3:
- - remove duplicate code from v2
-
-Signed-off-by: Anisse Astier <anisse@astier.eu>
----
-
-Sorry for the mixup, there were duplicate mkdir declaration due to moving
-code around.
-
-
----
- scripts/package/builddeb | 43 ++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 42 insertions(+), 1 deletion(-)
-
-diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-index acb8650..65ff0a4 100644
---- a/scripts/package/builddeb
-+++ b/scripts/package/builddeb
-@@ -78,17 +78,21 @@ tmpdir="$objtree/debian/tmp"
- fwdir="$objtree/debian/fwtmp"
- kernel_headers_dir="$objtree/debian/hdrtmp"
- libc_headers_dir="$objtree/debian/headertmp"
-+dbg_dir="$objtree/debian/dbgtmp"
- packagename=linux-image-$version
- fwpackagename=linux-firmware-image
- kernel_headers_packagename=linux-headers-$version
- libc_headers_packagename=linux-libc-dev
-+dbg_packagename=$packagename-dbg
- 
- if [ "$ARCH" = "um" ] ; then
- 	packagename=user-mode-linux-$version
- fi
- 
-+BUILD_DEBUG="$(grep -s '^CONFIG_DEBUG_INFO=y' .config || true)"
-+
- # Setup the directory structure
--rm -rf "$tmpdir" "$fwdir" "$kernel_headers_dir" "$libc_headers_dir"
-+rm -rf "$tmpdir" "$fwdir" "$kernel_headers_dir" "$libc_headers_dir" "$dbg_dir"
- mkdir -m 755 -p "$tmpdir/DEBIAN"
- mkdir -p  "$tmpdir/lib" "$tmpdir/boot" "$tmpdir/usr/share/doc/$packagename"
- mkdir -m 755 -p "$fwdir/DEBIAN"
-@@ -101,6 +105,10 @@ mkdir -p "$kernel_headers_dir/lib/modules/$version/"
- if [ "$ARCH" = "um" ] ; then
- 	mkdir -p "$tmpdir/usr/lib/uml/modules/$version" "$tmpdir/usr/bin"
- fi
-+if [ -n "$BUILD_DEBUG" ] ; then
-+	mkdir -p "$dbg_dir/usr/share/doc/$dbg_packagename"
-+	mkdir -m 755 -p "$dbg_dir/DEBIAN"
-+fi
- 
- # Build and install the kernel
- if [ "$ARCH" = "um" ] ; then
-@@ -128,6 +136,20 @@ if grep -q '^CONFIG_MODULES=y' .config ; then
- 		mv "$tmpdir/lib/modules/$version"/* "$tmpdir/usr/lib/uml/modules/$version/"
- 		rmdir "$tmpdir/lib/modules/$version"
- 	fi
-+	if [ -n "$BUILD_DEBUG" ] ; then
-+		(
-+			cd $tmpdir
-+			for module in $(find lib/modules/ -name *.ko); do
-+				mkdir -p $(dirname $dbg_dir/usr/lib/debug/$module)
-+				# only keep debug symbols in the debug file
-+				objcopy --only-keep-debug $module $dbg_dir/usr/lib/debug/$module
-+				# strip original module from debug symbols
-+				objcopy --strip-debug $module
-+				# then add a link to those
-+				objcopy --add-gnu-debuglink=$dbg_dir/usr/lib/debug/$module $module
-+			done
-+		)
-+	fi
- fi
- 
- if [ "$ARCH" != "um" ]; then
-@@ -299,4 +321,23 @@ fi
- 
- create_package "$packagename" "$tmpdir"
- 
-+if [ -n "$BUILD_DEBUG" ] ; then
-+	# Build debug package
-+	mkdir -p $dbg_dir/usr/lib/debug/lib/modules/$version/
-+	cp vmlinux $dbg_dir/usr/lib/debug/lib/modules/$version/
-+
-+	cat <<EOF >> debian/control
-+
-+Package: $dbg_packagename
-+Section: debug
-+Provides: linux-debug, linux-debug-$version
-+Architecture: any
-+Description: Linux kernel debugging symbols for $version
-+ This package will come in handy if you need to debug the kernel. It provides
-+ all the necessary debug symbols for the kernel and its modules.
-+EOF
-+
-+	create_package "$dbg_packagename" "$dbg_dir"
-+fi
-+
- exit 0
--- 
-1.8.1.4
-
-
+Michal
