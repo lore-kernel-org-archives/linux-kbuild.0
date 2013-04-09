@@ -1,39 +1,92 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from us02smtp2.synopsys.com ([198.182.60.77]:64215 "EHLO
-	alvesta.synopsys.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752257Ab3DIOKz (ORCPT
+Received: from mail-ob0-f178.google.com ([209.85.214.178]:37641 "EHLO
+	mail-ob0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S936063Ab3DIUPg (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 9 Apr 2013 10:10:55 -0400
-Message-ID: <51642158.3070205@synopsys.com>
-Date: Tue, 9 Apr 2013 19:40:32 +0530
-From: Vineet Gupta <Vineet.Gupta1@synopsys.com>
+	Tue, 9 Apr 2013 16:15:36 -0400
+Message-ID: <516476E4.3050206@gmail.com>
+Date: Tue, 09 Apr 2013 15:15:32 -0500
+From: Rob Herring <robherring2@gmail.com>
 MIME-Version: 1.0
-Subject: Re: [PATCH] Kbuild: Avoid DTB rebuilds if source files are untouched
-References: <1364973141-16354-1-git-send-email-vgupta@synopsys.com> <515BD6B8.1020607@synopsys.com> <515C5652.8070705@wwwdotorg.org> <515D0FFB.4030803@synopsys.com> <515DBA0E.6000604@wwwdotorg.org>
-In-Reply-To: <515DBA0E.6000604@wwwdotorg.org>
-Content-Type: text/plain; charset="ISO-8859-1"
+Subject: Re: [GIT PULL] dt: run C pre-processor on *.dts, create some standard
+ headers
+References: <1365187610-29422-1-git-send-email-swarren@wwwdotorg.org>
+In-Reply-To: <1365187610-29422-1-git-send-email-swarren@wwwdotorg.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Stephen Warren <swarren@wwwdotorg.org>
-Cc: "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>, linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Stephen Warren <swarren@nvidia.com>, Grant Likely <grant.likely@secretlab.ca>, linux-kbuild@vger.kernel.org
+Cc: Michal Marek <mmarek@suse.cz>, Grant Likely <glikely@secretlab.ca>, linux-kbuild@vger.kernel.org, devicetree-discuss@lists.ozlabs.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 
-On 04/04/2013 11:06 PM, Stephen Warren wrote:
-
-> +.SECONDARY: $(obj)/%.dtb.S
-> +
->  $(obj)/%.dtb.S: $(obj)/%.dtb
->         $(call cmd,dt_S_dtb)
+On 04/05/2013 01:46 PM, Stephen Warren wrote:
+> Rob, it might be worth keeping this in a separate branch in linux-next
+> so you can pull it out if it causes any issues. I've been using these
+> patches for quite a while now, but there's always opportunity for
+> surprises on architectures I don't use. I did just fix a bug when
+> building with O= a few days back, hence the V2 that I posted as patches.
 > 
-> and no longer see make rm'ing the .dtb.S file. So, the .SECONDARY is
-> behaving as expected, and should fix your problem.
 
-Interestingly, if I make the file name explicit, .SECONDARY works for me too.
+Pulled into my for-next branch.
 
-.SECONDARY: $(obj)/angel4.dtb.S
+Rob
 
-http://stackoverflow.com/questions/5426934/why-this-makefile-removes-my-goal
+> ----------------------------------------------------------------
+> 
+> This branch enhances the support for running dtc on device tree files.
+> 
+> A dedicated directory is created for header files that provide constants
+> for device-tree bindings.
+> 
+> The kbuild dependency script processor is enhanced to support processing
+> the dependency outputs from multiple separate commands at once.
+> 
+> The kbuild dtc rule is modified so that the C pre-processor is always
+> applied when compiling any device tree.
+> 
+> Some standard headers are created which define common constants for GPIO,
+> IRQ, and ARM GIC device tree bindings.
+> 
+> ----------------------------------------------------------------
+> 
+> The following changes since commit 6dbe51c251a327e012439c4772097a13df43c5b8:
+> 
+>   Linux 3.9-rc1
+> 
+> are available in the git repository at:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/swarren/linux-tegra.git tegra-for-3.10-dtc-cpp-chroot-std-headers
+> 
+> for you to fetch changes up to 4be505d4fc7a07371a2b658469ca1dda99993ca3:
+> 
+>   ARM: dt: create a DT header for the GIC
+> 
+> ----------------------------------------------------------------
+> 
+> Stephen Warren (7):
+>       kbuild: create an "include chroot" for DT bindings
+>       kbuild: fixdep: support concatenated dep files
+>       kbuild: cmd_dtc_cpp: extract deps from both gcc -E and dtc
+>       kbuild: always run gcc -E on *.dts, remove cmd_dtc_cpp
+>       ARM: dt: add header to define GPIO flags
+>       ARM: dt: add header to define IRQ flags
+>       ARM: dt: create a DT header for the GIC
+> 
+>  arch/arm/boot/dts/include/dt-bindings           |    1 +
+>  include/dt-bindings/gpio/gpio.h                 |   15 +++
+>  .../dt-bindings/interrupt-controller/arm-gic.h  |   22 +++++
+>  include/dt-bindings/interrupt-controller/irq.h  |   19 ++++
+>  scripts/Makefile.lib                            |   17 ++--
+>  scripts/basic/fixdep.c                          |   93 ++++++++++++------
+>  6 files changed, 125 insertions(+), 42 deletions(-)
+>  create mode 120000 arch/arm/boot/dts/include/dt-bindings
+>  create mode 100644 include/dt-bindings/gpio/gpio.h
+>  create mode 100644 include/dt-bindings/interrupt-controller/arm-gic.h
+>  create mode 100644 include/dt-bindings/interrupt-controller/irq.h
+> _______________________________________________
+> devicetree-discuss mailing list
+> devicetree-discuss@lists.ozlabs.org
+> https://lists.ozlabs.org/listinfo/devicetree-discuss
+> 
+> 
 
-Is this a make bug or is it related to when the rule is parsed by make !
-
--Vineet
