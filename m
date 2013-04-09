@@ -1,43 +1,110 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:49547 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1761639Ab3DIKwh (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 9 Apr 2013 06:52:37 -0400
-Message-ID: <5163F2F0.1070405@suse.cz>
-Date: Tue, 09 Apr 2013 12:52:32 +0200
-From: Michal Marek <mmarek@suse.cz>
+Received: from mail-we0-f170.google.com ([74.125.82.170]:56883 "EHLO
+	mail-we0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1759240Ab3DIMDA (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 9 Apr 2013 08:03:00 -0400
+Received: by mail-we0-f170.google.com with SMTP id z2so5417687wey.29
+        for <linux-kbuild@vger.kernel.org>; Tue, 09 Apr 2013 05:02:59 -0700 (PDT)
+Date: Tue, 9 Apr 2013 14:02:54 +0200
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Subject: Re: [PATCH] kconfig: do randomise choice entries in presence of
+ KCONFIG_ALLCONFIG
+Message-ID: <20130409120254.GA6418@free.fr>
+References: <20130227214102.6d63544d@skate>
+ <1362931313-31829-1-git-send-email-yann.morin.1998@free.fr>
+ <20130408115235.GA7741@free.fr>
 MIME-Version: 1.0
-Subject: Re: [PATCH 3/3] convert headers_install.pl to headers_install.sh
-References: <1361944667.959170@landley.net> <512F130C.5020002@suse.cz>
-In-Reply-To: <512F130C.5020002@suse.cz>
-Content-Type: text/plain; charset=ISO-8859-2
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20130408115235.GA7741@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Rob Landley <rob@landley.net>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>, Josh Boyer <jwboyer@redhat.com>, "Paul E. McKenney" <paulmck@linux.vnet.ibm.com>, Andrew Morton <akpm@linux-foundation.org>, David Howells <dhowell@redhat.com>, Sam Ravnborg <sam@ravnborg.org>
+To: linux-kbuild@vger.kernel.org
+Cc: Michal Marek <mmarek@suse.cz>, Sam Ravnborg <sam@ravnborg.org>, Arnaud Lacombe <lacombar@gmail.com>, Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
 
-On 28.2.2013 09:19, Michal Marek wrote:
-> On 27.2.2013 06:58, Rob Landley wrote:
->> From: Rob Landley <rob@landley.net>
->>
->> Remove perl from make headers_install by replacing a perl script (doing
->> a simple regex search and replace) with a smaller, faster, simpler,
->> POSIX-2008 shell script implementation.  The new shell script is a single
->> for loop calling sed and piping its output through unifdef to produce the
->> target file.
->>
->> Same as last time except for minor tweak to deal with code review from here:
->> http://lkml.indiana.edu/hypermail/linux/kernel/1302.3/00078.html
->>
->> (Note that this drops the "arch" argument, which isn't used. Kbuild
->> already points to the right input files on the command line.)
->>
->> Signed-off-by: Rob Landley <rob@landley.net>
-> 
-> Looks good, I will apply it after v3.9-rc1 is out.
+On Mon, Apr 08, 2013 at 01:52:35PM +0200, Yann E. MORIN wrote:
+> On Sun, Mar 10, 2013 at 05:01:53PM +0100, Yann E. MORIN wrote:
+> > Currently, randconfig does randomise choice entries, unless KCONFIG_ALLCONFIG
+> > is specified.
+[--SNIP--]
+> Although this patch does fix the suggested test-case, there are more
+> complex situations where this patch is not enough. (I need to shrink down
+> the currently failing Kconfig file to the smallest possible test-case).
 
-I forgot to do it right after rc1, but I took the patch from the mm tree
-now. I also added Sam's Ack from the earlier submission.
+Here is a newer, worse test-case (with my patch applied ontop Michal's
+kbuild/kconfig tree):
 
-Michal
+---8<--- config.in
+    config A
+        bool "A"
+    
+    if A
+    choice
+        bool "B/C"
+    config B
+        bool "B"
+    config C
+        bool "C"
+    endchoice
+    endif # A
+    
+    if B
+    choice
+        bool "D/E"
+    config D
+        bool "D"
+    config E
+        bool "E"
+    endchoice
+    endif # B
+---8<---
+
+With an empty './defconfig' file:
+    KCONFIG_ALLCONFIG=defconfig conf --randconfig config.in
+will sometime emit a .config with *both* B=y and C=y although they are
+mutually exclusive, being in a choice block.
+
+However, if the two choices are inverted:
+
+---8<--- config.in
+    config A
+        bool "A"
+    
+    if B
+    choice
+        bool "D/E"
+    config D
+        bool "D"
+    config E
+        bool "E"
+    endchoice
+    endif # B
+    
+    if A
+    choice
+        bool "B/C"
+    config B
+        bool "B"
+    config C
+        bool "C"
+    endchoice
+    endif # A
+---8<---
+
+Then --randconfig will properly randomise *both* choices!
+
+Note: if my patch is not applied, then only B will ever be selected, and
+C will never be.
+
+Regards,
+Yann E. MORIN.
+
+-- 
+.-----------------.--------------------.------------------.--------------------.
+|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
+| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
+| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
+| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
+'------------------------------^-------^------------------^--------------------'
